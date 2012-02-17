@@ -10,8 +10,6 @@
 class HDHRChannel;
 class HDHRStreamHandler;
 
-typedef QMap<uint,int> FilterMap;
-
 class HDHRSignalMonitor: public DTVSignalMonitor
 {
   public:

@@ -50,31 +50,6 @@ class PhrasePopup : public MythScreenType
     MythUIButton     *m_recordButton;
 };
 
-class TimePopup : public MythScreenType
-{
-    Q_OBJECT
-
-  public:
-    TimePopup(MythScreenStack *parentStack, ProgLister *parent);
-
-    bool Create();
-
-  signals:
-    void haveResult(QDateTime time);
-
-  private slots:
-    void okClicked(void);
-
-  private:
-    ProgLister      *m_parent;
-    QStringList      m_list;
-    QString          m_currentValue;
-
-    MythUIButtonList *m_dateList;
-    MythUIButtonList *m_timeList;
-    MythUIButton     *m_okButton;
-};
-
 class PowerSearchPopup : public MythScreenType
 {
     Q_OBJECT

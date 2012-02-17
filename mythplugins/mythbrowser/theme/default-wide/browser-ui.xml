@@ -215,6 +215,9 @@
                     </shape>
                 </state>
                 <state name="selectedinactive" from="active">
+                    <shape name="selectbar">
+                        <area>30,0,1130,30</area>
+                    </shape>
                     <textarea name="name">
                         <font>basesmallpurple</font>
                     </textarea>

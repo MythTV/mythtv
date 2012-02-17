@@ -300,6 +300,7 @@ static MythGenericTree *AddDirNode(MythGenericTree *where_to_add,
     sub_node->setOrderingIndex(kNodeSort);
     sub_node->SetData(QVariant::fromValue(TreeNodeData(fqPath, host, prefix)));
     sub_node->SetText(name, "title");
+    sub_node->DisplayState("subfolder", "nodetype");
 
     // ...and the updir node.
     if (add_up_dirs)
@@ -309,6 +310,7 @@ static MythGenericTree *AddDirNode(MythGenericTree *where_to_add,
                                   true, false);
         up_node->setAttribute(kNodeSort, kOrderUp);
         up_node->setOrderingIndex(kNodeSort);
+        up_node->DisplayState("subfolder", "nodetype");
     }
 
     return sub_node;
@@ -321,31 +323,22 @@ static int AddFileNode(MythGenericTree *where_to_add, QString name,
     sub_node->setAttribute(kNodeSort, kOrderItem);
     sub_node->setOrderingIndex(kNodeSort);
     sub_node->SetData(QVariant::fromValue(TreeNodeData(metadata)));
+
+    // Text
     QHash<QString, QString> textMap;
     metadata->toMap(textMap);
     sub_node->SetTextFromMap(textMap);
-    if (!metadata->GetHost().isEmpty())
-    {
-        QString coverart = generate_file_url("Coverart",
-                                             metadata->GetHost(), metadata->GetCoverFile());
-        sub_node->SetImage(coverart, "coverart");
-        QString banner = generate_file_url("Banners",
-                                           metadata->GetHost(), metadata->GetBanner());
-        sub_node->SetImage(banner, "banner");
-        QString fanart = generate_file_url("Fanart",
-                                           metadata->GetHost(), metadata->GetFanart());
-        sub_node->SetImage(fanart, "fanart");
-        QString screenshot = generate_file_url("Screenshots",
-                                               metadata->GetHost(), metadata->GetScreenshot());
-        sub_node->SetImage(screenshot, "screenshot");
-    }
-    else
-    {
-        sub_node->SetImage(metadata->GetCoverFile(), "coverart");
-        sub_node->SetImage(metadata->GetBanner(), "banner");
-        sub_node->SetImage(metadata->GetFanart(), "fanart");
-        sub_node->SetImage(metadata->GetScreenshot(), "screenshot");
-    }
+
+    // Images
+    QHash<QString, QString> imageMap;
+    metadata->GetImageMap(imageMap);
+    sub_node->SetImageFromMap(imageMap);
+    sub_node->SetImage("buttonimage", imageMap["smartimage"]);
+
+    // Statetypes
+    QHash<QString, QString> stateMap;
+    metadata->GetStateMap(stateMap);
+    sub_node->DisplayStateFromMap(stateMap);
 
     return 1;
 }
@@ -594,13 +587,18 @@ void VideoListImp::build_generic_tree(MythGenericTree *dst, meta_dir_node *src,
         {
             QString seas = QString::number((*entry)->getData()->GetSeason());
             QString ep = QString::number((*entry)->getData()->GetEpisode());
-            QString tit = (*entry)->getData()->GetTitle();
-            QString sub = (*entry)->getData()->GetSubtitle();
+            QString title = (*entry)->getData()->GetTitle();
+            QString subtitle = (*entry)->getData()->GetSubtitle();
             if (ep.size() < 2)
                 ep.prepend("0");
-            QString TitSeasEpSub = QString("%1 %2x%3 - %4").arg(tit).arg(seas)
-                                                           .arg(ep).arg(sub);
-            AddFileNode(dst, TitSeasEpSub, (*entry)->getData());
+            QString displayTitle = QString("%1 %2x%3 - %4").arg(title).arg(seas)
+                                                           .arg(ep)
+                                                           .arg(subtitle);
+            if (src->getName() == title)
+                displayTitle = QString("%2x%3 - %4").arg(seas).arg(ep)
+                                                       .arg(subtitle);
+
+            AddFileNode(dst, displayTitle, (*entry)->getData());
         }
         else if ((*entry)->getData()->GetSubtitle().isEmpty())
             AddFileNode(dst, (*entry)->getData()->GetTitle(), (*entry)->getData());
@@ -1006,77 +1004,10 @@ void VideoListImp::buildDbList()
         video_root->setName("videos");
         ptnm.insert(prefix_to_node_map::value_type(test_prefix, video_root));
     }
-
-    smart_dir_node unknown_prefix_root(new meta_dir_node("",
-                                               QObject::tr("Unknown Prefix"),
-                                               NULL, true));
-
-    smart_dir_node sg_prefix_root(new meta_dir_node("",
-                                               QObject::tr("Storage Groups"),
-                                               NULL, true));
     meta_dir_node *insert_hint = NULL;
     for (metadata_view_list::iterator p = mlist.begin(); p != mlist.end(); ++p)
     {
-        bool found_prefix = false;
-        if ((*p)->GetFilename().startsWith(test_prefix))
-        {
-            found_prefix = true;
-        }
-        else
-        {
-            for (QStringList::const_iterator prefix = dirs.begin();
-                 prefix != dirs.end(); ++prefix)
-            {
-                if ((*p)->GetFilename().startsWith(*prefix))
-                {
-                    test_prefix = *prefix;
-                    found_prefix = true;
-                    break;
-                }
-            }
-        }
-
-        if (found_prefix)
-        {
-            meta_dir_node *insert_base;
-            prefix_to_node_map::iterator np = ptnm.find(test_prefix);
-            if (np == ptnm.end())
-            {
-                smart_dir_node sdn = video_root->addSubDir(test_prefix,
-                        path_to_node_name(test_prefix), (*p)->GetHost(),
-                        (*p)->GetPrefix());
-                insert_base = sdn.get();
-                insert_base->setPathRoot();
-
-                ptnm.insert(prefix_to_node_map::value_type(test_prefix,
-                                                           insert_base));
-            }
-            else
-            {
-                insert_base = np->second;
-            }
-
-            (*p)->SetPrefix(test_prefix);
-            insert_hint = AddMetadataToDir(*p, insert_base, insert_hint);
-        }
-        else if (!found_prefix && ((*p)->IsHostSet()))
-        {
-            AddMetadataToDir(*p, sg_prefix_root.get());
-        }
-        else
-        {
-            AddMetadataToDir(*p, unknown_prefix_root.get());
-        }
-    }
-
-    if (!sg_prefix_root->empty())
-    {
-        video_root->addSubDir(sg_prefix_root);
-    }
-
-    if (!unknown_prefix_root->empty())
-    {
-        video_root->addSubDir(unknown_prefix_root);
+        AddMetadataToDir(*p, video_root);
     }
 
 //    print_dir_tree(m_metadata_tree); // AEW DEBUG

@@ -52,8 +52,7 @@ static bool is_abbrev(QString const& command,
 }
 
 NetworkControl::NetworkControl() :
-    QTcpServer(),
-    prompt("# "),
+    ServerPool(), prompt("# "),
     gotAnswer(false), answer(""),
     clientLock(QMutex::Recursive),
     commandThread(new MThread("NetworkControl", this)),
@@ -224,7 +223,8 @@ NetworkControl::NetworkControl() :
 
     gCoreContext->addListener(this);
 
-    connect(this, SIGNAL(newConnection()), this, SLOT(newConnection()));
+    connect(this, SIGNAL(newConnection(QTcpSocket*)),
+            this, SLOT(newConnection(QTcpSocket*)));
 }
 
 NetworkControl::~NetworkControl(void)
@@ -232,8 +232,7 @@ NetworkControl::~NetworkControl(void)
     clientLock.lock();
     while (!clients.isEmpty())
     {
-        NetworkControlClient *ncc = clients.front();
-        clients.pop_front();
+        NetworkControlClient *ncc = clients.takeFirst();
         delete ncc;
     }
     clientLock.unlock();
@@ -252,17 +251,6 @@ NetworkControl::~NetworkControl(void)
     commandThread->wait();
     delete commandThread;
     commandThread = NULL;
-}
-
-bool NetworkControl::listen(const QHostAddress & address, quint16 port)
-{
-    if (QTcpServer::listen(address,port))
-    {
-        LOG(VB_GENERAL, LOG_INFO, LOC +
-            QString("Listening for remote connections on port %1").arg(port));
-        return true;
-    }
-    return false;
 }
 
 void NetworkControl::run(void)
@@ -353,7 +341,7 @@ void NetworkControl::deleteClient(NetworkControlClient *ncc)
                 "locate specified NetworkControlClient").arg((long long)ncc));
 }
 
-void NetworkControl::newConnection()
+void NetworkControl::newConnection(QTcpSocket *client)
 {
     QString welcomeStr;
 
@@ -361,7 +349,6 @@ void NetworkControl::newConnection()
 
     gCoreContext->SendSystemEvent("NET_CTRL_CONNECTED");
 
-    QTcpSocket           *client = this->nextPendingConnection();
     NetworkControlClient *ncc = new NetworkControlClient(client);
 
     QMutexLocker locker(&clientLock);

@@ -12,6 +12,7 @@
 
 // mythui headers
 #include "mythmainwindow.h"
+#include "mythuiscrollbar.h"
 #include "mythuistatetype.h"
 #include "lcddevice.h"
 #include "mythuibutton.h"
@@ -24,17 +25,19 @@ MythUIButtonList::MythUIButtonList(MythUIType *parent, const QString &name)
     : MythUIType(parent, name)
 {
     m_showArrow = true;
+    m_showScrollBar = true;
 
     Const();
 }
 
 MythUIButtonList::MythUIButtonList(MythUIType *parent, const QString &name,
                                    const QRect &area, bool showArrow,
-                                   bool showScrollArrows)
+                                   bool showScrollArrows, bool showScrollBar)
     : MythUIType(parent, name)
 {
     m_Area      = area;
     m_showArrow = showArrow;
+    m_showScrollBar = showScrollBar;
 
     Const();
 }
@@ -79,6 +82,7 @@ void MythUIButtonList::Const(void)
     m_searchStartsWith = false;
 
     m_upArrow = m_downArrow = NULL;
+    m_scrollBar = NULL;
 
     m_buttontemplate = NULL;
 
@@ -1372,8 +1376,6 @@ void MythUIButtonList::SetPositionArrowStates()
     if (m_clearing)
         return;
 
-    m_needsUpdate = false;
-
     // set topitem, top position
     SanitizePosition();
     m_ButtonToItem.clear();
@@ -1565,6 +1567,13 @@ QVariant MythUIButtonList::GetDataValue() const
     return QVariant();
 }
 
+MythRect MythUIButtonList::GetButtonArea(void) const
+{
+    if (m_contentsRect.isValid())
+        return m_contentsRect;
+    return m_Area;
+}
+
 MythUIButtonListItem *MythUIButtonList::GetItemFirst() const
 {
     if (!m_itemList.empty())
@@ -1592,7 +1601,11 @@ int MythUIButtonList::GetCount() const
 uint MythUIButtonList::GetVisibleCount()
 {
     if (m_needsUpdate)
+    {
         SetPositionArrowStates();
+        SetScrollBarPosition();
+        m_needsUpdate = false;
+    }
 
     return m_itemsVisible;
 }
@@ -2157,6 +2170,7 @@ void MythUIButtonList::Init()
 
     m_upArrow = dynamic_cast<MythUIStateType *>(GetChild("upscrollarrow"));
     m_downArrow = dynamic_cast<MythUIStateType *>(GetChild("downscrollarrow"));
+    m_scrollBar = dynamic_cast<MythUIScrollBar *>(GetChild("scrollbar"));
 
     if (m_upArrow)
         m_upArrow->SetVisible(true);
@@ -2164,15 +2178,18 @@ void MythUIButtonList::Init()
     if (m_downArrow)
         m_downArrow->SetVisible(true);
 
+    if (m_scrollBar)
+        m_scrollBar->SetVisible(m_showScrollBar);
+
     m_contentsRect.CalculateArea(m_Area);
 
     m_buttontemplate = dynamic_cast<MythUIStateType *>(GetChild("buttonitem"));
 
     if (!m_buttontemplate)
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Statetype buttonitem is required in "
-                                         "mythuibuttonlist: %1")
-            .arg(objectName()));
+        LOG(VB_GENERAL, LOG_ERR, QString("(%1) Statetype buttonitem is "
+                                         "required in mythuibuttonlist: %2")
+            .arg(GetXMLLocation()).arg(objectName()));
         return;
     }
 
@@ -2390,34 +2407,8 @@ bool MythUIButtonList::keyPressEvent(QKeyEvent *e)
         }
         else if (action == "SEARCH")
         {
-            MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-
-            SearchButtonListDialog *dlg = new SearchButtonListDialog(popupStack, "MythSearchListDialog", this, "");
-
-            if (dlg->Create())
-            {
-                if (m_searchPosition.x() != -2 || m_searchPosition.y() != -2)
-                {
-                    int x = m_searchPosition.x();
-                    int y = m_searchPosition.y();
-                    QRect screenArea = GetMythMainWindow()->GetUIScreenRect();
-                    QRect dialogArea = dlg->GetArea();
-
-                    if (x == -1)
-                        x = (screenArea.width() - dialogArea.width()) / 2;
-
-                    if (y == -1)
-                        y = (screenArea.height() - dialogArea.height()) / 2;
-
-                    dlg->SetPosition(x, y);
-                }
-
-                popupStack->AddScreen(dlg);
-            }
-            else
-                delete dlg;
+            ShowSearchDialog();
         }
-
         else
             handled = false;
     }
@@ -2526,6 +2517,21 @@ void MythUIButtonList::CalculateVisibleItems(void)
     m_itemsVisible = m_columns * m_rows;
 }
 
+void MythUIButtonList::SetButtonArea(const MythRect &rect)
+{
+    if (rect == m_contentsRect)
+        return;
+
+    m_contentsRect = rect;
+
+    if (m_Area.isValid())
+        m_contentsRect.CalculateArea(m_Area);
+    else if (m_Parent)
+        m_contentsRect.CalculateArea(m_Parent->GetFullArea());
+    else
+        m_contentsRect.CalculateArea(GetMythMainWindow()->GetUIScreenRect());
+}
+
 /**
  *  \copydoc MythUIType::ParseElement()
  */
@@ -2533,7 +2539,7 @@ bool MythUIButtonList::ParseElement(
     const QString &filename, QDomElement &element, bool showWarnings)
 {
     if (element.tagName() == "buttonarea")
-        m_contentsRect = parseRect(element);
+        SetButtonArea(parseRect(element));
     else if (element.tagName() == "layout")
     {
         QString layout = getFirstText(element).toLower();
@@ -2592,6 +2598,8 @@ bool MythUIButtonList::ParseElement(
     }
     else if (element.tagName() == "showarrow")
         m_showArrow = parseBool(element);
+    else if (element.tagName() == "showscrollbar")
+        m_showScrollBar = parseBool(element);
     else if (element.tagName() == "spacing")
     {
         m_itemHorizSpacing = NormX(getFirstText(element).toInt());
@@ -2642,7 +2650,11 @@ bool MythUIButtonList::ParseElement(
 void MythUIButtonList::DrawSelf(MythPainter *, int, int, int, QRect)
 {
     if (m_needsUpdate)
+    {
         SetPositionArrowStates();
+        SetScrollBarPosition();
+        m_needsUpdate = false;
+    }
 }
 
 /**
@@ -2679,6 +2691,7 @@ void MythUIButtonList::CopyFrom(MythUIType *base)
 
     m_active = lb->m_active;
     m_showArrow = lb->m_showArrow;
+    m_showScrollBar = lb->m_showScrollBar;
 
     m_drawFromBottom = lb->m_drawFromBottom;
 
@@ -2695,6 +2708,7 @@ void MythUIButtonList::CopyFrom(MythUIType *base)
 
     m_upArrow = dynamic_cast<MythUIStateType *>(GetChild("upscrollarrow"));
     m_downArrow = dynamic_cast<MythUIStateType *>(GetChild("downscrollarrow"));
+    m_scrollBar = dynamic_cast<MythUIScrollBar *>(GetChild("scrollbar"));
 
     for (int i = 0; i < (int)m_itemsVisible; i++)
     {
@@ -2787,6 +2801,36 @@ void MythUIButtonList::updateLCD(void)
 
     if (!menuItems.isEmpty())
         lcddev->switchToMenu(menuItems, m_lcdTitle);
+}
+
+void MythUIButtonList::ShowSearchDialog(void)
+{
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+
+    SearchButtonListDialog *dlg = new SearchButtonListDialog(popupStack, "MythSearchListDialog", this, "");
+
+    if (dlg->Create())
+    {
+        if (m_searchPosition.x() != -2 || m_searchPosition.y() != -2)
+        {
+            int x = m_searchPosition.x();
+            int y = m_searchPosition.y();
+            QRect screenArea = GetMythMainWindow()->GetUIScreenRect();
+            QRect dialogArea = dlg->GetArea();
+
+            if (x == -1)
+                x = (screenArea.width() - dialogArea.width()) / 2;
+
+            if (y == -1)
+                y = (screenArea.height() - dialogArea.height()) / 2;
+
+            dlg->SetPosition(x, y);
+        }
+
+        popupStack->AddScreen(dlg);
+    }
+    else
+        delete dlg;
 }
 
 bool MythUIButtonList::Find(const QString &searchStr, bool startsWith)
@@ -2946,7 +2990,7 @@ void MythUIButtonListItem::SetText(const QString &text, const QString &name,
         m_parent->Update();
 }
 
-void MythUIButtonListItem::SetTextFromMap(QHash<QString, QString> &infoMap,
+void MythUIButtonListItem::SetTextFromMap(InfoMap &infoMap,
                                           const QString &state)
 {
     QHash<QString, QString>::iterator map_it = infoMap.begin();
@@ -3097,7 +3141,7 @@ void MythUIButtonListItem::setImage(MythImage *image, const QString &name)
         m_parent->Update();
 }
 
-void MythUIButtonListItem::SetImageFromMap(const QMap<QString, QString> &imageMap)
+void MythUIButtonListItem::SetImageFromMap(const InfoMap &imageMap)
 {
     m_imageFilenames.clear();
     m_imageFilenames = imageMap;
@@ -3125,7 +3169,7 @@ void MythUIButtonListItem::SetImage(
 
     if (!name.isEmpty())
     {
-        QMap<QString, QString>::iterator it = m_imageFilenames.find(name);
+        InfoMap::iterator it = m_imageFilenames.find(name);
 
         if (it == m_imageFilenames.end())
         {
@@ -3153,7 +3197,7 @@ QString MythUIButtonListItem::GetImage(const QString &name) const
     if (name.isEmpty())
         return m_imageFilename;
 
-    QMap<QString, QString>::const_iterator it = m_imageFilenames.find(name);
+    InfoMap::const_iterator it = m_imageFilenames.find(name);
 
     if (it != m_imageFilenames.end())
         return *it;
@@ -3168,7 +3212,7 @@ void MythUIButtonListItem::DisplayState(const QString &state,
         return;
 
     bool do_update = false;
-    QMap<QString, QString>::iterator it = m_states.find(name);
+    InfoMap::iterator it = m_states.find(name);
 
     if (it == m_states.end())
     {
@@ -3183,6 +3227,12 @@ void MythUIButtonListItem::DisplayState(const QString &state,
 
     if (m_parent && do_update)
         m_parent->Update();
+}
+
+void MythUIButtonListItem::SetStatesFromMap(const InfoMap &stateMap)
+{
+    m_states.clear();
+    m_states = stateMap;
 }
 
 bool MythUIButtonListItem::checkable() const
@@ -3378,7 +3428,7 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool selecte
     }
 
     MythUIImage *image;
-    QMap<QString, QString>::iterator imagefile_it = m_imageFilenames.begin();
+    InfoMap::iterator imagefile_it = m_imageFilenames.begin();
 
     while (imagefile_it != m_imageFilenames.end())
     {
@@ -3408,7 +3458,7 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool selecte
     }
 
     MythUIStateType *statetype;
-    QMap<QString, QString>::iterator state_it = m_states.begin();
+    InfoMap::iterator state_it = m_states.begin();
 
     while (state_it != m_states.end())
     {
@@ -3521,4 +3571,17 @@ void SearchButtonListDialog::prevClicked(void)
 
     if (m_searchState)
         m_searchState->DisplayState(found ? "found" : "notfound");
+}
+
+void MythUIButtonList::SetScrollBarPosition()
+{
+    if (m_clearing || !m_scrollBar || !m_showScrollBar)
+        return;
+
+    int maximum = m_itemCount <= static_cast<int>(m_itemsVisible) ?
+        0 : m_itemCount;
+    m_scrollBar->SetMaximum(maximum);
+    m_scrollBar->SetPageStep(m_itemsVisible);
+    m_scrollBar->SetSliderPosition(m_selPosition);
+    m_scrollBar->MoveToTop();
 }

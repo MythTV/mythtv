@@ -136,6 +136,10 @@ class DTVRecorder :
     unsigned int _video_bytes_remaining;
     unsigned int _other_bytes_remaining;
 
+    // MPEG2 parser information
+    int _progressive_sequence;
+    int _repeat_pict;
+
     // H.264 support
     bool _pes_synced;
     bool _seen_sps;

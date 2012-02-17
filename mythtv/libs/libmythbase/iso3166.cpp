@@ -1,7 +1,7 @@
 
 #include "iso3166.h"
 
-static CodeToNameMap createCountryMap(void)
+static ISO3166ToNameMap createCountryMap(void)
 {
     // TODO: List is incomplete!
     // Translations manually extracted from Debian iso-codes repo.
@@ -13,7 +13,7 @@ static CodeToNameMap createCountryMap(void)
     // A number of other countries are simply missing e.g. Most of
     // central/southern Africa, Western Asia, S.E. Asia and various countries
     // in other regions
-    CodeToNameMap map;
+    ISO3166ToNameMap map;
     map["AE"] = QString::fromUtf8("الإمارات العربيّة المتحدّة");   // United Arab Emirates
     map["AR"] = QString::fromUtf8("Argentina");   // Argentina
     map["AT"] = QString::fromUtf8("Österreich");   // Austria
@@ -87,11 +87,11 @@ static CodeToNameMap createCountryMap(void)
     return map;
 }
 
-static CodeToNameMap gCountryMap;
+static ISO3166ToNameMap gCountryMap;
 
-static CodeToNameMap createEnglishCountryMap(void)
+static ISO3166ToNameMap createEnglishCountryMap(void)
 {
-    CodeToNameMap map;
+    ISO3166ToNameMap map;
     map["AD"] = QString::fromUtf8("Andorra");
     map["AE"] = QString::fromUtf8("United Arab Emirates");
     map["AF"] = QString::fromUtf8("Afghanistan");
@@ -334,14 +334,14 @@ static CodeToNameMap createEnglishCountryMap(void)
     return map;
 }
 
-static CodeToNameMap gEnglishCountryMap;
+static ISO3166ToNameMap gEnglishCountryMap;
 
 /**
  *  \brief Returns a map of ISO-3166 country codes mapped to the country name
  *         in English.
  *  \sa MythContext::GetLanguage()
  */
-CodeToNameMap GetISO3166EnglishCountryMap(void)
+ISO3166ToNameMap GetISO3166EnglishCountryMap(void)
 {
     if (gEnglishCountryMap.empty())
         gEnglishCountryMap = createEnglishCountryMap();
@@ -349,7 +349,7 @@ CodeToNameMap GetISO3166EnglishCountryMap(void)
     return gEnglishCountryMap;
 }
 
-QString GetISO3166EnglishCountryName(QString iso3166Code)
+QString GetISO3166EnglishCountryName(const QString &iso3166Code)
 {
     if (gEnglishCountryMap.empty())
         gEnglishCountryMap = createEnglishCountryMap();
@@ -357,7 +357,7 @@ QString GetISO3166EnglishCountryName(QString iso3166Code)
     return gEnglishCountryMap[iso3166Code];
 }
 
-CodeToNameMap GetISO3166CountryMap()
+ISO3166ToNameMap GetISO3166CountryMap(void)
 {
     if (gCountryMap.empty())
         gCountryMap = createCountryMap();
@@ -365,7 +365,7 @@ CodeToNameMap GetISO3166CountryMap()
     return gCountryMap;
 }
 
-QString GetISO3166CountryName(QString iso3166Code)
+QString GetISO3166CountryName(const QString &iso3166Code)
 {
     if (gCountryMap.empty())
         gCountryMap = createCountryMap();

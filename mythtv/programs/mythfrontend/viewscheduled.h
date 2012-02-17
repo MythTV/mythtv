@@ -34,9 +34,10 @@ class ViewScheduled : public ScheduleCommon
 
     static void * RunViewScheduled(void *player, bool);
 
-    bool Create(void);
-    bool keyPressEvent(QKeyEvent *);
-    void customEvent(QEvent*);
+    virtual bool Create(void); // MythScreenType
+    virtual void ShowMenu(void); // MythScreenType
+    virtual bool keyPressEvent(QKeyEvent *); // QObject
+    virtual void customEvent(QEvent*); // QObject
 
   protected slots:
     void ChangeGroup(MythUIButtonListItem *item);
@@ -51,16 +52,16 @@ class ViewScheduled : public ScheduleCommon
     void SwitchList(void);
     void Close(void);
 
-  private:
-    virtual void Load(void);
-    virtual void Init(void);
+  protected:
+    virtual void Load(void); // MythScreenType
+    virtual void Init(void); // MythScreenType
 
+  private:
     void FillList(void);
     void LoadList(bool useExistingData = false);
     void setShowAll(bool all);
     void viewCards(void);
     void viewInputs(void);
-    void ShowMenu(void);
 
     void EmbedTVWindow(void);
 

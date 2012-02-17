@@ -32,7 +32,6 @@ class META_PUBLIC ParentalLevel
     Level m_level;
     bool m_hitlimit;
 };
-Q_DECLARE_METATYPE(ParentalLevel*)
 
 META_PUBLIC bool operator!=(const ParentalLevel &lhs, const ParentalLevel &rhs);
 META_PUBLIC bool operator==(const ParentalLevel &lhs, const ParentalLevel &rhs);
@@ -59,6 +58,8 @@ class META_PUBLIC ParentalLevelChangeChecker : public QObject
   private:
     class ParentalLevelChangeCheckerPrivate *m_private;
 };
+
 Q_DECLARE_METATYPE(ParentalLevelChangeChecker*)
+Q_DECLARE_METATYPE(ParentalLevel*)
 
 #endif // PARENTALCONTROLS_H_

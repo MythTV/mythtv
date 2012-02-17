@@ -182,20 +182,13 @@ MSocketDevice::MSocketDevice(int socket, Type type)
 MSocketDevice::MSocketDevice(Type type)
         : fd(-1), t(type), p(0), pp(0), e(NoError),
         d(new MSocketDevicePrivate(Unknown))
-
-        //  d(new MSocketDevicePrivate(IPv4))
 {
 #if defined(MSOCKETDEVICE_DEBUG)
     qDebug("MSocketDevice: Created MSocketDevice object %p, type %d",
            this, type);
 #endif
     init();
-
-    // For the time being, if it's of type Datagram create the socket now
-    // rather than later during connect (since there wont be one with udp)
-
-    if (type == Datagram)
-        setSocket(createNewSocket(), type);
+    setSocket(createNewSocket(), type);
 }
 
 /*!

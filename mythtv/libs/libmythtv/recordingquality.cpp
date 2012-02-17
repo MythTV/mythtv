@@ -13,6 +13,7 @@ static double score_gaps(const ProgramInfo*, const RecordingGaps&);
 RecordingQuality::RecordingQuality(
     const ProgramInfo *pi, const RecordingGaps &rg,
     const QDateTime &first, const QDateTime &latest) :
+    m_continuity_error_count(0), m_packet_count(0),
     m_overall_score(1.0), m_recording_gaps(rg)
 {
     if (!pi)
@@ -29,7 +30,7 @@ RecordingQuality::RecordingQuality(
         if (start < first.GetEnd())
             first = RecordingGap(start, first.GetEnd());
         else
-            m_recording_gaps.erase(m_recording_gaps.begin());
+            m_recording_gaps.pop_front();
     }
 
     // trim end
@@ -38,10 +39,10 @@ RecordingQuality::RecordingQuality(
            m_recording_gaps.back().GetEnd() > end)
     {
         RecordingGap &back = m_recording_gaps.back();
-        if (end < back.GetEnd())
-            back = RecordingGap(end, back.GetEnd());
+        if (back.GetStart() < end)
+            back = RecordingGap(back.GetStart(), end);
         else
-            m_recording_gaps.erase(m_recording_gaps.begin());
+            m_recording_gaps.pop_back();
     }
 
     // account for late start

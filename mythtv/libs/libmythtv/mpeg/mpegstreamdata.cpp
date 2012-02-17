@@ -180,11 +180,11 @@ void MPEGStreamData::Reset(int desiredProgram)
     SetPATSingleProgram(NULL);
     SetPMTSingleProgram(NULL);
 
-    pid_pes_map_t old = _partial_pes_packet_cache;
-    pid_pes_map_t::iterator it = old.begin();
+    pid_psip_map_t old = _partial_psip_packet_cache;
+    pid_psip_map_t::iterator it = old.begin();
     for (; it != old.end(); ++it)
-        DeletePartialPES(it.key());
-    _partial_pes_packet_cache.clear();
+        DeletePartialPSIP(it.key());
+    _partial_psip_packet_cache.clear();
 
     _pids_listening.clear();
     _pids_notlistening.clear();
@@ -218,21 +218,21 @@ void MPEGStreamData::Reset(int desiredProgram)
     AddListeningPID(MPEG_PAT_PID);
 }
 
-void MPEGStreamData::DeletePartialPES(uint pid)
+void MPEGStreamData::DeletePartialPSIP(uint pid)
 {
-    pid_pes_map_t::iterator it = _partial_pes_packet_cache.find(pid);
-    if (it != _partial_pes_packet_cache.end())
+    pid_psip_map_t::iterator it = _partial_psip_packet_cache.find(pid);
+    if (it != _partial_psip_packet_cache.end())
     {
-        PESPacket *pkt = *it;
-        _partial_pes_packet_cache.erase(it);
+        PSIPTable *pkt = *it;
+        _partial_psip_packet_cache.erase(it);
         delete pkt;
     }
 }
 
 /** \fn MPEGStreamData::AssemblePSIP(const TSPacket*,bool&)
- *  \brief PES packet assembler.
+ *  \brief PSIP packet assembler.
  *
- *   This is not a general purpose TS->PES packet converter,
+ *   This is not a general purpose TS->PSIP packet converter,
  *   it is only designed to work with MPEG tables which comply
  *   with certain restrictions that simplify the conversion.
  *
@@ -256,18 +256,18 @@ PSIPTable* MPEGStreamData::AssemblePSIP(const TSPacket* tspacket,
     bool broken = true;
     moreTablePackets = true;
 
-    PESPacket* partial = GetPartialPES(tspacket->PID());
+    PSIPTable* partial = GetPartialPSIP(tspacket->PID());
     if (partial && partial->AddTSPacket(tspacket, broken) && !broken)
     {
         // check if it's safe to read pespacket's Length()
         if ((partial->PSIOffset() + 1 + 3) > partial->TSSizeInBuffer())
         {
             LOG(VB_RECORD, LOG_ERR,
-                QString("Discarding broken PES packet. Packet's length at "
+                QString("Discarding broken PSIP packet. Packet's length at "
                         "position %1 isn't in the buffer of %2 bytes.")
                     .arg(partial->PSIOffset() + 1 + 3)
                     .arg(partial->TSSizeInBuffer()));
-            DeletePartialPES(tspacket->PID());
+            DeletePartialPSIP(tspacket->PID());
             return NULL;
         }
 
@@ -277,8 +277,8 @@ PSIPTable* MPEGStreamData::AssemblePSIP(const TSPacket* tspacket,
          (TableID::PAT == partial->StreamID()));
         if (!buggy && !partial->IsGood())
         {
-            LOG(VB_SIPARSER, LOG_ERR, "Discarding broken PES packet");
-            DeletePartialPES(tspacket->PID());
+            LOG(VB_SIPARSER, LOG_ERR, "Discarding broken PSIP packet");
+            DeletePartialPSIP(tspacket->PID());
             return NULL;
         }
 
@@ -291,7 +291,7 @@ PSIPTable* MPEGStreamData::AssemblePSIP(const TSPacket* tspacket,
         {
             if (partial->pesdata()[psip->SectionLength()] != 0xff)
             {
-#if 0 /* This doesn't work, you can't start PES packet like this
+#if 0 /* This doesn't work, you can't start PSIP packet like this
          because the PayloadStart() flag won't be set in this TSPacket
          -- dtk  May 4th, 2007
        */
@@ -303,8 +303,8 @@ PSIPTable* MPEGStreamData::AssemblePSIP(const TSPacket* tspacket,
                      partial->TSSizeInBuffer() - TSPacket::PAYLOAD_SIZE))
                 {
                     // Saving will handle deleting the old one
-                    SavePartialPES(tspacket->PID(),
-                                   new PESPacket(*tspacket));
+                    SavePartialPSIP(tspacket->PID(),
+                                   new PSIPTable(*tspacket));
                 }
                 else
 #endif
@@ -319,7 +319,7 @@ PSIPTable* MPEGStreamData::AssemblePSIP(const TSPacket* tspacket,
         if (packetStart > partial->TSSizeInBuffer())
         {
             LOG(VB_RECORD, LOG_ERR,
-                QString("Discarding broken PES packet. ") +
+                QString("Discarding broken PSIP packet. ") +
                 QString("Packet with %1 bytes doesn't fit "
                         "into a buffer of %2 bytes.")
                     .arg(packetStart).arg(partial->TSSizeInBuffer()));
@@ -328,13 +328,13 @@ PSIPTable* MPEGStreamData::AssemblePSIP(const TSPacket* tspacket,
         }
 
         moreTablePackets = false;
-        DeletePartialPES(tspacket->PID());
+        DeletePartialPSIP(tspacket->PID());
         return psip;
     }
     else if (partial)
     {
         if (broken)
-            DeletePartialPES(tspacket->PID());
+            DeletePartialPSIP(tspacket->PID());
 
         moreTablePackets = false;
         return 0; // partial packet is not yet complete.
@@ -342,7 +342,7 @@ PSIPTable* MPEGStreamData::AssemblePSIP(const TSPacket* tspacket,
 
     if (!tspacket->PayloadStart())
     {
-        // We didn't see this PES packet's start, so this must be the
+        // We didn't see this PSIP packet's start, so this must be the
         // tail end of something we missed. Ignore it.
         moreTablePackets = false;
         return 0;
@@ -364,7 +364,7 @@ PSIPTable* MPEGStreamData::AssemblePSIP(const TSPacket* tspacket,
     const int pes_length = (pesdata[2] & 0x0f) << 8 | pesdata[3];
     if ((pes_length + offset + extra_offset) > 188)
     {
-        SavePartialPES(tspacket->PID(), new PESPacket(*tspacket));
+        SavePartialPSIP(tspacket->PID(), new PSIPTable(*tspacket));
         moreTablePackets = false;
         return 0;
     }
@@ -377,11 +377,11 @@ PSIPTable* MPEGStreamData::AssemblePSIP(const TSPacket* tspacket,
     if ((offset + psip->SectionLength() < TSPacket::kSize) &&
         (pesdata[psip->SectionLength() + 1] != 0xff))
     {
-        // This isn't sutffing, so we need to put this
+        // This isn't stuffing, so we need to put this
         // on as a partial packet.
-        PESPacket *pesp = new PESPacket(*tspacket);
+        PSIPTable *pesp = new PSIPTable(*tspacket);
         pesp->SetPSIOffset(offset + psip->SectionLength());
-        SavePartialPES(tspacket->PID(), pesp);
+        SavePartialPSIP(tspacket->PID(), pesp);
         return psip;
     }
 
@@ -791,14 +791,14 @@ void MPEGStreamData::ProcessPAT(const ProgramAssociationTable *pat)
         // After 400ms emit error if we haven't found correct PAT.
         LOG(VB_GENERAL, LOG_ERR,
             "ProcessPAT: Program not found in PAT. "
-            "\n\t\t\tRescan your transports.");
+            "Rescan your transports.");
 
         send_single_program = CreatePATSingleProgram(*pat);
     }
     else if (foundProgram)
     {
         if (_invalid_pat_seen)
-            LOG(VB_RECORD, LOG_INFO, 
+            LOG(VB_RECORD, LOG_INFO,
                 "ProcessPAT: Good PAT seen after a bad PAT");
 
         _invalid_pat_seen = false;
@@ -865,18 +865,18 @@ void MPEGStreamData::UpdateTimeOffset(uint64_t _si_utc_time)
 
 }
 
-#define DONE_WITH_PES_PACKET() { if (psip) delete psip; \
-    if (morePSIPPackets) goto HAS_ANOTHER_PES; else return; }
+#define DONE_WITH_PSIP_PACKET() { if (psip) delete psip; \
+    if (morePSIPTables) goto HAS_ANOTHER_PSIP; else return; }
 
 /** \fn MPEGStreamData::HandleTSTables(const TSPacket*)
  *  \brief Assembles PSIP packets and processes them.
  */
 void MPEGStreamData::HandleTSTables(const TSPacket* tspacket)
 {
-    bool morePSIPPackets;
-  HAS_ANOTHER_PES:
+    bool morePSIPTables;
+  HAS_ANOTHER_PSIP:
     // Assemble PSIP
-    PSIPTable *psip = AssemblePSIP(tspacket, morePSIPPackets);
+    PSIPTable *psip = AssemblePSIP(tspacket, morePSIPTables);
     if (!psip)
        return;
 
@@ -885,14 +885,14 @@ void MPEGStreamData::HandleTSTables(const TSPacket* tspacket)
         (TableID::STUFFING == psip->TableID()))
     {
         LOG(VB_RECORD, LOG_DEBUG, "Dropping Stuffing table");
-        DONE_WITH_PES_PACKET();
+        DONE_WITH_PSIP_PACKET();
     }
 
     // Don't do validation on tables withotu CRC
     if (!psip->HasCRC())
     {
         HandleTables(tspacket->PID(), *psip);
-        DONE_WITH_PES_PACKET();
+        DONE_WITH_PSIP_PACKET();
     }
 
     // Validate PSIP
@@ -905,7 +905,7 @@ void MPEGStreamData::HandleTSTables(const TSPacket* tspacket)
         LOG(VB_RECORD, LOG_ERR,
             QString("PSIP packet failed CRC check. pid(0x%1) type(0x%2)")
                 .arg(tspacket->PID(),0,16).arg(psip->TableID(),0,16));
-        DONE_WITH_PES_PACKET();
+        DONE_WITH_PSIP_PACKET();
     }
 
     if (TableID::MGT <= psip->TableID() && psip->TableID() <= TableID::STT &&
@@ -913,21 +913,21 @@ void MPEGStreamData::HandleTSTables(const TSPacket* tspacket)
     { // we don't cache the next table, for now
         LOG(VB_RECORD, LOG_DEBUG, QString("Table not current 0x%1")
             .arg(psip->TableID(),2,16,QChar('0')));
-        DONE_WITH_PES_PACKET();
+        DONE_WITH_PSIP_PACKET();
     }
 
     if (tspacket->Scrambled())
     { // scrambled! ATSC, DVB require tables not to be scrambled
         LOG(VB_RECORD, LOG_ERR,
             "PSIP packet is scrambled, not ATSC/DVB compiant");
-        DONE_WITH_PES_PACKET();
+        DONE_WITH_PSIP_PACKET();
     }
 
     if (!psip->VerifyPSIP(!_have_CRC_bug))
     {
         LOG(VB_RECORD, LOG_ERR, QString("PSIP table 0x%1 is invalid")
             .arg(psip->TableID(),2,16,QChar('0')));
-        DONE_WITH_PES_PACKET();
+        DONE_WITH_PSIP_PACKET();
     }
 
     // Don't decode redundant packets,
@@ -949,22 +949,22 @@ void MPEGStreamData::HandleTSTables(const TSPacket* tspacket)
             for (uint i = 0; i < _mpeg_sp_listeners.size(); i++)
                 _mpeg_sp_listeners[i]->HandleSingleProgramPMT(pmt_sp);
         }
-        DONE_WITH_PES_PACKET(); // already parsed this table, toss it.
+        DONE_WITH_PSIP_PACKET(); // already parsed this table, toss it.
     }
 
     HandleTables(tspacket->PID(), *psip);
 
-    DONE_WITH_PES_PACKET();
+    DONE_WITH_PSIP_PACKET();
 }
-#undef DONE_WITH_PES_PACKET
+#undef DONE_WITH_PSIP_PACKET
 
 int MPEGStreamData::ProcessData(const unsigned char *buffer, int len)
 {
     int pos = 0;
     bool resync = false;
 
-    while (pos + TSPacket::kSize <= len) // while we have a whole packet left
-    {
+    while (pos + int(TSPacket::kSize) <= len)
+    { // while we have a whole packet left...
         if (buffer[pos] != SYNC_BYTE || resync)
         {
             int newpos = ResyncStream(buffer, pos+1, len);
@@ -982,7 +982,7 @@ int MPEGStreamData::ProcessData(const unsigned char *buffer, int len)
         resync = false;
         if (!ProcessTSPacket(*pkt))
         {
-            if (pos + TSPacket::kSize > len)
+            if (pos + int(TSPacket::kSize) > len)
                 continue;
             if (buffer[pos] != SYNC_BYTE)
             {
@@ -1133,16 +1133,16 @@ PIDPriority MPEGStreamData::GetPIDPriority(uint pid) const
     return kPIDPriorityNone;
 }
 
-void MPEGStreamData::SavePartialPES(uint pid, PESPacket* packet)
+void MPEGStreamData::SavePartialPSIP(uint pid, PSIPTable* packet)
 {
-    pid_pes_map_t::iterator it = _partial_pes_packet_cache.find(pid);
-    if (it == _partial_pes_packet_cache.end())
-        _partial_pes_packet_cache[pid] = packet;
+    pid_psip_map_t::iterator it = _partial_psip_packet_cache.find(pid);
+    if (it == _partial_psip_packet_cache.end())
+        _partial_psip_packet_cache[pid] = packet;
     else
     {
-        PESPacket *old = *it;
-        _partial_pes_packet_cache.remove(pid);
-        _partial_pes_packet_cache.insert(pid, packet);
+        PSIPTable *old = *it;
+        _partial_psip_packet_cache.remove(pid);
+        _partial_psip_packet_cache.insert(pid, packet);
         delete old;
     }
 }
@@ -1414,7 +1414,7 @@ void MPEGStreamData::ReturnCachedTable(const PSIPTable *psip) const
         psip_refcnt_map_t::iterator it;
         it = _cached_slated_for_deletion.find(psip);
         if (it != _cached_slated_for_deletion.end())
-            DeleteCachedTable((PSIPTable*)psip);
+            DeleteCachedTable(const_cast<PSIPTable*>(psip));
     }
 }
 

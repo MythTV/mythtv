@@ -18,6 +18,8 @@
 #include "upnpcmgr.h"
 #include "upnpmsrr.h"
 
+class BonjourRegister;
+
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -28,6 +30,11 @@
 
 class MediaServer : public UPnp
 {
+    private:
+
+#ifdef USING_LIBDNS_SD
+    BonjourRegister *m_bonjour;
+#endif
 
     protected:
 

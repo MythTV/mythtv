@@ -6,18 +6,7 @@
 //
 // Copyright (c) 2010 David Blain <dblain@mythtv.org>
 //                                          
-// This library is free software; you can redistribute it and/or 
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or at your option any later version of the LGPL.
-//
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
-//
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library.  If not, see <http://www.gnu.org/licenses/>.
+// Licensed under the GPL v2 or later, see COPYING for details
 //
 //////////////////////////////////////////////////////////////////////////////
 
@@ -49,7 +38,7 @@
 class SERVICE_PUBLIC DvrServices : public Service  //, public QScriptable ???
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "1.3" );
+    Q_CLASSINFO( "version"    , "1.4" );
     Q_CLASSINFO( "RemoveRecordedItem_Method",                   "POST" )
     Q_CLASSINFO( "AddRecordSchedule_Method",                    "POST" )
     Q_CLASSINFO( "RemoveRecordSchedule_Method",                 "POST" )
@@ -101,7 +90,38 @@ class SERVICE_PUBLIC DvrServices : public Service  //, public QScriptable ???
 
         // Recording Rules
 
-//        virtual bool               AddRecordSchedule  ( ) = 0;
+        virtual int                AddRecordSchedule     ( int       ChanId,
+                                                           QDateTime StartTime,
+                                                           int       ParentId,
+                                                           bool      Inactive,
+                                                           uint      Season,
+                                                           uint      Episode,
+                                                           QString   Inetref,
+                                                           int       FindId,
+                                                           QString   Type,
+                                                           QString   SearchType,
+                                                           int       RecPriority,
+                                                           uint      PreferredInput,
+                                                           int       StartOffset,
+                                                           int       EndOffset,
+                                                           QString   DupMethod,
+                                                           QString   DupIn,
+                                                           uint      Filter,
+                                                           QString   RecProfile,
+                                                           QString   RecGroup,
+                                                           QString   StorageGroup,
+                                                           QString   PlayGroup,
+                                                           bool      AutoExpire,
+                                                           int       MaxEpisodes,
+                                                           bool      MaxNewest,
+                                                           bool      AutoCommflag,
+                                                           bool      AutoTranscode,
+                                                           bool      AutoMetaLookup,
+                                                           bool      AutoUserJob1,
+                                                           bool      AutoUserJob2,
+                                                           bool      AutoUserJob3,
+                                                           bool      AutoUserJob4,
+                                                           int       Transcoder        ) = 0;
 
         virtual bool               RemoveRecordSchedule  ( uint             RecordId   ) = 0;
 

@@ -53,6 +53,11 @@ void MythTranscodeCommandLineParser::LoadArguments(void)
         ->SetGroup("Frame Server");
     add("--fifosync", "fifosync", false, "Enforce fifo sync.", "")
         ->SetGroup("Frame Server");
+    add("--cleancut", "cleancut", false,
+            "Improve quality of cutting by performing it partially by dropping data. "
+            "Works only in fifodir mode.", "")
+        ->SetGroup("Frame Server")
+        ->SetRequires("fifodir");
 
     add(QStringList( QStringList() << "-l" << "--honorcutlist" ), "usecutlist",
             "", "Specifies whether to use the cutlist.",

@@ -19,8 +19,8 @@ class StreamingRingBuffer : public RingBuffer
                           uint retry_ms = kDefaultOpenTimeout);
     virtual long long Seek(long long pos, int whence, bool has_lock);
     virtual long long GetRealFileSize(void) const;
-    virtual bool IsStreamed(void)       { return true;  }
-    virtual bool IsSeekingAllowed(void) { return false; }
+    virtual bool IsStreamed(void)       { return m_streamed;   }
+    virtual bool IsSeekingAllowed(void) { return m_allowSeeks; }
     virtual bool IsBookmarkAllowed(void) { return false; }
 
   protected:
@@ -28,6 +28,8 @@ class StreamingRingBuffer : public RingBuffer
 
   private:
     URLContext *m_context;
+    bool        m_streamed;
+    bool        m_allowSeeks;
 };
 
 #endif // STREAMINGRINGBUFFER_H

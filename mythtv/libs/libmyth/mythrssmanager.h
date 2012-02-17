@@ -104,7 +104,6 @@ class MPUBLIC RSSSite : public QObject
     void finished(RSSSite *item);
 
 };
-Q_DECLARE_METATYPE(RSSSite*)
 
 class MPUBLIC RSSManager : public QObject
 {
@@ -134,5 +133,7 @@ class MPUBLIC RSSManager : public QObject
     uint                           m_updateFreq;
     RSSSite::rssList               m_inprogress;
 };
+
+Q_DECLARE_METATYPE(RSSSite*)
 
 #endif

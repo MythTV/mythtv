@@ -282,6 +282,11 @@ class MPUBLIC ProgramInfo
     bool IsSameTimeslot(const ProgramInfo &other) const;
     bool IsSameProgramTimeslot(const ProgramInfo &other) const;//sched only
     static int GetRecordingTypeRecPriority(RecordingType type);//sched only
+    static bool UsingProgramIDAuthority(void)
+    {
+        return usingProgIDAuth;
+    };
+    static void CheckProgramIDAuthorities(void);//sched only
 
     // Used for extending scheduled recordings
     bool IsSameProgramWeakCheck(const ProgramInfo &other) const;
@@ -524,6 +529,7 @@ class MPUBLIC ProgramInfo
     AutoExpireType QueryAutoExpire(void) const;
     TranscodingStatus QueryTranscodeStatus(void) const;
     bool        QueryTuningInfo(QString &channum, QString &input) const;
+    QString     QueryInputDisplayName(void) const;
     uint        QueryAverageWidth(void) const;
     uint        QueryAverageHeight(void) const;
     uint        QueryAverageFrameRate(void) const;
@@ -713,9 +719,9 @@ class MPUBLIC ProgramInfo
 
     static QMutex staticDataLock;
     static ProgramInfoUpdater *updater;
+    static bool usingProgIDAuth;
 };
 
-Q_DECLARE_METATYPE(ProgramInfo*)
 
 MPUBLIC bool LoadFromProgram(
     ProgramList        &destination,
@@ -796,6 +802,8 @@ class MPUBLIC PMapDBReplacement
     QMutex *lock;
     QMap<MarkTypes,frm_pos_map_t> map;
 };
+
+Q_DECLARE_METATYPE(ProgramInfo*)
 
 #endif // MYTHPROGRAM_H_
 

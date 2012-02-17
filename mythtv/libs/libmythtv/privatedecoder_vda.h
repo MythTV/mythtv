@@ -19,7 +19,7 @@ class VDALibrary
   public:
     static VDALibrary* GetVDALibrary(void);
     VDALibrary();
-    bool IsValid(void) { return m_valid; }
+    bool IsValid(void) const { return m_valid; }
 
     MYTH_VDADECODERCREATE  decoderCreate;
     MYTH_VDADECODERDECODE  decoderDecode;

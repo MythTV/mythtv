@@ -6,18 +6,7 @@
 //
 // Copyright (c) 2010 David Blain <dblain@mythtv.org>
 //                                          
-// This library is free software; you can redistribute it and/or 
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or at your option any later version of the LGPL.
-//
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
-//
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library.  If not, see <http://www.gnu.org/licenses/>.
+// Licensed under the GPL v2 or later, see COPYING for details
 //
 //////////////////////////////////////////////////////////////////////////////
 
@@ -31,6 +20,8 @@
 #include "datacontracts/settingList.h"
 #include "datacontracts/storageGroupDirList.h"
 #include "datacontracts/timeZoneInfo.h"
+#include "datacontracts/logMessage.h"
+#include "datacontracts/logMessageList.h"
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
@@ -73,6 +64,8 @@ class SERVICE_PUBLIC MythServices : public Service  //, public QScriptable ???
             DTC::SettingList        ::InitializeCustomTypes();
             DTC::StorageGroupDirList::InitializeCustomTypes();
             DTC::TimeZoneInfo       ::InitializeCustomTypes();
+            DTC::LogMessage         ::InitializeCustomTypes();
+            DTC::LogMessageList     ::InitializeCustomTypes();
         }
 
     public slots:
@@ -96,6 +89,19 @@ class SERVICE_PUBLIC MythServices : public Service  //, public QScriptable ???
 
         virtual DTC::TimeZoneInfo*  GetTimeZone         ( ) = 0;
 
+        virtual DTC::LogMessageList*  GetLogs ( const QString   &HostName,
+                                                const QString   &Application,
+                                                int             PID,
+                                                int             TID,
+                                                const QString   &Thread,
+                                                const QString   &Filename,
+                                                int             Line,
+                                                const QString   &Function,
+                                                const QDateTime &FromTime,
+                                                const QDateTime &ToTime,
+                                                const QString   &Level,
+                                                const QString   &MsgContains ) = 0;
+
         virtual DTC::SettingList*   GetSetting          ( const QString   &HostName,
                                                           const QString   &Key,
                                                           const QString   &Default ) = 0;
@@ -116,7 +122,8 @@ class SERVICE_PUBLIC MythServices : public Service  //, public QScriptable ???
 
         virtual bool                SendMessage         ( const QString &Message,
                                                           const QString &Address,
-                                                          int   udpPort ) = 0;
+                                                          int   udpPort,
+                                                          int   Timeout ) = 0;
 
         virtual bool                BackupDatabase      ( void ) = 0;
 

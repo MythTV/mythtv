@@ -48,6 +48,7 @@ MPUBLIC vector<ProgramInfo *> *RemoteGetCurrentlyRecordingList(void);
 
 MPUBLIC bool RemoteGetFileList(QString host, QString path, QStringList* list,
                        QString sgroup, bool fileNamesOnly = false);
+MPUBLIC bool RemoteGetActiveBackends(QStringList *list);
 
 #endif
 

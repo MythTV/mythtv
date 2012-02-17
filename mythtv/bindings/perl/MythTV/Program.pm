@@ -236,8 +236,8 @@ package MythTV::Program;
         my ($ssecond, $sminute, $shour, $sday, $smonth, $syear) = localtime($self->{'recstartts'});
         my ($esecond, $eminute, $ehour, $eday, $emonth, $eyear) = localtime($self->{'recendts'});
     # Program start/end times
-        my ($spsecond, $spminute, $sphour, $spday, $spmonth, $spyear) = localtime($self->{'recstartts'});
-        my ($epsecond, $epminute, $ephour, $epday, $epmonth, $epyear) = localtime($self->{'recendts'});
+        my ($spsecond, $spminute, $sphour, $spday, $spmonth, $spyear) = localtime($self->{'starttime'});
+        my ($epsecond, $epminute, $ephour, $epday, $epmonth, $epyear) = localtime($self->{'endtime'});
     # Format some fields we may be parsing below
         # Recording start time
         $syear += 1900;

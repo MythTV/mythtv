@@ -1,6 +1,6 @@
 CONFIG += $$CCONFIG
 
-LIBVERSION = 0.24
+LIBVERSION = 0.25
 
 INCLUDEPATH += $${SYSROOT}$${PREFIX}/include
 #INCLUDEPATH += /usr/include/cdda
@@ -10,7 +10,7 @@ LIBS *= -L$${SYSROOT}$${PREFIX}/$${LIBDIRNAME}
 
 isEmpty(TARGET_OS) : win32 {
     CONFIG += mingw
-    DEFINES += USING_MINGW
+    DEFINES += USING_MINGW WIN32_LEAN_AND_MEAN NOMINMAX
     # Qt4 creates separate compile directories by default. This disables:
     CONFIG -= debug_and_release debug_and_release_target
     # Some shared libs we depend on are installed here:
@@ -47,7 +47,7 @@ QMAKE_CFLAGS_SHLIB = -DPIC -fPIC
 QMAKE_CFLAGS_RELEASE = $${QMAKE_CXXFLAGS_RELEASE}
 QMAKE_CFLAGS += $$CFLAGS
 
-# figure out defines 
+# figure out defines
 
 DEFINES += $$CONFIG_DEFINES
 DEFINES += _FILE_OFFSET_BITS=64
@@ -58,7 +58,7 @@ LOCAL_LIBDIR_X11 =
 !isEmpty( QMAKE_LIBDIR_X11 ) {
     LOCAL_LIBDIR_X11 = -L$$QMAKE_LIBDIR_X11
 }
-QMAKE_LIBDIR_X11 = 
+QMAKE_LIBDIR_X11 =
 
 EXTRA_LIBS += $$EXTRALIBS
 EXTRA_LIBS += $$FREETYPE_LIBS

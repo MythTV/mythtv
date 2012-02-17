@@ -88,6 +88,54 @@ VideoScannerThread::~VideoScannerThread()
     delete m_dbmetadata;
 }
 
+void VideoScannerThread::SetDirs(QStringList dirs)
+{
+    QString master = gCoreContext->GetMasterHostName();
+    QStringList searchhosts, mdirs;
+    m_offlineSGHosts.clear();
+
+    QStringList::iterator iter = dirs.begin(), iter2;
+    while ( iter != dirs.end() )
+    {
+        if (iter->startsWith("myth://"))
+        {
+            QUrl sgurl = *iter;
+            QString host = sgurl.host();
+            QString path = sgurl.path();
+
+            if (!m_liveSGHosts.contains(host))
+            {
+                // mark host as offline to warn user
+                if (!m_offlineSGHosts.contains(host))
+                    m_offlineSGHosts.append(host);
+                // erase from directory list to skip scanning
+                iter = dirs.erase(iter);
+                continue;
+            }
+            else if ((host == master) &&  (!mdirs.contains(path)))
+                // collect paths defined on master backend so other
+                // online backends can be set to fall through to them
+                mdirs.append(path);
+            else if (!searchhosts.contains(host))
+                // mark host as having directories defined so it
+                // does not fall through to those on the master
+                searchhosts.append(host);
+        }
+
+        ++iter;
+    }
+
+    for (iter = m_liveSGHosts.begin(); iter != m_liveSGHosts.end(); ++iter)
+        if ((!searchhosts.contains(*iter)) && (master != *iter))
+            for (iter2 = mdirs.begin(); iter2 != mdirs.end(); ++iter2)
+                // backend is online, but has no directories listed
+                // fall back to those on the master backend
+                dirs.append(gCoreContext->GenMythURL(*iter,
+                                            0, *iter2, "Videos"));
+
+    m_directories = dirs;
+}
+
 void VideoScannerThread::run()
 {
     RunProlog();
@@ -108,7 +156,6 @@ void VideoScannerThread::run()
 
     uint counter = 0;
     FileCheckList fs_files;
-    failedSGHosts.clear();
 
     if (m_HasGUI)
         SendProgressEvent(counter, (uint)m_directories.size(),
@@ -124,7 +171,7 @@ void VideoScannerThread::run()
                 QString host = sgurl.host();
                 QString path = sgurl.path();
 
-                failedSGHosts.append(host);
+                m_liveSGHosts.removeAll(host);
 
                 LOG(VB_GENERAL, LOG_ERR,
                     QString("Failed to scan :%1:").arg(*iter));
@@ -213,7 +260,7 @@ void VideoScannerThread::verifyFiles(FileCheckList &files,
                 // cannot reach, mark it as for removal later.
                 remove.push_back(std::make_pair((*p)->GetID(), lname));
             }
-            else if (!failedSGHosts.contains(lhost))
+            else if (m_liveSGHosts.contains(lhost))
             {
                 LOG(VB_GENERAL, LOG_INFO,
                     QString("Removing file SG(%1) :%2:")
@@ -221,9 +268,13 @@ void VideoScannerThread::verifyFiles(FileCheckList &files,
                 remove.push_back(std::make_pair((*p)->GetID(), lname));
             }
             else
+            {
                 LOG(VB_GENERAL, LOG_WARNING,
                     QString("SG(%1) not available. Not removing file :%2:")
                         .arg(lhost).arg(lname));
+                if (!m_offlineSGHosts.contains(lhost))
+                    m_offlineSGHosts.append(lhost);
+            }
         }
         if (m_HasGUI)
             SendProgressEvent(++counter);
@@ -275,9 +326,9 @@ bool VideoScannerThread::updateDB(const FileCheckList &add, const PurgeList &rem
                                  QString(),
                                  VIDEO_YEAR_DEFAULT,
                                  QDate::fromString("0000-00-00","YYYY-MM-DD"),
-                                 VIDEO_INETREF_DEFAULT, QString(),
+                                 VIDEO_INETREF_DEFAULT, 0, QString(),
                                  VIDEO_DIRECTOR_DEFAULT, QString(), VIDEO_PLOT_DEFAULT,
-                                 0.0, VIDEO_RATING_DEFAULT, 0,
+                                 0.0, VIDEO_RATING_DEFAULT, 0, 0,
                                  VideoMetadata::FilenameToMeta(p->first, 2).toInt(),
                                  VideoMetadata::FilenameToMeta(p->first, 3).toInt(),
                                  QDate::currentDate(),
@@ -317,6 +368,12 @@ bool VideoScannerThread::buildFileList(const QString &directory,
                                        const QStringList &imageExtensions,
                                        FileCheckList &filelist)
 {
+    // TODO: FileCheckList is a std::map, keyed off the filename. In the event
+    // multiple backends have access to shared storage, the potential exists
+    // for files to be scanned onto the wrong host. Add in some logic to prefer
+    // the backend with the content stored in a storage group determined to be
+    // local.
+
     LOG(VB_GENERAL,LOG_INFO, QString("buildFileList directory = %1")
                                  .arg(directory));
     FileAssociations::ext_ignore_list ext_list;
@@ -376,6 +433,14 @@ void VideoScanner::doScan(const QStringList &dirs)
         m_scanThread->SetProgressDialog(progressDlg);
     }
 
+    QStringList hosts;
+    if (!RemoteGetActiveBackends(&hosts))
+    {
+        LOG(VB_GENERAL, LOG_WARNING, "Could not retrieve list of "
+                            "available backends.");
+        hosts.clear();
+    }
+    m_scanThread->SetHosts(hosts);
     m_scanThread->SetDirs(dirs);
     m_scanThread->start();
 }
@@ -387,7 +452,7 @@ void VideoScanner::doScanAll()
 
 void VideoScanner::finishedScan()
 {
-    QStringList failedHosts = m_scanThread->GetFailedSGHosts();
+    QStringList failedHosts = m_scanThread->GetOfflineSGHosts();
     if (failedHosts.size() > 0)
     {
         QString msg = tr("Failed to Scan SG Video Hosts") + ":\n\n";

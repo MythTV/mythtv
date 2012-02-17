@@ -9,23 +9,25 @@ using namespace std;
 #include <QList>
 #include <QTimer>
 #include <QWaitCondition>
-#include <QTcpServer>
 
 // MythTV
 #include "socketrequesthandler.h"
 #include "sockethandler.h"
 #include "mthreadpool.h"
 #include "mythsocket.h"
+#include "serverpool.h"
 
-class MythServer : public QTcpServer
+class MythServer : public ServerPool
 {
     Q_OBJECT
+  public:
+    MythServer(QObject *parent=0);
 
   signals:
-    void newConnect(MythSocket*);
+    void newConnection(MythSocket *);
 
-  protected:
-    virtual void incomingConnection(int socket);
+  protected slots:
+    virtual void newTcpConnection(int socket);
 };
 
 class PROTOSERVER_PUBLIC MythSocketManager : public QObject, public MythSocketCBs

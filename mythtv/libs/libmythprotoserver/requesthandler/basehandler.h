@@ -1,3 +1,5 @@
+#ifndef _BASESOCKETREQUESTHANDLER_H_
+#define _BASESOCKETREQUESTHANDLER_H_
 
 using namespace std;
 
@@ -9,8 +11,6 @@ using namespace std;
 #include "socketrequesthandler.h"
 #include "sockethandler.h"
 #include "mythprotoserverexp.h"
-
-class MainServer;
 
 class PROTOSERVER_PUBLIC BaseRequestHandler : public SocketRequestHandler
 {
@@ -30,4 +30,4 @@ class PROTOSERVER_PUBLIC BaseRequestHandler : public SocketRequestHandler
     bool HandleQueryTimeZone(SocketHandler *sock);
 };
 
-
+#endif

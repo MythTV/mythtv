@@ -129,6 +129,7 @@ void MythSystemEventHandler::SubstituteMatches(const QStringList &tokens,
         // Check for some token names that we substitute one for one as
         // %MATCH% type variables.
         if ((*it == "CARDID") ||
+            (*it == "RECSTATUS") ||
             (*it == "HOSTNAME") ||
             (*it == "SECS") ||
             (*it == "SENDER") ||
@@ -321,10 +322,11 @@ void SendMythSystemRecEvent(const QString msg, const RecordingInfo *pginfo)
 {
     if (pginfo)
         gCoreContext->SendSystemEvent(
-            QString("%1 CARDID %2 CHANID %3 STARTTIME %4")
+            QString("%1 CARDID %2 CHANID %3 STARTTIME %4 RECSTATUS %5")
                     .arg(msg).arg(pginfo->GetCardID())
                     .arg(pginfo->GetChanID())
-                    .arg(pginfo->GetRecordingStartTime(ISODate)));
+                    .arg(pginfo->GetRecordingStartTime(ISODate))
+                    .arg(pginfo->GetRecordingStatus()));
     else
         LOG(VB_GENERAL, LOG_ERR, LOC + "SendMythSystemRecEvent() called with "
                                        "empty RecordingInfo");

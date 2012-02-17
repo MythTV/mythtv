@@ -209,7 +209,6 @@ void MythControls::ActionButtonPressed()
 
         m_menuPopup->AddButton(tr("Set Binding"));
         m_menuPopup->AddButton(tr("Remove Binding"));
-        m_menuPopup->AddButton(tr("Cancel"));
     }
     else // for blank keys, no reason to ask what to do
         GrabKey();
@@ -236,7 +235,6 @@ void MythControls::ChangeView(void)
     m_menuPopup->AddButton(tr("Actions By Context"));
     m_menuPopup->AddButton(tr("Contexts By Key"));
     m_menuPopup->AddButton(tr("Keys By Context"));
-    m_menuPopup->AddButton(tr("Cancel"));
 
 }
 
@@ -258,7 +256,6 @@ void MythControls::ShowMenu()
     m_menuPopup->AddButton(tr("Save"));
     m_menuPopup->AddButton(tr("Change View"));
     m_menuPopup->AddButton(tr("Reset All Keys to Defaults"));
-    m_menuPopup->AddButton(tr("Cancel"));
 }
 
 void MythControls::Close()
@@ -266,21 +263,18 @@ void MythControls::Close()
     if (m_bindings && m_bindings->HasChanges())
     {
         /* prompt user to save changes */
-        QString label = tr("Exiting, but there are unsaved changes."
-                            "Which would you prefer?");
+        QString label = tr("Save changes?");
 
         MythScreenStack *popupStack =
                                 GetMythMainWindow()->GetStack("popup stack");
 
-        m_menuPopup = new MythDialogBox(label, popupStack, "exitmenu");
+        MythConfirmationDialog *confirmPopup
+                    = new MythConfirmationDialog(popupStack, label, true);
 
-        if (m_menuPopup->Create())
-            popupStack->AddScreen(m_menuPopup);
+        if (confirmPopup->Create())
+            popupStack->AddScreen(confirmPopup);
 
-        m_menuPopup->SetReturnEvent(this, "exit");
-
-        m_menuPopup->AddButton(tr("Save then Exit"));
-        m_menuPopup->AddButton(tr("Exit without saving changes"));
+        confirmPopup->SetReturnEvent(this, "exit");
     }
     else
         MythScreenType::Close();
@@ -609,7 +603,9 @@ void MythControls::ResolveConflict(ActionID *conflict, int error_level,
     QString label = tr("This key binding conflicts with %1 in the %2 context.")
         .arg(conflict->GetAction()).arg(conflict->GetContext());
 
-    if (KeyBindings::kKeyBindingError == error_level)
+    bool error = (KeyBindings::kKeyBindingError == error_level);
+
+    if (error)
         label.append(tr(" Unable to bind key."));
     else
         label.append(tr(" Do you want to bind it anyway?"));
@@ -617,23 +613,17 @@ void MythControls::ResolveConflict(ActionID *conflict, int error_level,
     MythScreenStack *popupStack =
                             GetMythMainWindow()->GetStack("popup stack");
 
-    m_menuPopup =
-            new MythDialogBox(label, popupStack, "conflictmenu");
+    MythConfirmationDialog *confirmPopup =
+            new MythConfirmationDialog(popupStack, label, !error);
 
-    if (m_menuPopup->Create())
-        popupStack->AddScreen(m_menuPopup);
-
-    m_menuPopup->SetReturnEvent(this, "conflict");
-
-    if (KeyBindings::kKeyBindingError == error_level)
+    if (!error)
     {
-        m_menuPopup->AddButton(tr("OK"));
+        confirmPopup->SetData(qVariantFromValue(key));
+        confirmPopup->SetReturnEvent(this, "conflict");
     }
-    else
-    {
-        m_menuPopup->AddButton(tr("Cancel"));
-        m_menuPopup->AddButton(tr("Bind Key"), qVariantFromValue(key));
-    }
+
+    if (confirmPopup->Create())
+        popupStack->AddScreen(confirmPopup);
 
     delete conflict;
 }
@@ -724,12 +714,9 @@ void MythControls::customEvent(QEvent *event)
         }
         else if (resultid == "exit")
         {
-            if (buttonnum == 0)
-            {
+            if (buttonnum == 1)
                 Save();
-                Teardown();
-            }
-            else if (buttonnum == 1)
+            else
                 Teardown();
 
             Close();

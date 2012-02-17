@@ -530,6 +530,12 @@ void MSocketDevice::setOption(Option opt, int v)
 
 bool MSocketDevice::connect(const QHostAddress &addr, quint16 port)
 {
+    if (isValid() && addr.protocol() != pa.protocol())
+    {
+        close();
+        fd = -1;
+    }
+
     if (!isValid())
     {
 #if !defined(QT_NO_IPV6)

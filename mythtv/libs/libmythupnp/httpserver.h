@@ -5,20 +5,9 @@
 // Purpose     : HTTP 1.1 Mini Server Implmenetation
 //               Used for UPnp/AV implementation & status information
 //                                                                            
-// Copyright (c) 2005 David Blain <mythtv@theblains.net>
+// Copyright (c) 2005 David Blain <dblain@mythtv.org>
 //                                          
-// This library is free software; you can redistribute it and/or 
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or at your option any later version of the LGPL.
-//
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
-//
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library.  If not, see <http://www.gnu.org/licenses/>.
+// Licensed under the GPL v2 or later, see COPYING for details                    
 //
 //////////////////////////////////////////////////////////////////////////////
 
@@ -34,7 +23,6 @@
 
 // Qt headers
 #include <QReadWriteLock>
-#include <QTcpServer>
 #include <QMultiMap>
 #include <QRunnable>
 #include <QPointer>
@@ -42,6 +30,7 @@
 #include <QList>
 
 // MythTV headers
+#include "serverpool.h"
 #include "httprequest.h"
 #include "mthreadpool.h"
 #include "refcounted.h"
@@ -93,7 +82,7 @@ typedef QList<QPointer<HttpServerExtension> > HttpServerExtensionList;
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 
-class UPNP_PUBLIC HttpServer : public QTcpServer
+class UPNP_PUBLIC HttpServer : public ServerPool
 {
   protected:
     mutable QReadWriteLock  m_rwlock;
@@ -118,7 +107,7 @@ class UPNP_PUBLIC HttpServer : public QTcpServer
 
     QScriptEngine *ScriptEngine(void);
 
-    virtual void incomingConnection(int socket); // QTcpServer
+    virtual void newTcpConnection(int socket); // QTcpServer
 
     QString GetSharePath(void) const
     { // never modified after creation, so no need to lock

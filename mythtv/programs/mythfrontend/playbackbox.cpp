@@ -734,8 +734,8 @@ void PlaybackBox::updateGroupInfo(const QString &groupname,
     updateIcons();
 }
 
-void PlaybackBox::UpdateUIListItem(
-    ProgramInfo *pginfo, bool force_preview_reload)
+void PlaybackBox::UpdateUIListItem(ProgramInfo *pginfo,
+                                   bool force_preview_reload)
 {
     if (!pginfo)
         return;
@@ -780,8 +780,8 @@ void PlaybackBox::SetItemIcons(MythUIButtonListItem *item, ProgramInfo* pginfo)
         item->DisplayState(disp_flag_stat[i]?"yes":"no", disp_flags[i]);
 }
 
-void PlaybackBox::UpdateUIListItem(
-    MythUIButtonListItem *item, bool is_sel, bool force_preview_reload)
+void PlaybackBox::UpdateUIListItem(MythUIButtonListItem *item,
+                                   bool is_sel, bool force_preview_reload)
 {
     if (!item)
         return;
@@ -1144,6 +1144,13 @@ void PlaybackBox::updateIcons(const ProgramInfo *pginfo)
 
     if (iconState && !haveIcon)
         iconState->Reset();
+
+    iconState = dynamic_cast<MythUIStateType *>(GetChild("categorytype"));
+    if (iconState)
+    {
+        if (!(pginfo && iconState->DisplayState(pginfo->GetCategoryType())))
+            iconState->Reset();
+    }
 }
 
 bool PlaybackBox::IsUsageUIVisible(void) const
@@ -1223,6 +1230,9 @@ void PlaybackBox::UpdateUIRecGroupList(void)
         QString key = (*it);
         QString tmp = (key == "All Programs") ? "All" : key;
         QString name = ProgramInfo::i18n(tmp);
+
+        if (m_recGroups.size() == 2 && key == "Default")
+            continue;  // All and Default will be the same, so only show All
 
         MythUIButtonListItem *item = new MythUIButtonListItem(
             m_recgroupList, name, qVariantFromValue(key));
@@ -1371,6 +1381,8 @@ void PlaybackBox::updateRecList(MythUIButtonListItem *sel_item)
             if ((*it)->GetSubtitleType() & sit.key())
                 item->DisplayState(sit.value(), "subtitletypes");
         }
+
+        item->DisplayState((*it)->GetCategoryType(), "categorytype");
     }
 
     if (m_noRecordingsText)
@@ -3841,7 +3853,7 @@ void PlaybackBox::customEvent(QEvent *event)
             if (tokens.size() >= 4)
             {
                 chanid = tokens[2].toUInt();
-                recstartts = QDateTime::fromString(tokens[3]);
+                recstartts = QDateTime::fromString(tokens[3], Qt::ISODate);
             }
 
             if ((tokens.size() >= 2) && tokens[1] == "UPDATE")
@@ -4688,21 +4700,31 @@ void PlaybackBox::saveRecMetadata(const QString &newTitle,
         if (!newSubtitle.trimmed().isEmpty())
             tempSubTitle = QString("%1 - \"%2\"")
                             .arg(tempSubTitle).arg(newSubtitle);
-        QString seasone = QString("s%1e%2").arg(GetDisplaySeasonEpisode
-                                             (newSeason, 2))
-                        .arg(GetDisplaySeasonEpisode(newEpisode, 2));
-        QString seasonx = QString("%1x%2").arg(GetDisplaySeasonEpisode
-                                             (newSeason, 1))
-                        .arg(GetDisplaySeasonEpisode(newEpisode, 2));
+
+        QString seasone;
+        QString seasonx;
+        QString season;
+        QString episode;
+        if (newSeason > 0 || newEpisode > 0)
+        {
+            season = GetDisplaySeasonEpisode(newSeason, 1);
+            episode = GetDisplaySeasonEpisode(newEpisode, 1);
+            seasone = QString("s%1e%2").arg(GetDisplaySeasonEpisode
+                                                (newSeason, 2))
+                            .arg(GetDisplaySeasonEpisode(newEpisode, 2));
+            seasonx = QString("%1x%2").arg(GetDisplaySeasonEpisode
+                                                (newSeason, 1))
+                            .arg(GetDisplaySeasonEpisode(newEpisode, 2));
+        }
 
         item->SetText(tempSubTitle, "titlesubtitle");
         item->SetText(newTitle, "title");
         item->SetText(newSubtitle, "subtitle");
         item->SetText(newInetref, "inetref");
-        item->SetText(QString::number(newSeason), "season");
-        item->SetText(QString::number(newEpisode), "episode");
         item->SetText(seasonx, "00x00");
         item->SetText(seasone, "s00e00");
+        item->SetText(season, "season");
+        item->SetText(episode, "episode");
         if (newDescription != NULL)
             item->SetText(newDescription, "description");
     }

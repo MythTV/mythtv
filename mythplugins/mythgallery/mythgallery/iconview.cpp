@@ -334,16 +334,6 @@ void IconView::LoadThumbnail(ThumbItem *item)
                             .arg(ThumbGenerator::getThumbcacheDir(m_currDir))
                             .arg(item->GetName());
 
-//         int rotateAngle = 0;
-//
-//         rotateAngle = item->GetRotationAngle();
-//
-//         if (rotateAngle != 0)
-//         {
-//             QMatrix matrix;
-//             matrix.rotate(rotateAngle);
-//             image = image.xForm(matrix);
-//         }
     item->SetImageFilename(imagePath);
 }
 
@@ -391,7 +381,7 @@ void IconView::UpdateText(MythUIButtonListItem *item)
     if (!item)
     {
         if (m_positionText)
-            m_positionText->SetText("");
+            m_positionText->Reset();
         return;
     }
 

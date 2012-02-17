@@ -11,8 +11,8 @@ class PlaylistLoadingThread : public MThread
     PlaylistLoadingThread(PlaylistContainer *parent_ptr,
                           AllMusic *all_music_ptr);
     virtual void run();
-    
-  private:  
+
+  private:
     PlaylistContainer *parent;
     AllMusic          *all_music;
 };
@@ -28,11 +28,9 @@ class PlaylistContainer
 
     Playlist*       getActive(void) { return active_playlist; }
     Playlist*       getPlaylist(int id);
+    Playlist*       getPlaylist(const QString &name);
+    Playlist*       getStreamPlaylist(void) { return stream_playlist; }
 
-    void            setActiveWidget(PlaylistTitle *widget);
-    PlaylistTitle*  getActiveWidget(void) { return active_widget; }
-
-    GenericTree*    writeTree(GenericTree *tree_to_write_to);
     void            clearCDList();
     void            addCDTrack(int x);
     void            removeCDTrack(int x);
@@ -43,9 +41,6 @@ class PlaylistContainer
     void            copyNewPlaylist(QString name);
     void            copyToActive(int index);
 
-    void            showRelevantPlaylists(TreeCheckItem *alllist);
-    void            refreshRelevantPlaylists(TreeCheckItem *alllist);
-
     QString         getPlaylistName(int index, bool &reference);
 
     void            postLoad();
@@ -55,8 +50,8 @@ class PlaylistContainer
 
     void            popBackPlaylist();
     bool            pendingWriteback();
-    void            setPending(int x){pending_writeback_index = x;}
-    int             getPending(){return pending_writeback_index;}
+    void            setPending(int x) {pending_writeback_index = x;}
+    int             getPending() {return pending_writeback_index;}
 
     bool            nameIsUnique(QString a_name, int which_id);
 
@@ -68,14 +63,18 @@ class PlaylistContainer
 
     void            FillIntelliWeights(int &rating, int &playcount,
                                        int &lastplay, int &random);
+    QList<Playlist*> *getPlaylists(void) { return all_other_playlists; }
+    QStringList       getPlaylistNames(void);
+
   private:  
     Playlist            *active_playlist;
     Playlist            *backup_playlist;
-    list<int>            cd_playlist;
-    list<Playlist*>     *all_other_playlists;
+    Playlist            *stream_playlist;
+    QList<int>           cd_playlist;
+    QList<Playlist*>    *all_other_playlists;
     AllMusic            *all_available_music;
-    PlaylistTitle       *active_widget;
-    int                 pending_writeback_index;
+
+    int                  pending_writeback_index;
     
     PlaylistLoadingThread  *playlists_loader;
     bool                    done_loading;

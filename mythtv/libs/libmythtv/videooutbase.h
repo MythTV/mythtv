@@ -249,14 +249,23 @@ class VideoOutput
     QRect   GetSafeRect(void);
 
     // Visualisations
-    bool EnableVisualisation(AudioPlayer *audio, bool enable);
+    bool EnableVisualisation(AudioPlayer *audio, bool enable,
+                             const QString &name = QString(""));
     virtual bool CanVisualise(AudioPlayer *audio, MythRender *render);
-    virtual bool SetupVisualisation(AudioPlayer *audio, MythRender *render);
+    virtual bool SetupVisualisation(AudioPlayer *audio, MythRender *render,
+                                    const QString &name);
     VideoVisual* GetVisualisation(void) { return m_visual; }
+    QString GetVisualiserName(void);
+    virtual QStringList GetVisualiserList(void);
     void DestroyVisualisation(void);
 
     // Hue adjustment for certain vendors (mostly ATI)
     static int CalcHueBase(const QString &adaptor_name);
+
+    // 3D TV
+    virtual bool StereoscopicModesAllowed(void) const { return false; }
+    void SetStereoscopicMode(StereoscopicMode mode) { m_stereo = mode; }
+    StereoscopicMode GetStereoscopicMode(void) const { return m_stereo; }
 
   protected:
     void InitBuffers(int numdecode, bool extra_for_pause, int need_free,
@@ -339,6 +348,9 @@ class VideoOutput
 
     // Visualisation
     VideoVisual     *m_visual;
+
+    // 3D TV mode
+    StereoscopicMode m_stereo;
 };
 
 #endif

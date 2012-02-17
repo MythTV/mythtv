@@ -80,8 +80,7 @@ bool checkStoragePaths(QStringList &probs)
     }
     else if (query.size() < 1)
     {
-        if (gCoreContext->GetSetting("MasterServerIP","master") ==
-            gCoreContext->GetSetting("BackendServerIP","me"))
+        if (gCoreContext->IsMasterHost())
         {
             // Master backend must have a defined Default SG
             QString trMesg =

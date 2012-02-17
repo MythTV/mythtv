@@ -6,8 +6,13 @@
 #include "mythlogging.h"
 #include "mythevent.h"
 #include "mythuistatetracker.h"
+#include "mythuihelper.h"
 #include "mythmainwindow.h"
-#include "tv_actions.h"
+#include "tv_play.h"
+
+#include "videometadatalistmanager.h"
+#include "videometadata.h"
+#include "videoutils.h"
 
 #include "frontend.h"
 
@@ -24,13 +29,17 @@ DTC::FrontendStatus* Frontend::GetStatus(void)
     return status;
 }
 
-bool Frontend::SendMessage(const QString &Message)
+bool Frontend::SendMessage(const QString &Message, uint Timeout)
 {
     if (Message.isEmpty())
         return false;
 
+    QStringList data;
+    if (Timeout > 0 && Timeout < 1000)
+        data << QString::number(Timeout);
     qApp->postEvent(GetMythMainWindow(),
-                    new MythEvent(MythEvent::MythUserMessage, Message));
+                    new MythEvent(MythEvent::MythUserMessage, Message,
+                    data));
     return true;
 }
 
@@ -72,6 +81,121 @@ bool Frontend::SendAction(const QString &Action, const QString &Value,
 
     QKeyEvent* ke = new QKeyEvent(QEvent::KeyPress, 0, Qt::NoModifier, Action);
     qApp->postEvent(GetMythMainWindow(), (QEvent*)ke);
+    return true;
+}
+
+bool Frontend::PlayRecording(int ChanID, const QDateTime &StartTime)
+{
+    QDateTime starttime = StartTime;
+    starttime.setTimeSpec(Qt::UTC);
+
+    if (!starttime.isValid() || ChanID <= 0)
+    {
+        LOG(VB_GENERAL, LOG_WARNING, LOC + "Invalid parameters.");
+        return false;
+    }
+
+    if (GetMythUI()->GetCurrentLocation().toLower() == "playback")
+    {
+        QString message = QString("NETWORK_CONTROL STOP");
+        MythEvent me(message);
+        gCoreContext->dispatch(me);
+
+        QTime timer;
+        timer.start();
+        while ((timer.elapsed() < 10000) &&
+               (GetMythUI()->GetCurrentLocation().toLower() == "playback"))
+            usleep(10000);
+    }
+
+    if (GetMythUI()->GetCurrentLocation().toLower() != "playbackbox")
+    {
+        GetMythMainWindow()->JumpTo("TV Recording Playback");
+
+        QTime timer;
+        timer.start();
+        while ((timer.elapsed() < 10000) &&
+               (GetMythUI()->GetCurrentLocation().toLower() != "playbackbox"))
+            usleep(10000);
+
+        timer.start();
+        while ((timer.elapsed() < 10000) &&
+               (!GetMythUI()->IsTopScreenInitialized()))
+            usleep(10000);
+    }
+
+    if (GetMythUI()->GetCurrentLocation().toLower() == "playbackbox")
+    {
+        LOG(VB_GENERAL, LOG_INFO, LOC +
+            QString("PlayRecording, ChanID: %1 StartTime: %2")
+            .arg(ChanID).arg(starttime.toString(Qt::ISODate)));
+
+        QString message = QString("NETWORK_CONTROL PLAY PROGRAM %1 %2 %3")
+            .arg(ChanID)
+            .arg(starttime.toLocalTime().toString("yyyyMMddhhmmss"))
+            .arg("12345");
+
+        MythEvent me(message);
+        gCoreContext->dispatch(me);
+        return true;
+    }
+
+    return false;
+}
+
+bool Frontend::PlayVideo(const QString &Id, bool UseBookmark)
+{
+    if (TV::IsTVRunning())
+    {
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
+            QString("Ignoring PlayVideo request - frontend is busy."));
+        return false;
+    }
+
+    bool ok;
+    quint64 id = Id.toUInt(&ok);
+    if (!ok)
+    {
+        LOG(VB_GENERAL, LOG_WARNING, LOC + QString("Invalid video Id."));
+        return false;
+    }
+
+    VideoMetadataListManager::VideoMetadataPtr metadata =
+                     VideoMetadataListManager::loadOneFromDatabase(id);
+
+    if (!metadata)
+    {
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
+            QString("Didn't find any video metadata."));
+        return false;
+    }
+
+    if (metadata->GetHost().isEmpty())
+    {
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
+            QString("No host for video."));
+        return false;
+    }
+
+    QString mrl = generate_file_url("Videos", metadata->GetHost(),
+                                    metadata->GetFilename());
+    LOG(VB_GENERAL, LOG_INFO, LOC +
+        QString("PlayVideo, id: %1 usebookmark: %2 url: '%3'")
+        .arg(id).arg(UseBookmark).arg(mrl));
+
+    QStringList args;
+    args <<  mrl << metadata->GetPlot() <<  metadata->GetTitle()
+         << metadata->GetSubtitle() << metadata->GetDirector()
+         << QString::number(metadata->GetSeason())
+         << QString::number(metadata->GetEpisode())
+         << metadata->GetInetRef() << QString::number(metadata->GetLength())
+         << QString::number(metadata->GetYear())
+         << QString::number(metadata->GetID())
+         << QString::number(UseBookmark);
+
+    MythEvent *me = new MythEvent(ACTION_HANDLEMEDIA, args);
+    qApp->postEvent(GetMythMainWindow(), me);
+
     return true;
 }
 

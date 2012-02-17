@@ -65,6 +65,7 @@ void MythUICheckBox::toggleCheckState()
     if (m_CheckState)
         m_CheckState->DisplayState(m_currentCheckState);
 
+    emit DependChanged(!onOff);
     emit toggled(onOff);
     emit valueChanged();
 }
@@ -74,6 +75,10 @@ void MythUICheckBox::SetCheckState(MythUIStateType::StateType state)
     m_currentCheckState = state;
     m_CheckState->DisplayState(state);
 
+    if (state == MythUIStateType::Off)
+        emit DependChanged(true);
+    else
+        emit DependChanged(false);
     emit valueChanged();
 }
 
@@ -92,6 +97,7 @@ void MythUICheckBox::SetCheckState(bool onOff)
         m_CheckState->DisplayState(m_currentCheckState);
 
     emit toggled(onOff);
+    emit DependChanged(!onOff);
     emit valueChanged();
 }
 

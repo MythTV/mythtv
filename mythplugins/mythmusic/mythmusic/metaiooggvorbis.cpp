@@ -2,6 +2,7 @@
 // Mythmusic
 #include "metaiooggvorbis.h"
 #include "metadata.h"
+#include "musicutils.h"
 
 // Libmyth
 #include <mythcontext.h>
@@ -26,13 +27,13 @@ TagLib::Ogg::Vorbis::File *MetaIOOggVorbis::OpenFile(const QString &filename)
     QByteArray fname = filename.toLocal8Bit();
     TagLib::Ogg::Vorbis::File *oggfile =
                             new TagLib::Ogg::Vorbis::File(fname.constData());
-    
+
     if (!oggfile->isOpen())
     {
         delete oggfile;
         oggfile = NULL;
     }
-    
+
     return oggfile;
 }
 
@@ -46,18 +47,18 @@ bool MetaIOOggVorbis::write(const Metadata* mdata)
         return false;
 
     TagLib::Ogg::Vorbis::File *oggfile = OpenFile(mdata->Filename());
-    
+
     if (!oggfile)
         return false;
-    
+
     TagLib::Ogg::XiphComment *tag = oggfile->tag();
-    
+
     if (!tag)
     {
         delete oggfile;
         return false;
     }
-    
+
     WriteGenericMetadata(tag, mdata);
 
     // Compilation
@@ -94,22 +95,22 @@ bool MetaIOOggVorbis::write(const Metadata* mdata)
 Metadata* MetaIOOggVorbis::read(const QString &filename)
 {
     TagLib::Ogg::Vorbis::File *oggfile = OpenFile(filename);
-    
+
     if (!oggfile)
         return NULL;
-    
+
     TagLib::Ogg::XiphComment *tag = oggfile->tag();
-    
+
     if (!tag)
     {
         delete oggfile;
         return NULL;
     }
-    
+
     Metadata *metadata = new Metadata(filename);
-    
+
     ReadGenericMetadata(tag, metadata);
-    
+
     bool compilation = false;
 
     if (tag->contains("COMPILATION_ARTIST"))
@@ -122,7 +123,7 @@ Metadata* MetaIOOggVorbis::read(const QString &filename)
             compilation = true;
         }
     }
-    
+
     if (!compilation && tag->contains("MUSICBRAINZ_ALBUMARTISTID"))
     {
         QString musicbrainzcode = TStringToQString(
@@ -137,6 +138,6 @@ Metadata* MetaIOOggVorbis::read(const QString &filename)
         metadata->setLength(getTrackLength(oggfile));
     else
         delete oggfile;
-    
+
     return metadata;
 }

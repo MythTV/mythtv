@@ -26,6 +26,7 @@ class MUI_PUBLIC MythRect : public QRect
     bool operator== (const MythRect &other) const;
 
     void Init(void);
+    void Reset(void);
     void CalculateArea(const MythRect & parentArea);
 
     void NormRect(void);

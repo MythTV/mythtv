@@ -659,7 +659,6 @@ void CC608Decoder::ResetCC(int mode)
 QString CC608Decoder::ToASCII(const QString &cc608str, bool suppress_unknown)
 {
     QString ret = "";
-    int i = 0;
 
     for (int i = 0; i < cc608str.length(); i++)
     {

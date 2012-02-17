@@ -3,6 +3,7 @@
 #include <QDir>
 #include <QUrl>
 
+#include "mythcorecontext.h"
 #include "dbaccess.h"
 #include "dirscan.h"
 #include "remoteutil.h"
@@ -141,6 +142,13 @@ namespace
             ok = true;
         }
         else
+            // FIXME: In the case of the master backend running the scan through
+            // the SCAN_VIDEOS command, the master backend will attempt to
+            // connect back to itself in order to scan slave backends, resulting
+            // in an error.  While this is interpreted as the slave backend
+            // being offline, and does not result in the deletion of content on
+            // a slave backend, it does mean the backend scanner will never be
+            // able to update content existing anywhere but the master backend.
             ok = RemoteGetFileList(host, start_path, &list, "Videos");
 
         if (!ok || (!list.isEmpty() && list.at(0).startsWith("SLAVE UNREACHABLE")))
@@ -261,7 +269,7 @@ bool ScanVideoDirectory(const QString &start_path, DirectoryHandler *handler,
         QString path = sgurl.path();
 
         if (!scan_sg_dir(path, host, path, handler, extlookup, 
-                (isHostMaster(host) &&
+                (gCoreContext->IsMasterHost(host) &&
                  (gCoreContext->GetHostName().toLower() == host.toLower()))))
         {
             LOG(VB_GENERAL, LOG_ERR, 

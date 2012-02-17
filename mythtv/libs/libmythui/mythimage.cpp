@@ -248,14 +248,14 @@ void MythImage::ToGreyscale()
     }
 }
 
-bool MythImage::Load(MythImageReader &reader)
+bool MythImage::Load(MythImageReader *reader)
 {
-    if (!reader.canRead())
+    if (!reader || !reader->canRead())
         return false;
 
     QImage *im = new QImage;
 
-    if (im && reader.read(im))
+    if (im && reader->read(im))
     {
         Assign(*im);
         delete im;
@@ -290,7 +290,7 @@ bool MythImage::Load(const QString &filename, bool scale)
                 im->loadFromData(data);
 #if 0
             else
-                LOG(VB_GENERAL, LOG_ERR, 
+                LOG(VB_GENERAL, LOG_ERR,
                     QString("MythImage::Load failed to load remote image %1")
                         .arg(filename));
 #endif

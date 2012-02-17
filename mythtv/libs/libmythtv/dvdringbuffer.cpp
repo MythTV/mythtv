@@ -19,6 +19,8 @@
     if (++m_buttonVersion > 1024) \
         m_buttonVersion = 1;
 
+#define DVD_DRIVE_SPEED 1
+
 static const char *dvdnav_menu_table[] =
 {
     NULL,
@@ -209,7 +211,7 @@ long long DVDRingBuffer::Seek(long long pos, int whence, bool has_lock)
     if (ret >= 0)
     {
         readpos = ret;
-        
+
         ignorereadpos = -1;
 
         if (readaheadrunning)
@@ -1684,14 +1686,13 @@ double DVDRingBuffer::GetFrameRate(void)
     return dvdfps;
 }
 
-/** \brief set dvd speed. uses the DVDDriveSpeed Setting from the settings
+/** \brief set dvd speed. uses the constant DVD_DRIVE_SPEED
  *  table
  */
 void DVDRingBuffer::SetDVDSpeed(void)
 {
     QMutexLocker lock(&m_seekLock);
-    int dvdDriveSpeed = gCoreContext->GetNumSetting("DVDDriveSpeed", 12);
-    SetDVDSpeed(dvdDriveSpeed);
+    SetDVDSpeed(DVD_DRIVE_SPEED);
 }
 
 /** \brief set dvd speed.

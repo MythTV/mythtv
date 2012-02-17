@@ -70,7 +70,7 @@ class MUI_PUBLIC MFileInfo : public QFileInfo
     qint64  m_size;
 };
 
-Q_DECLARE_METATYPE(MFileInfo)
+Q_DECLARE_METATYPE(MFileInfo);
 
 class MUI_PUBLIC MythUIFileBrowser : public MythScreenType
 {

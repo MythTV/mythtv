@@ -18,6 +18,7 @@
 #include "util.h"
 #include "mythversion.h"
 #include "mythlogging.h"
+#include "storagegroup.h"
 
 // LibMythUI headers
 #include "mythmainwindow.h"
@@ -81,6 +82,9 @@ ThemeChooser::ThemeChooser(MythScreenStack *parent,
     m_popupMenu(NULL)
 {
     gCoreContext->addListener(this);
+
+    StorageGroup sgroup("Themes", gCoreContext->GetHostName());
+    m_userThemeDir = sgroup.GetFirstDir(true);
 }
 
 ThemeChooser::~ThemeChooser()
@@ -144,7 +148,7 @@ void ThemeChooser::Load(void)
 
     QString MythVersion = MYTH_SOURCE_PATH;
     QStringList themesSeen;
-    QDir themes(GetConfDir() + "/themes");
+    QDir themes(m_userThemeDir);
     themes.setFilter(QDir::Dirs | QDir::NoDotAndDotDot);
     themes.setSorting(QDir::Name | QDir::IgnoreCase);
 
@@ -465,9 +469,7 @@ void ThemeChooser::showPopupMenu(void)
             m_popupMenu->AddButton(tr("Select Theme"),
                                    SLOT(saveAndReload()));
 
-            QString themeDir = GetConfDir() + "/themes/";
-
-            if (info->GetPreviewPath().startsWith(themeDir))
+            if (info->GetPreviewPath().startsWith(m_userThemeDir))
                 m_popupMenu->AddButton(tr("Delete Theme"),
                                        SLOT(removeTheme()));
         }
@@ -764,7 +766,7 @@ void ThemeChooser::customEvent(QEvent *e)
                         m_downloadState = dsExtractingTheme;
                         ThemeExtractThread *extractThread =
                             new ThemeExtractThread(this, m_downloadFile,
-                                                   GetConfDir() + "/themes");
+                                                   m_userThemeDir);
                         MThreadPool::globalInstance()->start(
                             extractThread, "ThemeExtract");
 
@@ -792,7 +794,7 @@ void ThemeChooser::customEvent(QEvent *e)
             QFile::remove(args[0]);
 
             QString event = QString("THEME_INSTALLED PATH %1")
-                                    .arg(GetConfDir() + "/themes/" +
+                                    .arg(m_userThemeDir +
                                          m_downloadTheme->GetDirectoryName());
             gCoreContext->SendSystemEvent(event);
 
@@ -818,26 +820,21 @@ void ThemeChooser::removeTheme(void)
         return;
     }
 
-    QString themeDir = GetConfDir() + "/themes/";
-
-    if (!info->GetPreviewPath().startsWith(themeDir))
+    if (!info->GetPreviewPath().startsWith(m_userThemeDir))
     {
         ShowOkPopup(tr("%1 is not a user-installed theme and can not "
                        "be deleted.").arg(info->GetName()));
         return;
     }
 
-    themeDir.append(info->GetDirectoryName());
-    removeThemeDir(themeDir);
+    removeThemeDir(m_userThemeDir + info->GetDirectoryName());
 
     ReloadInBackground();
 }
 
 void ThemeChooser::removeThemeDir(const QString &dirname)
 {
-    QString themeDir = GetConfDir() + "/themes/";
-
-    if ((!dirname.startsWith(themeDir)) &&
+    if ((!dirname.startsWith(m_userThemeDir)) &&
         (!dirname.startsWith(GetMythUI()->GetThemeCacheDir())))
         return;
 
@@ -919,7 +916,9 @@ void ThemeUpdateChecker::checkForUpdate(void)
         QString remoteThemeDir =
             gCoreContext->GenMythURL(gCoreContext->GetSetting("MasterServerIP"),
                                      0,
-                                     QString("%1/%2").arg(m_mythVersion).arg(GetMythUI()->GetThemeName()),
+                                     QString("remotethemes/%1/%2")
+                                             .arg(m_mythVersion)
+                                             .arg(GetMythUI()->GetThemeName()),
                                      "Temp");
 
         QString infoXML = remoteThemeDir;

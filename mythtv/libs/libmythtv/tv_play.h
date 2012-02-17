@@ -148,18 +148,11 @@ class MTV_PUBLIC TV : public QObject
 
     Q_OBJECT
   public:
-    /// \brief Helper class for Sleep Timer code.
-    class SleepTimerInfo
-    {
-      public:
-        SleepTimerInfo(QString str, unsigned long secs)
-            : dispString(str), seconds(secs) { ; }
-        QString   dispString;
-        unsigned long seconds;
-    };
-
-    TV(void);
-   ~TV();
+    // Check whether we already have a TV object
+    static bool    IsTVRunning(void);
+    // Start media playback
+    static bool    StartTV(ProgramInfo *tvrec = NULL,
+                        uint flags = kStartTVNoFlags);
 
     // Public event handling
     bool event(QEvent *e);
@@ -175,10 +168,18 @@ class MTV_PUBLIC TV : public QObject
     // static functions
     static void InitKeys(void);
     static void ReloadKeys(void);
-    static bool StartTV(ProgramInfo *tvrec = NULL,
-                        uint flags = kStartTVNoFlags);
     static void SetFuncPtr(const char *, void *);
     static int  ConfiguredTunerCards(void);
+
+    /// \brief Helper class for Sleep Timer code.
+    class SleepTimerInfo
+    {
+      public:
+        SleepTimerInfo(QString str, unsigned long secs)
+            : dispString(str), seconds(secs) { ; }
+        QString   dispString;
+        unsigned long seconds;
+    };
 
   public slots:
     void HandleOSDClosed(int osdType);
@@ -196,6 +197,13 @@ class MTV_PUBLIC TV : public QObject
     static EMBEDRETURNVOIDSCHEDIT RunScheduleEditorPtr;
 
   private:
+    TV();
+   ~TV();
+    static TV*     GetTV(void);
+    static void    ReleaseTV(TV* tv);
+    static QMutex *gTVLock;
+    static TV     *gTV;
+
     // Private initialisation
     bool Init(bool createWindow = true);
     void InitFromDB(void);
@@ -228,6 +236,7 @@ class MTV_PUBLIC TV : public QObject
     bool TimeStretchHandleAction(PlayerContext*,
                                  const QStringList &actions);
     bool DiscMenuHandleAction(PlayerContext*, const QStringList &actions);
+    bool Handle3D(PlayerContext *ctx, const QString &action);
 
     // Timers and timer events
     int  StartTimer(int interval, int line);
@@ -302,7 +311,7 @@ class MTV_PUBLIC TV : public QObject
                                        const ProgramInfo &);
     void PrepareToExitPlayer(PlayerContext*, int line,
                              bool bookmark = true);
-    void SetExitPlayer(bool set_it, bool wants_to) const;
+    void SetExitPlayer(bool set_it, bool wants_to);
 
     bool RequestNextRecorder(PlayerContext *, bool);
     void DeleteRecorder();
@@ -482,6 +491,7 @@ class MTV_PUBLIC TV : public QObject
     void ToggleAdjustFill(PlayerContext*,
                           AdjustFillMode adjustfillMode = kAdjustFill_Toggle);
     void DoToggleStudioLevels(const PlayerContext *ctx);
+    void DoToggleNightMode(const PlayerContext*);
     void DoTogglePictureAttribute(const PlayerContext*,
                                   PictureAdjustType type);
     void DoChangePictureAttribute(
@@ -496,7 +506,8 @@ class MTV_PUBLIC TV : public QObject
 
     // Sundry on screen
     void ITVRestart(PlayerContext*, bool isLive);
-    void EnableVisualisation(const PlayerContext*, bool enable, bool toggle = false);
+    void EnableVisualisation(const PlayerContext*, bool enable, bool toggle = false,
+                             const QString &action = QString(""));
 
     // Manual zoom mode
     void SetManualZoom(const PlayerContext *, bool enabled, QString msg);

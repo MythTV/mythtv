@@ -440,32 +440,6 @@ MSqlDatabase *MDBManager::getDDCon()
     return getStaticCon(&m_DDCon, "DataDirectCon");
 }
 
-void MDBManager::closeStaticCon(MSqlDatabase **dbcon)
-{
-    DBList &list = m_static_pool[QThread::currentThread()];
-    if (dbcon && *dbcon && list.contains(*dbcon))
-    {
-        list.removeAll(*dbcon);
-        delete *dbcon;
-        *dbcon = NULL;
-    }
-    else if (dbcon && *dbcon)
-    {
-        LOG(VB_GENERAL, LOG_CRIT,
-            "Attempted to close static connection in wrong thread.");
-    }
-}
-
-void MDBManager::closeSchedCon()
-{
-    closeStaticCon(&m_schedCon);
-}
-
-void MDBManager::closeDDCon()
-{
-    closeStaticCon(&m_DDCon);
-}
-
 void MDBManager::CloseDatabases()
 {
     m_lock.lock();
@@ -604,16 +578,6 @@ MSqlQueryInfo MSqlQuery::DDCon()
     }
 
     return qi;
-}
-
-void MSqlQuery::CloseSchedCon()
-{
-    GetMythDB()->GetDBManager()->closeSchedCon();
-}
-
-void MSqlQuery::CloseDDCon()
-{
-    GetMythDB()->GetDBManager()->closeDDCon();
 }
 
 bool MSqlQuery::exec()

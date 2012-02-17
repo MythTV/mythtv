@@ -159,6 +159,7 @@ class MTV_PUBLIC MythPlayer
     void SetDuration(int duration);
     void SetVideoResize(const QRect &videoRect);
     void EnableFrameRateMonitor(bool enable = false);
+    void ForceDeinterlacer(const QString &override = QString());
 
     // Gets
     QSize   GetVideoBufferSize(void) const    { return video_dim; }
@@ -278,8 +279,12 @@ class MTV_PUBLIC MythPlayer
     void TracksChanged(uint trackType);
     void EnableSubtitles(bool enable);
     void EnableForcedSubtitles(bool enable);
+    // How to handle forced Subtitles (i.e. when in a movie someone speaks
+    // in a different language than the rest of the movie, subtitles are
+    // forced on even if the user doesn't have them turned on.)
+    // These two functions are not thread-safe (UI thread use only).
     void SetAllowForcedSubtitles(bool allow);
-    bool GetAllowForcedSubtitles(void) { return allowForcedSubtitles; }
+    bool GetAllowForcedSubtitles(void) const { return allowForcedSubtitles; }
 
     // Public MHEG/MHI stream selection
     bool SetAudioByComponentTag(int tag);
@@ -320,14 +325,20 @@ class MTV_PUBLIC MythPlayer
 
     // Public picture controls
     void ToggleStudioLevels(void);
+    void ToggleNightMode(void);
 
     // Visualisations
     bool CanVisualise(void);
     bool IsVisualising(void);
-    bool EnableVisualisation(bool enable);
+    QString GetVisualiserName(void);
+    QStringList GetVisualiserList(void);
+    bool EnableVisualisation(bool enable, const QString &name = QString(""));
 
     void SaveTotalDuration(void);
     void ResetTotalDuration(void);
+
+    static const int kNightModeBrightenssAdjustment;
+    static const int kNightModeContrastAdjustment;
 
   protected:
     // Initialization
@@ -435,7 +446,7 @@ class MTV_PUBLIC MythPlayer
     uint64_t GetNearestMark(uint64_t frame, bool right);
     bool IsTemporaryMark(uint64_t frame);
     bool HasTemporaryMark(void);
-    bool IsCutListSaved(PlayerContext *ctx) { return deleteMap.IsSaved(ctx); }
+    bool IsCutListSaved(void) { return deleteMap.IsSaved(); }
     bool DeleteMapHasUndo(void) { return deleteMap.HasUndo(); }
     bool DeleteMapHasRedo(void) { return deleteMap.HasRedo(); }
     QString DeleteMapGetUndoMessage(void) { return deleteMap.GetUndoMessage(); }

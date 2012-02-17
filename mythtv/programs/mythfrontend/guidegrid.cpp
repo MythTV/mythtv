@@ -510,7 +510,7 @@ bool GuideGrid::keyPressEvent(QKeyEvent *event)
         else if (action == ACTION_FINDER)
             showProgFinder();
         else if (action == "MENU")
-            showMenu();
+            ShowMenu();
         else if (action == "ESCAPE" || action == ACTION_GUIDE)
             Close();
         else if (action == ACTION_SELECT)
@@ -583,42 +583,71 @@ bool GuideGrid::keyPressEvent(QKeyEvent *event)
     return handled;
 }
 
-void GuideGrid::showMenu(void)
+void GuideGrid::ShowMenu(void)
 {
-    QString label = tr("Options");
+    QString label = tr("Guide Options");
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-    MythDialogBox *menuPopup = new MythDialogBox(label, popupStack, "menuPopup");
+    MythDialogBox *menuPopup = new MythDialogBox(label, popupStack,
+                                                 "guideMenuPopup");
 
     if (menuPopup->Create())
     {
-        menuPopup->SetReturnEvent(this, "menu");
+        menuPopup->SetReturnEvent(this, "guidemenu");
+
+        if (m_player && (m_player->GetState(-1) == kState_WatchingLiveTV))
+            menuPopup->AddButton(tr("Change to Channel"));
+
+        menuPopup->AddButton(tr("Record This"));
+
+        menuPopup->AddButton(tr("Recording Options"), NULL, true);
+
+        menuPopup->AddButton(tr("Program Details"));
+
+        menuPopup->AddButton(tr("Jump to Time"), NULL, true);
+
+        menuPopup->AddButton(tr("Reverse Channel Order"));
+
+        if (!m_changrplist.empty())
+        {
+            menuPopup->AddButton(tr("Choose Channel Group"));
+
+            if (m_changrpid == -1)
+                menuPopup->AddButton(tr("Add To Channel Group"), NULL, true);
+            else
+                menuPopup->AddButton(tr("Remove from Channel Group"), NULL, true);
+        }
+
+        popupStack->AddScreen(menuPopup);
+    }
+    else
+    {
+        delete menuPopup;
+    }
+}
+
+void GuideGrid::ShowRecordingMenu(void)
+{
+    QString label = tr("Recording Options");
+
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+    MythDialogBox *menuPopup = new MythDialogBox(label, popupStack,
+                                                 "recMenuPopup");
+
+    if (menuPopup->Create())
+    {
+        menuPopup->SetReturnEvent(this, "recmenu");
 
         ProgramInfo *pginfo = m_programInfos[m_currentRow][m_currentCol];
 
-        if (m_player && (m_player->GetState(-1) == kState_WatchingLiveTV))
-            menuPopup->AddButton(tr("Change Channel"));
-        menuPopup->AddButton(tr("Record"));
         if (pginfo && pginfo->GetRecordingRuleID())
             menuPopup->AddButton(tr("Edit Recording Status"));
         menuPopup->AddButton(tr("Edit Schedule"));
-        menuPopup->AddButton(tr("Program Details"));
-        menuPopup->AddButton(tr("Upcoming"));
+        menuPopup->AddButton(tr("Show Upcoming"));
         menuPopup->AddButton(tr("Custom Edit"));
 
         if (pginfo && pginfo->GetRecordingRuleID())
             menuPopup->AddButton(tr("Delete Rule"));
-
-        menuPopup->AddButton(tr("Reverse Channel Order"));
-
-        if (m_changrpid == -1)
-            menuPopup->AddButton(tr("Add To Channel Group"));
-        else
-            menuPopup->AddButton(tr("Remove from Channel Group"));
-
-        menuPopup->AddButton(tr("Choose Channel Group"));
-
-        menuPopup->AddButton(tr("Cancel"));
 
         popupStack->AddScreen(menuPopup);
     }
@@ -1359,39 +1388,19 @@ void GuideGrid::customEvent(QEvent *event)
                 delete record;
             }
         }
-        else if (resultid == "menu")
+        else if (resultid == "guidemenu")
         {
             if (resulttext == tr("Record"))
             {
                 quickRecord();
             }
-            if (resulttext == tr("Change Channel"))
+            else if (resulttext == tr("Change Channel"))
             {
                 enter();
-            }
-            if (resulttext == tr("Edit Recording Status"))
-            {
-                editRecSchedule();
-            }
-            else if (resulttext == tr("Edit Schedule"))
-            {
-                editSchedule();
             }
             else if (resulttext == tr("Program Details"))
             {
                 details();
-            }
-            else if (resulttext == tr("Upcoming"))
-            {
-                upcoming();
-            }
-            else if (resulttext == tr("Custom Edit"))
-            {
-                customEdit();
-            }
-            else if (resulttext == tr("Delete Rule"))
-            {
-                deleteRule();
             }
             else if (resulttext == tr("Reverse Channel Order"))
             {
@@ -1412,21 +1421,50 @@ void GuideGrid::customEvent(QEvent *event)
             {
                 ChannelGroupMenu(1);
             }
+            else if (resulttext == tr("Recording Options"))
+            {
+                ShowRecordingMenu();
+            }
+            else if (resulttext == tr("Jump to Time"))
+            {
+                ShowJumpToTime();
+            }
+        }
+        else if (resultid == "recmenu")
+        {
+            if (resulttext == tr("Edit Recording Status"))
+            {
+                editRecSchedule();
+            }
+            else if (resulttext == tr("Edit Schedule"))
+            {
+                editSchedule();
+            }
+            else if (resulttext == tr("Upcoming"))
+            {
+                upcoming();
+            }
+            else if (resulttext == tr("Custom Edit"))
+            {
+                customEdit();
+            }
+            else if (resulttext == tr("Delete Rule"))
+            {
+                deleteRule();
+            }
+
         }
         else if (resultid == "channelgrouptogglemenu")
         {
-            if (resulttext != tr("Cancel"))
-            {
-                int changroupid;
-                changroupid = ChannelGroup::GetChannelGroupId(resulttext);
+            int changroupid;
+            changroupid = ChannelGroup::GetChannelGroupId(resulttext);
 
-                if (changroupid > 0)
-                    toggleChannelFavorite(changroupid);
-            }
+            if (changroupid > 0)
+                toggleChannelFavorite(changroupid);
         }
         else if (resultid == "channelgroupmenu")
         {
-            if (resulttext != tr("Cancel") && buttonnum >= 0)
+            if (buttonnum >= 0)
             {
                 int changroupid;
 
@@ -1446,6 +1484,11 @@ void GuideGrid::customEvent(QEvent *event)
                 if (m_changroupname)
                     m_changroupname->SetText(changrpname);
             }
+        }
+        else if (resultid == "jumptotime")
+        {
+            QDateTime datetime = dce->GetData().toDateTime();
+            moveToTime(datetime);
         }
         else
             ScheduleCommon::customEvent(event);
@@ -1663,8 +1706,6 @@ void GuideGrid::ChannelGroupMenu(int mode)
                 menuPopup->AddButton(m_changrplist[i].name);
         }
 
-        menuPopup->AddButton(tr("Cancel"));
-
         popupStack->AddScreen(menuPopup);
     }
     else
@@ -1860,6 +1901,20 @@ void GuideGrid::moveUpDown(MoveVector movement)
     m_guideGrid->SetRedraw();
     updateInfo();
     updateChannels();
+}
+
+void GuideGrid::moveToTime(QDateTime datetime)
+{
+    if (!datetime.isValid())
+        return;
+
+    m_currentStartTime = datetime;
+
+    fillTimeInfos();
+    fillProgramInfos();
+    m_guideGrid->SetRedraw();
+    updateInfo();
+    updateDateText();
 }
 
 void GuideGrid::setStartChannel(int newStartChannel)
@@ -2145,3 +2200,23 @@ void GuideGrid::aboutToShow(void)
 
     MythScreenType::aboutToShow();
 }
+
+void GuideGrid::ShowJumpToTime(void)
+{
+    QString message =  tr("Jump to a specific date and time in the guide");
+    int flags = (MythTimeInputDialog::kAllDates | MythTimeInputDialog::kDay |
+                 MythTimeInputDialog::kHours);
+
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+    MythTimeInputDialog *timedlg = new MythTimeInputDialog(popupStack, message,
+                                                           flags);
+
+    if (timedlg->Create())
+    {
+        timedlg->SetReturnEvent(this, "jumptotime");
+        popupStack->AddScreen(timedlg);
+    }
+    else
+        delete timedlg;
+}
+

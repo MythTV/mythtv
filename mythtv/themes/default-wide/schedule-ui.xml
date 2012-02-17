@@ -974,34 +974,6 @@
 
     </window>
 
-    <window name="timepopup">
-        <area>-1,-1,580,165</area>
-
-        <imagetype name="box">
-            <filename>mythprogressdialog-background.png</filename>
-        </imagetype>
-
-        <textarea name="title" from="basetextarea">
-            <area>0,10,580,40</area>
-            <font>baselarge</font>
-            <align>hcenter,top</align>
-            <value>Select Time</value>
-        </textarea>
-
-        <buttonlist name="date_list" from="baseselector">
-            <position>40,60</position>
-        </buttonlist>
-
-        <buttonlist name="time_list" from="baseselector">
-            <position>330,60</position>
-        </buttonlist>
-
-        <button name="ok_button" from="basebutton">
-            <position>220,115</position>
-        </button>
-
-    </window>
-
     <window name="powersearchpopup">
         <area>-1,-1,500,500</area>
 

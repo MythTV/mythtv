@@ -28,6 +28,7 @@
 // MythTV
 #include "mpegdescriptors.h"
 
+// SCTE 57 p 83
 class FrameRateDescriptor : public MPEGDescriptor
 {
   public:
@@ -37,9 +38,10 @@ class FrameRateDescriptor : public MPEGDescriptor
     // descriptor_tag           8   0.0       0x82
     // descriptor_length        8   1.0
     // multiple_frame_rate_flag 1   2.0
-    bool MultipleFrameFlag(void) const { return _data[2] >> 7; }
-    //frame_rate_code           4   2.1
+    bool MultipleFrameRates(void) const { return _data[2] & 0x80; }
+    // frame_rate_code          4   2.1
     uint FrameRateCode(void) const { return (_data[2] >> 3) & 0xF; }
+    /// returns maximum frame rate in video
     double FrameRate(void) const
     {
         switch (FrameRateCode())
@@ -65,18 +67,18 @@ class FrameRateDescriptor : public MPEGDescriptor
                 return 0.0;
         }
     }
-    // reserved                 3
+    // reserved                 3   2.5
 
     QString toString(void) const
     {
         return QString("FrameRateDescriptor: "
-                       "MultipleFrameFlag(%1) FrameRate(%2)")
-            .arg(MultipleFrameFlag())
+                       "MultipleFrameRates(%1) MaximumFrameRate(%2)")
+            .arg(MultipleFrameRates())
             .arg(FrameRate());
     }
 };
 
-
+// SCTE 57 p 84
 class ExtendedVideoDescriptor : public MPEGDescriptor
 {
   public:
@@ -89,7 +91,7 @@ class ExtendedVideoDescriptor : public MPEGDescriptor
     bool CatalogModeFlag(void) const { return _data[2] & 0x80; }
     // video_includes_setup     1   2.1
     bool VideoIncludesSetup(void) const { return _data[2] & 0x40; }
-    // reserved                 6
+    // reserved                 6   2.2
 
     QString toString(void) const
     {
@@ -100,6 +102,7 @@ class ExtendedVideoDescriptor : public MPEGDescriptor
     }
 };
 
+// SCTE 57 p 85
 class SCTEComponentNameDescriptor : public MPEGDescriptor
 {
   public:
@@ -117,7 +120,7 @@ class SCTEComponentNameDescriptor : public MPEGDescriptor
 
     // for (i = 0; i < string_count; i++)
     // {
-    // ISO_639_langauge_code   24  loc(i)
+    // ISO_639_language_code   24  loc(i)
     int LanguageKey(uint i) const
         { return iso639_str3_to_key(&_data[loc(i)]); }
     QString LanguageString(uint i) const
@@ -174,7 +177,7 @@ class CueIdentifierDescriptor : public MPEGDescriptor
     QString toString(void) const;
 };
 
-
+// See SCTE 57 p 80
 class FrequencySpecificationDescriptor : public MPEGDescriptor
 {
   public:
@@ -184,15 +187,26 @@ class FrequencySpecificationDescriptor : public MPEGDescriptor
     //       Name             bits  loc  expected value
     // descriptor_tag           8   0.0       0x90
     // descriptor_length        8   1.0
-    // frequncy_unit            1   2
-    bool FrequnecyUnit(void) const { return _data[2] >> 7; }
-    uint FrequnecyUnitkHz(void) const
-        { return (FrequnecyUnit()) ? 125000 : 10000; }
-    // carrier_frequency        15
-    uint CarrierFrequnecy(void) const
-        { return ((_data[2] & 0x7F) << 8) | _data[3]; }
+    // frequency_unit           1   2.0
+    bool FrequencyUnit(void) const { return _data[2] & 0x80; }
+    uint FrequencyUnitHz(void) const
+        { return FrequencyUnit() ? 10000 : 125000; }
+    // carrier_frequency       15   2.1
+    uint CarrierFrequency(void) const
+        { return ((_data[2] << 8) | _data[3]) & 0x7fff; }
+    unsigned long long CarrierFrequnecyHz(void) const
+    {
+        return FrequencyUnitHz() * ((unsigned long long) CarrierFrequency());
+    }
+
+    QString toString(void) const
+    {
+        return QString("FrequencySpecificationDescriptor: %2 Hz")
+            .arg(CarrierFrequnecyHz());
+    }
 };
 
+// SCTE 57 p 81
 class ModulationParamsDescriptor : public MPEGDescriptor
 {
   public:
@@ -219,6 +233,7 @@ class ModulationParamsDescriptor : public MPEGDescriptor
     }
 };
 
+// SCTE 57 p 82
 class TransportStreamIdDescriptor : public MPEGDescriptor
 {
   public:
@@ -238,7 +253,7 @@ class TransportStreamIdDescriptor : public MPEGDescriptor
     }
 };
 
-// See SCTE 65 -- optional descriptor
+// See SCTE 65 p 55 -- optional descriptor
 class RevisionDetectionDescriptor : public MPEGDescriptor
 {
   public:

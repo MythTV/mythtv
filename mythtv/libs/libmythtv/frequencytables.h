@@ -214,9 +214,18 @@ class transport_scan_items_it_t
     }
 
     transport_scan_items_it_t operator++(int)
-        { transport_scan_items_it_t tmp = *this; return ++tmp; }
+    {
+        transport_scan_items_it_t tmp = *this;
+        operator++();
+        return tmp;
+    }
+
     transport_scan_items_it_t operator--(int)
-        { transport_scan_items_it_t tmp = *this; return --tmp; }
+    {
+        transport_scan_items_it_t tmp = *this;
+        operator--();
+        return tmp;
+    }
 
     transport_scan_items_it_t& operator+=(int incr)
         { for (int i = 0; i < incr; i++) ++(*this); return *this; }

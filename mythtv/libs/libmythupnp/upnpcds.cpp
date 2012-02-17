@@ -4,20 +4,9 @@
 //
 // Purpose     : uPnp Content Directory Service
 //
-// Copyright (c) 2005 David Blain <mythtv@theblains.net>
+// Copyright (c) 2005 David Blain <dblain@mythtv.org>
 //
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or at your option any later version of the LGPL.
-//
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
-//
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library.  If not, see <http://www.gnu.org/licenses/>.
+// Licensed under the GPL v2 or later, see COPYING for details                    
 //
 //////////////////////////////////////////////////////////////////////////////
 
@@ -731,7 +720,7 @@ UPnpCDSExtensionResults *UPnpCDSExtension::Browse( UPnpCDSRequest *pRequest )
 
     QString key = pRequest->m_sObjectId.section('=',1);
 
-    if (idPath.count() == 0)
+    if (idPath.isEmpty())
         return( NULL );
 
     // ----------------------------------------------------------------------
@@ -748,9 +737,9 @@ UPnpCDSExtensionResults *UPnpCDSExtension::Browse( UPnpCDSRequest *pRequest )
         {
             if (pRequest->m_sObjectId.contains("item"))
             {
-                idPath = idPath[idPath.count() - 2].split(
-                    " ", QString::SkipEmptyParts);
-                idPath = idPath[0].split('?', QString::SkipEmptyParts);
+                idPath.removeLast();
+                idPath = idPath.last().split(" ", QString::SkipEmptyParts);
+                idPath = idPath.first().split('?', QString::SkipEmptyParts);
 
                 if (idPath[0].startsWith(QString("Id")))
                     idPath[0] = QString("item=%1")
@@ -1066,12 +1055,12 @@ UPnpCDSExtensionResults *
     //
     // ----------------------------------------------------------------------
 
-    QString sKey = idPath.last().section( '=', 1, 1 );
+    QString sKey = idPath.takeLast().section( '=', 1, 1 );
     sKey = QUrl::fromPercentEncoding(sKey.toUtf8());
 
-    if (sKey.length() > 0)
+    if (!sKey.isEmpty())
     {
-        int nNodeIdx = idPath[ idPath.count() - 2 ].toInt();
+        int nNodeIdx = idPath.takeLast().toInt();
 
         switch( pRequest->m_eBrowseFlag )
         {

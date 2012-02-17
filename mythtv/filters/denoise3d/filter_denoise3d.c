@@ -428,7 +428,8 @@ static VideoFilter *NewDenoise3DFilter(VideoFrameType inpixfmt,
     if (options)
     {
         double param1, param2, param3;
-        switch (sscanf (options, "%lf:%lf:%lf", &param1, &param2, &param3))
+        switch (sscanf(options, "%20lf:%20lf:%20lf",
+                       &param1, &param2, &param3))
         {
             case 0:
             default:

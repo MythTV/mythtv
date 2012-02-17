@@ -444,6 +444,9 @@ void VideoOutWindow::ApplySnapToVideoRect(void)
     if (pip_state > kPIPOff)
         return;
 
+    if (display_video_rect.height() == 0 || display_video_rect.width() == 0)
+        return;
+
     float ydiff = abs(display_video_rect.height() - video_rect.height());
     if ((ydiff / display_video_rect.height()) < 0.05)
     {

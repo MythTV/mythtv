@@ -192,6 +192,7 @@ class ZMServer
     string               m_eventFileFormat;
     string               m_analyseFileFormat;
     key_t                m_shmKey;
+    string               m_mmapPath;
 };
 
 

@@ -22,7 +22,7 @@
     use MythTV;
 
 # Some variables we'll use here
-    our ($dest, $format, $usage, $underscores, $live, $rename);
+    our ($dest, $format, $usage, $underscores, $live, $rename, $maxlength);
     our ($chanid, $starttime, $filename);
     our ($dformat, $dseparator, $dreplacement, $separator, $replacement);
     our ($db_host, $db_user, $db_name, $db_pass, $video_dir, $verbose);
@@ -39,9 +39,10 @@
     $format      = $dformat;
     $separator   = $dseparator;
     $replacement = $dreplacement;
+    $maxlength   = -1;
 
 # Load the cli options
-    GetOptions('link|dest|destination|path:s' => \$dest,
+    GetOptions('link|destination|path:s'      => \$dest,
                'chanid=s'                     => \$chanid,
                'starttime=s'                  => \$starttime,
                'filename=s'                   => \$filename,
@@ -50,7 +51,8 @@
                'separator=s'                  => \$separator,
                'replacement=s'                => \$replacement,
                'rename'                       => \$rename,
-               'usage|help|h'                 => \$usage,
+               'maxlength=i'                  => \$maxlength,
+               'usage|help'                   => \$usage,
                'underscores'                  => \$underscores,
                'verbose'                      => \$verbose
               );
@@ -62,7 +64,9 @@ $0 usage:
 
 options:
 
---dest [destination directory]
+--link [destination directory]
+--destination [destination directory]
+--path [destination directory]
 
     Specify the directory for the links.  If no pathname is given, links will
     be created in the show_names directory inside of the current mythtv data
@@ -227,6 +231,19 @@ options:
     represents recordings using human-readable file names or use mythlink.pl to
     create links with human-readable names to the recording files.
 
+--maxlength length
+
+    Ensure the link name is length or fewer characters.  If the link name is
+    longer than length, truncate the name. Zero or any negative value for
+    length disables length checking.
+
+    Note that this option does not take into account the path length, so on a
+    file system used by applications with small path limitations (such as
+    Windows Explorer and Windows Command Prompt), you should specify a length
+    that takes into account characters used by the path to the dest directory.
+
+    default:  Unlimited
+
 --verbose
 
     Print debug info.
@@ -234,6 +251,7 @@ options:
     default:  No info printed to console
 
 --help
+--usage
 
     Show this help text.
 
@@ -245,6 +263,12 @@ EOF
     if ((defined($chanid) or defined($starttime)) and
         !(defined($chanid) and defined($starttime))) {
         die "The arguments --chanid and --starttime must be used together.\n";
+    }
+
+# Ensure --maxlength specifies a reasonable value (though filenames may
+# still be useless at such short lengths)
+    if ($maxlength > 0 and $maxlength < 19) {
+        die "The --maxlength must be 20 or higher.\n";
     }
 
 # Check the separator and replacement characters for illegal characters
@@ -353,20 +377,28 @@ EOF
         $safe_file = "'$safe_file'";
     # Figure out the suffix
         my ($suffix) = ($show->{'basename'} =~ /(\.\w+)$/);
+    # Check the link name's length
+        $name = cut_down_name($name, $suffix);
     # Link destination
     # Check for duplicates
-        if (-e "$dest/$name$suffix") {
+        if (($name) and -e "$dest/$name$suffix") {
             if ((!defined($filename) and !defined($chanid)) or
                 (! -l "$dest/$name$suffix")) {
                 $count = 2;
-                while (-e "$dest/$name.$count$suffix") {
+                $name = cut_down_name($name, ".$count$suffix");
+                while (($name) and -e "$dest/$name.$count$suffix") {
                     $count++;
+                    $name = cut_down_name($name, ".$count$suffix");
                 }
-                $name .= ".$count";
+                $name .= ".$count" if (($name));
             } else {
                 unlink "$dest/$name$suffix" or die "Couldn't remove ".
                        "old symlink $dest/$name$suffix: $!\n";
             }
+        }
+        if (!($name)) {
+            vprint("Unable to represent recording; maxlength too small.");
+            next;
         }
         $name .= $suffix;
     # Create the link
@@ -378,6 +410,22 @@ EOF
         symlink $show->{'local_path'}, "$dest/$name"
             or die "Can't create symlink $dest/$name:  $!\n";
         vprint("$dest/$name");
+    }
+
+# Check the length of the link name
+    sub cut_down_name {
+        my $name = shift;
+        my $suffix = shift;
+        if ($maxlength > 0) {
+            my $charsavailable = $maxlength - length($suffix);
+            if ($charsavailable > 0) {
+                $name = substr($name, 0, $charsavailable);
+            }
+            else {
+                $name = '';
+            }
+        }
+        return $name;
     }
 
 # Print the message, but only if verbosity is enabled

@@ -1,9 +1,12 @@
 #include <unistd.h>
+#include <zlib.h>
 
 // Qt headers
 #include <QDir>
 #include <QFileInfo>
 #include <QByteArray>
+#include <QNetworkReply>
+#include <QAuthenticator>
 
 // MythTV headers
 #include "datadirect.h"
@@ -19,9 +22,8 @@
 #include "dbutil.h"
 #include "mythsystem.h"
 #include "exitcodes.h"
+#include "mythdownloadmanager.h"
 #include "mythtvexp.h"
-
-#define SHOW_WGET_OUTPUT 0
 
 #define LOC QString("DataDirect: ")
 
@@ -46,6 +48,9 @@ static uint    update_channel_basic(uint    sourceid,   bool    insert,
                                     QString xmltvid,    QString callsign,
                                     QString name,       uint    freqid,
                                     QString chan_major, QString chan_minor);
+void authenticationCallback(QNetworkReply *reply, QAuthenticator *auth,
+                            void *arg);
+QByteArray gUncompress(const QByteArray &data);
 
 DataDirectStation::DataDirectStation(void) :
     stationid(""),              callsign(""),
@@ -957,96 +962,92 @@ void DataDirectProcessor::DataDirectProgramUpdate(void)
 #endif
 }
 
-bool DataDirectProcessor::DDPost(
-    QString    ddurl,
-    QString    postFilename, QString   &inputFile,
-    QString    userid,       QString    password,
-    QDateTime  pstartDate,   QDateTime  pendDate,
-    QString   &err_txt)
+void authenticationCallback(QNetworkReply *reply, QAuthenticator *auth,
+                            void *arg)
+{
+    if (!arg)
+        return;
+
+    DataDirectProcessor *dd = reinterpret_cast<DataDirectProcessor *>(arg);
+    dd->authenticationCallback(reply, auth);
+}
+
+void DataDirectProcessor::authenticationCallback(QNetworkReply *reply,
+                                                 QAuthenticator *auth)
+{
+    (void)reply;
+    auth->setUser(GetUserID());
+    auth->setPassword(GetPassword());
+}
+
+bool DataDirectProcessor::DDPost(QString    ddurl,        QString   &inputFile,
+                                 QDateTime  pstartDate,   QDateTime  pendDate,
+                                 QString   &err_txt)
 {
     if (!inputFile.isEmpty() && QFile(inputFile).exists())
     {
         return true;
     }
 
-    QFile postfile(postFilename);
-    if (!postfile.open(QIODevice::WriteOnly))
-    {
-        err_txt = "Unable to open post data output file.";
-        return false;
-    }
-
     QString startdatestr = pstartDate.toString(Qt::ISODate) + "Z";
     QString enddatestr = pendDate.toString(Qt::ISODate) + "Z";
-    QTextStream poststream(&postfile);
-    poststream << "<?xml version='1.0' encoding='utf-8'?>\n";
-    poststream << "<SOAP-ENV:Envelope\n";
-    poststream <<
-        "xmlns:SOAP-ENV='http://schemas.xmlsoap.org/soap/envelope/'\n";
-    poststream << "xmlns:xsd='http://www.w3.org/2001/XMLSchema'\n";
-    poststream << "xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'\n";
-    poststream <<
-        "xmlns:SOAP-ENC='http://schemas.xmlsoap.org/soap/encoding/'>\n";
-    poststream << "<SOAP-ENV:Body>\n";
-    poststream << "<ns1:download  xmlns:ns1='urn:TMSWebServices'>\n";
-    poststream << "<startTime xsi:type='xsd:dateTime'>";
-    poststream << startdatestr << "</startTime>\n";
-    poststream << "<endTime xsi:type='xsd:dateTime'>";
-    poststream << enddatestr << "</endTime>\n";
-    poststream << "</ns1:download>\n";
-    poststream << "</SOAP-ENV:Body>\n";
-    poststream << "</SOAP-ENV:Envelope>\n";
-    poststream << flush;
-    postfile.close();
-
-    // Allow for single quotes in userid and password (shell escape)
-    password.replace('\'', "'\\''");
-    userid.replace('\'', "'\\''");
+    QByteArray postdata;
+    postdata  = "<?xml version='1.0' encoding='utf-8'?>\n";
+    postdata += "<SOAP-ENV:Envelope\n";
+    postdata += "xmlns:SOAP-ENV='http://schemas.xmlsoap.org/soap/envelope/'\n";
+    postdata += "xmlns:xsd='http://www.w3.org/2001/XMLSchema'\n";
+    postdata += "xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'\n";
+    postdata += "xmlns:SOAP-ENC='http://schemas.xmlsoap.org/soap/encoding/'>\n";
+    postdata += "<SOAP-ENV:Body>\n";
+    postdata += "<ns1:download  xmlns:ns1='urn:TMSWebServices'>\n";
+    postdata += "<startTime xsi:type='xsd:dateTime'>";
+    postdata += startdatestr;
+    postdata += "</startTime>\n";
+    postdata += "<endTime xsi:type='xsd:dateTime'>";
+    postdata += enddatestr;
+    postdata += "</endTime>\n";
+    postdata += "</ns1:download>\n";
+    postdata += "</SOAP-ENV:Body>\n";
+    postdata += "</SOAP-ENV:Envelope>\n";
 
     if (inputFile.isEmpty()) {
         inputFile = QString("/tmp/mythtv_ddp_data");
     }
 
-    QString command;
+    const QByteArray header = "Accept-Encoding";
+    const QByteArray value  = "gzip";
+
+    LOG(VB_GENERAL, LOG_INFO, "Downloading DataDirect feed");
+
+    MythDownloadManager *manager = GetMythDownloadManager();
+
+    if (!manager->postAuth(ddurl, &postdata, &::authenticationCallback, this,
+                           &header, &value))
     {
-        QMutexLocker locker(&user_agent_lock);
-        command = QString(
-            "wget --http-user='%1' --http-passwd='%2' --post-file='%3' "
-            " %4 --user-agent='%5' --output-document=%6")
-            .arg(userid).arg(password).arg(postFilename).arg(ddurl)
-            .arg(user_agent).arg(inputFile);
-    }
-
-#ifdef USING_MINGW
-    // Allow for double quotes in userid and password (shell escape)
-    command.replace("\"","^\"");
-    // Replace single quotes with double-quotes
-    command.replace("'", "\"");
-    // Unescape unix-escaped single-quotes (which just became "\"")
-    command.replace("\"\\\"\"","'");
-    // gzip on win32 complains about broken pipe, so don't use it
-#else
-    // if (!SHOW_WGET_OUTPUT)
-    //    command += " 2> /dev/null ";
-
-    command += ".gz --header='Accept-Encoding:gzip'";
-#endif
-
-    if (SHOW_WGET_OUTPUT)
-        LOG(VB_GENERAL, LOG_DEBUG, LOC + "command: " + command);
-
-    err_txt = "Returned failure";
-    if (myth_system(command, kMSAnonLog) != GENERIC_EXIT_OK)
+        err_txt = QString("Download error");
         return false;
-
-#ifndef USING_MINGW
-    if (QFile::exists( inputFile+".gz" ))
-    {
-        command = QString("gzip -df %1").arg(inputFile+".gz");
-        if (myth_system(command) != GENERIC_EXIT_OK)
-            return false;
     }
-#endif
+
+    LOG(VB_GENERAL, LOG_INFO, QString("Downloaded %1 bytes")
+        .arg(postdata.size()));
+
+    LOG(VB_GENERAL, LOG_INFO, "Uncompressing DataDirect feed");
+
+    QByteArray uncompressed = gUncompress(postdata);
+
+    LOG(VB_GENERAL, LOG_INFO, QString("Uncompressed to %1 bytes")
+        .arg(uncompressed.size()));
+
+    QFile file(inputFile);
+    file.open(QIODevice::WriteOnly);
+    file.write(uncompressed);
+    file.close();
+
+    if (uncompressed.size() == 0)
+    {
+        err_txt = QString("Error uncompressing data");
+        return false;
+    }
 
     return true;
 }
@@ -1058,13 +1059,6 @@ bool DataDirectProcessor::GrabNextSuggestedTime(void)
     QString ddurl = m_providers[m_listingsProvider].webServiceURL;
 
     bool ok;
-    QString postFilename = GetPostFilename(ok);
-    if (!ok)
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC +
-            "GrabNextSuggestedTime: Creating temp post file");
-        return false;
-    }
     QString resultFilename = GetResultFilename(ok);
     if (!ok)
     {
@@ -1073,62 +1067,37 @@ bool DataDirectProcessor::GrabNextSuggestedTime(void)
         return false;
     }
 
-    QFile postfile(postFilename);
-    if (!postfile.open(QIODevice::WriteOnly))
+    QByteArray postdata;
+    postdata  = "<?xml version='1.0' encoding='utf-8'?>\n";
+    postdata += "<SOAP-ENV:Envelope\n";
+    postdata += "xmlns:SOAP-ENV='http://schemas.xmlsoap.org/soap/envelope/'\n";
+    postdata += "xmlns:xsd='http://www.w3.org/2001/XMLSchema'\n";
+    postdata += "xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'\n";
+    postdata += "xmlns:SOAP-ENC='http://schemas.xmlsoap.org/soap/encoding/'>\n";
+    postdata += "<SOAP-ENV:Body>\n";
+    postdata += "<tms:acknowledge xmlns:tms='urn:TMSWebServices'>\n";
+    postdata += "</SOAP-ENV:Body>\n";
+    postdata += "</SOAP-ENV:Envelope>\n";
+
+    MythDownloadManager *manager = GetMythDownloadManager();
+
+    if (!manager->postAuth(ddurl, &postdata, &::authenticationCallback, this))
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Opening '%1'")
-                .arg(postFilename) + ENO);
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            "GrabNextSuggestedTime: Could not download");
         return false;
     }
-
-    QTextStream poststream(&postfile);
-    poststream << "<?xml version='1.0' encoding='utf-8'?>\n";
-    poststream << "<SOAP-ENV:Envelope\n";
-    poststream
-        << "xmlns:SOAP-ENV='http://schemas.xmlsoap.org/soap/envelope/'\n";
-    poststream << "xmlns:xsd='http://www.w3.org/2001/XMLSchema'\n";
-    poststream << "xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'\n";
-    poststream
-        << "xmlns:SOAP-ENC='http://schemas.xmlsoap.org/soap/encoding/'>\n";
-    poststream << "<SOAP-ENV:Body>\n";
-    poststream << "<tms:acknowledge xmlns:tms='urn:TMSWebServices'>\n";
-    poststream << "</SOAP-ENV:Body>\n";
-    poststream << "</SOAP-ENV:Envelope>\n";
-    poststream << flush;
-    postfile.close();
-
-    QString command;
-    {
-        QMutexLocker locker(&user_agent_lock);
-        command = QString(
-            "wget --http-user='%1' --http-passwd='%2' --post-file='%3' %4 "
-            "--user-agent='%5' --output-document='%6'")
-            .arg(GetUserID().replace('\'', "'\\''"))
-            .arg(GetPassword().replace('\'', "'\\''")).arg(postFilename)
-            .arg(ddurl).arg(user_agent).arg(resultFilename);
-#ifdef USING_MINGW
-        // Allow for double quotes in userid and password (shell escape)
-        command.replace("\"","^\"");
-        // Replace single quotes with double-quotes
-        command.replace("'", "\"");
-        // Unescape unix-escaped single-quotes (which just became "\"")
-        command.replace("\"\\\"\"","'");
-#endif
-    }
-
-    if (SHOW_WGET_OUTPUT)
-        LOG(VB_GENERAL, LOG_DEBUG, LOC + "command: " + command);
-#ifndef USING_MINGW
-    else
-        command += " 2> /dev/null ";
-#endif
-
-    myth_system(command, kMSAnonLog);
 
     QDateTime NextSuggestedTime;
     QDateTime BlockedTime;
 
+    LOG(VB_GENERAL, LOG_INFO, QString("Suggested Time data: %1 bytes")
+        .arg(postdata.size()));
+
     QFile file(resultFilename);
+    file.open(QIODevice::WriteOnly);
+    file.write(postdata);
+    file.close();
 
     bool GotNextSuggestedTime = false;
     MUNUSED bool GotBlockedTime = false;
@@ -1207,16 +1176,7 @@ bool DataDirectProcessor::GrabData(const QDateTime &pstartDate,
             inputfile = cache_dd_data;
     }
 
-    bool ok;
-    QString postFilename = GetPostFilename(ok);
-    if (!ok)
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "GrabData: Creating temp post file");
-        return false;
-    }
-
-    if (!DDPost(ddurl, postFilename, inputfile, GetUserID(), GetPassword(),
-                pstartDate, pendDate, err))
+    if (!DDPost(ddurl, inputfile, pstartDate, pendDate, err))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + QString("Failed to get data: %1")
                 .arg(err));
@@ -1234,7 +1194,7 @@ bool DataDirectProcessor::GrabData(const QDateTime &pstartDate,
         return false;
     }
 
-    ok = true;
+    bool ok = true;
 
     DDStructureParser ddhandler(*this);
     QXmlInputSource  xmlsource;
@@ -1850,17 +1810,6 @@ QString DataDirectProcessor::CreateTempDirectory(bool *pok) const
     return m_tmpDir;
 }
 
-QString DataDirectProcessor::GetPostFilename(bool &ok) const
-{
-    ok = true;
-    if (m_tmpPostFile.isEmpty())
-    {
-        CreateTemp(m_tmpDir + "/mythtv_post_XXXXXX",
-                   "Failed to create temp post file",
-                   false, m_tmpPostFile, ok);
-    }
-    return m_tmpPostFile;
-}
 
 QString DataDirectProcessor::GetResultFilename(bool &ok) const
 {
@@ -1908,55 +1857,31 @@ bool DataDirectProcessor::Post(QString url, const PostList &list,
                                QString documentFile,
                                QString inCookieFile, QString outCookieFile)
 {
-    QString dfile = QString("'%1' ").arg(documentFile);
-    QString command = "wget ";
+    MythDownloadManager *manager = GetMythDownloadManager();
 
     if (!inCookieFile.isEmpty())
-        command += QString("--load-cookies=%1 ").arg(inCookieFile);
+        manager->loadCookieJar(inCookieFile);
 
-    if (!outCookieFile.isEmpty())
-    {
-        command += "--keep-session-cookies ";
-        command += QString("--save-cookies=%1 ").arg(outCookieFile);
-    }
-
-    QString post_data = "";
+    QByteArray postdata;
     for (uint i = 0; i < list.size(); i++)
     {
-        post_data += ((i) ? "&" : "") + list[i].key + "=";
-        post_data += html_escape(list[i].value);
+        postdata += ((i) ? "&" : "") + list[i].key + "=";
+        postdata += html_escape(list[i].value);
     }
 
-    if (post_data.length())
-        command += "--post-data='" + post_data + "' ";
+    if (!manager->post(url, &postdata))
+        return false;
 
-    command += url;
-    command += " ";
-
-    {
-        QMutexLocker locker(&user_agent_lock);
-        command += QString("--user-agent='%1' ").arg(user_agent);
-    }
-
-    command += "--output-document=";
-    command += (documentFile.isEmpty()) ? "- " : dfile;
-
-#ifdef USING_MINGW
-    command.replace("'", "\"");
-#endif
-
-    if (SHOW_WGET_OUTPUT)
-        LOG(VB_GENERAL, LOG_DEBUG, LOC + "command: " + command);
-    else
-    {
-        command += (documentFile.isEmpty()) ? "&> " : "2> ";
-        command += "/dev/null ";
-    }
-
-    myth_system(command);
+    if (!outCookieFile.isEmpty())
+        manager->saveCookieJar(outCookieFile);
 
     if (documentFile.isEmpty())
         return true;
+
+    QFile file(documentFile);
+    file.open(QIODevice::WriteOnly);
+    file.write(postdata);
+    file.close();
 
     QFileInfo fi(documentFile);
     return fi.size();
@@ -2402,6 +2327,88 @@ static QString get_lineup_type(uint sourceid)
     QString ret = srcid_to_type[sourceid];
     ret.detach();
     return ret;
+}
+
+/*
+ * This function taken from: 
+ * http://stackoverflow.com/questions/2690328/qt-quncompress-gzip-data
+ *
+ * Based on zlib example code.
+ *
+ * Copyright (c) 2011 Ralf Engels <ralf-engels@gmx.de>
+ * Copyright (C) 1995-2012 Jean-loup Gailly and Mark Adler
+ *
+ * Licensed under the terms of the ZLib license which is found at
+ * http://zlib.net/zlib_license.html and is as follows:
+ *
+ *  This software is provided 'as-is', without any express or implied
+ *  warranty.  In no event will the authors be held liable for any damages
+ *  arising from the use of this software.
+ *
+ *  Permission is granted to anyone to use this software for any purpose,
+ *  including commercial applications, and to alter it and redistribute it
+ *  freely, subject to the following restrictions:
+ *
+ *  1. The origin of this software must not be misrepresented; you must not
+ *     claim that you wrote the original software. If you use this software
+ *     in a product, an acknowledgment in the product documentation would be
+ *     appreciated but is not required.
+ *  2. Altered source versions must be plainly marked as such, and must not be
+ *     misrepresented as being the original software.
+ *  3. This notice may not be removed or altered from any source distribution.
+ *
+ *  NOTE: The Zlib license is listed as being GPL-compatible
+ *    http://www.gnu.org/licenses/license-list.html#ZLib
+ */
+
+QByteArray gUncompress(const QByteArray &data)
+{
+    if (data.size() <= 4) {
+        LOG(VB_GENERAL, LOG_WARNING, "gUncompress: Input data is truncated");
+        return QByteArray();
+    }
+
+    QByteArray result;
+
+    int ret;
+    z_stream strm;
+    static const int CHUNK_SIZE = 1024;
+    char out[CHUNK_SIZE];
+
+    /* allocate inflate state */
+    strm.zalloc = Z_NULL;
+    strm.zfree = Z_NULL;
+    strm.opaque = Z_NULL;
+    strm.avail_in = data.size();
+    strm.next_in = (Bytef*)(data.data());
+
+    ret = inflateInit2(&strm, 15 +  32); // gzip decoding
+    if (ret != Z_OK)
+        return QByteArray();
+
+    // run inflate()
+    do {
+        strm.avail_out = CHUNK_SIZE;
+        strm.next_out = (Bytef*)(out);
+
+        ret = inflate(&strm, Z_NO_FLUSH);
+        Q_ASSERT(ret != Z_STREAM_ERROR);  // state not clobbered
+
+        switch (ret) {
+        case Z_NEED_DICT:
+            ret = Z_DATA_ERROR;     // and fall through
+        case Z_DATA_ERROR:
+        case Z_MEM_ERROR:
+            (void)inflateEnd(&strm);
+            return QByteArray();
+        }
+
+        result.append(out, CHUNK_SIZE - strm.avail_out);
+    } while (strm.avail_out == 0);
+
+    // clean up and return
+    inflateEnd(&strm);
+    return result;
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

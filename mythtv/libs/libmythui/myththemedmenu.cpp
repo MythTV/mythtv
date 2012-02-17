@@ -296,35 +296,34 @@ void MythThemedMenu::ShowMenu()
     if (m_menuPopup->Create())
         mainStack->AddScreen(m_menuPopup);
 
+    m_menuPopup->SetReturnEvent(this, "popmenu");
+
+    // HACK Implement a better check for this
+    if (QCoreApplication::applicationName() == MYTH_APPNAME_MYTHFRONTEND)
+        m_menuPopup->AddButton(tr("Enter standby mode"), QVariant("standby"));
     switch (override_menu)
     {
         case 2:
         case 4:
             // shutdown
-            m_menuPopup->SetReturnEvent(this,"popmenu_shutdown");
-            m_menuPopup->AddButton(tr("Shutdown"));
+            m_menuPopup->AddButton(tr("Shutdown"), QVariant("shutdown"));
             break;
         case 5:
             // reboot
-            m_menuPopup->SetReturnEvent(this,"popmenu_reboot");
-            m_menuPopup->AddButton(tr("Reboot"));
+            m_menuPopup->AddButton(tr("Reboot"), QVariant("reboot"));
             break;
         case 3:
         case 6:
             // both
-            m_menuPopup->SetReturnEvent(this,"popmenu_exit");
-            m_menuPopup->AddButton(tr("Shutdown"));
-            m_menuPopup->AddButton(tr("Reboot"));
+            m_menuPopup->AddButton(tr("Shutdown"), QVariant("shutdown"));
+            m_menuPopup->AddButton(tr("Reboot"), QVariant("reboot"));
             break;
         case 0:
         default:
-            m_menuPopup->SetReturnEvent(this,"popmenu_noexit");
             break;
     }
 
-    m_menuPopup->AddButton(tr("About"));
-    m_menuPopup->AddButton(tr("Cancel"));
-
+    m_menuPopup->AddButton(tr("About"), QVariant("about"));
 }
 
 void MythThemedMenu::aboutScreen()
@@ -365,52 +364,27 @@ void MythThemedMenu::customEvent(QEvent *event)
         QString halt_cmd = GetMythDB()->GetSetting("HaltCommand");
         QString reboot_cmd = GetMythDB()->GetSetting("RebootCommand");
 
-        if (resultid == "popmenu_exit")
+        if (resultid == "popmenu")
         {
-            switch (buttonnum)
+            QString action = dce->GetData().toString();
+            if (action == "shutdown")
             {
-                case 0:
-                    if (!halt_cmd.isEmpty())
-                        myth_system(halt_cmd);
-                    break;
-                case 1:
-                    if (!reboot_cmd.isEmpty())
-                        myth_system(reboot_cmd);
-                    break;
-                case 2:
-                    aboutScreen();
-                    break;
+                if (!halt_cmd.isEmpty())
+                    myth_system(halt_cmd);
             }
-        }
-        else if (resultid == "popmenu_noexit")
-        {
-            if (buttonnum == 0)
+            else if (action == "reboot")
+            {
+                if (!reboot_cmd.isEmpty())
+                    myth_system(reboot_cmd);
+            }
+            else if (action == "about")
+            {
                 aboutScreen();
-        }
-        else if (resultid == "popmenu_reboot")
-        {
-            switch (buttonnum)
-            {
-                case 0:
-                    if (!reboot_cmd.isEmpty())
-                        myth_system(reboot_cmd);
-                    break;
-                case 1:
-                    aboutScreen();
-                    break;
             }
-        }
-        else if (resultid == "popmenu_shutdown")
-        {
-            switch (buttonnum)
+            else if (action == "standby")
             {
-                case 0:
-                    if (!halt_cmd.isEmpty())
-                        myth_system(halt_cmd);
-                    break;
-                case 1:
-                    aboutScreen();
-                    break;
+                QString arg("standby_mode");
+                m_state->m_callback(m_state->m_callbackdata, arg);
             }
         }
         else if (resultid == "password")
@@ -655,7 +629,7 @@ bool MythThemedMenu::parseMenu(const QString &menuname)
 
     if (m_buttonList->GetCount() == 0)
     {
-        LOG(VB_GENERAL, LOG_ERR, 
+        LOG(VB_GENERAL, LOG_ERR,
             QString("MythThemedMenu: No buttons for menu %1").arg(menuname));
         return false;
     }

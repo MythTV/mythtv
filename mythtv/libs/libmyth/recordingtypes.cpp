@@ -52,6 +52,59 @@ QString toString(RecordingType rectype)
     }
 }
 
+/// \brief Converts "rectype" into an untranslated description.
+QString toRawString(RecordingType rectype)
+{
+    switch (rectype)
+    {
+        case kSingleRecord:
+            return QString("Single Record");
+        case kTimeslotRecord:
+            return QString("Record Daily");
+        case kWeekslotRecord:
+            return QString("Record Weekly");
+        case kChannelRecord:
+            return QString("Channel Record");
+        case kAllRecord:
+            return QString("Record All");
+        case kFindOneRecord:
+            return QString("Find One");
+        case kFindDailyRecord:
+            return QString("Find Daily");
+        case kFindWeeklyRecord:
+            return QString("Find Weekly");
+        case kOverrideRecord:
+        case kDontRecord:
+            return QString("Override Recording");
+        default:
+            return QString("Not Recording");
+    }
+}
+
+RecordingType recTypeFromString(QString type)
+{
+    if (type.toLower() == "single record" || type.toLower() == "single")
+        return kSingleRecord;
+    else if (type.toLower() == "record daily" || type.toLower() == "daily")
+        return kTimeslotRecord;
+    else if (type.toLower() == "record weekly" || type.toLower() == "weekly")
+        return kWeekslotRecord;
+    else if (type.toLower() == "channel record" || type.toLower() == "channel")
+        return kChannelRecord;
+    else if (type.toLower() == "record all" || type.toLower() == "all")
+        return kAllRecord;
+    else if (type.toLower() == "find one" || type.toLower() == "one")
+        return kFindOneRecord;
+    else if (type.toLower() == "find daily" || type.toLower() == "daily")
+        return kFindDailyRecord;
+    else if (type.toLower() == "find weekly" || type.toLower() == "weekly")
+        return kFindWeeklyRecord;
+    else if (type.toLower() == "override recording" || type.toLower() == "override")
+        return kOverrideRecord;
+    else
+        return kDontRecord;
+}
+
 /// \brief Converts "rectype" into a human readable character.
 QChar toQChar(RecordingType rectype)
 {
@@ -83,4 +136,109 @@ QChar toQChar(RecordingType rectype)
             ret = " ";
     }
     return (ret.isEmpty()) ? QChar(' ') : ret[0];
+}
+
+QString toRawString(RecordingDupInType recdupin)
+{
+    switch (recdupin)
+    {
+        case kDupsInRecorded:
+            return QString("Current Recordings");
+        case kDupsInOldRecorded:
+            return QString("Previous Recordings");
+        case kDupsInAll:
+            return QString("All Recordings");
+        case kDupsNewEpi:
+            return QString("New Episodes Only");
+        default:
+            return QString("Unknown");
+    }
+}
+
+RecordingDupInType dupInFromString(QString type)
+{
+    if (type.toLower() == "current recordings" || type.toLower() == "current")
+        return kDupsInRecorded;
+    else if (type.toLower() == "previous recordings" || type.toLower() == "previous")
+        return kDupsInOldRecorded;
+    else if (type.toLower() == "all recordings" || type.toLower() == "all")
+        return kDupsInAll;
+    else if (type.toLower() == "new episodes only" || type.toLower() == "new")
+        return kDupsNewEpi;
+    else
+        return kDupsInAll;
+}
+
+QString toRawString(RecordingDupMethodType duptype)
+{
+    switch (duptype)
+    {
+        case kDupCheckNone:
+            return QString("None");
+        case kDupCheckSub:
+            return QString("Subtitle");
+        case kDupCheckDesc:
+            return QString("Description");
+        case kDupCheckSubDesc:
+            return QString("Subtitle and Description");
+        case kDupCheckSubThenDesc:
+            return QString("Subtitle then Description");
+        default:
+            return QString("Unknown");
+    }
+}
+
+RecordingDupMethodType dupMethodFromString(QString type)
+{
+    if (type.toLower() == "none")
+        return kDupCheckNone;
+    else if (type.toLower() == "subtitle")
+        return kDupCheckSub;
+    else if (type.toLower() == "description")
+        return kDupCheckDesc;
+    else if (type.toLower() == "subtitle and description" || type.toLower() == "subtitleanddescription")
+        return kDupCheckSubDesc;
+    else if (type.toLower() == "subtitle then description" || type.toLower() == "subtitlethendescription")
+        return kDupCheckSubThenDesc;
+    else
+        return kDupCheckSubDesc;
+}
+
+QString toRawString(RecSearchType searchtype)
+{
+    switch (searchtype)
+    {
+        case kNoSearch:
+            return QString("None");
+        case kPowerSearch:
+            return QString("Power Search");
+        case kTitleSearch:
+            return QString("Title Search");
+        case kKeywordSearch:
+            return QString("Keyword Search");
+        case kPeopleSearch:
+            return QString("People Search");
+        case kManualSearch:
+            return QString("Manual Search");
+        default:
+            return QString("Unknown");
+    }
+}
+
+RecSearchType searchTypeFromString(QString type)
+{
+    if (type.toLower() == "none")
+        return kNoSearch;
+    else if (type.toLower() == "power search" || type.toLower() == "power")
+        return kPowerSearch;
+    else if (type.toLower() == "title search" || type.toLower() == "title")
+        return kTitleSearch;
+    else if (type.toLower() == "keyword search" || type.toLower() == "keyword")
+        return kKeywordSearch;
+    else if (type.toLower() == "people search" || type.toLower() == "people")
+        return kPeopleSearch;
+    else if (type.toLower() == "manual search" || type.toLower() == "manual")
+        return kManualSearch;
+    else
+        return kNoSearch;
 }

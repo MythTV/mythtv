@@ -51,6 +51,7 @@ class SPDIFEncoder;
 class AudioOutputBase : public AudioOutput, public MThread
 {
  public:
+    const char *quality_string(int q);
     AudioOutputBase(const AudioSettings &settings);
     virtual ~AudioOutputBase();
 
@@ -187,6 +188,13 @@ class AudioOutputBase : public AudioOutput, public MThread
 
     int configured_channels;
     int max_channels;
+    enum
+    {
+        QUALITY_DISABLED = -1,
+        QUALITY_LOW      =  0,
+        QUALITY_MEDIUM   =  1,
+        QUALITY_HIGH     =  2,
+    };
     int src_quality;
 
  private:

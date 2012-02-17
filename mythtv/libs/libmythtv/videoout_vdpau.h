@@ -60,14 +60,16 @@ class VideoOutputVDPAU : public VideoOutput
         { return codec_is_vdpau(video_codec_id); }
     virtual bool hasHWAcceleration(void) const
         { return codec_is_vdpau(video_codec_id); }
-    virtual MythPainter* GetOSDPainter(void) { return (MythPainter*)m_osd_painter; }
+    virtual MythPainter *GetOSDPainter(void);
     virtual bool GetScreenShot(int width = 0, int height = 0,
                                QString filename = "");
 
     virtual bool CanVisualise(AudioPlayer *audio, MythRender *render)
         { return VideoOutput::CanVisualise(audio, m_render);       }
-    virtual bool SetupVisualisation(AudioPlayer *audio, MythRender *render)
-        { return VideoOutput::SetupVisualisation(audio, m_render); }
+    virtual bool SetupVisualisation(AudioPlayer *audio, MythRender *render,
+                                    const QString &name)
+        { return VideoOutput::SetupVisualisation(audio, m_render, name); }
+    virtual QStringList GetVisualiserList(void);
     virtual void ClearDummyFrame(VideoFrame* frame);
 
   private:

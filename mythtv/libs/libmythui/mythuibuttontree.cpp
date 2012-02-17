@@ -49,9 +49,9 @@ void MythUIButtonTree::Init()
 
     if (!m_listTemplate)
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("MythUIButtonList listtemplate is "
-                                         "required in mythuibuttonlist: %1")
-            .arg(objectName()));
+        LOG(VB_GENERAL, LOG_ERR, QString("(%1) MythUIButtonList listtemplate "
+                                         "is required in mythuibuttonlist: %2")
+            .arg(GetXMLLocation().arg(objectName())));
         return;
     }
 
@@ -365,6 +365,12 @@ bool MythUIButtonTree::SetCurrentNode(MythGenericTree *node)
     QStringList route = node->getRouteByString();
 
     return SetNodeByString(route);
+}
+
+void MythUIButtonTree::ShowSearchDialog(void)
+{
+    if (m_activeList)
+        m_activeList->ShowSearchDialog();
 }
 
 bool MythUIButtonTree::DoSetCurrentNode(MythGenericTree *node)

@@ -352,6 +352,18 @@ using_frontend {
     SOURCES += videocolourspace.cpp
     SOURCES += videovisual.cpp
 
+   using_opengl | using_vdpau {
+        # Goom
+        HEADERS += goom/filters.h goom/goomconfig.h goom/goom_core.h goom/graphic.h
+        HEADERS += goom/ifs.h goom/lines.h goom/drawmethods.h
+        HEADERS += goom/mmx.h goom/mathtools.h goom/tentacle3d.h goom/v3d.h
+        HEADERS += videovisualgoom.h
+        SOURCES += goom/filters.c goom/goom_core.c goom/graphic.c goom/tentacle3d.c
+        SOURCES += goom/ifs.c goom/ifs_display.c goom/lines.c goom/surf3d.c
+        SOURCES += goom/zoom_filter_mmx.c goom/zoom_filter_xmmx.c
+        SOURCES += videovisualgoom.cpp
+    }
+
     using_libfftw3 {
         DEFINES += FFTW3_SUPPORT
         HEADERS += videovisualspectrum.h
@@ -390,14 +402,27 @@ using_frontend {
     using_opengl_video:HEADERS += openglvideo.h   videoout_opengl.h
     using_opengl_video:SOURCES += openglvideo.cpp videoout_opengl.cpp
 
-    using_vaapi: DEFINES += USING_VAAPI
-    using_vaapi: DEFINES += vaapicontext.h   videoout_openglvaapi.h
-    using_vaapi: SOURCES += vaapicontext.cpp videoout_openglvaapi.cpp
-    using_vaapi: LIBS    += -lva -lva-x11 -lva-glx
+    using_vaapi {
+        DEFINES += USING_VAAPI
+        HEADERS += vaapicontext.h   videoout_nullvaapi.h
+        SOURCES += vaapicontext.cpp videoout_nullvaapi.cpp
+        LIBS    += -lva -lva-x11 -lva-glx
+        using_opengl_video:HEADERS += videoout_openglvaapi.h
+        using_opengl_video:SOURCES += videoout_openglvaapi.cpp
+    }
 
     # Misc. frontend
     HEADERS += DetectLetterbox.h
     SOURCES += DetectLetterbox.cpp
+
+    using_libdns_sd {
+        !macx: LIBS += -ldns_sd
+        HEADERS += mythairplayserver.h
+        SOURCES += mythairplayserver.cpp
+        using_libcrypto: HEADERS += mythraopdevice.h   mythraopconnection.h
+        using_libcrypto: SOURCES += mythraopdevice.cpp mythraopconnection.cpp
+        using_libcrypto: LIBS    += -lcrypto
+    }
 
     using_mheg {
         # DSMCC stuff

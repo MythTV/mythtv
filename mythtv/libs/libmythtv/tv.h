@@ -86,7 +86,7 @@ typedef enum
      *         a program, but there is no one currently watching it.
      */
     kState_RecordingOnly,
-    /** \brief This is a placeholder state which we never actualy enter,
+    /** \brief This is a placeholder state which we never actually enter,
      *         but is returned by GetState() when we are in the process
      *         of changing the state.
      */

@@ -56,6 +56,7 @@ using namespace std;
 #include "dbcheck.h"
 #include "mythmediamonitor.h"
 #include "statusbox.h"
+#include "idlescreen.h"
 #include "lcddevice.h"
 #include "langsettings.h"
 #include "mythtranslation.h"
@@ -85,6 +86,16 @@ using namespace std;
 #include "videometadatasettings.h"
 #include "videolist.h"
 
+#ifdef USING_RAOP
+#include "mythraopdevice.h"
+#endif
+
+#ifdef USING_LIBDNS_SD
+#include <QScopedPointer>
+#include "bonjourregister.h"
+#include "mythairplayserver.h"
+#include <external/FFmpeg/libavcodec/x86/mmx.h>
+#endif
 
 static ExitPrompter   *exitPopup = NULL;
 static MythThemedMenu *menu;
@@ -216,6 +227,14 @@ namespace
 
     void cleanup()
     {
+#ifdef USING_RAOP
+        MythRAOPDevice::Cleanup();
+#endif
+
+#ifdef USING_LIBDNS_SD
+        MythAirplayServer::Cleanup();
+#endif
+
         delete exitPopup;
         exitPopup = NULL;
 
@@ -571,6 +590,19 @@ static void showStatus(void)
         delete statusbox;
 }
 
+
+static void standbyScreen(void)
+{
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+
+    IdleScreen *idlescreen = new IdleScreen(mainStack);
+
+    if (idlescreen->Create())
+        mainStack->AddScreen(idlescreen);
+    else
+        delete idlescreen;
+}
+
 static void RunVideoScreen(VideoDialog::DialogType type, bool fromJump = false)
 {
     QString message = QObject::tr("Loading videos ...");
@@ -647,7 +679,8 @@ static void playDisc()
 
         QString filename = QString("bd:/%1/").arg(bluray_mountpoint);
 
-        GetMythMainWindow()->HandleMedia("Internal", filename);
+        GetMythMainWindow()->HandleMedia("Internal", filename, "", "", "", "",
+                                         0, 0, "", 0, "", "", true);
 
         GetMythUI()->RemoveCurrentLocation();
     }
@@ -677,7 +710,8 @@ static void playDisc()
             filename += dvd_device;
 
             command_string = "Internal";
-            GetMythMainWindow()->HandleMedia(command_string, filename);
+            GetMythMainWindow()->HandleMedia(command_string, filename, "", "",
+                                             "", "", 0, 0, "", 0, "", "", true);
             GetMythUI()->RemoveCurrentLocation();
 
             return;
@@ -999,6 +1033,8 @@ static void TVMenuCallback(void *data, QString &selection)
         handleExit(true);
     else if (sel == "exiting_app")
         handleExit(false);
+    else if (sel == "standby_mode")
+        standbyScreen();
     else
         LOG(VB_GENERAL, LOG_ERR, "Unknown menu action: " + selection);
 
@@ -1086,7 +1122,7 @@ static int internal_play_media(const QString &mrl, const QString &plot,
                         const QString &title, const QString &subtitle,
                         const QString &director, int season, int episode,
                         const QString &inetref, int lenMins, const QString &year,
-                        const QString &id)
+                        const QString &id, const bool useBookmark)
 {
     int res = -1;
 
@@ -1142,7 +1178,7 @@ static int internal_play_media(const QString &mrl, const QString &plot,
     else if (pginfo->IsVideo())
         pos = pginfo->QueryBookmark();
 
-    if (pos > 0)
+    if (useBookmark && pos > 0)
     {
         MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
         BookmarkDialog *bookmarkdialog = new BookmarkDialog(pginfo, mainStack);
@@ -1155,7 +1191,7 @@ static int internal_play_media(const QString &mrl, const QString &plot,
     }
     else
     {
-        TV::StartTV(pginfo, kStartTVNoFlags);
+        TV::StartTV(pginfo, kStartTVNoFlags | kStartTVIgnoreBookmark);
 
         res = 0;
 
@@ -1491,16 +1527,6 @@ int main(int argc, char **argv)
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
 
-    if (!cmdline.toBool("noupnp"))
-    {
-        g_pUPnp  = new MediaRenderer();
-        if (!g_pUPnp->initialized())
-        {
-            delete g_pUPnp;
-            g_pUPnp = NULL;
-        }
-    }
-
     if (!gContext->Init(true, bPromptForBackend, bBypassAutoDiscovery))
     {
         LOG(VB_GENERAL, LOG_ERR, "Failed to init MythContext, exiting.");
@@ -1517,6 +1543,16 @@ int main(int argc, char **argv)
 
     if (cmdline.toBool("reset"))
         ResetSettings = true;
+
+    if (!cmdline.toBool("noupnp"))
+    {
+        g_pUPnp  = new MediaRenderer();
+        if (!g_pUPnp->initialized())
+        {
+            delete g_pUPnp;
+            g_pUPnp = NULL;
+        }
+    }
 
     QString fileprefix = GetConfDir();
 
@@ -1537,6 +1573,28 @@ int main(int argc, char **argv)
     }
 
     setuid(getuid());
+
+#ifdef USING_LIBDNS_SD
+    // this needs to come after gCoreContext has been initialised
+    // (for hostname) - hence it is not in MediaRenderer
+    QScopedPointer<BonjourRegister> bonjour(new BonjourRegister());
+    if (bonjour.data())
+    {
+        QByteArray dummy;
+        int port = gCoreContext->GetNumSetting("UPnP/MythFrontend/ServicePort", 6547);
+        QByteArray name("Mythfrontend on ");
+        name.append(gCoreContext->GetHostName());
+        bonjour->Register(port, "_mythfrontend._tcp",
+                                 name, dummy);
+    }
+
+    if (getenv("MYTHTV_AIRPLAY"))
+        MythAirplayServer::Create();
+#endif
+
+#ifdef USING_RAOP
+    MythRAOPDevice::Create();
+#endif
 
     LCD::SetupLCD();
     if (LCD *lcd = LCD::Get())
@@ -1615,15 +1673,12 @@ int main(int argc, char **argv)
     NetworkControl *networkControl = NULL;
     if (gCoreContext->GetNumSetting("NetworkControlEnabled", 0))
     {
-        int networkPort =
-            gCoreContext->GetNumSetting("NetworkControlPort", 6545);
+        int port = gCoreContext->GetNumSetting("NetworkControlPort", 6545);
         networkControl = new NetworkControl();
-
-        if (!networkControl->listen(gCoreContext->MythHostAddressAny(),
-                                    networkPort))
+        if (!networkControl->listen(gCoreContext->MythHostAddress(), port))
             LOG(VB_GENERAL, LOG_ERR,
                 QString("NetworkControl failed to bind to port %1.")
-                    .arg(networkPort));
+                   .arg(port));
     }
 
 #ifdef __linux__

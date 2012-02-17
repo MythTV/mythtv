@@ -92,6 +92,7 @@ class META_PUBLIC MetadataFactory : public QObject
     MetadataLookupList SynchronousLookup(MetadataLookup *lookup);
 
     void VideoScan();
+    void VideoScan(QStringList hosts);
 
     bool IsRunning() { return m_lookupthread->isRunning() ||
                               m_imagedownload->isRunning() ||

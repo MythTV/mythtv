@@ -45,22 +45,23 @@ class MBASE_PUBLIC MThread
 {
     friend class MThreadInternal;
   public:
-    /// Standard constuctor
+    /// \brief Standard constructor
     explicit MThread(const QString &objectName);
-    /// Use this constuctor if you want the default run() method to
-    /// run the QRunnable's run() method instead of entering the Qt
-    /// event loop. Unlike MThreadPool, MThread will not delete a
-    /// runnable with the autoDelete property set.
+    /// \brief Use this constructor if you want the default run() method to
+    ///        run the QRunnable's run() method instead of entering the Qt
+    ///        event loop. Unlike MThreadPool, MThread will not delete a
+    ///        runnable with the autoDelete property set.
     explicit MThread(const QString &objectName, QRunnable *runnable);
     virtual ~MThread();
 
-    /// Sets up a thread, call this if you reimplement run().
+    /// \brief Sets up a thread, call this if you reimplement run().
     void RunProlog(void);
-    /// Cleans up a thread's resources, call this if you reimplement run().
+    /// \brief Cleans up a thread's resources, call this if you reimplement
+    ///        run().
     void RunEpilog(void);
 
-    /// Returns the thread, this will always return the same pointer
-    /// no matter how often you restart the thread.
+    /// \brief Returns the thread, this will always return the same pointer
+    ///        no matter how often you restart the thread.
     QThread *qthread(void);
 
     void setObjectName(const QString &name);
@@ -75,7 +76,7 @@ class MBASE_PUBLIC MThread
     void setStackSize(uint stackSize);
     uint stackSize(void) const;
 
-    /// Use this to exit from the thread if you are using a Qt event loop.
+    /// \brief Use this to exit from the thread if you are using a Qt event loop
     void exit(int retcode = 0);
     /// \brief Tell MThread to start running the thread in the near future.
     void start(QThread::Priority = QThread::InheritPriority);
@@ -90,18 +91,20 @@ class MBASE_PUBLIC MThread
     void quit(void); ///< calls exit(0)
 
   public:
+    /// \brief Wait for the MThread to exit, with a maximum timeout
+    /// \param time Maximum time to wait for MThread to exit, in ms
     bool wait(unsigned long time = ULONG_MAX);
 
-    /// This will print out all the running threads, call exit(1) on
-    /// each and then wait up to 5 seconds total for all the threads
-    /// to exit.
+    /// \brief This will print out all the running threads, call exit(1) on
+    ///        each and then wait up to 5 seconds total for all the threads
+    ///        to exit.
     static void Cleanup(void);
     static void GetAllThreadNames(QStringList &list);
     static void GetAllRunningThreadNames(QStringList &list);
 
     static const int kDefaultStartTimeout;
   protected:
-    /// \brief Run's the Qt event loop unless we have a QRunnable,
+    /// \brief Runs the Qt event loop unless we have a QRunnable,
     ///        in which case we run the runnable run instead.
     /// \note  If you override this method you must call RunProlog
     ///        before you do any work and RunEpilog before you exit

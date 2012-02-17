@@ -321,9 +321,6 @@ AvFormatDecoder::AvFormatDecoder(MythPlayer *parent,
 
     cc608_build_parity_table(cc608_parity_table);
 
-    if (gCoreContext->GetNumSetting("CCBackground", 0))
-        CC708Window::forceWhiteOnBlackText = true;
-
     LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("PlayerFlags: 0x%1")
         .arg(playerFlags, 0, 16));
 }
@@ -828,9 +825,11 @@ void AvFormatDecoder::InitByteContext(void)
     ic->pb->is_streamed = streamed;
 }
 
-extern "C" void HandleStreamChange(void* data)
+extern "C" void HandleStreamChange(void *data)
 {
-    AvFormatDecoder* decoder = (AvFormatDecoder*) data;
+    AvFormatDecoder *decoder =
+        reinterpret_cast<AvFormatDecoder*>(data);
+
     int cnt = decoder->ic->nb_streams;
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC +
@@ -842,9 +841,11 @@ extern "C" void HandleStreamChange(void* data)
     decoder->ScanStreams(false);
 }
 
-extern "C" void HandleDVDStreamChange(void* data)
+extern "C" void HandleDVDStreamChange(void *data)
 {
-    AvFormatDecoder* decoder = (AvFormatDecoder*) data;
+    AvFormatDecoder *decoder =
+        reinterpret_cast<AvFormatDecoder*>(data);
+
     int cnt = decoder->ic->nb_streams;
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC +
@@ -856,9 +857,10 @@ extern "C" void HandleDVDStreamChange(void* data)
     decoder->ScanStreams(true);
 }
 
-extern "C" void HandleBDStreamChange(void* data)
+extern "C" void HandleBDStreamChange(void *data)
 {
-    AvFormatDecoder* decoder = (AvFormatDecoder*) data;
+    AvFormatDecoder *decoder =
+        reinterpret_cast<AvFormatDecoder*>(data);
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "resetting");
 
@@ -1019,7 +1021,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
    
     if (dur == 0)
     {
-        if ((ic->duration == AV_NOPTS_VALUE) &&
+        if ((ic->duration == (int64_t)AV_NOPTS_VALUE) &&
             (!livetv && !ringBuffer->IsDisc()))
             av_estimate_timings(ic, 0);
 
@@ -1107,50 +1109,53 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
 float AvFormatDecoder::normalized_fps(AVStream *stream, AVCodecContext *enc)
 {
-    float fps, avg_fps, stream_fps, container_fps, estimated_fps;
-    avg_fps = stream_fps = container_fps = estimated_fps = 0.0f;
+    float fps, avg_fps, codec_fps, container_fps, estimated_fps;
+    avg_fps = codec_fps = container_fps = estimated_fps = 0.0f;
 
     if (stream->avg_frame_rate.den && stream->avg_frame_rate.num)
         avg_fps = av_q2d(stream->avg_frame_rate); // MKV default_duration
 
     if (enc->time_base.den && enc->time_base.num) // tbc
-        stream_fps = 1.0f / av_q2d(enc->time_base) / enc->ticks_per_frame;
+        codec_fps = 1.0f / av_q2d(enc->time_base) / enc->ticks_per_frame;
     // Some formats report fps waaay too high. (wrong time_base)
-    if (stream_fps > 121.0f && (enc->time_base.den > 10000) &&
+    if (codec_fps > 121.0f && (enc->time_base.den > 10000) &&
         (enc->time_base.num == 1))
     {
         enc->time_base.num = 1001;  // seems pretty standard
         if (av_q2d(enc->time_base) > 0)
-            stream_fps = 1.0f / av_q2d(enc->time_base);
+            codec_fps = 1.0f / av_q2d(enc->time_base);
     }
     if (stream->time_base.den && stream->time_base.num) // tbn
         container_fps = 1.0f / av_q2d(stream->time_base);
     if (stream->r_frame_rate.den && stream->r_frame_rate.num) // tbr
         estimated_fps = av_q2d(stream->r_frame_rate);
 
-    if (QString(ic->iformat->name).contains("matroska") &&
+    // matroska demuxer sets the default_duration to avg_frame_rate
+    // mov,mp4,m4a,3gp,3g2,mj2 demuxer sets avg_frame_rate
+    if ((QString(ic->iformat->name).contains("matroska") ||
+        QString(ic->iformat->name).contains("mov")) &&
         avg_fps < 121.0f && avg_fps > 3.0f)
-        fps = avg_fps; // matroska default_duration
+        fps = avg_fps;
     else if (QString(ic->iformat->name).contains("avi") &&
         container_fps < 121.0f && container_fps > 3.0f)
         fps = container_fps; // avi uses container fps for timestamps
-    else if (stream_fps < 121.0f && stream_fps > 3.0f)
-        fps = stream_fps;
+    else if (codec_fps < 121.0f && codec_fps > 3.0f)
+        fps = codec_fps;
     else if (container_fps < 121.0f && container_fps > 3.0f)
         fps = container_fps;
-    else if (estimated_fps < 70.0f && estimated_fps > 20.0f)
+    else if (estimated_fps < 121.0f && estimated_fps > 3.0f)
         fps = estimated_fps;
+    else if (avg_fps < 121.0f && avg_fps > 3.0f)
+        fps = avg_fps;
     else
-        fps = stream_fps;
+        fps = 30000.0f / 1001.0f; // 29.97 fps
 
-    // If it is still out of range, just assume NTSC...
-    fps = (fps > 121.0f) ? (30000.0f / 1001.0f) : fps;
     if (fps != m_fps)
     {
         LOG(VB_PLAYBACK, LOG_INFO, LOC +
-            QString("Selected FPS is %1 (avg %2 stream %3 "
+            QString("Selected FPS is %1 (avg %2 codec %3 "
                     "container %4 estimated %5)").arg(fps).arg(avg_fps)
-                .arg(stream_fps).arg(container_fps).arg(estimated_fps));
+                .arg(codec_fps).arg(container_fps).arg(estimated_fps));
         m_fps = fps;
     }
 
@@ -2559,14 +2564,19 @@ void AvFormatDecoder::DecodeDTVCC(const uint8_t *buf, uint len, bool scte)
     {
         uint cc_code  = buf[2+(cur*3)];
         bool cc_valid = cc_code & 0x04;
-        if (!cc_valid)
-            continue;
 
         uint data1    = buf[3+(cur*3)];
         uint data2    = buf[4+(cur*3)];
         uint data     = (data2 << 8) | data1;
         uint cc_type  = cc_code & 0x03;
         uint field;
+
+        if (!cc_valid)
+        {
+            if (cc_type >= 0x2)
+                ccd708->decode_cc_null();
+            continue;
+        }
 
         if (scte || cc_type <= 0x1) // EIA-608 field-1/2
         {

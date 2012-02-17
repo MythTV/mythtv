@@ -734,6 +734,7 @@ MythUIButtonListItem *MythGenericTree::CreateListButton(MythUIButtonList *list)
     item->SetData(qVariantFromValue(this));
     item->SetTextFromMap(m_strings);
     item->SetImageFromMap(m_imageFilenames);
+    item->SetStatesFromMap(m_states);
 
     if (visibleChildCount() > 0)
         item->setDrawArrow(true);
@@ -755,10 +756,10 @@ void MythGenericTree::SetText(const QString &text, const QString &name,
         m_text = text;
 }
 
-void MythGenericTree::SetTextFromMap(QHash<QString, QString> &infoMap,
+void MythGenericTree::SetTextFromMap(InfoMap &infoMap,
                                      const QString &state)
 {
-    QHash<QString, QString>::iterator map_it = infoMap.begin();
+    InfoMap::iterator map_it = infoMap.begin();
     while (map_it != infoMap.end())
     {
         TextProperties textprop;
@@ -785,13 +786,43 @@ void MythGenericTree::SetImage(const QString &filename, const QString &name)
         m_imageFilenames.insert(name, filename);
 }
 
+void MythGenericTree::SetImageFromMap(InfoMap &infoMap)
+{
+    m_imageFilenames.clear();
+    m_imageFilenames = infoMap;
+}
+
 QString MythGenericTree::GetImage(const QString &name) const
 {
     if (name.isEmpty())
         return QString();
 
-    QMap<QString, QString>::const_iterator it = m_imageFilenames.find(name);
+    InfoMap::const_iterator it = m_imageFilenames.find(name);
     if (it != m_imageFilenames.end())
+        return *it;
+
+    return QString();
+}
+
+void MythGenericTree::DisplayStateFromMap(QHash<QString,QString> &infoMap)
+{
+    m_states.clear();
+    m_states = infoMap;
+}
+
+void MythGenericTree::DisplayState(const QString &state, const QString &name)
+{
+    if (!name.isEmpty())
+        m_states.insert(name, state);
+}
+
+QString MythGenericTree::GetState(const QString &name) const
+{
+    if (name.isEmpty())
+        return QString();
+
+    InfoMap::const_iterator it = m_states.find(name);
+    if (it != m_states.end())
         return *it;
 
     return QString();

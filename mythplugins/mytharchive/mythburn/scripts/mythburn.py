@@ -15,30 +15,29 @@
 # paulh
 # 4 May 2006 - Added into mythtv svn
 
-#For this script to work you need to have...
-#Python2.3.5
-#python2.3-mysqldb
-#python2.3-imaging (PIL)
-#dvdauthor - v0.6.11
-#ffmpeg - 0.4.6
-#dvd+rw-tools - v5.21.4.10.8
-#cdrtools - v2.01
+# For this script to work you need to have...
+# Python - v2.6 or later
+# mythtv python bindings installed
+# python-imaging (PIL)
+# dvdauthor - v0.6.14
+# dvd+rw-tools - v7.1
+# cdrtools - v3.01
 
-#Optional for shrink-to-fit requantisation 
-#M2VRequantiser (from flexion, based on the newer code from Metakine) 
+# Optional for shrink-to-fit requantisation
+# M2VRequantiser (from flexion, based on the newer code from Metakine)
 
-#Optional (for Right To Left languages)
-#pyfribidi
+# Optional (for Right To Left languages)
+# pyfribidi
 
-#Optional (alternate demuxer)
-#ProjectX - 0.90.4.00
+# Optional (alternate demuxer)
+# ProjectX - 0.90.4.00
 
 #******************************************************************************
 #******************************************************************************
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20101206-1"
+VERSION="0.1.20111228-1"
 
 # keep all temporary files for debugging purposes
 # set this to True before a first run through when testing
@@ -63,18 +62,33 @@ useSyncOffset = True
 # chapter marks will be set to the cut point end marks
 addCutlistChapters = False
 
+# by default we always convert any audio tracks to ac3 for better compatibility
+encodetoac3 = True
 
 #*********************************************************************************
 #Dont change the stuff below!!
 #*********************************************************************************
-import os, string, socket, sys, getopt, traceback, signal
+import os
+import sys
+import string
+import getopt
+import traceback
+import signal
 import xml.dom.minidom
-import Image, ImageDraw, ImageFont, ImageColor
-import MySQLdb, codecs, unicodedata
-import time, datetime, tempfile
+import Image
+import ImageDraw
+import ImageFont
+import ImageColor
+import unicodedata
+import time
+import datetime
+import tempfile
 from fcntl import ioctl
 import CDROM
 from shutil import copy
+
+import MythTV
+from MythTV.altdict import OrdDict
 
 # media types (should match the enum in mytharchivewizard.h)
 DVD_SL = 0
@@ -117,7 +131,6 @@ dbVersion=""
 preferredlang1=""
 preferredlang2=""
 useFIFO = True
-encodetoac3 = False
 alwaysRunMythtranscode = False
 copyremoteFiles = False
 thumboffset = 10
@@ -153,7 +166,6 @@ erasedvdrw = False
 mediatype = DVD_SL
 savefilename = ''
 
-configHostname = socket.gethostname()
 installPrefix = ""
 
 # job xml file
@@ -168,6 +180,11 @@ themeFonts = {}
 
 # no. of processors we have access to
 cpuCount = 1
+
+DB = MythTV.MythDB()
+MVID = MythTV.MythVideo(db=DB)
+
+configHostname = DB.gethostname()
 
 #############################################################
 
@@ -312,44 +329,6 @@ def getCPUCount():
 def getEncodingProfilePath():
     """This is the folder where all encoder profile files are located."""
     return os.path.join(sharepath, "mytharchive", "encoder_profiles")
-
-#############################################################
-# Get the connection parameters needed to connect to the mythconverg DB 
-
-def getMysqlDBParameters():
-    global mysql_host
-    global mysql_user
-    global mysql_passwd
-    global mysql_db
-    global configHostname
-    global installPrefix
-
-    f = tempfile.NamedTemporaryFile();
-    result = os.spawnlp(os.P_WAIT, 'mytharchivehelper','mytharchivehelper',
-                        '--getdbparameters', '--outfile', f.name)
-    if result <> 0:
-        write("Failed to run mytharchivehelper to get mysql database parameters! "
-              "Exit code: %d" % result)
-        if result == 254: 
-            fatalError("Failed to init mythcontext.\n"
-                       "Please check the troubleshooting section of the README for ways to fix this error")
-
-    f.seek(0)
-    mysql_host = f.readline()[:-1]
-    mysql_user = f.readline()[:-1]
-    mysql_passwd = f.readline()[:-1]
-    mysql_db = f.readline()[:-1]
-    configHostname = f.readline()[:-1]
-    installPrefix = f.readline()[:-1]
-    f.close()
-    del f
-
-#############################################################
-# Returns a mySQL connection to mythconverg database.
-
-def getDatabaseConnection():
-    """Returns a mySQL connection to mythconverg database."""
-    return MySQLdb.connect(host=mysql_host, user=mysql_user, passwd=mysql_passwd, db=mysql_db, init_command='SET NAMES utf8')
 
 #############################################################
 # Returns true/false if a given file or path exists.
@@ -814,7 +793,6 @@ def getDefaultParametersFromMythTVDB():
                         'MusicLocation',
                         'MythArchiveVideoFormat',
                         'MythArchiveTempDir',
-                        'MythArchiveFfmpegCmd',
                         'MythArchiveMplexCmd',
                         'MythArchiveDvdauthorCmd',
                         'MythArchiveMkisofsCmd',
@@ -826,7 +804,6 @@ def getDefaultParametersFromMythTVDB():
                         'MythArchiveJpeg2yuvCmd',
                         'MythArchiveSpumuxCmd',
                         'MythArchiveMpeg2encCmd',
-                        'MythArchiveEncodeToAc3',
                         'MythArchiveCopyRemoteFiles',
                         'MythArchiveAlwaysUseMythTranscode',
                         'MythArchiveUseProjectX',
@@ -841,20 +818,12 @@ def getDefaultParametersFromMythTVDB():
                         'JobQueueCPU'
                         )) ORDER BY value"""
 
-    #write( sqlstatement)
-
-    # connect
-    db = getDatabaseConnection()
     # create a cursor
-    cursor = db.cursor()
+    cursor = DB.cursor()
     # execute SQL statement
     cursor.execute(sqlstatement, configHostname)
     # get the resultset as a tuple
     result = cursor.fetchall()
-
-    db.close()
-    del db
-    del cursor
 
     cfg = {}
     for i in range(len(result)):
@@ -869,19 +838,8 @@ def getDefaultParametersFromMythTVDB():
 # Save a setting to the settings table in the DB
 
 def saveSetting(name, data):
-    db = getDatabaseConnection()
-    cursor = db.cursor()
-
-    cursor.execute("""DELETE FROM settings
-                      WHERE value=%s
-                      AND hostname=%s""", (name, configHostname))
-
-    cursor.execute("""INSERT INTO settings (value, data, hostname)
-                      VALUES(%s, %s, %s)""", (name, data, configHostname))
-
-    db.close()
-    del db
-    del cursor
+    host = DB.gethostname()
+    DB.settings[host][name] = data
 
 #############################################################
 # Remove all archive items from the archiveitems DB table
@@ -890,15 +848,8 @@ def clearArchiveItems():
     ''' Remove all archive items from the archiveitems DB table'''
 
     write("Removing all archive items from the archiveitems DB table")
-
-    db = getDatabaseConnection()
-    cursor = db.cursor()
-
-    cursor.execute("DELETE FROM archiveitems")
-
-    db.close()
-    del db
-    del cursor
+    with DB as cursor:
+        cursor.execute("DELETE FROM archiveitems")
 
 #############################################################
 # Load the options from the options node passed in the job file
@@ -1357,377 +1308,114 @@ def getFileInformation(file, folder):
     infoDOM = impl.createDocument(None, "fileinfo", None)
     top_element = infoDOM.documentElement
 
+    data = OrdDict((('chanid',''),
+                    ('type',''),            ('filename',''),
+                    ('title',''),           ('recordingdate',''),
+                    ('recordingtime',''),   ('subtitle',''),
+                    ('description',''),     ('rating',''),
+                    ('coverfile',''),       ('cutlist','')))
+
     # if the jobfile has amended file details use them
     details = file.getElementsByTagName("details")
     if details.length > 0:
-        node = infoDOM.createElement("type")
-        node.appendChild(infoDOM.createTextNode(file.attributes["type"].value))
-        top_element.appendChild(node)
-
-        node = infoDOM.createElement("filename")
-        node.appendChild(infoDOM.createTextNode(file.attributes["filename"].value))
-        top_element.appendChild(node)   
-
-        node = infoDOM.createElement("title")
-        node.appendChild(infoDOM.createTextNode(details[0].attributes["title"].value))
-        top_element.appendChild(node)
-
-        node = infoDOM.createElement("recordingdate")
-        node.appendChild(infoDOM.createTextNode(details[0].attributes["startdate"].value))
-        top_element.appendChild(node)
-
-        node = infoDOM.createElement("recordingtime")
-        node.appendChild(infoDOM.createTextNode(details[0].attributes["starttime"].value))
-        top_element.appendChild(node)   
-
-        node = infoDOM.createElement("subtitle")
-        node.appendChild(infoDOM.createTextNode(details[0].attributes["subtitle"].value))
-        top_element.appendChild(node)   
-
-        node = infoDOM.createElement("description")
-        node.appendChild(infoDOM.createTextNode(getText(details[0])))
-        top_element.appendChild(node)   
-
-        node = infoDOM.createElement("rating")
-        node.appendChild(infoDOM.createTextNode(""))
-        top_element.appendChild(node)   
-
-        node = infoDOM.createElement("coverfile")
-        node.appendChild(infoDOM.createTextNode(""))
-        top_element.appendChild(node)
-
-        #FIXME: add cutlist to details?
-        node = infoDOM.createElement("cutlist")
-        node.appendChild(infoDOM.createTextNode(""))
-        top_element.appendChild(node)
+        data.type =             file.attributes["type"].value
+        data.filename =         file.attributes["filename"].value
+        data.title =            details[0].attributes["title"].value
+        data.recordingdate =    details[0].attributes["startdate"].value
+        data.recordingtime =    details[0].attributes["starttime"].value
+        data.subtitle =         details[0].attributes["subtitle"].value
+        data.description =      getText(details[0])
 
         # if this a myth recording we still need to find the chanid, starttime and hascutlist
         if file.attributes["type"].value=="recording":
-            basename = os.path.basename(file.attributes["filename"].value)
+            filename = file.attributes["filename"].value
+            try:
+                rec = DB.searchRecorded(basename=os.path.basename(filename)).next()
+            except StopIteration:
+                fatalError("Failed to get recording details from the DB for %s" % filename)
 
-            db = getDatabaseConnection()
-            cursor = db.cursor()
-            cursor.execute("""SELECT starttime, chanid FROM recorded
-                              WHERE basename=%s""", basename)
+            data.chanid = rec.chanid
+            data.recordingtime = rec.starttime.isoformat()
+            data.recordingdate = rec.starttime.isoformat()
 
-            result = cursor.fetchall()
-            numrows = int(cursor.rowcount)
-
-            #We must have exactly 1 row returned for this recording
-            if numrows!=1:
-                fatalError("Failed to get recording details from the DB for %s" % file.attributes["filename"].value)
-
-            # iterate through resultset
-            for record in result:
-                node = infoDOM.createElement("chanid")
-                node.appendChild(infoDOM.createTextNode("%s" % record[1]))
-                top_element.appendChild(node)
-
-                #date time is returned as 2005-12-19 00:15:00 
-                recdate = time.strptime(str(record[0])[0:19], "%Y-%m-%d %H:%M:%S")
-                node = infoDOM.createElement("starttime")
-                node.appendChild(infoDOM.createTextNode( time.strftime("%Y-%m-%dT%H:%M:%S", recdate)))
-                top_element.appendChild(node)
-
-                starttime = record[0]
-                chanid = record[1]
-
-                # find the cutlist if available
-                cursor = db.cursor()
-                cursor.execute("""SELECT mark, type FROM recordedmarkup
-                                  WHERE chanid=%s
-                                  AND starttime=%s
-                                  AND type IN(0,1)
-                                  ORDER BY mark""", (chanid, starttime))
-
-                if cursor.rowcount > 0:
-                    node = infoDOM.createElement("hascutlist")
-                    node.appendChild(infoDOM.createTextNode("yes"))
-                    top_element.appendChild(node)
-                else:
-                    node = infoDOM.createElement("hascutlist")
-                    node.appendChild(infoDOM.createTextNode("no"))
-                    top_element.appendChild(node)
-
-                # find the cut list end marks if available to use as chapter marks
+            cutlist = rec.markup.getcutlist()
+            if len(cutlist):
+                data.hascutlist = 'yes'
                 if file.attributes["usecutlist"].value == "0" and addCutlistChapters == True:
-                    cursor = db.cursor()
-                    cursor.execute("""SELECT mark, type FROM recordedmarkup
-                                      WHERE chanid=%s
-                                      AND starttime=%s
-                                      AND type=0
-                                      ORDER BY mark""", (chanid, starttime))    
-                    # get the resultset as a tuple
-                    result = cursor.fetchall()
-                    if cursor.rowcount > 0:
-                        res, fps, ar = getVideoParams(folder)
-                        chapterlist="00:00:00"
-                        #iterate through marks, adding to chapterlist
-                        for record in result:
-                            chapterlist += "," + frameToTime(int(record[0]), float(fps))
-
-                        node = infoDOM.createElement("chapterlist")
-                        node.appendChild(infoDOM.createTextNode(chapterlist))
-                        top_element.appendChild(node)
-
-                    db.close()
-                    del db
-                    del cursor
+                    chapterlist = ['00:00:00']
+                    res, fps, ar = getVideoParams(folder)
+                    for s,e in cutlist:
+                        chapterlist.append(frameToTime(s, float(fps)))
+                    data.chapterlist = ','.join(chapterlist)
+            else:
+                data.hascutlist = 'no'
 
     elif file.attributes["type"].value=="recording":
-        basename = os.path.basename(file.attributes["filename"].value)
-        # connect
-        db = getDatabaseConnection()
-        # create a cursor
-        cursor = db.cursor()
-        # execute SQL statement
-        cursor.execute("""SELECT progstart, stars, cutlist, category,
-                                 description, subtitle, title, starttime,
-                                 chanid
-                          FROM recorded
-                          WHERE basename=%s""", basename)
-        # get the resultset as a tuple
-        result = cursor.fetchall()
-        # get the number of rows in the resultset
-        numrows = int(cursor.rowcount)
-        #We must have exactly 1 row returned for this recording
-        if numrows!=1:
-            fatalError("Failed to get recording details from the DB for %s" % file.attributes["filename"].value)
+        filename = file.attributes["filename"].value
+        try:
+            rec = DB.searchRecorded(basename=os.path.basename(filename)).next()
+        except StopIteration:
+            fatalError("Failed to get recording details from the DB for %s" % filename)
 
-        # iterate through resultset
-        for record in result:
-            #write( record[0] , "-->", record[1], record[2], record[3])
-            write( "          " + record[6])
-            #Create an XML DOM to hold information about this video file
+        write("          " + rec.title)
+        data.type           = file.attributes["type"].value
+        data.filename       = filename
+        data.title          = rec.title
+        data.recordingdate  = rec.progstart.strftime(dateformat)
+        data.recordingtime  = rec.progstart.strftime(timeformat)
+        data.subtitle       = rec.subtitle
+        data.description    = rec.description
+        data.rating         = str(rec.stars)
+        data.chanid         = rec.chanid
+        data.starttime      = rec.starttime.isoformat()
 
-            node = infoDOM.createElement("type")
-            node.appendChild(infoDOM.createTextNode(file.attributes["type"].value))
-            top_element.appendChild(node)
-
-            node = infoDOM.createElement("filename")
-            node.appendChild(infoDOM.createTextNode(file.attributes["filename"].value))
-            top_element.appendChild(node)   
-
-            node = infoDOM.createElement("title")
-            node.appendChild(infoDOM.createTextNode(unicode(record[6], "UTF-8")))
-            top_element.appendChild(node)
-
-            #date time is returned as 2005-12-19 00:15:00            
-            recdate = time.strptime(str(record[0])[0:19], "%Y-%m-%d %H:%M:%S")
-            node = infoDOM.createElement("recordingdate")
-            node.appendChild(infoDOM.createTextNode( time.strftime(dateformat,recdate)  ))
-            top_element.appendChild(node)
-
-            node = infoDOM.createElement("recordingtime")
-            node.appendChild(infoDOM.createTextNode( time.strftime(timeformat,recdate)))
-            top_element.appendChild(node)   
-
-            node = infoDOM.createElement("subtitle")
-            node.appendChild(infoDOM.createTextNode(unicode(record[5], "UTF-8")))
-            top_element.appendChild(node)   
-
-            node = infoDOM.createElement("description")
-            node.appendChild(infoDOM.createTextNode(unicode(record[4], "UTF-8")))
-            top_element.appendChild(node)   
-
-            node = infoDOM.createElement("rating")
-            node.appendChild(infoDOM.createTextNode("%s" % record[1]))
-            top_element.appendChild(node)   
-
-            node = infoDOM.createElement("coverfile")
-            node.appendChild(infoDOM.createTextNode(""))
-            #node.appendChild(infoDOM.createTextNode(record[8]))
-            top_element.appendChild(node)
-
-            node = infoDOM.createElement("chanid")
-            node.appendChild(infoDOM.createTextNode("%s" % record[8]))
-            top_element.appendChild(node)
-
-            #date time is returned as 2005-12-19 00:15:00 
-            recdate = time.strptime(str(record[7])[0:19], "%Y-%m-%d %H:%M:%S")
-            node = infoDOM.createElement("starttime")
-            node.appendChild(infoDOM.createTextNode( time.strftime("%Y-%m-%dT%H:%M:%S", recdate)))
-            top_element.appendChild(node)
-
-            starttime = record[7]
-            chanid = record[8]
-
-            # find the cutlist if available
-            cursor = db.cursor()
-            # execute SQL statement
-            cursor.execute("""SELECT mark, type FROM recordedmarkup
-                              WHERE chanid=%s
-                              AND starttime=%s
-                              AND type IN(0,1)
-                              ORDER BY mark""", (chanid, starttime))
-
-            if cursor.rowcount > 0:
-                node = infoDOM.createElement("hascutlist")
-                node.appendChild(infoDOM.createTextNode("yes"))
-                top_element.appendChild(node)
-            else:
-                node = infoDOM.createElement("hascutlist")
-                node.appendChild(infoDOM.createTextNode("no"))
-                top_element.appendChild(node)
-
+        cutlist = rec.markup.getcutlist()
+        if len(cutlist):
+            data.hascutlist = 'yes'
             if file.attributes["usecutlist"].value == "0" and addCutlistChapters == True:
-                # find the cut list end marks if available
-                cursor = db.cursor()
-                # execute SQL statement
-                cursor.execute("""SELECT mark, type FROM recordedmarkup
-                                  WHERE chanid=%s
-                                  AND starttime=%s
-                                  AND type=0
-                                  ORDER BY mark""", (chanid, starttime))
-                # get the resultset as a tuple
-                result = cursor.fetchall()
-                if cursor.rowcount > 0:
-                    res, fps, ar = getVideoParams(folder)
-                    chapterlist="00:00:00"
-                    #iterate through marks, adding to chapterlist
-                    for record in result:
-                        chapterlist += "," + frameToTime(int(record[0]), float(fps))
-
-                    node = infoDOM.createElement("chapterlist")
-                    node.appendChild(infoDOM.createTextNode(chapterlist))
-                    top_element.appendChild(node)
-
-        db.close()
-        del db
-        del cursor
+                chapterlist = ['00:00:00']
+                res, fps, ar = getVideoParams(folder)
+                for s,e in cutlist:
+                    chapterlist.append(frameToTime(s, float(fps)))
+                data.chapterlist = ','.join(chapterlist)
+        else:
+            data.hascutlist = 'no'
 
     elif file.attributes["type"].value=="video":
-        # connect
-        db = getDatabaseConnection()
-        # create a cursor
-        cursor = db.cursor()
-        # execute SQL statement
-        cursor.execute("""SELECT title, director, plot, rating, inetref, year,
-                                 userrating, length, coverfile, subtitle
-                          FROM videometadata
-                          WHERE filename LIKE %s""", '%'+file.attributes["filename"].value)
-        # get the resultset as a tuple
-        result = cursor.fetchall()
-        # get the number of rows in the resultset
-        numrows = int(cursor.rowcount)
+        filename = file.attributes["filename"].value
+        try:
+            vid = MVID.searchVideos(file=filename).next()
+        except StopIteration:
+            vid = Video.fromFilename(filename)
 
-        #title,director,plot,rating,inetref,year,userrating,length,coverfile
-        #We must have exactly 1 row returned for this recording
-        if numrows<>1:
-            #Theres no record in the database so use a dummy row so we dont die!
-            #title,director,plot,rating,inetref,year,userrating,length,coverfile
-            record = file.attributes["filename"].value, "","",0,"","",0,0,""
+        data.type = file.attributes["type"].value
+        data.filename = filename
+        data.title = vid.title
 
-        for record in result:
-            write( "          " + record[0])
+        if vid.year != 1895:
+            data.recordingdate = str(vid.year)
 
-            node = infoDOM.createElement("type")
-            node.appendChild(infoDOM.createTextNode(file.attributes["type"].value))
-            top_element.appendChild(node)
+        data.subtitle = vid.subtitle
 
-            node = infoDOM.createElement("filename")
-            node.appendChild(infoDOM.createTextNode(file.attributes["filename"].value))
-            top_element.appendChild(node)   
+        if (vid.plot is not None) and (vid.plot != 'None'):
+            data.description = vid.plot
 
-            node = infoDOM.createElement("title")
-            node.appendChild(infoDOM.createTextNode(unicode(record[0], "UTF-8")))
-            top_element.appendChild(node)   
+        data.rating = str(vid.userrating)
 
-            node = infoDOM.createElement("recordingdate")
-            date = int(record[5])
-            if date != 1895:
-                node.appendChild(infoDOM.createTextNode("%s" % record[5]))
-            else:
-                node.appendChild(infoDOM.createTextNode(""))
-
-            top_element.appendChild(node)
-
-            node = infoDOM.createElement("recordingtime")
-            #node.appendChild(infoDOM.createTextNode(""))
-            top_element.appendChild(node)   
-
-            node = infoDOM.createElement("subtitle")
-            node.appendChild(infoDOM.createTextNode(unicode(record[9], "UTF-8")))
-            top_element.appendChild(node)   
-
-            node = infoDOM.createElement("description")
-            if record[2] != None:
-                desc = unicode(record[2], "UTF-8")
-                if desc != "None":
-                    node.appendChild(infoDOM.createTextNode(desc))
-                else:
-                    node.appendChild(infoDOM.createTextNode(""))
-            else:
-                    node.appendChild(infoDOM.createTextNode(""))
-            top_element.appendChild(node)
-
-            node = infoDOM.createElement("rating")
-            node.appendChild(infoDOM.createTextNode("%s" % record[6]))
-            top_element.appendChild(node)   
-
-            node = infoDOM.createElement("cutlist")
-            #node.appendChild(infoDOM.createTextNode(record[2]))
-            top_element.appendChild(node)   
-
-            node = infoDOM.createElement("coverfile")
-            if doesFileExist(record[8]):
-                node.appendChild(infoDOM.createTextNode(record[8]))
-            else:
-                node.appendChild(infoDOM.createTextNode(""))
-            top_element.appendChild(node)
-
-        db.close()
-        del db
-        del cursor
+        if doesFileExist(vid.coverfile):
+            data.coverfile = vid.coverfile
 
     elif file.attributes["type"].value=="file":
-
-        node = infoDOM.createElement("type")
-        node.appendChild(infoDOM.createTextNode(file.attributes["type"].value))
-        top_element.appendChild(node)
-
-        node = infoDOM.createElement("filename")
-        node.appendChild(infoDOM.createTextNode(file.attributes["filename"].value))
-        top_element.appendChild(node)
-
-        node = infoDOM.createElement("title")
-        node.appendChild(infoDOM.createTextNode(file.attributes["filename"].value))
-        top_element.appendChild(node)
-
-        node = infoDOM.createElement("recordingdate")
-        node.appendChild(infoDOM.createTextNode(""))
-        top_element.appendChild(node)
-
-        node = infoDOM.createElement("recordingtime")
-        node.appendChild(infoDOM.createTextNode(""))
-        top_element.appendChild(node)   
-
-        node = infoDOM.createElement("subtitle")
-        node.appendChild(infoDOM.createTextNode(""))
-        top_element.appendChild(node)   
-
-        node = infoDOM.createElement("description")
-        node.appendChild(infoDOM.createTextNode(""))
-        top_element.appendChild(node)   
-
-        node = infoDOM.createElement("rating")
-        node.appendChild(infoDOM.createTextNode(""))
-        top_element.appendChild(node)   
-
-        node = infoDOM.createElement("cutlist")
-        node.appendChild(infoDOM.createTextNode(""))
-        top_element.appendChild(node)   
-
-        node = infoDOM.createElement("coverfile")
-        node.appendChild(infoDOM.createTextNode(""))
-        top_element.appendChild(node)   
+        data.type =         file.attributes["type"].value
+        data.filename =     file.attributes["filename"].value
+        data.title =        file.attributes["filename"].value
 
     # if the jobfile has thumb image details copy the images to the work dir
     thumbs = file.getElementsByTagName("thumbimages")
     if thumbs.length > 0:
         thumbs = thumbs[0]
         thumbs = file.getElementsByTagName("thumb")
-        thumblist = ""
+        thumblist = []
         res, fps, ar = getVideoParams(folder)
 
         for thumb in thumbs:
@@ -1735,19 +1423,18 @@ def getFileInformation(file, folder):
             frame = thumb.attributes["frame"].value
             filename = thumb.attributes["filename"].value
             if caption != "Title":
-                if thumblist != "":
-                    thumblist += "," + frameToTime(int(frame), float(fps))
-                else:
-                    thumblist += frameToTime(int(frame), float(fps))
+                thumblist.append(frameToTime(int(frame), float(fps)))
 
             # copy thumb file to work dir
             copy(filename, folder)
 
-        node = infoDOM.createElement("thumblist")
-        node.appendChild(infoDOM.createTextNode(thumblist))
-        top_element.appendChild(node)
+        data.thumblist = ','.join(thumblist)
 
-        #top_element.appendChild(thumbs)
+    for k,v in data.items():
+        print "Node = %s, Data = %s" % (k, v)
+        node = infoDOM.createElement(k)
+        node.appendChild(infoDOM.createTextNode(str(v)))
+        top_element.appendChild(node)
 
     WriteXMLToFile (infoDOM, outputfile)
 
@@ -1805,7 +1492,7 @@ def preProcessFile(file, folder, count):
 def encodeAudio(format, sourcefile, destinationfile, deletesourceafterencode):
     write( "Encoding audio to "+format)
     if format == "ac3":
-        cmd = path_ffmpeg[0] + " -v 0 -y "
+        cmd = "mythffmpeg -v 0 -y "
 
         if cpuCount > 1:
             cmd += "-threads %d " % cpuCount
@@ -1814,7 +1501,7 @@ def encodeAudio(format, sourcefile, destinationfile, deletesourceafterencode):
         result = runCommand(cmd)
 
         if result != 0:
-            fatalError("Failed while running ffmpeg to re-encode the audio to ac3\n"
+            fatalError("Failed while running mythffmpeg to re-encode the audio to ac3\n"
                        "Command was %s" % cmd)
     else:
         fatalError("Unknown encodeAudio format " + format)
@@ -1929,12 +1616,13 @@ def multiplexMPEGStream(video, audio1, audio2, destination, syncOffset):
 def getStreamInformation(filename, xmlFilename, lenMethod):
     """create a stream.xml file for filename"""
     filename = quoteFilename(filename)
-    command = "mytharchivehelper --getfileinfo --infile %s --outfile %s --method %d" % (filename, xmlFilename, lenMethod)
+    command = "mytharchivehelper -q -q --getfileinfo --infile %s --outfile %s --method %d" % (filename, xmlFilename, lenMethod)
 
     result = runCommand(command)
 
     if result <> 0:
-        fatalError("Failed while running mytharchivehelper to get stream information from %s" % filename)
+        fatalError("Failed while running mytharchivehelper to get stream information.\n"
+                   "Result: %d, Command was %s" % (result, command))
 
     # print out the streaminfo.xml file to the log
     infoDOM = xml.dom.minidom.parse(xmlFilename)
@@ -1970,17 +1658,28 @@ def getVideoSize(xmlFilename):
 def runMythtranscode(chanid, starttime, destination, usecutlist, localfile):
     """Use mythtranscode to cut commercials and/or clean up an mpeg2 file"""
 
-    if localfile != "":
+    rec = DB.searchRecorded(chanid=chanid, starttime=starttime).next()
+    cutlist = rec.markup.getcutlist()
+
+    cutlist_s = ""
+    if usecutlist and len(cutlist):
+        cutlist_s = "'"
+        for cut in cutlist:
+            cutlist_s += ' %d-%d ' % cut
+        cutlist_s += "'"
+        write("Using cutlist: %s" % cutlist_s)
+
+    if (localfile != ""):
         localfile = quoteFilename(localfile)
         if usecutlist == True:
-            command = "mythtranscode --mpeg2 --honorcutlist -i %s -o %s" % (localfile, destination)
+            command = "mythtranscode --mpeg2 --honorcutlist %s --infile %s --outfile %s" % (cutlist_s, localfile, destination)
         else:
             command = "mythtranscode --mpeg2 -i %s -o %s" % (localfile, destination)
     else:
         if usecutlist == True:
-            command = "mythtranscode --mpeg2 --honorcutlist -c %s -s %s -o %s" % (chanid, starttime, destination)
+            command = "mythtranscode --mpeg2 --honorcutlist --chanid %s --starttime %s --outfile %s" % (chanid, starttime, destination)
         else:
-            command = "mythtranscode --mpeg2 -c %s -s %s -o %s" % (chanid, starttime, destination)
+            command = "mythtranscode --mpeg2 --chanid %s --starttime %s --outfile %s" % (chanid, starttime, destination)
 
     result = runCommand(command)
 
@@ -1998,39 +1697,33 @@ def runMythtranscode(chanid, starttime, destination, usecutlist, localfile):
 def generateProjectXCutlist(chanid, starttime, folder):
     """generate cutlist_x.txt for ProjectX"""
 
-    sqlstatement  = """SELECT mark FROM recordedmarkup 
-                    WHERE chanid = '%s' AND starttime = '%s' 
-                    AND type IN (0,1) ORDER BY mark""" % (chanid, starttime)
+    rec = DB.searchRecorded(chanid=chanid, starttime=starttime).next()
+    cutlist = rec.markup.getcutlist()
 
-    db = getDatabaseConnection()
-    cursor = db.cursor()
-    cursor.execute(sqlstatement)
-    result = cursor.fetchall()
-    numrows = int(cursor.rowcount)
+    if len(cutlist):
+        with open(os.path.join(folder, "cutlist_x.txt"), 'w') as cutlist_f:
+            cutlist_f.write("CollectionPanel.CutMode=2\n")
+            i = 0
+            for cut in cutlist:
+                # we need to reverse the cutlist because ProjectX wants to know
+                # the bits to keep not what to cut
+                
+                if i == 0:
+                    if cut[0] != 0:
+                        cutlist_f.write('0\n%d\n' % cut[0])
+                    cutlist_f.write('%d\n' % cut[1])
+                elif i == len(cutlist) - 1:
+                    cutlist_f.write('%d\n' % cut[0])
+                    if cut[1] != 9999999:
+                        cutlist_f.write('%d\n9999999\n' % cut[1])
+                else:
+                    cutlist_f.write('%d\n%d\n' % cut)
 
-    #We must have at least one row returned for this recording
-    if numrows==0:
+                i+=1
+        return True
+    else:
         write("No cutlist in the DB for chanid %s, starttime %s" % chanid, starttime)
-        db.close()
-        del db
-        del cursor
         return False
-
-    cutlist_f=open(os.path.join(folder, "cutlist_x.txt"), 'w')
-    cutlist_f.write("CollectionPanel.CutMode=2\n")
-
-    # iterate through resultset
-    for i in range(len(result)):
-        if i == 0:
-            if result[i][0] <> 0  and result[i][0] != "":
-                cutlist_f.write("0\n")
-        if result[i][0] != "" and result[i][0] <> 0:
-            cutlist_f.write("%d\n" % result[i])
-
-    cutlist_f.close()
-
-    return True
-
 
 #############################################################
 # Use Project-X to cut commercials and/or demux an mpeg2 file
@@ -2080,7 +1773,7 @@ def runProjectX(chanid, starttime, folder, usecutlist, file):
         if (os.path.exists(os.path.join(folder, "stream.sup")) and
             os.path.exists(os.path.join(folder, "stream.sup.IFO"))):
             write("Found DVB subtitles converting to DVD subtitles")
-            command = "mytharchivehelper --sup2dast "
+            command = "mytharchivehelper -q -q --sup2dast "
             command += " --infile %s --ifofile %s --delay 0" % (os.path.join(folder, "stream.sup"), os.path.join(folder, "stream.sup.IFO"))
 
             result = runCommand(command)
@@ -2289,7 +1982,7 @@ def extractVideoFrame(source, destination, seconds):
 
         source = quoteFilename(source)
 
-        command = "mytharchivehelper --createthumbnail --infile %s --thumblist '%s' --outfile %s" % (source, seconds, destination)
+        command = "mytharchivehelper -q -q --createthumbnail --infile %s --thumblist '%s' --outfile %s" % (source, seconds, destination)
         result = runCommand(command)
         if result <> 0:
             fatalError("Failed while running mytharchivehelper to get thumbnails.\n"
@@ -2314,22 +2007,23 @@ def extractVideoFrames(source, destination, thumbList):
 
     source = quoteFilename(source)
 
-    command = "mytharchivehelper -v important --createthumbnail --infile %s --thumblist '%s' --outfile %s" % (source, thumbList, destination)
+    command = "mytharchivehelper -q -q --createthumbnail --infile %s --thumblist '%s' --outfile %s" % (source, thumbList, destination)
     result = runCommand(command)
     if result <> 0:
-        fatalError("Failed while running mytharchivehelper to get thumbnails")
+        fatalError("Failed while running mytharchivehelper to get thumbnails.\n"
+                   "Result: %d, Command was %s" % (result, command))
 
 #############################################################
 # Re-encodes a file to mpeg2
 
 def encodeVideoToMPEG2(source, destvideofile, video, audio1, audio2, aspectratio, profile):
-    """Encodes an unknown video source file eg. AVI to MPEG2 video and AC3 audio, use ffmpeg"""
+    """Encodes an unknown video source file eg. AVI to MPEG2 video and AC3 audio, use mythffmpeg"""
 
     profileNode = findEncodingProfile(profile)
 
     passes = int(getText(profileNode.getElementsByTagName("passes")[0]))
 
-    command = path_ffmpeg[0]
+    command = "mythffmpeg"
 
     if cpuCount > 1:
         command += " -threads %d" % cpuCount
@@ -2391,7 +2085,7 @@ def encodeVideoToMPEG2(source, destvideofile, video, audio1, audio2, aspectratio
         write(command)
         result = runCommand(command)
         if result!=0:
-            fatalError("Failed while running ffmpeg to re-encode video.\n"
+            fatalError("Failed while running mythffmpeg to re-encode video.\n"
                        "Command was %s" % command)
 
     else:
@@ -2403,7 +2097,7 @@ def encodeVideoToMPEG2(source, destvideofile, video, audio1, audio2, aspectratio
         result = runCommand(pass1)
 
         if result!=0:
-            fatalError("Failed while running ffmpeg (Pass 1) to re-encode video.\n"
+            fatalError("Failed while running mythffmpeg (Pass 1) to re-encode video.\n"
                        "Command was %s" % command)
 
         if os.path.exists(destvideofile):
@@ -2415,13 +2109,13 @@ def encodeVideoToMPEG2(source, destvideofile, video, audio1, audio2, aspectratio
         result = runCommand(pass2)
 
         if result!=0:
-            fatalError("Failed while running ffmpeg (Pass 2) to re-encode video.\n"
+            fatalError("Failed while running mythffmpeg (Pass 2) to re-encode video.\n"
                        "Command was %s" % command)
 #############################################################
 # Re-encodes a nuv file to mpeg2 optionally removing commercials
 
 def encodeNuvToMPEG2(chanid, starttime, mediafile, destvideofile, folder, profile, usecutlist):
-    """Encodes a nuv video source file to MPEG2 video and AC3 audio, using mythtranscode & ffmpeg"""
+    """Encodes a nuv video source file to MPEG2 video and AC3 audio, using mythtranscode & mythffmpeg"""
 
     # make sure mythtranscode hasn't left some stale fifos hanging around
     if ((doesFileExist(os.path.join(folder, "audout")) or doesFileExist(os.path.join(folder, "vidout")))):
@@ -2488,25 +2182,25 @@ def encodeNuvToMPEG2(chanid, starttime, mediafile, destvideofile, folder, profil
     if chanid != -1:
         if (usecutlist == True):
             PID=os.spawnlp(os.P_NOWAIT, "mythtranscode", "mythtranscode",
-                        '-p', '27',
-                        '-c', chanid,
-                        '-s', starttime,
+                        '--profile', '27',
+                        '--chanid', chanid,
+                        '--starttime', starttime,
                         '--honorcutlist',
-                        '-f', folder)
+                        '--fifodir', folder)
             write("mythtranscode started (using cut list) PID = %s" % PID)
         else:
             PID=os.spawnlp(os.P_NOWAIT, "mythtranscode", "mythtranscode",
-                        '-p', '27',
-                        '-c', chanid,
-                        '-s', starttime,
-                        '-f', folder)
+                        '--profile', '27',
+                        '--chanid', chanid,
+                        '--starttime', starttime,
+                        '--fifodir', folder)
 
             write("mythtranscode started PID = %s" % PID)
     elif mediafile != -1:
         PID=os.spawnlp(os.P_NOWAIT, "mythtranscode", "mythtranscode",
-                '-p', '27',
-                '-i', mediafile,
-                '-f', folder)
+                '--profile', '27',
+                '--infile', mediafile,
+                '--fifodir', folder)
         write("mythtranscode started (using file) PID = %s" % PID)
     else:
         fatalError("no video source passed to encodeNuvToMPEG2.\n")
@@ -2515,7 +2209,7 @@ def encodeNuvToMPEG2(chanid, starttime, mediafile, destvideofile, folder, profil
     samplerate, channels = getAudioParams(folder)
     videores, fps, aspectratio = getVideoParams(folder)
 
-    command =  path_ffmpeg[0] + " -y "
+    command =  "mythffmpeg -y "
 
     if cpuCount > 1:
         command += "-threads %d " % cpuCount
@@ -2543,11 +2237,11 @@ def encodeNuvToMPEG2(chanid, starttime, mediafile, destvideofile, folder, profil
     if (not(doesFileExist(os.path.join(folder, "audout")) and doesFileExist(os.path.join(folder, "vidout")))):
         fatalError("Waited too long for mythtranscode to create the fifos - giving up!!")
 
-    write("Running ffmpeg")
+    write("Running mythffmpeg")
     result = runCommand(command)
     if result != 0:
         os.kill(PID, signal.SIGKILL)
-        fatalError("Failed while running ffmpeg to re-encode video.\n"
+        fatalError("Failed while running mythffmpeg to re-encode video.\n"
                    "Command was %s" % command)
 
 #############################################################
@@ -3501,7 +3195,7 @@ def generateVideoPreview(videoitem, itemonthispage, menuitem, starttime, menulen
                 height = getScaledAttribute(node, "h")
                 frames = int(secondsToFrames(menulength))
 
-                command = "mytharchivehelper --createthumbnail --infile  %s --thumblist '%s' --outfile '%s' --framecount %d" % (inputfile, starttime, outputfile, frames)
+                command = "mytharchivehelper -q -q --createthumbnail --infile  %s --thumblist '%s' --outfile '%s' --framecount %d" % (inputfile, starttime, outputfile, frames)
                 result = runCommand(command)
                 if (result != 0):
                     write( "mytharchivehelper failed with code %d. Command = %s" % (result, command) )
@@ -4797,8 +4491,8 @@ def doProcessFile(file, folder, count):
     #do we need to re-encode the file to make it DVD compliant?
     if not isFileOkayForDVD(file, folder):
         if getFileType(folder) == 'nuv':
-            #file is a nuv file which ffmpeg has problems reading so use mythtranscode to pass
-            #the video and audio streams to ffmpeg to do the reencode
+            #file is a nuv file which mythffmpeg has problems reading so use mythtranscode to pass
+            #the video and audio streams to mythffmpeg to do the reencode
 
             #we need to re-encode the file, make sure we get the right video/audio streams
             #would be good if we could also split the file at the same time
@@ -4951,8 +4645,8 @@ def doProcessFileProjectX(file, folder, count):
     #do we need to re-encode the file to make it DVD compliant?
     if not isFileOkayForDVD(file, folder):
         if getFileType(folder) == 'nuv':
-            #file is a nuv file which ffmpeg has problems reading so use mythtranscode to pass
-            #the video and audio streams to ffmpeg to do the reencode
+            #file is a nuv file which mythffmpeg has problems reading so use mythtranscode to pass
+            #the video and audio streams to mythffmpeg to do the reencode
 
             #we need to re-encode the file, make sure we get the right video/audio streams
             #would be good if we could also split the file at the same time
@@ -5091,7 +4785,7 @@ def copyRemote(files, tmpPath):
         tmpfile = node.attributes["filename"].value
         filename = os.path.basename(tmpfile)
 
-        res = runCommand("mytharchivehelper --isremote --infile " + quoteFilename(tmpfile))
+        res = runCommand("mytharchivehelper -q -q --isremote --infile " + quoteFilename(tmpfile))
         if res == 2:
             # file is on a remote filesystem so copy it to a local file
             write("Copying file from " + tmpfile)
@@ -5142,7 +4836,7 @@ def processJob(job):
         nodes=themeDOM.getElementsByTagName("detailspage")
         wantDetailsPage = (nodes.length > 0)
 
-        write( "wantIntro: %d, wantMainMenu: %d, wantChapterMenu:%d, wantDetailsPage: %d" \
+        write( "wantIntro: %d, wantMainMenu: %d, wantChapterMenu: %d, wantDetailsPage: %d" \
                 % (wantIntro, wantMainMenu, wantChapterMenu, wantDetailsPage))
 
         if videomode=="ntsc":
@@ -5164,7 +4858,7 @@ def processJob(job):
         files=media[0].getElementsByTagName("file")
         filecount=0
         if files.length > 0:
-            write( "There are %s files to process" % files.length)
+            write( "There are %s file(s) to process" % files.length)
 
             if debug_secondrunthrough==False:
                 #Delete all the temporary files that currently exist
@@ -5345,7 +5039,7 @@ def main():
     global videomode, temppath, logpath, dvddrivepath, dbVersion, preferredlang1
     global preferredlang2, useFIFO, encodetoac3, alwaysRunMythtranscode
     global copyremoteFiles, mainmenuAspectRatio, chaptermenuAspectRatio, dateformat
-    global timeformat, clearArchiveTable, nicelevel, drivespeed, path_mplex, path_ffmpeg
+    global timeformat, clearArchiveTable, nicelevel, drivespeed, path_mplex
     global path_dvdauthor, path_mkisofs, path_growisofs, path_M2VRequantiser, addSubtitles
     global path_jpeg2yuv, path_spumux, path_mpeg2enc, path_projectx, useprojectx, progresslog
     global progressfile, jobfile
@@ -5394,7 +5088,7 @@ def main():
         write( "mythburn.py (%s) starting up..." % VERSION)
 
     #Get mysql database parameters
-    getMysqlDBParameters()
+    #getMysqlDBParameters()
 
     saveSetting("MythArchiveLastRunStart", time.strftime("%Y-%m-%d %H:%M:%S "))
     saveSetting("MythArchiveLastRunType", "DVD")
@@ -5424,7 +5118,6 @@ def main():
     preferredlang1 = defaultsettings["ISO639Language0"]
     preferredlang2 = defaultsettings["ISO639Language1"]
     useFIFO = (defaultsettings["MythArchiveUseFIFO"] == '1')
-    encodetoac3 = (defaultsettings["MythArchiveEncodeToAc3"] == '1')
     alwaysRunMythtranscode = (defaultsettings["MythArchiveAlwaysUseMythTranscode"] == '1')
     copyremoteFiles = (defaultsettings["MythArchiveCopyRemoteFiles"] == '1')
     mainmenuAspectRatio = defaultsettings["MythArchiveMainMenuAR"]
@@ -5438,7 +5131,6 @@ def main():
 
     # external commands
     path_mplex = [defaultsettings["MythArchiveMplexCmd"], os.path.split(defaultsettings["MythArchiveMplexCmd"])[1]]
-    path_ffmpeg = [defaultsettings["MythArchiveFfmpegCmd"], os.path.split(defaultsettings["MythArchiveFfmpegCmd"])[1]]
     path_dvdauthor = [defaultsettings["MythArchiveDvdauthorCmd"], os.path.split(defaultsettings["MythArchiveDvdauthorCmd"])[1]]
     path_mkisofs = [defaultsettings["MythArchiveMkisofsCmd"], os.path.split(defaultsettings["MythArchiveMkisofsCmd"])[1]]
     path_growisofs = [defaultsettings["MythArchiveGrowisofsCmd"], os.path.split(defaultsettings["MythArchiveGrowisofsCmd"])[1]]

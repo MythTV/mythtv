@@ -15,7 +15,7 @@ namespace DTC
 class SERVICE_PUBLIC RecRule : public QObject
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "1.01" );
+    Q_CLASSINFO( "version"    , "1.10" );
 
     Q_PROPERTY( int             Id              READ Id               WRITE setId             )
     Q_PROPERTY( int             ParentId        READ ParentId         WRITE setParentId       )
@@ -40,14 +40,14 @@ class SERVICE_PUBLIC RecRule : public QObject
     Q_PROPERTY( QTime           Time            READ Time             WRITE setTime           )
     Q_PROPERTY( int             FindId          READ FindId           WRITE setFindId         )
 
-    Q_PROPERTY( int             Type            READ Type             WRITE setType           )
-    Q_PROPERTY( int             SearchType      READ SearchType       WRITE setSearchType     )
+    Q_PROPERTY( QString         Type            READ Type             WRITE setType           )
+    Q_PROPERTY( QString         SearchType      READ SearchType       WRITE setSearchType     )
     Q_PROPERTY( int             RecPriority     READ RecPriority      WRITE setRecPriority    )
     Q_PROPERTY( uint            PreferredInput  READ PreferredInput   WRITE setPreferredInput )
     Q_PROPERTY( int             StartOffset     READ StartOffset      WRITE setStartOffset    )
     Q_PROPERTY( int             EndOffset       READ EndOffset        WRITE setEndOffset      )
-    Q_PROPERTY( int             DupMethod       READ DupMethod        WRITE setDupMethod      )
-    Q_PROPERTY( int             DupIn           READ DupIn            WRITE setDupIn          )
+    Q_PROPERTY( QString         DupMethod       READ DupMethod        WRITE setDupMethod      )
+    Q_PROPERTY( QString         DupIn           READ DupIn            WRITE setDupIn          )
     Q_PROPERTY( uint            Filter          READ Filter           WRITE setFilter         )
 
     Q_PROPERTY( QString         RecProfile      READ RecProfile       WRITE setRecProfile     )
@@ -92,14 +92,14 @@ class SERVICE_PUBLIC RecRule : public QObject
     PROPERTYIMP    ( int        , Day            )
     PROPERTYIMP    ( QTime      , Time           )
     PROPERTYIMP    ( int        , FindId         )
-    PROPERTYIMP    ( int        , Type           )
-    PROPERTYIMP    ( int        , SearchType     )
+    PROPERTYIMP    ( QString    , Type           )
+    PROPERTYIMP    ( QString    , SearchType     )
     PROPERTYIMP    ( int        , RecPriority    )
     PROPERTYIMP    ( uint       , PreferredInput )
     PROPERTYIMP    ( int        , StartOffset    )
     PROPERTYIMP    ( int        , EndOffset      )
-    PROPERTYIMP    ( int        , DupMethod      )
-    PROPERTYIMP    ( int        , DupIn          )
+    PROPERTYIMP    ( QString    , DupMethod      )
+    PROPERTYIMP    ( QString    , DupIn          )
     PROPERTYIMP    ( uint       , Filter         )
     PROPERTYIMP    ( QString    , RecProfile     )
     PROPERTYIMP    ( QString    , RecGroup       )
@@ -141,14 +141,10 @@ class SERVICE_PUBLIC RecRule : public QObject
               m_ChanId        ( 0      ),
               m_Day           ( 0      ),
               m_FindId        ( 0      ),
-              m_Type          ( 0      ),
-              m_SearchType    ( 0      ),
               m_RecPriority   ( 0      ),
               m_PreferredInput( 0      ),
               m_StartOffset   ( 0      ),
               m_EndOffset     ( 0      ),
-              m_DupMethod     ( 0      ),
-              m_DupIn         ( 0      ),
               m_Filter        ( 0      ),
               m_AutoExpire    ( false  ),
               m_MaxEpisodes   ( 0      ),

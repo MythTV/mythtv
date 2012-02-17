@@ -241,8 +241,7 @@ void FileScanner::AddFileToDB(const QString &filename)
     directory.remove(0, m_startdir.length());
     directory = directory.section( '/', 0, -2);
 
-    QString nameFilter = gCoreContext->GetSetting("AlbumArtFilter",
-                                              "*.png;*.jpg;*.jpeg;*.gif;*.bmp");
+    QString nameFilter = gCoreContext->GetSetting("AlbumArtFilter", "*.png;*.jpg;*.jpeg;*.gif;*.bmp");
 
     // If this file is an image, insert the details into the music_albumart table
     if (nameFilter.indexOf(extension.toLower()) > -1)
@@ -270,9 +269,8 @@ void FileScanner::AddFileToDB(const QString &filename)
         LOG(VB_FILE, LOG_INFO,
             QString("Reading metadata from %1").arg(filename));
         Metadata *data = decoder->readMetadata();
-        if (data) 
+        if (data)
         {
-
             QString album_cache_string;
 
             // Set values from cache

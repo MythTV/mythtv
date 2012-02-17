@@ -150,7 +150,11 @@
                         <state name="no" />
                     </statetype>
                 </state>
-                <state name="selectedinactive" from="active" />
+                <state name="selectedinactive" from="active">
+                    <shape name="selectbar">
+                        <area>26,0,854,30</area>
+                    </shape>
+                </state>
                 <state name="selectedactive" from="active">
                     <shape name="selectbar">
                         <area>26,0,854,30</area>
@@ -473,7 +477,11 @@
                         <state name="no" />
                     </statetype>
                 </state>
-                <state name="selectedinactive" from="active" />
+                <state name="selectedinactive" from="active">
+                    <shape name="selectbar">
+                        <area>26,0,854,30</area>
+                    </shape>
+                </state>
                 <state name="selectedactive" from="active">
                     <shape name="selectbar">
                         <area>26,0,854,30</area>

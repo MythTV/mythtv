@@ -21,7 +21,7 @@
 MythUIVideo::MythUIVideo(MythUIType *parent, const QString &name)
     : MythUIType(parent, name)
 {
-    m_image = NULL;
+    m_image = GetMythPainter()->GetFormatImage();
     m_backgroundColor = QColor(Qt::black);
 }
 
@@ -45,28 +45,21 @@ void MythUIVideo::Reset(void)
         m_image = NULL;
     }
 
+    m_image = GetMythPainter()->GetFormatImage();
+
     MythUIType::Reset();
 }
 
 void MythUIVideo::UpdateFrame(MythImage *image)
 {
-    if (m_image)
-        m_image->DownRef();
-
-    m_image = image;
-    m_image->UpRef();
+    m_image->Assign(*image);
 
     SetRedraw();
 }
 
 void MythUIVideo::UpdateFrame(QPixmap *pixmap)
 {
-    if (m_image)
-        m_image->DownRef();
-
-    m_image = GetMythPainter()->GetFormatImage();
     m_image->Assign(*pixmap);
-    m_image->UpRef();
 
     SetRedraw();
 }

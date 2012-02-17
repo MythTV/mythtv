@@ -48,6 +48,7 @@ class MUI_PUBLIC MythUIStateType : public MythUIType
     void EnsureStateLoaded(StateType type);
 
     virtual void LoadNow(void);
+    virtual void RecalculateArea(bool recurse = true);
 
   protected:
     virtual bool ParseElement(
@@ -60,6 +61,7 @@ class MUI_PUBLIC MythUIStateType : public MythUIType
     QMap<int, MythUIType *> m_ObjectsByState;
 
     MythUIType *m_CurrentState;
+    MythRect    m_ParentArea;
 
     bool m_ShowEmpty;
 

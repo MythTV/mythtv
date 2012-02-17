@@ -1324,7 +1324,8 @@ static HostComboBox *MenuTheme()
     QList<ThemeInfo>::iterator it;
     for( it =  themelist.begin(); it != themelist.end(); ++it )
     {
-        gc->addSelection((*it).GetName(), (*it).GetDirectoryName());
+        gc->addSelection((*it).GetName(), (*it).GetDirectoryName(),
+                         (*it).GetDirectoryName() == "defaultmenu");
     }
 
     return gc;
@@ -1446,7 +1447,7 @@ static HostCheckBox *CCBackground()
     gc->setValue(false);
     gc->setHelpText(QObject::tr(
                         "If enabled, captions will be displayed "
-                        "as white text over a black background "
+                        "over a black background "
                         "for better contrast."));
     return gc;
 }
@@ -2247,18 +2248,6 @@ static HostComboBox *LongChannelFormat()
     return gc;
 }
 
-static GlobalCheckBox *LastFreeCard()
-{
-    GlobalCheckBox *bc = new GlobalCheckBox("LastFreeCard");
-    bc->setLabel(QObject::tr("Avoid conflicts between Live TV and "
-                 "scheduled shows"));
-    bc->setValue(false);
-    bc->setHelpText(QObject::tr("If enabled, Live TV will choose a tuner card "
-                    "that is less likely to have scheduled recordings "
-                    "rather than the best card available."));
-    return bc;
-}
-
 static GlobalCheckBox *LiveTVPriority()
 {
     GlobalCheckBox *bc = new GlobalCheckBox("LiveTVPriority");
@@ -2709,9 +2698,9 @@ static HostCheckBox *EnableMediaMon()
     HostCheckBox *gc = new HostCheckBox("MonitorDrives");
     gc->setLabel(QObject::tr("Monitor CD/DVD") +
                  QObject::tr(" (and other removable devices)"));
-    gc->setHelpText(QObject::tr("This enables support for monitoring "
-                    "your CD/DVD drives for new disks and launching "
-                    "the proper plugin to handle them."));
+    gc->setHelpText(QObject::tr("This enables support for monitoring your "
+                    "CD/DVD drives for new disks and launching the proper "
+                    "plugin to handle them. Requires restart."));
     gc->setValue(false);
     return gc;
 }
@@ -2723,7 +2712,8 @@ static HostLineEdit *IgnoreMedia()
     ge->setValue("");
     ge->setHelpText(QObject::tr("If there are any devices that you do not want "
                                 "to be monitored, list them here with commas "
-                                "in-between. The plugins will ignore them"));
+                                "in-between. The plugins will ignore them. "
+                                "Requires restart."));
     return ge;
 }
 
@@ -3484,7 +3474,6 @@ GeneralSettings::GeneralSettings()
     general->addChild(ChannelOrdering());
     general->addChild(ChannelFormat());
     general->addChild(LongChannelFormat());
-    general->addChild(LastFreeCard());
     general->addChild(LiveTVPriority());
     addChild(general);
 

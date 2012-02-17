@@ -16,9 +16,29 @@ static HostLineEdit *LocalServerIP()
     gc->setHelpText(QObject::tr("Enter the IP address of this machine. "
                     "Use an externally accessible address (ie, not "
                     "127.0.0.1) if you are going to be running a frontend "
-                    "on a different machine than this one."));
+                    "on a different machine than this one. Note, in IPv6 "
+                    "setups, this is still required for certain extras "
+                    "such as UPnP."));
     return gc;
 };
+
+static HostLineEdit *LocalServerIP6()
+{
+    HostLineEdit *gc = new HostLineEdit("BackendServerIP6");
+    gc->setLabel(QObject::tr("IPv6 address"));
+    gc->setValue("::1");
+    gc->setHelpText(QObject::tr("Enter the IPv6 address of this machine. "
+                    "Use an externally accessible address (ie, not "
+                    "::1) if you are going to be running a frontend "
+                    "on a different machine than this one."));
+#if defined(QT_NO_IPV6)
+    gc->setEnabled(false);
+#else
+    if (gCoreContext->MythHostAddress6().isEmpty())
+        gc->setEnabled(false);
+#endif
+    return gc;
+}
 
 static HostLineEdit *LocalServerPort()
 {
@@ -795,17 +815,6 @@ static GlobalLineEdit *MythFillDatabaseArgs()
     return be;
 }
 
-static GlobalLineEdit *MythFillDatabaseLog()
-{
-    GlobalLineEdit *be = new GlobalLineEdit("MythFillDatabaseLog");
-    be->setLabel(QObject::tr("Guide data program log path"));
-    be->setValue("");
-    be->setHelpText(QObject::tr("File or directory to use for logging "
-                    "output from the guide data program. Leave blank "
-                    "to disable logging."));
-    return be;
-}
-
 class MythFillSettings : public TriggeredConfigurationGroup
 {
   public:
@@ -822,7 +831,6 @@ class MythFillSettings : public TriggeredConfigurationGroup
          ConfigurationGroup* settings = new VerticalConfigurationGroup(false);
          settings->addChild(MythFillDatabasePath());
          settings->addChild(MythFillDatabaseArgs());
-         settings->addChild(MythFillDatabaseLog());
          settings->addChild(MythFillMinHour());
          settings->addChild(MythFillMaxHour());
          settings->addChild(MythFillGrabberSuggestsTime());
@@ -843,6 +851,10 @@ BackendSettings::BackendSettings() {
               new HorizontalConfigurationGroup(false, false, true, true);
     localIP->addChild(LocalServerIP());
     localServer->addChild(localIP);
+    HorizontalConfigurationGroup* localIP6 =
+              new HorizontalConfigurationGroup(false, false, true, true);
+    localIP6->addChild(LocalServerIP6());
+    localServer->addChild(localIP6);
     HorizontalConfigurationGroup* localPorts =
               new HorizontalConfigurationGroup(false, false, true, true);
     localPorts->addChild(LocalServerPort());

@@ -13,9 +13,11 @@ class MTV_PUBLIC InputInfo
 {
   public:
     InputInfo() : name(QString::null),
-                  sourceid(0), inputid(0), cardid(0), mplexid(0) {}
+                  sourceid(0), inputid(0), cardid(0), mplexid(0), 
+                  livetvorder(0) {}
     InputInfo(const QString &name,
-              uint sourceid, uint inputid, uint cardid, uint mplexid);
+              uint sourceid, uint inputid, uint cardid, uint mplexid, 
+              uint livetvorder);
     InputInfo(const InputInfo &other);
     InputInfo &operator=(const InputInfo &other);
     virtual ~InputInfo() {}
@@ -39,6 +41,7 @@ class MTV_PUBLIC InputInfo
     uint    inputid;  ///< unique key in DB for this input
     uint    cardid;   ///< card id associated with input
     uint    mplexid;  ///< mplexid restriction if applicable
+    uint    livetvorder; ///< order for live TV use
 };
 
 class MTV_PUBLIC TunedInputInfo : public InputInfo
@@ -47,7 +50,8 @@ class MTV_PUBLIC TunedInputInfo : public InputInfo
     TunedInputInfo() : chanid(0) { }
     TunedInputInfo(const QString &name,
                    uint _sourceid, uint _inputid,
-                   uint _cardid,   uint _mplexid, uint _chanid);
+                   uint _cardid,   uint _mplexid, uint _livetvorder, 
+                   uint _chanid);
     TunedInputInfo(const TunedInputInfo &other);
     TunedInputInfo &operator=(const TunedInputInfo &other);
     virtual ~TunedInputInfo() {}
@@ -74,8 +78,9 @@ class MTV_PUBLIC ChannelInputInfo : public InputInfo
                      QString _tuneToChannel,   QString _externalChanger,
                      uint    _sourceid,        uint    _cardid,
                      uint    _inputid,         uint    _mplexid,
+                     uint    _livetvorder,
                      const DBChanList &_channels) :
-        InputInfo(_name, _sourceid, _inputid, _cardid, _mplexid),
+        InputInfo(_name, _sourceid, _inputid, _cardid, _mplexid, _livetvorder),
         startChanNum(_startChanNum),
         tuneToChannel(_tuneToChannel),  externalChanger(_externalChanger),
         channels(_channels),

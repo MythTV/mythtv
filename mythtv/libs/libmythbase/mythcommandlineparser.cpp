@@ -1100,7 +1100,7 @@ CommandLineArg* MythCommandLineParser::add(QStringList arglist,
 
 /** \brief Print application version information
  */
-void MythCommandLineParser::PrintVersion(void)
+void MythCommandLineParser::PrintVersion(void) const
 {
     cout << "Please attach all output as a file in bug reports." << endl;
     cout << "MythTV Version : " << MYTH_SOURCE_VERSION << endl;
@@ -1116,7 +1116,7 @@ void MythCommandLineParser::PrintVersion(void)
 
 /** \brief Print command line option help
  */
-void MythCommandLineParser::PrintHelp(void)
+void MythCommandLineParser::PrintHelp(void) const
 {
     QString help = GetHelpString();
     cerr << help.toLocal8Bit().constData();
@@ -2135,7 +2135,7 @@ void MythCommandLineParser::addGeometry(void)
  */
 void MythCommandLineParser::addDisplay(void)
 {
-#ifdef CONFIG_X11
+#ifdef USING_X11
     add("-display", "display", "", "Specify X server to use.", "")
         ->SetGroup("User Interface");
 #endif

@@ -32,7 +32,7 @@ typedef struct
     QString filename;
     QString coverfile;
     int     parentalLevel;
-    unsigned long long size;
+    uint64_t size;
 } VideoInfo;
 
 class VideoSelector : public MythScreenType

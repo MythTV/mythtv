@@ -185,6 +185,7 @@ class MUI_PUBLIC MythConfirmationDialog : public MythScreenType
     bool Create(void);
     void SetReturnEvent(QObject *retobject, const QString &resultid);
     void SetData(QVariant data) { m_resultData = data; }
+    void SetMessage(const QString &message);
 
     bool keyPressEvent(QKeyEvent *event);
 
@@ -193,6 +194,7 @@ class MUI_PUBLIC MythConfirmationDialog : public MythScreenType
 
   private:
     void sendResult(bool);
+    MythUIText *m_messageText;
     QString m_message;
     bool m_showCancel;
     QObject *m_retObject;
@@ -290,6 +292,67 @@ class MUI_PUBLIC MythUISearchDialog : public MythScreenType
   private slots:
     void slotSendResult(void);
     void slotUpdateList(void);
+};
+
+/**
+ * \class MythUITimeInputDialog
+ * \brief Provide a dialog for inputting a date/time or both
+ *
+ * \param message The message to display to the user explaining what you are
+ *                asking for
+ * \param startTime The date/time to start the list, defaults to now
+ */
+class MUI_PUBLIC MythTimeInputDialog : public MythScreenType
+{
+    Q_OBJECT
+
+  public:
+    // FIXME Not sure about this enum
+    enum TimeInputResolution {
+        // Date Resolution
+        kNoDate       = 0x01,
+        kYear         = 0x02,
+        kMonth        = 0x04,
+        kDay          = 0x08,
+
+        // Time Resolution
+        kNoTime       = 0x10,
+        kHours        = 0x20,
+        kMinutes      = 0x40,
+
+        // Work forward/backwards or backwards and fowards from start time
+        kFutureDates  = 0x100,
+        kPastDates    = 0x200,
+        kAllDates     = 0x300
+    };
+
+    MythTimeInputDialog(MythScreenStack *parent, const QString &message,
+                        int resolutionFlags,
+                        QDateTime startTime = QDateTime::currentDateTime(),
+                        int dayLimit = 14);
+
+    bool Create();
+    void SetReturnEvent(QObject *retobject, const QString &resultid);
+
+  signals:
+    void haveResult(QDateTime time);
+
+  private slots:
+    void okClicked(void);
+
+  private:
+    QString           m_message;
+    QDateTime         m_startTime;
+    int               m_resolution;
+    int               m_rangeLimit;
+    QStringList       m_list;
+    QString           m_currentValue;
+
+    MythUIButtonList *m_dateList;
+    MythUIButtonList *m_timeList;
+
+    QObject          *m_retObject;
+    QString           m_id;
 };
 
 MUI_PUBLIC MythConfirmationDialog  *ShowOkPopup(const QString &message, QObject *parent = NULL,

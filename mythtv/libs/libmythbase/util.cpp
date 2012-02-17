@@ -732,10 +732,10 @@ bool getMemStats(int &totalMB, int &freeMB, int &totalVM, int &freeVM)
     // This is a real hack. I have not found a way to ask the kernel how much
     // swap it is using, and the dynamic_pager daemon doesn't even seem to be
     // able to report what filesystem it is using for the swapfiles. So, we do:
-    long long total, used, free;
+    int64_t total, used, free;
     free = getDiskSpace("/private/var/vm", total, used);
-    totalVM = (int)(total/1024LL);
-    freeVM = (int)(free/1024LL);
+    totalVM = (int)(total >> 10);
+    freeVM = (int)(free >> 10);
 
 #else
     LOG(VB_GENERAL, LOG_NOTICE, "getMemStats(): Unknown platform. "
@@ -1262,7 +1262,7 @@ bool IsPulseAudioRunning(void)
 {
 #ifdef USING_MINGW
     return false;
-#endif
+#else
 
 #if CONFIG_DARWIN || (__FreeBSD__) || defined(__OpenBSD__)
     const char *command = "ps -ax | grep -i pulseaudio | grep -v grep > /dev/null";
@@ -1273,6 +1273,7 @@ bool IsPulseAudioRunning(void)
     uint res = myth_system(command, kMSDontBlockInputDevs |
                                     kMSDontDisableDrawing);
     return (res == GENERIC_EXIT_OK);
+#endif // USING_MINGW
 }
 
 bool myth_nice(int val)

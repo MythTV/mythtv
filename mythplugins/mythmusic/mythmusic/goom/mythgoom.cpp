@@ -1,7 +1,5 @@
 #include "mythgoom.h"
 
-#ifdef SDL_SUPPORT
-
 #include <cmath>
 #include <cstdlib>
 
@@ -19,72 +17,54 @@ extern "C" {
 #include "goom_core.h"
 }
 
-Goom::Goom(long int winid)
+Goom::Goom()
 {
-    fps = 20;
+    m_fps = 20;
 
-    surface = NULL;
-    buffer = NULL;
-
-    char SDL_windowhack[32];
-    //char SDL_windowhack[sizeof(long int)];
-    sprintf(SDL_windowhack, "%ld", winid);
-    setenv("SDL_WINDOWID", SDL_windowhack, 1);
-
-    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_NOPARACHUTE) < 0)
-    {
-        LOG(VB_GENERAL, LOG_ERR, "Unable to init SDL");
-        return;
-    }
-
-    SDL_ShowCursor(0);
+    m_buffer = NULL;
 
     goom_init(800, 600, 0);
 
-    scalew = gCoreContext->GetNumSetting("VisualScaleWidth", 2);
-    scaleh = gCoreContext->GetNumSetting("VisualScaleHeight", 2);
+    m_scalew = 1; //gCoreContext->GetNumSetting("VisualScaleWidth", 2);
+    m_scaleh = 1; //gCoreContext->GetNumSetting("VisualScaleHeight", 2);
 
-    if (scaleh > 2)
-        scaleh = 2;
-    if (scaleh < 1)
-        scaleh = 1;
+    if (m_scaleh > 2)
+        m_scaleh = 2;
+    if (m_scaleh < 1)
+        m_scaleh = 1;
 
-    if (scalew > 2)
-        scalew = 2;
-    if (scalew < 1)
-        scalew = 1;
+    if (m_scalew > 2)
+        m_scalew = 2;
+    if (m_scalew < 1)
+        m_scalew = 1;
 }
 
 Goom::~Goom()
 {
     goom_close();
-    SDL_Quit();
-
-    unsetenv("SDL_WINDOWID");
 }
 
 void Goom::resize(const QSize &newsize)
 {
-    size = newsize;
+    m_size = newsize;
 
-    size.setHeight((size.height() / 2) * 2);
-    size.setWidth((size.width() / 2) * 2);
+    m_size.setHeight((m_size.height() / 2) * 2);
+    m_size.setWidth((m_size.width() / 2) * 2);
 
-    surface = SDL_SetVideoMode(size.width(), size.height(), 32, 0 /* SDL_ANYFORMAT */);
-    goom_set_resolution(size.width() / scalew, size.height() / scaleh, 0);
+    goom_set_resolution(m_size.width() / m_scalew, m_size.height() / m_scaleh, 0);
 }
 
 bool Goom::process(VisualNode *node)
 {
-    if (!node || node->length == 0 || !surface)
-        return true;
+    if (!node || node->length == 0)
+        return false;
 
     int numSamps = 512;
     if (node->length < 512)
         numSamps = node->length;
 
     signed short int data[2][512];
-   
+
     int i = 0;
     for (i = 0; i < numSamps; i++)
     {
@@ -101,79 +81,25 @@ bool Goom::process(VisualNode *node)
         data[1][i] = 0;
     }
 
-    buffer = goom_update(data, 0);
+    m_buffer = goom_update(data, 0);
 
     return false;
 }
 
 bool Goom::draw(QPainter *p, const QColor &back)
 {
-    (void)p;
-    (void)back;
+    p->fillRect(0, 0, m_size.width(), m_size.height(), back);
 
-    if (!surface)
-    {
-        LOG(VB_GENERAL, LOG_ERR, "No sdl surface");
-        return false;
-    }
+    if (!m_buffer)
+        return true;
 
-    if (!buffer)
-        return false;
+    QImage *image = new QImage((uchar*) m_buffer,  m_size.width(), m_size.height(), m_size.width() * 4, QImage::Format_ARGB32);
 
-    if (scalew != 1 || scaleh != 1)
-    {
-        SDL_LockSurface(surface);
+    p->drawImage(0, 0, *image);
 
-        register int *d = (int*)surface->pixels;
-        register int *s = (int*)buffer;
+    delete image;
 
-        int sw = (size.width() / scalew) << 2;
-        int sw2 = surface->pitch;
-        int swd = sw2 - sw * scalew;
-
-        long fin = (long)s;
-        long fd = (long)d + (sw2 * size.height());
-
-        while ((long)d < fd) {
-            fin += sw;
-            if (scalew == 2)
-            {
-                while ((long)s < fin) {
-                    register long col = *(s++);
-                    *(d++) = col; *(d++) = col;
-                } 
-            }
-            else
-            {
-                while ((long)s < fin) {
-                    register long col = *(s++);
-                    *(d++) = col;
-                }
-            }
-            d = (int*)((char*)d + swd);
-
-            if (scaleh == 2)
-            {
-                memcpy(d, ((char*)d) - sw2, sw2);
-                d = (int*)((char*)d + sw2);
-            }
-        }
-    }
-    else
-    {
-        SDL_Surface *tmpsurf = SDL_CreateRGBSurfaceFrom(buffer, size.width(),
-                                                        size.height(), 32, 
-                                                        size.width() * 4,
-                                                        0x00ff0000, 0x0000ff00,
-                                                        0x000000ff, 0x00000000);
-        SDL_BlitSurface(tmpsurf, NULL, surface, NULL);
-        SDL_FreeSurface(tmpsurf);
-    }
-
-    SDL_UnlockSurface(surface);
-    SDL_Flip(surface);
-
-    return false;
+    return true;
 }
 
 static class GoomFactory : public VisFactory
@@ -191,13 +117,10 @@ static class GoomFactory : public VisFactory
         return 1;
     }
 
-    VisualBase *create(MainVisual *parent, long int winid, const QString &pluginName) const
+    VisualBase *create(MainVisual *parent, const QString &pluginName) const
     {
         (void)parent;
         (void)pluginName;
-        return new Goom(winid);
+        return new Goom();
     }
 }GoomFactory;
-
-
-#endif

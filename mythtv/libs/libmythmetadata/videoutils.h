@@ -3,6 +3,7 @@
 
 #include "parentalcontrols.h"
 #include "mythmetaexp.h"
+#include "metadatacommon.h"
 
 template <typename T>
 inline void CheckedSet(T *uiItem, const QString &value)
@@ -54,7 +55,8 @@ META_PUBLIC QString TrailerToState(const QString &trailerFile);
 META_PUBLIC QString ParentalLevelToState(const ParentalLevel &level);
 META_PUBLIC QString WatchedToState(bool watched);
 
-META_PUBLIC bool isHostMaster(const QString &host);
+META_PUBLIC VideoContentType ContentTypeFromString(const QString &type);
+META_PUBLIC QString ContentTypeToString(VideoContentType type);
 
 // this needs to be an inline and pull in the storage group and context
 // headers since it this used in dbcheck.cpp.
@@ -63,7 +65,7 @@ META_PUBLIC bool isHostMaster(const QString &host);
 inline QString generate_file_url(
     const QString &storage_group, const QString &host, const QString &path)
 {
-    QString ip = gCoreContext->GetSettingOnHost("BackendServerIP", host);
+    QString ip = gCoreContext->GetBackendServerIP(host);
     uint port = gCoreContext->GetSettingOnHost("BackendServerPort",
                                                host).toUInt();
 

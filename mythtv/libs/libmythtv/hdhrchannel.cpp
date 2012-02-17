@@ -147,7 +147,7 @@ static QString format_dvbc(const DTVMultiplex &tuning, const QString &mod)
 }
 
 static QString get_tune_spec(
-    const DTVTunerType tunerType, const DTVMultiplex &tuning)
+    const DTVTunerType &tunerType, const DTVMultiplex &tuning)
 {
     const QString mod = format_modulation(tuning);
 

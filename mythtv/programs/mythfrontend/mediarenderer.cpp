@@ -45,6 +45,15 @@ class MythFrontendStatus : public HttpServerExtension
 
         SSDPCacheEntries* cache = NULL;
         QString ipaddress = QString();
+/*      QStringList::const_iterator sit = UPnp::g_IPAddrList.begin();
+        for (; sit != UPnp::g_IPAddrList.end(); ++sit)
+        {
+            if (QHostAddress(*sit).protocol() == QAbstractSocket::IPv4Protocol)
+            {
+                ipaddress = *sit;
+                break;
+            }
+        }*/
         if (!UPnp::g_IPAddrList.isEmpty())
             ipaddress = UPnp::g_IPAddrList.at(0);
 
@@ -213,7 +222,7 @@ MediaRenderer::MediaRenderer()
     if (!m_pHttpServer)
         return;
 
-    if (!m_pHttpServer->listen(gCoreContext->MythHostAddressAny(), nPort))
+    if (!m_pHttpServer->listen(gCoreContext->MythHostAddress(), nPort))
     {
         LOG(VB_GENERAL, LOG_ERR, "MediaRenderer::HttpServer Create Error");
         delete m_pHttpServer;

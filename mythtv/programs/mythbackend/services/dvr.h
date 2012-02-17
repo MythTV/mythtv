@@ -67,6 +67,39 @@ class Dvr : public DvrServices
 
         // Recording Rules
 
+        int               AddRecordSchedule   ( int       ChanId,
+                                                QDateTime StartTime,
+                                                int       ParentId,
+                                                bool      Inactive,
+                                                uint      Season,
+                                                uint      Episode,
+                                                QString   Inetref,
+                                                int       FindId,
+                                                QString   Type,
+                                                QString   SearchType,
+                                                int       RecPriority,
+                                                uint      PreferredInput,
+                                                int       StartOffset,
+                                                int       EndOffset,
+                                                QString   DupMethod,
+                                                QString   DupIn,
+                                                uint      Filter,
+                                                QString   RecProfile,
+                                                QString   RecGroup,
+                                                QString   StorageGroup,
+                                                QString   PlayGroup,
+                                                bool      AutoExpire,
+                                                int       MaxEpisodes,
+                                                bool      MaxNewest,
+                                                bool      AutoCommflag,
+                                                bool      AutoTranscode,
+                                                bool      AutoMetaLookup,
+                                                bool      AutoUserJob1,
+                                                bool      AutoUserJob2,
+                                                bool      AutoUserJob3,
+                                                bool      AutoUserJob4,
+                                                int       Transcoder);
+
         bool              RemoveRecordSchedule ( uint             RecordId   );
 
         DTC::RecRuleList* GetRecordScheduleList( int              StartIndex,

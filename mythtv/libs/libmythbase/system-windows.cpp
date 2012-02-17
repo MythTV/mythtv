@@ -275,6 +275,16 @@ void MythSystemManager::run(void)
         ChildListRebuild();
         m_mapLock.unlock();
 
+        // Occasionally, the caller has deleted the structure from under
+        // our feet.  If so, just log and move on.
+        if (!ms)
+        {
+            LOG(VB_SYSTEM, LOG_ERR,
+                QString("Structure for child handle %1 already deleted!")
+                .arg((long long)child));
+            continue;
+        }
+
         listLock.lock();
         msList.append(ms);
 
@@ -360,8 +370,20 @@ void MythSystemManager::ChildListRebuild()
     HANDLE              child;
 
     if ( oldCount != m_childCount )
-        m_children = (HANDLE *)realloc(m_children, 
-                                       m_childCount * sizeof(HANDLE));
+    {
+        HANDLE *new_children;
+        new_children = (HANDLE *)realloc(m_children, 
+                                         m_childCount * sizeof(HANDLE));
+        if (!new_children && m_childCount)
+        {
+            LOG(VB_SYSTEM, LOG_CRIT, "No memory to allocate new children");
+            free(m_children);
+            m_children = NULL;
+            return;
+        }
+
+        m_children = new_children;
+    }
 
     for (i = m_pMap.begin(), j = 0; i != m_pMap.end(); ++i)
     {

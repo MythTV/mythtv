@@ -6,13 +6,13 @@ using namespace std;
 
 #include <QWaitCondition>
 #include <QStringList>
-#include <QTcpServer>
 #include <QTcpSocket>
 #include <QRunnable>
 #include <QMutex>
 #include <QEvent>
 
 #include "mthread.h"
+#include "serverpool.h"
 
 class MainServer;
 class QTextStream;
@@ -89,18 +89,16 @@ class NetworkControlCloseEvent : public QEvent
 
 class NetworkControl;
 
-class NetworkControl : public QTcpServer, public QRunnable
+class NetworkControl : public ServerPool, public QRunnable
 {
     Q_OBJECT
 
   public:
     NetworkControl();
     ~NetworkControl();
-    bool listen(const QHostAddress &address = QHostAddress::AnyIPv6,
-                quint16 port = 0);
 
   private slots:
-    void newConnection();
+    void newConnection(QTcpSocket *socket);
     void receiveCommand(QString &command);
     void deleteClient(void);
 

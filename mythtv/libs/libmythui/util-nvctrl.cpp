@@ -16,18 +16,73 @@
 #include "libmythnvctrl/NVCtrl.h"
 #include "libmythnvctrl/NVCtrlLib.h"
 
+#ifdef USING_XRANDR
 #include "DisplayResX.h"
+#endif
 
+#ifdef USING_XRANDR
 static unsigned int display_device_mask(char *str);
 static void parse_mode_string(char *modeString, char **modeName, int *mask);
 static char *find_modeline(char *modeString, char *pModeLines,
                            int ModeLineLen);
 static int extract_id_string(char *str);
 static int modeline_is_interlaced(char *modeLine);
+#endif
 
+#define LOC QString("NVCtrl: ")
+
+int CheckNVOpenGLSyncToVBlank(void)
+{
+    MythXDisplay *d = OpenMythXDisplay();
+    if (!d)
+        return -1;
+
+    Display *dpy = d->GetDisplay();
+    int screen   = d->GetScreen();
+
+    if (!XNVCTRLIsNvScreen(dpy, screen))
+    {
+        delete d;
+        return -1;
+    }
+
+    int major, minor;
+    if (!XNVCTRLQueryVersion(dpy, &major, &minor))
+        return -1;
+
+    int sync = NV_CTRL_SYNC_TO_VBLANK_OFF;
+    if (!XNVCTRLQueryAttribute(dpy, screen, 0, NV_CTRL_SYNC_TO_VBLANK, &sync))
+    {
+        delete d;
+        return -1;
+    }
+
+    if (!sync)
+    {
+        LOG(VB_GENERAL, LOG_WARNING, LOC + "OpenGL Sync to VBlank is disabled.");
+        LOG(VB_GENERAL, LOG_WARNING, LOC + "For best results enable this in NVidia settings or try running:");
+        LOG(VB_GENERAL, LOG_WARNING, LOC + "nvidia-settings -a \"SyncToVBlank=1\"");
+    }
+
+    if (!sync && getenv("__GL_SYNC_TO_VBLANK"))
+    {
+        LOG(VB_GENERAL, LOG_INFO, LOC +
+            "OpenGL Sync to VBlank enabled via __GL_SYNC_TO_VBLANK.");
+        sync = 1;
+    }
+    else if (!sync)
+    {
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
+            "Alternatively try setting the '__GL_SYNC_TO_VBLANK' environment variable.");
+    }
+
+    return sync;
+}
 
 int GetNvidiaRates(t_screenrate& screenmap)
 {
+#ifdef USING_XRANDR
+
     MythXDisplay *d = OpenMythXDisplay();
     if (!d)
     {
@@ -274,9 +329,12 @@ int GetNvidiaRates(t_screenrate& screenmap)
 
     delete d;
     return 1;
-
+#else // USING_XRANDR
+    return -1;
+#endif
 }
 
+#ifdef USING_XRANDR
 /*
  * display_device_mask() - given a display device name, translate to
  * the display device mask
@@ -463,3 +521,5 @@ static int modeline_is_interlaced(char *modeLine)
 {
     return (strstr(modeLine, "Interlace") != NULL);
 }
+
+#endif

@@ -408,6 +408,118 @@ DTC::ProgramList* Dvr::GetConflictList( int  nStartIndex,
     return pPrograms;
 }
 
+int Dvr::AddRecordSchedule   ( int       nChanId,
+                               QDateTime dStartTime,
+                               int       nParentId,
+                               bool      bInactive,
+                               uint      nSeason,
+                               uint      nEpisode,
+                               QString   sInetref,
+                               int       nFindId,
+                               QString   sType,
+                               QString   sSearchType,
+                               int       nRecPriority,
+                               uint      nPreferredInput,
+                               int       nStartOffset,
+                               int       nEndOffset,
+                               QString   sDupMethod,
+                               QString   sDupIn,
+                               uint      nFilter,
+                               QString   sRecProfile,
+                               QString   sRecGroup,
+                               QString   sStorageGroup,
+                               QString   sPlayGroup,
+                               bool      bAutoExpire,
+                               int       nMaxEpisodes,
+                               bool      bMaxNewest,
+                               bool      bAutoCommflag,
+                               bool      bAutoTranscode,
+                               bool      bAutoMetaLookup,
+                               bool      bAutoUserJob1,
+                               bool      bAutoUserJob2,
+                               bool      bAutoUserJob3,
+                               bool      bAutoUserJob4,
+                               int       nTranscoder)
+{
+    RecordingInfo *info = new RecordingInfo(nChanId, dStartTime, false);
+    RecordingRule *rule = info->GetRecordingRule();
+
+    delete info;
+    info = NULL;
+
+    if (sType.isEmpty())
+        sType = "single";
+
+    if (sSearchType.isEmpty())
+        sSearchType = "none";
+
+    if (sDupMethod.isEmpty())
+        sDupMethod = "subtitleanddescription";
+
+    if (sDupIn.isEmpty())
+        sDupIn = "all";
+
+    rule->m_type = recTypeFromString(sType);
+    rule->m_searchType = searchTypeFromString(sSearchType);
+    rule->m_dupMethod = dupMethodFromString(sDupMethod);
+    rule->m_dupIn = dupInFromString(sDupIn);
+
+    if (sRecProfile.isEmpty())
+        sRecProfile = "Default";
+
+    if (sRecGroup.isEmpty())
+        sRecGroup = "Default";
+
+    if (sStorageGroup.isEmpty())
+        sStorageGroup = "Default";
+
+    if (sPlayGroup.isEmpty())
+        sPlayGroup = "Default";
+
+    rule->m_recProfile = sRecProfile;
+    rule->m_recGroup = sRecGroup;
+    rule->m_storageGroup = sStorageGroup;
+    rule->m_playGroup = sPlayGroup;
+
+    rule->m_parentRecID = nParentId;
+    rule->m_isInactive = bInactive;
+
+    rule->m_season = nSeason;
+    rule->m_episode = nEpisode;
+    rule->m_inetref = sInetref;
+    rule->m_findid = nFindId;
+
+    rule->m_recPriority = nRecPriority;
+    rule->m_prefInput = nPreferredInput;
+    rule->m_startOffset = nStartOffset;
+    rule->m_endOffset = nEndOffset;
+    rule->m_filter = nFilter;
+
+    rule->m_autoExpire = bAutoExpire;
+    rule->m_maxEpisodes = nMaxEpisodes;
+    rule->m_maxNewest = bMaxNewest;
+
+    rule->m_autoCommFlag = bAutoCommflag;
+    rule->m_autoTranscode = bAutoTranscode;
+    rule->m_autoMetadataLookup = bAutoMetaLookup;
+
+    rule->m_autoUserJob1 = bAutoUserJob1;
+    rule->m_autoUserJob2 = bAutoUserJob2;
+    rule->m_autoUserJob3 = bAutoUserJob3;
+    rule->m_autoUserJob4 = bAutoUserJob4;
+
+    rule->m_transcoder = nTranscoder;
+
+    rule->Save();
+
+    int recid = rule->m_recordID;
+
+    delete rule;
+    rule = NULL;
+
+    return recid;
+}
+
 bool Dvr::RemoveRecordSchedule ( uint nRecordId )
 {
     bool bResult = false;
@@ -426,8 +538,8 @@ bool Dvr::RemoveRecordSchedule ( uint nRecordId )
 DTC::RecRuleList* Dvr::GetRecordScheduleList( int nStartIndex,
                                               int nCount      )
 {
-    vector<ProgramInfo *> infoList;
-    RemoteGetAllScheduledRecordings(infoList);
+    RecList recList;
+    Scheduler::GetAllScheduled(recList);
 
     // ----------------------------------------------------------------------
     // Build Response
@@ -435,24 +547,21 @@ DTC::RecRuleList* Dvr::GetRecordScheduleList( int nStartIndex,
 
     DTC::RecRuleList *pRecRules = new DTC::RecRuleList();
 
-    nStartIndex   = min( nStartIndex, (int)infoList.size() );
-    nCount        = (nCount > 0) ? min( nCount, (int)infoList.size() ) : infoList.size();
-    int nEndIndex = min((nStartIndex + nCount), (int)infoList.size() );
+    nStartIndex   = min( nStartIndex, (int)recList.size() );
+    nCount        = (nCount > 0) ? min( nCount, (int)recList.size() ) : recList.size();
+    int nEndIndex = min((nStartIndex + nCount), (int)recList.size() );
 
     for( int n = nStartIndex; n < nEndIndex; n++)
     {
-        RecordingRule *rule = new RecordingRule();
-        ProgramInfo *pInfo = infoList[ n ];
-        rule->LoadByProgram(pInfo);
+        RecordingInfo *info = recList[n];
 
-        if (pInfo != NULL)
+        if (info != NULL)
         {
             DTC::RecRule *pRecRule = pRecRules->AddNewRecRule();
 
-            FillRecRuleInfo( pRecRule, rule );
+            FillRecRuleInfo( pRecRule, info->GetRecordingRule() );
 
-            delete rule;
-            delete pInfo;
+            delete info;
         }
     }
 
@@ -460,7 +569,7 @@ DTC::RecRuleList* Dvr::GetRecordScheduleList( int nStartIndex,
 
     pRecRules->setStartIndex    ( nStartIndex     );
     pRecRules->setCount         ( nCount          );
-    pRecRules->setTotalAvailable( infoList.size() );
+    pRecRules->setTotalAvailable( recList.size() );
     pRecRules->setAsOf          ( QDateTime::currentDateTime() );
     pRecRules->setVersion       ( MYTH_BINARY_VERSION );
     pRecRules->setProtoVer      ( MYTH_PROTO_VERSION  );

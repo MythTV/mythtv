@@ -23,6 +23,7 @@ class MBASE_PUBLIC StorageGroup
 
     QStringList GetDirList(void) const
         { QStringList tmp = m_dirlist; tmp.detach(); return tmp; }
+    QString GetFirstDir(bool appendSlash = false) const;
 
     QStringList GetDirFileList(QString dir, QString base,
                                bool recursive = false);

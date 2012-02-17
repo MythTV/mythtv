@@ -1734,7 +1734,7 @@ static int lirc_code2char_internal(const struct lirc_state *state,
 	int quit_happened;
 
 	*string=NULL;
-	if(sscanf(code,"%*x %x %*s %*s\n",&rep)==1)
+	if(sscanf(code,"%*20x %20x %*5000s %*5000s\n",&rep)==1)
 	{
 		backup=strdup(code);
 		if(backup==NULL) return(-1);

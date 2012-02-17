@@ -620,9 +620,11 @@ MetadataLookupList MetadataDownload::handleRecordingGeneric(
     args.append("-M");
     QString title = lookup->GetTitle();
     args.append(title);
-    lookup->SetSubtype(kProbableGenericTelevision);
+    LookupType origtype = lookup->GetSubtype();
     int origseason = lookup->GetSeason();
     int origepisode = lookup->GetEpisode();
+
+    lookup->SetSubtype(kProbableTelevision);
 
     if (origseason == 0 && origepisode == 0)
     {
@@ -640,6 +642,7 @@ MetadataLookupList MetadataDownload::handleRecordingGeneric(
 
     lookup->SetSeason(origseason);
     lookup->SetEpisode(origepisode);
+    lookup->SetSubtype(origtype);
 
     return list;
 }
@@ -656,8 +659,7 @@ QString MetadataDownload::getMXMLPath(QString filename)
     if (xmlname.startsWith("myth://"))
     {
         if (qurl.host().toLower() != gCoreContext->GetHostName().toLower() &&
-            (qurl.host() != gCoreContext->GetSettingOnHost("BackendServerIP",
-                                               gCoreContext->GetHostName())))
+            (!gCoreContext->IsThisHost(qurl.host())))
         {
             if (RemoteFile::Exists(xmlname))
                 ret = xmlname;
@@ -691,8 +693,7 @@ QString MetadataDownload::getNFOPath(QString filename)
     if (nfoname.startsWith("myth://"))
     {
         if (qurl.host().toLower() != gCoreContext->GetHostName().toLower() &&
-            (qurl.host() != gCoreContext->GetSettingOnHost("BackendServerIP",
-                                               gCoreContext->GetHostName())))
+            (!gCoreContext->IsThisHost(qurl.host())))
         {
             if (RemoteFile::Exists(nfoname))
                 ret = nfoname;

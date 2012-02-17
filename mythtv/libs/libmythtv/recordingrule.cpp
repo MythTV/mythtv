@@ -223,33 +223,15 @@ bool RecordingRule::LoadBySearch(RecSearchType lsearch, QString textname,
     {
         QString searchType;
         m_searchType = lsearch;
-        switch (m_searchType)
-        {
-            case kPowerSearch:
-                searchType = QObject::tr("Power Search");
-                break;
-            case kTitleSearch:
-                searchType = QObject::tr("Title Search");
-                break;
-            case kKeywordSearch:
-                searchType = QObject::tr("Keyword Search");
-                break;
-            case kPeopleSearch:
-                searchType = QObject::tr("People Search");
-                break;
-            default:
-                searchType = QObject::tr("Unknown Search");
-                break;
-        }
+        searchType = SearchTypeToString(m_searchType);
 
         QString ltitle = QString("%1 (%2)").arg(textname).arg(searchType);
         m_title = ltitle;
         m_subtitle = from;
-        m_description = m_searchFor = forwhat;
+        m_description = forwhat;
         m_findday = (m_startdate.dayOfWeek() + 1) % 7;
         QDate epoch(1970, 1, 1);
         m_findid = epoch.daysTo(m_startdate) + 719528;
-        m_searchTypeString = searchType;
     }
 
     m_loaded = true;
@@ -270,8 +252,7 @@ bool RecordingRule::ModifyPowerSearchByID(int rid, QString textname,
                                        .arg(QObject::tr("Power Search"));
     m_title = ltitle;
     m_subtitle = from;
-    m_description = m_searchFor = forwhat;
-    m_searchTypeString = QObject::tr("Power Search");
+    m_description = forwhat;
 
     m_loaded = true;
     return true;
@@ -504,8 +485,20 @@ void RecordingRule::ToMap(InfoMap &infoMap) const
                                           .arg(m_subtitle);
     }
 
-    infoMap["searchtype"] = m_searchTypeString;
-    infoMap["searchforwhat"] = m_searchFor;
+    infoMap["searchtype"] = SearchTypeToString(m_searchType);
+    if (m_searchType != kNoSearch)
+        infoMap["searchforwhat"] = m_description;
+
+
+    if (m_nextRecording.isValid())
+        infoMap["nextrecording"] = MythDateTimeToString(m_nextRecording,
+                                                        kDateFull | kAddYear);
+    if (m_lastRecorded.isValid())
+        infoMap["lastrecorded"] = MythDateTimeToString(m_lastRecorded,
+                                                       kDateFull | kAddYear);
+    if (m_lastDeleted.isValid())
+        infoMap["lastdeleted"] = MythDateTimeToString(m_lastDeleted,
+                                                      kDateFull | kAddYear);
 }
 
 void RecordingRule::UseTempTable(bool usetemp, QString table)
@@ -625,5 +618,34 @@ unsigned RecordingRule::GetDefaultFilter(void)
     }
     query.next();
     return query.value(0).toUInt();
+}
+
+QString RecordingRule::SearchTypeToString(const RecSearchType searchType)
+{
+    QString searchTypeString;
+
+    switch (searchType)
+    {
+        case kNoSearch:
+            searchTypeString = ""; // Allow themers to decide what to display
+            break;
+        case kPowerSearch:
+            searchTypeString = QObject::tr("Power Search");
+            break;
+        case kTitleSearch:
+            searchTypeString = QObject::tr("Title Search");
+            break;
+        case kKeywordSearch:
+            searchTypeString = QObject::tr("Keyword Search");
+            break;
+        case kPeopleSearch:
+            searchTypeString = QObject::tr("People Search");
+            break;
+        default:
+            searchTypeString = QObject::tr("Unknown Search");
+            break;
+    }
+
+    return searchTypeString;
 }
 

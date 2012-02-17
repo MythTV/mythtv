@@ -425,44 +425,12 @@ void HouseKeeper::RunMFD(void)
     QString mfpath = gCoreContext->GetSetting("MythFillDatabasePath",
                                           "mythfilldatabase");
     QString mfarg = gCoreContext->GetSetting("MythFillDatabaseArgs", "");
-    QString mflog = gCoreContext->GetSetting("MythFillDatabaseLog",
-                                         "/var/log/mythfilldatabase.log");
 
     if (mfpath == "mythfilldatabase")
         mfpath = GetInstallPrefix() + "/bin/mythfilldatabase";
 
     QString command = QString("%1 %2").arg(mfpath).arg(mfarg);
     command += logPropagateArgs;
-
-    // TODO: remove this mess once we no longer use wget.
-    if (mflog.length())
-    {
-        bool dir_writable = false;
-        QFileInfo testFile(mflog);
-        if (testFile.exists() && testFile.isDir() && testFile.isWritable())
-        {
-            mflog += "/mythfilldatabase.log";
-            testFile.setFile(mflog);
-            dir_writable = true;
-        }
-
-        if (!dir_writable && !testFile.exists())
-        {
-            dir_writable = QFileInfo(testFile.path()).isWritable();
-        }
-
-        if (dir_writable || (testFile.exists() && testFile.isWritable()))
-        {
-            command = QString("%1 %2 >>%3 2>&1").arg(mfpath).arg(mfarg)
-                    .arg(mflog);
-        }
-        else
-        {
-            LOG(VB_GENERAL, LOG_ERR,
-                QString("Invalid mythfilldatabase log path: %1 is not "
-                        "writable.").arg(mflog));
-        }
-    }
 
     {
         QMutexLocker locker(&fillDBLock);

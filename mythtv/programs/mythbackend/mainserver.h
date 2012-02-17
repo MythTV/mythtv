@@ -142,6 +142,8 @@ class MainServer : public QObject, public MythSocketCBs
                         MythSocket *socket);
     void HandleDone(MythSocket *socket);
 
+    void GetActiveBackends(QStringList &hosts);
+    void HandleActiveBackendsQuery(PlaybackSock *pbs);
     void HandleIsActiveBackendQuery(QStringList &slist, PlaybackSock *pbs);
     bool HandleDeleteFile(QStringList &slist, PlaybackSock *pbs);
     bool HandleDeleteFile(QString filename, QString storagegroup,
@@ -231,6 +233,7 @@ class MainServer : public QObject, public MythSocketCBs
     void getGuideDataThrough(QDateTime &GuideDataThrough);
 
     PlaybackSock *GetSlaveByHostname(const QString &hostname);
+    PlaybackSock *GetMediaServerByHostname(const QString &hostname);
     PlaybackSock *GetPlaybackBySock(MythSocket *socket);
     FileTransfer *GetFileTransferByID(int id);
     FileTransfer *GetFileTransferBySock(MythSocket *socket);

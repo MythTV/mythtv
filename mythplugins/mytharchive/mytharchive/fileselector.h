@@ -19,7 +19,7 @@ typedef struct
     bool directory;
     bool selected;
     QString filename;
-    long long size;
+    int64_t size;
 } FileData;
 
 typedef enum

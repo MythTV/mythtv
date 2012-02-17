@@ -23,6 +23,34 @@ using namespace std;
 
 #include "lookup.h"
 
+namespace
+{
+    void cleanup()
+    {
+        delete gContext;
+        gContext = NULL;
+
+    }
+
+    class CleanupGuard
+    {
+      public:
+        typedef void (*CleanupFunc)();
+
+      public:
+        CleanupGuard(CleanupFunc cleanFunction) :
+            m_cleanFunction(cleanFunction) {}
+
+        ~CleanupGuard()
+        {
+            m_cleanFunction();
+        }
+
+      private:
+        CleanupFunc m_cleanFunction;
+    };
+}
+
 bool inJobQueue = false;
 
 class MythMetadataLookupCommandLineParser : public MythCommandLineParser
@@ -107,11 +135,12 @@ int main(int argc, char *argv[])
     // Don't listen to console input
     close(0);
 
+    CleanupGuard callCleanup(cleanup);
+
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init(false))
     {
         LOG(VB_GENERAL, LOG_ERR, "Failed to init MythContext, exiting.");
-        delete gContext;
         return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
 
@@ -199,7 +228,6 @@ int main(int argc, char *argv[])
     if (!lookup->AllOK())
     {
         delete lookup;
-        delete gContext;
         return GENERIC_EXIT_NOT_OK;
     }
     LOG(VB_GENERAL, LOG_INFO,
@@ -233,7 +261,6 @@ int main(int argc, char *argv[])
     }
 
     delete lookup;
-    delete gContext;
 
     LOG(VB_GENERAL, LOG_NOTICE, "MythMetadataLookup run complete.");
 

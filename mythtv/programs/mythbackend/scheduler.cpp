@@ -97,6 +97,7 @@ Scheduler::Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList,
 
     if (doRun)
     {
+        ProgramInfo::CheckProgramIDAuthorities();
         {
             QMutexLocker locker(&schedLock);
             start(QThread::LowPriority);
@@ -118,8 +119,6 @@ Scheduler::~Scheduler()
         wait();
         locker.relock();
     }
-    else
-        MSqlQuery::CloseDDCon();
 
     while (!reclist.empty())
     {
@@ -279,12 +278,15 @@ static bool comp_redundant(RecordingInfo *a, RecordingInfo *b)
         return a->GetScheduledEndTime() < b->GetScheduledEndTime();
 
     // Note: the PruneRedundants logic depends on the following
-    if (a->GetTitle() != b->GetTitle())
-        return a->GetTitle() < b->GetTitle();
+    int cmp = a->GetTitle().compare(b->GetTitle(), Qt::CaseInsensitive);
+    if (cmp != 0)
+        return cmp < 0;
     if (a->GetRecordingRuleID() != b->GetRecordingRuleID())
         return a->GetRecordingRuleID() < b->GetRecordingRuleID();
-    if (a->GetChannelSchedulingID() != b->GetChannelSchedulingID())
-        return a->GetChannelSchedulingID() < b->GetChannelSchedulingID();
+    cmp = a->GetChannelSchedulingID().compare(b->GetChannelSchedulingID(), 
+                                              Qt::CaseInsensitive);
+    if (cmp != 0)
+        return cmp < 0;
     return a->GetRecordingStatus() < b->GetRecordingStatus();
 }
 
@@ -294,8 +296,10 @@ static bool comp_recstart(RecordingInfo *a, RecordingInfo *b)
         return a->GetRecordingStartTime() < b->GetRecordingStartTime();
     if (a->GetRecordingEndTime() != b->GetRecordingEndTime())
         return a->GetRecordingEndTime() < b->GetRecordingEndTime();
-    if (a->GetChannelSchedulingID() != b->GetChannelSchedulingID())
-        return a->GetChannelSchedulingID() < b->GetChannelSchedulingID();
+    int cmp = a->GetChannelSchedulingID().compare(b->GetChannelSchedulingID(), 
+                                                  Qt::CaseInsensitive);
+    if (cmp != 0)
+        return cmp < 0;
     if (a->GetRecordingStatus() != b->GetRecordingStatus())
         return a->GetRecordingStatus() < b->GetRecordingStatus();
     if (a->GetChanNum() != b->GetChanNum())
@@ -338,6 +342,9 @@ static bool comp_priority(RecordingInfo *a, RecordingInfo *b)
         else
             return a->GetRecordingStartTime() < b->GetRecordingStartTime();
     }
+
+    if (a->GetRecordingPriority2() != b->GetRecordingPriority2())
+        return a->GetRecordingPriority2() < b->GetRecordingPriority2();
 
     if (a->GetInputID() != b->GetInputID())
         return a->GetInputID() < b->GetInputID();
@@ -421,7 +428,17 @@ void Scheduler::FillRecordListFromDB(int recordid)
         return;
     }
 
-    thequery = "ALTER TABLE recordmatch ADD INDEX (recordid);";
+    thequery = "ALTER TABLE recordmatch "
+               "  ADD UNIQUE INDEX (recordid, chanid, starttime); ";
+    query.prepare(thequery);
+    if (!query.exec())
+    {
+        MythDB::DBError("FillRecordListFromDB", query);
+        return;
+    }
+
+    thequery = "ALTER TABLE recordmatch "
+               "  ADD INDEX (chanid, starttime, manualid); ";
     query.prepare(thequery);
     if (!query.exec())
     {
@@ -699,8 +716,10 @@ void Scheduler::SlaveConnected(RecordingList &slavelist)
 
             if (sp->GetInputID() &&
                 sp->GetScheduledStartTime() == rp->GetScheduledStartTime() &&
-                sp->GetChannelSchedulingID() == rp->GetChannelSchedulingID() &&
-                sp->GetTitle() == rp->GetTitle())
+                sp->GetChannelSchedulingID().compare(
+                    rp->GetChannelSchedulingID(), Qt::CaseInsensitive) == 0 &&
+                sp->GetTitle().compare(rp->GetTitle(), 
+                                       Qt::CaseInsensitive) == 0)
             {
                 if (sp->GetCardID() == rp->GetCardID())
                 {
@@ -874,8 +893,8 @@ void Scheduler::BuildListMaps(void)
             p->GetRecordingStatus() == rsWillRecord ||
             p->GetRecordingStatus() == rsUnknown)
         {
-            cardlistmap[p->GetCardID()].push_back(p);
-            titlelistmap[p->GetTitle()].push_back(p);
+            conflictlist.push_back(p);
+            titlelistmap[p->GetTitle().toLower()].push_back(p);
             recordidlistmap[p->GetRecordingRuleID()].push_back(p);
         }
     }
@@ -883,7 +902,7 @@ void Scheduler::BuildListMaps(void)
 
 void Scheduler::ClearListMaps(void)
 {
-    cardlistmap.clear();
+    conflictlist.clear();
     titlelistmap.clear();
     recordidlistmap.clear();
     cache_is_same_program.clear();
@@ -925,7 +944,7 @@ bool Scheduler::FindNextConflict(
         if (debugConflicts)
             msg = QString("comparing with '%1' ").arg(q->GetTitle());
 
-        if (p->GetCardID() != 0 && (p->GetCardID() != q->GetCardID()) &&
+        if (p->GetCardID() != q->GetCardID() &&
             !igrp.GetSharedInputGroup(p->GetInputID(), q->GetInputID()))
         {
             if (debugConflicts)
@@ -968,8 +987,7 @@ bool Scheduler::FindNextConflict(
 
         // if two inputs are in the same input group we have a conflict
         // unless the programs are on the same multiplex.
-        if (p->GetCardID() && (p->GetCardID() != q->GetCardID()) &&
-            igrp.GetSharedInputGroup(p->GetInputID(), q->GetInputID()))
+        if (p->GetCardID() != q->GetCardID())
         {
             uint p_mplexid = p->QueryMplexID();
             if (p_mplexid && (p_mplexid == q->QueryMplexID()))
@@ -989,33 +1007,21 @@ bool Scheduler::FindNextConflict(
 }
 
 const RecordingInfo *Scheduler::FindConflict(
-    const QMap<int, RecList> &reclists,
     const RecordingInfo        *p,
     int openend) const
 {
-    QMap<int, RecList>::const_iterator it = reclists.begin();
-    for (; it != reclists.end(); ++it)
-    {
-        if (debugConflicts)
-            LOG(VB_SCHEDULE, LOG_INFO,
-                QString("Checking '%1' for conflicts on cardid %2")
-                    .arg(p->GetTitle()).arg(it.key()));
-
-        const RecList &cardlist = *it;
-        RecConstIter k = cardlist.begin();
-        if (FindNextConflict(cardlist, p, k, openend))
-        {
-            return *k;
-        }
-    }
+    RecConstIter k = conflictlist.begin();
+    if (FindNextConflict(conflictlist, p, k, openend))
+        return *k;
 
     return NULL;
 }
 
 void Scheduler::MarkOtherShowings(RecordingInfo *p)
 {
-    RecList *showinglist = &titlelistmap[p->GetTitle()];
+    RecList *showinglist;
 
+    showinglist = &titlelistmap[p->GetTitle().toLower()];
     MarkShowingsList(*showinglist, p);
 
     if (p->GetRecordingRuleType() == kFindOneRecord ||
@@ -1025,8 +1031,7 @@ void Scheduler::MarkOtherShowings(RecordingInfo *p)
         showinglist = &recordidlistmap[p->GetRecordingRuleID()];
         MarkShowingsList(*showinglist, p);
     }
-
-    if (p->GetRecordingRuleType() == kOverrideRecord && p->GetFindID())
+    else if (p->GetRecordingRuleType() == kOverrideRecord && p->GetFindID())
     {
         showinglist = &recordidlistmap[p->GetParentRecordingRuleID()];
         MarkShowingsList(*showinglist, p);
@@ -1089,12 +1094,7 @@ bool Scheduler::TryAnotherShowing(RecordingInfo *p, bool samePriority,
         p->GetRecordingStatus() == rsTuning)
         return false;
 
-    RecList *showinglist = &titlelistmap[p->GetTitle()];
-
-    if (p->GetRecordingRuleType() == kFindOneRecord ||
-        p->GetRecordingRuleType() == kFindDailyRecord ||
-        p->GetRecordingRuleType() == kFindWeeklyRecord)
-        showinglist = &recordidlistmap[p->GetRecordingRuleID()];
+    RecList *showinglist = &recordidlistmap[p->GetRecordingRuleID()];
 
     RecStatusType oldstatus = p->GetRecordingStatus();
     p->SetRecordingStatus(rsLaterShowing);
@@ -1160,7 +1160,7 @@ bool Scheduler::TryAnotherShowing(RecordingInfo *p, bool samePriority,
             }
         }
 
-        const RecordingInfo *conflict = FindConflict(cardlistmap, q);
+        const RecordingInfo *conflict = FindConflict(q);
         if (conflict)
         {
             PrintRec(conflict, "        !");
@@ -1246,8 +1246,7 @@ void Scheduler::SchedNewRecords(void)
             MarkOtherShowings(p);
         else if (p->GetRecordingStatus() == rsUnknown)
         {
-            const RecordingInfo *conflict = FindConflict(cardlistmap, p,
-                                                         openEnd);
+            const RecordingInfo *conflict = FindConflict(p, openEnd);
             if (!conflict)
             {
                 p->SetRecordingStatus(rsWillRecord);
@@ -1298,16 +1297,8 @@ void Scheduler::MoveHigherRecords(bool move_this)
         p->SetRecordingStatus(rsWillRecord);
         MarkOtherShowings(p);
 
-        RecList cardlist;
-        QMap<int, RecList>::const_iterator it = cardlistmap.begin();
-        for (; it != cardlistmap.end(); ++it)
-        {
-            RecConstIter it2 = (*it).begin();
-            for (; it2 != (*it).end(); ++it2)
-                cardlist.push_back(*it2);
-        }
-        RecConstIter k = cardlist.begin();
-        for ( ; FindNextConflict(cardlist, p, k ); ++k)
+        RecConstIter k = conflictlist.begin();
+        for ( ; FindNextConflict(conflictlist, p, k); ++k)
         {
             if (!TryAnotherShowing(*k, true))
             {
@@ -1337,17 +1328,8 @@ void Scheduler::MoveHigherRecords(bool move_this)
         if (move_this)
             MarkOtherShowings(p);
 
-        RecList cardlist;
-        QMap<int, RecList>::const_iterator it = cardlistmap.begin();
-        for (; it != cardlistmap.end(); ++it)
-        {
-            RecConstIter it2 = (*it).begin();
-            for (; it2 != (*it).end(); ++it2)
-                cardlist.push_back(*it2);
-        }
-
-        RecConstIter k = cardlist.begin();
-        for ( ; FindNextConflict(cardlist, p, k); ++k)
+        RecConstIter k = conflictlist.begin();
+        for ( ; FindNextConflict(conflictlist, p, k); ++k)
         {
             if ((p->GetRecordingPriority() < (*k)->GetRecordingPriority() &&
                  !schedMoveHigher && move_this) ||
@@ -1417,6 +1399,7 @@ void Scheduler::PruneRedundants(void)
             !lastp->IsSameTimeslot(*p))
         {
             lastp = p;
+            lastp->SetRecordingPriority2(0);
             ++i;
         }
         else
@@ -1600,11 +1583,12 @@ void Scheduler::GetAllPending(QStringList &strList) const
     }
 }
 
-void Scheduler::getAllScheduled(QStringList &strList)
+/// Returns all scheduled programs serialized into a QStringList
+void Scheduler::GetAllScheduled(QStringList &strList)
 {
     RecList schedlist;
 
-    findAllScheduledPrograms(schedlist);
+    GetAllScheduled(schedlist);
 
     strList << QString::number(schedlist.size());
 
@@ -3240,20 +3224,22 @@ void Scheduler::BuildNewRecordsQueries(int recordid, QStringList &from,
         QString recidmatch = "";
         if (recordid != -1)
             recidmatch = "RECTABLE.recordid = :NRRECORDID AND ";
-        QString s = recidmatch +
+        QString s1 = recidmatch +
             "RECTABLE.search = :NRST AND "
             "program.manualid = 0 AND "
             "program.title = RECTABLE.title ";
-
-        while (1)
-        {
-            int i = s.indexOf("RECTABLE");
-            if (i == -1) break;
-            s = s.replace(i, strlen("RECTABLE"), recordTable);
-        }
+        s1.replace("RECTABLE", recordTable);
+        QString s2 = recidmatch +
+            "RECTABLE.search = :NRST AND "
+            "program.manualid = 0 AND "
+            "program.seriesid <> '' AND "
+            "program.seriesid = RECTABLE.seriesid ";
+        s2.replace("RECTABLE", recordTable);
 
         from << "";
-        where << s;
+        where << s1;
+        from << "";
+        where << s2;
         bindings[":NRST"] = kNoSearch;
         if (recordid != -1)
             bindings[":NRRECORDID"] = recordid;
@@ -3351,7 +3337,7 @@ void Scheduler::UpdateMatches(int recordid) {
     for (clause = 0; clause < fromclauses.count(); ++clause)
     {
         QString query = QString(
-"INSERT INTO recordmatch (recordid, chanid, starttime, manualid) "
+"REPLACE INTO recordmatch (recordid, chanid, starttime, manualid) "
 "SELECT RECTABLE.recordid, program.chanid, program.starttime, "
 " IF(search = %1, RECTABLE.recordid, 0) ").arg(kManualSearch) + QString(
 "FROM (RECTABLE, program INNER JOIN channel "
@@ -3662,19 +3648,20 @@ void Scheduler::AddNewRecords(void)
 "  ( "
 "    RECTABLE.dupmethod > 1 AND "
 "    oldrecorded.duplicate <> 0 AND "
-"    program.title = oldrecorded.title "
+"    program.title = oldrecorded.title AND "
+"    program.generic = 0 "
 "     AND "
 "     ( "
-"      (program.programid <> '' AND program.generic = 0 "
+"      (program.programid <> '' "
 "       AND program.programid = oldrecorded.programid) "
 "      OR "
-"      (oldrecorded.findid <> 0 AND "
-"        oldrecorded.findid = ") + progfindid + QString(") "
-"      OR "
-"      ( "
-"       program.generic = 0 "
-"       AND "
-"       (program.programid = '' OR oldrecorded.programid = '') "
+"      ( ") +
+        (ProgramInfo::UsingProgramIDAuthority() ?
+"       (program.programid = '' OR oldrecorded.programid = '' OR "
+"         LEFT(program.programid, LOCATE('/', program.programid)) <> "
+"         LEFT(oldrecorded.programid, LOCATE('/', oldrecorded.programid))) " :
+"       (program.programid = '' OR oldrecorded.programid = '') " )
+        + QString(
 "       AND "
 "       (((RECTABLE.dupmethod & 0x02) = 0) OR (program.subtitle <> '' "
 "          AND program.subtitle = oldrecorded.subtitle)) "
@@ -3699,19 +3686,20 @@ void Scheduler::AddNewRecords(void)
 "    RECTABLE.dupmethod > 1 AND "
 "    recorded.duplicate <> 0 AND "
 "    program.title = recorded.title AND "
+"    program.generic = 0 AND "
 "    recorded.recgroup NOT IN ('LiveTV','Deleted') "
 "     AND "
 "     ( "
-"      (program.programid <> '' AND program.generic = 0 "
+"      (program.programid <> '' "
 "       AND program.programid = recorded.programid) "
 "      OR "
-"      (recorded.findid <> 0 AND "
-"        recorded.findid = ") + progfindid + QString(") "
-"      OR "
-"      ( "
-"       program.generic = 0 "
-"       AND "
-"       (program.programid = '' OR recorded.programid = '') "
+"      ( ") +
+        (ProgramInfo::UsingProgramIDAuthority() ?
+"       (program.programid = '' OR recorded.programid = '' OR "
+"         LEFT(program.programid, LOCATE('/', program.programid)) <> "
+"         LEFT(recorded.programid, LOCATE('/', recorded.programid))) " :
+"       (program.programid = '' OR recorded.programid = '') ")
+        + QString(
 "       AND "
 "       (((RECTABLE.dupmethod & 0x02) = 0) OR (program.subtitle <> '' "
 "          AND program.subtitle = recorded.subtitle)) "
@@ -3769,7 +3757,7 @@ void Scheduler::AddNewRecords(void)
         "    p.subtitletypes+0, p.audioprop+0,   RECTABLE.storagegroup, "//40-42
         "    capturecard.hostname, recordmatch.oldrecstatus, "
         "                                           RECTABLE.avg_delay, "//43-45
-        "    oldrecstatus.future, "                                      //46
+        "    oldrecstatus.future, cardinput.schedorder, "                //46-47
         + pwrpri + QString(
         "FROM recordmatch "
         "INNER JOIN RECTABLE ON (recordmatch.recordid = RECTABLE.recordid) "
@@ -3874,6 +3862,7 @@ void Scheduler::AddNewRecords(void)
             result.value(39).toUInt(),//videoproperties
             result.value(41).toUInt(),//audioproperties
             result.value(46).toInt());//future
+        p->SetRecordingPriority2(result.value(47).toInt()); // schedorder
 
         if (!p->future && !p->IsReactivated() &&
             p->oldrecstatus != rsAborted &&
@@ -3890,7 +3879,7 @@ void Scheduler::AddNewRecords(void)
 
         p->SetRecordingPriority(
             p->GetRecordingPriority() + recTypeRecPriorityMap[p->GetRecordingRuleType()] +
-            result.value(47).toInt() +
+            result.value(48).toInt() +
             ((autopriority) ?
              autopriority - (result.value(45).toInt() * autostrata / 200) : 0));
 
@@ -3920,7 +3909,8 @@ void Scheduler::AddNewRecords(void)
 
         RecStatusType newrecstatus = p->GetRecordingStatus();
         // Check for rsOffLine
-        if ((doRun || specsched) && !cardMap.contains(p->GetCardID()))
+        if ((doRun || specsched) && 
+            (!cardMap.contains(p->GetCardID()) || !p->GetRecordingPriority2()))
             newrecstatus = rsOffLine;
 
         // Check for rsTooManyRecordings
@@ -4143,35 +4133,38 @@ void Scheduler::AddNotListed(void) {
         worklist.push_back(*tmp);
 }
 
-void Scheduler::findAllScheduledPrograms(RecList &proglist)
+/** \brief Returns all scheduled programs
+ *
+ *  \note Caller is responsible for deleting the RecordingInfo's returned.
+ */
+void Scheduler::GetAllScheduled(RecList &proglist)
 {
     QString query = QString(
-        "SELECT RECTABLE.title,       RECTABLE.subtitle,    " //  0,1
-        "       RECTABLE.description, RECTABLE.season,      " //  2,3
-        "       RECTABLE.episode,     RECTABLE.category,    " //  4,5
-        "       RECTABLE.chanid,      channel.channum,      " //  6,7
-        "       RECTABLE.station,     channel.name,         " //  8,9
-        "       RECTABLE.recgroup,    RECTABLE.playgroup,   " // 10,11
-        "       RECTABLE.seriesid,    RECTABLE.programid,   " // 12,13
-        "       RECTABLE.inetref,     RECTABLE.recpriority, " // 14,15
-        "       RECTABLE.startdate,   RECTABLE.starttime,   " // 16,17
-        "       RECTABLE.enddate,     RECTABLE.endtime,     " // 18,19
-        "       RECTABLE.recordid,    RECTABLE.type,        " // 20,21
-        "       RECTABLE.dupin,       RECTABLE.dupmethod,   " // 22,23
-        "       RECTABLE.findid,                            " // 24
-        "       channel.commmethod                          " // 25
-        "FROM RECTABLE "
-        "LEFT JOIN channel ON channel.callsign = RECTABLE.station "
+        "SELECT record.title,       record.subtitle,    " //  0,1
+        "       record.description, record.season,      " //  2,3
+        "       record.episode,     record.category,    " //  4,5
+        "       record.chanid,      channel.channum,    " //  6,7
+        "       record.station,     channel.name,       " //  8,9
+        "       record.recgroup,    record.playgroup,   " // 10,11
+        "       record.seriesid,    record.programid,   " // 12,13
+        "       record.inetref,     record.recpriority, " // 14,15
+        "       record.startdate,   record.starttime,   " // 16,17
+        "       record.enddate,     record.endtime,     " // 18,19
+        "       record.recordid,    record.type,        " // 20,21
+        "       record.dupin,       record.dupmethod,   " // 22,23
+        "       record.findid,                          " // 24
+        "       channel.commmethod                      " // 25
+        "FROM record "
+        "LEFT JOIN channel ON channel.callsign = record.station "
         "GROUP BY recordid "
         "ORDER BY title ASC");
-    query.replace("RECTABLE", recordTable);
 
     MSqlQuery result(MSqlQuery::InitCon());
     result.prepare(query);
 
     if (!result.exec())
     {
-        MythDB::DBError("findAllScheduledPrograms", result);
+        MythDB::DBError("GetAllScheduled", result);
         return;
     }
 

@@ -134,13 +134,7 @@ HTTPLiveStream::HTTPLiveStream(QString srcFile, uint16_t width, uint16_t height,
     m_relativeURL = m_httpPrefixRel + m_outBase + ".m3u8";
 
     StorageGroup sgroup("Streaming", gCoreContext->GetHostName());
-    QStringList groupDirs = sgroup.GetDirList();
-
-    m_outDir = GetConfDir() + "/tmp/hls";
-
-    if (!groupDirs.isEmpty())
-        m_outDir = groupDirs[0];
-
+    m_outDir = sgroup.GetFirstDir();
     QDir outDir(m_outDir);
 
     if (!outDir.exists() && !outDir.mkdir(m_outDir))
@@ -185,7 +179,7 @@ bool HTTPLiveStream::InitForWrite(void)
 }
 
 QString HTTPLiveStream::GetFilename(uint16_t segmentNumber, bool fileOnly,
-                                    bool audioOnly, bool encoded)
+                                    bool audioOnly, bool encoded) const
 {
     QString filename;
 
@@ -205,7 +199,7 @@ QString HTTPLiveStream::GetFilename(uint16_t segmentNumber, bool fileOnly,
     return filename.arg(1, 6, 10, QChar('0'));
 }
 
-QString HTTPLiveStream::GetCurrentFilename(bool audioOnly, bool encoded)
+QString HTTPLiveStream::GetCurrentFilename(bool audioOnly, bool encoded) const
 {
     return GetFilename(m_curSegment, false, audioOnly, encoded);
 }
@@ -315,7 +309,7 @@ bool HTTPLiveStream::AddSegment(void)
     return true;
 }
 
-QString HTTPLiveStream::GetHTMLPageName(void)
+QString HTTPLiveStream::GetHTMLPageName(void) const
 {
     if (m_streamid == -1)
         return QString();
@@ -359,7 +353,7 @@ bool HTTPLiveStream::WriteHTML(void)
     return true;
 }
 
-QString HTTPLiveStream::GetMetaPlaylistName(void)
+QString HTTPLiveStream::GetMetaPlaylistName(void) const
 {
     if (m_streamid == -1)
         return QString();
@@ -403,7 +397,7 @@ bool HTTPLiveStream::WriteMetaPlaylist(void)
     return true;
 }
 
-QString HTTPLiveStream::GetPlaylistName(bool audioOnly)
+QString HTTPLiveStream::GetPlaylistName(bool audioOnly) const
 {
     if (m_streamid == -1)
         return QString();
@@ -731,7 +725,7 @@ void HTTPLiveStream::SetOutputVars(void)
         m_httpPrefixRel = "";
 }
 
-HTTPLiveStreamStatus HTTPLiveStream::GetDBStatus(void)
+HTTPLiveStreamStatus HTTPLiveStream::GetDBStatus(void) const
 {
     if (m_streamid == -1)
         return kHLSStatusUndefined;

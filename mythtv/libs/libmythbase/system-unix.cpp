@@ -80,6 +80,7 @@ MythSystemIOHandler::MythSystemIOHandler(bool read) :
     m_pWaitLock(), m_pWait(), m_pLock(), m_pMap(PMap_t()), m_maxfd(-1),
     m_read(read)
 {
+    m_readbuf[0] = '\0';
 }
 
 void MythSystemIOHandler::run(void)
@@ -301,6 +302,17 @@ void MythSystemManager::run(void)
             // pop exited process off managed list, add to cleanup list
             ms = m_pMap.take(pid);
             m_mapLock.unlock();
+
+            // Occasionally, the caller has deleted the structure from under
+            // our feet.  If so, just log and move on.
+            if (!ms)
+            {
+                LOG(VB_SYSTEM, LOG_ERR,
+                    QString("Structure for child PID %1 already deleted!")
+                    .arg(pid));
+                continue;
+            }
+
             msList.append(ms);
 
             // handle normal exit
@@ -315,14 +327,14 @@ void MythSystemManager::run(void)
             }
 
             // handle forced exit
-            else if( WIFSIGNALED(status) && 
-                     ms->GetStatus() != GENERIC_EXIT_TIMEOUT )
+            else if( WIFSIGNALED(status) )
             {
                 // Don't override a timed out process which gets killed, but
                 // otherwise set the return status appropriately
-                int sig = WTERMSIG(status);
-                ms->SetStatus( GENERIC_EXIT_KILLED );
+                if (ms->GetStatus() != GENERIC_EXIT_TIMEOUT)
+                    ms->SetStatus( GENERIC_EXIT_KILLED );
 
+                int sig = WTERMSIG(status);
                 LOG(VB_SYSTEM, LOG_INFO,
                     QString("Managed child (PID: %1) has signalled! "
                             "command=%2, status=%3, result=%4, signal=%5")
@@ -769,6 +781,11 @@ void MythSystemUnix::Fork(time_t timeout)
                 _exit(GENERIC_EXIT_PIPE_FAILURE);
             }
         }
+        else
+        {
+            /* We aren't sucking this down, close stdout */
+            close(1);
+        }
 
         /* handle standard err */
         if( p_stderr[1] >= 0 )
@@ -781,6 +798,11 @@ void MythSystemUnix::Fork(time_t timeout)
                      << strerror(errno) << endl;
                 _exit(GENERIC_EXIT_PIPE_FAILURE);
             }
+        }
+        else
+        {
+            /* We aren't sucking this down, close stderr */
+            close(2);
         }
 
         /* Close all open file descriptors except stdin/stdout/stderr */

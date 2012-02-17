@@ -50,6 +50,8 @@ using_dvb:DEFINES += USING_DVB
 
 using_valgrind:DEFINES += USING_VALGRIND
 
+using_libdns_sd:DEFINES += USING_LIBDNS_SD
+
 xml_conf.path = $${PREFIX}/share/mythtv/backend-config/
 xml_conf.files = config_backend_general.xml config_backend_database.xml
 

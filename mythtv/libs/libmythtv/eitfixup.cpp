@@ -55,6 +55,8 @@ EITFixUp::EITFixUp()
       m_ukYearColon("^[\\d]{4}:"),
       m_ukExclusionFromSubtitle("(starring|stars\\s|drama|series|sitcom)",Qt::CaseInsensitive),
       m_ukCompleteDots("^\\.\\.+$"),
+      m_ukQuotedSubtitle("(?:^')([\\w\\s\\-,]+)(?:\\.' )"),
+      m_ukAllNew("All New To 4Music!\\s?"),
       m_comHemCountry("^(\\(.+\\))?\\s?([^ ]+)\\s([^\\.0-9]+)"
                       "(?:\\sfrån\\s([0-9]{4}))(?:\\smed\\s([^\\.]+))?\\.?"),
       m_comHemDirector("[Rr]egi"),
@@ -542,7 +544,7 @@ void EITFixUp::SetUKSubtitle(DBEventEIT &event) const
     QStringList strListColon = event.description.split(":");
     QStringList strListEnd;
 
-    bool fColon = false;
+    bool fColon = false, fQuotedSubtitle = false;
     int nPosition1;
     QString strEnd;
     if (strListColon.count()>1)
@@ -604,10 +606,17 @@ void EITFixUp::SetUKSubtitle(DBEventEIT &event) const
              fColon = true;
          }
     }
+    QRegExp tmpQuotedSubtitle = m_ukQuotedSubtitle;
+    if (tmpQuotedSubtitle.indexIn(event.description) != -1)
+    {
+        event.subtitle = tmpQuotedSubtitle.cap(1);
+        event.description.remove(m_ukQuotedSubtitle);
+        fQuotedSubtitle = true;
+    }
     QStringList strListPeriod;
     QStringList strListQuestion;
     QStringList strListExcl;
-    if (!fColon)
+    if (!(fColon || fQuotedSubtitle))
     {
         strListPeriod = event.description.split(".");
         if (strListPeriod.count() >1)
@@ -679,6 +688,9 @@ void EITFixUp::FixUK(DBEventEIT &event) const
 
     // BBC 7 [Rpt of ...] case.
     event.description = event.description.remove(m_ukBBC7rpt);
+
+    // "All New To 4Music!
+    event.description = event.description.remove(m_ukAllNew);
 
     // Remove [AD,S] etc.
     QRegExp tmpCC = m_ukCC;
@@ -1719,13 +1731,16 @@ void EITFixUp::FixNRK_DVBT(DBEventEIT &event) const
     // Move colon separated category from program-titles into description
     // Have seen "NRK2s historiekveld: Film: bla-bla"
     tmpExp1 =  m_noNRKCategories;
-    while (((position = tmpExp1.indexIn(event.title)) != -1) && (tmpExp1.cap(2).length() > 1)){
+    while (((position = tmpExp1.indexIn(event.title)) != -1) &&
+           (tmpExp1.cap(2).length() > 1))
+    {
         event.title  = tmpExp1.cap(2);
         event.description = "(" + tmpExp1.cap(1) + ") " + event.description;
     }
     // Remove season premiere markings
     tmpExp1 = m_noPremiere;
-    if ((position = tmpExp1.indexIn(event.title)) >=3){
+    if ((position = tmpExp1.indexIn(event.title)) >=3)
+    {
         event.title.remove(m_noPremiere);
     }
     // Try to find colon-delimited subtitle in title, only tested for NRK channels
@@ -1741,7 +1756,9 @@ void EITFixUp::FixNRK_DVBT(DBEventEIT &event) const
             {
                 event.title    = tmpExp1.cap(1);
                 event.subtitle = tmpExp1.cap(2);
-            } else if (event.subtitle == tmpExp1.cap(2)) {
+            }
+            else if (event.subtitle == tmpExp1.cap(2))
+            {
                 event.title    = tmpExp1.cap(1);
             }
         }

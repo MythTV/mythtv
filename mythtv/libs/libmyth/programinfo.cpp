@@ -44,6 +44,7 @@ int pginfo_init_statics() { return ProgramInfo::InitStatics(); }
 QMutex ProgramInfo::staticDataLock;
 ProgramInfoUpdater *ProgramInfo::updater;
 int dummy = pginfo_init_statics();
+bool ProgramInfo::usingProgIDAuth = true;
 
 
 const QString ProgramInfo::kFromRecordedQuery =
@@ -1360,9 +1361,8 @@ void ProgramInfo::ToMap(InfoMap &progMap,
 
     if (season > 0 || episode > 0)
     {
-        progMap["season"] = QString::number(season);
-        progMap["episode"] = QString::number(episode);
-
+        progMap["season"] = GetDisplaySeasonEpisode(season, 1);
+        progMap["episode"] = GetDisplaySeasonEpisode(episode, 1);
         progMap["s00e00"] = QString("s%1e%2").arg(GetDisplaySeasonEpisode
                                              (GetSeason(), 2))
                         .arg(GetDisplaySeasonEpisode(GetEpisode(), 2));
@@ -1370,6 +1370,12 @@ void ProgramInfo::ToMap(InfoMap &progMap,
                                              (GetSeason(), 1))
                         .arg(GetDisplaySeasonEpisode(GetEpisode(), 2));
     }
+    else
+    {
+        progMap["season"] = progMap["episode"] = "";
+        progMap["s00e00"] = progMap["00x00"] = "";
+    }
+
     progMap["category"] = category;
     progMap["callsign"] = chansign;
     progMap["commfree"] = (programflags & FL_CHANCOMMFREE) ? 1 : 0;
@@ -1498,6 +1504,8 @@ void ProgramInfo::ToMap(InfoMap &progMap,
     progMap["rectypestatus"] = tmp_rec;
 
     progMap["card"] = ::toString(GetRecordingStatus(), cardid);
+    progMap["input"] = ::toString(GetRecordingStatus(), inputid);
+    progMap["inputname"] = QueryInputDisplayName();
 
     progMap["recpriority"] = recpriority;
     progMap["recpriority2"] = recpriority2;
@@ -1520,6 +1528,9 @@ void ProgramInfo::ToMap(InfoMap &progMap,
 
     progMap["recstatus"] = ::toString(GetRecordingStatus(),
                                       GetRecordingRuleType());
+    progMap["recstatuslong"] = ::toDescription(GetRecordingStatus(),
+                                               GetRecordingRuleType(),
+                                               GetRecordingStartTime());
 
     if (IsRepeat())
     {
@@ -1570,6 +1581,42 @@ void ProgramInfo::ToMap(InfoMap &progMap,
         progMap["originalairdate"] = MythDateToString(originalAirDate, kDateFull);
         progMap["shortoriginalairdate"] = MythDateToString(originalAirDate, kDateShort);
     }
+
+    // 'mediatype' for a statetype, so untranslated
+    // 'mediatypestring' for textarea, so translated
+    // TODO Move to a dedicated ToState() method?
+    QString mediaType;
+    QString mediaTypeString;
+    switch (GetProgramInfoType())
+    {
+        case kProgramInfoTypeVideoFile :
+            mediaType = "video";
+            mediaTypeString = QObject::tr("Video");
+            break;
+        case kProgramInfoTypeVideoDVD :
+            mediaType = "dvd";
+            mediaTypeString = QObject::tr("DVD");
+            break;
+        case kProgramInfoTypeVideoStreamingHTML :
+            mediaType = "httpstream";
+            mediaTypeString = QObject::tr("HTTP Streaming");
+            break;
+        case kProgramInfoTypeVideoStreamingRTSP :
+            mediaType = "rtspstream";
+            mediaTypeString = QObject::tr("RTSP Streaming");
+            break;
+        case kProgramInfoTypeVideoBD :
+            mediaType = "bluraydisc";
+            mediaTypeString = QObject::tr("Blu-Ray Disc");
+            break;
+        case kProgramInfoTypeRecording : // Fall through
+        default :
+            mediaType = "recording";
+            mediaTypeString = QObject::tr("Recording",
+                                          "Recorded file, object not action");
+    }
+    progMap["mediatype"] = mediaType;
+    progMap["mediatypestring"] = mediaTypeString;
 }
 
 /// \brief Returns length of program/recording in seconds.
@@ -1878,13 +1925,10 @@ bool ProgramInfo::IsSameProgram(const ProgramInfo& other) const
         (recordid == other.recordid || recordid == other.parentid))
            return true;
 
-    if (title.toLower() != other.title.toLower())
+    if (dupmethod & kDupCheckNone)
         return false;
 
-    if (findid && findid == other.findid)
-        return true;
-
-    if (dupmethod & kDupCheckNone)
+    if (title.compare(other.title, Qt::CaseInsensitive) != 0)
         return false;
 
     if (catType == "series")
@@ -1894,29 +1938,42 @@ bool ProgramInfo::IsSameProgram(const ProgramInfo& other) const
     }
 
     if (!programid.isEmpty() && !other.programid.isEmpty())
-        return programid == other.programid;
+    {
+        if (usingProgIDAuth)
+        {
+            int index = programid.indexOf('/');
+            int oindex = other.programid.indexOf('/');
+            if (index == oindex && (index < 0 ||
+                programid.leftRef(index) == other.programid.leftRef(oindex)))
+                return programid == other.programid;
+        }
+        else
+        {
+            return programid == other.programid;
+        }
+    }
 
     if ((dupmethod & kDupCheckSub) &&
         ((subtitle.isEmpty()) ||
-         (subtitle.toLower() != other.subtitle.toLower())))
+         (subtitle.compare(other.subtitle, Qt::CaseInsensitive) != 0)))
         return false;
 
     if ((dupmethod & kDupCheckDesc) &&
         ((description.isEmpty()) ||
-         (description.toLower() != other.description.toLower())))
+         (description.compare(other.description, Qt::CaseInsensitive) != 0)))
         return false;
 
     if ((dupmethod & kDupCheckSubThenDesc) &&
         ((subtitle.isEmpty() &&
           ((!other.subtitle.isEmpty() &&
-            description.toLower() != other.subtitle.toLower()) ||
+            description.compare(other.subtitle, Qt::CaseInsensitive) != 0) ||
            (other.subtitle.isEmpty() &&
-            description.toLower() != other.description.toLower()))) ||
+            description.compare(other.description, Qt::CaseInsensitive) != 0))) ||
          (!subtitle.isEmpty() &&
           ((other.subtitle.isEmpty() &&
-            subtitle.toLower() != other.description.toLower()) ||
+            subtitle.compare(other.description, Qt::CaseInsensitive) != 0) ||
            (!other.subtitle.isEmpty() &&
-            subtitle.toLower() != other.subtitle.toLower())))))
+            subtitle.compare(other.subtitle, Qt::CaseInsensitive) != 0)))))
         return false;
 
     return true;
@@ -1929,11 +1986,12 @@ bool ProgramInfo::IsSameProgram(const ProgramInfo& other) const
  */
 bool ProgramInfo::IsSameTimeslot(const ProgramInfo& other) const
 {
-    if (title != other.title)
+    if (title.compare(other.title, Qt::CaseInsensitive) != 0)
         return false;
     if (startts == other.startts &&
         (chanid == other.chanid ||
-         (!chansign.isEmpty() && chansign == other.chansign)))
+         (!chansign.isEmpty() &&
+          chansign.compare(other.chansign, Qt::CaseInsensitive) == 0)))
         return true;
 
     return false;
@@ -1947,15 +2005,47 @@ bool ProgramInfo::IsSameTimeslot(const ProgramInfo& other) const
  */
 bool ProgramInfo::IsSameProgramTimeslot(const ProgramInfo &other) const
 {
-    if (title != other.title)
+    if (title.compare(other.title, Qt::CaseInsensitive) != 0)
         return false;
     if ((chanid == other.chanid ||
-         (!chansign.isEmpty() && chansign == other.chansign)) &&
+         (!chansign.isEmpty() &&
+          chansign.compare(other.chansign, Qt::CaseInsensitive) == 0)) &&
         startts < other.endts &&
         endts > other.startts)
         return true;
 
     return false;
+}
+
+void ProgramInfo::CheckProgramIDAuthorities(void)
+{
+    QMap<QString, int> authMap;
+    QString tables[] = { "program", "recorded", "oldrecorded", "" };
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    int tableIndex = 0;
+    QString table = tables[tableIndex];
+    while (!table.isEmpty())
+    {
+        query.prepare(QString(
+            "SELECT DISTINCT LEFT(programid, LOCATE('/', programid)) "
+            "FROM %1 WHERE programid <> ''").arg(table));
+        if (!query.exec())
+            MythDB::DBError("CheckProgramIDAuthorities", query);
+        else
+        {
+            while (query.next())
+                authMap[query.value(0).toString()] = 1;
+        }
+        ++tableIndex;
+        table = tables[tableIndex];
+    }
+
+    int numAuths = authMap.count();
+    LOG(VB_GENERAL, LOG_INFO,
+        QString("Found %1 distinct programid authorities").arg(numAuths));
+
+    usingProgIDAuth = (numAuths > 1);
 }
 
 /** \fn ProgramInfo::CreateRecordBasename(const QString &ext) const
@@ -2031,7 +2121,7 @@ void ProgramInfo::SetAvailableStatus(
 {
     if (status != availableStatus)
     {
-        LOG(VB_GUI, LOG_INFO, 
+        LOG(VB_GUI, LOG_INFO,
                  toString(kTitleSubtitle) + QString(": %1 -> %2")
                      .arg(::toString((AvailableStatusType)availableStatus))
                      .arg(::toString(status)));
@@ -2097,7 +2187,7 @@ QString ProgramInfo::QueryBasename(void) const
     }
     else
     {
-        LOG(VB_GENERAL, LOG_INFO, 
+        LOG(VB_GENERAL, LOG_INFO,
                  QString("QueryBasename found no entry for %1 @ %2")
                      .arg(chanid).arg(recstartts.toString(Qt::ISODate)));
     }
@@ -2198,7 +2288,7 @@ QString ProgramInfo::GetPlaybackURL(
         }
 
     // Fallback to streaming from the backend the recording was created on
-    tmpURL = gCoreContext->GenMythURL(gCoreContext->GetSettingOnHost("BackendServerIP", hostname),
+    tmpURL = gCoreContext->GenMythURL(gCoreContext->GetBackendServerIP(hostname),
                                       gCoreContext->GetSettingOnHost("BackendServerPort", hostname).toInt(),
                                       basename);
 
@@ -4147,6 +4237,36 @@ bool ProgramInfo::QueryTuningInfo(QString &channum, QString &input) const
         MythDB::DBError("GetChannel(ProgInfo...)", query);
         return false;
     }
+}
+
+/** \brief Returns the display name of the card input for this program.
+ *  \note Ideally this would call CardUtil::GetDisplayName(), but
+ *        that's in libmythtv.  Dupliacte code for now until a better
+ *        solution can be found.
+ */
+QString ProgramInfo::QueryInputDisplayName(void) const
+{
+    if (!inputid)
+        return QString::null;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT displayname, cardid, inputname "
+                  "FROM cardinput "
+                  "WHERE cardinputid = :INPUTID");
+    query.bindValue(":INPUTID", inputid);
+
+    if (!query.exec())
+        MythDB::DBError("ProgramInfo::GetInputDisplayName(uint)", query);
+    else if (query.next())
+    {
+        QString result = query.value(0).toString();
+        if (result.isEmpty())
+            result = QString("%1: %2").arg(query.value(1).toInt())
+                                      .arg(query.value(2).toString());
+        return result;
+    }
+
+    return QString::null;
 }
 
 static int init_tr(void)

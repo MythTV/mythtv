@@ -727,32 +727,71 @@ class FileOps( BECache ):
             regex = re.compile(regex)
         return EventLock(regex, self.hostname, self.db)
 
-    def _getPrograms(self, query, recstatus=None, recordid=None, header=0):
-        pgfieldcount = len(Program._field_order)
-        pgrecstatus = Program._field_order.index('recstatus')
-        pgrecordid = Program._field_order.index('recordid')
+    class _ProgramQuery( object ):
+        def __init__(self, query, header_length=0, sorted=False,
+                     recstatus=None, handler=None):
+            self.query = query
+            self.header_length = header_length
+            self.recstatus = recstatus
+            self.handler = handler if handler else Program
+            self.sorted = sorted
+            self.inst = None
+            self.func = None
 
-        res = self.backendCommand(query).split(BACKEND_SEP)
-        for i in xrange(header):
-            res.pop(0)
-        num_progs = int(res.pop(0))
-        if num_progs*pgfieldcount != len(res):
-            raise MythBEError(MythBEError.PROTO_PROGRAMINFO)
+        def __call__(self, *args, **kwargs):
+            if self.func is None:
+                if len(args) == 1:
+                    self.func = args[0]
+                elif 'func' in kwargs:
+                    self.func = kwargs['func']
+                if not callable(self.func):
+                    raise MythError('_ProgramQuery must receive a callable '+\
+                                    'before it is functional')
+                self.__doc__ = self.func.__doc__
+                self.__name__ = self.func.__name__
+                self.__module__ = self.func.__module__
+                return self
+            elif self.inst is None:
+                raise MythError('Call to uninitialized _ProgramQuery instance')
+            if self.sorted:
+                return self.sortedrun(*args, **kwargs)
+            return self.run(*args, **kwargs)
 
-        for i in range(num_progs):
-            offs = i * pgfieldcount
-            if recstatus is not None:
-                if int(res[offs+pgrecstatus]) != recstatus:
-                    continue
-            if recordid is not None:
-                if int(res[offs+pgrecordid]) != recordid:
-                    continue
-            yield Program(res[offs:offs+pgfieldcount], db=self.db)
+        def __get__(self, obj, type):
+            if obj is None:
+                return self
+            cls = self.__class__(self.query, self.header_length, self.sorted,
+                                 self.recstatus, self.handler)
+            cls.inst = obj
+            cls.func = self.func.__get__(obj, type)
+            return cls
 
-    def _getSortedPrograms(self, query, recstatus=None, \
-                           recordid=None, header=0):
-        return sorted(self._getPrograms(query, recstatus, recordid, header),\
-                      key=lambda p: p.starttime)
+        def run(self, *args, **kwargs):
+            pgfieldcount = len(Program._field_order)
+            pgrecstatus = Program._field_order.index('recstatus')
+            pgrecordid = Program._field_order.index('recordid')
+
+            res = self.inst.backendCommand(self.query).split(BACKEND_SEP)
+            for i in xrange(self.header_length):
+                res.pop(0)
+            num_progs = int(res.pop(0))
+            if num_progs*pgfieldcount != len(res):
+                raise MythBEError(MythBEError.PROTO_PROGRAMINFO)
+
+            for i in range(num_progs):
+                offs = i * pgfieldcount
+                if self.recstatus is not None:
+                    if int(res[offs+pgrecstatus]) != self.recstatus:
+                        continue
+                pg = self.handler(res[offs:offs+pgfieldcount],
+                                  db=self.inst.db)
+                pg = self.func(pg, *args, **kwargs)
+                if pg is not None:
+                    yield pg
+
+        def sortedrun(self, *args, **kwargs):
+            return iter(sorted(self.run(*args, **kwargs),
+                               key=lambda p: p.starttime))
 
 class FreeSpace( DictData ):
     """Represents a FreeSpace entry."""

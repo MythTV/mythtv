@@ -76,7 +76,10 @@ class MBASE_PUBLIC MythCoreContext : public MythObservable, public MythSocketCBs
                            uint timeout_ms = kMythSocketLongTimeout,
                            bool error_dialog_desired = false);
 
-    QHostAddress MythHostAddressAny(void);
+    void                ConfigureHostAddress(void);
+    QList<QHostAddress> MythHostAddress(void);
+    QList<QHostAddress> MythHostAddress4(void);
+    QList<QHostAddress> MythHostAddress6(void);
 
     QString GenMythURL(QString host = QString(), QString port = QString(),
                        QString path = QString(), QString storageGroup = QString());
@@ -95,19 +98,24 @@ class MBASE_PUBLIC MythCoreContext : public MythObservable, public MythSocketCBs
     bool IsFrontendOnly(void);   ///< is there a frontend, but no backend,
                                  ///  running on this host
     bool IsMasterHost(void);     ///< is this the same host as the master
+    bool IsMasterHost(const QString &host); //< is specified host the master
     bool IsMasterBackend(void);  ///< is this the actual MBE process
     bool BackendIsRunning(void); ///< a backend process is running on this host
 
+    bool IsThisHost(const QString &addr); //< is this address mapped to this host
+    bool IsThisHost(const QString &addr, const QString &host);
+
     void BlockShutdown(void);
     void AllowShutdown(void);
+    bool IsBlockingClient(void) const; ///< is this client blocking shutdown
 
     bool SendReceiveStringList(QStringList &strlist, bool quickTimeout = false,
                                bool block = true);
     void SendMessage(const QString &message);
     void SendEvent(const MythEvent &event);
-    void SendSystemEvent(const QString msg);
-    void SendHostSystemEvent(const QString msg, const QString &hostname,
-                             const QString args);
+    void SendSystemEvent(const QString &msg);
+    void SendHostSystemEvent(const QString &msg, const QString &hostname,
+                             const QString &args);
 
     void SetGUIObject(QObject *gui);
     QObject *GetGUIObject(void);
@@ -143,6 +151,9 @@ class MBASE_PUBLIC MythCoreContext : public MythObservable, public MythSocketCBs
                             int defaultval = 0);
     double GetFloatSettingOnHost(const QString &key, const QString &host,
                                  double defaultval = 0.0);
+
+    QString GetBackendServerIP(void);
+    QString GetBackendServerIP(const QString &host);
 
     void SetSetting(const QString &key, const QString &newValue);
 

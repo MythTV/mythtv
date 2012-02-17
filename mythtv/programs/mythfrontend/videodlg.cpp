@@ -270,8 +270,8 @@ namespace
             else
                 VideoPlayerCommand::PlayerFor(item.get()).Play();
 
-            if (item->GetChildID() > 0)
-                item = video_list.byID(item->GetChildID());
+            if (item->GetChildID() > 0 && video_list.byID(item->GetChildID()))
+                    item = video_list.byID(item->GetChildID());
             else
                 break;
         }
@@ -1006,9 +1006,6 @@ bool VideoDialog::Create()
 
     BuildFocusList();
 
-    CheckedSet(m_novideoText,
-               tr("Video dialog loading, or no videos available..."));
-
     if (m_d->m_type == DLG_TREE)
     {
         SetFocusWidget(m_videoButtonTree);
@@ -1030,18 +1027,25 @@ bool VideoDialog::Create()
                 SLOT(UpdateText(MythUIButtonListItem *)));
     }
 
-    connect(&m_d->m_parentalLevel, SIGNAL(SigLevelChanged()),
-            SLOT(reloadData()));
-
     return true;
 }
 
 void VideoDialog::Init()
 {
-
     m_d->m_parentalLevel.SetLevel(ParentalLevel(gCoreContext->
                     GetNumSetting("VideoDefaultParentalLevel",
                             ParentalLevel::plLowest)));
+    connect(&m_d->m_parentalLevel, SIGNAL(SigLevelChanged()),
+            SLOT(reloadData()));
+}
+
+void VideoDialog::Load()
+{
+    reloadData();
+    // We only want to prompt once, on startup, hence this is done in Load()
+    if (m_d->m_rootNode->childCount() == 1 &&
+        m_d->m_rootNode->getChildAt(0)->getInt() == kNoFilesFound)
+        PromptToScan();
 }
 
 /** \fn VideoDialog::refreshData()
@@ -1056,24 +1060,34 @@ void VideoDialog::refreshData()
     CheckedSet(m_parentalLevelState,
             ParentalLevelToState(m_d->m_parentalLevel.GetLevel()));
 
+    bool noFiles = (m_d->m_rootNode->childCount() == 1 &&
+                    m_d->m_rootNode->getChildAt(0)->getInt() == kNoFilesFound);
+
     if (m_novideoText)
-        m_novideoText->SetVisible(!m_d->m_treeLoaded);
+        m_novideoText->SetVisible(noFiles);
 }
 
-void VideoDialog::reloadAllData(bool dbChanged)
+void VideoDialog::scanFinished(bool dbChanged)
 {
     delete m_d->m_scanner;
     m_d->m_scanner = 0;
 
-    if (dbChanged) {
+    if (dbChanged)
         m_d->m_videoList->InvalidateCache();
-    }
 
     m_d->m_currentNode = NULL;
     reloadData();
 
     if (m_d->m_autoMeta)
         VideoAutoSearch();
+
+    if (m_d->m_rootNode->childCount() == 1 &&
+        m_d->m_rootNode->getChildAt(0)->getInt() == kNoFilesFound)
+    {
+        QString message = tr("The video scan found no files, have you "
+                             "configured a video storage group?");
+        ShowOkPopup(message);
+    }
 }
 
 /** \fn VideoDialog::reloadData()
@@ -2107,7 +2121,7 @@ void VideoDialog::createOkDialog(QString title)
         m_popupStack->AddScreen(okPopup);
 }
 
-/** \fn VideoDialog::searchComplet(QString string)
+/**
  *  \brief After using incremental search, move to the selected item.
  *  \return void.
  */
@@ -3252,7 +3266,17 @@ void VideoDialog::customEvent(QEvent *levent)
     }
     else if (levent->type() == DialogCompletionEvent::kEventType)
     {
-        m_menuPopup = NULL;
+        DialogCompletionEvent *dce = static_cast<DialogCompletionEvent *>(levent);
+        QString id = dce->GetId();
+
+        if (id == "scanprompt")
+        {
+            int result = dce->GetResult();
+            if (result == 1)
+                doVideoScan();
+        }
+        else
+            m_menuPopup = NULL;
     }
 }
 
@@ -3719,8 +3743,22 @@ void VideoDialog::doVideoScan()
 {
     if (!m_d->m_scanner)
         m_d->m_scanner = new VideoScanner();
-    connect(m_d->m_scanner, SIGNAL(finished(bool)), SLOT(reloadAllData(bool)));
+    connect(m_d->m_scanner, SIGNAL(finished(bool)), SLOT(scanFinished(bool)));
     m_d->m_scanner->doScan(GetVideoDirs());
+}
+
+void VideoDialog::PromptToScan()
+{
+    QString message = tr("There are no videos in the database, would you like "
+                         "to scan your video directories now?");
+    MythConfirmationDialog *dialog = new MythConfirmationDialog(m_popupStack,
+                                                                message,
+                                                                true);
+    dialog->SetReturnEvent(this, "scanprompt");
+    if (dialog->Create())
+        m_popupStack->AddScreen(dialog);
+    else
+        delete dialog;
 }
 
 #include "videodlg.moc"

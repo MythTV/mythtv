@@ -12,6 +12,8 @@
 #include "mythdb.h"
 #include "mythdirs.h"
 #include "storagegroup.h"
+#include "mythdownloadmanager.h"
+#include "mythcoreutil.h"
 
 HttpConfig::HttpConfig() : HttpServerExtension("HttpConfig", QString())
 {
@@ -145,6 +147,33 @@ bool HttpConfig::ProcessRequest(HTTPRequest *request)
             fn += "config_backend_general.xml";
 
         request->FormatFileResponse(fn);
+        return true;
+    }
+    else if ((request->m_sMethod == "InstallPackage") &&
+             (request->m_mapParams.contains("package")))
+    {
+        QString package = QUrl::fromPercentEncoding(request->m_mapParams["package"].toUtf8());
+        QString url = QString("http://www.mythtv.org/ftp/3rdParty/%1").arg(package);
+        StorageGroup tmpGroup("Temp", gCoreContext->GetHostName());
+        QString tmpFile = tmpGroup.GetFirstDir(true) + "package.zip";
+        StorageGroup destGroup("3rdParty", gCoreContext->GetHostName());
+        QString outDir = destGroup.GetFirstDir();
+
+        QString result = "false";
+        if ((GetMythDownloadManager()->download(url, tmpFile)) &&
+            (extractZIP(tmpFile, outDir)))
+        {
+            result = "true";
+        }
+
+        QTextStream os(&request->m_response);
+        os << StringListToJSON("Result", QStringList(result));
+
+        request->m_eResponseType     = ResponseTypeOther;
+        request->m_sResponseTypeText = "application/json";
+        request->m_mapRespHeaders[ "Cache-Control" ] =
+            "no-cache=\"Ext\", max-age = 0";
+
         return true;
     }
     else if ((request->m_sMethod == "FileBrowser") &&

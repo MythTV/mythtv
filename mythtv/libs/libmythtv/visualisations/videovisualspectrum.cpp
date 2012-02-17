@@ -181,3 +181,21 @@ bool VideoVisualSpectrum::InitialisePriv(void)
         QString("Initialised Spectrum with %1 bars") .arg(m_scale.range()));
     return true;
 }
+
+static class VideoVisualSpectrumFactory : public VideoVisualFactory
+{
+  public:
+    const QString &name(void) const
+    {
+        static QString name("Spectrum");
+        return name;
+    }
+
+    VideoVisual *Create(AudioPlayer *audio,
+                        MythRender  *render) const
+    {
+        return new VideoVisualSpectrum(audio, render);
+    }
+
+    virtual bool SupportedRenderer(RenderType type) { return true; }
+} VideoVisualSpectrumFactory;

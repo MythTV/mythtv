@@ -4,6 +4,8 @@
 
 using namespace std;
 
+#include <stdint.h>
+
 #include <QList>
 #include <QString>
 #include <QStringList>
@@ -19,7 +21,7 @@ class MBASE_PUBLIC FileSystemInfo : public QObject
     FileSystemInfo();
     FileSystemInfo(const FileSystemInfo &other);
     FileSystemInfo(QString hostname, QString path, bool local, int fsid,
-             int groupid, int blksize, long long total, long long used);
+             int groupid, int blksize, int64_t total, int64_t used);
     FileSystemInfo(QStringList::const_iterator &it,
             QStringList::const_iterator end);
     FileSystemInfo(const QStringList &slist);
@@ -37,11 +39,12 @@ class MBASE_PUBLIC FileSystemInfo : public QObject
     int         getFSysID(void)       const { return m_fsid; }
     int         getGroupID(void)      const { return m_grpid; }
     int         getBlockSize(void)    const { return m_blksize; }
-    long long   getTotalSpace(void)   const { return m_total; }
-    long long   getUsedSpace(void)    const { return m_used; }
+    int64_t     getTotalSpace(void)   const { return m_total; }
+    int64_t     getUsedSpace(void)    const { return m_used; }
     int         getWeight(void)       const { return m_weight; }
 
-    long long   getFreeSpace(void)    const { return m_total-m_used; }
+    // reserved space could potentially result in this being negative
+    int64_t     getFreeSpace(void)    const { return m_total-m_used; }
 
     // information puts
     void setHostname(QString hostname)      { m_hostname = hostname; }
@@ -50,15 +53,15 @@ class MBASE_PUBLIC FileSystemInfo : public QObject
     void setFSysID(int id)                  { m_fsid = id; }
     void setGroupID(int id)                 { m_grpid = id; }
     void setBlockSize(int size)             { m_blksize = size; }
-    void setTotalSpace(long long size)      { m_total = size; }
-    void setUsedSpace(long long size)       { m_used = size; }
+    void setTotalSpace(int64_t size)        { m_total = size; }
+    void setUsedSpace(int64_t size)         { m_used = size; }
     void setWeight(int weight)              { m_weight = weight; }
 
     bool        ToStringList(QStringList &slist) const;
 
     static const QList<FileSystemInfo> RemoteGetInfo(MythSocket *sock=NULL);
     static void Consolidate(QList<FileSystemInfo> &disks, bool merge=true,
-                            size_t fuzz=14000);
+                            int64_t fuzz=14000);
     void PopulateDiskSpace(void);
     void PopulateFSProp(void);
 
@@ -73,8 +76,8 @@ class MBASE_PUBLIC FileSystemInfo : public QObject
     int m_fsid;
     int m_grpid;
     int m_blksize;
-    long long m_total;
-    long long m_used;
+    int64_t m_total;
+    int64_t m_used;
     int m_weight;
 };
 #endif

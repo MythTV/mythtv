@@ -57,34 +57,38 @@ class MythBE( FileOps ):
     def __del__(self):
         self.freeTuner()
 
-    def getPendingRecordings(self):
+    @FileOps._ProgramQuery('QUERY_GETALLPENDING', header_length=1, sorted=True)
+    def getPendingRecordings(self, pg):
         """
         Returns a list of Program objects which are scheduled to be recorded.
         """
-        return self._getSortedPrograms('QUERY_GETALLPENDING', header=1)
+        return pg
 
-    def getScheduledRecordings(self):
+    @FileOps._ProgramQuery('QUERY_GETALLSCHEDULED', sorted=True)
+    def getScheduledRecordings(self, pg):
         """
         Returns a list of Program objects which are scheduled to be recorded.
         """
-        return self._getSortedPrograms('QUERY_GETALLSCHEDULED')
+        return pg
 
-    def getUpcomingRecordings(self):
+    @FileOps._ProgramQuery('QUERY_GETALLPENDING', header_length=1, sorted=True,
+                           recstatus=Program.rsWillRecord)
+    def getUpcomingRecordings(self, pg):
         """
         Returns a list of Program objects which are scheduled to be recorded.
 
         Sorts the list by recording start time and only returns those with
         record status of WillRecord.
         """
-        return self._getSortedPrograms('QUERY_GETALLPENDING', \
-                                recstatus=Program.rsWillRecord, header=1)
+        return pg
 
+    @FileOps._ProgramQuery('QUERY_GETALLPENDING', header_length=1, sorted=True,
+                           recstatus=Program.rsConflict)
     def getConflictedRecordings(self):
         """
         Retuns a list of Program objects subject to conflicts in the schedule.
         """
-        return self._getSortedPrograms('QUERY_GETALLPENDING', \
-                                recstatus=Program.rsConflict, header=1)
+        return pg
 
     def getRecorderList(self):
         """
@@ -214,17 +218,19 @@ class MythBE( FileOps ):
         else:
             return False
 
-    def getRecordings(self):
+    @FileOps._ProgramQuery('QUERY_RECORDINGS Ascending', sorted=True)
+    def getRecordings(self, pg):
         """
         Returns a list of all Program objects which have already recorded
         """
-        return self._getSortedPrograms('QUERY_RECORDINGS Ascending')
+        return pg
 
-    def getExpiring(self):
+    @FileOps._ProgramQuery('QUERY_GETEXPIRING', sorted=True)
+    def getExpiring(self, pg):
         """
         Returns a tuple of all Program objects nearing expiration
         """
-        return self._getSortedPrograms('QUERY_GETEXPIRING')
+        return pg
 
     def getCheckfile(self,program):
         """

@@ -1,3 +1,5 @@
+#include <QUrl>
+#include "mythcorecontext.h"
 #include "mythlogging.h"
 
 #include "streamingringbuffer.h"
@@ -5,7 +7,8 @@
 #define LOC QString("StreamRingBuf(%1): ").arg(filename)
 
 StreamingRingBuffer::StreamingRingBuffer(const QString &lfilename)
-  : RingBuffer(kRingBuffer_HTTP), m_context(NULL)
+  : RingBuffer(kRingBuffer_HTTP), m_context(NULL), m_streamed(true),
+    m_allowSeeks(false)
 {
     startreadahead = false;
     OpenFile(lfilename);
@@ -13,13 +16,19 @@ StreamingRingBuffer::StreamingRingBuffer(const QString &lfilename)
 
 StreamingRingBuffer::~StreamingRingBuffer()
 {
+    rwlock.lockForWrite();
     if (m_context)
         url_close(m_context);
+    rwlock.unlock();
 }
 
 bool StreamingRingBuffer::IsOpen(void) const
 {
-    return m_context;
+    bool result;
+    rwlock.lockForRead();
+    result = (bool)m_context;
+    rwlock.unlock();
+    return result;
 }
 
 long long StreamingRingBuffer::GetReadPosition(void) const
@@ -29,13 +38,30 @@ long long StreamingRingBuffer::GetReadPosition(void) const
 
 bool StreamingRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
 {
+    avcodeclock->lock();
     av_register_all();
+    avcodeclock->unlock();
+
+    rwlock.lockForWrite();
 
     safefilename = lfilename;
     filename = lfilename;
-    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Trying %1").arg(filename));
+
+    // TODO check whether local area file
+    QUrl url(filename);
+    QString ext = filename.right(3).toLower();
+    if (url.scheme().toLower() == "http" && (ext == "mp4" || ext == "m4v"))
+    {
+        m_allowSeeks = true;
+        m_streamed   = false; // yes - counterintuitive
+    }
+
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Trying %1 (allow seeks: %2")
+        .arg(filename).arg(m_allowSeeks));
 
     int res = url_open(&m_context, filename.toAscii(), URL_RDONLY);
+
+    rwlock.unlock();
 
     if (res < 0 || !m_context)
     {
@@ -52,7 +78,11 @@ long long StreamingRingBuffer::Seek(long long pos, int whence, bool has_lock)
     if (!m_context)
         return 0;
 
-    if (url_seek(m_context, pos, whence) < 0)
+    poslock.lockForWrite();
+    int seek = url_seek(m_context, pos, whence);
+    poslock.unlock();
+
+    if (seek < 0)
     {
         ateof = true;
         return 0;
@@ -69,7 +99,10 @@ int StreamingRingBuffer::safe_read(void *data, uint sz)
 
 long long StreamingRingBuffer::GetRealFileSize(void) const
 {
+    long long result = -1;
+    rwlock.lockForRead();
     if (m_context)
-        return url_filesize(m_context);
-    return -1;
+        result = url_filesize(m_context);
+    rwlock.unlock();
+    return result;
 }

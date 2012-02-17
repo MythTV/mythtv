@@ -7,12 +7,13 @@ Provides base classes for managing system calls.
 from exceptions import MythError, MythDBError, MythFileError
 from logging import MythLog
 from altdict import DictData, OrdDict
-from utility import levenshtein
+from utility import levenshtein, DequeBuffer
 from database import DBCache
 
 from subprocess import Popen
 from select import select
 from lxml import etree
+from time import sleep
 import shlex
 import os
 
@@ -25,12 +26,42 @@ class System( DBCache ):
     """
     logmodule = 'Python system call handler'
 
+    class Process( object ):
+        def __init__(self, cmd, useshell, log):
+            self.cmd = cmd
+            self.log = log
+            log(MythLog.SYSTEM, MythLog.INFO, 'Running external command', cmd)
+
+            if not useshell:
+                cmd = shlex.split(cmd)
+            self._fd = Popen(cmd, stdout=-1, stderr=-1, shell=useshell)
+
+            self.stdout = DequeBuffer(inp=self._fd.stdout)
+            self.stderr = DequeBuffer(inp=self._fd.stderr)
+
+        def poll(self):
+            return self._fd.poll()
+
+        def wait(self):
+            res = self._fd.wait()
+            while True:
+                # wait until pipes have been closed
+                if self.stdout._closed and self.stderr._closed:
+                    break
+                sleep(0.01)
+            return self._fd.wait()
+
     @classmethod
     def system(cls, command, db=None):
-        path = command.split()[0]
+        command = command.lsplit(' ',1)
+        path = command[0]
+        args = ''
+        if len(command) > 1:
+            args = command[1]
+
         try:
             s = cls(path, db=db)
-            res = s._runcmd(command)
+            res = s(args)
             if len(res):
                 s.log(MythLog.SYSTEM, MythLog.DEBUG, '---- Output ----', res)
             if len(s.stderr):
@@ -83,6 +114,32 @@ class System( DBCache ):
 
     def __call__(self, *args): return self.command(*args)
 
+    def command(self, *args):
+        """
+        obj(*args) -> output string
+
+        Executes external command, adding one or more strings to the
+            command during the call. If call exits with a code not
+            equal to 0, a MythError will be raised. The error code and
+            stderr will be available in the exception and this object
+            as attributes 'returncode' and 'stderr'.
+        """
+        if self.path is '':
+            return ''
+        cmd = '%s %s' % (self.path, ' '.join(['%s' % a for a in args]))
+        return self._runcmd(cmd)
+
+    def _runcmd(self, cmd):
+        p = self.Process(cmd, self.useshell, self.log)
+        p.wait()
+
+        self.returncode = p.poll()
+        self.stderr = p.stderr.read()
+        if self.returncode:
+            raise MythError(MythError.SYSTEM,self.returncode,cmd,self.stderr)
+
+        return p.stdout.read()
+
     def __str__(self):
         return "<%s '%s' at %s>" % \
                 (str(self.__class__).split("'")[1].split(".")[-1],
@@ -100,47 +157,11 @@ class System( DBCache ):
         """
         self.path += ' '+' '.join(['%s' % a for a in args])
 
-    def command(self, *args):
-        """
-        obj.command(*args) -> output string
-
-        Executes external command, adding one or more strings to the
-            command during the call. If call exits with a code not
-            equal to 0, a MythError will be raised. The error code and
-            stderr will be available in the exception and this object
-            as attributes 'returncode' and 'stderr'.
-        """
+    def _runasync(self, *args):
         if self.path is '':
             return ''
-        arg = ' '+' '.join(['%s' % a for a in args])
-        return self._runcmd('%s %s' % (self.path, arg))
-
-    def _runshell(self, cmd):
-        self.log(MythLog.SYSTEM, MythLog.INFO, 'Running external command', cmd)
-        fd = Popen(cmd, stdout=-1, stderr=-1, shell=True)
-        return self._runshared(fd, cmd)
-
-    def _runnative(self, cmd):
-        self.log(MythLog.SYSTEM, MythLog.INFO, 'Running external command', cmd)
-        args = shlex.split(cmd)
-        fd = Popen(args, stdout=-1, stderr=-1)
-        return self._runshared(fd, cmd)
-
-    def _runshared(self, fd, cmd):
-        pmap = {fd.stdout:'', fd.stderr:''}
-        while fd.poll() is None:
-            socks = select([fd.stdout, fd.stderr],[],[])
-            for sock in socks[0]:
-                pmap[sock] += sock.read()
-        self.stderr = pmap[fd.stderr]
-
-        self.returncode = fd.poll()
-        if self.returncode:
-            raise MythError(MythError.SYSTEM,self.returncode,cmd,self.stderr)
-        return pmap[fd.stdout]
-
-    def _runcmd(self, cmd):
-        return self._runshell(cmd) if self.useshell else self._runnative(cmd)
+        cmd = '%s %s' % (self.path, ' '.join(['%s' % a for a in args]))
+        return self.Process(cmd, self.useshell, self.log)
 
 class Metadata( DictData ):
     _global_type = {'title':3,      'subtitle':3,       'tagline':3,
@@ -311,10 +332,10 @@ class Grabber( System ):
 
         for item in xml.getiterator('item'):
             yield self.cls(item)
- 
-    def command(self, *args):
-        return self._processMetadata(System.command(self, *args))
 
+    def command(self, *args):
+        return self._processMetadata(super(Grabber, self).command(*args))
+ 
     def search(self, phrase, subtitle=None, tolerance=None, func=None):
         """
         obj.search(phrase, subtitle=None, tolerance=None) -> result generator
@@ -395,7 +416,7 @@ class SystemEvent( System ):
 
     def command(self, eventdata):
         """
-        obj.command(eventdata) -> output string
+        obj(eventdata) -> output string
 
         Executes external command, substituting event information into the
             command string. If call exits with a code not
