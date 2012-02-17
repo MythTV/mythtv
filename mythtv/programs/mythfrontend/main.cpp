@@ -1673,7 +1673,7 @@ int main(int argc, char **argv)
     NetworkControl *networkControl = NULL;
     if (gCoreContext->GetNumSetting("NetworkControlEnabled", 0))
     {
-        int port = gCoreContext->GetNumSetting("NetworkControlPort", 6545);
+        int port = gCoreContext->GetNumSetting("NetworkControlPort", 6546);
         networkControl = new NetworkControl();
         if (!networkControl->listen(gCoreContext->MythHostAddress(), port))
             LOG(VB_GENERAL, LOG_ERR,
