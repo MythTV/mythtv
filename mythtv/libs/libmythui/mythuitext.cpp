@@ -515,7 +515,7 @@ bool MythUIText::Layout(QString & paragraph, QTextLayout *layout, bool final,
         min_rect |= line.naturalTextRect();
         ++num_lines;
 
-        if (final)
+        if (final && line.textLength())
         {
         /**
          * FontMetrics::width() returns a value that is good for spacing
@@ -527,24 +527,14 @@ bool MythUIText::Layout(QString & paragraph, QTextLayout *layout, bool final,
          */
             QFontMetrics fm(GetFontProperties()->face());
             int bearing;
-            int position;
 
-            position = last_line;
-            if (m_CutMessage.length() > position)
-            {
-                bearing = fm.leftBearing(m_CutMessage[position]);
-                if (m_leftBearing > bearing)
-                    m_leftBearing = bearing;
-            }
-
-            position = (last_line + line.textLength() - 1);
-            if (m_CutMessage.length() > position && position >= 0)
-            {
-                bearing = fm.rightBearing
-                            (m_CutMessage[position]);
-                if (m_rightBearing > bearing)
-                    m_rightBearing = bearing;
-            }
+            bearing = fm.leftBearing(m_CutMessage[last_line]);
+            if (m_leftBearing > bearing)
+                m_leftBearing = bearing;
+            bearing = fm.rightBearing
+                      (m_CutMessage[last_line + line.textLength() - 1]);
+            if (m_rightBearing > bearing)
+                m_rightBearing = bearing;
         }
     }
 

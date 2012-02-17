@@ -1,3 +1,6 @@
+// This is an automatically generated file
+// Do not edit
+
 void strings_null() {
     ThemeUI::tr("Bookmark Manager");
     ThemeUI::tr("Cancel");
@@ -21,7 +24,4 @@ void strings_null() {
     ThemeUI::tr("Edit RSS News Feed");
     ThemeUI::tr("Contexts");
     ThemeUI::tr("Actions");
-    ThemeUI::tr("RSS Feeds");
-    ThemeUI::tr("MythNews Configuration");
-    ThemeUI::tr("Minutes");
 }
