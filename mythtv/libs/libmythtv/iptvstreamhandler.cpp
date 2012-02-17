@@ -1,7 +1,15 @@
 // -*- Mode: c++ -*-
 
 // System headers
-#include <sys/socket.h>
+#ifdef _WIN32
+# ifndef _MSC_VER
+#  include <ws2tcpip.h>
+# endif
+#else
+# include <sys/socket.h>
+# include <netinet/in.h>
+# include <netinet/ip.h>
+#endif
 
 // Qt headers
 #include <QUdpSocket>
@@ -151,6 +159,7 @@ void IPTVStreamHandler::run(void)
                     QString("Increasing buffer size to %1 failed")
                     .arg(buf_size) + ENO);
             }
+            /*
             int broadcast = 1;
             ok = setsockopt(fd, SOL_SOCKET, SO_BROADCAST,
                             (char *)&broadcast, sizeof(broadcast));
@@ -159,10 +168,29 @@ void IPTVStreamHandler::run(void)
                 LOG(VB_GENERAL, LOG_INFO, LOC +
                     QString("Enabling broadcast failed") + ENO);
             }
+            */
             m_sockets[i]->setSocketDescriptor(
                 fd, QAbstractSocket::UnconnectedState, QIODevice::ReadOnly);
 
-            m_sockets[i]->bind(m_addr, m_ports[i]);
+            m_sockets[i]->bind(QHostAddress::Any, m_ports[i]);
+            
+            if (m_addr != QHostAddress::Any)
+            {
+                //m_sockets[i]->joinMulticastGroup(m_addr); // needs Qt 4.8
+                LOG(VB_GENERAL, LOG_INFO, LOC + QString("Joining %1")
+                    .arg(m_addr.toString()));
+                struct ip_mreq imr;
+                memset(&imr, 0, sizeof(struct ip_mreq));
+                imr.imr_multiaddr.s_addr = inet_addr(
+                    m_addr.toString().toAscii().constData());
+                imr.imr_interface.s_addr = htonl(INADDR_ANY);
+                if (setsockopt(fd, IPPROTO_IP, IP_ADD_MEMBERSHIP,
+                               &imr, sizeof(imr)) < 0)
+                {
+                    LOG(VB_GENERAL, LOG_ERR, LOC +
+                        "setsockopt - IP_ADD_MEMBERSHIP " + ENO);
+                }
+            }
         }
     }
     if (m_use_rtp_streaming)
