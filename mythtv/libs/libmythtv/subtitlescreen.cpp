@@ -11,10 +11,13 @@
 
 #define LOC      QString("Subtitles: ")
 #define LOC_WARN QString("Subtitles Warning: ")
-#define PAD_WIDTH  0.20
-#define PAD_HEIGHT 0.04
+static const float PAD_WIDTH  = 0.20;
+static const float PAD_HEIGHT = 0.04;
 
-static const float LINE_SPACING = 1.1765f;
+// Normal font height is designed to be 1/20 of safe area height, with
+// extra blank space between lines to make 17 lines within the safe
+// area.
+static const float LINE_SPACING = (20.0 / 17.0);
 
 SubtitleScreen::SubtitleScreen(MythPlayer *player, const char * name,
                                int fontStretch) :
@@ -1132,9 +1135,9 @@ void FormattedTextSubtitle::Layout(void)
     int anchor_height = 0;
     for (int i = 0; i < m_lines.size(); i++)
     {
-        QSize sz = m_lines[i].CalcSize();
+        QSize sz = m_lines[i].CalcSize(LINE_SPACING);
         anchor_width = max(anchor_width, sz.width());
-        anchor_height += sz.height() * LINE_SPACING;
+        anchor_height += sz.height();
     }
 
     // Adjust the anchor point according to actual width and height
@@ -1159,7 +1162,7 @@ void FormattedTextSubtitle::Layout(void)
             m_lines[i].x_indent = anchor_x;
         if (m_lines[i].y_indent < 0)
             m_lines[i].y_indent = y;
-        y += m_lines[i].CalcSize().height() * LINE_SPACING;
+        y += m_lines[i].CalcSize(LINE_SPACING).height();
         // Prune leading all-whitespace chunks.
         while (!m_lines[i].chunks.isEmpty() &&
                m_lines[i].chunks.first().text.trimmed().isEmpty())
@@ -1325,12 +1328,15 @@ void SubtitleScreen::SetFontSizes(int nSmall, int nMedium, int nLarge)
 }
 
 QSize SubtitleScreen::CalcTextSize(const QString &text,
-                                   const CC708CharacterAttribute &format) const
+                                   const CC708CharacterAttribute &format,
+                                   float layoutSpacing) const
 {
     QFont *font = Get708Font(format)->GetFace();
     QFontMetrics fm(*font);
     int width = fm.width(text) + fm.maxWidth() * PAD_WIDTH;
     int height = fm.height() * (1 + PAD_HEIGHT);
+    if (layoutSpacing > 0 && !text.trimmed().isEmpty())
+        height = max(height, (int)(font->pixelSize() * layoutSpacing));
     return QSize(width, height);
 }
 
