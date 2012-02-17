@@ -56,8 +56,9 @@ class MythCoreContextPrivate : public QObject
     QObject         *m_GUIobject;
     QString          m_appBinaryVersion;
 
-    QMutex  m_hostnameLock;      ///< Locking for thread-safe copying of:
+    QMutex  m_localHostLock;      ///< Locking for thread-safe copying of:
     QString m_localHostname;     ///< hostname from mysql.txt or gethostname()
+    QMutex  m_masterHostLock;
     QString m_masterHostname;    ///< master backend hostname
 
     QMutex      m_sockLock;      ///< protects both m_serverSock and m_eventSock
@@ -842,7 +843,7 @@ QString MythCoreContext::GetMasterHostPrefix(QString storageGroup)
 
 QString MythCoreContext::GetMasterHostName(void)
 {
-    QMutexLocker locker(&d->m_hostnameLock);
+    QMutexLocker locker(&d->m_masterHostLock);
 
     if (d->m_masterHostname.isEmpty())
     {
@@ -876,7 +877,7 @@ void MythCoreContext::ActivateSettingsCache(bool activate)
 
 QString MythCoreContext::GetHostName(void)
 {
-    QMutexLocker (&d->m_hostnameLock);
+    QMutexLocker (&d->m_localHostLock);
     QString tmp = d->m_localHostname;
     tmp.detach();
     return tmp;
@@ -1324,7 +1325,7 @@ void MythCoreContext::dispatchNow(const MythEvent &event)
 
 void MythCoreContext::SetLocalHostname(const QString &hostname)
 {
-    QMutexLocker locker(&d->m_hostnameLock);
+    QMutexLocker locker(&d->m_localHostLock);
     d->m_localHostname = hostname;
     d->m_database->SetLocalHostname(hostname);
 }
