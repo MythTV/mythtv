@@ -1267,11 +1267,12 @@ void PlaybackBox::UpdateUIGroupList(const QStringList &groupPreferences)
                 m_currentGroup = groupname.toLower();
             }
 
-            if (groupname.isEmpty())
-                groupname = m_groupDisplayName;
+            QString displayName = groupname;
+            if (displayName.isEmpty())
+                displayName = m_groupDisplayName;
 
-            item->SetText(groupname, "name");
-            item->SetText(groupname);
+            item->SetText(displayName, "name");
+            item->SetText(displayName);
 
             int count = m_progLists[groupname.toLower()].size();
             item->SetText(QString::number(count), "reccount");
