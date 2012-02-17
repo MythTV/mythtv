@@ -22,7 +22,7 @@ MYTHTHEMES_DL="http://themes.mythtv.org/themes/repository/trunk/themes.zip"
 REAL_XMLPLUGINS="browser-ui.xml gallery-ui.xml game-ui.xml music-ui.xml \
     mytharchive-ui.xml mythburn-ui.xml netvision-ui.xml \
     news-ui.xml zoneminder-ui.xml weather-ui.xml \
-    mythnative-ui.xml"
+    mythnative-ui.xml musicsettings-ui.xml"
 
 BOGUS_XMLPLUGINS="dvd-ui.xml gallery2-ui.xml" # dvd-ui.xml (DVD ripper) needs
     # to be in this list to be excluded from mythtv. It isn't used anymore,
@@ -178,7 +178,7 @@ updateplugin mytharchive mytharchive-ui.xml mythburn-ui.xml mythnative-ui.xml
 updateplugin mythbrowser browser-ui.xml
 updateplugin mythgallery gallery-ui.xml
 updateplugin mythgame game-ui.xml
-updateplugin mythmusic music-ui.xml
+updateplugin mythmusic music-ui.xml musicsettings-ui.xml
 updateplugin mythnetvision netvision-ui.xml
 updateplugin mythnews news-ui.xml
 updateplugin mythweather weather-ui.xml
