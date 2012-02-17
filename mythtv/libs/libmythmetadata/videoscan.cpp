@@ -90,7 +90,9 @@ VideoScannerThread::~VideoScannerThread()
 
 void VideoScannerThread::SetDirs(QStringList dirs)
 {
-    QString master = gCoreContext->GetMasterHostName();
+    QString master = gCoreContext->IsMasterBackend() ? 
+                            gCoreContext->GetHostName() :
+                            gCoreContext->GetMasterHostName();
     QStringList searchhosts, mdirs;
     m_offlineSGHosts.clear();
 
