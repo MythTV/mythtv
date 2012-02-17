@@ -5003,6 +5003,14 @@ void MythPlayer::ResetTotalDuration(void)
     decoder->ResetTotalDuration();
 }
 
+void MythPlayer::SaveTotalFrames(void)
+{
+    if (!decoder)
+        return;
+
+    decoder->SaveTotalFrames();
+}
+
 static unsigned dbg_ident(const MythPlayer *player)
 {
     static QMutex   dbg_lock;
