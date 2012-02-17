@@ -5150,9 +5150,9 @@ bool RecMetadataEdit::Create()
     }
     m_inetrefEdit->SetText(m_progInfo->GetInetRef());
     m_inetrefEdit->SetMaxLength(255);
-    m_seasonSpin->SetRange(0,9999,1,1);
+    m_seasonSpin->SetRange(0,9999,1,5);
     m_seasonSpin->SetValue(m_progInfo->GetSeason());
-    m_episodeSpin->SetRange(0,9999,1,1);
+    m_episodeSpin->SetRange(0,9999,1,10);
     m_episodeSpin->SetValue(m_progInfo->GetEpisode());
 
     connect(okButton, SIGNAL(Clicked()), SLOT(SaveChanges()));
