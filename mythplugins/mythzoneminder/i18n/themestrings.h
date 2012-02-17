@@ -1,3 +1,6 @@
+// This is an automatically generated file
+// Do not edit
+
 void strings_null() {
     ThemeUI::tr("Edit Monitor Function");
     ThemeUI::tr("Enabled");
