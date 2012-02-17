@@ -2210,15 +2210,7 @@ void PlaybackBox::deleteSelected(MythUIButtonListItem *item)
     if (!pginfo)
         return;
 
-    bool undelete_possible =
-            gCoreContext->GetNumSetting("AutoExpireInsteadOfDelete", 0);
-
-    if (pginfo->GetRecordingGroup() == "Deleted" && undelete_possible)
-    {
-        RemoveProgram(pginfo->GetChanID(), pginfo->GetRecordingStartTime(),
-                      /*forgetHistory*/ false, /*force*/ false);
-    }
-    else if (pginfo->GetAvailableStatus() == asPendingDelete)
+    if (pginfo->GetAvailableStatus() == asPendingDelete)
     {
         LOG(VB_GENERAL, LOG_ERR, QString("deleteSelected(%1) -- failed ")
                 .arg(pginfo->toString(ProgramInfo::kTitleSubtitle)) +
@@ -2542,7 +2534,8 @@ void PlaybackBox::ShowDeletePopup(DeletePopupType type)
     const char *tmpslot = NULL;
 
     if ((kDeleteRecording == type) &&
-        (delItem->GetRecordingGroup() != "LiveTV"))
+        delItem->GetRecordingGroup() != "Deleted" &&
+        delItem->GetRecordingGroup() != "LiveTV")
     {
         tmpmessage = tr("Yes, and allow re-record");
         tmpslot = SLOT(DeleteForgetHistory());
