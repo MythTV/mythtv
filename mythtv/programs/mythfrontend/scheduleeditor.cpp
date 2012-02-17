@@ -1358,8 +1358,8 @@ bool MetadataOptions::Create()
     connect(m_seasonSpin, SIGNAL(itemSelected(MythUIButtonListItem*)),
                           SLOT(ValuesChanged()));
 
-    m_seasonSpin->SetRange(0,9999,1,1);
-    m_episodeSpin->SetRange(0,9999,1,1);
+    m_seasonSpin->SetRange(0,9999,1,5);
+    m_episodeSpin->SetRange(0,9999,1,10);
 
     // InetRef/Seas/Ep (needs to be built from original rule, not pginfo)
     if (m_recInfo)
