@@ -86,13 +86,13 @@ class MUI_PUBLIC MythUIText : public MythUIType, public StorageUser
     void SetCanvasPosition(int x, int y);
     void ShiftCanvas(int x, int y);
 
-    bool Layout(QString & paragraph, QTextLayout *layout,
+    bool Layout(QString & paragraph, QTextLayout *layout, bool final,
 		bool & overflow, qreal width, qreal & height, bool force,
 		qreal & last_line_width, QRectF & min_rect, int & num_lines);
     bool LayoutParagraphs(const QStringList & paragraphs,
 			  const QTextOption & textoption,
 			  qreal width, qreal & height, QRectF & min_rect,
-			  qreal & last_line_width, int & num_lines);
+			  qreal & last_line_width, int & num_lines, bool final);
     bool GetNarrowWidth(const QStringList & paragraphs,
 			const QTextOption & textoption, qreal & width);
     void FillCutMessage(void);
@@ -115,6 +115,10 @@ class MUI_PUBLIC MythUIText : public MythUIType, public StorageUser
     bool m_ShrinkNarrow;
     Qt::TextElideMode m_Cutdown;
     bool m_MultiLine;
+    int  m_Ascent;
+    int  m_Descent;
+    int  m_leftBearing;
+    int  m_rightBearing;
     int  m_Leading;
     int  m_extraLeading;
     int  m_lineHeight;

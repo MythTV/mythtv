@@ -42,6 +42,7 @@ MythUIText::MythUIText(MythUIType *parent, const QString &name)
     m_scrolling = false;
     m_scrollDirection = ScrollNone;
     m_textCase = CaseNormal;
+    m_Ascent = m_Descent = m_leftBearing = m_rightBearing = 0;
     m_Leading = 1;
     m_extraLeading = 0;
     m_lineHeight = 0;
@@ -79,6 +80,7 @@ MythUIText::MythUIText(const QString &text, const MythFontProperties &font,
     m_scrolling = false;
     m_scrollDirection = ScrollNone;
     m_textCase = CaseNormal;
+    m_Ascent = m_Descent = m_leftBearing = m_rightBearing = 0;
     m_Leading = 1;
     m_extraLeading = 0;
     m_lineHeight = 0;
@@ -356,6 +358,30 @@ void MythUIText::DrawSelf(MythPainter *p, int xoffset, int yoffset,
 
     int alpha = CalcAlpha(alphaMod);
 
+    if (m_Ascent)
+    {
+        drawrect.setY(drawrect.y() - m_Ascent);
+        canvas.setY(canvas.y() + m_Ascent);
+        canvas.setHeight(canvas.height() + (m_Descent * 2));
+    }
+    if (m_Descent)
+    {
+        drawrect.setHeight(drawrect.height() + m_Descent);
+        canvas.setHeight(canvas.height() + m_Descent);
+    }
+
+    if (m_leftBearing)
+    {
+        drawrect.setX(drawrect.x() + m_leftBearing);
+        canvas.setX(canvas.x() - m_leftBearing);
+        canvas.setWidth(canvas.width() - (m_leftBearing * 2));
+    }
+    if (m_rightBearing)
+    {
+        drawrect.setWidth(drawrect.width() - m_rightBearing);
+        canvas.setWidth(canvas.width() - m_rightBearing);
+    }
+
     if (GetFontProperties()->hasOutline())
     {
         QTextLayout::FormatRange range;
@@ -414,7 +440,7 @@ void MythUIText::DrawSelf(MythPainter *p, int xoffset, int yoffset,
                       *GetFontProperties(), alpha, drawrect);
 }
 
-bool MythUIText::Layout(QString & paragraph, QTextLayout *layout,
+bool MythUIText::Layout(QString & paragraph, QTextLayout *layout, bool final,
                         bool & overflow, qreal width, qreal & height,
                         bool force, qreal & last_line_width,
                         QRectF & min_rect, int & num_lines)
@@ -488,6 +514,28 @@ bool MythUIText::Layout(QString & paragraph, QTextLayout *layout,
         last_line_width = line.naturalTextWidth();
         min_rect |= line.naturalTextRect();
         ++num_lines;
+
+        if (final)
+        {
+        /**
+         * FontMetrics::width() returns a value that is good for spacing
+         * the characters, but may not represent the *full* width.  We need
+         * to make sure we have enough space for the *full* width or
+         * characters could be clipped.
+         *
+         * bearing will be negative if the char 'leans' over the "width"
+         */
+            QFontMetrics fm(GetFontProperties()->face());
+            int bearing;
+
+            bearing = fm.leftBearing(m_CutMessage[last_line]);
+            if (m_leftBearing > bearing)
+                m_leftBearing = bearing;
+            bearing = fm.rightBearing
+                      (m_CutMessage[last_line + line.textLength() - 1]);
+            if (m_rightBearing > bearing)
+                m_rightBearing = bearing;
+        }
     }
 
     layout->endLayout();
@@ -498,7 +546,7 @@ bool MythUIText::LayoutParagraphs(const QStringList & paragraphs,
                                   const QTextOption & textoption,
                                   qreal width, qreal & height,
                                   QRectF & min_rect, qreal & last_line_width,
-                                  int & num_lines)
+                                  int & num_lines, bool final)
 {
     QStringList::const_iterator Ipara;
     QVector<QTextLayout *>::iterator Ilayout;
@@ -522,13 +570,13 @@ bool MythUIText::LayoutParagraphs(const QStringList & paragraphs,
         para = *Ipara;
         saved_height = height;
         saved_rect = min_rect;
-        if (!Layout(para, layout, overflow, width, height, false,
+        if (!Layout(para, layout, final, overflow, width, height, false,
                     last_line_width, min_rect, num_lines))
         {
             // Again, with cut down
             min_rect = saved_rect;
             height = saved_height;
-            Layout(para, layout, overflow, width, height, true,
+            Layout(para, layout, final, overflow, width, height, true,
                    last_line_width, min_rect, num_lines);
             break;
         }
@@ -562,7 +610,7 @@ bool MythUIText::GetNarrowWidth(const QStringList & paragraphs,
         height = 0;
 
         LayoutParagraphs(paragraphs, textoption, width, height,
-                         min_rect, last_line_width, num_lines);
+                         min_rect, last_line_width, num_lines, false);
 
         if (height > m_drawRect.height())
         {
@@ -687,6 +735,8 @@ void MythUIText::FillCutMessage(void)
 
         for (++Ilayout ; Ilayout != m_Layouts.end(); ++Ilayout)
             (*Ilayout)->clearLayout();
+
+        m_Ascent = m_Descent = m_leftBearing = m_rightBearing = 0;
     }
     else
     {
@@ -739,12 +789,23 @@ void MythUIText::FillCutMessage(void)
             width = m_Area.width();
 
         height = 0;
+        m_leftBearing = m_rightBearing = 0;
         LayoutParagraphs(paragraphs, textoption, width, height,
-                         min_rect, last_line_width, num_lines);
+                         min_rect, last_line_width, num_lines, true);
 
         m_Canvas.setRect(0, 0, min_rect.x() + min_rect.width(), height);
         m_scrollPause = ScrollBounceDelay;
         m_scrollBounce = false;
+
+        /**
+         * FontMetrics::height() returns a value that is good for spacing
+         * the lines, but may not represent the *full* height.  We need
+         * to make sure we have enough space for the *full* height or
+         * characters could be clipped.
+         */
+        QRect actual = fm.boundingRect(m_CutMessage);
+        m_Ascent = -(actual.y() + fm.ascent());
+        m_Descent = actual.height() - fm.height();
     }
 
     if (m_scrolling)
