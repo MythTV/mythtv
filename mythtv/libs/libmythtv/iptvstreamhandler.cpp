@@ -6,6 +6,7 @@
 // MythTV headers
 #include "iptvstreamhandler.h"
 #include "rtppacketbuffer.h"
+#include "udppacketbuffer.h"
 #include "rtptsdatapacket.h"
 #include "rtpdatapacket.h"
 #include "rtpfecpacket.h"
@@ -87,17 +88,18 @@ void IPTVStreamHandler::Return(IPTVStreamHandler * & ref)
 }
 
 IPTVStreamHandler::IPTVStreamHandler(const QString &device) :
-    StreamHandler(device)
+    StreamHandler(device), m_use_rtp_streaming(true)
 {
     memset(m_sockets, 0, sizeof(m_sockets));
     QStringList parts = device.split("!");
-    if (parts.size() >= 5)
+    if (parts.size() >= 6)
     {
-        m_addr = QHostAddress(parts[0]);
-        m_ports[0] = parts[1].toInt();
-        m_ports[1] = parts[2].toInt();
-        m_ports[2] = parts[3].toInt();
-        m_bitrate = parts[4].toInt();
+        m_use_rtp_streaming = (parts[0].toUpper() == "RTP");
+        m_addr = QHostAddress(parts[1]);
+        m_ports[0] = parts[2].toInt();
+        m_ports[1] = parts[3].toInt();
+        m_ports[2] = parts[4].toInt();
+        m_bitrate = parts[5].toInt();
     }
     else
     {
@@ -136,7 +138,10 @@ void IPTVStreamHandler::run(void)
             m_sockets[i]->bind(m_addr, m_ports[i]);
         }
     }
-    m_buffer = new RTPPacketBuffer(m_bitrate);
+    if (m_use_rtp_streaming)
+        m_buffer = new RTPPacketBuffer(m_bitrate);
+    else
+        m_buffer = new UDPPacketBuffer(m_bitrate);
     m_write_helper = new IPTVStreamHandlerWriteHelper(this);
     m_write_helper->Start();
 
@@ -172,7 +177,7 @@ void IPTVStreamHandlerReadHelper::ReadPending(void)
     {
         while (m_socket->hasPendingDatagrams())
         {
-            RTPDataPacket packet(m_parent->m_buffer->GetEmptyPacket());
+            UDPPacket packet(m_parent->m_buffer->GetEmptyPacket());
             QByteArray &data = packet.GetDataReference();
             data.resize(m_socket->pendingDatagramSize());
             m_socket->readDatagram(data.data(), data.size(),
@@ -184,7 +189,7 @@ void IPTVStreamHandlerReadHelper::ReadPending(void)
     {
         while (m_socket->hasPendingDatagrams())
         {
-            RTPFECPacket packet(m_parent->m_buffer->GetEmptyPacket());
+            UDPPacket packet(m_parent->m_buffer->GetEmptyPacket());
             QByteArray &data = packet.GetDataReference();
             data.resize(m_socket->pendingDatagramSize());
             m_socket->readDatagram(data.data(), data.size(),
@@ -201,7 +206,38 @@ void IPTVStreamHandlerWriteHelper::timerEvent(QTimerEvent*)
     if (!m_parent->m_buffer->HasAvailablePacket())
         return;
 
-    while (true)
+    while (!m_parent->m_use_rtp_streaming)
+    {
+        UDPPacket packet(m_parent->m_buffer->PopDataPacket());
+
+        if (packet.GetDataReference().isEmpty())
+            break;
+
+        int remainder = 0;
+        {
+            QMutexLocker locker(&m_parent->_listener_lock);
+            QByteArray &data = packet.GetDataReference();
+            IPTVStreamHandler::StreamDataList::const_iterator sit;
+            sit = m_parent->_stream_data_list.begin();
+            for (; sit != m_parent->_stream_data_list.end(); ++sit)
+            {
+                remainder = sit.key()->ProcessData(
+                    reinterpret_cast<const unsigned char*>(data.data()),
+                    data.size());
+            }
+        }
+
+        if (remainder != 0)
+        {
+            LOG(VB_RECORD, LOG_INFO, LOC_WH +
+                QString("data_length = %1 remainder = %2")
+                .arg(packet.GetDataReference().size()).arg(remainder));
+        }
+
+        m_parent->m_buffer->FreePacket(packet);
+    }
+
+    while (m_parent->m_use_rtp_streaming)
     {
         RTPDataPacket packet(m_parent->m_buffer->PopDataPacket());
 
@@ -234,7 +270,7 @@ void IPTVStreamHandlerWriteHelper::timerEvent(QTimerEvent*)
             if (remainder != 0)
             {
                 LOG(VB_RECORD, LOG_INFO, LOC_WH +
-                    QString("RunTS(): data_length = %1 remainder = %2")
+                    QString("data_length = %1 remainder = %2")
                     .arg(ts_packet.GetTSDataSize()).arg(remainder));
             }
         }

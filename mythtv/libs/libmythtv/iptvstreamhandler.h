@@ -11,15 +11,12 @@ using namespace std;
 #include <QMutex>
 #include <QMap>
 
-#include "util.h"
-#include "DeviceReadBuffer.h"
-#include "mpegstreamdata.h"
 #include "streamhandler.h"
-#include "dtvconfparserhelpers.h"
 
 class IPTVStreamHandler;
 class DTVSignalMonitor;
-class RTPPacketBuffer;
+class MPEGStreamData;
+class PacketBuffer;
 class IPTVChannel;
 
 class IPTVStreamHandlerReadHelper : QObject
@@ -103,7 +100,8 @@ class IPTVStreamHandler : public StreamHandler
     QUdpSocket *m_sockets[3];
     IPTVStreamHandlerReadHelper *m_read_helpers[3];
     IPTVStreamHandlerWriteHelper *m_write_helper;
-    RTPPacketBuffer *m_buffer;
+    PacketBuffer *m_buffer;
+    bool m_use_rtp_streaming;
 
     // for implementing Get & Return
     static QMutex                            s_handlers_lock;

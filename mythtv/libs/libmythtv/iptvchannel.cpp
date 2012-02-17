@@ -84,12 +84,13 @@ bool IPTVChannel::Tune(const QString &freqid, int finetune)
 
     // TODO IMPLEMENT query from DB
 
+    QString type = "rtp"; // can be "rtp" or "udp"
     QHostAddress addr(QHostAddress::Any);
-
-    int ports[3] = { 5555, -1, -1, };
+    int ports[3] = { (type=="rtp")?5555:6666, -1, -1, };
     int bitrate = 5000000;
 
-    QString channel_id = QString("%1!%2!%3!%4!%5")
+    QString channel_id = QString("%1!%2!%3!%4!%5!%6")
+        .arg(type)
         .arg(addr.toString()).arg(ports[0]).arg(ports[1]).arg(ports[2])
         .arg(bitrate);
 
