@@ -876,7 +876,7 @@ void MythCoreContext::ActivateSettingsCache(bool activate)
 
 QString MythCoreContext::GetHostName(void)
 {
-    QMutexLocker (&d->m_hostnameLock);
+//    QMutexLocker (&d->m_hostnameLock);
     QString tmp = d->m_localHostname;
     tmp.detach();
     return tmp;
@@ -1324,7 +1324,7 @@ void MythCoreContext::dispatchNow(const MythEvent &event)
 
 void MythCoreContext::SetLocalHostname(const QString &hostname)
 {
-    QMutexLocker locker(&d->m_hostnameLock);
+//    QMutexLocker locker(&d->m_hostnameLock);
     d->m_localHostname = hostname;
     d->m_database->SetLocalHostname(hostname);
 }
