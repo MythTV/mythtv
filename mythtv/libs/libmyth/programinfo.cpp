@@ -1405,11 +1405,11 @@ void ProgramInfo::ToMap(InfoMap &progMap,
     else // if (IsRecording())
     {
         progMap["starttime"] = MythDateTimeToString(startts, kTime);
-        progMap["startdate"] = MythDateTimeToString(startts, kDateFull | kAddYear | kSimplify);
+        progMap["startdate"] = MythDateTimeToString(startts, kDateFull | kSimplify);
         progMap["shortstartdate"] = MythDateTimeToString(startts, kDateShort);
         progMap["startyear"] = startts.toString("yyyy");
         progMap["endtime"] = MythDateTimeToString(endts, kTime);
-        progMap["enddate"] = MythDateTimeToString(endts, kDateFull | kAddYear | kSimplify);
+        progMap["enddate"] = MythDateTimeToString(endts, kDateFull | kSimplify);
         progMap["shortenddate"] = MythDateTimeToString(endts, kDateShort);
         progMap["endyear"] = endts.toString("yyyy");
         progMap["recstarttime"] = MythDateTimeToString(recstartts, kTime);
@@ -1421,7 +1421,7 @@ void ProgramInfo::ToMap(InfoMap &progMap,
     }
 
     progMap["timedate"] = MythDateTimeToString(recstartts,
-                                            kDateTimeFull | kAddYear | kSimplify) + " - " +
+                                            kDateTimeFull | kSimplify) + " - " +
                           MythDateTimeToString(recendts, kTime);
 
     progMap["shorttimedate"] = MythDateTimeToString(recstartts,
@@ -1429,16 +1429,16 @@ void ProgramInfo::ToMap(InfoMap &progMap,
                                MythDateTimeToString(recendts, kTime);
 
     progMap["starttimedate"] = MythDateTimeToString(recstartts,
-                                            kDateTimeFull | kAddYear | kSimplify);
+                                            kDateTimeFull | kSimplify);
 
     progMap["shortstarttimedate"] = MythDateTimeToString(recstartts,
                                             kDateTimeShort | kSimplify);
 
     progMap["lastmodifiedtime"] = MythDateTimeToString(lastmodified, kTime);
     progMap["lastmodifieddate"] = MythDateTimeToString(lastmodified,
-                                                       kDateFull | kAddYear | kSimplify);
+                                                       kDateFull | kSimplify);
     progMap["lastmodified"] = MythDateTimeToString(lastmodified,
-                                            kDateTimeFull | kAddYear | kSimplify);
+                                            kDateTimeFull | kSimplify);
 
     progMap["channum"] = chanstr;
     progMap["chanid"] = chanid;

@@ -104,8 +104,6 @@ QString MythDateTimeToString(const QDateTime& datetime, uint format)
     return result;
 }
 
-static QRegExp stripYear("(\.|-|/)?(yyyy|yy)(\.|-|/)?");
-
 /** \fn MythDateToString
  *  \brief Returns a formatted QString based on the supplied QDate
  * 
@@ -126,27 +124,20 @@ QString MythDateToString(const QDate& date, uint format)
         else
             stringformat = gCoreContext->GetSetting("DateFormat", "ddd d MMMM");
         
-        if ((format & kAddYear) && (format & ~kSimplify))
+        if (format & kAddYear)
         {
             if (!stringformat.contains("yy")) // Matches both 2 or 4 digit year
                 stringformat.append(" yyyy");
         }
         
-        if ((format & ~kDateShort) && (format & kSimplify))
+        if (format & ~kDateShort)
         {
-            if (now == date)
+            if ((format & kSimplify) && (now == date))
                 result = QObject::tr("Today");
-            else if (now.addDays(-1) == date)
+            else if ((format & kSimplify) && (now.addDays(-1) == date))
                 result = QObject::tr("Yesterday");
-            else if (now.addDays(1) == date)
+            else if ((format & kSimplify) && (now.addDays(1) == date))
                 result = QObject::tr("Tomorrow");
-            else if ((now.year() == date.year()) && stringformat.contains("yy"))
-            {
-                // Best effort attempt to strip year when it was already
-                // present in the string - maybe unnecessary if the user
-                // explicitly chose a string containing the year?
-                stringformat.replace(stripYear, "");
-            }
         }
         
         if (result.isEmpty())
