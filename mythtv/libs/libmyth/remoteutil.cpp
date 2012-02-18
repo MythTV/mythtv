@@ -11,6 +11,7 @@
 #include "mythcorecontext.h"
 #include "storagegroup.h"
 #include "mythevent.h"
+#include "mythsocket.h"
 
 vector<ProgramInfo *> *RemoteGetRecordedList(int sort)
 {
@@ -470,7 +471,34 @@ bool RemoteGetFileList(QString host, QString path, QStringList* list,
     *list << path;
     *list << QString::number(fileNamesOnly);
 
-    bool ok = gCoreContext->SendReceiveStringList(*list);
+    bool ok = false;
+
+    if (gCoreContext->IsMasterBackend())
+    {
+        // since the master backend cannot connect back around to
+        // itself, and the libraries do not have access to the list
+        // of connected slave backends to query an existing connection
+        // start up a new temporary connection directly to the slave
+        // backend to query the file list
+        QString ann = QString("ANN Playback %1 0")
+                        .arg(gCoreContext->GetHostName());
+        QString addr = gCoreContext->GetBackendServerIP(host);
+        int port = gCoreContext->GetNumSettingOnHost("BackendServerPort",
+                                                     host, 6543);
+        bool mismatch = false;
+
+        MythSocket *sock = gCoreContext->ConnectCommandSocket(
+                                            addr, port, ann, &mismatch);
+        if (sock)
+        {
+            ok = sock->SendReceiveStringList(*list);
+            sock->DownRef();
+        }
+        else
+            list->clear();
+    }
+    else
+        ok = gCoreContext->SendReceiveStringList(*list);
 
 // Should the SLAVE UNREACH test be here ?
     return ok;
