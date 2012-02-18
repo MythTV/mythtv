@@ -343,8 +343,7 @@ void XMLParseBase::ClearGlobalObjectStore(void)
 void XMLParseBase::ParseChildren(const QString &filename,
                                  QDomElement &element,
                                  MythUIType *parent,
-                                 bool showWarnings,
-                                 QMap<QString, QString> &dependsMap)
+                                 bool showWarnings)
 {
     if (!parent)
     {
@@ -355,6 +354,7 @@ void XMLParseBase::ParseChildren(const QString &filename,
     for (QDomNode child = element.firstChild(); !child.isNull();
          child = child.nextSibling())
     {
+        QMap<QString, QString> dependsMap;
         QDomElement info = child.toElement();
         if (!info.isNull())
         {
@@ -404,7 +404,10 @@ void XMLParseBase::ParseChildren(const QString &filename,
                             "Unknown widget type");
             }
         }
+        parent->SetDependsMap(dependsMap);
     }
+    parent->ConnectDependants(true);
+    parent->Finalize();
 }
 
 MythUIType *XMLParseBase::ParseUIType(
@@ -413,7 +416,7 @@ MythUIType *XMLParseBase::ParseUIType(
     MythUIType *parent,
     MythScreenType *screen,
     bool showWarnings,
-    QMap<QString, QString> &dependsMap)
+    QMap<QString, QString> &parentDependsMap)
 {
     QString name = element.attribute("name", "");
     if (name.isEmpty())
@@ -542,15 +545,19 @@ MythUIType *XMLParseBase::ParseUIType(
         }
         else
             uitype->CopyFrom(base);
+
     }
 
     QString dependee = element.attribute("depends", "");
     if (!dependee.isEmpty())
-        dependsMap.insert(name, dependee);
+        parentDependsMap.insert(name, dependee);
 
     QFileInfo fi(filename);
     uitype->SetXMLLocation(fi.fileName(), element.lineNumber());
 
+    // If this was copied from another uitype then it already has a depends
+    // map so we want to append to that one
+    QMap<QString, QString> dependsMap = uitype->GetDependsMap();
     for (QDomNode child = element.firstChild(); !child.isNull();
          child = child.nextSibling())
     {
@@ -604,6 +611,7 @@ MythUIType *XMLParseBase::ParseUIType(
             }
         }
     }
+    uitype->SetDependsMap(dependsMap);
 
     uitype->Finalize();
     return uitype;
@@ -670,13 +678,12 @@ bool XMLParseBase::LoadWindowFromXML(const QString &xmlfile,
 
     const QStringList searchpath = GetMythUI()->GetThemeSearchPath();
     QStringList::const_iterator it = searchpath.begin();
-    QMap<QString, QString> dependsMap;
     for (; it != searchpath.end(); ++it)
     {
         QString themefile = *it + xmlfile;
         LOG(VB_GUI, LOG_INFO, LOC + "Loading window theme from " + themefile);
         if (doLoad(windowname, parent, themefile,
-                   onlyLoadWindows, showWarnings, dependsMap))
+                   onlyLoadWindows, showWarnings))
         {
             return true;
         }
@@ -697,8 +704,7 @@ bool XMLParseBase::doLoad(const QString &windowname,
                           MythUIType *parent,
                           const QString &filename,
                           bool onlywindows,
-                          bool showWarnings,
-                          QMap<QString, QString> &dependsMap)
+                          bool showWarnings)
 {
     QDomDocument doc;
     QFile f(filename);
@@ -735,7 +741,7 @@ bool XMLParseBase::doLoad(const QString &windowname,
                 QString include = getFirstText(e);
 
                 if (!include.isEmpty())
-                    LoadBaseTheme(include, dependsMap);
+                     LoadBaseTheme(include);
             }
 
             if (onlywindows && e.tagName() == "window")
@@ -750,12 +756,11 @@ bool XMLParseBase::doLoad(const QString &windowname,
                 }
 
                 if (!include.isEmpty())
-                    LoadBaseTheme(include, dependsMap);
+                    LoadBaseTheme(include);
 
                 if (name == windowname)
                 {
-                    ParseChildren(filename, e, parent, showWarnings, dependsMap);
-                    ConnectDependants(parent, dependsMap);
+                    ParseChildren(filename, e, parent, showWarnings);
                     return true;
                 }
             }
@@ -797,7 +802,15 @@ bool XMLParseBase::doLoad(const QString &windowname,
                          type == "editbar" ||
                          type == "video")
                 {
-                    ParseUIType(filename, e, type, parent, NULL, showWarnings, dependsMap);
+
+                    // We don't want widgets in base.xml
+                    // depending on each other so ignore dependsMap
+                    QMap<QString, QString> dependsMap;
+                    MythUIType *uitype = NULL;
+                    uitype = ParseUIType(filename, e, type, parent,
+                                         NULL, showWarnings, dependsMap);
+                    if (uitype)
+                        uitype->ConnectDependants(true);
                 }
                 else
                 {
@@ -808,31 +821,9 @@ bool XMLParseBase::doLoad(const QString &windowname,
         }
         n = n.nextSibling();
     }
-
-
-    ConnectDependants(parent, dependsMap);
     if (onlywindows)
         return false;
     return true;
-}
-
-void XMLParseBase::ConnectDependants(MythUIType * parent,
-                                     QMap<QString, QString> &dependsMap)
-{
-    QMapIterator<QString, QString> i(dependsMap);
-    while(i.hasNext())
-    {
-        i.next();
-        MythUIType *dependee = parent->GetChild(i.value());
-        MythUIType *dependant = parent->GetChild(i.key());
-
-        if (dependee && dependant)
-        {
-            QObject::connect(dependee, SIGNAL(DependChanged(bool)),
-                             dependant, SLOT(UpdateDependState(bool)));
-            dependant->UpdateDependState(true);
-        }
-    }
 }
 
 bool XMLParseBase::LoadBaseTheme(void)
@@ -848,7 +839,7 @@ bool XMLParseBase::LoadBaseTheme(void)
     {
         QString themefile = *it + "base.xml";
         if (doLoad(QString(), GetGlobalObjectStore(), themefile,
-                   loadOnlyWindows, showWarnings, dependsMap))
+                   loadOnlyWindows, showWarnings))
         {
             LOG(VB_GUI, LOG_INFO, LOC +
                 QString("Loaded base theme from '%1'").arg(themefile));
@@ -867,8 +858,7 @@ bool XMLParseBase::LoadBaseTheme(void)
     return ok;
 }
 
-bool XMLParseBase::LoadBaseTheme(const QString &baseTheme,
-                                    QMap<QString, QString> &dependsMap)
+bool XMLParseBase::LoadBaseTheme(const QString &baseTheme)
 {
     LOG(VB_GUI, LOG_INFO, LOC +
         QString("Asked to load base file from '%1'").arg(baseTheme));
@@ -891,7 +881,7 @@ bool XMLParseBase::LoadBaseTheme(const QString &baseTheme,
     {
         QString themefile = *it + baseTheme;
         if (doLoad(QString(), GetGlobalObjectStore(), themefile,
-                   loadOnlyWindows, showWarnings, dependsMap))
+                   loadOnlyWindows, showWarnings))
         {
             LOG(VB_GUI, LOG_INFO, LOC +
                 QString("Loaded base theme from '%1'").arg(themefile));

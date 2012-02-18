@@ -167,6 +167,9 @@ class MUI_PUBLIC MythUIType : public QObject, public XMLParseBase
     void SetVerticalZoom(float zoom);
     void SetAngle(float angle);
     void SetDependIsDefault(bool isDefault);
+    void SetReverseDependence(bool reverse);
+    void SetDependsMap(QMap<QString, QString> dependsMap);
+    QMap<QString, QString> GetDependsMap() const { return m_dependsMap; }
 
   protected:
     virtual void customEvent(QEvent *);
@@ -207,6 +210,8 @@ class MUI_PUBLIC MythUIType : public QObject, public XMLParseBase
     int NormX(const int width);
     int NormY(const int height);
 
+    void ConnectDependants(bool recurse = false);
+
     virtual bool ParseElement(
         const QString &filename, QDomElement &element, bool showWarnings);
     virtual void CopyFrom(MythUIType *base);
@@ -214,6 +219,7 @@ class MUI_PUBLIC MythUIType : public QObject, public XMLParseBase
     virtual void Finalize(void);
 
     QList<MythUIType *> m_ChildrenList;
+    QMap<QString, QString> m_dependsMap;
 
     bool m_Visible;
     bool m_HasFocus;
@@ -224,6 +230,7 @@ class MUI_PUBLIC MythUIType : public QObject, public XMLParseBase
     bool m_Vanish;
     bool m_Vanished;
     bool m_IsDependDefault;
+    bool m_ReverseDepend;
 
     int m_focusOrder;
 
