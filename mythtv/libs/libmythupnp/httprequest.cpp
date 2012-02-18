@@ -65,7 +65,7 @@ static MIMETypes g_MIMETypes[] =
     { "pdf" , "application/pdf"            },
     { "avi" , "video/avi"                  },
     { "css" , "text/css"                   },
-    { "swf" , "application/futuresplash"   },
+    { "swf" , "application/x-shockwave-flash" },
     { "xls" , "application/vnd.ms-excel"   },
     { "doc" , "application/vnd.ms-word"    },
     { "mid" , "audio/midi"                 },

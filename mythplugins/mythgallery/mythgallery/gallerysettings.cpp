@@ -17,7 +17,7 @@ static HostLineEdit *MythGalleryFilter()
     HostLineEdit *gc = new HostLineEdit("GalleryFilterDirectory");
     gc->setLabel(QObject::tr("Directory filter"));
     gc->setValue("");
-    gc->setHelpText(QObject::tr("Enter direcory names to be excluded in "
+    gc->setHelpText(QObject::tr("Enter directory names to be excluded in "
                                 "browser. (multiple entries delimited with "
                                 "':')"));
     return gc;
