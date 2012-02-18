@@ -1203,6 +1203,11 @@ static int internal_play_media(const QString &mrl, const QString &plot,
 
 static void gotoMainMenu(void)
 {
+    // Reset the selected button to the first item.
+    MythThemedMenuState *menu = dynamic_cast<MythThemedMenuState *>
+        (GetMythMainWindow()->GetMainStack()->GetTopScreen());
+    if (menu)
+        menu->m_buttonList->SetItemCurrent(0);
 }
 
 // If the theme specified in the DB is somehow broken, try a standard one:
