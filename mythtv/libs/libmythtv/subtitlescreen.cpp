@@ -1152,6 +1152,10 @@ void FormattedTextSubtitle::Layout(void)
     else if (m_yAnchorPoint == 2)
         anchor_y -= anchor_height;
 
+    // Shift the anchor point back into the safe area if necessary/possible.
+    anchor_y = max(0, min(anchor_y, m_safeArea.height() - anchor_height));
+    anchor_x = max(0, min(anchor_x, m_safeArea.width() - anchor_width));
+
     m_bounds = QRect(anchor_x, anchor_y, anchor_width, anchor_height);
 
     // Fill in missing coordinates
