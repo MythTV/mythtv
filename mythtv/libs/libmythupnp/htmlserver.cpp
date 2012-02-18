@@ -12,6 +12,7 @@
 
 #include "mythlogging.h"
 #include "htmlserver.h"
+#include "storagegroup.h"
 
 #include <QFileInfo>
 #include <QDir>
@@ -64,6 +65,7 @@ bool HtmlServerExtension::ProcessRequest( HTTPRequest *pRequest )
         if ( pRequest->m_sBaseUrl.startsWith("/") == false)
             return( false );
 
+        bool      bStorageGroupFile = false;
         QFileInfo oInfo( m_sAbsoluteSharePath + pRequest->m_sResourceUrl );
 
         if (oInfo.isDir())
@@ -76,7 +78,19 @@ bool HtmlServerExtension::ProcessRequest( HTTPRequest *pRequest )
                 oInfo.setFile( oInfo.filePath() + m_IndexFilename + ".html" );
         }
 
-        if (oInfo.exists() == true )
+        if (pRequest->m_sResourceUrl.startsWith("/StorageGroup/"))
+        {
+            StorageGroup oGroup(pRequest->m_sResourceUrl.section('/', 2, 2));
+            QString      sFile =
+                oGroup.FindFile(pRequest->m_sResourceUrl.section('/', 3));
+            if (!sFile.isEmpty())
+            {
+                oInfo.setFile(sFile);
+                bStorageGroupFile = true;
+            }
+        }
+
+        if (bStorageGroupFile || oInfo.exists() == true )
         {
             oInfo.makeAbsolute();
 
@@ -86,7 +100,8 @@ bool HtmlServerExtension::ProcessRequest( HTTPRequest *pRequest )
             // Checking for url's that contain ../ or similar.
             // --------------------------------------------------------------
 
-            if ( sResName.startsWith( m_sAbsoluteSharePath, Qt::CaseInsensitive ))
+            if (( bStorageGroupFile ) ||
+                (sResName.startsWith( m_sAbsoluteSharePath, Qt::CaseInsensitive )))
             {
                 if (oInfo.exists())
                 {
