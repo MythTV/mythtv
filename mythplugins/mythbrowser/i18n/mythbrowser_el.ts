@@ -181,17 +181,17 @@ Use the &apos;Add Bookmark&apos; menu option to add new bookmarks</source>
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mythbrowser/main.cpp" line="65"/>
+        <location filename="../mythbrowser/main.cpp" line="66"/>
         <source>Move to next browser tab</source>
         <translation>Στην επόμενη Καρτέλα</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/main.cpp" line="67"/>
+        <location filename="../mythbrowser/main.cpp" line="68"/>
         <source>Move to previous browser tab</source>
         <translation>Στην προηγούμενη Καρτέλα</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/main.cpp" line="70"/>
+        <location filename="../mythbrowser/main.cpp" line="71"/>
         <source>Internal Web Browser</source>
         <translation>Ενσωματωμένος Περιηγηγής</translation>
     </message>
@@ -199,52 +199,52 @@ Use the &apos;Add Bookmark&apos; menu option to add new bookmarks</source>
 <context>
     <name>ThemeUI</name>
     <message>
-        <location filename="themestrings.h" line="4"/>
+        <location filename="themestrings.h" line="7"/>
         <source>%DATE%, %TIME%</source>
         <translation>%DATE%, %TIME%</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="5"/>
+        <location filename="themestrings.h" line="8"/>
         <source>Web Bookmarks</source>
         <translation>Σελιδοδείκτες</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="6"/>
+        <location filename="themestrings.h" line="9"/>
         <source>Browse your favorite web sites.</source>
         <translation>Περιηγηθείτε στις αγαπημένες σας ιστοσελίδες.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="7"/>
+        <location filename="themestrings.h" line="10"/>
         <source>Browser:</source>
         <translation>Περιηγητής:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="8"/>
+        <location filename="themestrings.h" line="11"/>
         <source>Text Size:</source>
         <translation>Μέγεθος Κειμένου:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="9"/>
+        <location filename="themestrings.h" line="12"/>
         <source>Enable browser plugins (Flash, etc):</source>
         <translation>Ενεργοποίηση πρόσθετων περιήγησης (Flash, κλπ):</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="10"/>
+        <location filename="themestrings.h" line="13"/>
         <source>Cancel</source>
         <translation>Ακύρωση</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="11"/>
+        <location filename="themestrings.h" line="14"/>
         <source>OK</source>
         <translation>ΟΚ</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="12"/>
+        <location filename="themestrings.h" line="15"/>
         <source>Configure Web Browser</source>
         <translation>Διαμόρφωση Περιηγητή</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="13"/>
+        <location filename="themestrings.h" line="16"/>
         <source>You can edit the name, URL, and category for the selected Web Site on this screen.
 
 When you have finished editing, select &quot;OK&quot; or &quot;Cancel&quot; to continue.</source>
@@ -253,87 +253,92 @@ When you have finished editing, select &quot;OK&quot; or &quot;Cancel&quot; to c
 Όταν τελειώσετε, πατήστε &quot;OK&quot; ή &quot;Ακύρωση&quot; για συνέχεια.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="14"/>
+        <location filename="themestrings.h" line="17"/>
         <source>Category:</source>
         <translation>Κατηγορία:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="15"/>
+        <location filename="themestrings.h" line="18"/>
         <source>Name:</source>
         <translation>Όνομα:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="16"/>
+        <location filename="themestrings.h" line="19"/>
         <source>URL:</source>
         <translation>Διευθ:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="17"/>
+        <location filename="themestrings.h" line="20"/>
         <source>Genre:</source>
         <translation>Είδος:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="18"/>
+        <location filename="themestrings.h" line="21"/>
         <source>Channel:</source>
         <translation>Κανάλι:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="19"/>
+        <location filename="themestrings.h" line="22"/>
         <source>Click to choose from existing categories...</source>
         <translation>Πατήστε για επιλογή από υπάρχουσες κατηγορίες...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="2"/>
+        <location filename="themestrings.h" line="5"/>
         <source>Bookmark Manager</source>
         <translation>Διαχείριση Σελιδοδεικτών</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="3"/>
+        <location filename="themestrings.h" line="6"/>
         <source>Web Page</source>
         <translation>Ιστοσελίδα</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="20"/>
+        <location filename="themestrings.h" line="23"/>
         <source>Category</source>
         <translation>Κατηγορία</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="21"/>
+        <location filename="themestrings.h" line="24"/>
         <source>[x]</source>
         <translation>[x]</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="22"/>
+        <location filename="themestrings.h" line="25"/>
         <source>Name</source>
         <translation>Όνομα</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="23"/>
+        <location filename="themestrings.h" line="26"/>
         <source>URL</source>
         <translation>Διεύθυνση</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="24"/>
+        <location filename="themestrings.h" line="27"/>
         <source>Browser Command:</source>
         <translation>Εντολή Περιηγητή:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="25"/>
+        <location filename="themestrings.h" line="28"/>
         <source>Find...</source>
         <translation>Αναζήτηση...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="26"/>
+        <location filename="themestrings.h" line="29"/>
         <source>Find</source>
         <translation>Αναζήτηση</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="27"/>
+        <location filename="themestrings.h" line="30"/>
         <source>Enable browser plugins (Flash, etc)</source>
         <translation>Ενεργοποίηση πρόσθετων (Flash, κλπ)</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="28"/>
+        <location filename="themestrings.h" line="31"/>
+        <source>Enable plugins</source>
+        <translation>Ενεργοποίηση πρόσθετων</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="32"/>
         <source>Enable plugins:</source>
         <translation>Ενεργοποίηση πρόσθετων:</translation>
     </message>
