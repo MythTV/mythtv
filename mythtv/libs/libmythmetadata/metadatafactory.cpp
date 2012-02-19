@@ -67,7 +67,7 @@ MetadataFactory::~MetadataFactory()
 }
 
 void MetadataFactory::Lookup(RecordingRule *recrule, bool automatic,
-                             bool getimages)
+                             bool getimages, bool allowgeneric)
 {
     if (!recrule)
         return;
@@ -79,6 +79,7 @@ void MetadataFactory::Lookup(RecordingRule *recrule, bool automatic,
     lookup->SetData(qVariantFromValue(recrule));
     lookup->SetAutomatic(automatic);
     lookup->SetHandleImages(getimages);
+    lookup->SetAllowGeneric(allowgeneric);
     lookup->SetHost(gCoreContext->GetMasterHostName());
     lookup->SetTitle(recrule->m_title);
     lookup->SetSubtitle(recrule->m_subtitle);
@@ -93,7 +94,7 @@ void MetadataFactory::Lookup(RecordingRule *recrule, bool automatic,
 }
 
 void MetadataFactory::Lookup(ProgramInfo *pginfo, bool automatic,
-                             bool getimages)
+                             bool getimages, bool allowgeneric)
 {
     if (!pginfo)
         return;
@@ -105,6 +106,7 @@ void MetadataFactory::Lookup(ProgramInfo *pginfo, bool automatic,
     lookup->SetData(qVariantFromValue(pginfo));
     lookup->SetAutomatic(automatic);
     lookup->SetHandleImages(getimages);
+    lookup->SetAllowGeneric(allowgeneric);
     lookup->SetHost(gCoreContext->GetMasterHostName());
     lookup->SetTitle(pginfo->GetTitle());
     lookup->SetSubtitle(pginfo->GetSubtitle());
@@ -119,7 +121,7 @@ void MetadataFactory::Lookup(ProgramInfo *pginfo, bool automatic,
 }
 
 void MetadataFactory::Lookup(VideoMetadata *metadata, bool automatic,
-                             bool getimages)
+                             bool getimages, bool allowgeneric)
 {
     if (!metadata)
         return;
@@ -136,6 +138,7 @@ void MetadataFactory::Lookup(VideoMetadata *metadata, bool automatic,
     lookup->SetData(qVariantFromValue(metadata));
     lookup->SetAutomatic(automatic);
     lookup->SetHandleImages(getimages);
+    lookup->SetAllowGeneric(allowgeneric);
     lookup->SetHost(metadata->GetHost());
     lookup->SetTitle(metadata->GetTitle());
     lookup->SetSubtitle(metadata->GetSubtitle());
@@ -172,13 +175,15 @@ MetadataLookupList MetadataFactory::SynchronousLookup(QString title,
                                                       QString inetref,
                                                       int season,
                                                       int episode,
-                                                      QString grabber)
+                                                      QString grabber,
+                                                      bool allowgeneric)
 {
     MetadataLookup *lookup = new MetadataLookup();
     lookup->SetStep(kLookupSearch);
     lookup->SetType(kMetadataRecording);
     lookup->SetAutomatic(false);
     lookup->SetHandleImages(false);
+    lookup->SetAllowGeneric(allowgeneric);
     lookup->SetTitle(title);
     lookup->SetSubtitle(subtitle);
     lookup->SetSeason(season);

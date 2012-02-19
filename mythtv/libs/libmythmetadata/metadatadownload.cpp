@@ -562,7 +562,24 @@ MetadataLookupList MetadataDownload::handleTelevision(MetadataLookup* lookup)
         args.append(QString::number(lookup->GetSeason()));
         args.append(QString::number(lookup->GetEpisode()));
     }
+    else if (lookup->GetStep() == kLookupCollection)
+    {
+        args.append(QString("-C"));
+        args.append(lookup->GetCollectionref());
+    }
     list = runGrabber(cmd, args, lookup);
+
+    // Collection Fallback
+    // If the lookup allows generic metadata, and the specific
+    // season and episode are not available, try for series metadata.
+    if (list.isEmpty() &&
+        lookup->GetAllowGeneric() &&
+        lookup->GetStep() == kLookupData)
+    {
+        lookup->SetStep(kLookupCollection);
+        list = handleTelevision(lookup);
+    }
+
     return list;
 }
 
@@ -637,6 +654,7 @@ MetadataLookupList MetadataDownload::handleRecordingGeneric(
     if (list.count() == 1)
     {
         lookup->SetInetref(list.at(0)->GetInetref());
+        lookup->SetCollectionref(list.at(0)->GetCollectionref());
         list = handleTelevision(lookup);
     }
 

@@ -25,7 +25,7 @@ namespace DTC
 class SERVICE_PUBLIC ArtworkItem : public QObject
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "1.01" );
+    Q_CLASSINFO( "version"    , "1.02" );
 
     Q_PROPERTY( QString         Type            READ Type             WRITE setType           )
     Q_PROPERTY( QString         Url             READ Url              WRITE setUrl            )
@@ -87,6 +87,7 @@ class SERVICE_PUBLIC VideoLookup : public QObject
     Q_PROPERTY( QString         Description     READ Description      WRITE setDescription    )
     Q_PROPERTY( QString         Certification   READ Certification    WRITE setCertification  )
     Q_PROPERTY( QString         Inetref         READ Inetref          WRITE setInetref        )
+    Q_PROPERTY( QString         Collectionref   READ Collectionref    WRITE setCollectionref  )
     Q_PROPERTY( QString         HomePage        READ HomePage         WRITE setHomePage       )
     Q_PROPERTY( QDateTime       ReleaseDate     READ ReleaseDate      WRITE setReleaseDate    )
     Q_PROPERTY( float           UserRating      READ UserRating       WRITE setUserRating     )
@@ -110,6 +111,7 @@ class SERVICE_PUBLIC VideoLookup : public QObject
     PROPERTYIMP    ( QString    , Description    )
     PROPERTYIMP    ( QString    , Certification  )
     PROPERTYIMP    ( QString    , Inetref        )
+    PROPERTYIMP    ( QString    , Collectionref  )
     PROPERTYIMP    ( QString    , HomePage       )
     PROPERTYIMP    ( QDateTime  , ReleaseDate    )
     PROPERTYIMP    ( float      , UserRating     )
@@ -157,6 +159,7 @@ class SERVICE_PUBLIC VideoLookup : public QObject
             m_Description      = src.m_Description      ;
             m_Certification    = src.m_Certification    ;
             m_Inetref          = src.m_Inetref          ;
+            m_Collectionref    = src.m_Collectionref    ;
             m_HomePage         = src.m_HomePage         ;
             m_ReleaseDate      = src.m_ReleaseDate      ;
             m_UserRating       = src.m_UserRating       ;

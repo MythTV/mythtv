@@ -1411,7 +1411,7 @@ void MetadataOptions::Load()
         CreateBusyDialog("Trying to automatically find this "
                      "recording online...");
 
-        m_metadataFactory->Lookup(m_recordingRule, false, false);
+        m_metadataFactory->Lookup(m_recordingRule, false, false, true);
     }
 
     InfoMap progMap;
@@ -1450,12 +1450,14 @@ void MetadataOptions::PerformQuery()
         m_lookup->SetSubtype(kProbableTelevision);
     else
         m_lookup->SetSubtype(kProbableMovie);
+    m_lookup->SetAllowGeneric(true);
     m_lookup->SetAutomatic(false);
     m_lookup->SetHandleImages(false);
     m_lookup->SetHost(gCoreContext->GetMasterHostName());
     m_lookup->SetTitle(m_recordingRule->m_title);
     m_lookup->SetSubtitle(m_recordingRule->m_subtitle);
     m_lookup->SetInetref(m_inetrefEdit->GetText());
+    m_lookup->SetCollectionref(m_inetrefEdit->GetText());
     m_lookup->SetSeason(m_seasonSpin->GetIntValue());
     m_lookup->SetEpisode(m_episodeSpin->GetIntValue());
 
@@ -1659,11 +1661,13 @@ void MetadataOptions::FindNetArt(VideoArtworkType type)
         m_lookup->SetSubtype(kProbableTelevision);
     else
         m_lookup->SetSubtype(kProbableMovie);
+    m_lookup->SetAllowGeneric(true);
     m_lookup->SetData(qVariantFromValue<VideoArtworkType>(type));
     m_lookup->SetHost(gCoreContext->GetMasterHostName());
     m_lookup->SetTitle(m_recordingRule->m_title);
     m_lookup->SetSubtitle(m_recordingRule->m_subtitle);
     m_lookup->SetInetref(m_inetrefEdit->GetText());
+    m_lookup->SetCollectionref(m_inetrefEdit->GetText());
     m_lookup->SetSeason(m_seasonSpin->GetIntValue());
     m_lookup->SetEpisode(m_episodeSpin->GetIntValue());
 

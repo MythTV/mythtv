@@ -18,7 +18,8 @@ class ProgramInfo;
 
 enum LookupStep {
     kLookupSearch = 0,
-    kLookupData = 1
+    kLookupData = 1,
+    kLookupCollection = 2
 };
 
 struct PersonInfo
@@ -92,6 +93,7 @@ class META_PUBLIC MetadataLookup : public QObject
         bool automatic,
         bool handleimages,
         bool allowoverwrites,
+        bool allowgeneric,
         bool preferdvdorder,
         const QString &host,
         const QString &filename,
@@ -158,6 +160,7 @@ class META_PUBLIC MetadataLookup : public QObject
         bool automatic,
         bool handleimages,
         bool allowoverwrites,
+        bool allowgeneric,
         bool preferdvdorder,
         const QString &host,
         const QString &filename,
@@ -199,6 +202,7 @@ class META_PUBLIC MetadataLookup : public QObject
         bool automatic,
         bool handleimages,
         bool allowoverwrites,
+        bool allowgeneric,
         bool preferdvdorder,
         const QString &host,
         const QString &filename,
@@ -239,6 +243,7 @@ class META_PUBLIC MetadataLookup : public QObject
     // Sets for image download handling
     void SetHandleImages(bool handle) { m_handleimages = handle; };
     void SetAllowOverwrites(bool allow) { m_allowoverwrites = allow; };
+    void SetAllowGeneric(bool allow) { m_allowgeneric = allow; };
     void SetHost(const QString &host) { m_host = host; };
     void SetDownloads(ArtworkMap map) { m_downloads = map; };
 
@@ -275,6 +280,7 @@ class META_PUBLIC MetadataLookup : public QObject
     // Image Handling Gets
     bool GetHandleImages() const { return m_handleimages; };
     bool GetAllowOverwrites() const { return m_allowoverwrites; };
+    bool GetAllowGeneric() const { return m_allowgeneric; };
 
     // General
     QString GetFilename() const { return m_filename; };
@@ -360,6 +366,7 @@ class META_PUBLIC MetadataLookup : public QObject
     bool m_automatic;
     bool m_handleimages;
     bool m_allowoverwrites;
+    bool m_allowgeneric;
     bool m_dvdorder;
     QString m_host;
 
