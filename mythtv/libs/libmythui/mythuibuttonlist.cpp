@@ -1377,6 +1377,8 @@ void MythUIButtonList::SetPositionArrowStates()
     if (m_clearing)
         return;
 
+    m_needsUpdate = false;
+
     // set topitem, top position
     SanitizePosition();
     m_ButtonToItem.clear();
@@ -1605,7 +1607,6 @@ uint MythUIButtonList::GetVisibleCount()
     {
         SetPositionArrowStates();
         SetScrollBarPosition();
-        m_needsUpdate = false;
     }
 
     return m_itemsVisible;
@@ -2656,7 +2657,6 @@ void MythUIButtonList::DrawSelf(MythPainter *, int, int, int, QRect)
     {
         SetPositionArrowStates();
         SetScrollBarPosition();
-        m_needsUpdate = false;
     }
 }
 
