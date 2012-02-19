@@ -350,6 +350,8 @@ int main(int argc, char *argv[])
         return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
 
+    setHttpProxy();
+
     MythTranslation::load("mythfrontend");
 
     if (!UpgradeTVDatabaseSchema(false))

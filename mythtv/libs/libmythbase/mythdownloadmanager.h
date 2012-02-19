@@ -7,6 +7,7 @@
 #include <QNetworkAccessManager>
 #include <QNetworkDiskCache>
 #include <QNetworkReply>
+#include <QNetworkProxy>
 #include <QWaitCondition>
 #include <QString>
 
@@ -123,6 +124,7 @@ class MBASE_PUBLIC MythDownloadManager : public QObject, public MThread
 
     QNetworkAccessManager                        *m_manager;
     QNetworkDiskCache                            *m_diskCache;
+    QNetworkProxy                                *m_proxy;
 
     QWaitCondition                                m_queueWaitCond;
     QMutex                                        m_queueWaitLock;

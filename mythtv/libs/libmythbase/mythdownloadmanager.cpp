@@ -8,6 +8,7 @@
 #include <QNetworkCookieJar>
 #include <QAuthenticator>
 #include <QTextStream>
+#include <QNetworkProxy>
 
 #include "stdlib.h"
 
@@ -188,6 +189,7 @@ MythDownloadManager::MythDownloadManager() :
     MThread("DownloadManager"),
     m_manager(NULL),
     m_diskCache(NULL),
+    m_proxy(NULL),
     m_infoLock(new QMutex(QMutex::Recursive)),
     m_queueThread(NULL),
     m_runThread(false),
@@ -225,10 +227,15 @@ void MythDownloadManager::run(void)
 
     m_manager = new QNetworkAccessManager(this);
     m_diskCache = new QNetworkDiskCache(this);
+    m_proxy = new QNetworkProxy();
     m_diskCache->setCacheDirectory(GetConfDir() + "/Cache-" +
                                    QCoreApplication::applicationName() + "-" +
                                    gCoreContext->GetHostName());
     m_manager->setCache(m_diskCache);
+
+    // Set the proxy for the manager to be the application default proxy,
+    // which has already been setup
+    m_manager->setProxy(*m_proxy);
 
     // make sure the cookieJar is created in the same thread as the manager
     // and set its parent to NULL so it can be shared between managers
