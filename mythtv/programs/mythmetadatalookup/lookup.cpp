@@ -202,7 +202,8 @@ void LookerUpper::CopyRuleInetrefsToRecordings()
         if (pginfo && pginfo->GetInetRef().isEmpty())
         {
             RecordingRule *rule = new RecordingRule();
-            rule->LoadByProgram(pginfo);
+            rule->m_recordID = pginfo->GetRecordingRuleID();
+            rule->Load();
             if (!rule->m_inetref.isEmpty())
             {
                 QString msg = QString("%1").arg(pginfo->GetTitle());
