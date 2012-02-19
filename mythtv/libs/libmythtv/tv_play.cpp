@@ -12074,6 +12074,7 @@ void TV::ShowOSDPromptDeleteRecording(PlayerContext *ctx, QString title,
         return;
     }
 
+    bool paused = ContextIsPaused(ctx, __FILE__, __LINE__);
     if (!ctx->playingInfo->QueryIsDeleteCandidate(true))
     {
         LOG(VB_GENERAL, LOG_ERR,
@@ -12116,6 +12117,12 @@ void TV::ShowOSDPromptDeleteRecording(PlayerContext *ctx, QString title,
             osd->DialogBack("", action, true);
         }
         ReturnOSDLock(ctx, osd);
+        // If the delete prompt is to be displayed at the end of a
+        // recording that ends in a final cut region, it will get into
+        // a loop of popping up the OK button while the cut region
+        // plays.  Avoid this.
+        if (ctx->player->IsNearEnd() && !paused)
+            SetExitPlayer(true, true);
 
         return;
     }
@@ -12123,7 +12130,6 @@ void TV::ShowOSDPromptDeleteRecording(PlayerContext *ctx, QString title,
 
     ClearOSD(ctx);
 
-    bool paused = ContextIsPaused(ctx, __FILE__, __LINE__);
     if (!paused)
         DoTogglePause(ctx, false);
 
