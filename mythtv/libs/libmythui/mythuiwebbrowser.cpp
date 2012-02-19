@@ -427,6 +427,12 @@ void MythWebView::keyPressEvent(QKeyEvent *event)
     }
 }
 
+void MythWebView::wheelEvent(QWheelEvent *event)
+{
+    event->accept();
+    QCoreApplication::postEvent(GetMythMainWindow(), new QWheelEvent(*event));
+}
+
 void MythWebView::handleUnsupportedContent(QNetworkReply *reply)
 {
     if (reply->error() == QNetworkReply::NoError)
@@ -1251,13 +1257,8 @@ QVariant MythUIWebBrowser::evaluateJavaScript(const QString &scriptSource)
 
 void MythUIWebBrowser::Scroll(int dx, int dy)
 {
-    QSize contentsSize = m_browser->page()->currentFrame()->contentsSize();
     QPoint startPos = m_browser->page()->currentFrame()->scrollPosition();
     QPoint endPos = startPos + QPoint(dx, dy);
-    endPos.setX(qBound(0, endPos.x(), contentsSize.width() -
-                       m_browserArea.width()));
-    endPos.setY(qBound(0, endPos.y(), contentsSize.height() -
-                       m_browserArea.height()));
 
     if (GetPainter()->SupportsAnimation() && m_scrollAnimation.duration() > 0)
     {
@@ -1393,7 +1394,8 @@ void MythUIWebBrowser::UpdateBuffer(void)
  */
 void MythUIWebBrowser::Pulse(void)
 {
-    if (m_destinationScrollPos !=
+    if (m_scrollAnimation.IsActive() &&
+        m_destinationScrollPos !=
         m_browser->page()->currentFrame()->scrollPosition())
     {
         m_scrollAnimation.IncrementCurrentTime();
