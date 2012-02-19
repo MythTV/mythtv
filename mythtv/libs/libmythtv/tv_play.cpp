@@ -8613,13 +8613,13 @@ void TV::customEvent(QEvent *e)
     }
     else if (message.left(14) == "DONE_RECORDING")
     {
-        // int seconds = 0;
-        long long frames = 0;
+        int seconds = 0;
+        //long long frames = 0;
         if (tokens.size() >= 4)
         {
             cardnum = tokens[1].toUInt();
-            // seconds = tokens[2].toInt();
-            frames = tokens[3].toLongLong();
+            seconds = tokens[2].toInt();
+            //frames = tokens[3].toLongLong();
         }
 
         PlayerContext *mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
@@ -8634,7 +8634,7 @@ void TV::customEvent(QEvent *e)
                     if (ctx->player)
                     {
                         ctx->player->SetWatchingRecording(false);
-                        ctx->player->SetLength((int)(frames / ctx->player->GetFrameRate()));
+                        ctx->player->SetLength(seconds);
                     }
                     ctx->UnlockDeletePlayer(__FILE__, __LINE__);
 
@@ -8651,8 +8651,7 @@ void TV::customEvent(QEvent *e)
                     if (ctx->player)
                     {
                         ctx->player->SetWatchingRecording(false);
-                        ctx->player->SetLength((int)(frames /
-                                                  ctx->player->GetFrameRate()));
+                        ctx->player->SetLength(seconds);
                     }
                     ctx->UnlockDeletePlayer(__FILE__, __LINE__);
                 }
@@ -12075,6 +12074,7 @@ void TV::ShowOSDPromptDeleteRecording(PlayerContext *ctx, QString title,
         return;
     }
 
+    bool paused = ContextIsPaused(ctx, __FILE__, __LINE__);
     if (!ctx->playingInfo->QueryIsDeleteCandidate(true))
     {
         LOG(VB_GENERAL, LOG_ERR,
@@ -12117,6 +12117,12 @@ void TV::ShowOSDPromptDeleteRecording(PlayerContext *ctx, QString title,
             osd->DialogBack("", action, true);
         }
         ReturnOSDLock(ctx, osd);
+        // If the delete prompt is to be displayed at the end of a
+        // recording that ends in a final cut region, it will get into
+        // a loop of popping up the OK button while the cut region
+        // plays.  Avoid this.
+        if (ctx->player->IsNearEnd() && !paused)
+            SetExitPlayer(true, true);
 
         return;
     }
@@ -12124,7 +12130,6 @@ void TV::ShowOSDPromptDeleteRecording(PlayerContext *ctx, QString title,
 
     ClearOSD(ctx);
 
-    bool paused = ContextIsPaused(ctx, __FILE__, __LINE__);
     if (!paused)
         DoTogglePause(ctx, false);
 

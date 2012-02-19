@@ -474,6 +474,11 @@ void RecorderBase::SetDuration(uint64_t duration)
         curRecording->SaveTotalDuration(duration);
 }
 
+void RecorderBase::SetTotalFrames(uint64_t total_frames)
+{
+    if (curRecording)
+        curRecording->SaveTotalFrames(total_frames);
+}
 
 
 RecorderBase *RecorderBase::CreateRecorder(

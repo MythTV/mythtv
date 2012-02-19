@@ -23,7 +23,7 @@ import sys
 from optparse import OptionParser
 from urlparse import urljoin
 import urlgrabber.grabber
-import simplejson
+import json
 
 sys.path.append('/usr/share/smolt/client')
 
@@ -76,7 +76,7 @@ def main():
     pub_uuid_str = pub_uuid_fli.read()
     try:
         try:
-            pub_uuid_obj = simplejson.loads(pub_uuid_str)
+            pub_uuid_obj = json.loads(pub_uuid_str)
             print _('To view your profile visit: %s') % smolt.get_profile_link(opts.smoonURL, pub_uuid_obj["pub_uuid"])
         except ValueError, e:
             error(_('Something went wrong fetching the public UUID'))

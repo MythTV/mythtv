@@ -17,12 +17,16 @@ MetadataLookup::MetadataLookup(void) :
     m_automatic(false),
     m_handleimages(false),
     m_allowoverwrites(false),
+    m_allowgeneric(false),
     m_dvdorder(false),
     m_host(),
     m_filename(),
     m_title(),
+    m_network(),
+    m_status(),
     m_categories(),
     m_userrating(0),
+    m_ratingcount(0),
     m_language(),
     m_subtitle(),
     m_tagline(),
@@ -61,6 +65,7 @@ MetadataLookup::MetadataLookup(void) :
     m_runtime(0),
     m_runtimesecs(0),
     m_inetref(),
+    m_collectionref(),
     m_tmsref(),
     m_imdb(),
     m_people(),
@@ -81,12 +86,16 @@ MetadataLookup::MetadataLookup(
     bool automatic,
     bool handleimages,
     bool allowoverwrites,
+    bool allowgeneric,
     bool preferdvdorder,
     const QString &host,
     const QString &filename,
     const QString &title,
+    const QString &network,
+    const QString &status,
     const QStringList &categories,
     const float userrating,
+    uint ratingcount,
     const QString &language,
     const QString &subtitle,
     const QString &tagline,
@@ -125,6 +134,7 @@ MetadataLookup::MetadataLookup(
     const uint runtime,
     const uint runtimesecs,
     const QString &inetref,
+    const QString &collectionref,
     const QString &tmsref,
     const QString &imdb,
     const PeopleMap people,
@@ -141,12 +151,16 @@ MetadataLookup::MetadataLookup(
     m_automatic(automatic),
     m_handleimages(handleimages),
     m_allowoverwrites(allowoverwrites),
+    m_allowgeneric(allowgeneric),
     m_dvdorder(preferdvdorder),
     m_host(host),
     m_filename(filename),
     m_title(title),
+    m_network(network),
+    m_status(status),
     m_categories(categories),
     m_userrating(userrating),
+    m_ratingcount(ratingcount),
     m_language(language),
     m_subtitle(subtitle),
     m_tagline(tagline),
@@ -185,6 +199,7 @@ MetadataLookup::MetadataLookup(
     m_runtime(runtime),
     m_runtimesecs(runtimesecs),
     m_inetref(inetref),
+    m_collectionref(collectionref),
     m_tmsref(tmsref),
     m_imdb(imdb),
     m_people(people),
@@ -205,6 +220,7 @@ MetadataLookup::MetadataLookup(
     bool automatic,
     bool handleimages,
     bool allowoverwrites,
+    bool allowgeneric,
     bool preferdvdorder,
     const QString &host,
     const QString &filename,
@@ -244,6 +260,7 @@ MetadataLookup::MetadataLookup(
     m_automatic(automatic),
     m_handleimages(handleimages),
     m_allowoverwrites(allowoverwrites),
+    m_allowgeneric(allowgeneric),
     m_dvdorder(preferdvdorder),
     m_host(host),
     m_filename(filename),
@@ -291,6 +308,7 @@ MetadataLookup::MetadataLookup(
     bool automatic,
     bool handleimages,
     bool allowoverwrites,
+    bool allowgeneric,
     bool preferdvdorder,
     const QString &host,
     const QString &filename,
@@ -320,6 +338,7 @@ MetadataLookup::MetadataLookup(
     m_automatic(automatic),
     m_handleimages(handleimages),
     m_allowoverwrites(allowoverwrites),
+    m_allowgeneric(allowgeneric),
     m_dvdorder(preferdvdorder),
     m_host(host),
     m_filename(filename),
@@ -366,8 +385,11 @@ void MetadataLookup::toMap(MetadataMap &metadataMap)
 {
     metadataMap["filename"] = m_filename;
     metadataMap["title"] = m_title;
+    metadataMap["network"] = m_network;
+    metadataMap["status"] = m_status;
     metadataMap["category"] = m_categories.join(", ");
     metadataMap["userrating"] = QString::number(m_userrating);
+    metadataMap["ratingcount"] = QString::number(m_ratingcount);
     metadataMap["language"] = m_language;
     metadataMap["subtitle"] = m_subtitle;
     metadataMap["tagline"] = m_tagline;
@@ -404,6 +426,7 @@ void MetadataLookup::toMap(MetadataMap &metadataMap)
     metadataMap["runtime"] = QObject::tr("%n minute(s)", "", m_runtime);
     metadataMap["runtimesecs"] = QObject::tr("%n second(s)", "", m_runtimesecs);
     metadataMap["inetref"] = m_inetref;
+    metadataMap["collectionref"] = m_collectionref;
     metadataMap["tmsref"] = m_tmsref;
     metadataMap["imdb"] = m_imdb;
     metadataMap["studios"] = m_studios.join(", ");
@@ -418,7 +441,7 @@ MetadataLookup* LookupFromProgramInfo(ProgramInfo *pginfo)
     uint runtime = (runtimesecs/60);
 
     MetadataLookup *ret = new MetadataLookup(kMetadataRecording, kUnknownVideo,
-        qVariantFromValue(pginfo), kLookupData, false, false, false, false,
+        qVariantFromValue(pginfo), kLookupData, false, false, false, false, false,
         pginfo->GetHostname(),pginfo->GetBasename(),pginfo->GetTitle(),
         QStringList() << pginfo->GetCategory(), pginfo->GetStars() * 10,
         pginfo->GetSubtitle(), pginfo->GetDescription(), pginfo->GetChanID(),
@@ -514,6 +537,20 @@ void CreateMetadataXMLItem(MetadataLookup *lookup,
         item.appendChild(subtitle);
         subtitle.appendChild(docroot.createTextNode(lookup->GetSubtitle()));
     }
+    // Network
+    if (!lookup->GetNetwork().isEmpty())
+    {
+        QDomElement network = docroot.createElement("network");
+        item.appendChild(network);
+        network.appendChild(docroot.createTextNode(lookup->GetNetwork()));
+    }
+    // Status
+    if (!lookup->GetStatus().isEmpty())
+    {
+        QDomElement status = docroot.createElement("status");
+        item.appendChild(status);
+        status.appendChild(docroot.createTextNode(lookup->GetStatus()));
+    }
     // Season
     if (lookup->GetSeason() > 0 || lookup->GetEpisode() > 0)
     {
@@ -557,6 +594,13 @@ void CreateMetadataXMLItem(MetadataLookup *lookup,
         QDomElement inetref = docroot.createElement("inetref");
         item.appendChild(inetref);
         inetref.appendChild(docroot.createTextNode(lookup->GetInetref()));
+    }
+    // Collectionref
+    if (!lookup->GetCollectionref().isEmpty())
+    {
+        QDomElement collectionref = docroot.createElement("collectionref");
+        item.appendChild(collectionref);
+        collectionref.appendChild(docroot.createTextNode(lookup->GetCollectionref()));
     }
     // TMSref/SeriesID
     if (!lookup->GetTMSref().isEmpty())
@@ -746,6 +790,14 @@ void CreateMetadataXMLItem(MetadataLookup *lookup,
         userrating.appendChild(docroot.createTextNode(QString::number(
                        lookup->GetUserRating())));
     }
+    // Rating Count
+    if (lookup->GetRatingCount() > 0)
+    {
+        QDomElement ratingcount = docroot.createElement("ratingcount");
+        item.appendChild(ratingcount);
+        ratingcount.appendChild(docroot.createTextNode(QString::number(
+                       lookup->GetRatingCount())));
+    }
     // Track Number
     if (lookup->GetTrackNumber() > 0)
     {
@@ -881,11 +933,11 @@ MetadataLookup* ParseMetadataItem(const QDomElement& item,
     uint season = 0, episode = 0, chanid = 0, programflags = 0,
          audioproperties = 0, videoproperties = 0, subtitletype = 0,
          tracknum = 0, popularity = 0, budget = 0, revenue = 0,
-         year = 0, runtime = 0, runtimesecs = 0;
-    QString title, subtitle, tagline, description, certification,
+         year = 0, runtime = 0, runtimesecs = 0, ratingcount = 0;
+    QString title, network, status, subtitle, tagline, description, certification,
         channum, chansign, channame, chanplaybackfilters, recgroup,
         playgroup, seriesid, programid, storagegroup, album, system,
-        inetref, tmsref, imdb, homepage, trailerURL, language;
+        inetref, collectionref, tmsref, imdb, homepage, trailerURL, language;
     QStringList categories, countries, studios;
     float userrating = 0;
     QDate releasedate;
@@ -896,11 +948,14 @@ MetadataLookup* ParseMetadataItem(const QDomElement& item,
     // Get the easy parses
     language = item.firstChildElement("language").text();
     title = Parse::UnescapeHTML(item.firstChildElement("title").text());
+    network = Parse::UnescapeHTML(item.firstChildElement("network").text());
+    status = Parse::UnescapeHTML(item.firstChildElement("status").text());
     subtitle = Parse::UnescapeHTML(item.firstChildElement("subtitle").text());
     tagline = Parse::UnescapeHTML(item.firstChildElement("tagline").text());
     description = Parse::UnescapeHTML(item.firstChildElement("description").text());
     album = Parse::UnescapeHTML(item.firstChildElement("albumname").text());
     inetref = item.firstChildElement("inetref").text();
+    collectionref = item.firstChildElement("collectionref").text();
     tmsref = item.firstChildElement("tmsref").text();
     imdb = item.firstChildElement("imdb").text();
     homepage = item.firstChildElement("homepage").text();
@@ -937,6 +992,7 @@ MetadataLookup* ParseMetadataItem(const QDomElement& item,
                       firstChildElement("lastupdated").text());
 
     userrating = item.firstChildElement("userrating").text().toFloat();
+    ratingcount = item.firstChildElement("ratingcount").text().toUInt();
     tracknum = item.firstChildElement("tracknum").text().toUInt();
     popularity = item.firstChildElement("popularity").text().toUInt();
     budget = item.firstChildElement("budget").text().toUInt();
@@ -1071,16 +1127,16 @@ MetadataLookup* ParseMetadataItem(const QDomElement& item,
     return new MetadataLookup(lookup->GetType(), lookup->GetSubtype(),
         lookup->GetData(), lookup->GetStep(), lookup->GetAutomatic(),
         lookup->GetHandleImages(), lookup->GetAllowOverwrites(),
-        lookup->GetPreferDVDOrdering(), lookup->GetHost(),
-        lookup->GetFilename(), title, categories, userrating,
-        language, subtitle, tagline, description, season,
+        lookup->GetAllowGeneric(), lookup->GetPreferDVDOrdering(), lookup->GetHost(),
+        lookup->GetFilename(), title, network, status, categories, userrating,
+        ratingcount, language, subtitle, tagline, description, season,
         episode, chanid, channum, chansign, channame,
         chanplaybackfilters, recgroup, playgroup, seriesid, programid,
         storagegroup, startts, endts, recstartts, recendts, programflags,
         audioproperties, videoproperties, subtitletype, certification,
         countries, popularity, budget, revenue, album, tracknum, system, year,
-        releasedate, lastupdated, runtime, runtimesecs, inetref, tmsref,
-        imdb, people, studios, homepage, trailerURL, artwork, DownloadMap());
+        releasedate, lastupdated, runtime, runtimesecs, inetref, collectionref,
+        tmsref, imdb, people, studios, homepage, trailerURL, artwork, DownloadMap());
 }
 
 MetadataLookup* ParseMetadataMovieNFO(const QDomElement& item,
@@ -1152,8 +1208,9 @@ MetadataLookup* ParseMetadataMovieNFO(const QDomElement& item,
     return new MetadataLookup(lookup->GetType(), lookup->GetSubtype(),
         lookup->GetData(), lookup->GetStep(),
         lookup->GetAutomatic(), lookup->GetHandleImages(),
-        lookup->GetAllowOverwrites(), lookup->GetPreferDVDOrdering(),
-        lookup->GetHost(), lookup->GetFilename(), title, categories,
+        lookup->GetAllowOverwrites(), lookup->GetAllowGeneric(),
+        lookup->GetPreferDVDOrdering(), lookup->GetHost(),
+        lookup->GetFilename(), title, categories,
         userrating, subtitle, tagline, description, season, episode,
         certification, year, releasedate, runtime, runtimesecs,
         inetref, people, trailer, artwork, DownloadMap());

@@ -153,7 +153,8 @@ DTC::VideoLookupList* Video::LookupVideo( const QString    &Title,
                                               const QString    &Inetref,
                                               int              Season,
                                               int              Episode,
-                                              const QString    &GrabberType  )
+                                              const QString    &GrabberType,
+                                              bool             AllowGeneric )
 {
     DTC::VideoLookupList *pVideoLookups = new DTC::VideoLookupList();
 
@@ -163,7 +164,8 @@ DTC::VideoLookupList* Video::LookupVideo( const QString    &Title,
 
     if (factory)
         list = factory->SynchronousLookup(Title, Subtitle,
-                                         Inetref, Season, Episode, GrabberType);
+                                         Inetref, Season, Episode,
+                                         GrabberType, AllowGeneric);
 
     if ( !list.size() )
         return pVideoLookups;
@@ -185,6 +187,7 @@ DTC::VideoLookupList* Video::LookupVideo( const QString    &Title,
             pVideoLookup->setDescription(lookup->GetDescription());
             pVideoLookup->setCertification(lookup->GetCertification());
             pVideoLookup->setInetref(lookup->GetInetref());
+            pVideoLookup->setCollectionref(lookup->GetCollectionref());
             pVideoLookup->setHomePage(lookup->GetHomepage());
             pVideoLookup->setReleaseDate(QDateTime(lookup->GetReleaseDate()));
             pVideoLookup->setUserRating(lookup->GetUserRating());

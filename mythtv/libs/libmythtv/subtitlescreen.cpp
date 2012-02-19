@@ -11,12 +11,13 @@
 
 #define LOC      QString("Subtitles: ")
 #define LOC_WARN QString("Subtitles Warning: ")
-#define PAD_WIDTH  0.20
-#define PAD_HEIGHT 0.04
+static const float PAD_WIDTH  = 0.20;
+static const float PAD_HEIGHT = 0.04;
 
-static const float LINE_SPACING = 1.1765f;
-
-static QHash<int, MythFontProperties*> gCC708Fonts;
+// Normal font height is designed to be 1/20 of safe area height, with
+// extra blank space between lines to make 17 lines within the safe
+// area.
+static const float LINE_SPACING = (20.0 / 17.0);
 
 SubtitleScreen::SubtitleScreen(MythPlayer *player, const char * name,
                                int fontStretch) :
@@ -25,7 +26,8 @@ SubtitleScreen::SubtitleScreen(MythPlayer *player, const char * name,
     m_708reader(NULL), m_safeArea(QRect()), m_useBackground(false),
     m_removeHTML(QRegExp("</?.+>")),        m_subtitleType(kDisplayNone),
     m_textFontZoom(100),                    m_refreshArea(false),
-    m_fontStretch(fontStretch)
+    m_fontStretch(fontStretch),
+    m_fontsAreInitialized(false)
 {
     m_removeHTML.setMinimal(true);
 
@@ -96,6 +98,17 @@ bool SubtitleScreen::Create(void)
         LOG(VB_GENERAL, LOG_WARNING, LOC + "Failed to get CEA-708 reader.");
     m_useBackground = (bool)gCoreContext->GetNumSetting("CCBackground", 0);
     m_textFontZoom  = gCoreContext->GetNumSetting("OSDCC708TextZoom", 100);
+
+    QString defaultFont = gCoreContext->GetSetting("OSDSubFont", "FreeSans");
+    m_fontNames.append(defaultFont);       // default
+    m_fontNames.append("FreeMono");        // mono serif
+    m_fontNames.append("DejaVu Serif");    // prop serif
+    m_fontNames.append("Droid Sans Mono"); // mono sans
+    m_fontNames.append("Liberation Sans"); // prop sans
+    m_fontNames.append("Purisa");          // casual
+    m_fontNames.append("URW Chancery L");  // cursive
+    m_fontNames.append("Impact");          // capitals
+
     return true;
 }
 
@@ -344,7 +357,7 @@ void SubtitleScreen::DisplayAVSubtitles(void)
 
 void SubtitleScreen::DisplayTextSubtitles(void)
 {
-    if (!Initialise708Fonts(m_fontStretch) || !m_player || !m_subreader)
+    if (!m_player || !m_subreader)
         return;
 
     bool changed = false;
@@ -354,6 +367,8 @@ void SubtitleScreen::DisplayTextSubtitles(void)
         QRect oldsafe = m_safeArea;
         m_safeArea = vo->GetSafeRect();
         changed = (oldsafe != m_safeArea);
+        if (!InitializeFonts(changed))
+            return;
     }
     else
     {
@@ -419,7 +434,7 @@ void SubtitleScreen::DisplayTextSubtitles(void)
 
 void SubtitleScreen::DisplayRawTextSubtitles(void)
 {
-    if (!Initialise708Fonts(m_fontStretch) || !m_player || !m_subreader)
+    if (!m_player || !m_subreader)
         return;
 
     uint64_t duration;
@@ -433,6 +448,13 @@ void SubtitleScreen::DisplayRawTextSubtitles(void)
 
     VideoFrame *currentFrame = vo->GetLastShownFrame();
     if (!currentFrame)
+        return;
+
+    bool changed = false;
+    QRect oldsafe = m_safeArea;
+    m_safeArea = vo->GetSafeRect();
+    changed = (oldsafe != m_safeArea);
+    if (!InitializeFonts(changed))
         return;
 
     // delete old subs that may still be on screen
@@ -581,7 +603,7 @@ static QString extract_cc608(
 
 void SubtitleScreen::DisplayCC608Subtitles(void)
 {
-    if (!Initialise708Fonts(m_fontStretch) || !m_608reader)
+    if (!m_608reader)
         return;
 
     bool changed = false;
@@ -597,6 +619,8 @@ void SubtitleScreen::DisplayCC608Subtitles(void)
     {
         return;
     }
+    if (!InitializeFonts(changed))
+        return;
 
     CC608Buffer* textlist = m_608reader->GetOutputText(changed);
     if (!changed)
@@ -631,20 +655,17 @@ void SubtitleScreen::DisplayCC708Subtitles(void)
 
     CC708Service *cc708service = m_708reader->GetCurrentService();
     float video_aspect = 1.77777f;
+    bool changed = false;
     if (m_player && m_player->GetVideoOutput())
     {
         video_aspect = m_player->GetVideoAspect();
         QRect oldsafe = m_safeArea;
         m_safeArea = m_player->GetVideoOutput()->GetSafeRect();
-        if (oldsafe != m_safeArea)
+        changed = (oldsafe != m_safeArea);
+        if (changed)
         {
             for (uint i = 0; i < 8; i++)
                 cc708service->windows[i].changed = true;
-            int size = (m_safeArea.height() * m_textFontZoom) / 2000;
-            m_708fontSizes[1] = size;
-            m_708fontSizes[0] = size * 32 / 42;
-            m_708fontSizes[2] = size * 42 / 32;
-            m_708fontSizes[3] = 1; // just to be safe
         }
     }
     else
@@ -652,7 +673,7 @@ void SubtitleScreen::DisplayCC708Subtitles(void)
         return;
     }
 
-    if (!Initialise708Fonts(m_fontStretch))
+    if (!InitializeFonts(changed))
         return;
 
     for (uint i = 0; i < 8; i++)
@@ -734,53 +755,48 @@ void SubtitleScreen::AddScaledImage(QImage &img, QRect &pos)
     }
 }
 
-bool SubtitleScreen::Initialise708Fonts(int fontStretch)
+bool SubtitleScreen::InitializeFonts(bool wasResized)
 {
-    static bool initialised = false;
-    if (initialised)
+    bool success = true;
+
+    if (!m_fontsAreInitialized)
     {
-        foreach(MythFontProperties* font, gCC708Fonts)
-            font->face().setStretch(fontStretch);
-        return true;
-    }
+        LOG(VB_GENERAL, LOG_INFO, "InitializeFonts()");
 
-    LOG(VB_GENERAL, LOG_INFO, "Initialise708Fonts()");
-
-    QStringList fonts;
-    QString defaultFont = gCoreContext->GetSetting("OSDSubFont", "FreeSans");
-    fonts.append(defaultFont);       // default
-    fonts.append("FreeMono");        // mono serif
-    fonts.append("DejaVu Serif");    // prop serif
-    fonts.append("Droid Sans Mono"); // mono sans
-    fonts.append("Liberation Sans"); // prop sans
-    fonts.append("Purisa");          // casual
-    fonts.append("URW Chancery L");  // cursive
-    fonts.append("Impact");          // capitals
-
-    int count = 0;
-    foreach(QString font, fonts)
-    {
-        MythFontProperties *mythfont = new MythFontProperties();
-        if (mythfont)
+        int count = 0;
+        foreach(QString font, m_fontNames)
         {
-            QFont newfont(font);
-            newfont.setStretch(fontStretch);
-            font.detach();
-            mythfont->SetFace(newfont);
-            gCC708Fonts.insert(count, mythfont);
-            count++;
+            MythFontProperties *mythfont = new MythFontProperties();
+            if (mythfont)
+            {
+                QFont newfont(font);
+                newfont.setStretch(m_fontStretch);
+                font.detach();
+                mythfont->SetFace(newfont);
+                m_fontSet.insert(count, mythfont);
+                count++;
+            }
         }
+        success = count > 0;
+        LOG(VB_PLAYBACK, LOG_INFO, LOC +
+            QString("Loaded %1 CEA-708 fonts").arg(count));
     }
-    initialised = count > 0;
-    LOG(VB_PLAYBACK, LOG_INFO, LOC +
-        QString("Loaded %1 CEA-708 fonts").arg(count));
-    return initialised;
+
+    if (wasResized || !m_fontsAreInitialized)
+    {
+        foreach(MythFontProperties* font, m_fontSet)
+            font->face().setStretch(m_fontStretch);
+        // XXX reset font sizes
+    }
+
+    m_fontsAreInitialized = true;
+    return success;
 }
 
 MythFontProperties* SubtitleScreen::Get708Font(CC708CharacterAttribute attr)
     const
 {
-    MythFontProperties *mythfont = gCC708Fonts[attr.font_tag & 0x7];
+    MythFontProperties *mythfont = m_fontSet[attr.font_tag & 0x7];
     if (!mythfont)
         return NULL;
 
@@ -1119,9 +1135,9 @@ void FormattedTextSubtitle::Layout(void)
     int anchor_height = 0;
     for (int i = 0; i < m_lines.size(); i++)
     {
-        QSize sz = m_lines[i].CalcSize();
+        QSize sz = m_lines[i].CalcSize(LINE_SPACING);
         anchor_width = max(anchor_width, sz.width());
-        anchor_height += sz.height() * LINE_SPACING;
+        anchor_height += sz.height();
     }
 
     // Adjust the anchor point according to actual width and height
@@ -1136,6 +1152,10 @@ void FormattedTextSubtitle::Layout(void)
     else if (m_yAnchorPoint == 2)
         anchor_y -= anchor_height;
 
+    // Shift the anchor point back into the safe area if necessary/possible.
+    anchor_y = max(0, min(anchor_y, m_safeArea.height() - anchor_height));
+    anchor_x = max(0, min(anchor_x, m_safeArea.width() - anchor_width));
+
     m_bounds = QRect(anchor_x, anchor_y, anchor_width, anchor_height);
 
     // Fill in missing coordinates
@@ -1146,7 +1166,7 @@ void FormattedTextSubtitle::Layout(void)
             m_lines[i].x_indent = anchor_x;
         if (m_lines[i].y_indent < 0)
             m_lines[i].y_indent = y;
-        y += m_lines[i].CalcSize().height() * LINE_SPACING;
+        y += m_lines[i].CalcSize(LINE_SPACING).height();
         // Prune leading all-whitespace chunks.
         while (!m_lines[i].chunks.isEmpty() &&
                m_lines[i].chunks.first().text.trimmed().isEmpty())
@@ -1312,12 +1332,15 @@ void SubtitleScreen::SetFontSizes(int nSmall, int nMedium, int nLarge)
 }
 
 QSize SubtitleScreen::CalcTextSize(const QString &text,
-                                   const CC708CharacterAttribute &format) const
+                                   const CC708CharacterAttribute &format,
+                                   float layoutSpacing) const
 {
     QFont *font = Get708Font(format)->GetFace();
     QFontMetrics fm(*font);
     int width = fm.width(text) + fm.maxWidth() * PAD_WIDTH;
     int height = fm.height() * (1 + PAD_HEIGHT);
+    if (layoutSpacing > 0 && !text.trimmed().isEmpty())
+        height = max(height, (int)(font->pixelSize() * layoutSpacing));
     return QSize(width, height);
 }
 

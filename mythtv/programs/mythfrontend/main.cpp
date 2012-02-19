@@ -1203,6 +1203,11 @@ static int internal_play_media(const QString &mrl, const QString &plot,
 
 static void gotoMainMenu(void)
 {
+    // Reset the selected button to the first item.
+    MythThemedMenuState *menu = dynamic_cast<MythThemedMenuState *>
+        (GetMythMainWindow()->GetMainStack()->GetTopScreen());
+    if (menu)
+        menu->m_buttonList->SetItemCurrent(0);
 }
 
 // If the theme specified in the DB is somehow broken, try a standard one:
@@ -1527,16 +1532,6 @@ int main(int argc, char **argv)
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
 
-    if (!cmdline.toBool("noupnp"))
-    {
-        g_pUPnp  = new MediaRenderer();
-        if (!g_pUPnp->initialized())
-        {
-            delete g_pUPnp;
-            g_pUPnp = NULL;
-        }
-    }
-
     if (!gContext->Init(true, bPromptForBackend, bBypassAutoDiscovery))
     {
         LOG(VB_GENERAL, LOG_ERR, "Failed to init MythContext, exiting.");
@@ -1553,6 +1548,16 @@ int main(int argc, char **argv)
 
     if (cmdline.toBool("reset"))
         ResetSettings = true;
+
+    if (!cmdline.toBool("noupnp"))
+    {
+        g_pUPnp  = new MediaRenderer();
+        if (!g_pUPnp->initialized())
+        {
+            delete g_pUPnp;
+            g_pUPnp = NULL;
+        }
+    }
 
     QString fileprefix = GetConfDir();
 
@@ -1673,7 +1678,7 @@ int main(int argc, char **argv)
     NetworkControl *networkControl = NULL;
     if (gCoreContext->GetNumSetting("NetworkControlEnabled", 0))
     {
-        int port = gCoreContext->GetNumSetting("NetworkControlPort", 6545);
+        int port = gCoreContext->GetNumSetting("NetworkControlPort", 6546);
         networkControl = new NetworkControl();
         if (!networkControl->listen(gCoreContext->MythHostAddress(), port))
             LOG(VB_GENERAL, LOG_ERR,

@@ -25,8 +25,6 @@ class SubtitleScreen : public MythScreenType
 {
     friend class FormattedTextSubtitle;
 
-    static bool Initialise708Fonts(int fontStretch = QFont::Unstretched);
-
   public:
     SubtitleScreen(MythPlayer *player, const char * name, int fontStretch);
     virtual ~SubtitleScreen();
@@ -42,7 +40,8 @@ class SubtitleScreen : public MythScreenType
     void DisplayDVDButton(AVSubtitle* dvdButton, QRect &buttonPos);
 
     QSize CalcTextSize(const QString &text,
-                       const CC708CharacterAttribute &format) const;
+                       const CC708CharacterAttribute &format,
+                       float layoutSpacing) const;
 
     void RegisterExpiration(MythUIType *shape, long long endTime)
     {
@@ -66,6 +65,7 @@ class SubtitleScreen : public MythScreenType
     void DisplayCC708Subtitles(void);
     void AddScaledImage(QImage &img, QRect &pos);
     void Clear708Cache(int num);
+    bool InitializeFonts(bool wasResized);
     MythFontProperties* Get708Font(CC708CharacterAttribute attr) const;
     void SetFontSizes(int nSmall, int nMedium, int nLarge);
 
@@ -83,6 +83,9 @@ class SubtitleScreen : public MythScreenType
     bool               m_refreshArea;
     QHash<int,QList<MythUIType*> > m_708imageCache;
     int                m_fontStretch;
+    bool               m_fontsAreInitialized;
+    QStringList        m_fontNames;
+    QHash<int, MythFontProperties*> m_fontSet;
 
 #ifdef USING_LIBASS
     bool InitialiseAssLibrary(void);
@@ -112,9 +115,9 @@ class FormattedTextChunk
     }
     FormattedTextChunk(void) : parent(NULL) {}
 
-    QSize CalcSize(void) const
+    QSize CalcSize(float layoutSpacing = 0.0f) const
     {
-        return parent->CalcTextSize(text, format);
+        return parent->CalcTextSize(text, format, layoutSpacing);
     }
     bool Split(FormattedTextChunk &newChunk);
     QString ToLogString(void) const;
@@ -130,13 +133,13 @@ class FormattedTextLine
     FormattedTextLine(int x = -1, int y = -1, int o_x = -1, int o_y = -1)
         : x_indent(x), y_indent(y), orig_x(o_x), orig_y(o_y) {}
 
-    QSize CalcSize(void) const
+    QSize CalcSize(float layoutSpacing = 0.0f) const
     {
         int height = 0, width = 0;
         QList<FormattedTextChunk>::const_iterator it;
         for (it = chunks.constBegin(); it != chunks.constEnd(); ++it)
         {
-            QSize tmp = (*it).CalcSize();
+            QSize tmp = (*it).CalcSize(layoutSpacing);
             height = max(height, tmp.height());
             width += tmp.width();
         }

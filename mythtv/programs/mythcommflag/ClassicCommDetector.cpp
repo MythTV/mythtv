@@ -1805,7 +1805,10 @@ void ClassicCommDetector::BuildAllMethodsCommList(void)
                     .arg((framesProcessed - breakStart - 1)));
 
         commBreakMap[breakStart] = MARK_COMM_START;
-        commBreakMap[framesProcessed - (int)(2 * fps) - 2] = MARK_COMM_END;
+        // Create what is essentially an open-ended final skip region
+        // by setting the end point 10 seconds past the end of the
+        // recording.
+        commBreakMap[framesProcessed + (10 * fps)] = MARK_COMM_END;
     }
 
     // include/exclude blanks from comm breaks

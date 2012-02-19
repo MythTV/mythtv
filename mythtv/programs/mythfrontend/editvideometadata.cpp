@@ -261,7 +261,7 @@ namespace
 
         const FileAssociations::association_list fa_list =
                 FileAssociations::getFileAssociation().getList();
-        for (FileAssociations::association_list::const_iterator p = 
+        for (FileAssociations::association_list::const_iterator p =
                 fa_list.begin(); p != fa_list.end(); ++p)
         {
             exts << QString("*.%1").arg(p->extension.toUpper());
@@ -305,23 +305,23 @@ void EditMetadataDialog::fillWidgets()
     m_titleEdit->SetText(m_workingMetadata->GetTitle());
     m_subtitleEdit->SetText(m_workingMetadata->GetSubtitle());
 
-    m_seasonSpin->SetRange(0,9999,1);
+    m_seasonSpin->SetRange(0,9999,1,5);
     m_seasonSpin->SetValue(m_workingMetadata->GetSeason());
-    m_episodeSpin->SetRange(0,999,1);
+    m_episodeSpin->SetRange(0,999,1,10);
     m_episodeSpin->SetValue(m_workingMetadata->GetEpisode());
     if (m_yearSpin)
     {
-        m_yearSpin->SetRange(0,9999,1);
+        m_yearSpin->SetRange(0,9999,1,10);
         m_yearSpin->SetValue(m_workingMetadata->GetYear());
     }
     if (m_userRatingSpin)
     {
-        m_userRatingSpin->SetRange(0,10,1);
+        m_userRatingSpin->SetRange(0,10,1,2);
         m_userRatingSpin->SetValue(m_workingMetadata->GetUserRating());
     }
     if (m_lengthSpin)
     {
-        m_lengthSpin->SetRange(0,999,1);
+        m_lengthSpin->SetRange(0,999,1,15);
         m_lengthSpin->SetValue(m_workingMetadata->GetLength());
     }
 
@@ -465,7 +465,7 @@ void EditMetadataDialog::fillWidgets()
             !m_workingMetadata->GetFanart().isEmpty() &&
             !m_workingMetadata->GetFanart().startsWith("/"))
         {
-            m_fanart->SetFilename(generate_file_url("Fanart", 
+            m_fanart->SetFilename(generate_file_url("Fanart",
                                   m_workingMetadata->GetHost(),
                                   m_workingMetadata->GetFanart()));
         }
@@ -943,12 +943,12 @@ void EditMetadataDialog::FindTrailer()
                 GetConfDir() + "/MythVideo/Trailers",
                 *this, CEID_TRAILERFILE);
 }
-    
+
 void EditMetadataDialog::SetTrailer(QString file)
-{   
+{
     if (file.isEmpty())
         return;
-    
+
     if (file.startsWith("myth://"))
     {
         QUrl url(file);

@@ -2839,8 +2839,8 @@ void MythPlayer::EventLoop(void)
     }
 
     // Handle cutlist skipping
-    if (deleteMap.TrackerWantsToJump(framesPlayed, totalFrames, jumpto) &&
-        (ffrew_skip == 1))
+    if (!allpaused && (ffrew_skip == 1) &&
+        deleteMap.TrackerWantsToJump(framesPlayed, totalFrames, jumpto))
     {
         if (jumpto == totalFrames)
         {
@@ -5001,6 +5001,14 @@ void MythPlayer::ResetTotalDuration(void)
         return;
 
     decoder->ResetTotalDuration();
+}
+
+void MythPlayer::SaveTotalFrames(void)
+{
+    if (!decoder)
+        return;
+
+    decoder->SaveTotalFrames();
 }
 
 static unsigned dbg_ident(const MythPlayer *player)

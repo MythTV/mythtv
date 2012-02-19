@@ -48,6 +48,7 @@ MythUIType::MythUIType(QObject *parent, const QString &name)
     m_XYSpeed = QPoint(0, 0);
     m_deferload = false;
     m_IsDependDefault = false;
+    m_ReverseDepend = false;
 
     m_Parent = NULL;
 
@@ -1029,7 +1030,8 @@ void MythUIType::Refresh(void)
 
 void MythUIType::UpdateDependState(bool isDefault)
 {
-    m_IsDependDefault = isDefault;
+    m_IsDependDefault = m_ReverseDepend ? !isDefault : isDefault;
+
     SetVisible(!m_IsDependDefault);
 }
 
@@ -1146,6 +1148,9 @@ void MythUIType::CopyFrom(MythUIType *base)
         else
             (*it)->CreateCopy(this);
     }
+
+    m_dependsMap = base->m_dependsMap;
+    m_ReverseDepend = base->m_ReverseDepend;
 
     SetMinArea(base->m_MinArea);
 }
@@ -1351,4 +1356,51 @@ MythPainter *MythUIType::GetPainter(void)
         return m_Parent->GetPainter();
 
     return GetMythPainter();
+}
+
+void MythUIType::SetDependsMap(QMap<QString, QString> dependsMap)
+{
+    m_dependsMap = dependsMap;
+}
+
+void MythUIType::SetReverseDependence(bool reverse)
+{
+    m_ReverseDepend = reverse;
+}
+
+void MythUIType::ConnectDependants(bool recurse)
+{
+
+    QMapIterator<QString, QString> i(m_dependsMap);
+    while(i.hasNext())
+    {
+        i.next();
+        QString dependeeName = i.value();
+        bool reverse = false;
+        if (dependeeName.startsWith('!'))
+        {
+            reverse = true;
+            dependeeName.remove(0,1);
+        }
+        MythUIType *dependee = GetChild(dependeeName);
+        MythUIType *dependant = GetChild(i.key());
+
+        if (dependee && dependant)
+        {
+            QObject::connect(dependee, SIGNAL(DependChanged(bool)),
+                             dependant, SLOT(UpdateDependState(bool)));
+            dependant->SetReverseDependence(reverse);
+            dependant->UpdateDependState(true);
+        }
+    }
+
+    if (recurse)
+    {
+        QList<MythUIType *>::iterator it;
+        for (it = m_ChildrenList.begin(); it != m_ChildrenList.end(); ++it)
+        {
+            if (*it)
+                (*it)->ConnectDependants(recurse);
+        }
+    }
 }

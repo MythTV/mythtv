@@ -1,3 +1,6 @@
+// This is an automatically generated file
+// Do not edit
+
 void strings_null() {
     ThemeUI::tr("Bookmark Manager");
     ThemeUI::tr("Web Page");
@@ -25,5 +28,6 @@ void strings_null() {
     ThemeUI::tr("Find...");
     ThemeUI::tr("Find");
     ThemeUI::tr("Enable browser plugins (Flash, etc)");
+    ThemeUI::tr("Enable plugins");
     ThemeUI::tr("Enable plugins:");
 }

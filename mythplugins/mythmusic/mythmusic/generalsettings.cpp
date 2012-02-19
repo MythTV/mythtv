@@ -83,8 +83,8 @@ bool GeneralSettings::Create()
                  "Set this option to enable it by default. "
                  "You can enable or disable the upconversion "
                  "during playback at anytime."));
-    m_musicCDDevice->SetHelpText(tr("CDRom device used for ripping/playback."));
-    m_nonID3FileNameFormat->SetHelpText(tr("Directory and filename Format used to grab "
+    m_musicCDDevice->SetHelpText(tr("CD-ROM device used for ripping/playback."));
+    m_nonID3FileNameFormat->SetHelpText(tr("Directory and filename format used to grab "
                  "information if no ID3 information is found. Accepts "
                  "GENRE, ARTIST, ALBUM, TITLE, ARTIST_TITLE and "
                  "TRACK_TITLE."));
@@ -92,8 +92,8 @@ bool GeneralSettings::Create()
                  "in files and just try to determine Genre, Artist, "
                  "Album, and Track number and title from the "
                  "filename."));
-    m_tagEncoding->SetHelpText(tr("Some mp3 players don't understand tags encoded in UTF8 "
-                 "or UTF16, this setting allows you to change the encoding "
+    m_tagEncoding->SetHelpText(tr("Some MP3 players don't understand tags encoded in UTF-8 "
+                 "or UTF-16, this setting allows you to change the encoding "
                  "format used. Currently applies only to ID3 tags."));
     m_allowTagWriting->SetHelpText(tr("If set, MythMusic will be allowed to update the "
                  "metadata in the file (e.g. ID3) to match the "

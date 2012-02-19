@@ -146,9 +146,14 @@ void MythUITextEdit::Finalize()
 
     // Give it something to chew on, so it can position the initial
     // cursor in the right place.  Toggle text, to force an area recalc.
-    m_Text->SetText(".");
-    m_Text->SetText("");
-    m_cursorImage->SetPosition(m_Text->CursorPosition(0));
+    if (m_Text)
+    {
+        m_Text->SetText(".");
+        m_Text->SetText("");
+    }
+
+    if (m_cursorImage)
+        m_cursorImage->SetPosition(m_Text->CursorPosition(0));
 }
 
 void MythUITextEdit::SetInitialStates()

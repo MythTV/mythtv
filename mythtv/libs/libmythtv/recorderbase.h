@@ -254,6 +254,10 @@ class MTV_PUBLIC RecorderBase : public QRunnable
      */
     void SetDuration(uint64_t duration);
 
+    /** \brief Note the total frames in the recordedmark table
+     */
+    void SetTotalFrames(uint64_t total_frames);
+
     TVRec         *tvrec;
     RingBuffer    *ringBuffer;
     bool           weMadeBuffer;

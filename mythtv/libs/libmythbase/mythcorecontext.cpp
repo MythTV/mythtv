@@ -56,8 +56,9 @@ class MythCoreContextPrivate : public QObject
     QObject         *m_GUIobject;
     QString          m_appBinaryVersion;
 
-    QMutex  m_hostnameLock;      ///< Locking for thread-safe copying of:
+    QMutex  m_localHostLock;      ///< Locking for thread-safe copying of:
     QString m_localHostname;     ///< hostname from mysql.txt or gethostname()
+    QMutex  m_masterHostLock;
     QString m_masterHostname;    ///< master backend hostname
 
     QMutex      m_sockLock;      ///< protects both m_serverSock and m_eventSock
@@ -725,7 +726,8 @@ void MythCoreContext::ConfigureHostAddress(void)
                 .arg(it->toString()));
     }
 
-    if (!config_v4.isNull() && !d->m_IPv4.contains(config_v4))
+    if (!config_v4.isNull() && !d->m_IPv4.contains(config_v4) &&
+        !d->m_IPv4.isEmpty())
     {
         LOG(VB_GENERAL, LOG_CRIT, LOC + QString("Host is configured to listen "
                 "on %1, but address is not used on any local network "
@@ -733,7 +735,8 @@ void MythCoreContext::ConfigureHostAddress(void)
     }
 #if !defined(QT_NO_IPV6)
 
-    if (!config_v6.isNull() && !d->m_IPv6.contains(config_v6))
+    if (!config_v6.isNull() && !d->m_IPv6.contains(config_v6) && 
+        !d->m_IPv6.isEmpty())
     {
         LOG(VB_GENERAL, LOG_CRIT, LOC + QString("Host is configured to listen "
                 "on %1, but address is not used on any local network "
@@ -840,14 +843,20 @@ QString MythCoreContext::GetMasterHostPrefix(QString storageGroup)
 
 QString MythCoreContext::GetMasterHostName(void)
 {
-    QMutexLocker locker(&d->m_hostnameLock);
+    QMutexLocker locker(&d->m_masterHostLock);
 
     if (d->m_masterHostname.isEmpty())
     {
-        QStringList strlist("QUERY_HOSTNAME");
 
-        if (SendReceiveStringList(strlist))
-            d->m_masterHostname = strlist[0];
+        if (IsMasterBackend())
+            d->m_masterHostname = d->m_localHostname;
+        else
+        {
+            QStringList strlist("QUERY_HOSTNAME");
+
+            if (SendReceiveStringList(strlist))
+                d->m_masterHostname = strlist[0];
+        }
     }
 
     QString ret = d->m_masterHostname;
@@ -868,7 +877,7 @@ void MythCoreContext::ActivateSettingsCache(bool activate)
 
 QString MythCoreContext::GetHostName(void)
 {
-    QMutexLocker (&d->m_hostnameLock);
+    QMutexLocker (&d->m_localHostLock);
     QString tmp = d->m_localHostname;
     tmp.detach();
     return tmp;
@@ -1316,7 +1325,7 @@ void MythCoreContext::dispatchNow(const MythEvent &event)
 
 void MythCoreContext::SetLocalHostname(const QString &hostname)
 {
-    QMutexLocker locker(&d->m_hostnameLock);
+    QMutexLocker locker(&d->m_localHostLock);
     d->m_localHostname = hostname;
     d->m_database->SetLocalHostname(hostname);
 }

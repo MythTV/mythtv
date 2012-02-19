@@ -4100,6 +4100,11 @@ EOF
     fi
 fi
 
+# Disable OpenGL ES support if Qt does not support it
+if $(pkg-config --variable=qt_config QtOpenGL | grep -qv opengles2) ; then
+    disable opengles
+fi
+
 if enabled firewire; then
     fwlibs=""
     check_libx fwlibs libavc1394/avc1394.h avc1394_transaction_block2 -lavc1394 && check_libx fwlibs libiec61883/iec61883.h iec61883_cmp_reconnect -liec61883 || disable firewire

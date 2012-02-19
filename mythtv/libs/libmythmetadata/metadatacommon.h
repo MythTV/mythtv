@@ -18,7 +18,8 @@ class ProgramInfo;
 
 enum LookupStep {
     kLookupSearch = 0,
-    kLookupData = 1
+    kLookupData = 1,
+    kLookupCollection = 2
 };
 
 struct PersonInfo
@@ -92,12 +93,16 @@ class META_PUBLIC MetadataLookup : public QObject
         bool automatic,
         bool handleimages,
         bool allowoverwrites,
+        bool allowgeneric,
         bool preferdvdorder,
         const QString &host,
         const QString &filename,
         const QString &title,
+        const QString &network,
+        const QString &status,
         const QStringList &categories,
         const float userrating,
+        uint ratingcount,
         const QString &language,
         const QString &subtitle,
         const QString &tagline,
@@ -136,6 +141,7 @@ class META_PUBLIC MetadataLookup : public QObject
         const uint runtime,
         const uint runtimesecs,
         const QString &inetref,
+        const QString &collectionref,
         const QString &tmsref,
         const QString &imdb,
         const PeopleMap people,
@@ -154,6 +160,7 @@ class META_PUBLIC MetadataLookup : public QObject
         bool automatic,
         bool handleimages,
         bool allowoverwrites,
+        bool allowgeneric,
         bool preferdvdorder,
         const QString &host,
         const QString &filename,
@@ -195,6 +202,7 @@ class META_PUBLIC MetadataLookup : public QObject
         bool automatic,
         bool handleimages,
         bool allowoverwrites,
+        bool allowgeneric,
         bool preferdvdorder,
         const QString &host,
         const QString &filename,
@@ -235,6 +243,7 @@ class META_PUBLIC MetadataLookup : public QObject
     // Sets for image download handling
     void SetHandleImages(bool handle) { m_handleimages = handle; };
     void SetAllowOverwrites(bool allow) { m_allowoverwrites = allow; };
+    void SetAllowGeneric(bool allow) { m_allowgeneric = allow; };
     void SetHost(const QString &host) { m_host = host; };
     void SetDownloads(ArtworkMap map) { m_downloads = map; };
 
@@ -247,6 +256,8 @@ class META_PUBLIC MetadataLookup : public QObject
     void SetSeason(uint season) { m_season = season; };
     void SetEpisode(uint episode) { m_episode = episode; };
     void SetInetref(const QString &inetref) { m_inetref = inetref; };
+    void SetCollectionref(const QString &collectionref)
+                             { m_collectionref = collectionref; };
     void SetTMSref(const QString &tmsref) { m_tmsref = tmsref; };
     void SetPreferDVDOrdering(bool preferdvdorder)
                              { m_dvdorder = preferdvdorder; };
@@ -269,16 +280,20 @@ class META_PUBLIC MetadataLookup : public QObject
     // Image Handling Gets
     bool GetHandleImages() const { return m_handleimages; };
     bool GetAllowOverwrites() const { return m_allowoverwrites; };
+    bool GetAllowGeneric() const { return m_allowgeneric; };
 
     // General
     QString GetFilename() const { return m_filename; };
     QString GetTitle() const { return m_title; };
     QStringList GetCategories() const { return m_categories; };
     float GetUserRating() const { return m_userrating; };
+    uint GetRatingCount() const { return m_ratingcount; };
     QString GetLanguage() const { return m_language; };
     QString GetHost() const { return m_host; };
 
     // General - Video & ProgramInfo
+    QString GetNetwork() const { return m_network; };
+    QString GetStatus() const { return m_status; };
     QString GetSubtitle() const { return m_subtitle; };
     QString GetTagline() const { return m_tagline; };
     QString GetDescription() const { return m_description; };
@@ -326,6 +341,7 @@ class META_PUBLIC MetadataLookup : public QObject
 
     // Inetref
     QString GetInetref() const { return m_inetref; };
+    QString GetCollectionref() const { return m_collectionref; };
     QString GetIMDB() const { return m_imdb; };
     QString GetTMSref() const { return m_tmsref; };
 
@@ -350,13 +366,17 @@ class META_PUBLIC MetadataLookup : public QObject
     bool m_automatic;
     bool m_handleimages;
     bool m_allowoverwrites;
+    bool m_allowgeneric;
     bool m_dvdorder;
     QString m_host;
 
     QString m_filename;
     QString m_title;
+    QString m_network;
+    QString m_status;
     const QStringList m_categories;
     float m_userrating;
+    uint m_ratingcount;
     const QString m_language;
 
     // General - Video & ProgramInfo
@@ -406,6 +426,7 @@ class META_PUBLIC MetadataLookup : public QObject
 
     // Inetref
     QString m_inetref;
+    QString m_collectionref;
     QString m_tmsref;
     QString m_imdb;
 

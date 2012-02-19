@@ -1,7 +1,6 @@
 // -*- Mode: c++ -*-
 // Copyright (c) 2003-2005, Daniel Kristjansson
 
-#include <cassert>
 #include <cstdlib>
 #include <stdio.h>
 
@@ -278,7 +277,6 @@ static void parse_cc_service_stream(CC708Reader* cc, uint service_num)
     }
 
     // get rid of remaining bytes...
-    assert(((int)blk_size - i) >= 0);
     if ((blk_size - i) > 0)
     {
         memmove(cc->buf[service_num], cc->buf[service_num] + i,
@@ -575,13 +573,17 @@ static void rightsize_buf(CC708Reader* cc, uint service_num, uint block_size)
                 .arg(service_num) .arg(cc->buf_alloc[service_num]));
 #endif
     }
-    assert(min_new_size < cc->buf_alloc[service_num]);
+    if (min_new_size >= cc->buf_alloc[service_num])
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("buffer resize error: min_new_size=%1, buf_alloc[%2]=%3")
+            .arg(min_new_size)
+            .arg(service_num)
+            .arg(cc->buf_alloc[service_num]));
 }
 
 static void append_cc(CC708Reader* cc, uint service_num,
                       const unsigned char* blk_buf, int block_size)
 {
-    assert(cc);
     rightsize_buf(cc, service_num, block_size);
 
     memcpy(cc->buf[service_num] + cc->buf_size[service_num],
@@ -631,7 +633,9 @@ static void parse_cc_packet(CC708Reader* cb_cbs, CaptionPacket* pkt,
         LOG(VB_GENERAL, LOG_DEBUG, msg);
     }
 
-    assert(pkt_size<127);
+    if (pkt_size >= 127)
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("Unexpected pkt_size=%1").arg(pkt_size));
 
     while (off < pkt_size && pkt_buf[off])
     { // service_block
@@ -676,7 +680,12 @@ static void parse_cc_packet(CC708Reader* cb_cbs, CaptionPacket* pkt,
         off+=block_size+1;
     }
     if (off<pkt_size) // must end in null service block, if packet is not full.
-        assert(pkt_buf[off]==0);
+    {
+        if (pkt_buf[off] != 0)
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("CEA-708 packet error: pkt_size=%1, pkt_buf[%2]=%3")
+                .arg(pkt_size).arg(off).arg(pkt_buf[off]));
+    }
 }
 
 static void append_character(CC708Reader *cc, uint service_num, short ch)
@@ -689,7 +698,6 @@ static void append_character(CC708Reader *cc, uint service_num, short ch)
         cc->temp_str[service_num] = (short*)
             realloc(cc->temp_str[service_num], new_alloc * sizeof(short));
 
-        assert(cc->temp_str[service_num]);
         cc->temp_str_alloc[service_num] = new_alloc; // shorts allocated
     }
 

@@ -1267,11 +1267,12 @@ void PlaybackBox::UpdateUIGroupList(const QStringList &groupPreferences)
                 m_currentGroup = groupname.toLower();
             }
 
-            if (groupname.isEmpty())
-                groupname = m_groupDisplayName;
+            QString displayName = groupname;
+            if (displayName.isEmpty())
+                displayName = m_groupDisplayName;
 
-            item->SetText(groupname, "name");
-            item->SetText(groupname);
+            item->SetText(displayName, "name");
+            item->SetText(displayName);
 
             int count = m_progLists[groupname.toLower()].size();
             item->SetText(QString::number(count), "reccount");
@@ -2210,15 +2211,7 @@ void PlaybackBox::deleteSelected(MythUIButtonListItem *item)
     if (!pginfo)
         return;
 
-    bool undelete_possible =
-            gCoreContext->GetNumSetting("AutoExpireInsteadOfDelete", 0);
-
-    if (pginfo->GetRecordingGroup() == "Deleted" && undelete_possible)
-    {
-        RemoveProgram(pginfo->GetChanID(), pginfo->GetRecordingStartTime(),
-                      /*forgetHistory*/ false, /*force*/ false);
-    }
-    else if (pginfo->GetAvailableStatus() == asPendingDelete)
+    if (pginfo->GetAvailableStatus() == asPendingDelete)
     {
         LOG(VB_GENERAL, LOG_ERR, QString("deleteSelected(%1) -- failed ")
                 .arg(pginfo->toString(ProgramInfo::kTitleSubtitle)) +
@@ -2542,7 +2535,8 @@ void PlaybackBox::ShowDeletePopup(DeletePopupType type)
     const char *tmpslot = NULL;
 
     if ((kDeleteRecording == type) &&
-        (delItem->GetRecordingGroup() != "LiveTV"))
+        delItem->GetRecordingGroup() != "Deleted" &&
+        delItem->GetRecordingGroup() != "LiveTV")
     {
         tmpmessage = tr("Yes, and allow re-record");
         tmpslot = SLOT(DeleteForgetHistory());
@@ -5149,9 +5143,9 @@ bool RecMetadataEdit::Create()
     }
     m_inetrefEdit->SetText(m_progInfo->GetInetRef());
     m_inetrefEdit->SetMaxLength(255);
-    m_seasonSpin->SetRange(0,9999,1,1);
+    m_seasonSpin->SetRange(0,9999,1,5);
     m_seasonSpin->SetValue(m_progInfo->GetSeason());
-    m_episodeSpin->SetRange(0,9999,1,1);
+    m_episodeSpin->SetRange(0,9999,1,10);
     m_episodeSpin->SetValue(m_progInfo->GetEpisode());
 
     connect(okButton, SIGNAL(Clicked()), SLOT(SaveChanges()));

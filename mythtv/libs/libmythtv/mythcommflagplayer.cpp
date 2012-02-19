@@ -185,6 +185,7 @@ bool MythCommFlagPlayer::RebuildSeekTable(
         cout << "\r                         \r" << flush;
 
     SaveTotalDuration();
+    SaveTotalFrames();
 
     SetPlaying(false);
     killdecoder = true;

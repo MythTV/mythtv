@@ -16,6 +16,7 @@
 #include "mythsocketmanager.h"
 #include "mythcontext.h"
 #include "exitcodes.h"
+#include "dbcheck.h"
 #include "mythdbcon.h"
 #include "mythlogging.h"
 #include "mythversion.h"
@@ -109,6 +110,12 @@ int main(int argc, char *argv[])
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to init MythContext, exiting.");
         return GENERIC_EXIT_NO_MYTHCONTEXT;
+    }
+
+    if (!UpgradeTVDatabaseSchema(false))
+    {
+        LOG(VB_GENERAL, LOG_ERR, "Exiting due to schema mismatch.");
+        return GENERIC_EXIT_DB_OUTOFDATE;
     }
 
     cmdline.ApplySettingsOverride();

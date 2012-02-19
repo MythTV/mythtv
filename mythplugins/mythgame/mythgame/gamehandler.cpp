@@ -508,7 +508,7 @@ void GameHandler::VerifyGameDB(GameHandler *handler)
         MythDB::DBError("GameHandler::VerifyGameDB - "
                         "select", query);
 
-    QString message = QObject::tr("Verifying %1 files")
+    QString message = QObject::tr("Verifying %1 files...")
                                     .arg(handler->SystemName());
 
     CreateProgress(message);
@@ -674,7 +674,7 @@ void GameHandler::buildFileList(QString directory, GameHandler *handler,
             m_GameMap[RomName] = GameScan(RomName,Info.filePath(),inFileSystem,
                                  GameName, Info.absoluteDir().path());
 
-            LOG(VB_GENERAL, LOG_INFO, LOC + QString("Found Rom : (%1) - %2")
+            LOG(VB_GENERAL, LOG_INFO, LOC + QString("Found ROM : (%1) - %2")
                     .arg(handler->SystemName()).arg(RomName));
 
             *filecount = *filecount + 1;
@@ -699,7 +699,7 @@ void GameHandler::processGames(GameHandler *handler)
         else
         {
             LOG(VB_GENERAL, LOG_ERR, LOC +
-                QString("Rom Path does not exist: %1")
+                QString("ROM Path does not exist: %1")
                     .arg(handler->SystemRomPath()));
             return;
         }
@@ -711,7 +711,7 @@ void GameHandler::processGames(GameHandler *handler)
     {
         MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
-        QString message = QObject::tr("Scanning for %1 games")
+        QString message = QObject::tr("Scanning for %1 games...")
                                                 .arg(handler->SystemName());
         MythUIBusyDialog *busyDialog = new MythUIBusyDialog(message, popupStack,
                                                 "gamescanbusy");

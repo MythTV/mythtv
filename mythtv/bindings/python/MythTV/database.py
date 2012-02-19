@@ -1085,18 +1085,40 @@ class DBCache( MythSchema ):
             else:
                 update(self).run()
 
+    def _gethostfromaddr(self, addr, value=None):
+        if value is None:
+            for value in ['BackendServerIP','BackendServerIP6']:
+                try:
+                    return self._gethostfromaddr(addr, value)
+                except MythDBError:
+                    pass
+            else:
+                raise MythDBError(MythError.DB_SETTING,
+                                    'BackendServerIP[6]', addr)
+
+        with self as cursor:
+            if cursor.execute("""SELECT hostname FROM settings
+                                  WHERE value=? AND data=?""", [value, addr]) == 0:
+                raise MythDBError(MythError.DB_SETTING, value, addr)
+            return cursor.fetchone()[0]
+
+    def _getpreferredaddr(self, host):
+        ip6 = self.settings[host].BackendServerIP6
+        ip4 = self.settings[host].BackendServerIP
+        if ip6 is None:
+            if ip4 is None:
+                raise MythDBError(MythError.DB_SETTING,
+                                    'BackendServerIP[6]', host)
+            return ip4
+        elif (ip6 in ['::1', '0:0:0;0:0:0:0:1']) and (ip4 != '127.0.0.1'):
+            return ip4
+        return ip6
+
     def gethostname(self):
         return self.dbconn['LocalHostName']
 
     def getMasterBackend(self):
-        ip = self.settings.NULL.MasterServerIP
-        with self as cursor:
-            if cursor.execute("""SELECT hostname FROM settings
-                                     WHERE value='BackendServerIP'
-                                     AND data=?""", [ip]) == 0:
-                # no match found
-                raise MythDBError(MythError.DB_SETTING, 'BackendServerIP', ip)
-            return cursor.fetchone()[0]
+        return self._gethostfromaddr(self.settings.NULL.MasterServerIP)
 
     def getStorageGroup(self, groupname=None, hostname=None):
         """

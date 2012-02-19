@@ -195,7 +195,7 @@ class RomPath : public LineEditSetting, public GameDBStorage
     RomPath(const MythGamePlayerSettings &parent) :
         LineEditSetting(this), GameDBStorage(this, parent, "rompath")
     {
-        setLabel(QObject::tr("Rom Path"));
+        setLabel(QObject::tr("ROM Path"));
         setHelpText(QObject::tr("Location of the ROM files for this emulator"));
     };
 };
@@ -303,7 +303,7 @@ void MythGamePlayerEditor::menu(void)
         DialogCode val = MythPopupBox::Show2ButtonPopup(
             GetMythMainWindow(),
             "", tr("Game Player Menu"),
-            tr("Edit.."), tr("Delete.."), kDialogCodeButton1);
+            tr("Edit..."), tr("Delete..."), kDialogCodeButton1);
 
         if (kDialogCodeButton0 == val)
             edit();

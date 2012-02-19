@@ -1370,7 +1370,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
             gCoreContext->SendSystemEvent(
                 QString("CLIENT_CONNECTED HOSTNAME %1").arg(commands[2]));
     }
-    if (commands[1] == "MediaServer")
+    else if (commands[1] == "MediaServer")
     {
         if (commands.size() < 3)
         {
@@ -2502,9 +2502,7 @@ void MainServer::DoHandleDeleteRecording(
     {
         recinfo.ApplyRecordRecGroupChange("Deleted");
         recinfo.SaveAutoExpire(kDeletedAutoExpire, true);
-        if (recinfo.GetRecordingStatus() == rsRecording ||
-            recinfo.GetRecordingStatus() == rsTuning)
-            DoHandleStopRecording(recinfo, NULL);
+        DoHandleStopRecording(recinfo, NULL);
         if (forgetHistory)
             recinfo.ForgetHistory();
         QStringList outputlist( QString::number(0) );

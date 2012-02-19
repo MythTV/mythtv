@@ -3,6 +3,10 @@
 #include "mythlogging.h"
 #include "serverpool.h"
 
+#define PRETTYIP(x)      x->protocol() == QAbstractSocket::IPv6Protocol ? \
+                                    "[" + x->toString().toLower() + "]" : \
+                                          x->toString().toLower()
+
 PrivTcpServer::PrivTcpServer(QObject *parent) : QTcpServer(parent)
 {
 }
@@ -63,7 +67,7 @@ bool ServerPool::listen(QList<QHostAddress> addrs, quint16 port,
         if (server->listen(*it, m_port))
         {
             LOG(VB_GENERAL, LOG_INFO, QString("Listening on TCP %1:%2")
-                    .arg(it->toString()).arg(port));
+                    .arg(PRETTYIP(it)).arg(port));
             m_tcpServers.append(server);
             if (m_port == 0)
                 m_port = server->serverPort();
@@ -71,7 +75,7 @@ bool ServerPool::listen(QList<QHostAddress> addrs, quint16 port,
         else if (requireall)
         {
             LOG(VB_GENERAL, LOG_ERR, QString("Failed listening on TCP %1:%2")
-                    .arg(it->toString()).arg(port));
+                    .arg(PRETTYIP(it)).arg(port));
             close();
             server->disconnect();
             delete server;
@@ -80,7 +84,7 @@ bool ServerPool::listen(QList<QHostAddress> addrs, quint16 port,
         else
         {
             LOG(VB_GENERAL, LOG_WARNING, QString("Failed listening on TCP %1:%2")
-                    .arg(it->toString()).arg(port));
+                    .arg(PRETTYIP(it)).arg(port));
             server->disconnect();
             delete server;
         }
@@ -122,13 +126,13 @@ bool ServerPool::bind(QList<QHostAddress> addrs, quint16 port,
         if (socket->bind(*it, port))
         {
             LOG(VB_GENERAL, LOG_INFO, QString("Binding to UDP %1:%2")
-                    .arg(it->toString()).arg(port));
+                    .arg(PRETTYIP(it)).arg(port));
             m_udpSockets.append(socket);
         }
         else if (requireall)
         {
             LOG(VB_GENERAL, LOG_ERR, QString("Failed binding to UDP %1:%2")
-                    .arg(it->toString()).arg(port));
+                    .arg(PRETTYIP(it)).arg(port));
             close();
             socket->disconnect();
             delete socket;
@@ -137,7 +141,7 @@ bool ServerPool::bind(QList<QHostAddress> addrs, quint16 port,
         else
         {
             LOG(VB_GENERAL, LOG_WARNING, QString("Failed binding to UDP %1:%2")
-                    .arg(it->toString()).arg(port));
+                    .arg(PRETTYIP(it)).arg(port));
             socket->disconnect();
             delete socket;
         }

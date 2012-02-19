@@ -339,6 +339,8 @@ class MTV_PUBLIC MythPlayer
     static const int kNightModeBrightenssAdjustment;
     static const int kNightModeContrastAdjustment;
 
+    void SaveTotalFrames(void);
+
   protected:
     // Initialization
     void OpenDummy(void);
