@@ -307,7 +307,7 @@ class Collection( Element ):
     name     = Datapoint('name')
     backdrop = Datapoint('backdrop_path', handler=Backdrop, raw=False)
     poster   = Datapoint('poster_path', handler=Poster, raw=False)
-    members  = Datalist('parts', handler=Movie)
+    members  = Datalist('parts', handler=Movie, sort='releasedate')
 
     def _populate(self):
         return Request('collection/{0}'.format(self.id)).readJSON()

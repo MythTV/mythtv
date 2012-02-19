@@ -168,16 +168,16 @@ class Metadata( DictData ):
                     'description':3,'season':0,         'episode':0,
                     'dvdseason':3,  'dvdepisode':3,     'albumtitle':3,
                     'system':3,     'inetref':3,        'imdb':3,
-                    'tmsref':3,     'homepage':3,       'trailer':3,
-                    'language':3,   'releasedate':5,    'lastupdated':6,
-                    'userrating':1, 'tracnum':0,        'popularity':0,
-                    'budget':0,     'revenue':0,        'year':0,
-                    'runtime':0,    'runtimesecs':0,    'filename':3,
-                    'chanid':0,     'channum':3,        'callsign':3,
-                    'channame':3,   'playbackfilters':3,'recgroup':3,
-                    'playgroup':3,  'seriesid':3,       'programid':3,
-                    'startts':5,    'endts':5,          'storagegroup':3,
-                    'recstartts':5, 'recendts':5}
+                    'tmsref':3,     'collectionref':3,  'homepage':3,
+                    'trailer':3,    'language':3,       'releasedate':5,
+                    'lastupdated':6,'userrating':1,     'tracnum':0,
+                    'popularity':0, 'budget':0,         'revenue':0,
+                    'year':0,       'runtime':0,        'runtimesecs':0,
+                    'filename':3,   'chanid':0,         'channum':3,
+                    'callsign':3,   'channame':3,       'playbackfilters':3,
+                    'recgroup':3,   'playgroup':3,      'seriesid':3,
+                    'programid':3,  'startts':5,        'endts':5,
+                    'storagegroup':3,'recstartts':5,    'recendts':5}
 
     class _subgroup_name( list ):
         def __init__(self, xml):
@@ -274,9 +274,9 @@ class Metadata( DictData ):
 class VideoMetadata( Metadata ):
     _field_order = ['title','subtitle','tagline','description','season',
                     'episode','dvdseason','dvdepisode','inetref','imdb',
-                    'tmsref','homepage','trailer','language', 'releasedate',
-                    'lastupdated','userrating','popularity', 'budget',
-                    'revenue','year','runtime','filename','chanid',
+                    'tmsref','collectionref','homepage','trailer','language',
+                    'releasedate','lastupdated','userrating','popularity',
+                    'budget','revenue','year','runtime','filename','chanid',
                     'channum','callsign','channame','playbackfilters',
                     'recgroup','playgroup','seriesid','programid',
                     'startts','endts','storagegroup','recstartts',
