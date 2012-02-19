@@ -94,7 +94,6 @@ using namespace std;
 #include <QScopedPointer>
 #include "bonjourregister.h"
 #include "mythairplayserver.h"
-#include <external/FFmpeg/libavcodec/x86/mmx.h>
 #endif
 
 static ExitPrompter   *exitPopup = NULL;
