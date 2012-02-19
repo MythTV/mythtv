@@ -34,6 +34,8 @@ def buildSingle(inetref, language):
         setattr(m, i, getattr(movie, j))
     m.inetref = str(movie.id)
     m.year = movie.releasedate.year
+    if movie.collection:
+        m.collectionref = movie.collection.id
     for country, release in movie.releases.items():
         if release.certification:
             m.certifications[country] = release.certification
@@ -82,6 +84,22 @@ def buildList(query, language):
     sys.stdout.write(etree.tostring(tree, encoding='UTF-8', pretty_print=True))
     sys.exit(0)
 
+def buildCollection(inetref, language):
+    collection = Collection(inetref)
+    tree = etree.XML(u'<metadata></metadata>')
+    m = VideoMetadata()
+    m.collectionref = str(collection.id)
+    m.title = collection.name
+    if collection.backdrop:
+        m.images.append({'type':'fanart', 'url':collection.backdrop.geturl(),
+                  'thumb':collection.backdrop.geturl(collection.backdrop.sizes()[0])})
+    if collection.poster:
+        m.images.append({'type':'coverart', 'url':collection.poster.geturl(),
+                  'thumb':collection.poster.geturl(collection.poster.sizes()[0])})
+    tree.append(m.toXML())
+    sys.stdout.write(etree.tostring(tree, encoding='UTF-8', pretty_print=True))
+    sys.exit()
+
 def buildVersion():
     version = etree.XML(u'<grabber></grabber>')
     etree.SubElement(version, "name").text = __title__
@@ -106,6 +124,8 @@ def main():
                       dest="movielist", help="Get Movies matching search.")
     parser.add_option('-D', "--moviedata", action="store_true", default=False,
                       dest="moviedata", help="Get Movie data.")
+    parser.add_option('-C', "--collection", action="store_true", default=False,
+                      dest="collectiondata", help="Get Collection data.")
     parser.add_option( "-l", "--language", metavar="LANGUAGE", default=u'en',
                       dest="language", help="Specify language for filtering.")
 
@@ -123,6 +143,9 @@ def main():
 
     if opts.moviedata:
         buildSingle(args[0], opts.language)
+
+    if opts.collectiondata:
+        buildCollection(args[0], opts.language)
 
 if __name__ == '__main__':
     main()
