@@ -1071,11 +1071,11 @@ void PlaybackBox::updateIcons(const ProgramInfo *pginfo)
         iconState->Reset();
 
     iconMap.clear();
+    iconMap["avchd"] = VID_AVC;
     iconMap["hd1080"] = VID_1080;
     iconMap["hd720"] = VID_720;
     iconMap["hdtv"] = VID_HDTV;
     iconMap["widescreen"] = VID_WIDESCREEN;
-    //iconMap["avchd"] = VID_AVC;
 
     iconState = dynamic_cast<MythUIStateType *>(GetChild("videoprops"));
     haveIcon = false;
@@ -5224,7 +5224,7 @@ bool HelpPopup::Create()
     addItem("hd720",       tr("Recording is in 720p High Definition"));
     addItem("hdtv",        tr("Recording is in High Definition"));
     addItem("widescreen",  tr("Recording is Widescreen"));
-//    addItem("avchd",       tr("Recording uses H.264 codec"));
+    addItem("avchd",       tr("Recording is in HD using H.264 codec"));
 
     addItem("watched",     tr("Recording has been watched"));
 //    addItem("preserved",   tr("Recording is preserved"));
