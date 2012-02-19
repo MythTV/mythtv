@@ -287,6 +287,82 @@ bool AudioOutputALSA::IncPreallocBufferSize(int requested, int buffer_time)
     return ret;
 }
 
+QByteArray *AudioOutputALSA::GetELD(int card, int device, int subdevice)
+{
+    QByteArray *result = NULL;
+    snd_hctl_t *hctl;
+    snd_hctl_elem_t *elem;
+    snd_ctl_elem_info_t *info;     snd_ctl_elem_info_alloca(&info);
+    snd_ctl_elem_id_t *id;         snd_ctl_elem_id_alloca(&id);
+    snd_ctl_elem_value_t *control; snd_ctl_elem_value_alloca(&control);
+    snd_ctl_elem_type_t type;
+
+    unsigned int count;
+
+    int err;
+
+    snd_ctl_elem_id_set_interface(id, SND_CTL_ELEM_IFACE_PCM);
+    snd_ctl_elem_id_set_name(id, "ELD");
+    snd_ctl_elem_id_set_device(id, device);
+    if ((err = snd_hctl_open(&hctl,
+                             QString("hw:%1").arg(card).toAscii().constData(),
+                             0)) < 0)
+    {
+        VBAUDIO(QString("Control %1 open error: %2")
+                .arg(card)
+                .arg(snd_strerror(err)));
+        return NULL;
+    }
+    if ((err = snd_hctl_load(hctl)) < 0)
+    {
+        VBAUDIO(QString("Control %1 load error: %2")
+                .arg(card)
+                .arg(snd_strerror(err)));
+        /* frees automatically the control which cannot be added. */
+        return NULL;
+    }
+    elem = snd_hctl_find_elem(hctl, id);
+    if (elem)
+    {
+        if ((err = snd_hctl_elem_info(elem, info)) < 0)
+        {
+            VBAUDIO(QString("Control %1 snd_hctl_elem_info error: %2")
+                    .arg(card)
+                    .arg(snd_strerror(err)));
+            snd_hctl_close(hctl);
+            return NULL;
+        }
+        count = snd_ctl_elem_info_get_count(info);
+        type = snd_ctl_elem_info_get_type(info);
+        if (!snd_ctl_elem_info_is_readable(info))
+        {
+            VBAUDIO(QString("Control %1 element info is not readable")
+                    .arg(card));
+            snd_hctl_close(hctl);
+            return NULL;
+        }
+        if ((err = snd_hctl_elem_read(elem, control)) < 0)
+        {
+            VBAUDIO(QString("Control %1 element read error: %2")
+                    .arg(card)
+                    .arg(snd_strerror(err)));
+            snd_hctl_close(hctl);
+            return NULL;
+        }
+        if (type != SND_CTL_ELEM_TYPE_BYTES)
+        {
+            VBAUDIO(QString("Control %1 element is of the wrong type")
+                    .arg(card));
+            snd_hctl_close(hctl);
+            return NULL;
+        }
+        result = new QByteArray((char *)snd_ctl_elem_value_get_bytes(control),
+                                count);
+    }
+    snd_hctl_close(hctl);
+    return result;
+}
+
 AudioOutputSettings* AudioOutputALSA::GetOutputSettings(bool passthrough)
 {
     snd_pcm_hw_params_t *params;
@@ -356,6 +432,23 @@ AudioOutputSettings* AudioOutputALSA::GetOutputSettings(bool passthrough)
     for (uint channels = CHANNELS_MIN; channels <= CHANNELS_MAX; channels++)
         if (snd_pcm_hw_params_test_channels(pcm_handle, params, channels) >= 0)
             settings->AddSupportedChannels(channels);
+
+    int card, device, subdevice;
+    if (GetPCMInfo(card, device, subdevice) >= 0)
+    {
+        // Check if we can retrieve ELD for this device
+        QByteArray *eld = GetELD(card, device, subdevice);
+        if (eld != NULL)
+        {
+            VBAUDIO(QString("Successfully retrieved ELD data"));
+            settings->setELD(eld);
+            delete eld;
+       }
+    }
+    else
+    {
+        VBAUDIO("Can't get card and device number");
+    }
 
     snd_pcm_close(pcm_handle);
     pcm_handle = NULL;
