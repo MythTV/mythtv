@@ -17,7 +17,7 @@ class InteractiveTV
     InteractiveTV(MythPlayer *nvp);
     virtual ~InteractiveTV();
 
-    void Restart(uint chanid, uint sourceid, bool isLive);
+    void Restart(int chanid, int sourceid, bool isLive);
     // Process an incoming DSMCC packet.
     void ProcessDSMCCSection(unsigned char *data, int length,
                              int componentTag, unsigned carouselId,

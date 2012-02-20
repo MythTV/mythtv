@@ -11827,8 +11827,8 @@ void TV::UnpauseLiveTV(PlayerContext *ctx, bool bQuietly /*=false*/)
  */
 void TV::ITVRestart(PlayerContext *ctx, bool isLive)
 {
-    uint chanid = -1;
-    uint sourceid = -1;
+    int chanid = -1;
+    int sourceid = -1;
 
     if (ContextIsPaused(ctx, __FILE__, __LINE__))
         return;
