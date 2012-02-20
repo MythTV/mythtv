@@ -1,4 +1,6 @@
-<!DOCTYPE TS><TS>
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.0" language="de_DE">
 <context>
     <name>MythControls</name>
     <message>
@@ -401,6 +403,34 @@ Für neue Abonnements brauchen Sie nur die URL einzugeben und auf &quot;Speicher
     <message>
         <source>Search Internet Video</source>
         <translation>Suche Internet Videos</translation>
+    </message>
+    <message>
+        <source>Type the URL to an RSS 2.0 media feed below.  If editing an existing feed,modify any of the values you like.  Press &quot;Save&quot; to save/subscribe.
+
+For new subscriptions,you can simply enter the URL and click &quot;Save.&quot;</source>
+        <translation>Geben Sie die URL eines RSS 2.0 Feeds unten ein.  Falls Sie einen vorhandenen Feed bearbeiten können Sie jedes Feld ändern.  Drücken Sie &quot;Speichern&quot; um zu speichern/abonnieren.
+
+Für neue Abonnements reicht es wenn Sie die URL eingeben und &quot;Speichern&quot; klicken.</translation>
+    </message>
+    <message>
+        <source>Internet Video List</source>
+        <translation>Liste Internetvideos</translation>
+    </message>
+    <message>
+        <source>You haven&apos;t added any Sites/RSS Feeds yet!  To add a site,press MENU,then choose &quot;Scan/Manage Subscriptions,&quot; then &quot;Manage Site Subscriptions.&quot;</source>
+        <translation>Sie haben noch keine Seiten/RSS-Feeds hinzugefügt. Um eine Seite hinzuzufügen drücken Sie MENÜ und wählen Sie &quot;Abonnements durchsuchen/verwalten&quot;, und dann &quot;Seitenabonnements verwalten&quot;.</translation>
+    </message>
+    <message>
+        <source>User Rating: %1</source>
+        <translation>Benutzerbewertung: %1</translation>
+    </message>
+    <message>
+        <source>By: %1</source>
+        <translation>Von: %1</translation>
+    </message>
+    <message>
+        <source>Internet Video Gallery</source>
+        <translation>Internetvideogalerie</translation>
     </message>
     <message>
         <source>Search popular video sites</source>

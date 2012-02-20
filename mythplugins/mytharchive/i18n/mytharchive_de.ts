@@ -1,4 +1,6 @@
-<!DOCTYPE TS><TS>
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.0" language="de_DE">
 <context>
     <name>ArchiveFileSelector</name>
     <message>
@@ -350,11 +352,11 @@
     </message>
     <message>
         <source>FFmpeg Command</source>
-        <translation>Befehl für FFmpeg</translation>
+        <translation type="obsolete">Befehl für FFmpeg</translation>
     </message>
     <message>
         <source>Command to run FFmpeg.</source>
-        <translation>Der Befehl zum Ausführen von FFmpeg.</translation>
+        <translation type="obsolete">Der Befehl zum Ausführen von FFmpeg.</translation>
     </message>
     <message>
         <source>mplex Command</source>
@@ -436,11 +438,11 @@ Dies kann einige Minuten in Anspruch nehmen.</translation>
     </message>
     <message>
         <source>Always Encode to AC3</source>
-        <translation>Immer zu AC3 kodieren</translation>
+        <translation type="obsolete">Immer zu AC3 kodieren</translation>
     </message>
     <message>
         <source>If set audio tracks will always be re-encoded to AC3 for better compatibility with DVD players in NTSC countries.</source>
-        <translation>Für eine bessere Kompatibilität mit den DVD-Abspielgeräten in NTSC-Ländern werden bei dieser Auswahl Tonspuren immer zu AC3 neu-kodiert.</translation>
+        <translation type="obsolete">Für eine bessere Kompatibilität mit den DVD-Abspielgeräten in NTSC-Ländern werden bei dieser Auswahl Tonspuren immer zu AC3 neu-kodiert.</translation>
     </message>
     <message>
         <source>Copy remote files</source>
@@ -1135,6 +1137,46 @@ Bitte warten...</translation>
     <message>
         <source>Finish</source>
         <translation>Fertigstellen</translation>
+    </message>
+    <message>
+        <source>Select Destination:</source>
+        <translation>Ziel auswählen:</translation>
+    </message>
+    <message>
+        <source>Parental level: %1</source>
+        <translation>Altersfreigabe Stufe: %1</translation>
+    </message>
+    <message>
+        <source>Old size:</source>
+        <translation>Alte Größe:</translation>
+    </message>
+    <message>
+        <source>New size:</source>
+        <translation>Neue Größe:</translation>
+    </message>
+    <message>
+        <source>Select a theme:</source>
+        <translation>Thema auswählen:</translation>
+    </message>
+    <message>
+        <source>Menu</source>
+        <translation>Menü</translation>
+    </message>
+    <message>
+        <source>Chapter</source>
+        <translation>Kapitel</translation>
+    </message>
+    <message>
+        <source>Detail</source>
+        <translation>Detail</translation>
+    </message>
+    <message>
+        <source>Select File to Import</source>
+        <translation>Datei für Import auswählen</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation>Suche</translation>
     </message>
     <message>
         <source>Add video</source>

@@ -1,4 +1,6 @@
-<!DOCTYPE TS><TS>
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.0" language="de_DE">
 <context>
     <name>GLSingleView</name>
     <message>
@@ -65,7 +67,7 @@
     </message>
     <message>
         <source>Settings</source>
-        <translation>Optionen</translation>
+        <translation type="obsolete">Optionen</translation>
     </message>
     <message>
         <source>No images found in this directory.</source>
@@ -89,19 +91,19 @@
     </message>
     <message>
         <source>Meta Data Menu</source>
-        <translation>Metadatenmenü</translation>
+        <translation type="obsolete">Metadatenmenü</translation>
     </message>
     <message>
         <source>Marking Menu</source>
-        <translation>Auswahlmenü</translation>
+        <translation type="obsolete">Auswahlmenü</translation>
     </message>
     <message>
         <source>Filter / Sort Menu</source>
-        <translation>Filter- / Sortierungsmenü</translation>
+        <translation type="obsolete">Filter- / Sortierungsmenü</translation>
     </message>
     <message>
         <source>File Menu</source>
-        <translation>Dateimenü</translation>
+        <translation type="obsolete">Dateimenü</translation>
     </message>
     <message>
         <source>Metadata Options</source>
@@ -146,6 +148,18 @@
     <message>
         <source>Select All</source>
         <translation>Alle auswählen</translation>
+    </message>
+    <message>
+        <source>Meta Data Options</source>
+        <translation>Metadaten-Optionen</translation>
+    </message>
+    <message>
+        <source>Filter / Sort...</source>
+        <translation>Filtern / Sortieren...</translation>
+    </message>
+    <message>
+        <source>Settings...</source>
+        <translation>Einstellungen...</translation>
     </message>
     <message>
         <source>Show Devices</source>
@@ -350,6 +364,10 @@
         <translation>Eine durch Kommas getrennte Liste von Verzeichnissen. Ist das Element in der Liste ein Verzeichnis, wird sein Inhalt kopiert. Ist es eine ausführbare Datei wird diese gestartet.</translation>
     </message>
     <message>
+        <source>Enter directory names to be excluded in browser. (multiple entries delimited with &apos;:&apos;)</source>
+        <translation>Geben Sie die Namen der Verzeichnisse an welche im Browser nicht angezeigt werden sollen. (Mehrere Einträge mit &apos;:&apos; trennen)</translation>
+    </message>
+    <message>
         <source>This is the type of transition used between pictures in slideshow mode.</source>
         <translation>Wählt die Art des Übergangs zwischen zwei Bildern im Diashow Modus.</translation>
     </message>
@@ -379,11 +397,11 @@
     </message>
     <message>
         <source>Command run to display movie files</source>
-        <translation>Befehl zum Abspielen von Filmen</translation>
+        <translation type="obsolete">Befehl zum Abspielen von Filmen</translation>
     </message>
     <message>
         <source>This command is executed whenever a movie file is selected</source>
-        <translation>Dieser Befehl wird ausgeführt, wenn ein Film ausgewählt wird.</translation>
+        <translation type="obsolete">Dieser Befehl wird ausgeführt, wenn ein Film ausgewählt wird.</translation>
     </message>
     <message>
         <source>Store thumbnails in image directory</source>
@@ -419,7 +437,7 @@
     </message>
     <message>
         <source>Enter direcory names to be excluded in browser. (multiple entries delimited with &apos;:&apos;)</source>
-        <translation>Geben Sie Verzeichnisse an die beim Durchsuchen ausgenommen werden sollen. (Mehrere Einträge mit &quot;:&quot; trennen)</translation>
+        <translation type="obsolete">Geben Sie Verzeichnisse an die beim Durchsuchen ausgenommen werden sollen. (Mehrere Einträge mit &quot;:&quot; trennen)</translation>
     </message>
     <message>
         <source>Type filter</source>
@@ -588,8 +606,24 @@ Prüfen Sie ob das Verzeichnis existiert, lesbar ist und die MythGallery-Einstel
         <translation>MENU: Menü aktivieren</translation>
     </message>
     <message>
+        <source>Video Gallery</source>
+        <translation>Videogalerie</translation>
+    </message>
+    <message>
         <source>Filter/sort images</source>
         <translation>Bilder filtern/sortieren</translation>
+    </message>
+    <message>
+        <source>Directory filter:</source>
+        <translation>Verzeichnisfilter:</translation>
+    </message>
+    <message>
+        <source>Type filter:</source>
+        <translation>Typenfilter:</translation>
+    </message>
+    <message>
+        <source>Sort by:</source>
+        <translation>Sortieren nach:</translation>
     </message>
     <message>
         <source>Directory filter :</source>

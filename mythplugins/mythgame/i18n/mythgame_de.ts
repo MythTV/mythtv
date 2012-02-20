@@ -1,4 +1,6 @@
-<!DOCTYPE TS><TS>
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.0" language="de_DE">
 <context>
     <name>GameHandler</name>
     <message>
@@ -32,11 +34,19 @@ Aus der Datenbank entfernen?</translation>
     <name>GameScanner</name>
     <message>
         <source>Verifying game files</source>
-        <translation>Überprüfe Spieldateien</translation>
+        <translation type="obsolete">Überprüfe Spieldateien</translation>
     </message>
     <message>
         <source>Updating game database</source>
-        <translation>Aktualisiere Spieldatenbank</translation>
+        <translation type="obsolete">Aktualisiere Spieldatenbank</translation>
+    </message>
+    <message>
+        <source>Verifying game files...</source>
+        <translation>Verifiziere Spieldateien...</translation>
+    </message>
+    <message>
+        <source>Updating game database...</source>
+        <translation>Update Spieledatenbank...</translation>
     </message>
     <message>
         <source>Searching for games...</source>
@@ -141,11 +151,19 @@ Aus der Datenbank entfernen?</translation>
     </message>
     <message>
         <source>Edit..</source>
-        <translation>Editieren..</translation>
+        <translation type="obsolete">Editieren..</translation>
     </message>
     <message>
         <source>Delete..</source>
-        <translation>Löschen..</translation>
+        <translation type="obsolete">Löschen..</translation>
+    </message>
+    <message>
+        <source>Edit...</source>
+        <translation>Bearbeiten...</translation>
+    </message>
+    <message>
+        <source>Delete...</source>
+        <translation>Löschen...</translation>
     </message>
     <message>
         <source>Are you sure you want to delete this item?</source>
@@ -239,8 +257,12 @@ Aus der Datenbank entfernen?</translation>
         <translation>Typ des Spiels/Emulators. Wird vorwiegend für Informationszwecke genutzt und hat wenig Auswirkungen auf die Funktion ihres Systems.</translation>
     </message>
     <message>
+        <source>ROM Path</source>
+        <translation>ROM Pfad</translation>
+    </message>
+    <message>
         <source>Rom Path</source>
-        <translation>ROM-Pfad</translation>
+        <translation type="obsolete">ROM-Pfad</translation>
     </message>
     <message>
         <source>Location of the ROM files for this emulator</source>
@@ -327,8 +349,12 @@ Aus der Datenbank entfernen?</translation>
         <translation>0</translation>
     </message>
     <message>
+        <source>Verifying %1 files...</source>
+        <translation>Verifiziere %1 Dateien...</translation>
+    </message>
+    <message>
         <source>Scanning for %1 games</source>
-        <translation>Suche nach %1 Spielen</translation>
+        <translation type="obsolete">Suche nach %1 Spielen</translation>
     </message>
     <message>
         <source>Scanning for %1 games...</source>
@@ -390,7 +416,7 @@ dass sie dies tun möchten?</translation>
     </message>
     <message>
         <source>Verifying %1 files</source>
-        <translation>Verifiziere %1 Dateien</translation>
+        <translation type="obsolete">Verifiziere %1 Dateien</translation>
     </message>
     <message>
         <source>Scanning for %1 game(s)...</source>
