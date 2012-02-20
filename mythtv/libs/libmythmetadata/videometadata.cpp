@@ -480,7 +480,7 @@ void VideoMetadataImp::Reset()
                     VIDEO_COVERFILE_DEFAULT, VIDEO_SCREENSHOT_DEFAULT, VIDEO_BANNER_DEFAULT,
                     VIDEO_FANART_DEFAULT, VideoMetadata::FilenameToMeta(m_filename, 1), QString(),
                     VideoMetadata::FilenameToMeta(m_filename, 4), VIDEO_YEAR_DEFAULT,
-                    QDate(), VIDEO_INETREF_DEFAULT, 0, QString(), VIDEO_DIRECTOR_DEFAULT,
+                    QDate(), VIDEO_INETREF_DEFAULT, -1, QString(), VIDEO_DIRECTOR_DEFAULT,
                     QString(), VIDEO_PLOT_DEFAULT, 0.0,
                     VIDEO_RATING_DEFAULT, 0, 0,
                     VideoMetadata::FilenameToMeta(m_filename, 2).toInt(),
