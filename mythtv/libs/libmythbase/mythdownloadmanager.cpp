@@ -687,7 +687,7 @@ void MythDownloadManager::downloadQNetworkRequest(MythDownloadInfo *dlInfo)
                              QNetworkRequest::PreferCache);
 
     request.setRawHeader("User-Agent",
-                         "MythDownloadManager v" MYTH_BINARY_VERSION);
+                         "MythTV v" MYTH_BINARY_VERSION " MythDownloadManager");
 
     if (dlInfo->m_header && dlInfo->m_headerVal && 
         !dlInfo->m_header->isEmpty() && !dlInfo->m_headerVal->isEmpty())
