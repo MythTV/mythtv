@@ -6231,6 +6231,20 @@ NULL
             return false;
     }
 
+    if (dbver == "1296")
+    {
+        const char *updates[] = {
+"ALTER TABLE videocollection CHANGE inetref collectionref "
+"VARCHAR(128) CHARACTER SET utf8 COLLATE utf8_general_ci "
+"NOT NULL",
+"ALTER TABLE videocollection CHANGE genre genre VARCHAR(128) NULL DEFAULT ''",
+NULL
+};
+
+        if (!performActualUpdate(updates, "1297", dbver))
+            return false;
+    }
+
     return true;
 }
 
