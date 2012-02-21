@@ -1232,11 +1232,13 @@ bool FormattedTextSubtitle::Draw(QList<MythUIType*> *imageCache,
             QSize chunk_sz = (*chunk).CalcSize();
             if ((*chunk).format.GetBGAlpha())
             {
+                int padding = font.maxWidth() * PAD_WIDTH;
+                if (first)
+                    x += padding;
                 QBrush bgfill = QBrush((*chunk).format.GetBGColor());
                 QRect bgrect(x, y, chunk_sz.width(), height);
                 if (first)
-                    bgrect.setLeft(bgrect.left() + x_adjust -
-                                   font.maxWidth() * PAD_WIDTH);
+                    bgrect.setLeft(bgrect.left() + x_adjust - padding);
                 MythUIShape *bgshape = new MythUIShape(parent,
                         QString("subbg%1x%2@%3,%4")
                                      .arg(chunk_sz.width())
