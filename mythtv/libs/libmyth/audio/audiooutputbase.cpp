@@ -622,6 +622,13 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
             .arg(samplerate/1000)
             .arg(source_channels));
 
+    if (needs_downmix && source_channels > 8)
+    {
+        Error("Aborting Audio Reconfigure. "
+              "Can't handle audio with more than 8 channels.");
+        return;
+    }
+
     VBAUDIO(QString("enc(%1), passthru(%2), features (%3) "
                     "configured_channels(%4), %5 channels supported(%6) "
                     "max_channels(%7)")
