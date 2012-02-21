@@ -29,6 +29,7 @@
 using namespace std;
 
 #define LOC      QString("DownloadManager: ")
+#define CACHE_REDIRECTION_LIMIT     10
 
 MythDownloadManager *downloadManager = NULL;
 QMutex               dmCreateLock;
@@ -652,15 +653,26 @@ void MythDownloadManager::downloadQNetworkRequest(MythDownloadInfo *dlInfo)
 
         // Handle redirects, we want the metadata of the file headers
         QString redirectLoc;
+        int limit = 0;
         while (!(redirectLoc = getHeader(qurl, "Location")).isNull())
         {
+            if (limit == CACHE_REDIRECTION_LIMIT)
+            {
+                LOG(VB_GENERAL, LOG_WARNING, QString("Cache Redirection limit "
+                                                     "reached for %1")
+                                                    .arg(qurl.toString()));
+                return;
+            }
             qurl.setUrl(redirectLoc);
+            limit++;
         }
 
         LOG(VB_NETWORK, LOG_DEBUG, QString("Checking cache for %1")
                                                     .arg(qurl.toString()));
 
+        m_infoLock->lock();
         QNetworkCacheMetaData urlData = m_manager->cache()->metaData(qurl);
+        m_infoLock->unlock();
         if ((urlData.isValid()) &&
             ((!urlData.expirationDate().isValid()) ||
              (urlData.expirationDate().secsTo(now) < 10)))
@@ -1007,12 +1019,23 @@ void MythDownloadManager::downloadFinished(MythDownloadInfo *dlInfo)
         // already exist
         QUrl fileUrl = dlInfo->m_url;
         QString redirectLoc;
+        int limit = 0;
         while (!(redirectLoc = getHeader(fileUrl, "Location")).isNull())
         {
+            if (limit == CACHE_REDIRECTION_LIMIT)
+            {
+                LOG(VB_GENERAL, LOG_WARNING, QString("Cache Redirection limit "
+                                                     "reached for %1")
+                                                    .arg(fileUrl.toString()));
+                return;
+            }
             fileUrl.setUrl(redirectLoc);
+            limit++;
         }
 
+        m_infoLock->lock();
         QNetworkCacheMetaData urlData = m_manager->cache()->metaData(fileUrl);
+        m_infoLock->unlock();
         if (getHeader(urlData, "Date").isNull())
         {
             QNetworkCacheMetaData::RawHeaderList headers = urlData.rawHeaders();
@@ -1022,7 +1045,9 @@ void MythDownloadManager::downloadFinished(MythDownloadInfo *dlInfo)
                                         now.toString(dateFormat).toAscii());
             headers.append(newheader);
             urlData.setRawHeaders(headers);
+            m_infoLock->lock();
             m_manager->cache()->updateMetaData(urlData);
+            m_infoLock->unlock();
         }
         // End HACK
 
@@ -1246,9 +1271,18 @@ QDateTime MythDownloadManager::GetLastModified(const QString &url)
 
     // Deal with redirects, we want the cached data for the final url
     QString redirectLoc;
+    int limit = 0;
     while (!(redirectLoc = getHeader(cacheUrl, "Location")).isNull())
     {
+        if (limit == CACHE_REDIRECTION_LIMIT)
+        {
+            LOG(VB_GENERAL, LOG_WARNING, QString("Cache Redirection limit "
+                                                    "reached for %1")
+                                                .arg(cacheUrl.toString()));
+            return result;
+        }
         cacheUrl.setUrl(redirectLoc);
+        limit++;
     }
 
     m_infoLock->lock();
@@ -1332,7 +1366,11 @@ QString MythDownloadManager::getHeader(const QUrl& url, const QString& header)
     if (!m_manager || !m_manager->cache())
         return QString::null;
 
-    return getHeader(m_manager->cache()->metaData(url), header);
+    m_infoLock->lock();
+    QNetworkCacheMetaData metadata = m_manager->cache()->metaData(url);
+    m_infoLock->unlock();
+
+    return getHeader(metadata, header);
 }
 
 /** \brief Gets the value of an HTTP header from the cache
