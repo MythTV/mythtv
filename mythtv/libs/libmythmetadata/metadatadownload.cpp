@@ -641,7 +641,7 @@ MetadataLookupList MetadataDownload::handleRecordingGeneric(
     int origseason = lookup->GetSeason();
     int origepisode = lookup->GetEpisode();
 
-    lookup->SetSubtype(kProbableTelevision);
+    lookup->SetSubtype(kProbableGenericTelevision);
 
     if (origseason == 0 && origepisode == 0)
     {
