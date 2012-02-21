@@ -490,7 +490,7 @@ bool MythDownloadManager::download(QNetworkRequest *req, QByteArray *data)
  *  \param dest    Destination filename.
  *  \param reload  Whether to force reloading of the URL or not
  *  \param authCallback AuthCallback function for use with authentication
- *  \param authArg Opaque argument for callback function 
+ *  \param authArg Opaque argument for callback function
  *  \param header  Optional HTTP header to add to the request
  *  \param headerVal Value for the optional HTTP header to add to the request
  *  \return true if download was successful, false otherwise.
@@ -590,7 +590,7 @@ bool MythDownloadManager::post(QNetworkRequest *req, QByteArray *data)
  *  \param url      URL to post to
  *  \param data     Location holding post and response data
  *  \param authCallback AuthCallback function for authentication
- *  \param authArg Opaque argument for callback function 
+ *  \param authArg Opaque argument for callback function
  *  \param header  Optional HTTP header to add to the request
  *  \param headerVal Value for the optional HTTP header to add to the request
  *  \return true if post was successful, false otherwise.
@@ -689,7 +689,7 @@ void MythDownloadManager::downloadQNetworkRequest(MythDownloadInfo *dlInfo)
     request.setRawHeader("User-Agent",
                          "MythTV v" MYTH_BINARY_VERSION " MythDownloadManager");
 
-    if (dlInfo->m_header && dlInfo->m_headerVal && 
+    if (dlInfo->m_header && dlInfo->m_headerVal &&
         !dlInfo->m_header->isEmpty() && !dlInfo->m_headerVal->isEmpty())
     {
         request.setRawHeader(*(dlInfo->m_header), *(dlInfo->m_headerVal));
@@ -1327,6 +1327,14 @@ void MythDownloadManager::saveCookieJar(const QString &filename)
     jar->save(filename);
 }
 
+QString MythDownloadManager::getHeader(const QUrl& url, const QString& header)
+{
+    if (!m_manager || !m_manager->cache())
+        return QString::null;
+
+    return getHeader(m_manager->cache()->metaData(url), header);
+}
+
 /** \brief Gets the value of an HTTP header from the cache
  *  \param cacheData The cache data to search through
  *  \param header Which HTTP header to get the value of
@@ -1363,7 +1371,7 @@ void MythCookieJar::load(const QString &filename)
         QString cookie = stream.readLine();
         cookieList << QNetworkCookie::parseCookies(cookie.toLocal8Bit());
     }
-    
+
     setAllCookies(cookieList);
 }
 

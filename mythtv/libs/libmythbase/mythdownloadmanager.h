@@ -65,7 +65,7 @@ class MBASE_PUBLIC MythDownloadManager : public QObject, public MThread
     void queuePost(QNetworkRequest *req, QByteArray *data, QObject *caller);
     bool post(const QString &url, QByteArray *data);
     bool post(QNetworkRequest *req, QByteArray *data);
-    bool postAuth(const QString &url, QByteArray *data, 
+    bool postAuth(const QString &url, QByteArray *data,
                   AuthCallback authCallback, void *authArg,
                   const QByteArray *header = NULL,
                   const QByteArray *headerVal = NULL);
@@ -82,7 +82,7 @@ class MBASE_PUBLIC MythDownloadManager : public QObject, public MThread
     QNetworkCookieJar *getCookieJar(void) { return m_manager->cookieJar(); }
     void setCookieJar(QNetworkCookieJar *cookieJar) { m_manager->setCookieJar(cookieJar); }
 
-    QString getHeader(const QUrl &url, const QString &header) { return getHeader(m_manager->cache()->metaData(url), header); }
+    QString getHeader(const QUrl &url, const QString &header);
     QString getHeader(const QNetworkCacheMetaData &cacheData, const QString &header);
 
   private slots:
