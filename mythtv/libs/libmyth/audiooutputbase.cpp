@@ -421,6 +421,13 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
             .arg(output_settings->FormatToString(format))
             .arg(samplerate/1000).arg(source_channels));
 
+    if (needs_downmix && source_channels > 8)
+    {
+        Error("Aborting Audio Reconfigure. "
+              "Can't handle audio with more than 8 channels.");
+        return;
+    }
+
     /* Encode to AC-3 if we're allowed to passthru but aren't currently
        and we have more than 2 channels but multichannel PCM is not supported
        or if the device just doesn't support the number of channels */
