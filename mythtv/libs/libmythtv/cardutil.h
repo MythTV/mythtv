@@ -293,6 +293,7 @@ class MTV_PUBLIC CardUtil
         { return GetDisplayName(GetInputID(cardid, inputname)); }
     static QString      GetDisplayName(uint cardid, uint sourceid)
         { return GetDisplayName(GetInputID(cardid, sourceid)); }
+    static vector<uint> GetAllInputIDs(void);
     static vector<uint> GetInputIDs(uint cardid);
     static uint         GetInputID(uint cardid, const QString &inputname);
     static uint         GetInputID(uint cardid, uint sourceid);

@@ -544,7 +544,7 @@ void SchedOptEditor::Load()
     new MythUIButtonListItem(m_inputList, tr("Use any available input"),
                              qVariantFromValue(0));
 
-    vector<uint> inputids = CardUtil::GetInputIDs(0);
+    vector<uint> inputids = CardUtil::GetAllInputIDs();
     for (uint i = 0; i < inputids.size(); ++i)
     {
         new MythUIButtonListItem(m_inputList, tr("Prefer input %1")
