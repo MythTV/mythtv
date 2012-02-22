@@ -275,6 +275,16 @@ bool BDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
     safefilename = lfilename;
     filename = lfilename;
 
+        // clean path filename
+    QString filename = QDir(QDir::cleanPath(lfilename)).canonicalPath();
+    if (filename.isEmpty())
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("%1 nonexistent").arg(lfilename));
+        filename = lfilename;
+    }
+    safefilename = filename;
+
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Opened BDRingBuffer device at %1")
             .arg(filename.toLatin1().data()));
 
