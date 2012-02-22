@@ -762,7 +762,7 @@ ProgramInfo::ProgramInfo(const QString &_pathname) :
     QString basename = _pathname.section('/', -1);
     if (_pathname == basename)
         SetPathname(QDir::currentPath() + '/' + _pathname);
-    else if (_pathname.contains("./"))
+    else if (_pathname.contains("./") && !_pathname.contains(":"))
         SetPathname(QFileInfo(_pathname).absoluteFilePath());
     else
         SetPathname(_pathname);
