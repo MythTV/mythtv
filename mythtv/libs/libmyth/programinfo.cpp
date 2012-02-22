@@ -2209,6 +2209,10 @@ QString ProgramInfo::QueryBasename(void) const
 QString ProgramInfo::GetPlaybackURL(
     bool checkMaster, bool forceCheckLocal) const
 {
+        // return the original path if BD or DVD URI
+    if (IsVideoBD() || IsVideoDVD())
+        return GetPathname();
+
     QString basename = QueryBasename();
     if (basename.isEmpty())
         return "";

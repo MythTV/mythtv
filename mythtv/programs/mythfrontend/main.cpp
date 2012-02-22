@@ -676,7 +676,7 @@ static void playDisc()
     {
         GetMythUI()->AddCurrentLocation("playdisc");
 
-        QString filename = QString("bd:/%1/").arg(bluray_mountpoint);
+        QString filename = QString("bd:/%1").arg(bluray_mountpoint);
 
         GetMythMainWindow()->HandleMedia("Internal", filename, "", "", "", "",
                                          0, 0, "", 0, "", "", true);
