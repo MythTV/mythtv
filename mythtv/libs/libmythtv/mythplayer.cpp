@@ -1383,6 +1383,9 @@ void MythPlayer::EnableCaptions(uint mode, bool osd_msg)
 
     msg += " " + QObject::tr("On");
 
+    LOG(VB_PLAYBACK, LOG_INFO, QString("EnableCaptions(%1) msg: %2")
+        .arg(mode).arg(msg));
+
     textDisplayMode = mode;
     if (osd_msg)
         SetOSDMessage(msg, kOSDTimeout_Med);
@@ -1427,11 +1430,17 @@ void MythPlayer::SetCaptionsEnabled(bool enable, bool osd_msg)
     {
         DisableCaptions(origMode, false);
 
-        if ((kDisplayNone == mode) && osd_msg)
+        if (kDisplayNone == mode)
         {
-            SetOSDMessage(QObject::tr(
-                "No captions", "CC/Teletext/Subtitle text not available"),
-                kOSDTimeout_Med);
+            if (osd_msg)
+            {
+                SetOSDMessage(QObject::tr(
+                                  "No captions",
+                                  "CC/Teletext/Subtitle text not available"),
+                              kOSDTimeout_Med);
+            }
+            LOG(VB_PLAYBACK, LOG_INFO,
+                "No captions available yet to enable.");
         }
         else if (mode)
         {
