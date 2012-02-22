@@ -2762,10 +2762,6 @@ class PresetTuner : public LineEditSetting, public CardInputDBStorage
 
 void StartingChannel::SetSourceID(const QString &sourceid)
 {
-#if 0
-    LOG(VB_GENERAL, LOG_DEBUG, QString("StartingChannel::SetSourceID(%1)")
-            .arg(sourceid));
-#endif
     clearSelections();
     if (sourceid.isEmpty() || !sourceid.toUInt())
         return;
@@ -2773,7 +2769,7 @@ void StartingChannel::SetSourceID(const QString &sourceid)
     // Get the existing starting channel
     QString startChan = CardUtil::GetStartingChannel(getInputID());
 
-    DBChanList channels = ChannelUtil::GetChannels(sourceid.toUInt(), false);
+    DBChanList channels = ChannelUtil::GetAllChannels(sourceid.toUInt());
 
     if (channels.empty())
     {

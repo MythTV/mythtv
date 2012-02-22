@@ -1966,22 +1966,25 @@ bool ChannelUtil::GetExtendedChannelData(
                            dvb_transportid, dvb_networkid, dtv_si_std);
 }
 
-DBChanList ChannelUtil::GetChannels(
-    uint sourceid, bool vis_only, QString grp, uint changrpid)
+DBChanList ChannelUtil::GetChannelsInternal(
+    uint sourceid, bool vis_only, bool include_disconnected,
+    const QString &grp, uint changrpid)
 {
     DBChanList list;
 
     MSqlQuery query(MSqlQuery::InitCon());
 
-    QString qstr =
+    QString qstr = QString(
         "SELECT channum, callsign, channel.chanid, "
         "       atsc_major_chan, atsc_minor_chan, "
         "       name, icon, mplexid, visible, "
         "       channel.sourceid, cardinput.cardid, channelgroup.grpid "
         "FROM channel "
         "LEFT JOIN channelgroup ON channel.chanid     = channelgroup.chanid "
-        "JOIN cardinput         ON cardinput.sourceid = channel.sourceid "
-        "JOIN capturecard       ON cardinput.cardid   = capturecard.cardid ";
+        " %1  JOIN cardinput    ON cardinput.sourceid = channel.sourceid "
+        " %2  JOIN capturecard  ON cardinput.cardid   = capturecard.cardid ")
+        .arg((include_disconnected) ? "LEFT" : "")
+        .arg((include_disconnected) ? "LEFT" : "");
 
     QString cond = " WHERE ";
 
