@@ -4183,7 +4183,13 @@ if enabled x11; then
 fi
 
 if enabled x11; then
-    check_libx gl_lib GLES2/gl2.h glClear -lGLESv2 || check_libx gl_lib GL/gl.h glBegin -lGL || check_libx gl_lib GL/gl.h glBegin -lopengl32 || disable opengl
+    if disabled opengles; then
+        # Qt was compiled without OpenGL ES support, so GLES2 isn't usable
+        check_libx gl_lib GL/gl.h glBegin -lGL || check_libx gl_lib GL/gl.h glBegin -lopengl32 || disable opengl
+    else
+        # Qt was compiled with OpenGL ES support, so OpenGL support requires ES
+        check_libx gl_lib GLES2/gl2.h glClear -lGLESv2 || disable opengl
+    fi
 fi
 
 # Quartz video is Mac only and requires Carbon which is 32bit only
