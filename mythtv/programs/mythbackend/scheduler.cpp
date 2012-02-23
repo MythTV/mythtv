@@ -1464,26 +1464,24 @@ void Scheduler::UpdateNextRecord(void)
             if (next_record == nextRecMap[recid])
                 continue;
 
-            if (nextRecMap[recid].isNull() || !next_record.isValid())
-            {
-                subquery.prepare("UPDATE record "
-                                 "SET next_record = '0000-00-00 00:00:00' "
-                                 "WHERE recordid = :RECORDID;");
-                subquery.bindValue(":RECORDID", recid);
-
-            }
-            else
+            if (nextRecMap[recid].isValid())
             {
                 subquery.prepare("UPDATE record SET next_record = :NEXTREC "
                                  "WHERE recordid = :RECORDID;");
                 subquery.bindValue(":RECORDID", recid);
                 subquery.bindValue(":NEXTREC", nextRecMap[recid]);
+                if (!subquery.exec())
+                    MythDB::DBError("Update next_record", subquery);
             }
-            if (!subquery.exec())
-                MythDB::DBError("Update next_record", subquery);
-            else
-                LOG(VB_SCHEDULE, LOG_INFO, LOC +
-                    QString("Update next_record for %1").arg(recid));
+            else if (next_record.isValid())
+            {
+                subquery.prepare("UPDATE record "
+                                 "SET next_record = '0000-00-00 00:00:00' "
+                                 "WHERE recordid = :RECORDID;");
+                subquery.bindValue(":RECORDID", recid);
+                if (!subquery.exec())
+                    MythDB::DBError("Clear next_record", subquery);
+            }
         }
     }
 }
