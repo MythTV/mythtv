@@ -12,6 +12,8 @@
 #include "mythdb.h"
 #include "mythdirs.h"
 #include "storagegroup.h"
+#include "mythdownloadmanager.h"
+#include "mythcoreutil.h"
 
 HttpConfig::HttpConfig() : HttpServerExtension("HttpConfig", QString())
 {
@@ -47,6 +49,28 @@ bool HttpConfig::ProcessRequest(HTTPRequest *request)
     bool handled = false;
     if (request->m_sMethod == "Save")
     {
+        {
+            // DISABLE HTML SETUP SAVING
+            // DISABLE HTML SETUP SAVING
+            QTextStream os(&request->m_response);
+            os << "<html>\r\n"
+                  "  <head>\r\n"
+                  "    <title>Saving is Disabled</title>\r\n"
+                  "  </head>\r\n"
+                  "  <body>\r\n"
+                  "    <b>Saving is Disabled</b><br>\r\n"
+                  "  </body>\r\n"
+                  "</html>\r\n";
+
+            request->m_eResponseType = ResponseTypeHTML;
+            request->m_mapRespHeaders[ "Cache-Control" ] =
+                "no-cache=\"Ext\", max-age = 0";
+
+            return true;
+            // DISABLE HTML SETUP SAVING
+            // DISABLE HTML SETUP SAVING
+        }
+
         // FIXME, this is always false, what's it for
         if (request->m_sBaseUrl.right(7) == "config" &&
             !database_settings.empty())
@@ -145,6 +169,33 @@ bool HttpConfig::ProcessRequest(HTTPRequest *request)
             fn += "config_backend_general.xml";
 
         request->FormatFileResponse(fn);
+        return true;
+    }
+    else if ((request->m_sMethod == "InstallPackage") &&
+             (request->m_mapParams.contains("package")))
+    {
+        QString package = QUrl::fromPercentEncoding(request->m_mapParams["package"].toUtf8());
+        QString url = QString("http://www.mythtv.org/ftp/3rdParty/%1").arg(package);
+        StorageGroup tmpGroup("Temp", gCoreContext->GetHostName());
+        QString tmpFile = tmpGroup.GetFirstDir(true) + "package.zip";
+        StorageGroup destGroup("3rdParty", gCoreContext->GetHostName());
+        QString outDir = destGroup.GetFirstDir();
+
+        QString result = "false";
+        if ((GetMythDownloadManager()->download(url, tmpFile)) &&
+            (extractZIP(tmpFile, outDir)))
+        {
+            result = "true";
+        }
+
+        QTextStream os(&request->m_response);
+        os << StringListToJSON("Result", QStringList(result));
+
+        request->m_eResponseType     = ResponseTypeOther;
+        request->m_sResponseTypeText = "application/json";
+        request->m_mapRespHeaders[ "Cache-Control" ] =
+            "no-cache=\"Ext\", max-age = 0";
+
         return true;
     }
     else if ((request->m_sMethod == "FileBrowser") &&

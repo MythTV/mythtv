@@ -20,19 +20,19 @@ void PrivateDecoder::GetDecoders(render_opts &opts)
 }
 
 PrivateDecoder* PrivateDecoder::Create(const QString &decoder,
-                                       bool no_hardware_decode,
+                                       PlayerFlags flags,
                                        AVCodecContext *avctx)
 {
 #if defined(Q_OS_MACX)
     PrivateDecoderVDA *vda = new PrivateDecoderVDA();
-    if (vda && vda->Init(decoder, no_hardware_decode, avctx))
+    if (vda && vda->Init(decoder, flags, avctx))
         return vda;
     delete vda;
 #endif
 
 #ifdef USING_CRYSTALHD
     PrivateDecoderCrystalHD *chd = new PrivateDecoderCrystalHD();
-    if (chd && chd->Init(decoder, no_hardware_decode, avctx))
+    if (chd && chd->Init(decoder, flags, avctx))
         return chd;
     delete chd;
 #endif

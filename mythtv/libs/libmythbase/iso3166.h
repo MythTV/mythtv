@@ -12,8 +12,6 @@ using namespace std;
 
 #include "mythbaseexp.h"
 
-extern MBASE_PUBLIC QMap<int, QString> _iso3166_key_to_english_name;
-
 /** \file iso3166.h
  *  \brief ISO 3166-1 support functions
  *
@@ -26,11 +24,14 @@ extern MBASE_PUBLIC QMap<int, QString> _iso3166_key_to_english_name;
  *   \sa iso639.h
  */
 
-typedef QMap<QString, QString> CodeToNameMap;
+typedef QMap<QString, QString> ISO3166ToNameMap;
 
- MBASE_PUBLIC  CodeToNameMap GetISO3166EnglishCountryMap(void);
- MBASE_PUBLIC  QString GetISO3166EnglishCountryName(QString iso3166Code);
- MBASE_PUBLIC  CodeToNameMap GetISO3166CountryMap();
- MBASE_PUBLIC  QString GetISO3166CountryName(QString iso3166Code);
+// WARNING: These functions are not thread-safe and sould only be
+// called from the main UI thread.
+
+MBASE_PUBLIC  ISO3166ToNameMap GetISO3166EnglishCountryMap(void);
+MBASE_PUBLIC  QString GetISO3166EnglishCountryName(const QString &iso3166Code);
+MBASE_PUBLIC  ISO3166ToNameMap GetISO3166CountryMap(void);
+MBASE_PUBLIC  QString GetISO3166CountryName(const QString &iso3166Code);
 
 #endif // _ISO_3166_1_H_

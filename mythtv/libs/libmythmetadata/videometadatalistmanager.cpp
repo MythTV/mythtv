@@ -127,11 +127,11 @@ void VideoMetadataListManager::loadAllFromDatabase(metadata_list &items,
     query.setForwardOnly(true);
     QString BaseMetadataQuery(
         "SELECT title, director, studio, plot, rating, year, releasedate,"
-        "userrating, length, filename, hash, showlevel, "
-        "coverfile, inetref, homepage, childid, browse, watched, "
+        "userrating, length, playcount, filename, hash, showlevel, "
+        "coverfile, inetref, collectionref, homepage, childid, browse, watched, "
         "playcommand, category, intid, trailer, screenshot, banner, fanart, "
-        "subtitle, tagline, season, episode, host, insertdate, processed "
-        " FROM videometadata ");
+        "subtitle, tagline, season, episode, host, insertdate, processed, "
+        "contenttype FROM videometadata ");
 
     if (!sql.isEmpty())
         BaseMetadataQuery.append(sql);

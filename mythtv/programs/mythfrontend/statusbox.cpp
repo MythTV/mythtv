@@ -35,7 +35,6 @@ struct LogLine {
     QString state;
 };
 
-Q_DECLARE_METATYPE(LogLine)
 
 /** \class StatusBox
  *  \brief Reports on various status items.
@@ -554,15 +553,17 @@ void StatusBox::doListingsStatus()
     AddLogLine(tr("Mythfrontend version: %1 (%2)").arg(MYTH_SOURCE_PATH)
                .arg(MYTH_SOURCE_VERSION), helpmsg);
     AddLogLine(tr("Last mythfilldatabase guide update:"), helpmsg);
-    tmp = tr("Started:   %1").arg(MythDate::toString(mfdLastRunStart,
-                                                    MythDate::kDateTimeFull | MythDate::kSimplify));
+    tmp = tr("Started:   %1").arg(
+        MythDate::toString(
+            mfdLastRunStart, MythDate::kDateTimeFull | MythDate::kSimplify));
     AddLogLine(tmp, helpmsg);
 
     if (mfdLastRunEnd >= mfdLastRunStart)
     {
-        tmp =
-            tr("Finished: %1").arg(MythDate::toString(mfdLastRunEnd,
-                                                    MythDate::kDateTimeFull | MythDate::kSimplify));
+        tmp = tr("Finished: %1")
+            .arg(MythDate::toString(
+                     mfdLastRunEnd,
+                     MythDate::kDateTimeFull | MythDate::kSimplify));
         AddLogLine(tmp, helpmsg);
     }
 
@@ -571,8 +572,10 @@ void StatusBox::doListingsStatus()
 
     if (mfdNextRunStart >= mfdLastRunStart)
     {
-        tmp = tr("Suggested Next: %1").arg(MythDate::toString(mfdNextRunStart,
-                                                    MythDate::kDateTimeFull | MythDate::kSimplify));
+        tmp = tr("Suggested Next: %1")
+            .arg(MythDate::toString(
+                     mfdNextRunStart,
+                     MythDate::kDateTimeFull | MythDate::kSimplify));
         AddLogLine(tmp, helpmsg);
     }
 
@@ -587,9 +590,11 @@ void StatusBox::doListingsStatus()
     }
     else
     {
-        AddLogLine(tr("There is guide data until %1")
-                   .arg(MythDate::toString(GuideDataThrough,
-                                             MythDate::kDateTimeFull | MythDate::kSimplify)), helpmsg);
+        AddLogLine(
+            tr("There is guide data until %1")
+            .arg(MythDate::toString(
+                     GuideDataThrough,
+                     MythDate::kDateTimeFull | MythDate::kSimplify)), helpmsg);
 
         AddLogLine(QString("(%1).").arg(tr("%n day(s)", "", DaysOfData)),
                    helpmsg);
@@ -900,8 +905,9 @@ void StatusBox::doLogEntries(void)
             line = QString("%1").arg(query.value(5).toString());
 
             detail = tr("On %1 from %2.%3\n%4\n")
-                .arg(MythDate::toString(MythDate::as_utc(query.value(3).toDateTime()),
-                                          MythDate::kDateTimeShort))
+                .arg(MythDate::toString(
+                         MythDate::as_utc(query.value(3).toDateTime()),
+                         MythDate::kDateTimeShort))
                 .arg(query.value(4).toString())
                 .arg(query.value(1).toString())
                 .arg(query.value(5).toString());
@@ -911,7 +917,7 @@ void StatusBox::doLogEntries(void)
                 detail.append(tmp);
             else
                 detail.append(tr("No further details"));
-            
+
             AddLogLine(line, helpmsg, detail, detail,
                        "", query.value(0).toString());
         }
@@ -962,8 +968,9 @@ void StatusBox::doJobQueueStatus()
                 .arg(pginfo.GetTitle())
                 .arg(pginfo.GetChannelName())
                 .arg(pginfo.GetChanNum())
-                .arg(MythDate::toString(pginfo.GetRecordingStartTime(),
-                                          MythDate::kDateTimeFull | MythDate::kSimplify))
+                .arg(MythDate::toString(
+                         pginfo.GetRecordingStartTime(),
+                         MythDate::kDateTimeFull | MythDate::kSimplify))
                 .arg(tr("Job:"))
                 .arg(JobQueue::JobText((*it).type))
                 .arg(tr("Status: "))
@@ -974,15 +981,16 @@ void StatusBox::doJobQueueStatus()
 
             if ((*it).schedruntime > MythDate::current())
                 detail += '\n' + tr("Scheduled Run Time:") + ' ' +
-                    MythDate::toString((*it).schedruntime,
-                                         MythDate::kDateTimeFull | MythDate::kSimplify);
+                    MythDate::toString(
+                        (*it).schedruntime,
+                        MythDate::kDateTimeFull | MythDate::kSimplify);
             else
                 detail += '\n' + (*it).comment;
 
             line = QString("%1 @ %2").arg(pginfo.GetTitle())
-                                          .arg(MythDate::toString(
-                                              pginfo.GetRecordingStartTime(),
-                                              MythDate::kDateTimeFull | MythDate::kSimplify));
+                .arg(MythDate::toString(
+                         pginfo.GetRecordingStartTime(),
+                         MythDate::kDateTimeFull | MythDate::kSimplify));
 
             QString font;
             if ((*it).status == JOB_ERRORED)
@@ -1013,20 +1021,20 @@ static const QString sm_str(long long sizeKB, int prec=1)
     if (sizeKB>1024*1024*1024) // Terabytes
     {
         double sizeGB = sizeKB/(1024*1024*1024.0);
-        return QString("%1 TB").arg(sizeGB, 0, 'f', (sizeGB>10)?0:prec);
+        return QString(QObject::tr("%1 TB")).arg(sizeGB, 0, 'f', (sizeGB>10)?0:prec);
     }
     else if (sizeKB>1024*1024) // Gigabytes
     {
         double sizeGB = sizeKB/(1024*1024.0);
-        return QString("%1 GB").arg(sizeGB, 0, 'f', (sizeGB>10)?0:prec);
+        return QString(QObject::tr("%1 GB")).arg(sizeGB, 0, 'f', (sizeGB>10)?0:prec);
     }
     else if (sizeKB>1024) // Megabytes
     {
         double sizeMB = sizeKB/1024.0;
-        return QString("%1 MB").arg(sizeMB, 0, 'f', (sizeMB>10)?0:prec);
+        return QString(QObject::tr("%1 MB")).arg(sizeMB, 0, 'f', (sizeMB>10)?0:prec);
     }
     // Kilobytes
-    return QString("%1 KB").arg(sizeKB);
+    return QString(QObject::tr("%1 KB")).arg(sizeKB);
 }
 
 static const QString usage_str_kb(long long total,
@@ -1037,7 +1045,7 @@ static const QString usage_str_kb(long long total,
     if (total > 0.0 && free > 0.0)
     {
         double percent = (100.0*free)/total;
-        ret = QObject::tr("%1 total, %2 used, %3 (or %4%) free.")
+        ret = StatusBox::tr("%1 total, %2 used, %3 (or %4%) free.")
             .arg(sm_str(total)).arg(sm_str(used))
             .arg(sm_str(free)).arg(percent, 0, 'f', (percent >= 10.0) ? 0 : 2);
     }
@@ -1054,7 +1062,7 @@ static void disk_usage_with_rec_time_kb(QStringList& out, long long total,
                                         long long used, long long free,
                                         const recprof2bps_t& prof2bps)
 {
-    const QString tail = QObject::tr(", using your %1 rate of %2 kb/s");
+    const QString tail = StatusBox::tr(", using your %1 rate of %2 kb/s");
 
     out<<usage_str_kb(total, used, free);
     if (free<0)
@@ -1070,13 +1078,13 @@ static void disk_usage_with_rec_time_kb(QStringList& out, long long total,
         uint minLeft = ((free<<5)/bytesPerMin)<<5;
         minLeft = (minLeft/15)*15;
         uint hoursLeft = minLeft/60;
-        QString hourstring = QObject::tr("%n hour(s)", "", hoursLeft);
-        QString minstring = QObject::tr("%n minute(s)", "", minLeft%60);
-        QString remainstring = QObject::tr("%1 remaining", "time");
+        QString hourstring = StatusBox::tr("%n hour(s)", "", hoursLeft);
+        QString minstring = StatusBox::tr("%n minute(s)", "", minLeft%60);
+        QString remainstring = StatusBox::tr("%1 remaining", "time");
         if (minLeft%60 == 0)
             out<<remainstring.arg(hourstring) + pro;
         else if (minLeft > 60)
-            out<<QObject::tr("%1 and %2 remaining", "time").arg(hourstring)
+            out<<StatusBox::tr("%1 and %2 remaining", "time").arg(hourstring)
                                                    .arg(minstring) + pro;
         else
             out<<remainstring.arg(minstring) + pro;
@@ -1088,7 +1096,7 @@ static const QString uptimeStr(time_t uptime)
     int     days, hours, min, secs;
     QString str;
 
-    str = QString("   " + QObject::tr("Uptime") + ": ");
+    str = QString("   " + StatusBox::tr("Uptime") + ": ");
 
     if (uptime == 0)
         return str + "unknown";
@@ -1103,7 +1111,7 @@ static const QString uptimeStr(time_t uptime)
     if (days > 0)
     {
         char    buff[6];
-        QString dayLabel = QObject::tr("%n day(s)", "", days);
+        QString dayLabel = StatusBox::tr("%n day(s)", "", days);
 
         sprintf(buff, "%d:%02d", hours, min);
 
@@ -1141,7 +1149,11 @@ void StatusBox::getActualRecordedBPS(QString hostnames)
     if (query.exec() && query.next() &&
         query.value(0).toDouble() > 0)
     {
-        recordingProfilesBPS[tr("average")] =
+        QString rateStr = tr("average", "average rate");
+
+        // Don't user a tr() directly here as the Qt tools will
+        // not be able to extract the string for translation.
+        recordingProfilesBPS[rateStr] =
             (int)(query.value(0).toDouble());
     }
 
@@ -1157,7 +1169,11 @@ void StatusBox::getActualRecordedBPS(QString hostnames)
     if (query.exec() && query.next() &&
         query.value(0).toDouble() > 0)
     {
-        recordingProfilesBPS[tr("maximum")] =
+        QString rateStr = tr("maximum", "maximum rate");
+
+        // Don't user a tr() directly here as the Qt tools will
+        // not be able to extract the string for translation.
+        recordingProfilesBPS[rateStr] =
             (int)(query.value(0).toDouble());
     }
 }
@@ -1421,7 +1437,8 @@ void StatusBox::doAutoExpireList(bool updateExpList)
         QDateTime starttime = pginfo->GetRecordingStartTime();
         QDateTime endtime = pginfo->GetRecordingEndTime();
         contentLine =
-            MythDate::toString(starttime, MythDate::kDateFull | MythDate::kSimplify) + " - ";
+            MythDate::toString(
+                starttime, MythDate::kDateFull | MythDate::kSimplify) + " - ";
 
         contentLine +=
             "(" + ProgramInfo::i18n(pginfo->GetRecordingGroup()) + ") ";
@@ -1430,8 +1447,11 @@ void StatusBox::doAutoExpireList(bool updateExpList)
             " (" + sm_str(pginfo->GetFilesize() / 1024) + ")";
 
         detailInfo =
-            MythDate::toString(starttime, MythDate::kDateTimeFull | MythDate::kSimplify) + " - " +
-            MythDate::toString(endtime, MythDate::kDateTimeFull | MythDate::kSimplify);
+            MythDate::toString(
+                starttime, MythDate::kDateTimeFull | MythDate::kSimplify) +
+            " - " +
+            MythDate::toString(
+                endtime, MythDate::kDateTimeFull | MythDate::kSimplify);
 
         detailInfo += " (" + sm_str(pginfo->GetFilesize() / 1024) + ")";
 
@@ -1443,5 +1463,7 @@ void StatusBox::doAutoExpireList(bool updateExpList)
                    staticInfo + detailInfo);
     }
 }
+
+Q_DECLARE_METATYPE(LogLine)
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

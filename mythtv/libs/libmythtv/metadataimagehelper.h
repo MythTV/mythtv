@@ -15,7 +15,6 @@ enum VideoArtworkType {
     kArtworkInsideCover = 6,
     kArtworkCDImage = 7
 };
-Q_DECLARE_METATYPE(VideoArtworkType)
 
 struct ArtworkInfo
 {
@@ -25,7 +24,6 @@ struct ArtworkInfo
     uint width;
     uint height;
 };
-Q_DECLARE_METATYPE(ArtworkInfo)
 
 typedef QList< ArtworkInfo > ArtworkList;
 
@@ -50,7 +48,7 @@ MTV_PUBLIC bool SetArtwork(const QString &inetref,
 inline QString generate_myth_url(
     const QString &storage_group, const QString &host, const QString &path)
 {
-    QString ip = gCoreContext->GetSettingOnHost("BackendServerIP", host);
+    QString ip = gCoreContext->GetBackendServerIP(host);
     uint port = gCoreContext->GetSettingOnHost("BackendServerPort",
                                                host).toUInt();
 
@@ -58,5 +56,8 @@ inline QString generate_myth_url(
                                     StorageGroup::GetGroupToUse(host, storage_group));
 
 }
+
+Q_DECLARE_METATYPE(VideoArtworkType)
+Q_DECLARE_METATYPE(ArtworkInfo)
 
 #endif

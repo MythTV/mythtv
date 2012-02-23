@@ -237,6 +237,8 @@ void MythScreenType::aboutToHide(void)
                 GetMythMainWindow()->GetPaintWindow()->setMask(m_SavedMask);
         }
     }
+
+    ActivateAnimations(MythUIAnimation::AboutToHide);
 }
 
 void MythScreenType::aboutToShow(void)
@@ -253,6 +255,8 @@ void MythScreenType::aboutToShow(void)
             GetMythMainWindow()->GetPaintWindow()->setMask(region);
         }
     }
+
+    ActivateAnimations(MythUIAnimation::AboutToShow);
 }
 
 bool MythScreenType::IsDeleting(void) const
@@ -546,7 +550,7 @@ bool MythScreenType::ParseElement(
     }
     else
     {
-        return false;
+        return MythUIType::ParseElement(filename, element, showWarnings);
     }
 
     return true;

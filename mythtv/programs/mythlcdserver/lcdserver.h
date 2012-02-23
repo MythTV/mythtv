@@ -10,8 +10,8 @@
 #include <QStringList>
 #include <QObject>
 #include <QTcpSocket>
-#include <QTcpServer>
 
+#include "serverpool.h"
 #include "lcdprocclient.h"
 
 /*
@@ -39,7 +39,7 @@ class LCDServer : public QObject
 
   private slots:
 
-    void newConnection(void);
+    void newConnection(QTcpSocket *socket);
     void endConnection(void);
     void readSocket();
     QStringList parseCommand(QString &command);
@@ -64,8 +64,9 @@ class LCDServer : public QObject
   private:
 
     LCDProcClient   *m_lcd;
-    QTcpServer      *m_serverSocket;
-    QTcpSocket      *m_lastSocket;        // last socket we received data from
+    ServerPool      *m_serverPool;
+    QTcpSocket      *m_lastSocket;  // last socket we received data from
+
 };
 
 #endif

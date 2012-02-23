@@ -1,5 +1,5 @@
-                             MythMusic 
-                           Release 0.19
+                             MythMusic
+                           Release 0.25
 
 
 BUILD/CONFIGURATION INSTRUCTIONS
@@ -12,76 +12,39 @@ with this, as it won't work.
 In addition to MythTV's requirements, you'll need these software packages:
 (note: _all_ of these exist as software packages in Debian).
 
-   MAD - mp3 decoder library, and its libid3tag library.  
-         http://www.mars.org/home/rob/proj/mpeg/
-         __NB__: The libid3tag library writes ID3v2.4 format tags, which
-         seem to be less supported than the v2.3 version. Any MP3 file created
-         or editited in MythMusic will use ID3v2.4 tags.
-         amarok and Juk both support this format of tags as does the libmad output
-         plugin for xmms.
-
-   Vorbis - I've just used this with version 1.0.  You'll need a full install,
+   Vorbis - I've just used this with version 1.3.2.  You'll need a full install,
             encoding and decoding support.  http://www.vorbis.com
 
-   FLAC - lossless encoder/decoder.  Version >= 1.0.4 is needed.
-          http://flac.sourceforge.net
+   FLAC   - lossless encoder/decoder.  Version >= 1.0.4 is needed.
+            http://flac.sourceforge.net
 
    libcdaudio - Used to play CDs and to hit FreeDB for CD information.
-                I'm using 0.99.9.  http://libcdaudio.sourceforge.net
+                I'm using 0.99.12.  http://libcdaudio.sourceforge.net
 
    cdparanoia - The integrated ripping support uses the libraries from this.
-                I'm using cdparanoia III 9.8.  http://www.xiph.org/paranoia/
+                I'm using cdparanoia 3.10.2.  http://www.xiph.org/paranoia/
+
+   taglib     - A library for reading and editing audio meta data.
+                I'm using 1.7.  http://developer.kde.org/~wheeler/taglib.html
 
 Optionally:
 
    fftw   - A very nice library for Fast Fourier Transforms (helps analyze
-            audio data for playback visualizations). Currently using 2.1.3.
+            audio data for playback visualizations). Currently using 3.2.2.
             http://www.fftw.org/
-
-   OpenGL - Just about everyone should have this already (?). 
-            http://www.opengl.org
-
-   SDL    - Simple DirectMedia Layer library. Needed for some of the
-            visualizations. Currently using 1.2.5
-            http://www.libsdl.org
-
-   FAAD   - Free Advanced Audio Decoder. Needed for AAC/MP4 support.
-            Currently using 2.0.0. 
-	    http://www.audiocoding.com
-
-            __NB__: As of March 5, 2004, you can build and install FAAD2 v2.0
-            final, but you must manually copy mp4ff_int_types.h from faad2/common/mp4ff/
-            to your usr/local/include/ directory.
 
 Phew.  Lotta stuff required. If you're having problems, please check both
 the documentation and the mailing list archives at http://www.mythtv.org
 
-OK.  Once you've got all the prerequisites installed, on to compiling.
-There's a configure script in the main distribution directory, but it does
-not check for all of the above packages. It's just a tiny little script that
-lets you turn on and off support for the fftw, OpenGL, and SDL libraries. Run it
-with './configure --help' to see what you can set.
-
-Now type 'qmake mythmusic.pro' then 'make' in the main distribution directory. 
-
-Compiling note:  If you get an error on building this, that says something
-                 about 'mkspecs', then you don't have the QTDIR environment
-                 variable set.  On Debian, this should be set to /usr/share/qt.
-                 On Mandrake, it's /usr/lib/qt3.  You'll need to figure
-                 out what it should be on your system, set the variable,
-                 and attempt to compile again.
+The plugins configure script will enable MythMusic by default if you have all
+the pre-requisites installed so just do the usual ./configure; make;  and as
+root make install.
 
 If you get any errors about missing references, etc, you most likely don't have
 one of the required pieces of software installed.
 
-Follow this by a 'make install'.  It'll put a 'libmythmusic.so' plugin in your
-/usr/local/lib/mythtv/plugins directory.
-
-MythMusic will also read the mysql.txt settings file used by MythTV, so any 
-changes you made to those will be carried over into this.
-
-You'll want to go into the Music Settings section of the Setup item from 
-mythfrontend and set at least the path where your music is stored.
+You'll want to go into the Music Settings section of the Setup from mythfrontend
+and set at least the path where your music is stored.
 
 Once it's done searching for your music, the interface will show up.  It should
 be fairly easy to figure out.   Check out the HOWTO for details.
@@ -89,7 +52,7 @@ be fairly easy to figure out.   Check out the HOWTO for details.
 Feel free to subscribe to the development mailing list at:
 http://www.mythtv.org/mailman/listinfo/mythtv-dev
 
-A list that's restricted to the CVS commit messages is available at:
+A list that's restricted to the GIT commit messages is available at:
 http://www.mythtv.org/mailman/listinfo/mythtv-commits
 
 or, just email me directly:  Isaac Richards <ijr@po.cwru.edu>

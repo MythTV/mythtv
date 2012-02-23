@@ -44,8 +44,8 @@ from urlparse import urljoin
 from urlparse import urlparse
 from urllib import urlencode
 import urllib
-import simplejson
-from simplejson import JSONEncoder, JSONDecodeError
+import json
+from json import JSONEncoder
 import datetime
 import logging
 
@@ -672,7 +672,7 @@ class _HardwareProfile:
         tok_str = token.read()
         try:
             try:
-                tok_obj = simplejson.loads(tok_str)
+                tok_obj = json.loads(tok_str)
                 if tok_obj['prefered_protocol'] in supported_protocols:
                     prefered_protocol = tok_obj['prefered_protocol']
                 else:
@@ -760,7 +760,7 @@ class _HardwareProfile:
                 error(_('An error has occured while contacting the server: %s' % e))
                 sys.exit(1)
             admin_str = admin_token.read()
-            admin_obj = simplejson.loads(admin_str)
+            admin_obj = json.loads(admin_str)
             if admin_obj['prefered_protocol'] in supported_protocols:
                 prefered_protocol = admin_obj['prefered_protocol']
             else:
@@ -781,8 +781,8 @@ class _HardwareProfile:
 
         response = new_uuid.read()  # Either JSON or an error page in (X)HTML
         try:
-            response_dict = simplejson.loads(response)
-        except JSONDecodeError, e:
+            response_dict = json.loads(response)
+        except Exception, e:
             serverMessage(response)
             raise ServerError, _('Reply from server could not be interpreted')
         else:
@@ -1176,6 +1176,8 @@ def read_cpuinfo():
 def read_memory():
     un = os.uname()
     kernel = un[2]
+    if kernel[:2] == "3.":
+        return read_memory_2_6()
     if kernel[:3] == "2.6":
         return read_memory_2_6()
     if kernel[:3] == "2.4":
@@ -1281,7 +1283,7 @@ def read_pub_uuid(uuiddb, uuid, user_agent=user_agent, smoonURL=smoonURL, timeou
 	grabber = urlgrabber.grabber.URLGrabber(user_agent=user_agent, timeout=timeout, proxies=proxies)
 	try:
 		o = grabber.urlopen(urljoin(smoonURL + "/", '/client/pub_uuid/%s' % uuid))
-		pudict = simplejson.loads(o.read())
+		pudict = json.loads(o.read())
 		o.close()
 		uuiddb.set_pub_uuid(uuid, smoonURLparsed[1], pudict["pub_uuid"])
 		return pudict["pub_uuid"]

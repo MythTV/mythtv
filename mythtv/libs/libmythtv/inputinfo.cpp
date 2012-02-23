@@ -5,12 +5,14 @@
 
 InputInfo::InputInfo(
     const QString &_name,
-    uint _sourceid, uint _inputid, uint _cardid, uint _mplexid) :
+    uint _sourceid, uint _inputid, uint _cardid, uint _mplexid,
+    uint _livetvorder) :
     name(_name),
     sourceid(_sourceid),
     inputid(_inputid),
     cardid(_cardid),
-    mplexid(_mplexid)
+    mplexid(_mplexid),
+    livetvorder(_livetvorder)
 {
     name.detach();
 }
@@ -20,7 +22,8 @@ InputInfo::InputInfo(const InputInfo &other) :
     sourceid(other.sourceid),
     inputid(other.inputid),
     cardid(other.cardid),
-    mplexid(other.mplexid)
+    mplexid(other.mplexid),
+    livetvorder(other.livetvorder)
 {
     name.detach();
 }
@@ -33,6 +36,7 @@ InputInfo &InputInfo::operator=(const InputInfo &other)
     inputid  = other.inputid;
     cardid   = other.cardid;
     mplexid  = other.mplexid;
+    livetvorder = other.livetvorder;
     return *this;
 }
 
@@ -57,7 +61,8 @@ bool InputInfo::FromStringList(QStringList::const_iterator &it,
     sourceid = (*it).toUInt(); NEXT();
     inputid  = (*it).toUInt(); NEXT();
     cardid   = (*it).toUInt(); NEXT();
-    mplexid  = (*it).toUInt(); ++it;
+    mplexid  = (*it).toUInt(); NEXT();
+    livetvorder = (*it).toUInt(); ++it;
 
     return true;
 }
@@ -70,12 +75,15 @@ void InputInfo::ToStringList(QStringList &list) const
     list.push_back(QString::number(inputid));
     list.push_back(QString::number(cardid));
     list.push_back(QString::number(mplexid));
+    list.push_back(QString::number(livetvorder));
 }
 
 TunedInputInfo::TunedInputInfo(
     const QString &_name,
-    uint _sourceid, uint _inputid, uint _cardid, uint _mplexid, uint _chanid) :
-    InputInfo(_name, _sourceid, _inputid, _cardid, _mplexid), chanid(_chanid)
+    uint _sourceid, uint _inputid, uint _cardid, uint _mplexid,
+    uint _livetvorder, uint _chanid) :
+    InputInfo(_name, _sourceid, _inputid, _cardid, _mplexid, _livetvorder), 
+    chanid(_chanid)
 {
 }
 

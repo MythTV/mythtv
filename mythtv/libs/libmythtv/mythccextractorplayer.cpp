@@ -28,6 +28,7 @@ using namespace std;
 #include "teletextextractorreader.h"
 #include "mythccextractorplayer.h"
 #include "avformatdecoder.h"
+#include "subtitlescreen.h"
 #include "srtwriter.h"
 
 
@@ -47,10 +48,9 @@ TeletextStuff::~TeletextStuff() { delete reader; }
 DVBSubStuff::~DVBSubStuff() { delete reader; }
 
 MythCCExtractorPlayer::MythCCExtractorPlayer(
-    bool showProgress, const QString &fileName) :
-    MythPlayer(true /*muted*/),
+    PlayerFlags flags, bool showProgress, const QString &fileName) :
+    MythPlayer(flags),
     m_curTime(0),
-    m_curTimeShift(-1),
     m_myFramesPlayed(0),
     m_showProgress(showProgress),
     m_fileName(fileName)
@@ -61,8 +61,6 @@ MythCCExtractorPlayer::MythCCExtractorPlayer(
         comps.removeLast();
     m_workingDir = QDir(QFileInfo(m_fileName).path());
     m_baseName = comps.join(".");
-
-    SetNullVideo();
 }
 
 /**
@@ -75,9 +73,11 @@ void MythCCExtractorPlayer::OnGotNewFrame(void)
     videoOutput->StartDisplayingFrame();
     {
         VideoFrame *frame = videoOutput->GetLastShownFrame();
-        if (m_curTimeShift < 0)
-            m_curTimeShift = frame->timecode;
-        m_curTime = frame->timecode - m_curTimeShift;
+        double fps = frame->frame_rate;
+        if (fps <= 0)
+            fps = GetDecoder()->GetFPS();
+        double duration = 1 / fps + frame->repeat_pict * 0.5 / fps;
+        m_curTime += duration * 1000;
         videoOutput->DoneDisplayingFrame(frame);
     }
 
@@ -121,7 +121,6 @@ bool MythCCExtractorPlayer::run(void)
 
     killdecoder = false;
     framesPlayed = 0;
-    using_null_videoout = true;
 
     decoder->SetDecodeAllSubtitles(true);
 
@@ -210,7 +209,7 @@ void MythCCExtractorPlayer::IngestSubtitle(
 {
     bool update_last =
         !list.isEmpty() &&
-        m_curTime == list.back().start_time &&
+        (int64_t)m_curTime == list.back().start_time &&
         !content.isEmpty();
 
     if (update_last)
@@ -226,14 +225,14 @@ void MythCCExtractorPlayer::IngestSubtitle(
         // Finish previous subtitle.
         if (!last_one.text.isEmpty() && last_one.length < 0)
         {
-            list.back().length = m_curTime - last_one.start_time;
+            list.back().length = (int64_t)m_curTime - last_one.start_time;
         }
 
         // Put new one if it isn't empty.
         if (!content.isEmpty())
         {
             OneSubtitle new_one;
-            new_one.start_time = m_curTime;
+            new_one.start_time = (int64_t)m_curTime;
             new_one.text = content;
 
             list.push_back(new_one);
@@ -309,17 +308,22 @@ void MythCCExtractorPlayer::Ingest608Captions(void)
             if (!changed || !textlist)
                 break;
 
+            if (streamRawIdx < 0)
+                continue;
+
             textlist->lock.lock();
 
             const int ccIdx = ccIndexTbl[min(streamRawIdx,6)];
 
             if (ccIdx >= 4)
+            {
+                textlist->lock.unlock();
                 continue;
+            }
 
-            QStringList content;
-            vector<CC608Text*>::iterator bit = textlist->buffers.begin();
-            for (; bit != textlist->buffers.end(); ++bit)
-                content += CC608Decoder::ToASCII((*bit)->text, true);
+            FormattedTextSubtitle fsub;
+            fsub.InitFromCC608(textlist->buffers);
+            QStringList content = fsub.ToSRT();
 
             textlist->lock.unlock();
 
@@ -408,7 +412,7 @@ void MythCCExtractorPlayer::Ingest708Captions(void)
                     if (win.visible)
                         strings = win.GetStrings();
                     Ingest708Caption(it.key(), serviceIdx, windowIdx,
-                                     win.pen.row, win.pen.column, strings);
+                                     win.pen.row, win.pen.column, win, strings);
                     while (!strings.empty())
                     {
                         delete strings.back();
@@ -424,19 +428,12 @@ void MythCCExtractorPlayer::Ingest708Captions(void)
 void MythCCExtractorPlayer::Ingest708Caption(
     uint streamId, uint serviceIdx,
     uint windowIdx, uint start_row, uint start_column,
+    const CC708Window &win,
     const vector<CC708String*> &content)
 {
-    bool empty = true;
-    QStringList winContent;
-
-    vector<CC708String*>::const_iterator it = content.begin();
-    for (; it != content.end(); ++it)
-    {
-        QString tmp = (*it)->str.trimmed();
-        if (!tmp.isEmpty())
-            winContent += tmp;
-        empty &= tmp.isEmpty();
-    }
+    FormattedTextSubtitle fsub;
+    fsub.InitFromCC708(win, windowIdx, content);
+    QStringList winContent = fsub.ToSRT();
 
     QMap<int, Window> &cc708win = m_cc708_windows[streamId][serviceIdx];
     cc708win[windowIdx].row = start_row;
@@ -689,7 +686,7 @@ void MythCCExtractorPlayer::IngestDVBSubtitles(void)
             (*subit).reader->FreeAVSubtitle(subtitle);
 
             OneSubtitle sub;
-            sub.start_time = subtitle.start_display_time - m_curTimeShift;
+            sub.start_time = subtitle.start_display_time;
             sub.length =
                 subtitle.end_display_time - subtitle.start_display_time;
 

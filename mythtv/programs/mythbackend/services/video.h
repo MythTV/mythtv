@@ -54,7 +54,8 @@ class Video : public VideoServices
                                                        const QString    &Inetref,
                                                        int              Season,
                                                        int              Episode,
-                                                       const QString    &GrabberType );
+                                                       const QString    &GrabberType,
+                                                       bool             AllowGeneric );
 
         bool                      RemoveVideoFromDB  ( int      Id               );
 
@@ -118,10 +119,12 @@ class ScriptableVideo : public QObject
                               const QString    &Inetref,
                               int              Season,
                               int              Episode,
-                              const QString    &GrabberType)
+                              const QString    &GrabberType,
+                              bool             AllowGeneric )
         {
             return m_obj.LookupVideo( Title, Subtitle, Inetref,
-                                      Season, Episode, GrabberType );
+                                      Season, Episode, GrabberType,
+                                      AllowGeneric );
         }
 
         bool RemoveVideoFromDB(      int              Id         )

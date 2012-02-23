@@ -10,12 +10,9 @@
 using std::vector;
 #endif
 
-#if defined(__linux__) || defined(__FreeBSD__)
-#include <cdaudio.h>
-extern "C" {
-#include <cdda_interface.h>
-#include <cdda_paranoia.h>
-}
+#ifdef HAVE_CDIO
+# include <cdio/cdda.h>
+# include <cdio/paranoia.h>
 #endif
 
 class Metadata;
@@ -24,36 +21,41 @@ class CdDecoder : public Decoder
 {
   public:
     CdDecoder(const QString &file, DecoderFactory *, QIODevice *, AudioOutput *);
-    virtual ~CdDecoder(void);
+    virtual ~CdDecoder();
 
-    bool initialize();
-    double lengthInSeconds();
-    void seek(double);
-    void stop();
+    // Decoder implementation
+    virtual bool initialize();
+    virtual void seek(double);
+    virtual void stop();
 
-    int getNumTracks(void);
-    int getNumCDAudioTracks(void);
+    // Decoder overrides
+    virtual Metadata *getMetadata(void);
+    virtual void commitMetadata(Metadata *mdata);
 
     // The following need to allocate a new Metadata object each time,
     // because their callers (e.g. databasebox.cpp) free the returned value
     Metadata *getMetadata(int track);
-    Metadata *getMetadata(void);
-    Metadata *getLastMetadata(void);
+    Metadata *getLastMetadata();
 
-    void commitMetadata(Metadata *mdata);
-    void      setDevice(const QString &dev)  { devicename = dev; }
+#if CONFIG_DARWIN
+    double lengthInSeconds();
+#endif
+    int getNumTracks();
+    int getNumCDAudioTracks();
+
+    void      setDevice(const QString &dev);
     void      setCDSpeed(int speed);
 
   private:
     void run();
 
-    void writeBlock(void);
+    void writeBlock();
     void deinit();
 
-    volatile bool inited;
-    volatile bool user_stop;
+    volatile bool m_inited;
+    volatile bool m_user_stop;
 
-    QString devicename;
+    QString m_devicename;
 
 #if CONFIG_DARWIN
     void lookupCDDB(const QString &hexID, uint tracks);
@@ -66,26 +68,27 @@ class CdDecoder : public Decoder
     vector<int>        m_tracks;        ///< Start block offset of each track
     vector<Metadata*>  m_mData;         ///< After lookup, details of each trk
 #endif
+    static QMutex& getCdioMutex();
 
-    int stat;
-    char *output_buf;
-    ulong output_at;
+    DecoderEvent::Type m_stat;
+    char *m_output_buf;
+    std::size_t m_output_at;
 
-    unsigned int bks, bksFrames, decodeBytes;
-    bool finish;
-    long freq, bitrate;
-    int chan;
-    double totalTime, seekTime;
+    std::size_t m_bks, m_bksFrames, m_decodeBytes;
+    bool m_finish;
+    long m_freq, m_bitrate;
+    int m_chan;
+    double m_seekTime;
 
-    int settracknum;
-    int tracknum;
+    int m_settracknum;
+    int m_tracknum;
 
-#if defined(__linux__) || defined(__FreeBSD__)
-    cdrom_drive *device;
-    cdrom_paranoia *paranoia;
+#ifdef HAVE_CDIO
+    CdIo_t *m_cdio;
+    cdrom_drive_t *m_device;
+    cdrom_paranoia_t *m_paranoia;
+    lsn_t m_start, m_end, m_curpos;
 #endif
-
-    long int start, end, curpos;
 };
 
 #endif

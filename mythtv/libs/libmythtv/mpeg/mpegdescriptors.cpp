@@ -399,8 +399,8 @@ QString MPEGDescriptor::toString() const
         SET_STRING(ConditionalAccessDescriptor);
     else if (DescriptorID::network_name == DescriptorTag())
         SET_STRING(NetworkNameDescriptor);
-    else if (DescriptorID::linkage == DescriptorTag())
-        SET_STRING(LinkageDescriptor);
+    //else if (DescriptorID::linkage == DescriptorTag())
+    //    SET_STRING(LinkageDescriptor);
     else if (DescriptorID::adaptation_field_data == DescriptorTag())
         SET_STRING(AdaptationFieldDataDescriptor);
     //else if (DescriptorID::ancillary_data == DescriptorTag())
@@ -582,8 +582,9 @@ QString ISO639LanguageDescriptor::toString() const
 QString AVCVideoDescriptor::toString() const
 {
     return QString("AVC Video: IDC prof(%1) IDC level(%2) sets(%3%4%5) "
-                   "compat(%6) still(%7) 24hr(%8)")
+                   "compat(%6) still(%7) 24hr(%8) FramePacking(%9)")
         .arg(ProfileIDC()).arg(LevelIDC())
         .arg(ConstaintSet0()).arg(ConstaintSet1()).arg(ConstaintSet2())
-        .arg(AVCCompatible()).arg(AVCStill()).arg(AVC24HourPicture());
+        .arg(AVCCompatible()).arg(AVCStill()).arg(AVC24HourPicture())
+        .arg(FramePackingSEINotPresentFlag());
 }

@@ -876,7 +876,8 @@ void OpenGLVideo::SetSoftwareDeinterlacer(const QString &filter)
 
 void OpenGLVideo::PrepareFrame(bool topfieldfirst, FrameScanType scan,
                                bool softwareDeinterlacing,
-                               long long frame, bool draw_border)
+                               long long frame, StereoscopicMode stereo,
+                               bool draw_border)
 {
     if (inputTextures.empty() || filters.empty())
         return;
@@ -938,6 +939,17 @@ void OpenGLVideo::PrepareFrame(bool topfieldfirst, FrameScanType scan,
                 trect.setBottom((trueheight / 2) + (trect.bottom() / 2));
                 trect.adjust(0, -bob, 0, -bob);
             }
+        }
+
+        // discard stereoscopic fields
+        if (filter->outputBuffer == kDefaultBuffer)
+        {
+            if (kStereoscopicModeSideBySideDiscard == stereo)
+                trect = QRectF(trect.left() / 2.0f,  trect.top(),
+                               trect.width() / 2.0f, trect.height());
+            if (kStereoscopicModeTopAndBottomDiscard == stereo)
+                trect = QRectF(trect.left(),  trect.top() / 2.0f,
+                               trect.width(), trect.height() / 2.0f);
         }
 
         // vertex coordinates
@@ -1166,6 +1178,7 @@ static const QString field_calc =
 static const QString bobdeint[2] = {
 field_calc +
 "ADD other, tex, {0.0, %3, 0.0, 0.0};\n"
+"MIN other, other, {10000.0, %9, 10000.0, 10000.0};\n"
 "TEX other, other, texture[0], %1;\n"
 "CMP res, prev, res, other;\n",
 field_calc +
@@ -1183,6 +1196,7 @@ static const QString deint_end_bot =
 static const QString linearblend[2] = {
 "TEX current, tex, texture[0], %1;\n"
 "ADD other, tex, {0.0, %3, 0.0, 0.0};\n"
+"MIN other, other, {10000.0, %9, 10000.0, 10000.0};\n"
 "TEX other, other, texture[0], %1;\n"
 "SUB mov, tex, {0.0, %3, 0.0, 0.0};\n"
 "TEX mov, mov, texture[0], %1;\n"
@@ -1204,6 +1218,7 @@ static const QString kerneldeint[2] = {
 "MUL other, 0.125, prev;\n"
 "MAD other, 0.125, current, other;\n"
 "ADD prev, tex, {0.0, %3, 0.0, 0.0};\n"
+"MIN prev, prev, {10000.0, %9, 10000.0, 10000.0};\n"
 "TEX prev, prev, texture[1], %1;\n"
 "MAD other, 0.5, prev, other;\n"
 "SUB prev, tex, {0.0, %3, 0.0, 0.0};\n"
@@ -1360,6 +1375,8 @@ void OpenGLVideo::CustomiseProgramString(QString &string)
         yselect    /= ((float)inputTextureSize.width() / 2.0f);
     }
 
+    float maxheight  = (float)(min(inputTextureSize.height(), 1080) - 1) *
+                       lineHeight;
     float fieldSize = 1.0f / (lineHeight * 2.0);
 
     string.replace("%2", QString::number(fieldSize, 'f', 8));
@@ -1369,6 +1386,7 @@ void OpenGLVideo::CustomiseProgramString(QString &string)
     string.replace("%6", QString::number((float)fb_size.width(), 'f', 1));
     string.replace("%7", QString::number((float)fb_size.height(), 'f', 1));
     string.replace("%8", QString::number(1.0f / yselect, 'f', 8));
+    string.replace("%9", QString::number(maxheight, 'f', 8));
 
     string.replace("COLOUR_UNIFORM", COLOUR_UNIFORM);
 }
@@ -1407,8 +1425,9 @@ static const QString OneFieldShader[2] = {
 "varying vec2 v_texcoord0;\n"
 "void main(void)\n"
 "{\n"
-"    vec2 field   = vec2(0.0, step(0.5, fract(v_texcoord0.y * %2)) * %3);\n"
-"    vec4 yuva    = GLSL_TEXTURE(s_texture0, v_texcoord0 + field);\n"
+"    float field = v_texcoord0.y + (step(0.5, fract(v_texcoord0.y * %2)) * %3);\n"
+"    field       = clamp(field, 0.0, %9);\n"
+"    vec4 yuva   = GLSL_TEXTURE(s_texture0, vec2(v_texcoord0.x, field));\n"
 "SELECT_COLUMN"
 "    gl_FragColor = vec4(yuva.arb, 1.0) * COLOUR_UNIFORM;\n"
 "}\n",
@@ -1434,8 +1453,9 @@ static const QString LinearBlendShader[2] = {
 "void main(void)\n"
 "{\n"
 "    vec2 line  = vec2(0.0, %3);\n"
+"    vec2 line2 = vec2(v_texcoord0.x, clamp(v_texcoord0.y + %3, 0.0, %9));\n"
 "    vec4 yuva  = GLSL_TEXTURE(s_texture0, v_texcoord0);\n"
-"    vec4 above = GLSL_TEXTURE(s_texture0, v_texcoord0 + line);\n"
+"    vec4 above = GLSL_TEXTURE(s_texture0, line2);\n"
 "    vec4 below = GLSL_TEXTURE(s_texture0, v_texcoord0 - line);\n"
 "    if (fract(v_texcoord0.y * %2) >= 0.5)\n"
 "        yuva = mix(above, below, 0.5);\n"
@@ -1473,9 +1493,10 @@ static const QString KernelShader[2] = {
 "    {\n"
 "        vec2 twoup   = v_texcoord0 - vec2(0.0, %4);\n"
 "        vec2 twodown = v_texcoord0 + vec2(0.0, %4);\n"
+"        vec2 onedown = vec2(v_texcoord0.x, clamp(v_texcoord0.y + %3, 0.0, %9));\n"
 "        vec4 line0   = GLSL_TEXTURE(s_texture1, twoup);\n"
 "        vec4 line1   = GLSL_TEXTURE(s_texture1, v_texcoord0 - vec2(0.0, %3));\n"
-"        vec4 line3   = GLSL_TEXTURE(s_texture1, v_texcoord0 + vec2(0.0, %3));\n"
+"        vec4 line3   = GLSL_TEXTURE(s_texture1, onedown);\n"
 "        vec4 line4   = GLSL_TEXTURE(s_texture1, twodown);\n"
 "        vec4 line00  = GLSL_TEXTURE(s_texture2, twoup);\n"
 "        vec4 line20  = GLSL_TEXTURE(s_texture2, v_texcoord0);\n"

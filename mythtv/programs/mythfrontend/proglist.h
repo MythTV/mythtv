@@ -39,7 +39,7 @@ class ProgLister : public ScheduleCommon
 
   public:
     ProgLister(MythScreenStack *parent, ProgListType pltype,
-               const QString &view, const QString &from);
+               const QString &view, const QString &extraArg);
     explicit ProgLister(MythScreenStack *parent, uint recid = 0,
                         const QString &title = QString());
     ~ProgLister();
@@ -102,7 +102,7 @@ class ProgLister : public ScheduleCommon
     ProgListType      m_type;
     uint              m_recid;
     QString           m_title;
-    QString           m_addTables;
+    QString           m_extraArg;
     QDateTime         m_startTime;
     QDateTime         m_searchTime;
     QString           m_channelOrdering;

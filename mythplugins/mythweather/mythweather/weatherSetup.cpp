@@ -975,7 +975,7 @@ bool LocationDialog::Create()
 
 void LocationDialog::doSearch()
 {
-    QString busymessage = tr("Searching ...");
+    QString busymessage = tr("Searching...");
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
@@ -997,7 +997,7 @@ void LocationDialog::doSearch()
     int numresults = 0;
     clearResults();
 
-    QString searchingresults = tr("Searching ... Results: %1");
+    QString searchingresults = tr("Searching... Results: %1");
 
     m_resultsText->SetText(searchingresults.arg(0));
     qApp->processEvents();

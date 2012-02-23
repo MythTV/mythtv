@@ -1,0 +1,26 @@
+<div id='Title'>View Logs</div><br/>
+
+<div id='viewLogs'>
+    <table id="logs"></table>
+    <div id='pager'></div>
+    <div id='loghostname' style="float: left; text-align:left;">
+        <div id='logHostNameSelect'></div><br/>
+    </div>
+    <div id='logapplication' style="float: left; text-align:left;">
+        <div id='logApplicationSelect'></div>
+    </div>
+    <div id='navigation' style="float: right; text-align:right;">
+        <input type='button' onClick='javascript:selectColumns()'
+               value='Select Columns' />
+    </div>
+</div>
+
+<div class="contextMenu" id="logsmenu" style="display:none">
+    <ul>
+        <li id="selectCols">
+            <span class="ui-icon ui-icon-newwin" style="float:left"></span>
+            <span class="body">Select Columns</span>
+        </li>
+    </ul>
+</div>
+

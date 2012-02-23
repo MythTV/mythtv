@@ -456,33 +456,46 @@ void OSD::SetText(const QString &window, QHash<QString,QString> &map,
             screenshot->SetFilename(screenshotpath);
             screenshot->Load(false);
         }
-        MythUIProgressBar *bar =
-            dynamic_cast<MythUIProgressBar *>(win->GetChild("elapsedpercent"));
-        if (bar)
+    }
+    if (map.contains("nightmode"))
+    {
+        MythUIStateType *state = dynamic_cast<MythUIStateType *> (win->GetChild("nightmode"));
+        if (state)
+            state->DisplayState(map["nightmode"]);
+    }
+    if (map.contains("mediatype"))
+    {
+        MythUIStateType *state = dynamic_cast<MythUIStateType *> (win->GetChild("mediatype"));
+        if (state)
+            state->DisplayState(map["mediatype"]);
+    }
+
+    MythUIProgressBar *bar =
+        dynamic_cast<MythUIProgressBar *>(win->GetChild("elapsedpercent"));
+    if (bar)
+    {
+        int startts = map["startts"].toInt();
+        int endts   = map["endts"].toInt();
+        int nowts   = QDateTime::currentDateTime().toTime_t();
+        if (startts > nowts)
         {
-            int startts = map["startts"].toInt();
-            int endts   = map["endts"].toInt();
-            int nowts   = QDateTime::currentDateTime().toTime_t();
-            if (startts > nowts)
-            {
-                bar->SetUsed(0);
-            }
-            else if (endts < nowts)
-            {
-                bar->SetUsed(1000);
-            }
-            else
-            {
-                int duration = endts - startts;
-                if (duration > 0)
-                    bar->SetUsed(1000 * (nowts - startts) / duration);
-                else
-                    bar->SetUsed(0);
-            }
-            bar->SetVisible(startts > 0);
-            bar->SetStart(0);
-            bar->SetTotal(1000);
+            bar->SetUsed(0);
         }
+        else if (endts < nowts)
+        {
+            bar->SetUsed(1000);
+        }
+        else
+        {
+            int duration = endts - startts;
+            if (duration > 0)
+                bar->SetUsed(1000 * (nowts - startts) / duration);
+            else
+                bar->SetUsed(0);
+        }
+        bar->SetVisible(startts > 0);
+        bar->SetStart(0);
+        bar->SetTotal(1000);
     }
 
     win->SetVisible(true);
@@ -738,12 +751,20 @@ void OSD::CheckExpiry(void)
         {
             if (!m_PulsedDialogText.isEmpty() && now > m_NextPulseUpdate)
             {
-                QString replace = QObject::tr("%n second(s)", NULL,
-                                              now.secsTo(it.value()));
                 QString newtext = m_PulsedDialogText;
                 MythDialogBox *dialog = dynamic_cast<MythDialogBox*>(m_Dialog);
                 if (dialog)
+                {
+                    QString replace = QObject::tr("%n second(s)", NULL,
+                                                  now.secsTo(it.value()));
                     dialog->SetText(newtext.replace("%d", replace));
+                }
+                MythConfirmationDialog *cdialog = dynamic_cast<MythConfirmationDialog*>(m_Dialog);
+                if (cdialog)
+                {
+                    QString replace = QString::number(now.secsTo(it.value()));
+                    cdialog->SetMessage(newtext.replace("%d", replace));
+                }
                 m_NextPulseUpdate = now.addSecs(1);
             }
         }

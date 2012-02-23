@@ -45,7 +45,10 @@ typedef struct
     Metadata *metadata;
     bool      active;
     int       length;
+    bool      isNew;
 } RipTrack;
+
+Q_DECLARE_METATYPE(RipTrack *)
 
 class RipStatus;
 
@@ -86,14 +89,11 @@ class Ripper : public MythScreenType
 
     bool Create(void);
     bool keyPressEvent(QKeyEvent *);
+    void customEvent(QEvent *);
 
     bool somethingWasRipped();
     void scanCD(void);
     void ejectCD(void);
-
-    static QString filenameFromMetadata(Metadata *track, bool createDir = true);
-    static bool isNewTune(const QString &artist,
-                          const QString &album, const QString &title);
 
   protected slots:
     void startRipper(void);
@@ -108,6 +108,9 @@ class Ripper : public MythScreenType
     void searchArtist(void);
     void searchAlbum(void);
     void searchGenre(void);
+    void setArtist(QString artist);
+    void setAlbum(QString album);
+    void setGenre(QString genre);
     void RipComplete(bool result);
     void toggleTrackActive(MythUIButtonListItem *);
     void showEditMetadataDialog(MythUIButtonListItem *);
@@ -119,14 +122,12 @@ class Ripper : public MythScreenType
     void ripFinished(void);
 
   private:
-    void deleteTrack(QString& artist, QString& album, QString& title);
+    bool deleteExistingTrack(RipTrack *track);
+    void deleteAllExistingTracks(void);
     void updateTrackList(void);
     void updateTrackLengths(void);
-
-    bool showList(QString caption, QString &value);
-
-    static QString fixFileToken(QString token);
-    static QString fixFileToken_sl(QString token);
+    void toggleTrackActive(RipTrack *);
+    void ShowConflictMenu(RipTrack *);
 
     CdDecoder           *m_decoder;
 

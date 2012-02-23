@@ -72,16 +72,13 @@ static int RunCCExtract(const ProgramInfo &program_info)
         return GENERIC_EXIT_PERMISSIONS_ERROR;
     }
 
-    bool showProgress = true;
-    MythCCExtractorPlayer *ccp = new MythCCExtractorPlayer(
-        showProgress, filename);
+
+    PlayerFlags flags = (PlayerFlags)(kVideoIsNull | kAudioMuted  |
+                                      kDecodeNoLoopFilter | kDecodeFewBlocks |
+                                      kDecodeLowRes | kDecodeSingleThreaded |
+                                      kDecodeNoDecode);
+    MythCCExtractorPlayer *ccp = new MythCCExtractorPlayer(flags, true, filename);
     PlayerContext *ctx = new PlayerContext(kCCExtractorInUseID);
-    ctx->SetSpecialDecode((AVSpecialDecode)
-                          (kAVSpecialDecode_NoDecode |
-                           kAVSpecialDecode_NoLoopFilter |
-                           kAVSpecialDecode_FewBlocks |
-                           kAVSpecialDecode_LowRes |
-                           kAVSpecialDecode_SingleThreaded));
     ctx->SetPlayingInfo(&program_info);
     ctx->SetRingBuffer(tmprbuf);
     ctx->SetPlayer(ccp);

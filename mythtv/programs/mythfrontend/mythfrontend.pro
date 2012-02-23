@@ -39,7 +39,7 @@ HEADERS += videoplayercommand.h         videopopups.h
 HEADERS += videofilter.h                videolist.h
 HEADERS += videoplayersettings.h        videodlg.h
 HEADERS += videoglobalsettings.h        upnpscanner.h
-HEADERS += commandlineparser.h
+HEADERS += commandlineparser.h          idlescreen.h
 
 SOURCES += main.cpp playbackbox.cpp viewscheduled.cpp audiogeneralsettings.cpp
 SOURCES += globalsettings.cpp manualschedule.cpp programrecpriority.cpp
@@ -60,7 +60,7 @@ SOURCES += videoplayercommand.cpp       videopopups.cpp
 SOURCES += videofilter.cpp              videolist.cpp
 SOURCES += videoplayersettings.cpp      videodlg.cpp
 SOURCES += videoglobalsettings.cpp      upnpscanner.cpp
-SOURCES += commandlineparser.cpp
+SOURCES += commandlineparser.cpp        idlescreen.cpp
 
 HEADERS += serviceHosts/frontendServiceHost.h
 HEADERS += services/frontend.h
@@ -103,3 +103,7 @@ using_alsa:DEFINES += USING_ALSA
 using_jack:DEFINES += USING_JACK
 using_oss: DEFINES += USING_OSS
 macx:      DEFINES += USING_COREAUDIO
+using_libdns_sd {
+    DEFINES += USING_LIBDNS_SD
+    using_libcrypto: DEFINES += USING_RAOP
+}

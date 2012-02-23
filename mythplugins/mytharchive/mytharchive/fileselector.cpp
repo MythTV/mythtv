@@ -293,7 +293,7 @@ void FileSelector::OKPressed()
                 a->description = "";
                 a->startDate = "";
                 a->startTime = "";
-                a->size = (long long)file.size();
+                a->size = (int64_t)file.size();
                 a->filename = f;
                 a->hasCutlist = false;
                 a->useCutlist = false;

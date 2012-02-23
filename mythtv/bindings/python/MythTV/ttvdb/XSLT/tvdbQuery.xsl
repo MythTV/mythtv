@@ -27,6 +27,7 @@
                 <language><xsl:value-of select="normalize-space(language)"/></language>
                 <title><xsl:value-of select="normalize-space(SeriesName)"/></title>
                 <inetref><xsl:value-of select="normalize-space(id)"/></inetref>
+                <collectionref><xsl:value-of select="normalize-space(id)"/></collectionref>
                 <xsl:if test="./IMDB_ID/text() != ''">
                     <imdb><xsl:value-of select="normalize-space(substring-after(string(IMDB_ID), 'tt'))"/></imdb>
                 </xsl:if>

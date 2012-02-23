@@ -76,11 +76,11 @@ class META_PUBLIC MetadataFactory : public QObject
     ~MetadataFactory();
 
     void Lookup(ProgramInfo *pginfo, bool automatic = true,
-           bool getimages = true);
+           bool getimages = true, bool allowgeneric = false);
     void Lookup(VideoMetadata *metadata, bool automatic = true,
-           bool getimages = true);
+           bool getimages = true, bool allowgeneric = false);
     void Lookup(RecordingRule *recrule, bool automatic = true,
-           bool getimages = true);
+           bool getimages = true, bool allowgeneric = false);
     void Lookup(MetadataLookup *lookup);
 
     MetadataLookupList SynchronousLookup(QString title,
@@ -88,10 +88,12 @@ class META_PUBLIC MetadataFactory : public QObject
                                          QString inetref,
                                          int season,
                                          int episode,
-                                         QString grabber);
+                                         QString grabber,
+                                         bool allowgeneric = false);
     MetadataLookupList SynchronousLookup(MetadataLookup *lookup);
 
     void VideoScan();
+    void VideoScan(QStringList hosts);
 
     bool IsRunning() { return m_lookupthread->isRunning() ||
                               m_imagedownload->isRunning() ||

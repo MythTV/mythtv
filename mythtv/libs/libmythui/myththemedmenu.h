@@ -23,8 +23,6 @@ struct ThemedButton
     QString password;
 };
 
-Q_DECLARE_METATYPE(ThemedButton);
-
 struct ButtonIcon
 {
     QString name;
@@ -123,5 +121,7 @@ class MUI_PUBLIC MythThemedMenu : public MythThemedMenuState
 
     QString m_menumode;
 };
+
+Q_DECLARE_METATYPE(ThemedButton)
 
 #endif

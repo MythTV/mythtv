@@ -27,6 +27,7 @@ PlaybackSock::PlaybackSock(MainServer *parent, MythSocket *lsock,
     m_eventsMode = eventsMode;
     ip = "";
     backend = false;
+    mediaserver = false;
     expectingreply = false;
 
     disconnected = false;

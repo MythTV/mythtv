@@ -82,17 +82,6 @@ static HostLineEdit *MythArchiveDVDPlayerCmd()
     return gc;
 };
 
-static HostCheckBox *MythArchiveEncodeToAc3()
-{
-    HostCheckBox *gc = new HostCheckBox("MythArchiveEncodeToAc3");
-    gc->setLabel(QObject::tr("Always Encode to AC3"));
-    gc->setValue(false);
-    gc->setHelpText(QObject::tr("If set audio tracks will always be "
-            "re-encoded to AC3 for better compatibility with DVD players in "
-            "NTSC countries."));
-    return gc;
-};
-
 static HostCheckBox *MythArchiveCopyRemoteFiles()
 {
     HostCheckBox *gc = new HostCheckBox("MythArchiveCopyRemoteFiles");
@@ -235,15 +224,6 @@ static HostComboBox *MythArchiveDefaultEncProfile()
     return gc;
 }
 
-static HostLineEdit *MythArchiveFfmpegCmd()
-{
-    HostLineEdit *gc = new HostLineEdit("MythArchiveFfmpegCmd");
-    gc->setLabel(QObject::tr("FFmpeg Command"));
-    gc->setValue("ffmpeg");
-    gc->setHelpText(QObject::tr("Command to run FFmpeg."));
-    return gc;
-};
-
 static HostLineEdit *MythArchiveMplexCmd()
 {
     HostLineEdit *gc = new HostLineEdit("MythArchiveMplexCmd");
@@ -341,7 +321,6 @@ ArchiveSettings::ArchiveSettings()
 
     VerticalConfigurationGroup* vcg2 = new VerticalConfigurationGroup(false);
     vcg2->setLabel(QObject::tr("MythArchive Settings (2)"));
-    vcg2->addChild(MythArchiveEncodeToAc3());
     vcg2->addChild(MythArchiveCopyRemoteFiles());
     vcg2->addChild(MythArchiveAlwaysUseMythTranscode());
     vcg2->addChild(MythArchiveUseProjectX());
@@ -360,7 +339,6 @@ ArchiveSettings::ArchiveSettings()
 
     VerticalConfigurationGroup* vcg4 = new VerticalConfigurationGroup(false);
     vcg4->setLabel(QObject::tr("MythArchive External Commands (1)"));
-    vcg4->addChild(MythArchiveFfmpegCmd());
     vcg4->addChild(MythArchiveMplexCmd());
     vcg4->addChild(MythArchiveDvdauthorCmd());
     vcg4->addChild(MythArchiveSpumuxCmd());

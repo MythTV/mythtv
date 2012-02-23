@@ -27,53 +27,53 @@
 <context>
     <name>MythNews</name>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="452"/>
+        <location filename="../mythnews/mythnews.cpp" line="453"/>
         <source>Updated</source>
         <translation>Actualizadas</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="459"/>
+        <location filename="../mythnews/mythnews.cpp" line="460"/>
         <source>Unknown</source>
         <translation>Desconocido</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="933"/>
-        <source>Cancel</source>
-        <translation>Cancelar</translation>
-    </message>
-    <message>
-        <location filename="../mythnews/mythnews.cpp" line="929"/>
-        <source>Edit News Site</source>
-        <translation>Editar Sitio de Noticias</translation>
-    </message>
-    <message>
-        <location filename="../mythnews/mythnews.cpp" line="122"/>
+        <location filename="../mythnews/mythnews.cpp" line="123"/>
         <source>You haven&apos;t configured MythNews to use any sites.</source>
         <translation>No ha configurado MythNews para acceder a ningún sitio.</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="470"/>
-        <location filename="../mythnews/mythnews.cpp" line="729"/>
+        <location filename="../mythnews/mythnews.cpp" line="471"/>
+        <location filename="../mythnews/mythnews.cpp" line="730"/>
         <source>%1 of %2 (%3 percent)</source>
         <translation>%1 de %2 (%3 por ciento)</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="801"/>
+        <location filename="../mythnews/mythnews.cpp" line="808"/>
         <source>No browser command set! MythNews needs MythBrowser to be installed.</source>
         <translation>¡No hay ningún navegador configurado! MythNews necesita que MythBrowser esté instalado.</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="930"/>
-        <source>Add News Site</source>
-        <translation>Añadir Sitio de Noticias</translation>
+        <location filename="../mythnews/mythnews.cpp" line="900"/>
+        <source>Manage Feeds</source>
+        <translation>Gestionar Canales</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="932"/>
-        <source>Delete News Site</source>
-        <translation>Eliminar Sitio de Noticias</translation>
+        <location filename="../mythnews/mythnews.cpp" line="901"/>
+        <source>Add Feed</source>
+        <translation>Añadir Canal</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="915"/>
+        <location filename="../mythnews/mythnews.cpp" line="904"/>
+        <source>Edit Feed</source>
+        <translation>Editar Canal</translation>
+    </message>
+    <message>
+        <location filename="../mythnews/mythnews.cpp" line="905"/>
+        <source>Delete Feed</source>
+        <translation>Eliminar Canal</translation>
+    </message>
+    <message>
+        <location filename="../mythnews/mythnews.cpp" line="887"/>
         <source>Options</source>
         <translation>Opciones</translation>
     </message>
@@ -159,7 +159,7 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="702"/>
+        <location filename="../mythnews/mythnews.cpp" line="703"/>
         <source>Downloading media...</source>
         <translation>Descargando medios...</translation>
     </message>

@@ -9,6 +9,7 @@
 
 #include "parentalcontrols.h"
 #include "mythmetaexp.h"
+#include "metadatacommon.h"
 
 class MSqlQuery;
 class VideoMetadataListManager;
@@ -70,6 +71,7 @@ class META_PUBLIC VideoMetadata
              int year = VIDEO_YEAR_DEFAULT,
              const QDate &releasedate = QDate(),
              const QString &inetref = QString(),
+             int collectionref = 0,
              const QString &homepage = QString(),
              const QString &director = QString(),
              const QString &studio = QString(),
@@ -77,8 +79,9 @@ class META_PUBLIC VideoMetadata
              float userrating = 0.0,
              const QString &rating = QString(),
              int length = 0,
+             int playcount = 0,
              int season = 0,
-             int episode = 0, 
+             int episode = 0,
              const QDate &insertdate = QDate(),
              int id = 0,
              ParentalLevel::Level showlevel = ParentalLevel::plLowest,
@@ -92,13 +95,16 @@ class META_PUBLIC VideoMetadata
              const country_list &countries = country_list(),
              const cast_list &cast = cast_list(),
              const QString &host = "",
-             bool processed = false);
+             bool processed = false,
+             VideoContentType contenttype = kContentUnknown);
     ~VideoMetadata();
     VideoMetadata(MSqlQuery &query);
     VideoMetadata(const VideoMetadata &rhs);
     VideoMetadata &operator=(const VideoMetadata &rhs);
 
     void toMap(MetadataMap &metadataMap);
+    void GetStateMap(MetadataMap &stateMap);
+    void GetImageMap(MetadataMap &imageMap);
 
     // returns a string to use when sorting
     bool HasSortKey() const;
@@ -125,6 +131,9 @@ class META_PUBLIC VideoMetadata
 
     const QString &GetInetRef() const;
     void SetInetRef(const QString &inetRef);
+
+    int GetCollectionRef() const;
+    void SetCollectionRef(int collectionref);
 
     const QString &GetHomepage() const;
     void SetHomepage(const QString &homepage);
@@ -171,8 +180,14 @@ class META_PUBLIC VideoMetadata
     bool GetProcessed() const;
     void SetProcessed(bool processed);
 
+    VideoContentType GetContentType() const;
+    void SetContentType(VideoContentType contenttype);
+
     const QString &GetPlayCommand() const;
     void SetPlayCommand(const QString &playCommand);
+
+    unsigned int GetPlayCount() const;
+    void SetPlayCount(int count);
 
     ParentalLevel::Level GetShowLevel() const;
     void SetShowLevel(ParentalLevel::Level showLevel);
@@ -234,7 +249,6 @@ class META_PUBLIC VideoMetadata
   private:
     class VideoMetadataImp *m_imp;
 };
-Q_DECLARE_METATYPE(VideoMetadata*)
 
 META_PUBLIC void ClearMap(MetadataMap &metadataMap);
 
@@ -242,5 +256,7 @@ META_PUBLIC bool operator==(const VideoMetadata &a, const VideoMetadata &b);
 META_PUBLIC bool operator!=(const VideoMetadata &a, const VideoMetadata &b);
 
 META_PUBLIC bool operator<(const VideoMetadata::SortKey &lhs, const VideoMetadata::SortKey &rhs);
+
+Q_DECLARE_METATYPE(VideoMetadata*)
 
 #endif

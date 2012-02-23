@@ -17,6 +17,7 @@
 #include "vbilut.h"
 #include "H264Parser.h"
 #include "videodisplayprofile.h"
+#include "mythplayer.h"
 
 extern "C" {
 #include "frame.h"
@@ -93,10 +94,7 @@ class AvFormatDecoder : public DecoderBase
   public:
     static void GetDecoders(render_opts &opts);
     AvFormatDecoder(MythPlayer *parent, const ProgramInfo &pginfo,
-                    bool use_null_video_out,
-                    bool allow_private_decode = true,
-                    bool no_hardware_decode = false,
-                    AVSpecialDecode av_special_decode = kAVSpecialDecode_None);
+                    PlayerFlags flags);
    ~AvFormatDecoder();
 
     virtual void SetEof(bool eof);
@@ -118,9 +116,10 @@ class AvFormatDecoder : public DecoderBase
 
     virtual bool GetFrame(DecodeType); // DecoderBase
 
-    bool isLastFrameKey(void) { return false; }
+    virtual bool IsLastFrameKey(void) const { return false; } // DecoderBase
 
-    bool isCodecMPEG(void) { return codec_is_mpeg; }
+    virtual bool IsCodecMPEG(void) const
+        { return codec_is_mpeg; } // DecoderBase
 
     /// This is a No-op for this class.
     void WriteStoredData(RingBuffer *rb, bool storevid, long timecodeOffset)
@@ -309,11 +308,8 @@ class AvFormatDecoder : public DecoderBase
     bool reordered_pts_detected;
     bool pts_selected;
 
-    bool using_null_videoout;
+    PlayerFlags playerFlags;
     MythCodecID video_codec_id;
-    bool no_hardware_decoders;
-    bool allow_private_decoders;
-    AVSpecialDecode special_decode;
 
     int maxkeyframedist;
 

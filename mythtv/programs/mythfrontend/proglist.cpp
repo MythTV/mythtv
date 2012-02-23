@@ -25,12 +25,12 @@ using namespace std;
 #define LOC_ERR  QString("ProgLister, Error: ")
 
 ProgLister::ProgLister(MythScreenStack *parent, ProgListType pltype,
-                       const QString &view, const QString &from) :
+                       const QString &view, const QString &extraArg) :
     ScheduleCommon(parent, "ProgLister"),
     m_type(pltype),
     m_recid(0),
     m_title(),
-    m_addTables(from),
+    m_extraArg(extraArg),
     m_startTime(MythDate::current()),
     m_searchTime(m_startTime),
     m_channelOrdering(gCoreContext->GetSetting("ChannelOrdering", "channum")),
@@ -79,7 +79,7 @@ ProgLister::ProgLister(
     m_type(plPreviouslyRecorded),
     m_recid(recid),
     m_title(title),
-    m_addTables(),
+    m_extraArg(),
     m_startTime(MythDate::current()),
     m_searchTime(m_startTime),
     m_channelOrdering(gCoreContext->GetSetting("ChannelOrdering", "channum")),
@@ -282,7 +282,6 @@ void ProgLister::ShowMenu(void)
     sortMenu->AddItem(tr("Reverse Sort Order"));
     sortMenu->AddItem(tr("Sort By Title"));
     sortMenu->AddItem(tr("Sort By Time"));
-    sortMenu->AddItem(tr("Cancel"));
 
     MythMenu *menu = new MythMenu(tr("Options"), this, "menu");
 
@@ -312,8 +311,6 @@ void ProgLister::ShowMenu(void)
         menu->AddItem(
             tr("Delete Episode"), SLOT(ShowDeleteOldEpisodeMenu()));
     }
-
-    menu->AddItem(tr("Cancel"));
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
     MythDialogBox *menuPopup = new MythDialogBox(menu, popupStack, "menuPopup");
@@ -467,7 +464,11 @@ void ProgLister::ShowChooseViewMenu(void)
                 (m_curView >= 0) ? m_viewList[m_curView] : QString());
             break;
         case plTime:
-            screen = new TimePopup(popupStack, this);
+            QString message =  tr("Start search from date and time");
+            int flags = (MythTimeInputDialog::kDay |
+                         MythTimeInputDialog::kHours |
+                         MythTimeInputDialog::kFutureDates);
+            screen = new MythTimeInputDialog(popupStack, message, flags);
             connect_string = false;
             break;
     }
@@ -1119,8 +1120,11 @@ void ProgLister::FillItemList(bool restorePosition, bool updateDisp)
     {
         where = "WHERE channel.visible = 1 "
             "  AND program.endtime > :PGILSTART "
-            "  AND program.title = :PGILPHRASE0 ";
+            "  AND (program.title = :PGILPHRASE0 OR "
+            "       (program.seriesid <> '' AND "
+            "        program.seriesid = :PGILPHRASE1)) ";
         bindings[":PGILPHRASE0"] = qphrase;
+        bindings[":PGILPHRASE1"] = m_extraArg;
     }
     else if (m_type == plNewListings) // what's new list
     {
@@ -1214,8 +1218,8 @@ void ProgLister::FillItemList(bool restorePosition, bool updateDisp)
         where = QString("WHERE channel.visible = 1 "
                         "  AND program.endtime > :PGILSTART "
                         "  AND ( %1 ) ").arg(qphrase);
-        if (!m_addTables.isEmpty())
-            where = m_addTables + ' ' + where;
+        if (!m_extraArg.isEmpty())
+            where = m_extraArg + ' ' + where;
     }
     else if (m_type == plChannel) // list by channel
     {

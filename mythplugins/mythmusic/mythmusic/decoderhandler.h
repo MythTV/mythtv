@@ -19,7 +19,7 @@
 #include "pls.h"
 
 class MusicBuffer;
-
+class RemoteFile;
 
 class QUrl;
 class QNetworkAccessManager;
@@ -183,6 +183,21 @@ class DecoderIOFactoryFile : public DecoderIOFactory
     QIODevice *m_input;
 };
 
+class DecoderIOFactorySG : public DecoderIOFactory
+{
+  Q_OBJECT
+
+  public:
+    DecoderIOFactorySG(DecoderHandler *parent);
+    ~DecoderIOFactorySG(void);
+    void start(void);
+    void stop() {}
+    QIODevice *takeInput(void);
+
+  private:
+    QIODevice *m_input;
+};
+
 class DecoderIOFactoryUrl : public DecoderIOFactory 
 {
   Q_OBJECT
@@ -262,6 +277,35 @@ class MusicIODevice : public QIODevice
 
   protected:
     MusicBuffer *m_buffer;
+};
+
+class MusicSGIODevice : public QIODevice
+{
+  Q_OBJECT
+
+  public:
+    MusicSGIODevice(const QString &url);
+    ~MusicSGIODevice(void);
+
+    bool open(int);
+    void close(void) { };
+    bool flush(void);
+
+    qint64 size(void) const;
+    qint64 pos(void) const { return 0; }
+    qint64 bytesAvailable(void) const;
+    bool   isSequential(void) const { return true; }
+    bool   seek(qint64 pos);
+
+    qint64 readData(char *data, qint64 sz);
+    qint64 writeData(const char *data, qint64 sz);
+
+    int getch(void);
+    int putch(int c);
+    int ungetch(int);
+
+  protected:
+    RemoteFile *m_remotefile;
 };
 
 #endif /* DECODERHANDLER_H_ */

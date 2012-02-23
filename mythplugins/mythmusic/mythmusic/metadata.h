@@ -1,20 +1,26 @@
 #ifndef METADATA_H_
 #define METADATA_H_
 
-// C++
+// C/C++
 #include <vector>
+#include <iostream>
+#include <stdint.h>
+
 using namespace std;
 
 // qt
 #include <QStringList>
 #include <QMap>
+#include <QDateTime>
+#include <QImage>
+#include <QMetaType>
+
 
 // mythtv
-#include <uitypes.h>
+#include "mythexp.h"
 #include <mthread.h>
 
 // mythmusic
-#include "treecheckitem.h"
 
 
 class AllMusic;
@@ -29,6 +35,7 @@ enum ImageType
     IT_BACKCOVER,
     IT_CD,
     IT_INLAY,
+    IT_ARTIST,
     IT_LAST
 };
 
@@ -49,7 +56,6 @@ class AlbumArtImage
 };
 
 typedef QList<AlbumArtImage*> AlbumArtList;
-
 typedef QHash<QString,QString> MetadataMap;
 
 
@@ -89,6 +95,7 @@ class Metadata
                    m_format(lformat),
                    m_year(lyear),
                    m_tracknum(ltracknum),
+                   m_trackCount(0),
                    m_length(llength),
                    m_rating(lrating),
                    m_directoryid(-1),
@@ -97,14 +104,15 @@ class Metadata
                    m_albumid(-1),
                    m_genreid(-1),
                    m_lastplay(llastplay),
+                   m_templastplay(QDateTime()),
                    m_dateadded(ldateadded),
                    m_playcount(lplaycount),
+                   m_tempplaycount(0),
                    m_compilation(lcompilation),
                    m_albumArt(NULL),
                    m_id(lid),
                    m_filename(lfilename),
-                   m_changed(false),
-                   m_show(true)
+                   m_changed(false)
     {
         checkEmptyFields();
     }
@@ -165,6 +173,9 @@ class Metadata
     int Track() const { return m_tracknum; }
     void setTrack(int ltrack) { m_tracknum = ltrack; }
 
+    int GetTrackCount() const { return m_trackCount; }
+    void setTrackCount(int ltrackcount) { m_trackCount = ltrackcount; }
+
     int Length() const { return m_length; }
     void setLength(int llength) { m_length = llength; }
 
@@ -175,9 +186,9 @@ class Metadata
     void setID(IdType lid) { m_id = lid; }
     void setRepo(RepoType repo) { m_id = (m_id & METADATA_ID_MASK) | (repo << METADATA_REPO_SHIFT); }
 
-    bool isCDTrack(void) { return ID_TO_REPO(m_id) == RT_CD; }
+    bool isCDTrack(void) const { return ID_TO_REPO(m_id) == RT_CD; }
 
-    QString Filename() const { return m_filename; }
+    QString Filename(bool find = true) const;
     void setFilename(const QString &lfilename) { m_filename = lfilename; }
 
     QString Format() const { return m_format; }
@@ -193,9 +204,6 @@ class Metadata
 
     int PlayCount() const { return m_playcount; }
     void incPlayCount();
-
-    bool isVisible() const { return m_show; }
-    void setVisible(bool visible) { m_show = visible; }
 
     // track is part of a compilation album
     bool Compilation() const { return m_compilation; }
@@ -213,17 +221,15 @@ class Metadata
     void dumpToDatabase(void);
     void setField(const QString &field, const QString &data);
     void getField(const QString& field, QString *data);
-    void toMap(MetadataMap &metadataMap);
+    void toMap(MetadataMap &metadataMap, const QString &prefix = "");
 
-    void persist(void) const;
+    void persist(void);
     void UpdateModTime(void) const;
     bool hasChanged() const { return m_changed; }
-    int compare(const Metadata *other) const;
+    int  compare(const Metadata *other) const;
+
+    // static functions
     static void setArtistAndTrackFormats();
-
-    static void SetStartdir(const QString &dir);
-    static QString GetStartdir() { return m_startdir; }
-
     static QStringList fillFieldList(QString field);
 
     // this looks for any image available - preferring a front cover if available
@@ -251,6 +257,7 @@ class Metadata
     QString m_format;
     int m_year;
     int m_tracknum;
+    int m_trackCount;
     int m_length;
     int m_rating;
     int m_directoryid;
@@ -259,8 +266,10 @@ class Metadata
     int m_albumid;
     int m_genreid;
     QDateTime m_lastplay;
+    QDateTime m_templastplay;
     QDateTime m_dateadded;
     int  m_playcount;
+    int  m_tempplaycount;
     bool m_compilation;
 
     AlbumArtImages *m_albumArt;
@@ -268,10 +277,6 @@ class Metadata
     IdType   m_id;
     QString  m_filename;
     bool     m_changed;
-
-    bool     m_show;
-
-    static QString m_startdir;
 
     // Various formatting strings
     static QString m_formatnormalfileartist;
@@ -291,59 +296,7 @@ bool operator!=(const Metadata& a, const Metadata& b);
 Q_DECLARE_METATYPE(Metadata *)
 
 typedef QList<Metadata*> MetadataPtrList;
-class MusicNode;
-typedef QList<MusicNode*> MusicNodePtrList;
-
-class MusicNode
-{
-  public:
-
-    MusicNode(const QString &a_title, const QString &tree_level);
-   ~MusicNode();
-
-    QString     getTitle(void) const { return my_title; }
-    void        putYourselfOnTheListView(TreeCheckItem *parent, bool show_node);
-    void        writeTree(GenericTree *tree_to_write_to, int a_counter);
-    void        sort();
-    void        setPlayCountMin(int tmp_min) { m_playcountMin = tmp_min; }
-    void        setPlayCountMax(int tmp_max) { m_playcountMax = tmp_max; }
-    void        setLastPlayMin(double tmp_min) { m_lastplayMin = tmp_min; }
-    void        setLastPlayMax(double tmp_max) { m_lastplayMax = tmp_max; }
-
-    inline void addChild(MusicNode *child) { my_subnodes.append(child); }
-    inline void addLeaf(Metadata *leaf) { my_tracks.append(leaf); }
-    inline void setLeaves(MetadataPtrList leaves) { my_tracks = leaves; }
-
-    void clear(void) 
-    {
-        while (!my_subnodes.isEmpty())
-            delete my_subnodes.takeFirst();
-
-        // done delete the metadata since AllMusic owns it
-        my_tracks.clear();
-    }
-
-    static void SetStaticData(const QString &startdir, const QString &paths);
-
-  private:
-
-    MetadataPtrList     my_tracks;
-    MusicNodePtrList    my_subnodes;
-    QString             my_title;
-    QString             my_level;
-
-    static QString      m_startdir;
-    static QString      m_paths;
-    static int          m_RatingWeight;
-    static int          m_PlayCountWeight;
-    static int          m_LastPlayWeight;
-    static int          m_RandomWeight;
-
-    int                 m_playcountMin;
-    int                 m_playcountMax;
-    double              m_lastplayMin;
-    double              m_lastplayMax;
-};
+Q_DECLARE_METATYPE(MetadataPtrList *)
 
 //---------------------------------------------------------------------------
 
@@ -364,15 +317,11 @@ class MetadataLoadingThread : public MThread
 
 class AllMusic
 {
-    //  One class to read the data once at mythmusic start
-    //  And save any changes at mythmusic stop
-
   public:
 
-    AllMusic(QString path_assignment, QString a_startdir);
+    AllMusic(void);
     ~AllMusic();
 
-    QString     getLabel(int an_id, bool *error_flag);
     Metadata*   getMetadata(int an_id);
     bool        updateMetadata(int an_id, Metadata *the_track);
     int         count() const { return m_numPcs; }
@@ -380,50 +329,35 @@ class AllMusic
     void        save();
     bool        startLoading(void);
     void        resync();   //  After a CD rip, for example
-    void        clearCDData();
-    void        addCDTrack(Metadata *the_track);
+
+    // cd stuff
+    void        clearCDData(void);
+    void        addCDTrack(const Metadata &the_track);
     bool        checkCDTrack(Metadata *the_track);
-    bool        getCDMetadata(int m_the_track, Metadata *some_metadata);
-    QString     getCDTitle(){return m_cd_title;}
-    void        setCDTitle(const QString &a_title){m_cd_title = a_title;}
-    void        buildTree();
-    void        sortTree();
-    inline void clearTree() { m_root_node-> clear(); }
-    void        writeTree(GenericTree *tree_to_write_to);
-    void        setSorting(QString a_paths);
-    bool        putYourselfOnTheListView(TreeCheckItem *where);
-    void        putCDOnTheListView(CDCheckItem *where);
-    bool        doneLoading(){return m_done_loading;}
+    Metadata*   getCDMetadata(int m_the_track);
+    QString     getCDTitle(void) const { return m_cdTitle; }
+    void        setCDTitle(const QString &a_title) { m_cdTitle = a_title; }
+    int         getCDTrackCount(void) const { return m_cdData.count(); }
+
+    bool        doneLoading() const { return m_done_loading; }
     bool        cleanOutThreads();
-    int         getCDTrackCount(){return m_cd_data.count();}
-    void        resetListings(){m_last_listed = -1;}
-    void        setAllVisible(bool visible);
 
     MetadataPtrList *getAllMetadata(void) { return &m_all_music; }
 
-  private:
+    bool isValidID(int an_id);
 
+  private:
     MetadataPtrList     m_all_music;
-    MusicNode           *m_root_node;
 
     int m_numPcs;
     int m_numLoaded;
 
-    //  NB: While a QMap is VALUE BASED the
-    //  values we are copying here are pointers,
-    //  so they still reference the correct data
-    //  If, however, you create or delete metadata
-    //  you NEED to clear and rebuild the map
     typedef QMap<int, Metadata*> MusicMap;
     MusicMap music_map;
 
-    typedef QList<Metadata>       ValueMetadata;
-    ValueMetadata                 m_cd_data; //  More than one cd player?
-    QString                       m_cd_title;
-
-    QString     m_startdir;
-    QString     m_paths;
-
+    // cd stuff
+    MetadataPtrList m_cdData; //  More than one cd player?
+    QString m_cdTitle;
 
     MetadataLoadingThread   *m_metadata_loader;
     bool                     m_done_loading;
@@ -433,7 +367,6 @@ class AllMusic
     int                      m_playcountMax;
     double                   m_lastplayMin;
     double                   m_lastplayMax;
-
 };
 
 //----------------------------------------------------------------------------
@@ -451,8 +384,7 @@ class MusicData : public QObject
     void reloadMusic(void);
 
   public:
-    QString             paths;
-    QString             startdir;
+    QString             musicDir;
     PlaylistContainer  *all_playlists;
     AllMusic           *all_music;
     bool                initialized;

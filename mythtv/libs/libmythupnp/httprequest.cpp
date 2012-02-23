@@ -6,18 +6,7 @@
 //                                                                            
 // Copyright (c) 2005 David Blain <dblain@mythtv.org>
 //                                          
-// This library is free software; you can redistribute it and/or 
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or at your option any later version of the LGPL.
-//
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
-//
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library.  If not, see <http://www.gnu.org/licenses/>.
+// Licensed under the GPL v2 or later, see COPYING for details                    
 //
 //////////////////////////////////////////////////////////////////////////////
 
@@ -55,6 +44,7 @@
 #include "serializers/xmlSerializer.h"
 #include "serializers/soapSerializer.h"
 #include "serializers/jsonSerializer.h"
+#include "serializers/xmlplistSerializer.h"
 
 #ifndef O_LARGEFILE
 #define O_LARGEFILE 0
@@ -76,7 +66,7 @@ static MIMETypes g_MIMETypes[] =
     { "pdf" , "application/pdf"            },
     { "avi" , "video/avi"                  },
     { "css" , "text/css"                   },
-    { "swf" , "application/futuresplash"   },
+    { "swf" , "application/x-shockwave-flash" },
     { "xls" , "application/vnd.ms-excel"   },
     { "doc" , "application/vnd.ms-word"    },
     { "mid" , "audio/midi"                 },
@@ -89,7 +79,6 @@ static MIMETypes g_MIMETypes[] =
     { "mpg2", "video/mpeg"                 },
     { "mpeg", "video/mpeg"                 },
     { "mpeg2","video/mpeg"                 },
-    { "ts"  , "video/mpegts"               },
     { "vob" , "video/mpeg"                 },
     { "asf" , "video/x-ms-asf"             },
     { "nuv" , "video/nupplevideo"          },
@@ -107,6 +96,9 @@ static MIMETypes g_MIMETypes[] =
     // Similarly, this could be audio/flac or application/flac:
     { "flac", "audio/x-flac"               },
     { "m4a" , "audio/x-m4a"                },
+    // HTTP Live Streaming
+    { "m3u8", "application/x-mpegurl"      },
+    { "ts"  , "video/mp2t"                 },
 };
 
 static const char *Static401Error = 
@@ -1413,6 +1405,8 @@ Serializer *HTTPRequest::GetSerializer()
         else if (sAccept.contains( "text/javascript", Qt::CaseInsensitive ))    
             pSerializer = (Serializer *)new JSONSerializer(&m_response,
                                                            m_sMethod);
+        else if (sAccept.contains( "text/x-apple-plist+xml", Qt::CaseInsensitive ))
+            pSerializer = (Serializer *)new XmlPListSerializer(&m_response);
     }
 
     // Default to XML

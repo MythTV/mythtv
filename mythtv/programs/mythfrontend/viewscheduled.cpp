@@ -218,7 +218,6 @@ void ViewScheduled::ShowMenu(void)
         menuPopup->AddButton(tr("Delete Rule"));
         menuPopup->AddButton(tr("Show Cards"));
         menuPopup->AddButton(tr("Show Inputs"));
-        menuPopup->AddButton(tr("Cancel"));
 
         popupStack->AddScreen(menuPopup);
     }

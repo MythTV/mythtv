@@ -227,3 +227,15 @@ void MythOpenGLPainter::DeleteFormatImagePriv(MythImage *im)
         m_ImageExpireList.remove(im);
     }
 }
+
+void MythOpenGLPainter::PushTransformation(const UIEffects &fx, QPointF center)
+{
+    if (realRender)
+        realRender->PushTransformation(fx, center);
+}
+
+void MythOpenGLPainter::PopTransformation(void)
+{
+    if (realRender)
+        realRender->PopTransformation();
+}

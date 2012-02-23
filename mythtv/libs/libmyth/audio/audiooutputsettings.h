@@ -17,6 +17,7 @@
 extern "C" {
 #include "libavcodec/avcodec.h"  // to get codec id
 }
+#include "eldutils.h"
 
 using namespace std;
 
@@ -41,8 +42,8 @@ typedef enum {
     FEATURE_AAC    = 1 << 6,
 } DigitalFeature;
 
-static const int srs[] = { 8000,  11025, 16000, 22050, 32000,  44100,
-                           48000, 64000, 88200, 96000, 176400, 192000 };
+static const int srs[] = { 5512, 8000,  11025, 16000, 22050, 32000,  44100,
+                           48000, 88200, 96000, 176400, 192000 };
 
 static const AudioFormat fmts[] = { FORMAT_U8,  FORMAT_S16, FORMAT_S24LSB,
                                     FORMAT_S24, FORMAT_S32, FORMAT_FLT };
@@ -128,6 +129,7 @@ class MPUBLIC AudioOutputSettings
              * clear or set digital feature internal mask
              */ 
         void setFeature(bool val, DigitalFeature arg);
+        void setFeature(bool val, int arg);
 
             /**
              * Force set the greatest number of channels supported by the audio
@@ -156,7 +158,31 @@ class MPUBLIC AudioOutputSettings
                                          int &samplerate, int &channels,
                                          bool canDTSHDMA);
 
-    private:
+            // ELD related methods
+
+            /**
+             * get the ELD flag
+             */
+        bool hasELD();
+        bool hasValidELD();
+            /**
+             * set ELD data
+             */
+        void setELD(QByteArray *ba);
+            /**
+             * retrieve ELD data
+             */
+        ELD &getELD(void)             { return m_eld; };
+            /**
+             * Reports best supported channel number, restricted to ELD range
+             */
+        int  BestSupportedChannelsELD();
+            /**
+             * Reports best supported PCM channel number, restricted to ELD
+             */
+        int  BestSupportedPCMChannelsELD();
+
+  private:
         void SortSupportedChannels();
 
         /** passthrough status
@@ -173,9 +199,10 @@ class MPUBLIC AudioOutputSettings
              * will be set to true if we were able to retrieve the device ELD
              * (EDID like Data). ELD contains information about the audio
              * processing capabilities of the device connected to the audio card
-             * ELD is usually retrieve from EDID CEA-861-E extension.
+             * ELD is usually retrieved from EDID CEA-861-E extension.
              */
         bool m_has_eld;
+        ELD  m_eld;
 
         vector<int> m_sr, m_rates, m_channels;
         vector<AudioFormat> m_sf, m_formats;

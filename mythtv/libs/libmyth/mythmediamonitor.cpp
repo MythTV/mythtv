@@ -22,6 +22,7 @@ using namespace std;
 #include "mythdialogbox.h"
 #include "util.h"
 #include "mythlogging.h"
+#include "mythmainwindow.h"
 
 #ifdef USING_DARWIN_DA
 #include "mediamonitor-darwin.h"
@@ -57,6 +58,7 @@ void MonitorThread::run(void)
 ////////////////////////////////////////////////////////////////////////
 // MediaMonitor
 
+#define MONITOR_INTERVAL 5000
 
 MediaMonitor* MediaMonitor::GetMediaMonitor(void)
 {
@@ -64,12 +66,12 @@ MediaMonitor* MediaMonitor::GetMediaMonitor(void)
         return c_monitor;
 
 #ifdef USING_DARWIN_DA
-    c_monitor = new MediaMonitorDarwin(NULL, 500, true);
+    c_monitor = new MediaMonitorDarwin(NULL, MONITOR_INTERVAL, true);
 #else
   #if CONFIG_CYGWIN || defined(_WIN32)
-    c_monitor = new MediaMonitorWindows(NULL, 500, true);
+    c_monitor = new MediaMonitorWindows(NULL, MONITOR_INTERVAL, true);
   #else
-    c_monitor = new MediaMonitorUnix(NULL, 500, true);
+    c_monitor = new MediaMonitorUnix(NULL, MONITOR_INTERVAL, true);
   #endif
 #endif
 
@@ -570,7 +572,7 @@ QList<MythMediaDevice*> MediaMonitor::GetMedias(MythMediaType mediatype)
     QList<MythMediaDevice*>::iterator it = m_Devices.begin();
     for (;it != m_Devices.end(); ++it)
     {
-        if (((*it)->getMediaType() == mediatype) &&
+        if (((*it)->getMediaType() & mediatype) &&
             (((*it)->getStatus() == MEDIASTAT_USEABLE) ||
              ((*it)->getStatus() == MEDIASTAT_MOUNTED) ||
              ((*it)->getStatus() == MEDIASTAT_NOTMOUNTED)))
@@ -649,7 +651,8 @@ void MediaMonitor::JumpToMediaHandler(MythMediaDevice* pMedia)
         if (((*itr).MythMediaType & (int)pMedia->getMediaType()))
         {
             LOG(VB_GENERAL, LOG_NOTICE,
-                     "Found a handler - '" + itr.key() + "'");
+                QString("Found a handler for %1 - '%2'")
+                .arg(pMedia->MediaTypeString()) .arg(itr.key())); 
             handlers.append(*itr);
         }
         itr++;
@@ -662,7 +665,7 @@ void MediaMonitor::JumpToMediaHandler(MythMediaDevice* pMedia)
     }
 
 
-    // Generate a dialog, add buttons for each description,
+    // TODO - Generate a dialog, add buttons for each description,
     // if user didn't cancel, selected = handlers.at(choice);
     int selected = 0;
 
@@ -934,3 +937,7 @@ void MediaMonitor::ejectOpticalDisc()
 #endif
     }
 }
+
+/*
+ * vim:ts=4:sw=4:ai:et:si:sts=4
+ */

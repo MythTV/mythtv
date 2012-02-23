@@ -6,18 +6,7 @@
 //
 // Copyright (c) 2010 David Blain <dblain@mythtv.org>
 //                                          
-// This library is free software; you can redistribute it and/or 
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or at your option any later version of the LGPL.
-//
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
-//
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library.  If not, see <http://www.gnu.org/licenses/>.
+// Licensed under the GPL v2 or later, see COPYING for details
 //
 //////////////////////////////////////////////////////////////////////////////
 
@@ -29,6 +18,7 @@
 
 #include "service.h"
 #include "datacontracts/artworkInfoList.h"
+#include "datacontracts/liveStreamInfoList.h"
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
@@ -60,6 +50,7 @@ class SERVICE_PUBLIC ContentServices : public Service  //, public QScriptable ??
         ContentServices( QObject *parent = 0 ) : Service( parent )
         {
             DTC::ArtworkInfoList::InitializeCustomTypes();
+            DTC::LiveStreamInfoList::InitializeCustomTypes();
         }
 
     public slots:
@@ -111,6 +102,39 @@ class SERVICE_PUBLIC ContentServices : public Service  //, public QScriptable ??
         virtual bool                DownloadFile        ( const QString   &URL,
                                                           const QString   &StorageGroup ) = 0;
 
+        virtual DTC::LiveStreamInfo     *AddLiveStream          ( const QString   &StorageGroup,
+                                                                  const QString   &FileName,
+                                                                  const QString   &HostName,
+                                                                  int              MaxSegments,
+                                                                  int              Width,
+                                                                  int              Height,
+                                                                  int              Bitrate,
+                                                                  int              AudioBitrate,
+                                                                  int              SampleRate ) = 0;
+
+        virtual DTC::LiveStreamInfo     *AddRecordingLiveStream ( int              ChanId,
+                                                                  const QDateTime &StartTime,
+                                                                  int              MaxSegments,
+                                                                  int              Width,
+                                                                  int              Height,
+                                                                  int              Bitrate,
+                                                                  int              AudioBitrate,
+                                                                  int              SampleRate ) = 0;
+
+        virtual DTC::LiveStreamInfo     *AddVideoLiveStream     ( int              Id,
+                                                                  int              MaxSegments,
+                                                                  int              Width,
+                                                                  int              Height,
+                                                                  int              Bitrate,
+                                                                  int              AudioBitrate,
+                                                                  int              SampleRate ) = 0;
+
+        virtual DTC::LiveStreamInfo     *GetLiveStream            ( int Id ) = 0;
+        virtual DTC::LiveStreamInfoList *GetLiveStreamList        ( void ) = 0;
+        virtual DTC::LiveStreamInfoList *GetFilteredLiveStreamList( const QString &FileName ) = 0;
+
+        virtual DTC::LiveStreamInfo     *StopLiveStream         ( int Id ) = 0;
+        virtual bool                     RemoveLiveStream       ( int Id ) = 0;
 };
 
 #endif

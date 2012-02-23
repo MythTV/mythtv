@@ -23,7 +23,7 @@ CommBreakMap::CommBreakMap(void)
     maxShortMerge = gCoreContext->GetNumSetting("MergeShortCommBreaks", 0);
 }
 
-CommSkipMode CommBreakMap::GetAutoCommercialSkip(void)
+CommSkipMode CommBreakMap::GetAutoCommercialSkip(void) const
 {
     QMutexLocker locker(&commBreakMapLock);
     return autocommercialskip;
@@ -94,7 +94,7 @@ void CommBreakMap::SetTracker(uint64_t framesPlayed)
     }
 }
 
-void CommBreakMap::GetMap(frm_dir_map_t &map)
+void CommBreakMap::GetMap(frm_dir_map_t &map) const
 {
     QMutexLocker locker(&commBreakMapLock);
     map.clear();
@@ -102,13 +102,13 @@ void CommBreakMap::GetMap(frm_dir_map_t &map)
     map.detach();
 }
 
-bool CommBreakMap::IsInCommBreak(uint64_t frameNumber)
+bool CommBreakMap::IsInCommBreak(uint64_t frameNumber) const
 {
     QMutexLocker locker(&commBreakMapLock);
     if (commBreakMap.isEmpty())
         return false;
 
-    frm_dir_map_t::Iterator it = commBreakMap.find(frameNumber);
+    frm_dir_map_t::const_iterator it = commBreakMap.find(frameNumber);
     if (it != commBreakMap.end())
         return true;
 

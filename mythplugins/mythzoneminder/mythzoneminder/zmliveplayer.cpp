@@ -104,7 +104,7 @@ bool ZMLivePlayer::hideAll(void)
             GetMythUIType(QString("frame3-%1").arg(x))->SetVisible(false);
         }
     }
-    catch (const QString name)
+    catch (const QString &name)
     {
         LOG(VB_GENERAL, LOG_ERR,
             QString("Theme is missing a critical theme element ('%1')")

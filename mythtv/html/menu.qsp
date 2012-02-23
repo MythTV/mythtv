@@ -3,6 +3,7 @@
 </div>
 <div id="menu">
   <ul class="menu collapsible">
+<!--
     <li><a href='#'><i18n>Setup</i18n></a>
       <ul class="acitem collapsible">
         <li><a href='#' onClick="javascript:clearContent(); loadEditWindow('/setup/wizard.html', '/setup/js/wizard.js')"><i18n>Setup Wizard</i18n></a></li>
@@ -38,9 +39,11 @@
         <li><a href='#' onClick="javascript:loadSetupPage('password')"><i18n>Change Password</i18n></a></li>
       </ul>
     </li>
+-->
     <li><a href='#'><i18n>Information</i18n></a>
       <ul class="acitem collapsible">
         <li><a class='menuitem' href='#' onClick="javascript:loadContent('/Status/GetStatusHTML')"><i18n>Backend Status</i18n></a></li>
+        <li><a class='menuitem' href='#' onClick="javascript:loadMiscPage('viewlogs')"><i18n>View Logs</i18n></a></li>
       </ul>
     </li>
     <li><a href='#'><i18n>Utilities</i18n></a>
@@ -64,6 +67,11 @@
             <li class="indent1"><a href='/Video/wsdl'><i18n>Video Library Service</i18n></a></li>
           </ul>
         </li>
+        <li><a href='#'><i18n>Examples</i18n></a>
+          <ul class="acitem">
+            <li class="indent1"><a href='javascript:void(0);' onClick="loadContent('/samples/hlstest.qsp');"><i18n>HTTP Live Streaming</i18n></a></li>
+          </ul>
+        </li>
         <li><a href='#'><i18n>Server Side Scripting</i18n></a>
           <ul class="acitem">
             <li class="indent1"><a href='#' onClick="javascript:loadContent('/samples/serverside.qsp', '/samples/js/samples.js')"><i18n>Overview</i18n></a></li>
@@ -76,6 +84,11 @@
 %>
           </ul>
         </li>
+      </ul>
+    </li>
+    <li><a href='#'><i18n>3rd Party Software</i18n></a>
+      <ul class="acitem collapsible">
+        <li><a class='menuitem' href='#' onClick="javascript:loadContent('/3rdParty/jwplayer.qsp')"><i18n>JW Player&trade;</i18n></a></li>
       </ul>
     </li>
   </ul>

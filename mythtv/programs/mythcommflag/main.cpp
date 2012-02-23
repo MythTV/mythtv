@@ -619,11 +619,10 @@ static int DoFlagCommercials(
     return comms_found;
 }
 
-static bool DoesFileExist(ProgramInfo *program_info)
+static qint64 GetFileSize(ProgramInfo *program_info)
 {
     QString filename = get_filename(program_info);
-    long long size = 0;
-    bool exists = false;
+    qint64 size = -1;
 
     if (filename.startsWith("myth://"))
     {
@@ -632,7 +631,6 @@ static bool DoesFileExist(ProgramInfo *program_info)
 
         if (remotefile.Exists(filename, &filestat))
         {
-            exists = true;
             size = filestat.st_size;
         }
     }
@@ -641,12 +639,19 @@ static bool DoesFileExist(ProgramInfo *program_info)
         QFile file(filename);
         if (file.exists())
         {
-            exists = true;
             size = file.size();
         }
     }
 
-    if (!exists)
+    return size;
+}
+
+static bool DoesFileExist(ProgramInfo *program_info)
+{
+    QString filename = get_filename(program_info);
+    qint64 size = GetFileSize(program_info);
+
+    if (size < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, QString("Couldn't find file %1, aborting.")
                 .arg(filename));
@@ -661,6 +666,14 @@ static bool DoesFileExist(ProgramInfo *program_info)
     }
 
     return true;
+}
+
+static void UpdateFileSize(ProgramInfo *program_info)
+{
+    qint64 size = GetFileSize(program_info);
+
+    if (size != (qint64)program_info->GetFilesize())
+        program_info->SaveFilesize(size);
 }
 
 static bool IsMarked(uint chanid, QDateTime starttime)
@@ -868,24 +881,20 @@ static int FlagCommercials(ProgramInfo *program_info, int jobid,
         }
     }
 
-    MythCommFlagPlayer *cfp = new MythCommFlagPlayer();
-
-    PlayerContext *ctx = new PlayerContext(kFlaggerInUseID);
-
-    AVSpecialDecode sp = (AVSpecialDecode)
-        (kAVSpecialDecode_LowRes         |
-         kAVSpecialDecode_SingleThreaded |
-         kAVSpecialDecode_NoLoopFilter);
-
+    PlayerFlags flags = (PlayerFlags)(kAudioMuted   |
+                                      kVideoIsNull  |
+                                      kDecodeLowRes |
+                                      kDecodeSingleThreaded |
+                                      kDecodeNoLoopFilter);
     /* blank detector needs to be only sample center for this optimization. */
     if ((COMM_DETECT_BLANKS  == commDetectMethod) ||
         (COMM_DETECT_2_BLANK == commDetectMethod))
     {
-        sp = (AVSpecialDecode) (sp | kAVSpecialDecode_FewBlocks);
+        flags = (PlayerFlags) (flags | kDecodeFewBlocks);
     }
 
-    ctx->SetSpecialDecode(sp);
-
+    MythCommFlagPlayer *cfp = new MythCommFlagPlayer(flags);
+    PlayerContext *ctx = new PlayerContext(kFlaggerInUseID);
     ctx->SetPlayingInfo(program_info);
     ctx->SetRingBuffer(tmprbuf);
     ctx->SetPlayer(cfp);
@@ -1017,6 +1026,10 @@ static int RebuildSeekTable(ProgramInfo *pginfo, int jobid)
         }
     }
 
+    // Update the file size since mythcommflag --rebuild is often used in user
+    // scripts after transcoding or other size-changing operations
+    UpdateFileSize(pginfo);
+
     RingBuffer *tmprbuf = RingBuffer::Create(filename, false);
     if (!tmprbuf)
     {
@@ -1025,27 +1038,26 @@ static int RebuildSeekTable(ProgramInfo *pginfo, int jobid)
         return GENERIC_EXIT_PERMISSIONS_ERROR;
     }
 
-    MythCommFlagPlayer *cfp = new MythCommFlagPlayer();
+    MythCommFlagPlayer *cfp = new MythCommFlagPlayer(
+                (PlayerFlags)(kAudioMuted | kVideoIsNull | kDecodeNoDecode));
     PlayerContext *ctx = new PlayerContext(kFlaggerInUseID);
-    ctx->SetSpecialDecode(kAVSpecialDecode_NoDecode);
     ctx->SetPlayingInfo(pginfo);
     ctx->SetRingBuffer(tmprbuf);
     ctx->SetPlayer(cfp);
     cfp->SetPlayerInfo(NULL, NULL, true, ctx);
 
-    time_t time_now;
     if (progress)
     {
-        time_now = time(NULL);
-        cerr << "Rebuild started at " << ctime(&time_now) << endl;
+        QString time = QDateTime::currentDateTime().toString(Qt::TextDate);
+        cerr << "Rebuild started at " << qPrintable(time) << endl;
     }
 
     cfp->RebuildSeekTable(progress);
 
     if (progress)
     {
-        time_now = time(NULL);
-        cerr << "Rebuild completed at " << ctime(&time_now) << endl;
+        QString time = QDateTime::currentDateTime().toString(Qt::TextDate);
+        cerr << "Rebuild completed at " << qPrintable(time) << endl;
     }
 
     delete ctx;

@@ -10,8 +10,6 @@
 class ASIChannel;
 class ASIStreamHandler;
 
-typedef QMap<uint,int> FilterMap;
-
 class ASISignalMonitor: public DTVSignalMonitor
 {
   public:

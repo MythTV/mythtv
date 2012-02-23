@@ -350,6 +350,8 @@ int main(int argc, char *argv[])
         return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
 
+    setHttpProxy();
+
     MythTranslation::load("mythfrontend");
 
     if (!UpgradeTVDatabaseSchema(false))
@@ -376,7 +378,7 @@ int main(int argc, char *argv[])
 
         query.prepare("SELECT MAX(endtime) FROM program p LEFT JOIN channel c "
                       "ON p.chanid=c.chanid WHERE c.sourceid= :SRCID "
-                      "AND manualid = 0;");
+                      "AND manualid = 0 AND c.xmltvid != '';");
         query.bindValue(":SRCID", fromfile_id);
 
         if (query.exec() && query.next())
@@ -395,7 +397,7 @@ int main(int argc, char *argv[])
 
         query.prepare("SELECT MAX(endtime) FROM program p LEFT JOIN channel c "
                       "ON p.chanid=c.chanid WHERE c.sourceid= :SRCID "
-                      "AND manualid = 0;");
+                      "AND manualid = 0 AND c.xmltvid != '';");
         query.bindValue(":SRCID", fromfile_id);
 
         if (query.exec() && query.next())

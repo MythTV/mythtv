@@ -684,6 +684,7 @@ bool FileServerHandler::HandleQueryFileHash(SocketHandler *socket,
             MSqlQuery query(MSqlQuery::InitCon());
             query.prepare("SELECT hostname FROM settings "
                            "WHERE value='BackendServerIP' "
+                             " OR value='BackendServerIP6' "
                              "AND data=:HOSTNAME;");
             query.bindValue(":HOSTNAME", hostname);
 
@@ -823,7 +824,7 @@ bool FileServerHandler::HandleGetFileList(SocketHandler *socket,
             .arg(groupname).arg(host).arg(path).arg(wantHost));
 
     if ((host.toLower() == wantHost.toLower()) ||
-        (gCoreContext->GetSetting("BackendServerIP") == wantHost))
+        gCoreContext->IsThisHost(wantHost))
     {
         StorageGroup sg(groupname, host);
         LOG(VB_FILE, LOG_INFO, "Getting local info");
@@ -890,7 +891,7 @@ bool FileServerHandler::HandleFileQuery(SocketHandler *socket,
                              .arg(groupname).arg(wantHost).arg(filename));
 
     if ((wantHost.toLower() == gCoreContext->GetHostName().toLower()) ||
-        (wantHost == gCoreContext->GetSetting("BackendServerIP")))
+        gCoreContext->IsThisHost(wantHost))
     {
         // handle request locally
         LOG(VB_FILE, LOG_DEBUG, QString("Getting local info"));

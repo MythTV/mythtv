@@ -13,19 +13,20 @@
 class AudioOutput;
 class MainVisual;
 class Playlist;
+class CDWatcherThread;
 
 class MusicPlayerEvent : public MythEvent
 {
     public:
         MusicPlayerEvent(Type t, int id) :
-        MythEvent(t), TrackID(id), Volume(0), IsMuted(false) {}
+            MythEvent(t), TrackID(id), Volume(0), IsMuted(false) {}
         MusicPlayerEvent(Type t, uint vol, bool muted) :
-        MythEvent(t), TrackID(0), Volume(vol), IsMuted(muted) {}
+            MythEvent(t), TrackID(0), Volume(vol), IsMuted(muted) {}
         ~MusicPlayerEvent() {}
 
         virtual MythEvent *clone(void) const { return new MusicPlayerEvent(*this); }
 
-        // for track changed/added/deleted/metadata changed events
+        // for track changed/added/deleted/metadata changed/playlist changed events
         int TrackID;
 
         // for volume changed event
@@ -41,6 +42,7 @@ class MusicPlayerEvent : public MythEvent
         static Type TrackStatsChangedEvent;
         static Type AlbumArtChangedEvent;
         static Type CDChangedEvent;
+        static Type PlaylistChangedEvent;
 };
 
 class MusicPlayer : public QObject, public MythObservable
@@ -49,6 +51,9 @@ class MusicPlayer : public QObject, public MythObservable
 
   public:
      MusicPlayer(QObject *parent, const QString &dev);
+    ~MusicPlayer(void);
+
+    void switchPlayMode(bool playStreams);
 
     void playFile(const Metadata &meta);
 
@@ -97,27 +102,30 @@ class MusicPlayer : public QObject, public MythObservable
     DecoderHandler *getDecoderHandler(void) { return m_decoderHandler; }
     AudioOutput    *getOutput(void) { return m_output; }
 
-    GenericTree *constructPlaylist(void);
-    GenericTree *getPlaylistTree() { return m_playlistTree; }
-    void         setCurrentNode(GenericTree *node);
-    GenericTree *getCurrentNode(void) { return m_currentNode; }
-
     void         loadPlaylist(void);
     Playlist    *getPlaylist(void) { return m_currentPlaylist; }
 
+    // these add and remove tracks from the active playlist
+    void         removeTrack(int trackID);
+    void         addTrack(int trackID, bool updateUI);
+
+    void         moveTrackUpDown(bool moveUp, int whichTrack);
+
+    QList<Metadata> getPlayedTracksList(void) { return m_playedList; }
+
     int          getCurrentTrackPos(void) { return m_currentTrack; }
-    void         setCurrentTrackPos(int pos);
+    bool         setCurrentTrackPos(int pos);
+    void         changeCurrentTrack(int trackNo);
 
-    void         playlistChanged(int trackID, bool deleted);
-
-    QString      getRouteToCurrent(void);
+    void         activePlaylistChanged(int trackID, bool deleted);
+    void         playlistChanged(int playlistID);
 
     void         savePosition(void);
-    void         restorePosition(const QString &position); //TODO remove
-    void         restorePosition(int position);
+    void         restorePosition(void);
     void         seek(int pos);
 
     Metadata    *getCurrentMetadata(void);
+    Metadata    *getNextMetadata(void);
     Metadata    *getDisplayMetadata(void) { return &m_displayMetadata; }
     void         refreshMetadata(void);
     void         sendMetadataChangedEvent(int trackID);
@@ -127,8 +135,7 @@ class MusicPlayer : public QObject, public MythObservable
 
     void         toMap(QHash<QString, QString> &infoMap);
 
-    void showMiniPlayer(void);
-
+    void         showMiniPlayer(void);
     enum RepeatMode
     { REPEAT_OFF = 0,
       REPEAT_TRACK, 
@@ -156,37 +163,30 @@ class MusicPlayer : public QObject, public MythObservable
     RepeatMode toggleRepeatMode(void);
 
     ShuffleMode getShuffleMode(void) { return m_shuffleMode; }
-    void        setShuffleMode(ShuffleMode mode) { m_shuffleMode = mode; }
+    void        setShuffleMode(ShuffleMode mode);
     ShuffleMode toggleShuffleMode(void);
 
     ResumeMode  getResumeMode(void) { return m_resumeMode; }
 
   protected:
-    ~MusicPlayer(void);
     void customEvent(QEvent *event);
 
   private:
     void stopDecoder(void);
     bool openOutputDevice(void);
-    QString getFilenameFromID(int id);
     void updateLastplay(void);
+    void updateVolatileMetadata(void);
     void sendVolumeChangedEvent(void);
 
     void setupDecoderHandler(void);
     void decoderHandlerReady(void);
-    void decoderHandlerInfo(const QString&, const QString&);
-    void decoderHandlerOperationStart(const QString &);
-    void decoderHandlerOperationStop();
 
     Playlist    *m_currentPlaylist;
     int          m_currentTrack;
-
-    GenericTree *m_playlistTree;
-
-    GenericTree *m_currentNode;
-    Metadata    *m_currentMetadata;
     int          m_currentTime;
 
+    Metadata    *m_currentMetadata;
+    Metadata    *m_oneshotMetadata;
     Metadata     m_displayMetadata;
 
     AudioOutput    *m_output;
@@ -210,9 +210,41 @@ class MusicPlayer : public QObject, public MythObservable
     ResumeMode   m_resumeMode;
 
     float        m_playSpeed;
+
+    // cd stuff
+    CDWatcherThread *m_cdWatcher;
+
+    // streaming stuff
+    bool             m_isStreaming;
+    QList<Metadata>  m_playedList;
+    int              m_lastTrackStart;
 };
+
+Q_DECLARE_METATYPE(MusicPlayer::RepeatMode);
+Q_DECLARE_METATYPE(MusicPlayer::ShuffleMode);
 
 // This global variable contains the MusicPlayer instance for the application
 extern MPUBLIC MusicPlayer *gPlayer;
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+class CDWatcherThread : public QThread
+{
+  public:
+
+    CDWatcherThread(const QString &dev);
+    virtual void run(void);
+    bool    statusChanged(void) { return m_cdStatusChanged; }
+    QMutex *getLock(void) { return &m_musicLock; }
+    void    stop(void) { m_stopped = true; }
+
+  private:
+
+    bool    m_stopped;
+    QString m_cdDevice;
+    bool    m_cdStatusChanged;
+    QMutex  m_musicLock;
+};
 
 #endif

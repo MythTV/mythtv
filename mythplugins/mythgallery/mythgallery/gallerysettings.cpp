@@ -17,7 +17,7 @@ static HostLineEdit *MythGalleryFilter()
     HostLineEdit *gc = new HostLineEdit("GalleryFilterDirectory");
     gc->setLabel(QObject::tr("Directory filter"));
     gc->setValue("");
-    gc->setHelpText(QObject::tr("Enter direcory names to be excluded in "
+    gc->setHelpText(QObject::tr("Enter directory names to be excluded in "
                                 "browser. (multiple entries delimited with "
                                 "':')"));
     return gc;
@@ -80,16 +80,6 @@ static HostComboBox *MythGallerySortOrder()
                      QString::number(kSortOrderSizeDesc));
     gc->setHelpText(QObject::tr("This is the sort order for the displayed "
                     "picture thumbnails."));
-    return gc;
-};
-
-static HostLineEdit *MythGalleryMoviePlayerCmd()
-{
-    HostLineEdit *gc = new HostLineEdit("GalleryMoviePlayerCmd");
-    gc->setLabel(QObject::tr("Command run to display movie files"));
-    gc->setValue("mplayer -fs %s");
-    gc->setHelpText(QObject::tr("This command is executed whenever a movie "
-                    "file is selected"));
     return gc;
 };
 
@@ -264,7 +254,6 @@ GallerySettings::GallerySettings()
     general->addChild(MythGallerySortOrder());
     general->addChild(MythGalleryImportDirs());
     general->addChild(MythGalleryAutoLoad());
-    general->addChild(MythGalleryMoviePlayerCmd());
     general->addChild(MythGalleryFilter());
     general->addChild(MythGalleryFilterType());
     addChild(general);

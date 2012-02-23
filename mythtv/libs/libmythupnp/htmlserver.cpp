@@ -6,23 +6,13 @@
 //                                                                            
 // Copyright (c) 2011 David Blain <dblain@mythtv.org>
 //                                          
-// This library is free software; you can redistribute it and/or 
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or at your option any later version of the LGPL.
-//
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
-//
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library.  If not, see <http://www.gnu.org/licenses/>.
+// Licensed under the GPL v2 or later, see COPYING for details                    
 //
 //////////////////////////////////////////////////////////////////////////////
 
 #include "mythlogging.h"
 #include "htmlserver.h"
+#include "storagegroup.h"
 
 #include <QFileInfo>
 #include <QDir>
@@ -75,6 +65,7 @@ bool HtmlServerExtension::ProcessRequest( HTTPRequest *pRequest )
         if ( pRequest->m_sBaseUrl.startsWith("/") == false)
             return( false );
 
+        bool      bStorageGroupFile = false;
         QFileInfo oInfo( m_sAbsoluteSharePath + pRequest->m_sResourceUrl );
 
         if (oInfo.isDir())
@@ -87,7 +78,19 @@ bool HtmlServerExtension::ProcessRequest( HTTPRequest *pRequest )
                 oInfo.setFile( oInfo.filePath() + m_IndexFilename + ".html" );
         }
 
-        if (oInfo.exists() == true )
+        if (pRequest->m_sResourceUrl.startsWith("/StorageGroup/"))
+        {
+            StorageGroup oGroup(pRequest->m_sResourceUrl.section('/', 2, 2));
+            QString      sFile =
+                oGroup.FindFile(pRequest->m_sResourceUrl.section('/', 3));
+            if (!sFile.isEmpty())
+            {
+                oInfo.setFile(sFile);
+                bStorageGroupFile = true;
+            }
+        }
+
+        if (bStorageGroupFile || oInfo.exists() == true )
         {
             oInfo.makeAbsolute();
 
@@ -97,7 +100,8 @@ bool HtmlServerExtension::ProcessRequest( HTTPRequest *pRequest )
             // Checking for url's that contain ../ or similar.
             // --------------------------------------------------------------
 
-            if ( sResName.startsWith( m_sAbsoluteSharePath, Qt::CaseInsensitive ))
+            if (( bStorageGroupFile ) ||
+                (sResName.startsWith( m_sAbsoluteSharePath, Qt::CaseInsensitive )))
             {
                 if (oInfo.exists())
                 {

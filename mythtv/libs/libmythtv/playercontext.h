@@ -103,7 +103,6 @@ class MTV_PUBLIC PlayerContext
     void SetPIPState(PIPState change) { pipState = change; }
     void SetPlayerChangingBuffers(bool val) { playerUnsafe = val; }
     void SetNoHardwareDecoders(void) { nohardwaredecoders = true; }
-    void SetSpecialDecode(AVSpecialDecode sp) { specialDecode = sp; }
 
     // Gets
     QRect    GetStandAlonePIPRect(void);
@@ -116,7 +115,6 @@ class MTV_PUBLIC PlayerContext
     QString  GetPlayMessage(void) const;
     TVState  GetState(void) const;
     bool     GetPlayingInfoMap(InfoMap &infoMap) const;
-    AVSpecialDecode GetSpecialDecode(void) const { return specialDecode; }
 
     // Boolean Gets
     bool IsPIPSupported(void) const;
@@ -154,7 +152,6 @@ class MTV_PUBLIC PlayerContext
     RingBuffer         *buffer;
     ProgramInfo        *playingInfo; ///< Currently playing info
     long long           playingLen;  ///< Initial CalculateLength()
-    AVSpecialDecode     specialDecode;
     bool                nohardwaredecoders; // < Disable use of VDPAU decoding
     int                 last_cardid; ///< CardID of current/last recorder
     /// 0 == normal, +1 == fast forward, -1 == rewind

@@ -80,6 +80,6 @@ class TreeNodeData
     class TreeNodeDataPrivate *m_d;
 };
 
-Q_DECLARE_METATYPE(TreeNodeData);
+Q_DECLARE_METATYPE(TreeNodeData)
 
 #endif // VIDEOLIST_H

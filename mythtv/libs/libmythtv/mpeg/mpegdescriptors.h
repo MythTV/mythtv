@@ -69,7 +69,7 @@ class DescriptorID
         // DVB
         network_name                = 0x40, /* implemented */
         service_list                = 0x41, /* implemented */
-        dvb_stuffing                = 0x42,
+        dvb_stuffing                = 0x42, /* implemented */
         satellite_delivery_system   = 0x43, /* implemented */
         cable_delivery_system       = 0x44, /* implemented */
         vbi_data                    = 0x45, /* partial */
@@ -344,6 +344,8 @@ class AVCVideoDescriptor : public MPEGDescriptor
     bool AVCStill(void)           const { return _data[5]&0x80; }
     // AVC_24_hour_picture_flag 1   5.1
     bool AVC24HourPicture(void)   const { return _data[5]&0x40; }
+    bool FramePackingSEINotPresentFlag(void)
+                                  const { return _data[5]&0x20; }
     // reserved 6 bslbf
     QString toString() const;
 };

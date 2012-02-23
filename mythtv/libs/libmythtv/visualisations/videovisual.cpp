@@ -2,41 +2,46 @@
 #include "mythplayer.h"
 #include "videovisual.h"
 
-#ifdef FFTW3_SUPPORT
-#include "videovisualspectrum.h"
-#include "videovisualcircles.h"
-#endif
-
-#ifdef USING_OPENGL
-#include "mythrender_opengl2.h"
-#endif
+VideoVisualFactory* VideoVisualFactory::g_videoVisualFactory = NULL;
 
 bool VideoVisual::CanVisualise(AudioPlayer *audio, MythRender *render)
 {
     if (!audio)
         return false;
-#ifdef FFTW3_SUPPORT
     if (render && (audio->GetNumChannels() == 2 || audio->GetNumChannels() == 1))
         return true;
-#endif
     return false;
 }
 
-VideoVisual* VideoVisual::Create(AudioPlayer *audio, MythRender *render)
+QStringList VideoVisual::GetVisualiserList(RenderType type)
 {
-#ifdef FFTW3_SUPPORT
-    if (render)
+    QStringList result;
+    VideoVisualFactory* factory;
+    for (factory = VideoVisualFactory::VideoVisualFactories();
+         factory; factory = factory->next())
     {
-#ifdef USING_OPENGL
-        if (render->Type() == kRenderOpenGL2 ||
-            render->Type() == kRenderOpenGL2ES)
-        {
-            return new VideoVisualCircles(audio, render);
-        }
-#endif
-        return new VideoVisualSpectrum(audio, render);
+        if (factory->SupportedRenderer(type))
+            result << factory->name();
     }
-#endif
+    result.sort();
+    return result;
+}
+
+VideoVisual* VideoVisual::Create(const QString &name,
+                                 AudioPlayer *audio, MythRender *render)
+{
+    if (!audio || !render || name.isEmpty())
+        return NULL;
+
+    const VideoVisualFactory* factory;
+    for (factory = VideoVisualFactory::VideoVisualFactories();
+         factory; factory = factory->next())
+    {
+        if (name.isEmpty())
+            return factory->Create(audio, render);
+        else if (factory->name() == name)
+            return factory->Create(audio, render);
+    }
     return NULL;
 }
 

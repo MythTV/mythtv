@@ -179,7 +179,6 @@ class MPUBLIC ResultItem
     uint         m_episode;
     bool         m_customhtml;
 };
-Q_DECLARE_METATYPE(ResultItem*)
 
 class MPUBLIC Parse : public QObject
 {
@@ -223,5 +222,7 @@ class MPUBLIC Parse : public QObject
     static const QString MediaRSS;
     static const QString MythRSS;
 };
+
+Q_DECLARE_METATYPE(ResultItem*)
 
 #endif

@@ -538,7 +538,6 @@ MythArchive GUI theme
                     <imagetype name="buttonimage">
                         <area>5,5,134,90</area>
                         <preserveaspect>false</preserveaspect>
-                        <filename>mv_browse_nocover.png</filename>
                     </imagetype>
                 </state>
                 <state name="selectedactive" from="active">

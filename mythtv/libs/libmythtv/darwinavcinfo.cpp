@@ -340,6 +340,7 @@ bool DarwinAVCInfo::GetDeviceNodes(int &local_node, int &remote_node)
 static void dfd_device_change_msg(
     void *dfd, io_service_t, natural_t messageType, void*)
 {
-    DarwinFirewireDevice *dev = (DarwinFirewireDevice*) dfd;
+    DarwinFirewireDevice *dev =
+        reinterpret_cast<DarwinFirewireDevice*>(dfd);
     dev->HandleDeviceChange(messageType);
 }

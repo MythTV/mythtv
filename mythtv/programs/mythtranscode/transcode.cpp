@@ -5,6 +5,8 @@
 #include <QStringList>
 #include <QMap>
 #include <QRegExp>
+#include <QList>
+#include <QWaitCondition>
 
 #include "mythconfig.h"
 
@@ -14,11 +16,15 @@
 #include "mythcorecontext.h"
 #include "jobqueue.h"
 #include "exitcodes.h"
+#include "mthreadpool.h"
+#include "deletemap.h"
 
 #include "NuppelVideoRecorder.h"
 #include "mythplayer.h"
 #include "programinfo.h"
 #include "mythdbcon.h"
+#include "avformatwriter.h"
+#include "httplivestream.h"
 
 
 extern "C" {
@@ -36,7 +42,7 @@ using namespace std;
 
 class AudioReencodeBuffer : public AudioOutput
 {
- public:
+  public:
     AudioReencodeBuffer(AudioFormat audio_format, int audio_channels,
                         bool passthru)
     {
@@ -50,6 +56,8 @@ class AudioReencodeBuffer : public AudioOutput
         ab_size = 128;
         ab = new AudioBuffer[ab_size];
         m_initpassthru = passthru;
+
+        m_audioFrameSize = 0;
     }
 
     ~AudioReencodeBuffer()
@@ -110,20 +118,66 @@ class AudioReencodeBuffer : public AudioOutput
             ab = tmp;
             ab_size += 128;
         }
-        ab[ab_count].len = len;
-        ab[ab_count].offset = audiobuffer_len;
 
-        memcpy(audiobuffer + audiobuffer_len, buffer,
-               len);
-        audiobuffer_len    += len;
-        audiobuffer_frames += frames;
+        if (m_audioFrameSize)
+        {
+            int inputOffset = 0;
+            if ((ab_count) &&
+                (ab[ab_count-1].len != m_audioFrameSize))
+            {
+                int copyLen = m_audioFrameSize - ab[ab_count-1].len;
+                if (copyLen > len)
+                    copyLen = len;
 
-        // last_audiotime is at the end of the frame
-        last_audiotime = timecode + frames * 1000 /
-            eff_audiorate;
+                memcpy(audiobuffer + audiobuffer_len, buffer,
+                       copyLen);
+                inputOffset += copyLen;
 
-        ab[ab_count].time = last_audiotime;
-        ab_count++;
+                ab[ab_count-1].len  += copyLen;
+                ab[ab_count-1].time += (copyLen / bytes_per_frame /
+                                        (eff_audiorate / 1000));
+                audiobuffer_len   += copyLen;
+            }
+
+            while (inputOffset < len)
+            {
+                int copyLen = m_audioFrameSize;
+                if (copyLen > (len - inputOffset))
+                    copyLen = (len - inputOffset);
+
+                memcpy(audiobuffer + audiobuffer_len,
+                       (char *)buffer + inputOffset, copyLen);
+                inputOffset += copyLen;
+
+                last_audiotime = timecode + ((inputOffset / bytes_per_frame) /
+                                             (eff_audiorate / 1000));
+
+                ab[ab_count].len = copyLen;
+                ab[ab_count].offset = audiobuffer_len;
+                ab[ab_count].time = last_audiotime;
+
+                audiobuffer_len += copyLen;
+
+                ++ab_count;
+            }
+        }
+        else
+        {
+            ab[ab_count].len = len;
+            ab[ab_count].offset = audiobuffer_len;
+
+            memcpy(audiobuffer + audiobuffer_len, buffer,
+                   len);
+            audiobuffer_len    += len;
+            audiobuffer_frames += frames;
+
+            // last_audiotime is at the end of the frame
+            last_audiotime = timecode + frames * 1000 /
+                eff_audiorate;
+
+            ab[ab_count].time = last_audiotime;
+            ab_count++;
+        }
 
         return true;
     }
@@ -253,8 +307,329 @@ class AudioReencodeBuffer : public AudioOutput
     int channels, bits, bytes_per_frame, eff_audiorate;
     long long last_audiotime;
     bool                m_passthru;
-private:
+    int                 m_audioFrameSize;
+  private:
     bool                m_initpassthru;
+};
+
+// Cutter object is used in performing clean cutting. The
+// act of cutting is shared between the player and the
+// transcode loop. The player performs the initial part
+// of the cut by seeking, and the transcode loop handles
+// the remaining part by discarding data.
+class Cutter
+{
+  private:
+    bool          active;
+    frm_dir_map_t foreshortenedCutList;
+    DeleteMap     tracker;
+    int64_t       totalFrames;
+    int64_t       videoFramesToCut;
+    int64_t       audioFramesToCut;
+    float         audioFramesPerVideoFrame;
+    enum
+    {
+        MAXLEADIN  = 200,
+        MINCUT     = 20
+    };
+
+  public:
+    Cutter() : active(false), videoFramesToCut(0), audioFramesToCut(0),
+        audioFramesPerVideoFrame(0.0) {};
+
+    void SetCutList(frm_dir_map_t &deleteMap)
+    {
+        // Break each cut into two parts, the first for
+        // the player and the second for the transcode loop.
+        frm_dir_map_t           remainingCutList;
+        frm_dir_map_t::Iterator it;
+        int64_t                 start = 0;
+        int64_t                 leadinLength;
+
+        foreshortenedCutList.clear();
+
+        for (it = deleteMap.begin(); it != deleteMap.end(); ++it)
+        {
+            switch(it.value())
+            {
+                case MARK_CUT_START:
+                    foreshortenedCutList[it.key()] = MARK_CUT_START;
+                    start = it.key();
+                    break;
+
+                case MARK_CUT_END:
+                    leadinLength = min((int64_t)(it.key() - start),
+                                       (int64_t)MAXLEADIN);
+                    if (leadinLength >= MINCUT)
+                    {
+                        foreshortenedCutList[it.key() - leadinLength + 2] =
+                            MARK_CUT_END;
+                        remainingCutList[it.key() - leadinLength + 1] =
+                            MARK_CUT_START;
+                        remainingCutList[it.key()] = MARK_CUT_END;
+                    }
+                    else
+                    {
+                        // Cut too short to use new method.
+                        foreshortenedCutList[it.key()] = MARK_CUT_END;
+                    }
+                    break;
+            }
+        }
+
+        tracker.SetMap(remainingCutList);
+    }
+
+    frm_dir_map_t AdjustedCutList() const
+    {
+        return foreshortenedCutList;
+    }
+
+    void Activate(float v2a, int64_t total)
+    {
+        active = true;
+        audioFramesPerVideoFrame = v2a;
+        totalFrames = total;
+        videoFramesToCut = 0;
+        audioFramesToCut = 0;
+        tracker.TrackerReset(0, totalFrames);
+    }
+
+    void NewFrame(int64_t currentFrame)
+    {
+        if (active)
+        {
+            if (videoFramesToCut == 0)
+            {
+                uint64_t jumpTo = 0;
+
+                if (tracker.TrackerWantsToJump(currentFrame, totalFrames,
+                                               jumpTo))
+                {
+                    // Reset the tracker and work out how much video and audio
+                    // to drop
+                    tracker.TrackerReset(jumpTo, totalFrames);
+                    videoFramesToCut = jumpTo - currentFrame;
+                    audioFramesToCut += (int64_t)(videoFramesToCut *
+                                        audioFramesPerVideoFrame + 0.5);
+                    LOG(VB_GENERAL, LOG_INFO,
+                        QString("Clean cut: discarding frame from %1 to %2: "
+                                "vid %3 aud %4")
+                        .arg((long)currentFrame).arg((long)jumpTo)
+                        .arg((long)videoFramesToCut)
+                        .arg((long)audioFramesToCut));
+                }
+            }
+        }
+    }
+
+    bool InhibitUseVideoFrame()
+    {
+        if (videoFramesToCut == 0)
+        {
+            return false;
+        }
+        else
+        {
+            // We are inside a cut. Inhibit use of this frame
+            videoFramesToCut--;
+
+            if(videoFramesToCut == 0)
+                LOG(VB_GENERAL, LOG_INFO,
+                    QString("Clean cut: end of video cut; audio frames left "
+                            "to cut %1") .arg((long)audioFramesToCut));
+
+            return true;
+        }
+    }
+
+    bool InhibitUseAudioFrames(int64_t frames, long *totalAudio)
+    {
+        if (audioFramesToCut == 0)
+        {
+            return false;
+        }
+        else if (abs(audioFramesToCut - frames) < audioFramesToCut)
+        {
+            // Drop the packet containing these frames if doing
+            // so gets us closer to zero left to drop
+            audioFramesToCut -= frames;
+            if(audioFramesToCut == 0)
+                LOG(VB_GENERAL, LOG_INFO,
+                    QString("Clean cut: end of audio cut; vidio frames left "
+                            "to cut %1") .arg((long)videoFramesToCut));
+            return true;
+        }
+        else
+        {
+            // Don't drop this packet even though we still have frames to cut,
+            // because doing so would put us further out. Instead, inflate the 
+            // callers record of how many audio frames have been output.
+            *totalAudio += audioFramesToCut;
+            audioFramesToCut = 0;
+            LOG(VB_GENERAL, LOG_INFO,
+                QString("Clean cut: end of audio cut; vidio frames left to "
+                        "cut %1") .arg((long)videoFramesToCut));
+            return false;
+        }
+    }
+
+    bool InhibitDummyFrame()
+    {
+        if (audioFramesToCut > 0)
+        {
+            // If the cutter is in the process of dropping audio then
+            // it is better to drop more audio rather than insert a dummy frame
+            audioFramesToCut += (int64_t)(audioFramesPerVideoFrame + 0.5);
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    bool InhibitDropFrame()
+    {
+        if (audioFramesToCut > (int64_t)(audioFramesPerVideoFrame + 0.5))
+        {
+            // If the cutter is in the process of dropping audio and the
+            // amount to drop is sufficient then we can drop less
+            // audio rather than drop a frame
+            audioFramesToCut -= (int64_t)(audioFramesPerVideoFrame + 0.5);
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+};
+
+typedef struct transcodeFrameInfo
+{
+    VideoFrame *frame;
+    int         didFF;
+    bool        isKey;
+} TranscodeFrameInfo;
+
+class TranscodeFrameQueue : public QRunnable
+{
+  public:
+    TranscodeFrameQueue(MythPlayer *player, VideoOutput *videoout,
+        bool cutlist, int size = 5)
+      : m_player(player),         m_videoOutput(videoout),
+        m_honorCutlist(cutlist),
+        m_eof(false),             m_maxFrames(size),
+        m_runThread(true),        m_isRunning(false)
+    {
+
+    }
+
+    ~TranscodeFrameQueue()
+    {
+        m_runThread = false;
+        m_frameWaitCond.wakeAll();
+
+        while (m_isRunning)
+            usleep(50000);
+    }
+
+    void stop(void)
+    {
+        m_runThread = false;
+        m_frameWaitCond.wakeAll();
+
+        while (m_isRunning)
+            usleep(50000);
+    }
+
+    void run()
+    {
+        threadRegister("TranscodeFrameQueue");
+
+        frm_dir_map_t::iterator dm_iter;
+
+        m_isRunning = true;
+        while (m_runThread)
+        {
+            if (m_frameList.size() < m_maxFrames)
+            {
+                TranscodeFrameInfo tfInfo;
+                tfInfo.frame = NULL;
+                tfInfo.didFF = 0;
+                tfInfo.isKey = false;
+
+                if (m_player->TranscodeGetNextFrame(dm_iter, tfInfo.didFF,
+                    tfInfo.isKey, m_honorCutlist))
+                {
+                    tfInfo.frame = m_videoOutput->GetLastDecodedFrame();
+
+                    QMutexLocker locker(&m_queueLock);
+                    m_frameList.append(tfInfo);
+                }
+                else
+                {
+                    m_eof = true;
+                }
+
+                m_frameWaitCond.wakeAll();
+            }
+            else
+            {
+                m_frameWaitLock.lock();
+                m_frameWaitCond.wait(&m_frameWaitLock);
+                m_frameWaitLock.unlock();
+            }
+        }
+        m_isRunning = false;
+
+        threadDeregister();
+    }
+
+    VideoFrame *GetFrame(int &didFF, bool &isKey)
+    {
+        if (m_eof)
+            return NULL;
+
+        m_queueLock.lock();
+
+        if (m_frameList.isEmpty())
+        {
+            m_queueLock.unlock();
+
+            m_frameWaitLock.lock();
+            m_frameWaitCond.wait(&m_frameWaitLock);
+            m_frameWaitLock.unlock();
+
+            if (m_frameList.isEmpty())
+                return NULL;
+
+            m_queueLock.lock();
+        }
+
+        TranscodeFrameInfo tfInfo = m_frameList.takeFirst();
+        m_queueLock.unlock();
+        m_frameWaitCond.wakeAll();
+
+        didFF = tfInfo.didFF;
+        isKey = tfInfo.isKey;
+
+        return tfInfo.frame;
+    }
+
+  private:
+    MythPlayer               *m_player;
+    VideoOutput              *m_videoOutput;
+    bool                      m_honorCutlist;
+    bool                      m_eof;
+    int                       m_maxFrames;
+    bool                      m_runThread;
+    bool                      m_isRunning;
+    QMutex                    m_queueLock;
+    QList<TranscodeFrameInfo> m_frameList;
+    QWaitCondition            m_frameWaitCond;
+    QMutex                    m_frameWaitLock;
 };
 
 Transcode::Transcode(ProgramInfo *pginfo) :
@@ -268,7 +643,15 @@ Transcode::Transcode(ProgramInfo *pginfo) :
     fifow(NULL),
     kfa_table(NULL),
     showprogress(false),
-    recorderOptions("")
+    recorderOptions(""),
+    avfMode(false),
+    hlsMode(false),                 hlsStreamID(-1),
+    hlsDisableAudioOnly(false),
+    hlsMaxSegments(0),
+    cmdContainer("mpegts"),         cmdAudioCodec("libmp3lame"),
+    cmdVideoCodec("libx264"),
+    cmdWidth(480),                  cmdHeight(0),
+    cmdBitrate(800000),             cmdAudioBitrate(64000)
 {
 }
 
@@ -396,8 +779,8 @@ static int get_int_option(RecordingProfile &profile, const QString &name)
 static void TranscodeWriteText(void *ptr, unsigned char *buf, int len,
                                int timecode, int pagenr)
 {
-  NuppelVideoRecorder *nvr = (NuppelVideoRecorder *)ptr;
-  nvr->WriteText(buf, len, timecode, pagenr);
+    NuppelVideoRecorder *nvr = (NuppelVideoRecorder *)ptr;
+    nvr->WriteText(buf, len, timecode, pagenr);
 }
 
 int Transcode::TranscodeFile(const QString &inputname,
@@ -405,30 +788,63 @@ int Transcode::TranscodeFile(const QString &inputname,
                              const QString &profileName,
                              bool honorCutList, bool framecontrol,
                              int jobID, QString fifodir,
-                             bool fifo_info,
+                             bool fifo_info, bool cleanCut,
                              frm_dir_map_t &deleteMap,
                              int AudioTrackNo,
                              bool passthru)
 {
     QDateTime curtime = MythDate::current();
     QDateTime statustime = curtime;
-    int audioframesize;
     int audioFrame = 0;
+    Cutter cutter;
+    AVFormatWriter *avfw = NULL;
+    AVFormatWriter *avfw2 = NULL;
+    HTTPLiveStream *hls = NULL;
+    int hlsSegmentSize = 0;
+    int hlsSegmentFrames = 0;
 
     if (jobID >= 0)
         JobQueue::ChangeJobComment(jobID, "0% " + QObject::tr("Completed"));
 
-    nvr = new NuppelVideoRecorder(NULL, NULL);
+    if (hlsMode)
+    {
+        avfMode = true;
+
+        if (hlsStreamID != -1)
+        {
+            hls = new HTTPLiveStream(hlsStreamID);
+            hls->UpdateStatus(kHLSStatusStarting);
+            cmdWidth = hls->GetWidth();
+            cmdHeight = hls->GetHeight();
+            cmdBitrate = hls->GetBitrate();
+            cmdAudioBitrate = hls->GetAudioBitrate();
+        }
+    }
+
+    if (!avfMode)
+    {
+        nvr = new NuppelVideoRecorder(NULL, NULL);
+
+        if (!nvr)
+        {
+            LOG(VB_GENERAL, LOG_ERR,
+                "Transcoding aborted, error creating NuppelVideoRecorder.");
+            return REENCODE_ERROR;
+        }
+    }
 
     // Input setup
-    inRingBuffer = RingBuffer::Create(inputname, false, false);
-    player = new MythPlayer();
+    if (hls && (hlsStreamID != -1))
+        inRingBuffer = RingBuffer::Create(hls->GetSourceFile(), false, false);
+    else
+        inRingBuffer = RingBuffer::Create(inputname, false, false);
+
+    player = new MythPlayer(kVideoIsNull);
 
     player_ctx = new PlayerContext(kTranscoderInUseID);
     player_ctx->SetPlayingInfo(m_proginfo);
     player_ctx->SetRingBuffer(inRingBuffer);
     player_ctx->SetPlayer(player);
-    player->SetNullVideo();
     player->SetPlayerInfo(NULL, NULL, true, player_ctx);
 
     if (showprogress)
@@ -442,7 +858,7 @@ int Transcode::TranscodeFile(const QString &inputname,
     player->GetAudio()->SetAudioOutput(audioOutput);
     player->SetTranscoding(true);
 
-    if (player->OpenFile(false) < 0)
+    if (player->OpenFile() < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, "Transcoding aborted, error opening file.");
         if (player_ctx)
@@ -529,14 +945,198 @@ int Transcode::TranscodeFile(const QString &inputname,
            "will treat it as such.");
     }
 
-    float video_aspect = player->GetVideoAspect();
+    DecoderBase* dec = player->GetDecoder();
+    float video_aspect = dec ? dec->GetVideoAspect() : 4.0f / 3.0f;
     float video_frame_rate = player->GetFrameRate();
     int newWidth = video_width;
     int newHeight = video_height;
+    bool halfFramerate = false;
+    bool skippedLastFrame = false;
 
     kfa_table = new vector<struct kfatable_entry>;
 
-    if (fifodir.isEmpty())
+    if (avfMode)
+    {
+        newWidth = cmdWidth;
+        newHeight = cmdHeight;
+
+        // TODO: is this necessary?  It got commented out, but may still be
+        // needed.
+        // int actualHeight = (video_height == 1088 ? 1080 : video_height);
+
+        // If height or width are 0, then we need to calculate them
+        if (newHeight == 0 && newWidth > 0)
+            newHeight = (int)(1.0 * newWidth / video_aspect);
+        else if (newWidth == 0 && newHeight > 0)
+            newWidth = (int)(1.0 * newHeight * video_aspect);
+        else if (newWidth == 0 && newHeight == 0)
+        {
+            newHeight = 480;
+            newWidth = (int)(1.0 * 480 * video_aspect);
+            if (newWidth > 640)
+            {
+                newWidth = 640;
+                newHeight = (int)(1.0 * 640 / video_aspect);
+            }
+        }
+
+        // make sure dimensions are valid for MPEG codecs
+        newHeight = (newHeight + 15) & ~0xF;
+        newWidth  = (newWidth  + 15) & ~0xF;
+
+        avfw = new AVFormatWriter();
+        if (!avfw)
+        {
+            LOG(VB_GENERAL, LOG_ERR,
+                "Transcoding aborted, error creating AVFormatWriter.");
+            if (player_ctx)
+                delete player_ctx;
+            return REENCODE_ERROR;
+        }
+
+        avfw->SetVideoBitrate(cmdBitrate);
+        avfw->SetHeight(newHeight);
+        avfw->SetWidth(newWidth);
+        avfw->SetAspect(video_aspect);
+        avfw->SetAudioBitrate(cmdAudioBitrate);
+        avfw->SetAudioChannels(arb->channels);
+        avfw->SetAudioBits(16);
+        avfw->SetAudioSampleRate(arb->eff_audiorate);
+        avfw->SetAudioSampleBytes(2);
+
+        if (hlsMode)
+        {
+            int segmentSize = 10;
+            int audioOnlyBitrate = 0;
+
+            if (!hlsDisableAudioOnly)
+            {
+                audioOnlyBitrate = 48000;
+
+                avfw2 = new AVFormatWriter();
+                if (!avfw2)
+                {
+                    LOG(VB_GENERAL, LOG_ERR, "Transcoding aborted, error "
+                        "creating low-bitrate AVFormatWriter.");
+                    if (player_ctx)
+                        delete player_ctx;
+                    return REENCODE_ERROR;
+                }
+
+                avfw2->SetContainer("mpegts");
+                avfw2->SetAudioCodec("libmp3lame");
+                avfw2->SetAudioBitrate(audioOnlyBitrate);
+                avfw2->SetAudioChannels(arb->channels);
+                avfw2->SetAudioBits(16);
+                avfw2->SetAudioSampleRate(arb->eff_audiorate);
+                avfw2->SetAudioSampleBytes(2);
+            }
+
+            avfw->SetContainer("mpegts");
+            avfw->SetVideoCodec("libx264");
+            avfw->SetAudioCodec("libmp3lame");
+            //avfw->SetAudioCodec("libfaac");
+
+            if (hlsStreamID == -1)
+                hls = new HTTPLiveStream(inputname, newWidth, newHeight,
+                                         cmdBitrate,
+                                         cmdAudioBitrate, hlsMaxSegments,
+                                         segmentSize, audioOnlyBitrate);
+
+            hls->UpdateStatus(kHLSStatusStarting);
+            hls->UpdateSizeInfo(newWidth, newHeight, video_width, video_height);
+
+            if ((hlsStreamID != -1) &&
+                (!hls->InitForWrite()))
+            {
+                LOG(VB_GENERAL, LOG_ERR, "hls->InitForWrite() failed");
+                if (player_ctx)
+                    delete player_ctx;
+                return REENCODE_ERROR;
+            }
+
+            if (video_frame_rate > 30)
+            {
+                halfFramerate = true;
+                avfw->SetFramerate(video_frame_rate/2);
+
+                if (avfw2)
+                    avfw2->SetFramerate(video_frame_rate/2);
+
+                hlsSegmentSize = (int)(segmentSize * video_frame_rate / 2);
+            }
+            else
+            {
+                avfw->SetFramerate(video_frame_rate);
+
+                if (avfw2)
+                    avfw2->SetFramerate(video_frame_rate);
+
+                hlsSegmentSize = (int)(segmentSize * video_frame_rate);
+            }
+
+            avfw->SetKeyFrameDist(90);
+            if (avfw2)
+                avfw2->SetKeyFrameDist(90);
+
+            hls->AddSegment();
+            avfw->SetFilename(hls->GetCurrentFilename());
+            if (avfw2)
+                avfw2->SetFilename(hls->GetCurrentFilename(true));
+        }
+        else
+        {
+            avfw->SetContainer(cmdContainer);
+            avfw->SetVideoCodec(cmdVideoCodec);
+            avfw->SetAudioCodec(cmdAudioCodec);
+            avfw->SetFilename(outputname);
+            avfw->SetFramerate(video_frame_rate);
+        }
+
+        avfw->SetThreadCount(
+            gCoreContext->GetNumSetting("HTTPLiveStreamThreads", 2));
+
+        if (avfw2)
+            avfw2->SetThreadCount(1);
+
+        if (!avfw->Init())
+        {
+            LOG(VB_GENERAL, LOG_ERR, "avfw->Init() failed");
+            if (player_ctx)
+                delete player_ctx;
+            return REENCODE_ERROR;
+        }
+
+        if (!avfw->OpenFile())
+        {
+            LOG(VB_GENERAL, LOG_ERR, "avfw->OpenFile() failed");
+            if (player_ctx)
+                delete player_ctx;
+            return REENCODE_ERROR;
+        }
+
+        if (avfw2 && !avfw2->Init())
+        {
+            LOG(VB_GENERAL, LOG_ERR, "avfw2->Init() failed");
+            if (player_ctx)
+                delete player_ctx;
+            return REENCODE_ERROR;
+        }
+
+        if (avfw2 && !avfw2->OpenFile())
+        {
+            LOG(VB_GENERAL, LOG_ERR, "avfw2->OpenFile() failed");
+            if (player_ctx)
+                delete player_ctx;
+            return REENCODE_ERROR;
+        }
+
+        arb->m_audioFrameSize = avfw->GetAudioFrameSize() * arb->channels * 2;
+
+        player->SetVideoFilters(
+            gCoreContext->GetSetting("HTTPLiveStreamFilters"));
+    }
+    else if (fifodir.isEmpty())
     {
         if (!GetProfile(profileName, encodingType, video_height,
                         (int)round(video_frame_rate))) {
@@ -752,7 +1352,7 @@ int Transcode::TranscodeFile(const QString &inputname,
         nvr->StreamAllocate();
     }
 
-    if (vidsetting == encodingType && !framecontrol &&
+    if (vidsetting == encodingType && !framecontrol && !avfMode &&
         fifodir.isEmpty() && honorCutList &&
         video_width == newWidth && video_height == newHeight)
     {
@@ -761,9 +1361,23 @@ int Transcode::TranscodeFile(const QString &inputname,
     }
 
     if (deleteMap.size() > 0)
-        player->SetCutList(deleteMap);
+    {
+        if (cleanCut)
+        {
+            // Have the player seek only part of the way
+            // through a cut, and then use the cutter to
+            // discard the rest
+            cutter.SetCutList(deleteMap);
 
-    keyframedist = 30;
+            player->SetCutList(cutter.AdjustedCutList());
+        }
+        else
+        {
+            // Have the player apply the cut list
+            player->SetCutList(deleteMap);
+        }
+    }
+
     player->InitForTranscode(copyaudio, copyvideo);
     if (player->IsErrored())
     {
@@ -828,7 +1442,7 @@ int Transcode::TranscodeFile(const QString &inputname,
         LOG(VB_GENERAL, LOG_INFO,
             QString("FifoVideoHeight %1").arg(video_height));
         LOG(VB_GENERAL, LOG_INFO,
-            QString("FifoVideoAspectRatio %1").arg(player->GetVideoAspect()));
+            QString("FifoVideoAspectRatio %1").arg(video_aspect));
         LOG(VB_GENERAL, LOG_INFO,
             QString("FifoVideoFrameRate %1").arg(video_frame_rate));
         LOG(VB_GENERAL, LOG_INFO,
@@ -843,6 +1457,8 @@ int Transcode::TranscodeFile(const QString &inputname,
             // Request was for just the format of fifo data, not for
             // the actual transcode, so stop here.
             unlink(outputname.toLocal8Bit().constData());
+            if (player_ctx)
+                delete player_ctx;
             return REENCODE_OK;
         }
 
@@ -896,7 +1512,6 @@ int Transcode::TranscodeFile(const QString &inputname,
     bool is_key = 0;
     bool first_loop = true;
     unsigned char *newFrame = new unsigned char[frame.size];
-
     frame.buf = newFrame;
     AVPicture imageIn, imageOut;
     struct SwsContext  *scontext = NULL;
@@ -905,21 +1520,41 @@ int Transcode::TranscodeFile(const QString &inputname,
         LOG(VB_GENERAL, LOG_INFO, "Dumping Video and Audio data to fifos");
     else if (copyaudio)
         LOG(VB_GENERAL, LOG_INFO, "Copying Audio while transcoding Video");
+    else if (hlsMode)
+        LOG(VB_GENERAL, LOG_INFO, "Transcoding for HTTP Live Streaming");
+    else if (avfMode)
+        LOG(VB_GENERAL, LOG_INFO, "Transcoding to libavformat container");
     else
         LOG(VB_GENERAL, LOG_INFO, "Transcoding Video and Audio");
+
+    TranscodeFrameQueue *frameQueue =
+        new TranscodeFrameQueue(player, videoOutput, honorCutList);
+    MThreadPool::globalInstance()->start(frameQueue, "TranscodeFrameQueue");
 
     QTime flagTime;
     flagTime.start();
 
-    while (player->TranscodeGetNextFrame(dm_iter, did_ff, is_key, honorCutList))
+    if (cleanCut)
+        cutter.Activate(vidFrameTime * rateTimeConv, total_frame_count);
+
+    bool stopSignalled = false;
+    VideoFrame *lastDecode = NULL;
+
+    if (hls)
+        hls->UpdateStatus(kHLSStatusRunning);
+
+    while ((!stopSignalled) &&
+           (lastDecode = frameQueue->GetFrame(did_ff, is_key)))
     {
         if (first_loop)
         {
             copyaudio = player->GetRawAudioState();
             first_loop = false;
         }
-        VideoFrame *lastDecode = videoOutput->GetLastDecodedFrame();
+
         float new_aspect = lastDecode->aspect;
+
+        cutter.NewFrame(lastDecode->frameNumber);
 
         frame.timecode = lastDecode->timecode;
 
@@ -961,12 +1596,15 @@ int Transcode::TranscodeFile(const QString &inputname,
                     int count = 0;
                     while (delta > vidFrameTime)
                     {
-                        fifow->FIFOWrite(0, frame.buf, vidSize);
+                        if (!cutter.InhibitDummyFrame())
+                            fifow->FIFOWrite(0, frame.buf, vidSize);
+
                         count++;
                         delta -= (int)vidFrameTime;
                     }
                     QString msg = QString("Added %1 blank video frames")
                                   .arg(count);
+                    LOG(VB_GENERAL, LOG_INFO, msg);
                     curFrameNum += count;
                     dropvideo = 0;
                     wait_recover = 0;
@@ -990,18 +1628,30 @@ int Transcode::TranscodeFile(const QString &inputname,
                     .arg(delta));
 #endif
             if (arb->audiobuffer_len)
-                fifow->FIFOWrite(1, arb->audiobuffer, arb->audiobuffer_len);
+            {
+                if (!cutter.InhibitUseAudioFrames(arb->audiobuffer_frames,
+                                                  &totalAudio))
+                    fifow->FIFOWrite(1, arb->audiobuffer, arb->audiobuffer_len);
+            }
+
             if (dropvideo < 0)
             {
+                if (cutter.InhibitDropFrame())
+                    fifow->FIFOWrite(0, frame.buf, vidSize);
+
                 dropvideo++;
                 curFrameNum--;
             }
             else
             {
-                fifow->FIFOWrite(0, frame.buf, vidSize);
+                if (!cutter.InhibitUseVideoFrame())
+                    fifow->FIFOWrite(0, frame.buf, vidSize);
+
                 if (dropvideo)
                 {
-                    fifow->FIFOWrite(0, frame.buf, vidSize);
+                    if (!cutter.InhibitDummyFrame())
+                        fifow->FIFOWrite(0, frame.buf, vidSize);
+
                     curFrameNum++;
                     dropvideo--;
                 }
@@ -1025,6 +1675,8 @@ int Transcode::TranscodeFile(const QString &inputname,
                 delete [] newFrame;
                 if (player_ctx)
                     delete player_ctx;
+                if (frameQueue)
+                    frameQueue->stop();
                 return REENCODE_ERROR;
             }
 
@@ -1042,7 +1694,8 @@ int Transcode::TranscodeFile(const QString &inputname,
 
                     //need to correct the frame# and timecode here
                     // Question:  Is it necessary to change the timecodes?
-                    long sync_offset = player->UpdateStoredFrameNum(curFrameNum);
+                    long sync_offset;
+                    sync_offset = player->UpdateStoredFrameNum(curFrameNum);
                     nvr->UpdateSeekTable(num_keyframes, sync_offset);
                     ReencoderAddKFA(curFrameNum, lastKeyFrame, num_keyframes);
                     num_keyframes++;
@@ -1132,7 +1785,8 @@ int Transcode::TranscodeFile(const QString &inputname,
             if (video_aspect != new_aspect)
             {
                 video_aspect = new_aspect;
-                nvr->SetNewVideoParams(video_aspect);
+                if (nvr)
+                    nvr->SetNewVideoParams(video_aspect);
             }
 
 
@@ -1174,54 +1828,157 @@ int Transcode::TranscodeFile(const QString &inputname,
             }
 
             // audio is fully decoded, so we need to reencode it
-            audioframesize = arb->audiobuffer_len;
             if (arb->ab_count)
             {
-                for (uint loop = 0; loop < arb->ab_count; loop++)
+                uint loop = 0;
+                int bytesConsumed = 0;
+                int buffersConsumed = 0;
+                for (loop = 0; loop < arb->ab_count; loop++)
                 {
-                    nvr->SetOption("audioframesize", arb->ab[loop].len);
-                    nvr->WriteAudio(arb->audiobuffer + arb->ab[loop].offset,
-                                    audioFrame++,
-                                    arb->ab[loop].time - timecodeOffset);
-                    if (nvr->IsErrored())
-                    {
-                        LOG(VB_GENERAL, LOG_ERR,
-                            "Transcode: Encountered irrecoverable error in "
-                            "NVR::WriteAudio");
+                    if (arb->ab[loop].time > frame.timecode)
+                        break;
 
-                        delete [] newFrame;
-                        if (player_ctx)
-                            delete player_ctx;
-                        return REENCODE_ERROR;
+                    if (avfMode)
+                    {
+                        if (did_ff != 1)
+                        {
+                            avfw->WriteAudioFrame(
+                                arb->audiobuffer + arb->ab[loop].offset,
+                                audioFrame,
+                                arb->ab[loop].time - timecodeOffset);
+
+                            if (avfw2)
+                            {
+                                if ((avfw2->GetTimecodeOffset() == -1) &&
+                                    (avfw->GetTimecodeOffset() != -1))
+                                {
+                                    avfw2->SetTimecodeOffset(
+                                        avfw->GetTimecodeOffset());
+                                }
+
+                                avfw2->WriteAudioFrame(
+                                    arb->audiobuffer + arb->ab[loop].offset,
+                                    audioFrame,
+                                    arb->ab[loop].time - timecodeOffset);
+                            }
+
+                            ++audioFrame;
+                        }
                     }
+                    else
+                    {
+                        nvr->SetOption("audioframesize", arb->ab[loop].len);
+                        nvr->WriteAudio(arb->audiobuffer + arb->ab[loop].offset,
+                                        audioFrame++,
+                                        arb->ab[loop].time - timecodeOffset);
+                        if (nvr->IsErrored())
+                        {
+                            LOG(VB_GENERAL, LOG_ERR,
+                                "Transcode: Encountered irrecoverable error in "
+                                "NVR::WriteAudio");
+
+                            delete [] newFrame;
+                            if (player_ctx)
+                                delete player_ctx;
+                            if (frameQueue)
+                                frameQueue->stop();
+                            return REENCODE_ERROR;
+                        }
+                    }
+
+                    ++buffersConsumed;
+                    bytesConsumed += arb->ab[loop].len;
                 }
-                arb->ab_count = 0;
-                arb->audiobuffer_len = 0;
+
+                if (loop && (loop < arb->ab_count))
+                {
+                    int newCount = 0;
+                    int newLen = 0;
+                    int offset = 0;
+                    int index = 0;
+                    for (; loop < arb->ab_count; ++loop)
+                    {
+                        memcpy(arb->audiobuffer + offset,
+                               arb->audiobuffer + arb->ab[loop].offset,
+                               arb->ab[loop].len);
+                        arb->ab[loop].offset = offset;
+                        offset += arb->ab[loop].len;
+                        newCount++;
+                        newLen += arb->ab[loop].len;
+                        arb->ab[index].len = arb->ab[loop].len;
+                        arb->ab[index].offset = arb->ab[loop].offset;
+                        arb->ab[index].time = arb->ab[loop].time;
+                        index++;
+                    }
+
+                    arb->ab_count = newCount;
+                    arb->audiobuffer_len = newLen;
+                }
             }
 
-            player->GetCC608Reader()->TranscodeWriteText(&TranscodeWriteText,
-                                                   (void *)(nvr));
-
+            if (!avfMode)
+                player->GetCC608Reader()->
+                    TranscodeWriteText(&TranscodeWriteText, (void *)(nvr));
             lasttimecode = frame.timecode;
             frame.timecode -= timecodeOffset;
 
-            if (forceKeyFrames)
-                nvr->WriteVideo(&frame, true, true);
+            if (avfMode)
+            {
+                if (halfFramerate && !skippedLastFrame)
+                {
+                    skippedLastFrame = true;
+                }
+                else
+                {
+                    skippedLastFrame = false;
+
+                    if ((hls) &&
+                        (avfw->GetFramesWritten()) &&
+                        (hlsSegmentFrames > hlsSegmentSize) &&
+                        (avfw->NextFrameIsKeyFrame()))
+                    {
+                        hls->AddSegment();
+                        avfw->ReOpen(hls->GetCurrentFilename());
+
+                        if (avfw2)
+                            avfw2->ReOpen(hls->GetCurrentFilename(true));
+
+                        hlsSegmentFrames = 0;
+                    }
+
+                    avfw->WriteVideoFrame(&frame);
+                    ++hlsSegmentFrames;
+                }
+            }
             else
-                nvr->WriteVideo(&frame);
+            {
+                if (forceKeyFrames)
+                    nvr->WriteVideo(&frame, true, true);
+                else
+                    nvr->WriteVideo(&frame);
+            }
         }
-        if (showprogress && MythDate::current() > statustime)
+        if (MythDate::current() > statustime)
         {
-            LOG(VB_GENERAL, LOG_INFO,
-                QString("Processed: %1 of %2 frames(%3 seconds)").
-                    arg((long)curFrameNum).arg((long)total_frame_count).
-                    arg((long)(curFrameNum / video_frame_rate)));
-            statustime = MythDate::current();
-            statustime = statustime.addSecs(5);
+            if (showprogress)
+            {
+                LOG(VB_GENERAL, LOG_INFO,
+                    QString("Processed: %1 of %2 frames(%3 seconds)").
+                        arg((long)curFrameNum).arg((long)total_frame_count).
+                        arg((long)(curFrameNum / video_frame_rate)));
+            }
+
+            if (hls && hls->CheckStop())
+            {
+                hls->UpdateStatus(kHLSStatusStopping);
+                stopSignalled = true;
+            }
+
+            statustime = MythDate::current().addSecs(5);
         }
         if (MythDate::current() > curtime)
         {
-            if (honorCutList && m_proginfo &&
+            if (honorCutList && m_proginfo && !hls &&
                 m_proginfo->QueryMarkupFlag(MARK_UPDATED_CUT))
             {
                 LOG(VB_GENERAL, LOG_NOTICE,
@@ -1231,6 +1988,8 @@ int Transcode::TranscodeFile(const QString &inputname,
                 delete [] newFrame;
                 if (player_ctx)
                     delete player_ctx;
+                if (frameQueue)
+                    frameQueue->stop();
                 return REENCODE_CUTLIST_CHANGE;
             }
 
@@ -1245,6 +2004,8 @@ int Transcode::TranscodeFile(const QString &inputname,
                     delete [] newFrame;
                     if (player_ctx)
                         delete player_ctx;
+                    if (frameQueue)
+                        frameQueue->stop();
                     return REENCODE_STOPPED;
                 }
 
@@ -1254,6 +2015,9 @@ int Transcode::TranscodeFile(const QString &inputname,
                     flagFPS = curFrameNum / elapsed;
 
                 int percentage = curFrameNum * 100 / total_frame_count;
+
+                if (hls)
+                    hls->UpdatePercentComplete(percentage);
 
                 if (jobID >= 0)
                     JobQueue::ChangeJobComment(jobID,
@@ -1265,31 +2029,66 @@ int Transcode::TranscodeFile(const QString &inputname,
                             .arg(percentage).arg(flagFPS));
 
             }
-            curtime = MythDate::current();
-            curtime = curtime.addSecs(20);
+            curtime = MythDate::current().addSecs(20);
         }
 
         curFrameNum++;
         frame.frameNumber = 1 + (curFrameNum << 1);
+
+        player->DiscardVideoFrame(lastDecode);
     }
 
     sws_freeContext(scontext);
 
     if (! fifow)
     {
-        if (m_proginfo)
+        if (avfw)
+            avfw->CloseFile();
+
+        if (avfw2)
+            avfw2->CloseFile();
+
+        if (!hls && m_proginfo)
         {
             m_proginfo->ClearPositionMap(MARK_KEYFRAME);
             m_proginfo->ClearPositionMap(MARK_GOP_START);
             m_proginfo->ClearPositionMap(MARK_GOP_BYFRAME);
         }
 
-        nvr->WriteSeekTable();
-        if (!kfa_table->empty())
-            nvr->WriteKeyFrameAdjustTable(*kfa_table);
+        if (nvr)
+        {
+            nvr->WriteSeekTable();
+            if (!kfa_table->empty())
+                nvr->WriteKeyFrameAdjustTable(*kfa_table);
+        }
     } else {
         fifow->FIFODrain();
     }
+
+    if (avfw)
+        delete avfw;
+
+    if (avfw2)
+        delete avfw2;
+
+    if (hls)
+    {
+        if (!stopSignalled)
+        {
+            hls->UpdateStatus(kHLSStatusCompleted);
+            hls->UpdateStatusMessage("Transcoding Completed");
+            hls->UpdatePercentComplete(100);
+        }
+        else
+        {
+            hls->UpdateStatus(kHLSStatusStopped);
+            hls->UpdateStatusMessage("Transcoding Stopped");
+        }
+        delete hls;
+    }
+
+    if (frameQueue)
+        frameQueue->stop();
 
     delete [] newFrame;
     if (player_ctx)

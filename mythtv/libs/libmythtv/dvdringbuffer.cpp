@@ -19,6 +19,8 @@
     if (++m_buttonVersion > 1024) \
         m_buttonVersion = 1;
 
+#define DVD_DRIVE_SPEED 1
+
 static const char *dvdnav_menu_table[] =
 {
     NULL,
@@ -129,12 +131,15 @@ DVDRingBuffer::DVDRingBuffer(const QString &lfilename) :
 DVDRingBuffer::~DVDRingBuffer()
 {
     CloseDVD();
+    m_menuBtnLock.lock();
     ClearMenuSPUParameters();
+    m_menuBtnLock.unlock();
     ClearChapterCache();
 }
 
 void DVDRingBuffer::CloseDVD(void)
 {
+    rwlock.lockForWrite();
     if (m_dvdnav)
     {
         SetDVDSpeed(-1);
@@ -143,13 +148,16 @@ void DVDRingBuffer::CloseDVD(void)
     }
     m_gotStop = false;
     m_audioStreamsChanged = true;
+    rwlock.unlock();
 }
 
 void DVDRingBuffer::ClearChapterCache(void)
 {
+    rwlock.lockForWrite();
     foreach (QList<uint64_t> chapters, m_chapterMap)
         chapters.clear();
     m_chapterMap.clear();
+    rwlock.unlock();
 }
 
 long long DVDRingBuffer::Seek(long long pos, int whence, bool has_lock)
@@ -203,7 +211,7 @@ long long DVDRingBuffer::Seek(long long pos, int whence, bool has_lock)
     if (ret >= 0)
     {
         readpos = ret;
-        
+
         ignorereadpos = -1;
 
         if (readaheadrunning)
@@ -306,7 +314,11 @@ bool DVDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
     rwlock.lockForWrite();
 
     if (m_dvdnav)
+    {
+        rwlock.unlock();
         CloseDVD();
+        rwlock.lockForWrite();
+    }
 
     safefilename = lfilename;
     filename = lfilename;
@@ -1674,14 +1686,13 @@ double DVDRingBuffer::GetFrameRate(void)
     return dvdfps;
 }
 
-/** \brief set dvd speed. uses the DVDDriveSpeed Setting from the settings
+/** \brief set dvd speed. uses the constant DVD_DRIVE_SPEED
  *  table
  */
 void DVDRingBuffer::SetDVDSpeed(void)
 {
     QMutexLocker lock(&m_seekLock);
-    int dvdDriveSpeed = gCoreContext->GetNumSetting("DVDDriveSpeed", 12);
-    SetDVDSpeed(dvdDriveSpeed);
+    SetDVDSpeed(DVD_DRIVE_SPEED);
 }
 
 /** \brief set dvd speed.

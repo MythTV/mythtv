@@ -16,6 +16,7 @@
 #include "mythsocketmanager.h"
 #include "mythcontext.h"
 #include "exitcodes.h"
+#include "dbcheck.h"
 #include "mythdbcon.h"
 #include "mythlogging.h"
 #include "mythversion.h"
@@ -25,6 +26,7 @@
 #include "controlrequesthandler.h"
 #include "requesthandler/basehandler.h"
 #include "requesthandler/fileserverhandler.h"
+#include "requesthandler/messagehandler.h"
 
 #define LOC      QString("MythMediaServer: ")
 #define LOC_WARN QString("MythMediaServer, Warning: ")
@@ -110,18 +112,24 @@ int main(int argc, char *argv[])
         return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
 
+    if (!UpgradeTVDatabaseSchema(false))
+    {
+        LOG(VB_GENERAL, LOG_ERR, "Exiting due to schema mismatch.");
+        return GENERIC_EXIT_DB_OUTOFDATE;
+    }
+
     cmdline.ApplySettingsOverride();
 
-    gCoreContext->SetBackend(false);
+    gCoreContext->SetBackend(true); // blocks the event connection
     if (!gCoreContext->ConnectToMasterServer())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to connect to master server");
         return GENERIC_EXIT_CONNECT_ERROR;
     }
 
-    QString myip = gCoreContext->GetSetting("BackendServerIP");
     int     port = gCoreContext->GetNumSetting("BackendServerPort", 6543);
-    if (myip.isEmpty())
+    if (gCoreContext->GetSetting("BackendServerIP").isEmpty() &&
+        gCoreContext->GetSetting("BackendServerIP6").isEmpty())
     {
         cerr << "No setting found for this machine's BackendServerIP.\n"
              << "Please run setup on this machine and modify the first page\n"
@@ -140,6 +148,7 @@ int main(int argc, char *argv[])
 
     sockmanager->RegisterHandler(new BaseRequestHandler());
     sockmanager->RegisterHandler(new FileServerHandler());
+    sockmanager->RegisterHandler(new MessageHandler());
 
     ControlRequestHandler *controlRequestHandler = new ControlRequestHandler();
     sockmanager->RegisterHandler(controlRequestHandler);

@@ -232,16 +232,13 @@ MainServer::MainServer(bool master, int port,
 
     mythserver = new MythServer();
     mythserver->setProxy(QNetworkProxy::NoProxy);
-    if (!mythserver->listen(gCoreContext->MythHostAddressAny(), port))
+    if (!mythserver->listen(gCoreContext->MythHostAddress(), port))
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Failed to bind port %1. Exiting.")
-                .arg(port));
         SetExitCode(GENERIC_EXIT_SOCKET_ERROR, false);
         return;
     }
-
     connect(mythserver, SIGNAL(newConnect(MythSocket *)),
-            SLOT(newConnection(MythSocket *)));
+            this,        SLOT(newConnection(MythSocket *)));
 
     gCoreContext->addListener(this);
 
@@ -673,6 +670,10 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
             LOG(VB_GENERAL, LOG_ERR, "Bad FREE_TUNER query");
         else
             HandleFreeTuner(tokens[1].toInt(), pbs);
+    }
+    else if (command == "QUERY_ACTIVE_BACKENDS")
+    {
+        HandleActiveBackendsQuery(pbs);
     }
     else if (command == "QUERY_IS_ACTIVE_BACKEND")
     {
@@ -1295,6 +1296,7 @@ void MainServer::HandleVersion(MythSocket *socket, const QStringList &slist)
  * \par        ANN Monitor  \e host \e wantevents
  * Register \e host as a client, and allow shutdown of the socket
  * \par        ANN SlaveBackend \e IPaddress
+ * \par        ANN MediaServer \e IPaddress
  * \par        ANN FileTransfer stringlist(\e hostname, \e filename)
  * \par        ANN FileTransfer stringlist(\e hostname, \e filename) \e useReadahead \e retries
  */
@@ -1368,7 +1370,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
             gCoreContext->SendSystemEvent(
                 QString("CLIENT_CONNECTED HOSTNAME %1").arg(commands[2]));
     }
-    if (commands[1] == "MediaServer")
+    else if (commands[1] == "MediaServer")
     {
         if (commands.size() < 3)
         {
@@ -1381,6 +1383,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
 
         PlaybackSock *pbs = new PlaybackSock(this, socket, commands[2],
                                               kPBSEvents_Normal);
+        pbs->setAsMediaServer();
         pbs->setBlockShutdown(false);
         sockListLock.lockForWrite();
         playbackList.push_back(pbs);
@@ -1687,7 +1690,7 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
     QStringList outputlist(QString::number(destination.size()));
     QMap<QString, QString> backendIpMap;
     QMap<QString, QString> backendPortMap;
-    QString ip   = gCoreContext->GetSetting("BackendServerIP");
+    QString ip   = gCoreContext->GetBackendServerIP();
     QString port = gCoreContext->GetSetting("BackendServerPort");
 
     ProgramList::iterator it = destination.begin();
@@ -1843,7 +1846,7 @@ void MainServer::HandleFillProgramInfo(QStringList &slist, PlaybackSock *pbs)
     if (pginfo.HasPathname())
     {
         QString lpath = GetPlaybackURL(&pginfo);
-        QString ip    = gCoreContext->GetSetting("BackendServerIP");
+        QString ip    = gCoreContext->GetBackendServerIP();
         QString port  = gCoreContext->GetSetting("BackendServerPort");
 
         if (playbackhost == gCoreContext->GetHostName())
@@ -2046,7 +2049,7 @@ void MainServer::DeleteRecordedFiles(DeleteStruct *ds)
             QString localFile = sgroup.FindFile(basename);
 
             QString url = gCoreContext->GenMythURL(
-                                  gCoreContext->GetSettingOnHost("BackendServerIP", hostname),
+                                  gCoreContext->GetBackendServerIP(hostname),
                                   gCoreContext->GetSettingOnHost("BackendServerPort", hostname),
                                   basename,
                                   storagegroup);
@@ -2499,9 +2502,7 @@ void MainServer::DoHandleDeleteRecording(
     {
         recinfo.ApplyRecordRecGroupChange("Deleted");
         recinfo.SaveAutoExpire(kDeletedAutoExpire, true);
-        if (recinfo.GetRecordingStatus() == rsRecording ||
-            recinfo.GetRecordingStatus() == rsTuning)
-            DoHandleStopRecording(recinfo, NULL);
+        DoHandleStopRecording(recinfo, NULL);
         if (forgetHistory)
             recinfo.ForgetHistory();
         QStringList outputlist( QString::number(0) );
@@ -2803,7 +2804,7 @@ void MainServer::HandleQueryFreeSpaceSummary(PlaybackSock *pbs)
     }
     else
     {
-        unsigned int index = strlist.size() - 2;
+        unsigned int index = (uint)(strlist.size()) - 2;
         shortlist << strlist[index++];
         shortlist << strlist[index++];
     }
@@ -3012,7 +3013,7 @@ void MainServer::HandleQueryFileHash(QStringList &slist, PlaybackSock *pbs)
     }
     else
     {
-        PlaybackSock *slave = GetSlaveByHostname(hostname);
+        PlaybackSock *slave = GetMediaServerByHostname(hostname);
         if (slave)
         {
             hash = slave->GetFileHash(filename, storageGroup);
@@ -3023,13 +3024,14 @@ void MainServer::HandleQueryFileHash(QStringList &slist, PlaybackSock *pbs)
             MSqlQuery query(MSqlQuery::InitCon());
             query.prepare("SELECT hostname FROM settings "
                            "WHERE value='BackendServerIP' "
+                              "OR value='BackendServerIP6' "
                              "AND data=:HOSTNAME;");
             query.bindValue(":HOSTNAME", hostname);
 
             if (query.exec() && query.next())
             {
                 hostname = query.value(0).toString();
-                slave = GetSlaveByHostname(hostname);
+                slave = GetMediaServerByHostname(hostname);
                 if (slave)
                 {
                     hash = slave->GetFileHash(filename, storageGroup);
@@ -3195,7 +3197,7 @@ void MainServer::HandleGetScheduledRecordings(PlaybackSock *pbs)
     QStringList strList;
 
     if (m_sched)
-        m_sched->getAllScheduled(strList);
+        Scheduler::GetAllScheduled(strList);
     else
         strList << QString::number(0);
 
@@ -3266,7 +3268,8 @@ void MainServer::HandleSGGetFileList(QStringList &sList,
             .arg(groupname).arg(host).arg(path).arg(wantHost));
 
     if ((host.toLower() == wantHost.toLower()) ||
-        (gCoreContext->GetSetting("BackendServerIP") == wantHost))
+        (gCoreContext->GetSetting("BackendServerIP") == wantHost) ||
+        (gCoreContext->GetSetting("BackendServerIP6") == wantHost))
     {
         StorageGroup sg(groupname, host);
         LOG(VB_FILE, LOG_INFO, "HandleSGGetFileList: Getting local info");
@@ -3277,7 +3280,7 @@ void MainServer::HandleSGGetFileList(QStringList &sList,
     }
     else
     {
-        PlaybackSock *slave = GetSlaveByHostname(wantHost);
+        PlaybackSock *slave = GetMediaServerByHostname(wantHost);
         if (slave)
         {
             LOG(VB_FILE, LOG_INFO, "HandleSGGetFileList: Getting remote info");
@@ -3331,7 +3334,8 @@ void MainServer::HandleSGFileQuery(QStringList &sList,
             .arg(gCoreContext->GenMythURL(wantHost, 0, filename, groupname)));
 
     if ((wantHost.toLower() == gCoreContext->GetHostName().toLower()) ||
-        (wantHost == gCoreContext->GetSetting("BackendServerIP")))
+        (wantHost == gCoreContext->GetSetting("BackendServerIP")) ||
+        (wantHost == gCoreContext->GetSetting("BackendServerIP6")))
     {
         LOG(VB_FILE, LOG_INFO, "HandleSGFileQuery: Getting local info");
         StorageGroup sg(groupname, gCoreContext->GetHostName());
@@ -3339,7 +3343,7 @@ void MainServer::HandleSGFileQuery(QStringList &sList,
     }
     else
     {
-        PlaybackSock *slave = GetSlaveByHostname(wantHost);
+        PlaybackSock *slave = GetMediaServerByHostname(wantHost);
         if (slave)
         {
             LOG(VB_FILE, LOG_INFO, "HandleSGFileQuery: Getting remote info");
@@ -3493,47 +3497,40 @@ void MainServer::HandleGetFreeRecorder(PlaybackSock *pbs)
 
     EncoderLink *encoder = NULL;
     QString enchost;
-
-    bool lastcard = false;
-
-    if (gCoreContext->GetSetting("LastFreeCard", "0") == "1")
-        lastcard = true;
+    uint bestorder = 0;
 
     QMap<int, EncoderLink *>::Iterator iter = encoderList->begin();
     for (; iter != encoderList->end(); ++iter)
     {
         EncoderLink *elink = *iter;
 
-        if (!lastcard)
-        {
-            if (elink->IsLocal())
-                enchost = gCoreContext->GetHostName();
-            else
-                enchost = elink->GetHostName();
+        if (elink->IsLocal())
+            enchost = gCoreContext->GetHostName();
+        else
+            enchost = elink->GetHostName();
 
-            if (enchost == pbshost && elink->IsConnected() &&
-                !elink->IsTunerLocked() &&
-                !elink->GetFreeInputs(excluded_cardids).empty())
-            {
-                encoder = elink;
-                retval = iter.key();
-                LOG(VB_RECORD, LOG_INFO, QString("Card %1 is local.")
-                        .arg(iter.key()));
-                break;
-            }
-        }
-
-        if ((retval == -1 || lastcard) && elink->IsConnected() &&
-            !elink->IsTunerLocked() &&
-            !elink->GetFreeInputs(excluded_cardids).empty())
-        {
-            encoder = elink;
-            retval = iter.key();
-        }
         LOG(VB_RECORD, LOG_INFO, 
             QString("Checking card %1. Best card so far %2")
-                .arg(iter.key()).arg(retval));
+            .arg(iter.key()).arg(retval));
+
+        if (!elink->IsConnected() || elink->IsTunerLocked())
+            continue;
+
+        vector<InputInfo> inputs = elink->GetFreeInputs(excluded_cardids);
+
+        for (uint i = 0; i < inputs.size(); ++i)
+        {
+            if (!encoder || inputs[i].livetvorder < bestorder)
+            {
+                retval = iter.key();
+                encoder = elink;
+                bestorder = inputs[i].livetvorder;
+            }
+        }
     }
+
+    LOG(VB_RECORD, LOG_INFO, 
+        QString("Best card is %1").arg(retval));
 
     strlist << QString::number(retval);
 
@@ -3541,14 +3538,12 @@ void MainServer::HandleGetFreeRecorder(PlaybackSock *pbs)
     {
         if (encoder->IsLocal())
         {
-            strlist << gCoreContext->GetSetting("BackendServerIP");
+            strlist << gCoreContext->GetBackendServerIP();
             strlist << gCoreContext->GetSetting("BackendServerPort");
         }
         else
         {
-            strlist << gCoreContext->GetSettingOnHost("BackendServerIP",
-                                                  encoder->GetHostName(),
-                                                  "nohostname");
+            strlist << gCoreContext->GetBackendServerIP(encoder->GetHostName());
             strlist << gCoreContext->GetSettingOnHost("BackendServerPort",
                                                   encoder->GetHostName(), "-1");
         }
@@ -3674,14 +3669,12 @@ void MainServer::HandleGetNextFreeRecorder(QStringList &slist,
     {
         if (encoder->IsLocal())
         {
-            strlist << gCoreContext->GetSetting("BackendServerIP");
+            strlist << gCoreContext->GetBackendServerIP();
             strlist << gCoreContext->GetSetting("BackendServerPort");
         }
         else
         {
-            strlist << gCoreContext->GetSettingOnHost("BackendServerIP",
-                                                  encoder->GetHostName(),
-                                                  "nohostname");
+            strlist << gCoreContext->GetBackendServerIP(encoder->GetHostName());
             strlist << gCoreContext->GetSettingOnHost("BackendServerPort",
                                                   encoder->GetHostName(), "-1");
         }
@@ -4250,6 +4243,33 @@ void MainServer::HandleRemoteEncoder(QStringList &slist, QStringList &commands,
     SendResponse(pbssock, retlist);
 }
 
+void MainServer::GetActiveBackends(QStringList &hosts)
+{
+    hosts.clear();
+    hosts << gCoreContext->GetHostName();
+
+    QString hostname;
+    QReadLocker rlock(&sockListLock);
+    vector<PlaybackSock*>::iterator it;
+    for (it = playbackList.begin(); it != playbackList.end(); ++it)
+    {
+        if ((*it)->isMediaServer())
+        {
+            hostname = (*it)->getHostname();
+            if (!hosts.contains(hostname))
+                hosts << hostname;
+        }
+    }
+}
+
+void MainServer::HandleActiveBackendsQuery(PlaybackSock *pbs)
+{
+    QStringList retlist;
+    GetActiveBackends(retlist);
+    retlist.push_front(QString::number(retlist.size()));
+    SendResponse(pbs->getSocket(), retlist);
+}
+
 void MainServer::HandleIsActiveBackendQuery(QStringList &slist,
                                             PlaybackSock *pbs)
 {
@@ -4315,7 +4335,7 @@ void MainServer::BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
                                        bool allHosts)
 {
     QString allHostList = gCoreContext->GetHostName();
-    long long totalKB = -1, usedKB = -1;
+    int64_t totalKB = -1, usedKB = -1;
     QMap <QString, bool>foundDirs;
     QString driveKey;
     QString localStr = "1";
@@ -4423,7 +4443,7 @@ void MainServer::BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
             PlaybackSock *pbs = *pbsit;
 
             if ((pbs->IsDisconnected()) ||
-                (!pbs->isSlaveBackend()) ||
+                (!pbs->isMediaServer()) ||
                 (pbs->isLocal()) ||
                 (backendsCounted.contains(pbs->getHostname())))
                 continue;
@@ -4466,8 +4486,8 @@ void MainServer::BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
     strlist.clear();
 
     // Consolidate hosts sharing storage
-    size_t maxWriteFiveSec = GetCurrentMaxBitrate()/12 /*5 seconds*/;
-    maxWriteFiveSec = max((size_t)2048, maxWriteFiveSec); // safety for NFS mounted dirs
+    int64_t maxWriteFiveSec = GetCurrentMaxBitrate()/12 /*5 seconds*/;
+    maxWriteFiveSec = max((int64_t)2048, maxWriteFiveSec); // safety for NFS mounted dirs
     QList<FileSystemInfo>::iterator it1, it2;
     int bSize = 32;
     for (it1 = fsInfos.begin(); it1 != fsInfos.end(); ++it1)
@@ -4484,15 +4504,15 @@ void MainServer::BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
             // our fuzzy comparison uses the maximum of the two block sizes
             // or 32, whichever is greater
             bSize = max(32, max(it1->getBlockSize(), it2->getBlockSize()) / 1024);
-            long long diffSize = it1->getTotalSpace() - it2->getTotalSpace();
-            long long diffUsed = it1->getUsedSpace() - it2->getUsedSpace();
+            int64_t diffSize = it1->getTotalSpace() - it2->getTotalSpace();
+            int64_t diffUsed = it1->getUsedSpace() - it2->getUsedSpace();
             if (diffSize < 0)
                 diffSize = 0 - diffSize;
             if (diffUsed < 0)
                 diffUsed = 0 - diffUsed;
 
             if (it2->getFSysID() == -1 && (diffSize <= bSize) && 
-                ((size_t)diffUsed <= maxWriteFiveSec))
+                (diffUsed <= maxWriteFiveSec))
             {
                 if (!it1->getHostname().contains(it2->getHostname()))
                     it1->setHostname(it1->getHostname() + "," + it2->getHostname());
@@ -4965,7 +4985,9 @@ void MainServer::HandleScanVideos(PlaybackSock *pbs)
 
     if (metadatafactory)
     {
-        metadatafactory->VideoScan();
+        QStringList hosts;
+        GetActiveBackends(hosts);
+        metadatafactory->VideoScan(hosts);
         retlist << "OK";
     }
     else
@@ -5094,14 +5116,12 @@ void MainServer::HandleGetRecorderNum(QStringList &slist, PlaybackSock *pbs)
     {
         if (encoder->IsLocal())
         {
-            strlist << gCoreContext->GetSetting("BackendServerIP");
+            strlist << gCoreContext->GetBackendServerIP();
             strlist << gCoreContext->GetSetting("BackendServerPort");
         }
         else
         {
-            strlist << gCoreContext->GetSettingOnHost("BackendServerIP",
-                                                  encoder->GetHostName(),
-                                                  "nohostname");
+            strlist << gCoreContext->GetBackendServerIP(encoder->GetHostName());
             strlist << gCoreContext->GetSettingOnHost("BackendServerPort",
                                                   encoder->GetHostName(), "-1");
         }
@@ -5133,14 +5153,12 @@ void MainServer::HandleGetRecorderFromNum(QStringList &slist,
     {
         if (encoder->IsLocal())
         {
-            strlist << gCoreContext->GetSetting("BackendServerIP");
+            strlist << gCoreContext->GetBackendServerIP();
             strlist << gCoreContext->GetSetting("BackendServerPort");
         }
         else
         {
-            strlist << gCoreContext->GetSettingOnHost("BackendServerIP",
-                                                  encoder->GetHostName(),
-                                                  "nohostname");
+            strlist << gCoreContext->GetBackendServerIP(encoder->GetHostName());
             strlist << gCoreContext->GetSettingOnHost("BackendServerPort",
                                                   encoder->GetHostName(), "-1");
         }
@@ -5792,7 +5810,7 @@ PlaybackSock *MainServer::GetSlaveByHostname(const QString &hostname)
         PlaybackSock *pbs = *iter;
         if (pbs->isSlaveBackend() &&
             ((pbs->getHostname().toLower() == hostname.toLower()) ||
-             (pbs->getIP() == hostname)))
+             (gCoreContext->IsThisHost(hostname, pbs->getHostname()))))
         {
             sockListLock.unlock();
             pbs->UpRef();
@@ -5801,6 +5819,29 @@ PlaybackSock *MainServer::GetSlaveByHostname(const QString &hostname)
     }
 
     sockListLock.unlock();
+
+    return NULL;
+}
+
+PlaybackSock *MainServer::GetMediaServerByHostname(const QString &hostname)
+{
+    if (!ismaster)
+        return NULL;
+
+    QReadLocker rlock(&sockListLock);
+
+    vector<PlaybackSock *>::iterator iter = playbackList.begin();
+    for (; iter != playbackList.end(); ++iter)
+    {
+        PlaybackSock *pbs = *iter;
+        if (pbs->isMediaServer() &&
+            ((pbs->getHostname().toLower() == hostname.toLower()) ||
+             (gCoreContext->IsThisHost(hostname, pbs->getHostname()))))
+        {
+            pbs->UpRef();
+            return pbs;
+        }
+    }
 
     return NULL;
 }
@@ -6064,7 +6105,7 @@ void MainServer::reconnectTimeout(void)
 
     QString str = QString("ANN SlaveBackend %1 %2")
                           .arg(gCoreContext->GetHostName())
-                          .arg(gCoreContext->GetSetting("BackendServerIP"));
+                          .arg(gCoreContext->GetBackendServerIP());
 
     masterServerSock->Lock();
 
@@ -6092,8 +6133,8 @@ void MainServer::reconnectTimeout(void)
         !masterServerSock->readStringList(strlist) ||
         strlist.empty() || strlist[0] == "ERROR")
     {
+        masterServerSock->Unlock(); // DownRef will delete socket...
         masterServerSock->DownRef();
-        masterServerSock->Unlock();
         masterServerSock = NULL;
         if (strlist.empty())
         {

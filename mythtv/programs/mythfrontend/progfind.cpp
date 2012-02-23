@@ -240,7 +240,6 @@ void ProgFinder::ShowMenu(void)
             menuPopup->AddButton(tr("Custom Edit"));
             menuPopup->AddButton(tr("Program Guide"));
         }
-        menuPopup->AddButton(tr("Cancel"));
 
         popupStack->AddScreen(menuPopup);
     }

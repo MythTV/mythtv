@@ -286,7 +286,22 @@ AudioOutput::AudioDeviceConfig* AudioOutput::GetAudioDeviceConfig(
         }
     }
 
-    int max_channels = aosettings.BestSupportedChannels();
+    QString capabilities = desc;
+    int max_channels = aosettings.BestSupportedChannelsELD();
+    if (aosettings.hasELD())
+    {
+        if (aosettings.getELD().isValid())
+        {
+            capabilities += QObject::tr(" (%1 connected to %2)")
+                .arg(aosettings.getELD().product_name().simplified())
+                .arg(aosettings.getELD().connection_name());
+        }
+        else
+        {
+            capabilities += QObject::tr(" (No connection detected)");
+        }
+    }
+
     QString speakers;
     switch (max_channels)
     {
@@ -300,20 +315,44 @@ AudioOutput::AudioDeviceConfig* AudioOutput::GetAudioDeviceConfig(
             speakers = "2.0";
             break;
     }
-    QString capabilities = desc + QString("\nDevice supports up to %1")
-                                      .arg(speakers);
+
+    capabilities += QObject::tr("\nDevice supports up to %1")
+        .arg(speakers);
     if (aosettings.canPassthrough() >= 0)
     {
-        capabilities += QString(" (");
-        if (aosettings.canPassthrough() > 0)
-            capabilities += QString("digital output, ");
-        if (aosettings.canAC3())
-            capabilities += QString("AC3,");
-        if (aosettings.canDTS())
-            capabilities += QString("DTS,");
-        if (aosettings.canLPCM())
-            capabilities += QString("multi-channels LPCM");
-        capabilities += QString(")");
+        if (aosettings.hasELD() && aosettings.getELD().isValid())
+        {
+                // We have an ELD, show actual reported capabilities
+            capabilities += " (" + aosettings.getELD().codecs_desc() + ")";
+        }
+        else 
+        {
+                // build capabilities string, in a similar fashion as reported
+                // by ELD
+            int mask = 0;
+            mask |=
+                (aosettings.canLPCM() << 0) |
+                (aosettings.canAC3()  << 1) |
+                (aosettings.canDTS()  << 2);
+            static const char *type_names[] = { "LPCM", "AC3", "DTS" };
+
+            if (mask != 0)
+            {
+                capabilities += QObject::tr(" (guessing: ");
+                bool found_one = false;
+                for (unsigned int i = 0; i < 3; i++)
+                {
+                    if ((mask & (1 << i)) != 0)
+                    {
+                        if (found_one)
+                            capabilities += ", ";
+                        capabilities += type_names[i];
+                        found_one = true;
+                    }
+                }
+                capabilities += QString(")");
+            }
+        }
     }
     LOG(VB_AUDIO, LOG_INFO, QString("Found %1 (%2)")
                                 .arg(name).arg(capabilities));
@@ -332,7 +371,7 @@ static void fillSelectionsFromDir(const QDir &dir,
     {
         QFileInfo &fi = *it;
         QString name = fi.absoluteFilePath();
-        QString desc = QString("OSS device");
+        QString desc = QObject::tr("OSS device");
         AudioOutput::AudioDeviceConfig *adc =
             AudioOutput::GetAudioDeviceConfig(name, desc);
         if (!adc)
@@ -393,7 +432,7 @@ AudioOutput::ADCVect* AudioOutput::GetOutputList(void)
 #ifdef USING_JACK
     {
         QString name = "JACK:";
-        QString desc = "Use JACK default sound server.";
+        QString desc = QObject::tr("Use JACK default sound server.");
         adc = GetAudioDeviceConfig(name, desc);
         if (adc)
         {
@@ -414,7 +453,7 @@ AudioOutput::ADCVect* AudioOutput::GetOutputList(void)
                 QString key = i.key();
                 QString desc = i.value();
                 QString devname = QString("CoreAudio:%1").arg(key);
-                
+
                 adc = GetAudioDeviceConfig(devname, desc);
                 if (!adc)
                     continue;
@@ -424,7 +463,7 @@ AudioOutput::ADCVect* AudioOutput::GetOutputList(void)
         }
         delete devs;
         QString name = "CoreAudio:Default Output Device";
-        QString desc = "CoreAudio default output";
+        QString desc = QObject::tr("CoreAudio default output");
         adc = GetAudioDeviceConfig(name, desc);
         if (adc)
         {
@@ -473,7 +512,7 @@ AudioOutput::ADCVect* AudioOutput::GetOutputList(void)
 #ifdef USING_PULSEOUTPUT
     {
         QString name = "PulseAudio:default";
-        QString desc =  QString("PulseAudio default sound server. ");
+        QString desc =  QObject::tr("PulseAudio default sound server.");
         adc = GetAudioDeviceConfig(name, desc);
         if (adc)
         {

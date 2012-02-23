@@ -18,7 +18,8 @@ using namespace std;
 
 #define LOC QString("DevRdB(%1): ").arg(videodevice)
 
-DeviceReadBuffer::DeviceReadBuffer(DeviceReaderCB *cb, bool use_poll)
+DeviceReadBuffer::DeviceReadBuffer(
+    DeviceReaderCB *cb, bool use_poll, bool error_exit_on_poll_timeout)
     : MThread("DeviceReadBuffer"),
       videodevice(""),              _stream_fd(-1),
       readerCB(cb),
@@ -27,7 +28,9 @@ DeviceReadBuffer::DeviceReadBuffer(DeviceReaderCB *cb, bool use_poll)
       dorun(false),
       eof(false),                   error(false),
       request_pause(false),         paused(false),
-      using_poll(use_poll),         max_poll_wait(2500 /*ms*/),
+      using_poll(use_poll),
+      poll_timeout_is_error(error_exit_on_poll_timeout),
+      max_poll_wait(2500 /*ms*/),
 
       size(0),                      used(0),
       read_quanta(0),
@@ -78,10 +81,6 @@ bool DeviceReadBuffer::Setup(const QString &streamName, int streamfd,
     videodevice   = streamName;
     videodevice   = (videodevice == QString::null) ? "" : videodevice;
     _stream_fd    = streamfd;
-
-    // BEGIN HACK -- see #6897, remove after August 2009
-    max_poll_wait = (videodevice.contains("dvb")) ? 25000 : 2500;
-    // END HACK
 
     // Setup device ringbuffer
     eof           = false;
@@ -448,8 +447,12 @@ bool DeviceReadBuffer::Poll(void) const
         polls[1].revents = 0;
         poll_cnt = (wake_pipe[0] >= 0) ? poll_cnt : 1;
 
-        int timeout = max((int)max_poll_wait - timer.elapsed(), 10);
-        timeout = (1 == poll_cnt) ? 10 : timeout;
+        int timeout = max_poll_wait;
+        if (1 == poll_cnt)
+            timeout = 10;
+        else if (poll_timeout_is_error)
+            timeout = max((int)max_poll_wait - timer.elapsed(), 10);
+
         int ret = poll(polls, poll_cnt, timeout);
 
         if (polls[0].revents & (POLLHUP | POLLNVAL))
@@ -486,7 +489,8 @@ bool DeviceReadBuffer::Poll(void) const
             }
             else //  ret == 0
             {
-                if ((uint)timer.elapsed() >= max_poll_wait)
+                if (poll_timeout_is_error &&
+                    (timer.elapsed() >= (int)max_poll_wait))
                 {
                     LOG(VB_GENERAL, LOG_ERR, LOC + "Poll giving up 1");
                     QMutexLocker locker(&lock);
@@ -504,7 +508,7 @@ bool DeviceReadBuffer::Poll(void) const
             cnt = ::read(wake_pipe[0], dummy, cnt);
         }
 
-        if ((uint)timer.elapsed() >= max_poll_wait)
+        if (poll_timeout_is_error && (timer.elapsed() >= (int)max_poll_wait))
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + "Poll giving up 2");
             QMutexLocker locker(&lock);
@@ -512,6 +516,15 @@ bool DeviceReadBuffer::Poll(void) const
             return true;
         }
     }
+
+    int e = timer.elapsed();
+    if (e > (int)max_poll_wait)
+    {
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
+            QString("Poll took an unusually long time %1 ms")
+            .arg(timer.elapsed()));
+    }
+
     return retval;
 #endif //!USING_MINGW
 }

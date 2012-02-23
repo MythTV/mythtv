@@ -39,6 +39,10 @@ void MythTranscodeCommandLineParser::LoadArguments(void)
     add(QStringList( QStringList() << "-e" << "--ostream" ), "ostream", "",
             "Output stream type: dvd, ps", "")
         ->SetGroup("Encoding");
+//    add("--avf", "avf", false, "Generate libavformat output file.", "")
+//        ->SetGroup("Encoding");
+    add("--hls", "hls", false, "Generate HTTP Live Stream output.", "")
+        ->SetGroup("Encoding");
 
     add(QStringList( QStringList() << "-f" << "--fifodir" ), "fifodir", "",
             "Directory in which to write fifos to.", "")
@@ -49,6 +53,11 @@ void MythTranscodeCommandLineParser::LoadArguments(void)
         ->SetGroup("Frame Server");
     add("--fifosync", "fifosync", false, "Enforce fifo sync.", "")
         ->SetGroup("Frame Server");
+    add("--cleancut", "cleancut", false,
+            "Improve quality of cutting by performing it partially by dropping data. "
+            "Works only in fifodir mode.", "")
+        ->SetGroup("Frame Server")
+        ->SetRequires("fifodir");
 
     add(QStringList( QStringList() << "-l" << "--honorcutlist" ), "usecutlist",
             "", "Specifies whether to use the cutlist.",
@@ -77,5 +86,30 @@ void MythTranscodeCommandLineParser::LoadArguments(void)
             "Add a new transcoding job of the specified recording and "
             "profile to the jobqueue. Accepts an optional string to define "
             "the hostname.", "");
+
+//    add("--container", "container", "", "Output file container format", "")
+//        ->SetChildOf("avf");
+//    add("--acodec", "acodec", "", "Output file audio codec", "")
+//        ->SetChildOf("avf");
+//    add("--vcodec", "vcodec", "", "Output file video codec", "")
+//        ->SetChildOf("avf");
+    add("--width", "width", 0, "Output Video Width", "")
+//        ->SetChildOf("avf")
+        ->SetChildOf("hls");
+    add("--height", "height", 0, "Output Video Height", "")
+//        ->SetChildOf("avf")
+        ->SetChildOf("hls");
+    add("--bitrate", "bitrate", 800, "Output Video Bitrate (Kbits)", "")
+//        ->SetChildOf("avf")
+        ->SetChildOf("hls");
+    add("--audiobitrate", "audiobitrate", 64, "Output Audio Bitrate (Kbits)", "")
+//        ->SetChildOf("avf")
+        ->SetChildOf("hls");
+    add("--maxsegments", "maxsegments", 0, "Max HTTP Live Stream segments", "")
+        ->SetChildOf("hls");
+    add("--noaudioonly", "noaudioonly", 0, "Disable Audio-Only HLS Stream", "")
+        ->SetChildOf("hls");
+    add("--hlsstreamid", "hlsstreamid", -1, "Stream ID to process", "")
+        ->SetChildOf("hls");
 }
 

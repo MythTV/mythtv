@@ -55,7 +55,7 @@ POST_TARGETDEPS += ../../libs/libmythprotoserver/libmythprotoserver-$${MYTH_SHLI
 using_live: POST_TARGETDEPS += ../../libs/libmythlivemedia/libmythlivemedia-$${MYTH_SHLIB_EXT}
 using_hdhomerun: POST_TARGETDEPS += ../../libs/libmythhdhomerun/libmythhdhomerun-$${MYTH_SHLIB_EXT}
 
-DEPENDPATH += ../.. ../../libs ../../libs/libmyth
+DEPENDPATH += ../.. ../../libs ../../libs/libmyth ../../libs/libmyth/audio
 DEPENDPATH += ../../libs/libmythtv
 DEPENDPATH += ../../libs/libmythtv/mpeg ../../libs/libmythtv/vbitext
 DEPENDPATH += ../../external/FFmpeg

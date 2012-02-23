@@ -137,6 +137,14 @@ bool VideoOutputNull::Init(int width, int height, float aspect, WId winid,
     if ((width <= 0) || (height <= 0))
         return false;
 
+    if (!codec_is_std(codec_id))
+    {
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("Cannot create VideoOutputNull for codec %1")
+            .arg(toString(codec_id)));
+        return false;
+    }
+
     QMutexLocker locker(&global_lock);
 
     VideoOutput::Init(width, height, aspect, winid, win_rect, codec_id);

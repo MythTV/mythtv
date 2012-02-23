@@ -85,46 +85,33 @@ LCDServer::LCDServer(int port, QString message, int messageTime)
         m_lcd = NULL;
     }
 
-    //  Create the socket to listen to for connections
-    m_serverSocket = new QTcpServer(this);
-    connect(m_serverSocket, SIGNAL(newConnection()),
-            this, SLOT(newConnection()));
+    m_serverPool = new ServerPool();
+    connect(m_serverPool, SIGNAL(newConnection(QTcpSocket*)),
+            this,         SLOT(newConnection(QTcpSocket*)));
 
-    if (!m_serverSocket->listen(gCoreContext->MythHostAddressAny(), port))
+    if (!m_serverPool->listen(gCoreContext->MythHostAddress(), port))
     {
-         LOG(VB_GENERAL, LOG_ERR, LOC +
-             QString("Can't bind to server port %1").arg(port) +
-             "\n\t\t\tThere is probably copy of mythlcdserver already running."
-             "\n\t\t\tYou can verify this by running 'ps ax | "
-             "grep mythlcdserver'.");
-         return;
+        LOG(VB_GENERAL, LOG_ERR, "There is probably a copy of mythlcdserver "
+            "already running. You can verify this by running: \n"
+            "'ps ax | grep mythlcdserver'");
+        delete m_serverPool;
+        return;
     }
     m_lastSocket = NULL;
-
-    //  Announce the port we're listening on
-    if (debug_level > 0)
-        LOG(VB_NETWORK, LOG_INFO, QString("LCDServer: is listening on port %1")
-                .arg(port));
 
     if (m_lcd)
         m_lcd->setStartupMessage(message, messageTime);
 }
 
-void LCDServer::newConnection(void)
+void LCDServer::newConnection(QTcpSocket *socket)
 {
-    QTcpSocket *socket = m_serverSocket->nextPendingConnection();
-    while (socket)
-    {
-        connect(socket, SIGNAL(readyRead()),
-                this,   SLOT(  readSocket()));
-        connect(socket, SIGNAL(disconnected()),
-                this,   SLOT(  endConnection()));
+    connect(socket, SIGNAL(readyRead()),
+            this,   SLOT(  readSocket()));
+    connect(socket, SIGNAL(disconnected()),
+            this,   SLOT(  endConnection()));
 
-        if (debug_level > 0)
-            LOG(VB_NETWORK, LOG_INFO, "LCDServer: new connection");
-
-        socket = m_serverSocket->nextPendingConnection();
-    }
+    if (debug_level > 0)
+        LOG(VB_NETWORK, LOG_INFO, "LCDServer: new connection");
 
     if (m_lcd)
         m_lcd->switchToTime();
@@ -285,7 +272,10 @@ void LCDServer::shutDown()
     if (debug_level > 0)
         LOG(VB_GENERAL, LOG_INFO, "LCDServer:: shuting down");
 
-    delete m_serverSocket;
+    m_serverPool->disconnect();
+    m_serverPool->close();
+    delete m_serverPool;
+    m_serverPool = NULL;
 
     exit(0);
 }

@@ -270,7 +270,7 @@ void SelectDestination::setDestination(MythUIButtonListItem* item)
             m_doBurnText->Show();
             break;
         case AD_FILE:
-            long long dummy;
+            int64_t dummy;
             ArchiveDestinations[itemNo].freeSpace = 
                     getDiskSpace(m_filenameEdit->GetText(), dummy, dummy);
 
@@ -323,7 +323,7 @@ void SelectDestination::fileFinderClosed(QString filename)
 
 void SelectDestination::filenameEditLostFocus()
 {
-    long long dummy;
+    int64_t dummy;
     m_archiveDestination.freeSpace = getDiskSpace(m_filenameEdit->GetText(), dummy, dummy);
 
     // if we don't get a valid freespace value it probably means the file doesn't

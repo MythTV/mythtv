@@ -18,7 +18,8 @@ class ProgramInfo;
 
 enum LookupStep {
     kLookupSearch = 0,
-    kLookupData = 1
+    kLookupData = 1,
+    kLookupCollection = 2
 };
 
 struct PersonInfo
@@ -29,6 +30,7 @@ struct PersonInfo
     QString url;
 };
 
+// What type of grabber script to use
 enum MetadataType {
     kMetadataVideo = 0,
     kMetadataRecording = 1,
@@ -36,6 +38,7 @@ enum MetadataType {
     kMetadataGame = 3
 };
 
+// Determines the lookup fallback strategy
 enum LookupType {
     kProbableTelevision = 0,
     kProbableGenericTelevision = 1,
@@ -43,6 +46,16 @@ enum LookupType {
     kUnknownVideo = 3,
     kProbableMusic = 4,
     kProbableGame = 5
+};
+
+// Actual type of content
+enum VideoContentType {
+    kContentMovie = 0,
+    kContentTelevision = 1,
+    kContentAdult = 2,
+    kContentMusicVideo = 3,
+    kContentHomeMovie = 4,
+    kContentUnknown = 5
 };
 
 enum PeopleType {
@@ -80,28 +93,32 @@ class META_PUBLIC MetadataLookup : public QObject
         bool automatic,
         bool handleimages,
         bool allowoverwrites,
+        bool allowgeneric,
         bool preferdvdorder,
-        QString host,
-        QString filename,
-        QString title,
-        const QStringList categories,
+        const QString &host,
+        const QString &filename,
+        const QString &title,
+        const QString &network,
+        const QString &status,
+        const QStringList &categories,
         const float userrating,
-        const QString language,
-        QString subtitle,
-        const QString tagline,
-        const QString description,
+        uint ratingcount,
+        const QString &language,
+        const QString &subtitle,
+        const QString &tagline,
+        const QString &description,
         uint season,
         uint episode,
         const uint chanid,
-        const QString channum,
-        const QString chansign,
-        const QString channame,
-        const QString chanplaybackfilters,
-        const QString recgroup,
-        const QString playgroup,
-        const QString seriesid,
-        const QString programid,
-        const QString storagegroup,
+        const QString &channum,
+        const QString &chansign,
+        const QString &channame,
+        const QString &chanplaybackfilters,
+        const QString &recgroup,
+        const QString &playgroup,
+        const QString &seriesid,
+        const QString &programid,
+        const QString &storagegroup,
         const QDateTime startts,
         const QDateTime endts,
         const QDateTime recstartts,
@@ -110,26 +127,27 @@ class META_PUBLIC MetadataLookup : public QObject
         const uint audioproperties,
         const uint videoproperties,
         const uint subtitletype,
-        const QString certification,
-        const QStringList countries,
+        const QString &certification,
+        const QStringList &countries,
         const uint popularity,
         const uint budget,
         const uint revenue,
-        QString album,
+        const QString &album,
         uint tracknum,
-        QString system,
+        const QString &system,
         const uint year,
         const QDate releasedate,
         const QDateTime lastupdated,
         const uint runtime,
         const uint runtimesecs,
-        QString inetref,
-        QString tmsref,
-        QString imdb,
+        const QString &inetref,
+        const QString &collectionref,
+        const QString &tmsref,
+        const QString &imdb,
         const PeopleMap people,
-        const QStringList studios,
-        const QString homepage,
-        const QString trailerURL,
+        const QStringList &studios,
+        const QString &homepage,
+        const QString &trailerURL,
         const ArtworkMap artwork,
         DownloadMap downloads);
 
@@ -142,24 +160,25 @@ class META_PUBLIC MetadataLookup : public QObject
         bool automatic,
         bool handleimages,
         bool allowoverwrites,
+        bool allowgeneric,
         bool preferdvdorder,
-        QString host,
-        QString filename,
-        QString title,
-        const QStringList categories,
+        const QString &host,
+        const QString &filename,
+        const QString &title,
+        const QStringList &categories,
         const float userrating,
-        QString subtitle,
-        const QString description,
+        const QString &subtitle,
+        const QString &description,
         uint chanid,
-        const QString channum,
-        const QString chansign,
-        const QString channame,
-        const QString chanplaybackfilters,
-        const QString recgroup,
-        const QString playgroup,
-        const QString seriesid,
-        const QString programid,
-        const QString storagegroup,
+        const QString &channum,
+        const QString &chansign,
+        const QString &channame,
+        const QString &chanplaybackfilters,
+        const QString &recgroup,
+        const QString &playgroup,
+        const QString &seriesid,
+        const QString &programid,
+        const QString &storagegroup,
         const QDateTime startts,
         const QDateTime endts,
         const QDateTime recstartts,
@@ -183,25 +202,26 @@ class META_PUBLIC MetadataLookup : public QObject
         bool automatic,
         bool handleimages,
         bool allowoverwrites,
+        bool allowgeneric,
         bool preferdvdorder,
-        QString host,
-        QString filename,
-        QString title,
-        const QStringList categories,
+        const QString &host,
+        const QString &filename,
+        const QString &title,
+        const QStringList &categories,
         const float userrating,
-        QString subtitle,
-        const QString tagline,
-        const QString description,
+        const QString &subtitle,
+        const QString &tagline,
+        const QString &description,
         uint season,
         uint episode,
-        const QString certification,
+        const QString &certification,
         const uint year,
         const QDate releasedate,
         const uint runtime,
         const uint runtimesecs,
-        QString inetref,
+        const QString &inetref,
         const PeopleMap people,
-        const QString trailerURL,
+        const QString &trailerURL,
         const ArtworkMap artwork,
         DownloadMap downloads);
 
@@ -223,28 +243,31 @@ class META_PUBLIC MetadataLookup : public QObject
     // Sets for image download handling
     void SetHandleImages(bool handle) { m_handleimages = handle; };
     void SetAllowOverwrites(bool allow) { m_allowoverwrites = allow; };
-    void SetHost(QString host) { m_host = host; };
+    void SetAllowGeneric(bool allow) { m_allowgeneric = allow; };
+    void SetHost(const QString &host) { m_host = host; };
     void SetDownloads(ArtworkMap map) { m_downloads = map; };
 
     // General Sets
-    void SetTitle(QString title) { m_title = title; };
-    void SetFilename(QString filename) { m_filename = filename; };
+    void SetTitle(const QString &title) { m_title = title; };
+    void SetFilename(const QString &filename) { m_filename = filename; };
 
     // General Sets - Video
-    void SetSubtitle(QString subtitle) { m_subtitle = subtitle; };
+    void SetSubtitle(const QString &subtitle) { m_subtitle = subtitle; };
     void SetSeason(uint season) { m_season = season; };
     void SetEpisode(uint episode) { m_episode = episode; };
-    void SetInetref(QString inetref) { m_inetref = inetref; };
-    void SetTMSref(QString tmsref) { m_tmsref = tmsref; };
+    void SetInetref(const QString &inetref) { m_inetref = inetref; };
+    void SetCollectionref(const QString &collectionref)
+                             { m_collectionref = collectionref; };
+    void SetTMSref(const QString &tmsref) { m_tmsref = tmsref; };
     void SetPreferDVDOrdering(bool preferdvdorder)
                              { m_dvdorder = preferdvdorder; };
 
     // General Sets - Music
-    void SetAlbum(QString album) { m_album = album; };
+    void SetAlbum(const QString &album) { m_album = album; };
     void SetTrack(uint track) { m_tracknum = track; };
 
     // General Sets - Games
-    void SetSystem(QString system) { m_system = system; };
+    void SetSystem(const QString &system) { m_system = system; };
 
     // GETS
 
@@ -257,16 +280,20 @@ class META_PUBLIC MetadataLookup : public QObject
     // Image Handling Gets
     bool GetHandleImages() const { return m_handleimages; };
     bool GetAllowOverwrites() const { return m_allowoverwrites; };
+    bool GetAllowGeneric() const { return m_allowgeneric; };
 
     // General
     QString GetFilename() const { return m_filename; };
     QString GetTitle() const { return m_title; };
     QStringList GetCategories() const { return m_categories; };
     float GetUserRating() const { return m_userrating; };
+    uint GetRatingCount() const { return m_ratingcount; };
     QString GetLanguage() const { return m_language; };
     QString GetHost() const { return m_host; };
 
     // General - Video & ProgramInfo
+    QString GetNetwork() const { return m_network; };
+    QString GetStatus() const { return m_status; };
     QString GetSubtitle() const { return m_subtitle; };
     QString GetTagline() const { return m_tagline; };
     QString GetDescription() const { return m_description; };
@@ -314,6 +341,7 @@ class META_PUBLIC MetadataLookup : public QObject
 
     // Inetref
     QString GetInetref() const { return m_inetref; };
+    QString GetCollectionref() const { return m_collectionref; };
     QString GetIMDB() const { return m_imdb; };
     QString GetTMSref() const { return m_tmsref; };
 
@@ -338,13 +366,17 @@ class META_PUBLIC MetadataLookup : public QObject
     bool m_automatic;
     bool m_handleimages;
     bool m_allowoverwrites;
+    bool m_allowgeneric;
     bool m_dvdorder;
     QString m_host;
 
     QString m_filename;
     QString m_title;
+    QString m_network;
+    QString m_status;
     const QStringList m_categories;
     float m_userrating;
+    uint m_ratingcount;
     const QString m_language;
 
     // General - Video & ProgramInfo
@@ -394,6 +426,7 @@ class META_PUBLIC MetadataLookup : public QObject
 
     // Inetref
     QString m_inetref;
+    QString m_collectionref;
     QString m_tmsref;
     QString m_imdb;
 
@@ -409,7 +442,6 @@ class META_PUBLIC MetadataLookup : public QObject
     const ArtworkMap m_artwork;
     DownloadMap m_downloads;
 };
-Q_DECLARE_METATYPE(MetadataLookup*)
 
 typedef QList<MetadataLookup*> MetadataLookupList;
 
@@ -464,23 +496,23 @@ class META_PUBLIC MetaGrabberScript : public QObject
     ~MetaGrabberScript();
 
     MetaGrabberScript(
-        const QString name,
-        const QString author,
-        const QString thumbnail,
-        const QString command,
+        const QString &name,
+        const QString &author,
+        const QString &thumbnail,
+        const QString &command,
         const GrabberType type,
-        const QString typestring,
-        const QString description,
+        const QString &typestring,
+        const QString &description,
         const float version);
 
-    const QString GetName() { return m_name; };
-    const QString GetAuthor() { return m_author; };
-    const QString GetThumbnail() { return m_thumbnail; };
-    const QString GetCommand() { return m_command; };
-    GrabberType GetType() { return m_type; };
-    const QString GetTypeString() { return m_typestring; };
-    const QString GetDescription() { return m_description; };
-    float GetVersion() { return m_version; };
+    QString GetName(void) const { return m_name; };
+    QString GetAuthor(void) const { return m_author; };
+    QString GetThumbnail(void) const { return m_thumbnail; };
+    QString GetCommand(void) const { return m_command; };
+    GrabberType GetType(void) const { return m_type; };
+    QString GetTypeString(void) const { return m_typestring; };
+    QString GetDescription(void) const { return m_description; };
+    float GetVersion(void) const { return m_version; };
 
     void toMap(MetadataMap &metadataMap);
 
@@ -494,8 +526,10 @@ class META_PUBLIC MetaGrabberScript : public QObject
     QString m_description;
     float m_version;
 };
-Q_DECLARE_METATYPE(MetaGrabberScript*)
 
 META_PUBLIC MetaGrabberScript* ParseGrabberVersion(const QDomElement& item);
+
+Q_DECLARE_METATYPE(MetaGrabberScript*)
+Q_DECLARE_METATYPE(MetadataLookup*)
 
 #endif // METADATACOMMON_H_

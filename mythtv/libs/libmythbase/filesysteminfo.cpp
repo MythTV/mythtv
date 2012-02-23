@@ -48,7 +48,7 @@ using namespace std;
 
 FileSystemInfo::FileSystemInfo(void) :
     m_hostname(""), m_path(""), m_local(false), m_fsid(-1),
-    m_grpid(-1), m_blksize(4096), m_total(0), m_used(0)
+    m_grpid(-1), m_blksize(4096), m_total(0), m_used(0), m_weight(0)
 {
 }
 
@@ -58,9 +58,10 @@ FileSystemInfo::FileSystemInfo(const FileSystemInfo &other)
 }
 
 FileSystemInfo::FileSystemInfo(QString hostname, QString path, bool local,
-        int fsid, int groupid, int blksize, long long total, long long used) :
+        int fsid, int groupid, int blksize, int64_t total, int64_t used) :
     m_hostname(hostname), m_path(path), m_local(local), m_fsid(fsid),
-    m_grpid(groupid), m_blksize(blksize), m_total(total), m_used(used)
+    m_grpid(groupid), m_blksize(blksize), m_total(total), m_used(used),
+    m_weight(0)
 {
 }
 
@@ -85,6 +86,7 @@ void FileSystemInfo::clone(const FileSystemInfo &other)
     m_blksize = other.m_blksize;
     m_total = other.m_total;
     m_used = other.m_used;
+    m_weight = other.m_weight;
 }
 
 FileSystemInfo &FileSystemInfo::operator=(const FileSystemInfo &other)
@@ -103,6 +105,7 @@ void FileSystemInfo::clear(void)
     m_blksize   = 4096;
     m_total     = 0;
     m_used      = 0;
+    m_weight    = 0;
 }
 
 bool FileSystemInfo::ToStringList(QStringList &list) const
@@ -140,6 +143,8 @@ bool FileSystemInfo::FromStringList(QStringList::const_iterator &it,
     INT_FROM_LIST(m_total);
     INT_FROM_LIST(m_used);
 
+    m_weight = 0;
+
     return true;
 }
 
@@ -172,7 +177,7 @@ const QList<FileSystemInfo> FileSystemInfo::RemoteGetInfo(MythSocket *sock)
 }
 
 void FileSystemInfo::Consolidate(QList<FileSystemInfo> &disks,
-                                 bool merge, size_t fuzz)
+                                 bool merge, int64_t fuzz)
 {
     int newid = 0;
 
@@ -194,15 +199,15 @@ void FileSystemInfo::Consolidate(QList<FileSystemInfo> &disks,
 
             int bSize = max(32, max(it1->getBlockSize(), it2->getBlockSize())
                                         / 1024);
-            long long diffSize = it1->getTotalSpace() - it2->getTotalSpace();
-            long long diffUsed = it1->getUsedSpace() - it2->getUsedSpace();
+            int64_t diffSize = it1->getTotalSpace() - it2->getTotalSpace();
+            int64_t diffUsed = it1->getUsedSpace() - it2->getUsedSpace();
 
             if (diffSize < 0)
                 diffSize = 0 - diffSize;
             if (diffUsed < 0)
                 diffUsed = 0 - diffUsed;
 
-            if ((diffSize <= bSize) && ((size_t)diffUsed <= fuzz))
+            if ((diffSize <= bSize) && (diffUsed <= fuzz))
             {
                 it2->setFSysID(it1->getFSysID());
 
@@ -224,7 +229,7 @@ void FileSystemInfo::Consolidate(QList<FileSystemInfo> &disks,
 
 void FileSystemInfo::PopulateDiskSpace(void)
 {
-    long long total = -1, used = -1;
+    int64_t total = -1, used = -1;
     getDiskSpace(getPath().toAscii().constData(), total, used);
     setTotalSpace(total);
     setUsedSpace(used);

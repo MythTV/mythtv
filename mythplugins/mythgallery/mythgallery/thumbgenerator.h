@@ -78,8 +78,9 @@ private:
     bool         m_isGallery;
     QStringList  m_fileList;
     QMutex       m_mutex;
-    int          m_width, m_height;
-
+    int          m_width;
+    int          m_height;
+    bool         m_cancel;
 };
 
 #endif /* THUMBGENERATOR_H */

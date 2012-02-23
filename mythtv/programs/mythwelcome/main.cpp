@@ -30,9 +30,6 @@
 #include "welcomesettings.h"
 
 
-QString logfile;
-
-
 static void initKeys(void)
 {
     REG_KEY("Welcome", "STARTXTERM", QT_TRANSLATE_NOOP("MythControls",

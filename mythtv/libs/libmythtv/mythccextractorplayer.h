@@ -117,7 +117,8 @@ typedef QHash<uint, SubtitleReader*> SubtitleReaders;
 class MTV_PUBLIC MythCCExtractorPlayer : public MythPlayer
 {
   public:
-    MythCCExtractorPlayer(bool showProgress, const QString &fileName);
+    MythCCExtractorPlayer(PlayerFlags flags, bool showProgress,
+                          const QString &fileName);
     ~MythCCExtractorPlayer() {}
 
     bool run(void);
@@ -138,6 +139,7 @@ class MTV_PUBLIC MythCCExtractorPlayer : public MythPlayer
     void Ingest708Captions(void);
     void Ingest708Caption(uint streamId, uint serviceIdx, uint windowIdx,
                           uint start_row, uint start_column,
+                          const CC708Window &win,
                           const vector<CC708String*> &content);
     void Process708Captions(uint flags);
 
@@ -168,8 +170,7 @@ class MTV_PUBLIC MythCCExtractorPlayer : public MythPlayer
     QHash<uint, WindowsOnService > m_cc708_windows;
 
     /// Keeps track for decoding time to make timestamps for subtitles.
-    int64_t m_curTime;
-    int64_t m_curTimeShift;
+    double  m_curTime;
     uint64_t m_myFramesPlayed;
     bool    m_showProgress;
     QString m_fileName;

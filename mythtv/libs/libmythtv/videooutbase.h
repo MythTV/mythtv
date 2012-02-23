@@ -51,7 +51,8 @@ class VideoOutput
     static VideoOutput *Create(
         const QString &decoder, MythCodecID  codec_id,     void *codec_priv,
         PIPState pipState,      const QSize &video_dim,    float video_aspect,
-        WId win_id,             const QRect &display_rect, float video_prate);
+        QWidget *parentwidget,  const QRect &embed_rect,   float video_prate,
+        uint playerFlags);
 
     VideoOutput();
     virtual ~VideoOutput();
@@ -207,11 +208,13 @@ class VideoOutput
     virtual void CheckFrameStates(void) { }
 
     /// \bug not implemented correctly. vpos is not updated.
-    VideoFrame *GetLastDecodedFrame(void) { return vbuffers.GetLastDecodedFrame(); }
+    virtual VideoFrame *GetLastDecodedFrame(void)
+        { return vbuffers.GetLastDecodedFrame(); }
 
     /// \brief Returns frame from the head of the ready to be displayed queue,
     ///        if StartDisplayingFrame has been called.
-    VideoFrame *GetLastShownFrame(void)  { return vbuffers.GetLastShownFrame(); }
+    virtual VideoFrame *GetLastShownFrame(void)
+        { return vbuffers.GetLastShownFrame(); }
 
     /// \brief Returns string with status of each frame for debugging.
     QString GetFrameStatus(void) const { return vbuffers.GetStatus(); }
@@ -246,14 +249,23 @@ class VideoOutput
     QRect   GetSafeRect(void);
 
     // Visualisations
-    bool EnableVisualisation(AudioPlayer *audio, bool enable);
+    bool EnableVisualisation(AudioPlayer *audio, bool enable,
+                             const QString &name = QString(""));
     virtual bool CanVisualise(AudioPlayer *audio, MythRender *render);
-    virtual bool SetupVisualisation(AudioPlayer *audio, MythRender *render);
+    virtual bool SetupVisualisation(AudioPlayer *audio, MythRender *render,
+                                    const QString &name);
     VideoVisual* GetVisualisation(void) { return m_visual; }
+    QString GetVisualiserName(void);
+    virtual QStringList GetVisualiserList(void);
     void DestroyVisualisation(void);
 
     // Hue adjustment for certain vendors (mostly ATI)
     static int CalcHueBase(const QString &adaptor_name);
+
+    // 3D TV
+    virtual bool StereoscopicModesAllowed(void) const { return false; }
+    void SetStereoscopicMode(StereoscopicMode mode) { m_stereo = mode; }
+    StereoscopicMode GetStereoscopicMode(void) const { return m_stereo; }
 
   protected:
     void InitBuffers(int numdecode, bool extra_for_pause, int need_free,
@@ -336,6 +348,9 @@ class VideoOutput
 
     // Visualisation
     VideoVisual     *m_visual;
+
+    // 3D TV mode
+    StereoscopicMode m_stereo;
 };
 
 #endif

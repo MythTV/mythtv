@@ -10,7 +10,7 @@ CONFIG -= qt moc
 QMAKE_COPY_DIR = sh ../../cpsvndir
 
 defaultfiles.path = $${PREFIX}/share/mythtv/themes/default
-defaultfiles.files = default/*.xml default/images/*.png
+defaultfiles.files = default/*.xml default/images/*.png default/icons/*.png
 
 widefiles.path = $${PREFIX}/share/mythtv/themes/default-wide
 widefiles.files = default-wide/*.xml default-wide/images/*.png

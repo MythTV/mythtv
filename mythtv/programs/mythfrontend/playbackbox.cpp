@@ -269,6 +269,9 @@ static QString extract_main_state(const ProgramInfo &pginfo, const TV *player)
         state = "disabled";
     }
 
+    if (state == "normal" && (pginfo.GetVideoProperties() & VID_DAMAGED))
+        state = "warning";
+
     return state;
 }
 
@@ -731,8 +734,8 @@ void PlaybackBox::updateGroupInfo(const QString &groupname,
     updateIcons();
 }
 
-void PlaybackBox::UpdateUIListItem(
-    ProgramInfo *pginfo, bool force_preview_reload)
+void PlaybackBox::UpdateUIListItem(ProgramInfo *pginfo,
+                                   bool force_preview_reload)
 {
     if (!pginfo)
         return;
@@ -777,8 +780,8 @@ void PlaybackBox::SetItemIcons(MythUIButtonListItem *item, ProgramInfo* pginfo)
         item->DisplayState(disp_flag_stat[i]?"yes":"no", disp_flags[i]);
 }
 
-void PlaybackBox::UpdateUIListItem(
-    MythUIButtonListItem *item, bool is_sel, bool force_preview_reload)
+void PlaybackBox::UpdateUIListItem(MythUIButtonListItem *item,
+                                   bool is_sel, bool force_preview_reload)
 {
     if (!item)
         return;
@@ -1068,11 +1071,11 @@ void PlaybackBox::updateIcons(const ProgramInfo *pginfo)
         iconState->Reset();
 
     iconMap.clear();
+    iconMap["avchd"] = VID_AVC;
     iconMap["hd1080"] = VID_1080;
     iconMap["hd720"] = VID_720;
     iconMap["hdtv"] = VID_HDTV;
     iconMap["widescreen"] = VID_WIDESCREEN;
-    //iconMap["avchd"] = VID_AVC;
 
     iconState = dynamic_cast<MythUIStateType *>(GetChild("videoprops"));
     haveIcon = false;
@@ -1094,6 +1097,28 @@ void PlaybackBox::updateIcons(const ProgramInfo *pginfo)
     if (iconState && !haveIcon)
         iconState->Reset();
 
+    iconMap.clear();
+    iconMap["damaged"] = VID_DAMAGED;
+
+    iconState = dynamic_cast<MythUIStateType *>(GetChild("videoquality"));
+    haveIcon = false;
+    if (pginfo && iconState)
+    {
+        for (it = iconMap.begin(); it != iconMap.end(); ++it)
+        {
+            if (pginfo->GetVideoProperties() & (*it))
+            {
+                if (iconState->DisplayState(it.key()))
+                {
+                    haveIcon = true;
+                    break;
+                }
+            }
+        }
+    }
+
+    if (iconState && !haveIcon)
+        iconState->Reset();
     iconMap.clear();
     iconMap["deafsigned"] = SUB_SIGNED;
     iconMap["onscreensub"] = SUB_ONSCREEN;
@@ -1119,6 +1144,13 @@ void PlaybackBox::updateIcons(const ProgramInfo *pginfo)
 
     if (iconState && !haveIcon)
         iconState->Reset();
+
+    iconState = dynamic_cast<MythUIStateType *>(GetChild("categorytype"));
+    if (iconState)
+    {
+        if (!(pginfo && iconState->DisplayState(pginfo->GetCategoryType())))
+            iconState->Reset();
+    }
 }
 
 bool PlaybackBox::IsUsageUIVisible(void) const
@@ -1199,6 +1231,9 @@ void PlaybackBox::UpdateUIRecGroupList(void)
         QString tmp = (key == "All Programs") ? "All" : key;
         QString name = ProgramInfo::i18n(tmp);
 
+        if (m_recGroups.size() == 2 && key == "Default")
+            continue;  // All and Default will be the same, so only show All
+
         MythUIButtonListItem *item = new MythUIButtonListItem(
             m_recgroupList, name, qVariantFromValue(key));
 
@@ -1232,11 +1267,12 @@ void PlaybackBox::UpdateUIGroupList(const QStringList &groupPreferences)
                 m_currentGroup = groupname.toLower();
             }
 
-            if (groupname.isEmpty())
-                groupname = m_groupDisplayName;
+            QString displayName = groupname;
+            if (displayName.isEmpty())
+                displayName = m_groupDisplayName;
 
-            item->SetText(groupname, "name");
-            item->SetText(groupname);
+            item->SetText(displayName, "name");
+            item->SetText(displayName);
 
             int count = m_progLists[groupname.toLower()].size();
             item->SetText(QString::number(count), "reccount");
@@ -1346,6 +1382,8 @@ void PlaybackBox::updateRecList(MythUIButtonListItem *sel_item)
             if ((*it)->GetSubtitleType() & sit.key())
                 item->DisplayState(sit.value(), "subtitletypes");
         }
+
+        item->DisplayState((*it)->GetCategoryType(), "categorytype");
     }
 
     if (m_noRecordingsText)
@@ -2176,15 +2214,7 @@ void PlaybackBox::deleteSelected(MythUIButtonListItem *item)
     if (!pginfo)
         return;
 
-    bool undelete_possible =
-            gCoreContext->GetNumSetting("AutoExpireInsteadOfDelete", 0);
-
-    if (pginfo->GetRecordingGroup() == "Deleted" && undelete_possible)
-    {
-        RemoveProgram(pginfo->GetChanID(), pginfo->GetRecordingStartTime(),
-                      /*forgetHistory*/ false, /*force*/ false);
-    }
-    else if (pginfo->GetAvailableStatus() == asPendingDelete)
+    if (pginfo->GetAvailableStatus() == asPendingDelete)
     {
         LOG(VB_GENERAL, LOG_ERR, QString("deleteSelected(%1) -- failed ")
                 .arg(pginfo->toString(ProgramInfo::kTitleSubtitle)) +
@@ -2507,7 +2537,8 @@ void PlaybackBox::ShowDeletePopup(DeletePopupType type)
     const char *tmpslot = NULL;
 
     if ((kDeleteRecording == type) &&
-        (delItem->GetRecordingGroup() != "LiveTV"))
+        delItem->GetRecordingGroup() != "Deleted" &&
+        delItem->GetRecordingGroup() != "LiveTV")
     {
         tmpmessage = tr("Yes, and allow re-record");
         tmpslot = SLOT(DeleteForgetHistory());
@@ -4665,21 +4696,31 @@ void PlaybackBox::saveRecMetadata(const QString &newTitle,
         if (!newSubtitle.trimmed().isEmpty())
             tempSubTitle = QString("%1 - \"%2\"")
                             .arg(tempSubTitle).arg(newSubtitle);
-        QString seasone = QString("s%1e%2").arg(GetDisplaySeasonEpisode
-                                             (newSeason, 2))
-                        .arg(GetDisplaySeasonEpisode(newEpisode, 2));
-        QString seasonx = QString("%1x%2").arg(GetDisplaySeasonEpisode
-                                             (newSeason, 1))
-                        .arg(GetDisplaySeasonEpisode(newEpisode, 2));
+
+        QString seasone;
+        QString seasonx;
+        QString season;
+        QString episode;
+        if (newSeason > 0 || newEpisode > 0)
+        {
+            season = GetDisplaySeasonEpisode(newSeason, 1);
+            episode = GetDisplaySeasonEpisode(newEpisode, 1);
+            seasone = QString("s%1e%2").arg(GetDisplaySeasonEpisode
+                                                (newSeason, 2))
+                            .arg(GetDisplaySeasonEpisode(newEpisode, 2));
+            seasonx = QString("%1x%2").arg(GetDisplaySeasonEpisode
+                                                (newSeason, 1))
+                            .arg(GetDisplaySeasonEpisode(newEpisode, 2));
+        }
 
         item->SetText(tempSubTitle, "titlesubtitle");
         item->SetText(newTitle, "title");
         item->SetText(newSubtitle, "subtitle");
         item->SetText(newInetref, "inetref");
-        item->SetText(QString::number(newSeason), "season");
-        item->SetText(QString::number(newEpisode), "episode");
         item->SetText(seasonx, "00x00");
         item->SetText(seasone, "s00e00");
+        item->SetText(season, "season");
+        item->SetText(episode, "episode");
         if (newDescription != NULL)
             item->SetText(newDescription, "description");
     }
@@ -5104,9 +5145,9 @@ bool RecMetadataEdit::Create()
     }
     m_inetrefEdit->SetText(m_progInfo->GetInetRef());
     m_inetrefEdit->SetMaxLength(255);
-    m_seasonSpin->SetRange(0,9999,1,1);
+    m_seasonSpin->SetRange(0,9999,1,5);
     m_seasonSpin->SetValue(m_progInfo->GetSeason());
-    m_episodeSpin->SetRange(0,9999,1,1);
+    m_episodeSpin->SetRange(0,9999,1,10);
     m_episodeSpin->SetValue(m_progInfo->GetEpisode());
 
     connect(okButton, SIGNAL(Clicked()), SLOT(SaveChanges()));
@@ -5185,7 +5226,7 @@ bool HelpPopup::Create()
     addItem("hd720",       tr("Recording is in 720p High Definition"));
     addItem("hdtv",        tr("Recording is in High Definition"));
     addItem("widescreen",  tr("Recording is Widescreen"));
-//    addItem("avchd",       tr("Recording uses H.264 codec"));
+    addItem("avchd",       tr("Recording is in HD using H.264 codec"));
 
     addItem("watched",     tr("Recording has been watched"));
 //    addItem("preserved",   tr("Recording is preserved"));

@@ -29,6 +29,7 @@ class PROTOSERVER_PUBLIC SocketRequestHandler : public QObject
                                   QStringList &slist)   { (void)socket; }
     virtual void connectionClosed(MythSocket *socket)   { (void)socket; }
     virtual void SetParent(MythSocketManager *parent)   { m_parent = parent; }
+    MythSocketManager *GetParent(void)                  { return m_parent; }
 
   protected:
     MythSocketManager *m_parent;

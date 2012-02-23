@@ -72,7 +72,7 @@ QString toUIState(RecStatusType recstatus)
 }
 
 /// \brief Converts "recstatus" into a human readable string.
-QString toString(RecStatusType recstatus, uint cardid)
+QString toString(RecStatusType recstatus, uint id)
 {
     QString ret = "-";
     switch (recstatus)
@@ -84,13 +84,13 @@ QString toString(RecStatusType recstatus, uint cardid)
             ret = QObject::tr("R", "RecStatusChar rsRecorded");
             break;
         case rsRecording:
-            ret = QString::number(cardid);
+            ret = QString::number(id);
             break;
         case rsTuning:
             ret = QObject::tr("t", "RecStatusChar rsTuning");
             break;
         case rsWillRecord:
-            ret = QString::number(cardid);
+            ret = QString::number(id);
             break;
         case rsDontRecord:
             ret = QObject::tr("X", "RecStatusChar rsDontRecord");
@@ -216,8 +216,12 @@ QString toString(RecStatusType recstatus, RecordingType rectype)
 }
 
 /// \brief Converts "recstatus" into a long human readable description.
-QString toDescription(RecStatusType recstatus, const QDateTime &recstartts)
+QString toDescription(RecStatusType recstatus, RecordingType rectype,
+                      const QDateTime &recstartts)
 {
+    if (rectype == kNotRecording)
+        return QObject::tr("This showing is not scheduled to record");
+
     QString message;
     QDateTime now = MythDate::current();
 

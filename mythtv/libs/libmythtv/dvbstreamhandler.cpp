@@ -160,12 +160,12 @@ void DVBStreamHandler::RunTS(void)
         _error = true;
         return;
     }
-    bzero(buffer, buffer_size);
+    memset(buffer, 0, buffer_size);
 
     DeviceReadBuffer *drb = NULL;
     if (_needs_buffering)
     {
-        drb = new DeviceReadBuffer(this);
+        drb = new DeviceReadBuffer(this, true, false);
         if (!drb->Setup(_device, dvr_fd))
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to allocate DRB buffer");

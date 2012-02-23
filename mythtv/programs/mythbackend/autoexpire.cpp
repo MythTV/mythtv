@@ -134,7 +134,7 @@ AutoExpire::~AutoExpire()
  *   \return the desired free space for each file system
  */
 
-size_t AutoExpire::GetDesiredSpace(int fsID) const
+uint64_t AutoExpire::GetDesiredSpace(int fsID) const
 {
     QMutexLocker locker(&instance_lock);
     if (desired_space.contains(fsID))
@@ -163,8 +163,8 @@ void AutoExpire::CalcParams()
         return;
     }
 
-    size_t maxKBperMin = 0;
-    size_t extraKB = gCoreContext->GetNumSetting("AutoExpireExtraSpace", 0) <<
+    uint64_t maxKBperMin = 0;
+    uint64_t extraKB = gCoreContext->GetNumSetting("AutoExpireExtraSpace", 0) <<
                      20;
 
     QMap<int, uint64_t> fsMap;
@@ -189,7 +189,7 @@ void AutoExpire::CalcParams()
             continue;
 
         fsMap[fsit->getFSysID()] = 0;
-        size_t thisKBperMin = 0;
+        uint64_t thisKBperMin = 0;
 
         // append unknown recordings to all fsIDs
         vector<int>::iterator unknownfs_it = fsEncoderMap[-1].begin();
@@ -204,7 +204,6 @@ void AutoExpire::CalcParams()
                 .arg(fsit->getTotalSpace() / 1024.0 / 1024.0, 7, 'f', 1)
                 .arg(fsit->getUsedSpace() / 1024.0 / 1024.0, 7, 'f', 1)
                 .arg(fsit->getFreeSpace() / 1024.0 / 1024.0, 7, 'f', 1));
-
 
             vector<int>::iterator encit =
                 fsEncoderMap[fsit->getFSysID()].begin();
@@ -224,10 +223,10 @@ void AutoExpire::CalcParams()
                     continue;
                 }
 
-                long long maxBitrate = enc->GetMaxBitrate();
+                uint64_t maxBitrate = enc->GetMaxBitrate();
                 if (maxBitrate<=0)
                     maxBitrate = 19500000LL;
-                thisKBperMin += (((size_t)maxBitrate)*((size_t)15))>>11;
+                thisKBperMin += (((uint64_t)maxBitrate)*((uint64_t)15))>>11;
                 LOG(VB_FILE, LOG_INFO, QString("    Cardid %1: max bitrate "
                         "%2 Kb/sec, fsID %3 max is now %4 KB/min")
                         .arg(enc->GetCardID())
@@ -490,7 +489,7 @@ void AutoExpire::ExpireRecordings(void)
             continue;
         }
 
-        if ((size_t)max(0LL, fsit->getFreeSpace()) <
+        if (max((int64_t)0LL, fsit->getFreeSpace()) <
             desired_space[fsit->getFSysID()])
         {
             LOG(VB_FILE, LOG_INFO,
@@ -519,7 +518,7 @@ void AutoExpire::ExpireRecordings(void)
             QString myHostName = gCoreContext->GetHostName();
             pginfolist_t::iterator it = expireList.begin();
             while ((it != expireList.end()) &&
-                   ((size_t)max(0LL, fsit->getFreeSpace()) <
+                   (max((int64_t)0LL, fsit->getFreeSpace()) <
                     desired_space[fsit->getFSysID()]))
             {
                 ProgramInfo *p = *it;
@@ -711,7 +710,7 @@ void AutoExpire::ExpireEpisodesOverMax(void)
                     (!episodeParts.contains(episodeKey)) &&
                     (found > *maxIter))
                 {
-                    long long spaceFreed = query.value(5).toLongLong() >> 20;
+                    uint64_t spaceFreed = query.value(5).toLongLong() >> 20;
                     QString msg =
                         QString("%1Expiring %2 MBytes for %3 at %4 => %5.  "
                                 "Too many episodes, we only want to keep %6.")

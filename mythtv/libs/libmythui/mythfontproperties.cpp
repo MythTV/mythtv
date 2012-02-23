@@ -92,6 +92,15 @@ void MythFontProperties::CalcHash(void)
         m_hash += QString("%1%2%3").arg(m_outlineColor.name())
                  .arg(m_outlineSize).arg(m_outlineAlpha);
 
+    /* Note: drawingOffset is NOT used by the MythUIText class anymore.
+     * MythuiText draws the base text where theme told it to, and
+     * then expands the area (as needed) to draw the outline and/or shadow
+     * around it.
+     *
+     * drawingOffset is only maintained for use by MythUISimpleText.
+     *
+     * 2012-01-25 JPP
+     */
     m_drawingOffset = QPoint(0, 0);
 
     if (m_hasOutline)
@@ -106,7 +115,7 @@ void MythFontProperties::CalcHash(void)
         if (m_shadowOffset.y() < 0)
             m_drawingOffset.setY(-m_shadowOffset.y());
     }
-    if (m_hasShadow && !m_hasOutline)
+    if (m_hasShadow && m_hasOutline)
     {
         if (m_shadowOffset.x() < 0 && m_shadowOffset.x() < -m_outlineSize)
             m_drawingOffset.setX(-m_shadowOffset.x());
@@ -431,7 +440,7 @@ MythFontProperties *MythFontProperties::ParseFromXml(
     }
     else
     {
-        VERBOSE_XML(VB_GENERAL, LOG_DEBUG, filename, element,
+        VERBOSE_XML(VB_GUI, LOG_DEBUG, filename, element,
                     QString("loaded '%1'").arg(fi.family()));
     }
 

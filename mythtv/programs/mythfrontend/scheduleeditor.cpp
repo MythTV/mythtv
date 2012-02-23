@@ -15,6 +15,7 @@
 #include "playgroup.h"
 #include "tv_play.h"
 #include "recordingprofile.h"
+#include "cardutil.h"
 
 // Libmythui
 #include "mythmainwindow.h"
@@ -46,10 +47,11 @@
 static QString fs0(QT_TRANSLATE_NOOP("SchedFilterEditor", "New episode"));
 static QString fs1(QT_TRANSLATE_NOOP("SchedFilterEditor", "Identifiable episode"));
 static QString fs2(QT_TRANSLATE_NOOP("SchedFilterEditor", "First showing"));
-static QString fs3(QT_TRANSLATE_NOOP("SchedFilterEditor", "Primetime"));
+static QString fs3(QT_TRANSLATE_NOOP("SchedFilterEditor", "Prime time"));
 static QString fs4(QT_TRANSLATE_NOOP("SchedFilterEditor", "Commercial free"));
 static QString fs5(QT_TRANSLATE_NOOP("SchedFilterEditor", "High definition"));
-static QString fs6(QT_TRANSLATE_NOOP("SchedFilterEditor", "This Episode"));
+static QString fs6(QT_TRANSLATE_NOOP("SchedFilterEditor", "This episode"));
+static QString fs7(QT_TRANSLATE_NOOP("SchedFilterEditor", "This series"));
 
 void *ScheduleEditor::RunScheduleEditor(ProgramInfo *proginfo, void *player)
 {
@@ -247,29 +249,11 @@ void ScheduleEditor::Load()
     m_rulesList->SetValueByData(ENUM_TO_QVARIANT(type));
 
     InfoMap progMap;
+
+    m_recordingRule->ToMap(progMap);
+
     if (m_recInfo)
         m_recInfo->ToMap(progMap);
-    else
-        m_recordingRule->ToMap(progMap);
-
-    switch (m_recordingRule->m_searchType)
-    {
-        case kPowerSearch:
-            progMap["searchType"] = tr("Power Search");
-            break;
-        case kTitleSearch:
-            progMap["searchType"] = tr("Title Search");
-            break;
-        case kKeywordSearch:
-            progMap["searchType"] = tr("Keyword Search");
-            break;
-        case kPeopleSearch:
-            progMap["searchType"] = tr("People Search");
-            break;
-        default:
-            progMap["searchType"] = tr("Unknown Search");
-            break;
-    }
 
     SetTextFromMap(progMap);
 }
@@ -443,7 +427,7 @@ void ScheduleEditor::showUpcomingByTitle(void)
     if (m_recordingRule->m_searchType != kNoSearch)
         title.remove(QRegExp(" \\(.*\\)$"));
 
-    ShowUpcoming(title);
+    ShowUpcoming(title, m_recordingRule->m_seriesid);
 }
 
 void ScheduleEditor::ShowPreview(void)
@@ -560,20 +544,12 @@ void SchedOptEditor::Load()
     new MythUIButtonListItem(m_inputList, tr("Use any available input"),
                              qVariantFromValue(0));
 
-    query.prepare("SELECT cardinputid, cardid, inputname, displayname "
-                  "FROM cardinput ORDER BY cardinputid");
-
-    if (query.exec())
+    vector<uint> inputids = CardUtil::GetAllInputIDs();
+    for (uint i = 0; i < inputids.size(); ++i)
     {
-        while (query.next())
-        {
-            QString input_name = query.value(3).toString();
-            if (input_name.isEmpty())
-                input_name = QString("%1: %2").arg(query.value(1).toInt())
-                                              .arg(query.value(2).toString());
-            new MythUIButtonListItem(m_inputList, tr("Prefer input %1")
-                                        .arg(input_name), query.value(0));
-        }
+        new MythUIButtonListItem(m_inputList, tr("Prefer input %1")
+                                 .arg(CardUtil::GetDisplayName(inputids[i])),
+                                 inputids[i]);
     }
 
     m_inputList->SetValueByData(m_recordingRule->m_prefInput);
@@ -764,7 +740,7 @@ void SchedFilterEditor::Load()
             uint32_t filterid       = query.value(0).toInt();
             QString  description    = tr(query.value(1).toString()
                                          .toUtf8().constData());
-            bool     filter_default = query.value(2).toInt();
+            // bool     filter_default = query.value(2).toInt();
 
             // Fill in list of possible filters
             button = new MythUIButtonListItem(m_filtersList, description,
@@ -910,10 +886,13 @@ void StoreOptEditor::Load()
         while (query.next())
         {
             value = query.value(0).toString();
-            groups += value;
 
-            if (value == "Default")
-                foundDefault = true;
+            if (value != "Deleted")
+            {
+                groups += value;
+                if (value == "Default")
+                    foundDefault = true;
+            }
         }
     }
 
@@ -1379,16 +1358,28 @@ bool MetadataOptions::Create()
     connect(m_seasonSpin, SIGNAL(itemSelected(MythUIButtonListItem*)),
                           SLOT(ValuesChanged()));
 
-    // InetRef
-    m_inetrefEdit->SetText(m_recordingRule->m_inetref);
+    m_seasonSpin->SetRange(0,9999,1,5);
+    m_episodeSpin->SetRange(0,9999,1,10);
 
-    // Season
-    m_seasonSpin->SetRange(0,9999,1,1);
-    m_seasonSpin->SetValue(m_recordingRule->m_season);
+    // InetRef/Seas/Ep (needs to be built from original rule, not pginfo)
+    if (m_recInfo)
+    {
+        RecordingRule *rule = new RecordingRule();
+        rule->m_recordID = m_recInfo->GetRecordingRuleID();
+        rule->Load();
+        m_inetrefEdit->SetText(rule->m_inetref);
+        m_seasonSpin->SetValue(rule->m_season);
+        m_episodeSpin->SetValue(rule->m_episode);
 
-    // Episode
-    m_episodeSpin->SetRange(0,9999,1,1);
-    m_episodeSpin->SetValue(m_recordingRule->m_episode);
+        delete rule;
+        rule = NULL;
+    }
+    else
+    {
+        m_inetrefEdit->SetText(m_recordingRule->m_inetref);
+        m_seasonSpin->SetValue(m_recordingRule->m_season);
+        m_episodeSpin->SetValue(m_recordingRule->m_episode);
+    }
 
     if (m_coverart)
     {
@@ -1420,7 +1411,7 @@ void MetadataOptions::Load()
         CreateBusyDialog("Trying to automatically find this "
                      "recording online...");
 
-        m_metadataFactory->Lookup(m_recordingRule, false, false);
+        m_metadataFactory->Lookup(m_recordingRule, false, false, true);
     }
 
     InfoMap progMap;
@@ -1459,12 +1450,14 @@ void MetadataOptions::PerformQuery()
         m_lookup->SetSubtype(kProbableTelevision);
     else
         m_lookup->SetSubtype(kProbableMovie);
+    m_lookup->SetAllowGeneric(true);
     m_lookup->SetAutomatic(false);
     m_lookup->SetHandleImages(false);
     m_lookup->SetHost(gCoreContext->GetMasterHostName());
     m_lookup->SetTitle(m_recordingRule->m_title);
     m_lookup->SetSubtitle(m_recordingRule->m_subtitle);
     m_lookup->SetInetref(m_inetrefEdit->GetText());
+    m_lookup->SetCollectionref(m_inetrefEdit->GetText());
     m_lookup->SetSeason(m_seasonSpin->GetIntValue());
     m_lookup->SetEpisode(m_episodeSpin->GetIntValue());
 
@@ -1668,11 +1661,13 @@ void MetadataOptions::FindNetArt(VideoArtworkType type)
         m_lookup->SetSubtype(kProbableTelevision);
     else
         m_lookup->SetSubtype(kProbableMovie);
+    m_lookup->SetAllowGeneric(true);
     m_lookup->SetData(qVariantFromValue<VideoArtworkType>(type));
     m_lookup->SetHost(gCoreContext->GetMasterHostName());
     m_lookup->SetTitle(m_recordingRule->m_title);
     m_lookup->SetSubtitle(m_recordingRule->m_subtitle);
     m_lookup->SetInetref(m_inetrefEdit->GetText());
+    m_lookup->SetCollectionref(m_inetrefEdit->GetText());
     m_lookup->SetSeason(m_seasonSpin->GetIntValue());
     m_lookup->SetEpisode(m_episodeSpin->GetIntValue());
 

@@ -15,10 +15,14 @@ class Frontend : public FrontendServices
 
   public:
     DTC::FrontendStatus* GetStatus(void);
-    bool                 SendMessage(const QString &Message);
+    bool                 SendMessage(const QString &Message,
+                                     uint Timeout);
     bool                 SendAction(const QString &Action,
                                     const QString &Value,
                                     uint Width, uint Height);
+    virtual bool         PlayRecording(int ChanID,
+                                       const QDateTime &StartTime);
+    bool                 PlayVideo(const QString &Id, bool UseBookmark);
     QStringList          GetContextList(void);
     DTC::FrontendActionList* GetActionList(const QString &Context);
 

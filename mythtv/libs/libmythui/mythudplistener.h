@@ -3,6 +3,8 @@
 
 #include <QObject>
 
+#include "serverpool.h"
+
 class QByteArray;
 class QUdpSocket;
 class QDomElement;
@@ -18,16 +20,16 @@ class MythUDPListener : public QObject
     virtual void deleteLater(void);
 
   private slots:
-    void ReadPending(void);
+    void Process(const QByteArray &buf, QHostAddress sender,
+                 quint16 senderPort);
 
   private:
     ~MythUDPListener(void) { TeardownAll(); }
 
-    void Process(const QByteArray &buf);
     void TeardownAll(void);
 
   private:
-    QUdpSocket *m_socket;
+    ServerPool *m_socketPool;
 };
 
 #endif // MYTHUDPLISTENER_H

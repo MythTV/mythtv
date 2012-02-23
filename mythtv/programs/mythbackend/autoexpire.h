@@ -72,7 +72,7 @@ class AutoExpire : public QObject
     void CalcParams(void);
     void PrintExpireList(QString expHost = "ALL");
 
-    size_t GetDesiredSpace(int fsID) const;
+    uint64_t GetDesiredSpace(int fsID) const;
 
     void GetAllExpiring(QStringList &strList);
     void GetAllExpiring(pginfolist_t &list);
@@ -116,7 +116,7 @@ class AutoExpire : public QObject
     uint          desired_freq;      // protected by instance_lock
     bool          expire_thread_run; // protected by instance_lock
 
-    QMap<int, uint64_t> desired_space; // protected by instance_lock
+    QMap<int, int64_t>  desired_space; // protected by instance_lock
     QMap<int, int>      used_encoders; // protected by instance_lock
 
     mutable QMutex instance_lock;

@@ -4,20 +4,9 @@
 //
 // Purpose     : Global Helper Methods...
 //                                                                            
-// Copyright (c) 2007 David Blain <mythtv@theblains.net>
+// Copyright (c) 2007 David Blain <dblain@mythtv.org>
 //                                          
-// This library is free software; you can redistribute it and/or 
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or at your option any later version of the LGPL.
-//
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
-//
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library.  If not, see <http://www.gnu.org/licenses/>.
+// Licensed under the GPL v2 or later, see COPYING for details                    
 //
 //////////////////////////////////////////////////////////////////////////////
 
@@ -53,8 +42,6 @@ QString LookupUDN( QString sDeviceType )
 {
     QStringList sList = sDeviceType.split(':', QString::SkipEmptyParts);
     QString     sLoc  = "LookupUDN(" + sDeviceType + ')';
-    QString     sName;
-    QString     sUDN;
 
     if (sList.size() <= 2) 
     { 
@@ -63,16 +50,16 @@ QString LookupUDN( QString sDeviceType )
         return QString();
     }
 
-    sName = "UPnP/UDN/" + sList[ sList.size() - 2 ];
-    sUDN  = UPnp::GetConfiguration()->GetValue( sName, "" );
+    sList.removeLast();
+    QString sName = "UPnP/UDN/" + sList.last();
+    QString sUDN  = UPnp::GetConfiguration()->GetValue( sName, "" );
 
     LOG(VB_UPNP, LOG_INFO, sLoc + " sName=" + sName + ", sUDN=" + sUDN);
 
-    if ( sUDN.length() == 0) 
+    if (sUDN.isEmpty()) 
     {
         sUDN = QUuid::createUuid().toString();
-
-        sUDN = sUDN.mid( 1, sUDN.length() - 2);
+	sUDN.chop(2);
 
         Configuration *pConfig = UPnp::GetConfiguration();
 

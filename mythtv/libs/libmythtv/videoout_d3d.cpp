@@ -683,6 +683,11 @@ QStringList VideoOutputD3D::GetAllowedRenderers(
     return list;
 }
 
+MythPainter *VideoOutputD3D::GetOSDPainter(void)
+{
+    return m_osd_painter;
+}
+
 bool VideoOutputD3D::ApproveDeintFilter(const QString& filtername) const
 {
     if (codec_is_std(video_codec_id))
@@ -696,21 +701,17 @@ bool VideoOutputD3D::ApproveDeintFilter(const QString& filtername) const
 }
 
 MythCodecID VideoOutputD3D::GetBestSupportedCodec(
-    uint width,       uint height,
+    uint width,       uint height, const QString &decoder,
     uint stream_type, bool no_acceleration,
     PixelFormat &pix_fmt)
 {
 #ifdef USING_DXVA2
     QSize size(width, height);
     bool use_cpu = no_acceleration;
-    VideoDisplayProfile vdp;
-    vdp.SetInput(size);
-    QString dec = vdp.GetDecoder();
-
     MythCodecID test_cid = (MythCodecID)(kCodec_MPEG1_DXVA2 + (stream_type - 1));
     use_cpu |= !codec_is_dxva2_hw(test_cid);
     pix_fmt = PIX_FMT_DXVA2_VLD;
-    if ((dec == "dxva2") && !getenv("NO_DXVA2") && !use_cpu)
+    if ((decoder == "dxva2") && !getenv("NO_DXVA2") && !use_cpu)
         return test_cid;
 #endif
     return (MythCodecID)(kCodec_MPEG1 + (stream_type - 1));
@@ -738,8 +739,9 @@ bool VideoOutputD3D::CreateDecoder(void)
     m_decoder = new DXVA2Decoder(NUM_DXVA2_BUFS, video_codec_id,
                                  video_dim.width(), video_dim.height());
     return (m_decoder && m_decoder->Init(m_render));
-#endif
+#else
     return false;
+#endif
 }
 
 void VideoOutputD3D::DeleteDecoder(void)

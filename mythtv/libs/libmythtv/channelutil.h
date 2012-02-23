@@ -184,7 +184,17 @@ class MTV_PUBLIC ChannelUtil
 
     static DBChanList GetChannels(
         uint sourceid, bool visible_only, 
-        QString group_by = "", uint channel_groupid = 0);
+        const QString &group_by = QString(), uint channel_groupid = 0)
+    {
+        return GetChannelsInternal(sourceid, visible_only, false,
+                                   group_by, channel_groupid);
+    }
+    /// Returns channels that are not connected to a capture card
+    /// and channels that are not marked as visible.
+    static DBChanList GetAllChannels(uint sourceid)
+    {
+        return GetChannelsInternal(sourceid, false, true, QString(), 0);
+    }
     static vector<uint> GetChanIDs(int sourceid = -1);
     static uint    GetChannelCount(int sourceid = -1);
     static void    SortChannels(DBChanList &list, const QString &order,
@@ -268,6 +278,9 @@ class MTV_PUBLIC ChannelUtil
     static const QString kATSCSeparators;
 
   private:
+    static DBChanList GetChannelsInternal(
+        uint sourceid, bool visible_only, bool include_disconnected,
+        const QString &group_by, uint channel_groupid);
     static QString GetChannelStringField(int chanid, const QString &field);
     static QString GetChannelValueStr(const QString &channel_field,
                                       uint           cardid,

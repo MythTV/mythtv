@@ -18,12 +18,14 @@ HEADERS += requesthandler/basehandler.h requesthandler/outboundhandler.h
 
 HEADERS += requesthandler/fileserverhandler.h requesthandler/deletethread.h
 HEADERS += requesthandler/fileserverutil.h sockethandler/filetransfer.h
+HEADERS += requesthandler/messagehandler.h
 
 SOURCES += mythsocketmanager.cpp sockethandler.cpp
 SOURCES += requesthandler/basehandler.cpp requesthandler/outboundhandler.cpp
 
 SOURCES += requesthandler/fileserverhandler.cpp requesthandler/deletethread.cpp
 SOURCES += requesthandler/fileserverutil.cpp sockethandler/filetransfer.cpp
+SOURCES += requesthandler/messagehandler.cpp
 
 INCLUDEPATH += ../libmythbase ../libmyth ../libmythtv ../libmythui
 INCLUDEPATH += ../../external/FFmpeg ../.. ../ ./

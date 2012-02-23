@@ -41,12 +41,13 @@ class MythNews : public MythScreenType
     bool getHttpFile(const QString &sFilename, const QString &cmdURL);
     void createProgress(const QString &title);
     QString formatSize(long long bytes, int prec);
-    void playVideo(const QString &filename);
+    void playVideo(const NewsArticle &article);
 
     // menu stuff
     void ShowMenu(void);
     void deleteNewsSite(void);
     void ShowEditDialog(bool edit);
+    void ShowFeedManager();
 
     mutable QMutex m_lock;
     NewsSite::List m_NewsSites;

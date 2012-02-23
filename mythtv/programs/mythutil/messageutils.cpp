@@ -18,6 +18,7 @@
 const QString kMessage =
 "<mythmessage version=\"1\">\n"
 "  <text>%message_text%</text>\n"
+"  <timeout>%timeout%</timeout>\n"
 "</mythmessage>";
 
 static int PrintTemplate(const MythUtilCommandLineParser &cmdline)

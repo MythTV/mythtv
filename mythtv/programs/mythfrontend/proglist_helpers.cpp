@@ -110,7 +110,7 @@ void PhrasePopup::phraseSelected(MythUIButtonListItem *item)
         return;
 
     if (m_phraseList->GetCurrentPos() == 0)
-        m_phraseEdit->SetText("");
+        m_phraseEdit->Reset();
     else
         m_phraseEdit->SetText(item->GetText());
 
@@ -165,7 +165,7 @@ void PhrasePopup::deleteClicked(void)
     if (m_parent->m_viewList.count() < 1)
         SetFocusWidget(m_phraseEdit);
     else
-        SetFocusWidget(m_phraseEdit);
+        SetFocusWidget(m_phraseList);
 }
 
 void PhrasePopup::recordClicked(void)
@@ -224,83 +224,6 @@ void PhrasePopup::recordClicked(void)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-
-TimePopup::TimePopup(MythScreenStack *parentStack, ProgLister *parent)
-    : MythScreenType(parentStack, "timepopup"),
-      m_parent(parent), m_dateList(NULL), m_timeList(NULL),
-      m_okButton(NULL)
-{
-}
-
-bool TimePopup::Create()
-{
-    if (!LoadWindowFromXML("schedule-ui.xml", "timepopup", this))
-        return false;
-
-    bool err = false;
-    UIUtilE::Assign(this, m_dateList, "date_list", &err);
-    UIUtilE::Assign(this, m_timeList, "time_list", &err);
-    UIUtilE::Assign(this, m_okButton, "ok_button", &err);
-
-    if (err)
-    {
-        LOG(VB_GENERAL, LOG_ERR, "Cannot load screen 'timepopup'");
-        return false;
-    }
-
-    // date
-    for (int x = -1; x <= 14; x++)
-    {
-        QString text = MythDate::toString(m_parent->m_startTime.addDays(x),
-                                            MythDate::kDateFull | MythDate::kSimplify);
-        new MythUIButtonListItem(
-            m_dateList, text,
-            NULL, false);
-
-        if (m_parent->m_startTime.addDays(x).toLocalTime().toString("MMdd") ==
-            m_parent->m_searchTime.toLocalTime().toString("MMdd"))
-            m_dateList->SetItemCurrent(m_dateList->GetCount() - 1);
-    }
-
-    // time
-    QDateTime hr = QDateTime::currentDateTime();
-    for (int x = 0; x < 24; x++)
-    {
-        hr.setTime(QTime(x, 0, 0));
-        QString text = MythDate::toString(hr, MythDate::kTime);
-        new MythUIButtonListItem(m_timeList, text, NULL, false);
-
-        if (hr.toString("hh") == m_parent->m_searchTime.toString("hh"))
-            m_timeList->SetItemCurrent(x);
-    }
-
-    connect(m_okButton, SIGNAL(Clicked()), this, SLOT(okClicked()));
-
-    BuildFocusList();
-
-    SetFocusWidget(m_dateList);
-
-    return true;
-}
-
-void TimePopup::okClicked(void)
-{
-    QDateTime startTime = m_parent->m_startTime;
-    int dayOffset = m_dateList->GetCurrentPos() -1;
-
-    QTime hr;
-    hr.setHMS(m_timeList->GetCurrentPos(), 0, 0);
-
-    startTime = QDateTime(
-        startTime.toLocalTime().addDays(dayOffset).date(), hr,
-        Qt::LocalTime).toUTC();
-
-    emit haveResult(startTime);
-
-    Close();
-}
-
-//////////////////////////////////////////////////////////////////////////////
 
 PowerSearchPopup::PowerSearchPopup(MythScreenStack *parentStack,
                                    ProgLister *parent,
@@ -442,7 +365,7 @@ void PowerSearchPopup::deleteClicked(void)
         m_parent->m_curView = -1;
 
     if (m_parent->m_viewList.count() < 1)
-        SetFocusWidget(m_phraseList);
+        SetFocusWidget(m_phraseEdit);
     else
         SetFocusWidget(m_phraseList);
 }

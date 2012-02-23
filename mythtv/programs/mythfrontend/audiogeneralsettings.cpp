@@ -389,8 +389,7 @@ void AudioConfigSettings::AudioAdvanced()
     }
 
     AudioAdvancedSettingsGroup audiosettings(invalid ||
-                                             (settings.canLPCM() &&
-                                              settings.canPassthrough() >= 0));
+                                             (settings.canPassthrough() >= 0));
 
     if (audiosettings.exec() == kDialogCodeAccepted)
     {

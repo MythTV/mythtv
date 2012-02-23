@@ -191,8 +191,7 @@ void MetadataImageDownload::run()
                 bool onMaster = false;
                 QString resolvedFN;
                 if ((lookup->GetHost().toLower() == gCoreContext->GetHostName().toLower()) ||
-                    (lookup->GetHost() == gCoreContext->GetSettingOnHost("BackendServerIP",
-                                                             gCoreContext->GetHostName())))
+                    (gCoreContext->IsThisHost(lookup->GetHost())))
                 {
                     StorageGroup sg;
                     resolvedFN = sg.FindFile(filename);
@@ -371,6 +370,10 @@ QString getDownloadFilename(VideoArtworkType type, MetadataLookup *lookup,
         title = lookup->GetTitle();
         if (title.contains("/"))
             title.replace("/", "-");
+        if (title.contains("?"))
+            title.replace("?", "");
+        if (title.contains("*"))
+            title.replace("*", "");
         inter = QString(" Season %1").arg(QString::number(season));
         if (type == kArtworkScreenshot)
             inter += QString("x%1").arg(QString::number(episode));

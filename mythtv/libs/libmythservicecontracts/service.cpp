@@ -6,18 +6,7 @@
 //                                                                            
 // Copyright (c) 2010 David Blain <dblain@mythtv.org>
 //                                          
-// This library is free software; you can redistribute it and/or 
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or at your option any later version of the LGPL.
-//
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
-//
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library.  If not, see <http://www.gnu.org/licenses/>.
+// Licensed under the GPL v2 or later, see COPYING for details
 //
 //////////////////////////////////////////////////////////////////////////////
 
@@ -84,7 +73,13 @@ void* Service::ConvertToParameterPtr( int            nTypeId,
         case QMetaType::QString     : *(( QString        *)pParam) = sValue;                break;
         case QMetaType::QByteArray  : *(( QByteArray     *)pParam) = sValue.toUtf8      (); break;
 
-        case QMetaType::QDateTime   : *(( QDateTime      *)pParam) = QDateTime::fromString( sValue, Qt::ISODate ); break;
+        case QMetaType::QDateTime   :
+        {
+            QDateTime dt = QDateTime::fromString( sValue, Qt::ISODate );
+            dt.setTimeSpec(Qt::UTC);
+            *(( QDateTime      *)pParam) = dt.toLocalTime();
+            break;
+        }
         case QMetaType::QTime       : *(( QTime          *)pParam) = QTime::fromString    ( sValue, Qt::ISODate ); break;
         case QMetaType::QDate       : *(( QDate          *)pParam) = QDate::fromString    ( sValue, Qt::ISODate ); break;
     }

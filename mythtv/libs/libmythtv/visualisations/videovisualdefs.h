@@ -68,7 +68,7 @@ class LogScale
         }
     }
 
-    int operator[](int index)
+    int operator[](int index) const
     {
         return indices[index];
     }

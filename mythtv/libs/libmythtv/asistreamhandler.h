@@ -19,8 +19,6 @@ class ASIChannel;
 class DeviceReadBuffer;
 class ThreadedFileWriter;
 
-typedef QMap<uint,int> FilterMap;
-
 typedef enum ASIClockSource
 {
     kASIInternalClock         = 0,

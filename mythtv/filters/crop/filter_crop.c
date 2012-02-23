@@ -271,7 +271,7 @@ static VideoFilter *new_filter(VideoFrameType inpixfmt,
     if (options)
     {
         unsigned int param1, param2, param3, param4;
-        if (sscanf(options, "%u:%u:%u:%u",
+        if (sscanf(options, "%20u:%20u:%20u:%20u",
                    &param1, &param2, &param3, &param4) == 4)
         {
             filter->yp1 = param1;

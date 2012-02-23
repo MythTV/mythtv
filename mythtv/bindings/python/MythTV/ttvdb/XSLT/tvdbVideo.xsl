@@ -69,6 +69,7 @@
                     <runtime><xsl:value-of select="normalize-space(Runtime)"/></runtime>
                 </xsl:if>
                 <inetref><xsl:value-of select="normalize-space(id)"/></inetref>
+                <collectionref><xsl:value-of select="normalize-space(id)"/></collectionref>
                 <xsl:if test="./IMDB_ID/text() != '' and tvdbXpath:getValue(//requestDetails, //Data, 'IMDB') = ''">
                     <imdb><xsl:value-of select="normalize-space(substring-after(string(IMDB_ID), 'tt'))"/></imdb>
                 </xsl:if>

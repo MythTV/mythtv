@@ -18,6 +18,7 @@
 
 // qt
 #include <QDir>
+#include <QApplication>
 
 // myth
 #include <mythcontext.h>
@@ -26,6 +27,7 @@
 #include <mythdirs.h>
 #include <mythdb.h>
 #include <mythuihelper.h>
+#include <mythmainwindow.h>
 
 // mythgallery
 #include "config.h"
@@ -39,7 +41,6 @@
 #ifdef EXIF_SUPPORT
 #include <libexif/exif-data.h>
 #include <libexif/exif-entry.h>
-// include "exif.hpp"
 #endif // EXIF_SUPPORT
 
 #define LOC QString("GalleryUtil:")
@@ -122,42 +123,52 @@ bool GalleryUtil::IsMovie(const QString &filePath)
     return false;
 }
 
+long GalleryUtil::GetNaturalRotation(const unsigned char *buffer, int size)
+{
+    long rotateAngle = 0;
+
+#ifdef EXIF_SUPPORT
+    try
+    {
+        ExifData *data = exif_data_new_from_data(buffer, size);
+        if (data)
+        {
+            rotateAngle = GetNaturalRotation(data);
+            exif_data_free(data);
+        }
+        else
+        {
+            LOG(VB_FILE, LOG_ERR, LOC + "Could not load exif data from buffer");
+        }
+    }
+    catch (...)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            "Failed to extract EXIF headers from buffer");
+    }
+#else
+    // Shut the compiler up about the unused argument
+    (void)buffer;
+    (void)size;
+#endif
+
+    return rotateAngle;
+}
+
 long GalleryUtil::GetNaturalRotation(const QString &filePathString)
 {
     long rotateAngle = 0;
+
 #ifdef EXIF_SUPPORT
     QByteArray filePathBA = filePathString.toLocal8Bit();
     const char *filePath = filePathBA.constData();
 
     try
     {
-        ExifData *data = exif_data_new_from_file (filePath);
+        ExifData *data = exif_data_new_from_file(filePath);
         if (data)
         {
-            for (int i = 0; i < EXIF_IFD_COUNT; i++)
-            {
-                ExifEntry *entry = exif_content_get_entry (data->ifd[i],
-                                                        EXIF_TAG_ORIENTATION);
-                ExifByteOrder byteorder = exif_data_get_byte_order (data);
-
-                if (entry)
-                {
-                    ExifShort v_short = exif_get_short (entry->data, byteorder);
-                    LOG(VB_GENERAL, LOG_DEBUG,
-                        QString("Exif entry=%1").arg(v_short));
-
-                    /* See http://sylvana.net/jpegcrop/exif_orientation.html*/
-                    if (v_short == 8)
-                    {
-                        rotateAngle = -90;
-                    }
-                    else if (v_short == 6)
-                    {
-                        rotateAngle = 90;
-                    }
-                    break;
-                }
-            }
+            rotateAngle = GetNaturalRotation(data);
             exif_data_free(data);
         }
         else
@@ -165,44 +176,66 @@ long GalleryUtil::GetNaturalRotation(const QString &filePathString)
             LOG(VB_FILE, LOG_ERR, LOC +
                 QString("Could not load exif data from '%1'") .arg(filePath));
         }
-
-#if 0
-        Exiv2::ExifData exifData;
-        int rc = exifData.read(filePath);
-        if (!rc)
-        {
-            Exiv2::ExifKey key = Exiv2::ExifKey("Exif.Image.Orientation");
-            Exiv2::ExifData::iterator pos = exifData.findKey(key);
-            if (pos != exifData.end())
-            {
-                long orientation = pos->toLong();
-                switch (orientation)
-                {
-                    case 6:
-                        rotateAngle = 90;
-                        break;
-                    case 8:
-                        rotateAngle = -90;
-                        break;
-                    default:
-                        rotateAngle = 0;
-                        break;
-                }
-            }
-        }
-#endif
     }
     catch (...)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
-            QString("Failed to extract EXIF headers from '%1'")
-                .arg(filePathString));
+            QString("Failed to extract EXIF headers from '%1'") .arg(filePath));
     }
-
 #else
     // Shut the compiler up about the unused argument
     (void)filePathString;
+#endif
+
+    return rotateAngle;
+}
+
+long GalleryUtil::GetNaturalRotation(void *exifData)
+{
+    long rotateAngle = 0;
+
+#ifdef EXIF_SUPPORT
+    ExifData *data = (ExifData *)exifData;
+
+    if (!data)
+        return 0;
+
+    for (int i = 0; i < EXIF_IFD_COUNT; i++)
+    {
+        ExifEntry *entry = exif_content_get_entry(data->ifd[i],
+                                                  EXIF_TAG_ORIENTATION);
+        ExifByteOrder byteorder = exif_data_get_byte_order(data);
+
+        if (entry)
+        {
+            ExifShort v_short = exif_get_short(entry->data, byteorder);
+            LOG(VB_GENERAL, LOG_DEBUG,
+                QString("Exif entry=%1").arg(v_short));
+
+            /* See http://sylvana.net/jpegcrop/exif_orientation.html*/
+            switch (v_short)
+            {
+                case 3:
+                    rotateAngle = 180;
+                    break;
+                case 6:
+                    rotateAngle = 90;
+                    break;
+                case 8:
+                    rotateAngle = -90;
+                    break;
+                default:
+                    rotateAngle = 0;
+                    break;
+            }
+            break;
+        }
+    }
+#else
+    // Shut the compiler up about the unused argument
+    (void)exifData;
 #endif // EXIF_SUPPORT
+
     return rotateAngle;
 }
 
@@ -674,6 +707,43 @@ bool GalleryUtil::RenameDirectory(const QString &currDir, const QString &oldName
     return true;
 }
 
+
+void GalleryUtil::PlayVideo(const QString &filename)
+{
+    // HACK begin - remove when everything is using mythui
+    vector<QWidget *> widgetList;
+    if (GetMythMainWindow()->currentWidget())
+    {
+        QWidget *widget = GetMythMainWindow()->currentWidget();
+
+        while (widget)
+        {
+            widgetList.push_back(widget);
+            GetMythMainWindow()->detach(widget);
+            widget->hide();
+            widget = GetMythMainWindow()->currentWidget();
+        }
+
+        GetMythMainWindow()->GetPaintWindow()->raise();
+        GetMythMainWindow()->GetPaintWindow()->setFocus();
+        //GetMythMainWindow()->ShowPainterWindow();
+    }
+    // HACK end
+
+    GetMythMainWindow()->HandleMedia("Internal", filename);
+
+
+    // HACK begin - remove when everything is using mythui
+    vector<QWidget*>::reverse_iterator it;
+    for (it = widgetList.rbegin(); it != widgetList.rend(); ++it)
+    {
+        GetMythMainWindow()->attach(*it);
+        (*it)->show();
+    }
+    //GetMythMainWindow()->HidePainterWindow();
+    // HACK end
+}
+
 static QFileInfo MakeUnique(const QFileInfo &dest)
 {
     QFileInfo newDest = dest;
@@ -776,3 +846,7 @@ static bool FileDelete(const QFileInfo &file)
 
     return true;
 }
+
+/*
+ * vim:ts=4:sw=4:ai:et:si:sts=4
+ */

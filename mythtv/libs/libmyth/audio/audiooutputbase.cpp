@@ -28,18 +28,14 @@
 #define STST soundtouch::SAMPLETYPE
 #define AOALIGN(x) (((long)&x + 15) & ~0xf);
 
-#define QUALITY_DISABLED   -1
-#define QUALITY_LOW         0
-#define QUALITY_MEDIUM      1
-#define QUALITY_HIGH        2
-
 // 1,2,5 and 7 channels are currently valid for upmixing if required
 #define UPMIX_CHANNEL_MASK ((1<<1)|(1<<2)|(1<<5)|1<<7)
 #define IS_VALID_UPMIX_CHANNEL(ch) ((1 << (ch)) & UPMIX_CHANNEL_MASK)
 
-static const char *quality_string(int q)
+const char *AudioOutputBase::quality_string(int q)
 {
-    switch(q) {
+    switch(q)
+    {
         case QUALITY_DISABLED: return "disabled";
         case QUALITY_LOW:      return "low";
         case QUALITY_MEDIUM:   return "medium";
@@ -112,8 +108,8 @@ AudioOutputBase::AudioOutputBase(const AudioSettings &settings) :
 {
     src_in = (float *)AOALIGN(src_in_buf);
     memset(&src_data,          0, sizeof(SRC_DATA));
-    memset(src_in,             0, sizeof(float) * kAudioSRCInputSize);
-    memset(audiobuffer,        0, sizeof(char)  * kAudioRingBufferSize);
+    memset(src_in_buf,         0, sizeof(src_in_buf));
+    memset(audiobuffer,        0, sizeof(audiobuffer));
 
     // Handle override of SRC quality settings
     if (gCoreContext->GetNumSetting("SRCQualityOverride", false))
@@ -390,7 +386,7 @@ bool AudioOutputBase::ToggleUpmix(void)
     const AudioSettings settings(format, source_channels, codec,
                                  source_samplerate, passthru);
     Reconfigure(settings);
-    return configured_channels == max_channels;
+    return IsUpmixing();
 }
 
 /**
@@ -398,8 +394,7 @@ bool AudioOutputBase::ToggleUpmix(void)
  */
 bool AudioOutputBase::CanUpmix(void)
 {
-    return needs_upmix && IS_VALID_UPMIX_CHANNEL(source_channels) &&
-           configured_channels > 2;
+    return !passthru && source_channels <= 2 && max_channels > 2;
 }
 
 /*
@@ -627,6 +622,13 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
             .arg(samplerate/1000)
             .arg(source_channels));
 
+    if (needs_downmix && source_channels > 8)
+    {
+        Error("Aborting Audio Reconfigure. "
+              "Can't handle audio with more than 8 channels.");
+        return;
+    }
+
     VBAUDIO(QString("enc(%1), passthru(%2), features (%3) "
                     "configured_channels(%4), %5 channels supported(%6) "
                     "max_channels(%7)")
@@ -692,7 +694,7 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
             src_out = new float[kAudioSRCOutputSize];
         }
         src_data.data_out       = src_out;
-        src_data.output_frames  = kAudioSRCOutputSize;
+        src_data.output_frames  = kAudioSRCOutputSize / chans;
         src_data.end_of_input = 0;
     }
 
@@ -746,7 +748,8 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
             output_format = output_settings->BestSupportedFormat();
     }
 
-    bytes_per_frame =  processing ? 4 : output_settings->SampleSize(format);
+    bytes_per_frame =  processing ?
+        sizeof(float) : output_settings->SampleSize(format);
     bytes_per_frame *= channels;
 
     if (enc)
@@ -1205,7 +1208,7 @@ int AudioOutputBase::CopyWithUpmix(char *buffer, int frames, uint &org_waud)
         {
             AudioOutputUtil::MonoToStereo(WPOS, buffer, bdFrames);
             frames -= bdFrames;
-            off = bdFrames * bpf;
+            off = bdFrames * sizeof(float); // 1 channel of floats
             org_waud = 0;
         }
         if (frames > 0)
@@ -1217,7 +1220,7 @@ int AudioOutputBase::CopyWithUpmix(char *buffer, int frames, uint &org_waud)
 
     // Upmix to 6ch via FreeSurround
     // Calculate frame size of input
-    off =  processing ? 4 : output_settings->SampleSize(format);
+    off =  processing ? sizeof(float) : output_settings->SampleSize(format);
     off *= source_channels;
 
     int i = 0;
@@ -1693,8 +1696,8 @@ int AudioOutputBase::GetAudioData(uchar *buffer, int size, bool full_buffer,
     bool fromFloats = processing && !enc && output_format != FORMAT_FLT;
 
     // Scale if necessary
-    if (fromFloats && obytes != 4)
-        frag_size *= 4 / obytes;
+    if (fromFloats && obytes != sizeof(float))
+        frag_size *= sizeof(float) / obytes;
 
     int off = 0;
 

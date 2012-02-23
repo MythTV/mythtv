@@ -28,6 +28,10 @@
 #include "serviceHosts/videoServiceHost.h"
 #include "serviceHosts/captureServiceHost.h"
 
+#ifdef USING_LIBDNS_SD
+#include "bonjourregister.h"
+#endif
+
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -74,7 +78,7 @@ void MediaServer::Init(bool bIsMaster, bool bDisableUPnp /* = false */)
     if (!m_pHttpServer->isListening())
     {
         m_pHttpServer->setProxy(QNetworkProxy::NoProxy);
-        if (!m_pHttpServer->listen(gCoreContext->MythHostAddressAny(), nPort))
+        if (!m_pHttpServer->listen(gCoreContext->MythHostAddress(), nPort))
         {
             LOG(VB_GENERAL, LOG_ERR, "MediaServer::HttpServer Create Error");
             delete m_pHttpServer;
@@ -244,6 +248,20 @@ void MediaServer::Init(bool bIsMaster, bool bDisableUPnp /* = false */)
 
         Start();
 
+#ifdef USING_LIBDNS_SD
+        // advertise using Bonjour
+        m_bonjour = new BonjourRegister();
+        if (m_bonjour)
+        {
+            QByteArray dummy;
+            QByteArray name("Mythbackend on ");
+            name.append(gCoreContext->GetHostName());
+            m_bonjour->Register(nPort,
+                                bIsMaster ? "_mythbackend-master._tcp" :
+                                            "_mythbackend-slave._tcp",
+                                name, dummy);
+        }
+#endif
     }
 
     LOG(VB_UPNP, LOG_INFO, "MediaServer:Init:End");
@@ -262,6 +280,10 @@ MediaServer::~MediaServer()
 #endif
 
     delete m_pHttpServer;
+
+#ifdef USING_LIBDNS_SD
+    delete m_bonjour;
+#endif
 }
 
 //////////////////////////////////////////////////////////////////////////////

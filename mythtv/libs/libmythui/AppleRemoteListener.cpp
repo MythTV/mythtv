@@ -3,6 +3,7 @@
 
 #include <QCoreApplication>
 #include <QKeySequence>
+#include <QString>
 #include "lircevent.h"
 
 AppleRemoteListener::AppleRemoteListener(QObject* mainWindow_)
@@ -13,7 +14,7 @@ AppleRemoteListener::AppleRemoteListener(QObject* mainWindow_)
 void AppleRemoteListener::appleRemoteButton(AppleRemote::Event button,
                                             bool pressedDown)
 {
-    char* code = 0;
+    QString code = 0;
     bool separateRelease = false;
 
     switch (button)

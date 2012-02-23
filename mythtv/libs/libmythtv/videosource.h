@@ -290,43 +290,6 @@ private:
     const CaptureCard& m_parent;
 };
 
-class TunerCardInput : public ComboBoxSetting, public CaptureCardDBStorage
-{
-    Q_OBJECT
-  public:
-    TunerCardInput(const CaptureCard &parent,
-                   QString dev  = QString::null,
-                   QString type = QString::null);
-
-  public slots:
-    void fillSelections(const QString &device);
-
-  private:
-    QString last_device;
-    QString last_cardtype;
-    int     last_diseqct;
-};
-
-class SingleCardInput : public TunerCardInput
-{
-    Q_OBJECT
-
-  public:
-    SingleCardInput(const CaptureCard &parent) : TunerCardInput(parent)
-    {
-        setLabel(QObject::tr("Default input"));
-        addSelection("MPEG2TS");
-        setVisible(false);
-    }
-
-  public slots:
-    void fillSelections(const QString&)
-    {
-        clearSelections();
-        addSelection("MPEG2TS");
-    }
-};
-
 class TunerCardAudioInput : public ComboBoxSetting, public CaptureCardDBStorage
 {
     Q_OBJECT
@@ -479,7 +442,6 @@ class V4LConfigurationGroup : public VerticalConfigurationGroup
     CaptureCard       &parent;
     TransLabelSetting *cardinfo;
     VBIDevice         *vbidev;
-    TunerCardInput    *input;
 };
 
 class VideoDevice;
@@ -500,7 +462,6 @@ class MPEGConfigurationGroup: public VerticalConfigurationGroup
     VideoDevice       *device;
     VBIDevice         *vbidevice;
     TransLabelSetting *cardinfo;
-    TunerCardInput    *input;
 };
 
 class HDPVRConfigurationGroup: public VerticalConfigurationGroup
@@ -516,11 +477,9 @@ class HDPVRConfigurationGroup: public VerticalConfigurationGroup
   private:
     CaptureCard         &parent;
     TransLabelSetting   *cardinfo;
-    TunerCardInput      *videoinput;
     TunerCardAudioInput *audioinput;
 };
 
-class TunerCardInput;
 class InstanceCount;
 class ASIDevice;
 
@@ -538,11 +497,9 @@ class ASIConfigurationGroup: public VerticalConfigurationGroup
     CaptureCard       &parent;
     ASIDevice         *device;
     TransLabelSetting *cardinfo;
-    TunerCardInput    *input;
     InstanceCount     *instances;
 };
 
-class TunerCardInput;
 class InstanceCount;
 
 class ImportConfigurationGroup: public VerticalConfigurationGroup
@@ -578,7 +535,6 @@ class DemoConfigurationGroup: public VerticalConfigurationGroup
 };
 
 class DVBCardNum;
-class DVBInput;
 class DVBCardName;
 class DVBCardType;
 class DVBTuningDelay;
@@ -605,7 +561,6 @@ class DVBConfigurationGroup : public VerticalConfigurationGroup
     CaptureCard                  &parent;
 
     DVBCardNum                   *cardnum;
-    DVBInput                     *defaultinput;
     DVBCardName                  *cardname;
     DVBCardType                  *cardtype;
     SignalTimeout                *signal_timeout;

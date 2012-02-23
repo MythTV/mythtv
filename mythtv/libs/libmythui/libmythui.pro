@@ -31,6 +31,7 @@ HEADERS += mythvirtualkeyboard.h mythuishape.h mythuiguidegrid.h
 HEADERS += mythrender_base.h mythfontmanager.h mythuieditbar.h
 HEADERS += mythdisplay.h mythuivideo.h mythudplistener.h
 HEADERS += mythuiexp.h mythuisimpletext.h mythuistatetracker.h
+HEADERS += mythuianimation.h mythuiscrollbar.h
 
 SOURCES  = mythmainwindow.cpp mythpainter.cpp mythimage.cpp mythrect.cpp
 SOURCES += myththemebase.cpp  mythpainter_qimage.cpp mythpainter_yuva.cpp
@@ -49,7 +50,7 @@ SOURCES += mythvirtualkeyboard.cpp mythuishape.cpp mythuiguidegrid.cpp
 SOURCES += mythfontmanager.cpp mythuieditbar.cpp
 SOURCES += mythdisplay.cpp mythuivideo.cpp mythudplistener.cpp
 SOURCES += mythuisimpletext.cpp mythuistatetracker.cpp
-
+SOURCES += mythuianimation.cpp mythuiscrollbar.cpp
 
 inc.path = $${PREFIX}/include/mythtv/libmythui/
 
@@ -66,7 +67,7 @@ inc.files += x11colors.h mythgenerictree.h mythuibuttontree.h
 inc.files += mythvirtualkeyboard.h mythuishape.h mythuiguidegrid.h
 inc.files += mythuieditbar.h mythuifilebrowser.h mythuivideo.h
 inc.files += mythuiexp.h mythuisimpletext.h mythuiactions.h
-inc.files += mythuistatetracker.h
+inc.files += mythuistatetracker.h mythuianimation.h mythuiscrollbar.h
 
 INSTALLS += inc
 
@@ -86,6 +87,11 @@ using_x11 {
     DEFINES += USING_X11
     HEADERS += screensaver-x11.h
     SOURCES += screensaver-x11.cpp
+    # Add nvidia XV-EXTENSION support
+    HEADERS += util-nvctrl.h
+    SOURCES += util-nvctrl.cpp
+    LIBS += -L../libmythnvctrl -lmythnvctrl-$${LIBVERSION}
+    POST_TARGETDEPS += ../libmythnvctrl/libmythnvctrl-$${MYTH_LIB_EXT}
 }
 
 macx {
@@ -128,10 +134,6 @@ using_xrandr {
     DEFINES += USING_XRANDR
     HEADERS += DisplayResX.h
     SOURCES += DisplayResX.cpp
-    # Add nvidia XV-EXTENSION support
-    SOURCES += util-nvctrl.cpp
-    LIBS += -L../libmythnvctrl -lmythnvctrl-$${LIBVERSION}
-    POST_TARGETDEPS += ../libmythnvctrl/libmythnvctrl-$${MYTH_LIB_EXT}
 }
 
 cygwin:DEFINES += _WIN32

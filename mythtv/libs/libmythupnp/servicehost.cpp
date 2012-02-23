@@ -6,18 +6,7 @@
 //                                                                            
 // Copyright (c) 2010 David Blain <dblain@mythtv.org>
 //                                          
-// This library is free software; you can redistribute it and/or 
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or at your option any later version of the LGPL.
-//
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
-//
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library.  If not, see <http://www.gnu.org/licenses/>.
+// Licensed under the GPL v2 or later, see COPYING for details                    
 //
 //////////////////////////////////////////////////////////////////////////////
 
@@ -137,7 +126,7 @@ QVariant MethodInfo::Invoke( Service *pService, const QStringMap &reqParams )
                 QMetaType::destroy( types[ nIdx ], param[ nIdx ] );
         }
     }
-    catch(QString sMsg)
+    catch (QString &sMsg)
     {
         LOG(VB_GENERAL, LOG_ERR,
             QString("MethodInfo::Invoke - An Exception Occurred: %1")
@@ -146,14 +135,14 @@ QVariant MethodInfo::Invoke( Service *pService, const QStringMap &reqParams )
         if  ((types[ 0 ] != 0) && (param[ 0 ] != NULL ))
             QMetaType::destroy( types[ 0 ], param[ 0 ] );
 
-        throw sMsg;
+        throw;
     }
-    catch(HttpRedirectException ex)
+    catch (HttpRedirectException &ex)
     {
         bExceptionThrown = true;
         exception = ex;
     }
-    catch(...)
+    catch (...)
     {
         LOG(VB_GENERAL, LOG_INFO,
             "MethodInfo::Invoke - An Exception Occurred" );
@@ -376,12 +365,12 @@ bool ServiceHost::ProcessRequest( HTTPRequest *pRequest )
                 UPnp::FormatErrorResponse( pRequest, UPnPResult_InvalidAction );
         }
     }
-    catch( HttpRedirectException ex )
+    catch (HttpRedirectException &ex)
     {
         UPnp::FormatRedirectResponse( pRequest, ex.hostName );
         bHandled = true;
     }
-    catch( HttpException ex )
+    catch (HttpException &ex)
     {
         LOG(VB_GENERAL, LOG_ERR, ex.msg);
         UPnp::FormatErrorResponse( pRequest, UPnPResult_ActionFailed, ex.msg );
@@ -389,14 +378,14 @@ bool ServiceHost::ProcessRequest( HTTPRequest *pRequest )
         bHandled = true;
 
     }
-    catch( QString sMsg )
+    catch (QString &sMsg)
     {
         LOG(VB_GENERAL, LOG_ERR, sMsg);
         UPnp::FormatErrorResponse( pRequest, UPnPResult_ActionFailed, sMsg );
 
         bHandled = true;
     }
-    catch( ... )
+    catch ( ...)
     {
         QString sMsg( "ServiceHost::ProcessRequest - Unexpected Exception" );
 

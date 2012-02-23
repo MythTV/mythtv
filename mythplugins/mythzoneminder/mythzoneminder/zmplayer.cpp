@@ -149,10 +149,10 @@ void ZMPlayer::getEventInfo()
         m_frameImage->SetFilename(QString("mz_black.png"));
         m_frameImage->Load();
 
-        m_eventText->SetText("");
-        m_cameraText->SetText("");
-        m_frameText->SetText("");
-        m_dateText->SetText("");
+        m_eventText->Reset();
+        m_cameraText->Reset();
+        m_frameText->Reset();
+        m_dateText->Reset();
 
         return;
     }

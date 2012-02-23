@@ -935,7 +935,7 @@ OSStatus VoqvFloater_Callback(EventHandlerCallRef inHandlerCallRef,
                               void *inUserData)
 {
     (void)inHandlerCallRef;
-    VoqvFloater *floater = (VoqvFloater *)inUserData;
+    VoqvFloater *floater = reinterpret_cast<VoqvFloater*>(inUserData);
     WindowRef window;
     Point mouseLoc;
     Rect winLoc;
@@ -1205,7 +1205,7 @@ bool VideoOutputQuartz::InputChanged(const QSize &input_size,
         return true;
     }
 
-    const QSize video_dim = window.GetVideoDim();
+    const QSize video_dim = window.GetVideoDispDim();
 
     DeleteQuartzBuffers();
 

@@ -1,6 +1,8 @@
 #include <QCoreApplication>
 #include <QUdpSocket>
 #include <QDomDocument>
+#include <QList>
+#include <QHostAddress>
 
 #include "mythcorecontext.h"
 #include "mythlogging.h"
@@ -11,19 +13,22 @@
 
 MythUDPListener::MythUDPListener()
 {
-    uint udp_port = gCoreContext->GetNumSetting("UDPNotifyPort", 0);
-    m_socket = new QUdpSocket(this);
-    connect(m_socket, SIGNAL(readyRead()),
-            this,     SLOT(ReadPending()));
-    if (m_socket->bind(gCoreContext->MythHostAddressAny(), udp_port))
+    m_socketPool = new ServerPool(this);
+    connect(m_socketPool, SIGNAL(newDatagram(QByteArray, QHostAddress,
+                                                quint16)),
+            this,         SLOT(Process(const QByteArray, QHostAddress,
+                                       quint16)));
+
+    QList<QHostAddress> addrs = gCoreContext->MythHostAddress();
+    addrs << QHostAddress::Broadcast;
+    // TODO: Poll local subnet broadcast address from
+    // QNetworkInterface::addressEntries
+
+    if (!m_socketPool->bind(addrs,
+            gCoreContext->GetNumSetting("UDPNotifyPort", 0), false))
     {
-        LOG(VB_GENERAL, LOG_INFO, LOC + 
-            QString("bound to port %1").arg(udp_port));
-    }
-    else
-    {
-        LOG(VB_GENERAL, LOG_INFO, LOC +
-            QString("failed to bind to port %1").arg(udp_port));
+        delete m_socketPool;
+        m_socketPool = NULL;
     }
 }
 
@@ -36,34 +41,18 @@ void MythUDPListener::deleteLater(void)
 
 void MythUDPListener::TeardownAll(void)
 {
-    if (!m_socket)
+    if (!m_socketPool)
         return;
 
     LOG(VB_GENERAL, LOG_INFO, LOC + "Disconnecting");
 
-    m_socket->disconnect();
-    m_socket->close();
-    m_socket->deleteLater();
-    m_socket = NULL;
+    m_socketPool->close();
+    delete m_socketPool;
+    m_socketPool = NULL;
 }
 
-void MythUDPListener::ReadPending(void)
-{
-    QByteArray buf;
-    while (m_socket->hasPendingDatagrams())
-    {
-        buf.resize(m_socket->pendingDatagramSize());
-        QHostAddress sender;
-        quint16 senderPort;
-
-        m_socket->readDatagram(buf.data(), buf.size(),
-                               &sender, &senderPort);
-
-        Process(buf);
-    }
-}
-
-void MythUDPListener::Process(const QByteArray &buf)
+void MythUDPListener::Process(const QByteArray &buf, QHostAddress sender,
+                              quint16 senderPort)
 {
     QString errorMsg;
     int errorLine = 0;
@@ -97,6 +86,9 @@ void MythUDPListener::Process(const QByteArray &buf)
         }
     }
 
+    QString msg  = QString("");
+    uint timeout = 0;
+
     QDomNode n = docElem.firstChild();
     while (!n.isNull())
     {
@@ -104,13 +96,9 @@ void MythUDPListener::Process(const QByteArray &buf)
         if (!e.isNull())
         {
             if (e.tagName() == "text")
-            {
-                QString msg = e.text();
-                LOG(VB_GENERAL, LOG_INFO, msg);
-                MythMainWindow *window = GetMythMainWindow();
-                MythEvent* me = new MythEvent(MythEvent::MythUserMessage, msg);
-                qApp->postEvent(window, me);
-            }
+                msg = e.text();
+            else if (e.tagName() == "timeout")
+                timeout = e.text().toUInt();
             else
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC + QString("Unknown element: %1")
@@ -119,5 +107,18 @@ void MythUDPListener::Process(const QByteArray &buf)
             }
         }
         n = n.nextSibling();
+    }
+
+    if (!msg.isEmpty())
+    {
+        if (timeout < 0 || timeout > 1000)
+            timeout = 0;
+        LOG(VB_GENERAL, LOG_INFO, QString("Received message '%1', timeout %2")
+            .arg(msg).arg(timeout));
+        QStringList args;
+        args << QString::number(timeout);
+        MythMainWindow *window = GetMythMainWindow();
+        MythEvent* me = new MythEvent(MythEvent::MythUserMessage, msg, args);
+        qApp->postEvent(window, me);
     }
 }

@@ -22,6 +22,7 @@ using namespace std;
 #include "mythversion.h"
 #include "mythlogging.h"
 #include "mthread.h"
+#include "serverpool.h"
 
 #define LOC      QString("MythSocketManager: ")
 
@@ -45,6 +46,16 @@ class ProcessRequestRunnable : public QRunnable
     MythSocketManager &m_parent;
     MythSocket        *m_sock;
 };
+
+MythServer::MythServer(QObject *parent) : ServerPool(parent)
+{
+}
+
+void MythServer::newTcpConnection(int socket)
+{
+    MythSocket *s = new MythSocket(socket);
+    emit newConnection(s);
+}
 
 MythSocketManager::MythSocketManager() :
     m_server(NULL), m_threadPool("MythSocketManager")
@@ -73,16 +84,16 @@ bool MythSocketManager::Listen(int port)
         m_server = NULL;
     }
 
-    m_server = new MythServer();
+    m_server = new MythServer(this);
     m_server->setProxy(QNetworkProxy::NoProxy);
-    if (!m_server->listen(gCoreContext->MythHostAddressAny(), port))
+    if (!m_server->listen(gCoreContext->MythHostAddress(), port))
     {
         LOG(VB_GENERAL, LOG_ERR, QString("Failed to bind port %1.").arg(port));
         return false;
     }
 
-    connect(m_server, SIGNAL(newConnect(MythSocket *)),
-            SLOT(newConnection(MythSocket *)));
+    connect(m_server, SIGNAL(newConnection(MythSocket *)),
+            this,     SLOT(newConnection(MythSocket *)));
     return true;
 }
 
@@ -307,6 +318,11 @@ void MythSocketManager::ProcessRequestWork(MythSocket *sock)
 
     if (!handled)
     {
+        if (command == "BACKEND_MESSAGE")
+            // never respond to these... ever, even if they are not otherwise
+            // handled by something in m_handlerMap
+            return;
+
         listline.clear();
         listline << "ERROR" << "unknown command";
         sock->writeStringList(listline);
@@ -361,8 +377,3 @@ void MythSocketManager::HandleDone(MythSocket *sock)
     sock->close();
 }
 
-void MythServer::incomingConnection(int socket)
-{
-    MythSocket *s = new MythSocket(socket);
-    emit newConnect(s);
-}

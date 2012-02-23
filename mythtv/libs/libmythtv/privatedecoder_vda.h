@@ -19,7 +19,7 @@ class VDALibrary
   public:
     static VDALibrary* GetVDALibrary(void);
     VDALibrary();
-    bool IsValid(void) { return m_valid; }
+    bool IsValid(void) const { return m_valid; }
 
     MYTH_VDADECODERCREATE  decoderCreate;
     MYTH_VDADECODERDECODE  decoderDecode;
@@ -58,7 +58,7 @@ class PrivateDecoderVDA : public PrivateDecoder
     virtual ~PrivateDecoderVDA();
     virtual QString GetName(void) { return "vda"; }
     virtual bool Init(const QString &decoder,
-                      bool no_hardware_decode,
+                      PlayerFlags flags,
                       AVCodecContext *avctx);
     virtual bool Reset(void);
     virtual int  GetFrame(AVStream *stream,

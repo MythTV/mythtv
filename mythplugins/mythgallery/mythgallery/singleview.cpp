@@ -176,52 +176,36 @@ SingleView::~SingleView()
 
 void SingleView::paintEvent(QPaintEvent *)
 {
-    if (m_movieState > 0)
+    if (1 == m_movieState)
     {
-        if (m_movieState == 1)
+        m_movieState = 2;
+
+        ThumbItem *item = m_itemList.at(m_pos);
+
+        if (item)
+            GalleryUtil::PlayVideo(item->GetPath());
+
+        if (!m_slideshow_running && item)
         {
-            m_movieState = 2;
-            ThumbItem *item = m_itemList.at(m_pos);
-            QString cmd = gCoreContext->GetSetting("GalleryMoviePlayerCmd");
+            QImage image;
+            GetScreenShot(image, item);
+            if (image.isNull())
+                return;
 
-            if ((cmd.indexOf("internal", 0, Qt::CaseInsensitive) > -1) ||
-                (cmd.length() < 1))
-            {
-                cmd = "Internal";
-                GetMythMainWindow()->HandleMedia(cmd, item->GetPath());
-            }
-            else
-            {
-                QString path = QString("\"%1\"").arg(item->GetPath());
+            image = image.scaled(800, 600);
 
-                cmd.replace("%s", path);
-                myth_system(cmd);
-            }
+            // overlay "Press SELECT to play again" text
+            QPainter p(&image);
+            QRect rect = QRect(20, image.height() - 100,
+                               image.width() - 40, 80);
+            p.fillRect(rect, QBrush(QColor(0,0,0,100)));
+            p.setFont(QFont("Arial", 25, QFont::Bold));
+            p.setPen(QColor(255,255,255));
+            p.drawText(rect, Qt::AlignCenter, tr("Press SELECT to play again"));
+            p.end();
 
-            if (!m_slideshow_running)
-            {
-                if (item)
-                {
-                    QImage image;
-                    GetScreenShot(image, item);
-                    if (image.isNull())
-                        return;
-
-                    image = image.scaled(800, 600);
-
-                    // overlay "Press SELECT to play again" text
-                    QPainter p(&image);
-                    QRect rect = QRect(20, image.height() - 100, image.width() - 40, 80);
-                    p.fillRect(rect, QBrush(QColor(0,0,0,100)));
-                    p.setFont(QFont("Arial", 25, QFont::Bold));
-                    p.setPen(QColor(255,255,255));
-                    p.drawText(rect, Qt::AlignCenter, tr("Press SELECT to play again"));
-                    p.end();
-
-                    m_image = image;
-                    SetZoom(1.0);
-                }
-            }
+            m_image = image;
+            SetZoom(1.0);
         }
     }
 

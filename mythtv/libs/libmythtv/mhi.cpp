@@ -156,15 +156,16 @@ void MHIContext::StopEngine(void)
 
 
 // Start or restart the MHEG engine.
-void MHIContext::Restart(uint chanid, uint sourceid, bool isLive)
+void MHIContext::Restart(int chanid, int sourceid, bool isLive)
 {
     int tuneinfo = m_tuneinfo.isEmpty() ? 0 : m_tuneinfo.takeFirst();
 
-    LOG(VB_MHEG, LOG_INFO, QString("[mhi] Restart ch=%1 source=%2 live=%3 tuneinfo=0x%4")
-        .arg((int)chanid).arg((int)sourceid).arg(isLive).arg(tuneinfo,0,16));
+    LOG(VB_MHEG, LOG_INFO,
+        QString("[mhi] Restart ch=%1 source=%2 live=%3 tuneinfo=0x%4")
+        .arg(chanid).arg(sourceid).arg(isLive).arg(tuneinfo,0,16));
 
     m_currentSource = sourceid;
-    m_currentStream = (chanid) ? (int)chanid : -1;
+    m_currentStream = chanid ? chanid : -1;
     if (!(tuneinfo & kTuneKeepChnl))
         m_currentChannel = m_currentStream;
 

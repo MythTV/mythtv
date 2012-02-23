@@ -119,9 +119,6 @@ static void WeatherCallback(void *data, QString &selection)
             mainStack->AddScreen(srcsetup);
         else
             delete srcsetup;
-//             MythPopupBox::showOkPopup(GetMythMainWindow(), "no sources",
-//                     QObject::tr("No Sources defined, Sources are defined by"
-//                                 " adding screens in Screen Setup."));
     }
 }
 

@@ -99,7 +99,7 @@ typedef enum SkipTypes {
      * are just too many false positives from non-commercial cut scenes. */
     COMM_DETECT_2_ALL       = (COMM_DETECT_2_LOGO | COMM_DETECT_2_BLANK),
 
-    COMM_DETECT_PREPOSTROLL = 0x00000200,    
+    COMM_DETECT_PREPOSTROLL = 0x00000200,
     COMM_DETECT_PREPOSTROLL_ALL = (COMM_DETECT_PREPOSTROLL
                                    | COMM_DETECT_BLANKS
                                    | COMM_DETECT_SCENE)
@@ -144,7 +144,7 @@ typedef enum FlagMask {
 } ProgramFlag;
 
 typedef enum ProgramInfoType {
-    kProgramInfoTypeRecording = 0,    
+    kProgramInfoTypeRecording = 0,
     kProgramInfoTypeVideoFile,
     kProgramInfoTypeVideoDVD,
     kProgramInfoTypeVideoStreamingHTML,
@@ -163,6 +163,9 @@ typedef enum AudioProps {
     AUD_HARDHEAR      = 0x10,
     AUD_VISUALIMPAIR  = 0x20,
 } AudioProperty; // has 6 bits in ProgramInfo::properties
+#define kAudioPropertyBits 6
+#define kAudioPropertyOffset 0
+#define kAudioPropertyMask (0x3f<<kAudioPropertyOffset)
 
 /// if VideoProps changes, the audioprop column in program and
 /// recordedprogram has to changed accordingly
@@ -174,7 +177,11 @@ typedef enum VideoProps {
     VID_AVC           = 0x04,
     VID_720           = 0x08,
     VID_1080          = 0x10,
-} VideoProperty; // has 5 bits in ProgramInfo::properties
+    VID_DAMAGED       = 0x20,
+} VideoProperty; // has 6 bits in ProgramInfo::properties
+#define kVideoPropertyBits 6
+#define kVideoPropertyOffset kAudioPropertyBits
+#define kVideoPropertyMask (0x3f<<kVideoPropertyOffset)
 
 /// if SubtitleTypes changes, the audioprop column in program and
 /// recordedprogram has to changed accordingly
@@ -186,6 +193,9 @@ typedef enum SubtitleTypes {
     SUB_ONSCREEN      = 0x04,
     SUB_SIGNED        = 0x08
 } SubtitleType; // has 4 bits in ProgramInfo::properties
+#define kSubtitlePropertyBits 4
+#define kSubtitlePropertyOffset (kAudioPropertyBits+kVideoPropertyBits)
+#define kSubtitlePropertyMask (0x0f<<kSubtitlePropertyOffset)
 
 typedef enum RecStatusTypes {
     rsMissedFuture = -11,
@@ -215,9 +225,10 @@ typedef enum RecStatusTypes {
     rsOtherShowing = 13
 } RecStatusType; // note stored in int8_t in ProgramInfo
 MPUBLIC QString toUIState(RecStatusType);
-MPUBLIC QString toString(RecStatusType, uint cardid);
+MPUBLIC QString toString(RecStatusType, uint id);
 MPUBLIC QString toString(RecStatusType, RecordingType);
-MPUBLIC QString toDescription(RecStatusType, const QDateTime &recstartts);
+MPUBLIC QString toDescription(RecStatusType, RecordingType,
+                              const QDateTime &recstartts);
 
 typedef enum AvailableStatusTypes {
     asAvailable = 0,

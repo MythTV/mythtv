@@ -50,7 +50,7 @@ class MHIContext : public MHContext, public QRunnable
     // A NetworkBootInfo sub-descriptor is present in the PMT.
     void SetNetBootInfo(const unsigned char *data, uint length);
     /// Restart the MHEG engine.
-    void Restart(uint chanid, uint sourceid, bool isLive);
+    void Restart(int chanid, int sourceid, bool isLive);
     // Offer a key press.  Returns true if it accepts it.
     // This will depend on the current profile.
     bool OfferKey(QString key);

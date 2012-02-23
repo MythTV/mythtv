@@ -62,6 +62,7 @@ QString dvb_decode_short_name(const unsigned char *src, uint raw_length);
    byteBCDH2int(k) * 1000       + byteBCDL2int(k) * 100     + \
    byteBCDH2int(l) * 10         + byteBCDL2int(l))
 
+// DVB Bluebook A038 (Sept 2011) p 77
 class NetworkNameDescriptor : public MPEGDescriptor
 {
   public:
@@ -79,98 +80,165 @@ class NetworkNameDescriptor : public MPEGDescriptor
         { return QString("NetworkNameDescriptor: ")+Name(); }
 };
 
+// DVB Bluebook A038 (Sept 2011) p 63
 class LinkageDescriptor : public MPEGDescriptor
 {
   public:
-    enum
-    {
-        lt_InformationService          = 0x01,
-        lt_EPGService                  = 0x02,
-        lt_CAReplacementService        = 0x03,
-        lt_TSContainingCompleteNetworkBouquetSI = 0x04,
-        lt_ServiceReplacementService   = 0x05,
-        lt_DataBroadcastService        = 0x06,
-        lt_RCSMap                      = 0x07,
-        lt_MobileHandOver              = 0x08,
-        lt_SystemSoftwareUpdateService = 0x09,
-        lt_TSContaining_SSU_BAT_NIT    = 0x0A,
-        lt_IP_MACNotificationService   = 0x0B,
-        lt_TSContaining_INT_BAT_NIT    = 0x0C,
-    };
-
     LinkageDescriptor(const unsigned char *data, int len = 300) :
-        MPEGDescriptor(data, len, DescriptorID::linkage) { }
+        MPEGDescriptor(data, len, DescriptorID::linkage)
+    {
+        if (!_data)
+            return;
+        if (DescriptorLength() < 7)
+        {
+            _data = NULL;
+        }
+        else if (kMobileHandOver == LinkageType())
+        {
+            uint end = 8;
+            if (DescriptorLength() < end)
+            {
+                _data = NULL;
+                return;
+            }
+            end += (HasMobileNetworkID()) ? 2 : 0;
+            end += (HasMobileInitialServiceID()) ? 2 : 0;
+            if (DescriptorLength() < end)
+                _data = NULL;
+            m_offset = end + 2;
+        }
+        else if (kEventLinkage == LinkageType())
+        {
+            if (DescriptorLength() < 10)
+                _data = NULL;
+            m_offset = 12;
+        }
+    }
     //       Name             bits  loc  expected value
     // descriptor_tag           8   0.0       0x4A
     // descriptor_length        8   1.0
-    // transport_stream_id 16 uimsbf
+    // transport_stream_id     16   2.0
     uint TSID(void)            const { return (_data[2]<<8) | _data[3]; }
-    // original_network_id 16 uimsbf
+    // original_network_id     16   4.0
     uint OriginalNetworkID()   const { return (_data[4]<<8) | _data[5]; }
-    // service_id 16 uimsbf
+    // service_id              16   6.0
     uint ServiceID(void)       const { return (_data[6]<<8) | _data[7]; }
-    // linkage_type 8 uimsbf
+    // linkage_type             8   8.0
+    enum
+    {
+        kInformationService          = 0x01,
+        kEPGService                  = 0x02,
+        kCAReplacementService        = 0x03,
+        kTSContainingCompleteNetworkBouquetSI = 0x04,
+        kServiceReplacementService   = 0x05,
+        kDataBroadcastService        = 0x06,
+        kRCSMap                      = 0x07,
+        kMobileHandOver              = 0x08,
+        kSystemSoftwareUpdateService = 0x09,
+        kTSContaining_SSU_BAT_NIT    = 0x0A,
+        kIP_MACNotificationService   = 0x0B,
+        kTSContaining_INT_BAT_NIT    = 0x0C,
+        kEventLinkage                = 0x0D,
+    };
     uint LinkageType(void)     const { return _data[8]; }
+    QString LinkageTypeString(void) const;
 
-    // if (linkage_type != 0x08)
-    //    { for (i=0;i<N;i++) { private_data_byte 8 bslbf } }
-    uint PrivateDataLength_N8()   const { return DescriptorLength() - 7; }
-    const unsigned char* PrivateData_N8(void) const { return _data+9; }
     // if (linkage_type == 0x08)
-    //   {
-    //      hand-over_type 4 bslbf
-    uint HandOverType(void)    const { return _data[10]>>4; }
-    //      reserved_future_use 3 bslbf
-    //      origin_type 1 bslbf
-    bool OriginType(void)      const { return _data[10]&0x1; }
-    //      if (hand-over_type == 0x01 || hand-over_type == 0x02 ||
-    //          hand-over_type == 0x03)
-    //        { network_id 16 uimsbf }
-    bool HasNetworkID(void)    const { return bool(HandOverType() & 0x3); }
-    uint NetworkID(void)       const { return (_data[11]<<8) | _data[12]; }
-    //      if (origin_type ==0x00)
-    //        { initial_service_id 16 uimsbf }
-    bool HasInitialServiceID(void) const { return !OriginType(); }
-    uint InitialServiceID(void)const
-        { return HasNetworkID() ? (_data[13]<<8) | _data[14] : NetworkID(); }
-
+    // {
+    //    hand-over_type        4   9.0
+    enum
+    {
+        kHandOverIdentical         = 0x01,
+        kHandOverLocalVariation    = 0x02,
+        kHandOverAssociatedService = 0x03,
+    };
+    uint MobileHandOverType(void) const { return _data[9]>>4; }
+    QString MobileHandOverTypeString(void) const;
+    //    reserved_future_use   3   9.4
+    //    origin_type           1   9.7
+    enum
+    {
+        kOriginNIT = 0x0,
+        kOriginSDT = 0x1,
+    };
+    uint MobileOriginType(void) const { return _data[9]&0x1; }
+    QString MobileOriginTypeString(void) const;
+    //    if (hand-over_type == 0x01 || hand-over_type == 0x02 ||
+    //        hand-over_type == 0x03)
+    //    { network_id         16  10.0 }
+    bool HasMobileNetworkID(void) const
+        { return bool(MobileHandOverType() & 0x3); }
+    uint MobileNetworkID(void) const { return (_data[10]<<8) | _data[11]; }
+    //    if (origin_type ==0x00)
+    //    { initial_service_id 16  HasNetworkID()?10.0:12.0 }
+    bool HasMobileInitialServiceID(void) const
+        { return kOriginNIT == MobileOriginType(); }
+    uint MobileInitialServiceID(void) const
+    {
+        return HasMobileNetworkID() ?
+            ((_data[12]<<8) | _data[13]) : ((_data[10]<<8) | _data[11]);
+    }
+    // }
+    // if (linkage_type == 0x0D)
+    // {
+    //    target_event_id      16   9.0
+    uint TargetEventID(void) const { return (_data[9]<<8) | _data[10]; }
+    //    target_listed         1  11.0
+    bool IsTargetListed(void) const { return _data[11]&0x80; }
+    //    event_simulcast       1  11.1
+    bool IsEventSimulcast(void) const { return _data[11]&0x40; }
+    //    reserved              6  11.2
+    // }
     //      for (i=0;i<N;i++)
     //        { private_data_byte 8 bslbf }
-    uint PrivateDataOffset_8(void) const
-    {
-        return 11 + (HasNetworkID() ? 2 : 0) +
-            (HasInitialServiceID() ? 2 : 0);
-    }
-    uint PrivateDataLength_8(void) const
-        { return DescriptorLength() - (PrivateDataOffset_8()-2); }
-    const unsigned char* PrivateData_8(void) const
-        { return _data + PrivateDataOffset_8(); }
+    const unsigned char *PrivateData(void) const
+        { return _data + m_offset; }
+    uint PrivateDataLength(void) const
+        { return DescriptorLength() + 2 - m_offset; }
+
+  private:
+    uint m_offset;
 };
 
+// DVB Bluebook A038 (Sept 2011) p 38
 class AdaptationFieldDataDescriptor : public MPEGDescriptor
 {
   public:
     AdaptationFieldDataDescriptor(const unsigned char *data, int len = 300) :
-        MPEGDescriptor(data, len, DescriptorID::adaptation_field_data) { }
+        MPEGDescriptor(data, len, DescriptorID::adaptation_field_data, 1) { }
     //       Name             bits  loc  expected value
     // descriptor_tag           8   0.0       0x70
     // descriptor_length        8   1.0
     // adapt_field_data_id      8   2.0
     uint AdaptationFieldDataID(void) const { return _data[2]; }
+    QString toString(void) const
+    {
+        return QString("AdaptationFieldDataDescriptor  "
+                       "adaptation_field_data_identifier(%1)")
+            .arg(AdaptationFieldDataID());
+    }
 };
 
+// DVB Bluebook A038 (Sept 2011) p 38
 class AncillaryDataDescriptor : public MPEGDescriptor
 {
   public:
     AncillaryDataDescriptor(const unsigned char *data, int len = 300) :
-        MPEGDescriptor(data, len, DescriptorID::ancillary_data) { }
+        MPEGDescriptor(data, len, DescriptorID::ancillary_data, 1) { }
     //       Name             bits  loc  expected value
     // descriptor_tag           8   0.0       0x6b
     // descriptor_length        8   1.0
     // ancillary_data_id        8   2.0
     uint AncillaryDataID(void) const { return _data[2]; }
+    QString toString(void) const
+    {
+        return QString("AncillaryDataDescriptor "
+                       "ancillary_data_identifier(%1)")
+            .arg(AncillaryDataID());
+    }
 };
 
+// DVB Bluebook A038 (Sept 2011) p 39
 class AnnouncementSupportDescriptor : public MPEGDescriptor
 {
   public:
@@ -195,6 +263,7 @@ class AnnouncementSupportDescriptor : public MPEGDescriptor
     // }
 };
 
+// DVB Bluebook A038 (Sept 2011) p 41
 class BouquetNameDescriptor : public MPEGDescriptor
 {
   public:
@@ -216,6 +285,7 @@ class BouquetNameDescriptor : public MPEGDescriptor
     }
 };
 
+// DVB Bluebook A038 (Sept 2011) p 41
 class CAIdentifierDescriptor : public MPEGDescriptor
 {
   public:
@@ -225,10 +295,15 @@ class CAIdentifierDescriptor : public MPEGDescriptor
     // descriptor_tag           8   0.0       0x53
     // descriptor_length        8   1.0
     //
+    uint CASystemCount(void) const { return DescriptorLength() >> 1; }
     // for (i=0; i<N; i++)
     //   { CA_system_id 16 }
+    int CASystemId(uint i) const
+        { return (_data[2 + i*2] << 8) | _data[3 + i*2]; }
+    QString toString(void) const;
 };
 
+// DVB Bluebook A038 (Sept 2011) p 42
 class CellFrequencyLinkDescriptor : public MPEGDescriptor
 {
   public:
@@ -250,6 +325,7 @@ class CellFrequencyLinkDescriptor : public MPEGDescriptor
     // }
 };
 
+// DVB Bluebook A038 (Sept 2011) p 42
 class CellListDescriptor : public MPEGDescriptor
 {
   public:
@@ -277,6 +353,7 @@ class CellListDescriptor : public MPEGDescriptor
     // }
 };
 
+// DVB Bluebook A038 (Sept 2011) p 44
 class ComponentDescriptor : public MPEGDescriptor
 {
   public:
@@ -329,7 +406,7 @@ class ComponentDescriptor : public MPEGDescriptor
         if (0x1 == StreamContent())
             return MPEG2Properties();
         if (0x5 == StreamContent())
-            return VID_AVC || AVCProperties();
+            return VID_AVC | AVCProperties();
 
         return VID_UNKNOWN;
     }
@@ -491,6 +568,7 @@ typedef enum
 MTV_PUBLIC QString myth_category_type_to_string(uint category_type);
 MTV_PUBLIC MythCategoryType string_to_myth_category_type(const QString &type);
 
+// DVB Bluebook A038 (Sept 2011) p 46
 class ContentDescriptor : public MPEGDescriptor
 {
   public:
@@ -530,6 +608,7 @@ class ContentDescriptor : public MPEGDescriptor
     static volatile bool      categoryDescExists;
 };
 
+// DVB Bluebook A038 (Sept 2011) p 49
 class CountryAvailabilityDescriptor : public MPEGDescriptor
 {
   public:
@@ -566,6 +645,7 @@ class CountryAvailabilityDescriptor : public MPEGDescriptor
     }
 };
 
+// DVB Bluebook A038 (Sept 2011) p 50
 class DataBroadcastDescriptor : public MPEGDescriptor
 {
   public:
@@ -576,17 +656,37 @@ class DataBroadcastDescriptor : public MPEGDescriptor
     // descriptor_length        8   1.0
 
     // data_broadcast_id       16   2.0
+    uint DataBroadcastId(void) const { return _data[2] << 8 | _data[3]; }
     // component_tag            8   4.0
+    uint DataComponentTag(void) const { return _data[4]; }
     // selector_length          8   5.0
+    uint SelectorLength(void) const { return _data[5]; }
     // for (i=0; i<selector_length; i++)
     // {
     //   selector_byte          8
+    const unsigned char *Selector(void) const { return _data + 6; }
     // }
     // ISO_639_language_code   24
+    int LanguageKey(void) const
+        { return iso639_str3_to_key(&_data[6 + SelectorLength()]); }
+    QString LanguageString(void) const
+        { return iso639_key_to_str3(LanguageKey()); }
+    int CanonicalLanguageKey(void) const
+        { return iso639_key_to_canonical_key(LanguageKey()); }
+    QString CanonicalLanguageString(void) const
+        { return iso639_key_to_str3(CanonicalLanguageKey()); }
     // text_length              8
+    uint TextLength(void) const { return _data[6 + SelectorLength() + 3]; }
     // for (i=0; i<text_length; i++) { text_char 8 }
+    QString Text(void) const
+    {
+        return dvb_decode_text(&_data[6 + SelectorLength() + 4], TextLength());
+    }
+
+    QString toString(void) const;
 };
 
+// DVB Bluebook A038 (Sept 2011) p 51
 class DataBroadcastIdDescriptor : public MPEGDescriptor
 {
   public:
@@ -597,10 +697,12 @@ class DataBroadcastIdDescriptor : public MPEGDescriptor
     // descriptor_length        8   1.0
 
     // data_broadcast_id       16   2.0
+    uint DataBroadCastId(void) const { return _data[2] << 8 | _data[3]; }
     // for(i=0; i < N;i++ )
     // { id_selector_byte       8 }
 };
 
+// DVB Bluebook A038 (Sept 2011) p 51
 class CableDeliverySystemDescriptor : public MPEGDescriptor
 {
   public:
@@ -677,6 +779,7 @@ class CableDeliverySystemDescriptor : public MPEGDescriptor
     QString toString(void) const;
 };
 
+// DVB Bluebook A038 (Sept 2011) p 53
 class SatelliteDeliverySystemDescriptor : public MPEGDescriptor
 {
   public:
@@ -786,6 +889,7 @@ class SatelliteDeliverySystemDescriptor : public MPEGDescriptor
     QString toString(void) const;
 };
 
+// DVB Bluebook A038 (Sept 2011) p 55
 class TerrestrialDeliverySystemDescriptor : public MPEGDescriptor
 {
   public:
@@ -926,6 +1030,7 @@ class TerrestrialDeliverySystemDescriptor : public MPEGDescriptor
     QString toString(void) const;
 };
 
+// DVB Bluebook A038 (Sept 2011) p 58
 class DSNGDescriptor : public MPEGDescriptor
 {
   public:
@@ -937,6 +1042,7 @@ class DSNGDescriptor : public MPEGDescriptor
     // for (i=0;i<N;i++) { byte 8 }
 };
 
+// DVB Bluebook A038 (Sept 2011) p 58
 class ExtendedEventDescriptor : public MPEGDescriptor
 {
   public:
@@ -984,6 +1090,7 @@ class ExtendedEventDescriptor : public MPEGDescriptor
     // HACK end -- Pro7Sat is missing encoding
 };
 
+// DVB Bluebook A038 (Sept 2011) p 60
 class FrequencyListDescriptor : public MPEGDescriptor
 {
   public:
@@ -1026,6 +1133,8 @@ class FrequencyListDescriptor : public MPEGDescriptor
     QString toString(void) const;
 };
 
+// DVB Bluebook A038 (Sept 2011) p 70
+// ETSI EN 300 468 p 58
 class LocalTimeOffsetDescriptor : public MPEGDescriptor
 {
   public:
@@ -1034,19 +1143,42 @@ class LocalTimeOffsetDescriptor : public MPEGDescriptor
     //       Name             bits  loc  expected value
     // descriptor_tag           8   0.0       0x58
     // descriptor_length        8   1.0
-
+    uint Count(void) const { return DescriptorLength() / 13; }
     // for(i=0;i<N;i++)
     // {
     //   country_code          24   0.0+p
+    uint CountryCode(uint i) const
+    {
+        int o = 2 + i*13;
+        return ((_data[o] << 16) | (_data[o+1] << 8) | _data[o+2]);
+    }
+    QString CountryCodeString(uint i) const
+    {
+        int o = 2 + i*13;
+        return QString(_data[o]) + QChar(_data[o+1]) + QChar(_data[o+2]);
+    }
     //   country_region_id      6   3.0+p
+    uint CountryRegionId(uint i) const { return _data[2 + i*13 + 3] >> 2; }
     //   reserved               1   3.6+p
-    //   local_time_off_polarit 1   3.7+p
+    //   local_time_off_polarity 1   3.7+p
+    /// -1 if true, +1 if false (behind utc, ahead of utc, resp).
+    bool LocalTimeOffsetPolarity(uint i) const
+        { return _data[2 + i*13 + 3] & 0x01; }
     //   local_time_offset     16   4.0+p
+    uint LocalTimeOffset(uint i) const
+        { return (_data[2 + i*13 + 4] << 8) | _data[2 + i*13 + 5]; }
+    int LocalTimeOffsetWithPolarity(uint i) const
+        { return (LocalTimeOffsetPolarity(i) ? -1 : +1) * LocalTimeOffset(i); }
     //   time_of_change        40   6.0+p
+    // TODO decode this
     //   next_time_offset      16  11.0+p
+    uint NextTimeOffset(uint i) const
+        { return (_data[2 + i*13 + 11]<<8) | _data[2 + i*13 + 12]; }
     // }                           13.0
+    QString toString(void) const;
 };
 
+// DVB Bluebook A038 (Sept 2011) p 71
 class MosaicDescriptor : public MPEGDescriptor
 {
   public:
@@ -1098,6 +1230,7 @@ class MosaicDescriptor : public MPEGDescriptor
     // }
 };
 
+// DVB Bluebook A038 (Sept 2011) p 74
 class MultilingualBouquetNameDescriptor : public MPEGDescriptor
 {
   public:
@@ -1116,6 +1249,7 @@ class MultilingualBouquetNameDescriptor : public MPEGDescriptor
     // }
 };
 
+// DVB Bluebook A038 (Sept 2011) p 75
 class MultilingualNetworkNameDescriptor : public MPEGDescriptor
 {
   public:
@@ -1136,6 +1270,7 @@ class MultilingualNetworkNameDescriptor : public MPEGDescriptor
     // }
 };
 
+// DVB Bluebook A038 (Sept 2011) p 76
 class MultilingualServiceNameDescriptor : public MPEGDescriptor
 {
   public:
@@ -1156,6 +1291,7 @@ class MultilingualServiceNameDescriptor : public MPEGDescriptor
     // }
 };
 
+// DVB Bluebook A038 (Sept 2011) p 76
 class NVODReferenceDescriptor : public MPEGDescriptor
 {
   public:
@@ -1164,15 +1300,24 @@ class NVODReferenceDescriptor : public MPEGDescriptor
     //       Name             bits  loc  expected value
     // descriptor_tag           8   0.0       0x4b
     // descriptor_length        8   1.0
+    uint Count(void) const { return DescriptorLength() / 6; }
 
     // for (i=0;i<N;i++)
     // {
     //   transport_stream_id   16
+    uint TransportStreamId(uint i) const
+        { return (_data[i * 6 + 2] << 8) | _data[i * 6 + 3]; }
     //   original_network_id   16
+    uint OriginalNetworkId(uint i) const
+        { return (_data[i * 6 + 4] << 8) |  _data[i * 6 + 5]; }
     //   service_id            16
+    uint ServiceId(uint i) const
+        { return (_data[i * 6 + 6] << 8) | _data[i * 6 + 7]; }
     // }
+    QString toString(void) const;
 };
 
+// DVB Bluebook A038 (Sept 2011) p 78
 class ParentalRatingDescriptor : public MPEGDescriptor
 {
   public:
@@ -1181,6 +1326,7 @@ class ParentalRatingDescriptor : public MPEGDescriptor
     //       Name             bits  loc  expected value
     // descriptor_tag           8   0.0       0x55
     // descriptor_length        8   1.0
+    uint Count(void) const { return DescriptorLength() / 4; }
 
     // for (i=0; i<N; i++)
     // {
@@ -1189,19 +1335,28 @@ class ParentalRatingDescriptor : public MPEGDescriptor
     // }
 };
 
+// DVB Bluebook A038 (Sept 2011) p 78 (see also ETSI EN 300 231 PDC)
 class PDCDescriptor : public MPEGDescriptor
 {
   public:
     PDCDescriptor(const unsigned char *data, int len = 300) :
-        MPEGDescriptor(data, len, DescriptorID::pdc) { }
+        MPEGDescriptor(data, len, DescriptorID::pdc, 3) { }
     //       Name             bits  loc  expected value
     // descriptor_tag           8   0.0       0x69
     // descriptor_length        8   1.0
 
     // reserved_future_use      4   2.0
     // program_id_label        20   2.4
+    uint ProgramIdLabel(void) const
+    { return  (_data[2] & 0x0F) << 16 | _data[3] << 8 |  _data[4]; }
+    QString toString(void) const
+    {
+        return QString("PDCDescriptor program_id_label(%1)")
+            .arg(ProgramIdLabel());
+    }
 };
 
+// DVB Bluebook A038 (Sept 2011) p 79 (see also ETSI TS 101 162)
 class PrivateDataSpecifierDescriptor : public MPEGDescriptor
 {
   public:
@@ -1214,16 +1369,23 @@ class PrivateDataSpecifierDescriptor : public MPEGDescriptor
     // private_data_specifier  32   2.0
 };
 
+// DVB Bluebook A038 (Sept 2011) p 79
 class ScramblingDescriptor : public MPEGDescriptor
 {
   public:
     ScramblingDescriptor(const unsigned char *data, int len = 300) :
-        MPEGDescriptor(data, len, DescriptorID::scrambling) { }
+        MPEGDescriptor(data, len, DescriptorID::scrambling, 1) { }
     //       Name             bits  loc  expected value
     // descriptor_tag           8   0.0       0x65
     // descriptor_length        8   1.0
 
     // scrambling_mode          8   2.0
+    uint ScramblingMode(void) const { return _data[2]; }
+    QString toString(void) const
+    {
+        return QString("ScramblingDescriptor scrambling_mode(%1)")
+                .arg(ScramblingMode());
+    }
 };
 
 // Map serviceid's to their types
@@ -1252,6 +1414,7 @@ class ServiceDescriptorMapping
         kServiceTypeHDTV                     = 0x11,
         kServiceTypeAdvancedCodecSDDigitalTelevision       = 0x16,
         kServiceTypeAdvancedCodecHDDigitalTelevision       = 0x19,
+        kServiceTypeAdvancedCodecFrameCompatiblePlanoStereoscopicHDTelevisionService = 0x1c,
         kServiceTypeEchoStarTV1              = 0x91,
         kServiceTypeEchoStarTV2              = 0x9a,
         kServiceTypeEchoStarTV3              = 0xa4,
@@ -1297,7 +1460,8 @@ class ServiceDescriptorMapping
     {
         return
             (ServiceType() == kServiceTypeHDTV) ||
-            (ServiceType() == kServiceTypeAdvancedCodecHDDigitalTelevision);
+            (ServiceType() == kServiceTypeAdvancedCodecHDDigitalTelevision) ||
+            (ServiceType() == kServiceTypeAdvancedCodecFrameCompatiblePlanoStereoscopicHDTelevisionService);
     }
     bool IsTeletext(void) const
     {
@@ -1309,6 +1473,7 @@ class ServiceDescriptorMapping
     uint m_serviceid;
 };
 
+// DVB Bluebook A038 (Sept 2011) p 80
 class ServiceDescriptor : public MPEGDescriptor
 {
   public:
@@ -1359,6 +1524,7 @@ class ServiceDescriptor : public MPEGDescriptor
     }
 };
 
+// DVB Bluebook A038 (Sept 2011) p 82
 class ServiceAvailabilityDescriptor : public MPEGDescriptor
 {
   public:
@@ -1373,6 +1539,7 @@ class ServiceAvailabilityDescriptor : public MPEGDescriptor
     // for (i=0;i<N;i++) { cell_id 16 }
 };
 
+// DVB Bluebook A038 (Sept 2011) p 82
 class ServiceListDescriptor : public MPEGDescriptor
 {
   public:
@@ -1408,6 +1575,7 @@ class ServiceListDescriptor : public MPEGDescriptor
     }
 };
 
+// DVB Bluebook A038 (Sept 2011) p 82
 class ServiceMoveDescriptor : public MPEGDescriptor
 {
   public:
@@ -1422,6 +1590,7 @@ class ServiceMoveDescriptor : public MPEGDescriptor
     // new_service_id          16   6.0
 };
 
+// DVB Bluebook A038 (Sept 2011) p 83
 class ShortEventDescriptor : public MPEGDescriptor
 {
   public:
@@ -1473,6 +1642,7 @@ class ShortEventDescriptor : public MPEGDescriptor
         { return LanguageString() + " : " + EventName() + " : " + Text(); }
 };
 
+// DVB Bluebook A038 (Sept 2011) p 84
 class ShortSmoothingBufferDescriptor : public MPEGDescriptor
 {
   public:
@@ -1488,6 +1658,7 @@ class ShortSmoothingBufferDescriptor : public MPEGDescriptor
     // { DVB_reserved           8 }
 };
 
+// DVB Bluebook A038 (Sept 2011) p 85
 /// This is used to label streams so the can be treated differently,
 /// for instance each stream may get it's own cueing instructions.
 class StreamIdentifierDescriptor : public MPEGDescriptor
@@ -1508,6 +1679,24 @@ class StreamIdentifierDescriptor : public MPEGDescriptor
     }
 };
 
+// DVB Bluebook A038 (Sept 2011) p 86
+class StuffingDescriptor : public MPEGDescriptor
+{
+  public:
+    StuffingDescriptor(const unsigned char *data, int len = 300) :
+        MPEGDescriptor(data, len, DescriptorID::dvb_stuffing) { }
+    //       Name             bits  loc  expected value
+    // descriptor_tag           8   0.0       0x42
+    // descriptor_length        8   1.0
+    // stuffing_byte            *   2.0
+    QString toString(void) const
+    {
+        return QString("Stuffing Descriptor (0x42) length(%1)")
+            .arg(DescriptorLength());
+    }
+};
+
+// DVB Bluebook A038 (Sept 2011) p 86
 class SubtitlingDescriptor : public MPEGDescriptor
 {
   public:
@@ -1542,6 +1731,7 @@ class SubtitlingDescriptor : public MPEGDescriptor
     // }                            8.0
 };
 
+// DVB Bluebook A038 (Sept 2011) p 87
 class TelephoneDescriptor : public MPEGDescriptor
 {
   public:
@@ -1574,6 +1764,7 @@ class TelephoneDescriptor : public MPEGDescriptor
     //   { core_number_char 8 }
 };
 
+// DVB Bluebook A038 (Sept 2011) p 88
 class TeletextDescriptor : public MPEGDescriptor
 {
   public:
@@ -1608,6 +1799,7 @@ class TeletextDescriptor : public MPEGDescriptor
     // }                           5.0
 };
 
+// DVB Bluebook A038 (Sept 2011) p 89
 class TimeShiftedEventDescriptor : public MPEGDescriptor
 {
   public:
@@ -1621,6 +1813,7 @@ class TimeShiftedEventDescriptor : public MPEGDescriptor
     // reference_event_id      16   4.0
 };
 
+// DVB Bluebook A038 (Sept 2011) p 90
 class TimeShiftedServiceDescriptor : public MPEGDescriptor
 {
   public:
@@ -1633,6 +1826,7 @@ class TimeShiftedServiceDescriptor : public MPEGDescriptor
     // reference_service_id    16   2.0
 };
 
+// DVB Bluebook A038 (Sept 2011) p 90
 class TransportStreamDescriptor : public MPEGDescriptor
 {
   public:
@@ -1643,8 +1837,13 @@ class TransportStreamDescriptor : public MPEGDescriptor
     // descriptor_length        8   1.0
 
     // for (i=0; i<N; i++) { byte 8 }
+    QString Data(void) const
+        { return dvb_decode_text(&_data[2], DescriptorLength()); }
+    QString toString(void) const
+        { return QString("TransportStreamDescriptor data(%1)").arg(Data()); }
 };
 
+// DVB Bluebook A038 (Sept 2011) p 91
 class VBIDataDescriptor : public MPEGDescriptor
 {
   public:
@@ -1674,6 +1873,7 @@ class VBIDataDescriptor : public MPEGDescriptor
     // }
 };
 
+// DVB Bluebook A038 (Sept 2011) p 92
 class VBITeletextDescriptor : public MPEGDescriptor
 {
   public:
@@ -1692,6 +1892,7 @@ class VBITeletextDescriptor : public MPEGDescriptor
     // }                            5.0
 };
 
+// DVB Bluebook A038 (Sept 2011) p 119
 class PartialTransportStreamDescriptor : public MPEGDescriptor
 {
   public:
@@ -1703,10 +1904,16 @@ class PartialTransportStreamDescriptor : public MPEGDescriptor
 
     // DVB_reserved_future_use  2   2.0
     // peak_rate               22   2.2
+    uint PeakRate(void) const
+        { return (_data[2] & 0x3f) << 16 | _data[3] | _data[4]; }
     // DVB_reserved_future_use  2   5.0
     // min_overall_smooth_rate 22   5.2
+    uint SmoothRate(void) const
+        { return (_data[5] & 0x3f) << 16 | _data[6] | _data[7]; }
     // DVB_reserved_future_use  2   8.0
     // max_overall_smooth_buf  14   8.2
+    uint SmoothBuf(void) const { return ((_data[8] & 0x3f) << 8) | _data[9]; }
+    QString toString(void) const;
 };
 
 
@@ -1721,21 +1928,44 @@ class AC3Descriptor : public MPEGDescriptor
     // descriptor_length        8   1.0
 
     // component_type_flag      1   2.0
+    bool HasComponentType(void) const { return _data[2] && 0x80; }
     // bsid_flag                1   2.1
+    bool HasBSID(void) const { return _data[2] & 0x40; }
     // mainid_flag              1   2.2
+    bool HasMainID(void) const { return _data[2] & 0x20; }
     // asvc_flag                1   2.3
+    bool HasASVC(void) const { return _data[2] & 0x10; }
     // reserved_flags           4   2.4
     // if (component_type_flag == 1)
     //   { component_type       8 uimsbf }
+    uint ComponentType(void) const { return _data[3]; }
     // if (bsid_flag == 1)
     //   { bsid                 8 uimsbf }
+    uint BSID(void) const
+        { return (HasComponentType()) ? _data[4] : _data[3]; }
     // if (mainid_flag == 1)
     //   { mainid               8 uimsbf }
+    uint MainID(void) const
+    {
+        int offset = 3;
+        offset += (HasComponentType()) ? 1 : 0;
+        offset += (HasBSID()) ? 1 : 0;
+        return _data[offset];
+    }
     // if (asvc_flag==1)
     //   { asvc                 8 uimsbf }
+    uint ASVC(void) const
+    {
+        int offset = 3;
+        offset += (HasComponentType()) ? 1 : 0;
+        offset += (HasBSID()) ? 1 : 0;
+        offset += (HasMainID()) ? 1 : 0;
+        return _data[offset];
+    }
     // for (I=0;I<N;I++)
     //   { additional_info[i] N*8 uimsbf }
     //};
+    QString toString(void) const;
 };
 
 static QString coderate_inner(uint cr)
@@ -1774,6 +2004,7 @@ class UKChannelListDescriptor : public MPEGDescriptor
     QString toString(void) const;
 };
 
+// ETSI TS 102 323 (TV Anytime)
 class DVBContentIdentifierDescriptor : public MPEGDescriptor
 {
   public:
@@ -1794,6 +2025,7 @@ class DVBContentIdentifierDescriptor : public MPEGDescriptor
     }
 };
 
+// ETSI TS 102 323 (TV Anytime)
 class DefaultAuthorityDescriptor : public MPEGDescriptor
 {
   public:

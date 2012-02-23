@@ -69,33 +69,25 @@ class BECache( object ):
         if backend is None:
             # no backend given, use master
             self.host = self.db.settings.NULL.MasterServerIP
+            self.hostname = self.db._gethostfromaddr(self.host)
 
         else:
             backend = backend.strip('[]')
+            query = "SELECT hostname FROM settings WHERE value=? AND data=?"
             if self._reip.match(backend):
                 # given backend is IP address
                 self.host = backend
+                self.hostname = self.db._gethostfromaddr(
+                                            backend, 'BackendServerIP')
             elif check_ipv6(backend):
                 # given backend is IPv6 address
                 self.host = backend
+                self.hostname = self.db._gethostfromaddr(
+                                            backend, 'BackendServerIP6')
             else:
                 # given backend is hostname, pull address from database
                 self.hostname = backend
-                self.host = self.db.settings[backend].BackendServerIP
-                if not self.host:
-                    raise MythDBError(MythError.DB_SETTING,
-                                            'BackendServerIP', backend)
-
-        if self.hostname is None:
-            # reverse lookup hostname from address
-            with self.db.cursor(self.log) as cursor:
-                if cursor.execute("""SELECT hostname FROM settings
-                                     WHERE value='BackendServerIP'
-                                     AND data=?""", [self.host]) == 0:
-                    # no match found
-                    raise MythDBError(MythError.DB_SETTING, 'BackendServerIP',
-                                            self.host)
-                self.hostname = cursor.fetchone()[0]
+                self.host = self.db._getpreferredaddr(backend)
 
         # lookup port from database
         self.port = int(self.db.settings[self.hostname].BackendServerPort)
@@ -248,13 +240,7 @@ def ftopen(file, mode, forceremote=False, nooverwrite=False, db=None, \
     # get full system name
     host = host.strip('[]')
     if reip.match(host) or check_ipv6(host):
-        with db.cursor(log) as cursor:
-            if cursor.execute("""SELECT hostname FROM settings
-                                 WHERE value='BackendServerIP'
-                                 AND data=%s""", host) == 0:
-                raise MythDBError(MythError.DB_SETTING, \
-                                  'BackendServerIP', backend)
-            host = cursor.fetchone()[0]
+        host = db._gethostfromaddr(host)
 
     # user forced to remote access
     if forceremote:
@@ -727,32 +713,71 @@ class FileOps( BECache ):
             regex = re.compile(regex)
         return EventLock(regex, self.hostname, self.db)
 
-    def _getPrograms(self, query, recstatus=None, recordid=None, header=0):
-        pgfieldcount = len(Program._field_order)
-        pgrecstatus = Program._field_order.index('recstatus')
-        pgrecordid = Program._field_order.index('recordid')
+    class _ProgramQuery( object ):
+        def __init__(self, query, header_length=0, sorted=False,
+                     recstatus=None, handler=None):
+            self.query = query
+            self.header_length = header_length
+            self.recstatus = recstatus
+            self.handler = handler if handler else Program
+            self.sorted = sorted
+            self.inst = None
+            self.func = None
 
-        res = self.backendCommand(query).split(BACKEND_SEP)
-        for i in xrange(header):
-            res.pop(0)
-        num_progs = int(res.pop(0))
-        if num_progs*pgfieldcount != len(res):
-            raise MythBEError(MythBEError.PROTO_PROGRAMINFO)
+        def __call__(self, *args, **kwargs):
+            if self.func is None:
+                if len(args) == 1:
+                    self.func = args[0]
+                elif 'func' in kwargs:
+                    self.func = kwargs['func']
+                if not callable(self.func):
+                    raise MythError('_ProgramQuery must receive a callable '+\
+                                    'before it is functional')
+                self.__doc__ = self.func.__doc__
+                self.__name__ = self.func.__name__
+                self.__module__ = self.func.__module__
+                return self
+            elif self.inst is None:
+                raise MythError('Call to uninitialized _ProgramQuery instance')
+            if self.sorted:
+                return self.sortedrun(*args, **kwargs)
+            return self.run(*args, **kwargs)
 
-        for i in range(num_progs):
-            offs = i * pgfieldcount
-            if recstatus is not None:
-                if int(res[offs+pgrecstatus]) != recstatus:
-                    continue
-            if recordid is not None:
-                if int(res[offs+pgrecordid]) != recordid:
-                    continue
-            yield Program(res[offs:offs+pgfieldcount], db=self.db)
+        def __get__(self, obj, type):
+            if obj is None:
+                return self
+            cls = self.__class__(self.query, self.header_length, self.sorted,
+                                 self.recstatus, self.handler)
+            cls.inst = obj
+            cls.func = self.func.__get__(obj, type)
+            return cls
 
-    def _getSortedPrograms(self, query, recstatus=None, \
-                           recordid=None, header=0):
-        return sorted(self._getPrograms(query, recstatus, recordid, header),\
-                      key=lambda p: p.starttime)
+        def run(self, *args, **kwargs):
+            pgfieldcount = len(Program._field_order)
+            pgrecstatus = Program._field_order.index('recstatus')
+            pgrecordid = Program._field_order.index('recordid')
+
+            res = self.inst.backendCommand(self.query).split(BACKEND_SEP)
+            for i in xrange(self.header_length):
+                res.pop(0)
+            num_progs = int(res.pop(0))
+            if num_progs*pgfieldcount != len(res):
+                raise MythBEError(MythBEError.PROTO_PROGRAMINFO)
+
+            for i in range(num_progs):
+                offs = i * pgfieldcount
+                if self.recstatus is not None:
+                    if int(res[offs+pgrecstatus]) != self.recstatus:
+                        continue
+                pg = self.handler(res[offs:offs+pgfieldcount],
+                                  db=self.inst.db)
+                pg = self.func(pg, *args, **kwargs)
+                if pg is not None:
+                    yield pg
+
+        def sortedrun(self, *args, **kwargs):
+            return iter(sorted(self.run(*args, **kwargs),
+                               key=lambda p: p.starttime))
 
 class FreeSpace( DictData ):
     """Represents a FreeSpace entry."""

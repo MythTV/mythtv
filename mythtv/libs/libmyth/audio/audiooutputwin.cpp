@@ -7,6 +7,7 @@ using namespace std;
 
 #include <windows.h>
 #include <mmsystem.h>
+#include <objbase.h> // For DEFINE_GUID
 
 #define LOC QString("AOWin: ")
 

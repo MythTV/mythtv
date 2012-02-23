@@ -65,8 +65,7 @@ StorageGroupEditor::StorageGroupEditor(QString group) :
     else if (StorageGroup::kSpecialGroups.contains(group))
         dispGroup = QObject::tr(group.toLatin1().constData());
 
-    if (gCoreContext->GetSetting("MasterServerIP","master") ==
-            gCoreContext->GetSetting("BackendServerIP","me"))
+    if (gCoreContext->IsMasterHost())
     {
         listbox->setLabel(tr("'%1' Storage Group Directories").arg(dispGroup));
     }
@@ -244,8 +243,7 @@ MythDialog* StorageGroupEditor::dialogWidget(MythMainWindow* parent,
 StorageGroupListEditor::StorageGroupListEditor(void) :
     listbox(new ListBoxSetting(this)), lastValue("")
 {
-    if (gCoreContext->GetSetting("MasterServerIP","master") ==
-            gCoreContext->GetSetting("BackendServerIP","me"))
+    if (gCoreContext->IsMasterHost())
         listbox->setLabel(
             tr("Storage Groups (directories for new recordings)"));
     else
@@ -291,8 +289,7 @@ void StorageGroupListEditor::doDelete(void)
     if (name.left(28) == "__CREATE_NEW_STORAGE_GROUP__")
         return;
 
-    bool is_master_host = gCoreContext->GetSetting("MasterServerIP","master") ==
-                          gCoreContext->GetSetting("BackendServerIP","me");
+    bool is_master_host = gCoreContext->IsMasterHost();
 
     QString dispGroup = name;
     if (name == "Default")
@@ -361,8 +358,7 @@ void StorageGroupListEditor::Load(void)
     QStringList masterNames;
     bool createAddDefaultButton = false;
     QVector< bool > createAddSpecialGroupButton( StorageGroup::kSpecialGroups.size() );
-    bool isMaster = (gCoreContext->GetSetting("MasterServerIP","master") ==
-                     gCoreContext->GetSetting("BackendServerIP","me"));
+    bool isMaster = gCoreContext->IsMasterHost();
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT distinct groupname "

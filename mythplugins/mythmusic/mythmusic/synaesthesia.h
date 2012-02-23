@@ -6,10 +6,6 @@
 #include "mainvisual.h"
 #include "config.h"
 
-#ifdef SDL_SUPPORT
-#include <SDL.h>
-#endif
-
 class QImage;
 
 #define LogSize 10
@@ -23,7 +19,7 @@ class QImage;
 class Synaesthesia : public VisualBase
 {
 public:
-    Synaesthesia(long int winid);
+    Synaesthesia(void);
     virtual ~Synaesthesia();
 
     void resize(const QSize &size);
@@ -49,31 +45,28 @@ private:
     void fadeFade(void);
     void fade(void);
 
-    QSize size;
+    QSize m_size;
 
-    double cosTable[NumSamples];
-    double negSinTable[NumSamples];
-    int bitReverse[NumSamples];
-    int scaleDown[256];
-    int maxStarRadius;
-    int fadeMode;
-    bool pointsAreDiamonds;
-    double brightnessTwiddler;
-    double starSize;
+    double m_cosTable[NumSamples];
+    double m_negSinTable[NumSamples];
+    int m_bitReverse[NumSamples];
+    int m_scaleDown[256];
+    int m_maxStarRadius;
+    int m_fadeMode;
+    bool m_pointsAreDiamonds;
+    double m_brightnessTwiddler;
+    double m_starSize;
 
-    int outWidth;
-    int outHeight;
+    int m_outWidth;
+    int m_outHeight;
 
-    Bitmap<unsigned short> outputBmp, lastOutputBmp, lastLastOutputBmp;
-    QImage *outputImage;
+    Bitmap<unsigned short> m_outputBmp, m_lastOutputBmp, m_lastLastOutputBmp;
+    QImage *m_outputImage;
 
-    unsigned char palette[768];
-    double fgRedSlider, fgGreenSlider, bgRedSlider, bgGreenSlider;
+    unsigned char m_palette[768];
+    double m_fgRedSlider, m_fgGreenSlider, m_bgRedSlider, m_bgGreenSlider;
 
-    double energy_avg;
-#ifdef SDL_SUPPORT
-    SDL_Surface *surface;
-#endif
+    double m_energy_avg;
 };
 
 #endif // SYNAETHESIA

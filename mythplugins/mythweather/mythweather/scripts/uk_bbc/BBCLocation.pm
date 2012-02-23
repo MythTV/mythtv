@@ -1,120 +1,210 @@
+#! /usr/bin/perl
+# vim:ts=4:sw=4:ai:et:si:sts=4
+
 package BBCLocation;
 use strict;
+use warnings;
 require Exporter;
-use LWP::Simple;
 
-our @EXPORT = qw(Search);
-our $VERSION = 0.2;
+use utf8;
+use encoding 'utf8';
+use LWP::UserAgent;
+use JSON;
+use XML::XPath;
+use XML::XPath::XMLParser;
+use URI::Escape;
+
+
+our @EXPORT = qw(Search FindLoc);
+our $VERSION = 0.3;
 
 my @searchresults;
 my @resulturl;
 my $resultcount = -1;
 
 sub Search {
+    my ($search_string, $dir, $timeout, $logdir) = @_;
+    $search_string = uri_escape($search_string);
 
-    my $base_url       = 'http://news.bbc.co.uk/weather/util/search/Search.xhtml?';
-    my $world_base_url = $base_url . 'lowgraphics=true&region=world&search=';
-    my $local_base_url = $base_url . 'lowgraphics=true&region=uk&search=';
+    my $base_url = 'http://www.bbc.co.uk/locator/client/weather/en-GB/' .
+                   'search.json';
+    my $search_url = $base_url . '?ptrt=/&search=';
 
-    my $search_string = shift;
 
-    my $world_response = get $world_base_url . $search_string;
-    my $local_response = get $local_base_url . $search_string;
+    my $file = $search_string;
+    getCachedJSON($search_url . $search_string, $dir, $file, $timeout, $logdir);
 
-    &parseResults($world_response) if defined($world_response);
-    &parseResults($local_response) if defined($local_response);
+    my $cachefile  = "$dir/$file.json";
+    my $cachefile1 = "$dir/$file-results.html";
+    my $cachefile2 = "$dir/$file-pagination.html";
 
-    if ( ($resultcount > 0 ) && ($#searchresults < 0) ) {
-        foreach my $url (@resulturl) {
-            my $url_response = get $base_url . $url;
-            die unless defined $url_response;
-            &parseResults($url_response);
-        }
-    }
+    open OF, "<:utf8", $cachefile or die "Can't read $cachefile: $!\n";
+    my $content = do { local $/; <OF> };
+    close OF;
 
-    return @searchresults;
-}
+    my $decoded = decode_json $content;
+    $resultcount = $decoded->{"noOfResults"};
 
-sub parseResults {
-    my $response = shift;
-    my $isresults = 0;
-    my $resultline = "";
-    
-    # Initialise a hash for the $locid & $locname results.
-     
-    # Use of a hash indexed by $locid ensures that more informative results 
-    # (e.g. "Sale, Australia" vs. "Sale") coming from <p class="response"> 
-    # section will overwrite less informative results coming from 
-    # <span id="printbutton_Forecast"> section
-    
     my %loc_hash = ();
 
-    foreach (split("\n", $response)) {
-    
-    	# Declare a result if either the '<p class="response"> OR <span id="printbutton_Forecast"> strings are found
-	# This ensures that single and multiple matches are caught
-    
-        if (/<p class=\"response\">/ || /<span id=\"printbutton_Forecast\">/) {
-            $isresults = 1;
+    get_results($cachefile1, \%loc_hash);
+
+    if (exists $decoded->{"pagination"}) {
+        my %pages = ();
+        my $xp = XML::XPath->new(filename => $cachefile2);
+        my $nodeset = $xp->find("//ol/li/a");
+        foreach my $node ($nodeset->get_nodelist) {
+            my $url = $node->getAttribute("href");
+            my $num = $node->string_value;
+            $url =~ s/&amp;/&/;
+            $num =~ s/ //g;
+            $pages{$num} = $url;
         }
 
-        my $locname;
-        my $locid; 
-        my $url;
-	
-        if ($isresults) {
-            last if (/There are no forecasts matching/);
+        foreach my $page (keys %pages)
+        {
+            getCachedJSON($base_url . $pages{$page}, $dir, $file . "-$page",
+                          $timeout, $logdir);
 
-            $resultcount = $1 if (/<strong>There \w{2,3} (\d*) forecasts? matching/);
-
-            # Collect result URLs
-            if (/<a id=\"result_\d*\" .* href \=\"?.*search\=.*/) {
-                $url = $_;
-                $url =~ s/.*href \=\"(.*)\".*/$1/s;
-                push (@resulturl, $url);
-            }
-
-            # Collect location IDs and location names
-            elsif (/<a id=\"result_\d*\" .* href \=\"\/weather\/forecast\//) {
-                $locid = $_;
-                $locid =~ s/.*\/weather\/forecast\/(\d{0,5})\?.*/$1/s;
-        
-                $locname = $_;
-                $locname =~ s/.*<a id=\"result_\d*\".*>(.*)<\/a>.*/$1/s;
-
-                $resultline = $locid . "::" . $locname;
-		
-		$loc_hash{$locid} = $locname;
-            }
-	    
-	    # Extract location ID and name from "Print <location>" link
-	    
-	    # This string is always present (provided valid search result - invalid results are caught above)
-	    # irresepective of whether single or multiple matches are returned
-	    
-	    elsif (/<span id=\"printbutton_Forecast\"><a title=\"Print (.+)\" href=\"\/weather\/forecast\/(\d{0,5})?/o)
-	    {
-	    	$locid   = $2;
-		$locname = $1;
-	  	
-		$loc_hash{$locid} = $locname;		    
-	    }
+            my $cachefile3 = "$dir/$file-$page-results.html";
+            get_results($cachefile3, \%loc_hash);
         }
     }
-    
-    # Loop through contents of %loc_hash, check for existence within @searchresults, and add as necessary
-    
+
+    my @searchresults = ();
     foreach my $key (keys %loc_hash)
     {
     	my $resultline = $key."::".$loc_hash{$key};
-    
-   	if (! grep(/^$key/, @searchresults)) 
-	{
-		push (@searchresults, $resultline);
-	}
+        push (@searchresults, $resultline);
     }
-
     return @searchresults;
 }
+
+sub getCachedJSON {
+    my ($url, $dir, $file, $timeout, $logdir) = @_;
+
+    my $cachefile  = "$dir/$file.json";
+    my $cachefile1 = "$dir/$file-results.html";
+    my $cachefile2 = "$dir/$file-pagination.html";
+
+    my $now = time();
+    my $decoded;
+
+    log_print( $logdir, "Loading URL: $url\n" );
+
+    if( (-e $cachefile) and ((stat($cachefile))[9] >= ($now - $timeout)) ) {
+        # File cache is still recent.
+        log_print( $logdir, "cached in $cachefile\n" );
+    } else {
+        log_print( $logdir, "$url\ncaching to $cachefile\n" );
+
+        my $ua = LWP::UserAgent->new;
+        $ua->timeout(30);
+        $ua->env_proxy;
+        $ua->default_header('Accept-Language' => "en");
+
+        my $response = $ua->get($url);
+        if ( !$response->is_success ) {
+            die $response->status_line;
+        }
+
+        open OF, ">:utf8", $cachefile or die "Can't open $cachefile: $!\n";
+        print OF $response->content;
+        close OF;
+
+        $decoded = decode_json $response->content;
+
+        open OF, ">:utf8", $cachefile1 or die "Can't open $cachefile1: $!\n";
+        print OF "<html>".$decoded->{"results"}."</html>";
+        close OF;
+
+        if (exists $decoded->{"pagination"}) {
+            open OF, ">:utf8", $cachefile2 or
+                die "Can't open $cachefile2: $!\n";
+            print OF "<html>".$decoded->{"pagination"}."</html>";
+            close OF;
+        } else {
+            unlink $cachefile2;
+        }
+    }
+}
+
+sub get_results {
+    my ($file, $outhash) = @_;
+
+    my $xp = XML::XPath->new(filename => $file);
+    my $nodeset = $xp->find("//ul/li/a");
+    foreach my $node ($nodeset->get_nodelist) {
+        my $url = $node->getAttribute("href");
+        my $loc = $node->string_value;
+
+        $url =~ s/^\/weather\///;
+        $outhash->{$url} = $loc;
+    }
+}
+
+sub log_print {
+    return if not defined $::opt_D;
+    my $dir = shift;
+
+    open OF, ">>$dir/uk_bbc.log";
+    print OF @_;
+    close OF;
+}
+
+sub FindLoc {
+    my ($locid, $dir, $timeout, $logdir) = @_;
+
+    my $url = "http://www.bbc.co.uk/weather/$locid";
+
+    my $file = "$locid.html";
+    getCachedHTML($url, $dir, $file, $timeout, $logdir);
+
+    my $cachefile  = "$dir/$file";
+
+    open OF, "<:utf8", $cachefile;
+    my $contents = do { local $/; <OF>; };
+    close OF;
+
+    my ($rssid) = ($contents =~ /data-loc="(.*?)"/);
+    die "No RSS Location found for ID $locid!\n" unless defined $rssid;
+
+    $rssid =~ s/^LOC-//;
+    return $rssid;
+}
+
+
+sub getCachedHTML {
+    my ($url, $dir, $file, $timeout, $logdir) = @_;
+
+    my $cachefile  = "$dir/$file";
+
+    my $now = time();
+
+    log_print( $logdir, "Loading URL: $url\n" );
+
+    if( (-e $cachefile) and ((stat($cachefile))[9] >= ($now - $timeout)) ) {
+        # File cache is still recent.
+        log_print( $logdir, "cached in $cachefile\n" );
+    } else {
+        log_print( $logdir, "$url\ncaching to $cachefile\n" );
+
+        my $ua = LWP::UserAgent->new;
+        $ua->timeout(30);
+        $ua->env_proxy;
+        $ua->default_header('Accept-Language' => "en");
+
+        my $response = $ua->get($url);
+        if ( !$response->is_success ) {
+            die $response->status_line;
+        }
+
+        my $content = $response->content;
+        open OF, ">:utf8", $cachefile or die "Can't open $cachefile: $!\n";
+        print OF $content;
+        close OF;
+    }
+}
+
 
 1;

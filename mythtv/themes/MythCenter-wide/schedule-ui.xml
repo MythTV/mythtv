@@ -1342,14 +1342,14 @@
                         <align>allcenter</align>
                         <font>basesmall_normal</font>
                     </textarea>
+                    <shape name="selectbar">
+                        <area>0,0,0,0</area>
+                    </shape>
                 </state>
                 <state name="selectedactive" from="active">
                     <textarea name="buttontext">
                         <font>basesmall_normal_selected</font>
                     </textarea>
-                    <shape name="selectbar">
-                        <area>0,0,0,0</area>
-                    </shape>
                 </state>
                 <state name="selectedinactive" from="active"/>
             </statetype>

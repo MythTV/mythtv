@@ -51,7 +51,10 @@ class PlaybackSock
 
     // all backend<->backend stuff below here
     bool isSlaveBackend(void) const { return backend; }
-    void setAsSlaveBackend(void) { backend = true; }
+    void setAsSlaveBackend(void) { backend = true; mediaserver = true; }
+
+    bool isMediaServer(void) const { return mediaserver; }
+    void setAsMediaServer(void) { mediaserver = true; }
 
     bool isExpectingReply(void) const { return expectingreply; }
 
@@ -113,6 +116,7 @@ class PlaybackSock
     PlaybackSockEventsMode m_eventsMode;
     bool blockshutdown;
     bool backend;
+    bool mediaserver;
 
     QMutex refLock;
     QMutex sockLock;

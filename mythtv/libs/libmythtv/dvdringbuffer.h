@@ -32,7 +32,7 @@ class MTV_PUBLIC DVDInfo
   public:
     DVDInfo(const QString &filename);
    ~DVDInfo(void);
-    bool IsValid(void) { return m_nav != NULL; }
+    bool IsValid(void) const { return m_nav != NULL; }
     bool GetNameAndSerialNum(QString &name, QString &serialnum);
 
   protected:

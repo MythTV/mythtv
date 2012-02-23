@@ -50,7 +50,7 @@ struct ArchiveDestination ArchiveDestinations[] =
 
 int ArchiveDestinationsCount = sizeof(ArchiveDestinations) / sizeof(ArchiveDestinations[0]);
 
-QString formatSize(long long sizeKB, int prec)
+QString formatSize(int64_t sizeKB, int prec)
 {
     if (sizeKB>1024*1024*1024) // Terabytes
     {
@@ -307,7 +307,7 @@ void recalcItemSize(ArchiveItem *item)
     if (profile->name == "NONE")
     {
         if (item->hasCutlist && item->useCutlist)
-            item->newsize = (long long) (item->size /
+            item->newsize = (int64_t) (item->size /
                     ((float)item->duration / (float)item->cutDuration));
         else
             item->newsize = item->size;
@@ -325,7 +325,7 @@ void recalcItemSize(ArchiveItem *item)
             length = item->duration;
 
         float len = (float) length / 3600;
-        item->newsize = (long long) (len * profile->bitrate * 1024 * 1024);
+        item->newsize = (int64_t) (len * profile->bitrate * 1024 * 1024);
     }
 }
 

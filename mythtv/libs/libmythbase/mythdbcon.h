@@ -65,12 +65,9 @@ class MBASE_PUBLIC MDBManager
 
     MSqlDatabase *getSchedCon(void);
     MSqlDatabase *getDDCon(void);
-    void closeSchedCon(void);
-    void closeDDCon(void);
 
   private:
     MSqlDatabase *getStaticCon(MSqlDatabase **dbcon, QString name);
-    void closeStaticCon(MSqlDatabase **dbcon);
 
     QMutex m_lock;
     typedef QList<MSqlDatabase*> DBList;
@@ -211,9 +208,6 @@ class MBASE_PUBLIC MSqlQuery : private QSqlQuery
 
     /// \brief Returns dedicated connection. (Required for using temporary SQL tables.)
     static MSqlQueryInfo DDCon();
-
-    static void CloseSchedCon();
-    static void CloseDDCon();
 
   private:
     // Only QSql::In is supported as a param type and only named params...

@@ -43,14 +43,13 @@ class avfDecoder : public Decoder
     long freq, bitrate;
     AudioFormat m_sampleFmt;
     int m_channels;
-    double totalTime, seekTime;
+    double seekTime;
 
     QString devicename;
 
     AVInputFormat *m_inputFormat;
     AVFormatParameters m_params;
     AVFormatContext *m_inputContext;
-    AVStream *m_decStream;
     AVCodec *m_codec; // Codec
     AVCodecContext *m_audioDec;
 

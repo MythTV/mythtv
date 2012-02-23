@@ -7,7 +7,9 @@
 #include <QNetworkAccessManager>
 #include <QNetworkDiskCache>
 #include <QNetworkReply>
+#include <QNetworkProxy>
 #include <QWaitCondition>
+#include <QString>
 
 #include "mythbaseexp.h"
 #include "mthread.h"
@@ -16,6 +18,15 @@ class MythDownloadInfo;
 class RemoteFileDownloadThread;
 
 void ShutdownMythDownloadManager(void);
+
+// TODO : Overlap/Clash with RequestType in libupnp/httprequest.h
+typedef enum MRequestType {
+    kRequestGet,
+    kRequestHead,
+    kRequestPost
+} MRequestType;
+
+typedef void (*AuthCallback)(QNetworkReply*, QAuthenticator*, void*);
 
 class MBASE_PUBLIC MythDownloadManager : public QObject, public MThread
 {
@@ -43,12 +54,21 @@ class MBASE_PUBLIC MythDownloadManager : public QObject, public MThread
                   const bool reload = false);
     QNetworkReply *download(const QString &url, const bool reload = false);
     bool download(QNetworkRequest *req, QByteArray *data);
+    bool downloadAuth(const QString &url, const QString &dest,
+                      const bool reload = false,
+                      AuthCallback authCallback = NULL,
+                      void *authArg = NULL, const QByteArray *header = NULL,
+                      const QByteArray *headerVal = NULL);
 
     // Methods to POST to a URL
     void queuePost(const QString &url, QByteArray *data, QObject *caller);
     void queuePost(QNetworkRequest *req, QByteArray *data, QObject *caller);
     bool post(const QString &url, QByteArray *data);
     bool post(QNetworkRequest *req, QByteArray *data);
+    bool postAuth(const QString &url, QByteArray *data,
+                  AuthCallback authCallback, void *authArg,
+                  const QByteArray *header = NULL,
+                  const QByteArray *headerVal = NULL);
 
     // Cancel a download
     void cancelDownload(const QString &url);
@@ -57,12 +77,18 @@ class MBASE_PUBLIC MythDownloadManager : public QObject, public MThread
     void removeListener(QObject *caller);
     QDateTime GetLastModified(const QString &url);
 
+    void loadCookieJar(const QString &filename);
+    void saveCookieJar(const QString &filename);
     QNetworkCookieJar *getCookieJar(void) { return m_manager->cookieJar(); }
     void setCookieJar(QNetworkCookieJar *cookieJar) { m_manager->setCookieJar(cookieJar); }
+
+    QString getHeader(const QUrl &url, const QString &header);
+    QString getHeader(const QNetworkCacheMetaData &cacheData, const QString &header);
 
   private slots:
     // QNetworkAccessManager signals
     void downloadFinished(QNetworkReply* reply);
+    void authCallback(QNetworkReply *reply, QAuthenticator *authenticator);
 
     // QNetworkReply signals
     void downloadError(QNetworkReply::NetworkError errorCode);
@@ -75,11 +101,16 @@ class MBASE_PUBLIC MythDownloadManager : public QObject, public MThread
     // Helper methods for initializing and performing requests
     void queueItem(const QString &url, QNetworkRequest *req,
                    const QString &dest, QByteArray *data, QObject *caller,
-                   const bool post = false, const bool reload = false);
+                   const MRequestType reqType = kRequestGet,
+                   const bool reload = false);
 
     bool processItem(const QString &url, QNetworkRequest *req,
                      const QString &dest, QByteArray *data,
-                     const bool post = false, const bool reload = false);
+                     const MRequestType reqType = kRequestGet,
+                     const bool reload = false,
+                     AuthCallback authCallback = NULL,
+                     void *authArg = NULL, const QByteArray *header = NULL,
+                     const QByteArray *headerVal = NULL);
 
     void downloadRemoteFile(MythDownloadInfo *dlInfo);
     void downloadQNetworkRequest(MythDownloadInfo *dlInfo);
@@ -93,6 +124,7 @@ class MBASE_PUBLIC MythDownloadManager : public QObject, public MThread
 
     QNetworkAccessManager                        *m_manager;
     QNetworkDiskCache                            *m_diskCache;
+    QNetworkProxy                                *m_proxy;
 
     QWaitCondition                                m_queueWaitCond;
     QMutex                                        m_queueWaitLock;

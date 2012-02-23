@@ -49,9 +49,7 @@ bool DVBRecorder::Open(void)
     if (videodevice.isEmpty())
         return false;
 
-    memset(_stream_id,  0, sizeof(_stream_id));
-    memset(_pid_status, 0, sizeof(_pid_status));
-    memset(_continuity_counter, 0xff, sizeof(_continuity_counter));
+    ResetForNewFile();
 
     _stream_handler = DVBStreamHandler::Get(videodevice);
 
@@ -82,8 +80,6 @@ void DVBRecorder::run(void)
         LOG(VB_GENERAL, LOG_ERR, LOC + _error);
         return;
     }
-
-    _continuity_error_count = 0;
 
     {
         QMutexLocker locker(&pauseLock);

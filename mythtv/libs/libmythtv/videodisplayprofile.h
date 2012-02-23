@@ -86,7 +86,7 @@ class MTV_PUBLIC VideoDisplayProfile
 
     void SetInput(const QSize &size);
     void SetOutput(float framerate);
-    float GetOutput(void) { return last_rate; }
+    float GetOutput(void) const { return last_rate; }
 
     void SetVideoRenderer(const QString &video_renderer);
     bool CheckVideoRendererGroup(const QString renderer);

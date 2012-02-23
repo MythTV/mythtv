@@ -138,6 +138,8 @@ Advanced options (experts only):
   --libxml2-path=HDRLOC    location of directory containing
                            'libxml/parser.h', not the
                            directory with parser.h [$libxml2_path_default]
+  --disable-libdns-sd      disable DNS Service Discovery (Bonjour/Zeroconf/Avahi)
+  --disable-libcrypto      disable use of the OpenSSL cryptographic library
 
   --with-bindings=LIST     install the bindings specified in the
                            comma-separated list
@@ -147,9 +149,11 @@ Advanced options (experts only):
   --perl-config-opts=OPTS  Additional options to pass when generating
                            Makefile.perl for building Perl bindings.
 
-mythffmpeg options (These only affect the internal ffmpeg binary, not MythTV):
+External codec library options (used for mythffmpeg and streaming transcode):
   --enable-libmp3lame      enable MP3 encoding via libmp3lame [no]
+  --enable-libfaac         enable AAC encoding vic libfaac [no]
   --enable-libx264         enable H.264 encoding via x264 [no]
+  --enable-libvpx          enable VP8 encoding via libvpx [no]
   --enable-libxvid         enable Xvid encoding via xvidcore,
                            native MPEG-4/Xvid encoder exists [no]
 EOF
@@ -1352,6 +1356,8 @@ MYTHTV_CONFIG_LIST='
     asi
     joystick_menu
     libcec
+    libcrypto
+    libdns_sd
     libfftw3
     libmpeg2external
     libxml2
@@ -1897,7 +1903,7 @@ BLOCKQUOTE
 # default parameters
 pre_logfile="config.ep"
 logfile="$pre_logfile"
-compile_type="release"
+compile_type="profile"
 
 # installation paths
 prefix_default="/usr/local"
@@ -1996,6 +2002,8 @@ enable asi
 enable lamemp3
 enable libass
 enable libcec
+enable libcrypto
+enable libdns_sd
 enable libxml2
 enable libudf
 enable lirc
@@ -4092,6 +4100,11 @@ EOF
     fi
 fi
 
+# Disable OpenGL ES support if Qt does not support it
+if $(pkg-config --variable=qt_config QtOpenGL | grep -qv opengles2) ; then
+    disable opengles
+fi
+
 if enabled firewire; then
     fwlibs=""
     check_libx fwlibs libavc1394/avc1394.h avc1394_transaction_block2 -lavc1394 && check_libx fwlibs libiec61883/iec61883.h iec61883_cmp_reconnect -liec61883 || disable firewire
@@ -4117,7 +4130,8 @@ enabled libfftw3 && check_lib2 fftw3.h fftw_init_threads -lfftw3_threads -lfftw3
 # ass_flush_events was added in 0.9.10
 enabled libass && check_lib2 ass/ass.h ass_flush_events -lass || disable libass
 
-enabled libcec && check_cxx -I"$libcec_path" <<EOF || { echolog "libCEC support needs libcec >= 1" && disable libcec; }
+if enabled libcec ; then
+    check_cxx -I"$libcec_path" <<EOF || { disable libcec; }
 #include <libcec/cec.h>
 #include <iostream>
 using namespace std;
@@ -4129,6 +4143,13 @@ int main(void) {
     return (long) LoadLibCec;
 }
 EOF
+fi
+
+enabled libcrypto && check_lib openssl/rsa.h RSA_new -lcrypto || disable libcrypto
+
+if test $target_os != darwin ; then
+    enabled libdns_sd && check_lib dns_sd.h DNSServiceRegister -ldns_sd || disable libdns_sd
+fi
 
 if enabled libxml2 ; then
    if pkg-config --exists libxml-2.0 ; then
@@ -4255,7 +4276,7 @@ fi
 
 if enabled gxx; then
     if enabled symbol_visibility; then
-        if expr "$gxx_version" : '^4\.[2-9]' > /dev/null; then
+        if expr "$gxx_version" : '4\.[2-9]' > /dev/null; then
             check_cxxflags -fvisibility-inlines-hidden
             append CCONFIG "use_hidesyms"
         else
@@ -4263,7 +4284,7 @@ if enabled gxx; then
             warn "--enable-symbol-visibility requires gcc 4.2 or higher"
         fi
     fi
-    if expr "$gxx_version" : '^4\.[3-9]' > /dev/null; then
+    if expr "$gxx_version" : '4\.[3-9]' > /dev/null; then
         check_cxxflags -Wmissing-declarations
     fi
 fi
@@ -4288,12 +4309,15 @@ if enabled bindings_perl; then
     check_pl_lib "Sys::Hostname"  || disable_bindings_perl "Sys::Hostname"
 # Modules not distributed in Perl core
     check_pl_lib DBI              || disable_bindings_perl DBI
+    check_pl_lib "DBD::mysql"     || disable_bindings_perl "DBD::mysql"
     check_pl_lib "HTTP::Request"  || disable_bindings_perl "HTTP::Request"
     check_pl_lib "LWP::UserAgent" || disable_bindings_perl "LWP::UserAgent"
     check_pl_lib "Net::UPnP::QueryResponse" ||
         disable_bindings_perl "Net::UPnP::QueryResponse"
     check_pl_lib "Net::UPnP::ControlPoint"  ||
         disable_bindings_perl "Net::UPnP::ControlPoint"
+    check_pl_lib "IO::Socket::INET6"  ||
+        disable_bindings_perl "IO::Socket::INET6"
 fi
 
 # Check for php dependencies
@@ -4561,6 +4585,8 @@ echo "multi threaded libavcodec ${threads-no}"
 if enabled frontend; then
   echo "libxml2 support           ${libxml2-no} [$libxml2_path]"
 fi
+echo "libdns_sd (Bonjour)       ${libdns_sd-no}"
+echo "libcrypto                 ${libcrypto-no}"
 echo "Frontend                  ${frontend-no}"
 echo "Backend                   ${backend-no}"
 echo "OpenGL ES 2.0             ${opengles-no}"
@@ -4575,10 +4601,12 @@ echo "bindings_python           ${bindings_python-no}"
 echo "bindings_php              ${bindings_php-no}"
 echo ""
 
-echo "# mythffmpeg Options"
+echo "# External Codec Options"
 echo "mp3lame                   ${libmp3lame-no}"
+echo "faac                      ${libfaac-no}"
 echo "xvid                      ${libxvid-no}"
 echo "x264                      ${libx264-no}"
+echo "vpx                       ${libvpx-no}"
 echo ""
 
 MYTH_CONFIG_H=libs/libmythbase/mythconfig.h

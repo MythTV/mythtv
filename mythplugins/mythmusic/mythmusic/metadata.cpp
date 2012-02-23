@@ -12,6 +12,8 @@
 #include <mythdirs.h>
 #include <mythprogressdialog.h>
 #include <mythdownloadmanager.h>
+#include <mythlogging.h>
+#include <util.h>
 
 // mythmusic
 #include "metadata.h"
@@ -22,10 +24,10 @@
 #include "metaiooggvorbis.h"
 #include "metaioflacvorbis.h"
 #include "metaiowavpack.h"
-#include "treebuilders.h"
 #include "playlist.h"
 #include "playlistcontainer.h"
-#include "mythlogging.h"
+#include "musicutils.h"
+
 
 
 // this is the global MusicData object shared thoughout MythMusic
@@ -47,35 +49,15 @@ bool operator!=(const Metadata& a, const Metadata& b)
     return false;
 }
 
-static bool meta_less_than(const Metadata *item1, const Metadata *item2)
-{
-    return item1->compare(item2) < 0;
-}
-
-static bool music_less_than(const MusicNode *itemA, const MusicNode *itemB)
-{
-    QString title1 = itemA->getTitle().toLower();
-    QString title2 = itemB->getTitle().toLower();
-
-    // Cut "the " off the front of titles
-    if (title1.left(4) == thePrefix)
-        title1 = title1.mid(4);
-    if (title2.left(4) == thePrefix)
-        title2 = title2.mid(4);
-
-    return title1.localeAwareCompare(title2) < 0;
-}
-
-/**************************************************************************/
-
-Metadata::~Metadata(void)
+Metadata::~Metadata()
 {
     if (m_albumArt)
     {
         delete m_albumArt;
         m_albumArt = NULL;
     }
- }
+}
+
 
 Metadata& Metadata::operator=(const Metadata &rhs)
 {
@@ -88,11 +70,14 @@ Metadata& Metadata::operator=(const Metadata &rhs)
     m_genre = rhs.m_genre;
     m_year = rhs.m_year;
     m_tracknum = rhs.m_tracknum;
+    m_trackCount = rhs.m_trackCount;
     m_length = rhs.m_length;
     m_rating = rhs.m_rating;
     m_lastplay = rhs.m_lastplay;
+    m_templastplay = rhs.m_templastplay;
     m_dateadded = rhs.m_dateadded;
     m_playcount = rhs.m_playcount;
+    m_tempplaycount = rhs.m_tempplaycount;
     m_compilation = rhs.m_compilation;
     m_id = rhs.m_id;
     m_filename = rhs.m_filename;
@@ -104,22 +89,22 @@ Metadata& Metadata::operator=(const Metadata &rhs)
     m_albumArt = NULL;
     m_format = rhs.m_format;
     m_changed = rhs.m_changed;
-    m_show = rhs.m_show;
 
     return *this;
 }
 
-QString Metadata::m_startdir;
-
-void Metadata::SetStartdir(const QString &dir)
-{
-    Metadata::m_startdir = dir;
-}
-
-void Metadata::persist() const
+void Metadata::persist()
 {
     if (m_id < 1)
         return;
+
+    if (m_templastplay.isValid())
+    {
+        m_lastplay = m_templastplay;
+        m_playcount = m_tempplaycount;
+
+        m_templastplay = QDateTime();
+    }
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("UPDATE music_songs set rating = :RATING , "
@@ -132,6 +117,10 @@ void Metadata::persist() const
 
     if (!query.exec())
         MythDB::DBError("music persist", query);
+
+    gPlayer->sendTrackStatsChangedEvent(ID());
+
+    m_changed = false;
 }
 
 
@@ -182,13 +171,8 @@ bool Metadata::isInDatabase()
 {
     bool retval = false;
 
-    QString sqlfilepath(m_filename);
-    if (!sqlfilepath.contains("://"))
-    {
-        sqlfilepath.remove(0, m_startdir.length());
-    }
-    QString sqldir = sqlfilepath.section( '/', 0, -2);
-    QString sqlfilename =sqlfilepath.section( '/', -1 ) ;
+    QString sqldir = m_filename.section('/', 0, -2);
+    QString sqlfilename = m_filename.section('/', -1);
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT music_artists.artist_name, "
@@ -196,7 +180,8 @@ bool Metadata::isInDatabase()
     "music_albums.album_name, music_songs.name, music_genres.genre, "
     "music_songs.year, music_songs.track, music_songs.length, "
     "music_songs.song_id, music_songs.rating, music_songs.numplays, "
-    "music_songs.lastplay, music_albums.compilation, music_songs.format "
+    "music_songs.lastplay, music_albums.compilation, music_songs.format, "
+    "music_songs.track_count "
     "FROM music_songs "
     "LEFT JOIN music_directories "
     "ON music_songs.directory_id=music_directories.directory_id "
@@ -228,6 +213,7 @@ bool Metadata::isInDatabase()
         m_lastplay = query.value(11).toDateTime();
         m_compilation = (query.value(12).toInt() > 0);
         m_format = query.value(13).toString();
+        m_trackCount = query.value(14).toInt();
 
         retval = true;
     }
@@ -237,13 +223,8 @@ bool Metadata::isInDatabase()
 
 void Metadata::dumpToDatabase()
 {
-    QString sqlfilepath(m_filename);
-    if (!sqlfilepath.contains("://"))
-    {
-        sqlfilepath.remove(0, m_startdir.length());
-    }
-    QString sqldir = sqlfilepath.section( '/', 0, -2);
-    QString sqlfilename = sqlfilepath.section( '/', -1 ) ;
+    QString sqldir = m_filename.section('/', 0, -2);
+    QString sqlfilename = m_filename.section('/', -1);
 
     checkEmptyFields();
 
@@ -417,13 +398,13 @@ void Metadata::dumpToDatabase()
                    " artist_id, album_id,  name,         genre_id,"
                    " year,      track,     length,       filename,"
                    " rating,    format,    date_entered, date_modified,"
-                   " numplays) "
+                   " numplays,  track_count) "
                    "VALUES ( "
                    " :DIRECTORY, "
                    " :ARTIST,   :ALBUM,    :TITLE,       :GENRE,"
                    " :YEAR,     :TRACKNUM, :LENGTH,      :FILENAME,"
                    " :RATING,   :FORMAT,   :DATE_ADD,    :DATE_MOD,"
-                   " :PLAYCOUNT );";
+                   " :PLAYCOUNT,:TRACKCOUNT );";
     }
     else
     {
@@ -441,6 +422,7 @@ void Metadata::dumpToDatabase()
                    ", format = :FORMAT"
                    ", date_modified = :DATE_MOD "
                    ", numplays = :PLAYCOUNT "
+                   ", track_count = :TRACKCOUNT "
                    "WHERE song_id= :ID ;";
     }
 
@@ -464,6 +446,8 @@ void Metadata::dumpToDatabase()
         query.bindValue(":DATE_ADD",  MythDate::current());
     else
         query.bindValue(":ID", m_id);
+
+    query.bindValue(":TRACKCOUNT", m_trackCount);
 
     if (!query.exec())
         MythDB::DBError("Metadata::dumpToDatabase - updating music_songs",
@@ -630,6 +614,36 @@ QString Metadata::FormatTitle()
     return m_formattedtitle;
 }
 
+QString Metadata::Filename(bool find) const
+{
+    // if not asked to find the file just return the raw filename from the DB
+    if (find == false)
+        return m_filename;
+
+    // check for a cd track
+    if (m_filename.endsWith(".cda"))
+        return m_filename;
+
+    // check for http urls etc
+    if (m_filename.contains("://"))
+        return m_filename;
+
+    // first check to see if the filename is complete
+    if (QFile::exists(m_filename))
+        return m_filename;
+
+    // next try appending the start directory
+    if (QFile::exists(gMusicData->musicDir + m_filename))
+        return gMusicData->musicDir + m_filename;
+
+    // maybe it's in our 'Music' storage group
+    //TODO add storage group lookup here
+
+    // not found
+    LOG(VB_GENERAL, LOG_ERR, QString("Metadata: Asked to get the filename for a track but no file found: %1")
+                                     .arg(m_filename));
+    return QString();
+}
 
 void Metadata::setField(const QString &field, const QString &data)
 {
@@ -649,6 +663,8 @@ void Metadata::setField(const QString &field, const QString &data)
         m_year = data.toInt();
     else if (field == "tracknum")
         m_tracknum = data.toInt();
+    else if (field == "trackcount")
+        m_trackCount = data.toInt();
     else if (field == "length")
         m_length = data.toInt();
     else if (field == "compilation")
@@ -679,32 +695,41 @@ void Metadata::getField(const QString &field, QString *data)
     }
 }
 
-void Metadata::toMap(MetadataMap &metadataMap)
+void Metadata::toMap(MetadataMap &metadataMap, const QString &prefix)
 {
-    metadataMap["artist"] = m_artist;
-    metadataMap["formatartist"] = FormatArtist();
-    metadataMap["compilationartist"] = m_compilation_artist;
-    metadataMap["album"] = m_album;
-    metadataMap["title"] = m_title;
-    metadataMap["formattitle"] = FormatTitle();
-    metadataMap["tracknum"] = (m_tracknum > 0 ? QString("%1").arg(m_tracknum) : "");
-    metadataMap["genre"] = m_genre;
-    metadataMap["year"] = (m_year > 0 ? QString("%1").arg(m_year) : "");
+    using namespace MythDate;
+    metadataMap[prefix + "artist"] = m_artist;
+    metadataMap[prefix + "formatartist"] = FormatArtist();
+    metadataMap[prefix + "compilationartist"] = m_compilation_artist;
+    metadataMap[prefix + "album"] = m_album;
+    metadataMap[prefix + "title"] = m_title;
+    metadataMap[prefix + "formattitle"] = FormatTitle();
+    metadataMap[prefix + "tracknum"] = (m_tracknum > 0 ? QString("%1").arg(m_tracknum) : "");
+    metadataMap[prefix + "trackcount"] = (m_trackCount > 0 ? QString("%1").arg(m_trackCount) : "");
+    metadataMap[prefix + "genre"] = m_genre;
+    metadataMap[prefix + "year"] = (m_year > 0 ? QString("%1").arg(m_year) : "");
 
     int len = m_length / 1000;
     int eh = len / 3600;
     int em = (len / 60) % 60;
     int es = len % 60;
     if (eh > 0)
-        metadataMap["length"] = QString().sprintf("%d:%02d:%02d", eh, em, es);
+        metadataMap[prefix + "length"] = QString().sprintf("%d:%02d:%02d", eh, em, es);
     else
-        metadataMap["length"] = QString().sprintf("%02d:%02d", em, es);
+        metadataMap[prefix + "length"] = QString().sprintf("%02d:%02d", em, es);
 
-    metadataMap["lastplayed"] = MythDate::toString(m_lastplay,
-                                              MythDate::kDateFull | MythDate::kSimplify | MythDate::kAddYear);
+    if (m_lastplay.isValid())
+        metadataMap[prefix + "lastplayed"] =
+            MythDate::toString(m_lastplay, kDateFull | kSimplify | kAddYear);
+    else
+        metadataMap[prefix + "lastplayed"] = QObject::tr("Never Played");
 
-    metadataMap["playcount"] = QString::number(m_playcount);
-    metadataMap["filename"] = m_filename;
+    metadataMap[prefix + "dateadded"] = MythDate::toString(
+        m_dateadded, kDateFull | kSimplify | kAddYear);
+
+    metadataMap[prefix + "playcount"] = QString::number(m_playcount);
+    // FIXME we should use Filename() here but that will slow things down because of the hunt for the file
+    metadataMap[prefix + "filename"] = gMusicData->musicDir + m_filename;
 }
 
 void Metadata::decRating()
@@ -727,13 +752,13 @@ void Metadata::incRating()
 
 void Metadata::setLastPlay()
 {
-    m_lastplay = MythDate::current();
+    m_templastplay = MythDate::current();
     m_changed = true;
 }
 
 void Metadata::incPlayCount()
 {
-    m_playcount++;
+    m_tempplaycount = m_playcount + 1;
     m_changed = true;
 }
 
@@ -845,7 +870,8 @@ QString Metadata::getAlbumArtFile(void)
                 if (albumart_image->embedded && getTagger()->supportsEmbeddedImages())
                 {
                     // image is embedded try to extract it from the tag and cache it for latter
-                    QImage *image = getTagger()->getAlbumArt(m_filename, albumart_image->imageType);
+                    QImage *image = getTagger()->getAlbumArt(Filename(),
+                                                             albumart_image->imageType);
                     if (image)
                     {
                         image->save(res);
@@ -914,7 +940,7 @@ MetaIO* Metadata::getTagger(void)
         return &metaIOOggVorbis;
     else if (extension == "flac")
     {
-        if (metaIOID3.TagExists(m_filename))
+        if (metaIOID3.TagExists(Filename()))
             return &metaIOID3;
         else
             return &metaIOFLACVorbis;
@@ -943,13 +969,9 @@ void MetadataLoadingThread::run()
     RunEpilog();
 }
 
-AllMusic::AllMusic(QString path_assignment, QString a_startdir) :
-    m_root_node(NULL),
-
+AllMusic::AllMusic(void) :
     m_numPcs(0),
     m_numLoaded(0),
-    m_cd_title(QObject::tr("CD -- none")),
-    m_startdir(a_startdir),
     m_metadata_loader(NULL),
     m_done_loading(false),
     m_last_listed(-1),
@@ -959,11 +981,6 @@ AllMusic::AllMusic(QString path_assignment, QString a_startdir) :
     m_lastplayMin(0.0),
     m_lastplayMax(0.0)
 {
-    //  How should we sort?
-    setSorting(path_assignment);
-
-    m_root_node = new MusicNode(QObject::tr("All My Music"), m_paths);
-
     //  Start a thread to do data loading and sorting
     startLoading();
 }
@@ -976,7 +993,11 @@ AllMusic::~AllMusic()
         m_all_music.pop_back();
     }
 
-    delete m_root_node;
+    while (!m_cdData.empty())
+    {
+        delete m_cdData.back();
+        m_cdData.pop_back();
+    }
 
     m_metadata_loader->wait();
     delete m_metadata_loader;
@@ -988,7 +1009,7 @@ bool AllMusic::cleanOutThreads()
     //  probably selected mythmusic and then
     //  escaped out right away
 
-    if(m_metadata_loader->isFinished())
+    if (m_metadata_loader->isFinished())
     {
         return true;
     }
@@ -1026,6 +1047,8 @@ bool AllMusic::startLoading(void)
     return true;
 }
 
+// NOTE we don't clear the existing tracks just load any new ones found in the DB
+// maybe we should also check for any removed tracks?
 void AllMusic::resync()
 {
     m_done_loading = false;
@@ -1036,7 +1059,7 @@ void AllMusic::resync()
                      "music_songs.track, music_songs.length, music_songs.directory_id, "
                      "CONCAT_WS('/', music_directories.path, music_songs.filename) AS filename, "
                      "music_songs.rating, music_songs.numplays, music_songs.lastplay, music_songs.date_entered, "
-                     "music_albums.compilation, music_songs.format "
+                     "music_albums.compilation, music_songs.format, music_songs.track_count "
                      "FROM music_songs "
                      "LEFT JOIN music_directories ON music_songs.directory_id=music_directories.directory_id "
                      "LEFT JOIN music_artists ON music_songs.artist_id=music_artists.artist_id "
@@ -1051,9 +1074,6 @@ void AllMusic::resync()
     if (!query.exec(aquery))
         MythDB::DBError("AllMusic::resync", query);
 
-    m_root_node->clear();
-    m_all_music.clear();
-
     m_numPcs = query.size() * 2;
     m_numLoaded = 0;
 
@@ -1066,8 +1086,6 @@ void AllMusic::resync()
             if (!music_map.contains(id))
             {
                 filename = query.value(12).toString();
-                if (!filename.contains("://"))
-                    filename = m_startdir + filename;
 
                 Metadata *mdata = new Metadata(
                     filename,
@@ -1090,6 +1108,7 @@ void AllMusic::resync()
                 mdata->setDirectoryId(query.value(11).toInt());
                 mdata->setArtistId(query.value(1).toInt());
                 mdata->setAlbumId(query.value(4).toInt());
+                mdata->setTrackCount(query.value(19).toInt());
 
                 //  Don't delete mdata, as PtrList now owns it
                 m_all_music.append(mdata);
@@ -1123,149 +1142,20 @@ void AllMusic::resync()
                                   "That's ok with me if it's ok with you.");
     }
 
-    //  Build a tree to reflect current state of
-    //  the metadata. Once built, sort it.
-
-    buildTree();
-    sortTree();
     m_done_loading = true;
-}
-
-void AllMusic::sortTree()
-{
-    m_root_node->sort();
-}
-
-void AllMusic::buildTree()
-{
-    //
-    //  Given "paths" and loaded metadata,
-    //  build a tree (nodes, leaves, and all)
-    //  that reflects the desired structure
-    //  of the metadata. This is a structure
-    //  that makes it easy (and QUICK) to
-    //  display metadata on (for example) a
-    //  Select Music screen
-    //
-
-    MetadataPtrList list;
-
-    MetadataPtrList::iterator it = m_all_music.begin();
-    for (; it != m_all_music.end(); ++it)
-    {
-        if ((*it)->isVisible())
-            list.append(*it);
-        m_numLoaded++;
-    }
-
-    MusicTreeBuilder *builder = MusicTreeBuilder::createBuilder(m_paths);
-    builder->makeTree(m_root_node, list);
-    delete builder;
-}
-
-void AllMusic::writeTree(GenericTree *tree_to_write_to)
-{
-    m_root_node->writeTree(tree_to_write_to, 0);
-}
-
-bool AllMusic::putYourselfOnTheListView(TreeCheckItem *where)
-{
-    m_root_node->putYourselfOnTheListView(where, false);
-    return true;
-}
-
-void AllMusic::putCDOnTheListView(CDCheckItem *where)
-{
-    ValueMetadata::iterator anit;
-    for(anit = m_cd_data.begin(); anit != m_cd_data.end(); ++anit)
-    {
-        QString title_string;
-        if((*anit).Title().length() > 0)
-        {
-            title_string = (*anit).FormatTitle();
-        }
-        else
-        {
-            title_string = QObject::tr("Unknown");
-        }
-        QString title_temp = QString("%1 - %2").arg((*anit).Track()).arg(title_string);
-        QString level_temp = QObject::tr("title");
-        CDCheckItem *new_item = new CDCheckItem(where, title_temp, level_temp,
-                                                -(*anit).Track());
-        new_item->setCheck(false); //  Avoiding -Wall
-    }
-}
-
-QString AllMusic::getLabel(int an_id, bool *error_flag)
-{
-    QString a_label;
-    if(an_id > 0)
-    {
-
-        if (!music_map.contains(an_id))
-        {
-            a_label = QString(QObject::tr("Missing database entry: %1")).arg(an_id);
-            *error_flag = true;
-            return a_label;
-        }
-
-        a_label += music_map[an_id]->FormatArtist();
-        a_label += " ~ ";
-        a_label += music_map[an_id]->FormatTitle();
-
-
-        if(a_label.length() < 1)
-        {
-            a_label = QObject::tr("Ooops");
-            *error_flag = true;
-        }
-        else
-        {
-            *error_flag = false;
-        }
-        return a_label;
-    }
-    else
-    {
-        ValueMetadata::iterator anit;
-        for(anit = m_cd_data.begin(); anit != m_cd_data.end(); ++anit)
-        {
-            if( (*anit).Track() == an_id * -1)
-            {
-                a_label = QString("(CD) %1 ~ %2").arg((*anit).FormatArtist())
-                                                 .arg((*anit).FormatTitle());
-                *error_flag = false;
-                return a_label;
-            }
-        }
-    }
-
-    a_label.clear();
-    *error_flag = true;
-    return a_label;
 }
 
 Metadata* AllMusic::getMetadata(int an_id)
 {
-    if(an_id > 0)
-    {
-        if (music_map.contains(an_id))
-        {
-            return music_map[an_id];
-        }
-    }
-    else if(an_id < 0)
-    {
-        ValueMetadata::iterator anit;
-        for(anit = m_cd_data.begin(); anit != m_cd_data.end(); ++anit)
-        {
-            if( (*anit).Track() == an_id * -1)
-            {
-                return &(*anit);
-            }
-        }
-    }
+    if (music_map.contains(an_id))
+        return music_map[an_id];
+
     return NULL;
+}
+
+bool AllMusic::isValidID(int an_id)
+{
+    return music_map.contains(an_id);
 }
 
 bool AllMusic::updateMetadata(int an_id, Metadata *the_track)
@@ -1293,235 +1183,52 @@ void AllMusic::save(void)
     }
 }
 
-void AllMusic::clearCDData()
+// cd stuff
+void AllMusic::clearCDData(void)
 {
-    m_cd_data.clear();
-    m_cd_title = QObject::tr("CD -- none");
+    while (!m_cdData.empty())
+    {
+        delete m_cdData.back();
+        m_cdData.pop_back();
+    }
+
+    m_cdTitle = QObject::tr("CD -- none");
 }
 
-void AllMusic::addCDTrack(Metadata *the_track)
+void AllMusic::addCDTrack(const Metadata &the_track)
 {
-    m_cd_data.append(*the_track);
+    Metadata *mdata = new Metadata(the_track);
+    mdata->setID(m_cdData.count() + 1);
+    mdata->setRepo(RT_CD);
+    m_cdData.append(mdata);
+    music_map[mdata->ID()] = mdata;
 }
 
 bool AllMusic::checkCDTrack(Metadata *the_track)
 {
-    if (m_cd_data.count() < 1)
-    {
+    if (m_cdData.count() < 1)
         return false;
-    }
-    if (m_cd_data.last().FormatTitle() == the_track->FormatTitle())
-    {
+
+    if (m_cdData.last()->FormatTitle() == the_track->FormatTitle())
         return true;
-    }
+
     return false;
 }
 
-bool AllMusic::getCDMetadata(int the_track, Metadata *some_metadata)
+Metadata* AllMusic::getCDMetadata(int the_track)
 {
-    ValueMetadata::iterator anit;
-    for (anit = m_cd_data.begin(); anit != m_cd_data.end(); ++anit)
+    MetadataPtrList::iterator anit;
+    for (anit = m_cdData.begin(); anit != m_cdData.end(); ++anit)
     {
-        if ((*anit).Track() == the_track)
+        if ((*anit)->Track() == the_track)
         {
-            *some_metadata = (*anit);
-            return true;
-        }
-
-    }
-    return false;
-}
-
-void AllMusic::setSorting(QString a_paths)
-{
-    m_paths = a_paths;
-    MusicNode::SetStaticData(m_startdir, m_paths);
-
-    if (m_paths == "directory")
-        return;
-
-    //  Error checking
-    QStringList tree_levels = m_paths.split(" ");
-    QStringList::const_iterator it = tree_levels.begin();
-    for (; it != tree_levels.end(); ++it)
-    {
-        if (*it != "genre"        &&
-            *it != "artist"       &&
-            *it != "splitartist"  &&
-            *it != "splitartist1" &&
-            *it != "album"        &&
-            *it != "title")
-        {
-            LOG(VB_GENERAL, LOG_ERR,
-                QString("AllMusic::setSorting() Unknown tree level '%1'")
-                    .arg(*it));
+            return (*anit);
         }
     }
+
+    return NULL;
 }
 
-void AllMusic::setAllVisible(bool visible)
-{
-    MetadataPtrList::iterator it = m_all_music.begin();
-    for (; it != m_all_music.end(); ++it)
-        (*it)->setVisible(visible);
-}
-
-MusicNode::MusicNode(const QString &a_title, const QString &tree_level)
-{
-    my_title = a_title;
-    my_level = tree_level;
-    setPlayCountMin(0);
-    setPlayCountMax(0);
-    setLastPlayMin(0);
-    setLastPlayMax(0);
-}
-
-MusicNode::~MusicNode()
-{
-    clear();
-}
-
-// static member vars
-
-QString MusicNode::m_startdir;
-QString MusicNode::m_paths;
-int MusicNode::m_RatingWeight = 2;
-int MusicNode::m_PlayCountWeight = 2;
-int MusicNode::m_LastPlayWeight = 2;
-int MusicNode::m_RandomWeight = 2;
-
-void MusicNode::SetStaticData(const QString &startdir, const QString &paths)
-{
-    m_startdir = startdir;
-    m_paths = paths;
-    m_RatingWeight = gCoreContext->GetNumSetting("IntelliRatingWeight", 2);
-    m_PlayCountWeight = gCoreContext->GetNumSetting("IntelliPlayCountWeight", 2);
-    m_LastPlayWeight = gCoreContext->GetNumSetting("IntelliLastPlayWeight", 2);
-    m_RandomWeight = gCoreContext->GetNumSetting("IntelliRandomWeight", 2);
-}
-
-void MusicNode::putYourselfOnTheListView(TreeCheckItem *parent, bool show_node)
-{
-    TreeCheckItem *current_parent;
-
-    if (show_node)
-    {
-        QString title_temp = my_title;
-        QString level_temp = my_level;
-        current_parent = new TreeCheckItem(parent, title_temp, level_temp, 0);
-    }
-    else
-    {
-        current_parent = parent;
-    }
-
-
-    MetadataPtrList::iterator it = my_tracks.begin();
-    for (; it != my_tracks.end(); ++it)
-    {
-        QString title_temp = QString(QObject::tr("%1 - %2"))
-            .arg((*it)->Track()).arg((*it)->Title());
-        QString level_temp = QObject::tr("title");
-        TreeCheckItem *new_item = new TreeCheckItem(
-            current_parent, title_temp, level_temp, (*it)->ID());
-        new_item->setCheck(false); //  Avoiding -Wall
-    }
-
-    MusicNodePtrList::iterator mit = my_subnodes.begin();
-    for (; mit != my_subnodes.end(); ++mit)
-        (*mit)->putYourselfOnTheListView(current_parent, true);
-
-}
-
-void MusicNode::writeTree(GenericTree *tree_to_write_to, int a_counter)
-{
-
-    GenericTree *sub_node = tree_to_write_to->addNode(my_title);
-    sub_node->setAttribute(0, 0);
-    sub_node->setAttribute(1, a_counter);
-    sub_node->setAttribute(2, a_counter);
-    sub_node->setAttribute(3, a_counter);
-    sub_node->setAttribute(4, a_counter);
-    sub_node->setAttribute(5, a_counter);
-
-    int track_counter = 0;
-
-    MetadataPtrList::iterator it = my_tracks.begin();
-    for (; it != my_tracks.end(); ++it)
-    {
-        QString title_temp = QObject::tr("%1 - %2")
-            .arg((*it)->Track()).arg((*it)->Title());
-        GenericTree *subsub_node = sub_node->addNode(title_temp, (*it)->ID(), true);
-        subsub_node->setAttribute(0, 1);
-        subsub_node->setAttribute(1, track_counter);    // regular order
-        subsub_node->setAttribute(2, random());           // random order
-
-        //
-        //  "Intelligent" ordering
-        //
-        int rating = (*it)->Rating();
-        int playcount = (*it)->PlayCount();
-        double lastplaydbl = (*it)->LastPlay().toTime_t();
-        double ratingValue = (double)(rating) / 10;
-        double playcountValue, lastplayValue;
-
-        if (m_playcountMax == m_playcountMin)
-        {
-            playcountValue = 0;
-        }
-        else
-        {
-            playcountValue = ((m_playcountMin - (double)playcount) /
-                              (m_playcountMax - m_playcountMin) + 1);
-        }
-
-        if (m_lastplayMax == m_lastplayMin)
-        {
-            lastplayValue = 0;
-        }
-        else
-        {
-            lastplayValue = ((m_lastplayMin - lastplaydbl) /
-                             (m_lastplayMax - m_lastplayMin) + 1);
-        }
-
-        double rating_value =
-            m_RatingWeight * ratingValue +
-            m_PlayCountWeight * playcountValue +
-            m_LastPlayWeight * lastplayValue +
-            m_RandomWeight * (double)random() / (RAND_MAX + 1.0);
-
-        int integer_rating = (int) (4000001 - rating_value * 10000);
-        subsub_node->setAttribute(3, integer_rating);   //  "intelligent" order
-        ++track_counter;
-    }
-
-    MusicNodePtrList::const_iterator sit = my_subnodes.begin();
-    for (int another_counter = 0; sit != my_subnodes.end(); ++sit)
-    {
-        (*sit)->setPlayCountMin(m_playcountMin);
-        (*sit)->setPlayCountMax(m_playcountMax);
-        (*sit)->setLastPlayMin(m_lastplayMin);
-        (*sit)->setLastPlayMax(m_lastplayMax);
-        (*sit)->writeTree(sub_node, another_counter);
-        ++another_counter;
-    }
-}
-
-
-void MusicNode::sort()
-{
-    //  Sort any tracks
-    qStableSort(my_tracks.begin(), my_tracks.end(), meta_less_than);
-
-    //  Sort any subnodes
-    qStableSort(my_subnodes.begin(), my_subnodes.end(), music_less_than);
-
-    //  Tell any subnodes to sort themselves
-    MusicNodePtrList::const_iterator sit = my_subnodes.begin();
-    for (; sit != my_subnodes.end(); ++sit)
-        (*sit)->sort();
-}
 
 /**************************************************************************/
 
@@ -1579,9 +1286,8 @@ void AlbumArtImages::findImages(void)
         if (trackid == 0)
             return;
 
-        QFileInfo fi(m_parent->Filename());
-        QString dir = fi.absolutePath();
-        dir.remove(0, Metadata::GetStartdir().length());
+        QFileInfo fi(m_parent->Filename(false));
+        QString dir = fi.path();
 
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("SELECT albumart_id, CONCAT_WS('/', music_directories.path, "
@@ -1606,13 +1312,26 @@ void AlbumArtImages::findImages(void)
                 if (embedded)
                     image->filename = GetConfDir() + "/MythMusic/AlbumArt/" + query.value(1).toString();
                 else
-                    image->filename = Metadata::GetStartdir() + query.value(1).toString();
+                    image->filename = gMusicData->musicDir + query.value(1).toString();
 
                 image->imageType = (ImageType) query.value(3).toInt();
                 image->embedded = embedded;
 
                 m_imageList.push_back(image);
             }
+        }
+
+        // add any artist images
+        QString artist = m_parent->Artist().toLower();
+        if (findIcon("artist", artist) != QString())
+        {
+            AlbumArtImage *image = new AlbumArtImage();
+            image->id = -1;
+            image->filename = findIcon("artist", artist);
+            image->imageType = IT_ARTIST;
+            image->embedded = false;
+
+            m_imageList.push_back(image);
         }
     }
 }
@@ -1657,7 +1376,8 @@ QString AlbumArtImages::getTypeName(ImageType type)
         QT_TR_NOOP("Front Cover"),        // IT_FRONTCOVER
         QT_TR_NOOP("Back Cover"),         // IT_BACKCOVER
         QT_TR_NOOP("CD"),                 // IT_CD
-        QT_TR_NOOP("Inlay")               // IT_INLAY
+        QT_TR_NOOP("Inlay"),              // IT_INLAY
+        QT_TR_NOOP("Artist"),             // IT_ARTIST
     };
 
     return QObject::tr(type_strings[type]);
@@ -1672,7 +1392,8 @@ QString AlbumArtImages::getTypeFilename(ImageType type)
         QT_TR_NOOP("front"),        // IT_FRONTCOVER
         QT_TR_NOOP("back"),         // IT_BACKCOVER
         QT_TR_NOOP("cd"),           // IT_CD
-        QT_TR_NOOP("inlay")         // IT_INLAY
+        QT_TR_NOOP("inlay"),        // IT_INLAY
+        QT_TR_NOOP("artist")        // IT_ARTIST
     };
 
     return QObject::tr(filename_strings[type]);
@@ -1727,6 +1448,8 @@ void AlbumArtImages::addImage(const AlbumArtImage &newImage)
     {
         // we already have an image of this type so just update it with the new info
         image->filename = newImage.filename;
+        image->imageType = newImage.imageType;
+        image->embedded = newImage.embedded;
         image->description = newImage.description;
     }
 
@@ -1786,7 +1509,11 @@ void AlbumArtImages::dumpToDatabase(void)
     {
         AlbumArtImage *image = (*it);
 
-        if (image->id != 0)
+        //TODO: for the moment just ignore artist images
+        if (image->imageType == IT_ARTIST)
+            continue;
+
+        if (image->id > 0)
         {
             // re-use the same id this image had before
             query.prepare("INSERT INTO music_albumart ( albumart_id, "

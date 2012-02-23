@@ -51,9 +51,9 @@ class DTVParamHelper
 {
   public:
     DTVParamHelper(int _value) : value(_value) { }
+    DTVParamHelper &operator=(int _value) { value = _value; return *this; }
 
     operator int()                const { return value;          }
-    int operator=(int _value)           { return value = _value; }
     bool operator==(const int& v) const { return value == v;     }
     bool operator!=(const int& v) const { return value != v;     }
 

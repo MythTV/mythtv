@@ -64,7 +64,7 @@ void GameScannerThread::verifyFiles()
 
     if (m_HasGUI)
         SendProgressEvent(counter, (uint)m_dbgames.count(),
-                          GameScanner::tr("Verifying game files"));
+                          GameScanner::tr("Verifying game files..."));
 
     // For every file we know about, check to see if it still exists.
     for (QList<RomInfo*>::iterator p = m_dbgames.begin();
@@ -107,7 +107,7 @@ void GameScannerThread::updateDB()
     uint counter = 0;
     if (m_HasGUI)
         SendProgressEvent(counter, (uint)(m_files.size() + m_remove.size()),
-                          GameScanner::tr("Updating game database"));
+                          GameScanner::tr("Updating game database..."));
 
     for (QList<RomFileInfo>::iterator p = m_files.begin();
                                  p != m_files.end(); ++p)
