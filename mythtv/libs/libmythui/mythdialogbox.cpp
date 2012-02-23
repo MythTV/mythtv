@@ -906,7 +906,7 @@ bool MythTimeInputDialog::Create()
             item = new MythUIButtonListItem(m_dateList, text, NULL, false);
             item->SetData(QVariant(date));
 
-            if (m_startTime.date() == date)
+            if (selected)
                 m_dateList->SetItemCurrent(item);
         }
         m_dateList->SetVisible(true);
