@@ -1359,23 +1359,6 @@ static HostSpinBox *OSDCC708TextZoomPercentage(void)
     return gs;
 }
 
-static HostComboBox *SubtitleFont()
-{
-    HostComboBox *hcb = new HostComboBox("OSDSubFont");
-    QFontDatabase db;
-    QStringList fonts = db.families();
-    QStringList hide  = db.families(QFontDatabase::Symbol);
-
-    hcb->setLabel(QObject::tr("Subtitle Font"));
-    hcb->setHelpText(QObject::tr("The font to use for text based subtitles."));
-    foreach (QString font, fonts)
-    {
-        if (!hide.contains(font))
-            hcb->addSelection(font, font, font.toLower() == "freesans");
-    }
-    return hcb;
-}
-
 static HostComboBox *SubtitleCodec()
 {
     HostComboBox *gc = new HostComboBox("SubtitleCodec");
@@ -3451,7 +3434,6 @@ OSDSettings::OSDSettings()
     osd->addChild(CCBackground());
     osd->addChild(DefaultCCMode());
     osd->addChild(PreferCC708());
-    osd->addChild(SubtitleFont());
     osd->addChild(OSDCC708TextZoomPercentage());
     osd->addChild(SubtitleCodec());
     addChild(osd);
