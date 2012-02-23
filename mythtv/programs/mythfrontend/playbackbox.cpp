@@ -394,6 +394,7 @@ PlaybackBox::PlaybackBox(MythScreenStack *parent, QString name, BoxType ltype,
 
       // General m_popupMenu support
       m_popupMenu(NULL),
+      m_menuDialog(NULL),
       m_doToggleMenu(true),
       // Main Recording List support
       m_progsInDB(0),
@@ -2309,6 +2310,8 @@ void PlaybackBox::selected(MythUIButtonListItem *item)
 
 void PlaybackBox::popupClosed(QString which, int result)
 {
+    m_menuDialog = NULL;
+
     if (result == -2)
     {
         if (!m_doToggleMenu)
@@ -2383,7 +2386,7 @@ void PlaybackBox::ShowGroupPopup()
 
     m_popupMenu->AddItem(tr("Help (Status Icons)"), SLOT(showIconHelp()));
 
-    ShowMenu();
+    DisplayPopupMenu();
 }
 
 bool PlaybackBox::Play(
@@ -2596,7 +2599,7 @@ void PlaybackBox::ShowDeletePopup(DeletePopupType type)
         m_popupMenu->AddItem(tmpmessage, tmpslot);
     }
 
-    ShowMenu();
+    DisplayPopupMenu();
 }
 
 void PlaybackBox::ShowAvailabilityPopup(const ProgramInfo &pginfo)
@@ -2825,20 +2828,50 @@ MythMenu* PlaybackBox::createPlaylistJobMenu(void)
     return menu;
 }
 
-void PlaybackBox::ShowMenu(void)
+void PlaybackBox::DisplayPopupMenu(void)
 {
-    if (!m_popupMenu)
+    if (m_menuDialog || !m_popupMenu)
         return;
 
-    MythDialogBox *popupDialog = new  MythDialogBox(m_popupMenu, m_popupStack, "pbbmainmenupopup");
+    m_menuDialog = new MythDialogBox(m_popupMenu, m_popupStack, "pbbmainmenupopup");
 
-    if (popupDialog->Create())
+    if (m_menuDialog->Create())
     {
-        m_popupStack->AddScreen(popupDialog);
-        connect(popupDialog, SIGNAL(Closed(QString,int)), SLOT(popupClosed(QString,int)));
+        m_popupStack->AddScreen(m_menuDialog);
+        connect(m_menuDialog, SIGNAL(Closed(QString,int)), SLOT(popupClosed(QString,int)));
     }
     else
-        delete popupDialog;
+        delete m_menuDialog;
+}
+
+void PlaybackBox::ShowMenu()
+{
+    if (m_menuDialog)
+        return;
+
+    if (GetFocusWidget() == m_groupList)
+        ShowGroupPopup();
+    else
+    {
+        ProgramInfo *pginfo = CurrentItem();
+        if (pginfo)
+        {
+            m_helper.CheckAvailability(
+                *pginfo, kCheckForMenuAction);
+
+            if ((asPendingDelete == pginfo->GetAvailableStatus()) ||
+                (asPendingDelete == pginfo->GetAvailableStatus()))
+            {
+                ShowAvailabilityPopup(*pginfo);
+            }
+            else
+            {
+                ShowActionPopup(*pginfo);
+            }
+        }
+        else
+            ShowGroupPopup();
+    }
 }
 
 MythMenu* PlaybackBox::createPlayFromMenu()
@@ -3067,7 +3100,7 @@ void PlaybackBox::ShowActionPopup(const ProgramInfo &pginfo)
             m_popupMenu->AddItem(tr("Add to Playlist"), SLOT(togglePlayListItem()));
         }
 
-        ShowMenu();
+        DisplayPopupMenu();
 
         return;
     }
@@ -3132,7 +3165,7 @@ void PlaybackBox::ShowActionPopup(const ProgramInfo &pginfo)
         }
     }
 
-    ShowMenu();
+    DisplayPopupMenu();
 }
 
 QString PlaybackBox::CreateProgramInfoString(const ProgramInfo &pginfo) const
@@ -3716,29 +3749,7 @@ bool PlaybackBox::keyPressEvent(QKeyEvent *event)
             showIconHelp();
         else if (action == "MENU")
         {
-             if (GetFocusWidget() == m_groupList)
-                 ShowGroupPopup();
-             else
-             {
-                 ProgramInfo *pginfo = CurrentItem();
-                 if (pginfo)
-                 {
-                     m_helper.CheckAvailability(
-                         *pginfo, kCheckForMenuAction);
-
-                     if ((asPendingDelete == pginfo->GetAvailableStatus()) ||
-                         (asPendingDelete == pginfo->GetAvailableStatus()))
-                     {
-                         ShowAvailabilityPopup(*pginfo);
-                     }
-                     else
-                     {
-                         ShowActionPopup(*pginfo);
-                     }
-                 }
-                 else
-                     ShowGroupPopup();
-             }
+            ShowMenu();
         }
         else if (action == "NEXTFAV")
         {
@@ -3999,7 +4010,7 @@ void PlaybackBox::customEvent(QEvent *event)
             if (!forceDelete)
             {
                 m_delList = me->ExtraDataList();
-                if (!m_popupMenu)
+                if (!m_menuDialog)
                 {
                     ShowDeletePopup(kForceDeleteRecording);
                     return;
