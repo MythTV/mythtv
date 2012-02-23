@@ -29,11 +29,13 @@ QEvent::Type DialogCompletionEvent::kEventType =
 MythMenu::MythMenu(const QString &text, QObject *retobject, const QString &resultid) :
     m_parentMenu(NULL),  m_title(""), m_text(text), m_resultid(resultid), m_retObject(retobject)
 {
+    Init();
 }
 
 MythMenu::MythMenu(const QString &title, const QString &text, QObject *retobject, const QString &resultid) :
     m_parentMenu(NULL),  m_title(title), m_text(text), m_resultid(resultid), m_retObject(retobject)
 {
+    Init();
 }
 
 MythMenu::~MythMenu(void)
@@ -47,6 +49,13 @@ MythMenu::~MythMenu(void)
 
         delete item;
     }
+}
+
+void MythMenu::Init()
+{
+    m_title.detach();
+    m_text.detach();
+    m_resultid.detach();
 }
 
 void MythMenu::AddItem(const QString& title, const char* slot, MythMenu *subMenu, bool selected, bool checked)
