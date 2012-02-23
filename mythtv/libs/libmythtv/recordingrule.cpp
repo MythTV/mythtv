@@ -499,6 +499,9 @@ void RecordingRule::ToMap(InfoMap &infoMap) const
     if (m_lastDeleted.isValid())
         infoMap["lastdeleted"] = MythDateTimeToString(m_lastDeleted,
                                                       kDateFull | kAddYear);
+
+    infoMap["ruletype"] = toString(m_type);
+    infoMap["rectype"] = toString(m_type);
 }
 
 void RecordingRule::UseTempTable(bool usetemp, QString table)
