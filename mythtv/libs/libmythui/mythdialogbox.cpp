@@ -402,6 +402,7 @@ bool MythDialogBox::gestureEvent(MythGestureEvent *event)
         switch (event->GetButton())
         {
             case MythGestureEvent::RightButton :
+                SendEvent(-2);
                 Close();
                 handled = true;
                 break;
