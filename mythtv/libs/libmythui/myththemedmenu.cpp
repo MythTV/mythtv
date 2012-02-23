@@ -360,7 +360,7 @@ void MythThemedMenu::customEvent(QEvent *event)
         DialogCompletionEvent *dce = (DialogCompletionEvent*)(event);
 
         QString resultid = dce->GetId();
-        int buttonnum = dce->GetResult();
+        //int buttonnum = dce->GetResult();
         QString halt_cmd = GetMythDB()->GetSetting("HaltCommand");
         QString reboot_cmd = GetMythDB()->GetSetting("RebootCommand");
 
