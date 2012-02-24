@@ -1797,6 +1797,18 @@ class TeletextDescriptor : public MPEGDescriptor
     uint TeletextPageNum(uint i) const
         { return _data[6 + (i*5)]; }
     // }                           5.0
+    QString toString(void) const
+    {
+        QString str = QString("Teletext Descriptor: %1 pages\n")
+            .arg(StreamCount());
+        for (uint i=0; i<StreamCount(); i++)
+        {
+            if (i!=0) str.append("\n");
+            str.append(QString("      Type (%1) Magazine (%2) Page (%3) Language (%4)").arg(TeletextType(i))
+                .arg(TeletextMagazineNum(i), 0, 16).arg(TeletextPageNum(i), 2, 16, QChar('0')).arg(LanguageString(i)));
+        }
+        return str;
+    }
 };
 
 // DVB Bluebook A038 (Sept 2011) p 89
