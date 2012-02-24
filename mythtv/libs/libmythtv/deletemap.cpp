@@ -88,7 +88,13 @@ bool DeleteMap::HandleAction(QString &action, uint64_t frame,
     else if (action == "CUTTOBEGINNING")
         Add(frame, total, MARK_CUT_END, QObject::tr("Cut to Beginning"));
     else if (action == "CUTTOEND")
+    {
         Add(frame, total, MARK_CUT_START, QObject::tr("Cut to End"));
+        // If the recording is still in progress, add an explicit end
+        // mark at the end.
+        if (m_ctx->playingInfo->GetRecordingStatus() == rsRecording)
+            Add(total - 1, total, MARK_CUT_END, "");
+    }
     else if (action == "NEWCUT")
         NewCut(frame, total);
     else if (action == "DELETE")
