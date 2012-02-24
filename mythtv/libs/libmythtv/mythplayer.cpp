@@ -2349,7 +2349,21 @@ bool MythPlayer::Rewind(float seconds)
         return false;
 
     if (rewindtime <= 0)
-        rewindtime = (long long)(seconds * video_frame_rate);
+    {
+        uint64_t fp = framesPlayed;
+        uint64_t delta = (seconds * video_frame_rate);
+        uint64_t target = (fp >= delta ? fp - delta : 0);
+        if (IsInDelete(target))
+        {
+            target = GetNearestMark(target, false);
+            const int extraSecs = 5;
+            if (target >= extraSecs * video_frame_rate)
+                target -= extraSecs * video_frame_rate;
+            else
+                target = 0;
+        }
+        rewindtime = (long long)(fp - target);
+    }
     return (uint64_t)rewindtime >= framesPlayed;
 }
 
