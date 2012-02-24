@@ -469,7 +469,7 @@ void SubtitleScreen::DrawTextSubtitles(QStringList &wrappedsubs,
     fsub.InitFromSRT(wrappedsubs, m_textFontZoom);
     fsub.WrapLongLines();
     fsub.Layout();
-    m_refreshArea = m_refreshArea || fsub.Draw(0, start, duration);
+    m_refreshArea = fsub.Draw(0, start, duration) || m_refreshArea;
 }
 
 void SubtitleScreen::DisplayDVDButton(AVSubtitle* dvdButton, QRect &buttonPos)
@@ -644,7 +644,7 @@ void SubtitleScreen::DisplayCC608Subtitles(void)
     FormattedTextSubtitle fsub(m_safeArea, m_useBackground, this);
     fsub.InitFromCC608(textlist->buffers);
     fsub.Layout();
-    m_refreshArea = m_refreshArea || fsub.Draw();
+    m_refreshArea = fsub.Draw() || m_refreshArea;
     textlist->lock.unlock();
 }
 
@@ -706,7 +706,7 @@ void SubtitleScreen::DisplayCC708Subtitles(void)
                 m_refreshArea = true;
             }
             m_refreshArea =
-                m_refreshArea || fsub.Draw(&m_708imageCache[i]);
+                fsub.Draw(&m_708imageCache[i]) || m_refreshArea;
         }
         for (uint j = 0; j < list.size(); j++)
             delete list[j];
