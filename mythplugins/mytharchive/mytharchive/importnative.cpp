@@ -427,7 +427,7 @@ void ImportNative::finishedPressed()
 {
     if (m_details.chanID != "N/A" && m_localChanID_text->GetText() == "")
     {
-        ShowOkPopup(tr("You need to select a valid chanID!"));
+        ShowOkPopup(tr("You need to select a valid channel id!"));
         return;
     }
 
@@ -592,7 +592,7 @@ void ImportNative::searchChanID()
     fillSearchList("chanid");
 
     s = m_chanID_text->GetText();
-    showList(tr("Select a ChanID"), s, SLOT(gotChanID(QString)));
+    showList(tr("Select a channel id"), s, SLOT(gotChanID(QString)));
 }
 
 void ImportNative::gotChanID(QString value)
@@ -618,7 +618,7 @@ void ImportNative::searchChanNo()
     fillSearchList("channum");
 
     s = m_chanNo_text->GetText();
-    showList(tr("Select a ChanNo"), s, SLOT(gotChanNo(QString)));
+    showList(tr("Select a channel number"), s, SLOT(gotChanNo(QString)));
 }
 
 void ImportNative::gotChanNo(QString value)
@@ -644,7 +644,7 @@ void ImportNative::searchName()
     fillSearchList("name");
 
     s = m_chanName_text->GetText();
-    showList(tr("Select a Channel Name"), s, SLOT(gotName(QString)));
+    showList(tr("Select a channel name"), s, SLOT(gotName(QString)));
 }
 
 void ImportNative::gotName(QString value)
