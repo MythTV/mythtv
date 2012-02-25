@@ -310,6 +310,12 @@ void MythPlayer::SetWatchingRecording(bool mode)
         decoder->setWatchingRecording(mode);
 }
 
+bool MythPlayer::IsWatchingInprogress(void) const
+{
+    return watchingrecording && player_ctx->recorder &&
+        player_ctx->recorder->IsValidRecorder();
+}
+
 void MythPlayer::PauseBuffer(void)
 {
     bufferPauseLock.lock();
@@ -2692,8 +2698,7 @@ void MythPlayer::EventLoop(void)
         SetScanType(resetScan);
 
     // refresh the position map for an in-progress recording while editing
-    if (hasFullPositionMap && watchingrecording && player_ctx->recorder &&
-        player_ctx->recorder->IsValidRecorder() && deleteMap.IsEditing())
+    if (hasFullPositionMap && IsWatchingInprogress() && deleteMap.IsEditing())
     {
         if (editUpdateTimer.elapsed() > 2000)
         {
@@ -3470,8 +3475,7 @@ long long MythPlayer::CalcMaxFFTime(long long ff, bool setjump) const
     bool islivetvcur = (livetv && player_ctx->tvchain &&
                         !player_ctx->tvchain->HasNext());
 
-    if (livetv || (watchingrecording && player_ctx->recorder &&
-                   player_ctx->recorder->IsValidRecorder()))
+    if (livetv || IsWatchingInprogress())
         maxtime = (long long)(3.0 * video_frame_rate);
 
     long long ret = ff;
@@ -3491,8 +3495,7 @@ long long MythPlayer::CalcMaxFFTime(long long ff, bool setjump) const
             }
         }
     }
-    else if (islivetvcur || (watchingrecording && player_ctx->recorder &&
-                             player_ctx->recorder->IsValidRecorder()))
+    else if (islivetvcur || IsWatchingInprogress())
     {
         long long behind = player_ctx->recorder->GetFramesWritten() -
             framesPlayed;
@@ -3555,8 +3558,7 @@ bool MythPlayer::IsNearEnd(void)
 
     long long margin = (long long)(video_frame_rate * 2);
     margin = (long long) (margin * audio.GetStretchFactor());
-    bool watchingTV = watchingrecording && player_ctx->recorder &&
-        player_ctx->recorder->IsValidRecorder();
+    bool watchingTV = IsWatchingInprogress();
 
     framesRead = decoder->GetFramesRead();
 
@@ -3634,8 +3636,7 @@ void MythPlayer::WaitForSeek(uint64_t frame, bool override_seeks,
                         !player_ctx->tvchain->HasNext());
 
     uint64_t max = totalFrames;
-    if ((islivetvcur || (watchingrecording && player_ctx->recorder &&
-                   player_ctx->recorder->IsValidRecorder())))
+    if (islivetvcur || IsWatchingInprogress())
     {
         max = (uint64_t)player_ctx->recorder->GetFramesWritten();
     }
@@ -4487,9 +4488,7 @@ int MythPlayer::GetStatusbarPos(void) const
 {
     double spos = 0.0;
 
-    if ((livetv) ||
-        (watchingrecording && player_ctx->recorder &&
-         player_ctx->recorder->IsValidRecorder()))
+    if (livetv || IsWatchingInprogress())
     {
         spos = 1000.0 * framesPlayed / player_ctx->recorder->GetFramesWritten();
     }
@@ -4590,8 +4589,7 @@ void MythPlayer::calcSliderPos(osdInfo &info, bool paddedFields)
         playbackLen = player_ctx->tvchain->GetLengthAtCurPos();
         islive = true;
     }
-    else if (watchingrecording && player_ctx->recorder &&
-             player_ctx->recorder->IsValidRecorder())
+    else if (IsWatchingInprogress())
     {
         playbackLen =
             (int)(((float)player_ctx->recorder->GetFramesWritten() /

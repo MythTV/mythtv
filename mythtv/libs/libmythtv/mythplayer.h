@@ -215,6 +215,7 @@ class MTV_PUBLIC MythPlayer
     bool    HasTVChainNext(void) const;
     bool    CanSupportDoubleRate(void);
     bool    GetScreenShot(int width = 0, int height = 0, QString filename = "");
+    bool    IsWatchingInprogress(void) const;
 
     // Non-const gets
     virtual char *GetScreenGrabAtFrame(uint64_t frameNum, bool absolute,
