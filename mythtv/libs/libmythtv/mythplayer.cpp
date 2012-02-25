@@ -3764,17 +3764,25 @@ bool MythPlayer::EnableEdit(void)
     return deleteMap.IsEditing();
 }
 
-void MythPlayer::DisableEdit(bool save)
+/** \fn MythPlayer::DisableEdit(int)
+ *  \brief Leave cutlist edit mode, saving work in 1 of 3 ways.
+ *
+ *  \param howToSave If 1, save all changes.  If 0, discard all
+ *  changes.  If -1, do not explicitly save changes but leave
+ *  auto-save information intact in the database.
+ */
+void MythPlayer::DisableEdit(int howToSave)
 {
     QMutexLocker locker(&osdLock);
     if (!osd)
         return;
 
     deleteMap.SetEditing(false, osd);
-    if (!save)
+    if (howToSave == 0)
         deleteMap.LoadMap(totalFrames);
     // Unconditionally save to remove temporary marks from the DB.
-    deleteMap.SaveMap(totalFrames);
+    if (howToSave >= 0)
+        deleteMap.SaveMap(totalFrames);
     deleteMap.TrackerReset(framesPlayed, totalFrames);
     deleteMap.SetFileEditing(false);
     player_ctx->LockPlayingInfo(__FILE__, __LINE__);
@@ -3880,7 +3888,7 @@ bool MythPlayer::HandleProgramEditorActions(QStringList &actions,
         }
         else if (action == "REVERTEXIT")
         {
-            DisableEdit(false);
+            DisableEdit(0);
             refresh = false;
         }
         else if (action == ACTION_SAVEMAP)
@@ -3890,7 +3898,7 @@ bool MythPlayer::HandleProgramEditorActions(QStringList &actions,
         }
         else if (action == "EDIT" || action == "SAVEEXIT")
         {
-            DisableEdit();
+            DisableEdit(1);
             refresh = false;
         }
         else
