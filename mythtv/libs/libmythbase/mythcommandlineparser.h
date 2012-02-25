@@ -35,7 +35,7 @@ class MBASE_PUBLIC CommandLineArg : public ReferenceCounter
     QString         GetLongHelpString(QString keyword) const;
 
     bool            Set(QString opt);
-    bool            Set(QString opt, QString val);
+    bool            Set(QString opt, QByteArray val);
     void            Set(QVariant val)               { m_stored = val;
                                                       m_given = true; }
 
@@ -75,11 +75,14 @@ class MBASE_PUBLIC CommandLineArg : public ReferenceCounter
     void            SetRequires(CommandLineArg *other, bool forward = true);
     void            SetBlocks(CommandLineArg *other, bool forward = true);
 
+    void            Convert(void);
+
     QString         GetPreferredKeyword(void) const;
     bool            TestLinks(void) const;
     void            CleanupLinks(void);
 
     bool                    m_given;
+    bool                    m_converted;
     QString                 m_name;
     QString                 m_group;
     QString                 m_deprecated;
@@ -275,7 +278,7 @@ class MBASE_PUBLIC MythCommandLineParser
 
   private:
     int getOpt(int argc, const char * const * argv, int &argpos,
-               QString &opt, QString &val);
+               QString &opt, QByteArray &val);
     bool ReconcileLinks(void);
 
     QString                         m_appname;

@@ -143,10 +143,13 @@ const char* NamedOptType(int type)
  */
 CommandLineArg::CommandLineArg(QString name, QVariant::Type type,
                    QVariant def, QString help, QString longhelp) :
-    ReferenceCounter(), m_given(false), m_name(name), m_group(""),
-    m_deprecated(""), m_type(type), m_default(def), m_help(help),
+    ReferenceCounter(), m_given(false), m_converted(false), m_name(name),
+    m_group(""), m_deprecated(""), m_type(type), m_default(def), m_help(help),
     m_longhelp(longhelp)
 {
+    if ((m_type != QVariant::String) && (m_type != QVariant::StringList) &&
+            (m_type != QVariant::Map))
+        m_converted = true;
 }
 
 /** \brief Reduced constructor for CommandLineArg class
@@ -156,9 +159,12 @@ CommandLineArg::CommandLineArg(QString name, QVariant::Type type,
  *  supplied directly on the command line.
  */
 CommandLineArg::CommandLineArg(QString name, QVariant::Type type, QVariant def)
-  : ReferenceCounter(), m_given(false), m_name(name), m_group(""),
-    m_deprecated(""), m_type(type), m_default(def)
+  : ReferenceCounter(), m_given(false), m_converted(false), m_name(name),
+    m_group(""), m_deprecated(""), m_type(type), m_default(def)
 {
+    if ((m_type != QVariant::String) && (m_type != QVariant::StringList) &&
+            (m_type != QVariant::Map))
+        m_converted = true;
 }
 
 /** \brief Dummy constructor for CommandLineArg class
@@ -169,8 +175,8 @@ CommandLineArg::CommandLineArg(QString name, QVariant::Type type, QVariant def)
  *  name prior to parsing inputs.
  */
 CommandLineArg::CommandLineArg(QString name) :
-    ReferenceCounter(), m_given(false), m_name(name), m_deprecated(""),
-    m_type(QVariant::Invalid)
+    ReferenceCounter(), m_given(false), m_converted(false), m_name(name),
+    m_deprecated(""), m_type(QVariant::Invalid)
 {
 }
 
@@ -406,11 +412,11 @@ bool CommandLineArg::Set(QString opt)
 
 /** \brief Set option as provided on command line with value
  */
-bool CommandLineArg::Set(QString opt, QString val)
+bool CommandLineArg::Set(QString opt, QByteArray val)
 {
-    QStringList slist;
+    QVariantList vlist;
+    QList<QByteArray> blist;
     QVariantMap vmap;
-
     m_usedKeyword = opt;
 
     switch (m_type)
@@ -441,14 +447,14 @@ bool CommandLineArg::Set(QString opt, QString val)
         break;
 
       case QVariant::DateTime:
-        m_stored = QVariant(myth_dt_from_string(val));
+        m_stored = QVariant(myth_dt_from_string(QString(val)));
         break;
 
       case QVariant::StringList:
         if (!m_stored.isNull())
-            slist = m_stored.toStringList();
-        slist << val;
-        m_stored = QVariant(slist);
+            vlist = m_stored.toList();
+        vlist << val;
+        m_stored = QVariant(vlist);
         break;
 
       case QVariant::Map:
@@ -459,11 +465,11 @@ bool CommandLineArg::Set(QString opt, QString val)
             return false;
         }
 
-        slist = val.split('=');
+        blist = val.split('=');
 
         if (!m_stored.isNull())
             vmap = m_stored.toMap();
-        vmap[slist[0]] = QVariant(slist[1]);
+        vmap[QString(blist[0])] = QVariant(blist[1]);
         m_stored = QVariant(vmap);
         break;
 
@@ -475,8 +481,8 @@ bool CommandLineArg::Set(QString opt, QString val)
             return false;
         }
 
-        slist = val.split('x');
-        m_stored = QVariant(QSize(slist[0].toInt(), slist[1].toInt()));
+        blist = val.split('x');
+        m_stored = QVariant(QSize(blist[0].toInt(), blist[1].toInt()));
         break;
 
       default:
@@ -791,6 +797,65 @@ void CommandLineArg::AllowOneOf(QList<CommandLineArg*> args)
     }
 }
 
+/** \brief Convert stored string value from QByteArray to QString
+ *
+ *  This is a work around to delay string processing until after QApplication
+ *  has been initialized, to allow the locale to be configured and unicode
+ *  handling to work properly
+ */
+void CommandLineArg::Convert(void)
+{
+    if (!QCoreApplication::instance())
+        // QApplication not available, no sense doing anything yet
+        return;
+
+    if (m_converted)
+        // already run, abort
+        return;
+
+    if (!m_given)
+    {
+        // nothing to work on, abort
+        m_converted = true;
+        return;
+    }
+
+    if (m_type == QVariant::String)
+    {
+        if (m_stored.type() == QVariant::ByteArray)
+        {
+            m_stored = QString::fromLocal8Bit(m_stored.toByteArray());
+        }
+        // else
+        //      not sure why this isnt a bytearray, but ignore it and
+        //      set it as converted
+    }
+    else if (m_type == QVariant::StringList)
+    {
+        if (m_stored.type() == QVariant::List)
+        {
+            QVariantList vlist = m_stored.toList();
+            QVariantList::const_iterator iter = vlist.begin();
+            QStringList slist;
+            for (; iter != vlist.end(); ++iter)
+                slist << QString::fromLocal8Bit(iter->toByteArray());
+            m_stored = QVariant(slist);
+        }
+    }
+    else if (m_type == QVariant::Map)
+    {
+        QVariantMap vmap = m_stored.toMap();
+        QVariantMap::iterator iter = vmap.begin();
+        for (; iter != vmap.end(); ++iter)
+            (*iter) = QString::fromLocal8Bit(iter->toByteArray());
+    }
+    else
+        return;
+
+    m_converted = true;
+}
+
+
 /** \brief Return the longest keyword for the argument
  *
  *  This is used to determine which keyword to use when listing relations to
@@ -917,6 +982,8 @@ void CommandLineArg::PrintVerbose(void) const
     QSize tmpsize;
     QMap<QString, QVariant> tmpmap;
     QMap<QString, QVariant>::const_iterator it;
+    QVariantList vlist;
+    QVariantList::const_iterator it2;
     bool first;
 
     switch (m_type)
@@ -949,14 +1016,20 @@ void CommandLineArg::PrintVerbose(void) const
         break;
 
       case QVariant::String:
-        cerr << '"' << m_stored.toString().toLocal8Bit().constData()
+        cerr << '"' << m_stored.toByteArray().constData()
              << '"' << endl;
         break;
 
       case QVariant::StringList:
-        cerr << '"' << m_stored.toStringList().join("\", \"")
-                               .toLocal8Bit().constData()
-             << '"' << endl;
+        vlist = m_stored.toList();
+        it2 = vlist.begin();
+        cerr << '"' << it2->toByteArray().constData() << '"';
+        ++it2;
+        for (; it2 != vlist.end(); ++it2)
+            cerr << ", \""
+                 << it2->constData()
+                 << '"';
+        cerr << endl;
         break;
 
       case QVariant::Map:
@@ -973,7 +1046,7 @@ void CommandLineArg::PrintVerbose(void) const
 
             cerr << it.key().toLocal8Bit().constData()
                  << '='
-                 << (*it).toString().toLocal8Bit().constData()
+                 << it->toByteArray().constData()
                  << endl;
         }
 
@@ -1193,7 +1266,7 @@ QString MythCommandLineParser::GetHelpString(void) const
 /** \brief Internal use. Pull next key/value pair from argv.
  */
 int MythCommandLineParser::getOpt(int argc, const char * const * argv,
-                                    int &argpos, QString &opt, QString &val)
+                                  int &argpos, QString &opt, QByteArray &val)
 {
     opt.clear();
     val.clear();
@@ -1202,7 +1275,7 @@ int MythCommandLineParser::getOpt(int argc, const char * const * argv,
         // this shouldnt happen, return and exit
         return kEnd;
 
-    QString tmp = QString::fromLocal8Bit(argv[argpos]);
+    QByteArray tmp(argv[argpos]);
     if (tmp.isEmpty())
         // string is empty, return and loop
         return kEmpty;
@@ -1214,7 +1287,7 @@ int MythCommandLineParser::getOpt(int argc, const char * const * argv,
         return kArg;
     }
 
-    if (tmp.startsWith("-") && tmp.size() > 1)
+    if (tmp.startsWith('-') && tmp.size() > 1)
     {
         if (tmp == "--")
         {
@@ -1223,30 +1296,30 @@ int MythCommandLineParser::getOpt(int argc, const char * const * argv,
             return kPassthrough;
         }
 
-        if (tmp.contains("="))
+        if (tmp.contains('='))
         {
             // option contains '=', split
-            QStringList slist = tmp.split("=");
+            QList<QByteArray> blist = tmp.split('=');
 
-            if (slist.size() != 2)
+            if (blist.size() != 2)
             {
                 // more than one '=' in option, this is not handled
-                opt = tmp;
+                opt = QString(tmp);
                 return kInvalid;
             }
 
-            opt = slist[0];
-            val = slist[1];
+            opt = QString(blist[0]);
+            val = blist[1];
             return kOptVal;
         }
 
-        opt = tmp;
+        opt = QString(tmp);
 
         if (argpos+1 >= argc)
             // end of input, option only
             return kOptOnly;
 
-        tmp = QString::fromLocal8Bit(argv[++argpos]);
+        tmp = QByteArray(argv[++argpos]);
         if (tmp.isEmpty())
             // empty string, option only
             return kOptOnly;
@@ -1279,7 +1352,8 @@ int MythCommandLineParser::getOpt(int argc, const char * const * argv,
 bool MythCommandLineParser::Parse(int argc, const char * const * argv)
 {
     int res;
-    QString opt, val;
+    QString opt;
+    QByteArray val;
     CommandLineArg *argdef;
 
     // loop through command line arguments until all are spent
@@ -1293,7 +1367,7 @@ bool MythCommandLineParser::Parse(int argc, const char * const * argv)
         if (m_verbose)
             cerr << "res: " << NamedOptType(res) << endl
                  << "opt:  " << opt.toLocal8Bit().constData() << endl
-                 << "val:  " << val.toLocal8Bit().constData() << endl << endl;
+                 << "val:  " << val.constData() << endl << endl;
 
         // '--' found on command line, enable passthrough mode
         if (res == kPassthrough && !m_namedArgs.contains("_passthrough"))
@@ -1332,7 +1406,7 @@ bool MythCommandLineParser::Parse(int argc, const char * const * argv)
             if (!m_namedArgs.contains("_args"))
             {
                 cerr << "Received '"
-                     << val.toAscii().constData()
+                     << val.constData()
                      << "' but unassociated arguments have not been enabled"
                      << endl;
                 return false;        
@@ -1366,7 +1440,9 @@ bool MythCommandLineParser::Parse(int argc, const char * const * argv)
             {
                 // arbitrary allowed, specify general collection pool
                 argdef = m_namedArgs["_extra"];
-                QString tmp = QString("%1=%2").arg(opt).arg(val);
+                QByteArray tmp = opt.toLocal8Bit();
+                tmp += '=';
+                tmp += val;
                 val = tmp;
                 res = kOptVal;
             }
@@ -1883,6 +1959,9 @@ QString MythCommandLineParser::toString(QString key) const
 
     if (arg->m_given)
     {
+        if (!arg->m_converted)
+            arg->Convert();
+
         if (arg->m_stored.canConvert(QVariant::String))
             val = arg->m_stored.toString();
     }
@@ -1909,7 +1988,12 @@ QStringList MythCommandLineParser::toStringList(QString key, QString sep) const
     CommandLineArg *arg = m_namedArgs[key];
 
     if (arg->m_given)
+    {
+        if (!arg->m_converted)
+            arg->Convert();
+
         varval = arg->m_stored;
+    }
     else
         varval = arg->m_default;
 
@@ -1935,6 +2019,9 @@ QMap<QString,QString> MythCommandLineParser::toMap(QString key) const
 
     if (arg->m_given)
     {
+        if (!arg->m_converted)
+            arg->Convert();
+
         if (arg->m_stored.canConvert(QVariant::Map))
             tmp = arg->m_stored.toMap();
     }
