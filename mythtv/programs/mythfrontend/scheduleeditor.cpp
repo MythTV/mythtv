@@ -611,10 +611,12 @@ void SchedOptEditor::Load()
     m_ruleactiveCheck->SetCheckState(!m_recordingRule->m_isInactive);
 
     InfoMap progMap;
+
+    m_recordingRule->ToMap(progMap);
+
     if (m_recInfo)
         m_recInfo->ToMap(progMap);
-    else
-        m_recordingRule->ToMap(progMap);
+
     SetTextFromMap(progMap);
 }
 
@@ -753,10 +755,12 @@ void SchedFilterEditor::Load()
     }
 
     InfoMap progMap;
+
+    m_recordingRule->ToMap(progMap);
+
     if (m_recInfo)
         m_recInfo->ToMap(progMap);
-    else
-        m_recordingRule->ToMap(progMap);
+
     SetTextFromMap(progMap);
 }
 
@@ -998,10 +1002,12 @@ void StoreOptEditor::Load()
 
 
     InfoMap progMap;
+
+    m_recordingRule->ToMap(progMap);
+
     if (m_recInfo)
         m_recInfo->ToMap(progMap);
-    else
-        m_recordingRule->ToMap(progMap);
+
     SetTextFromMap(progMap);
 }
 
@@ -1214,10 +1220,12 @@ void PostProcEditor::Load()
         m_metadataLookupCheck->SetCheckState(m_recordingRule->m_autoMetadataLookup);
 
     InfoMap progMap;
+
+    m_recordingRule->ToMap(progMap);
+
     if (m_recInfo)
         m_recInfo->ToMap(progMap);
-    else
-        m_recordingRule->ToMap(progMap);
+
     SetTextFromMap(progMap);
 }
 
@@ -1415,10 +1423,12 @@ void MetadataOptions::Load()
     }
 
     InfoMap progMap;
+
+    m_recordingRule->ToMap(progMap);
+
     if (m_recInfo)
         m_recInfo->ToMap(progMap);
-    else
-        m_recordingRule->ToMap(progMap);
+
     SetTextFromMap(progMap);
 }
 
