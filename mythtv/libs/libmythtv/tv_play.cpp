@@ -10963,7 +10963,10 @@ void TV::FillOSDMenuSource(const PlayerContext *ctx, OSD *osd,
         cardids = RemoteRequestFreeRecorderList();
         cardid  = ctx->GetCardID();
         cardids.push_back(cardid);
-        stable_sort(cardids.begin(), cardids.end());
+        // The cardids are already in the preferred order.  Don't
+        // alter it if switching sources.
+        if (category != "SOURCESWITCHING")
+            stable_sort(cardids.begin(), cardids.end());
         excluded_cardids.push_back(cardid);
         InfoMap info;
         ctx->recorder->GetChannelInfo(info);
