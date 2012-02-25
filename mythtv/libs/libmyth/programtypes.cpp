@@ -156,7 +156,7 @@ QString toString(RecStatusType recstatus, uint id)
 /// \brief Converts "recstatus" into a short human readable description.
 QString toString(RecStatusType recstatus, RecordingType rectype)
 {
-    if (rectype == kNotRecording)
+    if (recstatus == rsUnknown && rectype == kNotRecording)
         return QObject::tr("Not Recording");
 
     switch (recstatus)
@@ -218,7 +218,7 @@ QString toString(RecStatusType recstatus, RecordingType rectype)
 QString toDescription(RecStatusType recstatus, RecordingType rectype,
                       const QDateTime &recstartts)
 {
-    if (rectype == kNotRecording)
+    if (recstatus == rsUnknown && rectype == kNotRecording)
         return QObject::tr("This showing is not scheduled to record");
 
     QString message;
