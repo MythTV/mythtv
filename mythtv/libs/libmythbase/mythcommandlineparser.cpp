@@ -1480,7 +1480,14 @@ bool MythCommandLineParser::Parse(int argc, const char * const * argv)
         else if (res == kOptVal)
         {
             if (!argdef->Set(opt, val))
-                return false;
+            {
+                // try testing keyword with no value
+                if (!argdef->Set(opt))
+                    return false;
+                // drop back an iteration so the unused value will get
+                // processed a second time as a keyword-less argument
+                --argpos;
+            }
         }
         else
             return false; // this should not occur
