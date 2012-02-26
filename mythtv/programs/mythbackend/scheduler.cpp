@@ -3905,7 +3905,13 @@ void Scheduler::AddNewRecords(void)
         if (p == NULL)
             continue;
 
-        RecStatusType newrecstatus = p->GetRecordingStatus();
+        if (p->GetRecordingStatus() != rsUnknown)
+        {
+            tmpList.push_back(p);
+            continue;
+        }
+
+        RecStatusType newrecstatus = rsUnknown;
         // Check for rsOffLine
         if ((doRun || specsched) && 
             (!cardMap.contains(p->GetCardID()) || !p->GetRecordingPriority2()))
