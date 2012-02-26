@@ -2,85 +2,146 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="et_EE">
 <context>
+    <name>GameHandler</name>
+    <message>
+        <location filename="../mythgame/gamehandler.cpp" line="226"/>
+        <source>%1 appears to be missing.
+Remove it from the database?</source>
+        <translation>%1 paistab puuduvat.
+Kustutada andmebaasist?</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamehandler.cpp" line="233"/>
+        <location filename="../mythgame/gamehandler.cpp" line="616"/>
+        <source>No</source>
+        <translation>Ei</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamehandler.cpp" line="234"/>
+        <source>No to all</source>
+        <translation>Ei kõigile</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamehandler.cpp" line="235"/>
+        <location filename="../mythgame/gamehandler.cpp" line="617"/>
+        <source>Yes</source>
+        <translation>Jah</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamehandler.cpp" line="236"/>
+        <source>Yes to all</source>
+        <translation>Jah kõigile</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamehandler.cpp" line="609"/>
+        <source>This will clear all game metadata from the database. Are you sure you want to do this?</source>
+        <translation>Kõikide mängude metaandmete andmebaasist kustutamine. Oled sa ikka kindel, et soovid seda?</translation>
+    </message>
+</context>
+<context>
+    <name>GameScanner</name>
+    <message>
+        <location filename="../mythgame/gamescan.cpp" line="67"/>
+        <source>Verifying game files...</source>
+        <translation>Kontrollin mängude faile...</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamescan.cpp" line="110"/>
+        <source>Updating game database...</source>
+        <translation>Uuendan mängude andmebaasi...</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamescan.cpp" line="145"/>
+        <source>Searching for games...</source>
+        <translation>Otsin mänge...</translation>
+    </message>
+</context>
+<context>
     <name>GameUI</name>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="272"/>
+        <location filename="../mythgame/gameui.cpp" line="139"/>
         <source>Favorites</source>
         <translation>Lemmikud</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="286"/>
+        <location filename="../mythgame/gameui.cpp" line="153"/>
         <source>All Games</source>
         <translation>Kõik mängud</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="291"/>
+        <location filename="../mythgame/gameui.cpp" line="158"/>
         <source>-   By Genre</source>
         <translation>-   žanri järgi</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="296"/>
+        <location filename="../mythgame/gameui.cpp" line="163"/>
         <source>-   By Year</source>
         <translation>-   aasta järgi</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="301"/>
+        <location filename="../mythgame/gameui.cpp" line="168"/>
         <source>-   By Name</source>
         <translation>-   nime järgi</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="306"/>
+        <location filename="../mythgame/gameui.cpp" line="173"/>
         <source>-   By Publisher</source>
         <translation>-   avaldaja järgi</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="407"/>
+        <location filename="../mythgame/gameui.cpp" line="270"/>
         <source>Choose System for</source>
         <translation>Vali süsteem</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="424"/>
-        <location filename="../mythgame/gameui.cpp" line="671"/>
+        <location filename="../mythgame/gameui.cpp" line="287"/>
+        <location filename="../mythgame/gameui.cpp" line="540"/>
         <source>Cancel</source>
         <translation>Tühista</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="581"/>
-        <location filename="../mythgame/gameui.cpp" line="655"/>
+        <location filename="../mythgame/gameui.cpp" line="440"/>
+        <location filename="../mythgame/gameui.cpp" line="520"/>
+        <source>Scan For Changes</source>
+        <translation>Kontrolli muudatusi</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gameui.cpp" line="446"/>
+        <location filename="../mythgame/gameui.cpp" line="524"/>
         <source>Show Information</source>
         <translation>Näita infot</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="583"/>
-        <location filename="../mythgame/gameui.cpp" line="660"/>
+        <location filename="../mythgame/gameui.cpp" line="448"/>
+        <location filename="../mythgame/gameui.cpp" line="529"/>
         <source>Remove Favorite</source>
         <translation>Eemalda lemmik</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="585"/>
-        <location filename="../mythgame/gameui.cpp" line="659"/>
+        <location filename="../mythgame/gameui.cpp" line="450"/>
+        <location filename="../mythgame/gameui.cpp" line="528"/>
         <source>Make Favorite</source>
         <translation>Loo lemmik</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="586"/>
-        <location filename="../mythgame/gameui.cpp" line="664"/>
+        <location filename="../mythgame/gameui.cpp" line="451"/>
+        <location filename="../mythgame/gameui.cpp" line="533"/>
         <source>Retrieve Details</source>
         <translation>Hangi andmeid</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="587"/>
-        <location filename="../mythgame/gameui.cpp" line="651"/>
+        <location filename="../mythgame/gameui.cpp" line="452"/>
+        <location filename="../mythgame/gameui.cpp" line="516"/>
         <source>Edit Details</source>
         <translation>Muuda andmeid</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="1053"/>
+        <location filename="../mythgame/gameui.cpp" line="922"/>
         <source>Fetching details for %1</source>
         <translation>Laen %1 andmeid</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="615"/>
+        <location filename="../mythgame/gameui.cpp" line="480"/>
         <source>Game Search</source>
         <translation>Mängu otsing</translation>
     </message>
@@ -122,13 +183,13 @@
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="306"/>
-        <source>Edit..</source>
-        <translation>Redigeeri..</translation>
+        <source>Edit...</source>
+        <translation>Redigeeri...</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="306"/>
-        <source>Delete..</source>
-        <translation>Kustuta..</translation>
+        <source>Delete...</source>
+        <translation>Kustuta...</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="330"/>
@@ -154,67 +215,19 @@
 <context>
     <name>QObject</name>
     <message>
+        <location filename="../mythgame/gamehandler.cpp" line="156"/>
+        <location filename="../mythgame/gamehandler.cpp" line="157"/>
+        <location filename="../mythgame/gamehandler.cpp" line="158"/>
         <location filename="../mythgame/gamehandler.cpp" line="159"/>
         <location filename="../mythgame/gamehandler.cpp" line="160"/>
-        <location filename="../mythgame/gamehandler.cpp" line="161"/>
-        <location filename="../mythgame/gamehandler.cpp" line="162"/>
-        <location filename="../mythgame/gamehandler.cpp" line="163"/>
-        <location filename="../mythgame/gamehandler.cpp" line="424"/>
+        <location filename="../mythgame/gamehandler.cpp" line="413"/>
+        <location filename="../mythgame/gamehandler.cpp" line="414"/>
+        <location filename="../mythgame/gamehandler.cpp" line="417"/>
+        <location filename="../mythgame/gamehandler.cpp" line="418"/>
+        <location filename="../mythgame/gamehandler.cpp" line="419"/>
         <location filename="../mythgame/gamehandler.cpp" line="425"/>
-        <location filename="../mythgame/gamehandler.cpp" line="428"/>
-        <location filename="../mythgame/gamehandler.cpp" line="429"/>
-        <location filename="../mythgame/gamehandler.cpp" line="430"/>
-        <location filename="../mythgame/gamehandler.cpp" line="436"/>
         <source>Unknown</source>
         <translation>Tundmatu</translation>
-    </message>
-    <message>
-        <location filename="../mythgame/gamehandler.cpp" line="225"/>
-        <location filename="../mythgame/gamehandler.cpp" line="607"/>
-        <source>No</source>
-        <translation>Ei</translation>
-    </message>
-    <message>
-        <location filename="../mythgame/gamehandler.cpp" line="226"/>
-        <source>No to all</source>
-        <translation>Ei, mitte ühtegi</translation>
-    </message>
-    <message>
-        <location filename="../mythgame/gamehandler.cpp" line="227"/>
-        <location filename="../mythgame/gamehandler.cpp" line="608"/>
-        <source>Yes</source>
-        <translation>Jah</translation>
-    </message>
-    <message>
-        <location filename="../mythgame/gamehandler.cpp" line="228"/>
-        <source>Yes to all</source>
-        <translation>Jah, kõik</translation>
-    </message>
-    <message>
-        <location filename="../mythgame/gamehandler.cpp" line="233"/>
-        <source>File Missing</source>
-        <translation>Faili pole</translation>
-    </message>
-    <message>
-        <location filename="../mythgame/gamehandler.cpp" line="234"/>
-        <source>%1 appears to be missing.
-Remove it from the database?</source>
-        <translation>%1 paistab puuduvat.
-Kustutada andmebaasist?</translation>
-    </message>
-    <message>
-        <location filename="../mythgame/gamehandler.cpp" line="612"/>
-        <source>Are you sure?</source>
-        <translation>Oled sa kindel?</translation>
-    </message>
-    <message>
-        <location filename="../mythgame/gamehandler.cpp" line="613"/>
-        <source>This will clear all Game Meta Data
-from the database. Are you sure you
-want to do this?</source>
-        <translation>Kõikide mängude metainfo
-andmebaasist kustutamine.
-Oled sa ikka kindel, et soovid seda?</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="25"/>
@@ -289,6 +302,11 @@ Oled sa ikka kindel, et soovid seda?</translation>
         <translation>Käsk</translation>
     </message>
     <message>
+        <location filename="../mythgame/gamesettings.cpp" line="172"/>
+        <source>Binary and optional parameters. Multiple commands separated with &apos;;&apos; . Use %s for the rom name. %d1, %d2, %d3 and %d4 represent disks in a multidisk/game. %s auto appended if not specified</source>
+        <translation>Binaari ning valikulised parameetrid. Mitme käsu puhul on eraldajaks &quot;;&quot;. %s on rom nimi, %d1, %d2, %d3 ja %d4 esindavad diske multidisk mängude korral. Kui midagi pole määratud, lisatakse automaatselt %s</translation>
+    </message>
+    <message>
         <location filename="../mythgame/gamesettings.cpp" line="182"/>
         <source>Type</source>
         <translation>Tüüp</translation>
@@ -300,7 +318,7 @@ Oled sa ikka kindel, et soovid seda?</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="198"/>
-        <source>Rom Path</source>
+        <source>ROM Path</source>
         <translation>ROM otsingutee</translation>
     </message>
     <message>
@@ -322,6 +340,11 @@ Oled sa ikka kindel, et soovid seda?</translation>
         <location filename="../mythgame/gamesettings.cpp" line="220"/>
         <source>File Extensions</source>
         <translation>Faililaiendid</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamesettings.cpp" line="221"/>
+        <source>A comma separated list of all file extensions for this emulator. Blank means any file under ROM PATH is considered to be used with this emulator</source>
+        <translation>Selle emulaatori faililaiendite nimekiri (komadega eraldatud). Tühja välja puhul loetakse kõiki kataloogis olevaid faile emulaatori failideks</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="231"/>
@@ -394,21 +417,27 @@ Oled sa ikka kindel, et soovid seda?</translation>
         <translation>Selle mängu ja/või emulaatori nimi</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="158"/>
-        <location filename="../mythgame/gamehandler.cpp" line="427"/>
+        <location filename="../mythgame/gamehandler.cpp" line="155"/>
+        <location filename="../mythgame/gamehandler.cpp" line="416"/>
         <source>19xx</source>
         <translation>19xx</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="164"/>
-        <location filename="../mythgame/gamehandler.cpp" line="431"/>
+        <location filename="../mythgame/gamehandler.cpp" line="161"/>
+        <location filename="../mythgame/gamehandler.cpp" line="420"/>
         <source>0</source>
         <translation>0</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamesettings.cpp" line="221"/>
-        <source>A Comma seperated list of all file extensions for this emulator. Blank means any file under ROM PATH is considered to be used with this emulator</source>
-        <translation>Selle emulaatori faililaiendite nimekiri (komadega eraldatud). Tühja välja puhul loetakse kõiki kataloogis olevaid faile emulaatori failideks</translation>
+        <location filename="../mythgame/gamehandler.cpp" line="511"/>
+        <source>Verifying %1 files...</source>
+        <translation>Kontrollin %1 faili...</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamehandler.cpp" line="714"/>
+        <location filename="../mythgame/gamehandler.cpp" line="742"/>
+        <source>Scanning for %1 games...</source>
+        <translation>Otsin %1 mängu...</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.h" line="33"/>
@@ -431,24 +460,9 @@ Oled sa ikka kindel, et soovid seda?</translation>
         <translation>Nimede tükeldamine teeb pikkade nimekirjade korral navigeerimise natuke kiiremaks</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamesettings.cpp" line="172"/>
-        <source>Binary and optional parameters. Multiple commands seperated with &apos;;&apos; . Use %s for the rom name. %d1, %d2, %d3 and %d4 represent disks in a multidisk/game. %s auto appended if not specified</source>
-        <translation>Binaari ning valikulised parameetrid. Mitme käsu puhul on eraldajaks &quot;;&quot;. %s on rom nimi, %d1, %d2, %d3 ja %d4 esindavad diske multidisk mängude korral. Kui midagi pole määratud, lisatakse automaatselt %s</translation>
-    </message>
-    <message>
-        <location filename="../mythgame/gamehandler.cpp" line="398"/>
+        <location filename="../mythgame/gamehandler.cpp" line="382"/>
         <source>Updating %1(%2) ROM database</source>
         <translation>Uuendan %1(%2) ROM-ide andmebaasi</translation>
-    </message>
-    <message>
-        <location filename="../mythgame/gamehandler.cpp" line="516"/>
-        <source>Verifying %1 files</source>
-        <translation>Kontrollin %1 faili</translation>
-    </message>
-    <message>
-        <location filename="../mythgame/gamehandler.cpp" line="719"/>
-        <source>Scanning for %1 game(s)...</source>
-        <translation>Skanneerin %1 mäng(u)...</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="86"/>
@@ -458,273 +472,278 @@ Oled sa ikka kindel, et soovid seda?</translation>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="88"/>
         <source>This directory will be the default browse location when assigning screenshots.</source>
-        <translation>Ekraanitõmmised pannakse vaikimisi siia kausta.</translation>
+        <translation>Ekraanitõmmised pannakse vaikimisi siia kataloogi.</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="96"/>
         <source>Directory where Game Fanart is stored</source>
-        <translation>Mängude reklaamplakatite kaust</translation>
+        <translation>Mängude reklaamplakatite kataloog</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="98"/>
         <source>This directory will be the default browse location when assigning fanart.</source>
-        <translation>Reklaamplakatid pannakse vaikimisi siia kausta.</translation>
+        <translation>Reklaamplakatid pannakse vaikimisi siia kataloogi.</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="106"/>
         <source>Directory where Game Boxart is stored</source>
-        <translation>Karbikujunduse kaust</translation>
+        <translation>Karbikujunduse kataloog</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="108"/>
         <source>This directory will be the default browse location when assigning boxart.</source>
-        <translation>Karbikujundus pannakse vaikimisi siia kausta.</translation>
+        <translation>Karbikujundus pannakse vaikimisi siia kataloogi.</translation>
     </message>
 </context>
 <context>
     <name>ThemeUI</name>
     <message>
-        <location filename="themestrings.h" line="24"/>
+        <location filename="themestrings.h" line="7"/>
         <source>System:</source>
         <translation>Süsteem:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="11"/>
+        <location filename="themestrings.h" line="8"/>
         <source>Year:</source>
         <translation>Aasta:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="10"/>
+        <location filename="themestrings.h" line="9"/>
         <source>Genre:</source>
         <translation>Žanr:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="25"/>
+        <location filename="themestrings.h" line="10"/>
         <source>Favorite:</source>
         <translation>Lemmik:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="26"/>
+        <location filename="themestrings.h" line="12"/>
         <source>No</source>
         <translation>Ei</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="27"/>
+        <location filename="themestrings.h" line="11"/>
         <source>Yes</source>
         <translation>Jah</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="38"/>
+        <location filename="themestrings.h" line="42"/>
         <source>Edit Game Information</source>
         <translation>Muuda mängu infot</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="39"/>
+        <location filename="themestrings.h" line="43"/>
         <source>Game Name:</source>
         <translation>Mängu nimi:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="12"/>
+        <location filename="themestrings.h" line="22"/>
         <source>Country:</source>
         <translation>Maa:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="13"/>
+        <location filename="themestrings.h" line="23"/>
         <source>Publisher:</source>
         <translation>Avaldaja:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="14"/>
+        <location filename="themestrings.h" line="24"/>
         <source>Plot:</source>
         <translation>Kirjeldus:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="16"/>
+        <location filename="themestrings.h" line="26"/>
         <source>Screenshot:</source>
         <translation>Ekraanitõmmis:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="17"/>
+        <location filename="themestrings.h" line="27"/>
         <source>Fanart:</source>
         <translation>Reklaamplakat:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="41"/>
+        <location filename="themestrings.h" line="45"/>
         <source>Boxart:</source>
         <translation>Karbikujundus:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="30"/>
+        <location filename="themestrings.h" line="34"/>
         <source>/path/to/the/thing.jpg</source>
         <translation>/tee/pildini/pilt.jpg</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="3"/>
+        <location filename="themestrings.h" line="13"/>
+        <source>Emulator:</source>
+        <translation>Emulaator:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="16"/>
         <source>Released %1</source>
         <translation>Avaldatud %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="4"/>
+        <location filename="themestrings.h" line="17"/>
         <source>%DATE%, %TIME%</source>
         <translation>%DATE%, %TIME%</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="5"/>
+        <location filename="themestrings.h" line="18"/>
         <source>Cancel</source>
         <translation>Tühista</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="7"/>
+        <location filename="themestrings.h" line="19"/>
         <source>Edit Metadata</source>
         <translation>Muuda infot</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="8"/>
+        <location filename="themestrings.h" line="20"/>
         <source>Modify your game&apos;s metadata.</source>
         <translation>Muuda mängude andmeid.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="9"/>
+        <location filename="themestrings.h" line="21"/>
         <source>Title:</source>
         <translation>Pealkiri:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="15"/>
+        <location filename="themestrings.h" line="25"/>
         <source>Cover Art:</source>
         <translation>Kaanepilt:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="18"/>
+        <location filename="themestrings.h" line="28"/>
         <source>Game is a Favorite</source>
         <translation>Mäng on lemmik</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="19"/>
+        <location filename="themestrings.h" line="29"/>
         <source>Click here to search existing coverart...</source>
         <translation>Klõpsa olemasoleva kaanepildi leidmiseks...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="20"/>
+        <location filename="themestrings.h" line="30"/>
         <source>Click here to search existing screenshots...</source>
         <translation>Klõpsa olemasoleva kuvapildi leidmiseks...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="21"/>
+        <location filename="themestrings.h" line="31"/>
         <source>Click here to search existing fanart...</source>
         <translation>Klõpsa olemasoleva plakati leidmiseks...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="22"/>
+        <location filename="themestrings.h" line="14"/>
         <source>Done</source>
         <translation>Tehtud</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="23"/>
+        <location filename="themestrings.h" line="6"/>
         <source>Play Games</source>
         <translation>Mängud</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="28"/>
+        <location filename="themestrings.h" line="32"/>
         <source>ROM Name:</source>
         <translation>ROM-i nimi:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="29"/>
+        <location filename="themestrings.h" line="33"/>
         <source>ROM Path:</source>
         <translation>ROM-i asukoht:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="32"/>
+        <location filename="themestrings.h" line="36"/>
         <source>Game:</source>
         <translation>Mäng:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="33"/>
+        <location filename="themestrings.h" line="37"/>
         <source>Type:</source>
         <translation>Tüüp:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="34"/>
+        <location filename="themestrings.h" line="38"/>
         <source>Filename:</source>
         <translation>Failinimi:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="35"/>
-        <source>Rompath:</source>
-        <translation>ROMi asukoht:</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="36"/>
+        <location filename="themestrings.h" line="40"/>
         <source>System(s):</source>
         <translation>Süsteem(id):</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="37"/>
+        <location filename="themestrings.h" line="41"/>
         <source>CRC:</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="40"/>
+        <location filename="themestrings.h" line="44"/>
         <source>Description:</source>
         <translation>Kirjeldus:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="42"/>
+        <location filename="themestrings.h" line="46"/>
         <source>No Plot.</source>
         <translation>Kirjeldus puudub.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="50"/>
+        <location filename="themestrings.h" line="54"/>
         <source>Empty your game library</source>
         <translation>Tühjenda mängude kogu</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="6"/>
+        <location filename="themestrings.h" line="15"/>
         <source>Play</source>
         <translation>Mängi</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="31"/>
+        <location filename="themestrings.h" line="35"/>
         <source>Game Information</source>
         <translation>Mängu info</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="2"/>
+        <location filename="themestrings.h" line="5"/>
         <source>Games</source>
         <translation>Mängud</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="43"/>
+        <location filename="themestrings.h" line="39"/>
+        <source>ROM path:</source>
+        <translation>ROM-i asukoht:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="47"/>
         <source>General Settings</source>
         <translation>Üldised seaded</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="44"/>
+        <location filename="themestrings.h" line="48"/>
         <source>Game folders and general options</source>
-        <translation>Mängude kaustad ja üldised valikud</translation>
+        <translation>Mängude kataloogid ja üldised valikud</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="45"/>
+        <location filename="themestrings.h" line="49"/>
         <source>Game Players</source>
         <translation>Mängijad</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="46"/>
+        <location filename="themestrings.h" line="50"/>
         <source>Configure an emulator</source>
         <translation>Seadista emulaator</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="47"/>
+        <location filename="themestrings.h" line="51"/>
         <source>Scan for Games</source>
         <translation>Otsi mänge</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="48"/>
+        <location filename="themestrings.h" line="52"/>
         <source>Add games to your library</source>
         <translation>Lisa mängud kogusse</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="49"/>
+        <location filename="themestrings.h" line="53"/>
         <source>Clear Game Data</source>
         <translation>Puhasta andmed</translation>
     </message>
