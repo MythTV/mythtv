@@ -1611,7 +1611,7 @@ void ProgramInfo::ToMap(InfoMap &progMap,
             break;
         case kProgramInfoTypeVideoBD :
             mediaType = "bluraydisc";
-            mediaTypeString = QObject::tr("Blu-Ray Disc");
+            mediaTypeString = QObject::tr("Blu-ray Disc");
             break;
         case kProgramInfoTypeRecording : // Fall through
         default :
