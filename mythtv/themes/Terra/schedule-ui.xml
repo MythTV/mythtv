@@ -1677,73 +1677,73 @@
             <area>700,646,420,30</area>
         </textarea>
 
-	<buttonlist name="filters" from="baseselector">
-	    <area>40,160,540,328</area>
-	    <layout>vertical</layout>
-	    <spacing>0</spacing>
-	    <scrollstyle>free</scrollstyle>
-	    <wrapstyle>items</wrapstyle>
-	    <buttonarea>5,5,500,320</buttonarea>
-	    <statetype name="buttonitem">
-		<state name="active">
-		    <area>0,0,500,40</area>
-		    <textarea name="buttontext">
-			<area>50,5,-5,30</area>
-		    </textarea>
-		    <statetype name="buttoncheck">
-			<position>5,10</position>
-			<state type="off">
-			    <imagetype name="checkoff">
-				<filename>lb-check-empty.png</filename>
-			    </imagetype>
-			</state>
-			<state type="half">
-			    <imagetype name="checkhalf">
-				<filename>lb-check-half.png</filename>
-			    </imagetype>
-			</state>
-			<state type="full">
-			    <imagetype name="checkfull">
-				<filename>lb-check-full.png</filename>
-			    </imagetype>
-			</state>
-		    </statetype>
-		</state>
-		<state name="selectedactive" from="active">
-		  <shape name="buttonbackground">
-                    <fill color="#8a916f" />
-		  </shape>
-		</state>
-		<state name="selectedinactive" from="active" />
-	    </statetype>
+        <buttonlist name="filters" from="baseselector">
+            <area>40,160,540,328</area>
+            <layout>vertical</layout>
+            <spacing>0</spacing>
+            <scrollstyle>free</scrollstyle>
+            <wrapstyle>items</wrapstyle>
+            <buttonarea>5,5,500,320</buttonarea>
+            <statetype name="buttonitem">
+                <state name="active">
+                    <area>0,0,500,40</area>
+                    <textarea name="buttontext">
+                        <area>50,5,-5,30</area>
+                    </textarea>
+                    <statetype name="buttoncheck">
+                        <position>5,10</position>
+                        <state type="off">
+                            <imagetype name="checkoff">
+                                <filename>lb-check-empty.png</filename>
+                            </imagetype>
+                        </state>
+                        <state type="half">
+                            <imagetype name="checkhalf">
+                                <filename>lb-check-half.png</filename>
+                            </imagetype>
+                        </state>
+                        <state type="full">
+                            <imagetype name="checkfull">
+                                <filename>lb-check-full.png</filename>
+                            </imagetype>
+                        </state>
+                    </statetype>
+                </state>
+                <state name="selectedactive" from="active">
+                    <shape name="buttonbackground">
+                        <fill color="#8a916f" />
+                    </shape>
+                </state>
+                <state name="selectedinactive" from="active" />
+            </statetype>
 
-	    <statetype name="upscrollarrow">
-	      <position>510,5</position>
-	      <state type="off">
-                <imagetype name="upon">
-		  <filename>lb-uparrow-reg.png</filename>
-                </imagetype>
-	      </state>
-	      <state type="full">
-                <imagetype name="upoff">
-		  <filename>lb-uparrow-sel.png</filename>
-                </imagetype>
-	      </state>
-	    </statetype>
-	    <statetype name="downscrollarrow">
-	      <position>510,305</position>
-	      <state type="off">
-                <imagetype name="dnon">
-		  <filename>lb-dnarrow-reg.png</filename>
-                </imagetype>
-	      </state>
-	      <state type="full">
-                <imagetype name="dnoff">
-		  <filename>lb-dnarrow-sel.png</filename>
-                </imagetype>
-	      </state>
-	    </statetype>
-	</buttonlist>
+            <statetype name="upscrollarrow">
+                <position>510,5</position>
+                <state type="off">
+                    <imagetype name="upon">
+                        <filename>lb-uparrow-reg.png</filename>
+                    </imagetype>
+                </state>
+                <state type="full">
+                    <imagetype name="upoff">
+                        <filename>lb-uparrow-sel.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
+            <statetype name="downscrollarrow">
+                <position>510,305</position>
+                <state type="off">
+                    <imagetype name="dnon">
+                        <filename>lb-dnarrow-reg.png</filename>
+                    </imagetype>
+                </state>
+                <state type="full">
+                    <imagetype name="dnoff">
+                        <filename>lb-dnarrow-sel.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
+        </buttonlist>
 
         <button name="back" from="basebutton">
             <position>60,595</position>
