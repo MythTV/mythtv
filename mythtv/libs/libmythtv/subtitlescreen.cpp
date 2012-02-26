@@ -11,7 +11,7 @@
 
 #define LOC      QString("Subtitles: ")
 #define LOC_WARN QString("Subtitles Warning: ")
-static const float PAD_WIDTH  = 0.20;
+static const float PAD_WIDTH  = 0.5;
 static const float PAD_HEIGHT = 0.04;
 
 // Normal font height is designed to be 1/20 of safe area height, with
@@ -203,7 +203,7 @@ void SubtitleScreen::OptimiseDisplayedArea(void)
     int top  = m_safeArea.top()  - bounding.top();
     SetArea(MythRect(bounding));
 
-    i.toFront();;
+    i.toFront();
     while (i.hasNext())
     {
         MythUIType *img = i.next();
@@ -1202,10 +1202,12 @@ bool FormattedTextSubtitle::Draw(QList<MythUIType*> *imageCache,
                                  uint64_t start, uint64_t duration) const
 {
     bool result = false;
+    QVector<MythUISimpleText *> bringToFront;
 
     for (int i = 0; i < m_lines.size(); i++)
     {
-        int x = m_lines[i].x_indent, y = m_lines[i].y_indent;
+        int x = m_lines[i].x_indent;
+        int y = m_lines[i].y_indent;
         int height = m_lines[i].CalcSize().height();
         QList<FormattedTextChunk>::const_iterator chunk;
         bool first = true;
@@ -1229,16 +1231,19 @@ bool FormattedTextSubtitle::Draw(QList<MythUIType*> *imageCache,
                 ++count;
             }
             int x_adjust = count * font.width(" ");
+            int padding = (*chunk).CalcPadding();
+            // Account for extra padding before the first chunk.
+            if (first)
+                x += padding;
             QSize chunk_sz = (*chunk).CalcSize();
             if ((*chunk).format.GetBGAlpha())
             {
-                int padding = font.maxWidth() * PAD_WIDTH;
-                if (first)
-                    x += padding;
                 QBrush bgfill = QBrush((*chunk).format.GetBGColor());
-                QRect bgrect(x, y, chunk_sz.width(), height);
+                QRect bgrect(x - padding, y,
+                             chunk_sz.width() + 2 * padding, height);
+                // Don't draw a background behind leading spaces.
                 if (first)
-                    bgrect.setLeft(bgrect.left() + x_adjust - padding);
+                    bgrect.setLeft(bgrect.left() + x_adjust);
                 MythUIShape *bgshape = new MythUIShape(parent,
                         QString("subbg%1x%2@%3,%4")
                                      .arg(chunk_sz.width())
@@ -1252,8 +1257,11 @@ bool FormattedTextSubtitle::Draw(QList<MythUIType*> *imageCache,
                     parent->RegisterExpiration(bgshape, start + duration);
                 result = true;
             }
+            // Shift to the right to account for leading spaces that
+            // are removed by the MythUISimpleText constructor.  Also
+            // add in padding at the end to avoid clipping.
             QRect rect(x + x_adjust, y,
-                       chunk_sz.width() - x_adjust, height);
+                       chunk_sz.width() - x_adjust + padding, height);
 
             MythUISimpleText *text =
                 new MythUISimpleText((*chunk).text, *mythfont, rect,
@@ -1262,6 +1270,7 @@ bool FormattedTextSubtitle::Draw(QList<MythUIType*> *imageCache,
                                      .arg(chunk_sz.width())
                                      .arg(height)
                                      .arg(x).arg(y));
+            bringToFront.append(text);
             if (imageCache)
                 imageCache->append(text);
             if (duration > 0)
@@ -1276,6 +1285,10 @@ bool FormattedTextSubtitle::Draw(QList<MythUIType*> *imageCache,
             first = false;
         }
     }
+    // Move each chunk of text to the front so that it isn't clipped
+    // by the preceding chunk's background.
+    for (int i = 0; i < bringToFront.size(); i++)
+        bringToFront.at(i)->MoveToTop();
     return result;
 }
 
@@ -1339,11 +1352,18 @@ QSize SubtitleScreen::CalcTextSize(const QString &text,
 {
     QFont *font = Get708Font(format)->GetFace();
     QFontMetrics fm(*font);
-    int width = fm.width(text) + fm.maxWidth() * PAD_WIDTH;
+    int width = fm.width(text);
     int height = fm.height() * (1 + PAD_HEIGHT);
     if (layoutSpacing > 0 && !text.trimmed().isEmpty())
         height = max(height, (int)(font->pixelSize() * layoutSpacing));
     return QSize(width, height);
+}
+
+int SubtitleScreen::CalcPadding(const CC708CharacterAttribute &format) const
+{
+    QFont *font = Get708Font(format)->GetFace();
+    QFontMetrics fm(*font);
+    return fm.maxWidth() * PAD_WIDTH;
 }
 
 #ifdef USING_LIBASS
