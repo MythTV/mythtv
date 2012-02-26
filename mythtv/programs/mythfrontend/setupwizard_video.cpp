@@ -70,12 +70,12 @@ bool VideoSetupWizard::Create()
     m_playbackProfileButtonList->SetHelpText( tr("Select from one of the "
                                 "preconfigured playback profiles.  When "
                                 "satisfied, you can test Standard Definition "
-                                "and High Definition playback with your choice "
-                                "before moving on.") );
+                                "and High Definition playback with the selected "
+                                "profile before moving on.") );
     m_testSDButton->SetHelpText( tr("Test your playback settings with Standard "
-                                    "definition content. (480p)") );
+                                    "Definition content. (480p)") );
     m_testHDButton->SetHelpText( tr("Test your playback settings with High "
-                                    "definition content (1080p).") );
+                                    "Definition content (1080p).") );
     m_nextButton->SetHelpText( tr("Save these changes and move on to the "
                                   "next configuration step.") );
     m_prevButton->SetHelpText(tr("Return to the previous configuration step."));

@@ -437,7 +437,7 @@ HostCheckBox *AudioConfigSettings::AC3PassThrough()
     gc->setLabel(QObject::tr("Dolby Digital"));
     gc->setValue(false);
     gc->setHelpText(QObject::tr("Enable if your amplifier or sound decoder "
-                    "supports AC3/Dolby Digital. You must use a digital "
+                    "supports AC-3/Dolby Digital. You must use a digital "
                     "connection. Uncheck if using an analog connection."));
     return gc;
 }
@@ -456,10 +456,10 @@ HostCheckBox *AudioConfigSettings::DTSPassThrough()
 HostCheckBox *AudioConfigSettings::EAC3PassThrough()
 {
     HostCheckBox *gc = new HostCheckBox("EAC3PassThru");
-    gc->setLabel(QObject::tr("E-AC3"));
+    gc->setLabel(QObject::tr("E-AC-3"));
     gc->setValue(false);
     gc->setHelpText(QObject::tr("Enable if your amplifier or sound decoder "
-                    "supports E-AC3 (DD+). You must use a hdmi connection."));
+                    "supports E-AC-3 (DD+). You must use a HDMI connection."));
     return gc;
 }
 
@@ -469,7 +469,7 @@ HostCheckBox *AudioConfigSettings::TrueHDPassThrough()
     gc->setLabel(QObject::tr("TrueHD"));
     gc->setValue(false);
     gc->setHelpText(QObject::tr("Enable if your amplifier or sound decoder "
-                    "supports Dolby TrueHD. You must use a hdmi connection."));
+                    "supports Dolby TrueHD. You must use a HDMI connection."));
     return gc;
 }
 
@@ -479,7 +479,7 @@ HostCheckBox *AudioConfigSettings::DTSHDPassThrough()
     gc->setLabel(QObject::tr("DTS-HD"));
     gc->setValue(false);
     gc->setHelpText(QObject::tr("Enable if your amplifier or sound decoder "
-                    "supports DTS-HD. You must use a hdmi connection."));
+                    "supports DTS-HD. You must use a HDMI connection."));
     return gc;
 }
 
@@ -1066,8 +1066,8 @@ HostCheckBox *AudioAdvancedSettings::MPCM()
     gc->setLabel(QObject::tr("Stereo PCM Only"));
     gc->setValue(false);
     gc->setHelpText(QObject::tr("Enable if your amplifier or sound decoder "
-                    "only supports 2 channels PCM (typically an old HDMI 1.0 "
-                    "device). Multi-channels audio will be re-encoded to AC3 "
+                    "only supports 2 channel PCM (typically an old HDMI 1.0 "
+                    "device). Multichannel audio will be re-encoded to AC-3 "
                     "when required"));
     return gc;
 }
@@ -1143,7 +1143,7 @@ HostComboBox *AudioAdvancedSettings::PassThroughOutputDevice()
 HostCheckBox *AudioAdvancedSettings::SPDIFRateOverride()
 {
     HostCheckBox *gc = new HostCheckBox("SPDIFRateOverride");
-    gc->setLabel(QObject::tr("SPDIF 48k rate override"));
+    gc->setLabel(QObject::tr("SPDIF 48kHz rate override"));
     gc->setValue(false);
     gc->setHelpText(QObject::tr("ALSA only. By default, let ALSA determine "
                         "the passthrough sampling rate. If checked "
