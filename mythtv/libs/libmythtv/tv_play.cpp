@@ -7043,6 +7043,7 @@ void TV::ChangeChannel(PlayerContext *ctx, uint chanid, const QString &chan)
 
     QString channum = chan;
     QStringList reclist;
+    QSet<uint> tunable_on;
 
     QString oldinputname = ctx->recorder->GetInput();
 
@@ -7073,12 +7074,43 @@ void TV::ChangeChannel(PlayerContext *ctx, uint chanid, const QString &chan)
             ctx->recorder->CheckChannelPrefix(chan,  pref_cardid,
                                               dummy, needed_spacer);
 
+            LOG(VB_CHANNEL, LOG_INFO, LOC +
+                QString("CheckChannelPrefix(%1, pref_cardid %2, %3, '%4') "
+                        "cardid %5")
+                .arg(chan).arg(pref_cardid).arg(dummy).arg(needed_spacer)
+                .arg(cardid));
+
             channum = add_spacer(chan, needed_spacer);
-            getit = (pref_cardid != cardid);
+            if (pref_cardid != cardid)
+            {
+                getit = true;
+            }
+            else
+            {
+                if (!chanid)
+                    chanid = get_chanid(ctx, cardid, chan);
+                tunable_on = IsTunableOn(ctx, chanid, true, false);
+                getit = !tunable_on.contains(cardid);
+            }
         }
 
         if (getit)
-            reclist = ChannelUtil::GetValidRecorderList(chanid, channum);
+        {
+            QStringList tmp =
+                ChannelUtil::GetValidRecorderList(chanid, channum);
+            if (tunable_on.empty())
+            {
+                if (!chanid)
+                    chanid = get_chanid(ctx, ctx->GetCardID(), chan);
+                tunable_on = IsTunableOn(ctx, chanid, true, false);
+            }
+            QStringList::const_iterator it = tmp.begin();
+            for (; it != tmp.end(); ++it)
+            {
+                if (!chanid || tunable_on.contains((*it).toUInt()))
+                    reclist.push_back(*it);
+            }
+        }
     }
 
     if (reclist.size())
@@ -7100,12 +7132,16 @@ void TV::ChangeChannel(PlayerContext *ctx, uint chanid, const QString &chan)
             ctx->prevChan.pop_back();
         }
 
+        uint new_cardid = testrec->GetRecorderNumber();
+        uint sourceid = ChannelUtil::GetSourceIDForChannel(chanid);
+        uint inputid = CardUtil::GetInputID(new_cardid, sourceid);
+
         // found the card on a different recorder.
         delete testrec;
         // Save the current channel if this is the first time
         if (ctx->prevChan.empty())
             ctx->PushPreviousChannel();
-        SwitchCards(ctx, chanid, channum);
+        SwitchCards(ctx, chanid, channum, inputid);
         return;
     }
 
@@ -7755,10 +7791,33 @@ void TV::ShowLCDDVDInfo(const PlayerContext *ctx)
 
 bool TV::IsTunable(const PlayerContext *ctx, uint chanid, bool use_cache)
 {
-    LOG(VB_PLAYBACK, LOG_INFO, QString("IsTunable(%1)").arg(chanid));
+    return !IsTunableOn(ctx,chanid,use_cache,true).empty();
+}
+
+static QString toCommaList(const QSet<uint> &list)
+{
+    QString ret = "";
+    for (QSet<uint>::const_iterator it = list.begin(); it != list.end(); ++it)
+        ret += QString("%1,").arg(*it);
+
+    if (ret.length())
+        return ret.left(ret.length()-1);
+
+    return "";
+}
+
+QSet<uint> TV::IsTunableOn(
+    const PlayerContext *ctx, uint chanid, bool use_cache, bool early_exit)
+{
+    QSet<uint> tunable_cards;
 
     if (!chanid)
-        return false;
+    {
+        LOG(VB_CHANNEL, LOG_INFO, LOC +
+            QString("IsTunableOn(%1) no").arg(chanid));
+
+        return tunable_cards;
+    }
 
     uint mplexid = ChannelUtil::GetMplexID(chanid);
     mplexid = (32767 == mplexid) ? 0 : mplexid;
@@ -7834,21 +7893,33 @@ bool TV::IsTunable(const PlayerContext *ctx, uint chanid, bool use_cache)
                 inputs[j].mplexid != mplexid)
                 continue;
 
-            LOG(VB_PLAYBACK, LOG_INFO, QString("IsTunable(%1) -> true\n")
-                    .arg(chanid));
+            tunable_cards.insert(cardids[i]);
 
-            return true;
+            break;
         }
+
+        if (early_exit && !tunable_cards.empty())
+            break;
     }
 
-    LOG(VB_PLAYBACK, LOG_INFO, QString("IsTunable(%1) -> false\n").arg(chanid));
+    if (tunable_cards.empty())
+    {
+        LOG(VB_CHANNEL, LOG_INFO, LOC + QString("IsTunableOn(%1) no")
+            .arg(chanid));
+    }
+    else
+    {
+        LOG(VB_CHANNEL, LOG_INFO, LOC + QString("IsTunableOn(%1) yes { %2 }")
+            .arg(chanid).arg(toCommaList(tunable_cards)));
+    }
 
-    return false;
+    return tunable_cards;
 }
 
 void TV::ClearTunableCache(void)
 {
     QMutexLocker locker(&is_tunable_cache_lock);
+    LOG(VB_CHANNEL, LOG_INFO, LOC + "ClearTunableCache()");
     is_tunable_cache_inputs.clear();
 }
 
