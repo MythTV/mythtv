@@ -856,7 +856,7 @@ void FormattedTextSubtitle::InitFromCC608(vector<CC608Text*> &buffers)
     vector<CC608Text*>::iterator i = buffers.begin();
     bool teletextmode = (*i)->teletextmode;
     bool useBackground = m_useBackground && !teletextmode;
-    int xscale = teletextmode ? 40 : 36;
+    //int xscale = teletextmode ? 40 : 36;
     int yscale = teletextmode ? 25 : 17;
     int pixelSize = m_safeArea.height() / (yscale * LINE_SPACING);
     if (parent)
@@ -871,12 +871,20 @@ void FormattedTextSubtitle::InitFromCC608(vector<CC608Text*> &buffers)
         QString text(cc->text);
 
         int orig_x = teletextmode ? cc->y : (cc->x + 3);
-        int x = (int)(((float)orig_x / (float)xscale) *
-                      (float)m_safeArea.width());
         int orig_y = teletextmode ? cc->x : cc->y;
         int y = (int)(((float)orig_y / (float)yscale) *
                       (float)m_safeArea.height());
-        FormattedTextLine line(x, y, orig_x, orig_y);
+        FormattedTextLine line(0, y, orig_x, orig_y);
+        // Indented lines are handled as initial strings of space
+        // characters, to improve vertical alignment.  Monospace fonts
+        // are assumed.
+        if (orig_x > 0)
+        {
+            CC708CharacterAttribute attr(false, false, false,
+                                         Qt::white, useBackground);
+            FormattedTextChunk chunk(QString(orig_x, ' '), attr, parent);
+            line.chunks += chunk;
+        }
         while (!text.isNull())
         {
             QString captionText =
