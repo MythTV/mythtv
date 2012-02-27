@@ -142,8 +142,8 @@ void MHIContext::StopEngine(void)
     if (NULL == m_engineThread)
         return;
 
-    m_runLock.lock();
     m_stop = true;
+    m_runLock.lock();
     m_engine_wait.wakeAll();
     m_runLock.unlock();
 
@@ -539,6 +539,7 @@ bool MHIContext::OfferKey(QString key)
 // Called from MythPlayer::VideoStart and MythPlayer::ReinitOSD
 void MHIContext::Reinit(const QRect &display)
 {
+    QMutexLocker locker(&m_display_lock);
     m_videoDisplayRect = m_videoRect = QRect();
     m_displayRect = display;
 }
