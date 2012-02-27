@@ -47,11 +47,8 @@ QString toUIState(RecStatusType recstatus)
     if (recstatus == rsRecorded     || recstatus == rsWillRecord)
         return "normal";
 
-    if (recstatus == rsRecording)
+    if (recstatus == rsRecording    || recstatus == rsTuning)
         return "running";
-
-    if (recstatus == rsTuning)
-        return "tuning";
 
     if (recstatus == rsConflict     || recstatus == rsOffLine      ||
         recstatus == rsTunerBusy    || recstatus == rsFailed       ||
