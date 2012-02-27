@@ -1093,7 +1093,9 @@ static QStringList get_valid_recorder_list(uint chanid)
             "SELECT cardinput.cardid "
             "FROM channel "
             "LEFT JOIN cardinput ON channel.sourceid = cardinput.sourceid "
-            "WHERE channel.chanid = :CHANID");
+            "WHERE channel.chanid = :CHANID AND "
+            "      cardinput.livetvorder > 0 "
+            "ORDER BY cardinput.livetvorder, cardinput.cardinputid");
     query.bindValue(":CHANID", chanid);
 
     if (!query.exec() || !query.isActive())
@@ -1125,7 +1127,9 @@ static QStringList get_valid_recorder_list(const QString &channum)
         "SELECT cardinput.cardid "
         "FROM channel "
         "LEFT JOIN cardinput ON channel.sourceid = cardinput.sourceid "
-        "WHERE channel.channum = :CHANNUM");
+        "WHERE channel.channum = :CHANNUM AND "
+        "      cardinput.livetvorder > 0 "
+        "ORDER BY cardinput.livetvorder, cardinput.cardinputid");
     query.bindValue(":CHANNUM", channum);
 
     if (!query.exec() || !query.isActive())

@@ -315,6 +315,22 @@ void MythSystemManager::run(void)
 
             msList.append(ms);
 
+            // Deal with (primarily) Ubuntu which seems to consistently be
+            // screwing up and reporting the signalled case as an exit.  This
+            // workaround will limit the valid exit value to 0 - 127.  As all
+            // of our return values match that (other than the occasional 255)
+            // this shouldn't cause any issues
+            if (ms->m_parent->onlyLowExitVal() && WIFEXITED(status) &&
+                WEXITSTATUS(status) != 255 && WEXITSTATUS(status) & 0x80)
+            {
+                // Just byte swap the status and it seems to be correctly done
+                uint16_t oldstatus = status;
+                status = ((status & 0x00FF) << 8) | ((status & 0xFF00) >> 8);
+                LOG(VB_SYSTEM, LOG_INFO,
+                    QString("Odd return value: swapping from %1 to %2")
+                    .arg(oldstatus) .arg(status));
+            }
+
             // handle normal exit
             if( WIFEXITED(status) )
             {

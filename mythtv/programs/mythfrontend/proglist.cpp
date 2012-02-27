@@ -7,6 +7,7 @@ using namespace std;
 // Qt
 #include <QCoreApplication>
 #include <QRegExp>
+#include <QLocale>
 
 // MythTV
 #include "scheduledrecording.h"
@@ -1525,8 +1526,8 @@ void ProgLister::UpdateButtonList(void)
         m_positionText->SetText(
             tr("%1 of %2", "Current position in list where %1 is the "
                "position, %2 is the total count")
-            .arg(m_progList->GetCurrentPos())
-            .arg(m_progList->GetCount()));
+            .arg(QLocale::system().toString(m_progList->GetCurrentPos() + 1))
+            .arg(QLocale::system().toString(m_progList->GetCount())));
     }
 }
 
@@ -1554,8 +1555,8 @@ void ProgLister::HandleSelected(MythUIButtonListItem *item)
         m_positionText->SetText(
             tr("%1 of %2", "Current position in list where %1 is the "
                "position, %2 is the total count")
-            .arg(m_progList->GetCurrentPos())
-            .arg(m_progList->GetCount()));
+            .arg(QLocale::system().toString(m_progList->GetCurrentPos() + 1))
+            .arg(QLocale::system().toString(m_progList->GetCount())));
     }
 
     MythUIStateType *ratingState = dynamic_cast<MythUIStateType*>

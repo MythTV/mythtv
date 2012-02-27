@@ -341,12 +341,12 @@ void MythBurn::toggleUseCutlist(void)
     {
         if (a->useCutlist)
         {
-            item->SetText(tr("Using Cutlist"), "cutlist");
+            item->SetText(tr("Using Cut List"), "cutlist");
             item->DisplayState("using", "cutliststatus");
         }
         else
         {
-            item->SetText(tr("Not Using Cutlist"), "cutlist");
+            item->SetText(tr("Not Using Cut List"), "cutlist");
             item->DisplayState("notusing", "cutliststatus");
         }
     }
@@ -465,12 +465,12 @@ void MythBurn::updateArchiveList(void)
             {
                 if (a->useCutlist)
                 {
-                    item->SetText(tr("Using Cutlist"), "cutlist");
+                    item->SetText(tr("Using Cut List"), "cutlist");
                     item->DisplayState("using", "cutliststatus");
                 }
                 else
                 {
-                    item->SetText(tr("Not Using Cutlist"), "cutlist");
+                    item->SetText(tr("Not Using Cut List"), "cutlist");
                     item->DisplayState("notusing", "cutliststatus");
                 }
             }
@@ -816,10 +816,10 @@ void MythBurn::showMenu()
     if (curItem->hasCutlist)
     {
         if (curItem->useCutlist)
-            menuPopup->AddButton(tr("Don't Use Cutlist"),
+            menuPopup->AddButton(tr("Don't Use Cut List"),
                                  SLOT(toggleUseCutlist()));
         else
-            menuPopup->AddButton(tr("Use Cutlist"),
+            menuPopup->AddButton(tr("Use Cut List"),
                                  SLOT(toggleUseCutlist()));
     }
 

@@ -42,6 +42,7 @@ class SubtitleScreen : public MythScreenType
     QSize CalcTextSize(const QString &text,
                        const CC708CharacterAttribute &format,
                        float layoutSpacing) const;
+    int CalcPadding(const CC708CharacterAttribute &format) const;
 
     void RegisterExpiration(MythUIType *shape, long long endTime)
     {
@@ -119,6 +120,10 @@ class FormattedTextChunk
     {
         return parent->CalcTextSize(text, format, layoutSpacing);
     }
+    int CalcPadding(void) const
+    {
+        return parent->CalcPadding(format);
+    }
     bool Split(FormattedTextChunk &newChunk);
     QString ToLogString(void) const;
 
@@ -136,14 +141,18 @@ class FormattedTextLine
     QSize CalcSize(float layoutSpacing = 0.0f) const
     {
         int height = 0, width = 0;
+        int padding = 0;
         QList<FormattedTextChunk>::const_iterator it;
         for (it = chunks.constBegin(); it != chunks.constEnd(); ++it)
         {
             QSize tmp = (*it).CalcSize(layoutSpacing);
             height = max(height, tmp.height());
             width += tmp.width();
+            padding = (*it).CalcPadding();
+            if (it == chunks.constBegin())
+                width += padding;
         }
-        return QSize(width, height);
+        return QSize(width + padding, height);
     }
 
     QList<FormattedTextChunk> chunks;

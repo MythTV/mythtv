@@ -3582,21 +3582,41 @@ void MainServer::HandleGetFreeRecorderCount(PlaybackSock *pbs)
     SendResponse(pbssock, strlist);
 }
 
+static bool comp_livetvorder(const InputInfo &a, const InputInfo &b)
+{
+    return a.livetvorder < b.livetvorder;
+}
+
 void MainServer::HandleGetFreeRecorderList(PlaybackSock *pbs)
 {
     MythSocket *pbssock = pbs->getSocket();
 
-    QStringList strlist;
+    vector<uint> excluded_cardids;
+    vector<InputInfo> allinputs;
 
     QMap<int, EncoderLink *>::Iterator iter = encoderList->begin();
     for (; iter != encoderList->end(); ++iter)
     {
         EncoderLink *elink = *iter;
 
-        if (elink->IsConnected() && !elink->IsTunerLocked() &&
-            !elink->IsBusy())
+        if (!elink->IsConnected() || elink->IsTunerLocked())
+            continue;
+
+        vector<InputInfo> inputs = elink->GetFreeInputs(excluded_cardids);
+        allinputs.insert(allinputs.end(), inputs.begin(), inputs.end());
+    }
+
+    stable_sort(allinputs.begin(), allinputs.end(), comp_livetvorder);
+
+    QStringList strlist;
+    QMap<int, bool> cardidused;
+    for (uint i = 0; i < allinputs.size(); ++i)
+    {
+        uint cardid = allinputs[i].cardid;
+        if (!cardidused[cardid])
         {
-            strlist << QString::number(iter.key());
+            strlist << QString::number(cardid);
+            cardidused[cardid] = true;
         }
     }
 

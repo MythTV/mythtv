@@ -249,14 +249,17 @@ MythUIType *MythUIType::GetChildAt(const QPoint &p, bool recursive,
             if (!(*it))
                 continue;
 
-            MythUIType *child = NULL;
+            // If this point doesn't fall within the child's area then move on
+            // This requires that the area is actually accurate and in some
+            // cases this still isn't true
+            if (!(*it)->GetArea().contains(p - GetArea().topLeft()))
+                continue;
 
 
-            if ((*it)->GetArea().contains(p - GetArea().topLeft()))
-                child = *it;
+            MythUIType *child = *it;
 
-            if (!child && recursive)
-                child = (*it)->GetChildAt(p - GetArea().topLeft(), recursive,
+            if (recursive && (focusable && !child->CanTakeFocus()))
+                child = child->GetChildAt(p - GetArea().topLeft(), recursive,
                                           focusable);
 
             if (child)

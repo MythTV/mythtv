@@ -452,7 +452,7 @@ void XMLTV_generic_config::Save()
     VerticalConfigurationGroup::Save();
 #if 0
     QString err_msg = QObject::tr(
-        "You MUST run 'mythfilldatabase --manual the first time,\n "
+        "You MUST run 'mythfilldatabase --manual' the first time,\n "
         "instead of just 'mythfilldatabase'.\nYour grabber does not provide "
         "channel numbers, so you have to set them manually.");
 

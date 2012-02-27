@@ -56,15 +56,18 @@ class MUI_PUBLIC MythMenuItem
 {
   public:
     MythMenuItem(const QString &text, QVariant data = 0, bool checked = false, MythMenu *subMenu = NULL) :
-        Text(text), Data(data), Checked(checked), SubMenu(subMenu), UseSlot(false) {}
+        Text(text), Data(data), Checked(checked), SubMenu(subMenu), UseSlot(false) { Init(); }
     MythMenuItem(const QString &text, const char *slot, bool checked = false, MythMenu *subMenu = NULL) :
-        Text(text), Data(qVariantFromValue(slot)), Checked(checked), SubMenu(subMenu), UseSlot(true) {}
+        Text(text), Data(qVariantFromValue(slot)), Checked(checked), SubMenu(subMenu), UseSlot(true) { Init(); }
 
     QString   Text;
     QVariant  Data;
     bool      Checked;
     MythMenu *SubMenu;
     bool      UseSlot;
+
+  private:
+    void Init(void) { Text.detach(); }
 };
 
 class MUI_PUBLIC MythMenu
@@ -84,6 +87,8 @@ class MUI_PUBLIC MythMenu
     void SetParent(MythMenu *parent) { m_parentMenu = parent; }
 
   private:
+    void Init(void);
+
     MythMenu *m_parentMenu;
     QString   m_title;
     QString   m_text;

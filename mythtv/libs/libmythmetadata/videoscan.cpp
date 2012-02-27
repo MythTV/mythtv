@@ -89,9 +89,17 @@ VideoScannerThread::~VideoScannerThread()
     delete m_dbmetadata;
 }
 
+void VideoScannerThread::SetHosts(const QStringList &hosts)
+{
+    m_liveSGHosts.clear();
+    QStringList::const_iterator iter = hosts.begin();
+    for (; iter != hosts.end(); ++iter)
+        m_liveSGHosts << iter->toLower();
+}
+
 void VideoScannerThread::SetDirs(QStringList dirs)
 {
-    QString master = gCoreContext->GetMasterHostName();
+    QString master = gCoreContext->GetMasterHostName().toLower();
     QStringList searchhosts, mdirs;
     m_offlineSGHosts.clear();
 
@@ -101,7 +109,7 @@ void VideoScannerThread::SetDirs(QStringList dirs)
         if (iter->startsWith("myth://"))
         {
             QUrl sgurl = *iter;
-            QString host = sgurl.host();
+            QString host = sgurl.host().toLower();
             QString path = sgurl.path();
 
             if (!m_liveSGHosts.contains(host))
@@ -169,7 +177,7 @@ void VideoScannerThread::run()
             if (iter->startsWith("myth://"))
             {
                 QUrl sgurl = *iter;
-                QString host = sgurl.host();
+                QString host = sgurl.host().toLower();
                 QString path = sgurl.path();
 
                 m_liveSGHosts.removeAll(host);
@@ -245,7 +253,7 @@ void VideoScannerThread::verifyFiles(FileCheckList &files,
          p != m_dbmetadata->getList().end(); ++p)
     {
         QString lname = (*p)->GetFilename();
-        QString lhost = (*p)->GetHost();
+        QString lhost = (*p)->GetHost().toLower();
         if (lname != QString::null)
         {
             iter = files.find(lname);

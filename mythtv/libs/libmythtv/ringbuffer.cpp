@@ -1332,7 +1332,7 @@ QString RingBuffer::BitrateToString(uint64_t rate, bool hz)
     }
     else if (rate >= 1000)
     {
-        msg = hz ? QObject::tr("%1KHz") : QObject::tr("%1Kbps");
+        msg = hz ? QObject::tr("%1kHz") : QObject::tr("%1kbps");
         bitrate = (float)rate / 1000.0;
         range = hz ? 1 : 0;
     }

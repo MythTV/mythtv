@@ -162,7 +162,7 @@ class MBASE_PUBLIC MythCoreContext : public MythObservable, public MythSocketCBs
     void OverrideSettingForSession(const QString &key, const QString &value);
 
     void dispatch(const MythEvent &event);
-    void dispatchNow(const MythEvent &event) MDEPRECATED;
+    void dispatchNow(const MythEvent &event); // MDEPRECATED;
 
     void InitLocale(void);
     const MythLocale *GetLocale(void) const;
