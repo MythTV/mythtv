@@ -432,13 +432,10 @@ bool MHIContext::GetCarouselData(QString objectPath, QByteArray &result)
     // same thread this is safe.  Otherwise we need to make a deep copy of
     // the result.
 
-    QMutexLocker locker(&m_runLock);
     bool bReported = false;
     QTime t; t.start();
     while (!m_stop)
     {
-        locker.unlock();
-
         if (isIC)
         {
             switch (m_ic.GetFile(objectPath, result, cert))
@@ -481,9 +478,7 @@ bool MHIContext::GetCarouselData(QString objectPath, QByteArray &result)
         // some more packets.  We should eventually find out if this item is
         // present.
         ProcessDSMCCQueue();
-
-        locker.relock();
-        m_engine_wait.wait(locker.mutex(), 300);
+        m_engine_wait.wait(&m_runLock, 300);
     }
     return false; // Stop has been set.  Say the object isn't present.
 }
@@ -590,7 +585,6 @@ bool MHIContext::OfferKey(QString key)
         .arg(key).arg(action).arg(m_keyQueue.size()) );
     { QMutexLocker locker(&m_keyLock);
     m_keyQueue.enqueue(action);}
-    QMutexLocker locker2(&m_runLock);
     m_engine_wait.wakeAll();
     return true;
 }
@@ -994,7 +988,7 @@ void MHIContext::EndStream()
 // Callback from MythPlayer when a stream starts or stops
 bool MHIContext::StreamStarted(bool bStarted)
 {
-    if (!m_engine || !m_notify)
+    if (!m_notify)
         return false;
 
     LOG(VB_MHEG, LOG_INFO, QString("[mhi] Stream 0x%1 %2")
