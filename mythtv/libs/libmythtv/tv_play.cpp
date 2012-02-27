@@ -3378,7 +3378,7 @@ void TV::HandlePseudoLiveTVTimerEvent(void)
             continue;
         }
 
-        LOG(VB_PLAYBACK, LOG_INFO,
+        LOG(VB_CHANNEL, LOG_INFO,
             QString("REC_PROGRAM -- channel change %1").arg(i));
 
         uint        chanid  = ctx->pseudoLiveTVRec->GetChanID();
@@ -6446,7 +6446,7 @@ void TV::SwitchInputs(PlayerContext *ctx, uint inputid)
         return;
     }
 
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("SwitchInputd(%1)").arg(inputid));
+    LOG(VB_CHANNEL, LOG_INFO, LOC + QString("SwitchInputs(%1)").arg(inputid));
 
     if ((uint)ctx->GetCardID() == CardUtil::GetCardID(inputid))
     {
@@ -6461,7 +6461,7 @@ void TV::SwitchInputs(PlayerContext *ctx, uint inputid)
 void TV::SwitchCards(PlayerContext *ctx,
                      uint chanid, QString channum, uint inputid)
 {
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("SwitchCards(%1,'%2',%3)")
+    LOG(VB_CHANNEL, LOG_INFO, LOC + QString("SwitchCards(%1,'%2',%3)")
             .arg(chanid).arg(channum).arg(inputid));
 
     RemoteEncoder *testrec = NULL;
@@ -7003,9 +7003,39 @@ void TV::ChangeChannel(PlayerContext *ctx, int direction)
         UpdateOSDInput(ctx);
 }
 
+static uint get_chanid(const PlayerContext *ctx,
+                       uint cardid, const QString &channum)
+{
+    uint chanid = 0, cur_sourceid = 0;
+    // try to find channel on current input
+    if (ctx && ctx->playingInfo && ctx->playingInfo->GetSourceID())
+    {
+        cur_sourceid = ctx->playingInfo->GetSourceID();
+        chanid = max(ChannelUtil::GetChanID(cur_sourceid, channum), 0);
+        if (chanid)
+            return chanid;
+    }
+    // try to find channel on all inputs
+    vector<uint> inputs = CardUtil::GetInputIDs(cardid);
+    for (vector<uint>::const_iterator it = inputs.begin();
+         it != inputs.end(); ++it)
+    {
+        uint sourceid = CardUtil::GetSourceID(*it);
+        if (cur_sourceid == sourceid)
+            continue; // already tested above
+        if (sourceid)
+        {
+            chanid = max(ChannelUtil::GetChanID(sourceid, channum), 0);
+            if (chanid)
+                return chanid;
+        }
+    }
+    return chanid;
+}
+
 void TV::ChangeChannel(PlayerContext *ctx, uint chanid, const QString &chan)
 {
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("ChangeChannel(%1, '%2') ")
+    LOG(VB_CHANNEL, LOG_INFO, LOC + QString("ChangeChannel(%1, '%2') ")
             .arg(chanid).arg(chan));
 
     if ((!chanid && chan.isEmpty()) || !ctx || !ctx->recorder)
@@ -7141,7 +7171,7 @@ void TV::ShowPreviousChannel(PlayerContext *ctx)
 {
     QString channum = ctx->GetPreviousChannel();
 
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("ShowPreviousChannel: '%1'")
+    LOG(VB_CHANNEL, LOG_INFO, LOC + QString("ShowPreviousChannel: '%1'")
             .arg(channum));
 
     if (channum.isEmpty())
@@ -7161,7 +7191,7 @@ void TV::PopPreviousChannel(PlayerContext *ctx, bool immediate_change)
     QString prev_channum = ctx->PopPreviousChannel();
     QString cur_channum  = ctx->tvchain->GetChannelName(-1);
 
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("PopPreviousChannel: '%1'->'%2'")
+    LOG(VB_CHANNEL, LOG_INFO, LOC + QString("PopPreviousChannel: '%1'->'%2'")
             .arg(cur_channum).arg(prev_channum));
 
     // Only change channel if previous channel != current channel
@@ -7760,7 +7790,7 @@ bool TV::IsTunable(const PlayerContext *ctx, uint chanid, bool use_cache)
         QString msg = QString("cardids[%1]: ").arg(sourceid);
         for (uint i = 0; i < cardids.size(); i++)
             msg += QString("%1, ").arg(cardids[i]);
-        LOG(VB_GENERAL, LOG_DEBUG,  msg);
+        LOG(VB_CHANNEL, LOG_INFO,  msg);
     }
 #endif
 
@@ -7791,7 +7821,7 @@ bool TV::IsTunable(const PlayerContext *ctx, uint chanid, bool use_cache)
         QString msg = QString("inputs[%1]: ").arg(cardids[i]);
         for (uint j = 0; j < inputs.size(); j++)
             msg += QString("%1, ").arg(inputs[j].inputid);
-        LOG(VB_GENERAL, LOG_DEBUG, msg);
+        LOG(VB_CHANNEL, LOG_INFO, msg);
     }
 #endif
 
@@ -9858,7 +9888,7 @@ bool TV::LoadDDMap(uint sourceid)
         }
 
 #if 0
-        LOG(VB_GENERAL, LOG_DEBUG,
+        LOG(VB_CHANNEL, LOG_INFO,
             QString("Adding channel: %1 -- %2 -- %3 -- %4")
                 .arg(tmp["channum"],4).arg(tmp["callsign"],7)
                 .arg(tmp["XMLTV"]).arg(tmp["channame"]));
@@ -10084,7 +10114,7 @@ void TV::OSDDialogEvent(int result, QString text, QString action)
                         new_channum = (*it).channum;
                 }
 
-                LOG(VB_GENERAL, LOG_DEBUG, LOC +
+                LOG(VB_CHANNEL, LOG_INFO, LOC +
                     QString("Channel Group: '%1'->'%2'")
                         .arg(cur_channum).arg(new_channum));
             }
