@@ -2296,7 +2296,7 @@ void JobQueue::DoFlagCommercialsThread(int jobID)
     LOG(VB_JOBQUEUE, LOG_INFO, LOC + QString("Running command: '%1'")
             .arg(command));
 
-    breaksFound = myth_system(command);
+    breaksFound = myth_system(command, kMSLowExitVal);
     int priority = LOG_NOTICE;
     QString comment;
 
