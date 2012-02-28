@@ -101,6 +101,10 @@ PlaylistEditorView::~PlaylistEditorView()
 {
     saveTreePosition();
 
+    for (int x = 0; x < m_deleteList.count(); x++)
+        delete m_deleteList.at(x);
+    m_deleteList.clear();
+
     if (m_rootNode)
         delete m_rootNode;
 }
@@ -376,6 +380,8 @@ void PlaylistEditorView::createRootNode(void )
 
     MetadataPtrList *alltracks = gMusicData->all_music->getAllMetadata();
     MetadataPtrList *compTracks = new MetadataPtrList;
+    m_deleteList.append(compTracks);
+
     for (int x = 0; x < alltracks->count(); x++)
     {
         Metadata *mdata = alltracks->at(x);
@@ -656,6 +662,7 @@ void PlaylistEditorView::filterTracks(MusicGenericTree *node)
                 else
                 {
                     MetadataPtrList *filteredTracks = new MetadataPtrList;
+                    m_deleteList.append(filteredTracks);
                     filteredTracks->append(mdata);
                     map.insert(mdata->Artist(), filteredTracks);
                 }
@@ -689,6 +696,7 @@ void PlaylistEditorView::filterTracks(MusicGenericTree *node)
                     else
                     {
                         MetadataPtrList *filteredTracks = new MetadataPtrList;
+                        m_deleteList.append(filteredTracks);
                         filteredTracks->append(mdata);
                         map.insert(mdata->CompilationArtist(), filteredTracks);
                     }
@@ -721,6 +729,7 @@ void PlaylistEditorView::filterTracks(MusicGenericTree *node)
                 else
                 {
                     MetadataPtrList *filteredTracks = new MetadataPtrList;
+                    m_deleteList.append(filteredTracks);
                     filteredTracks->append(mdata);
                     map.insert(mdata->Album(), filteredTracks);
                 }
@@ -753,6 +762,7 @@ void PlaylistEditorView::filterTracks(MusicGenericTree *node)
                 else
                 {
                     MetadataPtrList *filteredTracks = new MetadataPtrList;
+                    m_deleteList.append(filteredTracks);
                     filteredTracks->append(mdata);
                     map.insert(mdata->Genre(), filteredTracks);
                 }
@@ -785,6 +795,7 @@ void PlaylistEditorView::filterTracks(MusicGenericTree *node)
                 else
                 {
                     MetadataPtrList *filteredTracks = new MetadataPtrList;
+                    m_deleteList.append(filteredTracks);
                     filteredTracks->append(mdata);
                     map.insert(ratingStr, filteredTracks);
                 }
@@ -818,6 +829,7 @@ void PlaylistEditorView::filterTracks(MusicGenericTree *node)
                 else
                 {
                     MetadataPtrList *filteredTracks = new MetadataPtrList;
+                    m_deleteList.append(filteredTracks);
                     filteredTracks->append(mdata);
                     map.insert(yearStr, filteredTracks);
                 }
@@ -1167,6 +1179,11 @@ void PlaylistEditorView::reloadTree(void)
     QStringList route = m_playlistTree->GetCurrentNode()->getRouteByString();
 
     m_playlistTree->Reset();
+
+    for (int x = 0; x < m_deleteList.count(); x++)
+        delete m_deleteList.at(x);
+    m_deleteList.clear();
+
     m_rootNode->deleteAllChildren();
     createRootNode();
     m_playlistTree->AssignTree(m_rootNode);
