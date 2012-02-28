@@ -558,11 +558,12 @@ void Dsmcc::ProcessSection(const unsigned char *data, int length,
 // Reset the object carousel and clear the caches.
 void Dsmcc::Reset()
 {
-    LOG(VB_DSMCC, LOG_INFO, "Resetting carousel");
+    LOG(VB_DSMCC, LOG_INFO, "[dsmcc] Resetting carousel");
     QLinkedList<ObjCarousel*>::iterator it = carousels.begin();
     for (; it != carousels.end(); ++it)
         delete *it;
     carousels.clear();
+    m_startTag = 0;
 }
 
 int Dsmcc::GetDSMCCObject(QStringList &objectPath, QByteArray &result)

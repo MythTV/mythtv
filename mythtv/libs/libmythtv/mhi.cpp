@@ -311,6 +311,9 @@ void MHIContext::SetNetBootInfo(const unsigned char *data, uint length)
         .arg(data[0]).arg(data[1]).arg(length));
 
     QMutexLocker locker(&m_dsmccLock);
+    // The carousel should be reset now as the stream has changed
+    m_dsmcc->Reset();
+    ClearQueue();
     // Save the data from the descriptor.
     m_nbiData.resize(0);
     m_nbiData.reserve(length);
