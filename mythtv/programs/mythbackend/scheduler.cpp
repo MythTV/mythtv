@@ -559,6 +559,20 @@ void Scheduler::UpdateRecStatus(RecordingInfo *pginfo)
         RecordingInfo *p = *dreciter;
         if (p->IsSameProgramTimeslot(*pginfo))
         {
+            // FIXME!  If we are passed an rsUnknown recstatus, an
+            // in-progress recording might be being stopped.  Try
+            // to handle it sensibly until a better fix can be
+            // made after the 0.25 code freeze.
+            if (pginfo->GetRecordingStatus() == rsUnknown)
+            {
+                if (p->GetRecordingStatus() == rsTuning)
+                    pginfo->SetRecordingStatus(rsFailed);
+                else if (p->GetRecordingStatus() == rsRecording)
+                    pginfo->SetRecordingStatus(rsRecorded);
+                else
+                    pginfo->SetRecordingStatus(p->GetRecordingStatus());
+            }
+
             if (p->GetRecordingStatus() != pginfo->GetRecordingStatus())
             {
                 LOG(VB_GENERAL, LOG_INFO,
