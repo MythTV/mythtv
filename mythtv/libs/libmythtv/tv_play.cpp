@@ -8909,7 +8909,8 @@ void TV::customEvent(QEvent *e)
         }
 
         SetExitPlayer(true, true);
-        mctx->player->DisableEdit(-1);
+        if (mctx && mctx->player)
+            mctx->player->DisableEdit(-1);
         ReturnPlayerLock(mctx);
     }
 
