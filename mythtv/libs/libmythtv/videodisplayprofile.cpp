@@ -1256,7 +1256,7 @@ QString VideoDisplayProfile::GetDeinterlacerHelp(const QString &deint)
         "It has increased CPU requirements.");
 
     QString kFieldOrderMsg = QObject::tr(
-        "This deinterlacer attempts to syncronise with interlaced displays "
+        "This deinterlacer attempts to synchronize with interlaced displays "
         "whose size and refresh rate exactly match the video source. "
         "It has low CPU requirements.");
 

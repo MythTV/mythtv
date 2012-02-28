@@ -730,7 +730,7 @@ void TV::InitKeys(void)
     REG_KEY("TV Playback", ACTION_SETCONTRAST,
             QT_TRANSLATE_NOOP("MythControls", "Set the picture contrast"), "");
     REG_KEY("TV Playback", ACTION_SETCOLOUR,
-            QT_TRANSLATE_NOOP("MythControls", "Set the picture colour"), "");
+            QT_TRANSLATE_NOOP("MythControls", "Set the picture color"), "");
     REG_KEY("TV Playback", ACTION_SETHUE,
             QT_TRANSLATE_NOOP("MythControls", "Set the picture hue"), "");
     REG_KEY("TV Playback", ACTION_TOGGLESTUDIOLEVELS,

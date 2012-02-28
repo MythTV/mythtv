@@ -33,10 +33,10 @@ static HostLineEdit *GameAllTreeLevels()
 static HostLineEdit *GameFavTreeLevels()
 {
     HostLineEdit *gc = new HostLineEdit("GameFavTreeLevels");
-    gc->setLabel(QObject::tr("Favourite display order"));
+    gc->setLabel(QObject::tr("Favorite display order"));
     gc->setValue("gamename");
     gc->setHelpText(QObject::tr("Order in which to sort the games "
-                    "marked as favourites "
+                    "marked as favorites "
                     "- this is for all systems. Available choices: "
                     "system, year, genre and gamename"));
     return gc;

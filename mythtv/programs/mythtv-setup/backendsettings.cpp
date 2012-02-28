@@ -221,7 +221,7 @@ static HostCheckBox *DisableFirewireReset()
         QObject::tr(
             "By default, MythTV resets the FireWire bus when a "
             "FireWire recorder stops responding to commands. If "
-            "this causes problems, you can disable this behaviour "
+            "this causes problems, you can disable this behavior "
             "here."));
     hc->setValue(false);
     return hc;
