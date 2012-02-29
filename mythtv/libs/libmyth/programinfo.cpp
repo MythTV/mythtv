@@ -2782,8 +2782,8 @@ bool ProgramInfo::QueryIsDeleteCandidate(bool one_playback_allowed) const
     if (!IsRecording())
         return false;
 
-    if (gCoreContext->GetNumSetting("AutoExpireInsteadOfDelete", 0) &&
-        GetRecordingGroup() != "Deleted" && GetRecordingGroup() != "LiveTV")
+    // gCoreContext->GetNumSetting("AutoExpireInsteadOfDelete", 0) &&
+    if (GetRecordingGroup() != "Deleted" && GetRecordingGroup() != "LiveTV")
         return true;
 
     bool ok = true;

@@ -6258,6 +6258,32 @@ NULL
             return false;
     }
 
+    if (dbver == "1298")
+    {
+        QString queryStr;
+        if (gCoreContext->GetNumSetting("AutoExpireInsteadOfDelete", 0))
+        {
+            queryStr = "UPDATE settings SET data='-1' WHERE "
+                       "value='DeletedMaxAge' AND data='0'";
+        }
+        else
+        {
+            queryStr = "UPDATE settings SET data='0' WHERE "
+                       "value='DeletedMaxAge'";
+        }
+
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.prepare(queryStr);
+        if (!query.exec())
+        {
+            MythDB::DBError("Could not perform update for '1299'", query);
+            return false;
+        }
+
+        if (!UpdateDBVersionNumber("1299", dbver))
+            return false;
+    }
+
     return true;
 }
 

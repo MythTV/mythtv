@@ -2478,7 +2478,7 @@ void MainServer::DoHandleDeleteRecording(
         pbssock = pbs->getSocket();
 
     bool justexpire = expirer ? false :
-            (gCoreContext->GetNumSetting("AutoExpireInsteadOfDelete") &&
+            ( //gCoreContext->GetNumSetting("AutoExpireInsteadOfDelete") &&
              (recinfo.GetRecordingGroup() != "Deleted") &&
              (recinfo.GetRecordingGroup() != "LiveTV"));
 
@@ -2628,19 +2628,22 @@ void MainServer::DoHandleUndeleteRecording(
     RecordingInfo &recinfo, PlaybackSock *pbs)
 {
     int ret = -1;
-    bool undelete_possible =
-            gCoreContext->GetNumSetting("AutoExpireInsteadOfDelete", 0);
+
     MythSocket *pbssock = NULL;
     if (pbs)
         pbssock = pbs->getSocket();
 
-    if (undelete_possible)
+#if 0
+    if (gCoreContext->GetNumSetting("AutoExpireInsteadOfDelete", 0))
     {
+#endif
         recinfo.ApplyRecordRecGroupChange("Default");
         recinfo.UpdateLastDelete(false);
         recinfo.SaveAutoExpire(kDisableAutoExpire);
         ret = 0;
+#if 0
     }
+#endif
 
     QStringList outputlist( QString::number(ret) );
     SendResponse(pbssock, outputlist);

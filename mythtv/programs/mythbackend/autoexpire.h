@@ -32,7 +32,8 @@ enum ExpireMethodType {
     emShortLiveTVPrograms   = 10000,
     emNormalLiveTVPrograms  = 10001,
     emOldDeletedPrograms    = 10002,
-    emNormalDeletedPrograms = 10003
+    emNormalDeletedPrograms = 10003,
+    emQuickDeletedPrograms  = 10004
 };
 
 class AutoExpire;
@@ -96,6 +97,7 @@ class AutoExpire : public QObject
   private:
     void ExpireLiveTV(int type);
     void ExpireOldDeleted(void);
+    void ExpireQuickDeleted(void);
     void ExpireRecordings(void);
     void ExpireEpisodesOverMax(void);
 

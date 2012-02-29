@@ -139,11 +139,10 @@ bool RemoteUndeleteRecording(uint chanid, const QDateTime &recstartts)
 {
     bool result = false;
 
-    bool undelete_possible = 
-            gCoreContext->GetNumSetting("AutoExpireInsteadOfDelete", 0);
-
-    if (!undelete_possible)
+#if 0
+    if (!gCoreContext->GetNumSetting("AutoExpireInsteadOfDelete", 0))
         return result;
+#endif
 
     QStringList strlist(QString("UNDELETE_RECORDING"));
     strlist.push_back(QString::number(chanid));

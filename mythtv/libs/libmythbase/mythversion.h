@@ -50,11 +50,14 @@
  *
  *  MythTV Python Bindings
  *      mythtv/bindings/python/MythTV/static.py
+ */
+#if 0
  *
  *  MythTV PHP Bindings
  *      mythtv/bindings/php/MythBackend.php
- */
-#define MYTH_DATABASE_VERSION "1298"
+#endif
+
+#define MYTH_DATABASE_VERSION "1299"
 
 
  MBASE_PUBLIC  const char *GetMythSourceVersion();

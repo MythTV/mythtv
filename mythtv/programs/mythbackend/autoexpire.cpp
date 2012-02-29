@@ -325,8 +325,11 @@ void AutoExpire::RunExpirer(void)
 
             ExpireLiveTV(emNormalLiveTVPrograms);
 
-            if (gCoreContext->GetNumSetting("DeletedMaxAge", 0))
+            int maxAge = gCoreContext->GetNumSetting("DeletedMaxAge", 0);
+            if (maxAge > 0)
                 ExpireOldDeleted();
+            else if (maxAge == 0)
+                ExpireQuickDeleted();
 
             ExpireEpisodesOverMax();
 
@@ -379,6 +382,19 @@ void AutoExpire::ExpireOldDeleted(void)
 
     LOG(VB_FILE, LOG_INFO, LOC + QString("ExpireOldDeleted()"));
     FillDBOrdered(expireList, emOldDeletedPrograms);
+    SendDeleteMessages(expireList);
+    ClearExpireList(expireList);
+}
+
+/**
+ *  \brief This expires deleted programs within a few minutes
+ */
+void AutoExpire::ExpireQuickDeleted(void)
+{
+    pginfolist_t expireList;
+
+    LOG(VB_FILE, LOG_INFO, LOC + QString("ExpireQuickDeleted()"));
+    FillDBOrdered(expireList, emQuickDeletedPrograms);
     SendDeleteMessages(expireList);
     ClearExpireList(expireList);
 }
@@ -499,7 +515,7 @@ void AutoExpire::ExpireRecordings(void)
             QMap<QString, int> dirList;
             QList<FileSystemInfo>::iterator fsit2;
 
-            LOG(VB_FILE, LOG_INFO, 
+            LOG(VB_FILE, LOG_INFO,
                 QString("    Directories on filesystem ID %1:")
                     .arg(fsit->getFSysID()));
 
@@ -933,7 +949,7 @@ void AutoExpire::FillDBOrdered(pginfolist_t &expireList, int expMethod)
             orderby = "starttime ASC";
             break;
         case emOldDeletedPrograms:
-            if ((maxAge = gCoreContext->GetNumSetting("DeletedMaxAge", 0)) == 0)
+            if ((maxAge = gCoreContext->GetNumSetting("DeletedMaxAge", 0)) <= 0)
                 return;
             msg = QString("Adding programs deleted more than %1 days ago")
                           .arg(maxAge);
@@ -941,6 +957,14 @@ void AutoExpire::FillDBOrdered(pginfolist_t &expireList, int expMethod)
                     "AND lastmodified <= DATE_ADD(NOW(), INTERVAL '-%1' DAY) ")
                     .arg(maxAge);
             orderby = "starttime ASC";
+            break;
+        case emQuickDeletedPrograms:
+            if (gCoreContext->GetNumSetting("DeletedMaxAge", 0) != 0)
+                return;
+            msg = QString("Adding programs deleted more than 5 minutes ago");
+            where = QString("recgroup = 'Deleted' "
+                    "AND lastmodified <= DATE_ADD(NOW(), INTERVAL '-5' MINUTE) ");
+            orderby = "lastmodified ASC";
             break;
         case emNormalDeletedPrograms:
             if (gCoreContext->GetNumSetting("DeletedFifoOrder", 0) == 0)
