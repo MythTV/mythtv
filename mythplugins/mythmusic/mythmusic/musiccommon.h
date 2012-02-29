@@ -127,6 +127,8 @@ class MPUBLIC MusicCommon : public MythScreenType
     void startVisualizer(void);
     void stopVisualizer(void);
     void cycleVisualizer(void);
+    void switchVisualizer(const QString &visual);
+    void switchVisualizer(int visual);
     void resetVisualiserTimer(void);
 
     void playFirstTrack();
