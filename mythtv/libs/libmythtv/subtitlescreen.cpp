@@ -643,6 +643,7 @@ void SubtitleScreen::DisplayCC608Subtitles(void)
 
     FormattedTextSubtitle fsub(m_safeArea, m_useBackground, this);
     fsub.InitFromCC608(textlist->buffers);
+    fsub.Layout608();
     fsub.Layout();
     m_refreshArea = fsub.Draw() || m_refreshArea;
     textlist->lock.unlock();
@@ -858,7 +859,8 @@ void FormattedTextSubtitle::InitFromCC608(vector<CC608Text*> &buffers)
     bool useBackground = m_useBackground && !teletextmode;
     //int xscale = teletextmode ? 40 : 36;
     int yscale = teletextmode ? 25 : 17;
-    int pixelSize = m_safeArea.height() / (yscale * LINE_SPACING);
+    int pixelSize = m_safeArea.height() / (yscale * LINE_SPACING) *
+        (parent ? parent->m_textFontZoom : 100) / 100;
     if (parent)
         parent->SetFontSizes(pixelSize, pixelSize, pixelSize);
 
@@ -1130,6 +1132,55 @@ void FormattedTextSubtitle::WrapLongLines(void)
             }
         }
     }
+}
+
+// Adjusts the Y coordinates to avoid overlap, which could happen as a
+// result of a large text zoom factor.  Then, if the total height
+// exceeds the safe area, compresses each piece of vertical blank
+// space proportionally to make it fit.
+void FormattedTextSubtitle::Layout608(void)
+{
+    int i;
+    int totalHeight = 0;
+    int totalSpace = 0;
+    int firstY = 0;
+    int prevY = 0;
+    QVector<int> heights(m_lines.size());
+    QVector<int> spaceBefore(m_lines.size());
+    // Calculate totalHeight and totalSpace
+    for (i = 0; i < m_lines.size(); i++)
+    {
+        m_lines[i].y_indent = max(m_lines[i].y_indent, prevY); // avoid overlap
+        int y = m_lines[i].y_indent;
+        if (i == 0)
+            firstY = prevY = y;
+        int height = m_lines[i].CalcSize().height();
+        heights[i] = height;
+        spaceBefore[i] = y - prevY;
+        totalSpace += (y - prevY);
+        prevY = y + height;
+        totalHeight += height;
+    }
+    int safeHeight = m_safeArea.height();
+    int overage = min(totalHeight - safeHeight, totalSpace);
+
+    // Recalculate Y coordinates, applying the shrink factor to space
+    // between each line.
+    if (overage > 0 && totalSpace > 0)
+    {
+        float shrink = (totalSpace - overage) / (float)totalSpace;
+        prevY = firstY;
+        for (i = 0; i < m_lines.size(); i++)
+        {
+            m_lines[i].y_indent = prevY + spaceBefore[i] * shrink;
+            prevY = m_lines[i].y_indent + heights[i];
+        }
+    }
+
+    // Shift Y coordinates back up into the safe area.
+    int shift = min(firstY, max(0, prevY - safeHeight));
+    for (i = 0; i < m_lines.size(); i++)
+        m_lines[i].y_indent -= shift;
 }
 
 // Resolves any TBD x_indent and y_indent values in FormattedTextLine

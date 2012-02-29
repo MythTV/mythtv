@@ -192,6 +192,7 @@ class FormattedTextSubtitle
     void InitFromSRT(QStringList &subs, int textFontZoom);
     void WrapLongLines(void);
     void Layout(void);
+    void Layout608(void);
     bool Draw(QList<MythUIType*> *imageCache = 0,
               uint64_t start = 0, uint64_t duration = 0) const;
     QStringList ToSRT(void) const;
