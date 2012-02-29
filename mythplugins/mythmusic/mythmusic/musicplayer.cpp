@@ -829,6 +829,8 @@ void MusicPlayer::loadPlaylist(void)
             m_currentTrack = 0;
     }
 
+    m_currentMetadata = NULL;
+
     // now we have the playlist loaded we can start the cd watcher
     if (m_cdWatcher)
         m_cdWatcher->start();
