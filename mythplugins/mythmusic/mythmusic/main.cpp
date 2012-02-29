@@ -351,9 +351,6 @@ static void MusicCallback(void *data, QString &selection)
         else
             delete is;
     }
-
-    if (sel.startsWith("settings_"))
-        gCoreContext->dispatch(MythEvent(QString("MUSIC_SETTINGS_CHANGED")));
 }
 
 static int runMenu(QString which_menu)

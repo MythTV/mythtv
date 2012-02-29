@@ -83,6 +83,8 @@ void RatingSettings::slotSave(void)
     gCoreContext->SaveSetting("IntelliLastPlayWeight", m_lastPlayWeight->GetValue());
     gCoreContext->SaveSetting("IntelliRandomWeight", m_randomWeight->GetValue());
 
+    gCoreContext->dispatch(MythEvent(QString("MUSIC_SETTINGS_CHANGED RATING_SETTINGS")));
+
     Close();
 }
 

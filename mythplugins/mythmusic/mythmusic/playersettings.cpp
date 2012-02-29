@@ -90,6 +90,8 @@ void PlayerSettings::slotSave(void)
     int saveAutoPlayCD = (m_autoPlayCD->GetCheckState() == MythUIStateType::Full) ? 1 : 0;
     gCoreContext->SaveSetting("AutoPlayCD", saveAutoPlayCD);
 
+    gCoreContext->dispatch(MythEvent(QString("MUSIC_SETTINGS_CHANGED PLAYER_SETTINGS")));
+
     Close();
 }
 

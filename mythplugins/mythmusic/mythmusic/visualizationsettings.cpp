@@ -82,5 +82,7 @@ void VisualizationSettings::slotSave(void)
     gCoreContext->SaveSetting("VisualScaleWidth", m_scaleWidth->GetIntValue());
     gCoreContext->SaveSetting("VisualScaleHeight", m_scaleHeight->GetIntValue());
 
+    gCoreContext->dispatch(MythEvent(QString("MUSIC_SETTINGS_CHANGED VISUALIZATION_SETTINGS")));
+
     Close();
 }

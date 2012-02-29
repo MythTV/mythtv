@@ -139,5 +139,7 @@ void GeneralSettings::slotSave(void)
     int allowTagWriting = (m_allowTagWriting->GetCheckState() == MythUIStateType::Full) ? 1 : 0;
     gCoreContext->SaveSetting("AllowTagWriting", allowTagWriting);
 
+    gCoreContext->dispatch(MythEvent(QString("MUSIC_SETTINGS_CHANGED GENERAL_SETTINGS")));
+
     Close();
 }
