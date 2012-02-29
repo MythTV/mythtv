@@ -19,6 +19,7 @@
 
 // qt
 #include <QString>
+#include <QDateTime>
 
 // event details
 typedef struct
@@ -27,7 +28,7 @@ typedef struct
     int eventID;
     QString eventName;
     QString monitorName;
-    QString startTime;
+    QDateTime startTime;
     QString length;
 } Event;
 

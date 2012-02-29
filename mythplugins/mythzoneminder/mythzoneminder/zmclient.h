@@ -43,8 +43,8 @@ class MPUBLIC ZMClient : public QObject
     void getMonitorStatus(vector<Monitor*> *monitorList);
     void getEventList(const QString &monitorName, bool oldestFirst,
                       QString date, vector<Event*> *eventList);
-    void getEventFrame(int monitorID, int eventID, int frameNo, MythImage **image);
-    void getAnalyseFrame(int monitorID, int eventID, int frameNo, QImage &image);
+    void getEventFrame(Event *event, int frameNo, MythImage **image);
+    void getAnalyseFrame(Event *event, int frameNo, QImage &image);
     int  getLiveFrame(int monitorID, QString &status, unsigned char* buffer, int bufferSize);
     void getFrameList(int eventID, vector<Frame*> *frameList);
     void deleteEvent(int eventID);

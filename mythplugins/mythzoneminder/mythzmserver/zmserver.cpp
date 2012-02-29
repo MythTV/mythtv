@@ -52,7 +52,7 @@
 #include "zmserver.h"
 
 // the version of the protocol we understand
-#define ZM_PROTOCOL_VERSION "6"
+#define ZM_PROTOCOL_VERSION "7"
 
 // the maximum image size we are ever likely to get from ZM
 #define MAX_IMAGE_SIZE  (2048*1536*3)
@@ -242,6 +242,16 @@ ZMServer::ZMServer(int sock, bool debug)
     m_analyseFileFormat = buf;
     if (m_debug)
         cout << "Analyse file format is: " << m_analyseFileFormat << endl;
+
+    // is ZM using the deep storage directory format?
+    m_useDeepStorage = (getZMSetting("ZM_USE_DEEP_STORAGE") == "1");
+    if (m_debug)
+    {
+        if (m_useDeepStorage)
+            cout << "using deep storage directory structure" << endl;
+        else
+            cout << "using flat directory structure" << endl;
+    }
 
     getMonitorList();
 }
@@ -771,9 +781,8 @@ void ZMServer::getMonitorStatus(string id, string type, string device, string ho
 void ZMServer::handleGetEventFrame(vector<string> tokens)
 {
     static unsigned char buffer[MAX_IMAGE_SIZE];
-    char str[100];
 
-    if (tokens.size() != 4)
+    if (tokens.size() != 5)
     {
         sendError(ERROR_TOKEN_COUNT);
         return;
@@ -782,10 +791,11 @@ void ZMServer::handleGetEventFrame(vector<string> tokens)
     string monitorID(tokens[1]);
     string eventID(tokens[2]);
     int frameNo = atoi(tokens[3].c_str());
+    string eventTime(tokens[4]);
 
     if (m_debug)
         cout << "Getting frame " << frameNo << " for event " << eventID
-             << " on monitor " << monitorID << endl;
+             << " on monitor " << monitorID  << " event time is " << eventTime << endl;
 
     string outStr("");
 
@@ -793,9 +803,20 @@ void ZMServer::handleGetEventFrame(vector<string> tokens)
 
     // try to find the frame file
     string filepath("");
-    filepath = g_webPath + "/events/" + monitorID + "/" + eventID + "/";
-    sprintf(str, m_eventFileFormat.c_str(), frameNo);
-    filepath += str;
+    char str[100];
+
+    if (m_useDeepStorage)
+    {
+        filepath = g_webPath + "/events/" + monitorID + "/" + eventTime + "/";
+        sprintf(str, m_eventFileFormat.c_str(), frameNo);
+        filepath += str;
+    }
+    else
+    {
+        filepath = g_webPath + "/events/" + monitorID + "/" + eventID + "/";
+        sprintf(str, m_eventFileFormat.c_str(), frameNo);
+        filepath += str;
+    }
 
     FILE *fd;
     int fileSize = 0;
@@ -827,7 +848,7 @@ void ZMServer::handleGetAnalyseFrame(vector<string> tokens)
     static unsigned char buffer[MAX_IMAGE_SIZE];
     char str[100];
 
-    if (tokens.size() != 4)
+    if (tokens.size() != 5)
     {
         sendError(ERROR_TOKEN_COUNT);
         return;
@@ -836,10 +857,11 @@ void ZMServer::handleGetAnalyseFrame(vector<string> tokens)
     string monitorID(tokens[1]);
     string eventID(tokens[2]);
     int frameNo = atoi(tokens[3].c_str());
+    string eventTime(tokens[4]);
 
     if (m_debug)
         cout << "Getting anaylse frame " << frameNo << " for event " << eventID
-             << " on monitor " << monitorID << endl;
+             << " on monitor " << monitorID << " event time is " << eventTime << endl;
 
     // get the 'alarm' frames from the Frames table for this event
     MYSQL_RES *res;
@@ -889,9 +911,18 @@ void ZMServer::handleGetAnalyseFrame(vector<string> tokens)
 
     // try to find the analyse frame file
     string filepath("");
-    filepath = g_webPath + "/events/" + monitorID + "/" + eventID + "/";
-    sprintf(str, m_analyseFileFormat.c_str(), frameID);
-    filepath += str;
+    if (m_useDeepStorage)
+    {
+        filepath = g_webPath + "/events/" + monitorID + "/" + eventTime + "/";
+        sprintf(str, m_analyseFileFormat.c_str(), frameID);
+        filepath += str;
+    }
+    else
+    {
+        filepath = g_webPath + "/events/" + monitorID + "/" + eventID + "/";
+        sprintf(str, m_analyseFileFormat.c_str(), frameID);
+        filepath += str;
+    }
 
     FILE *fd;
     int fileSize = 0;

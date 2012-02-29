@@ -18,7 +18,7 @@
 #include "zmclient.h"
 
 // the protocol version we understand
-#define ZM_PROTOCOL_VERSION "6"
+#define ZM_PROTOCOL_VERSION "7"
 
 #define BUFFER_SIZE  (2048*1536*3)
 
@@ -322,9 +322,6 @@ void ZMClient::getEventList(const QString &monitorName, bool oldestFirst,
         return;
     }
 
-    QString dateFormat = gCoreContext->GetSetting("ZoneMinderDateFormat", "ddd - dd/MM");
-    QString timeFormat = gCoreContext->GetSetting("ZoneMinderTimeFormat", "hh:mm:ss");
-
     QStringList::Iterator it = strList.begin();
     it++; it++;
     for (int x = 0; x < eventCount; x++)
@@ -336,7 +333,7 @@ void ZMClient::getEventList(const QString &monitorName, bool oldestFirst,
         item->monitorName = *it++;
         QString sDate = *it++;
         QDateTime dt = QDateTime::fromString(sDate, Qt::ISODate);
-        item->startTime = dt.toString(dateFormat + " " + timeFormat);
+        item->startTime = dt;
         item->length = *it++;
         eventList->push_back(item);
     }
@@ -510,7 +507,7 @@ bool ZMClient::readData(unsigned char *data, int dataSize)
     return true;
 }
 
-void ZMClient::getEventFrame(int monitorID, int eventID, int frameNo, MythImage **image)
+void ZMClient::getEventFrame(Event *event, int frameNo, MythImage **image)
 {
     if (*image)
     {
@@ -519,9 +516,10 @@ void ZMClient::getEventFrame(int monitorID, int eventID, int frameNo, MythImage 
     }
 
     QStringList strList("GET_EVENT_FRAME");
-    strList << QString::number(monitorID);
-    strList << QString::number(eventID);
+    strList << QString::number(event->monitorID);
+    strList << QString::number(event->eventID);
     strList << QString::number(frameNo);
+    strList << event->startTime.toString("yy/MM/dd/hh/mm/ss");
     if (!sendReceiveStringList(strList))
         return;
 
@@ -552,12 +550,13 @@ void ZMClient::getEventFrame(int monitorID, int eventID, int frameNo, MythImage 
     delete [] data;
 }
 
-void ZMClient::getAnalyseFrame(int monitorID, int eventID, int frameNo, QImage &image)
+void ZMClient::getAnalyseFrame(Event *event, int frameNo, QImage &image)
 {
     QStringList strList("GET_ANALYSE_FRAME");
-    strList << QString::number(monitorID);
-    strList << QString::number(eventID);
+    strList << QString::number(event->monitorID);
+    strList << QString::number(event->eventID);
     strList << QString::number(frameNo);
+    strList << event->startTime.toString("yy/MM/dd/hh/mm/ss");
     if (!sendReceiveStringList(strList))
     {
         image = QImage();

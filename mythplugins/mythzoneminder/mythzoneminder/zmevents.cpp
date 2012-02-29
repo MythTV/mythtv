@@ -19,9 +19,10 @@
 #include <QKeyEvent>
 
 // myth
-#include "mythtv/mythcontext.h"
-#include "mythtv/mythdbcon.h"
+#include <mythcontext.h>
+#include <mythdbcon.h>
 #include <mythmainwindow.h>
+#include <util.h>
 
 // zoneminder
 #include "zmevents.h"
@@ -203,7 +204,7 @@ void ZMEvents::updateUIList()
 
         item->SetText(event->eventName);
         item->SetText(event->monitorName, "camera" );
-        item->SetText(event->startTime, "time");
+        item->SetText(MythDateTimeToString(event->startTime, kDateTimeFull | kSimplify), "time");
         item->SetText(event->length, "length");
     }
 
@@ -263,9 +264,7 @@ void ZMEvents::eventChanged(MythUIButtonListItem *item)
                 QImage image;
                 if (class ZMClient *zm = ZMClient::get())
                 {
-                    zm->getAnalyseFrame(event->monitorID,
-                                        event->eventID,
-                                        0, image);
+                    zm->getAnalyseFrame(event, 0, image);
                     if (!image.isNull())
                     {
                         MythImage *mimage = GetMythPainter()->GetFormatImage();
