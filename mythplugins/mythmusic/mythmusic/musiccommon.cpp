@@ -231,10 +231,7 @@ bool MusicCommon::CreateCommon(void)
             connect(m_visualModeTimer, SIGNAL(timeout()), this, SLOT(visEnable()));
         }
 
-        m_mainvisual->setVisual(m_visualModes[m_currentVisual]);
-
-        if (m_visualText)
-            m_visualText->SetText(m_visualModes[m_currentVisual]);
+        switchVisualizer(m_currentVisual);
 
         if (gPlayer->isPlaying())
             startVisualizer();
@@ -616,6 +613,16 @@ bool MusicCommon::keyPressEvent(QKeyEvent *e)
         }
         else if (action == "CYCLEVIS")
             cycleVisualizer();
+        else if (action == "BLANKSCR")
+        {
+            // change to the blank visualizer
+            if (m_mainvisual)
+                switchVisualizer("Blank");
+
+            // switch to the full screen visualiser view
+            if (m_currentView != MV_VISUALIZER)
+                switchView(MV_VISUALIZER);
+        }
         else if (action == "VOLUMEDOWN")
             changeVolume(false);
         else if (action == "VOLUMEUP")
@@ -816,6 +823,29 @@ void MusicCommon::resetVisualiserTimer()
         m_visualModeTimer->start(m_visualModeDelay * 1000);
 }
 
+void MusicCommon::switchVisualizer(const QString &visual)
+{
+    switchVisualizer(m_visualModes.indexOf(visual));
+}
+
+void MusicCommon::switchVisualizer(int visual)
+{
+    if (!m_mainvisual)
+        return;
+
+    if (visual < 0 || visual > m_visualModes.count() - 1)
+        visual = 0;
+
+    m_currentVisual = visual;
+
+    resetVisualiserTimer();
+
+    m_mainvisual->setVisual(m_visualModes[m_currentVisual]);
+
+    if (m_visualText)
+        m_visualText->SetText(m_visualModes[m_currentVisual]);
+}
+
 void MusicCommon::cycleVisualizer(void)
 {
     if (!m_mainvisual)
@@ -842,22 +872,8 @@ void MusicCommon::cycleVisualizer(void)
         }
 
         //Change to the new visualizer
-        resetVisualiserTimer();
-        m_mainvisual->setVisual("Blank");
-        m_mainvisual->setVisual(m_visualModes[m_currentVisual]);
+        switchVisualizer(m_currentVisual);
     }
-    else if (m_visualModes.count() == 1 && m_visualModes[m_currentVisual] == "AlbumArt")
-    {
-        // If only the AlbumArt visualization is selected, then go ahead and
-        // restart the visualization.  This will give AlbumArt the opportunity
-        // to change images if there are multiple images available.
-        resetVisualiserTimer();
-        m_mainvisual->setVisual("Blank");
-        m_mainvisual->setVisual(m_visualModes[m_currentVisual]);
-    }
-
-    if (m_visualText)
-        m_visualText->SetText(m_visualModes[m_currentVisual]);
 }
 
 void MusicCommon::startVisualizer(void)
@@ -1420,11 +1436,7 @@ void MusicCommon::customEvent(QEvent *event)
                 m_currentVisual = dce->GetData().toInt();
 
                 //Change to the new visualizer
-                resetVisualiserTimer();
-                m_mainvisual->setVisual(m_visualModes[m_currentVisual]);
-
-                if (m_visualText)
-                    m_visualText->SetText(m_visualModes[m_currentVisual]);
+                switchVisualizer(m_currentVisual);
             }
         }
         else if (resultid == "addplaylist")

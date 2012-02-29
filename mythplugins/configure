@@ -471,8 +471,9 @@ if test "$music" != "no" ; then
 
     if test "$cdio" != "no" ; then
         cdio="no"
-        if has_header cdio/cdio.h && has_library libcdio && has_library libcdio_cdda && has_library libcdio_paranoia ; then
+        if has_header cdio/cdio.h && has_header cdio/cdda.h && has_header cdio/paranoia.h && has_library libcdio && has_library libcdio_cdda && has_library libcdio_paranoia ; then
             cdio="yes"
+            echo "cdio=yes"
         fi
     fi
 
