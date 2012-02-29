@@ -82,9 +82,6 @@ QDateTime myth_dt_from_string(const QString &dtstr)
  * 
  *  \param datetime The QDateTime object to use
  *  \param format   The format of the string to return
- *  \param simplify If true then full dates will be simplified to
- *                  Today/Yesterday/Tomorrow if applicable otherwise no changes
- *                  are made
  */
 QString MythDateTimeToString(const QDateTime& datetime, uint format)
 {
