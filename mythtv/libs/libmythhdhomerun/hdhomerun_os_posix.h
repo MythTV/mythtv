@@ -50,7 +50,10 @@
 #include <pthread.h>
 
 typedef int bool_t;
+
+#if !defined(_DARWIN_C_SOURCE)
 typedef void (*sig_t)(int);
+#endif
 
 #define LIBTYPE
 #define console_vprintf vprintf

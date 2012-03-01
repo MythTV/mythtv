@@ -53,11 +53,6 @@ inc.files += quicksp.h metadatacommon.h metadatadownload.h metadataimagedownload
 
 INSTALLS += inc
 
-macx {
-
-    QMAKE_LFLAGS_SHLIB += -flat_namespace
-}
-
 QT += network xml sql
 
 include ( ../libs-targetfix.pro )
