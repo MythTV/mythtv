@@ -6480,7 +6480,7 @@ void TV::SwitchCards(PlayerContext *ctx,
         if (input_cardid)
             reclist.push_back(QString::number(input_cardid));
     }
-    else if (!channum.isEmpty())
+    else if (chanid || !channum.isEmpty())
     {
         // If we are switching to a channel not on the current recorder
         // we need to find the next free recorder with that channel.
@@ -6503,6 +6503,9 @@ void TV::SwitchCards(PlayerContext *ctx,
         // We are switching to a specific channel...
         if (inputname.isEmpty() && (chanid || !channum.isEmpty()))
         {
+            if (chanid && channum.isEmpty())
+                channum = ChannelUtil::GetChanNum(chanid);
+
             cardinputid = CardUtil::GetCardInputID(
                 cardid, channum, inputname);
         }
@@ -6559,6 +6562,11 @@ void TV::SwitchCards(PlayerContext *ctx,
 
         ctx->SetRecorder(testrec);
         ctx->recorder->Setup();
+        // We need to set channum for SpawnLiveTV..
+        if (channum.isEmpty() && chanid)
+            channum = ChannelUtil::GetChanNum(chanid);
+        if (channum.isEmpty() && inputid)
+            channum = CardUtil::GetStartingChannel(inputid);
         ctx->recorder->SpawnLiveTV(ctx->tvchain->GetID(), false, channum);
 
         if (!ctx->ReloadTVChain())
