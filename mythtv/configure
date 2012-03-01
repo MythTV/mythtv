@@ -106,6 +106,7 @@ Advanced options (experts only):
   --disable-lirc           disable lirc support (Infrared Remotes)
   --disable-joystick-menu  disable joystick menu
   --disable-firewire       disable support for FireWire cable boxes
+  --firewire-sdk           specify location for mac FireWire SDK [mac only]
   --disable-iptv           disable support for recording RTSP/UDP/RTP streams
   --disable-hdhomerun      disable support for HDHomeRun boxes
   --disable-v4l            disable Video4Linux support
@@ -1391,6 +1392,7 @@ PATHS_LIST='
     runprefix
     shlibdir
     x11_path
+    firewiresdk_path
 '
 
 CMDLINE_SET="
@@ -1947,6 +1949,7 @@ enable xvmcw
 dvb_path_default="${sysroot}/usr/include"
 x11_path_default="${sysroot}/usr/X11R6/include"
 xvmc_lib=""
+firewiresdk_path_default=""
 
 # configurable options
 enable avcodec
@@ -2193,6 +2196,9 @@ for opt do
     ;;
     --help|-h) show_help
     ;;
+    --firewire-sdk=*) firewiresdk_path="${optval}"
+    ;;
+
     *)
     optname="${opt%%=*}"
     optname="${optname#--}"
@@ -3969,16 +3975,20 @@ if enabled firewire; then
     check_libx fwlibs libavc1394/avc1394.h avc1394_transaction_block2 -lavc1394 && check_libx fwlibs libiec61883/iec61883.h iec61883_cmp_reconnect -liec61883 || disable firewire
 
     if test $target_os = darwin; then
-        # This should pick the newest. e.g. FireWireSDK21 instead of 20
-        # Unfortunately, the location keeps changing:
-        #/Developer/FireWireSDK20/Examples/AVCVideoServices/Framework
-        #/Developer/FireWireSDK21/Examples/Framework
-        mac_avc=`find /Developer/FireWireSDK* -name Framework 2> /dev/null \
-                 | tail -n 1`
+        if [ -n "$firewiresdk_path" ] ; then
+            mac_avc="$firewiresdk_path"
+        else
+            # This should pick the newest. e.g. FireWireSDK21 instead of 20
+            # Unfortunately, the location keeps changing:
+            #/Developer/FireWireSDK20/Examples/AVCVideoServices/Framework
+            #/Developer/FireWireSDK21/Examples/Framework
+            mac_avc=`find /Developer/FireWireSDK* -name Framework 2> /dev/null \
+                    | tail -n 1`
+        fi
         if test -d "$mac_avc" ; then
             firewire="yes"
         else
-            echo Firewire being disabled. /Developer/FireWireSDK* missing
+            echo Firewire being disabled. FireWire SDK missing
         fi
     fi
 fi
