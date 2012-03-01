@@ -1370,7 +1370,7 @@ static HostSpinBox *OSDCC708TextZoomPercentage(void)
 
 static HostComboBox *SubtitleFont()
 {
-    HostComboBox *hcb = new HostComboBox("OSDSubFont");
+    HostComboBox *hcb = new HostComboBox("DefaultSubtitleFont");
     QFontDatabase db;
     QStringList fonts = db.families();
     QStringList hide  = db.families(QFontDatabase::Symbol);
@@ -1380,7 +1380,7 @@ static HostComboBox *SubtitleFont()
     foreach (QString font, fonts)
     {
         if (!hide.contains(font))
-            hcb->addSelection(font, font, font.toLower() == "freesans");
+            hcb->addSelection(font, font, font.toLower() == "freemono");
     }
     return hcb;
 }
