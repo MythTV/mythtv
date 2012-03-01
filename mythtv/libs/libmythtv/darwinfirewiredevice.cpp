@@ -61,12 +61,12 @@ namespace AVS
 #define kResetTimeout             1500 /* msec */
 
 static IOReturn dfd_tspacket_handler_thunk(
-    long unsigned int tsPacketCount, UInt32 **ppBuf, void *callback_data);
+    UInt32 tsPacketCount, UInt32 **ppBuf, void *callback_data);
 static void dfd_update_device_list(void *dfd, io_iterator_t iterator);
 static void dfd_streaming_log_message(char *pString);
 void *dfd_controller_thunk(void *param);
-void dfd_stream_msg(long unsigned int msg, long unsigned int param1,
-                    long unsigned int param2, void *callback_data);
+void dfd_stream_msg(UInt32 msg, UInt32 param1,
+                    UInt32 param2, void *callback_data);
 int dfd_no_data_notification(void *callback_data);
 
 class DFDPriv
@@ -912,8 +912,8 @@ int dfd_no_data_notification(void *callback_data)
     return kIOReturnSuccess;
 }
 
-void dfd_stream_msg(long unsigned int msg, long unsigned int param1,
-                    long unsigned int param2, void *callback_data)
+void dfd_stream_msg(UInt32 msg, UInt32 param1,
+                    UInt32 param2, void *callback_data)
 {
     reinterpret_cast<DarwinFirewireDevice*>(callback_data)->
         ProcessStreamingMessage(msg, param1, param2);
@@ -935,7 +935,7 @@ int dfd_tspacket_handler(uint tsPacketCount, uint32_t **ppBuf,
 }
 
 static IOReturn dfd_tspacket_handler_thunk(
-    long unsigned int tsPacketCount, UInt32 **ppBuf, void *callback_data)
+    UInt32 tsPacketCount, UInt32 **ppBuf, void *callback_data)
 {
     return dfd_tspacket_handler(
         tsPacketCount, (uint32_t**)ppBuf, callback_data);
