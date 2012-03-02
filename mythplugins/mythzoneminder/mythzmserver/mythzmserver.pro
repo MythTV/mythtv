@@ -13,8 +13,13 @@ INSTALLS = target
 macx {
     CONFIG += qt
     QT += sql
+    #Can't use mysql_config output, as it could have been compiled with
+    # universal support, and we may want just 32 or 64 bits
+    LIBS += -lmysqlclient
 }
-LIBS = $$system(mysql_config --libs)
+else {
+    LIBS += $$system(mysql_config --libs)
+}
 
 linux: DEFINES += linux
 
