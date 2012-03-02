@@ -18,12 +18,12 @@
     </message>
     <message>
         <location filename="../mythweather/weatherSetup.cpp" line="978"/>
-        <source>Searching ...</source>
+        <source>Searching...</source>
         <translation>Buscando ...</translation>
     </message>
     <message>
         <location filename="../mythweather/weatherSetup.cpp" line="1000"/>
-        <source>Searching ... Results: %1</source>
+        <source>Searching... Results: %1</source>
         <translation>Buscando ... Resultados: %1</translation>
     </message>
     <message>
@@ -915,107 +915,107 @@
 <context>
     <name>ThemeUI</name>
     <message>
-        <location filename="themestrings.h" line="3"/>
+        <location filename="themestrings.h" line="6"/>
         <source>Humidity</source>
         <translation>Humedad</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="4"/>
+        <location filename="themestrings.h" line="7"/>
         <source>Pressure</source>
         <translation>Presión</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="7"/>
+        <location filename="themestrings.h" line="10"/>
         <source>Visibility</source>
         <translation>Visibilidad</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="5"/>
+        <location filename="themestrings.h" line="8"/>
         <source>Wind(Gust)</source>
         <translation>Viento (Rachas)</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="6"/>
+        <location filename="themestrings.h" line="9"/>
         <source>Wind Direction</source>
         <translation>Dirección del Viento</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="8"/>
+        <location filename="themestrings.h" line="11"/>
         <source>Feels Like</source>
         <translation>Sensación Térmica</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="30"/>
+        <location filename="themestrings.h" line="33"/>
         <source>High</source>
         <translation>Máxima</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="29"/>
+        <location filename="themestrings.h" line="32"/>
         <source>Low</source>
         <translation>Mínima</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="34"/>
+        <location filename="themestrings.h" line="37"/>
         <source>Global Settings</source>
         <translation>Configuración Global</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="17"/>
+        <location filename="themestrings.h" line="20"/>
         <source>Seconds to display each page:</source>
         <translation>Segundos a mostrar cada página:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="35"/>
+        <location filename="themestrings.h" line="38"/>
         <source>Retrieve data in the background:</source>
         <translation>Obtener datos en segundo plano:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="45"/>
+        <location filename="themestrings.h" line="52"/>
         <source>Source Setup</source>
         <translation>Configuración de Fuentes</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="24"/>
+        <location filename="themestrings.h" line="27"/>
         <source>Data Retrieval Interval (minutes):</source>
         <translation>Intervalo de Obtención de Datos (minutos):</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="2"/>
+        <location filename="themestrings.h" line="5"/>
         <source>%DATE%, %TIME%</source>
         <translation>%DATE%, %TIME%</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="9"/>
+        <location filename="themestrings.h" line="12"/>
         <source>Last Updated %1</source>
         <translation>Última Actualización %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="10"/>
+        <location filename="themestrings.h" line="13"/>
         <source>High Temperature:  %1</source>
         <translation>Temperatura Máxima:  %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="11"/>
+        <location filename="themestrings.h" line="14"/>
         <source>Low Temperature:  %1</source>
         <translation>Temperatura Mínima:  %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="12"/>
+        <location filename="themestrings.h" line="15"/>
         <source>Temperature:  %1</source>
         <translation>Temperatura:  %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="13"/>
+        <location filename="themestrings.h" line="16"/>
         <source>Chance of Precipitation:  %1</source>
         <translation>Probabilidad de Precipitación:  %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="14"/>
+        <location filename="themestrings.h" line="17"/>
         <source>Weather Screen Settings</source>
         <translation>Configuración de Pantallas de El Tiempo</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="15"/>
+        <location filename="themestrings.h" line="18"/>
         <source>This screen governs the behavior of the weather screens.  You can enable a background weather update which will run regardless of being on the weather screen, and configure how many seconds each screen will display.
 
 When you are done configuring the weather plugin, click &quot;Finish&quot; to continue.</source>
@@ -1027,37 +1027,37 @@ When you are done configuring the Weather Plugin, click &quot;Finish&quot; to co
 Cuando termine de configurar el complemento de El Tiempo, pulse &quot;Finalizar&quot; para continuar.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="16"/>
+        <location filename="themestrings.h" line="19"/>
         <source>Retrieve data in background:</source>
         <translation>Obtener datos en segundo plano:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="18"/>
+        <location filename="themestrings.h" line="21"/>
         <source>OK</source>
         <translation>Aceptar</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="19"/>
+        <location filename="themestrings.h" line="22"/>
         <source>Weather Setup</source>
         <translation>Configuración de El Tiempo</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="20"/>
+        <location filename="themestrings.h" line="23"/>
         <source>Available Screens</source>
         <translation>Pantallas Disponibles</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="21"/>
+        <location filename="themestrings.h" line="24"/>
         <source>Active Screens</source>
         <translation>Pantallas Activas</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="22"/>
+        <location filename="themestrings.h" line="25"/>
         <source>Weather Script Settings</source>
         <translation>Configuración de los guiones de El Tiempo</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="23"/>
+        <location filename="themestrings.h" line="26"/>
         <source>This settings screen governs the behavior of individual weather scripts.  Select the script whose behavior you with to change and press the right arrow. Adjust the interval at which data is retrieved, and the timeout for accessing the site.
 
 When you have completed your changes, click &quot;Finish&quot; to continue.</source>
@@ -1066,143 +1066,163 @@ When you have completed your changes, click &quot;Finish&quot; to continue.</sou
 Cuando termine los cambios, pulse &quot;Finalizar&quot; para continuar.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="25"/>
+        <location filename="themestrings.h" line="28"/>
         <source>Source Update Timeout (seconds):</source>
         <translation>Tiempo de Espera para Actualizar desde las Fuentes (segundos):</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="26"/>
+        <location filename="themestrings.h" line="29"/>
         <source>Finish</source>
         <translation>Finalizar</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="27"/>
+        <location filename="themestrings.h" line="30"/>
         <source>Search</source>
         <translation>Buscar</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="28"/>
+        <location filename="themestrings.h" line="31"/>
         <source>Enter Current Location</source>
         <translation>Introducir Localidad Actual</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="31"/>
+        <location filename="themestrings.h" line="34"/>
         <source>Weather Alerts</source>
         <translation>Alertas Meteorológicas</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="32"/>
+        <location filename="themestrings.h" line="35"/>
         <source>Temp</source>
         <translation>Temp</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="33"/>
+        <location filename="themestrings.h" line="36"/>
         <source>Precip</source>
         <translation>Precip</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="36"/>
+        <location filename="themestrings.h" line="39"/>
         <source>Weather Screen Setup</source>
         <translation>Configuración de la Pantalla de El Tiempo</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="37"/>
+        <location filename="themestrings.h" line="40"/>
         <source>Weather Source Setup</source>
         <translation>Configuración de las Fuentes de El Tiempo</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="38"/>
+        <location filename="themestrings.h" line="41"/>
         <source>Source</source>
         <translation>Fuente</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="41"/>
+        <location filename="themestrings.h" line="44"/>
         <source>Weather Location Search</source>
         <translation>Búsqueda de Localidades</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="42"/>
-        <source>Weather</source>
-        <translation>El Tiempo</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="43"/>
-        <source>Global Setup</source>
-        <translation>Configuración Global</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="44"/>
+        <location filename="themestrings.h" line="51"/>
         <source>Screen Setup</source>
         <translation>Configuración de la Pantalla</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="46"/>
+        <location filename="themestrings.h" line="53"/>
         <source>Location Search</source>
         <translation>Buscar Localidad</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="47"/>
+        <location filename="themestrings.h" line="45"/>
         <source>Humidity:</source>
         <translation>Humedad:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="48"/>
+        <location filename="themestrings.h" line="46"/>
         <source>Pressure:</source>
         <translation>Presión:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="49"/>
+        <location filename="themestrings.h" line="47"/>
         <source>Wind(Gust):</source>
         <translation>Viento (Rachas):</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="50"/>
+        <location filename="themestrings.h" line="48"/>
         <source>Wind Direction:</source>
         <translation>Dirección del Viento:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="51"/>
+        <location filename="themestrings.h" line="49"/>
         <source>Visibility:</source>
         <translation>Visibilidad:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="52"/>
+        <location filename="themestrings.h" line="50"/>
         <source>Feels Like:</source>
         <translation>Sensación Térmica:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="53"/>
+        <location filename="themestrings.h" line="54"/>
+        <source>: %1</source>
+        <translation>: %1</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="55"/>
+        <source>100%</source>
+        <translation>100%</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="56"/>
+        <source>Global Weather Settings</source>
+        <translation>Configuración Global de El Tiempo</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="57"/>
+        <source>Seconds to display each page</source>
+        <translation>Segundos a mostrar cada página</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="58"/>
+        <source>Retrieve data in the background</source>
+        <translation>Obtener datos en segundo plano</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="59"/>
+        <source>Enter your current location,nearest large town or city. In some countries postal codes are also supported.</source>
+        <translation>Introduzca su localidad actual, la ciudad o pueblo más grande y cercano. Para algunas ciudades se admiten códigos postales.</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="60"/>
         <source>General weather options</source>
         <oldsource>General weather plugin options</oldsource>
         <translation>Opciones Generales de El Tiempo</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="54"/>
+        <location filename="themestrings.h" line="61"/>
         <source>Screen Settings</source>
         <translation>Configuración de Pantalla</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="55"/>
+        <location filename="themestrings.h" line="62"/>
         <source>Choose which weather forecasts to display</source>
         <translation>Seleccione los pronósticos a mostrar</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="56"/>
+        <location filename="themestrings.h" line="63"/>
         <source>Source Settings</source>
         <translation>Configuración de Fuentes</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="57"/>
+        <location filename="themestrings.h" line="64"/>
         <source>Configure the behavior of weather scripts</source>
         <translation>Configure el comportamiento de los guiones de El Tiempo</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="39"/>
+        <location filename="themestrings.h" line="42"/>
         <source>Enter your current location, nearest large town or city. In some countries postal codes are also supported.</source>
         <translation>Introduzca su localidad actual, la ciudad o pueblo más grande y cercano. Para algunas ciudades se admiten códigos postales.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="40"/>
+        <location filename="themestrings.h" line="43"/>
         <source>Enter Location:</source>
         <translation>Introducir Localidad:</translation>
     </message>
