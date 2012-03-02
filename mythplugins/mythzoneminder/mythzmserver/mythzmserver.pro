@@ -17,7 +17,7 @@ macx {
     # universal support, and we may want just 32 or 64 bits
     MYSQLIBS = "$$system(mysql_config --libs)"
     MYSQLIBS ~= s/-arch +[a-z0-9_]+//g
-    LIBS += $$sptrinf($$MYSQLIBS) 
+    LIBS += $$sprintf($$MYSQLIBS) 
 } else {
     LIBS += $$system(mysql_config --libs)
 }                                                                              
