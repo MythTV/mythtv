@@ -362,7 +362,7 @@ void MythUIText::DrawSelf(MythPainter *p, int xoffset, int yoffset,
     {
         drawrect.setY(drawrect.y() - m_Ascent);
         canvas.setY(canvas.y() + m_Ascent);
-        canvas.setHeight(canvas.height() + (m_Descent * 2));
+        canvas.setHeight(canvas.height() + (m_Ascent * 2));
     }
     if (m_Descent)
     {
