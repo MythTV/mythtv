@@ -18,7 +18,6 @@
 #include "mythmainwindow.h"
 #include "mythfontproperties.h"
 #include "mythuihelper.h"
-#include <qnamespace.h>
 
 #define LOC      QString("MythUITextEdit: ")
 
