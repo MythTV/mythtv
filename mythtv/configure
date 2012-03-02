@@ -107,7 +107,8 @@ Advanced options (experts only):
   --disable-joystick-menu  disable joystick menu
   --disable-libcec         disable libCEC device support
   --libcec-path=HDRLOC     location of directory containing
-                           cec.h [$libcec_path_default]
+                           'libcec/cec.h', not the directory
+                           with 'cec.h' [$libcec_path_default]
   --disable-firewire       disable support for FireWire cable boxes
   --disable-iptv           disable support for recording RTSP/UDP/RTP streams
   --disable-hdhomerun      disable support for HDHomeRun boxes
@@ -2024,7 +2025,7 @@ disable indevs
 # mythtv paths
 dvb_path_default="${sysroot}/usr/include"
 x11_path_default="${sysroot}/usr/X11R6/include"
-libcec_path_default="${sysroot}/usr/include/libcec"
+libcec_path_default="${sysroot}/usr/include"
 libxml2_path_default="${sysroot}/usr/include/libxml2"
 
 # configurable options
@@ -4138,9 +4139,9 @@ using namespace std;
 using namespace CEC;
 #include <libcec/cecloader.h>
 int main(void) {
-    if (CEC_LIB_VERSION_MAJOR < 1)
+    if (CEC_LIB_VERSION_MAJOR < 1 && CEC_LIB_VERSION_MINOR < 5)
         return 0;
-    return (long) LoadLibCec;
+    return (long) LibCecInit;
 }
 EOF
 fi

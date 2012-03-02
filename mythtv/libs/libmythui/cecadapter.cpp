@@ -18,12 +18,11 @@
 #define MAX_CEC_DEVICES 10
 #define LOC QString("CECAdapter: ")
 
-#include "cec.h"
-#include "cecc.h"
+#include <libcec/cec.h>
 #include <iostream>
 using namespace CEC;
 using namespace std;
-#include "cecloader.h"
+#include <libcec/cecloader.h>
 
 QMutex* CECAdapter::gLock = new QMutex(QMutex::Recursive);
 
