@@ -102,6 +102,8 @@ class MUI_PUBLIC MythUITextEdit : public MythUIType, public StorageUser
     MythUIStateType *m_backgroundState;
     MythUIImage *m_cursorImage;
     MythUIText  *m_Text;
+
+    int m_composeKey;
 };
 
 #endif
