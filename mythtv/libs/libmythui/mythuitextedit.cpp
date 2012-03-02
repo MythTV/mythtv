@@ -482,8 +482,6 @@ bool MythUITextEdit::keyPressEvent(QKeyEvent *event)
         if (gDeadKeyMap.isEmpty())
             LoadDeadKeys(gDeadKeyMap);
 
-        LOG(VB_GUI, LOG_DEBUG, QString("Compose key: %1 Key: %2").arg(QString::number(m_composeKey, 16)).arg(QString::number(keynum, 16)));
-
         if (gDeadKeyMap.contains(keyCombo(m_composeKey, keynum)))
         {
             int keycode = gDeadKeyMap.value(keyCombo(m_composeKey, keynum));
@@ -495,7 +493,6 @@ bool MythUITextEdit::keyPressEvent(QKeyEvent *event)
                 character = character.toUpper();
             else
                 character = character.toLower();
-            LOG(VB_GUI, LOG_DEBUG, QString("Founding match for dead-key combo - %1").arg(character));
         }
         m_composeKey = 0;
     }
