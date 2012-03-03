@@ -47,7 +47,7 @@ static HostCheckBox *GameDeepScan()
     HostCheckBox *gc = new HostCheckBox("GameDeepScan");
     gc->setLabel(QObject::tr("Indepth Game Scan"));
     gc->setHelpText(QObject::tr("Enabling this causes a game scan to gather CRC values and attempt to find out more"
-                    " detailed information about the game: NOTE this can greatly increase the time a gamescan takes"
+                    " detailed information about the game: NOTE this can greatly increase the time a game scan takes"
                     " based on the amount of games scanned."));
     return gc;
 }
@@ -58,7 +58,7 @@ static HostCheckBox *GameRemovalPrompt()
     gc->setLabel(QObject::tr("Prompt for removal of deleted rom(s)"));
     gc->setHelpText(QObject::tr("This enables a prompt for removing"
                                 " deleted ROMs from the database during a "
-                                " gamescan"));
+                                " game scan"));
 
     return gc;
 }
