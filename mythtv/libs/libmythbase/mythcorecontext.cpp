@@ -819,7 +819,7 @@ QString MythCoreContext::GetMasterHostPrefix(const QString &storageGroup,
     {
         return GenMythURL(GetSetting("MasterServerIP"),
                           GetNumSetting("MasterServerPort", 6543),
-                          "",
+                          path,
                           storageGroup);
     }
 
