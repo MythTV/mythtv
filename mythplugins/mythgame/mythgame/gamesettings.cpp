@@ -55,7 +55,7 @@ static HostCheckBox *GameDeepScan()
 static HostCheckBox *GameRemovalPrompt()
 {
     HostCheckBox *gc = new HostCheckBox("GameRemovalPrompt");
-    gc->setLabel(QObject::tr("Prompt for removal of deleted rom(s)"));
+    gc->setLabel(QObject::tr("Prompt for removal of deleted ROM(s)"));
     gc->setHelpText(QObject::tr("This enables a prompt for removing"
                                 " deleted ROMs from the database during a "
                                 " game scan"));
@@ -67,7 +67,7 @@ static HostCheckBox *GameShowFileNames()
 {
     HostCheckBox *gc = new HostCheckBox("GameShowFileNames");
     gc->setLabel(QObject::tr("Display Files Names in Game Tree"));
-    gc->setHelpText(QObject::tr("Enabling this causes the filenames to be displayed in the game tree rather than the trimmed/looked up gamename"));
+    gc->setHelpText(QObject::tr("Enabling this causes the filenames to be displayed in the game tree rather than the trimmed/looked up game name"));
     return gc;
 }
 
