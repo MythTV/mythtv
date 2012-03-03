@@ -22,8 +22,15 @@ for search and retrieval of text metadata and image URLs from TMDB.
 Preliminary API specifications can be found at
 http://help.themoviedb.org/kb/api/about-3"""
 
-__version__="v0.1.0"
+__version__="v0.3.4"
 # 0.1.0 Initial development
+# 0.2.0 Add caching mechanism for API queries
+# 0.2.1 Temporary work around for broken search paging
+# 0.3.0 Rework backend machinery for managing OO interface to results
+# 0.3.1 Add collection support
+# 0.3.2 Remove MythTV key from results.py
+# 0.3.3 Add functional language support
+# 0.3.4 Re-enable search paging
 
 from request import set_key, Request
 from util import PagedList, Datapoint, Datalist, Datadict, Element
@@ -61,7 +68,8 @@ class MovieSearchResults( PagedList ):
         self.language=language
         if language:
             self.request = request.new(language=language)
-        super(MovieSearchResults, self).__init__(20)
+        res = self.request.readJSON()
+        super(MovieSearchResults, self).__init__(res, res['total_results'], 20)
 
     def __repr__(self):
         return u"<Search Results: {0}>".format(self.request._kwargs['query'])
@@ -81,7 +89,8 @@ class PeopleSearchResults( PagedList ):
 
     def __init__(self, request):
         self.request = request
-        super(PeopleSearchResults, self).__init__(20)
+        res = self.request.readJSON()
+        super(PeopleSearchResults, self).__init__(res, res['total_results'], 20)
 
     def __repr__(self):
         return u"<Search Results: {0}>".format(self.request._kwargs['query'])
