@@ -25,7 +25,6 @@ def set_key(key):
     Specify the API key to use retrieving data from themoviedb.org. This
     key must be set before any calls will function.
     """
-    # MythTV key: c27cb71cff5bd76e1a7a009380562c62
     if len(key) != 32:
         raise TMDBKeyInvalid("Specified API key must be 128-bit hex")
     try:
