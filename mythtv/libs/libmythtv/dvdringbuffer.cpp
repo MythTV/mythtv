@@ -1125,14 +1125,18 @@ bool DVDRingBuffer::GoToMenu(const QString str)
 void DVDRingBuffer::GoToNextProgram(void)
 {
     QMutexLocker locker(&m_seekLock);
-    if (!dvdnav_is_domain_vts(m_dvdnav))
+    // This conditional appears to be unnecessary, and might have come
+    // from a mistake in a libdvdnav resync.
+    //if (!dvdnav_is_domain_vts(m_dvdnav))
         dvdnav_next_pg_search(m_dvdnav);
 }
 
 void DVDRingBuffer::GoToPreviousProgram(void)
 {
     QMutexLocker locker(&m_seekLock);
-    if (!dvdnav_is_domain_vts(m_dvdnav))
+    // This conditional appears to be unnecessary, and might have come
+    // from a mistake in a libdvdnav resync.
+    //if (!dvdnav_is_domain_vts(m_dvdnav))
         dvdnav_prev_pg_search(m_dvdnav);
 }
 
