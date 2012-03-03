@@ -13,13 +13,13 @@ class PagedList( list ):
     List-like object, with support for automatically grabbing additional
     pages from a data source.
     """
-    def __init__(self, iterable=None, count=None, perpage=20):
-        super(PagedList, self).__init__()
-        if iterable:
-            super(PagedList, self).extend(iterable)
-        super(PagedList, self).extend([None]*(count-len(self)))
-
+    def __init__(self, iterable, count, perpage=20):
         self._perpage = perpage
+        if count:
+            super(PagedList, self).__init__(self._process(iterable))
+            super(PagedList, self).extend([None]*(count-len(self)))
+        else:
+            super(PagedList, self).__init__()
 
     def _getpage(self, page):
         raise NotImplementedError("PagedList._getpage() must be provided "+\
@@ -43,21 +43,6 @@ class PagedList( list ):
     def __iter__(self):
         for i in range(len(self)):
             yield self[i]
-
-class PagedList( list ):
-    """Temporary list-like object to deal with bug in the search API."""
-    def _getpage(self, page):
-        raise NotImplementedError("PagedList._getpage() must be provided "+\
-                                  "by subclass")
-    def __init__(self, perpage=20):
-        l = 0-perpage
-        page = 0
-        self._perpage = perpage
-        super(PagedList, self).__init__()
-        while len(self) >= (l+perpage):
-            l = len(self)
-            page += 1
-            self.extend(self._getpage(page))
 
 class Poller( object ):
     """
