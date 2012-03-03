@@ -87,7 +87,8 @@ class MBASE_PUBLIC MythCoreContext : public MythObservable, public MythSocketCBs
     QString GenMythURL(QString host = QString(), int port = 0,
                        QString path = QString(), QString storageGroup = QString());
 
-    QString GetMasterHostPrefix(QString storageGroup = QString());
+    QString GetMasterHostPrefix(const QString &storageGroup = QString(),
+                                const QString &path = QString());
     QString GetMasterHostName(void);
     QString GetHostName(void);
     QString GetFilePrefix(void);

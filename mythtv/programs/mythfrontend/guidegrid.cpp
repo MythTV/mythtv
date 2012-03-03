@@ -657,7 +657,7 @@ void GuideGrid::ShowRecordingMenu(void)
     }
 }
 
-PixmapChannel *GuideGrid::GetChannelInfo(uint chan_idx, int sel)
+DBChannel *GuideGrid::GetChannelInfo(uint chan_idx, int sel)
 {
     sel = (sel >= 0) ? sel : m_channelInfoIdx[chan_idx];
 
@@ -670,7 +670,7 @@ PixmapChannel *GuideGrid::GetChannelInfo(uint chan_idx, int sel)
     return &(m_channelInfos[chan_idx][sel]);
 }
 
-const PixmapChannel *GuideGrid::GetChannelInfo(uint chan_idx, int sel) const
+const DBChannel *GuideGrid::GetChannelInfo(uint chan_idx, int sel) const
 {
     return ((GuideGrid*)this)->GetChannelInfo(chan_idx, sel);
 }
@@ -715,7 +715,7 @@ uint GuideGrid::GetAlternateChannelIndex(
     uint chan_idx, bool with_same_channum) const
 {
     uint si = m_channelInfoIdx[chan_idx];
-    const PixmapChannel *chinfo = GetChannelInfo(chan_idx, si);
+    const DBChannel *chinfo = GetChannelInfo(chan_idx, si);
 
     PlayerContext *ctx = m_player->GetPlayerReadLock(-1, __FILE__, __LINE__);
 
@@ -725,7 +725,7 @@ uint GuideGrid::GetAlternateChannelIndex(
         if (i == si)
             continue;
 
-        const PixmapChannel *ciinfo = GetChannelInfo(chan_idx, i);
+        const DBChannel *ciinfo = GetChannelInfo(chan_idx, i);
         if (!ciinfo)
             continue;
 
@@ -783,7 +783,7 @@ DBChanList GuideGrid::GetSelection(void) const
     vector<uint64_t> sel;
     sel.push_back( MKKEY(idx, si) );
 
-    const PixmapChannel *ch = GetChannelInfo(sel[0]>>32, sel[0]&0xffff);
+    const DBChannel *ch = GetChannelInfo(sel[0]>>32, sel[0]&0xffff);
     if (!ch)
         return selected;
 
@@ -798,7 +798,7 @@ DBChanList GuideGrid::GetSelection(void) const
 
     for (uint i = 0; i < m_channelInfos[idx].size(); ++i)
     {
-        const PixmapChannel *ci = GetChannelInfo(idx, i);
+        const DBChannel *ci = GetChannelInfo(idx, i);
         if (ci && (i != si) &&
             (ci->callsign == ch->callsign) && (ci->channum  == ch->channum))
         {
@@ -808,7 +808,7 @@ DBChanList GuideGrid::GetSelection(void) const
 
     for (uint i = 0; i < m_channelInfos[idx].size(); ++i)
     {
-        const PixmapChannel *ci = GetChannelInfo(idx, i);
+        const DBChannel *ci = GetChannelInfo(idx, i);
         if (ci && (i != si) &&
             (ci->callsign == ch->callsign) && (ci->channum  != ch->channum))
         {
@@ -818,7 +818,7 @@ DBChanList GuideGrid::GetSelection(void) const
 
     for (uint i = 0; i < m_channelInfos[idx].size(); ++i)
     {
-        const PixmapChannel *ci = GetChannelInfo(idx, i);
+        const DBChannel *ci = GetChannelInfo(idx, i);
         if ((i != si) && (ci->callsign != ch->callsign))
         {
             sel.push_back( MKKEY(idx, i) );
@@ -827,7 +827,7 @@ DBChanList GuideGrid::GetSelection(void) const
 
     for (uint i = 1; i < sel.size(); ++i)
     {
-        const PixmapChannel *ci = GetChannelInfo(sel[i]>>32, sel[i]&0xffff);
+        const DBChannel *ci = GetChannelInfo(sel[i]>>32, sel[i]&0xffff);
         const ProgramList ch_proglist = GetProgramList(ch->chanid);
 
         if (!ci || proglist.size() != ch_proglist.size())
@@ -882,13 +882,13 @@ void GuideGrid::fillChannelInfos(bool gotostartchannel)
         if (ndup && cdup)
             continue;
 
-        PixmapChannel val(channels[chan]);
+        DBChannel val(channels[chan]);
 
         channum_to_index_map[val.channum].push_back(GetChannelCount());
         callsign_to_index_map[val.callsign].push_back(GetChannelCount());
 
         // add the new channel to the list
-        pix_chan_list_t tmp;
+        db_chan_list_t tmp;
         tmp.push_back(val);
         m_channelInfos.push_back(tmp);
     }
@@ -1508,7 +1508,7 @@ void GuideGrid::updateChannels(void)
 {
     m_channelList->Reset();
 
-    PixmapChannel *chinfo = GetChannelInfo(m_currentStartChannel);
+    DBChannel *chinfo = GetChannelInfo(m_currentStartChannel);
 
     if (m_player)
         m_player->ClearTunableCache();
@@ -1575,11 +1575,12 @@ void GuideGrid::updateChannels(void)
             chinfo->ToMap(infomap);
             item->SetTextFromMap(infomap);
 
-            if (!chinfo->icon.isEmpty() &&
-                chinfo->CacheChannelIcon())
+            if (!chinfo->icon.isEmpty())
             {
-                QString localpath = chinfo->m_localIcon;
-                item->SetImage(localpath, "channelicon");
+                QString iconurl =
+                                gCoreContext->GetMasterHostPrefix("ChannelIcon",
+                                                                  chinfo->icon);
+                item->SetImage(iconurl, "channelicon");
             }
         }
     }
@@ -1604,19 +1605,18 @@ void GuideGrid::updateInfo(void)
     if (chanNum < 0)
         chanNum = 0;
 
-    PixmapChannel *chinfo = GetChannelInfo(chanNum);
+    DBChannel *chinfo = GetChannelInfo(chanNum);
 
     if (m_channelImage)
     {
         m_channelImage->Reset();
         if (!chinfo->icon.isEmpty())
         {
-            if (chinfo->CacheChannelIcon())
-            {
-                QString localpath = chinfo->m_localIcon;
-                m_channelImage->SetFilename(localpath);
-                m_channelImage->Load();
-            }
+            QString iconurl = gCoreContext->GetMasterHostPrefix("ChannelIcon",
+                                                                chinfo->icon);
+
+            m_channelImage->SetFilename(iconurl);
+            m_channelImage->Load();
         }
     }
 
@@ -1736,7 +1736,7 @@ void GuideGrid::toggleChannelFavorite(int grpid)
     if (chanNum < 0)
         chanNum = 0;
 
-    PixmapChannel *ch = GetChannelInfo(chanNum);
+    DBChannel *ch = GetChannelInfo(chanNum);
     uint chanid = ch->chanid;
 
     if (m_changrpid == -1)
