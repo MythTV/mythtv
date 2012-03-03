@@ -49,11 +49,11 @@ class PagedList( list ):
     def _getpage(self, page):
         raise NotImplementedError("PagedList._getpage() must be provided "+\
                                   "by subclass")
-    def __init__(self, iterable, perpage=20):
-        l = 0
-        page = 1
+    def __init__(self, perpage=20):
+        l = 0-perpage
+        page = 0
         self._perpage = perpage
-        super(PagedList, self).__init__(iterable)
+        super(PagedList, self).__init__()
         while len(self) >= (l+perpage):
             l = len(self)
             page += 1
@@ -93,7 +93,7 @@ class Poller( object ):
         # retrieve data from callable function, and apply
         if not callable(self.func):
             raise RuntimeError('Poller object called without a source function')
-        self.apply(self.func())
+        self.apply(self.func().readJSON())
 
     def apply(self, data, set_nones=True):
         # apply data directly, bypassing callable function
@@ -111,7 +111,8 @@ class Data( object ):
     Basic response definition class
     This maps to a single key in a JSON dictionary received from the API
     """
-    def __init__(self, field, initarg=None, handler=None, poller=None, raw=True, default=u''):
+    def __init__(self, field, initarg=None, handler=None, poller=None,
+                 raw=True, default=u'', lang=False):
         """
         This defines how the dictionary value is to be processed by the poller
             field   -- defines the dictionary key that filters what data this uses
@@ -153,6 +154,8 @@ class Data( object ):
             value = self.handler(value)
         else:
             value = self.default
+        if isinstance(value, Element):
+            value._lang = inst._lang
         inst._data[self.field] = value
 
     def sethandler(self, handler):
@@ -162,7 +165,7 @@ class Data( object ):
         elif isinstance(handler, ElementType) and self.raw:
             self.handler = lambda x: handler(raw=x)
         else:
-            self.handler = handler
+            self.handler = lambda x: handler(x)
 
 class Datapoint( Data ):
     pass
@@ -199,7 +202,10 @@ class Datalist( Data ):
         data = []
         if value:
             for val in value:
-                data.append(self.handler(val))
+                val = self.handler(val)
+                if isinstance(val, Element):
+                    val._lang = inst._lang
+                data.append(val)
             if self.sort:
                 data.sort(key=lambda x: getattr(x, self.sort))
         inst._data[self.field] = data
@@ -247,6 +253,8 @@ class Datadict( Data ):
         if value:
             for val in value:
                 val = self.handler(val)
+                if isinstance(val, Element):
+                    val._lang = inst._lang
                 data[self.getkey(val)] = val
         inst._data[self.field] = data
 
@@ -263,7 +271,6 @@ class ElementType( type ):
         # run in reverse order so higher priority values overwrite lower ones
         data = {}
         pollers = {'_populate':None}
-
 
         for base in reversed(bases):
             if isinstance(base, mcs):
@@ -324,6 +331,9 @@ class ElementType( type ):
 
     def __call__(cls, *args, **kwargs):
         obj = cls.__new__(cls)
+        if 'language' in kwargs:
+            obj._lang = kwargs['language']
+
         obj._data = {}
         if 'raw' in kwargs:
             # if 'raw' keyword is supplied, create populate object manually
@@ -344,4 +354,5 @@ class ElementType( type ):
 
 class Element( object ):
     __metaclass__ = ElementType
+    _lang = 'en'
 
