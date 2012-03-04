@@ -15,6 +15,7 @@
 
 class MythUIButtonTree;
 class MythUIText;
+class MythMenu;
 
 // This is just so we can use the guarded pointers provided by QPointer in the MusicGenericTree
 class MPUBLIC MusicButtonItem : public MythUIButtonListItem, public QObject
@@ -70,6 +71,8 @@ class PlaylistEditorView : public MusicCommon
 
     void saveTreePosition(void);
 
+    virtual void ShowMenu(void);
+
   protected:
     void customEvent(QEvent *event);
 
@@ -97,6 +100,9 @@ class PlaylistEditorView : public MusicCommon
     void createRootNode(void);
     void reloadTree(void);
     void restoreTreePosition(const QStringList &route);
+
+    MythMenu* createPlaylistMenu(void);
+    MythMenu* createSmartPlaylistMenu(void);
 
   private:
     QString                 m_layout;

@@ -1337,7 +1337,6 @@ void MusicCommon::customEvent(QEvent *event)
                 gPlayer->setShuffleMode((MusicPlayer::ShuffleMode) mode);
                 updateShuffleMode();
 
-                //TODO maybe this should be done using an event from the player?
                 // store id of current track
                 int curTrackID = -1;
                 if (gPlayer->getCurrentMetadata())
@@ -1394,36 +1393,25 @@ void MusicCommon::customEvent(QEvent *event)
                 allTracks();
             else if (resulttext == tr("From CD"))
                 fromCD();
-            else if (resulttext ==  tr("Tracks by current Artist"))
+            else if (resulttext ==  tr("Tracks By Current Artist"))
                 byArtist();
-            else if (resulttext == tr("Tracks from current Genre"))
+            else if (resulttext == tr("Tracks From Current Genre"))
                 byGenre();
-            else if (resulttext == tr("Tracks from current Album"))
+            else if (resulttext == tr("Tracks From Current Album"))
                 byAlbum();
-            else if (resulttext == tr("Track from current Year"))
+            else if (resulttext == tr("Track From Current Year"))
                 byYear();
-            else if (resulttext == tr("Tracks with same Title"))
+            else if (resulttext == tr("Tracks With Same Title"))
                 byTitle();
         }
         else if (resultid == "playlistoptionsmenu")
         {
-            if (resulttext == tr("Replace"))
+            if (resulttext == tr("Replace Tracks"))
             {
                 m_playlistOptions.insertPLOption = PL_REPLACE;
-                m_playlistOptions.removeDups = false;
                 doUpdatePlaylist();
             }
-            else if (resulttext ==  tr("Insert after current track"))
-            {
-                m_playlistOptions.insertPLOption = PL_INSERTAFTERCURRENT;
-                doUpdatePlaylist();
-            }
-            else if (resulttext == tr("Append to end"))
-            {
-                m_playlistOptions.insertPLOption = PL_INSERTATEND;
-                doUpdatePlaylist();
-            }
-            else if (resulttext == tr("Add"))
+            else if (resulttext == tr("Add Tracks"))
             {
                 m_playlistOptions.insertPLOption = PL_INSERTATEND;
                 doUpdatePlaylist();
@@ -1533,7 +1521,7 @@ void MusicCommon::customEvent(QEvent *event)
         m_currentTrack = gPlayer->getCurrentTrackPos();
 
         // if we have just removed the playing track from the playlist
-        // move to the next trackCount
+        // move to the next track
         if (gPlayer->getCurrentMetadata())
         {
             if (gPlayer->getCurrentMetadata()->ID() == (Metadata::IdType) trackID)
@@ -1629,11 +1617,11 @@ void MusicCommon::customEvent(QEvent *event)
             }
         }
 
-        if (trackID == gPlayer->getCurrentMetadata()->ID())
+        if (gPlayer->getCurrentMetadata() && trackID == gPlayer->getCurrentMetadata()->ID())
             updateTrackInfo(gPlayer->getCurrentMetadata());
 
         // this will ensure the next track info gets updated
-        if (trackID == gPlayer->getNextMetadata()->ID())
+        if (gPlayer->getNextMetadata() && trackID == gPlayer->getNextMetadata()->ID())
             updateTrackInfo(gPlayer->getCurrentMetadata());
     }
     else if (event->type() == MusicPlayerEvent::AlbumArtChangedEvent)
@@ -2175,11 +2163,11 @@ MythMenu* MusicCommon::createQuickPlaylistsMenu(void)
 
     if (gPlayer->getCurrentMetadata())
     {
-        menu->AddItem(tr("Tracks by current Artist"));
-        menu->AddItem(tr("Tracks from current Album"));
-        menu->AddItem(tr("Tracks from current Genre"));
-        menu->AddItem(tr("Track from current Year"));
-        menu->AddItem(tr("Tracks with same Title"));
+        menu->AddItem(tr("Tracks By Current Artist"));
+        menu->AddItem(tr("Tracks From Current Album"));
+        menu->AddItem(tr("Tracks From Current Genre"));
+        menu->AddItem(tr("Track From Current Year"));
+        menu->AddItem(tr("Tracks With Same Title"));
     }
 
     menu->AddItem(tr("Cancel"));
@@ -2197,6 +2185,18 @@ MythMenu* MusicCommon::createVisualizerMenu(void)
         menu->AddItem(m_visualModes.at(x), qVariantFromValue(x));
 
     menu->AddItem(tr("Cancel"));
+
+    return menu;
+}
+
+MythMenu* MusicCommon::createPlaylistOptionsMenu(void)
+{
+    QString label = tr("Add to Playlist Options");
+
+    MythMenu *menu = new MythMenu(label, this, "playlistoptionsmenu");
+
+    menu->AddItem(tr("Replace Tracks"));
+    menu->AddItem(tr("Add Tracks"));
 
     return menu;
 }
@@ -2290,11 +2290,9 @@ void MusicCommon::byTitle(void)
     showPlaylistOptionsMenu();
 }
 
-void MusicCommon::showPlaylistOptionsMenu(void)
+void MusicCommon::showPlaylistOptionsMenu(bool addMainMenu)
 {
-    //FIXME: hard code these for the moment - remove later?
     m_playlistOptions.playPLOption = PL_CURRENT;
-    m_playlistOptions.removeDups = true;
 
     // Don't bother showing the dialog if the current playlist is empty
     if (gPlayer->getPlaylist()->getSongs().count() == 0)
@@ -2304,33 +2302,19 @@ void MusicCommon::showPlaylistOptionsMenu(void)
         return;
     }
 
-    QString label = tr("Add to Playlist Options");
+    MythMenu *menu = createPlaylistOptionsMenu();
+
+    if (addMainMenu)
+        menu->AddItem(tr("More Options"), NULL, createMainMenu());
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
-    MythDialogBox *menu = new MythDialogBox(label, popupStack, "playlistoptionsmenu");
+    MythDialogBox *menuPopup = new MythDialogBox(menu, popupStack, "playlistoptionsmenu");
 
-    if (!menu->Create())
-    {
-        delete menu;
-        return;
-    }
-
-    menu->SetReturnEvent(this, "playlistoptionsmenu");
-
-    menu->AddButton(tr("Replace"));
-
-    if (gPlayer->getShuffleMode() == MusicPlayer::SHUFFLE_OFF)
-    {
-        menu->AddButton(tr("Insert after current track"));
-        menu->AddButton(tr("Append to end"));
-    }
+    if (menuPopup->Create())
+        popupStack->AddScreen(menuPopup);
     else
-        menu->AddButton(tr("Add"));
-
-    menu->AddButton(tr("Cancel"));
-
-    popupStack->AddScreen(menu);
+        delete menu;
 }
 
 void MusicCommon::doUpdatePlaylist(void)
@@ -2350,7 +2334,7 @@ void MusicCommon::doUpdatePlaylist(void)
     {
         // update playlist from quick playlist
         gMusicData->all_playlists->getActive()->fillSonglistFromQuery(
-                    m_whereClause, m_playlistOptions.removeDups,
+                    m_whereClause, true,
                     m_playlistOptions.insertPLOption, curTrackID);
         m_whereClause.clear();
     }
@@ -2358,17 +2342,10 @@ void MusicCommon::doUpdatePlaylist(void)
     {
         // update playlist from song list (from the playlist editor)
         gMusicData->all_playlists->getActive()->fillSonglistFromList(
-                    m_songList, m_playlistOptions.removeDups,
+                    m_songList, true,
                     m_playlistOptions.insertPLOption, curTrackID);
 
         m_songList.clear();
-    }
-    else
-    {
-        // update playlist from smart playlist
-//        gMusicData->all_playlists->getActive()->fillSonglistFromSmartPlaylist(
-//                    curSmartPlaylistCategory, curSmartPlaylistName,
-//                    bRemoveDups, insertOption, curTrackID);
     }
 
     updateUIPlaylist();
@@ -2389,7 +2366,6 @@ void MusicCommon::doUpdatePlaylist(void)
 
         case PL_FIRSTNEW:
         {
-            //TODO need to test these
             switch (m_playlistOptions.insertPLOption)
             {
                 case PL_REPLACE:
