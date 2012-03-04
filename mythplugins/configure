@@ -289,13 +289,16 @@ exif
 newexif
 dcraw
 cdio
-taglib
+"
+
+DEPEND_LIST="
 vorbis
 flac
 mp3lame
+taglib
 "
 
-enable $PLUGIN_LIST $CONFIG_LIST
+enable $PLUGIN_LIST $CONFIG_LIST $DEPEND_LIST
 
 prefix="/usr/local"
 libdir_name="lib"
