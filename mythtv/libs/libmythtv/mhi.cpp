@@ -24,9 +24,6 @@ static FT_Library ft_library;
 #define FONT_TO_USE "FreeSans.ttf" // Tiresias Screenfont.ttf is mandated
 
 
-#define SCALED_X(arg1) (int)(((float)arg1 * m_xScale) + 0.5f)
-#define SCALED_Y(arg1) (int)(((float)arg1 * m_yScale) + 0.5f)
-
 // LifecycleExtension tuneinfo:
 const unsigned kTuneQuietly   = 1U<<0; // b0 tune quietly
 const unsigned kTuneKeepApp   = 1U<<1; // b1 keep app running
@@ -58,17 +55,11 @@ MHIContext::MHIContext(InteractiveTV *parent)
       m_keyProfile(0),
       m_engine(MHCreateEngine(this)), m_stop(false),
       m_updated(false),
-      m_displayWidth(StdDisplayWidth), m_displayHeight(StdDisplayHeight),
       m_face_loaded(false), m_engineThread(NULL), m_currentChannel(-1),
       m_currentStream(-1),  m_isLive(false),      m_currentSource(-1),
       m_audioTag(-1),       m_videoTag(-1),
-      m_lastNbiVersion(NBI_VERSION_UNSET),
-      m_videoRect(0, 0, StdDisplayWidth, StdDisplayHeight),
-      m_displayRect(0, 0, StdDisplayWidth, StdDisplayHeight)
+      m_lastNbiVersion(NBI_VERSION_UNSET)
 {
-    m_xScale = (float)m_displayWidth / (float)MHIContext::StdDisplayWidth;
-    m_yScale = (float)m_displayHeight / (float)MHIContext::StdDisplayHeight;
-
     if (!ft_loaded)
     {
         FT_Error error = FT_Init_FreeType(&ft_library);
@@ -546,12 +537,7 @@ bool MHIContext::OfferKey(QString key)
 // Called from MythPlayer::VideoStart and MythPlayer::ReinitOSD
 void MHIContext::Reinit(const QRect &display)
 {
-    QMutexLocker locker(&m_display_lock);
-    m_displayWidth = display.width();
-    m_displayHeight = display.height();
-    m_xScale = (float)m_displayWidth / (float)MHIContext::StdDisplayWidth;
-    m_yScale = (float)m_displayHeight / (float)MHIContext::StdDisplayHeight;
-    m_videoRect   = QRect(QPoint(0,0), display.size());
+    m_videoDisplayRect = m_videoRect = QRect();
     m_displayRect = display;
 }
 
@@ -664,16 +650,36 @@ void MHIContext::RequireRedraw(const QRegion &)
     m_updated = true;
 }
 
-void MHIContext::AddToDisplay(const QImage &image, int x, int y, bool bUnder /*=false*/)
+inline int MHIContext::ScaleX(int n, bool roundup) const
 {
-    MHIImageData *data = new MHIImageData;
-    int dispx = x + m_displayRect.left();
-    int dispy = y + m_displayRect.top();
+    return (n * m_displayRect.width() + (roundup ? StdDisplayWidth - 1 : 0)) / StdDisplayWidth;
+}
 
-    data->m_image = image;
-    data->m_x = dispx;
-    data->m_y = dispy;
+inline int MHIContext::ScaleY(int n, bool roundup) const
+{
+    return (n * m_displayRect.height() + (roundup ? StdDisplayHeight - 1 : 0)) / StdDisplayHeight;
+}
+
+inline QRect MHIContext::Scale(const QRect &r) const
+{
+    return QRect( m_displayRect.topLeft() +
+        QPoint(ScaleX(r.x()), ScaleY(r.y())),
+        QSize(ScaleX(r.width(), true), ScaleY(r.height(), true)) );
+}
+
+void MHIContext::AddToDisplay(const QImage &image, const QRect &displayRect, bool bUnder /*=false*/)
+{
+    const QRect scaledRect = Scale(displayRect);
+
+    MHIImageData *data = new MHIImageData;
+
+    data->m_image = image.convertToFormat(QImage::Format_ARGB32).scaled(
+        scaledRect.width(), scaledRect.height(),
+        Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+    data->m_x = scaledRect.x();
+    data->m_y = scaledRect.y();
     data->m_bUnder = bUnder;
+
     QMutexLocker locker(&m_display_lock);
     if (!bUnder)
         m_display.push_back(data);
@@ -696,6 +702,12 @@ void MHIContext::AddToDisplay(const QImage &image, int x, int y, bool bUnder /*=
     }
 }
 
+inline int Roundup(int n, int r)
+{
+    // NB assumes 2's complement arithmetic
+    return n + (-n & (r - 1));
+}
+
 // The videoRect gives the size and position to which the video must be scaled.
 // The displayRect gives the rectangle reserved for the video.
 // e.g. part of the video may be clipped within the displayRect.
@@ -704,21 +716,17 @@ void MHIContext::DrawVideo(const QRect &videoRect, const QRect &dispRect)
     // tell the video player to resize the video stream
     if (m_parent->GetNVP())
     {
-        QRect vidRect(SCALED_X(videoRect.x()),
-                      SCALED_Y(videoRect.y()),
-                      SCALED_X(videoRect.width()),
-                      SCALED_Y(videoRect.height()));
+        QRect vidRect = Scale(videoRect);
+        vidRect.setWidth(Roundup(vidRect.width(), 2));
+        vidRect.setHeight(Roundup(vidRect.height(), 2));
         if (m_videoRect != vidRect)
         {
-            m_parent->GetNVP()->SetVideoResize(vidRect.translated(m_displayRect.topLeft()));
+            m_parent->GetNVP()->SetVideoResize(vidRect);
             m_videoRect = vidRect;
         }
     }
 
-    m_videoDisplayRect = QRect(SCALED_X(dispRect.x()),
-                      SCALED_Y(dispRect.y()),
-                      SCALED_X(dispRect.width()),
-                      SCALED_Y(dispRect.height()));
+    m_videoDisplayRect = Scale(dispRect);
 
     // Mark all existing items in the display stack as under the video
     QMutexLocker locker(&m_display_lock);
@@ -1024,22 +1032,10 @@ void MHIContext::DrawRect(int xPos, int yPos, int width, int height,
     if (colour.alpha() == 0 || height == 0 || width == 0)
         return; // Fully transparent
 
-    QRgb qColour = qRgba(colour.red(), colour.green(),
-                         colour.blue(), colour.alpha());
+    QImage qImage(width, height, QImage::Format_ARGB32);
+    qImage.fill(qRgba(colour.red(), colour.green(), colour.blue(), colour.alpha()));
 
-    int scaledWidth  = SCALED_X(width);
-    int scaledHeight = SCALED_Y(height);
-    QImage qImage(scaledWidth, scaledHeight, QImage::Format_ARGB32);
-
-    for (int i = 0; i < scaledHeight; i++)
-    {
-        for (int j = 0; j < scaledWidth; j++)
-        {
-            qImage.setPixel(j, i, qColour);
-        }
-    }
-
-    AddToDisplay(qImage, SCALED_X(xPos), SCALED_Y(yPos));
+    AddToDisplay(qImage, QRect(xPos, yPos, width, height));
 }
 
 // Draw an image at the specified position.
@@ -1058,28 +1054,12 @@ void MHIContext::DrawImage(int x, int y, const QRect &clipRect,
 
     if (bScaled || displayRect == imageRect) // No clipping required
     {
-        QImage q_scaled =
-            qImage.scaled(
-                SCALED_X(displayRect.width()),
-                SCALED_Y(displayRect.height()),
-                Qt::IgnoreAspectRatio,
-                Qt::SmoothTransformation);
-        AddToDisplay(q_scaled.convertToFormat(QImage::Format_ARGB32),
-                     SCALED_X(x), SCALED_Y(y), bUnder);
+        AddToDisplay(qImage, displayRect, bUnder);
     }
     else if (!displayRect.isEmpty())
     { // We must clip the image.
-        QImage clipped = qImage.convertToFormat(QImage::Format_ARGB32)
-            .copy(displayRect.translated(-x, -y));
-        QImage q_scaled =
-            clipped.scaled(
-                SCALED_X(displayRect.width()),
-                SCALED_Y(displayRect.height()),
-                Qt::IgnoreAspectRatio,
-                Qt::SmoothTransformation);
-        AddToDisplay(q_scaled,
-                     SCALED_X(displayRect.x()),
-                     SCALED_Y(displayRect.y()), bUnder);
+        QImage clipped = qImage.copy(displayRect.translated(-x, -y));
+        AddToDisplay(clipped, displayRect, bUnder);
     }
     // Otherwise draw nothing.
 }
