@@ -33,7 +33,7 @@
 #include <mythcontext.h>
 #include <mythdirs.h>
 #include <mthread.h>
-#include <util.h>
+#include <mythmiscutil.h>
 
 // mythgallery
 #include "config.h"

@@ -26,7 +26,7 @@
 #include "mythsocket.h"
 #include "remotefile.h"
 #include "storagegroup.h"
-#include "util.h"
+#include "mythmiscutil.h"
 #include "playercontext.h"
 #include "mythdirs.h"
 #include "remoteutil.h"

@@ -34,7 +34,7 @@
 #include "netutils.h"
 #include "mythdirs.h"
 #include "mythdb.h"
-#include "util.h"
+#include "mythmiscutil.h"
 #include "tv.h"
 
 //  Mythfrontend

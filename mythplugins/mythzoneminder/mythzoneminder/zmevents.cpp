@@ -22,7 +22,7 @@
 #include <mythcontext.h>
 #include <mythdbcon.h>
 #include <mythmainwindow.h>
-#include <util.h>
+#include <mythmiscutil.h>
 
 // zoneminder
 #include "zmevents.h"

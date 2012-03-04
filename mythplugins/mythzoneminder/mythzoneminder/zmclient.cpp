@@ -10,7 +10,7 @@
 //myth
 #include "mythcontext.h"
 #include "mythdialogbox.h"
-#include "util.h"
+#include "mythmiscutil.h"
 #include "mythmainwindow.h"
 #include "mythlogging.h"
 

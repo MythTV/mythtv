@@ -6,7 +6,7 @@
 #include "mythsystem.h"
 #include "remoteutil.h"
 #include "lcddevice.h"
-#include "util.h"
+#include "mythmiscutil.h"
 #include "dbaccess.h"
 #include "videometadata.h"
 #include "videoutils.h"

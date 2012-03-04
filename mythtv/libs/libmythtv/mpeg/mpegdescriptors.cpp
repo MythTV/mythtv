@@ -6,7 +6,7 @@
 #include "sctedescriptors.h"
 #include "atscdescriptors.h"
 #include "dvbdescriptors.h"
-#include "util.h" // for xml_indent
+#include "mythmiscutil.h" // for xml_indent
 
 QMutex                RegistrationDescriptor::description_map_lock;
 bool                  RegistrationDescriptor::description_map_initialized = false;

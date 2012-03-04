@@ -7,7 +7,7 @@
 #include "mpegdescriptors.h"
 #include "pespacket.h"
 #include "mythtvexp.h"
-#include "util.h" // for xml_indent
+#include "mythmiscutil.h" // for xml_indent
 
 /** \file mpegtables.h
  *  \code

@@ -14,7 +14,7 @@ using namespace std;
 #include <QMap>
 
 #include "tspacket.h"
-#include "util.h"
+#include "mythmiscutil.h"
 #include "streamlisteners.h"
 #include "eitscanner.h"
 #include "mythtvexp.h"

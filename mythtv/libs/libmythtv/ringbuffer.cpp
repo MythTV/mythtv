@@ -25,7 +25,7 @@
 #include "mythconfig.h"
 #include "remotefile.h"
 #include "compat.h"
-#include "util.h"
+#include "mythmiscutil.h"
 #include "mythlogging.h"
 
 // about one second at 35mbit

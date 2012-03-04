@@ -38,7 +38,7 @@ using namespace std;
 
 // MythTV plugin headers
 #include <mythcontext.h>
-#include <util.h>
+#include <mythmiscutil.h>
 #include <mythuihelper.h>
 #include "mythlogging.h"
 

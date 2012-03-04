@@ -20,7 +20,7 @@
 #include <mythprogressdialog.h>
 
 #include <mythmainwindow.h>
-#include <util.h>
+#include <mythmiscutil.h>
 #include <httpcomms.h>
 #include <mythcontext.h>
 #include <mythdb.h>

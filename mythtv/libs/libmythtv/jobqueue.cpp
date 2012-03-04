@@ -20,7 +20,7 @@ using namespace std;
 #include "jobqueue.h"
 #include "programinfo.h"
 #include "mythcorecontext.h"
-#include "util.h"
+#include "mythmiscutil.h"
 #include "previewgenerator.h"
 #include "compat.h"
 #include "recordingprofile.h"
