@@ -6,7 +6,7 @@
 #include <mythuicheckbox.h>
 #include <mythmainwindow.h>
 #include <mythdialogbox.h>
-#include <util.h>
+#include <mythutil.h>
 #include <mythcontext.h>
 #include <mythdbcon.h>
 

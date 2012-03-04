@@ -14,7 +14,7 @@ using namespace std;
 #include "DeviceReadBuffer.h" // for ReaderPausedCB
 #include "mpegstreamdata.h" // for PIDPriority
 #include "mthread.h"
-#include "util.h"
+#include "mythutil.h"
 
 //#define DEBUG_PID_FILTERS
 

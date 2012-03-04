@@ -48,7 +48,7 @@
 #include <mythmainwindow.h>
 #include <mythdialogbox.h>
 #include <mythdirs.h>
-#include <util.h>
+#include <mythutil.h>
 #include <mythuitext.h>
 #include <mythuibutton.h>
 #include <mythuiimage.h>

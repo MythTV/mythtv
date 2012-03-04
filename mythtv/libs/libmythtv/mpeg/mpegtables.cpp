@@ -5,7 +5,7 @@
 #include "atscdescriptors.h"
 #include "mythlogging.h"
 #include "mpegtables.h"
-#include "util.h" // for xml_indent
+#include "mythutil.h" // for xml_indent
 
 const unsigned char DEFAULT_PAT_HEADER[8] =
 {

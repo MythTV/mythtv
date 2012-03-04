@@ -11,7 +11,7 @@
 #include "storagegroup.h"
 #include "remotefile.h"
 #include "remoteutil.h"
-#include "util.h"
+#include "mythutil.h"
 #include "mythlogging.h"
 #include "globals.h"
 #include "dbaccess.h"

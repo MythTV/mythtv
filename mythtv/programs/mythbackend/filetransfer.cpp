@@ -4,7 +4,7 @@
 
 #include "filetransfer.h"
 #include "ringbuffer.h"
-#include "util.h"
+#include "mythutil.h"
 #include "mythsocket.h"
 #include "programinfo.h"
 

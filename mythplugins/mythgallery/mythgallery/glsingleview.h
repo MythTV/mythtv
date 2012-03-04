@@ -26,7 +26,7 @@
 // MythTV plugin headers
 #include <mythdialogs.h>
 #include <mthread.h>
-#include <util.h>
+#include <mythutil.h>
 
 // MythGallery headers
 #include "imageview.h"

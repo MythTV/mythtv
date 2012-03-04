@@ -20,7 +20,7 @@
  */
 
 #include "sctetables.h"
-#include "util.h" // for xml_indent
+#include "mythutil.h" // for xml_indent
 
 QString CarrierDefinitionSubtable::toString(void) const
 {

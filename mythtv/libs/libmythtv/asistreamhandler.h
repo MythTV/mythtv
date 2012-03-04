@@ -11,7 +11,7 @@ using namespace std;
 #include <QMap>
 
 #include "streamhandler.h"
-#include "util.h"
+#include "mythutil.h"
 
 class ASIStreamHandler;
 class DTVSignalMonitor;
