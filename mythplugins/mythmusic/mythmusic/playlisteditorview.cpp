@@ -556,7 +556,6 @@ MythMenu* PlaylistEditorView::createPlaylistMenu(void)
 
             if (playlist)
             {
-
                 SongList songlist = playlist->getSongs();
 
                 for (int x = 0; x < songlist.count(); x++)

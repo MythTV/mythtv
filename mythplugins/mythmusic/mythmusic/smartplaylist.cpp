@@ -687,8 +687,6 @@ void SmartPlaylistEditor::showCategoryMenu(void)
     menu->AddButton(tr("Delete Category"), NULL);
     menu->AddButton(tr("Rename Category"), NULL);
 
-    menu->AddButton(tr("Cancel"));
-
     popupStack->AddScreen(menu);
 }
 
@@ -717,8 +715,6 @@ void SmartPlaylistEditor::showCriteriaMenu(void)
 
     if (item)
         menu->AddButton(tr("Delete Criteria"), SLOT(deleteCriteria()));
-
-    menu->AddButton(tr("Cancel"));
 
     popupStack->AddScreen(menu);
 }

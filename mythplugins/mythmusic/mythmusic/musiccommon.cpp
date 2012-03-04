@@ -1322,36 +1322,30 @@ void MusicCommon::customEvent(QEvent *event)
         }
         else if (resultid == "repeatmenu")
         {
-            if (resulttext != tr("Cancel"))
-            {
-                int mode = dce->GetData().toInt();
-                gPlayer->setRepeatMode((MusicPlayer::RepeatMode) mode);
-                updateRepeatMode();
-            }
+            int mode = dce->GetData().toInt();
+            gPlayer->setRepeatMode((MusicPlayer::RepeatMode) mode);
+            updateRepeatMode();
         }
         else if (resultid == "shufflemenu")
         {
-            if (resulttext != tr("Cancel"))
-            {
-                int mode = dce->GetData().toInt();
-                gPlayer->setShuffleMode((MusicPlayer::ShuffleMode) mode);
-                updateShuffleMode();
+            int mode = dce->GetData().toInt();
+            gPlayer->setShuffleMode((MusicPlayer::ShuffleMode) mode);
+            updateShuffleMode();
 
-                // store id of current track
-                int curTrackID = -1;
-                if (gPlayer->getCurrentMetadata())
-                    curTrackID = gPlayer->getCurrentMetadata()->ID();
+            // store id of current track
+            int curTrackID = -1;
+            if (gPlayer->getCurrentMetadata())
+                curTrackID = gPlayer->getCurrentMetadata()->ID();
 
-                updateUIPlaylist();
+            updateUIPlaylist();
 
-                if (!restorePosition(curTrackID))
-                    playFirstTrack();
+            if (!restorePosition(curTrackID))
+                playFirstTrack();
 
-                // need this to update the next track info
-                Metadata *curMeta = gPlayer->getCurrentMetadata();
-                if (curMeta)
-                    updateTrackInfo(curMeta);
-            }
+            // need this to update the next track info
+            Metadata *curMeta = gPlayer->getCurrentMetadata();
+            if (curMeta)
+                updateTrackInfo(curMeta);
         }
         else if (resultid == "exitmenu")
         {
@@ -2013,8 +2007,6 @@ MythMenu* MusicCommon::createMainMenu(void)
     if (m_visualizerVideo)
         menu->AddItem(tr("Change Visualizer"), NULL, createVisualizerMenu());
 
-    menu->AddItem(tr("Cancel"));
-
     return menu;
 }
 
@@ -2034,11 +2026,6 @@ MythMenu* MusicCommon::createViewMenu(void)
         menu->AddItem(tr("Search for Music"), qVariantFromValue((int)MV_SEARCH));
     if (m_currentView != MV_VISUALIZER)
         menu->AddItem(tr("Fullscreen Visualizer"), qVariantFromValue((int)MV_VISUALIZER));
-#if 0
-    menu->AddItem(tr("Lyrics"), qVariantFromValue((int)MV_LYRICS));
-    menu->AddItem(tr("Artist Information"), qVariantFromValue((int)MV_ARTISTINFO));
-#endif
-    menu->AddItem(tr("Cancel"));
 
     return menu;
 }
@@ -2067,8 +2054,6 @@ MythMenu* MusicCommon::createPlaylistMenu(void)
         else
             menu->AddItem(tr("Switch To Move Mode"));
     }
-
-    menu->AddItem(tr("Cancel"));
 
     return menu;
 }
@@ -2113,8 +2098,6 @@ MythMenu* MusicCommon::createPlayerMenu(void)
     menu->AddItem(tr("Stop"));
     menu->AddItem(tr("Pause"));
 
-    menu->AddItem(tr("Cancel"));
-
     return menu;
 }
 
@@ -2127,8 +2110,6 @@ MythMenu* MusicCommon::createRepeatMenu(void)
     menu->AddItem(tr("None"),  qVariantFromValue((int)MusicPlayer::REPEAT_OFF));
     menu->AddItem(tr("Track"), qVariantFromValue((int)MusicPlayer::REPEAT_TRACK));
     menu->AddItem(tr("All"),   qVariantFromValue((int)MusicPlayer::REPEAT_ALL));
-
-    menu->AddItem(tr("Cancel"));
 
     return menu;
 }
@@ -2144,8 +2125,6 @@ MythMenu* MusicCommon::createShuffleMenu(void)
     menu->AddItem(tr("Smart"),  qVariantFromValue((int)MusicPlayer::SHUFFLE_INTELLIGENT));
     menu->AddItem(tr("Album"),  qVariantFromValue((int)MusicPlayer::SHUFFLE_ALBUM));
     menu->AddItem(tr("Artist"), qVariantFromValue((int)MusicPlayer::SHUFFLE_ARTIST));
-
-    menu->AddItem(tr("Cancel"));
 
     return menu;
 }
@@ -2170,8 +2149,6 @@ MythMenu* MusicCommon::createQuickPlaylistsMenu(void)
         menu->AddItem(tr("Tracks With Same Title"));
     }
 
-    menu->AddItem(tr("Cancel"));
-
     return menu;
 }
 
@@ -2183,8 +2160,6 @@ MythMenu* MusicCommon::createVisualizerMenu(void)
 
     for (int x = 0; x < m_visualModes.count(); x++)
         menu->AddItem(m_visualModes.at(x), qVariantFromValue(x));
-
-    menu->AddItem(tr("Cancel"));
 
     return menu;
 }
