@@ -714,10 +714,11 @@ EOF
 
 check_py_lib(){
     log check_py_lib "$@"
+    lib=${1}
     check_cmd $python <<EOF
 import sys
 try:
-    import ${1}
+    import $lib
 except:
     sys.exit(1)
 sys.exit(0)

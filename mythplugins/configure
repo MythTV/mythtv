@@ -454,12 +454,13 @@ done
 
 check_py_lib(){
     log check_py_lib "$@"
+    lib=${1}
     check_cmd $python <<EOF
 from distutils.sysconfig import get_python_lib
 import sys
 sys.path.append(get_python_lib(prefix='${prefix}'))
 try:
-    import ${1}
+    import $lib
 except:
     sys.exit(1)
 sys.exit(0)
