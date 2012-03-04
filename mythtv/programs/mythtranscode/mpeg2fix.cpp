@@ -1758,6 +1758,7 @@ void MPEG2fixup::AddRangeList(QStringList rangelist, int type)
 {
     QStringList::iterator i;
     frm_dir_map_t *mapPtr;
+
     if (type == MPF_TYPE_CUTLIST)
     {
         mapPtr = &delMap;
@@ -1771,13 +1772,14 @@ void MPEG2fixup::AddRangeList(QStringList rangelist, int type)
     for (i = rangelist.begin(); i != rangelist.end(); ++i)
     {
         QStringList tmp = (*i).split(" - ");
-        long long start, end;
-        bool ok[2] = { false, false, };
-        if (tmp.size() >= 2)
-        {
-            start = tmp[0].toLongLong(&ok[0]);
-            end = tmp[1].toLongLong(&ok[1]);
-        }
+        if (tmp.size() < 2)
+            continue;
+
+        bool ok[2] = { false, false };
+
+        long long start = tmp[0].toLongLong(&ok[0]);
+        long long end   = tmp[1].toLongLong(&ok[1]);
+    
         if (ok[0] && ok[1])
         {
             if (start == 0)
@@ -1787,9 +1789,11 @@ void MPEG2fixup::AddRangeList(QStringList rangelist, int type)
             }
             else
                 mapPtr->insert(start - 1, MARK_CUT_START);
+
             mapPtr->insert(end, MARK_CUT_END);
         }
     }
+
     if (rangelist.count())
         use_secondary = true;
 }
