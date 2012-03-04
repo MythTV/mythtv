@@ -23,7 +23,7 @@ HttpConfig::~HttpConfig()
 {
 }
 
-QStringList HttpConfig::GetBasePaths() 
+QStringList HttpConfig::GetBasePaths()
 {
     QStringList paths;
     paths << "/Config";
@@ -103,6 +103,8 @@ bool HttpConfig::ProcessRequest(HTTPRequest *request)
                     okToSave = true;
             }
 
+            if (okToSave)
+                LOG(VB_UPNP, LOG_INFO, "HTTP method 'Save' called, but not handled");
 #if 0
             QTextStream os(&request->m_response);
             os << "<html><body><h3>The Save function for this screen is "
