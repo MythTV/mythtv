@@ -5,6 +5,7 @@
 #include "mythcorecontext.h"
 #include "settings.h"
 #include "channelsettings.h" // for ChannelTVFormat::GetFormats()
+#include "serverpool.h"
 #include <unistd.h>
 
 
@@ -34,7 +35,7 @@ static HostLineEdit *LocalServerIP6()
 #if defined(QT_NO_IPV6)
     gc->setEnabled(false);
 #else
-    if (gCoreContext->MythHostAddress6().isEmpty())
+    if (ServerPool::DefaultListenIPv6().isEmpty())
         gc->setEnabled(false);
 #endif
     return gc;

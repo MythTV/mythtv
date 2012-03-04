@@ -9,6 +9,7 @@
 #include <QAbstractSocket>
 #include <QHostAddress>
 #include <QNetworkInterface>
+#include <QNetworkAddressEntry>
 
 #include <cmath>
 
@@ -35,6 +36,7 @@ using namespace std;
 #include "mythlogging.h"
 #include "mythversion.h"
 #include "mthread.h"
+#include "serverpool.h"
 
 #define LOC      QString("MythCoreContext: ")
 
@@ -70,8 +72,6 @@ class MythCoreContextPrivate : public QObject
     bool           m_WOLInProgress;
 
     bool m_backend;
-    QList<QHostAddress> m_IPv4;
-    QList<QHostAddress> m_IPv6;
 
     MythDB *m_database;
 
@@ -635,135 +635,6 @@ bool MythCoreContext::IsFrontendOnly(void)
     return !backendOnLocalhost;
 }
 
-void MythCoreContext::ConfigureHostAddress(void)
-{
-    // populate stored IPv4 and IPv6 addresses
-    // if address is not defined, QHostAddress will be invalid and Null
-    QHostAddress config_v4(GetSetting("BackendServerIP"));
-#if !defined(QT_NO_IPV6)
-    QHostAddress config_v6(GetSetting("BackendServerIP6"));
-#endif
-
-    // loop through all available addresses to populate lists
-    QList<QHostAddress> IPs = QNetworkInterface::allAddresses();
-    QList<QHostAddress>::const_iterator it;
-    for (it = IPs.begin(); it != IPs.end(); ++it)
-    {
-        if (d->m_IPv4.contains(*it))
-            // already defined, skip
-            continue;
-        else if (!config_v4.isNull() && (*it == config_v4))
-        {
-            // IPv4 address is defined, add it
-            LOG(VB_GENERAL, LOG_DEBUG,
-                    QString("Adding BackendServerIP to address list."));
-            d->m_IPv4.append(*it);
-        }
-        else if (*it == QHostAddress::LocalHost)
-        {
-            // always listen on LocalHost
-            LOG(VB_GENERAL, LOG_DEBUG,
-                    QString("Adding IPv4 loopback to address list."));
-            d->m_IPv4.append(*it);
-        }
-        else if (config_v4.isNull() &&
-                 (it->protocol() == QAbstractSocket::IPv4Protocol))
-        {
-            // IPv4 address is not defined, populate one
-            // restrict autoconfiguration to RFC1918 private networks
-            if (it->isInSubnet(QHostAddress::parseSubnet("10.0.0.0/8")) ||
-                it->isInSubnet(QHostAddress::parseSubnet("172.16.0.0/12")) ||
-                it->isInSubnet(QHostAddress::parseSubnet("192.168.0.0/16")))
-            {
-                LOG(VB_GENERAL, LOG_DEBUG,
-                        QString("Adding '%1' to address list.")
-                            .arg(it->toString()));
-                d->m_IPv4.append(*it);
-            }
-            else
-                LOG(VB_GENERAL, LOG_DEBUG, QString("Skipping non-private "
-                        "address during IPv4 autoselection: %1")
-                            .arg(it->toString()));
-        }
-#if !defined(QT_NO_IPV6)
-        else if (d->m_IPv6.contains(*it))
-            // already defined, skip
-            continue;
-        else if (!config_v6.isNull() && (*it == config_v6))
-        {
-            // IPv6 address is defined, add it
-            LOG(VB_GENERAL, LOG_DEBUG,
-                    QString("Adding BackendServerIP6 to address list."));
-            d->m_IPv6.append(*it);
-        }
-        else if (*it == QHostAddress::LocalHostIPv6)
-        {
-            // always listen on LocalHost
-            LOG(VB_GENERAL, LOG_DEBUG,
-                    QString("Adding IPv6 loopback to address list."));
-            d->m_IPv6.append(*it);
-        }
-        else if (config_v6.isNull() &&
-                 (it->protocol() == QAbstractSocket::IPv6Protocol))
-        {
-            // IPv6 address is not defined, populate one
-            // put in additional block filtering here?
-            if (!it->isInSubnet(QHostAddress::parseSubnet("fe80::/10")))
-            {
-                LOG(VB_GENERAL, LOG_DEBUG,
-                        QString("Adding '%1' to address list.")
-                            .arg(it->toString()));
-                d->m_IPv6.append(*it);
-            }
-            else
-                LOG(VB_GENERAL, LOG_DEBUG, QString("Skipping link-local "
-                        "address during IPv6 autoselection: %1")
-                            .arg(it->toString()));
-        }
-#endif
-        else
-            LOG(VB_GENERAL, LOG_DEBUG, QString("Skipping address: %1")
-                .arg(it->toString()));
-    }
-
-    if (!config_v4.isNull() && !d->m_IPv4.contains(config_v4) &&
-        !d->m_IPv4.isEmpty())
-    {
-        LOG(VB_GENERAL, LOG_CRIT, LOC + QString("Host is configured to listen "
-                "on %1, but address is not used on any local network "
-                "interfaces.").arg(config_v4.toString()));
-    }
-#if !defined(QT_NO_IPV6)
-
-    if (!config_v6.isNull() && !d->m_IPv6.contains(config_v6) &&
-        !d->m_IPv6.isEmpty())
-    {
-        LOG(VB_GENERAL, LOG_CRIT, LOC + QString("Host is configured to listen "
-                "on %1, but address is not used on any local network "
-                "interfaces.").arg(config_v6.toString()));
-    }
-#endif
-}
-
-QList<QHostAddress> MythCoreContext::MythHostAddress(void)
-{
-    QList<QHostAddress> alist(d->m_IPv4);
-    alist << d->m_IPv6;
-    return alist;
-}
-
-QList<QHostAddress> MythCoreContext::MythHostAddress4(void)
-{
-    QList<QHostAddress> alist(d->m_IPv4);
-    return alist;
-}
-
-QList<QHostAddress> MythCoreContext::MythHostAddress6(void)
-{
-    QList<QHostAddress> alist(d->m_IPv6);
-    return alist;
-}
-
 QString MythCoreContext::GenMythURL(QString host, QString port, QString path, QString storageGroup)
 {
     return GenMythURL(host,port.toInt(),path,storageGroup);
@@ -808,7 +679,6 @@ QString MythCoreContext::GenMythURL(QString host, int port, QString path, QStrin
 
     return ret;
 }
-
 
 QString MythCoreContext::GetMasterHostPrefix(const QString &storageGroup,
                                              const QString &path)
@@ -1003,11 +873,11 @@ QString MythCoreContext::GetBackendServerIP(const QString &host)
 {
     QString addr4, addr6;
 #if !defined(QT_NO_IPV6)
-    if (!d->m_IPv6.isEmpty())
+    if (!ServerPool::DefaultListenIPv6().isEmpty())
         // we have IPv6 addresses, assume we can connect to them
         addr6 = GetSettingOnHost("BackendServerIP6", host, "");
 #endif
-    if (!d->m_IPv4.isEmpty())
+    if (!ServerPool::DefaultListenIPv4().isEmpty())
         addr4 = GetSettingOnHost("BackendServerIP", host, "");
 
     if (addr6.isEmpty())

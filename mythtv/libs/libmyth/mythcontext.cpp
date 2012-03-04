@@ -1105,7 +1105,6 @@ bool MythContext::Init(const bool gui,
     }
 
     gCoreContext->ActivateSettingsCache(true);
-    gCoreContext->ConfigureHostAddress();
 
     return true;
 }

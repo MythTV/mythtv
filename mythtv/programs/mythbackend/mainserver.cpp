@@ -232,7 +232,7 @@ MainServer::MainServer(bool master, int port,
 
     mythserver = new MythServer();
     mythserver->setProxy(QNetworkProxy::NoProxy);
-    if (!mythserver->listen(gCoreContext->MythHostAddress(), port))
+    if (!mythserver->listen(port))
     {
         SetExitCode(GENERIC_EXIT_SOCKET_ERROR, false);
         return;
