@@ -1443,7 +1443,7 @@ void CDWatcherThread::run()
                         LOG(VB_GENERAL, LOG_INFO, "Couldn't find your "
                         " CD. It may not be in the freedb database.\n"
                         "    More likely, however, is that you need to delete\n"
-                        "    ~/.cddb and ~/.cdserverrc and restart mythmusic.");
+                        "    ~/.cddb and ~/.cdserverrc and restart MythMusic.");
                     }
                     gMusicData->all_music->setCDTitle(parenttitle);
                     setTitle = true;

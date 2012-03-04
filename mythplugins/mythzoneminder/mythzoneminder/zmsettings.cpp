@@ -14,9 +14,9 @@
 static HostLineEdit *ZMServerIP()
 {
     HostLineEdit *gc = new HostLineEdit("ZoneMinderServerIP");
-    gc->setLabel(QObject::tr("IP address of the mythzoneminder server"));
+    gc->setLabel(QObject::tr("IP address of the MythZoneMinder server"));
     gc->setValue("127.0.0.1");
-    gc->setHelpText(QObject::tr("Enter the IP address of the mythzoneminder server "
+    gc->setHelpText(QObject::tr("Enter the IP address of the MythZoneMinder server "
             "that this frontend should connect to."));
     return gc;
 };

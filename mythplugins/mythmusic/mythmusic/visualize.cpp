@@ -1360,12 +1360,6 @@ bool Piano::draw(QPainter *p, const QColor &back)
         p->fillRect(rectsp[key], QColor(int(r), int(g), int(b)));
     }
 
-    if (0)
-    {
-        drawWarning(p, back, size,
-                QObject::tr("Piano Visualization Message") + "\n" +
-                QObject::tr("Are you sane running this code?"));
-    }
     return true;
 }
 

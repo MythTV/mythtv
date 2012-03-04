@@ -63,7 +63,7 @@ bool RatingSettings::Create()
                  "track was played when ordering a group of songs."));
     m_randomWeight->SetHelpText(tr("Used in \"Smart\" Shuffle mode. "
                  "This weighting affects how much strength is "
-                 "given to good old (peudo-)randomness "
+                 "given to good old (pseudo-)randomness "
                  "when ordering a group of songs."));
     m_cancelButton->SetHelpText(tr("Exit without saving settings"));
     m_saveButton->SetHelpText(tr("Save settings and Exit"));
