@@ -15,7 +15,7 @@
 #include "mythdownloadmanager.h"
 #include "programtypes.h"
 #include "mythsystemevent.h"
-#include "util.h"
+#include "mythutil.h"
 #include "mythversion.h"
 #include "mythlogging.h"
 #include "storagegroup.h"

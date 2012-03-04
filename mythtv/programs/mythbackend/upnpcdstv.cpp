@@ -16,7 +16,7 @@
 #include "upnpcdstv.h"
 #include "httprequest.h"
 #include "storagegroup.h"
-#include "util.h"
+#include "mythutil.h"
 #include "mythcorecontext.h"
 
 

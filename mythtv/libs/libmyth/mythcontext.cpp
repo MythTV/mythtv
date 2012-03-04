@@ -15,7 +15,7 @@ using namespace std;
 #include "mythcontext.h"
 #include "exitcodes.h"
 #include "oldsettings.h"
-#include "util.h"
+#include "mythutil.h"
 #include "remotefile.h"
 #include "mythplugin.h"
 #include "backendselect.h"

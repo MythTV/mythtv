@@ -10,7 +10,7 @@
 
 
 #include <mythdbcon.h>
-#include <util.h>
+#include <mythutil.h>
 #include <mythdb.h>
 
 #include <mythcontext.h>

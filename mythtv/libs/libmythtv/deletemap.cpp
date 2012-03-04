@@ -576,6 +576,8 @@ uint64_t DeleteMap::GetNearestMark(
         for (; it != m_deleteMap.end(); ++it)
             if (it.key() > frame)
                 return it.key();
+        if (hasMark)
+            *hasMark = false;
     }
     else
     {
@@ -587,8 +589,6 @@ uint64_t DeleteMap::GetNearestMark(
             result = it.key();
         }
     }
-    if (hasMark)
-        *hasMark = false;
     return result;
 }
 

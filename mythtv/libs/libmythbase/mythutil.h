@@ -1,5 +1,5 @@
-#ifndef UTIL_H_
-#define UTIL_H_
+#ifndef MYTHUTIL_H_
+#define MYTHUTIL_H_
 
 #include <algorithm>
 using namespace std;
@@ -143,4 +143,4 @@ inline void rdtsc(uint64_t &x)
 inline void rdtsc(uint64_t &x) { x = 0ULL; }
 #endif // !MMX
 
-#endif // UTIL_H_
+#endif // MYTHUTIL_H_

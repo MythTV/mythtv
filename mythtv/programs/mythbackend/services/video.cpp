@@ -37,7 +37,7 @@
 #include "storagegroup.h"
 #include "remotefile.h"
 #include "globals.h"
-#include "util.h"
+#include "mythutil.h"
 #include "serviceUtil.h"
 
 /////////////////////////////////////////////////////////////////////////////

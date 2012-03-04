@@ -13,7 +13,7 @@ using namespace std;
 #include <QMutexLocker>
 
 #include "requesthandler/deletethread.h"
-#include "util.h"
+#include "mythutil.h"
 #include "mythdb.h"
 #include "mythcorecontext.h"
 #include "mythlogging.h"

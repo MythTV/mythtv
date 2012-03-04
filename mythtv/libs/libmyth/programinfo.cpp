@@ -22,7 +22,7 @@ using namespace std;
 
 // MythTV headers
 #include "programinfo.h"
-#include "util.h"
+#include "mythutil.h"
 #include "mythcorecontext.h"
 #include "dialogbox.h"
 #include "remoteutil.h"

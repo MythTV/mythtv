@@ -18,7 +18,7 @@
 #include "internetContent.h"
 
 #include "mythcorecontext.h"
-#include "util.h"
+#include "mythutil.h"
 #include "mythsystem.h"
 #include "mythdirs.h"
 

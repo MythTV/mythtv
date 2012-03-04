@@ -30,7 +30,7 @@
 #include "compat.h"
 #include "mythversion.h"
 #include "mythcorecontext.h"
-#include "util.h"
+#include "mythutil.h"
 #include "serviceUtil.h"
 
 /////////////////////////////////////////////////////////////////////////////
