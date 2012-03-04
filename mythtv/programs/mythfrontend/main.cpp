@@ -36,7 +36,6 @@ using namespace std;
 #include "globalsettings.h"
 #include "audiogeneralsettings.h"
 #include "grabbersettings.h"
-#include "profilegroup.h"
 #include "playgroup.h"
 #include "networkcontrol.h"
 #include "dvdringbuffer.h"
@@ -909,11 +908,6 @@ static void TVMenuCallback(void *data, QString &selection)
     else if (sel == "setup_keys")
     {
         startKeysSetup();
-    }
-    else if (sel == "settings recording")
-    {
-        ProfileGroupEditor editor;
-        editor.exec();
     }
     else if (sel == "settings playgroup")
     {

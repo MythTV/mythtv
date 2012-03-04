@@ -38,6 +38,7 @@
 #include "mythsystemevent.h"
 #include "expertsettingseditor.h"
 #include "commandlineparser.h"
+#include "profilegroup.h"
 
 using namespace std;
 
@@ -100,6 +101,11 @@ static void SetupMenuCallback(void* data, QString& selection)
     {
         CardInputEditor cie;
         cie.exec();
+    }
+    else if (sel == "recording profile")
+    {
+        ProfileGroupEditor editor;
+        editor.exec();
     }
     else if (sel == "channel editor")
     {
