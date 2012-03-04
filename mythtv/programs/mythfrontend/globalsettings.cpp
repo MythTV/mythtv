@@ -2683,10 +2683,8 @@ static HostLineEdit *UDPNotifyPort()
     HostLineEdit *ge = new HostLineEdit("UDPNotifyPort");
     ge->setLabel(QObject::tr("UDP notify port"));
     ge->setValue("6948");
-    ge->setHelpText(QObject::tr("MythTV will listen for "
-                    "connections from the \"mythtvosd\" or \"mythudprelay\" "
-                    "programs on this port. For additional information, see "
-                    "http://www.mythtv.org/wiki/MythNotify ."));
+    ge->setHelpText(QObject::tr("MythTV will listen for connections "
+                    "from the \"mythutil\" program on this port."));
     return ge;
 }
 
