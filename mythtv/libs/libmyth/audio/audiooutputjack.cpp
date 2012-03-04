@@ -14,7 +14,7 @@ using namespace std;
 
 #include "mythcorecontext.h"
 #include "audiooutputjack.h"
-#include "mythutil.h"
+#include "util.h"
 
 #define LOC QString("AOJack: ")
 

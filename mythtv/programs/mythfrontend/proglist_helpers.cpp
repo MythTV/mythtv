@@ -8,7 +8,7 @@
 #include "mythuibutton.h"
 #include "channelutil.h"
 #include "proglist.h"
-#include "mythutil.h"
+#include "util.h"
 
 PhrasePopup::PhrasePopup(MythScreenStack *parentStack,
                          ProgLister *parent,

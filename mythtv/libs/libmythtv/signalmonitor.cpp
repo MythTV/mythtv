@@ -17,7 +17,7 @@
 extern "C" {
 #include "libavcodec/avcodec.h"
 }
-#include "mythutil.h"
+#include "util.h"
 
 #ifdef USING_DVB
 #   include "dvbsignalmonitor.h"

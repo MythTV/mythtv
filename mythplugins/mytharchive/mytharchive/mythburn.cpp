@@ -25,7 +25,7 @@
 #include <mythuicheckbox.h>
 #include <mythuibuttonlist.h>
 #include <mythuiprogressbar.h>
-#include <mythutil.h>
+#include <util.h>
 #include <mythsystem.h>
 #include <exitcodes.h>
 

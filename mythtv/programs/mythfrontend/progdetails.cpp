@@ -13,7 +13,7 @@
 #include "mythmainwindow.h"
 
 #include "progdetails.h"
-#include <mythutil.h>
+#include <util.h>
 
 
 #define LASTPAGE 2

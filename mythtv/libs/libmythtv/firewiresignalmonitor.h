@@ -15,7 +15,7 @@ using namespace std;
 #include "dtvsignalmonitor.h"
 #include "firewiredevice.h"
 #include "mthread.h"
-#include "mythutil.h"
+#include "util.h"
 
 class FirewireChannel;
 

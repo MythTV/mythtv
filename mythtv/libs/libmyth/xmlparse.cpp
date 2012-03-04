@@ -11,7 +11,7 @@ using namespace std;
 #include <QFile>
 
 #include "xmlparse.h"
-#include "mythutil.h"
+#include "util.h"
 #include "mythcorecontext.h"
 #include "mythfontproperties.h"
 #include "mythuihelper.h"

@@ -22,7 +22,7 @@ using namespace std;
 #include <mythdb.h>
 #include <compat.h>
 #include <mythmediamonitor.h>
-#include <mythutil.h>
+#include <util.h>
 #include <mythsystem.h>
 #include <exitcodes.h>
 

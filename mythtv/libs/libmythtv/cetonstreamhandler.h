@@ -17,7 +17,7 @@
 // MythTV headers
 #include "DeviceReadBuffer.h"
 #include "streamhandler.h"
-#include "mythutil.h"
+#include "util.h"
 
 class CetonStreamHandler;
 class DeviceReadBuffer;

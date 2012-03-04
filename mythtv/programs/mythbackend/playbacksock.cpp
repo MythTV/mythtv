@@ -8,7 +8,7 @@ using namespace std;
 #include "mainserver.h"
 
 #include "mythcorecontext.h"
-#include "mythutil.h"
+#include "util.h"
 #include "inputinfo.h"
 
 #define LOC QString("PlaybackSock: ")

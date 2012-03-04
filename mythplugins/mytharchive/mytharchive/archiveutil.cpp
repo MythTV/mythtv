@@ -19,7 +19,7 @@ using namespace std;
 #include <programinfo.h>
 #include <mythmainwindow.h>
 #include <mythdialogbox.h>
-#include <mythutil.h>
+#include <util.h>
 #include <mythsystem.h>
 #include <exitcodes.h>
 #include <mythlogging.h>

@@ -12,7 +12,7 @@
 #include "mthreadpool.h"
 #include "mythlogging.h"
 #include "exitcodes.h"
-#include "mythutil.h" // for checkTimeZone()
+#include "util.h" // for checkTimeZone()
 
 class Reconnect : public QRunnable
 {

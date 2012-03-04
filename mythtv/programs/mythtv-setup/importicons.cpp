@@ -9,7 +9,7 @@
 #include "mythlogging.h"
 #include "httpcomms.h"
 #include "importicons.h"
-#include "mythutil.h"
+#include "util.h"
 
 // MythUI
 #include "mythuitext.h"

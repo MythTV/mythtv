@@ -21,7 +21,7 @@ using namespace std;
 #include "jobqueue.h"
 #include "mythcorecontext.h"
 #include "mythdb.h"
-#include "mythutil.h"
+#include "util.h"
 #include "compat.h"
 #include "mythdirs.h"
 #include "programinfo.h"

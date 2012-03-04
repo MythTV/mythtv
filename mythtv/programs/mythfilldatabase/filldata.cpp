@@ -22,7 +22,7 @@ using namespace std;
 #include "mythlogging.h"
 #include "mythdbcon.h"
 #include "compat.h"
-#include "mythutil.h"
+#include "util.h"
 #include "mythdirs.h"
 #include "mythdb.h"
 #include "mythsystem.h"

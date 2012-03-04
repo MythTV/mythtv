@@ -36,7 +36,7 @@ extern "C" {
 #include "programinfo.h"
 #include "recordingprofile.h"
 #include "tv_rec.h"
-#include "mythutil.h"
+#include "util.h"
 #include "cardutil.h"
 
 // ivtv header

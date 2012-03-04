@@ -15,7 +15,7 @@ using namespace std;
 #include <mythdb.h>
 #include <mythversion.h>
 #include <remoteutil.h>
-#include <mythutil.h>
+#include <util.h>
 #include <netutils.h>
 #include <mythtranslation.h>
 #include <mythconfig.h>

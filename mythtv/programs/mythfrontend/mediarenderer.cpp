@@ -16,7 +16,7 @@
 #include "upnpscanner.h"
 #include "mythfexml.h"
 #include "compat.h"
-#include "mythutil.h"
+#include "util.h"
 
 #include "serviceHosts/frontendServiceHost.h"
 

@@ -12,7 +12,7 @@
 #include <mythprogressdialog.h>
 #include <mythdownloadmanager.h>
 #include <mythlogging.h>
-#include <mythutil.h>
+#include <util.h>
 
 // mythmusic
 #include "metadata.h"

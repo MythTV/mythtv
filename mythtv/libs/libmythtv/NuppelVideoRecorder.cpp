@@ -20,7 +20,7 @@
 #include <iostream>
 using namespace std;
 
-#include "mythutil.h"
+#include "util.h"
 #include "mythcontext.h"
 #include "NuppelVideoRecorder.h"
 #include "channelbase.h"

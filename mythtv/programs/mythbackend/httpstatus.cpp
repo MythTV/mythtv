@@ -39,7 +39,7 @@
 #include "exitcodes.h"
 #include "jobqueue.h"
 #include "upnp.h"
-#include <mythutil.h>
+#include <util.h>
 
 /////////////////////////////////////////////////////////////////////////////
 //

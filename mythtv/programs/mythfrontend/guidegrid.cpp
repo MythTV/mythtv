@@ -23,7 +23,7 @@ using namespace std;
 #include "tv_play.h"
 #include "tv_rec.h"
 #include "customedit.h"
-#include "mythutil.h"
+#include "util.h"
 #include "remoteutil.h"
 #include "channelutil.h"
 #include "cardutil.h"

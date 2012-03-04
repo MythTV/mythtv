@@ -29,7 +29,7 @@ using namespace std;
 // MythTV
 #include "mythdeque.h"
 #include "tv.h"
-#include "mythutil.h"
+#include "util.h"
 #include "programinfo.h"
 #include "channelutil.h"
 #include "videoouttypes.h"

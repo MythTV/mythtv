@@ -16,7 +16,7 @@ using namespace std;
 
 #include "mythdeque.h"
 #include "mythwidgets.h"
-#include "mythutil.h"
+#include "util.h"
 #include "mythdialogs.h"
 #include "mythwidgets.h"
 #include "mythfontproperties.h"

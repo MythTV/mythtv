@@ -42,7 +42,7 @@ using namespace std;
 #include "mythcorecontext.h"
 #include "fifowriter.h"
 #include "filtermanager.h"
-#include "mythutil.h"
+#include "util.h"
 #include "livetvchain.h"
 #include "decoderbase.h"
 #include "nuppeldecoder.h"

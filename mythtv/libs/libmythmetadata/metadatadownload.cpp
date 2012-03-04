@@ -11,7 +11,7 @@
 #include "mythsystem.h"
 #include "storagegroup.h"
 #include "metadatadownload.h"
-#include "mythutil.h"
+#include "util.h"
 #include "remotefile.h"
 #include "mythlogging.h"
 

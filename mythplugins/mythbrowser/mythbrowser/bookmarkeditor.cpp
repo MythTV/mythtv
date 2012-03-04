@@ -1,7 +1,7 @@
 
 // myth
 #include <mythmainwindow.h>
-#include <mythutil.h>
+#include <util.h>
 #include <mythcontext.h>
 #include <mythdbcon.h>
 

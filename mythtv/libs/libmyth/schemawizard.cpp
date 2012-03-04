@@ -5,7 +5,7 @@
 #include "mythdialogbox.h"
 #include "mythcorecontext.h"
 #include "schemawizard.h"
-#include "mythutil.h"
+#include "util.h"
 
 #include "mythtimer.h"
 #include "mythlogging.h"

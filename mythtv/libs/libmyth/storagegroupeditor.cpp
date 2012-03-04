@@ -8,7 +8,7 @@
 #include "mythcorecontext.h"
 #include "mythdb.h"
 #include "mythlogging.h"
-#include "mythutil.h"
+#include "util.h"
 
 #define LOC QString("SGE(%1): ").arg(m_groupname)
 

@@ -20,7 +20,7 @@ using namespace std;
 #include "recordinginfo.h"
 #include "recordingrule.h"
 #include "scheduledrecording.h"
-#include "mythutil.h"
+#include "util.h"
 #include "mythcorecontext.h"
 #include "dialogbox.h"
 #include "remoteutil.h"

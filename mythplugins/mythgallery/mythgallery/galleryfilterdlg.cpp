@@ -23,7 +23,7 @@ using namespace std;
 #include <QList>
 
 // MythTV headers
-#include <mythutil.h>
+#include <util.h>
 #include <mythdbcon.h>
 #include <mythuibuttonlist.h>
 #include <mythcontext.h>

@@ -36,7 +36,7 @@ using namespace std;
 // MythTV plugin headers
 #include <mythuihelper.h>
 #include <mythcontext.h>
-#include <mythutil.h>
+#include <util.h>
 
 // MythGallery headers
 #include "singleview.h"

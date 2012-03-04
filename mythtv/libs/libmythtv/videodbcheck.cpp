@@ -11,7 +11,7 @@
 #include "mythcorecontext.h"
 #include "mythlogging.h"
 #include "remotefile.h"
-#include "mythutil.h"
+#include "util.h"
 #include "libmythmetadata/videoutils.h"
 
 const QString minimumVideoDatabaseVersion = "1016";

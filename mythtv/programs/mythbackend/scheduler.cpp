@@ -31,7 +31,7 @@ using namespace std;
 #include "mainserver.h"
 #include "remoteutil.h"
 #include "backendutil.h"
-#include "mythutil.h"
+#include "util.h"
 #include "exitcodes.h"
 #include "mythcontext.h"
 #include "mythdb.h"

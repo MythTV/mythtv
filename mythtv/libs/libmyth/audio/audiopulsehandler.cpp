@@ -5,7 +5,7 @@
 #include "audiopulsehandler.h"
 #include "mythlogging.h"
 #include "mthread.h"
-#include "mythutil.h"
+#include "util.h"
 
 #define LOC QString("Pulse: ")
 

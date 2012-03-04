@@ -5,7 +5,7 @@ using namespace std;
 #include "mythcorecontext.h"
 #include "mythlogging.h"
 #include "programinfo.h"
-#include "mythutil.h"
+#include "util.h"
 
 static void merge_overlapping(RecordingGaps &gaps);
 static double score_gaps(const ProgramInfo*, const RecordingGaps&);

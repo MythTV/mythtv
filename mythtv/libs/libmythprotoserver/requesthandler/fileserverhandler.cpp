@@ -5,7 +5,7 @@ using namespace std;
 #include <QWriteLocker>
 #include <QReadLocker>
 
-#include "mythutil.h"
+#include "util.h"
 #include "mythdb.h"
 #include "ringbuffer.h"
 #include "mythsocket.h"

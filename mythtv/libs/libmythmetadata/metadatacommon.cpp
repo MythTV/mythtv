@@ -6,7 +6,7 @@
 #include "metadatacommon.h"
 #include "mythlogging.h"
 #include "mythlocale.h"
-#include "mythutil.h"
+#include "util.h"
 
 // null constructor
 MetadataLookup::MetadataLookup(void) :

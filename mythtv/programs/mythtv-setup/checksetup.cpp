@@ -10,7 +10,7 @@
 
 #include "mythdb.h"
 #include "mythcorecontext.h"
-#include "mythutil.h"
+#include "util.h"
 #include "checksetup.h"
 
 /// Check that a directory path exists and is writable

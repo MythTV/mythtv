@@ -14,7 +14,7 @@ using namespace std;
 #include "mythcontext.h"
 #include "mythdb.h"
 #include "mythversion.h"
-#include "mythutil.h"
+#include "util.h"
 #include "mythtranslation.h"
 
 #include "mythconfig.h"

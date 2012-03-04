@@ -58,7 +58,7 @@ using namespace std;
 #include "mythlogging.h"
 #include "mythversion.h"
 #include "logging.h"
-#include "mythutil.h"
+#include "util.h"
 
 #define TERMWIDTH 79
 
