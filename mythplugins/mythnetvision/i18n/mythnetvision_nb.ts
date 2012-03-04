@@ -263,57 +263,57 @@
 <context>
     <name>ThemeUI</name>
     <message>
-        <location filename="themestrings.h" line="2"/>
+        <location filename="themestrings.h" line="5"/>
         <source>Internet Video Browser</source>
         <translation>Utforsker for Internettvideo</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="3"/>
+        <location filename="themestrings.h" line="6"/>
         <source>No sites configured!</source>
         <translation>Ingen nettsteder er definert!</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="4"/>
+        <location filename="themestrings.h" line="7"/>
         <source>Videos - Gallery</source>
         <translation>Videoer - Galleri</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="5"/>
+        <location filename="themestrings.h" line="8"/>
         <source>Videos - Tree</source>
         <translation>Videoer - Tre</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="6"/>
+        <location filename="themestrings.h" line="9"/>
         <source>%DATE%, %TIME%</source>
-        <translation></translation>
+        <translation>%DATE%, %TIME%</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="7"/>
+        <location filename="themestrings.h" line="10"/>
         <source>No search scripts found!  This usually indicates missing prerequisites.</source>
         <translation>Ingen søkeskript er funnet!  Dette betyr som oftest at noen prerekvisitter mangler.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="8"/>
+        <location filename="themestrings.h" line="11"/>
         <source>Page %1</source>
         <translation>Side %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="9"/>
+        <location filename="themestrings.h" line="12"/>
         <source>Search:</source>
         <translation>Søk:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="10"/>
+        <location filename="themestrings.h" line="13"/>
         <source>Author: %1</source>
         <translation>Forfatter: %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="11"/>
+        <location filename="themestrings.h" line="14"/>
         <source>Edit/Add a New RSS Feed</source>
         <translation>Rediger/Legg til en ny RSS nyhetsmating</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="12"/>
+        <location filename="themestrings.h" line="15"/>
         <source>Type the URL to an RSS 2.0 media feed below.  If editing an existing feed, modify any of the values you like.  Press &quot;Save&quot; to save/subscribe.
 
 For new subscriptions, you can simply enter the URL and click &quot;Save.&quot;</source>
@@ -322,197 +322,231 @@ For new subscriptions, you can simply enter the URL and click &quot;Save.&quot;<
 For nye abonnement, så trenger du kun å taste inn URL og klikke &quot;Lagre&quot;</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="13"/>
+        <location filename="themestrings.h" line="16"/>
         <source>Title:</source>
         <translation>Tittel:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="14"/>
+        <location filename="themestrings.h" line="17"/>
         <source>URL:</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="15"/>
+        <location filename="themestrings.h" line="18"/>
         <source>Author:</source>
         <translation>Forfatter:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="16"/>
+        <location filename="themestrings.h" line="19"/>
         <source>Description:</source>
         <translation>Beskrivelse:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="17"/>
+        <location filename="themestrings.h" line="20"/>
         <source>Download video from this feed automatically</source>
         <translation>Last ned video fra denne matingen automatisk</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="18"/>
+        <location filename="themestrings.h" line="21"/>
         <source>Select to change image...</source>
         <translation>Velg for å endre bilde...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="19"/>
+        <location filename="themestrings.h" line="22"/>
         <source>Save</source>
         <translation>Lagre</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="20"/>
+        <location filename="themestrings.h" line="23"/>
         <source>Cancel</source>
         <translation>Avbryt</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="21"/>
+        <location filename="themestrings.h" line="24"/>
         <source>You haven&apos;t added any Sites/RSS Feeds yet!  To add a site, press MENU, then choose &quot;Scan/Manage Subscriptions,&quot; then &quot;Manage Site Subscriptions.&quot;</source>
         <translation>Du har ikke lagt til noen nettsteder/RSS nyhetsmatinger enda!  For å legge til et nettsted, trykk MENY, velg så &quot;Søk/Administrer abonnement&quot;, og til slutt &quot;Administrer nettstedsabonnementer&quot;</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="22"/>
+        <location filename="themestrings.h" line="25"/>
         <source>Manage Subscriptions</source>
         <translation>Administrer abonnement</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="23"/>
+        <location filename="themestrings.h" line="26"/>
         <source>Choose the sites you wish to browse/search.</source>
         <translation>Velg hvilke steder du vil utforske eller søke i.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="24"/>
+        <location filename="themestrings.h" line="27"/>
         <source>New Site</source>
         <translation>Nytt sted</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="25"/>
+        <location filename="themestrings.h" line="28"/>
         <source>Edit Site</source>
         <translation>Rediger sted</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="26"/>
+        <location filename="themestrings.h" line="29"/>
         <source>Unsubscribe</source>
         <translation>Avbryt abonnement</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="27"/>
+        <location filename="themestrings.h" line="30"/>
         <source>Search Net Videos</source>
         <translation>Søk nettvideoer</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="28"/>
+        <location filename="themestrings.h" line="31"/>
         <source>Search Term:</source>
         <translation>Søketerm:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="29"/>
+        <location filename="themestrings.h" line="32"/>
         <source>Size: %1</source>
         <translation>Størrelse: %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="30"/>
+        <location filename="themestrings.h" line="33"/>
         <source>Description: %1</source>
         <translation>Beskrivelse: %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="31"/>
+        <location filename="themestrings.h" line="34"/>
         <source>Can&apos;t find any search scripts!  This usually indicates missing search script prerequisites.  Try running a script from the command line.</source>
         <translation>Ingen søkeskript er funnet!  Dette betyr som oftest at noen prerekvisitter mangler.  Prøv å kjøre et skript fra kommandolinjen.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="32"/>
+        <location filename="themestrings.h" line="35"/>
         <source>Manage Site Subscriptions</source>
         <translation>Administrer nettstedsabonnement</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="33"/>
+        <location filename="themestrings.h" line="36"/>
         <source>Edit</source>
         <translation>Rediger</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="34"/>
+        <location filename="themestrings.h" line="37"/>
         <source>New</source>
         <translation>Ny</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="35"/>
+        <location filename="themestrings.h" line="38"/>
         <source>Remove</source>
         <translation>Fjern</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="36"/>
+        <location filename="themestrings.h" line="39"/>
         <source>Manage RSS Subscriptions</source>
         <translation>Administrer RSS-abonnement</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="37"/>
+        <location filename="themestrings.h" line="40"/>
         <source>Feed Name:</source>
         <translation>Navn på mating:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="38"/>
+        <location filename="themestrings.h" line="41"/>
         <source>Feed URL:</source>
         <translation>URL for mating:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="39"/>
+        <location filename="themestrings.h" line="42"/>
         <source>Site Description:</source>
         <translation>Beskrivelse av nettsted:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="40"/>
+        <location filename="themestrings.h" line="43"/>
         <source>Feed Author:</source>
         <translation>Forfatter for mating:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="41"/>
+        <location filename="themestrings.h" line="44"/>
         <source>Download this feed automatically</source>
         <translation>Last ned denne matingen automatisk</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="42"/>
+        <location filename="themestrings.h" line="45"/>
         <source>Choose Image</source>
         <translation>Velg bilde</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="43"/>
+        <location filename="themestrings.h" line="46"/>
         <source>Browse Net Videos</source>
         <translation>Utforsk nettvideoer</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="44"/>
+        <location filename="themestrings.h" line="47"/>
         <source>Posted: %1</source>
         <translation>Lagt opp: %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="45"/>
+        <location filename="themestrings.h" line="48"/>
         <source>Runtime</source>
         <translation>Varighet</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="46"/>
+        <location filename="themestrings.h" line="49"/>
         <source>Author</source>
         <translation>Forfatter</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="47"/>
+        <location filename="themestrings.h" line="50"/>
         <source>Rating</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="48"/>
+        <location filename="themestrings.h" line="51"/>
         <source>Search Internet Video</source>
         <translation>Søk etter Internettvideo</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="49"/>
+        <location filename="themestrings.h" line="52"/>
+        <source>Type the URL to an RSS 2.0 media feed below.  If editing an existing feed,modify any of the values you like.  Press &quot;Save&quot; to save/subscribe.
+
+For new subscriptions,you can simply enter the URL and click &quot;Save.&quot;</source>
+        <translation>Skriv inn UTL for en RSS 2.0 mediemating under.  Hvis du redigerer en eksisterende mating, så kan du endre hvilke verdier du ønsker.  Trykk &quot;Lagre&quot; for å lagre/abonnere.
+
+For nye abonnement, så trenger du kun å taste inn URL og klikke &quot;Lagre&quot;</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="53"/>
+        <source>Internet Video List</source>
+        <translation>Internett videoliste</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="54"/>
+        <source>You haven&apos;t added any Sites/RSS Feeds yet!  To add a site,press MENU,then choose &quot;Scan/Manage Subscriptions,&quot; then &quot;Manage Site Subscriptions.&quot;</source>
+        <translation>Du har ikke lagt til noen nettsteder/RSS nyhetsmatinger enda!  For å legge til et nettsted, trykk MENY, velg så &quot;Søk/Administrer abonnement&quot;, og til slutt &quot;Administrer nettstedsabonnementer&quot;</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="55"/>
+        <source>User Rating: %1</source>
+        <translation>Brukerrating: %1</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="56"/>
+        <source>By: %1</source>
+        <translation>Av: %1</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="57"/>
+        <source>Internet Video Gallery</source>
+        <translation>Internett videogalleri</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="58"/>
         <source>Search popular video sites</source>
         <translation>Søk i populære nettsteder</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="50"/>
+        <location filename="themestrings.h" line="59"/>
         <source>Browse Internet Video</source>
         <translation>Utforsk Internettvideo</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="51"/>
+        <location filename="themestrings.h" line="60"/>
         <source>Browse highlights and entire sites</source>
         <translation>Utforsk høydepunkter og hele nettsteder</translation>
     </message>
