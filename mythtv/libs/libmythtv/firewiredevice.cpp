@@ -402,9 +402,6 @@ vector<AVCInfo> FirewireDevice::GetSTBList(void)
 
 static void fw_init(QMap<uint64_t,QString> &id_to_model)
 {
-    // WARNING: Please update 6200ch.c or sa3250ch.c as well
-    //          when updating this function.
-
     const uint64_t sa_vendor_ids[] =
     {
         0x0a73,    0x0f21,    0x11e6,    0x14f8,    0x1692,    0x1868,
@@ -426,7 +423,7 @@ static void fw_init(QMap<uint64_t,QString> &id_to_model)
     {
         /* DCH-3200, DCX-3200 */
         0x1c11,    0x1cfb,    0x1fc4,    0x23a3,    0x23ee,    0x25f1,
-        0xfa01,    0x25f1,    0x25f2,
+        0xfa01,    0x25f1,    0x25f2,  0xcc7d37,
         /* DCX-3432 */
         0x24a0,
         /* DCH-3416 */
@@ -462,6 +459,7 @@ static void fw_init(QMap<uint64_t,QString> &id_to_model)
         id_to_model[motorola_vendor_ids[i] << 32 | 0xf740] = "DCX-3200";
         id_to_model[motorola_vendor_ids[i] << 32 | 0xf804] = "DCX-3200";
         id_to_model[motorola_vendor_ids[i] << 32 | 0xfa03] = "DCX-3200";
+        id_to_model[motorola_vendor_ids[i] << 32 | 0xfa05] = "DCX-3200";
         id_to_model[motorola_vendor_ids[i] << 32 | 0xfa07] = "DCX-3200";
         id_to_model[motorola_vendor_ids[i] << 32 | 0x24a1] = "DCX-3200";
         id_to_model[motorola_vendor_ids[i] << 32 | 0xea05] = "DCX-3432";
