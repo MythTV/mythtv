@@ -3075,7 +3075,8 @@ EOF
         # Workaround compile errors from missing gmtime_r/localtime_r/uint def
         CFLAGS=`echo $CFLAGS | sed 's/-D_POSIX_C_SOURCE=200112//'`
         ###### Standard ffmpeg configure stuff follows:
-        SHFLAGS='-dynamiclib -Wl,-single_module -Wl,-install_name,$(SHLIBDIR)/$(SLIBNAME),-current_version,$(LIBVERSION),-compatibility_version,$(LIBMAJOR) -Wl,-read_only_relocs,suppress'
+        SHFLAGS='-headerpad_max_install_names -dynamiclib -Wl,-single_module -Wl,-install_name,$(SLIBNAME),-current_version,$(LIBVERSION),-compatibility_version,$(LIBMAJOR)'
+        enabled x86_32 && append SHFLAGS -Wl,-read_only_relocs,suppress
         strip="${strip} -x"
         add_ldflags -Wl,-dynamic,-search_paths_first
         SLIBSUF=".dylib"
