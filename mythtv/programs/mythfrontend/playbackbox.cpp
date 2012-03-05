@@ -4043,7 +4043,7 @@ void PlaybackBox::customEvent(QEvent *event)
         }
         else if (message == "AVAILABILITY" && me->ExtraDataCount() == 8)
         {
-            const uint kMaxUIWaitTime = 100; // ms
+            const uint kMaxUIWaitTime = 10000; // ms
             QStringList list = me->ExtraDataList();
             QString key = list[0];
             CheckAvailabilityType cat =
