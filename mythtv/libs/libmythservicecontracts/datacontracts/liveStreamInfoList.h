@@ -21,7 +21,7 @@ class SERVICE_PUBLIC LiveStreamInfoList : public QObject
     // A Q_CLASSINFO entry with "<PropName>_type" as the key
     // and the type name as the value
 
-    Q_CLASSINFO( "LiveStreamInfos_type", "DTC::LiveStreamInfo");
+    Q_CLASSINFO( "LiveStreamInfos", "type=DTC::LiveStreamInfo");
 
     Q_PROPERTY( QVariantList LiveStreamInfos READ LiveStreamInfos DESIGNABLE true )
 

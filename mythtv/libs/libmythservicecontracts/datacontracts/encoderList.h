@@ -31,7 +31,7 @@ class SERVICE_PUBLIC EncoderList : public QObject
     // A Q_CLASSINFO entry with "<PropName>_type" as the key
     // and the type name as the value
 
-    Q_CLASSINFO( "Encoders_type", "DTC::Encoder");
+    Q_CLASSINFO( "Encoders", "type=DTC::Encoder");
 
     Q_PROPERTY( QVariantList Encoders READ Encoders DESIGNABLE true )
 

@@ -22,9 +22,9 @@ class SERVICE_PUBLIC LogMessageList : public QObject
     // A Q_CLASSINFO entry with "<PropName>_type" as the key
     // and the type name as the value
 
-    Q_CLASSINFO( "HostNames_type",    "DTC::LabelValue");
-    Q_CLASSINFO( "Applications_type", "DTC::LabelValue");
-    Q_CLASSINFO( "LogMessages_type",  "DTC::LogMessage");
+    Q_CLASSINFO( "HostNames", "type=DTC::LabelValue");
+    Q_CLASSINFO( "Applications", "type=DTC::LabelValue");
+    Q_CLASSINFO( "LogMessages", "type=DTC::LogMessage");
 
     Q_PROPERTY( QVariantList HostNames    READ HostNames    DESIGNABLE true )
     Q_PROPERTY( QVariantList Applications READ Applications DESIGNABLE true )

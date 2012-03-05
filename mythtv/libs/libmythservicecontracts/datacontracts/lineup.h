@@ -81,7 +81,7 @@ class SERVICE_PUBLIC LineupList : public QObject
     // A Q_CLASSINFO entry with "<PropName>_type" as the key
     // and the type name as the value
 
-    Q_CLASSINFO( "Lineups_type", "DTC::Lineup");
+    Q_CLASSINFO( "Lineups", "type=DTC::Lineup");
 
     Q_PROPERTY( QVariantList Lineups READ Lineups DESIGNABLE true )
 

@@ -32,7 +32,7 @@ class SERVICE_PUBLIC ArtworkInfoList : public QObject
     // A Q_CLASSINFO entry with "<PropName>_type" as the key
     // and the type name as the value
 
-    Q_CLASSINFO( "ArtworkInfos_type", "DTC::ArtworkInfo");
+    Q_CLASSINFO( "ArtworkInfos", "type=DTC::ArtworkInfo");
 
     Q_PROPERTY( QVariantList ArtworkInfos     READ ArtworkInfos DESIGNABLE true )
 
