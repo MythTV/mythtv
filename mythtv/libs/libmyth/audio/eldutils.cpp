@@ -157,9 +157,9 @@ static int cea_sampling_frequencies[8] = {
 };
 
 #define GRAB_BITS(buf, byte, lowbit, bits)            \
-({                                                    \
-    (buf[byte] >> (lowbit)) & ((1 << (bits)) - 1);    \
-})
+(                                                    \
+    (buf[byte] >> (lowbit)) & ((1 << (bits)) - 1)    \
+)
 
 ELD::ELD(const char *buf, int size)
 {

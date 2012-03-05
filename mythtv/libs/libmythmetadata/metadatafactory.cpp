@@ -170,7 +170,7 @@ void MetadataFactory::Lookup(MetadataLookup *lookup)
         m_lookupthread->addLookup(lookup);
 }
 
-MetadataLookupList MetadataFactory::SynchronousLookup(QString title,
+META_PUBLIC MetadataLookupList MetadataFactory::SynchronousLookup(QString title,
                                                       QString subtitle,
                                                       QString inetref,
                                                       int season,
