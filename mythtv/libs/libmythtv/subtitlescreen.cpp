@@ -1063,6 +1063,7 @@ bool FormattedTextChunk::Split(FormattedTextChunk &newChunk)
             QString("Failed to split chunk '%1'").arg(text));
         return false;
     }
+    newChunk.parent = parent;
     newChunk.format = format;
     newChunk.text = text.mid(lastSpace + 1).trimmed() + ' ';
     text = text.left(lastSpace).trimmed();
