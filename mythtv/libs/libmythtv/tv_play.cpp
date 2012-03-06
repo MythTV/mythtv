@@ -7063,14 +7063,14 @@ void TV::ChangeChannel(PlayerContext *ctx, uint chanid, const QString &chan)
     bool getit = false;
     if (ctx->recorder)
     {
-        if (ctx->pseudoLiveTVState == kPseudoRecording)
+        if ((ctx->pseudoLiveTVState == kPseudoRecording) || chanid)
         {
             getit = true;
         }
         else if (chanid)
         {
-            getit = ctx->recorder->ShouldSwitchToAnotherCard(
-                QString::number(chanid));
+            tunable_on = IsTunableOn(ctx, chanid, true, false);
+            getit = !tunable_on.contains(ctx->GetCardID());
         }
         else
         {
