@@ -2243,7 +2243,7 @@ void MythCommandLineParser::addUPnP(void)
 }
 
 /** \brief Canned argument definition for all logging options, including
- *  --verbose, --logfile, --logpath, --quiet, --loglevel, --syslog
+ *  --verbose, --logpath, --quiet, --loglevel, --syslog
  *  and --nodblog
  */
 void MythCommandLineParser::addLogging(
@@ -2264,16 +2264,13 @@ void MythCommandLineParser::addLogging(
         "This option takes an unsigned value corresponding "
         "to the bitwise log verbosity operator.")
                 ->SetGroup("Logging");
-    add(QStringList( QStringList() << "-l" << "--logfile" << "--logpath" ), 
-        "logpath", "",
-        "Writes logging messages to a file at logpath.\n"
-        "If a directory is given, a logfile will be created in that "
-        "directory with a filename of applicationName.date.pid.log.\n"
-        "If a full filename is given, that file will be used.\n"
+    add("--logpath", "logpath", "",
+        "Writes logging messages to a file in the directory logpath with "
+        "filenames in the format: applicationName.date.pid.log.\n"
         "This is typically used in combination with --daemon, and if used "
         "in combination with --pidfile, this can be used with log "
         "rotators, using the HUP call to inform MythTV to reload the "
-        "file (currently disabled).", "")
+        "file", "")
                 ->SetGroup("Logging");
     add(QStringList( QStringList() << "-q" << "--quiet"), "quiet", 0,
         "Don't log to the console (-q).  Don't log anywhere (-q -q)", "")
@@ -2301,7 +2298,7 @@ void MythCommandLineParser::addPIDFile(void)
             "Write PID of application to filename.",
             "Write the PID of the currently running process as a single "
             "line to this file. Used for init scripts to know what "
-            "process to terminate, and with --logfile and log rotators "
+            "process to terminate, and with log rotators "
             "to send a HUP signal to process to have it re-open files.");
 }
 
@@ -2324,8 +2321,7 @@ void MythCommandLineParser::addInFile(bool addOutFile)
         add("--outfile", "outfile", "", "Output file URI", "");
 }
 
-/** \brief Helper utility for logging interface to pull path to log file
- *  from --logfile, or generate one from --logpath
+/** \brief Helper utility for logging interface to pull path from --logpath
  */
 QString MythCommandLineParser::GetLogFilePath(void)
 {
@@ -2339,20 +2335,18 @@ QString MythCommandLineParser::GetLogFilePath(void)
     QString filepath;
 
     QFileInfo finfo(logfile);
-    if (finfo.isDir())
+    if (!finfo.isDir())
     {
-        SetValue("islogpath", true);
-        logdir  = finfo.filePath();
-        logfile = QCoreApplication::applicationName() + "." +
-                  QDateTime::currentDateTime().toString("yyyyMMddhhmmss") +
-                  QString(".%1").arg(pid) + ".log";
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("%1 is not a directory, disabling logfiles")
+            .arg(logfile));
+	return QString();
     }
-    else
-    {
-        SetValue("islogpath", false);
-        logdir  = finfo.path();
-        logfile = finfo.fileName();
-    }
+
+    logdir  = finfo.filePath();
+    logfile = QCoreApplication::applicationName() + "." +
+              QDateTime::currentDateTime().toString("yyyyMMddhhmmss") +
+              QString(".%1").arg(pid) + ".log";
 
     SetValue("logdir", logdir);
     SetValue("logfile", logfile);
@@ -2455,7 +2449,7 @@ int MythCommandLineParser::ConfigureLogging(QString mask, unsigned int progress)
         QString("Enabled verbose msgs: %1").arg(verboseString));
 
     QString logfile = GetLogFilePath();
-    bool propagate = toBool("islogpath");
+    bool propagate = !logfile.isEmpty();
 
     if (toBool("daemon"))
         quiet = max(quiet, 1);
