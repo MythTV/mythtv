@@ -246,7 +246,9 @@ bool Wsdl::GetWSDL( HTTPRequest *pRequest )
     oPort.setAttribute( "binding", QString("tns:BasicHttpBinding_%1").arg( sClassName ));
 
     oNode = createElement( "soap:address" );
-    oNode.setAttribute( "location", "http://localhost:6544/" + m_pServiceHost->GetServiceControlURL() );
+    oNode.setAttribute( "location", "http://" + 
+                                    pRequest->m_mapHeaders[ "host" ] + "/" +
+                                    m_pServiceHost->GetServiceControlURL() );
 
     oPort.appendChild( oNode );
     m_oService.appendChild( oPort );
