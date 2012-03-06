@@ -139,7 +139,7 @@ void ServerPool::SelectDefaultListen(bool force)
             {
                 // IPv6 address is not defined, populate one
                 // put in additional block filtering here?
-                if (ip.isInSubnet(QHostAddress::parseSubnet("fe80::/10")))
+                if (!ip.isInSubnet(QHostAddress::parseSubnet("fe80::/10")))
                 {
                     LOG(VB_GENERAL, LOG_DEBUG,
                             QString("Adding '%1' to address list.")
