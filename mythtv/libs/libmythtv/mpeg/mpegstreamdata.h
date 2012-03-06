@@ -33,6 +33,11 @@ typedef vector<const ProgramAssociationTable*> pat_vec_t;
 typedef QMap<uint, pat_vec_t>                  pat_map_t;
 typedef QMap<uint, ProgramAssociationTable*>   pat_cache_t;
 
+typedef ConditionalAccessTable*                cat_ptr_t;
+typedef vector<const ConditionalAccessTable*>  cat_vec_t;
+typedef QMap<uint, cat_vec_t>                  cat_map_t;
+typedef QMap<uint, ConditionalAccessTable*>    cat_cache_t;
+
 typedef ProgramMapTable*                pmt_ptr_t;
 typedef vector<const ProgramMapTable*>  pmt_vec_t;
 typedef QMap<uint, pmt_vec_t>           pmt_map_t;
@@ -171,6 +176,21 @@ class MTV_PUBLIC MPEGStreamData : public EITSource
         return *it;
     }
 
+    void SetVersionCAT(uint tsid, int version, uint last_section)
+    {
+        if (VersionCAT(tsid) == version)
+            return;
+        _cat_version[tsid] = version;
+        init_sections(_cat_section_seen[tsid], last_section);
+    }
+    int  VersionCAT(uint tsid) const
+    {
+        const QMap<uint, int>::const_iterator it = _cat_version.find(tsid);
+        if (it == _cat_version.end())
+            return -1;
+        return *it;
+    }
+
     void SetVersionPMT(uint program_num, int version, uint last_section)
     {
         if (VersionPMT(program_num) == version)
@@ -191,6 +211,10 @@ class MTV_PUBLIC MPEGStreamData : public EITSource
     bool PATSectionSeen(   uint tsid, uint section) const;
     bool HasAllPATSections(uint tsid) const;
 
+    void SetCATSectionSeen(uint tsid, uint section);
+    bool CATSectionSeen(   uint tsid, uint section) const;
+    bool HasAllCATSections(uint tsid) const;
+
     void SetPMTSectionSeen(uint prog_num, uint section);
     bool PMTSectionSeen(   uint prog_num, uint section) const;
     bool HasAllPMTSections(uint prog_num) const;
@@ -202,6 +226,10 @@ class MTV_PUBLIC MPEGStreamData : public EITSource
     bool HasCachedAnyPAT(uint tsid) const;
     bool HasCachedAnyPAT(void) const;
 
+    bool HasCachedAllCAT(uint tsid) const;
+    bool HasCachedAnyCAT(uint tsid) const;
+    bool HasCachedAnyCAT(void) const;
+
     bool HasCachedAllPMT(uint program_num) const;
     bool HasCachedAnyPMT(uint program_num) const;
     bool HasCachedAllPMTs(void) const;
@@ -212,6 +240,11 @@ class MTV_PUBLIC MPEGStreamData : public EITSource
     pat_vec_t       GetCachedPATs(void) const;
     pat_map_t       GetCachedPATMap(void) const;
 
+    const cat_ptr_t GetCachedCAT(uint tsid, uint section_num) const;
+    cat_vec_t       GetCachedCATs(uint tsid) const;
+    cat_vec_t       GetCachedCATs(void) const;
+    cat_map_t       GetCachedCATMap(void) const;
+
     const pmt_ptr_t GetCachedPMT(uint program_num, uint section_num) const;
     pmt_vec_t GetCachedPMTs(void) const;
     pmt_map_t GetCachedPMTMap(void) const;
@@ -219,6 +252,8 @@ class MTV_PUBLIC MPEGStreamData : public EITSource
     virtual void ReturnCachedTable(const PSIPTable *psip) const;
     virtual void ReturnCachedPATTables(pat_vec_t&) const;
     virtual void ReturnCachedPATTables(pat_map_t&) const;
+    virtual void ReturnCachedCATTables(cat_vec_t&) const;
+    virtual void ReturnCachedCATTables(cat_map_t&) const;
     virtual void ReturnCachedPMTTables(pmt_vec_t&) const;
     virtual void ReturnCachedPMTTables(pmt_map_t&) const;
 
@@ -299,6 +334,7 @@ class MTV_PUBLIC MPEGStreamData : public EITSource
         { _partial_psip_packet_cache.remove(pid); }
     void DeletePartialPSIP(uint pid);
     void ProcessPAT(const ProgramAssociationTable *pat);
+    void ProcessCAT(const ConditionalAccessTable *cat);
     void ProcessPMT(const ProgramMapTable *pmt);
     void ProcessEncryptedPacket(const TSPacket&);
 
@@ -310,6 +346,7 @@ class MTV_PUBLIC MPEGStreamData : public EITSource
     void IncrementRefCnt(const PSIPTable *psip) const;
     virtual bool DeleteCachedTable(PSIPTable *psip) const;
     void CachePAT(const ProgramAssociationTable *pat);
+    void CacheCAT(const ConditionalAccessTable *pat);
     void CachePMT(const ProgramMapTable *pmt);
 
   protected:
@@ -351,9 +388,11 @@ class MTV_PUBLIC MPEGStreamData : public EITSource
 
     // Table versions
     QMap<uint, int>           _pat_version;
+    QMap<uint, int>           _cat_version;
     QMap<uint, int>           _pmt_version;
 
     sections_map_t            _pat_section_seen;
+    sections_map_t            _cat_section_seen;
     sections_map_t            _pmt_section_seen;
 
     // PSIP construction
@@ -363,6 +402,7 @@ class MTV_PUBLIC MPEGStreamData : public EITSource
     bool                             _cache_tables;
     mutable QMutex                   _cache_lock;
     mutable pat_cache_t              _cached_pats;
+    mutable cat_cache_t              _cached_cats;
     mutable pmt_cache_t              _cached_pmts;
     mutable psip_refcnt_map_t        _cached_ref_cnt;
     mutable psip_refcnt_map_t        _cached_slated_for_deletion;
