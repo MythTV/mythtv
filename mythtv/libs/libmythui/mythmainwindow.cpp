@@ -2601,18 +2601,17 @@ void MythMainWindow::IdleTimeout(void)
         LOG(VB_GENERAL, LOG_NOTICE, QString("Entering standby mode after "
                                         "%1 minutes of inactivity")
                                         .arg(idletimeout));
+        EnterStandby(false);
 
         // HACK Prevent faked keypresses interrupting the transition to standby
         PauseIdleTimer(true);
         // HACK end
 
-        JumpTo("Main Menu");
+        JumpTo("Standby Mode");
 
         // HACK
         PauseIdleTimer(false);
         // HACK end
-
-        EnterStandby(false);
     }
 }
 
@@ -2637,6 +2636,8 @@ void MythMainWindow::ExitStandby(bool manual)
 {
     if (manual)
         PauseIdleTimer(false);
+    else
+        JumpTo("Main Menu");
 
     if (!d->standby)
         return;
