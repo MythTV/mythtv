@@ -4003,7 +4003,6 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
                                          DecodeType decodetype)
 {
     AVCodecContext *ctx = curstream->codec;
-    long long pts       = 0;
     int ret             = 0;
     int data_size       = 0;
     bool firstloop      = true;
@@ -4013,9 +4012,6 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
     int audIdx = selectedTrack[kTrackTypeAudio].av_stream_index;
     int audSubIdx = selectedTrack[kTrackTypeAudio].av_substream_index;
     avcodeclock->unlock();
-
-    if (pkt->dts != (int64_t)AV_NOPTS_VALUE)
-        pts = (long long)(av_q2d(curstream->time_base) * pkt->dts * 1000);
 
     AVPacket tmp_pkt;
     tmp_pkt.data = pkt->data;
