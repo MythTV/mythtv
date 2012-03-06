@@ -1919,6 +1919,7 @@ void MusicCommon::updatePlaylistStats(void)
         map["playlisttime"] = getTimeString(m_playlistPlayedTime + m_currentTime, m_playlistMaxTime);
         map["playlistplayedtime"] = getTimeString(m_playlistPlayedTime + m_currentTime, 0);
         map["playlisttotaltime"] = getTimeString(m_playlistMaxTime, 0);
+        map["playlistname"] = gPlayer->getPlaylist()->getName();
     }
     else
     {
@@ -1928,6 +1929,7 @@ void MusicCommon::updatePlaylistStats(void)
         map["playlisttime"] = "";
         map["playlistplayedtime"] = "";
         map["playlisttotaltime"] = "";
+        map["playlistname"] = "";
     }
 
     if (m_playlistProgressText)
