@@ -509,7 +509,7 @@ MythMainWindow::MythMainWindow(const bool useDB)
         idletime = STANDBY_TIMEOUT;
 
     d->idleTimer = new QTimer(this);
-    d->idleTimer->setSingleShot(true);
+    d->idleTimer->setSingleShot(false);
     d->idleTimer->setInterval(1000 * 60 * idletime); // 30 minutes
     connect(d->idleTimer, SIGNAL(timeout()), SLOT(IdleTimeout()));
     d->idleTimer->start();
