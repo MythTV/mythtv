@@ -159,7 +159,8 @@ void ServerPool::SelectDefaultListen(bool force)
         }
     }
 
-    if (!v4IsSet && !naList_4.isEmpty())
+    if (!v4IsSet && (config_v4 != QHostAddress::LocalHost)
+                 && !naList_4.isEmpty())
     {
         LOG(VB_GENERAL, LOG_CRIT, LOC + QString("Host is configured to listen "
                 "on %1, but address is not used on any local network "
@@ -167,13 +168,19 @@ void ServerPool::SelectDefaultListen(bool force)
     }
 
 #if !defined(QT_NO_IPV6)
-    if (!v6IsSet && !naList_6.isEmpty())
+    if (!v6IsSet && (config_v6 != QHostAddress::LocalHostIPv6)
+                 && !naList_6.isEmpty())
     {
         LOG(VB_GENERAL, LOG_CRIT, LOC + QString("Host is configured to listen "
                 "on %1, but address is not used on any local network "
                 "interfaces.").arg(PRETTYIP_(config_v6)));
     }
 #endif
+
+    // NOTE: there is no warning for the case where both defined addresses
+    //       are localhost, and neither are found. however this would also
+    //       mean there is no configured network at all, and should be
+    //       sufficiently rare a case as to not worry about it.
 }
 
 void ServerPool::RefreshDefaultListen(void)
