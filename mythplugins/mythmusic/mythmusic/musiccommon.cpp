@@ -129,8 +129,6 @@ bool MusicCommon::CreateCommon(void)
     UIUtilW::Assign(this, m_muteState,         "mutestate", &err);
 
     UIUtilW::Assign(this, m_playlistProgress,     "playlistprogress", &err);
-    UIUtilW::Assign(this, m_playlistProgressText, "playlistposition", &err);
-    UIUtilW::Assign(this, m_playlistLengthText,   "playlisttime", &err);
 
     UIUtilW::Assign(this, m_prevButton,    "prev", &err);
     UIUtilW::Assign(this, m_rewButton,     "rew", &err);
@@ -1933,12 +1931,6 @@ void MusicCommon::updatePlaylistStats(void)
     }
 
     SetTextFromMap(map);
-
-//     if (m_playlistProgressText)
-//         m_playlistProgressText->SetTextFromMap(map);
-//
-//     if (m_playlistLengthText)
-//         m_playlistLengthText->SetTextFromMap(map);
 
     if (m_playlistProgress)
         m_playlistProgress->SetUsed(m_playlistPlayedTime + m_currentTime);

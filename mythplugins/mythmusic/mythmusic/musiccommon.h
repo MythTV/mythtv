@@ -190,8 +190,6 @@ class MPUBLIC MusicCommon : public MythScreenType
     MythUIText            *m_volumeText;
 
     MythUIProgressBar     *m_playlistProgress;
-    MythUIText            *m_playlistProgressText;
-    MythUIText            *m_playlistLengthText;
 
     MythUIButton          *m_prevButton;
     MythUIButton          *m_rewButton;
