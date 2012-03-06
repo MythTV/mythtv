@@ -308,6 +308,8 @@ class AvFormatDecoder : public DecoderBase
     bool reordered_pts_detected;
     bool pts_selected;
 
+    bool force_dts_timestamps;
+
     PlayerFlags playerFlags;
     MythCodecID video_codec_id;
 
