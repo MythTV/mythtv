@@ -1932,11 +1932,13 @@ void MusicCommon::updatePlaylistStats(void)
         map["playlistname"] = "";
     }
 
-    if (m_playlistProgressText)
-        m_playlistProgressText->SetTextFromMap(map);
+    SetTextFromMap(map);
 
-    if (m_playlistLengthText)
-        m_playlistLengthText->SetTextFromMap(map);
+//     if (m_playlistProgressText)
+//         m_playlistProgressText->SetTextFromMap(map);
+//
+//     if (m_playlistLengthText)
+//         m_playlistLengthText->SetTextFromMap(map);
 
     if (m_playlistProgress)
         m_playlistProgress->SetUsed(m_playlistPlayedTime + m_currentTime);
