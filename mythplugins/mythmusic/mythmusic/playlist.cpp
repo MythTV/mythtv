@@ -546,7 +546,7 @@ void Playlist::loadPlaylist(QString a_name, QString a_host)
             rawSonglist = query.value(2).toString();
         }
         if (m_name == "default_playlist_storage")
-            m_name = "Unnamed Playlist";
+            m_name = QObject::tr("Default Playlist");
         if (m_name == "backup_playlist_storage")
             m_name = "and they should **REALLY** never see this";
     }
@@ -587,7 +587,7 @@ void Playlist::loadPlaylistByID(int id, QString a_host)
     }
 
     if (m_name == "default_playlist_storage")
-        m_name = "Unnamed Playlist";
+        m_name = QObject::tr("Default Playlist");
     if (m_name == "backup_playlist_storage")
         m_name = "and they should **REALLY** never see this";
 
