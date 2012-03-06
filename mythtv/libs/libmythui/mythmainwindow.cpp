@@ -2592,10 +2592,12 @@ void MythMainWindow::PauseIdleTimer(bool pause)
 
 void MythMainWindow::IdleTimeout(void)
 {
-    if (!d->standby)
+
+    int idletimeout = gCoreContext->GetNumSetting("FrontendIdleTimeout",
+                                                   STANDBY_TIMEOUT);
+
+    if (idletimeout > 0 && !d->standby)
     {
-        int idletimeout = gCoreContext->GetNumSetting("FrontendIdleTimeout",
-                                                       STANDBY_TIMEOUT);
         LOG(VB_GENERAL, LOG_NOTICE, QString("Entering standby mode after "
                                         "%1 minutes of inactivity")
                                         .arg(idletimeout));

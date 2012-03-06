@@ -1664,6 +1664,22 @@ static HostCheckBox *UseVirtualKeyboard()
     return gc;
 }
 
+static HostSpinBox *FrontendIdleTimeout()
+{
+    HostSpinBox *gs = new HostSpinBox("FrontendIdleTimeout", 0, 360, 15);
+    gs->setLabel(QObject::tr("Idle time before entering standby mode (minutes)"));
+    gs->setValue(90);
+    gs->setHelpText(QObject::tr("Number of minutes to wait when the frontend "
+                                "is idle before entering standby mode. Standby "
+                                "mode allows the backend to power down if "
+                                "configured to do so. Any remote or mouse input "
+                                "will cause the countdown to start again and/or "
+                                "exit idle mode. Video playback suspends the "
+                                "countdown. A value of zero prevents the "
+                                "frontend automatically entering standby."));
+    return gs;
+}
+
 static HostComboBox *OverrideExitMenu()
 {
     HostComboBox *gc = new HostComboBox("OverrideExitMenu");
@@ -3292,6 +3308,7 @@ MainGeneralSettings::MainGeneralSettings()
     VerticalConfigurationGroup *shutdownSettings =
         new VerticalConfigurationGroup(true, true, false, false);
     shutdownSettings->setLabel(QObject::tr("Shutdown/Reboot Settings"));
+    shutdownSettings->addChild(FrontendIdleTimeout());
     shutdownSettings->addChild(OverrideExitMenu());
     shutdownSettings->addChild(HaltCommand());
     shutdownSettings->addChild(RebootCommand());
