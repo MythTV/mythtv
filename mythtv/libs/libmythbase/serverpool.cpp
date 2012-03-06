@@ -257,7 +257,7 @@ void ServerPool::close(void)
         server = m_tcpServers.takeLast();
         server->disconnect();
         server->close();
-        delete server;
+        server->deleteLater();
     }
 
     QUdpSocket *socket;
@@ -266,15 +266,16 @@ void ServerPool::close(void)
         socket = m_udpSockets.takeLast();
         socket->disconnect();
         socket->close();
-        delete socket;
+        socket->deleteLater();
     }
+
+    m_listening = false;
 }
 
 bool ServerPool::listen(QList<QHostAddress> addrs, quint16 port,
                         bool requireall)
 {
     m_port = port;
-    m_listening = true;
     QList<QHostAddress>::const_iterator it;
 
     for (it = addrs.begin(); it != addrs.end(); ++it)
@@ -300,7 +301,7 @@ bool ServerPool::listen(QList<QHostAddress> addrs, quint16 port,
                     .arg(PRETTYIP(it)).arg(port));
             close();
             server->disconnect();
-            delete server;
+            server->deleteLater();
             return false;
         }
         else
@@ -308,13 +309,14 @@ bool ServerPool::listen(QList<QHostAddress> addrs, quint16 port,
             LOG(VB_GENERAL, LOG_WARNING, QString("Failed listening on TCP %1:%2")
                     .arg(PRETTYIP(it)).arg(port));
             server->disconnect();
-            delete server;
+            server->deleteLater();
         }
     }
 
     if (m_tcpServers.size() == 0)
         return false;
 
+    m_listening = true;
     return true;
 }
 
@@ -336,7 +338,6 @@ bool ServerPool::bind(QList<QHostAddress> addrs, quint16 port,
                       bool requireall)
 {
     m_port = port;
-    m_listening = true;
     QList<QHostAddress>::const_iterator it;
 
     for (it = addrs.begin(); it != addrs.end(); ++it)
@@ -357,7 +358,7 @@ bool ServerPool::bind(QList<QHostAddress> addrs, quint16 port,
                     .arg(PRETTYIP(it)).arg(port));
             close();
             socket->disconnect();
-            delete socket;
+            socket->deleteLater();
             return false;
         }
         else
@@ -365,13 +366,14 @@ bool ServerPool::bind(QList<QHostAddress> addrs, quint16 port,
             LOG(VB_GENERAL, LOG_WARNING, QString("Failed binding to UDP %1:%2")
                     .arg(PRETTYIP(it)).arg(port));
             socket->disconnect();
-            delete socket;
+            socket->deleteLater();
         }
     }
 
     if (m_udpSockets.size() == 0)
         return false;
 
+    m_listening = true;
     return true;
 }
 
