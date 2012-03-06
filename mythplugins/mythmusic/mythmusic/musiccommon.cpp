@@ -1640,9 +1640,15 @@ void MusicCommon::customEvent(QEvent *event)
                     {
                         QString artFile = mdata->getAlbumArtFile();
                         if (artFile.isEmpty())
-                            item->SetImage("mm_nothumb.png");
+                        {
+                            item->SetImage("");
+                            item->SetImage("", "coverart");
+                        }
                         else
+                        {
                             item->SetImage(mdata->getAlbumArtFile());
+                            item->SetImage(mdata->getAlbumArtFile(), "coverart");
+                        }
                     }
                 }
             }
@@ -1808,12 +1814,18 @@ void MusicCommon::playlistItemVisible(MythUIButtonListItem *item)
         {
             QString artFile = mdata->getAlbumArtFile();
             if (artFile.isEmpty())
-                item->SetImage("mm_nothumb.png");
+            {
+                item->SetImage("");
+                item->SetImage("", "coverart");
+            }
             else
+            {
                 item->SetImage(mdata->getAlbumArtFile());
+                item->SetImage(mdata->getAlbumArtFile(), "coverart");
+            }
         }
         else
-            item->SetImage("mm_nothumb.png");
+            item->SetImage("");
     }
 }
 
