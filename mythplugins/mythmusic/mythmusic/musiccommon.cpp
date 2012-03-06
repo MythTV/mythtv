@@ -7,6 +7,7 @@ using namespace std;
 
 // Qt includes
 #include <QApplication>
+#include <QLocale>
 
 // mythtv
 #include <mythuitextedit.h>
@@ -1911,9 +1912,13 @@ void MusicCommon::updatePlaylistStats(void)
     QHash<QString, QString> map;
     if (gPlayer->isPlaying() && trackCount > 0)
     {
-        map["playlistposition"] = QString("%1 of %2").arg(m_currentTrack + 1).arg(trackCount);
-        map["playlistcurrent"] = QString("%1").arg(m_currentTrack + 1);
-        map["playlistcount"] = QString("%1").arg(trackCount);
+        QString playlistcurrent = QLocale::system().toString(m_currentTrack + 1);
+        QString playlisttotal = QLocale::system().toString(trackCount);
+
+        map["playlistposition"] = QString("%1 of %2").arg(playlistcurrent)
+                                                     .arg(playlisttotal);
+        map["playlistcurrent"] = playlistcurrent;
+        map["playlistcount"] = playlisttotal;
         map["playlisttime"] = getTimeString(m_playlistPlayedTime + m_currentTime, m_playlistMaxTime);
         map["playlistplayedtime"] = getTimeString(m_playlistPlayedTime + m_currentTime, 0);
         map["playlisttotaltime"] = getTimeString(m_playlistMaxTime, 0);
