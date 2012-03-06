@@ -1323,6 +1323,9 @@ static void InitJumpPoints(void)
      REG_JUMP(QT_TRANSLATE_NOOP("MythControls", "Previously Recorded"),
          "", "", startPrevious);
 
+     REG_JUMP(QT_TRANSLATE_NOOP("MythControls", "Standby Mode"),
+         "", "", standbyScreen);
+
      // Video
 
      REG_JUMP(JUMP_VIDEO_DEFAULT, QT_TRANSLATE_NOOP("MythControls",
