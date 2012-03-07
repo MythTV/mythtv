@@ -35,7 +35,7 @@ void MythCDROMDarwin::setSpeed(int speed)
 void MythCDROMDarwin::setSpeed(const char *device, int speed)
 {
     int       fd;
-    QString   raw = "/dev/r"; raw += device;
+    QString   raw = device;
     uint16_t  spd = speed;
 
 
