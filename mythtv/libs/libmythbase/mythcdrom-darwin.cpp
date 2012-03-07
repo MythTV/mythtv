@@ -53,7 +53,7 @@ void MythCDROMDarwin::setSpeed(const char *device, int speed)
         close(fd);
         return;
     }
-    LOG(VB_MEDIA, LOG_INFO, LOC + ":setSpeed() - CD/DVD Speed Set to " +
+    LOG(VB_MEDIA, LOG_INFO, LOC + ":setSpeed() - CD/DVD speed now " +
                             QString::number(spd));
     close(fd);
 }
