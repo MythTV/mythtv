@@ -20,7 +20,7 @@ LIBS += -lmythavformat
 LIBS += -lmythavcodec
 LIBS += -lmythavcore
 LIBS += -lmythavutil
-LIBS += -ltag -logg -lvorbisfile -lvorbis -lvorbisenc -lFLAC -lmp3lame
+LIBS += -ltag -logg -lvorbisfile -lvorbis -lvorbisenc -lFLAC -lmp3lame -lz
 
 cdaudio: LIBS += -lcdaudio
 paranoia:LIBS += -lcdda_paranoia -lcdda_interface

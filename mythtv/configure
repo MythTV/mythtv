@@ -4767,7 +4767,7 @@ EOF
 
 # Should be done on all platforms, but for the time being limit it to mac only
 if enabled darwin; then
-  echo "QMAKE_LFLAGS+=\"$LDFLAGS\"" >> $TMPMAK
+  echo "QMAKE_LFLAGS+=\"$LDFLAGS\"" >> $MYTH_CONFIG_MAK
 fi
 
 cp_if_changed $TMPH $MYTH_CONFIG_H
