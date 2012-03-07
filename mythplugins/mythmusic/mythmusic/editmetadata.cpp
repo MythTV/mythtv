@@ -162,7 +162,6 @@ void EditMetadataCommon::showSaveMenu()
         menu->AddButton(tr("Save Changes"), SLOT(saveAll()));
 
     menu->AddButton(tr("Exit/Do Not Save"), SLOT(cleanupAndClose()));
-    menu->AddButton(tr("Cancel"));
 
     popupStack->AddScreen(menu);
 }
@@ -498,7 +497,6 @@ void EditMetadataDialog::showMenu(void )
     menu->AddButton(tr("Search Internet For Album Image"));
     menu->AddButton(tr("Search Internet For Genre Image"));
     menu->AddButton(tr("Check Track Length"));
-    menu->AddButton(tr("Cancel"));
 
     popupStack->AddScreen(menu);
 }
@@ -1090,8 +1088,6 @@ void EditAlbumartDialog::showMenu(void )
         if (m_metadata->getTagger()->supportsEmbeddedImages())
             menu->AddButton(tr("Copy Image To Tag"));
     }
-
-    menu->AddButton(tr("Cancel"));
 
     popupStack->AddScreen(menu);
 }

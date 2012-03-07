@@ -22,7 +22,7 @@ class SERVICE_PUBLIC VideoMultiplexList : public QObject
     // A Q_CLASSINFO entry with "<PropName>_type" as the key
     // and the type name as the value
 
-    Q_CLASSINFO( "VideoMultiplexes_type", "DTC::VideoMultiplex");
+    Q_CLASSINFO( "VideoMultiplexes", "type=DTC::VideoMultiplex");
 
     Q_PROPERTY( int          StartIndex     READ StartIndex      WRITE setStartIndex     )
     Q_PROPERTY( int          Count          READ Count           WRITE setCount          )

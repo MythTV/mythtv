@@ -31,7 +31,7 @@ class SERVICE_PUBLIC CaptureCardList : public QObject
     // A Q_CLASSINFO entry with "<PropName>_type" as the key
     // and the type name as the value
 
-    Q_CLASSINFO( "CaptureCards_type", "DTC::CaptureCard");
+    Q_CLASSINFO( "CaptureCards", "type=DTC::CaptureCard");
 
     Q_PROPERTY( QVariantList CaptureCards READ CaptureCards DESIGNABLE true )
 

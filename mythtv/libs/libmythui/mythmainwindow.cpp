@@ -509,7 +509,7 @@ MythMainWindow::MythMainWindow(const bool useDB)
         idletime = STANDBY_TIMEOUT;
 
     d->idleTimer = new QTimer(this);
-    d->idleTimer->setSingleShot(true);
+    d->idleTimer->setSingleShot(false);
     d->idleTimer->setInterval(1000 * 60 * idletime); // 30 minutes
     connect(d->idleTimer, SIGNAL(timeout()), SLOT(IdleTimeout()));
     d->idleTimer->start();
@@ -1442,6 +1442,8 @@ void MythMainWindow::ExitToMainMenu(void)
         MythScreenType *screen = toplevel->GetTopScreen();
         if (screen && screen->objectName() != QString("mainmenu"))
         {
+            MythEvent xe("EXIT_TO_MENU");
+            gCoreContext->dispatch(xe);
             if (screen->objectName() == QString("video playback window"))
             {
                 MythEvent *me = new MythEvent("EXIT_TO_MENU");
@@ -2590,25 +2592,26 @@ void MythMainWindow::PauseIdleTimer(bool pause)
 
 void MythMainWindow::IdleTimeout(void)
 {
-    if (!d->standby)
+
+    int idletimeout = gCoreContext->GetNumSetting("FrontendIdleTimeout",
+                                                   STANDBY_TIMEOUT);
+
+    if (idletimeout > 0 && !d->standby)
     {
-        int idletimeout = gCoreContext->GetNumSetting("FrontendIdleTimeout",
-                                                       STANDBY_TIMEOUT);
         LOG(VB_GENERAL, LOG_NOTICE, QString("Entering standby mode after "
                                         "%1 minutes of inactivity")
                                         .arg(idletimeout));
+        EnterStandby(false);
 
         // HACK Prevent faked keypresses interrupting the transition to standby
         PauseIdleTimer(true);
         // HACK end
 
-        JumpTo("Main Menu");
+        JumpTo("Standby Mode");
 
         // HACK
         PauseIdleTimer(false);
         // HACK end
-
-        EnterStandby(false);
     }
 }
 
@@ -2633,6 +2636,8 @@ void MythMainWindow::ExitStandby(bool manual)
 {
     if (manual)
         PauseIdleTimer(false);
+    else
+        JumpTo("Main Menu");
 
     if (!d->standby)
         return;

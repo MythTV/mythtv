@@ -8,7 +8,9 @@
 #include "mythlogging.h"
 #include "tv_rec.h"
 #include "linuxfirewiredevice.h"
+#if USING_OSX_FIREWIRE
 #include "darwinfirewiredevice.h"
+#endif
 #include "firewirechannel.h"
 
 #define LOC QString("FireChan(%1): ").arg(GetDevice())

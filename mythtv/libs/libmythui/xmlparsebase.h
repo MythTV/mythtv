@@ -40,7 +40,7 @@ class MUI_PUBLIC XMLParseBase
 
     static void ParseChildren(
         const QString &filename, QDomElement &element,
-        MythUIType *parent, bool showWarnings, QMap<QString, QString> &dependsMap);
+        MythUIType *parent, bool showWarnings);
 
     // parse one and return it.
     static MythUIType *ParseUIType(
@@ -48,7 +48,7 @@ class MUI_PUBLIC XMLParseBase
         QDomElement &element, const QString &type,
         MythUIType *parent, MythScreenType *screen,
         bool showWarnings,
-        QMap<QString, QString> &dependsMap);
+        QMap<QString, QString> &parentDependsMap);
 
     static bool WindowExists(const QString &xmlfile, const QString &windowname);
     static bool LoadWindowFromXML(const QString &xmlfile,
@@ -56,8 +56,7 @@ class MUI_PUBLIC XMLParseBase
                                   MythUIType *parent);
 
     static bool LoadBaseTheme(void);
-    static bool LoadBaseTheme(const QString &baseTheme,
-                                QMap<QString, QString> &dependsMap);
+    static bool LoadBaseTheme(const QString &baseTheme);
 
     static bool CopyWindowFromBase(const QString &windowname,
                                    MythScreenType *win);
@@ -65,8 +64,7 @@ class MUI_PUBLIC XMLParseBase
   private:
     static bool doLoad(const QString &windowname, MythUIType *parent,
                        const QString &filename,
-                       bool onlyLoadWindows, bool showWarnings,
-                       QMap<QString, QString> &dependsMap);
+                       bool onlyLoadWindows, bool showWarnings);
     static void ConnectDependants(MythUIType * parent,
                                     QMap<QString, QString> &dependsMap);
 

@@ -11,7 +11,7 @@ using namespace std;
 #include "mythdb.h"
 #include "mythlogging.h"
 #include "mythversion.h"
-#include "util.h"
+#include "mythmiscutil.h"
 
 #include "config.h"
 #include "remoteutil.h"

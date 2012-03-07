@@ -51,7 +51,6 @@ MythCCExtractorPlayer::MythCCExtractorPlayer(
     PlayerFlags flags, bool showProgress, const QString &fileName) :
     MythPlayer(flags),
     m_curTime(0),
-    m_curTimeShift(-1),
     m_myFramesPlayed(0),
     m_showProgress(showProgress),
     m_fileName(fileName)
@@ -74,9 +73,11 @@ void MythCCExtractorPlayer::OnGotNewFrame(void)
     videoOutput->StartDisplayingFrame();
     {
         VideoFrame *frame = videoOutput->GetLastShownFrame();
-        if (m_curTimeShift < 0)
-            m_curTimeShift = frame->timecode;
-        m_curTime = frame->timecode - m_curTimeShift;
+        double fps = frame->frame_rate;
+        if (fps <= 0)
+            fps = GetDecoder()->GetFPS();
+        double duration = 1 / fps + frame->repeat_pict * 0.5 / fps;
+        m_curTime += duration * 1000;
         videoOutput->DoneDisplayingFrame(frame);
     }
 
@@ -208,7 +209,7 @@ void MythCCExtractorPlayer::IngestSubtitle(
 {
     bool update_last =
         !list.isEmpty() &&
-        m_curTime == list.back().start_time &&
+        (int64_t)m_curTime == list.back().start_time &&
         !content.isEmpty();
 
     if (update_last)
@@ -224,14 +225,14 @@ void MythCCExtractorPlayer::IngestSubtitle(
         // Finish previous subtitle.
         if (!last_one.text.isEmpty() && last_one.length < 0)
         {
-            list.back().length = m_curTime - last_one.start_time;
+            list.back().length = (int64_t)m_curTime - last_one.start_time;
         }
 
         // Put new one if it isn't empty.
         if (!content.isEmpty())
         {
             OneSubtitle new_one;
-            new_one.start_time = m_curTime;
+            new_one.start_time = (int64_t)m_curTime;
             new_one.text = content;
 
             list.push_back(new_one);
@@ -685,7 +686,7 @@ void MythCCExtractorPlayer::IngestDVBSubtitles(void)
             (*subit).reader->FreeAVSubtitle(subtitle);
 
             OneSubtitle sub;
-            sub.start_time = subtitle.start_display_time - m_curTimeShift;
+            sub.start_time = subtitle.start_display_time;
             sub.length =
                 subtitle.end_display_time - subtitle.start_display_time;
 

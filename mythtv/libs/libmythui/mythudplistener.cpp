@@ -19,10 +19,8 @@ MythUDPListener::MythUDPListener()
             this,         SLOT(Process(const QByteArray, QHostAddress,
                                        quint16)));
 
-    QList<QHostAddress> addrs = gCoreContext->MythHostAddress();
-    addrs << QHostAddress::Broadcast;
-    // TODO: Poll local subnet broadcast address from
-    // QNetworkInterface::addressEntries
+    QList<QHostAddress> addrs = ServerPool::DefaultListen();
+    addrs << ServerPool::DefaultBroadcast();
 
     if (!m_socketPool->bind(addrs,
             gCoreContext->GetNumSetting("UDPNotifyPort", 0), false))

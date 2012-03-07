@@ -24,7 +24,7 @@ using namespace std;
 
 #include "mythcorecontext.h"
 #include "audiooutputoss.h"
-#include "util.h"
+#include "mythmiscutil.h"
 
 AudioOutputOSS::AudioOutputOSS(const AudioSettings &settings) :
     AudioOutputBase(settings),

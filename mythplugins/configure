@@ -4,7 +4,7 @@
 #
 
 ###
-# functions from ffmpeg'sconfigure
+# functions from ffmpeg's configure
 
 log(){
     echo "$@" >> $logfile
@@ -92,6 +92,179 @@ die_unknown(){
     exit 1
 }
 
+die(){
+    echolog "$@"
+    cat <<EOF
+
+If you think configure made a mistake, make sure that you are using the latest
+version of MythTV from git.  If the latest version fails, report the problem to the
+mythtv-dev@mythtv.org mailing list or IRC #mythtv on irc.freenode.net
+EOF
+cat <<EOF
+Include the log file "$logfile" produced by configure as this will help
+solving the problem.
+EOF
+    exit 1
+}
+
+append(){
+    var=$1
+    shift
+    eval "$var=\"\$$var $*\""
+}
+
+prepend(){
+    var=$1
+    shift
+    eval "$var=\"$* \$$var\""
+}
+
+check_cmd(){
+    log "$@"
+    "$@" >> $logfile 2>&1
+}
+
+filter_cflags=echo
+filter_cppflags=echo
+filter_cxxflags=echo
+filter_cxxppflags=echo
+
+check_cc(){
+    log check_cc "$@"
+    cat > $TMPC
+    log_file $TMPC
+    check_cmd $CC $CPPFLAGS $CFLAGS "$@" -c -o $TMPO $TMPC
+}
+
+check_cpp(){
+    log check_cpp "$@"
+    cat > $TMPC
+    log_file $TMPC
+    check_cmd $CC $CPPFLAGS $CFLAGS "$@" -E -o $TMPO $TMPC
+}
+
+check_ld(){
+    log check_ld "$@"
+    flags=''
+    libs=''
+    for f; do
+        test "${f}" = "${f#-l}" && flags="$flags $f" || libs="$libs $f"
+    done
+    check_cc $($filter_cflags $flags) || return
+    check_cmd $LD $LDFLAGS $flags -o $TMPE $TMPO $libs
+}
+
+check_header(){
+    log check_header "$@"
+    header=$1
+    shift
+    check_cpp "$@" <<EOF
+#include <$header>
+int x;
+EOF
+}
+
+check_func(){
+    log check_func "$@"
+    func=$1
+    shift
+    check_ld "$@" <<EOF
+extern int $func();
+int main(void){ $func(); }
+EOF
+}
+
+check_func_headers(){
+    log check_func_headers "$@"
+    headers=$1
+    func=$2
+    shift 2
+    incs=""
+    for hdr in $headers; do
+        incs="$incs
+#include <$hdr>"
+    done
+    check_ld "$@" <<EOF
+$incs
+int main(int argc, char **argv){
+    return (long) $func;
+}
+EOF
+}
+
+check_lib(){
+    log check_lib "$@"
+    header="$1"
+    func="$2"
+    shift 2
+    check_header $header && check_func $func "$@"
+}
+
+check_lib2(){
+    log check_lib2 "$@"
+    headers="$1"
+    func="$2"
+    shift 2
+    check_func_headers "$headers" $func "$@"
+}
+
+#CXX related tests
+check_header_cxx(){
+    log check_header_cxx "$@"
+    header=$1
+    shift
+    check_cxx "$@" <<EOF
+#include <$header>
+int x;
+EOF
+}
+
+add_ldflags(){
+    append LDFLAGS "$@"
+}
+
+add_cxxflags(){
+    append ECXXFLAGS "$@"
+}
+
+check_cxx(){
+    log check_cxx "$@"
+    cat > $TMPCXX
+    log_file $TMPCXX
+    check_cmd $CXX $CXXPPFLAGS $ECXXFLAGS "$@" -c -o $TMPO $TMPCXX
+}
+
+check_ld_cxx(){
+    log check_ld_cxx "$@"
+    flags=''
+    libs=''
+    for f; do
+        test "${f}" = "${f#-l}" && flags="$flags $f" || libs="$libs $f"
+    done
+    check_cxx $($filter_cxxflags $flags) || return
+    check_cmd $CXX $LDFLAGS $flags -o $TMPE $TMPO $libs
+}
+
+check_func_cxx(){
+    log check_func_cxx "$@"
+    func=$1
+    header=$2
+    shift 2
+    disable $(echo $func | sed -e 's/:://g')
+    check_ld_cxx "$@" <<EOF
+#include <$header>
+int main(void){ $func(); }
+EOF
+}
+
+check_lib_cxx(){
+    log check_lib_cxx "$@"
+    header="$1"
+    func="$2"
+    shift 2
+    check_header_cxx $header && check_func_cxx $func $header "$@"
+}
+
 #
 #    default parameters for all plugins
 #
@@ -118,8 +291,14 @@ dcraw
 cdio
 "
 
-enable $PLUGIN_LIST $CONFIG_LIST
+DEPEND_LIST="
+vorbis
+flac
+mp3lame
+taglib
+"
 
+enable $PLUGIN_LIST $CONFIG_LIST $DEPEND_LIST
 
 prefix="/usr/local"
 libdir_name="lib"
@@ -276,125 +455,129 @@ for opt do
   esac
 done
 
-# set temporary file name
-if test ! -z "$TMPDIR" ; then
-    TMPDIR1="${TMPDIR}"
-elif test ! -z "$TEMPDIR" ; then
-    TMPDIR1="${TEMPDIR}"
-else
-    TMPDIR1="/tmp"
-fi
-
-TMPC="${TMPDIR1}/myth-comp-${RANDOM}-$$-${RANDOM}.c"
-TMPE="${TMPDIR1}/myth-conf-${RANDOM}-$$-${RANDOM}"
-
-
-has_library()
-{
-    if test -f /etc/ld.so.conf ; then
-        LIBPATHS=`cat /etc/ld.so.conf | grep -v "#" | grep -v "include"`
-    else
-        LIBPATHS=''
-    fi
-
-    LIBPATHS="$LIBPATHS `echo $LD_LIBRARY_PATH | sed s/':'/' '/g` "
-    # Mac OS X has a different variable for this:
-    LIBPATHS="$LIBPATHS `echo $DYLD_LIBRARY_PATH | sed s/':'/' '/g` "
-
-    # recurse down just one level, should be enough in most cases
-    if test -f /etc/ld.so.conf ; then
-        INCL=`cat /etc/ld.so.conf | grep -v "#" | grep  "^include"`
-        SRCH=`echo "$INCL" | sed '{ s/^include \//\//; s/^include /\/etc\//}'`
-        for x in $SRCH ; do
-            LP_APPEND=`cat $x | grep -v "#" | grep -v "^include"`
-            LIBPATHS="$LIBPATHS $LP_APPEND"
-        done
-    fi
-
-    LIBPATHS="`echo $LIBPATHS $prefix/$libdir_name $sysroot/$libdir_name $sysroot/usr/$libdir_name $sysroot/usr/local/$libdir_name $sysroot/usr/X11R6/$libdir_name | sed s/'\/ '/' '/g` "
-
-    HAS_IT="no"
-    for LIBPATH in $LIBPATHS ; do
-        if test x`ls $LIBPATH/$1* 2> /dev/null | head -n 1` != x"" ; then
-            HAS_IT="yes"
-        fi
-    done
-    expr $HAS_IT : "yes" > /dev/null
-}
-
-has_header()
-{
-    HPATHS="$prefix/include $sysroot/usr/local/include $sysroot/usr/include $sysroot/usr/include/g++-v3 $sysroot/usr/X11R6/include $sysroot/"
-    INCL=`echo $DYLD_LIBRARY_PATH $LD_LIBRARY_PATH | sed s/':'/' '/g`
-    HPATHS="$HPATHS `echo $INCL | sed s/$libdir_name/include/g` "
-
-    HAS_IT="no"
-    for HPATH in $HPATHS ; do
-        if test x`ls $HPATH/$1* 2> /dev/null | head -n 1` != x"" ; then
-            HAS_IT="yes"
-        fi
-    done
-    expr $HAS_IT : "yes" > /dev/null
-}
-
 check_py_lib(){
     log check_py_lib "$@"
+    lib=${1}
     check_cmd $python <<EOF
 from distutils.sysconfig import get_python_lib
 import sys
 sys.path.append(get_python_lib(prefix='${prefix}'))
 try:
-    import ${1}
+    import $lib
 except:
     sys.exit(1)
 sys.exit(0)
 EOF
 }
 
+# set temporary file name
+: ${TMPDIR:=$TEMPDIR}
+: ${TMPDIR:=$TMP}
+: ${TMPDIR:=/tmp}
+
+if ! check_cmd type mktemp; then
+    # simple replacement for missing mktemp
+    # NOT SAFE FOR GENERAL USE
+    mktemp(){
+        echo "${2%XXX*}.${HOSTNAME}.${UID}.$$"
+    }
+fi
+
+tmpfile(){
+    tmp=$(mktemp -u "${TMPDIR}/mythplugins_conf.XXXXXXXX")$2 &&
+    (set -C; exec > $tmp) 2>/dev/null ||
+    die "Unable to create temporary file in $TMPDIR."
+    append TMPFILES $tmp
+    eval $1=$tmp
+}
+
+trap 'rm -f -- $TMPFILES' EXIT
+trap exit HUP INT TERM
+
+tmpfile TMPC  .c
+tmpfile TMPE  $EXESUF
+tmpfile TMPH  .h
+tmpfile TMPO  .o
+tmpfile TMPS  .S
+tmpfile TMPV  .ver
+tmpfile TMPSH .sh
+tmpfile TMPCXX .cpp
+tmpfile TMPASM .asm
+tmpfile TMPMAK .mak
+
+unset -f mktemp
+
+# make sure we can execute files in $TMPDIR
+cat > $TMPSH 2>> $logfile <<EOF
+#! /bin/sh
+EOF
+chmod +x $TMPSH >> $logfile 2>&1
+if ! $TMPSH >> $logfile 2>&1; then
+    cat <<EOF
+Unable to create and execute files in $TMPDIR.  Set the TMPDIR environment
+variable to another directory and make sure that it is not mounted noexec.
+EOF
+    die "Sanity test failed."
+fi
+
 is_qmake4(){
     $1 --version 2>&1 | egrep -q -e "Qt version 4\.[5-9]\.[0-9]"
 }
 
+# bring in mythtv config
+if [ -e $prefix/include/mythtv/mythconfig.mak ] ; then
+    rm mythconfig.mak 2> /dev/null
+    ${ln_s} $prefix/include/mythtv/mythconfig.mak mythconfig.mak
+else
+    echo "ERROR: mythconfig.mak not found at $prefix/include/mythtv/mythconfig.mak"
+    echo "Did you make AND install MythTV first?"
+    echo "Are you using the correct prefix ($prefix)?"
+    echo "Bailing out!!"
+    exit
+fi
+
+#Set build env variables according to mythconfig.mak
+LD=$(cat mythconfig.mak | grep -e "^LD=")
+LD=${LD#LD=}
+CC=$(cat mythconfig.mak | grep -e "^CC=")
+CC=${CC#CC=}
+CFLAGS=$(cat mythconfig.mak | grep -e "^CFLAGS=")
+CFLAGS=${CFLAGS#CFLAGS=}
+CPPFLAGS=$(cat mythconfig.mak | grep -e "^CPPFLAGS=")
+CPPFLAGS=${CPPFLAGS#CPPFLAGS=}
+LDFLAGS=$(cat mythconfig.mak | grep -e "^LDFLAGS=")
+LDFLAGS=${LDFLAGS#LDFLAGS=}
+CXX=$(cat mythconfig.mak | grep -e "^QMAKE_CXX=")
+CXX=${CXX#QMAKE_CXX=}
+ECXXFLAGS=$(cat mythconfig.mak | grep -e "^ECXXFLAGS=")
+ECXXFLAGS=${ECXXFLAGS#ECXXFLAGS=}
+CXXPPFLAGS=$(cat mythconfig.mak | grep -e "^CXXPPFLAGS=")
+CXXPPFLAGS=${CXXPPFLAGS#CXXPPFLAGS=}
+OPENGLV=$(cat mythconfig.mak | grep -e "^CONFIG_OPENGL_VIDEO=yes")
+
 if ! is_qmake4 $qmake; then
-    is_qmake4 qmake-qt4 && qmake=qmake-qt4 || die "qmake for Qt4.5 or newer not found.\nPlease specify the correct qmake with --qmake="
+    is_qmake4 qmake-qt4 && qmake=qmake-qt4 || die "qmake for Qt4.6 or newer not found.\nPlease specify the correct qmake with --qmake="
 fi
 
-if ! expr $($qmake -query QT_VERSION) : "4\.[5-9]\.[0-9]" >/dev/null; then
-    die "Qt4.5 or newer is required to build MythTV."
+if ! expr $($qmake -query QT_VERSION) : "4\.[6-9]\.[0-9]" >/dev/null; then
+    die "Qt4.6 or newer is required to build MythTV."
 fi
 
-if test "$opengl" != "no" ; then
-    opengl="no"
-    if has_library libGL ; then
-        opengl="yes"
-    fi
-    if test -f $sysroot/System/Library/Frameworks/AGL.framework/Versions/A/AGL ; then
-        opengl="yes"
-    fi
-    if test "`echo ${targetos} | cut -c1-5`" = "MINGW" ; then
-        opengl="yes"
-    fi
+# rely on what was discover during MythTV configure
+if enabled opengl && test "$OPENGLV" != "CONFIG_OPENGL_VIDEO=yes"; then
+    disable opengl
 fi
 
-if ! disabled fftw; then
-    disable fftw_lib3
-    if has_library libfftw3_threads ; then
-        if has_header fftw3.h ; then
-            enable fftw_lib3
-        fi
-    fi
+#Test if fftw_lib3 is available
+if enabled fftw &&! check_lib2 fftw3.h fftw_init_threads -lfftw3_threads -lfftw3f -lfftw3 ; then
+    disable fftw
 fi
 
-if test "$exif" != "no" ; then
-    exif="no"
-    if has_library libexif ; then
-        if has_header libexif/exif-data.h ; then
-            exif="yes"
-        fi
-    fi
+if ! check_lib libexif/exif-data.h exif_loader_new -lexif ; then
+    disable exif
 fi
 
-if ! disabled netvision; then
+if enabled netvision; then
     disable_netvision(){
         msg="$1"
         echo "MythNetvision requires the $msg"
@@ -412,14 +595,14 @@ if ! disabled netvision; then
     disabled netvision && echo "Disabling MythNetvision due to missing dependencies."
 fi
 
-if ! disabled weather; then
+if enabled weather; then
     check_pl_lib(){
         log check_pl_lib "$@"
         check_cmd perl -e "use ${1};"
     }
 
     disable_weather(){
-        echo "WARNING: disabling MythWeather; missing $1"
+        echo "MythWeather requires $1"
         disable weather
     }
 
@@ -431,14 +614,12 @@ if ! disabled weather; then
         disable_weather "DateTime::Format::ISO8601"
     check_pl_lib "SOAP::Lite"  || disable_weather "SOAP::Lite"
     check_pl_lib "JSON"  || disable_weather "JSON"
+
+    disabled weather && echo "Disabling MythWeather due to missing dependencies."
 fi
 
-if test "$dcraw" != "no" ; then
-    dcraw="no"
-    if test x`which dcraw 2>/dev/null` != x ; then
-        dcraw="yes"
-    fi
-fi
+# Test for dcraw utility
+enabled dcraw && command -v dcraw 2>/dev/null > /dev/null || disable dcraw
 
 if test x"$icc" != x ; then
     # Assume relative paths are for files in the standard icc directory.
@@ -454,62 +635,53 @@ if test x"$icc" != x ; then
     fi
 fi
 
-if test "$music" != "no" ; then
-    vorbis="no"
-    if has_header ogg/ogg.h && has_header vorbis/vorbisenc.h && has_header vorbis/vorbisfile.h && has_header vorbis/codec.h && has_library libogg && has_library libvorbisfile && has_library libvorbisenc && has_library libvorbis ; then
-        vorbis="yes"
-    else
+if enabled music ; then
+    if ! check_lib vorbis/codec.h vorbis_info_init -lvorbis || ! check_lib vorbis/vorbisenc.h vorbis_encode_setup_vbr -lvorbisenc -lvorbis -logg ; then
+        disable vorbis
         echo "MythMusic requires vorbis."
     fi
 
-    flac="no"
-    if has_header FLAC/all.h && has_library libFLAC ; then
-        flac="yes"
-    else
+    if ! check_lib FLAC/all.h FLAC__stream_decoder_new -lFLAC ;then
+        disable flac
         echo "MythMusic requires FLAC."
     fi
 
-    if test "$cdio" != "no" ; then
-        cdio="no"
-        if has_header cdio/cdio.h && has_library libcdio && has_library libcdio_cdda && has_library libcdio_paranoia ; then
-            cdio="yes"
-        fi
+    if ! check_lib cdio/cdio.h cdio_open -lcdio || ! check_lib cdio/cdda.h cdio_cddap_open -lcdio_cdda || ! check_lib cdio/paranoia.h cdio_paranoia_init -lcdio_paranoia ; then
+        disable cdio
     fi
 
-    mp3lame="no"
-    if has_header lame/lame.h && has_library libmp3lame ; then
-        mp3lame="yes"
-    else
+    if ! check_lib lame/lame.h lame_init -lmp3lame ; then
+        disable mp3lame
         echo "MythMusic requires the LAME mp3 encoder."
     fi
 
-    taglib="no"
+    taglib_minor="0"
     if test x`which taglib-config` != x"" ; then
         taglib_minor=`taglib-config --version | cut -d. -f2`
         if test x"$taglib_minor" = x"" ; then
             echo "Can't find taglib-config. Assuming 1.6 or later."
             taglib_minor="6"
         fi
+        tagprefix=`taglib-config --prefix`
+        add_cxxflags "-I${tagprefix}/include"
+        add_ldflags "-L${tagprefix}/lib"
     fi
 
-    if has_library libtag && has_header taglib/fileref.h && test $taglib_minor -ge 6 ; then
-        taglib="yes"
-    else
+    if test $taglib_minor -lt 6 || ! check_lib_cxx taglib/fileref.h TagLib::FileRef -ltag -lz ; then
+        disable taglib
         echo "MythMusic requires taglib 1.6 or later."
     fi
 
-    if test "$vorbis" = "no" -o "$flac" = "no" -o "$mp3lame" = "no" -o "$taglib" = "no" ; then
+    if disabled vorbis || disabled flac || disabled mp3lame || disabled taglib ; then
         echo "Disabling MythMusic due to missing dependencies."
-        music="no"
+        disable music
     fi
 fi
 
-if test "$zoneminder" != "no" ; then
-    if has_header mysql/mysql.h ; then
-         zoneminder="yes"
-    else
+if enabled zoneminder ; then
+    if ! check_header mysql/mysql.h ; then
         echo "Disabling MythZoneMinder. Requires mysql/mysql.h header"
-        zoneminder="no"
+        disable zoneminder
     fi
 fi
 
@@ -518,12 +690,10 @@ cat > $TMPC << EOF
 int main( void ) { return 0; }
 EOF
 
-_stdint_h=no
+disable _stdint_h
 if $cc -o $TMPE $TMPC 2> /dev/null ; then
-  _stdint_h=yes
+  enable _stdint_h
 fi
-
-rm -f $TMPC $TMPE
 
 ###########################################################
 #                                                         #
@@ -531,18 +701,6 @@ rm -f $TMPC $TMPE
 #  (ie. which plugins to build)                           #
 #                                                         #
 ###########################################################
-
-# bring in mythtv config
-if [ -e $prefix/include/mythtv/mythconfig.mak ] ; then
-  rm mythconfig.mak 2> /dev/null
-  ${ln_s} $prefix/include/mythtv/mythconfig.mak mythconfig.mak
-else
-  echo "ERROR: mythconfig.mak not found at $prefix/include/mythtv/mythconfig.mak"
-  echo "Did you make AND install MythTV first?"
-  echo "Are you using the correct prefix ($prefix)?"
-  echo "Bailing out!!"
-  exit
-fi
 
 echo ""
 echo "Configuration settings: "
@@ -555,63 +713,63 @@ echo "#    Automatically generated by mythplugin configure" >> ./config.pro
 echo "#    (manual modifications will be overwritten)" >> ./config.pro
 echo "#" >> ./config.pro
 
-if test "$archive" = "yes" ; then
+if enabled archive ; then
   echo "        MythArchive    plugin will be built"
   echo "SUBDIRS += mytharchive" >> ./config.pro
 else
   echo "        MythArchive    plugin will not be built"
 fi
 
-if test "$browser" = "yes" ; then
+if enabled browser ; then
   echo "        MythBrowser    plugin will be built"
   echo "SUBDIRS += mythbrowser" >> ./config.pro
 else
   echo "        MythBrowser    plugin will not be built"
 fi
 
-if test "$gallery" = "yes" ; then
+if enabled gallery ; then
   echo "        MythGallery    plugin will be built"
   echo "SUBDIRS += mythgallery" >> ./config.pro
 else
   echo "        MythGallery    plugin will not be built"
 fi
 
-if test "$game" = "yes" ; then
+if enabled game ; then
   echo "        MythGame       plugin will be built"
   echo "SUBDIRS += mythgame" >> ./config.pro
 else
   echo "        MythGame       plugin will not be built"
 fi
 
-if test "$music" = "yes" ; then
+if enabled music ; then
   echo "        MythMusic      plugin will be built"
   echo "SUBDIRS += mythmusic" >> ./config.pro
 else
   echo "        MythMusic      plugin will not be built"
 fi
 
-if test "$netvision" = "yes" ; then
+if enabled netvision ; then
   echo "        MythNetvision  plugin will be built"
   echo "SUBDIRS += mythnetvision" >> ./config.pro
 else
   echo "        MythNetvision  plugin will not be built"
 fi
 
-if test "$news" = "yes" ; then
+if enabled news ; then
   echo "        MythNews       plugin will be built"
   echo "SUBDIRS += mythnews" >> ./config.pro
 else
   echo "        MythNews       plugin will not be built"
 fi
 
-if test "$weather" = "yes" ; then
+if enabled weather ; then
   echo "        MythWeather    plugin will be built"
   echo "SUBDIRS += mythweather" >> ./config.pro
 else
   echo "        MythWeather    plugin will not be built"
 fi
 
-if test "$zoneminder" = "yes" ; then
+if enabled zoneminder ; then
   echo "        MythZoneMinder plugin will be built"
   echo "SUBDIRS += mythzoneminder" >> ./config.pro
 else
@@ -624,7 +782,7 @@ fi
 #                                                         #
 ###########################################################
 
-if test "$gallery" = "yes" ; then
+if enabled gallery ; then
 
     echo "/*" >  ./mythgallery/mythgallery/config.h
     echo "    Automatically generated by configure - do not modify" >> ./mythgallery/mythgallery/config.h
@@ -638,19 +796,17 @@ if test "$gallery" = "yes" ; then
     echo "#    Automatically generated by configure - modify only under penalty of death" >> ./mythgallery/mythgallery/config.pro
     echo "#" >> ./mythgallery/mythgallery/config.pro
 
-    if test "$opengl" = "yes" ; then
+    if enabled opengl ; then
         echo "        OpenGL         support will be included in MythGallery"
         echo "#define OPENGL_SUPPORT 1" >> ./mythgallery/mythgallery/config.h
         echo "CONFIG += opengl" >> ./mythgallery/mythgallery/config.pro
         echo "HEADERS += glsingleview.h" >> ./mythgallery/mythgallery/config.pro
         echo "SOURCES += glsingleview.cpp" >> ./mythgallery/mythgallery/config.pro
-    fi
-
-    if test "$opengl" = "no" ; then
+    else
         echo "        OpenGL         support will not be included in MythGallery"
     fi
 
-    if test "$exif" = "yes" ; then
+    if enabled exif ; then
         echo "        EXIF           support will be included in MythGallery"
         echo "#define EXIF_SUPPORT 1" >> ./mythgallery/mythgallery/config.h
         echo "LIBS += -lexif" >> ./mythgallery/mythgallery/config.pro
@@ -672,13 +828,11 @@ if test "$gallery" = "yes" ; then
                 echo
             fi
         fi
-    fi
-
-    if test "$exif" = "no" ; then
+    else
         echo "        EXIF           support will not be included in MythGallery"
     fi
 
-    if test "$dcraw" = "yes" ; then
+    if enabled dcraw ; then
         echo "        Dcraw          support will be included in MythGallery"
         echo "SUBDIRS += dcrawplugin" >> ./mythgallery/config.pro
         echo "#define DCRAW_SUPPORT 1" >> ./mythgallery/mythgallery/config.h
@@ -689,7 +843,7 @@ if test "$gallery" = "yes" ; then
         echo "    Automatically generated by configure - do not modify" >> ./mythgallery/dcrawplugin/config.h
         echo "*/" >> ./mythgallery/dcrawplugin/config.h
 
-        if test "$exif" = "yes" ; then
+        if enabled exif ; then
             echo "#define EXIF_SUPPORT 1" >> ./mythgallery/dcrawplugin/config.h
 
         fi
@@ -700,13 +854,9 @@ if test "$gallery" = "yes" ; then
             quoted_icc=`echo "$icc" | sed 's/\\([\\\\"?]\\)/\\\\\\1/g;\$!{s/\$/\\\\/}'`
             echo "#define ICC_PROFILE \"$quoted_icc\"" >> ./mythgallery/dcrawplugin/config.h
         fi
-
-    fi
-
-    if test "$dcraw" = "no" ; then
+    else
         echo "        Dcraw          support will not be included in MythGallery"
     fi
-
 fi
 
 ###########################################################
@@ -715,7 +865,7 @@ fi
 #                                                         #
 ###########################################################
 
-if test "$music" = "yes" ; then
+if enabled music ; then
 
     echo "/*" >  ./mythmusic/mythmusic/config.h
     echo "    Automatically generated by configure - do not modify" >> ./mythmusic/mythmusic/config.h
@@ -725,13 +875,13 @@ if test "$music" = "yes" ; then
     echo "#    Automatically generated by configure - modify only under penalty of death" >> ./mythmusic/mythmusic/config.pro
     echo "#" >> ./mythmusic/mythmusic/config.pro
 
-    if test "$_stdint_h" = "yes" ; then
+    if enabled _stdint_h ; then
       echo "#define HAVE_STDINT_H 1" >> ./mythmusic/mythmusic/config.h
     else
       echo "#undef  HAVE_STDINT_H" >> ./mythmusic/mythmusic/config.h
     fi
 
-    if test "$cdio" = "yes" ; then
+    if enabled cdio ; then
       echo "#define HAVE_CDIO 1" >> ./mythmusic/mythmusic/config.h
       echo "CONFIG += cdio" >> ./mythmusic/mythmusic/config.pro
       echo "        libcdio        support will be included in MythMusic"
@@ -740,7 +890,7 @@ if test "$music" = "yes" ; then
       echo "        libcdio        support will not be included in MythMusic"
     fi
 
-    if enabled fftw_lib3; then
+    if enabled fftw; then
         echo "        FFTW v.3       support will be included in MythMusic"
         echo "#define FFTW3_SUPPORT 1" >> ./mythmusic/mythmusic/config.h
         echo "LIBS += -lfftw3 -lm" >> \
@@ -749,7 +899,7 @@ if test "$music" = "yes" ; then
         echo "        FFTW           support will not be included in MythMusic"
     fi
 
-    if test "$taglib" = "yes" ; then
+    if enabled taglib ; then
         echo "INCLUDEPATH += `taglib-config --prefix`/include/taglib" >> ./mythmusic/mythmusic/config.pro
     fi
 fi

@@ -550,7 +550,7 @@ bool VideoDisplayProfile::SaveDB(uint groupid, item_list_t &items)
                 insert.bindValue(":GROUPID",   groupid);
                 insert.bindValue(":PROFILEID", (*it).GetProfileID());
                 insert.bindValue(":VALUE",     lit.key());
-                insert.bindValue(":DATA",      (*lit));
+                insert.bindValue(":DATA", ((*lit).isNull()) ? "" : (*lit));
                 if (!insert.exec())
                 {
                     MythDB::DBError("save_profile 2", insert);
@@ -584,7 +584,7 @@ bool VideoDisplayProfile::SaveDB(uint groupid, item_list_t &items)
                 update.bindValue(":GROUPID",   groupid);
                 update.bindValue(":PROFILEID", (*it).GetProfileID());
                 update.bindValue(":VALUE",     lit.key());
-                update.bindValue(":DATA",      (*lit));
+                update.bindValue(":DATA", ((*lit).isNull()) ? "" : (*lit));
                 if (!update.exec())
                 {
                     MythDB::DBError("save_profile 5", update);
@@ -597,7 +597,7 @@ bool VideoDisplayProfile::SaveDB(uint groupid, item_list_t &items)
                 insert.bindValue(":GROUPID",   groupid);
                 insert.bindValue(":PROFILEID", (*it).GetProfileID());
                 insert.bindValue(":VALUE",     lit.key());
-                insert.bindValue(":DATA",      (*lit));
+                insert.bindValue(":DATA", ((*lit).isNull()) ? "" : (*lit));
                 if (!insert.exec())
                 {
                     MythDB::DBError("save_profile 4", insert);
@@ -933,7 +933,7 @@ void VideoDisplayProfile::CreateProfile(
         query.bindValue(":GRPID",  groupid);
         query.bindValue(":PROFID", profileid);
         query.bindValue(":VALUE",  *itV);
-        query.bindValue(":DATA",   *itD);
+        query.bindValue(":DATA",   ((*itD).isNull()) ? "" : (*itD));
         if (!query.exec())
             MythDB::DBError("create_profile 3", query);
     }
@@ -1163,7 +1163,7 @@ QString VideoDisplayProfile::GetVideoRendererHelp(const QString &renderer)
     {
         msg = QObject::tr(
             "This video renderer uses OpenGL for scaling and color conversion "
-            "with full picture contols. The GPU can be used for deinterlacing. "
+            "with full picture controls. The GPU can be used for deinterlacing. "
             "This requires a faster GPU than XVideo.");
     }
 
@@ -1256,7 +1256,7 @@ QString VideoDisplayProfile::GetDeinterlacerHelp(const QString &deint)
         "It has increased CPU requirements.");
 
     QString kFieldOrderMsg = QObject::tr(
-        "This deinterlacer attempts to syncronise with interlaced displays "
+        "This deinterlacer attempts to synchronize with interlaced displays "
         "whose size and refresh rate exactly match the video source. "
         "It has low CPU requirements.");
 
@@ -1350,7 +1350,7 @@ QString VideoDisplayProfile::GetOSDHelp(const QString &osd)
     if (osd == "chromakey")
         msg = QObject::tr(
             "Render the OSD using the XVideo chromakey feature."
-            "This renderer does not alpha blend. But it is the fastest "
+            "This renderer does not alpha blend but is the fastest "
             "OSD renderer for XVideo.") + "\n" +
             QObject::tr(
                 "Note: nVidia hardware after the 5xxx series does not "

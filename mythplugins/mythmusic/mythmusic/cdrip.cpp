@@ -1482,7 +1482,7 @@ void RipStatus::customEvent(QEvent *event)
     {
         DialogCompletionEvent *dce = static_cast<DialogCompletionEvent *>(event);
 
-        if (dce->GetId() == "stop_ripping")
+        if (dce->GetId() == "stop_ripping" && dce->GetResult())
         {
             m_ripperThread->cancel();
             m_ripperThread->wait();

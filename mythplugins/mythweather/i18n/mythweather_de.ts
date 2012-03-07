@@ -1,4 +1,6 @@
-<!DOCTYPE TS><TS>
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.0" language="de_DE">
 <context>
     <name>GlobalSetup</name>
     <message>
@@ -14,11 +16,19 @@
     </message>
     <message>
         <source>Searching ...</source>
-        <translation>Suche...</translation>
+        <translation type="obsolete">Suche...</translation>
     </message>
     <message>
         <source>Searching ... Results: %1</source>
-        <translation>Suche.. Treffer: %1</translation>
+        <translation type="obsolete">Suche.. Treffer: %1</translation>
+    </message>
+    <message>
+        <source>Searching...</source>
+        <translation>Suche...</translation>
+    </message>
+    <message>
+        <source>Searching... Results: %1</source>
+        <translation>Suche... Treffer: %1</translation>
     </message>
     <message>
         <source>Search Complete. Results: %1</source>
@@ -897,11 +907,11 @@ Wenn Sie fertig sind klicken Sie &quot;Beenden&quot;.</translation>
     </message>
     <message>
         <source>Weather</source>
-        <translation>Wetter</translation>
+        <translation type="obsolete">Wetter</translation>
     </message>
     <message>
         <source>Global Setup</source>
-        <translation>Globale Einstellungen</translation>
+        <translation type="obsolete">Globale Einstellungen</translation>
     </message>
     <message>
         <source>Screen Setup</source>
@@ -934,6 +944,30 @@ Wenn Sie fertig sind klicken Sie &quot;Beenden&quot;.</translation>
     <message>
         <source>Feels Like:</source>
         <translation>Gefühlte Temperatur:</translation>
+    </message>
+    <message>
+        <source>: %1</source>
+        <translation>: %1</translation>
+    </message>
+    <message>
+        <source>100%</source>
+        <translation>100%</translation>
+    </message>
+    <message>
+        <source>Global Weather Settings</source>
+        <translation>Globale Wettereinstellungen</translation>
+    </message>
+    <message>
+        <source>Seconds to display each page</source>
+        <translation>Anzeigedauer jeder Seite</translation>
+    </message>
+    <message>
+        <source>Retrieve data in the background</source>
+        <translation>Daten im Hintergrund holen</translation>
+    </message>
+    <message>
+        <source>Enter your current location,nearest large town or city. In some countries postal codes are also supported.</source>
+        <translation>Bitte geben sie ihren Standort oder die nächstgelegende Stadt an. In manchen Fällen ist es auch möglich, nach Postleitzahlen zu suchen.</translation>
     </message>
     <message>
         <source>General weather options</source>

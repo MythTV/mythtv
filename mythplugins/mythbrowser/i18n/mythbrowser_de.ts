@@ -1,4 +1,6 @@
-<!DOCTYPE TS><TS>
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.0" language="de_DE">
 <context>
     <name>BookmarkEditor</name>
     <message>
@@ -247,6 +249,10 @@ Wenn Sie fertig sind, wählen Sie &quot;OK&quot; zum Speichern und Beenden oder 
     <message>
         <source>Enable browser plugins (Flash, etc)</source>
         <translation>Browserplugins aktivieren (Flash, etc.)</translation>
+    </message>
+    <message>
+        <source>Enable plugins</source>
+        <translation>Plugins aktivieren</translation>
     </message>
     <message>
         <source>Enable plugins:</source>

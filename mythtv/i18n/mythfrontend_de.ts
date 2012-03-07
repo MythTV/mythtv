@@ -1,4 +1,6 @@
-<!DOCTYPE TS><TS>
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.0" language="de_DE">
 <context>
     <name>ASIConfigurationGroup</name>
     <message>
@@ -221,6 +223,24 @@
     <message>
         <source>Input connections</source>
         <translation>Eingangsverknüpfungen</translation>
+    </message>
+</context>
+<context>
+    <name>CetonConfigurationGroup</name>
+    <message>
+        <source>Description</source>
+        <translation>Beschreibung</translation>
+    </message>
+</context>
+<context>
+    <name>CetonDeviceID</name>
+    <message>
+        <source>Device ID</source>
+        <translation>Geräte-ID</translation>
+    </message>
+    <message>
+        <source>Device ID of Ceton device</source>
+        <translation>Geräte-ID des Ceton-Geräts</translation>
     </message>
 </context>
 <context>
@@ -1212,7 +1232,8 @@
     </message>
     <message>
         <source>Do you want to go back and fix this(these) problem(s)?</source>
-        <translation>Möchten Sie zurück gehen und die Probleme beheben?</translation>
+        <translation>Möchten Sie zurück gehen und die Probleme beheben?
+        </translation>
     </message>
     <message>
         <source>Yes please</source>
@@ -1370,19 +1391,19 @@
     <name>GuideGrid</name>
     <message>
         <source>You don&apos;t have any channels defined in the database.
-<byte value="x9"/><byte value="x9"/><byte value="x9"/>The program guide will have nothing to show you.</source>
+			The program guide will have nothing to show you.</source>
         <translation>In der Datenbank sind keine Sender definiert.
                      Das EPG wird leer sein.</translation>
     </message>
     <message>
         <source>Channel group &apos;%1&apos; doesn&apos;t have any channels defined.
-<byte value="x9"/><byte value="x9"/><byte value="x9"/>The program guide will have nothing to show you.</source>
+			The program guide will have nothing to show you.</source>
         <translation>In der Sendergruppe &apos;%1&apos; sind keine Sender definiert.
                         Das EPG wird leer sein.</translation>
     </message>
     <message>
         <source>Options</source>
-        <translation>Optionen</translation>
+        <translation type="obsolete">Optionen</translation>
     </message>
     <message>
         <source>Change Channel</source>
@@ -1393,6 +1414,26 @@
         <translation>Aufnehmen</translation>
     </message>
     <message>
+        <source>Guide Options</source>
+        <translation>Programmoptionen</translation>
+    </message>
+    <message>
+        <source>Change to Channel</source>
+        <translation>Zum Sender wechseln</translation>
+    </message>
+    <message>
+        <source>Record This</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Recording Options</source>
+        <translation>Aufnahmeoptionen</translation>
+    </message>
+    <message>
+        <source>Jump to Time</source>
+        <translation>Zu Zeitpunkt springen</translation>
+    </message>
+    <message>
         <source>Edit Recording Status</source>
         <translation>Aufnahmestatus ändern</translation>
     </message>
@@ -1401,8 +1442,16 @@
         <translation>Aufnahmeplan ändern</translation>
     </message>
     <message>
+        <source>Jump to a specific date and time in the guide</source>
+        <translation>Zu einem bestimmten Zeitpunkt im Programm springen</translation>
+    </message>
+    <message>
         <source>Program Details</source>
         <translation>Weitere Informationen</translation>
+    </message>
+    <message>
+        <source>Show Upcoming</source>
+        <translation>Zeige kommende</translation>
     </message>
     <message>
         <source>Upcoming</source>
@@ -1434,7 +1483,7 @@
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Abbrechen</translation>
+        <translation type="obsolete">Abbrechen</translation>
     </message>
     <message>
         <source>You don&apos;t have any channel groups defined</source>
@@ -1570,6 +1619,345 @@
     <message>
         <source>Recording has been watched</source>
         <translation>Wurde schon angesehen</translation>
+    </message>
+</context>
+<context>
+    <name>HtmlUI</name>
+    <message>
+        <source>Loading</source>
+        <translation>Lade</translation>
+    </message>
+    <message>
+        <source>No</source>
+        <translation>Nein</translation>
+    </message>
+    <message>
+        <source>Unable to retrieve setting.</source>
+        <translation>Einstellungen können nicht geholt werden.</translation>
+    </message>
+    <message>
+        <source>Unable to save setting.</source>
+        <translation>Einstellungen können nicht gespeichert werden.</translation>
+    </message>
+    <message>
+        <source>Unable to send message.</source>
+        <translation>Nachricht kann nicht gesendet werden.</translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation>Ja</translation>
+    </message>
+    <message>
+        <source>April</source>
+        <translation>April</translation>
+    </message>
+    <message>
+        <source>August</source>
+        <translation>August</translation>
+    </message>
+    <message>
+        <source>Current Tuner Activity</source>
+        <translation>Aktuelle Tuner Aktivitäten</translation>
+    </message>
+    <message>
+        <source>December</source>
+        <translation>Dezember</translation>
+    </message>
+    <message>
+        <source>Encoder %1 is currently idle.</source>
+        <translation>Encoder %1 ist aktuell verfügbar.</translation>
+    </message>
+    <message>
+        <source>Encoder %1 is currently recording &quot;%2.&quot;  This program is being viewed.</source>
+        <translation>Encoder %1 nimmt aktuell &quot;%2&quot; auf.  Diese Sendung wird angesehen.</translation>
+    </message>
+    <message>
+        <source>Encoder %1 is currently recording &quot;%2.&quot;  This recording will end at %3.</source>
+        <translation>Encoder %1 nimmt aktuell &quot;%2&quot; auf.  Diese Aufnahme endet um %3.</translation>
+    </message>
+    <message>
+        <source>Encoder %1 is currently watching &quot;%2&quot; on Live TV.</source>
+        <translation>Encoder %1 sieht aktuell &quot;%2&quot; im Live TV.</translation>
+    </message>
+    <message>
+        <source>February</source>
+        <translation>Februar</translation>
+    </message>
+    <message>
+        <source>Friday</source>
+        <translation>Freitag</translation>
+    </message>
+    <message>
+        <source>January</source>
+        <translation>Januar</translation>
+    </message>
+    <message>
+        <source>July</source>
+        <translation>Juli</translation>
+    </message>
+    <message>
+        <source>June</source>
+        <translation>Juni</translation>
+    </message>
+    <message>
+        <source>Last Ten Recordings</source>
+        <translation>Letzte 10 Aufnahmen</translation>
+    </message>
+    <message>
+        <source>March</source>
+        <translation>März</translation>
+    </message>
+    <message>
+        <source>May</source>
+        <translation>Mai</translation>
+    </message>
+    <message>
+        <source>Monday</source>
+        <translation>Montag</translation>
+    </message>
+    <message>
+        <source>MythTV System Overview</source>
+        <translation>MythTV Systemübersicht</translation>
+    </message>
+    <message>
+        <source>November</source>
+        <translation>November</translation>
+    </message>
+    <message>
+        <source>October</source>
+        <translation>Oktober</translation>
+    </message>
+    <message>
+        <source>Recorded %2, %3 %4 at %5.</source>
+        <translation>Aufgenommen %2, %3 %4 auf %5.</translation>
+    </message>
+    <message>
+        <source>Saturday</source>
+        <translation>Samstag</translation>
+    </message>
+    <message>
+        <source>September</source>
+        <translation>September</translation>
+    </message>
+    <message>
+        <source>Sunday</source>
+        <translation>Sonntag</translation>
+    </message>
+    <message>
+        <source>Thursday</source>
+        <translation>Donnerstag</translation>
+    </message>
+    <message>
+        <source>Tuesday</source>
+        <translation>Dienstag</translation>
+    </message>
+    <message>
+        <source>Wednesday</source>
+        <translation>Mittwoch</translation>
+    </message>
+    <message>
+        <source>API</source>
+        <translation>API</translation>
+    </message>
+    <message>
+        <source>Advanced Setup</source>
+        <translation>Erweiterte Konfiguration</translation>
+    </message>
+    <message>
+        <source>Backend Status</source>
+        <translation>Backend Status</translation>
+    </message>
+    <message>
+        <source>Capture Card Service</source>
+        <translation>Aufnahmegeräte Service</translation>
+    </message>
+    <message>
+        <source>Change Password</source>
+        <translation>Passwort ändern</translation>
+    </message>
+    <message>
+        <source>Channel Editor</source>
+        <translation>Sender bearbeiten</translation>
+    </message>
+    <message>
+        <source>Channel Service</source>
+        <translation>Sender Service</translation>
+    </message>
+    <message>
+        <source>Content Service</source>
+        <translation>Inhalts Service</translation>
+    </message>
+    <message>
+        <source>DVR Service</source>
+        <translation>DVR Service</translation>
+    </message>
+    <message>
+        <source>Database</source>
+        <translation>Datenbank</translation>
+    </message>
+    <message>
+        <source>Database Tools</source>
+        <translation>Datenbank Tools</translation>
+    </message>
+    <message>
+        <source>Expert/Dev Setup</source>
+        <translation>Expert/Dev Setup</translation>
+    </message>
+    <message>
+        <source>General</source>
+        <translation>Allgemeines</translation>
+    </message>
+    <message>
+        <source>GetRecorded() Example</source>
+        <translation>GetRecorded() Beispiel</translation>
+    </message>
+    <message>
+        <source>GetStorageGroups()</source>
+        <translation>GetStorageGroups()</translation>
+    </message>
+    <message>
+        <source>Guide Data</source>
+        <translation>Programmdaten</translation>
+    </message>
+    <message>
+        <source>Guide Data Sources</source>
+        <translation>Programmdatenquellen</translation>
+    </message>
+    <message>
+        <source>Guide Service</source>
+        <translation>Programm Service</translation>
+    </message>
+    <message>
+        <source>Hardware Profile</source>
+        <translation>Hardwareprofil</translation>
+    </message>
+    <message>
+        <source>Information</source>
+        <translation>Information</translation>
+    </message>
+    <message>
+        <source>Job Queue</source>
+        <translation>Auftragsliste</translation>
+    </message>
+    <message>
+        <source>Myth Service</source>
+        <translation>Myth Service</translation>
+    </message>
+    <message>
+        <source>Overview</source>
+        <translation>Übersicht</translation>
+    </message>
+    <message>
+        <source>Recording Devices</source>
+        <translation>Aufnahmegeräte</translation>
+    </message>
+    <message>
+        <source>Send a Message</source>
+        <translation>Eine Nachricht senden</translation>
+    </message>
+    <message>
+        <source>Server Side Scripting</source>
+        <translation>Serverseitiges Skripting</translation>
+    </message>
+    <message>
+        <source>Setup</source>
+        <translation>Konfiguration</translation>
+    </message>
+    <message>
+        <source>Setup Wizard</source>
+        <translation>Einrichtungsassistent</translation>
+    </message>
+    <message>
+        <source>Storage Groups</source>
+        <translation>Speichergruppen</translation>
+    </message>
+    <message>
+        <source>System Events</source>
+        <translation>Systemereignisse</translation>
+    </message>
+    <message>
+        <source>Utilities</source>
+        <translation>Zubehör</translation>
+    </message>
+    <message>
+        <source>Video Library Service</source>
+        <translation>Video Service</translation>
+    </message>
+    <message>
+        <source>WSDL Links</source>
+        <translation>WSDL Links</translation>
+    </message>
+    <message>
+        <source>Actions</source>
+        <translation>Funktionen</translation>
+    </message>
+    <message>
+        <source>Commercial Flagger</source>
+        <translation>Werbeerkenner</translation>
+    </message>
+    <message>
+        <source>Commercial Flagging</source>
+        <translation>Werbeerkennung</translation>
+    </message>
+    <message>
+        <source>Description</source>
+        <translation>Beschreibung</translation>
+    </message>
+    <message>
+        <source>Edit</source>
+        <translation>Bearbeiten</translation>
+    </message>
+    <message>
+        <source>Transcoder</source>
+        <translation>Umwandler</translation>
+    </message>
+    <message>
+        <source>Transcoding</source>
+        <translation>Umwandeln</translation>
+    </message>
+    <message>
+        <source>User Job #%1</source>
+        <translation>Benutzer Job #%1</translation>
+    </message>
+    <message>
+        <source>Local Backend</source>
+        <translation>Lokales Backend</translation>
+    </message>
+    <message>
+        <source>Make this server the master backend</source>
+        <translation>Diesen Server als Master Backend nutzen</translation>
+    </message>
+    <message>
+        <source>Master Backend</source>
+        <translation>Master-Backend</translation>
+    </message>
+    <message>
+        <source>Security PIN</source>
+        <translation>Sicherheits PIN</translation>
+    </message>
+    <message>
+        <source>Filter</source>
+        <translation>Filter</translation>
+    </message>
+    <message>
+        <source>List Files</source>
+        <translation>Dateien auflisten</translation>
+    </message>
+    <message>
+        <source>Sample Storage Group browser</source>
+        <translation>Beispiel Speichergruppen Browser</translation>
+    </message>
+    <message>
+        <source>Storage Group</source>
+        <translation>Speichergruppe</translation>
+    </message>
+</context>
+<context>
+    <name>IdleScreen</name>
+    <message>
+        <source>MythTV is idle and will shutdown in %n second(s).</source>
+        <translation>MythTV ist untätig und wird in %n Sekunden ausschalten.        
+        </translation>
     </message>
 </context>
 <context>
@@ -1734,7 +2122,8 @@
     </message>
     <message>
         <source>%n commercial break(s)</source>
-        <translation>%n Werbung(en)        </translation>
+        <translation>%n Werbung(en)        
+        </translation>
     </message>
     <message>
         <source>Commercial Detection %1</source>
@@ -1937,7 +2326,7 @@
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Abbrechen</translation>
+        <translation type="obsolete">Abbrechen</translation>
     </message>
     <message>
         <source>Change View</source>
@@ -1968,16 +2357,20 @@
         <translation>Alle Tasten auf Standard zurücksetzen</translation>
     </message>
     <message>
+        <source>Save changes?</source>
+        <translation>Änderungen speichern?</translation>
+    </message>
+    <message>
         <source>Exiting, but there are unsaved changes.Which would you prefer?</source>
-        <translation>Beende, aber einige Änderungen sind noch nicht gespeichert. Was möchten Sie tun?</translation>
+        <translation type="obsolete">Beende, aber einige Änderungen sind noch nicht gespeichert. Was möchten Sie tun?</translation>
     </message>
     <message>
         <source>Save then Exit</source>
-        <translation>Speichern und beenden</translation>
+        <translation type="obsolete">Speichern und beenden</translation>
     </message>
     <message>
         <source>Exit without saving changes</source>
-        <translation>Beenden ohne zu speichern</translation>
+        <translation type="obsolete">Beenden ohne zu speichern</translation>
     </message>
     <message>
         <source>This action is mandatory and needs at least one key bound to it. Instead, try rebinding with another key.</source>
@@ -1997,11 +2390,11 @@
     </message>
     <message>
         <source>OK</source>
-        <translation>Ok</translation>
+        <translation type="obsolete">Ok</translation>
     </message>
     <message>
         <source>Bind Key</source>
-        <translation>Taste belegen</translation>
+        <translation type="obsolete">Taste belegen</translation>
     </message>
     <message>
         <source>Contexts</source>
@@ -2304,6 +2697,10 @@
         <translation>Freie Suche</translation>
     </message>
     <message>
+        <source>Seek to a position in seconds</source>
+        <translation>Zu einer Position springen, in Sekunden</translation>
+    </message>
+    <message>
         <source>Channel up</source>
         <translation>Einen Sender weiter schalten</translation>
     </message>
@@ -2372,6 +2769,10 @@
         <translation>Senderansicht umschalten</translation>
     </message>
     <message>
+        <source>Set the volume</source>
+        <translation>Lautstärke setzen</translation>
+    </message>
+    <message>
         <source>Toggle audio upmixer</source>
         <translation>Audio-Upmixer ein/aus</translation>
     </message>
@@ -2416,6 +2817,14 @@
         <translation>Untertitel ein/aus</translation>
     </message>
     <message>
+        <source>Enable any captions</source>
+        <translation>Untertitel aktivieren</translation>
+    </message>
+    <message>
+        <source>Disable any captions</source>
+        <translation></translation>
+    </message>
+    <message>
         <source>Toggle Teletext Captions</source>
         <translation>Teletext Untertitel ein/aus</translation>
     </message>
@@ -2438,6 +2847,14 @@
     <message>
         <source>Toggle External Subtitles</source>
         <translation>Externe Untertitel umschalten</translation>
+    </message>
+    <message>
+        <source>Enable External Subtitles</source>
+        <translation>Externe Untertitel aktivieren</translation>
+    </message>
+    <message>
+        <source>Disable External Subtitles</source>
+        <translation>Externe Untertitiel deaktivieren</translation>
     </message>
     <message>
         <source>Toggle Text Subtitles</source>
@@ -2494,6 +2911,14 @@
     <message>
         <source>Display ATSC CC4</source>
         <translation>ATSC CC4 anzeigen</translation>
+    </message>
+    <message>
+        <source>Enable Forced Subtitles</source>
+        <translation>Erzwungene Untertitel aktivieren</translation>
+    </message>
+    <message>
+        <source>Disable Forced Subtitles</source>
+        <translation>Erzwungene Untertitel deaktivieren</translation>
     </message>
     <message>
         <source>Next audio track</source>
@@ -2576,8 +3001,32 @@
         <translation>Audiosyncronisations anzeigen</translation>
     </message>
     <message>
+        <source>Set the audio sync adjustment</source>
+        <translation>Audiosynchronisation einstellen</translation>
+    </message>
+    <message>
         <source>Playback picture adjustments</source>
         <translation>Bildeinstellungen für Wiedergabe</translation>
+    </message>
+    <message>
+        <source>Toggle night mode</source>
+        <translation>Nachtmodus umschalten</translation>
+    </message>
+    <message>
+        <source>Set the picture brightness</source>
+        <translation>Bildhelligkeit einstellen</translation>
+    </message>
+    <message>
+        <source>Set the picture contrast</source>
+        <translation>Bildkontrast einstellen</translation>
+    </message>
+    <message>
+        <source>Set the picture colour</source>
+        <translation>Bildfarbe einstellen</translation>
+    </message>
+    <message>
+        <source>Set the picture hue</source>
+        <translation>Bildfarbton einstellen</translation>
     </message>
     <message>
         <source>Recording picture adjustments for this channel</source>
@@ -2636,12 +3085,44 @@
         <translation>Sendung ohne Nachfrage beenden</translation>
     </message>
     <message>
+        <source>Jump to a chapter</source>
+        <translation>Zu einem Kapitel springen</translation>
+    </message>
+    <message>
+        <source>Switch title</source>
+        <translation>Titel umschalten</translation>
+    </message>
+    <message>
+        <source>Switch angle</source>
+        <translation>Winkel umschalten</translation>
+    </message>
+    <message>
         <source>Toggle audio visualisation</source>
         <translation>Audiovisualisierung umschalten</translation>
     </message>
     <message>
         <source>Toggle OSD playback information</source>
         <translation>OSD Wiedergabeinformationen umschalten</translation>
+    </message>
+    <message>
+        <source>No 3D</source>
+        <translation>Kein 3D</translation>
+    </message>
+    <message>
+        <source>3D Side by Side</source>
+        <translation>3D Side by Side</translation>
+    </message>
+    <message>
+        <source>Discard 3D Side by Side</source>
+        <translation>3D Side by Side verwerfen</translation>
+    </message>
+    <message>
+        <source>3D Top and Bottom</source>
+        <translation>3D Top and Bottom</translation>
+    </message>
+    <message>
+        <source>Discard 3D Top and Bottom</source>
+        <translation>3D Top and Bottom verwerfen</translation>
     </message>
     <message>
         <source>Save screenshot of current video frame</source>
@@ -2900,6 +3381,14 @@
         <translation>9</translation>
     </message>
     <message>
+        <source>Turn the display on</source>
+        <translation>Bildschirm anschalten</translation>
+    </message>
+    <message>
+        <source>Turn the display off</source>
+        <translation>Bildschirm ausschalten</translation>
+    </message>
+    <message>
         <source>Trigger System Key Event #1</source>
         <translation>Systemereignis #1 auslösen</translation>
     </message>
@@ -3050,11 +3539,11 @@
     <name>MythSearchDialog</name>
     <message>
         <source>OK</source>
-        <translation>Ok</translation>
+        <translation type="obsolete">Ok</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Abbrechen</translation>
+        <translation type="obsolete">Abbrechen</translation>
     </message>
 </context>
 <context>
@@ -3152,6 +3641,10 @@
         <translation>Einstellungscache wurde geleert</translation>
     </message>
     <message>
+        <source>Screen created or destroyed</source>
+        <translation>Anzeige erstellt oder zerstört</translation>
+    </message>
+    <message>
         <source>Keystroke event #1</source>
         <translation>Tastendruck Ereignis #1</translation>
     </message>
@@ -3225,6 +3718,10 @@ Kehre nun ins vorherige Menü zurück.</translation>
         <translation>System-Menü</translation>
     </message>
     <message>
+        <source>Enter standby mode</source>
+        <translation>Standyby aktivieren</translation>
+    </message>
+    <message>
         <source>Shutdown</source>
         <translation>Ausschalten</translation>
     </message>
@@ -3238,7 +3735,7 @@ Kehre nun ins vorherige Menü zurück.</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Abbrechen</translation>
+        <translation type="obsolete">Abbrechen</translation>
     </message>
     <message>
         <source>Revision: %1
@@ -3279,7 +3776,8 @@ Kehre nun ins vorherige Menü zurück.</translation>
     <name>MythUISearchDialog</name>
     <message>
         <source>%n match(es)</source>
-        <translation>%n Treffer        </translation>
+        <translation>%n Treffer        
+        </translation>
     </message>
 </context>
 <context>
@@ -3651,7 +4149,8 @@ Kehre nun ins vorherige Menü zurück.</translation>
     </message>
     <message>
         <source>There is/are %n recording(s) in this display group</source>
-        <translation>Es sind %n Aufnahmen in dieser Gruppe        </translation>
+        <translation>Es sind %n Aufnahmen in dieser Gruppe
+        </translation>
     </message>
     <message>
         <source>Unknown</source>
@@ -3701,7 +4200,8 @@ Kehre nun ins vorherige Menü zurück.</translation>
     </message>
     <message>
         <source>There is %n item(s) in the playlist. Actions affect all items in the playlist</source>
-        <translation>Es sind %n Einträge in der Liste. Aktionen betreffen alle Einträge der Wiedergabeliste        </translation>
+        <translation>Es sind %n Einträge in der Liste. Aktionen betreffen alle Einträge der Wiedergabeliste
+        </translation>
     </message>
     <message>
         <source>Play Options</source>
@@ -3852,7 +4352,8 @@ Soll die folgende Sendung wirklich gelöscht werden?</translation>
     </message>
     <message>
         <source>%1 [%n item(s)]</source>
-        <translation>%1 [%n Einträge]        </translation>
+        <translation>%1 [%n Einträge]
+        </translation>
     </message>
     <message>
         <source>Change Filter</source>
@@ -4033,7 +4534,8 @@ Soll die folgende Sendung wirklich gelöscht werden?</translation>
     </message>
     <message>
         <source>%n star(s)</source>
-        <translation>%n Sterne        </translation>
+        <translation>%n Sterne
+        </translation>
     </message>
     <message>
         <source>Mono</source>
@@ -4179,7 +4681,8 @@ Soll die folgende Sendung wirklich gelöscht werden?</translation>
     </message>
     <message>
         <source>%n hour(s)</source>
-        <translation>%n Stunden        </translation>
+        <translation>%n Stunden
+        </translation>
     </message>
     <message>
         <source>Auto-expire off</source>
@@ -4280,7 +4783,7 @@ Soll die folgende Sendung wirklich gelöscht werden?</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Abbrechen</translation>
+        <translation type="obsolete">Abbrechen</translation>
     </message>
 </context>
 <context>
@@ -4331,7 +4834,7 @@ Soll die folgende Sendung wirklich gelöscht werden?</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Abbrechen</translation>
+        <translation type="obsolete">Abbrechen</translation>
     </message>
     <message>
         <source>No Programs</source>
@@ -4421,12 +4924,18 @@ Soll die folgende Sendung wirklich gelöscht werden?</translation>
         <translation>Folge löschen</translation>
     </message>
     <message>
+        <source>Start search from date and time</source>
+        <translation>Suche bei Zeitpunkt beginnen</translation>
+    </message>
+    <message>
         <source>%n star(s)</source>
-        <translation>%n Sterne        </translation>
+        <translation>%n Sterne
+        </translation>
     </message>
     <message>
         <source>%n star(s) and above</source>
-        <translation>%n Sterne und mehr        </translation>
+        <translation>%n Sterne und mehr
+        </translation>
     </message>
     <message>
         <source>Time</source>
@@ -4651,7 +5160,7 @@ Soll die folgende Sendung wirklich gelöscht werden?</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Abbrechen</translation>
+        <translation type="obsolete">Abbrechen</translation>
     </message>
     <message>
         <source>Sort Options</source>
@@ -4882,7 +5391,7 @@ Soll die folgende Sendung wirklich gelöscht werden?</translation>
     </message>
     <message>
         <source>Rear Right</source>
-        <translation>Hinten rechts</translation>
+        <translation type="obsolete">Hinten rechts</translation>
     </message>
     <message>
         <source>Surround Left</source>
@@ -5101,6 +5610,10 @@ Soll die folgende Sendung wirklich gelöscht werden?</translation>
         <translation>Menü bei Wiedergabeende einblenden</translation>
     </message>
     <message>
+        <source>NR</source>
+        <translation>NR</translation>
+    </message>
+    <message>
         <source>None</source>
         <translation>Keine</translation>
     </message>
@@ -5158,203 +5671,203 @@ Soll die folgende Sendung wirklich gelöscht werden?</translation>
     </message>
     <message>
         <source>Make this server the master backend</source>
-        <translation>Diesen Server als Master Backend nutzen</translation>
+        <translation type="obsolete">Diesen Server als Master Backend nutzen</translation>
     </message>
     <message>
         <source>Security PIN</source>
-        <translation>Sicherheits PIN</translation>
+        <translation type="obsolete">Sicherheits PIN</translation>
     </message>
     <message>
         <source>Actions</source>
-        <translation>Funktionen</translation>
+        <translation type="obsolete">Funktionen</translation>
     </message>
     <message>
         <source>Commercial Flagger</source>
-        <translation>Werbeerkenner</translation>
+        <translation type="obsolete">Werbeerkenner</translation>
     </message>
     <message>
         <source>Commercial Flagging</source>
-        <translation>Werbeerkennung</translation>
+        <translation type="obsolete">Werbeerkennung</translation>
     </message>
     <message>
         <source>Description</source>
-        <translation>Beschreibung</translation>
+        <translation type="obsolete">Beschreibung</translation>
     </message>
     <message>
         <source>Transcoder</source>
-        <translation>Umwandler</translation>
+        <translation type="obsolete">Umwandler</translation>
     </message>
     <message>
         <source>April</source>
-        <translation>April</translation>
+        <translation type="obsolete">April</translation>
     </message>
     <message>
         <source>August</source>
-        <translation>August</translation>
+        <translation type="obsolete">August</translation>
     </message>
     <message>
         <source>Current Tuner Activity</source>
-        <translation>Aktuelle Tuner Aktivitäten</translation>
+        <translation type="obsolete">Aktuelle Tuner Aktivitäten</translation>
     </message>
     <message>
         <source>December</source>
-        <translation>Dezember</translation>
+        <translation type="obsolete">Dezember</translation>
     </message>
     <message>
         <source>Encoder %1 is currently idle.</source>
-        <translation>Encoder %1 ist aktuell verfügbar.</translation>
+        <translation type="obsolete">Encoder %1 ist aktuell verfügbar.</translation>
     </message>
     <message>
         <source>Encoder %1 is currently recording &quot;%2.&quot;  This program is being viewed.</source>
-        <translation>Encoder %1 nimmt aktuell &quot;%2&quot; auf.  Diese Sendung wird angesehen.</translation>
+        <translation type="obsolete">Encoder %1 nimmt aktuell &quot;%2&quot; auf.  Diese Sendung wird angesehen.</translation>
     </message>
     <message>
         <source>Encoder %1 is currently recording &quot;%2.&quot;  This recording will end at %3.</source>
-        <translation>Encoder %1 nimmt aktuell &quot;%2&quot; auf.  Diese Aufnahme endet um %3.</translation>
+        <translation type="obsolete">Encoder %1 nimmt aktuell &quot;%2&quot; auf.  Diese Aufnahme endet um %3.</translation>
     </message>
     <message>
         <source>Encoder %1 is currently watching &quot;%2&quot; on Live TV.</source>
-        <translation>Encoder %1 sieht aktuell &quot;%2&quot; im Live TV.</translation>
+        <translation type="obsolete">Encoder %1 sieht aktuell &quot;%2&quot; im Live TV.</translation>
     </message>
     <message>
         <source>February</source>
-        <translation>Februar</translation>
+        <translation type="obsolete">Februar</translation>
     </message>
     <message>
         <source>Friday</source>
-        <translation>Freitag</translation>
+        <translation type="obsolete">Freitag</translation>
     </message>
     <message>
         <source>January</source>
-        <translation>Januar</translation>
+        <translation type="obsolete">Januar</translation>
     </message>
     <message>
         <source>July</source>
-        <translation>Juli</translation>
+        <translation type="obsolete">Juli</translation>
     </message>
     <message>
         <source>June</source>
-        <translation>Juni</translation>
+        <translation type="obsolete">Juni</translation>
     </message>
     <message>
         <source>Last Ten Recordings</source>
-        <translation>Letzte 10 Aufnahmen</translation>
+        <translation type="obsolete">Letzte 10 Aufnahmen</translation>
     </message>
     <message>
         <source>March</source>
-        <translation>März</translation>
+        <translation type="obsolete">März</translation>
     </message>
     <message>
         <source>May</source>
-        <translation>Mai</translation>
+        <translation type="obsolete">Mai</translation>
     </message>
     <message>
         <source>Monday</source>
-        <translation>Montag</translation>
+        <translation type="obsolete">Montag</translation>
     </message>
     <message>
         <source>MythTV System Overview</source>
-        <translation>MythTV Systemübersicht</translation>
+        <translation type="obsolete">MythTV Systemübersicht</translation>
     </message>
     <message>
         <source>November</source>
-        <translation>November</translation>
+        <translation type="obsolete">November</translation>
     </message>
     <message>
         <source>October</source>
-        <translation>Oktober</translation>
+        <translation type="obsolete">Oktober</translation>
     </message>
     <message>
         <source>Recorded %2, %3 %4 at %5.</source>
-        <translation>Aufgenommen %2, %3 %4 auf %5.</translation>
+        <translation type="obsolete">Aufgenommen %2, %3 %4 auf %5.</translation>
     </message>
     <message>
         <source>Saturday</source>
-        <translation>Samstag</translation>
+        <translation type="obsolete">Samstag</translation>
     </message>
     <message>
         <source>September</source>
-        <translation>September</translation>
+        <translation type="obsolete">September</translation>
     </message>
     <message>
         <source>Sunday</source>
-        <translation>Sonntag</translation>
+        <translation type="obsolete">Sonntag</translation>
     </message>
     <message>
         <source>Thursday</source>
-        <translation>Donnerstag</translation>
+        <translation type="obsolete">Donnerstag</translation>
     </message>
     <message>
         <source>Tuesday</source>
-        <translation>Dienstag</translation>
+        <translation type="obsolete">Dienstag</translation>
     </message>
     <message>
         <source>Wednesday</source>
-        <translation>Mittwoch</translation>
+        <translation type="obsolete">Mittwoch</translation>
     </message>
     <message>
         <source>Filter</source>
-        <translation>Filter</translation>
+        <translation type="obsolete">Filter</translation>
     </message>
     <message>
         <source>List Files</source>
-        <translation>Dateien auflisten</translation>
+        <translation type="obsolete">Dateien auflisten</translation>
     </message>
     <message>
         <source>Loading</source>
-        <translation>Lade</translation>
+        <translation type="obsolete">Lade</translation>
     </message>
     <message>
         <source>Sample Storage Group browser</source>
-        <translation>Beispiel Speichergruppen Browser</translation>
+        <translation type="obsolete">Beispiel Speichergruppen Browser</translation>
     </message>
     <message>
         <source>Storage Group</source>
-        <translation>Speichergruppe</translation>
+        <translation type="obsolete">Speichergruppe</translation>
     </message>
     <message>
         <source>API</source>
-        <translation>API</translation>
+        <translation type="obsolete">API</translation>
     </message>
     <message>
         <source>Advanced Setup</source>
-        <translation>Erweiterte Konfiguration</translation>
+        <translation type="obsolete">Erweiterte Konfiguration</translation>
     </message>
     <message>
         <source>Backend Status</source>
-        <translation>Backend Status</translation>
+        <translation type="obsolete">Backend Status</translation>
     </message>
     <message>
         <source>Change Password</source>
-        <translation>Passwort ändern</translation>
+        <translation type="obsolete">Passwort ändern</translation>
     </message>
     <message>
         <source>Channel Editor</source>
-        <translation>Sender bearbeiten</translation>
+        <translation type="obsolete">Sender bearbeiten</translation>
     </message>
     <message>
         <source>Channel Service</source>
-        <translation>Sender Service</translation>
+        <translation type="obsolete">Sender Service</translation>
     </message>
     <message>
         <source>Content Service</source>
-        <translation>Inhalts Service</translation>
+        <translation type="obsolete">Inhalts Service</translation>
     </message>
     <message>
         <source>DVR Service</source>
-        <translation>DVR Service</translation>
+        <translation type="obsolete">DVR Service</translation>
     </message>
     <message>
         <source>Database</source>
-        <translation>Datenbank</translation>
+        <translation type="obsolete">Datenbank</translation>
     </message>
     <message>
         <source>Database Tools</source>
-        <translation>Datenbank Tools</translation>
+        <translation type="obsolete">Datenbank Tools</translation>
     </message>
     <message>
         <source>Expert/Dev Setup</source>
-        <translation>Expert/Dev Setup</translation>
+        <translation type="obsolete">Expert/Dev Setup</translation>
     </message>
     <message>
         <source>General</source>
@@ -5362,75 +5875,75 @@ Soll die folgende Sendung wirklich gelöscht werden?</translation>
     </message>
     <message>
         <source>GetRecorded() Example</source>
-        <translation>GetRecorded() Beispiel</translation>
+        <translation type="obsolete">GetRecorded() Beispiel</translation>
     </message>
     <message>
         <source>GetStorageGroups()</source>
-        <translation>GetStorageGroups()</translation>
+        <translation type="obsolete">GetStorageGroups()</translation>
     </message>
     <message>
         <source>Guide Data</source>
-        <translation>Programmdaten</translation>
+        <translation type="obsolete">Programmdaten</translation>
     </message>
     <message>
         <source>Guide Data Sources</source>
-        <translation>Programmdatenquellen</translation>
+        <translation type="obsolete">Programmdatenquellen</translation>
     </message>
     <message>
         <source>Guide Service</source>
-        <translation>Programm Service</translation>
+        <translation type="obsolete">Programm Service</translation>
     </message>
     <message>
         <source>Hardware Profile</source>
-        <translation>Hardwareprofil</translation>
+        <translation type="obsolete">Hardwareprofil</translation>
     </message>
     <message>
         <source>Job Queue</source>
-        <translation>Auftragsliste</translation>
+        <translation type="obsolete">Auftragsliste</translation>
     </message>
     <message>
         <source>Myth Service</source>
-        <translation>Myth Service</translation>
+        <translation type="obsolete">Myth Service</translation>
     </message>
     <message>
         <source>Overview</source>
-        <translation>Übersicht</translation>
+        <translation type="obsolete">Übersicht</translation>
     </message>
     <message>
         <source>Recording Devices</source>
-        <translation>Aufnahmegeräte</translation>
+        <translation type="obsolete">Aufnahmegeräte</translation>
     </message>
     <message>
         <source>Send a Message</source>
-        <translation>Eine Nachricht senden</translation>
+        <translation type="obsolete">Eine Nachricht senden</translation>
     </message>
     <message>
         <source>Server Side Scripting</source>
-        <translation>Serverseitiges Skripting</translation>
+        <translation type="obsolete">Serverseitiges Skripting</translation>
     </message>
     <message>
         <source>Setup</source>
-        <translation>Konfiguration</translation>
+        <translation type="obsolete">Konfiguration</translation>
     </message>
     <message>
         <source>Setup Wizard</source>
-        <translation>Konfigurationsassistent</translation>
+        <translation type="obsolete">Konfigurationsassistent</translation>
     </message>
     <message>
         <source>Storage Groups</source>
-        <translation>Speichergruppen</translation>
+        <translation type="obsolete">Speichergruppen</translation>
     </message>
     <message>
         <source>System Events</source>
-        <translation>Systemereignisse</translation>
+        <translation type="obsolete">Systemereignisse</translation>
     </message>
     <message>
         <source>Utilities</source>
-        <translation>Zubehör</translation>
+        <translation type="obsolete">Zubehör</translation>
     </message>
     <message>
         <source>WSDL Links</source>
-        <translation>WSDL Links</translation>
+        <translation type="obsolete">WSDL Links</translation>
     </message>
     <message>
         <source>Program Guide</source>
@@ -5617,12 +6130,28 @@ Soll die folgende Sendung wirklich gelöscht werden?</translation>
         <translation>Falls aktiviert, wird für jede Aufnahme eine zusätzliche Datei mit dem Namen der Aufnahme dazu &apos;.ts&apos; und eine Nummer angelegt. Dies zeigt, dass der gesamte Inhalt eines Transponders für die Aufnahme genutzt wurde.</translation>
     </message>
     <message>
+        <source>No Cover</source>
+        <translation>Kein Cover</translation>
+    </message>
+    <message>
         <source>Yes</source>
         <translation>Ja</translation>
     </message>
     <message>
         <source>No</source>
         <translation>Nein</translation>
+    </message>
+    <message>
+        <source>Details Downloaded</source>
+        <translation>Details heruntergeladen</translation>
+    </message>
+    <message>
+        <source>Waiting for Detail Download</source>
+        <translation>Warte auf Herunterladen der Details</translation>
+    </message>
+    <message>
+        <source>No rating available.</source>
+        <translation>Keine Bewertung verfügbar.</translation>
     </message>
     <message>
         <source>Width</source>
@@ -5710,7 +6239,7 @@ Soll die folgende Sendung wirklich gelöscht werden?</translation>
     </message>
     <message>
         <source>This enables support for monitoring your CD/DVD drives for new disks and launching the proper plugin to handle them.</source>
-        <translation>Aktiviert die Unterstützung zur Überwachung Ihrer CD-/DVD-Laufwerke für neue Medien und den Start passender Plugins für deren Handhabung.</translation>
+        <translation type="obsolete">Aktiviert die Unterstützung zur Überwachung Ihrer CD-/DVD-Laufwerke für neue Medien und den Start passender Plugins für deren Handhabung.</translation>
     </message>
     <message>
         <source>Recorded</source>
@@ -5743,6 +6272,10 @@ Soll die folgende Sendung wirklich gelöscht werden?</translation>
     <message>
         <source>Tuner Busy</source>
         <translation>Tuner belegt</translation>
+    </message>
+    <message>
+        <source>This showing is not scheduled to record</source>
+        <translation>Diese Sendung wird nicht aufgenommen</translation>
     </message>
     <message>
         <source>This showing will be recorded.</source>
@@ -6212,7 +6745,7 @@ Most DVB-C transports transmit at 6.9 or 6.875 million symbols per second.</sour
     </message>
     <message>
         <source>Default input</source>
-        <translation>Standardeingang</translation>
+        <translation type="obsolete">Standardeingang</translation>
     </message>
     <message>
         <source>DVB device number</source>
@@ -6285,6 +6818,10 @@ Most DVB-C transports transmit at 6.9 or 6.875 million symbols per second.</sour
     <message>
         <source>DVEO ASI recorder</source>
         <translation>DVEO ASI recorder</translation>
+    </message>
+    <message>
+        <source>Ceton Cablecard tuner </source>
+        <translation>Ceton Kabeltuner </translation>
     </message>
     <message>
         <source>Import test recorder</source>
@@ -6764,7 +7301,7 @@ Möchten Sie weitersehen?</translation>
     </message>
     <message>
         <source>Any</source>
-        <translation>Jede</translation>
+        <translation type="obsolete">Jede</translation>
     </message>
     <message>
         <source>Record using the &quot;%1&quot; profile</source>
@@ -6856,7 +7393,7 @@ Möchten Sie weitersehen?</translation>
     </message>
     <message>
         <source>Video content to show a WMP cient</source>
-        <translation>Videoinhalt für einen WMP Client </translation>
+        <translation type="obsolete">Videoinhalt für einen WMP Client </translation>
     </message>
     <message>
         <source>Automatically update program listings</source>
@@ -6904,11 +7441,11 @@ Möchten Sie weitersehen?</translation>
     </message>
     <message>
         <source>Guide data program log path</source>
-        <translation>Pfad für das Log zur EPG-Aktualisierung</translation>
+        <translation type="obsolete">Pfad für das Log zur EPG-Aktualisierung</translation>
     </message>
     <message>
         <source>File or directory to use for logging output from the guide data program. Leave blank to disable logging.</source>
-        <translation>Datei oder Verzeichnis welches für die Logausgabe der EPG-Aktualisierung benutzt wird. Leer lassen um das Logging zu deaktivieren.</translation>
+        <translation type="obsolete">Datei oder Verzeichnis welches für die Logausgabe der EPG-Aktualisierung benutzt wird. Leer lassen um das Logging zu deaktivieren.</translation>
     </message>
     <message>
         <source>Program Schedule Downloading Options</source>
@@ -6992,7 +7529,7 @@ Möchten Sie weitersehen?</translation>
     </message>
     <message>
         <source>Uptime</source>
-        <translation>Betriebszeit</translation>
+        <translation type="obsolete">Betriebszeit</translation>
     </message>
     <message>
         <source>Use custom identifier for frontend preferences</source>
@@ -7585,6 +8122,14 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation>Beim Beenden des schnellen Vor-/Rücklaufs im &quot;Klebrige Tasten&quot;-Modus wird erst neu positioniert, bevor die Wiedergabe einsetzt. Dies gleicht die Verzögerung beim Beenden des schnellen Vor-/Rücklaufs aus.</translation>
     </message>
     <message>
+        <source>Default refresh rate when watching a video. Leave at &quot;Auto&quot; to automatically use the best available</source>
+        <translation>Standardwiederholrate bei Videowiedergabe. &quot;Auto&quot; wählt automatisch den besten Wert</translation>
+    </message>
+    <message>
+        <source>Refresh rate when watching a video at a specific resolution. Leave at &quot;Auto&quot; to automatically use the best available</source>
+        <translation>Standardwiederholrate bei Videowiedergabe mit einer bestimmten Auflösung. &quot;Auto&quot; wählt automatisch den besten Wert</translation>
+    </message>
+    <message>
         <source>Display current time on idle LCD display. </source>
         <translation>Die aktuelle Uhrzeit anzeigen.</translation>
     </message>
@@ -7642,7 +8187,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>%1 total, %2 used, %3 (or %4%) free.</source>
-        <translation>%2/%1 belegt, %3 (%4%) frei.</translation>
+        <translation type="obsolete">%2/%1 belegt, %3 (%4%) frei.</translation>
     </message>
     <message>
         <source>Re-Record</source>
@@ -8621,7 +9166,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Unable to create null video out</source>
-        <translation>Kann Null-Videogerät nicht anlegen.</translation>
+        <translation type="obsolete">Kann Null-Videogerät nicht anlegen.</translation>
     </message>
     <message>
         <source>Need to switch video renderer.</source>
@@ -8639,6 +9184,14 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <source>No captions</source>
         <comment>CC/Teletext/Subtitle text not available</comment>
         <translation>Keine Untertitel</translation>
+    </message>
+    <message>
+        <source>Forced Subtitles On</source>
+        <translation>Erzwungene Untertitel an</translation>
+    </message>
+    <message>
+        <source>Forced Subtitles Off</source>
+        <translation>Erzwungene Untertitel aus</translation>
     </message>
     <message>
         <source>Serious error detected in Video Output</source>
@@ -8695,6 +9248,14 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     <message>
         <source>Disabled Studio Levels</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Enabled Night Mode</source>
+        <translation>Nachtmodus aktiviert</translation>
+    </message>
+    <message>
+        <source>Disabled Night Mode</source>
+        <translation>Nachtmodus deaktiviert</translation>
     </message>
     <message>
         <source>Position</source>
@@ -8812,6 +9373,14 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     <message>
         <source>Recording Type Priority Settings</source>
         <translation>Einstellungen der Aufnahmetypprioritäten</translation>
+    </message>
+    <message>
+        <source>Season</source>
+        <translation>Staffel</translation>
+    </message>
+    <message>
+        <source>Episode</source>
+        <translation>Episode</translation>
     </message>
     <message>
         <source>^(The |A |An )</source>
@@ -9405,6 +9974,14 @@ Die meisten DVB-S Transponder senden mit einer Symbolrate von 27,5 Millionen.</t
         <translation>Die Standard-Darstellungsmethode für X11-Systeme. Benutzt XVideo-Harware-Unterstützung zur Skalierung und Farbkonvertierung. Falls die Hardware eine Bildkontrolle anbietet, wird sie genutzt.</translation>
     </message>
     <message>
+        <source>This video renderer uses OpenGL for scaling and color conversion with full picture contols. The GPU can be used for deinterlacing. This requires a faster GPU than XVideo.</source>
+        <translation>Dieser Videorenderer nutzt OpenGL für Skalierung und Farbanpassung mit allen Bildkontrollen. Die GPU kann für Deinterlacing genutzt werden. Dies benötigt eine stärkere GPU als XVideo.</translation>
+    </message>
+    <message>
+        <source>This video renderer uses OpenGL for scaling and color conversion. It uses faster OpenGL functionality when available but at the expense of picture controls and GPU based deinterlacing.</source>
+        <translation>Dieser Videorenderer nutzt OpenGL für Skalierung und Farbanpassung. Er benutzt, falls verfügbar, schnellere OpenGL-Funktionen, aber auf Kosten der Bildkontrollen und GPU-basiertem Deinterlacing.</translation>
+    </message>
+    <message>
         <source>This video renderer uses VAAPI for video decoding and OpenGL for scaling and color conversion.</source>
         <translation>Dieser Videorenderer nutzt VAAPI fürs Videodecoding und OpenGL für Skalierung und Farbanpassung.</translation>
     </message>
@@ -9434,7 +10011,7 @@ Die meisten DVB-S Transponder senden mit einer Symbolrate von 27,5 Millionen.</t
     </message>
     <message>
         <source>This video renderer uses OpenGL for scaling and color conversion and can offer limited picture contols. This requires a faster GPU than XVideo. Also, when enabled, picture controls consume additional resources.</source>
-        <translation>Diese Darstellungsmethode nutzt OpenGL zur Skalierung und Farbkonvertierung und bietet eine eingeschränkte BIldkontrolle. Dies benötigt eine schnellere GPU als XVideo. Ausserdem benötigt die Bildkontrolle zusätzliche Resourcen.</translation>
+        <translation type="obsolete">Diese Darstellungsmethode nutzt OpenGL zur Skalierung und Farbkonvertierung und bietet eine eingeschränkte BIldkontrolle. Dies benötigt eine schnellere GPU als XVideo. Ausserdem benötigt die Bildkontrolle zusätzliche Resourcen.</translation>
     </message>
     <message>
         <source>This deinterlacer requires the display to be capable of twice the frame rate as the source video.</source>
@@ -9561,12 +10138,48 @@ Ihr Grabber übergibt keine Sendernummern, diese müssen Sie manuell setzen.</tr
         <translation>Nur LiveTV</translation>
     </message>
     <message>
+        <source>Schedule order</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>If priorities and other factors are equal the scheduler will choose the available input with the lowest, non-zero value.  Setting this value to zero will make the input unavailable to the scheduler.</source>
+        <translation>Falls Prioritäten und andere Faktoren gleich sind wird der Scheduler den Eingang mit dem kleinsten Wert ungleich Null wählen. Wird dieser Wert auf 0 gesetzt ist dieser Eingang für den Scheduler nicht nutzbar.</translation>
+    </message>
+    <message>
+        <source>Live TV order</source>
+        <translation>Live TV Reihenfolge</translation>
+    </message>
+    <message>
+        <source>When entering Live TV, the available, local input with the lowest, non-zero value will be used.  If no local inputs are available, the available, remote input with the lowest, non-zero value will be used.  Setting this value to zero will make the input unavailable to live TV.</source>
+        <translation>Für Live-TV wird der Eingang mit dem kleinsten Wert ungleich Null benutzt. Zuerst wird nach verfügbaren lokalen Eingängen gesucht, danach nach verfügbaren entfernten Eingängen. Der Wert 0 deaktiviert diesen Eingang für LiveTV.</translation>
+    </message>
+    <message>
         <source>Interactions between inputs</source>
         <translation>Relationen zwischen Eingängen</translation>
     </message>
     <message>
         <source>Create a New Input Group</source>
         <translation>Neue Eingangsgruppe anlegen</translation>
+    </message>
+    <message>
+        <source>No 3D</source>
+        <translation>Kein 3D</translation>
+    </message>
+    <message>
+        <source>3D Side by Side</source>
+        <translation>3D Side by Side</translation>
+    </message>
+    <message>
+        <source>Discard 3D Side by Side</source>
+        <translation>3D Side by Side verwerfen</translation>
+    </message>
+    <message>
+        <source>3D Top and Bottom</source>
+        <translation>3D Top and Bottom</translation>
+    </message>
+    <message>
+        <source>Discard 3D Top and Bottom</source>
+        <translation>3D Top and Bottom verwerfen</translation>
     </message>
     <message>
         <source>Ignore</source>
@@ -9646,35 +10259,35 @@ Ihr Grabber übergibt keine Sendernummern, diese müssen Sie manuell setzen.</tr
     </message>
     <message>
         <source>[Reserved]</source>
-        <translation>[Reserviert]</translation>
+        <translation type="obsolete">[Reserviert]</translation>
     </message>
     <message>
         <source>SCTE mode 1</source>
-        <translation>SCTE-Modus 1</translation>
+        <translation type="obsolete">SCTE-Modus 1</translation>
     </message>
     <message>
         <source>SCTE mode 2</source>
-        <translation>SCTE-Modus 2</translation>
+        <translation type="obsolete">SCTE-Modus 2</translation>
     </message>
     <message>
         <source>ATSC 8-VSB</source>
-        <translation>ATSC 8-VSB</translation>
+        <translation type="obsolete">ATSC 8-VSB</translation>
     </message>
     <message>
         <source>ATSC 16-VSB</source>
-        <translation>ATSC 16-VSB</translation>
+        <translation type="obsolete">ATSC 16-VSB</translation>
     </message>
     <message>
         <source>ATSC TV</source>
-        <translation>ATSC-TV</translation>
+        <translation type="obsolete">ATSC-TV</translation>
     </message>
     <message>
         <source>ATSC Audio</source>
-        <translation>ATSC-Ton</translation>
+        <translation type="obsolete">ATSC-Ton</translation>
     </message>
     <message>
         <source>ATSC Data</source>
-        <translation>ATSC-Daten</translation>
+        <translation type="obsolete">ATSC-Daten</translation>
     </message>
     <message>
         <source>Detective/Thriller</source>
@@ -10082,7 +10695,7 @@ wird bereits verwendet.</translation>
     </message>
     <message>
         <source>If enabled, captions will be displayed as white text over a black background for better contrast.</source>
-        <translation>Falls aktiviert, werden Untertitel auf schwarzem Hintergrund gezeigt, um den Kontrast zu verbessern.</translation>
+        <translation type="obsolete">Falls aktiviert, werden Untertitel auf schwarzem Hintergrund gezeigt, um den Kontrast zu verbessern.</translation>
     </message>
     <message>
         <source>Prefer EIA-708 over EIA-608 captions</source>
@@ -10174,11 +10787,11 @@ wird bereits verwendet.</translation>
     </message>
     <message>
         <source>Default refresh rate when watching a video. Leave at &quot;Any&quot; to automatically use the best available</source>
-        <translation>Standard-Bildwiederholrate bei der Video-Wiedergabe. Bei der Einstellung &quot;Jede&quot; wird autom. die passendste verwendet.</translation>
+        <translation type="obsolete">Standard-Bildwiederholrate bei der Video-Wiedergabe. Bei der Einstellung &quot;Jede&quot; wird autom. die passendste verwendet.</translation>
     </message>
     <message>
         <source>Refresh rate when watching a video at a specific resolution. Leave at &quot;Any&quot; to automatically use the best available</source>
-        <translation>Standard-Bildwiederholrate bei der Videowiedergabe in einer bestimmten Auflösung. Bei der Einstellung &quot;Any&quot; wird autom. die passendste verwendet</translation>
+        <translation type="obsolete">Standard-Bildwiederholrate bei der Videowiedergabe in einer bestimmten Auflösung. Bei der Einstellung &quot;Any&quot; wird autom. die passendste verwendet</translation>
     </message>
     <message>
         <source>Toggles mouse cursor visibility. Most of the MythTV GUI does not respond to mouse clicks. Use this option to avoid &quot;losing&quot; your mouse cursor.</source>
@@ -10242,7 +10855,7 @@ wird bereits verwendet.</translation>
     </message>
     <message>
         <source>If there are any devices that you do not want to be monitored, list them here with commas in-between. The plugins will ignore them</source>
-        <translation>Geben Sie hier alle Geräte (z.B. /dev/cdrom2) durch Komma getrennt an, die nicht beobachtet werden sollen. Plugins werden diese Geräte ignorieren.</translation>
+        <translation type="obsolete">Geben Sie hier alle Geräte (z.B. /dev/cdrom2) durch Komma getrennt an, die nicht beobachtet werden sollen. Plugins werden diese Geräte ignorieren.</translation>
     </message>
     <message>
         <source>MythMediaMonitor</source>
@@ -10293,6 +10906,18 @@ wird bereits verwendet.</translation>
         <translation>IP-Adresse</translation>
     </message>
     <message>
+        <source>Enter the IP address of this machine. Use an externally accessible address (ie, not 127.0.0.1) if you are going to be running a frontend on a different machine than this one. Note, in IPv6 setups, this is still required for certain extras such as UPnP.</source>
+        <translation>Geben Sie die IP-Adresse dieser Maschine ein. Benutzen Sie eine extern erreichbare Adresse (z.B. nicht 127.0.0.1) falls Sie ein Frontend auf einer anderen Maschine als dieser betreiben. In IPv6-Umgebungen kann dies auch für einige Extras, z.B. UPnP, nötig sein.</translation>
+    </message>
+    <message>
+        <source>IPv6 address</source>
+        <translation>IPv6 Adresse</translation>
+    </message>
+    <message>
+        <source>Enter the IPv6 address of this machine. Use an externally accessible address (ie, not ::1) if you are going to be running a frontend on a different machine than this one.</source>
+        <translation>Geben Sie die IPv6-Adresse dieser Maschine ein. Benutzen Sie eine extern erreichbare Adresse (z.B. nicht ::1) falls Sie ein Frontend auf einer anderen Maschine als dieser betreiben.</translation>
+    </message>
+    <message>
         <source>Combination</source>
         <translation>Kombination</translation>
     </message>
@@ -10326,7 +10951,7 @@ wird bereits verwendet.</translation>
     </message>
     <message>
         <source>Enter the IP address of this machine. Use an externally accessible address (ie, not 127.0.0.1) if you are going to be running a frontend on a different machine than this one.</source>
-        <translation>Die IP-Adresse dieses Rechners. Geben Sie seine öffentliche Adresse (also nicht 127.0.0.1) an, falls Sie ein Frontend auf einem zweiten Rechner nutzen wollen.</translation>
+        <translation type="obsolete">Die IP-Adresse dieses Rechners. Geben Sie seine öffentliche Adresse (also nicht 127.0.0.1) an, falls Sie ein Frontend auf einem zweiten Rechner nutzen wollen.</translation>
     </message>
     <message>
         <source>Unless you&apos;ve got good reason, don&apos;t change this.</source>
@@ -10639,7 +11264,7 @@ wird bereits verwendet.</translation>
     </message>
     <message>
         <source>Video content to show a WMP client</source>
-        <translation type="obsolete">Videos, die einem WMP-Client gezeigt werden</translation>
+        <translation>Videos, die einem WMP-Client gezeigt werden</translation>
     </message>
     <message>
         <source>Which tree to show a Windows Media Player client when it requests a list of videos.</source>
@@ -11069,33 +11694,33 @@ Verwenden Sie den Auswurfknopf am Laufwerk.</translation>
     </message>
     <message>
         <source>Found %n off-air channel(s).</source>
-        <translation>%n Sender ohne Signal gefunden.        </translation>
+        <translation>%n Sender ohne Signal gefunden.</translation>
     </message>
     <message>
         <source>Found %n unused transport(s).</source>
-        <translation>%n ungenutzte Transponder gefunden.        </translation>
+        <translation>%n ungenutzte Transponder gefunden.</translation>
     </message>
     <message>
         <source>Found %n old %1 channel(s).</source>
-        <translation>%n alte %1 Sender gefunden.        </translation>
+        <translation>%n alte %1 Sender gefunden.</translation>
     </message>
     <message>
         <source>Found %n new non-conflicting %1 channel(s).</source>
-        <translation>%n neue, eindeutige %1 Sender gefunden.        </translation>
+        <translation>%n neue, eindeutige %1 Sender gefunden.  </translation>
     </message>
     <message>
         <source>Found %n new conflicting %1 channel(s).</source>
-        <translation>%n neue, im Konflikt stehende, %1 Sender gefunden.        </translation>
+        <translation>%n neue, im Konflikt stehende, %1 Sender gefunden.</translation>
     </message>
     <message>
         <source>Found %n conflicting old %1 channel(s).</source>
-        <translation>%n alte, im Konflikt stehende, %1 Sender gefunden.        </translation>
+        <translation>%n alte, im Konflikt stehende, %1 Sender gefunden. </translation>
     </message>
     <message>
         <source>Found %n transport(s):
 </source>
         <translation>%n Transponder gefunden:
-        </translation>
+</translation>
     </message>
     <message>
         <source>Update all</source>
@@ -11239,7 +11864,7 @@ Verwenden Sie den Auswurfknopf am Laufwerk.</translation>
     </message>
     <message>
         <source> %n day(s),</source>
-        <translation> %n Tage,        </translation>
+        <translation> %n Tage,</translation>
     </message>
     <message>
         <source> %n hour(s) and</source>
@@ -11365,7 +11990,7 @@ Verwenden Sie den Auswurfknopf am Laufwerk.</translation>
     </message>
     <message>
         <source>&apos;tv playback&apos; widget missing.</source>
-        <translation>&quot;tv playback&quot; Element fehlt.</translation>
+        <translation type="obsolete">&quot;tv playback&quot; Element fehlt.</translation>
     </message>
     <message>
         <source>Failed to initialize video output</source>
@@ -11397,7 +12022,8 @@ Verwenden Sie den Auswurfknopf am Laufwerk.</translation>
     </message>
     <message>
         <source>%n minute(s)</source>
-        <translation>%n Minuten        </translation>
+        <translation>%n Minuten        
+        </translation>
     </message>
     <message>
         <source>Manual Record</source>
@@ -11405,7 +12031,8 @@ Verwenden Sie den Auswurfknopf am Laufwerk.</translation>
     </message>
     <message>
         <source>%n star(s)</source>
-        <translation>%n Sterne        </translation>
+        <translation>%n Sterne        
+        </translation>
     </message>
     <message>
         <source>f</source>
@@ -11445,6 +12072,27 @@ Verwenden Sie den Auswurfknopf am Laufwerk.</translation>
     <message>
         <source>Commercial Detection</source>
         <translation>Werbeerkennung</translation>
+    </message>
+    <message>
+        <source>DVD</source>
+        <translation>DVD</translation>
+    </message>
+    <message>
+        <source>HTTP Streaming</source>
+        <translation>HTTP Streaming</translation>
+    </message>
+    <message>
+        <source>RTSP Streaming</source>
+        <translation>RTSP Streaming</translation>
+    </message>
+    <message>
+        <source>Blu-Ray Disc</source>
+        <translation>Blu-Ray Disc</translation>
+    </message>
+    <message>
+        <source>Recording</source>
+        <comment>Recorded file, object not action</comment>
+        <translation>Aufnahme</translation>
     </message>
     <message>
         <source>Preview Generation</source>
@@ -11611,11 +12259,11 @@ Verwenden Sie den Auswurfknopf am Laufwerk.</translation>
     </message>
     <message>
         <source>Yadif (2x, HW)</source>
-        <translation>Yadif (2x, HW)</translation>
+        <translation type="obsolete">Yadif (2x, HW)</translation>
     </message>
     <message>
         <source>Yadif (HW)</source>
-        <translation>Yadif (Hw)</translation>
+        <translation type="obsolete">Yadif (Hw)</translation>
     </message>
     <message>
         <source>One Field (1x, HW)</source>
@@ -12084,6 +12732,10 @@ kann nicht leer sein.</translation>
         <translation>Die Schriftart, welche für Untertitel benutzt wird.</translation>
     </message>
     <message>
+        <source>If enabled, captions will be displayed over a black background for better contrast.</source>
+        <translation>Falls aktiviert, werden Untertitel für besseren Kontrast vor schwarzem Hintergrund angezeigt.</translation>
+    </message>
+    <message>
         <source>If enabled, captions will be displayed when playing back recordings or watching Live TV. Closed Captioning can be turned on or off by pressing &quot;T&quot; during playback.</source>
         <translation>Falls gesetzt, werden Untertitel (engl. closed caption, CC) beim Fernsehen sowie bei der Wiedergabe von Aufnahmen eingeblendet. Mit &quot;T&quot; können Untertitel während der Wiedergabe ein- und ausgeblendet werden.</translation>
     </message>
@@ -12305,11 +12957,11 @@ kann nicht leer sein.</translation>
     </message>
     <message>
         <source>Avoid conflicts between Live TV and scheduled shows</source>
-        <translation>Konflikte zwischen LiveTV und geplanten Aufnahmen vermeiden</translation>
+        <translation type="obsolete">Konflikte zwischen LiveTV und geplanten Aufnahmen vermeiden</translation>
     </message>
     <message>
         <source>If enabled, Live TV will choose a tuner card that is less likely to have scheduled recordings rather than the best card available.</source>
-        <translation>Falls gesetzt, wird zum Fernsehen eine TV-Karte verwendet, die seltener durch geplante Aufnahmen blockiert ist.</translation>
+        <translation type="obsolete">Falls gesetzt, wird zum Fernsehen eine TV-Karte verwendet, die seltener durch geplante Aufnahmen blockiert ist.</translation>
     </message>
     <message>
         <source>Allow Live TV to move scheduled shows</source>
@@ -12480,8 +13132,16 @@ kann nicht leer sein.</translation>
         <translation>MythTV wird auf Verbindungen von den Programmen &quot;mythtvosd&quot; und &quot;mythudprelay&quot; auf diesem Port lauschen. Für weitere Informationen siehe http://www.mythtv.org/wiki/MythNotify .</translation>
     </message>
     <message>
+        <source>This enables support for monitoring your CD/DVD drives for new disks and launching the proper plugin to handle them. Requires restart.</source>
+        <translation>Dies aktiviert Unterstützung für das automatische Erkennen von eingelegten Datenträgern in CD und DVD-Laufwerken und startet das entsprechende Plugin um diese abzuspielen. Benötigt einen Restart.</translation>
+    </message>
+    <message>
         <source>Ignore devices</source>
         <translation>Folgende Geräte ignorieren</translation>
+    </message>
+    <message>
+        <source>If there are any devices that you do not want to be monitored, list them here with commas in-between. The plugins will ignore them. Requires restart.</source>
+        <translation>Falls Sie einige Geräte nicht überwachen wollen listen Sie diese hier kommagetrennt auf. Die Plugins werden diese dann ignorieren. Benötigt einen Restart.</translation>
     </message>
     <message>
         <source>Sort titles</source>
@@ -12617,7 +13277,7 @@ kann nicht leer sein.</translation>
     </message>
     <message>
         <source>%n second(s)</source>
-        <translation>%n Sekunden        </translation>
+        <translation>%n Sekunden</translation>
     </message>
     <message>
         <source>Play</source>
@@ -12648,21 +13308,21 @@ kann nicht leer sein.</translation>
     </message>
     <message>
         <source>, using your %1 rate of %2 kb/s</source>
-        <translation>, bei %1 %2 Kb/Sek.</translation>
+        <translation type="obsolete">, bei %1 %2 Kb/Sek.</translation>
     </message>
     <message>
         <source>%1 remaining</source>
         <comment>time</comment>
-        <translation>%1 übrig</translation>
+        <translation type="obsolete">%1 übrig</translation>
     </message>
     <message>
         <source>%1 and %2 remaining</source>
         <comment>time</comment>
-        <translation>%1 und %2 übrig</translation>
+        <translation type="obsolete">%1 und %2 übrig</translation>
     </message>
     <message>
         <source>%n day(s)</source>
-        <translation>%n Tage        </translation>
+        <translation type="obsolete">%n Tage        </translation>
     </message>
     <message>
         <source>All Channels</source>
@@ -12722,11 +13382,11 @@ kann nicht leer sein.</translation>
     </message>
     <message>
         <source>Go Back</source>
-        <translation>Zurück</translation>
+        <translation type="obsolete">Zurück</translation>
     </message>
     <message>
         <source>No Change</source>
-        <translation>Keine Änderung</translation>
+        <translation type="obsolete">Keine Änderung</translation>
     </message>
     <message>
         <source>Warning: container &apos;%1&apos; is missing child &apos;%2&apos;</source>
@@ -12842,12 +13502,24 @@ kann nicht leer sein.</translation>
         <translation>%1Mbps</translation>
     </message>
     <message>
+        <source>%1MHz</source>
+        <translation>%1MHz</translation>
+    </message>
+    <message>
         <source>%1Kbps</source>
         <translation>%1Kbps</translation>
     </message>
     <message>
+        <source>%1KHz</source>
+        <translation>%1KHz</translation>
+    </message>
+    <message>
         <source>%1bps</source>
         <translation>%1bps</translation>
+    </message>
+    <message>
+        <source>%1Hz</source>
+        <translation>%1Hz</translation>
     </message>
     <message>
         <source>Would you like to share your hardware profile with the MythTV developers? Profiles are anonymous and are a great way to help with future development.</source>
@@ -12995,11 +13667,11 @@ kann nicht leer sein.</translation>
     </message>
     <message>
         <source>DVD Drive Speed</source>
-        <translation>DVD Geschwindigkeit</translation>
+        <translation type="obsolete">DVD Geschwindigkeit</translation>
     </message>
     <message>
         <source>Set DVD Drive Speed during DVD Playback. Speed is in multiples of 177KB/s. Slower speeds may reduce drive noise but in some cases it causes playback to stutter.</source>
-        <translation>Setzt die DVD-Geschwindigkeit während der Wiedergabe.Die Geschwindigkeit ist ein Vielfaches von 177KB/s. Langsamere Geschwindigkeiten reduzieren den Geräuschpegel des Laufwerks, können aber zu ruckeln beim Abspielen führen.</translation>
+        <translation type="obsolete">Setzt die DVD-Geschwindigkeit während der Wiedergabe.Die Geschwindigkeit ist ein Vielfaches von 177KB/s. Langsamere Geschwindigkeiten reduzieren den Geräuschpegel des Laufwerks, können aber zu ruckeln beim Abspielen führen.</translation>
     </message>
     <message>
         <source>Video Tree remembers last selected position</source>
@@ -13055,7 +13727,7 @@ kann nicht leer sein.</translation>
     </message>
     <message>
         <source>Unknown Prefix</source>
-        <translation>Unbekannter Präfix</translation>
+        <translation type="obsolete">Unbekannter Präfix</translation>
     </message>
     <message>
         <source>videos</source>
@@ -13072,6 +13744,38 @@ kann nicht leer sein.</translation>
     <message>
         <source>Tomorrow</source>
         <translation>Morgen</translation>
+    </message>
+    <message>
+        <source>Parental PIN:</source>
+        <translation>Altersfreigabe PIN:</translation>
+    </message>
+    <message>
+        <source>Searching for video files</source>
+        <translation>Suche nach Videodateien</translation>
+    </message>
+    <message>
+        <source>Verifying video files</source>
+        <translation>Verifiziere Videodateien</translation>
+    </message>
+    <message>
+        <source>Updating video database</source>
+        <translation>Update Videodatenbank</translation>
+    </message>
+    <message>
+        <source>%1 TB</source>
+        <translation>%1 TB</translation>
+    </message>
+    <message>
+        <source>%1 GB</source>
+        <translation>%1 GB</translation>
+    </message>
+    <message>
+        <source>%1 MB</source>
+        <translation>%1 MB</translation>
+    </message>
+    <message>
+        <source>%1 KB</source>
+        <translation>%1 KB</translation>
     </message>
 </context>
 <context>
@@ -13194,8 +13898,20 @@ kann nicht leer sein.</translation>
         <translation>Erste Ausstrahlung</translation>
     </message>
     <message>
-        <source>Primetime</source>
+        <source>Prime time</source>
         <translation>Hauptsendezeit</translation>
+    </message>
+    <message>
+        <source>This episode</source>
+        <translation>Diese Episode</translation>
+    </message>
+    <message>
+        <source>This series</source>
+        <translation>Diese Serie</translation>
+    </message>
+    <message>
+        <source>Primetime</source>
+        <translation type="obsolete">Hauptsendezeit</translation>
     </message>
     <message>
         <source>Commercial free</source>
@@ -13250,11 +13966,11 @@ kann nicht leer sein.</translation>
     </message>
     <message>
         <source>Exclude unidentified episodes</source>
-        <translation>Unbekannte Folgen ausschließen</translation>
+        <translation type="obsolete">Unbekannte Folgen ausschließen</translation>
     </message>
     <message>
         <source>Exclude old episodes</source>
-        <translation>Alte Folgen ausschließen</translation>
+        <translation type="obsolete">Alte Folgen ausschließen</translation>
     </message>
     <message>
         <source>Record new episodes only</source>
@@ -13262,7 +13978,7 @@ kann nicht leer sein.</translation>
     </message>
     <message>
         <source>Record new episode first showings</source>
-        <translation>Erste Ausstrahlung jeder Folge aufnehmen</translation>
+        <translation type="obsolete">Erste Ausstrahlung jeder Folge aufnehmen</translation>
     </message>
 </context>
 <context>
@@ -13375,23 +14091,23 @@ kann nicht leer sein.</translation>
     </message>
     <message>
         <source>Power Search</source>
-        <translation>Erweiterte Suche</translation>
+        <translation type="obsolete">Erweiterte Suche</translation>
     </message>
     <message>
         <source>Title Search</source>
-        <translation>Titelsuche</translation>
+        <translation type="obsolete">Titelsuche</translation>
     </message>
     <message>
         <source>Keyword Search</source>
-        <translation>Schlüsselwortsuche</translation>
+        <translation type="obsolete">Schlüsselwortsuche</translation>
     </message>
     <message>
         <source>People Search</source>
-        <translation>Darstellersuche</translation>
+        <translation type="obsolete">Darstellersuche</translation>
     </message>
     <message>
         <source>Unknown Search</source>
-        <translation>Unbekannte Suche</translation>
+        <translation type="obsolete">Unbekannte Suche</translation>
     </message>
     <message>
         <source>Schedule Information</source>
@@ -13515,7 +14231,8 @@ und ist unter %2 zu finden</translation>
     </message>
     <message>
         <source>Change amount: %n pixel(s)</source>
-        <translation>Änderung: %n Pixel        </translation>
+        <translation>Änderung: %n Pixel        
+        </translation>
     </message>
     <message>
         <source>Options</source>
@@ -13791,16 +14508,56 @@ Keine weiteren Informationen</translation>
         <translation>Zeigt alle noch zu bearbeitenden Aufnahmen (z. B. um sie auf Werbung zu untersuchen).</translation>
     </message>
     <message>
+        <source>%1 total, %2 used, %3 (or %4%) free.</source>
+        <translation>%2/%1 belegt, %3 (%4%) frei.</translation>
+    </message>
+    <message>
+        <source>, using your %1 rate of %2 kb/s</source>
+        <translation>, bei %1 %2 Kb/Sek.</translation>
+    </message>
+    <message>
+        <source>%n hour(s)</source>
+        <translation>%n Stunden</translation>
+    </message>
+    <message>
+        <source>%n minute(s)</source>
+        <translation>%n Minuten</translation>
+    </message>
+    <message>
+        <source>%1 remaining</source>
+        <comment>time</comment>
+        <translation>%1 übrig</translation>
+    </message>
+    <message>
+        <source>%1 and %2 remaining</source>
+        <comment>time</comment>
+        <translation>%1 und %2 übrig</translation>
+    </message>
+    <message>
+        <source>Uptime</source>
+        <translation>Betriebszeit</translation>
+    </message>
+    <message>
+        <source>average</source>
+        <comment>average rate</comment>
+        <translation>Durchschnitt</translation>
+    </message>
+    <message>
+        <source>maximum</source>
+        <comment>maximum rate</comment>
+        <translation>Maximum</translation>
+    </message>
+    <message>
         <source>%n (is) LiveTV and consume(s) %1
 </source>
         <translation>%n sind LiveTV und belegen %1
-        </translation>
+</translation>
     </message>
     <message>
         <source>%n (is) Deleted and consume(s) %1
 </source>
         <translation>%n sind gelöscht und belegen %1
-        </translation>
+</translation>
     </message>
     <message>
         <source>WARNING: is mythfilldatabase running?</source>
@@ -13904,19 +14661,19 @@ Keine weiteren Informationen</translation>
     </message>
     <message>
         <source>%n day(s)</source>
-        <translation>%n Tage        </translation>
+        <translation>%n Tage</translation>
     </message>
     <message>
         <source>%n standard rule(s) (is) defined</source>
-        <translation>%n Standardregeln sind definiert        </translation>
+        <translation>%n Standardregeln sind definiert</translation>
     </message>
     <message>
         <source>%n search rule(s) are defined</source>
-        <translation>%n Suchregeln sind definiert        </translation>
+        <translation>%n Suchregeln sind definiert</translation>
     </message>
     <message>
         <source>%n matching showing(s)</source>
-        <translation>%n passende Sendungen        </translation>
+        <translation>%n passende Sendungen</translation>
     </message>
     <message>
         <source>%n recording(s) consuming %1 (is) allowed to expire
@@ -14524,7 +15281,7 @@ Wählen Sie eine laufende Aufnahme</translation>
     </message>
     <message>
         <source>Delete this recording?</source>
-        <translation>Diese Aufnahme löschen?</translation>
+        <translation type="obsolete">Diese Aufnahme löschen?</translation>
     </message>
     <message>
         <source>DVD</source>
@@ -14596,11 +15353,11 @@ Wählen Sie eine laufende Aufnahme</translation>
     </message>
     <message>
         <source>Sorry, PBP only supports %n video stream(s)</source>
-        <translation>Entschuldigung, PBP unterstützt nur %n Videostreams        </translation>
+        <translation>Entschuldigung, PBP unterstützt nur %n Videostreams</translation>
     </message>
     <message>
         <source>Sorry, PIP only supports %n video stream(s)</source>
-        <translation>Entschuldigung, PIP unterstützt nur %n Videostreams        </translation>
+        <translation>Entschuldigung, PIP unterstützt nur %n Videostreams</translation>
     </message>
     <message>
         <source>Sorry, cannot mix PBP and PIP views</source>
@@ -14612,7 +15369,7 @@ Wählen Sie eine laufende Aufnahme</translation>
     </message>
     <message>
         <source>Toggle Visualisation</source>
-        <translation>Visualisierung umschalten</translation>
+        <translation type="obsolete">Visualisierung umschalten</translation>
     </message>
     <message>
         <source>Adjust Fill</source>
@@ -14734,7 +15491,7 @@ Wählen Sie eine laufende Aufnahme</translation>
     </message>
     <message>
         <source>No, keep it, I changed my mind</source>
-        <translation>Nein</translation>
+        <translation type="obsolete">Nein</translation>
     </message>
     <message>
         <source>Zoom Committed</source>
@@ -14746,7 +15503,7 @@ Wählen Sie eine laufende Aufnahme</translation>
     </message>
     <message>
         <source>Visualisation On</source>
-        <translation>Visualisierung an</translation>
+        <translation type="obsolete">Visualisierung an</translation>
     </message>
     <message>
         <source>Visualisation Off</source>
@@ -14802,7 +15559,7 @@ Wählen Sie eine laufende Aufnahme</translation>
     </message>
     <message>
         <source>Jump Title</source>
-        <translation>Springe zu Titel</translation>
+        <translation type="obsolete">Springe zu Titel</translation>
     </message>
     <message>
         <source>Switch Angle</source>
@@ -14810,7 +15567,7 @@ Wählen Sie eine laufende Aufnahme</translation>
     </message>
     <message>
         <source>Switching</source>
-        <translation>Wechsle</translation>
+        <translation type="obsolete">Wechsle</translation>
     </message>
     <message>
         <source>TV</source>
@@ -14868,7 +15625,7 @@ Wählen Sie eine laufende Aufnahme</translation>
     </message>
     <message>
         <source>Toggle Subtitles</source>
-        <translation>Untertitel ein-/ausblenden</translation>
+        <translation type="obsolete">Untertitel ein-/ausblenden</translation>
     </message>
     <message>
         <source>Text Subtitles</source>
@@ -14880,7 +15637,7 @@ Wählen Sie eine laufende Aufnahme</translation>
     </message>
     <message>
         <source>Toggle External Subtitles</source>
-        <translation>Externe Untertitel umschalten</translation>
+        <translation type="obsolete">Externe Untertitel umschalten</translation>
     </message>
     <message>
         <source>Navigate</source>
@@ -14912,7 +15669,7 @@ Wählen Sie eine laufende Aufnahme</translation>
     </message>
     <message>
         <source>Toggle Audio Upmixer</source>
-        <translation>Audio-Upmixer ein/aus</translation>
+        <translation type="obsolete">Audio-Upmixer ein/aus</translation>
     </message>
     <message>
         <source>Channel Groups</source>
@@ -14925,6 +15682,86 @@ Wählen Sie eine laufende Aufnahme</translation>
     <message>
         <source>Chapter</source>
         <translation>Kapitel</translation>
+    </message>
+    <message>
+        <source>External Subtitles</source>
+        <translation>Externe Untertitel</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to delete:</source>
+        <translation>Diese Aufnahme wirklich löschen:</translation>
+    </message>
+    <message>
+        <source>Switch Title</source>
+        <translation>Titel umschalten</translation>
+    </message>
+    <message>
+        <source>Visualisation</source>
+        <translation>Visualisierung</translation>
+    </message>
+    <message>
+        <source>Disable Audio Upmixer</source>
+        <translation>Audio-Upmixer ausschalten</translation>
+    </message>
+    <message>
+        <source>Enable Audio Upmixer</source>
+        <translation>Audio-Upmixer einschalten</translation>
+    </message>
+    <message>
+        <source>None</source>
+        <translation>Keine</translation>
+    </message>
+    <message>
+        <source>3D</source>
+        <translation>3D</translation>
+    </message>
+    <message>
+        <source>Disable Night Mode</source>
+        <translation>Nachtmodus deaktivieren</translation>
+    </message>
+    <message>
+        <source>Enable Night Mode</source>
+        <translation>Nachtmodus aktivieren</translation>
+    </message>
+    <message>
+        <source>Side by Side</source>
+        <translation>Side by Side</translation>
+    </message>
+    <message>
+        <source>Discard Side by Side</source>
+        <translation>Side by Side verwerfen</translation>
+    </message>
+    <message>
+        <source>Top and Bottom</source>
+        <translation>Top and Bottom</translation>
+    </message>
+    <message>
+        <source>Discard Top and Bottom</source>
+        <translation>Top and Bottom verwerfen</translation>
+    </message>
+    <message>
+        <source>Disable Subtitles</source>
+        <translation>Untertitel ausschalten</translation>
+    </message>
+    <message>
+        <source>Enable Subtitles</source>
+        <translation>Untertitel einschalten</translation>
+    </message>
+    <message>
+        <source>Disable Forced Subtitles</source>
+        <translation>Erzwungene Untertitel deaktivieren</translation>
+    </message>
+    <message>
+        <source>Enable Forced Subtitles</source>
+        <translation>Erzwungene Untertitel aktivieren</translation>
+    </message>
+    <message>
+        <source>Disable External Subtitles</source>
+        <translation>Externe Untertitiel deaktivieren</translation>
+    </message>
+    <message>
+        <source>Enable External Subtitles</source>
+        <translation>Externe Untertitel aktivieren</translation>
     </message>
     <message>
         <source>Playback</source>
@@ -14991,6 +15828,10 @@ Wählen Sie eine laufende Aufnahme</translation>
         <translation>Wechsel zu PBP</translation>
     </message>
     <message>
+        <source>No, keep it</source>
+        <translation>Nein, behalten</translation>
+    </message>
+    <message>
         <source>Auto Detect</source>
         <translation>Autom. Erkennung</translation>
     </message>
@@ -15019,7 +15860,7 @@ Wählen Sie eine laufende Aufnahme</translation>
     </message>
     <message>
         <source>%n minute(s)</source>
-        <translation>%n Minuten        </translation>
+        <translation>%n Minuten</translation>
     </message>
 </context>
 <context>
@@ -15229,7 +16070,7 @@ Wählen Sie eine laufende Aufnahme</translation>
     </message>
     <message>
         <source>Prev</source>
-        <translation type="obsolete">Letztes</translation>
+        <translation>Letztes</translation>
     </message>
     <message>
         <source>File Finder</source>
@@ -15369,7 +16210,7 @@ Wählen Sie eine laufende Aufnahme</translation>
     </message>
     <message>
         <source>Weather Setup</source>
-        <translation>Wetter einrichten</translation>
+        <translation type="obsolete">Wetter einrichten</translation>
     </message>
     <message>
         <source>Theme Chooser</source>
@@ -15933,7 +16774,7 @@ Wenn Sie fertig sind drücken Sie &quot;OK&quot; um zu suchen.</translation>
     </message>
     <message>
         <source>-%n</source>
-        <translation>-%n        </translation>
+        <translation>-%n</translation>
     </message>
     <message>
         <source>Normal</source>
@@ -15941,7 +16782,7 @@ Wenn Sie fertig sind drücken Sie &quot;OK&quot; um zu suchen.</translation>
     </message>
     <message>
         <source>+%n</source>
-        <translation>+%n        </translation>
+        <translation>+%n</translation>
     </message>
     <message>
         <source>Input:</source>
@@ -15953,7 +16794,7 @@ Wenn Sie fertig sind drücken Sie &quot;OK&quot; um zu suchen.</translation>
     </message>
     <message>
         <source>%n minute(s) late</source>
-        <translation>%n Minuten später        </translation>
+        <translation>%n Minuten später</translation>
     </message>
     <message>
         <source>Start on time</source>
@@ -15961,7 +16802,7 @@ Wenn Sie fertig sind drücken Sie &quot;OK&quot; um zu suchen.</translation>
     </message>
     <message>
         <source>%n minute(s) early</source>
-        <translation>%n Minuten früher        </translation>
+        <translation>%n Minuten früher</translation>
     </message>
     <message>
         <source>End Offset:</source>
@@ -16087,7 +16928,7 @@ Finally, you can test, immediately activate, store, or cancel your rule.</source
     </message>
     <message>
         <source>(%STARTTIME% - %ENDTIME%) %LENMINS%</source>
-        <translation>(%STARTTIME% - %ENDTIME%) %LENMINS%</translation>
+        <translation type="obsolete">(%STARTTIME% - %ENDTIME%) %LENMINS%</translation>
     </message>
     <message>
         <source>%PLAYEDTIME% of %TOTALTIME% %(|REMAININGTIME| remaining)%%(|BEHINDTIME| behind)%</source>
@@ -16095,11 +16936,11 @@ Finally, you can test, immediately activate, store, or cancel your rule.</source
     </message>
     <message>
         <source>%YEARSTARS| %%DESCRIPTION%% |LONGREPEAT%</source>
-        <translation>%YEARSTARS| %%DESCRIPTION%% |LONGREPEAT%</translation>
+        <translation type="obsolete">%YEARSTARS| %%DESCRIPTION%% |LONGREPEAT%</translation>
     </message>
     <message>
         <source>%&quot;|SUBTITLE|&quot;%</source>
-        <translation>%&quot;|SUBTITLE|&quot;%</translation>
+        <translation type="obsolete">%&quot;|SUBTITLE|&quot;%</translation>
     </message>
     <message>
         <source>%&quot;|SUBTITLE|&quot; %%(|STARS|) %%DESCRIPTION%</source>
@@ -16165,7 +17006,7 @@ Finally, you can test, immediately activate, store, or cancel your rule.</source
     </message>
     <message>
         <source>Play %n trailer(s)</source>
-        <translation>Spiele %n Vorschauen        </translation>
+        <translation>Spiele %n Vorschauen</translation>
     </message>
     <message>
         <source>A MythTV theme based off the LCARS interface as featured in a well-known Sci-Fi franchise. LCARS took second place in MythTV&apos;s v0.23 theming contest.</source>
@@ -16241,15 +17082,15 @@ Finally, you can test, immediately activate, store, or cancel your rule.</source
     </message>
     <message>
         <source>State</source>
-        <translation>Status</translation>
+        <translation type="obsolete">Status</translation>
     </message>
     <message>
         <source>[x]</source>
-        <translation>[x]</translation>
+        <translation type="obsolete">[x]</translation>
     </message>
     <message>
         <source>Menu Item</source>
-        <translation>Menüeintrag</translation>
+        <translation type="obsolete">Menüeintrag</translation>
     </message>
     <message>
         <source>Program Search</source>
@@ -16378,6 +17219,10 @@ Finally, you can test, immediately activate, store, or cancel your rule.</source
         <translation>Keine Aufnahmen verfügbar oder lädt noch...</translation>
     </message>
     <message>
+        <source>(1) All (2) Important</source>
+        <translation>(1) Alle (2) Wichtige</translation>
+    </message>
+    <message>
         <source>Schedule Options Editor</source>
         <translation>Planungsoptionen bearbeiten</translation>
     </message>
@@ -16391,11 +17236,11 @@ Finally, you can test, immediately activate, store, or cancel your rule.</source
     </message>
     <message>
         <source>Archive Utilities</source>
-        <translation>Archivierungstools</translation>
+        <translation type="obsolete">Archivierungstools</translation>
     </message>
     <message>
         <source>(%STARTTIME% - %ENDTIME%)  %LENMINS%</source>
-        <translation>(%STARTTIME% - %ENDTIME%)  %LENMINS%</translation>
+        <translation type="obsolete">(%STARTTIME% - %ENDTIME%)  %LENMINS%</translation>
     </message>
     <message>
         <source>%CHANNUM%</source>
@@ -16403,55 +17248,55 @@ Finally, you can test, immediately activate, store, or cancel your rule.</source
     </message>
     <message>
         <source>Key Configuration</source>
-        <translation>Tastenbelegung</translation>
+        <translation type="obsolete">Tastenbelegung</translation>
     </message>
     <message>
         <source>Utilities</source>
-        <translation>Zubehör</translation>
+        <translation type="obsolete">Zubehör</translation>
     </message>
     <message>
         <source>Information</source>
-        <translation>Information</translation>
+        <translation type="obsolete">Information</translation>
     </message>
     <message>
         <source>Optical Media</source>
-        <translation>CD/DVD</translation>
+        <translation type="obsolete">CD/DVD</translation>
     </message>
     <message>
         <source>Photographs</source>
-        <translation>Fotos</translation>
+        <translation type="obsolete">Fotos</translation>
     </message>
     <message>
         <source>Media Setup</source>
-        <translation>Medien-Einstellungen</translation>
+        <translation type="obsolete">Medien-Einstellungen</translation>
     </message>
     <message>
         <source>Info Setup</source>
-        <translation>Info-Einstellungen</translation>
+        <translation type="obsolete">Info-Einstellungen</translation>
     </message>
     <message>
         <source>TV Setup</source>
-        <translation>TV-Einstellungen</translation>
+        <translation type="obsolete">TV-Einstellungen</translation>
     </message>
     <message>
         <source>DVD</source>
-        <translation>DVD</translation>
+        <translation type="obsolete">DVD</translation>
     </message>
     <message>
         <source>Music Setup</source>
-        <translation>Musik-Einstellungen</translation>
+        <translation type="obsolete">Musik-Einstellungen</translation>
     </message>
     <message>
         <source>Video Setup</source>
-        <translation>Video-Einstellungen</translation>
+        <translation type="obsolete">Video-Einstellungen</translation>
     </message>
     <message>
         <source>Game Setup</source>
-        <translation>Spiel-Einstellungen</translation>
+        <translation type="obsolete">Spiel-Einstellungen</translation>
     </message>
     <message>
         <source>Archive</source>
-        <translation>Archiv</translation>
+        <translation type="obsolete">Archiv</translation>
     </message>
     <message>
         <source>Probe</source>
@@ -16462,24 +17307,160 @@ Finally, you can test, immediately activate, store, or cancel your rule.</source
         <translation>%YEARSTARS% %DESCRIPTION% %LONGREPEAT%</translation>
     </message>
     <message>
+        <source>Cert.:</source>
+        <translation>Cert.:</translation>
+    </message>
+    <message>
+        <source>Age:</source>
+        <translation>Alter:</translation>
+    </message>
+    <message>
+        <source>TMDB/TVDB No.:</source>
+        <translation>TMDB/TVDB Nr.:</translation>
+    </message>
+    <message>
+        <source>Unique Player:</source>
+        <translation>Eigener Player:</translation>
+    </message>
+    <message>
+        <source>Search...</source>
+        <translation>Suchen...</translation>
+    </message>
+    <message>
+        <source>%DATE%   %TIME%</source>
+        <translation>%DATE%   %TIME%</translation>
+    </message>
+    <message>
+        <source>unrestricted</source>
+        <translation>Uneingeschränkt</translation>
+    </message>
+    <message>
+        <source>partially restricted</source>
+        <translation>Teilweise eingeschränkt</translation>
+    </message>
+    <message>
+        <source>mostly restricted</source>
+        <translation>Hauptsächlich eingeschränkt</translation>
+    </message>
+    <message>
+        <source>restricted</source>
+        <translation>Eingeschränkt</translation>
+    </message>
+    <message>
+        <source>(%1)</source>
+        <translation>(%1)</translation>
+    </message>
+    <message>
+        <source>%|RATING| %%|(STARS|) %%DESCRIPTION%</source>
+        <translation>%|RATING| %%|(STARS|) %%DESCRIPTION%</translation>
+    </message>
+    <message>
+        <source>%1</source>
+        <translation>%1</translation>
+    </message>
+    <message>
+        <source>%1 matches</source>
+        <translation>%1 Treffer</translation>
+    </message>
+    <message>
+        <source>%TITLE%% - |SUBTITLE%</source>
+        <translation>%TITLE%% - |SUBTITLE%</translation>
+    </message>
+    <message>
+        <source>Channel Icons</source>
+        <translation>Sendericons</translation>
+    </message>
+    <message>
+        <source>Storage to Buffer</source>
+        <translation>Speicher zu Puffer</translation>
+    </message>
+    <message>
+        <source>: %1</source>
+        <translation>: %1</translation>
+    </message>
+    <message>
+        <source>Buffer to Decoder</source>
+        <translation>Puffer zu Decoder</translation>
+    </message>
+    <message>
+        <source>Available Buffer</source>
+        <translation>Verfügbarer Puffer</translation>
+    </message>
+    <message>
+        <source>: %BUFFERAVAIL% of %BUFFERSIZE%Mb</source>
+        <translation>: %BUFFERAVAIL% of %BUFFERSIZE%Mb</translation>
+    </message>
+    <message>
+        <source>FPS</source>
+        <translation>FPS</translation>
+    </message>
+    <message>
+        <source>A/V Sync</source>
+        <translation>A/V Sync</translation>
+    </message>
+    <message>
+        <source>Frames decoded /free</source>
+        <translation>Frames decoded/free</translation>
+    </message>
+    <message>
+        <source>CPUs</source>
+        <translation>CPUs</translation>
+    </message>
+    <message>
+        <source>Codec/Dec</source>
+        <translation>Codec/Dec</translation>
+    </message>
+    <message>
+        <source>: %VIDEOCODEC% %VIDEODECODER%</source>
+        <translation>: %VIDEOCODEC% %VIDEODECODER%</translation>
+    </message>
+    <message>
+        <source>: %VIDEOWIDTH%x%VIDEOHEIGHT%@%VIDEOFRAMERATE%fps</source>
+        <translation>: %VIDEOWIDTH%x%VIDEOHEIGHT%@%VIDEOFRAMERATE%fps</translation>
+    </message>
+    <message>
+        <source>Sample rate</source>
+        <translation>Sample rate</translation>
+    </message>
+    <message>
+        <source>%DESCRIPTION% %(|REMAININGTIME|)%%(|BEHINDTIME|)%%VALUE%%UNITS%</source>
+        <translation>%DESCRIPTION% %(|REMAININGTIME|)%%(|BEHINDTIME|)%%VALUE%%UNITS%</translation>
+    </message>
+    <message>
+        <source>%STARTDATE%   %STARTTIME% - %ENDTIME%</source>
+        <translation>%STARTDATE%   %STARTTIME% - %ENDTIME%</translation>
+    </message>
+    <message>
+        <source>%|&quot;SUBTITLE|&quot;% %|(STARS|) %%DESCRIPTION%</source>
+        <translation>%|&quot;SUBTITLE|&quot;% %|(STARS|) %%DESCRIPTION%</translation>
+    </message>
+    <message>
+        <source>Channel Name:</source>
+        <translation>Sendername:</translation>
+    </message>
+    <message>
+        <source>XMLTV ID:</source>
+        <translation>XMLTV-ID:</translation>
+    </message>
+    <message>
         <source>No recordings exist</source>
         <translation>Keine Aufnahme verfügbar</translation>
     </message>
     <message>
         <source>New Password</source>
-        <translation>Neues Passwort</translation>
+        <translation type="obsolete">Neues Passwort</translation>
     </message>
     <message>
         <source>Manual Recording</source>
-        <translation>Manuelle Aufnahme</translation>
+        <translation type="obsolete">Manuelle Aufnahme</translation>
     </message>
     <message>
         <source>Programme Finder</source>
-        <translation>Sendung suchen</translation>
+        <translation type="obsolete">Sendung suchen</translation>
     </message>
     <message>
         <source>Programme Guide</source>
-        <translation>Programmübersicht</translation>
+        <translation type="obsolete">Programmübersicht</translation>
     </message>
     <message>
         <source>(1) Time (2) Title</source>
@@ -16487,11 +17468,11 @@ Finally, you can test, immediately activate, store, or cancel your rule.</source
     </message>
     <message>
         <source>No programs matched this search.</source>
-        <translation>Keine passende Sendung gefunden.</translation>
+        <translation type="obsolete">Keine passende Sendung gefunden.</translation>
     </message>
     <message>
         <source>A brushed metal and glass effect theme with a choice of colour schemes.</source>
-        <translation>Ein Theme mit Metall- und Glaseffekten und einer Auswahl an Farbschematas.</translation>
+        <translation type="obsolete">Ein Theme mit Metall- und Glaseffekten und einer Auswahl an Farbschematas.</translation>
     </message>
     <message>
         <source>Start Frontend</source>
@@ -16930,6 +17911,18 @@ Finally, you can test, immediately activate, store, or cancel your rule.</source
         <translation>Beschreibung</translation>
     </message>
     <message>
+        <source>No results found for this search</source>
+        <translation>Keine Ergebnisse für diese Suche gefunden</translation>
+    </message>
+    <message>
+        <source>%Season - |SEASON| %% Episode - |EPISODE| %</source>
+        <translation>%Season - |SEASON| %% Episode - |EPISODE| %</translation>
+    </message>
+    <message>
+        <source>Change MythTV key bindings</source>
+        <translation>MythTV Tastenbelegung ändern</translation>
+    </message>
+    <message>
         <source>Search List</source>
         <translation>Suchliste</translation>
     </message>
@@ -16940,6 +17933,10 @@ Finally, you can test, immediately activate, store, or cancel your rule.</source
     <message>
         <source>Not Found</source>
         <translation>Nicht gefunden</translation>
+    </message>
+    <message>
+        <source>Select Time &amp; Date</source>
+        <translation>Zeit und Datum wählen</translation>
     </message>
     <message>
         <source>Artwork and Metadata Sources</source>
@@ -17022,6 +18019,18 @@ Finally, you can test, immediately activate, store, or cancel your rule.</source
         <translation>Handbuch</translation>
     </message>
     <message>
+        <source>MythTV is in standby</source>
+        <translation>MythTV ist im Standby Modus</translation>
+    </message>
+    <message>
+        <source>Backend is idle</source>
+        <translation>Backend ist im Leerlauf</translation>
+    </message>
+    <message>
+        <source>Backend is recording</source>
+        <translation>Backend nimmt auf</translation>
+    </message>
+    <message>
         <source>Configure audio playback</source>
         <translation>Audiowiedergabe konfigurieren</translation>
     </message>
@@ -17040,6 +18049,144 @@ Finally, you can test, immediately activate, store, or cancel your rule.</source
     <message>
         <source>Configure surveillance, weather, news, and the web</source>
         <translation>Überwachung, Wetter, Nachrichten und Internet konfigurieren</translation>
+    </message>
+    <message>
+        <source>There is/are %n recording(s) in this display group</source>
+        <translation>Es sind %n Aufnahmen in dieser Gruppe</translation>
+    </message>
+    <message>
+        <source>Using the text areas below,you can change the recording title,subtitle,and description.
+
+Once you have completed your modifications,click the &quot;Save&quot; button.</source>
+        <translation>Sie können nun den Aufnahmetitel, Untertitel und die Beschreibung ändern.
+
+Wenn Sie fertig sind, drücken Sie den &apos;Ok&apos; Button.</translation>
+    </message>
+    <message>
+        <source>You Haven&apos;t Scheduled Any Programs To Be Recorded
+ To schedule a recording,exit this screen and select &apos;Program Guide&apos; or &apos;Program Finder&apos;</source>
+        <translation>Sie haben noch keine Aufnahmen geplant.
+ Um eine Aufnahme zu planen, wählen Sie &apos;Programmübersicht&apos; oder &apos;Programmsuche&apos;</translation>
+    </message>
+    <message>
+        <source>name</source>
+        <translation>Name</translation>
+    </message>
+    <message>
+        <source>Select a clause from the list:</source>
+        <translation>Wählen Sie eine Klausel aus der Liste:</translation>
+    </message>
+    <message>
+        <source>Press Up/Down from letter list,to navigate to another list.  Press Left/Right from Show or Episode list to navigate to another list.</source>
+        <translation>Drücken Sie Oben/Unten in der Liste um zu einer anderen Liste zu wechseln.  Drücken Sie Links/Rechts um aus der Sendungs- oder Episodenliste in eine andere Liste zu wechseln. </translation>
+    </message>
+    <message>
+        <source>Filter Options</source>
+        <translation>Filteroptionen</translation>
+    </message>
+    <message>
+        <source>Select the filters that should be applied for this recording.</source>
+        <translation>Wählen Sie die Filter  die auf diese Aufnahme angewandt werden sollen.</translation>
+    </message>
+    <message>
+        <source>-&gt;</source>
+        <translation>-&gt;</translation>
+    </message>
+    <message>
+        <source>TMDB/TVDB #</source>
+        <translation>TMDB/TVDB #</translation>
+    </message>
+    <message>
+        <source>Status</source>
+        <translation>Status</translation>
+    </message>
+    <message>
+        <source>(%1) +</source>
+        <translation>(%1) +</translation>
+    </message>
+    <message>
+        <source>= %1</source>
+        <translation>= %1</translation>
+    </message>
+    <message>
+        <source>(Last: %1)</source>
+        <translation>(Last: %1)</translation>
+    </message>
+    <message>
+        <source>%|(STARS|) %%DESCRIPTION%</source>
+        <translation>%|(STARS|) %%DESCRIPTION%</translation>
+    </message>
+    <message>
+        <source>Designed to show off some different element arrangements available in Myth 0.25.  Tested at 1280x720 and with FranÃÂ§ais</source>
+        <translation>Zeigt verschiedene in 0.25 verfügbare Elementanordnungen.  Getestet mit 1280x720 in französisch</translation>
+    </message>
+    <message>
+        <source>Year: %1</source>
+        <translation>Jahr: %1</translation>
+    </message>
+    <message>
+        <source>IMDB: %1</source>
+        <translation>IMDB: %1</translation>
+    </message>
+    <message>
+        <source>No videos in library,or no files found.  If you have configured a video directory,press &quot;M&quot; (or the MENU key) and select &quot;Scan for Changes.&quot;</source>
+        <translation>Keine Videos in der Bibliothek, oder keine Dateien gefunden.  Wenn ein Videoverzeichnis konfiguriert wurde, drücken Sie &quot;M&quot; (oder den Menü-Knopf) und wählen Sie &quot;Nach Videos suchen&quot;</translation>
+    </message>
+    <message>
+        <source>Category: %1</source>
+        <translation>Kategorie: %1</translation>
+    </message>
+    <message>
+        <source>Use default player</source>
+        <translation>Standardplayer verwenden</translation>
+    </message>
+    <message>
+        <source>Ignore</source>
+        <translation>Ignorieren</translation>
+    </message>
+    <message>
+        <source>Find local trailers</source>
+        <translation>Lokale Filmvorschauen finden</translation>
+    </message>
+    <message>
+        <source>Get Banner</source>
+        <translation>Banner holen</translation>
+    </message>
+    <message>
+        <source>Find local banner</source>
+        <translation>Banner lokal finden</translation>
+    </message>
+    <message>
+        <source>Get coverart</source>
+        <translation>Coverart holen</translation>
+    </message>
+    <message>
+        <source>Find local coverart</source>
+        <translation>Coverart lokal finden</translation>
+    </message>
+    <message>
+        <source>Get Fanart</source>
+        <translation>Fanart holen</translation>
+    </message>
+    <message>
+        <source>Find local fanart</source>
+        <translation>Fanart lokal finden</translation>
+    </message>
+    <message>
+        <source>Get Screenshot</source>
+        <translation>Screenshot holen</translation>
+    </message>
+    <message>
+        <source>Find local screenshot</source>
+        <translation>Lokalen Screenshot finden</translation>
+    </message>
+    <message>
+        <source>Browsable</source>
+        <translation>Durchsuchbar</translation>
+    </message>
+    <message>
+        <source>Filter video list</source>
+        <translation>Videoliste filtern</translation>
     </message>
     <message>
         <source>Artwork and Data Sources</source>
@@ -17416,19 +18563,19 @@ Falls Sie &quot;Standardplayer verwenden&quot; auswählen wird das für diesen D
     </message>
     <message>
         <source>SELECT: Edit</source>
-        <translation>SELECT: Ändern</translation>
+        <translation type="obsolete">SELECT: Ändern</translation>
     </message>
     <message>
         <source>INFO - Action Menu</source>
-        <translation>INFO - Aktionsmenü</translation>
+        <translation type="obsolete">INFO - Aktionsmenü</translation>
     </message>
     <message>
         <source>File Associations</source>
-        <translation>Dateierweiterungen</translation>
+        <translation type="obsolete">Dateierweiterungen</translation>
     </message>
     <message>
         <source>Video Filters</source>
-        <translation>Videofilter</translation>
+        <translation type="obsolete">Videofilter</translation>
     </message>
     <message>
         <source>Another Theme build on the new UI library Any suggestions or bugs to https://code.google.com/p/a-forest/ A special thank to Steve Adeff for his help on this project.</source>
@@ -17564,7 +18711,7 @@ Falls Sie &quot;Standardplayer verwenden&quot; auswählen wird das für diesen D
     </message>
     <message>
         <source>NetFlix</source>
-        <translation>NetFlix</translation>
+        <translation type="obsolete">NetFlix</translation>
     </message>
     <message>
         <source>Edit Keys</source>
@@ -17748,7 +18895,7 @@ Falls Sie &quot;Standardplayer verwenden&quot; auswählen wird das für diesen D
     </message>
     <message>
         <source>None</source>
-        <translation type="obsolete">Keine</translation>
+        <translation>Keine</translation>
     </message>
     <message>
         <source>Change Displayed Groups</source>
@@ -18004,7 +19151,7 @@ Falls Sie &quot;Standardplayer verwenden&quot; auswählen wird das für diesen D
     </message>
     <message>
         <source>Reduce priority by %n</source>
-        <translation>Priorität um %n verringern        </translation>
+        <translation>Priorität um %n verringern</translation>
     </message>
     <message>
         <source>Normal recording priority</source>
@@ -18012,11 +19159,11 @@ Falls Sie &quot;Standardplayer verwenden&quot; auswählen wird das für diesen D
     </message>
     <message>
         <source>Raise priority by %n</source>
-        <translation>Priorität um %n erhöhen        </translation>
+        <translation>Priorität um %n erhöhen</translation>
     </message>
     <message>
         <source>Start recording %n minute(s) late</source>
-        <translation>Starte Aufnahme %n Minuten später        </translation>
+        <translation>Starte Aufnahme %n Minuten später</translation>
     </message>
     <message>
         <source>Start recording on time</source>
@@ -18024,11 +19171,11 @@ Falls Sie &quot;Standardplayer verwenden&quot; auswählen wird das für diesen D
     </message>
     <message>
         <source>Start recording %n minute(s) early</source>
-        <translation>Starte Aufnahme %n Minuten früher        </translation>
+        <translation>Starte Aufnahme %n Minuten früher</translation>
     </message>
     <message>
         <source>End recording %n minute(s) early</source>
-        <translation>Beende Aufnahme %n Minuten früher        </translation>
+        <translation>Beende Aufnahme %n Minuten früher</translation>
     </message>
     <message>
         <source>End recording on time</source>
@@ -18036,7 +19183,7 @@ Falls Sie &quot;Standardplayer verwenden&quot; auswählen wird das für diesen D
     </message>
     <message>
         <source>End recording %n minute(s) late</source>
-        <translation>Beende Aufnahme %n Minuten später        </translation>
+        <translation>Beende Aufnahme %n Minuten später</translation>
     </message>
     <message>
         <source>Recording Rule Active</source>
@@ -18052,7 +19199,7 @@ Falls Sie &quot;Standardplayer verwenden&quot; auswählen wird das für diesen D
     </message>
     <message>
         <source>Keep at most %n episode(s)</source>
-        <translation>Maximal %n Folgen behalten        </translation>
+        <translation>Maximal %n Folgen behalten</translation>
     </message>
     <message>
         <source>Allow recordings to expire?</source>
@@ -18902,7 +20049,7 @@ dd MMM yyyy</translation>
     </message>
     <message>
         <source>Change MythTV key bindings.</source>
-        <translation>Tastaturbelegung anpassen</translation>
+        <translation type="obsolete">Tastaturbelegung anpassen</translation>
     </message>
     <message>
         <source>Play or import audio or video CDs or DVDs</source>
@@ -18986,38 +20133,38 @@ dd MMM yyyy</translation>
     <name>UIListBtnType</name>
     <message>
         <source>Search</source>
-        <translation>Suche</translation>
+        <translation type="obsolete">Suche</translation>
     </message>
     <message>
         <source>Starts with text</source>
-        <translation>Beginnt mit</translation>
+        <translation type="obsolete">Beginnt mit</translation>
     </message>
     <message>
         <source>Contains text</source>
-        <translation>Enthält</translation>
+        <translation type="obsolete">Enthält</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Abbrechen</translation>
+        <translation type="obsolete">Abbrechen</translation>
     </message>
 </context>
 <context>
     <name>UIManagedTreeListType</name>
     <message>
         <source>Search</source>
-        <translation>Suche</translation>
+        <translation type="obsolete">Suche</translation>
     </message>
     <message>
         <source>Starts with text</source>
-        <translation>Beginnt mit</translation>
+        <translation type="obsolete">Beginnt mit</translation>
     </message>
     <message>
         <source>Contains text</source>
-        <translation>Enthält</translation>
+        <translation type="obsolete">Enthält</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Abbrechen</translation>
+        <translation type="obsolete">Abbrechen</translation>
     </message>
 </context>
 <context>
@@ -19117,7 +20264,11 @@ dd MMM yyyy</translation>
     <name>VideoDialog</name>
     <message>
         <source>Video dialog loading, or no videos available...</source>
-        <translation>Video Dialog lädt oder keine Videos verfügbar...</translation>
+        <translation type="obsolete">Video Dialog lädt oder keine Videos verfügbar...</translation>
+    </message>
+    <message>
+        <source>The video scan found no files, have you configured a video storage group?</source>
+        <translation>Der Videoscan hat keine Dateien gefunden, haben Sie eine Videospeichergruppe konfiguriert?</translation>
     </message>
     <message>
         <source>Season</source>
@@ -19385,12 +20536,17 @@ dd MMM yyyy</translation>
         <source>Failed to delete file</source>
         <translation>Löschen der Datei fehlgeschlagen</translation>
     </message>
+    <message>
+        <source>There are no videos in the database, would you like to scan your video directories now?</source>
+        <translation>Es sind keine Videos in der Datenbank, wollen Sie die Videoverzeichnisse jetzt scannen?</translation>
+    </message>
 </context>
 <context>
     <name>VideoFilterDialog</name>
     <message>
         <source>Result of this filter : %n video(s)</source>
-        <translation>Ergebnis des Filters: %n Videos        </translation>
+        <translation>Ergebnis des Filters: %n Videos        
+        </translation>
     </message>
     <message>
         <source>Result of this filter : No Videos</source>
@@ -19399,6 +20555,17 @@ dd MMM yyyy</translation>
     <message>
         <source>minutes</source>
         <translation>Minuten</translation>
+    </message>
+</context>
+<context>
+    <name>VideoScanner</name>
+    <message>
+        <source>Failed to Scan SG Video Hosts</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>If they no longer exist please remove them</source>
+        <translation>Falls diese nicht länger verfügbar sind entfernen Sie sie bitte</translation>
     </message>
 </context>
 <context>
@@ -19560,7 +20727,7 @@ dd MMM yyyy</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Abbrechen</translation>
+        <translation type="obsolete">Abbrechen</translation>
     </message>
     <message>
         <source>Important</source>
@@ -19639,7 +20806,8 @@ dd MMM yyyy</translation>
     </message>
     <message>
         <source>MythTV is idle and will shutdown in %n second(s).</source>
-        <translation>MythTV ist untätig und wird in %n Sekunden ausschalten.        </translation>
+        <translation>MythTV ist untätig und wird in %n Sekunden ausschalten.        
+        </translation>
     </message>
     <message>
         <source>MythTV is idle.</source>

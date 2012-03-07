@@ -23,7 +23,10 @@ class MTV_PUBLIC DeleteMap
                  m_nextCutStartIsValid(false),
                  m_nextCutStart(0), m_changed(true),
                  m_seekamountpos(4), m_seekamount(30),
-                 m_ctx(0), m_undoStackPointer(-1) { Push(""); }
+                 m_ctx(0), m_cachedTotalForOSD(0), m_undoStackPointer(-1)
+    {
+        Push("");
+    }
 
     void SetPlayerContext(PlayerContext *ctx) { m_ctx = ctx; }
     bool HandleAction(QString &action, uint64_t frame, uint64_t played,
@@ -90,6 +93,7 @@ class MTV_PUBLIC DeleteMap
     int           m_seekamountpos;
     int           m_seekamount;
     PlayerContext *m_ctx;
+    uint64_t      m_cachedTotalForOSD;
 
     // Invariant: m_undoStack[m_undoStackPointer].deleteMap == m_deleteMap
     QVector<DeleteMapUndoEntry> m_undoStack;

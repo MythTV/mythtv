@@ -3,7 +3,7 @@
 #define _STREAMLISTENERS_H_
 
 #include "tspacket.h"
-#include "util.h"
+#include "mythmiscutil.h"
 
 class TSPacket;
 class TSPacket_nonconst;

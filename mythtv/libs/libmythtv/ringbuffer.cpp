@@ -25,7 +25,7 @@
 #include "mythconfig.h"
 #include "remotefile.h"
 #include "compat.h"
-#include "util.h"
+#include "mythmiscutil.h"
 #include "mythlogging.h"
 
 // about one second at 35mbit
@@ -138,31 +138,23 @@ RingBuffer *RingBuffer::Create(
 
     if (!stream_only && (dvdurl || dvddir || dvdext))
     {
-        if (lfilename.left(6) == "dvd://")     // 'Play DVD' sends "dvd:/" + dev
-            lfilename.remove(0,5);             // e.g. "dvd://dev/sda"
-        else if (lfilename.left(5) == "dvd:/") // Less correct URI "dvd:" + path
-            lfilename.remove(0,4);             // e.g. "dvd:/videos/ET"
-        else if (lfilename.left(4) == "dvd:")   // Win32 URI "dvd:" + abs path
-            lfilename.remove(0,4);              //             e.g. "dvd:D:\"
+        if (lfilename.left(4) == "dvd:")        // URI "dvd:" + path
+            lfilename.remove(0,4);              // e.g. "dvd:/dev/dvd"
 
-        if (mythurl || QFile::exists(lfilename))
-            LOG(VB_PLAYBACK, LOG_INFO, "Trying DVD at " + lfilename);
-        else
+        if (!(mythurl || QFile::exists(lfilename)))
             lfilename = "/dev/dvd";
+        LOG(VB_PLAYBACK, LOG_INFO, "Trying DVD at " + lfilename);
 
         return new DVDRingBuffer(lfilename);
     }
     else if (!stream_only && (bdurl || bddir))
     {
-        if (lfilename.left(5) == "bd://")      // 'Play DVD' sends "bd:/" + dev
-            lfilename.remove(0,4);             // e.g. "bd://dev/sda"
-        else if (lfilename.left(4) == "bd:/")  // Less correct URI "bd:" + path
+        if (lfilename.left(3) == "bd:")        // URI "bd:" + path
             lfilename.remove(0,3);             // e.g. "bd:/videos/ET"
 
-        if (mythurl || QFile::exists(lfilename))
-            LOG(VB_PLAYBACK, LOG_INFO, "Trying BD at " + lfilename);
-        else
+        if (!(mythurl || QFile::exists(lfilename)))
             lfilename = "/dev/dvd";
+        LOG(VB_PLAYBACK, LOG_INFO, "Trying BD at " + lfilename);
 
         return new BDRingBuffer(lfilename);
     }
@@ -1340,7 +1332,7 @@ QString RingBuffer::BitrateToString(uint64_t rate, bool hz)
     }
     else if (rate >= 1000)
     {
-        msg = hz ? QObject::tr("%1KHz") : QObject::tr("%1Kbps");
+        msg = hz ? QObject::tr("%1kHz") : QObject::tr("%1kbps");
         bitrate = (float)rate / 1000.0;
         range = hz ? 1 : 0;
     }

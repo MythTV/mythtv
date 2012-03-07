@@ -16,7 +16,7 @@
 #include "upnpcdstv.h"
 #include "httprequest.h"
 #include "storagegroup.h"
-#include "util.h"
+#include "mythmiscutil.h"
 #include "mythcorecontext.h"
 
 
@@ -404,6 +404,13 @@ void UPnpCDSTv::AddItem( const UPnpCDSRequest    *pRequest,
     QString sProtocol = QString( "http-get:*:%1:DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS=01500000000000000000000000000000" ).arg( sMimeType  );
     QString sURI      = QString( "%1GetRecording%2").arg( sURIBase   )
                                                     .arg( sURIParams );
+
+    // Sony BDPS370 requires a DLNA Profile Name
+    // FIXME: detection to determine the correct DLNA Profile Name
+    if (sMimeType == "video/mpeg")
+    {
+        sProtocol += ";DLNA.ORG_PN=MPEG_TS_SD_NA_ISO";
+    }
 
     Resource *pRes = pItem->AddResource( sProtocol, sURI );
 

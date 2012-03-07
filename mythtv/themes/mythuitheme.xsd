@@ -57,23 +57,23 @@
             <xs:element name="helptext" type="text" minOccurs="0" maxOccurs="1" />
             <xs:element name="focusorder" type="xs:integer" minOccurs="0" maxOccurs="1" />
             <xs:element name="minsize" minOccurs="0" maxOccurs="1">
-		<xs:complexType>
-		    <xs:simpleContent>
-			<xs:extension base="size">
-			    <xs:attribute name="vanish" type="boolean" />
-			    <xs:attribute name="initiator" type="boolean" />
-			    <xs:attribute name="shrink">
-				<xs:simpleType>
-				    <xs:restriction base="xs:token">
-					<xs:enumeration value="short" />
-					<xs:enumeration value="narrow" />
-				    </xs:restriction>
-				</xs:simpleType>
-			    </xs:attribute>
-			</xs:extension>
-		    </xs:simpleContent>
-		</xs:complexType>
-	    </xs:element>
+                <xs:complexType>
+                    <xs:simpleContent>
+                        <xs:extension base="size">
+                            <xs:attribute name="vanish" type="boolean" />
+                            <xs:attribute name="initiator" type="boolean" />
+                            <xs:attribute name="shrink">
+                                <xs:simpleType>
+                                    <xs:restriction base="xs:token">
+                                        <xs:enumeration value="short" />
+                                        <xs:enumeration value="narrow" />
+                                    </xs:restriction>
+                                </xs:simpleType>
+                            </xs:attribute>
+                        </xs:extension>
+                    </xs:simpleContent>
+                </xs:complexType>
+            </xs:element>
             <xs:element name="loadondemand" type="boolean" minOccurs="0" maxOccurs="1" />
         </xs:sequence>
     </xs:group>
@@ -83,6 +83,7 @@
     <xs:attributeGroup name="common_attributes">
         <xs:attribute name="name" type="xs:string" use="required" />
         <xs:attribute name="from" type="xs:string" />
+        <xs:attribute name="depends" type="xs:string" />
     </xs:attributeGroup>
 
 
@@ -198,9 +199,9 @@
                             <xs:enumeration value="extraexpanded" />
                             <xs:enumeration value="9" />
                             <xs:enumeration value="ultraexpanded" />
-			</xs:restriction>
-		    </xs:simpleType>
-		</xs:element>
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:element>
                 <xs:element name="weight" minOccurs="0" maxOccurs="1">
                     <xs:simpleType>
                         <xs:restriction base="xs:string">
@@ -297,22 +298,22 @@
                 </xs:complexType>
             </xs:element>
             <xs:element name="cutdown" minOccurs="0" maxOccurs="1">
-		<xs:simpleType>
-		    <xs:restriction base="xs:string">
-			<xs:enumeration value="true" />
-			<xs:enumeration value="false" />
-			<xs:enumeration value="1" />
-			<xs:enumeration value="0" />
-			<xs:enumeration value="yes" />
-			<xs:enumeration value="no" />
-			<xs:enumeration value="left" />
-			<xs:enumeration value="right" />
-			<xs:enumeration value="center" />
-			<xs:enumeration value="centre" />
-		    </xs:restriction>
-		</xs:simpleType>
-	    </xs:element>
-	    <xs:element name="extraleading" type="xs:integer" minOccurs="0" maxOccurs="1" />
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:enumeration value="true" />
+                        <xs:enumeration value="false" />
+                        <xs:enumeration value="1" />
+                        <xs:enumeration value="0" />
+                        <xs:enumeration value="yes" />
+                        <xs:enumeration value="no" />
+                        <xs:enumeration value="left" />
+                        <xs:enumeration value="right" />
+                        <xs:enumeration value="center" />
+                        <xs:enumeration value="centre" />
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element name="extraleading" type="xs:integer" minOccurs="0" maxOccurs="1" />
             <xs:element name="multiline" type="boolean" minOccurs="0" maxOccurs="1" />
             <xs:element name="align" type="align" minOccurs="0" maxOccurs="1" />
             <xs:element name="colorcycle" minOccurs="0" maxOccurs="1">
@@ -586,7 +587,7 @@
             <xs:element name="showarrow" type="boolean" minOccurs="0" maxOccurs="1" />
             <xs:element name="buttonarea" type="area" minOccurs="0" maxOccurs="1" />
             <xs:element name="drawfrombottom" type="boolean" minOccurs="0" maxOccurs="1" />
-	    <xs:element name="searchposition" type="position" minOccurs="0" maxOccurs="1" />
+            <xs:element name="searchposition" type="position" minOccurs="0" maxOccurs="1" />
         </xs:sequence>
     </xs:group>
 
@@ -621,7 +622,6 @@
     <xs:complexType name="textedit">
         <xs:choice minOccurs="0" maxOccurs="unbounded">
             <xs:group ref="widget_common" />
-
             <xs:group ref="widgets" />
         </xs:choice>
         <xs:attributeGroup ref="common_attributes" />
@@ -632,10 +632,10 @@
     <!-- Checkbox Widget -->
     <xs:element name="checkbox">
         <xs:complexType>
-            <xs:sequence>
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
                 <xs:group ref="widget_common" />
                 <xs:group ref="widgets" />
-            </xs:sequence>
+            </xs:choice>
             <xs:attributeGroup ref="common_attributes" />
         </xs:complexType>
     </xs:element>

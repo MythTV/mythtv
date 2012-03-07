@@ -24,11 +24,12 @@ using namespace std;
 #include <QHash>
 #include <QTime>
 #include <QMap>
+#include <QSet>
 
 // MythTV
 #include "mythdeque.h"
 #include "tv.h"
-#include "util.h"
+#include "mythmiscutil.h"
 #include "programinfo.h"
 #include "channelutil.h"
 #include "videoouttypes.h"
@@ -261,6 +262,8 @@ class MTV_PUBLIC TV : public QObject
     bool StartEmbedding(const QRect&);
     void StopEmbedding(void);
     bool IsTunable(const PlayerContext*, uint chanid, bool use_cache = false);
+    QSet<uint> IsTunableOn(const PlayerContext*, uint chanid,
+                           bool use_cache, bool early_exit);
     void ClearTunableCache(void);
     void ChangeChannel(const PlayerContext*, const DBChanList &options);
     void DrawUnusedRects(void);

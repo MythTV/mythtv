@@ -17,12 +17,13 @@ using namespace std;
 extern "C" {
 #include "libavutil/avutil.h"    // to check version of libavformat
 }
+#include "eldutils.h"
 
 #define LOC QString("AOS: ")
 
 AudioOutputSettings::AudioOutputSettings(bool invalid) :
     m_passthrough(-1),  m_features(FEATURE_NONE),
-    m_invalid(invalid), m_has_eld(false)
+    m_invalid(invalid), m_has_eld(false), m_eld(ELD())
 {
     m_sr.assign(srs,  srs  +
                 sizeof(srs)  / sizeof(int));
@@ -53,8 +54,9 @@ AudioOutputSettings& AudioOutputSettings::operator=(
     m_channels      = rhs.m_channels;
     m_passthrough   = rhs.m_passthrough;
     m_features      = rhs.m_features;
-    m_has_eld       = rhs.m_has_eld;
     m_invalid       = rhs.m_invalid;
+    m_has_eld       = rhs.m_has_eld;
+    m_eld           = rhs.m_eld;
     m_sr_it         = m_sr.begin() + (rhs.m_sr_it - rhs.m_sr.begin());
     m_sf_it         = m_sf.begin() + (rhs.m_sf_it - rhs.m_sf.begin());
     return *this;
@@ -253,12 +255,17 @@ void AudioOutputSettings::SetBestSupportedChannels(int channels)
     m_channels.push_back(channels);
 }
 
-void AudioOutputSettings::setFeature(bool val, DigitalFeature arg)
+void AudioOutputSettings::setFeature(bool val, int arg)
 {
     if (val)
         m_features |= arg;
     else
         m_features &= ~arg;
+};
+
+void AudioOutputSettings::setFeature(bool val, DigitalFeature arg)
+{
+    setFeature(val, (int) arg);
 };
 
 /**
@@ -282,9 +289,7 @@ AudioOutputSettings* AudioOutputSettings::GetCleaned(bool newcopy)
     if (m_invalid)
         return aosettings;
 
-    int mchannels = BestSupportedChannels();
-
-    if (mchannels > 2)
+    if (BestSupportedPCMChannelsELD() > 2)
     {
         aosettings->setFeature(FEATURE_LPCM);
     }
@@ -295,19 +300,28 @@ AudioOutputSettings* AudioOutputSettings::GetCleaned(bool newcopy)
         // assume all amplifier supporting E-AC3 also supports 7.1 LPCM
         // as it's mandatory under the bluray standard
 //#if LIBAVFORMAT_VERSION_INT > AV_VERSION_INT( 52, 83, 0 )
-        if (IsSupportedChannels(8) && IsSupportedRate(192000))
+        if (m_passthrough >= 0 && IsSupportedChannels(8) &&
+	    IsSupportedRate(192000))
             aosettings->setFeature(FEATURE_TRUEHD | FEATURE_DTSHD |
                                    FEATURE_EAC3);
 //#endif
         if (m_passthrough >= 0)
         {
-            if (mchannels == 2)
+            if (BestSupportedChannels() == 2)
             {
                 LOG(VB_AUDIO, LOG_INFO, LOC + "may be AC3 or DTS capable");
                 aosettings->AddSupportedChannels(6);
             }
             aosettings->setFeature(FEATURE_AC3 | FEATURE_DTS);
         }
+    }
+    else
+    {
+        // Can't do digital passthrough without 16 bits audio
+        aosettings->setPassthrough(-1);
+        aosettings->setFeature(false,
+                               FEATURE_AC3 | FEATURE_DTS | FEATURE_LPCM |
+                               FEATURE_EAC3 | FEATURE_TRUEHD | FEATURE_DTSHD);
     }
 
     return aosettings;
@@ -499,3 +513,37 @@ QString AudioOutputSettings::GetPassthroughParams(int codec, int codec_profile,
     return log;
 }
 
+bool AudioOutputSettings::hasValidELD()
+{
+    return m_has_eld && m_eld.isValid();
+};
+
+bool AudioOutputSettings::hasELD()
+{
+    return m_has_eld;
+};
+
+void AudioOutputSettings::setELD(QByteArray *ba)
+{
+    m_has_eld = true;
+    m_eld = ELD(ba->constData(), ba->size());
+    m_eld.show();
+}
+
+int AudioOutputSettings::BestSupportedChannelsELD()
+{
+    int chan = AudioOutputSettings::BestSupportedChannels();
+    if (!hasValidELD())
+        return chan;
+    int eldc = m_eld.maxChannels();
+    return eldc < chan ? eldc : chan;
+}
+
+int AudioOutputSettings::BestSupportedPCMChannelsELD()
+{
+    int chan = AudioOutputSettings::BestSupportedChannels();
+    if (!hasValidELD())
+        return chan;
+    int eldc = m_eld.maxLPCMChannels();
+    return eldc < chan ? eldc : chan;
+}

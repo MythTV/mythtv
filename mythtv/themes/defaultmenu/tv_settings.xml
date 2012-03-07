@@ -44,13 +44,6 @@
     </button>
 
     <button>
-        <type>TV_SETTINGS_RECORDING_PROFILES</type>
-        <text>Recording Profiles</text>
-        <description>Change the quality of your recordings</description>
-        <action>SETTINGS RECORDING</action>
-    </button>
-
-    <button>
         <type>TV_SETTINGS_RECPRIORITIES</type>
         <text>Recording Priorities</text>
         <description>Global recording priority and scheduling</description>

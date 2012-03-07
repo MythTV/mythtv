@@ -1,4 +1,6 @@
-<!DOCTYPE TS><TS>
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.0" language="de_DE">
 <context>
     <name>MythControls</name>
     <message>
@@ -34,11 +36,11 @@
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Abbrechen</translation>
+        <translation type="obsolete">Abbrechen</translation>
     </message>
     <message>
         <source>Edit News Site</source>
-        <translation>Newsfeed bearbeiten</translation>
+        <translation type="obsolete">Newsfeed bearbeiten</translation>
     </message>
     <message>
         <source>You haven&apos;t configured MythNews to use any sites.</source>
@@ -53,12 +55,28 @@
         <translation>Es ist kein Webbrowser definiert! Für MythNews muss MythBrowser installiert sein.</translation>
     </message>
     <message>
+        <source>Manage Feeds</source>
+        <translation>Feeds verwalten</translation>
+    </message>
+    <message>
+        <source>Add Feed</source>
+        <translation>Feed hinzufügen</translation>
+    </message>
+    <message>
+        <source>Edit Feed</source>
+        <translation>Feed bearbeiten</translation>
+    </message>
+    <message>
+        <source>Delete Feed</source>
+        <translation>Feed löschen</translation>
+    </message>
+    <message>
         <source>Add News Site</source>
-        <translation>Neuer Newsfeed</translation>
+        <translation type="obsolete">Neuer Newsfeed</translation>
     </message>
     <message>
         <source>Delete News Site</source>
-        <translation>Newsfeed löschen</translation>
+        <translation type="obsolete">Newsfeed löschen</translation>
     </message>
     <message>
         <source>Options</source>
@@ -230,15 +248,15 @@ Wenn Sie mit dem Bearbeiten fertig sind, wählen Sie &quot;OK&quot; oder &quot;A
     </message>
     <message>
         <source>RSS Feeds</source>
-        <translation>RSS-Feeds</translation>
+        <translation type="obsolete">RSS-Feeds</translation>
     </message>
     <message>
         <source>MythNews Configuration</source>
-        <translation>Mythnews Konfiguration</translation>
+        <translation type="obsolete">Mythnews Konfiguration</translation>
     </message>
     <message>
         <source>Minutes</source>
-        <translation>Minuten</translation>
+        <translation type="obsolete">Minuten</translation>
     </message>
     <message>
         <source>Cancel</source>

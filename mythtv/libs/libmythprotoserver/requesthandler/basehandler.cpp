@@ -9,7 +9,7 @@ using namespace std;
 #include "mythsocketmanager.h"
 #include "socketrequesthandler.h"
 #include "sockethandler.h"
-#include "util.h"
+#include "mythmiscutil.h"
 #include "mythlogging.h"
 #include "mythcorecontext.h"
 

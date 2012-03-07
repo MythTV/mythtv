@@ -7,7 +7,7 @@
 #include <QList>
 
 #include "mythcontext.h"
-#include "util.h"
+#include "mythmiscutil.h"
 
 #include "mythgenerictree.h"
 #include "videometadatalistmanager.h"
@@ -1004,7 +1004,7 @@ void VideoListImp::buildDbList()
         video_root->setName("videos");
         ptnm.insert(prefix_to_node_map::value_type(test_prefix, video_root));
     }
-    meta_dir_node *insert_hint = NULL;
+
     for (metadata_view_list::iterator p = mlist.begin(); p != mlist.end(); ++p)
     {
         AddMetadataToDir(*p, video_root);

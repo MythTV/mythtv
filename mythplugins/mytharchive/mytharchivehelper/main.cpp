@@ -62,7 +62,7 @@ using namespace std;
 #include <mythdirs.h>
 #include <mythconfig.h>
 #include <mythsystem.h>
-#include <util.h>
+#include <mythmiscutil.h>
 #include <mythlogging.h>
 
 extern "C" {

@@ -14,7 +14,7 @@ using namespace std;
 #include "mythcontext.h"
 #include "mythdb.h"
 #include "mythversion.h"
-#include "util.h"
+#include "mythmiscutil.h"
 #include "mythtranslation.h"
 
 #include "mythconfig.h"
@@ -349,6 +349,8 @@ int main(int argc, char *argv[])
         LOG(VB_GENERAL, LOG_ERR, "Failed to init MythContext, exiting.");
         return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
+
+    setHttpProxy();
 
     MythTranslation::load("mythfrontend");
 

@@ -657,8 +657,6 @@ void ImportMusicDialog::showMenu()
         menu->AddButton(tr("Change Year"), SLOT(setYear()));
         menu->AddButton(tr("Change Rating"), SLOT(setRating()));
     }
-
-    menu->AddButton(tr("Cancel"));
 }
 
 void ImportMusicDialog::saveDefaults(void)

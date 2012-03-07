@@ -1,0 +1,277 @@
+<html>
+<head>
+<title><i18n>HTTP Live Stream Demo</i18n></title>
+</head>
+<body>
+<script language="JavaScript" type="text/javascript" src="/js/fileutil.js"></script>
+<script language="JavaScript" type="text/javascript" src="/js/jquery.min.js"></script>
+<%
+    var content = new Content();
+    var jwpExists = 0;
+
+    var hash = content.GetHash("3rdParty", "JW_Player/player.swf");
+
+    if (hash != "")
+    {
+        jwpExists = 1;
+%>
+<script language="JavaScript" type="text/javascript" src="/StorageGroup/3rdParty/JW_Player/jwplayer.js"></script>
+<%
+    }
+    else
+    {
+%>
+<b>You must&nbsp;
+<a href='javascript:void(0);' onClick="javascript:loadContent('/3rdParty/jwplayer.qsp');"><i18n>install JW Player&trade;</i18n></a>&nbsp;
+to use this HLS test page</b><hr><br>
+<%
+    }
+%>
+
+<script language="JavaScript" type="text/javascript">
+
+$(document).ready(function() {
+    listLiveStreams();
+});
+
+function tdCell(data) {
+    return "<td>" + data + "</td>";
+}
+
+function emptyCell() {
+    return "<td>&nbsp;</td>";
+}
+
+function playStreamLink(url, width, height) {
+    var jwpcall = 'playStreamInJWPlayer("' + url + '", ' + width + ', ' +
+                  height + ');';
+    return "<a href='javascript: " + jwpcall + "'><i18n>Play</i18n></a>" +
+        " - <a href='" + url + "'>m3u8</a>";
+}
+
+var jwIsSetup = 0;
+function playStreamInJWPlayer(playlist, width, height) {
+    if (jwIsSetup) {
+        jwplayer('player').load({file: playlist, provider: "/StorageGroup/3rdParty/JW_Player/adaptiveProvider.swf"});
+        jwplayer('player').play();
+        return;
+    }
+
+    jwplayer('player').setup({
+        file: playlist,
+        width: width,
+        height: height,
+        modes: [
+          { type: "flash", 
+            src: "/StorageGroup/3rdParty/JW_Player/player.swf", 
+            config: {
+              file: playlist,
+              provider: "/StorageGroup/3rdParty/JW_Player/adaptiveProvider.swf"
+            }
+          },
+          { type: "html5",
+            config: {
+              file: playlist,
+            }
+          },
+          { type: "download" }
+        ]
+  });
+  jwplayer('player').play();
+  jwIsSetup = 1;
+}
+
+function stopStreamLink(id) {
+    return "<a href='javascript:stopStream(" + id + ");'><i18n>Stop</i18n></a>";
+}
+
+function stopStream(id) {
+    $("#LiveStreams").html("<i18n>Waiting</i18n>...");
+    $.getJSON("/Content/StopLiveStream", { Id : id }, function(data) {
+        listLiveStreams();
+    });
+}
+
+function removeStreamLink(id) {
+    return "<a href='javascript:void(0);' onClick='removeStream(" + id + ");'>[X]</a>";
+}
+
+function removeStream(id) {
+    $("#LiveStreams").html("<i18n>Waiting</i18n>...");
+    $.getJSON("/Content/RemoveLiveStream", { Id : id }, function(data) {
+        listLiveStreams();
+    });
+}
+
+function timedReloadList(seconds) {
+    setTimeout('listLiveStreams()', seconds * 1000);
+}
+
+function listLiveStreams() {
+    var ls = $("#LiveStreams");
+
+    if (ls.html() != "") {
+        ls.html("<i18n>Loading</i18n>...");
+    }
+    $.getJSON("/Content/GetLiveStreamList", { }, function(data) {
+        if (data.LiveStreamInfoList.LiveStreamInfos.length == 0) {
+            ls.html("");
+            return;
+        }
+        var table = "";
+        table += "<table border=1 cellpadding=2 cellspacing=2>";
+        table += "<tr><th><i18n>Play</i18n></th><th><i18n>Stop</i18n></th>" +
+            "<th><i18n>Filename</i18n></th><th><i18n>Size</i18n></th>" +
+            "<th><i18n>Status</i18n></th><th>%</th><th><i18n>Delete</i18n></th></tr>";
+        $.each(data.LiveStreamInfoList.LiveStreamInfos, function(i, value) {
+            table += "<tr>" +
+                tdCell(playStreamLink(value.RelativeURL,
+                       value.Width, value.Height));
+
+            if (value.StatusStr == "Running") {
+                table += tdCell(stopStreamLink(value.Id));
+            } else {
+                table += emptyCell();
+            }
+
+            table +=
+                tdCell(basename(value.SourceFile)) +
+                tdCell(value.Width + "x" + value.Height) +
+                tdCell(value.StatusStr) +
+                tdCell(value.PercentComplete + "%") +
+                tdCell(removeStreamLink(value.Id)) +
+                "</tr>";
+
+            if ((value.StatusStr == "Queued") ||
+                (value.StatusStr == "Starting") ||
+                (value.StatusStr == "Stopping")) {
+                timedReloadList(1);
+            }
+        });
+        table += "</table>";
+        ls.html(table);
+    });
+}
+
+function startStream(group, filename) {
+    $.getJSON("/Content/AddLiveStream", { StorageGroup : group, FileName : filename }, function(data) {
+        listLiveStreams();
+    });
+}
+
+function addStream() {
+    var datastr = $("#playform").serialize();
+
+    $("#LiveStreams").html("<i18n>Waiting</i18n>...");
+    $.getJSON("/Content/AddLiveStream", datastr, function(data) {
+        listLiveStreams();
+    });
+}
+
+function listFiles() {
+    var group = $("#sgName").val();
+    var filter = $("#sgFilter").val().toLowerCase();
+    $("#links").html("<i18n>Loading</i18n>...");
+    $.getJSON("/Content/GetFileList", { StorageGroup: group }, function(data) {
+        $("#links").html("");
+        var str = "<hr><form id='playform'>";
+        str += "<i18n>Width</i18n>: <select name='Width'>" +
+                "<option value='288'>288</option>" +
+                "<option value='400'>400</option>" +
+                "<option value='480' selected>480</option>" +
+                "<option value='640'>640</option>" +
+                "<option value='800'>800</option>" +
+                "<option value='960'>960</option>" +
+                "<option value='1024'>1024</option>" +
+                "<option value='1280'>1280</option>" +
+                "</select>";
+        str += "&nbsp;&nbsp;&nbsp;";
+        str += "<i18n>Height</i18n>: <select name='Height'>" +
+                "<option value='0' selected>Auto</option>" +
+                "<option value='320'>320</option>" +
+                "<option value='480'>480</option>" +
+                "<option value='540'>540</option>" +
+                "<option value='600'>600</option>" +
+                "<option value='768'>768</option>" +
+                "<option value='720'>720</option>" +
+                "</select><br>";
+        str += "<i18n>Bitrate</i18n>: <select name='Bitrate'>" +
+                "<option value='500000'>500k</option>" +
+                "<option value='600000'>600k</option>" +
+                "<option value='700000'>700k</option>" +
+                "<option value='800000' selected>800k</option>" +
+                "<option value='900000'>900k</option>" +
+                "<option value='1000000'>1000k</option>" +
+                "<option value='1500000'>1500k</option>" +
+                "<option value='2000000'>2000k</option>" +
+                "<option value='2500000'>2500k</option>" +
+                "<option value='3000000'>3000k</option>" +
+                "<option value='3500000'>3500k</option>" +
+                "</select>";
+        str += "&nbsp;&nbsp;&nbsp;";
+        str += "<i18n>Audio</i18n>: <select name='AudioBitrate'>" +
+                "<option value='32000'>32k</option>" +
+                "<option value='64000' selected>64k</option>" +
+                "<option value='96000'>96k</option>" +
+                "<option value='128000'>128k</option>" +
+                "<option value='192000'>192k</option>" +
+                "</select><br>";
+        str += "<input type=button onClick='addStream()' Value='<i18n>Add Stream</i18n>'>";
+        str += "<hr>";
+
+        $.each(data.QStringList, function(i, value) {
+            if ((filter.length == 0) ||
+                (value.toLowerCase().indexOf(filter) >= 0)) {
+                var tmpGroup = "'" + group + "'";
+                var tmpValue = "'" + value + "'";
+                str +=
+                    '<input type=radio Name="FileName" Value="' + value + '">' +
+                    value + "<br>";
+            }
+        });
+        str += "</form>";
+        $("#links").html(str);
+    });
+}
+</script>
+
+<font size=+1><i18n>HTTP Live Stream Demo</i18n></font> <a href='javascript:void(0);' onClick='listLiveStreams()'><font size=-1>(<i18n>Refresh</i18n>)</font></a><br>
+<div id='LiveStreams'>
+</div>
+<div id='player'>
+</div>
+<br>
+<div>
+    <table border=0 cellspacing=2 cellpadding=2>
+    <i18n>Storage Group</i18n>:
+    <select id="sgName">
+<%
+    var myth = new Myth();
+
+    var hostName = myth.GetHostName();
+    var list = myth.GetStorageGroupDirs("", "");
+    var seenHosts = new Array();
+
+    for (var nIdx=0; nIdx < list.StorageGroupDirs.length; nIdx++)
+    {
+        var sgDir = list.StorageGroupDirs[nIdx];
+        if (!seenHosts[sgDir.GroupName])
+        {
+            seenHosts[sgDir.GroupName] = 1;
+%>
+    <option value="<%= sgDir.GroupName %>"><%=sgDir.GroupName%></option>
+<%
+        }
+    }
+%>
+    </select>
+
+    <i18n>Filter</i18n>: <input id='sgFilter' size=20>&nbsp;
+    <input type='button' onClick='javascript:listFiles()' value='<i18n>List Files</i18n>'>
+</div>
+<br>
+<div id="links"></div>
+
+</body>
+</html>
+

@@ -108,7 +108,7 @@ bool MythRAOPConnection::Init(void)
     int baseport = m_dataPort;
     while (m_dataPort < baseport + RAOP_PORT_RANGE)
     {
-        if (m_dataSocket->bind(gCoreContext->MythHostAddress(), m_dataPort))
+        if (m_dataSocket->bind(m_dataPort))
         {
             LOG(VB_GENERAL, LOG_INFO, LOC +
                 QString("Bound to port %1 for incoming data").arg(m_dataPort));

@@ -11,7 +11,7 @@
 
 #define LOC      QString("Subtitles: ")
 #define LOC_WARN QString("Subtitles Warning: ")
-static const float PAD_WIDTH  = 0.20;
+static const float PAD_WIDTH  = 0.5;
 static const float PAD_HEIGHT = 0.04;
 
 // Normal font height is designed to be 1/20 of safe area height, with
@@ -99,7 +99,8 @@ bool SubtitleScreen::Create(void)
     m_useBackground = (bool)gCoreContext->GetNumSetting("CCBackground", 0);
     m_textFontZoom  = gCoreContext->GetNumSetting("OSDCC708TextZoom", 100);
 
-    QString defaultFont = gCoreContext->GetSetting("OSDSubFont", "FreeSans");
+    QString defaultFont =
+        gCoreContext->GetSetting("DefaultSubtitleFont", "FreeMono");
     m_fontNames.append(defaultFont);       // default
     m_fontNames.append("FreeMono");        // mono serif
     m_fontNames.append("DejaVu Serif");    // prop serif
@@ -203,7 +204,7 @@ void SubtitleScreen::OptimiseDisplayedArea(void)
     int top  = m_safeArea.top()  - bounding.top();
     SetArea(MythRect(bounding));
 
-    i.toFront();;
+    i.toFront();
     while (i.hasNext())
     {
         MythUIType *img = i.next();
@@ -469,7 +470,7 @@ void SubtitleScreen::DrawTextSubtitles(QStringList &wrappedsubs,
     fsub.InitFromSRT(wrappedsubs, m_textFontZoom);
     fsub.WrapLongLines();
     fsub.Layout();
-    m_refreshArea = m_refreshArea || fsub.Draw(0, start, duration);
+    m_refreshArea = fsub.Draw(0, start, duration) || m_refreshArea;
 }
 
 void SubtitleScreen::DisplayDVDButton(AVSubtitle* dvdButton, QRect &buttonPos)
@@ -643,8 +644,9 @@ void SubtitleScreen::DisplayCC608Subtitles(void)
 
     FormattedTextSubtitle fsub(m_safeArea, m_useBackground, this);
     fsub.InitFromCC608(textlist->buffers);
+    fsub.Layout608();
     fsub.Layout();
-    m_refreshArea = m_refreshArea || fsub.Draw();
+    m_refreshArea = fsub.Draw() || m_refreshArea;
     textlist->lock.unlock();
 }
 
@@ -706,7 +708,7 @@ void SubtitleScreen::DisplayCC708Subtitles(void)
                 m_refreshArea = true;
             }
             m_refreshArea =
-                m_refreshArea || fsub.Draw(&m_708imageCache[i]);
+                fsub.Draw(&m_708imageCache[i]) || m_refreshArea;
         }
         for (uint j = 0; j < list.size(); j++)
             delete list[j];
@@ -856,9 +858,10 @@ void FormattedTextSubtitle::InitFromCC608(vector<CC608Text*> &buffers)
     vector<CC608Text*>::iterator i = buffers.begin();
     bool teletextmode = (*i)->teletextmode;
     bool useBackground = m_useBackground && !teletextmode;
-    int xscale = teletextmode ? 40 : 36;
+    //int xscale = teletextmode ? 40 : 36;
     int yscale = teletextmode ? 25 : 17;
-    int pixelSize = m_safeArea.height() / (yscale * LINE_SPACING);
+    int pixelSize = m_safeArea.height() / (yscale * LINE_SPACING) *
+        (parent ? parent->m_textFontZoom : 100) / 100;
     if (parent)
         parent->SetFontSizes(pixelSize, pixelSize, pixelSize);
 
@@ -871,12 +874,20 @@ void FormattedTextSubtitle::InitFromCC608(vector<CC608Text*> &buffers)
         QString text(cc->text);
 
         int orig_x = teletextmode ? cc->y : (cc->x + 3);
-        int x = (int)(((float)orig_x / (float)xscale) *
-                      (float)m_safeArea.width());
         int orig_y = teletextmode ? cc->x : cc->y;
         int y = (int)(((float)orig_y / (float)yscale) *
                       (float)m_safeArea.height());
-        FormattedTextLine line(x, y, orig_x, orig_y);
+        FormattedTextLine line(0, y, orig_x, orig_y);
+        // Indented lines are handled as initial strings of space
+        // characters, to improve vertical alignment.  Monospace fonts
+        // are assumed.
+        if (orig_x > 0)
+        {
+            CC708CharacterAttribute attr(false, false, false,
+                                         Qt::white, useBackground);
+            FormattedTextChunk chunk(QString(orig_x, ' '), attr, parent);
+            line.chunks += chunk;
+        }
         while (!text.isNull())
         {
             QString captionText =
@@ -1052,6 +1063,7 @@ bool FormattedTextChunk::Split(FormattedTextChunk &newChunk)
             QString("Failed to split chunk '%1'").arg(text));
         return false;
     }
+    newChunk.parent = parent;
     newChunk.format = format;
     newChunk.text = text.mid(lastSpace + 1).trimmed() + ' ';
     text = text.left(lastSpace).trimmed();
@@ -1124,6 +1136,55 @@ void FormattedTextSubtitle::WrapLongLines(void)
     }
 }
 
+// Adjusts the Y coordinates to avoid overlap, which could happen as a
+// result of a large text zoom factor.  Then, if the total height
+// exceeds the safe area, compresses each piece of vertical blank
+// space proportionally to make it fit.
+void FormattedTextSubtitle::Layout608(void)
+{
+    int i;
+    int totalHeight = 0;
+    int totalSpace = 0;
+    int firstY = 0;
+    int prevY = 0;
+    QVector<int> heights(m_lines.size());
+    QVector<int> spaceBefore(m_lines.size());
+    // Calculate totalHeight and totalSpace
+    for (i = 0; i < m_lines.size(); i++)
+    {
+        m_lines[i].y_indent = max(m_lines[i].y_indent, prevY); // avoid overlap
+        int y = m_lines[i].y_indent;
+        if (i == 0)
+            firstY = prevY = y;
+        int height = m_lines[i].CalcSize().height();
+        heights[i] = height;
+        spaceBefore[i] = y - prevY;
+        totalSpace += (y - prevY);
+        prevY = y + height;
+        totalHeight += height;
+    }
+    int safeHeight = m_safeArea.height();
+    int overage = min(totalHeight - safeHeight, totalSpace);
+
+    // Recalculate Y coordinates, applying the shrink factor to space
+    // between each line.
+    if (overage > 0 && totalSpace > 0)
+    {
+        float shrink = (totalSpace - overage) / (float)totalSpace;
+        prevY = firstY;
+        for (i = 0; i < m_lines.size(); i++)
+        {
+            m_lines[i].y_indent = prevY + spaceBefore[i] * shrink;
+            prevY = m_lines[i].y_indent + heights[i];
+        }
+    }
+
+    // Shift Y coordinates back up into the safe area.
+    int shift = min(firstY, max(0, prevY - safeHeight));
+    for (i = 0; i < m_lines.size(); i++)
+        m_lines[i].y_indent -= shift;
+}
+
 // Resolves any TBD x_indent and y_indent values in FormattedTextLine
 // objects.  Calculates m_bounds.  Prunes most leading and all
 // trailing whitespace from each line so that displaying with a black
@@ -1151,6 +1212,10 @@ void FormattedTextSubtitle::Layout(void)
         anchor_y -= anchor_height / 2;
     else if (m_yAnchorPoint == 2)
         anchor_y -= anchor_height;
+
+    // Shift the anchor point back into the safe area if necessary/possible.
+    anchor_y = max(0, min(anchor_y, m_safeArea.height() - anchor_height));
+    anchor_x = max(0, min(anchor_x, m_safeArea.width() - anchor_width));
 
     m_bounds = QRect(anchor_x, anchor_y, anchor_width, anchor_height);
 
@@ -1198,10 +1263,12 @@ bool FormattedTextSubtitle::Draw(QList<MythUIType*> *imageCache,
                                  uint64_t start, uint64_t duration) const
 {
     bool result = false;
+    QVector<MythUISimpleText *> bringToFront;
 
     for (int i = 0; i < m_lines.size(); i++)
     {
-        int x = m_lines[i].x_indent, y = m_lines[i].y_indent;
+        int x = m_lines[i].x_indent;
+        int y = m_lines[i].y_indent;
         int height = m_lines[i].CalcSize().height();
         QList<FormattedTextChunk>::const_iterator chunk;
         bool first = true;
@@ -1225,14 +1292,19 @@ bool FormattedTextSubtitle::Draw(QList<MythUIType*> *imageCache,
                 ++count;
             }
             int x_adjust = count * font.width(" ");
+            int padding = (*chunk).CalcPadding();
+            // Account for extra padding before the first chunk.
+            if (first)
+                x += padding;
             QSize chunk_sz = (*chunk).CalcSize();
             if ((*chunk).format.GetBGAlpha())
             {
                 QBrush bgfill = QBrush((*chunk).format.GetBGColor());
-                QRect bgrect(x, y, chunk_sz.width(), height);
+                QRect bgrect(x - padding, y,
+                             chunk_sz.width() + 2 * padding, height);
+                // Don't draw a background behind leading spaces.
                 if (first)
-                    bgrect.setLeft(bgrect.left() + x_adjust -
-                                   font.maxWidth() * PAD_WIDTH);
+                    bgrect.setLeft(bgrect.left() + x_adjust);
                 MythUIShape *bgshape = new MythUIShape(parent,
                         QString("subbg%1x%2@%3,%4")
                                      .arg(chunk_sz.width())
@@ -1246,8 +1318,11 @@ bool FormattedTextSubtitle::Draw(QList<MythUIType*> *imageCache,
                     parent->RegisterExpiration(bgshape, start + duration);
                 result = true;
             }
+            // Shift to the right to account for leading spaces that
+            // are removed by the MythUISimpleText constructor.  Also
+            // add in padding at the end to avoid clipping.
             QRect rect(x + x_adjust, y,
-                       chunk_sz.width() - x_adjust, height);
+                       chunk_sz.width() - x_adjust + padding, height);
 
             MythUISimpleText *text =
                 new MythUISimpleText((*chunk).text, *mythfont, rect,
@@ -1256,6 +1331,7 @@ bool FormattedTextSubtitle::Draw(QList<MythUIType*> *imageCache,
                                      .arg(chunk_sz.width())
                                      .arg(height)
                                      .arg(x).arg(y));
+            bringToFront.append(text);
             if (imageCache)
                 imageCache->append(text);
             if (duration > 0)
@@ -1270,6 +1346,10 @@ bool FormattedTextSubtitle::Draw(QList<MythUIType*> *imageCache,
             first = false;
         }
     }
+    // Move each chunk of text to the front so that it isn't clipped
+    // by the preceding chunk's background.
+    for (int i = 0; i < bringToFront.size(); i++)
+        bringToFront.at(i)->MoveToTop();
     return result;
 }
 
@@ -1333,11 +1413,18 @@ QSize SubtitleScreen::CalcTextSize(const QString &text,
 {
     QFont *font = Get708Font(format)->GetFace();
     QFontMetrics fm(*font);
-    int width = fm.width(text) + fm.maxWidth() * PAD_WIDTH;
+    int width = fm.width(text);
     int height = fm.height() * (1 + PAD_HEIGHT);
     if (layoutSpacing > 0 && !text.trimmed().isEmpty())
         height = max(height, (int)(font->pixelSize() * layoutSpacing));
     return QSize(width, height);
+}
+
+int SubtitleScreen::CalcPadding(const CC708CharacterAttribute &format) const
+{
+    QFont *font = Get708Font(format)->GetFace();
+    QFontMetrics fm(*font);
+    return fm.maxWidth() * PAD_WIDTH;
 }
 
 #ifdef USING_LIBASS

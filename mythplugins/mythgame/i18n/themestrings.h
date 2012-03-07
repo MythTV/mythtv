@@ -1,3 +1,6 @@
+// This is an automatically generated file
+// Do not edit
+
 void strings_null() {
     ThemeUI::tr("Games");
     ThemeUI::tr("Play Games");

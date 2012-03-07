@@ -18,7 +18,8 @@ class MBASE_PUBLIC MythObservable
     void removeListener(QObject *listener);
 
     void dispatch(const MythEvent &event);
-    void dispatchNow(const MythEvent &event) MDEPRECATED;
+
+    void dispatchNow(const MythEvent &event); // MDEPRECATED;
 
     bool hasListeners(void) { return !m_listeners.isEmpty(); }
 

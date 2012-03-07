@@ -34,7 +34,7 @@
 #include "netutils.h"
 #include "mythdirs.h"
 #include "mythdb.h"
-#include "util.h"
+#include "mythmiscutil.h"
 #include "tv.h"
 
 //  Mythfrontend
@@ -393,6 +393,7 @@ PlaybackBox::PlaybackBox(MythScreenStack *parent, QString name, BoxType ltype,
       m_viewMask(VIEW_TITLES),
 
       // General m_popupMenu support
+      m_menuDialog(NULL),
       m_popupMenu(NULL),
       m_doToggleMenu(true),
       // Main Recording List support
@@ -1071,11 +1072,11 @@ void PlaybackBox::updateIcons(const ProgramInfo *pginfo)
         iconState->Reset();
 
     iconMap.clear();
+    iconMap["avchd"] = VID_AVC;
     iconMap["hd1080"] = VID_1080;
     iconMap["hd720"] = VID_720;
     iconMap["hdtv"] = VID_HDTV;
     iconMap["widescreen"] = VID_WIDESCREEN;
-    //iconMap["avchd"] = VID_AVC;
 
     iconState = dynamic_cast<MythUIStateType *>(GetChild("videoprops"));
     haveIcon = false;
@@ -1267,11 +1268,12 @@ void PlaybackBox::UpdateUIGroupList(const QStringList &groupPreferences)
                 m_currentGroup = groupname.toLower();
             }
 
-            if (groupname.isEmpty())
-                groupname = m_groupDisplayName;
+            QString displayName = groupname;
+            if (displayName.isEmpty())
+                displayName = m_groupDisplayName;
 
-            item->SetText(groupname, "name");
-            item->SetText(groupname);
+            item->SetText(displayName, "name");
+            item->SetText(displayName);
 
             int count = m_progLists[groupname.toLower()].size();
             item->SetText(QString::number(count), "reccount");
@@ -2210,15 +2212,7 @@ void PlaybackBox::deleteSelected(MythUIButtonListItem *item)
     if (!pginfo)
         return;
 
-    bool undelete_possible =
-            gCoreContext->GetNumSetting("AutoExpireInsteadOfDelete", 0);
-
-    if (pginfo->GetRecordingGroup() == "Deleted" && undelete_possible)
-    {
-        RemoveProgram(pginfo->GetChanID(), pginfo->GetRecordingStartTime(),
-                      /*forgetHistory*/ false, /*force*/ false);
-    }
-    else if (pginfo->GetAvailableStatus() == asPendingDelete)
+    if (pginfo->GetAvailableStatus() == asPendingDelete)
     {
         LOG(VB_GENERAL, LOG_ERR, QString("deleteSelected(%1) -- failed ")
                 .arg(pginfo->toString(ProgramInfo::kTitleSubtitle)) +
@@ -2316,6 +2310,8 @@ void PlaybackBox::selected(MythUIButtonListItem *item)
 
 void PlaybackBox::popupClosed(QString which, int result)
 {
+    m_menuDialog = NULL;
+
     if (result == -2)
     {
         if (!m_doToggleMenu)
@@ -2390,7 +2386,7 @@ void PlaybackBox::ShowGroupPopup()
 
     m_popupMenu->AddItem(tr("Help (Status Icons)"), SLOT(showIconHelp()));
 
-    ShowMenu();
+    DisplayPopupMenu();
 }
 
 bool PlaybackBox::Play(
@@ -2542,7 +2538,8 @@ void PlaybackBox::ShowDeletePopup(DeletePopupType type)
     const char *tmpslot = NULL;
 
     if ((kDeleteRecording == type) &&
-        (delItem->GetRecordingGroup() != "LiveTV"))
+        delItem->GetRecordingGroup() != "Deleted" &&
+        delItem->GetRecordingGroup() != "LiveTV")
     {
         tmpmessage = tr("Yes, and allow re-record");
         tmpslot = SLOT(DeleteForgetHistory());
@@ -2602,7 +2599,7 @@ void PlaybackBox::ShowDeletePopup(DeletePopupType type)
         m_popupMenu->AddItem(tmpmessage, tmpslot);
     }
 
-    ShowMenu();
+    DisplayPopupMenu();
 }
 
 void PlaybackBox::ShowAvailabilityPopup(const ProgramInfo &pginfo)
@@ -2831,20 +2828,50 @@ MythMenu* PlaybackBox::createPlaylistJobMenu(void)
     return menu;
 }
 
-void PlaybackBox::ShowMenu(void)
+void PlaybackBox::DisplayPopupMenu(void)
 {
-    if (!m_popupMenu)
+    if (m_menuDialog || !m_popupMenu)
         return;
 
-    MythDialogBox *popupDialog = new  MythDialogBox(m_popupMenu, m_popupStack, "pbbmainmenupopup");
+    m_menuDialog = new MythDialogBox(m_popupMenu, m_popupStack, "pbbmainmenupopup");
 
-    if (popupDialog->Create())
+    if (m_menuDialog->Create())
     {
-        m_popupStack->AddScreen(popupDialog);
-        connect(popupDialog, SIGNAL(Closed(QString,int)), SLOT(popupClosed(QString,int)));
+        m_popupStack->AddScreen(m_menuDialog);
+        connect(m_menuDialog, SIGNAL(Closed(QString,int)), SLOT(popupClosed(QString,int)));
     }
     else
-        delete popupDialog;
+        delete m_menuDialog;
+}
+
+void PlaybackBox::ShowMenu()
+{
+    if (m_menuDialog)
+        return;
+
+    if (GetFocusWidget() == m_groupList)
+        ShowGroupPopup();
+    else
+    {
+        ProgramInfo *pginfo = CurrentItem();
+        if (pginfo)
+        {
+            m_helper.CheckAvailability(
+                *pginfo, kCheckForMenuAction);
+
+            if ((asPendingDelete == pginfo->GetAvailableStatus()) ||
+                (asPendingDelete == pginfo->GetAvailableStatus()))
+            {
+                ShowAvailabilityPopup(*pginfo);
+            }
+            else
+            {
+                ShowActionPopup(*pginfo);
+            }
+        }
+        else
+            ShowGroupPopup();
+    }
 }
 
 MythMenu* PlaybackBox::createPlayFromMenu()
@@ -3073,7 +3100,7 @@ void PlaybackBox::ShowActionPopup(const ProgramInfo &pginfo)
             m_popupMenu->AddItem(tr("Add to Playlist"), SLOT(togglePlayListItem()));
         }
 
-        ShowMenu();
+        DisplayPopupMenu();
 
         return;
     }
@@ -3138,7 +3165,7 @@ void PlaybackBox::ShowActionPopup(const ProgramInfo &pginfo)
         }
     }
 
-    ShowMenu();
+    DisplayPopupMenu();
 }
 
 QString PlaybackBox::CreateProgramInfoString(const ProgramInfo &pginfo) const
@@ -3722,29 +3749,7 @@ bool PlaybackBox::keyPressEvent(QKeyEvent *event)
             showIconHelp();
         else if (action == "MENU")
         {
-             if (GetFocusWidget() == m_groupList)
-                 ShowGroupPopup();
-             else
-             {
-                 ProgramInfo *pginfo = CurrentItem();
-                 if (pginfo)
-                 {
-                     m_helper.CheckAvailability(
-                         *pginfo, kCheckForMenuAction);
-
-                     if ((asPendingDelete == pginfo->GetAvailableStatus()) ||
-                         (asPendingDelete == pginfo->GetAvailableStatus()))
-                     {
-                         ShowAvailabilityPopup(*pginfo);
-                     }
-                     else
-                     {
-                         ShowActionPopup(*pginfo);
-                     }
-                 }
-                 else
-                     ShowGroupPopup();
-             }
+            ShowMenu();
         }
         else if (action == "NEXTFAV")
         {
@@ -4005,7 +4010,7 @@ void PlaybackBox::customEvent(QEvent *event)
             if (!forceDelete)
             {
                 m_delList = me->ExtraDataList();
-                if (!m_popupMenu)
+                if (!m_menuDialog)
                 {
                     ShowDeletePopup(kForceDeleteRecording);
                     return;
@@ -4038,7 +4043,7 @@ void PlaybackBox::customEvent(QEvent *event)
         }
         else if (message == "AVAILABILITY" && me->ExtraDataCount() == 8)
         {
-            const uint kMaxUIWaitTime = 100; // ms
+            const uint kMaxUIWaitTime = 10000; // ms
             QStringList list = me->ExtraDataList();
             QString key = list[0];
             CheckAvailabilityType cat =
@@ -4149,6 +4154,10 @@ void PlaybackBox::customEvent(QEvent *event)
                 m_artImage[(uint)type]->SetFilename(fn);
                 m_artTimer[(uint)type]->start(s_artDelay[(uint)type]);
             }
+        }
+        else if (message == "EXIT_TO_MENU")
+        {
+            m_playListPlay.clear();
         }
     }
     else
@@ -5149,9 +5158,9 @@ bool RecMetadataEdit::Create()
     }
     m_inetrefEdit->SetText(m_progInfo->GetInetRef());
     m_inetrefEdit->SetMaxLength(255);
-    m_seasonSpin->SetRange(0,9999,1,1);
+    m_seasonSpin->SetRange(0,9999,1,5);
     m_seasonSpin->SetValue(m_progInfo->GetSeason());
-    m_episodeSpin->SetRange(0,9999,1,1);
+    m_episodeSpin->SetRange(0,9999,1,10);
     m_episodeSpin->SetValue(m_progInfo->GetEpisode());
 
     connect(okButton, SIGNAL(Clicked()), SLOT(SaveChanges()));
@@ -5230,7 +5239,7 @@ bool HelpPopup::Create()
     addItem("hd720",       tr("Recording is in 720p High Definition"));
     addItem("hdtv",        tr("Recording is in High Definition"));
     addItem("widescreen",  tr("Recording is Widescreen"));
-//    addItem("avchd",       tr("Recording uses H.264 codec"));
+    addItem("avchd",       tr("Recording is in HD using H.264 codec"));
 
     addItem("watched",     tr("Recording has been watched"));
 //    addItem("preserved",   tr("Recording is preserved"));

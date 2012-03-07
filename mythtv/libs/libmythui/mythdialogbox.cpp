@@ -11,7 +11,7 @@
 #include <QTime>
 
 #include "mythlogging.h"
-#include "util.h"
+#include "mythmiscutil.h"
 
 #include "mythmainwindow.h"
 #include "mythfontproperties.h"
@@ -29,11 +29,13 @@ QEvent::Type DialogCompletionEvent::kEventType =
 MythMenu::MythMenu(const QString &text, QObject *retobject, const QString &resultid) :
     m_parentMenu(NULL),  m_title(""), m_text(text), m_resultid(resultid), m_retObject(retobject)
 {
+    Init();
 }
 
 MythMenu::MythMenu(const QString &title, const QString &text, QObject *retobject, const QString &resultid) :
     m_parentMenu(NULL),  m_title(title), m_text(text), m_resultid(resultid), m_retObject(retobject)
 {
+    Init();
 }
 
 MythMenu::~MythMenu(void)
@@ -47,6 +49,13 @@ MythMenu::~MythMenu(void)
 
         delete item;
     }
+}
+
+void MythMenu::Init()
+{
+    m_title.detach();
+    m_text.detach();
+    m_resultid.detach();
 }
 
 void MythMenu::AddItem(const QString& title, const char* slot, MythMenu *subMenu, bool selected, bool checked)
@@ -393,6 +402,7 @@ bool MythDialogBox::gestureEvent(MythGestureEvent *event)
         switch (event->GetButton())
         {
             case MythGestureEvent::RightButton :
+                SendEvent(-2);
                 Close();
                 handled = true;
                 break;
@@ -906,7 +916,7 @@ bool MythTimeInputDialog::Create()
             item = new MythUIButtonListItem(m_dateList, text, NULL, false);
             item->SetData(QVariant(date));
 
-            if (m_startTime.date() == date)
+            if (selected)
                 m_dateList->SetItemCurrent(item);
         }
         m_dateList->SetVisible(true);

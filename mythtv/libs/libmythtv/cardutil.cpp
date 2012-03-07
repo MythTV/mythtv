@@ -738,7 +738,7 @@ static uint clone_capturecard(uint src_cardid, uint orig_dst_cardid)
         "    diseqcid              = :V9,"
         "    dvb_eitscan           = :V10 "
         "WHERE cardid = :CARDID");
-    for (uint i = 0; i < 12; i++)
+    for (uint i = 0; i < 11; i++)
         query2.bindValue(QString(":V%1").arg(i), query.value(i).toString());
     query2.bindValue(":CARDID", dst_cardid);
 
@@ -857,10 +857,12 @@ static bool clone_cardinputs(uint src_cardid, uint dst_cardid)
                 "    displayname     = :V5, "
                 "    dishnet_eit     = :V6, "
                 "    recpriority     = :V7, "
-                "    quicktune       = :V8 ");
+                "    quicktune       = :V8, "
+                "    schedorder      = :V9, "
+                "    livetvorder     = :V10 ");
 
             query2.bindValue(":CARDID", dst_cardid);
-            for (uint j = 0; j < 9; j++)
+            for (uint j = 0; j < 11; j++)
             {
                 query2.bindValue(QString(":V%1").arg(j),
                                  query.value(j).toString());
@@ -1031,7 +1033,7 @@ vector<uint> CardUtil::GetCardIDs(uint sourceid)
     query.prepare(
         "SELECT DISTINCT cardid "
         "FROM cardinput "
-        "WHERE sourceid = :SOURCEID OR :SOURCEID = 0");
+        "WHERE sourceid = :SOURCEID");
     query.bindValue(":SOURCEID", sourceid);
 
     vector<uint> list;
@@ -1287,6 +1289,27 @@ uint CardUtil::GetSourceID(uint inputid)
     return 0;
 }
 
+vector<uint> CardUtil::GetAllInputIDs(void)
+{
+    vector<uint> list;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "SELECT cardinputid "
+        "FROM cardinput");
+
+    if (!query.exec())
+    {
+        MythDB::DBError("CardUtil::GetAllInputIDs(uint)", query);
+        return list;
+    }
+
+    while (query.next())
+        list.push_back(query.value(0).toUInt());
+
+    return list;
+}
+
 vector<uint> CardUtil::GetInputIDs(uint cardid)
 {
     vector<uint> list;
@@ -1295,7 +1318,7 @@ vector<uint> CardUtil::GetInputIDs(uint cardid)
     query.prepare(
         "SELECT cardinputid "
         "FROM cardinput "
-        "WHERE cardid = :CARDID OR :CARDID = 0");
+        "WHERE cardid = :CARDID");
 
     query.bindValue(":CARDID", cardid);
 

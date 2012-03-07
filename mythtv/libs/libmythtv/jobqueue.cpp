@@ -20,7 +20,7 @@ using namespace std;
 #include "jobqueue.h"
 #include "programinfo.h"
 #include "mythcorecontext.h"
-#include "util.h"
+#include "mythmiscutil.h"
 #include "previewgenerator.h"
 #include "compat.h"
 #include "recordingprofile.h"
@@ -2296,7 +2296,7 @@ void JobQueue::DoFlagCommercialsThread(int jobID)
     LOG(VB_JOBQUEUE, LOG_INFO, LOC + QString("Running command: '%1'")
             .arg(command));
 
-    breaksFound = myth_system(command);
+    breaksFound = myth_system(command, kMSLowExitVal);
     int priority = LOG_NOTICE;
     QString comment;
 

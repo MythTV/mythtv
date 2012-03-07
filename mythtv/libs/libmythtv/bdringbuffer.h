@@ -10,7 +10,7 @@
 #include "libmythbluray/keys.h"
 
 #include "ringbuffer.h"
-#include "util.h"
+#include "mythmiscutil.h"
 
 /** \class BDRingBufferPriv
  *  \brief RingBuffer class for Blu-rays

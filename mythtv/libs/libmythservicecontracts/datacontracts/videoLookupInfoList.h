@@ -31,7 +31,7 @@ class SERVICE_PUBLIC VideoLookupList : public QObject
     // A Q_CLASSINFO entry with "<PropName>_type" as the key
     // and the type name as the value
 
-    Q_CLASSINFO( "VideoLookups_type", "DTC::VideoLookup");
+    Q_CLASSINFO( "VideoLookups", "type=DTC::VideoLookup");
 
     Q_PROPERTY( int          Count          READ Count           WRITE setCount          )
     Q_PROPERTY( QDateTime    AsOf           READ AsOf            WRITE setAsOf           )

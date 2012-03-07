@@ -69,33 +69,25 @@ class BECache( object ):
         if backend is None:
             # no backend given, use master
             self.host = self.db.settings.NULL.MasterServerIP
+            self.hostname = self.db._gethostfromaddr(self.host)
 
         else:
             backend = backend.strip('[]')
+            query = "SELECT hostname FROM settings WHERE value=? AND data=?"
             if self._reip.match(backend):
                 # given backend is IP address
                 self.host = backend
+                self.hostname = self.db._gethostfromaddr(
+                                            backend, 'BackendServerIP')
             elif check_ipv6(backend):
                 # given backend is IPv6 address
                 self.host = backend
+                self.hostname = self.db._gethostfromaddr(
+                                            backend, 'BackendServerIP6')
             else:
                 # given backend is hostname, pull address from database
                 self.hostname = backend
-                self.host = self.db.settings[backend].BackendServerIP
-                if not self.host:
-                    raise MythDBError(MythError.DB_SETTING,
-                                            'BackendServerIP', backend)
-
-        if self.hostname is None:
-            # reverse lookup hostname from address
-            with self.db.cursor(self.log) as cursor:
-                if cursor.execute("""SELECT hostname FROM settings
-                                     WHERE value='BackendServerIP'
-                                     AND data=?""", [self.host]) == 0:
-                    # no match found
-                    raise MythDBError(MythError.DB_SETTING, 'BackendServerIP',
-                                            self.host)
-                self.hostname = cursor.fetchone()[0]
+                self.host = self.db._getpreferredaddr(backend)
 
         # lookup port from database
         self.port = int(self.db.settings[self.hostname].BackendServerPort)
@@ -248,13 +240,7 @@ def ftopen(file, mode, forceremote=False, nooverwrite=False, db=None, \
     # get full system name
     host = host.strip('[]')
     if reip.match(host) or check_ipv6(host):
-        with db.cursor(log) as cursor:
-            if cursor.execute("""SELECT hostname FROM settings
-                                 WHERE value='BackendServerIP'
-                                 AND data=%s""", host) == 0:
-                raise MythDBError(MythError.DB_SETTING, \
-                                  'BackendServerIP', backend)
-            host = cursor.fetchone()[0]
+        host = db._gethostfromaddr(host)
 
     # user forced to remote access
     if forceremote:

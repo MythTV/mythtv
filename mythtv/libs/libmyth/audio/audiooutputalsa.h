@@ -38,6 +38,7 @@ class AudioOutputALSA : public AudioOutputBase
     inline int SetParameters(snd_pcm_t *handle, snd_pcm_format_t format,
                              uint channels, uint rate, uint buffer_time,
                              uint period_time);
+    QByteArray *GetELD(int card, int device, int subdevice);
     // Volume related
     bool OpenMixer(void);
 

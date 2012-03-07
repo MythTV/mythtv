@@ -314,8 +314,6 @@ bool BookmarkManager::keyPressEvent(QKeyEvent *event)
                 m_menuPopup->AddButton(tr("Clear Marked"), SLOT(slotClearMarked()));
             }
 
-            m_menuPopup->AddButton(tr("Cancel"));
-
             popupStack->AddScreen(m_menuPopup);
         }
         else if (action == "INFO")
@@ -495,7 +493,7 @@ void BookmarkManager::slotDeleteCurrent(void)
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
-    QString message = tr("Are you sure you want to delete the selected bookmark");
+    QString message = tr("Are you sure you want to delete the selected bookmark?");
 
     MythConfirmationDialog *dialog = new MythConfirmationDialog(popupStack, message, true);
 
@@ -539,7 +537,7 @@ void BookmarkManager::slotDeleteMarked(void)
 
      MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
-    QString message = tr("Are you sure you want to delete the marked bookmarks");
+    QString message = tr("Are you sure you want to delete the marked bookmarks?");
 
     MythConfirmationDialog *dialog = new MythConfirmationDialog(popupStack, message, true);
 

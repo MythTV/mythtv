@@ -544,7 +544,7 @@ void SchedOptEditor::Load()
     new MythUIButtonListItem(m_inputList, tr("Use any available input"),
                              qVariantFromValue(0));
 
-    vector<uint> inputids = CardUtil::GetInputIDs(0);
+    vector<uint> inputids = CardUtil::GetAllInputIDs();
     for (uint i = 0; i < inputids.size(); ++i)
     {
         new MythUIButtonListItem(m_inputList, tr("Prefer input %1")
@@ -611,10 +611,12 @@ void SchedOptEditor::Load()
     m_ruleactiveCheck->SetCheckState(!m_recordingRule->m_isInactive);
 
     InfoMap progMap;
+
+    m_recordingRule->ToMap(progMap);
+
     if (m_recInfo)
         m_recInfo->ToMap(progMap);
-    else
-        m_recordingRule->ToMap(progMap);
+
     SetTextFromMap(progMap);
 }
 
@@ -753,10 +755,12 @@ void SchedFilterEditor::Load()
     }
 
     InfoMap progMap;
+
+    m_recordingRule->ToMap(progMap);
+
     if (m_recInfo)
         m_recInfo->ToMap(progMap);
-    else
-        m_recordingRule->ToMap(progMap);
+
     SetTextFromMap(progMap);
 }
 
@@ -998,10 +1002,12 @@ void StoreOptEditor::Load()
 
 
     InfoMap progMap;
+
+    m_recordingRule->ToMap(progMap);
+
     if (m_recInfo)
         m_recInfo->ToMap(progMap);
-    else
-        m_recordingRule->ToMap(progMap);
+
     SetTextFromMap(progMap);
 }
 
@@ -1214,10 +1220,12 @@ void PostProcEditor::Load()
         m_metadataLookupCheck->SetCheckState(m_recordingRule->m_autoMetadataLookup);
 
     InfoMap progMap;
+
+    m_recordingRule->ToMap(progMap);
+
     if (m_recInfo)
         m_recInfo->ToMap(progMap);
-    else
-        m_recordingRule->ToMap(progMap);
+
     SetTextFromMap(progMap);
 }
 
@@ -1358,8 +1366,8 @@ bool MetadataOptions::Create()
     connect(m_seasonSpin, SIGNAL(itemSelected(MythUIButtonListItem*)),
                           SLOT(ValuesChanged()));
 
-    m_seasonSpin->SetRange(0,9999,1,1);
-    m_episodeSpin->SetRange(0,9999,1,1);
+    m_seasonSpin->SetRange(0,9999,1,5);
+    m_episodeSpin->SetRange(0,9999,1,10);
 
     // InetRef/Seas/Ep (needs to be built from original rule, not pginfo)
     if (m_recInfo)
@@ -1411,14 +1419,16 @@ void MetadataOptions::Load()
         CreateBusyDialog("Trying to automatically find this "
                      "recording online...");
 
-        m_metadataFactory->Lookup(m_recordingRule, false, false);
+        m_metadataFactory->Lookup(m_recordingRule, false, false, true);
     }
 
     InfoMap progMap;
+
+    m_recordingRule->ToMap(progMap);
+
     if (m_recInfo)
         m_recInfo->ToMap(progMap);
-    else
-        m_recordingRule->ToMap(progMap);
+
     SetTextFromMap(progMap);
 }
 
@@ -1450,12 +1460,14 @@ void MetadataOptions::PerformQuery()
         m_lookup->SetSubtype(kProbableTelevision);
     else
         m_lookup->SetSubtype(kProbableMovie);
+    m_lookup->SetAllowGeneric(true);
     m_lookup->SetAutomatic(false);
     m_lookup->SetHandleImages(false);
     m_lookup->SetHost(gCoreContext->GetMasterHostName());
     m_lookup->SetTitle(m_recordingRule->m_title);
     m_lookup->SetSubtitle(m_recordingRule->m_subtitle);
     m_lookup->SetInetref(m_inetrefEdit->GetText());
+    m_lookup->SetCollectionref(m_inetrefEdit->GetText());
     m_lookup->SetSeason(m_seasonSpin->GetIntValue());
     m_lookup->SetEpisode(m_episodeSpin->GetIntValue());
 
@@ -1659,11 +1671,13 @@ void MetadataOptions::FindNetArt(VideoArtworkType type)
         m_lookup->SetSubtype(kProbableTelevision);
     else
         m_lookup->SetSubtype(kProbableMovie);
+    m_lookup->SetAllowGeneric(true);
     m_lookup->SetData(qVariantFromValue<VideoArtworkType>(type));
     m_lookup->SetHost(gCoreContext->GetMasterHostName());
     m_lookup->SetTitle(m_recordingRule->m_title);
     m_lookup->SetSubtitle(m_recordingRule->m_subtitle);
     m_lookup->SetInetref(m_inetrefEdit->GetText());
+    m_lookup->SetCollectionref(m_inetrefEdit->GetText());
     m_lookup->SetSeason(m_seasonSpin->GetIntValue());
     m_lookup->SetEpisode(m_episodeSpin->GetIntValue());
 

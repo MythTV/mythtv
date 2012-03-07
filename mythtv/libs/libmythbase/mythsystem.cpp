@@ -300,6 +300,8 @@ void MythSystem::ProcessFlags(uint flags)
         m_settings["AutoCleanup"] = true;
     if( flags & kMSAnonLog )
         m_settings["AnonLog"] = true;
+    if( flags & kMSLowExitVal )
+        m_settings["OnlyLowExitVal"] = true;
 }
 
 QByteArray  MythSystem::Read(int size)

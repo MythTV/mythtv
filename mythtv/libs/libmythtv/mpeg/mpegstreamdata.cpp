@@ -88,6 +88,7 @@ MPEGStreamData::MPEGStreamData(int desiredProgram, bool cacheTables)
     memset(_si_time_offsets, 0, sizeof(_si_time_offsets));
 
     AddListeningPID(MPEG_PAT_PID);
+    AddListeningPID(MPEG_CAT_PID);
 }
 
 MPEGStreamData::~MPEGStreamData()
@@ -211,11 +212,17 @@ void MPEGStreamData::Reset(int desiredProgram)
         for (; it2 != _cached_pmts.end(); ++it2)
             DeleteCachedTable(*it2);
         _cached_pmts.clear();
+
+        cat_cache_t::iterator it3 = _cached_cats.begin();
+        for (; it3 != _cached_cats.end(); ++it3)
+            DeleteCachedTable(*it3);
+        _cached_cats.clear();
     }
 
     ResetDecryptionMonitoringState();
 
     AddListeningPID(MPEG_PAT_PID);
+    AddListeningPID(MPEG_CAT_PID);
 }
 
 void MPEGStreamData::DeletePartialPSIP(uint pid)
@@ -622,6 +629,16 @@ bool MPEGStreamData::CreatePMTSingleProgram(const ProgramMapTable &pmt)
         return false;
     }
 
+    desc_list_t cdesc = MPEGDescriptor::ParseOnlyInclude(
+        pmt.ProgramInfo(), pmt.ProgramInfoLength(),
+        DescriptorID::conditional_access);
+    for (uint i = 0; i < cdesc.size(); i++)
+    {
+        ConditionalAccessDescriptor cad(cdesc[i]);
+        if (cad.IsValid())
+            AddListeningPID(cad.PID());
+    }
+
     _pids_audio.clear();
     for (uint i = 0; i < audioPIDs.size(); i++)
         AddAudioPID(audioPIDs[i]);
@@ -683,7 +700,11 @@ bool MPEGStreamData::IsRedundant(uint pid, const PSIPTable &psip) const
     }
 
     if (TableID::CAT == table_id)
-        return false;
+    {
+        if (VersionCAT(psip.TableIDExtension()) != version)
+           return false;
+        return CATSectionSeen(psip.TableIDExtension(), psip.Section());
+    }
 
     if (TableID::PMT == table_id)
     {
@@ -724,12 +745,16 @@ bool MPEGStreamData::HandleTables(uint pid, const PSIPTable &psip)
         }
         case TableID::CAT:
         {
+            uint tsid = psip.TableIDExtension();
+            SetVersionCAT(tsid, version, psip.LastSection());
+            SetCATSectionSeen(tsid, psip.Section());
+
             ConditionalAccessTable cat(psip);
 
-            _listener_lock.lock();
-            for (uint i = 0; i < _mpeg_listeners.size(); i++)
-                _mpeg_listeners[i]->HandleCAT(&cat);
-            _listener_lock.unlock();
+            if (_cache_tables)
+                CacheCAT(&cat);
+
+            ProcessCAT(&cat);
 
             return true;
         }
@@ -812,6 +837,24 @@ void MPEGStreamData::ProcessPAT(const ProgramAssociationTable *pat)
         ProgramAssociationTable *pat_sp = PATSingleProgram();
         for (uint i = 0; i < _mpeg_sp_listeners.size(); i++)
             _mpeg_sp_listeners[i]->HandleSingleProgramPAT(pat_sp);
+    }
+}
+
+void MPEGStreamData::ProcessCAT(const ConditionalAccessTable *cat)
+{
+    _listener_lock.lock();
+    for (uint i = 0; i < _mpeg_listeners.size(); i++)
+        _mpeg_listeners[i]->HandleCAT(cat);
+    _listener_lock.unlock();
+
+    desc_list_t cdesc = MPEGDescriptor::ParseOnlyInclude(
+        cat->Descriptors(), cat->DescriptorsLength(),
+        DescriptorID::conditional_access);
+    for (uint i = 0; i < cdesc.size(); i++)
+    {
+        ConditionalAccessDescriptor cad(cdesc[i]);
+        if (cad.IsValid())
+            AddListeningPID(cad.PID());
     }
 }
 
@@ -1177,6 +1220,36 @@ bool MPEGStreamData::HasAllPATSections(uint tsid) const
     return true;
 }
 
+void MPEGStreamData::SetCATSectionSeen(uint tsid, uint section)
+{
+    sections_map_t::iterator it = _cat_section_seen.find(tsid);
+    if (it == _cat_section_seen.end())
+    {
+        _cat_section_seen[tsid].resize(32, 0);
+        it = _cat_section_seen.find(tsid);
+    }
+    (*it)[section>>3] |= bit_sel[section & 0x7];
+}
+
+bool MPEGStreamData::CATSectionSeen(uint tsid, uint section) const
+{
+    sections_map_t::const_iterator it = _cat_section_seen.find(tsid);
+    if (it == _cat_section_seen.end())
+        return false;
+    return (bool) ((*it)[section>>3] & bit_sel[section & 0x7]);
+}
+
+bool MPEGStreamData::HasAllCATSections(uint tsid) const
+{
+    sections_map_t::const_iterator it = _cat_section_seen.find(tsid);
+    if (it == _cat_section_seen.end())
+        return false;
+    for (uint i = 0; i < 32; i++)
+        if ((*it)[i] != 0xff)
+            return false;
+    return true;
+}
+
 void MPEGStreamData::SetPMTSectionSeen(uint prog_num, uint section)
 {
     sections_map_t::iterator it = _pmt_section_seen.find(prog_num);
@@ -1250,6 +1323,42 @@ bool MPEGStreamData::HasCachedAnyPAT(void) const
 {
     QMutexLocker locker(&_cache_lock);
     return _cached_pats.size();
+}
+
+bool MPEGStreamData::HasCachedAllCAT(uint tsid) const
+{
+    QMutexLocker locker(&_cache_lock);
+
+    cat_cache_t::const_iterator it = _cached_cats.find(tsid << 8);
+    if (it == _cached_cats.end())
+        return false;
+
+    uint last_section = (*it)->LastSection();
+    if (!last_section)
+        return true;
+
+    for (uint i = 1; i <= last_section; i++)
+        if (_cached_cats.find((tsid << 8) | i) == _cached_cats.end())
+            return false;
+
+    return true;
+}
+
+bool MPEGStreamData::HasCachedAnyCAT(uint tsid) const
+{
+    QMutexLocker locker(&_cache_lock);
+
+    for (uint i = 0; i <= 255; i++)
+        if (_cached_cats.find((tsid << 8) | i) != _cached_cats.end())
+            return true;
+
+    return false;
+}
+
+bool MPEGStreamData::HasCachedAnyCAT(void) const
+{
+    QMutexLocker locker(&_cache_lock);
+    return _cached_cats.size();
 }
 
 bool MPEGStreamData::HasCachedAllPMT(uint pnum) const
@@ -1355,6 +1464,51 @@ pat_vec_t MPEGStreamData::GetCachedPATs(void) const
     return pats;
 }
 
+const cat_ptr_t MPEGStreamData::GetCachedCAT(
+    uint tsid, uint section_num) const
+{
+    QMutexLocker locker(&_cache_lock);
+    ConditionalAccessTable *cat = NULL;
+
+    uint key = (tsid << 8) | section_num;
+    cat_cache_t::const_iterator it = _cached_cats.find(key);
+    if (it != _cached_cats.end())
+        IncrementRefCnt(cat = *it);
+
+    return cat;
+}
+
+cat_vec_t MPEGStreamData::GetCachedCATs(uint tsid) const
+{
+    QMutexLocker locker(&_cache_lock);
+    cat_vec_t cats;
+
+    for (uint i=0; i < 256; i++)
+    {
+        ConditionalAccessTable *cat = GetCachedCAT(tsid, i);
+        if (cat)
+            cats.push_back(cat);
+    }
+
+    return cats;
+}
+
+cat_vec_t MPEGStreamData::GetCachedCATs(void) const
+{
+    QMutexLocker locker(&_cache_lock);
+    cat_vec_t cats;
+
+    cat_cache_t::const_iterator it = _cached_cats.begin();
+    for (; it != _cached_cats.end(); ++it)
+    {
+        ConditionalAccessTable* cat = *it;
+        IncrementRefCnt(cat);
+        cats.push_back(cat);
+    }
+
+    return cats;
+}
+
 const pmt_ptr_t MPEGStreamData::GetCachedPMT(
     uint program_num, uint section_num) const
 {
@@ -1432,6 +1586,20 @@ void MPEGStreamData::ReturnCachedPATTables(pat_map_t &pats) const
     pats.clear();
 }
 
+void MPEGStreamData::ReturnCachedCATTables(cat_vec_t &cats) const
+{
+    for (cat_vec_t::iterator it = cats.begin(); it != cats.end(); ++it)
+        ReturnCachedTable(*it);
+    cats.clear();
+}
+
+void MPEGStreamData::ReturnCachedCATTables(cat_map_t &cats) const
+{
+    for (cat_map_t::iterator it = cats.begin(); it != cats.end(); ++it)
+        ReturnCachedCATTables(*it);
+    cats.clear();
+}
+
 void MPEGStreamData::ReturnCachedPMTTables(pmt_vec_t &pmts) const
 {
     for (pmt_vec_t::iterator it = pmts.begin(); it != pmts.end(); ++it)
@@ -1471,6 +1639,12 @@ bool MPEGStreamData::DeleteCachedTable(PSIPTable *psip) const
         _cached_pats[(tid << 8) | psip->Section()] = NULL;
         delete psip;
     }
+    else if (TableID::CAT == psip->TableID() &&
+             (_cached_cats[(tid << 8) | psip->Section()] == psip))
+    {
+        _cached_cats[(tid << 8) | psip->Section()] = NULL;
+        delete psip;
+    }
     else if ((TableID::PMT == psip->TableID()) &&
              (_cached_pmts[(tid << 8) | psip->Section()] == psip))
     {
@@ -1502,6 +1676,20 @@ void MPEGStreamData::CachePAT(const ProgramAssociationTable *_pat)
         DeleteCachedTable(*it);
 
     _cached_pats[key] = pat;
+}
+
+void MPEGStreamData::CacheCAT(const ConditionalAccessTable *_cat)
+{
+    ConditionalAccessTable *cat = new ConditionalAccessTable(*_cat);
+    uint key = (_cat->TableIDExtension() << 8) | _cat->Section();
+
+    QMutexLocker locker(&_cache_lock);
+
+    cat_cache_t::iterator it = _cached_cats.find(key);
+    if (it != _cached_cats.end())
+        DeleteCachedTable(*it);
+
+    _cached_cats[key] = cat;
 }
 
 void MPEGStreamData::CachePMT(const ProgramMapTable *_pmt)

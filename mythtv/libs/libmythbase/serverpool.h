@@ -45,6 +45,14 @@ class MBASE_PUBLIC ServerPool : public QObject
     ServerPool(QObject *parent=0);
    ~ServerPool(void);
 
+    static void RefreshDefaultListen(void);
+    static QList<QHostAddress> DefaultListen(void);
+    static QList<QHostAddress> DefaultListenIPv4(void);
+    static QList<QHostAddress> DefaultListenIPv6(void);
+    static QList<QHostAddress> DefaultBroadcast(void);
+    static QList<QHostAddress> DefaultBroadcastIPv4(void);
+//    static QList<QHostAddress> DefaultBroadcastIPv6(void);
+
     bool listen(QList<QHostAddress> addrs, quint16 port, bool requireall=true);
     bool listen(QStringList addrs, quint16 port, bool requireall=true);
     bool listen(quint16 port, bool requireall=true);
@@ -77,6 +85,8 @@ class MBASE_PUBLIC ServerPool : public QObject
     virtual void newTcpConnection(int socket);
 
   private:
+    static void SelectDefaultListen(bool force=false);
+
     bool            m_listening;
     int             m_maxPendingConn;
     quint16         m_port;

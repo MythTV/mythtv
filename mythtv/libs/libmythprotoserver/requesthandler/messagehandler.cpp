@@ -84,7 +84,7 @@ bool MessageHandler::HandleOutbound(SocketHandler *sock, QStringList &slist)
     QStringList::const_iterator iter = slist.begin();
     QString message = *(iter++);
     QStringList extra_data( *(iter++) );
-    iter++;
+    ++iter;
     for (; iter != slist.end(); ++iter)
         extra_data << *iter;
     MythEvent me(message, extra_data);

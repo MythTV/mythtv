@@ -217,6 +217,9 @@ class ChannelScanSM : public MPEGStreamListener,
     // Optional info
     DTVTunerType      scanDTVTunerType;
 
+    /// The big lock
+    mutable QMutex    lock;
+
     // State
     bool              scanning;
     volatile bool     threadExit;

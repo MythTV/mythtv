@@ -253,6 +253,35 @@ static void startRipper(void)
 #endif
 }
 
+static void runScan(void)
+{
+    if ("" != gMusicData->musicDir)
+    {
+        FileScanner *fscan = new FileScanner();
+        fscan->SearchDir(gMusicData->musicDir);
+
+        // save anything that may have changed
+        if (gMusicData->all_music && gMusicData->all_music->cleanOutThreads())
+            gMusicData->all_music->save();
+
+        if (gMusicData->all_playlists && gMusicData->all_playlists->cleanOutThreads())
+        {
+            gMusicData->all_playlists->save();
+            int x = gMusicData->all_playlists->getPending();
+            SavePending(x);
+        }
+
+        // force a complete reload of the tracks and playlists
+        gPlayer->stop(true);
+        delete gMusicData;
+
+        gMusicData = new MusicData;
+        loadMusic();
+
+        delete fscan;
+    }
+}
+
 static void startImport(void)
 {
     loadMusic();
@@ -291,14 +320,7 @@ static void MusicCallback(void *data, QString &selection)
     }
     else if (sel == "settings_scan")
     {
-        if ("" != gMusicData->musicDir)
-        {
-            loadMusic();
-            FileScanner *fscan = new FileScanner();
-            fscan->SearchDir(gMusicData->musicDir);
-            gMusicData->reloadMusic();
-            delete fscan;
-        }
+        runScan();
     }
     else if (sel == "settings_general")
      {
@@ -351,9 +373,6 @@ static void MusicCallback(void *data, QString &selection)
         else
             delete is;
     }
-
-    if (sel.startsWith("settings_"))
-        gCoreContext->dispatch(MythEvent(QString("MUSIC_SETTINGS_CHANGED")));
 }
 
 static int runMenu(QString which_menu)
@@ -417,19 +436,6 @@ static void runRipCD(void)
                      gMusicData, SLOT(reloadMusic()),
                      Qt::QueuedConnection);
 #endif
-}
-
-static void runScan(void)
-{
-    loadMusic();
-
-    if ("" != gMusicData->musicDir)
-    {
-        FileScanner *fscan = new FileScanner();
-        fscan->SearchDir(gMusicData->musicDir);
-        gMusicData->reloadMusic();
-        delete fscan;
-    }
 }
 
 static void showMiniPlayer(void)

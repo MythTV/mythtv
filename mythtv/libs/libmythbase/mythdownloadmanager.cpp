@@ -8,6 +8,7 @@
 #include <QNetworkCookieJar>
 #include <QAuthenticator>
 #include <QTextStream>
+#include <QNetworkProxy>
 
 #include "stdlib.h"
 
@@ -28,6 +29,7 @@
 using namespace std;
 
 #define LOC      QString("DownloadManager: ")
+#define CACHE_REDIRECTION_LIMIT     10
 
 MythDownloadManager *downloadManager = NULL;
 QMutex               dmCreateLock;
@@ -188,6 +190,7 @@ MythDownloadManager::MythDownloadManager() :
     MThread("DownloadManager"),
     m_manager(NULL),
     m_diskCache(NULL),
+    m_proxy(NULL),
     m_infoLock(new QMutex(QMutex::Recursive)),
     m_queueThread(NULL),
     m_runThread(false),
@@ -225,10 +228,15 @@ void MythDownloadManager::run(void)
 
     m_manager = new QNetworkAccessManager(this);
     m_diskCache = new QNetworkDiskCache(this);
+    m_proxy = new QNetworkProxy();
     m_diskCache->setCacheDirectory(GetConfDir() + "/Cache-" +
                                    QCoreApplication::applicationName() + "-" +
                                    gCoreContext->GetHostName());
     m_manager->setCache(m_diskCache);
+
+    // Set the proxy for the manager to be the application default proxy,
+    // which has already been setup
+    m_manager->setProxy(*m_proxy);
 
     // make sure the cookieJar is created in the same thread as the manager
     // and set its parent to NULL so it can be shared between managers
@@ -483,7 +491,7 @@ bool MythDownloadManager::download(QNetworkRequest *req, QByteArray *data)
  *  \param dest    Destination filename.
  *  \param reload  Whether to force reloading of the URL or not
  *  \param authCallback AuthCallback function for use with authentication
- *  \param authArg Opaque argument for callback function 
+ *  \param authArg Opaque argument for callback function
  *  \param header  Optional HTTP header to add to the request
  *  \param headerVal Value for the optional HTTP header to add to the request
  *  \return true if download was successful, false otherwise.
@@ -583,7 +591,7 @@ bool MythDownloadManager::post(QNetworkRequest *req, QByteArray *data)
  *  \param url      URL to post to
  *  \param data     Location holding post and response data
  *  \param authCallback AuthCallback function for authentication
- *  \param authArg Opaque argument for callback function 
+ *  \param authArg Opaque argument for callback function
  *  \param header  Optional HTTP header to add to the request
  *  \param headerVal Value for the optional HTTP header to add to the request
  *  \return true if post was successful, false otherwise.
@@ -645,15 +653,26 @@ void MythDownloadManager::downloadQNetworkRequest(MythDownloadInfo *dlInfo)
 
         // Handle redirects, we want the metadata of the file headers
         QString redirectLoc;
+        int limit = 0;
         while (!(redirectLoc = getHeader(qurl, "Location")).isNull())
         {
+            if (limit == CACHE_REDIRECTION_LIMIT)
+            {
+                LOG(VB_GENERAL, LOG_WARNING, QString("Cache Redirection limit "
+                                                     "reached for %1")
+                                                    .arg(qurl.toString()));
+                return;
+            }
             qurl.setUrl(redirectLoc);
+            limit++;
         }
 
         LOG(VB_NETWORK, LOG_DEBUG, QString("Checking cache for %1")
                                                     .arg(qurl.toString()));
 
+        m_infoLock->lock();
         QNetworkCacheMetaData urlData = m_manager->cache()->metaData(qurl);
+        m_infoLock->unlock();
         if ((urlData.isValid()) &&
             ((!urlData.expirationDate().isValid()) ||
              (urlData.expirationDate().secsTo(now) < 10)))
@@ -680,9 +699,9 @@ void MythDownloadManager::downloadQNetworkRequest(MythDownloadInfo *dlInfo)
                              QNetworkRequest::PreferCache);
 
     request.setRawHeader("User-Agent",
-                         "MythDownloadManager v" MYTH_BINARY_VERSION);
+                         "MythTV v" MYTH_BINARY_VERSION " MythDownloadManager");
 
-    if (dlInfo->m_header && dlInfo->m_headerVal && 
+    if (dlInfo->m_header && dlInfo->m_headerVal &&
         !dlInfo->m_header->isEmpty() && !dlInfo->m_headerVal->isEmpty())
     {
         request.setRawHeader(*(dlInfo->m_header), *(dlInfo->m_headerVal));
@@ -1000,12 +1019,23 @@ void MythDownloadManager::downloadFinished(MythDownloadInfo *dlInfo)
         // already exist
         QUrl fileUrl = dlInfo->m_url;
         QString redirectLoc;
+        int limit = 0;
         while (!(redirectLoc = getHeader(fileUrl, "Location")).isNull())
         {
+            if (limit == CACHE_REDIRECTION_LIMIT)
+            {
+                LOG(VB_GENERAL, LOG_WARNING, QString("Cache Redirection limit "
+                                                     "reached for %1")
+                                                    .arg(fileUrl.toString()));
+                return;
+            }
             fileUrl.setUrl(redirectLoc);
+            limit++;
         }
 
+        m_infoLock->lock();
         QNetworkCacheMetaData urlData = m_manager->cache()->metaData(fileUrl);
+        m_infoLock->unlock();
         if (getHeader(urlData, "Date").isNull())
         {
             QNetworkCacheMetaData::RawHeaderList headers = urlData.rawHeaders();
@@ -1015,7 +1045,9 @@ void MythDownloadManager::downloadFinished(MythDownloadInfo *dlInfo)
                                         now.toString(dateFormat).toAscii());
             headers.append(newheader);
             urlData.setRawHeaders(headers);
+            m_infoLock->lock();
             m_manager->cache()->updateMetaData(urlData);
+            m_infoLock->unlock();
         }
         // End HACK
 
@@ -1239,9 +1271,18 @@ QDateTime MythDownloadManager::GetLastModified(const QString &url)
 
     // Deal with redirects, we want the cached data for the final url
     QString redirectLoc;
+    int limit = 0;
     while (!(redirectLoc = getHeader(cacheUrl, "Location")).isNull())
     {
+        if (limit == CACHE_REDIRECTION_LIMIT)
+        {
+            LOG(VB_GENERAL, LOG_WARNING, QString("Cache Redirection limit "
+                                                    "reached for %1")
+                                                .arg(cacheUrl.toString()));
+            return result;
+        }
         cacheUrl.setUrl(redirectLoc);
+        limit++;
     }
 
     m_infoLock->lock();
@@ -1320,6 +1361,18 @@ void MythDownloadManager::saveCookieJar(const QString &filename)
     jar->save(filename);
 }
 
+QString MythDownloadManager::getHeader(const QUrl& url, const QString& header)
+{
+    if (!m_manager || !m_manager->cache())
+        return QString::null;
+
+    m_infoLock->lock();
+    QNetworkCacheMetaData metadata = m_manager->cache()->metaData(url);
+    m_infoLock->unlock();
+
+    return getHeader(metadata, header);
+}
+
 /** \brief Gets the value of an HTTP header from the cache
  *  \param cacheData The cache data to search through
  *  \param header Which HTTP header to get the value of
@@ -1356,7 +1409,7 @@ void MythCookieJar::load(const QString &filename)
         QString cookie = stream.readLine();
         cookieList << QNetworkCookie::parseCookies(cookie.toLocal8Bit());
     }
-    
+
     setAllCookies(cookieList);
 }
 

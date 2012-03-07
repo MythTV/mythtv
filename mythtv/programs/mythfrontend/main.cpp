@@ -36,7 +36,6 @@ using namespace std;
 #include "globalsettings.h"
 #include "audiogeneralsettings.h"
 #include "grabbersettings.h"
-#include "profilegroup.h"
 #include "playgroup.h"
 #include "networkcontrol.h"
 #include "dvdringbuffer.h"
@@ -94,7 +93,6 @@ using namespace std;
 #include <QScopedPointer>
 #include "bonjourregister.h"
 #include "mythairplayserver.h"
-#include <external/FFmpeg/libavcodec/x86/mmx.h>
 #endif
 
 static ExitPrompter   *exitPopup = NULL;
@@ -677,7 +675,7 @@ static void playDisc()
     {
         GetMythUI()->AddCurrentLocation("playdisc");
 
-        QString filename = QString("bd:/%1/").arg(bluray_mountpoint);
+        QString filename = QString("bd:/%1").arg(bluray_mountpoint);
 
         GetMythMainWindow()->HandleMedia("Internal", filename, "", "", "", "",
                                          0, 0, "", 0, "", "", true);
@@ -910,11 +908,6 @@ static void TVMenuCallback(void *data, QString &selection)
     else if (sel == "setup_keys")
     {
         startKeysSetup();
-    }
-    else if (sel == "settings recording")
-    {
-        ProfileGroupEditor editor;
-        editor.exec();
     }
     else if (sel == "settings playgroup")
     {
@@ -1203,6 +1196,11 @@ static int internal_play_media(const QString &mrl, const QString &plot,
 
 static void gotoMainMenu(void)
 {
+    // Reset the selected button to the first item.
+    MythThemedMenuState *menu = dynamic_cast<MythThemedMenuState *>
+        (GetMythMainWindow()->GetMainStack()->GetTopScreen());
+    if (menu)
+        menu->m_buttonList->SetItemCurrent(0);
 }
 
 // If the theme specified in the DB is somehow broken, try a standard one:
@@ -1324,6 +1322,9 @@ static void InitJumpPoints(void)
          "", "", showStatus);
      REG_JUMP(QT_TRANSLATE_NOOP("MythControls", "Previously Recorded"),
          "", "", startPrevious);
+
+     REG_JUMP(QT_TRANSLATE_NOOP("MythControls", "Standby Mode"),
+         "", "", standbyScreen);
 
      // Video
 
@@ -1673,9 +1674,9 @@ int main(int argc, char **argv)
     NetworkControl *networkControl = NULL;
     if (gCoreContext->GetNumSetting("NetworkControlEnabled", 0))
     {
-        int port = gCoreContext->GetNumSetting("NetworkControlPort", 6545);
+        int port = gCoreContext->GetNumSetting("NetworkControlPort", 6546);
         networkControl = new NetworkControl();
-        if (!networkControl->listen(gCoreContext->MythHostAddress(), port))
+        if (!networkControl->listen(port))
             LOG(VB_GENERAL, LOG_ERR,
                 QString("NetworkControl failed to bind to port %1.")
                    .arg(port));

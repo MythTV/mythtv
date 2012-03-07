@@ -11,7 +11,7 @@
 #include "scheduledrecording.h" // For signalChange()
 #include "playgroup.h" // For GetInitialName()
 #include "recordingprofile.h" // For constants
-#include "util.h"
+#include "mythmiscutil.h"
 
 static inline QString null_to_empty(const QString &str)
 {
@@ -499,6 +499,9 @@ void RecordingRule::ToMap(InfoMap &infoMap) const
     if (m_lastDeleted.isValid())
         infoMap["lastdeleted"] = MythDateTimeToString(m_lastDeleted,
                                                       kDateFull | kAddYear);
+
+    infoMap["ruletype"] = toString(m_type);
+    infoMap["rectype"] = toString(m_type);
 }
 
 void RecordingRule::UseTempTable(bool usetemp, QString table)
