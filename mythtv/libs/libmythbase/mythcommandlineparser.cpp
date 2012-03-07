@@ -144,8 +144,8 @@ const char* NamedOptType(int type)
 CommandLineArg::CommandLineArg(QString name, QVariant::Type type,
                    QVariant def, QString help, QString longhelp) :
     ReferenceCounter(), m_given(false), m_converted(false), m_name(name),
-    m_group(""), m_deprecated(""), m_type(type), m_default(def), m_help(help),
-    m_longhelp(longhelp)
+    m_group(""), m_deprecated(""), m_removed(""), m_removedversion(""),
+    m_type(type), m_default(def), m_help(help), m_longhelp(longhelp)
 {
     if ((m_type != QVariant::String) && (m_type != QVariant::StringList) &&
             (m_type != QVariant::Map))
@@ -160,7 +160,8 @@ CommandLineArg::CommandLineArg(QString name, QVariant::Type type,
  */
 CommandLineArg::CommandLineArg(QString name, QVariant::Type type, QVariant def)
   : ReferenceCounter(), m_given(false), m_converted(false), m_name(name),
-    m_group(""), m_deprecated(""), m_type(type), m_default(def)
+    m_group(""), m_deprecated(""), m_removed(""), m_removedversion(""),
+    m_type(type), m_default(def)
 {
     if ((m_type != QVariant::String) && (m_type != QVariant::StringList) &&
             (m_type != QVariant::Map))
@@ -176,7 +177,8 @@ CommandLineArg::CommandLineArg(QString name, QVariant::Type type, QVariant def)
  */
 CommandLineArg::CommandLineArg(QString name) :
     ReferenceCounter(), m_given(false), m_converted(false), m_name(name),
-    m_deprecated(""), m_type(QVariant::Invalid)
+    m_deprecated(""), m_removed(""), m_removedversion(""),
+    m_type(QVariant::Invalid)
 {
 }
 
@@ -242,6 +244,10 @@ QString CommandLineArg::GetHelpString(int off, QString group, bool force) const
         // option is marked as deprecated, do not show
         return helpstr;
 
+    if (!m_removed.isEmpty())
+        // option is marked as removed, do not show
+        return helpstr;
+
     QString pad;
     pad.fill(' ', off);
 
@@ -284,14 +290,12 @@ QString CommandLineArg::GetLongHelpString(QString keyword) const
     if (!m_keywords.contains(keyword))
         return helpstr;
 
+    // argument has been marked as removed, so warn user of such
+    if (!m_removed.isEmpty())
+        PrintRemovedWarning(keyword);
     // argument has been marked as deprecated, so warn user of such
-    if (!m_deprecated.isEmpty())
-        cerr << QString("****************************************************\n"
-                        " WARNING: %1 has been deprecated\n"
-                        "          %2\n"
-                        "****************************************************\n\n")
-                    .arg(keyword).arg(m_deprecated)
-                    .toLocal8Bit().constData();
+    else if (!m_deprecated.isEmpty())
+        PrintDeprecatedWarning(keyword);
 
     msg << "Option:      " << keyword << endl << endl;
 
@@ -652,6 +656,17 @@ CommandLineArg* CommandLineArg::SetDeprecated(QString depstr)
     if (depstr.isEmpty())
         depstr = "and will be removed in a future version.";
     m_deprecated = depstr;
+    return this;
+}
+
+/** \brief Set option as removed
+ */
+CommandLineArg* CommandLineArg::SetRemoved(QString remstr, QString remver)
+{
+    if (remstr.isEmpty())
+        remstr = "and is no longer available in this version.";
+    m_removed = remstr;
+    m_removedversion = remver;
     return this;
 }
 
@@ -1063,6 +1078,34 @@ void CommandLineArg::PrintVerbose(void) const
     }
 }
 
+/** \brief Internal use. Print warning for removed option.
+ */
+void CommandLineArg::PrintRemovedWarning(QString &keyword) const
+{
+    QString warn = QString("%1 has been removed").arg(keyword);
+    if (!m_removedversion.isEmpty())
+        warn += QString(" as of MythTV %1").arg(m_removedversion);
+
+    cerr << QString("****************************************************\n"
+                    " WARNING: %1\n"
+                    "          %2\n"
+                    "****************************************************\n\n")
+                .arg(warn).arg(m_removed)
+                .toLocal8Bit().constData();
+}
+
+/** \brief Internal use. Print warning for deprecated option.
+ */
+void CommandLineArg::PrintDeprecatedWarning(QString &keyword) const
+{
+    cerr << QString("****************************************************\n"
+                    " WARNING: %1 has been deprecated\n"
+                    "          %2\n"
+                    "****************************************************\n\n")
+                .arg(keyword).arg(m_deprecated)
+                .toLocal8Bit().constData();
+}
+
 /** \class MythCommandLineParser
  *  \brief Parent class for defining application command line parsers
  *
@@ -1457,14 +1500,16 @@ bool MythCommandLineParser::Parse(int argc, const char * const * argv)
         else
             argdef = m_optionedArgs[opt];
 
+        // argument has been marked as removed, warn user and fail
+        if (!argdef->m_removed.isEmpty())
+        {
+            argdef->PrintRemovedWarning(opt);
+            return false;
+        }
+
         // argument has been marked as deprecated, warn user
         if (!argdef->m_deprecated.isEmpty())
-            cerr << QString("****************************************************\n"
-                            " WARNING: %1 has been deprecated\n"
-                            "          %2\n"
-                            "****************************************************\n\n")
-                        .arg(opt).arg(argdef->m_deprecated)
-                        .toLocal8Bit().constData();
+            argdef->PrintDeprecatedWarning(opt);
 
         if (m_verbose)
             cerr << "name: " << argdef->GetName().toLocal8Bit().constData()
