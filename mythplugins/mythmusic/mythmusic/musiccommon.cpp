@@ -1021,8 +1021,8 @@ void MusicCommon::changeRating(bool increase)
     // Rationale here is that if you can't get visual feedback on ratings
     // adjustments, you probably should not be changing them
     // TODO: should check if the rating is visible in the playlist buttontlist
-    if (!m_ratingState)
-        return;
+    //if (!m_ratingState)
+    //    return;
 
     Metadata *curMeta = gPlayer->getCurrentMetadata();
     if (!curMeta)
