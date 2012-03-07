@@ -13,6 +13,7 @@
 
 #ifdef Q_WS_MACX
 #include "util-osx.h"
+#import <glu.h>
 #import <agl.h>
 #endif
 
