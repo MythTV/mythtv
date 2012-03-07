@@ -97,6 +97,7 @@ void MediaMonitor::SetCDSpeed(const char *device, int speed)
     {
         cd->setSpeed(device, speed);
         delete cd;
+        return;
     }
 
     LOG(VB_MEDIA, LOG_INFO, 
