@@ -3031,8 +3031,12 @@ void TV::timerEvent(QTimerEvent *te)
         {
             OSD *osd = GetOSDLock(actx);
             if (osd && !osd->IsWindowVisible("osd_input"))
+            {
+                ReturnOSDLock(actx, osd);
                 CommitQueuedInput(actx);
-            ReturnOSDLock(actx, osd);
+            }
+            else
+                ReturnOSDLock(actx, osd);
         }
         ReturnPlayerLock(actx);
 
