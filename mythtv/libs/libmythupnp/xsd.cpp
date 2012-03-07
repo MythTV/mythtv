@@ -76,9 +76,11 @@ bool Xsd::GetXSD( HTTPRequest *pRequest, QString sTypeName )
     // Render XSD
     // --------------------------------------------------------------
 
-    appendChild( createProcessingInstruction( "xml-stylesheet",
-                    "type=\"text/xsl\" href=\"/xslt/class.xslt\"" ));
-
+    if (!pRequest->m_mapParams.contains( "raw" ))
+    {
+        appendChild( createProcessingInstruction( "xml-stylesheet",
+                        "type=\"text/xsl\" href=\"/xslt/class.xslt\"" ));
+    }
 
     if (bIsArray)
     {

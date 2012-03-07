@@ -17,10 +17,10 @@
 			</div>
 		</div>
 		<hr />
-<!--
-		<p class="alignLeft"><xsl:value-of select="/w:definitions/w:service/w:documentation/text()" /></p>
-		<p class="alignRight"><a href="./wsdl?raw=1">View Xsd</a></p>
--->		
+		<xsl:variable name="CurrentType" select="/xs:schema/xs:complexType/@name" />
+
+		<p class="alignLeft"><xsl:value-of select="//xs:documentation/text()" /></p>
+		<p class="alignRight"><a href="./xsd?type={$CurrentType}&amp;raw=1">View Xsd</a></p>
 		<br />
 		
 		<div class="method" >
@@ -52,15 +52,27 @@
 
 	<tr>
 		<td></td>
+
+		<xsl:variable name="PropType" >
+			<xsl:choose>
+				<xsl:when test="starts-with(@type, 'tns:ArrayOf')">
+					<xsl:value-of select="concat(substring-after(@type, 'ArrayOf'), '[]')" />
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:value-of select="@type" />
+				</xsl:otherwise>
+			</xsl:choose>
+   
+	    </xsl:variable>
+
 		<xsl:choose>
 			<xsl:when test="$Search and /xs:schema/xs:include[contains( @schemaLocation, $Search)]">
-				<td class="prop_type"><a href="{ /xs:schema/xs:include[contains( @schemaLocation, $Search)]/@schemaLocation}"><xsl:value-of select="@type"/></a></td>
+				<td class="prop_type"><a href="{ /xs:schema/xs:include[contains( @schemaLocation, $Search)]/@schemaLocation}"><xsl:value-of select="$PropType"/></a></td>
 			</xsl:when>
 			<xsl:otherwise>
-				<td class="prop_type"><xsl:value-of select="@type"/></td>
+				<td class="prop_type"><xsl:value-of select="$PropType"/></td>
 			</xsl:otherwise>
 		</xsl:choose>
-	
 		<td class="prop_name"><xsl:value-of select="@name"/></td>
 	</tr>
 
