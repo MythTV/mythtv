@@ -46,7 +46,6 @@ MusicCommon::MusicCommon(MythScreenStack *parent, const QString &name)
             : MythScreenType(parent, name)
 {
     m_mainvisual = NULL;
-    m_visualModeTimer = NULL;
     m_moveTrackMode = false;
     m_movingTrack = false;
     m_currentTime = 0;
@@ -71,12 +70,6 @@ MusicCommon::MusicCommon(MythScreenStack *parent, const QString &name)
 MusicCommon::~MusicCommon(void)
 {
     gPlayer->removeListener(this);
-
-    if (m_visualModeTimer)
-    {
-        delete m_visualModeTimer;
-        m_visualModeTimer = NULL;
-    }
 
     if (m_mainvisual)
     {
@@ -216,18 +209,6 @@ bool MusicCommon::CreateCommon(void)
         {
             LOG(VB_GENERAL, LOG_ERR, QString("MusicCommon: Got a bad saved visualizer: %1").arg(m_currentVisual));
             m_currentVisual = 0;
-        }
-
-        QString visual_delay = gCoreContext->GetSetting("VisualModeDelay");
-        bool delayOK;
-        m_visualModeDelay = visual_delay.toInt(&delayOK);
-        if (!delayOK)
-            m_visualModeDelay = 0;
-        if (m_visualModeDelay > 0)
-        {
-            m_visualModeTimer = new QTimer(this);
-            m_visualModeTimer->start(m_visualModeDelay * 1000);
-            connect(m_visualModeTimer, SIGNAL(timeout()), this, SLOT(visEnable()));
         }
 
         switchVisualizer(m_currentVisual);
@@ -472,8 +453,6 @@ bool MusicCommon::onMediaEvent(MythMediaDevice*)
 bool MusicCommon::keyPressEvent(QKeyEvent *e)
 {
     bool handled = false;
-
-    resetVisualiserTimer();
 
     QStringList actions;
     handled = GetMythMainWindow()->TranslateKeyPress("Music", e, actions, true);
@@ -814,14 +793,6 @@ void MusicCommon::showSpeed(bool show)
 #endif
 }
 
-
-void MusicCommon::resetVisualiserTimer()
-{
-    //FIXME do we still need the timer?
-    if (m_visualModeDelay > 0 && m_visualModeTimer)
-        m_visualModeTimer->start(m_visualModeDelay * 1000);
-}
-
 void MusicCommon::switchVisualizer(const QString &visual)
 {
     switchVisualizer(m_visualModes.indexOf(visual));
@@ -836,8 +807,6 @@ void MusicCommon::switchVisualizer(int visual)
         visual = 0;
 
     m_currentVisual = visual;
-
-    resetVisualiserTimer();
 
     m_mainvisual->setVisual(m_visualModes[m_currentVisual]);
 

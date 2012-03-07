@@ -130,7 +130,6 @@ class MPUBLIC MusicCommon : public MythScreenType
     void cycleVisualizer(void);
     void switchVisualizer(const QString &visual);
     void switchVisualizer(int visual);
-    void resetVisualiserTimer(void);
 
     void playFirstTrack();
     bool restorePosition(int trackID);
@@ -145,8 +144,6 @@ class MPUBLIC MusicCommon : public MythScreenType
 
     QStringList            m_visualModes;
     unsigned int           m_currentVisual;
-    int                    m_visualModeDelay;
-    QTimer                *m_visualModeTimer;
 
     bool                   m_moveTrackMode;
     bool                   m_movingTrack;
