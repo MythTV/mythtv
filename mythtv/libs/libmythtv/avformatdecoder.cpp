@@ -262,6 +262,7 @@ AvFormatDecoder::AvFormatDecoder(MythPlayer *parent,
       pts_detected(false),
       reordered_pts_detected(false),
       pts_selected(true),
+      force_dts_timestamps(false),
       using_null_videoout(use_null_videoout),
       video_codec_id(kCodec_NONE),
       no_hardware_decoders(no_hardware_decode),
@@ -1063,6 +1064,9 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
                 .arg(QString().sprintf("%06.3f", secs))
                 .arg(framenum));
     }
+
+    if (getenv("FORCE_DTS_TIMESTAMPS"))
+        force_dts_timestamps = true;
 
     // Return true if recording has position map
     return recordingHasPositionMap;
@@ -3099,7 +3103,13 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
     // the DTS timestamp is missing. Also use fixups for missing PTS instead of
     // DTS to avoid oscillating between PTS and DTS. Only select DTS if PTS is
     // more faulty or never detected.
-    if (ringBuffer->isDVD())
+    if (force_dts_timestamps)
+    {
+        if (pkt->dts != (int64_t)AV_NOPTS_VALUE)
+            pts = pkt->dts;
+        pts_selected = false;
+    }
+    else if (ringBuffer->isDVD())
     {
         if (pkt->dts != (int64_t)AV_NOPTS_VALUE)
             pts = pkt->dts;
@@ -3139,10 +3149,11 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
     }
 
     VERBOSE(VB_PLAYBACK+VB_TIMESTAMP, LOC +
-            QString("video timecode %1 %2 %3 %4 %5 %6 (%7 active)%8")
+            QString("video timecode %1 %2 %3 %4 %5 %6 (%7)%8")
                     .arg(mpa_pic.reordered_opaque).arg(pkt->pts).arg(pkt->dts)
                     .arg(vpts).arg(temppts).arg(lastvpts)
-                    .arg((pts_selected) ? "reordered" : "dts")
+                    .arg((force_dts_timestamps) ? "dts forced" :
+                         (pts_selected) ? "reordered" : "dts")
                     .arg((vpts != temppts) ? " fixup" : ""));
 
 /* XXX: Broken.

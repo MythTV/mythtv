@@ -1193,11 +1193,12 @@ void PlaybackBox::UpdateUIGroupList(const QStringList &groupPreferences)
                 m_currentGroup = groupname.toLower();
             }
 
-            if (groupname.isEmpty())
-                groupname = m_groupDisplayName;
+            QString displayName = groupname;
+            if (displayName.isEmpty())
+                displayName = m_groupDisplayName;
 
-            item->SetText(groupname, "name");
-            item->SetText(groupname);
+            item->SetText(displayName, "name");
+            item->SetText(displayName);
 
             int count = m_progLists[groupname.toLower()].size();
             item->SetText(QString::number(count), "reccount");
@@ -3968,7 +3969,7 @@ void PlaybackBox::customEvent(QEvent *event)
         }
         else if (message == "AVAILABILITY" && me->ExtraDataCount() == 8)
         {
-            const uint kMaxUIWaitTime = 100; // ms
+            const uint kMaxUIWaitTime = 10000; // ms
             QStringList list = me->ExtraDataList();
             QString key = list[0];
             CheckAvailabilityType cat =

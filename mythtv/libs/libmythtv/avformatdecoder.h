@@ -295,6 +295,8 @@ class AvFormatDecoder : public DecoderBase
     bool reordered_pts_detected;
     bool pts_selected;
 
+    bool force_dts_timestamps;
+
     bool using_null_videoout;
     MythCodecID video_codec_id;
     bool no_hardware_decoders;
