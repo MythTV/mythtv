@@ -5181,7 +5181,7 @@ NULL
 "INSERT INTO keybindings (SELECT 'Main Menu', 'EXIT', 'System Exit', "
     "(CASE data WHEN '1' THEN 'Ctrl+Esc' WHEN '2' THEN 'Meta+Esc' "
     "WHEN '3' THEN 'Alt+Esc' WHEN '4' THEN 'Esc' ELSE '' END), hostname "
-    "FROM settings WHERE value = 'AllowQuitShutdown' LIMIT 1) "
+    "FROM settings WHERE value = 'AllowQuitShutdown' GROUP BY hostname) "
     "ON DUPLICATE KEY UPDATE keylist = VALUES(keylist);",
 NULL
 };
