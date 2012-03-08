@@ -32,7 +32,7 @@ void PrivTcpServer::incomingConnection(int socket)
 
 ServerPool::ServerPool(QObject *parent) : QObject(parent),
     m_listening(false), m_maxPendingConn(30), m_port(0),
-    m_proxy(QNetworkProxy::DefaultProxy)
+    m_proxy(QNetworkProxy::DefaultProxy), m_udpSend(NULL)
 {
 }
 
