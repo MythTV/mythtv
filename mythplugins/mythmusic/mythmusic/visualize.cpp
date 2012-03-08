@@ -1261,8 +1261,8 @@ bool Piano::draw(QPainter *p, const QColor &back)
     // just uses some Qt methods to draw on a pixmap.
     // MainVisual then bitblts that onto the screen.
 
-    QRect *rectsp = rects.data();
-    double *magnitudep = magnitude.data();
+    QRect *rectsp = &rects[0];
+    double *magnitudep = &magnitude[0];
 
     unsigned int key, n = PIANO_N;
     double r, g, b, per;
