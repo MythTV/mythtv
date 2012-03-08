@@ -129,6 +129,7 @@ class JOBFLAG( object ):
     USE_CUTLIST  = 0x0001
     LIVE_REC     = 0x0002
     EXTERNAL     = 0x0004
+    REBUILD      = 0x0008
 
 class JOBSTATUS( object ):
     UNKNOWN      = 0x0000
