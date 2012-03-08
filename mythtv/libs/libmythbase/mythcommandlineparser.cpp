@@ -2333,6 +2333,15 @@ void MythCommandLineParser::addLogging(
                 ->SetGroup("Logging");
     add("--nodblog", "nodblog", false, "Disable database logging.", "")
                 ->SetGroup("Logging");
+
+    add(QStringList( QStringList() << "-l" << "--logfile" ),
+        "logfile", "", "", "")
+                ->SetGroup("Logging")
+                ->SetRemoved("This option has been removed as part of "
+            "rewrite of the logging interface. Please update your init "
+            "scripts to use --syslog to interface with your system's "
+            "existing system logging daemon, or --logpath to specify a "
+            "dirctory for MythTV to write its logs to.", "0.25");
 }
 
 /** \brief Canned argument definition for --pidfile
