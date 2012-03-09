@@ -8,7 +8,7 @@
 #include <QFile>
 
 // libmythdb headers
-#include "httpcomms.h"
+#include "mythdownloadmanager.h"
 
 // libmyth headers
 #include "mythverbose.h"
@@ -148,7 +148,7 @@ void ChannelData::handleChannels(int id, QList<ChanInfo> *chanlist)
             localfile = fileprefix + filename;
             QFile actualfile(localfile);
             if (!actualfile.exists() &&
-                !HttpComms::getHttpFile(localfile, (*i).iconpath))
+                !GetMythDownloadManager()->download((*i).iconpath, localfile))
             {
                 VERBOSE(VB_IMPORTANT,
                         QString("Failed to fetch icon from '%1'")
