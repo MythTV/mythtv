@@ -15,7 +15,7 @@ using namespace std;
 #include "mythcontext.h"
 #include "exitcodes.h"
 #include "oldsettings.h"
-#include "util.h"
+#include "mythmiscutil.h"
 #include "remotefile.h"
 #include "mythplugin.h"
 #include "backendselect.h"
@@ -1105,7 +1105,6 @@ bool MythContext::Init(const bool gui,
     }
 
     gCoreContext->ActivateSettingsCache(true);
-    gCoreContext->ConfigureHostAddress();
 
     return true;
 }

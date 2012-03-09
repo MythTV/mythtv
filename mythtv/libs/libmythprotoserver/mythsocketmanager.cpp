@@ -86,7 +86,7 @@ bool MythSocketManager::Listen(int port)
 
     m_server = new MythServer(this);
     m_server->setProxy(QNetworkProxy::NoProxy);
-    if (!m_server->listen(gCoreContext->MythHostAddress(), port))
+    if (!m_server->listen(port))
     {
         LOG(VB_GENERAL, LOG_ERR, QString("Failed to bind port %1.").arg(port));
         return false;

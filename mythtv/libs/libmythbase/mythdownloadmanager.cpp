@@ -21,7 +21,7 @@
 #include "mythevent.h"
 #include "mythversion.h"
 #include "remotefile.h"
-#include "util.h"
+#include "mythmiscutil.h"
 
 #include "mythdownloadmanager.h"
 #include "mythlogging.h"

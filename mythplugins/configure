@@ -615,7 +615,7 @@ if enabled weather; then
 fi
 
 # Test for dcraw utility
-enabled dcraw && hash dcraw 2>/dev/null || disable dcraw
+enabled dcraw && command -v dcraw 2>/dev/null > /dev/null || disable dcraw
 
 if test x"$icc" != x ; then
     # Assume relative paths are for files in the standard icc directory.

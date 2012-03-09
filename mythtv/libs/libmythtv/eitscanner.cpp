@@ -13,7 +13,7 @@
 #include "eitscanner.h"
 #include "eithelper.h"
 #include "scheduledrecording.h"
-#include "util.h"
+#include "mythmiscutil.h"
 #include "mythdb.h"
 #include "mythlogging.h"
 #include "mthread.h"

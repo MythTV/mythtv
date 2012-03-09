@@ -9,7 +9,7 @@
 // Mythdb headers
 #include "mythlogging.h"
 #include "mythdb.h"
-#include "util.h"
+#include "mythmiscutil.h"
 
 // Mythui headers
 #include "mythsystem.h"

@@ -20,7 +20,7 @@
 
 #include "mythtimer.h"
 #include "compat.h"
-#include "util.h"
+#include "mythmiscutil.h"
 
 #define LOC QString("TFW(%1:%2): ").arg(filename).arg(fd)
 

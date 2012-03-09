@@ -7,7 +7,7 @@ using namespace std;
 #include <QCoreApplication>
 #include <QFile>
 
-#include "util.h"
+#include "mythmiscutil.h"
 #include "exitcodes.h"
 #include "mythcontext.h"
 #include "mythdb.h"

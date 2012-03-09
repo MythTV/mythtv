@@ -22,7 +22,7 @@ using namespace std;
 #include <QEvent>
 
 // MythTV headers
-#include "util.h"
+#include "mythmiscutil.h"
 #include "exitcodes.h"
 #include "mythcontext.h"
 #include "mythdb.h"

@@ -9,7 +9,7 @@
 #include "atscdescriptors.h"
 #include "mpegtables.h"
 #include "mythtvexp.h"
-#include "util.h"
+#include "mythmiscutil.h"
 
 // Some sample code is in pcHDTV's dtvscan.c,
 // accum_sect/dequeue_buf/atsc_tables.  We should stuff

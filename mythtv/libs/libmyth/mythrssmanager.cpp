@@ -3,7 +3,7 @@
 #include <QFile>
 #include <QDir>
 
-#include "util.h"
+#include "mythmiscutil.h"
 #include "mythdirs.h"
 #include "mythcontext.h"
 #include "mythlogging.h"

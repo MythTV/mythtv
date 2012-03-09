@@ -33,7 +33,7 @@
 #include "mythcorecontext.h"
 #include "mthreadpool.h"
 #include "storagegroup.h"
-#include "util.h"
+#include "mythmiscutil.h"
 
 #define LOC      QString("MythUIHelper: ")
 

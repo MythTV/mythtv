@@ -28,7 +28,7 @@ using namespace std;
 #include "ringbuffer.h"
 #include "cardutil.h"
 #include "tv_rec.h"
-#include "util.h"
+#include "mythmiscutil.h"
 
 #define TVREC_CARDNUM \
         ((tvrec != NULL) ? QString::number(tvrec->GetCaptureCardNum()) : "NULL")

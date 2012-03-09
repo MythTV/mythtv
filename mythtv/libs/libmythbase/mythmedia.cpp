@@ -15,7 +15,7 @@
 #include "mythmedia.h"
 #include "mythconfig.h"
 #include "mythlogging.h"
-#include "util.h"
+#include "mythmiscutil.h"
 #include "mythsystem.h"
 #include "exitcodes.h"
 

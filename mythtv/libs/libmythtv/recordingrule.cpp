@@ -11,7 +11,7 @@
 #include "scheduledrecording.h" // For signalChange()
 #include "playgroup.h" // For GetInitialName()
 #include "recordingprofile.h" // For constants
-#include "util.h"
+#include "mythmiscutil.h"
 
 static inline QString null_to_empty(const QString &str)
 {

@@ -4,7 +4,7 @@
 #include "mythdirs.h"
 #include "mythdb.h"
 #include "mythcontext.h"
-#include "util.h"
+#include "mythmiscutil.h"
 
 #include "netutils.h"
 

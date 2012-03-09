@@ -17,7 +17,7 @@ using namespace std;
 #include "premieretables.h"
 #include "dishdescriptors.h"
 #include "premieredescriptors.h"
-#include "util.h"
+#include "mythmiscutil.h"
 #include "programdata.h"
 #include "programinfo.h" // for subtitle types and audio and video properties
 #include "compat.h" // for gmtime_r on windows.

@@ -2,9 +2,9 @@
 #include <QFile>
 
 // MythTV headers
+#include <mythmiscutil.h>
 #include <mythlogging.h>
 #include <mythdirs.h>
-#include <util.h>
 
 // MythNews headers
 #include "newssite.h"

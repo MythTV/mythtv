@@ -8,7 +8,7 @@
 #include "mythcontext.h"
 #include "mythsystem.h"
 #include "exitcodes.h"
-#include "util.h"
+#include "mythmiscutil.h"
 #include "mythlogging.h"
 
 #include "netgrabbermanager.h"

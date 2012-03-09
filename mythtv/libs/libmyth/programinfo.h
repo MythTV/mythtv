@@ -17,7 +17,7 @@
 #include "programtypes.h"
 #include "mythdbcon.h"
 #include "mythexp.h"
-#include "util.h"
+#include "mythmiscutil.h"
 
 /* If NUMPROGRAMLINES gets updated following files need
    updates and code changes:

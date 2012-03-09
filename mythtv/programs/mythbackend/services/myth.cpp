@@ -34,7 +34,7 @@
 #include "storagegroup.h"
 #include "dbutil.h"
 #include "hardwareprofile.h"
-#include "util.h"
+#include "mythmiscutil.h"
 
 /////////////////////////////////////////////////////////////////////////////
 //

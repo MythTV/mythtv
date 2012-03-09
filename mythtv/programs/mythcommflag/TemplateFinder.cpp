@@ -14,7 +14,7 @@
 #include "mythplayer.h"
 #include "mythcorecontext.h"    /* gContext */
 #include "frame.h"          /* VideoFrame */
-#include "util.h"
+#include "mythmiscutil.h"
 #include "mythsystem.h"
 #include "exitcodes.h"
 

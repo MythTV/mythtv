@@ -76,11 +76,6 @@ class MBASE_PUBLIC MythCoreContext : public MythObservable, public MythSocketCBs
                            uint timeout_ms = kMythSocketLongTimeout,
                            bool error_dialog_desired = false);
 
-    void                ConfigureHostAddress(void);
-    QList<QHostAddress> MythHostAddress(void);
-    QList<QHostAddress> MythHostAddress4(void);
-    QList<QHostAddress> MythHostAddress6(void);
-
     QString GenMythURL(QString host = QString(), QString port = QString(),
                        QString path = QString(), QString storageGroup = QString());
 

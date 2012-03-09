@@ -63,7 +63,7 @@
 #include <QDir>
 #include <QList>
 
-#include "util.h"
+#include "mythmiscutil.h"
 #include "mythcontext.h"
 #include "lcddevice.h"
 
@@ -89,7 +89,7 @@ LCDServer::LCDServer(int port, QString message, int messageTime)
     connect(m_serverPool, SIGNAL(newConnection(QTcpSocket*)),
             this,         SLOT(newConnection(QTcpSocket*)));
 
-    if (!m_serverPool->listen(gCoreContext->MythHostAddress(), port))
+    if (!m_serverPool->listen(port))
     {
         LOG(VB_GENERAL, LOG_ERR, "There is probably a copy of mythlcdserver "
             "already running. You can verify this by running: \n"

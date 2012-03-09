@@ -22,7 +22,7 @@
 #define _SPLICE_DESCRIPTOR_H_
 
 #include "splicedescriptors.h"
-#include "util.h" // for xml_indent
+#include "mythmiscutil.h" // for xml_indent
 
 desc_list_t SpliceDescriptor::Parse(
     const unsigned char *data, uint len)

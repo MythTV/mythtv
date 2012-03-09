@@ -21,7 +21,7 @@ using namespace std;
 #include <mythuispinbox.h>
 #include <mythuicheckbox.h>
 #include <mythdialogbox.h>
-#include <util.h>
+#include <mythmiscutil.h>
 
 // mythmusic
 #include "smartplaylist.h"

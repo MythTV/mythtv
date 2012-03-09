@@ -18,7 +18,7 @@ using namespace std;
 #include "mythcontext.h"
 #include "mythdb.h"
 #include "mythversion.h"
-#include "util.h"
+#include "mythmiscutil.h"
 #include "transcode.h"
 #include "mpeg2fix.h"
 #include "remotefile.h"

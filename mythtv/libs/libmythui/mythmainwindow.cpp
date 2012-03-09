@@ -44,7 +44,7 @@ using namespace std;
 #include "mythsignalingtimer.h"
 #include "mythcorecontext.h"
 #include "mythmedia.h"
-#include "util.h"
+#include "mythmiscutil.h"
 
 // libmythui headers
 #include "myththemebase.h"

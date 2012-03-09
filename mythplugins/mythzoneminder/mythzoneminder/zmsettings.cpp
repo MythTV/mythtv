@@ -6,7 +6,7 @@
 
 // myth
 #include <mythcontext.h>
-#include <util.h>
+#include <mythmiscutil.h>
 
 // mythzoneminder
 #include "zmsettings.h"

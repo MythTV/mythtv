@@ -11,7 +11,7 @@
 #include "mythcontext.h"
 #include "mythdb.h"
 #include "mythlogging.h"
-#include "util.h"
+#include "mythmiscutil.h"
 
 #define LOC QString("EITCache: ")
 

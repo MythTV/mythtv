@@ -36,7 +36,7 @@
 // MythTV headers
 #include "channelscanmiscsettings.h"
 #include "scaninfo.h"
-#include "util.h"
+#include "mythmiscutil.h"
 
 class PaneExistingScanImport : public VerticalConfigurationGroup
 {

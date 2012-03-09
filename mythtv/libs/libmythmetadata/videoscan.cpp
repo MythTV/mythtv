@@ -15,7 +15,7 @@
 #include "mythevent.h"
 #include "remoteutil.h"
 #include "mythlogging.h"
-#include "util.h"
+#include "mythmiscutil.h"
 
 QEvent::Type VideoScanChanges::kEventType =
     (QEvent::Type) QEvent::registerEventType();

@@ -13,7 +13,7 @@
 // libmyth headers
 #include "mythlogging.h"
 #include "mythdb.h"
-#include "util.h"
+#include "mythmiscutil.h"
 
 // libmythtv headers
 #include "channelutil.h"

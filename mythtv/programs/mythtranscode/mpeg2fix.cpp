@@ -22,7 +22,7 @@
 #include <QFileInfo>
 
 #include "mythlogging.h"
-#include "util.h"
+#include "mythmiscutil.h"
 
 #ifdef USING_MINGW
 #include <winsock2.h>

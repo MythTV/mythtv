@@ -4,7 +4,7 @@
 #include "mythmainwindow.h"
 #include "mythdialogbox.h"
 #include "mythdirs.h"
-#include "util.h"
+#include "mythmiscutil.h"
 
 #include "mythuimetadataresults.h"
 

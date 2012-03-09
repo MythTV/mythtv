@@ -12,7 +12,7 @@
 #include "netutils.h"
 #include "mythcontext.h"
 #include "mythdirs.h"
-#include "util.h"
+#include "mythmiscutil.h"
 
 using namespace std;
 

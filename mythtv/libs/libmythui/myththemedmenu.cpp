@@ -27,7 +27,7 @@
 #include "mythdirs.h"
 #include "mythmedia.h"
 #include "mythversion.h"
-#include "util.h"
+#include "mythmiscutil.h"
 
 MythThemedMenuState::MythThemedMenuState(MythScreenStack *parent,
                                          const QString &name)

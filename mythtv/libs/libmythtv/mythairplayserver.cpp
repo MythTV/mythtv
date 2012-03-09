@@ -333,7 +333,7 @@ void MythAirplayServer::Start(void)
     int baseport = m_setupPort;
     while (m_setupPort < baseport + AIRPLAY_PORT_RANGE)
     {
-        if (listen(gCoreContext->MythHostAddress(), m_setupPort))
+        if (listen(m_setupPort))
         {
             LOG(VB_GENERAL, LOG_INFO, LOC +
                 QString("Listening for connections on port %1")

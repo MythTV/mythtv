@@ -1,4 +1,9 @@
 
+#include <QNetworkAddressEntry>
+#include <QReadWriteLock>
+#include <QWriteLocker>
+#include <QReadLocker>
+
 #include "mythcorecontext.h"
 #include "mythlogging.h"
 #include "serverpool.h"
@@ -6,6 +11,15 @@
 #define PRETTYIP(x)      x->protocol() == QAbstractSocket::IPv6Protocol ? \
                                     "[" + x->toString().toLower() + "]" : \
                                           x->toString().toLower()
+#define PRETTYIP_(x)      x.protocol() == QAbstractSocket::IPv6Protocol ? \
+                                    "[" + x.toString().toLower() + "]" : \
+                                          x.toString().toLower()
+
+#define LOC QString("ServerPool: ")
+
+static QList<QNetworkAddressEntry> naList_4;
+static QList<QNetworkAddressEntry> naList_6;
+static QReadWriteLock naLock;
 
 PrivTcpServer::PrivTcpServer(QObject *parent) : QTcpServer(parent)
 {
@@ -26,6 +40,214 @@ ServerPool::~ServerPool()
 {
     close();
 }
+
+void ServerPool::SelectDefaultListen(bool force)
+{
+    if (!force)
+    {
+        QReadLocker rlock(&naLock);
+        if (!naList_4.isEmpty() || !naList_6.isEmpty())
+            // lists are already populated, do nothing
+            return;
+    }
+
+    QWriteLocker wlock(&naLock);
+    naList_4.clear();
+    naList_6.clear();
+
+    // populate stored IPv4 and IPv6 addresses
+    // if address is not defined, QHostAddress will be invalid and Null
+    QHostAddress config_v4(gCoreContext->GetSetting("BackendServerIP"));
+    bool v4IsSet = config_v4.isNull() ? true : false;
+#if !defined(QT_NO_IPV6)
+    QHostAddress config_v6(gCoreContext->GetSetting("BackendServerIP6"));
+    bool v6IsSet = config_v6.isNull() ? true : false;
+#endif
+
+    // loop through all available interfaces
+    QList<QNetworkInterface> IFs = QNetworkInterface::allInterfaces();
+    QList<QNetworkInterface>::const_iterator qni;
+    for (qni = IFs.begin(); qni != IFs.end(); ++qni)
+    {
+        QList<QNetworkAddressEntry> IPs = qni->addressEntries();
+        QList<QNetworkAddressEntry>::const_iterator qnai;
+        for (qnai = IPs.begin(); qnai != IPs.end(); ++qnai)
+        {
+            QHostAddress ip = qnai->ip();
+            if (naList_4.contains(*qnai))
+                // already defined, skip
+                continue;
+            else if (!config_v4.isNull() && (ip == config_v4))
+            {
+                // IPv4 address is defined, add it
+                LOG(VB_GENERAL, LOG_DEBUG,
+                        QString("Adding BackendServerIP to address list."));
+                naList_4.append(*qnai);
+                v4IsSet = true;
+            }
+            else if (ip == QHostAddress::LocalHost)
+            {
+                // always listen on LocalHost
+                LOG(VB_GENERAL, LOG_DEBUG,
+                        QString("Adding IPv4 loopback to address list."));
+                naList_4.append(*qnai);
+                if (!v4IsSet && (config_v4 == ip))
+                    v4IsSet = true;
+            }
+            else if (config_v4.isNull() &&
+                     (ip.protocol() == QAbstractSocket::IPv4Protocol))
+            {
+                // IPv4 address is not defined, populate one
+                // restrict autoconfiguration to RFC1918 private networks
+                if (ip.isInSubnet(QHostAddress::parseSubnet("10.0.0.0/8")) ||
+                    ip.isInSubnet(QHostAddress::parseSubnet("172.16.0.0/12")) ||
+                    ip.isInSubnet(QHostAddress::parseSubnet("192.168.0.0/16")))
+                {
+                    LOG(VB_GENERAL, LOG_DEBUG,
+                            QString("Adding '%1' to address list.")
+                                .arg(ip.toString()));
+                    naList_4.append(*qnai);
+                }
+                else
+                    LOG(VB_GENERAL, LOG_DEBUG, QString("Skipping non-private "
+                            "address during IPv4 autoselection: %1")
+                                .arg(ip.toString()));
+            }
+#if !defined(QT_NO_IPV6)
+            else if (naList_6.contains(*qnai))
+                // already defined, skip
+                continue;
+            else if (!config_v6.isNull() && (ip == config_v6))
+            {
+                // IPv6 address is defined, add it
+                LOG(VB_GENERAL, LOG_DEBUG,
+                        QString("Adding BackendServerIP6 to address list."));
+                naList_6.append(*qnai);
+                v6IsSet = true;
+            }
+            else if (ip == QHostAddress::LocalHostIPv6)
+            {
+                // always listen on LocalHost
+                LOG(VB_GENERAL, LOG_DEBUG,
+                        QString("Adding IPv6 loopback to address list."));
+                naList_6.append(*qnai);
+                if (!v6IsSet && (config_v6 == ip))
+                    v6IsSet = true;
+            }
+            else if (config_v6.isNull() &&
+                     (ip.protocol() == QAbstractSocket::IPv6Protocol))
+            {
+                // IPv6 address is not defined, populate one
+                // put in additional block filtering here?
+                if (ip.isInSubnet(QHostAddress::parseSubnet("fe80::/10")))
+                {
+                    LOG(VB_GENERAL, LOG_DEBUG,
+                            QString("Adding '%1' to address list.")
+                                .arg(PRETTYIP_(ip)));
+                    naList_6.append(*qnai);
+                }
+                else
+                    LOG(VB_GENERAL, LOG_DEBUG, QString("Skipping link-local "
+                            "address during IPv6 autoselection: %1")
+                                .arg(PRETTYIP_(ip)));
+
+            }
+#endif
+            else
+                LOG(VB_GENERAL, LOG_DEBUG, QString("Skipping address: %1")
+                    .arg(PRETTYIP_(ip)));
+        }
+    }
+
+    if (!v4IsSet && !naList_4.isEmpty())
+    {
+        LOG(VB_GENERAL, LOG_CRIT, LOC + QString("Host is configured to listen "
+                "on %1, but address is not used on any local network "
+                "interfaces.").arg(config_v4.toString()));
+    }
+
+#if !defined(QT_NO_IPV6)
+    if (!v6IsSet && !naList_6.isEmpty())
+    {
+        LOG(VB_GENERAL, LOG_CRIT, LOC + QString("Host is configured to listen "
+                "on %1, but address is not used on any local network "
+                "interfaces.").arg(PRETTYIP_(config_v6)));
+    }
+#endif
+}
+
+void ServerPool::RefreshDefaultListen(void)
+{
+    SelectDefaultListen(true);
+    // TODO:
+    // send signal for any running servers to cycle their addresses
+    // will allow address configuration to be modified without a server
+    // reset for use with the migration to the mythtv-setup replacement
+}
+
+QList<QHostAddress> ServerPool::DefaultListen(void)
+{
+    QList<QHostAddress> alist;
+    alist << DefaultListenIPv4()
+          << DefaultListenIPv6();
+    return alist;
+}
+
+QList<QHostAddress> ServerPool::DefaultListenIPv4(void)
+{
+    SelectDefaultListen();
+    QReadLocker rlock(&naLock);
+
+    QList<QHostAddress> alist;
+    QList<QNetworkAddressEntry>::const_iterator it;
+    for (it = naList_4.begin(); it != naList_4.end(); ++it)
+        if (!alist.contains(it->ip()))
+            alist << it->ip();
+
+    return alist;
+}
+
+QList<QHostAddress> ServerPool::DefaultListenIPv6(void)
+{
+    SelectDefaultListen();
+    QReadLocker rlock(&naLock);
+
+    QList<QHostAddress> alist;
+    QList<QNetworkAddressEntry>::const_iterator it;
+    for (it = naList_6.begin(); it != naList_6.end(); ++it)
+        if (!alist.contains(it->ip()))
+            alist << it->ip();
+
+    return alist;
+}
+
+QList<QHostAddress> ServerPool::DefaultBroadcast(void)
+{
+    QList<QHostAddress> blist;
+    blist << DefaultBroadcastIPv4();
+    return blist;
+}
+
+QList<QHostAddress> ServerPool::DefaultBroadcastIPv4(void)
+{
+    SelectDefaultListen();
+    QReadLocker rlock(&naLock);
+
+    QList<QHostAddress> blist;
+    QList<QNetworkAddressEntry>::const_iterator it;
+    for (it = naList_4.begin(); it != naList_4.end(); ++it)
+        if (!blist.contains(it->broadcast()) && (it->prefixLength() != 32) &&
+                (it->ip() != QHostAddress::LocalHost))
+            blist << it->broadcast();
+
+    return blist;
+}
+
+//QList<QHostAddress> ServerPool::DefaultBroadcastIPv6(void)
+//{
+//
+//}
+
 
 void ServerPool::close(void)
 {
@@ -107,7 +329,7 @@ bool ServerPool::listen(QStringList addrstr, quint16 port, bool requireall)
 
 bool ServerPool::listen(quint16 port, bool requireall)
 {
-    return listen(gCoreContext->MythHostAddress(), port, requireall);
+    return listen(DefaultListen(), port, requireall);
 }
 
 bool ServerPool::bind(QList<QHostAddress> addrs, quint16 port,
@@ -164,7 +386,7 @@ bool ServerPool::bind(QStringList addrstr, quint16 port, bool requireall)
 
 bool ServerPool::bind(quint16 port, bool requireall)
 {
-    return bind(gCoreContext->MythHostAddress(), port, requireall);
+    return bind(DefaultListen(), port, requireall);
 }
 
 qint64 ServerPool::writeDatagram(const char * data, qint64 size,

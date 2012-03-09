@@ -14,7 +14,7 @@
 // libmyth headers
 #include "exitcodes.h"
 #include "mythcorecontext.h"
-#include "util.h"
+#include "mythmiscutil.h"
 
 // libmythtv headers
 #include "programinfo.h"
