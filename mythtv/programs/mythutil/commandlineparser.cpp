@@ -120,7 +120,8 @@ void MythUtilCommandLineParser::LoadArguments(void)
     add("--pids", "pids", "", "Pids to process", "")
         ->SetRequiredChildOf("pidfilter")
         ->SetRequiredChildOf("pidprinter");
-    add("--ptspids", "ptspids", "", "Pids to extract PTS from", "");
+    add("--ptspids", "ptspids", "", "Pids to extract PTS from", "")
+        ->SetGroup("MPEG-TS");
     add("--packetsize", "packetsize", 188, "TS Packet Size", "")
         ->SetChildOf("pidcounter")
         ->SetChildOf("pidfilter");

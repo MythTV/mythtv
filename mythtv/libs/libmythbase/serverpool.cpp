@@ -32,7 +32,7 @@ void PrivTcpServer::incomingConnection(int socket)
 
 ServerPool::ServerPool(QObject *parent) : QObject(parent),
     m_listening(false), m_maxPendingConn(30), m_port(0),
-    m_proxy(QNetworkProxy::DefaultProxy)
+    m_proxy(QNetworkProxy::DefaultProxy), m_udpSend(NULL)
 {
 }
 
@@ -276,6 +276,12 @@ void ServerPool::close(void)
         socket->deleteLater();
     }
 
+    if (m_udpSend)
+    {
+        delete m_udpSend;
+        m_udpSend = NULL;
+    }
+
     m_listening = false;
 }
 
@@ -380,6 +386,9 @@ bool ServerPool::bind(QList<QHostAddress> addrs, quint16 port,
     if (m_udpSockets.size() == 0)
         return false;
 
+    if (!m_udpSend)
+        m_udpSend = new QUdpSocket();
+
     m_listening = true;
     return true;
 }
@@ -401,15 +410,14 @@ bool ServerPool::bind(quint16 port, bool requireall)
 qint64 ServerPool::writeDatagram(const char * data, qint64 size,
                                  const QHostAddress &addr, quint16 port)
 {
-    if (!m_listening || m_udpSockets.isEmpty())
+    if (!m_listening || !m_udpSend)
     {
         LOG(VB_GENERAL, LOG_ERR, "Trying to write datagram to disconnected "
                             "ServerPool instance.");
         return -1;
     }
 
-    QUdpSocket *socket = m_udpSockets.first();
-    return socket->writeDatagram(data, size, addr, port);
+    return m_udpSend->writeDatagram(data, size, addr, port);
 }
 
 qint64 ServerPool::writeDatagram(const QByteArray &datagram,

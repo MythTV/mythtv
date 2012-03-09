@@ -14,6 +14,7 @@
 
 // C++ headers
 #include <QVector>
+#include <vector>
 
 // MythTV headers
 #include <visual.h>

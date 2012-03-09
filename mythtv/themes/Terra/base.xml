@@ -589,11 +589,11 @@
 
     <!-- Large Dialogue Box -->
     <window name="MythDialogBox">
-        <area>0,42,1280,515</area>
+        <area>0,42,1280,642</area>
         <shape name="fade" from="basefadebackground" />
 
         <imagetype name="backimg">
-            <position>236,58</position>
+            <area>236,58,815,516</area>
             <filename>popups/largemenubackground.png</filename>
         </imagetype>
 
@@ -763,11 +763,11 @@
     </window>
 
     <window name="MythFileBrowser">
-        <area>0,42,1280,515</area>
+        <area>0,42,1280,642</area>
         <shape name="fade" from="basefadebackground" />
 
         <imagetype name="backimg">
-            <position>236,58</position>
+            <area>236,58,815,516</area>
             <filename>popups/largemenubackground.png</filename>
         </imagetype>
 

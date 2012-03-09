@@ -19,7 +19,7 @@ function getSetting(hostname, key, defValue) {
     $.getJSON("/Myth/GetSetting",
         { HostName: hostname, Key: key, Default: defValue },
         function(data) {
-            result = data.SettingList.Settings[0].Value;
+            result = data.SettingList.Settings[key];
         }).error(function(data) {
             setErrorMessage("<i18n>Unable to retrieve setting.</i18n>");
         });

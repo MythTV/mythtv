@@ -26,5 +26,9 @@ void MythLCDServerCommandLineParser::LoadArguments(void)
             "Message display duration (in seconds)", "");
     add(QStringList( QStringList() << "-x" << "--debuglevel" ), "debug", 0,
             "debug verbosity", "Control debugging verbosity, values from 0-10");
+
+    add("--nodaemon", "nodaemon", false, "", "")
+        ->SetRemoved("This is the default behavior. No need for an argument.",
+                     "0.25");
 }
 

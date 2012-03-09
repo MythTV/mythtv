@@ -94,6 +94,7 @@ class MBASE_PUBLIC ServerPool : public QObject
 
     QList<PrivTcpServer*>   m_tcpServers;
     QList<QUdpSocket*>      m_udpSockets;
+    QUdpSocket             *m_udpSend;
 };
 
 #endif

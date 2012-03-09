@@ -733,43 +733,6 @@ void PlaylistEditorView::treeItemVisible(MythUIButtonListItem *item)
             if (mdata)
                 artFile = mdata->getAlbumArtFile();
         }
-        else if (mnode->getAction() == "all tracks")
-        {
-            artFile = "mm_alltracks.png";
-        }
-        else if (mnode->getAction() == "genres")
-        {
-            artFile = "mm_genres.png";
-        }
-        else if (mnode->getAction() == "albums")
-        {
-            artFile = "mm_albums.png";
-        }
-        else if (mnode->getAction() == "artists")
-        {
-            artFile = "mm_artists.png";
-        }
-        else if (mnode->getAction() == "compartists")
-        {
-            //TODO add a compilation artist icon
-            artFile = "mm_artists.png";
-        }
-        else if (mnode->getAction() == "ratings")
-        {
-            artFile = "mm_ratings.png";
-        }
-        else if (mnode->getAction() == "years")
-        {
-            artFile = "mm_years.png";
-        }
-        else if (mnode->getAction() == "playlists")
-        {
-            artFile = "mm_playlists.png";
-        }
-        else if (mnode->getAction() == "smartplaylists")
-        {
-            artFile = "mm_smartplaylists.png";
-        }
         else if (mnode->getAction() == "album")
         {
             // hunt for a coverart image for the album
@@ -785,13 +748,72 @@ void PlaylistEditorView::treeItemVisible(MythUIButtonListItem *item)
                 }
             }
         }
+        else if (mnode->getAction() == "compartist")
+        {
+            artFile = findIcon("artist", mnode->getString().toLower());
+        }
         else
         {
             artFile = findIcon(mnode->getAction(), mnode->getString().toLower());
         }
 
+        QString state = "default";
+
+        if (mnode->getAction() == "all tracks")
+        {
+            state = "alltracks";
+            artFile="blank.png";
+        }
+        else if (mnode->getAction() == "genres")
+        {
+            state = "genres";
+            artFile="blank.png";
+        }
+        else if (mnode->getAction() == "albums")
+        {
+            state = "albums";
+            artFile="blank.png";
+        }
+        else if (mnode->getAction() == "artists")
+        {
+            state = "artists";
+            artFile="blank.png";
+        }
+        else if (mnode->getAction() == "compartists")
+        {
+            state = "compartists";
+            artFile="blank.png";
+        }
+        else if (mnode->getAction() == "ratings")
+        {
+            state = "ratings";
+            artFile="blank.png";
+        }
+        else if (mnode->getAction() == "years")
+        {
+            state = "years";
+            artFile="blank.png";
+        }
+        else if (mnode->getAction() == "compilations")
+        {
+            state = "compilations";
+            artFile="blank.png";
+        }
+        else if (mnode->getAction() == "playlists")
+        {
+            state = "playlists";
+            artFile="blank.png";
+        }
+        else if (mnode->getAction() == "smartplaylists")
+        {
+            state = "smartplaylists";
+            artFile="blank.png";
+        }
+
+        item->DisplayState(state, "nodetype");
+
         if (artFile.isEmpty())
-            item->SetImage("mm_nothumb.png");
+            item->SetImage("");
         else
             item->SetImage(artFile);
     }

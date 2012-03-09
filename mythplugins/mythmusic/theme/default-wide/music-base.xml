@@ -504,7 +504,73 @@
 
                 <imagetype name="buttonimage">
                     <area>42,10,110,110</area>
+                    <filename>mm_nothumb.png</filename>
                 </imagetype>
+
+                <statetype name="nodetype">
+                    <position>42,10</position>
+                    <state name="default" />
+                    <state name="alltracks">
+                        <imagetype name="alltracks">
+                            <area>0,0,110,110</area>
+                            <filename>mm_alltracks.png</filename>
+                        </imagetype>
+                    </state>
+                    <state name="genres">
+                        <imagetype name="genres">
+                            <area>0,0,110,110</area>
+                            <filename>mm_genres.png</filename>
+                        </imagetype>
+                    </state>
+                    <state name="albums">
+                        <imagetype name="albums">
+                            <area>0,0,110,110</area>
+                            <filename>mm_albums.png</filename>
+                        </imagetype>
+                    </state>
+                    <state name="artists">
+                        <imagetype name="artists">
+                            <area>0,0,110,110</area>
+                            <filename>mm_artists.png</filename>
+                        </imagetype>
+                    </state>
+                    <state name="compartists">
+                        <imagetype name="compartists">
+                            <area>0,0,110,110</area>
+                            <filename>mm_compartists.png</filename>
+                        </imagetype>
+                    </state>
+                    <state name="ratings">
+                        <imagetype name="ratings">
+                            <area>0,0,110,110</area>
+                            <filename>mm_ratings.png</filename>
+                        </imagetype>
+                    </state>
+                    <state name="years">
+                        <imagetype name="years">
+                            <area>0,0,110,110</area>
+                            <filename>mm_years.png</filename>
+                        </imagetype>
+                    </state>
+                    <state name="compilations">
+                        <imagetype name="compilations">
+                            <area>0,0,110,110</area>
+                            <filename>mm_compilations.png</filename>
+                        </imagetype>
+                    </state>
+                    <state name="playlists">
+                        <imagetype name="playlists">
+                            <area>0,0,110,110</area>
+                            <filename>mm_playlists.png</filename>
+                        </imagetype>
+                    </state>
+                    <state name="smartplaylists">
+                        <imagetype name="smartplaylists">
+                            <area>0,0,110,110</area>
+                            <filename>mm_smartplaylists.png</filename>
+                        </imagetype>
+                    </state>
+                </statetype>
 
                 <statetype name="buttoncheck">
                     <position>15,100</position>
