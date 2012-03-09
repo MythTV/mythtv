@@ -3729,12 +3729,7 @@ NULL
         }
 
         // Perform the actual upgrade
-        QString qtmp = QString(
-            "ALTER DATABASE %1 DEFAULT CHARACTER SET latin1;")
-            .arg(gCoreContext->GetDatabaseParams().dbName);
-        QByteArray tmp = qtmp.toAscii();
         const char *updates[] = {
-tmp.constData(),
 "ALTER TABLE callsignnetworkmap"
 "  MODIFY callsign varbinary(20) NOT NULL default '',"
 "  MODIFY network varbinary(20) NOT NULL default '';",
@@ -3978,13 +3973,7 @@ NULL
 
     if (dbver == "1216")
     {
-        QString qtmp = QString(
-            "ALTER DATABASE %1 DEFAULT CHARACTER SET "
-            "utf8 COLLATE utf8_general_ci;")
-            .arg(gCoreContext->GetDatabaseParams().dbName);
-        QByteArray tmp = qtmp.toAscii();
         const char *updates[] = {
-tmp.constData(),
 "ALTER TABLE callsignnetworkmap"
 "  DEFAULT CHARACTER SET default,"
 "  MODIFY callsign varchar(20) CHARACTER SET utf8 NOT NULL default '',"
