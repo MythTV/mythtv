@@ -12,7 +12,9 @@
 
 // MythTV headers
 #include "linuxfirewiredevice.h"
+#if USING_OSX_FIREWIRE
 #include "darwinfirewiredevice.h"
+#endif
 #include "mythlogging.h"
 #include "pespacket.h"
 

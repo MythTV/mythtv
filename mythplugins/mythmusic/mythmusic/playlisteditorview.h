@@ -99,9 +99,11 @@ class PlaylistEditorView : public MusicCommon
     void restoreTreePosition(const QStringList &route);
 
   private:
-    QString           m_layout;
-    bool              m_restorePosition;
-    MusicGenericTree *m_rootNode;
+    QString                 m_layout;
+    bool                    m_restorePosition;
+    MusicGenericTree       *m_rootNode;
+    QList<MetadataPtrList*> m_deleteList;
+
     MythUIButtonTree *m_playlistTree;
     MythUIText       *m_breadcrumbsText;
     MythUIText       *m_positionText;

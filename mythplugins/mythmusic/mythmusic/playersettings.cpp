@@ -63,7 +63,7 @@ bool PlayerSettings::Create()
     m_resumeMode->SetHelpText(tr("Resume playback at either the beginning of the "
                  "active play queue, the beginning of the last track, "
                  "or an exact point within the last track."));
-    m_exitAction->SetHelpText(tr("Specify what action to take when exiting mythmusic plugin."));
+    m_exitAction->SetHelpText(tr("Specify what action to take when exiting MythMusic plugin."));
     m_autoLookupCD->SetHelpText(tr("Automatically lookup an audio CD if it is "
                  "present and show its information in the "
                  "Music Selection Tree."));
@@ -89,6 +89,8 @@ void PlayerSettings::slotSave(void)
     gCoreContext->SaveSetting("AutoLookupCD", saveAutoLookupCD);
     int saveAutoPlayCD = (m_autoPlayCD->GetCheckState() == MythUIStateType::Full) ? 1 : 0;
     gCoreContext->SaveSetting("AutoPlayCD", saveAutoPlayCD);
+
+    gCoreContext->dispatch(MythEvent(QString("MUSIC_SETTINGS_CHANGED PLAYER_SETTINGS")));
 
     Close();
 }

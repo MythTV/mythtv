@@ -302,13 +302,13 @@
             <area>20,100,150,30</area>
             <align>hcenter,vcenter</align>
         </textarea>
-        <imagetype name="iconpath">
+        <imagetype name="iconpath" depends="channum">
             <area>30,140,130,100</area>
         </imagetype>
-        <imagetype name="coverart">
-            <area>30,140,100,150</area>
+        <imagetype name="coverart" depends="!channum">
+            <area>45,100,100,150</area>
         </imagetype>
-        <textarea name="callsign">
+        <textarea name="callsign" depends="channum">
             <font>smaller</font>
             <area>20,250,150,30</area>
             <align>hcenter,vcenter</align>

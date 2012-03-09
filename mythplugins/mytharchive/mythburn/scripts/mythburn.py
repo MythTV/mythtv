@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # mythburn.py
 # The ported MythBurn scripts which feature:
 
@@ -30,14 +31,20 @@
 # pyfribidi
 
 # Optional (alternate demuxer)
-# ProjectX - 0.90.4.00
+# ProjectX - >=0.91
 
 #******************************************************************************
 #******************************************************************************
 #******************************************************************************
+
+
+# All strings in this file should be unicode, not byte string!! They get converted to utf-8 only
+
+
+
 
 # version of script - change after each update
-VERSION="0.1.20111228-1"
+VERSION="0.1.20120304-1"
 
 # keep all temporary files for debugging purposes
 # set this to True before a first run through when testing
@@ -256,6 +263,8 @@ class FontDef(object):
 
 def write(text, progress=True):
     """Simple place to channel all text output through"""
+
+    text = text.encode("utf-8", "replace")
     sys.stdout.write(text + "\n")
     sys.stdout.flush()
 
@@ -270,6 +279,7 @@ def fatalError(msg):
     """Display an error message and exit app"""
     write("*"*60)
     write("ERROR: " + msg)
+    write("See mythburn.log for more information.")
     write("*"*60)
     write("")
     saveSetting("MythArchiveLastRunResult", "Failed: " + quoteString(msg));
@@ -304,7 +314,7 @@ def getTempPath():
 # Try to work out how many cpus we have available
 
 def getCPUCount():
-    """return the number of CPU's"""
+    """return the number of CPUs"""
     cpustat = open("/proc/cpuinfo")
     cpudata = cpustat.readlines()
     cpustat.close()
@@ -338,12 +348,12 @@ def doesFileExist(file):
     return os.path.exists( file )
 
 #############################################################
-# Escape quotes in a filename
+# Escape quotes in a command line argument
 
-def quoteFilename(filename):
-    filename = filename.replace('"', '\\"')
-    filename = filename.replace('`', '\\`')
-    return '"%s"' % filename
+def quoteCmdArg(arg):
+    arg = arg.replace('"', '\\"')
+    arg = arg.replace('`', '\\`')
+    return '"%s"' % arg
 
 #############################################################
 # Returns the text contents from a given XML element.
@@ -406,13 +416,26 @@ def isResolutionOkayForDVD(videoresolution):
         return videoresolution==(720,576) or videoresolution==(704,576) or videoresolution==(352,576) or videoresolution==(352,288)
 
 #############################################################
-# Romoves all the files from a directory
+# Removes all the files from a directory
 
 def deleteAllFilesInFolder(folder):
     """Does what it says on the tin!."""
     for root, dirs, deletefiles in os.walk(folder, topdown=False):
         for name in deletefiles:
                 os.remove(os.path.join(root, name))
+
+#############################################################
+# Romoves all the objects from a directory
+
+def deleteEverythingInFolder(folder):
+    for root, dirs, files in os.walk(folder, topdown=False):
+        for name in files:
+                os.remove(os.path.join(root, name))
+        for name in dirs:
+                if os.path.islink(os.path.join(root, name)):
+                    os.remove(os.path.join(root, name))
+                else:
+                    os.rmdir(os.path.join(root, name))
 
 #############################################################
 # Check to see if the user has cancelled the DVD creation process
@@ -433,7 +456,14 @@ def checkCancelFlag():
 def runCommand(command):
     checkCancelFlag()
 
-    result = os.system(command)
+    # mytharchivehelper needes this locale to work correctly
+    try:
+       oldlocale = os.environ["LC_ALL"]
+    except:
+       oldlocale = ""
+    os.putenv("LC_ALL", "en_US.UTF-8")
+    result = os.system(command.encode('utf-8'))
+    os.putenv("LC_ALL", oldlocale)
 
     if os.WIFEXITED(result):
         result = os.WEXITSTATUS(result)
@@ -464,19 +494,19 @@ def encodeMenu(background, tempvideo, music, musiclength, tempmovie, xmlfile, fi
 
     totalframes=int(musiclength * framespersecond)
 
-    command = path_jpeg2yuv[0] + " -n %s -v0 -I p -f %s -j '%s' | %s -b 5000 -a %s -v 1 -f 8 -o '%s'" \
-              % (totalframes, framespersecond, background, path_mpeg2enc[0], aspectratio, tempvideo)
+    command = quoteCmdArg(path_jpeg2yuv[0]) + " -n %s -v0 -I p -f %s -j %s | %s -b 5000 -a %s -v 1 -f 8 -o %s" \
+              % (totalframes, framespersecond, quoteCmdArg(background), quoteCmdArg(path_mpeg2enc[0]), aspectratio, quoteCmdArg(tempvideo))
     result = runCommand(command)
     if result<>0:
         fatalError("Failed while running jpeg2yuv - %s" % command)
 
-    command = path_mplex[0] + " -f 8 -v 0 -o '%s' '%s' '%s'" % (tempmovie, tempvideo, music)
+    command = quoteCmdArg(path_mplex[0]) + " -f 8 -v 0 -o %s %s %s" % (quoteCmdArg(tempmovie), quoteCmdArg(tempvideo), quoteCmdArg(music))
     result = runCommand(command)
     if result<>0:
         fatalError("Failed while running mplex - %s" % command)
 
     if xmlfile != "":
-        command = path_spumux[0] + " -m dvd -s 0 '%s' < '%s' > '%s'" % (xmlfile, tempmovie, finaloutput)
+        command = quoteCmdArg(path_spumux[0]) + " -m dvd -s 0 %s < %s > %s" % (quoteCmdArg(xmlfile), quoteCmdArg(tempmovie), quoteCmdArg(finaloutput))
         result = runCommand(command)
         if result<>0:
             fatalError("Failed while running spumux - %s" % command)
@@ -1431,9 +1461,15 @@ def getFileInformation(file, folder):
         data.thumblist = ','.join(thumblist)
 
     for k,v in data.items():
-        print "Node = %s, Data = %s" % (k, v)
+        write( "Node = %s, Data = %s" % (k, v))
         node = infoDOM.createElement(k)
-        node.appendChild(infoDOM.createTextNode(str(v)))
+        # v may be either an integer. Therefore we have to
+        # convert it to an unicode-string
+        # If it is already a string it is not encoded as all
+        # strings in this script are unicode. As no
+        # encoding-argument is supplied to unicode() it does
+        # nothing in this case.
+        node.appendChild(infoDOM.createTextNode(unicode(v)))
         top_element.appendChild(node)
 
     WriteXMLToFile (infoDOM, outputfile)
@@ -1497,7 +1533,7 @@ def encodeAudio(format, sourcefile, destinationfile, deletesourceafterencode):
         if cpuCount > 1:
             cmd += "-threads %d " % cpuCount
 
-        cmd += "-i '%s' -f ac3 -ab 192k -ar 48000 '%s'" % (sourcefile, destinationfile)
+        cmd += "-i %s -f ac3 -ab 192k -ar 48000 %s" % (quoteCmdArg(sourcefile), quoteCmdArg(destinationfile))
         result = runCommand(cmd)
 
         if result != 0:
@@ -1591,13 +1627,13 @@ def multiplexMPEGStream(video, audio1, audio2, destination, syncOffset):
     # run spumux to add subtitles if they exist
     if os.path.exists(os.path.dirname(destination) + "/stream.d/spumux.xml"):
         write("Checking integrity of subtitle pngs")
-        command = os.path.join(scriptpath, "testsubtitlepngs.sh") + " %s/stream.d/spumux.xml" % (os.path.dirname(destination))
+        command = quoteCmdArg(os.path.join(scriptpath, "testsubtitlepngs.sh")) + " " + quoteCmdArg(os.path.dirname(destination) + "/stream.d/spumux.xml")
         result = runCommand(command)
         if result<>0:
             fatalError("Failed while running testsubtitlepngs.sh - %s" % command)
 
         write("Running spumux to add subtitles")
-        command = path_spumux[0] + " -P %s/stream.d/spumux.xml <%s >%s" % (os.path.dirname(destination), destination, os.path.splitext(destination)[0] + "-sub.mpg")
+        command = quoteCmdArg(path_spumux[0]) + " -P %s <%s >%s" % (quoteCmdArg(os.path.dirname(destination) + "/stream.d/spumux.xml"), quoteCmdArg(destination), quoteCmdArg(os.path.splitext(destination)[0] + "-sub.mpg"))
         result = runCommand(command)
         if result<>0:
             nonfatalError("Failed while running spumux.\n"
@@ -1615,8 +1651,9 @@ def multiplexMPEGStream(video, audio1, audio2, destination, syncOffset):
 
 def getStreamInformation(filename, xmlFilename, lenMethod):
     """create a stream.xml file for filename"""
-    filename = quoteFilename(filename)
-    command = "mytharchivehelper -q -q --getfileinfo --infile %s --outfile %s --method %d" % (filename, xmlFilename, lenMethod)
+
+    command = "mytharchivehelper -q -q --getfileinfo --infile %s --outfile %s --method %d" % (quoteCmdArg(filename), quoteCmdArg(xmlFilename), lenMethod)
+
 
     result = runCommand(command)
 
@@ -1626,7 +1663,7 @@ def getStreamInformation(filename, xmlFilename, lenMethod):
 
     # print out the streaminfo.xml file to the log
     infoDOM = xml.dom.minidom.parse(xmlFilename)
-    write("streaminfo.xml :-\n" + infoDOM.toprettyxml("    ", ""), False)
+    write(xmlFilename + ":-\n" + infoDOM.toprettyxml("    ", ""), False)
 
 #############################################################
 # Gets the video width and height from a file's stream xml file
@@ -1672,14 +1709,14 @@ def runMythtranscode(chanid, starttime, destination, usecutlist, localfile):
     if (localfile != ""):
         localfile = quoteFilename(localfile)
         if usecutlist == True:
-            command = "mythtranscode --mpeg2 --honorcutlist %s --infile %s --outfile %s" % (cutlist_s, localfile, destination)
+            command = "mythtranscode --mpeg2 --honorcutlist %s --infile %s --outfile %s" % (cutlist_s, quoteCmdArg(localfile), quoteCmdArg(destination))
         else:
-            command = "mythtranscode --mpeg2 -i %s -o %s" % (localfile, destination)
+            command = "mythtranscode --mpeg2 --infile %s --outfile %s" % (quoteCmdArg(localfile), quoteCmdArg(destination))
     else:
         if usecutlist == True:
-            command = "mythtranscode --mpeg2 --honorcutlist --chanid %s --starttime %s --outfile %s" % (chanid, starttime, destination)
+            command = "mythtranscode --mpeg2 --honorcutlist --chanid %s --starttime %s --outfile %s" % (chanid, starttime, quoteCmdArg(destination))
         else:
-            command = "mythtranscode --mpeg2 --chanid %s --starttime %s --outfile %s" % (chanid, starttime, destination)
+            command = "mythtranscode --mpeg2 --chanid %s --starttime %s --outfile %s" % (chanid, starttime, quoteCmdArg(destination))
 
     result = runCommand(command)
 
@@ -1736,26 +1773,14 @@ def runProjectX(chanid, starttime, folder, usecutlist, file):
             write("Failed to generate Project-X cutlist.")
             return False
 
-    pxbasename = os.path.splitext(os.path.basename(file))[0]
-
     if os.path.exists(file) != True:
         write("Error: input file doesn't exist on local filesystem")
         return False
 
-
-    qdestdir = quoteFilename(folder)
-    qpxbasename = quoteFilename(pxbasename)
-    qfile = quoteFilename(file)
-    qcutlist = os.path.join(folder, "cutlist_x.txt")
-
-    command = path_projectx[0] + " -id %s" % getStreamList(folder)
+    command = quoteCmdArg(path_projectx[0]) + " %s -id '%s' -set ExternPanel.appendPidToFileName=1 -out %s -name stream" % (quoteCmdArg(file), getStreamList(folder), quoteCmdArg(folder))
     if usecutlist == True:
-        command += " -cut %s -out %s -name %s %s" % (qcutlist, qdestdir, qpxbasename, qfile)
-    else:
-        command += " -out %s -name %s %s" % (qdestdir, qpxbasename, qfile)
-
+        command += " -cut %s" % quoteCmdArg(os.path.join(folder, "cutlist_x.txt"))
     write(command)
-
     result = runCommand(command)
 
     if (result != 0):
@@ -1765,7 +1790,63 @@ def runProjectX(chanid, starttime, folder, usecutlist, file):
 
 
     # workout which files we need and rename them
-    renameProjectXFiles(folder, pxbasename)
+    video, audio1, audio2 = selectStreams(folder)
+    if addSubtitles:
+        subtitles = selectSubtitleStream(folder)
+
+    videoID_hex = "0x%x" % video[VIDEO_ID]
+    if audio1[AUDIO_ID] != -1:
+        audio1ID_hex = "0x%x" % audio1[AUDIO_ID]
+    else:
+        audio1ID_hex = ""
+    if audio2[AUDIO_ID] != -1:
+        audio2ID_hex = "0x%x" % audio2[AUDIO_ID]
+    else:
+        audio2ID_hex = ""
+    if addSubtitles and subtitles[SUBTITLE_ID] != -1:
+        subtitlesID_hex = "0x%x" % subtitles[SUBTITLE_ID]
+    else:
+        subtitlesID_hex = ""
+
+
+    files = os.listdir(folder)
+    for file in files:
+        if file[0:9] == "stream{0x": # don't rename files that have already been renamed
+            PID = file[7:13]
+            SubID = file[19:23]
+            if PID == videoID_hex or SubID == videoID_hex:
+                os.rename(os.path.join(folder, file), os.path.join(folder, "stream.mv2"))
+            elif PID == audio1ID_hex or SubID == audio1ID_hex:
+                os.rename(os.path.join(folder, file), os.path.join(folder, "stream0." + file[-3:]))
+            elif PID == audio2ID_hex or SubID == audio2ID_hex:
+                os.rename(os.path.join(folder, file), os.path.join(folder, "stream1." + file[-3:]))
+            elif PID == subtitlesID_hex or SubID == subtitlesID_hex:
+                if file[-3:] == "sup":
+                    os.rename(os.path.join(folder, file), os.path.join(folder, "stream.sup"))
+                else:
+                    os.rename(os.path.join(folder, file), os.path.join(folder, "stream.sup.IFO"))
+
+
+    # Fallback if assignment and renaming by ID failed
+
+    files = os.listdir(folder)
+    for file in files:
+        if file[0:9] == "stream{0x": # don't rename files that have already been renamed
+            if not os.path.exists(os.path.join(folder, "stream.mv2")) and file[-3:] == "m2v":
+                os.rename(os.path.join(folder, file), os.path.join(folder, "stream.mv2"))
+            elif not (os.path.exists(os.path.join(folder, "stream0.ac3")) or os.path.exists(os.path.join(folder, "stream0.mp2"))) and file[-3:] == "ac3":
+                os.rename(os.path.join(folder, file), os.path.join(folder, "stream0.ac3"))
+            elif not (os.path.exists(os.path.join(folder, "stream0.ac3")) or os.path.exists(os.path.join(folder, "stream0.mp2"))) and file[-3:] == "mp2":
+                os.rename(os.path.join(folder, file), os.path.join(folder, "stream0.mp2"))
+            elif not (os.path.exists(os.path.join(folder, "stream1.ac3")) or os.path.exists(os.path.join(folder, "stream1.mp2"))) and file[-3:] == "ac3":
+                os.rename(os.path.join(folder, file), os.path.join(folder, "stream1.ac3"))
+            elif not (os.path.exists(os.path.join(folder, "stream1.ac3")) or os.path.exists(os.path.join(folder, "stream1.mp2"))) and file[-3:] == "mp2":
+                os.rename(os.path.join(folder, file), os.path.join(folder, "stream1.mp2"))
+            elif not os.path.exists(os.path.join(folder, "stream.sup")) and file[-3:] == "sup":
+                os.rename(os.path.join(folder, file), os.path.join(folder, "stream.sup"))
+            elif not os.path.exists(os.path.join(folder, "stream.sup.IFO")) and file[-3:] == "IFO":
+                os.rename(os.path.join(folder, file), os.path.join(folder, "stream.sup.IFO"))
+
 
     # if we have some dvb subtitles and the user wants to add them to the DVD
     # convert them to pngs and create the spumux xml file
@@ -1774,7 +1855,7 @@ def runProjectX(chanid, starttime, folder, usecutlist, file):
             os.path.exists(os.path.join(folder, "stream.sup.IFO"))):
             write("Found DVB subtitles converting to DVD subtitles")
             command = "mytharchivehelper -q -q --sup2dast "
-            command += " --infile %s --ifofile %s --delay 0" % (os.path.join(folder, "stream.sup"), os.path.join(folder, "stream.sup.IFO"))
+            command += " --infile %s --ifofile %s --delay 0" % (quoteCmdArg(os.path.join(folder, "stream.sup")), quoteCmdArg(os.path.join(folder, "stream.sup.IFO")))
 
             result = runCommand(command)
 
@@ -1787,127 +1868,6 @@ def runProjectX(chanid, starttime, folder, usecutlist, file):
             checkSubtitles(os.path.join(folder, "stream.d", "spumux.xml"))
 
     return True
-
-#############################################################
-# find the required stream files and rename them
-
-def renameProjectXFiles(folder, pxbasename):
-
-    write("renameProjectXFiles start -----------------------------------------", False)
-    logf = open(os.path.join(folder, pxbasename + "_log.txt"))
-    logdata = logf.readlines()
-    logf.close()
-
-    # find stream PIDs and Files
-    streamIds = []
-    streamFiles = []    
-    for line in logdata:
-         tokens = line.split()
-         if len(tokens) > 0:
-            if tokens[0] == "++>":
-              # From ProjectX/resources/pjxresources_en.properties:
-              if tokens[1] == "Mpg":
-                if tokens[2] == "Video:":
-                  write("found MPEG video stream %s" % tokens[4], False)
-                  streamIds.append(int(tokens[4], 16))
-                if tokens[2] == "Audio:":
-                  write("found MPEG audio stream %s" % tokens[4], False)
-                  streamIds.append(int(tokens[4], 16))
-              if tokens[1] == "AC3/DTS":
-                write("found AC3/DTS audio stream %s" % tokens[4], False)
-                streamIds.append(int(tokens[4], 16))              
-              if tokens[1] == "LPCM":
-                write("found LPCM audio stream %s" % tokens[4], False)
-                streamIds.append(int(tokens[4], 16))             
-              if tokens[1] == "Teletext:":
-                write("found Teletext stream %s" % tokens[3], False)
-                streamIds.append(int(tokens[3], 16))              
-              if tokens[1] == "Subpicture:":
-                write("found Subpicture stream %s" % tokens[3], False)
-                streamIds.append(int(tokens[3], 16))
-              if tokens[1] == "Generic_VBI:":
-                write("found Generic_VBI stream %s" % tokens[3], False)
-                streamIds.append(int(tokens[3], 16))                                            
-            if tokens[0] == "--->":
-              if tokens[1] == "new":
-                if tokens[2] == "File:":
-                  write("found file for stream 0x%x, %s" % (streamIds[len(streamIds)-1], tokens[3]), False)
-                  streamFiles.append(tokens[3].replace("'","")) # let's hope the path never has a space in it
-            if tokens[0] == "-->":
-              if tokens[1] == "stream":
-                if tokens[2] == "omitted":
-                  write("stream 0x%x omitted" % streamIds[len(streamIds)-1], False)
-                  streamFiles.append("")
-                  
-    write("streadmIds=%s" % streamIds)
-    write("streamFiles=%s" % streamFiles)
-
-    # choose which streams we need
-    video, audio1, audio2 = selectStreams(folder)
-
-    if getFileType(folder) == "mpeg":
-        videoID  = video[VIDEO_ID] & 255
-        audio1ID = audio1[AUDIO_ID] & 255
-        audio2ID = audio2[AUDIO_ID] & 255
-    else:
-        videoID  = video[VIDEO_ID]
-        audio1ID = audio1[AUDIO_ID]
-        audio2ID = audio2[AUDIO_ID]
-
-    # sanity check - we should have a file for each ID
-    if len(streamIds) == len(streamFiles):
-        # loop thought the available streams looking for the ones we want
-        for stream in streamIds:
-            write("got stream: %d" % stream, False)
-            if stream == videoID:
-                write("found video streamID", False)
-                if os.path.exists(streamFiles[streamIds.index(stream)]):
-                    write("found video stream file", False)
-                    os.rename(streamFiles[streamIds.index(stream)], os.path.join(folder, "stream.mv2"))
-
-            if stream == audio1ID:
-                write("found audio1 streamID", False)
-                if os.path.exists(streamFiles[streamIds.index(stream)]):
-                    write("found audio1 stream file", False)
-                    if audio1[AUDIO_CODEC] == "AC3":
-                        os.rename(streamFiles[streamIds.index(stream)], os.path.join(folder, "stream0.ac3"))
-                    else:
-                        os.rename(streamFiles[streamIds.index(stream)], os.path.join(folder, "stream0.mp2"))
-
-            if stream == audio2ID:
-                write("found audio2 streamID", False)
-                if os.path.exists(streamFiles[streamIds.index(stream)]):
-                    write("found audio2 stream file", False)
-                    if audio2[AUDIO_CODEC] == "AC3":
-                        os.rename(streamFiles[streamIds.index(stream)], os.path.join(folder, "stream1.ac3"))
-                    else:
-                        os.rename(streamFiles[streamIds.index(stream)], os.path.join(folder, "stream1.mp2"))
-
-    # final chance to find the correct stream files
-    if not os.path.exists(os.path.join(folder, "stream.mv2")):
-        if os.path.exists(os.path.join(folder, pxbasename + ".m2v")):
-            os.rename(os.path.join(folder, pxbasename + ".m2v"), os.path.join(folder, "stream.mv2"))
-
-    if not os.path.exists(os.path.join(folder, "stream0.mp2")) or not os.path.exists(os.path.join(folder, "stream0.ac3")):
-        if os.path.exists(os.path.join(folder, pxbasename + ".mp2")):
-            os.rename(os.path.join(folder, pxbasename + ".mp2"), os.path.join(folder, "stream0.mp2"))
-        if os.path.exists(os.path.join(folder, pxbasename + ".ac3")):
-            os.rename(os.path.join(folder, pxbasename + ".ac3"), os.path.join(folder, "stream0.ac3"))
-
-    if not os.path.exists(os.path.join(folder, "stream1.mp2")) or not os.path.exists(os.path.join(folder, "stream1.ac3")):
-        if os.path.exists(os.path.join(folder, pxbasename + "[1].mp2")):
-            os.rename(os.path.join(folder, pxbasename + "[1].mp2"), os.path.join(folder, "stream1.mp2"))
-        if os.path.exists(os.path.join(folder, pxbasename + "[1].ac3")):
-            os.rename(os.path.join(folder, pxbasename + "[1].ac3"), os.path.join(folder, "stream1.ac3"))
-
-    # do we have any subtitle files
-    if os.path.exists(os.path.join(folder, pxbasename + ".sup")):
-        os.rename(os.path.join(folder, pxbasename + ".sup"), os.path.join(folder, "stream.sup"))
-
-    if os.path.exists(os.path.join(folder, pxbasename + ".sup.IFO")):
-        os.rename(os.path.join(folder, pxbasename + ".sup.IFO"), os.path.join(folder, "stream.sup.IFO"))
-
-    write("renameProjectXFiles end -----------------------------------------", False)
 
 #############################################################
 # convert time stamp to pts
@@ -1980,9 +1940,7 @@ def extractVideoFrame(source, destination, seconds):
         else:
             fr=framerateNTSC
 
-        source = quoteFilename(source)
-
-        command = "mytharchivehelper -q -q --createthumbnail --infile %s --thumblist '%s' --outfile %s" % (source, seconds, destination)
+        command = "mytharchivehelper -q -q --createthumbnail --infile %s --thumblist '%s' --outfile %s" % (quoteCmdArg(source), seconds, quoteCmdArg(destination))
         result = runCommand(command)
         if result <> 0:
             fatalError("Failed while running mytharchivehelper to get thumbnails.\n"
@@ -2005,9 +1963,8 @@ def extractVideoFrames(source, destination, thumbList):
     write("Extracting thumbnail images from: %s - at %s" % (source, thumbList))
     write("Destination file %s" % destination)
 
-    source = quoteFilename(source)
-
-    command = "mytharchivehelper -q -q --createthumbnail --infile %s --thumblist '%s' --outfile %s" % (source, thumbList, destination)
+    command = "mytharchivehelper -q -q --createthumbnail --infile %s --thumblist '%s' --outfile %s" % (quoteCmdArg(source), thumbList, quoteCmdArg(destination))
+    write(command)
     result = runCommand(command)
     if result <> 0:
         fatalError("Failed while running mytharchivehelper to get thumbnails.\n"
@@ -2036,9 +1993,9 @@ def encodeVideoToMPEG2(source, destvideofile, video, audio1, audio2, aspectratio
 
         # do some parameter substitution
         if value == "%inputfile":
-            value = quoteFilename(source)
+            value = quoteCmdArg(source)
         if value == "%outputfile":
-            value = quoteFilename(destvideofile)
+            value = quoteCmdArg(destvideofile)
         if value == "%aspect":
             value = aspectratio
 
@@ -2092,7 +2049,7 @@ def encodeVideoToMPEG2(source, destvideofile, video, audio1, audio2, aspectratio
         passLog = os.path.join(getTempPath(), 'pass')
 
         pass1 = string.replace(command, "%passno","1")
-        pass1 = string.replace(pass1, "%passlogfile", passLog)
+        pass1 = string.replace(pass1, "%passlogfile", quoteCmdArg(passLog))
         write("Pass 1 - " + pass1)
         result = runCommand(pass1)
 
@@ -2214,9 +2171,9 @@ def encodeNuvToMPEG2(chanid, starttime, mediafile, destvideofile, folder, profil
     if cpuCount > 1:
         command += "-threads %d " % cpuCount
 
-    command += "-f s16le -ar %s -ac %s -i %s " % (samplerate, channels, os.path.join(folder, "audout")) 
+    command += "-f s16le -ar %s -ac %s -i %s " % (samplerate, channels, quoteCmdArg(os.path.join(folder, "audout"))) 
     command += "-f rawvideo -pix_fmt yuv420p -s %s -aspect %s -r %s " % (videores, aspectratio, fps)
-    command += "-i %s " % os.path.join(folder, "vidout")
+    command += "-i %s " % quoteCmdArg(os.path.join(folder, "vidout"))
     command += "-aspect %s -r %s " % (aspectratio, fps)
     if (deinterlace == 1):
         command += "-deinterlace "
@@ -2224,7 +2181,7 @@ def encodeNuvToMPEG2(chanid, starttime, mediafile, destvideofile, folder, profil
     command += "-s %s -b %s -vcodec mpeg2video " % (outvideores, outvideobitrate)
     command += "-qmin %s -qmax %s -qdiff %s " % (qmin, qmax, qdiff)
     command += "-ab %s -ar %s -acodec %s " % (outaudiobitrate, outaudiosamplerate, outaudiocodec)
-    command += "-f dvd %s" % quoteFilename(destvideofile)
+    command += "-f dvd %s" % quoteCmdArg(destvideofile)
 
     #wait for mythtranscode to create the fifos
     tries = 30
@@ -2261,10 +2218,10 @@ def runDVDAuthor():
 def CreateDVDISO(title):
     write("Creating ISO image")
     checkCancelFlag()
-    command = path_mkisofs[0] + ' -dvd-video '
-    command += ' -V ' + quoteFilename(title)
-    command += ' -o ' + os.path.join(getTempPath(), 'mythburn.iso')
-    command += " " + os.path.join(getTempPath(),'dvd')
+    command = quoteCmdArg(path_mkisofs[0]) + ' -dvd-video '
+    command += ' -V ' + quoteCmdArg(title)
+    command += ' -o ' + quoteCmdArg(os.path.join(getTempPath(), 'mythburn.iso'))
+    command += " " + quoteCmdArg(os.path.join(getTempPath(),'dvd'))
 
     result = runCommand(command)
 
@@ -2279,80 +2236,115 @@ def CreateDVDISO(title):
 
 def BurnDVDISO(title):
     write( "Burning ISO image to %s" % dvddrivepath)
-    checkCancelFlag()
+
+    #######################
+    # some helper functions
+    def drivestatus():
+        f = os.open(dvddrivepath, os.O_RDONLY | os.O_NONBLOCK)
+        status = ioctl(f,CDROM.CDROM_DRIVE_STATUS, 0)
+        os.close(f)
+        return status
+    def displayneededdisktype():
+        if mediatype == DVD_SL:
+          write("Please insert an empty single-layer disc (DVD+R or DVD-R).")
+        if mediatype == DVD_DL:
+          write("Please insert an empty double-layer disc (DVD+R DL or DVD-R DL).")
+        if mediatype == DVD_RW:
+          write("Please insert a rewritable disc (DVD+RW or DVD-RW).")
+    def tray(action):
+        runCommand("pumount " + quoteCmdArg(dvddrivepath));
+        waitForDrive()
+        try:
+            f = os.open(drivepath, os.O_RDONLY | os.O_NONBLOCK)
+            r = ioctl(f,action, 0)
+            os.close(f)
+            return True
+        except:
+            write("Failed to eject the disc!")
+            return False
+        finally:
+            os.close(f)
+    def waitForDrive():
+        tries = 0
+        while drivestatus() == CDROM.CDS_DRIVE_NOT_READY:
+	    checkCancelFlag()
+            write("Waiting for drive")
+            time.sleep(5)
+            tries += 1
+            if tries > 10:
+                # Try a hard reset if the device is still not ready
+                write("Try a hard-reset of the device")
+                tray(CDROM.CDROMRESET)
+                tries = 0
+
+
+    ####################
+    # start working here
+
 
     finished = False
-    tries = 0
-    while not finished and tries < 10:
-        f = os.open(dvddrivepath, os.O_RDONLY | os.O_NONBLOCK)
-        drivestatus = ioctl(f,CDROM.CDROM_DRIVE_STATUS, 0)
-        os.close(f);
+    while not finished:
+        # Maybe the user has no appropriate medium or something alike. Give her the chance to cancel.
+        checkCancelFlag()
 
-        if drivestatus == CDROM.CDS_DISC_OK or drivestatus == CDROM.CDS_NO_INFO:
+        # If drive needs some time (for example to close the tray) give it to it
+        waitForDrive()
+
+        if drivestatus() == CDROM.CDS_DISC_OK or drivestatus() == CDROM.CDS_NO_INFO:
 
             # If the frontend has a previously burnt DVD+RW mounted,
             # growisofs will fail to burn it, so try to pumount it first...
-            runCommand("pumount " + dvddrivepath);
+            runCommand("pumount " + quoteCmdArg(dvddrivepath));
 
+
+            command = quoteCmdArg(path_growisofs[0]) + " -dvd-compat"
+            if drivespeed != 0:
+                command += " -speed=%d" % drivespeed
             if mediatype == DVD_RW and erasedvdrw == True:
-                command = path_growisofs[0] + " -dvd-compat "
-                if drivespeed != 0:
-                    command += "-speed=%d " % drivespeed
-                command += " -use-the-force-luke -Z " + dvddrivepath 
-                command += " -dvd-video -V '" + title.replace("'", "'\\''") + "' "
-                command += os.path.join(getTempPath(),'dvd')
-            else:
-                command = path_growisofs[0] + " -dvd-compat "
-                if drivespeed != 0:
-                    command += "-speed=%d " % drivespeed
-                command += " -Z " + dvddrivepath + " -dvd-video -V '" + title.replace("'", "'\\''") + "' "
-                command += os.path.join(getTempPath(),'dvd')
-
+                command += " -use-the-force-luke"
+            command += " -Z " + quoteCmdArg(dvddrivepath) + " -dvd-video -V " + quoteCmdArg(title) + " " + quoteCmdArg(os.path.join(getTempPath(),'dvd'))
             write(command)
             write("Running growisofs to burn DVD")
 
             result = runCommand(command)
-            if result != 0:
-                write("-"*60)
-                write("ERROR: Failed while running growisofs.")
-                write("Result %d, Command was: %s" % (result, command))
-                write("Please check the troubleshooting section of the README for ways to fix this error")
-                write("-"*60)
-                write("")
-                sys.exit(1)
-            finished = True
+            if result == 0:
+                finished = True
+            else:
+                if result == 252:
+                    write("-"*60)
+                    write("You probably inserted a medium of wrong type.")
+                elif (result == 156):
+                    write("-"*60)
+                    write("You probably inserted a non-empty, corrupt or too small medium.")
+                elif (result == 144):
+                    write("-"*60)
+                    write("You inserted a non-empty medium.")
+                else:
+                    write("-"*60)
+                    write("ERROR: Failed while running growisofs.")
+                    write("Result %d, Command was: %s" % (result, command))
+                    write("Please check mythburn.log for further information")
+                    write("-"*60)
+                    write("")
+                    write("Going to try it again until canceled by user:")
+                    write("-"*60)
+                    write("")
+                displayneededdisktype()
 
-            try:
-                # eject the burned disc
-                f = os.open(dvddrivepath, os.O_RDONLY | os.O_NONBLOCK)
-                r = ioctl(f,CDROM.CDROMEJECT, 0)
-                os.close(f)
-            except:
-                write("Failed to eject the disc! "
-                      "Maybe the media monitor has mounted it")
+            # eject the disc
+            tray(CDROM.CDROMEJECT)
 
-        elif drivestatus == CDROM.CDS_TRAY_OPEN:
-            # Give the user 10secs to close the Tray
+
+        elif drivestatus() == CDROM.CDS_TRAY_OPEN:
+            displayneededdisktype()
             write("Waiting for tray to close.")
-            time.sleep(10)
-        elif drivestatus == CDROM.CDS_NO_DISC:
-            # Open the Tray, if there is one.
-            write("Opening tray to get it fed with a DVD.")
-            f = os.open(dvddrivepath, os.O_RDONLY | os.O_NONBLOCK)
-            ioctl(f,CDROM.CDROMEJECT, 0)
-            os.close(f);
-        elif drivestatus == CDROM.CDS_DRIVE_NOT_READY:
-            # Try a hard reset
-            write("Trying a hard-reset of the device")
-            f = os.open(dvddrivepath, os.O_RDONLY | os.O_NONBLOCK)
-            ioctl(f,CDROM.CDROMEJECT, 0)
-            os.close(f);
-
-        time.sleep(1)
-        tries += 1
-
-    if not finished:
-        fatalError("Tried 10 times to get a good status from DVD drive - Giving up!")
+            # Wait until user closes tray or cancels
+            while drivestatus() == CDROM.CDS_TRAY_OPEN:
+                checkCancelFlag()
+                time.sleep(5)
+        elif drivestatus() == CDROM.CDS_NO_DISC:
+            tray(CDROM.CDROMEJECT)
+            displayneededdisktype()
 
     write("Finished burning ISO image")
 
@@ -2363,7 +2355,7 @@ def BurnDVDISO(title):
 def deMultiplexMPEG2File(folder, mediafile, video, audio1, audio2):
 
     if getFileType(folder) == "mpegts":
-        command = "mythreplex --demux --fix_sync -t TS -o %s " % (folder + "/stream")
+        command = "mythreplex --demux --fix_sync -t TS -o %s " % quoteCmdArg(folder + "/stream")
         command += "-v %d " % (video[VIDEO_ID])
 
         if audio1[AUDIO_ID] != -1: 
@@ -2383,7 +2375,7 @@ def deMultiplexMPEG2File(folder, mediafile, video, audio1, audio2):
                 command += "-c %d " % (audio2[AUDIO_ID])
 
     else:
-        command = "mythreplex --demux --fix_sync -o %s " % (folder + "/stream")
+        command = "mythreplex --demux --fix_sync -o %s " % quoteCmdArg(folder + "/stream")
         command += "-v %d " % (video[VIDEO_ID] & 255)
 
         if audio1[AUDIO_ID] != -1: 
@@ -2403,7 +2395,7 @@ def deMultiplexMPEG2File(folder, mediafile, video, audio1, audio2):
             elif audio2[AUDIO_CODEC] == 'EAC3':
                 command += "-c %d " % (audio2[AUDIO_ID] & 255)
 
-    mediafile = quoteFilename(mediafile)
+    mediafile = quoteCmdArg(mediafile)
     command += mediafile
     write("Running: " + command)
 
@@ -2420,23 +2412,22 @@ def runM2VRequantiser(source,destination,factor):
     M2Vsize0 = os.path.getsize(source)
     write("Initial M2Vsize is %.2f Mb , target is %.2f Mb" % ( (float(M2Vsize0)/mega), (float(M2Vsize0)/(factor*mega)) ))
 
-    command = path_M2VRequantiser[0]   
+    command = quoteCmdArg(path_M2VRequantiser[0])
     command += " %.5f "  % factor
     command += " %s "  % M2Vsize0
-    command += " <  %s " % source
-    command += " >  %s " % destination
+    command += " <  %s " % quoteCmdArg(source)
+    command += " >  %s " % quoteCmdArg(destination)
  
     write("Running: " + command)
     result = runCommand(command)
+    if result<>0:
+        fatalError("Failed while running M2VRequantiser. Command was %s" % command)
 
     M2Vsize1 = os.path.getsize(destination)
        
     write("M2Vsize after requant is  %.2f Mb " % (float(M2Vsize1)/mega))
     fac1=float(M2Vsize0) / float(M2Vsize1)
     write("Factor demanded %.5f, achieved %.5f, ratio %.5f " % ( factor, fac1, fac1/factor))
-            
-    if result<>0:
-        fatalError("Failed while running M2VRequantiser. Command was %s" % command)
 
 #############################################################
 # Calculates the total size of all the video, audio and menu files 
@@ -3195,7 +3186,7 @@ def generateVideoPreview(videoitem, itemonthispage, menuitem, starttime, menulen
                 height = getScaledAttribute(node, "h")
                 frames = int(secondsToFrames(menulength))
 
-                command = "mytharchivehelper -q -q --createthumbnail --infile  %s --thumblist '%s' --outfile '%s' --framecount %d" % (inputfile, starttime, outputfile, frames)
+                command = "mytharchivehelper -q -q --createthumbnail --infile  %s --thumblist '%s' --outfile %s --framecount %d" % (quoteCmdArg(inputfile), starttime, quoteCmdArg(outputfile), frames)
                 result = runCommand(command)
                 if (result != 0):
                     write( "mytharchivehelper failed with code %d. Command = %s" % (result, command) )
@@ -4061,7 +4052,7 @@ def selectStreams(folder):
     # 2. if there is one or more stream(s) using the 2nd preferred language we use that
     # 3. if we still haven't found a stream we use the stream with the lowest PID
     # 4. we prefer ac3 over mp2
-    # 5. if there are more that one stream with the chosen language we use the one with the lowest PID
+    # 5. if there are more than one stream with the chosen language we use the one with the lowest PID
 
     write("Preferred audio languages %s and %s" % (preferredlang1, preferredlang2))
 
@@ -4785,7 +4776,7 @@ def copyRemote(files, tmpPath):
         tmpfile = node.attributes["filename"].value
         filename = os.path.basename(tmpfile)
 
-        res = runCommand("mytharchivehelper -q -q --isremote --infile " + quoteFilename(tmpfile))
+        res = runCommand("mytharchivehelper -q -q --isremote --infile " + quoteCmdArg(tmpfile))
         if res == 2:
             # file is on a remote filesystem so copy it to a local file
             write("Copying file from " + tmpfile)
@@ -4850,9 +4841,6 @@ def processJob(job):
 
         write( "Final DVD Video format will be " + videomode)
 
-        #Ensure the destination dvd folder is empty
-        if doesFileExist(os.path.join(getTempPath(),"dvd")):
-            deleteAllFilesInFolder(os.path.join(getTempPath(),"dvd"))
 
         #Loop through all the files
         files=media[0].getElementsByTagName("file")
@@ -4862,18 +4850,12 @@ def processJob(job):
 
             if debug_secondrunthrough==False:
                 #Delete all the temporary files that currently exist
-                deleteAllFilesInFolder(getTempPath())
+                deleteEverythingInFolder(getTempPath())
 
             #If User wants to, copy remote files to a tmp dir
             if copyremoteFiles==True:
                 if debug_secondrunthrough==False:
                     localCopyFolder=os.path.join(getTempPath(),"localcopy")
-                    #If it already exists destroy it to remove previous debris
-                    if os.path.exists(localCopyFolder):
-                        #Remove all the files first
-                        deleteAllFilesInFolder(localCopyFolder)
-                        #Remove the folder
-                        os.rmdir (localCopyFolder)
                     os.makedirs(localCopyFolder)
                 files=copyRemote(files,getTempPath())
 
@@ -4887,20 +4869,6 @@ def processJob(job):
                 folder=getItemTempPath(filecount)
 
                 if debug_secondrunthrough==False:
-                    #If it already exists destroy it to remove previous debris
-                    if os.path.exists(folder):
-                        #Remove all the files first
-                        deleteAllFilesInFolder(folder)
-                        subtitlefolder = os.path.join(folder, "stream.d")
-                        if os.path.exists(subtitlefolder):
-                            deleteAllFilesInFolder(subtitlefolder)
-                            os.rmdir(subtitlefolder)
-                        previewfolder = os.path.join(folder, "preview")
-                        if os.path.exists(previewfolder):
-                            deleteAllFilesInFolder(previewfolder)
-                            os.rmdir(previewfolder)
-                        #Remove the folder
-                        os.rmdir (folder)
                     os.makedirs(folder)
                 #Do the pre-process work
                 preProcessFile(node,folder,filecount)
@@ -4987,9 +4955,21 @@ def processJob(job):
                 fatalError("The info.xml file (%s) doesn't look right" % os.path.join(folder,"info.xml"))
             title = expandItemText(infoDOM,"%title",1,0,0,0,0)
 
-            # convert to ascii and truncate to 32 chars
-            title = unicodedata.normalize('NFKD', title).encode('ASCII', 'ignore')
-            title = title[:32]
+            # replace all non-ascii-characters
+            title.encode('ascii', 'replace').decode('ascii', 'replace')
+            title.strip()
+            # replace not-allowed characters
+            index = 0
+            title_new = ''
+            while (index < len(title)) and (index<=7):
+                if title[index].isalnum and title[index] != ' ':
+                    title_new += title[index]
+                else:
+                    title_new += '_'
+                index = index + 1
+            title = title_new.upper()
+            if len(title) < 1:
+                title = 'UNNAMED'
 
             #Create the DVD ISO image
             if docreateiso == True or mediatype == FILE:

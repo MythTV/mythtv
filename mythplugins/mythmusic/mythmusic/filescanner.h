@@ -34,13 +34,13 @@ class FileScanner
         void ScanArtwork(MusicLoadedMap &music_files);
         void cleanDB();
 
-        QString         m_startdir;
-        IdCache         m_directoryid;
-        IdCache         m_artistid;
-        IdCache         m_genreid;
-        IdCache         m_albumid;
+        QString  m_startdir;
+        IdCache  m_directoryid;
+        IdCache  m_artistid;
+        IdCache  m_genreid;
+        IdCache  m_albumid;
 
-        Decoder             *m_decoder;
+        Decoder *m_decoder;
 };
 
 #endif // _FILESCANNER_H_

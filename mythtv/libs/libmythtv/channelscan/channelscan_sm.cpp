@@ -236,6 +236,8 @@ void ChannelScanSM::SetAnalog(bool is_analog)
 
 void ChannelScanSM::HandleAllGood(void)
 {
+    QMutexLocker locker(&lock);
+
     QString cur_chan = (*current).FriendlyName;
     QStringList list = cur_chan.split(" ", QString::SkipEmptyParts);
     QString freqid = (list.size() >= 2) ? list[1] : cur_chan;
@@ -341,6 +343,8 @@ bool ChannelScanSM::ScanExistingTransports(uint sourceid, bool follow_nit)
 
 void ChannelScanSM::HandlePAT(const ProgramAssociationTable *pat)
 {
+    QMutexLocker locker(&lock);
+
     LOG(VB_CHANSCAN, LOG_INFO, LOC +
         QString("Got a Program Association Table for %1")
             .arg((*current).FriendlyName) + "\n" + pat->toString());
@@ -356,6 +360,8 @@ void ChannelScanSM::HandlePAT(const ProgramAssociationTable *pat)
 
 void ChannelScanSM::HandlePMT(uint, const ProgramMapTable *pmt)
 {
+    QMutexLocker locker(&lock);
+
     LOG(VB_CHANSCAN, LOG_INFO, LOC + QString("Got a Program Map Table for %1")
             .arg((*current).FriendlyName) + "\n" + pmt->toString());
 
@@ -365,6 +371,8 @@ void ChannelScanSM::HandlePMT(uint, const ProgramMapTable *pmt)
 
 void ChannelScanSM::HandleVCT(uint, const VirtualChannelTable *vct)
 {
+    QMutexLocker locker(&lock);
+
     LOG(VB_CHANSCAN, LOG_INFO, LOC +
         QString("Got a Virtual Channel Table for %1")
             .arg((*current).FriendlyName) + "\n" + vct->toString());
@@ -382,6 +390,8 @@ void ChannelScanSM::HandleVCT(uint, const VirtualChannelTable *vct)
 
 void ChannelScanSM::HandleMGT(const MasterGuideTable *mgt)
 {
+    QMutexLocker locker(&lock);
+
     LOG(VB_CHANSCAN, LOG_INFO, LOC + QString("Got the Master Guide for %1")
             .arg((*current).FriendlyName) + "\n" + mgt->toString());
 
@@ -390,6 +400,8 @@ void ChannelScanSM::HandleMGT(const MasterGuideTable *mgt)
 
 void ChannelScanSM::HandleSDT(uint tsid, const ServiceDescriptionTable *sdt)
 {
+    QMutexLocker locker(&lock);
+
     LOG(VB_CHANSCAN, LOG_INFO, LOC +
         QString("Got a Service Description Table for %1")
             .arg((*current).FriendlyName) + "\n" + sdt->toString());
@@ -433,6 +445,8 @@ void ChannelScanSM::HandleSDT(uint tsid, const ServiceDescriptionTable *sdt)
 
 void ChannelScanSM::HandleNIT(const NetworkInformationTable *nit)
 {
+    QMutexLocker locker(&lock);
+
     LOG(VB_CHANSCAN, LOG_INFO, LOC +
         QString("Got a Network Information Table for %1")
             .arg((*current).FriendlyName) + "\n" + nit->toString());
@@ -442,6 +456,8 @@ void ChannelScanSM::HandleNIT(const NetworkInformationTable *nit)
 
 void ChannelScanSM::HandleBAT(const BouquetAssociationTable *bat)
 {
+    QMutexLocker locker(&lock);
+
     LOG(VB_CHANSCAN, LOG_INFO, LOC + "Got a Bouquet Association Table\n" +
         bat->toString());
 
@@ -483,6 +499,8 @@ void ChannelScanSM::HandleBAT(const BouquetAssociationTable *bat)
 
 void ChannelScanSM::HandleSDTo(uint tsid, const ServiceDescriptionTable *sdt)
 {
+    QMutexLocker locker(&lock);
+
     LOG(VB_CHANSCAN, LOG_INFO, LOC +
         "Got a Service Description Table (other)\n" + sdt->toString());
 
@@ -513,6 +531,8 @@ void ChannelScanSM::HandleSDTo(uint tsid, const ServiceDescriptionTable *sdt)
 
 void ChannelScanSM::HandleEncryptionStatus(uint pnum, bool encrypted)
 {
+    QMutexLocker locker(&lock);
+
     currentEncryptionStatus[pnum] = encrypted ? kEncEncrypted : kEncDecrypted;
 
     if (kEncDecrypted == currentEncryptionStatus[pnum])
@@ -1534,6 +1554,8 @@ bool ChannelScanSM::HasTimedOut(void)
  */
 void ChannelScanSM::HandleActiveScan(void)
 {
+    QMutexLocker locker(&lock);
+
     bool do_post_insertion = waitingForTables;
 
     if (!HasTimedOut())
@@ -1576,7 +1598,8 @@ void ChannelScanSM::HandleActiveScan(void)
                 QString name = QString("TransportID %1").arg(it.key() & 0xffff);
                 TransportScanItem item(sourceID, name, *it, signalTimeout);
                 LOG(VB_CHANSCAN, LOG_INFO, LOC + "Adding " + name + " - " +
-                    item.tuning.toString());
+                    item.
+tuning.toString());
                 scanTransports.push_back(item);
                 ts_scanned.insert(it.key());
             }

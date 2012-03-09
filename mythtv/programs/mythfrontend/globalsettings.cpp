@@ -345,6 +345,7 @@ static GlobalSpinBox *AutoExpireExtraSpace()
     return bs;
 };
 
+#if 0
 static GlobalCheckBox *AutoExpireInsteadOfDelete()
 {
     GlobalCheckBox *cb = new GlobalCheckBox("AutoExpireInsteadOfDelete");
@@ -355,14 +356,20 @@ static GlobalCheckBox *AutoExpireInsteadOfDelete()
                     "instead of deleting immediately."));
     return cb;
 }
+#endif
 
 static GlobalSpinBox *DeletedMaxAge()
 {
-    GlobalSpinBox *bs = new GlobalSpinBox("DeletedMaxAge", 0, 365, 1);
-    bs->setLabel(QObject::tr("Deleted max age (days)"));
-    bs->setHelpText(QObject::tr("When set to a number greater than zero, "
-                    "Auto-Expire will force expiration of Deleted recordings "
-                    "when they are this many days old."));
+    GlobalSpinBox *bs = new GlobalSpinBox("DeletedMaxAge", -1, 365, 1);
+    bs->setLabel(QObject::tr("Time to retain deleted recordings (days)"));
+    bs->setHelpText(QObject::tr("Determines the maximum number of days before "
+                                "undeleting a recording will become impossible. "
+                                "A value of zero means the recording will be "
+                                "permanently deleted between 5 and 20 minutes "
+                                "later. A value of minus one means recordings "
+                                "will be retained until space is required. "
+                                "A recording will always be removed before this "
+                                "time if the space is needed for a new recording."));
     bs->setValue(0);
     return bs;
 };
@@ -378,6 +385,7 @@ static GlobalCheckBox *DeletedFifoOrder()
     return cb;
 };
 
+#if 0
 class DeletedExpireOptions : public TriggeredConfigurationGroup
 {
     public:
@@ -399,6 +407,7 @@ class DeletedExpireOptions : public TriggeredConfigurationGroup
              addTarget("0", new HorizontalConfigurationGroup(true));
          };
 };
+#endif
 
 static GlobalComboBox *AutoExpireMethod()
 {
@@ -1357,6 +1366,23 @@ static HostSpinBox *OSDCC708TextZoomPercentage(void)
     gs->setHelpText(QObject::tr("Use this to enlarge or shrink text based subtitles."));
 
     return gs;
+}
+
+static HostComboBox *SubtitleFont()
+{
+    HostComboBox *hcb = new HostComboBox("DefaultSubtitleFont");
+    QFontDatabase db;
+    QStringList fonts = db.families();
+    QStringList hide  = db.families(QFontDatabase::Symbol);
+
+    hcb->setLabel(QObject::tr("Subtitle Font"));
+    hcb->setHelpText(QObject::tr("The font to use for text based subtitles."));
+    foreach (QString font, fonts)
+    {
+        if (!hide.contains(font))
+            hcb->addSelection(font, font, font.toLower() == "freemono");
+    }
+    return hcb;
 }
 
 static HostComboBox *SubtitleCodec()
@@ -3434,6 +3460,7 @@ OSDSettings::OSDSettings()
     osd->addChild(CCBackground());
     osd->addChild(DefaultCCMode());
     osd->addChild(PreferCC708());
+    osd->addChild(SubtitleFont());
     osd->addChild(OSDCC708TextZoomPercentage());
     osd->addChild(SubtitleCodec());
     addChild(osd);
@@ -3481,7 +3508,9 @@ GeneralSettings::GeneralSettings()
     expgrp->addChild(expgrp1);
 
     autoexp->addChild(expgrp);
-    autoexp->addChild(new DeletedExpireOptions());
+//    autoexp->addChild(new DeletedExpireOptions());
+    autoexp->addChild(DeletedFifoOrder());
+    autoexp->addChild(DeletedMaxAge());
 
     addChild(autoexp);
 

@@ -68,13 +68,9 @@
 <context>
     <name>ImportNative</name>
     <message>
-        <source>You need to select a valid chanID!</source>
-        <translation type="obsolete">You need to select a valid chanID!</translation>
-    </message>
-    <message>
         <location filename="../mytharchive/importnative.cpp" line="430"/>
-        <source>You need to select a valid ChanID!</source>
-        <translation>You need to select a valid ChanID!</translation>
+        <source>You need to select a valid channel id!</source>
+        <translation>You need to select a valid channel ID!</translation>
     </message>
     <message>
         <location filename="../mytharchive/importnative.cpp" line="465"/>
@@ -83,22 +79,18 @@
     </message>
     <message>
         <location filename="../mytharchive/importnative.cpp" line="595"/>
-        <source>Select a ChanID</source>
-        <translation>Select a ChanID</translation>
+        <source>Select a channel id</source>
+        <translation>Select a channel ID</translation>
     </message>
     <message>
         <location filename="../mytharchive/importnative.cpp" line="621"/>
-        <source>Select a ChanNum</source>
-        <translation>Select a ChanNum</translation>
-    </message>
-    <message>
-        <source>Select a ChanNo</source>
-        <translation type="obsolete">Select a ChanNo</translation>
+        <source>Select a channel number</source>
+        <translation>Select a channel number</translation>
     </message>
     <message>
         <location filename="../mytharchive/importnative.cpp" line="647"/>
-        <source>Select a Channel Name</source>
-        <translation>Select a Channel Name</translation>
+        <source>Select a channel name</source>
+        <translation>Select a channel name</translation>
     </message>
     <message>
         <location filename="../mytharchive/importnative.cpp" line="673"/>
@@ -142,26 +134,10 @@
 <context>
     <name>MythBurn</name>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="344"/>
-        <location filename="../mytharchive/mythburn.cpp" line="468"/>
-        <source>Using Cutlist</source>
-        <translation>Using Cutlist</translation>
-    </message>
-    <message>
-        <location filename="../mytharchive/mythburn.cpp" line="349"/>
-        <location filename="../mytharchive/mythburn.cpp" line="473"/>
-        <source>Not Using Cutlist</source>
-        <translation>Not Using Cutlist</translation>
-    </message>
-    <message>
-        <source>No Cut List</source>
-        <translation type="obsolete">No Cut List</translation>
-    </message>
-    <message>
         <location filename="../mytharchive/mythburn.cpp" line="355"/>
         <location filename="../mytharchive/mythburn.cpp" line="479"/>
-        <source>No Cutlist</source>
-        <translation>No Cutlist</translation>
+        <source>No Cut List</source>
+        <translation>No Cut List</translation>
     </message>
     <message>
         <location filename="../mytharchive/mythburn.cpp" line="366"/>
@@ -184,14 +160,26 @@
         <translation>Menu</translation>
     </message>
     <message>
+        <location filename="../mytharchive/mythburn.cpp" line="344"/>
+        <location filename="../mytharchive/mythburn.cpp" line="468"/>
+        <source>Using Cut List</source>
+        <translation>Using Cut List</translation>
+    </message>
+    <message>
+        <location filename="../mytharchive/mythburn.cpp" line="349"/>
+        <location filename="../mytharchive/mythburn.cpp" line="473"/>
+        <source>Not Using Cut List</source>
+        <translation>Not Using Cut List</translation>
+    </message>
+    <message>
         <location filename="../mytharchive/mythburn.cpp" line="819"/>
-        <source>Don&apos;t Use Cutlist</source>
-        <translation>Don&apos;t Use Cutlist</translation>
+        <source>Don&apos;t Use Cut List</source>
+        <translation>Don&apos;t Use Cut List</translation>
     </message>
     <message>
         <location filename="../mytharchive/mythburn.cpp" line="822"/>
-        <source>Use Cutlist</source>
-        <translation>Use Cutlist</translation>
+        <source>Use Cut List</source>
+        <translation>Use Cut List</translation>
     </message>
     <message>
         <location filename="../mytharchive/mythburn.cpp" line="826"/>
@@ -227,13 +215,9 @@
 <context>
     <name>MythControls</name>
     <message>
-        <source>Toggle use cut list state for selected program</source>
-        <translation type="obsolete">Toggle use cut list state for selected program</translation>
-    </message>
-    <message>
         <location filename="../mytharchive/main.cpp" line="299"/>
-        <source>Toggle use cutlist state for selected program</source>
-        <translation>Toggle use cutlist state for selected program</translation>
+        <source>Toggle use cut list state for selected program</source>
+        <translation>Toggle use cut list state for selected programme</translation>
     </message>
     <message>
         <location filename="../mytharchive/main.cpp" line="302"/>
@@ -700,17 +684,9 @@ Please Wait...</translation>
         <translation>Single Layer DVD</translation>
     </message>
     <message>
-        <source>Single Layer DVD (4482Mb)</source>
-        <translation type="obsolete">Single Layer DVD (4482MB)</translation>
-    </message>
-    <message>
         <location filename="../mytharchive/archiveutil.cpp" line="38"/>
         <source>Dual Layer DVD</source>
         <translation>Dual Layer DVD</translation>
-    </message>
-    <message>
-        <source>Dual Layer DVD (8964Mb)</source>
-        <translation type="obsolete">Dual Layer DVD (8964MB)</translation>
     </message>
     <message>
         <location filename="../mytharchive/archiveutil.cpp" line="35"/>

@@ -101,6 +101,10 @@ PlaylistEditorView::~PlaylistEditorView()
 {
     saveTreePosition();
 
+    for (int x = 0; x < m_deleteList.count(); x++)
+        delete m_deleteList.at(x);
+    m_deleteList.clear();
+
     if (m_rootNode)
         delete m_rootNode;
 }
@@ -370,6 +374,25 @@ void PlaylistEditorView::createRootNode(void )
     node = new MusicGenericTree(m_rootNode, tr("Years"), "years");
     node->setDrawArrow(true);
     node->SetData(qVariantFromValue(gMusicData->all_music->getAllMetadata()));
+
+    node = new MusicGenericTree(m_rootNode, tr("Compilations"), "compilations");
+    node->setDrawArrow(true);
+
+    MetadataPtrList *alltracks = gMusicData->all_music->getAllMetadata();
+    MetadataPtrList *compTracks = new MetadataPtrList;
+    m_deleteList.append(compTracks);
+
+    for (int x = 0; x < alltracks->count(); x++)
+    {
+        Metadata *mdata = alltracks->at(x);
+        if (mdata)
+        {
+            if (mdata->Compilation())
+                compTracks->append(mdata);
+        }
+    }
+    node->SetData(qVariantFromValue(compTracks));
+
 #if 0
     node = new MusicGenericTree(m_rootNode, tr("Directory"), "directory");
     node->setDrawArrow(true);
@@ -430,8 +453,8 @@ void PlaylistEditorView::treeItemClicked(MythUIButtonListItem *item)
         showPlaylistOptionsMenu();
     }
     else if (mnode->getAction() == "album" || mnode->getAction() == "artist" ||
-             mnode->getAction() == "genre" || mnode->getAction() == "year" ||
-             mnode->getAction() == "rating")
+             mnode->getAction() == "compartist" || mnode->getAction() == "genre" ||
+             mnode->getAction() == "year" || mnode->getAction() == "rating")
     {
         MetadataPtrList *tracks = qVariantValue<MetadataPtrList*> (node->GetData());
         for (int x = 0; x < tracks->count(); x++)
@@ -494,6 +517,11 @@ void PlaylistEditorView::treeItemVisible(MythUIButtonListItem *item)
         }
         else if (mnode->getAction() == "artists")
         {
+            artFile = "mm_artists.png";
+        }
+        else if (mnode->getAction() == "compartists")
+        {
+            //TODO add a compilation artist icon
             artFile = "mm_artists.png";
         }
         else if (mnode->getAction() == "ratings")
@@ -634,6 +662,7 @@ void PlaylistEditorView::filterTracks(MusicGenericTree *node)
                 else
                 {
                     MetadataPtrList *filteredTracks = new MetadataPtrList;
+                    m_deleteList.append(filteredTracks);
                     filteredTracks->append(mdata);
                     map.insert(mdata->Artist(), filteredTracks);
                 }
@@ -644,6 +673,41 @@ void PlaylistEditorView::filterTracks(MusicGenericTree *node)
         while (i != map.constEnd())
         {
             MusicGenericTree *newnode = new MusicGenericTree(node, i.key(), "artist");
+            newnode->SetData(qVariantFromValue(i.value()));
+            ++i;
+        }
+    }
+    else if (node->getAction() == "compartists")
+    {
+        QMap<QString, MetadataPtrList*> map;
+
+        for (int x = 0; x < tracks->count(); x++)
+        {
+            Metadata *mdata = tracks->at(x);
+            if (mdata)
+            {
+                if (mdata->CompilationArtist() != mdata->Artist())
+                {
+                    if (map.contains(mdata->CompilationArtist()))
+                    {
+                        MetadataPtrList *filteredTracks = map.value(mdata->CompilationArtist());
+                        filteredTracks->append(mdata);
+                    }
+                    else
+                    {
+                        MetadataPtrList *filteredTracks = new MetadataPtrList;
+                        m_deleteList.append(filteredTracks);
+                        filteredTracks->append(mdata);
+                        map.insert(mdata->CompilationArtist(), filteredTracks);
+                    }
+                }
+            }
+        }
+
+        QMap<QString, MetadataPtrList*>::const_iterator i = map.constBegin();
+        while (i != map.constEnd())
+        {
+            MusicGenericTree *newnode = new MusicGenericTree(node, i.key(), "compartist");
             newnode->SetData(qVariantFromValue(i.value()));
             ++i;
         }
@@ -665,6 +729,7 @@ void PlaylistEditorView::filterTracks(MusicGenericTree *node)
                 else
                 {
                     MetadataPtrList *filteredTracks = new MetadataPtrList;
+                    m_deleteList.append(filteredTracks);
                     filteredTracks->append(mdata);
                     map.insert(mdata->Album(), filteredTracks);
                 }
@@ -697,6 +762,7 @@ void PlaylistEditorView::filterTracks(MusicGenericTree *node)
                 else
                 {
                     MetadataPtrList *filteredTracks = new MetadataPtrList;
+                    m_deleteList.append(filteredTracks);
                     filteredTracks->append(mdata);
                     map.insert(mdata->Genre(), filteredTracks);
                 }
@@ -729,6 +795,7 @@ void PlaylistEditorView::filterTracks(MusicGenericTree *node)
                 else
                 {
                     MetadataPtrList *filteredTracks = new MetadataPtrList;
+                    m_deleteList.append(filteredTracks);
                     filteredTracks->append(mdata);
                     map.insert(ratingStr, filteredTracks);
                 }
@@ -762,6 +829,7 @@ void PlaylistEditorView::filterTracks(MusicGenericTree *node)
                 else
                 {
                     MetadataPtrList *filteredTracks = new MetadataPtrList;
+                    m_deleteList.append(filteredTracks);
                     filteredTracks->append(mdata);
                     map.insert(yearStr, filteredTracks);
                 }
@@ -777,9 +845,10 @@ void PlaylistEditorView::filterTracks(MusicGenericTree *node)
         }
 
     }
-    else if (node->getAction() == "artist" || node->getAction() == "album" ||
-             node->getAction() == "genre" || node->getAction() == "rating" ||
-             node->getAction() == "year")
+    else if (node->getAction() == "artist" || node->getAction() == "compartist" ||
+             node->getAction() == "album" || node->getAction() == "genre" ||
+             node->getAction() == "rating" || node->getAction() == "year" ||
+             node->getAction() == "compilations")
     {
         // which fields have we already filtered by
         QStringList fields;
@@ -801,12 +870,52 @@ void PlaylistEditorView::filterTracks(MusicGenericTree *node)
             newnode->SetData(node->GetData());
         }
 
-
         if (!fields.contains("artists"))
         {
             newnode = new MusicGenericTree(node, tr("Artists"), "artists");
             newnode->setDrawArrow(true);
             newnode->SetData(node->GetData());
+        }
+
+        if (!fields.contains("compartists"))
+        {
+            // only show the Compilation Artists node if we are one the Compilations branch
+            bool showCompArtists = false;
+            MusicGenericTree *mnode = node;
+            do
+            {
+                if (mnode->getAction() == "compilations")
+                {
+                    showCompArtists = true;
+                    break;
+                }
+
+                mnode = (MusicGenericTree *) mnode->getParent();
+
+            } while (mnode);
+
+            // only show the Comp. Artist if it differs from the Artist
+            bool found = false;
+            MetadataPtrList *tracks = qVariantValue<MetadataPtrList*> (node->GetData());
+            for (int x = 0; x < tracks->count(); x++)
+            {
+                Metadata *mdata = tracks->at(x);
+                if (mdata)
+                {
+                    if (mdata->Artist() != mdata->CompilationArtist())
+                    {
+                        found = true;
+                        break;
+                    }
+                }
+            }
+
+            if (showCompArtists && found)
+            {
+                newnode = new MusicGenericTree(node, tr("Compilation Artists"), "compartists");
+                newnode->setDrawArrow(true);
+                newnode->SetData(node->GetData());
+            }
         }
 
         if (!fields.contains("genres"))
@@ -1070,6 +1179,11 @@ void PlaylistEditorView::reloadTree(void)
     QStringList route = m_playlistTree->GetCurrentNode()->getRouteByString();
 
     m_playlistTree->Reset();
+
+    for (int x = 0; x < m_deleteList.count(); x++)
+        delete m_deleteList.at(x);
+    m_deleteList.clear();
+
     m_rootNode->deleteAllChildren();
     createRootNode();
     m_playlistTree->AssignTree(m_rootNode);

@@ -2359,10 +2359,13 @@ void MainServer::DoHandleStopRecording(
     if (pbs)
         pbssock = pbs->getSocket();
 
-    if (recinfo.GetRecordingStatus() == rsRecording)
-        recinfo.SetRecordingStatus(rsRecorded);
-    else if (recinfo.GetRecordingStatus() != rsRecorded)
-        recinfo.SetRecordingStatus(rsFailed);
+    // FIXME!  We don't know what state the recorder is in at this
+    // time.  Simply set the recstatus to rsUnknown and let the
+    // scheduler do the best it can with it.  The proper long term fix
+    // is probably to have the recorder return the actual recstatus as
+    // part of the stop recording response.  That's a more involved
+    // change than I care to make during the 0.25 code freeze.
+    recinfo.SetRecordingStatus(rsUnknown);
 
     if (ismaster && recinfo.GetHostname() != gCoreContext->GetHostName())
     {
@@ -2475,7 +2478,7 @@ void MainServer::DoHandleDeleteRecording(
         pbssock = pbs->getSocket();
 
     bool justexpire = expirer ? false :
-            (gCoreContext->GetNumSetting("AutoExpireInsteadOfDelete") &&
+            ( //gCoreContext->GetNumSetting("AutoExpireInsteadOfDelete") &&
              (recinfo.GetRecordingGroup() != "Deleted") &&
              (recinfo.GetRecordingGroup() != "LiveTV"));
 
@@ -2497,23 +2500,22 @@ void MainServer::DoHandleDeleteRecording(
         return;
     }
 
+    // Stop the recording if it's still in progress.
+    DoHandleStopRecording(recinfo, NULL);
+
     if (justexpire && !forceMetadataDelete &&
         recinfo.GetFilesize() > (1024 * 1024) )
     {
         recinfo.ApplyRecordRecGroupChange("Deleted");
         recinfo.SaveAutoExpire(kDeletedAutoExpire, true);
-        DoHandleStopRecording(recinfo, NULL);
         if (forgetHistory)
             recinfo.ForgetHistory();
+        else if (m_sched)
+            m_sched->Reschedule(0);
         QStringList outputlist( QString::number(0) );
         SendResponse(pbssock, outputlist);
         return;
     }
-
-    if (recinfo.GetRecordingStatus() == rsRecording)
-        recinfo.SetRecordingStatus(rsRecorded);
-    else if (recinfo.GetRecordingStatus() != rsRecorded)
-        recinfo.SetRecordingStatus(rsFailed);
 
     // If this recording was made by a another recorder, and that
     // recorder is available, tell it to do the deletion.
@@ -2525,15 +2527,12 @@ void MainServer::DoHandleDeleteRecording(
         {
             int num = slave->DeleteRecording(&recinfo, forceMetadataDelete);
 
-            if (num > 0)
-            {
-                (*encoderList)[num]->StopRecording();
-                if (m_sched)
-                    m_sched->UpdateRecStatus(&recinfo);
-            }
-
             if (forgetHistory)
                 recinfo.ForgetHistory();
+            else if (m_sched && 
+                     recinfo.GetRecordingGroup() != "Deleted" &&
+                     recinfo.GetRecordingGroup() != "LiveTV")
+                m_sched->Reschedule(0);
 
             if (pbssock)
             {
@@ -2545,37 +2544,6 @@ void MainServer::DoHandleDeleteRecording(
             return;
         }
     }
-
-    // Tell all encoders to stop recording to the file being deleted.
-    // Hopefully this is never triggered.
-
-    QMap<int, EncoderLink *>::Iterator iter = encoderList->begin();
-    for (; iter != encoderList->end(); ++iter)
-    {
-        EncoderLink *elink = *iter;
-
-        if (elink->IsLocal() && elink->MatchesRecording(&recinfo))
-        {
-            resultCode = iter.key();
-
-            elink->StopRecording(true);
-
-            while (elink->IsBusyRecording() ||
-                   elink->GetState() == kState_ChangingState)
-            {
-                usleep(100);
-            }
-
-            if (ismaster)
-            {
-                if (m_sched)
-                    m_sched->UpdateRecStatus(&recinfo);
-            }
-        }
-    }
-
-    if (forgetHistory)
-        recinfo.ForgetHistory();
 
     QFile checkFile(filename);
     bool fileExists = checkFile.exists();
@@ -2619,6 +2587,13 @@ void MainServer::DoHandleDeleteRecording(
         SendResponse(pbssock, outputlist);
     }
 
+    if (forgetHistory)
+        recinfo.ForgetHistory();
+    else if (m_sched && 
+             recinfo.GetRecordingGroup() != "Deleted" &&
+             recinfo.GetRecordingGroup() != "LiveTV")
+        m_sched->Reschedule(0);
+
     // Tell MythTV frontends that the recording list needs to be updated.
     if (fileExists || !recinfo.GetFilesize() || forceMetadataDelete)
     {
@@ -2653,19 +2628,22 @@ void MainServer::DoHandleUndeleteRecording(
     RecordingInfo &recinfo, PlaybackSock *pbs)
 {
     int ret = -1;
-    bool undelete_possible =
-            gCoreContext->GetNumSetting("AutoExpireInsteadOfDelete", 0);
+
     MythSocket *pbssock = NULL;
     if (pbs)
         pbssock = pbs->getSocket();
 
-    if (undelete_possible)
+#if 0
+    if (gCoreContext->GetNumSetting("AutoExpireInsteadOfDelete", 0))
     {
+#endif
         recinfo.ApplyRecordRecGroupChange("Default");
         recinfo.UpdateLastDelete(false);
         recinfo.SaveAutoExpire(kDisableAutoExpire);
         ret = 0;
+#if 0
     }
+#endif
 
     QStringList outputlist( QString::number(ret) );
     SendResponse(pbssock, outputlist);

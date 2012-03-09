@@ -17,7 +17,7 @@ using namespace std;
 #include "mythtvexp.h"
 #include "programtypes.h"
 
-// TODO: Refactor DBChannel, PixmapChannel and ChannelInfo into a single class
+// TODO: Refactor DBChannel and ChannelInfo into a single class
 
 class MTV_PUBLIC DBChannel
 {
@@ -70,20 +70,6 @@ class MTV_PUBLIC ChannelInfo
     QString sourcename;
     int favid;
     QString recpriority;
-};
-
-class MTV_PUBLIC PixmapChannel : public DBChannel
-{
-  public:
-    PixmapChannel(const PixmapChannel &other) :
-        DBChannel(other), m_localIcon() { }
-    PixmapChannel(const DBChannel &other) :
-        DBChannel(other), m_localIcon() { }
-
-    bool CacheChannelIcon(void);
-
-  public:
-    QString m_localIcon;
 };
 
 class MTV_PUBLIC ChannelInsertInfo

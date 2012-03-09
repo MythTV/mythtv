@@ -33,10 +33,10 @@ static HostLineEdit *GameAllTreeLevels()
 static HostLineEdit *GameFavTreeLevels()
 {
     HostLineEdit *gc = new HostLineEdit("GameFavTreeLevels");
-    gc->setLabel(QObject::tr("Favourite display order"));
+    gc->setLabel(QObject::tr("Favorite display order"));
     gc->setValue("gamename");
     gc->setHelpText(QObject::tr("Order in which to sort the games "
-                    "marked as favourites "
+                    "marked as favorites "
                     "- this is for all systems. Available choices: "
                     "system, year, genre and gamename"));
     return gc;
@@ -46,8 +46,8 @@ static HostCheckBox *GameDeepScan()
 {
     HostCheckBox *gc = new HostCheckBox("GameDeepScan");
     gc->setLabel(QObject::tr("Indepth Game Scan"));
-    gc->setHelpText(QObject::tr("Enabling this causes a game scan to gather crc values and attempt to find out more"
-                    " detailed information about the game: NOTE this can greatly increase the time a gamescan takes"
+    gc->setHelpText(QObject::tr("Enabling this causes a game scan to gather CRC values and attempt to find out more"
+                    " detailed information about the game: NOTE this can greatly increase the time a game scan takes"
                     " based on the amount of games scanned."));
     return gc;
 }
@@ -55,10 +55,10 @@ static HostCheckBox *GameDeepScan()
 static HostCheckBox *GameRemovalPrompt()
 {
     HostCheckBox *gc = new HostCheckBox("GameRemovalPrompt");
-    gc->setLabel(QObject::tr("Prompt for removal of deleted rom(s)"));
+    gc->setLabel(QObject::tr("Prompt for removal of deleted ROM(s)"));
     gc->setHelpText(QObject::tr("This enables a prompt for removing"
-                                " deleted roms from the database during a "
-                                " gamescan"));
+                                " deleted ROMs from the database during a "
+                                " game scan"));
 
     return gc;
 }
@@ -67,7 +67,7 @@ static HostCheckBox *GameShowFileNames()
 {
     HostCheckBox *gc = new HostCheckBox("GameShowFileNames");
     gc->setLabel(QObject::tr("Display Files Names in Game Tree"));
-    gc->setHelpText(QObject::tr("Enabling this causes the filenames to be displayed in the game tree rather than the trimmed/looked up gamename"));
+    gc->setHelpText(QObject::tr("Enabling this causes the filenames to be displayed in the game tree rather than the trimmed/looked up game name"));
     return gc;
 }
 
@@ -157,7 +157,7 @@ class AllowMultipleRoms : public CheckBoxSetting, public GameDBStorage
     AllowMultipleRoms(const MythGamePlayerSettings &parent) :
         CheckBoxSetting(this), GameDBStorage(this, parent, "spandisks")
     {
-        setLabel(QObject::tr("Allow games to span multiple roms/disks"));
+        setLabel(QObject::tr("Allow games to span multiple ROMs/disks"));
         setHelpText(QObject::tr("This setting means that we will look for items like game.1.rom, game.2.rom and consider them a single game."));
     };
 };
@@ -169,7 +169,7 @@ class Command : public LineEditSetting, public GameDBStorage
         LineEditSetting(this), GameDBStorage(this, parent, "commandline")
     {
         setLabel(QObject::tr("Command"));
-        setHelpText(QObject::tr("Binary and optional parameters. Multiple commands separated with \';\' . Use \%s for the rom name. \%d1, \%d2, \%d3 and \%d4 represent disks in a multidisk/game. %s auto appended if not specified"));
+        setHelpText(QObject::tr("Binary and optional parameters. Multiple commands separated with \';\' . Use \%s for the ROM name. \%d1, \%d2, \%d3 and \%d4 represent disks in a multidisk/game. %s auto appended if not specified"));
     };
 };
 

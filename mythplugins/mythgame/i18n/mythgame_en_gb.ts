@@ -41,14 +41,6 @@ Remove it from the database?</translation>
 <context>
     <name>GameScanner</name>
     <message>
-        <source>Verifying game files</source>
-        <translation type="obsolete">Verifying game files</translation>
-    </message>
-    <message>
-        <source>Updating game database</source>
-        <translation type="obsolete">Updating game database</translation>
-    </message>
-    <message>
         <location filename="../mythgame/gamescan.cpp" line="67"/>
         <source>Verifying game files...</source>
         <translation>Verifying game files...</translation>
@@ -195,14 +187,6 @@ Remove it from the database?</translation>
         <translation>Game Player Menu</translation>
     </message>
     <message>
-        <source>Edit..</source>
-        <translation type="obsolete">Edit..</translation>
-    </message>
-    <message>
-        <source>Delete..</source>
-        <translation type="obsolete">Delete..</translation>
-    </message>
-    <message>
         <location filename="../mythgame/gamesettings.cpp" line="306"/>
         <source>Edit...</source>
         <translation>Edit...</translation>
@@ -263,10 +247,6 @@ Remove it from the database?</translation>
         <translation>Verifying %1 files...</translation>
     </message>
     <message>
-        <source>Scanning for %1 games</source>
-        <translation type="obsolete">Scanning for %1 games</translation>
-    </message>
-    <message>
         <location filename="../mythgame/gamehandler.cpp" line="714"/>
         <location filename="../mythgame/gamehandler.cpp" line="742"/>
         <source>Scanning for %1 games...</source>
@@ -278,10 +258,6 @@ Remove it from the database?</translation>
         <translation>Updating %1(%2) ROM database</translation>
     </message>
     <message>
-        <source>Verifying %1 files</source>
-        <translation type="obsolete">Verifying %1 files</translation>
-    </message>
-    <message>
         <location filename="../mythgame/gamesettings.cpp" line="25"/>
         <source>Game display order</source>
         <translation>Game display order</translation>
@@ -290,16 +266,6 @@ Remove it from the database?</translation>
         <location filename="../mythgame/gamesettings.cpp" line="27"/>
         <source>Order in which to sort the games - this is for all systems. Available choices: system, year, genre and gamename</source>
         <translation>Order in which to sort the games - this is for all systems. Available choices: system, year, genre and game name</translation>
-    </message>
-    <message>
-        <location filename="../mythgame/gamesettings.cpp" line="36"/>
-        <source>Favourite display order</source>
-        <translation>Favourite display order</translation>
-    </message>
-    <message>
-        <location filename="../mythgame/gamesettings.cpp" line="38"/>
-        <source>Order in which to sort the games marked as favourites - this is for all systems. Available choices: system, year, genre and gamename</source>
-        <translation>Order in which to sort the games marked as favourites - this is for all systems. Available choices: system, year, genre and game name</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="48"/>
@@ -412,13 +378,19 @@ Remove it from the database?</translation>
         <translation>Type</translation>
     </message>
     <message>
+        <location filename="../mythgame/gamesettings.cpp" line="36"/>
+        <source>Favorite display order</source>
+        <translation>Favourite display order</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamesettings.cpp" line="38"/>
+        <source>Order in which to sort the games marked as favorites - this is for all systems. Available choices: system, year, genre and gamename</source>
+        <translation>Order in which to sort the games marked as favourites - this is for all systems. Available choices: system, year, genre and gamename</translation>
+    </message>
+    <message>
         <location filename="../mythgame/gamesettings.cpp" line="188"/>
         <source>Type of Game/Emulator. Mostly for informational purposes and has little effect on the function of your system.</source>
         <translation>Type of Game/Emulator. Mostly for informational purposes and has little effect on the function of your system.</translation>
-    </message>
-    <message>
-        <source>Rom Path</source>
-        <translation type="obsolete">ROM Path</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="199"/>

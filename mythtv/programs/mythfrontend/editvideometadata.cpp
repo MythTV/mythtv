@@ -70,11 +70,6 @@ bool EditMetadataDialog::Create()
     UIUtilE::Assign(this, m_seasonSpin, "season", &err);
     UIUtilE::Assign(this, m_episodeSpin, "episode", &err);
 
-    UIUtilE::Assign(this, m_coverartText, "coverart_text", &err);
-    UIUtilE::Assign(this, m_screenshotText, "screenshot_text", &err);
-    UIUtilE::Assign(this, m_bannerText, "banner_text", &err);
-    UIUtilE::Assign(this, m_fanartText, "fanart_text", &err);
-    UIUtilE::Assign(this, m_trailerText, "trailer_text", &err);
 
     UIUtilE::Assign(this, m_categoryList, "category_select", &err);
     UIUtilE::Assign(this, m_levelList, "level_select", &err);
@@ -83,11 +78,6 @@ bool EditMetadataDialog::Create()
     UIUtilE::Assign(this, m_browseCheck, "browse_check", &err);
     UIUtilE::Assign(this, m_watchedCheck, "watched_check", &err);
 
-    UIUtilE::Assign(this, m_coverartButton, "coverart_button", &err);
-    UIUtilE::Assign(this, m_bannerButton, "banner_button", &err);
-    UIUtilE::Assign(this, m_fanartButton, "fanart_button", &err);
-    UIUtilE::Assign(this, m_screenshotButton, "screenshot_button", &err);
-    UIUtilE::Assign(this, m_trailerButton, "trailer_button", &err);
     UIUtilE::Assign(this, m_doneButton, "done_button", &err);
 
     if (err)
@@ -95,6 +85,18 @@ bool EditMetadataDialog::Create()
         LOG(VB_GENERAL, LOG_ERR, "Cannot load screen 'edit_metadata'");
         return false;
     }
+
+    UIUtilW::Assign(this, m_coverartText, "coverart_text");
+    UIUtilW::Assign(this, m_screenshotText, "screenshot_text");
+    UIUtilW::Assign(this, m_bannerText, "banner_text");
+    UIUtilW::Assign(this, m_fanartText, "fanart_text");
+    UIUtilW::Assign(this, m_trailerText, "trailer_text");
+
+    UIUtilW::Assign(this, m_coverartButton, "coverart_button");
+    UIUtilW::Assign(this, m_bannerButton, "banner_button");
+    UIUtilW::Assign(this, m_fanartButton, "fanart_button");
+    UIUtilW::Assign(this, m_screenshotButton, "screenshot_button");
+    UIUtilW::Assign(this, m_trailerButton, "trailer_button");
 
     UIUtilW::Assign(this, m_netBannerButton, "net_banner_button");
     UIUtilW::Assign(this, m_netFanartButton, "net_fanart_button");
@@ -165,10 +167,14 @@ bool EditMetadataDialog::Create()
     connect(m_doneButton, SIGNAL(Clicked()), SLOT(SaveAndExit()));
 
     // Find Artwork locally
-    connect(m_coverartButton, SIGNAL(Clicked()), SLOT(FindCoverArt()));
-    connect(m_bannerButton, SIGNAL(Clicked()), SLOT(FindBanner()));
-    connect(m_fanartButton, SIGNAL(Clicked()), SLOT(FindFanart()));
-    connect(m_screenshotButton, SIGNAL(Clicked()), SLOT(FindScreenshot()));
+    if (m_coverartButton)
+        connect(m_coverartButton, SIGNAL(Clicked()), SLOT(FindCoverArt()));
+    if (m_bannerButton)
+        connect(m_bannerButton, SIGNAL(Clicked()), SLOT(FindBanner()));
+    if (m_fanartButton)
+        connect(m_fanartButton, SIGNAL(Clicked()), SLOT(FindFanart()));
+    if (m_screenshotButton)
+        connect(m_screenshotButton, SIGNAL(Clicked()), SLOT(FindScreenshot()));
 
     // Find Artwork on the Internet
     if (m_netCoverartButton)
@@ -180,7 +186,8 @@ bool EditMetadataDialog::Create()
     if (m_netScreenshotButton)
         connect(m_netScreenshotButton, SIGNAL(Clicked()), SLOT(FindNetScreenshot()));
 
-    connect(m_trailerButton, SIGNAL(Clicked()), SLOT(FindTrailer()));
+    if (m_trailerButton)
+        connect(m_trailerButton, SIGNAL(Clicked()), SLOT(FindTrailer()));
 
     connect(m_browseCheck, SIGNAL(valueChanged()), SLOT(ToggleBrowse()));
     connect(m_watchedCheck, SIGNAL(valueChanged()), SLOT(ToggleWatched()));
@@ -392,11 +399,17 @@ void EditMetadataDialog::fillWidgets()
         m_browseCheck->SetCheckState(MythUIStateType::Full);
     if (m_workingMetadata->GetWatched())
         m_watchedCheck->SetCheckState(MythUIStateType::Full);
-    m_coverartText->SetText(m_workingMetadata->GetCoverFile());
-    m_screenshotText->SetText(m_workingMetadata->GetScreenshot());
-    m_bannerText->SetText(m_workingMetadata->GetBanner());
-    m_fanartText->SetText(m_workingMetadata->GetFanart());
-    m_trailerText->SetText(m_workingMetadata->GetTrailer());
+    if (m_coverartText)
+        m_coverartText->SetText(m_workingMetadata->GetCoverFile());
+    if (m_screenshotText)
+        m_screenshotText->SetText(m_workingMetadata->GetScreenshot());
+    if (m_bannerText)
+        m_bannerText->SetText(m_workingMetadata->GetBanner());
+    if (m_fanartText)
+        m_fanartText->SetText(m_workingMetadata->GetFanart());
+    if (m_trailerText)
+        m_trailerText->SetText(m_workingMetadata->GetTrailer());
+
     m_playerEdit->SetText(m_workingMetadata->GetPlayCommand());
     if (m_taglineEdit)
         m_taglineEdit->SetText(m_workingMetadata->GetTagline());

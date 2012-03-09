@@ -107,6 +107,12 @@ MBASE_PUBLIC QDateTime fromTime_t(uint seconds)
     return dt.toUTC();
 }
 
+/** \fn toString(const QDateTime&,uint)
+ *  \brief Returns a formatted QString based on the supplied QDateTime
+ * 
+ *  \param datetime The QDateTime object to use
+ *  \param format   The format of the string to return
+ */
 QString toString(const QDateTime &raw_dt, uint format)
 {
     QString result;

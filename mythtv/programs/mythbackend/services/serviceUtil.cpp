@@ -248,7 +248,7 @@ void FillArtworkInfoList( DTC::ArtworkInfoList *pArtworkInfoList,
                 pArtInfo->setStorageGroup("Banners");
                 pArtInfo->setType("banner");
                 pArtInfo->setURL(QString("/Content/GetImageFile?StorageGroup=%1"
-                              "&FileName=%2").arg("Fanart")
+                              "&FileName=%2").arg("Banners")
                               .arg(QUrl(i.value().url).path()));
                 break;
             case kArtworkCoverart:
@@ -256,7 +256,7 @@ void FillArtworkInfoList( DTC::ArtworkInfoList *pArtworkInfoList,
                 pArtInfo->setStorageGroup("Coverart");
                 pArtInfo->setType("coverart");
                 pArtInfo->setURL(QString("/Content/GetImageFile?StorageGroup=%1"
-                              "&FileName=%2").arg("Fanart")
+                              "&FileName=%2").arg("Coverart")
                               .arg(QUrl(i.value().url).path()));
                 break;
         }

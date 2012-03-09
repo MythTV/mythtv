@@ -351,10 +351,10 @@ void XMLParseBase::ParseChildren(const QString &filename,
         return;
     }
 
+    QMap<QString, QString> dependsMap;
     for (QDomNode child = element.firstChild(); !child.isNull();
          child = child.nextSibling())
     {
-        QMap<QString, QString> dependsMap;
         QDomElement info = child.toElement();
         if (!info.isNull())
         {
@@ -404,8 +404,8 @@ void XMLParseBase::ParseChildren(const QString &filename,
                             "Unknown widget type");
             }
         }
-        parent->SetDependsMap(dependsMap);
     }
+    parent->SetDependsMap(dependsMap);
     parent->ConnectDependants(true);
     parent->Finalize();
 }
@@ -681,7 +681,7 @@ bool XMLParseBase::LoadWindowFromXML(const QString &xmlfile,
     for (; it != searchpath.end(); ++it)
     {
         QString themefile = *it + xmlfile;
-        LOG(VB_GUI, LOG_INFO, LOC + "Loading window theme from " + themefile);
+        LOG(VB_GUI, LOG_INFO, LOC + QString("Loading window %1 from %2").arg(windowname).arg(themefile));
         if (doLoad(windowname, parent, themefile,
                    onlyLoadWindows, showWarnings))
         {

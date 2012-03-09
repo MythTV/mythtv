@@ -68,9 +68,6 @@ inc.files += mythuiimageresults.h metadataimagehelper.h
 INSTALLS += inc
 
 macx {
-
-    QMAKE_LFLAGS_SHLIB += -flat_namespace
-
     using_firewire:using_backend:LIBS += -F$${CONFIG_MAC_AVC} -framework AVCVideoServices
 }
 

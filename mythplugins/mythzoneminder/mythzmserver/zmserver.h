@@ -189,6 +189,7 @@ class ZMServer
     bool                 m_debug;
     int                  m_sock;
     map<int, MONITOR *>  m_monitors;
+    bool                 m_useDeepStorage;
     string               m_eventFileFormat;
     string               m_analyseFileFormat;
     key_t                m_shmKey;

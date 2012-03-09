@@ -329,7 +329,7 @@ void ContentDescriptor::Init(void)
     categoryDesc[0x21] = QObject::tr("News/weather report");
     categoryDesc[0x22] = QObject::tr("News magazine");
     categoryDesc[0x23] = QObject::tr("Documentary");
-    categoryDesc[0x24] = QObject::tr("Intelligent Programmes");
+    categoryDesc[0x24] = QObject::tr("Intelligent Programs");
 
     categoryDesc[0x30] = QObject::tr("Entertainment");
     categoryDesc[0x31] = QObject::tr("Game Show");
@@ -352,9 +352,9 @@ void ContentDescriptor::Init(void)
     categoryDesc[0x4B] = QObject::tr("Martial Sports");
 
     categoryDesc[0x50] = QObject::tr("Kids");
-    categoryDesc[0x51] = QObject::tr("Pre-School Children's Programmes");
-    categoryDesc[0x52] = QObject::tr("Entertainment Programmes for 6 to 14");
-    categoryDesc[0x53] = QObject::tr("Entertainment Programmes for 10 to 16");
+    categoryDesc[0x51] = QObject::tr("Pre-School Children's Programs");
+    categoryDesc[0x52] = QObject::tr("Entertainment Programs for 6 to 14");
+    categoryDesc[0x53] = QObject::tr("Entertainment Programs for 10 to 16");
     categoryDesc[0x54] = QObject::tr("Informational/Educational");
     categoryDesc[0x55] = QObject::tr("Cartoons/Puppets");
 
@@ -404,7 +404,7 @@ void ContentDescriptor::Init(void)
     // Special
     categoryDesc[0xB0] = QObject::tr("Original Language");
     categoryDesc[0xB1] = QObject::tr("Black & White");
-    categoryDesc[0xB2] = QObject::tr("\"Unpublished\" Programmes");
+    categoryDesc[0xB2] = QObject::tr("\"Unpublished\" Programs");
     categoryDesc[0xB3] = QObject::tr("Live Broadcast");
     // UK Freeview custom id
     categoryDesc[0xF0] = QObject::tr("Drama");

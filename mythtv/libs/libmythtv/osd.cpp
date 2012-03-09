@@ -416,14 +416,24 @@ void OSD::SetText(const QString &window, QHash<QString,QString> &map,
         MythUIImage *icon = dynamic_cast<MythUIImage *> (win->GetChild("iconpath"));
         if (icon)
         {
+            icon->Reset();
+
             uint chanid = map["chanid"].toUInt();
             QString iconpath;
             if (map.contains("iconpath"))
                 iconpath = map["iconpath"];
             else
                 iconpath = ChannelUtil::GetIcon(chanid);
-            icon->SetFilename(iconpath);
-            icon->Load(false);
+
+            if (!iconpath.isEmpty())
+            {
+                QString iconurl =
+                                gCoreContext->GetMasterHostPrefix("ChannelIcon",
+                                                                  iconpath);
+
+                icon->SetFilename(iconurl);
+                icon->Load(false);
+            }
         }
     }
     if (map.contains("inetref"))

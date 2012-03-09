@@ -107,8 +107,10 @@ Advanced options (experts only):
   --disable-joystick-menu  disable joystick menu
   --disable-libcec         disable libCEC device support
   --libcec-path=HDRLOC     location of directory containing
-                           cec.h [$libcec_path_default]
+                           'libcec/cec.h', not the directory
+                           with 'cec.h' [$libcec_path_default]
   --disable-firewire       disable support for FireWire cable boxes
+  --firewire-sdk           specify location for mac FireWire SDK [mac only]
   --disable-iptv           disable support for recording RTSP/UDP/RTP streams
   --disable-hdhomerun      disable support for HDHomeRun boxes
   --disable-ceton          disable support for Ceton cards
@@ -1448,6 +1450,7 @@ PATHS_LIST='
     shlibdir
     x11_path
     libxml2_path
+    firewiresdk_path
 '
 
 CMDLINE_SET="
@@ -2024,8 +2027,9 @@ disable indevs
 # mythtv paths
 dvb_path_default="${sysroot}/usr/include"
 x11_path_default="${sysroot}/usr/X11R6/include"
-libcec_path_default="${sysroot}/usr/include/libcec"
+libcec_path_default="${sysroot}/usr/include"
 libxml2_path_default="${sysroot}/usr/include/libxml2"
+firewiresdk_path_default=""
 
 # configurable options
 enable avcodec
@@ -2272,6 +2276,9 @@ for opt do
     ;;
     --help|-h) show_help
     ;;
+    --firewire-sdk=*) firewiresdk_path="${optval}"
+    ;;
+
     *)
     optname="${opt%%=*}"
     optname="${optname#--}"
@@ -3120,18 +3127,18 @@ case $target_os in
         strip="strip -d"
         ;;
     darwin)
-        _restrict=__restrict__
-        enable malloc_aligned
-        gas="gas-preprocessor.pl $cc"
-        enabled ppc && add_asflags -force_cpusubtype_ALL
-        # Workaround compile errors from missing u_int/uint def
-        CPPFLAGS=`echo $CPPFLAGS | sed 's/-D_POSIX_C_SOURCE=200112//'`
-        # Workaround compile errors from missing ru_maxrss
-        add_cppflags -D_DARWIN_C_SOURCE
         enable  appleremote
         enable  backend
         enable  darwin
         disable dvb
+        disable v4l1
+        disable v4l2
+        disable x11
+        # Workaround compile errors from missing u_int/uint def
+        CFLAGS=`echo $CFLAGS | sed 's/-D_POSIX_C_SOURCE=200112//'`
+        CPPFLAGS=`echo $CPPFLAGS | sed 's/-D_POSIX_C_SOURCE=200112//'`
+        # Workaround compile errors from missing ru_maxrss
+        add_cppflags -D_DARWIN_C_SOURCE
         # Prevent linker problems on default Intel 10.5 XCode:
         ldver=$(ld -v 2>&1 | sed -e s/^[^-]*-//)
         osxver=$(uname -r | cut -c 1)
@@ -3144,13 +3151,19 @@ EOF
             disable mmx
             enable disable_mmx_for_debugging   # prevent later call to die
         fi
-        disable v4l1
-        disable v4l2
-        disable x11
-        # Workaround compile errors from missing gmtime_r/localtime_r/uint def
-        CFLAGS=`echo $CFLAGS | sed 's/-D_POSIX_C_SOURCE=200112//'`
+
         ###### Standard ffmpeg configure stuff follows:
-        SHFLAGS='-dynamiclib -Wl,-single_module -Wl,-install_name,$(SHLIBDIR)/$(SLIBNAME),-current_version,$(LIBVERSION),-compatibility_version,$(LIBMAJOR) -Wl,-read_only_relocs,suppress'
+        enable malloc_aligned
+        gas="gas-preprocessor.pl $cc"
+        enabled ppc && add_asflags -force_cpusubtype_ALL
+        
+        build_os_ver=$(uname -r)
+        if test ${build_os_ver:0:1} = 8; then
+            SHFLAGS='-dynamiclib -Wl,-single_module -Wl,-install_name,$(SHLIBDIR)/$(SLIBNAME),-current_version,$(LIBVERSION)'
+        else
+            SHFLAGS='-dynamiclib -Wl,-single_module -Wl,-install_name,$(SHLIBDIR)/$(SLIBNAME),-current_version,$(LIBVERSION),-compatibility_version,$(LIBMAJOR)'
+        fi
+        enabled x86_32 && append SHFLAGS -Wl,-read_only_relocs,suppress
         strip="${strip} -x"
         add_ldflags -Wl,-dynamic,-search_paths_first
         SLIBSUF=".dylib"
@@ -4110,16 +4123,20 @@ if enabled firewire; then
     check_libx fwlibs libavc1394/avc1394.h avc1394_transaction_block2 -lavc1394 && check_libx fwlibs libiec61883/iec61883.h iec61883_cmp_reconnect -liec61883 || disable firewire
 
     if test $target_os = darwin; then
-        # This should pick the newest. e.g. FireWireSDK21 instead of 20
-        # Unfortunately, the location keeps changing:
-        #/Developer/FireWireSDK20/Examples/AVCVideoServices/Framework
-        #/Developer/FireWireSDK21/Examples/Framework
-        mac_avc=`find /Developer/FireWireSDK* -name Framework 2> /dev/null \
-                 | tail -n 1`
+        if [ -n "$firewiresdk_path" ] ; then
+            mac_avc="$firewiresdk_path"
+        else
+            # This should pick the newest. e.g. FireWireSDK21 instead of 20
+            # Unfortunately, the location keeps changing:
+            #/Developer/FireWireSDK20/Examples/AVCVideoServices/Framework
+            #/Developer/FireWireSDK21/Examples/Framework
+            mac_avc=`find /Developer/FireWireSDK* -name Framework 2> /dev/null \
+                    | tail -n 1`
+        fi
         if test -d "$mac_avc" ; then
             firewire="yes"
         else
-            echo Firewire being disabled. /Developer/FireWireSDK* missing
+            echo Firewire being disabled. FireWire SDK missing
         fi
     fi
 fi
@@ -4138,9 +4155,9 @@ using namespace std;
 using namespace CEC;
 #include <libcec/cecloader.h>
 int main(void) {
-    if (CEC_LIB_VERSION_MAJOR < 1)
+    if (CEC_LIB_VERSION_MAJOR < 1 && CEC_LIB_VERSION_MINOR < 5)
         return 0;
-    return (long) LoadLibCec;
+    return (long) LibCecInit;
 }
 EOF
 fi
@@ -4947,6 +4964,11 @@ LATE_LIBS+=-L${sysroot}${libdir}
 EOF
 
 #echo "endif # FFMPEG_CONFIG_MAK" >> $TMPMAK
+
+# Should be done on all platforms, but for the time being limit it to mac only
+if enabled darwin; then
+  echo "QMAKE_LFLAGS+=\"$LDFLAGS\"" >> $TMPMAK
+fi
 
 cp_if_changed $TMPH $MYTH_CONFIG_H
 

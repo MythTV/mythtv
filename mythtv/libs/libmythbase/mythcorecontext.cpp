@@ -703,7 +703,7 @@ void MythCoreContext::ConfigureHostAddress(void)
                     QString("Adding IPv6 loopback to address list."));
             d->m_IPv6.append(*it);
         }
-        else if (config_v6.isNull() && 
+        else if (config_v6.isNull() &&
                  (it->protocol() == QAbstractSocket::IPv6Protocol))
         {
             // IPv6 address is not defined, populate one
@@ -735,7 +735,7 @@ void MythCoreContext::ConfigureHostAddress(void)
     }
 #if !defined(QT_NO_IPV6)
 
-    if (!config_v6.isNull() && !d->m_IPv6.contains(config_v6) && 
+    if (!config_v6.isNull() && !d->m_IPv6.contains(config_v6) &&
         !d->m_IPv6.isEmpty())
     {
         LOG(VB_GENERAL, LOG_CRIT, LOC + QString("Host is configured to listen "
@@ -810,7 +810,8 @@ QString MythCoreContext::GenMythURL(QString host, int port, QString path, QStrin
 }
 
 
-QString MythCoreContext::GetMasterHostPrefix(QString storageGroup)
+QString MythCoreContext::GetMasterHostPrefix(const QString &storageGroup,
+                                             const QString &path)
 {
     QString ret;
 
@@ -818,7 +819,7 @@ QString MythCoreContext::GetMasterHostPrefix(QString storageGroup)
     {
         return GenMythURL(GetSetting("MasterServerIP"),
                           GetNumSetting("MasterServerPort", 6543),
-                          "",
+                          path,
                           storageGroup);
     }
 
@@ -834,7 +835,7 @@ QString MythCoreContext::GetMasterHostPrefix(QString storageGroup)
 
          ret = GenMythURL(d->m_serverSock->peerAddress().toString(),
                           d->m_serverSock->peerPort(),
-                          "",
+                          path,
                           storageGroup);
     }
 

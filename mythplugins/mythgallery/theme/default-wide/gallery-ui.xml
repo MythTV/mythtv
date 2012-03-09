@@ -138,7 +138,6 @@
 
         <textarea name="numimages_text" from="basetextarea">
             <area>200,255,1260,30</area>
-            <value>NumImages_Text</value>
             <align>left,top</align>
         </textarea>
 

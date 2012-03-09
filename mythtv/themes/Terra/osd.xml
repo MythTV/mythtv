@@ -101,15 +101,19 @@
             <font>basesmall</font>
         </textarea>
 
-        <textarea name="channum">
-            <area>15,95,120,30</area>
+        <textarea name="channum" depends="!iconpath">
+            <area>35,95,80,30</area>
             <font>baseextralarge</font>
             <align>hcenter</align>
             <template>%CHANNUM%</template>
         </textarea>
 
-        <imagetype name="iconpath">
+        <imagetype name="iconpath" depends="!coverart">
             <area>15,65,120,90</area>
+        </imagetype>
+
+        <imagetype name="coverart">
+            <area>35,60,80,120</area>
         </imagetype>
 
         <fontdef name="timefont" from="baselarge">
@@ -118,7 +122,7 @@
         </fontdef>
 
         <clock name="time">
-            <area>15,177,120,35</area>
+            <area>15,187,120,35</area>
             <font>timefont</font>
             <cutdown>no</cutdown>
             <align>allcenter</align>
@@ -225,15 +229,19 @@
             <font>basesmall</font>
         </textarea>
 
-        <textarea name="channum">
-            <area>15,95,120,30</area>
+        <textarea name="channum" depends="!iconpath">
+            <area>35,95,80,30</area>
             <font>baseextralarge</font>
             <align>hcenter</align>
             <template>%CHANNUM%</template>
         </textarea>
 
-        <imagetype name="iconpath">
+        <imagetype name="iconpath" depends="!coverart">
             <area>15,65,120,90</area>
+        </imagetype>
+
+        <imagetype name="coverart">
+            <area>35,60,80,120</area>
         </imagetype>
 
         <fontdef name="timefont" from="baselarge">
@@ -242,7 +250,7 @@
         </fontdef>
 
         <clock name="time">
-            <area>15,177,120,35</area>
+            <area>15,187,120,35</area>
             <font>timefont</font>
             <cutdown>no</cutdown>
             <align>allcenter</align>

@@ -22,8 +22,15 @@ for search and retrieval of text metadata and image URLs from TMDB.
 Preliminary API specifications can be found at
 http://help.themoviedb.org/kb/api/about-3"""
 
-__version__="v0.1.0"
+__version__="v0.3.4"
 # 0.1.0 Initial development
+# 0.2.0 Add caching mechanism for API queries
+# 0.2.1 Temporary work around for broken search paging
+# 0.3.0 Rework backend machinery for managing OO interface to results
+# 0.3.1 Add collection support
+# 0.3.2 Remove MythTV key from results.py
+# 0.3.3 Add functional language support
+# 0.3.4 Re-enable search paging
 
 from request import set_key, Request
 from util import PagedList, Datapoint, Datalist, Datadict, Element
@@ -39,27 +46,30 @@ DEBUG = False
 class Configuration( Element ):
     images = Datapoint('images')
     def _populate(self):
-        return Request('configuration').readJSON()
+        return Request('configuration')
 Configuration = Configuration()
 
-def searchMovie(query, language='en-US'):
+def searchMovie(query, language='en', adult=False):
     return MovieSearchResults(
-                Request('search/movie', query=query, language=language))
+                    Request('search/movie', query=query, include_adult=adult),
+                    language=language)
 
 class MovieSearchResults( PagedList ):
     """Stores a list of search matches."""
-    @staticmethod
-    def _process(data):
+    def _process(self, data):
         for item in data['results']:
-            yield Movie(raw=item)
+            yield Movie(raw=item, language=self.language)
 
     def _getpage(self, page):
         self.request = self.request.new(page=page)
         return list(self._process(self.request.readJSON()))
 
-    def __init__(self, request):
-        self.request = request
-        super(MovieSearchResults, self).__init__(self._process(request.readJSON()), 20)
+    def __init__(self, request, language=None):
+        self.language=language
+        if language:
+            self.request = request.new(language=language)
+        res = self.request.readJSON()
+        super(MovieSearchResults, self).__init__(res, res['total_results'], 20)
 
     def __repr__(self):
         return u"<Search Results: {0}>".format(self.request._kwargs['query'])
@@ -79,7 +89,8 @@ class PeopleSearchResults( PagedList ):
 
     def __init__(self, request):
         self.request = request
-        super(PeopleSearchResults, self).__init__(self._process(request.readJSON()), 20)
+        res = self.request.readJSON()
+        super(PeopleSearchResults, self).__init__(res, res['total_results'], 20)
 
     def __repr__(self):
         return u"<Search Results: {0}>".format(self.request._kwargs['query'])
@@ -134,11 +145,11 @@ class Person( Element ):
                         format(self.__class__.__name__, self, hex(id(self)))
 
     def _populate(self):
-        return Request('person/{0}'.format(self.id)).readJSON()
+        return Request('person/{0}'.format(self.id))
     def _populate_credits(self):
-        return Request('person/{0}/credits'.format(self.id)).readJSON()
+        return Request('person/{0}/credits'.format(self.id), language=self._lang)
     def _populate_images(self):
-        return Request('person/{0}/images'.format(self.id)).readJSON()
+        return Request('person/{0}/images'.format(self.id))
 
     roles       = Datalist('cast', handler=lambda x: ReverseCast(raw=x), poller=_populate_credits)
     crew        = Datalist('crew', handler=lambda x: ReverseCrew(raw=x), poller=_populate_credits)
@@ -188,17 +199,29 @@ class Genre( Element ):
     id      = Datapoint('id')
     name    = Datapoint('name')
 
+    def __repr__(self):
+        return u"<{0.__class__.__name__} '{0.name}'>".format(self)
+
 class Studio( Element ):
     id      = Datapoint('id')
     name    = Datapoint('name')
+
+    def __repr__(self):
+        return u"<{0.__class__.__name__} '{0.name}'>".format(self)
 
 class Country( Element ):
     code    = Datapoint('iso_3166_1')
     name    = Datapoint('name')
 
+    def __repr__(self):
+        return u"<{0.__class__.__name__} '{0.name}'>".format(self)
+
 class Language( Element ):
     code    = Datapoint('iso_639_1')
     name    = Datapoint('name')
+
+    def __repr__(self):
+        return u"<{0.__class__.__name__} '{0.name}'>".format(self)
 
 class Movie( Element ):
     @classmethod
@@ -235,21 +258,21 @@ class Movie( Element ):
     languages   = Datalist('spoken_languages', handler=Language)
 
     def _populate(self):
-        return Request('movie/{0}'.format(self.id)).readJSON()
+        return Request('movie/{0}'.format(self.id), language=self._lang)
     def _populate_titles(self):
-        return Request('movie/{0}/alternative_titles'.format(self.id)).readJSON()
+        return Request('movie/{0}/alternative_titles'.format(self.id))
     def _populate_cast(self):
-        return Request('movie/{0}/casts'.format(self.id)).readJSON()
+        return Request('movie/{0}/casts'.format(self.id))
     def _populate_images(self):
-        return Request('movie/{0}/images'.format(self.id)).readJSON()
+        return Request('movie/{0}/images'.format(self.id), language=self._lang)
     def _populate_keywords(self):
-        return Request('movie/{0}/keywords'.format(self.id)).readJSON()
+        return Request('movie/{0}/keywords'.format(self.id))
     def _populate_releases(self):
-        return Request('movie/{0}/releases'.format(self.id)).readJSON()
+        return Request('movie/{0}/releases'.format(self.id))
     def _populate_trailers(self):
-        return Request('movie/{0}/trailers'.format(self.id)).readJSON()
+        return Request('movie/{0}/trailers'.format(self.id), language=self._lang)
     def _populate_translations(self):
-        return Request('movie/{0}/translations'.format(self.id)).readJSON()
+        return Request('movie/{0}/translations'.format(self.id))
 
     alternate_titles = Datalist('titles', handler=AlternateTitle, poller=_populate_titles)
     cast             = Datalist('cast', handler=Cast, poller=_populate_cast, sort='order')
@@ -310,15 +333,15 @@ class Collection( Element ):
     members  = Datalist('parts', handler=Movie, sort='releasedate')
 
     def _populate(self):
-        return Request('collection/{0}'.format(self.id)).readJSON()
+        return Request('collection/{0}'.format(self.id), language=self._lang)
 
     def __repr__(self):
         return u"<{0.__class__.__name__} '{0.name}'>".format(self).encode('utf-8')
         return u"<{0} {1}>".format(self.__class__.__name__, s).encode('utf-8')
 
 if __name__ == '__main__':
-    set_key('c27cb71cff5bd76e1a7a009380562c62')
-    DEBUG = False
+    set_key('c27cb71cff5bd76e1a7a009380562c62') #MythTV API Key
+    DEBUG = True
 
     banner = 'tmdb_api interactive shell.'
     import code

@@ -7,6 +7,7 @@
 #include <QChar>
 #include <QKeyEvent>
 #include <QDomDocument>
+#include <Qt>
 
 // libmythbase headers
 #include "mythlogging.h"
@@ -49,6 +50,8 @@ MythUITextEdit::MythUITextEdit(MythUIType *parent, const QString &name)
     m_initialized = false;
 
     m_lastKeyPress.start();
+
+    m_composeKey = 0;
 }
 
 MythUITextEdit::~MythUITextEdit()
@@ -345,16 +348,102 @@ void MythUITextEdit::PasteTextFromClipboard(QClipboard::Mode mode)
     InsertText(clipboard->text(mode));
 }
 
-bool MythUITextEdit::keyPressEvent(QKeyEvent *e)
+typedef QPair<int, int> keyCombo;
+static QMap<keyCombo, int> gDeadKeyMap;
+
+static void LoadDeadKeys(QMap<QPair<int, int>, int> &map)
+{
+                 // Dead key              // Key        // Result
+    map[keyCombo(Qt::Key_Dead_Grave,      Qt::Key_A)] = Qt::Key_Agrave;
+    map[keyCombo(Qt::Key_Dead_Acute,      Qt::Key_A)] = Qt::Key_Aacute;
+    map[keyCombo(Qt::Key_Dead_Circumflex, Qt::Key_A)] = Qt::Key_Acircumflex;
+    map[keyCombo(Qt::Key_Dead_Tilde,      Qt::Key_A)] = Qt::Key_Atilde;
+    map[keyCombo(Qt::Key_Dead_Diaeresis,  Qt::Key_A)] = Qt::Key_Adiaeresis;
+    map[keyCombo(Qt::Key_Dead_Abovering,  Qt::Key_A)] = Qt::Key_Aring;
+
+    map[keyCombo(Qt::Key_Dead_Cedilla,    Qt::Key_C)] = Qt::Key_Ccedilla;
+
+    map[keyCombo(Qt::Key_Dead_Grave,      Qt::Key_E)] = Qt::Key_Egrave;
+    map[keyCombo(Qt::Key_Dead_Acute,      Qt::Key_E)] = Qt::Key_Eacute;
+    map[keyCombo(Qt::Key_Dead_Circumflex, Qt::Key_E)] = Qt::Key_Ecircumflex;
+    map[keyCombo(Qt::Key_Dead_Diaeresis,  Qt::Key_E)] = Qt::Key_Ediaeresis;
+
+    map[keyCombo(Qt::Key_Dead_Grave,      Qt::Key_I)] = Qt::Key_Igrave;
+    map[keyCombo(Qt::Key_Dead_Acute,      Qt::Key_I)] = Qt::Key_Iacute;
+    map[keyCombo(Qt::Key_Dead_Circumflex, Qt::Key_I)] = Qt::Key_Icircumflex;
+    map[keyCombo(Qt::Key_Dead_Diaeresis,  Qt::Key_I)] = Qt::Key_Idiaeresis;
+
+    map[keyCombo(Qt::Key_Dead_Tilde,      Qt::Key_N)] = Qt::Key_Ntilde;
+
+    map[keyCombo(Qt::Key_Dead_Grave,      Qt::Key_O)] = Qt::Key_Ograve;
+    map[keyCombo(Qt::Key_Dead_Acute,      Qt::Key_O)] = Qt::Key_Oacute;
+    map[keyCombo(Qt::Key_Dead_Circumflex, Qt::Key_O)] = Qt::Key_Ocircumflex;
+    map[keyCombo(Qt::Key_Dead_Tilde,      Qt::Key_O)] = Qt::Key_Otilde;
+    map[keyCombo(Qt::Key_Dead_Diaeresis,  Qt::Key_O)] = Qt::Key_Odiaeresis;
+
+    map[keyCombo(Qt::Key_Dead_Grave,      Qt::Key_U)] = Qt::Key_Ugrave;
+    map[keyCombo(Qt::Key_Dead_Acute,      Qt::Key_U)] = Qt::Key_Uacute;
+    map[keyCombo(Qt::Key_Dead_Circumflex, Qt::Key_U)] = Qt::Key_Ucircumflex;
+    map[keyCombo(Qt::Key_Dead_Diaeresis,  Qt::Key_U)] = Qt::Key_Udiaeresis;
+
+    map[keyCombo(Qt::Key_Dead_Acute,      Qt::Key_Y)] = Qt::Key_Yacute;
+    map[keyCombo(Qt::Key_Dead_Diaeresis,  Qt::Key_Y)] = Qt::Key_ydiaeresis;
+
+    return;
+}
+
+bool MythUITextEdit::keyPressEvent(QKeyEvent *event)
 {
     m_lastKeyPress.restart();
 
     QStringList actions;
     bool handled = false;
 
-    handled = GetMythMainWindow()->TranslateKeyPress("Global", e, actions, false);
+    handled = GetMythMainWindow()->TranslateKeyPress("Global", event, actions,
+                                                     false);
 
-    if (!handled && InsertCharacter(e->text()))
+    Qt::KeyboardModifiers modifiers = event->modifiers();
+    int keynum = event->key();
+
+    if (keynum >= Qt::Key_Shift && keynum <= Qt::Key_CapsLock)
+        return false;
+
+    QString character;
+    // Compose key handling
+    // Enter composition mode
+    if ((modifiers & Qt::GroupSwitchModifier) &&
+        (keynum >= Qt::Key_Dead_Grave) && (keynum <= Qt::Key_Dead_Horn))
+    {
+        m_composeKey = keynum;
+        handled = true;
+    }
+    else if (m_composeKey > 0) // 'Compose' the key
+    {
+        if (gDeadKeyMap.isEmpty())
+            LoadDeadKeys(gDeadKeyMap);
+
+        LOG(VB_GUI, LOG_DEBUG, QString("Compose key: %1 Key: %2").arg(QString::number(m_composeKey, 16)).arg(QString::number(keynum, 16)));
+
+        if (gDeadKeyMap.contains(keyCombo(m_composeKey, keynum)))
+        {
+            int keycode = gDeadKeyMap.value(keyCombo(m_composeKey, keynum));
+
+            //QKeyEvent key(QEvent::KeyPress, keycode, modifiers);
+            character = QChar(keycode);
+
+            if (modifiers & Qt::ShiftModifier)
+                character = character.toUpper();
+            else
+                character = character.toLower();
+            LOG(VB_GUI, LOG_DEBUG, QString("Founding match for dead-key combo - %1").arg(character));
+        }
+        m_composeKey = 0;
+    }
+
+    if (character.isEmpty())
+        character = event->text();
+
+    if (!handled && InsertCharacter(character))
         handled = true;
 
     for (int i = 0; i < actions.size() && !handled; i++)
@@ -379,7 +468,7 @@ bool MythUITextEdit::keyPressEvent(QKeyEvent *e)
         {
             RemoveCharacter(m_Position);
         }
-        else if (action == "SELECT" && e->key() != Qt::Key_Space
+        else if (action == "SELECT" && keynum != Qt::Key_Space
                  && GetMythDB()->GetNumSetting("UseVirtualKeyboard", 1) == 1)
         {
             MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");

@@ -393,8 +393,8 @@ PlaybackBox::PlaybackBox(MythScreenStack *parent, QString name, BoxType ltype,
       m_viewMask(VIEW_TITLES),
 
       // General m_popupMenu support
-      m_popupMenu(NULL),
       m_menuDialog(NULL),
+      m_popupMenu(NULL),
       m_doToggleMenu(true),
       // Main Recording List support
       m_progsInDB(0),

@@ -573,6 +573,8 @@ void MythScreenType::CopyFrom(MythUIType *base)
 
     MythUIType::CopyFrom(base);
 
+    ConnectDependants(true);
+
     BuildFocusList();
 };
 

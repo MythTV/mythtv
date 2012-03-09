@@ -200,17 +200,28 @@ AudioOutputSettings* AudioOutputCA::GetOutputSettings(bool digital)
     // Seek hardware sample rate available
     int rate;
     int *rates = d->RatesList(d->mDeviceID);
-    int *p_rates = rates;
 
-    while (*p_rates > 0 && (rate = settings->GetNextRate()))
+    if (rates == NULL)
     {
-        if (*p_rates == rate)
-        {
-            settings->AddSupportedRate(*p_rates);
-            p_rates++;
-        }
+        // Error retrieving rates, assume 48kHz
+        settings->AddSupportedRate(48000);
     }
-    free(rates);
+    else
+    {
+        while ((rate = settings->GetNextRate()))
+        {
+			int *p_rates = rates;
+			while (*p_rates > 0)
+			{
+				if (*p_rates == rate)
+				{
+					settings->AddSupportedRate(*p_rates);
+				}
+                p_rates++;
+            }
+        }
+        free(rates);
+    }
 
     // Supported format: 16 bits audio or float
     settings->AddSupportedFormat(FORMAT_S16);
