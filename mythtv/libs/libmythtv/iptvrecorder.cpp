@@ -21,6 +21,7 @@ IPTVRecorder::IPTVRecorder(TVRec *rec, IPTVChannel *channel) :
 IPTVRecorder::~IPTVRecorder()
 {
     StopRecording();
+    Close();
 }
 
 bool IPTVRecorder::Open(void)
