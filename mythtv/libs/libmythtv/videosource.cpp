@@ -1541,7 +1541,8 @@ class IPTVHost : public LineEditSetting, public CaptureCardDBStorage
     {
         setValue("http://mafreebox.freebox.fr/freeboxtv/playlist.m3u");
         setLabel(QObject::tr("M3U URL"));
-        setHelpText(QObject::tr("URL of M3U containing IPTV channel URLs."));
+        setHelpText(
+            QObject::tr("URL of M3U containing RTSP/RTP/UDP channel URLs."));
     }
 };
 
@@ -2499,7 +2500,7 @@ void CardType::fillSelections(SelectSetting* setting)
 #endif // USING_HDHOMERUN
 
 #ifdef USING_IPTV
-    setting->addSelection(QObject::tr("Network recorder"), "FREEBOX");
+    setting->addSelection(QObject::tr("IPTV recorder"), "FREEBOX");
 #endif // USING_IPTV
 
 #ifdef USING_ASI

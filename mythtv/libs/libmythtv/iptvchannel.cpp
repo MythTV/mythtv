@@ -6,6 +6,9 @@
  *  Distributed as part of MythTV under GPL v2 and later.
  */
 
+// Qt headers
+#include <QUrl>
+
 // MythTV headers
 #include "iptvstreamhandler.h"
 #include "iptvrecorder.h"
@@ -44,8 +47,8 @@ bool IPTVChannel::Open(void)
     }
 
     m_open = true;
-    if (!m_last_channel_id.isEmpty())
-        m_stream_handler = IPTVStreamHandler::Get(m_last_channel_id);
+    if (m_last_tuning.IsValid())
+        m_stream_handler = IPTVStreamHandler::Get(m_last_tuning);
 
     return m_open;
 }
@@ -74,25 +77,21 @@ bool IPTVChannel::IsOpen(void) const
     return m_open;
 }
 
-bool IPTVChannel::Tune(const QString &freqid, int finetune)
+bool IPTVChannel::Tune(const IPTVTuningData &tuning)
 {
     QMutexLocker locker(&m_lock);
-    (void) finetune;
 
-    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Tune(%1) TO BE IMPLEMENTED")
-        .arg(freqid));
+    if (tuning.GetDataURL().scheme().toUpper() == "RTSP")
+    {
+        // TODO get RTP info using RTSP
+    }
 
-    // TODO IMPLEMENT query from DB
-
-    QString type = "rtp"; // can be "rtp" or "udp"
-    QHostAddress addr(QHostAddress::Any);
-    int ports[3] = { (type=="rtp")?5555:6666, -1, -1, };
-    int bitrate = 5000000;
-
-    QString channel_id = QString("%1!%2!%3!%4!%5!%6")
-        .arg(type)
-        .arg(addr.toString()).arg(ports[0]).arg(ports[1]).arg(ports[2])
-        .arg(bitrate);
+    if (!tuning.IsValid())
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Invalid tuning info %1")
+            .arg(tuning.GetDeviceName()));
+        return false;
+    }
 
     if (m_stream_handler)
     {
@@ -101,11 +100,11 @@ bool IPTVChannel::Tune(const QString &freqid, int finetune)
         IPTVStreamHandler::Return(m_stream_handler);
     }
 
-    m_stream_handler = IPTVStreamHandler::Get(channel_id);
+    m_stream_handler = IPTVStreamHandler::Get(tuning);
     if (m_stream_data)
         m_stream_handler->AddListener(m_stream_data);
 
-    m_last_channel_id = channel_id;
+    m_last_tuning = tuning;
 
     return true;
 }

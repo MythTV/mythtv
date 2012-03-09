@@ -287,8 +287,19 @@ bool DTVChannel::SetChannelByString(const QString &channum)
     bool ok = true;
     if ((*it)->externalChanger.isEmpty())
     {
-        if ((*it)->name.contains("composite", Qt::CaseInsensitive) ||
-            (*it)->name.contains("s-video", Qt::CaseInsensitive))
+        if (IsIPTV())
+        {
+            int chanid = ChannelUtil::GetChanID((*it)->sourceid, channum);
+            IPTVTuningData tuning = ChannelUtil::GetIPTVTuningData(chanid);
+            if (!Tune(tuning))
+            {
+                LOG(VB_GENERAL, LOG_ERR, loc + "Tuning to IPTV URL");
+                ClearDTVInfo();
+                ok = false;
+            }
+        }
+        else if ((*it)->name.contains("composite", Qt::CaseInsensitive) ||
+                 (*it)->name.contains("s-video", Qt::CaseInsensitive))
         {
             LOG(VB_GENERAL, LOG_WARNING, loc + "You have not set "
                     "an external channel changing"

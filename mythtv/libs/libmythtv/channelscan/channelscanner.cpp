@@ -31,6 +31,7 @@
 using namespace std;
 
 #include "analogsignalmonitor.h"
+#include "iptvchannelfetcher.h"
 #include "dvbsignalmonitor.h"
 #include "scanwizardconfig.h"
 #include "channelscan_sm.h"
@@ -45,7 +46,7 @@ using namespace std;
 #define LOC QString("ChScan: ")
 
 ChannelScanner::ChannelScanner() :
-    scanMonitor(NULL), channel(NULL), sigmonScanner(NULL),
+    scanMonitor(NULL), channel(NULL), sigmonScanner(NULL), iptvScanner(NULL),
     freeToAirOnly(false), serviceRequirements(kRequireAV)
 {
 }
@@ -73,6 +74,13 @@ void ChannelScanner::Teardown(void)
     {
         delete channel;
         channel = NULL;
+    }
+
+    if (iptvScanner)
+    {
+        iptvScanner->Stop();
+        delete iptvScanner;
+        iptvScanner = NULL;
     }
 
     if (scanMonitor)
@@ -262,6 +270,27 @@ DTVConfParser::return_t ChannelScanner::ImportDVBUtils(
     }
 
     return ret;
+}
+
+bool ChannelScanner::ImportM3U(
+    uint cardid, const QString &inputname, uint sourceid)
+{
+    (void) cardid;
+    (void) inputname;
+    (void) sourceid;
+
+    if (!scanMonitor)
+        scanMonitor = new ScanMonitor(this);
+
+    // Create an IPTV scan object
+    iptvScanner = new IPTVChannelFetcher(
+        cardid, inputname, sourceid, scanMonitor);
+
+    MonitorProgress(false, false, false, false);
+
+    iptvScanner->Scan();
+
+    return true;
 }
 
 void ChannelScanner::PreScanCommon(

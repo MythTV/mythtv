@@ -115,9 +115,7 @@ void ScanWizard::SetPage(const QString &pageTitle)
     else if (scantype == ScanTypeSetting::IPTVImport)
     {
         do_scan = false;
-        LOG(VB_GENERAL, LOG_INFO, "M3U Import not implemented.");
-        // TODO FIXME re-implement..
-        //scannerPane->ImportM3U(cardid, inputname, sourceid);
+        scannerPane->ImportM3U(cardid, inputname, sourceid);
     }
     else if ((scantype == ScanTypeSetting::FullScan_ATSC)     ||
              (scantype == ScanTypeSetting::FullTransportScan) ||

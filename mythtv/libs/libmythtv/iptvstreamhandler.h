@@ -6,12 +6,16 @@
 #include <vector>
 using namespace std;
 
+#include <QHostAddress>
 #include <QUdpSocket>
 #include <QString>
 #include <QMutex>
 #include <QMap>
 
+#include "channelutil.h"
 #include "streamhandler.h"
+
+#define IPTV_SOCKET_COUNT 3
 
 class IPTVStreamHandler;
 class DTVSignalMonitor;
@@ -25,12 +29,7 @@ class IPTVStreamHandlerReadHelper : QObject
 
   public:
     IPTVStreamHandlerReadHelper(
-        IPTVStreamHandler *p, QUdpSocket *s, uint stream) :
-        m_parent(p), m_socket(s), m_stream(stream)
-    {
-        connect(m_socket, SIGNAL(readyRead()),
-                this,     SLOT(ReadPending()));
-    }
+        IPTVStreamHandler *p, QUdpSocket *s, uint stream);
 
   public slots:
     void ReadPending(void);
@@ -38,6 +37,7 @@ class IPTVStreamHandlerReadHelper : QObject
   private:
     IPTVStreamHandler *m_parent;
     QUdpSocket *m_socket;
+    QHostAddress m_sender;
     uint m_stream;
 };
 
@@ -72,7 +72,7 @@ class IPTVStreamHandler : public StreamHandler
     friend class IPTVStreamHandlerReadHelper;
     friend class IPTVStreamHandlerWriteHelper;
   public:
-    static IPTVStreamHandler *Get(const QString &devicename);
+    static IPTVStreamHandler *Get(const IPTVTuningData &tuning);
     static void Return(IPTVStreamHandler * & ref);
 
     virtual void AddListener(MPEGStreamData *data,
@@ -83,22 +83,18 @@ class IPTVStreamHandler : public StreamHandler
         StreamHandler::AddListener(data, false, false, output_file);
     } // StreamHandler
 
-    int GetBitrate(void) const { return m_bitrate; }
-
   private:
-    IPTVStreamHandler(const QString &);
+    IPTVStreamHandler(const IPTVTuningData &tuning);
 
     virtual void run(void); // MThread
 
     virtual void SetRunningDesired(bool desired); // StreamHandler
 
   private:
-    // TODO should we care about who is broadcasting to us?
-    QHostAddress m_addr;
-    int m_ports[3];
-    int m_bitrate;
-    QUdpSocket *m_sockets[3];
-    IPTVStreamHandlerReadHelper *m_read_helpers[3];
+    IPTVTuningData m_tuning;
+    QUdpSocket *m_sockets[IPTV_SOCKET_COUNT];
+    IPTVStreamHandlerReadHelper *m_read_helpers[IPTV_SOCKET_COUNT];
+    QHostAddress m_sender[IPTV_SOCKET_COUNT];
     IPTVStreamHandlerWriteHelper *m_write_helper;
     PacketBuffer *m_buffer;
     bool m_use_rtp_streaming;

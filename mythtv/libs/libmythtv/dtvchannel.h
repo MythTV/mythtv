@@ -22,7 +22,7 @@ using namespace std;
 // MythTV headers
 #include "dtvconfparserhelpers.h" // for DTVTunerType
 #include "channelbase.h"
-#include "channelutil.h" // for pid_cache_t
+#include "channelutil.h" // for pid_cache_t, IPTVTuningData
 
 class ProgramAssociationTable;
 class ProgramMapTable;
@@ -49,6 +49,8 @@ class DTVChannel : public ChannelBase
     /// are in the same MPTS stream on the same input. But generally you
     /// will need to implement this when adding support for new hardware.
     virtual bool Tune(const DTVMultiplex &tuning, QString inputname) = 0;
+    /// \brief Performs IPTV Tuning. Only implemented by IPTVChannel.
+    virtual bool Tune(const IPTVTuningData&) { return false; }
     /// \brief Enters power saving mode if the card supports it
     virtual bool EnterPowerSavingMode(void)
     {
@@ -118,6 +120,8 @@ class DTVChannel : public ChannelBase
     virtual bool IsMaster(void) const { return false; }
 
     virtual bool IsPIDTuningSupported(void) const { return false; }
+
+    virtual bool IsIPTV(void) const { return false; }
 
     bool HasGeneratedPAT(void) const { return genPAT != NULL; }
     bool HasGeneratedPMT(void) const { return genPMT != NULL; }

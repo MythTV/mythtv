@@ -17,6 +17,7 @@ using namespace std;
 #include "mythtvexp.h"
 #include "dtvmultiplex.h"
 #include "dbchannelinfo.h"
+#include "iptvtuningdata.h"
 
 class NetworkInformationTable;
 
@@ -134,6 +135,15 @@ class MTV_PUBLIC ChannelUtil
                                  QString xmltvid = QString::null,
                                  QString default_authority = QString::null);
 
+    static bool    CreateIPTVTuningData(
+        uint channel_id, const IPTVTuningData &tuning)
+    {
+        return UpdateIPTVTuningData(channel_id, tuning);
+    }
+
+    static bool    UpdateIPTVTuningData(
+        uint channel_id, const IPTVTuningData &tuning);
+
     static void    UpdateInsertInfoFromDB(ChannelInsertInfo &chan);
 
     static bool    DeleteChannel(uint channel_id);
@@ -181,6 +191,7 @@ class MTV_PUBLIC ChannelUtil
         { return GetChannelValueInt("serviceid", sourceid, channum); }
     static QString GetVideoFilters(uint sourceid, const QString &channum)
         { return GetChannelValueStr("videofilters", sourceid, channum); }
+    static IPTVTuningData GetIPTVTuningData(uint chanid);
 
     static DBChanList GetChannels(
         uint sourceid, bool visible_only, 
