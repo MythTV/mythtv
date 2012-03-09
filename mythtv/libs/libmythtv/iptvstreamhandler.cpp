@@ -113,13 +113,6 @@ IPTVStreamHandler::IPTVStreamHandler(const IPTVTuningData &tuning) :
     m_use_rtp_streaming = m_tuning.GetDataURL().scheme().toUpper() == "RTP";
 }
 
-void IPTVStreamHandler::SetRunningDesired(bool desired)
-{
-    StreamHandler::SetRunningDesired(desired);
-    if (!desired)
-        exit(0);
-}
-
 void IPTVStreamHandler::run(void)
 {
     RunProlog();

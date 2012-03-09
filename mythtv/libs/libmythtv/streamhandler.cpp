@@ -175,17 +175,11 @@ void StreamHandler::Stop(void)
 {
     QMutexLocker locker(&_start_stop_lock);
 
-    do
+    while (_running)
     {
         SetRunningDesired(false);
-        while (!_running_desired && _running)
-            _running_state_changed.wait(&_start_stop_lock, 100);
-        if (_running_desired)
-        {
-            LOG(VB_GENERAL, LOG_WARNING, LOC +
-                "Programmer Error: Start called before Stop finished");
-        }
-    } while (_running_desired);
+        _running_state_changed.wait(&_start_stop_lock, 100);
+    }
 
     wait();
 }
@@ -205,6 +199,13 @@ void StreamHandler::SetRunning(bool is_running,
     _using_buffering      = is_using_buffering;
     _using_section_reader = is_using_section_reader;
     _running_state_changed.wakeAll();
+}
+
+void StreamHandler::SetRunningDesired(bool desired)
+{
+    _running_desired = desired;
+    if (!desired)
+        MThread::exit(0);
 }
 
 bool StreamHandler::AddPIDFilter(PIDInfo *info)

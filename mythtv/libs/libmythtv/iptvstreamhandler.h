@@ -88,8 +88,6 @@ class IPTVStreamHandler : public StreamHandler
 
     virtual void run(void); // MThread
 
-    virtual void SetRunningDesired(bool desired); // StreamHandler
-
   private:
     IPTVTuningData m_tuning;
     QUdpSocket *m_sockets[IPTV_SOCKET_COUNT];
