@@ -1218,10 +1218,10 @@ void MythMainWindow::InitKeys()
     RegisterKey("Browser", "HISTORYFORWARD",  QT_TRANSLATE_NOOP("MythControls",
         "Go forward to previous page"),     "F");
 
-    RegisterKey("Main Menu",    "EXIT",       QT_TRANSLATE_NOOP("MythControls",
-        "System Exit"),                     "");
     RegisterKey("Main Menu",    "EXITPROMPT", QT_TRANSLATE_NOOP("MythControls",
         "Display System Exit Prompt"),      "Esc");
+    RegisterKey("Main Menu",    "EXIT",       QT_TRANSLATE_NOOP("MythControls",
+        "System Exit"),                     "");
 }
 
 void MythMainWindow::ReloadKeys()
