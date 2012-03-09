@@ -8,28 +8,6 @@
 #include "mythlogging.h"
 
 
-// Only some of the QTextCodec calls are reenterant.
-// If you use this please verify that you are using a reenterant call.
-static const QTextCodec *iso8859_codecs[16] =
-{
-    QTextCodec::codecForName("Latin1"),
-    QTextCodec::codecForName("ISO8859-1"),  // Western
-    QTextCodec::codecForName("ISO8859-2"),  // Central European
-    QTextCodec::codecForName("ISO8859-3"),  // Central European
-    QTextCodec::codecForName("ISO8859-4"),  // Baltic
-    QTextCodec::codecForName("ISO8859-5"),  // Cyrillic
-    QTextCodec::codecForName("ISO8859-6"),  // Arabic
-    QTextCodec::codecForName("ISO8859-7"),  // Greek
-    QTextCodec::codecForName("ISO8859-8"),  // Hebrew, visually ordered
-    QTextCodec::codecForName("ISO8859-9"),  // Turkish
-    QTextCodec::codecForName("ISO8859-10"),
-    QTextCodec::codecForName("ISO8859-11"),
-    QTextCodec::codecForName("ISO8859-12"),
-    QTextCodec::codecForName("ISO8859-13"),
-    QTextCodec::codecForName("ISO8859-14"),
-    QTextCodec::codecForName("ISO8859-15"), // Western
-};
-
 static QString decode_iso6937(const unsigned char *buf, uint length)
 {
     // ISO/IEC 6937 to unicode (UCS2) convertor...
@@ -119,6 +97,28 @@ QString dvb_decode_text(const unsigned char *src, uint raw_length,
 
 static QString decode_text(const unsigned char *buf, uint length)
 {
+    // Only some of the QTextCodec calls are reentrant.
+    // If you use this please verify that you are using a reentrant call.
+    static const QTextCodec *iso8859_codecs[16] =
+    {
+        QTextCodec::codecForName("Latin1"),
+        QTextCodec::codecForName("ISO8859-1"),  // Western
+        QTextCodec::codecForName("ISO8859-2"),  // Central European
+        QTextCodec::codecForName("ISO8859-3"),  // Central European
+        QTextCodec::codecForName("ISO8859-4"),  // Baltic
+        QTextCodec::codecForName("ISO8859-5"),  // Cyrillic
+        QTextCodec::codecForName("ISO8859-6"),  // Arabic
+        QTextCodec::codecForName("ISO8859-7"),  // Greek
+        QTextCodec::codecForName("ISO8859-8"),  // Hebrew, visually ordered
+        QTextCodec::codecForName("ISO8859-9"),  // Turkish
+        QTextCodec::codecForName("ISO8859-10"),
+        QTextCodec::codecForName("ISO8859-11"),
+        QTextCodec::codecForName("ISO8859-12"),
+        QTextCodec::codecForName("ISO8859-13"),
+        QTextCodec::codecForName("ISO8859-14"),
+        QTextCodec::codecForName("ISO8859-15"), // Western
+    };
+
     // Decode using the correct text codec
     if (buf[0] >= 0x20)
     {

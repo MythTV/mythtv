@@ -97,6 +97,7 @@ void MediaMonitor::SetCDSpeed(const char *device, int speed)
     {
         cd->setSpeed(device, speed);
         delete cd;
+        return;
     }
 
     LOG(VB_MEDIA, LOG_INFO, 
@@ -162,9 +163,13 @@ MythMediaDevice * MediaMonitor::selectDrivePopup(const QString label,
 
     if (drives.count() == 0)
     {
-        LOG(VB_MEDIA, LOG_INFO,
-                 "MediaMonitor::selectDrivePopup(" + label +
-                 ") - No suitable devices");
+        QString msg = "MediaMonitor::selectDrivePopup() ";
+        if (m_StartThread)
+            msg += "- no removable devices";
+        else
+            msg += "MonitorDrives is disabled - no device list";
+
+        LOG(VB_MEDIA, LOG_INFO, msg);
         return NULL;
     }
 
@@ -932,8 +937,9 @@ void MediaMonitor::ejectOpticalDisc()
         LOG(VB_MEDIA, LOG_INFO, "Trying Linux 'eject -T' command");
         myth_system("eject -T");
 #elif CONFIG_DARWIN
-        LOG(VB_MEDIA, LOG_INFO, "Trying 'disktool -e disk1");
-        myth_system("disktool -e disk1");
+        QString def = DEFAULT_CD;
+        LOG(VB_MEDIA, LOG_INFO, "Trying 'disktool -e " + def);
+        myth_system("disktool -e " + def);
 #endif
     }
 }

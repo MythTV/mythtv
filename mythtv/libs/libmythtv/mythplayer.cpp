@@ -129,6 +129,7 @@ MythPlayer::MythPlayer(PlayerFlags flags)
       parentWidget(NULL), embedding(false), embedRect(QRect()),
       // State
       totalDecoderPause(false), decoderPaused(false),
+      inJumpToProgramPause(false),
       pauseDecoder(false), unpauseDecoder(false),
       killdecoder(false),   decoderSeek(-1),     decodeOneFrame(false),
       needNewPauseFrame(false),
@@ -2534,6 +2535,8 @@ void MythPlayer::JumpToProgram(void)
     if (!pginfo)
         return;
 
+    inJumpToProgramPause = true;
+
     bool newIsDummy = player_ctx->tvchain->GetCardType(newid) == "DUMMY";
     SetPlayingInfo(*pginfo);
 
@@ -2549,6 +2552,7 @@ void MythPlayer::JumpToProgram(void)
         ResetPlaying();
         SetEof(false);
         delete pginfo;
+        inJumpToProgramPause = false;
         return;
     }
 
@@ -2566,6 +2570,7 @@ void MythPlayer::JumpToProgram(void)
         SetEof(true);
         SetErrored(QObject::tr("Error opening jump program file buffer"));
         delete pginfo;
+        inJumpToProgramPause = false;
         return;
     }
 
@@ -2578,6 +2583,7 @@ void MythPlayer::JumpToProgram(void)
         if (!IsErrored())
             SetErrored(QObject::tr("Error reopening video decoder"));
         delete pginfo;
+        inJumpToProgramPause = false;
         return;
     }
 
@@ -2592,6 +2598,7 @@ void MythPlayer::JumpToProgram(void)
 
     CheckTVChain();
     forcePositionMapSync = true;
+    inJumpToProgramPause = false;
     Play();
     ChangeSpeed();
 
@@ -3022,7 +3029,7 @@ void MythPlayer::DecoderLoop(bool pause)
     {
         DecoderPauseCheck();
 
-        if (totalDecoderPause)
+        if (totalDecoderPause || inJumpToProgramPause)
         {
             usleep(1000);
             continue;

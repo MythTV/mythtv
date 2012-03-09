@@ -11,6 +11,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <errno.h>
+#include "mythconfig.h"
 
 #ifdef _WIN32
 # include <winsock2.h>
@@ -21,6 +22,10 @@
 # include <netinet/in.h>
 # include <arpa/inet.h>
 # define GET_SOCKET_ERROR    errno
+#endif
+
+#if CONFIG_DARWIN
+#include <unistd.h>
 #endif
 
 // Qt headers

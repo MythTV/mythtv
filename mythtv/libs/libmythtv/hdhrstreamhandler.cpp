@@ -122,11 +122,9 @@ void HDHRStreamHandler::run(void)
     SetRunning(true, false, false);
 
     /* Calculate buffer size */
-    uint buffersize = gCoreContext->GetNumSetting(
-        "HDRingbufferSize", 50 * TSPacket::kSize) * 1024;
+    uint buffersize = 40000 * TSPacket::kSize;
     buffersize /= VIDEO_DATA_PACKET_SIZE;
     buffersize *= VIDEO_DATA_PACKET_SIZE;
-    buffersize = max(49 * TSPacket::kSize * 128, buffersize);
 
     LOG(VB_RECORD, LOG_INFO, LOC + "RunTS(): begin");
 
@@ -147,7 +145,7 @@ void HDHRStreamHandler::run(void)
 
         if (!data_buffer)
         {
-            usleep(5000);
+            usleep(20000);
             continue;
         }
 

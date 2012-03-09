@@ -11,7 +11,7 @@ namespace DTC
         Q_OBJECT
         Q_CLASSINFO("version", "1.0");
 
-        Q_CLASSINFO("ActionList_type", "Action"); // is this legal?
+        Q_CLASSINFO( "ActionList", "type=QString;name=Action"); // is this legal?
 
         Q_PROPERTY(QVariantMap ActionList READ ActionList DESIGNABLE true)
 

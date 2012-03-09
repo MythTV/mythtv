@@ -60,6 +60,7 @@ class MBASE_PUBLIC CommandLineArg : public ReferenceCounter
     CommandLineArg* SetBlocks(QStringList opts);
 
     CommandLineArg* SetDeprecated(QString depstr = "");
+    CommandLineArg* SetRemoved(QString remstr = "", QString remver = "");
 
     static void     AllowOneOf(QList<CommandLineArg*> args);
 
@@ -81,11 +82,16 @@ class MBASE_PUBLIC CommandLineArg : public ReferenceCounter
     bool            TestLinks(void) const;
     void            CleanupLinks(void);
 
+    void            PrintRemovedWarning(QString &keyword) const;
+    void            PrintDeprecatedWarning(QString &keyword) const;
+
     bool                    m_given;
     bool                    m_converted;
     QString                 m_name;
     QString                 m_group;
     QString                 m_deprecated;
+    QString                 m_removed;
+    QString                 m_removedversion;
     QVariant::Type          m_type;
     QVariant                m_default;
     QVariant                m_stored;

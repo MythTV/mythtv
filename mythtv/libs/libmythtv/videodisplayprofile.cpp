@@ -1163,7 +1163,7 @@ QString VideoDisplayProfile::GetVideoRendererHelp(const QString &renderer)
     {
         msg = QObject::tr(
             "This video renderer uses OpenGL for scaling and color conversion "
-            "with full picture contols. The GPU can be used for deinterlacing. "
+            "with full picture controls. The GPU can be used for deinterlacing. "
             "This requires a faster GPU than XVideo.");
     }
 
@@ -1350,7 +1350,7 @@ QString VideoDisplayProfile::GetOSDHelp(const QString &osd)
     if (osd == "chromakey")
         msg = QObject::tr(
             "Render the OSD using the XVideo chromakey feature."
-            "This renderer does not alpha blend. But it is the fastest "
+            "This renderer does not alpha blend but is the fastest "
             "OSD renderer for XVideo.") + "\n" +
             QObject::tr(
                 "Note: nVidia hardware after the 5xxx series does not "

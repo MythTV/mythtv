@@ -351,6 +351,9 @@ void MythUIText::ShiftCanvas(int x, int y)
 void MythUIText::DrawSelf(MythPainter *p, int xoffset, int yoffset,
                           int alphaMod, QRect clipRect)
 {
+    if (m_Canvas.isNull())
+        return;
+
     FormatVector formats;
     QRect drawrect = m_drawRect.toQRect();
     drawrect.translate(xoffset, yoffset);

@@ -36,7 +36,7 @@ class SERVICE_PUBLIC ChannelInfo : public QObject
     // A Q_CLASSINFO entry with "<PropName>_type" as the key
     // and the type name as the value
 
-    Q_CLASSINFO( "Programs_type", "DTC::Program");
+    Q_CLASSINFO( "Programs", "type=DTC::Program");
 
     Q_PROPERTY( uint      ChanId          READ ChanId         WRITE setChanId        )
     Q_PROPERTY( QString   ChanNum         READ ChanNum        WRITE setChanNum       )

@@ -1032,6 +1032,9 @@ bool DataDirectProcessor::DDPost(QString    ddurl,        QString   &inputFile,
     LOG(VB_GENERAL, LOG_INFO, QString("Uncompressed to %1 bytes")
         .arg(uncompressed.size()));
 
+    if (uncompressed.size() == 0)
+        uncompressed = postdata;
+
     QFile file(inputFile);
     file.open(QIODevice::WriteOnly);
     file.write(uncompressed);

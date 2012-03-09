@@ -63,6 +63,8 @@ class UPNP_PUBLIC SoapSerializer : public XmlSerializer
             m_pXmlWriter->writeStartDocument( "1.0" );
 
             m_pXmlWriter->writeStartElement("http://schemas.xmlsoap.org/soap/envelope/", "Envelope" );
+
+            m_pXmlWriter->writeAttribute( "xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance" );
            // m_pXmlWriter->writeAttribute( "encodingStyle", "http://schemas.xmlsoap.org/soap/encoding/" );
 
             m_pXmlWriter->writeStartElement( "http://schemas.xmlsoap.org/soap/envelope/", "Body" );
@@ -70,6 +72,8 @@ class UPNP_PUBLIC SoapSerializer : public XmlSerializer
             m_pXmlWriter->writeStartElement( m_sRequestName + "Response" );
             m_pXmlWriter->writeAttribute( "xmlns", m_sNamespace );
 
+            m_bIsRoot = false;
+    
             sName = m_sRequestName + "Result";
         }
 };

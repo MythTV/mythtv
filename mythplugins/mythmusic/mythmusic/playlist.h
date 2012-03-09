@@ -30,7 +30,6 @@ struct PlaylistOptions
 {
     InsertPLOption insertPLOption;
     PlayPLOption playPLOption;
-    bool removeDups;
 };
 
 typedef QList<Metadata*> SongList;

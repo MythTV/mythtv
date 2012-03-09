@@ -36,7 +36,6 @@ using namespace std;
 #include "globalsettings.h"
 #include "audiogeneralsettings.h"
 #include "grabbersettings.h"
-#include "profilegroup.h"
 #include "playgroup.h"
 #include "networkcontrol.h"
 #include "dvdringbuffer.h"
@@ -910,11 +909,6 @@ static void TVMenuCallback(void *data, QString &selection)
     {
         startKeysSetup();
     }
-    else if (sel == "settings recording")
-    {
-        ProfileGroupEditor editor;
-        editor.exec();
-    }
     else if (sel == "settings playgroup")
     {
         PlayGroupEditor editor;
@@ -1328,6 +1322,9 @@ static void InitJumpPoints(void)
          "", "", showStatus);
      REG_JUMP(QT_TRANSLATE_NOOP("MythControls", "Previously Recorded"),
          "", "", startPrevious);
+
+     REG_JUMP(QT_TRANSLATE_NOOP("MythControls", "Standby Mode"),
+         "", "", standbyScreen);
 
      // Video
 

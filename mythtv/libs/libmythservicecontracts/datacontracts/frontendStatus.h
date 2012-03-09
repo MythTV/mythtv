@@ -11,10 +11,10 @@ namespace DTC
         Q_OBJECT
         Q_CLASSINFO("version", "1.0");
 
-        Q_CLASSINFO("State_type", "QString");
-        Q_CLASSINFO("ChapterTimes_type", "Chapter");
-        Q_CLASSINFO("SubtitleTracks_type", "Track");
-        Q_CLASSINFO("AudioTracks_type", "Track");
+        Q_CLASSINFO( "State", "type=QString");
+        Q_CLASSINFO( "ChapterTimes", "type=QString;name=Chapter");
+        Q_CLASSINFO( "SubtitleTracks", "type=QString;name=Track");
+        Q_CLASSINFO( "AudioTracks", "type=QString;name=Track");
 
         Q_PROPERTY(QVariantMap State READ State DESIGNABLE true)
         Q_PROPERTY(QVariantList ChapterTimes READ ChapterTimes DESIGNABLE true)

@@ -302,19 +302,25 @@ int dvdinput_setup(const char *path)
 #ifdef __APPLE__
   if (!dvdcss_library)
   {
-    CFURLRef    appUrlRef = CFBundleCopyBundleURL(CFBundleGetMainBundle());
-    CFStringRef macPath   = CFURLCopyFileSystemPath(appUrlRef,
-                                                    kCFURLPOSIXPathStyle);
-    char        path[FILENAME_MAX];
-
-    snprintf(path, FILENAME_MAX-1, "%s/Contents/Plugins/%s",
-             CFStringGetCStringPtr(macPath, CFStringGetSystemEncoding()),
-             CSS_LIB);
     fprintf(stderr, "libdvdread: dlopen(%s) failed.\n", CSS_LIB);
-    fprintf(stderr, "Trying %s\n", path);
-
-    dvdcss_library = dlopen(path, RTLD_LAZY);
-
+    CFURLRef     appUrlRef = CFBundleCopyBundleURL(CFBundleGetMainBundle());
+    CFStringRef  macPath   = CFURLCopyFileSystemPath(appUrlRef,
+                                                    kCFURLPOSIXPathStyle);
+    static char *paths[]   = {
+        "%s/Contents/Frameworks/%s",
+        "%s/Contents/PlugIns/%s", // proper spelling, important on case sensitive fs
+        "%s/Contents/Plugins/%s", // to be compatible with old bundler
+        NULL
+    };
+    char         path[FILENAME_MAX];
+    for (int i = 0; paths[i] != NULL && dvdcss_library == NULL; i++)
+    {
+        snprintf(path, FILENAME_MAX-1, paths[i],
+                 CFStringGetCStringPtr(macPath, CFStringGetSystemEncoding()),
+                 CSS_LIB);
+        fprintf(stderr, "Trying %s\n", path);
+        dvdcss_library = dlopen(path, RTLD_LAZY);
+    }
     CFRelease(appUrlRef);
     CFRelease(macPath);
   }

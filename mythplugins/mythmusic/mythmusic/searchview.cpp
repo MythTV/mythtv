@@ -295,8 +295,6 @@ void SearchView::ShowMenu(void)
 
         menu->AddItem(tr("More Options"), NULL, createMainMenu());
 
-        menu->AddItem(tr("Cancel"));
-
         MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
         MythDialogBox *menuPopup = new MythDialogBox(menu, popupStack, "actionmenu");

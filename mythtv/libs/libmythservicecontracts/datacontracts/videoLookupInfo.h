@@ -76,7 +76,7 @@ class SERVICE_PUBLIC VideoLookup : public QObject
     Q_OBJECT
     Q_CLASSINFO( "version"    , "1.0" );
 
-    Q_CLASSINFO( "Artwork_type", "DTC::ArtworkItem");
+    Q_CLASSINFO( "Artwork", "type=DTC::ArtworkItem");
 
     Q_PROPERTY( QString         Title           READ Title            WRITE setTitle          )
     Q_PROPERTY( QString         SubTitle        READ SubTitle         WRITE setSubTitle       )

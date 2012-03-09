@@ -15,6 +15,7 @@
 #include "mythlogging.h"
 #include "servicehost.h"
 #include "wsdl.h"
+#include "xsd.h"
 
 #define _MAX_PARAMS 256
 
@@ -280,7 +281,7 @@ bool ServiceHost::ProcessRequest( HTTPRequest *pRequest )
                     .arg(pRequest->m_sMethod) .arg(pRequest->m_sRawRequest));
 
             // --------------------------------------------------------------
-            // Check to see if they are requestion the WSDL service Definition
+            // Check to see if they are requesting the WSDL service Definition
             // --------------------------------------------------------------
 
             if (( pRequest->m_eType   == RequestTypeGet ) &&
@@ -293,6 +294,27 @@ bool ServiceHost::ProcessRequest( HTTPRequest *pRequest )
                 wsdl.GetWSDL( pRequest );
 
                 delete pService;
+                return true;
+            }
+
+            // --------------------------------------------------------------
+            // Check to see if they are requesting XSD - Type Definition
+            // --------------------------------------------------------------
+
+            if (( pRequest->m_eType   == RequestTypeGet ) &&
+                ( pRequest->m_sMethod == "xsd"          ))
+            {
+                if ( pRequest->m_mapParams.count() > 0)
+                {
+                    pService =  qobject_cast<Service*>(m_oMetaObject.newInstance());
+
+                    Xsd xsd;
+
+                    xsd.GetXSD( pRequest, pRequest->m_mapParams[ "type" ] );
+
+                    delete pService;
+                }
+
                 return true;
             }
 

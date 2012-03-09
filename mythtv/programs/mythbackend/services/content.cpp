@@ -1033,9 +1033,7 @@ DTC::LiveStreamInfo *Content::AddVideoLiveStream( int nId,
         return NULL;
     }
 
-    QFileInfo fInfo( sFileName );
-
-    return AddLiveStream( "Videos", fInfo.fileName(),
+    return AddLiveStream( "Videos", metadata->GetFilename(),
                           metadata->GetHost(), nMaxSegments, nWidth,
                           nHeight, nBitrate, nAudioBitrate, nSampleRate );
 }

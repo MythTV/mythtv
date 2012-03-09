@@ -9,6 +9,7 @@
 #include <QWaitCondition>
 #include <QMutex>
 #include <QMutexLocker>
+#include <QByteArray>
 
 #include "mythconfig.h"
 
@@ -41,36 +42,31 @@ using namespace std;
 class AudioBuffer
 {
   public:
-    AudioBuffer() : m_buffer(NULL), m_bufsize(0), m_len(0) {};
+    AudioBuffer() : m_buffer(QByteArray()), m_time(-1) {};
+    AudioBuffer(const AudioBuffer &old) : m_buffer(old.m_buffer),
+        m_time(old.m_time) {};
 
-    ~AudioBuffer()
-    {   
-        if (m_buffer)
-            delete [] m_buffer;
-    }
+    ~AudioBuffer() {};
 
-    void setBufsize(int bufsize)
+    void appendData(unsigned char *buffer, int len, long long time)
     {
-        m_bufsize = bufsize;
-        if (m_buffer)
-            delete [] m_buffer;
-        m_buffer = new unsigned char[m_bufsize];
-    }
-
-    void addData(unsigned char *buffer, int len, long long time)
-    {
-        setBufsize(len);
-
-        memcpy(m_buffer, buffer, len);
-        m_len = len;
-        m_offset = 0;
+        m_buffer.append((const char *)buffer, len);
         m_time = time;
     }
 
-    unsigned char *m_buffer;
-    int m_bufsize;
-    int m_len;
-    int m_offset;
+    void setData(unsigned char *buffer, int len, long long time)
+    {
+        m_buffer.clear();
+        appendData(buffer, len, time);
+    }
+
+    void clear(void)
+    {
+        m_buffer.clear();
+        m_time = -1;
+    }
+
+    QByteArray m_buffer;
     long long m_time;
 };
 
@@ -136,12 +132,39 @@ class AudioReencodeBuffer : public AudioOutput
             return true;
 
         QMutexLocker locker(&m_bufferMutex);
-        AudioBuffer *ab = new AudioBuffer;
+        AudioBuffer *ab;
+
+        if (m_audioFrameSize)
+        {
+            int currLen = m_saveBuffer.m_buffer.size();
+            if (currLen)
+            {
+                ab = new AudioBuffer(m_saveBuffer);
+                m_saveBuffer.clear();
+            }
+            else
+                ab = new AudioBuffer;
+
+            int overage;
+
+            if ((overage = (currLen + len) % m_audioFrameSize))
+            {
+                long long newtime = timecode + ((len / m_bytes_per_frame) /
+                                                (m_eff_audiorate / 1000));
+                len -= overage;
+                m_saveBuffer.setData(&((unsigned char *)buffer)[len], overage,
+                                     newtime);
+            }
+        }
+        else
+        {
+            ab = new AudioBuffer;
+        }
 
         m_last_audiotime = timecode + ((len / m_bytes_per_frame) /
                                        (m_eff_audiorate / 1000));
+        ab->appendData((unsigned char *)buffer, len, m_last_audiotime);
 
-        ab->addData((unsigned char *)buffer, len, m_last_audiotime);
         m_bufferList.append(ab);
 
         return true;
@@ -193,7 +216,7 @@ class AudioReencodeBuffer : public AudioOutput
             AudioBuffer *ab = *it;
 
             if (ab->m_time <= time)
-                samples += ab->m_len;
+                samples += ab->m_buffer.size();
             else
                 break;
         }
@@ -321,6 +344,7 @@ class AudioReencodeBuffer : public AudioOutput
     bool                m_initpassthru;
     QMutex              m_bufferMutex;
     QList<AudioBuffer *> m_bufferList;
+    AudioBuffer          m_saveBuffer;
 };
 
 // Cutter object is used in performing clean cutting. The
@@ -1448,6 +1472,21 @@ int Transcode::TranscodeFile(const QString &inputname,
         if (!arb->m_passthru)
             audio_codec_name = "raw";
 
+        // If cutlist is used then get info on first uncut frame
+        if (honorCutList && fifo_info)
+        {
+            bool is_key;
+            int did_ff;
+            frm_dir_map_t::iterator dm_iter;
+            player->TranscodeGetNextFrame(dm_iter, did_ff, is_key, true);
+
+            QSize buf_size = player->GetVideoBufferSize();
+            video_width = buf_size.width();
+            video_height = buf_size.height();
+            video_aspect = player->GetVideoAspect();
+            video_frame_rate = player->GetFrameRate();
+        }
+
         // Display details of the format of the fifo data.
         LOG(VB_GENERAL, LOG_INFO,
             QString("FifoVideoWidth %1").arg(video_width));
@@ -1646,7 +1685,8 @@ int Transcode::TranscodeFile(const QString &inputname,
 
                 if (!cutter ||
                     !cutter->InhibitUseAudioFrames(1, &totalAudio))
-                    fifow->FIFOWrite(1, ab->m_buffer, ab->m_len);
+                    fifow->FIFOWrite(1, ab->m_buffer.data(),
+                                     ab->m_buffer.size());
 
                 delete ab;
             }
@@ -1853,12 +1893,13 @@ int Transcode::TranscodeFile(const QString &inputname,
                 for (loop = 0; loop < count; loop++)
                 {
                     AudioBuffer *ab = arb->GetData();
+                    unsigned char *buf = (unsigned char *)ab->m_buffer.data();
                     if (avfMode)
                     {
                         if (did_ff != 1)
                         {
-                            avfw->WriteAudioFrame(ab->m_buffer,
-                                audioFrame, ab->m_time - timecodeOffset);
+                            avfw->WriteAudioFrame(buf, audioFrame,
+                                                  ab->m_time - timecodeOffset);
 
                             if (avfw2)
                             {
@@ -1869,8 +1910,8 @@ int Transcode::TranscodeFile(const QString &inputname,
                                         avfw->GetTimecodeOffset());
                                 }
 
-                                avfw2->WriteAudioFrame(ab->m_buffer,
-                                    audioFrame, ab->m_time - timecodeOffset);
+                                avfw2->WriteAudioFrame(buf, audioFrame,
+                                                   ab->m_time - timecodeOffset);
                             }
 
                             ++audioFrame;
@@ -1878,8 +1919,8 @@ int Transcode::TranscodeFile(const QString &inputname,
                     }
                     else
                     {
-                        nvr->SetOption("audioframesize", ab->m_len);
-                        nvr->WriteAudio(ab->m_buffer, audioFrame++,
+                        nvr->SetOption("audioframesize", ab->m_buffer.size());
+                        nvr->WriteAudio(buf, audioFrame++,
                                         ab->m_time - timecodeOffset);
                         if (nvr->IsErrored())
                         {
@@ -1898,7 +1939,7 @@ int Transcode::TranscodeFile(const QString &inputname,
                     }
 
                     ++buffersConsumed;
-                    bytesConsumed += ab->m_len;
+                    bytesConsumed += ab->m_buffer.size();
 
                     delete ab;
                 }

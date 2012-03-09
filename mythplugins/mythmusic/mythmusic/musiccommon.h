@@ -87,6 +87,7 @@ class MPUBLIC MusicCommon : public MythScreenType
     MythMenu* createRepeatMenu(void);
     MythMenu* createShuffleMenu(void);
     MythMenu* createVisualizerMenu(void);
+    MythMenu* createPlaylistOptionsMenu(void);
 
     void playlistItemClicked(MythUIButtonListItem *item);
     void playlistItemVisible(MythUIButtonListItem *item);
@@ -102,7 +103,7 @@ class MPUBLIC MusicCommon : public MythScreenType
 
   protected:
     void showExitMenu(void);
-    void showPlaylistOptionsMenu(void);
+    void showPlaylistOptionsMenu(bool addMainMenu = false);
 
     QString getTimeString(int exTime, int maxTime);
     void updateProgressBar(void);
@@ -129,7 +130,6 @@ class MPUBLIC MusicCommon : public MythScreenType
     void cycleVisualizer(void);
     void switchVisualizer(const QString &visual);
     void switchVisualizer(int visual);
-    void resetVisualiserTimer(void);
 
     void playFirstTrack();
     bool restorePosition(int trackID);
@@ -144,8 +144,6 @@ class MPUBLIC MusicCommon : public MythScreenType
 
     QStringList            m_visualModes;
     unsigned int           m_currentVisual;
-    int                    m_visualModeDelay;
-    QTimer                *m_visualModeTimer;
 
     bool                   m_moveTrackMode;
     bool                   m_movingTrack;
@@ -189,8 +187,6 @@ class MPUBLIC MusicCommon : public MythScreenType
     MythUIText            *m_volumeText;
 
     MythUIProgressBar     *m_playlistProgress;
-    MythUIText            *m_playlistProgressText;
-    MythUIText            *m_playlistLengthText;
 
     MythUIButton          *m_prevButton;
     MythUIButton          *m_rewButton;

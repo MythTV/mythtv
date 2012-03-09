@@ -314,8 +314,6 @@ bool BookmarkManager::keyPressEvent(QKeyEvent *event)
                 m_menuPopup->AddButton(tr("Clear Marked"), SLOT(slotClearMarked()));
             }
 
-            m_menuPopup->AddButton(tr("Cancel"));
-
             popupStack->AddScreen(m_menuPopup);
         }
         else if (action == "INFO")

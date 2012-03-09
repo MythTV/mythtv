@@ -590,6 +590,7 @@ class MTV_PUBLIC MythPlayer
     mutable QMutex decoderSeekLock;
     bool           totalDecoderPause;
     bool           decoderPaused;
+    bool           inJumpToProgramPause;
     bool           pauseDecoder;
     bool           unpauseDecoder;
     bool volatile  killdecoder;

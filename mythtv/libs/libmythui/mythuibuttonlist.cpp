@@ -3440,8 +3440,13 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool selecte
 
         if (image)
         {
-            image->SetFilename(imagefile_it.value());
-            image->Load();
+            if (!imagefile_it.value().isEmpty())
+            {
+                image->SetFilename(imagefile_it.value());
+                image->Load();
+            }
+            else
+                image->Reset();
         }
 
         ++imagefile_it;
@@ -3455,7 +3460,12 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool selecte
                 (buttonstate->GetChild(image_it.key()));
 
         if (image)
-            image->SetImage(image_it.value());
+        {
+            if (image_it.value())
+                image->SetImage(image_it.value());
+            else
+                image->Reset();
+        }
 
         ++image_it;
     }

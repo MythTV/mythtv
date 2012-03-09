@@ -37,7 +37,16 @@ void MythFrontendCommandLineParser::LoadArguments(void)
         "Start the frontend within specified plugin.", "")
             ->SetGroup("Startup Behavior")
             ->SetBlocks("jumppoint");
-        
+
+    add(QStringList( QStringList() << "-G" << "--get-setting" ),
+        "getsetting", "", "", "")
+            ->SetRemoved("Use the Services API instead.", "0.25");
+    add(QStringList( QStringList() << "-u" << "--upgrade-schema" ),
+        "upgradeschema", "", "", "")
+            ->SetRemoved("The frontend is no longer allowed to update\n"
+               "          the primary database schema. Use mythtv-setup\n"
+               "          or restart your primary backend to have it\n"
+               "          perform the task automatically.", "0.25");
 }
 
 QString MythFrontendCommandLineParser::GetHelpHeader(void) const

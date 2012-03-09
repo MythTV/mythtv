@@ -242,7 +242,6 @@ void AudioOutputPulseAudio::WriteAudio(uchar *aubuf, int size)
         int write_status = PA_ERR_INVALID;
         size_t to_write = size;
         unsigned char *buf_ptr = aubuf;
-        pa_context_state_t cstate;
 
         pa_threaded_mainloop_lock(mainloop);
         while (to_write > 0)

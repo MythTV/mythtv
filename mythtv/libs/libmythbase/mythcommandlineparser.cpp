@@ -144,8 +144,8 @@ const char* NamedOptType(int type)
 CommandLineArg::CommandLineArg(QString name, QVariant::Type type,
                    QVariant def, QString help, QString longhelp) :
     ReferenceCounter(), m_given(false), m_converted(false), m_name(name),
-    m_group(""), m_deprecated(""), m_type(type), m_default(def), m_help(help),
-    m_longhelp(longhelp)
+    m_group(""), m_deprecated(""), m_removed(""), m_removedversion(""),
+    m_type(type), m_default(def), m_help(help), m_longhelp(longhelp)
 {
     if ((m_type != QVariant::String) && (m_type != QVariant::StringList) &&
             (m_type != QVariant::Map))
@@ -160,7 +160,8 @@ CommandLineArg::CommandLineArg(QString name, QVariant::Type type,
  */
 CommandLineArg::CommandLineArg(QString name, QVariant::Type type, QVariant def)
   : ReferenceCounter(), m_given(false), m_converted(false), m_name(name),
-    m_group(""), m_deprecated(""), m_type(type), m_default(def)
+    m_group(""), m_deprecated(""), m_removed(""), m_removedversion(""),
+    m_type(type), m_default(def)
 {
     if ((m_type != QVariant::String) && (m_type != QVariant::StringList) &&
             (m_type != QVariant::Map))
@@ -176,7 +177,8 @@ CommandLineArg::CommandLineArg(QString name, QVariant::Type type, QVariant def)
  */
 CommandLineArg::CommandLineArg(QString name) :
     ReferenceCounter(), m_given(false), m_converted(false), m_name(name),
-    m_deprecated(""), m_type(QVariant::Invalid)
+    m_deprecated(""), m_removed(""), m_removedversion(""),
+    m_type(QVariant::Invalid)
 {
 }
 
@@ -242,6 +244,10 @@ QString CommandLineArg::GetHelpString(int off, QString group, bool force) const
         // option is marked as deprecated, do not show
         return helpstr;
 
+    if (!m_removed.isEmpty())
+        // option is marked as removed, do not show
+        return helpstr;
+
     QString pad;
     pad.fill(' ', off);
 
@@ -284,14 +290,12 @@ QString CommandLineArg::GetLongHelpString(QString keyword) const
     if (!m_keywords.contains(keyword))
         return helpstr;
 
+    // argument has been marked as removed, so warn user of such
+    if (!m_removed.isEmpty())
+        PrintRemovedWarning(keyword);
     // argument has been marked as deprecated, so warn user of such
-    if (!m_deprecated.isEmpty())
-        cerr << QString("****************************************************\n"
-                        " WARNING: %1 has been deprecated\n"
-                        "          %2\n"
-                        "****************************************************\n\n")
-                    .arg(keyword).arg(m_deprecated)
-                    .toLocal8Bit().constData();
+    else if (!m_deprecated.isEmpty())
+        PrintDeprecatedWarning(keyword);
 
     msg << "Option:      " << keyword << endl << endl;
 
@@ -652,6 +656,17 @@ CommandLineArg* CommandLineArg::SetDeprecated(QString depstr)
     if (depstr.isEmpty())
         depstr = "and will be removed in a future version.";
     m_deprecated = depstr;
+    return this;
+}
+
+/** \brief Set option as removed
+ */
+CommandLineArg* CommandLineArg::SetRemoved(QString remstr, QString remver)
+{
+    if (remstr.isEmpty())
+        remstr = "and is no longer available in this version.";
+    m_removed = remstr;
+    m_removedversion = remver;
     return this;
 }
 
@@ -1063,6 +1078,34 @@ void CommandLineArg::PrintVerbose(void) const
     }
 }
 
+/** \brief Internal use. Print warning for removed option.
+ */
+void CommandLineArg::PrintRemovedWarning(QString &keyword) const
+{
+    QString warn = QString("%1 has been removed").arg(keyword);
+    if (!m_removedversion.isEmpty())
+        warn += QString(" as of MythTV %1").arg(m_removedversion);
+
+    cerr << QString("****************************************************\n"
+                    " WARNING: %1\n"
+                    "          %2\n"
+                    "****************************************************\n\n")
+                .arg(warn).arg(m_removed)
+                .toLocal8Bit().constData();
+}
+
+/** \brief Internal use. Print warning for deprecated option.
+ */
+void CommandLineArg::PrintDeprecatedWarning(QString &keyword) const
+{
+    cerr << QString("****************************************************\n"
+                    " WARNING: %1 has been deprecated\n"
+                    "          %2\n"
+                    "****************************************************\n\n")
+                .arg(keyword).arg(m_deprecated)
+                .toLocal8Bit().constData();
+}
+
 /** \class MythCommandLineParser
  *  \brief Parent class for defining application command line parsers
  *
@@ -1457,14 +1500,16 @@ bool MythCommandLineParser::Parse(int argc, const char * const * argv)
         else
             argdef = m_optionedArgs[opt];
 
+        // argument has been marked as removed, warn user and fail
+        if (!argdef->m_removed.isEmpty())
+        {
+            argdef->PrintRemovedWarning(opt);
+            return false;
+        }
+
         // argument has been marked as deprecated, warn user
         if (!argdef->m_deprecated.isEmpty())
-            cerr << QString("****************************************************\n"
-                            " WARNING: %1 has been deprecated\n"
-                            "          %2\n"
-                            "****************************************************\n\n")
-                        .arg(opt).arg(argdef->m_deprecated)
-                        .toLocal8Bit().constData();
+            argdef->PrintDeprecatedWarning(opt);
 
         if (m_verbose)
             cerr << "name: " << argdef->GetName().toLocal8Bit().constData()
@@ -2243,7 +2288,7 @@ void MythCommandLineParser::addUPnP(void)
 }
 
 /** \brief Canned argument definition for all logging options, including
- *  --verbose, --logfile, --logpath, --quiet, --loglevel, --syslog
+ *  --verbose, --logpath, --quiet, --loglevel, --syslog
  *  and --nodblog
  */
 void MythCommandLineParser::addLogging(
@@ -2264,16 +2309,13 @@ void MythCommandLineParser::addLogging(
         "This option takes an unsigned value corresponding "
         "to the bitwise log verbosity operator.")
                 ->SetGroup("Logging");
-    add(QStringList( QStringList() << "-l" << "--logfile" << "--logpath" ), 
-        "logpath", "",
-        "Writes logging messages to a file at logpath.\n"
-        "If a directory is given, a logfile will be created in that "
-        "directory with a filename of applicationName.date.pid.log.\n"
-        "If a full filename is given, that file will be used.\n"
+    add("--logpath", "logpath", "",
+        "Writes logging messages to a file in the directory logpath with "
+        "filenames in the format: applicationName.date.pid.log.\n"
         "This is typically used in combination with --daemon, and if used "
         "in combination with --pidfile, this can be used with log "
         "rotators, using the HUP call to inform MythTV to reload the "
-        "file (currently disabled).", "")
+        "file", "")
                 ->SetGroup("Logging");
     add(QStringList( QStringList() << "-q" << "--quiet"), "quiet", 0,
         "Don't log to the console (-q).  Don't log anywhere (-q -q)", "")
@@ -2291,6 +2333,15 @@ void MythCommandLineParser::addLogging(
                 ->SetGroup("Logging");
     add("--nodblog", "nodblog", false, "Disable database logging.", "")
                 ->SetGroup("Logging");
+
+    add(QStringList( QStringList() << "-l" << "--logfile" ),
+        "logfile", "", "", "")
+                ->SetGroup("Logging")
+                ->SetRemoved("This option has been removed as part of "
+            "rewrite of the logging interface. Please update your init "
+            "scripts to use --syslog to interface with your system's "
+            "existing system logging daemon, or --logpath to specify a "
+            "dirctory for MythTV to write its logs to.", "0.25");
 }
 
 /** \brief Canned argument definition for --pidfile
@@ -2301,7 +2352,7 @@ void MythCommandLineParser::addPIDFile(void)
             "Write PID of application to filename.",
             "Write the PID of the currently running process as a single "
             "line to this file. Used for init scripts to know what "
-            "process to terminate, and with --logfile and log rotators "
+            "process to terminate, and with log rotators "
             "to send a HUP signal to process to have it re-open files.");
 }
 
@@ -2324,8 +2375,7 @@ void MythCommandLineParser::addInFile(bool addOutFile)
         add("--outfile", "outfile", "", "Output file URI", "");
 }
 
-/** \brief Helper utility for logging interface to pull path to log file
- *  from --logfile, or generate one from --logpath
+/** \brief Helper utility for logging interface to pull path from --logpath
  */
 QString MythCommandLineParser::GetLogFilePath(void)
 {
@@ -2339,20 +2389,18 @@ QString MythCommandLineParser::GetLogFilePath(void)
     QString filepath;
 
     QFileInfo finfo(logfile);
-    if (finfo.isDir())
+    if (!finfo.isDir())
     {
-        SetValue("islogpath", true);
-        logdir  = finfo.filePath();
-        logfile = QCoreApplication::applicationName() + "." +
-            MythDate::toString(MythDate::current(), MythDate::kFilename) +
-            QString(".%1").arg(pid) + ".log";
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("%1 is not a directory, disabling logfiles")
+            .arg(logfile));
+	return QString();
     }
-    else
-    {
-        SetValue("islogpath", false);
-        logdir  = finfo.path();
-        logfile = finfo.fileName();
-    }
+
+    logdir  = finfo.filePath();
+    logfile = QCoreApplication::applicationName() + "." +
+              QDateTime::currentDateTime().toString("yyyyMMddhhmmss") +
+              QString(".%1").arg(pid) + ".log";
 
     SetValue("logdir", logdir);
     SetValue("logfile", logfile);
@@ -2455,7 +2503,7 @@ int MythCommandLineParser::ConfigureLogging(QString mask, unsigned int progress)
         QString("Enabled verbose msgs: %1").arg(verboseString));
 
     QString logfile = GetLogFilePath();
-    bool propagate = toBool("islogpath");
+    bool propagate = !logfile.isEmpty();
 
     if (toBool("daemon"))
         quiet = max(quiet, 1);

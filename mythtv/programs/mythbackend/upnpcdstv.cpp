@@ -405,6 +405,13 @@ void UPnpCDSTv::AddItem( const UPnpCDSRequest    *pRequest,
     QString sURI      = QString( "%1GetRecording%2").arg( sURIBase   )
                                                     .arg( sURIParams );
 
+    // Sony BDPS370 requires a DLNA Profile Name
+    // FIXME: detection to determine the correct DLNA Profile Name
+    if (sMimeType == "video/mpeg")
+    {
+        sProtocol += ";DLNA.ORG_PN=MPEG_TS_SD_NA_ISO";
+    }
+
     Resource *pRes = pItem->AddResource( sProtocol, sURI );
 
     uint uiStart = dtProgStart.toTime_t();

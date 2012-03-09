@@ -27,7 +27,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 XmlSerializer::XmlSerializer( QIODevice *pDevice, const QString &sRequestName )
-              : PropertiesAsAttributes( true )
+              : m_bIsRoot( true ), PropertiesAsAttributes( true )
 {
     m_pXmlWriter   = new QXmlStreamWriter( pDevice );
     m_sRequestName = sRequestName;
@@ -81,6 +81,13 @@ void XmlSerializer::EndSerialize()
 void XmlSerializer::BeginObject( const QString &sName, const QObject  *pObject )
 {
     m_pXmlWriter->writeStartElement( sName );
+
+    if (m_bIsRoot)
+    {
+        m_pXmlWriter->writeAttribute( "xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance" );
+
+        m_bIsRoot = false;
+    }
 
     const QMetaObject *pMeta = pObject->metaObject();
 
@@ -161,8 +168,12 @@ void XmlSerializer::RenderValue( const QString &sName, const QVariant &vValue )
 
         case QVariant::DateTime:
         {
-            m_pXmlWriter->writeCharacters( vValue.toDateTime().toUTC()
-                                               .toString(Qt::ISODate) );
+            QDateTime dt( vValue.toDateTime() );
+
+            if (dt.isNull())
+                m_pXmlWriter->writeAttribute( "xsi:nil", "true" );
+
+            m_pXmlWriter->writeCharacters( dt.toUTC().toString(Qt::ISODate) );
             break;
         }
 
@@ -232,8 +243,20 @@ void XmlSerializer::RenderMap( const QString &sName, const QVariantMap &map )
         it.next();
 
         m_pXmlWriter->writeStartElement( sItemName );
+
+        m_pXmlWriter->writeStartElement( "Key" );
+        m_pXmlWriter->writeCharacters( it.key() );
+        m_pXmlWriter->writeEndElement();
+
+        m_pXmlWriter->writeStartElement( "Value" );
+        RenderValue( sItemName, it.value() );
+        m_pXmlWriter->writeEndElement();
+
+/*
         m_pXmlWriter->writeAttribute   ( "key", it.key() );
-        m_pXmlWriter->writeCharacters  ( it.value().toString() );
+        RenderValue( sItemName, it.value() );
+        //m_pXmlWriter->writeCharacters  ( it.value().toString() );
+*/
         m_pXmlWriter->writeEndElement();
     }
 }
@@ -264,12 +287,50 @@ QString XmlSerializer::GetContentName( const QString        &sName,
                                        const QMetaObject   *pMetaObject,
                                        const QMetaProperty *pMetaProp )
 {
-    QString sMethodClassInfo = sName + "_type";
+    // Try to read Name or TypeName from classinfo metadata.
 
-    int nClassIdx = pMetaObject->indexOfClassInfo( sMethodClassInfo.toAscii() );
+    int nClassIdx = pMetaObject->indexOfClassInfo( sName.toAscii() );
 
     if (nClassIdx >=0)
-        return GetItemName( pMetaObject->classInfo( nClassIdx ).value() );
+    {
+        QString     sOptionData = pMetaObject->classInfo( nClassIdx ).value();
+        QStringList sOptions    = sOptionData.split( ';' );
+        
+        QString sNameOption = FindOptionValue( sOptions, "name" );
 
-    return sName;
+        if (sNameOption.isEmpty())
+            sNameOption = FindOptionValue( sOptions, "type" );
+
+        if (!sNameOption.isEmpty())
+            return GetItemName(  sNameOption );
+    }
+
+    // Neither found, so lets use the type name (slightly modified).
+
+    QString sTypeName( sName );    
+
+    if (sName.at(0) == 'Q')        
+        sTypeName = sName.mid( 1 );    
+
+    sTypeName.remove( "DTC::"    );    
+    sTypeName.remove( QChar('*') );
+
+    return sTypeName;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////////
+
+QString XmlSerializer::FindOptionValue( const QStringList &sOptions, const QString &sName )
+{
+    QString sKey = sName + "=";
+
+    for (int nIdx = 0; nIdx < sOptions.size(); ++nIdx)
+    {
+        if (sOptions.at( nIdx ).startsWith( sKey ))
+            return sOptions.at( nIdx ).mid( sKey.length() );
+    }
+
+    return QString();
 }

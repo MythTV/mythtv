@@ -83,7 +83,7 @@ QMAKE_LFLAGS_SHLIB += $${FREETYPE_LIBS}
 
 macx {
     # Mac OS X Frameworks
-    FWKS = AGL ApplicationServices Carbon Cocoa CoreFoundation OpenGL QuickTime IOKit
+    FWKS = AGL ApplicationServices Carbon Cocoa CoreServices CoreFoundation OpenGL QuickTime IOKit
     using_quartz_video {
         FWKS += QuartzCore
     } else {

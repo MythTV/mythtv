@@ -338,8 +338,6 @@ bool MythBrowser::keyPressEvent(QKeyEvent *event)
                 m_menuPopup->AddButton(tr("Delete Tab"), SLOT(slotDeleteTab()));
 
             m_menuPopup->AddButton(tr("Add Bookmark"), SLOT(slotAddBookmark()));
-
-            m_menuPopup->AddButton(tr("Cancel"));
         }
         else if (action == "INFO")
         {

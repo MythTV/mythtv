@@ -22,7 +22,7 @@ class SERVICE_PUBLIC VideoSourceList : public QObject
     // A Q_CLASSINFO entry with "<PropName>_type" as the key
     // and the type name as the value
 
-    Q_CLASSINFO( "VideoSources_type", "DTC::VideoSource");
+    Q_CLASSINFO( "VideoSources", "type=DTC::VideoSource");
 
     Q_PROPERTY( QDateTime    AsOf           READ AsOf            WRITE setAsOf           )
     Q_PROPERTY( QString      Version        READ Version         WRITE setVersion        )

@@ -435,7 +435,7 @@ bool MythUITextEdit::keyPressEvent(QKeyEvent *event)
                 character = character.toUpper();
             else
                 character = character.toLower();
-            LOG(VB_GUI, LOG_DEBUG, QString("Founding match for dead-key combo - %1").arg(character));
+            LOG(VB_GUI, LOG_DEBUG, QString("Found match for dead-key combo - %1").arg(character));
         }
         m_composeKey = 0;
     }
