@@ -138,6 +138,8 @@ void IPTVStreamHandler::run(void)
         // can set some socket options
         int fd = socket(AF_INET, SOCK_DGRAM, 0); // create IPv4 socket
         int buf_size = 2 * 1024 * max(m_tuning.GetBitrate(i)/1000, 500U);
+        if (!m_tuning.GetBitrate(i))
+            buf_size = 2 * 1024 * 1024;
         int ok = setsockopt(fd, SOL_SOCKET, SO_RCVBUF,
                             (char *)&buf_size, sizeof(buf_size));
         if (ok)

@@ -87,6 +87,16 @@ class MTV_PUBLIC IPTVTuningData
             .arg(GetFECURL1().toString());
     }
 
+    bool operator==(const IPTVTuningData &other) const
+    {
+        return GetDeviceName() == other.GetDeviceName();
+    }
+
+    bool operator!=(const IPTVTuningData &other) const
+    {
+        return GetDeviceName() != other.GetDeviceName();
+    }
+
     QUrl GetDataURL(void) const { return m_data_url; }
     QUrl GetFECURL0(void) const { return m_fec_url0; }
     QUrl GetFECURL1(void) const { return m_fec_url1; }

@@ -26,6 +26,7 @@ class IPTVRecorder : public DTVRecorder
     bool IsOpen(void) const;
 
     virtual void SetStreamData(MPEGStreamData*); // DTVRecorder
+    virtual bool PauseAndWait(int timeout = 100); // RecorderBase
 
     virtual void run(void); // QRunnable
 

@@ -53,7 +53,7 @@ class DTVSignalMonitor : public SignalMonitor,
 
     /// Sets the MPEG stream data for DTVSignalMonitor to use,
     /// and connects the table signals to the monitor.
-    void SetStreamData(MPEGStreamData* data);
+    virtual void SetStreamData(MPEGStreamData* data);
 
     /// Returns the MPEG stream data if it exists
     MPEGStreamData *GetStreamData()      { return stream_data; }

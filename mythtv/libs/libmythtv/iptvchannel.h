@@ -41,6 +41,9 @@ class IPTVChannel : public DTVChannel
     virtual bool IsIPTV(void) const { return true; } // DTVChannel
 
   private:
+    void SetStreamDataInternal(MPEGStreamData*);
+
+  private:
     mutable QMutex m_lock;
     volatile bool m_open;
     IPTVTuningData m_last_tuning;

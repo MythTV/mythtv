@@ -57,10 +57,15 @@ void IPTVSignalMonitor::Stop(void)
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + "Stop() -- begin");
     SignalMonitor::Stop();
-    if (GetStreamData())
-        GetChannel()->SetStreamData(GetStreamData());
+    GetChannel()->SetStreamData(NULL);
     m_streamHandlerStarted = false;
     LOG(VB_CHANNEL, LOG_INFO, LOC + "Stop() -- end");
+}
+
+void IPTVSignalMonitor::SetStreamData(MPEGStreamData *data)
+{
+    DTVSignalMonitor::SetStreamData(data);
+    GetChannel()->SetStreamData(GetStreamData());
 }
 
 void IPTVSignalMonitor::HandlePAT(const ProgramAssociationTable *pat)

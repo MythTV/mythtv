@@ -18,8 +18,11 @@ class IPTVSignalMonitor : public DTVSignalMonitor
 
     void Stop(void);
 
+    // DTVSignalMonitor
+    virtual void SetStreamData(MPEGStreamData *data);
+
     // MPEG
-    void HandlePAT(const ProgramAssociationTable*);
+    virtual void HandlePAT(const ProgramAssociationTable*);
 
   protected:
     IPTVSignalMonitor(void);

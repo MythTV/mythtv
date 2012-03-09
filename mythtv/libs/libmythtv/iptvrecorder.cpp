@@ -10,6 +10,7 @@
 #include "mpegstreamdata.h"
 #include "iptvrecorder.h"
 #include "iptvchannel.h"
+#include "tv_rec.h"
 
 #define LOC QString("IPTVRec: ")
 
@@ -59,8 +60,35 @@ void IPTVRecorder::Close(void)
 void IPTVRecorder::SetStreamData(MPEGStreamData *data)
 {
     DTVRecorder::SetStreamData(data);
-    if (m_open)
+    if (m_open && !IsPaused())
         m_channel->SetStreamData(_stream_data);
+}
+
+bool IPTVRecorder::PauseAndWait(int timeout)
+{
+    QMutexLocker locker(&pauseLock);
+    if (request_pause)
+    {
+        if (!IsPaused(true))
+        {
+            m_channel->SetStreamData(NULL);
+            paused = true;
+            pauseWait.wakeAll();
+            if (tvrec)
+                tvrec->RecorderPaused();
+        }
+
+        unpauseWait.wait(&pauseLock, timeout);
+    }
+
+    if (!request_pause && IsPaused(true))
+    {
+        m_channel->SetStreamData(_stream_data);
+        paused = false;
+        unpauseWait.wakeAll();
+    }
+
+    return IsPaused(true);
 }
 
 void IPTVRecorder::run(void)
