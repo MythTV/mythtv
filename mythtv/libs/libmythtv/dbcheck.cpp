@@ -1605,6 +1605,7 @@ NULL
 
     if (dbver == "1286")
     {
+        LOG(VB_GENERAL, LOG_CRIT, "Upgrading to MythTV schema version 1287");
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("SELECT cardid, videodevice "
                       "FROM capturecard "
@@ -1831,6 +1832,7 @@ NULL
 
     if (dbver == "1295")
     {
+        LOG(VB_GENERAL, LOG_CRIT, "Upgrading to MythTV schema version 1296");
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("SELECT data, hostname "
                       "FROM settings "
@@ -1921,6 +1923,7 @@ NULL
 
     if (dbver == "1298")
     {
+        LOG(VB_GENERAL, LOG_CRIT, "Upgrading to MythTV schema version 1299");
         QString queryStr;
         if (gCoreContext->GetNumSetting("AutoExpireInsteadOfDelete", 0))
         {
