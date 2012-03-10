@@ -245,6 +245,7 @@ int main(int argc, char *argv[])
                 return GENERIC_EXIT_INVALID_CMDLINE;
             }
 
+            uint64_t last = 0, start, end;
             QStringList cutlist = cmdline.toStringList("usecutlist", " ");
             QStringList::iterator it;
             for (it = cutlist.begin(); it != cutlist.end(); ++it)
@@ -253,46 +254,39 @@ int main(int argc, char *argv[])
                     (*it).split("-", QString::SkipEmptyParts);
                 if (startend.size() == 2)
                 {
-                    cerr << "Cutting from: " << startend.first().toULongLong()
-                         << " to: " << startend.last().toULongLong() << endl;
-                    deleteMap[startend.first().toULongLong()] = MARK_CUT_START;
-                    deleteMap[startend.last().toULongLong()] = MARK_CUT_END;
+                    start = startend.first().toULongLong();
+                    end = startend.last().toULongLong();
+
+                    if (cmdline.toBool("inversecut"))
+                    {
+                        cerr << "Cutting from: " << last
+                             << " to: " << start << "\n";
+                        deleteMap[start] = MARK_CUT_END;
+                        deleteMap[end] = MARK_CUT_START;
+                        last = end;
+                    }
+                    else
+                    {
+                        cerr << "Cutting from: " << start
+                             << " to: " << end << "\n";
+                        deleteMap[start] = MARK_CUT_START;
+                        deleteMap[end] = MARK_CUT_END;
+                    }
                 }
             }
-        }
-    }
 
-    if (cmdline.toBool("inversecut"))
-    {
-        if (!cmdline.toBool("inputfile"))
-        {
-            cerr << "Inversed cutlists are only allowed when using" << endl
-                 << "the --infile option." << endl;
-            return GENERIC_EXIT_INVALID_CMDLINE;
-        }
-
-        deleteMap[0] = MARK_CUT_START;
-
-        uint64_t last = 0;
-        QStringList cutlist = cmdline.toStringList("inversecut", " ");
-        QStringList::iterator it;
-        for (it = cutlist.begin(); it != cutlist.end(); ++it)
-        {
-            QStringList startend = (*it).split(
-                        "-", QString::SkipEmptyParts);
-            if (startend.count() == 2)
+            if (cmdline.toBool("inversecut"))
             {
-                cerr << "Cutting from: " << last
-                     << " to: "
-                     << startend.first().toULongLong() <<"\n";
-                deleteMap[startend.first().toULongLong()] = MARK_CUT_END;
-                deleteMap[startend.last().toULongLong()] = MARK_CUT_START;
-                last = startend.last().toInt();
+                deleteMap[0] = MARK_CUT_START;
+                deleteMap[999999999] = MARK_CUT_END;
             }
         }
-        cerr << "Cutting from: " << last
-             << " to the end\n";
-        deleteMap[999999999] = MARK_CUT_END;
+        else if (cmdline.toBool("inversecut"))
+        {
+            cerr << "Cutlist inversion requires an external cutlist be" << endl
+                 << "provided using the --honorcutlist option." << endl;
+            return GENERIC_EXIT_INVALID_CMDLINE;
+        }
     }
 
     if (cmdline.toBool("cleancut"))
