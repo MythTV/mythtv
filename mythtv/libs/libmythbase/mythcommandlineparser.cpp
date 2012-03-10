@@ -2175,7 +2175,8 @@ void MythCommandLineParser::allowPassthrough(bool allow)
 void MythCommandLineParser::addHelp(void)
 {
     add(QStringList( QStringList() << "-h" << "--help" << "--usage" ),
-            "showhelp", "", "Display this help printout.",
+            "showhelp", "", "Display this help printout, or give detailed "
+                            "information of selected option.",
             "Displays a list of all commands available for use with "
             "this application. If another option is provided as an "
             "argument, it will provide detailed information on that "
