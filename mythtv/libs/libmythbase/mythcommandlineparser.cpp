@@ -251,6 +251,8 @@ QString CommandLineArg::GetHelpString(int off, QString group, bool force) const
     QString pad;
     pad.fill(' ', off);
 
+    cerr << "adding description for " << GetKeywordString().toLocal8Bit().constData() << endl;
+
     // print the first line with the available keywords
     QStringList hlist = m_help.split('\n');
     wrapList(hlist, termwidth-off);
@@ -263,6 +265,8 @@ QString CommandLineArg::GetHelpString(int off, QString group, bool force) const
     QStringList::const_iterator i1;
     for (i1 = hlist.begin() + 1; i1 != hlist.end(); ++i1)
         msg << pad << *i1 << endl;
+
+    cerr << "  running through " << m_children.count() << " children" << endl;
 
     // loop through any child arguments to print underneath
     QList<CommandLineArg*>::const_iterator i2;
@@ -1399,8 +1403,11 @@ bool MythCommandLineParser::Parse(int argc, const char * const * argv)
     QByteArray val;
     CommandLineArg *argdef;
 
+    // reconnect interdependencies between command line options
+    if (!ReconcileLinks())
+        return false;
+
     // loop through command line arguments until all are spent
-    QMap<QString, CommandLineArg>::const_iterator i;
     for (int argpos = 1; argpos < argc; ++argpos)
     {
 
@@ -1542,10 +1549,11 @@ bool MythCommandLineParser::Parse(int argc, const char * const * argv)
                  << endl;
     }
  
+    QMap<QString, CommandLineArg*>::const_iterator it;
+
     if (m_verbose)
     {
         cerr << "Processed option list:" << endl;
-        QMap<QString, CommandLineArg*>::const_iterator it;
         for (it = m_namedArgs.begin(); it != m_namedArgs.end(); ++it)
             (*it)->PrintVerbose();
 
@@ -1567,7 +1575,12 @@ bool MythCommandLineParser::Parse(int argc, const char * const * argv)
         cerr << endl;
     }
 
-    return ReconcileLinks();
+    // make sure all interdependencies are fulfilled
+    for (it = m_namedArgs.begin(); it != m_namedArgs.end(); ++it)
+        if (!(*it)->TestLinks())
+            return false;
+
+    return true;
 }
 
 /** \brief Replace dummy arguments used to define interdependency with pointers
@@ -1708,12 +1721,6 @@ bool MythCommandLineParser::ReconcileLinks(void)
             (*i1)->SetBlocks(m_namedArgs[(*i2)->m_name]);
             ++i2;
         }
-    }
-
-    for (i1 = m_namedArgs.begin(); i1 != m_namedArgs.end(); ++i1)
-    {
-        if (!(*i1)->TestLinks())
-            return false;
     }
 
     return true;
