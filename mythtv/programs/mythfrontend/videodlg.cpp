@@ -2358,11 +2358,7 @@ void VideoDialog::VideoMenu()
             menu->AddItem(tr("Mark as Watched"), SLOT(ToggleWatched()));
         menu->AddItem(tr("Video Info"), NULL, CreateInfoMenu());
         menu->AddItem(tr("Change Video Details"), NULL, CreateManageMenu());
-
-        if (m_d->m_type == DLG_MANAGER)
-        {
-            menu->AddItem(tr("Delete"), SLOT(RemoveVideo()));
-        }
+        menu->AddItem(tr("Delete"), SLOT(RemoveVideo()));
     }
     if (node && !(node->getInt() >= 0) && node->getInt() != kUpFolder)
         menu->AddItem(tr("Play Folder"), SLOT(playFolder()));
