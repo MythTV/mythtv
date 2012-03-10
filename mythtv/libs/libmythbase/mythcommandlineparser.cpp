@@ -251,8 +251,6 @@ QString CommandLineArg::GetHelpString(int off, QString group, bool force) const
     QString pad;
     pad.fill(' ', off);
 
-    cerr << "adding description for " << GetKeywordString().toLocal8Bit().constData() << endl;
-
     // print the first line with the available keywords
     QStringList hlist = m_help.split('\n');
     wrapList(hlist, termwidth-off);
@@ -265,8 +263,6 @@ QString CommandLineArg::GetHelpString(int off, QString group, bool force) const
     QStringList::const_iterator i1;
     for (i1 = hlist.begin() + 1; i1 != hlist.end(); ++i1)
         msg << pad << *i1 << endl;
-
-    cerr << "  running through " << m_children.count() << " children" << endl;
 
     // loop through any child arguments to print underneath
     QList<CommandLineArg*>::const_iterator i2;
