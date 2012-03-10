@@ -1423,6 +1423,7 @@ bool MythCommandLineParser::Parse(int argc, const char * const * argv)
         if (res == kPassthrough && !m_namedArgs.contains("_passthrough"))
         {
             cerr << "Received '--' but passthrough has not been enabled" << endl;
+            SetValue("showhelp", "");
             return false;
         }
 
@@ -1440,6 +1441,7 @@ bool MythCommandLineParser::Parse(int argc, const char * const * argv)
         {
             cerr << "Invalid option received:" << endl << "    "
                  << opt.toLocal8Bit().constData();
+            SetValue("showhelp", "");
             return false;
         }
 
@@ -1459,6 +1461,7 @@ bool MythCommandLineParser::Parse(int argc, const char * const * argv)
                      << val.constData()
                      << "' but unassociated arguments have not been enabled"
                      << endl;
+                SetValue("showhelp", "");
                 return false;        
             }
 
@@ -1471,6 +1474,7 @@ bool MythCommandLineParser::Parse(int argc, const char * const * argv)
         {
             cerr << "Command line arguments received out of sequence"
                  << endl;
+            SetValue("showhelp", "");
             return false;
         }
 
@@ -1501,6 +1505,7 @@ bool MythCommandLineParser::Parse(int argc, const char * const * argv)
                 // arbitrary not allowed, fault out
                 cerr << "Unhandled option given on command line:" << endl 
                      << "    " << opt.toLocal8Bit().constData() << endl;
+                SetValue("showhelp", "");
                 return false;
             }
         }
@@ -1511,6 +1516,7 @@ bool MythCommandLineParser::Parse(int argc, const char * const * argv)
         if (!argdef->m_removed.isEmpty())
         {
             argdef->PrintRemovedWarning(opt);
+            SetValue("showhelp", "");
             return false;
         }
 
@@ -1526,7 +1532,10 @@ bool MythCommandLineParser::Parse(int argc, const char * const * argv)
         if (res == kOptOnly)
         {
             if (!argdef->Set(opt))
+            {
+                SetValue("showhelp", "");
                 return false;
+            }
         }
         // argument has keyword and value
         else if (res == kOptVal)
@@ -1535,14 +1544,20 @@ bool MythCommandLineParser::Parse(int argc, const char * const * argv)
             {
                 // try testing keyword with no value
                 if (!argdef->Set(opt))
+                {
+                    SetValue("showhelp", "");
                     return false;
+                }
                 // drop back an iteration so the unused value will get
                 // processed a second time as a keyword-less argument
                 --argpos;
             }
         }
         else
+        {
+            SetValue("showhelp", "");
             return false; // this should not occur
+        }
 
         if (m_verbose)
             cerr << "value: " << argdef->m_stored.toString().toLocal8Bit().constData()
@@ -1577,8 +1592,22 @@ bool MythCommandLineParser::Parse(int argc, const char * const * argv)
 
     // make sure all interdependencies are fulfilled
     for (it = m_namedArgs.begin(); it != m_namedArgs.end(); ++it)
+    {
         if (!(*it)->TestLinks())
+        {
+            QString keyword = (*it)->m_usedKeyword;
+            if (keyword.startsWith('-'))
+            {
+                if (keyword.startsWith("--"))
+                    keyword.remove(0,2);
+                else
+                    keyword.remove(0,1);
+            }
+
+            SetValue("showhelp", keyword);
             return false;
+        }
+    }
 
     return true;
 }
