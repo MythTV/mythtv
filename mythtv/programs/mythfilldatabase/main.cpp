@@ -249,7 +249,7 @@ int main(int argc, char *argv[])
     if (cmdline.toBool("refreshday"))
         cmdline.SetValue("refresh",
                 cmdline.toStringList("refresh") << 
-                         QString::number(cmdline.toUInt("refreshday")));
+                                        cmdline.toStringList("refreshday"));
 
     QStringList sl = cmdline.toStringList("refresh");
     if (!sl.isEmpty())
