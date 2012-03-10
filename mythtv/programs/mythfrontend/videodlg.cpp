@@ -3458,7 +3458,7 @@ void VideoDialog::RemoveVideo()
     if (!metadata)
         return;
 
-    QString message = tr("Are you sure you want to delete:\n%1")
+    QString message = tr("Are you sure you want to permanently delete:\n%1")
                           .arg(metadata->GetTitle());
 
     MythConfirmationDialog *confirmdialog =
