@@ -71,19 +71,26 @@ Use the &apos;Add Bookmark&apos; menu option to add new bookmarks</source>
         <translation>Очистить помеченное</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="317"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="496"/>
+        <source>Are you sure you want to delete the selected bookmark?</source>
+        <translation>Вы уверены что хотите удалить выбранную закладку?</translation>
+    </message>
+    <message>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="540"/>
+        <source>Are you sure you want to delete the marked bookmarks?</source>
+        <translation>Вы уверены что хотите удалить выбранные закладки?</translation>
+    </message>
+    <message>
         <source>Cancel</source>
-        <translation>Отмена</translation>
+        <translation type="obsolete">Отмена</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="498"/>
         <source>Are you sure you want to delete the selected bookmark</source>
-        <translation>Вы уверены что хотите удалить выбранную закладку</translation>
+        <translation type="obsolete">Вы уверены что хотите удалить выбранную закладку</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="542"/>
         <source>Are you sure you want to delete the marked bookmarks</source>
-        <translation>Вы уверены что хотите удалить выбранные закладки</translation>
+        <translation type="obsolete">Вы уверены что хотите удалить выбранные закладки</translation>
     </message>
 </context>
 <context>
@@ -173,9 +180,8 @@ Use the &apos;Add Bookmark&apos; menu option to add new bookmarks</source>
         <translation>Добавить закладку</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="342"/>
         <source>Cancel</source>
-        <translation>Отмена</translation>
+        <translation type="obsolete">Отмена</translation>
     </message>
 </context>
 <context>
