@@ -63,7 +63,7 @@ void XmlPListSerializer::RenderValue(const QString &sName,
     if ( vValue.canConvert<QObject*>())
     {
         const QObject *pObject = vValue.value<QObject*>();
-        SerializePListObjectProperties(pObject);
+        SerializePListObjectProperties(sName, pObject);
         return;
     }
 
@@ -239,11 +239,14 @@ void XmlPListSerializer::AddProperty(const QString &sName,
     RenderValue(sName, vValue);
 }
 
-void XmlPListSerializer::SerializePListObjectProperties(const QObject *pObject)
+void XmlPListSerializer::SerializePListObjectProperties(const QString &sName,
+                                                        const QObject *pObject)
 {
     if (!pObject)
         return;
 
+    QString sItemName = GetItemName(sName);
+    m_pXmlWriter->writeTextElement("key", sItemName);
     m_pXmlWriter->writeStartElement("dict");
 
     const QMetaObject *pMetaObject = pObject->metaObject();
