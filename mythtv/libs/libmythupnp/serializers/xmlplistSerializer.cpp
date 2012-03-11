@@ -92,7 +92,7 @@ void XmlPListSerializer::RenderValue(const QString &sName,
             if (needKey)
                 m_pXmlWriter->writeTextElement("key", sName);
             m_pXmlWriter->writeTextElement("date", vValue.toDateTime()
-                                           .toUTC().toString(Qt::ISODate));
+                                           .toUTC().toString("yyyy-MM-ddThh:mm:ssZ"));
             break;
         }
 
