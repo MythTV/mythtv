@@ -184,7 +184,7 @@ class FormattedTextSubtitle
         m_xAnchor = 0;
         m_yAnchor = 0;
     }
-    void InitFromCC608(vector<CC608Text*> &buffers);
+    void InitFromCC608(vector<CC608Text*> &buffers, int textFontZoom = 100);
     void InitFromCC708(const CC708Window &win, int num,
                        const vector<CC708String*> &list,
                        float aspect = 1.77777f,
