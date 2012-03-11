@@ -32,12 +32,11 @@
         <translation>Αφαίρεση Αντικειμένου</translation>
     </message>
     <message>
-        <location filename="../mytharchive/exportnative.cpp" line="401"/>
         <source>Cancel</source>
-        <translation>Ακύρωση</translation>
+        <translation type="obsolete">Ακύρωση</translation>
     </message>
     <message>
-        <location filename="../mytharchive/exportnative.cpp" line="537"/>
+        <location filename="../mytharchive/exportnative.cpp" line="536"/>
         <source>You don&apos;t have any videos!</source>
         <translation>Δεν έχετε ταινίες!</translation>
     </message>
@@ -68,8 +67,12 @@
 <context>
     <name>ImportNative</name>
     <message>
-        <location filename="../mytharchive/importnative.cpp" line="430"/>
         <source>You need to select a valid chanID!</source>
+        <translation type="obsolete">Πρέπει να επιλέξετε έγκυρο αναγν. καναλιού!</translation>
+    </message>
+    <message>
+        <location filename="../mytharchive/importnative.cpp" line="430"/>
+        <source>You need to select a valid channel id!</source>
         <translation>Πρέπει να επιλέξετε έγκυρο αναγν. καναλιού!</translation>
     </message>
     <message>
@@ -79,18 +82,30 @@
     </message>
     <message>
         <location filename="../mytharchive/importnative.cpp" line="595"/>
-        <source>Select a ChanID</source>
-        <translation>Επιλογή Αναγν. Καναλιού</translation>
+        <source>Select a channel id</source>
+        <translation>Επιλογή αναγν. καναλιού</translation>
     </message>
     <message>
         <location filename="../mytharchive/importnative.cpp" line="621"/>
-        <source>Select a ChanNo</source>
-        <translation>Επιλογή Αρ. Καναλιού</translation>
+        <source>Select a channel number</source>
+        <translation>Επιλογή αρ. καναλιού</translation>
     </message>
     <message>
         <location filename="../mytharchive/importnative.cpp" line="647"/>
+        <source>Select a channel name</source>
+        <translation>Επιλογή ονόματος καναλιού</translation>
+    </message>
+    <message>
+        <source>Select a ChanID</source>
+        <translation type="obsolete">Επιλογή Αναγν. Καναλιού</translation>
+    </message>
+    <message>
+        <source>Select a ChanNo</source>
+        <translation type="obsolete">Επιλογή Αρ. Καναλιού</translation>
+    </message>
+    <message>
         <source>Select a Channel Name</source>
-        <translation>Επιλογή Ονόματος Καναλιού</translation>
+        <translation type="obsolete">Επιλογή Ονόματος Καναλιού</translation>
     </message>
     <message>
         <location filename="../mytharchive/importnative.cpp" line="673"/>
@@ -126,23 +141,30 @@
         <translation>Εμφάνιση Πλήρους Καταγραφής</translation>
     </message>
     <message>
-        <location filename="../mytharchive/logviewer.cpp" line="319"/>
         <source>Cancel</source>
-        <translation>Ακύρωση</translation>
+        <translation type="obsolete">Ακύρωση</translation>
     </message>
 </context>
 <context>
     <name>MythBurn</name>
     <message>
+        <source>Using Cutlist</source>
+        <translation type="obsolete">Με χρήση Λίστας Κοψιμάτων</translation>
+    </message>
+    <message>
+        <source>Not Using Cutlist</source>
+        <translation type="obsolete">Χωρίς χρήση Λίστας Κοψιμάτων</translation>
+    </message>
+    <message>
         <location filename="../mytharchive/mythburn.cpp" line="344"/>
         <location filename="../mytharchive/mythburn.cpp" line="468"/>
-        <source>Using Cutlist</source>
+        <source>Using Cut List</source>
         <translation>Με χρήση Λίστας Κοψιμάτων</translation>
     </message>
     <message>
         <location filename="../mytharchive/mythburn.cpp" line="349"/>
         <location filename="../mytharchive/mythburn.cpp" line="473"/>
-        <source>Not Using Cutlist</source>
+        <source>Not Using Cut List</source>
         <translation>Χωρίς χρήση Λίστας Κοψιμάτων</translation>
     </message>
     <message>
@@ -173,13 +195,21 @@
     </message>
     <message>
         <location filename="../mytharchive/mythburn.cpp" line="819"/>
-        <source>Don&apos;t Use Cutlist</source>
+        <source>Don&apos;t Use Cut List</source>
         <translation>Χωρίς χρήση Λίστας Κοψιμάτων</translation>
     </message>
     <message>
         <location filename="../mytharchive/mythburn.cpp" line="822"/>
-        <source>Use Cutlist</source>
+        <source>Use Cut List</source>
         <translation>Με χρήση Λίστας Κοψιμάτων</translation>
+    </message>
+    <message>
+        <source>Don&apos;t Use Cutlist</source>
+        <translation type="obsolete">Χωρίς χρήση Λίστας Κοψιμάτων</translation>
+    </message>
+    <message>
+        <source>Use Cutlist</source>
+        <translation type="obsolete">Με χρήση Λίστας Κοψιμάτων</translation>
     </message>
     <message>
         <location filename="../mytharchive/mythburn.cpp" line="826"/>
@@ -202,12 +232,11 @@
         <translation>Επεξεργασία Μικρογραφιών</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="830"/>
         <source>Cancel</source>
-        <translation>Ακύρωση</translation>
+        <translation type="obsolete">Ακύρωση</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="966"/>
+        <location filename="../mytharchive/mythburn.cpp" line="965"/>
         <source>It was not possible to create the DVD.  An error occured when running the scripts</source>
         <translation>Αδύνατη η δημιουργία του DVD. Προκλήθηκε σφάλμα κατά την εκτέλεση των scripts</translation>
     </message>
@@ -571,7 +600,7 @@ Have you set the correct path in the settings?</source>
 Έχετε βάλει τη σωστή διαδρομή στις ρυθμίσεις;</translation>
     </message>
     <message>
-        <location filename="../mytharchive/exportnative.cpp" line="501"/>
+        <location filename="../mytharchive/exportnative.cpp" line="500"/>
         <source>It was not possible to create the DVD. An error occured when running the scripts</source>
         <translation>Αδύνατη η δημιουργία του DVD. Συνέβη σφάλμα κατά την εκτέλεση των scripts</translation>
     </message>
@@ -605,47 +634,46 @@ Removing stale lock file.</source>
         <translation>Η τελευταία εκτέλεση απέτυχε να δημιουργήσει DVD.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1009"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1008"/>
         <source>You don&apos;t have any videos!</source>
         <translation>Δεν έχετε ταινίες!</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1156"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1155"/>
         <source>Cannot burn a DVD.
 The last run failed to create a DVD.</source>
         <translation>Δεν μπορώ να γράψω DVD.
 Η τελευταία εκτέλεση απέτυχε να δημιουργήσει DVD.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1162"/>
-        <location filename="../mytharchive/mythburn.cpp" line="1174"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1161"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1173"/>
         <source>Burn DVD</source>
         <translation>Εγγραφή DVD</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1163"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1162"/>
         <source>
 Place a blank DVD in the drive and select an option below.</source>
         <translation>
 Τοποθετήστε ένα κενό DVD στη συσκευή και διαλέξτε μια από τις παρακάτω επιλογές.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1175"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1174"/>
         <source>Burn DVD Rewritable</source>
         <translation>Εγγραφή Επανεγγράψιμου DVD</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1176"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1175"/>
         <source>Burn DVD Rewritable (Force Erase)</source>
         <translation>Εγγραφή Επανεγγράψιμου DVD (Αναγκαστική Διαγραφή)</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1177"/>
         <source>Cancel</source>
-        <translation>Ακύρωση</translation>
+        <translation type="obsolete">Ακύρωση</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1233"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1231"/>
         <source>It was not possible to run mytharchivehelper to burn the DVD.</source>
         <translation>Δεν ήταν δυνατή η εκτέλεση του mytharchivehelper για εγγραφή του DVD.</translation>
     </message>
@@ -654,8 +682,8 @@ Place a blank DVD in the drive and select an option below.</source>
     <name>RecordingSelector</name>
     <message>
         <location filename="../mytharchive/recordingselector.cpp" line="113"/>
-        <location filename="../mytharchive/recordingselector.cpp" line="420"/>
-        <location filename="../mytharchive/recordingselector.cpp" line="525"/>
+        <location filename="../mytharchive/recordingselector.cpp" line="419"/>
+        <location filename="../mytharchive/recordingselector.cpp" line="524"/>
         <source>All Recordings</source>
         <translation>Όλες οι Εγγραφές</translation>
     </message>
@@ -691,9 +719,8 @@ Please Wait...</source>
         <translation>Επιλογή Όλων</translation>
     </message>
     <message>
-        <location filename="../mytharchive/recordingselector.cpp" line="216"/>
         <source>Cancel</source>
-        <translation>Ακύρωση</translation>
+        <translation type="obsolete">Ακύρωση</translation>
     </message>
 </context>
 <context>
@@ -704,9 +731,8 @@ Please Wait...</source>
         <translation>DVD Μονής Επίστρωσης</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archiveutil.cpp" line="35"/>
         <source>Single Layer DVD (4482Mb)</source>
-        <translation>DVD Μονής Επίστρωσης (4482Mb)</translation>
+        <translation type="obsolete">DVD Μονής Επίστρωσης (4482Mb)</translation>
     </message>
     <message>
         <location filename="../mytharchive/archiveutil.cpp" line="38"/>
@@ -714,9 +740,18 @@ Please Wait...</source>
         <translation>DVD Διπλής Επίστρωσης</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archiveutil.cpp" line="39"/>
         <source>Dual Layer DVD (8964Mb)</source>
-        <translation>DVD Διπλής Επίστρωσης (8964Mb)</translation>
+        <translation type="obsolete">DVD Διπλής Επίστρωσης (8964Mb)</translation>
+    </message>
+    <message>
+        <location filename="../mytharchive/archiveutil.cpp" line="35"/>
+        <source>Single Layer DVD (4,482 MB)</source>
+        <translation>DVD Μονής Επίστρωσης (4.482 MB)</translation>
+    </message>
+    <message>
+        <location filename="../mytharchive/archiveutil.cpp" line="39"/>
+        <source>Dual Layer DVD (8,964 MB)</source>
+        <translation>DVD Διπλής Επίστρωσης (8.964 MB)</translation>
     </message>
     <message>
         <location filename="../mytharchive/archiveutil.cpp" line="42"/>
@@ -1306,9 +1341,8 @@ Please Wait...</source>
         <translation>Έξοδος, Χωρίς Αποθήκευση Μικρογραφιών</translation>
     </message>
     <message>
-        <location filename="../mytharchive/thumbfinder.cpp" line="941"/>
         <source>Cancel</source>
-        <translation>Ακύρωση</translation>
+        <translation type="obsolete">Ακύρωση</translation>
     </message>
 </context>
 <context>
@@ -1329,18 +1363,17 @@ Please Wait...</source>
         <translation>Επιλογή Όλων</translation>
     </message>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="160"/>
         <source>Cancel</source>
-        <translation>Ακύρωση</translation>
+        <translation type="obsolete">Ακύρωση</translation>
     </message>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="358"/>
-        <location filename="../mytharchive/videoselector.cpp" line="491"/>
+        <location filename="../mytharchive/videoselector.cpp" line="357"/>
+        <location filename="../mytharchive/videoselector.cpp" line="490"/>
         <source>All Videos</source>
         <translation>Όλες οι Ταινίες</translation>
     </message>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="548"/>
+        <location filename="../mytharchive/videoselector.cpp" line="547"/>
         <source>You need to enter a valid password for this parental level</source>
         <translation>Πρέπει να εισάγετε τον σωστό κωδικό γι΄αυτό το γονικό επίπεδο</translation>
     </message>
