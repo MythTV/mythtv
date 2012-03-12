@@ -20,7 +20,8 @@
 		</div>
 		<hr />
 		<p class="alignLeft"><xsl:value-of select="/w:definitions/w:service/w:documentation/text()" /></p>
-		<p class="alignRight"><a href="./wsdl?raw=1">View Xsd</a></p>
+		<p class="alignRight"><a href="javascript:window.location.href += '?raw=1';" >View Wsdl</a></p> 
+
 		<br />
 
 		<xsl:apply-templates select="/w:definitions/w:portType/w:operation" />

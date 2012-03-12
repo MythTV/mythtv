@@ -20,7 +20,7 @@
 		<xsl:variable name="CurrentType" select="/xs:schema/xs:complexType/@name" />
 
 		<p class="alignLeft"><xsl:value-of select="//xs:documentation/text()" /></p>
-		<p class="alignRight"><a href="./xsd?type={$CurrentType}&amp;raw=1">View Xsd</a></p>
+		<p class="alignRight"><a href="javascript:window.location.href += '&amp;raw=1';" >View Xsd</a></p> 
 		<br />
 		
 		<div class="method" >
