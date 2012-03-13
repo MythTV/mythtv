@@ -1987,12 +1987,7 @@ bool InitializeMythSchema(void)
     LOG(VB_GENERAL, LOG_NOTICE,
         "Inserting MythTV initial database information.");
 
-    QString qtmp = QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8;")
-        .arg(gCoreContext->GetDatabaseParams().dbName);
-    QByteArray tmp = qtmp.toAscii();
-
     const char *updates[] = {
-tmp.constData(),
 "CREATE TABLE callsignnetworkmap ("
 "  id int(11) NOT NULL AUTO_INCREMENT,"
 "  callsign varchar(20) NOT NULL DEFAULT '',"
