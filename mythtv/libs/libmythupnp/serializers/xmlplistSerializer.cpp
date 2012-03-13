@@ -89,19 +89,25 @@ void XmlPListSerializer::RenderValue(const QString &sName,
 
         case QVariant::DateTime:
         {
-            if (needKey)
-                m_pXmlWriter->writeTextElement("key", sName);
-            m_pXmlWriter->writeTextElement("date", vValue.toDateTime()
-                                           .toUTC().toString("yyyy-MM-ddThh:mm:ssZ"));
+            if (vValue.toDateTime().isValid())
+            {
+                if (needKey)
+                    m_pXmlWriter->writeTextElement("key", sName);
+                m_pXmlWriter->writeTextElement("date", vValue.toDateTime()
+                                               .toUTC().toString("yyyy-MM-ddThh:mm:ssZ"));
+            }
             break;
         }
 
         case QVariant::ByteArray:
         {
-            if (needKey)
-                m_pXmlWriter->writeTextElement("key", sName);
-            m_pXmlWriter->writeTextElement("data",
-                            vValue.toByteArray().toBase64().data());
+            if (!vValue.toByteArray().isNull())
+            {
+                if (needKey)
+                    m_pXmlWriter->writeTextElement("key", sName);
+                m_pXmlWriter->writeTextElement("data",
+                                vValue.toByteArray().toBase64().data());
+            }
             break;
         }
 
