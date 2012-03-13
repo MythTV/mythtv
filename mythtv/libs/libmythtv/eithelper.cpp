@@ -807,6 +807,10 @@ static void init_fixup(QMap<uint64_t,uint> &fix)
     fix[ 2051LL << 32 | 2U << 16] = EITFixUp::kFixUK;
     fix[ 2053LL << 32 | 2U << 16] = EITFixUp::kFixUK;
     fix[ 2054LL << 32 | 2U << 16] = EITFixUp::kFixUK;
+    fix[ 2056LL << 32 | 2U << 16] = EITFixUp::kFixUK;
+    fix[ 2057LL << 32 | 2U << 16] = EITFixUp::kFixUK;
+    fix[ 2063LL << 32 | 2U << 16] = EITFixUp::kFixUK;
+    fix[ 2068LL << 32 | 2U << 16] = EITFixUp::kFixUK;
 
     // ComHem Sweden
     fix[40999U << 16       ] = EITFixUp::kFixComHem;

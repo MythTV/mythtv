@@ -41,14 +41,22 @@ Remove it from the database?</source>
 <context>
     <name>GameScanner</name>
     <message>
-        <location filename="../mythgame/gamescan.cpp" line="67"/>
         <source>Verifying game files</source>
-        <translation>Έλεγχος αρχειών παιχνιδιών</translation>
+        <translation type="obsolete">Έλεγχος αρχειών παιχνιδιών</translation>
+    </message>
+    <message>
+        <source>Updating game database</source>
+        <translation type="obsolete">Ενημερώνω τη βάση δεδομένων</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamescan.cpp" line="67"/>
+        <source>Verifying game files...</source>
+        <translation>Έλεγχος αρχείων παιχνιδιών...</translation>
     </message>
     <message>
         <location filename="../mythgame/gamescan.cpp" line="110"/>
-        <source>Updating game database</source>
-        <translation>Ενημερώνω τη βάση δεδομένων</translation>
+        <source>Updating game database...</source>
+        <translation>Ενημερώνω τη βάση δεδομένων...</translation>
     </message>
     <message>
         <location filename="../mythgame/gamescan.cpp" line="145"/>
@@ -187,13 +195,21 @@ Remove it from the database?</source>
         <translation>Επιλογές Συστημάτων Παιχνιδιού</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamesettings.cpp" line="306"/>
         <source>Edit..</source>
+        <translation type="obsolete">Επεξεργασία..</translation>
+    </message>
+    <message>
+        <source>Delete..</source>
+        <translation type="obsolete">Διαγραφή..</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamesettings.cpp" line="306"/>
+        <source>Edit...</source>
         <translation>Επεξεργασία..</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="306"/>
-        <source>Delete..</source>
+        <source>Delete...</source>
         <translation>Διαγραφή..</translation>
     </message>
     <message>
@@ -242,11 +258,16 @@ Remove it from the database?</source>
         <translation>0</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="714"/>
-        <source>Scanning for %1 games</source>
-        <translation>Ανίχνευση για παιχνίδια %1</translation>
+        <location filename="../mythgame/gamehandler.cpp" line="511"/>
+        <source>Verifying %1 files...</source>
+        <translation>Επιβεβαίωση %1 αρχείων...</translation>
     </message>
     <message>
+        <source>Scanning for %1 games</source>
+        <translation type="obsolete">Ανίχνευση για παιχνίδια %1</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamehandler.cpp" line="714"/>
         <location filename="../mythgame/gamehandler.cpp" line="742"/>
         <source>Scanning for %1 games...</source>
         <translation>Ανίχνευση για παιχνίδια %1...</translation>
@@ -283,9 +304,8 @@ Remove it from the database?</source>
         <translation>Ενημέρωση %1 (%2) της βιβλιοθήκης ROM</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="511"/>
         <source>Verifying %1 files</source>
-        <translation>Επιβεβαίωση %1 αρχείων</translation>
+        <translation type="obsolete">Επιβεβαίωση %1 αρχείων</translation>
     </message>
     <message>
         <source>Are you sure?</source>
@@ -314,14 +334,12 @@ want to do this?</source>
         <translation>Η σειρά ταξινόμησης των παιχνιδιών - ισχύει για όλα τα συστήματα. Διαθέσιμες επιλογές: system, year, genre and gamename</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamesettings.cpp" line="36"/>
         <source>Favourite display order</source>
-        <translation>Σειρά εμφάνισης Αγαπημένων</translation>
+        <translation type="obsolete">Σειρά εμφάνισης Αγαπημένων</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamesettings.cpp" line="38"/>
         <source>Order in which to sort the games marked as favourites - this is for all systems. Available choices: system, year, genre and gamename</source>
-        <translation>Η σειρά ταξινόμησης των παιχνιδιών στη λίστα Αγαπημένων - ισχύει για όλα τα συστήματα. Διαθέσιμες επιλογές: system, year, genre and gamename</translation>
+        <translation type="obsolete">Η σειρά ταξινόμησης των παιχνιδιών στη λίστα Αγαπημένων - ισχύει για όλα τα συστήματα. Διαθέσιμες επιλογές: system, year, genre and gamename</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="48"/>
@@ -329,19 +347,16 @@ want to do this?</source>
         <translation>Λεπτομερής Αναζήτηση Παιχνιδιών</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamesettings.cpp" line="49"/>
         <source>Enabling this causes a game scan to gather crc values and attempt to find out more detailed information about the game: NOTE this can greatly increase the time a gamescan takes based on the amount of games scanned.</source>
-        <translation>Αν το επιλέξετε η αναζήτηση παιχνιδιών θα συγκεντρώσει στοιχεία ισοτιμίας (crc) προσπαθώντας να ανακαλύψει περισσότερες πληροφορίες για το παιχνίδι: ΣΗΜΕΙΩΣΗ μπορεί να αυξήσει σημαντικά το χρόνο ανίχνευσης, ανάλογα με το πλήθος των παιχνιδιών.</translation>
+        <translation type="obsolete">Αν το επιλέξετε η αναζήτηση παιχνιδιών θα συγκεντρώσει στοιχεία ισοτιμίας (crc) προσπαθώντας να ανακαλύψει περισσότερες πληροφορίες για το παιχνίδι: ΣΗΜΕΙΩΣΗ μπορεί να αυξήσει σημαντικά το χρόνο ανίχνευσης, ανάλογα με το πλήθος των παιχνιδιών.</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamesettings.cpp" line="58"/>
         <source>Prompt for removal of deleted rom(s)</source>
-        <translation>Ερώτηση για αφαίρεση διαγραμμένων ROM</translation>
+        <translation type="obsolete">Ερώτηση για αφαίρεση διαγραμμένων ROM</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamesettings.cpp" line="59"/>
         <source>This enables a prompt for removing deleted roms from the database during a  gamescan</source>
-        <translation>Κατά την ανίχνευση, επιτρέπει την ερώτηση για αφαίρεση από τη βάση δεδομένων των rom που έχουν διαγραφεί</translation>
+        <translation type="obsolete">Κατά την ανίχνευση, επιτρέπει την ερώτηση για αφαίρεση από τη βάση δεδομένων των rom που έχουν διαγραφεί</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="69"/>
@@ -349,8 +364,37 @@ want to do this?</source>
         <translation>Εμφάνιση Ονομάτων Αρχείων στο Δένδρο Παιχνιδιών</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamesettings.cpp" line="70"/>
         <source>Enabling this causes the filenames to be displayed in the game tree rather than the trimmed/looked up gamename</source>
+        <translation type="obsolete">Αν το επιλέξετε θα φαίνονται τα ονόματα των αρχείων αντί για τα ονόματα των παιχνιδιών</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamesettings.cpp" line="36"/>
+        <source>Favorite display order</source>
+        <translation>Σειρά εμφάνισης αγαπημένων</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamesettings.cpp" line="38"/>
+        <source>Order in which to sort the games marked as favorites - this is for all systems. Available choices: system, year, genre and gamename</source>
+        <translation>Η σειρά ταξινόμησης των παιχνιδιών στη λίστα αγαπημένων - ισχύει για όλα τα συστήματα. Διαθέσιμες επιλογές: system, year, genre and gamename</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamesettings.cpp" line="49"/>
+        <source>Enabling this causes a game scan to gather CRC values and attempt to find out more detailed information about the game: NOTE this can greatly increase the time a game scan takes based on the amount of games scanned.</source>
+        <translation>Αν το επιλέξετε η αναζήτηση παιχνιδιών θα συγκεντρώσει στοιχεία ισοτιμίας (crc) προσπαθώντας να ανακαλύψει περισσότερες πληροφορίες για το παιχνίδι: ΣΗΜΕΙΩΣΗ μπορεί να αυξήσει σημαντικά το χρόνο ανίχνευσης, ανάλογα με το πλήθος των παιχνιδιών.</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamesettings.cpp" line="58"/>
+        <source>Prompt for removal of deleted ROM(s)</source>
+        <translation>Ερώτηση για αφαίρεση διαγραμμένης(ων) ROM</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamesettings.cpp" line="59"/>
+        <source>This enables a prompt for removing deleted ROMs from the database during a  game scan</source>
+        <translation>Κατά την ανίχνευση, επιτρέπει την ερώτηση για αφαίρεση από τη βάση δεδομένων των rom που έχουν διαγραφεί</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamesettings.cpp" line="70"/>
+        <source>Enabling this causes the filenames to be displayed in the game tree rather than the trimmed/looked up game name</source>
         <translation>Αν το επιλέξετε θα φαίνονται τα ονόματα των αρχείων αντί για τα ονόματα των παιχνιδιών</translation>
     </message>
     <message>
@@ -400,8 +444,22 @@ want to do this?</source>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="160"/>
-        <source>Allow games to span multiple roms/disks</source>
+        <source>Allow games to span multiple ROMs/disks</source>
         <translation>Επιτρέπονται πολλαπλές roms/δίσκοι στα παιχνίδια</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamesettings.cpp" line="172"/>
+        <source>Binary and optional parameters. Multiple commands separated with &apos;;&apos; . Use %s for the ROM name. %d1, %d2, %d3 and %d4 represent disks in a multidisk/game. %s auto appended if not specified</source>
+        <translation>Το εκτελέσιμο και προεραιτικές παράμετροι. Πολλαπλές εντολές χωρίζονται με &apos;,&apos;. Χρησιμοποιείστε το %s για το όνομα της rom. %d1, %d2, %d3 και %d4 αντιπροσωπεύουν πολλαπλούς δίσκους στο παιχνίδι. το %s προστίθεται αυτόματα αν δεν οριστεί</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamesettings.cpp" line="198"/>
+        <source>ROM Path</source>
+        <translation>Διαδρομή ROM</translation>
+    </message>
+    <message>
+        <source>Allow games to span multiple roms/disks</source>
+        <translation type="obsolete">Επιτρέπονται πολλαπλές roms/δίσκοι στα παιχνίδια</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="161"/>
@@ -414,9 +472,8 @@ want to do this?</source>
         <translation>Εντολή</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamesettings.cpp" line="172"/>
         <source>Binary and optional parameters. Multiple commands separated with &apos;;&apos; . Use %s for the rom name. %d1, %d2, %d3 and %d4 represent disks in a multidisk/game. %s auto appended if not specified</source>
-        <translation>Το εκτελέσιμο και προεραιτικές παράμετροι. Πολλαπλές εντολές χωρίζονται με &apos;,&apos;. Χρησιμοποιείστε το %s για το όνομα της rom. %d1, %d2, %d3 και %d4 αντιπροσωπεύουν πολλαπλούς δίσκους στο παιχνίδι. το %s προστίθεται αυτόματα αν δεν οριστεί</translation>
+        <translation type="obsolete">Το εκτελέσιμο και προεραιτικές παράμετροι. Πολλαπλές εντολές χωρίζονται με &apos;,&apos;. Χρησιμοποιείστε το %s για το όνομα της rom. %d1, %d2, %d3 και %d4 αντιπροσωπεύουν πολλαπλούς δίσκους στο παιχνίδι. το %s προστίθεται αυτόματα αν δεν οριστεί</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="221"/>
@@ -438,9 +495,8 @@ want to do this?</source>
         <translation>Τύπος του Παιχνιδιού/Προσομοιωτή. Κυρίως για ενημερωτικούς σκοπούς και λίγο επηρρεάζει την λειτουργία του συστήματος.</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamesettings.cpp" line="198"/>
         <source>Rom Path</source>
-        <translation>Διαδρομή Rom</translation>
+        <translation type="obsolete">Διαδρομή Rom</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="199"/>

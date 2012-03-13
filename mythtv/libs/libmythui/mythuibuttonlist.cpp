@@ -2858,6 +2858,9 @@ bool MythUIButtonList::DoFind(bool doMove, bool searchForward)
     if (m_searchStr.isEmpty())
         return true;
 
+    if (GetCount() == 0)
+        return false;
+
     int startPos = GetCurrentPos();
     int currPos = startPos;
     bool found = false;

@@ -129,11 +129,18 @@ void HDHRStreamHandler::run(void)
     LOG(VB_RECORD, LOG_INFO, LOC + "RunTS(): begin");
 
     int remainder = 0;
+    QTime last_update;
     while (_running_desired && !_error)
     {
-        UpdateFiltersFromStreamData();
-        if (_tune_mode != hdhrTuneModeVChannel)
-            UpdateFilters();
+        int elapsed = !last_update.isValid() ? -1 : last_update.elapsed();
+        elapsed = (elapsed < 0) ? 1000 : elapsed;
+        if (elapsed > 100)
+        {
+            UpdateFiltersFromStreamData();
+            if (_tune_mode != hdhrTuneModeVChannel)
+                UpdateFilters();
+            last_update.restart();
+        }
 
         size_t read_size = 64 * 1024; // read about 64KB
         read_size /= VIDEO_DATA_PACKET_SIZE;

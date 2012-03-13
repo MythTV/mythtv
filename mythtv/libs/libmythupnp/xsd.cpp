@@ -223,6 +223,12 @@ bool Xsd::RenderXSD( HTTPRequest *pRequest, QObject *pClass )
                     sType = "ArrayOf" + sContentType;
 
                 bCustomType = true;
+
+            }
+            else if (sType == "QStringList") 
+            { 
+                sType = "ArrayOfString"; 
+                bCustomType = true; 
             }
 
             QString sNewPropName( metaProperty.name() );

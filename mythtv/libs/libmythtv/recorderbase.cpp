@@ -36,6 +36,8 @@ using namespace std;
 #define LOC      QString("RecBase(%1:%2): ") \
                  .arg(TVREC_CARDNUM).arg(videodevice)
 
+const uint RecorderBase::kTimeOfLatestDataIntervalTarget = 5000;
+
 RecorderBase::RecorderBase(TVRec *rec)
     : tvrec(rec),               ringBuffer(NULL),
       weMadeBuffer(true),       videocodec("rtjpeg"),
@@ -329,7 +331,10 @@ void RecorderBase::ClearStatistics(void)
 {
     QMutexLocker locker(&statisticsLock);
     timeOfFirstData = QDateTime();
+    timeOfFirstDataIsSet.fetchAndStoreRelaxed(0);
     timeOfLatestData = QDateTime();
+    timeOfLatestDataCount.fetchAndStoreRelaxed(0);
+    timeOfLatestDataPacketInterval.fetchAndStoreRelaxed(2000);
     recordingGaps.clear();
 }
 

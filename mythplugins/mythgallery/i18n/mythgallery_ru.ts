@@ -92,7 +92,7 @@
     <message>
         <location filename="../mythgallery/iconview.cpp" line="400"/>
         <source>Gallery Home</source>
-        <translation type="unfinished">Галерея</translation>
+        <translation>Галерея</translation>
     </message>
     <message>
         <location filename="../mythgallery/iconview.cpp" line="890"/>
@@ -522,12 +522,12 @@
     <message>
         <location filename="../mythgallery/gallerysettings.cpp" line="29"/>
         <source>Type filter</source>
-        <translation type="unfinished">Фильтр типов</translation>
+        <translation>Фильтр типов</translation>
     </message>
     <message>
         <location filename="../mythgallery/gallerysettings.cpp" line="33"/>
         <source>This is the type filter for the displayed thumbnails.</source>
-        <translation type="unfinished">Это фильт типов для отображаемых миниатюр.</translation>
+        <translation>Это фильтр типов для отображаемых миниатюр.</translation>
     </message>
     <message>
         <location filename="../mythgallery/gallerysettings.cpp" line="81"/>
@@ -718,7 +718,7 @@ Check the directory exists, is readable and the setting is correct on MythGaller
     <message>
         <location filename="themestrings.h" line="11"/>
         <source>Video Gallery</source>
-        <translation type="unfinished">Галерея видео</translation>
+        <translation>Галерея видео</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="12"/>
@@ -728,12 +728,12 @@ Check the directory exists, is readable and the setting is correct on MythGaller
     <message>
         <location filename="themestrings.h" line="13"/>
         <source>Directory filter:</source>
-        <translation type="unfinished">Фильтр каталогов:</translation>
+        <translation>Фильтр каталогов:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="14"/>
         <source>Type filter:</source>
-        <translation type="unfinished">Фильтр типов:</translation>
+        <translation>Фильтр типов:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="16"/>
@@ -743,12 +743,12 @@ Check the directory exists, is readable and the setting is correct on MythGaller
     <message>
         <location filename="themestrings.h" line="19"/>
         <source>Directory filter :</source>
-        <translation type="unfinished">Фильтр каталогов:</translation>
+        <translation>Фильтр каталогов :</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="20"/>
         <source>Type filter :</source>
-        <translation type="unfinished">Фильтр типов:</translation>
+        <translation>Фильтр типов :</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="21"/>

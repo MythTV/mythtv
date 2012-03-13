@@ -268,17 +268,34 @@ void DTVRecorder::BufferedWrite(const TSPacket &tspacket)
     if (_wait_for_keyframe_option && _first_keyframe<0)
         return;
 
-    if (!timeOfFirstData.isValid() && curRecording)
+    if (curRecording && timeOfFirstDataIsSet.testAndSetRelaxed(0,1))
     {
         QMutexLocker locker(&statisticsLock);
         timeOfFirstData = mythCurrentDateTime();
+        timeOfLatestData = mythCurrentDateTime();
+        timeOfLatestDataTimer.start();
     }
 
-    uint64_t now = mythCurrentDateTime().toTime_t();
-    if (!timeOfLatestData.isValid() || (now - timeOfLatestData.toTime_t() >= 5))
+    int val = timeOfLatestDataCount.fetchAndAddRelaxed(1);
+    int thresh = timeOfLatestDataPacketInterval.fetchAndAddRelaxed(0);
+    if (val > thresh)
     {
         QMutexLocker locker(&statisticsLock);
+        uint elapsed = timeOfLatestDataTimer.restart();
+        int interval = thresh;
+        if (elapsed > kTimeOfLatestDataIntervalTarget + 250)
+            interval = timeOfLatestDataPacketInterval
+                .fetchAndStoreRelaxed(thresh * 4 / 5);
+        else if (elapsed + 250 < kTimeOfLatestDataIntervalTarget)
+            interval = timeOfLatestDataPacketInterval
+                .fetchAndStoreRelaxed(thresh * 9 / 8);
+
+        timeOfLatestDataCount.fetchAndStoreRelaxed(1);
         timeOfLatestData = mythCurrentDateTime();
+
+        LOG(VB_RECORD, LOG_DEBUG, LOC + QString("Updating timeOfLatestData ") +
+            QString("elapsed(%1) interval(%2)")
+            .arg(elapsed).arg(interval));
     }
 
     // Do we have to buffer the packet for exact keyframe detection?

@@ -83,7 +83,17 @@ static QNetworkAccessManager *networkManager = NULL;
 static void DestroyNetworkAccessManager(void)
 {
     if (networkManager)
+    {
+        MythDownloadManager *dlmgr = GetMythDownloadManager();
+        if (dlmgr)
+        {
+            LOG(VB_GENERAL, LOG_DEBUG, "Refreshing DLManager's Cookie Jar");
+            dlmgr->refreshCookieJar(networkManager->cookieJar());
+        }
+
         delete networkManager;
+        networkManager = NULL;
+    }
 }
 
 static QNetworkAccessManager *GetNetworkAccessManager(void)
@@ -92,7 +102,8 @@ static QNetworkAccessManager *GetNetworkAccessManager(void)
         return networkManager;
 
     networkManager = new QNetworkAccessManager();
-    networkManager->setCookieJar(GetMythDownloadManager()->getCookieJar());
+    LOG(VB_GENERAL, LOG_DEBUG, "Copying DLManager's Cookie Jar");
+    networkManager->setCookieJar(GetMythDownloadManager()->copyCookieJar());
 
     atexit(DestroyNetworkAccessManager);
 
@@ -252,6 +263,11 @@ MythWebPage::MythWebPage(QObject *parent)
     setNetworkAccessManager(GetNetworkAccessManager());
 }
 
+MythWebPage::~MythWebPage()
+{
+    DestroyNetworkAccessManager();
+}
+
 bool MythWebPage::supportsExtension(Extension extension) const
 {
     if (extension == QWebPage::ErrorPageExtension)
@@ -346,6 +362,7 @@ MythWebView::MythWebView(QWidget *parent, MythUIWebBrowser *parentBrowser)
 
 MythWebView::~MythWebView(void)
 {
+    delete m_webpage;
     delete m_api;
 }
 

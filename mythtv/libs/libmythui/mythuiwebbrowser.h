@@ -60,6 +60,7 @@ class MythWebPage : public QWebPage
 
   public:
     MythWebPage(QObject *parent = 0);
+    ~MythWebPage();
 
     virtual bool extension (Extension extension, const ExtensionOption *option = 0, ExtensionReturn *output = 0);
     virtual bool supportsExtension (Extension extension) const;

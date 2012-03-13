@@ -124,34 +124,34 @@
 <context>
     <name>NewsSite</name>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="225"/>
-        <location filename="../mythnews/newssite.cpp" line="234"/>
-        <location filename="../mythnews/newssite.cpp" line="243"/>
+        <location filename="../mythnews/newssite.cpp" line="233"/>
+        <location filename="../mythnews/newssite.cpp" line="242"/>
+        <location filename="../mythnews/newssite.cpp" line="251"/>
         <source>Failed to retrieve news</source>
         <translation>Не удается загрузить новости</translation>
     </message>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="226"/>
+        <location filename="../mythnews/newssite.cpp" line="234"/>
         <source>No Cached News.</source>
         <translation>Нет новостей в кэше.</translation>
     </message>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="245"/>
+        <location filename="../mythnews/newssite.cpp" line="253"/>
         <source>Failed to read downloaded file.</source>
         <translation>Не удалось прочитать загруженный файл.</translation>
     </message>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="253"/>
+        <location filename="../mythnews/newssite.cpp" line="261"/>
         <source>Showing Cached News.</source>
         <translation>Показать новости из кэша.</translation>
     </message>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="274"/>
+        <location filename="../mythnews/newssite.cpp" line="282"/>
         <source>XML-file is not valid RSS-feed</source>
         <translation>Файл XML не является лентой RSS</translation>
     </message>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="218"/>
+        <location filename="../mythnews/newssite.cpp" line="226"/>
         <source>Retrieve Failed. </source>
         <translation>Загрузка не удалась. </translation>
     </message>

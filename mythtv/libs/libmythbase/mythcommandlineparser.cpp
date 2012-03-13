@@ -1399,8 +1399,11 @@ bool MythCommandLineParser::Parse(int argc, const char * const * argv)
     QByteArray val;
     CommandLineArg *argdef;
 
+    // reconnect interdependencies between command line options
+    if (!ReconcileLinks())
+        return false;
+
     // loop through command line arguments until all are spent
-    QMap<QString, CommandLineArg>::const_iterator i;
     for (int argpos = 1; argpos < argc; ++argpos)
     {
 
@@ -1416,6 +1419,7 @@ bool MythCommandLineParser::Parse(int argc, const char * const * argv)
         if (res == kPassthrough && !m_namedArgs.contains("_passthrough"))
         {
             cerr << "Received '--' but passthrough has not been enabled" << endl;
+            SetValue("showhelp", "");
             return false;
         }
 
@@ -1433,6 +1437,7 @@ bool MythCommandLineParser::Parse(int argc, const char * const * argv)
         {
             cerr << "Invalid option received:" << endl << "    "
                  << opt.toLocal8Bit().constData();
+            SetValue("showhelp", "");
             return false;
         }
 
@@ -1452,6 +1457,7 @@ bool MythCommandLineParser::Parse(int argc, const char * const * argv)
                      << val.constData()
                      << "' but unassociated arguments have not been enabled"
                      << endl;
+                SetValue("showhelp", "");
                 return false;        
             }
 
@@ -1464,6 +1470,7 @@ bool MythCommandLineParser::Parse(int argc, const char * const * argv)
         {
             cerr << "Command line arguments received out of sequence"
                  << endl;
+            SetValue("showhelp", "");
             return false;
         }
 
@@ -1494,6 +1501,7 @@ bool MythCommandLineParser::Parse(int argc, const char * const * argv)
                 // arbitrary not allowed, fault out
                 cerr << "Unhandled option given on command line:" << endl 
                      << "    " << opt.toLocal8Bit().constData() << endl;
+                SetValue("showhelp", "");
                 return false;
             }
         }
@@ -1504,6 +1512,7 @@ bool MythCommandLineParser::Parse(int argc, const char * const * argv)
         if (!argdef->m_removed.isEmpty())
         {
             argdef->PrintRemovedWarning(opt);
+            SetValue("showhelp", "");
             return false;
         }
 
@@ -1519,7 +1528,10 @@ bool MythCommandLineParser::Parse(int argc, const char * const * argv)
         if (res == kOptOnly)
         {
             if (!argdef->Set(opt))
+            {
+                SetValue("showhelp", "");
                 return false;
+            }
         }
         // argument has keyword and value
         else if (res == kOptVal)
@@ -1528,24 +1540,31 @@ bool MythCommandLineParser::Parse(int argc, const char * const * argv)
             {
                 // try testing keyword with no value
                 if (!argdef->Set(opt))
+                {
+                    SetValue("showhelp", "");
                     return false;
+                }
                 // drop back an iteration so the unused value will get
                 // processed a second time as a keyword-less argument
                 --argpos;
             }
         }
         else
+        {
+            SetValue("showhelp", "");
             return false; // this should not occur
+        }
 
         if (m_verbose)
             cerr << "value: " << argdef->m_stored.toString().toLocal8Bit().constData()
                  << endl;
     }
  
+    QMap<QString, CommandLineArg*>::const_iterator it;
+
     if (m_verbose)
     {
         cerr << "Processed option list:" << endl;
-        QMap<QString, CommandLineArg*>::const_iterator it;
         for (it = m_namedArgs.begin(); it != m_namedArgs.end(); ++it)
             (*it)->PrintVerbose();
 
@@ -1567,7 +1586,26 @@ bool MythCommandLineParser::Parse(int argc, const char * const * argv)
         cerr << endl;
     }
 
-    return ReconcileLinks();
+    // make sure all interdependencies are fulfilled
+    for (it = m_namedArgs.begin(); it != m_namedArgs.end(); ++it)
+    {
+        if (!(*it)->TestLinks())
+        {
+            QString keyword = (*it)->m_usedKeyword;
+            if (keyword.startsWith('-'))
+            {
+                if (keyword.startsWith("--"))
+                    keyword.remove(0,2);
+                else
+                    keyword.remove(0,1);
+            }
+
+            SetValue("showhelp", keyword);
+            return false;
+        }
+    }
+
+    return true;
 }
 
 /** \brief Replace dummy arguments used to define interdependency with pointers
@@ -1708,12 +1746,6 @@ bool MythCommandLineParser::ReconcileLinks(void)
             (*i1)->SetBlocks(m_namedArgs[(*i2)->m_name]);
             ++i2;
         }
-    }
-
-    for (i1 = m_namedArgs.begin(); i1 != m_namedArgs.end(); ++i1)
-    {
-        if (!(*i1)->TestLinks())
-            return false;
     }
 
     return true;
@@ -2175,7 +2207,8 @@ void MythCommandLineParser::allowPassthrough(bool allow)
 void MythCommandLineParser::addHelp(void)
 {
     add(QStringList( QStringList() << "-h" << "--help" << "--usage" ),
-            "showhelp", "", "Display this help printout.",
+            "showhelp", "", "Display this help printout, or give detailed "
+                            "information of selected option.",
             "Displays a list of all commands available for use with "
             "this application. If another option is provided as an "
             "argument, it will provide detailed information on that "
