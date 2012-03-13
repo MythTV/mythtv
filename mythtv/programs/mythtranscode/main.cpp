@@ -240,11 +240,12 @@ int main(int argc, char *argv[])
         {
             if (!cmdline.toBool("inputfile") && !cmdline.toBool("hls"))
             {
-                cerr << "External cutlists are only allowed when using" << endl
-                     << "the --infile option." << endl;
+                LOG(VB_GENERAL, LOG_CRIT, "External cutlists are only allowed "
+                                          "when using the --infile option.");
                 return GENERIC_EXIT_INVALID_CMDLINE;
             }
 
+            uint64_t last = 0, start, end;
             QStringList cutlist = cmdline.toStringList("usecutlist", " ");
             QStringList::iterator it;
             for (it = cutlist.begin(); it != cutlist.end(); ++it)
@@ -253,46 +254,84 @@ int main(int argc, char *argv[])
                     (*it).split("-", QString::SkipEmptyParts);
                 if (startend.size() == 2)
                 {
-                    cerr << "Cutting from: " << startend.first().toULongLong()
-                         << " to: " << startend.last().toULongLong() << endl;
-                    deleteMap[startend.first().toULongLong()] = MARK_CUT_START;
-                    deleteMap[startend.last().toULongLong()] = MARK_CUT_END;
+                    start = startend.first().toULongLong();
+                    end = startend.last().toULongLong();
+
+                    if (cmdline.toBool("inversecut"))
+                    {
+                        LOG(VB_GENERAL, LOG_DEBUG,
+                                QString("Cutting section %1-%2.")
+                                    .arg(last).arg(start));
+                        deleteMap[start] = MARK_CUT_END;
+                        deleteMap[end] = MARK_CUT_START;
+                        last = end;
+                    }
+                    else
+                    {
+                        LOG(VB_GENERAL, LOG_DEBUG,
+                                QString("Cutting section %1-%2.")
+                                    .arg(start).arg(end));
+                        deleteMap[start] = MARK_CUT_START;
+                        deleteMap[end] = MARK_CUT_END;
+                    }
+                }
+            }
+
+            if (cmdline.toBool("inversecut"))
+            {
+                if (deleteMap.contains(0) && (deleteMap[0] == MARK_CUT_END))
+                    deleteMap.remove(0);
+                else
+                    deleteMap[0] = MARK_CUT_START;
+                deleteMap[999999999] = MARK_CUT_END;
+                LOG(VB_GENERAL, LOG_DEBUG,
+                    QString("Cutting section %1-999999999.")
+                                    .arg(last));
+            }
+
+            // sanitize cutlist
+            if (deleteMap.count() >= 2)
+            {
+                frm_dir_map_t::iterator cur = deleteMap.begin(), prev;
+                prev = cur++;
+                while (cur != deleteMap.end())
+                {
+                    if (prev.value() == cur.value())
+                    {
+                        // two of the same type next to each other
+                        QString err("Cut %1points found at %3 and %4, with no "
+                                    "%2 point in between.");
+                        if (prev.value() == MARK_CUT_END)
+                            err = err.arg("end").arg("start");
+                        else
+                            err = err.arg("start").arg("end");
+                        LOG(VB_GENERAL, LOG_CRIT, "Invalid cutlist defined!");
+                        LOG(VB_GENERAL, LOG_CRIT, err.arg(prev.key())
+                                                     .arg(cur.key()));
+                        return GENERIC_EXIT_INVALID_CMDLINE;
+                    }
+                    else if ( (prev.value() == MARK_CUT_START) &&
+                              ((cur.key() - prev.key()) < 2) )
+                    {
+                        LOG(VB_GENERAL, LOG_WARNING, QString("Discarding "
+                                          "insufficiently long cut: %1-%2")
+                                            .arg(prev.key()).arg(cur.key()));
+                        prev = deleteMap.erase(prev);
+                        cur  = deleteMap.erase(cur);
+
+                        if (cur == deleteMap.end())
+                            continue;
+                    }
+                    prev = cur++;
                 }
             }
         }
-    }
-
-    if (cmdline.toBool("inversecut"))
-    {
-        if (!cmdline.toBool("inputfile"))
+        else if (cmdline.toBool("inversecut"))
         {
-            cerr << "Inversed cutlists are only allowed when using" << endl
-                 << "the --infile option." << endl;
+            cerr << "Cutlist inversion requires an external cutlist be" << endl
+                 << "provided using the --honorcutlist option." << endl;
             return GENERIC_EXIT_INVALID_CMDLINE;
         }
-
-        deleteMap[0] = MARK_CUT_START;
-
-        uint64_t last = 0;
-        QStringList cutlist = cmdline.toStringList("inversecut", " ");
-        QStringList::iterator it;
-        for (it = cutlist.begin(); it != cutlist.end(); ++it)
-        {
-            QStringList startend = (*it).split(
-                        "-", QString::SkipEmptyParts);
-            if (startend.count() == 2)
-            {
-                cerr << "Cutting from: " << last
-                     << " to: "
-                     << startend.first().toULongLong() <<"\n";
-                deleteMap[startend.first().toULongLong()] = MARK_CUT_END;
-                deleteMap[startend.last().toULongLong()] = MARK_CUT_START;
-                last = startend.last().toInt();
-            }
-        }
-        cerr << "Cutting from: " << last
-             << " to the end\n";
-        deleteMap[999999999] = MARK_CUT_END;
     }
 
     if (cmdline.toBool("cleancut"))

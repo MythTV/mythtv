@@ -67,7 +67,8 @@ void MythTranscodeCommandLineParser::LoadArguments(void)
         ->SetGroup("Cutlist");
     add("--inversecut", "inversecut", false,
             "Inverses the cutlist, leaving only the marked off sections.", "")
-        ->SetGroup("Cutlist");
+        ->SetGroup("Cutlist")
+        ->SetRequires("usecutlist");
 
     add("--showprogress", "showprogress", false,
             "Display status info in stdout", "")

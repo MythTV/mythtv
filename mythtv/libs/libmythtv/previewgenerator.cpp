@@ -327,8 +327,6 @@ void PreviewGenerator::run(void)
 {
     RunProlog();
     Run();
-    connect(qthread(), SIGNAL(finished()),
-            this, SLOT(deleteLater()));
     RunEpilog();
 }
 

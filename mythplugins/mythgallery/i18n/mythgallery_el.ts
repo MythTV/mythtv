@@ -420,9 +420,8 @@
         <translation>Φίλτρο φακέλου</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="20"/>
         <source>Enter direcory names to be excluded in browser. (multiple entries delimited with &apos;:&apos;)</source>
-        <translation>Δώστε ονόματα φακέλων προς εξαίρεση από την περιήγηση (πολλαπλές τιμές χωρισμένες με &apos;:&apos;)</translation>
+        <translation type="obsolete">Δώστε ονόματα φακέλων προς εξαίρεση από την περιήγηση (πολλαπλές τιμές χωρισμένες με &apos;:&apos;)</translation>
     </message>
     <message>
         <location filename="../mythgallery/gallerysettings.cpp" line="29"/>
@@ -471,6 +470,11 @@
     <message>
         <source>This command is executed whenever a movie file is selected</source>
         <translation type="obsolete">Εκτελείτε όταν επιλέγεται αρχείο ταινίας</translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/gallerysettings.cpp" line="20"/>
+        <source>Enter directory names to be excluded in browser. (multiple entries delimited with &apos;:&apos;)</source>
+        <translation>Δώστε ονόματα φακέλων προς εξαίρεση από την περιήγηση (πολλαπλές τιμές χωρίζονται με &apos;:&apos;)</translation>
     </message>
     <message>
         <location filename="../mythgallery/gallerysettings.cpp" line="89"/>
@@ -752,6 +756,11 @@ Check the directory exists, is readable and the setting is correct on MythGaller
         <location filename="themestrings.h" line="12"/>
         <source>Filter/sort images</source>
         <translation>Φιλτράρισμα/ταξινόμιση εικόνων</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="13"/>
+        <source>Directory filter:</source>
+        <translation>Φίλτρο φακέλου:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="14"/>

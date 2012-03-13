@@ -71,19 +71,26 @@ Use the &apos;Add Bookmark&apos; menu option to add new bookmarks</source>
         <translation>Εκκαθάριση Σημαδεμένου</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="317"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="496"/>
+        <source>Are you sure you want to delete the selected bookmark?</source>
+        <translation>Σίγουρα θέλετε να διαγράψετε τον επιλεγμένο σελειδοδείκτη;</translation>
+    </message>
+    <message>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="540"/>
+        <source>Are you sure you want to delete the marked bookmarks?</source>
+        <translation>Σίγουρα θέλετε να διαγράψετε τους σημαδεμένους σελειδοδείκτες;</translation>
+    </message>
+    <message>
         <source>Cancel</source>
-        <translation>Ακύρωση</translation>
+        <translation type="obsolete">Ακύρωση</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="498"/>
         <source>Are you sure you want to delete the selected bookmark</source>
-        <translation>Σίγουρα θέλετε να διαγράψετε τον επιλεγμένο σελειδοδείκτη</translation>
+        <translation type="obsolete">Σίγουρα θέλετε να διαγράψετε τον επιλεγμένο σελειδοδείκτη</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="542"/>
         <source>Are you sure you want to delete the marked bookmarks</source>
-        <translation>Σίγουρα θέλετε να διαγράψετε τον σημαδεμένο σελειδοδείκτη</translation>
+        <translation type="obsolete">Σίγουρα θέλετε να διαγράψετε τον σημαδεμένο σελειδοδείκτη</translation>
     </message>
 </context>
 <context>
@@ -173,9 +180,8 @@ Use the &apos;Add Bookmark&apos; menu option to add new bookmarks</source>
         <translation>Προσθήκη Σελιδοδείκτη</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="342"/>
         <source>Cancel</source>
-        <translation>Ακύρωση</translation>
+        <translation type="obsolete">Ακύρωση</translation>
     </message>
 </context>
 <context>

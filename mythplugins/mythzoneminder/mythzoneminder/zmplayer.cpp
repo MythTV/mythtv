@@ -58,7 +58,7 @@ ZMPlayer::~ZMPlayer()
 
     m_frameTimer->deleteLater();
 
-    if (!m_frameList)
+    if (m_frameList)
         delete m_frameList;
 }
 

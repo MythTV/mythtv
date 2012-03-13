@@ -202,9 +202,6 @@ QList<QHostAddress> ServerPool::DefaultListen(void)
 
 QList<QHostAddress> ServerPool::DefaultListenIPv4(void)
 {
-    QList<QHostAddress> alist;
-    alist << QHostAddress::Any;
-#if 0
     SelectDefaultListen();
     QReadLocker rlock(&naLock);
 
@@ -213,15 +210,12 @@ QList<QHostAddress> ServerPool::DefaultListenIPv4(void)
     for (it = naList_4.begin(); it != naList_4.end(); ++it)
         if (!alist.contains(it->ip()))
             alist << it->ip();
-#endif
+
     return alist;
 }
 
 QList<QHostAddress> ServerPool::DefaultListenIPv6(void)
 {
-    QList<QHostAddress> alist;
-    alist << QHostAddress::AnyIPv6;
-#if 0
     SelectDefaultListen();
     QReadLocker rlock(&naLock);
 
@@ -230,7 +224,7 @@ QList<QHostAddress> ServerPool::DefaultListenIPv6(void)
     for (it = naList_6.begin(); it != naList_6.end(); ++it)
         if (!alist.contains(it->ip()))
             alist << it->ip();
-#endif
+
     return alist;
 }
 
@@ -243,9 +237,6 @@ QList<QHostAddress> ServerPool::DefaultBroadcast(void)
 
 QList<QHostAddress> ServerPool::DefaultBroadcastIPv4(void)
 {
-    QList<QHostAddress> blist;
-    blist << QHostAddress::Any;
-#if 0
     SelectDefaultListen();
     QReadLocker rlock(&naLock);
 
@@ -255,7 +246,7 @@ QList<QHostAddress> ServerPool::DefaultBroadcastIPv4(void)
         if (!blist.contains(it->broadcast()) && (it->prefixLength() != 32) &&
                 (it->ip() != QHostAddress::LocalHost))
             blist << it->broadcast();
-#endif
+
     return blist;
 }
 

@@ -320,7 +320,7 @@ AudioOutputSettings* AudioOutputSettings::GetCleaned(bool newcopy)
         // Can't do digital passthrough without 16 bits audio
         aosettings->setPassthrough(-1);
         aosettings->setFeature(false,
-                               FEATURE_AC3 | FEATURE_DTS | FEATURE_LPCM |
+                               FEATURE_AC3 | FEATURE_DTS |
                                FEATURE_EAC3 | FEATURE_TRUEHD | FEATURE_DTSHD);
     }
 

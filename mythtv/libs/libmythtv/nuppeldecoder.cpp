@@ -596,6 +596,16 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         setreadahead = true;
 
     bitrate = 0;
+    unsigned min_bitrate = 1000;
+    if (usingextradata && extradata.video_fourcc == FOURCC_DIVX)
+    {
+        // Use video bitrate, ignore negligible audio bitrate
+        bitrate = extradata.lavc_bitrate / 1000;
+    }
+    bitrate = max(bitrate, min_bitrate); // set minimum 1 Mb/s to be safe
+    LOG(VB_PLAYBACK, LOG_INFO,
+        QString("Setting bitrate to %1 Kb/s").arg(bitrate));
+
     ringBuffer->UpdateRawBitrate(GetRawBitrate());
 
     videosizetotal = 0;

@@ -79,8 +79,11 @@ class MBASE_PUBLIC MythDownloadManager : public QObject, public MThread
 
     void loadCookieJar(const QString &filename);
     void saveCookieJar(const QString &filename);
-    QNetworkCookieJar *getCookieJar(void) { return m_manager->cookieJar(); }
-    void setCookieJar(QNetworkCookieJar *cookieJar) { m_manager->setCookieJar(cookieJar); }
+    void setCookieJar(QNetworkCookieJar *cookieJar);
+
+    QNetworkCookieJar *copyCookieJar(void);
+    void refreshCookieJar(QNetworkCookieJar *jar);
+    void updateCookieJar(void);
 
     QString getHeader(const QUrl &url, const QString &header);
     QString getHeader(const QNetworkCacheMetaData &cacheData, const QString &header);
@@ -122,6 +125,8 @@ class MBASE_PUBLIC MythDownloadManager : public QObject, public MThread
     bool saveFile(const QString &outFile, const QByteArray &data,
                   const bool append = false);
 
+    void updateCookieJar(QNetworkCookieJar *jar);
+
     QNetworkAccessManager                        *m_manager;
     QNetworkDiskCache                            *m_diskCache;
     QNetworkProxy                                *m_proxy;
@@ -138,6 +143,9 @@ class MBASE_PUBLIC MythDownloadManager : public QObject, public MThread
 
     bool                                          m_runThread;
     bool                                          m_isRunning;
+
+    QNetworkCookieJar                            *m_inCookieJar;
+    QMutex                                        m_cookieLock;
 
     friend class RemoteFileDownloadThread;
 };

@@ -30,14 +30,22 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../mythzoneminder/zmsettings.cpp" line="17"/>
         <source>IP address of the mythzoneminder server</source>
-        <translation>IP-адрес Zoneminder</translation>
+        <translation type="obsolete">IP-адрес Zoneminder</translation>
+    </message>
+    <message>
+        <source>Enter the IP address of the mythzoneminder server that this frontend should connect to.</source>
+        <translation type="obsolete">Введите адрес сервера для соединения с фронтедом.</translation>
+    </message>
+    <message>
+        <location filename="../mythzoneminder/zmsettings.cpp" line="17"/>
+        <source>IP address of the MythZoneMinder server</source>
+        <translation>IP-адрес сервера MythZoneMinder</translation>
     </message>
     <message>
         <location filename="../mythzoneminder/zmsettings.cpp" line="19"/>
-        <source>Enter the IP address of the mythzoneminder server that this frontend should connect to.</source>
-        <translation>Введите адрес сервера для соединения с фронтедом.</translation>
+        <source>Enter the IP address of the MythZoneMinder server that this frontend should connect to.</source>
+        <translation>Введите адрес сервера MythZoneMinder для соединения с фронтедом.</translation>
     </message>
     <message>
         <location filename="../mythzoneminder/zmsettings.cpp" line="27"/>
@@ -57,12 +65,12 @@
     <message>
         <location filename="../mythzoneminder/zmsettings.cpp" line="41"/>
         <source>Samples are shown using today&apos;s date.</source>
-        <translation type="unfinished">Примеры показываются с использованием сегодняшней даты.</translation>
+        <translation>Примеры показываются с использованием сегодняшней даты.</translation>
     </message>
     <message>
         <location filename="../mythzoneminder/zmsettings.cpp" line="47"/>
         <source>Samples are shown using tomorrow&apos;s date.</source>
-        <translation type="unfinished">Примеры показываются с использованием завтрашней даты.</translation>
+        <translation>Примеры показываются с использованием завтрашней даты.</translation>
     </message>
     <message>
         <location filename="../mythzoneminder/zmsettings.cpp" line="63"/>
@@ -250,7 +258,7 @@
     <message>
         <location filename="themestrings.h" line="35"/>
         <source>There are no events to show</source>
-        <translation type="unfinished">Нет событий для показа</translation>
+        <translation>Нет событий для показа</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="37"/>
@@ -317,50 +325,50 @@
 <context>
     <name>ZMEvents</name>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="95"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="96"/>
         <source>Play</source>
         <translation>Воспроизвести</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="102"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="103"/>
         <source>Delete</source>
         <translation>Удалить</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="178"/>
-        <location filename="../mythzoneminder/zmevents.cpp" line="351"/>
-        <location filename="../mythzoneminder/zmevents.cpp" line="366"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="179"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="350"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="365"/>
         <source>All Cameras</source>
         <translation>Все камеры</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="181"/>
-        <location filename="../mythzoneminder/zmevents.cpp" line="375"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="182"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="374"/>
         <source>All Dates</source>
         <translation>Все даты</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="451"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="450"/>
         <source>Refresh</source>
         <translation>Обновить</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="452"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="451"/>
         <source>Change View</source>
         <translation>Изменить вид</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="453"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="452"/>
         <source>Delete All</source>
         <translation>Удалить все</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="465"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="464"/>
         <source>Delete All Events?</source>
         <translation>Удалить все события?</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="466"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="465"/>
         <source>Deleting %1 events in this view.</source>
         <translation>Удалено %1 событий в этом просмотре.</translation>
     </message>
@@ -381,29 +389,29 @@
 <context>
     <name>ZMPlayer</name>
     <message>
-        <location filename="../mythzoneminder/zmplayer.cpp" line="106"/>
-        <location filename="../mythzoneminder/zmplayer.cpp" line="288"/>
+        <location filename="../mythzoneminder/zmplayer.cpp" line="107"/>
+        <location filename="../mythzoneminder/zmplayer.cpp" line="289"/>
         <source>Pause</source>
         <translation>Пауза</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmplayer.cpp" line="112"/>
+        <location filename="../mythzoneminder/zmplayer.cpp" line="113"/>
         <source>Delete</source>
         <translation>Удалить</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmplayer.cpp" line="118"/>
+        <location filename="../mythzoneminder/zmplayer.cpp" line="119"/>
         <source>Previous</source>
         <translation>Предидущее</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmplayer.cpp" line="124"/>
+        <location filename="../mythzoneminder/zmplayer.cpp" line="125"/>
         <source>Next</source>
         <translation>Следующее</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmplayer.cpp" line="295"/>
-        <location filename="../mythzoneminder/zmplayer.cpp" line="374"/>
+        <location filename="../mythzoneminder/zmplayer.cpp" line="296"/>
+        <location filename="../mythzoneminder/zmplayer.cpp" line="375"/>
         <source>Play</source>
         <translation>Воспроизведение</translation>
     </message>

@@ -489,7 +489,10 @@ bool MythConfirmationDialog::Create(void)
 
     BuildFocusList();
 
-    SetFocusWidget(okButton);
+    if (m_showCancel)
+        SetFocusWidget(cancelButton);
+    else
+        SetFocusWidget(okButton);
 
     return true;
 }

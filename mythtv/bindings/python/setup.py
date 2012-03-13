@@ -2,12 +2,14 @@
 
 from distutils.core import setup
 from distutils.cmd import Command
-from distutils.sysconfig import get_python_lib
+from distutils.sysconfig import get_python_lib, project_base
 from distutils.command.install import INSTALL_SCHEMES
 from distutils.command.build import build as pybuild
 
 import os
 import glob
+
+SCRIPTS = ['scripts/mythpython', 'scripts/mythwikiscripts']
 
 for scheme in INSTALL_SCHEMES.values():
     scheme['data'] = scheme['purelib']
@@ -24,14 +26,21 @@ class uninstall(Command):
         if os.access(mythtv_path, os.F_OK):
             for path,dirs,files in os.walk(mythtv_path, topdown=False):
                 for fname in files:
-                    print 'unlinking '+os.path.join(path,fname)
-                    os.unlink(os.path.join(path,fname))
+                    fname = os.path.join(path,fname)
+                    print 'unlinking '+fname
+                    os.unlink(fname)
                 print 'removing folder '+path
                 os.rmdir(path)
             for fname in os.listdir(install_path):
                 if fname.endswith('.egg-info') and fname.startswith('MythTV'):
-                    print 'unlinking '+os.path.join(install_path, fname)
-                    os.unlink(os.path.join(install_path, fname))
+                    fname = os.path.join(install_path, fname)
+                    print 'unlinking '+fname
+                    os.unlink(fname)
+            for fname in SCRIPTS:
+                fname = os.path.join(project_base, fname.split('/')[-1])
+                if os.access(fname, os.F_OK):
+                    print 'unlinking '+fname
+                    os.unlink(fname)
 
 class build(pybuild):
     user_options = pybuild.user_options + [('mythtv-prefix=', None, 'MythTV installation prefix')]
@@ -65,6 +74,8 @@ class build(pybuild):
         with open(path,'w') as fo:
             fo.write(''.join(buff))
 
+
+
 setup(
         name='MythTV',
         version='0.24.0',
@@ -73,7 +84,7 @@ setup(
         packages=['MythTV', 'MythTV/tmdb', 'MythTV/ttvdb', 'MythTV/wikiscripts'],
         data_files=[('MythTV/tmdb/XSLT',glob.glob('MythTV/tmdb/XSLT/*')), ('MythTV/ttvdb/XSLT', glob.glob('MythTV/ttvdb/XSLT/*'))],
         url=['http://www.mythtv.org/'],
-        scripts=['scripts/mythpython', 'scripts/mythwikiscripts'],
+        scripts=SCRIPTS,
         requires=['MySQLdb','lxml'],
         cmdclass={'uninstall':uninstall,
                   'build':build},

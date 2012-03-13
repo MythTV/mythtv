@@ -385,7 +385,21 @@ bool SyslogLogger::logmsg(LoggingItem *item)
     if (!m_opened)
         return false;
 
-    syslog( item->level, "%s", item->message );
+    char shortname;
+
+    {
+        QMutexLocker locker(&loglevelMapMutex);
+        LoglevelMap::iterator it = loglevelMap.find(item->level);
+        if (it == loglevelMap.end())
+            shortname = '-';
+        else
+            shortname = (*it)->shortname;
+    }
+
+    char *threadName = getThreadName(item);
+
+    syslog( item->level, "%c %s %s:%d (%s) %s", shortname, threadName,
+            item->file, item->line, item->function, item->message );
 
     return true;
 }

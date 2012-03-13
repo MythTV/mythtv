@@ -152,7 +152,7 @@ void MythFillDatabaseCommandLineParser::LoadArguments(void)
             "used, rather use --dd-grab-all to pull all listings each time.")
         ->SetDeprecated("use --refresh instead")
         ->SetGroup("Filtering");
-    add("--refresh-day", "refreshday", 0U, "",
+    add("--refresh-day", "refreshday", QVariant::StringList, "",
             "This option is only valid for selected grabbers.\n"
             "Force a refresh for guide data on a specific day. This can "
             "be used in combination with other --refresh-<n> options.\n"

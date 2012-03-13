@@ -379,8 +379,6 @@ bool doUpgradeVideoDatabaseSchema(void)
     if (dbver == "1016")
     {
         const QString updates[] = {
-QString("ALTER DATABASE %1 DEFAULT CHARACTER SET latin1;")
-        .arg(gCoreContext->GetDatabaseParams().dbName),
 "ALTER TABLE dvdbookmark"
 "  MODIFY serialid varbinary(16) NOT NULL default '',"
 "  MODIFY name varbinary(32) default NULL;",
@@ -425,8 +423,6 @@ QString("ALTER DATABASE %1 DEFAULT CHARACTER SET latin1;")
     if (dbver == "1017")
     {
         const QString updates[] = {
-QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;")
-        .arg(gCoreContext->GetDatabaseParams().dbName),
 "ALTER TABLE dvdbookmark"
 "  DEFAULT CHARACTER SET default,"
 "  MODIFY serialid varchar(16) CHARACTER SET utf8 NOT NULL default '',"

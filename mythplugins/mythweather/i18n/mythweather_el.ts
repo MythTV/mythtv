@@ -17,13 +17,21 @@
         <translation>Αναζήτηση</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="978"/>
         <source>Searching ...</source>
+        <translation type="obsolete">Ψάχνω...</translation>
+    </message>
+    <message>
+        <source>Searching ... Results: %1</source>
+        <translation type="obsolete">Ψάχνω ... Αποτελέσματα: %1</translation>
+    </message>
+    <message>
+        <location filename="../mythweather/weatherSetup.cpp" line="978"/>
+        <source>Searching...</source>
         <translation>Ψάχνω...</translation>
     </message>
     <message>
         <location filename="../mythweather/weatherSetup.cpp" line="1000"/>
-        <source>Searching ... Results: %1</source>
+        <source>Searching... Results: %1</source>
         <translation>Ψάχνω ... Αποτελέσματα: %1</translation>
     </message>
     <message>
@@ -1194,6 +1202,11 @@ When you have completed your changes, click &quot;Finish&quot; to continue.</sou
         <location filename="themestrings.h" line="55"/>
         <source>100%</source>
         <translation>100%</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="56"/>
+        <source>Global Weather Settings</source>
+        <translation>Γενικές Επιλογές Καιρού</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="57"/>

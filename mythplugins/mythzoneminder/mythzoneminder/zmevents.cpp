@@ -49,7 +49,7 @@ ZMEvents::ZMEvents(MythScreenStack *parent) :
 
 ZMEvents::~ZMEvents()
 {
-    if (!m_eventList)
+    if (m_eventList)
         delete m_eventList;
 
     // remember how the user wants to display the event list
