@@ -935,7 +935,6 @@ class CetonDeviceID : public LabelSetting, public CaptureCardDBStorage
 
   public slots:
     void SetIP(const QString&);
-    void SetCard(const QString&);
     void SetTuner(const QString&);
 
   private:

@@ -64,7 +64,6 @@ class CetonStreamHandler : public StreamHandler
 
   private:
     QString     _ip_address;
-    bool        _using_rtp;
     uint        _card;
     uint        _tuner;
     QString     _device_path;

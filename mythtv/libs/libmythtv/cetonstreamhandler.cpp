@@ -124,7 +124,6 @@ CetonStreamHandler::CetonStreamHandler(const QString &device) :
     QStringList tuner_parts = parts.at(1).split(".");
     if (tuner_parts.size() == 2)
     {
-        _using_rtp = (tuner_parts.at(0) == "RTP");
         _card = tuner_parts.at(0).toUInt();
         _tuner = tuner_parts.at(1).toUInt();
     }
@@ -140,19 +139,6 @@ CetonStreamHandler::CetonStreamHandler(const QString &device) :
         LOG(VB_RECORD, LOG_ERR, LOC +
             QString("Ceton tuner does not seem to be available at IP"));
         return;
-    }
-
-    if (!_using_rtp)
-    {
-        _device_path = QString("/dev/ceton/ctn91xx_mpeg%1_%2")
-            .arg(_card).arg(_tuner);
-
-        if (!QFile(_device_path).exists())
-        {
-            LOG(VB_RECORD, LOG_ERR, LOC +
-                QString("Tuner device unavailable"));
-            return;
-        }
     }
 
     _valid = true;
@@ -197,27 +183,11 @@ void CetonStreamHandler::run(void)
     QFile file(_device_path);
     CetonRTP rtp(_ip_address, _tuner);
 
-    if (_using_rtp)
+    if (!(rtp.Init() && rtp.StartStreaming()))
     {
-        if (!(rtp.Init() && rtp.StartStreaming()))
-        {
-            LOG(VB_RECORD, LOG_ERR, LOC +
-                "Starting recording (RTP initialization failed). Aborting.");
-            _error = true;
-        }
-    }
-    else
-    {
-        if (!file.open(QIODevice::ReadOnly))
-        {
-            LOG(VB_RECORD, LOG_ERR, LOC +
-                "Starting recording (file open failed). Aborting.");
-            _error = true;
-        }
-
-        int flags = fcntl(file.handle(), F_GETFL, 0);
-        if (flags == -1) flags = 0;
-        fcntl(file.handle(), F_SETFL, flags | O_NONBLOCK);
+        LOG(VB_RECORD, LOG_ERR, LOC +
+            "Starting recording (RTP initialization failed). Aborting.");
+        _error = true;
     }
 
     if (_error)
@@ -240,11 +210,7 @@ void CetonStreamHandler::run(void)
     int remainder = 0;
     while (_running_desired && !_error)
     {
-        int bytes_read;
-        if (_using_rtp)
-            bytes_read = rtp.Read(buffer, buffer_size);
-        else
-            bytes_read = file.read(buffer, buffer_size);
+        int bytes_read = rtp.Read(buffer, buffer_size);
 
         if (bytes_read <= 0)
         {
@@ -286,10 +252,7 @@ void CetonStreamHandler::run(void)
     }
     LOG(VB_RECORD, LOG_INFO, LOC + "RunTS(): " + "shutdown");
 
-    if (_using_rtp)
-        rtp.StopStreaming();
-    else
-        file.close();
+    rtp.StopStreaming();
 
     delete[] buffer;
 
