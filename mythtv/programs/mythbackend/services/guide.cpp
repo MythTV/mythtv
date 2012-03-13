@@ -91,14 +91,16 @@ DTC::ProgramGuide *Guide::GetProgramGuide( const QDateTime &dtStartTime ,
                          "AND program.chanid <= :EndChanId "
                          "AND program.endtime >= :StartDate "
                          "AND program.starttime <= :EndDate "
+                         "AND program.starttime >= :StartDateLimit "
                         "GROUP BY program.starttime, channel.channum, "
                          "channel.callsign, program.title "
                         "ORDER BY program.chanid ";
 
-    bindings[":StartChanId"] = nStartChanId;
-    bindings[":EndChanId"  ] = nEndChanId;
-    bindings[":StartDate"  ] = dtStartTime;
-    bindings[":EndDate"    ] = dtEndTime;
+    bindings[":StartChanId"   ] = nStartChanId;
+    bindings[":EndChanId"     ] = nEndChanId;
+    bindings[":StartDate"     ] = dtStartTime;
+    bindings[":StartDateLimit"] = dtStartTime.addDays(-1);
+    bindings[":EndDate"       ] = dtEndTime;
 
     // ----------------------------------------------------------------------
     // Get all Pending Scheduled Programs
