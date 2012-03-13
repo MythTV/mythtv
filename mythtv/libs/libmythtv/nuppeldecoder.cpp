@@ -595,7 +595,7 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     if (usingextradata && extradata.video_fourcc == FOURCC_DIVX)
         setreadahead = true;
 
-    bitrate = 0;
+    bitrate = 8000;
     ringBuffer->UpdateRawBitrate(GetRawBitrate());
 
     videosizetotal = 0;
