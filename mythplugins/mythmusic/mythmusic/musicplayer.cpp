@@ -946,12 +946,12 @@ void MusicPlayer::changeCurrentTrack(int trackNo)
     m_currentTrack = trackNo;
 
     // sanity check the current track
-    if (m_currentTrack < 0 || m_currentTrack > m_currentPlaylist->getSongs().size())
+    if (m_currentTrack < 0 || m_currentTrack >= m_currentPlaylist->getSongs().size())
     {
         LOG(VB_GENERAL, LOG_ERR,
             QString("MusicPlayer: asked to set the current track to an invalid track no. %1")
             .arg(trackNo));
-        m_currentTrack = 0;
+        m_currentTrack = -1;
         m_currentMetadata = NULL;
         return;
     }
@@ -1225,6 +1225,8 @@ void MusicPlayer::activePlaylistChanged(int trackID, bool deleted)
         if (deleted)
         {
             // all tracks were removed
+            m_currentTrack = -1;
+            m_currentMetadata = NULL;
             stop(true);
             MusicPlayerEvent me(MusicPlayerEvent::AllTracksRemovedEvent, 0);
             dispatch(me);
