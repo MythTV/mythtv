@@ -17,7 +17,7 @@
 class VDALibrary
 {
   public:
-    static VDALibrary* GetVDALibrary(void);
+    static MTV_PUBLIC VDALibrary* GetVDALibrary(void);
     VDALibrary();
     bool IsValid(void) const { return m_valid; }
 

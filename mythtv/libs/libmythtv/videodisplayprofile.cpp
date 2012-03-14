@@ -1094,6 +1094,47 @@ void VideoDisplayProfile::CreateVDPAUProfiles(const QString &hostname)
                   "vdpauskipchroma,vdpaucolorspace=auto");
 }
 
+#if defined(Q_OS_MACX)
+void VideoDisplayProfile::CreateVDAProfiles(const QString &hostname)
+{
+    (void) QObject::tr("VDA High Quality", "Sample: VDA high quality");
+    DeleteProfileGroup("VDA High Quality", hostname);
+    uint groupid = CreateProfileGroup("VDA High Quality", hostname);
+    CreateProfile(groupid, 1, ">", 0, 0, "", 0, 0,
+                  "vda", 2, true, "opengl", "opengl2", true,
+                  "greedyhdoubleprocessdeint", "greedyhdeint",
+                  "");
+    CreateProfile(groupid, 1, ">", 0, 0, "", 0, 0,
+                  "ffmpeg", 2, true, "opengl", "opengl2", true,
+                  "greedyhdoubleprocessdeint", "greedyhdeint",
+                  "");
+
+    (void) QObject::tr("VDA Normal", "Sample: VDA average quality");
+    DeleteProfileGroup("VDA Normal", hostname);
+    groupid = CreateProfileGroup("VDA Normal", hostname);
+    CreateProfile(groupid, 1, ">", 0, 0, "", 0, 0,
+                  "vda", 2, true, "opengl", "opengl2", true,
+                  "opengldoubleratekerneldeint", "openglkerneldeint",
+                  "");
+    CreateProfile(groupid, 2, ">", 0, 0, "", 0, 0,
+                  "ffmpeg", 2, true, "opengl", "opengl2", true,
+                  "opengldoubleratekerneldeint", "openglkerneldeint",
+                  "");
+
+    (void) QObject::tr("VDA Slim", "Sample: VDA low power GPU");
+    DeleteProfileGroup("VDA Slim", hostname);
+    groupid = CreateProfileGroup("VDA Slim", hostname);
+    CreateProfile(groupid, 1, ">", 0, 0, "", 0, 0,
+                  "vda", 2, true, "opengl", "opengl2", true,
+                  "opengldoubleratelinearblend", "opengllinearblend",
+                  "");
+    CreateProfile(groupid, 2, ">", 0, 0, "", 0, 0,
+                  "ffmpeg", 2, true, "opengl", "opengl2", true,
+                  "opengldoubleratelinearblend", "opengllinearblend",
+                  "");
+}
+#endif
+
 void VideoDisplayProfile::CreateProfiles(const QString &hostname)
 {
     CreateNewProfiles(hostname);
