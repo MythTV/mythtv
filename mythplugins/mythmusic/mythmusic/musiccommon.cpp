@@ -340,6 +340,7 @@ void MusicCommon::switchView(MusicView view)
     }
 
     gPlayer->removeListener(this);
+    gPlayer->setAllowRestorePos(false);
 
     switch (view)
     {
@@ -422,6 +423,8 @@ void MusicCommon::switchView(MusicView view)
     }
 
     Close();
+
+    gPlayer->setAllowRestorePos(true);
 }
 
 #if 0
