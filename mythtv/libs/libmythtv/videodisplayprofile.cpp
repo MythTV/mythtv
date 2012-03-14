@@ -687,6 +687,13 @@ QString VideoDisplayProfile::GetDecoderHelp(QString decoder)
         msg += QObject::tr(
             "VAAPI will attempt to use the graphics hardware to "
             "accelerate video decoding.");
+
+    if (decoder == "vda")
+        msg += QObject::tr(
+            "VDA will attempt to use the graphics hardware to "
+            "accelerate video decoding. "
+            "(H264 only, requires Mac OS 10.6.3)");
+
     return msg;
 }
 
