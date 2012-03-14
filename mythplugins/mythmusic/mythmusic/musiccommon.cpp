@@ -1526,7 +1526,8 @@ void MusicCommon::customEvent(QEvent *event)
 
                     item->SetTextFromMap(metadataMap);
 
-                    if (gPlayer->isPlaying() && mdata->ID() == gPlayer->getCurrentMetadata()->ID())
+                    if (gPlayer->isPlaying() && gPlayer->getCurrentMetadata() &&
+                        mdata->ID() == gPlayer->getCurrentMetadata()->ID())
                     {
                         item->SetFontState("running");
                         item->DisplayState("playing", "playstate");
@@ -1622,7 +1623,7 @@ void MusicCommon::customEvent(QEvent *event)
             }
         }
 
-        if (trackID == gPlayer->getCurrentMetadata()->ID())
+        if (gPlayer->getCurrentMetadata() && trackID == gPlayer->getCurrentMetadata()->ID())
             updateTrackInfo(gPlayer->getCurrentMetadata());
     }
 }
@@ -1823,7 +1824,8 @@ void MusicCommon::updateUIPlaylist(void)
             mdata->toMap(metadataMap);
             item->SetTextFromMap(metadataMap);
 
-            if (gPlayer->isPlaying() && mdata->ID() == gPlayer->getCurrentMetadata()->ID())
+            if (gPlayer->isPlaying() && gPlayer->getCurrentMetadata() &&
+                mdata->ID() == gPlayer->getCurrentMetadata()->ID())
             {
                 item->SetFontState("running");
                 item->DisplayState("playing", "playstate");
@@ -1836,7 +1838,7 @@ void MusicCommon::updateUIPlaylist(void)
 
             item->DisplayState(QString("%1").arg(mdata->Rating()), "ratingstate");
 
-            if (mdata->ID() == gPlayer->getCurrentMetadata()->ID())
+            if (gPlayer->getCurrentMetadata() && mdata->ID() == gPlayer->getCurrentMetadata()->ID())
                 m_currentPlaylist->SetItemCurrent(item);
         }
     }
