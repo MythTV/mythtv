@@ -1111,6 +1111,50 @@
 
     </window>
 
+    <window name="MythTimeInputDialog">
+        <area>-1,-1,580,165</area>
+
+        <animation trigger="AboutToShow">
+            <section>
+                <alpha start="0" end="255" easingcurve="OutQuart"/>
+                <zoom start="0" end="100" easingcurve="OutQuart"/>
+            </section>
+        </animation>
+
+        <animation trigger="AboutToHide">
+            <section>
+                <alpha start="255" end="0" easingcurve="InQuart"/>
+                <zoom start="100" end="0" easingcurve="InQuart"/>
+            </section>
+        </animation>
+
+        <imagetype name="box">
+            <filename>mythprogressdialog-background.png</filename>
+        </imagetype>
+
+        <textarea name="message" from="basetextarea">
+            <area>10,8,560,50</area>
+            <font>basemedium</font>
+            <align>allcenter</align>
+            <value>Select Time &amp; Date</value>
+            <multiline>true</multiline>
+        </textarea>
+
+        <buttonlist name="dates" from="baseselector">
+            <position>40,65</position>
+        </buttonlist>
+
+        <buttonlist name="times" from="baseselector">
+            <position>330,65</position>
+        </buttonlist>
+
+        <button name="ok" from="basebutton">
+            <position>220,115</position>
+            <value>OK</value>
+        </button>
+
+    </window>
+
     <window name="videowindow">
 
         <shape name="shape1">
