@@ -68,6 +68,7 @@ MusicPlayer::MusicPlayer(QObject *parent, const QString &dev)
     m_canShowPlayer = true;
     m_wasPlaying = true;
     m_updatedLastplay = false;
+    m_allowRestorePos = true;
 
     m_playSpeed = 1.0;
 
@@ -883,6 +884,10 @@ void MusicPlayer::savePosition(void)
 
 void MusicPlayer::restorePosition(void)
 {
+    // if we are switching views we don't wont to restore the position
+    if (!m_allowRestorePos)
+        return;
+
     m_currentTrack = 0;
     uint trackID = 0;
 
