@@ -5,6 +5,7 @@
  * \author   Andrew Kimpton, Nigel Pearson
  */
 
+#include <QDir>
 #include <QMetaType>
 
 #include "mythmediamonitor.h"
@@ -420,7 +421,17 @@ void MonitorThreadDarwin::diskInsert(const char *devName,
     media->setDeviceModel(model.toAscii());  // Same for the Manufacturer and model
 
     // Mac OS X devices are pre-mounted here:
-    media->setMountPath((QString("/Volumes/") + volName).toAscii());
+    QString mnt = "/Volumes/"; mnt += volName;
+    media->setMountPath(mnt.toAscii());
+
+    QDir d(mnt);
+    while (!d.exists())
+    {
+        LOG(VB_MEDIA, LOG_WARNING,
+            (msg + "() - Waiting for mount '%1' to become stable.").arg(mnt));
+        usleep(120000);
+    }
+
     media->setStatus(MEDIASTAT_MOUNTED);
 
     // This is checked in AddDevice(), but checking earlier means
