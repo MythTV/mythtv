@@ -598,11 +598,12 @@
     <textedit name="basemultilinetextedit">
         <area>0,0,376,110</area>
         <statetype name="background">
+            <area>0,0,100%,100%</area>
             <state name="active">
-                <area>0,0,376,110</area>
+                <area>0,0,100%,100%</area>
                 <shape name="background" from="basewidgetshape" />
                 <shape name="textbackground">
-                    <area>10,10,356,90</area>
+                    <area>10,10,-10,-10</area>
                     <type>roundbox</type>
                     <cornerradius>4</cornerradius>
                     <fill color="#FFFFFF" alpha="200" />
@@ -620,7 +621,7 @@
             <filename>cursor.png</filename>
         </imagetype>
         <textarea name="text">
-            <area>12,12,352,103</area>
+            <area>12,12,-12,-12</area>
             <font>basesmall_textedit</font>
             <multiline>yes</multiline>
         </textarea>
