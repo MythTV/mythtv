@@ -657,7 +657,7 @@ QString VideoDisplayProfile::GetDecoderName(const QString &decoder)
 
 QString VideoDisplayProfile::GetDecoderHelp(QString decoder)
 {
-    QString msg = QObject::tr("Decoder to use to play back MPEG2 video.");
+    QString msg = QObject::tr("Processing method used to decode video.");
 
     if (decoder.isEmpty())
         return msg;
