@@ -1135,6 +1135,33 @@ void VideoDisplayProfile::CreateVDAProfiles(const QString &hostname)
 }
 #endif
 
+void VideoDisplayProfile::CreateOpenGLProfiles(const QString &hostname)
+{
+    (void) QObject::tr("OpenGL High Quality", "Sample: OpenGL high quality");
+    DeleteProfileGroup("OpenGL High Quality", hostname);
+    uint groupid = CreateProfileGroup("OpenGL High Quality", hostname);
+    CreateProfile(groupid, 1, ">", 0, 0, "", 0, 0,
+                  "ffmpeg", 2, true, "opengl", "opengl2", true,
+                  "greedyhdoubleprocessdeint", "greedyhdeint",
+                  "");
+
+    (void) QObject::tr("OpenGL Normal", "Sample: OpenGL average quality");
+    DeleteProfileGroup("OpenGL Normal", hostname);
+    groupid = CreateProfileGroup("OpenGL Normal", hostname);
+    CreateProfile(groupid, 1, ">", 0, 0, "", 0, 0,
+                  "ffmpeg", 2, true, "opengl", "opengl2", true,
+                  "opengldoubleratekerneldeint", "openglkerneldeint",
+                  "");
+
+    (void) QObject::tr("OpenGL Slim", "Sample: OpenGL low power GPU");
+    DeleteProfileGroup("OpenGL Slim", hostname);
+    groupid = CreateProfileGroup("OpenGL Slim", hostname);
+    CreateProfile(groupid, 1, ">", 0, 0, "", 0, 0,
+                  "ffmpeg", 1, true, "opengl", "opengl2", true,
+                  "opengldoubleratelinearblend", "opengllinearblend",
+                  "");
+}
+
 void VideoDisplayProfile::CreateProfiles(const QString &hostname)
 {
     CreateNewProfiles(hostname);

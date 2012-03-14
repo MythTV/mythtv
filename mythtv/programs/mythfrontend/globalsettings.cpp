@@ -1167,6 +1167,14 @@ PlaybackProfileConfigs::PlaybackProfileConfigs(const QString &str) :
     }
 #endif
 
+    if (!profiles.contains("OpenGL Normal") &&
+        !profiles.contains("OpenGL High Quality") &&
+        !profiles.contains("OpenGL Slim"))
+    {
+        VideoDisplayProfile::CreateOpenGLProfiles(host);
+        profiles = VideoDisplayProfile::GetProfiles(host);
+    }
+
     QString profile = VideoDisplayProfile::GetDefaultProfileName(host);
     if (!profiles.contains(profile))
     {

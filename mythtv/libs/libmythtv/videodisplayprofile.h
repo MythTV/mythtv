@@ -153,6 +153,7 @@ class MTV_PUBLIC VideoDisplayProfile
 #if defined(Q_OS_MACX)
     static void        CreateVDAProfiles(const QString &hostname);
 #endif
+    static void        CreateOpenGLProfiles(const QString &hostname);
 
     static QStringList GetVideoRenderers(const QString &decoder);
     static QString     GetVideoRendererHelp(const QString &renderer);
