@@ -393,7 +393,7 @@
     <window name="manualschedule">
 
         <textarea name="pagetitle" from="basetextarea">
-            <area>40,40,1200,40</area>
+            <area>15,5,1200,40</area>
             <font>baselarge</font>
             <value>Manual Recording Schedule</value>
         </textarea>
@@ -475,9 +475,8 @@
     <window name="viewscheduled">
 
         <textarea name="pagetitle">
-            <area>20,4,400,40</area>
+            <area>15,5,400,40</area>
             <font>baselarge</font>
-            <align>left,bottom</align>
             <value>Scheduled Recordings</value>
         </textarea>
 
@@ -715,7 +714,7 @@
     <window name="programrecpriority">
 
         <textarea name="pagetitle" from="basetextarea">
-            <area>20,4,570,40</area>
+            <area>15,5,570,40</area>
             <font>baselarge</font>
             <value>Schedule Priorities</value>
         </textarea>
@@ -852,7 +851,7 @@
     <window name="custompriority">
 
         <textarea name="pagetitle" from="basetextarea">
-            <area>40,40,760,40</area>
+            <area>15,5,760,40</area>
             <font>baselarge</font>
             <value>Custom Priority Rules</value>
         </textarea>
@@ -1208,9 +1207,8 @@
     <window name="programlist">
 
         <textarea name="sched" from="basetextarea">
-            <area>20,4,400,40</area>
+            <area>15,5,400,40</area>
             <font>baselarge</font>
-            <align>left,bottom</align>
             <value>Program Listings</value>
         </textarea>
         <textarea name="keyinstr" from="basetextarea">
@@ -1319,7 +1317,7 @@
     <window name="progdetails">
 
         <textarea name="title" from="basetextarea">
-            <area>80,20,720,40</area>
+            <area>15,5,720,40</area>
             <font>baselarge</font>
             <value>Program Details:</value>
         </textarea>
@@ -1550,7 +1548,7 @@
     <window name="managerecrules">
 
         <textarea name="pagetitle" from="basetextarea">
-            <area>20,4,400,40</area>
+            <area>15,5,400,40</area>
             <font>baselarge</font>
             <value>Manage Recording Rules</value>
         </textarea>
