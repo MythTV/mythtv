@@ -30,7 +30,8 @@ class UPNP_PUBLIC XmlPListSerializer : public XmlSerializer
                                   const QMetaProperty *pMetaProp );
 
         void SerializePListObjectProperties( const QString &sName,
-                                             const QObject *pObject );
+                                             const QObject *pObject,
+                                                   bool    needKey );
 
     public:
                  XmlPListSerializer( QIODevice *pDevice );
