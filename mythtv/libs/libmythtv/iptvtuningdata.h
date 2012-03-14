@@ -58,9 +58,9 @@ class MTV_PUBLIC IPTVTuningData
         m_bitrate[0] = data_bitrate;
         m_bitrate[1] = fec_bitrate0;
         m_bitrate[2] = fec_bitrate1;
-        if (fec_type.toLower() == "rcf2733")
+        if (fec_type.toLower() == "rfc2733")
             m_fec_type = kRFC2733;
-        else if (fec_type.toLower() == "rcf5109")
+        else if (fec_type.toLower() == "rfc5109")
             m_fec_type = kRFC5109;
         else if (fec_type.toLower() == "smpte2022")
             m_fec_type = kSMPTE2022;
