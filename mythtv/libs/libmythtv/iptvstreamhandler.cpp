@@ -22,6 +22,7 @@
 #include "rtpdatapacket.h"
 #include "rtpfecpacket.h"
 #include "mythlogging.h"
+#include "cetonrtsp.h"
 
 #define LOC QString("IPTVSH(%1): ").arg(_device)
 
@@ -124,9 +125,50 @@ void IPTVStreamHandler::run(void)
     // TODO Error handling..
 
     // Setup
+    CetonRTSP *rtsp = NULL;
+    IPTVTuningData tuning = m_tuning;
+    if (m_tuning.GetURL(0).scheme().toLower() == "rtsp")
+    {
+        rtsp = new CetonRTSP(m_tuning.GetURL(0));
+
+        // Check RTSP capabilities
+        QStringList options;
+        if (!(rtsp->GetOptions(options)     && options.contains("OPTIONS")  &&
+              options.contains("DESCRIBE")  && options.contains("SETUP")    &&
+              options.contains("PLAY")      && options.contains("TEARDOWN")))
+        {
+            LOG(VB_RECORD, LOG_ERR, LOC +
+                "RTSP interface did not support the necessary options");
+            delete rtsp;
+            SetRunning(false, false, false);
+            RunEpilog();
+            return;
+        }
+
+        if (!rtsp->Describe())
+        {
+            LOG(VB_RECORD, LOG_ERR, LOC +
+                "RTSP Describe command failed");
+            delete rtsp;
+            SetRunning(false, false, false);
+            RunEpilog();
+            return;
+        }
+
+        tuning = IPTVTuningData(
+            QString("rtp://%1@%2:0")
+            .arg(m_tuning.GetURL(0).host())
+            .arg(QHostAddress(QHostAddress::Any).toString()), 0,
+            IPTVTuningData::kNone,
+            QString("rtp://%1@%2:0")
+            .arg(m_tuning.GetURL(0).host())
+            .arg(QHostAddress(QHostAddress::Any).toString()), 0,
+            "", 0);
+    }
+
     for (uint i = 0; i < IPTV_SOCKET_COUNT; i++)
     {
-        QUrl url = m_tuning.GetURL(i);
+        QUrl url = tuning.GetURL(i);
         if (url.port() < 0)
             continue;
 
@@ -137,8 +179,8 @@ void IPTVStreamHandler::run(void)
         // we need to open the descriptor ourselves so we
         // can set some socket options
         int fd = socket(AF_INET, SOCK_DGRAM, 0); // create IPv4 socket
-        int buf_size = 2 * 1024 * max(m_tuning.GetBitrate(i)/1000, 500U);
-        if (!m_tuning.GetBitrate(i))
+        int buf_size = 2 * 1024 * max(tuning.GetBitrate(i)/1000, 500U);
+        if (!tuning.GetBitrate(i))
             buf_size = 2 * 1024 * 1024;
         int ok = setsockopt(fd, SOL_SOCKET, SO_RCVBUF,
                             (char *)&buf_size, sizeof(buf_size));
@@ -163,7 +205,7 @@ void IPTVStreamHandler::run(void)
 
         m_sockets[i]->bind(QHostAddress::Any, url.port());
 
-        QHostAddress dest_addr(m_tuning.GetURL(i).host());
+        QHostAddress dest_addr(tuning.GetURL(i).host());
 
         if (dest_addr != QHostAddress::Any)
         {
@@ -187,14 +229,31 @@ void IPTVStreamHandler::run(void)
             m_sender[i] = QHostAddress(url.userInfo());
     }
     if (m_use_rtp_streaming)
-        m_buffer = new RTPPacketBuffer(m_tuning.GetBitrate(0));
+        m_buffer = new RTPPacketBuffer(tuning.GetBitrate(0));
     else
-        m_buffer = new UDPPacketBuffer(m_tuning.GetBitrate(0));
+        m_buffer = new UDPPacketBuffer(tuning.GetBitrate(0));
     m_write_helper = new IPTVStreamHandlerWriteHelper(this);
     m_write_helper->Start();
 
-    // Enter event loop
-    exec();
+    bool error = false;
+    if (rtsp)
+    {
+        // Start Streaming
+        if (!rtsp->Setup(m_sockets[0]->localPort(),
+                         m_sockets[1]->localPort()) ||
+            !rtsp->Play())
+        {
+            LOG(VB_RECORD, LOG_ERR, LOC +
+                "Starting recording (RTP initialization failed). Aborting.");
+            error = true;
+        }
+    }
+
+    if (!error)
+    {
+        // Enter event loop
+        exec();
+    }
 
     // Clean up
     for (uint i = 0; i < IPTV_SOCKET_COUNT; i++)
@@ -211,6 +270,12 @@ void IPTVStreamHandler::run(void)
     m_buffer = NULL;
     delete m_write_helper;
     m_write_helper = NULL;
+
+    if (rtsp)
+    {
+        rtsp->Teardown();
+        delete rtsp;
+    }
 
     SetRunning(false, false, false);
     RunEpilog();

@@ -600,11 +600,11 @@ using_backend {
         # MythTV Ceton glue
         HEADERS += cetonsignalmonitor.h   cetonchannel.h
         HEADERS += cetonrecorder.h        cetonstreamhandler.h
-        HEADERS += cetonrtp.h             cetonrtsp.h
+        HEADERS += cetonrtsp.h
 
         SOURCES += cetonsignalmonitor.cpp cetonchannel.cpp
         SOURCES += cetonrecorder.cpp      cetonstreamhandler.cpp
-        SOURCES += cetonrtp.cpp           cetonrtsp.cpp
+        SOURCES += cetonrtsp.cpp
 
         HEADERS *= streamhandler.h
         SOURCES *= streamhandler.cpp

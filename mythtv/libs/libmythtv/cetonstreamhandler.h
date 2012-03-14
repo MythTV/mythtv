@@ -15,16 +15,14 @@
 #include <QMap>
 
 // MythTV headers
-#include "DeviceReadBuffer.h"
-#include "streamhandler.h"
+#include "iptvstreamhandler.h"
 #include "mythmiscutil.h"
 
 class CetonStreamHandler;
-class DeviceReadBuffer;
 class CetonChannel;
 class QUrl;
 
-class CetonStreamHandler : public StreamHandler
+class CetonStreamHandler : public IPTVStreamHandler
 {
   public:
     static CetonStreamHandler *Get(const QString &devicename);
@@ -48,8 +46,6 @@ class CetonStreamHandler : public StreamHandler
 
     bool Open(void);
     void Close(void);
-
-    virtual void run(void); // MThread
 
     bool VerifyTuning(void);
     void RepeatTuning(void);

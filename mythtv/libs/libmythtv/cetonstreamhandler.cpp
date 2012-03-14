@@ -15,8 +15,6 @@
 
 // Qt headers
 #include <QCoreApplication>
-#include <QBuffer>
-#include <QFile>
 #include <QHttp>
 #include <QUrl>
 
@@ -26,7 +24,6 @@
 #include "mpegstreamdata.h"
 #include "cetonchannel.h"
 #include "mythlogging.h"
-#include "cetonrtp.h"
 #include "cardutil.h"
 
 #define LOC QString("CetonSH(%1): ").arg(_device)
@@ -106,7 +103,8 @@ void CetonStreamHandler::Return(CetonStreamHandler * & ref)
 }
 
 CetonStreamHandler::CetonStreamHandler(const QString &device) :
-    StreamHandler(device),
+    IPTVStreamHandler(IPTVTuningData(
+                          "", 0, IPTVTuningData::kNone, "", 0, "", 0)),
     _connected(false),
     _valid(false)
 {
@@ -141,6 +139,12 @@ CetonStreamHandler::CetonStreamHandler(const QString &device) :
         return;
     }
 
+    int rtspPort = 8554;
+    QString url = QString("rtsp://%1:%2/cetonmpeg%3")
+        .arg(_ip_address).arg(rtspPort).arg(_tuner);
+    m_tuning = IPTVTuningData(url, 0, IPTVTuningData::kNone, "", 0, "", 0);
+    m_use_rtp_streaming = true;
+
     _valid = true;
 
     QString cardstatus = GetVar("cas", "CardStatus");
@@ -173,93 +177,6 @@ CetonStreamHandler::CetonStreamHandler(const QString &device) :
 
         _info_queried.insert(_ip_address, true);
     }
-}
-
-void CetonStreamHandler::run(void)
-{
-    RunProlog();
-    bool _error = false;
-
-    QFile file(_device_path);
-    CetonRTP rtp(_ip_address, _tuner);
-
-    if (!(rtp.Init() && rtp.StartStreaming()))
-    {
-        LOG(VB_RECORD, LOG_ERR, LOC +
-            "Starting recording (RTP initialization failed). Aborting.");
-        _error = true;
-    }
-
-    if (_error)
-    {
-        RunEpilog();
-        return;
-    }
-
-    SetRunning(true, false, false);
-
-    int buffer_size = (64 * 1024); // read about 64KB
-    buffer_size /= TSPacket::kSize;
-    buffer_size *= TSPacket::kSize;
-    char *buffer = new char[buffer_size];
-
-    LOG(VB_RECORD, LOG_INFO, LOC + "RunTS(): begin");
-
-    _read_timer.start();
-
-    int remainder = 0;
-    while (_running_desired && !_error)
-    {
-        int bytes_read = rtp.Read(buffer, buffer_size);
-
-        if (bytes_read <= 0)
-        {
-            if (_read_timer.elapsed() >= 5000)
-            {
-                LOG(VB_RECORD, LOG_WARNING, LOC +
-                    "No data received for 5 seconds...checking tuning");
-                if (!VerifyTuning())
-                    RepeatTuning();
-                _read_timer.start();
-            }
-
-            usleep(5000);
-            continue;
-        }
-
-        _read_timer.start();
-
-        _listener_lock.lock();
-
-        if (_stream_data_list.empty())
-        {
-            _listener_lock.unlock();
-            continue;
-        }
-
-        StreamDataList::const_iterator sit = _stream_data_list.begin();
-        for (; sit != _stream_data_list.end(); ++sit)
-            remainder = sit.key()->ProcessData(
-                reinterpret_cast<unsigned char*>(buffer), bytes_read);
-
-        _listener_lock.unlock();
-        if (remainder != 0)
-        {
-            LOG(VB_RECORD, LOG_INFO, LOC +
-                QString("RunTS(): bytes_read = %1 remainder = %2")
-                    .arg(bytes_read).arg(remainder));
-        }
-    }
-    LOG(VB_RECORD, LOG_INFO, LOC + "RunTS(): " + "shutdown");
-
-    rtp.StopStreaming();
-
-    delete[] buffer;
-
-    LOG(VB_RECORD, LOG_INFO, LOC + "RunTS(): " + "end");
-
-    SetRunning(false, false, false);
-    RunEpilog();
 }
 
 bool CetonStreamHandler::Open(void)

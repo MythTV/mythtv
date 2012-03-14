@@ -6,26 +6,36 @@
 
 #include <QStringList>
 #include <QTcpSocket>
+#include <QUrl>
 
 // MythTV includes
 #include "cetonrtsp.h"
 #include "mythlogging.h"
 
 
-#define LOC QString("CetonRTSP(%1-%2): ").arg(_ip).arg(_tuner)
+#define LOC QString("CetonRTSP(%1): ").arg(_requestUrl)
 
 QMutex CetonRTSP::_rtspMutex;
 
 CetonRTSP::CetonRTSP(const QString &ip, uint tuner, ushort port) :
     _ip(ip),
     _port(port),
-    _tuner(tuner),
     _sequenceNumber(0),
     _sessionNumber(0),
     _responseCode(-1)
 {
     _requestUrl = QString("rtsp://%1:%2/cetonmpeg%3")
         .arg(ip).arg(port).arg(tuner);
+}
+
+CetonRTSP::CetonRTSP(const QUrl &url) :
+    _ip(url.host()),
+    _port((url.port() >= 0) ? url.port() : 554),
+    _sequenceNumber(0),
+    _sessionNumber(0),
+    _responseCode(-1)
+{
+    _requestUrl = url.toString();
 }
 
 bool CetonRTSP::ProcessRequest(
@@ -175,6 +185,10 @@ bool CetonRTSP::Describe(void)
 
 bool CetonRTSP::Setup(ushort clientPort1, ushort clientPort2)
 {
+    LOG(VB_GENERAL, LOG_INFO, QString("CetonRTSP: ") +
+        QString("Transport: RTP/AVP;unicast;client_port=%1-%2")
+        .arg(clientPort1).arg(clientPort2));
+
     QStringList extraHeaders;
     extraHeaders.append(
         QString("Transport: RTP/AVP;unicast;client_port=%1-%2")

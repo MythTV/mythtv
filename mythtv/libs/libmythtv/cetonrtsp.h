@@ -12,10 +12,13 @@
 #include <QString>
 #include <QMutex>
 
+class QUrl;
+
 class CetonRTSP
 {
   public:
     explicit CetonRTSP(const QString &ip, uint tuner, ushort port);
+    explicit CetonRTSP(const QUrl&);
 
     bool GetOptions(QStringList &options);
     bool Describe(void);
@@ -30,7 +33,6 @@ class CetonRTSP
   private:
     QString     _ip;
     ushort      _port;
-    uint        _tuner;
     uint        _sequenceNumber;
     uint        _sessionNumber;
     QString     _requestUrl;

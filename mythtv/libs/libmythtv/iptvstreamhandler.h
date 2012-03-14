@@ -83,12 +83,12 @@ class IPTVStreamHandler : public StreamHandler
         StreamHandler::AddListener(data, false, false, output_file);
     } // StreamHandler
 
-  private:
+  protected:
     IPTVStreamHandler(const IPTVTuningData &tuning);
 
     virtual void run(void); // MThread
 
-  private:
+  protected:
     IPTVTuningData m_tuning;
     QUdpSocket *m_sockets[IPTV_SOCKET_COUNT];
     IPTVStreamHandlerReadHelper *m_read_helpers[IPTV_SOCKET_COUNT];
