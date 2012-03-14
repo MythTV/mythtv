@@ -1696,7 +1696,7 @@
     <window name="customedit">
 
         <textarea name="pagetitle" from="basetextarea">
-            <area>70,30,760,40</area>
+            <area>15,5,760,40</area>
             <font>baselarge</font>
             <value>Custom Record Rules</value>
         </textarea>
@@ -1723,9 +1723,7 @@
         </textedit>
 
         <textarea name="sampleslabel" from="ruleslabel">
-            <area>30,230,220,80</area>
-            <align>left,top</align>
-            <multiline>yes</multiline>
+            <area>0,230,280,40</area>
             <value>Sample Clauses:</value>
         </textarea>
 
@@ -1741,66 +1739,18 @@
             <cutdown>yes</cutdown>
         </textarea>
 
-        <textedit name="description">
+        <textedit name="description" from="basemultilinetextedit">
             <area>100,340,1080,150</area>
-            <statetype name="background">
-                <area>0,0,100%,100%</area>
-                <state name="active">
-                    <area>0,0,100%,100%</area>
-                    <shape name="background">
-                        <area>0,0,100%,100%</area>
-                        <fill color="#FFFFFF" alpha="180" />
-                    </shape>
-                </state>
-                <state name="selected" from="active">
-                    <shape name="background">
-                        <fill color="#FFFFFF" alpha="255" />
-                    </shape>
-                </state>
-                <state name="inactive" from="active" />
-            </statetype>
-            <imagetype name="cursor">
-                <filename>cursor.png</filename>
-            </imagetype>
-            <textarea name="text">
-                <area>10,10,1060,130</area>
-                <font>basesmall_textedit</font>
-                <multiline>yes</multiline>
-            </textarea>
         </textedit>
 
         <textarea name="subtitlelabel" from="ruleslabel">
-            <area>0,520,300,86</area>
+            <area>0,520,280,86</area>
             <value>Additional Tables:</value>
             <align>right</align>
         </textarea>
 
-        <textedit name="subtitle">
+        <textedit name="subtitle" from="basemultilinetextedit">
             <area>300,520,880,86</area>
-            <statetype name="background">
-                <area>0,0,100%,100%</area>
-                <state name="active">
-                    <area>0,0,100%,100%</area>
-                    <shape name="background">
-                        <area>0,0,100%,100%</area>
-                        <fill color="#FFFFFF" alpha="180" />
-                    </shape>
-                </state>
-                <state name="selected" from="active">
-                    <shape name="background">
-                        <fill color="#FFFFFF" alpha="255" />
-                    </shape>
-                </state>
-                <state name="inactive" from="active" />
-            </statetype>
-            <imagetype name="cursor">
-                <filename>cursor.png</filename>
-            </imagetype>
-            <textarea name="text">
-                <area>10,10,860,76</area>
-                <font>basesmall_textedit</font>
-                <multiline>yes</multiline>
-            </textarea>
         </textedit>
 
         <button name="test" from="basebutton">
