@@ -88,6 +88,8 @@ class MusicPlayer : public QObject, public MythObservable
     void nextAuto(void);
 
     bool isPlaying(void) { return m_isPlaying; }
+    bool isPaused(void) { return getOutput() ? getOutput()->IsPaused() : false; }
+    bool isStopped(void) { return !(isPlaying() || isPaused()); }
     bool hasClient(void) { return hasListeners(); }
 
     /// This will allow/disallow the mini player showing on track changes
