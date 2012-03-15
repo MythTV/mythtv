@@ -188,7 +188,8 @@ class MythMainWindowPrivate
         m_pendingUpdate(false),
 
         idleTimer(NULL),
-        standby(false)
+        standby(false),
+        enteringStandby(false)
     {
     }
 
@@ -279,6 +280,7 @@ class MythMainWindowPrivate
 
     QTimer *idleTimer;
     bool standby;
+    bool enteringStandby;
 };
 
 // Make keynum in QKeyEvent be equivalent to what's in QKeySequence
@@ -2570,8 +2572,7 @@ void MythMainWindow::HideMouseTimeout(void)
 
 void MythMainWindow::ResetIdleTimer(void)
 {
-    // If the timer isn't active then it's been paused
-    if (!d->idleTimer->isActive())
+    if (d->standby && d->enteringStandby)
         return;
 
     if (d->standby)
@@ -2592,6 +2593,7 @@ void MythMainWindow::PauseIdleTimer(bool pause)
 
 void MythMainWindow::IdleTimeout(void)
 {
+    d->enteringStandby = false;
 
     int idletimeout = gCoreContext->GetNumSetting("FrontendIdleTimeout",
                                                    STANDBY_TIMEOUT);
@@ -2602,21 +2604,16 @@ void MythMainWindow::IdleTimeout(void)
                                         "%1 minutes of inactivity")
                                         .arg(idletimeout));
         EnterStandby(false);
-
-        // HACK Prevent faked keypresses interrupting the transition to standby
-        PauseIdleTimer(true);
-        // HACK end
-
+        d->enteringStandby = true;
         JumpTo("Standby Mode");
-
-        // HACK
-        PauseIdleTimer(false);
-        // HACK end
     }
 }
 
 void MythMainWindow::EnterStandby(bool manual)
 {
+    if (manual && d->enteringStandby)
+        d->enteringStandby = false;
+
     if (d->standby)
         return;
 
@@ -2634,6 +2631,9 @@ void MythMainWindow::EnterStandby(bool manual)
 
 void MythMainWindow::ExitStandby(bool manual)
 {
+    if (d->enteringStandby)
+        return;
+
     if (manual)
         PauseIdleTimer(false);
     else

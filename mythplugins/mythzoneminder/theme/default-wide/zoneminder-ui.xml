@@ -5,8 +5,9 @@
     <window name="functionpopup">
         <area>-1,-1,413,426</area>
 
-        <imagetype name="box">
-            <filename>mz_function_popup.png</filename>
+        <imagetype name="backimg">
+            <area>0,0,413,426</area>
+            <filename>mythdialogbox-background.png</filename>
         </imagetype>
 
         <textarea name="title" from="basetextarea">

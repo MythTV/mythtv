@@ -96,7 +96,7 @@ class MTV_PUBLIC DVDRingBuffer : public RingBuffer
 
     uint GetAudioLanguage(int id);
     int  GetAudioTrackNum(uint key);
-
+    int  GetAudioTrackType(uint stream_id);
 
     bool GetNameAndSerialNum(QString& _name, QString& _serialnum);
     double GetFrameRate(void);
