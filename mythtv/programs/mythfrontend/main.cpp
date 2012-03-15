@@ -252,6 +252,8 @@ namespace
             pmanager = NULL;
         }
 
+        DestroyMythMainWindow();
+
         delete gContext;
         gContext = NULL;
 
@@ -1765,8 +1767,6 @@ int main(int argc, char **argv)
         mon->deleteLater();
 
     delete networkControl;
-
-    DestroyMythMainWindow();
 
     return ret;
 
