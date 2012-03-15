@@ -314,6 +314,17 @@ void IPTVStreamHandlerWriteHelper::timerEvent(QTimerEvent*)
                 continue;
             }
 
+            uint exp_seq_num = m_last_sequence_number + 1;
+            uint seq_num = ts_packet.GetSequenceNumber();
+            if (m_last_sequence_number &&
+                ((exp_seq_num&0xFFFF) != (seq_num&0xFFFF)))
+            {
+                LOG(VB_RECORD, LOG_INFO, LOC_WH +
+                    QString("Sequence number mismatch %1!=%2")
+                    .arg(seq_num).arg(exp_seq_num));
+            }
+            m_last_sequence_number = seq_num;
+
             m_parent->_listener_lock.lock();
 
             int remainder = 0;
