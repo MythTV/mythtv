@@ -561,10 +561,10 @@
                         <area>240,1,190,24</area>
                     </textarea>
                     <textarea name="titlesubtitle" from="shortstarttimedate">
-                        <area>440,1,700,24</area>
+                        <area>440,1,690,24</area>
                     </textarea>
                     <textarea name="card" from="shortstarttimedate">
-                        <area>1150,1,30,24</area>
+                        <area>1140,1,40,24</area>
                         <align>right,vcenter</align>
                     </textarea>
                 </state>
@@ -1124,10 +1124,10 @@
                         <area>240,1,190,24</area>
                     </textarea>
                     <textarea name="titlesubtitle" from="shortstarttimedate">
-                        <area>440,1,700,24</area>
+                        <area>440,1,690,24</area>
                     </textarea>
                     <textarea name="card" from="shortstarttimedate">
-                        <area>1150,1,30,24</area>
+                        <area>1140,1,40,24</area>
                         <align>right,vcenter</align>
                     </textarea>
                 </state>
@@ -2082,14 +2082,14 @@
                         <area>260,1,170,24</area>
                     </textarea>
                     <textarea name="titlesubtitle" from="shortstarttimedate">
-                        <area>440,1,650,24</area>
+                        <area>440,1,630,24</area>
                     </textarea>
                     <textarea name="statusbefore" from="shortstarttimedate">
-                        <area>1100,1,30,24</area>
+                        <area>1080,1,40,24</area>
                         <align>right,vcenter</align>
                     </textarea>
                     <textarea name="statusafter" from="shortstarttimedate">
-                        <area>1140,1,30,24</area>
+                        <area>1130,1,40,24</area>
                         <align>right,vcenter</align>
                     </textarea>
                 </state>
