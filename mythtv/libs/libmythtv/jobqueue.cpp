@@ -1987,6 +1987,7 @@ void JobQueue::DoTranscodeThread(int jobID)
         LOG(VB_JOBQUEUE, LOG_INFO, LOC + QString("Running command: '%1'")
                                            .arg(command));
 
+        GetMythDB()->GetDBManager()->CloseDatabases();
         uint result = myth_system(command);
         int status = GetJobStatus(jobID);
 
@@ -2160,6 +2161,7 @@ void JobQueue::DoMetadataLookupThread(int jobID)
     LOG(VB_JOBQUEUE, LOG_INFO, LOC + QString("Running command: '%1'")
             .arg(command));
 
+    GetMythDB()->GetDBManager()->CloseDatabases();
     retVal = myth_system(command);
     int priority = LOG_NOTICE;
     QString comment;
@@ -2296,6 +2298,7 @@ void JobQueue::DoFlagCommercialsThread(int jobID)
     LOG(VB_JOBQUEUE, LOG_INFO, LOC + QString("Running command: '%1'")
             .arg(command));
 
+    GetMythDB()->GetDBManager()->CloseDatabases();
     breaksFound = myth_system(command, kMSLowExitVal);
     int priority = LOG_NOTICE;
     QString comment;
@@ -2413,6 +2416,7 @@ void JobQueue::DoUserJobThread(int jobID)
 
     LOG(VB_JOBQUEUE, LOG_INFO, LOC + QString("Running command: '%1'")
                                        .arg(command));
+    GetMythDB()->GetDBManager()->CloseDatabases();
     uint result = myth_system(command);
 
     if ((result == GENERIC_EXIT_DAEMONIZING_ERROR) ||
