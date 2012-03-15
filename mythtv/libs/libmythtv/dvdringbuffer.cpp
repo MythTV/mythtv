@@ -1691,7 +1691,7 @@ uint8_t DVDRingBuffer::GetNumAudioChannels(int id)
     unsigned char channels = dvdnav_audio_stream_channels(m_dvdnav, id);
     if (channels == 0xff)
         return 0;
-    return (uint8_t)channels + 1;
+    return (uint8_t)channels;
 }
 
 /** \brief Get the dvd title and serial num
