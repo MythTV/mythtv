@@ -1867,9 +1867,9 @@ void *JobQueue::TranscodeThread(void *param)
     JobThreadStruct *jts = (JobThreadStruct *)param;
     JobQueue *jq = jts->jq;
 
-    threadRegister(QString("Transcode_%1").arg(jts->jobID));
+    MThread::ThreadSetup(QString("Transcode_%1").arg(jts->jobID));
     jq->DoTranscodeThread(jts->jobID);
-    threadDeregister();
+    MThread::ThreadCleanup();
 
     delete jts;
 
@@ -2096,9 +2096,9 @@ void *JobQueue::MetadataLookupThread(void *param)
     JobThreadStruct *jts = (JobThreadStruct *)param;
     JobQueue *jq = jts->jq;
 
-    threadRegister(QString("Metadata_%1").arg(jts->jobID));
+    MThread::ThreadSetup(QString("Metadata_%1").arg(jts->jobID));
     jq->DoMetadataLookupThread(jts->jobID);
-    threadDeregister();
+    MThread::ThreadCleanup();
 
     delete jts;
 
@@ -2220,9 +2220,9 @@ void *JobQueue::FlagCommercialsThread(void *param)
     JobThreadStruct *jts = (JobThreadStruct *)param;
     JobQueue *jq = jts->jq;
 
-    threadRegister(QString("Commflag_%1").arg(jts->jobID));
+    MThread::ThreadSetup(QString("Commflag_%1").arg(jts->jobID));
     jq->DoFlagCommercialsThread(jts->jobID);
-    threadDeregister();
+    MThread::ThreadCleanup();
 
     delete jts;
 
@@ -2366,9 +2366,9 @@ void *JobQueue::UserJobThread(void *param)
     JobThreadStruct *jts = (JobThreadStruct *)param;
     JobQueue *jq = jts->jq;
 
-    threadRegister(QString("UserJob_%1").arg(jts->jobID));
+    MThread::ThreadSetup(QString("UserJob_%1").arg(jts->jobID));
     jq->DoUserJobThread(jts->jobID);
-    threadDeregister();
+    MThread::ThreadCleanup();
 
     delete jts;
 

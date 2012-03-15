@@ -70,8 +70,6 @@ MBASE_PUBLIC void logStop(void);
 MBASE_PUBLIC void logPropagateCalc(void);
 MBASE_PUBLIC bool logPropagateQuiet(void);
 
-MBASE_PUBLIC void threadRegister(QString name);
-MBASE_PUBLIC void threadDeregister(void);
 MBASE_PUBLIC int  syslogGetFacility(QString facility);
 MBASE_PUBLIC LogLevel_t logLevelGet(QString level);
 MBASE_PUBLIC QString logLevelGetName(LogLevel_t level);
