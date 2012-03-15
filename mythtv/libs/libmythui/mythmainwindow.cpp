@@ -2639,7 +2639,7 @@ void MythMainWindow::ExitStandby(bool manual)
 
     if (manual)
         PauseIdleTimer(false);
-    else
+    else if (gCoreContext->GetNumSetting("idleTimeoutSecs", 0))
         JumpTo("Main Menu");
 
     if (!d->standby)
