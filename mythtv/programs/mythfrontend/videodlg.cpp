@@ -2464,9 +2464,9 @@ MythMenu* VideoDialog::CreateViewMenu()
         menu->AddItem(tr("Enable File Browse Mode"), SLOT(ToggleBrowseMode()));
 
     if (m_d->m_isFlatList)
-        menu->AddItem(tr("Disable Flat View"), SLOT(ToggleFlatView()));
+        menu->AddItem(tr("Show Directory Structure"), SLOT(ToggleFlatView()));
     else
-        menu->AddItem(tr("Enable Flat View"), SLOT(ToggleFlatView()));
+        menu->AddItem(tr("Hide Directory Structure"), SLOT(ToggleFlatView()));
 
     return menu;
 }
