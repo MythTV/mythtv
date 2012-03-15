@@ -90,6 +90,13 @@ class MBASE_PUBLIC MThread
     void terminate(void);
     void quit(void); ///< calls exit(0)
 
+    /// This is to be called on startup in those few threads that
+    /// haven't been ported to MThread.
+    static void ThreadSetup(const QString&);
+    /// This is to be called on exit in those few threads that
+    /// haven't been ported to MThread.
+    static void ThreadCleanup(void);
+
   public:
     /// \brief Wait for the MThread to exit, with a maximum timeout
     /// \param time Maximum time to wait for MThread to exit, in ms

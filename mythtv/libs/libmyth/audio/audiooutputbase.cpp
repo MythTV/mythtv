@@ -894,7 +894,7 @@ void AudioOutputBase::Pause(bool paused)
 {
     if (unpause_when_ready)
         return;
-    VBAUDIO(QString("Pause %0").arg(paused));
+    VBAUDIO(QString("Pause %1").arg(paused));
     if (pauseaudio != paused)
         was_paused = pauseaudio;
     pauseaudio = paused;
@@ -917,10 +917,25 @@ void AudioOutputBase::Reset()
     QMutexLocker lockav(&avsync_lock);
 
     audbuf_timecode = audiotime = frames_buffered = 0;
-    waud = raud;    // empty ring buffer
+    if (encoder)
+    {
+        waud = raud = 0;    // empty ring buffer
+        memset(audiobuffer, 0, kAudioRingBufferSize);
+    }
+    else
+    {
+        waud = raud;        // empty ring buffer
+    }
     reset_active.Ref();
     current_seconds = -1;
     was_paused = !pauseaudio;
+    // clear any state that could remember previous audio in any active filters
+    if (needs_upmix && upmixer)
+        upmixer->flush();
+    if (pSoundStretch)
+        pSoundStretch->clear();
+    if (encoder)
+        encoder->clear();
 
     // Setup visualisations, zero the visualisations buffers
     prepareVisuals();
@@ -1238,6 +1253,12 @@ int AudioOutputBase::CopyWithUpmix(char *buffer, int frames, uint &org_waud)
         bdFrames = (kAudioRingBufferSize - org_waud) / bpf;
         if (bdFrames < nFrames)
         {
+            if ((org_waud % bpf) != 0)
+            {
+                VBERROR(QString("Upmixing: org_waud = %1 (bpf = %2)")
+                        .arg(org_waud)
+                        .arg(bpf));
+            }
             upmixer->receiveFrames((float *)(WPOS), bdFrames);
             nFrames -= bdFrames;
             org_waud = 0;
@@ -1444,6 +1465,18 @@ bool AudioOutputBase::AddData(void *in_buffer, int in_len,
         frames_final += frames;
 
         bdiff = kAudioRingBufferSize - waud;
+        if ((len % bpf) != 0 && bdiff < len)
+        {
+            VBERROR(QString("AddData: Corruption likely: len = %1 (bpf = %2)")
+                    .arg(len)
+                    .arg(bpf));
+        }
+        if ((bdiff % bpf) != 0 && bdiff < len)
+        {
+            VBERROR(QString("AddData: Corruption likely: bdiff = %1 (bpf = %2)")
+                    .arg(bdiff)
+                    .arg(bpf));
+        }
 
         if (pSoundStretch)
         {

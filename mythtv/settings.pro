@@ -138,8 +138,12 @@ LOCAL_LIBDIR_OGL =
 }
 QMAKE_LIBDIR_OPENGL =
 
-!macx {
-    !isEmpty( QMAKE_LIBDIR_QT ) {
+!isEmpty( QMAKE_LIBDIR_QT ) {
+    !macx {
+        LATE_LIBS += "-L$$QMAKE_LIBDIR_QT"
+        QMAKE_LIBDIR_QT = ""
+    }
+    macx:!qt_framework {
         LATE_LIBS += "-L$$QMAKE_LIBDIR_QT"
         QMAKE_LIBDIR_QT = ""
     }

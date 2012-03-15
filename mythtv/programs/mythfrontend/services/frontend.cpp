@@ -87,7 +87,6 @@ bool Frontend::SendAction(const QString &Action, const QString &Value,
 bool Frontend::PlayRecording(int ChanID, const QDateTime &StartTime)
 {
     QDateTime starttime = StartTime;
-    starttime.setTimeSpec(Qt::UTC);
 
     if (!starttime.isValid() || ChanID <= 0)
     {

@@ -1426,8 +1426,6 @@ void MythDownloadManager::updateCookieJar(void)
 {
     QMutexLocker locker(&m_cookieLock);
 
-    QNetworkCookieJar *oldJar = m_manager->cookieJar();
-
     MythCookieJar *inJar = static_cast<MythCookieJar *>(m_inCookieJar);
     MythCookieJar *outJar = new MythCookieJar(*inJar);
     m_manager->setCookieJar(static_cast<QNetworkCookieJar *>(outJar));

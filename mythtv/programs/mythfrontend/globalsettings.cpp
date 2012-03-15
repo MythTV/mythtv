@@ -39,6 +39,10 @@
 #include "mythdirs.h"
 #include "mythuihelper.h"
 
+#if defined(Q_OS_MACX)
+#include "privatedecoder_vda.h"
+#endif
+
 static HostCheckBox *DecodeExtraAudio()
 {
     HostCheckBox *gc = new HostCheckBox("DecodeExtraAudio");
@@ -1147,6 +1151,27 @@ PlaybackProfileConfigs::PlaybackProfileConfigs(const QString &str) :
         !profiles.contains("VDPAU Slim"))
     {
         VideoDisplayProfile::CreateVDPAUProfiles(host);
+        profiles = VideoDisplayProfile::GetProfiles(host);
+    }
+
+#if defined(Q_OS_MACX)
+    if (VDALibrary::GetVDALibrary() != NULL)
+    {
+        if (!profiles.contains("VDA Normal") &&
+            !profiles.contains("VDA High Quality") &&
+            !profiles.contains("VDA Slim"))
+        {
+            VideoDisplayProfile::CreateVDAProfiles(host);
+            profiles = VideoDisplayProfile::GetProfiles(host);
+        }
+    }
+#endif
+
+    if (!profiles.contains("OpenGL Normal") &&
+        !profiles.contains("OpenGL High Quality") &&
+        !profiles.contains("OpenGL Slim"))
+    {
+        VideoDisplayProfile::CreateOpenGLProfiles(host);
         profiles = VideoDisplayProfile::GetProfiles(host);
     }
 

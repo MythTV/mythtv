@@ -165,6 +165,7 @@ MythPlayer::MythPlayer(PlayerFlags flags)
       // General Caption/Teletext/Subtitle support
       textDisplayMode(kDisplayNone),
       prevTextDisplayMode(kDisplayNone),
+      prevNonzeroTextDisplayMode(kDisplayNone),
       // Support for analog captions and teletext
       vbimode(VBIMode::None),
       ttPageNum(0x888),
@@ -1317,6 +1318,8 @@ void MythPlayer::ResetCaptions(void)
 
 void MythPlayer::DisableCaptions(uint mode, bool osd_msg)
 {
+    if (textDisplayMode)
+        prevNonzeroTextDisplayMode = textDisplayMode;
     textDisplayMode &= ~mode;
     ResetCaptions();
 
@@ -1394,6 +1397,8 @@ void MythPlayer::EnableCaptions(uint mode, bool osd_msg)
         .arg(mode).arg(msg));
 
     textDisplayMode = mode;
+    if (textDisplayMode)
+        prevNonzeroTextDisplayMode = textDisplayMode;
     if (osd_msg)
         SetOSDMessage(msg, kOSDTimeout_Med);
 }
@@ -1432,7 +1437,8 @@ void MythPlayer::SetCaptionsEnabled(bool enable, bool osd_msg)
         DisableCaptions(origMode, osd_msg);
         return;
     }
-    int mode = NextCaptionTrack(kDisplayNone);
+    int mode = HasCaptionTrack(prevNonzeroTextDisplayMode) ?
+        prevNonzeroTextDisplayMode : NextCaptionTrack(kDisplayNone);
     if (origMode != (uint)mode)
     {
         DisableCaptions(origMode, false);
@@ -1642,6 +1648,23 @@ void MythPlayer::ChangeCaptionTrack(int dir)
     }
 }
 
+bool MythPlayer::HasCaptionTrack(int mode)
+{
+    if (mode == kDisplayNone)
+        return false;
+    if (((mode == kDisplayTextSubtitle) && HasTextSubtitles()) ||
+         (mode == kDisplayNUVTeletextCaptions))
+    {
+        return true;
+    }
+    else if (!(mode == kDisplayTextSubtitle) &&
+               decoder->GetTrackCount(toTrackType(mode)))
+    {
+        return true;
+    }
+    return false;
+}
+
 int MythPlayer::NextCaptionTrack(int mode)
 {
     // Text->TextStream->708/608->608/708->AVSubs->Teletext->NUV->None
@@ -1666,17 +1689,9 @@ int MythPlayer::NextCaptionTrack(int mode)
     else if (kDisplayNone == mode)
         nextmode = kDisplayTextSubtitle;
 
-    if (((nextmode == kDisplayTextSubtitle) && HasTextSubtitles()) ||
-         (nextmode == kDisplayNUVTeletextCaptions) ||
-         (nextmode == kDisplayNone))
-    {
+    if (nextmode == kDisplayNone || HasCaptionTrack(nextmode))
         return nextmode;
-    }
-    else if (!(nextmode == kDisplayTextSubtitle) &&
-               decoder->GetTrackCount(toTrackType(nextmode)))
-    {
-        return nextmode;
-    }
+
     return NextCaptionTrack(nextmode);
 }
 

@@ -26,6 +26,7 @@ class AudioOutputDigitalEncoder
     size_t GetFrames(void *ptr, int maxlen);
     int    Buffered(void) const
     { return inlen / sizeof(inbuf_t) / av_context->channels; }
+    void clear();
 
   private:
     void *realloc(void *ptr, size_t old_size, size_t new_size);

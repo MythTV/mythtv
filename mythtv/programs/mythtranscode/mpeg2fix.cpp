@@ -22,6 +22,7 @@
 #include <QFileInfo>
 
 #include "mythlogging.h"
+#include "mthread.h"
 
 #ifdef USING_MINGW
 #include <winsock2.h>
@@ -499,11 +500,10 @@ int MPEG2replex::WaitBuffers()
 
 void *MPEG2fixup::ReplexStart(void *data)
 {
-    threadRegister("MPEG2Replex");
+    MThread::ThreadSetup("MPEG2Replex");
     MPEG2fixup *m2f = (MPEG2fixup *) data;
     m2f->rx.Start();
-    GetMythDB()->GetDBManager()->CloseDatabases();
-    threadDeregister();
+    MThread::ThreadCleanup();
     return NULL;
 }
 

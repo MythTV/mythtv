@@ -478,6 +478,7 @@ class MTV_PUBLIC MythPlayer
     int  GetTrack(uint type);
     int  ChangeTrack(uint type, int dir);
     void ChangeCaptionTrack(int dir);
+    bool HasCaptionTrack(int mode);
     int  NextCaptionTrack(int mode);
     void DoDisableForcedSubtitles(void);
     void DoEnableForcedSubtitles(void);
@@ -674,6 +675,7 @@ class MTV_PUBLIC MythPlayer
     // General Caption/Teletext/Subtitle support
     uint     textDisplayMode;
     uint     prevTextDisplayMode;
+    uint     prevNonzeroTextDisplayMode;
 
     // Support for analog captions and teletext
     // (i.e. Vertical Blanking Interval (VBI) encoded data.)
