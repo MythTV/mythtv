@@ -204,10 +204,7 @@ void PlaylistEditorView::customEvent(QEvent *event)
     }
     else if (event->type() == DialogCompletionEvent::kEventType)
     {
-        DialogCompletionEvent *dce = dynamic_cast<DialogCompletionEvent*>(event);
-
-        if (!dce)
-            return;
+        DialogCompletionEvent *dce = static_cast<DialogCompletionEvent*>(event);
 
         // make sure the user didn't ESCAPE out of the menu
         if (dce->GetResult() < 0)

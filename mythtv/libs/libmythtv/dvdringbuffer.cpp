@@ -1571,6 +1571,36 @@ int DVDRingBuffer::GetAudioTrackNum(uint stream_id)
     return dvdnav_get_audio_logical_stream(m_dvdnav, stream_id);
 }
 
+int DVDRingBuffer::GetAudioTrackType(uint stream_id)
+{
+    AudioTrackType ret = kAudioTypeNormal;
+    audio_attr_t attributes;
+    int logicalStreamId = dvdnav_get_audio_logical_stream(m_dvdnav, stream_id);
+    if (dvdnav_get_audio_attr(m_dvdnav, logicalStreamId, &attributes) >= 1)
+    {
+        LOG(VB_AUDIO, LOG_INFO, QString("DVD Audio Track #%1 Language "
+                                        "Extension Code - %2")
+                                        .arg(stream_id)
+                                        .arg(attributes.code_extension));
+        switch (attributes.code_extension)
+        {
+            case 1:
+                ret = kAudioTypeNormal;
+                break;
+            case 2:
+                ret = kAudioTypeAudioDescription;
+                break;
+            case 3: case 4:
+                ret = kAudioTypeCommentary;
+                break;
+            case 0: default:
+                break;
+        }
+    }
+
+    return (int)ret;
+}
+
 /** \brief get the subtitle language from the dvd
  */
 uint DVDRingBuffer::GetSubtitleLanguage(int id)
@@ -1661,7 +1691,7 @@ uint8_t DVDRingBuffer::GetNumAudioChannels(int id)
     unsigned char channels = dvdnav_audio_stream_channels(m_dvdnav, id);
     if (channels == 0xff)
         return 0;
-    return (uint8_t)channels + 1;
+    return (uint8_t)channels;
 }
 
 /** \brief Get the dvd title and serial num

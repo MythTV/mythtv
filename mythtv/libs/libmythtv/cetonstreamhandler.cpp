@@ -418,7 +418,7 @@ void CetonStreamHandler::RepeatTuning(void)
 
 bool CetonStreamHandler::TunerOff(void)
 {
-    bool result = TuneFrequency(0, "qam256");
+    bool result = TuneFrequency(0, "qam_256");
     if (result && _using_cablecard)
         result = TuneVChannel("0");
 
@@ -434,8 +434,8 @@ bool CetonStreamHandler::TuneFrequency(
     if (frequency >= 100000000)
         frequency /= 1000;
 
-    QString modulation_id = (modulation == "qam256") ? "2" :
-                            (modulation == "qam64")  ? "0" :
+    QString modulation_id = (modulation == "qam_256") ? "2" :
+                            (modulation == "qam_64")  ? "0" :
                             (modulation == "ntsc-m") ? "4" :
                             (modulation == "8vsb")   ? "6" :
                                                        "";
@@ -473,6 +473,15 @@ bool CetonStreamHandler::TuneProgram(uint program)
 {
     LOG(VB_RECORD, LOG_INFO, LOC + QString("TuneProgram(%1)").arg(program));
 
+    QStringList program_list = GetProgramList();
+    if (!program_list.contains(QString::number(program)))
+    {
+        LOG(VB_RECORD, LOG_ERR, LOC + 
+        QString("TuneProgram(%1) - Requested program not in the program list").arg(program));
+        return false;
+    };
+
+
     _last_program = program;
 
     QUrl params;
@@ -496,6 +505,9 @@ bool CetonStreamHandler::TuneProgram(uint program)
 
 bool CetonStreamHandler::TuneVChannel(const QString &vchannel)
 {
+    if ((vchannel != "0") && (_last_vchannel != "0"))
+        ClearProgramNumber();
+
     LOG(VB_RECORD, LOG_INFO, LOC + QString("TuneVChannel(%1)").arg(vchannel));
 
     _last_vchannel = vchannel;
@@ -519,14 +531,35 @@ bool CetonStreamHandler::TuneVChannel(const QString &vchannel)
     return result;
 }
 
+void CetonStreamHandler::ClearProgramNumber(void)
+{
+    TuneVChannel("0");
+    for(int i=0; i<50;  i++)
+    {
+        if (GetVar("mux", "ProgramNumber") == "0")
+            return;
+        usleep(20000);
+    };
+
+    LOG(VB_RECORD, LOG_ERR, LOC + QString("Program number failed to clear"));
+}
+
 uint CetonStreamHandler::GetProgramNumber(void) const
 {
-    QString prog = GetVar("mux", "ProgramNumber");
+    for(int i = 1; i <= 30; i++)
+    {
+        QString prog = GetVar("mux", "ProgramNumber");
+        LOG(VB_RECORD, LOG_INFO, LOC + QString("GetProgramNumber() got %1 on attempt %2").arg(prog).arg(i));
 
-    LOG(VB_RECORD, LOG_INFO, LOC + QString("GetProgramNumber() got %1")
-        .arg(prog));
+        uint prognum = prog.toUInt();
+        if (prognum != 0) 
+            return prognum;
 
-    return prog.toUInt();
+        usleep(100000);
+    };
+
+    LOG(VB_RECORD, LOG_ERR, LOC + QString("Error: GetProgramNumber() failed to get a non-zero program number"));
+    return 0;
 }
 
 QString CetonStreamHandler::GetVar(
@@ -562,7 +595,7 @@ QString CetonStreamHandler::GetVar(
     return result;
 }
 
-QStringList CetonStreamHandler::GetProgramList(const QString &host, uint tuner)
+QStringList CetonStreamHandler::GetProgramList()
 {
     QString loc = LOC + QString("CetonHTTP: DoGetProgramList(%1,%2) - ")
         .arg(_ip_address).arg(_tuner);

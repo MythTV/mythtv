@@ -494,10 +494,10 @@
                         <area>190,1,140,24</area>
                     </textarea>
                     <textarea name="title" from="shortstarttimedate">
-                        <area>340,1,370,24</area>
+                        <area>340,1,365,24</area>
                     </textarea>
                     <textarea name="card" from="shortstarttimedate">
-                        <area>720,1,30,24</area>
+                        <area>715,1,35,24</area>
                         <align>right,vcenter</align>
                     </textarea>
                 </state>
@@ -1191,10 +1191,10 @@
                         <area>190,1,140,24</area>
                     </textarea>
                     <textarea name="titlesubtitle" from="shortstarttimedate">
-                        <area>340,1,370,24</area>
+                        <area>340,1,365,24</area>
                     </textarea>
                     <textarea name="card" from="shortstarttimedate">
-                        <area>720,1,30,24</area>
+                        <area>715,1,35,24</area>
                         <align>right,vcenter</align>
                     </textarea>
                 </state>
@@ -1998,14 +1998,14 @@
                         <area>190,1,140,24</area>
                     </textarea>
                     <textarea name="titlesubtitle" from="shortstarttimedate">
-                        <area>340,1,330,24</area>
+                        <area>340,1,320,24</area>
                     </textarea>
                     <textarea name="statusbefore" from="shortstarttimedate">
-                        <area>680,1,30,24</area>
+                        <area>670,1,35,24</area>
                         <align>right,vcenter</align>
                     </textarea>
                     <textarea name="statusafter" from="shortstarttimedate">
-                        <area>720,1,30,24</area>
+                        <area>715,1,35,24</area>
                         <align>right,vcenter</align>
                     </textarea>
                 </state>

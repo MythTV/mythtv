@@ -393,7 +393,7 @@
     <window name="manualschedule">
 
         <textarea name="pagetitle" from="basetextarea">
-            <area>40,40,1200,40</area>
+            <area>15,5,1200,40</area>
             <font>baselarge</font>
             <value>Manual Recording Schedule</value>
         </textarea>
@@ -475,9 +475,8 @@
     <window name="viewscheduled">
 
         <textarea name="pagetitle">
-            <area>20,4,400,40</area>
+            <area>15,5,400,40</area>
             <font>baselarge</font>
-            <align>left,bottom</align>
             <value>Scheduled Recordings</value>
         </textarea>
 
@@ -517,10 +516,10 @@
                         <area>240,2,230,24</area>
                     </textarea>
                     <textarea name="title" from="shortstarttimedate">
-                        <area>480,2,665,24</area>
+                        <area>480,2,655,24</area>
                     </textarea>
                     <textarea name="card" from="shortstarttimedate">
-                        <area>1155,2,30,24</area>
+                        <area>1145,2,40,24</area>
                         <align>right,vcenter</align>
                     </textarea>
                 </state>
@@ -538,10 +537,10 @@
                         <area>240,2,230,24</area>
                     </textarea>
                     <textarea name="title" from="shortstarttimedate">
-                        <area>480,2,665,24</area>
+                        <area>480,2,655,24</area>
                     </textarea>
                     <textarea name="card" from="shortstarttimedate">
-                        <area>1155,2,30,24</area>
+                        <area>1145,2,40,24</area>
                         <align>right,vcenter</align>
                      </textarea>
                     <shape name="selectbar">
@@ -639,13 +638,13 @@
                     </textarea>
                 </state>
                 <state name="selectedactive" from="active">
-		    <shape name="selectbar">
-			<area>0,0,1176,30</area>
-			<type>roundbox</type>
-			<line color="#00FF00" alpha="255" width="1" />
-			<fill color="#43b038" alpha="128" />
-			<cornerradius>4</cornerradius>
-		    </shape>
+                    <shape name="selectbar">
+                        <area>0,0,1176,30</area>
+                        <type>roundbox</type>
+                        <line color="#00FF00" alpha="255" width="1" />
+                        <fill color="#43b038" alpha="128" />
+                        <cornerradius>4</cornerradius>
+                    </shape>
                 </state>
                 <state name="selectedinactive" from="active" />
             </statetype>
@@ -715,7 +714,7 @@
     <window name="programrecpriority">
 
         <textarea name="pagetitle" from="basetextarea">
-            <area>20,4,570,40</area>
+            <area>15,5,570,40</area>
             <font>baselarge</font>
             <value>Schedule Priorities</value>
         </textarea>
@@ -852,7 +851,7 @@
     <window name="custompriority">
 
         <textarea name="pagetitle" from="basetextarea">
-            <area>40,40,760,40</area>
+            <area>15,5,760,40</area>
             <font>baselarge</font>
             <value>Custom Priority Rules</value>
         </textarea>
@@ -954,6 +953,20 @@
     <window name="phrasepopup">
         <area>-1,-1,500,500</area>
 
+        <animation trigger="AboutToShow">
+            <section>
+                <alpha start="0" end="255" easingcurve="OutQuart"/>
+                <zoom start="0" end="100" easingcurve="OutQuart"/>
+            </section>
+        </animation>
+
+        <animation trigger="AboutToHide">
+            <section>
+                <alpha start="255" end="0" easingcurve="InQuart"/>
+                <zoom start="100" end="0" easingcurve="InQuart"/>
+            </section>
+        </animation>
+
         <imagetype name="box">
             <filename>mythdialogbox-background.png</filename>
         </imagetype>
@@ -1010,6 +1023,20 @@
     <window name="timepopup">
         <area>-1,-1,580,166</area>
 
+        <animation trigger="AboutToShow">
+            <section>
+                <alpha start="0" end="255" easingcurve="OutQuart"/>
+                <zoom start="0" end="100" easingcurve="OutQuart"/>
+            </section>
+        </animation>
+
+        <animation trigger="AboutToHide">
+            <section>
+                <alpha start="255" end="0" easingcurve="InQuart"/>
+                <zoom start="100" end="0" easingcurve="InQuart"/>
+            </section>
+        </animation>
+
         <imagetype name="box">
             <filename>mythprogressdialog-background.png</filename>
         </imagetype>
@@ -1038,6 +1065,20 @@
 
     <window name="powersearchpopup">
         <area>-1,-1,500,500</area>
+
+        <animation trigger="AboutToShow">
+            <section>
+                <alpha start="0" end="255" easingcurve="OutQuart"/>
+                <zoom start="0" end="100" easingcurve="OutQuart"/>
+            </section>
+        </animation>
+
+        <animation trigger="AboutToHide">
+            <section>
+                <alpha start="255" end="0" easingcurve="InQuart"/>
+                <zoom start="100" end="0" easingcurve="InQuart"/>
+            </section>
+        </animation>
 
         <imagetype name="box">
             <filename>mythdialogbox-background.png</filename>
@@ -1087,6 +1128,20 @@
 
     <window name="editpowersearchpopup">
         <area>-1,-1,500,550</area>
+
+        <animation trigger="AboutToShow">
+            <section>
+                <alpha start="0" end="255" easingcurve="OutQuart"/>
+                <zoom start="0" end="100" easingcurve="OutQuart"/>
+            </section>
+        </animation>
+
+        <animation trigger="AboutToHide">
+            <section>
+                <alpha start="255" end="0" easingcurve="InQuart"/>
+                <zoom start="100" end="0" easingcurve="InQuart"/>
+            </section>
+        </animation>
 
         <imagetype name="box">
             <area>0,0,500,550</area>
@@ -1152,9 +1207,8 @@
     <window name="programlist">
 
         <textarea name="sched" from="basetextarea">
-            <area>20,4,400,40</area>
+            <area>15,5,400,40</area>
             <font>baselarge</font>
-            <align>left,bottom</align>
             <value>Program Listings</value>
         </textarea>
         <textarea name="keyinstr" from="basetextarea">
@@ -1187,10 +1241,10 @@
                         <area>240,2,230,24</area>
                     </textarea>
                     <textarea name="titlesubtitle" from="shortstarttimedate">
-                        <area>480,2,665,24</area>
+                        <area>480,2,655,24</area>
                     </textarea>
                     <textarea name="card" from="shortstarttimedate">
-                        <area>1155,2,30,24</area>
+                        <area>1145,2,40,24</area>
                         <align>right,vcenter</align>
                     </textarea>
                 </state>
@@ -1208,10 +1262,10 @@
                         <area>240,2,230,24</area>
                     </textarea>
                     <textarea name="titlesubtitle" from="shortstarttimedate">
-                        <area>480,2,665,24</area>
+                        <area>480,2,655,24</area>
                     </textarea>
                     <textarea name="card" from="shortstarttimedate">
-                        <area>1155,2,30,24</area>
+                        <area>1145,2,40,24</area>
                         <align>right,vcenter</align>
                     </textarea>
                     <shape name="selectbar">
@@ -1263,7 +1317,7 @@
     <window name="progdetails">
 
         <textarea name="title" from="basetextarea">
-            <area>80,20,720,40</area>
+            <area>15,5,720,40</area>
             <font>baselarge</font>
             <value>Program Details:</value>
         </textarea>
@@ -1282,6 +1336,20 @@
 
     <window name="searchpopup" from="MythTextInputDialog">
         <area>-1,10,580,166</area>
+
+        <animation trigger="AboutToShow">
+            <section>
+                <alpha start="0" end="255" easingcurve="OutQuart"/>
+                <zoom start="0" end="100" easingcurve="OutQuart"/>
+            </section>
+        </animation>
+
+        <animation trigger="AboutToHide">
+            <section>
+                <alpha start="255" end="0" easingcurve="InQuart"/>
+                <zoom start="100" end="0" easingcurve="InQuart"/>
+            </section>
+        </animation>
 
         <imagetype name="backimg">
             <filename>mythprogressdialog-background.png</filename>
@@ -1480,7 +1548,7 @@
     <window name="managerecrules">
 
         <textarea name="pagetitle" from="basetextarea">
-            <area>20,4,400,40</area>
+            <area>15,5,400,40</area>
             <font>baselarge</font>
             <value>Manage Recording Rules</value>
         </textarea>
@@ -1626,7 +1694,7 @@
     <window name="customedit">
 
         <textarea name="pagetitle" from="basetextarea">
-            <area>70,30,760,40</area>
+            <area>15,5,760,40</area>
             <font>baselarge</font>
             <value>Custom Record Rules</value>
         </textarea>
@@ -1653,9 +1721,7 @@
         </textedit>
 
         <textarea name="sampleslabel" from="ruleslabel">
-            <area>30,230,220,80</area>
-            <align>left,top</align>
-            <multiline>yes</multiline>
+            <area>0,230,280,40</area>
             <value>Sample Clauses:</value>
         </textarea>
 
@@ -1671,66 +1737,18 @@
             <cutdown>yes</cutdown>
         </textarea>
 
-        <textedit name="description">
+        <textedit name="description" from="basemultilinetextedit">
             <area>100,340,1080,150</area>
-            <statetype name="background">
-                <area>0,0,100%,100%</area>
-                <state name="active">
-                    <area>0,0,100%,100%</area>
-                    <shape name="background">
-                        <area>0,0,100%,100%</area>
-                        <fill color="#FFFFFF" alpha="180" />
-                    </shape>
-                </state>
-                <state name="selected" from="active">
-                    <shape name="background">
-                        <fill color="#FFFFFF" alpha="255" />
-                    </shape>
-                </state>
-                <state name="inactive" from="active" />
-            </statetype>
-            <imagetype name="cursor">
-                <filename>cursor.png</filename>
-            </imagetype>
-            <textarea name="text">
-                <area>10,10,1060,130</area>
-                <font>basesmall_textedit</font>
-                <multiline>yes</multiline>
-            </textarea>
         </textedit>
 
         <textarea name="subtitlelabel" from="ruleslabel">
-            <area>0,520,300,86</area>
+            <area>0,520,280,86</area>
             <value>Additional Tables:</value>
             <align>right</align>
         </textarea>
 
-        <textedit name="subtitle">
+        <textedit name="subtitle" from="basemultilinetextedit">
             <area>300,520,880,86</area>
-            <statetype name="background">
-                <area>0,0,100%,100%</area>
-                <state name="active">
-                    <area>0,0,100%,100%</area>
-                    <shape name="background">
-                        <area>0,0,100%,100%</area>
-                        <fill color="#FFFFFF" alpha="180" />
-                    </shape>
-                </state>
-                <state name="selected" from="active">
-                    <shape name="background">
-                        <fill color="#FFFFFF" alpha="255" />
-                    </shape>
-                </state>
-                <state name="inactive" from="active" />
-            </statetype>
-            <imagetype name="cursor">
-                <filename>cursor.png</filename>
-            </imagetype>
-            <textarea name="text">
-                <area>10,10,860,76</area>
-                <font>basesmall_textedit</font>
-                <multiline>yes</multiline>
-            </textarea>
         </textedit>
 
         <button name="test" from="basebutton">

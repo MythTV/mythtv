@@ -657,7 +657,7 @@ QString VideoDisplayProfile::GetDecoderName(const QString &decoder)
 
 QString VideoDisplayProfile::GetDecoderHelp(QString decoder)
 {
-    QString msg = QObject::tr("Decoder to use to play back MPEG2 video.");
+    QString msg = QObject::tr("Processing method used to decode video.");
 
     if (decoder.isEmpty())
         return msg;
@@ -687,6 +687,13 @@ QString VideoDisplayProfile::GetDecoderHelp(QString decoder)
         msg += QObject::tr(
             "VAAPI will attempt to use the graphics hardware to "
             "accelerate video decoding.");
+
+    if (decoder == "vda")
+        msg += QObject::tr(
+            "VDA will attempt to use the graphics hardware to "
+            "accelerate video decoding. "
+            "(H264 only, requires Mac OS 10.6.3)");
+
     return msg;
 }
 
@@ -1092,6 +1099,74 @@ void VideoDisplayProfile::CreateVDPAUProfiles(const QString &hostname)
                   "vdpau", 1, true, "vdpau", "vdpau", true,
                   "vdpaubobdeint", "vdpauonefield",
                   "vdpauskipchroma,vdpaucolorspace=auto");
+}
+
+#if defined(Q_OS_MACX)
+void VideoDisplayProfile::CreateVDAProfiles(const QString &hostname)
+{
+    (void) QObject::tr("VDA High Quality", "Sample: VDA high quality");
+    DeleteProfileGroup("VDA High Quality", hostname);
+    uint groupid = CreateProfileGroup("VDA High Quality", hostname);
+    CreateProfile(groupid, 1, ">", 0, 0, "", 0, 0,
+                  "vda", 2, true, "opengl", "opengl2", true,
+                  "greedyhdoubleprocessdeint", "greedyhdeint",
+                  "");
+    CreateProfile(groupid, 1, ">", 0, 0, "", 0, 0,
+                  "ffmpeg", 2, true, "opengl", "opengl2", true,
+                  "greedyhdoubleprocessdeint", "greedyhdeint",
+                  "");
+
+    (void) QObject::tr("VDA Normal", "Sample: VDA average quality");
+    DeleteProfileGroup("VDA Normal", hostname);
+    groupid = CreateProfileGroup("VDA Normal", hostname);
+    CreateProfile(groupid, 1, ">", 0, 0, "", 0, 0,
+                  "vda", 2, true, "opengl", "opengl2", true,
+                  "opengldoubleratekerneldeint", "openglkerneldeint",
+                  "");
+    CreateProfile(groupid, 2, ">", 0, 0, "", 0, 0,
+                  "ffmpeg", 2, true, "opengl", "opengl2", true,
+                  "opengldoubleratekerneldeint", "openglkerneldeint",
+                  "");
+
+    (void) QObject::tr("VDA Slim", "Sample: VDA low power GPU");
+    DeleteProfileGroup("VDA Slim", hostname);
+    groupid = CreateProfileGroup("VDA Slim", hostname);
+    CreateProfile(groupid, 1, ">", 0, 0, "", 0, 0,
+                  "vda", 2, true, "opengl", "opengl2", true,
+                  "opengldoubleratelinearblend", "opengllinearblend",
+                  "");
+    CreateProfile(groupid, 2, ">", 0, 0, "", 0, 0,
+                  "ffmpeg", 2, true, "opengl", "opengl2", true,
+                  "opengldoubleratelinearblend", "opengllinearblend",
+                  "");
+}
+#endif
+
+void VideoDisplayProfile::CreateOpenGLProfiles(const QString &hostname)
+{
+    (void) QObject::tr("OpenGL High Quality", "Sample: OpenGL high quality");
+    DeleteProfileGroup("OpenGL High Quality", hostname);
+    uint groupid = CreateProfileGroup("OpenGL High Quality", hostname);
+    CreateProfile(groupid, 1, ">", 0, 0, "", 0, 0,
+                  "ffmpeg", 2, true, "opengl", "opengl2", true,
+                  "greedyhdoubleprocessdeint", "greedyhdeint",
+                  "");
+
+    (void) QObject::tr("OpenGL Normal", "Sample: OpenGL average quality");
+    DeleteProfileGroup("OpenGL Normal", hostname);
+    groupid = CreateProfileGroup("OpenGL Normal", hostname);
+    CreateProfile(groupid, 1, ">", 0, 0, "", 0, 0,
+                  "ffmpeg", 2, true, "opengl", "opengl2", true,
+                  "opengldoubleratekerneldeint", "openglkerneldeint",
+                  "");
+
+    (void) QObject::tr("OpenGL Slim", "Sample: OpenGL low power GPU");
+    DeleteProfileGroup("OpenGL Slim", hostname);
+    groupid = CreateProfileGroup("OpenGL Slim", hostname);
+    CreateProfile(groupid, 1, ">", 0, 0, "", 0, 0,
+                  "ffmpeg", 1, true, "opengl", "opengl2", true,
+                  "opengldoubleratelinearblend", "opengllinearblend",
+                  "");
 }
 
 void VideoDisplayProfile::CreateProfiles(const QString &hostname)

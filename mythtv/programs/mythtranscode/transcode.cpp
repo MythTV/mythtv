@@ -581,8 +581,6 @@ class TranscodeFrameQueue : public QRunnable
 
     void run()
     {
-        threadRegister("TranscodeFrameQueue");
-
         frm_dir_map_t::iterator dm_iter;
 
         m_isRunning = true;
@@ -618,8 +616,6 @@ class TranscodeFrameQueue : public QRunnable
             }
         }
         m_isRunning = false;
-
-        threadDeregister();
     }
 
     VideoFrame *GetFrame(int &didFF, bool &isKey)
