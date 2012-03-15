@@ -46,7 +46,8 @@ class IPTVStreamHandlerWriteHelper : QObject
     Q_OBJECT
 
   public:
-    IPTVStreamHandlerWriteHelper(IPTVStreamHandler *p) : m_parent(p) { }
+    IPTVStreamHandlerWriteHelper(IPTVStreamHandler *p) :
+        m_parent(p), m_timer(0), m_last_sequence_number(0) { }
     ~IPTVStreamHandlerWriteHelper()
     {
         killTimer(m_timer);
@@ -65,6 +66,7 @@ class IPTVStreamHandlerWriteHelper : QObject
   private:
     IPTVStreamHandler *m_parent;
     int m_timer;
+    uint m_last_sequence_number;
 };
 
 class IPTVStreamHandler : public StreamHandler

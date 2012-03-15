@@ -19,21 +19,27 @@ void RTPPacketBuffer::PushDataPacket(const UDPPacket &udp_packet)
 
     bool large_was_seen_recently = m_large_sequence_number_seen_recently > 0;
     m_large_sequence_number_seen_recently = 
-        (key > (1U>>31)) ? 500 : m_large_sequence_number_seen_recently - 1;
+        (key > (1U<<15)) ? 500 : m_large_sequence_number_seen_recently - 1;
     m_large_sequence_number_seen_recently =
         max(m_large_sequence_number_seen_recently, 0);
 
     if (m_large_sequence_number_seen_recently > 0)
     {
-        if (key < (1U>>20)) 
-            key += 1ULL<<32;
+        if (key < 500) 
+            key += 1ULL<<16;
     }
     else if (large_was_seen_recently)
     {
-        m_current_sequence += 1ULL<<32;
+        m_current_sequence += 1ULL<<16;
     }
 
     key += m_current_sequence;
+
+/*
+    LOG(VB_RECORD, LOG_DEBUG, QString("Pushing %1 as %2 (lr %3)")
+        .arg(packet.GetSequenceNumber()).arg(key)
+        .arg(m_large_sequence_number_seen_recently));
+*/
 
     m_unordered_packets[key] = packet;
 
@@ -47,6 +53,10 @@ void RTPPacketBuffer::PushDataPacket(const UDPPacket &udp_packet)
         {
             QMap<uint64_t, RTPDataPacket>::iterator it =
                 m_unordered_packets.begin();
+/*
+            LOG(VB_RECORD, LOG_DEBUG, QString("Popping %1 as %2")
+                .arg((*it).GetSequenceNumber()).arg(it.key()));
+*/
             m_available_packets.push_back(*it);
             m_unordered_packets.erase(it);
         }
