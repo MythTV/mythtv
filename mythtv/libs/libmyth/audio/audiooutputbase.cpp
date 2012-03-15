@@ -706,10 +706,6 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
         VBAUDIO(QString("Creating AC-3 Encoder with sr = %1, ch = %2")
                 .arg(samplerate).arg(configured_channels));
 
-        if (encoder)
-        {
-            delete encoder;
-        }
         encoder = new AudioOutputDigitalEncoder();
         if (!encoder->Init(CODEC_ID_AC3, 448000, samplerate,
                            configured_channels))
