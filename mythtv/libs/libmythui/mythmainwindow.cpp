@@ -2605,7 +2605,10 @@ void MythMainWindow::IdleTimeout(void)
                                         .arg(idletimeout));
         EnterStandby(false);
         d->enteringStandby = true;
-        JumpTo("Standby Mode");
+        if (gCoreContext->GetNumSetting("idleTimeoutSecs", 0))
+        {
+            JumpTo("Standby Mode");
+        }
     }
 }
 
