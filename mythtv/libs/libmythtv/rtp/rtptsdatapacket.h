@@ -33,7 +33,7 @@ class RTPTSDataPacket : public RTPDataPacket
     }
 
   private:
-    uint GetTSOffset(void) const { return 0; /* TODO */ }
+    uint GetTSOffset(void) const { return m_off; }
 };
 
 #endif // _RTP_TS_DATA_PACKET_H_
