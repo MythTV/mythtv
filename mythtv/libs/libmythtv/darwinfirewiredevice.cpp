@@ -28,6 +28,7 @@ using namespace std;
 #include "darwinfirewiredevice.h"
 #include "darwinavcinfo.h"
 #include "mythlogging.h"
+#include "mthread.h"
 
 // Apple Firewire example headers
 #include <AVCVideoServices/StringLogger.h>
@@ -892,9 +893,9 @@ void DarwinFirewireDevice::HandleDeviceChange(uint messageType)
 
 void *dfd_controller_thunk(void *callback_data)
 {
-    threadRegister("DarwinController");
+    MThread::ThreadSetup("DarwinController");
     reinterpret_cast<DarwinFirewireDevice*>(callback_data)->RunController();
-    threadDeregister();
+    MThread::ThreadCleanup();
     return NULL;
 }
 

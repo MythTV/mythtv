@@ -55,8 +55,10 @@ class CetonStreamHandler : public StreamHandler
     void RepeatTuning(void);
 
     bool TunerOff(void);
+    void ClearProgramNumber(void);
+
     QString GetVar(const QString &section, const QString &variable) const;
-    QStringList GetProgramList(const QString &host, uint tuner);
+    QStringList GetProgramList();
     bool HttpRequest(const QString &method, const QString &script,
                      const QUrl &params,
                      QString &response, uint &status_code) const;

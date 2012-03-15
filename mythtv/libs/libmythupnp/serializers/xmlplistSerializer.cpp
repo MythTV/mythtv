@@ -63,7 +63,7 @@ void XmlPListSerializer::RenderValue(const QString &sName,
     if ( vValue.canConvert<QObject*>())
     {
         const QObject *pObject = vValue.value<QObject*>();
-        SerializePListObjectProperties(pObject);
+        SerializePListObjectProperties(sName, pObject, needKey);
         return;
     }
 
@@ -89,19 +89,25 @@ void XmlPListSerializer::RenderValue(const QString &sName,
 
         case QVariant::DateTime:
         {
-            if (needKey)
-                m_pXmlWriter->writeTextElement("key", sName);
-            m_pXmlWriter->writeTextElement("date", vValue.toDateTime()
-                                           .toUTC().toString(Qt::ISODate));
+            if (vValue.toDateTime().isValid())
+            {
+                if (needKey)
+                    m_pXmlWriter->writeTextElement("key", sName);
+                m_pXmlWriter->writeTextElement("date", vValue.toDateTime()
+                                               .toUTC().toString("yyyy-MM-ddThh:mm:ssZ"));
+            }
             break;
         }
 
         case QVariant::ByteArray:
         {
-            if (needKey)
-                m_pXmlWriter->writeTextElement("key", sName);
-            m_pXmlWriter->writeTextElement("data",
-                            vValue.toByteArray().toBase64().data());
+            if (!vValue.toByteArray().isNull())
+            {
+                if (needKey)
+                    m_pXmlWriter->writeTextElement("key", sName);
+                m_pXmlWriter->writeTextElement("data",
+                                vValue.toByteArray().toBase64().data());
+            }
             break;
         }
 
@@ -239,11 +245,18 @@ void XmlPListSerializer::AddProperty(const QString &sName,
     RenderValue(sName, vValue);
 }
 
-void XmlPListSerializer::SerializePListObjectProperties(const QObject *pObject)
+void XmlPListSerializer::SerializePListObjectProperties(const QString &sName,
+                                                        const QObject *pObject,
+                                                        bool          needKey )
 {
     if (!pObject)
         return;
 
+    if (needKey)
+    {
+        QString sItemName = GetItemName(sName);
+        m_pXmlWriter->writeTextElement("key", sItemName);
+    }
     m_pXmlWriter->writeStartElement("dict");
 
     const QMetaObject *pMetaObject = pObject->metaObject();

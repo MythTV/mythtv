@@ -252,6 +252,8 @@ namespace
             pmanager = NULL;
         }
 
+        DestroyMythMainWindow();
+
         delete gContext;
         gContext = NULL;
 
@@ -1329,15 +1331,15 @@ static void InitJumpPoints(void)
      // Video
 
      REG_JUMP(JUMP_VIDEO_DEFAULT, QT_TRANSLATE_NOOP("MythControls",
-         "The Video default view"), "", jumpScreenVideoDefault);
+         "The Video Default View"), "", jumpScreenVideoDefault);
      REG_JUMP(JUMP_VIDEO_MANAGER, QT_TRANSLATE_NOOP("MythControls",
-         "The Video video manager"), "", jumpScreenVideoManager);
+         "The Video Manager"), "", jumpScreenVideoManager);
      REG_JUMP(JUMP_VIDEO_BROWSER, QT_TRANSLATE_NOOP("MythControls",
-         "The Video video browser"), "", jumpScreenVideoBrowser);
+         "The Video Browser"), "", jumpScreenVideoBrowser);
      REG_JUMP(JUMP_VIDEO_TREE, QT_TRANSLATE_NOOP("MythControls",
-         "The Video video listings"), "", jumpScreenVideoTree);
+         "The Video Listings"), "", jumpScreenVideoTree);
      REG_JUMP(JUMP_VIDEO_GALLERY, QT_TRANSLATE_NOOP("MythControls",
-         "The Video video gallery"), "", jumpScreenVideoGallery);
+         "The Video Gallery"), "", jumpScreenVideoGallery);
      REG_JUMP("Play Disc", QT_TRANSLATE_NOOP("MythControls",
          "Play an Optical Disc"), "", playDisc);
 
@@ -1765,8 +1767,6 @@ int main(int argc, char **argv)
         mon->deleteLater();
 
     delete networkControl;
-
-    DestroyMythMainWindow();
 
     return ret;
 

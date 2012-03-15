@@ -496,10 +496,10 @@
                         <area>240,1,130,24</area>
                     </textarea>
                     <textarea name="title" from="shortstarttimedate">
-                        <area>375,1,345,24</area>
+                        <area>375,1,340,24</area>
                     </textarea>
                     <textarea name="card" from="shortstarttimedate">
-                        <area>720,1,30,24</area>
+                        <area>715,1,35,24</area>
                         <align>right,vcenter</align>
                     </textarea>
                 </state>
@@ -512,10 +512,10 @@
                         <area>240,1,130,24</area>
                     </textarea>
                     <textarea name="title" from="shortstarttimedate">
-                        <area>375,1,345,24</area>
+                        <area>375,1,340,24</area>
                     </textarea>
                     <textarea name="card" from="shortstarttimedate">
-                        <area>720,1,30,24</area>
+                        <area>715,1,35,24</area>
                         <align>right,vcenter</align>
                     </textarea>
                     <shape name="selectbar">
@@ -1257,11 +1257,11 @@
                         <font>basesmallwhite</font>
                     </textarea>
                     <textarea name="titlesubtitle" from="shortstarttimedate">
-                        <area>390,1,320,24</area>
+                        <area>390,1,315,24</area>
                         <font>basesmallboldblue</font>
                     </textarea>
                     <textarea name="card" from="shortstarttimedate">
-                        <area>720,1,30,24</area>
+                        <area>715,1,35,24</area>
                         <font>basesmallboldblue</font>
                         <align>right,vcenter</align>
                     </textarea>

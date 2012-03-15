@@ -223,27 +223,21 @@ bool MusicCommon::CreateCommon(void)
     if (m_movingTracksState)
         m_movingTracksState->DisplayState("off");
 
+    if (m_stopButton)
+        m_stopButton->SetLocked(gPlayer->isStopped());
+    if (m_playButton)
+        m_playButton->SetLocked(gPlayer->isPlaying());
+    if (m_pauseButton)
+        m_pauseButton->SetLocked(gPlayer->isPaused());
     if (m_trackState)
     {
-        if (!gPlayer->isPlaying()) // TODO: Add Player status check
-        {
-            if (gPlayer->getOutput() && gPlayer->getOutput()->IsPaused())
-                m_trackState->DisplayState("paused");
-            else
-                m_trackState->DisplayState("stopped");
-        }
-        else
+        if (gPlayer->isPlaying())
             m_trackState->DisplayState("playing");
-    }
+        else if (gPlayer->isPaused())
+            m_trackState->DisplayState("paused");
+        else
+            m_trackState->DisplayState("stopped");
 
-    if (gPlayer->isPlaying())
-    {
-        if (m_stopButton)
-            m_stopButton->SetLocked(false);
-        if (m_playButton)
-            m_playButton->SetLocked(true);
-        if (m_pauseButton)
-            m_pauseButton->SetLocked(false);
     }
 
     updateShuffleMode();
@@ -346,22 +340,10 @@ void MusicCommon::switchView(MusicView view)
     }
 
     gPlayer->removeListener(this);
+    gPlayer->setAllowRestorePos(false);
 
     switch (view)
     {
-#if 0
-        case MV_LYRICS:
-        {
-            LyricsView *view = new LyricsView(mainStack);
-
-            if (view->Create())
-                mainStack->AddScreen(view);
-            else
-                delete view;
-
-            break;
-        }
-#endif
         case MV_PLAYLIST:
         {
             PlaylistView *view = new PlaylistView(mainStack);
@@ -378,7 +360,7 @@ void MusicCommon::switchView(MusicView view)
         {
             // if we are switching playlist editor views save and restore
             // the current position in the tree
-            bool restorePos = (m_currentView ==  MV_PLAYLISTEDITORGALLERY);
+            bool restorePos = (m_currentView == MV_PLAYLISTEDITORGALLERY);
             PlaylistEditorView *oldView = dynamic_cast<PlaylistEditorView *>(this);
             if (oldView)
                 oldView->saveTreePosition();
@@ -397,7 +379,7 @@ void MusicCommon::switchView(MusicView view)
         {
             // if we are switching playlist editor views save and restore
             // the current position in the tree
-            bool restorePos = (m_currentView ==  MV_PLAYLISTEDITORTREE);
+            bool restorePos = (m_currentView == MV_PLAYLISTEDITORTREE);
             PlaylistEditorView *oldView = dynamic_cast<PlaylistEditorView *>(this);
             if (oldView)
                 oldView->saveTreePosition();
@@ -441,6 +423,8 @@ void MusicCommon::switchView(MusicView view)
     }
 
     Close();
+
+    gPlayer->setAllowRestorePos(true);
 }
 
 #if 0
@@ -1526,7 +1510,8 @@ void MusicCommon::customEvent(QEvent *event)
 
                     item->SetTextFromMap(metadataMap);
 
-                    if (gPlayer->isPlaying() && mdata->ID() == gPlayer->getCurrentMetadata()->ID())
+                    if (gPlayer->isPlaying() && gPlayer->getCurrentMetadata() &&
+                        mdata->ID() == gPlayer->getCurrentMetadata()->ID())
                     {
                         item->SetFontState("running");
                         item->DisplayState("playing", "playstate");
@@ -1622,7 +1607,7 @@ void MusicCommon::customEvent(QEvent *event)
             }
         }
 
-        if (trackID == gPlayer->getCurrentMetadata()->ID())
+        if (gPlayer->getCurrentMetadata() && trackID == gPlayer->getCurrentMetadata()->ID())
             updateTrackInfo(gPlayer->getCurrentMetadata());
     }
 }
@@ -1822,21 +1807,32 @@ void MusicCommon::updateUIPlaylist(void)
             MetadataMap metadataMap;
             mdata->toMap(metadataMap);
             item->SetTextFromMap(metadataMap);
+            item->SetFontState("normal");
+            item->DisplayState("default", "playstate");
 
-            if (gPlayer->isPlaying() && mdata->ID() == gPlayer->getCurrentMetadata()->ID())
+            // if this is the current track update its play state to match the player
+            if (gPlayer->getCurrentMetadata() && mdata->ID() == gPlayer->getCurrentMetadata()->ID())
             {
-                item->SetFontState("running");
-                item->DisplayState("playing", "playstate");
-            }
-            else
-            {
-                item->SetFontState("normal");
-                item->DisplayState("default", "playstate");
+                if (gPlayer->isPlaying())
+                {
+                    item->SetFontState("running");
+                    item->DisplayState("playing", "playstate");
+                }
+                else if (gPlayer->isPaused())
+                {
+                    item->SetFontState("idle");
+                    item->DisplayState("paused", "playstate");
+                }
+                else
+                {
+                    item->SetFontState("normal");
+                    item->DisplayState("stopped", "playstate");
+                }
             }
 
             item->DisplayState(QString("%1").arg(mdata->Rating()), "ratingstate");
 
-            if (mdata->ID() == gPlayer->getCurrentMetadata()->ID())
+            if (gPlayer->getCurrentMetadata() && mdata->ID() == gPlayer->getCurrentMetadata()->ID())
                 m_currentPlaylist->SetItemCurrent(item);
         }
     }
