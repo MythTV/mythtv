@@ -149,7 +149,7 @@ MythCoreContextPrivate::~MythCoreContextPrivate()
         m_database = NULL;
     }
 
-    deregister_thread_with_logger();
+    loggingDeregisterThread();
 }
 
 /// If another thread has already started WOL process, wait on them...

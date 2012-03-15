@@ -226,7 +226,7 @@ void MThread::RunEpilog(void)
 
 void MThread::ThreadSetup(const QString &name)
 {
-    register_thread_with_logger(name);
+    loggingRegisterThread(name);
     qsrand(QDateTime::currentDateTime().toTime_t() ^
            QTime::currentTime().msec());
 }
@@ -235,7 +235,7 @@ void MThread::ThreadCleanup(void)
 {
     if (GetMythDB() && GetMythDB()->GetDBManager())
         GetMythDB()->GetDBManager()->CloseDatabases();
-    deregister_thread_with_logger();
+    loggingDeregisterThread();
 }
 
 QThread *MThread::qthread(void)

@@ -81,7 +81,7 @@ class MPoolThread : public MThread
             }
 
             if (!m_runnable_name.isEmpty())
-                register_thread_with_logger(m_runnable_name);
+                loggingRegisterThread(m_runnable_name);
 
             bool autodelete = m_runnable->autoDelete();
             m_runnable->run();
@@ -92,8 +92,8 @@ class MPoolThread : public MThread
             m_reserved = false;
             m_runnable = NULL;
 
-            deregister_thread_with_logger();
-            register_thread_with_logger(objectName());
+            loggingDeregisterThread();
+            loggingRegisterThread(objectName());
 
             GetMythDB()->GetDBManager()->PurgeIdleConnections(false);
             QCoreApplication::processEvents();
