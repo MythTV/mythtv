@@ -3569,29 +3569,42 @@ QString AvFormatDecoder::GetTrackDesc(uint type, uint trackNo) const
 
         QString msg = iso639_key_toName(lang_key);
 
-        int av_index = tracks[kTrackTypeAudio][trackNo].av_stream_index;
-        AVStream *s = ic->streams[av_index];
+        switch (tracks[type][trackNo].audio_type)
+        {
+            case kAudioTypeAudioDescription :
+                msg += QObject::tr(" (Audio Description)",
+                                   "Audio described for the visually impaired");
+                break;
+            case kAudioTypeCommentary :
+                msg += QObject::tr(" (Commentary)", "Audio commentary track");
+                break;
+            case kAudioTypeNormal : default :
+                int av_index = tracks[kTrackTypeAudio][trackNo].av_stream_index;
+                AVStream *s = ic->streams[av_index];
 
-        if (!s)
-            return QString("%1: %2").arg(trackNo + 1).arg(msg);
+                if (s)
+                {
+                    if (s->codec->codec_id == CODEC_ID_MP3)
+                        msg += QString(" MP%1").arg(s->codec->sub_id);
+                    else if (s->codec->codec)
+                        msg += QString(" %1").arg(s->codec->codec->name).toUpper();
 
-        if (s->codec->codec_id == CODEC_ID_MP3)
-            msg += QString(" MP%1").arg(s->codec->sub_id);
-        else if (s->codec->codec)
-            msg += QString(" %1").arg(s->codec->codec->name).toUpper();
+                    int channels = 0;
+                    if (ringBuffer->IsDVD())
+                        channels = ringBuffer->DVD()->GetNumAudioChannels(trackNo);
+                    else if (s->codec->channels)
+                        channels = tracks[kTrackTypeAudio][trackNo].orig_num_channels;
 
-        int channels = 0;
-        if (ringBuffer->IsDVD())
-            channels = ringBuffer->DVD()->GetNumAudioChannels(trackNo);
-        else if (s->codec->channels)
-            channels = tracks[kTrackTypeAudio][trackNo].orig_num_channels;
+                    if (channels == 0)
+                        msg += QString(" ?ch");
+                    else if((channels > 4) && !(channels & 1))
+                        msg += QString(" %1.1ch").arg(channels - 1);
+                    else
+                        msg += QString(" %1ch").arg(channels);
+                }
 
-        if (channels == 0)
-            msg += QString(" ?ch");
-        else if((channels > 4) && !(channels & 1))
-            msg += QString(" %1.1ch").arg(channels - 1);
-        else
-            msg += QString(" %1ch").arg(channels);
+                break;
+        }
 
         return QString("%1: %2").arg(trackNo + 1).arg(msg);
     }
