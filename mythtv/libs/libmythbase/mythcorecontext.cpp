@@ -222,6 +222,8 @@ bool MythCoreContext::Init(void)
             lang_variables.append(", and ");
         lang_variables.append("LANG");
     }
+    LOG(VB_GENERAL, LOG_INFO, QString("Assumed character encoding: %1")
+                                     .arg(lc_value));
     if (!lang_variables.isEmpty())
         LOG(VB_GENERAL, LOG_WARNING, QString("This application expects to "
             "be running a locale that specifies a UTF-8 codeset, and many "
