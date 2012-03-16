@@ -261,6 +261,9 @@ bool MythMediaDevice::ScanMediaType(const QString &directory, ext_cnt_t &cnt)
         if (("." == fi.fileName()) || (".." == fi.fileName()))
             continue;
 
+        if (fi.isSymLink())
+            continue;
+
         if (fi.isDir())
         {
             ScanMediaType(fi.absoluteFilePath(), cnt);
