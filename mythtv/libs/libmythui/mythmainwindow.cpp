@@ -2604,9 +2604,9 @@ void MythMainWindow::IdleTimeout(void)
                                         "%1 minutes of inactivity")
                                         .arg(idletimeout));
         EnterStandby(false);
-        d->enteringStandby = true;
         if (gCoreContext->GetNumSetting("idleTimeoutSecs", 0))
         {
+            d->enteringStandby = true;
             JumpTo("Standby Mode");
         }
     }
