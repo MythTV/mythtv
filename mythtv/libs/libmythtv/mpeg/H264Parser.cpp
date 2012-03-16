@@ -951,6 +951,16 @@ void H264Parser::decode_SPS(GetBitContext * gb)
         vui_parameters(gb);
 }
 
+void H264Parser::parse_SPS(uint8_t *sps, uint32_t sps_size,
+                           bool& interlaced, int32_t& max_ref_frames)
+{
+    GetBitContext gb;
+    init_get_bits(&gb, sps, sps_size << 3);
+    decode_SPS(&gb);
+    interlaced = !frame_mbs_only_flag;
+    max_ref_frames = num_ref_frames;
+}
+
 void H264Parser::decode_PPS(GetBitContext * gb)
 {
     /*
