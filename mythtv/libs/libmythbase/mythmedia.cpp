@@ -111,9 +111,15 @@ bool MythMediaDevice::performMountCmd(bool DoMount)
 {
     if (DoMount && isMounted())
     {
+#ifdef Q_OS_MAC
+        // Not an error - DiskArbitration has already mounted the device.
+        // AddDevice calls mount() so onDeviceMounted() can get mediaType.
+        onDeviceMounted();
+#else
         LOG(VB_MEDIA, LOG_ERR, "MythMediaDevice::performMountCmd(true)"
                                " - Logic Error? Device already mounted.");
         return true;
+#endif
     }
 
     if (isDeviceOpen())
