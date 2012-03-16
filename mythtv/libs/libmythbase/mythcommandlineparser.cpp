@@ -1139,8 +1139,8 @@ MythCommandLineParser::~MythCommandLineParser()
     i = m_namedArgs.begin();
     while (i != m_namedArgs.end())
     {
-        (*i)->DownRef();
         (*i)->CleanupLinks();
+        (*i)->DownRef();
         i = m_namedArgs.erase(i);
     }
 
