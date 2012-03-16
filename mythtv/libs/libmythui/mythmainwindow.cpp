@@ -994,7 +994,7 @@ void MythMainWindow::Init(void)
         d->render = NULL;
     }
 
-    QString painter = GetMythDB()->GetSetting("UIPainter", "auto");
+    QString painter = GetMythDB()->GetSetting("ThemePainter", "qt");
 #ifdef USING_MINGW
     if (painter == "auto" || painter == "d3d9")
     {
