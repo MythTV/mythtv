@@ -175,6 +175,7 @@ class MusicPlayer : public QObject, public MythObservable
     void customEvent(QEvent *event);
 
   private:
+    void loadSettings(void);
     void stopDecoder(void);
     bool openOutputDevice(void);
     void updateLastplay(void);
