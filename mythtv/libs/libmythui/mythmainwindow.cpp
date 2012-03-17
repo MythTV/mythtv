@@ -2564,7 +2564,8 @@ void MythMainWindow::HideMouseTimeout(void)
 
 void MythMainWindow::ResetIdleTimer(void)
 {
-    if (d->standby && d->enteringStandby)
+    if (!d->idleTimer->isActive() ||
+        (d->standby && d->enteringStandby))
         return;
 
     if (d->standby)
