@@ -121,7 +121,7 @@ bool Settings::LoadSettingsFiles(QString filename, QString prefix,
 bool Settings::ReadSettings(QString pszFile)
 {
     QString LOC = "(old)Settings::ReadSettings(" + pszFile + ") - ";
-    fstream fin(pszFile.toAscii(), ios::in);
+    fstream fin(pszFile.toLocal8Bit().constData(), ios::in);
 
     if (!fin.is_open())
     {

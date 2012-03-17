@@ -727,8 +727,10 @@ static void playDisc()
                         command_string.replace(QRegExp("%d"), dvd_device);
             }
             sendPlaybackStart();
+            GetMythMainWindow()->PauseIdleTimer(true);
             myth_system(command_string);
             sendPlaybackEnd();
+            GetMythMainWindow()->PauseIdleTimer(false);
             if (GetMythMainWindow())
             {
                 GetMythMainWindow()->raise();

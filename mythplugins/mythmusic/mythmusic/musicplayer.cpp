@@ -13,6 +13,7 @@
 #include <audiooutput.h>
 #include <mythdb.h>
 #include <mythdialogbox.h>
+#include <mythmainwindow.h>
 
 // mythmusic
 #include "musicplayer.h"
@@ -281,6 +282,8 @@ void MusicPlayer::stop(bool stopAll)
     // event so any listeners can act on it
     OutputEvent oe(OutputEvent::Stopped);
     dispatch(oe);
+
+    GetMythMainWindow()->PauseIdleTimer(false);
 }
 
 void MusicPlayer::pause(void)
@@ -297,6 +300,8 @@ void MusicPlayer::pause(void)
         getDecoder()->cond()->wakeAll();
         getDecoder()->unlock();
     }
+
+    GetMythMainWindow()->PauseIdleTimer(false);
 }
 
 void MusicPlayer::play(void)
@@ -320,6 +325,8 @@ void MusicPlayer::play(void)
     getDecoderHandler()->start(meta);
 
     m_isStreaming = (meta->Format() == "cast");
+
+    GetMythMainWindow()->PauseIdleTimer(true);
 }
 
 void MusicPlayer::stopDecoder(void)

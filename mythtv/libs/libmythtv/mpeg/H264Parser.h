@@ -164,6 +164,9 @@ class H264Parser {
 
     uint32_t GetUnitsInTick(void) const { return unitsInTick; }
 
+    void parse_SPS(uint8_t *sps, uint32_t sps_size,
+                   bool& interlaced, int32_t& max_ref_frames);
+
   private:
     enum constants {EXTENDED_SAR = 255};
 

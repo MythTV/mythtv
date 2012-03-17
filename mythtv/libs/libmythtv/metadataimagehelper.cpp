@@ -19,12 +19,20 @@ ArtworkMap GetArtwork(QString inetref,
     if (strict)
         querystring += "AND season = :SEASON;";
     else
-        querystring += "ORDER BY season = :SEASON DESC, season DESC;";
+    {
+        if (season > 0)
+        {
+            querystring += "ORDER BY season = :SEASON DESC, season DESC;";
+        }
+        else
+            querystring += "ORDER BY season DESC;";
+    }
 
     query.prepare(querystring);
 
     query.bindValue(":INETREF", inetref);
-    query.bindValue(":SEASON", season);
+    if (strict || season > 0)
+        query.bindValue(":SEASON", season);
 
     if (!query.exec())
     {

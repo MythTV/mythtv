@@ -111,9 +111,15 @@ bool MythMediaDevice::performMountCmd(bool DoMount)
 {
     if (DoMount && isMounted())
     {
+#ifdef Q_OS_MAC
+        // Not an error - DiskArbitration has already mounted the device.
+        // AddDevice calls mount() so onDeviceMounted() can get mediaType.
+        onDeviceMounted();
+#else
         LOG(VB_MEDIA, LOG_ERR, "MythMediaDevice::performMountCmd(true)"
                                " - Logic Error? Device already mounted.");
         return true;
+#endif
     }
 
     if (isDeviceOpen())
@@ -253,6 +259,9 @@ bool MythMediaDevice::ScanMediaType(const QString &directory, ext_cnt_t &cnt)
         QFileInfo &fi = *it;
 
         if (("." == fi.fileName()) || (".." == fi.fileName()))
+            continue;
+
+        if (fi.isSymLink())
             continue;
 
         if (fi.isDir())
