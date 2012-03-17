@@ -1146,6 +1146,7 @@ PlaybackProfileConfigs::PlaybackProfileConfigs(const QString &str) :
         profiles = VideoDisplayProfile::GetProfiles(host);
     }
 
+#ifdef USING_VDPAU
     if (!profiles.contains("VDPAU Normal") &&
         !profiles.contains("VDPAU High Quality") &&
         !profiles.contains("VDPAU Slim"))
@@ -1153,6 +1154,7 @@ PlaybackProfileConfigs::PlaybackProfileConfigs(const QString &str) :
         VideoDisplayProfile::CreateVDPAUProfiles(host);
         profiles = VideoDisplayProfile::GetProfiles(host);
     }
+#endif
 
 #if defined(Q_OS_MACX)
     if (VDALibrary::GetVDALibrary() != NULL)
@@ -1167,6 +1169,7 @@ PlaybackProfileConfigs::PlaybackProfileConfigs(const QString &str) :
     }
 #endif
 
+#ifdef USING_OPENGL
     if (!profiles.contains("OpenGL Normal") &&
         !profiles.contains("OpenGL High Quality") &&
         !profiles.contains("OpenGL Slim"))
@@ -1174,6 +1177,7 @@ PlaybackProfileConfigs::PlaybackProfileConfigs(const QString &str) :
         VideoDisplayProfile::CreateOpenGLProfiles(host);
         profiles = VideoDisplayProfile::GetProfiles(host);
     }
+#endif
 
     QString profile = VideoDisplayProfile::GetDefaultProfileName(host);
     if (!profiles.contains(profile))
