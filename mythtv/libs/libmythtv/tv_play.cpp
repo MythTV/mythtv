@@ -298,6 +298,7 @@ bool TV::StartTV(ProgramInfo *tvrec, uint flags)
     // Must be before Init() otherwise we swallow the PLAYBACK_START event
     // with the event filter
     sendPlaybackStart();
+    GetMythMainWindow()->PauseIdleTimer(true);
 
     // Initialize TV
     if (!tv->Init())
@@ -305,6 +306,7 @@ bool TV::StartTV(ProgramInfo *tvrec, uint flags)
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed initializing TV");
         ReleaseTV(tv);
         sendPlaybackEnd();
+        GetMythMainWindow()->PauseIdleTimer(false);
         delete curProgram;
         return false;
     }
@@ -454,6 +456,7 @@ bool TV::StartTV(ProgramInfo *tvrec, uint flags)
     }
 
     sendPlaybackEnd();
+    GetMythMainWindow()->PauseIdleTimer(true);
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "StartTV -- end");
 

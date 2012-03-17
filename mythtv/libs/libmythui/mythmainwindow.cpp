@@ -2363,14 +2363,6 @@ void MythMainWindow::customEvent(QEvent *ce)
             state.insert("currentlocation", GetMythUI()->GetCurrentLocation());
             MythUIStateTracker::SetState(state);
         }
-        else if (message.startsWith("PLAYBACK_START"))
-        {
-            PauseIdleTimer(true);
-        }
-        else if (message.startsWith("PLAYBACK_END"))
-        {
-            PauseIdleTimer(false);
-        }
     }
     else if ((MythEvent::Type)(ce->type()) == MythEvent::MythUserMessage)
     {
