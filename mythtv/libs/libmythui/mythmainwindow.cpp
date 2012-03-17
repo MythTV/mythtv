@@ -994,7 +994,7 @@ void MythMainWindow::Init(void)
         d->render = NULL;
     }
 
-    QString painter = GetMythDB()->GetSetting("UIPainter", "auto");
+    QString painter = GetMythDB()->GetSetting("ThemePainter", "qt");
 #ifdef USING_MINGW
     if (painter == "auto" || painter == "d3d9")
     {
@@ -2363,14 +2363,6 @@ void MythMainWindow::customEvent(QEvent *ce)
             state.insert("currentlocation", GetMythUI()->GetCurrentLocation());
             MythUIStateTracker::SetState(state);
         }
-        else if (message.startsWith("PLAYBACK_START"))
-        {
-            PauseIdleTimer(true);
-        }
-        else if (message.startsWith("PLAYBACK_END"))
-        {
-            PauseIdleTimer(false);
-        }
     }
     else if ((MythEvent::Type)(ce->type()) == MythEvent::MythUserMessage)
     {
@@ -2584,9 +2576,15 @@ void MythMainWindow::ResetIdleTimer(void)
 void MythMainWindow::PauseIdleTimer(bool pause)
 {
     if (pause)
+    {
+        LOG(VB_GENERAL, LOG_NOTICE, "Suspending idle timer");
         d->idleTimer->stop();
+    }
     else
+    {
+        LOG(VB_GENERAL, LOG_NOTICE, "Resuming idle timer");
         d->idleTimer->start();
+    }
 
     // ResetIdleTimer();
 }
@@ -2604,9 +2602,9 @@ void MythMainWindow::IdleTimeout(void)
                                         "%1 minutes of inactivity")
                                         .arg(idletimeout));
         EnterStandby(false);
-        d->enteringStandby = true;
         if (gCoreContext->GetNumSetting("idleTimeoutSecs", 0))
         {
+            d->enteringStandby = true;
             JumpTo("Standby Mode");
         }
     }

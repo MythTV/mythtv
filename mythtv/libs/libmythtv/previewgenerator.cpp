@@ -88,6 +88,7 @@ void PreviewGenerator::SetOutputFilename(const QString &fileName)
 
 void PreviewGenerator::TeardownAll(void)
 {
+    QMutexLocker locker(&previewLock);
     previewWaitCondition.wakeAll();
     listener = NULL;
 }

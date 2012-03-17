@@ -2270,6 +2270,25 @@ static HostComboBox *MythTimeFormat()
     return gc;
 }
 
+static HostComboBox *ThemePainter()
+{
+    HostComboBox *gc = new HostComboBox("ThemePainter");
+    gc->setLabel(QObject::tr("Paint engine"));
+    gc->addSelection(QObject::tr("Qt"), "qt");
+    gc->addSelection(QObject::tr("Auto"), "auto");
+#ifdef USING_OPENGL
+    gc->addSelection(QObject::tr("OpenGL"), "opengl");
+#endif
+#ifdef USING_MINGW
+    gc->addSelection(QObject::tr("Direct3D"), "d3d9");
+#endif
+    gc->setHelpText(QObject::tr("This selects what MythTV uses to draw. "
+                    "Choosing 'Auto' is recommended, unless running on systems "
+                    "with broken OpenGL implementations (broken hardware or "
+                    "drivers or windowing systems) where only Qt works."));
+    return gc;
+}
+
 static HostComboBox *ChannelFormat()
 {
     HostComboBox *gc = new HostComboBox("ChannelFormat");
@@ -3653,6 +3672,7 @@ AppearanceSettings::AppearanceSettings()
     VerticalConfigurationGroup* screen = new VerticalConfigurationGroup(false);
     screen->setLabel(QObject::tr("Theme") + " / " + QObject::tr("Screen Settings"));
 
+    screen->addChild(ThemePainter());
     screen->addChild(MenuTheme());
 
     if (MythDisplay::GetNumberXineramaScreens() > 1)
