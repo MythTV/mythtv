@@ -2584,9 +2584,15 @@ void MythMainWindow::ResetIdleTimer(void)
 void MythMainWindow::PauseIdleTimer(bool pause)
 {
     if (pause)
+    {
+        LOG(VB_GENERAL, LOG_NOTICE, "Suspending idle timer");
         d->idleTimer->stop();
+    }
     else
+    {
+        LOG(VB_GENERAL, LOG_NOTICE, "Resuming idle timer");
         d->idleTimer->start();
+    }
 
     // ResetIdleTimer();
 }
