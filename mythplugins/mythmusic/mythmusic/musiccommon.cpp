@@ -1760,10 +1760,10 @@ void MusicCommon::playlistItemVisible(MythUIButtonListItem *item)
     if (!item)
         return;
 
-    if (item->GetImage().isEmpty())
+    Metadata *mdata = qVariantValue<Metadata*> (item->GetData());
+    if (mdata)
     {
-        Metadata *mdata = qVariantValue<Metadata*> (item->GetData());
-        if (mdata)
+        if (item->GetImage().isEmpty())
         {
             QString artFile = mdata->getAlbumArtFile();
             if (artFile.isEmpty())
@@ -1777,8 +1777,15 @@ void MusicCommon::playlistItemVisible(MythUIButtonListItem *item)
                 item->SetImage(mdata->getAlbumArtFile(), "coverart");
             }
         }
-        else
-            item->SetImage("");
+
+        if (item->GetText() == " ")
+        {
+            MetadataMap metadataMap;
+            mdata->toMap(metadataMap);
+            item->SetText("");
+            item->SetTextFromMap(metadataMap);
+            item->DisplayState(QString("%1").arg(mdata->Rating()), "ratingstate");
+        }
     }
 }
 
@@ -1802,11 +1809,8 @@ void MusicCommon::updateUIPlaylist(void)
         if (mdata)
         {
             MythUIButtonListItem *item =
-                new MythUIButtonListItem(m_currentPlaylist, "", qVariantFromValue(mdata));
+                new MythUIButtonListItem(m_currentPlaylist, " ", qVariantFromValue(mdata));
 
-            MetadataMap metadataMap;
-            mdata->toMap(metadataMap);
-            item->SetTextFromMap(metadataMap);
             item->SetFontState("normal");
             item->DisplayState("default", "playstate");
 
@@ -1829,8 +1833,6 @@ void MusicCommon::updateUIPlaylist(void)
                     item->DisplayState("stopped", "playstate");
                 }
             }
-
-            item->DisplayState(QString("%1").arg(mdata->Rating()), "ratingstate");
 
             if (gPlayer->getCurrentMetadata() && mdata->ID() == gPlayer->getCurrentMetadata()->ID())
                 m_currentPlaylist->SetItemCurrent(item);
