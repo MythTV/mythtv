@@ -189,6 +189,8 @@ bool MusicCommon::CreateCommon(void)
         connect(m_currentPlaylist, SIGNAL(itemVisible(MythUIButtonListItem*)),
                 this, SLOT(playlistItemVisible(MythUIButtonListItem*)));
 
+        m_currentPlaylist->SetSearchFields("**search**");
+
         updateUIPlaylist();
     }
 
@@ -1811,6 +1813,7 @@ void MusicCommon::updateUIPlaylist(void)
             MythUIButtonListItem *item =
                 new MythUIButtonListItem(m_currentPlaylist, " ", qVariantFromValue(mdata));
 
+            item->SetText(mdata->Artist() + mdata->Album() + mdata->Title(), "**search**");
             item->SetFontState("normal");
             item->DisplayState("default", "playstate");
 
