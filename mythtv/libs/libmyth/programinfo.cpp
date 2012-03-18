@@ -618,7 +618,9 @@ ProgramInfo::ProgramInfo(
         dupmethod   = s.dupmethod;
         findid      = s.findid;
 
-        if (s.recstatus == rsWillRecord || s.recstatus == rsRecording)
+        if (s.recstatus == rsWillRecord || 
+            s.recstatus == rsRecording ||
+            s.recstatus == rsTuning)
         {
             if (oneChanid)
             {
