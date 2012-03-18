@@ -710,7 +710,7 @@ void MusicPlayer::customEvent(QEvent *event)
         {
             QString startdir = gCoreContext->GetSetting("MusicLocation");
             startdir = QDir::cleanPath(startdir);
-            if (!startdir.endsWith("/"))
+            if (!startdir.isEmpty() && !startdir.endsWith("/"))
                 startdir += "/";
 
             gMusicData->musicDir = startdir;
