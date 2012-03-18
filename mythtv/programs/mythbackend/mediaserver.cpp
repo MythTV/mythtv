@@ -45,6 +45,9 @@
 //////////////////////////////////////////////////////////////////////////////
 
 MediaServer::MediaServer(void) :
+#ifdef USING_LIBDNS_SD
+    m_bonjour(NULL),
+#endif
     m_pUPnpCDS(NULL), m_pUPnpCMGR(NULL),
     m_sSharePath(GetShareDir())
 {
