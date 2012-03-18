@@ -217,13 +217,17 @@
     </window>
 
     <window name="config">
+        <imagetype name="topbar" from="basetopbar" />
+        <textarea name="header" from="baseheading">
+            <value>News Settings</value>
+        </textarea>
 
         <buttonlist name="category" from="basebuttonlist">
-            <area>40,40,500,550</area>
+            <area>40,90,500,550</area>
         </buttonlist>
 
         <buttonlist name="sites" from="basebuttonlist">
-            <area>560,40,670,550</area>
+            <area>560,90,670,550</area>
             <showarrow>no</showarrow>
         </buttonlist>
 

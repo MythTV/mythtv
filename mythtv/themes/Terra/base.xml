@@ -95,6 +95,57 @@
         <align>left</align>
     </textarea>
 
+    <group name="basepopupbackground">
+        <area>0,0,100%,100%</area>
+        <shape name="popupbackgroundshadow1">
+            <area>1,1,100%-2,100%-2</area>
+            <type>roundbox</type>
+            <fill color="#000000" alpha="150" />
+            <line color="#000000" alpha="150" width="4" />
+            <cornerradius>12</cornerradius>
+        </shape>
+        <shape name="popupbackgroundshadow2">
+            <area>2,2,100%-1,100%-1</area>
+            <type>roundbox</type>
+            <fill color="#000000" alpha="100" />
+            <line color="#000000" alpha="100" width="4" />
+            <cornerradius>12</cornerradius>
+        </shape>
+        <shape name="popupbackgroundshadow3">
+            <area>3,3,100%,100%</area>
+            <type>roundbox</type>
+            <fill color="#000000" alpha="50" />
+            <line color="#000000" alpha="50" width="4" />
+            <cornerradius>12</cornerradius>
+        </shape>
+        <shape name="popupbackground">
+            <area>0,0,100%-3,100%-2</area>
+            <type>roundbox</type>
+            <fill color="#757562" alpha="255" />
+            <line color="#a7ac93" alpha="255" width="4" />
+            <cornerradius>12</cornerradius>
+        </shape>
+
+        <!--title area -->
+        <shape name="popuptitlebackground">
+            <area>6,6,100%-8,40</area>
+            <type>roundbox</type>
+            <fill color="#000000" alpha="50" />
+            <cornerradius>12</cornerradius>
+        </shape>
+        <textarea name="title_text" from="basetextarea">
+            <area>6,6,100%-8,40</area>
+            <font>baselarge</font>
+            <align>center,vcenter</align>
+        </textarea>
+
+        <!-- separator between button and rest -->
+        <shape name="separator">
+            <area>20,100%-75,100%-24,3</area>
+            <fill color="#a7ac93"/>
+        </shape>
+    </group>
+
     <!-- Base definition of a textedit -->
     <textedit name="basetextedit">
         <area>0,0,437,45</area>
@@ -399,6 +450,95 @@
         </statetype>
     </buttonlist>
 
+    <buttonlist name="basebuttonlist">
+        <area>0,0,300,500</area>
+        <layout>vertical</layout>
+        <spacing>5</spacing>
+        <wrapstyle>selection</wrapstyle>
+        <buttonarea>0,0,100%,97%</buttonarea>
+        <statetype name="buttonitem">
+            <state name="active">
+                <area>0,0,100%,30</area>
+                <shape name="buttonbackground">
+                    <area>0,0,100%,100%</area>
+                    <fill color="#000000" alpha="50" />
+                </shape>
+                <textarea name="buttontext">
+                    <area>5,0,85%,30</area>
+                    <font>basesmall</font>
+                    <cutdown>yes</cutdown>
+                    <align>left,vcenter</align>
+                </textarea>
+                <statetype name="buttoncheck">
+                    <position>91%,5</position>
+                    <state type="off">
+                        <imagetype name="checkoff">
+                            <filename>lb-check-empty.png</filename>
+                        </imagetype>
+                    </state>
+                    <state type="half">
+                        <imagetype name="checkhalf">
+                            <filename>lb-check-half.png</filename>
+                        </imagetype>
+                    </state>
+                    <state type="full">
+                        <imagetype name="checkfull">
+                            <filename>lb-check-full.png</filename>
+                        </imagetype>
+                    </state>
+                </statetype>
+                <imagetype name="buttonarrow">
+                    <position>94%,7</position>
+                    <filename>lb-arrow.png</filename>
+                </imagetype>
+            </state>
+            <state name="selectedactive" from="active">
+                <shape name="buttonbackground">
+                    <fill color="#8a916f" />
+                </shape>
+                <textarea name="buttontext">
+                    <font>basesmallbrown</font>
+                </textarea>
+            </state>
+            <state name="selectedinactive" from="active">
+                <shape name="buttonbackground">
+                    <fill style="gradient">
+                        <gradient start="#52CA38" end="#349838" alpha="100" />
+                    </fill>
+                </shape>
+                <textarea name="buttontext">
+                    <font>basesmallpurple</font>
+                </textarea>
+            </state>
+        </statetype>
+        <statetype name="upscrollarrow">
+            <position>10,97%</position>
+            <state type="off">
+                <imagetype name="upon">
+                    <filename>lb-uparrow-reg.png</filename>
+                </imagetype>
+            </state>
+            <state type="full">
+                <imagetype name="upoff">
+                    <filename>lb-uparrow-sel.png</filename>
+                </imagetype>
+            </state>
+        </statetype>
+        <statetype name="downscrollarrow">
+            <position>40,97%</position>
+            <state type="off">
+                <imagetype name="dnon">
+                    <filename>lb-dnarrow-reg.png</filename>
+                </imagetype>
+            </state>
+            <state type="full">
+                <imagetype name="dnoff">
+                    <filename>lb-dnarrow-sel.png</filename>
+                </imagetype>
+            </state>
+        </statetype>
+    </buttonlist>
+
     <!-- Base definition of a list in wide 'selector' configuration -->
     <buttonlist name="basewideselector" from="baseselector">
         <area>0,0,601,35</area>
@@ -487,6 +627,15 @@
         </shape>
     </shape>
 
+    <!-- Base definition of a shape used as a background on many screens -->
+    <shape name="basebackground">
+        <area>0,0,100,100</area>
+        <type>roundbox</type>
+        <fill color="#757562" alpha="120" />
+        <line color="#a7ac93" alpha="255" width="4" />
+        <cornerradius>12</cornerradius>
+    </shape>
+
     <shape name="basefadebackground">
         <area>0,0,1280,642</area>
         <fill color="#1a1a1a" alpha="170" />
@@ -496,6 +645,13 @@
         <position>0,0</position>
         <filename>backgrounds/topbar.png</filename>
     </imagetype>
+
+    <!-- standard title for the window -->
+    <group name="baseheader">
+        <imagetype name="topbar" from="basetopbar" />
+        <textarea name="heading" from="baseheading">
+        </textarea>
+    </group>
 
     <window name="backgroundwindow">
         <imagetype name="backimg">
@@ -670,6 +826,8 @@
     <!-- Text Input Dialog -->
     <window name="MythTextInputDialog">
         <area>0,42,1280,642</area>
+
+
         <shape name="fade" from="basefadebackground" />
 
         <imagetype name="backimg">
@@ -691,6 +849,104 @@
             <position>528,360</position>
             <value>OK</value>
         </button>
+    </window>
+
+    <!-- search dialog -->
+    <!-- for some reason, I cannot manage to override this one it say itemList is missing -->
+    <window name="MythSearchDialog">
+        <area>-1,-1,500,500</area>
+
+        <!--area>0,0,100%,100%</area-->
+        <shape name="popupbackgroundshadow1">
+            <area>1,1,100%-2,100%-2</area>
+            <type>roundbox</type>
+            <fill color="#000000" alpha="150" />
+            <line color="#000000" alpha="150" width="4" />
+            <cornerradius>12</cornerradius>
+        </shape>
+        <shape name="popupbackgroundshadow2">
+            <area>2,2,100%-1,100%-1</area>
+            <type>roundbox</type>
+            <fill color="#000000" alpha="100" />
+            <line color="#000000" alpha="100" width="4" />
+            <cornerradius>12</cornerradius>
+        </shape>
+        <shape name="popupbackgroundshadow3">
+            <area>3,3,100%,100%</area>
+            <type>roundbox</type>
+            <fill color="#000000" alpha="50" />
+            <line color="#000000" alpha="50" width="4" />
+            <cornerradius>12</cornerradius>
+        </shape>
+        <shape name="popupbackground">
+            <area>0,0,100%-3,100%-2</area>
+            <type>roundbox</type>
+            <fill color="#757562" alpha="255" />
+            <line color="#a7ac93" alpha="255" width="4" />
+            <cornerradius>12</cornerradius>
+        </shape>
+
+        <!--title area -->
+        <shape name="popuptitlebackground">
+            <area>6,6,100%-8,40</area>
+            <type>roundbox</type>
+            <fill color="#000000" alpha="50" />
+            <cornerradius>12</cornerradius>
+        </shape>
+        <textarea name="title" from="basetextarea">
+            <area>6,6,100%-8,40</area>
+            <font>baselarge</font>
+            <align>center,vcenter</align>
+        </textarea>
+
+        <!-- separator between button and rest -->
+        <shape name="separatortop">
+            <area>20,50,100%-24,3</area>
+            <fill color="#a7ac93"/>
+        </shape>
+
+        <textedit name="input" from="basetextedit">
+            <position>29,55</position>
+        </textedit>
+
+        <buttonlist name="itemlist" from="basebuttonlist">
+            <area>12,110,100%-16,100%-85</area>
+            <showarrow>no</showarrow>
+            <statetype name="buttonitem">
+                <state name="active">
+                    <textarea name="buttontext">
+                        <area>4,0,460,30</area>
+                    </textarea>
+                </state>
+                <state name="selectedinactive">
+                    <textarea name="buttontext">
+                        <area>5,0,460,30</area>
+                    </textarea>
+                </state>
+                <state name="selectedactive">
+                    <textarea name="buttontext">
+                        <area>5,0,460,30</area>
+                    </textarea>
+                </state>
+            </statetype>
+        </buttonlist>
+
+        <!-- separator between button and rest -->
+        <shape name="separator">
+            <area>20,100%-75,100%-24,3</area>
+            <fill color="#a7ac93"/>
+        </shape>
+
+        <button name="cancel" from="basebutton">
+            <position>25%-112,100%-65</position>
+            <value>Cancel</value>
+        </button>
+
+        <button name="ok" from="basebutton">
+            <position>75%-112,100%-65</position>
+            <value>OK</value>
+        </button>
+
     </window>
 
     <!-- Busy Dialog -->
@@ -877,6 +1133,9 @@
         </textarea>
 
     </window>
+
+
+
 
     <window name="MythMetadataResults">
         <area>0,42,1280,515</area>
