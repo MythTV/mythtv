@@ -11,82 +11,132 @@
 <context>
     <name>GameHandler</name>
     <message>
+        <location filename="../mythgame/gamehandler.cpp" line="226"/>
+        <source>%1 appears to be missing.
+Remove it from the database?</source>
+        <translation>%1 verkar saknas.
+Ta bort det från databasen?</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamehandler.cpp" line="233"/>
+        <location filename="../mythgame/gamehandler.cpp" line="616"/>
         <source>No</source>
-        <translation type="obsolete">Nej</translation>
+        <translation>Nej</translation>
     </message>
     <message>
+        <location filename="../mythgame/gamehandler.cpp" line="234"/>
         <source>No to all</source>
-        <translation type="obsolete">Nej till alla</translation>
+        <translation>Nej till alla</translation>
     </message>
     <message>
+        <location filename="../mythgame/gamehandler.cpp" line="235"/>
+        <location filename="../mythgame/gamehandler.cpp" line="617"/>
         <source>Yes</source>
-        <translation type="obsolete">Ja</translation>
+        <translation>Ja</translation>
     </message>
     <message>
+        <location filename="../mythgame/gamehandler.cpp" line="236"/>
         <source>Yes to all</source>
-        <translation type="obsolete">Ja till alla</translation>
+        <translation>Ja till alla</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamehandler.cpp" line="609"/>
+        <source>This will clear all game metadata from the database. Are you sure you want to do this?</source>
+        <translation>Detta rensar all spelmetadata från databasen. Är du säker på att du vill göra det?</translation>
+    </message>
+</context>
+<context>
+    <name>GameScanner</name>
+    <message>
+        <source>Verifying game files</source>
+        <translation type="obsolete">Verifierar spelfiler</translation>
+    </message>
+    <message>
+        <source>Updating game database</source>
+        <translation type="obsolete">Uppdaterar speldatabas</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamescan.cpp" line="67"/>
+        <source>Verifying game files...</source>
+        <translation>Verifierar spelfiler...</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamescan.cpp" line="110"/>
+        <source>Updating game database...</source>
+        <translation>Uppdaterar speldatabasen...</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamescan.cpp" line="145"/>
+        <source>Searching for games...</source>
+        <translation>Söker efter spel...</translation>
     </message>
 </context>
 <context>
     <name>GameUI</name>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="286"/>
+        <location filename="../mythgame/gameui.cpp" line="153"/>
         <source>All Games</source>
         <translation>Alla spel</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="291"/>
+        <location filename="../mythgame/gameui.cpp" line="158"/>
         <source>-   By Genre</source>
         <translation>-   Enligt genre</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="296"/>
+        <location filename="../mythgame/gameui.cpp" line="163"/>
         <source>-   By Year</source>
         <translation>-   Enligt år</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="301"/>
+        <location filename="../mythgame/gameui.cpp" line="168"/>
         <source>-   By Name</source>
         <translation>-   Enligt namn</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="306"/>
+        <location filename="../mythgame/gameui.cpp" line="173"/>
         <source>-   By Publisher</source>
         <translation>-   Enligt utgivare</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="424"/>
-        <location filename="../mythgame/gameui.cpp" line="671"/>
+        <location filename="../mythgame/gameui.cpp" line="287"/>
+        <location filename="../mythgame/gameui.cpp" line="540"/>
         <source>Cancel</source>
         <translation>Avbryt</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="581"/>
-        <location filename="../mythgame/gameui.cpp" line="655"/>
+        <location filename="../mythgame/gameui.cpp" line="440"/>
+        <location filename="../mythgame/gameui.cpp" line="520"/>
+        <source>Scan For Changes</source>
+        <translation>Sök efter ändringar</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gameui.cpp" line="446"/>
+        <location filename="../mythgame/gameui.cpp" line="524"/>
         <source>Show Information</source>
         <translation>Visa information</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="583"/>
-        <location filename="../mythgame/gameui.cpp" line="660"/>
+        <location filename="../mythgame/gameui.cpp" line="448"/>
+        <location filename="../mythgame/gameui.cpp" line="529"/>
         <source>Remove Favorite</source>
         <translation>Ta bort favorit</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="585"/>
-        <location filename="../mythgame/gameui.cpp" line="659"/>
+        <location filename="../mythgame/gameui.cpp" line="450"/>
+        <location filename="../mythgame/gameui.cpp" line="528"/>
         <source>Make Favorite</source>
         <translation>Skapa favorit</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="586"/>
-        <location filename="../mythgame/gameui.cpp" line="664"/>
+        <location filename="../mythgame/gameui.cpp" line="451"/>
+        <location filename="../mythgame/gameui.cpp" line="533"/>
         <source>Retrieve Details</source>
         <translation>Hämta detaljer</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="587"/>
-        <location filename="../mythgame/gameui.cpp" line="651"/>
+        <location filename="../mythgame/gameui.cpp" line="452"/>
+        <location filename="../mythgame/gameui.cpp" line="516"/>
         <source>Edit Details</source>
         <translation>Redigera detaljer</translation>
     </message>
@@ -95,22 +145,22 @@
         <translation type="obsolete">Redigera metadata</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="1053"/>
+        <location filename="../mythgame/gameui.cpp" line="922"/>
         <source>Fetching details for %1</source>
         <translation>Hämtar detaljer för %1</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="615"/>
+        <location filename="../mythgame/gameui.cpp" line="480"/>
         <source>Game Search</source>
         <translation>Spelsökning</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="272"/>
+        <location filename="../mythgame/gameui.cpp" line="139"/>
         <source>Favorites</source>
         <translation>Favoriter</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="407"/>
+        <location filename="../mythgame/gameui.cpp" line="270"/>
         <source>Choose System for</source>
         <translation>Välj system för</translation>
     </message>
@@ -118,27 +168,27 @@
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mythgame/main.cpp" line="112"/>
+        <location filename="../mythgame/main.cpp" line="113"/>
         <source>Game frontend</source>
         <translation>Spelgränssnitt</translation>
     </message>
     <message>
-        <location filename="../mythgame/main.cpp" line="115"/>
+        <location filename="../mythgame/main.cpp" line="116"/>
         <source>Toggle the current game as a favorite</source>
         <translation>Växla aktuellt spel som favorit</translation>
     </message>
     <message>
-        <location filename="../mythgame/main.cpp" line="117"/>
+        <location filename="../mythgame/main.cpp" line="118"/>
         <source>Show incremental search dialog</source>
         <translation>Visa inkrementell sökdialog</translation>
     </message>
     <message>
-        <location filename="../mythgame/main.cpp" line="119"/>
+        <location filename="../mythgame/main.cpp" line="120"/>
         <source>Incremental search find next match</source>
         <translation>Nästa träff vid inkrementell sökning</translation>
     </message>
     <message>
-        <location filename="../mythgame/main.cpp" line="121"/>
+        <location filename="../mythgame/main.cpp" line="122"/>
         <source>Download metadata for current item</source>
         <translation>Hämta metadata för aktuell post</translation>
     </message>
@@ -151,14 +201,22 @@
         <translation>Spelarmeny</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamesettings.cpp" line="306"/>
         <source>Edit..</source>
-        <translation>Redigera..</translation>
+        <translation type="obsolete">Redigera..</translation>
+    </message>
+    <message>
+        <source>Delete..</source>
+        <translation type="obsolete">Ta bort..</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="306"/>
-        <source>Delete..</source>
-        <translation>Ta bort..</translation>
+        <source>Edit...</source>
+        <translation>Redigera...</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamesettings.cpp" line="306"/>
+        <source>Delete...</source>
+        <translation>Ta bort...</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="330"/>
@@ -189,22 +247,32 @@
         <translation>Visningsordning för spel</translation>
     </message>
     <message>
+        <location filename="../mythgame/gamesettings.cpp" line="36"/>
+        <source>Favorite display order</source>
+        <translation>Sorteringsordning för favoriter</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamesettings.cpp" line="38"/>
+        <source>Order in which to sort the games marked as favorites - this is for all systems. Available choices: system, year, genre and gamename</source>
+        <translation>Sorteringsordning för spel markerade som favoriter: detta gäller alla system. Tillgängliga val: system, år, genre och spelnamn</translation>
+    </message>
+    <message>
         <location filename="../mythgame/gamesettings.cpp" line="116"/>
         <source>MythGame Settings -- General</source>
         <translation>Inställningar för MythGame: Allmänt</translation>
     </message>
     <message>
+        <location filename="../mythgame/gamehandler.cpp" line="156"/>
+        <location filename="../mythgame/gamehandler.cpp" line="157"/>
+        <location filename="../mythgame/gamehandler.cpp" line="158"/>
+        <location filename="../mythgame/gamehandler.cpp" line="159"/>
         <location filename="../mythgame/gamehandler.cpp" line="160"/>
-        <location filename="../mythgame/gamehandler.cpp" line="161"/>
-        <location filename="../mythgame/gamehandler.cpp" line="162"/>
-        <location filename="../mythgame/gamehandler.cpp" line="163"/>
-        <location filename="../mythgame/gamehandler.cpp" line="164"/>
+        <location filename="../mythgame/gamehandler.cpp" line="413"/>
+        <location filename="../mythgame/gamehandler.cpp" line="414"/>
+        <location filename="../mythgame/gamehandler.cpp" line="417"/>
+        <location filename="../mythgame/gamehandler.cpp" line="418"/>
+        <location filename="../mythgame/gamehandler.cpp" line="419"/>
         <location filename="../mythgame/gamehandler.cpp" line="425"/>
-        <location filename="../mythgame/gamehandler.cpp" line="426"/>
-        <location filename="../mythgame/gamehandler.cpp" line="429"/>
-        <location filename="../mythgame/gamehandler.cpp" line="430"/>
-        <location filename="../mythgame/gamehandler.cpp" line="431"/>
-        <location filename="../mythgame/gamehandler.cpp" line="437"/>
         <source>Unknown</source>
         <translation>Okänd</translation>
     </message>
@@ -214,14 +282,12 @@
         <translation>Sorteringsordning för spelen: detta gäller alla system. Tillgängliga val: system, år, genre och spelnamn</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamesettings.cpp" line="36"/>
         <source>Favourite display order</source>
-        <translation>Sorteringsordning för favoriter</translation>
+        <translation type="obsolete">Sorteringsordning för favoriter</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamesettings.cpp" line="38"/>
         <source>Order in which to sort the games marked as favourites - this is for all systems. Available choices: system, year, genre and gamename</source>
-        <translation>Sorteringsordning för spel markerade som favoriter: detta gäller alla system. Tillgängliga val: system, år, genre och spelnamn</translation>
+        <translation type="obsolete">Sorteringsordning för spel markerade som favoriter: detta gäller alla system. Tillgängliga val: system, år, genre och spelnamn</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="48"/>
@@ -229,14 +295,12 @@
         <translation>Djupsökning av spel</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamesettings.cpp" line="49"/>
         <source>Enabling this causes a game scan to gather crc values and attempt to find out more detailed information about the game: NOTE this can greatly increase the time a gamescan takes based on the amount of games scanned.</source>
-        <translation>Aktiveras detta, gör det att ett spel söker för att beräkna CRC-värden och försök hitta mer detaljerad information om spelet: Observera: Det kan öka tidsåtgången för en spelsökning väsentligt, beroende på antal spel.</translation>
+        <translation type="obsolete">Aktiveras detta, gör det att ett spel söker för att beräkna CRC-värden och försök hitta mer detaljerad information om spelet: Observera: Det kan öka tidsåtgången för en spelsökning väsentligt, beroende på antal spel.</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamesettings.cpp" line="160"/>
         <source>Allow games to span multiple roms/disks</source>
-        <translation>Tillåt spel att sträcka sig över flera ROM eller skivor</translation>
+        <translation type="obsolete">Tillåt spel att sträcka sig över flera ROM eller skivor</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="161"/>
@@ -247,6 +311,10 @@
         <location filename="../mythgame/gamesettings.cpp" line="171"/>
         <source>Command</source>
         <translation>Kommando</translation>
+    </message>
+    <message>
+        <source>Binary and optional parameters. Multiple commands separated with &apos;;&apos; . Use %s for the rom name. %d1, %d2, %d3 and %d4 represent disks in a multidisk/game. %s auto appended if not specified</source>
+        <translation type="obsolete">Binär och valfria parametrar. Flera kommando separeras med &apos;;&apos;. Använd %s för ROM-namnet. %d1, %d2, %d3 och %d4 representerar skivor i spel med flera skivor. %s läggs till automatiskt om det inte anges</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="182"/>
@@ -260,8 +328,42 @@
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="198"/>
-        <source>Rom Path</source>
+        <source>ROM Path</source>
         <translation>ROM-sökväg</translation>
+    </message>
+    <message>
+        <source>Rom Path</source>
+        <translation type="obsolete">ROM-sökväg</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamesettings.cpp" line="49"/>
+        <source>Enabling this causes a game scan to gather CRC values and attempt to find out more detailed information about the game: NOTE this can greatly increase the time a game scan takes based on the amount of games scanned.</source>
+        <translation>Aktiveras detta gör det att CRC-värden samlas in vid en sökning av spel och försöker hitta mer detaljerad information om spelet: Observera: Detta kan öka tidsåtgången för en sökning väsentligt, beroende på antal spel.</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamesettings.cpp" line="58"/>
+        <source>Prompt for removal of deleted ROM(s)</source>
+        <translation>Bekräfta borttagning av raderad(e) ROM</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamesettings.cpp" line="59"/>
+        <source>This enables a prompt for removing deleted ROMs from the database during a  game scan</source>
+        <translation>Detta aktiverar en fråga innan borttagna ROM raderas från databasen när en sökning av spel genomförs</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamesettings.cpp" line="70"/>
+        <source>Enabling this causes the filenames to be displayed in the game tree rather than the trimmed/looked up game name</source>
+        <translation>Aktiveras detta visas filnamnen i spelträdet i stället för förkortade/uppslagna spelnamn</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamesettings.cpp" line="160"/>
+        <source>Allow games to span multiple ROMs/disks</source>
+        <translation>Tillåt spel att sträcka sig över flera ROM eller skivor</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamesettings.cpp" line="172"/>
+        <source>Binary and optional parameters. Multiple commands separated with &apos;;&apos; . Use %s for the ROM name. %d1, %d2, %d3 and %d4 represent disks in a multidisk/game. %s auto appended if not specified</source>
+        <translation>Program och valfria parametrar. Flera kommando separeras med &apos;;&apos;. Använd %s för ROM-namnet. %d1, %d2, %d3 och %d4 representerar skivor i spel med flera skivor. %s läggs till automatiskt om det inte anges</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="199"/>
@@ -282,6 +384,11 @@
         <location filename="../mythgame/gamesettings.cpp" line="220"/>
         <source>File Extensions</source>
         <translation>Filändelser</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamesettings.cpp" line="221"/>
+        <source>A comma separated list of all file extensions for this emulator. Blank means any file under ROM PATH is considered to be used with this emulator</source>
+        <translation>En kommaseparerad lista över alla filändelser som används av denna emulator. Tomt betyder att alla filer under ROM-sökvägen anses användas av denna emulator</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="231"/>
@@ -354,14 +461,12 @@
         <translation>Namn på detta spel och/eller emulator</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamesettings.cpp" line="58"/>
         <source>Prompt for removal of deleted rom(s)</source>
-        <translation>Bekräfta borttagning av raderad(e) ROM</translation>
+        <translation type="obsolete">Bekräfta borttagning av raderad(e) ROM</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamesettings.cpp" line="59"/>
         <source>This enables a prompt for removing deleted roms from the database during a  gamescan</source>
-        <translation>Detta aktiverar en fråga innan borttagna ROM raderas från databasen under en spelsökning</translation>
+        <translation type="obsolete">Detta aktiverar en fråga innan borttagna ROM raderas från databasen under en spelsökning</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="69"/>
@@ -369,67 +474,61 @@
         <translation>Visa filnamn i spelträdet</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamesettings.cpp" line="70"/>
         <source>Enabling this causes the filenames to be displayed in the game tree rather than the trimmed/looked up gamename</source>
-        <translation>Aktiveras detta, visas filnamnen i spelträdet i stället för förkortade/uppslagna spelnamn</translation>
+        <translation type="obsolete">Aktiveras detta, visas filnamnen i spelträdet i stället för förkortade/uppslagna spelnamn</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="159"/>
-        <location filename="../mythgame/gamehandler.cpp" line="428"/>
+        <location filename="../mythgame/gamehandler.cpp" line="155"/>
+        <location filename="../mythgame/gamehandler.cpp" line="416"/>
         <source>19xx</source>
         <translation>19xx</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="165"/>
-        <location filename="../mythgame/gamehandler.cpp" line="432"/>
+        <location filename="../mythgame/gamehandler.cpp" line="161"/>
+        <location filename="../mythgame/gamehandler.cpp" line="420"/>
         <source>0</source>
         <translation>0</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="226"/>
-        <location filename="../mythgame/gamehandler.cpp" line="608"/>
+        <location filename="../mythgame/gamehandler.cpp" line="511"/>
+        <source>Verifying %1 files...</source>
+        <translation>Verifierar %1 filer...</translation>
+    </message>
+    <message>
         <source>No</source>
-        <translation>Nej</translation>
+        <translation type="obsolete">Nej</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="227"/>
         <source>No to all</source>
-        <translation>Nej till alla</translation>
+        <translation type="obsolete">Nej till alla</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="228"/>
-        <location filename="../mythgame/gamehandler.cpp" line="609"/>
         <source>Yes</source>
-        <translation>Ja</translation>
+        <translation type="obsolete">Ja</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="229"/>
         <source>Yes to all</source>
-        <translation>Ja till alla</translation>
+        <translation type="obsolete">Ja till alla</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="234"/>
         <source>File Missing</source>
-        <translation>Fil saknas</translation>
+        <translation type="obsolete">Fil saknas</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="235"/>
         <source>%1 appears to be missing.
 Remove it from the database?</source>
-        <translation>%1 verkar saknas.
+        <translation type="obsolete">%1 verkar saknas.
 Ta bort det från databasen?</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="613"/>
         <source>Are you sure?</source>
-        <translation>Är du säker?</translation>
+        <translation type="obsolete">Är du säker?</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="614"/>
         <source>This will clear all Game Meta Data
 from the database. Are you sure you
 want to do this?</source>
-        <translation>Detta rensar alla spelmetadata
+        <translation type="obsolete">Detta rensar alla spelmetadata
 från databasen. Är du säker på
 att du vill göra det?</translation>
     </message>
@@ -439,9 +538,8 @@ att du vill göra det?</translation>
         <translation>SEGA/MASTER SYSTEM</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamesettings.cpp" line="221"/>
         <source>A Comma seperated list of all file extensions for this emulator. Blank means any file under ROM PATH is considered to be used with this emulator</source>
-        <translation>Kommaseparerad lista över alla filändelser som används av denna emulator. Tomt betyder att alla filer under ROM-sökvägen anses användas av denna emulator</translation>
+        <translation type="obsolete">Kommaseparerad lista över alla filändelser som används av denna emulator. Tomt betyder att alla filer under ROM-sökvägen anses användas av denna emulator</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.h" line="26"/>
@@ -459,24 +557,31 @@ att du vill göra det?</translation>
         <translation>Aktiverar kondensat för filnamn i visningsträdet. Det kan snabba upp navigering i långa listor något</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamesettings.cpp" line="172"/>
         <source>Binary and optional parameters. Multiple commands seperated with &apos;;&apos; . Use %s for the rom name. %d1, %d2, %d3 and %d4 represent disks in a multidisk/game. %s auto appended if not specified</source>
-        <translation>Binära och valfria parametrar. Flera kommando separeras med &apos;;&apos;. Använd %s för ROM-namnet. %d1, %d2, %d3 och %d4 representerar skivor i spel med flera skivor. %s läggs till automatiskt om det inte anges</translation>
+        <translation type="obsolete">Binära och valfria parametrar. Flera kommando separeras med &apos;;&apos;. Använd %s för ROM-namnet. %d1, %d2, %d3 och %d4 representerar skivor i spel med flera skivor. %s läggs till automatiskt om det inte anges</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="399"/>
+        <location filename="../mythgame/gamehandler.cpp" line="382"/>
         <source>Updating %1(%2) ROM database</source>
         <translation>Uppdaterar %1(%2) ROM-databas</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="517"/>
         <source>Verifying %1 files</source>
-        <translation>Verifierar %1 filer</translation>
+        <translation type="obsolete">Verifierar %1 filer</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="720"/>
+        <source>Scanning for %1 games</source>
+        <translation type="obsolete">Söker efter %1-spel</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamehandler.cpp" line="714"/>
+        <location filename="../mythgame/gamehandler.cpp" line="742"/>
+        <source>Scanning for %1 games...</source>
+        <translation>Söker efter %1-spel...</translation>
+    </message>
+    <message>
         <source>Scanning for %1 game(s)...</source>
-        <translation>Söker efter %1 spel...</translation>
+        <translation type="obsolete">Söker efter %1 spel...</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="86"/>
@@ -512,142 +617,147 @@ att du vill göra det?</translation>
 <context>
     <name>ThemeUI</name>
     <message>
-        <location filename="themestrings.h" line="24"/>
+        <location filename="themestrings.h" line="7"/>
         <source>System:</source>
         <translation>System:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="11"/>
+        <location filename="themestrings.h" line="8"/>
         <source>Year:</source>
         <translation>År:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="10"/>
+        <location filename="themestrings.h" line="9"/>
         <source>Genre:</source>
         <translation>Genre:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="25"/>
+        <location filename="themestrings.h" line="10"/>
         <source>Favorite:</source>
         <translation>Favorit:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="38"/>
+        <location filename="themestrings.h" line="42"/>
         <source>Edit Game Information</source>
         <translation>Redigera spelinformation</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="39"/>
+        <location filename="themestrings.h" line="43"/>
         <source>Game Name:</source>
         <translation>Spelnamn:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="12"/>
+        <location filename="themestrings.h" line="22"/>
         <source>Country:</source>
         <translation>Land:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="13"/>
+        <location filename="themestrings.h" line="23"/>
         <source>Publisher:</source>
         <translation>Utgivare:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="14"/>
+        <location filename="themestrings.h" line="24"/>
         <source>Plot:</source>
         <translation>Handling:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="16"/>
+        <location filename="themestrings.h" line="26"/>
         <source>Screenshot:</source>
         <translation>Skärmbild:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="17"/>
+        <location filename="themestrings.h" line="27"/>
         <source>Fanart:</source>
         <translation>Användarbild:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="41"/>
+        <location filename="themestrings.h" line="45"/>
         <source>Boxart:</source>
         <translation>Förpackningsbilder:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="30"/>
+        <location filename="themestrings.h" line="34"/>
         <source>/path/to/the/thing.jpg</source>
         <translation>/sökväg/till/bilden.jpg</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="3"/>
+        <location filename="themestrings.h" line="13"/>
+        <source>Emulator:</source>
+        <translation>Emulator:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="16"/>
         <source>Released %1</source>
         <translation>Utgivet %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="4"/>
+        <location filename="themestrings.h" line="17"/>
         <source>%DATE%, %TIME%</source>
         <translation>%DATE%, %TIME%</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="5"/>
+        <location filename="themestrings.h" line="18"/>
         <source>Cancel</source>
         <translation>Avbryt</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="7"/>
+        <location filename="themestrings.h" line="19"/>
         <source>Edit Metadata</source>
         <translation>Redigera detaljer</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="8"/>
+        <location filename="themestrings.h" line="20"/>
         <source>Modify your game&apos;s metadata.</source>
         <translation>Redigera ditt spels detaljer.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="9"/>
+        <location filename="themestrings.h" line="21"/>
         <source>Title:</source>
         <translation>Titel:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="15"/>
+        <location filename="themestrings.h" line="25"/>
         <source>Cover Art:</source>
         <translation>Omslagsbild:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="18"/>
+        <location filename="themestrings.h" line="28"/>
         <source>Game is a Favorite</source>
         <translation>Spelet är en favorit</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="19"/>
+        <location filename="themestrings.h" line="29"/>
         <source>Click here to search existing coverart...</source>
         <translation>Klicka här för att söka bland tillgängliga omslagsbilder...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="20"/>
+        <location filename="themestrings.h" line="30"/>
         <source>Click here to search existing screenshots...</source>
         <translation>Klicka här för att söka bland tillgängliga skärmbilder...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="21"/>
+        <location filename="themestrings.h" line="31"/>
         <source>Click here to search existing fanart...</source>
         <translation>Klicka här för att söka bland tillgängliga användarbilder...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="22"/>
+        <location filename="themestrings.h" line="14"/>
         <source>Done</source>
         <translation>Klar</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="23"/>
+        <location filename="themestrings.h" line="6"/>
         <source>Play Games</source>
         <translation>Spela spel</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="28"/>
+        <location filename="themestrings.h" line="32"/>
         <source>ROM Name:</source>
         <translation>ROM-namn:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="29"/>
+        <location filename="themestrings.h" line="33"/>
         <source>ROM Path:</source>
         <translation>ROM-sökväg:</translation>
     </message>
@@ -656,107 +766,111 @@ att du vill göra det?</translation>
         <translation type="obsolete">Filmhanterare</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="32"/>
+        <location filename="themestrings.h" line="36"/>
         <source>Game:</source>
         <translation>Spel:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="33"/>
+        <location filename="themestrings.h" line="37"/>
         <source>Type:</source>
         <translation>Typ:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="34"/>
+        <location filename="themestrings.h" line="38"/>
         <source>Filename:</source>
         <translation>Filnamn:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="35"/>
         <source>Rompath:</source>
-        <translation>ROM-sökväg:</translation>
+        <translation type="obsolete">ROM-sökväg:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="36"/>
+        <location filename="themestrings.h" line="40"/>
         <source>System(s):</source>
         <translation>System:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="37"/>
+        <location filename="themestrings.h" line="41"/>
         <source>CRC:</source>
         <translation>CRC:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="40"/>
+        <location filename="themestrings.h" line="44"/>
         <source>Description:</source>
         <translation>Beskrivning:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="42"/>
+        <location filename="themestrings.h" line="46"/>
         <source>No Plot.</source>
         <translation>Ingen handling.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="50"/>
+        <location filename="themestrings.h" line="54"/>
         <source>Empty your game library</source>
         <translation>Töm ditt spelbibliotek</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="6"/>
+        <location filename="themestrings.h" line="15"/>
         <source>Play</source>
         <translation>Spela</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="31"/>
+        <location filename="themestrings.h" line="35"/>
         <source>Game Information</source>
         <translation>Spelinformation</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="26"/>
+        <location filename="themestrings.h" line="12"/>
         <source>No</source>
         <translation>Nej</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="27"/>
+        <location filename="themestrings.h" line="11"/>
         <source>Yes</source>
         <translation>Ja</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="2"/>
+        <location filename="themestrings.h" line="5"/>
         <source>Games</source>
         <translation>Spel</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="43"/>
+        <location filename="themestrings.h" line="39"/>
+        <source>ROM path:</source>
+        <translation>ROM-sökväg:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="47"/>
         <source>General Settings</source>
         <translation>Generella inställningar</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="44"/>
+        <location filename="themestrings.h" line="48"/>
         <source>Game folders and general options</source>
         <translation>Spelkataloger och generella inställningar</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="45"/>
+        <location filename="themestrings.h" line="49"/>
         <source>Game Players</source>
         <translation>Spelare</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="46"/>
+        <location filename="themestrings.h" line="50"/>
         <source>Configure an emulator</source>
         <translation>Konfigurera en emulator</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="47"/>
+        <location filename="themestrings.h" line="51"/>
         <source>Scan for Games</source>
         <translation>Sök efter spel</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="48"/>
+        <location filename="themestrings.h" line="52"/>
         <source>Add games to your library</source>
         <translation>Lägg till spel till ditt spelbibliotek</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="49"/>
+        <location filename="themestrings.h" line="53"/>
         <source>Clear Game Data</source>
         <translation>Rensa speldata</translation>
     </message>
