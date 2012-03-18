@@ -454,6 +454,15 @@ int NativeArchive::doNativeArchive(const QString &jobFile)
     return 0;
 }
 
+static QRegExp badChars = QRegExp("(/|\\\\|:|\'|\"|\\?|\\|)");
+
+static QString fixFilename(const QString &filename)
+{
+    QString ret = filename;
+    ret.replace(badChars, "_");
+    return ret;
+}
+
 int NativeArchive::exportRecording(QDomElement   &itemNode,
                                    const QString &saveDirectory)
 {
@@ -461,7 +470,7 @@ int NativeArchive::exportRecording(QDomElement   &itemNode,
     bool doDelete = false;
     QString dbVersion = gCoreContext->GetSetting("DBSchemaVer", "");
 
-    title = itemNode.attribute("title");
+    title = fixFilename(itemNode.attribute("title"));
     filename = itemNode.attribute("filename");
     doDelete = (itemNode.attribute("delete", "0") == "0");
     LOG(VB_JOBQUEUE, LOG_INFO, QString("Archiving %1 (%2), do delete: %3")
@@ -851,7 +860,7 @@ int NativeArchive::exportVideo(QDomElement   &itemNode,
     int intID = 0, categoryID = 0;
     QString coverFile = "";
 
-    title = itemNode.attribute("title");
+    title = fixFilename(itemNode.attribute("title"));
     filename = itemNode.attribute("filename");
     doDelete = (itemNode.attribute("delete", "0") == "0");
     LOG(VB_JOBQUEUE, LOG_INFO, QString("Archiving %1 (%2), do delete: %3")
