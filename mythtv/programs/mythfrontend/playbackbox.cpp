@@ -824,6 +824,47 @@ void PlaybackBox::UpdateUIListItem(MythUIButtonListItem *item,
 
     SetItemIcons(item, pginfo);
 
+    QMap<AudioProps, QString> audioFlags;
+    audioFlags[AUD_DOLBY] = "dolby";
+    audioFlags[AUD_SURROUND] = "surround";
+    audioFlags[AUD_STEREO] = "stereo";
+    audioFlags[AUD_MONO] = "mono";
+
+    QMap<VideoProps, QString> videoFlags;
+    videoFlags[VID_1080] = "hd1080";
+    videoFlags[VID_720] = "hd720";
+    videoFlags[VID_HDTV] = "hdtv";
+    videoFlags[VID_WIDESCREEN] = "widescreen";
+
+    QMap<SubtitleTypes, QString> subtitleFlags;
+    subtitleFlags[SUB_SIGNED] = "deafsigned";
+    subtitleFlags[SUB_ONSCREEN] = "onscreensub";
+    subtitleFlags[SUB_NORMAL] = "subtitles";
+    subtitleFlags[SUB_HARDHEAR] = "cc";
+
+    QMap<AudioProps, QString>::iterator ait;
+    for (ait = audioFlags.begin(); ait != audioFlags.end(); ++ait)
+    {
+        if (pginfo->GetAudioProperties() & ait.key())
+            item->DisplayState(ait.value(), "audioprops");
+    }
+
+    QMap<VideoProps, QString>::iterator vit;
+    for (vit = videoFlags.begin(); vit != videoFlags.end(); ++vit)
+    {
+        if (pginfo->GetVideoProperties() & vit.key())
+            item->DisplayState(vit.value(), "videoprops");
+    }
+
+    QMap<SubtitleTypes, QString>::iterator sit;
+    for (sit = subtitleFlags.begin(); sit != subtitleFlags.end(); ++sit)
+    {
+        if (pginfo->GetSubtitleType() & sit.key())
+            item->DisplayState(sit.value(), "subtitletypes");
+    }
+
+    item->DisplayState(pginfo->GetCategoryType(), "categorytype");
+
     QString rating = QString::number(pginfo->GetStars(10));
 
     item->DisplayState(rating, "ratingstate");
@@ -920,6 +961,7 @@ void PlaybackBox::ItemVisible(MythUIButtonListItem *item)
                 m_helper.GetPreviewImage(*sel_pginfo, false));
         }
     }
+    UpdateUIListItem(item, item == sel_item, false);
 }
 
 
@@ -1316,24 +1358,6 @@ void PlaybackBox::updateRecList(MythUIButtonListItem *sel_item)
 
     ProgramList &progList = *pmit;
 
-    QMap<AudioProps, QString> audioFlags;
-    audioFlags[AUD_DOLBY] = "dolby";
-    audioFlags[AUD_SURROUND] = "surround";
-    audioFlags[AUD_STEREO] = "stereo";
-    audioFlags[AUD_MONO] = "mono";
-
-    QMap<VideoProps, QString> videoFlags;
-    videoFlags[VID_1080] = "hd1080";
-    videoFlags[VID_720] = "hd720";
-    videoFlags[VID_HDTV] = "hdtv";
-    videoFlags[VID_WIDESCREEN] = "widescreen";
-
-    QMap<SubtitleTypes, QString> subtitleFlags;
-    subtitleFlags[SUB_SIGNED] = "deafsigned";
-    subtitleFlags[SUB_ONSCREEN] = "onscreensub";
-    subtitleFlags[SUB_NORMAL] = "subtitles";
-    subtitleFlags[SUB_HARDHEAR] = "cc";
-
     ProgramList::iterator it = progList.begin();
     for (; it != progList.end(); ++it)
     {
@@ -1343,48 +1367,8 @@ void PlaybackBox::updateRecList(MythUIButtonListItem *sel_item)
 
         MythUIButtonListItem *item =
             new PlaybackBoxListItem(this, m_recordingList, *it);
-
-        QString state = extract_main_state(**it, m_player);
-
-        item->SetFontState(state);
-
-        InfoMap infoMap;
-        (*it)->ToMap(infoMap);
-        item->SetTextFromMap(infoMap);
-
-        QString tempSubTitle  = extract_subtitle(**it, groupname);
-
-        if (groupname == (*it)->GetTitle().toLower())
-            item->SetText(tempSubTitle,       "titlesubtitle");
-
-        item->DisplayState(state, "status");
-
-        item->DisplayState(QString::number((*it)->GetStars(10)), "ratingstate");
-
-        SetItemIcons(item, (*it));
-
-        QMap<AudioProps, QString>::iterator ait;
-        for (ait = audioFlags.begin(); ait != audioFlags.end(); ++ait)
-        {
-            if ((*it)->GetAudioProperties() & ait.key())
-                item->DisplayState(ait.value(), "audioprops");
-        }
-
-        QMap<VideoProps, QString>::iterator vit;
-        for (vit = videoFlags.begin(); vit != videoFlags.end(); ++vit)
-        {
-            if ((*it)->GetVideoProperties() & vit.key())
-                item->DisplayState(vit.value(), "videoprops");
-        }
-
-        QMap<SubtitleTypes, QString>::iterator sit;
-        for (sit = subtitleFlags.begin(); sit != subtitleFlags.end(); ++sit)
-        {
-            if ((*it)->GetSubtitleType() & sit.key())
-                item->DisplayState(sit.value(), "subtitletypes");
-        }
-
-        item->DisplayState((*it)->GetCategoryType(), "categorytype");
+        // Defer initialization of the item's properties until it
+        // first becomes visible.
     }
 
     if (m_noRecordingsText)
