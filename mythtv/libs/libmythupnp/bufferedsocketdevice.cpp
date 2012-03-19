@@ -497,9 +497,9 @@ qlonglong BufferedSocketDevice::WriteBlock( const char *data, qulonglong len )
 
     QByteArray *a = m_bufWrite.back();
 
-    bool writeNow = ( m_nWriteSize + len >= 1400 || len > 512 );
+    bool writeNow = ( (m_nWriteSize + len >= 1400) || (len > 512) );
 
-    if ( a && a->size() + len < 128 ) 
+    if ( a && (a->size() + len < 128) ) 
     {
         // small buffer, resize
         int i = a->size();
