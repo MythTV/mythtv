@@ -1416,8 +1416,8 @@ void MetadataOptions::Load()
 {
     if (m_recordingRule->m_inetref.isEmpty())
     {
-        CreateBusyDialog("Trying to automatically find this "
-                     "recording online...");
+        CreateBusyDialog(tr("Trying to automatically find this "
+                            "recording online..."));
 
         m_metadataFactory->Lookup(m_recordingRule, false, false, true);
     }
@@ -1450,8 +1450,8 @@ void MetadataOptions::PerformQuery()
 {
     m_lookup = new MetadataLookup();
 
-    CreateBusyDialog("Trying to manually find this "
-                     "recording online...");
+    CreateBusyDialog(tr("Trying to manually find this "
+                        "recording online..."));
 
     m_lookup->SetStep(kLookupSearch);
     m_lookup->SetType(kMetadataRecording);
@@ -1872,9 +1872,9 @@ void MetadataOptions::customEvent(QEvent *levent)
         delete lookup;
         lookup = NULL;
 
-        QString title = "No match found for this recording. You can "
-                        "try entering a TVDB/TMDB number, season, and "
-                        "episode manually.";
+        QString title = tr("No match found for this recording. You can "
+                           "try entering a TVDB/TMDB number, season, and "
+                           "episode manually.");
 
         MythConfirmationDialog *okPopup =
                 new MythConfirmationDialog(m_popupStack, title, false);
@@ -1918,9 +1918,10 @@ void MetadataOptions::customEvent(QEvent *levent)
         {
             MetadataLookup *lookup = lul.takeFirst();
 
-            QString title = "This number, season, and episode combination "
-                            "does not appear to be valid (or the site may "
-                            "be down).  Check your information and try again.";
+            QString title = tr("This number, season, and episode combination "
+                               "does not appear to be valid (or the site may "
+                               "be down). Check your information and try "
+                               "again.");
 
             MythConfirmationDialog *okPopup =
                     new MythConfirmationDialog(m_popupStack, title, false);
