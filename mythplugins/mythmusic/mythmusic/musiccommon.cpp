@@ -1347,7 +1347,7 @@ void MusicCommon::customEvent(QEvent *event)
                 byGenre();
             else if (resulttext == tr("Tracks From Current Album"))
                 byAlbum();
-            else if (resulttext == tr("Track From Current Year"))
+            else if (resulttext == tr("Tracks From Current Year"))
                 byYear();
             else if (resulttext == tr("Tracks With Same Title"))
                 byTitle();
@@ -2128,7 +2128,7 @@ MythMenu* MusicCommon::createQuickPlaylistsMenu(void)
         menu->AddItem(tr("Tracks By Current Artist"));
         menu->AddItem(tr("Tracks From Current Album"));
         menu->AddItem(tr("Tracks From Current Genre"));
-        menu->AddItem(tr("Track From Current Year"));
+        menu->AddItem(tr("Tracks From Current Year"));
         menu->AddItem(tr("Tracks With Same Title"));
     }
 

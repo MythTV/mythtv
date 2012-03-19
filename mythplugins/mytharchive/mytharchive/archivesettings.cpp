@@ -18,7 +18,7 @@ static HostLineEdit *MythArchiveTempDir()
     gc->setLabel(QObject::tr("MythArchive Temp Directory"));
     gc->setValue("");
     gc->setHelpText(QObject::tr("Location where MythArchive should create its "
-            "temporory work files. LOTS of free space required here."));
+            "temporary work files. LOTS of free space required here."));
     return gc;
 };
 
