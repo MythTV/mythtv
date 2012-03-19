@@ -1928,7 +1928,7 @@ class AC3Descriptor : public MPEGDescriptor
     // descriptor_length        8   1.0
 
     // component_type_flag      1   2.0
-    bool HasComponentType(void) const { return _data[2] && 0x80; }
+    bool HasComponentType(void) const { return _data[2] & 0x80; }
     // bsid_flag                1   2.1
     bool HasBSID(void) const { return _data[2] & 0x40; }
     // mainid_flag              1   2.2
