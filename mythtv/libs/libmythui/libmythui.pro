@@ -96,9 +96,11 @@ using_x11 {
 
 macx {
     QMAKE_EXT_CPP += .mm
+    QMAKE_OBJECTIVE_CFLAGS += $$QMAKE_CFLAGS
     HEADERS += screensaver-osx.h   DisplayResOSX.h   util-osx.h   util-osx-cocoa.h
     SOURCES += screensaver-osx.cpp DisplayResOSX.cpp util-osx.cpp util-osx-cocoa.mm
 
+    QMAKE_CXXFLAGS += -F/System/Library/Frameworks/CoreServices.framework/Frameworks
     QMAKE_CXXFLAGS += -F/System/Library/Frameworks/ApplicationServices.framework/Frameworks
     QMAKE_CXXFLAGS += -F/System/Library/Frameworks/Carbon.framework/Frameworks
     QMAKE_CXXFLAGS += -F/System/Library/Frameworks/Cocoa.framework/Frameworks

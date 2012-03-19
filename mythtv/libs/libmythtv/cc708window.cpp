@@ -495,7 +495,7 @@ void CC708Window::LimitPenLocation(void)
 
 void CC708Pen::SetPenStyle(uint style)
 {
-    static const uint style2font[] = { 1, 1, 2, 3, 4, 5, 4, 5 };
+    static const uint style2font[] = { 0, 0, 1, 2, 3, 4, 3, 4 };
 
     if ((style < 1) || (style > 7))
         return;

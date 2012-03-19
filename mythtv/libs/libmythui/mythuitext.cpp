@@ -351,6 +351,9 @@ void MythUIText::ShiftCanvas(int x, int y)
 void MythUIText::DrawSelf(MythPainter *p, int xoffset, int yoffset,
                           int alphaMod, QRect clipRect)
 {
+    if (m_Canvas.isNull())
+        return;
+
     FormatVector formats;
     QRect drawrect = m_drawRect.toQRect();
     drawrect.translate(xoffset, yoffset);
@@ -361,8 +364,8 @@ void MythUIText::DrawSelf(MythPainter *p, int xoffset, int yoffset,
     if (m_Ascent)
     {
         drawrect.setY(drawrect.y() - m_Ascent);
-        canvas.setY(canvas.y() + m_Ascent);
-        canvas.setHeight(canvas.height() + (m_Descent * 2));
+        canvas.moveTop(canvas.y() + m_Ascent);
+        canvas.setHeight(canvas.height() + m_Ascent);
     }
     if (m_Descent)
     {
@@ -373,8 +376,8 @@ void MythUIText::DrawSelf(MythPainter *p, int xoffset, int yoffset,
     if (m_leftBearing)
     {
         drawrect.setX(drawrect.x() + m_leftBearing);
-        canvas.setX(canvas.x() - m_leftBearing);
-        canvas.setWidth(canvas.width() - (m_leftBearing * 2));
+        canvas.moveLeft(canvas.x() - m_leftBearing);
+        canvas.setWidth(canvas.width() - m_leftBearing);
     }
     if (m_rightBearing)
     {
@@ -412,10 +415,10 @@ void MythUIText::DrawSelf(MythPainter *p, int xoffset, int yoffset,
 
         /* Canvas pos is where the view port (drawrect) pulls from, so
          * it needs moved to the right for the left edge to be picked up*/
-        canvas.setX(canvas.x() + outline.x());
-        canvas.setWidth(canvas.width() + (outline.x() * 2));
-        canvas.setY(canvas.y() + outline.y());
-        canvas.setHeight(canvas.height() + (outline.y() * 2));
+        canvas.moveLeft(canvas.x() + outline.x());
+        canvas.setWidth(canvas.width() + outline.x());
+        canvas.moveTop(canvas.y() + outline.y());
+        canvas.setHeight(canvas.height() + outline.y());
     }
 
     if (GetFontProperties()->hasShadow())
@@ -515,7 +518,7 @@ bool MythUIText::Layout(QString & paragraph, QTextLayout *layout, bool final,
         min_rect |= line.naturalTextRect();
         ++num_lines;
 
-        if (final)
+        if (final && line.textLength())
         {
         /**
          * FontMetrics::width() returns a value that is good for spacing

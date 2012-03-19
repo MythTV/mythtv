@@ -325,16 +325,16 @@ class PlaybackBox : public ScheduleCommon
         uint chanid, const QDateTime &recstartts, uint64_t filesize);
 
     void ScheduleUpdateUIList(void);
-
     void ShowMenu(void);
     bool CreatePopupMenu(const QString &title);
+    void DisplayPopupMenu(void);
     //bool CreatePopupMenu(const QString &title, const ProgramInfo &pginfo)
     //    { return CreatePopupMenu(title + CreateProgramInfoString(pginfo)); }
     bool CreatePopupMenuPlaylist(void);
 
     QString CreateProgramInfoString(const ProgramInfo &program) const;
 
-  private:
+
     QRegExp m_prefixes;   ///< prefixes to be ignored when sorting
     QRegExp m_titleChaff; ///< stuff to remove for search rules
 
@@ -388,6 +388,7 @@ class PlaybackBox : public ScheduleCommon
 
     // Popup support //////////////////////////////////////////////////////////
     // General popup support
+    MythDialogBox      *m_menuDialog;
     MythMenu           *m_popupMenu;
     MythScreenStack    *m_popupStack;
 

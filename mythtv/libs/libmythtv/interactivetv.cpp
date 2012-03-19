@@ -33,7 +33,7 @@ InteractiveTV::~InteractiveTV()
 }
 
 // Start or restart the MHEG engine.
-void InteractiveTV::Restart(uint chanid, uint sourceid, bool isLive)
+void InteractiveTV::Restart(int chanid, int sourceid, bool isLive)
 {
     m_context->Restart(chanid, sourceid, isLive);
 }

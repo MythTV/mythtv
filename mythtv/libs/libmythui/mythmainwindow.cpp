@@ -188,7 +188,8 @@ class MythMainWindowPrivate
         m_pendingUpdate(false),
 
         idleTimer(NULL),
-        standby(false)
+        standby(false),
+        enteringStandby(false)
     {
     }
 
@@ -279,6 +280,7 @@ class MythMainWindowPrivate
 
     QTimer *idleTimer;
     bool standby;
+    bool enteringStandby;
 };
 
 // Make keynum in QKeyEvent be equivalent to what's in QKeySequence
@@ -509,7 +511,7 @@ MythMainWindow::MythMainWindow(const bool useDB)
         idletime = STANDBY_TIMEOUT;
 
     d->idleTimer = new QTimer(this);
-    d->idleTimer->setSingleShot(true);
+    d->idleTimer->setSingleShot(false);
     d->idleTimer->setInterval(1000 * 60 * idletime); // 30 minutes
     connect(d->idleTimer, SIGNAL(timeout()), SLOT(IdleTimeout()));
     d->idleTimer->start();
@@ -992,7 +994,7 @@ void MythMainWindow::Init(void)
         d->render = NULL;
     }
 
-    QString painter = GetMythDB()->GetSetting("UIPainter", "auto");
+    QString painter = GetMythDB()->GetSetting("ThemePainter", "qt");
 #ifdef USING_MINGW
     if (painter == "auto" || painter == "d3d9")
     {
@@ -1218,10 +1220,10 @@ void MythMainWindow::InitKeys()
     RegisterKey("Browser", "HISTORYFORWARD",  QT_TRANSLATE_NOOP("MythControls",
         "Go forward to previous page"),     "F");
 
-    RegisterKey("Main Menu",    "EXIT",       QT_TRANSLATE_NOOP("MythControls",
-        "System Exit"),                     "");
     RegisterKey("Main Menu",    "EXITPROMPT", QT_TRANSLATE_NOOP("MythControls",
         "Display System Exit Prompt"),      "Esc");
+    RegisterKey("Main Menu",    "EXIT",       QT_TRANSLATE_NOOP("MythControls",
+        "System Exit"),                     "");
 }
 
 void MythMainWindow::ReloadKeys()
@@ -1442,6 +1444,8 @@ void MythMainWindow::ExitToMainMenu(void)
         MythScreenType *screen = toplevel->GetTopScreen();
         if (screen && screen->objectName() != QString("mainmenu"))
         {
+            MythEvent xe("EXIT_TO_MENU");
+            gCoreContext->dispatch(xe);
             if (screen->objectName() == QString("video playback window"))
             {
                 MythEvent *me = new MythEvent("EXIT_TO_MENU");
@@ -2359,14 +2363,6 @@ void MythMainWindow::customEvent(QEvent *ce)
             state.insert("currentlocation", GetMythUI()->GetCurrentLocation());
             MythUIStateTracker::SetState(state);
         }
-        else if (message.startsWith("PLAYBACK_START"))
-        {
-            PauseIdleTimer(true);
-        }
-        else if (message.startsWith("PLAYBACK_END"))
-        {
-            PauseIdleTimer(false);
-        }
     }
     else if ((MythEvent::Type)(ce->type()) == MythEvent::MythUserMessage)
     {
@@ -2568,8 +2564,8 @@ void MythMainWindow::HideMouseTimeout(void)
 
 void MythMainWindow::ResetIdleTimer(void)
 {
-    // If the timer isn't active then it's been paused
-    if (!d->idleTimer->isActive())
+    if (!d->idleTimer->isActive() ||
+        (d->standby && d->enteringStandby))
         return;
 
     if (d->standby)
@@ -2581,39 +2577,45 @@ void MythMainWindow::ResetIdleTimer(void)
 void MythMainWindow::PauseIdleTimer(bool pause)
 {
     if (pause)
+    {
+        LOG(VB_GENERAL, LOG_NOTICE, "Suspending idle timer");
         d->idleTimer->stop();
+    }
     else
+    {
+        LOG(VB_GENERAL, LOG_NOTICE, "Resuming idle timer");
         d->idleTimer->start();
+    }
 
     // ResetIdleTimer();
 }
 
 void MythMainWindow::IdleTimeout(void)
 {
-    if (!d->standby)
+    d->enteringStandby = false;
+
+    int idletimeout = gCoreContext->GetNumSetting("FrontendIdleTimeout",
+                                                   STANDBY_TIMEOUT);
+
+    if (idletimeout > 0 && !d->standby)
     {
-        int idletimeout = gCoreContext->GetNumSetting("FrontendIdleTimeout",
-                                                       STANDBY_TIMEOUT);
         LOG(VB_GENERAL, LOG_NOTICE, QString("Entering standby mode after "
                                         "%1 minutes of inactivity")
                                         .arg(idletimeout));
-
-        // HACK Prevent faked keypresses interrupting the transition to standby
-        PauseIdleTimer(true);
-        // HACK end
-
-        JumpTo("Main Menu");
-
-        // HACK
-        PauseIdleTimer(false);
-        // HACK end
-
         EnterStandby(false);
+        if (gCoreContext->GetNumSetting("idleTimeoutSecs", 0))
+        {
+            d->enteringStandby = true;
+            JumpTo("Standby Mode");
+        }
     }
 }
 
 void MythMainWindow::EnterStandby(bool manual)
 {
+    if (manual && d->enteringStandby)
+        d->enteringStandby = false;
+
     if (d->standby)
         return;
 
@@ -2631,8 +2633,13 @@ void MythMainWindow::EnterStandby(bool manual)
 
 void MythMainWindow::ExitStandby(bool manual)
 {
+    if (d->enteringStandby)
+        return;
+
     if (manual)
         PauseIdleTimer(false);
+    else if (gCoreContext->GetNumSetting("idleTimeoutSecs", 0))
+        JumpTo("Main Menu");
 
     if (!d->standby)
         return;

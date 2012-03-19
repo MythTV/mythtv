@@ -122,20 +122,25 @@ void HDHRStreamHandler::run(void)
     SetRunning(true, false, false);
 
     /* Calculate buffer size */
-    uint buffersize = gCoreContext->GetNumSetting(
-        "HDRingbufferSize", 50 * TSPacket::kSize) * 1024;
+    uint buffersize = 40000 * TSPacket::kSize;
     buffersize /= VIDEO_DATA_PACKET_SIZE;
     buffersize *= VIDEO_DATA_PACKET_SIZE;
-    buffersize = max(49 * TSPacket::kSize * 128, buffersize);
 
     LOG(VB_RECORD, LOG_INFO, LOC + "RunTS(): begin");
 
     int remainder = 0;
+    QTime last_update;
     while (_running_desired && !_error)
     {
-        UpdateFiltersFromStreamData();
-        if (_tune_mode != hdhrTuneModeVChannel)
-            UpdateFilters();
+        int elapsed = !last_update.isValid() ? -1 : last_update.elapsed();
+        elapsed = (elapsed < 0) ? 1000 : elapsed;
+        if (elapsed > 100)
+        {
+            UpdateFiltersFromStreamData();
+            if (_tune_mode != hdhrTuneModeVChannel)
+                UpdateFilters();
+            last_update.restart();
+        }
 
         size_t read_size = 64 * 1024; // read about 64KB
         read_size /= VIDEO_DATA_PACKET_SIZE;
@@ -147,7 +152,7 @@ void HDHRStreamHandler::run(void)
 
         if (!data_buffer)
         {
-            usleep(5000);
+            usleep(20000);
             continue;
         }
 

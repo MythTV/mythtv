@@ -12,7 +12,7 @@
 
 #include "tspacket.h"
 #include "mthread.h"
-#include "util.h"
+#include "mythmiscutil.h"
 
 class DeviceReaderCB
 {

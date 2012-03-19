@@ -21,7 +21,7 @@ class SERVICE_PUBLIC StorageGroupDirList : public QObject
     // A Q_CLASSINFO entry with "<PropName>_type" as the key
     // and the type name as the value
 
-    Q_CLASSINFO( "StorageGroupDirs_type", "DTC::StorageGroupDir");
+    Q_CLASSINFO( "StorageGroupDirs", "type=DTC::StorageGroupDir");
 
     Q_PROPERTY( QVariantList StorageGroupDirs READ StorageGroupDirs DESIGNABLE true )
 

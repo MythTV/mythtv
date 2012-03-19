@@ -65,7 +65,7 @@ void StorageGroup::StaticInit(void)
 
     m_staticInitDone = true;
 
-    m_builtinGroups["ChannelIcons"] = GetConfDir() + "/ChannelIcons";
+    m_builtinGroups["ChannelIcons"] = GetConfDir() + "/channels";
     m_builtinGroups["Themes"] = GetConfDir() + "/themes";
     m_builtinGroups["Temp"] = GetConfDir() + "/tmp";
     m_builtinGroups["Streaming"] = GetConfDir() + "/tmp/hls";
@@ -363,7 +363,7 @@ bool StorageGroup::FileExists(QString filename)
 // in the order EXISTS, DATE, SIZE
 QStringList StorageGroup::GetFileInfo(QString filename)
 {
-    LOG(VB_FILE, LOG_DEBUG, LOC + 
+    LOG(VB_FILE, LOG_DEBUG, LOC +
         QString("GetFileInfo: For '%1'") .arg(filename));
 
     QStringList details;
@@ -440,7 +440,7 @@ QString StorageGroup::GetRelativePathname(const QString &filename)
                 if (result.startsWith("/"))
                     result.replace(0, 1, "");
 
-                LOG(VB_FILE, LOG_DEBUG, 
+                LOG(VB_FILE, LOG_DEBUG,
                     QString("StorageGroup::GetRelativePathname(%1) = '%2'")
                         .arg(filename).arg(result));
                 return result;
@@ -585,7 +585,7 @@ QString StorageGroup::FindFile(QString filename)
 
     QString recDir = FindFileDir(filename);
     QString result = "";
-    
+
     if (!recDir.isEmpty())
     {
         result = recDir + "/" + filename;
@@ -698,7 +698,7 @@ QString StorageGroup::FindNextDirMostFree(void)
     }
 
     if (nextDir.isEmpty())
-        LOG(VB_FILE, LOG_ERR, LOC + 
+        LOG(VB_FILE, LOG_ERR, LOC +
             "FindNextDirMostFree: Unable to find any directories to use.");
     else
         LOG(VB_FILE, LOG_DEBUG, LOC +
@@ -724,7 +724,7 @@ void StorageGroup::CheckAllStorageGroupDirs(void)
         return;
     }
 
-    LOG(VB_FILE, LOG_DEBUG, LOC + 
+    LOG(VB_FILE, LOG_DEBUG, LOC +
         "CheckAllStorageGroupDirs(): Checking All Storage Group directories");
 
     QFile testFile("");
@@ -809,7 +809,7 @@ QStringList StorageGroup::getGroupDirs(QString groupname, QString host)
     QString sql = QString("SELECT dirname,hostname "
                   "FROM storagegroup "
                   "WHERE groupname = :GROUPNAME %1").arg(addHost);
-    
+
     query.prepare(sql);
     query.bindValue(":GROUPNAME", groupname);
 

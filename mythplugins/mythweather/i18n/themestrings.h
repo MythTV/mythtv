@@ -1,3 +1,6 @@
+// This is an automatically generated file
+// Do not edit
+
 void strings_null() {
     ThemeUI::tr("%DATE%, %TIME%");
     ThemeUI::tr("Humidity");
@@ -39,17 +42,21 @@ void strings_null() {
     ThemeUI::tr("Enter your current location, nearest large town or city. In some countries postal codes are also supported.");
     ThemeUI::tr("Enter Location:");
     ThemeUI::tr("Weather Location Search");
-    ThemeUI::tr("Weather");
-    ThemeUI::tr("Global Setup");
-    ThemeUI::tr("Screen Setup");
-    ThemeUI::tr("Source Setup");
-    ThemeUI::tr("Location Search");
     ThemeUI::tr("Humidity:");
     ThemeUI::tr("Pressure:");
     ThemeUI::tr("Wind(Gust):");
     ThemeUI::tr("Wind Direction:");
     ThemeUI::tr("Visibility:");
     ThemeUI::tr("Feels Like:");
+    ThemeUI::tr("Screen Setup");
+    ThemeUI::tr("Source Setup");
+    ThemeUI::tr("Location Search");
+    ThemeUI::tr(": %1");
+    ThemeUI::tr("100%");
+    ThemeUI::tr("Global Weather Settings");
+    ThemeUI::tr("Seconds to display each page");
+    ThemeUI::tr("Retrieve data in the background");
+    ThemeUI::tr("Enter your current location,nearest large town or city. In some countries postal codes are also supported.");
     ThemeUI::tr("General weather options");
     ThemeUI::tr("Screen Settings");
     ThemeUI::tr("Choose which weather forecasts to display");

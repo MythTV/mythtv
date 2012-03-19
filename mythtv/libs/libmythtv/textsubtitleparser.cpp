@@ -124,6 +124,7 @@ bool TextSubtitleParser::LoadSubtitles(QString fileName, TextSubtitles &target)
     if (!sub_data.rbuffer)
         return false;
 
+    sub_data.errs = 0;
     subtitle_t *loaded_subs = sub_read_file(&sub_data);
     if (!loaded_subs)
     {

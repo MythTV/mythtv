@@ -36,7 +36,6 @@ using namespace std;
 #include "globalsettings.h"
 #include "audiogeneralsettings.h"
 #include "grabbersettings.h"
-#include "profilegroup.h"
 #include "playgroup.h"
 #include "networkcontrol.h"
 #include "dvdringbuffer.h"
@@ -94,7 +93,6 @@ using namespace std;
 #include <QScopedPointer>
 #include "bonjourregister.h"
 #include "mythairplayserver.h"
-#include <external/FFmpeg/libavcodec/x86/mmx.h>
 #endif
 
 static ExitPrompter   *exitPopup = NULL;
@@ -253,6 +251,8 @@ namespace
             delete pmanager;
             pmanager = NULL;
         }
+
+        DestroyMythMainWindow();
 
         delete gContext;
         gContext = NULL;
@@ -677,7 +677,7 @@ static void playDisc()
     {
         GetMythUI()->AddCurrentLocation("playdisc");
 
-        QString filename = QString("bd:/%1/").arg(bluray_mountpoint);
+        QString filename = QString("bd:/%1").arg(bluray_mountpoint);
 
         GetMythMainWindow()->HandleMedia("Internal", filename, "", "", "", "",
                                          0, 0, "", 0, "", "", true);
@@ -727,8 +727,10 @@ static void playDisc()
                         command_string.replace(QRegExp("%d"), dvd_device);
             }
             sendPlaybackStart();
+            GetMythMainWindow()->PauseIdleTimer(true);
             myth_system(command_string);
             sendPlaybackEnd();
+            GetMythMainWindow()->PauseIdleTimer(false);
             if (GetMythMainWindow())
             {
                 GetMythMainWindow()->raise();
@@ -910,11 +912,6 @@ static void TVMenuCallback(void *data, QString &selection)
     else if (sel == "setup_keys")
     {
         startKeysSetup();
-    }
-    else if (sel == "settings recording")
-    {
-        ProfileGroupEditor editor;
-        editor.exec();
     }
     else if (sel == "settings playgroup")
     {
@@ -1203,6 +1200,11 @@ static int internal_play_media(const QString &mrl, const QString &plot,
 
 static void gotoMainMenu(void)
 {
+    // Reset the selected button to the first item.
+    MythThemedMenuState *menu = dynamic_cast<MythThemedMenuState *>
+        (GetMythMainWindow()->GetMainStack()->GetTopScreen());
+    if (menu)
+        menu->m_buttonList->SetItemCurrent(0);
 }
 
 // If the theme specified in the DB is somehow broken, try a standard one:
@@ -1325,18 +1327,21 @@ static void InitJumpPoints(void)
      REG_JUMP(QT_TRANSLATE_NOOP("MythControls", "Previously Recorded"),
          "", "", startPrevious);
 
+     REG_JUMP(QT_TRANSLATE_NOOP("MythControls", "Standby Mode"),
+         "", "", standbyScreen);
+
      // Video
 
      REG_JUMP(JUMP_VIDEO_DEFAULT, QT_TRANSLATE_NOOP("MythControls",
-         "The Video default view"), "", jumpScreenVideoDefault);
+         "The Video Default View"), "", jumpScreenVideoDefault);
      REG_JUMP(JUMP_VIDEO_MANAGER, QT_TRANSLATE_NOOP("MythControls",
-         "The Video video manager"), "", jumpScreenVideoManager);
+         "The Video Manager"), "", jumpScreenVideoManager);
      REG_JUMP(JUMP_VIDEO_BROWSER, QT_TRANSLATE_NOOP("MythControls",
-         "The Video video browser"), "", jumpScreenVideoBrowser);
+         "The Video Browser"), "", jumpScreenVideoBrowser);
      REG_JUMP(JUMP_VIDEO_TREE, QT_TRANSLATE_NOOP("MythControls",
-         "The Video video listings"), "", jumpScreenVideoTree);
+         "The Video Listings"), "", jumpScreenVideoTree);
      REG_JUMP(JUMP_VIDEO_GALLERY, QT_TRANSLATE_NOOP("MythControls",
-         "The Video video gallery"), "", jumpScreenVideoGallery);
+         "The Video Gallery"), "", jumpScreenVideoGallery);
      REG_JUMP("Play Disc", QT_TRANSLATE_NOOP("MythControls",
          "Play an Optical Disc"), "", playDisc);
 
@@ -1673,9 +1678,9 @@ int main(int argc, char **argv)
     NetworkControl *networkControl = NULL;
     if (gCoreContext->GetNumSetting("NetworkControlEnabled", 0))
     {
-        int port = gCoreContext->GetNumSetting("NetworkControlPort", 6545);
+        int port = gCoreContext->GetNumSetting("NetworkControlPort", 6546);
         networkControl = new NetworkControl();
-        if (!networkControl->listen(gCoreContext->MythHostAddress(), port))
+        if (!networkControl->listen(port))
             LOG(VB_GENERAL, LOG_ERR,
                 QString("NetworkControl failed to bind to port %1.")
                    .arg(port));
@@ -1764,8 +1769,6 @@ int main(int argc, char **argv)
         mon->deleteLater();
 
     delete networkControl;
-
-    DestroyMythMainWindow();
 
     return ret;
 

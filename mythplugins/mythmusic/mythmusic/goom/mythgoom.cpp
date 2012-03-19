@@ -6,6 +6,7 @@
 #include <iostream>
 using namespace std;
 
+#include <QCoreApplication>
 #include <QPainter>
 
 #include <compat.h>
@@ -107,7 +108,8 @@ static class GoomFactory : public VisFactory
   public:
     const QString &name(void) const
     {
-        static QString name("Goom");
+        static QString name = QCoreApplication::translate("Visualizers",
+                                                          "Goom");
         return name;
     }
 

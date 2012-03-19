@@ -167,6 +167,8 @@ bool PreviewGeneratorQueue::event(QEvent *e)
                 return true;
             }
 
+            if ((*it).gen)
+                (*it).gen->deleteLater();
             (*it).gen           = NULL;
             (*it).genStarted    = false;
             if (me->Message() == "PREVIEW_SUCCESS")
@@ -473,11 +475,14 @@ void PreviewGeneratorQueue::SetPreviewGenerator(
         PreviewGenState &state = m_previewMap[key];
         if (state.gen)
         {
-            if (!g->GetToken().isEmpty())
-                state.tokens.insert(g->GetToken());
-            g->deleteLater();
+            if (g && state.gen != g)
+            {
+                if (!g->GetToken().isEmpty())
+                    state.tokens.insert(g->GetToken());
+                g->deleteLater();
+            }
         }
-        else
+        else if (g)
         {
             g->AttachSignals(this);
             state.gen = g;

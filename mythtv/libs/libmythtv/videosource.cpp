@@ -452,7 +452,7 @@ void XMLTV_generic_config::Save()
     VerticalConfigurationGroup::Save();
 #if 0
     QString err_msg = QObject::tr(
-        "You MUST run 'mythfilldatabase --manual the first time,\n "
+        "You MUST run 'mythfilldatabase --manual' the first time,\n"
         "instead of just 'mythfilldatabase'.\nYour grabber does not provide "
         "channel numbers, so you have to set them manually.");
 
@@ -579,7 +579,6 @@ void XMLTVConfig::Load(void)
         while (!ostream.atEnd())
         {
             QString grabber_list(ostream.readLine());
-            grabber_list = grabber_list.left(grabber_list.size() - 1);
             QStringList grabber_split =
                 grabber_list.split("|", QString::SkipEmptyParts);
             QString grabber_name = grabber_split[1] + " (xmltv)";
@@ -2762,10 +2761,6 @@ class PresetTuner : public LineEditSetting, public CardInputDBStorage
 
 void StartingChannel::SetSourceID(const QString &sourceid)
 {
-#if 0
-    LOG(VB_GENERAL, LOG_DEBUG, QString("StartingChannel::SetSourceID(%1)")
-            .arg(sourceid));
-#endif
     clearSelections();
     if (sourceid.isEmpty() || !sourceid.toUInt())
         return;
@@ -2773,7 +2768,7 @@ void StartingChannel::SetSourceID(const QString &sourceid)
     // Get the existing starting channel
     QString startChan = CardUtil::GetStartingChannel(getInputID());
 
-    DBChanList channels = ChannelUtil::GetChannels(sourceid.toUInt(), false);
+    DBChanList channels = ChannelUtil::GetAllChannels(sourceid.toUInt());
 
     if (channels.empty())
     {

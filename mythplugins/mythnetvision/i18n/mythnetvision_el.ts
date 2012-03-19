@@ -119,127 +119,127 @@
         <translation>Επιλογές Αναπαραγωγής / Μεταφόρτωσης</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="492"/>
+        <location filename="../mythnetvision/nettree.cpp" line="488"/>
         <source>Stream Video</source>
         <translation>Ροή Ταινίας</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="493"/>
+        <location filename="../mythnetvision/nettree.cpp" line="489"/>
         <source>Open Web Link</source>
         <translation>Άνοιγμα Συνδέσμου</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="496"/>
+        <location filename="../mythnetvision/nettree.cpp" line="492"/>
         <source>Save This Video</source>
         <translation>Αποθήκευση της Ταινίας</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="499"/>
+        <location filename="../mythnetvision/nettree.cpp" line="495"/>
         <source>Scan/Manage Subscriptions</source>
         <translation>Ανίχνευση / Διαχείριση Συνδρομών</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="500"/>
+        <location filename="../mythnetvision/nettree.cpp" line="496"/>
         <source>Change View</source>
         <translation>Αλλαγή Προβολής</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="512"/>
+        <location filename="../mythnetvision/nettree.cpp" line="508"/>
         <source>View Options</source>
         <translation>Επιλογές Προβολής</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="524"/>
+        <location filename="../mythnetvision/nettree.cpp" line="513"/>
         <source>Switch to List View</source>
         <translation>Προβολή Λίστας</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="526"/>
+        <location filename="../mythnetvision/nettree.cpp" line="515"/>
         <source>Switch to Gallery View</source>
         <translation>Προβολή Γκαλερί</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="528"/>
+        <location filename="../mythnetvision/nettree.cpp" line="517"/>
         <source>Switch to Browse View</source>
         <translation>Προβολή Περιήγησης</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="538"/>
+        <location filename="../mythnetvision/nettree.cpp" line="524"/>
         <source>Subscription Management</source>
         <translation>Διαχείριση Συνδρομών</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="549"/>
+        <location filename="../mythnetvision/nettree.cpp" line="529"/>
         <source>Update Site Maps</source>
         <translation>Ενημέρ. Χαρτών Ιστοσελ.</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="550"/>
+        <location filename="../mythnetvision/nettree.cpp" line="530"/>
         <source>Update RSS</source>
         <translation>Ενημέρωση RSS</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="551"/>
+        <location filename="../mythnetvision/nettree.cpp" line="531"/>
         <source>Manage Site Subscriptions</source>
         <translation>Διαχ. Συνδρ. Ιστοσελίδων</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="552"/>
+        <location filename="../mythnetvision/nettree.cpp" line="532"/>
         <source>Manage RSS Subscriptions</source>
         <translation>Διαχείριση Συνδρομών RSS</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="554"/>
+        <location filename="../mythnetvision/nettree.cpp" line="534"/>
         <source>Enable Automatic Site Updates</source>
         <translation>Αυτόματες Ενημερώσεις Ιστοσελ.</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="556"/>
+        <location filename="../mythnetvision/nettree.cpp" line="536"/>
         <source>Disable Automatic Site Updates</source>
         <translation>Όχι Αυτόματες Ενημερώσεις Ιστοσ.</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="613"/>
-        <location filename="../mythnetvision/nettree.cpp" line="632"/>
-        <location filename="../mythnetvision/nettree.cpp" line="670"/>
-        <location filename="../mythnetvision/nettree.cpp" line="714"/>
+        <location filename="../mythnetvision/nettree.cpp" line="590"/>
+        <location filename="../mythnetvision/nettree.cpp" line="609"/>
+        <location filename="../mythnetvision/nettree.cpp" line="647"/>
+        <location filename="../mythnetvision/nettree.cpp" line="691"/>
         <source>Back</source>
         <translation>Πίσω</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="835"/>
+        <location filename="../mythnetvision/nettree.cpp" line="812"/>
         <source>No browser command set! MythNetTree needs MythBrowser installed to display the video.</source>
         <translation>Δεν έχει οριστεί εντολή φυλλομετρητή. Το MythNetTree χρειάζεται το MythBrowser για προβολή της ταινίας.</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="885"/>
+        <location filename="../mythnetvision/nettree.cpp" line="862"/>
         <source>Are you sure you want to delete this file?</source>
         <translation>Σίγουρα θέλετε να διαγράψετε το αρχείο;</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="981"/>
+        <location filename="../mythnetvision/nettree.cpp" line="958"/>
         <source>Downloading Video...</source>
         <translation>Κατεβάζω την Ταινία...</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="1219"/>
+        <location filename="../mythnetvision/nettree.cpp" line="1199"/>
         <source>Updating RSS.  This could take a while...</source>
         <translation>Ενημερώνω τα RSS. Μπορεί να πάρει λίγη ώρα...</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="1234"/>
+        <location filename="../mythnetvision/nettree.cpp" line="1214"/>
         <source>Updating Site Maps.  This could take a while...</source>
         <translation>Ενημερώνω τους χάρτες των Ιστοσελίδων. Μπορεί να πάρει λίγη ώρα...</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="1324"/>
+        <location filename="../mythnetvision/nettree.cpp" line="1304"/>
         <source>Downloading Video...
 (%1 of %2 MB)</source>
         <translation>Κατεβάζω την Ταινία...
 (%1 από %2 MB)</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="1350"/>
+        <location filename="../mythnetvision/nettree.cpp" line="1330"/>
         <source>Error downloading video to backend.</source>
         <translation>Σφάλμα κατά το κατέβασμα της ταινίας στον backend.</translation>
     </message>
@@ -263,32 +263,32 @@
 <context>
     <name>ThemeUI</name>
     <message>
-        <location filename="themestrings.h" line="7"/>
+        <location filename="themestrings.h" line="10"/>
         <source>No search scripts found!  This usually indicates missing prerequisites.</source>
         <translation>Δεν βρέθηκαν σκριπτάκια αναζήτησης!  Αυτό συνήθως σημαίνει ελλείψεις προαπαιτούμενων.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="8"/>
+        <location filename="themestrings.h" line="11"/>
         <source>Page %1</source>
         <translation>Σελίδα %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="9"/>
+        <location filename="themestrings.h" line="12"/>
         <source>Search:</source>
         <translation>Αναζήτηση:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="10"/>
+        <location filename="themestrings.h" line="13"/>
         <source>Author: %1</source>
         <translation>Συγγραφέας: %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="11"/>
+        <location filename="themestrings.h" line="14"/>
         <source>Edit/Add a New RSS Feed</source>
         <translation>Επεξεργασία/Προσθήκη Νέας τροφοδοσίας RSS</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="12"/>
+        <location filename="themestrings.h" line="15"/>
         <source>Type the URL to an RSS 2.0 media feed below.  If editing an existing feed, modify any of the values you like.  Press &quot;Save&quot; to save/subscribe.
 
 For new subscriptions, you can simply enter the URL and click &quot;Save.&quot;</source>
@@ -297,222 +297,256 @@ For new subscriptions, you can simply enter the URL and click &quot;Save.&quot;<
 Για νέες συνδρομές, μπορείτε απλά να δώσετε τη διεύθυνση και να πατήσετε &quot;Save&quot;</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="13"/>
+        <location filename="themestrings.h" line="16"/>
         <source>Title:</source>
         <translation>Τίτλος:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="14"/>
+        <location filename="themestrings.h" line="17"/>
         <source>URL:</source>
         <translation>URL:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="15"/>
+        <location filename="themestrings.h" line="18"/>
         <source>Author:</source>
         <translation>Συγγραφέας:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="16"/>
+        <location filename="themestrings.h" line="19"/>
         <source>Description:</source>
         <translation>Περιγραφή:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="17"/>
+        <location filename="themestrings.h" line="20"/>
         <source>Download video from this feed automatically</source>
         <translation>Αυτόματη μεταφόρτωση ταινιών από αυτή την τροφοδοσία</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="18"/>
+        <location filename="themestrings.h" line="21"/>
         <source>Select to change image...</source>
         <translation>Επιλέξτε για αλλαγή εικόνας...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="19"/>
+        <location filename="themestrings.h" line="22"/>
         <source>Save</source>
         <translation>Αποθήκευση</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="20"/>
+        <location filename="themestrings.h" line="23"/>
         <source>Cancel</source>
         <translation>Ακύρωση</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="21"/>
+        <location filename="themestrings.h" line="24"/>
         <source>You haven&apos;t added any Sites/RSS Feeds yet!  To add a site, press MENU, then choose &quot;Scan/Manage Subscriptions,&quot; then &quot;Manage Site Subscriptions.&quot;</source>
         <translation>Δεν έχετε προσθέσει Ιστοσελίδες/Τροφοδοσίες RSS ακόμα!  Για προσθήκη Site πατήστε MENOY, επιλέξτε &quot;Ανίχνευση/Διαχείριση Συνδρομών&quot; και μετά &quot;Διαχείριση Συνδρομών Ιστοσελίδων&quot;</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="6"/>
+        <location filename="themestrings.h" line="9"/>
         <source>%DATE%, %TIME%</source>
         <translation>%DATE%, %TIME%</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="2"/>
+        <location filename="themestrings.h" line="5"/>
         <source>Internet Video Browser</source>
         <translation>Περιητητής Ταινιών Διαδικτύου</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="3"/>
+        <location filename="themestrings.h" line="6"/>
         <source>No sites configured!</source>
         <translation>Δεν έχουν οριστεί ιστοσελίδες!</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="4"/>
+        <location filename="themestrings.h" line="7"/>
         <source>Videos - Gallery</source>
         <translation>Ταινίες - Γκαλερί</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="5"/>
+        <location filename="themestrings.h" line="8"/>
         <source>Videos - Tree</source>
         <translation>Ταινίες - Λίστα</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="22"/>
+        <location filename="themestrings.h" line="25"/>
         <source>Manage Subscriptions</source>
         <translation>Διαχείριση Συνδρομών</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="23"/>
+        <location filename="themestrings.h" line="26"/>
         <source>Choose the sites you wish to browse/search.</source>
         <translation>Επιλέξτε τις ιστοσελίδες που θέλετε να περιηγηθείτε/ψάξετε.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="24"/>
+        <location filename="themestrings.h" line="27"/>
         <source>New Site</source>
         <translation>Νέα Ιστοσελίδα</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="25"/>
+        <location filename="themestrings.h" line="28"/>
         <source>Edit Site</source>
         <translation>Επεξεργασία Ιστοσελίδας</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="26"/>
+        <location filename="themestrings.h" line="29"/>
         <source>Unsubscribe</source>
         <translation>Κατάργηση Συνδρομής</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="27"/>
+        <location filename="themestrings.h" line="30"/>
         <source>Search Net Videos</source>
         <translation>Ευρεση Ταινιων Διαδικτυου</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="28"/>
+        <location filename="themestrings.h" line="31"/>
         <source>Search Term:</source>
         <translation>Όρος Αναζήτησης:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="29"/>
+        <location filename="themestrings.h" line="32"/>
         <source>Size: %1</source>
         <translation>Μέγεθος: %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="30"/>
+        <location filename="themestrings.h" line="33"/>
         <source>Description: %1</source>
         <translation>Περιγραφή: %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="31"/>
+        <location filename="themestrings.h" line="34"/>
         <source>Can&apos;t find any search scripts!  This usually indicates missing search script prerequisites.  Try running a script from the command line.</source>
         <translation>Δεν βρέθηκαν σκριπτάκια αναζήτησης!  Αυτό συνήθως σημαίνει ελλείψεις προαπαιτούμενων. Δοκιμάστε να τρέξετε κάποιο σκριπτάκι από την γραμμή εντολών.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="32"/>
+        <location filename="themestrings.h" line="35"/>
         <source>Manage Site Subscriptions</source>
         <translation>Διαχείριση Συνδρομών Ιστοσελίδων</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="33"/>
+        <location filename="themestrings.h" line="36"/>
         <source>Edit</source>
         <translation>Επεξεργασία</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="34"/>
+        <location filename="themestrings.h" line="37"/>
         <source>New</source>
         <translation>Νέα</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="35"/>
+        <location filename="themestrings.h" line="38"/>
         <source>Remove</source>
         <translation>Αφαίρεση</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="36"/>
+        <location filename="themestrings.h" line="39"/>
         <source>Manage RSS Subscriptions</source>
         <translation>Διαχείριση Συνδρομών RSS</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="37"/>
+        <location filename="themestrings.h" line="40"/>
         <source>Feed Name:</source>
         <translation>Όνομα:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="38"/>
+        <location filename="themestrings.h" line="41"/>
         <source>Feed URL:</source>
         <translation>Διεύθυνση:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="39"/>
+        <location filename="themestrings.h" line="42"/>
         <source>Site Description:</source>
         <translation>Περιγραφή:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="40"/>
+        <location filename="themestrings.h" line="43"/>
         <source>Feed Author:</source>
         <translation>Συγγραφέας:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="41"/>
+        <location filename="themestrings.h" line="44"/>
         <source>Download this feed automatically</source>
         <translation>Αυτόματη μεταφόρτωση</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="42"/>
+        <location filename="themestrings.h" line="45"/>
         <source>Choose Image</source>
         <translation>Εικονίδιο</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="43"/>
+        <location filename="themestrings.h" line="46"/>
         <source>Browse Net Videos</source>
         <translation>Περιηγηση Ταινιων Διαδικτυου</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="44"/>
+        <location filename="themestrings.h" line="47"/>
         <source>Posted: %1</source>
         <translation>Αναρτήθηκε: %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="45"/>
+        <location filename="themestrings.h" line="48"/>
         <source>Runtime</source>
         <translation>Διάρκεια</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="46"/>
+        <location filename="themestrings.h" line="49"/>
         <source>Author</source>
         <translation>Συγγραφέας</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="47"/>
+        <location filename="themestrings.h" line="50"/>
         <source>Rating</source>
         <translation>Αξιολόγηση</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="48"/>
+        <location filename="themestrings.h" line="51"/>
         <source>Search Internet Video</source>
         <translation>Ευρεση Ταινιων Διαδικτυου</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="49"/>
+        <location filename="themestrings.h" line="52"/>
+        <source>Type the URL to an RSS 2.0 media feed below.  If editing an existing feed,modify any of the values you like.  Press &quot;Save&quot; to save/subscribe.
+
+For new subscriptions,you can simply enter the URL and click &quot;Save.&quot;</source>
+        <translation>Γράψτε τη διεύθυνση μιας τροφοδοσίας RSS 2.0. Εάν διορθώνετε κάποια υπάρχουσα, αλλάξτε όποια τιμή θέλετε.  Πατήστε &quot;Αποθήκευση&quot; για αποθήκευση/συνδρομή.
+
+Για νέες συνδρομές, μπορείτε απλά να δώσετε τη διεύθυνση και να πατήσετε &quot;Save&quot;</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="53"/>
+        <source>Internet Video List</source>
+        <translation>Λίστα Ταινιών Διαδικτύου</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="54"/>
+        <source>You haven&apos;t added any Sites/RSS Feeds yet!  To add a site,press MENU,then choose &quot;Scan/Manage Subscriptions,&quot; then &quot;Manage Site Subscriptions.&quot;</source>
+        <translation>Δεν έχετε προσθέσει Ιστοσελίδες/Τροφοδοσίες RSS ακόμα!  Για προσθήκη ιστοσελίδας πατήστε ΕΠΙΛΟΓΕΣ, επιλέξτε &quot;Ανίχνευση/Διαχείριση Συνδρομών&quot; και μετά &quot;Διαχείριση Συνδρομών Ιστοσελίδων&quot;</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="55"/>
+        <source>User Rating: %1</source>
+        <translation>Αξιολόγηση Χρήστη: %1</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="56"/>
+        <source>By: %1</source>
+        <translation>Από: %1</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="57"/>
+        <source>Internet Video Gallery</source>
+        <translation>Έκθεση Ταινιών Διαδικτύου</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="58"/>
         <source>Search popular video sites</source>
         <translation>Αναζήτηση δημοφιλών σελίδων ταινιών</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="50"/>
+        <location filename="themestrings.h" line="59"/>
         <source>Browse Internet Video</source>
         <translation>Περιηγηση Ταινιων Διαδικτυου</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="51"/>
+        <location filename="themestrings.h" line="60"/>
         <source>Browse highlights and entire sites</source>
         <translation>Περιήγηση στιγμιοτύπων και ολόκληρων ιστοσελίδων</translation>
     </message>

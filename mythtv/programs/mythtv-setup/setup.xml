@@ -12,33 +12,40 @@
      <action>CAPTURE CARDS</action>
    </button>
 
+    <button>
+        <type>TV_SETTINGS_RECORDING_PROFILES</type>
+        <text>3. Recording Profiles</text>
+        <description>Configure the recording and transcoding quality (where applicable)</description>
+        <action>RECORDING PROFILE</action>
+    </button>
+
    <button>
      <type>SETUP_VIDEO_SOURCES</type>
-     <text>3. Video sources</text>
+     <text>4. Video sources</text>
      <action>VIDEO SOURCES</action>
    </button>
 
    <button>
      <type>SETUP_INPUT_CONNECTIONS</type>
-     <text>4. Input connections</text>
+     <text>5. Input connections</text>
      <action>CARD INPUTS</action>
    </button>
 
    <button>
      <type>SETUP_CHANNEL_EDITOR</type>
-     <text>5. Channel Editor</text>
+     <text>6. Channel Editor</text>
      <action>CHANNEL EDITOR</action>
    </button>
 
    <button>
      <type>SETUP_STORAGE_GROUPS</type>
-     <text>6. Storage Directories</text>
+     <text>7. Storage Directories</text>
      <action>STORAGE GROUPS</action>
    </button>
 
    <button>
      <type>SETUP_SYSTEM_EVENTS</type>
-     <text>7. System Events</text>
+     <text>8. System Events</text>
      <action>SYSTEMEVENTEDITOR</action>
    </button>
 

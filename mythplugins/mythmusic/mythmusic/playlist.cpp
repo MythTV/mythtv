@@ -22,7 +22,7 @@ using namespace std;
 #include <mythdb.h>
 #include <compat.h>
 #include <mythmediamonitor.h>
-#include <util.h>
+#include <mythmiscutil.h>
 #include <mythsystem.h>
 #include <exitcodes.h>
 
@@ -546,7 +546,7 @@ void Playlist::loadPlaylist(QString a_name, QString a_host)
             rawSonglist = query.value(2).toString();
         }
         if (m_name == "default_playlist_storage")
-            m_name = "the user should never see this";
+            m_name = QObject::tr("Default Playlist");
         if (m_name == "backup_playlist_storage")
             m_name = "and they should **REALLY** never see this";
     }
@@ -587,7 +587,7 @@ void Playlist::loadPlaylistByID(int id, QString a_host)
     }
 
     if (m_name == "default_playlist_storage")
-        m_name = "the user should never see this";
+        m_name = QObject::tr("Default Playlist");
     if (m_name == "backup_playlist_storage")
         m_name = "and they should **REALLY** never see this";
 
@@ -669,7 +669,7 @@ void Playlist::fillSonglistFromQuery(QString whereClause,
     }
     new_songlist.remove(0, 1);
 
-    if (removeDuplicates)
+    if (removeDuplicates && insertOption != PL_REPLACE)
         new_songlist = removeDuplicateTracks(orig_songlist, new_songlist);
 
     switch (insertOption)
@@ -734,7 +734,7 @@ void Playlist::fillSonglistFromList(const QList<int> &songList,
     }
     new_songlist.remove(0, 1);
 
-    if (removeDuplicates)
+    if (removeDuplicates && insertOption != PL_REPLACE)
         new_songlist = removeDuplicateTracks(orig_songlist, new_songlist);
 
     switch (insertOption)
@@ -899,6 +899,8 @@ void Playlist::fillSonglistFromSmartPlaylist(QString category, QString name,
     // add limit
     if (limitTo > 0)
         whereClause +=  " LIMIT " + QString::number(limitTo);
+
+    //m_name = name; // Set Playlist name to match smart playlist name
 
     fillSonglistFromQuery(whereClause, removeDuplicates,
                           insertOption, currentTrackID);

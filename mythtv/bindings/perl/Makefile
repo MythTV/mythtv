@@ -28,6 +28,6 @@ install: all
 	$(MAKE) -f Makefile.perl pure_install $(PREFIX_FLAGS) $(ROOT_FLAGS)
 
 uninstall:
-	$(warning make unsinstall is not supported for the perl bindings)
+	$(warning make uninstall is not supported for the perl bindings)
 
 .PHONY: all clean distclean install perl_build uninstall

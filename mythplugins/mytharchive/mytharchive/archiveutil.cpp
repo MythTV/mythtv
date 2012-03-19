@@ -19,7 +19,7 @@ using namespace std;
 #include <programinfo.h>
 #include <mythmainwindow.h>
 #include <mythdialogbox.h>
-#include <util.h>
+#include <mythmiscutil.h>
 #include <mythsystem.h>
 #include <exitcodes.h>
 #include <mythlogging.h>
@@ -32,11 +32,11 @@ struct ArchiveDestination ArchiveDestinations[] =
 {
     {AD_DVD_SL,
      QT_TRANSLATE_NOOP("SelectDestination", "Single Layer DVD"),
-     QT_TRANSLATE_NOOP("SelectDestination", "Single Layer DVD (4482Mb)"),
+     QT_TRANSLATE_NOOP("SelectDestination", "Single Layer DVD (4,482 MB)"),
      4482*1024},
     {AD_DVD_DL,
      QT_TRANSLATE_NOOP("SelectDestination", "Dual Layer DVD"),
-     QT_TRANSLATE_NOOP("SelectDestination", "Dual Layer DVD (8964Mb)"),
+     QT_TRANSLATE_NOOP("SelectDestination", "Dual Layer DVD (8,964 MB)"),
      8964*1024},
     {AD_DVD_RW,
      QT_TRANSLATE_NOOP("SelectDestination", "DVD +/- RW"),

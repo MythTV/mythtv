@@ -41,7 +41,7 @@
 class SERVICE_PUBLIC VideoServices : public Service  //, public QScriptable ???
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "1.1" );
+    Q_CLASSINFO( "version"    , "1.2" );
     Q_CLASSINFO( "RemoveVideoFromDB_Method",           "POST" )
     Q_CLASSINFO( "AddVideo_Method",                    "POST" )
 
@@ -74,7 +74,8 @@ class SERVICE_PUBLIC VideoServices : public Service  //, public QScriptable ???
                                                                  const QString    &Inetref,
                                                                  int              Season,
                                                                  int              Episode,
-                                                                 const QString    &GrabberType) = 0;
+                                                                 const QString    &GrabberType,
+                                                                 bool             AllowGeneric) = 0;
 
         virtual bool                        RemoveVideoFromDB  ( int              Id         ) = 0;
 

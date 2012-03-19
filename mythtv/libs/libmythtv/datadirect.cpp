@@ -18,7 +18,7 @@
 #include "mythdb.h"
 #include "mythlogging.h"
 #include "mythversion.h"
-#include "util.h"
+#include "mythmiscutil.h"
 #include "dbutil.h"
 #include "mythsystem.h"
 #include "exitcodes.h"
@@ -1037,6 +1037,9 @@ bool DataDirectProcessor::DDPost(QString    ddurl,        QString   &inputFile,
 
     LOG(VB_GENERAL, LOG_INFO, QString("Uncompressed to %1 bytes")
         .arg(uncompressed.size()));
+
+    if (uncompressed.size() == 0)
+        uncompressed = postdata;
 
     QFile file(inputFile);
     file.open(QIODevice::WriteOnly);

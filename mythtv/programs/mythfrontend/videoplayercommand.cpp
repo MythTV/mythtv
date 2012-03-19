@@ -6,7 +6,7 @@
 #include "mythsystem.h"
 #include "remoteutil.h"
 #include "lcddevice.h"
-#include "util.h"
+#include "mythmiscutil.h"
 #include "dbaccess.h"
 #include "videometadata.h"
 #include "videoutils.h"
@@ -153,8 +153,10 @@ class VideoPlayMythSystem : public VideoPlayProc
     bool Play() const
     {
         sendPlaybackStart();
+        GetMythMainWindow()->PauseIdleTimer(true);
         myth_system(m_play_command);
         sendPlaybackEnd();
+        GetMythMainWindow()->PauseIdleTimer(false);
 
         return true;
     }

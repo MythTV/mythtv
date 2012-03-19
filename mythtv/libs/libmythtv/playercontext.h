@@ -15,7 +15,7 @@ using namespace std;
 #include "mythdeque.h"
 #include "tv.h"
 #include "videoouttypes.h"
-#include "util.h"
+#include "mythmiscutil.h"
 
 class TV;
 class RemoteEncoder;

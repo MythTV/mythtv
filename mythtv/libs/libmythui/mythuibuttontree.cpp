@@ -113,7 +113,7 @@ void MythUIButtonTree::SetTreeState(bool refreshAll)
     m_visibleLists = 0;
     uint listid = 0;
 
-    while (listid < m_numLists)
+    while (listid < (uint)m_buttonlists.count())
     {
         MythUIButtonList *list = m_buttonlists.at(listid);
 
@@ -477,8 +477,8 @@ void MythUIButtonTree::SwitchList(bool right)
 
     if (right)
     {
-        if ((m_activeListID < m_visibleLists - 1) &&
-            (m_activeListID < (uint)m_buttonlists.count() - 1))
+        if ((m_activeListID + 1 < m_visibleLists) &&
+            (m_activeListID + 1 < (uint)m_buttonlists.count()))
             m_activeListID++;
         else if (m_currentNode && m_currentNode->visibleChildCount() > 0)
         {

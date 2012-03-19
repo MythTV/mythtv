@@ -37,7 +37,7 @@
 #-------------------------------------
 __title__ ="TheTVDB.com";
 __author__="R.D.Vaughan"
-__version__="1.1.3"
+__version__="1.1.5"
 # Version .1    Initial development
 # Version .2    Add an option to get season and episode numbers from ep name
 # Version .3    Cleaned up the documentation and added a usage display option
@@ -134,9 +134,11 @@ __version__="1.1.3"
 # Version 1.1.2 Convert version information to XML
 # Version 1.1.3 Implement fuzzy matching for episode name lookup
 # Version 1.1.4 Add test mode (replaces --toprated)
+# Version 1.1.5 Add the -C (collection option) with corresponding XML output
+#               and add a <collectionref> XML tag to Search and Query XML output
 
 usage_txt='''
-Usage: ttvdb.py usage: ttvdb -hdruviomMPFBDS [parameters]
+Usage: ttvdb.py usage: ttvdb -hdruviomMPFBDSC [parameters]
  <series name or 'series and season number' or 'series and season number and episode number'>
 
 For details on using ttvdb with Mythvideo see the ttvdb wiki page at:
@@ -167,6 +169,7 @@ Options:
   -S, --screenshot      Get Series episode screenshot URL
   -D, --data            Get Series episode data
   -N, --numbers         Get Season and Episode numbers
+  -C, --collection      Get A TV Series (collection) series specific information
 
 Command examples:
 (Return the banner graphics for a series)
@@ -290,6 +293,45 @@ Banner:http://www.thetvdb.com/banners/graphical/73739-g4.jpg,http://www.thetvdb.
     <title>Star For A Night</title>
     <inetref>71476</inetref>
     <releasedate>1999-01-01</releasedate>
+  </item>
+</metadata>
+
+(Return TV series collection data of "thetv.com series id" for a specified language)
+> ttvdb.py -l de -C 80159
+<?xml version='1.0' encoding='UTF-8'?>
+<metadata>
+  <item>
+    <language>de</language>
+    <title>Sanctuary</title>
+    <network>Syfy</network>
+    <airday>Friday</airday>
+    <airtime>22:00</airtime>
+    <description>Dr. Helen Magnus ist eine so brillante wie geheimnisvolle Wissenschaftlerin die sich mit den Kreaturen der Nacht beschäftigt. In ihrem Unterschlupf - genannt "Sanctuary" - hat sie ein Team versammelt, das seltsame und furchteinflößende Ungeheuer untersucht, die mit den Menschen auf der Erde leben. Konfrontiert mit ihren düstersten Ängsten und ihren schlimmsten Alpträumen versucht das Sanctuary-Team, die Welt vor den Monstern - und die Monster vor der Welt zu schützen.</description>
+    <certifications>
+      <certification locale="us" name="TV-PG"/>
+    </certifications>
+    <categories>
+      <category type="genre" name="Action and Adventure"/>
+      <category type="genre" name="Science-Fiction"/>
+    </categories>
+    <studios>
+      <studio name="Syfy"/>
+    </studios>
+    <runtime>60</runtime>
+    <inetref>80159</inetref>
+    <imdb>0965394</imdb>
+    <tmsref>EP01085421</tmsref>
+    <userrating>8.0</userrating>
+    <ratingcount>128</ratingcount>
+    <year>2007</year>
+    <releasedate>2007-05-14</releasedate>
+    <lastupdated>Fri, 17 Feb 2012 16:57:02 GMT</lastupdated>
+    <status>Continuing</status>
+    <images>
+      <image type="coverart" url="http://www.thetvdb.com/banners/posters/80159-4.jpg" thumb="http://www.thetvdb.com/banners/_cache/posters/80159-4.jpg"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/80159-8.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/80159-8.jpg"/>
+      <image type="banner" url="http://www.thetvdb.com/banners/graphical/80159-g6.jpg" thumb="http://www.thetvdb.com/banners/_cache/graphical/80159-g6.jpg"/>
+    </images>
   </item>
 </metadata>
 '''
@@ -1066,6 +1108,31 @@ def displaySeriesXML(tvdb_api, series_season_ep):
     sys.exit(0)
 # end displaySeriesXML()
 
+def displayCollectionXML(tvdb_api):
+    '''Using a XSLT style sheet translate TVDB series results into the MythTV Universal Query format
+    return nothing
+    '''
+    global xslt, tvdbXpath
+
+    # Remove duplicates when non-English language code is specified
+    if xslt.language != 'en':
+        compareFilter = etree.XPath('//id[text()=$Id]')
+        idLangFilter = etree.XPath('//id[text()=$Id]/../language[text()="en"]/..')
+        tmpTree = deepcopy(tvdb_api.seriesInfoTree)
+        for seriesId in tmpTree.xpath('//Series/id/text()'):
+            if len(compareFilter(tvdb_api.seriesInfoTree, Id=seriesId)) > 1:
+                tmpList = idLangFilter(tvdb_api.seriesInfoTree, Id=seriesId)
+                if len(tmpList):
+                    tvdb_api.seriesInfoTree.remove(tmpList[0])
+
+    tvdbCollectionXslt = etree.XSLT(etree.parse(u'%s%s' % (tvdb_api.baseXsltDir, u'tvdbCollection.xsl')))
+    items = tvdbCollectionXslt(tvdb_api.seriesInfoTree)
+    if items.getroot() != None:
+        if len(items.xpath('//item')):
+            sys.stdout.write(etree.tostring(items, encoding='UTF-8', method="xml", xml_declaration=True, pretty_print=True, ))
+    sys.exit(0)
+# end displayCollectionXML()
+
 def main():
     parser = OptionParser(usage=u"%prog usage: ttvdb -hdruviomMPFBDS [parameters]\n <series name or 'series and season number' or 'series and season number and episode number'>\n\nFor details on using ttvdb with Mythvideo see the ttvdb wiki page at:\nhttp://www.mythtv.org/wiki/Ttvdb.py")
 
@@ -1103,6 +1170,8 @@ def main():
                         help=u"Get Series episode data")
     parser.add_option(  "-N", "--numbers", action="store_true", default=False, dest="numbers",
                         help=u"Get Season and Episode numbers")
+    parser.add_option(  "-C", "--collection", action="store_true", default=False, dest="collection",
+                        help=u'Get a TV Series (collection) "series" level information')
 
     opts, series_season_ep = parser.parse_args()
 
@@ -1197,21 +1266,21 @@ def main():
     if not opts.language in valid_languages:
         opts.language = 'en'    # Set the default to English when an invalid language was specified
 
-    # Set XML to bge the default display mode for -N, -M and -D
+    # Set XML to be the default display mode for -N, -M, -D, -C
     opts.xml = True
     initializeXslt(opts.language)
 
     # Access thetvdb.com API with banners (Posters, Fanart, banners, screenshots) data retrieval enabled
     if opts.list ==True:
-        t = Tvdb(banners=False, debug = opts.debug, cache = cache_dir, custom_ui=returnAllSeriesUI, language = opts.language, apikey="0BB856A59C51D607")  # thetvdb.com API key requested by MythTV)
+        t = Tvdb(banners=False, debug = opts.debug, cache = cache_dir, custom_ui=returnAllSeriesUI, language = opts.language, apikey="0BB856A59C51D607")  # thetvdb.com API key requested by MythTV
         if opts.xml:
             t.xml = True
     elif opts.interactive == True:
-        t = Tvdb(banners=True, debug=opts.debug, interactive=True,  select_first=False, cache=cache_dir, actors = True, language = opts.language, apikey="0BB856A59C51D607")  # thetvdb.com API key requested by MythTV)
+        t = Tvdb(banners=True, debug=opts.debug, interactive=True,  select_first=False, cache=cache_dir, actors = True, language = opts.language, apikey="0BB856A59C51D607")  # thetvdb.com API key requested by MythTV
         if opts.xml:
             t.xml = True
     else:
-        t = Tvdb(banners=True, debug = opts.debug, cache = cache_dir, actors = True, language = opts.language, apikey="0BB856A59C51D607")  # thetvdb.com API key requested by MythTV)
+        t = Tvdb(banners=True, debug = opts.debug, cache = cache_dir, actors = True, language = opts.language, apikey="0BB856A59C51D607")  # thetvdb.com API key requested by MythTV
         if opts.xml:
             t.xml = True
 
@@ -1222,6 +1291,14 @@ def main():
         SID = True
     else:
         SID = False
+
+    # The -C collections options only supports a SID as input
+    if opts.collection:
+        if SID:
+            pass
+        else:
+            parser.error("! Option (-C), collection requires an inetref number")
+            sys.exit(1)
 
     if opts.debug == True:
         print "# ..got tvdb mirrors"
@@ -1249,7 +1326,7 @@ def main():
         opts.configure = False # Turn off the override option as there is nothing to override
 
     # Check if a video name was passed and if so parse it for series name, season and episode numbers
-    if len(series_season_ep) == 1:
+    if not opts.collection and len(series_season_ep) == 1:
         for r in name_parse:
             match = r.match(series_season_ep[0])
             if match:
@@ -1278,6 +1355,18 @@ def main():
                 match_list.append(key_value)
                 print key_value
         sys.exit(0) # The Series list option (-M) is the only option honoured when used
+
+    # Fetch TV series collection information
+    if opts.collection:
+        try:
+            t._getShowData(series_season_ep[0])
+        except tvdb_shownotfound:
+            sys.exit(0) # No matching series
+        except Exception, e:
+            sys.stderr.write("! Error: %s\n" % (e))
+            sys.exit(1) # Most likely a communications error
+        displayCollectionXML(t)
+        sys.exit(0) # The TV Series collection option (-C) is the only option honoured when used
 
     # Verify that thetvdb.com has the desired series_season_ep.
     # Exit this module if series_season_ep is not found

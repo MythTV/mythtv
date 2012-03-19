@@ -1205,7 +1205,7 @@ bool VideoOutputQuartz::InputChanged(const QSize &input_size,
         return true;
     }
 
-    const QSize video_dim = window.GetVideoDim();
+    const QSize video_dim = window.GetVideoDispDim();
 
     DeleteQuartzBuffers();
 

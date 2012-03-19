@@ -41,6 +41,9 @@ void Serializer::Serialize( const QObject *pObject, const QString &_sName )
         sName = pObject->metaObject()->className();
 
         sName = sName.section( ":", -1 );
+
+        if (sName.at(0) == 'Q')
+            sName = sName.mid( 1 );
     }
 
     // ---------------------------------------------------------------
@@ -59,6 +62,10 @@ void Serializer::Serialize( const QObject *pObject, const QString &_sName )
 void Serializer::Serialize( const QVariant &vValue, const QString &_sName )
 {
     QString sName( _sName );
+
+    if (sName.at(0) == 'Q')
+        sName = sName.mid( 1 );
+
     BeginSerialize( sName );
 
     AddProperty( sName, vValue, NULL, NULL );

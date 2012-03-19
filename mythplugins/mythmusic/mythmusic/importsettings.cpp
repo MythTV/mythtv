@@ -143,5 +143,7 @@ void ImportSettings::slotSave(void)
     int saveMp3UseVBR = (m_mp3UseVBR->GetCheckState() == MythUIStateType::Full) ? 1 : 0;
     gCoreContext->SaveSetting("Mp3UseVBR", saveMp3UseVBR);
 
+    gCoreContext->dispatch(MythEvent(QString("MUSIC_SETTINGS_CHANGED IMPORT_SETTINGS")));
+
     Close();
 }

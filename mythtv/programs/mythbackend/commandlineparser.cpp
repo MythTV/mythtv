@@ -92,6 +92,26 @@ void MythBackendCommandLineParser::LoadArguments(void)
             "recordings.");
     add("--user", "username", "",
             "Drop permissions to username after starting.", "");
+
+    add("--upnprebuild", "upnprebuild", false, "", "")
+            ->SetRemoved("The UPnP server no longer maintains its own list\n"
+               "          of video content, and instead uses the shared\n"
+               "          list of the Video Library. Update the Video Library\n"
+               "          content list from within mythfrontend, or on the\n"
+               "          command line using 'mythutil --scanvideos'.",
+                         "0.25");
+    add("--infile", "inputfile", "", "", "")
+            ->SetRemoved("mythbackend is no longer used for preview\n"
+               "          generation. Please use mythpreviewgen.", "0.25");
+    add("--outfile", "outputfile", "", "", "")
+            ->SetRemoved("mythbackend is no longer used for preview\n"
+               "          generation. Please use mythpreviewgen.", "0.25");
+    add("--chanid", "chanid", "", "", "")
+            ->SetRemoved("mythbackend is no longer used for preview\n"
+               "          generation. Please use mythpreviewgen.", "0.25");
+    add("--starttime", "starttime", "", "", "")
+            ->SetRemoved("mythbackend is no longer used for preview\n"
+               "          generation. Please use mythpreviewgen.", "0.25");
 }
 
 QString MythBackendCommandLineParser::GetHelpHeader(void) const

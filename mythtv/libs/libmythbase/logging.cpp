@@ -385,7 +385,21 @@ bool SyslogLogger::logmsg(LoggingItem *item)
     if (!m_opened)
         return false;
 
-    syslog( item->level, "%s", item->message );
+    char shortname;
+
+    {
+        QMutexLocker locker(&loglevelMapMutex);
+        LoglevelMap::iterator it = loglevelMap.find(item->level);
+        if (it == loglevelMap.end())
+            shortname = '-';
+        else
+            shortname = (*it)->shortname;
+    }
+
+    char *threadName = getThreadName(item);
+
+    syslog( item->level, "%c %s %s:%d (%s) %s", shortname, threadName,
+            item->file, item->line, item->function, item->message );
 
     return true;
 }
@@ -1234,7 +1248,7 @@ void logStop(void)
 ///         by the RunProlog() call in each thread.
 /// \param  name    the name of the thread being registered.  This is used for
 ///                 indicating the thread each log message is coming from.
-void threadRegister(QString name)
+void loggingRegisterThread(const QString &name)
 {
     if (logThreadFinished)
         return;
@@ -1252,7 +1266,7 @@ void threadRegister(QString name)
 
 /// \brief  Deregister the current thread's name.  This is triggered by the 
 ///         RunEpilog() call in each thread.
-void threadDeregister(void)
+void loggingDeregisterThread(void)
 {
     if (logThreadFinished)
         return;

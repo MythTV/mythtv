@@ -109,7 +109,15 @@ bool NewsSite::podcast(void) const
 QString NewsSite::description(void) const
 {
     QMutexLocker locker(&m_lock);
-    return QString("%1\n%2").arg(m_desc).arg(m_errorString);
+    QString result;
+
+    if (!m_desc.isEmpty())
+        result = m_desc;
+
+    if (!m_errorString.isEmpty())
+        result += m_desc.isEmpty() ? m_errorString : '\n' + m_errorString;
+
+    return result;
 }
 
 QString NewsSite::imageURL(void) const

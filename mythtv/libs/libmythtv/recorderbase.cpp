@@ -28,13 +28,15 @@ using namespace std;
 #include "ringbuffer.h"
 #include "cardutil.h"
 #include "tv_rec.h"
-#include "util.h"
+#include "mythmiscutil.h"
 
 #define TVREC_CARDNUM \
         ((tvrec != NULL) ? QString::number(tvrec->GetCaptureCardNum()) : "NULL")
 
 #define LOC      QString("RecBase(%1:%2): ") \
                  .arg(TVREC_CARDNUM).arg(videodevice)
+
+const uint RecorderBase::kTimeOfLatestDataIntervalTarget = 5000;
 
 RecorderBase::RecorderBase(TVRec *rec)
     : tvrec(rec),               ringBuffer(NULL),
@@ -329,7 +331,10 @@ void RecorderBase::ClearStatistics(void)
 {
     QMutexLocker locker(&statisticsLock);
     timeOfFirstData = QDateTime();
+    timeOfFirstDataIsSet.fetchAndStoreRelaxed(0);
     timeOfLatestData = QDateTime();
+    timeOfLatestDataCount.fetchAndStoreRelaxed(0);
+    timeOfLatestDataPacketInterval.fetchAndStoreRelaxed(2000);
     recordingGaps.clear();
 }
 
@@ -474,6 +479,11 @@ void RecorderBase::SetDuration(uint64_t duration)
         curRecording->SaveTotalDuration(duration);
 }
 
+void RecorderBase::SetTotalFrames(uint64_t total_frames)
+{
+    if (curRecording)
+        curRecording->SaveTotalFrames(total_frames);
+}
 
 
 RecorderBase *RecorderBase::CreateRecorder(

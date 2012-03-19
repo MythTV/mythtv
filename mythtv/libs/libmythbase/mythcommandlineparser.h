@@ -35,7 +35,7 @@ class MBASE_PUBLIC CommandLineArg : public ReferenceCounter
     QString         GetLongHelpString(QString keyword) const;
 
     bool            Set(QString opt);
-    bool            Set(QString opt, QString val);
+    bool            Set(QString opt, QByteArray val);
     void            Set(QVariant val)               { m_stored = val;
                                                       m_given = true; }
 
@@ -60,6 +60,7 @@ class MBASE_PUBLIC CommandLineArg : public ReferenceCounter
     CommandLineArg* SetBlocks(QStringList opts);
 
     CommandLineArg* SetDeprecated(QString depstr = "");
+    CommandLineArg* SetRemoved(QString remstr = "", QString remver = "");
 
     static void     AllowOneOf(QList<CommandLineArg*> args);
 
@@ -75,14 +76,22 @@ class MBASE_PUBLIC CommandLineArg : public ReferenceCounter
     void            SetRequires(CommandLineArg *other, bool forward = true);
     void            SetBlocks(CommandLineArg *other, bool forward = true);
 
+    void            Convert(void);
+
     QString         GetPreferredKeyword(void) const;
     bool            TestLinks(void) const;
     void            CleanupLinks(void);
 
+    void            PrintRemovedWarning(QString &keyword) const;
+    void            PrintDeprecatedWarning(QString &keyword) const;
+
     bool                    m_given;
+    bool                    m_converted;
     QString                 m_name;
     QString                 m_group;
     QString                 m_deprecated;
+    QString                 m_removed;
+    QString                 m_removedversion;
     QVariant::Type          m_type;
     QVariant                m_default;
     QVariant                m_stored;
@@ -275,7 +284,7 @@ class MBASE_PUBLIC MythCommandLineParser
 
   private:
     int getOpt(int argc, const char * const * argv, int &argpos,
-               QString &opt, QString &val);
+               QString &opt, QByteArray &val);
     bool ReconcileLinks(void);
 
     QString                         m_appname;

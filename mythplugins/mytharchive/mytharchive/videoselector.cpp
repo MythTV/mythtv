@@ -157,7 +157,6 @@ void VideoSelector::showMenu()
 
     menuPopup->AddButton(tr("Clear All"), SLOT(clearAll()));
     menuPopup->AddButton(tr("Select All"), SLOT(selectAll()));
-    menuPopup->AddButton(tr("Cancel"), NULL);
 }
 
 void VideoSelector::selectAll()

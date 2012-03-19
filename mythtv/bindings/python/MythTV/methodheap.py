@@ -1100,13 +1100,7 @@ class MythXML( XMLConnection ):
         if re.match('(?:\d{1,3}\.){3}\d{1,3}',backend) or \
                     check_ipv6(backend):
             # process ip address
-            with self.db.cursor(self.log) as cursor:
-                if cursor.execute("""SELECT hostname FROM settings
-                                     WHERE value='BackendServerIP'
-                                     AND data=%s""", backend) == 0:
-                    raise MythDBError(MythError.DB_SETTING, 
-                                        backend+': BackendServerIP')
-                host = cursor.fetchone()[0]
+            host = self.db._gethostfromaddr(backend)
             self.host = backend
             self.port = int(self.db.settings[host].BackendStatusPort)
         else:

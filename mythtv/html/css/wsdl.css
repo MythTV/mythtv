@@ -1,0 +1,84 @@
+﻿h1 {
+	padding:0;
+	margin:0;
+}
+
+.masthead {
+	text-align: center;
+	background-color:#F0F0F0;
+	border:1px solid #d4d4d4;
+
+}
+
+.masthead img {
+	float: left;
+	border:0;
+}
+
+div.method{
+	color:#000000;
+	background-color:#F0F0F0;
+	margin:0px;
+
+	padding-left:5px;
+	padding-bottom:5px;
+	
+	border:1px solid #d4d4d4;
+	width:99%;
+	clear:both;
+}
+
+div.method_props
+{
+	background-color: #ffffff;
+	border: 1px solid #d4d4d4;
+	width: 99%;
+	/*
+	font-family: "Courier New";
+	*/
+}
+
+div.method_props table {
+	margin:3px;
+	width:100%;
+	border-collapse:collapse;
+}
+
+div.method_props td {
+	border-bottom: thin #F0F0F0 solid;
+}
+
+.method_name {
+	font-size:medium;
+	font-weight:bolder;
+	padding: 3, 0, 3, 0;
+	margin: 3, 0, 3, 0;
+	color:#003399;
+}
+
+
+.alignLeft {
+	float: left;
+	vertical-align:top;
+}
+
+.alignRight {
+	float: right;
+	vertical-align:top;
+}
+
+.label {
+	color:navy;
+	font-weight:bold;
+	border-bottom: thin;
+	
+}
+.method_props_return
+{
+	color:navy;
+}
+
+.HTTPMethod {
+	font-size:small;
+	color:#006600
+}

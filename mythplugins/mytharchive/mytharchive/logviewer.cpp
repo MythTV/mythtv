@@ -316,5 +316,4 @@ void LogViewer::showMenu()
 
     menuPopup->AddButton(tr("Show Progress Log"), SLOT(showProgressLog()));
     menuPopup->AddButton(tr("Show Full Log"), SLOT(showFullLog()));
-    menuPopup->AddButton(tr("Cancel"), NULL);
 }

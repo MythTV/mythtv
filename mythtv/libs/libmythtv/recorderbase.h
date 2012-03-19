@@ -5,6 +5,7 @@
 #include <stdint.h>
 
 #include <QWaitCondition>
+#include <QAtomicInt>
 #include <QDateTime>
 #include <QRunnable>
 #include <QString>
@@ -254,6 +255,10 @@ class MTV_PUBLIC RecorderBase : public QRunnable
      */
     void SetDuration(uint64_t duration);
 
+    /** \brief Note the total frames in the recordedmark table
+     */
+    void SetTotalFrames(uint64_t total_frames);
+
     TVRec         *tvrec;
     RingBuffer    *ringBuffer;
     bool           weMadeBuffer;
@@ -304,9 +309,15 @@ class MTV_PUBLIC RecorderBase : public QRunnable
     // without locking and updated with the lock held. Outside that
     // thread these values are only read, and only with the lock held.
     mutable QMutex statisticsLock;
+    QAtomicInt     timeOfFirstDataIsSet; // doesn't need locking
     QDateTime      timeOfFirstData;
-    QDateTime      timeOfLatestData; // updated every 5 seconds
+    QAtomicInt     timeOfLatestDataCount; // doesn't need locking
+    QAtomicInt     timeOfLatestDataPacketInterval; // doesn't need locking
+    QDateTime      timeOfLatestData;
+    MythTimer      timeOfLatestDataTimer;
     RecordingGaps  recordingGaps;
+    /// timeOfLatest update interval target in milliseconds.
+    static const uint kTimeOfLatestDataIntervalTarget;
 };
 
 #endif

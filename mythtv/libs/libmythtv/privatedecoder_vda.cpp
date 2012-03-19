@@ -13,13 +13,10 @@
 #undef CodecType
 #import  "QuickTime/ImageCompression.h"
 #endif
+#include "H264Parser.h"
 
 extern "C" {
 #include "libavformat/avformat.h"
-#include "libavcodec/avcodec.h"
-extern const uint8_t *ff_find_start_code(const uint8_t * p,
-                                         const uint8_t *end,
-                                         uint32_t * state);
 }
 VDALibrary *gVDALib = NULL;
 
@@ -106,6 +103,189 @@ QString vda_err_to_string(OSStatus err)
     return "Unknown error";
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// TODO: refactor this so as not to need these ffmpeg routines.
+// These are not exposed in ffmpeg's API so we dupe them here.
+// AVC helper functions for muxers,
+//  * Copyright (c) 2006 Baptiste Coudurier <baptiste.coudurier@smartjog.com>
+// This is part of FFmpeg
+//  * License as published by the Free Software Foundation; either
+//  * version 2.1 of the License, or (at your option) any later version.
+#define VDA_RB16(x)                          \
+  ((((const uint8_t*)(x))[0] <<  8) |        \
+   ((const uint8_t*)(x)) [1])
+
+#define VDA_RB24(x)                          \
+  ((((const uint8_t*)(x))[0] << 16) |        \
+   (((const uint8_t*)(x))[1] <<  8) |        \
+   ((const uint8_t*)(x))[2])
+
+#define VDA_RB32(x)                          \
+  ((((const uint8_t*)(x))[0] << 24) |        \
+   (((const uint8_t*)(x))[1] << 16) |        \
+   (((const uint8_t*)(x))[2] <<  8) |        \
+   ((const uint8_t*)(x))[3])
+
+#define VDA_WB32(p, d) { \
+  ((uint8_t*)(p))[3] = (d); \
+  ((uint8_t*)(p))[2] = (d) >> 8; \
+  ((uint8_t*)(p))[1] = (d) >> 16; \
+  ((uint8_t*)(p))[0] = (d) >> 24; }
+
+static const uint8_t *avc_find_startcode_internal(const uint8_t *p, const uint8_t *end)
+{
+    const uint8_t *a = p + 4 - ((intptr_t)p & 3);
+
+    for (end -= 3; p < a && p < end; p++)
+    {
+        if (p[0] == 0 && p[1] == 0 && p[2] == 1)
+            return p;
+    }
+
+    for (end -= 3; p < end; p += 4)
+    {
+        uint32_t x = *(const uint32_t*)p;
+        if ((x - 0x01010101) & (~x) & 0x80808080) // generic
+        {
+            if (p[1] == 0)
+            {
+                if (p[0] == 0 && p[2] == 1)
+                    return p;
+                if (p[2] == 0 && p[3] == 1)
+                    return p+1;
+            }
+            if (p[3] == 0)
+            {
+                if (p[2] == 0 && p[4] == 1)
+                    return p+2;
+                if (p[4] == 0 && p[5] == 1)
+                    return p+3;
+            }
+        }
+    }
+
+    for (end += 3; p < end; p++)
+    {
+        if (p[0] == 0 && p[1] == 0 && p[2] == 1)
+            return p;
+    }
+
+    return end + 3;
+}
+
+const uint8_t *avc_find_startcode(const uint8_t *p, const uint8_t *end)
+{
+    const uint8_t *out= avc_find_startcode_internal(p, end);
+    if (p<out && out<end && !out[-1])
+        out--;
+    return out;
+}
+
+const int avc_parse_nal_units(ByteIOContext *pb, const uint8_t *buf_in, int size)
+{
+    const uint8_t *p = buf_in;
+    const uint8_t *end = p + size;
+    const uint8_t *nal_start, *nal_end;
+
+    size = 0;
+    nal_start = avc_find_startcode(p, end);
+    while (nal_start < end)
+    {
+        while (!*(nal_start++));
+        nal_end = avc_find_startcode(nal_start, end);
+        put_be32(pb, nal_end - nal_start);
+        put_buffer(pb, nal_start, nal_end - nal_start);
+        size += 4 + nal_end - nal_start;
+        nal_start = nal_end;
+    }
+    return size;
+}
+
+const int avc_parse_nal_units_buf(const uint8_t *buf_in,
+                                  uint8_t **buf, int *size)
+{
+    ByteIOContext *pb;
+    int ret = url_open_dyn_buf(&pb);
+    if (ret < 0)
+        return ret;
+
+    avc_parse_nal_units(pb, buf_in, *size);
+
+    av_freep(buf);
+    *size = url_close_dyn_buf(pb, buf);
+    return 0;
+}
+
+const int isom_write_avcc(ByteIOContext *pb, const uint8_t *data, int len)
+{
+    // extradata from bytestream h264, convert to avcC atom data for bitstream
+    if (len > 6)
+    {
+        /* check for h264 start code */
+        if (VDA_RB32(data) == 0x00000001 || VDA_RB24(data) == 0x000001)
+        {
+            uint8_t *buf=NULL, *end, *start;
+            uint32_t sps_size=0, pps_size=0;
+            uint8_t *sps=0, *pps=0;
+
+            int ret = avc_parse_nal_units_buf(data, &buf, &len);
+            if (ret < 0)
+                return ret;
+            start = buf;
+            end = buf + len;
+
+            /* look for sps and pps */
+            while (buf < end)
+            {
+                unsigned int size;
+                uint8_t nal_type;
+                size = VDA_RB32(buf);
+                nal_type = buf[4] & 0x1f;
+                if (nal_type == 7) /* SPS */
+                {
+                    sps = buf + 4;
+                    sps_size = size;
+
+                    //parse_sps(sps+1, sps_size-1);
+                }
+                else if (nal_type == 8) /* PPS */
+                {
+                    pps = buf + 4;
+                    pps_size = size;
+                }
+                buf += size + 4;
+            }
+            if (!sps)
+            {
+                LOG(VB_GENERAL, LOG_ERR, LOC + "Invalid data (sps)");
+                return -1;
+            }
+
+            put_byte(pb, 1); /* version */
+            put_byte(pb, sps[1]); /* profile */
+            put_byte(pb, sps[2]); /* profile compat */
+            put_byte(pb, sps[3]); /* level */
+            put_byte(pb, 0xff); /* 6 bits reserved (111111) + 2 bits nal size length - 1 (11) */
+            put_byte(pb, 0xe1); /* 3 bits reserved (111) + 5 bits number of sps (00001) */
+
+            put_be16(pb, sps_size);
+            put_buffer(pb, sps, sps_size);
+            if (pps)
+            {
+                put_byte(pb, 1); /* number of pps */
+                put_be16(pb, pps_size);
+                put_buffer(pb, pps, pps_size);
+            }
+            av_free(start);
+        }
+        else
+        {
+            put_buffer(pb, data, len);
+        }
+    }
+    return 0;
+}
+
 void PrivateDecoderVDA::GetDecoders(render_opts &opts)
 {
     opts.decoders->append("vda");
@@ -116,9 +296,9 @@ void PrivateDecoderVDA::GetDecoders(render_opts &opts)
 
 PrivateDecoderVDA::PrivateDecoderVDA()
   : PrivateDecoder(), m_lib(NULL), m_decoder(NULL), m_size(QSize()),
-    m_frame_lock(QMutex::Recursive), m_frames_decoded(0), m_num_ref_frames(0),
-    m_annexb(false), m_slice_count(0)
-{        
+    m_frame_lock(QMutex::Recursive), m_frames_decoded(0), m_annexb(false),
+    m_slice_count(0), m_convert_3byteTo4byteNALSize(false), m_max_ref_frames(0)
+{
 }
 
 PrivateDecoderVDA::~PrivateDecoderVDA()
@@ -145,43 +325,107 @@ bool PrivateDecoderVDA::Init(const QString &decoder,
     if (!m_lib)
         return false;
 
-    bool valid_extradata = true;
     uint8_t *extradata = avctx->extradata;
-    int extradata_size = avctx->extradata_size;
-    if (!extradata || extradata_size < 7)
-        valid_extradata = false;
+    int extrasize = avctx->extradata_size;
+    if (!extradata || extrasize < 7)
+        return false;
 
     CFDataRef avc_cdata = NULL;
-    if (valid_extradata && extradata[0] != 1)
+    if (extradata[0] != 1)
     {
-        if (!RewriteAvcc(&extradata, extradata_size, avc_cdata))
+        if (extradata[0] == 0 && extradata[1] == 0 && extradata[2] == 0 &&
+            extradata[3] == 1)
         {
-            LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to re-write avcc...");
-            valid_extradata = false;
+            // video content is from x264 or from bytestream h264 (AnnexB format)
+            // NAL reformating to bitstream format needed
+            ByteIOContext *pb;
+            if (url_open_dyn_buf(&pb) < 0)
+            {
+                return false;
+            }
+
+            m_annexb = true;
+            isom_write_avcc(pb, extradata, extrasize);
+            // unhook from ffmpeg's extradata
+            extradata = NULL;
+            // extract the avcC atom data into extradata then write it into avcCData for VDADecoder
+            extrasize = url_close_dyn_buf(pb, &extradata);
+            // CFDataCreate makes a copy of extradata contents
+            avc_cdata = CFDataCreate(kCFAllocatorDefault,
+                                    (const uint8_t*)extradata, extrasize);
+            // done with the converted extradata, we MUST free using av_free
+            av_free(extradata);
         }
         else
         {
-            m_annexb = true;
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Invalid avcC atom data");
+            return false;
         }
     }
     else
     {
+        if (extradata[4] == 0xFE)
+        {
+            // video content is from so silly encoder that think 3 byte NAL sizes
+            // are valid, setup to convert 3 byte NAL sizes to 4 byte.
+            extradata[4] = 0xFF;
+            m_convert_3byteTo4byteNALSize = true;
+        }
+        // CFDataCreate makes a copy of extradata contents
         avc_cdata = CFDataCreate(kCFAllocatorDefault, (const uint8_t*)extradata,
-                                 extradata_size);   
-    }
-
-    if (!valid_extradata)
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "Invalid avcC atom data");
-        return false;
+                                 extrasize);
     }
 
     OSType format = 'avc1';
+
+    // check the avcC atom's sps for number of reference frames and
+    // bail if interlaced, VDA does not handle interlaced h264.
+    uint32_t avcc_len = CFDataGetLength(avc_cdata);
+    if (avcc_len < 8)
+    {
+        // avcc atoms with length less than 8 are borked.
+        CFRelease(avc_cdata);
+        return false;
+    }
+    bool interlaced = false;
+    uint8_t *spc = (uint8_t*)CFDataGetBytePtr(avc_cdata) + 6;
+    uint32_t sps_size = VDA_RB16(spc);
+    if (sps_size)
+    {
+        H264Parser *h264_parser = new H264Parser();
+        h264_parser->parse_SPS(spc+3, sps_size-1,
+                              interlaced, m_max_ref_frames);
+        delete h264_parser;
+    }
+    else
+    {
+        m_max_ref_frames = avctx->refs;
+    }
+    if (interlaced)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Possible interlaced content. Aborting");
+        CFRelease(avc_cdata);
+        return false;
+    }
+    if (m_max_ref_frames == 0)
+    {
+        m_max_ref_frames = 2;
+    }
+
+    if (avctx->profile == FF_PROFILE_H264_MAIN && avctx->level == 32 &&
+        m_max_ref_frames > 4)
+    {
+        // Main@L3.2, VDA cannot handle greater than 4 reference frames
+        LOG(VB_GENERAL, LOG_ERR,
+            LOC + "Main@L3.2 detected, VDA cannot decode.");
+        CFRelease(avc_cdata);
+        return false;
+    }
+
     int32_t width  = avctx->coded_width;
     int32_t height = avctx->coded_height;
-    m_size = QSize(width, height);
-    m_num_ref_frames = avctx->refs;
-    m_slice_count    = avctx->slice_count;
+    m_size         = QSize(width, height);
+    m_slice_count  = avctx->slice_count;
 
     int mbs = ceil((double)width / 16.0f);
     if (((mbs == 49)  || (mbs == 54 ) || (mbs == 59 ) || (mbs == 64) ||
@@ -249,10 +493,11 @@ bool PrivateDecoderVDA::Init(const QString &decoder,
     {
         LOG(VB_PLAYBACK, LOG_INFO, LOC +
             QString("Created VDA decoder: Size %1x%2 Ref Frames %3 "
-                    "Slices %4 AnnexB %5")
-            .arg(width).arg(height).arg(m_num_ref_frames).arg(m_slice_count)
-            .arg(m_annexb ? "Yes" : "No"));
+                    "Slices %5 AnnexB %6")
+            .arg(width).arg(height).arg(m_max_ref_frames)
+            .arg(m_slice_count).arg(m_annexb ? "Yes" : "No"));
     }
+    m_max_ref_frames = std::min(m_max_ref_frames, 5);
     return ok;
 }
 
@@ -274,7 +519,7 @@ void PrivateDecoderVDA::PopDecodedFrame(void)
     QMutexLocker lock(&m_frame_lock);
     if (m_decoded_frames.isEmpty())
         return;
-    CVPixelBufferRelease(m_decoded_frames.last().buffer);    
+    CVPixelBufferRelease(m_decoded_frames.last().buffer);
     m_decoded_frames.removeLast();
 }
 
@@ -292,7 +537,7 @@ int  PrivateDecoderVDA::GetFrame(AVStream *stream,
                                  AVPacket *pkt)
 {
     if (!pkt)
-        
+
     CocoaAutoReleasePool pool;
     int result = -1;
     if (!m_lib || !stream)
@@ -304,15 +549,54 @@ int  PrivateDecoderVDA::GetFrame(AVStream *stream,
 
     if (pkt)
     {
-        CFDataRef data;
+        CFDataRef avc_demux;
         CFDictionaryRef params;
         if (m_annexb)
         {
-            if (!RewritePacket(pkt->data, pkt->size, data))
-                return -1;
+            // convert demuxer packet from bytestream (AnnexB) to bitstream
+            ByteIOContext *pb;
+            int demuxer_bytes;
+            uint8_t *demuxer_content;
+
+            if(url_open_dyn_buf(&pb) < 0)
+            {
+                return result;
+            }
+            demuxer_bytes = avc_parse_nal_units(pb, pkt->data, pkt->size);
+            demuxer_bytes = url_close_dyn_buf(pb, &demuxer_content);
+            avc_demux = CFDataCreate(kCFAllocatorDefault, demuxer_content, demuxer_bytes);
+            av_free(demuxer_content);
+        }
+        else if (m_convert_3byteTo4byteNALSize)
+        {
+            // convert demuxer packet from 3 byte NAL sizes to 4 byte
+            ByteIOContext *pb;
+            if (url_open_dyn_buf(&pb) < 0)
+            {
+                return result;
+            }
+
+            uint32_t nal_size;
+            uint8_t *end = pkt->data + pkt->size;
+            uint8_t *nal_start = pkt->data;
+            while (nal_start < end)
+            {
+                nal_size = VDA_RB24(nal_start);
+                put_be32(pb, nal_size);
+                nal_start += 3;
+                put_buffer(pb, nal_start, nal_size);
+                nal_start += nal_size;
+            }
+
+            uint8_t *demuxer_content;
+            int demuxer_bytes = url_close_dyn_buf(pb, &demuxer_content);
+            avc_demux = CFDataCreate(kCFAllocatorDefault, demuxer_content, demuxer_bytes);
+            av_free(demuxer_content);
         }
         else
-            data = CFDataCreate(kCFAllocatorDefault, pkt->data, pkt->size);
+        {
+            avc_demux = CFDataCreate(kCFAllocatorDefault, pkt->data, pkt->size);
+        }
 
         CFStringRef keys[4] = { CFSTR("FRAME_PTS"),
                                 CFSTR("FRAME_INTERLACED"), CFSTR("FRAME_TFF"),
@@ -332,15 +616,15 @@ int  PrivateDecoderVDA::GetFrame(AVStream *stream,
                                     &kCFTypeDictionaryValueCallBacks);
 
         INIT_ST;
-        vda_st = m_lib->decoderDecode((VDADecoder)m_decoder, 0, data, params);
+        vda_st = m_lib->decoderDecode((VDADecoder)m_decoder, 0, avc_demux, params);
         CHECK_ST;
         if (vda_st == kVDADecoderNoErr)
             result = pkt->size;
-        CFRelease(data);
+        CFRelease(avc_demux);
         CFRelease(params);
     }
 
-    if (m_decoded_frames.size() < m_num_ref_frames)
+    if (m_decoded_frames.size() < m_max_ref_frames)
         return result;
 
     *got_picture_ptr = 1;
@@ -403,7 +687,7 @@ void PrivateDecoderVDA::VDADecoderCallback(void *decompressionOutputRefCon,
         LOG(VB_GENERAL, LOG_ERR, LOC + "Callback: Decoder dropped frame");
         return;
     }
-    
+
     if (!imageBuffer)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
@@ -480,109 +764,4 @@ void PrivateDecoderVDA::VDADecoderCallback(void *decompressionOutputRefCon,
         decoder->m_decoded_frames.insert(i, frame);
         decoder->m_frames_decoded++;
     }
-}
-
-bool PrivateDecoderVDA::RewriteAvcc(uint8_t **data, int &len,
-                                    CFDataRef &data_out)
-{
-    if (len < 7)
-        return false;
-
-    uint32_t sync = 0xffffffff;
-    const uint8_t *next  = NULL;
-    const uint8_t *begin = *data;
-    const uint8_t *end   = begin + len;
-    const uint8_t *sps = NULL, *spsend = NULL;
-    const uint8_t *pps = NULL, *ppsend = NULL;
-    uint8_t this_nal = 0;
-
-    while (begin < end)
-    {
-        begin = ff_find_start_code(begin, end, &sync);
-        if ((sync & 0xffffff00) != 0x00000100)
-            continue;
-
-        this_nal = *(begin -1) & 0x1f;
-        next = ff_find_start_code(begin, end, &sync);
-
-        if (this_nal == 7 && next)
-        {
-            sps = begin - 1;
-            spsend = next;
-        }
-        if (this_nal == 8 && next)
-        {
-            pps = begin - 1;
-            ppsend = next;
-        }
-    }
-
-    if (!sps || !spsend)
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to find sps.");
-        return false;
-    }
-
-    int spssize = spsend - sps;
-    int ppssize = pps ? ppsend - pps : 0;
-    ByteIOContext *pb;
-    if (url_open_dyn_buf(&pb) < 0)
-        return false;
-
-    put_byte(pb, 1);      /* version */
-    put_byte(pb, sps[1]); /* profile */
-    put_byte(pb, sps[2]); /* profile compat */
-    put_byte(pb, sps[3]); /* level */
-    put_byte(pb, 0xff);   /* 6 bits reserved (111111) + 2 bits nal size length - 1 (11) */
-    put_byte(pb, 0xe1);   /* 3 bits reserved (111) + 5 bits number of sps (00001) */
-
-    put_be16(pb, spssize);
-    put_buffer(pb, sps, spssize);
-    if (pps)
-    {
-        put_byte(pb, 1); /* number of pps */
-        put_be16(pb, ppssize);
-        put_buffer(pb, pps, ppssize);
-    }
-    *data = NULL;
-    len = url_close_dyn_buf(pb, data);
-    data_out = CFDataCreate(kCFAllocatorDefault,
-                            (const uint8_t*)*data, len);
-    av_free(*data);
-    return true;
-}
-
-bool PrivateDecoderVDA::RewritePacket(uint8_t *data, int len,
-                                      CFDataRef &data_out)
-{
-    ByteIOContext *pb;
-    if (url_open_dyn_buf(&pb) < 0)
-        return false;
-
-    uint32_t sync = 0xffffffff;
-    const uint8_t *next  = NULL;
-    const uint8_t *begin = data;
-    const uint8_t *end   = begin + len;
-    begin = ff_find_start_code(begin, end, &sync);
-    while (begin < end)
-    {
-        const uint8_t* this_start = begin - 1;
-        next = ff_find_start_code(begin, end, &sync);
-        const uint8_t* this_end = next;
-        if (this_end != end)
-        {
-            while (((this_end - data) > 4) && *(this_end - 5) == 0)
-                this_end--;
-            this_end -= 4;
-        }
-        int size = this_end - this_start;
-        put_be32(pb, size);
-        put_buffer(pb, this_start, size);
-        begin = next;
-    }
-    uint8_t *newpkt;
-    int size = url_close_dyn_buf(pb, &newpkt);
-    data_out = CFDataCreate(kCFAllocatorDefault, newpkt, size);
-    av_free(newpkt);
-    return true;
 }

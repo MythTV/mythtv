@@ -1,3 +1,6 @@
+// This is an automatically generated file
+// Do not edit
+
 void strings_null() {
     ThemeUI::tr("A high quality profile giving approx. 1 hour of video on a single layer DVD");
     ThemeUI::tr("A standard play profile giving approx. 2 hour of video on a single layer DVD");
@@ -88,6 +91,16 @@ void strings_null() {
     ThemeUI::tr("Ok");
     ThemeUI::tr("Video Category");
     ThemeUI::tr("x.xx Gb");
+    ThemeUI::tr("Select Destination:");
+    ThemeUI::tr("Parental level: %1");
+    ThemeUI::tr("Old size:");
+    ThemeUI::tr("New size:");
+    ThemeUI::tr("Select a theme:");
+    ThemeUI::tr("Menu");
+    ThemeUI::tr("Chapter");
+    ThemeUI::tr("Detail");
+    ThemeUI::tr("Select File to Import");
+    ThemeUI::tr("Search");
     ThemeUI::tr("Add video");
     ThemeUI::tr("Create DVD");
     ThemeUI::tr("Create Archive");

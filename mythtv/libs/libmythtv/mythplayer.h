@@ -216,6 +216,7 @@ class MTV_PUBLIC MythPlayer
     bool    HasTVChainNext(void) const;
     bool    CanSupportDoubleRate(void);
     bool    GetScreenShot(int width = 0, int height = 0, QString filename = "");
+    bool    IsWatchingInprogress(void) const;
 
     // Non-const gets
     virtual char *GetScreenGrabAtFrame(uint64_t frameNum, bool absolute,
@@ -340,6 +341,8 @@ class MTV_PUBLIC MythPlayer
     static const int kNightModeBrightenssAdjustment;
     static const int kNightModeContrastAdjustment;
 
+    void SaveTotalFrames(void);
+
   protected:
     // Initialization
     void OpenDummy(void);
@@ -441,7 +444,7 @@ class MTV_PUBLIC MythPlayer
     bool EnableEdit(void);
     bool HandleProgramEditorActions(QStringList &actions, long long frame = -1);
     bool GetEditMode(void) { return deleteMap.IsEditing(); }
-    void DisableEdit(bool save = true);
+    void DisableEdit(int howToSave);
     bool IsInDelete(uint64_t frame);
     uint64_t GetNearestMark(uint64_t frame, bool right);
     bool IsTemporaryMark(uint64_t frame);
@@ -476,6 +479,7 @@ class MTV_PUBLIC MythPlayer
     int  GetTrack(uint type);
     int  ChangeTrack(uint type, int dir);
     void ChangeCaptionTrack(int dir);
+    bool HasCaptionTrack(int mode);
     int  NextCaptionTrack(int mode);
     void DoDisableForcedSubtitles(void);
     void DoEnableForcedSubtitles(void);
@@ -588,6 +592,7 @@ class MTV_PUBLIC MythPlayer
     mutable QMutex decoderSeekLock;
     bool           totalDecoderPause;
     bool           decoderPaused;
+    bool           inJumpToProgramPause;
     bool           pauseDecoder;
     bool           unpauseDecoder;
     bool volatile  killdecoder;
@@ -671,6 +676,7 @@ class MTV_PUBLIC MythPlayer
     // General Caption/Teletext/Subtitle support
     uint     textDisplayMode;
     uint     prevTextDisplayMode;
+    uint     prevNonzeroTextDisplayMode;
 
     // Support for analog captions and teletext
     // (i.e. Vertical Blanking Interval (VBI) encoded data.)

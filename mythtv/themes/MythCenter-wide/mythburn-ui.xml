@@ -1,0 +1,591 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mythuitheme SYSTEM "http://www.mythtv.org/schema/mythuitheme.dtd">
+<!--
+
+MythArchive GUI theme
+
+-->
+<mythuitheme>
+
+    <window name="profilepopup">
+        <area>-1,-1,413,426</area>
+
+        <animation trigger="AboutToShow">
+            <section>
+                <alpha duration="750" start="0" end="255" easingcurve="OutCubic"/>
+                <zoom duration="750" start="0" end="100" easingcurve="OutCubic"/>
+            </section>
+        </animation>
+
+        <animation trigger="AboutToHide">
+            <section>
+                <alpha duration="1000" start="255" end="0" easingcurve="InQuart"/>
+                <zoom duration="1000" start="100" end="0" easingcurve="InQuart"/>
+            </section>
+        </animation>
+
+        <imagetype name="backimg">
+            <area>0,0,413,426</area>
+            <filename>mythdialogbox-background.png</filename>
+        </imagetype>
+
+        <textarea name="title" from="basetextarea">
+            <area>20,20,360,40</area>
+            <font>basemedium</font>
+            <align>hcenter,top</align>
+            <value>Change Encoding Profile</value>
+        </textarea>
+
+        <textarea name="caption_text" from="basetextarea">
+            <area>20,70,360,30</area>
+            <align>hcenter,top</align>
+        </textarea>
+
+        <buttonlist name="profile_list" from="baseselector">
+            <position>90,130</position>
+        </buttonlist>
+
+        <textarea name="description_text" from="basetextarea">
+            <area>25,180,350,90</area>
+            <align>allcenter</align>
+            <font>basesmallgrey</font>
+            <multiline>yes</multiline>
+        </textarea>
+
+       <textarea name="oldsize_text" from="basetextarea">
+            <area>30,300,200,60</area>
+            <font>basesmallpurple</font>
+            <align>left</align>
+        </textarea>
+
+       <textarea name="newsize_text" from="basetextarea">
+            <area>170,300,200,60</area>
+            <font>basesmallpurple</font>
+            <align>right</align>
+        </textarea>
+
+        <button name="ok_button" from="basebutton">
+            <position>125,350</position>
+            <value>OK</value>
+        </button>
+    </window>
+
+    <!--
+        theme selector
+    -->
+
+    <window name="themeselector">
+
+        <textarea name="title" from="basetextarea">
+            <area>0,10,1280,50</area>
+            <font>baselarge</font>
+            <align>allcenter</align>
+            <value>DVD Menu Theme</value>
+        </textarea>
+
+        <shape name="topbackground" from="basebackground">
+            <area>30,70,1220,170</area>
+        </shape>
+
+        <textarea name="themetitle" from="basetextarea">
+            <area>60,95,500,50</area>
+            <font>basesmallyellow</font>
+            <value>Select a theme</value>
+        </textarea>
+
+        <buttonlist name="theme_selector" from="basewideselector">
+            <position>60,180</position>
+        </buttonlist>
+
+        <imagetype name="theme_image" >
+            <area>1060,100,145,125</area>
+        </imagetype>
+
+        <!--
+            theme preview images
+        -->
+
+        <shape name="middlebackground" from="basebackground">
+            <area>30,260,1220,220</area>
+        </shape>
+
+        <imagetype name="intro_image">
+            <area>100,275,195,162</area>
+        </imagetype>
+
+        <textarea name="introtitle" from="basetextarea">
+            <area>100,435,162,40</area>
+            <align>hcenter</align>
+            <value>Intro</value>
+        </textarea>
+
+        <imagetype name="mainmenu_image">
+            <area>390,275,195,162</area>
+        </imagetype>
+
+        <textarea name="menutitle" from="introtitle">
+            <area>390,435,195,40</area>
+            <value>Main Menu</value>
+        </textarea>
+
+        <imagetype name="chapter_image">
+            <area>680,275,195,162</area>
+        </imagetype>
+
+        <textarea name="chaptertitle" from="introtitle">
+            <area>680,435,195,40</area>
+            <value>Chapter Menu</value>
+        </textarea>
+
+        <imagetype name="details_image">
+            <area>970,275,195,162</area>
+        </imagetype>
+
+        <textarea name="detailtitle" from="introtitle">
+            <area>970,435,195,40</area>
+            <value>Details</value>
+        </textarea>
+
+        <!--
+            theme description
+        -->
+
+        <shape name="bottombackground" from="basebackground">
+            <area>30,500,1220,120</area>
+        </shape>
+
+        <textarea name="themedescription" from="basetextarea">
+            <area>60,515,1170,90</area>
+            <multiline>yes</multiline>
+        </textarea>
+
+        <button name="cancel_button" from="basebutton">
+            <position>55,650</position>
+            <value>Cancel</value>
+        </button>
+
+        <button name="prev_button" from="basebutton">
+            <position>900,650</position>
+            <value>Prev</value>
+        </button>
+
+        <button name="next_button" from="basebutton">
+            <position>1060,650</position>
+            <value>Next</value>
+        </button>
+
+    </window>
+
+    <!--
+        ******************************************************************
+        The main mythburn screen
+        *******************************************************************
+    -->
+
+    <window name="mythburn">
+
+        <fontdef name="smallstatsfont" from="basesmall">
+            <color>#ffffff</color>
+            <size>10</size>
+        </fontdef>
+
+        <fontdef name="statserror" from="basesmall">
+            <color>#ff0000</color>
+            <size>10</size>
+        </fontdef>
+
+        <shape name="bottombackground" from="basebackground">
+            <area>30,70,1220,500</area>
+        </shape>
+
+        <textarea name="title" from="basetextarea">
+            <area>0,10,1280,50</area>
+            <font>baselarge</font>
+            <align>hcenter</align>
+            <value>Select Archive Items</value>
+        </textarea>
+
+        <buttonlist name="archivelist">
+            <area>60,80,1180,420</area>
+            <layout>vertical</layout>
+            <spacing>5</spacing>
+            <buttonarea>0,0,1145,420</buttonarea>
+            <statetype name="buttonitem">
+                <area>0,0,1145,100</area>
+                <state name="active">
+                    <shape name="buttonbackground">
+                        <area>0,0,1145,100</area>
+                        <fill style="gradient">
+                            <gradient start="#505050" end="#000000" alpha="200" />
+                        </fill>
+                    </shape>
+                    <textarea name="buttontext" from="basetextarea">
+                        <area>10,5,470,30</area>
+                        <font>basesmallyellow</font>
+                    </textarea>
+                    <textarea name="subtitle" from="basetextarea">
+                        <area>10,40,300,30</area>
+                        <font>basesmallpurple</font>
+                    </textarea>
+                    <textarea name="date" from="basetextarea">
+                        <area>10,70,285,30</area>
+                    </textarea>
+                    <textarea name="size" from="basetextarea">
+                        <area>930,5,200,30</area>
+                        <align>right</align>
+                    </textarea>
+                    <textarea name="profile" from="size">
+                        <area>830,40,300,30</area>
+                    </textarea>
+                    <!-- optional cut status text
+                    <textarea name="cutlist" from="size">
+                        <area>830,70,300,30</area>
+                    </textarea>
+                    -->
+                    <statetype name="cutliststatus">
+                        <position>1095,70</position>
+                        <state name="none"></state>
+                        <state name="using">
+                            <imagetype name="statusimage">
+                                <filename>ma_cutlist.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="notusing">
+                            <imagetype name="statusimage">
+                                <filename>ma_cutlist_off.png</filename>
+                            </imagetype>
+                        </state>
+                    </statetype>
+                    <statetype name="movestate">
+                        <position>1070,77</position>
+                        <state name="off"></state>
+                        <state name="on">
+                            <imagetype name="statusimage">
+                                <filename>ma_updown.png</filename>
+                            </imagetype>
+                        </state>
+                    </statetype>
+
+                </state>
+                <state name="selectedactive" from="active">
+                    <shape name="buttonbackground">
+                        <fill style="gradient">
+                            <gradient start="#52CA38" end="#349838" />
+                        </fill>
+                    </shape>
+                    <textarea name="buttontext">
+                        <font>basesmallyellow</font>
+                    </textarea>
+                </state>
+               <state name="selectedinactive" from="active">
+                    <shape name="buttonbackground">
+                        <fill style="gradient">
+                            <gradient start="#52CA38" end="#349838" alpha="100" />
+                        </fill>
+                    </shape>
+
+                    <textarea name="buttontext">
+                        <font>basesmallyellow</font>
+                    </textarea>
+                </state>
+            </statetype>
+            <statetype name="upscrollarrow">
+                <position>240,370</position>
+                <state type="on">
+                    <imagetype name="upon">
+                        <filename>up_arrow.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
+            <statetype name="downscrollarrow">
+                <position>456,370</position>
+                <state type="on">
+                    <imagetype name="dnon">
+                        <filename>down_arrow.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
+        </buttonlist>
+
+        <textarea name="nofiles" from="basetextarea">
+            <area>50,70,1100,175</area>
+            <align>allcenter</align>
+            <value>No files are selected for archive</value>
+        </textarea>
+
+        <button name="addrecording_button" from="basewidebutton">
+            <position>60,510</position>
+            <value>Add Recording</value>
+        </button>
+
+        <button name="addvideo_button" from="basewidebutton">
+            <position>500,510</position>
+            <value>Add Video</value>
+        </button>
+
+        <button name="addfile_button" from="basewidebutton">
+            <position>920,510</position>
+            <value>Add File</value>
+        </button>
+
+        <progressbar name="size_bar" from="baseprogressbar">
+            <position>372,600</position>
+        </progressbar>
+
+        <textarea name="maxsize" from="basetextarea">
+            <area>798,580,100,30</area>
+            <font>smallstatsfont</font>
+            <align>right</align>
+        </textarea>
+
+        <textarea name="minsize" from="basetextarea">
+            <area>383,580,100,30</area>
+            <font>smallstatsfont</font>
+        </textarea>
+
+        <textarea name="currentsize" from="basetextarea">
+            <area>372,580,536,30</area>
+            <font>smallstatsfont</font>
+            <align>hcenter</align>
+        </textarea>
+
+        <textarea name="currentsize_error" from="currentsize">
+            <font>statserror</font>
+        </textarea>
+
+        <button name="cancel_button" from="basebutton">
+            <position>55,650</position>
+            <value>Cancel</value>
+        </button>
+
+        <button name="prev_button" from="basebutton">
+            <position>900,650</position>
+            <value>Prev</value>
+        </button>
+
+        <button name="next_button" from="basebutton">
+            <position>1060,650</position>
+            <value>Next</value>
+        </button>
+
+    </window>
+
+  <!--
+      *******************************************************************
+      The editmetadata dialog
+      *******************************************************************
+  -->
+
+  <window name="edit_metadata">
+
+        <textarea name="screentitle">
+            <area>15,5,800,50</area>
+            <font>baselarge</font>
+            <value>Archive Item Details</value>
+        </textarea>
+
+        <!--
+            Labels
+        -->
+
+        <textarea name="title_label" from="basetextarea">
+            <area>45,70,370,50</area>
+            <font>basesmall</font>
+            <align>right,vcenter</align>
+            <value>Title:</value>
+        </textarea>
+
+        <textarea name="subtitle_label" from="title_label">
+            <area>45,135,370,50</area>
+            <value>Subtitle:</value>
+        </textarea>
+
+        <textarea name="startdate_label" from="title_label">
+            <area>45,200,370,50</area>
+            <value>Start Date:</value>
+        </textarea>
+
+        <textarea name="starttime_label" from="title_label">
+            <area>45,265,370,50</area>
+            <value>Time:</value>
+        </textarea>
+
+        <textarea name="description_label" from="title_label">
+            <area>45,330,370,50</area>
+            <value>Description:</value>
+        </textarea>
+
+        <!--
+            edits
+        -->
+
+        <textedit name="title_edit" from="basetextedit">
+            <area>425,70,600,50</area>
+        </textedit>
+
+        <textedit name="subtitle_edit" from="basetextedit">
+            <area>425,135,600,50</area>
+        </textedit>
+
+        <textedit name="startdate_edit" from="basetextedit">
+            <position>425,200</position>
+        </textedit>
+
+        <textedit name="starttime_edit" from="basetextedit">
+            <position>425,265</position>
+        </textedit>
+
+        <textedit name="description_edit" from="basemultilinetextedit">
+            <area>425,330,600,300</area>
+        </textedit>
+
+        <!--
+            Push buttons
+        -->
+        <button name="ok_button" from="basebutton">
+            <position>480,650</position>
+            <value>OK</value>
+        </button>
+
+        <button name="cancel_button" from="basebutton">
+            <position>650,650</position>
+            <value>Cancel</value>
+        </button>
+    </window>
+
+  <window name="thumbfinder">
+
+        <textarea name="title" from="basetextarea">
+            <area>0,10,800,45</area>
+            <font>baselarge</font>
+            <align>allcenter</align>
+            <value>Thumb Image Selector</value>
+        </textarea>
+
+        <imagetype name="topbgimage">
+            <area>420,65,365,80</area>
+            <filename>trans-cr-background.png</filename>
+        </imagetype>
+
+        <button name="frame_button">
+            <position>22,65</position>
+            <statetype name="buttonstate">
+                <state name="active">
+                    <imagetype name="background">
+                        <filename>ma_frame_button_off.png</filename>
+                    </imagetype>
+                </state>
+                <state name="selected" from="active">
+                    <imagetype name="background">
+                        <filename>ma_frame_button_on.png</filename>
+                    </imagetype>
+                </state>
+                <state name="disabled" from="active" />
+                <state name="pushed" from="active">
+                    <imagetype name="background">
+                        <filename>ma_frame_button_on.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
+        </button>
+
+        <imagetype name="frameimage">
+            <area>27,70,360,229</area>
+            <filename>ma_black.png</filename>
+        </imagetype>
+
+        <textarea name="label1" from="basetextarea">
+            <area>420,75,365,20</area>
+            <font>basesmallyellow</font>
+            <align>hcenter</align>
+            <value>Current Position</value>
+        </textarea>
+
+        <textarea name="currentpos" from="basetextarea">
+            <area>420,95,365,40</area>
+            <align>hcenter</align>
+        </textarea>
+
+        <imagetype name="bottombgimage">
+            <area>420,175,365,80</area>
+            <filename>trans-cr-background.png</filename>
+        </imagetype>
+
+        <textarea name="label2" from="basetextarea">
+            <area>420,185,365,20</area>
+            <align>hcenter</align>
+            <font>basesmallyellow</font>
+            <value>Seek Amount</value>
+        </textarea>
+
+        <textarea name="seekamount" from="basetextarea">
+            <area>420,210,365,40</area>
+            <align>hcenter</align>
+            <value>Frame</value>
+        </textarea>
+
+        <imagetype name="positionimage">
+            <area>425,142,350,25</area>
+            <filename>trans-cr-background.png</filename>
+        </imagetype>
+
+        <button name="cancel_button" from="basebutton">
+            <position>425,260</position>
+            <value>Cancel</value>
+        </button>
+
+        <button name="save_button" from="basebutton">
+            <position>625,260</position>
+            <value>Save</value>
+        </button>
+
+        <buttonlist name="thumblist">
+            <area>25,320,760,280</area>
+            <layout>grid</layout>
+            <spacing>5</spacing>
+            <buttonarea>0,0,760,270</buttonarea>
+            <statetype name="buttonitem">
+                <state name="active">
+                    <area>0,0,144,125</area>
+                    <shape name="buttonbackground">
+                        <area>0,0,100%,100%</area>
+                        <fill style="gradient">
+                            <gradient start="#505050" end="#000000" alpha="200" />
+                        </fill>
+                    </shape>
+                    <textarea name="buttontext" from="basetextarea">
+                        <area>5,100,134,30</area>
+                        <font>basesmall</font>
+                        <align>hcenter,top</align>
+                    </textarea>
+                    <imagetype name="buttonimage">
+                        <area>5,5,134,90</area>
+                        <preserveaspect>false</preserveaspect>
+                    </imagetype>
+                </state>
+                <state name="selectedactive" from="active">
+                    <shape name="buttonbackground">
+                        <fill style="gradient">
+                            <gradient start="#52CA38" end="#349838" alpha="255" />
+                        </fill>
+                    </shape>
+                    <textarea name="buttontext">
+                        <font>basesmall</font>
+                    </textarea>
+                </state>
+                <state name="selectedinactive" from="active">
+                    <shape name="buttonbackground">
+                        <fill style="gradient">
+                            <gradient start="#52CA38" end="#349838" alpha="100" />
+                        </fill>
+                    </shape>
+                    <textarea name="buttontext">
+                        <font>basesmallpurple</font>
+                    </textarea>
+                </state>
+            </statetype>
+        </buttonlist>
+
+    </window>
+
+</mythuitheme>

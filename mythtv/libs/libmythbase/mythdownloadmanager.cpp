@@ -8,6 +8,8 @@
 #include <QNetworkCookieJar>
 #include <QAuthenticator>
 #include <QTextStream>
+#include <QNetworkProxy>
+#include <QMutexLocker>
 
 #include "stdlib.h"
 
@@ -28,6 +30,7 @@
 using namespace std;
 
 #define LOC      QString("DownloadManager: ")
+#define CACHE_REDIRECTION_LIMIT     10
 
 MythDownloadManager *downloadManager = NULL;
 QMutex               dmCreateLock;
@@ -92,11 +95,14 @@ class MythDownloadInfo
 
 
 /** \brief A subclassed QNetworkCookieJar that allows for reading and writing
- *         cookie files that contain raw formatted cookies.
+ *         cookie files that contain raw formatted cookies and copying the
+ *         cookie jar to share between threads.
  */
 class MythCookieJar : public QNetworkCookieJar
 {
   public:
+    MythCookieJar();
+    MythCookieJar(MythCookieJar &old);
     void load(const QString &filename);
     void save(const QString &filename);
 };
@@ -188,10 +194,12 @@ MythDownloadManager::MythDownloadManager() :
     MThread("DownloadManager"),
     m_manager(NULL),
     m_diskCache(NULL),
+    m_proxy(NULL),
     m_infoLock(new QMutex(QMutex::Recursive)),
     m_queueThread(NULL),
     m_runThread(false),
-    m_isRunning(false)
+    m_isRunning(false),
+    m_inCookieJar(NULL)
 {
 }
 
@@ -205,6 +213,9 @@ MythDownloadManager::~MythDownloadManager()
     wait();
 
     delete m_infoLock;
+
+    if (m_inCookieJar)
+        delete m_inCookieJar;
 }
 
 /** \brief Runs a loop to process incoming download requests and
@@ -225,10 +236,15 @@ void MythDownloadManager::run(void)
 
     m_manager = new QNetworkAccessManager(this);
     m_diskCache = new QNetworkDiskCache(this);
+    m_proxy = new QNetworkProxy();
     m_diskCache->setCacheDirectory(GetConfDir() + "/Cache-" +
                                    QCoreApplication::applicationName() + "-" +
                                    gCoreContext->GetHostName());
     m_manager->setCache(m_diskCache);
+
+    // Set the proxy for the manager to be the application default proxy,
+    // which has already been setup
+    m_manager->setProxy(*m_proxy);
 
     // make sure the cookieJar is created in the same thread as the manager
     // and set its parent to NULL so it can be shared between managers
@@ -240,6 +256,11 @@ void MythDownloadManager::run(void)
     m_isRunning = true;
     while (m_runThread)
     {
+        if (m_inCookieJar)
+        {
+            LOG(VB_GENERAL, LOG_DEBUG, "Updating DLManager's Cookie Jar");
+            updateCookieJar();
+        }
         m_infoLock->lock();
         downloading = !m_downloadInfos.isEmpty();
         itemsInQueue = !m_downloadQueue.isEmpty();
@@ -287,7 +308,10 @@ void MythDownloadManager::run(void)
             if (dlInfo->m_url.startsWith("myth://"))
                 downloadRemoteFile(dlInfo);
             else
+            {
+                QMutexLocker cLock(&m_cookieLock);
                 downloadQNetworkRequest(dlInfo);
+            }
 
             m_downloadInfos[qurl.toString()] = dlInfo;
         }
@@ -483,7 +507,7 @@ bool MythDownloadManager::download(QNetworkRequest *req, QByteArray *data)
  *  \param dest    Destination filename.
  *  \param reload  Whether to force reloading of the URL or not
  *  \param authCallback AuthCallback function for use with authentication
- *  \param authArg Opaque argument for callback function 
+ *  \param authArg Opaque argument for callback function
  *  \param header  Optional HTTP header to add to the request
  *  \param headerVal Value for the optional HTTP header to add to the request
  *  \return true if download was successful, false otherwise.
@@ -583,7 +607,7 @@ bool MythDownloadManager::post(QNetworkRequest *req, QByteArray *data)
  *  \param url      URL to post to
  *  \param data     Location holding post and response data
  *  \param authCallback AuthCallback function for authentication
- *  \param authArg Opaque argument for callback function 
+ *  \param authArg Opaque argument for callback function
  *  \param header  Optional HTTP header to add to the request
  *  \param headerVal Value for the optional HTTP header to add to the request
  *  \return true if post was successful, false otherwise.
@@ -645,15 +669,26 @@ void MythDownloadManager::downloadQNetworkRequest(MythDownloadInfo *dlInfo)
 
         // Handle redirects, we want the metadata of the file headers
         QString redirectLoc;
+        int limit = 0;
         while (!(redirectLoc = getHeader(qurl, "Location")).isNull())
         {
+            if (limit == CACHE_REDIRECTION_LIMIT)
+            {
+                LOG(VB_GENERAL, LOG_WARNING, QString("Cache Redirection limit "
+                                                     "reached for %1")
+                                                    .arg(qurl.toString()));
+                return;
+            }
             qurl.setUrl(redirectLoc);
+            limit++;
         }
 
         LOG(VB_NETWORK, LOG_DEBUG, QString("Checking cache for %1")
                                                     .arg(qurl.toString()));
 
+        m_infoLock->lock();
         QNetworkCacheMetaData urlData = m_manager->cache()->metaData(qurl);
+        m_infoLock->unlock();
         if ((urlData.isValid()) &&
             ((!urlData.expirationDate().isValid()) ||
              (urlData.expirationDate().secsTo(now) < 10)))
@@ -680,9 +715,9 @@ void MythDownloadManager::downloadQNetworkRequest(MythDownloadInfo *dlInfo)
                              QNetworkRequest::PreferCache);
 
     request.setRawHeader("User-Agent",
-                         "MythDownloadManager v" MYTH_BINARY_VERSION);
+                         "MythTV v" MYTH_BINARY_VERSION " MythDownloadManager");
 
-    if (dlInfo->m_header && dlInfo->m_headerVal && 
+    if (dlInfo->m_header && dlInfo->m_headerVal &&
         !dlInfo->m_header->isEmpty() && !dlInfo->m_headerVal->isEmpty())
     {
         request.setRawHeader(*(dlInfo->m_header), *(dlInfo->m_headerVal));
@@ -1000,12 +1035,23 @@ void MythDownloadManager::downloadFinished(MythDownloadInfo *dlInfo)
         // already exist
         QUrl fileUrl = dlInfo->m_url;
         QString redirectLoc;
+        int limit = 0;
         while (!(redirectLoc = getHeader(fileUrl, "Location")).isNull())
         {
+            if (limit == CACHE_REDIRECTION_LIMIT)
+            {
+                LOG(VB_GENERAL, LOG_WARNING, QString("Cache Redirection limit "
+                                                     "reached for %1")
+                                                    .arg(fileUrl.toString()));
+                return;
+            }
             fileUrl.setUrl(redirectLoc);
+            limit++;
         }
 
+        m_infoLock->lock();
         QNetworkCacheMetaData urlData = m_manager->cache()->metaData(fileUrl);
+        m_infoLock->unlock();
         if (getHeader(urlData, "Date").isNull())
         {
             QNetworkCacheMetaData::RawHeaderList headers = urlData.rawHeaders();
@@ -1015,7 +1061,9 @@ void MythDownloadManager::downloadFinished(MythDownloadInfo *dlInfo)
                                         now.toString(dateFormat).toAscii());
             headers.append(newheader);
             urlData.setRawHeaders(headers);
+            m_infoLock->lock();
             m_manager->cache()->updateMetaData(urlData);
+            m_infoLock->unlock();
         }
         // End HACK
 
@@ -1239,9 +1287,18 @@ QDateTime MythDownloadManager::GetLastModified(const QString &url)
 
     // Deal with redirects, we want the cached data for the final url
     QString redirectLoc;
+    int limit = 0;
     while (!(redirectLoc = getHeader(cacheUrl, "Location")).isNull())
     {
+        if (limit == CACHE_REDIRECTION_LIMIT)
+        {
+            LOG(VB_GENERAL, LOG_WARNING, QString("Cache Redirection limit "
+                                                    "reached for %1")
+                                                .arg(cacheUrl.toString()));
+            return result;
+        }
         cacheUrl.setUrl(redirectLoc);
+        limit++;
     }
 
     m_infoLock->lock();
@@ -1303,6 +1360,8 @@ QDateTime MythDownloadManager::GetLastModified(const QString &url)
  */
 void MythDownloadManager::loadCookieJar(const QString &filename)
 {
+    QMutexLocker locker(&m_cookieLock);
+
     MythCookieJar *jar = new MythCookieJar;
     jar->load(filename);
     m_manager->setCookieJar(jar);
@@ -1313,11 +1372,78 @@ void MythDownloadManager::loadCookieJar(const QString &filename)
  */
 void MythDownloadManager::saveCookieJar(const QString &filename)
 {
+    QMutexLocker locker(&m_cookieLock);
+
     if (!m_manager->cookieJar())
         return;
 
     MythCookieJar *jar = static_cast<MythCookieJar *>(m_manager->cookieJar());
     jar->save(filename);
+}
+
+void MythDownloadManager::setCookieJar(QNetworkCookieJar *cookieJar)
+{
+    QMutexLocker locker(&m_cookieLock);
+    m_manager->setCookieJar(cookieJar);
+}
+
+/** \brief Copy from one cookie jar to another
+ *  \return new copy of the cookie jar
+ */
+QNetworkCookieJar *MythDownloadManager::copyCookieJar(void)
+{
+    QMutexLocker locker(&m_cookieLock);
+
+    if (!m_manager->cookieJar())
+        return NULL;
+
+    MythCookieJar *inJar = static_cast<MythCookieJar *>(m_manager->cookieJar());
+    MythCookieJar *outJar = new MythCookieJar(*inJar);
+
+    return static_cast<QNetworkCookieJar *>(outJar);
+}
+
+/** \brief Refresh the temporary cookie jar from another cookie jar
+ *  \param jar other cookie jar to update from
+ */
+void MythDownloadManager::refreshCookieJar(QNetworkCookieJar *jar)
+{
+    QMutexLocker locker(&m_cookieLock);
+    if (m_inCookieJar)
+        delete m_inCookieJar;
+
+    MythCookieJar *inJar = static_cast<MythCookieJar *>(jar);
+    MythCookieJar *outJar = new MythCookieJar(*inJar);
+    m_inCookieJar = static_cast<QNetworkCookieJar *>(outJar);
+
+    QMutexLocker locker2(&m_queueWaitLock);
+    m_queueWaitCond.wakeAll();
+}
+
+/** \brief Update the cookie jar from the temporary cookie jar
+ */
+void MythDownloadManager::updateCookieJar(void)
+{
+    QMutexLocker locker(&m_cookieLock);
+
+    MythCookieJar *inJar = static_cast<MythCookieJar *>(m_inCookieJar);
+    MythCookieJar *outJar = new MythCookieJar(*inJar);
+    m_manager->setCookieJar(static_cast<QNetworkCookieJar *>(outJar));
+
+    delete m_inCookieJar;
+    m_inCookieJar = NULL;
+}
+
+QString MythDownloadManager::getHeader(const QUrl& url, const QString& header)
+{
+    if (!m_manager || !m_manager->cache())
+        return QString::null;
+
+    m_infoLock->lock();
+    QNetworkCacheMetaData metadata = m_manager->cache()->metaData(url);
+    m_infoLock->unlock();
+
+    return getHeader(metadata, header);
 }
 
 /** \brief Gets the value of an HTTP header from the cache
@@ -1344,6 +1470,21 @@ QString MythDownloadManager::getHeader(const QNetworkCacheMetaData &cacheData,
 }
 
 
+/** \brief Creates a MythCookieJar from another MythCookieJar
+ *  \param old the MythCookieJar to copy
+ */
+MythCookieJar::MythCookieJar(MythCookieJar &old)
+{
+    const QList<QNetworkCookie> cookieList = old.allCookies();
+    setAllCookies(cookieList);
+}
+
+/** \brief Creates an empty MythCookieJar
+ */
+MythCookieJar::MythCookieJar()
+{
+}
+
 /** \brief Loads the cookie jar from a cookie file
  *  \param filename Filename of the cookie file to read.
  */
@@ -1356,7 +1497,7 @@ void MythCookieJar::load(const QString &filename)
         QString cookie = stream.readLine();
         cookieList << QNetworkCookie::parseCookies(cookie.toLocal8Bit());
     }
-    
+
     setAllCookies(cookieList);
 }
 

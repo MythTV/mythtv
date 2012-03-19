@@ -23,7 +23,6 @@
 #define MYTH_APPNAME_MYTHTRANSCODE "mythtranscode"
 #define MYTH_APPNAME_MYTHWELCOME "mythwelcome"
 #define MYTH_APPNAME_MYTHSHUTDOWN "mythshutdown"
-#define MYTH_APPNAME_MYTHMESSAGE "mythmessage"
 #define MYTH_APPNAME_MYTHLCDSERVER "mythlcdserver"
 #define MYTH_APPNAME_MYTHAVTEST "mythavtest"
 #define MYTH_APPNAME_MYTHMEDIASERVER "mythmediaserver"
@@ -76,18 +75,14 @@ class MBASE_PUBLIC MythCoreContext : public MythObservable, public MythSocketCBs
                            uint timeout_ms = kMythSocketLongTimeout,
                            bool error_dialog_desired = false);
 
-    void                ConfigureHostAddress(void);
-    QList<QHostAddress> MythHostAddress(void);
-    QList<QHostAddress> MythHostAddress4(void);
-    QList<QHostAddress> MythHostAddress6(void);
-
     QString GenMythURL(QString host = QString(), QString port = QString(),
                        QString path = QString(), QString storageGroup = QString());
 
     QString GenMythURL(QString host = QString(), int port = 0,
                        QString path = QString(), QString storageGroup = QString());
 
-    QString GetMasterHostPrefix(QString storageGroup = QString());
+    QString GetMasterHostPrefix(const QString &storageGroup = QString(),
+                                const QString &path = QString());
     QString GetMasterHostName(void);
     QString GetHostName(void);
     QString GetFilePrefix(void);
@@ -162,7 +157,7 @@ class MBASE_PUBLIC MythCoreContext : public MythObservable, public MythSocketCBs
     void OverrideSettingForSession(const QString &key, const QString &value);
 
     void dispatch(const MythEvent &event);
-    void dispatchNow(const MythEvent &event) MDEPRECATED;
+    void dispatchNow(const MythEvent &event); // MDEPRECATED;
 
     void InitLocale(void);
     const MythLocale *GetLocale(void) const;

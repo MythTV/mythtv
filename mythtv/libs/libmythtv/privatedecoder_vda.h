@@ -17,7 +17,7 @@
 class VDALibrary
 {
   public:
-    static VDALibrary* GetVDALibrary(void);
+    static MTV_PUBLIC VDALibrary* GetVDALibrary(void);
     VDALibrary();
     bool IsValid(void) const { return m_valid; }
 
@@ -84,10 +84,11 @@ class PrivateDecoderVDA : public PrivateDecoder
     QSize           m_size;
     QMutex          m_frame_lock;
     int32_t         m_frames_decoded;
-    int32_t         m_num_ref_frames;
     QList<VDAFrame> m_decoded_frames;
-    bool            m_annexb;
+    bool            m_annexb; //m_convert_bytestream
     uint32_t        m_slice_count;
+    bool            m_convert_3byteTo4byteNALSize;
+    int32_t         m_max_ref_frames;
 };
 
 #endif // PRIVATEDECODER_VDA_H

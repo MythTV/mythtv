@@ -22,7 +22,7 @@ class SERVICE_PUBLIC RecRuleList : public QObject
     // A Q_CLASSINFO entry with "<PropName>_type" as the key
     // and the type name as the value
 
-    Q_CLASSINFO( "RecRules_type", "DTC::RecRule");
+    Q_CLASSINFO( "RecRules", "type=DTC::RecRule");
 
     Q_PROPERTY( int          StartIndex     READ StartIndex      WRITE setStartIndex     )
     Q_PROPERTY( int          Count          READ Count           WRITE setCount          )

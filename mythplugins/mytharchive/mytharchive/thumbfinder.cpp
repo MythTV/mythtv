@@ -48,7 +48,7 @@
 #include <mythmainwindow.h>
 #include <mythdialogbox.h>
 #include <mythdirs.h>
-#include <util.h>
+#include <mythmiscutil.h>
 #include <mythuitext.h>
 #include <mythuibutton.h>
 #include <mythuiimage.h>
@@ -938,7 +938,6 @@ void ThumbFinder::showMenu()
 
     menuPopup->AddButton(tr("Exit, Save Thumbnails"), SLOT(savePressed()));
     menuPopup->AddButton(tr("Exit, Don't Save Thumbnails"), SLOT(cancelPressed()));
-    menuPopup->AddButton(tr("Cancel"), NULL);
 }
 
 void ThumbFinder::updatePositionBar(int64_t frame)

@@ -170,8 +170,7 @@ class MTV_PUBLIC MythCCExtractorPlayer : public MythPlayer
     QHash<uint, WindowsOnService > m_cc708_windows;
 
     /// Keeps track for decoding time to make timestamps for subtitles.
-    int64_t m_curTime;
-    int64_t m_curTimeShift;
+    double  m_curTime;
     uint64_t m_myFramesPlayed;
     bool    m_showProgress;
     QString m_fileName;

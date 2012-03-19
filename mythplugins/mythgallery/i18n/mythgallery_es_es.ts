@@ -430,6 +430,11 @@
         <translation>Lista de rutas separadas por &apos;:&apos;. Si la ruta es un directorio, su contenido se copiará. Si es un programa, se ejecutará.</translation>
     </message>
     <message>
+        <location filename="../mythgallery/gallerysettings.cpp" line="20"/>
+        <source>Enter directory names to be excluded in browser. (multiple entries delimited with &apos;:&apos;)</source>
+        <translation>Introduzca los directorios a excluir en el explorador (delimitar las entradas múltiples con &apos;:&apos;)</translation>
+    </message>
+    <message>
         <location filename="../mythgallery/gallerysettings.cpp" line="178"/>
         <source>This is the type of transition used between pictures in slideshow mode.</source>
         <translation>Tipo de transición a emplear entre imágenes en el modo de presentación.</translation>
@@ -503,11 +508,6 @@
         <location filename="../mythgallery/gallerysettings.cpp" line="18"/>
         <source>Directory filter</source>
         <translation>Filtro de directorios</translation>
-    </message>
-    <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="20"/>
-        <source>Enter direcory names to be excluded in browser. (multiple entries delimited with &apos;:&apos;)</source>
-        <translation>Introduzca los directorios a excluir en el explorador (delimitar las entradas múltiples con &apos;:&apos;)</translation>
     </message>
     <message>
         <location filename="../mythgallery/gallerysettings.cpp" line="29"/>
@@ -686,72 +686,92 @@ Compruebe que el directorio exista, sea legible y la configuración de MythGalle
 <context>
     <name>ThemeUI</name>
     <message>
-        <location filename="themestrings.h" line="4"/>
+        <location filename="themestrings.h" line="7"/>
         <source>%DATE%, %TIME%</source>
         <translation>%DATE%, %TIME%</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="5"/>
+        <location filename="themestrings.h" line="8"/>
         <source>No images are present in the pictures folder.</source>
         <translation>No existen imágenes en la carpeta de imágenes.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="2"/>
+        <location filename="themestrings.h" line="5"/>
         <source>Image Gallery</source>
         <translation>Galería de Imágenes</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="3"/>
+        <location filename="themestrings.h" line="6"/>
         <source>No images found in configured directory.  Are you sure you have set up the plugin properly?</source>
         <translation>No se encontraron imágenes en el directorio configurado. ¿Seguro que ha configurado adecuadamente el complemento?</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="6"/>
+        <location filename="themestrings.h" line="9"/>
         <source>SELECT: View</source>
         <translation>SELECT: Vista</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="7"/>
+        <location filename="themestrings.h" line="10"/>
         <source>MENU: Activate Menu</source>
         <translation>MENU: Activar Menú</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="8"/>
+        <location filename="themestrings.h" line="11"/>
+        <source>Video Gallery</source>
+        <translation>Galería de Vídeos</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="12"/>
         <source>Filter/sort images</source>
         <translation>Filtrar/ordenar imágenes</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="9"/>
+        <location filename="themestrings.h" line="13"/>
+        <source>Directory filter:</source>
+        <translation>Filtro de directorios:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="14"/>
+        <source>Type filter:</source>
+        <translation>Filtro de tipos:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="16"/>
+        <source>Sort by:</source>
+        <translation>Ordenar por:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="19"/>
         <source>Directory filter :</source>
         <translation>Filtro de directorios:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="10"/>
+        <location filename="themestrings.h" line="20"/>
         <source>Type filter :</source>
         <translation>Filtro de tipos:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="11"/>
+        <location filename="themestrings.h" line="21"/>
         <source>NumImages_Text</source>
         <translation>NumImages_Text</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="12"/>
+        <location filename="themestrings.h" line="22"/>
         <source>Sort by :</source>
         <translation>Ordenar por:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="13"/>
+        <location filename="themestrings.h" line="15"/>
         <source>Check Filter</source>
         <translation>Marcar Filtro</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="14"/>
+        <location filename="themestrings.h" line="17"/>
         <source>Done</source>
         <translation>Hecho</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="15"/>
+        <location filename="themestrings.h" line="18"/>
         <source>Save as default</source>
         <translation>Guardar como predeterminado</translation>
     </message>

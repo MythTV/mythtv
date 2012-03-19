@@ -15,7 +15,7 @@
 #include "dbutil.h"
 #include "mythcorecontext.h"
 #include "storagegroup.h"
-#include "util.h"
+#include "mythmiscutil.h"
 #include "mythdb.h"
 #include "mythdirs.h"
 #include "mythlogging.h"

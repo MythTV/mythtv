@@ -25,8 +25,6 @@ class MBASE_PUBLIC MThreadPool
     static void StopAllPools(void);
     static void ShutdownAllPools(void);
 
-    void start(QRunnable *runnable, int priority = 0)
-        { start(runnable, "", priority); }
     void start(QRunnable *runnable, QString debugName, int priority = 0);
     bool tryStart(QRunnable *runnable, QString debugName);
 

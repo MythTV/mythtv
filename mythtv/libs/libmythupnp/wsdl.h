@@ -36,7 +36,7 @@ class UPNP_PUBLIC Wsdl : public QDomDocument
 {
     protected:
         ServiceHost             *m_pServiceHost;
-        QMap< QString, bool >    m_typesCreated;
+        QMap<QString, bool>      m_typesToInclude;
 
         QDomElement              m_oRoot;
         QDomElement              m_oTypes;
@@ -47,7 +47,6 @@ class UPNP_PUBLIC Wsdl : public QDomDocument
 
     protected:
 
-        QString     ConvertTypeToXSD( const QString &sType, bool bCustomType = false );
 
         QDomElement CreateBindingOperation( MethodInfo    &oInfo,
                                             const QString &sClassName );
@@ -60,30 +59,17 @@ class UPNP_PUBLIC Wsdl : public QDomDocument
                                             QString       sTypeName,
                                             bool          bReturnType = false );
 
-        bool        CreateType            ( QObject       *pParent,
-                                            QString       &sTypeName );
+        bool        IsCustomType          ( QString &sTypeName );
 
-        bool        CreateArrayType       ( QObject       *pParent,
-                                            QString      &sTypeName, 
-                                            QString       sElementName,
-                                            QString       sElementType,
-                                            bool          bCustomType );
+        QString     ReadClassInfo         ( const QMetaObject *pMeta, 
+                                            const QString     &sKey );
 
-        bool        CreateMapType         ( QObject       *pParent,
-                                            QString      &sTypeName, 
-                                            QString       sElementName,
-                                            QString       sElementType,
-                                            bool          bCustomType );
-
-        QString     ReadClassInfo         ( QObject *pObject, 
-                                            QString  sKey );
 
     public:
 
         Wsdl( ServiceHost *pServiceHost );
 
         bool GetWSDL( HTTPRequest *pRequest );
-
 };
 
 #endif

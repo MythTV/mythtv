@@ -1,8 +1,8 @@
 #ifndef MYTH_MEDIA_MONITOR_DARWIN_H
 #define MYTH_MEDIA_MONITOR_DARWIN_H
 
-#define DEFAULT_DVD "/dev/disk1"
-#define DEFAULT_CD  "/dev/disk1"
+#define DEFAULT_DVD "disk1"
+#define DEFAULT_CD  "disk1"
 
 class MonitorThreadDarwin : public MonitorThread
 {

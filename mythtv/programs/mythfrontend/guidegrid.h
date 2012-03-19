@@ -31,8 +31,8 @@ class MythUIGuideGrid;
 
 #define MAX_DISPLAY_TIMES 36
 
-typedef vector<PixmapChannel>   pix_chan_list_t;
-typedef vector<pix_chan_list_t> pix_chan_list_list_t;
+typedef vector<DBChannel>   db_chan_list_t;
+typedef vector<db_chan_list_t> db_chan_list_list_t;
 
 class JumpToChannel;
 class JumpToChannelListener
@@ -180,8 +180,8 @@ class GuideGrid : public ScheduleCommon, public JumpToChannelListener
 
     void setStartChannel(int newStartChannel);
 
-    PixmapChannel       *GetChannelInfo(uint chan_idx, int sel = -1);
-    const PixmapChannel *GetChannelInfo(uint chan_idx, int sel = -1) const;
+    DBChannel       *GetChannelInfo(uint chan_idx, int sel = -1);
+    const DBChannel *GetChannelInfo(uint chan_idx, int sel = -1) const;
     uint                 GetChannelCount(void) const;
     int                  GetStartChannelOffset(int row = -1) const;
 
@@ -194,7 +194,7 @@ class GuideGrid : public ScheduleCommon, public JumpToChannelListener
     int   m_selectRecThreshold;
 
     bool m_allowFinder;
-    pix_chan_list_list_t m_channelInfos;
+    db_chan_list_list_t m_channelInfos;
     QMap<uint,uint>      m_channelInfoIdx;
 
     vector<ProgramList*> m_programs;

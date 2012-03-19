@@ -9,7 +9,7 @@
 #include "mythlogging.h"
 #include "httpcomms.h"
 #include "importicons.h"
-#include "util.h"
+#include "mythmiscutil.h"
 
 // MythUI
 #include "mythuitext.h"
@@ -309,7 +309,7 @@ bool ImportIconsWizard::initialLoad(QString name)
     if (query.exec() && query.size() > 0)
     {
         m_progressDialog =
-                new MythUIProgressDialog(tr("Initialising, please wait..."),
+                new MythUIProgressDialog(tr("Initializing, please wait..."),
                                         m_popupStack, "IconImportInitProgress");
 
         if (m_progressDialog->Create())

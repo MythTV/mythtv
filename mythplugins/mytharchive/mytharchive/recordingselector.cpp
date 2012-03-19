@@ -25,7 +25,7 @@
 #include <mythprogressdialog.h>
 #include <mythdialogbox.h>
 #include <mythlogging.h>
-#include <util.h>
+#include <mythmiscutil.h>
 #include <netutils.h>
 
 // mytharchive
@@ -213,7 +213,6 @@ void RecordingSelector::showMenu()
 
     menuPopup->AddButton(tr("Clear All"), SLOT(clearAll()));
     menuPopup->AddButton(tr("Select All"), SLOT(selectAll()));
-    menuPopup->AddButton(tr("Cancel"), NULL);
 }
 
 void RecordingSelector::selectAll()

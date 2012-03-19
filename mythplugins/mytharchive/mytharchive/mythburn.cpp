@@ -25,7 +25,7 @@
 #include <mythuicheckbox.h>
 #include <mythuibuttonlist.h>
 #include <mythuiprogressbar.h>
-#include <util.h>
+#include <mythmiscutil.h>
 #include <mythsystem.h>
 #include <exitcodes.h>
 
@@ -341,12 +341,12 @@ void MythBurn::toggleUseCutlist(void)
     {
         if (a->useCutlist)
         {
-            item->SetText(tr("Using Cutlist"), "cutlist");
+            item->SetText(tr("Using Cut List"), "cutlist");
             item->DisplayState("using", "cutliststatus");
         }
         else
         {
-            item->SetText(tr("Not Using Cutlist"), "cutlist");
+            item->SetText(tr("Not Using Cut List"), "cutlist");
             item->DisplayState("notusing", "cutliststatus");
         }
     }
@@ -465,12 +465,12 @@ void MythBurn::updateArchiveList(void)
             {
                 if (a->useCutlist)
                 {
-                    item->SetText(tr("Using Cutlist"), "cutlist");
+                    item->SetText(tr("Using Cut List"), "cutlist");
                     item->DisplayState("using", "cutliststatus");
                 }
                 else
                 {
-                    item->SetText(tr("Not Using Cutlist"), "cutlist");
+                    item->SetText(tr("Not Using Cut List"), "cutlist");
                     item->DisplayState("notusing", "cutliststatus");
                 }
             }
@@ -816,10 +816,10 @@ void MythBurn::showMenu()
     if (curItem->hasCutlist)
     {
         if (curItem->useCutlist)
-            menuPopup->AddButton(tr("Don't Use Cutlist"),
+            menuPopup->AddButton(tr("Don't Use Cut List"),
                                  SLOT(toggleUseCutlist()));
         else
-            menuPopup->AddButton(tr("Use Cutlist"),
+            menuPopup->AddButton(tr("Use Cut List"),
                                  SLOT(toggleUseCutlist()));
     }
 
@@ -827,7 +827,6 @@ void MythBurn::showMenu()
     menuPopup->AddButton(tr("Edit Details"), SLOT(editDetails()));
     menuPopup->AddButton(tr("Change Encoding Profile"), SLOT(changeProfile()));
     menuPopup->AddButton(tr("Edit Thumbnails"), SLOT(editThumbnails()));
-    menuPopup->AddButton(tr("Cancel"), NULL);
 }
 
 void MythBurn::removeItem()
@@ -1174,7 +1173,6 @@ void BurnMenu::start(void)
     menuPopup->AddButton(QObject::tr("Burn DVD"));
     menuPopup->AddButton(QObject::tr("Burn DVD Rewritable"));
     menuPopup->AddButton(QObject::tr("Burn DVD Rewritable (Force Erase)"));
-    menuPopup->AddButton(QObject::tr("Cancel"));
 }
 
 void BurnMenu::customEvent(QEvent *event)

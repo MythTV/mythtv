@@ -30,7 +30,7 @@ class SERVICE_PUBLIC SettingList : public QObject
     // A Q_CLASSINFO entry with "<PropName>_type" as the key
     // and the type name as the value
 
-    Q_CLASSINFO( "Settings_type", "QString");
+    Q_CLASSINFO( "Settings", "type=QString;name=String");
 
     Q_PROPERTY( QString     HostName READ HostName WRITE setHostName )
     Q_PROPERTY( QVariantMap Settings READ Settings DESIGNABLE true )

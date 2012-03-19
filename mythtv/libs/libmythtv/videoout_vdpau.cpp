@@ -1219,7 +1219,7 @@ void VideoOutputVDPAU::ParseOptions(void)
         if (!name.contains("vdpau"))
             continue;
 
-        if (name.contains("vdpaubuffersize"))
+        if (name.contains("vdpaubuffercount"))
         {
             uint num = opts.toUInt();
             if (MIN_PROCESS_BUFFER <= num && num <= MAX_PROCESS_BUFFER)

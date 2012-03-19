@@ -2,6 +2,7 @@
 #define _DARWIN_FIREWIRE_DEVICE_H_
 
 #include "firewiredevice.h"
+#include <IOKit/IOKitLib.h>
 
 class DFDPriv;
 class DarwinAVCInfo;
@@ -13,8 +14,8 @@ class DarwinFirewireDevice : public FirewireDevice
                                        uint64_t guid, void *item);
     friend int dfd_no_data_notification(void *cb_data);
     friend void dfd_stream_msg(
-        long unsigned int msg, long unsigned int param1,
-        long unsigned int param2, void *callback_data);
+        UInt32 msg, UInt32 param1,
+        UInt32 param2, void *callback_data);
     friend int dfd_tspacket_handler(
         uint tsPacketCount, uint32_t **ppBuf, void *callback_data);
 

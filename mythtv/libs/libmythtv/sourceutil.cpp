@@ -9,7 +9,7 @@
 #include "mythdb.h"
 #include "mythdirs.h"
 #include "mythlogging.h"
-#include "util.h"
+#include "mythmiscutil.h"
 
 bool SourceUtil::HasDigitalChannel(uint sourceid)
 {

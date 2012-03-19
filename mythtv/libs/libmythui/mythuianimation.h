@@ -50,6 +50,7 @@ class MythUIAnimation : public QVariantAnimation, XMLParseBase
     void CopyFrom(const MythUIAnimation* animation);
     Trigger GetTrigger(void) const { return m_trigger; }
     QVariant Value() const { return m_value; }
+    bool IsActive() const { return m_active; }
 
     virtual void updateCurrentValue(const QVariant& value);
 

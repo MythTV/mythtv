@@ -40,7 +40,9 @@ class SubtitleScreen : public MythScreenType
     void DisplayDVDButton(AVSubtitle* dvdButton, QRect &buttonPos);
 
     QSize CalcTextSize(const QString &text,
-                       const CC708CharacterAttribute &format) const;
+                       const CC708CharacterAttribute &format,
+                       float layoutSpacing) const;
+    int CalcPadding(const CC708CharacterAttribute &format) const;
 
     void RegisterExpiration(MythUIType *shape, long long endTime)
     {
@@ -114,9 +116,13 @@ class FormattedTextChunk
     }
     FormattedTextChunk(void) : parent(NULL) {}
 
-    QSize CalcSize(void) const
+    QSize CalcSize(float layoutSpacing = 0.0f) const
     {
-        return parent->CalcTextSize(text, format);
+        return parent->CalcTextSize(text, format, layoutSpacing);
+    }
+    int CalcPadding(void) const
+    {
+        return parent->CalcPadding(format);
     }
     bool Split(FormattedTextChunk &newChunk);
     QString ToLogString(void) const;
@@ -132,17 +138,21 @@ class FormattedTextLine
     FormattedTextLine(int x = -1, int y = -1, int o_x = -1, int o_y = -1)
         : x_indent(x), y_indent(y), orig_x(o_x), orig_y(o_y) {}
 
-    QSize CalcSize(void) const
+    QSize CalcSize(float layoutSpacing = 0.0f) const
     {
         int height = 0, width = 0;
+        int padding = 0;
         QList<FormattedTextChunk>::const_iterator it;
         for (it = chunks.constBegin(); it != chunks.constEnd(); ++it)
         {
-            QSize tmp = (*it).CalcSize();
+            QSize tmp = (*it).CalcSize(layoutSpacing);
             height = max(height, tmp.height());
             width += tmp.width();
+            padding = (*it).CalcPadding();
+            if (it == chunks.constBegin())
+                width += padding;
         }
-        return QSize(width, height);
+        return QSize(width + padding, height);
     }
 
     QList<FormattedTextChunk> chunks;
@@ -174,7 +184,7 @@ class FormattedTextSubtitle
         m_xAnchor = 0;
         m_yAnchor = 0;
     }
-    void InitFromCC608(vector<CC608Text*> &buffers);
+    void InitFromCC608(vector<CC608Text*> &buffers, int textFontZoom = 100);
     void InitFromCC708(const CC708Window &win, int num,
                        const vector<CC708String*> &list,
                        float aspect = 1.77777f,
@@ -182,6 +192,7 @@ class FormattedTextSubtitle
     void InitFromSRT(QStringList &subs, int textFontZoom);
     void WrapLongLines(void);
     void Layout(void);
+    void Layout608(void);
     bool Draw(QList<MythUIType*> *imageCache = 0,
               uint64_t start = 0, uint64_t duration = 0) const;
     QStringList ToSRT(void) const;

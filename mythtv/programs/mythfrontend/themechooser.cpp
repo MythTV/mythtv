@@ -15,7 +15,7 @@
 #include "mythdownloadmanager.h"
 #include "programtypes.h"
 #include "mythsystemevent.h"
-#include "util.h"
+#include "mythmiscutil.h"
 #include "mythversion.h"
 #include "mythlogging.h"
 #include "storagegroup.h"
@@ -195,6 +195,8 @@ void ThemeChooser::Load(void)
     QString themeSite = QString("%1/%2")
         .arg(gCoreContext->GetSetting("ThemeRepositoryURL",
              "http://themes.mythtv.org/themes/repository")).arg(MythVersion);
+    QDir remoteThemesDir(GetMythUI()->GetThemeCacheDir()
+                             .append("/themechooser/").append(MythVersion));
 
     int downloadFailures =
         gCoreContext->GetNumSetting("ThemeInfoDownloadFailures", 0);
@@ -208,6 +210,9 @@ void ThemeChooser::Load(void)
                         "remote theme list download").arg(remoteThemesFile));
             m_refreshDownloadableThemes = true;
         }
+
+        if (!remoteThemesDir.exists())
+            m_refreshDownloadableThemes = true;
     }
     else if (downloadFailures < 2) // (and themes.zip does not exist)
     {
@@ -242,9 +247,6 @@ void ThemeChooser::Load(void)
                                       downloadFailures);
         }
     }
-
-    QDir remoteThemesDir(GetMythUI()->GetThemeCacheDir()
-                             .append("/themechooser/").append(MythVersion));
 
     if ((QFile::exists(remoteThemesFile)) &&
         (remoteThemesDir.exists()))
@@ -611,9 +613,16 @@ void ThemeChooser::saveAndReload(MythUIButtonListItem *item)
 
         OpenBusyPopup(tr("Downloading %1 Theme").arg(info->GetName()));
         m_downloadTheme = info;
+#if 0
         m_downloadFile = RemoteDownloadFile(downloadURL,
                                             "Temp", baseName);
         m_downloadState = dsDownloadingOnBackend;
+#else
+        QString localFile = GetConfDir() + "/tmp/" + baseName;
+        GetMythDownloadManager()->queueDownload(downloadURL, localFile, this);
+        m_downloadFile = localFile;
+        m_downloadState = dsDownloadingOnFrontend;
+#endif
     }
     else
     {

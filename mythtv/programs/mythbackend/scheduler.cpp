@@ -31,7 +31,7 @@ using namespace std;
 #include "mainserver.h"
 #include "remoteutil.h"
 #include "backendutil.h"
-#include "util.h"
+#include "mythmiscutil.h"
 #include "exitcodes.h"
 #include "mythcontext.h"
 #include "mythdb.h"
@@ -559,6 +559,20 @@ void Scheduler::UpdateRecStatus(RecordingInfo *pginfo)
         RecordingInfo *p = *dreciter;
         if (p->IsSameProgramTimeslot(*pginfo))
         {
+            // FIXME!  If we are passed an rsUnknown recstatus, an
+            // in-progress recording might be being stopped.  Try
+            // to handle it sensibly until a better fix can be
+            // made after the 0.25 code freeze.
+            if (pginfo->GetRecordingStatus() == rsUnknown)
+            {
+                if (p->GetRecordingStatus() == rsTuning)
+                    pginfo->SetRecordingStatus(rsFailed);
+                else if (p->GetRecordingStatus() == rsRecording)
+                    pginfo->SetRecordingStatus(rsRecorded);
+                else
+                    pginfo->SetRecordingStatus(p->GetRecordingStatus());
+            }
+
             if (p->GetRecordingStatus() != pginfo->GetRecordingStatus())
             {
                 LOG(VB_GENERAL, LOG_INFO,
@@ -1464,26 +1478,24 @@ void Scheduler::UpdateNextRecord(void)
             if (next_record == nextRecMap[recid])
                 continue;
 
-            if (nextRecMap[recid].isNull() || !next_record.isValid())
-            {
-                subquery.prepare("UPDATE record "
-                                 "SET next_record = '0000-00-00 00:00:00' "
-                                 "WHERE recordid = :RECORDID;");
-                subquery.bindValue(":RECORDID", recid);
-
-            }
-            else
+            if (nextRecMap[recid].isValid())
             {
                 subquery.prepare("UPDATE record SET next_record = :NEXTREC "
                                  "WHERE recordid = :RECORDID;");
                 subquery.bindValue(":RECORDID", recid);
                 subquery.bindValue(":NEXTREC", nextRecMap[recid]);
+                if (!subquery.exec())
+                    MythDB::DBError("Update next_record", subquery);
             }
-            if (!subquery.exec())
-                MythDB::DBError("Update next_record", subquery);
-            else
-                LOG(VB_SCHEDULE, LOG_INFO, LOC +
-                    QString("Update next_record for %1").arg(recid));
+            else if (next_record.isValid())
+            {
+                subquery.prepare("UPDATE record "
+                                 "SET next_record = '0000-00-00 00:00:00' "
+                                 "WHERE recordid = :RECORDID;");
+                subquery.bindValue(":RECORDID", recid);
+                if (!subquery.exec())
+                    MythDB::DBError("Clear next_record", subquery);
+            }
         }
     }
 }
@@ -3907,7 +3919,13 @@ void Scheduler::AddNewRecords(void)
         if (p == NULL)
             continue;
 
-        RecStatusType newrecstatus = p->GetRecordingStatus();
+        if (p->GetRecordingStatus() != rsUnknown)
+        {
+            tmpList.push_back(p);
+            continue;
+        }
+
+        RecStatusType newrecstatus = rsUnknown;
         // Check for rsOffLine
         if ((doRun || specsched) && 
             (!cardMap.contains(p->GetCardID()) || !p->GetRecordingPriority2()))

@@ -34,7 +34,7 @@ class SERVICE_PUBLIC ProgramList : public QObject
     // A Q_CLASSINFO entry with "<PropName>_type" as the key
     // and the type name as the value
 
-    Q_CLASSINFO( "Programs_type", "DTC::Program");
+    Q_CLASSINFO( "Programs", "type=DTC::Program");
 
     Q_PROPERTY( int          StartIndex     READ StartIndex      WRITE setStartIndex     )
     Q_PROPERTY( int          Count          READ Count           WRITE setCount          )

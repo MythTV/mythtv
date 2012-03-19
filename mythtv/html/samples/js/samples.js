@@ -15,7 +15,7 @@ function GetSettingValue()
            	$("#debug").html( inspect( data , 10 ) );
 
 
-        	$("#SettingValue").val( data.SettingList.Settings[0].Value );
+        	$("#SettingValue").val( data.SettingList.Settings[sKey] );
         });
 }
 

@@ -8,28 +8,6 @@
 #include "mythlogging.h"
 
 
-// Only some of the QTextCodec calls are reenterant.
-// If you use this please verify that you are using a reenterant call.
-static const QTextCodec *iso8859_codecs[16] =
-{
-    QTextCodec::codecForName("Latin1"),
-    QTextCodec::codecForName("ISO8859-1"),  // Western
-    QTextCodec::codecForName("ISO8859-2"),  // Central European
-    QTextCodec::codecForName("ISO8859-3"),  // Central European
-    QTextCodec::codecForName("ISO8859-4"),  // Baltic
-    QTextCodec::codecForName("ISO8859-5"),  // Cyrillic
-    QTextCodec::codecForName("ISO8859-6"),  // Arabic
-    QTextCodec::codecForName("ISO8859-7"),  // Greek
-    QTextCodec::codecForName("ISO8859-8"),  // Hebrew, visually ordered
-    QTextCodec::codecForName("ISO8859-9"),  // Turkish
-    QTextCodec::codecForName("ISO8859-10"),
-    QTextCodec::codecForName("ISO8859-11"),
-    QTextCodec::codecForName("ISO8859-12"),
-    QTextCodec::codecForName("ISO8859-13"),
-    QTextCodec::codecForName("ISO8859-14"),
-    QTextCodec::codecForName("ISO8859-15"), // Western
-};
-
 static QString decode_iso6937(const unsigned char *buf, uint length)
 {
     // ISO/IEC 6937 to unicode (UCS2) convertor...
@@ -119,6 +97,28 @@ QString dvb_decode_text(const unsigned char *src, uint raw_length,
 
 static QString decode_text(const unsigned char *buf, uint length)
 {
+    // Only some of the QTextCodec calls are reentrant.
+    // If you use this please verify that you are using a reentrant call.
+    static const QTextCodec *iso8859_codecs[16] =
+    {
+        QTextCodec::codecForName("Latin1"),
+        QTextCodec::codecForName("ISO8859-1"),  // Western
+        QTextCodec::codecForName("ISO8859-2"),  // Central European
+        QTextCodec::codecForName("ISO8859-3"),  // Central European
+        QTextCodec::codecForName("ISO8859-4"),  // Baltic
+        QTextCodec::codecForName("ISO8859-5"),  // Cyrillic
+        QTextCodec::codecForName("ISO8859-6"),  // Arabic
+        QTextCodec::codecForName("ISO8859-7"),  // Greek
+        QTextCodec::codecForName("ISO8859-8"),  // Hebrew, visually ordered
+        QTextCodec::codecForName("ISO8859-9"),  // Turkish
+        QTextCodec::codecForName("ISO8859-10"),
+        QTextCodec::codecForName("ISO8859-11"),
+        QTextCodec::codecForName("ISO8859-12"),
+        QTextCodec::codecForName("ISO8859-13"),
+        QTextCodec::codecForName("ISO8859-14"),
+        QTextCodec::codecForName("ISO8859-15"), // Western
+    };
+
     // Decode using the correct text codec
     if (buf[0] >= 0x20)
     {
@@ -329,7 +329,7 @@ void ContentDescriptor::Init(void)
     categoryDesc[0x21] = QObject::tr("News/weather report");
     categoryDesc[0x22] = QObject::tr("News magazine");
     categoryDesc[0x23] = QObject::tr("Documentary");
-    categoryDesc[0x24] = QObject::tr("Intelligent Programmes");
+    categoryDesc[0x24] = QObject::tr("Intelligent Programs");
 
     categoryDesc[0x30] = QObject::tr("Entertainment");
     categoryDesc[0x31] = QObject::tr("Game Show");
@@ -352,9 +352,9 @@ void ContentDescriptor::Init(void)
     categoryDesc[0x4B] = QObject::tr("Martial Sports");
 
     categoryDesc[0x50] = QObject::tr("Kids");
-    categoryDesc[0x51] = QObject::tr("Pre-School Children's Programmes");
-    categoryDesc[0x52] = QObject::tr("Entertainment Programmes for 6 to 14");
-    categoryDesc[0x53] = QObject::tr("Entertainment Programmes for 10 to 16");
+    categoryDesc[0x51] = QObject::tr("Pre-School Children's Programs");
+    categoryDesc[0x52] = QObject::tr("Entertainment Programs for 6 to 14");
+    categoryDesc[0x53] = QObject::tr("Entertainment Programs for 10 to 16");
     categoryDesc[0x54] = QObject::tr("Informational/Educational");
     categoryDesc[0x55] = QObject::tr("Cartoons/Puppets");
 
@@ -404,7 +404,7 @@ void ContentDescriptor::Init(void)
     // Special
     categoryDesc[0xB0] = QObject::tr("Original Language");
     categoryDesc[0xB1] = QObject::tr("Black & White");
-    categoryDesc[0xB2] = QObject::tr("\"Unpublished\" Programmes");
+    categoryDesc[0xB2] = QObject::tr("\"Unpublished\" Programs");
     categoryDesc[0xB3] = QObject::tr("Live Broadcast");
     // UK Freeview custom id
     categoryDesc[0xF0] = QObject::tr("Drama");

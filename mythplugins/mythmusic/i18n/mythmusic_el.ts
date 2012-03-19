@@ -67,27 +67,27 @@
 <context>
     <name>CriteriaRowEditor</name>
     <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="1595"/>
+        <location filename="../mythmusic/smartplaylist.cpp" line="1591"/>
         <source>Select an Artist</source>
         <translation>Επιλέξτε Καλλιτέχνη</translation>
     </message>
     <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="1600"/>
+        <location filename="../mythmusic/smartplaylist.cpp" line="1596"/>
         <source>Select a Compilation Artist</source>
         <translation>Επιλέξτε Καλλιτέχνη Σύνθεσης</translation>
     </message>
     <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="1605"/>
+        <location filename="../mythmusic/smartplaylist.cpp" line="1601"/>
         <source>Select an Album</source>
         <translation>Επιλέξτε Δίσκο</translation>
     </message>
     <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="1610"/>
+        <location filename="../mythmusic/smartplaylist.cpp" line="1606"/>
         <source>Select a Genre</source>
         <translation>Επιλέξτε Είδος</translation>
     </message>
     <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="1615"/>
+        <location filename="../mythmusic/smartplaylist.cpp" line="1611"/>
         <source>Select a Title</source>
         <translation>Επιλέξτε Τίτλο</translation>
     </message>
@@ -202,65 +202,64 @@
 <context>
     <name>EditAlbumartDialog</name>
     <message>
-        <location filename="../mythmusic/editmetadata.cpp" line="1008"/>
-        <location filename="../mythmusic/editmetadata.cpp" line="1063"/>
-        <location filename="../mythmusic/editmetadata.cpp" line="1203"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="1006"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="1061"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="1199"/>
         <source>Change Image Type</source>
         <translation>Αλλαγή Τύπου Εικόνας</translation>
     </message>
     <message>
-        <location filename="../mythmusic/editmetadata.cpp" line="1010"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="1008"/>
         <source>What image type do you want to use for this image?</source>
         <translation>Τι τύπο αρχείου θέλετε να χρησιμοποιήσετε γι΄αυτή την εικόνα;</translation>
     </message>
     <message>
-        <location filename="../mythmusic/editmetadata.cpp" line="1043"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="1041"/>
         <source>Options</source>
         <translation>Επιλογές</translation>
     </message>
     <message>
-        <location filename="../mythmusic/editmetadata.cpp" line="1057"/>
-        <location filename="../mythmusic/editmetadata.cpp" line="1197"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="1055"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="1193"/>
         <source>Edit Metadata</source>
         <translation>Επεξεργασία Στοιχείων</translation>
     </message>
     <message>
-        <location filename="../mythmusic/editmetadata.cpp" line="1058"/>
-        <location filename="../mythmusic/editmetadata.cpp" line="1199"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="1056"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="1195"/>
         <source>Rescan For Images</source>
         <translation>Επανανίχνευση για Εικόνες</translation>
     </message>
     <message>
-        <location filename="../mythmusic/editmetadata.cpp" line="1059"/>
-        <location filename="../mythmusic/editmetadata.cpp" line="1201"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="1057"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="1197"/>
         <source>Search Internet For Images</source>
         <translation>Εύρεση Εικόνων στο Internet</translation>
     </message>
     <message>
-        <location filename="../mythmusic/editmetadata.cpp" line="1076"/>
-        <location filename="../mythmusic/editmetadata.cpp" line="1205"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="1074"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="1201"/>
         <source>Copy Selected Image To Tag</source>
         <translation>Αντιγραφή Επιλεγμένης Εικόνας στην Ετικέττα</translation>
     </message>
     <message>
-        <location filename="../mythmusic/editmetadata.cpp" line="1081"/>
-        <location filename="../mythmusic/editmetadata.cpp" line="1207"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="1079"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="1203"/>
         <source>Remove Selected Image From Tag</source>
         <translation>Αφαίρεση Επιλεγμένης Εικόνας από την Ετικέττα</translation>
     </message>
     <message>
-        <location filename="../mythmusic/editmetadata.cpp" line="1091"/>
-        <location filename="../mythmusic/editmetadata.cpp" line="1209"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="1089"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="1205"/>
         <source>Copy Image To Tag</source>
         <translation>Αντιγραφή Εικόνας στην Ετικέττα</translation>
     </message>
     <message>
-        <location filename="../mythmusic/editmetadata.cpp" line="1094"/>
         <source>Cancel</source>
-        <translation>Ακύρωση</translation>
+        <translation type="obsolete">Ακύρωση</translation>
     </message>
     <message>
-        <location filename="../mythmusic/editmetadata.cpp" line="1298"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="1294"/>
         <source>Are you sure you want to permanently remove this image from the tag?</source>
         <translation>Σίγουρα θέλετε να διαγράψετε μόνιμα την εικόνα από την ετικέττα;</translation>
     </message>
@@ -284,9 +283,8 @@
         <translation>Έξοδος/Χωρίς Αποθήκευση</translation>
     </message>
     <message>
-        <location filename="../mythmusic/editmetadata.cpp" line="165"/>
         <source>Cancel</source>
-        <translation>Ακύρωση</translation>
+        <translation type="obsolete">Ακύρωση</translation>
     </message>
 </context>
 <context>
@@ -308,62 +306,62 @@
         <translation type="obsolete">Ολοκληρώθηκε</translation>
     </message>
     <message>
-        <location filename="../mythmusic/editmetadata.cpp" line="482"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="481"/>
         <source>Options</source>
         <translation>Επιλογές</translation>
     </message>
     <message>
-        <location filename="../mythmusic/editmetadata.cpp" line="496"/>
-        <location filename="../mythmusic/editmetadata.cpp" line="768"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="495"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="766"/>
         <source>Edit Albumart Images</source>
         <translation>Επεξεργασία Εικόνων Δίσκου</translation>
     </message>
     <message>
-        <location filename="../mythmusic/editmetadata.cpp" line="497"/>
-        <location filename="../mythmusic/editmetadata.cpp" line="775"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="496"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="773"/>
         <source>Search Internet For Artist Image</source>
         <translation>Εύρεση Φωτό Καλλιτέχνη στο Internet</translation>
     </message>
     <message>
-        <location filename="../mythmusic/editmetadata.cpp" line="498"/>
-        <location filename="../mythmusic/editmetadata.cpp" line="780"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="497"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="778"/>
         <source>Search Internet For Album Image</source>
         <translation>Εύρεση Εικόνας Άλμπουμ στο Internet</translation>
     </message>
     <message>
-        <location filename="../mythmusic/editmetadata.cpp" line="499"/>
-        <location filename="../mythmusic/editmetadata.cpp" line="770"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="498"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="768"/>
         <source>Search Internet For Genre Image</source>
         <translation>Εύρεση Εικόνα Είδους Μουσικής στο Internet</translation>
     </message>
     <message>
-        <location filename="../mythmusic/editmetadata.cpp" line="500"/>
-        <location filename="../mythmusic/editmetadata.cpp" line="785"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="499"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="783"/>
         <source>Check Track Length</source>
         <translation>Έλεγχος μήκους τραγουδιού</translation>
     </message>
     <message>
-        <location filename="../mythmusic/editmetadata.cpp" line="537"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="535"/>
         <source>Various Artists</source>
         <translation>Διάφοροι Καλλιτέχνες</translation>
     </message>
     <message>
-        <location filename="../mythmusic/editmetadata.cpp" line="544"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="542"/>
         <source>Select an Artist</source>
         <translation>Επιλέξτε Καλλιτέχνη</translation>
     </message>
     <message>
-        <location filename="../mythmusic/editmetadata.cpp" line="589"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="587"/>
         <source>Select a Compilation Artist</source>
         <translation>Επιλέξτε Καλλιτέχνη Σύνθεσης</translation>
     </message>
     <message>
-        <location filename="../mythmusic/editmetadata.cpp" line="614"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="612"/>
         <source>Select an Album</source>
         <translation>Επιλέξτε Δίσκο</translation>
     </message>
     <message>
-        <location filename="../mythmusic/editmetadata.cpp" line="657"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="655"/>
         <source>Select a Genre</source>
         <translation>Επιλέξτε Είδος</translation>
     </message>
@@ -392,9 +390,8 @@
         <translation type="obsolete">Έξοδος/Χωρίς Αποθήκευση</translation>
     </message>
     <message>
-        <location filename="../mythmusic/editmetadata.cpp" line="501"/>
         <source>Cancel</source>
-        <translation>Ακύρωση</translation>
+        <translation type="obsolete">Ακύρωση</translation>
     </message>
     <message>
         <source>Are you sure you want to save the modified metadata to the file?</source>
@@ -439,13 +436,26 @@
     </message>
     <message>
         <location filename="../mythmusic/generalsettings.cpp" line="86"/>
-        <source>CDRom device used for ripping/playback.</source>
-        <translation>Η συσκευή CDROM για αναπαραγωγή / αντιγραφή.</translation>
+        <source>CD-ROM device used for ripping/playback.</source>
+        <translation>Η συσκευή CDROM για αναπαραγωγή/αντιγραφή.</translation>
     </message>
     <message>
         <location filename="../mythmusic/generalsettings.cpp" line="87"/>
-        <source>Directory and filename Format used to grab information if no ID3 information is found. Accepts GENRE, ARTIST, ALBUM, TITLE, ARTIST_TITLE and TRACK_TITLE.</source>
+        <source>Directory and filename format used to grab information if no ID3 information is found. Accepts GENRE, ARTIST, ALBUM, TITLE, ARTIST_TITLE and TRACK_TITLE.</source>
         <translation>Η μορφή του φακέλου και αρχείου για ανάκτηση στοιχείων εάν δεν βρεθούν πληροφορίες ID3. Δέχεται GENRE, ARTIST, ALBUM, TITLE, ARTIST_TITLE και TRACK_TITLE.</translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/generalsettings.cpp" line="95"/>
+        <source>Some MP3 players don&apos;t understand tags encoded in UTF-8 or UTF-16, this setting allows you to change the encoding format used. Currently applies only to ID3 tags.</source>
+        <translation>Μερικοί αναπαραγωγείς mp3 δεν καταλαβαίνουν ετικέτες κωδικοποιημένες κατά UTF8 ή UTF16, αυτή η ρύθμιση σας επιτρέπει να αλλάξετε τη χρησιμοποιούμενη μορφή. Επί του παρόντος εφαρμόζεται μόνο σε ετικέτες ID3.</translation>
+    </message>
+    <message>
+        <source>CDRom device used for ripping/playback.</source>
+        <translation type="obsolete">Η συσκευή CDROM για αναπαραγωγή / αντιγραφή.</translation>
+    </message>
+    <message>
+        <source>Directory and filename Format used to grab information if no ID3 information is found. Accepts GENRE, ARTIST, ALBUM, TITLE, ARTIST_TITLE and TRACK_TITLE.</source>
+        <translation type="obsolete">Η μορφή του φακέλου και αρχείου για ανάκτηση στοιχείων εάν δεν βρεθούν πληροφορίες ID3. Δέχεται GENRE, ARTIST, ALBUM, TITLE, ARTIST_TITLE και TRACK_TITLE.</translation>
     </message>
     <message>
         <location filename="../mythmusic/generalsettings.cpp" line="91"/>
@@ -453,9 +463,8 @@
         <translation>Αν οριστεί, το MythMusic θα παραλείπει τον έλεγχο των ετικετών ID3 των αρχείων και θα προσπαθεί να εντοπίσει το Είδος, Καλλιτέχνη, Δίσκο, αριθμό Τραγουδιού και Τίτλο από το αρχείο.</translation>
     </message>
     <message>
-        <location filename="../mythmusic/generalsettings.cpp" line="95"/>
         <source>Some mp3 players don&apos;t understand tags encoded in UTF8 or UTF16, this setting allows you to change the encoding format used. Currently applies only to ID3 tags.</source>
-        <translation>Μερικοί αναπαραγωγείς mp3 δεν καταλαβαίνουν ετικέτες κωδικοποιημένες κατά UTF8 ή UTF16, αυτή η ρύθμιση σας επιτρέπει να αλλάξετε τη χρησιμοποιούμενη μορφή. Επί του παρόντος εφαρμόζεται μόνο σε ετικέτες ID3.</translation>
+        <translation type="obsolete">Μερικοί αναπαραγωγείς mp3 δεν καταλαβαίνουν ετικέτες κωδικοποιημένες κατά UTF8 ή UTF16, αυτή η ρύθμιση σας επιτρέπει να αλλάξετε τη χρησιμοποιούμενη μορφή. Επί του παρόντος εφαρμόζεται μόνο σε ετικέτες ID3.</translation>
     </message>
     <message>
         <location filename="../mythmusic/generalsettings.cpp" line="98"/>
@@ -476,42 +485,42 @@
 <context>
     <name>ImportCoverArtDialog</name>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="947"/>
-        <location filename="../mythmusic/importmusic.cpp" line="1119"/>
+        <location filename="../mythmusic/importmusic.cpp" line="945"/>
+        <location filename="../mythmusic/importmusic.cpp" line="1117"/>
         <source>Front Cover</source>
         <translation>Εμπροσθόφυλλο</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="949"/>
-        <location filename="../mythmusic/importmusic.cpp" line="1121"/>
+        <location filename="../mythmusic/importmusic.cpp" line="947"/>
+        <location filename="../mythmusic/importmusic.cpp" line="1119"/>
         <source>Back Cover</source>
         <translation>Οπισθόφυλλο</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="951"/>
-        <location filename="../mythmusic/importmusic.cpp" line="1125"/>
+        <location filename="../mythmusic/importmusic.cpp" line="949"/>
+        <location filename="../mythmusic/importmusic.cpp" line="1123"/>
         <source>CD</source>
         <translation>CD</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="953"/>
-        <location filename="../mythmusic/importmusic.cpp" line="1123"/>
+        <location filename="../mythmusic/importmusic.cpp" line="951"/>
+        <location filename="../mythmusic/importmusic.cpp" line="1121"/>
         <source>Inlay</source>
         <translation>Εσώφυλλο</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="955"/>
-        <location filename="../mythmusic/importmusic.cpp" line="1127"/>
+        <location filename="../mythmusic/importmusic.cpp" line="953"/>
+        <location filename="../mythmusic/importmusic.cpp" line="1125"/>
         <source>&lt;Unknown&gt;</source>
         <translation>&lt;Άγνωστο&gt;</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="1094"/>
+        <location filename="../mythmusic/importmusic.cpp" line="1092"/>
         <source>File Already Exists</source>
         <translation>Το Αρχείο Υπάρχει Ήδη</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="1096"/>
+        <location filename="../mythmusic/importmusic.cpp" line="1094"/>
         <source>New File</source>
         <translation>Νέο Αρχείο</translation>
     </message>
@@ -598,9 +607,8 @@ Could not copy file to: %1</source>
         <translation>Αλλαγή Αξιολόγησης</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="661"/>
         <source>Cancel</source>
-        <translation>Ακύρωση</translation>
+        <translation type="obsolete">Ακύρωση</translation>
     </message>
 </context>
 <context>
@@ -701,276 +709,261 @@ GENRE, ARTIST, ALBUM, TRACK, TITLE, YEAR</translation>
 <context>
     <name>MusicCommon</name>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="802"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="787"/>
         <source>Speed: </source>
         <translation>Ταχύτητα:</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="1035"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1019"/>
         <source>Playing stream.</source>
         <translation>Παίζω τη Ροή.</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="1064"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1048"/>
         <source>Buffering stream.</source>
         <translation>Ροοθηκεύω τη ροή.</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="1068"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1052"/>
         <source>Stream paused.</source>
         <translation>Η ροή είναι σε παύση.</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="1127"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1111"/>
         <source>kbps</source>
         <translation>kbps</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="1127"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="1133"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1111"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1117"/>
         <source>kHz</source>
         <translation>kHz</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="1127"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="1133"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1111"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1117"/>
         <source>ch</source>
         <translation>ch</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="1156"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1140"/>
         <source>Output error.</source>
         <translation>Σφάλμα εξόδου.</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="1166"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1150"/>
         <source>Stream stopped.</source>
         <translation>Η ροή διακόπηκε.</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="1254"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2065"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1235"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2031"/>
         <source>Save To New Playlist</source>
         <translation>Αποθήκευση σε νέα Λίστα</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="1256"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1237"/>
         <source>Enter new playlist name</source>
         <translation>Δώστε όνομα νέας λίστας</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="1270"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2066"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1251"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2032"/>
         <source>Save To Existing Playlist</source>
         <translation>Αποθήκευση σε υπάρχουσα Λίστα</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="1272"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1253"/>
         <source>Select the playlist to save to</source>
         <translation>Επιλέξτε τη λίστα προς αποθήκευση</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="1359"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2109"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1333"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2073"/>
         <source>Change Volume</source>
         <translation>Αλλαγή Έντασης</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="1361"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2110"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1335"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2074"/>
         <source>Mute</source>
         <translation>Σίγαση</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="1363"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2111"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1337"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2075"/>
         <source>Previous Track</source>
         <translation>Προηγούμενο Τραγούδι</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="1365"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2112"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1339"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2076"/>
         <source>Next Track</source>
         <translation>Επόμενο Τραγούδι</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="1367"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2113"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1341"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2077"/>
         <source>Jump Back</source>
         <translation>Άλμα Πίσω</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="1369"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2114"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1343"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2078"/>
         <source>Jump Forward</source>
         <translation>Άλμα Εμπρός</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="1371"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2115"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1345"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2079"/>
         <source>Play</source>
         <translation>Παίξε</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="1373"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2116"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1347"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2080"/>
         <source>Stop</source>
         <translation>Διακοπή</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="1375"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2117"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1349"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2081"/>
         <source>Pause</source>
         <translation>Παύση</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="1380"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2162"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1354"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2120"/>
         <source>All Tracks</source>
         <translation>Όλα τα Τραγούδια</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="1382"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2165"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1356"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2123"/>
         <source>From CD</source>
         <translation>Από CD</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="1384"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2169"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2265"/>
+        <source>More Options</source>
+        <translation>Περισσότερες Επιλογές</translation>
+    </message>
+    <message>
         <source>Tracks by current Artist</source>
-        <translation>Τραγούδια από τον τρέχων Καλλιτέχνη</translation>
+        <translation type="obsolete">Τραγούδια από τον τρέχων Καλλιτέχνη</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="1386"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2171"/>
         <source>Tracks from current Genre</source>
-        <translation>Τραγούδια από το τρέχον Είδος</translation>
+        <translation type="obsolete">Τραγούδια από το τρέχον Είδος</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="1388"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2170"/>
         <source>Tracks from current Album</source>
-        <translation>Τραγούδια από τον Τρέχων Δίσκο</translation>
+        <translation type="obsolete">Τραγούδια από τον Τρέχων Δίσκο</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="1390"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2172"/>
         <source>Track from current Year</source>
-        <translation>Τραγούδια από το τρέχον Έτος</translation>
+        <translation type="obsolete">Τραγούδια από το τρέχον Έτος</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="1392"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2173"/>
         <source>Tracks with same Title</source>
-        <translation>Τραγούδια με ίδιο Τίτλο</translation>
+        <translation type="obsolete">Τραγούδια με ίδιο Τίτλο</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="1397"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2312"/>
         <source>Replace</source>
-        <translation>Αντικατάσταση</translation>
+        <translation type="obsolete">Αντικατάσταση</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="1403"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2316"/>
         <source>Insert after current track</source>
-        <translation>Εισαγωγή μετά το τρέχον κομμάτι</translation>
+        <translation type="obsolete">Εισαγωγή μετά το τρέχον κομμάτι</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="1408"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2317"/>
         <source>Append to end</source>
-        <translation>Προσθήκη στο τέλος</translation>
+        <translation type="obsolete">Προσθήκη στο τέλος</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="1413"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2320"/>
         <source>Add</source>
-        <translation>Προσθήκη</translation>
+        <translation type="obsolete">Προσθήκη</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="2001"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1974"/>
         <source>Actions</source>
         <translation>Ενέργειες</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="2009"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2026"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1982"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1997"/>
         <source>Switch View</source>
         <translation>Εναλλαγή Προβολής</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="2010"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2051"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1983"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2017"/>
         <source>Playlist Options</source>
         <translation>Επιλογές Λίστας</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="2011"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2141"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1984"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2101"/>
         <source>Set Shuffle Mode</source>
         <translation>Ορίζει τον Τύπο Ανάμιξης</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="2012"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2126"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1985"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2088"/>
         <source>Set Repeat Mode</source>
         <translation>Ορίζει τον Τύπο Επανάληψης</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="2013"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1986"/>
         <source>Player Options</source>
         <translation>Επιλογές Προγράμματος Αναπαραγωγης</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="2014"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2158"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1987"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2116"/>
         <source>Quick Playlists</source>
         <translation>Γρήγορες Λίστες</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="2017"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1990"/>
         <source>Change Visualizer</source>
         <translation>Αλλαγή Οπτικοποίησης</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="2031"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2002"/>
         <source>Current Playlist</source>
         <translation>Τρέχουσα Λίστα</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="2033"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2004"/>
         <source>Playlist Editor - Tree</source>
         <translation>Επεξεργασία Λίστας - Δένδρο</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="2035"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2006"/>
         <source>Playlist Editor - Gallery</source>
         <translation>Επεξεργασία Λίστας - Συλλογή</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="2037"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2008"/>
         <source>Search for Music</source>
         <translation>Αναζήτηση Μουσικής</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="2039"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2010"/>
         <source>Fullscreen Visualizer</source>
         <translation>Οπτικοποίηση Πλήρους Οθόνης</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="2041"/>
         <source>Lyrics</source>
-        <translation>Στίχοι</translation>
+        <translation type="obsolete">Στίχοι</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="2042"/>
         <source>Artist Information</source>
-        <translation>Πληροφορίες Καλλιτέχνη</translation>
+        <translation type="obsolete">Πληροφορίες Καλλιτέχνη</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="2081"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2045"/>
         <source>Exiting Music Player.
 
 Do you want to continue playing in the background?</source>
@@ -979,53 +972,53 @@ Do you want to continue playing in the background?</source>
 Θέλετε να συνεχίσει η μουσική στο παρασκήνιο;</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="2105"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2069"/>
         <source>Player Actions</source>
         <translation>Ενέργειες Προγράμματος Αναπαραγωγής</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="2130"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2145"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2092"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2105"/>
         <source>None</source>
         <translation>Όχι</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="2131"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2093"/>
         <source>Track</source>
         <translation>Τραγούδι</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="2132"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2094"/>
         <source>All</source>
         <translation>Όλα</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="2146"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2106"/>
         <source>Random</source>
         <translation>Τυχαίο</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="2147"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2107"/>
         <source>Smart</source>
         <translation>Έξυπνο</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="2148"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2108"/>
         <source>Album</source>
         <translation>Δίσκος</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="2149"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2109"/>
         <source>Artist</source>
         <translation>Καλλιτέχνης</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="2183"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2139"/>
         <source>Choose Visualizer</source>
         <translation>Επιλέξτε Οπτικοποίηση</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="2298"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2151"/>
         <source>Add to Playlist Options</source>
         <translation>Προσθήκη στις Επιλογές Αναπαραγωγής</translation>
     </message>
@@ -1034,31 +1027,31 @@ Do you want to continue playing in the background?</source>
         <translation type="obsolete">Τέλος αναπαραγωγής ροής.</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="1192"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1176"/>
         <source>Decoder error.</source>
         <translation>Σφάλμα αποκωδικοποιητή.</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="1228"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2007"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1209"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1980"/>
         <source>Search List...</source>
         <translation>Αναζήτηση Λίστας...</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="1235"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2057"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1216"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2023"/>
         <source>Sync List With Current Track</source>
         <translation>Συγχρ. Λίστας με το Παρόν Κομμάτι</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="1239"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2058"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1220"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2024"/>
         <source>Remove Selected Track</source>
         <translation>Αφαίρεση Επιλεγμένου Κομματιού</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="1249"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2061"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1230"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2027"/>
         <source>Remove All Tracks</source>
         <translation>Αφαίρεση όλων των Κομματιών</translation>
     </message>
@@ -1067,42 +1060,73 @@ Do you want to continue playing in the background?</source>
         <translation type="obsolete">Αποθήκευση ως νέα Λίστα</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="1285"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2071"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1266"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2037"/>
         <source>Switch To Move Mode</source>
         <translation>Αλλαγή σε Κατάσταση Μετακίνησης</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="1293"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2069"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1274"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2035"/>
         <source>Switch To Select Mode</source>
         <translation>Αλλαγή σε Κατάσταση Επιλογής</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="1312"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="1321"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2019"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2044"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2074"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2098"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2119"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2134"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2151"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2176"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2190"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2322"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1358"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2127"/>
+        <source>Tracks By Current Artist</source>
+        <translation>Τραγούδια από τον Επιλεγμένο Καλλιτέχνη</translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/musiccommon.cpp" line="1360"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2129"/>
+        <source>Tracks From Current Genre</source>
+        <translation>Τραγούδια από το Ίδιο Είδος</translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/musiccommon.cpp" line="1362"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2128"/>
+        <source>Tracks From Current Album</source>
+        <translation>Τραγούδια από τον Ίδιο Δίσκο</translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/musiccommon.cpp" line="1364"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2130"/>
+        <source>Track From Current Year</source>
+        <translation>Τραγούδια από το Ίδιο Έτος</translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/musiccommon.cpp" line="1366"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2131"/>
+        <source>Tracks With Same Title</source>
+        <translation>Τραγούδια με Ίδιο Τίτλο</translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/musiccommon.cpp" line="1371"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2155"/>
+        <source>Replace Tracks</source>
+        <translation>Αντικατάσταση Τραγουδιών</translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/musiccommon.cpp" line="1376"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2156"/>
+        <source>Add Tracks</source>
+        <translation>Προσθήκη Τραγουδιών</translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/musiccommon.cpp" line="2062"/>
         <source>Cancel</source>
         <translation>Ακύρωση</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="1346"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2096"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1320"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2060"/>
         <source>No - Exit, Stop Playing</source>
         <translation>Όχι - Έξοδος και Διακοπή Μουσικής</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="1352"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2097"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1326"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2061"/>
         <source>Yes - Exit, Continue Playing</source>
         <translation>Ναι - Έξοδος και Συνέχιση Μουσικής</translation>
     </message>
@@ -1114,8 +1138,8 @@ Do you want to continue playing in the background?</source>
         <translation type="obsolete">Κορυφή λίστας αναπαραγωγής</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musicplayer.cpp" line="1213"/>
-        <location filename="../mythmusic/musicplayer.cpp" line="1216"/>
+        <location filename="../mythmusic/musicplayer.cpp" line="1215"/>
+        <location filename="../mythmusic/musicplayer.cpp" line="1218"/>
         <source>Muted</source>
         <translation>Σε Σίγαση</translation>
     </message>
@@ -1123,147 +1147,147 @@ Do you want to continue playing in the background?</source>
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mythmusic/main.cpp" line="512"/>
+        <location filename="../mythmusic/main.cpp" line="518"/>
         <source>Play music</source>
         <translation>Αναπαραγωγή μουσικής</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="514"/>
+        <location filename="../mythmusic/main.cpp" line="520"/>
         <source>Select music playlists</source>
         <translation>Επιλογή λίστας μουσικής</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="516"/>
+        <location filename="../mythmusic/main.cpp" line="522"/>
         <source>Rip CD</source>
         <translation>Αντιγραφή CD</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="518"/>
+        <location filename="../mythmusic/main.cpp" line="524"/>
         <source>Scan music</source>
         <translation>Ανίχνευση μουσικής</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="520"/>
+        <location filename="../mythmusic/main.cpp" line="526"/>
         <source>Show Music Miniplayer</source>
         <translation>Εμφάνιση Μικρού Αναπαραγωγέα</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="523"/>
+        <location filename="../mythmusic/main.cpp" line="529"/>
         <source>Move to the next track</source>
         <translation>Πήγαινε σοτ επόμενο Τραγούδι</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="525"/>
+        <location filename="../mythmusic/main.cpp" line="531"/>
         <source>Move to the previous track</source>
         <translation>Πήγαινε στο προηγούμενο τραγούδι</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="527"/>
+        <location filename="../mythmusic/main.cpp" line="533"/>
         <source>Fast forward</source>
         <translation>Γρήγορα μπροστά</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="529"/>
+        <location filename="../mythmusic/main.cpp" line="535"/>
         <source>Rewind</source>
         <translation>Γρήγορα πίσω</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="531"/>
+        <location filename="../mythmusic/main.cpp" line="537"/>
         <source>Pause/Start playback</source>
         <translation>Παύση/Εκκίνηση αναπαραγωγής</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="533"/>
+        <location filename="../mythmusic/main.cpp" line="539"/>
         <source>Start playback</source>
         <translation>Εκκίνηση αναπαραγωγής</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="535"/>
+        <location filename="../mythmusic/main.cpp" line="541"/>
         <source>Stop playback</source>
         <translation>Διακοπή αναπαραγωγής</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="537"/>
+        <location filename="../mythmusic/main.cpp" line="543"/>
         <source>Volume down</source>
         <translation>Μείωση έντασης</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="539"/>
+        <location filename="../mythmusic/main.cpp" line="545"/>
         <source>Volume up</source>
         <translation>Αύξηση έντασης</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="541"/>
+        <location filename="../mythmusic/main.cpp" line="547"/>
         <source>Mute</source>
         <translation>Σίγαση</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="543"/>
+        <location filename="../mythmusic/main.cpp" line="549"/>
         <source>Toggle audio upmixer</source>
         <translation>Εναλλαγή μετατροπέα ήχου</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="545"/>
+        <location filename="../mythmusic/main.cpp" line="551"/>
         <source>Cycle visualizer mode</source>
         <translation>Εναλλαγή κατάστασης οπτικοποίησης</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="547"/>
+        <location filename="../mythmusic/main.cpp" line="553"/>
         <source>Blank screen</source>
         <translation>Κενή οθόνη</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="549"/>
+        <location filename="../mythmusic/main.cpp" line="555"/>
         <source>Increase rating</source>
         <translation>Αύξηση βαθμολογίας</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="551"/>
+        <location filename="../mythmusic/main.cpp" line="557"/>
         <source>Decrease rating</source>
         <translation>Μείωση βαθμολογίας</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="553"/>
+        <location filename="../mythmusic/main.cpp" line="559"/>
         <source>Refresh music tree</source>
         <translation>Ανανέωση λίστας μουσικής</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="555"/>
+        <location filename="../mythmusic/main.cpp" line="561"/>
         <source>Filter All My Music</source>
         <translation>Φιλτράρισμα Όλης της Μουσικής</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="557"/>
+        <location filename="../mythmusic/main.cpp" line="563"/>
         <source>Show incremental search dialog</source>
         <translation>Εμφάνιση αυξητικού διαλόγου αναζήτησης</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="559"/>
+        <location filename="../mythmusic/main.cpp" line="565"/>
         <source>Incremental search find next match</source>
         <translation>Αυξητική αναζήτηση εύρεση νέου ταιριάσματος</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="561"/>
+        <location filename="../mythmusic/main.cpp" line="567"/>
         <source>Increase Play Speed</source>
         <translation>Αύξηση Ταχύτητας Αναπαραγωγής</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="563"/>
+        <location filename="../mythmusic/main.cpp" line="569"/>
         <source>Decrease Play Speed</source>
         <translation>Μείωση Ταχύτητας Αναπαραγωγής</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="565"/>
+        <location filename="../mythmusic/main.cpp" line="571"/>
         <source>Toggle track selection</source>
         <translation>Εναλλαγή επιλογής τραγουδιού</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="572"/>
+        <location filename="../mythmusic/main.cpp" line="578"/>
         <source>MythMusic Media Handler 1/2</source>
         <translation>Χειριστής Μέσων 1/2</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="575"/>
+        <location filename="../mythmusic/main.cpp" line="581"/>
         <source>MythMusic Media Handler 2/2</source>
         <translation>Χειριστής Μέσων 2/2</translation>
     </message>
@@ -1495,18 +1519,26 @@ Do you want to continue playing in the background?</source>
     </message>
     <message>
         <location filename="../mythmusic/playersettings.cpp" line="63"/>
-        <source>Resume playback at either the beginning of the active play queue, the beginning of the last track, an exact point within the last track.</source>
+        <source>Resume playback at either the beginning of the active play queue, the beginning of the last track, or an exact point within the last track.</source>
         <translation>Συνεχίζει την αναπαραγωγή είτε από την αρχή της τρέχουσας ουράς αναπαραγωγής, την αρχή του τελευταίου τραγουδιού ή το ακριβές σημείο του τελευταίου τραγουδιού.</translation>
     </message>
     <message>
         <location filename="../mythmusic/playersettings.cpp" line="66"/>
+        <source>Specify what action to take when exiting MythMusic plugin.</source>
+        <translation>Ορίζει ποιά ενέργεια θα εκτελείται όταν βγαίνετε από την αναπαραγωγή μουσικής.</translation>
+    </message>
+    <message>
+        <source>Resume playback at either the beginning of the active play queue, the beginning of the last track, an exact point within the last track.</source>
+        <translation type="obsolete">Συνεχίζει την αναπαραγωγή είτε από την αρχή της τρέχουσας ουράς αναπαραγωγής, την αρχή του τελευταίου τραγουδιού ή το ακριβές σημείο του τελευταίου τραγουδιού.</translation>
+    </message>
+    <message>
         <source>Specify what action to take when exiting mythmusic plugin.</source>
-        <translation>Ορίζει ποιά ενέργεια θα εκτελείται όταν βγαίνετε από τον αναπαραγωγέα μουσικής.</translation>
+        <translation type="obsolete">Ορίζει ποιά ενέργεια θα εκτελείται όταν βγαίνετε από τον αναπαραγωγέα μουσικής.</translation>
     </message>
     <message>
         <location filename="../mythmusic/playersettings.cpp" line="67"/>
         <source>Automatically lookup an audio CD if it is present and show its information in the Music Selection Tree.</source>
-        <translation>Αυτόματα ανιχνεύει αν έχει εισαχθεί CD και εμφανίζει τα στοιχεία του στο Δένδρο Επιλογής Μουσικής.</translation>
+        <translation>Αν έχει εισαχθεί CD ψάχνει τα στοιχεία του και τα εμφανίζει στο Δένδρο Επιλογής Μουσικής.</translation>
     </message>
     <message>
         <location filename="../mythmusic/playersettings.cpp" line="70"/>
@@ -1527,70 +1559,132 @@ Do you want to continue playing in the background?</source>
 <context>
     <name>PlaylistEditorView</name>
     <message>
-        <location filename="../mythmusic/playlisteditorview.cpp" line="346"/>
-        <location filename="../mythmusic/playlisteditorview.cpp" line="793"/>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="232"/>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="589"/>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="599"/>
+        <source>New Smart Playlist</source>
+        <translation>Νέα Έξυπνη Λίστα Αναπαραγωγής</translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="254"/>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="600"/>
+        <source>Remove Smart Playlist</source>
+        <translation>Αφαίρεση Έξυπνης Λίστας Αναπαραγωγής</translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="263"/>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="598"/>
+        <source>Edit Smart Playlist</source>
+        <translation>Επεξεργασία Έξυπνης Λίστας Αναπαραγωγής</translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="284"/>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="316"/>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="548"/>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="595"/>
+        <source>Replace Tracks</source>
+        <translation>Αντικατάσταση Τραγουδιών</translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="289"/>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="322"/>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="549"/>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="596"/>
+        <source>Add Tracks</source>
+        <translation>Προσθήκη Τραγουδιών</translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="308"/>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="550"/>
+        <source>Remove Playlist</source>
+        <translation>Αφαίρεση Λίστας Αναπαραγωγής</translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="516"/>
+        <source>More Options</source>
+        <translation>Περισσότερες Επιλογές</translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="547"/>
+        <source>Playlist Actions</source>
+        <translation>Ενέργειες Λίστας</translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="585"/>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="593"/>
+        <source>Smart Playlist Actions</source>
+        <translation>Ενέργειες Έξυπνης Λίστας</translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="621"/>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="1114"/>
         <source>All Tracks</source>
         <translation>Όλα τα Τραγούδια</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playlisteditorview.cpp" line="350"/>
-        <location filename="../mythmusic/playlisteditorview.cpp" line="799"/>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="625"/>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="1120"/>
         <source>Albums</source>
         <translation>Δίσκοι</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playlisteditorview.cpp" line="354"/>
-        <location filename="../mythmusic/playlisteditorview.cpp" line="807"/>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="629"/>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="1127"/>
         <source>Artists</source>
         <translation>Καλλιτέχνες</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playlisteditorview.cpp" line="358"/>
-        <location filename="../mythmusic/playlisteditorview.cpp" line="814"/>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="633"/>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="1175"/>
         <source>Genres</source>
         <translation>Είδη</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playlisteditorview.cpp" line="362"/>
-        <location filename="../mythmusic/playlisteditorview.cpp" line="821"/>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="637"/>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="1182"/>
         <source>Tags</source>
         <translation>Ετικέτες</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playlisteditorview.cpp" line="366"/>
-        <location filename="../mythmusic/playlisteditorview.cpp" line="828"/>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="641"/>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="1189"/>
         <source>Ratings</source>
         <translation>Αξιολογήσεις</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playlisteditorview.cpp" line="370"/>
-        <location filename="../mythmusic/playlisteditorview.cpp" line="835"/>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="645"/>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="1196"/>
         <source>Years</source>
         <translation>Έτη</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playlisteditorview.cpp" line="374"/>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="649"/>
+        <source>Compilations</source>
+        <translation>Συνθέσεις</translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="668"/>
         <source>Directory</source>
         <translation>Φάκελος</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playlisteditorview.cpp" line="377"/>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="671"/>
         <source>Playlists</source>
         <translation>Λίστες</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playlisteditorview.cpp" line="380"/>
-        <location filename="../mythmusic/playlisteditorview.cpp" line="1115"/>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="674"/>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="1481"/>
         <source>Smart Playlists</source>
         <translation>Έξυπνες Λίστες Αναπαραγωγής</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playlisteditorview.cpp" line="557"/>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="837"/>
         <source>%1 of %2</source>
         <translation>%1 από %2</translation>
     </message>
     <message numerus="yes">
-        <location filename="../mythmusic/playlisteditorview.cpp" line="723"/>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="1041"/>
         <source>%n Star(s)</source>
         <translation>
             <numerusform>%n Αστέρι</numerusform>
@@ -1598,12 +1692,17 @@ Do you want to continue playing in the background?</source>
         </translation>
     </message>
     <message>
-        <location filename="../mythmusic/playlisteditorview.cpp" line="997"/>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="1167"/>
+        <source>Compilation Artists</source>
+        <translation>Καλλιτέχνες Σύνθεσης</translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="1358"/>
         <source>** No matching tracks **</source>
         <translation>** Δεν ταιριάζουν τραγούδια **</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playlisteditorview.cpp" line="1037"/>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="1398"/>
         <source>** Empty Playlist!! **</source>
         <translation>** Άδεια Λίστα!! **</translation>
     </message>
@@ -1661,7 +1760,7 @@ Do you want to continue playing in the background?</source>
         <translation type="obsolete">Το θέμα που χρησιμοποιείτε δεν περιέχει το στοιχείο %1. Παρακαλώ επικοινωνήστε με το δημιουργό του και ζητήστε του αν θα μπορούσε να το ενημερώσει. &lt;br&gt;&lt;br&gt;Η επόμενη οθόνη θα είναι άδεια. Πατήστε Escape για να γυρίσετε στις επιλογές.</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musicplayer.cpp" line="1440"/>
+        <location filename="../mythmusic/musicplayer.cpp" line="1442"/>
         <source>Unknown</source>
         <translation>Άγνωστο</translation>
     </message>
@@ -2314,12 +2413,18 @@ Do you want to continue playing in the background?</source>
         <translation>ώπα</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playlist.cpp" line="1226"/>
+        <location filename="../mythmusic/playlist.cpp" line="549"/>
+        <location filename="../mythmusic/playlist.cpp" line="590"/>
+        <source>Default Playlist</source>
+        <translation>Εξ ορισμού Λίστα</translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/playlist.cpp" line="1228"/>
         <source>Creating CD File System</source>
         <translation>Δημιουργία Συστήματος Αρχείων CD</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playlist.cpp" line="1275"/>
+        <location filename="../mythmusic/playlist.cpp" line="1277"/>
         <source>Burning CD</source>
         <translation>Εγγραφή CD</translation>
     </message>
@@ -2353,17 +2458,15 @@ Do you want to continue playing in the background?</source>
         <translation type="obsolete">Τρέξατε το configure;</translation>
     </message>
     <message>
-        <location filename="../mythmusic/visualize.cpp" line="1366"/>
         <source>Piano Visualization Message</source>
-        <translation>Μήνυμα Οπτικοποίησης Πιάνου</translation>
+        <translation type="obsolete">Μήνυμα Οπτικοποίησης Πιάνου</translation>
     </message>
     <message>
-        <location filename="../mythmusic/visualize.cpp" line="1367"/>
         <source>Are you sane running this code?</source>
-        <translation>Είστε με τα καλά σας που τρέχετε αυτόν τον κώδικα;</translation>
+        <translation type="obsolete">Είστε με τα καλά σας που τρέχετε αυτόν τον κώδικα;</translation>
     </message>
     <message>
-        <location filename="../mythmusic/visualize.cpp" line="1541"/>
+        <location filename="../mythmusic/visualize.cpp" line="1535"/>
         <source>?</source>
         <translation>;</translation>
     </message>
@@ -2411,8 +2514,12 @@ Check the URL is correct.</source>
     </message>
     <message>
         <location filename="../mythmusic/ratingsettings.cpp" line="64"/>
+        <source>Used in &quot;Smart&quot; Shuffle mode. This weighting affects how much strength is given to good old (pseudo-)randomness when ordering a group of songs.</source>
+        <translation>Χρησιμοποιείται κατά το &quot;Έξυπνο&quot; Ανακάτεμα. Επηρεάζει πόση σημασία θα έχει η αξιολόγηση που δίνετε στον παλιό καλό βαθμό (ψευδο) τυχαιότητας κατά την ταξινόμηση της ομάδας τραγουδιών.</translation>
+    </message>
+    <message>
         <source>Used in &quot;Smart&quot; Shuffle mode. This weighting affects how much strength is given to good old (peudo-)randomness when ordering a group of songs.</source>
-        <translation>Χρησιμοποιείται κατά την &quot;Έξυπνη&quot; Ανάμιξη. Επηρεάζει πόση σημασία θα έχει η αξιολόγηση που δίνετε στον βαθμό τυχαιότητας κατά την ταξινόμηση της ομάδας τραγουδιών.</translation>
+        <translation type="obsolete">Χρησιμοποιείται κατά την &quot;Έξυπνη&quot; Ανάμιξη. Επηρεάζει πόση σημασία θα έχει η αξιολόγηση που δίνετε στον βαθμό τυχαιότητας κατά την ταξινόμηση της ομάδας τραγουδιών.</translation>
     </message>
     <message>
         <location filename="../mythmusic/ratingsettings.cpp" line="68"/>
@@ -2614,9 +2721,8 @@ Do you want to permanently delete the existing file(s)?</source>
         <translation>Περισσότερες Επιλογές</translation>
     </message>
     <message>
-        <location filename="../mythmusic/searchview.cpp" line="298"/>
         <source>Cancel</source>
-        <translation>Ακύρωση</translation>
+        <translation type="obsolete">Ακύρωση</translation>
     </message>
 </context>
 <context>
@@ -2681,7 +2787,7 @@ Do you want to permanently delete the existing file(s)?</source>
         <translation type="obsolete">Ακύρωση</translation>
     </message>
     <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="2588"/>
+        <location filename="../mythmusic/smartplaylist.cpp" line="2584"/>
         <source>Invalid Date</source>
         <translation>Λάθος Ημερομηνία</translation>
     </message>
@@ -2784,7 +2890,7 @@ Do you want to permanently delete the existing file(s)?</source>
         <translation type="obsolete">Έξοδος</translation>
     </message>
     <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="1785"/>
+        <location filename="../mythmusic/smartplaylist.cpp" line="1781"/>
         <source>%1 of %2</source>
         <translation>%1 από %2</translation>
     </message>
@@ -2792,52 +2898,52 @@ Do you want to permanently delete the existing file(s)?</source>
 <context>
     <name>SmartPlaylistDialog</name>
     <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="2081"/>
+        <location filename="../mythmusic/smartplaylist.cpp" line="2077"/>
         <source>Smart Playlists</source>
         <translation>Έξυπνες Λίστες Αναπαραγωγής</translation>
     </message>
     <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="2113"/>
+        <location filename="../mythmusic/smartplaylist.cpp" line="2109"/>
         <source>1 Select</source>
         <translation>1 Επιλογή</translation>
     </message>
     <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="2115"/>
+        <location filename="../mythmusic/smartplaylist.cpp" line="2111"/>
         <source>Select</source>
         <translation>Επιλογή</translation>
     </message>
     <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="2120"/>
+        <location filename="../mythmusic/smartplaylist.cpp" line="2116"/>
         <source>2 New</source>
         <translation>2 Νέα</translation>
     </message>
     <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="2122"/>
+        <location filename="../mythmusic/smartplaylist.cpp" line="2118"/>
         <source>New</source>
         <translation>Νέα</translation>
     </message>
     <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="2128"/>
+        <location filename="../mythmusic/smartplaylist.cpp" line="2124"/>
         <source>3 Edit</source>
         <translation>3 Επεξεργασία</translation>
     </message>
     <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="2130"/>
+        <location filename="../mythmusic/smartplaylist.cpp" line="2126"/>
         <source>Edit</source>
         <translation>Επεξεργασία</translation>
     </message>
     <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="2135"/>
+        <location filename="../mythmusic/smartplaylist.cpp" line="2131"/>
         <source>4 Delete</source>
         <translation>4 Διαγραφή</translation>
     </message>
     <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="2137"/>
+        <location filename="../mythmusic/smartplaylist.cpp" line="2133"/>
         <source>Delete</source>
         <translation>Διαγραφή</translation>
     </message>
     <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="2283"/>
+        <location filename="../mythmusic/smartplaylist.cpp" line="2279"/>
         <source>Are you sure you want to delete this SmartPlaylist?</source>
         <translation>Σίγουρα θέλετε να διαγράψετε τη Λίστα;</translation>
     </message>
@@ -2862,15 +2968,15 @@ Do you want to permanently delete the existing file(s)?</source>
     </message>
     <message>
         <location filename="../mythmusic/smartplaylist.cpp" line="427"/>
-        <location filename="../mythmusic/smartplaylist.cpp" line="766"/>
-        <location filename="../mythmusic/smartplaylist.cpp" line="872"/>
+        <location filename="../mythmusic/smartplaylist.cpp" line="762"/>
+        <location filename="../mythmusic/smartplaylist.cpp" line="868"/>
         <source>All</source>
         <translation>Όλες</translation>
     </message>
     <message>
         <location filename="../mythmusic/smartplaylist.cpp" line="428"/>
-        <location filename="../mythmusic/smartplaylist.cpp" line="874"/>
-        <location filename="../mythmusic/smartplaylist.cpp" line="1042"/>
+        <location filename="../mythmusic/smartplaylist.cpp" line="870"/>
+        <location filename="../mythmusic/smartplaylist.cpp" line="1038"/>
         <source>Any</source>
         <translation>Κάποιες</translation>
     </message>
@@ -2891,10 +2997,8 @@ Do you want to permanently delete the existing file(s)?</source>
         <translation type="obsolete">Όριο:</translation>
     </message>
     <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="690"/>
-        <location filename="../mythmusic/smartplaylist.cpp" line="721"/>
         <source>Cancel</source>
-        <translation>Ακύρωση</translation>
+        <translation type="obsolete">Ακύρωση</translation>
     </message>
     <message>
         <source>Save</source>
@@ -2947,32 +3051,32 @@ Do you want to permanently delete the existing file(s)?</source>
         <translation>Ενέργειες Κατηγορίας</translation>
     </message>
     <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="697"/>
+        <location filename="../mythmusic/smartplaylist.cpp" line="695"/>
         <source>Criteria Actions</source>
         <translation>Ενέργειες Κριτηρίων</translation>
     </message>
     <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="714"/>
+        <location filename="../mythmusic/smartplaylist.cpp" line="712"/>
         <source>Edit Criteria</source>
         <translation>Επεξεργασία Κριτηρίων</translation>
     </message>
     <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="716"/>
+        <location filename="../mythmusic/smartplaylist.cpp" line="714"/>
         <source>Add Criteria</source>
         <translation>Προσθήκη Κριτηρίων</translation>
     </message>
     <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="719"/>
+        <location filename="../mythmusic/smartplaylist.cpp" line="717"/>
         <source>Delete Criteria</source>
         <translation>Διαγραφή Κριτηρίων</translation>
     </message>
     <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="966"/>
+        <location filename="../mythmusic/smartplaylist.cpp" line="962"/>
         <source>Are you sure you want to delete this Category?</source>
         <translation>Σίγουρα θέλετε να διαγράψετε αυτή την Κατηγορία;</translation>
     </message>
     <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="968"/>
+        <location filename="../mythmusic/smartplaylist.cpp" line="964"/>
         <source>It will also delete any Smart Playlists belonging to this category.</source>
         <translation>Θα διαγραφούν επίσης και όποιες Λίστες ανήκουν σ΄αυτή την κατηγορία.</translation>
     </message>
@@ -2980,447 +3084,627 @@ Do you want to permanently delete the existing file(s)?</source>
 <context>
     <name>ThemeUI</name>
     <message>
-        <location filename="themestrings.h" line="5"/>
+        <location filename="themestrings.h" line="61"/>
         <source>Please Wait...</source>
         <oldsource>Please Wait ...</oldsource>
         <translation>Παρακαλώ Περιμένετε...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="6"/>
+        <location filename="themestrings.h" line="62"/>
         <source>Track Information</source>
         <translation>Πληροφορίες Τραγουδιού</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="7"/>
+        <location filename="themestrings.h" line="63"/>
         <source>Compilation:</source>
         <translation>Σύνθεση:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="8"/>
+        <location filename="themestrings.h" line="64"/>
         <source>Comp. Artist:</source>
         <translation>Καλλιτέχνης Σύνθ:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="9"/>
+        <location filename="themestrings.h" line="65"/>
         <source>Artist:</source>
         <translation>Καλλιτέχνης:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="10"/>
+        <location filename="themestrings.h" line="66"/>
         <source>Album:</source>
         <translation>Δίσκος:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="11"/>
+        <location filename="themestrings.h" line="67"/>
         <source>Title:</source>
         <translation>Τίτλος:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="12"/>
+        <location filename="themestrings.h" line="68"/>
         <source>Track No.:</source>
         <translation>Αρ. Τραγ.:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="13"/>
+        <location filename="themestrings.h" line="69"/>
         <source>Genre:</source>
         <translation>Είδος:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="14"/>
+        <location filename="themestrings.h" line="70"/>
         <source>Year:</source>
         <translation>Έτος:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="15"/>
+        <location filename="themestrings.h" line="71"/>
         <source>Rating:</source>
         <translation>Αξιολόγηση:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="16"/>
+        <location filename="themestrings.h" line="72"/>
         <source>Play Count:</source>
         <translation>Παίχθηκε φορές:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="17"/>
+        <location filename="themestrings.h" line="73"/>
         <source>Last Play:</source>
         <translation>Παίχτηκε τελευταία:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="18"/>
+        <location filename="themestrings.h" line="74"/>
         <source>Filename:</source>
         <translation>Αρχείο:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="19"/>
+        <location filename="themestrings.h" line="75"/>
         <source>Album Art</source>
         <translation>Εξώφυλλο</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="20"/>
+        <location filename="themestrings.h" line="76"/>
         <source>No Album Art Found</source>
         <translation>Δεν Βρέθηκε Εξώφυλλο</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="21"/>
+        <location filename="themestrings.h" line="77"/>
         <source>Type:</source>
         <translation>Τύπος:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="22"/>
+        <location filename="themestrings.h" line="78"/>
         <source>%DATE%, %TIME%</source>
         <translation>%DATE%, %TIME%</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="23"/>
+        <location filename="themestrings.h" line="79"/>
         <source>Import Coverart</source>
         <translation>Εισαγωγή Εξωφύλλου</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="24"/>
+        <location filename="themestrings.h" line="80"/>
         <source>Browse cover images on your system.</source>
         <translation>Ψάχνει εικόνες εξωφύλλων στον Η/Υ.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="25"/>
+        <location filename="themestrings.h" line="81"/>
         <source>File:</source>
         <translation>Αρχείο:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="26"/>
+        <location filename="themestrings.h" line="82"/>
         <source>Destination:</source>
         <translation>Προορισμός:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="27"/>
+        <location filename="themestrings.h" line="83"/>
         <source>Image Type:</source>
         <translation>Τύπος Εικόνας:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="28"/>
+        <location filename="themestrings.h" line="84"/>
         <source>Previous</source>
         <translation>Προηγούμενο</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="29"/>
+        <location filename="themestrings.h" line="85"/>
         <source>Next</source>
         <translation>Επόμενο</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="30"/>
+        <location filename="themestrings.h" line="86"/>
         <source>Copy</source>
         <translation>Αντιγραφή</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="31"/>
+        <location filename="themestrings.h" line="87"/>
         <source>Done</source>
         <translation>Εντάξει</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="32"/>
+        <location filename="themestrings.h" line="88"/>
         <source>Already in database</source>
         <translation>Ήδη στη συλλογή</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="33"/>
+        <location filename="themestrings.h" line="89"/>
         <source>Import Music</source>
         <translation>Εισαγωγή Μουσικής</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="34"/>
+        <location filename="themestrings.h" line="90"/>
         <source>Import local music files.</source>
         <translation>Εισαγωγή τοπικών αρχείων μουσικής.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="35"/>
+        <location filename="themestrings.h" line="91"/>
         <source>Location:</source>
         <translation>Θέση:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="36"/>
+        <location filename="themestrings.h" line="92"/>
         <source>Track is part of a compilation</source>
         <translation>Το τραγούδι είναι μέρος σύνθεσης</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="37"/>
+        <location filename="themestrings.h" line="93"/>
         <source>Click to browse directories...</source>
         <translation>Πατήστε για περιήγηση στους φακέλους...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="38"/>
+        <location filename="themestrings.h" line="94"/>
         <source>Search</source>
         <translation>Αναζήτηση</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="39"/>
+        <location filename="themestrings.h" line="95"/>
         <source>Choose Coverart</source>
         <translation>Επιλέξτε Εξώφυλλο</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="40"/>
+        <location filename="themestrings.h" line="96"/>
         <source>Add</source>
         <translation>Προσθήκη</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="41"/>
+        <location filename="themestrings.h" line="97"/>
         <source>Play</source>
         <translation>Παίξε</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="42"/>
+        <location filename="themestrings.h" line="98"/>
         <source>Next New</source>
         <translation>Επόμενη Νέα</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="43"/>
+        <location filename="themestrings.h" line="99"/>
         <source>Add All New</source>
         <translation>Προσθήκη Όλων Νέων</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="44"/>
+        <location filename="themestrings.h" line="100"/>
         <source>Rip A CD</source>
         <translation>Αντιγραφή CD</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="45"/>
+        <location filename="themestrings.h" line="101"/>
         <source>Input metadata for the CD you have inserted.</source>
         <translation>Εισαγωγή στοιχείων για το CD που εισάγατε.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="46"/>
+        <location filename="themestrings.h" line="102"/>
         <source>Quality:</source>
         <translation>Ποιότητα:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="47"/>
+        <location filename="themestrings.h" line="103"/>
         <source>Album Name:</source>
         <translation>Όνομα Δίσκου:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="48"/>
+        <location filename="themestrings.h" line="104"/>
         <source>Album Year:</source>
         <translation>Έτος Δίσκου:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="49"/>
+        <location filename="themestrings.h" line="105"/>
         <source>Album is a compilation</source>
         <translation>Ο δίσκος αποτελεί Σύνθεση</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="50"/>
+        <location filename="themestrings.h" line="106"/>
         <source>Click here to search existing artists...</source>
         <translation>Πατήστε για αναζήτηση σε υπάρχοντες καλλιτέχνες...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="51"/>
+        <location filename="themestrings.h" line="107"/>
         <source>Click here to search existing albums...</source>
         <translation>Πατήστε για αναζήτηση σε υπάρχοντες δίσκους...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="52"/>
+        <location filename="themestrings.h" line="108"/>
         <source>Click here to search existing genres...</source>
         <translation>Πατήστε για αναζήτηση σε υπάρχοντα είδη...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="53"/>
+        <location filename="themestrings.h" line="109"/>
         <source>Switch Titles</source>
         <translation>Εναλλαγή Τίτλων</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="54"/>
+        <location filename="themestrings.h" line="110"/>
         <source>Scan CD</source>
         <translation>Ανίχνευση CD</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="55"/>
+        <location filename="themestrings.h" line="111"/>
         <source>Rip CD</source>
         <translation>Αντιγραφή CD</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="56"/>
+        <location filename="themestrings.h" line="112"/>
         <source>Metadata</source>
         <translation>Στοιχεία</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="58"/>
+        <location filename="themestrings.h" line="114"/>
         <source>Scan</source>
         <translation>Ανίχνευση</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="59"/>
+        <location filename="themestrings.h" line="115"/>
         <source>Cover Art</source>
         <translation>Εξώφυλλα</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="62"/>
+        <location filename="themestrings.h" line="118"/>
         <source>Album</source>
         <translation>Άλμπουμ</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="63"/>
+        <location filename="themestrings.h" line="119"/>
         <source>Genre</source>
         <translation>Είδος</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="64"/>
+        <location filename="themestrings.h" line="120"/>
         <source>Multi-Artist:</source>
         <translation>Πολλαπλοί-Καλλιτέχνες:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="65"/>
+        <location filename="themestrings.h" line="121"/>
         <source>Track</source>
         <translation>Τραγούδι</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="66"/>
+        <location filename="themestrings.h" line="122"/>
         <source>Title</source>
         <translation>Τίτλος</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="82"/>
+        <location filename="themestrings.h" line="126"/>
+        <source>Play List</source>
+        <translation>Λίστα Αναπαραγωγής</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="127"/>
+        <source>Played %1 times</source>
+        <translation>Παίχθηκε %1 φορές</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="128"/>
+        <source>Play List Editor (tree)</source>
+        <translation>Επεξεργασία Λίστας (δένδρο)</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="129"/>
+        <source>Play List Editor (gallery)</source>
+        <translation>Επεξεργασία Λίστας (συλλογή)</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="130"/>
+        <source>Play List Editor (search)</source>
+        <translation>Επεξεργασία Λίστας (αναζήτηση)</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="131"/>
+        <source>%TITLE% by %ARTIST% on %ALBUM%</source>
+        <translation>%TITLE% από %ARTIST% στο %ALBUM%</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="132"/>
+        <source>Next: %NEXTTITLE% by %NEXTARTIST%</source>
+        <translation>Επόμενοt: %NEXTTITLE% από %NEXTARTIST%</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="133"/>
+        <source>Smart Playlist Editor</source>
+        <translation>Επεξεργασία Έξυπνης Λίστας Αναπαραγωγής</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="134"/>
+        <source>Category:</source>
+        <translation>Κατηγορία:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="135"/>
+        <source>Edit</source>
+        <translation>Επεξεργασία</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="136"/>
+        <source>Match:</source>
+        <translation>Ταίριασμα:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="137"/>
+        <source>of the following conditions:</source>
+        <translation>από τις παρακάτω συνθήκες:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="138"/>
+        <source>Order By:</source>
+        <translation>Σειρά Κατά:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="139"/>
+        <source>Limit:</source>
+        <translation>Όριο:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="140"/>
+        <source>Show Results</source>
+        <translation>Εμφάνιση Αποτελεσμάτων</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="141"/>
+        <source>Edit Criteria</source>
+        <translation>Επεξεργασία Κριτηρίων</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="142"/>
+        <source>Edit Date</source>
+        <translation>Επεξεργασία Ημερομηνίας</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="143"/>
+        <source>Use Current Date</source>
+        <translation>Χρήση Τρέχουσας Ημερομηνίας</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="144"/>
+        <source>Fixed Date</source>
+        <translation>Σταθερή Ημερομηνία</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="145"/>
+        <source>Day</source>
+        <translation>Ημέρα</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="146"/>
+        <source>Month</source>
+        <translation>Μήνας</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="147"/>
+        <source>Year</source>
+        <translation>Έτος</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="148"/>
+        <source>+/- Days</source>
+        <translation>+/- Ημέρες</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="149"/>
+        <source>Order By Fields</source>
+        <translation>Σειρά κατά Πεδία</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="150"/>
+        <source>Delete</source>
+        <translation>Διαγραφή</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="151"/>
+        <source>Move Up</source>
+        <translation>Προς Τα Πάνω</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="152"/>
+        <source>Move Down</source>
+        <translation>Προς τα Κάτω</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="153"/>
+        <source>Ascending</source>
+        <translation>Αύξουσα</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="154"/>
+        <source>Descending</source>
+        <translation>Φθίνουσα</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="155"/>
+        <source>Smart Playlist Result Viewer</source>
+        <translation>Εμφάνιση Αποτελέσματος Έξυπνης Λίστας Αναπαραγωγής</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="157"/>
+        <source>Compilation</source>
+        <translation>Σύνθεση</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="159"/>
+        <source>Album Artwork</source>
+        <translation>Εξώφυλλο Δίσκου</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="161"/>
+        <source>Date Added:</source>
+        <translation>Προστέθηκε στις:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="166"/>
+        <source>Look Up</source>
+        <translation>Εύρεση</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="167"/>
+        <source>Rip a CD</source>
+        <translation>Αντιγραφή CD</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="168"/>
+        <source>Multi-Artist</source>
+        <translation>Πολλαπλοί Καλλιτέχνες</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="170"/>
+        <source>Importing CD:</source>
+        <translation>Εισάγω το CD:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="171"/>
+        <source>Encoding Track:</source>
+        <translation>Κωδικοποίηση Τραγουδιού:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="173"/>
         <source>%VOLUMEPERCENT%</source>
         <translation>%VOLUMEPERCENT%</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="61"/>
+        <location filename="themestrings.h" line="117"/>
         <source>Artist</source>
         <translation>Καλλιτέχνης</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="2"/>
+        <location filename="themestrings.h" line="5"/>
         <source>Playing:</source>
         <translation>Παίζει:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="3"/>
+        <location filename="themestrings.h" line="6"/>
         <source>None</source>
         <translation>Όχι</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="4"/>
+        <location filename="themestrings.h" line="7"/>
         <source>%TITLE%  by  %ARTIST%</source>
         <translation>%TITLE%  από  %ARTIST%</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="67"/>
+        <location filename="themestrings.h" line="123"/>
         <source>Length</source>
         <translation>Διάρκεια</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="69"/>
+        <location filename="themestrings.h" line="125"/>
         <source>Encoding Track</source>
         <translation>Κωδικοποίηση Τραγουδιού</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="70"/>
         <source>Edit Playlist</source>
-        <translation>Επεξεργασία Λίστας Αναπαραγωγής</translation>
+        <translation type="obsolete">Επεξεργασία Λίστας Αναπαραγωγής</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="71"/>
+        <location filename="themestrings.h" line="207"/>
         <source>Play Music</source>
         <translation>Αναπαραγωγη Μουσικης</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="72"/>
         <source>Edit Metadata</source>
-        <translation>Επεξεργασία Στοιχείων</translation>
+        <translation type="obsolete">Επεξεργασία Στοιχείων</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="73"/>
         <source>Edit AlbumArt</source>
-        <translation>Επεξεργασία Εξωφύλλων</translation>
+        <translation type="obsolete">Επεξεργασία Εξωφύλλων</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="74"/>
+        <location filename="themestrings.h" line="169"/>
         <source>Ripping CD</source>
         <translation>Αντιγράφω CD</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="75"/>
+        <location filename="themestrings.h" line="184"/>
         <source>Importing CD</source>
         <translation>Εισάγω CD</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="76"/>
         <source>Directory Finder</source>
-        <translation>Εύρεση Φακέλου</translation>
+        <translation type="obsolete">Εύρεση Φακέλου</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="68"/>
+        <location filename="themestrings.h" line="124"/>
         <source>Import Cover Art</source>
         <translation>Εισαγωγή Εξωφύλλου</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="77"/>
-        <source>/some/file/goes/here/test.mp3</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="78"/>
         <source>123 of 345</source>
-        <translation>123 από 345</translation>
+        <translation type="obsolete">123 από 345</translation>
     </message>
     <message>
         <source>All ready in database</source>
         <translation type="obsolete">Ήδη στη συλλογή</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="88"/>
+        <location filename="themestrings.h" line="8"/>
         <source>General Settings</source>
         <translation>Γενικες Ρυθμισεις</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="89"/>
+        <location filename="themestrings.h" line="201"/>
         <source>Music folders and general options</source>
         <translation>Φάκελοι Μουσικής και γενικές επιλογές</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="90"/>
+        <location filename="themestrings.h" line="19"/>
         <source>Player Settings</source>
         <translation>Ρυθμισεις Αναπαραγωγης</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="91"/>
+        <location filename="themestrings.h" line="202"/>
         <source>Music playback options</source>
         <translation>Επιλογές Αναπαραγωγής Μουσικής</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="92"/>
+        <location filename="themestrings.h" line="29"/>
         <source>Ripper Settings</source>
         <translation>Ρυθμισεις Αντιγραφης</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="93"/>
+        <location filename="themestrings.h" line="203"/>
         <source>CD copying options</source>
         <translation>Επιλογές Αντιγραφής CD</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="94"/>
+        <location filename="themestrings.h" line="208"/>
         <source>Select Music</source>
         <translation>Επιλογη Μουσικης</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="60"/>
+        <location filename="themestrings.h" line="116"/>
         <source>Import CD</source>
         <translation>Εισαγωγη CD</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="57"/>
+        <location filename="themestrings.h" line="113"/>
         <source>Import Files</source>
         <translation>Εισαγωγη Αρχειων</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="79"/>
+        <location filename="themestrings.h" line="156"/>
         <source>Edit Track Information</source>
         <translation>Επεξεργασία Πληροφοριών Τραγουδιού</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="80"/>
+        <location filename="themestrings.h" line="158"/>
         <source>N/A</source>
         <translation>Δ/Υ</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="81"/>
+        <location filename="themestrings.h" line="172"/>
         <source>Volume</source>
         <translation>Ένταση</translation>
     </message>
@@ -3429,47 +3713,442 @@ Do you want to permanently delete the existing file(s)?</source>
         <translation type="obsolete">0%</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="83"/>
+        <location filename="themestrings.h" line="160"/>
         <source>Length:</source>
         <translation>Μήκος:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="84"/>
+        <location filename="themestrings.h" line="163"/>
         <source>Last Played:</source>
         <translation>Παίχθηκε τελευταία:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="85"/>
+        <location filename="themestrings.h" line="162"/>
         <source>Last Value</source>
         <translation>Τελευταία Τιμή</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="86"/>
+        <location filename="themestrings.h" line="9"/>
+        <source>Directory to hold music:</source>
+        <translation>Φάκελος για αποθήκευση μουσικής:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="10"/>
+        <source>CD device:</source>
+        <translation>Συσκευή CD:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="11"/>
+        <source>Audio device:</source>
+        <translation>Συσκευή Ήχου:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="12"/>
+        <source>Filename Format:</source>
+        <translation>Μορφή αρχείων:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="13"/>
+        <source>Tag Encoding:</source>
+        <translation>Κωδικοποίηση Ετικέτας:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="14"/>
+        <source>Convert stereo to 5.1 sound</source>
+        <translation>Μετατροπή στερεοφωνικού ήχου σε 5.1 πολυκάναλο</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="15"/>
+        <source>Ignore ID3 Tags</source>
+        <translation>Αγνόηση Ετικετών ID3</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="16"/>
+        <source>Allow metadata to be written to tags</source>
+        <translation>Να γράφονται πληροφορίες στις ετικέττες</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="17"/>
+        <source>Save</source>
+        <translation>Αποθήκευση</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="18"/>
+        <source>Cancel</source>
+        <translation>Ακύρωση</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="20"/>
+        <source>Resume mode:</source>
+        <translation>Είδος Συνέχειας:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="21"/>
+        <source>Action on exit:</source>
+        <translation>Ενέργεια κατά την έξοδο:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="22"/>
+        <source>Automatically lookup CDs</source>
+        <translation>Αυτόματη αναζήτηση στοιχείων των CD</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="23"/>
+        <source>Automatically Play CDs</source>
+        <translation>Αυτόματη Αναπαραγωγή CD</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="24"/>
+        <source>Rating Settings</source>
+        <translation>Ρυθμισεις Αξιολογησης</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="25"/>
+        <source>Rating Weight:</source>
+        <translation>Βαρύτητα Αξιολόγησης:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="26"/>
+        <source>Play Count Weight:</source>
+        <translation>Βαρύτητα Επαναλήψεων Αναπαραγωγής:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="27"/>
+        <source>Last Play Weight:</source>
+        <translation>Βαρύτητα Παλαιότητας Αναπαραγωγής:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="28"/>
+        <source>Random Weight:</source>
+        <translation>Βαρύτητα Τυχαιότητας:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="30"/>
+        <source>Paranoia Level:</source>
+        <translation>Επίπεδο Παράνοιας:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="31"/>
+        <source>Encoding Type:</source>
+        <translation>Τύπος Κωδικοποίησης:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="32"/>
+        <source>Default Rip Quality:</source>
+        <translation>Προεπιλεγμένη Ποιότητα Αντιγραφής:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="33"/>
+        <source>File storage location:</source>
+        <translation>Θέση αποθήκευσης αρχείου:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="34"/>
+        <source>Replace space with underscore</source>
+        <translation>Αντικατάστση κενού με &apos;_&apos;</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="35"/>
+        <source>Use variable bitrates</source>
+        <translation>Χρήση μεταβλητής δειγματοληψίας</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="36"/>
+        <source>Automatically eject CDs after ripping</source>
+        <translation>Αυτόματη εξαγωγή CD μετά την αντιγραφή</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="37"/>
+        <source>Script Path:</source>
+        <translation>Φάκελος με σκριπτάκι:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="38"/>
+        <source>Burn Settings</source>
+        <translation>Ρυθμίσεις Εγγραφής CD</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="39"/>
+        <source>Enable CD Writing</source>
+        <translation>Ενεργοποίηση Εγγραφής CD</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="40"/>
+        <source>CD-Writer Device:</source>
+        <translation>Συσκευή Εγγραφέα CD:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="41"/>
+        <source>Disk Size:</source>
+        <translation>Μέγεθος Δίσκου:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="42"/>
+        <source>CD Write Speed:</source>
+        <translation>Ταχύτητα Εγγραφής CD:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="43"/>
+        <source>CD Blanking Type:</source>
+        <translation>Τρόπος Διαγραφής CD:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="44"/>
+        <source>Enable directories on MP3 Creation</source>
+        <translation>Επιτρέπονται οι φάκελοι κατά την δημιουργία MP3</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="45"/>
+        <source>Visualiser Settings</source>
+        <translation>Ρυθμισεις Οπτικοποιησης</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="46"/>
+        <source>Width for Visual Scaling:</source>
+        <translation>Πλάτος για Οπτική Κλιμάκωση:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="47"/>
+        <source>Height for Visual Scaling:</source>
+        <translation>Ύψος για Οπτική Κλιμάκωση:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="48"/>
+        <source>Change Visualizer on each song</source>
+        <translation>Αλλαγή Οπτικοποίησης ανά τραγούδι</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="49"/>
+        <source>Randomize Visualizer order</source>
+        <translation>Τυχαία σειρά Οπτικοποιήσεων</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="50"/>
+        <source>Repeat: Off</source>
+        <translation>Επαν.: Όχι</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="51"/>
+        <source>Repeat: Track</source>
+        <translation>Επαν.: Τραγούδι</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="52"/>
+        <source>Repeat: All</source>
+        <translation>Επαν.: Όλα</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="53"/>
+        <source>Shuffle: Off</source>
+        <translation>Ανάμιξη: Όχι</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="54"/>
+        <source>Shuffle: Random</source>
+        <translation>Ανάμιξη: Τυχαία</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="55"/>
+        <source>Shuffle: Intelligent</source>
+        <translation>Ανάμιξη: Έξυπνη</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="56"/>
+        <source>Shuffle: Album</source>
+        <translation>Ανάμιξη: Δίσκος</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="57"/>
+        <source>Shuffle: Artist</source>
+        <translation>Ανάμιξη: Καλλιτέχνης</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="58"/>
+        <source>Now Playing: %TITLE% by %ARTIST% on %ALBUM%</source>
+        <translation>Τώρα παίζει: %TITLE% από %ARTIST% στο %ALBUM%</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="59"/>
+        <source>You haven&apos;t selected any tracks to play</source>
+        <translation>Δεν έχετε επιλέξει τραγούδια για αναπαραγωγή</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="60"/>
+        <source>%1 -</source>
+        <translation>%1 -</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="164"/>
         <source>Played:</source>
         <translation>Παίχθηκε:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="87"/>
+        <location filename="themestrings.h" line="165"/>
         <source>%playcount% times</source>
         <translation>%playcount% φορές</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="95"/>
+        <location filename="themestrings.h" line="174"/>
+        <source>Repeat Mode: Off</source>
+        <translation>Επανάληψη: Όχι</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="175"/>
+        <source>Repeat Mode: Track</source>
+        <translation>Επανάληψη: Τραγούδι</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="176"/>
+        <source>Repeat Mode: All</source>
+        <translation>Επανάληψη: Όλα</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="177"/>
+        <source>Shuffle Mode: Off</source>
+        <translation>Ανάμιξη: Όχι</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="178"/>
+        <source>Shuffle Mode: Random</source>
+        <translation>Ανάμιξη: Τυχαία</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="179"/>
+        <source>Shuffle Mode: Intelligent</source>
+        <translation>Ανάμιξη: Έξυπνη</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="180"/>
+        <source>Shuffle Mode: Album</source>
+        <translation>Ανάμιξη: Δίσκος</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="181"/>
+        <source>Shuffle Mode: Artist</source>
+        <translation>Ανάμιξη: Καλλιτέχνης</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="182"/>
+        <source>%VOLUMEPERCENT% %|(MUTE|)%</source>
+        <translation>%VOLUMEPERCENT% %|(MUTE|)%</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="183"/>
+        <source>Matches</source>
+        <translation>Αποτελέσματα</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="185"/>
+        <source>Match</source>
+        <translation>Αποτέλεσμα</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="186"/>
+        <source>Of The Following Conditions</source>
+        <translation>Από Τις Ακόλουθες Συνθήκες</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="187"/>
+        <source>Matches:</source>
+        <translation>Αποτελέσματα:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="188"/>
+        <source>OK</source>
+        <translation>ΟΚ</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="189"/>
+        <source>Convert stereo to 5.1 sound:</source>
+        <translation>Μετατροπή στερεοφωνικού ήχου σε 5.1 πολυκάναλο:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="190"/>
+        <source>Ignore ID3 Tags:</source>
+        <translation>Αγνόηση Ετικετών ID3:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="191"/>
+        <source>Allow metadata to be written to tags:</source>
+        <translation>Να γράφονται πληροφορίες στις ετικέττες:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="192"/>
+        <source>Automatically lookup CDs:</source>
+        <translation>Αυτόματη εύρεση στοιχείων των CD:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="193"/>
+        <source>Automatically Play CDs:</source>
+        <translation>Αυτόματη αναπαραγωγή CD:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="194"/>
+        <source>Replace space with underscore:</source>
+        <translation>Αντικατάστση κενού με &apos;_&apos;:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="195"/>
+        <source>Use variable bitrates:</source>
+        <translation>Χρήση μεταβλητής δειγματοληψίας:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="196"/>
+        <source>Automatically eject CDs after ripping:</source>
+        <translation>Αυτόματη εξαγωγή CD μετά την αντιγραφή:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="197"/>
+        <source>Change Visualizer on each song:</source>
+        <translation>Αλλαγή Οπτικοποίησης ανά τραγούδι:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="198"/>
+        <source>Randomize Visualizer order:</source>
+        <translation>Τυχαία σειρά Οπτικοποιήσεων:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="199"/>
+        <source>Enable CD Writing:</source>
+        <translation>Ενεργοποίηση Εγγραφής CD:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="200"/>
+        <source>Enable directories on MP3 Creation:</source>
+        <translation>Επιτρέπονται οι φάκελοι κατά την δημιουργία MP3:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="204"/>
+        <source>Music rating options</source>
+        <translation>Επιλογές αξιολόγησης μουσικής</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="205"/>
+        <source>Visualization Settings</source>
+        <translation>Ρυθμισεις Οπτικοποιησης</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="206"/>
+        <source>Music visualization options</source>
+        <translation>Επιλογές οπτικοποίησης</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="209"/>
         <source>Scan for New Music</source>
         <translation>Ανιχνευση για Νεα Μουσικη</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="96"/>
+        <location filename="themestrings.h" line="210"/>
         <source>Eject media</source>
         <translation>Εξαγωγη Μεσου</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="97"/>
+        <location filename="themestrings.h" line="211"/>
         <source>Music Settings</source>
         <translation>Ρυθμισεις Μουσικης</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="98"/>
+        <location filename="themestrings.h" line="212"/>
         <source>Configure playback and CD ripping</source>
         <translation>Ρυθμίζει την αναπαραγωγή και αντιγραφή CD</translation>
     </message>
@@ -3565,9 +4244,8 @@ Do you want to permanently delete the existing file(s)?</source>
         <translation>Άλλες Επιλογές</translation>
     </message>
     <message>
-        <location filename="../mythmusic/visualizerview.cpp" line="106"/>
         <source>Cancel</source>
-        <translation>Ακύρωση</translation>
+        <translation type="obsolete">Ακύρωση</translation>
     </message>
 </context>
 </TS>

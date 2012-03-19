@@ -86,5 +86,29 @@ void MythCommFlagCommandLineParser::LoadArguments(void)
             ->SetGroup("Advanced");
     add("--dry-run", "dryrun", false,
         "Don't actually queue operation, just list what would be done", "");
+
+    add("--sleep", "fullspeed", false, "", "")
+            ->SetRemoved("If your system is incapable of performing\n"
+               "          commercial detection without disrupting other\n"
+               "          operations, use the jobqueue execution window\n"
+               "          settings to ensure tasks do not run during the\n"
+               "          time you may be running such other operations.",
+                         "0.25");
+    add("--nopercentage", "nopercentage", false, "", "")
+            ->SetRemoved("Use --noprogress instead.", "0.25");
+    add("--very-quiet", "veryquiet", false, "", "")
+            ->SetRemoved("Use --quiet instead. Can be used multiple times\n"
+               "          for increased effect.", "0.25");
+    add("--all", "runall", false, "", "")
+            ->SetRemoved("Use --queue with no content definition for\n"
+               "          similar behavior. Will queue all tasks to be\n"
+               "          run through the jobqueue, rather than run them\n"
+               "          all synchronously within this instance.", "0.25");
+    add("--allstart", "allstart", "", "", "")
+            ->SetRemoved("and is no longer available in this version.", "0.25");
+    add("--allend", "allend", "", "", "")
+            ->SetRemoved("and is no longer available in this version.", "0.25");
+    add("--hogcpu", "hogcpu", "", "", "")
+            ->SetRemoved("and is no longer available in this version.", "0.25");
 }
 

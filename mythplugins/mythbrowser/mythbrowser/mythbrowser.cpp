@@ -27,12 +27,14 @@ MythBrowser::MythBrowser(MythScreenStack *parent,
       m_zoom(zoom),        m_menuPopup(NULL),
       m_defaultFavIcon(NULL)
 {
+    GetMythMainWindow()->PauseIdleTimer(true);
 }
 
 MythBrowser::~MythBrowser()
 {
     while (!m_browserList.isEmpty())
         delete m_browserList.takeFirst();
+    GetMythMainWindow()->PauseIdleTimer(false);
 }
 
 bool MythBrowser::Create(void)
@@ -338,8 +340,6 @@ bool MythBrowser::keyPressEvent(QKeyEvent *event)
                 m_menuPopup->AddButton(tr("Delete Tab"), SLOT(slotDeleteTab()));
 
             m_menuPopup->AddButton(tr("Add Bookmark"), SLOT(slotAddBookmark()));
-
-            m_menuPopup->AddButton(tr("Cancel"));
         }
         else if (action == "INFO")
         {

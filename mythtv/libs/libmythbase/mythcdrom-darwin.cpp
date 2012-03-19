@@ -1,5 +1,6 @@
 #include <errno.h>
 #include <sys/fcntl.h>
+#include <unistd.h> // for close definition
 
 #include <IOKit/storage/IOCDMediaBSDClient.h>
 #include <IOKit/storage/IODVDMediaBSDClient.h>
@@ -35,7 +36,7 @@ void MythCDROMDarwin::setSpeed(int speed)
 void MythCDROMDarwin::setSpeed(const char *device, int speed)
 {
     int       fd;
-    QString   raw = "/dev/r"; raw += device;
+    QString   raw = device;
     uint16_t  spd = speed;
 
 
@@ -53,7 +54,7 @@ void MythCDROMDarwin::setSpeed(const char *device, int speed)
         close(fd);
         return;
     }
-    LOG(VB_MEDIA, LOG_INFO, LOC + ":setSpeed() - CD/DVD Speed Set to " +
+    LOG(VB_MEDIA, LOG_INFO, LOC + ":setSpeed() - CD/DVD speed now " +
                             QString::number(spd));
     close(fd);
 }

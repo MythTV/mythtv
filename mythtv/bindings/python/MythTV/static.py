@@ -5,7 +5,7 @@ Contains any static and global variables for MythTV Python Bindings
 """
 
 OWN_VERSION = (0,25,-1,3)
-SCHEMA_VERSION = 1296
+SCHEMA_VERSION = 1299
 NVSCHEMA_VERSION = 1007
 MUSICSCHEMA_VERSION = 1018
 PROTO_VERSION = '72'
@@ -129,6 +129,7 @@ class JOBFLAG( object ):
     USE_CUTLIST  = 0x0001
     LIVE_REC     = 0x0002
     EXTERNAL     = 0x0004
+    REBUILD      = 0x0008
 
 class JOBSTATUS( object ):
     UNKNOWN      = 0x0000

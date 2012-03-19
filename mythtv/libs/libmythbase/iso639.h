@@ -62,7 +62,7 @@ static inline bool iso639_is_key_undefined(int code)
 
 static inline int iso639_str3_to_key(const unsigned char *iso639_2)
 {
-    return (iso639_2[0]<<16)|(iso639_2[1]<<8)|iso639_2[2];
+    return ((tolower(iso639_2[0])<<16)|(tolower(iso639_2[1])<<8)|tolower(iso639_2[2]));
 }
 
 static inline int iso639_str3_to_key(const char *iso639_2)

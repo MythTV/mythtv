@@ -516,7 +516,7 @@ static int createCodeToEnglishNamesMap(QMap<int, QString>& names)
   names[iso639_str3_to_key("pra")] = QString("Prakrit languages");
   names[iso639_str3_to_key("pro")] = QString("Old Proven�al  (to 1500)");
   names[iso639_str3_to_key("pus")] = QString("Pushto");
-  names[iso639_str3_to_key("qaa")] = QString("Reserved for local use");
+  names[iso639_str3_to_key("qaa")] = QString("Original language"); // from DVB-SI (EN 300 468)
   names[iso639_str3_to_key("qtz")] = QString("Reserved for local use");
   names[iso639_str3_to_key("que")] = QString("Quechua");
   names[iso639_str3_to_key("raj")] = QString("Rajasthani");

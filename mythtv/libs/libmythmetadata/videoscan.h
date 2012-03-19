@@ -64,7 +64,7 @@ class META_PUBLIC VideoScannerThread : public MThread
 
     void run();
     void SetDirs(QStringList dirs);
-    void SetHosts(const QStringList &hosts) { m_liveSGHosts = hosts; };
+    void SetHosts(const QStringList &hosts);
     void SetProgressDialog(MythUIProgressDialog *dialog) { m_dialog = dialog; };
     QStringList GetOfflineSGHosts(void) { return m_offlineSGHosts; };
     bool getDataChanged() { return m_DBDataChanged; };

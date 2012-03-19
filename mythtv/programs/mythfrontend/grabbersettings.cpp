@@ -52,7 +52,7 @@ bool GrabberSettings::Create()
         return false;
     }
 
-    m_movieGrabberButtonList->SetHelpText(tr("Select an source to use when searching for "
+    m_movieGrabberButtonList->SetHelpText(tr("Select a source to use when searching for "
                                              "information and artwork about movies."));
     m_tvGrabberButtonList->SetHelpText(tr("Select a source to use when searching for "
                                           "information and artwork about television."));

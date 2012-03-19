@@ -48,7 +48,7 @@ class SERVICE_PUBLIC ProgramGuide : public QObject
     // A Q_CLASSINFO entry with "<PropName>_type" as the key
     // and the type name as the value
 
-    Q_CLASSINFO( "Channels_type", "DTC::Channel");
+    Q_CLASSINFO( "Channels", "type=DTC::ChannelInfo");
 
 
     Q_PROPERTY( QDateTime     StartTime      READ StartTime      WRITE setStartTime      )

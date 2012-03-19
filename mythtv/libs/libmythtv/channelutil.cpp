@@ -1093,7 +1093,9 @@ static QStringList get_valid_recorder_list(uint chanid)
             "SELECT cardinput.cardid "
             "FROM channel "
             "LEFT JOIN cardinput ON channel.sourceid = cardinput.sourceid "
-            "WHERE channel.chanid = :CHANID");
+            "WHERE channel.chanid = :CHANID AND "
+            "      cardinput.livetvorder > 0 "
+            "ORDER BY cardinput.livetvorder, cardinput.cardinputid");
     query.bindValue(":CHANID", chanid);
 
     if (!query.exec() || !query.isActive())
@@ -1125,7 +1127,9 @@ static QStringList get_valid_recorder_list(const QString &channum)
         "SELECT cardinput.cardid "
         "FROM channel "
         "LEFT JOIN cardinput ON channel.sourceid = cardinput.sourceid "
-        "WHERE channel.channum = :CHANNUM");
+        "WHERE channel.channum = :CHANNUM AND "
+        "      cardinput.livetvorder > 0 "
+        "ORDER BY cardinput.livetvorder, cardinput.cardinputid");
     query.bindValue(":CHANNUM", channum);
 
     if (!query.exec() || !query.isActive())
@@ -1966,22 +1970,25 @@ bool ChannelUtil::GetExtendedChannelData(
                            dvb_transportid, dvb_networkid, dtv_si_std);
 }
 
-DBChanList ChannelUtil::GetChannels(
-    uint sourceid, bool vis_only, QString grp, uint changrpid)
+DBChanList ChannelUtil::GetChannelsInternal(
+    uint sourceid, bool vis_only, bool include_disconnected,
+    const QString &grp, uint changrpid)
 {
     DBChanList list;
 
     MSqlQuery query(MSqlQuery::InitCon());
 
-    QString qstr =
+    QString qstr = QString(
         "SELECT channum, callsign, channel.chanid, "
         "       atsc_major_chan, atsc_minor_chan, "
         "       name, icon, mplexid, visible, "
         "       channel.sourceid, cardinput.cardid, channelgroup.grpid "
         "FROM channel "
         "LEFT JOIN channelgroup ON channel.chanid     = channelgroup.chanid "
-        "JOIN cardinput         ON cardinput.sourceid = channel.sourceid "
-        "JOIN capturecard       ON cardinput.cardid   = capturecard.cardid ";
+        " %1  JOIN cardinput    ON cardinput.sourceid = channel.sourceid "
+        " %2  JOIN capturecard  ON cardinput.cardid   = capturecard.cardid ")
+        .arg((include_disconnected) ? "LEFT" : "")
+        .arg((include_disconnected) ? "LEFT" : "");
 
     QString cond = " WHERE ";
 

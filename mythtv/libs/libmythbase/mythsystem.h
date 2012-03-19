@@ -22,6 +22,7 @@ typedef enum MythSystemMask {
     kMSAbortOnJump        = 0x00001000, //< abort this process on a jumppoint
     kMSSetPGID            = 0x00002000, //< set the process group id
     kMSAutoCleanup        = 0x00004000, //< automatically delete if backgrounded
+    kMSLowExitVal         = 0x00008000, //< allow exit values 0-127 only
 } MythSystemFlag;
 
 #ifdef __cplusplus
@@ -73,8 +74,9 @@ class MBASE_PUBLIC MythSystem : public QObject
 
         void JumpAbort(void);
 
-        bool isBackground()  { return GetSetting("RunInBackground"); };
-        bool doAutoCleanup() { return GetSetting("AutoCleanup"); };
+        bool isBackground()   { return GetSetting("RunInBackground"); };
+        bool doAutoCleanup()  { return GetSetting("AutoCleanup"); };
+        bool onlyLowExitVal() { return GetSetting("OnlyLowExitVal"); };
         void HandlePreRun();
         void HandlePostRun();
 

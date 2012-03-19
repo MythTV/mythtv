@@ -39,6 +39,10 @@
 #include "mythdirs.h"
 #include "mythuihelper.h"
 
+#if defined(Q_OS_MACX)
+#include "privatedecoder_vda.h"
+#endif
+
 static HostCheckBox *DecodeExtraAudio()
 {
     HostCheckBox *gc = new HostCheckBox("DecodeExtraAudio");
@@ -345,6 +349,7 @@ static GlobalSpinBox *AutoExpireExtraSpace()
     return bs;
 };
 
+#if 0
 static GlobalCheckBox *AutoExpireInsteadOfDelete()
 {
     GlobalCheckBox *cb = new GlobalCheckBox("AutoExpireInsteadOfDelete");
@@ -355,14 +360,20 @@ static GlobalCheckBox *AutoExpireInsteadOfDelete()
                     "instead of deleting immediately."));
     return cb;
 }
+#endif
 
 static GlobalSpinBox *DeletedMaxAge()
 {
-    GlobalSpinBox *bs = new GlobalSpinBox("DeletedMaxAge", 0, 365, 1);
-    bs->setLabel(QObject::tr("Deleted max age (days)"));
-    bs->setHelpText(QObject::tr("When set to a number greater than zero, "
-                    "Auto-Expire will force expiration of Deleted recordings "
-                    "when they are this many days old."));
+    GlobalSpinBox *bs = new GlobalSpinBox("DeletedMaxAge", -1, 365, 1);
+    bs->setLabel(QObject::tr("Time to retain deleted recordings (days)"));
+    bs->setHelpText(QObject::tr("Determines the maximum number of days before "
+                                "undeleting a recording will become impossible. "
+                                "A value of zero means the recording will be "
+                                "permanently deleted between 5 and 20 minutes "
+                                "later. A value of minus one means recordings "
+                                "will be retained until space is required. "
+                                "A recording will always be removed before this "
+                                "time if the space is needed for a new recording."));
     bs->setValue(0);
     return bs;
 };
@@ -378,6 +389,7 @@ static GlobalCheckBox *DeletedFifoOrder()
     return cb;
 };
 
+#if 0
 class DeletedExpireOptions : public TriggeredConfigurationGroup
 {
     public:
@@ -399,6 +411,7 @@ class DeletedExpireOptions : public TriggeredConfigurationGroup
              addTarget("0", new HorizontalConfigurationGroup(true));
          };
 };
+#endif
 
 static GlobalComboBox *AutoExpireMethod()
 {
@@ -1133,6 +1146,7 @@ PlaybackProfileConfigs::PlaybackProfileConfigs(const QString &str) :
         profiles = VideoDisplayProfile::GetProfiles(host);
     }
 
+#ifdef USING_VDPAU
     if (!profiles.contains("VDPAU Normal") &&
         !profiles.contains("VDPAU High Quality") &&
         !profiles.contains("VDPAU Slim"))
@@ -1140,6 +1154,30 @@ PlaybackProfileConfigs::PlaybackProfileConfigs(const QString &str) :
         VideoDisplayProfile::CreateVDPAUProfiles(host);
         profiles = VideoDisplayProfile::GetProfiles(host);
     }
+#endif
+
+#if defined(Q_OS_MACX)
+    if (VDALibrary::GetVDALibrary() != NULL)
+    {
+        if (!profiles.contains("VDA Normal") &&
+            !profiles.contains("VDA High Quality") &&
+            !profiles.contains("VDA Slim"))
+        {
+            VideoDisplayProfile::CreateVDAProfiles(host);
+            profiles = VideoDisplayProfile::GetProfiles(host);
+        }
+    }
+#endif
+
+#ifdef USING_OPENGL
+    if (!profiles.contains("OpenGL Normal") &&
+        !profiles.contains("OpenGL High Quality") &&
+        !profiles.contains("OpenGL Slim"))
+    {
+        VideoDisplayProfile::CreateOpenGLProfiles(host);
+        profiles = VideoDisplayProfile::GetProfiles(host);
+    }
+#endif
 
     QString profile = VideoDisplayProfile::GetDefaultProfileName(host);
     if (!profiles.contains(profile))
@@ -1361,7 +1399,7 @@ static HostSpinBox *OSDCC708TextZoomPercentage(void)
 
 static HostComboBox *SubtitleFont()
 {
-    HostComboBox *hcb = new HostComboBox("OSDSubFont");
+    HostComboBox *hcb = new HostComboBox("DefaultSubtitleFont");
     QFontDatabase db;
     QStringList fonts = db.families();
     QStringList hide  = db.families(QFontDatabase::Symbol);
@@ -1371,7 +1409,7 @@ static HostComboBox *SubtitleFont()
     foreach (QString font, fonts)
     {
         if (!hide.contains(font))
-            hcb->addSelection(font, font, font.toLower() == "freesans");
+            hcb->addSelection(font, font, font.toLower() == "freemono");
     }
     return hcb;
 }
@@ -1653,6 +1691,22 @@ static HostCheckBox *UseVirtualKeyboard()
                     "in MythTV's line edit boxes. To use, hit SELECT (Enter "
                     "or Space) while a line edit is in focus."));
     return gc;
+}
+
+static HostSpinBox *FrontendIdleTimeout()
+{
+    HostSpinBox *gs = new HostSpinBox("FrontendIdleTimeout", 0, 360, 15);
+    gs->setLabel(QObject::tr("Idle time before entering standby mode (minutes)"));
+    gs->setValue(90);
+    gs->setHelpText(QObject::tr("Number of minutes to wait when the frontend "
+                                "is idle before entering standby mode. Standby "
+                                "mode allows the backend to power down if "
+                                "configured to do so. Any remote or mouse input "
+                                "will cause the countdown to start again and/or "
+                                "exit idle mode. Video playback suspends the "
+                                "countdown. A value of zero prevents the "
+                                "frontend automatically entering standby."));
+    return gs;
 }
 
 static HostComboBox *OverrideExitMenu()
@@ -2156,6 +2210,12 @@ static HostComboBox *MythDateFormatCB()
     gc->addSelection(sampdate.toString("ddd MMM d yyyy"), "ddd MMM d yyyy");
     gc->addSelection(sampdate.toString("ddd d MMM yyyy"), "ddd d MMM yyyy");
     gc->addSelection(sampdate.toString("ddd yyyy-MM-dd"), "ddd yyyy-MM-dd");
+    gc->addSelection(sampdate.toString(
+        QString::fromUtf8("dddd yyyy\u5E74M\u6708d\u65E5")),
+        QString::fromUtf8("dddd yyyy\u5E74M\u6708d\u65E5"));
+    gc->addSelection(sampdate.toString(
+        QString::fromUtf8("ddd M\u6708d\u65E5")),
+        QString::fromUtf8("ddd M\u6708d\u65E5"));
     gc->setHelpText(QObject::tr("Your preferred date format.") + ' ' +
                     sampleStr);
     return gc;
@@ -2195,6 +2255,9 @@ static HostComboBox *MythShortDateFormat()
     gc->addSelection(sampdate.toString("ddd d/M"), "ddd d/M");
     gc->addSelection(sampdate.toString("M/d ddd"), "M/d ddd");
     gc->addSelection(sampdate.toString("d/M ddd"), "d/M ddd");
+    gc->addSelection(sampdate.toString(
+        QString::fromUtf8("M\u6708d\u65E5")),
+        QString::fromUtf8("M\u6708d\u65E5"));
     gc->setHelpText(QObject::tr("Your preferred short date format.") + ' ' +
                     sampleStr);
     return gc;
@@ -2214,9 +2277,29 @@ static HostComboBox *MythTimeFormat()
     gc->addSelection(samptime.toString("h:mm"), "h:mm");
     gc->addSelection(samptime.toString("hh:mm"), "hh:mm");
     gc->addSelection(samptime.toString("hh.mm"), "hh.mm");
+    gc->addSelection(samptime.toString("AP h:mm"), "AP h:mm");
     gc->setHelpText(QObject::tr("Your preferred time format. You must choose "
                     "a format with \"AM\" or \"PM\" in it, otherwise your "
                     "time display will be 24-hour or \"military\" time."));
+    return gc;
+}
+
+static HostComboBox *ThemePainter()
+{
+    HostComboBox *gc = new HostComboBox("ThemePainter");
+    gc->setLabel(QObject::tr("Paint engine"));
+    gc->addSelection(QObject::tr("Qt"), "qt");
+    gc->addSelection(QObject::tr("Auto"), "auto");
+#ifdef USING_OPENGL
+    gc->addSelection(QObject::tr("OpenGL"), "opengl");
+#endif
+#ifdef USING_MINGW
+    gc->addSelection(QObject::tr("Direct3D"), "d3d9");
+#endif
+    gc->setHelpText(QObject::tr("This selects what MythTV uses to draw. "
+                    "Choosing 'Auto' is recommended, unless running on systems "
+                    "with broken OpenGL implementations (broken hardware or "
+                    "drivers or windowing systems) where only Qt works."));
     return gc;
 }
 
@@ -2674,10 +2757,8 @@ static HostLineEdit *UDPNotifyPort()
     HostLineEdit *ge = new HostLineEdit("UDPNotifyPort");
     ge->setLabel(QObject::tr("UDP notify port"));
     ge->setValue("6948");
-    ge->setHelpText(QObject::tr("MythTV will listen for "
-                    "connections from the \"mythtvosd\" or \"mythudprelay\" "
-                    "programs on this port. For additional information, see "
-                    "http://www.mythtv.org/wiki/MythNotify ."));
+    ge->setHelpText(QObject::tr("MythTV will listen for connections "
+                    "from the \"mythutil\" program on this port."));
     return ge;
 }
 
@@ -3285,6 +3366,7 @@ MainGeneralSettings::MainGeneralSettings()
     VerticalConfigurationGroup *shutdownSettings =
         new VerticalConfigurationGroup(true, true, false, false);
     shutdownSettings->setLabel(QObject::tr("Shutdown/Reboot Settings"));
+    shutdownSettings->addChild(FrontendIdleTimeout());
     shutdownSettings->addChild(OverrideExitMenu());
     shutdownSettings->addChild(HaltCommand());
     shutdownSettings->addChild(RebootCommand());
@@ -3499,7 +3581,9 @@ GeneralSettings::GeneralSettings()
     expgrp->addChild(expgrp1);
 
     autoexp->addChild(expgrp);
-    autoexp->addChild(new DeletedExpireOptions());
+//    autoexp->addChild(new DeletedExpireOptions());
+    autoexp->addChild(DeletedFifoOrder());
+    autoexp->addChild(DeletedMaxAge());
 
     addChild(autoexp);
 
@@ -3602,6 +3686,7 @@ AppearanceSettings::AppearanceSettings()
     VerticalConfigurationGroup* screen = new VerticalConfigurationGroup(false);
     screen->setLabel(QObject::tr("Theme") + " / " + QObject::tr("Screen Settings"));
 
+    screen->addChild(ThemePainter());
     screen->addChild(MenuTheme());
 
     if (MythDisplay::GetNumberXineramaScreens() > 1)

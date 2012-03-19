@@ -19,6 +19,7 @@
 using namespace std;
 
 // Qt
+#include <QCoreApplication>
 #include <QPainter>
 #include <QImage>
 
@@ -646,7 +647,8 @@ static class SynaesthesiaFactory : public VisFactory
   public:
     const QString &name(void) const
     {
-        static QString name("Synaesthesia");
+        static QString name = QCoreApplication::translate("Visualizers",
+                                                          "Synaesthesia");
         return name;
     }
 

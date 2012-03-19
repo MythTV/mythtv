@@ -45,6 +45,9 @@
 //////////////////////////////////////////////////////////////////////////////
 
 MediaServer::MediaServer(void) :
+#ifdef USING_LIBDNS_SD
+    m_bonjour(NULL),
+#endif
     m_pUPnpCDS(NULL), m_pUPnpCMGR(NULL),
     m_sSharePath(GetShareDir())
 {
@@ -78,7 +81,7 @@ void MediaServer::Init(bool bIsMaster, bool bDisableUPnp /* = false */)
     if (!m_pHttpServer->isListening())
     {
         m_pHttpServer->setProxy(QNetworkProxy::NoProxy);
-        if (!m_pHttpServer->listen(gCoreContext->MythHostAddress(), nPort))
+        if (!m_pHttpServer->listen(nPort))
         {
             LOG(VB_GENERAL, LOG_ERR, "MediaServer::HttpServer Create Error");
             delete m_pHttpServer;

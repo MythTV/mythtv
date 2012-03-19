@@ -26,7 +26,7 @@
 #include "mythsocket.h"
 #include "remotefile.h"
 #include "storagegroup.h"
-#include "util.h"
+#include "mythmiscutil.h"
 #include "playercontext.h"
 #include "mythdirs.h"
 #include "remoteutil.h"
@@ -88,6 +88,7 @@ void PreviewGenerator::SetOutputFilename(const QString &fileName)
 
 void PreviewGenerator::TeardownAll(void)
 {
+    QMutexLocker locker(&previewLock);
     previewWaitCondition.wakeAll();
     listener = NULL;
 }
@@ -327,8 +328,6 @@ void PreviewGenerator::run(void)
 {
     RunProlog();
     Run();
-    connect(qthread(), SIGNAL(finished()),
-            this, SLOT(deleteLater()));
     RunEpilog();
 }
 

@@ -23,7 +23,7 @@ HttpConfig::~HttpConfig()
 {
 }
 
-QStringList HttpConfig::GetBasePaths() 
+QStringList HttpConfig::GetBasePaths()
 {
     QStringList paths;
     paths << "/Config";
@@ -49,6 +49,28 @@ bool HttpConfig::ProcessRequest(HTTPRequest *request)
     bool handled = false;
     if (request->m_sMethod == "Save")
     {
+        {
+            // DISABLE HTML SETUP SAVING
+            // DISABLE HTML SETUP SAVING
+            QTextStream os(&request->m_response);
+            os << "<html>\r\n"
+                  "  <head>\r\n"
+                  "    <title>Saving is Disabled</title>\r\n"
+                  "  </head>\r\n"
+                  "  <body>\r\n"
+                  "    <b>Saving is Disabled</b><br>\r\n"
+                  "  </body>\r\n"
+                  "</html>\r\n";
+
+            request->m_eResponseType = ResponseTypeHTML;
+            request->m_mapRespHeaders[ "Cache-Control" ] =
+                "no-cache=\"Ext\", max-age = 0";
+
+            return true;
+            // DISABLE HTML SETUP SAVING
+            // DISABLE HTML SETUP SAVING
+        }
+
         // FIXME, this is always false, what's it for
         if (request->m_sBaseUrl.right(7) == "config" &&
             !database_settings.empty())
@@ -81,6 +103,8 @@ bool HttpConfig::ProcessRequest(HTTPRequest *request)
                     okToSave = true;
             }
 
+            if (okToSave)
+                LOG(VB_UPNP, LOG_INFO, "HTTP method 'Save' called, but not handled");
 #if 0
             QTextStream os(&request->m_response);
             os << "<html><body><h3>The Save function for this screen is "

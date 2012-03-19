@@ -31,7 +31,7 @@ class SERVICE_PUBLIC VideoMetadataInfoList : public QObject
     // A Q_CLASSINFO entry with "<PropName>_type" as the key
     // and the type name as the value
 
-    Q_CLASSINFO( "VideoMetadataInfos_type", "DTC::VideoMetadataInfo");
+    Q_CLASSINFO( "VideoMetadataInfos", "type=DTC::VideoMetadataInfo");
 
     Q_PROPERTY( int          StartIndex     READ StartIndex      WRITE setStartIndex     )
     Q_PROPERTY( int          Count          READ Count           WRITE setCount          )

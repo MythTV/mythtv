@@ -92,6 +92,7 @@ void MythObservable::dispatch(const MythEvent &event)
  *  almost always unsafe.
  *
  *  \param event a MythEvent to dispatch.
+ *  \deprecated Do not use in new code
  */
 void MythObservable::dispatchNow(const MythEvent &event)
 {

@@ -83,7 +83,8 @@ void MythFillDatabaseCommandLineParser::LoadArguments(void)
             "overwrite channel names, frequencies, etc. with "
             "values available from the data source. This will "
             "override custom channel names, which is why it "
-            "is disabled by default.");
+            "is disabled by default.")
+        ->SetGroup("Channel List Handling");
     add("--remove-new-channels", "removechannels", false,
             "disable new channels on datadirect web interface",
             "When using DataDirect, ask mythfilldatabase to "
@@ -93,14 +94,16 @@ void MythFillDatabaseCommandLineParser::LoadArguments(void)
             "MythTV by running mythfilldatabase without this "
             "option. New digital channels cannot be directly "
             "imported and thus are disabled automatically.")
-        ->SetBlocks("file");
+        ->SetBlocks("file")
+        ->SetGroup("Channel List Handling");
     add("--do-not-filter-new-channels", "nofilterchannels", false,
             "don't filter ATSC channels for addition",
             "Normally, MythTV tries to avoid adding ATSC "
             "channels to NTSC channel lineups. This option "
             "restores the behavior of adding every channel in "
             "the downloaded channel lineup to MythTV's lineup, "
-            "in case MythTV's smarts fail you.");
+            "in case MythTV's smarts fail you.")
+        ->SetGroup("Channel List Handling");
     // need documentation for this one
     add("--cardtype", "cardtype", "", "", "No information.");
 
@@ -116,19 +119,22 @@ void MythFillDatabaseCommandLineParser::LoadArguments(void)
             "    #[-#]\n"
             "    all\n\n"
             "example:\n"
-            "   --refresh today --refresh 4-8 --refresh nottomorrow");
+            "   --refresh today --refresh 4-8 --refresh nottomorrow")
+        ->SetGroup("Filtering");
 
     add("--max-days", "maxdays", 0, "force number of days to update",
             "Force the maximum number of days, counting today, "
             "for the guide data grabber to check for future "
-            "listings.");
+            "listings.")
+        ->SetGroup("Filtering");
     add("--refresh-today", "refreshtoday", false, "",
             "This option is only valid for selected grabbers.\n"
             "Force a refresh for today's guide data.\nThis can be used "
             "in combination with other --refresh-<n> options.\n"
             "If being used with datadirect, this option should not be "
             "used, rather use --dd-grab-all to pull all listings each time.")
-        ->SetDeprecated("use --refresh instead");
+        ->SetDeprecated("use --refresh instead")
+        ->SetGroup("Filtering");
     add("--dont-refresh-tomorrow", "dontrefreshtomorrow", false, "",
             "This option is only valid for selected grabbers.\n"
             "Prevent mythfilldatabase from pulling information for "
@@ -136,28 +142,32 @@ void MythFillDatabaseCommandLineParser::LoadArguments(void)
             "unless specifically specified otherwise.\n"
             "If being used with datadirect, this option should not be "
             "used, rather use --dd-grab-all to pull all listings each time.")
-        ->SetDeprecated("use --refresh instead");
+        ->SetDeprecated("use --refresh instead")
+        ->SetGroup("Filtering");
     add("--refresh-second", "refreshsecond", false, "",
             "This option is only valid for selected grabbers.\n"
             "Force a refresh for guide data two days from now. This can "
             "be used in combination with other --refresh-<n> options.\n"
             "If being used with datadirect, this option should not be "
             "used, rather use --dd-grab-all to pull all listings each time.")
-        ->SetDeprecated("use --refresh instead");
-    add("--refresh-day", "refreshday", 0U, "",
+        ->SetDeprecated("use --refresh instead")
+        ->SetGroup("Filtering");
+    add("--refresh-day", "refreshday", QVariant::StringList, "",
             "This option is only valid for selected grabbers.\n"
             "Force a refresh for guide data on a specific day. This can "
             "be used in combination with other --refresh-<n> options.\n"
             "If being used with datadirect, this option should not be "
             "used, rather use --dd-grab-all to pull all listings each time.")
-        ->SetDeprecated("use --refresh instead");
+        ->SetDeprecated("use --refresh instead")
+        ->SetGroup("Filtering");
     add("--dont-refresh-tba", "dontrefreshtba", false,
             "don't refresh \"To be announced\" programs",
             "This option is only valid for selected grabbers.\n"
             "Prevent mythfilldatabase from automatically refreshing any "
             "programs marked as \"To be announced\".\n"
             "If being used with datadirect, this option should not be "
-            "used, rather use --dd-grab-all to pull all listings each time.");
+            "used, rather use --dd-grab-all to pull all listings each time.")
+        ->SetGroup("Filtering");
 
     add("--refresh-all", "refreshall", false, "",
             "This option is only valid for selected grabbers.\n"
@@ -169,7 +179,8 @@ void MythFillDatabaseCommandLineParser::LoadArguments(void)
         ->SetBlocks("dontrefreshtomorrow")
         ->SetBlocks("refreshsecond")
         ->SetBlocks("refreshday")
-        ->SetBlocks("maxdays");
+        ->SetBlocks("maxdays")
+        ->SetGroup("Filtering");
 
     add("--dd-grab-all", "ddgraball", false,
             "refresh full data using DataDirect",
@@ -187,15 +198,28 @@ void MythFillDatabaseCommandLineParser::LoadArguments(void)
     add("--only-update-channels", "onlychannels", false,
             "only update channel lineup",
             "Download as little listings data as possible to update the "
-            "channel lineup.");
+            "channel lineup.")
+        ->SetGroup("Channel List Handling");
     add("--no-mark-repeats", "markrepeats", true, "do not mark repeats", "");
     add("--export-icon-map", "exporticonmap", "iconmap.xml",
-            "export icon map to file", "");
+            "export icon map to file", "")
+        ->SetGroup("Channel Icon Handling");
     add("--import-icon-map", "importiconmap", "iconmap.xml",
-            "import icon map to file", "");
+            "import icon map to file", "")
+        ->SetGroup("Channel Icon Handling");
     add("--update-icon-map", "updateiconmap", false,
-            "updates icon map icons", "");
+            "updates icon map icons", "")
+        ->SetGroup("Channel Icon Handling");
     add("--reset-icon-map", "reseticonmap", "", "resets icon maps",
             "Reset all icon maps. If given 'all' as an optional value, reset "
-            "channel icons as well.");
+            "channel icons as well.")
+        ->SetGroup("Channel Icon Handling");
+
+    add("--graboptions", "graboptions", "", "", "")
+        ->SetRemoved("mythfilldatabase now passes any text after an\n"
+           "          independent '--' directly to the external grabber.\n"
+           "          e.g. mythfilldatabase -- --daily", "0.25");
+    add("--mark-repeats", "oldmarkrepeats", "", "", "")
+        ->SetRemoved("This is now the default behavior. Use\n"
+           "          --no-mark-repeats to disable.", "0.25");
 }

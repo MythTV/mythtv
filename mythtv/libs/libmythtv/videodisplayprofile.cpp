@@ -550,7 +550,7 @@ bool VideoDisplayProfile::SaveDB(uint groupid, item_list_t &items)
                 insert.bindValue(":GROUPID",   groupid);
                 insert.bindValue(":PROFILEID", (*it).GetProfileID());
                 insert.bindValue(":VALUE",     lit.key());
-                insert.bindValue(":DATA",      (*lit));
+                insert.bindValue(":DATA", ((*lit).isNull()) ? "" : (*lit));
                 if (!insert.exec())
                 {
                     MythDB::DBError("save_profile 2", insert);
@@ -584,7 +584,7 @@ bool VideoDisplayProfile::SaveDB(uint groupid, item_list_t &items)
                 update.bindValue(":GROUPID",   groupid);
                 update.bindValue(":PROFILEID", (*it).GetProfileID());
                 update.bindValue(":VALUE",     lit.key());
-                update.bindValue(":DATA",      (*lit));
+                update.bindValue(":DATA", ((*lit).isNull()) ? "" : (*lit));
                 if (!update.exec())
                 {
                     MythDB::DBError("save_profile 5", update);
@@ -597,7 +597,7 @@ bool VideoDisplayProfile::SaveDB(uint groupid, item_list_t &items)
                 insert.bindValue(":GROUPID",   groupid);
                 insert.bindValue(":PROFILEID", (*it).GetProfileID());
                 insert.bindValue(":VALUE",     lit.key());
-                insert.bindValue(":DATA",      (*lit));
+                insert.bindValue(":DATA", ((*lit).isNull()) ? "" : (*lit));
                 if (!insert.exec())
                 {
                     MythDB::DBError("save_profile 4", insert);
@@ -657,7 +657,7 @@ QString VideoDisplayProfile::GetDecoderName(const QString &decoder)
 
 QString VideoDisplayProfile::GetDecoderHelp(QString decoder)
 {
-    QString msg = QObject::tr("Decoder to use to play back MPEG2 video.");
+    QString msg = QObject::tr("Processing method used to decode video.");
 
     if (decoder.isEmpty())
         return msg;
@@ -687,6 +687,13 @@ QString VideoDisplayProfile::GetDecoderHelp(QString decoder)
         msg += QObject::tr(
             "VAAPI will attempt to use the graphics hardware to "
             "accelerate video decoding.");
+
+    if (decoder == "vda")
+        msg += QObject::tr(
+            "VDA will attempt to use the graphics hardware to "
+            "accelerate video decoding. "
+            "(H264 only, requires Mac OS 10.6.3)");
+
     return msg;
 }
 
@@ -933,7 +940,7 @@ void VideoDisplayProfile::CreateProfile(
         query.bindValue(":GRPID",  groupid);
         query.bindValue(":PROFID", profileid);
         query.bindValue(":VALUE",  *itV);
-        query.bindValue(":DATA",   *itD);
+        query.bindValue(":DATA",   ((*itD).isNull()) ? "" : (*itD));
         if (!query.exec())
             MythDB::DBError("create_profile 3", query);
     }
@@ -1094,6 +1101,74 @@ void VideoDisplayProfile::CreateVDPAUProfiles(const QString &hostname)
                   "vdpauskipchroma,vdpaucolorspace=auto");
 }
 
+#if defined(Q_OS_MACX)
+void VideoDisplayProfile::CreateVDAProfiles(const QString &hostname)
+{
+    (void) QObject::tr("VDA High Quality", "Sample: VDA high quality");
+    DeleteProfileGroup("VDA High Quality", hostname);
+    uint groupid = CreateProfileGroup("VDA High Quality", hostname);
+    CreateProfile(groupid, 1, ">", 0, 0, "", 0, 0,
+                  "vda", 2, true, "opengl", "opengl2", true,
+                  "greedyhdoubleprocessdeint", "greedyhdeint",
+                  "");
+    CreateProfile(groupid, 1, ">", 0, 0, "", 0, 0,
+                  "ffmpeg", 2, true, "opengl", "opengl2", true,
+                  "greedyhdoubleprocessdeint", "greedyhdeint",
+                  "");
+
+    (void) QObject::tr("VDA Normal", "Sample: VDA average quality");
+    DeleteProfileGroup("VDA Normal", hostname);
+    groupid = CreateProfileGroup("VDA Normal", hostname);
+    CreateProfile(groupid, 1, ">", 0, 0, "", 0, 0,
+                  "vda", 2, true, "opengl", "opengl2", true,
+                  "opengldoubleratekerneldeint", "openglkerneldeint",
+                  "");
+    CreateProfile(groupid, 2, ">", 0, 0, "", 0, 0,
+                  "ffmpeg", 2, true, "opengl", "opengl2", true,
+                  "opengldoubleratekerneldeint", "openglkerneldeint",
+                  "");
+
+    (void) QObject::tr("VDA Slim", "Sample: VDA low power GPU");
+    DeleteProfileGroup("VDA Slim", hostname);
+    groupid = CreateProfileGroup("VDA Slim", hostname);
+    CreateProfile(groupid, 1, ">", 0, 0, "", 0, 0,
+                  "vda", 2, true, "opengl", "opengl2", true,
+                  "opengldoubleratelinearblend", "opengllinearblend",
+                  "");
+    CreateProfile(groupid, 2, ">", 0, 0, "", 0, 0,
+                  "ffmpeg", 2, true, "opengl", "opengl2", true,
+                  "opengldoubleratelinearblend", "opengllinearblend",
+                  "");
+}
+#endif
+
+void VideoDisplayProfile::CreateOpenGLProfiles(const QString &hostname)
+{
+    (void) QObject::tr("OpenGL High Quality", "Sample: OpenGL high quality");
+    DeleteProfileGroup("OpenGL High Quality", hostname);
+    uint groupid = CreateProfileGroup("OpenGL High Quality", hostname);
+    CreateProfile(groupid, 1, ">", 0, 0, "", 0, 0,
+                  "ffmpeg", 2, true, "opengl", "opengl2", true,
+                  "greedyhdoubleprocessdeint", "greedyhdeint",
+                  "");
+
+    (void) QObject::tr("OpenGL Normal", "Sample: OpenGL average quality");
+    DeleteProfileGroup("OpenGL Normal", hostname);
+    groupid = CreateProfileGroup("OpenGL Normal", hostname);
+    CreateProfile(groupid, 1, ">", 0, 0, "", 0, 0,
+                  "ffmpeg", 2, true, "opengl", "opengl2", true,
+                  "opengldoubleratekerneldeint", "openglkerneldeint",
+                  "");
+
+    (void) QObject::tr("OpenGL Slim", "Sample: OpenGL low power GPU");
+    DeleteProfileGroup("OpenGL Slim", hostname);
+    groupid = CreateProfileGroup("OpenGL Slim", hostname);
+    CreateProfile(groupid, 1, ">", 0, 0, "", 0, 0,
+                  "ffmpeg", 1, true, "opengl", "opengl2", true,
+                  "opengldoubleratelinearblend", "opengllinearblend",
+                  "");
+}
+
 void VideoDisplayProfile::CreateProfiles(const QString &hostname)
 {
     CreateNewProfiles(hostname);
@@ -1163,7 +1238,7 @@ QString VideoDisplayProfile::GetVideoRendererHelp(const QString &renderer)
     {
         msg = QObject::tr(
             "This video renderer uses OpenGL for scaling and color conversion "
-            "with full picture contols. The GPU can be used for deinterlacing. "
+            "with full picture controls. The GPU can be used for deinterlacing. "
             "This requires a faster GPU than XVideo.");
     }
 
@@ -1256,7 +1331,7 @@ QString VideoDisplayProfile::GetDeinterlacerHelp(const QString &deint)
         "It has increased CPU requirements.");
 
     QString kFieldOrderMsg = QObject::tr(
-        "This deinterlacer attempts to syncronise with interlaced displays "
+        "This deinterlacer attempts to synchronize with interlaced displays "
         "whose size and refresh rate exactly match the video source. "
         "It has low CPU requirements.");
 
@@ -1350,7 +1425,7 @@ QString VideoDisplayProfile::GetOSDHelp(const QString &osd)
     if (osd == "chromakey")
         msg = QObject::tr(
             "Render the OSD using the XVideo chromakey feature."
-            "This renderer does not alpha blend. But it is the fastest "
+            "This renderer does not alpha blend but is the fastest "
             "OSD renderer for XVideo.") + "\n" +
             QObject::tr(
                 "Note: nVidia hardware after the 5xxx series does not "
