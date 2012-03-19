@@ -2210,6 +2210,8 @@ static HostComboBox *MythDateFormatCB()
     gc->addSelection(sampdate.toString("ddd MMM d yyyy"), "ddd MMM d yyyy");
     gc->addSelection(sampdate.toString("ddd d MMM yyyy"), "ddd d MMM yyyy");
     gc->addSelection(sampdate.toString("ddd yyyy-MM-dd"), "ddd yyyy-MM-dd");
+    gc->addSelection(sampdate.toString(QString::fromUtf8("dddd yyyy\u5E74M\u6708d\u65E5")), QString::fromUtf8("dddd yyyy\u5E74M\u6708d\u65E5"));
+    gc->addSelection(sampdate.toString(QString::fromUtf8("ddd M\u6708d\u65E5")), QString::fromUtf8("ddd M\u6708d\u65E5"));
     gc->setHelpText(QObject::tr("Your preferred date format.") + ' ' +
                     sampleStr);
     return gc;
@@ -2249,6 +2251,7 @@ static HostComboBox *MythShortDateFormat()
     gc->addSelection(sampdate.toString("ddd d/M"), "ddd d/M");
     gc->addSelection(sampdate.toString("M/d ddd"), "M/d ddd");
     gc->addSelection(sampdate.toString("d/M ddd"), "d/M ddd");
+    gc->addSelection(sampdate.toString(QString::fromUtf8("M\u6708d\u65E5")), QString::fromUtf8("M\u6708d\u65E5"));
     gc->setHelpText(QObject::tr("Your preferred short date format.") + ' ' +
                     sampleStr);
     return gc;
@@ -2268,6 +2271,7 @@ static HostComboBox *MythTimeFormat()
     gc->addSelection(samptime.toString("h:mm"), "h:mm");
     gc->addSelection(samptime.toString("hh:mm"), "hh:mm");
     gc->addSelection(samptime.toString("hh.mm"), "hh.mm");
+    gc->addSelection(samptime.toString("AP h:mm"), "AP h:mm");
     gc->setHelpText(QObject::tr("Your preferred time format. You must choose "
                     "a format with \"AM\" or \"PM\" in it, otherwise your "
                     "time display will be 24-hour or \"military\" time."));
