@@ -193,7 +193,7 @@ bool IconView::Create(void)
 
     if (m_noImagesText)
     {
-        m_noImagesText->SetText(tr("No images found in this directory."));
+        m_noImagesText->SetText(tr("No images found in this folder."));
         m_noImagesText->SetVisible(false);
     }
 
@@ -971,7 +971,7 @@ MythMenu* IconView::CreateFileMenu(void)
     menu->AddItem(tr("Copy here"));
     menu->AddItem(tr("Move here"));
     menu->AddItem(tr("Delete"));
-    menu->AddItem(tr("Create Dir"));
+    menu->AddItem(tr("Create folder"));
     menu->AddItem(tr("Rename"));
 
     return menu;
@@ -1365,7 +1365,7 @@ void IconView::DoRename(QString folderName)
     {
         QString msg;
         if (thumbitem->IsDir())
-            msg = tr("Failed to rename directory");
+            msg = tr("Failed to rename folder");
         else
             msg = tr("Failed to rename file");
 
