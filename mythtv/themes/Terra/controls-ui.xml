@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mythuitheme SYSTEM "http://www.mythtv.org/schema/mythuitheme.dtd">
+<mythuitheme>
+
+    <window name="keygrabpopup">
+        <area>390,150,500,500</area>
+        <imagetype name="backimg">
+            <filename>mythdialogbox-background.png</filename>
+        </imagetype>
+
+        <textarea name="message" from="basetextarea">
+            <area>18,18,460,400</area>
+            <multiline>yes</multiline>
+        </textarea>
+
+        <button name="cancel" from="basebutton">
+            <position>10,420</position>
+            <value>Cancel</value>
+        </button>
+
+        <button name="ok" from="basebutton">
+            <position>265,420</position>
+            <value>OK</value>
+        </button>
+    </window>
+
+    <window name="controls">
+
+        <imagetype name="topbar" from="basetopbar" />
+        <textarea name="header" from="baseheading">
+            <value>Edit Keys</value>
+        </textarea>
+
+        <textarea name="leftdesc" from="basetextarea">
+            <area>64,46,560,30</area>
+            <value>Contexts</value>
+            <align>center</align>
+        </textarea>
+
+        <buttonlist name="leftlist" from="basebuttonlist">
+            <area>64,86,560,440</area>
+            <showarrow>no</showarrow>
+        </buttonlist>
+
+        <textarea name="rightdesc" from="leftdesc">
+            <area>656,46,560,30</area>
+            <value>Actions</value>
+        </textarea>
+
+        <buttonlist name="rightlist" from="leftlist">
+            <area>656,86,560,440</area>
+        </buttonlist>
+
+        <button name="action_0" from="basebutton">
+            <position>275,560</position>
+        </button>
+
+        <button name="action_1" from="action_0">
+            <position>465,560</position>
+        </button>
+
+        <button name="action_2" from="action_0">
+            <position>655,560</position>
+        </button>
+
+        <button name="action_3" from="action_0">
+            <position>845,560</position>
+        </button>
+
+        <textarea name="description" from="basetextarea">
+            <area>64,600,1152,90</area>
+            <multiline>yes</multiline>
+            <align>center</align>
+        </textarea>
+
+    </window>
+</mythuitheme>
