@@ -212,7 +212,8 @@ void DVDThemeSelector::themeChanged(MythUIButtonListItem *item)
     if (QFile::exists(themeDir + theme_list[itemNo] + "/description.txt"))
     {
         QString desc = loadFile(themeDir + theme_list[itemNo] + "/description.txt");
-        themedesc_text->SetText(QCoreApplication::translate("BurnThemeUI", desc.toUtf8().constData()));
+        themedesc_text->SetText(QCoreApplication::translate("BurnThemeUI", 
+                                desc.toUtf8().constData()));
     }
     else
         themedesc_text->SetText(tr("No theme description file found!"));
