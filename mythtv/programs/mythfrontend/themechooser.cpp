@@ -613,9 +613,16 @@ void ThemeChooser::saveAndReload(MythUIButtonListItem *item)
 
         OpenBusyPopup(tr("Downloading %1 Theme").arg(info->GetName()));
         m_downloadTheme = info;
+#if 0
         m_downloadFile = RemoteDownloadFile(downloadURL,
                                             "Temp", baseName);
         m_downloadState = dsDownloadingOnBackend;
+#else
+        QString localFile = GetConfDir() + "/tmp/" + baseName;
+        GetMythDownloadManager()->queueDownload(downloadURL, localFile, this);
+        m_downloadFile = localFile;
+        m_downloadState = dsDownloadingOnFrontend;
+#endif
     }
     else
     {
