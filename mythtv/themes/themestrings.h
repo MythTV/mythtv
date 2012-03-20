@@ -882,7 +882,7 @@ void strings_null() {
     ThemeUI::tr(": %VIDEOWIDTH%x%VIDEOHEIGHT%@%VIDEOFRAMERATE%fps");
     ThemeUI::tr("Sample rate");
     ThemeUI::tr("%DESCRIPTION% %(|REMAININGTIME|)%%(|BEHINDTIME|)%%VALUE%%UNITS%");
-    ThemeUI::tr("%STARTDATE%   %STARTTIME% - %ENDTIME%");
+    ThemeUI::tr("%STARTDATE%   %STARTTIME%% - |ENDTIME%");
     ThemeUI::tr("%|\"SUBTITLE|\"% %|(STARS|) %%DESCRIPTION%");
     ThemeUI::tr("Channel Name:");
     ThemeUI::tr("XMLTV ID:");
@@ -903,7 +903,7 @@ void strings_null() {
     ThemeUI::tr("= %1");
     ThemeUI::tr("(Last: %1)");
     ThemeUI::tr("%|(STARS|) %%DESCRIPTION%");
-    ThemeUI::tr("Designed to show off some different element arrangements available in Myth 0.25.  Tested at 1280x720 and with FranÃ§ais. Reminder: On Watch Recordings screen [Rew] and [FF] can be used to change the Rec. Group.");
+    ThemeUI::tr("Designed to show off some different element arrangements available in Myth 0.25.  Tested at 1280x720 and with Français. Reminder: On Watch Recordings screen [Rew] and [FF] can be used to change the Rec. Group.");
     ThemeUI::tr("Year: %1");
     ThemeUI::tr("IMDB: %1");
     ThemeUI::tr("No videos in library,or no files found.  If you have configured a video directory,press \"M\" (or the MENU key) and select \"Scan for Changes.\"");
