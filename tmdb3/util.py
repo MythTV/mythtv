@@ -8,42 +8,6 @@
 
 from copy import copy
 
-class PagedList( list ):
-    """
-    List-like object, with support for automatically grabbing additional
-    pages from a data source.
-    """
-    def __init__(self, iterable, count, perpage=20):
-        self._perpage = perpage
-        if count:
-            super(PagedList, self).__init__(self._process(iterable))
-            super(PagedList, self).extend([None]*(count-len(self)))
-        else:
-            super(PagedList, self).__init__()
-
-    def _getpage(self, page):
-        raise NotImplementedError("PagedList._getpage() must be provided "+\
-                                  "by subclass")
-
-    def _populateindex(self, index):
-        self._populatepage(int(index/self._perpage)+1)
-
-    def _populatepage(self, page):
-        offset = (page-1)*self._perpage
-        for i,data in enumerate(self._getpage(page)):
-            super(PagedList, self).__setitem__(offset+i, data)
-
-    def __getitem__(self, index):
-        item = super(PagedList, self).__getitem__(index)
-        if item is None:
-            self._populateindex(index)
-        item = super(PagedList, self).__getitem__(index)
-        return item
-
-    def __iter__(self):
-        for i in range(len(self)):
-            yield self[i]
-
 class Poller( object ):
     """
     Wrapper for an optional callable to populate an Element derived class

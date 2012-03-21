@@ -33,7 +33,8 @@ __version__="v0.3.4"
 # 0.3.4 Re-enable search paging
 
 from request import set_key, Request
-from util import PagedList, Datapoint, Datalist, Datadict, Element
+from util import Datapoint, Datalist, Datadict, Element
+from pager import PagedRequest
 from tmdb_exceptions import *
 
 import json
@@ -50,47 +51,31 @@ class Configuration( Element ):
 Configuration = Configuration()
 
 def searchMovie(query, language='en', adult=False):
-    return MovieSearchResults(
+    return MovieSearchResult(
                     Request('search/movie', query=query, include_adult=adult),
                     language=language)
 
-class MovieSearchResults( PagedList ):
+class MovieSearchResult( PagedRequest ):
     """Stores a list of search matches."""
-    def _process(self, data):
-        for item in data['results']:
-            yield Movie(raw=item, language=self.language)
-
-    def _getpage(self, page):
-        self.request = self.request.new(page=page)
-        return list(self._process(self.request.readJSON()))
-
     def __init__(self, request, language=None):
-        self.language=language
         if language:
-            self.request = request.new(language=language)
-        res = self.request.readJSON()
-        super(MovieSearchResults, self).__init__(res, res['total_results'], 20)
-
+            super(MovieSearchResult, self).__init__(
+                                request.new(language=language),
+                                lambda x: Movie(raw=x, language=language))
+        else:
+            super(MovieSearchResult, self).__init__(res,
+                                lambda x: Movie(raw=x))
+    
     def __repr__(self):
-        return u"<Search Results: {0}>".format(self.request._kwargs['query'])
+        return u"<Search Results: {0}>".format(self._request._kwargs['query'])
 
 def searchPerson(query):
-    return PeopleSearchResults(Request('search/person', query=query))
+    return PeopleSearchResult(Request('search/person', query=query))
 
-class PeopleSearchResults( PagedList ):
-    @staticmethod
-    def _process(data):
-        for item in data['results']:
-            yield Person(raw=item)
-
-    def _getpage(self, page):
-        self.request = self.request.new(page=page)
-        return list(self._process(self.request.readJSON()))
-
+class PeopleSearchResult( PagedRequest ):
+    """Stores a list of search matches."""
     def __init__(self, request):
-        self.request = request
-        res = self.request.readJSON()
-        super(PeopleSearchResults, self).__init__(res, res['total_results'], 20)
+        super(PeopleSearchResults, self).__init__(res)
 
     def __repr__(self):
         return u"<Search Results: {0}>".format(self.request._kwargs['query'])
