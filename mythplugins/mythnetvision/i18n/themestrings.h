@@ -49,9 +49,8 @@ void strings_null() {
     ThemeUI::tr("Author");
     ThemeUI::tr("Rating");
     ThemeUI::tr("Search Internet Video");
-    ThemeUI::tr("Type the URL to an RSS 2.0 media feed below.  If editing an existing feed,modify any of the values you like.  Press \"Save\" to save/subscribe.\n\nFor new subscriptions,you can simply enter the URL and click \"Save.\"");
+    ThemeUI::tr("Select to change image");
     ThemeUI::tr("Internet Video List");
-    ThemeUI::tr("You haven't added any Sites/RSS Feeds yet!  To add a site,press MENU,then choose \"Scan/Manage Subscriptions,\" then \"Manage Site Subscriptions.\"");
     ThemeUI::tr("User Rating: %1");
     ThemeUI::tr("By: %1");
     ThemeUI::tr("Internet Video Gallery");
