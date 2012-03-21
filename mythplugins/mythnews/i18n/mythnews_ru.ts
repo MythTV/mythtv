@@ -143,7 +143,7 @@
     <message>
         <location filename="../mythnews/newssite.cpp" line="261"/>
         <source>Showing Cached News.</source>
-        <translation>Показать новости из кэша.</translation>
+        <translation>Показаны новости из кэша.</translation>
     </message>
     <message>
         <location filename="../mythnews/newssite.cpp" line="282"/>
@@ -167,17 +167,17 @@
 <context>
     <name>ThemeUI</name>
     <message>
-        <location filename="themestrings.h" line="8"/>
+        <location filename="themestrings.h" line="9"/>
         <source>%DATE%, %TIME%</source>
         <translation>%DATE%, %TIME%</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="9"/>
+        <location filename="themestrings.h" line="10"/>
         <source>Edit RSS News Feeds</source>
         <translation>Изменить новостные ленты RSS</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="10"/>
+        <location filename="themestrings.h" line="11"/>
         <source>You can edit the name, URL, and icon path for the selected RSS Feed on this screen.  You can also designate the item as a podcast.
 
 When you have finished editing, select &quot;OK&quot; or &quot;Cancel&quot; to continue.</source>
@@ -186,32 +186,32 @@ When you have finished editing, select &quot;OK&quot; or &quot;Cancel&quot; to c
 По окончании редактирования для продолжения нажмите &quot;ОК&quot; или &quot;Отмена&quot;.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="11"/>
+        <location filename="themestrings.h" line="12"/>
         <source>Name:</source>
         <translation>Название:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="12"/>
+        <location filename="themestrings.h" line="13"/>
         <source>URL:</source>
         <translation>URL:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="13"/>
+        <location filename="themestrings.h" line="14"/>
         <source>Icon:</source>
         <translation>Значок:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="14"/>
+        <location filename="themestrings.h" line="15"/>
         <source>Podcast:</source>
         <translation>Подкаст:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="15"/>
+        <location filename="themestrings.h" line="16"/>
         <source>Genre:</source>
         <translation>Жанр:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="16"/>
+        <location filename="themestrings.h" line="17"/>
         <source>Channel:</source>
         <translation>Канал:</translation>
     </message>
@@ -231,17 +231,17 @@ When you have finished editing, select &quot;OK&quot; or &quot;Cancel&quot; to c
         <translation>ОК</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="17"/>
+        <location filename="themestrings.h" line="18"/>
         <source>News Subscriptions</source>
         <translation>Подписки на новости</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="18"/>
+        <location filename="themestrings.h" line="19"/>
         <source>Choose the news sites you would like to read.</source>
         <translation>Выберите новостные сайты, которые вы хотите читать.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="20"/>
+        <location filename="themestrings.h" line="8"/>
         <source>News Settings</source>
         <translation>Настройки новостей</translation>
     </message>
@@ -276,7 +276,7 @@ When you have finished editing, select &quot;OK&quot; or &quot;Cancel&quot; to c
         <translation>Действия</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="19"/>
+        <location filename="themestrings.h" line="20"/>
         <source>News Feeds</source>
         <translation>Новостные ленты</translation>
     </message>
