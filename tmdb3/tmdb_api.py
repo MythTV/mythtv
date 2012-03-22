@@ -63,7 +63,7 @@ class MovieSearchResult( PagedRequest ):
                                 request.new(language=language),
                                 lambda x: Movie(raw=x, language=language))
         else:
-            super(MovieSearchResult, self).__init__(res,
+            super(MovieSearchResult, self).__init__(request,
                                 lambda x: Movie(raw=x))
     
     def __repr__(self):
@@ -214,6 +214,18 @@ class Movie( Element ):
         req = Request('latest/movie')
         req.lifetime = 600
         return cls(raw=req.readJSON())
+
+    @classmethod
+    def nowplaying(cls, language='en'):
+        return MovieSearchResult(Request('movie/now-playing'), language=language)
+
+    @classmethod
+    def mostpopular(cls, language='en'):
+        return MovieSearchResult(Request('movie/popular'), language=language)
+
+    @classmethod
+    def toprated(cls, language='en'):
+        return MovieSearchResult(Request('movie/top-rated'), language=language)
 
     id              = Datapoint('id', initarg=1)
     title           = Datapoint('title')
