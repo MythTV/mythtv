@@ -133,27 +133,30 @@ class AudioReencodeBuffer : public AudioOutput
 
         QMutexLocker locker(&m_bufferMutex);
         AudioBuffer *ab;
+        unsigned char *buf = (unsigned char *)buffer;
+        int savedlen = 0;
+        int firstlen = 0;
 
         if (m_audioFrameSize)
         {
-            int currLen = m_saveBuffer.m_buffer.size();
-            if (currLen)
+            savedlen = m_saveBuffer.m_buffer.size();
+            if (savedlen)
             {
                 ab = new AudioBuffer(m_saveBuffer);
                 m_saveBuffer.clear();
+                firstlen = m_audioFrameSize - savedlen;
             }
             else
                 ab = new AudioBuffer;
 
             int overage;
 
-            if ((overage = (currLen + len) % m_audioFrameSize))
+            if ((overage = (len + savedlen) % m_audioFrameSize))
             {
                 long long newtime = timecode + ((len / m_bytes_per_frame) /
                                                 (m_eff_audiorate / 1000));
                 len -= overage;
-                m_saveBuffer.setData(&((unsigned char *)buffer)[len], overage,
-                                     newtime);
+                m_saveBuffer.setData(&buf[len], overage, newtime);
             }
         }
         else
@@ -161,11 +164,30 @@ class AudioReencodeBuffer : public AudioOutput
             ab = new AudioBuffer;
         }
 
-        m_last_audiotime = timecode + ((len / m_bytes_per_frame) /
-                                       (m_eff_audiorate / 1000));
-        ab->appendData((unsigned char *)buffer, len, m_last_audiotime);
+        int bufflen = (m_audioFrameSize ? m_audioFrameSize : len);
+        int index = 0;
 
-        m_bufferList.append(ab);
+        do
+        {
+            if (!len)
+                break;
+
+            int blocklen = (firstlen ? firstlen : bufflen);
+
+            m_last_audiotime = timecode + ((blocklen / m_bytes_per_frame) /
+                                           (m_eff_audiorate / 1000));
+            ab->appendData(&buf[index], blocklen, m_last_audiotime);
+            m_bufferList.append(ab);
+
+            timecode = m_last_audiotime;
+            index += blocklen;
+            firstlen = 0;
+
+            ab = new AudioBuffer;
+        } while (index < len);
+
+        // The last buffer is actually unused
+        delete ab;
 
         return true;
     }
