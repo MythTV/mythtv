@@ -1568,7 +1568,9 @@ void ChannelScanSM::HandleActiveScan(void)
             return;
 
         // Stop signal monitor for previous transport
+        locker.unlock();
         signalMonitor->Stop();
+        locker.relock();
     }
 
     if (0 == nextIt.offset() && nextIt == scanTransports.begin())

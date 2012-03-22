@@ -497,12 +497,8 @@ For new subscriptions, you can simply enter the URL and click &quot;Save.&quot;<
     </message>
     <message>
         <location filename="themestrings.h" line="52"/>
-        <source>Type the URL to an RSS 2.0 media feed below.  If editing an existing feed,modify any of the values you like.  Press &quot;Save&quot; to save/subscribe.
-
-For new subscriptions,you can simply enter the URL and click &quot;Save.&quot;</source>
-        <translation>Type the URL to an RSS 2.0 media feed below.  If editing an existing feed,modify any of the values you like.  Press &quot;Save&quot; to save/subscribe.
-
-For new subscriptions,you can simply enter the URL and click &quot;Save.&quot;</translation>
+        <source>Select to change image</source>
+        <translation>Select to change image</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="53"/>
@@ -511,36 +507,31 @@ For new subscriptions,you can simply enter the URL and click &quot;Save.&quot;</
     </message>
     <message>
         <location filename="themestrings.h" line="54"/>
-        <source>You haven&apos;t added any Sites/RSS Feeds yet!  To add a site,press MENU,then choose &quot;Scan/Manage Subscriptions,&quot; then &quot;Manage Site Subscriptions.&quot;</source>
-        <translation>You haven&apos;t added any Sites/RSS Feeds yet!  To add a site,press MENU,then choose &quot;Scan/Manage Subscriptions,&quot; then &quot;Manage Site Subscriptions.&quot;</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="55"/>
         <source>User Rating: %1</source>
         <translation>User Rating: %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="56"/>
+        <location filename="themestrings.h" line="55"/>
         <source>By: %1</source>
         <translation>By: %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="57"/>
+        <location filename="themestrings.h" line="56"/>
         <source>Internet Video Gallery</source>
         <translation>Internet Video Gallery</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="58"/>
+        <location filename="themestrings.h" line="57"/>
         <source>Search popular video sites</source>
         <translation>Search popular video sites</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="59"/>
+        <location filename="themestrings.h" line="58"/>
         <source>Browse Internet Video</source>
         <translation>Browse Internet Video</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="60"/>
+        <location filename="themestrings.h" line="59"/>
         <source>Browse highlights and entire sites</source>
         <translation>Browse highlights and entire sites</translation>
     </message>

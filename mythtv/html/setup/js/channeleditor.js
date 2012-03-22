@@ -460,7 +460,7 @@ function initXMLTVIdList() {
     var x = 0;
     $.ajaxSetup({ async: false });
     $.post("/Channel/GetXMLTVIdList", { SourceID : sourceid }, function(data) {
-       $.each(data.QStringList, function(i, value) {
+       $.each(data.StringList, function(i, value) {
             ids[x] = value;
             x++;
         });

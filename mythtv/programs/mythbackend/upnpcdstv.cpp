@@ -314,7 +314,7 @@ void UPnpCDSTv::AddItem( const UPnpCDSRequest    *pRequest,
     // Build Support Strings
     // ----------------------------------------------------------------------
 
-    QString sName      = sTitle + ": " + (sSubtitle.isEmpty() ? sDescription : sSubtitle);
+    QString sName      = sTitle + ": " + (sSubtitle.isEmpty() ? sDescription.left(128) : sSubtitle);
 
     QString sURIBase   = QString( "http://%1:%2/Content/" )
                             .arg( m_mapBackendIp  [ sHostName ] )

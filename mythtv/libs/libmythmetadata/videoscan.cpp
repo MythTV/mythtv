@@ -258,9 +258,14 @@ void VideoScannerThread::verifyFiles(FileCheckList &files,
             iter = files.find(lname);
             if (iter != files.end())
             {
-                // If it's both on disk and in the database we're done with
-                // it.
-                iter->second.check= true;
+                if (lhost != iter->second.host)
+                    // file has changed hosts
+                    // add to delete list for further processing
+                    remove.push_back(std::make_pair((*p)->GetID(), lname));
+                else
+                    // file is on disk on the proper host and in the database
+                    // we're done with it
+                    iter->second.check = true;
             }
             else if (lhost.isEmpty())
             {

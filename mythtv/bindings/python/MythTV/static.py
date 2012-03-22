@@ -114,8 +114,8 @@ class JOBTYPE( object ):
     USERJOB      = 0xff00
     USERJOB1     = 0x0100
     USERJOB2     = 0x0200
-    USERJOB3     = 0x0300
-    USERJOB4     = 0x0400
+    USERJOB3     = 0x0400
+    USERJOB4     = 0x0800
 
 class JOBCMD( object ):
     RUN          = 0x0000
@@ -141,7 +141,7 @@ class JOBSTATUS( object ):
     PAUSED       = 0x0006
     RETRY        = 0x0007
     ERRORING     = 0x0008
-    ABORTING     = 0x0008
+    ABORTING     = 0x0009
     DONE         = 0x0100
     FINISHED     = 0x0110
     ABORTED      = 0x0120

@@ -205,6 +205,7 @@ int main(int argc, char *argv[])
     }
 
     fdataout.setDevice(&fstringout);
+    fdataout.setCodec("UTF-8");
 
     fdataout << QString("// This is an automatically generated file\n");
     fdataout << QString("// Do not edit\n\n");
@@ -217,10 +218,10 @@ int main(int argc, char *argv[])
         QString string = (*strit);
         if (string.contains("%n"))
             fdataout << QString("    ThemeUI::tr(\"%1\", 0, 1);\n")
-                                .arg((*strit).toUtf8().data());
+                                .arg(string);
         else
             fdataout << QString("    ThemeUI::tr(\"%1\");\n")
-                                .arg((*strit).toUtf8().data());
+                                .arg(string);
 
 #if 0
         if (translatedStrings.contains(*strit))
