@@ -72,9 +72,9 @@ class GPUAvDecoder : public DecoderBase
 
     virtual bool GetFrame(DecodeType); // DecoderBase
 
-    bool isLastFrameKey(void) { return false; }
+    bool IsLastFrameKey(void) const { return false; }
 
-    bool isCodecMPEG(void) { return codec_is_mpeg; }
+    bool IsCodecMPEG(void) const { return codec_is_mpeg; }
 
     /// This is a No-op for this class.
     void WriteStoredData(RingBuffer *rb, bool storevid, long timecodeOffset)
