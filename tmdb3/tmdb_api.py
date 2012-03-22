@@ -22,7 +22,7 @@ for search and retrieval of text metadata and image URLs from TMDB.
 Preliminary API specifications can be found at
 http://help.themoviedb.org/kb/api/about-3"""
 
-__version__="v0.3.4"
+__version__="v0.3.6"
 # 0.1.0 Initial development
 # 0.2.0 Add caching mechanism for API queries
 # 0.2.1 Temporary work around for broken search paging
@@ -31,6 +31,8 @@ __version__="v0.3.4"
 # 0.3.2 Remove MythTV key from results.py
 # 0.3.3 Add functional language support
 # 0.3.4 Re-enable search paging
+# 0.3.5 Add methods for grabbing current, popular, and top rated movies
+# 0.3.6 Rework paging mechanism
 
 from request import set_key, Request
 from util import Datapoint, Datalist, Datadict, Element
