@@ -279,12 +279,15 @@ MythUIType *MythUIType::GetChildAt(const QPoint &p, bool recursive,
 
 void MythUIType::ActivateAnimations(MythUIAnimation::Trigger trigger)
 {
-    foreach (MythUIAnimation* animation, m_animations)
-        if (animation->GetTrigger() == trigger)
-            animation->Activate();
+    if (GetMythMainWindow()->GetCurrentPainter()->EffectsEnabled())
+    {
+        foreach (MythUIAnimation* animation, m_animations)
+            if (animation->GetTrigger() == trigger)
+                animation->Activate();
 
-    foreach (MythUIType* uiType, m_ChildrenList)
-        uiType->ActivateAnimations(trigger);
+        foreach (MythUIType* uiType, m_ChildrenList)
+            uiType->ActivateAnimations(trigger);
+    }
 }
 
 bool MythUIType::NeedsRedraw(void) const

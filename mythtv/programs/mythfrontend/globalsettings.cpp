@@ -2303,6 +2303,17 @@ static HostComboBox *ThemePainter()
     return gc;
 }
 
+static HostCheckBox *GUIEffectsEnabled()
+{
+    HostCheckBox *gc = new HostCheckBox("GUIEffectsEnabled");
+    gc->setLabel(QObject::tr("Enable GUI Effects"));
+    gc->setValue(true);
+    gc->setHelpText(QObject::tr("This selects whether to use any effects "
+                    "defined by the theme (Note: not all the paint engines "
+                    "allow animations to be used)."));
+    return gc;
+}
+
 static HostComboBox *ChannelFormat()
 {
     HostComboBox *gc = new HostComboBox("ChannelFormat");
@@ -3687,6 +3698,7 @@ AppearanceSettings::AppearanceSettings()
     screen->setLabel(QObject::tr("Theme") + " / " + QObject::tr("Screen Settings"));
 
     screen->addChild(ThemePainter());
+    screen->addChild(GUIEffectsEnabled());
     screen->addChild(MenuTheme());
 
     if (MythDisplay::GetNumberXineramaScreens() > 1)
