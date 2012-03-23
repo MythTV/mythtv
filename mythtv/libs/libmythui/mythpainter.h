@@ -33,7 +33,6 @@ class MUI_PUBLIC MythPainter
 
     virtual QString GetName(void) = 0;
     virtual bool SupportsAnimation(void) = 0;
-    bool EffectsEnabled(void);
     virtual bool SupportsAlpha(void) = 0;
     virtual bool SupportsClipping(void) = 0;
     virtual void FreeResources(void) { }
