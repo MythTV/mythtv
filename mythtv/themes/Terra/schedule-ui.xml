@@ -1451,8 +1451,6 @@
 
     </window>
 
-
-
     <window name="scheduleeditor">
 
         <imagetype name="backdrop" from="basebackdrop" />
@@ -2260,8 +2258,7 @@
             <value></value>
         </textarea>
 
-    </window>>
-
+    </window>
 
     <window name="managerecrules">
 
