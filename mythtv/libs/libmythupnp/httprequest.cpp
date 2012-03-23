@@ -246,11 +246,31 @@ long HTTPRequest::SendResponse( void )
 #endif
 
     // ----------------------------------------------------------------------
+    // Check for ETag match...
+    // ----------------------------------------------------------------------
+
+    QString sETag = GetHeaderValue( "If-None-Match", "" );
+
+    if ( !sETag.isEmpty() && sETag == m_mapRespHeaders[ "ETag" ] )
+    {
+        LOG(VB_UPNP, LOG_INFO,
+            QString("HTTPRequest::SendResponse(%1) - Cached")
+                .arg(sETag));
+
+        m_nResponseStatus = 304;
+
+        // no content can be returned.
+        m_response.buffer().clear();
+    }
+
+    // ----------------------------------------------------------------------
     // Write out Header.
     // ----------------------------------------------------------------------
+
     const QByteArray &buffer = m_response.buffer();
 
     QString    rHeader = BuildHeader( buffer.length() );
+
     QByteArray sHeader = rHeader.toUtf8();
     nBytes  = WriteBlockDirect( sHeader.constData(), sHeader.length() );
 
@@ -720,6 +740,7 @@ QString HTTPRequest::GetResponseStatus( void )
         case 201:   return( "201 Created"                          );
         case 202:   return( "202 Accepted"                         );
         case 206:   return( "206 Partial Content"                  );
+        case 304:   return( "304 Not Modified"                     );
         case 400:   return( "400 Bad Request"                      );
         case 401:   return( "401 Unauthorized"                     );
         case 403:   return( "403 Forbidden"                        );
@@ -1438,6 +1459,17 @@ QString HTTPRequest::Encode(const QString &sIn)
         QString("HTTPRequest::Encode Output : %1").arg(sStr));
 #endif
     return sStr;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+QString HTTPRequest::GetETagHash(const QByteArray &data)
+{
+    QByteArray hash = QCryptographicHash::hash( data.data(), QCryptographicHash::Sha1);
+
+    return ("\"" + hash.toHex() + "\"");
 }
 
 /////////////////////////////////////////////////////////////////////////////
