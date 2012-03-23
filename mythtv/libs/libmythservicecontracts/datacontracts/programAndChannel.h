@@ -120,6 +120,8 @@ class SERVICE_PUBLIC ChannelInfo : public QObject
               m_SourceId        ( 0      ),
               m_InputId         ( 0      ),
               m_CommFree        ( 0      ),
+              m_UseEIT          ( false  ),
+              m_Visible         ( true   ),
               m_SerializeDetails( true   )
         {
         }
@@ -140,6 +142,8 @@ class SERVICE_PUBLIC ChannelInfo : public QObject
             m_SourceId     = src.m_SourceId    ;
             m_InputId      = src.m_InputId     ;
             m_CommFree     = src.m_CommFree    ;
+            m_UseEIT       = src.m_UseEIT      ;
+            m_Visible      = src.m_Visible     ;
 
             CopyListContents< Program >( this, m_Programs, src.m_Programs );
         }
