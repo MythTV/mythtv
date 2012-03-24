@@ -1056,7 +1056,7 @@ void LogPrintLine( uint64_t mask, LogLevel_t level, const char *file, int line,
         QString string(format);
         format = strdup(string.replace(logRegExp, "%%").toLocal8Bit()
                               .constData());
-        formatcopy = format;
+        formatcopy = (char *)format;
     }
 
     va_start(arguments, format);
