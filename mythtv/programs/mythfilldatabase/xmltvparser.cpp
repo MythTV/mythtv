@@ -533,7 +533,7 @@ ProgInfo *XMLTVParser::parseProgram(
         programid.append(uniqueid);
     else
     {
-        QString seriesid = QString::number(ELFHash(pginfo->title.toLocal8Bit()
+        QString seriesid = QString::number(ELFHash(pginfo->title.toUtf8()
                                                .constData()));
         pginfo->seriesId = seriesid;
         programid.append(seriesid);
