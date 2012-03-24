@@ -1054,13 +1054,15 @@ void LogPrintLine( uint64_t mask, LogLevel_t level, const char *file, int line,
     if( fromQString && strchr(format, '%') )
     {
         QString string(format);
-        format = string.replace(logRegExp, "%%").toLocal8Bit().constData();
-        format = formatcopy = strdup(format);
+        format = strdup(string.replace(logRegExp, "%%").toLocal8Bit()
+                              .constData());
+        formatcopy = format;
     }
 
     va_start(arguments, format);
     vsnprintf(item->message, LOGLINE_MAX, format, arguments);
     va_end(arguments);
+
     if (formatcopy)
         free(formatcopy);
 
