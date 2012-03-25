@@ -14,7 +14,7 @@ __author__ = "Raymond Wagner"
 __version__ = "0.1.0"
 # 0.1.0 Initial version
 
-from tmdb_api import searchMovie, Movie, Collection, set_key
+from tmdb3 import searchMovie, Movie, Collection, set_key
 from MythTV import VideoMetadata
 
 from optparse import OptionParser
