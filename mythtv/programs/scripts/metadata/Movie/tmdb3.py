@@ -118,8 +118,8 @@ def main():
 
     parser = OptionParser()
 
-    parser.add_option('-v', "--version", action="store_true", default=False,
-                      dest="version", help="Display version and author")
+#    parser.add_option('-v', "--version", action="store_true", default=False,
+#                      dest="version", help="Display version and author")
     parser.add_option('-M', "--movielist", action="store_true", default=False,
                       dest="movielist", help="Get Movies matching search.")
     parser.add_option('-D', "--moviedata", action="store_true", default=False,
@@ -131,8 +131,8 @@ def main():
 
     opts, args = parser.parse_args()
 
-    if opts.version:
-        buildVersion()
+#    if opts.version:
+#        buildVersion()
 
     if (len(args) != 1) or (args[0] == ''):
         sys.stdout.write('ERROR: tmdb3.py requires exactly one non-empty argument')
