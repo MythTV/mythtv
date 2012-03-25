@@ -291,6 +291,6 @@ class FileEngine( CacheEngine ):
         t = time.time()
         for k,v in self.cache.items():
             if v[0] < t: # expiration has passed
-                del self._cache[k]
+                del self.cache[k]
 
 
