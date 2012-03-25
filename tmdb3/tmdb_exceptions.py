@@ -7,7 +7,26 @@
 #-----------------------
 
 class TMDBError( Exception ):
-    pass
+    Error                   = 0
+    KeyError                = 10
+    KeyMissing              = 20
+    KeyInvalid              = 30
+    KeyRevoked              = 40
+    RequestError            = 50
+    PagingIssue             = 60
+    CacheError              = 70
+    CacheReadError          = 71
+    CacheWriteError         = 72
+    CacheDirectoryError     = 73
+    ImageSizeError          = 80
+    HTTPError               = 90
+    Offline                 = 100
+
+    def __init__(self, msg=None, errno=0):
+        self.errno = errno
+        if errno:
+            self.errno = getattr(self, 'TMDB'+self.__class__.__name__, errno)
+        self.args = (msg,)
 
 class TMDBKeyError( TMDBError ):
     pass
@@ -27,6 +46,27 @@ class TMDBRequestError( TMDBError ):
 class TMDBPagingIssue( TMDBRequestError ):
     pass
 
+class TMDBCacheError( TMDBRequestError ):
+    pass
+
+class TMDBCacheReadError( TMDBCacheError ):
+    def __init__(self, filename):
+        super(TMDBCachePermissionsError, self).__init__(
+            "User does not have permission to access cache file: {0}.".format(filename))
+        self.filename = filename
+
+class TMDBCacheWriteError( TMDBCacheError ):
+    def __init__(self, filename):
+        super(TMDBCachePermissionsError, self).__init__(
+            "User does not have permission to write cache file: {0}.".format(filename))
+        self.filename = filename
+
+class TMDBCacheDirectoryError( TMDBCacheError ):
+    def __init__(self, filename):
+        super(TMDBCachePermissionsError, self).__init__(
+            "Directory containing cache file does not exist: {0}.".format(filename))
+        self.filename = filename
+
 class TMDBImageSizeError( TMDBError ):
     pass
 
@@ -35,3 +75,4 @@ class TMDBHTTPError( TMDBError ):
 
 class TMDBOffline( TMDBError ):
     pass
+

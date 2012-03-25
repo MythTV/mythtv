@@ -18,7 +18,7 @@ import os
 
 DEBUG = False
 
-cache = Cache('pytmdb3.cache')
+cache = Cache(filename='pytmdb3.cache')
 
 def set_key(key):
     """
@@ -32,6 +32,10 @@ def set_key(key):
     except:
         raise TMDBKeyInvalid("Specified API key must be 128-bit hex")
     Request._api_key = key
+
+def set_cache(engine=None, *args, **kwargs):
+    """Specify caching engine and properties."""
+    cache.configure(engine, *args, **kwargs)
 
 class Request( urllib2.Request ):
     _api_key = None
