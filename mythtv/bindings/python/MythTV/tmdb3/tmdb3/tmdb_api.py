@@ -22,7 +22,7 @@ for search and retrieval of text metadata and image URLs from TMDB.
 Preliminary API specifications can be found at
 http://help.themoviedb.org/kb/api/about-3"""
 
-__version__="v0.3.4"
+__version__="v0.3.7"
 # 0.1.0 Initial development
 # 0.2.0 Add caching mechanism for API queries
 # 0.2.1 Temporary work around for broken search paging
@@ -31,9 +31,13 @@ __version__="v0.3.4"
 # 0.3.2 Remove MythTV key from results.py
 # 0.3.3 Add functional language support
 # 0.3.4 Re-enable search paging
+# 0.3.5 Add methods for grabbing current, popular, and top rated movies
+# 0.3.6 Rework paging mechanism
+# 0.3.7 Generalize caching mechanism, and allow controllability
 
 from request import set_key, Request
-from util import PagedList, Datapoint, Datalist, Datadict, Element
+from util import Datapoint, Datalist, Datadict, Element
+from pager import PagedRequest
 from tmdb_exceptions import *
 
 import json
@@ -50,47 +54,31 @@ class Configuration( Element ):
 Configuration = Configuration()
 
 def searchMovie(query, language='en', adult=False):
-    return MovieSearchResults(
+    return MovieSearchResult(
                     Request('search/movie', query=query, include_adult=adult),
                     language=language)
 
-class MovieSearchResults( PagedList ):
+class MovieSearchResult( PagedRequest ):
     """Stores a list of search matches."""
-    def _process(self, data):
-        for item in data['results']:
-            yield Movie(raw=item, language=self.language)
-
-    def _getpage(self, page):
-        self.request = self.request.new(page=page)
-        return list(self._process(self.request.readJSON()))
-
     def __init__(self, request, language=None):
-        self.language=language
         if language:
-            self.request = request.new(language=language)
-        res = self.request.readJSON()
-        super(MovieSearchResults, self).__init__(res, res['total_results'], 20)
-
+            super(MovieSearchResult, self).__init__(
+                                request.new(language=language),
+                                lambda x: Movie(raw=x, language=language))
+        else:
+            super(MovieSearchResult, self).__init__(request,
+                                lambda x: Movie(raw=x))
+    
     def __repr__(self):
-        return u"<Search Results: {0}>".format(self.request._kwargs['query'])
+        return u"<Search Results: {0}>".format(self._request._kwargs['query'])
 
 def searchPerson(query):
-    return PeopleSearchResults(Request('search/person', query=query))
+    return PeopleSearchResult(Request('search/person', query=query))
 
-class PeopleSearchResults( PagedList ):
-    @staticmethod
-    def _process(data):
-        for item in data['results']:
-            yield Person(raw=item)
-
-    def _getpage(self, page):
-        self.request = self.request.new(page=page)
-        return list(self._process(self.request.readJSON()))
-
+class PeopleSearchResult( PagedRequest ):
+    """Stores a list of search matches."""
     def __init__(self, request):
-        self.request = request
-        res = self.request.readJSON()
-        super(PeopleSearchResults, self).__init__(res, res['total_results'], 20)
+        super(PeopleSearchResults, self).__init__(res)
 
     def __repr__(self):
         return u"<Search Results: {0}>".format(self.request._kwargs['query'])
@@ -229,6 +217,18 @@ class Movie( Element ):
         req = Request('latest/movie')
         req.lifetime = 600
         return cls(raw=req.readJSON())
+
+    @classmethod
+    def nowplaying(cls, language='en'):
+        return MovieSearchResult(Request('movie/now-playing'), language=language)
+
+    @classmethod
+    def mostpopular(cls, language='en'):
+        return MovieSearchResult(Request('movie/popular'), language=language)
+
+    @classmethod
+    def toprated(cls, language='en'):
+        return MovieSearchResult(Request('movie/top-rated'), language=language)
 
     id              = Datapoint('id', initarg=1)
     title           = Datapoint('title')
