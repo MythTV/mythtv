@@ -39,7 +39,7 @@ class LocaleBase( object ):
         try:
             return cls._stored[key.lower()]
         except:
-            raise Exception("'{0}' is not a known valid {1} code.".format(key, cls.__name__))
+            raise TMDBLocaleError("'{0}' is not a known valid {1} code.".format(key, cls.__name__))
 
 class Language( LocaleBase ):
     __slots__ = ['ISO639_1', 'ISO639_2', 'ISO639_2B', 'englishname',
