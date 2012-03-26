@@ -43,18 +43,42 @@ class Poller( object ):
         # retrieve data from callable function, and apply
         if not callable(self.func):
             raise RuntimeError('Poller object called without a source function')
-        self.apply(self.func().readJSON())
+        req = self.func()
+        if (('language' in req._kwargs) or ('country' in req._kwargs)) \
+                and self.inst._locale.fallthrough:
+            # request specifies a locale filter, and fallthrough is enabled
+            # run a first pass with specified filter
+            if not self.apply(req.readJSON(), False):
+                return
+            # if first pass results in missed data, run a second pass to
+            # fill in the gaps
+            self.apply(req.new(language=None, country=None).readJSON())
+            # re-apply the filtered first pass data over top the second
+            # unfiltered set. this is to work around the issue that the
+            # properties have no way of knowing when they should or 
+            # should not overwrite existing data. the cache engine will
+            # take care of the duplicate query
+        else:
+        self.apply(req.readJSON())
 
     def apply(self, data, set_nones=True):
         # apply data directly, bypassing callable function
+        unfilled = False
         for k,v in self.lookup.items():
-            if k in data:
+            if (k in data) and (data[k] is not None):
+                # argument received data, populate it
                 setattr(self.inst, v, data[k])
             elif set_nones:
+                # argument did not receive data, so fill it with None
+                # to indicate such and prevent a repeat scan
                 setattr(self.inst, v, None)
-            # else leave attribute empty, allowing it to later trigger a poll
-            # to get data if requested. this is intended for use when
-            # initializing a class with raw data
+            else:
+                # argument does not need data, so ignore it allowing it to
+                # trigger a later poll. this is intended for use when
+                # initializing a class with raw data, or when performing a
+                # first pass through when performing locale fall through
+                unfilled = True
+        return unfilled
 
 class Data( object ):
     """

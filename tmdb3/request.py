@@ -52,7 +52,8 @@ class Request( urllib2.Request ):
         """Return a request object, using specified API path and arguments."""
         kwargs['api_key'] = self.api_key
         self._url = url.lstrip('/')
-        self._kwargs = [(kwa,kwv) for kwa,kwv in kwargs.items() if kwv is not None]
+        self._kwargs = dict([(kwa,kwv) for kwa,kwv in kwargs.items()
+                                        if kwv is not None])
         url = '{0}{1}?{2}'.format(self._base_url, self._url,
                                   urllib.urlencode(kwargs))
         urllib2.Request.__init__(self, url)

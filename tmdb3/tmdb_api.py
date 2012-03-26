@@ -39,7 +39,7 @@ __version__="v0.4.0"
 from request import set_key, Request
 from util import Datapoint, Datalist, Datadict, Element
 from pager import PagedRequest
-from locales import get_locale
+from locales import get_locale, set_locale
 from tmdb_exceptions import *
 
 import json
