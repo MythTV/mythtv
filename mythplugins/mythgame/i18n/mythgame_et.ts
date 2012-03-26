@@ -240,34 +240,9 @@ Kustutada andmebaasist?</translation>
         <translation>Millises järjekorras mänge kuvatakse. Võimalikud valikud on: platvorm, aasta, žanr või mängu nimi</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamesettings.cpp" line="36"/>
-        <source>Favourite display order</source>
-        <translation>Lemmikute kuvamise järjekord</translation>
-    </message>
-    <message>
-        <location filename="../mythgame/gamesettings.cpp" line="38"/>
-        <source>Order in which to sort the games marked as favourites - this is for all systems. Available choices: system, year, genre and gamename</source>
-        <translation>Millises järjekorras kuvatakse lemmikuid. Võimalikud valikud on: platvorm, aasta, žanr või mängu nimi</translation>
-    </message>
-    <message>
         <location filename="../mythgame/gamesettings.cpp" line="48"/>
         <source>Indepth Game Scan</source>
         <translation>Põhjalikum mängude otsimine</translation>
-    </message>
-    <message>
-        <location filename="../mythgame/gamesettings.cpp" line="49"/>
-        <source>Enabling this causes a game scan to gather crc values and attempt to find out more detailed information about the game: NOTE this can greatly increase the time a gamescan takes based on the amount of games scanned.</source>
-        <translation>Sellega kontrollitakse CRC väärtusi ning üritatakse leida mängu kohta rohkem informatsiooni. TÄHELEPANU, olenevalt mängude arvust, võin see suurendada oluliselt mängude otsimise aega.</translation>
-    </message>
-    <message>
-        <location filename="../mythgame/gamesettings.cpp" line="58"/>
-        <source>Prompt for removal of deleted rom(s)</source>
-        <translation>Kustutatud ROMi(de) eemaldamisel küsi kinnitust</translation>
-    </message>
-    <message>
-        <location filename="../mythgame/gamesettings.cpp" line="59"/>
-        <source>This enables a prompt for removing deleted roms from the database during a  gamescan</source>
-        <translation>Küsib üle mängude otsimisel avastautud kustutatud ROMi(de) eemaldamise andmebaasist</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="69"/>
@@ -275,19 +250,9 @@ Kustutada andmebaasist?</translation>
         <translation>Näita mängude puus failide nimesid</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamesettings.cpp" line="70"/>
-        <source>Enabling this causes the filenames to be displayed in the game tree rather than the trimmed/looked up gamename</source>
-        <translation>Näitab lühendatud nimede või mängudest leitud nimede asemel failinimesid</translation>
-    </message>
-    <message>
         <location filename="../mythgame/gamesettings.cpp" line="116"/>
         <source>MythGame Settings -- General</source>
         <translation>MythGame seaded -- Üldine</translation>
-    </message>
-    <message>
-        <location filename="../mythgame/gamesettings.cpp" line="160"/>
-        <source>Allow games to span multiple roms/disks</source>
-        <translation>Luba mängude asetsemist mitmel ROMil või kettal</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="161"/>
@@ -302,8 +267,43 @@ Kustutada andmebaasist?</translation>
         <translation>Käsk</translation>
     </message>
     <message>
+        <location filename="../mythgame/gamesettings.cpp" line="36"/>
+        <source>Favorite display order</source>
+        <translation>Lemmikute kuvamise järjekord</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamesettings.cpp" line="38"/>
+        <source>Order in which to sort the games marked as favorites - this is for all systems. Available choices: system, year, genre and gamename</source>
+        <translation>Millises järjekorras kuvatakse lemmikuid. Võimalikud valikud on: platvorm, aasta, žanr või mängu nimi</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamesettings.cpp" line="49"/>
+        <source>Enabling this causes a game scan to gather CRC values and attempt to find out more detailed information about the game: NOTE this can greatly increase the time a game scan takes based on the amount of games scanned.</source>
+        <translation>Sellega kontrollitakse CRC väärtusi ning üritatakse leida mängu kohta rohkem informatsiooni. TÄHELEPANU, olenevalt mängude arvust, võin see suurendada oluliselt mängude otsimise aega.</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamesettings.cpp" line="58"/>
+        <source>Prompt for removal of deleted ROM(s)</source>
+        <translation>Kustutatud ROMi(de) eemaldamisel küsi kinnitust</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamesettings.cpp" line="59"/>
+        <source>This enables a prompt for removing deleted ROMs from the database during a  game scan</source>
+        <translation>Küsib üle mängude otsimisel avastautud kustutatud ROMi(de) eemaldamise andmebaasist</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamesettings.cpp" line="70"/>
+        <source>Enabling this causes the filenames to be displayed in the game tree rather than the trimmed/looked up game name</source>
+        <translation>Näitab lühendatud nimede või mängudest leitud nimede asemel failinimesid</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamesettings.cpp" line="160"/>
+        <source>Allow games to span multiple ROMs/disks</source>
+        <translation>Luba mängude asetsemist mitmel ROMil või kettal</translation>
+    </message>
+    <message>
         <location filename="../mythgame/gamesettings.cpp" line="172"/>
-        <source>Binary and optional parameters. Multiple commands separated with &apos;;&apos; . Use %s for the rom name. %d1, %d2, %d3 and %d4 represent disks in a multidisk/game. %s auto appended if not specified</source>
+        <source>Binary and optional parameters. Multiple commands separated with &apos;;&apos; . Use %s for the ROM name. %d1, %d2, %d3 and %d4 represent disks in a multidisk/game. %s auto appended if not specified</source>
         <translation>Binaari ning valikulised parameetrid. Mitme käsu puhul on eraldajaks &quot;;&quot;. %s on rom nimi, %d1, %d2, %d3 ja %d4 esindavad diske multidisk mängude korral. Kui midagi pole määratud, lisatakse automaatselt %s</translation>
     </message>
     <message>
@@ -684,11 +684,16 @@ Kustutada andmebaasist?</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="46"/>
+        <source>Favorite</source>
+        <translation>Lemmik</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="47"/>
         <source>No Plot.</source>
         <translation>Kirjeldus puudub.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="54"/>
+        <location filename="themestrings.h" line="55"/>
         <source>Empty your game library</source>
         <translation>Tühjenda mängude kogu</translation>
     </message>
@@ -713,37 +718,37 @@ Kustutada andmebaasist?</translation>
         <translation>ROM-i asukoht:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="47"/>
+        <location filename="themestrings.h" line="48"/>
         <source>General Settings</source>
         <translation>Üldised seaded</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="48"/>
+        <location filename="themestrings.h" line="49"/>
         <source>Game folders and general options</source>
         <translation>Mängude kataloogid ja üldised valikud</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="49"/>
+        <location filename="themestrings.h" line="50"/>
         <source>Game Players</source>
         <translation>Mängijad</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="50"/>
+        <location filename="themestrings.h" line="51"/>
         <source>Configure an emulator</source>
         <translation>Seadista emulaator</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="51"/>
+        <location filename="themestrings.h" line="52"/>
         <source>Scan for Games</source>
         <translation>Otsi mänge</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="52"/>
+        <location filename="themestrings.h" line="53"/>
         <source>Add games to your library</source>
         <translation>Lisa mängud kogusse</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="53"/>
+        <location filename="themestrings.h" line="54"/>
         <source>Clear Game Data</source>
         <translation>Puhasta andmed</translation>
     </message>
