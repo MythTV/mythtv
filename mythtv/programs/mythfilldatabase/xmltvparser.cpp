@@ -214,6 +214,8 @@ static void fromXMLTVDate(QString &timestr, QDateTime &dt, int localTimezoneOffs
         dt = dt.addSecs(localTimezoneOffset * 60 );
     }
 
+    dt = dt.toUTC();
+
     timestr = MythDate::toString(dt, MythDate::kFilename);
 }
 
