@@ -1046,7 +1046,7 @@ QDateTime Parse::RFC822TimeToQDateTime(const QString& t) const
         return QDateTime();
     result = result.addSecs(hoursShift * 3600 * (-1) + minutesShift *60 * (-1));
     result.setTimeSpec(Qt::UTC);
-    return result.toLocalTime();
+    return result;
 }
 
 QDateTime Parse::FromRFC3339(const QString& t) const
@@ -1080,7 +1080,7 @@ QDateTime Parse::FromRFC3339(const QString& t) const
         result = result.addSecs(hoursShift * 3600 * multiplier + minutesShift * 60 * multiplier);
     }
     result.setTimeSpec(Qt::UTC);
-    return result.toLocalTime();
+    return result;
 }
 
 QList<Enclosure> Parse::GetEnclosures(const QDomElement& entry) const
