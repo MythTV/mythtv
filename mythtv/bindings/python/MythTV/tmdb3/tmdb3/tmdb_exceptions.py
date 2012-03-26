@@ -21,6 +21,7 @@ class TMDBError( Exception ):
     ImageSizeError          = 80
     HTTPError               = 90
     Offline                 = 100
+    LocaleError             = 110
 
     def __init__(self, msg=None, errno=0):
         self.errno = errno
@@ -74,5 +75,8 @@ class TMDBHTTPError( TMDBError ):
     pass
 
 class TMDBOffline( TMDBError ):
+    pass
+
+class TMDBLocaleError( TMDBError ):
     pass
 
