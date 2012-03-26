@@ -179,9 +179,9 @@ void FillRecRuleInfo( DTC::RecRule  *pRecRule,
     pRecRule->setEpisode        (  pRule->m_episode                );
     pRecRule->setCategory       (  pRule->m_category               );
     pRecRule->setStartTime      (  QDateTime(pRule->m_startdate,
-                                             pRule->m_starttime)   );
+                                             pRule->m_starttime, Qt::UTC));
     pRecRule->setEndTime        (  QDateTime(pRule->m_enddate,
-                                             pRule->m_endtime)     );
+                                             pRule->m_endtime, Qt::UTC));
     pRecRule->setSeriesId       (  pRule->m_seriesid               );
     pRecRule->setProgramId      (  pRule->m_programid              );
     pRecRule->setInetref        (  pRule->m_inetref                );
