@@ -22,7 +22,7 @@ for search and retrieval of text metadata and image URLs from TMDB.
 Preliminary API specifications can be found at
 http://help.themoviedb.org/kb/api/about-3"""
 
-__version__="v0.4.0"
+__version__="v0.4.1"
 # 0.1.0 Initial development
 # 0.2.0 Add caching mechanism for API queries
 # 0.2.1 Temporary work around for broken search paging
@@ -35,6 +35,7 @@ __version__="v0.4.0"
 # 0.3.6 Rework paging mechanism
 # 0.3.7 Generalize caching mechanism, and allow controllability
 # 0.4.0 Add full locale support (language and country) and optional fall through
+# 0.4.1 Add custom classmethod for dealing with IMDB movie IDs
 
 from request import set_key, Request
 from util import Datapoint, Datalist, Datadict, Element
@@ -231,6 +232,21 @@ class Movie( Element ):
     @classmethod
     def toprated(cls, locale=None):
         return MovieSearchResult(Request('movie/top-rated'), locale=locale)
+
+    @classmethod
+    def fromIMDB(cls, imdbid, locale=None):
+        try:
+            # assume string
+            if not imdbid.startswith('tt'):
+                imdbid = "tt{0:0>7}".format(imdbid)
+        except AttributeError:
+            # assume integer
+            imdbid = "tt{0:0>7}".format(imdbid)
+        if locale is None:
+            locale = get_locale()
+        movie = cls(imdbid, locale=locale)
+        movie._populate()
+        return movie
 
     id              = Datapoint('id', initarg=1)
     title           = Datapoint('title')

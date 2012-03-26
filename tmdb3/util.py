@@ -320,7 +320,7 @@ class ElementType( type ):
             # defined by the Data definitions
             if len(args) != len(cls._InitArgs):
                 raise TypeError('__init__() takes exactly {0} arguments ({1} given)'\
-                            .format(len(cls._InitArgs)+1), len(args)+1)
+                            .format(len(cls._InitArgs)+1, len(args)+1))
             for a,v in zip(cls._InitArgs, args):
                 setattr(obj, a, v)
 
