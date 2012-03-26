@@ -58,7 +58,6 @@ class Poller( object ):
             # properties have no way of knowing when they should or 
             # should not overwrite existing data. the cache engine will
             # take care of the duplicate query
-        else:
         self.apply(req.readJSON())
 
     def apply(self, data, set_nones=True):
