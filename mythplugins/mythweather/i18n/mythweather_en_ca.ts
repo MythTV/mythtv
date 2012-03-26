@@ -984,6 +984,11 @@
         <translation>100%</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="56"/>
+        <source>Global Weather Settings</source>
+        <translation>Global Weather Settings</translation>
+    </message>
+    <message>
         <location filename="themestrings.h" line="57"/>
         <source>Seconds to display each page</source>
         <translation>Seconds to display each page</translation>
