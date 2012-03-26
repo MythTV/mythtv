@@ -6,6 +6,7 @@
 
 // libmythbase headers
 #include "mythlogging.h"
+#include "mythcorecontext.h"
 
 // libmythui headers
 #include "mythfontproperties.h"
@@ -32,6 +33,11 @@ MythPainter::~MythPainter(void)
             .arg(m_allocatedImages.size()));
     while (!m_allocatedImages.isEmpty())
         m_allocatedImages.takeLast()->SetParent(NULL);
+}
+
+bool MythPainter::EffectsEnabled(void )
+{
+    return (gCoreContext->GetNumSetting("GUIEffectsEnabled", 1) == 1);
 }
 
 void MythPainter::SetClipRect(const QRect &)

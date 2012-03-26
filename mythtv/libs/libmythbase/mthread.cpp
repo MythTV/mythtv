@@ -34,6 +34,7 @@ using namespace std;
 #include "mythdbcon.h"
 #include "mthread.h"
 #include "mythtimer.h"
+#include "logging.h"
 #include "mythdb.h"
 
 bool is_current_thread(MThread *thread)
@@ -207,9 +208,7 @@ void MThread::RunProlog(void)
         return;
     }
     setTerminationEnabled(false);
-    threadRegister(m_thread->objectName());
-    qsrand(QDateTime::currentDateTime().toTime_t() ^
-           QTime::currentTime().msec());
+    ThreadSetup(m_thread->objectName());
     m_prolog_executed = true;
 }
 
@@ -221,9 +220,22 @@ void MThread::RunEpilog(void)
             "RunEpilog can only be executed in the run() method of a thread.");
         return;
     }
-    GetMythDB()->GetDBManager()->CloseDatabases();
-    threadDeregister();
+    ThreadCleanup();
     m_epilog_executed = true;
+}
+
+void MThread::ThreadSetup(const QString &name)
+{
+    loggingRegisterThread(name);
+    qsrand(QDateTime::currentDateTime().toTime_t() ^
+           QTime::currentTime().msec());
+}
+
+void MThread::ThreadCleanup(void)
+{
+    if (GetMythDB() && GetMythDB()->GetDBManager())
+        GetMythDB()->GetDBManager()->CloseDatabases();
+    loggingDeregisterThread();
 }
 
 QThread *MThread::qthread(void)

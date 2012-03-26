@@ -78,9 +78,9 @@ bool CetonChannel::Tune(const QString &freqid, int /*finetune*/)
 static QString format_modulation(const DTVMultiplex &tuning)
 {
     if (DTVModulation::kModulationQAM256 == tuning.modulation)
-        return "qam256";
+        return "qam_256";
     else if (DTVModulation::kModulationQAM64 == tuning.modulation)
-        return "qam64";
+        return "qam_64";
     //note...ceton also supports NTSC-M, but not sure what to use that for
     else if (DTVModulation::kModulation8VSB == tuning.modulation)
         return "8vsb";

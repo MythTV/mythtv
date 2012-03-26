@@ -1020,7 +1020,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         dur /= 1000000;
         frames = m_playbackinfo->QueryTotalFrames();
     }
-   
+
     if (dur == 0)
     {
         if ((ic->duration == (int64_t)AV_NOPTS_VALUE) &&
@@ -2124,32 +2124,39 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             int channels  = ic->streams[i]->codec->channels;
             int lang_indx = lang_aud_cnt[lang]++;
             audioStreamCount++;
+            AudioTrackType type = kAudioTypeNormal;
 
             if (ic->streams[i]->codec->avcodec_dual_language)
             {
                 tracks[kTrackTypeAudio].push_back(
-                    StreamInfo(i, lang, lang_indx, ic->streams[i]->id, channels,                               false));
+                    StreamInfo(i, lang, lang_indx, ic->streams[i]->id, channels,
+                               false, false, false, type));
                 lang_indx = lang_aud_cnt[lang]++;
                 tracks[kTrackTypeAudio].push_back(
-                    StreamInfo(i, lang, lang_indx, ic->streams[i]->id, channels,                               true));
+                    StreamInfo(i, lang, lang_indx, ic->streams[i]->id, channels,
+                               true, false, false, type));
             }
             else
             {
                 int logical_stream_id;
                 if (ringBuffer && ringBuffer->IsDVD())
+                {
                     logical_stream_id =
                         ringBuffer->DVD()->GetAudioTrackNum(ic->streams[i]->id);
+                    type = (AudioTrackType)(ringBuffer->DVD()->GetAudioTrackType(ic->streams[i]->id));
+                }
                 else
                     logical_stream_id = ic->streams[i]->id;
 
                 tracks[kTrackTypeAudio].push_back(
-                   StreamInfo(i, lang, lang_indx, logical_stream_id, channels));
+                   StreamInfo(i, lang, lang_indx, logical_stream_id, channels,
+                              false, false, false, type));
             }
 
             LOG(VB_AUDIO, LOG_INFO, LOC +
-                QString("Audio Track #%1 is A/V stream #%2 "
-                        "and has %3 channels in the %4 language(%5).")
-                    .arg(tracks[kTrackTypeAudio].size()).arg(i)
+                QString("Audio Track #%1, with type %2 is A/V stream #%3 "
+                        "and has %4 channels in the %5 language(%6).")
+                    .arg(tracks[kTrackTypeAudio].size()).arg((int)type).arg(i)
                     .arg(enc->channels)
                     .arg(iso639_key_toName(lang)).arg(lang));
         }
@@ -3562,29 +3569,42 @@ QString AvFormatDecoder::GetTrackDesc(uint type, uint trackNo) const
 
         QString msg = iso639_key_toName(lang_key);
 
-        int av_index = tracks[kTrackTypeAudio][trackNo].av_stream_index;
-        AVStream *s = ic->streams[av_index];
+        switch (tracks[type][trackNo].audio_type)
+        {
+            case kAudioTypeAudioDescription :
+                msg += QObject::tr(" (Audio Description)",
+                                   "Audio described for the visually impaired");
+                break;
+            case kAudioTypeCommentary :
+                msg += QObject::tr(" (Commentary)", "Audio commentary track");
+                break;
+            case kAudioTypeNormal : default :
+                int av_index = tracks[kTrackTypeAudio][trackNo].av_stream_index;
+                AVStream *s = ic->streams[av_index];
 
-        if (!s)
-            return QString("%1: %2").arg(trackNo + 1).arg(msg);
+                if (s)
+                {
+                    if (s->codec->codec_id == CODEC_ID_MP3)
+                        msg += QString(" MP%1").arg(s->codec->sub_id);
+                    else if (s->codec->codec)
+                        msg += QString(" %1").arg(s->codec->codec->name).toUpper();
 
-        if (s->codec->codec_id == CODEC_ID_MP3)
-            msg += QString(" MP%1").arg(s->codec->sub_id);
-        else if (s->codec->codec)
-            msg += QString(" %1").arg(s->codec->codec->name).toUpper();
+                    int channels = 0;
+                    if (ringBuffer->IsDVD())
+                        channels = ringBuffer->DVD()->GetNumAudioChannels(trackNo);
+                    else if (s->codec->channels)
+                        channels = tracks[kTrackTypeAudio][trackNo].orig_num_channels;
 
-        int channels = 0;
-        if (ringBuffer->IsDVD())
-            channels = ringBuffer->DVD()->GetNumAudioChannels(trackNo);
-        else if (s->codec->channels)
-            channels = tracks[kTrackTypeAudio][trackNo].orig_num_channels;
+                    if (channels == 0)
+                        msg += QString(" ?ch");
+                    else if((channels > 4) && !(channels & 1))
+                        msg += QString(" %1.1ch").arg(channels - 1);
+                    else
+                        msg += QString(" %1ch").arg(channels);
+                }
 
-        if (channels == 0)
-            msg += QString(" ?ch");
-        else if((channels > 4) && !(channels & 1))
-            msg += QString(" %1.1ch").arg(channels - 1);
-        else
-            msg += QString(" %1ch").arg(channels);
+                break;
+        }
 
         return QString("%1: %2").arg(trackNo + 1).arg(msg);
     }
@@ -3699,6 +3719,19 @@ static vector<int> filter_lang(const sinfo_vec_t &tracks, int lang_key)
     return ret;
 }
 
+static sinfo_vec_t filter_type(const sinfo_vec_t &tracks, AudioTrackType type)
+{
+    sinfo_vec_t ret;
+
+    for (uint i = 0; i < tracks.size(); i++)
+    {
+        if (tracks[i].audio_type == type)
+            ret.push_back(tracks[i]);
+    }
+
+    return ret;
+}
+
 int AvFormatDecoder::filter_max_ch(const AVFormatContext *ic,
                                    const sinfo_vec_t     &tracks,
                                    const vector<int>     &fs,
@@ -3807,7 +3840,8 @@ int AvFormatDecoder::AutoSelectAudioTrack(void)
         LOG(VB_AUDIO, LOG_INFO, LOC + "Trying to select default track");
         for (uint i = 0; i < atracks.size(); i++) {
             int idx = atracks[i].av_stream_index;
-            if (ic->streams[idx]->disposition & AV_DISPOSITION_DEFAULT) {
+            if (ic->streams[idx]->disposition & AV_DISPOSITION_DEFAULT)
+            {
                 selTrack = i;
                 break;
             }
@@ -3835,7 +3869,7 @@ int AvFormatDecoder::AutoSelectAudioTrack(void)
     if ((selTrack < 0) && wlang >= -1 && numStreams)
     {
         LOG(VB_AUDIO, LOG_INFO, LOC + "Trying to reselect audio track");
-        // Try to reselect user selected subtitle stream.
+        // Try to reselect user selected audio stream.
         // This should find the stream after a commercial
         // break and in some cases after a channel change.
         uint windx = wtrack.language_index;
@@ -3855,33 +3889,42 @@ int AvFormatDecoder::AutoSelectAudioTrack(void)
     {
         LOG(VB_AUDIO, LOG_INFO, LOC + "Trying to select audio track (w/lang)");
 
+        // Filter out commentary and audio description tracks
+        sinfo_vec_t ftracks = filter_type(atracks, kAudioTypeNormal);
+
+        if (ftracks.empty())
+        {
+            LOG(VB_AUDIO, LOG_WARNING, "No audio tracks matched the filter so trying without filter.");
+            ftracks = atracks;
+        }
+
         // try to get the language track matching the frontend language.
         QString language_key_convert = iso639_str2_to_str3(gCoreContext->GetLanguage());
         uint language_key = iso639_str3_to_key(language_key_convert);
         uint canonical_key = iso639_key_to_canonical_key(language_key);
 
-        vector<int> flang = filter_lang(atracks, canonical_key);
+        vector<int> flang = filter_lang(ftracks, canonical_key);
 
         if (m_audio->CanDTSHD())
-            selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_DTS,
+            selTrack = filter_max_ch(ic, ftracks, flang, CODEC_ID_DTS,
                                      FF_PROFILE_DTS_HD_MA);
         if (selTrack < 0)
-            selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_TRUEHD);
+            selTrack = filter_max_ch(ic, ftracks, flang, CODEC_ID_TRUEHD);
 
         if (selTrack < 0 && m_audio->CanDTSHD())
-            selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_DTS,
+            selTrack = filter_max_ch(ic, ftracks, flang, CODEC_ID_DTS,
                                      FF_PROFILE_DTS_HD_HRA);
         if (selTrack < 0)
-            selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_EAC3);
+            selTrack = filter_max_ch(ic, ftracks, flang, CODEC_ID_EAC3);
 
         if (selTrack < 0)
-            selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_DTS);
+            selTrack = filter_max_ch(ic, ftracks, flang, CODEC_ID_DTS);
 
         if (selTrack < 0)
-            selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_AC3);
+            selTrack = filter_max_ch(ic, ftracks, flang, CODEC_ID_AC3);
 
         if (selTrack < 0)
-            selTrack = filter_max_ch(ic, atracks, flang);
+            selTrack = filter_max_ch(ic, ftracks, flang);
 
         // try to get best track for most preferred language
         // Set by the "Guide Data" language prefs in Appearance.
@@ -3890,31 +3933,31 @@ int AvFormatDecoder::AutoSelectAudioTrack(void)
             vector<int>::const_iterator it = languagePreference.begin();
             for (; it !=  languagePreference.end() && selTrack < 0; ++it)
             {
-                vector<int> flang = filter_lang(atracks, *it);
+                vector<int> flang = filter_lang(ftracks, *it);
 
                 if (m_audio->CanDTSHD())
-                    selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_DTS,
+                    selTrack = filter_max_ch(ic, ftracks, flang, CODEC_ID_DTS,
                                              FF_PROFILE_DTS_HD_MA);
                 if (selTrack < 0)
-                    selTrack = filter_max_ch(ic, atracks, flang,
+                    selTrack = filter_max_ch(ic, ftracks, flang,
                                              CODEC_ID_TRUEHD);
 
                 if (selTrack < 0 && m_audio->CanDTSHD())
-                    selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_DTS,
+                    selTrack = filter_max_ch(ic, ftracks, flang, CODEC_ID_DTS,
                                              FF_PROFILE_DTS_HD_HRA);
 
                 if (selTrack < 0)
-                    selTrack = filter_max_ch(ic, atracks, flang,
+                    selTrack = filter_max_ch(ic, ftracks, flang,
                                              CODEC_ID_EAC3);
 
                 if (selTrack < 0)
-                    selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_DTS);
+                    selTrack = filter_max_ch(ic, ftracks, flang, CODEC_ID_DTS);
 
                 if (selTrack < 0)
-                    selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_AC3);
+                    selTrack = filter_max_ch(ic, ftracks, flang, CODEC_ID_AC3);
 
                 if (selTrack < 0)
-                    selTrack = filter_max_ch(ic, atracks, flang);
+                    selTrack = filter_max_ch(ic, ftracks, flang);
             }
         }
         // try to get best track for any language
@@ -3922,29 +3965,29 @@ int AvFormatDecoder::AutoSelectAudioTrack(void)
         {
             LOG(VB_AUDIO, LOG_INFO, LOC +
                 "Trying to select audio track (wo/lang)");
-            vector<int> flang = filter_lang(atracks, -1);
+            vector<int> flang = filter_lang(ftracks, -1);
 
             if (m_audio->CanDTSHD())
-                selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_DTS,
+                selTrack = filter_max_ch(ic, ftracks, flang, CODEC_ID_DTS,
                                          FF_PROFILE_DTS_HD_MA);
             if (selTrack < 0)
-                selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_TRUEHD);
+                selTrack = filter_max_ch(ic, ftracks, flang, CODEC_ID_TRUEHD);
 
             if (selTrack < 0 && m_audio->CanDTSHD())
-                selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_DTS,
+                selTrack = filter_max_ch(ic, ftracks, flang, CODEC_ID_DTS,
                                          FF_PROFILE_DTS_HD_HRA);
 
             if (selTrack < 0)
-                selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_EAC3);
+                selTrack = filter_max_ch(ic, ftracks, flang, CODEC_ID_EAC3);
 
             if (selTrack < 0)
-                selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_DTS);
+                selTrack = filter_max_ch(ic, ftracks, flang, CODEC_ID_DTS);
 
             if (selTrack < 0)
-                selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_AC3);
+                selTrack = filter_max_ch(ic, ftracks, flang, CODEC_ID_AC3);
 
             if (selTrack < 0)
-                selTrack = filter_max_ch(ic, atracks, flang);
+                selTrack = filter_max_ch(ic, ftracks, flang);
         }
     }
 

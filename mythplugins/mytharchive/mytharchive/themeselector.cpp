@@ -9,6 +9,7 @@
 #include <QFileInfo>
 #include <QKeyEvent>
 #include <QTextStream>
+#include <QCoreApplication>
 
 // myth
 #include <mythcontext.h>
@@ -211,10 +212,11 @@ void DVDThemeSelector::themeChanged(MythUIButtonListItem *item)
     if (QFile::exists(themeDir + theme_list[itemNo] + "/description.txt"))
     {
         QString desc = loadFile(themeDir + theme_list[itemNo] + "/description.txt");
-        themedesc_text->SetText(desc);
+        themedesc_text->SetText(QCoreApplication::translate("BurnThemeUI", 
+                                desc.toUtf8().constData()));
     }
     else
-        themedesc_text->SetText("No description found!");
+        themedesc_text->SetText(tr("No theme description file found!"));
 }
 
 QString DVDThemeSelector::loadFile(const QString &filename)
@@ -224,20 +226,28 @@ QString DVDThemeSelector::loadFile(const QString &filename)
     QFile file(filename);
 
     if (!file.exists())
-        return "";
-
-    if (file.open( QIODevice::ReadOnly ))
     {
-        QTextStream stream(&file);
-
-        while ( !stream.atEnd() )
-        {
-            res = res + stream.readLine();
-        }
-        file.close();
+        res = tr("No theme description file found!");
     }
-    else
-        return "";
+    else {
+        if (file.open(QIODevice::ReadOnly))
+        {
+            QTextStream stream(&file);
+
+            if (!stream.atEnd())
+            {
+                res = stream.readAll();
+                res = res.replace("\n", " ").trimmed();
+            }
+            else {
+                res = tr("Empty theme description!");
+            }
+            file.close();
+        }
+        else {
+           res = tr("Unable to open theme description file!");
+        }
+    }
 
     return res;
 }

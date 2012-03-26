@@ -39,6 +39,10 @@
 #include "mythdirs.h"
 #include "mythuihelper.h"
 
+#if defined(Q_OS_MACX)
+#include "privatedecoder_vda.h"
+#endif
+
 static HostCheckBox *DecodeExtraAudio()
 {
     HostCheckBox *gc = new HostCheckBox("DecodeExtraAudio");
@@ -1142,6 +1146,7 @@ PlaybackProfileConfigs::PlaybackProfileConfigs(const QString &str) :
         profiles = VideoDisplayProfile::GetProfiles(host);
     }
 
+#ifdef USING_VDPAU
     if (!profiles.contains("VDPAU Normal") &&
         !profiles.contains("VDPAU High Quality") &&
         !profiles.contains("VDPAU Slim"))
@@ -1149,6 +1154,30 @@ PlaybackProfileConfigs::PlaybackProfileConfigs(const QString &str) :
         VideoDisplayProfile::CreateVDPAUProfiles(host);
         profiles = VideoDisplayProfile::GetProfiles(host);
     }
+#endif
+
+#if defined(Q_OS_MACX)
+    if (VDALibrary::GetVDALibrary() != NULL)
+    {
+        if (!profiles.contains("VDA Normal") &&
+            !profiles.contains("VDA High Quality") &&
+            !profiles.contains("VDA Slim"))
+        {
+            VideoDisplayProfile::CreateVDAProfiles(host);
+            profiles = VideoDisplayProfile::GetProfiles(host);
+        }
+    }
+#endif
+
+#ifdef USING_OPENGL
+    if (!profiles.contains("OpenGL Normal") &&
+        !profiles.contains("OpenGL High Quality") &&
+        !profiles.contains("OpenGL Slim"))
+    {
+        VideoDisplayProfile::CreateOpenGLProfiles(host);
+        profiles = VideoDisplayProfile::GetProfiles(host);
+    }
+#endif
 
     QString profile = VideoDisplayProfile::GetDefaultProfileName(host);
     if (!profiles.contains(profile))
@@ -2181,6 +2210,12 @@ static HostComboBox *MythDateFormatCB()
     gc->addSelection(sampdate.toString("ddd MMM d yyyy"), "ddd MMM d yyyy");
     gc->addSelection(sampdate.toString("ddd d MMM yyyy"), "ddd d MMM yyyy");
     gc->addSelection(sampdate.toString("ddd yyyy-MM-dd"), "ddd yyyy-MM-dd");
+    gc->addSelection(sampdate.toString(
+        QString::fromUtf8("dddd yyyy\u5E74M\u6708d\u65E5")),
+        QString::fromUtf8("dddd yyyy\u5E74M\u6708d\u65E5"));
+    gc->addSelection(sampdate.toString(
+        QString::fromUtf8("ddd M\u6708d\u65E5")),
+        QString::fromUtf8("ddd M\u6708d\u65E5"));
     gc->setHelpText(QObject::tr("Your preferred date format.") + ' ' +
                     sampleStr);
     return gc;
@@ -2220,6 +2255,9 @@ static HostComboBox *MythShortDateFormat()
     gc->addSelection(sampdate.toString("ddd d/M"), "ddd d/M");
     gc->addSelection(sampdate.toString("M/d ddd"), "M/d ddd");
     gc->addSelection(sampdate.toString("d/M ddd"), "d/M ddd");
+    gc->addSelection(sampdate.toString(
+        QString::fromUtf8("M\u6708d\u65E5")),
+        QString::fromUtf8("M\u6708d\u65E5"));
     gc->setHelpText(QObject::tr("Your preferred short date format.") + ' ' +
                     sampleStr);
     return gc;
@@ -2239,9 +2277,40 @@ static HostComboBox *MythTimeFormat()
     gc->addSelection(samptime.toString("h:mm"), "h:mm");
     gc->addSelection(samptime.toString("hh:mm"), "hh:mm");
     gc->addSelection(samptime.toString("hh.mm"), "hh.mm");
+    gc->addSelection(samptime.toString("AP h:mm"), "AP h:mm");
     gc->setHelpText(QObject::tr("Your preferred time format. You must choose "
                     "a format with \"AM\" or \"PM\" in it, otherwise your "
                     "time display will be 24-hour or \"military\" time."));
+    return gc;
+}
+
+static HostComboBox *ThemePainter()
+{
+    HostComboBox *gc = new HostComboBox("ThemePainter");
+    gc->setLabel(QObject::tr("Paint engine"));
+    gc->addSelection(QObject::tr("Qt"), "qt");
+    gc->addSelection(QObject::tr("Auto"), "auto");
+#ifdef USING_OPENGL
+    gc->addSelection(QObject::tr("OpenGL"), "opengl");
+#endif
+#ifdef USING_MINGW
+    gc->addSelection(QObject::tr("Direct3D"), "d3d9");
+#endif
+    gc->setHelpText(QObject::tr("This selects what MythTV uses to draw. "
+                    "Choosing 'Auto' is recommended, unless running on systems "
+                    "with broken OpenGL implementations (broken hardware or "
+                    "drivers or windowing systems) where only Qt works."));
+    return gc;
+}
+
+static HostCheckBox *GUIEffectsEnabled()
+{
+    HostCheckBox *gc = new HostCheckBox("GUIEffectsEnabled");
+    gc->setLabel(QObject::tr("Enable GUI Effects"));
+    gc->setValue(true);
+    gc->setHelpText(QObject::tr("This selects whether to use any effects "
+                    "defined by the theme (Note: not all the paint engines "
+                    "allow animations to be used)."));
     return gc;
 }
 
@@ -3628,6 +3697,8 @@ AppearanceSettings::AppearanceSettings()
     VerticalConfigurationGroup* screen = new VerticalConfigurationGroup(false);
     screen->setLabel(QObject::tr("Theme") + " / " + QObject::tr("Screen Settings"));
 
+    screen->addChild(ThemePainter());
+    screen->addChild(GUIEffectsEnabled());
     screen->addChild(MenuTheme());
 
     if (MythDisplay::GetNumberXineramaScreens() > 1)

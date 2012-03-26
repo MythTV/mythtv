@@ -23,7 +23,6 @@
 #define MYTH_APPNAME_MYTHTRANSCODE "mythtranscode"
 #define MYTH_APPNAME_MYTHWELCOME "mythwelcome"
 #define MYTH_APPNAME_MYTHSHUTDOWN "mythshutdown"
-#define MYTH_APPNAME_MYTHMESSAGE "mythmessage"
 #define MYTH_APPNAME_MYTHLCDSERVER "mythlcdserver"
 #define MYTH_APPNAME_MYTHAVTEST "mythavtest"
 #define MYTH_APPNAME_MYTHMEDIASERVER "mythmediaserver"

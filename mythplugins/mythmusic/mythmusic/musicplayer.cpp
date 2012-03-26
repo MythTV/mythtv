@@ -13,6 +13,7 @@
 #include <audiooutput.h>
 #include <mythdb.h>
 #include <mythdialogbox.h>
+#include <mythmainwindow.h>
 
 // mythmusic
 #include "musicplayer.h"
@@ -68,6 +69,7 @@ MusicPlayer::MusicPlayer(QObject *parent, const QString &dev)
     m_canShowPlayer = true;
     m_wasPlaying = true;
     m_updatedLastplay = false;
+    m_allowRestorePos = true;
 
     m_playSpeed = 1.0;
 
@@ -91,26 +93,7 @@ MusicPlayer::MusicPlayer(QObject *parent, const QString &dev)
     else
         setRepeatMode(REPEAT_OFF);
 
-    QString resumestring = gCoreContext->GetSetting("ResumeMode", "off");
-    if (resumestring.toLower() == "off")
-        m_resumeMode = RESUME_OFF;
-    else if (resumestring.toLower() == "track")
-        m_resumeMode = RESUME_TRACK;
-    else
-        m_resumeMode = RESUME_EXACT;
-
-    m_lastplayDelay = gCoreContext->GetNumSetting("MusicLastPlayDelay", LASTPLAY_DELAY);
-
-    m_autoShowPlayer = (gCoreContext->GetNumSetting("MusicAutoShowPlayer", 1) > 0);
-
-    //  Do we check the CD?
-    bool checkCD = gCoreContext->GetNumSetting("AutoLookupCD");
-    if (checkCD)
-    {
-        m_cdWatcher = new CDWatcherThread(m_CDdevice);
-        // don't start the cd watcher here
-        // since the playlists haven't been loaded yet
-    }
+    loadSettings();
 
     gCoreContext->addListener(this);
 }
@@ -226,6 +209,30 @@ void MusicPlayer::removeVisual(MainVisual *visual)
     }
 }
 
+void MusicPlayer::loadSettings(void )
+{
+    QString resumestring = gCoreContext->GetSetting("ResumeMode", "off");
+    if (resumestring.toLower() == "off")
+        m_resumeMode = RESUME_OFF;
+    else if (resumestring.toLower() == "track")
+        m_resumeMode = RESUME_TRACK;
+    else
+        m_resumeMode = RESUME_EXACT;
+
+    m_lastplayDelay = gCoreContext->GetNumSetting("MusicLastPlayDelay", LASTPLAY_DELAY);
+
+    m_autoShowPlayer = (gCoreContext->GetNumSetting("MusicAutoShowPlayer", 1) > 0);
+
+    //  Do we check the CD?
+    bool checkCD = gCoreContext->GetNumSetting("AutoLookupCD");
+    if (checkCD)
+    {
+        m_cdWatcher = new CDWatcherThread(m_CDdevice);
+        // don't start the cd watcher here
+        // since the playlists haven't been loaded yet
+    }
+}
+
 // this stops playing the playlist and plays the file pointed to by mdata
 void MusicPlayer::playFile(const Metadata &mdata)
 {
@@ -280,6 +287,8 @@ void MusicPlayer::stop(bool stopAll)
     // event so any listeners can act on it
     OutputEvent oe(OutputEvent::Stopped);
     dispatch(oe);
+
+    GetMythMainWindow()->PauseIdleTimer(false);
 }
 
 void MusicPlayer::pause(void)
@@ -296,6 +305,8 @@ void MusicPlayer::pause(void)
         getDecoder()->cond()->wakeAll();
         getDecoder()->unlock();
     }
+
+    GetMythMainWindow()->PauseIdleTimer(false);
 }
 
 void MusicPlayer::play(void)
@@ -319,6 +330,8 @@ void MusicPlayer::play(void)
     getDecoderHandler()->start(meta);
 
     m_isStreaming = (meta->Format() == "cast");
+
+    GetMythMainWindow()->PauseIdleTimer(true);
 }
 
 void MusicPlayer::stopDecoder(void)
@@ -697,10 +710,12 @@ void MusicPlayer::customEvent(QEvent *event)
         {
             QString startdir = gCoreContext->GetSetting("MusicLocation");
             startdir = QDir::cleanPath(startdir);
-            if (!startdir.endsWith("/"))
+            if (!startdir.isEmpty() && !startdir.endsWith("/"))
                 startdir += "/";
 
             gMusicData->musicDir = startdir;
+
+            loadSettings();
         }
     }
 
@@ -883,20 +898,28 @@ void MusicPlayer::savePosition(void)
 
 void MusicPlayer::restorePosition(void)
 {
+    // if we are switching views we don't wont to restore the position
+    if (!m_allowRestorePos)
+        return;
+
     m_currentTrack = 0;
     uint trackID = 0;
 
     if (gPlayer->getResumeMode() > MusicPlayer::RESUME_OFF)
+    {
         trackID = gCoreContext->GetNumSetting("MusicBookmark", 0);
 
-    for (int x = 0; x < m_currentPlaylist->getSongs().size(); x++)
-    {
-        if (m_currentPlaylist->getSongs().at(x)->ID() == trackID)
+        for (int x = 0; x < m_currentPlaylist->getSongs().size(); x++)
         {
-            m_currentTrack = x;
-            m_currentMetadata = m_currentPlaylist->getSongAt(x);
+            if (m_currentPlaylist->getSongs().at(x)->ID() == trackID)
+            {
+                m_currentTrack = x;
+                break;
+            }
         }
     }
+
+    m_currentMetadata = m_currentPlaylist->getSongAt(m_currentTrack);
 
     if (m_currentMetadata)
     {
@@ -946,12 +969,12 @@ void MusicPlayer::changeCurrentTrack(int trackNo)
     m_currentTrack = trackNo;
 
     // sanity check the current track
-    if (m_currentTrack < 0 || m_currentTrack > m_currentPlaylist->getSongs().size())
+    if (m_currentTrack < 0 || m_currentTrack >= m_currentPlaylist->getSongs().size())
     {
         LOG(VB_GENERAL, LOG_ERR,
             QString("MusicPlayer: asked to set the current track to an invalid track no. %1")
             .arg(trackNo));
-        m_currentTrack = 0;
+        m_currentTrack = -1;
         m_currentMetadata = NULL;
         return;
     }
@@ -1225,6 +1248,8 @@ void MusicPlayer::activePlaylistChanged(int trackID, bool deleted)
         if (deleted)
         {
             // all tracks were removed
+            m_currentTrack = -1;
+            m_currentMetadata = NULL;
             stop(true);
             MusicPlayerEvent me(MusicPlayerEvent::AllTracksRemovedEvent, 0);
             dispatch(me);

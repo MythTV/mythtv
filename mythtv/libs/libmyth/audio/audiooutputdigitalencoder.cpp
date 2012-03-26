@@ -260,3 +260,8 @@ size_t AudioOutputDigitalEncoder::GetFrames(void *ptr, int maxlen)
     memmove(out, (char *)out + len, outlen);
     return len;
 }
+
+void AudioOutputDigitalEncoder::clear()
+{
+    inlen = outlen = 0;
+}

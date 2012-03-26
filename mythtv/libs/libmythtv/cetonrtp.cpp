@@ -18,6 +18,7 @@
 
 #include "cetonrtp.h"
 #include "mythlogging.h"
+#include "mythcorecontext.h"
 
 #define LOC QString("CetonRTP(%1-%2): ").arg(_ip).arg(_tuner)
 
@@ -70,7 +71,7 @@ bool CetonRTP::Init(void)
         socklen_t bs_size = sizeof(oldBufferSize);
         getsockopt(socket, SOL_SOCKET, SO_RCVBUF, &oldBufferSize, &bs_size);
 
-        int requestedBufferSize = 1024*1024*2;
+        int requestedBufferSize = gCoreContext->GetNumSetting("CetonSocketBufferSize", 1024*1024*16);
         bs_size = sizeof(requestedBufferSize);
         if (setsockopt(socket, SOL_SOCKET, SO_RCVBUF, &requestedBufferSize,
                        sizeof(requestedBufferSize)) == -1)

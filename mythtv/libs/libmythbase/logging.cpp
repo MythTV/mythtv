@@ -1248,7 +1248,7 @@ void logStop(void)
 ///         by the RunProlog() call in each thread.
 /// \param  name    the name of the thread being registered.  This is used for
 ///                 indicating the thread each log message is coming from.
-void threadRegister(QString name)
+void loggingRegisterThread(const QString &name)
 {
     if (logThreadFinished)
         return;
@@ -1266,7 +1266,7 @@ void threadRegister(QString name)
 
 /// \brief  Deregister the current thread's name.  This is triggered by the 
 ///         RunEpilog() call in each thread.
-void threadDeregister(void)
+void loggingDeregisterThread(void)
 {
     if (logThreadFinished)
         return;

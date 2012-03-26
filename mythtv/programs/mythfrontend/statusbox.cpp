@@ -122,10 +122,6 @@ void StatusBox::Init()
                             qVariantFromValue((void*)SLOT(doTunerStatus())));
     item->DisplayState("tuner", "icon");
 
-    item = new MythUIButtonListItem(m_categoryList, tr("Log Entries"),
-                            qVariantFromValue((void*)SLOT(doLogEntries())));
-    item->DisplayState("log", "icon");
-
     item = new MythUIButtonListItem(m_categoryList, tr("Job Queue"),
                             qVariantFromValue((void*)SLOT(doJobQueueStatus())));
     item->DisplayState("jobqueue", "icon");

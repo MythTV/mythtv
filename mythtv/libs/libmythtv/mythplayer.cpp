@@ -165,6 +165,7 @@ MythPlayer::MythPlayer(PlayerFlags flags)
       // General Caption/Teletext/Subtitle support
       textDisplayMode(kDisplayNone),
       prevTextDisplayMode(kDisplayNone),
+      prevNonzeroTextDisplayMode(kDisplayNone),
       // Support for analog captions and teletext
       vbimode(VBIMode::None),
       ttPageNum(0x888),
@@ -1317,6 +1318,8 @@ void MythPlayer::ResetCaptions(void)
 
 void MythPlayer::DisableCaptions(uint mode, bool osd_msg)
 {
+    if (textDisplayMode)
+        prevNonzeroTextDisplayMode = textDisplayMode;
     textDisplayMode &= ~mode;
     ResetCaptions();
 
@@ -1394,6 +1397,8 @@ void MythPlayer::EnableCaptions(uint mode, bool osd_msg)
         .arg(mode).arg(msg));
 
     textDisplayMode = mode;
+    if (textDisplayMode)
+        prevNonzeroTextDisplayMode = textDisplayMode;
     if (osd_msg)
         SetOSDMessage(msg, kOSDTimeout_Med);
 }
@@ -1432,7 +1437,8 @@ void MythPlayer::SetCaptionsEnabled(bool enable, bool osd_msg)
         DisableCaptions(origMode, osd_msg);
         return;
     }
-    int mode = NextCaptionTrack(kDisplayNone);
+    int mode = HasCaptionTrack(prevNonzeroTextDisplayMode) ?
+        prevNonzeroTextDisplayMode : NextCaptionTrack(kDisplayNone);
     if (origMode != (uint)mode)
     {
         DisableCaptions(origMode, false);
@@ -1642,6 +1648,23 @@ void MythPlayer::ChangeCaptionTrack(int dir)
     }
 }
 
+bool MythPlayer::HasCaptionTrack(int mode)
+{
+    if (mode == kDisplayNone)
+        return false;
+    if (((mode == kDisplayTextSubtitle) && HasTextSubtitles()) ||
+         (mode == kDisplayNUVTeletextCaptions))
+    {
+        return true;
+    }
+    else if (!(mode == kDisplayTextSubtitle) &&
+               decoder->GetTrackCount(toTrackType(mode)))
+    {
+        return true;
+    }
+    return false;
+}
+
 int MythPlayer::NextCaptionTrack(int mode)
 {
     // Text->TextStream->708/608->608/708->AVSubs->Teletext->NUV->None
@@ -1666,17 +1689,9 @@ int MythPlayer::NextCaptionTrack(int mode)
     else if (kDisplayNone == mode)
         nextmode = kDisplayTextSubtitle;
 
-    if (((nextmode == kDisplayTextSubtitle) && HasTextSubtitles()) ||
-         (nextmode == kDisplayNUVTeletextCaptions) ||
-         (nextmode == kDisplayNone))
-    {
+    if (nextmode == kDisplayNone || HasCaptionTrack(nextmode))
         return nextmode;
-    }
-    else if (!(nextmode == kDisplayTextSubtitle) &&
-               decoder->GetTrackCount(toTrackType(nextmode)))
-    {
-        return nextmode;
-    }
+
     return NextCaptionTrack(nextmode);
 }
 
@@ -2427,9 +2442,10 @@ void MythPlayer::SwitchToProgram(void)
         return;
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "SwitchToProgram - start");
-    bool d1 = false, d2 = false;
+    bool discontinuity = false, newtype = false;
     int newid = -1;
-    ProgramInfo *pginfo = player_ctx->tvchain->GetSwitchProgram(d1, d2, newid);
+    ProgramInfo *pginfo = player_ctx->tvchain->GetSwitchProgram(
+        discontinuity, newtype, newid);
     if (!pginfo)
         return;
 
@@ -2455,7 +2471,7 @@ void MythPlayer::SwitchToProgram(void)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "SwitchToProgram's OpenFile failed " +
             QString("(card type: %1).")
-                .arg(player_ctx->tvchain->GetCardType(newid)));
+            .arg(player_ctx->tvchain->GetCardType(newid)));
         LOG(VB_GENERAL, LOG_ERR, player_ctx->tvchain->toString());
         SetEof(true);
         SetErrored(QObject::tr("Error opening switch program buffer"));
@@ -2464,19 +2480,39 @@ void MythPlayer::SwitchToProgram(void)
     }
 
     if (GetEof())
+    {
+        discontinuity = true;
         ResetCaptions();
+    }
 
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("newid: %1 decoderEof: %2")
-                                       .arg(newid).arg(GetEof()));
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("SwitchToProgram(void) "
+        "discont: %1 newtype: %2 newid: %3 decoderEof: %4")
+        .arg(discontinuity).arg(newtype).arg(newid).arg(GetEof()));
 
-    player_ctx->tvchain->SetProgram(*pginfo);
-    if (decoder)
-        decoder->SetProgramInfo(*pginfo);
+    if (discontinuity || newtype)
+    {
+        player_ctx->tvchain->SetProgram(*pginfo);
+        if (decoder)
+            decoder->SetProgramInfo(*pginfo);
 
-    player_ctx->buffer->Reset(true);
-    if (OpenFile() < 0)
-        SetErrored(QObject::tr("Error opening switch program file"));
-
+        player_ctx->buffer->Reset(true);
+        if (newtype)
+        {
+            if (OpenFile() < 0)
+                SetErrored(QObject::tr("Error opening switch program file"));
+        }
+        else
+            ResetPlaying();
+    }
+    else
+    {
+        player_ctx->SetPlayerChangingBuffers(true);
+        if (decoder)
+        {
+            decoder->SetReadAdjust(player_ctx->buffer->SetAdjustFilesize());
+            decoder->SetWaitForChange();
+        }
+    }
     delete pginfo;
 
     if (IsErrored())
@@ -2493,8 +2529,11 @@ void MythPlayer::SwitchToProgram(void)
         player_ctx->buffer->UpdateRawBitrate(decoder->GetRawBitrate());
     player_ctx->buffer->Unpause();
 
-    CheckTVChain();
-    forcePositionMapSync = true;
+    if (discontinuity || newtype)
+    {
+        CheckTVChain();
+        forcePositionMapSync = true;
+    }
 
     Play();
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "SwitchToProgram - end");
@@ -2528,10 +2567,11 @@ void MythPlayer::FileChangedCallback(void)
 void MythPlayer::JumpToProgram(void)
 {
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "JumpToProgram - start");
-    bool d1 = false, d2 = false;
+    bool discontinuity = false, newtype = false;
     int newid = -1;
     long long nextpos = player_ctx->tvchain->GetJumpPos();
-    ProgramInfo *pginfo = player_ctx->tvchain->GetSwitchProgram(d1, d2, newid);
+    ProgramInfo *pginfo = player_ctx->tvchain->GetSwitchProgram(
+        discontinuity, newtype, newid);
     if (!pginfo)
         return;
 
@@ -2574,8 +2614,14 @@ void MythPlayer::JumpToProgram(void)
         return;
     }
 
-    if (OpenFile() < 0)
-        SetErrored(QObject::tr("Error opening jump program file"));
+    bool wasDummy = isDummy;
+    if (newtype || wasDummy)
+    {
+        if (OpenFile() < 0)
+            SetErrored(QObject::tr("Error opening jump program file"));
+    }
+    else
+        ResetPlaying();
 
     if (IsErrored() || !decoder)
     {

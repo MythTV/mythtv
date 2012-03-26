@@ -458,7 +458,6 @@ class ImageLoadThread : public QRunnable
 
     void run()
     {
-        threadRegister("ImageLoad");
         bool aborted = false;
         QString filename =  m_imageProperties.filename;
 
@@ -491,8 +490,6 @@ class ImageLoadThread : public QRunnable
                                                     m_number, aborted);
             QCoreApplication::postEvent(const_cast<MythUIImage*>(m_parent), le);
         }
-
-        threadDeregister();
     }
 
 private:
@@ -1010,7 +1007,7 @@ bool MythUIImage::Load(bool allowLoadInBackground, bool forceStat)
                                              imProps,
                                              bFilename, i,
                                              static_cast<ImageCacheMode>(cacheMode2));
-            GetMythUI()->GetImageThreadPool()->start(bImgThread);
+            GetMythUI()->GetImageThreadPool()->start(bImgThread, "ImageLoad");
         }
         else
         {

@@ -1,6 +1,7 @@
 SOURCES += ../mytharchive/*.cpp
 SOURCES += ../mytharchive/*.h
 SOURCES += ./themestrings.h
+SOURCES += ../mythburn/themes/burnthemestrings.h
 
 TRANSLATIONS  = mytharchive_de.ts mytharchive_sl.ts mytharchive_fr.ts
 TRANSLATIONS += mytharchive_sv.ts mytharchive_nl.ts mytharchive_nb.ts

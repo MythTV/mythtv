@@ -17,19 +17,27 @@
         <translation>Wyszukuj</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="978"/>
         <source>Searching ...</source>
-        <translation>Wyszukuję ...</translation>
+        <translation type="obsolete">Wyszukuję ...</translation>
+    </message>
+    <message>
+        <source>Searching ... Results: %1</source>
+        <translation type="obsolete">Wyszukiwanie ... znaleziono %1</translation>
+    </message>
+    <message>
+        <location filename="../mythweather/weatherSetup.cpp" line="978"/>
+        <source>Searching...</source>
+        <translation>Wyszukuję...</translation>
     </message>
     <message>
         <location filename="../mythweather/weatherSetup.cpp" line="1000"/>
-        <source>Searching ... Results: %1</source>
-        <translation>Wyszukiwanie ... znaleziono %1</translation>
+        <source>Searching... Results: %1</source>
+        <translation>Wyszukiwanie... Znaleziono: %1</translation>
     </message>
     <message>
         <location filename="../mythweather/weatherSetup.cpp" line="1048"/>
         <source>Search Complete. Results: %1</source>
-        <translation>Wyszukiwanie zakończone. Znaleziono: %1 </translation>
+        <translation>Wyszukiwanie zakończone. Znaleziono: %1</translation>
     </message>
     <message>
         <location filename="../mythweather/weatherSetup.cpp" line="1069"/>
@@ -62,7 +70,7 @@
     <message>
         <location filename="../mythweather/weatherUtils.cpp" line="15"/>
         <source>Current Conditions</source>
-        <translation>Pogoda na dziś</translation>
+        <translation>Pogoda na Dziś</translation>
     </message>
     <message>
         <location filename="../mythweather/weatherUtils.cpp" line="17"/>
@@ -87,12 +95,12 @@
     <message>
         <location filename="../mythweather/weatherUtils.cpp" line="25"/>
         <source>Static Map</source>
-        <translation>Statyczne mapy pogody</translation>
+        <translation>Statyczne Mapy Pogody</translation>
     </message>
     <message>
         <location filename="../mythweather/weatherUtils.cpp" line="27"/>
         <source>Animated Map</source>
-        <translation>Animowane mapy pogody</translation>
+        <translation>Animowane Mapy Pogody</translation>
     </message>
 </context>
 <context>
@@ -100,12 +108,12 @@
     <message>
         <location filename="../mythweather/weatherSetup.cpp" line="151"/>
         <source>Active Screens</source>
-        <translation>Aktywne ekrany</translation>
+        <translation>Aktywne Ekrany</translation>
     </message>
     <message>
         <location filename="../mythweather/weatherSetup.cpp" line="155"/>
         <source>Inactive Screens</source>
-        <translation>Nieaktywne ekrany</translation>
+        <translation>Nieaktywne Ekrany</translation>
     </message>
     <message>
         <location filename="../mythweather/weatherSetup.cpp" line="176"/>
@@ -120,7 +128,7 @@
     <message>
         <location filename="../mythweather/weatherSetup.cpp" line="236"/>
         <source>Sources</source>
-        <translation>Źródła info. o pogodzie</translation>
+        <translation>Źródła informacji</translation>
     </message>
     <message>
         <location filename="../mythweather/weatherSetup.cpp" line="252"/>
@@ -163,12 +171,12 @@
     <message>
         <location filename="../mythweather/weatherSetup.cpp" line="269"/>
         <source>change location; </source>
-        <translation>Zmienić lokalizację;</translation>
+        <translation>Zmień lokalizację;</translation>
     </message>
     <message>
         <location filename="../mythweather/weatherSetup.cpp" line="271"/>
         <source>change units; </source>
-        <translation>Zmienić jednostki;</translation>
+        <translation>Zmień jednostki;</translation>
     </message>
     <message>
         <location filename="../mythweather/weatherSetup.cpp" line="272"/>
@@ -178,17 +186,17 @@
     <message>
         <location filename="../mythweather/weatherSetup.cpp" line="508"/>
         <source>Manipulate Screen</source>
-        <translation>Modyfikuj ekran</translation>
+        <translation>Modyfikuj Ekran</translation>
     </message>
     <message>
         <location filename="../mythweather/weatherSetup.cpp" line="522"/>
         <source>Move Up</source>
-        <translation>Przesuń wyżej</translation>
+        <translation>Przesuń Wyżej</translation>
     </message>
     <message>
         <location filename="../mythweather/weatherSetup.cpp" line="523"/>
         <source>Move Down</source>
-        <translation>Przesuń niżej</translation>
+        <translation>Przesuń Niżej</translation>
     </message>
     <message>
         <location filename="../mythweather/weatherSetup.cpp" line="524"/>
@@ -198,13 +206,13 @@
     <message>
         <location filename="../mythweather/weatherSetup.cpp" line="525"/>
         <source>Change Location</source>
-        <translation>Zmień lokalizację</translation>
+        <translation>Zmień Lokalizację</translation>
     </message>
     <message>
         <location filename="../mythweather/weatherSetup.cpp" line="527"/>
         <location filename="../mythweather/weatherSetup.cpp" line="588"/>
         <source>Change Units</source>
-        <translation>Zmień jednostkę</translation>
+        <translation>Zmień Jednostkę</translation>
     </message>
     <message>
         <location filename="../mythweather/weatherSetup.cpp" line="528"/>
@@ -229,7 +237,7 @@
     <message>
         <location filename="../mythweather/weatherSetup.cpp" line="793"/>
         <source>Finish</source>
-        <translation>Zakończono</translation>
+        <translation>Zakończ</translation>
     </message>
     <message>
         <location filename="../mythweather/weatherSetup.cpp" line="907"/>
@@ -918,72 +926,72 @@
 <context>
     <name>ThemeUI</name>
     <message>
-        <location filename="themestrings.h" line="2"/>
+        <location filename="themestrings.h" line="5"/>
         <source>%DATE%, %TIME%</source>
         <translation>%DATE%, %TIME%</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="3"/>
+        <location filename="themestrings.h" line="6"/>
         <source>Humidity</source>
         <translation>Wilgotność</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="4"/>
+        <location filename="themestrings.h" line="7"/>
         <source>Pressure</source>
         <translation>Ciśnienie</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="5"/>
+        <location filename="themestrings.h" line="8"/>
         <source>Wind(Gust)</source>
         <translation>Wiatr</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="6"/>
+        <location filename="themestrings.h" line="9"/>
         <source>Wind Direction</source>
         <translation>Kierunek wiatru</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="7"/>
+        <location filename="themestrings.h" line="10"/>
         <source>Visibility</source>
         <translation>Widoczność</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="8"/>
+        <location filename="themestrings.h" line="11"/>
         <source>Feels Like</source>
         <translation>Odczuwalana</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="9"/>
+        <location filename="themestrings.h" line="12"/>
         <source>Last Updated %1</source>
         <translation>Ostatnio aktualizowane %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="10"/>
+        <location filename="themestrings.h" line="13"/>
         <source>High Temperature:  %1</source>
         <translation>Najwyższa temp: %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="11"/>
+        <location filename="themestrings.h" line="14"/>
         <source>Low Temperature:  %1</source>
         <translation>Najniższa temp: %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="12"/>
+        <location filename="themestrings.h" line="15"/>
         <source>Temperature:  %1</source>
         <translation>Temperatura: %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="13"/>
+        <location filename="themestrings.h" line="16"/>
         <source>Chance of Precipitation:  %1</source>
         <translation>Możliwe opady: %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="14"/>
+        <location filename="themestrings.h" line="17"/>
         <source>Weather Screen Settings</source>
         <translation>Ustawienia pogody</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="15"/>
+        <location filename="themestrings.h" line="18"/>
         <source>This screen governs the behavior of the weather screens.  You can enable a background weather update which will run regardless of being on the weather screen, and configure how many seconds each screen will display.
 
 When you are done configuring the weather plugin, click &quot;Finish&quot; to continue.</source>
@@ -993,215 +1001,238 @@ When you are done configuring the Weather Plugin, click &quot;Finish&quot; to co
         <translation>Tutaj możesz ustawić jak informacje o pogodzie będą prezentowane. Możesz ustawić aktualizacje pogodowe w tle, które będą się odbywały niezależnie do tego co aktualnie oglądasz. Możesz także ustawić jakie informacje o pgodzie będą prezentowane.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="16"/>
+        <location filename="themestrings.h" line="19"/>
         <source>Retrieve data in background:</source>
         <translation>Ładuj informacje o pogodzie w tle:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="17"/>
+        <location filename="themestrings.h" line="20"/>
         <source>Seconds to display each page:</source>
         <translation>Ile sekund wyświetlać każdy ekran:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="18"/>
+        <location filename="themestrings.h" line="21"/>
         <source>OK</source>
         <translation>Ok</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="19"/>
+        <location filename="themestrings.h" line="22"/>
         <source>Weather Setup</source>
         <translation>Ustawienia informacji o pogodzie</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="20"/>
+        <location filename="themestrings.h" line="23"/>
         <source>Available Screens</source>
         <translation>Dostępne typy informacji</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="21"/>
+        <location filename="themestrings.h" line="24"/>
         <source>Active Screens</source>
         <translation>Aktywne informacje</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="22"/>
+        <location filename="themestrings.h" line="25"/>
         <source>Weather Script Settings</source>
         <translation>Ustawienia skryptów</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="23"/>
+        <location filename="themestrings.h" line="26"/>
         <source>This settings screen governs the behavior of individual weather scripts.  Select the script whose behavior you with to change and press the right arrow. Adjust the interval at which data is retrieved, and the timeout for accessing the site.
 
 When you have completed your changes, click &quot;Finish&quot; to continue.</source>
         <translation>Tutaj możesz skonfigurować sktypty pogodowe oraz sposób ich wykonwyania.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="24"/>
+        <location filename="themestrings.h" line="27"/>
         <source>Data Retrieval Interval (minutes):</source>
         <translation>Jak często ładować info o pogodzie (min):</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="25"/>
+        <location filename="themestrings.h" line="28"/>
         <source>Source Update Timeout (seconds):</source>
         <translation>Timeout dla ładowania info (sekundy):</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="26"/>
+        <location filename="themestrings.h" line="29"/>
         <source>Finish</source>
         <translation>Zakończ</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="27"/>
+        <location filename="themestrings.h" line="30"/>
         <source>Search</source>
         <translation>Wyszukuj</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="28"/>
+        <location filename="themestrings.h" line="31"/>
         <source>Enter Current Location</source>
         <translation>Podaj Twoją lokalizację</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="29"/>
+        <location filename="themestrings.h" line="32"/>
         <source>Low</source>
         <translation>Niskie</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="30"/>
+        <location filename="themestrings.h" line="33"/>
         <source>High</source>
         <translation>Wysokie</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="31"/>
+        <location filename="themestrings.h" line="34"/>
         <source>Weather Alerts</source>
         <translation>Alarmy pogodowe</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="32"/>
+        <location filename="themestrings.h" line="35"/>
         <source>Temp</source>
         <translation>Temperatura</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="33"/>
+        <location filename="themestrings.h" line="36"/>
         <source>Precip</source>
         <translation>Percepcja</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="34"/>
+        <location filename="themestrings.h" line="37"/>
         <source>Global Settings</source>
         <translation>Ustawienia ogólne</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="35"/>
+        <location filename="themestrings.h" line="38"/>
         <source>Retrieve data in the background:</source>
         <translation>Ładuj informacje o pogodzie w tle:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="36"/>
+        <location filename="themestrings.h" line="39"/>
         <source>Weather Screen Setup</source>
         <translation>Ustawienia prezentacji pogody</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="37"/>
+        <location filename="themestrings.h" line="40"/>
         <source>Weather Source Setup</source>
         <translation>Ustawienia źródeł info o pogodzie</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="38"/>
+        <location filename="themestrings.h" line="41"/>
         <source>Source</source>
         <translation>Źródło</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="39"/>
+        <location filename="themestrings.h" line="42"/>
         <source>Enter your current location, nearest large town or city. In some countries postal codes are also supported.</source>
         <translation>Wprowadź Twoją obecna lokalizację lub najbliższe duże miasto. W niektórych karajach możesz podać kod pocztowy.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="40"/>
+        <location filename="themestrings.h" line="43"/>
         <source>Enter Location:</source>
         <translation>Podaj lokalizację:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="41"/>
+        <location filename="themestrings.h" line="44"/>
         <source>Weather Location Search</source>
         <translation>Wyszukiwanie lokalizacji</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="42"/>
         <source>Weather</source>
-        <translation>Pogoda</translation>
+        <translation type="obsolete">Pogoda</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="43"/>
         <source>Global Setup</source>
-        <translation>Ustawienia ogólne</translation>
+        <translation type="obsolete">Ustawienia ogólne</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="44"/>
+        <location filename="themestrings.h" line="51"/>
         <source>Screen Setup</source>
         <translation>Ustawienia prezentacji pogody</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="45"/>
+        <location filename="themestrings.h" line="52"/>
         <source>Source Setup</source>
         <translation>Ustawienia źródeł info.o pogodzie</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="46"/>
+        <location filename="themestrings.h" line="53"/>
         <source>Location Search</source>
         <translation>Wyszukiwanie lokalizacji</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="47"/>
+        <location filename="themestrings.h" line="45"/>
         <source>Humidity:</source>
         <translation>Wilgotność:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="48"/>
+        <location filename="themestrings.h" line="46"/>
         <source>Pressure:</source>
         <translation>Ciśnienie:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="49"/>
+        <location filename="themestrings.h" line="47"/>
         <source>Wind(Gust):</source>
         <translation>Wiatr:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="50"/>
+        <location filename="themestrings.h" line="48"/>
         <source>Wind Direction:</source>
         <translation>Kierunek wiatru:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="51"/>
+        <location filename="themestrings.h" line="49"/>
         <source>Visibility:</source>
         <translation>Widoczność:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="52"/>
+        <location filename="themestrings.h" line="50"/>
         <source>Feels Like:</source>
         <translation>Odczuwalana:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="53"/>
+        <location filename="themestrings.h" line="54"/>
+        <source>: %1</source>
+        <translation>: %1</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="55"/>
+        <source>100%</source>
+        <translation>100%</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="57"/>
+        <source>Seconds to display each page</source>
+        <translation>Sekund wyświetlania każdej strony</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="58"/>
+        <source>Retrieve data in the background</source>
+        <translation>Ładuj dane w tle</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="59"/>
+        <source>Enter your current location,nearest large town or city. In some countries postal codes are also supported.</source>
+        <translation>Wprować Twoją aktualną lokalizację lub miasto. W niektórych krajach może to być także kod pocztowy.</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="60"/>
         <source>General weather options</source>
         <oldsource>General weather plugin options</oldsource>
         <translation>Ogólne ustawienia pogody</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="54"/>
+        <location filename="themestrings.h" line="61"/>
         <source>Screen Settings</source>
         <translation>Ustawienia prezentacji pogody</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="55"/>
+        <location filename="themestrings.h" line="62"/>
         <source>Choose which weather forecasts to display</source>
         <translation>Wybierz przewidywanie które chesz oglądać</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="56"/>
+        <location filename="themestrings.h" line="63"/>
         <source>Source Settings</source>
         <translation>Ustawienia źródeł info.o pogodzie</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="57"/>
+        <location filename="themestrings.h" line="64"/>
         <source>Configure the behavior of weather scripts</source>
         <translation>Konfiguruj pracę skryptów pogodowych</translation>
     </message>

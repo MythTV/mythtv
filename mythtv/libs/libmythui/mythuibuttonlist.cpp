@@ -1390,6 +1390,8 @@ void MythUIButtonList::SetPositionArrowStates()
 
     updateLCD();
 
+    m_needsUpdate = false;
+
     if (!m_downArrow || !m_upArrow)
         return;
 
@@ -3300,6 +3302,8 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool selecte
     if (!m_parent)
         return;
 
+    m_parent->ItemVisible(this);
+
     QString state;
 
     if (selected)
@@ -3489,8 +3493,6 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool selecte
 
         ++state_it;
     }
-
-    m_parent->ItemVisible(this);
 }
 
 //---------------------------------------------------------

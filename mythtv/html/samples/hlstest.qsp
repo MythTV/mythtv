@@ -219,7 +219,7 @@ function listFiles() {
         str += "<input type=button onClick='addStream()' Value='<i18n>Add Stream</i18n>'>";
         str += "<hr>";
 
-        $.each(data.QStringList, function(i, value) {
+        $.each(data.StringList, function(i, value) {
             if ((filter.length == 0) ||
                 (value.toLowerCase().indexOf(filter) >= 0)) {
                 var tmpGroup = "'" + group + "'";

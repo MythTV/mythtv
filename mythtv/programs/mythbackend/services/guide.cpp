@@ -54,9 +54,6 @@ DTC::ProgramGuide *Guide::GetProgramGuide( const QDateTime &dtStartTime ,
         throw( "EndTime is before StartTime");
 
     if (nNumChannels == 0)
-        nNumChannels = 1;
-
-    if (nNumChannels == -1)
         nNumChannels = SHRT_MAX;
 
     // ----------------------------------------------------------------------

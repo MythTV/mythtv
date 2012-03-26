@@ -189,6 +189,8 @@ bool MusicCommon::CreateCommon(void)
         connect(m_currentPlaylist, SIGNAL(itemVisible(MythUIButtonListItem*)),
                 this, SLOT(playlistItemVisible(MythUIButtonListItem*)));
 
+        m_currentPlaylist->SetSearchFields("**search**");
+
         updateUIPlaylist();
     }
 
@@ -223,27 +225,21 @@ bool MusicCommon::CreateCommon(void)
     if (m_movingTracksState)
         m_movingTracksState->DisplayState("off");
 
+    if (m_stopButton)
+        m_stopButton->SetLocked(gPlayer->isStopped());
+    if (m_playButton)
+        m_playButton->SetLocked(gPlayer->isPlaying());
+    if (m_pauseButton)
+        m_pauseButton->SetLocked(gPlayer->isPaused());
     if (m_trackState)
     {
-        if (!gPlayer->isPlaying()) // TODO: Add Player status check
-        {
-            if (gPlayer->getOutput() && gPlayer->getOutput()->IsPaused())
-                m_trackState->DisplayState("paused");
-            else
-                m_trackState->DisplayState("stopped");
-        }
-        else
+        if (gPlayer->isPlaying())
             m_trackState->DisplayState("playing");
-    }
+        else if (gPlayer->isPaused())
+            m_trackState->DisplayState("paused");
+        else
+            m_trackState->DisplayState("stopped");
 
-    if (gPlayer->isPlaying())
-    {
-        if (m_stopButton)
-            m_stopButton->SetLocked(false);
-        if (m_playButton)
-            m_playButton->SetLocked(true);
-        if (m_pauseButton)
-            m_pauseButton->SetLocked(false);
     }
 
     updateShuffleMode();
@@ -346,22 +342,10 @@ void MusicCommon::switchView(MusicView view)
     }
 
     gPlayer->removeListener(this);
+    gPlayer->setAllowRestorePos(false);
 
     switch (view)
     {
-#if 0
-        case MV_LYRICS:
-        {
-            LyricsView *view = new LyricsView(mainStack);
-
-            if (view->Create())
-                mainStack->AddScreen(view);
-            else
-                delete view;
-
-            break;
-        }
-#endif
         case MV_PLAYLIST:
         {
             PlaylistView *view = new PlaylistView(mainStack);
@@ -378,7 +362,7 @@ void MusicCommon::switchView(MusicView view)
         {
             // if we are switching playlist editor views save and restore
             // the current position in the tree
-            bool restorePos = (m_currentView ==  MV_PLAYLISTEDITORGALLERY);
+            bool restorePos = (m_currentView == MV_PLAYLISTEDITORGALLERY);
             PlaylistEditorView *oldView = dynamic_cast<PlaylistEditorView *>(this);
             if (oldView)
                 oldView->saveTreePosition();
@@ -397,7 +381,7 @@ void MusicCommon::switchView(MusicView view)
         {
             // if we are switching playlist editor views save and restore
             // the current position in the tree
-            bool restorePos = (m_currentView ==  MV_PLAYLISTEDITORTREE);
+            bool restorePos = (m_currentView == MV_PLAYLISTEDITORTREE);
             PlaylistEditorView *oldView = dynamic_cast<PlaylistEditorView *>(this);
             if (oldView)
                 oldView->saveTreePosition();
@@ -441,6 +425,8 @@ void MusicCommon::switchView(MusicView view)
     }
 
     Close();
+
+    gPlayer->setAllowRestorePos(true);
 }
 
 #if 0
@@ -1141,7 +1127,7 @@ void MusicCommon::customEvent(QEvent *event)
 
         LOG(VB_GENERAL, LOG_ERR, QString("%1 %2").arg(statusString)
             .arg(*aoe->errorMessage()));
-        ShowOkPopup(QString("MythMusic has encountered the following error:\n%1")
+        ShowOkPopup(QString(tr("MythMusic has encountered the following error:\n%1"))
                     .arg(*aoe->errorMessage()));
         stopAll();
     }
@@ -1183,7 +1169,7 @@ void MusicCommon::customEvent(QEvent *event)
         LOG(VB_GENERAL, LOG_ERR, QString("%1 %2").arg(statusString)
             .arg(*dxe->errorMessage()));
 
-        ShowOkPopup(QString("MythMusic has encountered the following error:\n%1")
+        ShowOkPopup(QString(tr("MythMusic has encountered the following error:\n%1"))
                     .arg(*dxe->errorMessage()));
     }
     else if (event->type() == DialogCompletionEvent::kEventType)
@@ -1361,7 +1347,7 @@ void MusicCommon::customEvent(QEvent *event)
                 byGenre();
             else if (resulttext == tr("Tracks From Current Album"))
                 byAlbum();
-            else if (resulttext == tr("Track From Current Year"))
+            else if (resulttext == tr("Tracks From Current Year"))
                 byYear();
             else if (resulttext == tr("Tracks With Same Title"))
                 byTitle();
@@ -1526,7 +1512,8 @@ void MusicCommon::customEvent(QEvent *event)
 
                     item->SetTextFromMap(metadataMap);
 
-                    if (gPlayer->isPlaying() && mdata->ID() == gPlayer->getCurrentMetadata()->ID())
+                    if (gPlayer->isPlaying() && gPlayer->getCurrentMetadata() &&
+                        mdata->ID() == gPlayer->getCurrentMetadata()->ID())
                     {
                         item->SetFontState("running");
                         item->DisplayState("playing", "playstate");
@@ -1622,7 +1609,7 @@ void MusicCommon::customEvent(QEvent *event)
             }
         }
 
-        if (trackID == gPlayer->getCurrentMetadata()->ID())
+        if (gPlayer->getCurrentMetadata() && trackID == gPlayer->getCurrentMetadata()->ID())
             updateTrackInfo(gPlayer->getCurrentMetadata());
     }
 }
@@ -1775,10 +1762,10 @@ void MusicCommon::playlistItemVisible(MythUIButtonListItem *item)
     if (!item)
         return;
 
-    if (item->GetImage().isEmpty())
+    Metadata *mdata = qVariantValue<Metadata*> (item->GetData());
+    if (mdata)
     {
-        Metadata *mdata = qVariantValue<Metadata*> (item->GetData());
-        if (mdata)
+        if (item->GetImage().isEmpty())
         {
             QString artFile = mdata->getAlbumArtFile();
             if (artFile.isEmpty())
@@ -1792,8 +1779,15 @@ void MusicCommon::playlistItemVisible(MythUIButtonListItem *item)
                 item->SetImage(mdata->getAlbumArtFile(), "coverart");
             }
         }
-        else
-            item->SetImage("");
+
+        if (item->GetText() == " ")
+        {
+            MetadataMap metadataMap;
+            mdata->toMap(metadataMap);
+            item->SetText("");
+            item->SetTextFromMap(metadataMap);
+            item->DisplayState(QString("%1").arg(mdata->Rating()), "ratingstate");
+        }
     }
 }
 
@@ -1817,26 +1811,33 @@ void MusicCommon::updateUIPlaylist(void)
         if (mdata)
         {
             MythUIButtonListItem *item =
-                new MythUIButtonListItem(m_currentPlaylist, "", qVariantFromValue(mdata));
+                new MythUIButtonListItem(m_currentPlaylist, " ", qVariantFromValue(mdata));
 
-            MetadataMap metadataMap;
-            mdata->toMap(metadataMap);
-            item->SetTextFromMap(metadataMap);
+            item->SetText(mdata->Artist() + mdata->Album() + mdata->Title(), "**search**");
+            item->SetFontState("normal");
+            item->DisplayState("default", "playstate");
 
-            if (gPlayer->isPlaying() && mdata->ID() == gPlayer->getCurrentMetadata()->ID())
+            // if this is the current track update its play state to match the player
+            if (gPlayer->getCurrentMetadata() && mdata->ID() == gPlayer->getCurrentMetadata()->ID())
             {
-                item->SetFontState("running");
-                item->DisplayState("playing", "playstate");
-            }
-            else
-            {
-                item->SetFontState("normal");
-                item->DisplayState("default", "playstate");
+                if (gPlayer->isPlaying())
+                {
+                    item->SetFontState("running");
+                    item->DisplayState("playing", "playstate");
+                }
+                else if (gPlayer->isPaused())
+                {
+                    item->SetFontState("idle");
+                    item->DisplayState("paused", "playstate");
+                }
+                else
+                {
+                    item->SetFontState("normal");
+                    item->DisplayState("stopped", "playstate");
+                }
             }
 
-            item->DisplayState(QString("%1").arg(mdata->Rating()), "ratingstate");
-
-            if (mdata->ID() == gPlayer->getCurrentMetadata()->ID())
+            if (gPlayer->getCurrentMetadata() && mdata->ID() == gPlayer->getCurrentMetadata()->ID())
                 m_currentPlaylist->SetItemCurrent(item);
         }
     }
@@ -1884,7 +1885,7 @@ void MusicCommon::updatePlaylistStats(void)
         QString playlistcurrent = QLocale::system().toString(m_currentTrack + 1);
         QString playlisttotal = QLocale::system().toString(trackCount);
 
-        map["playlistposition"] = QString("%1 of %2").arg(playlistcurrent)
+        map["playlistposition"] = QString(tr("%1 of %2")).arg(playlistcurrent)
                                                      .arg(playlisttotal);
         map["playlistcurrent"] = playlistcurrent;
         map["playlistcount"] = playlisttotal;
@@ -2127,7 +2128,7 @@ MythMenu* MusicCommon::createQuickPlaylistsMenu(void)
         menu->AddItem(tr("Tracks By Current Artist"));
         menu->AddItem(tr("Tracks From Current Album"));
         menu->AddItem(tr("Tracks From Current Genre"));
-        menu->AddItem(tr("Track From Current Year"));
+        menu->AddItem(tr("Tracks From Current Year"));
         menu->AddItem(tr("Tracks With Same Title"));
     }
 

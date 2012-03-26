@@ -882,7 +882,7 @@ DTC::LiveStreamInfo *HTTPLiveStream::StopStream(int id)
         LOG(VB_GENERAL, LOG_ERR, SLOC +
             QString("Unable to remove mark stream stopped for stream %1.")
                     .arg(id));
-        return false;
+        return NULL;
     }
 
     HTTPLiveStream *hls = new HTTPLiveStream(id);

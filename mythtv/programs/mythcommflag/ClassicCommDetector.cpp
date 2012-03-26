@@ -2229,7 +2229,9 @@ bool ClassicCommDetector::FrameIsInBreakMap(
         }
     }
 
-    for (uint64_t i = f; i >= 0; i--)
+    // We want from f down to 0, but without wrapping the counter to negative
+    // on an unsigned counter.
+    for (uint64_t i = (f + 1); i-- > 0; )
     {
         if (breakMap.contains(i))
         {

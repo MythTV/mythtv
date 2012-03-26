@@ -43,6 +43,7 @@ void strings_null() {
     ThemeUI::tr("Game Name:");
     ThemeUI::tr("Description:");
     ThemeUI::tr("Boxart:");
+    ThemeUI::tr("Favorite");
     ThemeUI::tr("No Plot.");
     ThemeUI::tr("General Settings");
     ThemeUI::tr("Game folders and general options");

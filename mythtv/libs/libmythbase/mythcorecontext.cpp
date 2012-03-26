@@ -35,6 +35,7 @@ using namespace std;
 #include "exitcodes.h"
 #include "mythlogging.h"
 #include "mythversion.h"
+#include "logging.h"
 #include "mthread.h"
 #include "serverpool.h"
 
@@ -103,7 +104,7 @@ MythCoreContextPrivate::MythCoreContextPrivate(MythCoreContext *lparent,
       m_scheduler(NULL),
       m_blockingClient(false)
 {
-    threadRegister("CoreContext");
+    MThread::ThreadSetup("CoreContext");
     srandom(QDateTime::currentDateTime().toTime_t() ^
             QTime::currentTime().msec());
 }
@@ -147,7 +148,8 @@ MythCoreContextPrivate::~MythCoreContextPrivate()
         DestroyMythDB();
         m_database = NULL;
     }
-    threadDeregister();
+
+    loggingDeregisterThread();
 }
 
 /// If another thread has already started WOL process, wait on them...
@@ -220,6 +222,8 @@ bool MythCoreContext::Init(void)
             lang_variables.append(", and ");
         lang_variables.append("LANG");
     }
+    LOG(VB_GENERAL, LOG_INFO, QString("Assumed character encoding: %1")
+                                     .arg(lc_value));
     if (!lang_variables.isEmpty())
         LOG(VB_GENERAL, LOG_WARNING, QString("This application expects to "
             "be running a locale that specifies a UTF-8 codeset, and many "

@@ -20,6 +20,9 @@ class QString;
 class MSqlQuery;
 class LoggingItem;
 
+void loggingRegisterThread(const QString &name);
+void loggingDeregisterThread(void);
+
 /// \brief A semi-opaque handle that is used by the various loggers to indicate
 ///        which instance is being referenced.
 typedef union {

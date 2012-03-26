@@ -38,6 +38,7 @@ using namespace std;
 #include "mthreadpool.h"
 #include "mythlogging.h"
 #include "mythtimer.h"
+#include "logging.h"
 #include "mthread.h"
 #include "mythdb.h"
 
@@ -80,7 +81,7 @@ class MPoolThread : public MThread
             }
 
             if (!m_runnable_name.isEmpty())
-                threadRegister(m_runnable_name);
+                loggingRegisterThread(m_runnable_name);
 
             bool autodelete = m_runnable->autoDelete();
             m_runnable->run();
@@ -91,8 +92,8 @@ class MPoolThread : public MThread
             m_reserved = false;
             m_runnable = NULL;
 
-            threadDeregister();
-            threadRegister(objectName());
+            loggingDeregisterThread();
+            loggingRegisterThread(objectName());
 
             GetMythDB()->GetDBManager()->PurgeIdleConnections(false);
             QCoreApplication::processEvents();

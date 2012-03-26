@@ -2458,15 +2458,16 @@ MythMenu* VideoDialog::CreateViewMenu()
     if (!(m_d->m_type & DLG_MANAGER))
         menu->AddItem(tr("Switch to Manage View"), SLOT(SwitchManager()));
 
-    if (m_d->m_isFileBrowser)
-        menu->AddItem(tr("Disable File Browse Mode"), SLOT(ToggleBrowseMode()));
-    else
-        menu->AddItem(tr("Enable File Browse Mode"), SLOT(ToggleBrowseMode()));
-
     if (m_d->m_isFlatList)
-        menu->AddItem(tr("Disable Flat View"), SLOT(ToggleFlatView()));
+        menu->AddItem(tr("Show Directory Structure"), SLOT(ToggleFlatView()));
     else
-        menu->AddItem(tr("Enable Flat View"), SLOT(ToggleFlatView()));
+        menu->AddItem(tr("Hide Directory Structure"), SLOT(ToggleFlatView()));
+
+    if (m_d->m_isFileBrowser)
+        menu->AddItem(tr("Browse Library (recommended)"), SLOT(ToggleBrowseMode()));
+    else
+        menu->AddItem(tr("Browse Filesystem (slow)"), SLOT(ToggleBrowseMode()));
+
 
     return menu;
 }

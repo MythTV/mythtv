@@ -16,8 +16,7 @@ void strings_null() {
     ThemeUI::tr("Sort by:");
     ThemeUI::tr("Done");
     ThemeUI::tr("Save as default");
-    ThemeUI::tr("Directory filter :");
+    ThemeUI::tr("Folder filter :");
     ThemeUI::tr("Type filter :");
-    ThemeUI::tr("NumImages_Text");
     ThemeUI::tr("Sort by :");
 }

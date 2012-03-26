@@ -36,8 +36,6 @@ class VideoSetupWizard : public MythScreenType
 
     void save(void);
 
-    void Close(void);
-
   private:
     void initProgressDialog();
 
