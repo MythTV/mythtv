@@ -143,7 +143,7 @@
         <translation>ZoneMinder Live Player</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="41"/>
+        <location filename="themestrings.h" line="48"/>
         <source>[x]</source>
         <translation>[x]</translation>
     </message>
@@ -273,17 +273,54 @@
         <translation>Monitor 4</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="41"/>
+        <source>[R] = Running
+[S] = Stopped</source>
+        <translation>[R] = Running
+[S] = Stopped</translation>
+    </message>
+    <message>
         <location filename="themestrings.h" line="42"/>
+        <source>Select Camera:</source>
+        <translation>Select Camera:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="43"/>
+        <source>Select Date:</source>
+        <translation>Select Date:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="44"/>
+        <source>Test</source>
+        <translation>Test</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="45"/>
+        <source>Record</source>
+        <translation>Record</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="46"/>
+        <source>Cancel</source>
+        <translation>Cancel</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="47"/>
+        <source>Store</source>
+        <translation>Store</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="49"/>
         <source>Show Console</source>
         <translation>Show Console</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="43"/>
+        <location filename="themestrings.h" line="50"/>
         <source>Show Live View</source>
         <translation>Show Live View</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="44"/>
+        <location filename="themestrings.h" line="51"/>
         <source>Show Events</source>
         <translation>Show Events</translation>
     </message>
