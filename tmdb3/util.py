@@ -7,6 +7,7 @@
 #-----------------------
 
 from copy import copy
+from locales import get_locale
 
 class Poller( object ):
     """
@@ -104,7 +105,7 @@ class Data( object ):
         else:
             value = self.default
         if isinstance(value, Element):
-            value._lang = inst._lang
+            value._locale = inst._locale
         inst._data[self.field] = value
 
     def sethandler(self, handler):
@@ -153,7 +154,7 @@ class Datalist( Data ):
             for val in value:
                 val = self.handler(val)
                 if isinstance(val, Element):
-                    val._lang = inst._lang
+                    val._locale = inst._locale
                 data.append(val)
             if self.sort:
                 data.sort(key=lambda x: getattr(x, self.sort))
@@ -203,7 +204,7 @@ class Datadict( Data ):
             for val in value:
                 val = self.handler(val)
                 if isinstance(val, Element):
-                    val._lang = inst._lang
+                    val._locale = inst._locale
                 data[self.getkey(val)] = val
         inst._data[self.field] = data
 
@@ -280,8 +281,10 @@ class ElementType( type ):
 
     def __call__(cls, *args, **kwargs):
         obj = cls.__new__(cls)
-        if 'language' in kwargs:
-            obj._lang = kwargs['language']
+        if 'locale' in kwargs:
+            obj._locale = kwargs['locale']
+        else:
+            obj._locale = get_locale()
 
         obj._data = {}
         if 'raw' in kwargs:
