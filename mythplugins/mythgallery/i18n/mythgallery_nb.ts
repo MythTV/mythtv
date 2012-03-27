@@ -12,29 +12,64 @@
 <context>
     <name>GalleryFilterDialog</name>
     <message>
-        <location filename="../mythgallery/galleryfilterdlg.cpp" line="205"/>
         <source>No files / directories found</source>
-        <translation>Ingen filer / kataloger funnet</translation>
+        <translation type="obsolete">Ingen filer / kataloger funnet</translation>
+    </message>
+    <message>
+        <source>Filter result : %1 directories found but no files</source>
+        <translation type="obsolete">Filterresultat: %1 kataloger funnet men ingen filer</translation>
+    </message>
+    <message>
+        <source>Filter result : %1 directories, %2 movie(s) found</source>
+        <translation type="obsolete">Filterresultat: %1 kataloger funnet, %2 film(er) funnet</translation>
+    </message>
+    <message>
+        <source>Filter result : %1 directories, %2 image(s) found</source>
+        <translation type="obsolete">Filterresultat: %1 kataloger funnet, %2 bilde(r) funnet</translation>
+    </message>
+    <message>
+        <source>Filter result : %1 directories, %2 image(s) and %3 movie(s) found</source>
+        <translation type="obsolete">Filterresultat: %1 kataloger funnet, %2 bilde(r) og %3 film(er) funnet</translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/galleryfilterdlg.cpp" line="145"/>
+        <source>Filter result : (unknown)</source>
+        <translation>Filterresultat:(ukjent)</translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/galleryfilterdlg.cpp" line="178"/>
+        <source>-- please be patient --</source>
+        <translation>-- vær tålmodig --</translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/galleryfilterdlg.cpp" line="190"/>
+        <source>-- scanning current filter --</source>
+        <translation>-- søker med gjeldende filter --</translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/galleryfilterdlg.cpp" line="205"/>
+        <source>No files / folders found</source>
+        <translation>Ingen filer / mapper funnet</translation>
     </message>
     <message>
         <location filename="../mythgallery/galleryfilterdlg.cpp" line="209"/>
-        <source>Filter result : %1 directories found but no files</source>
-        <translation>Filterresultat: %1 kataloger funnet men ingen filer</translation>
+        <source>Filter result : %1 folder(s) found but no files</source>
+        <translation>Filterresultat: %1 mapper funnet men ingen filer</translation>
     </message>
     <message>
         <location filename="../mythgallery/galleryfilterdlg.cpp" line="213"/>
-        <source>Filter result : %1 directories, %2 movie(s) found</source>
-        <translation>Filterresultat: %1 kataloger funnet, %2 film(er) funnet</translation>
+        <source>Filter result : %1 folder(s), %2 movie(s) found</source>
+        <translation>Filterresultat: %1 bilde(r) funnet, %2 film(er) funnet</translation>
     </message>
     <message>
         <location filename="../mythgallery/galleryfilterdlg.cpp" line="217"/>
-        <source>Filter result : %1 directories, %2 image(s) found</source>
-        <translation>Filterresultat: %1 kataloger funnet, %2 bilde(r) funnet</translation>
+        <source>Filter result : %1 folder(s), %2 image(s) found</source>
+        <translation>Filterresultat: %1 mapper, %2 bilde(r) funnet</translation>
     </message>
     <message>
         <location filename="../mythgallery/galleryfilterdlg.cpp" line="221"/>
-        <source>Filter result : %1 directories, %2 image(s) and %3 movie(s) found</source>
-        <translation>Filterresultat: %1 kataloger funnet, %2 bilde(r) og %3 film(er) funnet</translation>
+        <source>Filter result : %1 folder(s), %2 image(s) and %3 movie(s) found</source>
+        <translation>Filterresultat: %1 mapper, %2 bilde(r) og %3 film(er) funnet</translation>
     </message>
     <message>
         <location filename="../mythgallery/galleryfilterdlg.cpp" line="226"/>
@@ -114,6 +149,11 @@
         <translation>Merk alle</translation>
     </message>
     <message>
+        <location filename="../mythgallery/iconview.cpp" line="196"/>
+        <source>No images found in this folder.</source>
+        <translation>Ingen bilder ble funnet i denne mappen.</translation>
+    </message>
+    <message>
         <location filename="../mythgallery/iconview.cpp" line="896"/>
         <source>Meta Data Options</source>
         <translation>Metadata alternativer</translation>
@@ -144,9 +184,13 @@
         <translation>Flytt her</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="974"/>
         <source>Create Dir</source>
-        <translation>Lag katalog</translation>
+        <translation type="obsolete">Lag katalog</translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/iconview.cpp" line="974"/>
+        <source>Create folder</source>
+        <translation>Lag ny mappe</translation>
     </message>
     <message>
         <location filename="../mythgallery/iconview.cpp" line="1027"/>
@@ -204,6 +248,11 @@
         <translation>Lag ny mappe</translation>
     </message>
     <message>
+        <location filename="../mythgallery/iconview.cpp" line="1368"/>
+        <source>Failed to rename folder</source>
+        <translation>Kunne ikke gi nytt navn til mappe</translation>
+    </message>
+    <message>
         <location filename="../mythgallery/iconview.cpp" line="1429"/>
         <source>Moving marked images...</source>
         <translation>Flytt markerte bilder...</translation>
@@ -220,9 +269,8 @@
         <translation>Gi nytt navn</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1368"/>
         <source>Failed to rename directory</source>
-        <translation>Kunne ikke gi nytt navn til mappe</translation>
+        <translation type="obsolete">Kunne ikke gi nytt navn til mappe</translation>
     </message>
     <message>
         <location filename="../mythgallery/iconview.cpp" line="1370"/>
@@ -230,9 +278,8 @@
         <translation>Kunne ikke gi nytt navn til fil</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="196"/>
         <source>No images found in this directory.</source>
-        <translation>Ingen bilder ble funnet i denne mappen.</translation>
+        <translation type="obsolete">Ingen bilder ble funnet i denne mappen.</translation>
     </message>
     <message>
         <location filename="../mythgallery/iconview.cpp" line="389"/>
@@ -781,8 +828,9 @@ Bekreft at mappen eksisterer, er lesbar og at innstillingene er korrekte.</trans
     </message>
     <message>
         <location filename="themestrings.h" line="19"/>
-        <source>Directory filter :</source>
-        <translation>Katalogfilter:</translation>
+        <source>Folder filter :</source>
+        <oldsource>Directory filter :</oldsource>
+        <translation>Mappefilter:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="20"/>
@@ -790,13 +838,12 @@ Bekreft at mappen eksisterer, er lesbar og at innstillingene er korrekte.</trans
         <translation>Typefilter:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="21"/>
         <source>NumImages_Text</source>
         <translatorcomment>This will be removed the next time you update.</translatorcomment>
-        <translation>NumImages_Text</translation>
+        <translation type="obsolete">NumImages_Text</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="22"/>
+        <location filename="themestrings.h" line="21"/>
         <source>Sort by :</source>
         <translation>Sorter etter:</translation>
     </message>

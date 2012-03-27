@@ -2042,7 +2042,7 @@ void ClassicCommDetector::BuildSceneChangeCommList(void)
 
     sceneCommBreakMap.clear();
 
-    memset(sc_histogram, 0, sizeof(sc_histogram));
+    memset(sc_histogram, 0, (seconds+1)*sizeof(int));
     for (uint64_t f = 1; f <= framesProcessed; f++)
     {
         if (sceneMap.contains(f))

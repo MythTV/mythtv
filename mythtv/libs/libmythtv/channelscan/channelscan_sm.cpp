@@ -752,7 +752,7 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
         if (tsid_checked[tsid])
             continue;
         tsid_checked[tsid] = true;
-        if (!currentInfo->pats[tsid].empty())
+        if (currentInfo->pats.contains(tsid))
             continue;
 
         if (!wait_until_complete || sd->HasCachedAllPAT(tsid))
@@ -805,7 +805,7 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
         if (tsid_checked[tsid])
             continue;
         tsid_checked[tsid] = true;
-        if (!currentInfo->sdts[tsid].empty())
+        if (currentInfo->sdts.contains(tsid))
             continue;
 
         if (!wait_until_complete || sd->HasCachedAllSDT(tsid))
