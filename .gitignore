@@ -1,0 +1,8 @@
+# GVIM stuff #
+##############
+.*.swp
+
+# Python stuff #
+################
+build
+*.pyc

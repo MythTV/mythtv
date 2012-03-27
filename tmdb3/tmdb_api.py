@@ -79,11 +79,11 @@ def searchPerson(query):
 class PeopleSearchResult( PagedRequest ):
     """Stores a list of search matches."""
     def __init__(self, request):
-        super(PeopleSearchResults, self).__init__(request,
+        super(PeopleSearchResult, self).__init__(request,
                                 lambda x: Person(raw=x))
 
     def __repr__(self):
-        return u"<Search Results: {0}>".format(self.request._kwargs['query'])
+        return u"<Search Results: {0}>".format(self._request._kwargs['query'])
 
 class Image( Element ):
     filename        = Datapoint('file_path', initarg=1,
@@ -151,8 +151,8 @@ class Cast( Person ):
     order       = Datapoint('order')
 
     def __repr__(self):
-        return u"<{0} '{1.name}' as '{1.character}' at {2}>".\
-                        format(self.__class__.__name__, self, hex(id(self)))
+        return u"<{0} '{1.name}' as '{1.character}'>".\
+                        format(self.__class__.__name__, self)
 
 class Crew( Person ):
     job         = Datapoint('job')
@@ -181,10 +181,16 @@ class Trailer( Element ):
     size    = Datapoint('size')
     source  = Datapoint('source')
 
+    def __repr__(self):
+        return u"<{0.__class__.__name__} '{0.name}'>".format(self)
+
 class Translation( Element ):
     name          = Datapoint('name')
     language      = Datapoint('iso_639_1')
     englishname   = Datapoint('english_name')
+
+    def __repr__(self):
+        return u"<{0.__class__.__name__} '{0.name}' ({0.language})>".format(self)
 
 class Genre( Element ):
     id      = Datapoint('id')
