@@ -145,6 +145,27 @@ to download a requested size. Invalid sizes return an error
       raise TMDBImageSizeError
   tmdb3.tmdb_exceptions.TMDBImageSizeError: None
 
+## Trailers
+
+TheMovieDb offers access to trailers on Youtube and Apple, however their use
+is slightly different. Youtube trailers offer an individual file, while Apple
+trailers offer multiple sizes.
+
+  >>> from tmdb3 import Movie
+  >>> movie = Movie(27205)
+  >>> movie.youtube_trailers
+  [<YoutubeTrailer 'Trailer 1'>, <YoutubeTrailer 'Trailer 2'>]
+  >>> movie.youtube_trailers[0].geturl()
+  'http://www.youtube.com/watch?v=suIIHZqDR30'
+  >>> movie.apple_trailers
+  [<AppleTrailer 'Teaser'>, <AppleTrailer 'Trailer 1'>, <AppleTrailer 'Trailer 2'>]
+  >>> movie.apple_trailers[0].sizes()
+  [u'480p', u'720p', u'1080p']
+  >>> movie.apple_trailers[0].geturl()
+  u'http://pdl.warnerbros.com/wbmovies/inception/Inception_TRL1_1080.mov'
+  >>> movie.apple_trailers[0].geturl()
+  u'http://pdl.warnerbros.com/wbmovies/inception/Inception_TRL1_480.mov'
+
 ## List of Available Data 
 
   type              name
@@ -262,3 +283,12 @@ Trailer:
   string                name
   string                size
   string                source
+
+YoutubeTrailer (derived from Trailer)
+  string                geturl()
+
+AppleTrailer
+  string                name
+  dict(Trailer)         sources             (indexed by size)
+  list(string)          sizes()
+  string                geturl(size=None)
