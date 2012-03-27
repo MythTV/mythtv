@@ -209,6 +209,13 @@ Movie:
   dict(Release)         releases            (indexed by country)
   list(Translation)     translations
 
+Movie classmethods
+  Movie                 fromIMDB(imdbid)    special constructor for use with IMDb codes
+  Movie                 latest()            gets latest movie added to database
+  list(Movie)           nowplaying()        content currently in theater
+  list(Movie)           mostpopular()       based off themoviedb.org page view counts
+  list(Movie)           toprated()          based off themoviedb.org user ratings
+
 Person:
   integer               id
   string                name
