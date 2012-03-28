@@ -191,7 +191,6 @@ CetonStreamHandler::CetonStreamHandler(const QString &device) :
 void CetonStreamHandler::run(void)
 {
     RunProlog();
-    bool _error = false;
 
     QFile file(_device_path);
     CetonRTP rtp(_ip_address, _tuner);
