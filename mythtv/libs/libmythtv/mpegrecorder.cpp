@@ -423,7 +423,11 @@ bool MpegRecorder::OpenV4L2DeviceAsInput(void)
         SetRecordingVolume(chanfd); // we don't care if this fails...
 
     if (!SetV4L2DeviceOptions(chanfd))
+    {
+        close(chanfd);
+        chanfd = -1;
         return false;
+    }
 
     SetVBIOptions(chanfd); // we don't care if this fails...
 
