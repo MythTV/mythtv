@@ -115,7 +115,7 @@ CetonStreamHandler::CetonStreamHandler(const QString &device) :
     QStringList parts = device.split("-");
     if (parts.size() != 2)
     {
-        LOG(VB_RECORD, LOG_ERR, LOC +
+        LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("Invalid device id %1").arg(_device));
         return;
     }
@@ -130,15 +130,15 @@ CetonStreamHandler::CetonStreamHandler(const QString &device) :
     }
     else
     {
-        LOG(VB_RECORD, LOG_ERR, LOC +
+        LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("Invalid device id %1").arg(_device));
         return;
     }
 
     if (GetVar("diag", "Host_IP_Address") == "")
     {
-        LOG(VB_RECORD, LOG_ERR, LOC +
-            QString("Ceton tuner does not seem to be available at IP"));
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            "Ceton tuner does not seem to be available at IP");
         return;
     }
 
@@ -149,8 +149,7 @@ CetonStreamHandler::CetonStreamHandler(const QString &device) :
 
         if (!QFile(_device_path).exists())
         {
-            LOG(VB_RECORD, LOG_ERR, LOC +
-                QString("Tuner device unavailable"));
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Tuner device unavailable");
             return;
         }
     }
@@ -201,7 +200,7 @@ void CetonStreamHandler::run(void)
     {
         if (!(rtp.Init() && rtp.StartStreaming()))
         {
-            LOG(VB_RECORD, LOG_ERR, LOC +
+            LOG(VB_GENERAL, LOG_ERR, LOC +
                 "Starting recording (RTP initialization failed). Aborting.");
             _error = true;
         }
@@ -210,7 +209,7 @@ void CetonStreamHandler::run(void)
     {
         if (!file.open(QIODevice::ReadOnly))
         {
-            LOG(VB_RECORD, LOG_ERR, LOC +
+            LOG(VB_GENERAL, LOG_ERR, LOC +
                 "Starting recording (file open failed). Aborting.");
             _error = true;
         }
@@ -461,7 +460,7 @@ bool CetonStreamHandler::TuneFrequency(
 
     if (!result)
     {
-        LOG(VB_RECORD, LOG_ERR, LOC +
+        LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("TuneFrequency() - HTTP status = %1 - response = %2")
             .arg(status).arg(response));
     }
@@ -476,8 +475,9 @@ bool CetonStreamHandler::TuneProgram(uint program)
     QStringList program_list = GetProgramList();
     if (!program_list.contains(QString::number(program)))
     {
-        LOG(VB_RECORD, LOG_ERR, LOC + 
-        QString("TuneProgram(%1) - Requested program not in the program list").arg(program));
+        LOG(VB_GENERAL, LOG_ERR, LOC + 
+        QString("TuneProgram(%1) - Requested program not in the program list")
+            .arg(program));
         return false;
     };
 
@@ -495,7 +495,7 @@ bool CetonStreamHandler::TuneProgram(uint program)
 
     if (!result)
     {
-        LOG(VB_RECORD, LOG_ERR, LOC +
+        LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("TuneProgram() - HTTP status = %1 - response = %2")
             .arg(status).arg(response));
     }
@@ -523,7 +523,7 @@ bool CetonStreamHandler::TuneVChannel(const QString &vchannel)
 
     if (!result)
     {
-        LOG(VB_RECORD, LOG_ERR, LOC +
+        LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("TuneVChannel() - HTTP status = %1 - response = %2")
             .arg(status).arg(response));
     }
@@ -541,7 +541,7 @@ void CetonStreamHandler::ClearProgramNumber(void)
         usleep(20000);
     };
 
-    LOG(VB_RECORD, LOG_ERR, LOC + QString("Program number failed to clear"));
+    LOG(VB_GENERAL, LOG_ERR, LOC + "Program number failed to clear");
 }
 
 uint CetonStreamHandler::GetProgramNumber(void) const
@@ -549,7 +549,9 @@ uint CetonStreamHandler::GetProgramNumber(void) const
     for(int i = 1; i <= 30; i++)
     {
         QString prog = GetVar("mux", "ProgramNumber");
-        LOG(VB_RECORD, LOG_INFO, LOC + QString("GetProgramNumber() got %1 on attempt %2").arg(prog).arg(i));
+        LOG(VB_RECORD, LOG_INFO, LOC +
+            QString("GetProgramNumber() got %1 on attempt %2")
+            .arg(prog).arg(i));
 
         uint prognum = prog.toUInt();
         if (prognum != 0) 
@@ -558,7 +560,9 @@ uint CetonStreamHandler::GetProgramNumber(void) const
         usleep(100000);
     };
 
-    LOG(VB_RECORD, LOG_ERR, LOC + QString("Error: GetProgramNumber() failed to get a non-zero program number"));
+    LOG(VB_GENERAL, LOG_ERR, LOC +
+        "GetProgramNumber() failed to get a non-zero program number");
+
     return 0;
 }
 
@@ -577,7 +581,7 @@ QString CetonStreamHandler::GetVar(
     uint status;
     if (!HttpRequest("GET", "/get_var.json", params, response, status))
     {
-        LOG(VB_RECORD, LOG_ERR, loc +
+        LOG(VB_GENERAL, LOG_ERR, loc +
             QString("HttpRequest failed - %1").arg(response));
         return QString();
     }
@@ -585,7 +589,7 @@ QString CetonStreamHandler::GetVar(
     QRegExp regex("^\\{ \"?result\"?: \"(.*)\" \\}$");
     if (regex.indexIn(response) == -1)
     {
-        LOG(VB_RECORD, LOG_ERR, loc +
+        LOG(VB_GENERAL, LOG_ERR, loc +
             QString("unexpected http response: -->%1<--").arg(response));
         return QString();
     }
@@ -607,7 +611,7 @@ QStringList CetonStreamHandler::GetProgramList()
     uint status;
     if (!HttpRequest("GET", "/get_pat.json", params, response, status))
     {
-        LOG(VB_RECORD, LOG_ERR,
+        LOG(VB_GENERAL, LOG_ERR,
             loc + QString("HttpRequest failed - %1").arg(response));
         return QStringList();
     }
@@ -617,7 +621,7 @@ QStringList CetonStreamHandler::GetProgramList()
 
     if (regex.indexIn(response) == -1)
     {
-        LOG(VB_RECORD, LOG_ERR,
+        LOG(VB_GENERAL, LOG_ERR,
             loc + QString("returned unexpected output: -->%1<--")
             .arg(response));
         return QStringList();
