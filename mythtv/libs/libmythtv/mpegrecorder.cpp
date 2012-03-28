@@ -1338,7 +1338,8 @@ bool MpegRecorder::StartEncoding(int fd)
 
     LOG(VB_RECORD, LOG_INFO, LOC + "StartEncoding");
 
-    if (ioctl(fd, VIDIOC_ENCODER_CMD, &command) == 0)
+    bool started = 0 == ioctl(fd, VIDIOC_ENCODER_CMD, &command);
+    if (started)
     {
         if (driver == "hdpvr")
         {
@@ -1348,20 +1349,20 @@ bool MpegRecorder::StartEncoding(int fd)
         }
 
         LOG(VB_RECORD, LOG_INFO, LOC + "Encoding started");
-        return true;
+    }
+    else if ((ENOTTY == errno) || (EINVAL == errno))
+    {
+        // Some drivers do not support this ioctl at all.  It is marked as
+        // "experimental" in the V4L2 API spec. These drivers return EINVAL
+        // in older kernels and ENOTTY in 3.1+
+        started = true;
+    }
+    else
+    {
+        LOG(VB_GENERAL, LOG_WARNING, LOC + "StartEncoding failed" + ENO);
     }
 
-    // Some drivers do not support this ioctl at all.  It is marked as
-    // "experimental" in the V4L2 API spec.  If we fail with EINVAL (which
-    // happens if the ioctl isn't supported), treat it as a success, but
-    // put a warning in the logs.  This should keep any driver without this
-    // support (such as saa7164) recording without affecting those that do
-    // use it.
-    if (errno == EINVAL)
-        return true;
-
-    LOG(VB_GENERAL, LOG_WARNING, LOC + "StartEncoding failed" + ENO);
-    return false;
+    return started;
 }
 
 bool MpegRecorder::StopEncoding(int fd)
@@ -1375,23 +1376,24 @@ bool MpegRecorder::StopEncoding(int fd)
 
     LOG(VB_RECORD, LOG_INFO, LOC + "StopEncoding");
 
-    if (ioctl(fd, VIDIOC_ENCODER_CMD, &command) == 0)
+    bool stopped = 0 == ioctl(fd, VIDIOC_ENCODER_CMD, &command);
+    if (stopped)
     {
         LOG(VB_RECORD, LOG_INFO, LOC + "Encoding stopped");
-        return true;
+    }
+    else if ((ENOTTY == errno) || (EINVAL == errno))
+    {
+        // Some drivers do not support this ioctl at all.  It is marked as
+        // "experimental" in the V4L2 API spec. These drivers return EINVAL
+        // in older kernels and ENOTTY in 3.1+
+        stopped = true;
+    }
+    else
+    {
+        LOG(VB_GENERAL, LOG_WARNING, LOC + "StopEncoding failed" + ENO);
     }
 
-    // Some drivers do not support this ioctl at all.  It is marked as
-    // "experimental" in the V4L2 API spec.  If we fail with EINVAL (which
-    // happens if the ioctl isn't supported), treat it as a success, but
-    // put a warning in the logs.  This should keep any driver without this
-    // support (such as saa7164) recording without affecting those that do
-    // use it.
-    if (errno == EINVAL)
-        return true;
-
-    LOG(VB_GENERAL, LOG_WARNING, LOC + "StopEncoding failed" + ENO);
-    return false;
+    return stopped;
 }
 
 void MpegRecorder::SetStreamData(void)
