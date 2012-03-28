@@ -64,7 +64,7 @@ class Poller( object ):
         # apply data directly, bypassing callable function
         unfilled = False
         for k,v in self.lookup.items():
-            if (k in data) and
+            if (k in data) and \
                     ((data[k] is not None) if callable(self.func) else True):
                 # argument received data, populate it
                 setattr(self.inst, v, data[k])
