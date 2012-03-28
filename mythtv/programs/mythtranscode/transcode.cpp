@@ -145,10 +145,12 @@ class AudioReencodeBuffer : public AudioOutput
             savedlen = (m_saveBuffer ? m_saveBuffer->m_buffer.size() : 0);
             if (savedlen)
                 firstlen = m_audioFrameSize - savedlen;
-            else
-                ab = new AudioBuffer;
 
             int overage = (len + savedlen) % m_audioFrameSize;
+
+            LOG(VB_AUDIO, LOG_DEBUG, 
+                QString("len: %1, savedlen: %2, overage: %3")
+                .arg(len).arg(savedlen).arg(overage));
 
             if (overage)
             {
@@ -156,7 +158,10 @@ class AudioReencodeBuffer : public AudioOutput
                                                 (m_eff_audiorate / 1000));
                 if (overage < len)
                 {
-                    ab = m_saveBuffer;
+                    if (!m_saveBuffer)
+                        ab = new AudioBuffer;
+                    else
+                        ab = m_saveBuffer;
                     m_saveBuffer = new AudioBuffer; 
                     len -= overage;
                     m_saveBuffer->setData(&buf[len], overage, newtime);
@@ -169,11 +174,13 @@ class AudioReencodeBuffer : public AudioOutput
                     len = 0;
                 }
             }
-            else if (savedlen && m_saveBuffer)
+            else if (savedlen)
             {
                 ab = m_saveBuffer;
                 m_saveBuffer = NULL;
             }
+            else
+                ab = new AudioBuffer;
         }
         else
         {
@@ -200,6 +207,11 @@ class AudioReencodeBuffer : public AudioOutput
             m_bufferList.append(ab);
 
             timecode = m_last_audiotime;
+
+            LOG(VB_AUDIO, LOG_DEBUG, 
+                QString("blocklen: %1, index: %2, timecode: %3")
+                .arg(blocklen).arg(index).arg(timecode));
+
             index += blocklen;
             firstlen = 0;
 
