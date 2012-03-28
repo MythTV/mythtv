@@ -455,7 +455,7 @@ bool MpegRecorder::OpenV4L2DeviceAsInput(void)
     if (!_device_read_buffer)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to allocate DRB buffer");
-        _error = true;
+        _error = "Failed to allocate DRB buffer";
         close(chanfd);
         chanfd = -1;
         close(readfd);
@@ -465,8 +465,8 @@ bool MpegRecorder::OpenV4L2DeviceAsInput(void)
 
     if (!_device_read_buffer->Setup(vdevice.constData(), readfd))
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to allocate DRB buffer");
-        _error = true;
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to setup DRB buffer");
+        _error = "Failed to setup DRB buffer";
         close(chanfd);
         chanfd = -1;
         close(readfd);
@@ -906,7 +906,8 @@ void MpegRecorder::run(void)
 {
     if (!Open())
     {
-        _error = "Failed to open V4L device";
+        if (_error.isEmpty())
+            _error = "Failed to open V4L device";
         return;
     }
 
@@ -971,7 +972,7 @@ void MpegRecorder::run(void)
         if (!StartEncoding(readfd))
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to start recording");
-            _error = true;
+            _error = "Failed to start recording";
         }
         else
             _device_read_buffer->Start();
@@ -1010,7 +1011,7 @@ void MpegRecorder::run(void)
             {
                 if (!Open())
                 {
-                    _error = true;
+                    _error = "Failed to open device";
                     break;
                 }
 
@@ -1040,7 +1041,7 @@ void MpegRecorder::run(void)
                      IsRecordingRequested())
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC + "Device EOF detected");
-                _error = true;
+                _error = "Device EOF detected";
             }
         }
         else
