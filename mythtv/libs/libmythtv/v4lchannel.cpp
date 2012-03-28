@@ -196,10 +196,15 @@ static int format_to_mode(const QString &fmt, int v4l_version)
             return VIDEO_MODE_NTSC; // We've dropped V4L ATSC support...
         return VIDEO_MODE_NTSC;
     }
+#else
+    else if (v4l_version == 1)
+    {
+        return V4L2_STD_NTSC;
+    }
 #endif
 
     LOG(VB_GENERAL, LOG_ERR,
-        "format_to_mode() does not recognize V4L" + v4l_version);
+        QString("format_to_mode() does not recognize V4L") + v4l_version);
 
     return V4L2_STD_NTSC; // assume V4L version 2
 }
@@ -281,11 +286,16 @@ static QString mode_to_format(int mode, int v4l_version)
         else if (mode == 6)
             return "NTSC-JP";
     }
+#else
+    if (1 == v4l_version)
+    {
+        return "Unknown";
+    }
 #endif
     else
     {
         LOG(VB_GENERAL, LOG_ERR,
-            "mode_to_format() does not recognize V4L" + v4l_version);
+            QString("mode_to_format() does not recognize V4L") + v4l_version);
     }
 
     return "Unknown";
