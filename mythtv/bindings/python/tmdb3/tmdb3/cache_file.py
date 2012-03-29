@@ -45,11 +45,25 @@ try:
                 suppress = self.callback(exc_type, exc_value, exc_tb)
             fcntl.flock(self.fileobj, fcntl.LOCK_UN)
             return suppress
+
+    def parse_filename(filename):
+        if '$' in filename:
+            # replace any environmental variables
+            filename = os.path.expandvars(filename)
+        if filename.startswith('~'):
+            # check for home directory
+            return os.path.expanduser(filename)
+        elif not filename.startswith('/'):
+            # check for absolute path
+            return filename
+        # return path with temp directory prepended
+        return '/tmp/' + filename
+
 except ImportError:
     import msvcrt
     class Flock( object ):
-        LOCK_EX = msvcrt.NBLCK
-        LOCK_SH = msvcrt.NBLCK
+        LOCK_EX = msvcrt.LK_LOCK
+        LOCK_SH = msvcrt.LK_LOCK
 
         def __init__(self, fileobj, operation, callback=None):
             self.fileobj = fileobj
@@ -64,6 +78,23 @@ except ImportError:
                 suppress = self.callback(exc_type, exc_value, exc_tb)
             msvcrt.locking(self.fileobj.fileno(), msvcrt.LK_UNLCK, self.size)
             return suppress
+
+    def parse_filename(filename):
+        if '%' in filename:
+            # replace any environmental variables
+            filename = os.path.expandvars(filename)
+        if filename.startswith('~'):
+            # check for home directory
+            return os.path.expanduser(filename)
+        elif (ord(filename[0]) in (range(65,91)+range(99,123))) \
+                and (filename[1:3] == ':\\'):
+            # check for absolute drive path (e.g. C:\...)
+            return filename
+        elif (filename.count('\\') >= 3) and (filename.startswith('\\\\')):
+            # check for absolute UNC path (e.g. \\server\...)
+            return filename
+        # return path with temp directory prepended
+        return os.path.expandvars(os.path.join('%TEMP%',filename))
 
 class FileEngine( CacheEngine ):
     """Simple file-backed engine."""
@@ -86,10 +117,8 @@ class FileEngine( CacheEngine ):
 
         if self.cachefile is None:
             raise TMDBCacheError("No cache filename given.")
-        if self.cachefile.startswith('~'):
-            self.cachefile = os.path.expanduser(self.cachefile)
-        elif not self.cachefile.startswith('/'):
-            self.cachefile = '/tmp/' + self.cachefile
+
+        self.cachefile = parse_filename(self.cachefile)
 
         try:
             # attempt to read existing cache at filename
