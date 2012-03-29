@@ -423,7 +423,11 @@ bool MpegRecorder::OpenV4L2DeviceAsInput(void)
         SetRecordingVolume(chanfd); // we don't care if this fails...
 
     if (!SetV4L2DeviceOptions(chanfd))
+    {
+        close(chanfd);
+        chanfd = -1;
         return false;
+    }
 
     SetVBIOptions(chanfd); // we don't care if this fails...
 
@@ -451,7 +455,7 @@ bool MpegRecorder::OpenV4L2DeviceAsInput(void)
     if (!_device_read_buffer)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to allocate DRB buffer");
-        _error = true;
+        _error = "Failed to allocate DRB buffer";
         close(chanfd);
         chanfd = -1;
         close(readfd);
@@ -461,8 +465,8 @@ bool MpegRecorder::OpenV4L2DeviceAsInput(void)
 
     if (!_device_read_buffer->Setup(vdevice.constData(), readfd))
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to allocate DRB buffer");
-        _error = true;
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to setup DRB buffer");
+        _error = "Failed to setup DRB buffer";
         close(chanfd);
         chanfd = -1;
         close(readfd);
@@ -902,7 +906,8 @@ void MpegRecorder::run(void)
 {
     if (!Open())
     {
-        _error = "Failed to open V4L device";
+        if (_error.isEmpty())
+            _error = "Failed to open V4L device";
         return;
     }
 
@@ -967,7 +972,7 @@ void MpegRecorder::run(void)
         if (!StartEncoding(readfd))
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to start recording");
-            _error = true;
+            _error = "Failed to start recording";
         }
         else
             _device_read_buffer->Start();
@@ -1006,7 +1011,7 @@ void MpegRecorder::run(void)
             {
                 if (!Open())
                 {
-                    _error = true;
+                    _error = "Failed to open device";
                     break;
                 }
 
@@ -1036,7 +1041,7 @@ void MpegRecorder::run(void)
                      IsRecordingRequested())
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC + "Device EOF detected");
-                _error = true;
+                _error = "Device EOF detected";
             }
         }
         else
@@ -1333,7 +1338,8 @@ bool MpegRecorder::StartEncoding(int fd)
 
     LOG(VB_RECORD, LOG_INFO, LOC + "StartEncoding");
 
-    if (ioctl(fd, VIDIOC_ENCODER_CMD, &command) == 0)
+    bool started = 0 == ioctl(fd, VIDIOC_ENCODER_CMD, &command);
+    if (started)
     {
         if (driver == "hdpvr")
         {
@@ -1343,20 +1349,20 @@ bool MpegRecorder::StartEncoding(int fd)
         }
 
         LOG(VB_RECORD, LOG_INFO, LOC + "Encoding started");
-        return true;
+    }
+    else if ((ENOTTY == errno) || (EINVAL == errno))
+    {
+        // Some drivers do not support this ioctl at all.  It is marked as
+        // "experimental" in the V4L2 API spec. These drivers return EINVAL
+        // in older kernels and ENOTTY in 3.1+
+        started = true;
+    }
+    else
+    {
+        LOG(VB_GENERAL, LOG_WARNING, LOC + "StartEncoding failed" + ENO);
     }
 
-    // Some drivers do not support this ioctl at all.  It is marked as
-    // "experimental" in the V4L2 API spec.  If we fail with EINVAL (which
-    // happens if the ioctl isn't supported), treat it as a success, but
-    // put a warning in the logs.  This should keep any driver without this
-    // support (such as saa7164) recording without affecting those that do
-    // use it.
-    if (errno == EINVAL)
-        return true;
-
-    LOG(VB_GENERAL, LOG_WARNING, LOC + "StartEncoding failed" + ENO);
-    return false;
+    return started;
 }
 
 bool MpegRecorder::StopEncoding(int fd)
@@ -1370,23 +1376,24 @@ bool MpegRecorder::StopEncoding(int fd)
 
     LOG(VB_RECORD, LOG_INFO, LOC + "StopEncoding");
 
-    if (ioctl(fd, VIDIOC_ENCODER_CMD, &command) == 0)
+    bool stopped = 0 == ioctl(fd, VIDIOC_ENCODER_CMD, &command);
+    if (stopped)
     {
         LOG(VB_RECORD, LOG_INFO, LOC + "Encoding stopped");
-        return true;
+    }
+    else if ((ENOTTY == errno) || (EINVAL == errno))
+    {
+        // Some drivers do not support this ioctl at all.  It is marked as
+        // "experimental" in the V4L2 API spec. These drivers return EINVAL
+        // in older kernels and ENOTTY in 3.1+
+        stopped = true;
+    }
+    else
+    {
+        LOG(VB_GENERAL, LOG_WARNING, LOC + "StopEncoding failed" + ENO);
     }
 
-    // Some drivers do not support this ioctl at all.  It is marked as
-    // "experimental" in the V4L2 API spec.  If we fail with EINVAL (which
-    // happens if the ioctl isn't supported), treat it as a success, but
-    // put a warning in the logs.  This should keep any driver without this
-    // support (such as saa7164) recording without affecting those that do
-    // use it.
-    if (errno == EINVAL)
-        return true;
-
-    LOG(VB_GENERAL, LOG_WARNING, LOC + "StopEncoding failed" + ENO);
-    return false;
+    return stopped;
 }
 
 void MpegRecorder::SetStreamData(void)

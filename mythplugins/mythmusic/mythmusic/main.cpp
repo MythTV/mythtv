@@ -255,31 +255,56 @@ static void startRipper(void)
 
 static void runScan(void)
 {
-    if ("" != gMusicData->musicDir)
+    // maybe we haven't loaded the music yet in which case we wont have a valid music dir set
+    if (gMusicData->musicDir.isEmpty())
     {
-        FileScanner *fscan = new FileScanner();
-        fscan->SearchDir(gMusicData->musicDir);
+        QString startdir = gCoreContext->GetSetting("MusicLocation");
+        startdir = QDir::cleanPath(startdir);
+        if (!startdir.isEmpty() && !startdir.endsWith("/"))
+            startdir += "/";
 
-        // save anything that may have changed
-        if (gMusicData->all_music && gMusicData->all_music->cleanOutThreads())
-            gMusicData->all_music->save();
-
-        if (gMusicData->all_playlists && gMusicData->all_playlists->cleanOutThreads())
-        {
-            gMusicData->all_playlists->save();
-            int x = gMusicData->all_playlists->getPending();
-            SavePending(x);
-        }
-
-        // force a complete reload of the tracks and playlists
-        gPlayer->stop(true);
-        delete gMusicData;
-
-        gMusicData = new MusicData;
-        loadMusic();
-
-        delete fscan;
+        gMusicData->musicDir = startdir;
     }
+
+    // if we still don't have a valid start dir warn the user and give up
+    if (gMusicData->musicDir.isEmpty())
+    {
+        ShowOkPopup(QObject::tr("You need to tell me where to find your music on the "
+                                "'General Settings' page of MythMusic's settings pages."));
+       return;
+    }
+
+    if (!QFile::exists(gMusicData->musicDir))
+    {
+        ShowOkPopup(QObject::tr("Can't find your music directory. Have you set it correctly on the "
+                                "'General Settings' page of MythMusic's settings pages?"));
+       return;
+    }
+
+    LOG(VB_GENERAL, LOG_INFO, QString("Scanning '%1' for music files").arg(gMusicData->musicDir));
+
+    FileScanner *fscan = new FileScanner();
+    fscan->SearchDir(gMusicData->musicDir);
+
+    // save anything that may have changed
+    if (gMusicData->all_music && gMusicData->all_music->cleanOutThreads())
+        gMusicData->all_music->save();
+
+    if (gMusicData->all_playlists && gMusicData->all_playlists->cleanOutThreads())
+    {
+        gMusicData->all_playlists->save();
+        int x = gMusicData->all_playlists->getPending();
+        SavePending(x);
+    }
+
+    // force a complete reload of the tracks and playlists
+    gPlayer->stop(true);
+    delete gMusicData;
+
+    gMusicData = new MusicData;
+    loadMusic();
+
+    delete fscan;
 }
 
 static void startImport(void)

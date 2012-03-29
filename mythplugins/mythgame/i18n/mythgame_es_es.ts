@@ -230,6 +230,26 @@ Remove it from the database?</source>
         <translation>Orden en el que mostrar los juegos marcados como favoritos - esto es válido para todos los sistemas. Opciones posibles: sistema, año, género y nombre</translation>
     </message>
     <message>
+        <location filename="../mythgame/gamesettings.cpp" line="49"/>
+        <source>Enabling this causes a game scan to gather CRC values and attempt to find out more detailed information about the game: NOTE this can greatly increase the time a game scan takes based on the amount of games scanned.</source>
+        <translation>Activarlo hace que la búsqueda de juegos recopile los valores CRC e intente obtener información más detallada sobre el juego: NOTA, esto puede incrementar mucho el tiempo de exploración, dependiendo de la cantidad de juegos analizados.</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamesettings.cpp" line="58"/>
+        <source>Prompt for removal of deleted ROM(s)</source>
+        <translation>Preguntar por la eliminación de ROM(s) borradas</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamesettings.cpp" line="59"/>
+        <source>This enables a prompt for removing deleted ROMs from the database during a  game scan</source>
+        <translation>Esto hará que se solicite la eliminación de la base de datos de las ROMs borradas durante la búsqueda de juegos</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamesettings.cpp" line="70"/>
+        <source>Enabling this causes the filenames to be displayed in the game tree rather than the trimmed/looked up game name</source>
+        <translation>Activarlo hace que los nombres de archivo se muestren en el árbol de juegos en vez del nombre recortado/buscado del juego</translation>
+    </message>
+    <message>
         <location filename="../mythgame/gamesettings.cpp" line="116"/>
         <source>MythGame Settings -- General</source>
         <translation>Configuración de MythGame -- General</translation>
@@ -260,34 +280,9 @@ Remove it from the database?</source>
         <translation>Búsqueda Intensiva de Juegos</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamesettings.cpp" line="49"/>
-        <source>Enabling this causes a game scan to gather crc values and attempt to find out more detailed information about the game: NOTE this can greatly increase the time a gamescan takes based on the amount of games scanned.</source>
-        <translation>Activarlo hace que la búsqueda de juegos recopile los valores CRC e intente obtener información más detallada sobre el juego: NOTA, esto puede incrementar mucho el tiempo de exploración, dependiendo de la cantidad de juegos analizados.</translation>
-    </message>
-    <message>
-        <location filename="../mythgame/gamesettings.cpp" line="58"/>
-        <source>Prompt for removal of deleted rom(s)</source>
-        <translation>Preguntar por la eliminación de rom(s) borradas</translation>
-    </message>
-    <message>
-        <location filename="../mythgame/gamesettings.cpp" line="59"/>
-        <source>This enables a prompt for removing deleted roms from the database during a  gamescan</source>
-        <translation>En una búsqueda de juegos, esto activa la pregunta de eliminar de la base de datos las roms que hayan sido borradas</translation>
-    </message>
-    <message>
         <location filename="../mythgame/gamesettings.cpp" line="69"/>
         <source>Display Files Names in Game Tree</source>
         <translation>Mostrar Nombres de Archivo en el Árbol de Juegos</translation>
-    </message>
-    <message>
-        <location filename="../mythgame/gamesettings.cpp" line="70"/>
-        <source>Enabling this causes the filenames to be displayed in the game tree rather than the trimmed/looked up gamename</source>
-        <translation>Activarlo hace que los nombres de archivo se muestren en el árbol de juegos en vez del nombre recortado/buscado del juego</translation>
-    </message>
-    <message>
-        <location filename="../mythgame/gamesettings.cpp" line="160"/>
-        <source>Allow games to span multiple roms/disks</source>
-        <translation>Permitir que los juegos abarquen múltiples roms/discos</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="161"/>
@@ -300,9 +295,14 @@ Remove it from the database?</source>
         <translation>Orden</translation>
     </message>
     <message>
+        <location filename="../mythgame/gamesettings.cpp" line="160"/>
+        <source>Allow games to span multiple ROMs/disks</source>
+        <translation>Permitir que los juegos abarquen múltiples ROMs/discos</translation>
+    </message>
+    <message>
         <location filename="../mythgame/gamesettings.cpp" line="172"/>
-        <source>Binary and optional parameters. Multiple commands separated with &apos;;&apos; . Use %s for the rom name. %d1, %d2, %d3 and %d4 represent disks in a multidisk/game. %s auto appended if not specified</source>
-        <translation>Parámetros binarios y opcionales. Las órdenes múltiples se separan con &apos;;&apos;. Use %s para el nombre de la rom. %d1, %d2, %d3 y %d4 representan discos en un juego multidisco. %s se añadirá automáticamente si no se especifica</translation>
+        <source>Binary and optional parameters. Multiple commands separated with &apos;;&apos; . Use %s for the ROM name. %d1, %d2, %d3 and %d4 represent disks in a multidisk/game. %s auto appended if not specified</source>
+        <translation>Parámetros binarios y opcionales. Las órdenes múltiples se separan con &apos;;&apos;. Utilice %s para el nombre de la ROM. %d1, %d2, %d3 y %d4 representan discos en un juego multidisco. %s se añadirá automáticamente si no se especifica</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="182"/>
@@ -690,11 +690,16 @@ Remove it from the database?</source>
     </message>
     <message>
         <location filename="themestrings.h" line="46"/>
+        <source>Favorite</source>
+        <translation>Favorito</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="47"/>
         <source>No Plot.</source>
         <translation>Sin Trama.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="54"/>
+        <location filename="themestrings.h" line="55"/>
         <source>Empty your game library</source>
         <translation>Vaciar su biblioteca de juegos</translation>
     </message>
@@ -714,37 +719,37 @@ Remove it from the database?</source>
         <translation>Juegos</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="47"/>
+        <location filename="themestrings.h" line="48"/>
         <source>General Settings</source>
         <translation>Configuración General</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="48"/>
+        <location filename="themestrings.h" line="49"/>
         <source>Game folders and general options</source>
         <translation>Carpetas de juegos y opciones generales</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="49"/>
+        <location filename="themestrings.h" line="50"/>
         <source>Game Players</source>
         <translation>Emuladores</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="50"/>
+        <location filename="themestrings.h" line="51"/>
         <source>Configure an emulator</source>
         <translation>Configurar un emulador</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="51"/>
+        <location filename="themestrings.h" line="52"/>
         <source>Scan for Games</source>
         <translation>Buscar Juegos</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="52"/>
+        <location filename="themestrings.h" line="53"/>
         <source>Add games to your library</source>
         <translation>Añadir juegos a su biblioteca</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="53"/>
+        <location filename="themestrings.h" line="54"/>
         <source>Clear Game Data</source>
         <translation>Eliminar Datos de los Juegos</translation>
     </message>

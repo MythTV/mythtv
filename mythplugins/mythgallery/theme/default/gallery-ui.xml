@@ -124,7 +124,7 @@
         <!-- Filter: labels -->
         <textarea name="filter_text" from="basetextarea">
             <area>10,107,180,34</area>
-            <value>Directory filter :</value>
+            <value>Folder filter :</value>
             <align>right,top</align>
         </textarea>
 

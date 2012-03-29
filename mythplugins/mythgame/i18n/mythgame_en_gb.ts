@@ -273,29 +273,9 @@ Remove it from the database?</translation>
         <translation>Indepth Game Scan</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamesettings.cpp" line="49"/>
-        <source>Enabling this causes a game scan to gather crc values and attempt to find out more detailed information about the game: NOTE this can greatly increase the time a gamescan takes based on the amount of games scanned.</source>
-        <translation>Enabling this causes a game scan to gather CRC values and attempt to find out more detailed information about the game: NOTE this can greatly increase the time a gamescan takes based on the number of games scanned.</translation>
-    </message>
-    <message>
-        <location filename="../mythgame/gamesettings.cpp" line="58"/>
-        <source>Prompt for removal of deleted rom(s)</source>
-        <translation>Prompt for removal of deleted ROM(s)</translation>
-    </message>
-    <message>
-        <location filename="../mythgame/gamesettings.cpp" line="59"/>
-        <source>This enables a prompt for removing deleted roms from the database during a  gamescan</source>
-        <translation>This enables a prompt for removing deleted ROMs from the database during a gamescan</translation>
-    </message>
-    <message>
         <location filename="../mythgame/gamesettings.cpp" line="69"/>
         <source>Display Files Names in Game Tree</source>
         <translation>Display Files Names in Game Tree</translation>
-    </message>
-    <message>
-        <location filename="../mythgame/gamesettings.cpp" line="70"/>
-        <source>Enabling this causes the filenames to be displayed in the game tree rather than the trimmed/looked up gamename</source>
-        <translation>Enabling this causes the filenames to be displayed in the game tree rather than the trimmed/looked up game name</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="77"/>
@@ -343,11 +323,6 @@ Remove it from the database?</translation>
         <translation>MythGame Settings (General)</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamesettings.cpp" line="160"/>
-        <source>Allow games to span multiple roms/disks</source>
-        <translation>Allow games to span multiple ROMs/disks</translation>
-    </message>
-    <message>
         <location filename="../mythgame/gamesettings.cpp" line="161"/>
         <source>This setting means that we will look for items like game.1.rom, game.2.rom and consider them a single game.</source>
         <translation>This setting means that we will look for items like game.1.rom, game.2.rom and consider them a single game.</translation>
@@ -356,11 +331,6 @@ Remove it from the database?</translation>
         <location filename="../mythgame/gamesettings.cpp" line="171"/>
         <source>Command</source>
         <translation>Command</translation>
-    </message>
-    <message>
-        <location filename="../mythgame/gamesettings.cpp" line="172"/>
-        <source>Binary and optional parameters. Multiple commands separated with &apos;;&apos; . Use %s for the rom name. %d1, %d2, %d3 and %d4 represent disks in a multidisk/game. %s auto appended if not specified</source>
-        <translation>Binary and optional parameters. Multiple commands separated with &apos;;&apos; . Use %s for the rom name. %d1, %d2, %d3 and %d4 represent disks in a multidisk/game. %s auto appended if not specified</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="198"/>
@@ -386,6 +356,36 @@ Remove it from the database?</translation>
         <location filename="../mythgame/gamesettings.cpp" line="38"/>
         <source>Order in which to sort the games marked as favorites - this is for all systems. Available choices: system, year, genre and gamename</source>
         <translation>Order in which to sort the games marked as favourites - this is for all systems. Available choices: system, year, genre and gamename</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamesettings.cpp" line="49"/>
+        <source>Enabling this causes a game scan to gather CRC values and attempt to find out more detailed information about the game: NOTE this can greatly increase the time a game scan takes based on the amount of games scanned.</source>
+        <translation>Enabling this causes a game scan to gather CRC values and attempt to find out more detailed information about the game: NOTE this can greatly increase the time a game scan takes based on the amount of games scanned.</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamesettings.cpp" line="58"/>
+        <source>Prompt for removal of deleted ROM(s)</source>
+        <translation>Prompt for removal of deleted ROM(s)</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamesettings.cpp" line="59"/>
+        <source>This enables a prompt for removing deleted ROMs from the database during a  game scan</source>
+        <translation>This enables a prompt for removing deleted ROMs from the database during a game scan</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamesettings.cpp" line="70"/>
+        <source>Enabling this causes the filenames to be displayed in the game tree rather than the trimmed/looked up game name</source>
+        <translation>Enabling this causes the filenames to be displayed in the game tree, rather than the trimmed/looked-up game name</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamesettings.cpp" line="160"/>
+        <source>Allow games to span multiple ROMs/disks</source>
+        <translation>Allow games to span multiple ROMs/disks</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamesettings.cpp" line="172"/>
+        <source>Binary and optional parameters. Multiple commands separated with &apos;;&apos; . Use %s for the ROM name. %d1, %d2, %d3 and %d4 represent disks in a multidisk/game. %s auto appended if not specified</source>
+        <translation>Binary and optional parameters. Multiple commands separated with &apos;;&apos; . Use %s for the ROM name. %d1, %d2, %d3 and %d4 represent disks in a multidisk/game. %s auto appended if not specified</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="188"/>
@@ -702,46 +702,51 @@ Remove it from the database?</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="46"/>
+        <source>Favorite</source>
+        <translation>Favourite</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="47"/>
         <source>No Plot.</source>
         <translation>No Plot.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="47"/>
+        <location filename="themestrings.h" line="48"/>
         <source>General Settings</source>
         <translation>General Settings</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="48"/>
+        <location filename="themestrings.h" line="49"/>
         <source>Game folders and general options</source>
         <translation>Game folders and general options</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="49"/>
+        <location filename="themestrings.h" line="50"/>
         <source>Game Players</source>
         <translation>Game Players</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="50"/>
+        <location filename="themestrings.h" line="51"/>
         <source>Configure an emulator</source>
         <translation>Configure an emulator</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="51"/>
+        <location filename="themestrings.h" line="52"/>
         <source>Scan for Games</source>
         <translation>Scan for Games</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="52"/>
+        <location filename="themestrings.h" line="53"/>
         <source>Add games to your library</source>
         <translation>Add games to your library</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="53"/>
+        <location filename="themestrings.h" line="54"/>
         <source>Clear Game Data</source>
         <translation>Clear Game Data</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="54"/>
+        <location filename="themestrings.h" line="55"/>
         <source>Empty your game library</source>
         <translation>Empty your game library</translation>
     </message>

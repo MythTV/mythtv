@@ -93,7 +93,7 @@
         <webbrowser name="webbrowser">
             <area>20,20,1240,600</area>
             <zoom>1.0</zoom>
-            <background color="black" alpha="1" />
+            <background color="#000000" alpha="1" />
         </webbrowser>
 
         <button name="done" from="basebutton">
@@ -330,7 +330,7 @@
     <window name="visualizerview">
 
         <video name="visualizer">
-            <area>0,0,1280,720,</area>
+            <area>0,0,1280,720</area>
         </video>
 
     </window>
@@ -1551,7 +1551,7 @@
             <area>15,180,1250,320</area>
             <fill color="#000000" alpha="50" />
         </shape>
- 
+
         <textarea name="matchlbl"  from="categorylbl">
             <position>20,200</position>
             <value>Match</value>

@@ -37,7 +37,7 @@ VideoSetupWizard::VideoSetupWizard(MythScreenStack *parent,
 {
     m_popupStack = GetMythMainWindow()->GetStack("popup stack");
     m_vdp = new VideoDisplayProfile();
-    m_audioScreen->Hide();
+
     gCoreContext->addListener(this);
 }
 
@@ -99,14 +99,6 @@ VideoSetupWizard::~VideoSetupWizard()
     gCoreContext->removeListener(this);
 }
 
-void VideoSetupWizard::Close()
-{
-    if (m_audioScreen)
-        m_audioScreen->Show();
-
-    MythScreenType::Close();
-}
-
 void VideoSetupWizard::loadData(void)
 {
     QStringList profiles = m_vdp->GetProfiles(gCoreContext->GetHostName());
@@ -156,8 +148,6 @@ void VideoSetupWizard::save(void)
 
 void VideoSetupWizard::slotPrevious(void)
 {
-    if (m_audioScreen)
-        m_audioScreen->Show();
     Close();
 }
 

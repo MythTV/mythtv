@@ -26,7 +26,6 @@
             <layout>horizontal</layout>
             <buttonarea>0,0,100%,100%</buttonarea>
             <statetype name="buttonitem">
-                <buttonarea>0,0,100%,100%</buttonarea>
                 <state name="inactive">
                     <!-- Use full width for a single button -->
                     <area>0,0,100%,100%</area>

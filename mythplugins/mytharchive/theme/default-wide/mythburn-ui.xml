@@ -362,12 +362,11 @@ MythArchive GUI theme
       *******************************************************************
   -->
 
-  <window name="edit_metadata">
+    <window name="edit_metadata">
 
-        <textarea name="title" from="basetextarea">
-            <area>0,15,800,50</area>
+        <textarea name="screentitle">
+            <area>15,5,800,50</area>
             <font>baselarge</font>
-            <align>allcenter</align>
             <value>Archive Item Details</value>
         </textarea>
 
@@ -376,29 +375,29 @@ MythArchive GUI theme
         -->
 
         <textarea name="title_label" from="basetextarea">
-            <area>45,70,170,50</area>
-            <font>basesmallyellow</font>
+            <area>45,70,370,50</area>
+            <font>basesmall</font>
             <align>right,vcenter</align>
             <value>Title:</value>
         </textarea>
 
         <textarea name="subtitle_label" from="title_label">
-            <area>45,135,170,50</area>
+            <area>45,135,370,50</area>
             <value>Subtitle:</value>
         </textarea>
 
         <textarea name="startdate_label" from="title_label">
-            <area>45,200,170,50</area>
+            <area>45,200,370,50</area>
             <value>Start Date:</value>
         </textarea>
 
         <textarea name="starttime_label" from="title_label">
-            <area>45,265,170,50</area>
+            <area>45,265,370,50</area>
             <value>Time:</value>
         </textarea>
 
         <textarea name="description_label" from="title_label">
-            <area>45,330,170,50</area>
+            <area>45,330,370,50</area>
             <value>Description:</value>
         </textarea>
 
@@ -407,40 +406,40 @@ MythArchive GUI theme
         -->
 
         <textedit name="title_edit" from="basetextedit">
-            <position>225,70</position>
+            <area>425,70,600,50</area>
         </textedit>
 
         <textedit name="subtitle_edit" from="basetextedit">
-            <position>225,135</position>
+            <area>425,135,600,50</area>
         </textedit>
 
         <textedit name="startdate_edit" from="basetextedit">
-            <position>225,200</position>
+            <position>425,200</position>
         </textedit>
 
         <textedit name="starttime_edit" from="basetextedit">
-            <position>225,265</position>
+            <position>425,265</position>
         </textedit>
 
-        <textedit name="description_edit" from="basetextedit">
-            <position>225,330</position>
+        <textedit name="description_edit" from="basemultilinetextedit">
+            <area>425,330,600,300</area>
         </textedit>
 
         <!--
             Push buttons
         -->
         <button name="ok_button" from="basebutton">
-            <position>250,540</position>
+            <position>480,650</position>
             <value>OK</value>
         </button>
 
         <button name="cancel_button" from="basebutton">
-            <position>450,540</position>
+            <position>650,650</position>
             <value>Cancel</value>
         </button>
     </window>
 
-  <window name="thumbfinder">
+    <window name="thumbfinder">
 
         <textarea name="title" from="basetextarea">
             <area>0,10,800,45</area>

@@ -38,6 +38,13 @@ void strings_null() {
     ThemeUI::tr("Monitor 2");
     ThemeUI::tr("Monitor 3");
     ThemeUI::tr("Monitor 4");
+    ThemeUI::tr("[R] = Running\n[S] = Stopped");
+    ThemeUI::tr("Select Camera:");
+    ThemeUI::tr("Select Date:");
+    ThemeUI::tr("Test");
+    ThemeUI::tr("Record");
+    ThemeUI::tr("Cancel");
+    ThemeUI::tr("Store");
     ThemeUI::tr("[x]");
     ThemeUI::tr("Show Console");
     ThemeUI::tr("Show Live View");

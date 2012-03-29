@@ -22,7 +22,7 @@ for search and retrieval of text metadata and image URLs from TMDB.
 Preliminary API specifications can be found at
 http://help.themoviedb.org/kb/api/about-3"""
 
-__version__="v0.3.4"
+__version__="v0.4.1"
 # 0.1.0 Initial development
 # 0.2.0 Add caching mechanism for API queries
 # 0.2.1 Temporary work around for broken search paging
@@ -31,9 +31,16 @@ __version__="v0.3.4"
 # 0.3.2 Remove MythTV key from results.py
 # 0.3.3 Add functional language support
 # 0.3.4 Re-enable search paging
+# 0.3.5 Add methods for grabbing current, popular, and top rated movies
+# 0.3.6 Rework paging mechanism
+# 0.3.7 Generalize caching mechanism, and allow controllability
+# 0.4.0 Add full locale support (language and country) and optional fall through
+# 0.4.1 Add custom classmethod for dealing with IMDB movie IDs
 
 from request import set_key, Request
-from util import PagedList, Datapoint, Datalist, Datadict, Element
+from util import Datapoint, Datalist, Datadict, Element
+from pager import PagedRequest
+from locales import get_locale, set_locale
 from tmdb_exceptions import *
 
 import json
@@ -49,54 +56,38 @@ class Configuration( Element ):
         return Request('configuration')
 Configuration = Configuration()
 
-def searchMovie(query, language='en', adult=False):
-    return MovieSearchResults(
+def searchMovie(query, locale=None, adult=False):
+    return MovieSearchResult(
                     Request('search/movie', query=query, include_adult=adult),
-                    language=language)
+                    locale=locale)
 
-class MovieSearchResults( PagedList ):
+class MovieSearchResult( PagedRequest ):
     """Stores a list of search matches."""
-    def _process(self, data):
-        for item in data['results']:
-            yield Movie(raw=item, language=self.language)
-
-    def _getpage(self, page):
-        self.request = self.request.new(page=page)
-        return list(self._process(self.request.readJSON()))
-
-    def __init__(self, request, language=None):
-        self.language=language
-        if language:
-            self.request = request.new(language=language)
-        res = self.request.readJSON()
-        super(MovieSearchResults, self).__init__(res, res['total_results'], 20)
-
+    def __init__(self, request, locale=None):
+        if locale is None:
+            locale = get_locale()
+        super(MovieSearchResult, self).__init__(
+                                request.new(language=locale.language),
+                                lambda x: Movie(raw=x, locale=locale))
+    
     def __repr__(self):
-        return u"<Search Results: {0}>".format(self.request._kwargs['query'])
+        return u"<Search Results: {0}>".format(self._request._kwargs['query'])
 
 def searchPerson(query):
-    return PeopleSearchResults(Request('search/person', query=query))
+    return PeopleSearchResult(Request('search/person', query=query))
 
-class PeopleSearchResults( PagedList ):
-    @staticmethod
-    def _process(data):
-        for item in data['results']:
-            yield Person(raw=item)
-
-    def _getpage(self, page):
-        self.request = self.request.new(page=page)
-        return list(self._process(self.request.readJSON()))
-
+class PeopleSearchResult( PagedRequest ):
+    """Stores a list of search matches."""
     def __init__(self, request):
-        self.request = request
-        res = self.request.readJSON()
-        super(PeopleSearchResults, self).__init__(res, res['total_results'], 20)
+        super(PeopleSearchResults, self).__init__(request,
+                                lambda x: Person(raw=x))
 
     def __repr__(self):
         return u"<Search Results: {0}>".format(self.request._kwargs['query'])
 
 class Image( Element ):
-    filename        = Datapoint('file_path', initarg=1, handler=lambda x: x.lstrip('/'))
+    filename        = Datapoint('file_path', initarg=1,
+                                handler=lambda x: x.lstrip('/'))
     aspectratio     = Datapoint('aspect_ratio')
     height          = Datapoint('height')
     width           = Datapoint('width')
@@ -147,7 +138,7 @@ class Person( Element ):
     def _populate(self):
         return Request('person/{0}'.format(self.id))
     def _populate_credits(self):
-        return Request('person/{0}/credits'.format(self.id), language=self._lang)
+        return Request('person/{0}/credits'.format(self.id), language=self._locale.language)
     def _populate_images(self):
         return Request('person/{0}/images'.format(self.id))
 
@@ -230,6 +221,33 @@ class Movie( Element ):
         req.lifetime = 600
         return cls(raw=req.readJSON())
 
+    @classmethod
+    def nowplaying(cls, locale=None):
+        return MovieSearchResult(Request('movie/now-playing'), locale=locale)
+
+    @classmethod
+    def mostpopular(cls, locale=None):
+        return MovieSearchResult(Request('movie/popular'), locale=locale)
+
+    @classmethod
+    def toprated(cls, locale=None):
+        return MovieSearchResult(Request('movie/top-rated'), locale=locale)
+
+    @classmethod
+    def fromIMDB(cls, imdbid, locale=None):
+        try:
+            # assume string
+            if not imdbid.startswith('tt'):
+                imdbid = "tt{0:0>7}".format(imdbid)
+        except AttributeError:
+            # assume integer
+            imdbid = "tt{0:0>7}".format(imdbid)
+        if locale is None:
+            locale = get_locale()
+        movie = cls(imdbid, locale=locale)
+        movie._populate()
+        return movie
+
     id              = Datapoint('id', initarg=1)
     title           = Datapoint('title')
     originaltitle   = Datapoint('original_title')
@@ -239,7 +257,7 @@ class Movie( Element ):
     budget          = Datapoint('budget')
     revenue         = Datapoint('revenue')
     releasedate     = Datapoint('release_date', handler=lambda x: \
-                                         datetime.datetime.strptime(x, '%Y-%m-%d'))
+                                datetime.datetime.strptime(x, '%Y-%m-%d'))
     homepage        = Datapoint('homepage')
     imdb            = Datapoint('imdb_id')
 
@@ -251,26 +269,27 @@ class Movie( Element ):
     votes           = Datapoint('vote_count')
 
     adult       = Datapoint('adult')
-    collection  = Datapoint('belongs_to_collection', handler=lambda x: Collection(raw=x))
+    collection  = Datapoint('belongs_to_collection', handler=lambda x: \
+                                                        Collection(raw=x))
     genres      = Datalist('genres', handler=Genre)
     studios     = Datalist('production_companies', handler=Studio)
     countries   = Datalist('production_countries', handler=Country)
     languages   = Datalist('spoken_languages', handler=Language)
 
     def _populate(self):
-        return Request('movie/{0}'.format(self.id), language=self._lang)
+        return Request('movie/{0}'.format(self.id), language=self._locale.language)
     def _populate_titles(self):
-        return Request('movie/{0}/alternative_titles'.format(self.id))
+        return Request('movie/{0}/alternative_titles'.format(self.id), country=self._locale.country)
     def _populate_cast(self):
         return Request('movie/{0}/casts'.format(self.id))
     def _populate_images(self):
-        return Request('movie/{0}/images'.format(self.id), language=self._lang)
+        return Request('movie/{0}/images'.format(self.id), language=self._locale.language)
     def _populate_keywords(self):
         return Request('movie/{0}/keywords'.format(self.id))
     def _populate_releases(self):
         return Request('movie/{0}/releases'.format(self.id))
     def _populate_trailers(self):
-        return Request('movie/{0}/trailers'.format(self.id), language=self._lang)
+        return Request('movie/{0}/trailers'.format(self.id), language=self._locale.language)
     def _populate_translations(self):
         return Request('movie/{0}/translations'.format(self.id))
 
@@ -333,7 +352,7 @@ class Collection( Element ):
     members  = Datalist('parts', handler=Movie, sort='releasedate')
 
     def _populate(self):
-        return Request('collection/{0}'.format(self.id), language=self._lang)
+        return Request('collection/{0}'.format(self.id), language=self._locale.language)
 
     def __repr__(self):
         return u"<{0.__class__.__name__} '{0.name}'>".format(self).encode('utf-8')

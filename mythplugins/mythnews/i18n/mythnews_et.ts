@@ -124,34 +124,34 @@
 <context>
     <name>NewsSite</name>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="218"/>
+        <location filename="../mythnews/newssite.cpp" line="226"/>
         <source>Retrieve Failed. </source>
         <translation>Tõmbamine ebaõnnestus. </translation>
     </message>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="225"/>
-        <location filename="../mythnews/newssite.cpp" line="234"/>
-        <location filename="../mythnews/newssite.cpp" line="243"/>
+        <location filename="../mythnews/newssite.cpp" line="233"/>
+        <location filename="../mythnews/newssite.cpp" line="242"/>
+        <location filename="../mythnews/newssite.cpp" line="251"/>
         <source>Failed to retrieve news</source>
         <translation>Uudiste tõmbamine ebaõnnestus</translation>
     </message>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="226"/>
+        <location filename="../mythnews/newssite.cpp" line="234"/>
         <source>No Cached News.</source>
         <translation>Puhverdatud uudiseid pole.</translation>
     </message>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="245"/>
+        <location filename="../mythnews/newssite.cpp" line="253"/>
         <source>Failed to read downloaded file.</source>
         <translation>Viga alla laaditud faili lugemisel.</translation>
     </message>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="253"/>
+        <location filename="../mythnews/newssite.cpp" line="261"/>
         <source>Showing Cached News.</source>
         <translation>Näitan puhverdatud uudiseid.</translation>
     </message>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="274"/>
+        <location filename="../mythnews/newssite.cpp" line="282"/>
         <source>XML-file is not valid RSS-feed</source>
         <translation>XML-fail pole korrektne RSS-voog</translation>
     </message>
@@ -167,17 +167,17 @@
 <context>
     <name>ThemeUI</name>
     <message>
-        <location filename="themestrings.h" line="8"/>
+        <location filename="themestrings.h" line="9"/>
         <source>%DATE%, %TIME%</source>
         <translation>%DATE%, %TIME%</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="9"/>
+        <location filename="themestrings.h" line="10"/>
         <source>Edit RSS News Feeds</source>
         <translation>Muuda RSS uudisvoogusid</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="10"/>
+        <location filename="themestrings.h" line="11"/>
         <source>You can edit the name, URL, and icon path for the selected RSS Feed on this screen.  You can also designate the item as a podcast.
 
 When you have finished editing, select &quot;OK&quot; or &quot;Cancel&quot; to continue.</source>
@@ -185,32 +185,32 @@ When you have finished editing, select &quot;OK&quot; or &quot;Cancel&quot; to c
 Jätkamiseks vajuta &quot;OK&quot; või &quot;Tühista&quot;.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="11"/>
+        <location filename="themestrings.h" line="12"/>
         <source>Name:</source>
         <translation>Nimi:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="12"/>
+        <location filename="themestrings.h" line="13"/>
         <source>URL:</source>
         <translation>URL:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="13"/>
+        <location filename="themestrings.h" line="14"/>
         <source>Icon:</source>
         <translation>Ikoon:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="14"/>
+        <location filename="themestrings.h" line="15"/>
         <source>Podcast:</source>
         <translation>Podcast:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="15"/>
+        <location filename="themestrings.h" line="16"/>
         <source>Genre:</source>
         <translation>Žanr:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="16"/>
+        <location filename="themestrings.h" line="17"/>
         <source>Channel:</source>
         <translation>Kanal:</translation>
     </message>
@@ -230,17 +230,17 @@ Jätkamiseks vajuta &quot;OK&quot; või &quot;Tühista&quot;.</translation>
         <translation>OK</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="17"/>
+        <location filename="themestrings.h" line="18"/>
         <source>News Subscriptions</source>
         <translation>Tellitud uudised</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="18"/>
+        <location filename="themestrings.h" line="19"/>
         <source>Choose the news sites you would like to read.</source>
         <translation>Vali uudised mida soovid lugeda.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="20"/>
+        <location filename="themestrings.h" line="8"/>
         <source>News Settings</source>
         <translation>Uudiste seaded</translation>
     </message>
@@ -276,7 +276,7 @@ Jätkamiseks vajuta &quot;OK&quot; või &quot;Tühista&quot;.</translation>
         <translation>Tegevused</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="19"/>
+        <location filename="themestrings.h" line="20"/>
         <source>News Feeds</source>
         <translation>Uudisvood</translation>
     </message>

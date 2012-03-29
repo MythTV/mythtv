@@ -93,26 +93,7 @@ MusicPlayer::MusicPlayer(QObject *parent, const QString &dev)
     else
         setRepeatMode(REPEAT_OFF);
 
-    QString resumestring = gCoreContext->GetSetting("ResumeMode", "off");
-    if (resumestring.toLower() == "off")
-        m_resumeMode = RESUME_OFF;
-    else if (resumestring.toLower() == "track")
-        m_resumeMode = RESUME_TRACK;
-    else
-        m_resumeMode = RESUME_EXACT;
-
-    m_lastplayDelay = gCoreContext->GetNumSetting("MusicLastPlayDelay", LASTPLAY_DELAY);
-
-    m_autoShowPlayer = (gCoreContext->GetNumSetting("MusicAutoShowPlayer", 1) > 0);
-
-    //  Do we check the CD?
-    bool checkCD = gCoreContext->GetNumSetting("AutoLookupCD");
-    if (checkCD)
-    {
-        m_cdWatcher = new CDWatcherThread(m_CDdevice);
-        // don't start the cd watcher here
-        // since the playlists haven't been loaded yet
-    }
+    loadSettings();
 
     gCoreContext->addListener(this);
 }
@@ -225,6 +206,30 @@ void MusicPlayer::removeVisual(MainVisual *visual)
         }
 
         m_visualisers.remove(visual);
+    }
+}
+
+void MusicPlayer::loadSettings(void )
+{
+    QString resumestring = gCoreContext->GetSetting("ResumeMode", "off");
+    if (resumestring.toLower() == "off")
+        m_resumeMode = RESUME_OFF;
+    else if (resumestring.toLower() == "track")
+        m_resumeMode = RESUME_TRACK;
+    else
+        m_resumeMode = RESUME_EXACT;
+
+    m_lastplayDelay = gCoreContext->GetNumSetting("MusicLastPlayDelay", LASTPLAY_DELAY);
+
+    m_autoShowPlayer = (gCoreContext->GetNumSetting("MusicAutoShowPlayer", 1) > 0);
+
+    //  Do we check the CD?
+    bool checkCD = gCoreContext->GetNumSetting("AutoLookupCD");
+    if (checkCD)
+    {
+        m_cdWatcher = new CDWatcherThread(m_CDdevice);
+        // don't start the cd watcher here
+        // since the playlists haven't been loaded yet
     }
 }
 
@@ -705,10 +710,12 @@ void MusicPlayer::customEvent(QEvent *event)
         {
             QString startdir = gCoreContext->GetSetting("MusicLocation");
             startdir = QDir::cleanPath(startdir);
-            if (!startdir.endsWith("/"))
+            if (!startdir.isEmpty() && !startdir.endsWith("/"))
                 startdir += "/";
 
             gMusicData->musicDir = startdir;
+
+            loadSettings();
         }
     }
 
@@ -899,16 +906,20 @@ void MusicPlayer::restorePosition(void)
     uint trackID = 0;
 
     if (gPlayer->getResumeMode() > MusicPlayer::RESUME_OFF)
+    {
         trackID = gCoreContext->GetNumSetting("MusicBookmark", 0);
 
-    for (int x = 0; x < m_currentPlaylist->getSongs().size(); x++)
-    {
-        if (m_currentPlaylist->getSongs().at(x)->ID() == trackID)
+        for (int x = 0; x < m_currentPlaylist->getSongs().size(); x++)
         {
-            m_currentTrack = x;
-            m_currentMetadata = m_currentPlaylist->getSongAt(x);
+            if (m_currentPlaylist->getSongs().at(x)->ID() == trackID)
+            {
+                m_currentTrack = x;
+                break;
+            }
         }
     }
+
+    m_currentMetadata = m_currentPlaylist->getSongAt(m_currentTrack);
 
     if (m_currentMetadata)
     {

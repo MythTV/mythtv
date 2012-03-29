@@ -12,29 +12,44 @@
 <context>
     <name>GalleryFilterDialog</name>
     <message>
+        <location filename="../mythgallery/galleryfilterdlg.cpp" line="145"/>
+        <source>Filter result : (unknown)</source>
+        <translation>Результат фильтрации: (неизвестно)</translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/galleryfilterdlg.cpp" line="178"/>
+        <source>-- please be patient --</source>
+        <translation>-- пожалуйста, будьте терпеливы --</translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/galleryfilterdlg.cpp" line="190"/>
+        <source>-- scanning current filter --</source>
+        <translation>-- сканируется текущий фильтр --</translation>
+    </message>
+    <message>
         <location filename="../mythgallery/galleryfilterdlg.cpp" line="205"/>
-        <source>No files / directories found</source>
+        <source>No files / folders found</source>
         <translation>Не найдено файлов/каталогов</translation>
     </message>
     <message>
         <location filename="../mythgallery/galleryfilterdlg.cpp" line="209"/>
-        <source>Filter result : %1 directories found but no files</source>
-        <translation>Результат фильтрации: найдено %1 каталогов, но ни одного файла</translation>
+        <source>Filter result : %1 folder(s) found but no files</source>
+        <translation>Результат фильтрации: найдено %1 папок, но ни одного файла</translation>
     </message>
     <message>
         <location filename="../mythgallery/galleryfilterdlg.cpp" line="213"/>
-        <source>Filter result : %1 directories, %2 movie(s) found</source>
-        <translation>Результат фильтрации: найдено %1 каталогов и %2 фильмов</translation>
+        <source>Filter result : %1 folder(s), %2 movie(s) found</source>
+        <translation>Результат фильтрации: найдено %1 папок, %2 фильмов</translation>
     </message>
     <message>
         <location filename="../mythgallery/galleryfilterdlg.cpp" line="217"/>
-        <source>Filter result : %1 directories, %2 image(s) found</source>
-        <translation>Результат фильтрации: найдено %1 каталогов и %2 изображений</translation>
+        <source>Filter result : %1 folder(s), %2 image(s) found</source>
+        <translation>Результат фильтрации: найдено %1 папок, %2 изображений</translation>
     </message>
     <message>
         <location filename="../mythgallery/galleryfilterdlg.cpp" line="221"/>
-        <source>Filter result : %1 directories, %2 image(s) and %3 movie(s) found</source>
-        <translation>Результат фильтрации: найдено %1 каталогов, %2 изображений и %3 видео</translation>
+        <source>Filter result : %1 folder(s), %2 image(s) and %3 movie(s) found</source>
+        <translation>Результат фильтрации: найдено %1 папок, %2 изображений и %3 видео</translation>
     </message>
     <message>
         <location filename="../mythgallery/galleryfilterdlg.cpp" line="226"/>
@@ -78,11 +93,6 @@
         <location filename="../mythgallery/iconview.cpp" line="970"/>
         <source>Import</source>
         <translation>Импорт</translation>
-    </message>
-    <message>
-        <location filename="../mythgallery/iconview.cpp" line="196"/>
-        <source>No images found in this directory.</source>
-        <translation>Изображения в этом каталоге не найдены.</translation>
     </message>
     <message>
         <location filename="../mythgallery/iconview.cpp" line="389"/>
@@ -162,6 +172,11 @@
         <translation>Выбрать все</translation>
     </message>
     <message>
+        <location filename="../mythgallery/iconview.cpp" line="196"/>
+        <source>No images found in this folder.</source>
+        <translation>Изображения в этом каталоге не найдены.</translation>
+    </message>
+    <message>
         <location filename="../mythgallery/iconview.cpp" line="896"/>
         <source>Meta Data Options</source>
         <translation>Параметры метаданных</translation>
@@ -193,8 +208,8 @@
     </message>
     <message>
         <location filename="../mythgallery/iconview.cpp" line="974"/>
-        <source>Create Dir</source>
-        <translation>Создать каталог</translation>
+        <source>Create folder</source>
+        <translation>Создать папку</translation>
     </message>
     <message>
         <location filename="../mythgallery/iconview.cpp" line="1027"/>
@@ -252,6 +267,11 @@
         <translation>Создать новый каталог</translation>
     </message>
     <message>
+        <location filename="../mythgallery/iconview.cpp" line="1368"/>
+        <source>Failed to rename folder</source>
+        <translation>Не удалось переименовать папку</translation>
+    </message>
+    <message>
         <location filename="../mythgallery/iconview.cpp" line="1429"/>
         <source>Moving marked images...</source>
         <translation>Переместить помеченные изображения...</translation>
@@ -266,11 +286,6 @@
         <location filename="../mythgallery/iconview.cpp" line="1342"/>
         <source>Rename</source>
         <translation>Переименовать</translation>
-    </message>
-    <message>
-        <location filename="../mythgallery/iconview.cpp" line="1368"/>
-        <source>Failed to rename directory</source>
-        <translation>Не удалось переименовать каталог</translation>
     </message>
     <message>
         <location filename="../mythgallery/iconview.cpp" line="1370"/>
@@ -742,8 +757,9 @@ Check the directory exists, is readable and the setting is correct on MythGaller
     </message>
     <message>
         <location filename="themestrings.h" line="19"/>
-        <source>Directory filter :</source>
-        <translation>Фильтр каталогов :</translation>
+        <source>Folder filter :</source>
+        <oldsource>Directory filter :</oldsource>
+        <translation>Фильтр папок :</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="20"/>
@@ -752,11 +768,6 @@ Check the directory exists, is readable and the setting is correct on MythGaller
     </message>
     <message>
         <location filename="themestrings.h" line="21"/>
-        <source>NumImages_Text</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="22"/>
         <source>Sort by :</source>
         <translation>Сортировать по:</translation>
     </message>

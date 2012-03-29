@@ -205,12 +205,12 @@ Remove it from the database?</source>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="306"/>
         <source>Edit...</source>
-        <translation>Επεξεργασία..</translation>
+        <translation>Επεξεργασία...</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="306"/>
         <source>Delete...</source>
-        <translation>Διαγραφή..</translation>
+        <translation>Διαγραφή...</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="330"/>
@@ -816,46 +816,51 @@ want to do this?</source>
     </message>
     <message>
         <location filename="themestrings.h" line="46"/>
+        <source>Favorite</source>
+        <translation>Αγαπημένο</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="47"/>
         <source>No Plot.</source>
         <translation>Χωρίς πλοκή.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="47"/>
+        <location filename="themestrings.h" line="48"/>
         <source>General Settings</source>
         <translation>Γενικές Ρυθμίσεις</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="48"/>
+        <location filename="themestrings.h" line="49"/>
         <source>Game folders and general options</source>
         <translation>Φάκελοι παιχνιδιών και γενικές επιλογές</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="49"/>
+        <location filename="themestrings.h" line="50"/>
         <source>Game Players</source>
         <translation>Συστηματα Παιχνιδιων</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="50"/>
+        <location filename="themestrings.h" line="51"/>
         <source>Configure an emulator</source>
         <translation>Ρύθμιση Προσομοιωτή</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="51"/>
+        <location filename="themestrings.h" line="52"/>
         <source>Scan for Games</source>
         <translation>Ανιχνευση για Παιχνιδια</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="52"/>
+        <location filename="themestrings.h" line="53"/>
         <source>Add games to your library</source>
         <translation>Προσθέστε παιχνίδια στη συλλογή σας</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="53"/>
+        <location filename="themestrings.h" line="54"/>
         <source>Clear Game Data</source>
         <translation>Εκκαθαριση Συλλογης</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="54"/>
+        <location filename="themestrings.h" line="55"/>
         <source>Empty your game library</source>
         <translation>Σβήνει τη συλλογή παιχνιδιών σας</translation>
     </message>

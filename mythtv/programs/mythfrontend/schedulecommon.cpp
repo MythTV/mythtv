@@ -214,7 +214,8 @@ void ScheduleCommon::ShowRecordingDialog(const RecordingInfo& recinfo)
         if (recinfo.GetRecordingStartTime() < now &&
             recinfo.GetRecordingEndTime() > now)
         {
-            if (recinfo.GetRecordingStatus() != rsRecording)
+            if (recinfo.GetRecordingStatus() != rsRecording &&
+                recinfo.GetRecordingStatus() != rsTuning)
                 menuPopup->AddButton(tr("Reactivate"),
                                      qVariantFromValue(recinfo));
             else
@@ -237,6 +238,7 @@ void ScheduleCommon::ShowRecordingDialog(const RecordingInfo& recinfo)
                     recinfo.GetDuplicateCheckMethod();
 
                 if (recinfo.GetRecordingStatus() != rsRecording &&
+                    recinfo.GetRecordingStatus() != rsTuning &&
                     recinfo.GetRecordingRuleType() != kFindOneRecord &&
                     !((recinfo.GetFindID() == 0 ||
                        !IsFindApplicable(recinfo)) &&
@@ -262,7 +264,8 @@ void ScheduleCommon::ShowRecordingDialog(const RecordingInfo& recinfo)
             if (recinfo.GetRecordingRuleType() != kOverrideRecord &&
                 recinfo.GetRecordingRuleType() != kDontRecord)
             {
-                if (recinfo.GetRecordingStatus() == rsRecording)
+                if (recinfo.GetRecordingStatus() == rsRecording ||
+                    recinfo.GetRecordingStatus() == rsTuning)
                 {
                     menuPopup->AddButton(tr("Modify Recording Options"),
                                          qVariantFromValue(recinfo));
@@ -284,7 +287,8 @@ void ScheduleCommon::ShowRecordingDialog(const RecordingInfo& recinfo)
             if (recinfo.GetRecordingRuleType() == kOverrideRecord ||
                 recinfo.GetRecordingRuleType() == kDontRecord)
             {
-                if (recinfo.GetRecordingStatus() == rsRecording)
+                if (recinfo.GetRecordingStatus() == rsRecording ||
+                    recinfo.GetRecordingStatus() == rsTuning)
                 {
                     menuPopup->AddButton(tr("Modify Recording Options"),
                                          qVariantFromValue(recinfo));

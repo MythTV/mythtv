@@ -31,12 +31,12 @@
     <name>QObject</name>
     <message>
         <location filename="../mythzoneminder/zmsettings.cpp" line="17"/>
-        <source>IP address of the mythzoneminder server</source>
+        <source>IP address of the MythZoneMinder server</source>
         <translation>IP address of the MythZoneMinder server</translation>
     </message>
     <message>
         <location filename="../mythzoneminder/zmsettings.cpp" line="19"/>
-        <source>Enter the IP address of the mythzoneminder server that this frontend should connect to.</source>
+        <source>Enter the IP address of the MythZoneMinder server that this frontend should connect to.</source>
         <translation>Enter the IP address of the MythZoneMinder server that this frontend should connect to.</translation>
     </message>
     <message>
@@ -143,7 +143,7 @@
         <translation>ZoneMinder Live Player</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="41"/>
+        <location filename="themestrings.h" line="48"/>
         <source>[x]</source>
         <translation>[x]</translation>
     </message>
@@ -273,17 +273,54 @@
         <translation>Monitor 4</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="41"/>
+        <source>[R] = Running
+[S] = Stopped</source>
+        <translation>[R] = Running
+[S] = Stopped</translation>
+    </message>
+    <message>
         <location filename="themestrings.h" line="42"/>
+        <source>Select Camera:</source>
+        <translation>Select Camera:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="43"/>
+        <source>Select Date:</source>
+        <translation>Select Date:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="44"/>
+        <source>Test</source>
+        <translation>Test</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="45"/>
+        <source>Record</source>
+        <translation>Record</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="46"/>
+        <source>Cancel</source>
+        <translation>Cancel</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="47"/>
+        <source>Store</source>
+        <translation>Store</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="49"/>
         <source>Show Console</source>
         <translation>Show Console</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="43"/>
+        <location filename="themestrings.h" line="50"/>
         <source>Show Live View</source>
         <translation>Show Live View</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="44"/>
+        <location filename="themestrings.h" line="51"/>
         <source>Show Events</source>
         <translation>Show Events</translation>
     </message>
@@ -317,50 +354,50 @@
 <context>
     <name>ZMEvents</name>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="95"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="96"/>
         <source>Play</source>
         <translation>Play</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="102"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="103"/>
         <source>Delete</source>
         <translation>Delete</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="178"/>
-        <location filename="../mythzoneminder/zmevents.cpp" line="351"/>
-        <location filename="../mythzoneminder/zmevents.cpp" line="366"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="179"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="350"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="365"/>
         <source>All Cameras</source>
         <translation>All Cameras</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="181"/>
-        <location filename="../mythzoneminder/zmevents.cpp" line="375"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="182"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="374"/>
         <source>All Dates</source>
         <translation>All Dates</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="451"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="450"/>
         <source>Refresh</source>
         <translation>Refresh</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="452"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="451"/>
         <source>Change View</source>
         <translation>Change View</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="453"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="452"/>
         <source>Delete All</source>
         <translation>Delete All</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="465"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="464"/>
         <source>Delete All Events?</source>
         <translation>Delete All Events?</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="466"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="465"/>
         <source>Deleting %1 events in this view.</source>
         <translation>Deleting %1 events in this view.</translation>
     </message>
@@ -381,29 +418,29 @@
 <context>
     <name>ZMPlayer</name>
     <message>
-        <location filename="../mythzoneminder/zmplayer.cpp" line="106"/>
-        <location filename="../mythzoneminder/zmplayer.cpp" line="288"/>
+        <location filename="../mythzoneminder/zmplayer.cpp" line="107"/>
+        <location filename="../mythzoneminder/zmplayer.cpp" line="289"/>
         <source>Pause</source>
         <translation>Pause</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmplayer.cpp" line="112"/>
+        <location filename="../mythzoneminder/zmplayer.cpp" line="113"/>
         <source>Delete</source>
         <translation>Delete</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmplayer.cpp" line="118"/>
+        <location filename="../mythzoneminder/zmplayer.cpp" line="119"/>
         <source>Previous</source>
         <translation>Previous</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmplayer.cpp" line="124"/>
+        <location filename="../mythzoneminder/zmplayer.cpp" line="125"/>
         <source>Next</source>
         <translation>Next</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmplayer.cpp" line="295"/>
-        <location filename="../mythzoneminder/zmplayer.cpp" line="374"/>
+        <location filename="../mythzoneminder/zmplayer.cpp" line="296"/>
+        <location filename="../mythzoneminder/zmplayer.cpp" line="375"/>
         <source>Play</source>
         <translation>Play</translation>
     </message>

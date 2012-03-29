@@ -148,4 +148,69 @@
 
     </window>
 
+    <window name="browserconfig">
+        <imagetype name="topbar" from="basetopbar" />
+        <textarea name="title" from="baseheading">
+            <value>Rating Settings</value>
+        </textarea>
+
+        <!--textarea name="title" from="basetextarea">
+            <font>baselarge</font>
+            <area>0,50,1280,50</area>
+            <align>allcenter</align>
+        </textarea-->
+
+        <textarea name="commandlabel" from="basetextarea">
+            <area>130,150,300,30</area>
+            <align>right,vcenter</align>
+            <value>Browser Command:</value>
+        </textarea>
+
+        <textedit name="command" from="basetextedit">
+            <position>445,140</position>
+        </textedit>
+
+        <textarea name="zoomlabel" from="commandlabel">
+            <position>130,250</position>
+            <align>right,vcenter</align>
+            <value>Text Size:</value>
+        </textarea>
+
+        <textedit name="zoom" from="basetextedit">
+            <position>445,240</position>
+        </textedit>
+
+        <textarea name="pluginlabel" from="commandlabel">
+           <position>130,350</position>
+            <value>Enable plugins:</value>
+        </textarea>
+
+        <checkbox name="enablepluginscheck" from="basecheckbox">
+            <position>445,350</position>
+        </checkbox>
+
+        <shape name="background">
+            <area>200,420,800,140</area>
+            <type>roundbox</type>
+            <fill color="#000000" alpha="70" />
+            <cornerradius>8</cornerradius>
+        </shape>
+
+        <textarea name="description" from="basetextarea">
+            <area>210,430,780,120</area>
+            <multiline>yes</multiline>
+        </textarea>
+
+        <button name="cancel" from="basebutton">
+            <position>250,620</position>
+            <value>Cancel</value>
+        </button>
+
+        <button name="ok" from="basebutton">
+            <position>880,620</position>
+            <value>OK</value>
+        </button>
+
+    </window>
+
 </mythuitheme>

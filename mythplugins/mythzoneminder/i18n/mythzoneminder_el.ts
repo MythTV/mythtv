@@ -163,6 +163,43 @@
     </message>
     <message>
         <location filename="themestrings.h" line="41"/>
+        <source>[R] = Running
+[S] = Stopped</source>
+        <translation>[R] = Ενεργό
+[S] = Σταματημένο</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="42"/>
+        <source>Select Camera:</source>
+        <translation>Επιλογή Κάμερας:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="43"/>
+        <source>Select Date:</source>
+        <translation>Επιλογή Ημερομηνίας:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="44"/>
+        <source>Test</source>
+        <translation>Δοκιμή</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="45"/>
+        <source>Record</source>
+        <translation>Εγγραφή</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="46"/>
+        <source>Cancel</source>
+        <translation>Ακύρωση</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="47"/>
+        <source>Store</source>
+        <translation>Αποθήκευση</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="48"/>
         <source>[x]</source>
         <translation>[x]</translation>
     </message>
@@ -294,17 +331,17 @@
         <translation>Οθόνη 4</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="42"/>
+        <location filename="themestrings.h" line="49"/>
         <source>Show Console</source>
         <translation>Διαχειριση</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="43"/>
+        <location filename="themestrings.h" line="50"/>
         <source>Show Live View</source>
         <translation>Ζωντανη Ληψη</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="44"/>
+        <location filename="themestrings.h" line="51"/>
         <source>Show Events</source>
         <translation>Συμβαντα</translation>
     </message>

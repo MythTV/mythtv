@@ -31,13 +31,13 @@
     <name>QObject</name>
     <message>
         <location filename="../mythzoneminder/zmsettings.cpp" line="17"/>
-        <source>IP address of the mythzoneminder server</source>
-        <translation>Dirección IP del servidor mythzoneminder</translation>
+        <source>IP address of the MythZoneMinder server</source>
+        <translation>Dirección IP del servidor MythZoneMinder</translation>
     </message>
     <message>
         <location filename="../mythzoneminder/zmsettings.cpp" line="19"/>
-        <source>Enter the IP address of the mythzoneminder server that this frontend should connect to.</source>
-        <translation>Introduzca la dirección IP del servidor mythzoneminder al que se conectará este cliente.</translation>
+        <source>Enter the IP address of the MythZoneMinder server that this frontend should connect to.</source>
+        <translation>Introduzca la dirección IP del servidor MythZoneMinder al que se conectará este cliente.</translation>
     </message>
     <message>
         <location filename="../mythzoneminder/zmsettings.cpp" line="27"/>
@@ -154,7 +154,7 @@
         <translation>Reproductor en Directo de ZoneMinder</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="41"/>
+        <location filename="themestrings.h" line="48"/>
         <source>[x]</source>
         <translation>[x]</translation>
     </message>
@@ -274,17 +274,54 @@
         <translation>Monitor 4</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="41"/>
+        <source>[R] = Running
+[S] = Stopped</source>
+        <translation>[R] = Ejecutándose
+[S] = Detenido</translation>
+    </message>
+    <message>
         <location filename="themestrings.h" line="42"/>
+        <source>Select Camera:</source>
+        <translation>Seleccionar Cámara:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="43"/>
+        <source>Select Date:</source>
+        <translation>Seleccionar Fecha:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="44"/>
+        <source>Test</source>
+        <translation>Probar</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="45"/>
+        <source>Record</source>
+        <translation>Grabar</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="46"/>
+        <source>Cancel</source>
+        <translation>Cancelar</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="47"/>
+        <source>Store</source>
+        <translation>Almacenar</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="49"/>
         <source>Show Console</source>
         <translation>Mostrar Consola</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="43"/>
+        <location filename="themestrings.h" line="50"/>
         <source>Show Live View</source>
         <translation>Mostrar Vista en Directo</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="44"/>
+        <location filename="themestrings.h" line="51"/>
         <source>Show Events</source>
         <translation>Mostrar Eventos</translation>
     </message>

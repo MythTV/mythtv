@@ -756,19 +756,26 @@ void MythSocket::Unlock(bool wake_readyread) const
 bool MythSocket::connect(const QString &host, quint16 port)
 {
     QHostAddress hadr;
-    
+
+    // attempt direct assignment
     if (!hadr.setAddress(host))
     {
-        QHostInfo info = QHostInfo::fromName(host);
-        if (!info.addresses().isEmpty())
+        // attempt internal lookup through MythCoreContext
+        if (!gCoreContext ||
+            !hadr.setAddress(gCoreContext->GetBackendServerIP(host)))
         {
-            hadr = info.addresses().first();
-        }
-        else
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC + QString("Unable to lookup: %1")
-                    .arg(host));
-            return false;
+            // attempt external lookup from hosts/DNS
+            QHostInfo info = QHostInfo::fromName(host);
+            if (!info.addresses().isEmpty())
+            {
+                hadr = info.addresses().first();
+            }
+            else
+            {
+                LOG(VB_GENERAL, LOG_ERR, LOC + QString("Unable to lookup: %1")
+                        .arg(host));
+                return false;
+            }
         }
     }
 
