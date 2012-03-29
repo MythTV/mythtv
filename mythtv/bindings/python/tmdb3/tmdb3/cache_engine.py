@@ -15,6 +15,8 @@ class Engines( object ):
         self._engines[engine.name] = engine
     def __getitem__(self, key):
         return self._engines[key]
+    def __contains__(self, key):
+        return self._engines.__contains__(key)
 Engines = Engines()
 
 class CacheEngineType( type ):
