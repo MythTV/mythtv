@@ -1961,7 +1961,8 @@ NULL
  * command to get the initial data:
  *
  * mysqldump --skip-comments --skip-opt --compact --skip-quote-names -t \
- *     mythconverg | sed -e 's/^.*$/"&",/' -e 's#\\#\\\\#g'
+ *           --ignore-table=mythconverg.logging mythconverg |
+ *   sed -e 's/^.*$/"&",/' -e 's#\\#\\\\#g'
  *
  * don't forget to delete host specific data
  *
@@ -2030,12 +2031,16 @@ bool InitializeMythSchema(void)
 "  sourceid int(10) unsigned NOT NULL DEFAULT '0',"
 "  inputname varchar(32) NOT NULL DEFAULT '',"
 "  externalcommand varchar(128) DEFAULT NULL,"
+"  changer_device varchar(128) DEFAULT NULL,"
+"  changer_model varchar(128) DEFAULT NULL,"
 "  tunechan varchar(10) DEFAULT NULL,"
 "  startchan varchar(10) DEFAULT NULL,"
 "  displayname varchar(64) NOT NULL DEFAULT '',"
 "  dishnet_eit tinyint(1) NOT NULL DEFAULT '0',"
 "  recpriority int(11) NOT NULL DEFAULT '0',"
 "  quicktune tinyint(4) NOT NULL DEFAULT '0',"
+"  schedorder int(10) unsigned NOT NULL DEFAULT '0',"
+"  livetvorder int(10) unsigned NOT NULL DEFAULT '0',"
 "  PRIMARY KEY (cardinputid)"
 ") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
 "CREATE TABLE channel ("
@@ -2418,14 +2423,46 @@ bool InitializeMythSchema(void)
 "  searchtype int(10) unsigned NOT NULL DEFAULT '3',"
 "  UNIQUE KEY phrase (phrase,searchtype)"
 ") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
+"CREATE TABLE livestream ("
+"  id int(10) unsigned NOT NULL AUTO_INCREMENT,"
+"  width int(10) unsigned NOT NULL,"
+"  height int(10) unsigned NOT NULL,"
+"  bitrate int(10) unsigned NOT NULL,"
+"  audiobitrate int(10) unsigned NOT NULL,"
+"  samplerate int(10) unsigned NOT NULL,"
+"  audioonlybitrate int(10) unsigned NOT NULL,"
+"  segmentsize int(10) unsigned NOT NULL DEFAULT '10',"
+"  maxsegments int(10) unsigned NOT NULL DEFAULT '0',"
+"  startsegment int(10) unsigned NOT NULL DEFAULT '0',"
+"  currentsegment int(10) unsigned NOT NULL DEFAULT '0',"
+"  segmentcount int(10) unsigned NOT NULL DEFAULT '0',"
+"  percentcomplete int(10) unsigned NOT NULL DEFAULT '0',"
+"  created datetime NOT NULL,"
+"  lastmodified datetime NOT NULL,"
+"  relativeurl varchar(512) NOT NULL,"
+"  fullurl varchar(1024) NOT NULL,"
+"  `status` int(10) unsigned NOT NULL DEFAULT '0',"
+"  statusmessage varchar(256) NOT NULL,"
+"  sourcefile varchar(512) NOT NULL,"
+"  sourcehost varchar(64) NOT NULL,"
+"  sourcewidth int(10) unsigned NOT NULL DEFAULT '0',"
+"  sourceheight int(10) unsigned NOT NULL DEFAULT '0',"
+"  outdir varchar(256) NOT NULL,"
+"  outbase varchar(128) NOT NULL,"
+"  PRIMARY KEY (id)"
+") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
 "CREATE TABLE logging ("
 "  id bigint(20) unsigned NOT NULL AUTO_INCREMENT,"
-"  `host` varchar(64) NOT NULL,"
-"  application varchar(64) NOT NULL,"
-"  pid int(11) NOT NULL,"
-"  thread varchar(64) NOT NULL,"
+"  `host` varchar(64) NOT NULL DEFAULT '',"
+"  application varchar(64) NOT NULL DEFAULT '',"
+"  pid int(11) NOT NULL DEFAULT '0',"
+"  tid int(11) NOT NULL DEFAULT '0',"
+"  thread varchar(64) NOT NULL DEFAULT '',"
+"  filename varchar(255) NOT NULL DEFAULT '',"
+"  line int(11) NOT NULL DEFAULT '0',"
+"  `function` varchar(255) NOT NULL DEFAULT '',"
 "  msgtime datetime NOT NULL,"
-"  `level` int(11) NOT NULL,"
+"  `level` int(11) NOT NULL DEFAULT '0',"
 "  message varchar(2048) NOT NULL,"
 "  PRIMARY KEY (id),"
 "  KEY `host` (`host`,application,pid,msgtime),"
@@ -2492,7 +2529,9 @@ bool InitializeMythSchema(void)
 "  KEY recstatus (recstatus,programid,seriesid),"
 "  KEY recstatus_2 (recstatus,title,subtitle),"
 "  KEY future (future),"
-"  KEY chanid (chanid,starttime)"
+"  KEY chanid (chanid,starttime),"
+"  KEY subtitle (subtitle),"
+"  KEY description (description(255))"
 ") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
 "CREATE TABLE people ("
 "  person mediumint(8) unsigned NOT NULL AUTO_INCREMENT,"
@@ -2530,7 +2569,7 @@ bool InitializeMythSchema(void)
 "  PRIMARY KEY (id),"
 "  UNIQUE KEY `name` (`name`,hostname),"
 "  KEY cardtype (cardtype)"
-") ENGINE=MyISAM AUTO_INCREMENT=17 DEFAULT CHARSET=utf8;",
+") ENGINE=MyISAM AUTO_INCREMENT=18 DEFAULT CHARSET=utf8;",
 "CREATE TABLE program ("
 "  chanid int(10) unsigned NOT NULL DEFAULT '0',"
 "  starttime datetime NOT NULL DEFAULT '0000-00-00 00:00:00',"
@@ -2573,7 +2612,9 @@ bool InitializeMythSchema(void)
 "  KEY program_manualid (manualid),"
 "  KEY previouslyshown (previouslyshown),"
 "  KEY programid (programid,starttime),"
-"  KEY starttime (starttime)"
+"  KEY starttime (starttime),"
+"  KEY subtitle (subtitle),"
+"  KEY description (description(255))"
 ") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
 "CREATE TABLE programgenres ("
 "  chanid int(10) unsigned NOT NULL DEFAULT '0',"
@@ -2784,7 +2825,7 @@ bool InitializeMythSchema(void)
 "  `last` tinyint(1) NOT NULL DEFAULT '0',"
 "  audioprop set('STEREO','MONO','SURROUND','DOLBY','HARDHEAR','VISUALIMPAIR') NOT NULL,"
 "  subtitletypes set('HARDHEAR','NORMAL','ONSCREEN','SIGNED') NOT NULL,"
-"  videoprop set('HDTV','WIDESCREEN','AVC','720','1080') NOT NULL,"
+"  videoprop set('HDTV','WIDESCREEN','AVC','720','1080','DAMAGED') NOT NULL,"
 "  PRIMARY KEY (chanid,starttime,manualid),"
 "  KEY endtime (endtime),"
 "  KEY title (title),"
@@ -2824,7 +2865,7 @@ bool InitializeMythSchema(void)
 "  profilegroup int(10) unsigned NOT NULL DEFAULT '0',"
 "  PRIMARY KEY (id),"
 "  KEY profilegroup (profilegroup)"
-") ENGINE=MyISAM AUTO_INCREMENT=66 DEFAULT CHARSET=utf8;",
+") ENGINE=MyISAM AUTO_INCREMENT=70 DEFAULT CHARSET=utf8;",
 "CREATE TABLE recordmatch ("
 "  recordid int(10) unsigned NOT NULL,"
 "  chanid int(10) unsigned NOT NULL,"
@@ -2834,7 +2875,7 @@ bool InitializeMythSchema(void)
 "  recduplicate tinyint(1) DEFAULT NULL,"
 "  findduplicate tinyint(1) DEFAULT NULL,"
 "  oldrecstatus int(11) DEFAULT NULL,"
-"  KEY recordid (recordid),"
+"  UNIQUE KEY recordid (recordid,chanid,starttime),"
 "  KEY chanid (chanid,starttime,manualid)"
 ") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
 "CREATE TABLE settings ("
@@ -2900,6 +2941,27 @@ bool InitializeMythSchema(void)
 "  category varchar(128) NOT NULL,"
 "  PRIMARY KEY (intid)"
 ") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
+"CREATE TABLE videocollection ("
+"  intid int(10) unsigned NOT NULL AUTO_INCREMENT,"
+"  title varchar(256) NOT NULL,"
+"  contenttype set('MOVIE','TELEVISION','ADULT','MUSICVIDEO','HOMEVIDEO') NOT NULL DEFAULT '',"
+"  plot text,"
+"  network varchar(128) DEFAULT NULL,"
+"  collectionref varchar(128) NOT NULL,"
+"  certification varchar(128) DEFAULT NULL,"
+"  genre varchar(128) DEFAULT '',"
+"  releasedate date DEFAULT NULL,"
+"  `language` varchar(10) DEFAULT NULL,"
+"  `status` varchar(64) DEFAULT NULL,"
+"  rating float DEFAULT '0',"
+"  ratingcount int(10) DEFAULT '0',"
+"  runtime smallint(5) unsigned DEFAULT '0',"
+"  banner text,"
+"  fanart text,"
+"  coverart text,"
+"  PRIMARY KEY (intid),"
+"  KEY title (title)"
+") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
 "CREATE TABLE videocountry ("
 "  intid int(10) unsigned NOT NULL AUTO_INCREMENT,"
 "  country varchar(128) NOT NULL,"
@@ -2920,11 +2982,13 @@ bool InitializeMythSchema(void)
 "  plot text,"
 "  rating varchar(128) NOT NULL,"
 "  inetref varchar(255) NOT NULL,"
+"  collectionref int(10) NOT NULL DEFAULT '-1',"
 "  homepage text NOT NULL,"
 "  `year` int(10) unsigned NOT NULL,"
 "  releasedate date NOT NULL,"
 "  userrating float NOT NULL,"
 "  length int(10) unsigned NOT NULL,"
+"  playcount int(10) NOT NULL DEFAULT '0',"
 "  season smallint(5) unsigned NOT NULL DEFAULT '0',"
 "  episode smallint(5) unsigned NOT NULL DEFAULT '0',"
 "  showlevel int(10) unsigned NOT NULL,"
@@ -2943,6 +3007,7 @@ bool InitializeMythSchema(void)
 "  banner text,"
 "  fanart text,"
 "  insertdate timestamp NULL DEFAULT CURRENT_TIMESTAMP,"
+"  contenttype set('MOVIE','TELEVISION','ADULT','MUSICVIDEO','HOMEVIDEO') NOT NULL DEFAULT '',"
 "  PRIMARY KEY (intid),"
 "  KEY director (director),"
 "  KEY title (title)"
@@ -2965,6 +3030,14 @@ bool InitializeMythSchema(void)
 "  UNIQUE KEY idvideo_2 (idvideo,idgenre),"
 "  KEY idvideo (idvideo),"
 "  KEY idgenre (idgenre)"
+") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
+"CREATE TABLE videopathinfo ("
+"  intid int(10) unsigned NOT NULL AUTO_INCREMENT,"
+"  path text,"
+"  contenttype set('MOVIE','TELEVISION','ADULT','MUSICVIDEO','HOMEVIDEO') NOT NULL DEFAULT '',"
+"  collectionref int(10) DEFAULT '0',"
+"  recurse tinyint(1) DEFAULT '0',"
+"  PRIMARY KEY (intid)"
 ") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
 "CREATE TABLE videosource ("
 "  sourceid int(10) unsigned NOT NULL AUTO_INCREMENT,"
@@ -3076,12 +3149,15 @@ bool InitializeMythSchema(void)
 "INSERT INTO profilegroups VALUES (13,'HD-PVR Recorders','HDPVR',1,NULL);",
 "INSERT INTO profilegroups VALUES (15,'ASI Recorder (DVEO)','ASI',1,NULL);",
 "INSERT INTO profilegroups VALUES (16,'OCUR Recorder (CableLabs)','OCUR',1,NULL);",
+"INSERT INTO profilegroups VALUES (17,'Ceton Recorder','CETON',1,NULL);",
 "INSERT INTO recordfilter VALUES (0,'New episode','program.previouslyshown = 0',0);",
 "INSERT INTO recordfilter VALUES (1,'Identifiable episode','program.generic = 0',0);",
 "INSERT INTO recordfilter VALUES (2,'First showing','program.first > 0',0);",
-"INSERT INTO recordfilter VALUES (3,'Primetime','HOUR(program.starttime) >= 19 AND HOUR(program.starttime) < 23',0);",
+"INSERT INTO recordfilter VALUES (3,'Prime time','HOUR(program.starttime) >= 19 AND HOUR(program.starttime) < 23',0);",
 "INSERT INTO recordfilter VALUES (4,'Commercial free','channel.commmethod = -2',0);",
 "INSERT INTO recordfilter VALUES (5,'High definition','program.hdtv > 0',0);",
+"INSERT INTO recordfilter VALUES (6,'This episode','(RECTABLE.programid <> \\'\\' AND program.programid = RECTABLE.programid) OR (RECTABLE.programid = \\'\\' AND program.subtitle = RECTABLE.subtitle AND program.description = RECTABLE.description)',0);",
+"INSERT INTO recordfilter VALUES (7,'This series','(RECTABLE.seriesid <> \\'\\' AND program.seriesid = RECTABLE.seriesid)',0);",
 "INSERT INTO recordingprofiles VALUES (1,'Default',NULL,NULL,1);",
 "INSERT INTO recordingprofiles VALUES (2,'Live TV',NULL,NULL,1);",
 "INSERT INTO recordingprofiles VALUES (3,'High Quality',NULL,NULL,1);",
@@ -3147,12 +3223,16 @@ bool InitializeMythSchema(void)
 "INSERT INTO recordingprofiles VALUES (63,'Live TV',NULL,NULL,16);",
 "INSERT INTO recordingprofiles VALUES (64,'High Quality',NULL,NULL,16);",
 "INSERT INTO recordingprofiles VALUES (65,'Low Quality',NULL,NULL,16);",
+"INSERT INTO recordingprofiles VALUES (66,'Default',NULL,NULL,17);",
+"INSERT INTO recordingprofiles VALUES (67,'Live TV',NULL,NULL,17);",
+"INSERT INTO recordingprofiles VALUES (68,'High Quality',NULL,NULL,17);",
+"INSERT INTO recordingprofiles VALUES (69,'Low Quality',NULL,NULL,17);",
 "INSERT INTO settings VALUES ('mythfilldatabaseLastRunStart','',NULL);",
 "INSERT INTO settings VALUES ('mythfilldatabaseLastRunEnd','',NULL);",
 "INSERT INTO settings VALUES ('mythfilldatabaseLastRunStatus','',NULL);",
 "INSERT INTO settings VALUES ('DataDirectMessage','',NULL);",
 "INSERT INTO settings VALUES ('HaveRepeats','0',NULL);",
-"INSERT INTO settings VALUES ('DBSchemaVer','1280',NULL);",
+"INSERT INTO settings VALUES ('DBSchemaVer','1299',NULL);",
 "INSERT INTO settings VALUES ('DefaultTranscoder','0',NULL);",
 "INSERT INTO videotypes VALUES (1,'txt','',1,0);",
 "INSERT INTO videotypes VALUES (2,'log','',1,0);",
@@ -3188,7 +3268,7 @@ NULL
 };
 
     QString dbver = "";
-    if (!performActualUpdate(updates, "1280", dbver))
+    if (!performActualUpdate(updates, "1299", dbver))
         return false;
     return true;
 }
