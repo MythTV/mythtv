@@ -63,6 +63,7 @@ def searchMovie(query, locale=None, adult=False):
 
 class MovieSearchResult( PagedRequest ):
     """Stores a list of search matches."""
+    _name = None
     def __init__(self, request, locale=None):
         if locale is None:
             locale = get_locale()
@@ -71,7 +72,8 @@ class MovieSearchResult( PagedRequest ):
                                 lambda x: Movie(raw=x, locale=locale))
     
     def __repr__(self):
-        return u"<Search Results: {0}>".format(self._request._kwargs['query'])
+        name = self._name if self._name else self._request._kwargs['query']
+        return u"<Search Results: {0}>".format(name)
 
 def searchPerson(query):
     return PeopleSearchResult(Request('search/person', query=query))
@@ -79,11 +81,11 @@ def searchPerson(query):
 class PeopleSearchResult( PagedRequest ):
     """Stores a list of search matches."""
     def __init__(self, request):
-        super(PeopleSearchResults, self).__init__(request,
+        super(PeopleSearchResult, self).__init__(request,
                                 lambda x: Person(raw=x))
 
     def __repr__(self):
-        return u"<Search Results: {0}>".format(self.request._kwargs['query'])
+        return u"<Search Results: {0}>".format(self._request._kwargs['query'])
 
 class Image( Element ):
     filename        = Datapoint('file_path', initarg=1,
@@ -151,8 +153,8 @@ class Cast( Person ):
     order       = Datapoint('order')
 
     def __repr__(self):
-        return u"<{0} '{1.name}' as '{1.character}' at {2}>".\
-                        format(self.__class__.__name__, self, hex(id(self)))
+        return u"<{0} '{1.name}' as '{1.character}'>".\
+                        format(self.__class__.__name__, self)
 
 class Crew( Person ):
     job         = Datapoint('job')
@@ -181,10 +183,36 @@ class Trailer( Element ):
     size    = Datapoint('size')
     source  = Datapoint('source')
 
+class YoutubeTrailer( Trailer ):
+    def geturl(self):
+        return "http://www.youtube.com/watch?v={0}".format(self.source)
+
+    def __repr__(self):
+        return u"<{0.__class__.__name__} '{0.name}'>".format(self)
+
+class AppleTrailer( Element ):
+    name    = Datapoint('name')
+    sources = Datadict('sources', handler=Trailer, attr='size')
+
+    def sizes(self):
+        return self.sources.keys()
+
+    def geturl(self, size=None):
+        if size is None:
+            # sort assuming ###p format for now, take largest resolution
+            size = str(sorted([int(size[:-1]) for size in self.sources])[-1])+'p'
+        return self.sources[size].source
+
+    def __repr__(self):
+        return u"<{0.__class__.__name__} '{0.name}'>".format(self)
+
 class Translation( Element ):
     name          = Datapoint('name')
     language      = Datapoint('iso_639_1')
     englishname   = Datapoint('english_name')
+
+    def __repr__(self):
+        return u"<{0.__class__.__name__} '{0.name}' ({0.language})>".format(self)
 
 class Genre( Element ):
     id      = Datapoint('id')
@@ -223,15 +251,21 @@ class Movie( Element ):
 
     @classmethod
     def nowplaying(cls, locale=None):
-        return MovieSearchResult(Request('movie/now-playing'), locale=locale)
+        res = MovieSearchResult(Request('movie/now-playing'), locale=locale)
+        res._name = 'Now Playing'
+        return res
 
     @classmethod
     def mostpopular(cls, locale=None):
-        return MovieSearchResult(Request('movie/popular'), locale=locale)
+        res = MovieSearchResult(Request('movie/popular'), locale=locale)
+        res._name = 'Popular'
+        return res
 
     @classmethod
     def toprated(cls, locale=None):
-        return MovieSearchResult(Request('movie/top-rated'), locale=locale)
+        res = MovieSearchResult(Request('movie/top-rated'), locale=locale)
+        res._name = 'Top Rated'
+        return res
 
     @classmethod
     def fromIMDB(cls, imdbid, locale=None):
@@ -300,8 +334,8 @@ class Movie( Element ):
     posters          = Datalist('posters', handler=Poster, poller=_populate_images)
     keywords         = Datalist('keywords', handler=Keyword, poller=_populate_keywords)
     releases         = Datadict('countries', handler=Release, poller=_populate_releases, attr='country')
-    youtube_trailers = Datalist('youtube', handler=Trailer, poller=_populate_trailers)
-    apple_trailers   = Datalist('quicktime', handler=Trailer, poller=_populate_trailers)
+    youtube_trailers = Datalist('youtube', handler=YoutubeTrailer, poller=_populate_trailers)
+    apple_trailers   = Datalist('quicktime', handler=AppleTrailer, poller=_populate_trailers)
     translations     = Datalist('translations', handler=Translation, poller=_populate_translations)
 
     def __repr__(self):
