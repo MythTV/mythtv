@@ -502,14 +502,9 @@ bool CetonStreamHandler::TuneProgram(uint program)
     return result;
 }
 
-bool CetonStreamHandler::TuneVChannel(const QString &vchannel)
+bool CetonStreamHandler::PerformTuneVChannel(const QString &vchannel)
 {
-    if ((vchannel != "0") && (_last_vchannel != "0"))
-        ClearProgramNumber();
-
-    LOG(VB_RECORD, LOG_INFO, LOC + QString("TuneVChannel(%1)").arg(vchannel));
-
-    _last_vchannel = vchannel;
+    LOG(VB_RECORD, LOG_INFO, LOC + QString("PerformTuneVChannel(%1)").arg(vchannel));
 
     QUrl params;
     params.addQueryItem("instance_id", QString::number(_tuner));
@@ -523,16 +518,30 @@ bool CetonStreamHandler::TuneVChannel(const QString &vchannel)
     if (!result)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
-            QString("TuneVChannel() - HTTP status = %1 - response = %2")
+            QString("PerformTuneVChannel() - HTTP status = %1 - response = %2")
             .arg(status).arg(response));
     }
 
     return result;
 }
 
+
+bool CetonStreamHandler::TuneVChannel(const QString &vchannel)
+{
+    if ((vchannel != "0") && (_last_vchannel != "0"))
+        ClearProgramNumber();
+
+    LOG(VB_RECORD, LOG_INFO, LOC + QString("TuneVChannel(%1)").arg(vchannel));
+
+    _last_vchannel = vchannel;
+
+    return PerformTuneVChannel(vchannel);
+}
+
 void CetonStreamHandler::ClearProgramNumber(void)
 {
-    TuneVChannel("0");
+    LOG(VB_RECORD, LOG_INFO, LOC + QString("ClearProgramNumber()"));
+    PerformTuneVChannel("0");
     for(int i=0; i<50;  i++)
     {
         if (GetVar("mux", "ProgramNumber") == "0")
