@@ -1,0 +1,450 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mythuitheme SYSTEM "http://www.mythtv.org/schema/mythuitheme.dtd">
+
+<mythuitheme>
+
+    <window name="generalsettings">
+
+        <imagetype name="topbar" from="basetopbar" />
+        <textarea name="title" from="baseheading">
+            <value>General Settings</value>
+        </textarea>
+
+        <textarea name="musiclocation_label" from="basetextarea">
+            <area>140,100,500,50</area>
+            <align>right,vcenter</align>
+            <value>Directory to hold music:</value>
+        </textarea> 
+        <textedit name="musiclocation" from="basetextedit">
+            <area>650,100,550,50</area>
+        </textedit>
+
+        <textarea name="musiccddevice_label" from="basetextarea">
+            <area>140,160,500,50</area>
+            <align>right,vcenter</align>
+            <value>CD device:</value>
+        </textarea>
+        <textedit name="musiccddevice" from="basetextedit">
+            <area>650,160,280,50</area>
+        </textedit>
+
+        <textarea name="musicaudiodevice_label" from="basetextarea">
+            <area>140,220,500,50</area>
+            <align>right,vcenter</align>
+            <value>Audio device:</value>
+        </textarea>
+        <textedit name="musicaudiodevice" from="basetextedit">
+            <area>650,220,280,50</area>
+        </textedit>
+
+        <textarea name="musicdefaultupmix_label" from="basetextarea">
+            <area>140,275,500,40</area>
+            <align>right,vcenter</align>
+            <value>Convert stereo to 5.1 sound:</value>
+        </textarea>
+        <checkbox name="musicdefaultupmix" from="basecheckbox">
+            <position>650,280</position>
+        </checkbox>
+
+        <textarea name="nonid3filenameformat_label" from="basetextarea">
+            <area>140,320,500,50</area>
+            <align>right,vcenter</align>
+            <value>Filename Format:</value>
+        </textarea>
+        <textedit name="nonid3filenameformat" from="basetextedit">
+            <area>650,320,550,50</area>
+        </textedit>
+
+        <textarea name="ignoreid3tags_label" from="basetextarea">
+            <area>140,375,500,40</area>
+            <align>right,vcenter</align>
+            <value>Ignore ID3 Tags:</value>
+        </textarea>
+        <checkbox name="ignoreid3tags" from="basecheckbox">
+            <position>650,380</position>
+        </checkbox>
+
+        <textarea name="tagencoding_label" from="basetextarea">
+            <area>140,420,500,40</area>
+            <align>right,vcenter</align>
+            <value>Tag Encoding:</value>
+        </textarea>
+        <buttonlist name="tagencoding" from="baseselector">
+            <position>650,420</position>
+        </buttonlist>
+
+        <textarea name="allowtagwriting_label" from="basetextarea">
+            <area>140,470,500,40</area>
+            <align>right,vcenter</align>
+            <value>Allow metadata to be written to tags:</value>
+        </textarea>
+        <checkbox name="allowtagwriting" from="basecheckbox">
+            <position>650,475</position>
+        </checkbox>
+
+        <textarea name="helptext" from="basetextarea">
+            <area>100,540,1080,100</area>
+            <cutdown>yes</cutdown>
+            <align>allcenter</align>
+            <multiline>yes</multiline>
+        </textarea>
+
+        <button name="save" from="basebutton">
+            <position>250,620</position>
+            <value>Save</value>
+        </button>
+        <button name="cancel" from="basebutton">
+            <position>880,620</position>
+            <value>Cancel</value>
+        </button>
+    </window>
+
+    <window name="playersettings">
+
+        <imagetype name="topbar" from="basetopbar" />
+        <textarea name="title" from="baseheading">
+            <value>Player Settings</value>
+        </textarea>
+
+        <textarea name="resumemode_label" from="basetextarea">
+            <area>240,220,400,40</area>
+            <align>right,vcenter</align>
+            <value>Resume mode:</value>
+        </textarea>
+        <buttonlist name="resumemode" from="basemediumselector">
+            <position>650,220</position>
+        </buttonlist>
+
+        <textarea name="exitaction_label" from="basetextarea">
+            <area>240,270,400,40</area>
+            <align>right,vcenter</align>
+            <value>Action on exit:</value>
+        </textarea>
+        <buttonlist name="exitaction" from="basemediumselector">
+            <position>650,270</position>
+        </buttonlist>
+
+        <textarea name="autolookupcd_label" from="basetextarea">
+            <area>240,335,400,40</area>
+            <align>right,vcenter</align>
+            <value>Automatically lookup CDs:</value>
+        </textarea>
+        <checkbox name="autolookupcd" from="basecheckbox">
+            <position>650,340</position>
+        </checkbox>
+
+        <textarea name="autoplaycd_label" from="basetextarea">
+            <area>240,385,400,40</area>
+            <align>right,vcenter</align>
+            <value>Automatically Play CDs:</value>
+        </textarea>
+        <checkbox name="autoplaycd" from="basecheckbox">
+            <position>650,390</position>
+        </checkbox>
+
+        <textarea name="helptext" from="basetextarea">
+            <area>205,540,870,80</area>
+            <cutdown>yes</cutdown>
+            <align>allcenter</align>
+            <multiline>yes</multiline>
+        </textarea>
+
+        <button name="save" from="basebutton">
+            <position>250,620</position>
+            <value>Save</value>
+        </button>
+        <button name="cancel" from="basebutton">
+            <position>880,620</position>
+            <value>Cancel</value>
+        </button>
+    </window>
+
+    <window name="ratingsettings">
+        <imagetype name="topbar" from="basetopbar" />
+        <textarea name="title" from="baseheading">
+            <value>Rating Settings</value>
+        </textarea>
+
+        <textarea name="ratingweight_label" from="basetextarea">
+            <area>240,220,400,40</area>
+            <align>right,vcenter</align>
+            <value>Rating Weight:</value>
+        </textarea>
+        <spinbox name="ratingweight" from="basespinbox">
+            <position>650,220</position>
+        </spinbox>
+
+        <textarea name="playcountweight_label" from="basetextarea">
+            <area>240,270,400,40</area>
+            <align>right,vcenter</align>
+            <value>Play Count Weight:</value>
+        </textarea>
+        <spinbox name="playcountweight" from="basespinbox">
+            <position>650,270</position>
+        </spinbox>
+
+        <textarea name="lastplayweight_label" from="basetextarea">
+            <area>240,320,400,40</area>
+            <align>right,vcenter</align>
+            <value>Last Play Weight:</value>
+        </textarea>
+        <spinbox name="lastplayweight" from="basespinbox">
+            <position>650,320</position>
+        </spinbox>
+
+        <textarea name="randomweight_label" from="basetextarea">
+            <area>240,370,400,40</area>
+            <align>right,vcenter</align>
+            <value>Random Weight:</value>
+        </textarea>
+        <spinbox name="randomweight" from="basespinbox">
+            <position>650,370</position>
+        </spinbox>
+
+        <textarea name="helptext" from="basetextarea">
+            <area>205,540,870,80</area>
+            <cutdown>yes</cutdown>
+            <align>allcenter</align>
+            <multiline>yes</multiline>
+        </textarea>
+
+        <button name="save" from="basebutton">
+            <position>250,620</position>
+            <value>Save</value>
+        </button>
+        <button name="cancel" from="basebutton">
+            <position>880,620</position>
+            <value>Cancel</value>
+        </button>
+    </window>
+
+    <window name="importsettings">
+        <imagetype name="topbar" from="basetopbar" />
+        <textarea name="title" from="baseheading">
+            <value>Ripper Settings</value>
+        </textarea>
+
+        <textarea name="paranoialevel_label" from="basetextarea">
+            <area>140,100,500,50</area>
+            <align>right,vcenter</align>
+            <value>Paranoia Level:</value>
+        </textarea>
+        <buttonlist name="paranoialevel" from="basemediumselector">
+            <position>650,100</position>
+        </buttonlist>
+
+        <textarea name="filenametemplate_label" from="basetextarea">
+            <area>140,150,500,50</area>
+            <align>right,vcenter</align>
+            <value>File storage location:</value>
+        </textarea>
+        <textedit name="filenametemplate" from="basetextedit">
+            <area>650,150,550,50</area>
+        </textedit>
+
+        <textarea name="nowhitespace_label" from="basetextarea">
+            <area>140,200,500,40</area>
+            <align>right,vcenter</align>
+            <value>Replace space with underscore:</value>
+        </textarea>
+        <checkbox name="nowhitespace" from="basecheckbox">
+            <position>650,205</position>
+        </checkbox>
+
+        <textarea name="encoding_label" from="basetextarea">
+            <area>140,250,500,40</area>
+            <align>right,vcenter</align>
+            <value>Encoding Type:</value>
+        </textarea>
+        <buttonlist name="encodertype" from="baseselector">
+            <position>650,250</position>
+        </buttonlist>
+
+        <textarea name="defaultripquality_label" from="basetextarea">
+            <area>140,300,500,40</area>
+            <align>right,vcenter</align>
+            <value>Default Rip Quality:</value>
+        </textarea>
+        <buttonlist name="defaultripquality" from="baseselector">
+            <position>650,300</position>
+        </buttonlist>
+
+        <textarea name="mp3usevbr_label" from="basetextarea">
+            <area>140,350,500,40</area>
+            <align>right,vcenter</align>
+            <value>Use variable bitrates:</value>
+        </textarea>
+        <checkbox name="mp3usevbr" from="basecheckbox">
+            <position>650,355</position>
+        </checkbox>
+
+        <textarea name="ejectcd_label" from="basetextarea">
+            <area>140,400,500,40</area>
+            <align>right,vcenter</align>
+            <value>Automatically eject CDs after ripping:</value>
+        </textarea>
+        <checkbox name="ejectcd" from="basecheckbox">
+            <position>650,405</position>
+        </checkbox>
+
+        <textarea name="postcdripscript_label" from="basetextarea">
+            <area>140,450,500,50</area>
+            <align>right,vcenter</align>
+            <value>Script Path:</value>
+        </textarea>
+        <textedit name="postcdripscript" from="basetextedit">
+            <area>650,450,550,50</area>
+        </textedit>
+
+        <textarea name="helptext" from="basetextarea">
+            <area>205,540,870,80</area>
+            <cutdown>yes</cutdown>
+            <align>allcenter</align>
+            <multiline>yes</multiline>
+        </textarea>
+
+        <button name="save" from="basebutton">
+            <position>250,620</position>
+            <value>Save</value>
+        </button>
+        <button name="cancel" from="basebutton">
+            <position>880,620</position>
+            <value>Cancel</value>
+        </button>
+    </window>
+
+    <window name="burningsettings">
+        <imagetype name="topbar" from="basetopbar" />
+        <textarea name="title" from="baseheading">
+            <value>Burn Settings</value>
+        </textarea>
+
+        <textarea name="cdwriterenabled_label" from="basetextarea">
+            <area>240,160,400,40</area>
+            <align>right,vcenter</align>
+            <value>Enable CD Writing:</value>
+        </textarea>
+        <textarea name="cdwriterdevice_label" from="basetextarea">
+            <area>240,210,400,40</area>
+            <align>right,vcenter</align>
+            <value>CD-Writer Device:</value>
+        </textarea>
+        <textarea name="cddisksize_label" from="basetextarea">
+            <area>240,260,400,40</area>
+            <align>right,vcenter</align>
+            <value>Disk Size:</value>
+        </textarea>
+        <textarea name="cdwritespeed_label" from="basetextarea">
+            <area>240,310,400,40</area>
+            <align>right,vcenter</align>
+            <value>CD Write Speed:</value>
+        </textarea>
+        <textarea name="cdblanktype_label" from="basetextarea">
+            <area>240,360,400,40</area>
+            <align>right,vcenter</align>
+            <value>CD Blanking Type:</value>
+        </textarea>
+        <textarea name="cdcreatedir_label" from="basetextarea">
+            <area>240,410,400,40</area>
+            <align>right,vcenter</align>
+            <value>Enable directories on MP3 Creation:</value>
+        </textarea>
+
+        <checkbox name="cdwriterenabled" from="basecheckbox">
+            <position>650,165</position>
+        </checkbox>
+        <textedit name="cdwriterdevice" from="basetextedit">
+            <position>650,210</position>
+        </textedit>
+        <buttonlist name="cddisksize" from="baseselector">
+            <position>650,260</position>
+        </buttonlist>
+        <buttonlist name="cdwritespeed" from="baseselector">
+            <position>650,310</position>
+        </buttonlist>
+        <buttonlist name="cdblanktype" from="baseselector">
+            <position>650,360</position>
+        </buttonlist>
+        <checkbox name="cdcreatedir" from="basecheckbox">
+            <position>650,415</position>
+        </checkbox>
+
+        <textarea name="helptext" from="basetextarea">
+            <area>205,540,870,80</area>
+            <cutdown>yes</cutdown>
+            <align>allcenter</align>
+            <multiline>yes</multiline>
+        </textarea>
+
+        <button name="save" from="basebutton">
+            <position>250,620</position>
+            <value>Save</value>
+        </button>
+        <button name="cancel" from="basebutton">
+            <position>880,620</position>
+            <value>Cancel</value>
+        </button>
+
+    </window>
+
+    <window name="visualizationsettings">
+
+        <imagetype name="topbar" from="basetopbar" />
+        <textarea name="title" from="baseheading">
+            <value>Visualiser Settings</value>
+        </textarea>
+
+        <textarea name="cycleonsongchange_label" from="basetextarea">
+            <area>140,160,500,40</area>
+            <align>right,vcenter</align>
+            <value>Change Visualizer on each song:</value>
+        </textarea>
+        <checkbox name="cycleonsongchange" from="basecheckbox">
+            <position>650,160</position>
+        </checkbox>
+
+        <textarea name="randomizeorder_label" from="basetextarea">
+            <area>140,210,500,40</area>
+            <align>right,vcenter</align>
+            <value>Randomize Visualizer order:</value>
+        </textarea>
+        <checkbox name="randomizeorder" from="basecheckbox">
+            <position>650,210</position>
+        </checkbox>
+
+        <textarea name="scalewidth_label" from="basetextarea">
+            <area>240,260,400,40</area>
+            <align>right,vcenter</align>
+            <value>Width for Visual Scaling:</value>
+        </textarea>
+        <spinbox name="scalewidth" from="basespinbox">
+            <position>650,260</position>
+        </spinbox>
+
+        <textarea name="scaleheight_label" from="basetextarea">
+            <area>240,310,400,40</area>
+            <align>right,vcenter</align>
+            <value>Height for Visual Scaling:</value>
+        </textarea>
+        <spinbox name="scaleheight" from="basespinbox">
+            <position>650,310</position>
+        </spinbox>
+
+        <textarea name="helptext" from="basetextarea">
+            <area>205,540,870,80</area>
+            <cutdown>yes</cutdown>
+            <align>allcenter</align>
+            <multiline>yes</multiline>
+        </textarea>
+
+        <button name="save" from="basebutton">
+            <position>250,620</position>
+            <value>Save</value>
+        </button>
+        <button name="cancel" from="basebutton">
+            <position>880,620</position>
+            <value>Cancel</value>
+        </button>
+    </window>
+
+</mythuitheme>

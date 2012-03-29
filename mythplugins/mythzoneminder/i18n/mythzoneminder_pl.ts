@@ -24,19 +24,27 @@
     <message>
         <location filename="../mythzoneminder/main.cpp" line="134"/>
         <source>ZoneMinder Events</source>
-        <translation>Zarejestrowane zdarzenia</translation>
+        <translation>Zarejestrowane Zdarzenia</translation>
     </message>
 </context>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../mythzoneminder/zmsettings.cpp" line="17"/>
         <source>IP address of the mythzoneminder server</source>
+        <translation type="obsolete">Adrs IP serwera ZoneMinder</translation>
+    </message>
+    <message>
+        <source>Enter the IP address of the mythzoneminder server that this frontend should connect to.</source>
+        <translation type="obsolete">Wprowadź adres IP serwera ZoneMinder, z którego ten terminal ma korzystać.</translation>
+    </message>
+    <message>
+        <location filename="../mythzoneminder/zmsettings.cpp" line="17"/>
+        <source>IP address of the MythZoneMinder server</source>
         <translation>Adrs IP serwera ZoneMinder</translation>
     </message>
     <message>
         <location filename="../mythzoneminder/zmsettings.cpp" line="19"/>
-        <source>Enter the IP address of the mythzoneminder server that this frontend should connect to.</source>
+        <source>Enter the IP address of the MythZoneMinder server that this frontend should connect to.</source>
         <translation>Wprowadź adres IP serwera ZoneMinder, z którego ten terminal ma korzystać.</translation>
     </message>
     <message>
@@ -88,78 +96,78 @@
 <context>
     <name>ThemeUI</name>
     <message>
-        <location filename="themestrings.h" line="2"/>
+        <location filename="themestrings.h" line="5"/>
         <source>Edit Monitor Function</source>
-        <translation>Wybierz typ monitora</translation>
+        <translation>Wybierz Typ Monitora</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="3"/>
+        <location filename="themestrings.h" line="6"/>
         <source>Enabled</source>
         <translation>Włączony</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="4"/>
+        <location filename="themestrings.h" line="7"/>
         <source>ZoneMinder Console</source>
         <oldsource>Zone Minder Console</oldsource>
-        <translation>Konsola monitoringu</translation>
+        <translation>Konsola Monitoringu</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="5"/>
+        <location filename="themestrings.h" line="8"/>
         <source>Status</source>
         <translation>Status</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="6"/>
+        <location filename="themestrings.h" line="9"/>
         <source>Load: 0.12</source>
         <translation>Obciążenie: 0,12</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="7"/>
+        <location filename="themestrings.h" line="10"/>
         <source>Disk: 100%</source>
         <translation>Dysk: 100%</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="8"/>
+        <location filename="themestrings.h" line="11"/>
         <source>Camera</source>
         <translation>Kamera</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="9"/>
+        <location filename="themestrings.h" line="12"/>
         <source>Function</source>
         <translation>Funkcja</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="10"/>
+        <location filename="themestrings.h" line="13"/>
         <source>Source</source>
         <translation>Źródło</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="11"/>
+        <location filename="themestrings.h" line="14"/>
         <source>Events</source>
         <translation>Zdarzenia</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="13"/>
+        <location filename="themestrings.h" line="16"/>
         <source>ZoneMinder Events</source>
-        <translation>Zarejestrowane zdarzenia</translation>
+        <translation>Zarejestrowane Zdarzenia</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="23"/>
+        <location filename="themestrings.h" line="26"/>
         <source>ZoneMinder Event Player</source>
         <translation>Odtwarzacz Zdarzeń</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="33"/>
+        <location filename="themestrings.h" line="36"/>
         <source>ZoneMinder Live Player</source>
         <translation>Kamery Live</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="38"/>
+        <location filename="themestrings.h" line="41"/>
         <source>[x]</source>
         <translation>[v]</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="12"/>
+        <location filename="themestrings.h" line="15"/>
         <source>[R] = Running [S] = Stopped</source>
         <translation>[R] = Działa [S] = Zatrzymany</translation>
     </message>
@@ -168,47 +176,47 @@
         <translation type="obsolete">Zarejestrowane zdarzenia</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="14"/>
+        <location filename="themestrings.h" line="17"/>
         <source>Select Camera</source>
-        <translation>Wybierz kamerę</translation>
+        <translation>Wybierz Kamerę</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="15"/>
+        <location filename="themestrings.h" line="18"/>
         <source>Select Date</source>
-        <translation>Wybierz datę</translation>
+        <translation>Wybierz Datę</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="16"/>
+        <location filename="themestrings.h" line="19"/>
         <source>0/0</source>
         <translation>0/0</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="17"/>
+        <location filename="themestrings.h" line="20"/>
         <source>Event Name</source>
-        <translation>Nazwa zdarzenia</translation>
+        <translation>Nazwa Zdarzenia</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="18"/>
+        <location filename="themestrings.h" line="21"/>
         <source>Date/Time</source>
         <translation>Data/Czas</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="19"/>
+        <location filename="themestrings.h" line="22"/>
         <source>Length</source>
         <translation>Długość</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="20"/>
+        <location filename="themestrings.h" line="23"/>
         <source>Name</source>
         <translation>Nazwa</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="21"/>
+        <location filename="themestrings.h" line="24"/>
         <source>Date</source>
         <translation>Data</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="22"/>
+        <location filename="themestrings.h" line="25"/>
         <source>Duration</source>
         <translation>Czas trwania</translation>
     </message>
@@ -217,47 +225,47 @@
         <translation type="obsolete">Odtwarzacz zdarzeń</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="24"/>
+        <location filename="themestrings.h" line="27"/>
         <source>Event:</source>
         <translation>Zdarzenie:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="25"/>
+        <location filename="themestrings.h" line="28"/>
         <source>Event Name (1/123)</source>
         <translation>Nazwa zdarzenia (1/123)</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="26"/>
+        <location filename="themestrings.h" line="29"/>
         <source>Camera:</source>
         <translation>Kamera:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="27"/>
+        <location filename="themestrings.h" line="30"/>
         <source>Camera Name</source>
         <translation>Nazwa kamery</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="28"/>
+        <location filename="themestrings.h" line="31"/>
         <source>Frame:</source>
         <translation>Ramka:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="29"/>
+        <location filename="themestrings.h" line="32"/>
         <source>1/123</source>
         <translation>1/123</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="30"/>
+        <location filename="themestrings.h" line="33"/>
         <source>Date:</source>
         <translation>Data:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="31"/>
+        <location filename="themestrings.h" line="34"/>
         <source>Mon 01 Nov 2006 12:34</source>
         <translation>Pon 01 Grud 2006 12:34</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="32"/>
+        <location filename="themestrings.h" line="35"/>
         <source>There are no events to show</source>
         <translation>Brak zdarzeń do pokazania</translation>
     </message>
@@ -266,39 +274,39 @@
         <translation type="obsolete">Odtwarzacz Live</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="34"/>
+        <location filename="themestrings.h" line="37"/>
         <source>Monitor 1</source>
         <translation>Monitor 1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="35"/>
+        <location filename="themestrings.h" line="38"/>
         <source>Monitor 2</source>
         <translation>Monitor 2</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="36"/>
+        <location filename="themestrings.h" line="39"/>
         <source>Monitor 3</source>
         <translation>Monitor 3</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="37"/>
+        <location filename="themestrings.h" line="40"/>
         <source>Monitor 4</source>
         <translation>Monitor 4</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="39"/>
+        <location filename="themestrings.h" line="42"/>
         <source>Show Console</source>
-        <translation>Pokarz konsolę</translation>
+        <translation>Pokarz Konsolę</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="40"/>
+        <location filename="themestrings.h" line="43"/>
         <source>Show Live View</source>
         <translation>Pokarz w Live</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="41"/>
+        <location filename="themestrings.h" line="44"/>
         <source>Show Events</source>
-        <translation>Pokarz zarejestrowane zdarzenia</translation>
+        <translation>Pokarz Zarejestrowane Zdarzenia</translation>
     </message>
 </context>
 <context>
@@ -330,50 +338,50 @@
 <context>
     <name>ZMEvents</name>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="95"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="96"/>
         <source>Play</source>
         <translation>Odtwarzaj</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="102"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="103"/>
         <source>Delete</source>
-        <translation>Kasuj</translation>
+        <translation>Skasuj</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="178"/>
-        <location filename="../mythzoneminder/zmevents.cpp" line="351"/>
-        <location filename="../mythzoneminder/zmevents.cpp" line="366"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="179"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="350"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="365"/>
         <source>All Cameras</source>
-        <translation>Wszystkie kamery</translation>
+        <translation>Wszystkie Kamery</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="181"/>
-        <location filename="../mythzoneminder/zmevents.cpp" line="375"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="182"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="374"/>
         <source>All Dates</source>
-        <translation>Wszystkie dni</translation>
+        <translation>Wszystkie Dni</translation>
+    </message>
+    <message>
+        <location filename="../mythzoneminder/zmevents.cpp" line="450"/>
+        <source>Refresh</source>
+        <translation>Odśwież</translation>
     </message>
     <message>
         <location filename="../mythzoneminder/zmevents.cpp" line="451"/>
-        <source>Refresh</source>
-        <translation>Odświerz</translation>
+        <source>Change View</source>
+        <translation>Zmień Widok</translation>
     </message>
     <message>
         <location filename="../mythzoneminder/zmevents.cpp" line="452"/>
-        <source>Change View</source>
-        <translation>Zmień widok</translation>
+        <source>Delete All</source>
+        <translation>Skasuj Wszystko</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="453"/>
-        <source>Delete All</source>
-        <translation>Skasuj wszystko</translation>
+        <location filename="../mythzoneminder/zmevents.cpp" line="464"/>
+        <source>Delete All Events?</source>
+        <translation>Czy skasować wszystkie zdarzenia?</translation>
     </message>
     <message>
         <location filename="../mythzoneminder/zmevents.cpp" line="465"/>
-        <source>Delete All Events?</source>
-        <translation>Czy skasować wszystkie zdarzenia ?</translation>
-    </message>
-    <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="466"/>
         <source>Deleting %1 events in this view.</source>
         <translation>Kasuję %1 zdarzeń w tym widoku.</translation>
     </message>
@@ -388,7 +396,7 @@ You don&apos;t have any monitors defined!</source>
     <message>
         <location filename="../mythzoneminder/zmliveplayer.cpp" line="124"/>
         <source>Can&apos;t show live view.</source>
-        <translation>Nie mogę wyświetlić Live View.</translation>
+        <translation>Nie mogę wyświetlić widoku Live.</translation>
     </message>
     <message>
         <location filename="../mythzoneminder/zmliveplayer.cpp" line="125"/>
@@ -399,29 +407,29 @@ You don&apos;t have any monitors defined!</source>
 <context>
     <name>ZMPlayer</name>
     <message>
-        <location filename="../mythzoneminder/zmplayer.cpp" line="106"/>
-        <location filename="../mythzoneminder/zmplayer.cpp" line="288"/>
+        <location filename="../mythzoneminder/zmplayer.cpp" line="107"/>
+        <location filename="../mythzoneminder/zmplayer.cpp" line="289"/>
         <source>Pause</source>
         <translation>Pauza</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmplayer.cpp" line="112"/>
+        <location filename="../mythzoneminder/zmplayer.cpp" line="113"/>
         <source>Delete</source>
         <translation>Kasuj</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmplayer.cpp" line="118"/>
+        <location filename="../mythzoneminder/zmplayer.cpp" line="119"/>
         <source>Previous</source>
         <translation>Poprzedni</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmplayer.cpp" line="124"/>
+        <location filename="../mythzoneminder/zmplayer.cpp" line="125"/>
         <source>Next</source>
         <translation>Następny</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmplayer.cpp" line="295"/>
-        <location filename="../mythzoneminder/zmplayer.cpp" line="374"/>
+        <location filename="../mythzoneminder/zmplayer.cpp" line="296"/>
+        <location filename="../mythzoneminder/zmplayer.cpp" line="375"/>
         <source>Play</source>
         <translation>Odtwarzaj</translation>
     </message>

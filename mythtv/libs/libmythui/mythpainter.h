@@ -13,7 +13,6 @@ class QRegion;
 class QPoint;
 class QColor;
 
-//  #include "mythfontproperties.h"
 #include "compat.h"
 #include "mythuiexp.h"
 
@@ -56,10 +55,10 @@ class MUI_PUBLIC MythPainter
                           const MythFontProperties &font, int alpha,
                           const QRect &boundRect);
     virtual void DrawTextLayout(const QRect &canvasRect,
-				const LayoutVector & layouts,
-				const FormatVector & formats,
-				const MythFontProperties &font, int alpha,
-				const QRect &destRect);
+                                const LayoutVector & layouts,
+                                const FormatVector & formats,
+                                const MythFontProperties &font, int alpha,
+                                const QRect &destRect);
     virtual void DrawRect(const QRect &area, const QBrush &fillBrush,
                           const QPen &linePen, int alpha);
     virtual void DrawRoundRect(const QRect &area, int cornerRadius,
@@ -94,9 +93,9 @@ class MUI_PUBLIC MythPainter
     MythImage *GetImageFromString(const QString &msg, int flags, const QRect &r,
                                   const MythFontProperties &font);
     MythImage *GetImageFromTextLayout(const LayoutVector & layouts,
-				      const FormatVector & formats,
-				      const MythFontProperties &font,
-				      QRect &canvas, QRect &dest);
+                                      const FormatVector & formats,
+                                      const MythFontProperties &font,
+                                      QRect &canvas, QRect &dest);
     MythImage *GetImageFromRect(const QRect &area, int radius, int ellipse,
                                 const QBrush &fillBrush,
                                 const QPen &linePen);

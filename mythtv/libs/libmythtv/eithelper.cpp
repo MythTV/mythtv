@@ -57,7 +57,7 @@ EITHelper::EITHelper() :
 EITHelper::~EITHelper()
 {
     QMutexLocker locker(&eitList_lock);
-    for (uint i = 0; i < db_events.size(); i++)
+    while (db_events.size())
         delete db_events.dequeue();
 
     delete eitfixup;
@@ -83,7 +83,7 @@ uint EITHelper::ProcessEvents(void)
         return 0;
 
     MSqlQuery query(MSqlQuery::InitCon());
-    for (uint i = 0; (i < kChunkSize) && (i < db_events.size()); i++)
+    for (uint i = 0; (i < kChunkSize) && (db_events.size() > 0); i++)
     {
         DBEventEIT *event = db_events.dequeue();
         eitList_lock.unlock();

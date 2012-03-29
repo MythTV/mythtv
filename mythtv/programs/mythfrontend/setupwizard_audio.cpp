@@ -27,7 +27,6 @@ AudioSetupWizard::AudioSetupWizard(MythScreenStack *parent,
       m_testSpeakerButton(NULL),         m_nextButton(NULL),
       m_prevButton(NULL)
 {
-    m_generalScreen->Hide();
 }
 
 bool AudioSetupWizard::Create()
@@ -144,13 +143,6 @@ AudioSetupWizard::~AudioSetupWizard()
     }
 }
 
-void AudioSetupWizard::Close()
-{
-    if (m_generalScreen)
-        m_generalScreen->Show();
-    MythScreenType::Close();
-}
-
 void AudioSetupWizard::Load(void)
 {
     m_outputlist = AudioOutput::GetOutputList();
@@ -250,7 +242,6 @@ void AudioSetupWizard::save(void)
 
 void AudioSetupWizard::slotPrevious(void)
 {
-    m_generalScreen->Show();
     Close();
 }
 

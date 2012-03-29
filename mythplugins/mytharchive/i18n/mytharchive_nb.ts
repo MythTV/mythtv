@@ -15,6 +15,73 @@
     </message>
 </context>
 <context>
+    <name>BurnThemeUI</name>
+    <message>
+        <location filename="../mythburn/themes/burnthemestrings.h" line="5"/>
+        <source>Has an intro and contains a main menu with 4 recordings per page. Does not have a chapter selection submenu.</source>
+        <translation>Har en intro og inneholder en hovedmeny med 4 opptak per side. Har ikke kapittelmeny.</translation>
+    </message>
+    <message>
+        <location filename="../mythburn/themes/burnthemestrings.h" line="6"/>
+        <source>Has an intro and contains a summary main menu with 10 recordings per page. Does not have a chapter selection submenu, recording titles, dates or category.</source>
+        <translation>Har en intro og inneholder en oppsummerende hovedmeny med 10 opptak per side. Har ikke kapittelmeny, tittel for opptak, dato eller kategori.</translation>
+    </message>
+    <message>
+        <location filename="../mythburn/themes/burnthemestrings.h" line="7"/>
+        <source>Has an intro and contains a main menu with 6 recordings per page. Does not have a scene selection submenu.</source>
+        <translation>Har en intro og inneholder en hovedmeny med 6 opptak per side. Har ikke undemeny for valg av scene.</translation>
+    </message>
+    <message>
+        <location filename="../mythburn/themes/burnthemestrings.h" line="8"/>
+        <source>Has an intro and contains a main menu with 3 recordings per page and a scene selection submenu with 8 chapters points. Shows a program details page before each recording.</source>
+        <translation>Har en intro og inneholder en hovedmeny med 3 opptak per side og en undermeny for scener med 8 kapittelpunkt. Viser en side med programdetaljer før hvert opptak.</translation>
+    </message>
+    <message>
+        <location filename="../mythburn/themes/burnthemestrings.h" line="9"/>
+        <source>Has an intro and contains a main menu with 3 recordings per page and a scene selection submenu with 8 chapters points. Shows a program details page before each recording. Uses animated thumb images.</source>
+        <translation>Har en intro og inneholder en hovedmeny med 3 opptak per side og en undermeny for scener med 8 kapittelpunkt. Viser en side med programdetaljer før hvert opptak. Bruker animerte miniatyrbilder.</translation>
+    </message>
+    <message>
+        <location filename="../mythburn/themes/burnthemestrings.h" line="10"/>
+        <source>Has an intro and contains a main menu with 3 recordings per page and a scene selection submenu with 8 chapters points.</source>
+        <translation>Har en intro og inneholder en hovedmeny med 3 opptak per side og en undermeny for scener med 8 kapittelpunkt.</translation>
+    </message>
+    <message>
+        <location filename="../mythburn/themes/burnthemestrings.h" line="11"/>
+        <source>Has an intro and contains a main menu with 3 recordings per page and a scene selection submenu with 8 chapters points. All the thumb images are animated.</source>
+        <translation>Har en intro og inneholder en hovedmeny med 3 opptak per side og en undermeny for scener med 8 kapittelpunkt. Alle miniatyrbilder er animert.</translation>
+    </message>
+    <message>
+        <location filename="../mythburn/themes/burnthemestrings.h" line="12"/>
+        <source>Creates an auto play DVD with no menus. Shows an intro movie then for each title shows a details page followed by the video in sequence.</source>
+        <translation>Lager en DVD uten menyer med automatisk avspilling. Viser en introduksjonsvideo for så å vise en detaljside for hver tittel fulgt av selve videoen.</translation>
+    </message>
+    <message>
+        <location filename="../mythburn/themes/burnthemestrings.h" line="13"/>
+        <source>Creates an auto play DVD with no menus and no intro.</source>
+        <translation>Lager en DVD uten menyer og intro med automatisk avspilling.</translation>
+    </message>
+</context>
+<context>
+    <name>DVDThemeSelector</name>
+    <message>
+        <location filename="../mytharchive/themeselector.cpp" line="219"/>
+        <location filename="../mytharchive/themeselector.cpp" line="230"/>
+        <source>No theme description file found!</source>
+        <translation>Ingen beskrivelsesfil for tema funnet!</translation>
+    </message>
+    <message>
+        <location filename="../mytharchive/themeselector.cpp" line="243"/>
+        <source>Empty theme description!</source>
+        <translation>Tom temabeskrivelse!</translation>
+    </message>
+    <message>
+        <location filename="../mytharchive/themeselector.cpp" line="248"/>
+        <source>Unable to open theme description file!</source>
+        <translation>Kunne ikke åpne beskrivelsesfil for tema!</translation>
+    </message>
+</context>
+<context>
     <name>ExportNative</name>
     <message>
         <source>Cancel</source>
@@ -407,9 +474,8 @@ This may take a few minutes.</source>
 Dette kan ta et par minutter.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="20"/>
         <source>Location where MythArchive should create its temporory work files. LOTS of free space required here.</source>
-        <translation>Plassering hvor Myth-arkiv skal lagre midlertidige arbeidsfiler. Her må det være MYE ledig plass.</translation>
+        <translation type="obsolete">Plassering hvor Myth-arkiv skal lagre midlertidige arbeidsfiler. Her må det være MYE ledig plass.</translation>
     </message>
     <message>
         <source>Always Encode to AC3</source>
@@ -473,6 +539,11 @@ Dette kan ta et par minutter.</translation>
         <location filename="../mytharchive/archivesettings.cpp" line="18"/>
         <source>MythArchive Temp Directory</source>
         <translation>Mytharkivs katalog for midlertidige filer</translation>
+    </message>
+    <message>
+        <location filename="../mytharchive/archivesettings.cpp" line="20"/>
+        <source>Location where MythArchive should create its temporary work files. LOTS of free space required here.</source>
+        <translation>Plassering hvor Myth-arkiv skal lagre midlertidige arbeidsfiler. Her må det være MYE ledig plass.</translation>
     </message>
     <message>
         <location filename="../mytharchive/archivesettings.cpp" line="28"/>
@@ -782,257 +853,267 @@ Vennligst vent...</translation>
 <context>
     <name>ThemeUI</name>
     <message>
-        <location filename="themestrings.h" line="10"/>
+        <location filename="themestrings.h" line="9"/>
         <source>Select Destination</source>
         <translation>Velg destinasjon</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="73"/>
+        <location filename="themestrings.h" line="84"/>
         <source>description goes here.</source>
         <translation>beskrivelse her.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="14"/>
+        <location filename="themestrings.h" line="11"/>
         <source>Free Space:</source>
         <translation>Ledig plass:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="16"/>
+        <location filename="themestrings.h" line="12"/>
         <source>Make ISO Image</source>
         <translation>Lag ISO image</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="17"/>
+        <location filename="themestrings.h" line="13"/>
         <source>Burn to DVD</source>
         <translation>Brenn til DVD</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="76"/>
+        <location filename="themestrings.h" line="14"/>
         <source>Force Overwrite of DVD-RW Media</source>
         <translation>Tving overskriving av DVD RW medie</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="77"/>
+        <location filename="themestrings.h" line="18"/>
         <source>Select Recordings</source>
         <translation>Velg opptak</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="78"/>
+        <location filename="themestrings.h" line="19"/>
         <source>Show Recordings</source>
         <translation>Vis opptak</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="24"/>
+        <location filename="themestrings.h" line="21"/>
         <source>File Finder</source>
         <translation>Filfinner</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="79"/>
+        <location filename="themestrings.h" line="24"/>
         <source>Select Videos</source>
         <translation>Velg videoer</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="92"/>
+        <location filename="themestrings.h" line="25"/>
         <source>Video Category</source>
         <translation>Videokategori</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="81"/>
+        <location filename="themestrings.h" line="87"/>
         <source>title goes here</source>
         <translation>tittel her</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="93"/>
+        <location filename="themestrings.h" line="94"/>
         <source>x.xx Gb</source>
         <translation>x.xx Gb</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="82"/>
+        <location filename="themestrings.h" line="26"/>
         <source>PL:</source>
         <translation>PL:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="83"/>
+        <location filename="themestrings.h" line="88"/>
         <source>1</source>
         <translation>1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="28"/>
+        <location filename="themestrings.h" line="27"/>
         <source>No videos available</source>
         <translation>Ingen videoer tilgjengelig</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="29"/>
+        <location filename="themestrings.h" line="28"/>
         <source>Log Viewer</source>
         <translation>Loggviser</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="33"/>
+        <location filename="themestrings.h" line="31"/>
         <source>Change Encoding Profile</source>
         <translation>Endre kodingsprofil</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="35"/>
+        <location filename="themestrings.h" line="32"/>
         <source>DVD Menu Theme</source>
         <translation>DVD menytema</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="84"/>
+        <location filename="themestrings.h" line="33"/>
         <source>Select a theme</source>
         <translation>Velg et tema</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="38"/>
+        <location filename="themestrings.h" line="34"/>
         <source>Intro</source>
         <translation>Intro</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="39"/>
+        <location filename="themestrings.h" line="35"/>
         <source>Main Menu</source>
         <translation>Hovedmeny</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="40"/>
+        <location filename="themestrings.h" line="36"/>
         <source>Chapter Menu</source>
         <translation>Kapittelmeny</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="41"/>
+        <location filename="themestrings.h" line="37"/>
         <source>Details</source>
         <translation>Detaljer</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="42"/>
+        <location filename="themestrings.h" line="38"/>
         <source>Select Archive Items</source>
         <translation>Velg arkivelementer</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="44"/>
+        <location filename="themestrings.h" line="39"/>
         <source>No files are selected for archive</source>
         <translation>Ingen filer er valgt for arkivet</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="48"/>
+        <location filename="themestrings.h" line="43"/>
         <source>Archive Item Details</source>
         <translation>Detaljer for arkivelement</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="49"/>
+        <location filename="themestrings.h" line="44"/>
         <source>Title:</source>
         <translation>Tittel:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="50"/>
+        <location filename="themestrings.h" line="45"/>
         <source>Subtitle:</source>
         <translation>Undertekst:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="51"/>
+        <location filename="themestrings.h" line="46"/>
         <source>Start Date:</source>
         <translation>Startdato:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="52"/>
+        <location filename="themestrings.h" line="47"/>
         <source>Time:</source>
         <translation>Tid:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="53"/>
+        <location filename="themestrings.h" line="48"/>
         <source>Description:</source>
         <translation>Beskrivelse:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="54"/>
+        <location filename="themestrings.h" line="49"/>
         <source>Thumb Image Selector</source>
         <translation>velger for miniatyrbilde</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="55"/>
+        <location filename="themestrings.h" line="50"/>
         <source>Current Position</source>
         <translation>Gjeldende posisjon</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="56"/>
+        <location filename="themestrings.h" line="82"/>
         <source>0:00:00.00</source>
         <translation>0:00:00.00</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="57"/>
+        <location filename="themestrings.h" line="104"/>
+        <source>Channel ID:</source>
+        <translation>Kanal ID:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="105"/>
+        <source>Channel Number:</source>
+        <translation>Kanalnummer:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="51"/>
         <source>Seek Amount</source>
         <translation>Søkemengde</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="58"/>
+        <location filename="themestrings.h" line="52"/>
         <source>Frame</source>
         <translation>Ramme</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="60"/>
+        <location filename="themestrings.h" line="83"/>
         <source>Up Level</source>
         <translation>Opp et nivå</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="85"/>
+        <location filename="themestrings.h" line="89"/>
         <source>xxxxx MB</source>
         <translation>xxxxx MB</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="86"/>
+        <location filename="themestrings.h" line="90"/>
         <source>0 MB</source>
         <translation>0 MB</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="87"/>
+        <location filename="themestrings.h" line="91"/>
         <source>sep 13, 2004 11:00 pm (1h 15m)</source>
         <translation>13 sept, 2004 11:00 (1t 15min)</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="88"/>
+        <location filename="themestrings.h" line="92"/>
         <source>x.xx GB</source>
         <translation>x.xx GB</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="89"/>
+        <location filename="themestrings.h" line="55"/>
         <source>File Finder To Import</source>
         <translation>Filfinner for importering</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="90"/>
+        <location filename="themestrings.h" line="56"/>
         <source>Start Time:</source>
         <translation>Starttid:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="61"/>
+        <location filename="themestrings.h" line="57"/>
         <source>Select Associated Channel</source>
         <translation>Velg assosiert kanal</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="62"/>
+        <location filename="themestrings.h" line="58"/>
         <source>Archived Channel</source>
         <translation>Arkivert kanal</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="63"/>
+        <location filename="themestrings.h" line="59"/>
         <source>Chan. ID:</source>
         <translation>Kanal ID:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="64"/>
+        <location filename="themestrings.h" line="60"/>
         <source>Chan. No:</source>
         <translation>Kanal Nr:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="65"/>
+        <location filename="themestrings.h" line="61"/>
         <source>Callsign:</source>
         <translation>Kallesignal:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="66"/>
+        <location filename="themestrings.h" line="62"/>
         <source>Name:</source>
         <translation>Navn:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="67"/>
+        <location filename="themestrings.h" line="63"/>
         <source>Local Channel</source>
         <translation>Lokal kanal</translation>
     </message>
@@ -1057,267 +1138,266 @@ Vennligst vent...</translation>
         <translation>En profil med utvidet avspillingstid som gir omtrent 6 timer med video på en enkeltlags DVD</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="94"/>
+        <location filename="themestrings.h" line="95"/>
         <source>Select Destination:</source>
         <translation>Velg destinasjon:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="95"/>
+        <location filename="themestrings.h" line="96"/>
         <source>Parental level: %1</source>
         <translation>Foreldrenivå: %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="96"/>
+        <location filename="themestrings.h" line="97"/>
         <source>Old size:</source>
         <translation>Gammel størrelse:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="97"/>
+        <location filename="themestrings.h" line="98"/>
         <source>New size:</source>
         <translation>Ny størrelse:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="98"/>
+        <location filename="themestrings.h" line="99"/>
         <source>Select a theme:</source>
         <translation>Velg et tema:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="99"/>
+        <location filename="themestrings.h" line="100"/>
         <source>Menu</source>
         <translation>Meny</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="100"/>
+        <location filename="themestrings.h" line="101"/>
         <source>Chapter</source>
         <translation>Kapittel</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="101"/>
+        <location filename="themestrings.h" line="102"/>
         <source>Detail</source>
         <translation>Detalj</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="102"/>
+        <location filename="themestrings.h" line="103"/>
         <source>Select File to Import</source>
         <translation>Velg fil som skal importeres</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="103"/>
         <source>Search</source>
-        <translation>Søk</translation>
+        <translation type="obsolete">Søk</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="105"/>
+        <location filename="themestrings.h" line="106"/>
         <source>Create DVD</source>
         <translation>Lag DVD</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="106"/>
+        <location filename="themestrings.h" line="107"/>
         <source>Create Archive</source>
         <translation>Lag arkiv</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="107"/>
+        <location filename="themestrings.h" line="108"/>
         <source>Encode Video File</source>
         <translation>Kod videofil</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="108"/>
+        <location filename="themestrings.h" line="109"/>
         <source>Import Archive</source>
         <translation>Importer arkiv</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="109"/>
+        <location filename="themestrings.h" line="110"/>
         <source>Archive Utilities</source>
         <translation>Arkiv-verktøy</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="110"/>
+        <location filename="themestrings.h" line="111"/>
         <source>Show Log Viewer</source>
         <translation>Vis loggviser</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="111"/>
+        <location filename="themestrings.h" line="112"/>
         <source>Play Created DVD</source>
         <translation>Spill DVD som er laget</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="112"/>
+        <location filename="themestrings.h" line="113"/>
         <source>Burn DVD</source>
         <translation>Brenn DVD</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="11"/>
+        <location filename="themestrings.h" line="69"/>
         <source>Choose where you would like your files archived.</source>
         <translation>Velg hvor du vil at filene dine skal bli arkivert.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="9"/>
+        <location filename="themestrings.h" line="68"/>
         <source>%DATE%, %TIME%</source>
         <translation>%DATE%, %TIME%</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="12"/>
+        <location filename="themestrings.h" line="70"/>
         <source>Output Type:</source>
         <translation>Utdata type:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="13"/>
+        <location filename="themestrings.h" line="71"/>
         <source>Destination:</source>
         <translation>Mål:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="15"/>
+        <location filename="themestrings.h" line="72"/>
         <source>Click here to find an output location...</source>
         <translation>Klikk her for å finne et utdatasted...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="18"/>
+        <location filename="themestrings.h" line="73"/>
         <source>Erase DVD-RW before burning</source>
         <translation>Slett DVD-RW før brenning</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="19"/>
+        <location filename="themestrings.h" line="15"/>
         <source>Cancel</source>
         <translation>Avbryt</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="20"/>
+        <location filename="themestrings.h" line="74"/>
         <source>Previous</source>
         <translation>Forrige</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="21"/>
+        <location filename="themestrings.h" line="17"/>
         <source>Next</source>
         <translation>Neste</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="22"/>
+        <location filename="themestrings.h" line="75"/>
         <source>Filter:</source>
         <translation>Filter:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="23"/>
+        <location filename="themestrings.h" line="20"/>
         <source>OK</source>
         <translation>OK</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="25"/>
+        <location filename="themestrings.h" line="76"/>
         <source>Select the file you wish to use.</source>
         <translation>Velg hvilken fil du vil bruke.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="26"/>
+        <location filename="themestrings.h" line="22"/>
         <source>Back</source>
         <translation>Tilbake</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="27"/>
+        <location filename="themestrings.h" line="23"/>
         <source>Home</source>
         <translation>Hjem</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="30"/>
+        <location filename="themestrings.h" line="77"/>
         <source>See logs from your archive runs.</source>
         <translation>Se logger fra arkiveringskjøringen.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="31"/>
+        <location filename="themestrings.h" line="29"/>
         <source>Update</source>
         <translation>Oppdater</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="32"/>
+        <location filename="themestrings.h" line="30"/>
         <source>Exit</source>
         <translation>Avslutt</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="75"/>
+        <location filename="themestrings.h" line="85"/>
         <source>0.00 GB</source>
         <translation>0.00 GB</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="80"/>
+        <location filename="themestrings.h" line="86"/>
         <source>Video Category:</source>
         <translation>Videokategori:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="91"/>
+        <location filename="themestrings.h" line="93"/>
         <source>Ok</source>
         <translation>OK</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="34"/>
+        <location filename="themestrings.h" line="78"/>
         <source>12.34 GB</source>
         <translation>12.34 GB</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="36"/>
+        <location filename="themestrings.h" line="79"/>
         <source>Choose the appearance of your DVD.</source>
         <translation>Velg utseende for DVDen din.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="37"/>
+        <location filename="themestrings.h" line="80"/>
         <source>Theme:</source>
         <translation>Tema:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="43"/>
+        <location filename="themestrings.h" line="81"/>
         <source>Select the recordings and videos you wish to save.</source>
         <translation>Velg hvilke opptak og videoer du vil lagre.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="45"/>
+        <location filename="themestrings.h" line="40"/>
         <source>Add Recording</source>
         <translation>Legg til opptak</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="46"/>
+        <location filename="themestrings.h" line="41"/>
         <source>Add Video</source>
         <translation>Legg til video</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="47"/>
+        <location filename="themestrings.h" line="42"/>
         <source>Add File</source>
         <translation>Legg til fil</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="59"/>
+        <location filename="themestrings.h" line="53"/>
         <source>Save</source>
         <translation>Lagre</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="74"/>
+        <location filename="themestrings.h" line="10"/>
         <source>Find</source>
         <translation>Finn</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="71"/>
+        <location filename="themestrings.h" line="16"/>
         <source>Prev</source>
         <translation>Forrige</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="68"/>
+        <location filename="themestrings.h" line="64"/>
         <source>Search Channel</source>
         <translation>Søk i kanal</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="69"/>
+        <location filename="themestrings.h" line="65"/>
         <source>Search Callsign</source>
         <translation>Søk i kallesignal</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="70"/>
+        <location filename="themestrings.h" line="66"/>
         <source>Search Name</source>
         <translation>Søk i navn</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="72"/>
+        <location filename="themestrings.h" line="67"/>
         <source>Finish</source>
         <translation>Fullfør</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="104"/>
+        <location filename="themestrings.h" line="54"/>
         <source>Add video</source>
         <translation>Legg til video</translation>
     </message>

@@ -1200,6 +1200,11 @@ Når du er ferdig må du klikke «Ferdig» for å fortsette.</translation>
         <translation>100%</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="56"/>
+        <source>Global Weather Settings</source>
+        <translation>Globale værinnstillinger</translation>
+    </message>
+    <message>
         <location filename="themestrings.h" line="57"/>
         <source>Seconds to display each page</source>
         <translation>Sekunder hver side skal vises</translation>

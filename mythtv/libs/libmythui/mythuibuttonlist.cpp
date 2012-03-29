@@ -1390,6 +1390,8 @@ void MythUIButtonList::SetPositionArrowStates()
 
     updateLCD();
 
+    m_needsUpdate = false;
+
     if (!m_downArrow || !m_upArrow)
         return;
 

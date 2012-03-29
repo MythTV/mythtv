@@ -360,7 +360,7 @@
             <state name="disabled" from="active" />
             <state name="pushed" from="active">
                 <textarea name="text" >
-                    <area>4,4,100%-4,100%</area>>
+                    <area>4,4,100%-4,100%</area>
                 </textarea>
             </state>
         </statetype>

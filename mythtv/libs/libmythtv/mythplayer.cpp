@@ -2442,9 +2442,10 @@ void MythPlayer::SwitchToProgram(void)
         return;
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "SwitchToProgram - start");
-    bool d1 = false, d2 = false;
+    bool discontinuity = false, newtype = false;
     int newid = -1;
-    ProgramInfo *pginfo = player_ctx->tvchain->GetSwitchProgram(d1, d2, newid);
+    ProgramInfo *pginfo = player_ctx->tvchain->GetSwitchProgram(
+        discontinuity, newtype, newid);
     if (!pginfo)
         return;
 
@@ -2470,7 +2471,7 @@ void MythPlayer::SwitchToProgram(void)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "SwitchToProgram's OpenFile failed " +
             QString("(card type: %1).")
-                .arg(player_ctx->tvchain->GetCardType(newid)));
+            .arg(player_ctx->tvchain->GetCardType(newid)));
         LOG(VB_GENERAL, LOG_ERR, player_ctx->tvchain->toString());
         SetEof(true);
         SetErrored(QObject::tr("Error opening switch program buffer"));
@@ -2479,19 +2480,39 @@ void MythPlayer::SwitchToProgram(void)
     }
 
     if (GetEof())
+    {
+        discontinuity = true;
         ResetCaptions();
+    }
 
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("newid: %1 decoderEof: %2")
-                                       .arg(newid).arg(GetEof()));
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("SwitchToProgram(void) "
+        "discont: %1 newtype: %2 newid: %3 decoderEof: %4")
+        .arg(discontinuity).arg(newtype).arg(newid).arg(GetEof()));
 
-    player_ctx->tvchain->SetProgram(*pginfo);
-    if (decoder)
-        decoder->SetProgramInfo(*pginfo);
+    if (discontinuity || newtype)
+    {
+        player_ctx->tvchain->SetProgram(*pginfo);
+        if (decoder)
+            decoder->SetProgramInfo(*pginfo);
 
-    player_ctx->buffer->Reset(true);
-    if (OpenFile() < 0)
-        SetErrored(QObject::tr("Error opening switch program file"));
-
+        player_ctx->buffer->Reset(true);
+        if (newtype)
+        {
+            if (OpenFile() < 0)
+                SetErrored(QObject::tr("Error opening switch program file"));
+        }
+        else
+            ResetPlaying();
+    }
+    else
+    {
+        player_ctx->SetPlayerChangingBuffers(true);
+        if (decoder)
+        {
+            decoder->SetReadAdjust(player_ctx->buffer->SetAdjustFilesize());
+            decoder->SetWaitForChange();
+        }
+    }
     delete pginfo;
 
     if (IsErrored())
@@ -2508,8 +2529,11 @@ void MythPlayer::SwitchToProgram(void)
         player_ctx->buffer->UpdateRawBitrate(decoder->GetRawBitrate());
     player_ctx->buffer->Unpause();
 
-    CheckTVChain();
-    forcePositionMapSync = true;
+    if (discontinuity || newtype)
+    {
+        CheckTVChain();
+        forcePositionMapSync = true;
+    }
 
     Play();
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "SwitchToProgram - end");
@@ -2543,10 +2567,11 @@ void MythPlayer::FileChangedCallback(void)
 void MythPlayer::JumpToProgram(void)
 {
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "JumpToProgram - start");
-    bool d1 = false, d2 = false;
+    bool discontinuity = false, newtype = false;
     int newid = -1;
     long long nextpos = player_ctx->tvchain->GetJumpPos();
-    ProgramInfo *pginfo = player_ctx->tvchain->GetSwitchProgram(d1, d2, newid);
+    ProgramInfo *pginfo = player_ctx->tvchain->GetSwitchProgram(
+        discontinuity, newtype, newid);
     if (!pginfo)
         return;
 
@@ -2589,8 +2614,14 @@ void MythPlayer::JumpToProgram(void)
         return;
     }
 
-    if (OpenFile() < 0)
-        SetErrored(QObject::tr("Error opening jump program file"));
+    bool wasDummy = isDummy;
+    if (newtype || wasDummy)
+    {
+        if (OpenFile() < 0)
+            SetErrored(QObject::tr("Error opening jump program file"));
+    }
+    else
+        ResetPlaying();
 
     if (IsErrored() || !decoder)
     {

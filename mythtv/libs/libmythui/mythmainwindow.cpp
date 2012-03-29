@@ -436,8 +436,8 @@ MythMainWindow::MythMainWindow(const bool useDB)
     d->ignore_joystick_keys = false;
     d->exitingtomain = false;
     d->popwindows = true;
-    d->exitmenucallback = false;
-    d->exitmenumediadevicecallback = false;
+    d->exitmenucallback = NULL;
+    d->exitmenumediadevicecallback = NULL;
     d->mediadeviceforcallback = NULL;
     d->escapekey = Qt::Key_Escape;
     d->mainStack = NULL;
@@ -2564,7 +2564,8 @@ void MythMainWindow::HideMouseTimeout(void)
 
 void MythMainWindow::ResetIdleTimer(void)
 {
-    if (d->standby && d->enteringStandby)
+    if (!d->idleTimer->isActive() ||
+        (d->standby && d->enteringStandby))
         return;
 
     if (d->standby)

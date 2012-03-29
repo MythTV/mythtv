@@ -503,10 +503,14 @@ For nye abonnement, så trenger du kun å taste inn URL og klikke &quot;Lagre&qu
     </message>
     <message>
         <location filename="themestrings.h" line="52"/>
+        <source>Select to change image</source>
+        <translation>Velg for å endre bilde</translation>
+    </message>
+    <message>
         <source>Type the URL to an RSS 2.0 media feed below.  If editing an existing feed,modify any of the values you like.  Press &quot;Save&quot; to save/subscribe.
 
 For new subscriptions,you can simply enter the URL and click &quot;Save.&quot;</source>
-        <translation>Skriv inn UTL for en RSS 2.0 mediemating under.  Hvis du redigerer en eksisterende mating, så kan du endre hvilke verdier du ønsker.  Trykk &quot;Lagre&quot; for å lagre/abonnere.
+        <translation type="obsolete">Skriv inn UTL for en RSS 2.0 mediemating under.  Hvis du redigerer en eksisterende mating, så kan du endre hvilke verdier du ønsker.  Trykk &quot;Lagre&quot; for å lagre/abonnere.
 
 For nye abonnement, så trenger du kun å taste inn URL og klikke &quot;Lagre&quot;</translation>
     </message>
@@ -516,37 +520,36 @@ For nye abonnement, så trenger du kun å taste inn URL og klikke &quot;Lagre&qu
         <translation>Internett videoliste</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="54"/>
         <source>You haven&apos;t added any Sites/RSS Feeds yet!  To add a site,press MENU,then choose &quot;Scan/Manage Subscriptions,&quot; then &quot;Manage Site Subscriptions.&quot;</source>
-        <translation>Du har ikke lagt til noen nettsteder/RSS nyhetsmatinger enda!  For å legge til et nettsted, trykk MENY, velg så &quot;Søk/Administrer abonnement&quot;, og til slutt &quot;Administrer nettstedsabonnementer&quot;</translation>
+        <translation type="obsolete">Du har ikke lagt til noen nettsteder/RSS nyhetsmatinger enda!  For å legge til et nettsted, trykk MENY, velg så &quot;Søk/Administrer abonnement&quot;, og til slutt &quot;Administrer nettstedsabonnementer&quot;</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="55"/>
+        <location filename="themestrings.h" line="54"/>
         <source>User Rating: %1</source>
         <translation>Brukerrating: %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="56"/>
+        <location filename="themestrings.h" line="55"/>
         <source>By: %1</source>
         <translation>Av: %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="57"/>
+        <location filename="themestrings.h" line="56"/>
         <source>Internet Video Gallery</source>
         <translation>Internett videogalleri</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="58"/>
+        <location filename="themestrings.h" line="57"/>
         <source>Search popular video sites</source>
         <translation>Søk i populære nettsteder</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="59"/>
+        <location filename="themestrings.h" line="58"/>
         <source>Browse Internet Video</source>
         <translation>Utforsk Internettvideo</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="60"/>
+        <location filename="themestrings.h" line="59"/>
         <source>Browse highlights and entire sites</source>
         <translation>Utforsk høydepunkter og hele nettsteder</translation>
     </message>

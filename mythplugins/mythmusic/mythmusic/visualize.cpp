@@ -17,6 +17,7 @@
 using namespace std;
 
 // Qt
+#include <QCoreApplication>
 #include <QPainter>
 #include <QImage>
 
@@ -531,7 +532,8 @@ static class StereoScopeFactory : public VisFactory
   public:
     const QString &name(void) const
     {
-        static QString name("StereoScope");
+        static QString name = QCoreApplication::translate("Visualizers",
+                                                          "StereoScope");
         return name;
     }
 
@@ -558,7 +560,8 @@ static class MonoScopeFactory : public VisFactory
   public:
     const QString &name(void) const
     {
-        static QString name("MonoScope");
+        static QString name = QCoreApplication::translate("Visualizers",
+                                                          "MonoScope");
         return name;
     }
 
@@ -804,7 +807,8 @@ static class SpectrumFactory : public VisFactory
   public:
     const QString &name(void) const
     {
-        static QString name("Spectrum");
+        static QString name = QCoreApplication::translate("Visualizers",
+                                                          "Spectrum");
         return name;
     }
 
@@ -897,7 +901,8 @@ static class SquaresFactory : public VisFactory
   public:
     const QString &name(void) const
     {
-        static QString name("Squares");
+        static QString name = QCoreApplication::translate("Visualizers",
+                                                          "Squares");
         return name;
     }
 
@@ -1368,7 +1373,8 @@ static class PianoFactory : public VisFactory
   public:
     const QString &name(void) const
     {
-        static QString name("Piano");
+        static QString name = QCoreApplication::translate("Visualizers",
+                                                          "Piano");
         return name;
     }
 
@@ -1553,7 +1559,8 @@ static class AlbumArtFactory : public VisFactory
   public:
     const QString &name(void) const
     {
-        static QString name("AlbumArt");
+        static QString name = QCoreApplication::translate("Visualizers",
+                                                          "AlbumArt");
         return name;
     }
 
@@ -1605,7 +1612,8 @@ static class BlankFactory : public VisFactory
   public:
     const QString &name(void) const
     {
-        static QString name("Blank");
+        static QString name = QCoreApplication::translate("Visualizers",
+                                                          "Blank");
         return name;
     }
 

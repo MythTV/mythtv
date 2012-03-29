@@ -579,7 +579,6 @@ void XMLTVConfig::Load(void)
         while (!ostream.atEnd())
         {
             QString grabber_list(ostream.readLine());
-            grabber_list = grabber_list.left(grabber_list.size() - 1);
             QStringList grabber_split =
                 grabber_list.split("|", QString::SkipEmptyParts);
             QString grabber_name = grabber_split[1] + " (xmltv)";

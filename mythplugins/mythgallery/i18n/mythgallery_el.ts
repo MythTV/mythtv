@@ -12,29 +12,64 @@
 <context>
     <name>GalleryFilterDialog</name>
     <message>
-        <location filename="../mythgallery/galleryfilterdlg.cpp" line="205"/>
         <source>No files / directories found</source>
+        <translation type="obsolete">Δεν βρέθηκαν αρχεία / φάκελοι</translation>
+    </message>
+    <message>
+        <source>Filter result : %1 directories found but no files</source>
+        <translation type="obsolete">Αποτέλεσμα φίλτρου: Βρέθηκαν %1 φάκελοι αλλά κανένα αρχείο</translation>
+    </message>
+    <message>
+        <source>Filter result : %1 directories, %2 movie(s) found</source>
+        <translation type="obsolete">Αποτέλεσμα φίλτρου: Βρέθηκαν %1 φάκελοι, %2 ταινία(ες)</translation>
+    </message>
+    <message>
+        <source>Filter result : %1 directories, %2 image(s) found</source>
+        <translation type="obsolete">Αποτέλεσμα φίλτρου: Βρέθηκαν %1 φάκελοι, %2 εικόνα(ες)</translation>
+    </message>
+    <message>
+        <source>Filter result : %1 directories, %2 image(s) and %3 movie(s) found</source>
+        <translation type="obsolete">Αποτέλεσμα φίλτρου: Βρέθηκαν %1 φάκελοι, %2 εικόνα(ες) και %3 ταινία(ες)</translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/galleryfilterdlg.cpp" line="145"/>
+        <source>Filter result : (unknown)</source>
+        <translation>Αποτέλεσμα φίλτρου : (άγνωστο)</translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/galleryfilterdlg.cpp" line="178"/>
+        <source>-- please be patient --</source>
+        <translation>-- παρακαλώ περιμένετε --</translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/galleryfilterdlg.cpp" line="190"/>
+        <source>-- scanning current filter --</source>
+        <translation>-- ανιχνεύω βάσει ενεργού φίλτρου --</translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/galleryfilterdlg.cpp" line="205"/>
+        <source>No files / folders found</source>
         <translation>Δεν βρέθηκαν αρχεία / φάκελοι</translation>
     </message>
     <message>
         <location filename="../mythgallery/galleryfilterdlg.cpp" line="209"/>
-        <source>Filter result : %1 directories found but no files</source>
-        <translation>Αποτέλεσμα φίλτρου: Βρέθηκαν %1 φάκελοι αλλά κανένα αρχείο</translation>
+        <source>Filter result : %1 folder(s) found but no files</source>
+        <translation>Αποτέλεσμα φίλτρου : Βρέθηκαν %1 φάκελοι αλλά κανένα αρχείο</translation>
     </message>
     <message>
         <location filename="../mythgallery/galleryfilterdlg.cpp" line="213"/>
-        <source>Filter result : %1 directories, %2 movie(s) found</source>
-        <translation>Αποτέλεσμα φίλτρου: Βρέθηκαν %1 φάκελοι, %2 ταινία(ες)</translation>
+        <source>Filter result : %1 folder(s), %2 movie(s) found</source>
+        <translation>Αποτέλεσμα φίλτρου : Βρέθηκαν %1 φάκελοι, %2 ταινία(ες)</translation>
     </message>
     <message>
         <location filename="../mythgallery/galleryfilterdlg.cpp" line="217"/>
-        <source>Filter result : %1 directories, %2 image(s) found</source>
-        <translation>Αποτέλεσμα φίλτρου: Βρέθηκαν %1 φάκελοι, %2 εικόνα(ες)</translation>
+        <source>Filter result : %1 folder(s), %2 image(s) found</source>
+        <translation>Αποτέλεσμα φίλτρου : Βρέθηκαν %1 φάκελοι, %2 εικόνα(ες)</translation>
     </message>
     <message>
         <location filename="../mythgallery/galleryfilterdlg.cpp" line="221"/>
-        <source>Filter result : %1 directories, %2 image(s) and %3 movie(s) found</source>
-        <translation>Αποτέλεσμα φίλτρου: Βρέθηκαν %1 φάκελοι, %2 εικόνα(ες) και %3 ταινία(ες)</translation>
+        <source>Filter result : %1 folder(s), %2 image(s) and %3 movie(s) found</source>
+        <translation>Αποτέλεσμα φίλτρου : Βρέθηκαν %1 φάκελος(οι), %2 εικόνα(ες) και %3 ταινία(ες)</translation>
     </message>
     <message>
         <location filename="../mythgallery/galleryfilterdlg.cpp" line="226"/>
@@ -60,9 +95,8 @@
         <translation>Ο φάκελος &apos;%1&apos; δεν υπάρχει ή δεν είναι προσπελάσιμος.</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="196"/>
         <source>No images found in this directory.</source>
-        <translation>Δεν βρέθηκαν φωτογραφίες στο φάκελο.</translation>
+        <translation type="obsolete">Δεν βρέθηκαν φωτογραφίες στο φάκελο.</translation>
     </message>
     <message>
         <location filename="../mythgallery/iconview.cpp" line="389"/>
@@ -167,6 +201,11 @@
         <translation>Επιλογές Αρχείων</translation>
     </message>
     <message>
+        <location filename="../mythgallery/iconview.cpp" line="196"/>
+        <source>No images found in this folder.</source>
+        <translation>Δεν βρέθηκαν φωτογραφίες στο φάκελο.</translation>
+    </message>
+    <message>
         <location filename="../mythgallery/iconview.cpp" line="896"/>
         <source>Meta Data Options</source>
         <translation>Επιλογές Μεταπληροφοριών</translation>
@@ -212,9 +251,13 @@
         <translation>Διαγραφή</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="974"/>
         <source>Create Dir</source>
-        <translation>Δημιουργία Φακέλου</translation>
+        <translation type="obsolete">Δημιουργία Φακέλου</translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/iconview.cpp" line="974"/>
+        <source>Create folder</source>
+        <translation>Δημιουργία φακέλου</translation>
     </message>
     <message>
         <location filename="../mythgallery/iconview.cpp" line="975"/>
@@ -279,8 +322,12 @@
     </message>
     <message>
         <location filename="../mythgallery/iconview.cpp" line="1368"/>
-        <source>Failed to rename directory</source>
+        <source>Failed to rename folder</source>
         <translation>Αδυναμία μετονομασίας φακέλου</translation>
+    </message>
+    <message>
+        <source>Failed to rename directory</source>
+        <translation type="obsolete">Αδυναμία μετονομασίας φακέλου</translation>
     </message>
     <message>
         <location filename="../mythgallery/iconview.cpp" line="1370"/>
@@ -774,8 +821,9 @@ Check the directory exists, is readable and the setting is correct on MythGaller
     </message>
     <message>
         <location filename="themestrings.h" line="19"/>
-        <source>Directory filter :</source>
-        <translation>Φίλτρο φακέλου:</translation>
+        <source>Folder filter :</source>
+        <oldsource>Directory filter :</oldsource>
+        <translation>Φίλτρο φακέλου :</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="20"/>
@@ -783,12 +831,11 @@ Check the directory exists, is readable and the setting is correct on MythGaller
         <translation>Τύπος φίλτρου:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="21"/>
         <source>NumImages_Text</source>
-        <translation>Κείμενο_numImages</translation>
+        <translation type="obsolete">Κείμενο_numImages</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="22"/>
+        <location filename="themestrings.h" line="21"/>
         <source>Sort by :</source>
         <translation>Ταξινόμηση κατά:</translation>
     </message>

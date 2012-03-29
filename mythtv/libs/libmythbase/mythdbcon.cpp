@@ -72,7 +72,7 @@ MSqlDatabase::MSqlDatabase(const QString &name)
     m_name = name;
     m_name.detach();
     m_db = QSqlDatabase::addDatabase("QMYSQL", m_name);
-    LOG(VB_GENERAL, LOG_INFO, "Database connection created: " + m_name);
+    LOG(VB_DATABASE, LOG_INFO, "Database connection created: " + m_name);
 
     if (!m_db.isValid())
     {
@@ -91,7 +91,7 @@ MSqlDatabase::~MSqlDatabase()
                                 // removeDatabase() so that connections
                                 // and queries are cleaned up correctly
         QSqlDatabase::removeDatabase(m_name);
-        LOG(VB_GENERAL, LOG_INFO, "Database connection deleted: " + m_name);
+        LOG(VB_DATABASE, LOG_INFO, "Database connection deleted: " + m_name);
     }
 }
 
@@ -174,7 +174,7 @@ bool MSqlDatabase::OpenDatabase(bool skipdb)
         }
         if (connected)
         {
-            LOG(VB_GENERAL, LOG_INFO,
+            LOG(VB_DATABASE, LOG_INFO,
                     QString("Connected to database '%1' at host: %2")
                             .arg(m_db.databaseName()).arg(m_db.hostName()));
 
@@ -294,7 +294,7 @@ MSqlDatabase *MDBManager::popConnection(bool reuse)
     {
         db = new MSqlDatabase("DBManager" + QString::number(m_nextConnID++));
         ++m_connCount;
-        LOG(VB_GENERAL, LOG_INFO,
+        LOG(VB_DATABASE, LOG_INFO,
                 QString("New DB connection, total: %1").arg(m_connCount));
     }
     else
@@ -449,7 +449,7 @@ void MDBManager::CloseDatabases()
 
     for (DBList::iterator it = list.begin(); it != list.end(); ++it)
     {
-        LOG(VB_GENERAL, LOG_INFO,
+        LOG(VB_DATABASE, LOG_INFO,
             "Closing DB connection named '" + (*it)->m_name + "'");
         (*it)->m_db.close();
         delete (*it);
@@ -461,7 +461,7 @@ void MDBManager::CloseDatabases()
     while (!slist.isEmpty())
     {
         MSqlDatabase *db = slist.takeFirst();
-        LOG(VB_GENERAL, LOG_INFO,
+        LOG(VB_DATABASE, LOG_INFO,
             "Closing DB connection named '" + db->m_name + "'");
         db->m_db.close();
         delete db;

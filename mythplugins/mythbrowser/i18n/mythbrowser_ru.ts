@@ -80,18 +80,6 @@ Use the &apos;Add Bookmark&apos; menu option to add new bookmarks</source>
         <source>Are you sure you want to delete the marked bookmarks?</source>
         <translation>Вы уверены что хотите удалить выбранные закладки?</translation>
     </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="obsolete">Отмена</translation>
-    </message>
-    <message>
-        <source>Are you sure you want to delete the selected bookmark</source>
-        <translation type="obsolete">Вы уверены что хотите удалить выбранную закладку</translation>
-    </message>
-    <message>
-        <source>Are you sure you want to delete the marked bookmarks</source>
-        <translation type="obsolete">Вы уверены что хотите удалить выбранные закладки</translation>
-    </message>
 </context>
 <context>
     <name>BrowserConfig</name>
@@ -129,59 +117,55 @@ Use the &apos;Add Bookmark&apos; menu option to add new bookmarks</source>
 <context>
     <name>MythBrowser</name>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="118"/>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="325"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="120"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="327"/>
         <source>Enter URL</source>
         <translation>Введите URL</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="250"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="252"/>
         <source>Loading...</source>
         <translation>Загрузка...</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="314"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="316"/>
         <source>Actions</source>
         <translation>Действия</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="328"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="330"/>
         <source>Back</source>
         <translation>Назад</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="331"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="333"/>
         <source>Forward</source>
         <translation>Вперед</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="333"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="335"/>
         <source>Zoom In</source>
         <translation>Увеличить</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="334"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="336"/>
         <source>Zoom Out</source>
         <translation>Уменьшить</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="335"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="337"/>
         <source>New Tab</source>
         <translation>Новая вкладка</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="338"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="340"/>
         <source>Delete Tab</source>
         <translation>Удалить вкладку</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="340"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="342"/>
         <source>Add Bookmark</source>
         <translation>Добавить закладку</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="obsolete">Отмена</translation>
     </message>
 </context>
 <context>
@@ -210,27 +194,27 @@ Use the &apos;Add Bookmark&apos; menu option to add new bookmarks</source>
         <translation>Менеджер закладок</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="23"/>
+        <location filename="themestrings.h" line="26"/>
         <source>Category</source>
         <translation>Категория</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="24"/>
+        <location filename="themestrings.h" line="27"/>
         <source>[x]</source>
         <translation>[x]</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="25"/>
+        <location filename="themestrings.h" line="28"/>
         <source>Name</source>
         <translation>Название</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="26"/>
+        <location filename="themestrings.h" line="29"/>
         <source>URL</source>
         <translation>URL</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="17"/>
+        <location filename="themestrings.h" line="20"/>
         <source>Category:</source>
         <translation>Категория:</translation>
     </message>
@@ -240,42 +224,47 @@ Use the &apos;Add Bookmark&apos; menu option to add new bookmarks</source>
         <translation>Веб-странциа</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="7"/>
+        <location filename="themestrings.h" line="13"/>
         <source>%DATE%, %TIME%</source>
         <translation>%DATE%, %TIME%</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="8"/>
+        <location filename="themestrings.h" line="14"/>
         <source>Web Bookmarks</source>
         <translation>Закладки веб</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="9"/>
+        <location filename="themestrings.h" line="15"/>
         <source>Browse your favorite web sites.</source>
         <translation>Просмотр ваших любимых сайтов.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="10"/>
+        <location filename="themestrings.h" line="16"/>
         <source>Browser:</source>
         <translation>Браузер:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="12"/>
+        <location filename="themestrings.h" line="17"/>
         <source>Enable browser plugins (Flash, etc):</source>
         <translation>Включить плагины (Flash и т.п.):</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="14"/>
+        <location filename="themestrings.h" line="12"/>
         <source>OK</source>
         <translation>ОК</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="15"/>
+        <location filename="themestrings.h" line="7"/>
+        <source>Rating Settings</source>
+        <translation>Настройки рейтинга</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="18"/>
         <source>Configure Web Browser</source>
         <translation>Настроить браузер</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="16"/>
+        <location filename="themestrings.h" line="19"/>
         <source>You can edit the name, URL, and category for the selected Web Site on this screen.
 
 When you have finished editing, select &quot;OK&quot; or &quot;Cancel&quot; to continue.</source>
@@ -284,67 +273,67 @@ When you have finished editing, select &quot;OK&quot; or &quot;Cancel&quot; to c
 Выберите &quot;ОК&quot; или &quot;Отмена&quot; после того как закончите редактирование.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="20"/>
+        <location filename="themestrings.h" line="23"/>
         <source>Genre:</source>
         <translation>Жанр:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="21"/>
+        <location filename="themestrings.h" line="24"/>
         <source>Channel:</source>
         <translation>Канал:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="22"/>
+        <location filename="themestrings.h" line="25"/>
         <source>Click to choose from existing categories...</source>
         <translation>Щелкните чтобы выбрать из существующих категорий...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="29"/>
+        <location filename="themestrings.h" line="31"/>
         <source>Find</source>
         <translation>Найти</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="30"/>
+        <location filename="themestrings.h" line="32"/>
         <source>Enable browser plugins (Flash, etc)</source>
         <translation>Включить плагины (Flash и т.п.)</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="31"/>
+        <location filename="themestrings.h" line="33"/>
         <source>Enable plugins</source>
         <translation>Включить плагины</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="32"/>
+        <location filename="themestrings.h" line="10"/>
         <source>Enable plugins:</source>
         <translation>Включить плагины:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="28"/>
+        <location filename="themestrings.h" line="30"/>
         <source>Find...</source>
         <translation>Найти...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="18"/>
+        <location filename="themestrings.h" line="21"/>
         <source>Name:</source>
         <translation>Название:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="19"/>
+        <location filename="themestrings.h" line="22"/>
         <source>URL:</source>
         <translation>URL:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="13"/>
+        <location filename="themestrings.h" line="11"/>
         <source>Cancel</source>
         <translation>Отмена</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="27"/>
+        <location filename="themestrings.h" line="8"/>
         <source>Browser Command:</source>
         <translation>Команда браузера:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="11"/>
+        <location filename="themestrings.h" line="9"/>
         <source>Text Size:</source>
         <translation>Размер текста:</translation>
     </message>

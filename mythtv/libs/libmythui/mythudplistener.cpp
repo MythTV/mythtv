@@ -109,7 +109,7 @@ void MythUDPListener::Process(const QByteArray &buf, QHostAddress sender,
 
     if (!msg.isEmpty())
     {
-        if (timeout < 0 || timeout > 1000)
+        if (timeout > 1000)
             timeout = 0;
         LOG(VB_GENERAL, LOG_INFO, QString("Received message '%1', timeout %2")
             .arg(msg).arg(timeout));

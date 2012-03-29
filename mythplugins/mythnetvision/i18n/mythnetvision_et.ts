@@ -328,7 +328,7 @@ Uute liitumiste jaoks sisesta lihtsalt URL ja klõpsa &quot;Salvesta.&quot;</tra
     <message>
         <location filename="themestrings.h" line="17"/>
         <source>URL:</source>
-        <translation></translation>
+        <translation>URL:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="18"/>
@@ -441,6 +441,11 @@ Uute liitumiste jaoks sisesta lihtsalt URL ja klõpsa &quot;Salvesta.&quot;</tra
         <translation>Vali pilt</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="52"/>
+        <source>Select to change image</source>
+        <translation>Vali pildi muutmiseks</translation>
+    </message>
+    <message>
         <location filename="themestrings.h" line="23"/>
         <source>Cancel</source>
         <translation>Tühista</translation>
@@ -497,51 +502,37 @@ Uute liitumiste jaoks sisesta lihtsalt URL ja klõpsa &quot;Salvesta.&quot;</tra
         <translation>Otsi interneti videoid</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="52"/>
-        <source>Type the URL to an RSS 2.0 media feed below.  If editing an existing feed,modify any of the values you like.  Press &quot;Save&quot; to save/subscribe.
-
-For new subscriptions,you can simply enter the URL and click &quot;Save.&quot;</source>
-        <translation>Sisesta allpool RSS 2.0 meedia voo URL. Salvestamiseks/liitumiseks klõpsa &quot;Salvesta&quot;
-
-Uute liitumiste jaoks sisesta lihtsalt URL ja klõpsa &quot;Salvesta.&quot;</translation>
-    </message>
-    <message>
         <location filename="themestrings.h" line="53"/>
         <source>Internet Video List</source>
         <translation>Netivideote loend</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="54"/>
-        <source>You haven&apos;t added any Sites/RSS Feeds yet!  To add a site,press MENU,then choose &quot;Scan/Manage Subscriptions,&quot; then &quot;Manage Site Subscriptions.&quot;</source>
-        <translation>Hetkel pole ühtegi voogu/lehte lisatud! Lisamiseks klõpsa MENÜÜ ja vali &quot;Otsi/muuda liitumisi&quot;, siis &quot;Muuda allikatega liitumisi.&quot;</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="55"/>
         <source>User Rating: %1</source>
         <translation>Kasutajate hinnang: %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="56"/>
+        <location filename="themestrings.h" line="55"/>
         <source>By: %1</source>
         <translation>%1 poolt</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="57"/>
+        <location filename="themestrings.h" line="56"/>
         <source>Internet Video Gallery</source>
         <translation>Netivideote galerii</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="58"/>
+        <location filename="themestrings.h" line="57"/>
         <source>Search popular video sites</source>
         <translation>Otsi populaarseid video lehti</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="59"/>
+        <location filename="themestrings.h" line="58"/>
         <source>Browse Internet Video</source>
         <translation>Sirvi interneti videoid</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="60"/>
+        <location filename="themestrings.h" line="59"/>
         <source>Browse highlights and entire sites</source>
         <translation>Sirvi esile tõstetuid ja kogu lehti</translation>
     </message>

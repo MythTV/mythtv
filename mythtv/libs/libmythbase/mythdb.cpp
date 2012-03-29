@@ -359,20 +359,17 @@ QString MythDB::GetSetting(const QString &_key, const QString &defaultval)
             return value;
         }
     }
-    else
+    SettingsMap::const_iterator it = d->overriddenSettings.find(key);
+    if (it != d->overriddenSettings.end())
     {
-        SettingsMap::const_iterator it = d->overriddenSettings.find(key);
-        if (it != d->overriddenSettings.end())
-        {
-            value = *it;
-            d->settingsCacheLock.unlock();
-            return value;
-        }
+        value = *it;
+        d->settingsCacheLock.unlock();
+        return value;
     }
     d->settingsCacheLock.unlock();
 
     if (d->ignoreDatabase || !HaveValidDatabase())
-        return value;
+        return defaultval;
 
     MSqlQuery query(MSqlQuery::InitCon());
     if (!query.isConnected())
@@ -455,18 +452,15 @@ bool MythDB::GetSettings(QMap<QString,QString> &_key_value_pairs)
                 }
             }
         }
-        else
+        for (; kvit != _key_value_pairs.end(); ++dit, ++kvit)
         {
-            for (; kvit != _key_value_pairs.end(); ++dit, ++kvit)
+            SettingsMap::const_iterator it =
+                d->overriddenSettings.find(dit.key());
+            if (it != d->overriddenSettings.end())
             {
-                SettingsMap::const_iterator it =
-                    d->overriddenSettings.find(dit.key());
-                if (it != d->overriddenSettings.end())
-                {
-                    *kvit = *it;
-                    *dit = true;
-                    done_cnt++;
-                }
+                *kvit = *it;
+                *dit = true;
+                done_cnt++;
             }
         }
         d->settingsCacheLock.unlock();
@@ -608,15 +602,12 @@ QString MythDB::GetSettingOnHost(const QString &_key, const QString &_host,
             return value;
         }
     }
-    else
+    SettingsMap::const_iterator it = d->overriddenSettings.find(myKey);
+    if (it != d->overriddenSettings.end())
     {
-        SettingsMap::const_iterator it = d->overriddenSettings.find(myKey);
-        if (it != d->overriddenSettings.end())
-        {
-            value = *it;
-            d->settingsCacheLock.unlock();
-            return value;
-        }
+        value = *it;
+        d->settingsCacheLock.unlock();
+        return value;
     }
     d->settingsCacheLock.unlock();
 

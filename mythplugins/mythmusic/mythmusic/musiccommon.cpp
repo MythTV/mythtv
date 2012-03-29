@@ -189,6 +189,8 @@ bool MusicCommon::CreateCommon(void)
         connect(m_currentPlaylist, SIGNAL(itemVisible(MythUIButtonListItem*)),
                 this, SLOT(playlistItemVisible(MythUIButtonListItem*)));
 
+        m_currentPlaylist->SetSearchFields("**search**");
+
         updateUIPlaylist();
     }
 
@@ -1125,7 +1127,7 @@ void MusicCommon::customEvent(QEvent *event)
 
         LOG(VB_GENERAL, LOG_ERR, QString("%1 %2").arg(statusString)
             .arg(*aoe->errorMessage()));
-        ShowOkPopup(QString("MythMusic has encountered the following error:\n%1")
+        ShowOkPopup(QString(tr("MythMusic has encountered the following error:\n%1"))
                     .arg(*aoe->errorMessage()));
         stopAll();
     }
@@ -1167,7 +1169,7 @@ void MusicCommon::customEvent(QEvent *event)
         LOG(VB_GENERAL, LOG_ERR, QString("%1 %2").arg(statusString)
             .arg(*dxe->errorMessage()));
 
-        ShowOkPopup(QString("MythMusic has encountered the following error:\n%1")
+        ShowOkPopup(QString(tr("MythMusic has encountered the following error:\n%1"))
                     .arg(*dxe->errorMessage()));
     }
     else if (event->type() == DialogCompletionEvent::kEventType)
@@ -1345,7 +1347,7 @@ void MusicCommon::customEvent(QEvent *event)
                 byGenre();
             else if (resulttext == tr("Tracks From Current Album"))
                 byAlbum();
-            else if (resulttext == tr("Track From Current Year"))
+            else if (resulttext == tr("Tracks From Current Year"))
                 byYear();
             else if (resulttext == tr("Tracks With Same Title"))
                 byTitle();
@@ -1760,10 +1762,10 @@ void MusicCommon::playlistItemVisible(MythUIButtonListItem *item)
     if (!item)
         return;
 
-    if (item->GetImage().isEmpty())
+    Metadata *mdata = qVariantValue<Metadata*> (item->GetData());
+    if (mdata)
     {
-        Metadata *mdata = qVariantValue<Metadata*> (item->GetData());
-        if (mdata)
+        if (item->GetImage().isEmpty())
         {
             QString artFile = mdata->getAlbumArtFile();
             if (artFile.isEmpty())
@@ -1777,8 +1779,15 @@ void MusicCommon::playlistItemVisible(MythUIButtonListItem *item)
                 item->SetImage(mdata->getAlbumArtFile(), "coverart");
             }
         }
-        else
-            item->SetImage("");
+
+        if (item->GetText() == " ")
+        {
+            MetadataMap metadataMap;
+            mdata->toMap(metadataMap);
+            item->SetText("");
+            item->SetTextFromMap(metadataMap);
+            item->DisplayState(QString("%1").arg(mdata->Rating()), "ratingstate");
+        }
     }
 }
 
@@ -1802,11 +1811,9 @@ void MusicCommon::updateUIPlaylist(void)
         if (mdata)
         {
             MythUIButtonListItem *item =
-                new MythUIButtonListItem(m_currentPlaylist, "", qVariantFromValue(mdata));
+                new MythUIButtonListItem(m_currentPlaylist, " ", qVariantFromValue(mdata));
 
-            MetadataMap metadataMap;
-            mdata->toMap(metadataMap);
-            item->SetTextFromMap(metadataMap);
+            item->SetText(mdata->Artist() + mdata->Album() + mdata->Title(), "**search**");
             item->SetFontState("normal");
             item->DisplayState("default", "playstate");
 
@@ -1829,8 +1836,6 @@ void MusicCommon::updateUIPlaylist(void)
                     item->DisplayState("stopped", "playstate");
                 }
             }
-
-            item->DisplayState(QString("%1").arg(mdata->Rating()), "ratingstate");
 
             if (gPlayer->getCurrentMetadata() && mdata->ID() == gPlayer->getCurrentMetadata()->ID())
                 m_currentPlaylist->SetItemCurrent(item);
@@ -1880,7 +1885,7 @@ void MusicCommon::updatePlaylistStats(void)
         QString playlistcurrent = QLocale::system().toString(m_currentTrack + 1);
         QString playlisttotal = QLocale::system().toString(trackCount);
 
-        map["playlistposition"] = QString("%1 of %2").arg(playlistcurrent)
+        map["playlistposition"] = QString(tr("%1 of %2")).arg(playlistcurrent)
                                                      .arg(playlisttotal);
         map["playlistcurrent"] = playlistcurrent;
         map["playlistcount"] = playlisttotal;
@@ -2123,7 +2128,7 @@ MythMenu* MusicCommon::createQuickPlaylistsMenu(void)
         menu->AddItem(tr("Tracks By Current Artist"));
         menu->AddItem(tr("Tracks From Current Album"));
         menu->AddItem(tr("Tracks From Current Genre"));
-        menu->AddItem(tr("Track From Current Year"));
+        menu->AddItem(tr("Tracks From Current Year"));
         menu->AddItem(tr("Tracks With Same Title"));
     }
 
@@ -2392,7 +2397,7 @@ void MusicCommon::playFirstTrack()
 //---------------------------------------------------------
 // MythMusicVolumeDialog
 //---------------------------------------------------------
-#define MUSICVOLUMEPOPUPTIME 5 * 1000
+#define MUSICVOLUMEPOPUPTIME 4 * 1000
 
 MythMusicVolumeDialog::MythMusicVolumeDialog(MythScreenStack *parent, const char *name)
          : MythScreenType(parent, name, false)
@@ -2455,7 +2460,10 @@ bool MythMusicVolumeDialog::keyPressEvent(QKeyEvent *event)
     if (!handled && MythScreenType::keyPressEvent(event))
         handled = true;
 
-    m_displayTimer->start(MUSICVOLUMEPOPUPTIME);
+    // Restart the display timer only if we handled this keypress, if nothing
+    // has changed there's no need to keep the volume on-screen
+    if (handled)
+        m_displayTimer->start(MUSICVOLUMEPOPUPTIME);
 
     return handled;
 }

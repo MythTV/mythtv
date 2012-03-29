@@ -914,152 +914,152 @@
 <context>
     <name>ThemeUI</name>
     <message>
-        <location filename="themestrings.h" line="6"/>
+        <location filename="themestrings.h" line="5"/>
         <source>Humidity</source>
         <translation>Õhuniiskus</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="7"/>
+        <location filename="themestrings.h" line="6"/>
         <source>Pressure</source>
         <translation>Õhurõhk</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="10"/>
+        <location filename="themestrings.h" line="9"/>
         <source>Visibility</source>
         <translation>Nähtavus</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="8"/>
+        <location filename="themestrings.h" line="7"/>
         <source>Wind(Gust)</source>
         <translation>Tuul(tuulehoog)</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="9"/>
+        <location filename="themestrings.h" line="8"/>
         <source>Wind Direction</source>
         <translation>Tuulesuund</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="11"/>
+        <location filename="themestrings.h" line="10"/>
         <source>Feels Like</source>
         <translation>Tundub nagu</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="33"/>
+        <location filename="themestrings.h" line="12"/>
         <source>High</source>
         <translation>Kõrge</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="32"/>
+        <location filename="themestrings.h" line="11"/>
         <source>Low</source>
         <translation>Madal</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="39"/>
+        <location filename="themestrings.h" line="44"/>
         <source>Weather Screen Setup</source>
         <translation>Ilma kuva seadistus</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="40"/>
+        <location filename="themestrings.h" line="45"/>
         <source>Weather Source Setup</source>
         <translation>Ilma allika seadistus</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="41"/>
+        <location filename="themestrings.h" line="46"/>
         <source>Source</source>
         <translation>Allikas</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="45"/>
+        <location filename="themestrings.h" line="48"/>
         <source>Humidity:</source>
         <translation>Õhuniiskus:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="46"/>
+        <location filename="themestrings.h" line="49"/>
         <source>Pressure:</source>
         <translation>Õhurõhk:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="47"/>
+        <location filename="themestrings.h" line="50"/>
         <source>Wind(Gust):</source>
         <translation>Tuul(tuulehoog):</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="48"/>
+        <location filename="themestrings.h" line="51"/>
         <source>Wind Direction:</source>
         <translation>Tuulesuund:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="49"/>
+        <location filename="themestrings.h" line="52"/>
         <source>Visibility:</source>
         <translation>Nähtavus:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="50"/>
+        <location filename="themestrings.h" line="53"/>
         <source>Feels Like:</source>
         <translation>Tundub nagu:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="37"/>
+        <location filename="themestrings.h" line="16"/>
         <source>Global Settings</source>
         <translation>Üldised seaded</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="20"/>
+        <location filename="themestrings.h" line="17"/>
         <source>Seconds to display each page:</source>
         <translation>Mitu sekundit igat lehte näidatakse:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="38"/>
+        <location filename="themestrings.h" line="18"/>
         <source>Retrieve data in the background:</source>
         <translation>Hangi andmeid taustal:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="52"/>
+        <location filename="themestrings.h" line="20"/>
         <source>Source Setup</source>
         <translation>Allika seadistus</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="27"/>
+        <location filename="themestrings.h" line="21"/>
         <source>Data Retrieval Interval (minutes):</source>
         <translation>Andmete hankimise sagedus(minutites):</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="5"/>
+        <location filename="themestrings.h" line="26"/>
         <source>%DATE%, %TIME%</source>
         <translation>%DATE%, %TIME%</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="12"/>
+        <location filename="themestrings.h" line="27"/>
         <source>Last Updated %1</source>
         <translation>Uuendatud %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="13"/>
+        <location filename="themestrings.h" line="28"/>
         <source>High Temperature:  %1</source>
         <translation>Kõrgeim temperatuur: %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="14"/>
+        <location filename="themestrings.h" line="29"/>
         <source>Low Temperature:  %1</source>
         <translation>Madalaim temperatuur: %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="15"/>
+        <location filename="themestrings.h" line="30"/>
         <source>Temperature:  %1</source>
         <translation>Temperatuur: %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="16"/>
+        <location filename="themestrings.h" line="31"/>
         <source>Chance of Precipitation:  %1</source>
         <translation>Sademete tõenäosus: %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="17"/>
+        <location filename="themestrings.h" line="32"/>
         <source>Weather Screen Settings</source>
         <translation>Ilma kuva seaded</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="18"/>
+        <location filename="themestrings.h" line="33"/>
         <source>This screen governs the behavior of the weather screens.  You can enable a background weather update which will run regardless of being on the weather screen, and configure how many seconds each screen will display.
 
 When you are done configuring the weather plugin, click &quot;Finish&quot; to continue.</source>
@@ -1070,37 +1070,37 @@ When you are done configuring the Weather Plugin, click &quot;Finish&quot; to co
 Kui kõik on tehtud, kliki jätkamiseks &quot;Lõpeta&quot;.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="19"/>
+        <location filename="themestrings.h" line="34"/>
         <source>Retrieve data in background:</source>
         <translation>Hangi andmeid taustal:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="21"/>
+        <location filename="themestrings.h" line="35"/>
         <source>OK</source>
         <translation>OK</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="22"/>
+        <location filename="themestrings.h" line="36"/>
         <source>Weather Setup</source>
         <translation>Ilmateate seadistamine</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="23"/>
+        <location filename="themestrings.h" line="37"/>
         <source>Available Screens</source>
         <translation>Võimalikud kuvad</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="24"/>
+        <location filename="themestrings.h" line="38"/>
         <source>Active Screens</source>
         <translation>Aktiivsed kuvad</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="25"/>
+        <location filename="themestrings.h" line="39"/>
         <source>Weather Script Settings</source>
         <translation>Ilmateate skripti seaded</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="26"/>
+        <location filename="themestrings.h" line="40"/>
         <source>This settings screen governs the behavior of individual weather scripts.  Select the script whose behavior you with to change and press the right arrow. Adjust the interval at which data is retrieved, and the timeout for accessing the site.
 
 When you have completed your changes, click &quot;Finish&quot; to continue.</source>
@@ -1108,52 +1108,52 @@ When you have completed your changes, click &quot;Finish&quot; to continue.</sou
 Kui kõik on tehtud, vajuta jätkamiseks &quot;Lõpeta&quot;.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="28"/>
+        <location filename="themestrings.h" line="22"/>
         <source>Source Update Timeout (seconds):</source>
         <translation>Allika uuendamise ajalimiit (sekundites):</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="29"/>
+        <location filename="themestrings.h" line="41"/>
         <source>Finish</source>
         <translation>Lõpeta</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="30"/>
+        <location filename="themestrings.h" line="42"/>
         <source>Search</source>
         <translation>Otsi</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="31"/>
+        <location filename="themestrings.h" line="43"/>
         <source>Enter Current Location</source>
         <translation>Sisesta asukoht</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="34"/>
+        <location filename="themestrings.h" line="13"/>
         <source>Weather Alerts</source>
         <translation>Ilma hoiatused</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="35"/>
+        <location filename="themestrings.h" line="14"/>
         <source>Temp</source>
         <translation>Temp</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="44"/>
+        <location filename="themestrings.h" line="47"/>
         <source>Weather Location Search</source>
         <translation>Asukoha otsing</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="36"/>
+        <location filename="themestrings.h" line="15"/>
         <source>Precip</source>
         <translation>Sademed</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="51"/>
+        <location filename="themestrings.h" line="19"/>
         <source>Screen Setup</source>
         <translation>Kuva seadistus</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="53"/>
+        <location filename="themestrings.h" line="23"/>
         <source>Location Search</source>
         <translation>Asukoha otsing</translation>
     </message>
@@ -1183,43 +1183,42 @@ Kui kõik on tehtud, vajuta jätkamiseks &quot;Lõpeta&quot;.</translation>
         <translation>Hangi andmeid taustal</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="59"/>
         <source>Enter your current location,nearest large town or city. In some countries postal codes are also supported.</source>
-        <translation>Sisesta asukoht. Lähim suurem linn. Osades riikides sobib ka posti sihtnumber.</translation>
+        <translation type="obsolete">Sisesta asukoht. Lähim suurem linn. Osades riikides sobib ka posti sihtnumber.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="60"/>
+        <location filename="themestrings.h" line="59"/>
         <source>General weather options</source>
         <oldsource>General weather plugin options</oldsource>
         <translation>Ilmateate üldised valikud</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="61"/>
+        <location filename="themestrings.h" line="60"/>
         <source>Screen Settings</source>
         <translation>Kuva seadistus</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="62"/>
+        <location filename="themestrings.h" line="61"/>
         <source>Choose which weather forecasts to display</source>
         <translation>Vali millist ilmateadet kuvada</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="63"/>
+        <location filename="themestrings.h" line="62"/>
         <source>Source Settings</source>
         <translation>Allika seadistus</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="64"/>
+        <location filename="themestrings.h" line="63"/>
         <source>Configure the behavior of weather scripts</source>
         <translation>Seadista ilmateate skriptide käitumist</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="42"/>
+        <location filename="themestrings.h" line="24"/>
         <source>Enter your current location, nearest large town or city. In some countries postal codes are also supported.</source>
         <translation>Sisesta asukoht. Lähim suurem linn. Osades riikides sobib ka posti sihtnumber.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="43"/>
+        <location filename="themestrings.h" line="25"/>
         <source>Enter Location:</source>
         <translation>Sisesta asukoht:</translation>
     </message>

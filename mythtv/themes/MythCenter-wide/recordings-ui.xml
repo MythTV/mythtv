@@ -14,7 +14,7 @@
             <area>850,10,410,30</area>
             <font>basesmall_normal</font>
             <align>vcenter,right</align>
-            <format>%DATE% %TIME%</format>
+            <template>%DATE% %TIME%</template>
         </clock>
 
         <imagetype name="listbackground">

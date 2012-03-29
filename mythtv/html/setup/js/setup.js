@@ -199,7 +199,7 @@ function getHostsOptionList() {
         hostOptions = "";
         $.ajaxSetup({ async: false });
         $.getJSON("/Myth/GetHosts", function(data) {
-            $.each(data.QStringList, function(i, value) {
+            $.each(data.StringList, function(i, value) {
                 hostOptions += "<option value='" + value + "'>" + value + "</option>";
             });
         });

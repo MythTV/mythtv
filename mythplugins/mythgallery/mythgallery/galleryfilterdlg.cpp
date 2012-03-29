@@ -131,7 +131,7 @@ bool GalleryFilterDialog::Create()
 
 void GalleryFilterDialog::fillWidgets()
 {
-    // Directory filter
+    // Folder filter
     m_dirFilter->SetText(m_settingsTemp->getDirFilter(), false);
 
     // Type Filter
@@ -142,7 +142,7 @@ void GalleryFilterDialog::fillWidgets()
     new MythUIButtonListItem(m_typeFilter, QObject::tr("Movies only"),
                              kTypeFilterMoviesOnly);
     m_typeFilter->SetValueByData(m_settingsTemp->getTypeFilter());
-    m_numImagesText->SetText("Filter result : (unknown)");
+    m_numImagesText->SetText(tr("Filter result : (unknown)"));
 
     // Sort order
     new MythUIButtonListItem(m_sortList, QObject::tr("Unsorted"),
@@ -175,7 +175,7 @@ void GalleryFilterDialog::updateFilter()
 {
     if (m_scanning)
     {
-        m_numImagesText->SetText("-- please be patient --");
+        m_numImagesText->SetText(tr("-- please be patient --"));
         return;
     }
     else
@@ -187,7 +187,7 @@ void GalleryFilterDialog::updateFilter()
     int img_count = 0;
     int mov_count = 0;
 
-    m_numImagesText->SetText("-- scanning current filter --");
+    m_numImagesText->SetText(tr("-- scanning current filter --"));
 
     FilterScanThread fltScan(m_photoDir, *m_settingsTemp, &dir_count,
                              &img_count, &mov_count);
@@ -202,24 +202,24 @@ void GalleryFilterDialog::updateFilter()
     m_scanning = false;
 
     if (dir_count + img_count + mov_count == 0)
-        m_numImagesText->SetText(QString(tr("No files / directories found")));
+        m_numImagesText->SetText(QString(tr("No files / folders found")));
     else if (dir_count > 0)
     {
         if (img_count + mov_count == 0)
             m_numImagesText->SetText(QString(tr(
-                "Filter result : %1 directories found but no files"))
+                "Filter result : %1 folder(s) found but no files"))
                      .arg(dir_count));
         else if (img_count == 0)
             m_numImagesText->SetText(QString(tr(
-                "Filter result : %1 directories, %2 movie(s) found"))
+                "Filter result : %1 folder(s), %2 movie(s) found"))
                      .arg(dir_count) .arg(mov_count));
         else if (mov_count == 0)
             m_numImagesText->SetText(QString(tr(
-                "Filter result : %1 directories, %2 image(s) found"))
+                "Filter result : %1 folder(s), %2 image(s) found"))
                      .arg(dir_count) .arg(img_count));
         else
             m_numImagesText->SetText(QString(tr(
-                "Filter result : %1 directories, %2 image(s) and %3 movie(s) "
+                "Filter result : %1 folder(s), %2 image(s) and %3 movie(s) "
                 "found")) .arg(dir_count) .arg(img_count) .arg(mov_count));
     }
     else if (img_count > 0 && mov_count > 0)

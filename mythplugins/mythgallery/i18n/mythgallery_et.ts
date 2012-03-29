@@ -12,28 +12,43 @@
 <context>
     <name>GalleryFilterDialog</name>
     <message>
+        <location filename="../mythgallery/galleryfilterdlg.cpp" line="145"/>
+        <source>Filter result : (unknown)</source>
+        <translation>Filtri tulemus: (tundmatu)</translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/galleryfilterdlg.cpp" line="178"/>
+        <source>-- please be patient --</source>
+        <translation>-- läheb aega --</translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/galleryfilterdlg.cpp" line="190"/>
+        <source>-- scanning current filter --</source>
+        <translation>-- uurin filtrit --</translation>
+    </message>
+    <message>
         <location filename="../mythgallery/galleryfilterdlg.cpp" line="205"/>
-        <source>No files / directories found</source>
+        <source>No files / folders found</source>
         <translation>Faile / katalooge ei leitud</translation>
     </message>
     <message>
         <location filename="../mythgallery/galleryfilterdlg.cpp" line="209"/>
-        <source>Filter result : %1 directories found but no files</source>
+        <source>Filter result : %1 folder(s) found but no files</source>
         <translation>Filtri tulemus: leiti %1 kataloog(i) kuid mitte ühtegi faili</translation>
     </message>
     <message>
         <location filename="../mythgallery/galleryfilterdlg.cpp" line="213"/>
-        <source>Filter result : %1 directories, %2 movie(s) found</source>
-        <translation>Filtri tulemus: leiti %1 kataloog(i), %2 film(i)</translation>
+        <source>Filter result : %1 folder(s), %2 movie(s) found</source>
+        <translation>Filtri tulemus: leiti %1 kataloog(i) ja %2 film(i)</translation>
     </message>
     <message>
         <location filename="../mythgallery/galleryfilterdlg.cpp" line="217"/>
-        <source>Filter result : %1 directories, %2 image(s) found</source>
+        <source>Filter result : %1 folder(s), %2 image(s) found</source>
         <translation>Filtri tulemus: leiti %1 kataloog(i), %2 pilt(i)</translation>
     </message>
     <message>
         <location filename="../mythgallery/galleryfilterdlg.cpp" line="221"/>
-        <source>Filter result : %1 directories, %2 image(s) and %3 movie(s) found</source>
+        <source>Filter result : %1 folder(s), %2 image(s) and %3 movie(s) found</source>
         <translation>Filtri tulemus: leiti %1 kataloog(i), %2 pilt(i) ja %3 film(i)</translation>
     </message>
     <message>
@@ -110,6 +125,11 @@
         <translation>Vali kõik</translation>
     </message>
     <message>
+        <location filename="../mythgallery/iconview.cpp" line="196"/>
+        <source>No images found in this folder.</source>
+        <translation>Kataloogis pole pilte.</translation>
+    </message>
+    <message>
         <location filename="../mythgallery/iconview.cpp" line="896"/>
         <source>Meta Data Options</source>
         <translation>Metaandmete valikud</translation>
@@ -141,7 +161,7 @@
     </message>
     <message>
         <location filename="../mythgallery/iconview.cpp" line="974"/>
-        <source>Create Dir</source>
+        <source>Create folder</source>
         <translation>Loo kataloog</translation>
     </message>
     <message>
@@ -200,6 +220,11 @@
         <translation>Loo uus kataloog</translation>
     </message>
     <message>
+        <location filename="../mythgallery/iconview.cpp" line="1368"/>
+        <source>Failed to rename folder</source>
+        <translation>Viga kataloogi ümber nimetamisel</translation>
+    </message>
+    <message>
         <location filename="../mythgallery/iconview.cpp" line="1429"/>
         <source>Moving marked images...</source>
         <translation>Valitud piltide liigutamine...</translation>
@@ -214,11 +239,6 @@
         <location filename="../mythgallery/iconview.cpp" line="1342"/>
         <source>Rename</source>
         <translation>Nimeta ümber</translation>
-    </message>
-    <message>
-        <location filename="../mythgallery/iconview.cpp" line="196"/>
-        <source>No images found in this directory.</source>
-        <translation>Kataloogis pole pilte.</translation>
     </message>
     <message>
         <location filename="../mythgallery/iconview.cpp" line="389"/>
@@ -266,11 +286,6 @@
         <location filename="../mythgallery/iconview.cpp" line="969"/>
         <source>Eject</source>
         <translation>Väljasta</translation>
-    </message>
-    <message>
-        <location filename="../mythgallery/iconview.cpp" line="1368"/>
-        <source>Failed to rename directory</source>
-        <translation>Viga kataloogi ümber nimetamisel</translation>
     </message>
     <message>
         <location filename="../mythgallery/iconview.cpp" line="1370"/>
@@ -742,8 +757,9 @@ Vaata kas kataloog on olemas, loetav ja seaded on seadistuste lehel õiged.</tra
     </message>
     <message>
         <location filename="themestrings.h" line="19"/>
-        <source>Directory filter :</source>
-        <translation>Kataloogi filter :</translation>
+        <source>Folder filter :</source>
+        <oldsource>Directory filter :</oldsource>
+        <translation>Kataloogi filter:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="20"/>
@@ -752,11 +768,6 @@ Vaata kas kataloog on olemas, loetav ja seaded on seadistuste lehel õiged.</tra
     </message>
     <message>
         <location filename="themestrings.h" line="21"/>
-        <source>NumImages_Text</source>
-        <translation>PiltideArv_Tekst</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="22"/>
         <source>Sort by :</source>
         <translation>Sortimisalus :</translation>
     </message>

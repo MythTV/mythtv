@@ -12,32 +12,44 @@
 <context>
     <name>GalleryFilterDialog</name>
     <message>
+        <location filename="../mythgallery/galleryfilterdlg.cpp" line="145"/>
+        <source>Filter result : (unknown)</source>
+        <translation>Filter result : (unknown)</translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/galleryfilterdlg.cpp" line="178"/>
+        <source>-- please be patient --</source>
+        <translation>-- please be patient --</translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/galleryfilterdlg.cpp" line="190"/>
+        <source>-- scanning current filter --</source>
+        <translation>-- scanning current filter --</translation>
+    </message>
+    <message>
         <location filename="../mythgallery/galleryfilterdlg.cpp" line="205"/>
-        <source>No files / directories found</source>
-        <translation>No files / directories found</translation>
+        <source>No files / folders found</source>
+        <translation>No files / folders found</translation>
     </message>
     <message>
         <location filename="../mythgallery/galleryfilterdlg.cpp" line="209"/>
-        <source>Filter result : %1 directories found but no files</source>
-        <translatorcomment>Hardcoded plurals...</translatorcomment>
-        <translation>Filter result : %1 directories found but no files</translation>
+        <source>Filter result : %1 folder(s) found but no files</source>
+        <translation>Filter result : %1 folder(s) found but no files</translation>
     </message>
     <message>
         <location filename="../mythgallery/galleryfilterdlg.cpp" line="213"/>
-        <source>Filter result : %1 directories, %2 movie(s) found</source>
-        <translatorcomment>Hardcoded plurals...</translatorcomment>
-        <translation>Filter result : %1 directories, %2 movie(s) found</translation>
+        <source>Filter result : %1 folder(s), %2 movie(s) found</source>
+        <translation>Filter result : %1 folder(s), %2 movie(s) found</translation>
     </message>
     <message>
         <location filename="../mythgallery/galleryfilterdlg.cpp" line="217"/>
-        <source>Filter result : %1 directories, %2 image(s) found</source>
-        <translation>Filter result : %1 directories, %2 image(s) found</translation>
+        <source>Filter result : %1 folder(s), %2 image(s) found</source>
+        <translation>Filter result : %1 folder(s), %2 image(s) found</translation>
     </message>
     <message>
         <location filename="../mythgallery/galleryfilterdlg.cpp" line="221"/>
-        <source>Filter result : %1 directories, %2 image(s) and %3 movie(s) found</source>
-        <translatorcomment>Hardcoded plurals...</translatorcomment>
-        <translation>Filter result : %1 directories, %2 image(s) and %3 movie(s) found</translation>
+        <source>Filter result : %1 folder(s), %2 image(s) and %3 movie(s) found</source>
+        <translation>Filter result : %1 folder(s), %2 image(s) and %3 movie(s) found</translation>
     </message>
     <message>
         <location filename="../mythgallery/galleryfilterdlg.cpp" line="226"/>
@@ -64,11 +76,6 @@
         <location filename="../mythgallery/iconview.cpp" line="136"/>
         <source>MythGallery Directory &apos;%1&apos; does not exist or is unreadable.</source>
         <translation>MythGallery Directory &apos;%1&apos; does not exist or is unreadable.</translation>
-    </message>
-    <message>
-        <location filename="../mythgallery/iconview.cpp" line="196"/>
-        <source>No images found in this directory.</source>
-        <translation>No images found in this directory.</translation>
     </message>
     <message>
         <location filename="../mythgallery/iconview.cpp" line="389"/>
@@ -153,6 +160,11 @@
         <translation>File Options</translation>
     </message>
     <message>
+        <location filename="../mythgallery/iconview.cpp" line="196"/>
+        <source>No images found in this folder.</source>
+        <translation>No images found in this folder.</translation>
+    </message>
+    <message>
         <location filename="../mythgallery/iconview.cpp" line="896"/>
         <source>Meta Data Options</source>
         <translation>Meta Data Options</translation>
@@ -199,8 +211,8 @@
     </message>
     <message>
         <location filename="../mythgallery/iconview.cpp" line="974"/>
-        <source>Create Dir</source>
-        <translation>Create Dir</translation>
+        <source>Create folder</source>
+        <translation>Create folder</translation>
     </message>
     <message>
         <location filename="../mythgallery/iconview.cpp" line="975"/>
@@ -265,8 +277,8 @@
     </message>
     <message>
         <location filename="../mythgallery/iconview.cpp" line="1368"/>
-        <source>Failed to rename directory</source>
-        <translation>Failed to rename directory</translation>
+        <source>Failed to rename folder</source>
+        <translation>Failed to rename folder</translation>
     </message>
     <message>
         <location filename="../mythgallery/iconview.cpp" line="1370"/>
@@ -763,8 +775,9 @@ Check the directory exists, is readable and the setting is correct on MythGaller
     </message>
     <message>
         <location filename="themestrings.h" line="19"/>
-        <source>Directory filter :</source>
-        <translation>Directory filter :</translation>
+        <source>Folder filter :</source>
+        <oldsource>Directory filter :</oldsource>
+        <translation>Folder filter :</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="20"/>
@@ -773,11 +786,6 @@ Check the directory exists, is readable and the setting is correct on MythGaller
     </message>
     <message>
         <location filename="themestrings.h" line="21"/>
-        <source>NumImages_Text</source>
-        <translation>NumImages_Text</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="22"/>
         <source>Sort by :</source>
         <translation>Sort by :</translation>
     </message>

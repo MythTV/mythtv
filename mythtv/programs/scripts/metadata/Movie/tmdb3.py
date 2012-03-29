@@ -11,17 +11,18 @@
 #-----------------------
 __title__ = "TheMovieDB.org"
 __author__ = "Raymond Wagner"
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 # 0.1.0 Initial version
+# 0.2.0 Add language support, move cache to home directory
 
-from tmdb_api import searchMovie, Movie, Collection, set_key
+from MythTV.tmdb3 import searchMovie, Movie, Collection, set_key, set_cache, set_locale
 from MythTV import VideoMetadata
 
 from optparse import OptionParser
 from lxml import etree
 import sys
 
-def buildSingle(inetref, language):
+def buildSingle(inetref):
     movie = Movie(inetref)
     tree = etree.XML(u'<metadata></metadata>')
     mapping = [['runtime',      'runtime'],     ['title',       'originaltitle'],
@@ -35,7 +36,7 @@ def buildSingle(inetref, language):
     m.inetref = str(movie.id)
     m.year = movie.releasedate.year
     if movie.collection:
-        m.collectionref = movie.collection.id
+        m.collectionref = str(movie.collection.id)
     for country, release in movie.releases.items():
         if release.certification:
             m.certifications[country] = release.certification
@@ -48,12 +49,12 @@ def buildSingle(inetref, language):
     for cast in movie.cast:
         d = {'name':cast.name, 'character':cast.character, 'department':'Actors',
              'job':'Actor', 'url':'http://www.themoviedb.org/people/{0}'.format(cast.id)}
-        if cast.profile is not None: d['thumb'] = cast.profile.geturl()
+        if cast.profile: d['thumb'] = cast.profile.geturl()
         m.people.append(d)
     for crew in movie.crew:
         d = {'name':crew.name, 'job':crew.job, 'department':crew.department,
              'url':'http://www.themoviedb.org/people/{0}'.format(cast.id)}
-        if crew.profile is not None: d['thumb'] = crew.profile.geturl()
+        if crew.profile: d['thumb'] = crew.profile.geturl()
         m.people.append(d)
     for backdrop in movie.backdrops:
         m.images.append({'type':'fanart', 'url':backdrop.geturl(),
@@ -65,8 +66,8 @@ def buildSingle(inetref, language):
     sys.stdout.write(etree.tostring(tree, encoding='UTF-8', pretty_print=True))
     sys.exit()
 
-def buildList(query, language):
-    results = searchMovie(query, language)
+def buildList(query):
+    results = searchMovie(query)
     tree = etree.XML(u'<metadata></metadata>')
     mapping = [['runtime',      'runtime'],     ['title',       'originaltitle'],
                ['releasedate',  'releasedate'], ['tagline',     'tagline'],
@@ -84,7 +85,7 @@ def buildList(query, language):
     sys.stdout.write(etree.tostring(tree, encoding='UTF-8', pretty_print=True))
     sys.exit(0)
 
-def buildCollection(inetref, language):
+def buildCollection(inetref):
     collection = Collection(inetref)
     tree = etree.XML(u'<metadata></metadata>')
     m = VideoMetadata()
@@ -115,11 +116,12 @@ def buildVersion():
 
 def main():
     set_key('c27cb71cff5bd76e1a7a009380562c62')
+    set_cache(engine='file', filename='~/.mythtv/pytmdb3.cache')
 
     parser = OptionParser()
 
-    parser.add_option('-v', "--version", action="store_true", default=False,
-                      dest="version", help="Display version and author")
+#    parser.add_option('-v', "--version", action="store_true", default=False,
+#                      dest="version", help="Display version and author")
     parser.add_option('-M', "--movielist", action="store_true", default=False,
                       dest="movielist", help="Get Movies matching search.")
     parser.add_option('-D', "--moviedata", action="store_true", default=False,
@@ -131,21 +133,24 @@ def main():
 
     opts, args = parser.parse_args()
 
-    if opts.version:
-        buildVersion()
+#    if opts.version:
+#        buildVersion()
+
+    if opts.language:
+        set_locale(language=opts.language, fallthrough=True)
 
     if (len(args) != 1) or (args[0] == ''):
         sys.stdout.write('ERROR: tmdb3.py requires exactly one non-empty argument')
         sys.exit(1)
 
     if opts.movielist:
-        buildList(args[0], opts.language)
+        buildList(args[0])
 
     if opts.moviedata:
-        buildSingle(args[0], opts.language)
+        buildSingle(args[0])
 
     if opts.collectiondata:
-        buildCollection(args[0], opts.language)
+        buildCollection(args[0])
 
 if __name__ == '__main__':
     main()

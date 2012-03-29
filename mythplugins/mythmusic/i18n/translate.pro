@@ -1,5 +1,7 @@
 SOURCES += ../mythmusic/*.cpp
 SOURCES += ../mythmusic/*.h
+SOURCES += ../mythmusic/goom/*.cpp
+SOURCES += ../mythmusic/goom/*.h
 SOURCES += ./themestrings.h
 
 TRANSLATIONS  = mythmusic_it.ts mythmusic_es.ts mythmusic_ca.ts
