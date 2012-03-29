@@ -10,3 +10,4 @@ TRANSLATIONS += mytharchive_da.ts mytharchive_cs.ts mytharchive_en_gb.ts
 TRANSLATIONS += mytharchive_sl.ts mytharchive_hu.ts mytharchive_en_us.ts
 TRANSLATIONS += mytharchive_ru.ts mytharchive_el.ts mytharchive_pt.ts
 TRANSLATIONS += mytharchive_pl.ts mytharchive_en_ca.ts mytharchive_es_es.ts
+TRANSLATIONS += mytharchive_zh_hk.ts
