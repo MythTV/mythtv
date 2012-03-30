@@ -22,7 +22,7 @@ for search and retrieval of text metadata and image URLs from TMDB.
 Preliminary API specifications can be found at
 http://help.themoviedb.org/kb/api/about-3"""
 
-__version__="v0.4.1"
+__version__="v0.4.3"
 # 0.1.0 Initial development
 # 0.2.0 Add caching mechanism for API queries
 # 0.2.1 Temporary work around for broken search paging
@@ -36,6 +36,8 @@ __version__="v0.4.1"
 # 0.3.7 Generalize caching mechanism, and allow controllability
 # 0.4.0 Add full locale support (language and country) and optional fall through
 # 0.4.1 Add custom classmethod for dealing with IMDB movie IDs
+# 0.4.2 Improve cache file selection for Windows systems
+# 0.4.3 Add a few missed Person properties
 
 from request import set_key, Request
 from util import Datapoint, Datalist, Datadict, Element
@@ -132,6 +134,8 @@ class Person( Element ):
     homepage    = Datapoint('homepage')
     birthplace  = Datapoint('place_of_birth')
     profile     = Datapoint('profile_path', handler=Profile, raw=False)
+    adult       = Datapoint('adult')
+    aliases     = Datalist('also_known_as')
 
     def __repr__(self):
         return u"<{0} '{1.name}' at {2}>".\
