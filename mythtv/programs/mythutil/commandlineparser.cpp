@@ -104,8 +104,8 @@ void MythUtilCommandLineParser::LoadArguments(void)
                 "metadata, userjob1, userjob2, userjob3, userjob4) to run "
                 "for the recording with the given chanid and starttime.")
                 ->SetGroup("JobQueue")
-                ->SetRequires("chanid")
-                ->SetRequires("starttime")
+                ->SetRequiredChild("chanid")
+                ->SetRequiredChild("starttime")
 
         // messageutils.cpp
         << add("--message", "message", false,
