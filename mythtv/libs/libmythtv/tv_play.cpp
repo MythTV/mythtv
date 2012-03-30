@@ -1423,7 +1423,7 @@ void TV::GetStatus(void)
         status.insert("subtitle", ctx->playingInfo->GetSubtitle());
         status.insert("starttime",
                            ctx->playingInfo->GetRecordingStartTime()
-                           .toUTC().toString(Qt::ISODate));
+                           .toUTC().toString("yyyy-MM-ddThh:mm:ssZ"));
         status.insert("chanid",
                            QString::number(ctx->playingInfo->GetChanID()));
         status.insert("programid", ctx->playingInfo->GetProgramID());
