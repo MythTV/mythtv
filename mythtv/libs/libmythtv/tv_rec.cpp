@@ -778,8 +778,8 @@ void TVRec::StartedRecording(RecordingInfo *curRec)
         return;
 
     curRec->StartedRecording(rbFileExt);
-    LOG(VB_RECORD, LOG_INFO, LOC + QString("StartedRecording(0x%1) fn(%2)")
-            .arg((uint64_t)curRec,0,16).arg(curRec->GetPathname()));
+    LOG(VB_RECORD, LOG_INFO, LOC + QString("StartedRecording(%1) fn(%2)")
+        .arg(curRec->MakeUniqueKey()).arg(curRec->GetPathname()));
 
     if (curRec->IsCommercialFree())
         curRec->SaveCommFlagged(COMM_FLAG_COMMFREE);
@@ -806,8 +806,8 @@ void TVRec::FinishedRecording(RecordingInfo *curRec, RecordingQuality *recq)
     if (recq)
     {
         LOG((recq->IsDamaged()) ? VB_GENERAL : VB_RECORD, LOG_INFO,
-            QString("TVRec::FinishedRecording(%1) %2 recq:%3\n")
-            .arg(curRec->GetTitle())
+            LOC + QString("FinishedRecording(%1) %2 recq:%3\n")
+            .arg(curRec->MakeUniqueKey())
             .arg((recq->IsDamaged()) ? "damaged" : "good")
             .arg(recq->toStringXML()));
         is_good = !recq->IsDamaged();
@@ -851,10 +851,10 @@ void TVRec::FinishedRecording(RecordingInfo *curRec, RecordingQuality *recq)
     // Print something informative to the log
     LOG(VB_RECORD, LOG_INFO, LOC +
         QString("FinishedRecording(%1)"
-                "\n\t\t\tkey: %2\n\t\t\t"
+                "\n\t\t\ttitle: %2\n\t\t\t"
                 "in recgroup: %3 status: %4:%5 %6 %7")
-            .arg(curRec->GetTitle())
             .arg(curRec->MakeUniqueKey())
+            .arg(curRec->GetTitle())
             .arg(recgrp)
             .arg(toString(ors, kSingleRecord))
             .arg(toString(curRec->GetRecordingStatus(), kSingleRecord))
@@ -1309,22 +1309,19 @@ void TVRec::run(void)
             {
                 if (!switchingBuffer)
                 {
+                    LOG(VB_RECORD, LOG_INFO, LOC +
+                        "Switching Buffer (" +
+                        QString("!has_rec(%1) && ").arg(has_rec) +
+                        QString("!rec_soon(%1) && (").arg(rec_soon) +
+                        now.toString(Qt::ISODate) + " >= " +
+                        curRecording->GetScheduledEndTime(ISODate) +
+                        QString("(%1) ))")
+                        .arg(now >= curRecording->GetScheduledEndTime()));
+
                     switchingBuffer = true;
 
                     SwitchLiveTVRingBuffer(channel->GetCurrentName(),
                                            false, true);
-
-                    QDateTime starttime; starttime.setTime_t(0);
-                    if (curRecording)
-                        starttime = curRecording->GetRecordingStartTime();
-
-                    LOG(VB_RECORD, LOG_INFO, LOC +
-                        QString("!has_rec(%1) ").arg(!has_rec) +
-                        QString("!rec_soon(%1) ").arg(!rec_soon) +
-                        QString("curRec(0x%1) ")
-                            .arg((uint64_t)curRecording,0,16) +
-                        QString("starttm(%1)")
-                            .arg(starttime.toString(Qt::ISODate)));
                 }
                 else
                 {
@@ -4409,9 +4406,16 @@ bool TVRec::CreateLiveTVRingBuffer(const QString & channum)
 bool TVRec::SwitchLiveTVRingBuffer(const QString & channum,
                                    bool discont, bool set_rec)
 {
+    QString msg;
+    if (curRecording)
+    {
+        msg = QString(" curRec(%1) curRec.size(%2)")
+            .arg(curRecording->MakeUniqueKey())
+            .arg(curRecording->GetFilesize());
+    }
     LOG(VB_RECORD, LOG_INFO, LOC +
-        QString("SwitchLiveTVRingBuffer(discont %1, set_rec %2")
-            .arg(discont).arg(set_rec));
+        QString("SwitchLiveTVRingBuffer(discont %1, set_next_rec %2)")
+        .arg(discont).arg(set_rec) + msg);
 
     RecordingInfo *pginfo = NULL;
     RingBuffer    *rb = NULL;
@@ -4433,14 +4437,7 @@ bool TVRec::SwitchLiveTVRingBuffer(const QString & channum,
         return false;
     }
 
-    ProgramInfo *pi = tvchain->GetProgramAt(-1);
-    if (pi)
-    {
-        RecordingInfo *oldinfo = new RecordingInfo(*pi);
-        delete pi;
-        FinishedRecording(oldinfo, NULL);
-        delete oldinfo;
-    }
+    QString oldcardtype = tvchain->GetCardType(-1);
 
     pginfo->MarkAsInUse(true, kRecorderInUseID);
     pginfo->SaveAutoExpire(kLiveTVAutoExpire);
@@ -4458,8 +4455,11 @@ bool TVRec::SwitchLiveTVRingBuffer(const QString & channum,
     }
     else if (!set_rec)
     {
-        if (curRecording)
+        // dummy recordings are finished before this
+        // is called and other recordings must be finished..
+        if (curRecording && oldcardtype != "DUMMY")
         {
+            FinishedRecording(curRecording, NULL);
             curRecording->MarkAsInUse(false, kRecorderInUseID);
             delete curRecording;
         }

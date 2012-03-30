@@ -295,6 +295,8 @@ void MainServer::Stop()
 {
     m_stopped = true;
 
+    gCoreContext->removeListener(this);
+
     {
         QMutexLocker locker(&masterFreeSpaceListLock);
         if (masterFreeSpaceListUpdater)
