@@ -4437,14 +4437,7 @@ bool TVRec::SwitchLiveTVRingBuffer(const QString & channum,
         return false;
     }
 
-    ProgramInfo *pi = tvchain->GetProgramAt(-1);
-    if (pi)
-    {
-        RecordingInfo *oldinfo = new RecordingInfo(*pi);
-        delete pi;
-        FinishedRecording(oldinfo, NULL);
-        delete oldinfo;
-    }
+    QString oldcardtype = tvchain->GetCardType(-1);
 
     pginfo->MarkAsInUse(true, kRecorderInUseID);
     pginfo->SaveAutoExpire(kLiveTVAutoExpire);
@@ -4462,8 +4455,11 @@ bool TVRec::SwitchLiveTVRingBuffer(const QString & channum,
     }
     else if (!set_rec)
     {
-        if (curRecording)
+        // dummy recordings are finished before this
+        // is called and other recordings must be finished..
+        if (curRecording && oldcardtype != "DUMMY")
         {
+            FinishedRecording(curRecording, NULL);
             curRecording->MarkAsInUse(false, kRecorderInUseID);
             delete curRecording;
         }
