@@ -53,7 +53,7 @@ try:
         if filename.startswith('~'):
             # check for home directory
             return os.path.expanduser(filename)
-        elif not filename.startswith('/'):
+        elif filename.startswith('/'):
             # check for absolute path
             return filename
         # return path with temp directory prepended
