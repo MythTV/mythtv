@@ -106,18 +106,20 @@ out. The people search method behaves similarly.
 
 ## Direct Queries
 
-There are currently three data types that support direct access: collections,
-movies, and people. These each take a single integer ID as an argument. All
-data attributes are implemented as properties, and populated on-demand as
-used, rather than when the object is created.
+There are currently four data types that support direct access: collections,
+movies, people, and studios. These each take a single integer ID as an
+argument. All data attributes are implemented as properties, and populated
+on-demand as used, rather than when the object is created.
 
-  >>> from tmdb3 import Collection, Movie, Person
+  >>> from tmdb3 import Collection, Movie, Person, Studio
   >>> Collection(10)
   <Collection 'Star Wars Collection'>
   >>> Movie(11)
   <Movie 'Star Wars: Episode IV - A New Hope' (1977)>
   >>> Person(2)
   <Person 'Mark Hamill'>
+  >>> Studio(1)
+  <Studio 'Lucasfilm'>
 
 ## Image Behavior
 
@@ -223,7 +225,9 @@ Person:
   datetime              dayofbirth
   datetime              dayofdeath
   string                homepage
-  Profile               profilie
+  Profile               profile
+  boolean               adult
+  list(string)          aliases
   list(ReverseCast)     roles
   list(ReverseCrew)     crew
   list(Profile)         profiles
@@ -255,6 +259,7 @@ Image:
 Backdrop (derived from Image)
 Poster (derived from Image)
 Profile (derived from Image)
+Logo (derived from Image)
 
 AlternateTitle:
   string                country
@@ -277,6 +282,11 @@ Genre:
 Studio:
   integer               id
   string                name
+  string                description
+  string                headquarters
+  Logo                  logo
+  Studio                parent
+  list(Movie)           movies
 
 Country:
   string                code
