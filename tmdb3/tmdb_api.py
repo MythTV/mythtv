@@ -22,7 +22,7 @@ for search and retrieval of text metadata and image URLs from TMDB.
 Preliminary API specifications can be found at
 http://help.themoviedb.org/kb/api/about-3"""
 
-__version__="v0.4.3"
+__version__="v0.4.4"
 # 0.1.0 Initial development
 # 0.2.0 Add caching mechanism for API queries
 # 0.2.1 Temporary work around for broken search paging
@@ -38,6 +38,7 @@ __version__="v0.4.3"
 # 0.4.1 Add custom classmethod for dealing with IMDB movie IDs
 # 0.4.2 Improve cache file selection for Windows systems
 # 0.4.3 Add a few missed Person properties
+# 0.4.4 Add support for additional Studio information
 
 from request import set_key, Request
 from util import Datapoint, Datalist, Datadict, Element
@@ -118,6 +119,10 @@ class Poster( Image ):
 class Profile( Image ):
     def sizes(self):
         return Configuration.images['profile_sizes']
+class Logo( Image ):
+    def sizes(self):
+        # FIXME: documentation does not list available sizes
+        return ['original']
 
 class AlternateTitle( Element ):
     country     = Datapoint('iso_3166_1')
@@ -226,11 +231,31 @@ class Genre( Element ):
         return u"<{0.__class__.__name__} '{0.name}'>".format(self)
 
 class Studio( Element ):
-    id      = Datapoint('id')
-    name    = Datapoint('name')
+    id              = Datapoint('id', initarg=1)
+    name            = Datapoint('name')
+    description     = Datapoint('description')
+    headquarters    = Datapoint('headquarters')
+    logo            = Datapoint('logo_path', handler=Logo)
+    # FIXME: manage not-yet-defined handlers in a way that will propogate
+    #        locale information properly
+    parent          = Datapoint('parent_company', handler=lambda x: Studio(raw=x))
 
     def __repr__(self):
         return u"<{0.__class__.__name__} '{0.name}'>".format(self)
+
+    def _populate(self):
+        return Request('company/{0}'.format(self.id))
+    def _populate_movies(self):
+        return Request('company/{0}/movies'.format(self.id), language=self._locale.language)
+
+    # FIXME: add a cleaner way of adding types with no additional processing
+    @property
+    def movies(self):
+        if 'movies' not in self._data:
+            search = MovieSearchResult(self._populate_movies(), locale=self._locale)
+            search._name = "{0.name} Movies".format(self)
+            self._data['movies'] = search
+        return self._data['movies']
 
 class Country( Element ):
     code    = Datapoint('iso_3166_1')
