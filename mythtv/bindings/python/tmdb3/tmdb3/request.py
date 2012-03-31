@@ -17,8 +17,10 @@ import json
 import os
 
 DEBUG = False
-
 cache = Cache(filename='pytmdb3.cache')
+
+#DEBUG = True
+#cache = Cache(engine='null')
 
 def set_key(key):
     """
@@ -55,7 +57,7 @@ class Request( urllib2.Request ):
         self._kwargs = dict([(kwa,kwv) for kwa,kwv in kwargs.items()
                                         if kwv is not None])
         url = '{0}{1}?{2}'.format(self._base_url, self._url,
-                                  urllib.urlencode(kwargs))
+                                  urllib.urlencode(self._kwargs))
         urllib2.Request.__init__(self, url)
         self.add_header('Accept', 'application/json')
         self.lifetime = 3600 # 1hr
