@@ -32,6 +32,13 @@ class LocaleBase( object ):
                                 ' does not support modification.')
         super(LocaleBase, self).__delattr__(key)
 
+    def __lt__(self, other):
+        return (id(self) != id(other)) and (str(self) > str(other))
+    def __gt__(self, other):
+        return (id(self) != id(other)) and (str(self) < str(other))
+    def __eq__(self, other):
+        return (id(self) == id(other)) or (str(self) == str(other))
+
     @classmethod
     def getstored(cls, key):
         if key is None:
@@ -81,6 +88,9 @@ class Locale( LocaleBase ):
     def __init__(self, language, country):
         self.language = Language.getstored(language)
         self.country = Country.getstored(country)
+
+    def __str__(self):
+        return u"{0}_{1}".format(self.language, self.country)
 
     def __repr__(self):
         return u"<Locale {0.language}_{0.country}>".format(self)

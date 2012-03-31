@@ -107,6 +107,16 @@ class Image( Element ):
         url = Configuration.images['base_url'].rstrip('/')
         return url+'/{0}/{1}'.format(size, self.filename)
 
+    # sort preferring locale's language, but keep remaining ordering consistent
+    def __lt__(self, other):
+        return (self.language == self._locale.language) \
+                and (self.language != other.language)
+    def __gt__(self, other):
+        return (self.language != other.language) \
+                and (other.language == self._locale.language)
+    def __eq__(self, other):
+        return self.language == other.language
+
     def __repr__(self):
         return u"<{0.__class__.__name__} '{0.filename}'>".format(self)
 
@@ -127,6 +137,16 @@ class Logo( Image ):
 class AlternateTitle( Element ):
     country     = Datapoint('iso_3166_1')
     title       = Datapoint('title')
+
+    # sort preferring locale's country, but keep remaining ordering consistent
+    def __lt__(self, other):
+        return (self.country == self._locale.country) \
+                and (self.country != other.country)
+    def __gt__(self, other):
+        return (self.country != other.country) \
+                and (other.country == self._locale.country)
+    def __eq__(self, other):
+        return self.country == other.country
 
 class Person( Element ):
     id          = Datapoint('id', initarg=1)
@@ -342,11 +362,13 @@ class Movie( Element ):
     def _populate(self):
         return Request('movie/{0}'.format(self.id), language=self._locale.language)
     def _populate_titles(self):
-        return Request('movie/{0}/alternative_titles'.format(self.id), country=self._locale.country)
+        kwargs = {'country':self._locale.country} if not self._locale.fallthrough else {}
+        return Request('movie/{0}/alternative_titles'.format(self.id), **kwargs)
     def _populate_cast(self):
         return Request('movie/{0}/casts'.format(self.id))
     def _populate_images(self):
-        return Request('movie/{0}/images'.format(self.id), language=self._locale.language)
+        kwargs = {'language':self._locale.language} if not self._locale.fallthrough else {}
+        return Request('movie/{0}/images'.format(self.id), **kwargs)
     def _populate_keywords(self):
         return Request('movie/{0}/keywords'.format(self.id))
     def _populate_releases(self):
@@ -356,11 +378,11 @@ class Movie( Element ):
     def _populate_translations(self):
         return Request('movie/{0}/translations'.format(self.id))
 
-    alternate_titles = Datalist('titles', handler=AlternateTitle, poller=_populate_titles)
+    alternate_titles = Datalist('titles', handler=AlternateTitle, poller=_populate_titles, sort=True)
     cast             = Datalist('cast', handler=Cast, poller=_populate_cast, sort='order')
     crew             = Datalist('crew', handler=Crew, poller=_populate_cast)
-    backdrops        = Datalist('backdrops', handler=Backdrop, poller=_populate_images)
-    posters          = Datalist('posters', handler=Poster, poller=_populate_images)
+    backdrops        = Datalist('backdrops', handler=Backdrop, poller=_populate_images, sort=True)
+    posters          = Datalist('posters', handler=Poster, poller=_populate_images, sort=True)
     keywords         = Datalist('keywords', handler=Keyword, poller=_populate_keywords)
     releases         = Datadict('countries', handler=Release, poller=_populate_releases, attr='country')
     youtube_trailers = Datalist('youtube', handler=YoutubeTrailer, poller=_populate_trailers)
