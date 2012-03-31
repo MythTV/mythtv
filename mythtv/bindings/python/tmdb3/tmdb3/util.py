@@ -181,7 +181,10 @@ class Datalist( Data ):
                     val._locale = inst._locale
                 data.append(val)
             if self.sort:
-                data.sort(key=lambda x: getattr(x, self.sort))
+                if self.sort is True:
+                    data.sort()
+                else:
+                    data.sort(key=lambda x: getattr(x, self.sort))
         inst._data[self.field] = data
 
 class Datadict( Data ):
