@@ -99,9 +99,12 @@ DTC::ProgramList* Dvr::GetFilteredRecordedList( bool           bDescending,
         for( int n = nStartIndex; n < nEndIndex; n++)
         {
             ProgramInfo *pInfo = progList[ n ];
-            DTC::Program *pProgram = pPrograms->AddNewProgram();
+            if (pInfo->GetRecordingGroup() != "Deleted")
+            {
+                DTC::Program *pProgram = pPrograms->AddNewProgram();
 
-            FillProgramInfo( pProgram, pInfo, true );
+                FillProgramInfo( pProgram, pInfo, true );
+            }
         }
     }
     else
