@@ -255,7 +255,7 @@ class Studio( Element ):
     name            = Datapoint('name')
     description     = Datapoint('description')
     headquarters    = Datapoint('headquarters')
-    logo            = Datapoint('logo_path', handler=Logo)
+    logo            = Datapoint('logo_path', handler=Logo, raw=False)
     # FIXME: manage not-yet-defined handlers in a way that will propogate
     #        locale information properly
     parent          = Datapoint('parent_company', handler=lambda x: Studio(raw=x))
