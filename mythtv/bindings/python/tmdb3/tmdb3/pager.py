@@ -57,6 +57,8 @@ class PagedList( Sequence ):
         self._pagesize = pagesize
 
     def __getitem__(self, index):
+        if isinstance(index, slice):
+            return [self[x] for x in xrange(*index.indices(len(self)))]
         if index >= len(self):
             raise IndexError("list index outside range")
         if (index >= len(self._data)) \
