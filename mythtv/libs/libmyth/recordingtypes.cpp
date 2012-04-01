@@ -93,11 +93,11 @@ RecordingType recTypeFromString(QString type)
         return kChannelRecord;
     else if (type.toLower() == "record all" || type.toLower() == "all")
         return kAllRecord;
-    else if (type.toLower() == "find one" || type.toLower() == "one")
+    else if (type.toLower() == "find one" || type.toLower() == "findone")
         return kFindOneRecord;
-    else if (type.toLower() == "find daily" || type.toLower() == "daily")
+    else if (type.toLower() == "find daily" || type.toLower() == "finddaily")
         return kFindDailyRecord;
-    else if (type.toLower() == "find weekly" || type.toLower() == "weekly")
+    else if (type.toLower() == "find weekly" || type.toLower() == "findweekly")
         return kFindWeeklyRecord;
     else if (type.toLower() == "override recording" || type.toLower() == "override")
         return kOverrideRecord;
