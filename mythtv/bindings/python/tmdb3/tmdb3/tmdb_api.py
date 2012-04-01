@@ -131,8 +131,7 @@ class Profile( Image ):
         return Configuration.images['profile_sizes']
 class Logo( Image ):
     def sizes(self):
-        # FIXME: documentation does not list available sizes
-        return ['original']
+        return Configuration.images['logo_sizes']
 
 class AlternateTitle( Element ):
     country     = Datapoint('iso_3166_1')
