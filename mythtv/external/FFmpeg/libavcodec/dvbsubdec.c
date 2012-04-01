@@ -1497,6 +1497,7 @@ static int dvbsub_decode(AVCodecContext *avctx,
     p = buf;
     p_end = buf + buf_size;
 
+    int gotpage, gotregion, gotclut, gotobject, gotdisplay = 0;
     while (p_end - p >= 6 && *p == 0x0f) {
         p += 1;
         segment_type = *p++;
@@ -1516,18 +1517,22 @@ static int dvbsub_decode(AVCodecContext *avctx,
             case DVBSUB_PAGE_SEGMENT:
                 dvbsub_parse_page_segment(avctx, p, segment_length);
                 got_segment |= 1;
+                gotpage = 1;
                 break;
             case DVBSUB_REGION_SEGMENT:
                 dvbsub_parse_region_segment(avctx, p, segment_length);
                 got_segment |= 2;
+                gotregion = 1;
                 break;
             case DVBSUB_CLUT_SEGMENT:
                 dvbsub_parse_clut_segment(avctx, p, segment_length);
                 got_segment |= 4;
+                gotclut = 1;
                 break;
             case DVBSUB_OBJECT_SEGMENT:
                 dvbsub_parse_object_segment(avctx, p, segment_length);
                 got_segment |= 8;
+                gotobject = 1;
                 break;
             case DVBSUB_DISPLAYDEFINITION_SEGMENT:
                 dvbsub_parse_display_definition_segment(avctx, p, segment_length);
@@ -1535,6 +1540,7 @@ static int dvbsub_decode(AVCodecContext *avctx,
             case DVBSUB_DISPLAY_SEGMENT:
                 *data_size = dvbsub_display_end_segment(avctx, p, segment_length, sub);
                 got_segment |= 16;
+                gotdisplay = 1;
                 break;
             default:
                 av_dlog(avctx, "Subtitling segment type 0x%x, page id %d, length %d\n",
@@ -1548,6 +1554,11 @@ static int dvbsub_decode(AVCodecContext *avctx,
     // Some streams do not send a display segment but if we have all the other
     // segments then we need no further data.
     if (got_segment == 15 && sub)
+        *data_size = dvbsub_display_end_segment(avctx, p, 0, sub);
+
+    // Some streams do not send a display segment but if we have all the other
+    // segments then we need no further data. see #9373
+    if ((gotpage & gotregion & gotclut & gotobject) && !gotdisplay && sub)
         *data_size = dvbsub_display_end_segment(avctx, p, 0, sub);
 
     return p - buf;

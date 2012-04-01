@@ -70,7 +70,11 @@ X(\name):
 
 .macro movrel rd, sym, gp
 #if CONFIG_PIC
-    lwz     \rd, \sym@got(\gp)
+    bcl             20, 31, lab_pic_\@
+lab_pic_\@:
+    mflr    \rd
+    addis   \rd, \rd, (\sym - lab_pic_\@)@ha
+    addi    \rd, \rd, (\sym - lab_pic_\@)@l
 #else
     lis     \rd, \sym@ha
     la      \rd, \sym@l(\rd)

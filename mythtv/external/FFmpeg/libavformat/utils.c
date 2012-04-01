@@ -2509,7 +2509,8 @@ int avformat_find_stream_info(AVFormatContext *ic, AVDictionary **options)
     }
 
     for (i=0; i<ic->nb_streams; i++) {
-        ic->streams[i]->info->last_dts = AV_NOPTS_VALUE;
+        if (ic->streams[i]->info )
+            ic->streams[i]->info->last_dts = AV_NOPTS_VALUE;
     }
 
     count = 0;
@@ -2561,6 +2562,13 @@ int avformat_find_stream_info(AVFormatContext *ic, AVDictionary **options)
                 ret = count;
                 av_log(ic, AV_LOG_DEBUG, "All info found\n");
                 flush_codecs = 0;
+                break;
+            }
+            /* Is this is an MHEG only stream? Then we really can stop. */
+            if (i == 1 && ic->streams[0]->codec->codec_id == CODEC_ID_DSMCC_B)
+            {
+                ret = count;
+                av_log(ic, AV_LOG_DEBUG, "All DSM info found\n");
                 break;
             }
         }

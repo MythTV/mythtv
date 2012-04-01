@@ -51,6 +51,7 @@ typedef struct PGSSubPictureReference {
 typedef struct PGSSubPresentation {
     int                    id_number;
     int                    object_count;
+    int object_forced;
     PGSSubPictureReference *objects;
 } PGSSubPresentation;
 
@@ -342,6 +343,7 @@ static void parse_presentation_segment(AVCodecContext *avctx,
         buf++;
         /* composition_flag (0x80 - object cropped, 0x40 - object forced) */
         reference->composition = bytestream_get_byte(&buf);
+        ctx->presentation.object_forced = (reference->composition & 0x40) >> 6;
 
         reference->x = bytestream_get_be16(&buf);
         reference->y = bytestream_get_be16(&buf);
@@ -393,6 +395,7 @@ static int display_end_segment(AVCodecContext *avctx, void *data,
     if (!ctx->presentation.object_count)
         return 1;
 
+    sub->forced             = ctx->presentation.object_forced;
     sub->start_display_time = 0;
     sub->end_display_time   = 20000;
     sub->format             = 0;

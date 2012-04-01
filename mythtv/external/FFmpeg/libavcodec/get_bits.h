@@ -135,7 +135,11 @@ for examples see get_bits, show_bits, skip_bits, get_vlc
     name##_index < name##_size_plus8
 #endif
 
-#define CLOSE_READER(name, gb) (gb)->index = name##_index
+// Added the void use of the cache to defeat compiler warnings with newer gcc
+// (warning: variable 're_cache" set but not used)
+#   define CLOSE_READER(name, gb) \
+    (gb)->index = name##_index;   \
+    (void)name##_cache
 
 #ifdef BITSTREAM_READER_LE
 

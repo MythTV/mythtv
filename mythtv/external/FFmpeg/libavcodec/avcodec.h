@@ -1240,6 +1240,13 @@ typedef struct AVFrame {
     uint8_t atsc_cc_buf[1024];\
     int atsc_cc_len;
 
+    /** SCTE CC data CEA-608 
+     * - encoding: unused
+     * - decoding: Set by libavcodec
+     */
+    uint8_t scte_cc_buf[1024];
+    int scte_cc_len;
+
 } AVFrame;
 
 struct AVCodecInternal;
@@ -3135,6 +3142,7 @@ typedef struct AVSubtitle {
     unsigned num_rects;
     AVSubtitleRect **rects;
     int64_t pts;    ///< Same as packet pts, in AV_TIME_BASE
+    int forced;
 } AVSubtitle;
 
 /* packet functions */
