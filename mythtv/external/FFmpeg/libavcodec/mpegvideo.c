@@ -146,7 +146,7 @@ const uint8_t *avpriv_mpv_find_start_code(const uint8_t *restrict p,
 {
     int i;
 
-    assert(p <= end);
+    // assert(p <= end);
     if (p >= end)
         return end;
 
@@ -1187,6 +1187,11 @@ int ff_MPV_frame_start(MpegEncContext *s, AVCodecContext *avctx)
             else if (s->pict_type != AV_PICTURE_TYPE_B)
                 pic->f.reference = 3;
         }
+
+        /* Put ATSC captions cached from parse_user_data into the correct frame */
+        memcpy(pic->f.atsc_cc_buf, s->tmp_atsc_cc_buf, s->tmp_atsc_cc_len);
+        pic->f.atsc_cc_len = s->tmp_atsc_cc_len;
+        s->tmp_atsc_cc_len = 0;
 
         pic->f.coded_picture_number = s->coded_picture_number++;
 

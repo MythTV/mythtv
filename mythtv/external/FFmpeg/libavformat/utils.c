@@ -39,12 +39,18 @@
 #include "libavutil/parseutils.h"
 #include "riff.h"
 #include "audiointerleave.h"
+#include "mpegts.h"
 #include "url.h"
 #include <sys/time.h>
 #include <time.h>
 #include <stdarg.h>
 #if CONFIG_NETWORK
 #include "network.h"
+#endif
+
+#ifdef _WIN32
+#define gmtime_r(X, Y)    (memcpy(Y, gmtime(X),    sizeof(struct tm)), Y)
+#define localtime_r(X, Y) (memcpy(Y, localtime(X), sizeof(struct tm)), Y)
 #endif
 
 #undef NDEBUG
@@ -145,6 +151,10 @@ AVOutputFormat *av_oformat_next(AVOutputFormat *f)
     else  return first_oformat;
 }
 
+/**
+ * @brief Add input format to linked list of registered input formats.
+ * @param format Input format descriptor
+ */
 void av_register_input_format(AVInputFormat *format)
 {
     AVInputFormat **p;
@@ -154,6 +164,10 @@ void av_register_input_format(AVInputFormat *format)
     format->next = NULL;
 }
 
+/**
+ * @brief Add output format to linked list of registered input formats.
+ * @param format Output format descriptor
+ */
 void av_register_output_format(AVOutputFormat *format)
 {
     AVOutputFormat **p;
@@ -163,6 +177,11 @@ void av_register_output_format(AVOutputFormat *format)
     format->next = NULL;
 }
 
+/**
+ * @brief Match an extension to a filename with extension.
+ * @param filename File name to match to an extension
+ * @param extensions File extension to look for
+ */
 int av_match_ext(const char *filename, const char *extensions)
 {
     const char *ext, *p;
@@ -208,6 +227,10 @@ static int match_format(const char *name, const char *names)
     return !av_strcasecmp(name, names);
 }
 
+/**
+ * @brief Guesses video format based on file name, file extension, and
+ *        mime type.
+ */
 AVOutputFormat *av_guess_format(const char *short_name, const char *filename,
                                 const char *mime_type)
 {
@@ -609,6 +632,7 @@ int avformat_open_input(AVFormatContext **ps, const char *filename, AVInputForma
         }
     }
 
+    s->build_index = 1;
     s->duration = s->start_time = AV_NOPTS_VALUE;
     av_strlcpy(s->filename, filename, sizeof(s->filename));
 
@@ -712,6 +736,9 @@ int ff_read_packet(AVFormatContext *s, AVPacket *pkt)
         }
 
         st= s->streams[pkt->stream_index];
+        
+        if (!st)
+            return -1;
 
         switch(st->codec->codec_type){
         case AVMEDIA_TYPE_VIDEO:
@@ -815,6 +842,10 @@ static void compute_frame_duration(int *pnum, int *pden, AVStream *st,
 
     *pnum = 0;
     *pden = 0;
+
+    if (!st || !st->codec)
+        return;
+    
     switch(st->codec->codec_type) {
     case AVMEDIA_TYPE_VIDEO:
         if (st->r_frame_rate.num && !pc) {
@@ -889,6 +920,9 @@ static void update_initial_timestamps(AVFormatContext *s, int stream_index,
 {
     AVStream *st= s->streams[stream_index];
     AVPacketList *pktl= s->parse_queue ? s->parse_queue : s->packet_buffer;
+
+    if (!st)
+        return;
 
     if(st->first_dts != AV_NOPTS_VALUE || dts == AV_NOPTS_VALUE || st->cur_dts == AV_NOPTS_VALUE || is_relative(dts))
         return;
@@ -988,7 +1022,7 @@ static void compute_pkt_fields(AVFormatContext *s, AVStream *st,
     // Note, if this is misbehaving for a H.264 file then possibly presentation_delayed is not set correctly.
     if(delay==1 && pkt->dts == pkt->pts && pkt->dts != AV_NOPTS_VALUE && presentation_delayed){
         av_log(s, AV_LOG_DEBUG, "invalid dts/pts combination %"PRIi64"\n", pkt->dts);
-        pkt->dts= AV_NOPTS_VALUE;
+        pkt->pts= AV_NOPTS_VALUE;
     }
 
     if (pkt->duration == 0) {
@@ -1234,6 +1268,11 @@ static int read_from_packet_buffer(AVPacketList **pkt_buffer,
     return 0;
 }
 
+/**
+ * Simply sets data pointer to null.
+ *
+ * This will leak memory if no one else frees the memory used by the packet.
+ */
 static int read_frame_internal(AVFormatContext *s, AVPacket *pkt)
 {
     int ret = 0, i, got_packet = 0;
@@ -1244,6 +1283,9 @@ static int read_frame_internal(AVFormatContext *s, AVPacket *pkt)
         AVStream *st;
         AVPacket cur_pkt;
 
+        cur_pkt.data = NULL;
+        cur_pkt.size = 0;
+
         /* read next packet */
         ret = ff_read_packet(s, &cur_pkt);
         if (ret < 0) {
@@ -1252,7 +1294,7 @@ static int read_frame_internal(AVFormatContext *s, AVPacket *pkt)
             /* flush the parsers */
             for(i = 0; i < s->nb_streams; i++) {
                 st = s->streams[i];
-                if (st->parser && st->need_parsing)
+                if (st && st->codec && st->parser && st->need_parsing)
                     parse_packet(s, NULL, st->index);
             }
             /* all remaining packets are now in parse_queue =>
@@ -1280,7 +1322,8 @@ static int read_frame_internal(AVFormatContext *s, AVPacket *pkt)
                    cur_pkt.duration,
                    cur_pkt.flags);
 
-        if (st->need_parsing && !st->parser && !(s->flags & AVFMT_FLAG_NOPARSE)) {
+        if (st && st->codec && st->need_parsing && !st->parser &&
+            !(s->flags & AVFMT_FLAG_NOPARSE)) {
             st->parser = av_parser_init(st->codec->codec_id);
             if (!st->parser) {
                 av_log(s, AV_LOG_VERBOSE, "parser not found for codec "
@@ -1299,6 +1342,7 @@ static int read_frame_internal(AVFormatContext *s, AVPacket *pkt)
             /* no parsing needed: we just output the packet as is */
             *pkt = cur_pkt;
             compute_pkt_fields(s, st, NULL, pkt);
+            st->got_frame = 0;
             if ((s->iformat->flags & AVFMT_GENERIC_INDEX) &&
                 (pkt->flags & AV_PKT_FLAG_KEY) && pkt->dts != AV_NOPTS_VALUE) {
                 ff_reduce_index(s, st->index);
@@ -1406,6 +1450,9 @@ static void flush_packet_queue(AVFormatContext *s)
 /*******************************************************/
 /* seek support */
 
+/**
+ * @brief Finds the index of the first video stream within the AVFormatContext.
+ */
 int av_find_default_stream_index(AVFormatContext *s)
 {
     int first_audio_index = -1;
@@ -1444,6 +1491,7 @@ void ff_read_frame_flush(AVFormatContext *s)
             av_parser_close(st->parser);
             st->parser = NULL;
         }
+        st->got_frame = 0;
         st->last_IP_pts = AV_NOPTS_VALUE;
         if(st->first_dts == AV_NOPTS_VALUE) st->cur_dts = RELATIVE_TS_BASE;
         else                                st->cur_dts = AV_NOPTS_VALUE; /* we set the current DTS to an unspecified origin */
@@ -1960,7 +2008,7 @@ static int has_duration(AVFormatContext *ic)
 }
 
 /**
- * Estimate the stream timings from the one of each components.
+ * @brief Estimate the stream timings from the one of each components.
  *
  * Also computes the global bitrate if possible.
  */
@@ -2061,10 +2109,15 @@ static void estimate_timings_from_bit_rate(AVFormatContext *ic)
     }
 }
 
+/** Maximum number of bytes we read to determine timing from PTS stream. */
 #define DURATION_MAX_READ_SIZE 250000
 #define DURATION_MAX_RETRY 3
 
-/* only usable for MPEG-PS streams */
+/**
+ * @brief Estimates timings using PTS stream.
+ *
+ * Only usable for MPEG-PS streams.
+ */
 static void estimate_timings_from_pts(AVFormatContext *ic, int64_t old_offset)
 {
     AVPacket pkt1, *pkt = &pkt1;
@@ -2109,6 +2162,13 @@ static void estimate_timings_from_pts(AVFormatContext *ic, int64_t old_offset)
             if (ret != 0)
                 break;
             read_size += pkt->size;
+
+            if (pkt->stream_index >= ic->nb_streams)
+            {
+                av_free_packet(pkt);
+                continue;
+            }
+
             st = ic->streams[pkt->stream_index];
             if (pkt->pts != AV_NOPTS_VALUE &&
                 (st->start_time != AV_NOPTS_VALUE ||
@@ -2142,7 +2202,15 @@ static void estimate_timings_from_pts(AVFormatContext *ic, int64_t old_offset)
     }
 }
 
-static void estimate_timings(AVFormatContext *ic, int64_t old_offset)
+/**
+ * @brief Attempts to estimate timings using whatever means possible.
+ *
+ * First, if the stream is an MPEG-PS stream we try to find the PTS stream.
+ * Then we try to get the timings form one of the A/V streams.
+ * Finally, we just guess at the timings based on the estimated bit rate.
+ *
+ */
+void estimate_timings(AVFormatContext *ic, int64_t old_offset)
 {
     int64_t file_size;
 
@@ -2382,14 +2450,21 @@ int av_find_stream_info(AVFormatContext *ic)
 }
 #endif
 
+/* absolute maximum size we read until we abort */
+#define MAX_READ_SIZE        5000000
+
+/** Number of frames to read, max. */
+#define MAX_FRAMES           45
+
 int avformat_find_stream_info(AVFormatContext *ic, AVDictionary **options)
 {
-    int i, count, ret, read_size, j;
+    int i, count, ret, read_size, j, read_packets = 0;
     AVStream *st;
     AVPacket pkt1, *pkt;
     int64_t old_offset = avio_tell(ic->pb);
     int orig_nb_streams = ic->nb_streams;        // new streams might appear, no options for those
     int flush_codecs = 1;
+    int hasaudio = 0, hasvideo = 0;
 
     for(i=0;i<ic->nb_streams;i++) {
         AVCodec *codec;
@@ -2439,6 +2514,7 @@ int avformat_find_stream_info(AVFormatContext *ic, AVDictionary **options)
 
     count = 0;
     read_size = 0;
+
     for(;;) {
         if (ff_check_interrupt(&ic->interrupt_callback)){
             ret= AVERROR_EXIT;
@@ -2467,14 +2543,20 @@ int avformat_find_stream_info(AVFormatContext *ic, AVDictionary **options)
                 break;
             if(st->parser && st->parser->parser->split && !st->codec->extradata)
                 break;
-            if(st->first_dts == AV_NOPTS_VALUE && (st->codec->codec_type == AVMEDIA_TYPE_VIDEO || st->codec->codec_type == AVMEDIA_TYPE_AUDIO))
+            if(st->first_dts == AV_NOPTS_VALUE && st->codec->codec_id != CODEC_ID_DSMCC_B)
                 break;
+            if (st->codec->codec_type == CODEC_TYPE_VIDEO)
+                hasvideo = 1;
+            else if (st->codec->codec_type == CODEC_TYPE_AUDIO)
+                hasaudio = 1;
         }
         if (i == ic->nb_streams) {
             /* NOTE: if the format has no header, then we need to read
                some packets to get most of the streams, so we cannot
                stop here */
-            if (!(ic->ctx_flags & AVFMTCTX_NOHEADER)) {
+            if (!(ic->ctx_flags & AVFMTCTX_NOHEADER) ||
+                (read_size >= MAX_READ_SIZE || read_packets >= MAX_FRAMES) ||
+                (hasvideo && hasaudio)) {
                 /* if we found the info for all the codecs, we can stop */
                 ret = count;
                 av_log(ic, AV_LOG_DEBUG, "All info found\n");
@@ -2492,6 +2574,9 @@ int avformat_find_stream_info(AVFormatContext *ic, AVDictionary **options)
         /* NOTE: a new stream can be added there if no header in file
            (AVFMTCTX_NOHEADER) */
         ret = read_frame_internal(ic, &pkt1);
+
+        read_packets++;
+
         if (ret == AVERROR(EAGAIN))
             continue;
 
@@ -2915,6 +3000,54 @@ AVStream *avformat_new_stream(AVFormatContext *s, AVCodec *c)
     st->reference_dts = AV_NOPTS_VALUE;
 
     st->sample_aspect_ratio = (AVRational){0,1};
+    s->streams[s->nb_streams++] = st;
+    return st;
+}
+
+/**
+ * @brief Add a stream to an MPEG media stream.
+ *
+ * This is used by mpegts instead of av_new_stream, so we can
+ * track new streams as indicated by the PMT.
+ *
+ * @param s MPEG media stream handle
+ * @param st new media stream
+ * @param id file format dependent stream id
+ */
+AVStream *av_add_stream(AVFormatContext *s, AVStream *st, int id)
+{
+    int i;
+
+    if (!st)
+    {
+        av_log(s, AV_LOG_ERROR, "av_add_stream: Error, AVStream is NULL");
+        return NULL;
+    }
+
+    av_remove_stream(s, id, 0);
+
+    if (s->nb_streams >= MAX_STREAMS)
+    {
+        av_log(s, AV_LOG_ERROR, "av_add_stream: Error, (s->nb_streams >= MAX_STREAMS)");
+        return NULL;
+    }
+
+    if (s->iformat) {
+        /* no default bitrate if decoding */
+        st->codec->bit_rate = 0;
+    }
+    st->index = s->nb_streams;
+    st->id = id;
+    st->start_time = AV_NOPTS_VALUE;
+    st->duration = AV_NOPTS_VALUE;
+    st->cur_dts = AV_NOPTS_VALUE;
+    st->first_dts = AV_NOPTS_VALUE;
+
+    /* default pts settings is MPEG like */
+    av_set_pts_info(st, 33, 1, 90000);
+    st->last_IP_pts = AV_NOPTS_VALUE;
+    for(i=0; i<MAX_REORDER_DELAY+1; i++)
+        st->pts_buffer[i]= AV_NOPTS_VALUE;
 
     s->streams[s->nb_streams++] = st;
     return st;
@@ -2965,6 +3098,81 @@ AVChapter *avpriv_new_chapter(AVFormatContext *s, int id, AVRational time_base, 
     chapter->end   = end;
 
     return chapter;
+}
+
+
+/**
+ * @brief Remove a stream from a media stream.
+ *
+ * This is used by mpegts, so we can track streams as indicated by the PMT.
+ *
+ * @param s MPEG media stream handle
+ * @param id stream id of stream to remove
+ * @param remove_ts if true, remove any matching MPEG-TS filter as well
+ */
+void av_remove_stream(AVFormatContext *s, int id, int remove_ts) {
+    int i;
+    int changes = 0;
+
+    for (i=0; i<s->nb_streams; i++) {
+        if (s->streams[i]->id != id)
+            continue;
+
+        av_log(NULL, AV_LOG_DEBUG, "av_remove_stream 0x%x\n", id);
+
+        /* close codec context */
+        AVCodecContext *codec_ctx = s->streams[i]->codec;
+        if (codec_ctx->codec) {
+            avcodec_close(codec_ctx);
+            av_free(codec_ctx);
+        }
+        /* make sure format context is not using the codec context */
+        if (&s->streams[i] == s->cur_st) {
+            av_log(NULL, AV_LOG_DEBUG, "av_remove_stream cur_st = NULL\n");
+            s->cur_st = NULL;
+        }
+     /*   else if (s->cur_st > &s->streams[i]) {
+            av_log(NULL, AV_LOG_DEBUG, "av_remove_stream cur_st -= 1\n");
+            s->cur_st -= sizeof(AVFormatContext *);
+        } */
+        else {
+            av_log(NULL, AV_LOG_DEBUG,
+                   "av_remove_stream: no change to cur_st\n");
+        }
+
+        av_log(NULL, AV_LOG_DEBUG, "av_remove_stream: removing... "
+               "s->nb_streams=%d i=%d\n", s->nb_streams, i);
+        /* actually remove av stream */
+        s->nb_streams--;
+        if ((s->nb_streams - i) > 0) {
+            memmove(&s->streams[i], &s->streams[i+1],
+                    (s->nb_streams-i)*sizeof(AVFormatContext *));
+        }
+        else
+            s->streams[i] = NULL;
+
+        /* remove ts filter if remove ts is true and
+         * the format decoder is the "mpegts" decoder
+         */
+        if (remove_ts && s->iformat && s->priv_data &&
+            (0 == strncmp(s->iformat->name, "mpegts", 6))) {
+            av_log(NULL, AV_LOG_DEBUG,
+                   "av_remove_stream: mpegts_remove_stream\n");
+            MpegTSContext *context = (MpegTSContext*) s->priv_data;
+            mpegts_remove_stream(context, id);
+        }
+        changes = 1;
+    }
+    if (changes)
+    {
+        // flush queued packets after a stream change (might need to make smarter)
+        flush_packet_queue(s);
+
+        /* renumber the streams */
+        av_log(NULL, AV_LOG_DEBUG, "av_remove_stream: renumbering streams\n");
+        for (i=0; i<s->nb_streams; i++)
+            s->streams[i]->index=i;
+    }
 }
 
 /************************************************************/
@@ -3463,6 +3671,7 @@ int av_interleave_packet_per_dts(AVFormatContext *s, AVPacket *out,
 
 /**
  * Interleave an AVPacket correctly so it can be muxed.
+ *
  * @param out the interleaved packet will be output here
  * @param in the input packet
  * @param flush 1 if no further packets are available as input and all
@@ -3788,6 +3997,7 @@ uint64_t ff_ntp_time(void)
 int av_get_frame_filename(char *buf, int buf_size,
                           const char *path, int number)
 {
+    struct tm time_r;
     const char *p;
     char *q, buf1[20], c;
     int nd, len, percentd_found;

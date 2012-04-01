@@ -415,6 +415,13 @@ static int pcm_decode_frame(AVCodecContext *avctx, void *data,
         dst_int32_t = (int32_t *)s->frame.data[0];
         n /= avctx->channels;
         switch (avctx->bits_per_coded_sample) {
+        case 16:
+            while (n--) {
+                c = avctx->channels;
+                while (c--)
+                    *dst_int32_t++ = bytestream_get_be16(&src) << 16;
+            }
+            break;
         case 20:
             while (n--) {
                 c = avctx->channels;

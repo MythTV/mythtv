@@ -1063,7 +1063,14 @@ void ff_mpeg4_encode_picture_header(MpegEncContext * s, int picture_number)
     time_div= FFUDIV(s->time, s->avctx->time_base.den);
     time_mod= FFUMOD(s->time, s->avctx->time_base.den);
     time_incr= time_div - s->last_time_base;
-    assert(time_incr >= 0);
+
+    if (time_incr < 0)
+    {
+        s->last_time_base = time_div;
+        time_incr = 0;
+    }
+
+    //assert(time_incr >= 0);
     while(time_incr--)
         put_bits(&s->pb, 1, 1);
 

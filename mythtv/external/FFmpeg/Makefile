@@ -1,14 +1,15 @@
-MAIN_MAKEFILE=1
 include config.mak
 
-vpath %.c    $(SRC_PATH)
-vpath %.cpp  $(SRC_PATH)
-vpath %.h    $(SRC_PATH)
-vpath %.S    $(SRC_PATH)
-vpath %.asm  $(SRC_PATH)
-vpath %.v    $(SRC_PATH)
-vpath %.texi $(SRC_PATH)
-vpath %/fate_config.sh.template $(SRC_PATH)
+SRC_DIR = $(SRC_PATH_BARE)
+
+vpath %.c    $(SRC_PATH_BARE)
+vpath %.cpp  $(SRC_PATH_BARE)
+vpath %.h    $(SRC_PATH_BARE)
+vpath %.S    $(SRC_PATH_BARE)
+vpath %.asm  $(SRC_PATH_BARE)
+vpath %.v    $(SRC_PATH_BARE)
+vpath %.texi $(SRC_PATH_BARE)
+vpath %/fate_config.sh.template $(SRC_PATH_BARE)
 
 PROGS-$(CONFIG_FFMPEG)   += ffmpeg
 PROGS-$(CONFIG_FFPLAY)   += ffplay
@@ -22,6 +23,7 @@ TESTTOOLS   = audiogen videogen rotozoom tiny_psnr base64
 HOSTPROGS  := $(TESTTOOLS:%=tests/%) doc/print_options
 TOOLS       = qt-faststart trasher
 TOOLS-$(CONFIG_ZLIB) += cws2fws
+MYTHPROGS   = $(addprefix myth, ${PROGS})
 
 BASENAMES   = ffmpeg ffplay ffprobe ffserver
 ALLPROGS    = $(BASENAMES:%=%$(PROGSSUF)$(EXESUF))
@@ -42,7 +44,7 @@ DATA_FILES := $(wildcard $(SRC_PATH)/presets/*.ffpreset) $(SRC_PATH)/doc/ffprobe
 
 SKIPHEADERS = cmdutils_common_opts.h
 
-include $(SRC_PATH)/common.mak
+include common.mak
 
 FF_EXTRALIBS := $(FFEXTRALIBS)
 FF_DEP_LIBS  := $(DEP_LIBS)
@@ -57,6 +59,9 @@ $(TOOLS): %$(EXESUF): %.o
 	$(LD) $(LDFLAGS) -o $@ $< $(ELIBS)
 
 tools/cws2fws$(EXESUF): ELIBS = -lz
+
+${MYTHPROGS}: myth%: %
+	$(CP) $< $@
 
 config.h: .config
 .config: $(wildcard $(FFLIBS:%=$(SRC_PATH)/lib%/all*.c))
@@ -95,8 +100,8 @@ OBJDIRS += tools
 
 -include $(wildcard tools/*.d)
 
-VERSION_SH  = $(SRC_PATH)/version.sh
-GIT_LOG     = $(SRC_PATH)/.git/logs/HEAD
+VERSION_SH  = $(SRC_PATH_BARE)/external/FFmpeg/version.sh
+GIT_LOG     = $(SRC_PATH_BARE)/.git/logs/HEAD
 
 .version: $(wildcard $(GIT_LOG)) $(VERSION_SH) config.mak
 .version: M=@
@@ -109,7 +114,7 @@ version.h .version:
 -include .version
 
 ifdef PROGS
-install: install-progs install-data
+install: install-mythprogs
 endif
 
 install: install-libs install-headers
@@ -122,6 +127,10 @@ install-progs-$(CONFIG_SHARED): install-libs
 install-progs: install-progs-yes $(PROGS)
 	$(Q)mkdir -p "$(BINDIR)"
 	$(INSTALL) -c -m 755 $(INSTPROGS) "$(BINDIR)"
+
+install-mythprogs: install-progs-yes $(MYTHPROGS)
+	$(Q)mkdir -p "$(BINDIR)"
+	$(INSTALL) -c -m 755 $(MYTHPROGS) "$(BINDIR)"
 
 install-data: $(DATA_FILES)
 	$(Q)mkdir -p "$(DATADIR)"
@@ -159,8 +168,8 @@ coverage-html: coverage.info
 	$(Q)genhtml -o $@ $<
 	$(Q)touch $@
 
-include $(SRC_PATH)/doc/Makefile
-include $(SRC_PATH)/tests/Makefile
+#include $(SRC_PATH)/doc/Makefile
+#include $(SRC_PATH)/tests/Makefile
 
 $(sort $(OBJDIRS)):
 	$(Q)mkdir -p $@

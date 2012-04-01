@@ -42,12 +42,20 @@
 #define M4OD_TID  0x05
 #define SDT_TID   0x42
 
+#define DVB_CAROUSEL_ID             0x13
+#define DVB_VBI_DATA_ID             0x45
+#define DVB_VBI_TELETEXT_ID         0x46
+#define DVB_TELETEXT_ID             0x56
+#define DVB_SUBT_DESCID             0x59
+#define DVB_BROADCAST_ID            0x66
+#define DVB_DATA_STREAM             0x52
 #define STREAM_TYPE_VIDEO_MPEG1     0x01
 #define STREAM_TYPE_VIDEO_MPEG2     0x02
 #define STREAM_TYPE_AUDIO_MPEG1     0x03
 #define STREAM_TYPE_AUDIO_MPEG2     0x04
 #define STREAM_TYPE_PRIVATE_SECTION 0x05
 #define STREAM_TYPE_PRIVATE_DATA    0x06
+#define STREAM_TYPE_DSMCC_B         0x0b
 #define STREAM_TYPE_AUDIO_AAC       0x0f
 #define STREAM_TYPE_AUDIO_AAC_LATM  0x11
 #define STREAM_TYPE_VIDEO_MPEG4     0x10
@@ -57,9 +65,18 @@
 
 #define STREAM_TYPE_AUDIO_AC3       0x81
 #define STREAM_TYPE_AUDIO_DTS       0x8a
+#define STREAM_TYPE_AUDIO_HDMV_AC3_PLUS      0x84
+#define STREAM_TYPE_AUDIO_HDMV_AC3_TRUE_HD   0x83
+#define STREAM_TYPE_AUDIO_HDMV_DTS           0x82
+#define STREAM_TYPE_AUDIO_HDMV_DTS_HD        0x85
+#define STREAM_TYPE_AUDIO_HDMV_DTS_HD_MASTER 0x86
+
+#define STREAM_TYPE_SUBTITLE_DVB    0x100
+#define STREAM_TYPE_VBI_DVB         0x101
 
 typedef struct MpegTSContext MpegTSContext;
 
+void mpegts_remove_stream(MpegTSContext *ts, int pid);
 MpegTSContext *ff_mpegts_parse_open(AVFormatContext *s);
 int ff_mpegts_parse_packet(MpegTSContext *ts, AVPacket *pkt,
                            const uint8_t *buf, int len);
@@ -89,6 +106,31 @@ typedef struct {
     SLConfigDescr sl;
 } Mp4Descr;
 
+typedef struct
+{
+    char language[4];
+    int comp_page;
+    int anc_page;
+    int sub_id;
+    int txt_type;
+    int vbi_data;
+    /* DSMCC data */
+    int data_id;
+    int carousel_id;
+    int component_tag;
+    unsigned int codec_tag;
+} dvb_caption_info_t;
+
+typedef struct
+{
+    int pid;
+    int type;
+    enum CodecID       codec_id;
+    enum CodecType     codec_type;
+    dvb_caption_info_t dvbci;
+} pmt_entry_t;
+
+
 /**
  * Parse an MPEG-2 descriptor
  * @param[in] fc                    Format context (used for logging only)
@@ -98,9 +140,9 @@ typedef struct {
  * @param desc_list_end             End of buffer
  * @return <0 to stop processing
  */
-int ff_parse_mpeg2_descriptor(AVFormatContext *fc, AVStream *st, int stream_type,
+int ff_parse_mpeg2_descriptor(AVFormatContext *fc, pmt_entry_t *item, int stream_type,
                               const uint8_t **pp, const uint8_t *desc_list_end,
                               Mp4Descr *mp4_descr, int mp4_descr_count, int pid,
-                              MpegTSContext *ts);
+                              MpegTSContext *ts, dvb_caption_info_t *dvbci);
 
 #endif /* AVFORMAT_MPEGTS_H */

@@ -142,5 +142,6 @@ int avpriv_mpa_decode_header(AVCodecContext *avctx, uint32_t head, int *sample_r
     *sample_rate = s->sample_rate;
     *channels = s->nb_channels;
     *bit_rate = s->bit_rate;
+    avctx->avcodec_dual_language = (s->mode == MPA_DUAL) ? 1 : 0;
     return s->frame_size;
 }

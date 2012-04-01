@@ -466,6 +466,9 @@ static int mpegps_read_packet(AVFormatContext *s,
         } else if(es_type == STREAM_TYPE_AUDIO_AAC){
             codec_id = CODEC_ID_AAC;
             type = AVMEDIA_TYPE_AUDIO;
+        } else if(es_type == STREAM_TYPE_AUDIO_AAC_LATM){
+            codec_id = CODEC_ID_AAC_LATM;
+            type = CODEC_TYPE_AUDIO;
         } else if(es_type == STREAM_TYPE_VIDEO_MPEG4){
             codec_id = CODEC_ID_MPEG4;
             type = AVMEDIA_TYPE_VIDEO;
@@ -513,6 +516,9 @@ static int mpegps_read_packet(AVFormatContext *s,
     } else if (startcode >= 0x20 && startcode <= 0x3f) {
         type = AVMEDIA_TYPE_SUBTITLE;
         codec_id = CODEC_ID_DVD_SUBTITLE;
+    } else if (startcode == 0x69 || startcode == 0x49) {
+        type = CODEC_TYPE_DATA;
+        codec_id = CODEC_ID_MPEG2VBI;
     } else if (startcode >= 0xfd55 && startcode <= 0xfd5f) {
         type = AVMEDIA_TYPE_VIDEO;
         codec_id = CODEC_ID_VC1;
@@ -545,6 +551,12 @@ static int mpegps_read_packet(AVFormatContext *s,
     st->request_probe     = request_probe;
     if (codec_id != CODEC_ID_PCM_S16BE)
         st->need_parsing = AVSTREAM_PARSE_FULL;
+
+    /* notify the callback of the change in streams */
+    if (s->streams_changed) {
+        s->streams_changed(s->stream_change_data);
+    }
+
  found:
     if(st->discard >= AVDISCARD_ALL)
         goto skip;

@@ -120,6 +120,8 @@ static inline int mpeg4_is_resync(MpegEncContext *s){
         return 0;
     }
 
+// disabling the while loop since it causes playback issues. see #3001
+#if 0
     while(v<=0xFF){
         if(s->pict_type==AV_PICTURE_TYPE_B || (v>>(8-s->pict_type)!=1) || s->partitioned_frame)
             break;
@@ -127,6 +129,7 @@ static inline int mpeg4_is_resync(MpegEncContext *s){
         bits_count+= 8+s->pict_type;
         v= show_bits(&s->gb, 16);
     }
+#endif
 
     if(bits_count + 8 >= s->gb.size_in_bits){
         v>>=8;
@@ -1618,7 +1621,9 @@ static int decode_vol_header(MpegEncContext *s, GetBitContext *gb){
     if (get_bits1(gb) != 0) {   /* fixed_vop_rate  */
         s->avctx->time_base.num = get_bits(gb, s->time_increment_bits);
     }else
-        s->avctx->time_base.num = 1;
+        /* fix for h263 frame rate */
+        s->avctx->time_base.num = (s->avctx->time_base.den>10000) ? 1001 : 1;
+        //s->avctx->time_base.num = 1;
 
     s->t_frame=0;
 

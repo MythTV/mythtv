@@ -1452,8 +1452,6 @@ mp3on4float_decoder_select="mpegaudiodsp"
 mpc7_decoder_select="mpegaudiodsp"
 mpc8_decoder_select="mpegaudiodsp"
 mpeg_vdpau_decoder_select="vdpau mpegvideo_decoder"
-mpeg_xvmc_decoder_deps="X11_extensions_XvMClib_h"
-mpeg_xvmc_decoder_select="mpegvideo_decoder"
 mpeg1_vdpau_decoder_select="vdpau mpeg1video_decoder"
 mpeg1_vdpau_hwaccel_select="vdpau mpeg1video_decoder"
 mpeg1video_encoder_select="aandct"
@@ -3090,7 +3088,6 @@ check_header sys/select.h
 check_header termios.h
 check_header vdpau/vdpau.h
 check_header vdpau/vdpau_x11.h
-check_header X11/extensions/XvMClib.h
 check_header asm/types.h
 
 disabled  zlib || check_lib   zlib.h      zlibVersion -lz   || disable  zlib

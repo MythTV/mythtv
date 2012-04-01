@@ -787,6 +787,10 @@ typedef struct AVStream {
      * NOT PART OF PUBLIC API
      */
     int request_probe;
+
+    int got_frame;
+
+    int component_tag; ///< Component tag given in PMT, for MythTV MHEG
 } AVStream;
 
 #define AV_PROGRAM_RUNNING 1
@@ -904,6 +908,14 @@ typedef struct AVFormatContext {
 
     unsigned int packet_size;
     int max_delay;
+
+    int build_index;
+
+    /* mpeg-ts support */
+    void (*streams_changed)(void*);
+    void *stream_change_data;
+    const uint8_t *cur_pmt_sect;
+    int cur_pmt_sect_len;
 
     int flags;
 #define AVFMT_FLAG_GENPTS       0x0001 ///< Generate missing pts even if it requires parsing future frames.
@@ -1549,6 +1561,10 @@ attribute_deprecated
 void av_set_pts_info(AVStream *s, int pts_wrap_bits,
                      unsigned int pts_num, unsigned int pts_den);
 #endif
+
+void av_estimate_timings(AVFormatContext *ic, int64_t old_offset);
+AVStream *av_add_stream(AVFormatContext *s, AVStream *st, int id);
+void av_remove_stream(AVFormatContext *s, int id, int remove_ts);
 
 #define AVSEEK_FLAG_BACKWARD 1 ///< seek backward
 #define AVSEEK_FLAG_BYTE     2 ///< seeking based on position in bytes

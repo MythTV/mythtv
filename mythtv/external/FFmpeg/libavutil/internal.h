@@ -39,6 +39,7 @@
 #include "timer.h"
 #include "cpu.h"
 #include "dict.h"
+#include "intmath.h"
 
 struct AVDictionary {
     int count;

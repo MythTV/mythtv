@@ -405,6 +405,9 @@ void avcodec_register_all(void)
     REGISTER_DECODER (LIBCELT, libcelt);
     REGISTER_DECODER (LIBDIRAC, libdirac);
     REGISTER_ENCODER (LIBFAAC, libfaac);
+#if 0
+    REGISTER_DECODER (LIBFAAD_LATM, libfaad_latm);
+#endif
     REGISTER_ENCDEC  (LIBGSM, libgsm);
     REGISTER_ENCDEC  (LIBGSM_MS, libgsm_ms);
     REGISTER_ENCODER (LIBMP3LAME, libmp3lame);

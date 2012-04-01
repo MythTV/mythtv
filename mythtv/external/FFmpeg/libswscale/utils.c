@@ -49,6 +49,8 @@
 #include "libavutil/pixdesc.h"
 #include "libavutil/avassert.h"
 
+#include "libavutil/cpu.h"
+
 unsigned swscale_version(void)
 {
     av_assert0(LIBSWSCALE_VERSION_MICRO >= 100);

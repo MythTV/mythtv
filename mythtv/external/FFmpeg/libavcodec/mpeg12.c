@@ -2139,7 +2139,193 @@ static void mpeg_decode_user_data(AVCodecContext *avctx,
                 return;
             avctx->dtg_active_format = p[0] & 0x0f;
         }
+    } else if (buf_end - p >= 6 &&
+               p[0] == 0x43 && p[1] == 0x43 && p[2] == 0x01 && p[3] == 0xf8 &&
+               p[4] == 0x9e) {
+#undef fprintf
+        Mpeg1Context *s1 = avctx->priv_data;
+        MpegEncContext *s = &s1->mpeg_enc_ctx;
+        int atsc_cnt_loc = s->tmp_atsc_cc_len;
+        uint8_t real_count = 0;
+        unsigned int i;
+
+        s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = 0x40 | (0x1f&real_count);
+        s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = 0x00; // em_data
+
+        for (i=5; i < (buf_end - p - 2) &&
+                 (s->tmp_atsc_cc_len + 3) < ATSC_CC_BUF_SIZE; i++)
+        {
+            if ((p[i]&0xfe) == 0xfe) // CC1&CC2 || CC3&CC4
+            {
+                uint8_t type = (p[i] & 0x01) ^ 0x01;
+                uint8_t cc_data_1 = p[++i];
+                uint8_t cc_data_2 = p[++i];
+                uint8_t valid = 1;
+                uint8_t cc608_hdr = 0xf8 | (valid ? 0x04 : 0x00) | type;
+                real_count++;
+                s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = cc608_hdr;
+                s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = cc_data_1;
+                s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = cc_data_2;
+                continue;
+            }
+            break;
+        }
+        if (!real_count)
+        {
+            s->tmp_atsc_cc_len = atsc_cnt_loc;
+        }
+        else
+        {
+            s->tmp_atsc_cc_buf[atsc_cnt_loc] = 0x40 | (0x1f&real_count);
+            s->tmp_atsc_cc_len = atsc_cnt_loc + 2 + 3 * real_count;
+        }
+    } else if (buf_end - p >= 6 &&
+               p[0] == 'G' && p[1] == 'A' && p[2] == '9' && p[3] == '4') {
+        /* Parse CEA-708/608 Closed Captions in ATSC user data */
+        int user_data_type_code = p[4];
+        if (user_data_type_code == 0x03) { // caption data
+            Mpeg1Context   *s1 = avctx->priv_data;
+            MpegEncContext *s  = &s1->mpeg_enc_ctx;
+            int cccnt = p[5] & 0x1f;
+            int cclen = 3 * cccnt + 2;
+            int proc  = (p[5] >> 6) & 1;
+            int blen  = s->tmp_atsc_cc_len;
+
+            p += 5;
+
+            if ((cclen <= buf_end - p) && ((cclen + blen) < ATSC_CC_BUF_SIZE)) {
+                uint8_t *dst = s->tmp_atsc_cc_buf + s->tmp_atsc_cc_len;
+                memcpy(dst, p, cclen);
+                s->tmp_atsc_cc_len += cclen;
+            }
+        }
+        else if (user_data_type_code == 0x04) {
+            // additional CEA-608 data, as per SCTE 21
+        }
+        else if (user_data_type_code == 0x05) {
+            // luma PAM data, as per SCTE 21
+        }
+        else if (user_data_type_code == 0x06) {
+            // bar data (letterboxing info)
+        }
+    } else if (buf_end - p >= 3 && p[0] == 0x03 && ((p[1]&0x7f) == 0x01)) {
+        // SCTE 20 encoding of CEA-608
+        unsigned int cc_count = p[2]>>3;
+        unsigned int cc_bits = cc_count * 26;
+        unsigned int cc_bytes = (cc_bits + 7 - 3) / 8;
+        Mpeg1Context *s1 = avctx->priv_data;
+        MpegEncContext *s = &s1->mpeg_enc_ctx;
+        if (buf_end - p >= (2+cc_bytes) && (s->tmp_atsc_cc_len + 2 + 3*cc_count) < ATSC_CC_BUF_SIZE) {
+            int atsc_cnt_loc = s->tmp_atsc_cc_len;
+            uint8_t real_count = 0, marker = 1, i;
+            GetBitContext gb;
+            init_get_bits(&gb, p+2, (buf_end-p-2) * sizeof(uint8_t));
+            get_bits(&gb, 5); // swallow cc_count
+            s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = 0x40 | (0x1f&cc_count);
+            s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = 0x00; // em_data
+            for (i = 0; i < cc_count; i++) {
+                uint8_t valid, cc608_hdr;
+                uint8_t priority = get_bits(&gb, 2);
+                uint8_t field_no = get_bits(&gb, 2);
+                uint8_t line_offset = get_bits(&gb, 5);
+                uint8_t cc_data_1 = av_reverse[get_bits(&gb, 8)];
+                uint8_t cc_data_2 = av_reverse[get_bits(&gb, 8)];
+                uint8_t type = (1 == field_no) ? 0x00 : 0x01;
+                (void) priority; // we use all the data, don't need priority
+                marker &= get_bits(&gb, 1);
+                // dump if marker bit missing
+                valid = marker;
+                // ignore forbidden and repeated (3:2 pulldown) field numbers
+                valid = valid && (1 == field_no || 2 == field_no);
+                // ignore content not in line 21
+                valid = valid && (11 == line_offset);
+                if (!valid)
+                    continue;
+                cc608_hdr = 0xf8 | (valid ? 0x04 : 0x00) | type;
+                real_count++;
+                s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = cc608_hdr;
+                s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = cc_data_1;
+                s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = cc_data_2;
+            }
+            if (!real_count)
+            {
+                s->tmp_atsc_cc_len = atsc_cnt_loc;
+            }
+            else
+            {
+                s->tmp_atsc_cc_buf[atsc_cnt_loc] = 0x40 | (0x1f&real_count);
+                s->tmp_atsc_cc_len = atsc_cnt_loc + 2 + 3 * real_count;
+            }
+        }
+    } else if (buf_end - p >= 11 &&
+               p[0] == 0x05 && p[1] == 0x02) {
+        /* parse EIA-608 captions embedded in a DVB stream. */
+        Mpeg1Context   *s1 = avctx->priv_data;
+        MpegEncContext *s  = &s1->mpeg_enc_ctx;
+        uint8_t dvb_cc_type = p[7];
+        p += 8;
+
+        /* Predictive frame tag, but MythTV reorders predictive
+         * frames for us along with the CC data, so we ignore it.
+         */
+        if (dvb_cc_type == 0x05) {
+            dvb_cc_type = p[6];
+            p += 7;
+        }
+
+        if (dvb_cc_type == 0x02) { /* 2-byte caption, can be repeated */
+            int type = 0x00; // line 21 field 1 == 0x00, field 2 == 0x01
+            uint8_t cc608_hdr = 0xf8 | 0x04/*valid*/ | type;
+            uint8_t hi = p[1] & 0xFF;
+            uint8_t lo = p[2] & 0xFF;
+
+            dvb_cc_type = p[3];
+
+            if ((2 <= buf_end - p) && ((3 + s->tmp_atsc_cc_len) < ATSC_CC_BUF_SIZE)) {
+                s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = 0x40 | (0x1f&1/*cc_count*/);
+                s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = 0x00; // em_data
+                s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = cc608_hdr;
+                s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = hi;
+                s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = lo;
+
+                /* Only repeat characters when the next type flag
+                 * is 0x04 and the characters are repeatable (i.e., less than
+                 * 32 with the parity stripped).
+                 */
+                if (dvb_cc_type == 0x04 && (hi & 0x7f) < 32) {
+                    if ((2 <= buf_end - p) && ((3 + s->tmp_atsc_cc_len) < ATSC_CC_BUF_SIZE)) {
+                        s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = 0x40 | (0x1f&1/*cc_count*/);
+                        s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = 0x00; // em_data
+                        s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = cc608_hdr;
+                        s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = hi;
+                        s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = lo;
+                    }
+                }
+            }
+
+            p += 6;
+        } else if (dvb_cc_type == 0x04) { /* 4-byte caption, not repeated */
+            if ((4 <= buf_end - p) &&
+                ((6 + s->tmp_atsc_cc_len) < ATSC_CC_BUF_SIZE)) {
+                int type = 0x00; // line 21 field 1 == 0x00, field 2 == 0x01
+                uint8_t cc608_hdr = 0xf8 | 0x04/*valid*/ | type;
+
+                s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = 0x40 | (0x1f&2/*cc_count*/);
+                s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = 0x00; // em_data
+                s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = cc608_hdr;
+                s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = p[1] & 0xFF;
+                s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = p[2] & 0xFF;
+                s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = cc608_hdr;
+                s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = p[3] & 0xFF;
+                s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = p[4] & 0xFF;
+            }
+
+            p += 9;
+        }
     }
+    // For other CEA-608 embedding options see:
+    /* SCTE 21 */
+    /* ETSI EN 301 775 */
 }
 
 static void mpeg_decode_gop(AVCodecContext *avctx,

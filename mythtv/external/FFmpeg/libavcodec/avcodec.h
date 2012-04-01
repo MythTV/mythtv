@@ -414,6 +414,13 @@ enum CodecID {
     CODEC_ID_SRT,
     CODEC_ID_MICRODVD   = MKBETAG('m','D','V','D'),
 
+    /* teletext codecs */
+    CODEC_ID_MPEG2VBI,
+    CODEC_ID_DVB_VBI,
+
+    /* DSMCC codec */
+    CODEC_ID_DSMCC_B,
+
     /* other specific kind of codecs (generally used for attachments) */
     CODEC_ID_FIRST_UNKNOWN = 0x18000,           ///< A dummy ID pointing at the start of various fake codecs.
     CODEC_ID_TTF = 0x18000,
@@ -1225,6 +1232,14 @@ typedef struct AVFrame {
      * - decoding: Read by user.
      */
     int64_t pkt_pos;
+
+    /** ATSC CC data CEA-608/708 
+     * - encoding: unused
+     * - decoding: Set by libavcodec
+     */
+    uint8_t atsc_cc_buf[1024];\
+    int atsc_cc_len;
+
 } AVFrame;
 
 struct AVCodecInternal;
@@ -2174,6 +2189,15 @@ typedef struct AVCodecContext {
     int (*reget_buffer)(struct AVCodecContext *c, AVFrame *pic);
 
 
+    /**
+     * set when bilingual audio data has been detected.
+     * 0 normally, 1 if dual language flag is set
+     *
+     * - encoding: unused (called delay in this case...)
+     * - decoding: set by lavc
+     */
+    int avcodec_dual_language;
+
     /* - encoding parameters */
     float qcompress;  ///< amount of qscale change between easy & hard scenes (0.0-1.0)
     float qblur;      ///< amount of qscale smoothing over time (0.0-1.0)
@@ -3082,6 +3106,10 @@ typedef struct AVSubtitleRect {
     int w;         ///< width            of pict, undefined when pict is not set
     int h;         ///< height           of pict, undefined when pict is not set
     int nb_colors; ///< number of colors in pict, undefined when pict is not set
+    int display_x; ///< top left corner of region into which pict is displayed
+    int display_y; ///< top left corner of region into which pict is displayed
+    int display_w; ///< width           of region into which pict is displayed
+    int display_h; ///< height          of region into which pict is displayed
 
     /**
      * data+linesize for the bitmap of this subtitle.
@@ -4533,5 +4561,8 @@ int av_codec_is_encoder(AVCodec *codec);
  * @return a non-zero number if codec is a decoder, zero otherwise
  */
 int av_codec_is_decoder(AVCodec *codec);
+
+const char *ff_codec_id_string(enum CodecID codec_id);
+const char *ff_codec_type_string(enum CodecType codec_type);
 
 #endif /* AVCODEC_AVCODEC_H */

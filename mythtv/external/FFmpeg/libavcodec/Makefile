@@ -3,6 +3,14 @@ include $(SUBDIR)../config.mak
 NAME = avcodec
 FFLIBS = avutil
 
+# x86_32 needs -O1 -fomit-frame-pointer to compile inline asm
+ifeq ($(ARCH_X86_32), yes)
+    CFLAGS += -fomit-frame-pointer
+    ifneq (, $(findstring debug, $(CCONFIG)))
+        CFLAGS += -O1
+    endif
+endif
+
 HEADERS = avcodec.h avfft.h dxva2.h vaapi.h vda.h vdpau.h version.h xvmc.h
 
 OBJS = allcodecs.o                                                      \
@@ -15,6 +23,7 @@ OBJS = allcodecs.o                                                      \
        fmtconvert.o                                                     \
        imgconvert.o                                                     \
        jrevdct.o                                                        \
+       myth_utils.o                                                     \
        options.o                                                        \
        parser.o                                                         \
        raw.o                                                            \
@@ -63,6 +72,7 @@ OBJS-$(CONFIG_AAC_ENCODER)             += aacenc.o aaccoder.o    \
                                           psymodel.o iirfilter.o \
                                           mpeg4audio.o kbdwin.o  \
                                           audio_frame_queue.o
+OBJS-$(CONFIG_AAC_LATM_DECODER)        += aaclatmdec.o
 OBJS-$(CONFIG_AASC_DECODER)            += aasc.o msrledec.o
 OBJS-$(CONFIG_AC3_DECODER)             += ac3dec.o ac3dec_data.o ac3.o kbdwin.o
 OBJS-$(CONFIG_AC3_ENCODER)             += ac3enc_float.o ac3enc.o ac3tab.o \

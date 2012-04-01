@@ -818,6 +818,11 @@ static void dvbsub_parse_pixel_data_block(AVCodecContext *avctx, DVBSubObjectDis
             else
                 map_table = NULL;
 
+            if (y_pos >= region->height) {
+                av_log(avctx, AV_LOG_ERROR, "Invalid y position!\n");
+                return;
+            }
+
             x_pos = dvbsub_read_2bit_string(pbuf + (y_pos * region->width),
                                             region->width, &buf, buf_end - buf,
                                             non_mod, map_table, x_pos);
@@ -833,6 +838,11 @@ static void dvbsub_parse_pixel_data_block(AVCodecContext *avctx, DVBSubObjectDis
             else
                 map_table = NULL;
 
+            if (y_pos >= region->height) {
+                av_log(avctx, AV_LOG_ERROR, "Invalid y position!\n");
+                return;
+            }
+
             x_pos = dvbsub_read_4bit_string(pbuf + (y_pos * region->width),
                                             region->width, &buf, buf_end - buf,
                                             non_mod, map_table, x_pos);
@@ -840,6 +850,11 @@ static void dvbsub_parse_pixel_data_block(AVCodecContext *avctx, DVBSubObjectDis
         case 0x12:
             if (region->depth < 8) {
                 av_log(avctx, AV_LOG_ERROR, "8-bit pixel string in %d-bit region!\n", region->depth);
+                return;
+            }
+
+            if (y_pos >= region->height) {
+                av_log(avctx, AV_LOG_ERROR, "Invalid y position!\n");
                 return;
             }
 
@@ -1012,6 +1027,11 @@ static void dvbsub_parse_clut_segment(AVCodecContext *avctx,
         YUV_TO_RGB2_CCIR(r, g, b, y);
 
         av_dlog(avctx, "clut %d := (%d,%d,%d,%d)\n", entry_id, r, g, b, alpha);
+
+        if (alpha == 255)
+        {
+            r = g = b = 0;
+        }
 
         if (depth & 0x80)
             clut->clut4[entry_id] = RGBA(r,g,b,255 - alpha);
@@ -1367,14 +1387,8 @@ static int dvbsub_display_end_segment(AVCodecContext *avctx, const uint8_t *buf,
     DVBSubCLUT *clut;
     uint32_t *clut_table;
     int i;
-    int offset_x=0, offset_y=0;
 
     sub->end_display_time = ctx->time_out * 1000;
-
-    if (display_def) {
-        offset_x = display_def->x;
-        offset_y = display_def->y;
-    }
 
     sub->num_rects = ctx->display_list_size;
 
@@ -1395,10 +1409,20 @@ static int dvbsub_display_end_segment(AVCodecContext *avctx, const uint8_t *buf,
             continue;
 
         rect = sub->rects[i];
-        rect->x = display->x_pos + offset_x;
-        rect->y = display->y_pos + offset_y;
+        rect->x = display->x_pos;
+        rect->y = display->y_pos;
         rect->w = region->width;
         rect->h = region->height;
+        if (display_def) {
+            rect->display_x = display_def->x;
+            rect->display_y = display_def->y;
+            rect->display_w = display_def->width;
+            rect->display_h = display_def->height;
+        }
+        else {
+            rect->display_w = 720;
+            rect->display_h = 576;
+        }
         rect->nb_colors = (1 << region->depth);
         rect->type      = SUBTITLE_BITMAP;
         rect->pict.linesize[0] = region->width;

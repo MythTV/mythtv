@@ -89,6 +89,8 @@ try to unroll inner for(x=0 ... loop to avoid these damn if(x ... checks
 #include "postprocess_internal.h"
 #include "libavutil/avstring.h"
 
+#include "libavutil/cpu.h"
+
 unsigned postproc_version(void)
 {
     av_assert0(LIBPOSTPROC_VERSION_MICRO >= 100);
@@ -947,6 +949,22 @@ pp_context *pp_get_context(int width, int height, int cpuCaps){
     PPContext *c= av_malloc(sizeof(PPContext));
     int stride= FFALIGN(width, 16);  //assumed / will realloc if needed
     int qpStride= (width+15)/16 + 2; //assumed / will realloc if needed
+    int cpuflags;
+
+    if (CONFIG_RUNTIME_CPUDETECT &&
+        !(cpuCaps & (PP_CPU_CAPS_MMX   | PP_CPU_CAPS_MMX2    |
+                     PP_CPU_CAPS_3DNOW | PP_CPU_CAPS_ALTIVEC ))) {
+        cpuflags = av_get_cpu_flags();
+
+        if (HAVE_MMX && cpuflags & AV_CPU_FLAG_MMX)
+            cpuCaps |= PP_CPU_CAPS_MMX;
+        if (HAVE_MMX2 && cpuflags & AV_CPU_FLAG_MMX2)
+            cpuCaps |= PP_CPU_CAPS_MMX2;
+        if (HAVE_AMD3DNOW && cpuflags & AV_CPU_FLAG_3DNOW)
+            cpuCaps |= PP_CPU_CAPS_3DNOW;
+        if (HAVE_ALTIVEC && cpuflags & AV_CPU_FLAG_ALTIVEC)
+            cpuCaps |= PP_CPU_CAPS_ALTIVEC;
+    }
 
     memset(c, 0, sizeof(PPContext));
     c->av_class = &av_codec_context_class;
