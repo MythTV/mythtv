@@ -1,6 +1,7 @@
 include config.mak
 
 SRC_DIR = $(SRC_PATH_BARE)
+SRC_PATH = $(SRC_PATH_BARE)/external/FFmpeg
 
 vpath %.c    $(SRC_PATH_BARE)
 vpath %.cpp  $(SRC_PATH_BARE)
@@ -82,9 +83,9 @@ endef
 define DOSUBDIR
 $(foreach V,$(SUBDIR_VARS),$(eval $(call RESET,$(V))))
 SUBDIR := $(1)/
-include $(SRC_PATH)/$(1)/Makefile
--include $(SRC_PATH)/$(1)/$(ARCH)/Makefile
-include $(SRC_PATH)/library.mak
+include $(SRC_PATH_BARE)/external/FFmpeg/$(1)/Makefile
+-include $(SRC_PATH_BARE)/external/FFmpeg/$(1)/$(ARCH)/Makefile
+include $(SRC_PATH_BARE)/external/FFmpeg/library.mak
 endef
 
 $(foreach D,$(FFLIBS),$(eval $(call DOSUBDIR,lib$(D))))

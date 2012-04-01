@@ -468,7 +468,7 @@ static int mpegps_read_packet(AVFormatContext *s,
             type = AVMEDIA_TYPE_AUDIO;
         } else if(es_type == STREAM_TYPE_AUDIO_AAC_LATM){
             codec_id = CODEC_ID_AAC_LATM;
-            type = CODEC_TYPE_AUDIO;
+            type = AVMEDIA_TYPE_AUDIO;
         } else if(es_type == STREAM_TYPE_VIDEO_MPEG4){
             codec_id = CODEC_ID_MPEG4;
             type = AVMEDIA_TYPE_VIDEO;
@@ -517,7 +517,7 @@ static int mpegps_read_packet(AVFormatContext *s,
         type = AVMEDIA_TYPE_SUBTITLE;
         codec_id = CODEC_ID_DVD_SUBTITLE;
     } else if (startcode == 0x69 || startcode == 0x49) {
-        type = CODEC_TYPE_DATA;
+        type = AVMEDIA_TYPE_DATA;
         codec_id = CODEC_ID_MPEG2VBI;
     } else if (startcode >= 0xfd55 && startcode <= 0xfd5f) {
         type = AVMEDIA_TYPE_VIDEO;

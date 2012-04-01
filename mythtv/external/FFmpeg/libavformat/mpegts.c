@@ -716,10 +716,10 @@ static const StreamType HDMV_types[] = {
 
 /* ATSC ? */
 static const StreamType MISC_types[] = {
-    { 0x81, AVMEDIA_TYPE_AUDIO,   CODEC_ID_AC3 },
-    { 0x8a, AVMEDIA_TYPE_AUDIO,   CODEC_ID_DTS },
-    { 0x100, CODEC_TYPE_SUBTITLE, CODEC_ID_DVB_SUBTITLE },
-    { 0x101, CODEC_TYPE_DATA,     CODEC_ID_DVB_VBI },
+    { 0x81, AVMEDIA_TYPE_AUDIO,     CODEC_ID_AC3 },
+    { 0x8a, AVMEDIA_TYPE_AUDIO,     CODEC_ID_DTS },
+    { 0x100, AVMEDIA_TYPE_SUBTITLE, CODEC_ID_DVB_SUBTITLE },
+    { 0x101, AVMEDIA_TYPE_DATA,     CODEC_ID_DVB_VBI },
     { 0 },
 };
 
@@ -749,8 +749,8 @@ static const StreamType DESC_types[] = {
 
 /* component tags */
 static const StreamType COMPONENT_TAG_types[] = {
-    { 0x0a, CODEC_TYPE_AUDIO,        CODEC_ID_MP3 },
-    { 0x52, CODEC_TYPE_VIDEO, CODEC_ID_MPEG2VIDEO },
+    { 0x0a, AVMEDIA_TYPE_AUDIO,        CODEC_ID_MP3 },
+    { 0x52, AVMEDIA_TYPE_VIDEO, CODEC_ID_MPEG2VIDEO },
 };
 
 static void mpegts_find_stream_type(AVStream *st,
@@ -1533,14 +1533,15 @@ int ff_parse_mpeg2_descriptor(AVFormatContext *fc, pmt_entry_t *item, int stream
         language[1] = get8(pp, desc_end);
         language[2] = get8(pp, desc_end);
         language[3] = 0;
-        av_dict_set(&st->metadata, "language", language, 0);
         break;
     case 0x59: /* subtitling descriptor */
         language[0] = get8(pp, desc_end);
         language[1] = get8(pp, desc_end);
         language[2] = get8(pp, desc_end);
         language[3] = 0;
+        get8(pp, desc_end);
 
+#if 0
         /* hearing impaired subtitles detection */
         switch(get8(pp, desc_end)) {
         case 0x20: /* DVB subtitles (for the hard of hearing) with no monitor aspect ratio criticality */
@@ -1552,6 +1553,7 @@ int ff_parse_mpeg2_descriptor(AVFormatContext *fc, pmt_entry_t *item, int stream
             st->disposition |= AV_DISPOSITION_HEARING_IMPAIRED;
             break;
         }
+#endif
 
         dvbci->comp_page   = get16(pp, desc_end);
         dvbci->anc_page    = get16(pp, desc_end);
@@ -1570,7 +1572,6 @@ int ff_parse_mpeg2_descriptor(AVFormatContext *fc, pmt_entry_t *item, int stream
         }
 #endif
         *pp += 4;
-        av_dict_set(&st->metadata, "language", language, 0);
         break;
     case 0x0a: /* ISO 639 language descriptor */
         for (i = 0; i + 4 <= desc_len; i += 4) {
@@ -1584,13 +1585,13 @@ int ff_parse_mpeg2_descriptor(AVFormatContext *fc, pmt_entry_t *item, int stream
             case 0x02: st->disposition |= AV_DISPOSITION_HEARING_IMPAIRED; break;
             case 0x03: st->disposition |= AV_DISPOSITION_VISUAL_IMPAIRED; break;
         }
-        }
+	}
 #else
+        }
         get8(pp, desc_end);
 #endif
         if (i) {
             language[i - 1] = 0;
-            av_dict_set(&st->metadata, "language", language, 0);
         }
         break;
     case 0x05: /* registration descriptor */
@@ -1600,9 +1601,11 @@ int ff_parse_mpeg2_descriptor(AVFormatContext *fc, pmt_entry_t *item, int stream
             stream_type == STREAM_TYPE_PRIVATE_DATA)
             mpegts_find_stream_type_pmt(item, dvbci->codec_tag, REGD_types);
         break;
+#if 0
     case 0x52: /* stream identifier descriptor */
         st->stream_identifier = 1 + get8(pp, desc_end);
         break;
+#endif
     case DVB_BROADCAST_ID:
         dvbci->data_id = get16(pp, desc_end);
         break;
@@ -1644,7 +1647,8 @@ int ff_parse_mpeg2_descriptor(AVFormatContext *fc, pmt_entry_t *item, int stream
     return 0;
 }
 
-static int find_in_list(const int *pids, int pid) {
+static int find_in_list(const int *pids, int pid)
+{
     int i;
     for (i=0; i<PMT_PIDS_MAX; i++)
         if (pids[i]==pid)
@@ -1657,12 +1661,12 @@ static int is_desired_stream(pmt_entry_t *item)
     int val = 0;
     switch (item->codec_type)
     {
-        case CODEC_TYPE_VIDEO:
-        case CODEC_TYPE_AUDIO:
-        case CODEC_TYPE_SUBTITLE:
+        case AVMEDIA_TYPE_VIDEO:
+        case AVMEDIA_TYPE_AUDIO:
+        case AVMEDIA_TYPE_SUBTITLE:
             val = 1;
             break;
-        case CODEC_TYPE_DATA:
+        case AVMEDIA_TYPE_DATA:
             switch (item->codec_id)
             {
                 case CODEC_ID_DSMCC_B:
@@ -1711,7 +1715,7 @@ static void pmt_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
 
     // initialize to codec_type_unknown
     for (int i=0; i < PMT_PIDS_MAX; i++)
-        items[i].codec_type = CODEC_TYPE_UNKNOWN;
+        items[i].codec_type = AVMEDIA_TYPE_UNKNOWN;
 
     mpegts_cleanup_streams(ts); /* in case someone else removed streams.. */
  
@@ -1779,7 +1783,7 @@ static void pmt_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
     }
     p += program_info_length;
     if (p >= p_end)
-        goto out;
+	return;
 
     // stop parsing after pmt, we found header
     if (!ts->stream->nb_streams)
@@ -1880,9 +1884,6 @@ static void pmt_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
         ts->pmt_scan_state = PMT_FOUND;
         ts->stop_parse = 1;
     }
-
-out:
-    av_free(mp4_dec_config_descr);
 }
 
 static int is_pat_same(MpegTSContext *mpegts_ctx,
@@ -2018,7 +2019,7 @@ static void mpegts_cleanup_streams(MpegTSContext *ts)
     }
 }
 
-static AVStream *new_section_av_stream(SectionContext *sect, enum CodecType type,
+static AVStream *new_section_av_stream(SectionContext *sect, enum AVMediaType type,
                                        enum CodecID id)
 {
     FF_ALLOCZ_OR_GOTO(NULL, sect->st, sizeof(AVStream), fail);
@@ -2304,7 +2305,6 @@ static void pat_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
     }
 }
 
-#if 0
 static void sdt_cb(MpegTSFilter *filter, const uint8_t *section, int section_len)
 {
     MpegTSContext *ts = filter->u.section_filter.opaque;
@@ -2381,7 +2381,6 @@ static void sdt_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
         p = desc_list_end;
     }
 }
-#endif
 
 static SectionContext *add_section_stream(MpegTSContext *ts, int pid, int stream_type)
 {

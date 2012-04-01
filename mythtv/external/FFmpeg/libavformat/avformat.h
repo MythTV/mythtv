@@ -1102,6 +1102,7 @@ typedef struct AVPacketList {
     struct AVPacketList *next;
 } AVPacketList;
 
+#define MAX_STREAMS 100
 
 /**
  * @defgroup lavf_core Core functions

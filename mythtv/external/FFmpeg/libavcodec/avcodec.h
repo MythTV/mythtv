@@ -4563,6 +4563,6 @@ int av_codec_is_encoder(AVCodec *codec);
 int av_codec_is_decoder(AVCodec *codec);
 
 const char *ff_codec_id_string(enum CodecID codec_id);
-const char *ff_codec_type_string(enum CodecType codec_type);
+const char *ff_codec_type_string(enum AVMediaType codec_type);
 
 #endif /* AVCODEC_AVCODEC_H */

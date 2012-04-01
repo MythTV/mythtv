@@ -126,7 +126,7 @@ typedef struct
     int pid;
     int type;
     enum CodecID       codec_id;
-    enum CodecType     codec_type;
+    enum AVMediaType   codec_type;
     dvb_caption_info_t dvbci;
 } pmt_entry_t;
 

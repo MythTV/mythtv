@@ -129,7 +129,7 @@ static int latm_read_audio_specific_config(GetBitContext *gb,
     c->object_type = audio_object_type;
 
     c->sampling_index = copy_bits(pb, gb, 4);
-    c->sample_rate = ff_mpeg4audio_sample_rates[c->sampling_index];
+    c->sample_rate = avpriv_mpeg4audio_sample_rates[c->sampling_index];
     if (c->sampling_index == 0x0f) {
         c->sample_rate = copy_bits(pb, gb, 24);
     }
@@ -148,7 +148,7 @@ static int latm_read_audio_specific_config(GetBitContext *gb,
     } else if (audio_object_type == AOT_SBR) {
         c->sbr = 1;
         c->ext_sampling_index = copy_bits(pb, gb, 4);
-        c->ext_sample_rate = ff_mpeg4audio_sample_rates[c->ext_sampling_index];
+        c->ext_sample_rate = avpriv_mpeg4audio_sample_rates[c->ext_sampling_index];
         if (c->ext_sampling_index == 0x0f) {
             c->ext_sample_rate = copy_bits(pb, gb, 24);
         }
@@ -419,7 +419,7 @@ static int latm_decode_close(AVCodecContext *avctx)
 
 AVCodec aac_latm_decoder = {
     .name = "aac_latm",
-    .type = CODEC_TYPE_AUDIO,
+    .type = AVMEDIA_TYPE_AUDIO,
     .id   = CODEC_ID_AAC_LATM,
     .priv_data_size = sizeof(struct LATMContext),
     .init   = latm_decode_init,
@@ -427,8 +427,8 @@ AVCodec aac_latm_decoder = {
     .decode = latm_decode_frame,
     .long_name = NULL_IF_CONFIG_SMALL("AAC LATM (Advanced Audio Codec LATM "
                                       "syntax)"),
-    .sample_fmts = (const enum SampleFormat[]) {
-        SAMPLE_FMT_S16,SAMPLE_FMT_NONE
+    .sample_fmts = (const enum AVSampleFormat[]) {
+        AV_SAMPLE_FMT_S16, AV_SAMPLE_FMT_NONE
     },
     .channel_layouts = aac_channel_layout,
 };

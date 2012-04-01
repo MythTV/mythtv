@@ -2545,9 +2545,9 @@ int avformat_find_stream_info(AVFormatContext *ic, AVDictionary **options)
                 break;
             if(st->first_dts == AV_NOPTS_VALUE && st->codec->codec_id != CODEC_ID_DSMCC_B)
                 break;
-            if (st->codec->codec_type == CODEC_TYPE_VIDEO)
+            if (st->codec->codec_type == AVMEDIA_TYPE_VIDEO)
                 hasvideo = 1;
-            else if (st->codec->codec_type == CODEC_TYPE_AUDIO)
+            else if (st->codec->codec_type == AVMEDIA_TYPE_AUDIO)
                 hasaudio = 1;
         }
         if (i == ic->nb_streams) {
@@ -3126,11 +3126,13 @@ void av_remove_stream(AVFormatContext *s, int id, int remove_ts) {
             avcodec_close(codec_ctx);
             av_free(codec_ctx);
         }
+#if 0
         /* make sure format context is not using the codec context */
         if (&s->streams[i] == s->cur_st) {
             av_log(NULL, AV_LOG_DEBUG, "av_remove_stream cur_st = NULL\n");
             s->cur_st = NULL;
         }
+#endif
      /*   else if (s->cur_st > &s->streams[i]) {
             av_log(NULL, AV_LOG_DEBUG, "av_remove_stream cur_st -= 1\n");
             s->cur_st -= sizeof(AVFormatContext *);
