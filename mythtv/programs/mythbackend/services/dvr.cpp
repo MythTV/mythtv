@@ -444,9 +444,6 @@ int Dvr::AddRecordSchedule   ( int       nChanId,
     RecordingInfo *info = new RecordingInfo(nChanId, dStartTime, false);
     RecordingRule *rule = info->GetRecordingRule();
 
-    delete info;
-    info = NULL;
-
     if (sType.isEmpty())
         sType = "single";
 
@@ -459,6 +456,7 @@ int Dvr::AddRecordSchedule   ( int       nChanId,
     if (sDupIn.isEmpty())
         sDupIn = "all";
 
+    rule->m_title = info->GetTitle();
     rule->m_type = recTypeFromString(sType);
     rule->m_searchType = searchTypeFromString(sSearchType);
     rule->m_dupMethod = dupMethodFromString(sDupMethod);
