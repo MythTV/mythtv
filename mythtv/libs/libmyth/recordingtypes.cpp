@@ -83,6 +83,8 @@ QString toRawString(RecordingType rectype)
 
 RecordingType recTypeFromString(QString type)
 {
+    if (type.toLower() == "not recording" || type.toLower() == "not")
+        return kNotRecording;
     if (type.toLower() == "single record" || type.toLower() == "single")
         return kSingleRecord;
     else if (type.toLower() == "record daily" || type.toLower() == "daily")
