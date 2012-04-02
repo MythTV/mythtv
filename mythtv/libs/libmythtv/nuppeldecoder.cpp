@@ -25,11 +25,12 @@ using namespace std;
 
 #include "minilzo.h"
 
-#if HAVE_BIGENDIAN
 extern "C" {
+#if HAVE_BIGENDIAN
 #include "bswap.h"
-}
 #endif
+#include "libavutil/opt.h"
+}
 
 #define LOC QString("NVD: ")
 
@@ -72,7 +73,6 @@ NuppelDecoder::NuppelDecoder(MythPlayer *parent,
 
     {
         QMutexLocker locker(avcodeclock);
-        avcodec_init();
         avcodec_register_all();
     }
 
@@ -641,8 +641,6 @@ int get_nuppel_buffer(struct AVCodecContext *c, AVFrame *pic)
     pic->opaque = nd->directframe;
     pic->type = FF_BUFFER_TYPE_USER;
 
-    pic->age = 256 * 256 * 256 * 64;
-
     return 1;
 }
 
@@ -703,13 +701,14 @@ bool NuppelDecoder::InitAVCodecVideo(int codec)
     if (mpa_vidctx)
         av_free(mpa_vidctx);
 
-    mpa_vidctx = avcodec_alloc_context();
+    mpa_vidctx = avcodec_alloc_context3(NULL);
 
     mpa_vidctx->codec_id = (enum CodecID)codec;
-    mpa_vidctx->codec_type = CODEC_TYPE_VIDEO;
+    mpa_vidctx->codec_type = AVMEDIA_TYPE_VIDEO;
     mpa_vidctx->width = video_width;
     mpa_vidctx->height = video_height;
-    mpa_vidctx->error_recognition = 2;
+    mpa_vidctx->err_recognition = AV_EF_CRCCHECK | AV_EF_BITSTREAM |
+                                  AV_EF_BUFFER;
     mpa_vidctx->bits_per_coded_sample = 12;
 
     if (directrendering)
@@ -722,13 +721,13 @@ bool NuppelDecoder::InitAVCodecVideo(int codec)
     }
     if (ffmpeg_extradatasize > 0)
     {
-        mpa_vidctx->flags |= CODEC_FLAG_EXTERN_HUFF;
+        av_opt_set_int(mpa_vidctx, "extern_huff", 1, 0);
         mpa_vidctx->extradata = ffmpeg_extradata;
         mpa_vidctx->extradata_size = ffmpeg_extradatasize;
     }
 
     QMutexLocker locker(avcodeclock);
-    if (avcodec_open(mpa_vidctx, mpa_vidcodec) < 0)
+    if (avcodec_open2(mpa_vidctx, mpa_vidcodec, NULL) < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Couldn't find lavc video codec");
         return false;
@@ -782,13 +781,13 @@ bool NuppelDecoder::InitAVCodecAudio(int codec)
     if (mpa_audctx)
         av_free(mpa_audctx);
 
-    mpa_audctx = avcodec_alloc_context();
+    mpa_audctx = avcodec_alloc_context3(NULL);
 
     mpa_audctx->codec_id = (enum CodecID)codec;
-    mpa_audctx->codec_type = CODEC_TYPE_AUDIO;
+    mpa_audctx->codec_type = AVMEDIA_TYPE_AUDIO;
 
     QMutexLocker locker(avcodeclock);
-    if (avcodec_open(mpa_audctx, mpa_audcodec) < 0)
+    if (avcodec_open2(mpa_audctx, mpa_audcodec, NULL) < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Couldn't find lavc audio codec");
         return false;
@@ -1270,13 +1269,16 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype)
 
                 while (pkt.size > 0)
                 {
+                    AVFrame frame;
                     data_size = AVCODEC_MAX_AUDIO_FRAME_SIZE;
-                    ret = avcodec_decode_audio3(mpa_audctx, audioSamples,
-                                                &data_size, &pkt);
+                    int got_frame = 0;
+                    ret = avcodec_decode_audio4(mpa_audctx, &frame,
+                                                &got_frame, &pkt);
 
-                    if (data_size)
-                        m_audio->AddAudioData((char *)audioSamples, data_size,
-                                              frameheader.timecode, 0);
+                    if (got_frame && data_size > 0)
+                        m_audio->AddAudioData((char *)frame.extended_data[0],
+                                              data_size, frameheader.timecode,
+                                              0);
 
                     pkt.size -= ret;
                     pkt.data += ret;

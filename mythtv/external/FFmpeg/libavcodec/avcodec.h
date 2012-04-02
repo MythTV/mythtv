@@ -1305,11 +1305,13 @@ typedef struct AVCodecContext {
      */
     unsigned int stream_codec_tag;
 
-#if FF_API_SUB_ID
+#if 1 || FF_API_SUB_ID
     /**
-     * @deprecated this field is unused
+     * this field is unused by ffmpeg, but is used by MythTV for the DVB
+     * caption carousel
+     * 
      */
-    attribute_deprecated int sub_id;
+    int sub_id;
 #endif
 
     void *priv_data;

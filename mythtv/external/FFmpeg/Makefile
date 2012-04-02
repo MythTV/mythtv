@@ -1,16 +1,16 @@
 include config.mak
 
-SRC_DIR = $(SRC_PATH_BARE)
-SRC_PATH = $(SRC_PATH_BARE)/external/FFmpeg
+SRC_PATH = ${SRC_PATH_BARE}/external/FFmpeg
+SRC_DIR = $(SRC_PATH)
 
-vpath %.c    $(SRC_PATH_BARE)
-vpath %.cpp  $(SRC_PATH_BARE)
-vpath %.h    $(SRC_PATH_BARE)
-vpath %.S    $(SRC_PATH_BARE)
-vpath %.asm  $(SRC_PATH_BARE)
-vpath %.v    $(SRC_PATH_BARE)
-vpath %.texi $(SRC_PATH_BARE)
-vpath %/fate_config.sh.template $(SRC_PATH_BARE)
+vpath %.c    $(SRC_DIR)
+vpath %.cpp  $(SRC_DIR)
+vpath %.h    $(SRC_DIR)
+vpath %.S    $(SRC_DIR)
+vpath %.asm  $(SRC_DIR)
+vpath %.v    $(SRC_DIR)
+vpath %.texi $(SRC_DIR)
+vpath %/fate_config.sh.template $(SRC_DIR)
 
 PROGS-$(CONFIG_FFMPEG)   += ffmpeg
 PROGS-$(CONFIG_FFPLAY)   += ffplay

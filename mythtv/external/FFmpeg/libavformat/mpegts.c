@@ -2155,7 +2155,7 @@ static void mpegts_add_stream(MpegTSContext *ts, int id, pmt_entry_t* item,
             ts->pid_cnt++;
 
             if (item->dvbci.language[0])
-                av_metadata_set2(&st->metadata, "language", item->dvbci.language, 0);
+                av_dict_set(&st->metadata, "language", item->dvbci.language, 0);
 
             if (item->dvbci.sub_id && (item->codec_id == CODEC_ID_DVB_SUBTITLE))
                 st->codec->sub_id = item->dvbci.sub_id;
@@ -2782,7 +2782,7 @@ static int mpegts_read_header(AVFormatContext *s)
             /* now find the info for the first service if we found any,
                otherwise try to filter all PATs */
             
-            url_fseek(pb, pos, SEEK_SET);
+            ffurl_seek(pb, pos, SEEK_SET);
             ts->req_sid = sid = ts->prg[i].id;
             handle_packets(ts, s->probesize / ts->raw_packet_size);
 
@@ -2797,7 +2797,7 @@ static int mpegts_read_header(AVFormatContext *s)
                 /* turn off crc checking */
                 ts->pmt_filter->u.section_filter.check_crc = 0;
                 /* try again */
-                url_fseek(pb, pos, SEEK_SET);
+                ffurl_seek(pb, pos, SEEK_SET);
                 ts->req_sid = sid = ts->prg[i].id;
                 handle_packets(ts, s->probesize / ts->raw_packet_size);
             }
@@ -2812,7 +2812,7 @@ static int mpegts_read_header(AVFormatContext *s)
                        "contents of first TS packet only!\n");
                 ts->pmt_filter->pmt_chop_at_ts = 1;
                 /* try again */
-                url_fseek(pb, pos, SEEK_SET);
+                ffurl_seek(pb, pos, SEEK_SET);
                 ts->req_sid = sid = ts->prg[i].id;
                 handle_packets(ts, s->probesize / ts->raw_packet_size);
             }

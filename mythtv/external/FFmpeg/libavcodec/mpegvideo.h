@@ -203,7 +203,7 @@ typedef struct MotionEstContext{
  * MpegEncContext.
  */
 typedef struct MpegEncContext {
-    AVClass *class;
+    AVClass *clss;
     struct AVCodecContext *avctx;
     /* the following parameters must be initialized before encoding */
     int width, height;///< picture size. must be a multiple of 16

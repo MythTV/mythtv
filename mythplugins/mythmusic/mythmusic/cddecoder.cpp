@@ -274,7 +274,9 @@ bool CdDecoder::initialize()
 
     setCDSpeed(2);
 
-    return m_inited = true;
+    m_inited = true;
+
+    return m_inited;
 }
 
 // pure virtual

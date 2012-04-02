@@ -13,6 +13,7 @@ LIBAVFORMAT_$MAJOR {
                 ffio_set_buf_size;
                 ffurl_close;
                 ffurl_open;
+                ffurl_read;
                 ffurl_read_complete;
                 ffurl_seek;
                 ffurl_size;
@@ -36,5 +37,6 @@ LIBAVFORMAT_$MAJOR {
                 udp_get_local_port;
                 init_checksum;
                 init_put_byte;
+		ff_read_frame_flush;
         local: *;
 };

@@ -1849,7 +1849,7 @@ static int grabThumbnail(QString inFile, QString thumbList, QString outFile, int
 
     QByteArray inFileBA = inFile.toLocal8Bit();
 
-    int ret = av_open_input_file(&inputFC, inFileBA.constData(), NULL, 0, NULL);
+    int ret = avformat_open_input(&inputFC, inFileBA.constData(), NULL, NULL);
     if (ret)
     {
         LOG(VB_JOBQUEUE, LOG_ERR, "grabThumbnail(): Couldn't open input file" +
@@ -1858,11 +1858,11 @@ static int grabThumbnail(QString inFile, QString thumbList, QString outFile, int
     }
 
     // Getting stream information
-    if ((ret = av_find_stream_info(inputFC)) < 0)
+    if ((ret = avformat_find_stream_info(inputFC, NULL)) < 0)
     {
         LOG(VB_JOBQUEUE, LOG_ERR,
             QString("Couldn't get stream info, error #%1").arg(ret));
-        av_close_input_file(inputFC);
+        avformat_close_input(&inputFC);
         inputFC = NULL;
         return 1;
     }
@@ -1874,7 +1874,7 @@ static int grabThumbnail(QString inFile, QString thumbList, QString outFile, int
     for (uint i = 0; i < inputFC->nb_streams; i++)
     {
         AVStream *st = inputFC->streams[i];
-        if (inputFC->streams[i]->codec->codec_type == CODEC_TYPE_VIDEO)
+        if (inputFC->streams[i]->codec->codec_type == AVMEDIA_TYPE_VIDEO)
         {
             videostream = i;
             width = st->codec->width;
@@ -1906,7 +1906,7 @@ static int grabThumbnail(QString inFile, QString thumbList, QString outFile, int
     }
 
     // open codec
-    if (avcodec_open(codecCtx, codec) < 0)
+    if (avcodec_open2(codecCtx, codec, NULL) < 0)
     {
         LOG(VB_JOBQUEUE, LOG_ERR, "Couldn't open codec for video stream");
         return 1;
@@ -2036,7 +2036,7 @@ static int grabThumbnail(QString inFile, QString thumbList, QString outFile, int
     avcodec_close(codecCtx);
 
     // close the video file
-    av_close_input_file(inputFC);
+    avformat_close_input(&inputFC);
 
     return 0;
 }
@@ -2195,7 +2195,7 @@ static int getFileInfo(QString inFile, QString outFile, int lenMethod)
 
     QByteArray inFileBA = inFile.toLocal8Bit();
 
-    int ret = av_open_input_file(&inputFC, inFileBA.constData(), fmt, 0, NULL);
+    int ret = avformat_open_input(&inputFC, inFileBA.constData(), fmt, NULL);
 
     if (ret)
     {
@@ -2205,13 +2205,13 @@ static int getFileInfo(QString inFile, QString outFile, int lenMethod)
     }
 
     // Getting stream information
-    ret = av_find_stream_info(inputFC);
+    ret = avformat_find_stream_info(inputFC, NULL);
 
     if (ret < 0)
     {
         LOG(VB_JOBQUEUE, LOG_ERR,
             QString("Couldn't get stream info, error #%1").arg(ret));
-        av_close_input_file(inputFC);
+        avformat_close_input(&inputFC);
         inputFC = NULL;
         return 1;
     }
@@ -2244,7 +2244,7 @@ static int getFileInfo(QString inFile, QString outFile, int lenMethod)
 
         switch (inputFC->streams[i]->codec->codec_type)
         {
-            case CODEC_TYPE_VIDEO:
+            case AVMEDIA_TYPE_VIDEO:
             {
                 QStringList param = QString(buf).split(',', QString::SkipEmptyParts);
                 QString codec = param[0].remove("Video:", Qt::CaseInsensitive);
@@ -2358,7 +2358,7 @@ static int getFileInfo(QString inFile, QString outFile, int lenMethod)
                 break;
             }
 
-            case CODEC_TYPE_AUDIO:
+            case AVMEDIA_TYPE_AUDIO:
             {
                 QStringList param = QString(buf).split(',', QString::SkipEmptyParts);
                 QString codec = param[0].remove("Audio:", Qt::CaseInsensitive);
@@ -2376,8 +2376,8 @@ static int getFileInfo(QString inFile, QString outFile, int lenMethod)
 
                 stream.setAttribute("channels", st->codec->channels);
 
-                AVMetadataTag *metatag =
-                    av_metadata_get(st->metadata, "language", NULL, 0);
+                AVDictionaryEntry *metatag =
+                    av_dict_get(st->metadata, "language", NULL, 0);
                 if (metatag)
                     stream.setAttribute("language", metatag->value);
                 else
@@ -2404,7 +2404,7 @@ static int getFileInfo(QString inFile, QString outFile, int lenMethod)
                 break;
             }
 
-            case CODEC_TYPE_SUBTITLE:
+            case AVMEDIA_TYPE_SUBTITLE:
             {
                 QStringList param = QString(buf).split(',', QString::SkipEmptyParts);
                 QString codec = param[0].remove("Subtitle:", Qt::CaseInsensitive);
@@ -2414,8 +2414,8 @@ static int getFileInfo(QString inFile, QString outFile, int lenMethod)
                 stream.setAttribute("ffmpegindex", ffmpegIndex++);
                 stream.setAttribute("codec", codec.trimmed());
 
-                AVMetadataTag *metatag =
-                    av_metadata_get(st->metadata, "language", NULL, 0);
+                AVDictionaryEntry *metatag =
+                    av_dict_get(st->metadata, "language", NULL, 0);
                 if (metatag)
                     stream.setAttribute("language", metatag->value);
                 else
@@ -2428,7 +2428,7 @@ static int getFileInfo(QString inFile, QString outFile, int lenMethod)
                 break;
             }
 
-            case CODEC_TYPE_DATA:
+            case AVMEDIA_TYPE_DATA:
             {
                 QDomElement stream = doc.createElement("data");
                 stream.setAttribute("streamindex", i);
@@ -2460,7 +2460,7 @@ static int getFileInfo(QString inFile, QString outFile, int lenMethod)
     f.close();
 
     // Close input file
-    av_close_input_file(inputFC);
+    avformat_close_input(&inputFC);
     inputFC = NULL;
 
     return 0;

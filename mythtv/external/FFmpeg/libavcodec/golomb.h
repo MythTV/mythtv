@@ -121,7 +121,7 @@ static inline int svq3_get_ue_golomb(GetBitContext *gb){
 
         return ff_interleaved_ue_golomb_vlc_code[buf];
     }else{
-        int ret = 1;
+        uint ret = 1;
 
         do {
             buf >>= 32 - 8;

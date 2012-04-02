@@ -24,11 +24,12 @@
 #include "NuppelVideoRecorder.h"
 #include "avformatwriter.h"
 
-#if HAVE_BIGENDIAN
 extern "C" {
+#if HAVE_BIGENDIAN
 #include "byteswap.h"
-}
 #endif
+#include "libavutil/opt.h"
+}
 
 #define LOC QString("AVFW(%1): ").arg(m_filename)
 #define LOC_ERR QString("AVFW(%1) Error: ").arg(m_filename)
@@ -65,10 +66,16 @@ AVFormatWriter::~AVFormatWriter()
         m_pkt = NULL;
     }
 
+    if (m_audPkt)
+    {
+        delete m_audPkt;
+        m_audPkt = NULL;
+    }
+
     if (m_ctx)
     {
         av_write_trailer(m_ctx);
-        url_fclose(m_ctx->pb);
+        avio_close(m_ctx->pb);
         for(unsigned int i = 0; i < m_ctx->nb_streams; i++) {
             av_freep(&m_ctx->streams[i]);
         }
@@ -156,9 +163,10 @@ bool AVFormatWriter::Init(void)
         return false;
     }
 
-    if (av_set_parameters(m_ctx, NULL) < 0)
+    m_audPkt = new AVPacket;
+    if (!m_audPkt)
     {
-        LOG(VB_RECORD, LOG_ERR, "Init(): Invalid output format parameters");
+        LOG(VB_RECORD, LOG_ERR, LOC + "Init(): error allocating AVPacket");
         return false;
     }
 
@@ -181,10 +189,10 @@ bool AVFormatWriter::OpenFile(void)
 {
     if (!(m_fmt.flags & AVFMT_NOFILE))
     {
-        if (url_fopen(&m_ctx->pb, m_filename.toAscii().constData(), URL_WRONLY)
-             < 0)
+        if (avio_open(&m_ctx->pb, m_filename.toAscii().constData(),
+                      AVIO_FLAG_WRITE) < 0)
         {
-            LOG(VB_RECORD, LOG_ERR, LOC + "OpenFile(): url_fopen() failed");
+            LOG(VB_RECORD, LOG_ERR, LOC + "OpenFile(): avio_open() failed");
             return false;
         }
     }
@@ -203,7 +211,7 @@ bool AVFormatWriter::OpenFile(void)
     uc->prot = &AVF_RingBuffer_Protocol;
     uc->priv_data = (void *)m_avfRingBuffer;
 
-    av_write_header(m_ctx);
+    avformat_write_header(m_ctx, NULL);
 
     return true;
 }
@@ -213,7 +221,7 @@ bool AVFormatWriter::CloseFile(void)
     if (m_ctx)
     {
         av_write_trailer(m_ctx);
-        url_fclose(m_ctx->pb);
+        avio_close(m_ctx->pb);
         for(unsigned int i = 0; i < m_ctx->nb_streams; i++) {
             av_freep(&m_ctx->streams[i]);
         }
@@ -260,27 +268,31 @@ bool AVFormatWriter::WriteVideoFrame(VideoFrame *frame)
     m_picture->type = FF_BUFFER_TYPE_SHARED;
 
     if ((m_framesWritten % m_keyFrameDist) == 0)
-        m_picture->pict_type = FF_I_TYPE;
+        m_picture->pict_type = AV_PICTURE_TYPE_I;
     else
-        m_picture->pict_type = 0;
+        m_picture->pict_type = AV_PICTURE_TYPE_NONE;
+
+    int got_pkt = 0;
 
     {
         QMutexLocker locker(avcodeclock);
-        csize = avcodec_encode_video(m_videoStream->codec,
-                                   (unsigned char *)m_videoOutBuf, 
-                                   len, m_picture); 
+        av_init_packet(m_pkt);
+        m_pkt->data = (unsigned char *)m_videoOutBuf;
+        m_pkt->size = len;
+        csize = avcodec_encode_video2(m_videoStream->codec, m_pkt,
+                                      m_picture, &got_pkt); 
     }
 
-    if (!csize)
+    if (csize < 0 || !got_pkt)
     {
-        // LOG(VB_RECORD, LOG_ERR, QString("WriteVideoFrame(): cs: %1, mfw: %2, tc: %3, fn: %4").arg(csize).arg(m_framesWritten).arg(frame->timecode).arg(frame->frameNumber));
+#if 0
+        LOG(VB_RECORD, LOG_ERR, QString("WriteVideoFrame(): cs: %1, mfw: %2, tc: %3, fn: %4").arg(csize).arg(m_framesWritten).arg(frame->timecode).arg(frame->frameNumber));
+#endif
         return false;
     }
 
-    av_init_packet(m_pkt);
-
     if ((m_framesWritten % m_keyFrameDist) == 0)
-        m_pkt->flags |= PKT_FLAG_KEY;
+        m_pkt->flags |= AV_PKT_FLAG_KEY;
 
     long long tc = frame->timecode;
     if (m_startingTimecodeOffset == -1)
@@ -319,20 +331,32 @@ bool AVFormatWriter::WriteAudioFrame(unsigned char *buf, int fnum, int timecode)
 {
     int csize = 0;
 
-#if HAVE_BIGENDIAN
     int sample_cnt = m_audioFrameSize / m_audioBytesPerSample;
+#if HAVE_BIGENDIAN
     bswap_16_buf((short int*) buf, sample_cnt, m_audioChannels);
 #endif
 
+    int got_packet = 0;
+
     {
         QMutexLocker locker(avcodeclock);
-        csize = avcodec_encode_audio(m_audioStream->codec, m_audioOutBuf,
-                                     m_audioOutBufSize, (short int *)buf);
+        m_audPkt->data = m_audioOutBuf;
+        m_audPkt->size = m_audioOutBufSize;
+
+        m_audPicture->data[0] = buf;
+        m_audPicture->linesize[0] = m_audioFrameSize;
+        m_audPicture->nb_samples = sample_cnt;
+        m_audPicture->format = AV_SAMPLE_FMT_S16;
+
+        csize = avcodec_encode_audio2(m_audioStream->codec, m_audPkt,
+                                      m_audPicture, &got_packet);
     }
 
-    if (!csize)
+    if (csize < 0 || !got_packet)
     {
-        // LOG(VB_RECORD, LOG_ERR, QString("WriteAudioFrame(): cs: %1, mfw: %2, tc: %3, fn: %4").arg(csize).arg(m_framesWritten).arg(timecode).arg(fnum));
+#if 0
+        LOG(VB_RECORD, LOG_ERR, QString("WriteAudioFrame(): cs: %1, mfw: %2, tc: %3, fn: %4").arg(csize).arg(m_framesWritten).arg(timecode).arg(fnum));
+#endif
         return false;
     }
 
@@ -385,13 +409,14 @@ AVStream* AVFormatWriter::AddVideoStream(void)
     AVCodecContext *c;
     AVStream *st;
 
-    st = av_new_stream(m_ctx, 0);
+    st = avformat_new_stream(m_ctx, NULL);
     if (!st)
     {
         LOG(VB_RECORD, LOG_ERR,
-            LOC + "AddVideoStream(): av_new_stream() failed");
+            LOC + "AddVideoStream(): avformat_new_stream() failed");
         return NULL;
     }
+    st->id = 0;
 
     c = st->codec;
 
@@ -430,10 +455,6 @@ AVStream* AVFormatWriter::AddVideoStream(void)
         c->level                 = 13;
         c->flags                |= CODEC_FLAG_LOOP_FILTER;
         c->me_cmp               |= 1;
-        c->partitions           |= X264_PART_I8X8
-                                 + X264_PART_I4X4
-                                 + X264_PART_P8X8
-                                 + X264_PART_B8X8;
         c->me_method             = ME_HEX;
         c->me_subpel_quality     = 6;
         c->me_range              = 16;
@@ -446,14 +467,12 @@ AVStream* AVFormatWriter::AddVideoStream(void)
         c->qmax                  = 51;
         c->max_qdiff             = 4;
         c->refs                  = 3;
-        c->directpred            = 1;
-        c->rc_lookahead          = 0;
-
-        c->flags2               |= CODEC_FLAG2_FASTPSKIP;
-        c->flags2               |= CODEC_FLAG2_8X8DCT;
-        c->flags2               ^= CODEC_FLAG2_8X8DCT;
-        c->flags2               |= CODEC_FLAG2_WPRED;
-        c->flags2               ^= CODEC_FLAG2_WPRED;
+        av_opt_set(c, "partitions", "i8x8,i4x4,p8x8,b8x8", 0);
+        av_opt_set_int(c, "direct-pred", 1, 0);
+        av_opt_set_int(c, "rc-lookahead", 0, 0);
+        av_opt_set_int(c, "fast-pskip", 1, 0);
+        av_opt_set_int(c, "8x8dct", 0, 0);
+        av_opt_set_int(c, "weightb", 0, 0);
     }
 
     if(m_ctx->oformat->flags & AVFMT_GLOBALHEADER)
@@ -479,7 +498,7 @@ bool AVFormatWriter::OpenVideo(void)
         return false;
     }
 
-    if (avcodec_open(c, codec) < 0)
+    if (avcodec_open2(c, codec, NULL) < 0)
     {
         LOG(VB_RECORD, LOG_ERR,
             LOC + "OpenVideo(): avcodec_open() failed");
@@ -520,13 +539,14 @@ AVStream* AVFormatWriter::AddAudioStream(void)
     AVCodecContext *c;
     AVStream *st;
 
-    st = av_new_stream(m_ctx, 1);
+    st = avformat_new_stream(m_ctx, NULL);
     if (!st)
     {
         LOG(VB_RECORD, LOG_ERR,
-            LOC + "AddAudioStream(): av_new_stream() failed");
+            LOC + "AddAudioStream(): avformat_new_stream() failed");
         return NULL;
     }
+    st->id = 1;
 
     c = st->codec;
     c->codec_id = m_ctx->oformat->audio_codec;
@@ -578,7 +598,7 @@ bool AVFormatWriter::OpenAudio(void)
         return false;
     }
 
-    if (avcodec_open(c, codec) < 0)
+    if (avcodec_open2(c, codec, NULL) < 0)
     {
         LOG(VB_RECORD, LOG_ERR,
             LOC + "OpenAudio(): avcodec_open() failed");
@@ -609,6 +629,14 @@ bool AVFormatWriter::OpenAudio(void)
     }
     m_audioSamples =
         (unsigned int *)av_malloc(m_audioInputFrameSize * 2 * c->channels);
+
+    m_audPicture = avcodec_alloc_frame();
+    if (!m_audPicture)
+    {
+        LOG(VB_RECORD, LOG_ERR,
+            LOC + "OpenAudio(): alloc_frame() failed");
+        return false;
+    }
 
     return true;
 }

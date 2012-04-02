@@ -1132,9 +1132,16 @@ COMPONENT_LIST="
     protocols
 "
 
+PROGRAM_LIST="
+    ffplay
+    ffprobe
+    ffserver
+    ffmpeg
+"
+
 CONFIG_LIST="
     $COMPONENT_LIST
-    aandct
+    $PROGRAM_LIST
     ac3dsp
     avcodec
     avdevice
@@ -1142,30 +1149,29 @@ CONFIG_LIST="
     avformat
     avisynth
     bzlib
+    crystalhd
     dct
     doc
     dwt
     dxva2
     fastdiv
-    ffmpeg
-    ffplay
-    ffprobe
-    ffserver
     fft
     frei0r
     gnutls
-    golomb
     gpl
     gray
-    h264dsp
-    h264pred
     hardcoded_tables
-    huffman
+    libaacplus
+    libass
+    libbluray
+    libcdio
+    libcelt
     libdc1394
     libdirac
     libfaac
     libfreetype
     libgsm
+    libmodplug
     libmp3lame
     libnut
     libopencore_amrnb
@@ -1178,6 +1184,7 @@ CONFIG_LIST="
     libspeex
     libstagefright_h264
     libtheora
+    libutvideo
     libv4l2
     libvo_aacenc
     libvo_amrwbenc
@@ -1186,12 +1193,10 @@ CONFIG_LIST="
     libx264
     libxavs
     libxvid
-    lpc
     lsp
     mdct
     memalign_hack
-    mlib
-    mpegaudio_hp
+    mpegaudiodsp
     network
     nonfree
     openal
@@ -1210,6 +1215,7 @@ CONFIG_LIST="
     swresample
     swscale
     swscale_alpha
+    thumb
     vaapi
     vda
     vdpau
@@ -2177,6 +2183,11 @@ enable avdevice
 enable avfilter
 enable avformat
 enable avutil
+enable postproc
+enable stripping
+enable swresample
+enable swscale
+
 enable asm
 enable debug
 #enable doc
@@ -2187,12 +2198,9 @@ enable gpl
 enable mpegaudio_hp
 enable network
 enable optimizations
-enable postproc
 enable protocols
 enable runtime_cpudetect
 enable shared
-enable stripping
-enable swscale
 enable swscale_alpha
 
 # build settings
@@ -4163,11 +4171,20 @@ check_cxxflags -D__STDC_LIMIT_MACROS
 
 # add some linker flags
 check_ldflags -Wl,--warn-common
-<<BLOCKQUOTE
 check_ldflags -Wl,--as-needed
-BLOCKQUOTE
-check_ldflags '-Wl,-rpath-link,\$(BUILD_ROOT)/external/FFmpeg/libpostproc -Wl,-rpath-link,\$(BUILD_ROOT)/external/FFmpeg/libswscale -Wl,-rpath-link,\$(BUILD_ROOT)/external/FFmpeg/libavfilter -Wl,-rpath-link,\$(BUILD_ROOT)/external/FFmpeg/libavdevice -Wl,-rpath-link,\$(BUILD_ROOT)/external/FFmpeg/libavformat -Wl,-rpath-link,\$(BUILD_ROOT)/external/FFmpeg/libavcodec -Wl,-rpath-link,\$(BUILD_ROOT)/external/FFmpeg/libavutil'
-check_ldflags -Wl,-Bsymbolic
+check_ldflags '-Wl,-rpath-link,\$(SRC_PATH_BARE)/external/FFmpeg/libpostproc:\$(SRC_PATH_BARE)/external/FFmpeg/libswresample:\$(SRC_PATH_BARE)/external/FFmpeg/libswscale:\$(SRC_PATH_BARE)/external/FFmpeg/libavfilter:\$(SRC_PATH_BARE)/external/FFmpeg/libavdevice:\$(SRC_PATH_BARE)/external/FFmpeg/libavformat:\$(SRC_PATH_BARE)/external/FFmpeg/libavcodec:\$(SRC_PATH_BARE)/external/FFmpeg/libavutil'
+test_ldflags -Wl,-Bsymbolic && append SHFLAGS -Wl,-Bsymbolic
+
+enabled xmm_clobber_test &&                             \
+    check_ldflags -Wl,--wrap,avcodec_open2              \
+                  -Wl,--wrap,avcodec_decode_audio4      \
+                  -Wl,--wrap,avcodec_decode_video2      \
+                  -Wl,--wrap,avcodec_decode_subtitle2   \
+                  -Wl,--wrap,avcodec_encode_audio2      \
+                  -Wl,--wrap,avcodec_encode_video       \
+                  -Wl,--wrap,avcodec_encode_subtitle    \
+                  -Wl,--wrap,sws_scale ||               \
+    disable xmm_clobber_test
 
 echo "X{};" > $TMPV
 if test_ldflags -Wl,--version-script,$TMPV; then
@@ -4952,6 +4969,7 @@ cat > $TMPH <<EOF
 #define FFMPEG_CONFIGURATION "$(c_escape $FFMPEG_CONFIGURATION)"
 #define FFMPEG_LICENSE "$(c_escape $license)"
 #define FFMPEG_DATADIR "$(eval c_escape $datadir)"
+#define AVCONV_DATADIR "$(eval c_escape $datadir)"
 #define CC_TYPE "$cc_type"
 #define CC_VERSION $cc_version
 #define restrict $_restrict

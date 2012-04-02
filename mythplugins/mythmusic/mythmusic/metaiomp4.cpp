@@ -86,30 +86,29 @@ Metadata* MetaIOMP4::read(const QString &filename)
     bool compilation = false;
 
     AVFormatContext* p_context = NULL;
-    AVFormatParameters* p_params = NULL;
     AVInputFormat* p_inputformat = NULL;
 
     QByteArray local8bit = filename.toLocal8Bit();
-    if ((av_open_input_file(&p_context, local8bit.constData(),
-                           p_inputformat, 0, p_params) < 0))
+    if ((avformat_open_input(&p_context, local8bit.constData(),
+                             p_inputformat, NULL) < 0))
     {
         return NULL;
     }
 
-    if (av_find_stream_info(p_context) < 0)
+    if (avformat_find_stream_info(p_context, NULL) < 0)
         return NULL;
 
 #if 0
     //### Debugging, enable to dump a list of all field names/values found
 
-    AVMetadataTag *tag = av_metadata_get(p_context->metadata, "\0", NULL,
+    AVDictionaryEntry *tag = av_dict_get(p_context->metadata, "\0", NULL,
                                          AV_METADATA_IGNORE_SUFFIX);
     while (tag != NULL)
     {
         LOG(VB_GENERAL, LOG_DEBUG, QString("Tag: %1 Value: %2")
                 .arg(tag->key) .arg(QString::fromUtf8(tag->value)));
-        tag = av_metadata_get(p_context->metadata, "\0", tag,
-                              AV_METADATA_IGNORE_SUFFIX);
+        tag = av_dict_get(p_context->metadata, "\0", tag,
+                          AV_METADATA_IGNORE_SUFFIX);
     }
     //####
 #endif
@@ -149,7 +148,7 @@ Metadata* MetaIOMP4::read(const QString &filename)
 
     retdata->setCompilation(compilation);
 
-    av_close_input_file(p_context);
+    avformat_close_input(&p_context);
 
     return retdata;
 }
@@ -163,7 +162,7 @@ Metadata* MetaIOMP4::read(const QString &filename)
  */
 QString MetaIOMP4::getFieldValue(AVFormatContext* context, const char* tagname)
 {
-    AVMetadataTag *tag = av_metadata_get(context->metadata, tagname, NULL, 0);
+    AVDictionaryEntry *tag = av_dict_get(context->metadata, tagname, NULL, 0);
 
     QString value;
 
@@ -182,23 +181,22 @@ QString MetaIOMP4::getFieldValue(AVFormatContext* context, const char* tagname)
 int MetaIOMP4::getTrackLength(const QString &filename)
 {
     AVFormatContext* p_context = NULL;
-    AVFormatParameters* p_params = NULL;
     AVInputFormat* p_inputformat = NULL;
 
     // Open the specified file and populate the metadata info
     QByteArray local8bit = filename.toLocal8Bit();
-    if ((av_open_input_file(&p_context, local8bit.constData(),
-                           p_inputformat, 0, p_params) < 0))
+    if ((avformat_open_input(&p_context, local8bit.constData(),
+                             p_inputformat, NULL) < 0))
     {
         return 0;
     }
 
-    if (av_find_stream_info(p_context) < 0)
+    if (avformat_find_stream_info(p_context, NULL) < 0)
         return 0;
 
     int rv = getTrackLength(p_context);
 
-    av_close_input_file(p_context);
+    avformat_close_input(&p_context);
 
     return rv;
 }

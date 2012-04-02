@@ -40,6 +40,10 @@ using namespace std;
 #include "metaiomp4.h"
 #include "metaiowavpack.h"
 
+extern "C" {
+#include "libavformat/avio.h"
+}
+
 // size of the buffer used for streaming
 #define BUFFER_SIZE 8192
 
@@ -89,7 +93,6 @@ avfDecoder::avfDecoder(const QString &file, DecoderFactory *d, QIODevice *i,
 {
     setObjectName("avfDecoder");
     setFilename(file);
-    memset(&m_params, 0, sizeof(AVFormatParameters));
 }
 
 avfDecoder::~avfDecoder(void)
@@ -154,11 +157,11 @@ bool avfDecoder::initialize()
         // if the input is not a file then setup the buffer
         // and iocontext to stream from it
         m_buffer = (unsigned char*) av_malloc(BUFFER_SIZE + FF_INPUT_BUFFER_PADDING_SIZE);
-        m_byteIOContext = new ByteIOContext;
-        init_put_byte(m_byteIOContext, m_buffer, BUFFER_SIZE, 0, input(), &ReadFunc, &WriteFunc, &SeekFunc);
+        m_byteIOContext = avio_alloc_context(m_buffer, BUFFER_SIZE, 0, input(),
+                                             &ReadFunc, &WriteFunc, &SeekFunc);
         filename = "stream";
 
-        m_byteIOContext->is_streamed = 1;
+        m_byteIOContext->seekable = 0;
 
         // probe the stream
         AVProbeData probe_data;
@@ -199,11 +202,15 @@ bool avfDecoder::initialize()
     // this should populate the input context
     int err;
     if (m_inputIsFile)
-        err = av_open_input_file(&m_inputContext, filename.toLocal8Bit().constData(),
-                                    m_inputFormat, 0, &m_params);
+        err = avformat_open_input(&m_inputContext,
+                                  filename.toLocal8Bit().constData(),
+                                  m_inputFormat, NULL);
     else
-        err = av_open_input_stream(&m_inputContext, m_byteIOContext, "decoder",
-                                      m_inputFormat, &m_params);
+    {
+        m_inputContext->pb = m_byteIOContext;
+        err = avformat_open_input(&m_inputContext, "decoder",
+                                      m_inputFormat, NULL);
+    }
 
     if (err < 0)
     {
@@ -218,7 +225,7 @@ bool avfDecoder::initialize()
 
     // determine the stream format
     // this also populates information needed for metadata
-    if (av_find_stream_info(m_inputContext) < 0)
+    if (avformat_find_stream_info(m_inputContext, NULL) < 0)
     {
         error("Could not determine the stream format.");
         deinit();
@@ -244,9 +251,10 @@ bool avfDecoder::initialize()
         return false;
     }
 
-    if (avcodec_open(m_audioDec,m_codec) < 0)
+    if (avcodec_open2(m_audioDec, m_codec, NULL) < 0)
     {
-        error(QString("Could not open audio codec: %1").arg(m_audioDec->codec_id));
+        error(QString("Could not open audio codec: %1")
+            .arg(m_audioDec->codec_id));
         deinit();
         return false;
     }
@@ -265,11 +273,11 @@ bool avfDecoder::initialize()
 
     switch (m_audioDec->sample_fmt)
     {
-        case SAMPLE_FMT_U8:     m_sampleFmt = FORMAT_U8;    break;
-        case SAMPLE_FMT_S16:    m_sampleFmt = FORMAT_S16;   break;
-        case SAMPLE_FMT_FLT:    m_sampleFmt = FORMAT_FLT;   break;
-        case SAMPLE_FMT_DBL:    m_sampleFmt = FORMAT_NONE;  break;
-        case SAMPLE_FMT_S32:
+        case AV_SAMPLE_FMT_U8:     m_sampleFmt = FORMAT_U8;    break;
+        case AV_SAMPLE_FMT_S16:    m_sampleFmt = FORMAT_S16;   break;
+        case AV_SAMPLE_FMT_FLT:    m_sampleFmt = FORMAT_FLT;   break;
+        case AV_SAMPLE_FMT_DBL:    m_sampleFmt = FORMAT_NONE;  break;
+        case AV_SAMPLE_FMT_S32:
             switch (m_audioDec->bits_per_raw_sample)
             {
                 case  0:    m_sampleFmt = FORMAT_S32;   break;
@@ -278,14 +286,13 @@ bool avfDecoder::initialize()
                 default:    m_sampleFmt = FORMAT_NONE;
             }
             break;
-        default:                m_sampleFmt = FORMAT_NONE;
+        default:            m_sampleFmt = FORMAT_NONE;
     }
 
     if (m_sampleFmt == FORMAT_NONE)
     {
-        int bps =
-            av_get_bits_per_sample_fmt(m_audioDec->sample_fmt);
-        if (m_audioDec->sample_fmt == SAMPLE_FMT_S32 &&
+        int bps = av_get_bytes_per_sample(m_audioDec->sample_fmt) << 3;
+        if (m_audioDec->sample_fmt == AV_SAMPLE_FMT_S32 &&
             m_audioDec->bits_per_raw_sample)
         {
             bps = m_audioDec->bits_per_raw_sample;
@@ -337,10 +344,7 @@ void avfDecoder::deinit()
     // Cleanup here
     if (m_inputContext)
     {
-        if (m_inputIsFile)
-            av_close_input_file(m_inputContext);
-        else
-            av_close_input_stream(m_inputContext);
+        avformat_close_input(&m_inputContext);
         m_inputContext = NULL;
     }
 
@@ -429,11 +433,16 @@ void avfDecoder::run()
                     // m_samples is the output buffer
                     // data_size is the size in bytes of the frame
                     // tmp_pkt is the input buffer
+                    AVFrame frame;
+                    int got_frame = 0;
+
                     data_size = AVCODEC_MAX_AUDIO_FRAME_SIZE;
-                    dec_len = avcodec_decode_audio3(m_audioDec, m_samples,
-                                                    &data_size, &tmp_pkt);
-                    if (dec_len < 0)
+                    dec_len = avcodec_decode_audio4(m_audioDec, &frame,
+                                                    &got_frame, &tmp_pkt);
+                    if (dec_len < 0 || !got_frame)
                         break;
+
+                    memcpy(m_samples, frame.extended_data[0], data_size);
 
                     s = (char *)m_samples;
                     // Copy the data to the output buffer

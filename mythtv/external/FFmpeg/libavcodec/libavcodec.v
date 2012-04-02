@@ -27,5 +27,10 @@ LIBAVCODEC_$MAJOR {
                 ff_jpeg_fdct*;
                 #XBMC's configure checks for ff_vdpau_vc1_decode_picture()
                 ff_vdpau_vc1_decode_picture;
+		ff_codec_type_string;
+		ff_codec_id_string;
+		ff_*golomb*code;
+		ff_*golomb*len;
+		ff_inv_zigzag_direct16;
         local:  *;
 };

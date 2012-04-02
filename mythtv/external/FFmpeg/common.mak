@@ -22,6 +22,7 @@ endif
 
 ALLFFLIBS = avcodec avdevice avfilter avformat avutil postproc swscale swresample
 
+
 # NASM requires -I path terminated with /
 IFLAGS     := -I. -I$(SRC_PATH)/
 CPPFLAGS   := $(IFLAGS) $(CPPFLAGS)
@@ -79,8 +80,6 @@ OBJS      += $(OBJS-yes)
 FFLIBS    := $(FFLIBS-yes) $(FFLIBS)
 TESTPROGS += $(TESTPROGS-yes)
 
-FFEXTRALIBS := $(FFLIBS:%=-lmyth%$(BUILDSUF)) $(EXTRALIBS)
-
 EXAMPLES  := $(EXAMPLES:%=$(SUBDIR)%-example$(EXESUF))
 OBJS      := $(sort $(OBJS:%=$(SUBDIR)%))
 TESTOBJS  := $(TESTOBJS:%=$(SUBDIR)%) $(TESTPROGS:%=$(SUBDIR)%-test.o)
@@ -90,6 +89,9 @@ HOSTPROGS := $(HOSTPROGS:%=$(SUBDIR)%$(HOSTEXESUF))
 TOOLS     += $(TOOLS-yes)
 TOOLOBJS  := $(TOOLS:%=tools/%.o)
 TOOLS     := $(TOOLS:%=tools/%$(EXESUF))
+
+FFEXTRALIBS := $(addprefix -lmyth,$(addsuffix $(BUILDSUF),$(FFLIBS))) $(EXTRALIBS)
+#FFLDFLAGS   := $(addprefix -L$(SRC_PATH_BARE)/external/FFmpeg/lib,$(ALLFFLIBS)) $(LDFLAGS)
 
 DEP_LIBS := $(foreach NAME,$(FFLIBS),lib$(NAME)/$($(CONFIG_SHARED:yes=S)LIBNAME))
 

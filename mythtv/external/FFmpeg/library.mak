@@ -1,6 +1,6 @@
-SRC_DIR := $(SRC_PATH)/lib$(NAME)
+SRC_DIR := $(SRC_PATH_BARE)/lib$(NAME)
 
-include $(SRC_PATH)/common.mak
+include $(SRC_PATH_BARE)/external/FFmpeg/common.mak
 
 LIBVERSION := $(lib$(NAME)_VERSION)
 LIBMAJOR   := $(lib$(NAME)_VERSION_MAJOR)
@@ -28,7 +28,9 @@ $(SUBDIR)$(LIBNAME): $(OBJS)
 	$(AR) rc $@ $^ $(EXTRAOBJS)
 	$(RANLIB) $@
 
-install-headers: install-lib$(NAME)-headers install-lib$(NAME)-pkgconfig
+
+#install-headers: install-lib$(NAME)-headers install-lib$(NAME)-pkgconfig
+install-headers: install-lib$(NAME)-headers
 
 install-libs-$(CONFIG_STATIC): install-lib$(NAME)-static
 install-libs-$(CONFIG_SHARED): install-lib$(NAME)-shared
@@ -42,7 +44,7 @@ $(SUBDIR)$(SLIBNAME): $(SUBDIR)$(SLIBNAME_WITH_MAJOR)
 
 $(SUBDIR)$(SLIBNAME_WITH_MAJOR): $(OBJS) $(SUBDIR)lib$(NAME).ver
 	$(SLIB_CREATE_DEF_CMD)
-	$$(LD) $(SHFLAGS) $(LDFLAGS) -o $$@ $$(filter %.o,$$^) $(FFEXTRALIBS) $(EXTRAOBJS)
+	$$(LD) $(SHFLAGS) $(LDFLAGS) -o $$@ $$(filter %.o,$$^)  $(EXTRAOBJS) $(FFEXTRALIBS)
 	$(SLIB_EXTRA_CMD)
 
 ifdef SUBDIR

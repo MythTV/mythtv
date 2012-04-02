@@ -262,7 +262,7 @@ class AvFormatDecoder : public DecoderBase
     H264Parser *m_h264_parser;
 
     AVFormatContext *ic;
-    AVFormatParameters params;
+    // AVFormatParameters params;
 
     URLContext readcontext;
 

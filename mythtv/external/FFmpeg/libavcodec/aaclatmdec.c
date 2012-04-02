@@ -91,7 +91,7 @@ static void latm_read_ga_specific_config(int audio_object_type,
     ext_flag = copy_bits(pb, gb, 1);
 
     if (!c->chan_config)
-        ff_copy_pce_data(pb, gb);                // program_config_element
+        avpriv_copy_pce_data(pb, gb);                // program_config_element
 
     if (audio_object_type == AOT_AAC_SCALABLE ||
         audio_object_type == AOT_ER_AAC_SCALABLE)

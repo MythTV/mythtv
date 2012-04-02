@@ -98,7 +98,6 @@ bool AudioOutputDigitalEncoder::Init(
             .arg(samplerate) .arg(channels));
 
     // We need to do this when called from mythmusic
-    avcodec_init();
     avcodec_register_all();
 #if LIBAVCODEC_VERSION_INT > AV_VERSION_INT( 52, 113, 0 )
     codec = avcodec_find_encoder_by_name("ac3_fixed");
