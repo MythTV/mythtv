@@ -12,28 +12,63 @@
 <context>
     <name>GalleryFilterDialog</name>
     <message>
-        <location filename="../mythgallery/galleryfilterdlg.cpp" line="205"/>
         <source>No files / directories found</source>
+        <translation type="obsolete">Keine Dateien/Verzeichnisse gefunden</translation>
+    </message>
+    <message>
+        <source>Filter result : %1 directories found but no files</source>
+        <translation type="obsolete">Filterergebnis : %1 Verzeichnisse gefunden, aber keine Dateien</translation>
+    </message>
+    <message>
+        <source>Filter result : %1 directories, %2 movie(s) found</source>
+        <translation type="obsolete">Filterergebnis : %1 Verzeichnisse, %2 Filme gefunden</translation>
+    </message>
+    <message>
+        <source>Filter result : %1 directories, %2 image(s) found</source>
+        <translation type="obsolete">Filterergebnis : %1 Verzeichnisse, %2 Bilder gefunden</translation>
+    </message>
+    <message>
+        <source>Filter result : %1 directories, %2 image(s) and %3 movie(s) found</source>
+        <translation type="obsolete">Filterergebnis : %1 Verzeichnisse, %2 Bilder und %3 Filme gefunden</translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/galleryfilterdlg.cpp" line="145"/>
+        <source>Filter result : (unknown)</source>
+        <translation>Filterergebnis : (unbekannt)</translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/galleryfilterdlg.cpp" line="178"/>
+        <source>-- please be patient --</source>
+        <translation>-- Bitte haben SIe Geduld --</translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/galleryfilterdlg.cpp" line="190"/>
+        <source>-- scanning current filter --</source>
+        <translation>-- Scanne aktuellen Filter --</translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/galleryfilterdlg.cpp" line="205"/>
+        <source>No files / folders found</source>
         <translation>Keine Dateien/Verzeichnisse gefunden</translation>
     </message>
     <message>
         <location filename="../mythgallery/galleryfilterdlg.cpp" line="209"/>
-        <source>Filter result : %1 directories found but no files</source>
+        <source>Filter result : %1 folder(s) found but no files</source>
         <translation>Filterergebnis : %1 Verzeichnisse gefunden, aber keine Dateien</translation>
     </message>
     <message>
         <location filename="../mythgallery/galleryfilterdlg.cpp" line="213"/>
-        <source>Filter result : %1 directories, %2 movie(s) found</source>
+        <source>Filter result : %1 folder(s), %2 movie(s) found</source>
         <translation>Filterergebnis : %1 Verzeichnisse, %2 Filme gefunden</translation>
     </message>
     <message>
         <location filename="../mythgallery/galleryfilterdlg.cpp" line="217"/>
-        <source>Filter result : %1 directories, %2 image(s) found</source>
+        <source>Filter result : %1 folder(s), %2 image(s) found</source>
         <translation>Filterergebnis : %1 Verzeichnisse, %2 Bilder gefunden</translation>
     </message>
     <message>
         <location filename="../mythgallery/galleryfilterdlg.cpp" line="221"/>
-        <source>Filter result : %1 directories, %2 image(s) and %3 movie(s) found</source>
+        <source>Filter result : %1 folder(s), %2 image(s) and %3 movie(s) found</source>
         <translation>Filterergebnis : %1 Verzeichnisse, %2 Bilder und %3 Filme gefunden</translation>
     </message>
     <message>
@@ -84,9 +119,8 @@
         <translation type="obsolete">Optionen</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="196"/>
         <source>No images found in this directory.</source>
-        <translation>Keine Bilder in diesem Verzeichnis gefunden.</translation>
+        <translation type="obsolete">Keine Bilder in diesem Verzeichnis gefunden.</translation>
     </message>
     <message>
         <location filename="../mythgallery/iconview.cpp" line="389"/>
@@ -182,6 +216,11 @@
         <translation>Alle auswählen</translation>
     </message>
     <message>
+        <location filename="../mythgallery/iconview.cpp" line="196"/>
+        <source>No images found in this folder.</source>
+        <translation>Keine Bilder in diesem Verzeichnis gefunden.</translation>
+    </message>
+    <message>
         <location filename="../mythgallery/iconview.cpp" line="896"/>
         <source>Meta Data Options</source>
         <translation>Metadaten-Optionen</translation>
@@ -212,8 +251,12 @@
         <translation>Hierher verschieben</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="974"/>
         <source>Create Dir</source>
+        <translation type="obsolete">Verzeichnis erstellen</translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/iconview.cpp" line="974"/>
+        <source>Create folder</source>
         <translation>Verzeichnis erstellen</translation>
     </message>
     <message>
@@ -272,6 +315,11 @@
         <translation>Neues Verzeichnis erstellen</translation>
     </message>
     <message>
+        <location filename="../mythgallery/iconview.cpp" line="1368"/>
+        <source>Failed to rename folder</source>
+        <translation>Konnte Verzeichnis nicht umbenennen</translation>
+    </message>
+    <message>
         <location filename="../mythgallery/iconview.cpp" line="1429"/>
         <source>Moving marked images...</source>
         <translation>Verschiebe ausgewählte Bilder...</translation>
@@ -288,9 +336,8 @@
         <translation>Umbenennen</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1368"/>
         <source>Failed to rename directory</source>
-        <translation>Konnte Verzeichnis nicht umbenennen</translation>
+        <translation type="obsolete">Konnte Verzeichnis nicht umbenennen</translation>
     </message>
     <message>
         <location filename="../mythgallery/iconview.cpp" line="1370"/>
@@ -774,7 +821,8 @@ Prüfen Sie ob das Verzeichnis existiert, lesbar ist und die MythGallery-Einstel
     </message>
     <message>
         <location filename="themestrings.h" line="19"/>
-        <source>Directory filter :</source>
+        <source>Folder filter :</source>
+        <oldsource>Directory filter :</oldsource>
         <translation>Verzeichnisfilter :</translation>
     </message>
     <message>
@@ -783,12 +831,11 @@ Prüfen Sie ob das Verzeichnis existiert, lesbar ist und die MythGallery-Einstel
         <translation>Typenfilter :</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="21"/>
         <source>NumImages_Text</source>
-        <translation>NumImages_Text</translation>
+        <translation type="obsolete">NumImages_Text</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="22"/>
+        <location filename="themestrings.h" line="21"/>
         <source>Sort by :</source>
         <translation>Sortieren nach:</translation>
     </message>
