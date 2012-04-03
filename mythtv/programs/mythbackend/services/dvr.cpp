@@ -27,6 +27,7 @@
 #include "compat.h"
 #include "mythversion.h"
 #include "mythcorecontext.h"
+#include "mythevent.h"
 #include "scheduler.h"
 #include "autoexpire.h"
 #include "jobqueue.h"
@@ -183,8 +184,18 @@ bool Dvr::RemoveRecorded( int              nChanId,
 
     ProgramInfo *pInfo = new ProgramInfo(nChanId, dStartTime);
 
+    QString cmd = QString("DELETE_RECORDING %1 %2")
+                .arg(nChanId)
+                .arg(dStartTime.toString(Qt::ISODate));
+    MythEvent me(cmd);
+
+    LOG(VB_GENERAL, LOG_INFO, cmd);
+
     if (pInfo->HasPathname())
-        bResult = RemoteDeleteRecording(nChanId, dStartTime, true, false);
+    {
+        gCoreContext->dispatch(me);
+        bResult = true;
+    }
 
     return bResult;
 }
