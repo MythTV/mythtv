@@ -286,7 +286,7 @@ void AudioOutputPulseAudio::WriteAudio(uchar *aubuf, int size)
 
 int AudioOutputPulseAudio::GetBufferedOnSoundcard(void) const
 {
-    pa_usec_t latency = (pa_usec_t) -1;
+    pa_usec_t latency = 0;
     size_t buffered = 0;
 
     if (!pcontext || pa_context_get_state(pcontext) != PA_CONTEXT_READY)
@@ -312,11 +312,6 @@ int AudioOutputPulseAudio::GetBufferedOnSoundcard(void) const
     }
 
     pa_threaded_mainloop_unlock(mainloop);
-
-    if (latency < 0)
-    {
-        latency = 0;
-    }
 
     return ((uint64_t)latency * samplerate *
             output_bytes_per_frame / 1000000) + buffered;
