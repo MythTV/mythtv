@@ -237,7 +237,7 @@ void AudioSetupWizard::save(void)
     int dtshdState = 0;
     if (m_dtshdCheck->GetCheckState() == MythUIStateType::Full)
         dtshdState = 1;
-    gCoreContext->SaveSetting("DTSHDPassThru", truehdState);
+    gCoreContext->SaveSetting("DTSHDPassThru", dtshdState);
 }
 
 void AudioSetupWizard::slotPrevious(void)
