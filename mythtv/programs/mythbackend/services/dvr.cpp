@@ -189,8 +189,6 @@ bool Dvr::RemoveRecorded( int              nChanId,
                 .arg(dStartTime.toString(Qt::ISODate));
     MythEvent me(cmd);
 
-    LOG(VB_GENERAL, LOG_INFO, cmd);
-
     if (pInfo->HasPathname())
     {
         gCoreContext->dispatch(me);
