@@ -203,9 +203,8 @@ void AudioConfigSettings::AudioRescan()
     if (!slotlock.tryLock())
         return;
 
-    QVector<AudioOutput::AudioDeviceConfig>* list =
-        AudioOutput::GetOutputList();
-    QVector<AudioOutput::AudioDeviceConfig>::const_iterator it;
+    AudioOutput::ADCVect* list = AudioOutput::GetOutputList();
+    AudioOutput::ADCVect::const_iterator it;
 
     audiodevs.clear();
     for (it = list->begin(); it != list->end(); ++it)
@@ -511,12 +510,11 @@ void AudioConfigSettings::StartAudioTest()
 {
     AudioOutputSettings settings = UpdateCapabilities(QString::null);
     
-    QString out  = m_OutputDevice->getValue();
+    QString out = m_OutputDevice->getValue();
     QString passthrough =
         gCoreContext->GetNumSetting("PassThruDeviceOverride", false) ?
         gCoreContext->GetSetting("PassThruOutputDevice") : QString::null;
     int channels = m_MaxAudioChannels->getValue().toInt();
-    QString errMsg;
 
     AudioTestGroup audiotest(out, passthrough, channels, settings);
 
