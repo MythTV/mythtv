@@ -89,7 +89,7 @@ avfDecoder::avfDecoder(const QString &file, DecoderFactory *d, QIODevice *i,
     m_codec(NULL),
     m_audioDec(NULL),           m_inputIsFile(false),
     m_buffer(NULL),             m_byteIOContext(NULL),
-    errcode(0),                 m_samples(NULL)
+    errcode(0)
 {
     setObjectName("avfDecoder");
     setFilename(file);
@@ -99,8 +99,6 @@ avfDecoder::~avfDecoder(void)
 {
     if (inited)
         deinit();
-
-    av_freep((void *)&m_samples);
 }
 
 void avfDecoder::stop()
@@ -182,20 +180,6 @@ bool avfDecoder::initialize()
         LOG(VB_PLAYBACK, LOG_INFO,
             QString("avfDecoder: playing stream, format probed is: %1")
                 .arg(m_inputFormat->long_name));
-    }
-
-    if (!m_samples)
-    {
-        m_samples = (int16_t *)av_mallocz(AVCODEC_MAX_AUDIO_FRAME_SIZE *
-                                          sizeof(int32_t));
-        if (!m_samples)
-        {
-            error("Could not allocate output buffer in "
-                  "avfDecoder::initialize");
-
-            deinit();
-            return false;
-        }
     }
 
     // open the media file
@@ -379,7 +363,7 @@ void avfDecoder::run()
     }
 
     AVPacket pkt, tmp_pkt;
-    char *s;
+    AVFrame *frame = avcodec_alloc_frame();
     int data_size, dec_len;
     uint fill, total;
     // account for possible frame expansion in aobase (upmix, float conv)
@@ -423,6 +407,7 @@ void avfDecoder::run()
                     break;
                 }
 
+		av_init_packet(&tmp_pkt);
                 tmp_pkt.data = pkt.data;
                 tmp_pkt.size = pkt.size;
 
@@ -430,23 +415,23 @@ void avfDecoder::run()
                        !user_stop && seekTime <= 0.0)
                 {
                     // Decode the stream to the output codec
-                    // m_samples is the output buffer
-                    // data_size is the size in bytes of the frame
-                    // tmp_pkt is the input buffer
-                    AVFrame frame;
                     int got_frame = 0;
 
                     data_size = AVCODEC_MAX_AUDIO_FRAME_SIZE;
-                    dec_len = avcodec_decode_audio4(m_audioDec, &frame,
+                    dec_len = avcodec_decode_audio4(m_audioDec, frame,
                                                     &got_frame, &tmp_pkt);
                     if (dec_len < 0 || !got_frame)
                         break;
 
-                    memcpy(m_samples, frame.extended_data[0], data_size);
-
-                    s = (char *)m_samples;
+                    data_size = 
+                        av_samples_get_buffer_size(NULL,
+                                                   m_audioDec->channels,
+                                                   frame->nb_samples,
+                                                   m_audioDec->sample_fmt,
+                                                   1);
                     // Copy the data to the output buffer
-                    memcpy((char *)(output_buf + output_at), s, data_size);
+                    memcpy((char *)(output_buf + output_at), 
+                           frame->extended_data[0], data_size);
 
                     // Increment the output pointer and count
                     output_at += data_size;
@@ -501,6 +486,8 @@ void avfDecoder::run()
         DecoderEvent e((DecoderEvent::Type) stat);
         dispatch(e);
     }
+
+    av_free(frame);
 
     deinit();
     RunEpilog();

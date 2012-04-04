@@ -57,7 +57,6 @@ class avfDecoder : public Decoder
     AVIOContext *m_byteIOContext;
 
     int errcode;
-    int16_t *m_samples;
 };
 
 #endif
