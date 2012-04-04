@@ -209,39 +209,39 @@
             <value>Audio Device:</value>
         </textarea>
 
-        <textarea name="speaktext_text" from="auddev_text">
-            <position>40,148</position>
-            <value>Number of Speakers:</value>
-        </textarea>
-
         <textarea name="ac3_text" from="basetextarea">
-            <area>410,200,600,30</area>
+            <area>410,150,600,30</area>
             <font>basesmall</font>
             <value>My audio subsystem supports Dolby Digital</value>
         </textarea>
 
         <textarea name="dts_text" from="basetextarea">
-            <area>410,245,600,30</area>
+            <area>410,195,600,30</area>
             <font>basesmall</font>
             <value>My audio subsystem supports DTS</value>
         </textarea>
 
         <textarea name="eac3_text" from="basetextarea">
-            <area>410,290,600,30</area>
+            <area>410,240,600,30</area>
             <font>basesmall</font>
             <value>My audio subsystem supports E-AC-3</value>
         </textarea>
 
         <textarea name="truehd_text" from="basetextarea">
-            <area>410,335,600,30</area>
+            <area>410,285,600,30</area>
             <font>basesmall</font>
             <value>My audio subsystem supports TrueHD</value>
         </textarea>
 
         <textarea name="dtshd_text" from="basetextarea">
-            <area>410,380,600,30</area>
+            <area>410,330,600,30</area>
             <font>basesmall</font>
             <value>My audio subsystem supports DTS-HD</value>
+        </textarea>
+
+        <textarea name="speaktext_text" from="auddev_text">
+            <position>40,370</position>
+            <value>Number of Speakers:</value>
         </textarea>
 
     <!--Widgets-->
@@ -250,32 +250,32 @@
             <position>360,97</position>
         </buttonlist>
 
-        <buttonlist name="speakers" from="basewideselector">
-            <position>360,142</position>
-        </buttonlist>
-
         <checkbox name="ac3check" from="basecheckbox">
-            <position>360,197</position>
+            <position>360,145</position>
         </checkbox>
 
         <checkbox name="dtscheck" from="basecheckbox">
-            <position>360,242</position>
+            <position>360,190</position>
         </checkbox>
 
         <checkbox name="eac3check" from="basecheckbox">
-            <position>360,287</position>
+            <position>360,235</position>
         </checkbox>
 
         <checkbox name="truehdcheck" from="basecheckbox">
-            <position>360,332</position>
+            <position>360,280</position>
         </checkbox>
 
         <checkbox name="dtshdcheck" from="basecheckbox">
-            <position>360,377</position>
+            <position>360,325</position>
         </checkbox>
 
+        <buttonlist name="speakers" from="basewideselector">
+            <position>360,365</position>
+        </buttonlist>
+
         <button name="testspeakers" from="basewidebutton">
-            <position>360,422</position>
+            <position>360,407</position>
         </button>
 
         <button name="previous" from="basebutton">
