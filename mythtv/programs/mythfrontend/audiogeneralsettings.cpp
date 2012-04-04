@@ -315,7 +315,7 @@ AudioOutputSettings AudioConfigSettings::UpdateCapabilities(
 
         if (max_speakers > 2 && !bLPCM)
             max_speakers = 2;
-        if (max_speakers == 2 && (bAC3 || bDTS))
+        if (max_speakers == 2 && bAC3)
             max_speakers = 6;
     }
 
