@@ -53,6 +53,8 @@ class AudioSetupWizard : public MythScreenType
     MythUIButton        *m_prevButton;
 
   private slots:
+    AudioOutputSettings UpdateCapabilities(MythUIButtonListItem*);
+    AudioOutputSettings UpdateCapabilities(void);
     void slotNext(void);
     void slotPrevious(void);
 
