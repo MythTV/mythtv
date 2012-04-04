@@ -46,7 +46,6 @@ NuppelDecoder::NuppelDecoder(MythPlayer *parent,
       disablevideo(false), totalLength(0), totalFrames(0), effdsp(0),
       directframe(NULL),            decoded_video_frame(NULL),
       mpa_vidcodec(0), mpa_vidctx(0), mpa_audcodec(0), mpa_audctx(0),
-      audioSamples_buf(new short int[AVCODEC_MAX_AUDIO_FRAME_SIZE+16]),
       directrendering(false),
       lastct('1'), strm(0), buf(0), buf2(0),
       videosizetotal(0), videoframesread(0), setreadahead(false)
@@ -57,8 +56,7 @@ NuppelDecoder::NuppelDecoder(MythPlayer *parent,
     memset(&extradata, 0, sizeof(extendeddata));
     memset(&tmppicture, 0, sizeof(AVPicture));
     planes[0] = planes[1] = planes[2] = 0;
-    audioSamples = (short int*) (((long)audioSamples_buf + 15) & ~0xf);
-    memset(audioSamples, 0, AVCODEC_MAX_AUDIO_FRAME_SIZE * sizeof(short int));
+    m_audioFrame = avcodec_alloc_frame();
 
     // set parent class variables
     positionMapType = MARK_KEYFRAME;
@@ -96,8 +94,8 @@ NuppelDecoder::~NuppelDecoder()
         delete [] buf2;
     if (strm_buf)
         delete [] strm_buf;
-    if (audioSamples_buf)
-        delete [] audioSamples_buf;
+
+    av_free(m_audioFrame);
 
     while (!StoredData.empty())
     {
@@ -1056,6 +1054,7 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype)
     bool ret = false;
     int seeklen = 0;
     AVPacket pkt;
+    AVFrame *frame = avcodec_alloc_frame();
 
     decoded_video_frame = NULL;
 
@@ -1263,22 +1262,27 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype)
                 pkt.data = strm;
                 pkt.size = frameheader.packetlength;
                 int ret = 0;
-                int data_size;
 
                 QMutexLocker locker(avcodeclock);
 
                 while (pkt.size > 0)
                 {
-                    AVFrame frame;
-                    data_size = AVCODEC_MAX_AUDIO_FRAME_SIZE;
                     int got_frame = 0;
-                    ret = avcodec_decode_audio4(mpa_audctx, &frame,
+                    ret = avcodec_decode_audio4(mpa_audctx, m_audioFrame,
                                                 &got_frame, &pkt);
 
-                    if (got_frame && data_size > 0)
-                        m_audio->AddAudioData((char *)frame.extended_data[0],
-                                              data_size, frameheader.timecode,
-                                              0);
+                    if (got_frame && ret > 0)
+                    {
+                        int data_size =
+                            av_samples_get_buffer_size(NULL,
+                                                       mpa_audctx->channels,
+                                                       m_audioFrame->nb_samples,
+                                                       mpa_audctx->sample_fmt,
+                                                       1);
+                        m_audio->AddAudioData(
+                            (char *)m_audioFrame->extended_data[0],
+                            data_size, frameheader.timecode, 0);
+                    }
 
                     pkt.size -= ret;
                     pkt.data += ret;
