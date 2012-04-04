@@ -300,6 +300,7 @@ AvFormatDecoder::AvFormatDecoder(MythPlayer *parent,
       // Interactive TV
       itv(NULL),
       // Audio
+      m_audioFrame(NULL),
       audioSamples(NULL),
       disable_passthru(false),
       m_fps(0.0f),
@@ -309,8 +310,7 @@ AvFormatDecoder::AvFormatDecoder(MythPlayer *parent,
     memset(ccX08_in_pmt, 0, sizeof(ccX08_in_pmt));
     memset(ccX08_in_tracks, 0, sizeof(ccX08_in_tracks));
 
-    audioSamples = (short int *)av_mallocz(AVCODEC_MAX_AUDIO_FRAME_SIZE *
-                                           sizeof(int32_t));
+    m_audioFrame = avcodec_alloc_frame();
     ccd608->SetIgnoreTimecode(true);
 
     bool debug = VERBOSE_LEVEL_CHECK(VB_LIBAV, LOG_ANY);
@@ -344,7 +344,7 @@ AvFormatDecoder::~AvFormatDecoder()
 
     sws_freeContext(sws_ctx);
 
-    av_freep((void *)&audioSamples);
+    av_free(m_audioFrame);
 
     if (avfRingBuffer)
         delete avfRingBuffer;
@@ -812,7 +812,7 @@ void AvFormatDecoder::InitByteContext(void)
                                    .arg(buf_size).arg(streamed));
 
     readcontext.prot = &AVF_RingBuffer_Protocol;
-    readcontext.flags = 0;
+    readcontext.flags = AVIO_FLAG_READ;
     readcontext.is_streamed = streamed;
     readcontext.max_packet_size = 0;
     readcontext.priv_data = avfRingBuffer;
@@ -926,7 +926,9 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         return -1;
     }
 
+#if 0
     fmt->flags |= AVFMT_NOFILE;
+#endif
 
     ic = avformat_alloc_context();
     if (!ic)
@@ -941,7 +943,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     if (err < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
-            QString("avformat err(%1) on av_open_input_file call.").arg(err));
+            QString("avformat err(%1) on avformat_open_input call.").arg(err));
         return -1;
     }
 
@@ -4053,6 +4055,7 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
     avcodeclock->unlock();
 
     AVPacket tmp_pkt;
+    av_init_packet(&tmp_pkt);
     tmp_pkt.data = pkt->data;
     tmp_pkt.size = pkt->size;
 
@@ -4102,16 +4105,19 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
                     ctx->channels = m_audio->GetMaxChannels();
             }
 
-            AVFrame frame;
+            avcodec_get_frame_defaults(m_audioFrame);
             int got_frame = 0;
 
-            data_size = AVCODEC_MAX_AUDIO_FRAME_SIZE;
-            ret = avcodec_decode_audio4(ctx, &frame, &got_frame, &tmp_pkt);
+            ret = avcodec_decode_audio4(ctx, m_audioFrame, &got_frame,
+                                        &tmp_pkt);
             if (ret > 0 && got_frame)
             {
-                decoded_size = data_size;
+                decoded_size = ret;
                 already_decoded = true;
-                memcpy(audioSamples, frame.extended_data[0], decoded_size);
+                data_size = av_samples_get_buffer_size(NULL, ctx->channels,
+                                                       m_audioFrame->nb_samples,
+                                                       ctx->sample_fmt, 1);
+                audioSamples = m_audioFrame->extended_data[0];
             }
             reselectAudioTrack |= ctx->channels;
         }
@@ -4162,23 +4168,28 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
                 decoded_size = -1;
                 if (m_audio->NeedDecodingBeforePassthrough())
                 {
-                    AVFrame frame;
+                    avcodec_get_frame_defaults(m_audioFrame);
                     int got_frame = 0;
 
-                    data_size = AVCODEC_MAX_AUDIO_FRAME_SIZE;
-                    ret = avcodec_decode_audio4(ctx, &frame, &got_frame,
+                    ret = avcodec_decode_audio4(ctx, m_audioFrame, &got_frame,
                                                 &tmp_pkt);
                     if (ret > 0 && got_frame)
                     {
-                        decoded_size = data_size;
-                        memcpy(audioSamples, frame.extended_data[0],
-                               decoded_size);
+                        decoded_size = ret;
+                        data_size =
+                            av_samples_get_buffer_size(NULL, ctx->channels,
+                                                       m_audioFrame->nb_samples,
+                                                       ctx->sample_fmt, 1);
+                        audioSamples = m_audioFrame->extended_data[0];
                     }
                 }
             }
-            memcpy(audioSamples, tmp_pkt.data, tmp_pkt.size);
-            data_size = tmp_pkt.size;
-             // We have processed all the data, there can't be any left
+            else
+            {
+                audioSamples = tmp_pkt.data;
+                data_size = tmp_pkt.size;
+            }
+            // We have processed all the data, there can't be any left
             tmp_pkt.size = 0;
         }
         else
@@ -4194,15 +4205,19 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
                 else
                     ctx->request_channels = 0;
 
-                AVFrame frame;
+                avcodec_get_frame_defaults(m_audioFrame);
                 int got_frame = 0;
 
-                data_size = AVCODEC_MAX_AUDIO_FRAME_SIZE;
-                ret = avcodec_decode_audio4(ctx, &frame, &got_frame, &tmp_pkt);
+                ret = avcodec_decode_audio4(ctx, m_audioFrame, &got_frame,
+                                            &tmp_pkt);
                 if (ret > 0 && got_frame)
                 {
-                    decoded_size = data_size;
-                    memcpy(audioSamples, frame.extended_data[0], data_size);
+                    decoded_size = ret;
+                    data_size =
+                        av_samples_get_buffer_size(NULL, ctx->channels,
+                                                   m_audioFrame->nb_samples,
+                                                   ctx->sample_fmt, 1);
+                    audioSamples = m_audioFrame->extended_data[0];
                 }
             }
 
@@ -4237,8 +4252,8 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
         long long temppts = lastapts;
 
         if (audSubIdx != -1)
-            extract_mono_channel(audSubIdx, &audioOut,
-                                 (char *)audioSamples, data_size);
+            extract_mono_channel(audSubIdx, &audioOut, (char *)audioSamples,
+                                 data_size);
 
         int frames = (ctx->channels <= 0 || decoded_size < 0) ? -1 :
             decoded_size / (ctx->channels *

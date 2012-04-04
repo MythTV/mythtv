@@ -713,9 +713,7 @@ static const StreamType ISO_types[] = {
     { 0x0b, AVMEDIA_TYPE_DATA,     CODEC_ID_DSMCC_B }, /* DVB_CAROUSEL_ID */
     { 0x0f, AVMEDIA_TYPE_AUDIO,        CODEC_ID_AAC },
     { 0x10, AVMEDIA_TYPE_VIDEO,      CODEC_ID_MPEG4 },
-    /* Makito encoder sets stream type 0x11 for AAC,
-     * so auto-detect LOAS/LATM instead of hardcoding it. */
-//  { 0x11, AVMEDIA_TYPE_AUDIO,   CODEC_ID_AAC_LATM }, /* LATM syntax */
+    { 0x11, AVMEDIA_TYPE_AUDIO,   CODEC_ID_AAC_LATM }, /* LATM syntax */
     { 0x1b, AVMEDIA_TYPE_VIDEO,       CODEC_ID_H264 },
     { 0xd1, AVMEDIA_TYPE_VIDEO,      CODEC_ID_DIRAC },
     { 0xea, AVMEDIA_TYPE_VIDEO,        CODEC_ID_VC1 },
@@ -2782,7 +2780,7 @@ static int mpegts_read_header(AVFormatContext *s)
             /* now find the info for the first service if we found any,
                otherwise try to filter all PATs */
             
-            ffurl_seek(pb, pos, SEEK_SET);
+            avio_seek(pb, pos, SEEK_SET);
             ts->req_sid = sid = ts->prg[i].id;
             handle_packets(ts, s->probesize / ts->raw_packet_size);
 
@@ -2797,7 +2795,7 @@ static int mpegts_read_header(AVFormatContext *s)
                 /* turn off crc checking */
                 ts->pmt_filter->u.section_filter.check_crc = 0;
                 /* try again */
-                ffurl_seek(pb, pos, SEEK_SET);
+                avio_seek(pb, pos, SEEK_SET);
                 ts->req_sid = sid = ts->prg[i].id;
                 handle_packets(ts, s->probesize / ts->raw_packet_size);
             }
@@ -2812,7 +2810,7 @@ static int mpegts_read_header(AVFormatContext *s)
                        "contents of first TS packet only!\n");
                 ts->pmt_filter->pmt_chop_at_ts = 1;
                 /* try again */
-                ffurl_seek(pb, pos, SEEK_SET);
+                avio_seek(pb, pos, SEEK_SET);
                 ts->req_sid = sid = ts->prg[i].id;
                 handle_packets(ts, s->probesize / ts->raw_packet_size);
             }

@@ -346,7 +346,8 @@ class AvFormatDecoder : public DecoderBase
     InteractiveTV    *itv;                ///< MHEG/MHP decoder
 
     // Audio
-    short int        *audioSamples;
+    AVFrame          *m_audioFrame;
+    uint8_t          *audioSamples;
     bool              disable_passthru;
 
     AudioInfo         audioIn;
