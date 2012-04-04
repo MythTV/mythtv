@@ -510,10 +510,10 @@
                 <area>0,0,1200,24</area>
                 <state name="active">
                     <textarea name="shortstarttimedate" from="buttontext">
-                        <area>10,2,215,24</area>
+                        <area>10,2,250,24</area>
                     </textarea>
                     <textarea name="channel" from="shortstarttimedate">
-                        <area>240,2,230,24</area>
+                        <area>270,2,200,24</area>
                     </textarea>
                     <textarea name="title" from="shortstarttimedate">
                         <area>480,2,655,24</area>
@@ -525,7 +525,7 @@
                 </state>
                 <state name="selectedactive" from="active">
                     <textarea name="shortstarttimedate" from="buttontext">
-                        <area>10,2,215,24</area>
+                        <area>10,2,250,24</area>
                         <font>base_normal_selected</font>
                         <font state="disabled">basesmall_disabled_selected</font>
                         <font state="error">basesmall_error_selected</font>
@@ -534,7 +534,7 @@
                         <font state="running">basesmall_running_selected</font>
                     </textarea>
                     <textarea name="channel" from="shortstarttimedate">
-                        <area>240,2,230,24</area>
+                        <area>270,2,200,24</area>
                     </textarea>
                     <textarea name="title" from="shortstarttimedate">
                         <area>480,2,655,24</area>
@@ -1235,10 +1235,10 @@
                 <area>0,0,1200,24</area>
                 <state name="active">
                     <textarea name="shortstarttimedate" from="buttontext">
-                        <area>10,2,215,24</area>
+                        <area>10,2,250,24</area>
                     </textarea>
                     <textarea name="channel" from="shortstarttimedate">
-                        <area>240,2,230,24</area>
+                        <area>270,2,200,24</area>
                     </textarea>
                     <textarea name="titlesubtitle" from="shortstarttimedate">
                         <area>480,2,655,24</area>
@@ -1250,7 +1250,7 @@
                 </state>
                 <state name="selectedactive" from="active">
                     <textarea name="shortstarttimedate" from="buttontext">
-                        <area>10,2,215,24</area>
+                        <area>10,2,250,24</area>
                         <font>base_normal_selected</font>
                         <font state="disabled">basesmall_disabled_selected</font>
                         <font state="error">basesmall_error_selected</font>
@@ -1259,7 +1259,7 @@
                         <font state="running">basesmall_running_selected</font>
                     </textarea>
                     <textarea name="channel" from="shortstarttimedate">
-                        <area>240,2,230,24</area>
+                        <area>270,2,200,24</area>
                     </textarea>
                     <textarea name="titlesubtitle" from="shortstarttimedate">
                         <area>480,2,655,24</area>
