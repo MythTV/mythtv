@@ -157,9 +157,15 @@ void MythUIText::SetTextFromMap(QHash<QString, QString> &map)
         if (!newText.isEmpty() && newText.contains(regexp))
         {
             int pos = 0;
-            QString tempString = newText;
 
-            while ((pos = regexp.indexIn(newText, pos)) != -1)
+            QString translatedTemplate = qApp->translate("ThemeUI",
+                                                         newText.toUtf8(),
+                                                         NULL,
+                                                 QCoreApplication::UnicodeUTF8);
+
+            QString tempString = translatedTemplate;
+
+            while ((pos = regexp.indexIn(translatedTemplate, pos)) != -1)
             {
                 QString key = regexp.cap(4).toLower().trimmed();
                 QString replacement;
