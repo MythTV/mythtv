@@ -223,7 +223,7 @@ void MythRAOPConnection::udpDataReady(QByteArray buf, QHostAddress peer,
         int ret = avcodec_decode_audio4(m_codeccontext, frame,
                                          &got_frame, &tmp_pkt);
 
-	if (ret < 0)
+        if (ret < 0)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + QString("Error decoding audio"));
             break;
@@ -236,8 +236,8 @@ void MythRAOPConnection::udpDataReady(QByteArray buf, QHostAddress peer,
                                            frame->nb_samples,
                                            m_codeccontext->sample_fmt, 1);
 
-	    frame->linesize[0] = decoded_size;
-	    int frames = frame->nb_samples;
+            frame->linesize[0] = decoded_size;
+            int frames = frame->nb_samples;
             if (frames != 352)
             {
                 LOG(VB_GENERAL, LOG_WARNING,
@@ -251,10 +251,10 @@ void MythRAOPConnection::udpDataReady(QByteArray buf, QHostAddress peer,
             m_audioQueue.insert(this_timestamp, frame);
 
             this_timestamp += (frames * 1000) / m_sampleRate;
-	}
+        }
 
-	tmp_pkt.data += ret;
-	tmp_pkt.size -= ret;
+        tmp_pkt.data += ret;
+        tmp_pkt.size -= ret;
     }
 
     // N.B. Unless playback is really messed up, this should only pass through
@@ -396,11 +396,11 @@ void MythRAOPConnection::ProcessAudio(uint64_t timenow)
     {
         it.next();
         if (it.key() < ideal_ts)
-	{
-	    AVFrame *frame = it.value();
+        {
+            AVFrame *frame = it.value();
             m_audio->AddData(frame->extended_data[0], frame->linesize[0],
                              it.key(), frame->nb_samples);
-	}
+        }
     }
 
     ExpireAudio(ideal_ts);
