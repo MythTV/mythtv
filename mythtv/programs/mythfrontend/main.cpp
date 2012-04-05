@@ -1224,6 +1224,7 @@ static bool resetTheme(QString themedir, const QString badtheme)
     themedir = GetMythUI()->FindThemeDir(themename);
 
     MythTranslation::reload();
+    gCoreContext->ReInitLocale();
     GetMythUI()->LoadQtConfig();
     GetMythMainWindow()->Init();
 
@@ -1243,6 +1244,7 @@ static int reloadTheme(void)
         return GENERIC_EXIT_NO_THEME;
     }
 
+    gCoreContext->ReInitLocale();
     MythTranslation::reload();
 
     GetMythMainWindow()->SetEffectsEnabled(false);

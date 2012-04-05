@@ -10,6 +10,7 @@
 #include <QHostAddress>
 #include <QNetworkInterface>
 #include <QNetworkAddressEntry>
+#include <QLocale>
 
 #include <cmath>
 
@@ -1225,7 +1226,7 @@ MythDB *MythCoreContext::GetDB(void)
     return d->m_database;
 }
 
-const MythLocale *MythCoreContext::GetLocale(void) const
+MythLocale *MythCoreContext::GetLocale(void) const
 {
     return d->m_locale;
 }
@@ -1263,6 +1264,29 @@ void MythCoreContext::InitLocale(void )
 {
     if (!d->m_locale)
         d->m_locale = new MythLocale();
+
+    QString localeCode = d->m_locale->GetLocaleCode();
+    LOG(VB_GENERAL, LOG_NOTICE, QString("Setting QT default locale to %1")
+                                                            .arg(localeCode));
+    QLocale::setDefault(d->m_locale->ToQLocale());
+}
+
+void MythCoreContext::ReInitLocale(void)
+{
+    if (!d->m_locale)
+        d->m_locale = new MythLocale();
+    else
+        d->m_locale->ReInit();
+
+    QString localeCode = d->m_locale->GetLocaleCode();
+    LOG(VB_GENERAL, LOG_NOTICE, QString("Setting QT default locale to %1")
+                                                            .arg(localeCode));
+    QLocale::setDefault(d->m_locale->ToQLocale());
+}
+
+const QLocale MythCoreContext::GetQLocale(void) const
+{
+    return d->m_locale->ToQLocale();
 }
 
 void MythCoreContext::SaveLocaleDefaults(void)

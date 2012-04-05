@@ -2,7 +2,6 @@
 #include "mythlocale.h"
 
 // QT
-#include <QLocale>
 #include <QDomDocument>
 #include <QFile>
 #include <QIODevice>
@@ -14,6 +13,11 @@
 
 MythLocale::MythLocale(QString localeName) :
     m_defaultsLoaded(false)
+{
+    Init(localeName);
+}
+
+void MythLocale::Init(const QString &localeName)
 {
     QString dbLanguage = GetMythDB()->GetSetting("Language", "");
     QString dbCountry = GetMythDB()->GetSetting("Country", "");
@@ -41,6 +45,13 @@ MythLocale::MythLocale(QString localeName) :
         else
             m_localeCode = locale.name();
     }
+
+    m_qtLocale = QLocale(m_localeCode);
+}
+
+void MythLocale::ReInit()
+{
+    Init();
 }
 
 QString MythLocale::GetCountryCode(void) const
@@ -92,7 +103,7 @@ bool MythLocale::LoadDefaultsFromXML(void)
 
         if (!file.exists())
         {
-            LOG(VB_GENERAL, LOG_ERR, 
+            LOG(VB_GENERAL, LOG_ERR,
                 QString("No locale defaults file for %1, skipping")
                     .arg(m_localeCode));
             return false;

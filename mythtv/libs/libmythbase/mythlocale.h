@@ -4,6 +4,7 @@
 // QT
 #include <QString>
 #include <QMap>
+#include <QLocale>
 
 // libmythbase
 #include "iso3166.h"
@@ -16,6 +17,8 @@ class MBASE_PUBLIC MythLocale
     MythLocale(QString localeName = QString());
     ~MythLocale() { };
 
+    void ReInit();
+
     QString GetCountryCode() const; /// ISO3166 2-letter
     QString GetCountry() const; /// Name of country in English
     QString GetNativeCountry() const; /// Name of country in the native language
@@ -26,6 +29,8 @@ class MBASE_PUBLIC MythLocale
 
     QString GetLocaleCode() const { return m_localeCode; }
 
+    const QLocale ToQLocale() const { return m_qtLocale; }
+
     bool LoadDefaultsFromXML(void);
     void SaveLocaleDefaults(bool overwrite = false);
     void ResetToLocaleDefaults(void);
@@ -34,8 +39,11 @@ class MBASE_PUBLIC MythLocale
     QString GetLocaleSetting(const QString &key);
 
   private:
+    void Init(const QString &localeName = QString());
+
     QString m_localeCode;
     bool m_defaultsLoaded;
+    QLocale m_qtLocale;
 
     typedef QMap<QString, QString> SettingsMap;
     SettingsMap m_globalSettings;

@@ -160,7 +160,9 @@ class MBASE_PUBLIC MythCoreContext : public MythObservable, public MythSocketCBs
     void dispatchNow(const MythEvent &event); // MDEPRECATED;
 
     void InitLocale(void);
-    const MythLocale *GetLocale(void) const;
+    void ReInitLocale(void);
+    MythLocale *GetLocale(void) const;
+    const QLocale GetQLocale(void) const;
     void SaveLocaleDefaults(void);
     QString GetLanguage(void);
     QString GetLanguageAndVariant(void);
