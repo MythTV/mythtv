@@ -218,21 +218,26 @@ void MythRAOPConnection::udpDataReady(QByteArray buf, QHostAddress peer,
 
     while (tmp_pkt.size > 0)
     {
-        int decoded_data_size = AVCODEC_MAX_AUDIO_FRAME_SIZE;
-        int16_t *samples = (int16_t *)av_mallocz(AVCODEC_MAX_AUDIO_FRAME_SIZE);
-        int used = avcodec_decode_audio3(m_codeccontext, samples,
-                                         &decoded_data_size, &tmp_pkt);
+        AVFrame *frame = avcodec_alloc_frame();
+        int got_frame = 0;
+        int ret = avcodec_decode_audio4(m_codeccontext, frame,
+                                         &got_frame, &tmp_pkt);
 
-	if (used < 0)
+	if (ret < 0)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + QString("Error decoding audio"));
             break;
         }
 
-        if (decoded_data_size > 0)
+        if (ret > 0 && got_frame)
         {
-            int frames = decoded_data_size / 4;
+            int decoded_size = 
+                av_samples_get_buffer_size(NULL, m_codeccontext->channels,
+                                           frame->nb_samples,
+                                           m_codeccontext->sample_fmt, 1);
 
+	    frame->linesize[0] = decoded_size;
+	    int frames = frame->nb_samples;
             if (frames != 352)
             {
                 LOG(VB_GENERAL, LOG_WARNING,
@@ -243,13 +248,13 @@ void MythRAOPConnection::udpDataReady(QByteArray buf, QHostAddress peer,
                 LOG(VB_GENERAL, LOG_WARNING,
                     LOC + "Duplicate packet timestamp.");
 
-            m_audioQueue.insert(this_timestamp, samples);
+            m_audioQueue.insert(this_timestamp, frame);
 
             this_timestamp += (frames * 1000) / m_sampleRate;
 	}
 
-	tmp_pkt.data += used;
-	tmp_pkt.size -= used;
+	tmp_pkt.data += ret;
+	tmp_pkt.size -= ret;
     }
 
     // N.B. Unless playback is really messed up, this should only pass through
@@ -345,13 +350,13 @@ void MythRAOPConnection::ProcessSyncPacket(const QByteArray &buf, uint64_t timen
 int MythRAOPConnection::ExpireAudio(uint64_t timestamp)
 {
     int res = 0;
-    QMutableMapIterator<uint64_t,int16_t*> it(m_audioQueue);
+    QMutableMapIterator<uint64_t,AVFrame*> it(m_audioQueue);
     while (it.hasNext())
     {
         it.next();
         if (it.key() < timestamp)
         {
-            av_freep((void *)&(it.value()));
+            av_free((void *)(it.value()));
             m_audioQueue.remove(it.key());
             res++;
         }
@@ -386,12 +391,16 @@ void MythRAOPConnection::ProcessAudio(uint64_t timenow)
     m_latencyQueued += queue_length;
     m_latencyCounter++;
 
-    QMapIterator<uint64_t,int16_t*> it(m_audioQueue);
+    QMapIterator<uint64_t,AVFrame*> it(m_audioQueue);
     while (it.hasNext())
     {
         it.next();
         if (it.key() < ideal_ts)
-            m_audio->AddData(it.value(), 1408 /* FIXME */, it.key(), 352);
+	{
+	    AVFrame *frame = it.value();
+            m_audio->AddData(frame->extended_data[0], frame->linesize[0],
+                             it.key(), frame->nb_samples);
+	}
     }
 
     ExpireAudio(ideal_ts);
@@ -774,7 +783,7 @@ bool MythRAOPConnection::CreateDecoder(void)
         return false;
     }
 
-    m_codeccontext = avcodec_alloc_context();
+    m_codeccontext = avcodec_alloc_context3(m_codec);
     if (m_codec && m_codeccontext)
     {
         unsigned char* extradata = new unsigned char[36];
@@ -799,7 +808,7 @@ bool MythRAOPConnection::CreateDecoder(void)
         m_codeccontext->extradata = extradata;
         m_codeccontext->extradata_size = 36;
         m_codeccontext->channels = 2;
-        if (avcodec_open(m_codeccontext, m_codec) < 0)
+        if (avcodec_open2(m_codeccontext, m_codec, NULL) < 0)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to open ALAC decoder - going silent...");
             DestroyDecoder();
