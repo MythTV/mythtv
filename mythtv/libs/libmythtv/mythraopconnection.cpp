@@ -212,29 +212,45 @@ void MythRAOPConnection::udpDataReady(QByteArray buf, QHostAddress peer,
     memcpy(decrypted_data + aeslen, data_in + aeslen, len - aeslen);
 
     AVPacket tmp_pkt;
-    memset(&tmp_pkt, 0, sizeof(tmp_pkt));
+    av_init_packet(&tmp_pkt);
     tmp_pkt.data = decrypted_data;
     tmp_pkt.size = len;
-    int decoded_data_size = AVCODEC_MAX_AUDIO_FRAME_SIZE;
-    int16_t* samples = (int16_t *)av_mallocz(AVCODEC_MAX_AUDIO_FRAME_SIZE * sizeof(int32_t));
-    int used = avcodec_decode_audio3(m_codeccontext, samples,
-                                     &decoded_data_size, &tmp_pkt);
-    if (used != len)
+
+    while (tmp_pkt.size > 0)
     {
-        LOG(VB_GENERAL, LOG_WARNING, LOC +
-            QString("Decoder only used %1 of %2 bytes.").arg(used).arg(len));
+        int decoded_data_size = AVCODEC_MAX_AUDIO_FRAME_SIZE;
+        int16_t *samples = (int16_t *)av_mallocz(AVCODEC_MAX_AUDIO_FRAME_SIZE);
+        int used = avcodec_decode_audio3(m_codeccontext, samples,
+                                         &decoded_data_size, &tmp_pkt);
+
+	if (used < 0)
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC + QString("Error decoding audio"));
+            break;
+        }
+
+        if (decoded_data_size > 0)
+        {
+            int frames = decoded_data_size / 4;
+
+            if (frames != 352)
+            {
+                LOG(VB_GENERAL, LOG_WARNING,
+                    LOC + QString("Decoded %1 frames (not 352)") .arg(frames));
+            }
+
+            if (m_audioQueue.contains(this_timestamp))
+                LOG(VB_GENERAL, LOG_WARNING,
+                    LOC + "Duplicate packet timestamp.");
+
+            m_audioQueue.insert(this_timestamp, samples);
+
+            this_timestamp += (frames * 1000) / m_sampleRate;
+	}
+
+	tmp_pkt.data += used;
+	tmp_pkt.size -= used;
     }
-
-    if (decoded_data_size / 4 != 352)
-    {
-        LOG(VB_GENERAL, LOG_WARNING, LOC + QString("Decoded %1 frames (not 352)")
-            .arg(decoded_data_size / 4));
-    }
-
-    if (m_audioQueue.contains(this_timestamp))
-        LOG(VB_GENERAL, LOG_WARNING, LOC + "Duplicate packet timestamp.");
-
-    m_audioQueue.insert(this_timestamp, samples);
 
     // N.B. Unless playback is really messed up, this should only pass through
     // properly sequenced packets
