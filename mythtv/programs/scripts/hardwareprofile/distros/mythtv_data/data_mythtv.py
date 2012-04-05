@@ -261,8 +261,8 @@ class _Mythtv_data:
             else:
                 foundit = 0
             return foundit
-            
-        
+
+
         data = OrdDict()
         data.device           = _SETTINGS.AudioOutputDevice
         data.passthrudevice   = _SETTINGS.PassThruOutputDevice
@@ -403,17 +403,30 @@ class _Mythtv_data:
 
 
     def Processtuners(self):
-        data = OrdDict()
+        class CaptureCard( MythTV.database.DBData ): pass
 
-        c = _DB.cursor()
-        c.execute("""select cardtype,count(cardtype)
-                    from capturecard group by cardtype""")
-        for k,v in c.fetchall():
-            data[k] = v
-         
+        cardtypes = {}
+        virtual = [0,0]
+        virtualtypes = ('DVB', 'HDHOMERUN', 'ASI')
 
-        return {'tuners':data}
-        
+        for card in CaptureCard.getAllEntries(db=_DB):
+            isvirt = (card.cardtype in virtualtypes)
+            loc = card.videodevice+'@'+card.hostname
+            if card.cardtype not in cardtypes:
+                cardtypes[card.cardtype] = [loc]
+                virtual[0] += isvirt
+            else:
+                if loc not in cardtypes[card.cardtype]:
+                    cardtypes[card.cardtype].append(loc)
+                    virtual[0] += isvirt
+                else:
+                    virtual[1] += isvirt
+
+        data = {'tuners':dict([(k,len(v)) for k,v in cardtypes.items()])}
+        if virtual[0]:
+            data['vtpertuner'] = sum(virtual)/float(virtual[0])
+        return data
+
     def ProcessSmoltInfo(self):
         smoltfile=home+"/.mythtv/smolt.info"
         config = {}
