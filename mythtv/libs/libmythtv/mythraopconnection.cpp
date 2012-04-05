@@ -223,7 +223,7 @@ void MythRAOPConnection::udpDataReady(QByteArray buf, QHostAddress peer,
         int used = avcodec_decode_audio3(m_codeccontext, samples,
                                          &decoded_data_size, &tmp_pkt);
 
-	if (used < 0)
+        if (used < 0)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + QString("Error decoding audio"));
             break;
@@ -246,10 +246,10 @@ void MythRAOPConnection::udpDataReady(QByteArray buf, QHostAddress peer,
             m_audioQueue.insert(this_timestamp, samples);
 
             this_timestamp += (frames * 1000) / m_sampleRate;
-	}
+        }
 
-	tmp_pkt.data += used;
-	tmp_pkt.size -= used;
+        tmp_pkt.data += used;
+        tmp_pkt.size -= used;
     }
 
     // N.B. Unless playback is really messed up, this should only pass through
