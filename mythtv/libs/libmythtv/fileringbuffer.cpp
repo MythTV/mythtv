@@ -192,6 +192,7 @@ bool FileRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
     rwlock.lockForWrite();
 
     filename = lfilename;
+    safefilename = lfilename;
 
     if (remotefile)
     {
