@@ -288,7 +288,7 @@ AudioOutputSettings AudioSetupWizard::UpdateCapabilities(
                 {
                     MythUIButtonListItem *stereo =
                         new MythUIButtonListItem(m_speakerNumberButtonList,
-                                                 "Stereo");
+                                                 QObject::tr("Stereo"));
                     stereo->SetData(2);
                     break;
                 }
