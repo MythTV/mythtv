@@ -195,6 +195,8 @@ AudioConfigSettings::AudioConfigSettings(ConfigurationWizard *parent) :
             this, SLOT(UpdateCapabilities(const QString&)));
     connect(m_DTSHDPassThrough, SIGNAL(valueChanged(const QString&)),
             this, SLOT(UpdateCapabilities(const QString&)));
+
+    m_maxspeakers = gCoreContext->GetNumSetting("MaxChannels", 2);
     AudioRescan();
 }
 
@@ -326,7 +328,11 @@ AudioOutputSettings AudioConfigSettings::UpdateCapabilities(
     m_TrueHDPassThrough->setEnabled(bTRUEHD);
     m_DTSHDPassThrough->setEnabled(bDTSHD);
 
-    int cur_speakers = m_MaxAudioChannels->getValue().toInt();
+    if (m_MaxAudioChannels->getValue().toInt() > m_maxspeakers)
+    {
+        m_maxspeakers = m_MaxAudioChannels->getValue().toInt();
+    }
+    int cur_speakers = m_maxspeakers;
 
     if (cur_speakers > max_speakers)
     {

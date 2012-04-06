@@ -62,6 +62,7 @@ class AudioConfigSettings : public VerticalConfigurationGroup
     AudioOutput::ADCVect devices;
     QMutex               slotlock;
     ConfigurationWizard *m_parent;
+    int                  m_maxspeakers;
 };
 
 class AudioDeviceComboBox : public HostComboBox

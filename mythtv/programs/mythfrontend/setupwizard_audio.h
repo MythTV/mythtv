@@ -51,6 +51,7 @@ class AudioSetupWizard : public MythScreenType
 
     MythUIButton        *m_nextButton;
     MythUIButton        *m_prevButton;
+    int                  m_maxspeakers;
 
   private slots:
     AudioOutputSettings UpdateCapabilities(MythUIButtonListItem*);

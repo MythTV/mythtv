@@ -197,6 +197,7 @@ void AudioSetupWizard::Init(void)
         m_audioDeviceButtonList->SetValueByData(qVariantFromValue(current));
     }
 
+    m_maxspeakers = gCoreContext->GetNumSetting("MaxChannels", 2);
     // Update list for default audio device
     UpdateCapabilities();
 
@@ -256,16 +257,18 @@ AudioOutputSettings AudioSetupWizard::UpdateCapabilities(
     if (max_speakers == 2 && bAC3)
         max_speakers = 6;
 
-    int cur_speakers;
-    if (m_speakerNumberButtonList->GetItemCurrent() == NULL)
-    {
-        cur_speakers = gCoreContext->GetNumSetting("MaxChannels", 2);
-    }
-    else
+    int cur_speakers = m_maxspeakers;
+
+    if (m_speakerNumberButtonList->GetItemCurrent() != NULL)
     {
         cur_speakers = qVariantValue<int>
             (m_speakerNumberButtonList->GetItemCurrent()->GetData());
     }
+    if (cur_speakers > m_maxspeakers)
+    {
+        m_maxspeakers = cur_speakers;
+    }
+    cur_speakers = m_maxspeakers;
 
     if (cur_speakers > max_speakers)
     {
