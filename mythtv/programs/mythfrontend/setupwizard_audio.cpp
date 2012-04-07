@@ -349,8 +349,7 @@ void AudioSetupWizard::slotNext(void)
 {
     if (m_testThread)
     {
-        m_testThread->cancel();
-        m_testThread->wait();
+        toggleSpeakers();
     }
 
     save();
