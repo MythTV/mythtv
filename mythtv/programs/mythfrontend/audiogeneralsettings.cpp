@@ -107,7 +107,7 @@ AudioConfigSettings::AudioConfigSettings(ConfigurationWizard *parent) :
     m_AudioUpmix(NULL),     m_AudioUpmixType(NULL),
     m_AC3PassThrough(NULL), m_DTSPassThrough(NULL),
     m_EAC3PassThrough(NULL),m_TrueHDPassThrough(NULL), m_DTSHDPassThrough(NULL),
-    m_parent(parent)
+    m_parent(parent),       m_lastAudioDevice("")
 {
     setLabel(QObject::tr("Audio System"));
     setUseLabel(false);
@@ -186,15 +186,7 @@ AudioConfigSettings::AudioConfigSettings(ConfigurationWizard *parent) :
     connect(m_OutputDevice, SIGNAL(valueChanged(const QString&)),
             this, SLOT(UpdateCapabilities(const QString&)));
     connect(m_AC3PassThrough, SIGNAL(valueChanged(const QString&)),
-            this, SLOT(UpdateCapabilities(const QString&)));
-    connect(m_DTSPassThrough, SIGNAL(valueChanged(const QString&)),
-            this, SLOT(UpdateCapabilities(const QString&)));
-    connect(m_EAC3PassThrough, SIGNAL(valueChanged(const QString&)),
-            this, SLOT(UpdateCapabilities(const QString&)));
-    connect(m_TrueHDPassThrough, SIGNAL(valueChanged(const QString&)),
-            this, SLOT(UpdateCapabilities(const QString&)));
-    connect(m_DTSHDPassThrough, SIGNAL(valueChanged(const QString&)),
-            this, SLOT(UpdateCapabilities(const QString&)));
+            this, SLOT(UpdateCapabilitiesAC3()));
 
     m_maxspeakers = gCoreContext->GetNumSetting("MaxChannels", 2);
     AudioRescan();
@@ -259,12 +251,19 @@ void AudioConfigSettings::UpdateVisibility(const QString &device)
 }
 
 AudioOutputSettings AudioConfigSettings::UpdateCapabilities(
-    const QString &device)
+    const QString &device, bool restore, bool AC3)
 {
     int max_speakers = 8;
     int realmax_speakers = 8;
 
     bool invalid = false;
+
+    if (device.length() > 0)
+    {
+        restore = device != m_lastAudioDevice;
+        m_lastAudioDevice = device;
+    }
+
     AudioOutputSettings settings, settingsdigital;
 
         // Test if everything is set yet
@@ -318,7 +317,13 @@ AudioOutputSettings AudioConfigSettings::UpdateCapabilities(
         if (max_speakers > 2 && !bLPCM)
             max_speakers = 2;
         if (max_speakers == 2 && bAC3)
+        {
             max_speakers = 6;
+            if (AC3)
+            {
+                restore = true;
+            }
+        }
     }
 
     m_triggerDigital->setValue(invalid || settingsdigital.canFeature(
@@ -328,11 +333,15 @@ AudioOutputSettings AudioConfigSettings::UpdateCapabilities(
     m_TrueHDPassThrough->setEnabled(bTRUEHD);
     m_DTSHDPassThrough->setEnabled(bDTSHD);
 
-    if (m_MaxAudioChannels->getValue().toInt() > m_maxspeakers)
+    int cur_speakers = m_MaxAudioChannels->getValue().toInt();
+    if (cur_speakers > m_maxspeakers)
     {
         m_maxspeakers = m_MaxAudioChannels->getValue().toInt();
     }
-    int cur_speakers = m_maxspeakers;
+    if (restore)
+    {
+        cur_speakers = m_maxspeakers;
+    }
 
     if (cur_speakers > max_speakers)
     {
@@ -378,6 +387,11 @@ AudioOutputSettings AudioConfigSettings::UpdateCapabilities(
     return settings;
 }
 
+AudioOutputSettings AudioConfigSettings::UpdateCapabilitiesAC3(void)
+{
+    return UpdateCapabilities(QString::null, false, true);
+}
+
 void AudioConfigSettings::AudioAdvanced()
 {
     QString out  = m_OutputDevice->getValue();
@@ -393,13 +407,19 @@ void AudioConfigSettings::AudioAdvanced()
         settings = audiodevs.value(out).settings;
     }
 
+    bool LPCM1 = settings.canFeature(FEATURE_LPCM) &&
+        gCoreContext->GetNumSetting("StereoPCM", false);
+
     AudioAdvancedSettingsGroup audiosettings(invalid ||
                                              (settings.canPassthrough() >= 0));
 
     if (audiosettings.exec() == kDialogCodeAccepted)
     {
-        AudioRescan();
-        UpdateCapabilities(QString::null);
+        bool LPCM2 = settings.canFeature(FEATURE_LPCM) &&
+            gCoreContext->GetNumSetting("StereoPCM", false);
+            // restore speakers configure only of StereoPCM has changed and
+            // we have LPCM capabilities
+        UpdateCapabilities(QString::null, LPCM1 != LPCM2);
     }
 }
 
@@ -514,8 +534,8 @@ bool AudioConfigSettings::CheckPassthrough()
 
 void AudioConfigSettings::StartAudioTest()
 {
-    AudioOutputSettings settings = UpdateCapabilities(QString::null);
-    
+    AudioOutputSettings settings = UpdateCapabilities(QString::null,
+                                                      false, false);
     QString out = m_OutputDevice->getValue();
     QString passthrough =
         gCoreContext->GetNumSetting("PassThruDeviceOverride", false) ?
