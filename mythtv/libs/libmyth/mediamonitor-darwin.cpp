@@ -399,6 +399,7 @@ void MonitorThreadDarwin::diskInsert(const char *devName,
                                      const char *volName,
                                      QString model, bool isCDorDVD)
 {
+    QString           devPath = "/dev/"; devPath += devName;
     MythMediaDevice  *media;
     QString           msg = "MonitorThreadDarwin::diskInsert";
 
@@ -406,9 +407,9 @@ void MonitorThreadDarwin::diskInsert(const char *devName,
                       .arg(devName).arg(volName).arg(model).arg(isCDorDVD));
 
     if (isCDorDVD)
-        media = MythCDROM::get(NULL, devName, true, m_Monitor->m_AllowEject);
+        media = MythCDROM::get(NULL, devPath.toAscii(), true, m_Monitor->m_AllowEject);
     else
-        media = MythHDD::Get(NULL, devName, true, false);
+        media = MythHDD::Get(NULL, devPath.toAscii(), true, false);
 
     if (!media)
     {
@@ -424,14 +425,22 @@ void MonitorThreadDarwin::diskInsert(const char *devName,
     QString mnt = "/Volumes/"; mnt += volName;
     media->setMountPath(mnt.toAscii());
 
+    int  attempts = 0;
     QDir d(mnt);
     while (!d.exists())
     {
         LOG(VB_MEDIA, LOG_WARNING,
             (msg + "() - Waiting for mount '%1' to become stable.").arg(mnt));
         usleep(120000);
+        if ( ++attempts > 4 )
+            usleep(200000);
+        if ( attempts > 8 )
+        {
+            delete media;
+            LOG(VB_MEDIA, LOG_ALERT, msg + "() - Giving up");
+            return;
+        }
     }
-
     media->setStatus(MEDIASTAT_MOUNTED);
 
     // This is checked in AddDevice(), but checking earlier means
