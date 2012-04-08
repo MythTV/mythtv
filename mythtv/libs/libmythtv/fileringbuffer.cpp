@@ -429,9 +429,6 @@ int FileRingBuffer::safe_read(int fd, void *data, uint sz)
         return 0;
     }
 
-    if (stopreads)
-        return 0;
-
     while (tot < sz)
     {
         ret = read(fd2, (char *)data + tot, sz - tot);
@@ -470,7 +467,7 @@ int FileRingBuffer::safe_read(int fd, void *data, uint sz)
                 break;
             }
         }
-        if (stopreads)
+        if (stopreads && (tot > 0))
             break;
         if (tot < sz)
             usleep(60000);
