@@ -1251,7 +1251,10 @@ static int reloadTheme(void)
 
     GetMythUI()->LoadQtConfig();
 
-    menu->Close();
+    if (menu)
+    {
+        menu->Close();
+    }
     GetMythMainWindow()->Init();
 
     GetMythMainWindow()->ReinitDone();
