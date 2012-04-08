@@ -476,8 +476,6 @@ MythMainWindow::MythMainWindow(const bool useDB)
 
 MythMainWindow::~MythMainWindow()
 {
-    gCoreContext->removeListener(this);
-
     d->drawTimer->stop();
 
     while (!d->stackList.isEmpty())
