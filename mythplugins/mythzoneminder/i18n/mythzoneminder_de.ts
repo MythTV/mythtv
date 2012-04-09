@@ -164,37 +164,38 @@
         <location filename="themestrings.h" line="41"/>
         <source>[R] = Running
 [S] = Stopped</source>
-        <translation type="unfinished"></translation>
+        <translation>[R] = Läuft
+[S] = Gestoppt</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="42"/>
         <source>Select Camera:</source>
-        <translation type="unfinished"></translation>
+        <translation>Kamera auswählen:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="43"/>
         <source>Select Date:</source>
-        <translation type="unfinished"></translation>
+        <translation>Datum auswählen:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="44"/>
         <source>Test</source>
-        <translation type="unfinished"></translation>
+        <translation>Test</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="45"/>
         <source>Record</source>
-        <translation type="unfinished"></translation>
+        <translation>Aufnehmen</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="46"/>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Abbrechen</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="47"/>
         <source>Store</source>
-        <translation type="unfinished"></translation>
+        <translation>Speichern</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="48"/>
