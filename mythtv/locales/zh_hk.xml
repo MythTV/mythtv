@@ -33,8 +33,4 @@
   <!-- Plugins -->
     <!-- MythArchive -->
     <setting name="MythArchiveVideoFormat">PAL</setting>
-
-    <!-- Date/Time format -->
-    <setting name="MythArchiveDateFormat">%Y年%m月%d日 (%A)</setting>
-    <setting name="MythArchiveTimeFormat">%p %I:%M</setting>
 </mythlocale>

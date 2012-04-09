@@ -773,7 +773,7 @@
     <message>
         <location filename="../programs/mythfrontend/customedit.cpp" line="315"/>
         <source>Only channels from the Favorites group</source>
-        <translation type="unfinished">Pouze stanice ze skupiny Oblíbené</translation>
+        <translation>Pouze stanice ze skupiny Oblíbené</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/customedit.cpp" line="438"/>
@@ -892,22 +892,22 @@
     <message>
         <location filename="../programs/mythfrontend/customedit.cpp" line="672"/>
         <source>Replace as a search</source>
-        <translation type="unfinished">Zaměnit jako vyhledávání</translation>
+        <translation>Zaměnit jako vyhledávání</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/customedit.cpp" line="674"/>
         <source>Store as a search</source>
-        <translation type="unfinished">Uložit jako vyhledávání</translation>
+        <translation>Uložit jako vyhledávání</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/customedit.cpp" line="678"/>
         <source>Replace as an example</source>
-        <translation type="unfinished">Zaměnit jako příklad</translation>
+        <translation>Zaměnit jako příklad</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/customedit.cpp" line="680"/>
         <source>Store as an example</source>
-        <translation type="unfinished">Uložit jako příklad</translation>
+        <translation>Uložit jako příklad</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/customedit.cpp" line="707"/>
@@ -1642,12 +1642,12 @@
     <message>
         <location filename="../programs/mythfrontend/editvideometadata.cpp" line="674"/>
         <source>Downloading selected artwork...</source>
-        <translation type="unfinished">Stahuji vybranou ilustraci...</translation>
+        <translation>Stahuji vybranou ilustraci...</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/editvideometadata.cpp" line="735"/>
         <source>Searching for available artwork...</source>
-        <translation type="unfinished">Vyhledávám dostupné ilustrace...</translation>
+        <translation>Vyhledávám dostupné ilustrace...</translation>
     </message>
 </context>
 <context>
@@ -1745,7 +1745,7 @@
     <message>
         <location filename="../programs/mythtv-setup/expertsettingseditor.h" line="32"/>
         <source>Expert Settings Editor</source>
-        <translation type="unfinished">Editor expertních nastavení</translation>
+        <translation>Editor expertních nastavení</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/expertsettingseditor.h" line="33"/>
@@ -1894,17 +1894,17 @@
     <message>
         <location filename="../programs/mythfrontend/grabbersettings.cpp" line="55"/>
         <source>Select a source to use when searching for information and artwork about movies.</source>
-        <translation type="unfinished">Vyberte zdroj, kde se budou vyhledávat informace a ilustrace k filmům.</translation>
+        <translation>Vyberte zdroj, kde se budou vyhledávat informace a ilustrace k filmům.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/grabbersettings.cpp" line="57"/>
         <source>Select a source to use when searching for information and artwork about television.</source>
-        <translation type="unfinished">Vyberte zdroj, kde se budou vyhledávat informace a ilustrace k televizním stanicím.</translation>
+        <translation>Vyberte zdroj, kde se budou vyhledávat informace a ilustrace k televizním stanicím.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/grabbersettings.cpp" line="59"/>
         <source>Select a source to use when searching for information and artwork about video games.</source>
-        <translation type="unfinished">Vyberte zdroj, kde se budou vyhledávat informace a ilustrace ke hrám.</translation>
+        <translation>Vyberte zdroj, kde se budou vyhledávat informace a ilustrace ke hrám.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/grabbersettings.cpp" line="61"/>
@@ -1919,7 +1919,7 @@
     <message>
         <location filename="../programs/mythfrontend/grabbersettings.cpp" line="64"/>
         <source>If set, the backend will attempt to perform artwork updates for recordings daily. When new seasons begin to record, this will attempt to provide you with fresh, relevant artwork while preserving the artwork assigned to old recordings.</source>
-        <translation type="unfinished">Pokud nastaveno, backend se pokusí vyhledáva aktualizace ilustrací k nahrávkám denně. Pokud se začne nahrávat nová série, pokusí se najít novou, relevantní ilustraci při zachování ilustrace přiřazené k původním nahrávkám.</translation>
+        <translation>Pokud nastaveno, backend se pokusí vyhledáva aktualizace ilustrací k nahrávkám denně. Pokud se začne nahrávat nová série, pokusí se najít novou, relevantní ilustraci při zachování ilustrace přiřazené k původním nahrávkám.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/grabbersettings.cpp" line="75"/>
@@ -2292,22 +2292,22 @@
     <message>
         <location filename="../html/htmlstrings.h" line="23"/>
         <source>Encoder %1 is currently idle.</source>
-        <translation type="unfinished">Tuner %1 zahálí.</translation>
+        <translation>Tuner %1 zahálí.</translation>
     </message>
     <message>
         <location filename="../html/htmlstrings.h" line="24"/>
         <source>Encoder %1 is currently recording &quot;%2.&quot;  This program is being viewed.</source>
-        <translation type="unfinished">Tuner %1 právě nahrává &quot;%2.&quot;  Tento program se již přehrává.</translation>
+        <translation>Tuner %1 právě nahrává &quot;%2.&quot;  Tento program se již přehrává.</translation>
     </message>
     <message>
         <location filename="../html/htmlstrings.h" line="25"/>
         <source>Encoder %1 is currently recording &quot;%2.&quot;  This recording will end at %3.</source>
-        <translation type="unfinished">Tuner %1 právě nahrává &quot;%2.&quot;  Nahrávání bude ukončeno v %3.</translation>
+        <translation>Tuner %1 právě nahrává &quot;%2.&quot;  Nahrávání bude ukončeno v %3.</translation>
     </message>
     <message>
         <location filename="../html/htmlstrings.h" line="26"/>
         <source>Encoder %1 is currently watching &quot;%2&quot; on Live TV.</source>
-        <translation type="unfinished">Tuner %1 je používán LiveTV k přehrávání &quot;%2&quot;.</translation>
+        <translation>Tuner %1 je používán LiveTV k přehrávání &quot;%2&quot;.</translation>
     </message>
     <message>
         <location filename="../html/htmlstrings.h" line="27"/>
@@ -2372,7 +2372,7 @@
     <message>
         <location filename="../html/htmlstrings.h" line="39"/>
         <source>Recorded %2, %3 %4 at %5.</source>
-        <translation type="unfinished">Nahráno %2, %3 %4 v %5.</translation>
+        <translation>Nahráno %2, %3 %4 v %5.</translation>
     </message>
     <message>
         <location filename="../html/htmlstrings.h" line="40"/>
@@ -2422,7 +2422,7 @@
     <message>
         <location filename="../html/htmlstrings.h" line="50"/>
         <source>Capture Card Service</source>
-        <translation type="unfinished">Služba zachytávacích karet</translation>
+        <translation>Služba zachytávacích karet</translation>
     </message>
     <message>
         <location filename="../html/htmlstrings.h" line="51"/>
@@ -2437,17 +2437,17 @@
     <message>
         <location filename="../html/htmlstrings.h" line="53"/>
         <source>Channel Service</source>
-        <translation type="unfinished">SLužba stanic</translation>
+        <translation>SLužba stanic</translation>
     </message>
     <message>
         <location filename="../html/htmlstrings.h" line="54"/>
         <source>Content Service</source>
-        <translation type="unfinished">Služba obsahu</translation>
+        <translation>Služba obsahu</translation>
     </message>
     <message>
         <location filename="../html/htmlstrings.h" line="55"/>
         <source>DVR Service</source>
-        <translation type="unfinished">Služba DVR</translation>
+        <translation>Služba DVR</translation>
     </message>
     <message>
         <location filename="../html/htmlstrings.h" line="56"/>
@@ -2472,12 +2472,12 @@
     <message>
         <location filename="../html/htmlstrings.h" line="60"/>
         <source>GetRecorded() Example</source>
-        <translation type="unfinished">Příklad GetRecorded()</translation>
+        <translation>Příklad GetRecorded()</translation>
     </message>
     <message>
         <location filename="../html/htmlstrings.h" line="61"/>
         <source>GetStorageGroups()</source>
-        <translation type="unfinished">GetStorageGroups()</translation>
+        <translation>GetStorageGroups()</translation>
     </message>
     <message>
         <location filename="../html/htmlstrings.h" line="62"/>
@@ -2562,7 +2562,7 @@
     <message>
         <location filename="../html/htmlstrings.h" line="78"/>
         <source>Video Library Service</source>
-        <translation type="unfinished">Služba Video knihovny</translation>
+        <translation>Služba Video knihovny</translation>
     </message>
     <message>
         <location filename="../html/htmlstrings.h" line="79"/>
@@ -2637,12 +2637,12 @@
     <message>
         <location filename="../html/htmlstrings.h" line="96"/>
         <source>List Files</source>
-        <translation type="unfinished">Seznam souborů</translation>
+        <translation>Seznam souborů</translation>
     </message>
     <message>
         <location filename="../html/htmlstrings.h" line="98"/>
         <source>Sample Storage Group browser</source>
-        <translation type="unfinished">Ukázkový prohlížeč Diskových úložišť</translation>
+        <translation>Ukázkový prohlížeč Diskových úložišť</translation>
     </message>
     <message>
         <location filename="../html/htmlstrings.h" line="99"/>
@@ -2855,17 +2855,17 @@
     <message>
         <location filename="../libs/libmythtv/jobqueue.cpp" line="1109"/>
         <source>Look up Metadata</source>
-        <translation type="unfinished">Vyhledat metadata</translation>
+        <translation>Vyhledat metadata</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/jobqueue.cpp" line="2148"/>
         <source>Metadata Lookup Starting</source>
-        <translation type="unfinished">Vyhledání matadat startuje</translation>
+        <translation>Vyhledání matadat startuje</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/jobqueue.cpp" line="2174"/>
         <source>Unable to find mythmetadatalookup</source>
-        <translation type="unfinished">Nemohu najít mythmetadatalookup</translation>
+        <translation>Nemohu najít mythmetadatalookup</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/jobqueue.cpp" line="2186"/>
@@ -2882,13 +2882,13 @@
     <message>
         <location filename="../libs/libmythtv/jobqueue.cpp" line="2198"/>
         <source>Metadata Lookup Complete.</source>
-        <translation type="unfinished">Vyhledání metadat kompletní.</translation>
+        <translation>Vyhledání metadat kompletní.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/jobqueue.cpp" line="2204"/>
         <source>Metadata Lookup %1</source>
         <comment>Job ID</comment>
-        <translation type="unfinished">Vyhledání metadat %1 (ID)</translation>
+        <translation>Vyhledání metadat %1 (ID)</translation>
     </message>
     <message numerus="yes">
         <location filename="../libs/libmythtv/jobqueue.cpp" line="2335"/>
@@ -2944,17 +2944,17 @@
     <message>
         <location filename="../programs/mythlcdserver/lcdprocclient.cpp" line="1997"/>
         <source>R </source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../programs/mythlcdserver/lcdprocclient.cpp" line="2002"/>
         <source>E </source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../programs/mythlcdserver/lcdprocclient.cpp" line="2009"/>
         <source>C </source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../programs/mythlcdserver/lcdprocclient.cpp" line="2035"/>
@@ -3073,37 +3073,37 @@
     <message>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="1419"/>
         <source>Trying to automatically find this recording online...</source>
-        <translation type="unfinished">Pokouším se automaticky vyhledat tuto nahrávku online...</translation>
+        <translation>Pokouším se automaticky vyhledat tuto nahrávku online...</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="1453"/>
         <source>Trying to manually find this recording online...</source>
-        <translation type="unfinished">Pokouším se ručně vyhledat tuto nahrávku online...</translation>
+        <translation>Pokouším se ručně vyhledat tuto nahrávku online...</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="1490"/>
         <source>Downloading selected artwork...</source>
-        <translation type="unfinished">Stahuji vybranou ilustraci...</translation>
+        <translation>Stahuji vybranou ilustraci...</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="1645"/>
         <source>You must set a reference number on this rule to set artwork.  For items without a metadata source, you can set any unique value.</source>
-        <translation type="unfinished">Musíte nastavit referenční číslo pravidla pro nastavení ilustrace.  Pro položky bez zdrojových metadat, můžete nastavit libovolnou inikátní hodnotu.</translation>
+        <translation>Musíte nastavit referenční číslo pravidla pro nastavení ilustrace.  Pro položky bez zdrojových metadat, můžete nastavit libovolnou inikátní hodnotu.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="1662"/>
         <source>Searching for available artwork...</source>
-        <translation type="unfinished">Vyhledávám dostupné ilustrace...</translation>
+        <translation>Vyhledávám dostupné ilustrace...</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="1875"/>
         <source>No match found for this recording. You can try entering a TVDB/TMDB number, season, and episode manually.</source>
-        <translation type="unfinished">Pro tuto nahrávku nebylo nic nalezeno. Můžete se pokusit nastavit TVDB/TMDB číslo, sezónu, a epizodu ručně.</translation>
+        <translation>Pro tuto nahrávku nebylo nic nalezeno. Můžete se pokusit nastavit TVDB/TMDB číslo, sezónu, a epizodu ručně.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="1921"/>
         <source>This number, season, and episode combination does not appear to be valid (or the site may be down). Check your information and try again.</source>
-        <translation type="unfinished">Tato kombinace čísla, sezóny a epizody nevypadá jako validní (nebo je server nedostupný). Ověřte si informaci a zkuste to znovu.</translation>
+        <translation>Tato kombinace čísla, sezóny a epizody nevypadá jako validní (nebo je server nedostupný). Ověřte si informaci a zkuste to znovu.</translation>
     </message>
 </context>
 <context>
@@ -3137,12 +3137,12 @@
     <message>
         <location filename="../programs/mythfrontend/videometadatasettings.cpp" line="102"/>
         <source>If set, all files below the MythVideo directory will be displayed unless their extension is explicitly set to be ignored.</source>
-        <translation type="unfinished">Pokud nastaveno, všechny soubory v adresáři MythVideo busou zobrazeny, pokud přípona není explicentě nastavena k ignorování.</translation>
+        <translation>Pokud nastaveno, všechny soubory v adresáři MythVideo busou zobrazeny, pokud přípona není explicentě nastavena k ignorování.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/videometadatasettings.cpp" line="106"/>
         <source>If set, every time a scan for new videos is performed, a mass metadata update of the collection will also occur.</source>
-        <translation type="unfinished">Pokud nastaveno, při každém vyhledání nových videí bude spuštěna i hromadná aktualizace metadat celé sbírky.</translation>
+        <translation>Pokud nastaveno, při každém vyhledání nových videí bude spuštěna i hromadná aktualizace metadat celé sbírky.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/videometadatasettings.cpp" line="110"/>
@@ -3254,7 +3254,7 @@
     <message>
         <location filename="../programs/mythfrontend/mythcontrols.cpp" line="258"/>
         <source>Reset All Keys to Defaults</source>
-        <translation type="unfinished">Nastavit výchozí přiřazení kláves</translation>
+        <translation>Nastavit výchozí přiřazení kláves</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/mythcontrols.cpp" line="266"/>
@@ -3919,7 +3919,7 @@
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="738"/>
         <source>Set the picture hue</source>
-        <translation type="unfinished">Nastavit zabarvení obrazu</translation>
+        <translation>Nastavit zabarvení obrazu</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="743"/>
@@ -3974,17 +3974,17 @@
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="770"/>
         <source>Jump to the Popup Menu</source>
-        <translation type="unfinished">Skočit do Popup menu</translation>
+        <translation>Skočit do Popup menu</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="772"/>
         <source>Jump to the DVD Chapter Menu</source>
-        <translation type="unfinished">Skočit do nabídky DVD kapitol</translation>
+        <translation>Skočit do nabídky DVD kapitol</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="774"/>
         <source>Jump to the DVD Title Menu</source>
-        <translation type="unfinished">Skočit na DVD menu titulu</translation>
+        <translation>Skočit na DVD menu titulu</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="776"/>
@@ -3999,7 +3999,7 @@
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="780"/>
         <source>Switch title</source>
-        <translation type="unfinished">Přepnout titul</translation>
+        <translation>Přepnout titul</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="782"/>
@@ -4024,7 +4024,7 @@
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="851"/>
         <source>Toggle OSD playback information</source>
-        <translation type="unfinished">Přepnout OSD informace o přehrávání</translation>
+        <translation>Přepnout OSD informace o přehrávání</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="855"/>
@@ -4034,22 +4034,22 @@
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="857"/>
         <source>3D Side by Side</source>
-        <translation type="unfinished">3D vedle sebe</translation>
+        <translation>3D vedle sebe</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="859"/>
         <source>Discard 3D Side by Side</source>
-        <translation type="unfinished">Zrušit 3D vedle sebe</translation>
+        <translation>Zrušit 3D vedle sebe</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="861"/>
         <source>3D Top and Bottom</source>
-        <translation type="unfinished">3D nahoře a dole</translation>
+        <translation>3D nahoře a dole</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="863"/>
         <source>Discard 3D Top and Bottom</source>
-        <translation type="unfinished">Zrušit 3D nahoře a dole</translation>
+        <translation>Zrušit 3D nahoře a dole</translation>
     </message>
     <message>
         <source>Save screenshot of current video frame</source>
@@ -4245,7 +4245,7 @@
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="1110"/>
         <source>Play a media resource</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="1117"/>
@@ -4290,12 +4290,12 @@
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="1142"/>
         <source>Redo</source>
-        <translation type="unfinished">Znovu</translation>
+        <translation>Znovu</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="1144"/>
         <source>Show incremental search dialog</source>
-        <translation type="unfinished">Zobrazit inkrementální vyhledávací dialog</translation>
+        <translation>Zobrazit inkrementální vyhledávací dialog</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="1147"/>
@@ -4450,7 +4450,7 @@
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="1223"/>
         <source>Display System Exit Prompt</source>
-        <translation type="unfinished">Zobrazit dialog Potvrzení ukončení</translation>
+        <translation>Zobrazit dialog Potvrzení ukončení</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/main.cpp" line="1299"/>
@@ -4530,52 +4530,52 @@
     <message>
         <location filename="../programs/mythfrontend/main.cpp" line="1335"/>
         <source>The Video Default View</source>
-        <translation type="unfinished">Výchozí zobrazení Videa</translation>
+        <translation>Výchozí zobrazení Videa</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/main.cpp" line="1337"/>
         <source>The Video Manager</source>
-        <translation type="unfinished">Video Manažer</translation>
+        <translation>Video Manažer</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/main.cpp" line="1339"/>
         <source>The Video Browser</source>
-        <translation type="unfinished">Procházení videí</translation>
+        <translation>Procházení videí</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/main.cpp" line="1341"/>
         <source>The Video Listings</source>
-        <translation type="unfinished">Zobrazení videí</translation>
+        <translation>Zobrazení videí</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/main.cpp" line="1343"/>
         <source>The Video Gallery</source>
-        <translation type="unfinished">Videa - Galerie</translation>
+        <translation>Videa - Galerie</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/main.cpp" line="1345"/>
         <source>Play an Optical Disc</source>
-        <translation type="unfinished">Přehrát optický disk</translation>
+        <translation>Přehrát optický disk</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/main.cpp" line="1348"/>
         <source>Toggle Show Widget Borders</source>
-        <translation type="unfinished">Přepnout zobrazení okrajů Widgetů</translation>
+        <translation>Přepnout zobrazení okrajů Widgetů</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/main.cpp" line="1350"/>
         <source>Toggle Show Widget Names</source>
-        <translation type="unfinished">Přepnout zobrazení názvů Widgetů</translation>
+        <translation>Přepnout zobrazení názvů Widgetů</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/main.cpp" line="1352"/>
         <source>Reset All Keys</source>
-        <translation type="unfinished">Resetovat klávesy</translation>
+        <translation>Resetovat klávesy</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/main.cpp" line="1353"/>
         <source>Reset all keys to defaults</source>
-        <translation type="unfinished">Resetovat přiřazení kláves na výchozí</translation>
+        <translation>Resetovat přiřazení kláves na výchozí</translation>
     </message>
     <message>
         <source>ScreenShot</source>
@@ -4604,7 +4604,7 @@
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="605"/>
         <source>Toggle audio upmixer</source>
-        <translation type="unfinished">Přepnout upmixer zvuku</translation>
+        <translation>Přepnout upmixer zvuku</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="1134"/>
@@ -4694,12 +4694,12 @@
     <message>
         <location filename="../programs/mythfrontend/main.cpp" line="1366"/>
         <source>Play selected item in alternate player</source>
-        <translation type="unfinished">Přehrát vybranou položku alternativním přehrávačem</translation>
+        <translation>Přehrát vybranou položku alternativním přehrávačem</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/main.cpp" line="1368"/>
         <source>Open video filter dialog</source>
-        <translation type="unfinished">Otevřít dialog filtrování videa</translation>
+        <translation>Otevřít dialog filtrování videa</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/main.cpp" line="1370"/>
@@ -4709,27 +4709,27 @@
     <message>
         <location filename="../programs/mythfrontend/main.cpp" line="1372"/>
         <source>Increase Parental Level</source>
-        <translation type="unfinished">Zvýšit rodičovskou úrověň</translation>
+        <translation>Zvýšit rodičovskou úrověň</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/main.cpp" line="1374"/>
         <source>Decrease Parental Level</source>
-        <translation type="unfinished">Snížit rodičovskou úrověň</translation>
+        <translation>Snížit rodičovskou úrověň</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/main.cpp" line="1376"/>
         <source>Show Incremental Search Dialog</source>
-        <translation type="unfinished">Zobrazit inkrementální vyhledávací dialog</translation>
+        <translation>Zobrazit inkrementální vyhledávací dialog</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/main.cpp" line="1378"/>
         <source>Download metadata for current item</source>
-        <translation type="unfinished">Stahnout metadatel pro aktuální záznam</translation>
+        <translation>Stahnout metadatel pro aktuální záznam</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/main.cpp" line="1380"/>
         <source>Display Item Detail Popup</source>
-        <translation type="unfinished">ZObrazit detailní popup položky</translation>
+        <translation>ZObrazit detailní popup položky</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/main.cpp" line="1382"/>
@@ -4748,7 +4748,7 @@
     <message>
         <location filename="../programs/mythfrontend/main.cpp" line="1458"/>
         <source>MythDVD DVD Media Handler</source>
-        <translation type="unfinished">MythDVD obsluha médií DVD</translation>
+        <translation>MythDVD obsluha médií DVD</translation>
     </message>
     <message>
         <source>Play a VCD</source>
@@ -4855,7 +4855,7 @@
     <message>
         <location filename="../libs/libmythtv/mythsystemevent.cpp" line="383"/>
         <source>Playback program changed</source>
-        <translation type="unfinished">Program přehrávání změněn</translation>
+        <translation>Program přehrávání změněn</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mythsystemevent.cpp" line="384"/>
@@ -4915,7 +4915,7 @@
     <message>
         <location filename="../libs/libmythtv/mythsystemevent.cpp" line="395"/>
         <source>Screen created or destroyed</source>
-        <translation type="unfinished">Obrazovka vytvořena nebo zrušena</translation>
+        <translation>Obrazovka vytvořena nebo zrušena</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mythsystemevent.cpp" line="396"/>
@@ -5176,7 +5176,7 @@ Větev: %2
     <message>
         <location filename="../libs/libmythtv/channelscan/paneatsc.h" line="42"/>
         <source>Scanning Range</source>
-        <translation type="unfinished">Rozsah vyhledávání</translation>
+        <translation>Rozsah vyhledávání</translation>
     </message>
 </context>
 <context>
@@ -5854,13 +5854,13 @@ Jste si jisti že chcete smazat:</translation>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2242"/>
         <source>Cannot delete
 </source>
-        <translation type="unfinished">Nemožno smazat</translation>
+        <translation>Nemožno smazat</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2223"/>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2238"/>
         <source>This recording is already being deleted</source>
-        <translation type="unfinished">Tato nahrávka již byla smazána</translation>
+        <translation>Tato nahrávka již byla smazána</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2353"/>
@@ -5870,12 +5870,12 @@ Jste si jisti že chcete smazat:</translation>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2574"/>
         <source>Yes, delete it and the remaining %1 list items</source>
-        <translation type="unfinished">Ano, smazat toto a zbývajících %1 položek seznamu</translation>
+        <translation>Ano, smazat toto a zbývajících %1 položek seznamu</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2596"/>
         <source>No, and keep the remaining %1 list items</source>
-        <translation type="unfinished">Ne, zachovat zbývajících %1 položek seznamu</translation>
+        <translation>Ne, zachovat zbývajících %1 položek seznamu</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2633"/>
@@ -6036,7 +6036,7 @@ Jste si jisti že chcete smazat:</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="645"/>
         <source>Deblocking filter</source>
-        <translation type="unfinished">Deblocking filter</translation>
+        <translation>Deblocking filter</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="646"/>
@@ -6071,12 +6071,12 @@ Jste si jisti že chcete smazat:</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="664"/>
         <source>When unchecked the deblocking loopfilter will be disabled </source>
-        <translation type="unfinished">Pokud nezvoleno, &quot;deblocking loopfilter&quot; bude vypnut </translation>
+        <translation>Pokud nezvoleno, &quot;deblocking loopfilter&quot; bude vypnut </translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="665"/>
         <source>Disabling will significantly reduce the load on the CPU when watching HD H.264 but may significantly reduce video quality.</source>
-        <translation type="unfinished">Vypnutí výrazně sníží zatížení CPU při přehrávání HD H.264 videa, může ale výrazně snížit kvalitu obrazu.</translation>
+        <translation>Vypnutí výrazně sníží zatížení CPU při přehrávání HD H.264 videa, může ale výrazně snížit kvalitu obrazu.</translation>
     </message>
 </context>
 <context>
@@ -6099,7 +6099,7 @@ Jste si jisti že chcete smazat:</translation>
     <message>
         <location filename="../programs/mythfrontend/videoplayersettings.cpp" line="101"/>
         <source>This path is the location your operating system mounts Blu-ray discs.</source>
-        <translation type="unfinished">Tato cesta je lokace, kam Váš operační systém připojuje Blu-ray disky.</translation>
+        <translation>Tato cesta je lokace, kam Váš operační systém připojuje Blu-ray disky.</translation>
     </message>
     <message>
         <source>This can be any command to launch a VCD player. The Internal player will not play VCDs. %d will be substituted for the VCD device (e.g. /dev/cdrom).</source>
@@ -6117,7 +6117,7 @@ Jste si jisti že chcete smazat:</translation>
     <message>
         <location filename="../programs/mythfrontend/videoplayersettings.cpp" line="108"/>
         <source>Some Blu-ray discs require that a player region be explicitly set. Only change the value from &apos;No Region&apos; if you encounter a disc which fails to play citing a region mismatch.</source>
-        <translation type="unfinished">Některé Blu-ray disky vyžadují explicitní nastavení regionu přehrávače. Změňte hodnotu z &quot;Bez regionu&quot; pouze pokud některý z disků nejde přehrát s chybou rozdílných regionů.</translation>
+        <translation>Některé Blu-ray disky vyžadují explicitní nastavení regionu přehrávače. Změňte hodnotu z &quot;Bez regionu&quot; pouze pokud některý z disků nejde přehrát s chybou rozdílných regionů.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/videoplayersettings.cpp" line="112"/>
@@ -6657,7 +6657,7 @@ Jste si jisti že chcete smazat:</translation>
         <location filename="../programs/mythfrontend/proglist.cpp" line="161"/>
         <source>Rule Search</source>
         <translatorcomment>bylo by dobré najít kde se tohle nachází a doladit</translatorcomment>
-        <translation type="unfinished">Vyhledávání pravidlem</translation>
+        <translation>Vyhledávání pravidlem</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/proglist.cpp" line="162"/>
@@ -6693,7 +6693,7 @@ Jste si jisti že chcete smazat:</translation>
     <message>
         <location filename="../programs/mythfrontend/proglist.cpp" line="468"/>
         <source>Start search from date and time</source>
-        <translation type="unfinished">Spustit vyhledávání od data a času</translation>
+        <translation>Spustit vyhledávání od data a času</translation>
     </message>
     <message numerus="yes">
         <location filename="../programs/mythfrontend/proglist.cpp" line="940"/>
@@ -6827,7 +6827,7 @@ Jste si jisti že chcete smazat:</translation>
         <location filename="../programs/mythfrontend/proglist.cpp" line="1358"/>
         <source>^(The |A |An )</source>
         <comment>Regular Expression for what to ignore when sorting</comment>
-        <translation type="unfinished">^(The |A |An )</translation>
+        <translation>^(The |A |An )</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/proglist.cpp" line="1527"/>
@@ -7362,7 +7362,7 @@ Jste si jisti že chcete smazat:</translation>
     <message>
         <location filename="../libs/libmythtv/channelsettings.cpp" line="547"/>
         <source>Channel Options - Raw Transport Stream</source>
-        <translation type="unfinished">Možnosti stanic - Raw Transport Stream</translation>
+        <translation>Možnosti stanic - Raw Transport Stream</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="4868"/>
@@ -7718,7 +7718,7 @@ Většina DVB-C transportů je přenášena rychlostí 6.9 nebo 6.875 milionu sy
     <message>
         <location filename="../libs/libmythmetadata/globals.cpp" line="22"/>
         <source>NR</source>
-        <translation type="unfinished">NR</translation>
+        <translation>NR</translation>
     </message>
     <message>
         <location filename="../libs/libmythmetadata/globals.cpp" line="23"/>
@@ -7849,12 +7849,12 @@ Většina DVB-C transportů je přenášena rychlostí 6.9 nebo 6.875 milionu sy
     <message>
         <location filename="../libs/libmythtv/deletemap.cpp" line="64"/>
         <source>(Nothing to undo)</source>
-        <translation type="unfinished">(Nejde zpět)</translation>
+        <translation>(Nejde zpět)</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/deletemap.cpp" line="70"/>
         <source>(Nothing to redo)</source>
-        <translation type="unfinished">(Nejde v před)</translation>
+        <translation>(Nejde v před)</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/deletemap.cpp" line="82"/>
@@ -8777,7 +8777,7 @@ Chcete pokračovat ve sledování?</translation>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="1016"/>
         <source>Record Full TS?</source>
-        <translation type="unfinished">Nahrát celý TS?</translation>
+        <translation>Nahrát celý TS?</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="1018"/>
@@ -9265,17 +9265,17 @@ Chcete pokračovat ve sledování?</translation>
     <message>
         <location filename="../programs/mythfrontend/audiogeneralsettings.cpp" line="769"/>
         <source>Surround Left</source>
-        <translation type="unfinished">Levý surround</translation>
+        <translation>Levý surround</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/audiogeneralsettings.cpp" line="773"/>
         <source>Surround Right</source>
-        <translation type="unfinished">Pravý surround</translation>
+        <translation>Pravý surround</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/audiogeneralsettings.cpp" line="762"/>
         <source>LFE</source>
-        <translation type="unfinished">LFE</translation>
+        <translation>LFE</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/audiogeneralsettings.cpp" line="439"/>
@@ -9345,7 +9345,7 @@ Chcete pokračovat ve sledování?</translation>
     <message>
         <location filename="../programs/mythfrontend/audiogeneralsettings.cpp" line="1116"/>
         <source>Use a distinct digital output device from default. (default is not checked)</source>
-        <translation type="unfinished">Použít odlišné digitální výstupní zařízení než je výchozí. (výchozí není vybráno)</translation>
+        <translation>Použít odlišné digitální výstupní zařízení než je výchozí. (výchozí není vybráno)</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/audiogeneralsettings.cpp" line="1137"/>
@@ -9355,17 +9355,17 @@ Chcete pokračovat ve sledování?</translation>
     <message>
         <location filename="../programs/mythfrontend/audiogeneralsettings.cpp" line="1148"/>
         <source>ALSA only. By default, let ALSA determine the passthrough sampling rate. If checked set the sampling rate to 48kHz for passthrough. (default is not checked)</source>
-        <translation type="unfinished">Pouze ALSA. Standardně ALSA rozhodne o vzorkovací frekvenci pro přímý průchod. Pokud nastaveno, vzorkovací frekvence bude 48kHz. (výchozí nenastaveno)</translation>
+        <translation>Pouze ALSA. Standardně ALSA rozhodne o vzorkovací frekvenci pro přímý průchod. Pokud nastaveno, vzorkovací frekvence bude 48kHz. (výchozí nenastaveno)</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/audiogeneralsettings.cpp" line="1158"/>
         <source>HBR passthrough support</source>
-        <translation type="unfinished">Podpora přímého průchodu HBR</translation>
+        <translation>Podpora přímého průchodu HBR</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/audiogeneralsettings.cpp" line="1160"/>
         <source>HBR support is required for TrueHD and DTS-HD passthrough. If unchecked, Myth will limit the passthrough bitrate to 6.144Mbit/s.This will disable True-HD passthrough, however will allow DTS-HD content to be sent as DTS-HD Hi-Res. (default is checked)</source>
-        <translation type="unfinished">Podpora HBR je vyžadována pro TrueHD a DTS-HD přímý průchod. Pokud nenastaveno, Myth bude limitovat bitrate na 6.144Mbit/s. Toto zakáže True-HD prostup, ale umožní zasílání DTS-HD obsah jako DTS-HD Hi Res. (výchozí je nastaveno)</translation>
+        <translation>Podpora HBR je vyžadována pro TrueHD a DTS-HD přímý průchod. Pokud nenastaveno, Myth bude limitovat bitrate na 6.144Mbit/s. Toto zakáže True-HD prostup, ale umožní zasílání DTS-HD obsah jako DTS-HD Hi Res. (výchozí je nastaveno)</translation>
     </message>
     <message>
         <source>MythTV can control the PCM and master mixer volume.  If you prefer to use an external mixer program, then disable this option.</source>
@@ -9547,7 +9547,7 @@ Chcete pokračovat ve sledování?</translation>
     <message>
         <location filename="../programs/mythfrontend/videofilter.cpp" line="824"/>
         <source>Date Added</source>
-        <translation type="unfinished">Datum přidání</translation>
+        <translation>Datum přidání</translation>
     </message>
     <message>
         <source>Automatically Skip Commercials</source>
@@ -10540,7 +10540,7 @@ Chcete pokračovat ve sledování?</translation>
         <location filename="../libs/libmyth/programtypes.cpp" line="86"/>
         <source>t</source>
         <comment>RecStatusChar rsTuning</comment>
-        <translation type="unfinished"></translation>
+        <translation>t</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programtypes.cpp" line="107"/>
@@ -10558,7 +10558,7 @@ Chcete pokračovat ve sledování?</translation>
         <location filename="../libs/libmyth/programtypes.cpp" line="113"/>
         <source>m</source>
         <comment>RecStatusChar rsMissedFuture</comment>
-        <translation type="unfinished"></translation>
+        <translation>m</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programtypes.cpp" line="137"/>
@@ -10590,7 +10590,7 @@ Chcete pokračovat ve sledování?</translation>
     <message>
         <location filename="../libs/libmyth/programtypes.cpp" line="186"/>
         <source>Missed Future</source>
-        <translatorcomment>Internal use, Doesn&apos;t need to be translated...</translatorcomment>
+        <translatorcomment>Internal use, It does not need to be translated.</translatorcomment>
         <translation>Missed Future</translation>
     </message>
     <message>
@@ -11523,13 +11523,13 @@ Chcete pokračovat ve sledování?</translation>
         <location filename="../libs/libmythtv/avformatdecoder.cpp" line="3575"/>
         <source> (Audio Description)</source>
         <comment>Audio described for the visually impaired</comment>
-        <translation type="unfinished">(Popiska Zvuku)</translation>
+        <translation>(Popiska Zvuku)</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/avformatdecoder.cpp" line="3579"/>
         <source> (Commentary)</source>
         <comment>Audio commentary track</comment>
-        <translation type="unfinished">(Komentář)</translation>
+        <translation>(Komentář)</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/avformatdecoder.cpp" line="3616"/>
@@ -12809,7 +12809,7 @@ Chcete pokračovat ve sledování?</translation>
     <message>
         <location filename="../libs/libmythtv/signalmonitor.cpp" line="201"/>
         <source>Script Status</source>
-        <translation type="unfinished">Stav skriptu</translation>
+        <translation>Stav skriptu</translation>
     </message>
     <message>
         <source>Error: channel change failed</source>
@@ -13039,47 +13039,47 @@ Většina DVB-S vysílačů přenáší rychlostí 27,5 milionu symbolů za seku
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1107"/>
         <source>VDA High Quality</source>
         <comment>Sample: VDA high quality</comment>
-        <translation type="unfinished">VDA vysoká kvalita</translation>
+        <translation>VDA vysoká kvalita</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1119"/>
         <source>VDA Normal</source>
         <comment>Sample: VDA average quality</comment>
-        <translation type="unfinished">VDA normální</translation>
+        <translation>VDA normální</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1131"/>
         <source>VDA Slim</source>
         <comment>Sample: VDA low power GPU</comment>
-        <translation type="unfinished">VDA GPU s nizkým výkonem</translation>
+        <translation>VDA GPU s nizkým výkonem</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1147"/>
         <source>OpenGL High Quality</source>
         <comment>Sample: OpenGL high quality</comment>
-        <translation type="unfinished">OpenGL vysoká kvalita</translation>
+        <translation>OpenGL vysoká kvalita</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1155"/>
         <source>OpenGL Normal</source>
         <comment>Sample: OpenGL average quality</comment>
-        <translation type="unfinished">OpenGL normální kvalita</translation>
+        <translation>OpenGL normální kvalita</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1163"/>
         <source>OpenGL Slim</source>
         <comment>Sample: OpenGL low power GPU</comment>
-        <translation type="unfinished">OpenGL GPU s nízkým výkonem</translation>
+        <translation>OpenGL GPU s nízkým výkonem</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1333"/>
         <source>This deinterlacer attempts to synchronize with interlaced displays whose size and refresh rate exactly match the video source. It has low CPU requirements.</source>
-        <translation type="unfinished">Tento deinterlacer se pokouší synchronizovat s prokládaným displejem, jehož rozlišení a obnovovací frekvence přesně odpovídá zdroji obrazu. Má nízké nároky na procesor.</translation>
+        <translation>Tento deinterlacer se pokouší synchronizovat s prokládaným displejem, jehož rozlišení a obnovovací frekvence přesně odpovídá zdroji obrazu. Má nízké nároky na procesor.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1426"/>
         <source>Render the OSD using the XVideo chromakey feature.This renderer does not alpha blend but is the fastest OSD renderer for XVideo.</source>
-        <translation type="unfinished">Vykreslovat OSD s využitím XVideo chromakey. Tento vykreslovač nedělá alpha blend ale je to nejrychlejší vykreslovač OSD pro XVideo.</translation>
+        <translation>Vykreslovat OSD s využitím XVideo chromakey. Tento vykreslovač nedělá alpha blend ale je to nejrychlejší vykreslovač OSD pro XVideo.</translation>
     </message>
     <message>
         <source>Interlaced (2x, Hw)</source>
@@ -13193,7 +13193,7 @@ Většina DVB-S vysílačů přenáší rychlostí 27,5 milionu symbolů za seku
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1259"/>
         <source>This video renderer uses VAAPI for video decoding and OpenGL for scaling and color conversion.</source>
-        <translation type="unfinished">Tento vykreslovač videa použije VAAPI pro dekódování a OpenGL pro škálování a konverzi barev.</translation>
+        <translation>Tento vykreslovač videa použije VAAPI pro dekódování a OpenGL pro škálování a konverzi barev.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1300"/>
@@ -13448,7 +13448,7 @@ Většina DVB-S vysílačů přenáší rychlostí 27,5 milionu symbolů za seku
         <source>You MUST run &apos;mythfilldatabase --manual&apos; the first time,
 instead of just &apos;mythfilldatabase&apos;.
 Your grabber does not provide channel numbers, so you have to set them manually.</source>
-        <translation type="unfinished">Poprvé musíte spustit &quot;mythfilldabase --manual&quot;,
+        <translation>Poprvé musíte spustit &quot;mythfilldabase --manual&quot;,
 místo pouze &quot;mythfilldatabase&quot;.
 Váš grabber neposkytuje čísla stanic, musíte je nastavit manuálně.</translation>
     </message>
@@ -13578,12 +13578,12 @@ Váš grabber neposkytuje čísla stanic, musíte je nastavit manuálně.</trans
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="1160"/>
         <source>Motorola Generic</source>
-        <translation type="unfinished">Motorola obecný</translation>
+        <translation>Motorola obecný</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="1161"/>
         <source>SA/Cisco Generic</source>
-        <translation type="unfinished">SA/Cisco obecný</translation>
+        <translation>SA/Cisco obecný</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="1284"/>
@@ -14379,12 +14379,12 @@ nesmí být prázdné.</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2291"/>
         <source>Qt</source>
-        <translation type="unfinished">Qt</translation>
+        <translation>Qt</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2294"/>
         <source>OpenGL</source>
-        <translation type="unfinished">OpenGL</translation>
+        <translation>OpenGL</translation>
     </message>
     <message>
         <source>Menu Theme</source>
@@ -14863,7 +14863,7 @@ Překontrolujte zda video existuje</translation>
         <location filename="../libs/libmythmetadata/videometadata.cpp" line="1092"/>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="378"/>
         <source>^(The |A |An )</source>
-        <translation type="unfinished">^(The |A |An )</translation>
+        <translation>^(The |A |An )</translation>
     </message>
     <message>
         <source>, using your %1 rate of %2 Kb/sec</source>
@@ -15235,7 +15235,7 @@ Překontrolujte zda video existuje</translation>
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="194"/>
         <source>Balanced percent free space</source>
-        <translation type="unfinished">Balancovat volné místo procentuelně</translation>
+        <translation>Balancovat volné místo procentuelně</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="195"/>
@@ -15284,72 +15284,72 @@ Překontrolujte zda video existuje</translation>
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="728"/>
         <source>If enabled, the master backend will include the list of recorded shows in the list of videos.  This is mainly to accommodate UPnP players which do not allow more than 1 video section.</source>
-        <translation type="unfinished">Pokud povoleno, Hlavní backend zahrne nahrané programy do seznamu videí. Toto je určeno hlavně pro UPnP přehrávače nepodporující více než 1 video sekci.</translation>
+        <translation>Pokud povoleno, Hlavní backend zahrne nahrané programy do seznamu videí. Toto je určeno hlavně pro UPnP přehrávače nepodporující více než 1 video sekci.</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="743"/>
         <source>Which tree to show a Windows Media Player client when it requests a list of videos.</source>
-        <translation type="unfinished">Který strom ukázat Window Media Playeru, když vyžaduje seznam videí.</translation>
+        <translation>Který strom ukázat Window Media Playeru, když vyžaduje seznam videí.</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="751"/>
         <source>Automatically update program listings</source>
-        <translation type="unfinished">Automaticky aktualizovat programové informace</translation>
+        <translation>Automaticky aktualizovat programové informace</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="753"/>
         <source>If enabled, the guide data program will be run automatically.</source>
-        <translation type="unfinished">Pokud povoleno, program čtení programových informací (EPG) bude spuštěn automaticky.</translation>
+        <translation>Pokud povoleno, program čtení programových informací (EPG) bude spuštěn automaticky.</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="761"/>
         <source>Guide data program execution start</source>
-        <translation type="unfinished">Start programu čtení EPG</translation>
+        <translation>Start programu čtení EPG</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="763"/>
         <source>This setting and the following one define a time period when the guide data program is allowed to run. For example, setting start to 11 and end to 13 would mean that the program would only run between 11:00 AM and 1:59 PM.</source>
-        <translation type="unfinished">Toto a následující nastavení definuje periodu kdy je povoleno spuštění programu pro řčtení programových informací. Např. nastavení startu na 11 a konce na 13 povolí běh progtramu mezi 11:00 a 13:59.</translation>
+        <translation>Toto a následující nastavení definuje periodu kdy je povoleno spuštění programu pro řčtení programových informací. Např. nastavení startu na 11 a konce na 13 povolí běh progtramu mezi 11:00 a 13:59.</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="774"/>
         <source>Guide data program execution end</source>
-        <translation type="unfinished">Ukončení programu čtení EPG</translation>
+        <translation>Ukončení programu čtení EPG</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="776"/>
         <source>This setting and the preceding one define a time period when the guide data program is allowed to run. For example, setting start to 11 and end to 13 would mean that the program would only run between 11:00 AM and 1:59 PM.</source>
-        <translation type="unfinished">Toto a předchozí nastavení definuje periodu kdy je povoleno spuštění programu pro řčtení programových informací. Např. nastavení startu na 11 a konce na 13 povolí běh progtramu mezi 11:00 a 13:59.</translation>
+        <translation>Toto a předchozí nastavení definuje periodu kdy je povoleno spuštění programu pro řčtení programových informací. Např. nastavení startu na 11 a konce na 13 povolí běh progtramu mezi 11:00 a 13:59.</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="787"/>
         <source>Run guide data program at time suggested by the grabber.</source>
-        <translation type="unfinished">Spustit program čtení EPG na základě doporučení grabberu.</translation>
+        <translation>Spustit program čtení EPG na základě doporučení grabberu.</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="790"/>
         <source>If enabled, allow a DataDirect guide data provider to specify the next download time in order to distribute load on their servers. Guide data program execution start/end times are also ignored.</source>
-        <translation type="unfinished">Pokud povoleno, umožní poskytovateli DataDirect nastavi čas následujícího spuštění pro distribuci zátěže jejich serverů. V tom případě jsou nastavení startu a konce čtení EPG ignorovány.</translation>
+        <translation>Pokud povoleno, umožní poskytovateli DataDirect nastavi čas následujícího spuštění pro distribuci zátěže jejich serverů. V tom případě jsou nastavení startu a konce čtení EPG ignorovány.</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="800"/>
         <source>Guide data program</source>
-        <translation type="unfinished">Program čtení EPG</translation>
+        <translation>Program čtení EPG</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="812"/>
         <source>Guide data arguments</source>
-        <translation type="unfinished">Argumenty čtení EPG</translation>
+        <translation>Argumenty čtení EPG</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="814"/>
         <source>Any arguments you want passed to the guide data program.</source>
-        <translation type="unfinished">Jakékoli argumenty které chcete předávat programu čtení EPG.</translation>
+        <translation>Jakékoli argumenty které chcete předávat programu čtení EPG.</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="825"/>
         <source>Program Schedule Downloading Options</source>
-        <translation type="unfinished">Možnosti stahování programových informací</translation>
+        <translation>Možnosti stahování programových informací</translation>
     </message>
     <message>
         <source>Used if the XMLTV data comes from a different time zone than your own. This adjusts the times in the XMLTV EPG data to compensate. &apos;Auto&apos; converts the XMLTV time to local time using your computer&apos;s time zone. &apos;None&apos; ignores the XMLTV time zone, interpreting times as local.</source>
@@ -15378,7 +15378,7 @@ Překontrolujte zda video existuje</translation>
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="345"/>
         <source>If enabled, the master backend will stream and delete files if it finds them in a storage directory. Useful if you are using a central storage location, like a NFS share, and your slave backend isn&apos;t running.</source>
-        <translation type="unfinished">Pokud je aktivováno, &quot;Hlavní backend&quot; bude streamovat a mazat soubory, pokud je nalezne v datovém úložišti. Vhodné pokud používáte centrální úložiště, jako &quot;NFS share&quot; a &quot;pomocný backend&quot; neběží.</translation>
+        <translation>Pokud je aktivováno, &quot;Hlavní backend&quot; bude streamovat a mazat soubory, pokud je nalezne v datovém úložišti. Vhodné pokud používáte centrální úložiště, jako &quot;NFS share&quot; a &quot;pomocný backend&quot; neběží.</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="355"/>
@@ -15562,7 +15562,7 @@ Překontrolujte zda video existuje</translation>
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="653"/>
         <source>Allow metadata lookup jobs</source>
-        <translation type="unfinished">Povolit úlohy vyhledávání metadat</translation>
+        <translation>Povolit úlohy vyhledávání metadat</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="663"/>
@@ -15642,7 +15642,7 @@ Překontrolujte zda video existuje</translation>
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="739"/>
         <source>Video content to show a WMP client</source>
-        <translation type="unfinished">Obsah videa pro zobrazení klientům WMP</translation>
+        <translation>Obsah videa pro zobrazení klientům WMP</translation>
     </message>
     <message>
         <source>This forces us to show WMP clients  either the Recordings tree or the Video tree when  they request a list of videos </source>
@@ -16108,12 +16108,12 @@ Většina DVB-S vysílačů přenáší rychlostí 27,5 milionu symbolů za seku
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1239"/>
         <source>This video renderer uses OpenGL for scaling and color conversion with full picture controls. The GPU can be used for deinterlacing. This requires a faster GPU than XVideo.</source>
-        <translation type="unfinished">Tento zobrazovač využívá OpenGL pro škálování a barevnou konverzi. GPU může být použito pro deinterlaci. Vyžaduje ruchlejší GPU než XVideo.</translation>
+        <translation>Tento zobrazovač využívá OpenGL pro škálování a barevnou konverzi. GPU může být použito pro deinterlaci. Vyžaduje ruchlejší GPU než XVideo.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1246"/>
         <source>This video renderer uses OpenGL for scaling and color conversion. It uses faster OpenGL functionality when available but at the expense of picture controls and GPU based deinterlacing.</source>
-        <translation type="unfinished">Tento zobrazovač využívá OpenGL pro škálování a barevnou konverzi. Používá rychlejší OpenGL funkcionality pokud je k dispozici, je to ale za cenu ztrátu kontroly obrazu a deinterlace s pomocí GPU.</translation>
+        <translation>Tento zobrazovač využívá OpenGL pro škálování a barevnou konverzi. Používá rychlejší OpenGL funkcionality pokud je k dispozici, je to ale za cenu ztrátu kontroly obrazu a deinterlace s pomocí GPU.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1295"/>
@@ -16164,22 +16164,22 @@ Většina DVB-S vysílačů přenáší rychlostí 27,5 milionu symbolů za seku
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="2823"/>
         <source>Schedule order</source>
-        <translation type="unfinished">Řazení plánování</translation>
+        <translation>Řazení plánování</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="2825"/>
         <source>If priorities and other factors are equal the scheduler will choose the available input with the lowest, non-zero value.  Setting this value to zero will make the input unavailable to the scheduler.</source>
-        <translation type="unfinished">Pokud jsou priority a další faktory stejné, plánovač použije vstup s nejnižší, nenulovou hodnotou. Nastavení hodnoty na nulu, způsobí nedostupnost vstupu pro plánovač.</translation>
+        <translation>Pokud jsou priority a další faktory stejné, plánovač použije vstup s nejnižší, nenulovou hodnotou. Nastavení hodnoty na nulu, způsobí nedostupnost vstupu pro plánovač.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="2840"/>
         <source>Live TV order</source>
-        <translation type="unfinished">Řazení LiveTV</translation>
+        <translation>Řazení LiveTV</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="2842"/>
         <source>When entering Live TV, the available, local input with the lowest, non-zero value will be used.  If no local inputs are available, the available, remote input with the lowest, non-zero value will be used.  Setting this value to zero will make the input unavailable to live TV.</source>
-        <translation type="unfinished">Při spuštění LiveTV, lokální dostupný vstup s nejnižší, nenulovou hodnotou bude použit. Pokud nejsou dostupné lokální vstupy, dostupný vzdálený vstup s nejnižší, nenulovou hodnotou bude použit. Nastavení hodnoty na nula učiní vstup nedostupný pro LiveTV.</translation>
+        <translation>Při spuštění LiveTV, lokální dostupný vstup s nejnižší, nenulovou hodnotou bude použit. Pokud nejsou dostupné lokální vstupy, dostupný vzdálený vstup s nejnižší, nenulovou hodnotou bude použit. Nastavení hodnoty na nula učiní vstup nedostupný pro LiveTV.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="2859"/>
@@ -16539,12 +16539,12 @@ Budete muset použít vysouvací tlačítko.</translation>
     <message>
         <location filename="../libs/libmythtv/mythplayer.cpp" line="1561"/>
         <source>Forced Subtitles On</source>
-        <translation type="unfinished">Vynucene titulky zapnuté</translation>
+        <translation>Vynucene titulky zapnuté</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mythplayer.cpp" line="1562"/>
         <source>Forced Subtitles Off</source>
-        <translation type="unfinished">Vynucené titulky vypnuté</translation>
+        <translation>Vynucené titulky vypnuté</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mythplayer.cpp" line="1784"/>
@@ -16595,45 +16595,45 @@ Budete muset použít vysouvací tlačítko.</translation>
     <message>
         <location filename="../libs/libmythtv/mythplayer.cpp" line="3805"/>
         <source>Using previously auto-saved cuts</source>
-        <translation type="unfinished">Využívám dříve automaticky uložené střihy</translation>
+        <translation>Využívám dříve automaticky uložené střihy</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mythplayer.cpp" line="3929"/>
         <location filename="../libs/libmythtv/mythplayer.cpp" line="3967"/>
         <source>New cut added.</source>
-        <translation type="unfinished">Přidán nový střih</translation>
+        <translation>Přidán nový střih.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mythplayer.cpp" line="3971"/>
         <location filename="../libs/libmythtv/tv_play.cpp" line="9465"/>
         <source>Undo</source>
-        <translation type="unfinished">Zpět</translation>
+        <translation>Zpět</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mythplayer.cpp" line="3976"/>
         <location filename="../libs/libmythtv/tv_play.cpp" line="9469"/>
         <source>Redo</source>
-        <translation type="unfinished">Znovu</translation>
+        <translation>Znovu</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mythplayer.cpp" line="4974"/>
         <source>Enabled Studio Levels</source>
-        <translation type="unfinished">Povolit studiové úrovně</translation>
+        <translation>Povolit studiové úrovně</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mythplayer.cpp" line="4975"/>
         <source>Disabled Studio Levels</source>
-        <translation type="unfinished">Vypnout studiové úrovně</translation>
+        <translation>Vypnout studiové úrovně</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mythplayer.cpp" line="4999"/>
         <source>Enabled Night Mode</source>
-        <translation type="unfinished">Povolit noční mód</translation>
+        <translation>Povolit noční mód</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mythplayer.cpp" line="5005"/>
         <source>Disabled Night Mode</source>
-        <translation type="unfinished">Vypnout noční mód</translation>
+        <translation>Vypnout noční mód</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="4529"/>
@@ -17024,23 +17024,23 @@ Budete muset použít vysouvací tlačítko.</translation>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="1608"/>
         <source>HTTP Streaming</source>
-        <translation type="unfinished">Streamování HTTP</translation>
+        <translation>Streamování HTTP</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="1612"/>
         <source>RTSP Streaming</source>
-        <translation type="unfinished">Streamování RTSP</translation>
+        <translation>Streamování RTSP</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="1616"/>
         <source>Blu-ray Disc</source>
-        <translation type="unfinished">Blu-ray Disc</translation>
+        <translation>Blu-ray Disc</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="1621"/>
         <source>Recording</source>
         <comment>Recorded file, object not action</comment>
-        <translation type="unfinished">Nahrávka</translation>
+        <translation>Nahrávka</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2742"/>
@@ -17311,17 +17311,17 @@ Chcete pokračovat ve sledování?</translation>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="644"/>
         <source>VAAPI acceleration</source>
-        <translation type="unfinished">Akcelerace VAAPI</translation>
+        <translation>Akcelerace VAAPI</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="645"/>
         <source>Windows hardware acceleration</source>
-        <translation type="unfinished">Hardwarová akcelerace Windows</translation>
+        <translation>Hardwarová akcelerace Windows</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="660"/>
         <source>Processing method used to decode video.</source>
-        <translation type="unfinished">Metoda použítá k dekódování videa.</translation>
+        <translation>Metoda použítá k dekódování videa.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="676"/>
@@ -17472,17 +17472,17 @@ Chcete pokračovat ve sledování?</translation>
     <message>
         <location filename="../programs/mythcommflag/ClassicCommDetector.cpp" line="297"/>
         <source>Building Head Start Buffer</source>
-        <translation type="unfinished">Vytvářím hlavní startovací buffer</translation>
+        <translation>Vytvářím hlavní startovací buffer</translation>
     </message>
     <message>
         <location filename="../programs/mythcommflag/ClassicCommDetector.cpp" line="322"/>
         <source>Building Logo Detection Buffer</source>
-        <translation type="unfinished">Vytvářím buffer detekce loga</translation>
+        <translation>Vytvářím buffer detekce loga</translation>
     </message>
     <message>
         <location filename="../programs/mythcommflag/ClassicCommDetector.cpp" line="352"/>
         <source>Searching for Logo</source>
-        <translation type="unfinished">Vyhledávám logo</translation>
+        <translation>Vyhledávám logo</translation>
     </message>
     <message>
         <location filename="../programs/mythcommflag/ClassicCommDetector.cpp" line="525"/>
@@ -17576,12 +17576,12 @@ Chcete pokračovat ve sledování?</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="368"/>
         <source>Time to retain deleted recordings (days)</source>
-        <translation type="unfinished">Doba uchování smazaných nahrávek (dny)</translation>
+        <translation>Doba uchování smazaných nahrávek (dny)</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="369"/>
         <source>Determines the maximum number of days before undeleting a recording will become impossible. A value of zero means the recording will be permanently deleted between 5 and 20 minutes later. A value of minus one means recordings will be retained until space is required. A recording will always be removed before this time if the space is needed for a new recording.</source>
-        <translation type="unfinished">Určuje maximální počed dní než je obnova smazané nahrávky nemožná. Nulová hodnota znamená, že nahrávka bude trvale smazána zai 5 až 20 minut. Negativní hodnota znamená uchování nahrávky dokud nebude potřeba místo. Nahrávka bude odstraněna vždy, pokud je potřeba místo pro novou nahrávku.</translation>
+        <translation>Určuje maximální počed dní než je obnova smazané nahrávky nemožná. Nulová hodnota znamená, že nahrávka bude trvale smazána zai 5 až 20 minut. Negativní hodnota znamená uchování nahrávky dokud nebude potřeba místo. Nahrávka bude odstraněna vždy, pokud je potřeba místo pro novou nahrávku.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="530"/>
@@ -17742,7 +17742,7 @@ Chcete pokračovat ve sledování?</translation>
         <location filename="../programs/mythfrontend/audiogeneralsettings.cpp" line="225"/>
         <location filename="../programs/mythfrontend/audiogeneralsettings.cpp" line="710"/>
         <source> is invalid or not useable.</source>
-        <translation type="unfinished">je neplatné nebo nepoužitelné.</translation>
+        <translation>je neplatné nebo nepoužitelné.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/audiogeneralsettings.cpp" line="227"/>
@@ -17750,7 +17750,7 @@ Chcete pokračovat ve sledování?</translation>
         <location filename="../programs/mythfrontend/audiogeneralsettings.cpp" line="713"/>
         <location filename="../programs/mythfrontend/audiogeneralsettings.cpp" line="872"/>
         <source>Warning</source>
-        <translation type="unfinished">Varování</translation>
+        <translation>Varování</translation>
     </message>
     <message>
         <source>No digital passthrough</source>
@@ -17800,7 +17800,7 @@ Chcete pokračovat ve sledování?</translation>
     <message>
         <location filename="../programs/mythfrontend/audiogeneralsettings.cpp" line="430"/>
         <source>Set the audio surround-upconversion quality.</source>
-        <translation type="unfinished">Nastavte kvalitu upkonverze prostorového zvuku.</translation>
+        <translation>Nastavte kvalitu upkonverze prostorového zvuku.</translation>
     </message>
     <message>
         <source>Advanced audio configuration</source>
@@ -17834,7 +17834,7 @@ Chcete pokračovat ve sledování?</translation>
     <message>
         <location filename="../programs/mythfrontend/audiogeneralsettings.cpp" line="1114"/>
         <source>Separate digital output device</source>
-        <translation type="unfinished">Samostatné digitální výstupní zařízení</translation>
+        <translation>Samostatné digitální výstupní zařízení</translation>
     </message>
     <message>
         <source>Use a distinct digital output device from default.</source>
@@ -17937,12 +17937,12 @@ Chcete pokračovat ve sledování?</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="216"/>
         <source>Run metadata lookup</source>
-        <translation type="unfinished">Spustit vyhledání metadat</translation>
+        <translation>Spustit vyhledání metadat</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="218"/>
         <source>This is the default value used for the automatic metadata lookup setting when a new scheduled recording is created.</source>
-        <translation type="unfinished">Toto je výchozí hodnota použitá pro automatické vyhledání metadat když je vytvořeno nové plánované nahrávání.</translation>
+        <translation>Toto je výchozí hodnota použitá pro automatické vyhledání metadat když je vytvořeno nové plánované nahrávání.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="227"/>
@@ -18231,7 +18231,7 @@ nesmí být prázdné.</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1486"/>
         <source>If enabled, captions will be displayed over a black background for better contrast.</source>
-        <translation type="unfinished">Pokud povoleno, titulky budou zobrazeny přes černé pozadí pro lepší kontrast.</translation>
+        <translation>Pokud povoleno, titulky budou zobrazeny přes černé pozadí pro lepší kontrast.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1498"/>
@@ -18326,12 +18326,12 @@ nesmí být prázdné.</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1699"/>
         <source>Idle time before entering standby mode (minutes)</source>
-        <translation type="unfinished">Doba nečinnosti před přechodem do standby (minut)</translation>
+        <translation>Doba nečinnosti před přechodem do standby (minut)</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1701"/>
         <source>Number of minutes to wait when the frontend is idle before entering standby mode. Standby mode allows the backend to power down if configured to do so. Any remote or mouse input will cause the countdown to start again and/or exit idle mode. Video playback suspends the countdown. A value of zero prevents the frontend automatically entering standby.</source>
-        <translation type="unfinished">Počet minut, než se čekající frontent přepne do stanby módu. Standby mód umožní vypnutí backendu, pokud je tak nakonfigurován. Jakýkoli příkaz ovladače nebo myši způsobí nové odpočítávání. Přehrávání videa odpočítávání potlačí. Nulová hodnota zabrání přechodu do standby.</translation>
+        <translation>Počet minut, než se čekající frontent přepne do stanby módu. Standby mód umožní vypnutí backendu, pokud je tak nakonfigurován. Jakýkoli příkaz ovladače nebo myši způsobí nové odpočítávání. Přehrávání videa odpočítávání potlačí. Nulová hodnota zabrání přechodu do standby.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1715"/>
@@ -18466,12 +18466,12 @@ nesmí být prázdné.</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2048"/>
         <source>Default refresh rate when watching a video. Leave at &quot;Auto&quot; to automatically use the best available</source>
-        <translation type="unfinished">Výchozí obnovovací frekvence při přehrávání videa. Ponechte &quot;Auto&quot; pro využití nejlepší dostupné</translation>
+        <translation>Výchozí obnovovací frekvence při přehrávání videa. Ponechte &quot;Auto&quot; pro využití nejlepší dostupné</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2051"/>
         <source>Refresh rate when watching a video at a specific resolution. Leave at &quot;Auto&quot; to automatically use the best available</source>
-        <translation type="unfinished">Obnovovací frekvence pro video ve specifickém rozlišení. Ponechte &quot;Auto&quot; pro automatické použití nejlepší dostupné</translation>
+        <translation>Obnovovací frekvence pro video ve specifickém rozlišení. Ponechte &quot;Auto&quot; pro automatické použití nejlepší dostupné</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2081"/>
@@ -18486,7 +18486,7 @@ nesmí být prázdné.</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2147"/>
         <source>Toggles mouse cursor visibility for touchscreens. By default MythTV will auto-hide the cursor if the mouse doesn&apos;t move for a period, this setting disables the cursor entirely.</source>
-        <translation type="unfinished">Přepíná viditelnost kurzoru myši na touchscreen zařízení. Ve výchozím stavu MythTV automaticky schová kurzor pokud se chvíli nehýbe. Toto nastavení zakáře kurzor úplně.</translation>
+        <translation>Přepíná viditelnost kurzoru myši na touchscreen zařízení. Ve výchozím stavu MythTV automaticky schová kurzor pokud se chvíli nehýbe. Toto nastavení zakáře kurzor úplně.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2170"/>
@@ -18506,12 +18506,12 @@ nesmí být prázdné.</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2290"/>
         <source>Paint engine</source>
-        <translation type="unfinished">Vykreslovací stroj</translation>
+        <translation>Vykreslovací stroj</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2297"/>
         <source>Direct3D</source>
-        <translation type="unfinished">Direct3D</translation>
+        <translation>Direct3D</translation>
     </message>
     <message>
         <source>This selects what MythTV uses to draw. If you have decent hardware, select OpenGL.</source>
@@ -18735,7 +18735,7 @@ nesmí být prázdné.</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2758"/>
         <source>UDP notify port</source>
-        <translation type="unfinished">Port pro UDP hlášení</translation>
+        <translation>Port pro UDP hlášení</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2792"/>
@@ -18745,7 +18745,7 @@ nesmí být prázdné.</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2794"/>
         <source>If there are any devices that you do not want to be monitored, list them here with commas in-between. The plugins will ignore them. Requires restart.</source>
-        <translation type="unfinished">Pokud máte zařízení, která nechcete monitorovat, vypište je sem a oddělte je čárkou. Pluginy je budou ignorovat. Vyžaduje restart.</translation>
+        <translation>Pokud máte zařízení, která nechcete monitorovat, vypište je sem a oddělte je čárkou. Pluginy je budou ignorovat. Vyžaduje restart.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2827"/>
@@ -19282,12 +19282,12 @@ nesmí být prázdné.</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2760"/>
         <source>MythTV will listen for connections from the &quot;mythutil&quot; program on this port.</source>
-        <translation type="unfinished">MythTV bude na tomto portu čekat na spojení od programu &quot;mythutil&quot;.</translation>
+        <translation>MythTV bude na tomto portu čekat na spojení od programu &quot;mythutil&quot;.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2782"/>
         <source>This enables support for monitoring your CD/DVD drives for new disks and launching the proper plugin to handle them. Requires restart.</source>
-        <translation type="unfinished">Povolí podporu pro monitorování vložení disku do CD/DVD mechanik a spouští vhodné pluginy. Vyžaduje restart.</translation>
+        <translation>Povolí podporu pro monitorování vložení disku do CD/DVD mechanik a spouští vhodné pluginy. Vyžaduje restart.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="3662"/>
@@ -19453,7 +19453,8 @@ nesmí být prázdné.</translation>
         <source>Found %n transport(s):
 </source>
         <translation>
-            <numerusform>Nalezen %n transport:</numerusform>
+            <numerusform>Nalezen %n transport:
+</numerusform>
             <numerusform>Nalezeny %n transporty:</numerusform>
             <numerusform>Nalezeno %n transportů:</numerusform>
         </translation>
@@ -19609,42 +19610,42 @@ Chcete pokračovat ve sledování?</translation>
     <message>
         <location filename="../programs/mythfrontend/audiogeneralsettings.cpp" line="120"/>
         <source>Rescan</source>
-        <translation type="unfinished">Znovu vyhledat</translation>
+        <translation>Znovu vyhledat</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/audiogeneralsettings.cpp" line="121"/>
         <source>Rescan for available audio devices. Current entry will be checked and capability entries populated.</source>
-        <translation type="unfinished">Znovu vyhledá dostupná zvuková zařízení. Aktuální záznam bude zkontrolován a budou vypněny položky podporovaných vlastností.</translation>
+        <translation>Znovu vyhledá dostupná zvuková zařízení. Aktuální záznam bude zkontrolován a budou vypněny položky podporovaných vlastností.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/audiogeneralsettings.cpp" line="154"/>
         <source>Digital Audio Capabilities</source>
-        <translation type="unfinished">Vlastnosti digitálního zvuku</translation>
+        <translation>Vlastnosti digitálního zvuku</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/audiogeneralsettings.cpp" line="170"/>
         <source>Test</source>
-        <translation type="unfinished">Test</translation>
+        <translation>Test</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/audiogeneralsettings.cpp" line="171"/>
         <source>Will play a test pattern on all configured speakers</source>
-        <translation type="unfinished">Přehraje testovací zvuk na všech konfigurovaných reproduktorech</translation>
+        <translation>Přehraje testovací zvuk na všech konfigurovaných reproduktorech</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/audiogeneralsettings.cpp" line="177"/>
         <source>Advanced Audio Settings</source>
-        <translation type="unfinished">Rozšířená konfigurace zvuku</translation>
+        <translation>Rozšířená konfigurace zvuku</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/audiogeneralsettings.cpp" line="178"/>
         <source>Enable extra audio settings. Under most usage all options should be left alone</source>
-        <translation type="unfinished">Extra nastavení zvuku. Ve většině případů by se toto nemělo měnit</translation>
+        <translation>Extra nastavení zvuku. Ve většině případů by se toto nemělo měnit</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/audiogeneralsettings.cpp" line="238"/>
         <source>Passthrough device is invalid or not useable. Check configuration in Advanced Settings:</source>
-        <translation type="unfinished">Zařízení pro přímé předání neexistuje nebo se nedá použít. Zkontrolujte nastavení v &quot;Rozšířené konfiguraci zvuku&quot;:</translation>
+        <translation>Zařízení pro přímé předání neexistuje nebo se nedá použít. Zkontrolujte nastavení v &quot;Rozšířené konfiguraci zvuku&quot;:</translation>
     </message>
     <message>
         <source>Enable if your amplifier or sound decoder supports AC3/Dolby Digital. You must use a digital connection. Uncheck if using an analog connection.</source>
@@ -19730,7 +19731,7 @@ Chcete pokračovat ve sledování?</translation>
     <message>
         <location filename="../libs/libmythtv/channelscan/paneexistingscanimport.h" line="47"/>
         <source>Scan to Import</source>
-        <translation type="unfinished">Vyhledat k importu</translation>
+        <translation>Vyhledat k importu</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/paneexistingscanimport.h" line="65"/>
@@ -19751,7 +19752,7 @@ Chcete pokračovat ve sledování?</translation>
     <message>
         <location filename="../libs/libmythtv/mythbdplayer.cpp" line="267"/>
         <source>Failed to switch title.</source>
-        <translation type="unfinished">Přepnutí titulu selhalo.</translation>
+        <translation>Přepnutí titulu selhalo.</translation>
     </message>
     <message>
         <source>Error Requesting Connection Info</source>
@@ -19783,7 +19784,7 @@ Chcete pokračovat ve sledování?</translation>
     <message>
         <location filename="../programs/mythfrontend/videoglobalsettings.cpp" line="18"/>
         <source>Starting Parental Level</source>
-        <translation type="unfinished">Výchozí rodičovská úroveň</translation>
+        <translation>Výchozí rodičovská úroveň</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/videoglobalsettings.cpp" line="19"/>
@@ -19857,7 +19858,7 @@ Chcete pokračovat ve sledování?</translation>
     <message>
         <location filename="../programs/mythfrontend/videoglobalsettings.cpp" line="84"/>
         <source>Multiple directories can be separated by &apos;:&apos;. Each directory must exist and be readable by the user running the frontend.</source>
-        <translation type="unfinished">Více adresářů může být odděleno dvojtečkou. Všechny adresáře musí existovat a uživatel spouštějící Frontend je musí být schopen číst.</translation>
+        <translation>Více adresářů může být odděleno dvojtečkou. Všechny adresáře musí existovat a uživatel spouštějící Frontend je musí být schopen číst.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/videoglobalsettings.cpp" line="95"/>
@@ -19866,7 +19867,7 @@ Chcete pokračovat ve sledování?</translation>
         <location filename="../programs/mythfrontend/videoglobalsettings.cpp" line="128"/>
         <location filename="../programs/mythfrontend/videoglobalsettings.cpp" line="139"/>
         <source>This directory must exist, and the user running the frontend needs to have read/write permission to the directory.</source>
-        <translation type="unfinished">Adresář musí existovat a uživatel spouštějící Frontend musí mít práva čtení a zápisu do tohoto adresáře.</translation>
+        <translation>Adresář musí existovat a uživatel spouštějící Frontend musí mít práva čtení a zápisu do tohoto adresáře.</translation>
     </message>
     <message>
         <source>Multiple directories can be separated by &apos;:&apos;. Each directory must exist and be readable by the user running MythVideo.</source>
@@ -20147,12 +20148,12 @@ Chcete pokračovat ve sledování?</translation>
     <message>
         <location filename="../programs/mythfrontend/videoglobalsettings.cpp" line="166"/>
         <source>Video Tree remembers last selected position</source>
-        <translation type="unfinished">Strom zobrazení si pamatuje poslední pozici</translation>
+        <translation>Strom zobrazení si pamatuje poslední pozici</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/videoglobalsettings.cpp" line="168"/>
         <source>If set, the current position in the Video Tree is persistent.</source>
-        <translation type="unfinished">Pokud nastaveno, současná pozice ve stromu videa bude zachována.</translation>
+        <translation>Pokud nastaveno, současná pozice ve stromu videa bude zachována.</translation>
     </message>
     <message>
         <source>Command to search for movie listings</source>
@@ -20263,28 +20264,28 @@ Zkontrolujte nastavení VideoManagera</translation>
     <message>
         <location filename="../libs/libmythmetadata/videoutils.cpp" line="18"/>
         <source>No Cover</source>
-        <translation type="unfinished">Žádný obal</translation>
+        <translation>Žádný obal</translation>
     </message>
     <message>
         <location filename="../libs/libmythmetadata/videoutils.cpp" line="160"/>
         <source>Details Downloaded</source>
-        <translation type="unfinished">Detaily staženy</translation>
+        <translation>Detaily staženy</translation>
     </message>
     <message>
         <location filename="../libs/libmythmetadata/videoutils.cpp" line="160"/>
         <source>Waiting for Detail Download</source>
-        <translation type="unfinished">Čekám na stažení detailů</translation>
+        <translation>Čekám na stažení detailů</translation>
     </message>
     <message>
         <location filename="../libs/libmythmetadata/videoutils.cpp" line="171"/>
         <source>No rating available.</source>
-        <translation type="unfinished">Hodnocení není k dispozici.</translation>
+        <translation>Hodnocení není k dispozici.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/videolist.cpp" line="645"/>
         <location filename="../programs/mythfrontend/videolist.cpp" line="653"/>
         <source>Video Home</source>
-        <translation type="unfinished">Úvodní strana</translation>
+        <translation>Úvodní strana</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/videolist.cpp" line="655"/>
@@ -20384,12 +20385,12 @@ Zkontrolujte nastavení VideoManagera</translation>
     <message>
         <location filename="../libs/libmythmetadata/parentalcontrols.cpp" line="309"/>
         <source>Parental PIN:</source>
-        <translation type="unfinished">Rodičovský PIN:</translation>
+        <translation>Rodičovský PIN:</translation>
     </message>
     <message>
         <location filename="../libs/libmythbase/mythmiscutil.cpp" line="133"/>
         <source>Today</source>
-        <translation type="unfinished">Dnes</translation>
+        <translation>Dnes</translation>
     </message>
     <message>
         <location filename="../libs/libmythbase/mythmiscutil.cpp" line="135"/>
@@ -20399,7 +20400,7 @@ Zkontrolujte nastavení VideoManagera</translation>
     <message>
         <location filename="../libs/libmythbase/mythmiscutil.cpp" line="137"/>
         <source>Tomorrow</source>
-        <translation type="unfinished">Zítra</translation>
+        <translation>Zítra</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/ringbuffer.cpp" line="1325"/>
@@ -20444,22 +20445,22 @@ Zkontrolujte nastavení VideoManagera</translation>
     <message>
         <location filename="../programs/mythfrontend/setupwizard_general.cpp" line="132"/>
         <source>Would you like to share your hardware profile with the MythTV developers? Profiles are anonymous and are a great way to help with future development.</source>
-        <translation type="unfinished">Chcete sdílet scůj hardwarový profil s vývojáři MythTV? Profily jsou anonymní a je to skvělá možnost pomoci s budoucím vývojem.</translation>
+        <translation>Chcete sdílet scůj hardwarový profil s vývojáři MythTV? Profily jsou anonymní a je to skvělá možnost pomoci s budoucím vývojem.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/setupwizard_general.cpp" line="233"/>
         <source>Are you sure you want to delete your online profile?  Your information is anonymous and helps the developers to know what hardware the majority of users prefer.</source>
-        <translation type="unfinished">Jste si jisti, že chcete smazat Váš online profil? Vaše informace jsou anonymní a pomáhají vývojářům se znalostí, jaký hardware preferuje majorita uživatelů.</translation>
+        <translation>Jste si jisti, že chcete smazat Váš online profil? Vaše informace jsou anonymní a pomáhají vývojářům se znalostí, jaký hardware preferuje majorita uživatelů.</translation>
     </message>
     <message>
         <location filename="../libs/libmythmetadata/videoscan.cpp" line="170"/>
         <source>Searching for video files</source>
-        <translation type="unfinished">Vyhledávám video soubory</translation>
+        <translation>Vyhledávám video soubory</translation>
     </message>
     <message>
         <location filename="../libs/libmythmetadata/videoscan.cpp" line="247"/>
         <source>Verifying video files</source>
-        <translation type="unfinished">Ověřuji video soubory</translation>
+        <translation>Ověřuji video soubory</translation>
     </message>
     <message>
         <location filename="../libs/libmythmetadata/videoscan.cpp" line="303"/>
@@ -21089,8 +21090,8 @@ umístěný je v %2</translation>
         <source>Change amount: %n pixel(s)</source>
         <translation>
             <numerusform>Změnit množství: %n pixel</numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>Změnit množství: %n pixely</numerusform>
+            <numerusform>Změnit množství: %n pixelů</numerusform>
         </translation>
     </message>
     <message>
@@ -21476,13 +21477,13 @@ No other details</source>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="1140"/>
         <source>average</source>
         <comment>average rate</comment>
-        <translation type="unfinished">průměrné</translation>
+        <translation>průměrné</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="1160"/>
         <source>maximum</source>
         <comment>maximum rate</comment>
-        <translation type="unfinished">maximální</translation>
+        <translation>maximální</translation>
     </message>
     <message numerus="yes">
         <location filename="../programs/mythfrontend/statusbox.cpp" line="1414"/>
@@ -23030,12 +23031,12 @@ Vyberte stávající nahrávání</translation>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="10610"/>
         <source>Disable studio levels</source>
-        <translation type="unfinished">Vypnout studiové úrovně</translation>
+        <translation>Vypnout studiové úrovně</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="10611"/>
         <source>Enable studio levels</source>
-        <translation type="unfinished">Zapnout studiové úrovně</translation>
+        <translation>Zapnout studiové úrovně</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="10653"/>
@@ -23073,17 +23074,17 @@ Vyberte stávající nahrávání</translation>
         <location filename="../libs/libmythtv/tv_play.cpp" line="10936"/>
         <location filename="../libs/libmythtv/tv_play.cpp" line="10943"/>
         <source>Navigate</source>
-        <translation type="unfinished">Navigovat</translation>
+        <translation>Navigovat</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="10957"/>
         <source>Top menu</source>
-        <translation type="unfinished">Hlavní menu</translation>
+        <translation>Hlavní menu</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="10958"/>
         <source>Popup menu</source>
-        <translation type="unfinished">Vyskakující menu</translation>
+        <translation>Vyskakující menu</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="10963"/>
@@ -23149,7 +23150,7 @@ Vyberte stávající nahrávání</translation>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="11337"/>
         <source>Playback data</source>
-        <translation type="unfinished">Data přehrávání</translation>
+        <translation>Data přehrávání</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="11375"/>
@@ -23305,17 +23306,17 @@ Vyberte stávající nahrávání</translation>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="6231"/>
         <source>Jump Chapter</source>
-        <translation type="unfinished">Přeskočit kapitolu</translation>
+        <translation>Přeskočit kapitolu</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="8319"/>
         <source>Upmixer On</source>
-        <translation type="unfinished">Upmixer zapnutý</translation>
+        <translation>Upmixer zapnutý</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="8319"/>
         <source>Upmixer Off</source>
-        <translation type="unfinished">Upmixer vypnutý</translation>
+        <translation>Upmixer vypnutý</translation>
     </message>
     <message>
         <source>Toggle Audio Upmixer</source>
@@ -23338,12 +23339,12 @@ Vyberte stávající nahrávání</translation>
     <message>
         <location filename="../programs/mythfrontend/themechooser.cpp" line="454"/>
         <source>Hide Fullscreen Preview</source>
-        <translation type="unfinished">Skrýt celoobrazovkový náhled</translation>
+        <translation>Skrýt celoobrazovkový náhled</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/themechooser.cpp" line="457"/>
         <source>Show Fullscreen Preview</source>
-        <translation type="unfinished">Ukázat celoobrazovkový náhled</translation>
+        <translation>Ukázat celoobrazovkový náhled</translation>
     </message>
     <message>
         <source>Hide Downloadable Themes</source>
@@ -23356,87 +23357,87 @@ Vyberte stávající nahrávání</translation>
     <message>
         <location filename="../programs/mythfrontend/themechooser.cpp" line="147"/>
         <source>Loading Installed Themes</source>
-        <translation type="unfinished">Načítám istalované motivy</translation>
+        <translation>Načítám istalované motivy</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/themechooser.cpp" line="227"/>
         <source>Refreshing Downloadable Themes Information</source>
-        <translation type="unfinished">Obnovuji informace o stažitelných motivech</translation>
+        <translation>Obnovuji informace o stažitelných motivech</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/themechooser.cpp" line="239"/>
         <source>Extracting Downloadable Themes Information</source>
-        <translation type="unfinished">Extrahuji informace o stažitelných motivech</translation>
+        <translation>Extrahuji informace o stažitelných motivech</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/themechooser.cpp" line="254"/>
         <source>Loading Downloadable Themes</source>
-        <translation type="unfinished">Načítám stažitelné motivy</translation>
+        <translation>Načítám stažitelné motivy</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/themechooser.cpp" line="461"/>
         <source>Refresh Downloadable Themes</source>
-        <translation type="unfinished">Obnovuji stažitelné motivy</translation>
+        <translation>Obnovuji stažitelné motivy</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/themechooser.cpp" line="471"/>
         <source>Select Theme</source>
-        <translation type="unfinished">Zvolit motiv</translation>
+        <translation>Zvolit motiv</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/themechooser.cpp" line="475"/>
         <source>Delete Theme</source>
-        <translation type="unfinished">Smazat Motiv</translation>
+        <translation>Smazat Motiv</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/themechooser.cpp" line="481"/>
         <source>Disable Theme Update Notifications</source>
-        <translation type="unfinished">Vyonout upozornění na motivy</translation>
+        <translation>Vyonout upozornění na motivy</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/themechooser.cpp" line="484"/>
         <source>Enable Theme Update Notifications</source>
-        <translation type="unfinished">Povolit upozornění na motivy</translation>
+        <translation>Povolit upozornění na motivy</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/themechooser.cpp" line="614"/>
         <source>Downloading %1 Theme</source>
-        <translation type="unfinished">Stahuji motiv %1 </translation>
+        <translation>Stahuji motiv %1 </translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/themechooser.cpp" line="755"/>
         <source>Copying %1 Theme Package</source>
-        <translation type="unfinished">Kopíruji balíček motivu %1</translation>
+        <translation>Kopíruji balíček motivu %1</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/themechooser.cpp" line="764"/>
         <source>ERROR downloading theme package on master backend.</source>
-        <translation type="unfinished">CHYBA při stahování balíčku motivu na hlavní backend.</translation>
+        <translation>CHYBA při stahování balíčku motivu na hlavní backend.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/themechooser.cpp" line="785"/>
         <source>Installing %1 Theme</source>
-        <translation type="unfinished">Instaluji motiv %1</translation>
+        <translation>Instaluji motiv %1</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/themechooser.cpp" line="791"/>
         <source>ERROR downloading theme package from master backend.</source>
-        <translation type="unfinished">CHYBA při stahování balíčku motivu z hlavního backendu.</translation>
+        <translation>CHYBA při stahování balíčku motivu z hlavního backendu.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/themechooser.cpp" line="821"/>
         <source>Error, no theme selected.</source>
-        <translation type="unfinished">Chyba, nebyl zvolen žádný motiv.</translation>
+        <translation>Chyba, nebyl zvolen žádný motiv.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/themechooser.cpp" line="828"/>
         <source>Error, unable to find current theme.</source>
-        <translation type="unfinished">Chyba, nemohu najít nastavený motiv.</translation>
+        <translation>Chyba, nemohu najít nastavený motiv.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/themechooser.cpp" line="834"/>
         <source>%1 is not a user-installed theme and can not be deleted.</source>
-        <translation type="unfinished">Motiv %1 není motiv nainstalovaný uživatele, nemůže být smazán.</translation>
+        <translation>Motiv %1 není motiv nainstalovaný uživatele, nemůže být smazán.</translation>
     </message>
 </context>
 <context>
@@ -23552,7 +23553,7 @@ Vyberte stávající nahrávání</translation>
     <message>
         <location filename="../themes/themestrings.h" line="835"/>
         <source>Airdate:</source>
-        <translation type="unfinished">Datum vysílání:</translation>
+        <translation>Datum vysílání:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="670"/>
@@ -24096,22 +24097,22 @@ Vyberte stávající nahrávání</translation>
     <message>
         <location filename="../themes/themestrings.h" line="254"/>
         <source>Metadata Options</source>
-        <translation type="unfinished">Možnosti metadat</translation>
+        <translation>Možnosti metadat</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="264"/>
         <source>Schedule filters</source>
-        <translation type="unfinished">Filtry plánování</translation>
+        <translation>Filtry plánování</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="277"/>
         <source>Perform Query</source>
-        <translation type="unfinished">Spustit dotaz</translation>
+        <translation>Spustit dotaz</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="278"/>
         <source>Find Online Coverart</source>
-        <translation type="unfinished">Najít obal (Coverart) online</translation>
+        <translation>Najít obal (Coverart) online</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="279"/>
@@ -24126,7 +24127,7 @@ Vyberte stávající nahrávání</translation>
     <message>
         <location filename="../themes/themestrings.h" line="281"/>
         <source>Find Local Coverart</source>
-        <translation type="unfinished">Najít obal (Coverart) lokálně</translation>
+        <translation>Najít obal (Coverart) lokálně</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="282"/>
@@ -24156,27 +24157,27 @@ Vyberte stávající nahrávání</translation>
     <message>
         <location filename="../themes/themestrings.h" line="360"/>
         <source>Channel Number</source>
-        <translation type="unfinished">Číslo stanice</translation>
+        <translation>Číslo stanice</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="363"/>
         <source>Automatically Look Up Metadata</source>
-        <translation type="unfinished">Automaticky vyhledat Metadata</translation>
+        <translation>Automaticky vyhledat Metadata</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="372"/>
         <source>Blu-ray Mount:</source>
-        <translation type="unfinished">Připojení Blu-ray:</translation>
+        <translation>Připojení Blu-ray:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="373"/>
         <source>Blu-ray Region:</source>
-        <translation type="unfinished">Region Blu-ray:</translation>
+        <translation>Region Blu-ray:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="391"/>
         <source>MythTV</source>
-        <translation type="unfinished">MythTV</translation>
+        <translation>MythTV</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="410"/>
@@ -24217,7 +24218,7 @@ Vyberte stávající nahrávání</translation>
         <location filename="../themes/themestrings.h" line="437"/>
         <source>%PLAYEDTIME% of %TOTALTIME%
 %(|REMAININGTIME| remaining)%%(|BEHINDTIME| behind)%</source>
-        <translation type="unfinished">%PLAYEDTIME% of %TOTALTIME%
+        <translation>%PLAYEDTIME% of %TOTALTIME%
 %(|REMAININGTIME| zbývá)%%(|BEHINDTIME| přehráno)%</translation>
     </message>
     <message>
@@ -24258,7 +24259,7 @@ Vyberte stávající nahrávání</translation>
     <message numerus="yes">
         <location filename="../themes/themestrings.h" line="487"/>
         <source>Play %n trailer(s)</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>Přehrávám %n ukázku</numerusform>
             <numerusform>Přehrávám %n ukázky</numerusform>
             <numerusform>Přehrávám %n ukázek</numerusform>
@@ -24272,7 +24273,7 @@ Vyberte stávající nahrávání</translation>
     <message>
         <location filename="../themes/themestrings.h" line="498"/>
         <source>Search List</source>
-        <translation type="unfinished">Prohledat seznam</translation>
+        <translation>Prohledat seznam</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="499"/>
@@ -24320,12 +24321,12 @@ Až budou úpravy hotovy, stiskněte tlačítko &quot;Uložit&quot;.</translatio
     <message>
         <location filename="../themes/themestrings.h" line="895"/>
         <source>Press Up/Down from letter list, to navigate to another list.  Press Left/Right from Show or Episode list to navigate to another list.</source>
-        <translation type="unfinished">Stiskněte Nahoru/Dolů ze seznamu písmen, k navigaci na další seznam. Stiskněte Vlevo/Vpravo z programu nebo epizody k navigaci na další seznam.</translation>
+        <translation>Stiskněte Nahoru/Dolů ze seznamu písmen, k navigaci na další seznam. Stiskněte Vlevo/Vpravo z programu nebo epizody k navigaci na další seznam.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="896"/>
         <source>Filter Options</source>
-        <translation type="unfinished">Možnosti filtru</translation>
+        <translation>Možnosti filtru</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="897"/>
@@ -24670,7 +24671,7 @@ Až budou úpravy hotovy, stiskněte tlačítko &quot;Uložit&quot;.</translatio
     <message>
         <location filename="../themes/themestrings.h" line="530"/>
         <source>Visible:</source>
-        <translation type="unfinished">Zobrazené :</translation>
+        <translation>Zobrazené :</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="532"/>
@@ -24700,7 +24701,7 @@ Až budou úpravy hotovy, stiskněte tlačítko &quot;Uložit&quot;.</translatio
     <message>
         <location filename="../themes/themestrings.h" line="562"/>
         <source>Video</source>
-        <translation type="unfinished">Obraz</translation>
+        <translation>Obraz</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="563"/>
@@ -24945,7 +24946,7 @@ Až budou úpravy hotovy, stiskněte tlačítko &quot;Uložit&quot;.</translatio
     <message>
         <location filename="../themes/themestrings.h" line="926"/>
         <source>LCARS</source>
-        <translation type="unfinished"></translation>
+        <translation>LCARS</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="927"/>
@@ -25058,12 +25059,12 @@ Až budou úpravy hotovy, stiskněte tlačítko &quot;Uložit&quot;.</translatio
     <message>
         <location filename="../themes/themestrings.h" line="795"/>
         <source>Program Search</source>
-        <translation type="unfinished">Hledání pořadu</translation>
+        <translation>Hledání pořadu</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="796"/>
         <source>Optical</source>
-        <translation type="unfinished">Optické</translation>
+        <translation>Optické</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="797"/>
@@ -25078,7 +25079,7 @@ Až budou úpravy hotovy, stiskněte tlačítko &quot;Uložit&quot;.</translatio
     <message>
         <location filename="../themes/themestrings.h" line="798"/>
         <source>Running Time:</source>
-        <translation type="unfinished">Délka:</translation>
+        <translation>Délka:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="799"/>
@@ -25192,7 +25193,7 @@ Až budou úpravy hotovy, stiskněte tlačítko &quot;Uložit&quot;.</translatio
     <message>
         <location filename="../themes/themestrings.h" line="25"/>
         <source>Perform basic configuration tasks</source>
-        <translation type="unfinished">Provést základní konfigurační úkoly</translation>
+        <translation>Provést základní konfigurační úkoly</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="28"/>
@@ -25715,7 +25716,7 @@ Až budou úpravy hotovy, stiskněte tlačítko &quot;Uložit&quot;.</translatio
     <message>
         <location filename="../themes/themestrings.h" line="870"/>
         <source>None</source>
-        <translation type="unfinished">Žádný</translation>
+        <translation>Žádný</translation>
     </message>
     <message>
         <source>%|&quot;SUBTITLE|&quot;% %DESCRIPTION%</source>
@@ -26563,12 +26564,12 @@ Pokud zvolíte &quot;Použít výchozí přehrávač&quot;, set příkazů pro p
     <message>
         <location filename="../themes/themestrings.h" line="779"/>
         <source>This item was released on %1.</source>
-        <translation type="unfinished">Tato položka byla uvolněna %1.</translation>
+        <translation>Tato položka byla uvolněna %1.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="780"/>
         <source>It was added to your collection on %1.</source>
-        <translation type="unfinished">Bylo přidáno do Vaší kolekce %1.</translation>
+        <translation>Bylo přidáno do Vaší kolekce %1.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="781"/>
@@ -26755,7 +26756,7 @@ Pokud zvolíte &quot;Použít výchozí přehrávač&quot;, set příkazů pro p
     <message>
         <location filename="../themes/themestrings.h" line="807"/>
         <source>Video File Associations</source>
-        <translation type="unfinished">Přiřazení přípon video souborů</translation>
+        <translation>Přiřazení přípon video souborů</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="309"/>
@@ -26820,7 +26821,7 @@ Pokud zvolíte &quot;Použít výchozí přehrávač&quot;, set příkazů pro p
     <message>
         <location filename="../themes/themestrings.h" line="317"/>
         <source>Include while Browsing:</source>
-        <translation type="unfinished">Zahrnout při procházení:</translation>
+        <translation>Zahrnout při procházení:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="485"/>
@@ -27064,27 +27065,27 @@ K naplánování nahrávání, opusťte tuto obrazovku a zvolte &quot;Programov�
     <message>
         <location filename="../themes/themestrings.h" line="808"/>
         <source>File to Play Next:</source>
-        <translation type="unfinished">Soubor pro následné přehrání:</translation>
+        <translation>Soubor pro následné přehrání:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="809"/>
         <source>Videos - Manager</source>
-        <translation type="unfinished">Video Manager</translation>
+        <translation>Video Manager</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="810"/>
         <source>Cast:</source>
-        <translation type="unfinished">Hrají:</translation>
+        <translation>Hrají:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="811"/>
         <source>Videos - Browser</source>
-        <translation type="unfinished">Procházet videa</translation>
+        <translation>Procházet videa</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="818"/>
         <source>%PLAYEDTIME% of %TOTALTIME% %(|REMAININGTIME| remaining)%%(|BEHINDTIME| behind)%</source>
-        <translation type="unfinished">%PLAYEDTIME% of %TOTALTIME% %(|REMAININGTIME| zbývá)%%(|BEHINDTIME| přehráno)%</translation>
+        <translation>%PLAYEDTIME% of %TOTALTIME% %(|REMAININGTIME| zbývá)%%(|BEHINDTIME| přehráno)%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="827"/>
@@ -27549,7 +27550,7 @@ K naplánování nahrávání, opusťte tuto obrazovku a zvolte &quot;Programov�
     <message>
         <location filename="../themes/themestrings.h" line="186"/>
         <source>Plot:</source>
-        <translation type="unfinished">Rozlišení:</translation>
+        <translation>Rozlišení:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="415"/>
@@ -27627,7 +27628,7 @@ K naplánování nahrávání, opusťte tuto obrazovku a zvolte &quot;Programov�
     <message>
         <location filename="../themes/themestrings.h" line="859"/>
         <source>Prev</source>
-        <translation type="unfinished">Předchozí</translation>
+        <translation>Předchozí</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="420"/>
@@ -27710,7 +27711,7 @@ K naplánování nahrávání, opusťte tuto obrazovku a zvolte &quot;Programov�
     <message>
         <location filename="../themes/themestrings.h" line="658"/>
         <source>Change Group View</source>
-        <translation type="unfinished">Změnit skupinový pohled</translation>
+        <translation>Změnit skupinový pohled</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="659"/>
@@ -27760,7 +27761,7 @@ K naplánování nahrávání, opusťte tuto obrazovku a zvolte &quot;Programov�
     <message>
         <location filename="../themes/themestrings.h" line="668"/>
         <source>These icons represent information about your recordings.</source>
-        <translation type="unfinished">Tyto ikony reprezentují informace o vašich nahrávkách.</translation>
+        <translation>Tyto ikony reprezentují informace o vašich nahrávkách.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="669"/>
@@ -28083,17 +28084,17 @@ Nakonec můžete pravidlo vyzkoušet, okamžitě aktivovat, uložit nebo zrušit
     <message>
         <location filename="../themes/themestrings.h" line="734"/>
         <source>By %1</source>
-        <translation type="unfinished">Podle %1</translation>
+        <translation>Podle %1</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="735"/>
         <source>Native Resolution: %1</source>
-        <translation type="unfinished">Nativní rozlišení: %1</translation>
+        <translation>Nativní rozlišení: %1</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="736"/>
         <source>Version %1</source>
-        <translation type="unfinished">Verze %1</translation>
+        <translation>Verze %1</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="737"/>
@@ -28213,7 +28214,7 @@ K naplánování nahrávání, opusťte tuto obrazovku a zvolte &quot;Programov�
     <message>
         <location filename="../themes/themestrings.h" line="824"/>
         <source>Search Term</source>
-        <translation type="unfinished">Vyhledávací pojem</translation>
+        <translation>Vyhledávací pojem</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="452"/>
@@ -28406,7 +28407,7 @@ K naplánování nahrávání, opusťte tuto obrazovku a zvolte &quot;Programov�
     <message>
         <location filename="../themes/themestrings.h" line="318"/>
         <source>Item has been watched:</source>
-        <translation type="unfinished">Bylo přehráno:</translation>
+        <translation>Bylo přehráno:</translation>
     </message>
     <message>
         <source>%SUBTITLE|&quot;|&quot; %%DESCRIPTION%</source>
@@ -28557,12 +28558,12 @@ K naplánování nahrávání, opusťte tuto obrazovku a zvolte &quot;Programov�
     <message>
         <location filename="../themes/themestrings.h" line="856"/>
         <source>Unique Player:</source>
-        <translation type="unfinished">Unikátní přehrávač:</translation>
+        <translation>Unikátní přehrávač:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="857"/>
         <source>Search...</source>
-        <translation type="unfinished">Vyhledat...</translation>
+        <translation>Vyhledat...</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="858"/>
@@ -28572,22 +28573,22 @@ K naplánování nahrávání, opusťte tuto obrazovku a zvolte &quot;Programov�
     <message>
         <location filename="../themes/themestrings.h" line="860"/>
         <source>unrestricted</source>
-        <translation type="unfinished">neomezno</translation>
+        <translation>neomezno</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="861"/>
         <source>partially restricted</source>
-        <translation type="unfinished">částečně omezeno</translation>
+        <translation>částečně omezeno</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="862"/>
         <source>mostly restricted</source>
-        <translation type="unfinished">převážně omezeno</translation>
+        <translation>převážně omezeno</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="863"/>
         <source>restricted</source>
-        <translation type="unfinished">omezeno</translation>
+        <translation>omezeno</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="864"/>
@@ -28637,7 +28638,7 @@ K naplánování nahrávání, opusťte tuto obrazovku a zvolte &quot;Programov�
     <message>
         <location filename="../themes/themestrings.h" line="874"/>
         <source>Available Buffer</source>
-        <translation type="unfinished">Dostupný Buffer</translation>
+        <translation>Dostupný Buffer</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="875"/>
@@ -28756,7 +28757,7 @@ K naplánování nahrávání, opusťte tuto obrazovku a zvolte &quot;Programov�
     <message>
         <location filename="../themes/themestrings.h" line="326"/>
         <source>Filters video list</source>
-        <translation type="unfinished">Filtruje seznam videí</translation>
+        <translation>Filtruje seznam videí</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="390"/>
@@ -28799,7 +28800,7 @@ K naplánování nahrávání, opusťte tuto obrazovku a zvolte &quot;Programov�
     <message>
         <location filename="../themes/themestrings.h" line="244"/>
         <source>Search For</source>
-        <translation type="unfinished">Hledat</translation>
+        <translation>Hledat</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="341"/>
@@ -28971,7 +28972,7 @@ dd MMMM yyyy</translation>
     <message>
         <location filename="../themes/themestrings.h" line="433"/>
         <source>Info</source>
-        <translation type="unfinished">Informace</translation>
+        <translation>Informace</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="465"/>
@@ -29267,7 +29268,7 @@ dd MMM yyyy</source>
         <location filename="../programs/mythfrontend/upnpscanner.cpp" line="224"/>
         <location filename="../programs/mythfrontend/upnpscanner.cpp" line="271"/>
         <source>Media Servers</source>
-        <translation type="unfinished">Servery médií</translation>
+        <translation>Servery médií</translation>
     </message>
 </context>
 <context>
@@ -29843,12 +29844,12 @@ dd MMM yyyy</source>
     <message>
         <location filename="../libs/libmythmetadata/videoscan.cpp" line="471"/>
         <source>Failed to Scan SG Video Hosts</source>
-        <translation type="unfinished">Vyhledání Storage Groups video hostů selhalo</translation>
+        <translation>Vyhledání Storage Groups video hostů selhalo</translation>
     </message>
     <message>
         <location filename="../libs/libmythmetadata/videoscan.cpp" line="476"/>
         <source>If they no longer exist please remove them</source>
-        <translation type="unfinished">Pokud již neexistují, odstraňte je prosím</translation>
+        <translation>Pokud již neexistují, odstraňte je prosím</translation>
     </message>
 </context>
 <context>

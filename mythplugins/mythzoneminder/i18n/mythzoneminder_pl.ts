@@ -163,6 +163,43 @@
     </message>
     <message>
         <location filename="themestrings.h" line="41"/>
+        <source>[R] = Running
+[S] = Stopped</source>
+        <translation>[R] = Działa
+[S] = Zatrzymany</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="42"/>
+        <source>Select Camera:</source>
+        <translation>Wybierz Kamerę:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="43"/>
+        <source>Select Date:</source>
+        <translation>Wybierz Datę:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="44"/>
+        <source>Test</source>
+        <translation>Test</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="45"/>
+        <source>Record</source>
+        <translation>Nagrywaj</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="46"/>
+        <source>Cancel</source>
+        <translation>Rezygnuj</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="47"/>
+        <source>Store</source>
+        <translation>Zapisz</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="48"/>
         <source>[x]</source>
         <translation>[v]</translation>
     </message>
@@ -294,17 +331,17 @@
         <translation>Monitor 4</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="42"/>
+        <location filename="themestrings.h" line="49"/>
         <source>Show Console</source>
         <translation>Pokarz Konsolę</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="43"/>
+        <location filename="themestrings.h" line="50"/>
         <source>Show Live View</source>
         <translation>Pokarz w Live</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="44"/>
+        <location filename="themestrings.h" line="51"/>
         <source>Show Events</source>
         <translation>Pokarz Zarejestrowane Zdarzenia</translation>
     </message>

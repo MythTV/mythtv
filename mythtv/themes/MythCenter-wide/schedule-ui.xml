@@ -960,14 +960,12 @@
             </section>
         </animation>
 
-        <!-- Disappears when virtual keyboard is used
         <animation trigger="AboutToHide">
             <section>
                 <alpha start="255" end="0" easingcurve="InQuart"/>
                 <zoom start="100" end="0" easingcurve="InQuart"/>
             </section>
         </animation>
-        -->
 
         <imagetype name="box">
             <filename>mythdialogbox-background.png</filename>
@@ -1138,14 +1136,12 @@
             </section>
         </animation>
 
-        <!-- Disappears when virtual keyboard is used
         <animation trigger="AboutToHide">
             <section>
                 <alpha start="255" end="0" easingcurve="InQuart"/>
                 <zoom start="100" end="0" easingcurve="InQuart"/>
             </section>
         </animation>
-        -->
 
         <imagetype name="box">
             <area>0,0,500,550</area>
@@ -1348,14 +1344,12 @@
             </section>
         </animation>
 
-        <!-- Disappears when virtual keyboard is used
         <animation trigger="AboutToHide">
             <section>
                 <alpha start="255" end="0" easingcurve="InQuart"/>
                 <zoom start="100" end="0" easingcurve="InQuart"/>
             </section>
         </animation>
-        -->
 
         <imagetype name="backimg">
             <filename>mythprogressdialog-background.png</filename>
