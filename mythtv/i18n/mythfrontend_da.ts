@@ -1750,7 +1750,8 @@
         <location filename="../programs/mythfrontend/guidegrid.cpp" line="645"/>
         <location filename="../programs/mythfrontend/guidegrid.cpp" line="1439"/>
         <source>Edit Schedule</source>
-        <translation>Rediger planlægning</translation>
+        <translatorcomment>Passer bedre ind end &quot;planlægning&quot;</translatorcomment>
+        <translation>Rediger optageregel</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/guidegrid.cpp" line="2207"/>
@@ -3246,7 +3247,7 @@
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="540"/>
         <source>Change Group View</source>
-        <translation>Ændre gruppevisning</translation>
+        <translation>Skift gruppevisning</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="543"/>
@@ -4881,12 +4882,12 @@ Returning to the previous menu.</source>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2362"/>
         <source>Change Group View</source>
-        <translation>Ændre gruppevisning</translation>
+        <translation>Skift gruppevisning</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2366"/>
         <source>Change Group Password</source>
-        <translation>Ændre gruppekodeord</translation>
+        <translation>Skift gruppekodeord</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2693"/>
@@ -5046,12 +5047,13 @@ Returning to the previous menu.</source>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2359"/>
         <source>Change Group Filter</source>
-        <translation>Ændre gruppefilter</translation>
+        <translation>Skift gruppefilter</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2377"/>
         <source>Add this Group to Playlist</source>
-        <translation>Tilføj denne gruppe til afspilningsliste</translation>
+        <translatorcomment>&quot;denne&quot; er udeladt fra sætningen da sætningen er for lang</translatorcomment>
+        <translation>Tilføj gruppe til afspilningsliste</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="566"/>
@@ -6184,7 +6186,8 @@ Er du sikker på at du vil slette den:</translation>
     <message>
         <location filename="../programs/mythfrontend/proglist.cpp" line="299"/>
         <source>Edit Schedule</source>
-        <translation>Rediger planlægning</translation>
+        <translatorcomment>Passer bedre ind end &quot;planlægning&quot;</translatorcomment>
+        <translation>Rediger optageregel</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/proglist.cpp" line="300"/>
@@ -6487,7 +6490,8 @@ Er du sikker på at du vil slette den:</translation>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="664"/>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="773"/>
         <source>Sort By Record Count</source>
-        <translation>Sorter efter optagelses antal</translation>
+        <translatorcomment>Desværre nødt til at forkerte teksten pga. manglende plads</translatorcomment>
+        <translation>Sorter efter opt. antal</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="665"/>
@@ -6499,7 +6503,8 @@ Er du sikker på at du vil slette den:</translation>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="666"/>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="795"/>
         <source>Sort By Average Delay</source>
-        <translation>Sorter efter gennemsnitslig forsinkelse</translation>
+        <translatorcomment>Der er ikke plads til &quot;gennemsnitslig&quot;...og hvad betyder denne sætning egentlig?</translatorcomment>
+        <translation>Sorter efter forsinkelse</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="1496"/>
@@ -7269,12 +7274,12 @@ Er du sikker på at du vil slette den:</translation>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="106"/>
         <source>Recording volume of the capture card.</source>
-        <translation>Optagelses-lydniveau for optagekortet.</translation>
+        <translation>Lydniveau for optagekortet.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="331"/>
         <source>Volume of the recording </source>
-        <translation>Optagelseslydstyrke </translation>
+        <translation>Optagelydstyrke </translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="346"/>
@@ -8579,7 +8584,7 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="12204"/>
         <source>Cannot delete program </source>
-        <translation>Kan ikke slette programmet</translation>
+        <translation>Kan ikke slette optagelsen </translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/deletemap.cpp" line="90"/>
@@ -10291,7 +10296,7 @@ De fleste kort kan autodetektere dette, så vælg Auto medmindre det ikke virker
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1688"/>
         <source>Use line edit virtual keyboards</source>
-        <translation>Brug virtuelt keyboard på linierne</translation>
+        <translation>Brug virtuelt keyboard i tekstbokse</translation>
     </message>
     <message>
         <location filename="../programs/mythwelcome/welcomesettings.cpp" line="97"/>
@@ -17080,7 +17085,7 @@ Vær venlig at lukke dem før opgradering.</translation>
     <message>
         <location filename="../libs/libmyth/schemawizard.cpp" line="396"/>
         <source>Error: MythTV database has newer %1 schema (%2) than expected (%3).</source>
-        <translation>Fejl: MythTV database har nyere %1 skema (%2) end forventet (%3).</translation>
+        <translation>Fejl: MythTV databasen har et nyere %1 skema (%2) end forventet (%3).</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/schemawizard.cpp" line="403"/>
@@ -19463,7 +19468,7 @@ fra opbevaringsgruppen?</translation>
     <message>
         <location filename="../themes/themestrings.h" line="658"/>
         <source>Change Group View</source>
-        <translation>Ændre gruppevisning</translation>
+        <translation>Skift gruppevisning</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="659"/>
@@ -19488,7 +19493,7 @@ fra opbevaringsgruppen?</translation>
     <message>
         <location filename="../themes/themestrings.h" line="663"/>
         <source>Change Group Password</source>
-        <translation>Ændre gruppekodeord</translation>
+        <translation>Skift gruppekodeord</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="664"/>
@@ -19520,7 +19525,7 @@ fra opbevaringsgruppen?</translation>
         <source>Using the text areas below, you can change the recording title, subtitle, and description.
 
 Once you have completed your modifications, click the &quot;OK&quot; button.</source>
-        <translation>Ved at bruge tekstfelterne nedenunder, kan du ændre optagelsestitlen, undertitlen og beskrivelsen.
+        <translation>Ved at bruge tekstfelterne nedenfor, kan du ændre optagelsestitlen, undertitlen og beskrivelsen.
 
 Når du har færdiggjort dine ændringer, klik på &quot;OK&quot; knappen.</translation>
     </message>
@@ -19618,14 +19623,14 @@ Når du har færdiggjort din regel, kan du teste, slette eller installere den me
         <source>You can specify basic criteria to create powerful search and record rules.  Below, you may enter title, subtitle, and description phrases (all optional), as well as category, genre, and channel values to refine a complex search for programs.
 
 When you have completed your configuration, press &quot;OK&quot; to search.</source>
-        <translation>Du kan fastsætte kriterier for at lave kraftfulde søge- og optageregler.  Nedenunder, kan du skrive titel, undertitel og beskrivelse (ingen er påkrævet), ligesom du kan definere kategori, genre og kanal.
+        <translation>Du kan specificere kriterier for at lave kraftfulde søge- og optageregler.  Nedenfor kan du skrive titel, undertitel og beskrivelse (ingen er påkrævet), ligesom du kan definere kategori, genre og kanal.
 
 Når du har færdiggjort din konfiguration, så tryk &quot;OK&quot; for at søge.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="690"/>
         <source>Below you will find the program details of the selected item.  There are two available screens.  You can toggle between them by pressing INFO.</source>
-        <translation>Nedenunder kan du finde programdetaljer for det valgte element. Der er to tilgængelige sider. Du kan skifte mellem dem ved at trykke INFO.</translation>
+        <translation>Nedenfor kan du finde programdetaljer for den valgte udsendelse.  Der er to tilgængelige sider.  Du kan skifte mellem dem ved at trykke INFO.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="691"/>
@@ -19646,7 +19651,6 @@ Når du har færdiggjort din konfiguration, så tryk &quot;OK&quot; for at søge
         <location filename="../themes/themestrings.h" line="694"/>
         <source>-%n</source>
         <translation>
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -19762,7 +19766,7 @@ Når du har færdiggjort din konfiguration, så tryk &quot;OK&quot; for at søge
     <message>
         <location filename="../themes/themestrings.h" line="715"/>
         <source>Post Processing Options</source>
-        <translation>Efterbehandlings muligheder</translation>
+        <translation>Efterbehandlingsmuligheder</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="716"/>
@@ -19794,9 +19798,9 @@ Når du har færdiggjort din konfiguration, så tryk &quot;OK&quot; for at søge
         <source>To create a custom recording rule, either select an existing rule, or create a new rule by typing in a name.  Then select a rule type and hit enter.  The SQL code will be transferred below, and you can edit it and insert your own program information.
 
 Finally, you can test, immediately activate, store, or cancel your rule.</source>
-        <translation>For at lave en brugerdefineret optageregel, vælg enten en eksisterende regel eller lav en ny regel ved at skrive et navn. Vælg så typen af reglen og tryk ENTER. SQL koden vil blive overført nedenunder, og du kan redigere og indsætte din egen programinformation.
+        <translation>For at lave en brugerdefineret optageregel, vælg enten en eksisterende regel eller lav en ny regel ved at skrive et navn. Vælg så typen af reglen og tryk ENTER. SQL koden vil blive indsat nedenfor, og du kan redigere og indsætte din egen programinformation.
 
-Til sidst kan du teste, aktivere, lagre eller annullere din regel.</translation>
+Til sidst kan du teste, aktivere, gemme eller annullere din regel.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="722"/>
@@ -19937,7 +19941,7 @@ Til sidst kan du teste, aktivere, lagre eller annullere din regel.</translation>
     <message>
         <location filename="../themes/themestrings.h" line="739"/>
         <source>Type your tweet below.  Select &quot;Send&quot; to submit it.</source>
-        <translation>Skriv dit tweet nedenunder. Vælg &quot;Send&quot; for at sende det.</translation>
+        <translation>Skriv dit tweet nedenfor. Vælg &quot;Send&quot; for at sende det.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="740"/>
@@ -20140,7 +20144,7 @@ Til sidst kan du teste, aktivere, lagre eller annullere din regel.</translation>
     <message>
         <location filename="../themes/themestrings.h" line="849"/>
         <source>Post Processing Editor</source>
-        <translation>Efterbehandlings muligheder</translation>
+        <translation>Efterbehandlingseditor</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="166"/>
@@ -20534,8 +20538,7 @@ Til sidst kan du teste, aktivere, lagre eller annullere din regel.</translation>
     <message>
         <location filename="../themes/themestrings.h" line="89"/>
         <source>Manual Schedule</source>
-        <translatorcomment>&quot;optagelse&quot; giver bedre mening end &quot;planlægning&quot; i menuen</translatorcomment>
-        <translation>Manuel optagelse</translation>
+        <translation>Optag manuelt</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="90"/>
@@ -20595,7 +20598,7 @@ Til sidst kan du teste, aktivere, lagre eller annullere din regel.</translation>
     <message>
         <location filename="../themes/themestrings.h" line="101"/>
         <source>TV navigation and recording preferences</source>
-        <translation>TV navigation og optagelses præferencer</translation>
+        <translation>TV navigation og optagepræferencer</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="102"/>
@@ -22028,7 +22031,7 @@ Klik på &quot;Gem&quot;, når du er færdig med at redigere.</translation>
     <message>
         <location filename="../themes/themestrings.h" line="180"/>
         <source>Edit Recording Metadata</source>
-        <translation>Rediger optagelses metadata</translation>
+        <translation>Rediger optagelsesmetadata</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="444"/>
@@ -22044,7 +22047,7 @@ Klik på &quot;Gem&quot;, når du er færdig med at redigere.</translation>
     <message>
         <location filename="../themes/themestrings.h" line="189"/>
         <source>Manual Recording Schedule</source>
-        <translation>Manuel optagelsesplanlægning</translation>
+        <translation>Manuel optageplanlægning</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="190"/>
@@ -22129,7 +22132,8 @@ Klik på &quot;Gem&quot;, når du er færdig med at redigere.</translation>
     <message>
         <location filename="../themes/themestrings.h" line="212"/>
         <source>Final Priority:</source>
-        <translation>Endelig prioritet:</translation>
+        <translatorcomment>Tekst for lang</translatorcomment>
+        <translation>Endelig pri.:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="213"/>
@@ -22380,7 +22384,7 @@ Klik på &quot;Gem&quot;, når du er færdig med at redigere.</translation>
     <message>
         <location filename="../themes/themestrings.h" line="460"/>
         <source>Post-Processing Options</source>
-        <translation>Efterbehandlings muligheder</translation>
+        <translation>Efterbehandlingsmuligheder</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="270"/>
@@ -23224,12 +23228,14 @@ Hvis du vælger &quot;Brug standard afspiller&quot;, vil den valgte afspilningsk
     <message>
         <location filename="../themes/themestrings.h" line="217"/>
         <source>Recording Group:</source>
-        <translation>Optagelsesgruppe:</translation>
+        <translatorcomment>Tekst for lang</translatorcomment>
+        <translation>Optag. gruppe:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="219"/>
         <source>Storage Group:</source>
-        <translation>Opbevaringsgruppe:</translation>
+        <translatorcomment>Tekst for lang</translatorcomment>
+        <translation>Opbevar.gruppe:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="220"/>
