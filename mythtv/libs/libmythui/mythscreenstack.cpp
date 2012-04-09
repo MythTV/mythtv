@@ -155,7 +155,7 @@ void MythScreenStack::PopScreen(MythScreenType *screen, bool allowFade,
             {
                 m_topScreen = (*it);
                 (*it)->SetAlpha(255);
-                if (screen->IsFullscreen())
+                if (screen && screen->IsFullscreen())
                     (*it)->aboutToShow();
             }
         }
