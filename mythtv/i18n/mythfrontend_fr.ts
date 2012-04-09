@@ -88,7 +88,7 @@
     <message>
         <location filename="../programs/mythfrontend/backendconnectionmanager.cpp" line="90"/>
         <source>Your frontend and backend are configured in different timezones.  You must correct this mismatch to continue.</source>
-        <translation>Votre frontend et backend sont dans des zones horaires différentes. Vous devez corriger cette erreur pour continuer.</translation>
+        <translation>Votre frontal et backend sont dans des fuseaux horaires différents. Vous devez corriger cette erreur pour continuer.</translation>
     </message>
 </context>
 <context>
@@ -216,7 +216,7 @@
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="3016"/>
         <source>Sorry, this Input Group name cannot be blank.</source>
-        <translation>Désolé, ce nom de groupe d&apos;entrées ne peut pas être vide.</translation>
+        <translation>Désolé, le nom de groupe d&apos;entrées ne peut pas être vide.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="3037"/>
@@ -1513,7 +1513,7 @@
     <message>
         <location filename="../programs/mythtv-setup/expertsettingseditor.h" line="32"/>
         <source>Expert Settings Editor</source>
-        <translation>Editeur de configuration avancé</translation>
+        <translation>Éditeur de configuration avancé</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/expertsettingseditor.h" line="33"/>
@@ -1531,7 +1531,7 @@
     <message>
         <location filename="../programs/mythfrontend/videofileassoc.cpp" line="374"/>
         <source>The command to use when playing this kind of file.  To use MythTV&apos;s Internal player, use &quot;Internal&quot; as the player.  For all other players, you can use %s to substitute the filename.</source>
-        <translation>Commande utilisée pour visualiser ce type de fichier. Mettre &quot;Internal&quot; pour utiliser le lecteur interne de Mythtv. Pour tous les autres lecteurs, utiliser %s pour désigner le fichier.</translation>
+        <translation>Commande utilisée pour visualiser ce type de fichier. Mettre &quot;Internal&quot; pour utiliser le lecteur interne de MythTV. Pour tous les autres lecteurs, utiliser %s pour désigner le fichier.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/videofileassoc.cpp" line="378"/>
@@ -1607,7 +1607,7 @@
     <message>
         <location filename="../programs/mythfrontend/setupwizard_general.cpp" line="158"/>
         <source>Hardware profile submitted. Thank you for supporting MythTV!</source>
-        <translation>Profil matériel transmis. Mythtv vous remercie pour votre aide!</translation>
+        <translation>Profil matériel transmis. MythTV vous remercie pour votre aide!</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/setupwizard_general.cpp" line="172"/>
@@ -4293,7 +4293,7 @@
     <message>
         <location filename="../programs/mythfrontend/main.cpp" line="1378"/>
         <source>Download metadata for current item</source>
-        <translation>Télécharger les méta-données pour l&apos;item sélectionné</translation>
+        <translation>Télécharger les métadonnées pour l&apos;item sélectionné</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/main.cpp" line="1380"/>
@@ -6820,7 +6820,8 @@ Are you sure you want to delete:</source>
         <location filename="../libs/libmythtv/videoouttypes.h" line="266"/>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="203"/>
         <source>Off</source>
-        <translation>Éteint</translation>
+        <translatorcomment>Il serait préférable de pouvoir choisir séparément le féminin et le masculin</translatorcomment>
+        <translation>Désactivé</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="3482"/>
@@ -7147,7 +7148,7 @@ Are you sure you want to delete:</source>
         <location filename="../libs/libmyth/programtypes.cpp" line="192"/>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1519"/>
         <source>Repeat</source>
-        <translation>Répéter</translation>
+        <translation>Rediffusion</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programtypes.cpp" line="188"/>
@@ -7510,7 +7511,8 @@ La plupart des transpondeurs DVB-C transmettent à 6,9 ou 6,875 million de symbo
         <location filename="../libs/libmythtv/mythplayer.cpp" line="1394"/>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="553"/>
         <source>On</source>
-        <translation>On</translation>
+        <translatorcomment>Il serait préférable de pouvoir choisir séparément le féminin et le masculin</translatorcomment>
+        <translation>Activé</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="235"/>
@@ -8070,13 +8072,13 @@ La plupart des transpondeurs DVB-C transmettent à 6,9 ou 6,875 million de symbo
         <location filename="../libs/libmythtv/tv_play.cpp" line="8422"/>
         <source>MythTV was set to sleep after %1 minutes and will exit in %d seconds.
 Do you wish to continue watching?</source>
-        <translation>Mythtv doit se mettre en veille dans %1 minutes et s&apos;arrêter dans %d secondes
-Voulez-vous continuer à utiliser Mythtv ?</translation>
+        <translation>MythTV doit se mettre en veille dans %1 minutes et s&apos;arrêter dans %d secondes
+Voulez-vous continuer à utiliser MythTV ?</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="8486"/>
         <source>MythTV has been idle for %1 minutes and will exit in %d seconds. Are you still watching?</source>
-        <translation>MythTV a été inactif durant %1 minutes et se terminera dans %d secondes. Voulez-vous continuer à utiliser Mythtv ?</translation>
+        <translation>MythTV a été inactif durant %1 minutes et se terminera dans %d secondes. Voulez-vous continuer à utiliser MythTV ?</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="9401"/>
@@ -8504,7 +8506,7 @@ Voulez-vous continuer à utiliser Mythtv ?</translation>
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="2842"/>
         <source>When entering Live TV, the available, local input with the lowest, non-zero value will be used.  If no local inputs are available, the available, remote input with the lowest, non-zero value will be used.  Setting this value to zero will make the input unavailable to live TV.</source>
-        <translation>Pour le LiveTV, Mythtv utilisera l&apos;entrée locale disponible ayant la plus faible valeur non nulle. Si aucune entrée locale n&apos;est disponible, l&apos;entrée distante disponible ayant la plus faible valeur sera utilisée. La définition de cette valeur à zéro rendra l&apos;entrée indisponible pour la télévision en direct.</translation>
+        <translation>Pour le LiveTV, MythTV utilisera l&apos;entrée locale disponible ayant la plus faible valeur non nulle. Si aucune entrée locale n&apos;est disponible, l&apos;entrée distante disponible ayant la plus faible valeur sera utilisée. La définition de cette valeur à zéro rendra l&apos;entrée indisponible pour la télévision en direct.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="3249"/>
@@ -8990,7 +8992,7 @@ Voulez-vous continuer à utiliser Mythtv ?</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="3118"/>
         <source>Scale video as necessary</source>
-        <translation>Redimensionner la video au besoin</translation>
+        <translation>Redimensionner la vidéo au besoin</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/dbsettings.cpp" line="53"/>
@@ -9851,7 +9853,7 @@ La plupart des cartes peuvent autodétecter cela maintenant, donc laissez-la à 
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2299"/>
         <source>This selects what MythTV uses to draw. Choosing &apos;Auto&apos; is recommended, unless running on systems with broken OpenGL implementations (broken hardware or drivers or windowing systems) where only Qt works.</source>
-        <translation>Définit la méthode d&apos;affichage de Mythtv. Il est recommandé de choisir &quot;Auto&quot; sauf sur les systèmes dont l&apos;implémentation OpenGL est déficiente (mauvais matériel, mauvais pilotes ou systèmes de fenêtrage) et où uniquement Qt fonctionne.</translation>
+        <translation>Définit la méthode d&apos;affichage de MythTV. Il est recommandé de choisir &quot;Auto&quot; sauf sur les systèmes dont l&apos;implémentation OpenGL est déficiente (mauvais matériel, mauvais pilotes ou systèmes de fenêtrage) et où uniquement Qt fonctionne.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2760"/>
@@ -9978,7 +9980,7 @@ La plupart des cartes peuvent autodétecter cela maintenant, donc laissez-la à 
     <message>
         <location filename="../libs/libmythtv/channelsettings.cpp" line="332"/>
         <source>If enabled, guide information for this channel will be updated using &apos;Over-the-Air&apos; program listings.</source>
-        <translation>Si activé, les données dans cette source seront mises à jour avec les grilles TV fournies par les chaînes elles-mêmes.</translation>
+        <translation>Si activé, les données dans cette source seront mises à jour avec les grilles de programmes TV fournies par les chaînes elles-mêmes.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelsettings.cpp" line="348"/>
@@ -10522,7 +10524,7 @@ La plupart des cartes peuvent autodétecter cela maintenant, donc laissez-la à 
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2739"/>
         <source>This enables support for controlling mythfrontend over the network.</source>
-        <translation>Ceci active le support du contrôle de mythfrontend par le réseau.</translation>
+        <translation>Ceci active le support du contrôle de Mythfrontend par le réseau.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/commbreakmap.cpp" line="352"/>
@@ -12117,7 +12119,7 @@ Votre récupérateur ne fournit pas les numéros de chaînes, vous devez donc le
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1218"/>
         <source>This is the standard video renderer for X11 systems. It uses XVideo hardware assist for scaling, color conversion. If the hardware offers picture controls the renderer supports them.</source>
-        <translation>Ceci est le moteur de rendu vidéo standard pour les systèmes X11. Il utilise l&apos;assistance matérielle XVideo pour le redimensionnement, la conversion de couleurs. Si la matériel offre les contrôles d&apos;image, le rotor de rendu les supporte.</translation>
+        <translation>Ceci est le moteur de rendu vidéo standard pour les systèmes X11. Il utilise l&apos;assistance matérielle XVideo pour le redimensionnement, la conversion de couleurs. Si la matériel offre les contrôles d&apos;image, le moteur de rendu les supporte.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1224"/>
@@ -12306,12 +12308,12 @@ Votre récupérateur ne fournit pas les numéros de chaînes, vous devez donc le
     <message>
         <location filename="../libs/libmythtv/videoouttypes.h" line="206"/>
         <source>14:9</source>
-        <translation>14:9</translation>
+        <translation>14/9</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videoouttypes.h" line="208"/>
         <source>2.35:1</source>
-        <translation>2.35:1</translation>
+        <translation>2.35/1</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videoouttypes.h" line="220"/>
@@ -12751,7 +12753,7 @@ Votre récupérateur ne fournit pas les numéros de chaînes, vous devez donc le
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="277"/>
         <source>This is the default value used for the &apos;Run %1&apos; setting when a new scheduled recording is created.</source>
-        <translation>Si coché, la tâche utilisateur « %1 » sera automatiquement exécutée sur tous les nouveaux enregistrements</translation>
+        <translation>Si coché, la tâche utilisateur « %1 » sera automatiquement exécutée sur tous les nouveaux enregistrements.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="333"/>
@@ -14154,17 +14156,17 @@ Il se peut que vous deviez utiliser le bouton d&apos;éjection sur le lecteur.</
     <message>
         <location filename="../libs/libmythtv/tv.cpp" line="87"/>
         <source>Auto-Skip OFF</source>
-        <translation>Saut automatique INACTIF</translation>
+        <translation>Ne pas sauter automatiquement</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv.cpp" line="88"/>
         <source>Auto-Skip ON</source>
-        <translation>Saut automatique ACTIF</translation>
+        <translation>Sauter automatiquement</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv.cpp" line="89"/>
         <source>Auto-Skip Notify</source>
-        <translation>Avertir des sauts automatiques</translation>
+        <translation>Avertir de la présence d&apos;un saut</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="643"/>
@@ -14836,7 +14838,7 @@ Il se peut que vous deviez utiliser le bouton d&apos;éjection sur le lecteur.</
     <message>
         <location filename="../programs/mythfrontend/audiogeneralsettings.cpp" line="1015"/>
         <source>Initial volume for the Master mixer. This affects all sound created by the audio device. Note: Do not set this too low.</source>
-        <translation>Volume initial du mélangeur principal. Ceci affecte tous les sons créés par la carte son.  Note : ne pas régler ceci à un niveau trop bas.</translation>
+        <translation>Volume initial du mélangeur principal. Ceci affecte tous les sons créés par la carte son. Note : ne pas régler ceci à un niveau trop bas.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/audiogeneralsettings.cpp" line="1024"/>
@@ -14911,12 +14913,12 @@ Il se peut que vous deviez utiliser le bouton d&apos;éjection sur le lecteur.</
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="229"/>
         <source>This is the default value used for the automatic commercial detection setting when a new scheduled recording is created.</source>
-        <translation>Si coché, le balisage des publicités sera automatiquement exécuté sur tous les nouveaux enregistrements</translation>
+        <translation>Si coché, le balisage des publicités sera automatiquement exécuté sur tous les nouveaux enregistrements.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="240"/>
         <source>This is the default value used for the automatic-transcode setting when a new scheduled recording is created.</source>
-        <translation>Si coché, le transcodage par défaut sera automatiquement exécuté sur tous les nouveaux enregistrements</translation>
+        <translation>Si coché, le transcodage par défaut sera automatiquement exécuté sur tous les nouveaux enregistrements.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="249"/>
@@ -15944,6 +15946,7 @@ de lecture ne peut pas être vide.</translation>
     <message>
         <location filename="../libs/libmyth/mythcontext.cpp" line="194"/>
         <source>The plugin %1 has failed to run for some reason...</source>
+        <translatorcomment>l&apos;écran suivant donne la raison -&gt; On ne peut en être toujours sûr...</translatorcomment>
         <translation>Le module d&apos;extension %1 a échoué dans son exécution pour une raison quelconque...</translation>
     </message>
     <message>
@@ -16054,12 +16057,12 @@ de lecture ne peut pas être vide.</translation>
     <message>
         <location filename="../libs/libmyth/mythcontext.cpp" line="1054"/>
         <source>This application is not compatible with the installed MythTV libraries.</source>
-        <translation>Cette application n&apos;est pas compatible avec les &quot;librairies&quot; MythTV installées</translation>
+        <translation>Cette application n&apos;est pas compatible avec les &quot;librairies&quot; MythTV installées.</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/mythcontext.cpp" line="1137"/>
         <source>Plugin %1 is not compatible with the installed MythTV libraries.</source>
-        <translation>%1 n&apos;est pas compatible avec les &quot;librairies&quot; MythTV installées</translation>
+        <translation>%1 n&apos;est pas compatible avec les &quot;librairies&quot; MythTV installées.</translation>
     </message>
     <message>
         <location filename="../libs/libmythbase/mythcorecontext.cpp" line="196"/>
@@ -16254,7 +16257,7 @@ de lecture ne peut pas être vide.</translation>
     <message>
         <location filename="../programs/mythfrontend/videoglobalsettings.cpp" line="25"/>
         <source>This is the &apos;level&apos; that Video starts at. Any videos with a level at or below this will be shown in the list or while browsing by default. The Parental PIN should be set to limit changing of the default level.</source>
-        <translation>C&apos;est le niveau sur lequel la bibliothèque video démarre. Toutes les vidéos ayant un niveau inférieur ou égal à la valeur choisie seront affichées dans la liste. Afin d&apos;empêcher le changement du niveau par défaut, le code parental doit être saisi.</translation>
+        <translation>C&apos;est le niveau sur lequel la bibliothèque vidéo démarre. Toutes les vidéos ayant un niveau inférieur ou égal à la valeur choisie seront affichées dans la liste. Afin d&apos;empêcher le changement du niveau par défaut, le code parental doit être saisi.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/videoglobalsettings.cpp" line="33"/>
@@ -16318,7 +16321,7 @@ de lecture ne peut pas être vide.</translation>
         <location filename="../programs/mythfrontend/videoglobalsettings.cpp" line="128"/>
         <location filename="../programs/mythfrontend/videoglobalsettings.cpp" line="139"/>
         <source>This directory must exist, and the user running the frontend needs to have read/write permission to the directory.</source>
-        <translation>Ce répertoire doit exister et l&apos;utilisateur exécutant le frontend doit avoir les droits de lecture/écriture sur celui-ci.</translation>
+        <translation>Ce répertoire doit exister et l&apos;utilisateur exécutant le frontal doit avoir les droits de lecture/écriture sur celui-ci.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/videoglobalsettings.cpp" line="166"/>
@@ -16599,7 +16602,7 @@ de lecture ne peut pas être vide.</translation>
     <message>
         <location filename="../libs/libmyth/rawsettingseditor.cpp" line="21"/>
         <source>Settings Editor</source>
-        <translation>Editeur de réglages</translation>
+        <translation>Éditeur de réglages</translation>
     </message>
 </context>
 <context>
@@ -16733,7 +16736,7 @@ de lecture ne peut pas être vide.</translation>
     <message>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="50"/>
         <source>Prime time</source>
-        <translation>Début de soirée</translation>
+        <translation>Heure de grande écoute</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="51"/>
@@ -17099,9 +17102,10 @@ Nom de base de données : %2</translation>
     <message numerus="yes">
         <location filename="../programs/mythfrontend/screenwizard.cpp" line="258"/>
         <source>Change amount: %n pixel(s)</source>
+        <translatorcomment>Il s&apos;agit ici d&apos;ajuster la position de l&apos;écran. On peut le faire de manière grossière ou fine.</translatorcomment>
         <translation>
-            <numerusform>Modifier le montant : %n pixel</numerusform>
-            <numerusform>Modifier le montant : %n pixels</numerusform>
+            <numerusform>Modifier l&apos;incrément : %n pixel</numerusform>
+            <numerusform>Modifier l&apos;incrément : %n pixels</numerusform>
         </translation>
     </message>
     <message>
@@ -18137,7 +18141,7 @@ du groupe de stockage ?</translation>
         <location filename="../libs/libmythtv/tv_play.cpp" line="10951"/>
         <location filename="../libs/libmythtv/tv_play.cpp" line="11045"/>
         <source>Commercial Auto-Skip</source>
-        <translation>Saut automatique les publicités</translation>
+        <translation>Saut automatique des publicités</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="11263"/>
@@ -19721,7 +19725,7 @@ du groupe de stockage ?</translation>
     <message>
         <location filename="../themes/themestrings.h" line="314"/>
         <source>Edit Video Information</source>
-        <translation>Editer les informations de la vidéo</translation>
+        <translation>Éditer les informations de la vidéo</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="318"/>
@@ -20281,7 +20285,7 @@ du groupe de stockage ?</translation>
     <message>
         <location filename="../themes/themestrings.h" line="484"/>
         <source>Edit Video Metadata</source>
-        <translation>Editer les métadonnées de la vidéo</translation>
+        <translation>Éditer les métadonnées de la vidéo</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="184"/>
@@ -20604,7 +20608,7 @@ Si vous sélectionnez &quot;Utiliser le lecteur par défaut&quot;, la commande d
     <message>
         <location filename="../themes/themestrings.h" line="136"/>
         <source>Metadata Settings</source>
-        <translation>Réglages de méta-données</translation>
+        <translation>Réglages de métadonnées</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="812"/>
@@ -20891,7 +20895,7 @@ Si vous sélectionnez &quot;Utiliser le lecteur par défaut&quot;, la commande d
     <message>
         <location filename="../themes/themestrings.h" line="614"/>
         <source>Edit Channels</source>
-        <translation>Editer les chaînes</translation>
+        <translation>Éditer les chaînes</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="615"/>
@@ -20938,7 +20942,7 @@ Si vous sélectionnez &quot;Utiliser le lecteur par défaut&quot;, la commande d
     <message>
         <location filename="../themes/themestrings.h" line="641"/>
         <source>Assign custom keys to MythTV shortcuts.</source>
-        <translation>Affecter vos touches personnelles aux raccourcis de Mythtv.</translation>
+        <translation>Affecter vos touches personnelles aux raccourcis de MythTV.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="415"/>
@@ -20973,7 +20977,7 @@ Si vous sélectionnez &quot;Utiliser le lecteur par défaut&quot;, la commande d
     <message>
         <location filename="../themes/themestrings.h" line="645"/>
         <source>Edit the details about this channel.</source>
-        <translation>Editer les détails de cette chaîne.</translation>
+        <translation>Éditer les détails de cette chaîne.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="646"/>
@@ -21157,10 +21161,7 @@ Une fois vos modifications complétées, veuillez cliquer sur le bouton &quot;Va
     <message>
         <location filename="../themes/themestrings.h" line="818"/>
         <source>%PLAYEDTIME% of %TOTALTIME% %(|REMAININGTIME| remaining)%%(|BEHINDTIME| behind)%</source>
-        <translation variants="yes">
-            <lengthvariant>%PLAYEDTIME% de %TOTALTIME% %(|REMAININGTIME| restant)%%(|BEHINDTIME| écoulé)%</lengthvariant>
-            <lengthvariant></lengthvariant>
-        </translation>
+        <translation>%PLAYEDTIME% de %TOTALTIME% %(|REMAININGTIME| restante(s))%%(|BEHINDTIME| écoulée(s))%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="167"/>
@@ -21211,7 +21212,7 @@ Une fois vos modifications complétées, veuillez cliquer sur le bouton &quot;Va
         <source>%PLAYEDTIME% of %TOTALTIME%
 %(|REMAININGTIME| remaining)%%(|BEHINDTIME| behind)%</source>
         <translation>%PLAYEDTIME% de %TOTALTIME%
-%(|REMAININGTIME| restant)%%(|BEHINDTIME| écoulé)%</translation>
+%(|REMAININGTIME| restante(s))%%(|BEHINDTIME| écoulée(s))%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="438"/>
@@ -22264,7 +22265,7 @@ Donc il faudrait mettre &quot; Commande de lecture personnalisée&quot; </transl
     <message>
         <location filename="../themes/themestrings.h" line="254"/>
         <source>Metadata Options</source>
-        <translation>Options de méta-données</translation>
+        <translation>Options de métadonnées</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="264"/>
@@ -22435,7 +22436,7 @@ Donc il faudrait mettre &quot; Commande de lecture personnalisée&quot; </transl
     <message>
         <location filename="../themes/themestrings.h" line="399"/>
         <source>Movie Metadata Source:</source>
-        <translation>Sources de métadonnées des films :</translation>
+        <translation>Source de métadonnées des films :</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="400"/>
@@ -23082,7 +23083,7 @@ Lorsque vous avez effectuer toutes vos corrections, clicquez sur le bouton &quot
     <message>
         <location filename="../themes/themestrings.h" line="928"/>
         <source>TintedGlass is a transparent theme that is a little old school MythTV yet takes advantage of new MythUI features.</source>
-        <translation>TintedGlass est un thème transparent reprenant l&apos;ancienne philosophie de Mythtv et utilisant en partie les nouvelles fonctionnalités de la nouvelle interface.</translation>
+        <translation>TintedGlass est un thème transparent reprenant l&apos;ancienne philosophie de MythTV et utilisant en partie les nouvelles fonctionnalités de la nouvelle interface.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="929"/>
@@ -23390,7 +23391,7 @@ Lorsque vous avez effectuer toutes vos corrections, clicquez sur le bouton &quot
     <message>
         <location filename="../themes/themestrings.h" line="459"/>
         <source>Rule Overview</source>
-        <translation>Régle - Vue d&apos;ensemble</translation>
+        <translation>Règle - Vue d&apos;ensemble</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="248"/>
@@ -23576,7 +23577,7 @@ Lorsque vous avez effectuer toutes vos corrections, clicquez sur le bouton &quot
     <message>
         <location filename="../themes/themestrings.h" line="496"/>
         <source>Edit or delete any recording rule</source>
-        <translation>Éditer ou supprimer toutes les régles d&apos;enregistrement</translation>
+        <translation>Éditer ou supprimer toutes les règles d&apos;enregistrement</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="497"/>
@@ -23686,7 +23687,7 @@ Lorsque vous avez effectuer toutes vos corrections, clicquez sur le bouton &quot
     <message>
         <location filename="../themes/themestrings.h" line="558"/>
         <source>Look at Pictures</source>
-        <translation>Regarder les photos</translation>
+        <translation>Regarder vos photos</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="560"/>
@@ -23716,7 +23717,7 @@ Lorsque vous avez effectuer toutes vos corrections, clicquez sur le bouton &quot
     <message>
         <location filename="../themes/themestrings.h" line="568"/>
         <source>Play any of your media</source>
-        <translation>Voir tout le contenu de votre médiathèque</translation>
+        <translation>Afficher le contenu de votre médiathèque</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="569"/>
@@ -23875,7 +23876,7 @@ dd MMM yyyy</translation>
     <message>
         <location filename="../themes/themestrings.h" line="550"/>
         <source>Browse your video library</source>
-        <translation>Parcourir votre médiathèque</translation>
+        <translation>Parcourir votre vidéothèque</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="552"/>
@@ -23890,7 +23891,7 @@ dd MMM yyyy</translation>
     <message>
         <location filename="../themes/themestrings.h" line="554"/>
         <source>Search popular video sites</source>
-        <translation>Rechercher sur des sites vidéo populaires</translation>
+        <translation>Rechercher sur les sites vidéo internet populaires</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="555"/>
@@ -23900,7 +23901,8 @@ dd MMM yyyy</translation>
     <message>
         <location filename="../themes/themestrings.h" line="556"/>
         <source>Browse highlights and entire sites</source>
-        <translation>Parcourir les faits saillants et l&apos;ensemble des sites</translation>
+        <translatorcomment>Notre traduction est erronée</translatorcomment>
+        <translation>Parcourir les faits saillants et l&apos;ensemble des sites </translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="26"/>
@@ -24376,7 +24378,7 @@ dd MMM yyyy</translation>
     <message>
         <location filename="../programs/mythfrontend/videodlg.cpp" line="2486"/>
         <source>Metadata Settings</source>
-        <translation>Réglages de méta-données</translation>
+        <translation>Réglages de métadonnées</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/videodlg.cpp" line="2487"/>
