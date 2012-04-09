@@ -264,12 +264,37 @@ long HTTPRequest::SendResponse( void )
     }
 
     // ----------------------------------------------------------------------
+
+    int nContentLen = m_response.buffer().length();
+
+    QBuffer *pBuffer = &m_response;
+
+    // ----------------------------------------------------------------------
+    // Should we try to return data gzip'd?
+    // ----------------------------------------------------------------------
+
+    QBuffer compBuffer;
+
+    if (( nContentLen > 0 ) && m_mapHeaders[ "accept-encoding" ].contains( "gzip" ))
+    {
+        QByteArray compressed = gzipCompress( m_response.buffer() );
+        compBuffer.setData( compressed );
+
+        if (compBuffer.buffer().length() > 0)
+        {
+            pBuffer = &compBuffer;
+
+            m_mapRespHeaders[ "Content-Encoding" ] = "gzip";
+        }
+    }
+
+    // ----------------------------------------------------------------------
     // Write out Header.
     // ----------------------------------------------------------------------
 
-    const QByteArray &buffer = m_response.buffer();
+    nContentLen = pBuffer->buffer().length();
 
-    QString    rHeader = BuildHeader( buffer.length() );
+    QString    rHeader = BuildHeader( nContentLen );
 
     QByteArray sHeader = rHeader.toUtf8();
     nBytes  = WriteBlockDirect( sHeader.constData(), sHeader.length() );
@@ -278,9 +303,9 @@ long HTTPRequest::SendResponse( void )
     // Write out Response buffer.
     // ----------------------------------------------------------------------
 
-    if (( m_eType != RequestTypeHead ) && ( buffer.length() > 0 ))
+    if (( m_eType != RequestTypeHead ) && ( nContentLen > 0 ))
     {
-        nBytes += SendData( &m_response, 0, m_response.size() );
+        nBytes += SendData( pBuffer, 0, nContentLen );
     }
 
     // ----------------------------------------------------------------------
@@ -455,7 +480,14 @@ long HTTPRequest::SendResponseFile( QString sFileName )
 
 qint64 HTTPRequest::SendData( QIODevice *pDevice, qint64 llStart, qint64 llBytes )
 {
+    bool   bShouldClose = false;
     qint64 sent = 0;
+
+    if (!pDevice->isOpen())
+    {
+        pDevice->open( QIODevice::ReadOnly );
+        bShouldClose = true;
+    }
 
     // ----------------------------------------------------------------------
     // Set out file position to requested start location.
@@ -486,6 +518,9 @@ qint64 HTTPRequest::SendData( QIODevice *pDevice, qint64 llStart, qint64 llBytes
             llBytesRemaining -= llBytesRead;
         }
     }
+
+    if (bShouldClose)
+        pDevice->close();
 
     return sent;
 }
@@ -1689,3 +1724,4 @@ bool BufferedSocketDeviceRequest::IsBlocking()
 
     return false;
 }
+
