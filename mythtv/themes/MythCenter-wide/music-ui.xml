@@ -1696,14 +1696,12 @@
             </section>
         </animation>
 
-        <!-- Disappears when virtual keyboard is used
         <animation trigger="AboutToHide">
             <section>
                 <alpha start="255" end="0" easingcurve="InQuart"/>
                 <zoom start="100" end="0" easingcurve="InQuart"/>
             </section>
         </animation>
-        -->
 
         <imagetype name="box">
             <position>0,0</position>
