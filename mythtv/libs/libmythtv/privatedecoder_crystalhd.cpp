@@ -1,3 +1,5 @@
+#include <unistd.h>
+
 #include "privatedecoder_crystalhd.h"
 #include "myth_imgconvert.h"
 

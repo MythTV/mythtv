@@ -30,6 +30,7 @@
 #include "audioinputoss.h"
 #include "mythverbose.h"
 #include <fcntl.h>
+#include <unistd.h>
 #include <sys/ioctl.h>
 
 #define LOC     QString("AudioInOSS: ")

@@ -14,6 +14,7 @@
 #include <sys/types.h>  // for fnctl
 #include <fcntl.h>      // for fnctl
 #include <errno.h>      // for checking errno
+#include <unistd.h>     // for read, write, close, pipe
 
 #ifndef O_NONBLOCK
 #define O_NONBLOCK 0 /* not actually supported in MINGW */

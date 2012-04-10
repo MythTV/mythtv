@@ -23,6 +23,7 @@
 
 // ANSI C headers
 #include <cstdlib>
+#include <unistd.h>
 
 // Qt headers
 #include <QStringList>

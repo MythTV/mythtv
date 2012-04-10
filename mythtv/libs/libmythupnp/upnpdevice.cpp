@@ -26,6 +26,7 @@
 #include "httpcomms.h"
 
 #include <cerrno>
+#include <unistd.h>
 
 #include <QFile>
 #include <QTextStream>

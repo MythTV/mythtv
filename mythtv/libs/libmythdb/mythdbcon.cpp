@@ -1,5 +1,6 @@
 // ANSI C
 #include <cstdlib>
+#include <unistd.h>
 
 // Qt
 #include <QVector>

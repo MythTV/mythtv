@@ -12,6 +12,7 @@
 #include <cmath>
 #include <fcntl.h>
 #include <errno.h>
+#include <unistd.h>
 
 # ifdef linux
 #   include <sys/vfs.h>

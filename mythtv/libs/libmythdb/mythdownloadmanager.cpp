@@ -6,6 +6,8 @@
 #include <QDir>
 #include <QThreadPool>
 
+#include <unistd.h>
+
 // libmythdb
 #include "stdlib.h"
 #include "compat.h"

@@ -1,3 +1,5 @@
+#include <unistd.h>
+
 #include "programinfoupdater.h"
 #include "remoteutil.h"
 #include "compat.h"

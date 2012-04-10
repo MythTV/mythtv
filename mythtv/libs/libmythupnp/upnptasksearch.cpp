@@ -23,6 +23,7 @@
 
 #include <compat.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #include <QStringList>
 #include <QFile>

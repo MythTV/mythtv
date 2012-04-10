@@ -6,6 +6,8 @@ using namespace std;
 #include <QTimer>
 #include <QFile>
 
+#include <unistd.h>
+
 #include "mythverbose.h"
 #include "compat.h"
 #include "mcodecs.h"

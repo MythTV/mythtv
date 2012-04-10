@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include <cassert>
 #include <cerrno>
+#include <unistd.h>
 
 #include "compat.h"
 
