@@ -238,7 +238,7 @@ Après modifications, taper &quot;Valider&quot; ou &quot;Annuler&quot; pour cont
     <message>
         <location filename="themestrings.h" line="19"/>
         <source>Choose the news sites you would like to read.</source>
-        <translation>Choisir les sites de nouvelles que vous souhaitez lire .</translation>
+        <translation>Choisir les sites de nouvelles que vous souhaitez lire.</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="8"/>

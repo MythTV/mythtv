@@ -65,7 +65,8 @@
     <message>
         <location filename="../mythnetvision/netsearch.cpp" line="348"/>
         <source>Searching %1 for &quot;%2&quot;...</source>
-        <translation>Rechercher %1 pour &quot;%2&quot;...</translation>
+        <translatorcomment>Rechercher &quot;mythtv&quot; sur &quot;daily motion&quot; ...</translatorcomment>
+        <translation>Rechercher &quot;%2&quot; sur &quot;%1&quot; ...</translation>
     </message>
     <message>
         <location filename="../mythnetvision/netsearch.cpp" line="370"/>
@@ -223,12 +224,12 @@ Gilles correction de &quot;Téléchargement du vidéo...&quot;</translatorcommen
     <message>
         <location filename="../mythnetvision/nettree.cpp" line="1199"/>
         <source>Updating RSS.  This could take a while...</source>
-        <translation>Mise à jour des RSS. Cela pourrait prendre un certain temps...</translation>
+        <translation>Mise à jour des RSS. Cela peut prendre un certain temps...</translation>
     </message>
     <message>
         <location filename="../mythnetvision/nettree.cpp" line="1214"/>
         <source>Updating Site Maps.  This could take a while...</source>
-        <translation>Mise à jour des sites. Cela pourrait prendre un certain temps...</translation>
+        <translation>Mise à jour des sites. Cela peut prendre un certain temps...</translation>
     </message>
     <message>
         <location filename="../mythnetvision/nettree.cpp" line="1304"/>

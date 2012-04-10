@@ -223,7 +223,7 @@
          setting_type="global" label="Disable FireWire reset"
          help_text="By default, MythTV resets the FireWire bus when a
                     FireWire recorder stops responding to commands. If
-                    this causes problems, you can disable this behaviour
+                    this causes problems, you can disable this behavior
                     here."
          data_type="checkbox" />
     </group>

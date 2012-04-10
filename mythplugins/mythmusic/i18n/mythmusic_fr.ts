@@ -256,7 +256,8 @@
     <message>
         <location filename="../mythmusic/generalsettings.cpp" line="77"/>
         <source>This directory must exist, and the user running MythMusic needs to have write permission to the directory.</source>
-        <translation>Ce répertoire doit exister et l&apos;utilisateur de MythMusic doit avoir la permission d&apos;écrire dans ce répertoire.</translation>
+        <translatorcomment>Le message Anglais est erroné, on ne devrait pas parler du module mais plutôt du frontal en général.</translatorcomment>
+        <translation>Ce répertoire doit exister et l&apos;utilisateur exécutant le frontal doit avoir la permission d&apos;écrire dans ce répertoire.</translation>
     </message>
     <message>
         <location filename="../mythmusic/generalsettings.cpp" line="80"/>
@@ -2742,7 +2743,7 @@ Voulez-vous supprimer définitivement le(s) fichier(s) existant(s) ?</translatio
     <message>
         <location filename="themestrings.h" line="17"/>
         <source>Now Playing: %TITLE% by %ARTIST% on %ALBUM%</source>
-        <translation>Joue actuellement : %TITLE% par %ARTIST% de %ALBUM%</translation>
+        <translation>Vous écoutez %TITLE% par %ARTIST% de l&apos;album %ALBUM%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="25"/>

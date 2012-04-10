@@ -25,7 +25,7 @@ AudioSetupWizard::AudioSetupWizard(MythScreenStack *parent,
       m_ac3Check(NULL),                  m_eac3Check(NULL),
       m_truehdCheck(NULL),               m_dtshdCheck(NULL),
       m_testSpeakerButton(NULL),         m_nextButton(NULL),
-      m_prevButton(NULL)
+      m_prevButton(NULL),                m_lastAudioDevice("")
 {
 }
 
@@ -197,25 +197,20 @@ void AudioSetupWizard::Init(void)
         m_audioDeviceButtonList->SetValueByData(qVariantFromValue(current));
     }
 
+    m_maxspeakers = gCoreContext->GetNumSetting("MaxChannels", 2);
+    m_lastAudioDevice = m_audioDeviceButtonList->GetItemCurrent()->GetText();
+
     // Update list for default audio device
     UpdateCapabilities();
 
     connect(m_ac3Check,
-            SIGNAL(valueChanged()), SLOT(UpdateCapabilities()));
-    connect(m_dtsCheck,
-            SIGNAL(valueChanged()), SLOT(UpdateCapabilities()));
+            SIGNAL(valueChanged()), SLOT(UpdateCapabilitiesAC3()));
     connect(m_audioDeviceButtonList,
             SIGNAL(itemSelected(MythUIButtonListItem*)),
             SLOT(UpdateCapabilities(MythUIButtonListItem*)));
 }
 
-AudioOutputSettings AudioSetupWizard::UpdateCapabilities(void)
-{
-    return UpdateCapabilities(NULL);
-}
-
-AudioOutputSettings AudioSetupWizard::UpdateCapabilities(
-    MythUIButtonListItem* item)
+AudioOutputSettings AudioSetupWizard::UpdateCapabilities(bool restore, bool AC3)
 {
     QString out = m_audioDeviceButtonList->GetItemCurrent()->GetText();
     int max_speakers = 8;
@@ -254,17 +249,28 @@ AudioOutputSettings AudioSetupWizard::UpdateCapabilities(
     if (max_speakers > 2 && !bLPCM)
         max_speakers = 2;
     if (max_speakers == 2 && bAC3)
-        max_speakers = 6;
-
-    int cur_speakers;
-    if (m_speakerNumberButtonList->GetItemCurrent() == NULL)
     {
-        cur_speakers = gCoreContext->GetNumSetting("MaxChannels", 2);
+        max_speakers = 6;
+        if (AC3)
+        {
+            restore = true;
+        }
     }
-    else
+
+    int cur_speakers = m_maxspeakers;
+
+    if (m_speakerNumberButtonList->GetItemCurrent() != NULL)
     {
         cur_speakers = qVariantValue<int>
             (m_speakerNumberButtonList->GetItemCurrent()->GetData());
+    }
+    if (cur_speakers > m_maxspeakers)
+    {
+        m_maxspeakers = cur_speakers;
+    }
+    if (restore)
+    {
+        cur_speakers = m_maxspeakers;
     }
 
     if (cur_speakers > max_speakers)
@@ -285,7 +291,7 @@ AudioOutputSettings AudioSetupWizard::UpdateCapabilities(
                 {
                     MythUIButtonListItem *stereo =
                         new MythUIButtonListItem(m_speakerNumberButtonList,
-                                                 "Stereo");
+                                                 QObject::tr("Stereo"));
                     stereo->SetData(2);
                     break;
                 }
@@ -322,12 +328,28 @@ AudioOutputSettings AudioSetupWizard::UpdateCapabilities(
     return settings;
 }
 
+AudioOutputSettings AudioSetupWizard::UpdateCapabilities(
+    MythUIButtonListItem* item)
+{
+    bool restore = false;
+    if (item)
+    {
+        restore = item->GetText() != m_lastAudioDevice;
+        m_lastAudioDevice = item->GetText();
+    }
+    return UpdateCapabilities(restore);
+}
+
+AudioOutputSettings AudioSetupWizard::UpdateCapabilitiesAC3(void)
+{
+    return UpdateCapabilities(false, true);
+}
+
 void AudioSetupWizard::slotNext(void)
 {
     if (m_testThread)
     {
-        m_testThread->cancel();
-        m_testThread->wait();
+        toggleSpeakers();
     }
 
     save();
@@ -407,7 +429,7 @@ void AudioSetupWizard::toggleSpeakers(void)
         return;
     }
 
-    AudioOutputSettings settings = UpdateCapabilities();
+    AudioOutputSettings settings = UpdateCapabilities(false);
     QString out = m_audioDeviceButtonList->GetItemCurrent()->GetText();
     int channels =
         qVariantValue<int> (m_speakerNumberButtonList->GetItemCurrent()->GetData());

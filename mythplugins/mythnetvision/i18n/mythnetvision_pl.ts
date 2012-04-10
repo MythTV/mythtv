@@ -502,10 +502,14 @@ Dla nowych subskrypcji poprostu wprowadź URL i naciśnij &apos;Zachowaj&apos;</
     </message>
     <message>
         <location filename="themestrings.h" line="52"/>
+        <source>Select to change image</source>
+        <translation>Wybierz aby zmienić ikonę</translation>
+    </message>
+    <message>
         <source>Type the URL to an RSS 2.0 media feed below.  If editing an existing feed,modify any of the values you like.  Press &quot;Save&quot; to save/subscribe.
 
 For new subscriptions,you can simply enter the URL and click &quot;Save.&quot;</source>
-        <translation>Wprowadź URL dla kanału RSS 2.0. Jeśli edytujesz istniejący kanał - zmień wedle uznania. Kiedy gotowe -naciśnij &apos;Zachowaj&apos;.
+        <translation type="obsolete">Wprowadź URL dla kanału RSS 2.0. Jeśli edytujesz istniejący kanał - zmień wedle uznania. Kiedy gotowe -naciśnij &apos;Zachowaj&apos;.
 
 Dla nowych subskrypcji poprostu wprowadź URL i naciśnij &apos;Zachowaj&apos;</translation>
     </message>
@@ -515,37 +519,36 @@ Dla nowych subskrypcji poprostu wprowadź URL i naciśnij &apos;Zachowaj&apos;</
         <translation>Lista z Internet.Wideo</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="54"/>
         <source>You haven&apos;t added any Sites/RSS Feeds yet!  To add a site,press MENU,then choose &quot;Scan/Manage Subscriptions,&quot; then &quot;Manage Site Subscriptions.&quot;</source>
-        <translation>Nie wprowadziłeś jeszcze żadnych kanałów RSS. Aby dodać, naciśnij &apos;MENU&apos; i następnie wybierz &apos;Szuka/Edytuj subskrypcje&apos; an następnie &apos;Zarządzaj subskrypcjami&apos;</translation>
+        <translation type="obsolete">Nie wprowadziłeś jeszcze żadnych kanałów RSS. Aby dodać, naciśnij &apos;MENU&apos; i następnie wybierz &apos;Szuka/Edytuj subskrypcje&apos; an następnie &apos;Zarządzaj subskrypcjami&apos;</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="55"/>
+        <location filename="themestrings.h" line="54"/>
         <source>User Rating: %1</source>
         <translation>Ocena: %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="56"/>
+        <location filename="themestrings.h" line="55"/>
         <source>By: %1</source>
         <translation>Przez: %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="57"/>
+        <location filename="themestrings.h" line="56"/>
         <source>Internet Video Gallery</source>
         <translation>Galeria Internet Wideo</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="58"/>
+        <location filename="themestrings.h" line="57"/>
         <source>Search popular video sites</source>
         <translation>Wyszukuj popularne portale z Internetowym Video</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="59"/>
+        <location filename="themestrings.h" line="58"/>
         <source>Browse Internet Video</source>
         <translation>Przeglądaj Internetowe Video</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="60"/>
+        <location filename="themestrings.h" line="59"/>
         <source>Browse highlights and entire sites</source>
         <translation>Przeglądaj wyróżnienia i całe portale</translation>
     </message>

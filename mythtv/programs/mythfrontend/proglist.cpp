@@ -1319,18 +1319,18 @@ void ProgLister::FillItemList(bool restorePosition, bool updateDisp)
     {
         if (m_recid && !m_title.isEmpty())
         {
-            where = QString("WHERE recordid = %1 OR title = :MTITLE ")
+            where = QString("AND ( recordid = %1 OR title = :MTITLE )")
                 .arg(m_recid);
             bindings[":MTITLE"] = m_title;
         }
         else if (!m_title.isEmpty())
         {
-            where = QString("WHERE title = :MTITLE ");
+            where = QString("AND title = :MTITLE ");
             bindings[":MTITLE"] = m_title;
         }
         else if (m_recid)
         {
-            where = QString("WHERE recordid = %1 ").arg(m_recid);
+            where = QString("AND recordid = %1 ").arg(m_recid);
         }
     }
 
