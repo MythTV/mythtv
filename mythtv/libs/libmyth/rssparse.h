@@ -13,6 +13,7 @@ using namespace std;
 #include <QPair>
 #include <QMap>
 #include <QVariant>
+#include <sys/types.h>
 
 #include "mythexp.h"
 
