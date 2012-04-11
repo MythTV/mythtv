@@ -52,19 +52,19 @@ class TMDBCacheError( TMDBRequestError ):
 
 class TMDBCacheReadError( TMDBCacheError ):
     def __init__(self, filename):
-        super(TMDBCachePermissionsError, self).__init__(
+        super(TMDBCacheReadError, self).__init__(
             "User does not have permission to access cache file: {0}.".format(filename))
         self.filename = filename
 
 class TMDBCacheWriteError( TMDBCacheError ):
     def __init__(self, filename):
-        super(TMDBCachePermissionsError, self).__init__(
+        super(TMDBCacheWriteError, self).__init__(
             "User does not have permission to write cache file: {0}.".format(filename))
         self.filename = filename
 
 class TMDBCacheDirectoryError( TMDBCacheError ):
     def __init__(self, filename):
-        super(TMDBCachePermissionsError, self).__init__(
+        super(TMDBCacheDirectoryError, self).__init__(
             "Directory containing cache file does not exist: {0}.".format(filename))
         self.filename = filename
 
