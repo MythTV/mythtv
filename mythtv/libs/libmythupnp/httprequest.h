@@ -195,6 +195,7 @@ class UPNP_PUBLIC HTTPRequest
         static QString  TestMimeType    ( const QString &sFileName );
         static long     GetParameters   ( QString  sParams, QStringMap &mapParams );
         static QString  Encode          ( const QString &sIn );
+        static QString  GetETagHash     ( const QByteArray &data );
 
         // ------------------------------------------------------------------
 

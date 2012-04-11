@@ -163,7 +163,8 @@ class MainServer : public QObject, public MythSocketCBs
     void HandleUndeleteRecording(QStringList &slist, PlaybackSock *pbs);
     void DoHandleUndeleteRecording(RecordingInfo &recinfo, PlaybackSock *pbs);
     void HandleForgetRecording(QStringList &slist, PlaybackSock *pbs);
-    void HandleRescheduleRecordings(int recordid, PlaybackSock *pbs);
+    void HandleRescheduleRecordings(const QStringList &request, 
+                                    PlaybackSock *pbs);
     void HandleGoToSleep(PlaybackSock *pbs);
     void HandleQueryFreeSpace(PlaybackSock *pbs, bool allBackends);
     void HandleQueryFreeSpaceSummary(PlaybackSock *pbs);

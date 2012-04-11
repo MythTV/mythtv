@@ -1050,15 +1050,21 @@ void LogPrintLine( uint64_t mask, LogLevel_t level, const char *file, int line,
     if (!item)
         return;
 
+    char *formatcopy = NULL;
     if( fromQString && strchr(format, '%') )
     {
         QString string(format);
-        format = string.replace(logRegExp, "%%").toLocal8Bit().constData();
+        format = strdup(string.replace(logRegExp, "%%").toLocal8Bit()
+                              .constData());
+        formatcopy = (char *)format;
     }
 
     va_start(arguments, format);
     vsnprintf(item->message, LOGLINE_MAX, format, arguments);
     va_end(arguments);
+
+    if (formatcopy)
+        free(formatcopy);
 
     logQueue.enqueue(item);
 

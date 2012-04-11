@@ -18,6 +18,7 @@
 
 #include <QList>
 #include <QMetaType>
+#include <QCryptographicHash>
 
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -30,6 +31,8 @@
 class UPNP_PUBLIC Serializer
 {
     protected:
+
+        QCryptographicHash  m_hash;
 
         virtual void BeginSerialize( QString &sName ) {}
         virtual void EndSerialize  () {}
@@ -47,6 +50,10 @@ class UPNP_PUBLIC Serializer
         void SerializeObject          ( const QObject *pObject, const QString &sName );
         void SerializeObjectProperties( const QObject *pObject );
 
+        QString    ReadPropertyMetadata  ( const QObject *pObject, 
+                                                 QString  sPropName, 
+                                                 QString  sKey );
+
     public:
 
         virtual void Serialize( const QObject *pObject, const QString &_sName = QString() );
@@ -60,7 +67,7 @@ class UPNP_PUBLIC Serializer
         virtual void    AddHeaders     ( QStringMap &headers );
 
 
-        Serializer()
+        Serializer() : m_hash( QCryptographicHash::Sha1 )
         {
             qRegisterMetaType< QList<QObject*> >("QList<QObject*>");
         }

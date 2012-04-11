@@ -17,12 +17,11 @@ class SERVICE_PUBLIC VideoSourceList : public QObject
     Q_OBJECT
     Q_CLASSINFO( "version", "1.0" );
 
-    // We need to know the type that will ultimately be contained in 
-    // any QVariantList or QVariantMap.  We do his by specifying
-    // A Q_CLASSINFO entry with "<PropName>_type" as the key
-    // and the type name as the value
+    // Q_CLASSINFO Used to augment Metadata for properties. 
+    // See datacontracthelper.h for details
 
     Q_CLASSINFO( "VideoSources", "type=DTC::VideoSource");
+	Q_CLASSINFO( "AsOf"	       , "transient=true"       );
 
     Q_PROPERTY( QDateTime    AsOf           READ AsOf            WRITE setAsOf           )
     Q_PROPERTY( QString      Version        READ Version         WRITE setVersion        )

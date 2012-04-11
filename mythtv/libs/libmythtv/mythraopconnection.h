@@ -91,7 +91,15 @@ class MythRAOPConnection : public QObject
     AVCodecContext *m_codeccontext;
     QList<int>      m_audioFormat;
     int             m_sampleRate;
-    QMap<uint64_t, int16_t*>  m_audioQueue;
+    typedef struct 
+    {
+        int16_t *samples;
+        uint32_t frames;
+        uint32_t size;
+    } AudioFrame;
+            
+    QMap<uint64_t, AudioFrame>  m_audioQueue;
+    uint32_t        m_queueLength;
     bool            m_allowVolumeControl;
     // audio/packet sync
     bool            m_seenPacket;

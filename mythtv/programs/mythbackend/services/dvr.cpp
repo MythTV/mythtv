@@ -27,6 +27,7 @@
 #include "compat.h"
 #include "mythversion.h"
 #include "mythcorecontext.h"
+#include "mythevent.h"
 #include "scheduler.h"
 #include "autoexpire.h"
 #include "jobqueue.h"
@@ -99,9 +100,12 @@ DTC::ProgramList* Dvr::GetFilteredRecordedList( bool           bDescending,
         for( int n = nStartIndex; n < nEndIndex; n++)
         {
             ProgramInfo *pInfo = progList[ n ];
-            DTC::Program *pProgram = pPrograms->AddNewProgram();
+            if (pInfo->GetRecordingGroup() != "Deleted")
+            {
+                DTC::Program *pProgram = pPrograms->AddNewProgram();
 
-            FillProgramInfo( pProgram, pInfo, true );
+                FillProgramInfo( pProgram, pInfo, true );
+            }
         }
     }
     else
@@ -180,8 +184,16 @@ bool Dvr::RemoveRecorded( int              nChanId,
 
     ProgramInfo *pInfo = new ProgramInfo(nChanId, dStartTime);
 
+    QString cmd = QString("DELETE_RECORDING %1 %2")
+                .arg(nChanId)
+                .arg(dStartTime.toString(Qt::ISODate));
+    MythEvent me(cmd);
+
     if (pInfo->HasPathname())
-        bResult = RemoteDeleteRecording(nChanId, dStartTime, true, false);
+    {
+        gCoreContext->dispatch(me);
+        bResult = true;
+    }
 
     return bResult;
 }
@@ -444,9 +456,6 @@ int Dvr::AddRecordSchedule   ( int       nChanId,
     RecordingInfo *info = new RecordingInfo(nChanId, dStartTime, false);
     RecordingRule *rule = info->GetRecordingRule();
 
-    delete info;
-    info = NULL;
-
     if (sType.isEmpty())
         sType = "single";
 
@@ -459,6 +468,7 @@ int Dvr::AddRecordSchedule   ( int       nChanId,
     if (sDupIn.isEmpty())
         sDupIn = "all";
 
+    rule->m_title = info->GetTitle();
     rule->m_type = recTypeFromString(sType);
     rule->m_searchType = searchTypeFromString(sSearchType);
     rule->m_dupMethod = dupMethodFromString(sDupMethod);

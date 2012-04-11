@@ -675,7 +675,7 @@ void ProgLister::DeleteOldEpisode(bool ok)
     if (!query.exec())
         MythDB::DBError("ProgLister::DeleteOldEpisode", query);
 
-    ScheduledRecording::signalChange(0);
+    ScheduledRecording::RescheduleCheck(*pi, "DeleteOldEpisode");
     FillItemList(true);
 }
 
@@ -704,7 +704,11 @@ void ProgLister::DeleteOldSeries(bool ok)
     if (!query.exec())
         MythDB::DBError("ProgLister::DeleteOldSeries -- delete", query);
 
-    ScheduledRecording::signalChange(0);
+    // Set the programid to the special value of "**any**" which the
+    // scheduler recognizes to mean the entire series was deleted.
+    RecordingInfo tempri(*pi);
+    tempri.SetProgramID("**any**");
+    ScheduledRecording::RescheduleCheck(tempri, "DeleteOldSeries");
     FillItemList(true);
 }
 
@@ -1319,18 +1323,18 @@ void ProgLister::FillItemList(bool restorePosition, bool updateDisp)
     {
         if (m_recid && !m_title.isEmpty())
         {
-            where = QString("WHERE recordid = %1 OR title = :MTITLE ")
+            where = QString("AND ( recordid = %1 OR title = :MTITLE )")
                 .arg(m_recid);
             bindings[":MTITLE"] = m_title;
         }
         else if (!m_title.isEmpty())
         {
-            where = QString("WHERE title = :MTITLE ");
+            where = QString("AND title = :MTITLE ");
             bindings[":MTITLE"] = m_title;
         }
         else if (m_recid)
         {
-            where = QString("WHERE recordid = %1 ").arg(m_recid);
+            where = QString("AND recordid = %1 ").arg(m_recid);
         }
     }
 

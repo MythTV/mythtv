@@ -503,10 +503,14 @@ Für neue Abonnements brauchen Sie nur die URL einzugeben und auf &quot;Speicher
     </message>
     <message>
         <location filename="themestrings.h" line="52"/>
+        <source>Select to change image</source>
+        <translation>Auswählen um das Bild zu ändern</translation>
+    </message>
+    <message>
         <source>Type the URL to an RSS 2.0 media feed below.  If editing an existing feed,modify any of the values you like.  Press &quot;Save&quot; to save/subscribe.
 
 For new subscriptions,you can simply enter the URL and click &quot;Save.&quot;</source>
-        <translation>Geben Sie die URL eines RSS 2.0 Feeds unten ein.  Falls Sie einen vorhandenen Feed bearbeiten können Sie jedes Feld ändern.  Drücken Sie &quot;Speichern&quot; um zu speichern/abonnieren.
+        <translation type="obsolete">Geben Sie die URL eines RSS 2.0 Feeds unten ein.  Falls Sie einen vorhandenen Feed bearbeiten können Sie jedes Feld ändern.  Drücken Sie &quot;Speichern&quot; um zu speichern/abonnieren.
 
 Für neue Abonnements reicht es wenn Sie die URL eingeben und &quot;Speichern&quot; klicken.</translation>
     </message>
@@ -516,37 +520,36 @@ Für neue Abonnements reicht es wenn Sie die URL eingeben und &quot;Speichern&qu
         <translation>Liste Internetvideos</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="54"/>
         <source>You haven&apos;t added any Sites/RSS Feeds yet!  To add a site,press MENU,then choose &quot;Scan/Manage Subscriptions,&quot; then &quot;Manage Site Subscriptions.&quot;</source>
-        <translation>Sie haben noch keine Seiten/RSS-Feeds hinzugefügt. Um eine Seite hinzuzufügen drücken Sie MENÜ und wählen Sie &quot;Abonnements durchsuchen/verwalten&quot;, und dann &quot;Seitenabonnements verwalten&quot;.</translation>
+        <translation type="obsolete">Sie haben noch keine Seiten/RSS-Feeds hinzugefügt. Um eine Seite hinzuzufügen drücken Sie MENÜ und wählen Sie &quot;Abonnements durchsuchen/verwalten&quot;, und dann &quot;Seitenabonnements verwalten&quot;.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="55"/>
+        <location filename="themestrings.h" line="54"/>
         <source>User Rating: %1</source>
         <translation>Benutzerbewertung: %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="56"/>
+        <location filename="themestrings.h" line="55"/>
         <source>By: %1</source>
         <translation>Von: %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="57"/>
+        <location filename="themestrings.h" line="56"/>
         <source>Internet Video Gallery</source>
         <translation>Internetvideogalerie</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="58"/>
+        <location filename="themestrings.h" line="57"/>
         <source>Search popular video sites</source>
         <translation>Suche populäre Videoseiten</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="59"/>
+        <location filename="themestrings.h" line="58"/>
         <source>Browse Internet Video</source>
         <translation>Internet Videos durchsuchen</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="60"/>
+        <location filename="themestrings.h" line="59"/>
         <source>Browse highlights and entire sites</source>
         <translation>Highlights und ganze Seiten browsen</translation>
     </message>

@@ -2397,7 +2397,7 @@ void MusicCommon::playFirstTrack()
 //---------------------------------------------------------
 // MythMusicVolumeDialog
 //---------------------------------------------------------
-#define MUSICVOLUMEPOPUPTIME 5 * 1000
+#define MUSICVOLUMEPOPUPTIME 4 * 1000
 
 MythMusicVolumeDialog::MythMusicVolumeDialog(MythScreenStack *parent, const char *name)
          : MythScreenType(parent, name, false)
@@ -2460,7 +2460,10 @@ bool MythMusicVolumeDialog::keyPressEvent(QKeyEvent *event)
     if (!handled && MythScreenType::keyPressEvent(event))
         handled = true;
 
-    m_displayTimer->start(MUSICVOLUMEPOPUPTIME);
+    // Restart the display timer only if we handled this keypress, if nothing
+    // has changed there's no need to keep the volume on-screen
+    if (handled)
+        m_displayTimer->start(MUSICVOLUMEPOPUPTIME);
 
     return handled;
 }

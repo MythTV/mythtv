@@ -1,0 +1,301 @@
+## PyTMDB3
+
+This Python module implements the v3 API for TheMovieDb.org, allowing access
+to movie and cast information, as well as related artwork. More information
+can be found at:
+
+http://help.themoviedb.org/kb/api/about-3
+
+## Initial Access
+
+Access to the API requires a personal key. You can create one by signing up
+for an account on TheMovieDb.org, and generating one from your Account Details
+page. Once done, the PyTMDB3 module must be be given this key as follows:
+
+  >>> from tmdb3 import set_key
+  >>> set_key('your_api_key')
+
+## Caching Engine
+
+In order to limit excessive usage against the online API server, the PyTMDB3
+module supports caching of requests. Cached data is keyed off the request URL,
+and is currently stored for one hour. This may get tuned further as the v3
+API gets increased usage, and official limits are set per host.
+
+There are currently two engines available for use. The 'null' engine merely
+discards all information, and is only intended for debugging use. The 'file'
+engine is defualt, and will store to '/tmp/pytmdb3.cache' unless configured
+otherwise. The cache engine can be configured as follows.
+
+  >>> from tmdb3 import set_cache
+  >>> set_cache('null')
+  >>> set_cache(filename='/full/path/to/cache') # the 'file' engine is assumed
+  >>> set_cache(filename='tmdb3.cache')         # relative paths are put in /tmp
+  >>> set_cache(engine='file', filename='~/.tmdb3cache')
+
+## Locale Configuration
+
+The previous v2 API supported language selection, but would fall through to
+the defaults for any fields that did not have language-specific values. The
+v3 API no longer performs this fall through, leaving it up to clients to
+optionally implement it on their own.
+
+The PyTMDB3 module supports the use of locales in two separate manners. One
+can define a global locale that is automatically used if not specified
+otherwise, or a specific locale can be supplied directly to searches and
+data queries using the 'locale=' keyword argument, which is then propogated
+through any subsequent queries made through those objects.
+
+Locale settings are controlled through two functions
+
+  >>> from tmdb3 import get_locale, set_locale
+  >>> get_locale()
+  <Locale None_None>
+  >>> set_locale()
+  >>> get_locale()
+  <Locale en_US>
+  >>> set_locale('en', 'gb')
+  >>> get_locale()
+  <Locale en_GB>
+  >>> get_locale('fr', 'fr')
+  <Locale fr_FR>
+
+set_locale() is used to set the global default locale. It optionally accepts
+'language' and 'country' keyword arguments. If not supplied, it will attempt
+to pull such information from your environment. It also accepts a
+'fallthrough' keyword argument, which is used to control the language and 
+country filter fall through. This is disabled by default, meaning if a
+language is set, it will only return information specific to that language.
+
+get_locale() also accepts optional 'language' and 'country' keyword arguments,
+and can be used to generate locales to use directly, overriding the global
+configuration. If none are given, this instead returns the global
+configuration. Note that fall through behavior is applied module-wide, and
+individual locales cannot be used to change that behavior.
+
+## Authentication
+
+This is not yet supported.
+
+## Searching
+
+There are currently two search methods available for use: movies and people.
+Search results from TheMovieDb are sent iteratively, twenty results per page.
+The search methods provided by the PyTMDB3 module return list-like structures
+that will automatically grab new pages as needed.
+
+  >>> from tmdb3 import searchMovie
+  >>> res = searchMovie('A New Hope')
+  >>> res
+  <Search Results: A New Hope>
+  >>> len(res)
+  4
+  >>> res[0]
+  <Movie 'Star Wars: Episode IV - A New Hope' (1977)>
+
+The movieSearch() method accepts an 'adult' keyword to allow adult content
+to be returned. By default, this is set to false and such content is filtered
+out. The people search method behaves similarly.
+
+  >>> from tmdb import searchPerson
+  >>> res = searchPerson('Hanks')
+  >>> res
+  <Search Results: Hanks>
+  >>> res[0]
+  <Person 'Tom Hanks'>
+
+## Direct Queries
+
+There are currently three data types that support direct access: collections,
+movies, and people. These each take a single integer ID as an argument. All
+data attributes are implemented as properties, and populated on-demand as
+used, rather than when the object is created.
+
+  >>> from tmdb3 import Collection, Movie, Person
+  >>> Collection(10)
+  <Collection 'Star Wars Collection'>
+  >>> Movie(11)
+  <Movie 'Star Wars: Episode IV - A New Hope' (1977)>
+  >>> Person(2)
+  <Person 'Mark Hamill'>
+
+## Image Behavior
+
+TheMovieDb currently offers three types of artwork: backdrops, posters, and
+profiles. The three data queries above will each carry a default one of these
+and potentially a list of additionals to choose from. Each can be downloaded
+directly, or at one of several pre-scaled reduced resolutions. The PyTMDB3
+module provides a list of list of available sizes, and will generate a URL
+to download a requested size. Invalid sizes return an error
+
+  >>> from tmdb3 import Movie
+  >>> p = Movie(11).poster
+  >>> p
+  <Poster 'tvSlBzAdRE29bZe5yYWrJ2ds137.jpg'>
+  >>> p.sizes()
+  [u'w92', u'w154', u'w185', u'w342', u'w500', u'original']
+  >>> p.geturl()
+  u'http://cf2.imgobject.com/t/p/original/tvSlBzAdRE29bZe5yYWrJ2ds137.jpg'
+  >>> p.geturl('w342')
+  u'http://cf2.imgobject.com/t/p/w342/tvSlBzAdRE29bZe5yYWrJ2ds137.jpg'
+  >>> p.geturl('w300')
+  Traceback (most recent call last):
+    File "<stdin>", line 1, in <module>
+    File "tmdb3/tmdb_api.py", line 101, in geturl
+      raise TMDBImageSizeError
+  tmdb3.tmdb_exceptions.TMDBImageSizeError: None
+
+## Trailers
+
+TheMovieDb offers access to trailers on Youtube and Apple, however their use
+is slightly different. Youtube trailers offer an individual file, while Apple
+trailers offer multiple sizes.
+
+  >>> from tmdb3 import Movie
+  >>> movie = Movie(27205)
+  >>> movie.youtube_trailers
+  [<YoutubeTrailer 'Trailer 1'>, <YoutubeTrailer 'Trailer 2'>]
+  >>> movie.youtube_trailers[0].geturl()
+  'http://www.youtube.com/watch?v=suIIHZqDR30'
+  >>> movie.apple_trailers
+  [<AppleTrailer 'Teaser'>, <AppleTrailer 'Trailer 1'>, <AppleTrailer 'Trailer 2'>]
+  >>> movie.apple_trailers[0].sizes()
+  [u'480p', u'720p', u'1080p']
+  >>> movie.apple_trailers[0].geturl()
+  u'http://pdl.warnerbros.com/wbmovies/inception/Inception_TRL1_1080.mov'
+  >>> movie.apple_trailers[0].geturl()
+  u'http://pdl.warnerbros.com/wbmovies/inception/Inception_TRL1_480.mov'
+
+## List of Available Data 
+
+  type              name
+
+Collection:
+  integer               id
+  string                name
+  Backdrop              backdrop
+  Poster                poster
+  list(Movie)           members             (sorted by release date)
+
+Movie:
+  integer               id
+  string                title               (language specific)
+  string                originaltitle       (origin language)
+  string                tagline
+  string                overview
+  integer               runtime
+  integer               budget
+  integer               revenue
+  datetime              releasedate
+  string                homepage
+  string                IMDB reference id   ('ttXXXXXXX')
+  Backdrop              backdrop
+  Poster                poster
+  float                 popularity
+  float                 userrating
+  integer               votes
+  boolean               adult
+  Collection            collection
+  list(Genre)           genres
+  list(Studio)          studios
+  list(Country)         countries
+  list(Language)        languages
+  list(AlternateTitle)  alternate_titles
+  list(Cast)            cast                (sorted by billing)
+  list(Crew)            crew
+  list(Backdrop)        backdrops
+  list(Poster)          posters
+  list(Keyword)         keywords
+  dict(Release)         releases            (indexed by country)
+  list(Translation)     translations
+
+Movie classmethods
+  Movie                 fromIMDB(imdbid)    special constructor for use with IMDb codes
+  Movie                 latest()            gets latest movie added to database
+  list(Movie)           nowplaying()        content currently in theater
+  list(Movie)           mostpopular()       based off themoviedb.org page view counts
+  list(Movie)           toprated()          based off themoviedb.org user ratings
+
+Person:
+  integer               id
+  string                name
+  string                biography
+  datetime              dayofbirth
+  datetime              dayofdeath
+  string                homepage
+  Profile               profilie
+  list(ReverseCast)     roles
+  list(ReverseCrew)     crew
+  list(Profile)         profiles
+
+Cast (derived from Person):
+  string                character
+  integer               order               (as appears in credits)
+
+Crew (derived from Person):
+  string                job
+  string                department
+
+ReverseCast (derived from Movie):
+  string                character
+
+ReverseCrew (derived from Movie):
+  string                job
+  string                department
+
+Image:
+  string                filename            (arbitrary alphanumeric code)
+  float                 aspectratio         (not available for default images)
+  integer               height              (not available for default images)
+  integer               width               (not available for default images)
+  integer               language            (not available for default images)
+  list(string)          sizes()
+  string                geturl(size='original')
+
+Backdrop (derived from Image)
+Poster (derived from Image)
+Profile (derived from Image)
+
+AlternateTitle:
+  string                country
+  string                title
+
+Release:
+  string                certification
+  string                country
+  datetime              releasedate
+
+Translation:
+  string                name
+  string                englishname
+  string                language
+
+Genre:
+  integer               id
+  string                name
+
+Studio:
+  integer               id
+  string                name
+
+Country:
+  string                code
+  string                name
+
+Language:
+  string                code
+  string                name
+
+Trailer:
+  string                name
+  string                size
+  string                source
+
+YoutubeTrailer (derived from Trailer)
+  string                geturl()
+
+AppleTrailer
+  string                name
+  dict(Trailer)         sources             (indexed by size)
+  list(string)          sizes()
+  string                geturl(size=None)

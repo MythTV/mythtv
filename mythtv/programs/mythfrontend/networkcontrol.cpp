@@ -221,6 +221,8 @@ NetworkControl::NetworkControl() :
 
 NetworkControl::~NetworkControl(void)
 {
+    gCoreContext->removeListener(this);
+
     clientLock.lock();
     while (!clients.isEmpty())
     {

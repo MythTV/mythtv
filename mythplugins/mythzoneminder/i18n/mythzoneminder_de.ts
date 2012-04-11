@@ -162,6 +162,43 @@
     </message>
     <message>
         <location filename="themestrings.h" line="41"/>
+        <source>[R] = Running
+[S] = Stopped</source>
+        <translation>[R] = Läuft
+[S] = Gestoppt</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="42"/>
+        <source>Select Camera:</source>
+        <translation>Kamera auswählen:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="43"/>
+        <source>Select Date:</source>
+        <translation>Datum auswählen:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="44"/>
+        <source>Test</source>
+        <translation>Test</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="45"/>
+        <source>Record</source>
+        <translation>Aufnehmen</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="46"/>
+        <source>Cancel</source>
+        <translation>Abbrechen</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="47"/>
+        <source>Store</source>
+        <translation>Speichern</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="48"/>
         <source>[x]</source>
         <translation>[x]</translation>
     </message>
@@ -293,17 +330,17 @@
         <translation>Monitor 4</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="42"/>
+        <location filename="themestrings.h" line="49"/>
         <source>Show Console</source>
         <translation>Konsole anzeigen</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="43"/>
+        <location filename="themestrings.h" line="50"/>
         <source>Show Live View</source>
         <translation>Liveansicht zeigen</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="44"/>
+        <location filename="themestrings.h" line="51"/>
         <source>Show Events</source>
         <translation>Ereignisse anzeigen</translation>
     </message>

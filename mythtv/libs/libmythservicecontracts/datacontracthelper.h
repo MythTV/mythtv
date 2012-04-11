@@ -9,8 +9,33 @@
 //////////////////////////////////////////////////////////////////////////////
 //
 //  * Copy Constructors (needed for Q_PROPERTY) don't do Deep Copies yet.
+//
 //  * DECLARE_METATYPE not working if this header is not included... need
 //    to find solution since Serializer classes doesn't include this header.
+//
+//  * Q_CLASSINFO is used to add metadata options to individual properties
+//    the the Qt Metadata system doesn't account for.  
+//    It can be used in each data contract class.  The format is as follows:
+//
+//        Q_CLASSINFO( "<PropName>", "<option>=<value>;<option>=<value" );
+//
+//    Valid options/values are:
+//
+//       type=<containedType> - used by collections to know what type of
+//                              object is stored. (QVariantMap, QVariantList)
+//       name=<name>          - used for QVariantMap & QVariantList to hint
+//                              to the serializer what name to use for each
+//                              object in collection (child element in XML).
+//       transient=true       - If present, this property will not be used
+//                              when calculating the SHA1 hash used for ETag
+//                              http header.
+//
+//
+//  * DESIGNABLE in Q_PROPERTY is used to indicate if it should be Serialized 
+//    (can specify a propery to support runtime logic)
+//
+//  * Q_CLASSINFO( "defaultProp", "<propname>" ) is used to indicate the 
+//    default property (used for node text in XML)
 //
 //////////////////////////////////////////////////////////////////////////////
 

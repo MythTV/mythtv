@@ -31,10 +31,8 @@ class SERVICE_PUBLIC ChannelInfo : public QObject
     Q_OBJECT
     Q_CLASSINFO( "version", "1.06" );
 
-    // We need to know the type that will ultimately be contained in 
-    // any QVariantList or QVariantMap.  We do his by specifying
-    // A Q_CLASSINFO entry with "<PropName>_type" as the key
-    // and the type name as the value
+    // Q_CLASSINFO Used to augment Metadata for properties. 
+    // See datacontracthelper.h for details
 
     Q_CLASSINFO( "Programs", "type=DTC::Program");
 
@@ -120,6 +118,8 @@ class SERVICE_PUBLIC ChannelInfo : public QObject
               m_SourceId        ( 0      ),
               m_InputId         ( 0      ),
               m_CommFree        ( 0      ),
+              m_UseEIT          ( false  ),
+              m_Visible         ( true   ),
               m_SerializeDetails( true   )
         {
         }
@@ -140,6 +140,8 @@ class SERVICE_PUBLIC ChannelInfo : public QObject
             m_SourceId     = src.m_SourceId    ;
             m_InputId      = src.m_InputId     ;
             m_CommFree     = src.m_CommFree    ;
+            m_UseEIT       = src.m_UseEIT      ;
+            m_Visible      = src.m_Visible     ;
 
             CopyListContents< Program >( this, m_Programs, src.m_Programs );
         }

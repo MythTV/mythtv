@@ -1423,7 +1423,7 @@ void TV::GetStatus(void)
         status.insert("subtitle", ctx->playingInfo->GetSubtitle());
         status.insert("starttime",
                            ctx->playingInfo->GetRecordingStartTime()
-                           .toUTC().toString(Qt::ISODate));
+                           .toUTC().toString("yyyy-MM-ddThh:mm:ssZ"));
         status.insert("chanid",
                            QString::number(ctx->playingInfo->GetChanID()));
         status.insert("programid", ctx->playingInfo->GetProgramID());
@@ -11073,9 +11073,8 @@ void TV::FillOSDMenuSource(const PlayerContext *ctx, OSD *osd,
     if ((category == "SOURCE" || category == "INPUTSWITCHING"||
          category == "SOURCESWITCHING") && ctx->recorder)
     {
-        cardids = RemoteRequestFreeRecorderList();
+        cardids = CardUtil::GetCardList();
         cardid  = ctx->GetCardID();
-        cardids.push_back(cardid);
         // The cardids are already in the preferred order.  Don't
         // alter it if switching sources.
         if (category != "SOURCESWITCHING")

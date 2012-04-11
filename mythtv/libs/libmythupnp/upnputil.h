@@ -139,4 +139,6 @@ bool operator==           ( TaskTime t1, TaskTime t2 );
 void AddMicroSecToTaskTime( TaskTime &t, suseconds_t uSecs );
 void AddSecondsToTaskTime ( TaskTime &t, long nSecs );
 
+QByteArray gzipCompress( const QByteArray &data );
+
 #endif

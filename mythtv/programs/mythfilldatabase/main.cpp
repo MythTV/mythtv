@@ -648,87 +648,67 @@ int main(int argc, char *argv[])
             MythDB::DBError("Clearing first and last showings", updt);
 
         LOG(VB_GENERAL, LOG_INFO, "Marking episode first showings.");
+        updt.prepare("UPDATE program "
+                     "JOIN (SELECT MIN(starttime) AS starttime, programid "
+                     "      FROM program "
+                     "      WHERE programid <> '' "
+                     "      GROUP BY programid "
+                     "     ) AS firsts "
+                     "ON program.programid = firsts.programid "
+                     "  AND program.starttime = firsts.starttime "
+                     "SET program.first=1;");
+        if (!updt.exec())
+            MythDB::DBError("Marking first showings by id", updt);
+        int found = updt.numRowsAffected();
 
-        MSqlQuery query(MSqlQuery::InitCon());
-        query.prepare("SELECT MIN(starttime),programid FROM program "
-                      "WHERE programid > '' GROUP BY programid;");
-        if (query.exec())
-        {
-            updt.prepare("UPDATE program set first = 1 "
-                         "WHERE starttime = :STARTTIME "
-                         "  AND programid = :PROGRAMID;");
-            while(query.next())
-            {
-                updt.bindValue(":STARTTIME", query.value(0).toDateTime());
-                updt.bindValue(":PROGRAMID", query.value(1).toString());
-                if (!updt.exec())
-                    MythDB::DBError("Marking first showings by id", updt);
-            }
-        }
-        int found = query.size();
-        query.prepare("SELECT MIN(starttime),title,subtitle,"
-                      "       LEFT(description, 1024) AS partdesc "
-                      "FROM program WHERE programid = '' "
-                      "GROUP BY title,subtitle,partdesc;");
-        if (query.exec())
-        {
-            updt.prepare("UPDATE program set first = 1 "
-                         "WHERE starttime = :STARTTIME "
-                         "  AND title = :TITLE "
-                         "  AND subtitle = :SUBTITLE "
-                         "  AND LEFT(description, 1024) = :PARTDESC");
-            while(query.next())
-            {
-                updt.bindValue(":STARTTIME", query.value(0).toDateTime());
-                updt.bindValue(":TITLE", query.value(1).toString());
-                updt.bindValue(":SUBTITLE", query.value(2).toString());
-                updt.bindValue(":PARTDESC", query.value(3).toString());
-                if (!updt.exec())
-                    MythDB::DBError("Marking first showings", updt);
-            }
-        }
-        found += query.size();
+        updt.prepare("UPDATE program "
+                      "JOIN (SELECT MIN(starttime) AS starttime, title, subtitle,"
+                      "           LEFT(description, 1024) AS partdesc "
+                      "      FROM program "
+                      "      WHERE programid = '' "
+                      "      GROUP BY title, subtitle, partdesc "
+                      "     ) AS firsts "
+                      "ON program.starttime = firsts.starttime "
+                      "  AND program.title = firsts.title "
+                      "  AND program.subtitle = firsts.subtitle "
+                      "  AND LEFT(program.description, 1024) = firsts.partdesc "
+                      "SET program.first = 1 "
+                      "WHERE program.programid = '';");
+        if (!updt.exec())
+            MythDB::DBError("Marking first showings", updt);
+        found += updt.numRowsAffected();
         LOG(VB_GENERAL, LOG_INFO, QString("    Found %1").arg(found));
 
         LOG(VB_GENERAL, LOG_INFO, "Marking episode last showings.");
-        query.prepare("SELECT MAX(starttime),programid FROM program "
-                      "WHERE programid > '' GROUP BY programid;");
-        if (query.exec())
-        {
-            updt.prepare("UPDATE program set last = 1 "
-                         "WHERE starttime = :STARTTIME "
-                         "  AND programid = :PROGRAMID;");
-            while(query.next())
-            {
-                updt.bindValue(":STARTTIME", query.value(0).toDateTime());
-                updt.bindValue(":PROGRAMID", query.value(1).toString());
-                if (!updt.exec())
-                    MythDB::DBError("Marking last showings by id", updt);
-            }
-        }
-        found = query.size();
-        query.prepare("SELECT MAX(starttime),title,subtitle,"
-                      "       LEFT(description, 1024) AS partdesc "
-                      "FROM program WHERE programid = '' "
-                      "GROUP BY title,subtitle,partdesc;");
-        if (query.exec())
-        {
-            updt.prepare("UPDATE program set last = 1 "
-                         "WHERE starttime = :STARTTIME "
-                         "  AND title = :TITLE "
-                         "  AND subtitle = :SUBTITLE "
-                         "  AND LEFT(description, 1024) = :PARTDESC");
-            while(query.next())
-            {
-                updt.bindValue(":STARTTIME", query.value(0).toDateTime());
-                updt.bindValue(":TITLE", query.value(1).toString());
-                updt.bindValue(":SUBTITLE", query.value(2).toString());
-                updt.bindValue(":PARTDESC", query.value(3).toString());
-                if (!updt.exec())
-                    MythDB::DBError("Marking last showings", updt);
-            }
-        }
-        found += query.size();
+        updt.prepare("UPDATE program "
+                     "JOIN (SELECT MAX(starttime) AS starttime, programid "
+                     "      FROM program "
+                     "      WHERE programid <> '' "
+                     "      GROUP BY programid "
+                     "     ) AS lasts "
+                     "ON program.programid = lasts.programid "
+                     "  AND program.starttime = lasts.starttime "
+                     "SET program.last=1;");
+        if (!updt.exec())
+            MythDB::DBError("Marking last showings by id", updt);
+        found = updt.numRowsAffected();
+
+        updt.prepare("UPDATE program "
+                      "JOIN (SELECT MAX(starttime) AS starttime, title, subtitle,"
+                      "           LEFT(description, 1024) AS partdesc "
+                      "      FROM program "
+                      "      WHERE programid = '' "
+                      "      GROUP BY title, subtitle, partdesc "
+                      "     ) AS lasts "
+                      "ON program.starttime = lasts.starttime "
+                      "  AND program.title = lasts.title "
+                      "  AND program.subtitle = lasts.subtitle "
+                      "  AND LEFT(program.description, 1024) = lasts.partdesc "
+                      "SET program.last = 1 "
+                      "WHERE program.programid = '';");
+        if (!updt.exec())
+            MythDB::DBError("Marking last showings", updt);
+        found += updt.numRowsAffected();
         LOG(VB_GENERAL, LOG_INFO, QString("    Found %1").arg(found));
     }
 
@@ -760,7 +740,8 @@ int main(int argc, char *argv[])
             "===============================================================");
 
     if (grab_data || mark_repeats)
-        ScheduledRecording::signalChange(-1);
+        ScheduledRecording::RescheduleMatch(0, 0, 0, QDateTime(),
+                                            "MythFillDatabase");
 
     gCoreContext->SendMessage("CLEAR_SETTINGS_CACHE");
 

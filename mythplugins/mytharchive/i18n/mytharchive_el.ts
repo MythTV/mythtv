@@ -15,6 +15,73 @@
     </message>
 </context>
 <context>
+    <name>BurnThemeUI</name>
+    <message>
+        <location filename="../mythburn/themes/burnthemestrings.h" line="5"/>
+        <source>Has an intro and contains a main menu with 4 recordings per page. Does not have a chapter selection submenu.</source>
+        <translation>Έχει εισαγωγή και περιέχει κεντρικό μενού με 4 εγγραφές ανά σελίδα. Δεν έχει υπομενού επιλογής κεφαλαίου.</translation>
+    </message>
+    <message>
+        <location filename="../mythburn/themes/burnthemestrings.h" line="6"/>
+        <source>Has an intro and contains a summary main menu with 10 recordings per page. Does not have a chapter selection submenu, recording titles, dates or category.</source>
+        <translation>Έχει εισαγωγή και περιέχει ένα περιληπτικό κύριο μενού με 10 εγγραφές ανά σελίδα. Δεν έχει υπομενού επιλογής κεφαλαίου, τίτλων εγγραφής ή κατηγορίας.</translation>
+    </message>
+    <message>
+        <location filename="../mythburn/themes/burnthemestrings.h" line="7"/>
+        <source>Has an intro and contains a main menu with 6 recordings per page. Does not have a scene selection submenu.</source>
+        <translation>Έχει εισαγωγή και περιέχει κεντρικό μενού με 6 εγγραφές ανά σελίδα. Δεν έχει υπομενού επιλογής σκηνής.</translation>
+    </message>
+    <message>
+        <location filename="../mythburn/themes/burnthemestrings.h" line="8"/>
+        <source>Has an intro and contains a main menu with 3 recordings per page and a scene selection submenu with 8 chapters points. Shows a program details page before each recording.</source>
+        <translation>Έχει εισαγωγή και περιέχει κύριο μενού με 3 εγγραφές ανά σελίδα και υπομενού επιλογής σκηνής με 8 σημεία κεφαλαίων. Εμφανίζει σελίδα λεπτομερειών εκπομπής πριν από κάθε εγγραφή.</translation>
+    </message>
+    <message>
+        <location filename="../mythburn/themes/burnthemestrings.h" line="9"/>
+        <source>Has an intro and contains a main menu with 3 recordings per page and a scene selection submenu with 8 chapters points. Shows a program details page before each recording. Uses animated thumb images.</source>
+        <translation>Έχει εισαγωγή και περιέχει κύριο μενού με 3 εγγραφές ανά σελίδα και υπομενού επιλογής σκηνής με 8 σημεία κεφαλαίων. Εμφανίζει σελίδα λεπτομερειών εκπομπής πριν από κάθε εγγραφή. Χρησιμοποιεί κινούμενες μικρογραφίες.</translation>
+    </message>
+    <message>
+        <location filename="../mythburn/themes/burnthemestrings.h" line="10"/>
+        <source>Has an intro and contains a main menu with 3 recordings per page and a scene selection submenu with 8 chapters points.</source>
+        <translation>Έχει εισαγωγή και περιέχει κύριο μενού με 3 εγγραφές ανά σελίδα και υπομενού επιλογής σκηνής με 8 σημεία κεφαλαίων.</translation>
+    </message>
+    <message>
+        <location filename="../mythburn/themes/burnthemestrings.h" line="11"/>
+        <source>Has an intro and contains a main menu with 3 recordings per page and a scene selection submenu with 8 chapters points. All the thumb images are animated.</source>
+        <translation>Έχει εισαγωγή και περιέχει κύριο μενού με 3 εγγραφές ανά σελίδα και υπομενού επιλογής σκηνής με 8 σημεία κεφαλαίων. Όλες οι εικόνες είναι κινούμενες.</translation>
+    </message>
+    <message>
+        <location filename="../mythburn/themes/burnthemestrings.h" line="12"/>
+        <source>Creates an auto play DVD with no menus. Shows an intro movie then for each title shows a details page followed by the video in sequence.</source>
+        <translation>Δημιουργεί αυτόματα εκτελέσιμο DVD χωρίς μενού. Εμφανίζει μια εισαγωγική ταινία και για κάθε εκπομπή εμφανίζει σελίδα λεπτομερειών ακολουθούμενο από την εκπομπή.</translation>
+    </message>
+    <message>
+        <location filename="../mythburn/themes/burnthemestrings.h" line="13"/>
+        <source>Creates an auto play DVD with no menus and no intro.</source>
+        <translation>Δημιουργεί αυτόματα εκτελέσιμο DVD χωρίς μενού και χωρίς εισαγωγή.</translation>
+    </message>
+</context>
+<context>
+    <name>DVDThemeSelector</name>
+    <message>
+        <location filename="../mytharchive/themeselector.cpp" line="219"/>
+        <location filename="../mytharchive/themeselector.cpp" line="230"/>
+        <source>No theme description file found!</source>
+        <translation>Δεν βρέθηκε αρχείο περιγραφής για το θέμα!</translation>
+    </message>
+    <message>
+        <location filename="../mytharchive/themeselector.cpp" line="243"/>
+        <source>Empty theme description!</source>
+        <translation>Κενή περιγραφή θέματος!</translation>
+    </message>
+    <message>
+        <location filename="../mytharchive/themeselector.cpp" line="248"/>
+        <source>Unable to open theme description file!</source>
+        <translation>Αδύνατο το άνοιγμα του αρχείου περιγραφής για το θέμα!</translation>
+    </message>
+</context>
+<context>
     <name>ExportNative</name>
     <message>
         <location filename="../mytharchive/exportnative.cpp" line="242"/>
@@ -287,9 +354,8 @@
         <translation>Φάκελος Προσωρινής Αποθήκευσης</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="20"/>
         <source>Location where MythArchive should create its temporory work files. LOTS of free space required here.</source>
-        <translation>Θέση όπου το MythArchive μπορεί να φτιάξει τα προσωρινά του αρχεία. Χρειάζεται ΠΟΛΥΣ χώρος.</translation>
+        <translation type="obsolete">Θέση όπου το MythArchive μπορεί να φτιάξει τα προσωρινά του αρχεία. Χρειάζεται ΠΟΛΥΣ χώρος.</translation>
     </message>
     <message>
         <location filename="../mytharchive/archivesettings.cpp" line="28"/>
@@ -476,6 +542,11 @@
     <message>
         <source>Command to run FFmpeg.</source>
         <translation type="obsolete">Η εντολή που θα τρέξει το FFmpeg.</translation>
+    </message>
+    <message>
+        <location filename="../mytharchive/archivesettings.cpp" line="20"/>
+        <source>Location where MythArchive should create its temporary work files. LOTS of free space required here.</source>
+        <translation>Θέση όπου το MythArchive μπορεί να φτιάξει τα προσωρινά του αρχεία. Χρειάζεται ΠΟΛΥΣ χώρος.</translation>
     </message>
     <message>
         <location filename="../mytharchive/archivesettings.cpp" line="229"/>
@@ -803,522 +874,531 @@ Please Wait...</source>
         <translation>Ένα πολύ μεγάλης διάρκειας προφίλ που δίνει περίπου 6 ώρες ταινίας σε μονής επίστρωσης DVD</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="9"/>
+        <location filename="themestrings.h" line="68"/>
         <source>%DATE%, %TIME%</source>
         <translation>%DATE%, %TIME%</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="10"/>
+        <location filename="themestrings.h" line="9"/>
         <source>Select Destination</source>
         <translation>Επιλέξτε Προορισμό</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="11"/>
+        <location filename="themestrings.h" line="69"/>
         <source>Choose where you would like your files archived.</source>
         <translation>Διαλέξτε πού θα θέλατε να αποθηκευτούν τα αρχεία σας.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="12"/>
+        <location filename="themestrings.h" line="70"/>
         <source>Output Type:</source>
         <translation>Τύπος Εξόδου:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="13"/>
+        <location filename="themestrings.h" line="71"/>
         <source>Destination:</source>
         <translation>Προορισμός:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="14"/>
+        <location filename="themestrings.h" line="11"/>
         <source>Free Space:</source>
         <translation>Ελεύθερος Χώρος:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="15"/>
+        <location filename="themestrings.h" line="72"/>
         <source>Click here to find an output location...</source>
         <translation>Πατήστε εδώ για να βρείτε τοποθεσία εξόδου...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="16"/>
+        <location filename="themestrings.h" line="12"/>
         <source>Make ISO Image</source>
         <translation>Δημιουργία Ειδώλου ISO</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="17"/>
+        <location filename="themestrings.h" line="13"/>
         <source>Burn to DVD</source>
         <translation>Εγγραφή σε DVD</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="18"/>
+        <location filename="themestrings.h" line="73"/>
         <source>Erase DVD-RW before burning</source>
         <translation>Διαγραφή DVD-RW πριν την εγγραφή</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="19"/>
+        <location filename="themestrings.h" line="15"/>
         <source>Cancel</source>
         <translation>Ακύρωση</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="20"/>
+        <location filename="themestrings.h" line="74"/>
         <source>Previous</source>
         <translation>Προηγούμενο</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="21"/>
+        <location filename="themestrings.h" line="17"/>
         <source>Next</source>
         <translation>Επόμενο</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="22"/>
+        <location filename="themestrings.h" line="75"/>
         <source>Filter:</source>
         <translation>Φίλτρο:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="23"/>
+        <location filename="themestrings.h" line="20"/>
         <source>OK</source>
         <translation>OK</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="24"/>
+        <location filename="themestrings.h" line="21"/>
         <source>File Finder</source>
         <translation>Εύρεση Αρχείου</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="25"/>
+        <location filename="themestrings.h" line="76"/>
         <source>Select the file you wish to use.</source>
         <translation>Επιλέξτε το αρχείο που θέλετε να χρησιμοποιήσετε.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="26"/>
+        <location filename="themestrings.h" line="22"/>
         <source>Back</source>
         <translation>Πίσω</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="27"/>
+        <location filename="themestrings.h" line="23"/>
         <source>Home</source>
         <translation>Αρχικό</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="28"/>
+        <location filename="themestrings.h" line="27"/>
         <source>No videos available</source>
         <translation>Δεν υπάρχουν ταινίες</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="29"/>
+        <location filename="themestrings.h" line="28"/>
         <source>Log Viewer</source>
         <translation>Προβολή Καταγραφής</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="30"/>
+        <location filename="themestrings.h" line="77"/>
         <source>See logs from your archive runs.</source>
         <translation>Δείτε τις καταγραφές από τις αρχειοθετήσεις σας.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="31"/>
+        <location filename="themestrings.h" line="29"/>
         <source>Update</source>
         <translation>Ενημέρωση</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="32"/>
+        <location filename="themestrings.h" line="30"/>
         <source>Exit</source>
         <translation>Έξοδος</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="60"/>
+        <location filename="themestrings.h" line="83"/>
         <source>Up Level</source>
         <translation>Επίπεδο Πάνω</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="73"/>
+        <location filename="themestrings.h" line="84"/>
         <source>description goes here.</source>
         <translation>εδώ μπαίνει η περιγραφή.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="74"/>
+        <location filename="themestrings.h" line="10"/>
         <source>Find</source>
         <translation>Εύρεση</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="75"/>
+        <location filename="themestrings.h" line="85"/>
         <source>0.00 GB</source>
         <translation>0.00 GB</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="76"/>
+        <location filename="themestrings.h" line="14"/>
         <source>Force Overwrite of DVD-RW Media</source>
         <translation>Επιβολή Διαγραφής DVD-RW</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="77"/>
+        <location filename="themestrings.h" line="18"/>
         <source>Select Recordings</source>
         <translation>Επιλογή Εγγραφών</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="78"/>
+        <location filename="themestrings.h" line="19"/>
         <source>Show Recordings</source>
         <translation>Προβολή Εγγραφών</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="79"/>
+        <location filename="themestrings.h" line="24"/>
         <source>Select Videos</source>
         <translation>Επιλογή Ταινιών</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="80"/>
+        <location filename="themestrings.h" line="86"/>
         <source>Video Category:</source>
         <translation>Κατηγορία Ταινιών:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="81"/>
+        <location filename="themestrings.h" line="87"/>
         <source>title goes here</source>
         <translation>εδώ μπαίνει ο τίτλος</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="82"/>
+        <location filename="themestrings.h" line="26"/>
         <source>PL:</source>
         <translation>ΓΕ:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="83"/>
+        <location filename="themestrings.h" line="88"/>
         <source>1</source>
         <translation>1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="91"/>
+        <location filename="themestrings.h" line="93"/>
         <source>Ok</source>
         <translation>Ok</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="92"/>
+        <location filename="themestrings.h" line="25"/>
         <source>Video Category</source>
         <translation>Κατηγορία Ταινιών</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="93"/>
+        <location filename="themestrings.h" line="94"/>
         <source>x.xx Gb</source>
         <translation>x.xx Gb</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="33"/>
+        <location filename="themestrings.h" line="31"/>
         <source>Change Encoding Profile</source>
         <translation>Αλλαγή Προφίλ Εγγραφής</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="34"/>
+        <location filename="themestrings.h" line="78"/>
         <source>12.34 GB</source>
         <translation>12.34 GB</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="35"/>
+        <location filename="themestrings.h" line="32"/>
         <source>DVD Menu Theme</source>
         <translation>Θέμα Μενού DVD</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="36"/>
+        <location filename="themestrings.h" line="79"/>
         <source>Choose the appearance of your DVD.</source>
         <translation>Επιλέξτε την εμφάνιση του DVD σας.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="37"/>
+        <location filename="themestrings.h" line="80"/>
         <source>Theme:</source>
         <translation>Θέμα:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="38"/>
+        <location filename="themestrings.h" line="34"/>
         <source>Intro</source>
         <translation>Εισαγωγή</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="39"/>
+        <location filename="themestrings.h" line="35"/>
         <source>Main Menu</source>
         <translation>Κύριο Μενού</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="40"/>
+        <location filename="themestrings.h" line="36"/>
         <source>Chapter Menu</source>
         <translation>Μενού Κεφαλαίων</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="41"/>
+        <location filename="themestrings.h" line="37"/>
         <source>Details</source>
         <translation>Λεπτομέρειες</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="42"/>
+        <location filename="themestrings.h" line="38"/>
         <source>Select Archive Items</source>
         <translation>Επιλογή Αρχείων προς Αρχειοθέτηση</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="43"/>
+        <location filename="themestrings.h" line="81"/>
         <source>Select the recordings and videos you wish to save.</source>
         <translation>Επιλέξτε τις εγγραφές και τις ταινίες που θέλετε να αποθηκεύσετε.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="44"/>
+        <location filename="themestrings.h" line="39"/>
         <source>No files are selected for archive</source>
         <translation>Δεν έχουν επιλεγεί αρχεία για αρχειοθέτηση</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="45"/>
+        <location filename="themestrings.h" line="40"/>
         <source>Add Recording</source>
         <translation>Προσθήκη Εγγραφής</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="46"/>
+        <location filename="themestrings.h" line="41"/>
         <source>Add Video</source>
         <translation>Προσθήκη Ταινίας</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="47"/>
+        <location filename="themestrings.h" line="42"/>
         <source>Add File</source>
         <translation>Προσθήκη Αρχείου</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="48"/>
+        <location filename="themestrings.h" line="43"/>
         <source>Archive Item Details</source>
         <translation>Λεπτομέρειες Στοιχείου</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="49"/>
+        <location filename="themestrings.h" line="44"/>
         <source>Title:</source>
         <translation>Τίτλος:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="50"/>
+        <location filename="themestrings.h" line="45"/>
         <source>Subtitle:</source>
         <translation>Υπότιτλος:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="51"/>
+        <location filename="themestrings.h" line="46"/>
         <source>Start Date:</source>
         <translation>Ημ/νία Εκκίνησης:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="52"/>
+        <location filename="themestrings.h" line="47"/>
         <source>Time:</source>
         <translation>Ώρα:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="53"/>
+        <location filename="themestrings.h" line="48"/>
         <source>Description:</source>
         <translation>Περιγραφή:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="54"/>
+        <location filename="themestrings.h" line="49"/>
         <source>Thumb Image Selector</source>
         <translation>Επιλογή Μικρογραφίας</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="55"/>
+        <location filename="themestrings.h" line="50"/>
         <source>Current Position</source>
         <translation>Τρέχουσα Θέση</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="56"/>
+        <location filename="themestrings.h" line="82"/>
         <source>0:00:00.00</source>
         <translation>0:00:00.00</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="57"/>
+        <location filename="themestrings.h" line="51"/>
         <source>Seek Amount</source>
         <translation>Τιμή Εύρεσης</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="58"/>
+        <location filename="themestrings.h" line="52"/>
         <source>Frame</source>
         <translation>Καρέ</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="59"/>
+        <location filename="themestrings.h" line="53"/>
         <source>Save</source>
         <translation>Αποθήκευση</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="84"/>
+        <location filename="themestrings.h" line="33"/>
         <source>Select a theme</source>
         <translation>Επιλέξτε ένα Θέμα</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="85"/>
+        <location filename="themestrings.h" line="89"/>
         <source>xxxxx MB</source>
         <translation>xxxxx MB</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="86"/>
+        <location filename="themestrings.h" line="90"/>
         <source>0 MB</source>
         <translation>0 MB</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="71"/>
+        <location filename="themestrings.h" line="16"/>
         <source>Prev</source>
         <translation>Προηγ</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="87"/>
+        <location filename="themestrings.h" line="91"/>
         <source>sep 13, 2004 11:00 pm (1h 15m)</source>
         <translation>Σεπ 13,2004 11:00 πμ (1h 15m)</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="88"/>
+        <location filename="themestrings.h" line="92"/>
         <source>x.xx GB</source>
         <translation>x.xx GB</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="89"/>
+        <location filename="themestrings.h" line="55"/>
         <source>File Finder To Import</source>
         <translation>Εισαγωγή Ανιχνευτή Αρχείων</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="90"/>
+        <location filename="themestrings.h" line="56"/>
         <source>Start Time:</source>
         <translation>Ώρα Εκκίνησης:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="61"/>
+        <location filename="themestrings.h" line="57"/>
         <source>Select Associated Channel</source>
         <translation>Επιλέξτε το Συσχετιζόμενο Κανάλι</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="62"/>
+        <location filename="themestrings.h" line="58"/>
         <source>Archived Channel</source>
         <translation>Αρχειοθετημένο Κανάλι</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="63"/>
+        <location filename="themestrings.h" line="59"/>
         <source>Chan. ID:</source>
         <translation>Αναγν. Καν:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="64"/>
+        <location filename="themestrings.h" line="60"/>
         <source>Chan. No:</source>
         <translation>Νο Καν:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="65"/>
+        <location filename="themestrings.h" line="61"/>
         <source>Callsign:</source>
         <translation>Ονομ:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="66"/>
+        <location filename="themestrings.h" line="62"/>
         <source>Name:</source>
         <translation>Όνομα:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="67"/>
+        <location filename="themestrings.h" line="63"/>
         <source>Local Channel</source>
         <translation>Τοπικό Κανάλι</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="68"/>
+        <location filename="themestrings.h" line="64"/>
         <source>Search Channel</source>
         <translation>Αναζήτηση Καναλιού</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="69"/>
+        <location filename="themestrings.h" line="65"/>
         <source>Search Callsign</source>
         <translation>Αναζήτηση Ονομασίας</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="70"/>
+        <location filename="themestrings.h" line="66"/>
         <source>Search Name</source>
         <translation>Αναζήτηση Ονόματος</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="72"/>
+        <location filename="themestrings.h" line="67"/>
         <source>Finish</source>
         <translation>Τέλος</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="94"/>
+        <location filename="themestrings.h" line="95"/>
         <source>Select Destination:</source>
         <translation>Επιλέξτε Προορισμό:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="95"/>
+        <location filename="themestrings.h" line="96"/>
         <source>Parental level: %1</source>
         <translation>Γονικό επίπεδο: %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="96"/>
+        <location filename="themestrings.h" line="97"/>
         <source>Old size:</source>
         <translation>Παλιό μέγεθος:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="97"/>
+        <location filename="themestrings.h" line="98"/>
         <source>New size:</source>
         <translation>Νέο μέγεθος:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="98"/>
+        <location filename="themestrings.h" line="99"/>
         <source>Select a theme:</source>
         <translation>Επιλέξτε ένα θέμα:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="99"/>
+        <location filename="themestrings.h" line="100"/>
         <source>Menu</source>
         <translation>Επιλογές</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="100"/>
+        <location filename="themestrings.h" line="101"/>
         <source>Chapter</source>
         <translation>Κεφάλαιο</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="101"/>
+        <location filename="themestrings.h" line="102"/>
         <source>Detail</source>
         <translation>Λεπτομέρειες</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="102"/>
+        <location filename="themestrings.h" line="103"/>
         <source>Select File to Import</source>
         <translation>Επιλέξτε Αρχείο προς Εισαγωγή</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="103"/>
         <source>Search</source>
-        <translation>Αναζήτηση</translation>
+        <translation type="obsolete">Αναζήτηση</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="104"/>
+        <location filename="themestrings.h" line="54"/>
         <source>Add video</source>
         <translation>Προσθήκη Ταινίας</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="104"/>
+        <source>Channel ID:</source>
+        <translation>Αναγν. Καν:</translation>
+    </message>
+    <message>
         <location filename="themestrings.h" line="105"/>
+        <source>Channel Number:</source>
+        <translation>Αριθ. Καναλιού:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="106"/>
         <source>Create DVD</source>
         <translation>Δημιουργια DVD</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="106"/>
+        <location filename="themestrings.h" line="107"/>
         <source>Create Archive</source>
         <translation>Δημιουργια Αρχειου Συμπιεσης</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="107"/>
+        <location filename="themestrings.h" line="108"/>
         <source>Encode Video File</source>
         <translation>Κωδικοποίηση Αρχείου Ταινίας</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="108"/>
+        <location filename="themestrings.h" line="109"/>
         <source>Import Archive</source>
         <translation>Εισαγωγη Αρχειου Συμπιεσης</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="109"/>
+        <location filename="themestrings.h" line="110"/>
         <source>Archive Utilities</source>
         <translation>Ευκολιες Αρχειοθετησης</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="110"/>
+        <location filename="themestrings.h" line="111"/>
         <source>Show Log Viewer</source>
         <translation>Εμφανιση Προβολεα Καταγραφης</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="111"/>
+        <location filename="themestrings.h" line="112"/>
         <source>Play Created DVD</source>
         <translation>Αναπαραγωγη του γραμμένου DVD</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="112"/>
+        <location filename="themestrings.h" line="113"/>
         <source>Burn DVD</source>
         <translation>Εγγραφη του DVD</translation>
     </message>

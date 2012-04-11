@@ -246,11 +246,56 @@ long HTTPRequest::SendResponse( void )
 #endif
 
     // ----------------------------------------------------------------------
+    // Check for ETag match...
+    // ----------------------------------------------------------------------
+
+    QString sETag = GetHeaderValue( "If-None-Match", "" );
+
+    if ( !sETag.isEmpty() && sETag == m_mapRespHeaders[ "ETag" ] )
+    {
+        LOG(VB_UPNP, LOG_INFO,
+            QString("HTTPRequest::SendResponse(%1) - Cached")
+                .arg(sETag));
+
+        m_nResponseStatus = 304;
+
+        // no content can be returned.
+        m_response.buffer().clear();
+    }
+
+    // ----------------------------------------------------------------------
+
+    int nContentLen = m_response.buffer().length();
+
+    QBuffer *pBuffer = &m_response;
+
+    // ----------------------------------------------------------------------
+    // Should we try to return data gzip'd?
+    // ----------------------------------------------------------------------
+
+    QBuffer compBuffer;
+
+    if (( nContentLen > 0 ) && m_mapHeaders[ "accept-encoding" ].contains( "gzip" ))
+    {
+        QByteArray compressed = gzipCompress( m_response.buffer() );
+        compBuffer.setData( compressed );
+
+        if (compBuffer.buffer().length() > 0)
+        {
+            pBuffer = &compBuffer;
+
+            m_mapRespHeaders[ "Content-Encoding" ] = "gzip";
+        }
+    }
+
+    // ----------------------------------------------------------------------
     // Write out Header.
     // ----------------------------------------------------------------------
-    const QByteArray &buffer = m_response.buffer();
 
-    QString    rHeader = BuildHeader( buffer.length() );
+    nContentLen = pBuffer->buffer().length();
+
+    QString    rHeader = BuildHeader( nContentLen );
+
     QByteArray sHeader = rHeader.toUtf8();
     nBytes  = WriteBlockDirect( sHeader.constData(), sHeader.length() );
 
@@ -258,9 +303,9 @@ long HTTPRequest::SendResponse( void )
     // Write out Response buffer.
     // ----------------------------------------------------------------------
 
-    if (( m_eType != RequestTypeHead ) && ( buffer.length() > 0 ))
+    if (( m_eType != RequestTypeHead ) && ( nContentLen > 0 ))
     {
-        nBytes += SendData( &m_response, 0, m_response.size() );
+        nBytes += SendData( pBuffer, 0, nContentLen );
     }
 
     // ----------------------------------------------------------------------
@@ -435,7 +480,14 @@ long HTTPRequest::SendResponseFile( QString sFileName )
 
 qint64 HTTPRequest::SendData( QIODevice *pDevice, qint64 llStart, qint64 llBytes )
 {
+    bool   bShouldClose = false;
     qint64 sent = 0;
+
+    if (!pDevice->isOpen())
+    {
+        pDevice->open( QIODevice::ReadOnly );
+        bShouldClose = true;
+    }
 
     // ----------------------------------------------------------------------
     // Set out file position to requested start location.
@@ -466,6 +518,9 @@ qint64 HTTPRequest::SendData( QIODevice *pDevice, qint64 llStart, qint64 llBytes
             llBytesRemaining -= llBytesRead;
         }
     }
+
+    if (bShouldClose)
+        pDevice->close();
 
     return sent;
 }
@@ -720,6 +775,7 @@ QString HTTPRequest::GetResponseStatus( void )
         case 201:   return( "201 Created"                          );
         case 202:   return( "202 Accepted"                         );
         case 206:   return( "206 Partial Content"                  );
+        case 304:   return( "304 Not Modified"                     );
         case 400:   return( "400 Bad Request"                      );
         case 401:   return( "401 Unauthorized"                     );
         case 403:   return( "403 Forbidden"                        );
@@ -1444,6 +1500,17 @@ QString HTTPRequest::Encode(const QString &sIn)
 //
 /////////////////////////////////////////////////////////////////////////////
 
+QString HTTPRequest::GetETagHash(const QByteArray &data)
+{
+    QByteArray hash = QCryptographicHash::hash( data.data(), QCryptographicHash::Sha1);
+
+    return ("\"" + hash.toHex() + "\"");
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
 bool HTTPRequest::IsUrlProtected( const QString &sBaseUrl )
 {
     QString sProtected = UPnp::GetConfiguration()->GetValue( "HTTP/Protected/Urls", "/setup;/Config" );
@@ -1657,3 +1724,4 @@ bool BufferedSocketDeviceRequest::IsBlocking()
 
     return false;
 }
+

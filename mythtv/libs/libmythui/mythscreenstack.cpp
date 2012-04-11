@@ -34,7 +34,7 @@ MythScreenStack::MythScreenStack(MythMainWindow *parent, const QString &name,
 MythScreenStack::~MythScreenStack()
 {
     CheckDeletes(true);
-    
+
     while (!m_Children.isEmpty())
     {
         MythScreenType *child = m_Children.back();
@@ -61,7 +61,7 @@ void MythScreenStack::AddScreen(MythScreenType *screen, bool allowFade)
     m_DoInit = false;
 
     MythScreenType *old = m_topScreen;
-    if (old)
+    if (old && screen->IsFullscreen())
         old->aboutToHide();
 
     m_Children.push_back(screen);
@@ -98,6 +98,8 @@ void MythScreenStack::PopScreen(MythScreenType *screen, bool allowFade,
 {
     if (!screen || screen->IsDeleting())
         return;
+
+    bool poppedFullscreen = screen->IsFullscreen();
 
     screen->aboutToHide();
 
@@ -155,7 +157,8 @@ void MythScreenStack::PopScreen(MythScreenType *screen, bool allowFade,
             {
                 m_topScreen = (*it);
                 (*it)->SetAlpha(255);
-                (*it)->aboutToShow();
+                if (poppedFullscreen)
+                    (*it)->aboutToShow();
             }
         }
     }

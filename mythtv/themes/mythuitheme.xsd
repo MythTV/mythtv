@@ -78,7 +78,6 @@
         </xs:sequence>
     </xs:group>
 
-
     <!-- Attributes common to all widgets -->
     <xs:attributeGroup name="common_attributes">
         <xs:attribute name="name" type="xs:string" use="required" />
@@ -108,19 +107,19 @@
 
     <xs:simpleType name="area">
         <xs:restriction base="xs:string">
-            <xs:pattern value="\s*(-?[0-9]*|\d{0,3}%([+,-]\d+)?)\s*,\s*(-?[0-9]*|\d{0,3}%([+,-]\d+)?)\s*,\s*(-?[0-9]*|\d{0,3}%([+,-]\d+)?)\s*,\s*(-?[0-9]*|\d{0,3}%([+,-]\d+)?)\s*" />
+            <xs:pattern value="\s*(-?[0-9]+|\d{0,3}%([+,-]\d+)?)\s*,\s*(-?[0-9]+|\d{0,3}%([+,-]\d+)?)\s*,\s*(-?[0-9]+|\d{0,3}%([+,-]\d+)?)\s*,\s*(-?[0-9]+|\d{0,3}%([+,-]\d+)?)\s*" />
         </xs:restriction>
     </xs:simpleType>
 
     <xs:simpleType name="position">
         <xs:restriction base="xs:string">
-            <xs:pattern value="(\s*(-?[0-9]*|\d{0,3}%([+,-]\d+)?))\s*,\s*((-?[0-9]*|\d{0,3}%([+,-]\d+)?))\s*" />
+            <xs:pattern value="(\s*(-?[0-9]+|\d{0,3}%([+,-]\d+)?))\s*,\s*((-?[0-9]+|\d{0,3}%([+,-]\d+)?))\s*" />
         </xs:restriction>
     </xs:simpleType>
 
     <xs:simpleType name="size">
         <xs:restriction base="xs:string">
-            <xs:pattern value="(\s*([0-9]*|\d{0,3}%))\s*,\s*(([0-9]*|\d{0,3}%)\s*)" />
+            <xs:pattern value="(\s*([0-9]+|\d{0,3}%))\s*,\s*(([0-9]+|\d{0,3}%)\s*)" />
         </xs:restriction>
     </xs:simpleType>
 
@@ -134,6 +133,13 @@
         <xs:restriction base="xs:integer">
             <xs:minInclusive value="0" />
             <xs:maxInclusive value="255" />
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="angle">
+        <xs:restriction base="xs:integer">
+            <xs:minInclusive value="0" />
+            <xs:maxInclusive value="360" />
         </xs:restriction>
     </xs:simpleType>
 
@@ -151,6 +157,145 @@
         </xs:restriction>
     </xs:simpleType>
 
+   <!-- Common effect attributes -->
+    <xs:attributeGroup name="common_effect_attributes">
+        <xs:attribute name="easingcurve">
+            <xs:simpleType>
+                <xs:restriction base="xs:string">
+                    <xs:enumeration value="Linear" />
+                    <xs:enumeration value="InQuad" />
+                    <xs:enumeration value="OutQuad" />
+                    <xs:enumeration value="InOutQuad" />
+                    <xs:enumeration value="OutInQuad" />
+                    <xs:enumeration value="InCubic" />
+                    <xs:enumeration value="OutCubic" />
+                    <xs:enumeration value="InOutCubic" />
+                    <xs:enumeration value="OutInCubic" />
+                    <xs:enumeration value="InQuart" />
+                    <xs:enumeration value="OutQuart" />
+                    <xs:enumeration value="InOutQuart" />
+                    <xs:enumeration value="OutInQuart" />
+                    <xs:enumeration value="InQuint" />
+                    <xs:enumeration value="OutQuint" />
+                    <xs:enumeration value="InOutQuint" />
+                    <xs:enumeration value="OutInQuint" />
+                    <xs:enumeration value="InSine" />
+                    <xs:enumeration value="OutSine" />
+                    <xs:enumeration value="InOutSine" />
+                    <xs:enumeration value="OutInSine" />
+                    <xs:enumeration value="InExpo" />
+                    <xs:enumeration value="OutExpo" />
+                    <xs:enumeration value="InOutExpo" />
+                    <xs:enumeration value="OutInExpo" />
+                    <xs:enumeration value="InCirc" />
+                    <xs:enumeration value="OutCirc" />
+                    <xs:enumeration value="InOutCirc" />
+                    <xs:enumeration value="OutInCirc" />
+                    <xs:enumeration value="InElastic" />
+                    <xs:enumeration value="OutElastic" />
+                    <xs:enumeration value="InOutElastic" />
+                    <xs:enumeration value="OutInElastic" />
+                    <xs:enumeration value="InBack" />
+                    <xs:enumeration value="OutBack" />
+                    <xs:enumeration value="InOutBack" />
+                    <xs:enumeration value="OutInBack" />
+                    <xs:enumeration value="InBounce" />
+                    <xs:enumeration value="OutBounce" />
+                    <xs:enumeration value="InOutBounce" />
+                    <xs:enumeration value="OutInBounce" />
+                    <xs:enumeration value="InCurve" />
+                    <xs:enumeration value="OutCurve" />
+                    <xs:enumeration value="SineCurve" />
+                    <xs:enumeration value="CosineCurve" />
+                </xs:restriction>
+            </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="duration" type="xs:integer" />
+    </xs:attributeGroup>
+
+    <!-- Animation definition -->
+    <xs:element name="animation">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="duration" type="xs:integer" minOccurs="0" maxOccurs="1" />
+                <xs:element name="centre" minOccurs="0" maxOccurs="1">
+                    <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                            <xs:enumeration value="topleft" />
+                            <xs:enumeration value="top" />
+                            <xs:enumeration value="topright" />
+                            <xs:enumeration value="left" />
+                            <xs:enumeration value="middle" />
+                            <xs:enumeration value="right" />
+                            <xs:enumeration value="bottomleft" />
+                            <xs:enumeration value="bottom" />
+                            <xs:enumeration value="bottomright" />
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:element>
+                <xs:element name="section">
+                    <xs:complexType>
+                        <xs:choice minOccurs="0" maxOccurs="unbounded">
+                            <xs:element name="alpha" minOccurs="0" maxOccurs="1">
+                                <xs:complexType>
+                                    <xs:attributeGroup ref="common_effect_attributes" />
+                                    <xs:attribute name="start" type="alpha" use="required" />
+                                    <xs:attribute name="end" type="alpha" use="required" />
+                                </xs:complexType>
+                            </xs:element>
+                            <xs:element name="position" minOccurs="0" maxOccurs="1">
+                                <xs:complexType>
+                                    <xs:attributeGroup ref="common_effect_attributes" />
+                                    <xs:attribute name="start" type="position" use="required" />
+                                    <xs:attribute name="end" type="position" use="required" />
+                                </xs:complexType>
+                            </xs:element>
+                            <xs:element name="angle" minOccurs="0" maxOccurs="1">
+                                <xs:complexType>
+                                    <xs:attributeGroup ref="common_effect_attributes" />
+                                    <xs:attribute name="start" type="angle" use="required" />
+                                    <xs:attribute name="end" type="angle" use="required" />
+                                </xs:complexType>
+                            </xs:element>
+                            <xs:element name="zoom" minOccurs="0" maxOccurs="1">
+                                <xs:complexType>
+                                    <xs:attributeGroup ref="common_effect_attributes" />
+                                    <xs:attribute name="start" type="percentage" use="required" />
+                                    <xs:attribute name="end" type="percentage" use="required" />
+                                </xs:complexType>
+                            </xs:element>
+                            <xs:element name="horizontalzoom" minOccurs="0" maxOccurs="1">
+                                <xs:complexType>
+                                    <xs:attributeGroup ref="common_effect_attributes" />
+                                    <xs:attribute name="start" type="percentage" use="required" />
+                                    <xs:attribute name="end" type="percentage" use="required" />
+                                </xs:complexType>
+                            </xs:element>
+                            <xs:element name="verticalzoom" minOccurs="0" maxOccurs="1">
+                                <xs:complexType>
+                                    <xs:attributeGroup ref="common_effect_attributes" />
+                                    <xs:attribute name="start" type="percentage" use="required" />
+                                    <xs:attribute name="end" type="percentage" use="required" />
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:choice>
+                        <xs:attribute name="duration" type="xs:integer" />
+                        <xs:attribute name="looped" type="boolean" />
+                        <xs:attribute name="reversible" type="boolean" />
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+            <xs:attribute name="trigger" use="required">
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:enumeration value="AboutToShow" />
+                        <xs:enumeration value="AboutToHide" />
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:attribute>
+        </xs:complexType>
+    </xs:element>
+
     <!-- MythUI Theme Root -->
     <xs:element name="mythuitheme">
         <xs:complexType>
@@ -160,7 +305,6 @@
             </xs:choice>
         </xs:complexType>
     </xs:element>
-
 
     <!-- Font Definition -->
     <xs:element name="fontdef">
@@ -244,6 +388,7 @@
     <xs:element name="window">
         <xs:complexType>
             <xs:choice minOccurs="0" maxOccurs="unbounded">
+                <xs:element ref="animation" />
                 <xs:group ref="widget_common" />
                 <xs:group ref="widgets" />
             </xs:choice>
@@ -318,9 +463,9 @@
             <xs:element name="align" type="align" minOccurs="0" maxOccurs="1" />
             <xs:element name="colorcycle" minOccurs="0" maxOccurs="1">
                 <xs:complexType>
-                        <xs:attribute name="start" type="color" />
-                        <xs:attribute name="end" type="color" />
-                        <xs:attribute name="steps" type="xs:integer" />
+                    <xs:attribute name="start" type="color" />
+                    <xs:attribute name="end" type="color" />
+                    <xs:attribute name="steps" type="xs:integer" />
                 </xs:complexType>
             </xs:element>
             <xs:element name="scroll" minOccurs="0" maxOccurs="1">
@@ -429,17 +574,17 @@
                             <xs:element name="gradient" minOccurs="0" maxOccurs="1">
                                 <xs:complexType>
                                     <xs:sequence>
-                                        <xs:element name="stop" minOccurs="0" maxOccurs="1">
+                                        <xs:element name="stop" minOccurs="0" maxOccurs="unbounded">
                                             <xs:complexType>
-                                                <xs:attribute name="position" type="position" use="required" />
+                                                <xs:attribute name="position" type="percentage" use="required" />
                                                 <xs:attribute name="color" type="color" use="required" />
                                                 <xs:attribute name="alpha" type="alpha" />
                                             </xs:complexType>
                                         </xs:element>
                                     </xs:sequence>
-                                    <xs:attribute name="start" type="xs:anySimpleType" />
-                                    <xs:attribute name="end" type="xs:anySimpleType" />
-                                    <xs:attribute name="alpha" type="xs:anySimpleType" />
+                                    <xs:attribute name="start" type="color" />
+                                    <xs:attribute name="end" type="color" />
+                                    <xs:attribute name="alpha" type="alpha" />
                                     <xs:attribute name="direction" default="vertical">
                                         <xs:simpleType>
                                             <xs:restriction base="xs:string">
@@ -588,6 +733,16 @@
             <xs:element name="buttonarea" type="area" minOccurs="0" maxOccurs="1" />
             <xs:element name="drawfrombottom" type="boolean" minOccurs="0" maxOccurs="1" />
             <xs:element name="searchposition" type="position" minOccurs="0" maxOccurs="1" />
+            <xs:element name="triggerevent" minOccurs="0" maxOccurs="1">
+                <xs:complexType>
+                    <xs:simpleContent>
+                        <xs:extension base="xs:string">
+                            <xs:attribute name="action" type="xs:string" />
+                            <xs:attribute name="context" type="xs:string" />
+                        </xs:extension>
+                    </xs:simpleContent>
+                </xs:complexType>
+            </xs:element>
         </xs:sequence>
     </xs:group>
 
@@ -798,6 +953,86 @@
                 <xs:group ref="widgets" />
             </xs:choice>
             <xs:attributeGroup ref="common_attributes" />
+        </xs:complexType>
+    </xs:element>
+
+    <!-- ThemeInfo -->
+    <xs:element name="themeinfo">
+        <xs:complexType>
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+                <xs:element name="name" type="xs:string" minOccurs="1" maxOccurs="1" />
+
+                <xs:element name="types" minOccurs="1" maxOccurs="1">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="type" minOccurs="1" maxOccurs="3">
+                                <xs:simpleType>
+                                    <xs:restriction base="xs:string">
+                                        <xs:enumeration value="UI" />
+                                        <xs:enumeration value="OSD" />
+                                        <xs:enumeration value="Menu" />
+                                    </xs:restriction>
+                                </xs:simpleType>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+
+                <xs:element name="aspect" minOccurs="1" maxOccurs="1">
+                    <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                            <xs:enumeration value="4:3" />
+                            <xs:enumeration value="16:9" />
+                            <xs:enumeration value="16:10" />
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:element>
+
+                <xs:element name="baseres" minOccurs="0" maxOccurs="1">
+                    <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                            <xs:pattern value="([0-9]{3,4})x([0-9]{3,4})" />
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:element>
+
+                <xs:element name="author" minOccurs="1" maxOccurs="1">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="name" type="xs:string" minOccurs="1" maxOccurs="1" />
+                            <xs:element name="email" type="xs:string" minOccurs="1" maxOccurs="1" />
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+
+                <xs:element name="version" minOccurs="1" maxOccurs="1">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="major" type="xs:integer" minOccurs="1" maxOccurs="1" />
+                            <xs:element name="minor" type="xs:integer" minOccurs="1" maxOccurs="1" />
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+
+                <xs:element name="detail" minOccurs="1" maxOccurs="1">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="thumbnail" minOccurs="1" maxOccurs="1">
+                                <xs:complexType>
+                                    <xs:simpleContent>
+                                        <xs:extension base="xs:string">
+                                            <xs:attribute name="name" type="xs:string" use="required" />
+                                        </xs:extension>
+                                    </xs:simpleContent>
+                                </xs:complexType>
+                            </xs:element>
+                            <xs:element name="description" type="xs:string" minOccurs="1" maxOccurs="1" />
+                            <xs:element name="errata" type="xs:string" minOccurs="1" maxOccurs="1" />
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+
+            </xs:choice>
         </xs:complexType>
     </xs:element>
 

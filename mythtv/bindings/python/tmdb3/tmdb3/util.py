@@ -7,42 +7,7 @@
 #-----------------------
 
 from copy import copy
-
-class PagedList( list ):
-    """
-    List-like object, with support for automatically grabbing additional
-    pages from a data source.
-    """
-    def __init__(self, iterable, count, perpage=20):
-        self._perpage = perpage
-        if count:
-            super(PagedList, self).__init__(self._process(iterable))
-            super(PagedList, self).extend([None]*(count-len(self)))
-        else:
-            super(PagedList, self).__init__()
-
-    def _getpage(self, page):
-        raise NotImplementedError("PagedList._getpage() must be provided "+\
-                                  "by subclass")
-
-    def _populateindex(self, index):
-        self._populatepage(int(index/self._perpage)+1)
-
-    def _populatepage(self, page):
-        offset = (page-1)*self._perpage
-        for i,data in enumerate(self._getpage(page)):
-            super(PagedList, self).__setitem__(offset+i, data)
-
-    def __getitem__(self, index):
-        item = super(PagedList, self).__getitem__(index)
-        if item is None:
-            self._populateindex(index)
-        item = super(PagedList, self).__getitem__(index)
-        return item
-
-    def __iter__(self):
-        for i in range(len(self)):
-            yield self[i]
+from locales import get_locale
 
 class Poller( object ):
     """
@@ -78,18 +43,42 @@ class Poller( object ):
         # retrieve data from callable function, and apply
         if not callable(self.func):
             raise RuntimeError('Poller object called without a source function')
-        self.apply(self.func().readJSON())
+        req = self.func()
+        if (('language' in req._kwargs) or ('country' in req._kwargs)) \
+                and self.inst._locale.fallthrough:
+            # request specifies a locale filter, and fallthrough is enabled
+            # run a first pass with specified filter
+            if not self.apply(req.readJSON(), False):
+                return
+            # if first pass results in missed data, run a second pass to
+            # fill in the gaps
+            self.apply(req.new(language=None, country=None).readJSON())
+            # re-apply the filtered first pass data over top the second
+            # unfiltered set. this is to work around the issue that the
+            # properties have no way of knowing when they should or 
+            # should not overwrite existing data. the cache engine will
+            # take care of the duplicate query
+        self.apply(req.readJSON())
 
     def apply(self, data, set_nones=True):
         # apply data directly, bypassing callable function
+        unfilled = False
         for k,v in self.lookup.items():
-            if k in data:
+            if (k in data) and \
+                    ((data[k] is not None) if callable(self.func) else True):
+                # argument received data, populate it
                 setattr(self.inst, v, data[k])
             elif set_nones:
+                # argument did not receive data, so fill it with None
+                # to indicate such and prevent a repeat scan
                 setattr(self.inst, v, None)
-            # else leave attribute empty, allowing it to later trigger a poll
-            # to get data if requested. this is intended for use when
-            # initializing a class with raw data
+            else:
+                # argument does not need data, so ignore it allowing it to
+                # trigger a later poll. this is intended for use when
+                # initializing a class with raw data, or when performing a
+                # first pass through when performing locale fall through
+                unfilled = True
+        return unfilled
 
 class Data( object ):
     """
@@ -140,7 +129,7 @@ class Data( object ):
         else:
             value = self.default
         if isinstance(value, Element):
-            value._lang = inst._lang
+            value._locale = inst._locale
         inst._data[self.field] = value
 
     def sethandler(self, handler):
@@ -189,7 +178,7 @@ class Datalist( Data ):
             for val in value:
                 val = self.handler(val)
                 if isinstance(val, Element):
-                    val._lang = inst._lang
+                    val._locale = inst._locale
                 data.append(val)
             if self.sort:
                 data.sort(key=lambda x: getattr(x, self.sort))
@@ -239,7 +228,7 @@ class Datadict( Data ):
             for val in value:
                 val = self.handler(val)
                 if isinstance(val, Element):
-                    val._lang = inst._lang
+                    val._locale = inst._locale
                 data[self.getkey(val)] = val
         inst._data[self.field] = data
 
@@ -316,8 +305,10 @@ class ElementType( type ):
 
     def __call__(cls, *args, **kwargs):
         obj = cls.__new__(cls)
-        if 'language' in kwargs:
-            obj._lang = kwargs['language']
+        if 'locale' in kwargs:
+            obj._locale = kwargs['locale']
+        else:
+            obj._locale = get_locale()
 
         obj._data = {}
         if 'raw' in kwargs:
@@ -330,7 +321,7 @@ class ElementType( type ):
             # defined by the Data definitions
             if len(args) != len(cls._InitArgs):
                 raise TypeError('__init__() takes exactly {0} arguments ({1} given)'\
-                            .format(len(cls._InitArgs)+1), len(args)+1)
+                            .format(len(cls._InitArgs)+1, len(args)+1))
             for a,v in zip(cls._InitArgs, args):
                 setattr(obj, a, v)
 

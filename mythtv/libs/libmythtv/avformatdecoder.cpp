@@ -88,7 +88,7 @@ __inline AVRational GetAVTimeBaseQ()
 
 static const float eps = 1E-5;
 
-static const int max_video_queue_size = 180;
+static const int max_video_queue_size = 220;
 
 static int cc608_parity(uint8_t byte);
 static int cc608_good_parity(const int *parity_table, uint16_t data);

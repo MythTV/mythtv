@@ -1044,7 +1044,7 @@ static void TVMenuCallback(void *data, QString &selection)
 
         if (sel == "settings general" ||
             sel == "settings generalrecpriorities")
-            ScheduledRecording::signalChange(0);
+            ScheduledRecording::ReschedulePlace("TVMenuCallback");
         GetMythMainWindow()->ShowPainterWindow();
     }
 }
@@ -1224,6 +1224,7 @@ static bool resetTheme(QString themedir, const QString badtheme)
     themedir = GetMythUI()->FindThemeDir(themename);
 
     MythTranslation::reload();
+    gCoreContext->ReInitLocale();
     GetMythUI()->LoadQtConfig();
     GetMythMainWindow()->Init();
 
@@ -1243,13 +1244,17 @@ static int reloadTheme(void)
         return GENERIC_EXIT_NO_THEME;
     }
 
+    gCoreContext->ReInitLocale();
     MythTranslation::reload();
 
     GetMythMainWindow()->SetEffectsEnabled(false);
 
     GetMythUI()->LoadQtConfig();
 
-    menu->Close();
+    if (menu)
+    {
+        menu->Close();
+    }
     GetMythMainWindow()->Init();
 
     GetMythMainWindow()->ReinitDone();

@@ -4,7 +4,7 @@
 <context>
     <name>GLSingleView</name>
     <message>
-        <location filename="../mythgallery/glsingleview.cpp" line="243"/>
+        <location filename="../mythgallery/glsingleview.cpp" line="229"/>
         <source>Press SELECT to play again</source>
         <translation>Tryk ENTER for at afspille igen</translation>
     </message>
@@ -12,148 +12,144 @@
 <context>
     <name>GalleryFilterDialog</name>
     <message>
+        <location filename="../mythgallery/galleryfilterdlg.cpp" line="145"/>
+        <source>Filter result : (unknown)</source>
+        <translation>Filter resultat: (ukendt)</translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/galleryfilterdlg.cpp" line="178"/>
+        <source>-- please be patient --</source>
+        <translation>-- vent venligst --</translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/galleryfilterdlg.cpp" line="190"/>
+        <source>-- scanning current filter --</source>
+        <translation>-- scanner aktuelt filter --</translation>
+    </message>
+    <message>
         <location filename="../mythgallery/galleryfilterdlg.cpp" line="205"/>
-        <source>No files / directories found</source>
-        <translation type="unfinished"></translation>
+        <source>No files / folders found</source>
+        <translation>Ingen filer / mapper fundet</translation>
     </message>
     <message>
         <location filename="../mythgallery/galleryfilterdlg.cpp" line="209"/>
-        <source>Filter result : %1 directories found but no files</source>
-        <translation type="unfinished"></translation>
+        <source>Filter result : %1 folder(s) found but no files</source>
+        <translation>Filter resultat: %1 mappe(r) fundet men ingen filer</translation>
     </message>
     <message>
         <location filename="../mythgallery/galleryfilterdlg.cpp" line="213"/>
-        <source>Filter result : %1 directories, %2 movie(s) found</source>
-        <translation type="unfinished"></translation>
+        <source>Filter result : %1 folder(s), %2 movie(s) found</source>
+        <translatorcomment>Indsat &quot;og&quot; for konsistens</translatorcomment>
+        <translation>Filter resultat: %1 mappe(r) og %2 film fundet</translation>
     </message>
     <message>
         <location filename="../mythgallery/galleryfilterdlg.cpp" line="217"/>
-        <source>Filter result : %1 directories, %2 image(s) found</source>
-        <translation type="unfinished"></translation>
+        <source>Filter result : %1 folder(s), %2 image(s) found</source>
+        <translatorcomment>Indsat &quot;og&quot; for konsistens</translatorcomment>
+        <translation>Filter resultat: %1 mappe(r) og %2 billede(r) fundet</translation>
     </message>
     <message>
         <location filename="../mythgallery/galleryfilterdlg.cpp" line="221"/>
-        <source>Filter result : %1 directories, %2 image(s) and %3 movie(s) found</source>
-        <translation type="unfinished"></translation>
+        <source>Filter result : %1 folder(s), %2 image(s) and %3 movie(s) found</source>
+        <translation>Filter resultat: %1 mappe(r), %2 billede(r) og %3 film fundet</translation>
     </message>
     <message>
         <location filename="../mythgallery/galleryfilterdlg.cpp" line="226"/>
         <source>Filter result : %1 image(s) and %2 movie(s) found</source>
-        <translation type="unfinished"></translation>
+        <translation>Filter resultat: %1 mappe(r) og %2 film fundet</translation>
     </message>
     <message>
         <location filename="../mythgallery/galleryfilterdlg.cpp" line="230"/>
         <source>Filter result : %1 image(s) found</source>
-        <translation type="unfinished"></translation>
+        <translation>Filter resultat: %1 billede(r) fundet</translation>
     </message>
     <message>
         <location filename="../mythgallery/galleryfilterdlg.cpp" line="233"/>
         <source>Filter result : %1 movie(s) found</source>
-        <translation type="unfinished"></translation>
+        <translation>Filter resultat: %1 film fundet</translation>
     </message>
 </context>
 <context>
     <name>IconView</name>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="567"/>
+        <location filename="../mythgallery/iconview.cpp" line="557"/>
         <source>Error</source>
         <translation>Fejl</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="904"/>
+        <location filename="../mythgallery/iconview.cpp" line="894"/>
         <source>SlideShow</source>
         <translation>Slideshow</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="939"/>
+        <location filename="../mythgallery/iconview.cpp" line="929"/>
         <source>Rotate CW</source>
         <translation>Roter med uret</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="940"/>
+        <location filename="../mythgallery/iconview.cpp" line="930"/>
         <source>Rotate CCW</source>
         <translation>Roter mod uret</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="980"/>
+        <location filename="../mythgallery/iconview.cpp" line="970"/>
         <source>Import</source>
         <translation>Importer</translation>
     </message>
     <message>
-        <source>Settings</source>
-        <translation type="obsolete">Indstillinger</translation>
-    </message>
-    <message>
-        <location filename="../mythgallery/iconview.cpp" line="196"/>
-        <source>No images found in this directory.</source>
-        <translation>Ingen billeder blev fundet i dette bibliotek.</translation>
-    </message>
-    <message>
-        <location filename="../mythgallery/iconview.cpp" line="399"/>
+        <location filename="../mythgallery/iconview.cpp" line="389"/>
         <source>%1 of %2</source>
         <translation>%1 af %2</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="410"/>
+        <location filename="../mythgallery/iconview.cpp" line="400"/>
         <source>Gallery Home</source>
         <translation>Galleri forside</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="900"/>
+        <location filename="../mythgallery/iconview.cpp" line="890"/>
         <source>Gallery Options</source>
-        <translation>Galleri indstillinger</translation>
+        <translation>Galleri-indstillinger</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="905"/>
+        <location filename="../mythgallery/iconview.cpp" line="895"/>
         <source>Random</source>
         <translation>Tilfældigt slideshow</translation>
     </message>
     <message>
-        <source>Meta Data Menu</source>
-        <translation type="obsolete">Metadata menu</translation>
-    </message>
-    <message>
-        <source>Marking Menu</source>
-        <translation type="obsolete">Markerings menu</translation>
-    </message>
-    <message>
-        <source>File Menu</source>
-        <translation type="obsolete">Filhåndterings menu</translation>
-    </message>
-    <message>
-        <location filename="../mythgallery/iconview.cpp" line="935"/>
+        <location filename="../mythgallery/iconview.cpp" line="925"/>
         <source>Metadata Options</source>
-        <translation>Metadata indstillinger</translation>
+        <translation>Metadata-indstillinger</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="907"/>
-        <location filename="../mythgallery/iconview.cpp" line="947"/>
+        <location filename="../mythgallery/iconview.cpp" line="897"/>
+        <location filename="../mythgallery/iconview.cpp" line="937"/>
         <source>Marking Options</source>
         <translation>Markeringsmuligheder</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="951"/>
+        <location filename="../mythgallery/iconview.cpp" line="941"/>
         <source>Select One</source>
         <translation>Marker en</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="952"/>
+        <location filename="../mythgallery/iconview.cpp" line="942"/>
         <source>Clear One Marked</source>
         <translation>Fjern én markeret</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="909"/>
-        <location filename="../mythgallery/iconview.cpp" line="974"/>
+        <location filename="../mythgallery/iconview.cpp" line="899"/>
+        <location filename="../mythgallery/iconview.cpp" line="964"/>
         <source>File Options</source>
         <translation>Filhåndtering</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="979"/>
+        <location filename="../mythgallery/iconview.cpp" line="969"/>
         <source>Eject</source>
         <translation>Skub ud</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="983"/>
+        <location filename="../mythgallery/iconview.cpp" line="973"/>
         <source>Delete</source>
         <translation>Slet</translation>
     </message>
@@ -163,133 +159,138 @@
         <translation>MythGallery mappe %1 eksisterer ikke eller kan ikke læses.</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="568"/>
+        <location filename="../mythgallery/iconview.cpp" line="558"/>
         <source>The selected device is no longer available</source>
         <translation>Den valgte enhed er ikke længere tilgængelig</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="954"/>
+        <location filename="../mythgallery/iconview.cpp" line="944"/>
         <source>Clear Marked</source>
         <translation>Fjern markeringer</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="953"/>
+        <location filename="../mythgallery/iconview.cpp" line="943"/>
         <source>Select All</source>
         <translation>Marker alle</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="906"/>
+        <location filename="../mythgallery/iconview.cpp" line="196"/>
+        <source>No images found in this folder.</source>
+        <translation>Ingen billeder blev fundet i dette bibliotek.</translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/iconview.cpp" line="896"/>
         <source>Meta Data Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Metadata-indstillinger</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="908"/>
+        <location filename="../mythgallery/iconview.cpp" line="898"/>
         <source>Filter / Sort...</source>
-        <translation type="unfinished"></translation>
+        <translation>Filtrer / Sorter...</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="910"/>
+        <location filename="../mythgallery/iconview.cpp" line="900"/>
         <source>Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>Indstillinger...</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="978"/>
+        <location filename="../mythgallery/iconview.cpp" line="968"/>
         <source>Show Devices</source>
         <translation>Vis enheder</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="981"/>
+        <location filename="../mythgallery/iconview.cpp" line="971"/>
         <source>Copy here</source>
         <translation>Kopier hertil</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="982"/>
+        <location filename="../mythgallery/iconview.cpp" line="972"/>
         <source>Move here</source>
         <translation>Flyt hertil</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="984"/>
-        <source>Create Dir</source>
+        <location filename="../mythgallery/iconview.cpp" line="974"/>
+        <source>Create folder</source>
         <translation>Opret mappe</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1037"/>
+        <location filename="../mythgallery/iconview.cpp" line="1027"/>
         <source>Delete Current File or Folder</source>
         <translation>Slet den aktuelle fil eller mappe</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1039"/>
+        <location filename="../mythgallery/iconview.cpp" line="1029"/>
         <source>Deleting 1 folder, including any subfolders and files.</source>
         <translation>Sletter 1 mappe, inklusiv alle undermapper og filer.</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1040"/>
+        <location filename="../mythgallery/iconview.cpp" line="1030"/>
         <source>Deleting 1 image.</source>
         <translation>Sletter 1 billede.</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1107"/>
+        <location filename="../mythgallery/iconview.cpp" line="1097"/>
         <source>Import pictures?</source>
-        <translation type="unfinished"></translation>
+        <translation>Importer billeder?</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1109"/>
+        <location filename="../mythgallery/iconview.cpp" line="1099"/>
         <source>No</source>
-        <translation type="unfinished"></translation>
+        <translation>Nej</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1110"/>
+        <location filename="../mythgallery/iconview.cpp" line="1100"/>
         <source>Yes</source>
-        <translation type="unfinished"></translation>
+        <translation>Ja</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1153"/>
+        <location filename="../mythgallery/iconview.cpp" line="1143"/>
         <source>Nothing found to import</source>
-        <translation type="unfinished"></translation>
+        <translation>Intet at importere</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1155"/>
+        <location filename="../mythgallery/iconview.cpp" line="1145"/>
         <source>OK</source>
-        <translation type="unfinished"></translation>
+        <translation>OK</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1258"/>
+        <location filename="../mythgallery/iconview.cpp" line="1248"/>
         <source>Deleting %1 images and folders, including any subfolders and files.</source>
         <translation>Sletter %1 billeder og mapper, inklusiv alle undermapper og filer.</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1321"/>
+        <location filename="../mythgallery/iconview.cpp" line="1311"/>
         <source>New Folder</source>
         <translation>Ny mappe</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1323"/>
+        <location filename="../mythgallery/iconview.cpp" line="1313"/>
         <source>Create New Folder</source>
         <translation>Opret ny mappe</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1439"/>
+        <location filename="../mythgallery/iconview.cpp" line="1368"/>
+        <source>Failed to rename folder</source>
+        <translation>Fejl ved omdøbning af mappe</translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/iconview.cpp" line="1429"/>
         <source>Moving marked images...</source>
         <translation>Flytter markerede billeder...</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1439"/>
+        <location filename="../mythgallery/iconview.cpp" line="1429"/>
         <source>Copying marked images...</source>
         <translation>Kopierer markerede billeder...</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="985"/>
-        <location filename="../mythgallery/iconview.cpp" line="1352"/>
+        <location filename="../mythgallery/iconview.cpp" line="975"/>
+        <location filename="../mythgallery/iconview.cpp" line="1342"/>
         <source>Rename</source>
         <translation>Omdøb</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1378"/>
-        <source>Failed to rename directory</source>
-        <translation>Fejl ved omdøbning af mappe</translation>
-    </message>
-    <message>
-        <location filename="../mythgallery/iconview.cpp" line="1380"/>
+        <location filename="../mythgallery/iconview.cpp" line="1370"/>
         <source>Failed to rename file</source>
         <translation>Fejl ved omdøbning af fil</translation>
     </message>
@@ -421,89 +422,84 @@
         <translation>Denne mappe skal eksistere og MythGalleri skal have læse rettigheder.</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="109"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="99"/>
         <source>Paths to import images from</source>
         <translation>Stier hvor der skal importeres billeder fra</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="120"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="110"/>
         <source>Automatically load MythGallery to display pictures</source>
         <translation>Start automatisk MythGallery for at vise billeder</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="122"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="112"/>
         <source>When a new CD-Rom or removable storage device containing pictures is detected then load MythGallery to display the content.</source>
         <translation>Når der detekteres en ny CD-ROM eller flytbar disk indeholdende billeder, startes MythGallery for at vise indholdet.</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="173"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="163"/>
         <source>Type of transition</source>
         <translation>Overgangstype</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="196"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="186"/>
         <source>Type of background</source>
         <translation>Baggrundstype</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="211"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="201"/>
         <source>This is the number of seconds to display each picture.</source>
         <translation>Antal sekunder som hvert billede skal vises.</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="111"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="101"/>
         <source>This is a colon separated list of paths. If the path in the list is a directory, its contents will be copied. If it is an executable, it will be run.</source>
         <translation>Dette er en kolon separeret liste af stier. Hvis stien i listen er en mappe, bliver indeholdet kopieret. Hvis det er en kommando, bliver den kørt.</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="188"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="20"/>
+        <source>Enter directory names to be excluded in browser. (multiple entries delimited with &apos;:&apos;)</source>
+        <translation>Indtast mappenavne som skal ekskluderes fra browser (adskil med &apos;:&apos;)</translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/gallerysettings.cpp" line="178"/>
         <source>This is the type of transition used between pictures in slideshow mode.</source>
         <translation>Dette er den overgangstype der benyttes mellem billederne under slideshow.</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="201"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="191"/>
         <source>This is the type of background for each picture in single view mode.</source>
         <translation>Dette er den baggrundstype der benyttes til hvert billede under enkeltbilledvisning.</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="209"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="199"/>
         <source>Slideshow Delay</source>
         <translation>Slideshow pause</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="131"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="121"/>
         <source>Use OpenGL transitions</source>
-        <translation>Brug OpenGL overgange</translation>
+        <translation>Brug OpenGL-overgange</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="133"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="123"/>
         <source>Check this to enable OpenGL based slideshow transitions</source>
-        <translation>Sæt denne for at aktivere OpenGL overgange</translation>
+        <translation>Sæt denne for at aktivere OpenGL-overgange</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="141"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="131"/>
         <source>Type of OpenGL transition</source>
-        <translation>OpenGL overgangstype</translation>
+        <translation>OpenGL-overgangstype</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="154"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="144"/>
         <source>This is the type of OpenGL transition used between pictures in slideshow mode.</source>
-        <translation>Dette er den OpenGL overgangetype som benyttes mellem billeder i slideshow mode.</translation>
-    </message>
-    <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="89"/>
-        <source>Command run to display movie files</source>
-        <translation>Kommando til at afspille film filer</translation>
-    </message>
-    <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="91"/>
-        <source>This command is executed whenever a movie file is selected</source>
-        <translation>Denne kommando køres når der vælges en film fil</translation>
+        <translation>Dette er den OpenGL-overgangetype som benyttes mellem billeder i slideshow mode.</translation>
     </message>
     <message>
         <location filename="../mythgallery/gallerysettings.cpp" line="55"/>
         <source>Store thumbnails in image directory</source>
-        <translation>Gem mini-billeder i billed mappen</translation>
+        <translation>Gem mini-billeder i billedmappen</translation>
     </message>
     <message>
         <location filename="../mythgallery/gallerysettings.cpp" line="57"/>
@@ -511,22 +507,22 @@
         <translation>Hvis aktiv, bliver mini-billederne gemt i&apos;.thumbcache&apos; mapper i ovenstående mappe. Ellers bliver de gemt i brugerens hjemmemappe.</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="219"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="209"/>
         <source>Recurse into directories</source>
         <translation>Inkluder undermapper</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="220"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="210"/>
         <source>Check this to let the slideshow recurse into sub-directories.</source>
         <translation>Sættes hvis slideshowet skal indeholde billeder fra undermapper.</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="99"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="89"/>
         <source>Overlay caption</source>
         <translation>Billedtekst</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="101"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="91"/>
         <source>This is the number of seconds to show a caption on top of a full size picture.</source>
         <translation>Antallet af sekunder som en billedtekst skal vises ovenpå et fuldskærmsbillede.</translation>
     </message>
@@ -538,22 +534,17 @@
     <message>
         <location filename="../mythgallery/gallerysettings.cpp" line="18"/>
         <source>Directory filter</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="20"/>
-        <source>Enter direcory names to be excluded in browser. (multiple entries delimited with &apos;:&apos;)</source>
-        <translation type="unfinished"></translation>
+        <translation>Mappefilter</translation>
     </message>
     <message>
         <location filename="../mythgallery/gallerysettings.cpp" line="29"/>
         <source>Type filter</source>
-        <translation type="unfinished"></translation>
+        <translation>Typefilter</translation>
     </message>
     <message>
         <location filename="../mythgallery/gallerysettings.cpp" line="33"/>
         <source>This is the type filter for the displayed thumbnails.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dette er typefilteret for de viste mini-billeder.</translation>
     </message>
     <message>
         <location filename="../mythgallery/gallerysettings.cpp" line="81"/>
@@ -561,19 +552,19 @@
         <translation>Sorteringsorden af mini-billeder under navigering.</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="163"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="153"/>
         <source>Duration of OpenGL Transition (milliseconds)</source>
-        <translation>Varighed af OpenGL overgang (millisekunder)</translation>
+        <translation>Varighed af OpenGL-overgang (millisekunder)</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="231"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="221"/>
         <source>MythGallery Settings (Slideshow)</source>
-        <translation>MythGallery indstillinger (Slideshow)</translation>
+        <translation>MythGallery-indstillinger (Slideshow)</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="261"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="251"/>
         <source>MythGallery Settings (General)</source>
-        <translation>MythGallery indstillinger (Generelt)</translation>
+        <translation>MythGallery-indstillinger (Generelt)</translation>
     </message>
     <message>
         <location filename="../mythgallery/main.cpp" line="52"/>
@@ -643,68 +634,68 @@ Kontroller at mappen findes, kan læses og at indstillingerne er korrekte på My
     <message>
         <location filename="../mythgallery/galleryfilterdlg.cpp" line="138"/>
         <source>All</source>
-        <translation type="unfinished"></translation>
+        <translation>Alle</translation>
     </message>
     <message>
         <location filename="../mythgallery/galleryfilterdlg.cpp" line="140"/>
         <source>Images only</source>
-        <translation type="unfinished"></translation>
+        <translation>Kun billeder</translation>
     </message>
     <message>
         <location filename="../mythgallery/galleryfilterdlg.cpp" line="142"/>
         <source>Movies only</source>
-        <translation type="unfinished"></translation>
+        <translation>Kun film</translation>
     </message>
     <message>
         <location filename="../mythgallery/galleryfilterdlg.cpp" line="148"/>
         <source>Unsorted</source>
-        <translation type="unfinished"></translation>
+        <translation>Usorteret</translation>
     </message>
     <message>
         <location filename="../mythgallery/galleryfilterdlg.cpp" line="150"/>
         <source>Name (A-Z alpha)</source>
-        <translation type="unfinished"></translation>
+        <translation>Navn (A-Z alfabetisk)</translation>
     </message>
     <message>
         <location filename="../mythgallery/galleryfilterdlg.cpp" line="153"/>
         <source>Reverse Name (Z-A alpha)</source>
-        <translation type="unfinished"></translation>
+        <translation>Omvendt navn (Z-A alfabetisk)</translation>
     </message>
     <message>
         <location filename="../mythgallery/galleryfilterdlg.cpp" line="155"/>
         <source>Mod Time (oldest first)</source>
-        <translation type="unfinished"></translation>
+        <translation>Redigeringstid (ældste først)</translation>
     </message>
     <message>
         <location filename="../mythgallery/galleryfilterdlg.cpp" line="158"/>
         <source>Reverse Mod Time (newest first)</source>
-        <translation type="unfinished"></translation>
+        <translation>Omvendt redigeringstid (nyeste først)</translation>
     </message>
     <message>
         <location filename="../mythgallery/galleryfilterdlg.cpp" line="160"/>
         <source>Extension (A-Z alpha)</source>
-        <translation type="unfinished"></translation>
+        <translation>Endelse (A-Z alfabetisk)</translation>
     </message>
     <message>
         <location filename="../mythgallery/galleryfilterdlg.cpp" line="163"/>
         <source>Reverse Extension (Z-A alpha)</source>
-        <translation type="unfinished"></translation>
+        <translation>Omvendt endelse (Z-A alfabetisk)</translation>
     </message>
     <message>
         <location filename="../mythgallery/galleryfilterdlg.cpp" line="166"/>
         <source>Filesize (smallest first)</source>
-        <translation type="unfinished"></translation>
+        <translation>Filstørrelse (mindste først)</translation>
     </message>
     <message>
         <location filename="../mythgallery/galleryfilterdlg.cpp" line="169"/>
         <source>Reverse Filesize (largest first)</source>
-        <translation type="unfinished"></translation>
+        <translation>Omvendt filstørrelse (største først)</translation>
     </message>
 </context>
 <context>
     <name>SingleView</name>
     <message>
-        <location filename="../mythgallery/singleview.cpp" line="218"/>
+        <location filename="../mythgallery/singleview.cpp" line="204"/>
         <source>Press SELECT to play again</source>
         <translation>Tryk ENTER for at afspille igen</translation>
     </message>
@@ -712,74 +703,89 @@ Kontroller at mappen findes, kan læses og at indstillingerne er korrekte på My
 <context>
     <name>ThemeUI</name>
     <message>
-        <location filename="themestrings.h" line="4"/>
+        <location filename="themestrings.h" line="7"/>
         <source>%DATE%, %TIME%</source>
         <translation>%DATE%, %TIME%</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="5"/>
+        <location filename="themestrings.h" line="8"/>
         <source>No images are present in the pictures folder.</source>
         <translation>Der er ingen billeder i billedmappen.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="2"/>
+        <location filename="themestrings.h" line="5"/>
         <source>Image Gallery</source>
         <translation>Billedgalleri</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="3"/>
+        <location filename="themestrings.h" line="6"/>
         <source>No images found in configured directory.  Are you sure you have set up the plugin properly?</source>
-        <translation type="unfinished"></translation>
+        <translation>Ingen billeder fundet i konfigureret mappe.  Er du sikker på at du har opsat det korrekt?</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="6"/>
+        <location filename="themestrings.h" line="9"/>
         <source>SELECT: View</source>
         <translation>ENTER: Vis</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="7"/>
+        <location filename="themestrings.h" line="10"/>
         <source>MENU: Activate Menu</source>
         <translation>MENU: Aktiver menu</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="8"/>
-        <source>Filter/sort images</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="9"/>
-        <source>Directory filter :</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="10"/>
-        <source>Type filter :</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="themestrings.h" line="11"/>
-        <source>NumImages_Text</source>
-        <translation type="unfinished"></translation>
+        <source>Video Gallery</source>
+        <translation>Videogalleri</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="12"/>
-        <source>Sort by :</source>
-        <translation type="unfinished"></translation>
+        <source>Filter/sort images</source>
+        <translation>Filtrer/sorter billeder</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="13"/>
-        <source>Check Filter</source>
-        <translation type="unfinished"></translation>
+        <source>Directory filter:</source>
+        <translation>Mappefilter:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="14"/>
-        <source>Done</source>
-        <translation type="unfinished"></translation>
+        <location filename="themestrings.h" line="19"/>
+        <source>Folder filter :</source>
+        <translation>Mappefilter :</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="20"/>
+        <source>Type filter :</source>
+        <translation>Typefilter :</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="21"/>
+        <source>Sort by :</source>
+        <translation>Sorter efter :</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="15"/>
+        <source>Check Filter</source>
+        <translation>Kontroller filter</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="14"/>
+        <source>Type filter:</source>
+        <translation>Typefilter:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="16"/>
+        <source>Sort by:</source>
+        <translation>Sorter efter:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="17"/>
+        <source>Done</source>
+        <translation>Færdig</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="18"/>
         <source>Save as default</source>
-        <translation type="unfinished"></translation>
+        <translation>Gem som standard</translation>
     </message>
 </context>
 </TS>

@@ -397,7 +397,7 @@
             </shape>
 
 
-            <buttonlist name="channels" from2="basebuttonlist">
+            <buttonlist name="channels" from="basebuttonlist">
                 <area>0,0,100%,100%</area>
                 <buttonarea>0,0,100%,100%</buttonarea>
                 <statetype name="buttonitem">
@@ -1451,8 +1451,6 @@
 
     </window>
 
-
-
     <window name="scheduleeditor">
 
         <imagetype name="backdrop" from="basebackdrop" />
@@ -2260,8 +2258,7 @@
             <value></value>
         </textarea>
 
-    </window>>
-
+    </window>
 
     <window name="managerecrules">
 

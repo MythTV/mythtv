@@ -295,6 +295,8 @@ void MainServer::Stop()
 {
     m_stopped = true;
 
+    gCoreContext->removeListener(this);
+
     {
         QMutexLocker locker(&masterFreeSpaceListLock);
         if (masterFreeSpaceListUpdater)
@@ -523,10 +525,8 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
     }
     else if (command == "RESCHEDULE_RECORDINGS")
     {
-        if (tokens.size() != 2)
-            LOG(VB_GENERAL, LOG_ERR, "Bad RESCHEDULE_RECORDINGS request");
-        else
-            HandleRescheduleRecordings(tokens[1].toInt(), pbs);
+        listline.pop_front();
+        HandleRescheduleRecordings(listline, pbs);
     }
     else if (command == "FORGET_RECORDING")
     {
@@ -1005,17 +1005,8 @@ void MainServer::customEvent(QEvent *e)
 
         if (me->Message().left(21) == "RESCHEDULE_RECORDINGS" && m_sched)
         {
-            QStringList tokens = me->Message()
-                .split(" ", QString::SkipEmptyParts);
-
-            if (tokens.size() != 2)
-            {
-                LOG(VB_GENERAL, LOG_ERR, "Bad RESCHEDULE_RECORDINGS message");
-                return;
-            }
-
-            int recordid = tokens[1].toInt();
-            m_sched->Reschedule(recordid);
+            QStringList request = me->ExtraDataList();
+            m_sched->Reschedule(request);
             return;
         }
 
@@ -1442,7 +1433,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
         }
 
         if (!wasAsleep && m_sched)
-            m_sched->Reschedule(0);
+            m_sched->ReschedulePlace("SlaveConnected");
 
         QString message = QString("LOCAL_SLAVE_BACKEND_ONLINE %2")
                                   .arg(commands[2]);
@@ -1999,9 +1990,6 @@ void MainServer::DoDeleteThread(DeleteStruct *ds)
 
     DoDeleteInDB(ds);
 
-    if (pginfo.GetRecordingGroup() != "LiveTV")
-        ScheduledRecording::signalChange(0);
-
     deletelock.unlock();
 
     if (slowDeletes && fd >= 0)
@@ -2511,7 +2499,7 @@ void MainServer::DoHandleDeleteRecording(
         if (forgetHistory)
             recinfo.ForgetHistory();
         else if (m_sched)
-            m_sched->Reschedule(0);
+            m_sched->RescheduleCheck(recinfo, "DoHandleDelete1");
         QStringList outputlist( QString::number(0) );
         SendResponse(pbssock, outputlist);
         return;
@@ -2532,7 +2520,7 @@ void MainServer::DoHandleDeleteRecording(
             else if (m_sched && 
                      recinfo.GetRecordingGroup() != "Deleted" &&
                      recinfo.GetRecordingGroup() != "LiveTV")
-                m_sched->Reschedule(0);
+                m_sched->RescheduleCheck(recinfo, "DoHandleDelete2");
 
             if (pbssock)
             {
@@ -2592,7 +2580,7 @@ void MainServer::DoHandleDeleteRecording(
     else if (m_sched && 
              recinfo.GetRecordingGroup() != "Deleted" &&
              recinfo.GetRecordingGroup() != "LiveTV")
-        m_sched->Reschedule(0);
+        m_sched->RescheduleCheck(recinfo, "DoHandleDelete3");
 
     // Tell MythTV frontends that the recording list needs to be updated.
     if (fileExists || !recinfo.GetFilesize() || forceMetadataDelete)
@@ -2649,12 +2637,13 @@ void MainServer::DoHandleUndeleteRecording(
     SendResponse(pbssock, outputlist);
 }
 
-void MainServer::HandleRescheduleRecordings(int recordid, PlaybackSock *pbs)
+void MainServer::HandleRescheduleRecordings(const QStringList &request, 
+                                            PlaybackSock *pbs)
 {
     QStringList result;
     if (m_sched)
     {
-        m_sched->Reschedule(recordid);
+        m_sched->Reschedule(request);
         result = QStringList( QString::number(1) );
     }
     else
@@ -3149,7 +3138,8 @@ void MainServer::HandleGetPendingRecordings(PlaybackSock *pbs,
                     record->m_recordID = recordid;
                     if (record->Load() &&
                         record->m_searchType == kManualSearch)
-                        HandleRescheduleRecordings(recordid, NULL);
+                        m_sched->RescheduleMatch(recordid, 0, 0, QDateTime(),
+                                                 "Speculation");
                     delete record;
                 }
                 query.prepare("DELETE FROM program WHERE manualid = :RECID;");
@@ -3411,7 +3401,7 @@ void MainServer::HandleLockTuner(PlaybackSock *pbs, int cardid)
                         << query.value(2).toString();
 
                 if (m_sched)
-                    m_sched->Reschedule(0);
+                    m_sched->ReschedulePlace("LockTuner");
 
                 SendResponse(pbssock, strlist);
                 return;
@@ -3457,7 +3447,7 @@ void MainServer::HandleFreeTuner(int cardid, PlaybackSock *pbs)
         LOG(VB_GENERAL, LOG_INFO, msg);
 
         if (m_sched)
-            m_sched->Reschedule(0);
+            m_sched->ReschedulePlace("FreeTuner");
 
         strlist << "OK";
     }
@@ -6222,7 +6212,7 @@ void MainServer::HandleSlaveDisconnectedEvent(const MythEvent &event)
             m_sched->SlaveDisconnected(event.ExtraData(i).toUInt());
 
         if (needsReschedule)
-            m_sched->Reschedule(0);
+            m_sched->ReschedulePlace("SlaveDisconnected");
     }
 }
 
