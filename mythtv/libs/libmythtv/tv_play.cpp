@@ -7066,7 +7066,7 @@ void TV::ChangeChannel(PlayerContext *ctx, uint chanid, const QString &chan)
     bool getit = false;
     if (ctx->recorder)
     {
-        if ((ctx->pseudoLiveTVState == kPseudoRecording) || chanid)
+        if (ctx->pseudoLiveTVState == kPseudoRecording)
         {
             getit = true;
         }
