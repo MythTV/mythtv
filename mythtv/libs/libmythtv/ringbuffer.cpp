@@ -410,7 +410,7 @@ bool RingBuffer::IsNearEnd(double fps, uint vvf) const
     double bytes_per_frame = kbits_per_sec * (1000.0/8.0) / fps;
     double readahead_frames = sz / bytes_per_frame;
 
-    bool near_end = ((vvf + readahead_frames) < 10.0) || (sz < rbs*1.5);
+    bool near_end = ((vvf + readahead_frames) < 20.0) || (sz < rbs*1.5);
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "IsReallyNearEnd()" +
             QString(" br(%1KB)").arg(kbits_per_sec/8) +

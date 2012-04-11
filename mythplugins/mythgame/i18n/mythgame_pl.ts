@@ -813,46 +813,51 @@ want to do this?</source>
     </message>
     <message>
         <location filename="themestrings.h" line="46"/>
+        <source>Favorite</source>
+        <translation>Ulubione</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="47"/>
         <source>No Plot.</source>
         <translation>Brak zdjęcia.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="47"/>
+        <location filename="themestrings.h" line="48"/>
         <source>General Settings</source>
         <translation>Ustawienia Ogólne</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="48"/>
+        <location filename="themestrings.h" line="49"/>
         <source>Game folders and general options</source>
         <translation>Ustawienia katalogów i opcje ogólne </translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="49"/>
+        <location filename="themestrings.h" line="50"/>
         <source>Game Players</source>
         <translation>Gracze</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="50"/>
+        <location filename="themestrings.h" line="51"/>
         <source>Configure an emulator</source>
         <translation>Konfiguruj emulator</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="51"/>
+        <location filename="themestrings.h" line="52"/>
         <source>Scan for Games</source>
         <translation>Wyszuku gry</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="52"/>
+        <location filename="themestrings.h" line="53"/>
         <source>Add games to your library</source>
         <translation>Dodaj gry do biblioteki</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="53"/>
+        <location filename="themestrings.h" line="54"/>
         <source>Clear Game Data</source>
         <translation>Usuń dane o grze</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="54"/>
+        <location filename="themestrings.h" line="55"/>
         <source>Empty your game library</source>
         <translation>Wyczyść Twoją bibliotekę</translation>
     </message>

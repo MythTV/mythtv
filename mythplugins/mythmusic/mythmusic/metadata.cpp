@@ -1378,7 +1378,8 @@ QString AlbumArtImages::getTypeName(ImageType type)
         QT_TR_NOOP("Artist"),             // IT_ARTIST
     };
 
-    return QObject::tr(type_strings[type]);
+    return QCoreApplication::translate("AlbumArtImages",
+                                       type_strings[type]);
 }
 
 // static method to get a filename from an ImageType
@@ -1394,7 +1395,8 @@ QString AlbumArtImages::getTypeFilename(ImageType type)
         QT_TR_NOOP("artist")        // IT_ARTIST
     };
 
-    return QObject::tr(filename_strings[type]);
+    return QCoreApplication::translate("AlbumArtImages",
+                                       filename_strings[type]);
 }
 
 // static method to guess the image type from the filename

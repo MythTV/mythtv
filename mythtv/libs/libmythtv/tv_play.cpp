@@ -11073,9 +11073,8 @@ void TV::FillOSDMenuSource(const PlayerContext *ctx, OSD *osd,
     if ((category == "SOURCE" || category == "INPUTSWITCHING"||
          category == "SOURCESWITCHING") && ctx->recorder)
     {
-        cardids = RemoteRequestFreeRecorderList();
+        cardids = CardUtil::GetCardList();
         cardid  = ctx->GetCardID();
-        cardids.push_back(cardid);
         // The cardids are already in the preferred order.  Don't
         // alter it if switching sources.
         if (category != "SOURCESWITCHING")

@@ -22,6 +22,7 @@
 #define _AUDIOINPUT_H_
 
 #include <QString>
+#include <unistd.h>
 
 class AudioInput
 {

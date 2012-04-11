@@ -177,7 +177,7 @@ void EITScanner::RescheduleRecordings(void)
         QDateTime::currentDateTime().addSecs(kMinRescheduleInterval);
     resched_lock.unlock();
 
-    ScheduledRecording::signalChange(-1);
+    ScheduledRecording::RescheduleMatch(0, 0, 0, QDateTime(), "EITScanner");
 }
 
 /** \fn EITScanner::StartPassiveScan(ChannelBase*, EITSource*, bool)

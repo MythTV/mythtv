@@ -306,7 +306,7 @@ void CustomPriority::installClicked(void)
     if (!query.exec())
         MythDB::DBError("Install power search insert", query);
     else
-        ScheduledRecording::signalChange(0);
+        ScheduledRecording::ReschedulePlace("InstallCustomPriority");
 
     Close();
 }
@@ -324,7 +324,7 @@ void CustomPriority::deleteClicked(void)
     if (!query.exec())
         MythDB::DBError("Delete power search query", query);
     else
-        ScheduledRecording::signalChange(0);
+        ScheduledRecording::ReschedulePlace("DeleteCustomPriority");
 
     Close();
 }

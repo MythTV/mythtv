@@ -359,6 +359,7 @@ int MythRAOPConnection::ExpireAudio(uint64_t timestamp)
             m_queueLength -= frame->nb_samples;
             av_free((void *)frame);
             m_audioQueue.remove(it.key());
+            m_queueLength -= frame.frames;
             res++;
         }
     }

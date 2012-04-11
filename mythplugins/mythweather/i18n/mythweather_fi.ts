@@ -16,11 +16,19 @@
     </message>
     <message>
         <source>Searching ...</source>
-        <translation>Hakee...</translation>
+        <translation type="obsolete">Hakee...</translation>
     </message>
     <message>
         <source>Searching ... Results: %1</source>
-        <translation>Hakee ... Tulokset: %1</translation>
+        <translation type="obsolete">Hakee ... Tulokset: %1</translation>
+    </message>
+    <message>
+        <source>Searching...</source>
+        <translation>Hakee...</translation>
+    </message>
+    <message>
+        <source>Searching... Results: %1</source>
+        <translation>Hakee... Tulokset: %1</translation>
     </message>
     <message>
         <source>Search Complete. Results: %1</source>
@@ -176,7 +184,7 @@
     </message>
     <message>
         <source>Script %1 is still running when trying to do update, Make sure it isn&apos;t hanging, make sure timeout values are sane... Not running this time around</source>
-        <translation>Skripti %1 yrittää edelleen päivitystä, varmista ettei se ole jumissa, ja varmista että aikakatkaisun arvot on järkevät... Ei ajeta tällä kertaa</translation>
+        <translation type="obsolete">Skripti %1 yrittää edelleen päivitystä, varmista ettei se ole jumissa, ja varmista että aikakatkaisun arvot on järkevät... Ei ajeta tällä kertaa</translation>
     </message>
 </context>
 <context>
@@ -787,7 +795,7 @@
     </message>
     <message>
         <source>%DATE%, %TIME%</source>
-        <translation></translation>
+        <translation>%DATE%, %TIME%</translation>
     </message>
     <message>
         <source>Last Updated %1</source>
@@ -817,7 +825,7 @@
         <source>This screen governs the behavior of the weather screens.  You can enable a background weather update which will run regardless of being on the weather screen, and configure how many seconds each screen will display.
 
 When you are done configuring the Weather Plugin, click &quot;Finish&quot; to continue.</source>
-        <translation>Tämä sivu määrittelee säänäyttöjen käytöksen. Voit laittaa sääpäivityksen tausta-ajoon huolimatta siitä oletko säänäytöllä vai et, ja säätää montako sekuntia jokainen näyttöä kestää.</translation>
+        <translation type="obsolete">Tämä sivu määrittelee säänäyttöjen käytöksen. Voit laittaa sääpäivityksen tausta-ajoon huolimatta siitä oletko säänäytöllä vai et, ja säätää montako sekuntia jokainen näyttöä kestää.</translation>
     </message>
     <message>
         <source>Retrieve data in background:</source>
@@ -825,7 +833,7 @@ When you are done configuring the Weather Plugin, click &quot;Finish&quot; to co
     </message>
     <message>
         <source>OK</source>
-        <translation></translation>
+        <translation>OK</translation>
     </message>
     <message>
         <source>Weather Setup</source>
@@ -896,12 +904,40 @@ Kun olet valmis, paina &quot;Lopeta&quot; jatkaaksesi.</translation>
         <translation>Säätietojen sijaintihaku</translation>
     </message>
     <message>
+        <source>: %1</source>
+        <translation>: %1</translation>
+    </message>
+    <message>
+        <source>100%</source>
+        <translation>100%</translation>
+    </message>
+    <message>
+        <source>Global Weather Settings</source>
+        <translation>Maailmansää -asetukset</translation>
+    </message>
+    <message>
+        <source>Seconds to display each page</source>
+        <translation>Montako sekuntia näytetään jokaista sivua</translation>
+    </message>
+    <message>
+        <source>Retrieve data in the background</source>
+        <translation>Hae tietoa taustalla</translation>
+    </message>
+    <message>
+        <source>Enter your current location,nearest large town or city. In some countries postal codes are also supported.</source>
+        <translation type="obsolete">Syötä nykyinen sijaintisi, lähin iso kylä tai kaupunki. Joissain maissa toimii myös postinumerot.</translation>
+    </message>
+    <message>
+        <source>General weather options</source>
+        <translation>Yleiset sään asetukset</translation>
+    </message>
+    <message>
         <source>Weather</source>
-        <translation>Sää</translation>
+        <translation type="obsolete">Sää</translation>
     </message>
     <message>
         <source>Global Setup</source>
-        <translation>Yleiset asetukset</translation>
+        <translation type="obsolete">Yleiset asetukset</translation>
     </message>
     <message>
         <source>Screen Setup</source>
@@ -914,6 +950,12 @@ Kun olet valmis, paina &quot;Lopeta&quot; jatkaaksesi.</translation>
     <message>
         <source>Humidity:</source>
         <translation>Kosteus:</translation>
+    </message>
+    <message>
+        <source>This screen governs the behavior of the weather screens.  You can enable a background weather update which will run regardless of being on the weather screen, and configure how many seconds each screen will display.
+
+When you are done configuring the weather plugin, click &quot;Finish&quot; to continue.</source>
+        <translation>Tämä sivu määrittelee säänäyttöjen käytöksen. Voit laittaa sääpäivityksen tausta-ajoon huolimatta siitä oletko säänäytöllä vai et, ja säätää montako sekuntia jokainen näyttö kestää.</translation>
     </message>
     <message>
         <source>Pressure:</source>
@@ -937,7 +979,7 @@ Kun olet valmis, paina &quot;Lopeta&quot; jatkaaksesi.</translation>
     </message>
     <message>
         <source>General weather plugin options</source>
-        <translation>Yleiset sääliitännäisten asetukset</translation>
+        <translation type="obsolete">Yleiset sääliitännäisten asetukset</translation>
     </message>
     <message>
         <source>Screen Settings</source>

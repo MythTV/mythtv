@@ -370,7 +370,10 @@ int handle_command(const MythBackendCommandLineParser &cmdline)
         }
 
         verboseMask |= VB_SCHEDULE;
+        LogLevel_t oldLogLevel = logLevel;
+        logLevel = LOG_DEBUG;
         sched->PrintList(true);
+        logLevel = oldLogLevel;
         delete sched;
         return GENERIC_EXIT_OK;
     }
@@ -381,7 +384,8 @@ int handle_command(const MythBackendCommandLineParser &cmdline)
         if (gCoreContext->ConnectToMasterServer())
         {
             LOG(VB_GENERAL, LOG_INFO, "Connected to master for reschedule");
-            ScheduledRecording::signalChange(-1);
+            ScheduledRecording::RescheduleMatch(0, 0, 0, QDateTime(),
+                                                "MythBackendCommand");
             ok = true;
         }
         else

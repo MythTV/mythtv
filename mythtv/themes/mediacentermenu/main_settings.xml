@@ -2,6 +2,13 @@
 <mythmenu name="SETUP">
 
     <button>
+        <type>SETTINGS_SETUPWIZARD</type>
+        <text>Setup Wizard</text>
+        <description>Perform basic configuration tasks</description>
+        <action>SETTINGS SETUPWIZARD</action>
+    </button>
+
+    <button>
         <type>SETTINGS_GENERAL</type>
         <text>General</text>
         <description>Core MythTV behavior and system settings</description>
@@ -34,13 +41,6 @@
         <text>Screen Setup Wizards</text>
         <description>Compensate for TVs with overscan</description>
         <action>SCREENSETUPWIZARD</action>
-    </button>
-
-    <button>
-        <type>SETTINGS_SETUPWIZARD</type>
-        <text>Setup Wizard</text>
-        <description>Perform basic configuration tasks</description>
-        <action>SETTINGS SETUPWIZARD</action>
     </button>
 
     <button>

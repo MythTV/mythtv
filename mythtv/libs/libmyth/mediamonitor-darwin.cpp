@@ -424,12 +424,21 @@ void MonitorThreadDarwin::diskInsert(const char *devName,
     QString mnt = "/Volumes/"; mnt += volName;
     media->setMountPath(mnt.toAscii());
 
+    int  attempts = 0;
     QDir d(mnt);
     while (!d.exists())
     {
         LOG(VB_MEDIA, LOG_WARNING,
             (msg + "() - Waiting for mount '%1' to become stable.").arg(mnt));
         usleep(120000);
+        if ( ++attempts > 4 )
+            usleep(200000);
+        if ( attempts > 8 )
+        {
+            delete media;
+            LOG(VB_MEDIA, LOG_ALERT, msg + "() - Giving up");
+            return;
+        }
     }
 
     media->setStatus(MEDIASTAT_MOUNTED);

@@ -27,13 +27,7 @@ namespace DTC
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 //
-// -=>NOTE: DESIGNABLE - is used to indicate if should be Serialized 
-//                       (can specify a propery to support runtime logic)
-//                       
 //
-//          Q_CLASSINFO( "defaultProp", "<propname>" ) -
-//                       is used to indicate the default property 
-//                       (used for node text in XML)
 //
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
@@ -43,13 +37,11 @@ class SERVICE_PUBLIC ProgramGuide : public QObject
     Q_OBJECT
     Q_CLASSINFO( "version", "1.0" );
 
-    // We need to know the type that will ultimately be contained in 
-    // any QVariantList or QVariantMap.  We do his by specifying
-    // A Q_CLASSINFO entry with "<PropName>_type" as the key
-    // and the type name as the value
+    // Q_CLASSINFO Used to augment Metadata for properties. 
+    // See datacontracthelper.h for details
 
     Q_CLASSINFO( "Channels", "type=DTC::ChannelInfo");
-
+	Q_CLASSINFO( "AsOf"	   , "transient=true"       );
 
     Q_PROPERTY( QDateTime     StartTime      READ StartTime      WRITE setStartTime      )
     Q_PROPERTY( QDateTime     EndTime        READ EndTime        WRITE setEndTime        )

@@ -79,7 +79,7 @@ QDateTime myth_dt_from_string(const QString &dtstr)
 
 /** \fn MythDateTimeToString
  *  \brief Returns a formatted QString based on the supplied QDateTime
- * 
+ *
  *  \param datetime The QDateTime object to use
  *  \param format   The format of the string to return
  */
@@ -94,16 +94,16 @@ QString MythDateTimeToString(const QDateTime& datetime, uint format)
     {
         if (!result.isEmpty())
             result.append(", ");
-        
+
         result += MythTimeToString(datetime.time(), format);
     }
-    
+
     return result;
 }
 
 /** \fn MythDateToString
  *  \brief Returns a formatted QString based on the supplied QDate
- * 
+ *
  *  \param date     The QDate object to use
  *  \param format   The format of the string to return
  */
@@ -120,13 +120,13 @@ QString MythDateToString(const QDate& date, uint format)
             stringformat = gCoreContext->GetSetting("ShortDateFormat", "ddd d");
         else
             stringformat = gCoreContext->GetSetting("DateFormat", "ddd d MMMM");
-        
+
         if (format & kAddYear)
         {
             if (!stringformat.contains("yy")) // Matches both 2 or 4 digit year
                 stringformat.append(" yyyy");
         }
-        
+
         if (format & ~kDateShort)
         {
             if ((format & kSimplify) && (now == date))
@@ -136,17 +136,17 @@ QString MythDateToString(const QDate& date, uint format)
             else if ((format & kSimplify) && (now.addDays(1) == date))
                 result = QObject::tr("Tomorrow");
         }
-        
+
         if (result.isEmpty())
-            result = date.toString(stringformat);
+            result = gCoreContext->GetQLocale().toString(date, stringformat);
     }
-    
+
     return result;
 }
 
 /** \fn MythTimeToString
  *  \brief Returns a formatted QString based on the supplied QTime
- * 
+ *
  *  \param time     The QTime object to use
  *  \param format   The format of the string to return
  */
@@ -157,9 +157,9 @@ QString MythTimeToString(const QTime& time, uint format)
     if (format & kTime)
     {
         QString timeformat = gCoreContext->GetSetting("TimeFormat", "h:mm AP");
-        result = time.toString(timeformat);
-    }    
-    
+        result = gCoreContext->GetQLocale().toString(time, timeformat);
+    }
+
     return result;
 }
 
@@ -576,7 +576,7 @@ bool checkTimeZone(const QStringList &master_settings)
     // Verify current time
     if (master_time_string == "UNDEF")
     {
-        LOG(VB_GENERAL, LOG_CRIT, 
+        LOG(VB_GENERAL, LOG_CRIT,
             "Unable to determine current time on the master "
             "backend . If local time or time zone settings "
             "differ from those on the master backend, some "
@@ -1186,7 +1186,7 @@ QString FileHash(QString filename)
         hash = initialsize;
     else
     {
-        LOG(VB_GENERAL, LOG_ERR, 
+        LOG(VB_GENERAL, LOG_ERR,
             "Error: Unable to open selected file, missing read permissions?");
         return QString("NULL");
     }
@@ -1470,7 +1470,7 @@ void setHttpProxy(void)
             if (telnet(host, 8080))  // MS ISA
                 port = 8080;
 
-            LOG(VB_NETWORK, LOG_INFO, LOC + 
+            LOG(VB_NETWORK, LOG_INFO, LOC +
                 QString("assuming port %1 on host %2") .arg(port).arg(host));
             url.setPort(port);
         }
@@ -1565,7 +1565,7 @@ void wrapList(QStringList &list, int width)
                 inserted = true;
             }
             else
-            { 
+            {
                 left.chop(1);
                 if( !left.contains(" ") )
                 {

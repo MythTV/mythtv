@@ -1948,6 +1948,18 @@ NULL
             return false;
     }
 
+    if (dbver == "1299")
+    {
+        const char *updates[] = {
+"ALTER TABLE recordmatch ADD COLUMN findid INT NOT NULL DEFAULT 0",
+"ALTER TABLE recordmatch ADD INDEX (recordid, findid)",
+NULL
+};
+
+        if (!performActualUpdate(updates, "1300", dbver))
+            return false;
+    }
+
     return true;
 }
 

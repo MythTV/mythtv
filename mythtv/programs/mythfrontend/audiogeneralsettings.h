@@ -30,7 +30,10 @@ class AudioConfigSettings : public VerticalConfigurationGroup
 
   private slots:
     void UpdateVisibility(const QString&);
-    AudioOutputSettings UpdateCapabilities(const QString&);
+    AudioOutputSettings UpdateCapabilities(const QString&,
+                                           bool restore = true,
+                                           bool AC3 = false);
+    AudioOutputSettings UpdateCapabilitiesAC3(void);
     void AudioRescan();
     void AudioAdvanced();
     void StartAudioTest();
@@ -62,6 +65,8 @@ class AudioConfigSettings : public VerticalConfigurationGroup
     AudioOutput::ADCVect devices;
     QMutex               slotlock;
     ConfigurationWizard *m_parent;
+    int                  m_maxspeakers;
+    QString              m_lastAudioDevice;
 };
 
 class AudioDeviceComboBox : public HostComboBox

@@ -3,18 +3,21 @@
 #include "mythcorecontext.h"
 #include "mythlogging.h"
 #include "remoteutil.h"
+#include "scheduledrecording.h"
 
 // local headers
 #include "backendutils.h"
 
-static int RawSendEvent(const QString &eventString)
+static int RawSendEvent(const QStringList &eventStringList)
 {
-    if (eventString.isEmpty())
+    if (eventStringList.isEmpty() || eventStringList[0].isEmpty())
         return GENERIC_EXIT_INVALID_CMDLINE;
 
     if (gCoreContext->ConnectToMasterServer(false, false))
     {
-        gCoreContext->SendMessage(eventString);
+        QStringList message("MESSAGE");
+        message << eventStringList;
+        gCoreContext->SendReceiveStringList(message);
         return GENERIC_EXIT_OK;
     }
     return GENERIC_EXIT_CONNECT_ERROR;
@@ -36,28 +39,22 @@ static int ClearSettingsCache(const MythUtilCommandLineParser &cmdline)
 
 static int SendEvent(const MythUtilCommandLineParser &cmdline)
 {
-    return RawSendEvent(cmdline.toString("event"));
+    return RawSendEvent(cmdline.toStringList("event"));
 }
 
 static int SendSystemEvent(const MythUtilCommandLineParser &cmdline)
 {
-    return RawSendEvent(QString("SYSTEM_EVENT %1 SENDER %2")
-                                .arg(cmdline.toString("systemevent"))
-                                .arg(gCoreContext->GetHostName()));
+    return RawSendEvent(QStringList(QString("SYSTEM_EVENT %1 SENDER %2")
+                                    .arg(cmdline.toString("systemevent"))
+                                    .arg(gCoreContext->GetHostName())));
 }
 
 static int Reschedule(const MythUtilCommandLineParser &cmdline)
 {
     if (gCoreContext->ConnectToMasterServer(false, false))
     {
-        QStringList slist("RESCHEDULE_RECORDINGS -1");
-        if (gCoreContext->SendReceiveStringList(slist))
-        {
-            LOG(VB_GENERAL, LOG_ERR,
-                "Error sending reschedule command to master backend");
-            return GENERIC_EXIT_CONNECT_ERROR;
-        }
-
+        ScheduledRecording::RescheduleMatch(0, 0, 0, QDateTime(),
+                                            "MythUtilCommand");
         LOG(VB_GENERAL, LOG_INFO, "Reschedule command sent to master");
         return GENERIC_EXIT_OK;
     }
