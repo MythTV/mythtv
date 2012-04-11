@@ -68,8 +68,8 @@ class MpegRecorder : public V4LRecorder,
     uint GetFilteredAudioBitRate(uint audio_layer) const;
 
     void RestartEncoding(void);
-    bool StartEncoding(int fd);
-    bool StopEncoding(int fd);
+    bool StartEncoding(void);
+    void StopEncoding(void);
 
     void SetBitrate(int bitrate, int maxbitrate, const QString & reason);
     void HandleResolutionChanges(void);

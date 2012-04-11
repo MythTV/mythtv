@@ -2190,30 +2190,32 @@ static HostComboBox *MythDateFormatCB()
             QObject::tr("Samples are shown using tomorrow's date.");
     }
 
-    gc->addSelection(sampdate.toString("ddd MMM d"), "ddd MMM d");
-    gc->addSelection(sampdate.toString("ddd d MMM"), "ddd d MMM");
-    gc->addSelection(sampdate.toString("ddd MMMM d"), "ddd MMMM d");
-    gc->addSelection(sampdate.toString("ddd d MMMM"), "ddd d MMMM");
-    gc->addSelection(sampdate.toString("dddd MMM d"), "dddd MMM d");
-    gc->addSelection(sampdate.toString("dddd d MMM"), "dddd d MMM");
-    gc->addSelection(sampdate.toString("MMM d"), "MMM d");
-    gc->addSelection(sampdate.toString("d MMM"), "d MMM");
-    gc->addSelection(sampdate.toString("MM/dd"), "MM/dd");
-    gc->addSelection(sampdate.toString("dd/MM"), "dd/MM");
-    gc->addSelection(sampdate.toString("MM.dd"), "MM.dd");
-    gc->addSelection(sampdate.toString("dd.MM"), "dd.MM");
-    gc->addSelection(sampdate.toString("M/d/yyyy"), "M/d/yyyy");
-    gc->addSelection(sampdate.toString("d/M/yyyy"), "d/M/yyyy");
-    gc->addSelection(sampdate.toString("MM.dd.yyyy"), "MM.dd.yyyy");
-    gc->addSelection(sampdate.toString("dd.MM.yyyy"), "dd.MM.yyyy");
-    gc->addSelection(sampdate.toString("yyyy-MM-dd"), "yyyy-MM-dd");
-    gc->addSelection(sampdate.toString("ddd MMM d yyyy"), "ddd MMM d yyyy");
-    gc->addSelection(sampdate.toString("ddd d MMM yyyy"), "ddd d MMM yyyy");
-    gc->addSelection(sampdate.toString("ddd yyyy-MM-dd"), "ddd yyyy-MM-dd");
-    gc->addSelection(sampdate.toString(
+    QLocale locale = gCoreContext->GetQLocale();
+
+    gc->addSelection(locale.toString(sampdate, "ddd MMM d"), "ddd MMM d");
+    gc->addSelection(locale.toString(sampdate, "ddd d MMM"), "ddd d MMM");
+    gc->addSelection(locale.toString(sampdate, "ddd MMMM d"), "ddd MMMM d");
+    gc->addSelection(locale.toString(sampdate, "ddd d MMMM"), "ddd d MMMM");
+    gc->addSelection(locale.toString(sampdate, "dddd MMM d"), "dddd MMM d");
+    gc->addSelection(locale.toString(sampdate, "dddd d MMM"), "dddd d MMM");
+    gc->addSelection(locale.toString(sampdate, "MMM d"), "MMM d");
+    gc->addSelection(locale.toString(sampdate, "d MMM"), "d MMM");
+    gc->addSelection(locale.toString(sampdate, "MM/dd"), "MM/dd");
+    gc->addSelection(locale.toString(sampdate, "dd/MM"), "dd/MM");
+    gc->addSelection(locale.toString(sampdate, "MM.dd"), "MM.dd");
+    gc->addSelection(locale.toString(sampdate, "dd.MM"), "dd.MM");
+    gc->addSelection(locale.toString(sampdate, "M/d/yyyy"), "M/d/yyyy");
+    gc->addSelection(locale.toString(sampdate, "d/M/yyyy"), "d/M/yyyy");
+    gc->addSelection(locale.toString(sampdate, "MM.dd.yyyy"), "MM.dd.yyyy");
+    gc->addSelection(locale.toString(sampdate, "dd.MM.yyyy"), "dd.MM.yyyy");
+    gc->addSelection(locale.toString(sampdate, "yyyy-MM-dd"), "yyyy-MM-dd");
+    gc->addSelection(locale.toString(sampdate, "ddd MMM d yyyy"), "ddd MMM d yyyy");
+    gc->addSelection(locale.toString(sampdate, "ddd d MMM yyyy"), "ddd d MMM yyyy");
+    gc->addSelection(locale.toString(sampdate, "ddd yyyy-MM-dd"), "ddd yyyy-MM-dd");
+    gc->addSelection(locale.toString(sampdate,
         QString::fromUtf8("dddd yyyy\u5E74M\u6708d\u65E5")),
         QString::fromUtf8("dddd yyyy\u5E74M\u6708d\u65E5"));
-    gc->addSelection(sampdate.toString(
+    gc->addSelection(locale.toString(sampdate,
         QString::fromUtf8("ddd M\u6708d\u65E5")),
         QString::fromUtf8("ddd M\u6708d\u65E5"));
     gc->setHelpText(QObject::tr("Your preferred date format.") + ' ' +
@@ -2236,26 +2238,27 @@ static HostComboBox *MythShortDateFormat()
         sampleStr =
             QObject::tr("Samples are shown using tomorrow's date.");
     }
+    QLocale locale = gCoreContext->GetQLocale();
 
-    gc->addSelection(sampdate.toString("M/d"), "M/d");
-    gc->addSelection(sampdate.toString("d/M"), "d/M");
-    gc->addSelection(sampdate.toString("MM/dd"), "MM/dd");
-    gc->addSelection(sampdate.toString("dd/MM"), "dd/MM");
-    gc->addSelection(sampdate.toString("MM.dd"), "MM.dd");
-    gc->addSelection(sampdate.toString("dd.MM."), "dd.MM.");
-    gc->addSelection(sampdate.toString("M.d."), "M.d.");
-    gc->addSelection(sampdate.toString("d.M."), "d.M.");
-    gc->addSelection(sampdate.toString("MM-dd"), "MM-dd");
-    gc->addSelection(sampdate.toString("dd-MM"), "dd-MM");
-    gc->addSelection(sampdate.toString("MMM d"), "MMM d");
-    gc->addSelection(sampdate.toString("d MMM"), "d MMM");
-    gc->addSelection(sampdate.toString("ddd d"), "ddd d");
-    gc->addSelection(sampdate.toString("d ddd"), "d ddd");
-    gc->addSelection(sampdate.toString("ddd M/d"), "ddd M/d");
-    gc->addSelection(sampdate.toString("ddd d/M"), "ddd d/M");
-    gc->addSelection(sampdate.toString("M/d ddd"), "M/d ddd");
-    gc->addSelection(sampdate.toString("d/M ddd"), "d/M ddd");
-    gc->addSelection(sampdate.toString(
+    gc->addSelection(locale.toString(sampdate, "M/d"), "M/d");
+    gc->addSelection(locale.toString(sampdate, "d/M"), "d/M");
+    gc->addSelection(locale.toString(sampdate, "MM/dd"), "MM/dd");
+    gc->addSelection(locale.toString(sampdate, "dd/MM"), "dd/MM");
+    gc->addSelection(locale.toString(sampdate, "MM.dd"), "MM.dd");
+    gc->addSelection(locale.toString(sampdate, "dd.MM."), "dd.MM.");
+    gc->addSelection(locale.toString(sampdate, "M.d."), "M.d.");
+    gc->addSelection(locale.toString(sampdate, "d.M."), "d.M.");
+    gc->addSelection(locale.toString(sampdate, "MM-dd"), "MM-dd");
+    gc->addSelection(locale.toString(sampdate, "dd-MM"), "dd-MM");
+    gc->addSelection(locale.toString(sampdate, "MMM d"), "MMM d");
+    gc->addSelection(locale.toString(sampdate, "d MMM"), "d MMM");
+    gc->addSelection(locale.toString(sampdate, "ddd d"), "ddd d");
+    gc->addSelection(locale.toString(sampdate, "d ddd"), "d ddd");
+    gc->addSelection(locale.toString(sampdate, "ddd M/d"), "ddd M/d");
+    gc->addSelection(locale.toString(sampdate, "ddd d/M"), "ddd d/M");
+    gc->addSelection(locale.toString(sampdate, "M/d ddd"), "M/d ddd");
+    gc->addSelection(locale.toString(sampdate, "d/M ddd"), "d/M ddd");
+    gc->addSelection(locale.toString(sampdate,
         QString::fromUtf8("M\u6708d\u65E5")),
         QString::fromUtf8("M\u6708d\u65E5"));
     gc->setHelpText(QObject::tr("Your preferred short date format.") + ' ' +
@@ -2270,14 +2273,16 @@ static HostComboBox *MythTimeFormat()
 
     QTime samptime = QTime::currentTime();
 
-    gc->addSelection(samptime.toString("h:mm AP"), "h:mm AP");
-    gc->addSelection(samptime.toString("h:mm ap"), "h:mm ap");
-    gc->addSelection(samptime.toString("hh:mm AP"), "hh:mm AP");
-    gc->addSelection(samptime.toString("hh:mm ap"), "hh:mm ap");
-    gc->addSelection(samptime.toString("h:mm"), "h:mm");
-    gc->addSelection(samptime.toString("hh:mm"), "hh:mm");
-    gc->addSelection(samptime.toString("hh.mm"), "hh.mm");
-    gc->addSelection(samptime.toString("AP h:mm"), "AP h:mm");
+    QLocale locale = gCoreContext->GetQLocale();
+
+    gc->addSelection(locale.toString(samptime, "h:mm AP"), "h:mm AP");
+    gc->addSelection(locale.toString(samptime, "h:mm ap"), "h:mm ap");
+    gc->addSelection(locale.toString(samptime, "hh:mm AP"), "hh:mm AP");
+    gc->addSelection(locale.toString(samptime, "hh:mm ap"), "hh:mm ap");
+    gc->addSelection(locale.toString(samptime, "h:mm"), "h:mm");
+    gc->addSelection(locale.toString(samptime, "hh:mm"), "hh:mm");
+    gc->addSelection(locale.toString(samptime, "hh.mm"), "hh.mm");
+    gc->addSelection(locale.toString(samptime, "AP h:mm"), "AP h:mm");
     gc->setHelpText(QObject::tr("Your preferred time format. You must choose "
                     "a format with \"AM\" or \"PM\" in it, otherwise your "
                     "time display will be 24-hour or \"military\" time."));

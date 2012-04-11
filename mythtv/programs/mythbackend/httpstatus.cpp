@@ -966,8 +966,7 @@ int HttpStatus::PrintScheduled( QTextStream &os, QDomElement scheduled )
 
                 if ( airDate.isValid())
                     os << "Orig. Airdate: "
-                       << airDate.toLocalTime().toString(
-                           longdateformat + " " +timeformat)
+                       << airDate.toLocalTime().toString(longdateformat)
                        << "<br /><br />";
 
                 os << sDesc << "<br /><br />"

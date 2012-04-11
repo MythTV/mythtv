@@ -2307,7 +2307,7 @@ else
     shlibdir_default="${prefix_default}/${libdir_name}"
 fi
 
-if enabled_any cpu_override croos_compile || test x"$tune" != x"generic" &&
+if enabled_any cpu_override cross_compile || test x"$tune" != x"generic" &&
     enabled proc_opt; then
     echo "Warning! --enable-proc-opt shouldn't be used with --arch, --cpu or --tune"
     echo "Disabling it now."

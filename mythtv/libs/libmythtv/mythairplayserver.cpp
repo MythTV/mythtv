@@ -17,12 +17,8 @@
 #include "mythuiactions.h"
 #include "mythmainwindow.h"
 #include "mythuistatetracker.h"
+#include "plist.h"
 #include "tv_play.h"
-
-#if defined(Q_WS_MAC)
-#include "util-osx-cocoa.h"
-#include <CoreFoundation/CoreFoundation.h>
-#endif
 
 #include "bonjourregister.h"
 #include "mythairplayserver.h"
@@ -625,55 +621,15 @@ void MythAirplayServer::HandleResponse(APHTTPRequest *req,
         if (req->GetHeaders().contains("Content-Type") &&
             req->GetHeaders()["Content-Type"] == "application/x-apple-binary-plist")
         {
-#if defined(Q_WS_MAC)
-            CocoaAutoReleasePool pool;
-            CFDataRef data = CFDataCreate(
-                    NULL, (const UInt8*)req->GetBody().data(),
-                    req->GetBody().size());
-            CFPropertyListRef plist =
-                CFPropertyListCreateFromXMLData(NULL, data, kCFPropertyListImmutable, NULL);
-            if (plist && CFPropertyListIsValid(plist, kCFPropertyListBinaryFormat_v1_0))
-            {
-                if (CFGetTypeID(plist) ==  CFDictionaryGetTypeID())
-                {
-                    CFDictionaryRef dict = (CFDictionaryRef)plist;
-                    const void* contentref;
-                    if (CFDictionaryGetValueIfPresent(dict,
-                                                      CFSTR("Content-Location"),
-                                                      &contentref))
-                    {
-                        CFStringRef str = (CFStringRef)contentref;
-                        if (str)
-                        {
-                            CFIndex l = 2 * (CFStringGetLength(str) + 1);
-                            QByteArray buf(l, 0);
-                            if (CFStringGetCString(str, buf.data(), l, kCFStringEncodingUTF8))
-                                file = buf.trimmed();
-                        }
-                    }
+            PList plist(req->GetBody());
+            LOG(VB_GENERAL, LOG_DEBUG, LOC + plist.ToString());
 
-                    const void* posref;
-                    if (CFDictionaryGetValueIfPresent(dict,
-                                                      CFSTR("Start-Position"),
-                                                      &posref))
-                    {
-                        CFNumberRef num = (CFNumberRef)posref;
-                        if (num) CFNumberGetValue(num, kCFNumberDoubleType, &start_pos);
-                    }
-
-                }
-                else if (CFGetTypeID(plist) ==  CFArrayGetTypeID())
-                {
-                    LOG(VB_GENERAL, LOG_WARNING, LOC + "Array plist not implemented.");
-                }
-                else
-                {
-                    LOG(VB_GENERAL, LOG_WARNING, LOC + "Unknown plist type.");
-                }
-            }
-#else
-            LOG(VB_GENERAL, LOG_ERR, LOC + "plist type not yet supported.");
-#endif
+            QVariant start   = plist.GetValue("Start-Position");
+            QVariant content = plist.GetValue("Content-Location");
+            if (start.isValid() && start.canConvert<double>())
+                start_pos = start.toDouble();
+            if (content.isValid() && content.canConvert<QByteArray>())
+                file = content.toByteArray();
         }
         else
         {

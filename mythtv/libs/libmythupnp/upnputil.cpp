@@ -34,6 +34,8 @@
 #include <ifaddrs.h>
 #endif
 
+#include "zlib.h"
+
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
@@ -245,4 +247,67 @@ void AddMicroSecToTaskTime( TaskTime &t, suseconds_t uSecs )
 void AddSecondsToTaskTime( TaskTime &t, long nSecs )
 {
     t.tv_sec  += nSecs;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//           
+/////////////////////////////////////////////////////////////////////////////
+
+QByteArray gzipCompress( const QByteArray &data )
+{
+    if (data.length() == 0)
+        return QByteArray();
+    
+    static const int CHUNK_SIZE = 1024;
+    char out[ CHUNK_SIZE ];
+
+    // allocate inflate state 
+    z_stream strm;
+
+    strm.zalloc   = Z_NULL;
+    strm.zfree    = Z_NULL;
+    strm.opaque   = Z_NULL;
+    strm.avail_in = data.length();
+    strm.next_in  = (Bytef*)(data.data());
+
+    int ret = deflateInit2( &strm,
+                            Z_DEFAULT_COMPRESSION,
+                            Z_DEFLATED,
+                            15 + 16,
+                            8,
+                            Z_DEFAULT_STRATEGY ); // gzip encoding
+    if (ret != Z_OK)
+        return QByteArray();
+
+    QByteArray result;
+
+    // run deflate()
+    do 
+    {
+        strm.avail_out = CHUNK_SIZE;
+        strm.next_out  = (Bytef*)(out);
+
+        ret = deflate(&strm, Z_FINISH);
+
+        Q_ASSERT(ret != Z_STREAM_ERROR);  // state not clobbered
+
+        switch (ret) 
+        {
+            case Z_NEED_DICT:
+                ret = Z_DATA_ERROR;     // and fall through
+            case Z_DATA_ERROR:
+            case Z_MEM_ERROR:
+                (void)deflateEnd(&strm);
+                return QByteArray();
+        }
+
+        result.append( out, CHUNK_SIZE - strm.avail_out );
+    } 
+    while (strm.avail_out == 0);
+
+    // clean up and return
+
+    deflateEnd(&strm);
+
+    return result;
 }

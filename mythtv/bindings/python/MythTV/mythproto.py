@@ -670,7 +670,17 @@ class FileOps( BECache ):
                                     ['BACKEND_MESSAGE',
                                      'SCHEDULE_CHANGE',
                                      'empty']))
-        self.backendCommand('RESCHEDULE_RECORDINGS '+str(recordid))
+        if recordid == 0:
+            self.backendCommand(BACKEND_SEP.join(\
+                ['RESCHEDULE_RECORDINGS',
+                 'CHECK 0 0 0 Python',
+                 '', '', '', '**any**']))
+        else:
+            if recordid == -1:
+                recordid = 0
+            self.backendCommand(BACKEND_SEP.join(\
+                ['RESCHEDULE_RECORDINGS',
+                 'MATCH ' + str(recordid) + ' 0 0 - Python']))
         if wait:
             eventlock.wait()
 

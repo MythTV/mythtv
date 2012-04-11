@@ -423,7 +423,11 @@ bool MpegRecorder::OpenV4L2DeviceAsInput(void)
         SetRecordingVolume(chanfd); // we don't care if this fails...
 
     if (!SetV4L2DeviceOptions(chanfd))
+    {
+        close(chanfd);
+        chanfd = -1;
         return false;
+    }
 
     SetVBIOptions(chanfd); // we don't care if this fails...
 
@@ -451,7 +455,7 @@ bool MpegRecorder::OpenV4L2DeviceAsInput(void)
     if (!_device_read_buffer)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to allocate DRB buffer");
-        _error = true;
+        _error = "Failed to allocate DRB buffer";
         close(chanfd);
         chanfd = -1;
         close(readfd);
@@ -461,8 +465,8 @@ bool MpegRecorder::OpenV4L2DeviceAsInput(void)
 
     if (!_device_read_buffer->Setup(vdevice.constData(), readfd))
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to allocate DRB buffer");
-        _error = true;
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to setup DRB buffer");
+        _error = "Failed to setup DRB buffer";
         close(chanfd);
         chanfd = -1;
         close(readfd);
@@ -902,7 +906,8 @@ void MpegRecorder::run(void)
 {
     if (!Open())
     {
-        _error = "Failed to open V4L device";
+        if (_error.isEmpty())
+            _error = "Failed to open V4L device";
         return;
     }
 
@@ -963,14 +968,7 @@ void MpegRecorder::run(void)
     else if (_device_read_buffer)
     {
         LOG(VB_RECORD, LOG_INFO, LOC + "Initial startup of recorder");
-
-        if (!StartEncoding(readfd))
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to start recording");
-            _error = true;
-        }
-        else
-            _device_read_buffer->Start();
+        StartEncoding();
     }
 
     QByteArray vdevice = videodevice.toAscii();
@@ -1000,25 +998,6 @@ void MpegRecorder::run(void)
                 }
             }
         }
-        else
-        {
-            if (readfd < 0)
-            {
-                if (!Open())
-                {
-                    _error = true;
-                    break;
-                }
-
-                if (readfd < 0)
-                {
-                    LOG(VB_GENERAL, LOG_ERR, LOC +
-                        QString("Failed to open device '%1'")
-                            .arg(videodevice));
-                    continue;
-                }
-            }
-        }
 
         if (_device_read_buffer)
         {
@@ -1036,7 +1015,7 @@ void MpegRecorder::run(void)
                      IsRecordingRequested())
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC + "Device EOF detected");
-                _error = true;
+                _error = "Device EOF detected";
             }
         }
         else
@@ -1133,18 +1112,7 @@ void MpegRecorder::run(void)
 
     LOG(VB_RECORD, LOG_INFO, LOC + "run finishing up");
 
-    pauseLock.lock();
-    if (_device_read_buffer)
-    {
-        if (_device_read_buffer->IsRunning())
-            _device_read_buffer->Stop();
-
-        delete _device_read_buffer;
-        _device_read_buffer = NULL;
-    }
-    pauseLock.unlock();
-
-    StopEncoding(readfd);
+    StopEncoding();
 
     {
         QMutexLocker locker(&pauseLock);
@@ -1178,10 +1146,7 @@ void MpegRecorder::run(void)
 
 void MpegRecorder::StopRecording(void)
 {
-    pauseLock.lock();
-    if (_device_read_buffer && _device_read_buffer->IsRunning())
-        _device_read_buffer->Stop();
-    pauseLock.unlock();
+    MpegRecorder::StopEncoding();
     V4LRecorder::StopRecording();
 }
 
@@ -1241,13 +1206,7 @@ bool MpegRecorder::PauseAndWait(int timeout)
         {
             LOG(VB_RECORD, LOG_INFO, LOC + "PauseAndWait pause");
 
-            if (_device_read_buffer)
-            {
-                _device_read_buffer->SetRequestPause(true);
-                _device_read_buffer->WaitForPaused(4000);
-            }
-
-            StopEncoding(readfd);
+            StopEncoding();
 
             paused = true;
             pauseWait.wakeAll();
@@ -1272,10 +1231,7 @@ bool MpegRecorder::PauseAndWait(int timeout)
             SetV4L2DeviceOptions(chanfd);
         }
 
-        StartEncoding(readfd);
-
-        if (_device_read_buffer)
-            _device_read_buffer->SetRequestPause(false);
+        StartEncoding();
 
         if (_stream_data)
             _stream_data->Reset(_stream_data->DesiredProgram());
@@ -1290,11 +1246,9 @@ void MpegRecorder::RestartEncoding(void)
 {
     LOG(VB_RECORD, LOG_INFO, LOC + "RestartEncoding");
 
-    _device_read_buffer->Stop();
-
     QMutexLocker locker(&start_stop_encoding_lock);
 
-    StopEncoding(readfd);
+    StopEncoding();
 
     // Make sure the next things in the file are a PAT & PMT
     if (_stream_data &&
@@ -1308,19 +1262,11 @@ void MpegRecorder::RestartEncoding(void)
 
     if (driver == "hdpvr") // HD-PVR will sometimes reset to defaults
         SetV4L2DeviceOptions(chanfd);
-    if (!StartEncoding(readfd))
-    {
-        if (0 != close(readfd))
-            LOG(VB_GENERAL, LOG_ERR, LOC + "Close error" + ENO);
 
-        readfd = -1;
-        return;
-    }
-
-    _device_read_buffer->Start();
+    StartEncoding();
 }
 
-bool MpegRecorder::StartEncoding(int fd)
+bool MpegRecorder::StartEncoding(void)
 {
     QMutexLocker locker(&start_stop_encoding_lock);
 
@@ -1333,7 +1279,20 @@ bool MpegRecorder::StartEncoding(int fd)
 
     LOG(VB_RECORD, LOG_INFO, LOC + "StartEncoding");
 
-    if (ioctl(fd, VIDIOC_ENCODER_CMD, &command) == 0)
+    if (readfd < 0)
+    {
+        readfd = open(videodevice.toAscii().constData(), O_RDWR | O_NONBLOCK);
+        if (readfd < 0)
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                "StartEncoding: Can't open video device." + ENO);
+            _error = "Failed to start recording";
+            return false;
+        }
+    }
+
+    bool started = 0 == ioctl(readfd, VIDIOC_ENCODER_CMD, &command);
+    if (started)
     {
         if (driver == "hdpvr")
         {
@@ -1343,50 +1302,68 @@ bool MpegRecorder::StartEncoding(int fd)
         }
 
         LOG(VB_RECORD, LOG_INFO, LOC + "Encoding started");
-        return true;
+    }
+    else if ((ENOTTY == errno) || (EINVAL == errno))
+    {
+        // Some drivers do not support this ioctl at all.  It is marked as
+        // "experimental" in the V4L2 API spec. These drivers return EINVAL
+        // in older kernels and ENOTTY in 3.1+
+        started = true;
+    }
+    else
+    {
+        LOG(VB_GENERAL, LOG_WARNING, LOC + "StartEncoding failed" + ENO);
     }
 
-    // Some drivers do not support this ioctl at all.  It is marked as
-    // "experimental" in the V4L2 API spec.  If we fail with EINVAL (which
-    // happens if the ioctl isn't supported), treat it as a success, but
-    // put a warning in the logs.  This should keep any driver without this
-    // support (such as saa7164) recording without affecting those that do
-    // use it.
-    if (errno == EINVAL)
-        return true;
+    if (_device_read_buffer)
+    {
+        _device_read_buffer->Reset(videodevice.toAscii().constData(), readfd);
+        _device_read_buffer->Start();
+    }
 
-    LOG(VB_GENERAL, LOG_WARNING, LOC + "StartEncoding failed" + ENO);
-    return false;
+    return true;
 }
 
-bool MpegRecorder::StopEncoding(int fd)
+void MpegRecorder::StopEncoding(void)
 {
     QMutexLocker locker(&start_stop_encoding_lock);
+
+    LOG(VB_RECORD, LOG_INFO, LOC + "StopEncoding");
+
+    if (readfd < 0)
+        return;
 
     struct v4l2_encoder_cmd command;
     memset(&command, 0, sizeof(struct v4l2_encoder_cmd));
     command.cmd   = V4L2_ENC_CMD_STOP;
     command.flags = V4L2_ENC_CMD_STOP_AT_GOP_END;
 
-    LOG(VB_RECORD, LOG_INFO, LOC + "StopEncoding");
-
-    if (ioctl(fd, VIDIOC_ENCODER_CMD, &command) == 0)
+    bool stopped = 0 == ioctl(readfd, VIDIOC_ENCODER_CMD, &command);
+    if (stopped)
     {
         LOG(VB_RECORD, LOG_INFO, LOC + "Encoding stopped");
-        return true;
+    }
+    else if ((ENOTTY == errno) || (EINVAL == errno))
+    {
+        // Some drivers do not support this ioctl at all.  It is marked as
+        // "experimental" in the V4L2 API spec. These drivers return EINVAL
+        // in older kernels and ENOTTY in 3.1+
+        stopped = true;
+    }
+    else
+    {
+        LOG(VB_GENERAL, LOG_WARNING, LOC + "StopEncoding failed" + ENO);
     }
 
-    // Some drivers do not support this ioctl at all.  It is marked as
-    // "experimental" in the V4L2 API spec.  If we fail with EINVAL (which
-    // happens if the ioctl isn't supported), treat it as a success, but
-    // put a warning in the logs.  This should keep any driver without this
-    // support (such as saa7164) recording without affecting those that do
-    // use it.
-    if (errno == EINVAL)
-        return true;
+    if (_device_read_buffer && _device_read_buffer->IsRunning())
+    {
+        usleep(20 * 1000); // allow last bits of data through..
+        _device_read_buffer->Stop();
+    }
 
-    LOG(VB_GENERAL, LOG_WARNING, LOC + "StopEncoding failed" + ENO);
-    return false;
+    // close the fd so streamoff/streamon work in V4LChannel
+    close(readfd);   
+    readfd = -1;
 }
 
 void MpegRecorder::SetStreamData(void)

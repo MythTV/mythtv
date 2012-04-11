@@ -37,7 +37,7 @@ void MythTranscodeCommandLineParser::LoadArguments(void)
             "Specifies that a lossless transcode should be used.", "")
         ->SetGroup("Encoding");
     add(QStringList( QStringList() << "-e" << "--ostream" ), "ostream", "",
-            "Output stream type: dvd, ps", "")
+            "Output stream type: dvd, ts", "")
         ->SetGroup("Encoding");
 //    add("--avf", "avf", false, "Generate libavformat output file.", "")
 //        ->SetGroup("Encoding");

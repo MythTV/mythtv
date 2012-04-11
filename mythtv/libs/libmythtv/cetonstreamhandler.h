@@ -55,6 +55,7 @@ class CetonStreamHandler : public StreamHandler
     void RepeatTuning(void);
 
     bool TunerOff(void);
+    bool PerformTuneVChannel(const QString &vchannel);
     void ClearProgramNumber(void);
 
     QString GetVar(const QString &section, const QString &variable) const;

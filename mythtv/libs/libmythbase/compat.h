@@ -44,6 +44,8 @@
 # include <sys/resource.h> // for setpriority
 # include <sys/socket.h>
 # include <sys/wait.h>     // For WIFEXITED on Mac OS X
+# include <stdio.h>        // for snprintf(), used by inline dlerror()
+# include <unistd.h>       // for usleep()
 #endif
 
 #ifdef USING_MINGW

@@ -1157,7 +1157,7 @@ void RecordingInfo::ReactivateRecording(void)
     if (!result.exec())
         MythDB::DBError("ReactivateRecording", result);
 
-    ScheduledRecording::signalChange(0);
+    ScheduledRecording::ReschedulePlace("Reactivate");
 }
 
 /**
@@ -1225,7 +1225,7 @@ void RecordingInfo::AddHistory(bool resched, bool forcedup, bool future)
     // The adding of an entry to oldrecorded may affect near-future
     // scheduling decisions, so recalculate if told
     if (resched)
-        ScheduledRecording::signalChange(0);
+        ScheduledRecording::RescheduleCheck(*this, "AddHistory");
 }
 
 /** \fn RecordingInfo::DeleteHistory(void)
@@ -1259,7 +1259,7 @@ void RecordingInfo::DeleteHistory(void)
 
     // The removal of an entry from oldrecorded may affect near-future
     // scheduling decisions, so recalculate
-    ScheduledRecording::signalChange(0);
+    ScheduledRecording::RescheduleCheck(*this, "DeleteHistory");
 }
 
 /** \fn RecordingInfo::ForgetHistory(void)
@@ -1323,7 +1323,7 @@ void RecordingInfo::ForgetHistory(void)
 
     // The removal of an entry from oldrecorded may affect near-future
     // scheduling decisions, so recalculate
-    ScheduledRecording::signalChange(0);
+    ScheduledRecording::RescheduleCheck(*this, "ForgetHistory");
 }
 
 /** \fn RecordingInfo::SetDupHistory(void)
@@ -1349,7 +1349,7 @@ void RecordingInfo::SetDupHistory(void)
     if (!result.exec())
         MythDB::DBError("setDupHistory", result);
 
-    ScheduledRecording::signalChange(0);
+    ScheduledRecording::RescheduleCheck(*this, "SetHistory");
 }
 
 /**

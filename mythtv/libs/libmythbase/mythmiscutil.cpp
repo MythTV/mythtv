@@ -109,7 +109,7 @@ MBASE_PUBLIC QDateTime fromTime_t(uint seconds)
 
 /** \fn toString(const QDateTime&,uint)
  *  \brief Returns a formatted QString based on the supplied QDateTime
- * 
+ *
  *  \param datetime The QDateTime object to use
  *  \param format   The format of the string to return
  */
@@ -154,6 +154,11 @@ QString toString(const QDateTime &raw_dt, uint format)
     return result;
 }
 
+/** \brief Returns a formatted QString based on the supplied QDate
+ *
+ *  \param date     The QDate object to use
+ *  \param format   The format of the string to return
+ */
 QString toString(const QDate &date, uint format)
 {
     QString result;
@@ -167,13 +172,13 @@ QString toString(const QDate &date, uint format)
             stringformat = gCoreContext->GetSetting("ShortDateFormat", "ddd d");
         else
             stringformat = gCoreContext->GetSetting("DateFormat", "ddd d MMMM");
-        
+
         if (format & kAddYear)
         {
             if (!stringformat.contains("yy")) // Matches both 2 or 4 digit year
                 stringformat.append(" yyyy");
         }
-        
+
         if (format & ~kDateShort)
         {
             if ((format & kSimplify) && (now == date))
@@ -183,9 +188,9 @@ QString toString(const QDate &date, uint format)
             else if ((format & kSimplify) && (now.addDays(1) == date))
                 result = QObject::tr("Tomorrow");
         }
-        
+
         if (result.isEmpty())
-            result = date.toString(stringformat);
+            result = gCoreContext->GetQLocale().toString(date, stringformat);
     }
 
     return result;
@@ -611,7 +616,7 @@ bool checkTimeZone(const QStringList &master_settings)
     // Verify current time
     if (master_time_string == "UNDEF")
     {
-        LOG(VB_GENERAL, LOG_CRIT, 
+        LOG(VB_GENERAL, LOG_CRIT,
             "Unable to determine current time on the master "
             "backend . If local time or time zone settings "
             "differ from those on the master backend, some "
@@ -1197,7 +1202,7 @@ QString FileHash(QString filename)
         hash = initialsize;
     else
     {
-        LOG(VB_GENERAL, LOG_ERR, 
+        LOG(VB_GENERAL, LOG_ERR,
             "Error: Unable to open selected file, missing read permissions?");
         return QString("NULL");
     }
@@ -1481,7 +1486,7 @@ void setHttpProxy(void)
             if (telnet(host, 8080))  // MS ISA
                 port = 8080;
 
-            LOG(VB_NETWORK, LOG_INFO, LOC + 
+            LOG(VB_NETWORK, LOG_INFO, LOC +
                 QString("assuming port %1 on host %2") .arg(port).arg(host));
             url.setPort(port);
         }
@@ -1576,7 +1581,7 @@ void wrapList(QStringList &list, int width)
                 inserted = true;
             }
             else
-            { 
+            {
                 left.chop(1);
                 if( !left.contains(" ") )
                 {

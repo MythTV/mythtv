@@ -252,6 +252,7 @@ void LiveTVChain::ReloadAll(void)
     if (prev_size!=m_chain.size())
     {
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "ReloadAll(): Added new recording");
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + toString());
     }
 }
 
@@ -396,6 +397,7 @@ void LiveTVChain::ClearSwitch(void)
 ProgramInfo *LiveTVChain::GetSwitchProgram(bool &discont, bool &newtype,
                                            int &newid)
 {
+    ReloadAll();
     QMutexLocker lock(&m_lock);
 
     if (m_switchid < 0 || m_curpos == m_switchid)
@@ -411,7 +413,26 @@ ProgramInfo *LiveTVChain::GetSwitchProgram(bool &discont, bool &newtype,
     while (!pginfo && m_switchid < (int)m_chain.count() && m_switchid >= 0)
     {
         GetEntryAt(m_switchid, entry);
-        pginfo = EntryToProgram(entry);
+
+        bool at_last_entry = 
+            ((m_switchid > m_curpos) &&
+             (m_switchid == (int)(m_chain.count()-1))) ||
+            ((m_switchid <= m_curpos) && (m_switchid == 0));
+
+        // Skip dummy recordings, if possible.
+        if (at_last_entry || (entry.cardtype != "DUMMY"))
+            pginfo = EntryToProgram(entry);
+
+        // Skip empty recordings, if possible
+        if (pginfo && (0 == pginfo->GetFilesize()) &&
+            m_switchid < (int)(m_chain.count()-1))
+        {
+            LOG(VB_GENERAL, LOG_WARNING,
+                QString("Skipping empty program %1")
+                .arg(pginfo->MakeUniqueKey()));
+            delete pginfo;
+            pginfo = NULL;
+        }
 
         if (!pginfo)
         {
@@ -426,24 +447,6 @@ ProgramInfo *LiveTVChain::GetSwitchProgram(bool &discont, bool &newtype,
     {
         ClearSwitch();
         return NULL;
-    }
-
-    // Skip dummy recordings, if possible.
-    if (entry.cardtype == "DUMMY")
-    {
-        if (m_switchid > m_curpos && m_switchid + 1 < (int)m_chain.count())
-            m_switchid++;
-        else if (m_switchid < m_curpos && m_switchid > 0)
-            m_switchid--;
-
-        GetEntryAt(m_switchid, entry);
-        delete pginfo;
-        pginfo = EntryToProgram(entry);
-        if (!pginfo)
-        {
-            ClearSwitch();
-            return NULL;
-        }
     }
 
     discont = true;

@@ -8,6 +8,7 @@
 #include "mythmainwindow.h"
 #include "mythfontproperties.h"
 
+#include "mythcorecontext.h"
 #include "mythlogging.h"
 #include "mythdb.h"
 
@@ -51,7 +52,7 @@ void MythUIClock::Pulse(void)
  */
 QString MythUIClock::GetTimeText(void)
 {
-    QString newMsg = m_Time.toString(m_Format);
+    QString newMsg = gCoreContext->GetQLocale().toString(m_Time, m_Format);
 
     m_nextUpdate = m_Time.addSecs(1);
     m_nextUpdate = QDateTime(
@@ -86,15 +87,17 @@ bool MythUIClock::ParseElement(
         element.tagName() == "template")
     {
         QString format = parseText(element);
+        format = qApp->translate("ThemeUI", format.toUtf8(), NULL,
+                                 QCoreApplication::UnicodeUTF8);
         format.replace("%TIME%", m_TimeFormat, Qt::CaseInsensitive);
         format.replace("%DATE%", m_DateFormat, Qt::CaseInsensitive);
         format.replace("%SHORTDATE%", m_ShortDateFormat, Qt::CaseInsensitive);
         m_Format = format;
-        m_Message = QDateTime::currentDateTime().toString(m_Format);
+        m_Message = gCoreContext->GetQLocale().toString(QDateTime::currentDateTime(), m_Format);
     }
     else
     {
-        m_Message = QDateTime::currentDateTime().toString(m_Format);
+        m_Message = gCoreContext->GetQLocale().toString(QDateTime::currentDateTime(), m_Format);
         return MythUIText::ParseElement(filename, element, showWarnings);
     }
 

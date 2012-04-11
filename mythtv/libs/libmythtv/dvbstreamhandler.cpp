@@ -187,7 +187,6 @@ void DVBStreamHandler::RunTS(void)
 
     LOG(VB_RECORD, LOG_INFO, LOC + "RunTS(): begin");
 
-    bool _error = false;
     fd_set fd_select_set;
     FD_ZERO(        &fd_select_set);
     FD_SET (dvr_fd, &fd_select_set);

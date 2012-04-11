@@ -76,7 +76,8 @@ class AudioReencodeBuffer : public AudioOutput
 {
   public:
     AudioReencodeBuffer(AudioFormat audio_format, int audio_channels,
-                        bool passthru)
+                        bool passthru) :
+        m_saveBuffer(NULL)
     {
         Reset();
         const AudioSettings settings(audio_format, audio_channels, 0, 0, false);
@@ -88,6 +89,8 @@ class AudioReencodeBuffer : public AudioOutput
     ~AudioReencodeBuffer()
     {
         Reset();
+        if (m_saveBuffer)
+            delete m_saveBuffer;
     }
 
     // reconfigure sound out for new params
@@ -132,37 +135,60 @@ class AudioReencodeBuffer : public AudioOutput
             return true;
 
         QMutexLocker locker(&m_bufferMutex);
-        AudioBuffer *ab;
+        AudioBuffer *ab = NULL;
         unsigned char *buf = (unsigned char *)buffer;
         int savedlen = 0;
         int firstlen = 0;
 
         if (m_audioFrameSize)
         {
-            savedlen = m_saveBuffer.m_buffer.size();
+            savedlen = (m_saveBuffer ? m_saveBuffer->m_buffer.size() : 0);
             if (savedlen)
-            {
-                ab = new AudioBuffer(m_saveBuffer);
-                m_saveBuffer.clear();
                 firstlen = m_audioFrameSize - savedlen;
-            }
-            else
-                ab = new AudioBuffer;
 
-            int overage;
+            int overage = (len + savedlen) % m_audioFrameSize;
 
-            if ((overage = (len + savedlen) % m_audioFrameSize))
+            LOG(VB_AUDIO, LOG_DEBUG, 
+                QString("len: %1, savedlen: %2, overage: %3")
+                .arg(len).arg(savedlen).arg(overage));
+
+            if (overage)
             {
                 long long newtime = timecode + ((len / m_bytes_per_frame) /
                                                 (m_eff_audiorate / 1000));
-                len -= overage;
-                m_saveBuffer.setData(&buf[len], overage, newtime);
+                if (overage < len)
+                {
+                    if (!m_saveBuffer)
+                        ab = new AudioBuffer;
+                    else
+                        ab = m_saveBuffer;
+                    m_saveBuffer = new AudioBuffer; 
+                    len -= overage;
+                    m_saveBuffer->setData(&buf[len], overage, newtime);
+                }
+                else
+                {
+                    if (!m_saveBuffer)
+                        m_saveBuffer = new AudioBuffer; 
+                    m_saveBuffer->appendData(buf, len, newtime);
+                    len = 0;
+                }
             }
+            else if (savedlen)
+            {
+                ab = m_saveBuffer;
+                m_saveBuffer = NULL;
+            }
+            else
+                ab = new AudioBuffer;
         }
         else
         {
             ab = new AudioBuffer;
         }
+
+        if (!ab)
+            return true;
 
         int bufflen = (m_audioFrameSize ? m_audioFrameSize : len);
         int index = 0;
@@ -173,6 +199,7 @@ class AudioReencodeBuffer : public AudioOutput
                 break;
 
             int blocklen = (firstlen ? firstlen : bufflen);
+            blocklen = (blocklen > len ? len : blocklen);
 
             m_last_audiotime = timecode + ((blocklen / m_bytes_per_frame) /
                                            (m_eff_audiorate / 1000));
@@ -180,6 +207,11 @@ class AudioReencodeBuffer : public AudioOutput
             m_bufferList.append(ab);
 
             timecode = m_last_audiotime;
+
+            LOG(VB_AUDIO, LOG_DEBUG, 
+                QString("blocklen: %1, index: %2, timecode: %3")
+                .arg(blocklen).arg(index).arg(timecode));
+
             index += blocklen;
             firstlen = 0;
 
@@ -366,7 +398,7 @@ class AudioReencodeBuffer : public AudioOutput
     bool                m_initpassthru;
     QMutex              m_bufferMutex;
     QList<AudioBuffer *> m_bufferList;
-    AudioBuffer          m_saveBuffer;
+    AudioBuffer         *m_saveBuffer;
 };
 
 // Cutter object is used in performing clean cutting. The

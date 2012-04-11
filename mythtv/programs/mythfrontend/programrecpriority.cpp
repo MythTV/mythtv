@@ -1027,7 +1027,10 @@ void ProgramRecPriority::deactivate(void)
             }
             else
             {
-                ScheduledRecording::signalChange(0);
+                ScheduledRecording::ReschedulePlace(
+                    QString("DeactivateRule %1 %2")
+                    .arg(pgRecInfo->GetRecordingRuleID())
+                    .arg(pgRecInfo->GetTitle()));
                 pgRecInfo->recstatus = inactive ? rsInactive : rsUnknown;
                 item->DisplayState("disabled", "status");
             }

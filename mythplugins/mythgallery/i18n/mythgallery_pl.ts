@@ -12,28 +12,63 @@
 <context>
     <name>GalleryFilterDialog</name>
     <message>
-        <location filename="../mythgallery/galleryfilterdlg.cpp" line="205"/>
         <source>No files / directories found</source>
+        <translation type="obsolete">Nie znaleziono żadnych plików/katalogów</translation>
+    </message>
+    <message>
+        <source>Filter result : %1 directories found but no files</source>
+        <translation type="obsolete">Filtrowanie: %1 katalogów ale 0 plików</translation>
+    </message>
+    <message>
+        <source>Filter result : %1 directories, %2 movie(s) found</source>
+        <translation type="obsolete">Filtrowanie: znaleziono %1 katalogów z %2 filmami</translation>
+    </message>
+    <message>
+        <source>Filter result : %1 directories, %2 image(s) found</source>
+        <translation type="obsolete">Filtrowanie: znaleziono %1 katalogów z %2 zdjęć</translation>
+    </message>
+    <message>
+        <source>Filter result : %1 directories, %2 image(s) and %3 movie(s) found</source>
+        <translation type="obsolete">Filtrowanie: znaleziono %1 katalogów z %2 zdjęć i %3 filmów</translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/galleryfilterdlg.cpp" line="145"/>
+        <source>Filter result : (unknown)</source>
+        <translation>Wynik filtrowania: (nie znaleziono)</translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/galleryfilterdlg.cpp" line="178"/>
+        <source>-- please be patient --</source>
+        <translation>Proszę o cierpliwość</translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/galleryfilterdlg.cpp" line="190"/>
+        <source>-- scanning current filter --</source>
+        <translation>Wyszukuję z aktualnym filtrem</translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/galleryfilterdlg.cpp" line="205"/>
+        <source>No files / folders found</source>
         <translation>Nie znaleziono żadnych plików/katalogów</translation>
     </message>
     <message>
         <location filename="../mythgallery/galleryfilterdlg.cpp" line="209"/>
-        <source>Filter result : %1 directories found but no files</source>
+        <source>Filter result : %1 folder(s) found but no files</source>
         <translation>Filtrowanie: %1 katalogów ale 0 plików</translation>
     </message>
     <message>
         <location filename="../mythgallery/galleryfilterdlg.cpp" line="213"/>
-        <source>Filter result : %1 directories, %2 movie(s) found</source>
-        <translation>Filtrowanie: znaleziono %1 katalogów z %2 filmami</translation>
+        <source>Filter result : %1 folder(s), %2 movie(s) found</source>
+        <translation>Filtrowanie: %1 katalogów, %2 filmów</translation>
     </message>
     <message>
         <location filename="../mythgallery/galleryfilterdlg.cpp" line="217"/>
-        <source>Filter result : %1 directories, %2 image(s) found</source>
+        <source>Filter result : %1 folder(s), %2 image(s) found</source>
         <translation>Filtrowanie: znaleziono %1 katalogów z %2 zdjęć</translation>
     </message>
     <message>
         <location filename="../mythgallery/galleryfilterdlg.cpp" line="221"/>
-        <source>Filter result : %1 directories, %2 image(s) and %3 movie(s) found</source>
+        <source>Filter result : %1 folder(s), %2 image(s) and %3 movie(s) found</source>
         <translation>Filtrowanie: znaleziono %1 katalogów z %2 zdjęć i %3 filmów</translation>
     </message>
     <message>
@@ -60,9 +95,8 @@
         <translation>Katalog MythGallery &apos;%1&apos; nie istnieje albo jest niedostępny.</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="196"/>
         <source>No images found in this directory.</source>
-        <translation>W katalogu nie znaleźiono żadnych zdjęć.</translation>
+        <translation type="obsolete">W katalogu nie znaleźiono żadnych zdjęć.</translation>
     </message>
     <message>
         <location filename="../mythgallery/iconview.cpp" line="389"/>
@@ -167,6 +201,11 @@
         <translation>Opcje pliku</translation>
     </message>
     <message>
+        <location filename="../mythgallery/iconview.cpp" line="196"/>
+        <source>No images found in this folder.</source>
+        <translation>Nie znaleziono żadnych zdjęć.</translation>
+    </message>
+    <message>
         <location filename="../mythgallery/iconview.cpp" line="896"/>
         <source>Meta Data Options</source>
         <translation>Opcje Metadanych</translation>
@@ -212,8 +251,12 @@
         <translation>Skasuj</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="974"/>
         <source>Create Dir</source>
+        <translation type="obsolete">Utwórz katalog</translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/iconview.cpp" line="974"/>
+        <source>Create folder</source>
         <translation>Utwórz katalog</translation>
     </message>
     <message>
@@ -279,8 +322,12 @@
     </message>
     <message>
         <location filename="../mythgallery/iconview.cpp" line="1368"/>
+        <source>Failed to rename folder</source>
+        <translation>Nieudana zmiana nazwy katalogu</translation>
+    </message>
+    <message>
         <source>Failed to rename directory</source>
-        <translation>Zmiana nazwy niepowiodła się</translation>
+        <translation type="obsolete">Zmiana nazwy niepowiodła się</translation>
     </message>
     <message>
         <location filename="../mythgallery/iconview.cpp" line="1370"/>
@@ -756,6 +803,11 @@ Check the directory exists, is readable and the setting is correct on MythGaller
         <translation>Filtruj/Sortuj zdjęcia</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="13"/>
+        <source>Directory filter:</source>
+        <translation>Filtr katalogów:</translation>
+    </message>
+    <message>
         <location filename="themestrings.h" line="14"/>
         <source>Type filter:</source>
         <translation>Filtr typów:</translation>
@@ -767,8 +819,9 @@ Check the directory exists, is readable and the setting is correct on MythGaller
     </message>
     <message>
         <location filename="themestrings.h" line="19"/>
-        <source>Directory filter :</source>
-        <translation>Katalog do filtrowania:</translation>
+        <source>Folder filter :</source>
+        <oldsource>Directory filter :</oldsource>
+        <translation>Filtr katalogów:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="20"/>
@@ -776,12 +829,11 @@ Check the directory exists, is readable and the setting is correct on MythGaller
         <translation>Typ filtra:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="21"/>
         <source>NumImages_Text</source>
-        <translation>NumImages_Text</translation>
+        <translation type="obsolete">NumImages_Text</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="22"/>
+        <location filename="themestrings.h" line="21"/>
         <source>Sort by :</source>
         <translation>Sortuj po:</translation>
     </message>

@@ -29,6 +29,8 @@ MythThemeBase::MythThemeBase()
 
 MythThemeBase::~MythThemeBase()
 {
+    GetGlobalFontMap()->Clear();
+    XMLParseBase::ClearGlobalObjectStore();
     GetGlobalFontManager()->ReleaseFonts("UI");
     GetGlobalFontManager()->ReleaseFonts("Shared");
     delete d;
@@ -79,7 +81,7 @@ void MythThemeBase::Init(void)
     XMLParseBase::LoadBaseTheme();
     d->backgroundscreen = new MythScreenType(d->background, "backgroundscreen");
 
-    if (!XMLParseBase::CopyWindowFromBase("backgroundwindow", 
+    if (!XMLParseBase::CopyWindowFromBase("backgroundwindow",
                                           d->backgroundscreen))
     {
         QString backgroundname = GetMythUI()->qtconfig()->GetSetting("BackgroundPixmap"
