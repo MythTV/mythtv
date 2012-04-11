@@ -675,7 +675,7 @@ void ProgLister::DeleteOldEpisode(bool ok)
     if (!query.exec())
         MythDB::DBError("ProgLister::DeleteOldEpisode", query);
 
-    ScheduledRecording::signalChange(0);
+    ScheduledRecording::RescheduleCheck(*pi, "DeleteOldEpisode");
     FillItemList(true);
 }
 
@@ -704,7 +704,11 @@ void ProgLister::DeleteOldSeries(bool ok)
     if (!query.exec())
         MythDB::DBError("ProgLister::DeleteOldSeries -- delete", query);
 
-    ScheduledRecording::signalChange(0);
+    // Set the programid to the special value of "**any**" which the
+    // scheduler recognizes to mean the entire series was deleted.
+    RecordingInfo tempri(*pi);
+    tempri.SetProgramID("**any**");
+    ScheduledRecording::RescheduleCheck(tempri, "DeleteOldSeries");
     FillItemList(true);
 }
 

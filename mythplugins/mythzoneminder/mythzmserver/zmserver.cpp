@@ -24,10 +24,7 @@
 #include <netinet/in.h>
 #include <sys/stat.h>
 #include <sys/shm.h>
-
-#if _POSIX_MAPPED_FILES > 0L
 #include <sys/mman.h>
-#endif
 
 #ifdef linux
 #  include <sys/vfs.h>

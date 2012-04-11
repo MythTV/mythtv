@@ -2678,7 +2678,8 @@ void ProgramInfo::SaveDeletePendingFlag(bool deleteFlag)
     MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare("UPDATE recorded"
-                  " SET deletepending = :DELETEFLAG"
+                  " SET deletepending = :DELETEFLAG, "
+                  "     duplicate = 0 "
                   " WHERE chanid = :CHANID"
                   " AND starttime = :STARTTIME ;");
     query.bindValue(":CHANID", chanid);
