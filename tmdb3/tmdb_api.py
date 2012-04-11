@@ -75,7 +75,7 @@ class MovieSearchResult( PagedRequest ):
         super(MovieSearchResult, self).__init__(
                                 request.new(language=locale.language),
                                 lambda x: Movie(raw=x, locale=locale))
-    
+
     def __repr__(self):
         name = self._name if self._name else self._request._kwargs['query']
         return u"<Search Results: {0}>".format(name)
