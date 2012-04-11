@@ -740,7 +740,8 @@ int main(int argc, char *argv[])
             "===============================================================");
 
     if (grab_data || mark_repeats)
-        ScheduledRecording::signalChange(-1);
+        ScheduledRecording::RescheduleMatch(0, 0, 0, QDateTime(),
+                                            "MythFillDatabase");
 
     gCoreContext->SendMessage("CLEAR_SETTINGS_CACHE");
 

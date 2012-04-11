@@ -1044,7 +1044,7 @@ static void TVMenuCallback(void *data, QString &selection)
 
         if (sel == "settings general" ||
             sel == "settings generalrecpriorities")
-            ScheduledRecording::signalChange(0);
+            ScheduledRecording::ReschedulePlace("TVMenuCallback");
         GetMythMainWindow()->ShowPainterWindow();
     }
 }

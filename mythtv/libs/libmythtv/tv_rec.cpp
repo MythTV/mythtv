@@ -2668,7 +2668,7 @@ void TVRec::NotifySchedulerOfRecording(RecordingInfo *rec)
     rec->AddHistory(false);
 
     // + save RecordingRule so that we get a recordid
-    //   (don't allow signalChange(), avoiding unneeded reschedule)
+    //   (don't allow RescheduleMatch(), avoiding unneeded reschedule)
     rec->GetRecordingRule()->Save(false);
 
     // + save recordid to recorded entry
