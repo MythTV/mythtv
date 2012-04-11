@@ -83,7 +83,8 @@ void MythUtilCommandLineParser::LoadArguments(void)
                 "access those files to do so. If enabled, this will also "
                 "trigger the bulk metadata scanner upon completion.")
                 ->SetGroup("Backend")
-        << add("--event", "event", "", "Send a backend event test message.", "")
+        << add("--event", "event", QVariant::StringList, 
+                "Send a backend event test message.", "")
                 ->SetGroup("Backend")
         << add("--systemevent", "systemevent", "",
                 "Send a backend SYSTEM_EVENT test message.", "")
