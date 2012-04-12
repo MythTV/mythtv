@@ -3188,9 +3188,12 @@ void TV::PrepToSwitchToRecordedProgram(PlayerContext *ctx,
     SetExitPlayer(true, true);
 }
 
-void TV::PrepareToExitPlayer(PlayerContext *ctx, int line, bool bookmark)
+void TV::PrepareToExitPlayer(PlayerContext *ctx, int line, BookmarkAction bookmark)
 {
-    bool bookmark_it = bookmark && IsBookmarkAllowed(ctx);
+    bool bm_basic =
+        (bookmark == kBookmarkAlways ||
+         (bookmark == kBookmarkAuto && db_playback_exit_prompt == 2));
+    bool bookmark_it = bm_basic && IsBookmarkAllowed(ctx);
     ctx->LockDeletePlayer(__FILE__, line);
     if (ctx->player)
     {
@@ -3264,7 +3267,7 @@ void TV::HandleEndOfPlaybackTimerEvent(void)
         if (mctx == ctx)
         {
             endOfRecording = true;
-            PrepareToExitPlayer(mctx, __LINE__, false);
+            PrepareToExitPlayer(mctx, __LINE__);
             SetExitPlayer(true, true);
         }
     }
@@ -4216,7 +4219,7 @@ bool TV::ActiveHandleAction(PlayerContext *ctx,
     }
     else if (has_action(ACTION_STOP, actions))
     {
-        PrepareToExitPlayer(ctx, __LINE__, false);
+        PrepareToExitPlayer(ctx, __LINE__);
         SetExitPlayer(true, true);
     }
     else if (has_action(ACTION_EXITSHOWNOPROMPTS, actions))
@@ -4272,7 +4275,7 @@ bool TV::ActiveHandleAction(PlayerContext *ctx,
                 ShowOSDStopWatchingRecording(ctx);
                 return handled;
             }
-            PrepareToExitPlayer(ctx, __LINE__, db_playback_exit_prompt == 2);
+            PrepareToExitPlayer(ctx, __LINE__);
             requestDelete = false;
             do_exit = true;
         }
@@ -8915,8 +8918,7 @@ void TV::customEvent(QEvent *e)
         for (uint i = 0; mctx && (i < player.size()); i++)
         {
             PlayerContext *ctx = GetPlayer(mctx, i);
-            PrepareToExitPlayer(ctx, __LINE__, db_playback_exit_prompt == 1 ||
-                                               db_playback_exit_prompt == 2);
+            PrepareToExitPlayer(ctx, __LINE__);
         }
 
         SetExitPlayer(true, true);
@@ -10068,7 +10070,7 @@ void TV::OSDDialogEvent(int result, QString text, QString action)
         DoTogglePause(actx, true);
     else if (action == ACTION_STOP)
     {
-        PrepareToExitPlayer(actx, __LINE__, false);
+        PrepareToExitPlayer(actx, __LINE__);
         SetExitPlayer(true, true);
     }
     else if (action == ACTION_JUMPFFWD)
@@ -12319,7 +12321,7 @@ bool TV::HandleOSDVideoExit(PlayerContext *ctx, QString action)
     }
     else if (action == "SAVEPOSITIONANDEXIT" && bookmark_ok)
     {
-        PrepareToExitPlayer(ctx, __LINE__);
+        PrepareToExitPlayer(ctx, __LINE__, kBookmarkAlways);
         SetExitPlayer(true, true);
     }
     else if (action == "KEEPWATCHING" && !near_end)
