@@ -110,7 +110,7 @@ QString toString(RecStatusType recstatus, uint id)
             ret = QObject::tr("M", "RecStatusChar rsMissed");
             break;
         case rsMissedFuture:
-            ret = QObject::tr("m", "RecStatusChar rsMissedFuture");
+            ret = "M";
             break;
         case rsConflict:
             ret = QObject::tr("C", "RecStatusChar rsConflict");
@@ -183,7 +183,7 @@ QString toString(RecStatusType recstatus, RecordingType rectype)
         case rsMissed:
             return QObject::tr("Missed");
         case rsMissedFuture:
-            return QObject::tr("Missed Future");
+            return "Missed Future";
         case rsConflict:
             return QObject::tr("Conflicting");
         case rsLaterShowing:
@@ -248,9 +248,9 @@ QString toDescription(RecStatusType recstatus, RecordingType rectype,
                     "master backend was hung or not running.");
                 break;
             case rsMissedFuture:
-                message = QObject::tr(
+                message = 
                     "This showing was not recorded because the "
-                    "master backend was hung or not running.");
+                    "master backend was hung or not running.";
                 break;
             case rsCancelled:
                 message = QObject::tr(
