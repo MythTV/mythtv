@@ -1527,7 +1527,7 @@ static void pmt_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
         if (desc_list_end > p_end)
             break;
         for(;;) {
-            if (ff_parse_mpeg2_descriptor(ts->stream, st, stream_type, &p, desc_list_end,
+            if (ff_old_parse_mpeg2_descriptor(ts->stream, st, stream_type, &p, desc_list_end,
                 mp4_descr, mp4_descr_count, pid, ts) < 0)
                 break;
 
