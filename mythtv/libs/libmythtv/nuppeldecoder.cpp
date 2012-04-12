@@ -1054,7 +1054,6 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype)
     bool ret = false;
     int seeklen = 0;
     AVPacket pkt;
-    AVFrame *frame = avcodec_alloc_frame();
 
     decoded_video_frame = NULL;
 

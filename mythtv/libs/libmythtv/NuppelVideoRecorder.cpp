@@ -2956,10 +2956,17 @@ void NuppelVideoRecorder::WriteVideo(VideoFrame *frame, bool skipsync,
 
         if (!hardware_encode)
         {
+            AVPacket packet;
+            packet.data = (uint8_t *)strm;
+            packet.size = len;
+
+            int got_packet = 0;
+
             QMutexLocker locker(avcodeclock);
-            tmp = avcodec_encode_video(mpa_vidctx, (unsigned char *)strm,
-                                       len, &mpa_picture);
-            if (tmp == -1)
+            tmp = avcodec_encode_video2(mpa_vidctx, &packet, &mpa_picture,
+                                        &got_packet);
+
+            if (tmp < 0 || !got_packet)
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC +
                     "WriteVideo : avcodec_encode_video() failed");
