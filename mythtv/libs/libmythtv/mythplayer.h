@@ -381,6 +381,12 @@ class MTV_PUBLIC MythPlayer
     virtual long long CalcMaxFFTime(long long ff, bool setjump = true) const;
     long long CalcRWTime(long long rw) const;
     virtual void calcSliderPos(osdInfo &info, bool paddedFields = false);
+    uint64_t TranslatePositionAbsToRel(uint64_t absPosition) {
+        return deleteMap.TranslatePositionAbsToRel(absPosition);
+    }
+    uint64_t TranslatePositionRelToAbs(uint64_t relPosition) {
+        return deleteMap.TranslatePositionRelToAbs(relPosition);
+    }
 
     // Commercial stuff
     void SetAutoCommercialSkip(CommSkipMode autoskip)

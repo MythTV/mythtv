@@ -839,3 +839,63 @@ bool DeleteMap::IsSaved(void) const
 
     return currentMap == savedMap;
 }
+
+uint64_t DeleteMap::TranslatePositionAbsToRel(const frm_dir_map_t &deleteMap,
+                                              uint64_t absPosition)
+{
+    uint64_t subtraction = 0;
+    uint64_t startOfCutRegion = 0;
+    frm_dir_map_t::const_iterator i;
+    bool withinCut = false;
+    bool first = true;
+    for (i = deleteMap.constBegin(); i != deleteMap.constEnd(); ++i)
+    {
+        if (first)
+            withinCut = (i.value() == MARK_CUT_END);
+        first = false;
+        if (i.key() > absPosition)
+            break;
+        if (i.value() == MARK_CUT_START && !withinCut)
+        {
+            withinCut = true;
+            startOfCutRegion = i.key();
+        }
+        else if (i.value() == MARK_CUT_END && withinCut)
+        {
+            withinCut = false;
+            subtraction += (i.key() - startOfCutRegion);
+        }
+    }
+    if (withinCut)
+        subtraction += (absPosition - startOfCutRegion);
+    return absPosition - subtraction;
+}
+
+uint64_t DeleteMap::TranslatePositionRelToAbs(const frm_dir_map_t &deleteMap,
+                                              uint64_t relPosition)
+{
+    uint64_t addition = 0;
+    uint64_t startOfCutRegion = 0;
+    frm_dir_map_t::const_iterator i;
+    bool withinCut = false;
+    bool first = true;
+    for (i = deleteMap.constBegin(); i != deleteMap.constEnd(); ++i)
+    {
+        if (first)
+            withinCut = (i.value() == MARK_CUT_END);
+        first = false;
+        if (i.value() == MARK_CUT_START && !withinCut)
+        {
+            withinCut = true;
+            startOfCutRegion = i.key();
+            if (relPosition + addition <= startOfCutRegion)
+                break;
+        }
+        else if (i.value() == MARK_CUT_END && withinCut)
+        {
+            withinCut = false;
+            addition += (i.key() - startOfCutRegion);
+        }
+    }
+    return relPosition + addition;
+}
