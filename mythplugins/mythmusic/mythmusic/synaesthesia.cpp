@@ -606,6 +606,8 @@ bool Synaesthesia::draw(QPainter *p, const QColor &back)
     if (!m_outputImage)
         return true;
 
+    (void)back;
+
     register uint32_t *ptrOutput = (uint32_t *)output;
 
     for (int j = 0; j < m_outHeight * 2; j += 2) 
