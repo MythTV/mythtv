@@ -312,8 +312,13 @@ class MTV_PUBLIC TV : public QObject
     void setUnderNetworkControl(bool setting) { underNetworkControl = setting; }
     void PrepToSwitchToRecordedProgram(PlayerContext*,
                                        const ProgramInfo &);
+    enum BookmarkAction {
+        kBookmarkAlways,
+        kBookmarkNever,
+        kBookmarkAuto // set iff db_playback_exit_prompt==2
+    };
     void PrepareToExitPlayer(PlayerContext*, int line,
-                             bool bookmark = true);
+                             BookmarkAction bookmark = kBookmarkAuto);
     void SetExitPlayer(bool set_it, bool wants_to);
 
     bool RequestNextRecorder(PlayerContext *, bool);
