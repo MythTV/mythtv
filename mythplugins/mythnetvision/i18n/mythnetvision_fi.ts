@@ -19,6 +19,10 @@
         <translation>Haun Valinnat</translation>
     </message>
     <message>
+        <source>Stream Video</source>
+        <translation>Striimaa video</translation>
+    </message>
+    <message>
         <source>Open Web Link</source>
         <translation>Avaa Nettilinkki</translation>
     </message>
@@ -67,9 +71,23 @@
         <translation>Haluatko varmasti poistaa tiedoston?</translation>
     </message>
     <message>
+        <source>Downloading Video...</source>
+        <translation>Lataa videota...</translation>
+    </message>
+    <message>
+        <source>Downloading Video...
+(%1 of %2 MB)</source>
+        <translation>Lataa videota...
+(%1 / %2 Mt)</translation>
+    </message>
+    <message>
+        <source>Error downloading video to backend.</source>
+        <translation>Virhe ladatessa videota palvelimelle.</translation>
+    </message>
+    <message>
         <source>This file already downloaded to:
 %1</source>
-        <translation>Tiedosto on jo ladattu kohteeseen:
+        <translation type="obsolete">Tiedosto on jo ladattu kohteeseen:
 %1</translation>
     </message>
 </context>
@@ -78,6 +96,10 @@
     <message>
         <source>Playback/Download Options</source>
         <translation>Toisto/Lataus Valinnat</translation>
+    </message>
+    <message>
+        <source>Stream Video</source>
+        <translation>Striimaa video</translation>
     </message>
     <message>
         <source>Open Web Link</source>
@@ -152,12 +174,26 @@
         <translation>Haluatko varmasti poistaa tiedoston?</translation>
     </message>
     <message>
+        <source>Downloading Video...</source>
+        <translation>Lataa videota...</translation>
+    </message>
+    <message>
         <source>Updating RSS.  This could take a while...</source>
         <translation>Päivitetään RSS. Tämä voi viedä tovin...</translation>
     </message>
     <message>
         <source>Updating Site Maps.  This could take a while...</source>
         <translation>Päivittää sivustokarttoja. Tämä voi viedä tovin...</translation>
+    </message>
+    <message>
+        <source>Downloading Video...
+(%1 of %2 MB)</source>
+        <translation>Lataa videota...
+(%1 / %2 Mt)</translation>
+    </message>
+    <message>
+        <source>Error downloading video to backend.</source>
+        <translation>Virhe ladatessa videota palvelimelle.</translation>
     </message>
 </context>
 <context>
@@ -171,14 +207,30 @@
     <name>SearchEditor</name>
     <message>
         <source>Querying Backend for Internet Content Sources...</source>
-        <translation>Kysytään taustapalvelimelta internetsisältöjen lähteitä</translation>
+        <translation>Kysytään taustapalvelimelta internetsisältöjen lähteitä...</translation>
     </message>
 </context>
 <context>
     <name>ThemeUI</name>
     <message>
+        <source>Internet Video Browser</source>
+        <translation>Internet videoselain</translation>
+    </message>
+    <message>
+        <source>No sites configured!</source>
+        <translation>Ei lähteitä asetettuna!</translation>
+    </message>
+    <message>
+        <source>Videos - Gallery</source>
+        <translation>Videot - Galleria</translation>
+    </message>
+    <message>
+        <source>Videos - Tree</source>
+        <translation>Videot - Puu</translation>
+    </message>
+    <message>
         <source>%DATE%, %TIME%</source>
-        <translation></translation>
+        <translation>%DATE%, %TIME%</translation>
     </message>
     <message>
         <source>No search scripts found!  This usually indicates missing prerequisites.</source>
@@ -214,7 +266,7 @@ Uusille tilauksille voit yksinkertaisesti syöttää URL:in ja painaa &quot;Tall
     </message>
     <message>
         <source>URL:</source>
-        <translation></translation>
+        <translation>URL:</translation>
     </message>
     <message>
         <source>Author:</source>
@@ -350,7 +402,35 @@ Uusille tilauksille voit yksinkertaisesti syöttää URL:in ja painaa &quot;Tall
     </message>
     <message>
         <source>Search Internet Video</source>
-        <translation>Etsi Internet Videoita</translation>
+        <translation>Etsi videoita internetistä</translation>
+    </message>
+    <message>
+        <source>Type the URL to an RSS 2.0 media feed below.  If editing an existing feed,modify any of the values you like.  Press &quot;Save&quot; to save/subscribe.
+
+For new subscriptions,you can simply enter the URL and click &quot;Save.&quot;</source>
+        <translation type="obsolete">Kirjoita alle RSS 2.0 syötteen URL. Olemassa olevan syötteen kaikkia kenttiä voi muokata. Paina &quot;Tallenna&quot; tallentaaksesi/tilataksesi.
+
+Uusille tilauksille voit yksinkertaisesti syöttää URL:in ja painaa &quot;Tallenna&quot;.</translation>
+    </message>
+    <message>
+        <source>Internet Video List</source>
+        <translation>Internet videolista</translation>
+    </message>
+    <message>
+        <source>You haven&apos;t added any Sites/RSS Feeds yet!  To add a site,press MENU,then choose &quot;Scan/Manage Subscriptions,&quot; then &quot;Manage Site Subscriptions.&quot;</source>
+        <translation type="obsolete">Et ole lisännyt vielä yhtään sivustoa/RSS syötettä! Lisätäksesi sivuston, paina MENU, sitten valitse &quot;Selaa/Hallitse tilauksia&quot;, sitten &quot;Hallitse sivuston tilauksia&quot;.</translation>
+    </message>
+    <message>
+        <source>User Rating: %1</source>
+        <translation>Käyttäjän arvostelu: %1</translation>
+    </message>
+    <message>
+        <source>By: %1</source>
+        <translation>Peruste: %1</translation>
+    </message>
+    <message>
+        <source>Internet Video Gallery</source>
+        <translation>Internetvideogalleria</translation>
     </message>
     <message>
         <source>Search popular video sites</source>
@@ -364,12 +444,16 @@ Uusille tilauksille voit yksinkertaisesti syöttää URL:in ja painaa &quot;Tall
         <source>Browse highlights and entire sites</source>
         <translation>Selaa kohokohtia ja koko sivustoja</translation>
     </message>
+    <message>
+        <source>Select to change image</source>
+        <translation>Valitse vaihtaaksesi kuvaa</translation>
+    </message>
 </context>
 <context>
     <name>TreeEditor</name>
     <message>
         <source>Querying Backend for Internet Content Sources...</source>
-        <translation>Kysytään taustapalvelimelta internetsisältöjen lähteitä</translation>
+        <translation>Kysytään taustapalvelimelta internetsisältöjen lähteitä...</translation>
     </message>
 </context>
 </TS>
