@@ -134,7 +134,23 @@ void DeleteMap::UpdateSeekAmount(int change, double framerate)
     }
 }
 
-/**
+static QString createTimeString(uint64_t frame, uint64_t total,
+                                double frame_rate, bool full_resolution)
+{
+    int secs   = (int)(frame / frame_rate);
+    int frames = frame - (int)(secs * frame_rate);
+    int totalSecs = (int)(total / frame_rate);
+    QString timestr;
+    if (totalSecs >= 3600)
+        timestr = QString::number(secs / 3600) + ":";
+    timestr += QString("%1").arg((secs / 60) % 60, 2, 10, QChar(48)) +
+        QString(":%1").arg(secs % 60, 2, 10, QChar(48));
+    if (full_resolution)
+        timestr += QString(".%1").arg(frames, 2, 10, QChar(48));
+    return timestr;
+}
+
+ /**
  * \brief Show and update the edit mode On Screen Display. The cut regions
  *        are only refreshed if the deleteMap has been updated.
  */
@@ -152,22 +168,25 @@ void DeleteMap::UpdateOSD(uint64_t frame, uint64_t total, double frame_rate,
     infoMap.detach();
     m_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
 
-    int secs   = (int)(frame / frame_rate);
-    int frames = frame - (int)(secs * frame_rate);
-    QString timestr = QString::number(secs / 3600) +
-                      QString(":%1").arg((secs / 60) % 60, 2, 10, QChar(48)) +
-                      QString(":%1").arg(secs % 60, 2, 10, QChar(48)) +
-                      QString(".%1").arg(frames, 2, 10, QChar(48));
-
     QString cutmarker = " ";
     if (IsInDelete(frame))
         cutmarker = QObject::tr("cut");
 
+    QString timestr = createTimeString(frame, total, frame_rate, true);
+    uint64_t relTotal = TranslatePositionAbsToRel(total);
+    QString relTimeDisplay = createTimeString(TranslatePositionAbsToRel(frame),
+                                              relTotal, frame_rate, false);
+    QString relLengthDisplay = createTimeString(relTotal,
+                                                relTotal, frame_rate, false);
     infoMap["timedisplay"]  = timestr;
     infoMap["framedisplay"] = QString::number(frame);
     infoMap["cutindicator"] = cutmarker;
     infoMap["title"]        = QObject::tr("Edit");
     infoMap["seekamount"]   = m_seekText;;
+    infoMap["reltimedisplay"] = relTimeDisplay;
+    infoMap["rellengthdisplay"] = relLengthDisplay;
+    infoMap["fulltimedisplay"] = timestr + " (" +
+        QObject::tr("%1 of %2").arg(relTimeDisplay).arg(relLengthDisplay) + ")";
 
     QHash<QString,float> posMap;
     posMap.insert("position", (float)((double)frame/(double)total));
