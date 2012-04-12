@@ -60,10 +60,10 @@
 
 typedef struct MpegTSContext MpegTSContext;
 
-MpegTSContext *ff_mpegts_parse_open(AVFormatContext *s);
-int ff_mpegts_parse_packet(MpegTSContext *ts, AVPacket *pkt,
+MpegTSContext *ff_old_mpegts_parse_open(AVFormatContext *s);
+int ff_old_mpegts_parse_packet(MpegTSContext *ts, AVPacket *pkt,
                            const uint8_t *buf, int len);
-void ff_mpegts_parse_close(MpegTSContext *ts);
+void ff_old_mpegts_parse_close(MpegTSContext *ts);
 
 typedef struct {
     int use_au_start;

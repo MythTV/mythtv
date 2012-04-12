@@ -77,10 +77,10 @@
 typedef struct MpegTSContext MpegTSContext;
 
 void mpegts_remove_stream(MpegTSContext *ts, int pid);
-MpegTSContext *ff_mythtv_mpegts_parse_open(AVFormatContext *s);
-int ff_mythtv_mpegts_parse_packet(MpegTSContext *ts, AVPacket *pkt,
-                                  const uint8_t *buf, int len);
-void ff_mythtv_mpegts_parse_close(MpegTSContext *ts);
+MpegTSContext *ff_mpegts_parse_open(AVFormatContext *s);
+int ff_mythtv_parse_packet(MpegTSContext *ts, AVPacket *pkt,
+                           const uint8_t *buf, int len);
+void ff_mpegts_parse_close(MpegTSContext *ts);
 
 typedef struct {
     int use_au_start;

@@ -2257,7 +2257,7 @@ static int read_seek(AVFormatContext *s, int stream_index, int64_t target_ts, in
 /**************************************************************/
 /* parsing functions - called from other demuxers such as RTP */
 
-MpegTSContext *ff_mpegts_parse_open(AVFormatContext *s)
+MpegTSContext *ff_old_mpegts_parse_open(AVFormatContext *s)
 {
     MpegTSContext *ts;
 
@@ -2276,7 +2276,7 @@ MpegTSContext *ff_mpegts_parse_open(AVFormatContext *s)
 
 /* return the consumed length if a packet was output, or -1 if no
    packet is output */
-int ff_mpegts_parse_packet(MpegTSContext *ts, AVPacket *pkt,
+int ff_old_mpegts_parse_packet(MpegTSContext *ts, AVPacket *pkt,
                         const uint8_t *buf, int len)
 {
     int len1;
@@ -2301,7 +2301,7 @@ int ff_mpegts_parse_packet(MpegTSContext *ts, AVPacket *pkt,
     return len1 - len;
 }
 
-void ff_mpegts_parse_close(MpegTSContext *ts)
+void ff_old_mpegts_parse_close(MpegTSContext *ts)
 {
     int i;
 

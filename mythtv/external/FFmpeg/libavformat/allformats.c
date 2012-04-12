@@ -155,7 +155,7 @@ void av_register_all(void)
     REGISTER_MUXER    (MPEG2VOB, mpeg2vob);
     REGISTER_DEMUXER  (MPEGPS, mpegps);
     REGISTER_MUXER    (MPEGTS, mpegts);
-    REGISTER_DEMUXER  (MPEGTS, mpegts);
+//    REGISTER_DEMUXER  (MPEGTS, mpegts);
     REGISTER_DEMUXER  (MPEGTS, mythtv_mpegts);
     REGISTER_DEMUXER  (MPEGTSRAW, mythtv_mpegtsraw);
     REGISTER_DEMUXER  (MPEGTSRAW, mpegtsraw);

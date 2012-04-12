@@ -229,7 +229,7 @@ typedef struct PESContext {
     SLConfigDescr sl;
 } PESContext;
 
-extern AVInputFormat ff_mpegts_demuxer;
+extern AVInputFormat ff_mythtv_mpegts_demuxer;
 
 struct SectionContext {
     int pid;
@@ -1478,7 +1478,7 @@ static void m4sl_cb(MpegTSFilter *filter, const uint8_t *section, int section_le
         av_free(mp4_descr[i].dec_config_descr);
 }
 
-int ff_mythtv_parse_mpeg2_descriptor(AVFormatContext *fc, pmt_entry_t *item, int stream_type,
+int ff_parse_mpeg2_descriptor(AVFormatContext *fc, pmt_entry_t *item, int stream_type,
                               const uint8_t **pp, const uint8_t *desc_list_end,
                               Mp4Descr *mp4_descr, int mp4_descr_count, int pid,
                               MpegTSContext *ts, dvb_caption_info_t *dvbci)
@@ -1847,7 +1847,7 @@ static void pmt_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
         if (desc_list_end > p_end)
             break;
         for(;;) {
-            if (ff_mythtv_parse_mpeg2_descriptor(ts->stream, &items[last_item], stream_type, &p, desc_list_end,
+            if (ff_parse_mpeg2_descriptor(ts->stream, &items[last_item], stream_type, &p, desc_list_end,
                 mp4_descr, mp4_descr_count, pid, ts, &dvbci) < 0)
                 break;
         }
@@ -2731,7 +2731,7 @@ static int mpegts_read_header(AVFormatContext *s)
     ts->stream = s;
     ts->auto_guess = 0;
 
-    if (s->iformat == &ff_mpegts_demuxer) {
+    if (s->iformat == &ff_mythtv_mpegts_demuxer) {
         /* normal demux */
 
         if (!ts->auto_guess) {
@@ -3125,7 +3125,7 @@ static int read_seek(AVFormatContext *s, int stream_index, int64_t target_ts, in
 /**************************************************************/
 /* parsing functions - called from other demuxers such as RTP */
 
-MpegTSContext *ff_mythtv_mpegts_parse_open(AVFormatContext *s)
+MpegTSContext *ff_mpegts_parse_open(AVFormatContext *s)
 {
     MpegTSContext *ts;
 
@@ -3144,7 +3144,7 @@ MpegTSContext *ff_mythtv_mpegts_parse_open(AVFormatContext *s)
 
 /* return the consumed length if a packet was output, or -1 if no
    packet is output */
-int ff_mythtv_mpegts_parse_packet(MpegTSContext *ts, AVPacket *pkt,
+int ff_mpegts_parse_packet(MpegTSContext *ts, AVPacket *pkt,
                                   const uint8_t *buf, int len)
 {
     int len1;
@@ -3169,7 +3169,7 @@ int ff_mythtv_mpegts_parse_packet(MpegTSContext *ts, AVPacket *pkt,
     return len1 - len;
 }
 
-void ff_mythtv_mpegts_parse_close(MpegTSContext *ts)
+void ff_mpegts_parse_close(MpegTSContext *ts)
 {
     int i;
 
