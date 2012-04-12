@@ -27,18 +27,10 @@
     <name>QObject</name>
     <message>
         <source>IP address of the mythzoneminder server</source>
-        <translation type="obsolete">Mythzoneminder palvelimen IP osoite</translation>
-    </message>
-    <message>
-        <source>Enter the IP address of the mythzoneminder server that this frontend should connect to.</source>
-        <translation type="obsolete">Aseta mythzoneminder palvelimen IP osoite johon tämän käyttöliittymän tulisi kytkeytyä.</translation>
-    </message>
-    <message>
-        <source>IP address of the MythZoneMinder server</source>
         <translation>Mythzoneminder palvelimen IP osoite</translation>
     </message>
     <message>
-        <source>Enter the IP address of the MythZoneMinder server that this frontend should connect to.</source>
+        <source>Enter the IP address of the mythzoneminder server that this frontend should connect to.</source>
         <translation>Aseta mythzoneminder palvelimen IP osoite johon tämän käyttöliittymän tulisi kytkeytyä.</translation>
     </message>
     <message>
@@ -90,11 +82,11 @@
     </message>
     <message>
         <source>Zone Minder Console</source>
-        <translation type="obsolete">Zone Minder Konsoli</translation>
+        <translation>Zone Minder Konsoli</translation>
     </message>
     <message>
         <source>Status</source>
-        <translation>Tila</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Load: 0.12</source>
@@ -121,16 +113,8 @@
         <translation>Tapahtumat</translation>
     </message>
     <message>
-        <source>ZoneMinder Event Player</source>
-        <translation>Zone Minder tapahtumien toistin</translation>
-    </message>
-    <message>
-        <source>ZoneMinder Live Player</source>
-        <translation>Zone Minder live toisto</translation>
-    </message>
-    <message>
         <source>[x]</source>
-        <translation>[x]</translation>
+        <translation></translation>
     </message>
     <message>
         <source>[R] = Running [S] = Stopped</source>
@@ -138,15 +122,7 @@
     </message>
     <message>
         <source>Zone Minder Events</source>
-        <translation type="obsolete">Zone Minder Tapahtumat</translation>
-    </message>
-    <message>
-        <source>ZoneMinder Console</source>
-        <translation>ZoneMinder konsoli</translation>
-    </message>
-    <message>
-        <source>ZoneMinder Events</source>
-        <translation>ZoneMinder tapahtumat</translation>
+        <translation>Zone Minder Tapahtumat</translation>
     </message>
     <message>
         <source>Select Camera</source>
@@ -158,7 +134,7 @@
     </message>
     <message>
         <source>0/0</source>
-        <translation>0/0</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Event Name</source>
@@ -186,7 +162,7 @@
     </message>
     <message>
         <source>Zone Minder Event Player</source>
-        <translation type="obsolete">Zone Minder Tapahtumien Toistin</translation>
+        <translation>Zone Minder Tapahtumien Toistin</translation>
     </message>
     <message>
         <source>Event:</source>
@@ -226,7 +202,7 @@
     </message>
     <message>
         <source>Zone Minder Live Player</source>
-        <translation type="obsolete">Zone Minder Live Esitys</translation>
+        <translation>Zone Minder Live Esitys</translation>
     </message>
     <message>
         <source>Monitor 1</source>
@@ -255,35 +231,6 @@
     <message>
         <source>Show Events</source>
         <translation>Näytä Tapahtumat</translation>
-    </message>
-    <message>
-        <source>[R] = Running
-[S] = Stopped</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Select Camera:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Select Date:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Test</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Record</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Store</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -352,16 +299,8 @@
     <message>
         <source>Can&apos;t show live view.
 You don&apos;t have any monitors defined!</source>
-        <translation type="obsolete">Ei voi näyttää Live näkymää.
+        <translation>Ei voi näyttää Live näkymää.
 Et ole määrittänyt yhtään monitoria!</translation>
-    </message>
-    <message>
-        <source>Can&apos;t show live view.</source>
-        <translation>Ei voida näyttää live näkymää.</translation>
-    </message>
-    <message>
-        <source>You don&apos;t have any monitors defined!</source>
-        <translation>Et ole määritellyt yhtään monitoria!</translation>
     </message>
 </context>
 <context>

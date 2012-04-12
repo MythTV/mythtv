@@ -31,28 +31,12 @@
         <translation>Tuntematon</translation>
     </message>
     <message>
-        <source>Manage Feeds</source>
-        <translation>Hallitse syötteitä</translation>
-    </message>
-    <message>
-        <source>Add Feed</source>
-        <translation>Lisää syöte</translation>
-    </message>
-    <message>
-        <source>Edit Feed</source>
-        <translation>Muokkaa syötettä</translation>
-    </message>
-    <message>
-        <source>Delete Feed</source>
-        <translation>Poista syöte</translation>
-    </message>
-    <message>
         <source>Cancel</source>
-        <translation type="obsolete">Peruuta</translation>
+        <translation>Peruuta</translation>
     </message>
     <message>
         <source>Edit News Site</source>
-        <translation type="obsolete">Muokkaa Uutislähdettä</translation>
+        <translation>Muokkaa Uutislähdettä</translation>
     </message>
     <message>
         <source>%1 of %2 (%3 percent)</source>
@@ -64,11 +48,11 @@
     </message>
     <message>
         <source>Add News Site</source>
-        <translation type="obsolete">Lisää Uusi Uutislähde</translation>
+        <translation>Lisää Uusi Uutislähde</translation>
     </message>
     <message>
         <source>Delete News Site</source>
-        <translation type="obsolete">Poista Uutislähde</translation>
+        <translation>Poista Uutislähde</translation>
     </message>
     <message>
         <source>Options</source>
@@ -152,7 +136,7 @@
     <name>ThemeUI</name>
     <message>
         <source>%DATE%, %TIME%</source>
-        <translation>%DATE%, %TIME%</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Edit RSS News Feeds</source>
@@ -172,7 +156,7 @@ Kun olet valmis, valitse&quot;OK&quot; tai &quot;Peruuta&quot; jatkaaksesi.</tra
     </message>
     <message>
         <source>URL:</source>
-        <translation>URL:</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Icon:</source>
@@ -193,10 +177,6 @@ Kun olet valmis, valitse&quot;OK&quot; tai &quot;Peruuta&quot; jatkaaksesi.</tra
     <message>
         <source>OK</source>
         <translation>OK</translation>
-    </message>
-    <message>
-        <source>Bookmark Manager</source>
-        <translation>Kirjanmerkkien hallinta</translation>
     </message>
     <message>
         <source>News Subscriptions</source>
@@ -220,7 +200,7 @@ Kun olet valmis, valitse&quot;OK&quot; tai &quot;Peruuta&quot; jatkaaksesi.</tra
     </message>
     <message>
         <source>[x]</source>
-        <translation>[x]</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Web Site</source>
@@ -240,15 +220,15 @@ Kun olet valmis, valitse&quot;OK&quot; tai &quot;Peruuta&quot; jatkaaksesi.</tra
     </message>
     <message>
         <source>RSS Feeds</source>
-        <translation type="obsolete">RSS syötteet</translation>
+        <translation>RSS syötteet</translation>
     </message>
     <message>
         <source>MythNews Configuration</source>
-        <translation type="obsolete">MythNews asetukset</translation>
+        <translation>MythNews asetukset</translation>
     </message>
     <message>
         <source>Minutes</source>
-        <translation type="obsolete">Minuuttia</translation>
+        <translation>Minuuttia</translation>
     </message>
     <message>
         <source>Cancel</source>

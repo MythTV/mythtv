@@ -13,64 +13,10 @@
     </message>
 </context>
 <context>
-    <name>BurnThemeUI</name>
-    <message>
-        <source>Has an intro and contains a main menu with 4 recordings per page. Does not have a chapter selection submenu.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Has an intro and contains a summary main menu with 10 recordings per page. Does not have a chapter selection submenu, recording titles, dates or category.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Has an intro and contains a main menu with 6 recordings per page. Does not have a scene selection submenu.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Has an intro and contains a main menu with 3 recordings per page and a scene selection submenu with 8 chapters points. Shows a program details page before each recording.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Has an intro and contains a main menu with 3 recordings per page and a scene selection submenu with 8 chapters points. Shows a program details page before each recording. Uses animated thumb images.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Has an intro and contains a main menu with 3 recordings per page and a scene selection submenu with 8 chapters points.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Has an intro and contains a main menu with 3 recordings per page and a scene selection submenu with 8 chapters points. All the thumb images are animated.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Creates an auto play DVD with no menus. Shows an intro movie then for each title shows a details page followed by the video in sequence.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Creates an auto play DVD with no menus and no intro.</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>DVDThemeSelector</name>
-    <message>
-        <source>No theme description file found!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Empty theme description!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Unable to open theme description file!</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>ExportNative</name>
     <message>
         <source>Cancel</source>
-        <translation type="obsolete">Peruuta</translation>
+        <translation>Peruuta</translation>
     </message>
     <message>
         <source>You need to add at least one item to archive!</source>
@@ -112,10 +58,6 @@
     <name>ImportNative</name>
     <message>
         <source>You need to select a valid chanID!</source>
-        <translation type="obsolete">Valitse kelvollinen kanava-id!</translation>
-    </message>
-    <message>
-        <source>You need to select a valid channel id!</source>
         <translation>Valitse kelvollinen kanava-id!</translation>
     </message>
     <message>
@@ -123,39 +65,27 @@
         <translation>Ei ollut mahdollista tuoda arkistoa. Tapahtui virhe ajettaessa &apos;mytharchivehelperiä&apos;</translation>
     </message>
     <message>
-        <source>Select a channel id</source>
+        <source>Select a ChanID</source>
         <translation>Valitse kanava-id</translation>
     </message>
     <message>
-        <source>Select a channel number</source>
+        <source>Select a ChanNo</source>
         <translation>Valitse kanavanumero</translation>
     </message>
     <message>
-        <source>Select a channel name</source>
-        <translation>Valitse kanavanimi</translation>
-    </message>
-    <message>
-        <source>Select a ChanID</source>
-        <translation type="obsolete">Valitse kanava-id</translation>
-    </message>
-    <message>
-        <source>Select a ChanNo</source>
-        <translation type="obsolete">Valitse kanavanumero</translation>
-    </message>
-    <message>
         <source>Select a Channel Name</source>
-        <translation type="obsolete">Valitse Kanavanimi</translation>
+        <translation>Valitse Kanavanimi</translation>
     </message>
     <message>
         <source>Select a Callsign</source>
-        <translation>Valitse kutsumanimi</translation>
+        <translation>Valitse Kutsumanimi</translation>
     </message>
 </context>
 <context>
     <name>LogViewer</name>
     <message>
         <source>Cancel</source>
-        <translation type="obsolete">Peru</translation>
+        <translation>Peruuta</translation>
     </message>
     <message>
         <source>Show Progress Log</source>
@@ -182,22 +112,14 @@
     <name>MythBurn</name>
     <message>
         <source>Cancel</source>
-        <translation type="obsolete">Peruuta</translation>
+        <translation>Peruuta</translation>
     </message>
     <message>
         <source>Using Cutlist</source>
-        <translation type="obsolete">Käyttää leikkauslistaa</translation>
-    </message>
-    <message>
-        <source>Not Using Cutlist</source>
-        <translation type="obsolete">Ei käytä leikkauslistaa</translation>
-    </message>
-    <message>
-        <source>Using Cut List</source>
         <translation>Käyttää leikkauslistaa</translation>
     </message>
     <message>
-        <source>Not Using Cut List</source>
+        <source>Not Using Cutlist</source>
         <translation>Ei käytä leikkauslistaa</translation>
     </message>
     <message>
@@ -221,20 +143,12 @@
         <translation></translation>
     </message>
     <message>
-        <source>Don&apos;t Use Cut List</source>
+        <source>Don&apos;t Use Cutlist</source>
         <translation>Älä käytä leikkauslistaa</translation>
     </message>
     <message>
-        <source>Use Cut List</source>
-        <translation>Käytä leikkauslistaa</translation>
-    </message>
-    <message>
-        <source>Don&apos;t Use Cutlist</source>
-        <translation type="obsolete">Älä käytä leikkauslistaa</translation>
-    </message>
-    <message>
         <source>Use Cutlist</source>
-        <translation type="obsolete">Käytä leikkauslistaa</translation>
+        <translation>Käytä leikkauslistaa</translation>
     </message>
     <message>
         <source>Remove Item</source>
@@ -320,11 +234,11 @@
     </message>
     <message>
         <source>FFmpeg Command</source>
-        <translation type="obsolete">FFmpeg-komento</translation>
+        <translation>FFmpeg-komento</translation>
     </message>
     <message>
         <source>Command to run FFmpeg.</source>
-        <translation type="obsolete">Komento, jolla ajetaan FFmpeg.</translation>
+        <translation>Komento, jolla ajetaan FFmpeg.</translation>
     </message>
     <message>
         <source>mplex Command</source>
@@ -394,15 +308,15 @@ Voi kestää vielä hetken.</translation>
     </message>
     <message>
         <source>Location where MythArchive should create its temporory work files. LOTS of free space required here.</source>
-        <translation type="obsolete">sijainti, johon MythArchiven tulisi luoda väliaikaisia työtiedostoja. Tähän vaaditaan PALJON tyhjää tilaa.</translation>
+        <translation>sijainti, johon MythArchiven tulisi luoda väliaikaisia työtiedostoja. Tähän vaaditaan PALJON tyhjää tilaa.</translation>
     </message>
     <message>
         <source>Always Encode to AC3</source>
-        <translation type="obsolete">Koodaa aina AC3:si</translation>
+        <translation>Koodaa aina AC3:si</translation>
     </message>
     <message>
         <source>If set audio tracks will always be re-encoded to AC3 for better compatibility with DVD players in NTSC countries.</source>
-        <translation type="obsolete">Jos asetettu, ääniraidat tullaan aina uudelleenkoodaamaan AC3:si paremman DVD-soitin yhteensopivuuden takaamiseksi NTSC -maissa.</translation>
+        <translation>Jos asetettu, ääniraidat tullaan aina uudelleenkoodaamaan AC3:si paremman DVD-soitin yhteensopivuuden takaamiseksi NTSC -maissa.</translation>
     </message>
     <message>
         <source>Copy remote files</source>
@@ -606,25 +520,15 @@ Aseta tyhjä DVD asemaan ja valitse alla oleva optio.</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="obsolete">Peruuta</translation>
+        <translation>Peruuta</translation>
     </message>
     <message>
         <source>It was not possible to run mytharchivehelper to burn the DVD.</source>
         <translation>Ei ollut mahdollista ajaa mytharchivehelper :iä DVD:n polttoon.</translation>
     </message>
-    <message>
-        <source>Location where MythArchive should create its temporary work files. LOTS of free space required here.</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>RecordingSelector</name>
-    <message>
-        <source>Retrieving Recording List.
-Please Wait...</source>
-        <translation>Hakee tallennusluetteloa.
-Ole hyvä ja odota...</translation>
-    </message>
     <message>
         <source>Clear All</source>
         <translation>Tyhjennä Kaikki</translation>
@@ -635,7 +539,7 @@ Ole hyvä ja odota...</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="obsolete">Peruuta</translation>
+        <translation>Peruuta</translation>
     </message>
     <message>
         <source>All Recordings</source>
@@ -643,7 +547,7 @@ Ole hyvä ja odota...</translation>
     </message>
     <message>
         <source>Retrieving Recording List. Please Wait...</source>
-        <translation type="obsolete">Hakee nauhoitusluetteloa...</translation>
+        <translation>Hakee nauhoitusluetteloa...</translation>
     </message>
     <message>
         <source>Either you don&apos;t have any recordings or no recordings are available locally!</source>
@@ -662,7 +566,7 @@ Ole hyvä ja odota...</translation>
     </message>
     <message>
         <source>Single Layer DVD (4482Mb)</source>
-        <translation type="obsolete">Yksikerroksinen DVD (4482Mt)</translation>
+        <translation>Yksikerroksinen DVD (4482Mt)</translation>
     </message>
     <message>
         <source>Dual Layer DVD</source>
@@ -670,15 +574,7 @@ Ole hyvä ja odota...</translation>
     </message>
     <message>
         <source>Dual Layer DVD (8964Mb)</source>
-        <translation type="obsolete">Kaksikerroksinen DVD (8964Mt)</translation>
-    </message>
-    <message>
-        <source>Single Layer DVD (4,482 MB)</source>
-        <translation>Yksikerroksinen DVD (4482 Mt)</translation>
-    </message>
-    <message>
-        <source>Dual Layer DVD (8,964 MB)</source>
-        <translation>Kaksikerroksinen DVD (8964 Mt)</translation>
+        <translation>Kaksikerroksinen DVD (8964Mt)</translation>
     </message>
     <message>
         <source>DVD +/- RW</source>
@@ -721,7 +617,7 @@ Ole hyvä ja odota...</translation>
     </message>
     <message>
         <source>%DATE%, %TIME%</source>
-        <translation>%DATE%, %TIME%</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Select Destination</source>
@@ -749,7 +645,7 @@ Ole hyvä ja odota...</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Peru</translation>
+        <translation>Peruuta</translation>
     </message>
     <message>
         <source>Previous</source>
@@ -765,7 +661,7 @@ Ole hyvä ja odota...</translation>
     </message>
     <message>
         <source>OK</source>
-        <translation>OK</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Select the file you wish to use.</source>
@@ -790,10 +686,6 @@ Ole hyvä ja odota...</translation>
     <message>
         <source>Exit</source>
         <translation>Poistu</translation>
-    </message>
-    <message>
-        <source>Up Level</source>
-        <translation>Ylätaso</translation>
     </message>
     <message>
         <source>description goes here.</source>
@@ -998,15 +890,15 @@ Ole hyvä ja odota...</translation>
     </message>
     <message>
         <source>Prev</source>
-        <translation>Edel</translation>
+        <translation>Edellinen</translation>
     </message>
     <message>
         <source>sep 13, 2004 11:00 pm (1h 15m)</source>
-        <translation>syys 13, 2004 11:00 pm (1t 15m)</translation>
+        <translation type="obsolete">syys 13, 2004 11:00 pm (1t 15m)</translation>
     </message>
     <message>
         <source>x.xx GB</source>
-        <translation>x,xx Gt</translation>
+        <translation type="obsolete">x,xx Gt</translation>
     </message>
     <message>
         <source>File Finder To Import</source>
@@ -1061,46 +953,6 @@ Ole hyvä ja odota...</translation>
         <translation>Lopeta</translation>
     </message>
     <message>
-        <source>Select Destination:</source>
-        <translation>Valitse kohde:</translation>
-    </message>
-    <message>
-        <source>Parental level: %1</source>
-        <translation>Ikäluokitus: %1</translation>
-    </message>
-    <message>
-        <source>Old size:</source>
-        <translation>Vanha koko:</translation>
-    </message>
-    <message>
-        <source>New size:</source>
-        <translation>Uusi koko:</translation>
-    </message>
-    <message>
-        <source>Select a theme:</source>
-        <translation>Valitse teema:</translation>
-    </message>
-    <message>
-        <source>Menu</source>
-        <translation>Valikko</translation>
-    </message>
-    <message>
-        <source>Chapter</source>
-        <translation>Kappale</translation>
-    </message>
-    <message>
-        <source>Detail</source>
-        <translation>Tieto</translation>
-    </message>
-    <message>
-        <source>Select File to Import</source>
-        <translation>Valitse tuotava tiedosto</translation>
-    </message>
-    <message>
-        <source>Search</source>
-        <translation type="obsolete">Etsi</translation>
-    </message>
-    <message>
         <source>Add video</source>
         <translation>Lisää video</translation>
     </message>
@@ -1136,20 +988,12 @@ Ole hyvä ja odota...</translation>
         <source>Burn DVD</source>
         <translation>Polta DVD</translation>
     </message>
-    <message>
-        <source>Channel ID:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Channel Number:</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>ThumbFinder</name>
     <message>
         <source>Cancel</source>
-        <translation type="obsolete">Peruuta</translation>
+        <translation>Peruuta</translation>
     </message>
     <message>
         <source>Menu</source>
@@ -1176,19 +1020,15 @@ Ole hyvä ja odota...</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="obsolete">Peruuta</translation>
+        <translation>Peruuta</translation>
     </message>
     <message>
         <source>All Videos</source>
         <translation>Kaikki Videot</translation>
     </message>
     <message>
-        <source>You need to enter a valid password for this parental level</source>
-        <translation>Anna salasana tälle ikäluokitukselle</translation>
-    </message>
-    <message>
         <source>Parental Pin:</source>
-        <translation type="obsolete">PIN-koodi:</translation>
+        <translation>PIN-koodi:</translation>
     </message>
     <message>
         <source>Menu</source>
