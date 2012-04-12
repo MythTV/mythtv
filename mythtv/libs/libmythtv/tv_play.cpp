@@ -456,7 +456,7 @@ bool TV::StartTV(ProgramInfo *tvrec, uint flags)
     }
 
     sendPlaybackEnd();
-    GetMythMainWindow()->PauseIdleTimer(true);
+    GetMythMainWindow()->PauseIdleTimer(false);
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "StartTV -- end");
 
