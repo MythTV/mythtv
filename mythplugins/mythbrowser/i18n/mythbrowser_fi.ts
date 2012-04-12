@@ -59,16 +59,24 @@ Käytä &apos;Lisää kirjainmerkki&apos; valikosta lisätäksesi uusia kirjainm
         <translation>Poista valinnat</translation>
     </message>
     <message>
+        <source>Are you sure you want to delete the selected bookmark?</source>
+        <translation>Haluatko varmasti poistaa valitun kirjainmerkin?</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to delete the marked bookmarks?</source>
+        <translation>Haluatko varmasti poistaa valitut kirjainmerkit?</translation>
+    </message>
+    <message>
         <source>Cancel</source>
-        <translation>Peruuta</translation>
+        <translation type="obsolete">Peruuta</translation>
     </message>
     <message>
         <source>Are you sure you want to delete the selected bookmark</source>
-        <translation>Haluatko varmasti poistaa tämän kirjainmerkin</translation>
+        <translation type="obsolete">Haluatko varmasti poistaa tämän kirjainmerkin</translation>
     </message>
     <message>
         <source>Are you sure you want to delete the marked bookmarks</source>
-        <translation>Haluatko varmasti poistaa valitut kirjainmerkit</translation>
+        <translation type="obsolete">Haluatko varmasti poistaa valitut kirjainmerkit</translation>
     </message>
 </context>
 <context>
@@ -138,7 +146,7 @@ Käytä &apos;Lisää kirjainmerkki&apos; valikosta lisätäksesi uusia kirjainm
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Peruuta</translation>
+        <translation type="obsolete">Peruuta</translation>
     </message>
     <message>
         <source>Add Bookmark</source>
@@ -172,7 +180,7 @@ Käytä &apos;Lisää kirjainmerkki&apos; valikosta lisätäksesi uusia kirjainm
     </message>
     <message>
         <source>[x]</source>
-        <translation></translation>
+        <translation>[x]</translation>
     </message>
     <message>
         <source>Name</source>
@@ -180,15 +188,19 @@ Käytä &apos;Lisää kirjainmerkki&apos; valikosta lisätäksesi uusia kirjainm
     </message>
     <message>
         <source>URL</source>
-        <translation></translation>
+        <translation>URL</translation>
     </message>
     <message>
         <source>Category:</source>
         <translation>Luokka:</translation>
     </message>
     <message>
+        <source>Web Page</source>
+        <translation>Nettisivu</translation>
+    </message>
+    <message>
         <source>%DATE%, %TIME%</source>
-        <translation></translation>
+        <translation>%DATE%, %TIME%</translation>
     </message>
     <message>
         <source>Web Bookmarks</source>
@@ -208,7 +220,7 @@ Käytä &apos;Lisää kirjainmerkki&apos; valikosta lisätäksesi uusia kirjainm
     </message>
     <message>
         <source>OK</source>
-        <translation></translation>
+        <translation>OK</translation>
     </message>
     <message>
         <source>Configure Web Browser</source>
@@ -243,6 +255,14 @@ Kun olet valmis, paina &quot;OK&quot; tai &quot;Peruuta&quot; jatkaaksesi.</tran
         <translation>Etsi</translation>
     </message>
     <message>
+        <source>Enable browser plugins (Flash, etc)</source>
+        <translation>Käytä selaimen liitännäisiä (Flash, jne)</translation>
+    </message>
+    <message>
+        <source>Enable plugins</source>
+        <translation>Salli liitännäiset</translation>
+    </message>
+    <message>
         <source>Enable plugins:</source>
         <translation>Salli liitännäiset:</translation>
     </message>
@@ -252,11 +272,11 @@ Kun olet valmis, paina &quot;OK&quot; tai &quot;Peruuta&quot; jatkaaksesi.</tran
     </message>
     <message>
         <source>URL:</source>
-        <translation></translation>
+        <translation>URL:</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Peruuta</translation>
+        <translation>Peru</translation>
     </message>
     <message>
         <source>Browser Command:</source>
@@ -265,6 +285,10 @@ Kun olet valmis, paina &quot;OK&quot; tai &quot;Peruuta&quot; jatkaaksesi.</tran
     <message>
         <source>Text Size:</source>
         <translation>Tekstin koko:</translation>
+    </message>
+    <message>
+        <source>Rating Settings</source>
+        <translation></translation>
     </message>
 </context>
 <context>
