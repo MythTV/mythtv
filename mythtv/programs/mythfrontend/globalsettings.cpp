@@ -1503,19 +1503,6 @@ static HostCheckBox *DefaultCCMode()
     return gc;
 }
 
-static HostCheckBox *PreferCC708()
-{
-    HostCheckBox *gc = new HostCheckBox("Prefer708Captions");
-    gc->setLabel(QObject::tr("Prefer EIA-708 over EIA-608 captions"));
-    gc->setValue(true);
-    gc->setHelpText(
-        QObject::tr(
-            "If enabled, the newer EIA-708 captions will be preferred over "
-            "the older EIA-608 captions in ATSC streams."));
-
-    return gc;
-}
-
 static HostCheckBox *EnableMHEG()
 {
     HostCheckBox *gc = new HostCheckBox("EnableMHEG");
@@ -3537,7 +3524,6 @@ OSDSettings::OSDSettings()
     osd->addChild(BrowseAllTuners());
     osd->addChild(CCBackground());
     osd->addChild(DefaultCCMode());
-    osd->addChild(PreferCC708());
     osd->addChild(SubtitleFont());
     osd->addChild(OSDCC708TextZoomPercentage());
     osd->addChild(SubtitleCodec());

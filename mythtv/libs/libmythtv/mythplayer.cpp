@@ -174,7 +174,7 @@ MythPlayer::MythPlayer(PlayerFlags flags)
       enableForcedSubtitles(false), disableForcedSubtitles(false),
       allowForcedSubtitles(true),
       // CC608/708
-      db_prefer708(true), cc608(this), cc708(this),
+      cc608(this), cc708(this),
       // MHEG/MHI Interactive TV visible in OSD
       itvVisible(false),
       interactiveTV(NULL),
@@ -227,7 +227,6 @@ MythPlayer::MythPlayer(PlayerFlags flags)
     captionsEnabledbyDefault = gCoreContext->GetNumSetting("DefaultCCMode");
     decode_extra_audio = gCoreContext->GetNumSetting("DecodeExtraAudio", 0);
     itvEnabled         = gCoreContext->GetNumSetting("EnableMHEG", 0);
-    db_prefer708       = gCoreContext->GetNumSetting("Prefer708Captions", 1);
     clearSavedPosition = gCoreContext->GetNumSetting("ClearSavedPosition", 1);
     endExitPrompt      = gCoreContext->GetNumSetting("EndOfRecordingExitPrompt");
     pip_default_loc    = (PIPLocation)gCoreContext->GetNumSetting("PIPLocation", kPIPTopLeft);
@@ -1667,19 +1666,19 @@ bool MythPlayer::HasCaptionTrack(int mode)
 
 int MythPlayer::NextCaptionTrack(int mode)
 {
-    // Text->TextStream->708/608->608/708->AVSubs->Teletext->NUV->None
+    // Text->TextStream->708->608->AVSubs->Teletext->NUV->None
     // NUV only offerred if PAL
     bool pal      = (vbimode == VBIMode::PAL_TT);
     int  nextmode = kDisplayNone;
 
     if (kDisplayTextSubtitle == mode)
         nextmode = kDisplayRawTextSubtitle;
-    if (kDisplayRawTextSubtitle == mode)
-        nextmode = db_prefer708 ? kDisplayCC708 : kDisplayCC608;
+    else if (kDisplayRawTextSubtitle == mode)
+        nextmode = kDisplayCC708;
     else if (kDisplayCC708 == mode)
-        nextmode = db_prefer708 ? kDisplayCC608 : kDisplayAVSubtitle;
+        nextmode = kDisplayCC608;
     else if (kDisplayCC608 == mode)
-        nextmode = db_prefer708 ? kDisplayAVSubtitle : kDisplayCC708;
+        nextmode = kDisplayAVSubtitle;
     else if (kDisplayAVSubtitle == mode)
         nextmode = kDisplayTeletextCaptions;
     else if (kDisplayTeletextCaptions == mode)

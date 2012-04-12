@@ -696,7 +696,6 @@ class MTV_PUBLIC MythPlayer
     bool      allowForcedSubtitles;
 
     // CC608/708
-    bool db_prefer708;
     CC608Reader cc608;
     CC708Reader cc708;
 
