@@ -400,7 +400,8 @@ class MTV_PUBLIC TV : public QObject
     ProgramInfo *GetLastProgram(void) const;
 
     // Seek, skip, jump, speed
-    void DoSeek(PlayerContext*, float time, const QString &mesg);
+    void DoSeek(PlayerContext*, float time, const QString &mesg,
+                bool timeIsOffset, bool honorCutlist);
     bool DoPlayerSeek(PlayerContext*, float time);
     enum ArbSeekWhence {
         ARBSEEK_SET = 0,
@@ -408,8 +409,8 @@ class MTV_PUBLIC TV : public QObject
         ARBSEEK_FORWARD,
         ARBSEEK_END
     };
-    void DoSeekAbsolute(PlayerContext *ctx, long long seconds);
-    void DoArbSeek(PlayerContext*, ArbSeekWhence whence);
+    void DoSeekAbsolute(PlayerContext *ctx, long long seconds, bool honorCutlist);
+    void DoArbSeek(PlayerContext*, ArbSeekWhence whence, bool honorCutlist);
     void DoJumpFFWD(PlayerContext *ctx);
     void DoJumpRWND(PlayerContext *ctx);
     void NormalSpeed(PlayerContext*);
