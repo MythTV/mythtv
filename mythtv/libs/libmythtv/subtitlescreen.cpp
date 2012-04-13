@@ -368,8 +368,7 @@ void SubtitleScreen::DisplayTextSubtitles(void)
         QRect oldsafe = m_safeArea;
         m_safeArea = vo->GetSafeRect();
         changed = (oldsafe != m_safeArea);
-        if (!InitializeFonts(changed))
-            return;
+        InitializeFonts(changed);
     }
     else
     {
@@ -455,8 +454,7 @@ void SubtitleScreen::DisplayRawTextSubtitles(void)
     QRect oldsafe = m_safeArea;
     m_safeArea = vo->GetSafeRect();
     changed = (oldsafe != m_safeArea);
-    if (!InitializeFonts(changed))
-        return;
+    InitializeFonts(changed);
 
     // delete old subs that may still be on screen
     DeleteAllChildren();
@@ -620,8 +618,7 @@ void SubtitleScreen::DisplayCC608Subtitles(void)
     {
         return;
     }
-    if (!InitializeFonts(changed))
-        return;
+    InitializeFonts(changed);
 
     CC608Buffer* textlist = m_608reader->GetOutputText(changed);
     if (!changed)
@@ -675,8 +672,7 @@ void SubtitleScreen::DisplayCC708Subtitles(void)
         return;
     }
 
-    if (!InitializeFonts(changed))
-        return;
+    InitializeFonts(changed);
 
     for (uint i = 0; i < 8; i++)
     {
@@ -757,31 +753,21 @@ void SubtitleScreen::AddScaledImage(QImage &img, QRect &pos)
     }
 }
 
-bool SubtitleScreen::InitializeFonts(bool wasResized)
+void SubtitleScreen::InitializeFonts(bool wasResized)
 {
-    bool success = true;
-
     if (!m_fontsAreInitialized)
     {
-        LOG(VB_GENERAL, LOG_INFO, "InitializeFonts()");
-
         int count = 0;
         foreach(QString font, m_fontNames)
         {
             MythFontProperties *mythfont = new MythFontProperties();
-            if (mythfont)
-            {
-                QFont newfont(font);
-                newfont.setStretch(m_fontStretch);
-                font.detach();
-                mythfont->SetFace(newfont);
-                m_fontSet.insert(count, mythfont);
-                count++;
-            }
+            QFont newfont(font);
+            newfont.setStretch(m_fontStretch);
+            font.detach();
+            mythfont->SetFace(newfont);
+            m_fontSet.insert(count, mythfont);
+            count++;
         }
-        success = count > 0;
-        LOG(VB_PLAYBACK, LOG_INFO, LOC +
-            QString("Loaded %1 CEA-708 fonts").arg(count));
     }
 
     if (wasResized || !m_fontsAreInitialized)
@@ -792,7 +778,6 @@ bool SubtitleScreen::InitializeFonts(bool wasResized)
     }
 
     m_fontsAreInitialized = true;
-    return success;
 }
 
 MythFontProperties* SubtitleScreen::Get708Font(CC708CharacterAttribute attr)
