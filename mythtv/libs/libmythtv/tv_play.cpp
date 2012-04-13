@@ -567,7 +567,7 @@ void TV::InitKeys(void)
     REG_KEY("TV Playback", ACTION_JUMPRWND, QT_TRANSLATE_NOOP("MythControls",
             "Jump back"), "PgUp");
     REG_KEY("TV Playback", "INFOWITHCUTLIST", QT_TRANSLATE_NOOP("MythControls",
-            "Info ignoring cutlist"), "");
+            "Info utilizing cutlist"), "");
     REG_KEY("TV Playback", ACTION_JUMPBKMRK, QT_TRANSLATE_NOOP("MythControls",
             "Jump to bookmark"), "K");
     REG_KEY("TV Playback", "FFWDSTICKY", QT_TRANSLATE_NOOP("MythControls",
