@@ -4697,62 +4697,62 @@ void MythPlayer::calcSliderPos(osdInfo &info, bool paddedFields)
                 video_frame_rate;
         }
 
-    info.values.insert(relPrefix + "secondsplayed", (int)secsplayed);
-    info.values.insert(relPrefix + "totalseconds", playbackLen);
-    info.values[relPrefix + "position"] = (int)(1000.0f * (secsplayed / (float)playbackLen));
+        info.values.insert(relPrefix + "secondsplayed", (int)secsplayed);
+        info.values.insert(relPrefix + "totalseconds", playbackLen);
+        info.values[relPrefix + "position"] = (int)(1000.0f * (secsplayed / (float)playbackLen));
 
-    int phours = (int)secsplayed / 3600;
-    int pmins = ((int)secsplayed - phours * 3600) / 60;
-    int psecs = ((int)secsplayed - phours * 3600 - pmins * 60);
+        int phours = (int)secsplayed / 3600;
+        int pmins = ((int)secsplayed - phours * 3600) / 60;
+        int psecs = ((int)secsplayed - phours * 3600 - pmins * 60);
 
-    int shours = playbackLen / 3600;
-    int smins = (playbackLen - shours * 3600) / 60;
-    int ssecs = (playbackLen - shours * 3600 - smins * 60);
+        int shours = playbackLen / 3600;
+        int smins = (playbackLen - shours * 3600) / 60;
+        int ssecs = (playbackLen - shours * 3600 - smins * 60);
 
-    int secsbehind = max((playbackLen - (int) secsplayed), 0);
-    int sbhours = secsbehind / 3600;
-    int sbmins = (secsbehind - sbhours * 3600) / 60;
-    int sbsecs = (secsbehind - sbhours * 3600 - sbmins * 60);
+        int secsbehind = max((playbackLen - (int) secsplayed), 0);
+        int sbhours = secsbehind / 3600;
+        int sbmins = (secsbehind - sbhours * 3600) / 60;
+        int sbsecs = (secsbehind - sbhours * 3600 - sbmins * 60);
 
-    QString text1, text2, text3;
-    if (paddedFields)
-    {
-        text1.sprintf("%02d:%02d:%02d", phours, pmins, psecs);
-        text2.sprintf("%02d:%02d:%02d", shours, smins, ssecs);
-        text3.sprintf("%02d:%02d:%02d", sbhours, sbmins, sbsecs);
-    }
-    else
-    {
-        if (shours > 0)
+        QString text1, text2, text3;
+        if (paddedFields)
         {
-            text1.sprintf("%d:%02d:%02d", phours, pmins, psecs);
-            text2.sprintf("%d:%02d:%02d", shours, smins, ssecs);
+            text1.sprintf("%02d:%02d:%02d", phours, pmins, psecs);
+            text2.sprintf("%02d:%02d:%02d", shours, smins, ssecs);
+            text3.sprintf("%02d:%02d:%02d", sbhours, sbmins, sbsecs);
         }
         else
         {
-            text1.sprintf("%d:%02d", pmins, psecs);
-            text2.sprintf("%d:%02d", smins, ssecs);
+            if (shours > 0)
+            {
+                text1.sprintf("%d:%02d:%02d", phours, pmins, psecs);
+                text2.sprintf("%d:%02d:%02d", shours, smins, ssecs);
+            }
+            else
+            {
+                text1.sprintf("%d:%02d", pmins, psecs);
+                text2.sprintf("%d:%02d", smins, ssecs);
+            }
+
+            if (sbhours > 0)
+            {
+                text3.sprintf("%d:%02d:%02d", sbhours, sbmins, sbsecs);
+            }
+            else if (sbmins > 0)
+            {
+                text3.sprintf("%d:%02d", sbmins, sbsecs);
+            }
+            else
+            {
+                text3 = QObject::tr("%n second(s)", "", sbsecs);
+            }
         }
 
-        if (sbhours > 0)
-        {
-            text3.sprintf("%d:%02d:%02d", sbhours, sbmins, sbsecs);
-        }
-        else if (sbmins > 0)
-        {
-            text3.sprintf("%d:%02d", sbmins, sbsecs);
-        }
-        else
-        {
-            text3 = QObject::tr("%n second(s)", "", sbsecs);
-        }
-    }
-
-    info.text[relPrefix + "description"] = QObject::tr("%1 of %2").arg(text1).arg(text2);
-    info.text[relPrefix + "playedtime"] = text1;
-    info.text[relPrefix + "totaltime"] = text2;
-    info.text[relPrefix + "remainingtime"] = islive ? QString() : text3;
-    info.text[relPrefix + "behindtime"] = islive ? text3 : QString();
+        info.text[relPrefix + "description"] = QObject::tr("%1 of %2").arg(text1).arg(text2);
+        info.text[relPrefix + "playedtime"] = text1;
+        info.text[relPrefix + "totaltime"] = text2;
+        info.text[relPrefix + "remainingtime"] = islive ? QString() : text3;
+        info.text[relPrefix + "behindtime"] = islive ? text3 : QString();
     }
 }
 
