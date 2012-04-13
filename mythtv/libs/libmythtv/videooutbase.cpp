@@ -1829,18 +1829,32 @@ void VideoOutput::InitDisplayMeasurements(uint width, uint height, bool resize)
 
 int VideoOutput::CalcHueBase(const QString &adaptor_name)
 {
+    int hue_adj = 50;
+
     // XVideo adjustments
     if ((adaptor_name == "ATI Radeon Video Overlay") ||
+        (adaptor_name == "XA G3D Textured Video") || /* ATI in VMWare*/
+        (adaptor_name == "Radeon Textured Video") || /* ATI */
+        (adaptor_name == "AMD Radeon AVIVO Video") || /* ATI */
         (adaptor_name == "XV_SWOV" /* VIA 10K & 12K */) ||
         (adaptor_name == "Savage Streams Engine" /* S3 Prosavage DDR-K */) ||
-        (adaptor_name == "SIS 300/315/330 series Video Overlay"))
+        (adaptor_name == "SIS 300/315/330 series Video Overlay") ||
+        adaptor_name.toLower().contains("xvba")) /* VAAPI */
     {
-        return 50;
+        hue_adj = 50;
+    }
+    else if (adaptor_name.left(4) == "NV17") /* nVidia */
+    {
+        hue_adj = 0;
+    }
+    else
+    {
+        LOG(VB_GENERAL, LOG_INFO, LOC +
+            QString("CalcHueBase(%1): Unknown adaptor, hue may be wrong.")
+            .arg(adaptor_name));
+        LOG(VB_GENERAL, LOG_INFO, LOC +
+            "Please open a ticket if you need to adjust the hue.");
     }
 
-    // VAAPI
-    if (adaptor_name.toLower().contains("xvba"))
-        return 50;
-
-    return 0; //< nVidia normal
+    return hue_adj;
 }
