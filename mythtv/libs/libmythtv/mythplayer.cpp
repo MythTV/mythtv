@@ -4685,9 +4685,21 @@ void MythPlayer::calcSliderPos(osdInfo &info, bool paddedFields)
     playbackLen = max(playbackLen, 1);
     secsplayed  = min((float)playbackLen, max(secsplayed, 0.0f));
 
-    info.values.insert("secondsplayed", (int)secsplayed);
-    info.values.insert("totalseconds", playbackLen);
-    info.values["position"] = (int)(1000.0f * (secsplayed / (float)playbackLen));
+    // Set the raw values, followed by the translated values.
+    for (int i = 0; i < 2 ; ++i)
+    {
+        QString relPrefix = (i == 0 ? "" : "rel");
+        if (i > 0)
+        {
+            playbackLen = deleteMap.TranslatePositionAbsToRel(playbackLen * video_frame_rate) /
+                video_frame_rate;
+            secsplayed = deleteMap.TranslatePositionAbsToRel(secsplayed * video_frame_rate) /
+                video_frame_rate;
+        }
+
+    info.values.insert(relPrefix + "secondsplayed", (int)secsplayed);
+    info.values.insert(relPrefix + "totalseconds", playbackLen);
+    info.values[relPrefix + "position"] = (int)(1000.0f * (secsplayed / (float)playbackLen));
 
     int phours = (int)secsplayed / 3600;
     int pmins = ((int)secsplayed - phours * 3600) / 60;
@@ -4736,11 +4748,12 @@ void MythPlayer::calcSliderPos(osdInfo &info, bool paddedFields)
         }
     }
 
-    info.text["description"] = QObject::tr("%1 of %2").arg(text1).arg(text2);
-    info.text["playedtime"] = text1;
-    info.text["totaltime"] = text2;
-    info.text["remainingtime"] = islive ? QString() : text3;
-    info.text["behindtime"] = islive ? text3 : QString();
+    info.text[relPrefix + "description"] = QObject::tr("%1 of %2").arg(text1).arg(text2);
+    info.text[relPrefix + "playedtime"] = text1;
+    info.text[relPrefix + "totaltime"] = text2;
+    info.text[relPrefix + "remainingtime"] = islive ? QString() : text3;
+    info.text[relPrefix + "behindtime"] = islive ? text3 : QString();
+    }
 }
 
 int MythPlayer::GetNumChapters()
