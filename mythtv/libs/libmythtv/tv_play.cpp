@@ -456,7 +456,7 @@ bool TV::StartTV(ProgramInfo *tvrec, uint flags)
     }
 
     sendPlaybackEnd();
-    GetMythMainWindow()->PauseIdleTimer(true);
+    GetMythMainWindow()->PauseIdleTimer(false);
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "StartTV -- end");
 
@@ -566,6 +566,8 @@ void TV::InitKeys(void)
             "Jump ahead"), "PgDown");
     REG_KEY("TV Playback", ACTION_JUMPRWND, QT_TRANSLATE_NOOP("MythControls",
             "Jump back"), "PgUp");
+    REG_KEY("TV Playback", "INFOWITHCUTLIST", QT_TRANSLATE_NOOP("MythControls",
+            "Info utilizing cutlist"), "");
     REG_KEY("TV Playback", ACTION_JUMPBKMRK, QT_TRANSLATE_NOOP("MythControls",
             "Jump to bookmark"), "K");
     REG_KEY("TV Playback", "FFWDSTICKY", QT_TRANSLATE_NOOP("MythControls",
@@ -3188,15 +3190,19 @@ void TV::PrepToSwitchToRecordedProgram(PlayerContext *ctx,
     SetExitPlayer(true, true);
 }
 
-void TV::PrepareToExitPlayer(PlayerContext *ctx, int line, bool bookmark)
+void TV::PrepareToExitPlayer(PlayerContext *ctx, int line, BookmarkAction bookmark)
 {
-    bool bookmark_it = bookmark && IsBookmarkAllowed(ctx);
+    bool bm_basic =
+        (bookmark == kBookmarkAlways ||
+         (bookmark == kBookmarkAuto && db_playback_exit_prompt == 2));
+    bool bookmark_it = bm_basic && IsBookmarkAllowed(ctx);
     ctx->LockDeletePlayer(__FILE__, line);
     if (ctx->player)
     {
-        if (bookmark_it && (!(ctx->player->IsNearEnd()) ||
-                            StateIsRecording(GetState(ctx))))
-            SetBookmark(ctx);
+        if (bookmark_it)
+            SetBookmark(ctx,
+                        (ctx->player->IsNearEnd() || getEndOfRecording())
+                        && !StateIsRecording(GetState(ctx)));
         if (db_auto_set_watched)
             ctx->player->SetWatched();
     }
@@ -3264,7 +3270,7 @@ void TV::HandleEndOfPlaybackTimerEvent(void)
         if (mctx == ctx)
         {
             endOfRecording = true;
-            PrepareToExitPlayer(mctx, __LINE__, false);
+            PrepareToExitPlayer(mctx, __LINE__);
             SetExitPlayer(true, true);
         }
     }
@@ -4148,25 +4154,21 @@ bool TV::ActiveHandleAction(PlayerContext *ctx,
     else if (has_action(ACTION_JUMPBKMRK, actions))
     {
         ctx->LockDeletePlayer(__FILE__, __LINE__);
-        long long bookmark = ctx->player->GetBookmark();
-        long long curloc   = ctx->player->GetFramesPlayed();
+        uint64_t bookmark  = ctx->player->GetBookmark();
         float     rate     = ctx->player->GetFrameRate();
-        long long seekloc = (long long) ((bookmark - curloc) / rate);
+        float seekloc = ctx->player->TranslatePositionAbsToRel(bookmark) / rate;
         ctx->UnlockDeletePlayer(__FILE__, __LINE__);
 
         if (bookmark > rate)
-            DoSeek(ctx, seekloc, tr("Jump to Bookmark"));
+            DoSeek(ctx, seekloc, tr("Jump to Bookmark"),
+                   /*timeIsOffset*/false,
+                   /*honorCutlist*/true);
     }
     else if (has_action(ACTION_JUMPSTART,actions))
     {
-        long long seekloc = +1;
-        ctx->LockDeletePlayer(__FILE__, __LINE__);
-        seekloc = (int64_t) (-1.0 * ctx->player->GetFramesPlayed() /
-                             ctx->player->GetFrameRate());
-        ctx->UnlockDeletePlayer(__FILE__, __LINE__);
-
-        if (seekloc <= 0)
-            DoSeek(ctx, seekloc, tr("Jump to Beginning"));
+        DoSeek(ctx, 0, tr("Jump to Beginning"),
+               /*timeIsOffset*/false,
+               /*honorCutlist*/true);
     }
     else if (has_action(ACTION_CLEAROSD, actions))
     {
@@ -4216,7 +4218,7 @@ bool TV::ActiveHandleAction(PlayerContext *ctx,
     }
     else if (has_action(ACTION_STOP, actions))
     {
-        PrepareToExitPlayer(ctx, __LINE__, false);
+        PrepareToExitPlayer(ctx, __LINE__);
         SetExitPlayer(true, true);
     }
     else if (has_action(ACTION_EXITSHOWNOPROMPTS, actions))
@@ -4272,7 +4274,7 @@ bool TV::ActiveHandleAction(PlayerContext *ctx,
                 ShowOSDStopWatchingRecording(ctx);
                 return handled;
             }
-            PrepareToExitPlayer(ctx, __LINE__, db_playback_exit_prompt == 2);
+            PrepareToExitPlayer(ctx, __LINE__);
             requestDelete = false;
             do_exit = true;
         }
@@ -4324,11 +4326,13 @@ bool TV::ActiveHandleAction(PlayerContext *ctx,
         ChangeTimeStretch(ctx, -1);
     else if (has_action("MENU", actions))
         ShowOSDMenu(ctx);
-    else if (has_action("INFO", actions))
+    else if (has_action("INFO", actions) ||
+             has_action("INFOWITHCUTLIST", actions))
     {
         if (HasQueuedInput())
         {
-            DoArbSeek(ctx, ARBSEEK_SET);
+            DoArbSeek(ctx, ARBSEEK_SET,
+                      has_action("INFOWITHCUTLIST", actions));
         }
         else
             ToggleOSD(ctx, true);
@@ -4814,15 +4818,24 @@ void TV::ProcessNetworkControlCommand(PlayerContext *ctx,
         ctx->UnlockDeletePlayer(__FILE__, __LINE__);
 
         if (tokens[2] == "BEGINNING")
-            DoSeek(ctx, -fplay, tr("Jump to Beginning"));
+            DoSeek(ctx, 0, tr("Jump to Beginning"),
+                   /*timeIsOffset*/false,
+                   /*honorCutlist*/true);
         else if (tokens[2] == "FORWARD")
-            DoSeek(ctx, ctx->fftime, tr("Skip Ahead"));
+            DoSeek(ctx, ctx->fftime, tr("Skip Ahead"),
+                   /*timeIsOffset*/true,
+                   /*honorCutlist*/true);
         else if (tokens[2] == "BACKWARD")
-            DoSeek(ctx, -ctx->rewtime, tr("Skip Back"));
-        else if ((tokens[2] == "POSITION") && (tokens.size() == 4) &&
+            DoSeek(ctx, -ctx->rewtime, tr("Skip Back"),
+                   /*timeIsOffset*/true,
+                   /*honorCutlist*/true);
+        else if ((tokens[2] == "POSITION" ||
+                  tokens[2] == "POSITIONWITHCUTLIST") &&
+                 (tokens.size() == 4) &&
                  (tokens[3].contains(QRegExp("^\\d+$"))))
         {
-            DoSeekAbsolute(ctx, tokens[3].toInt());
+            DoSeekAbsolute(ctx, tokens[3].toInt(),
+                           tokens[2] == "POSITIONWITHCUTLIST");
         }
     }
     else if (tokens.size() >= 3 && tokens[1] == "VOLUME")
@@ -5856,7 +5869,8 @@ bool TV::SeekHandleAction(PlayerContext *actx, const QStringList &actions,
                           const bool isDVD)
 {
     const int kRewind = 4, kForward = 8, kSticky = 16, kSlippery = 32,
-              kRelative = 64, kAbsolute = 128, kWhenceMask = 3;
+              kRelative = 64, kAbsolute = 128, kIgnoreCutlist = 256,
+              kWhenceMask = 3;
     int flags = 0;
     if (has_action(ACTION_SEEKFFWD, actions))
         flags = ARBSEEK_FORWARD | kForward | kSlippery | kRelative;
@@ -5876,7 +5890,8 @@ bool TV::SeekHandleAction(PlayerContext *actx, const QStringList &actions,
     int direction = (flags & kRewind) ? -1 : 1;
     if (HasQueuedInput())
     {
-        DoArbSeek(actx, static_cast<ArbSeekWhence>(flags & kWhenceMask));
+        DoArbSeek(actx, static_cast<ArbSeekWhence>(flags & kWhenceMask),
+                  !(flags & kIgnoreCutlist));
     }
     else if (ContextIsPaused(actx, __FILE__, __LINE__))
     {
@@ -5891,7 +5906,9 @@ bool TV::SeekHandleAction(PlayerContext *actx, const QStringList &actions,
                              direction * (1.001 / rate);
             QString message = (flags & kRewind) ? QString(tr("Rewind")) :
                                                  QString(tr("Forward"));
-            DoSeek(actx, time, message);
+            DoSeek(actx, time, message,
+                   /*timeIsOffset*/true,
+                   /*honorCutlist*/!(flags & kIgnoreCutlist));
         }
     }
     else if (flags & kSticky)
@@ -5902,19 +5919,26 @@ bool TV::SeekHandleAction(PlayerContext *actx, const QStringList &actions,
     {
             if (smartForward)
                 doSmartForward = true;
-            DoSeek(actx, -actx->rewtime, tr("Skip Back"));
+            DoSeek(actx, -actx->rewtime, tr("Skip Back"),
+                   /*timeIsOffset*/true,
+                   /*honorCutlist*/!(flags & kIgnoreCutlist));
     }
     else
     {
         if (smartForward & doSmartForward)
-            DoSeek(actx, actx->rewtime, tr("Skip Ahead"));
+            DoSeek(actx, actx->rewtime, tr("Skip Ahead"),
+                   /*timeIsOffset*/true,
+                   /*honorCutlist*/!(flags & kIgnoreCutlist));
         else
-            DoSeek(actx, actx->fftime, tr("Skip Ahead"));
+            DoSeek(actx, actx->fftime, tr("Skip Ahead"),
+                   /*timeIsOffset*/true,
+                   /*honorCutlist*/!(flags & kIgnoreCutlist));
     }
     return true;
 }
 
-void TV::DoSeek(PlayerContext *ctx, float time, const QString &mesg)
+void TV::DoSeek(PlayerContext *ctx, float time, const QString &mesg,
+                bool timeIsOffset, bool honorCutlist)
 {
     bool limitkeys = false;
 
@@ -5928,12 +5952,27 @@ void TV::DoSeek(PlayerContext *ctx, float time, const QString &mesg)
         keyRepeatTimer.start();
         NormalSpeed(ctx);
         time += StopFFRew(ctx);
+        float framerate = ctx->player->GetFrameRate();
+        uint64_t currentFrameAbs = ctx->player->GetFramesPlayed();
+        uint64_t currentFrameRel = honorCutlist ?
+            ctx->player->TranslatePositionAbsToRel(currentFrameAbs) :
+            currentFrameAbs;
+        int64_t desiredFrameRel = (timeIsOffset ? currentFrameRel : 0) +
+            time * framerate + 0.5;
+        if (desiredFrameRel < 0)
+            desiredFrameRel = 0;
+        uint64_t desiredFrameAbs = honorCutlist ?
+            ctx->player->TranslatePositionRelToAbs(desiredFrameRel) :
+            desiredFrameRel;
+        time = ((int64_t)desiredFrameAbs - (int64_t)currentFrameAbs) /
+            framerate;
         DoPlayerSeek(ctx, time);
         UpdateOSDSeekMessage(ctx, mesg, kOSDTimeout_Med);
     }
 }
 
-void TV::DoSeekAbsolute(PlayerContext *ctx, long long seconds)
+void TV::DoSeekAbsolute(PlayerContext *ctx, long long seconds,
+                        bool honorCutlist)
 {
     ctx->LockDeletePlayer(__FILE__, __LINE__);
     if (!ctx->player)
@@ -5941,12 +5980,14 @@ void TV::DoSeekAbsolute(PlayerContext *ctx, long long seconds)
         ctx->UnlockDeletePlayer(__FILE__, __LINE__);
         return;
     }
-    seconds -= (ctx->player->GetFramesPlayed() - 1) / ctx->player->GetFrameRate();
     ctx->UnlockDeletePlayer(__FILE__, __LINE__);
-    DoSeek(ctx, seconds, tr("Jump To"));
+    DoSeek(ctx, seconds, tr("Jump To"),
+           /*timeIsOffset*/false,
+           honorCutlist);
 }
 
-void TV::DoArbSeek(PlayerContext *ctx, ArbSeekWhence whence)
+void TV::DoArbSeek(PlayerContext *ctx, ArbSeekWhence whence,
+                   bool honorCutlist)
 {
     bool ok = false;
     int seek = GetQueuedInputAsInt(&ok);
@@ -5957,9 +5998,11 @@ void TV::DoArbSeek(PlayerContext *ctx, ArbSeekWhence whence)
     float time = ((seek / 100) * 3600) + ((seek % 100) * 60);
 
     if (whence == ARBSEEK_FORWARD)
-        DoSeek(ctx, time, tr("Jump Ahead"));
+        DoSeek(ctx, time, tr("Jump Ahead"),
+               /*timeIsOffset*/true, honorCutlist);
     else if (whence == ARBSEEK_REWIND)
-        DoSeek(ctx, -time, tr("Jump Back"));
+        DoSeek(ctx, -time, tr("Jump Back"),
+               /*timeIsOffset*/true, honorCutlist);
     else if (whence == ARBSEEK_END)
     {
         ctx->LockDeletePlayer(__FILE__, __LINE__);
@@ -5971,10 +6014,11 @@ void TV::DoArbSeek(PlayerContext *ctx, ArbSeekWhence whence)
         time = (ctx->player->CalcMaxFFTime(LONG_MAX, false) /
                 ctx->player->GetFrameRate()) - time;
         ctx->UnlockDeletePlayer(__FILE__, __LINE__);
-        DoSeek(ctx, time, tr("Jump To"));
+        DoSeek(ctx, time, tr("Jump To"),
+               /*timeIsOffset*/(whence != ARBSEEK_SET), honorCutlist);
     }
     else
-        DoSeekAbsolute(ctx, time);
+        DoSeekAbsolute(ctx, time, honorCutlist);
 }
 
 void TV::NormalSpeed(PlayerContext *ctx)
@@ -6906,7 +6950,8 @@ bool TV::CommitQueuedInput(PlayerContext *ctx)
     {
         commited = true;
         if (HasQueuedInput())
-            DoArbSeek(ctx, ARBSEEK_FORWARD);
+            // XXX Should the cutlist be honored?
+            DoArbSeek(ctx, ARBSEEK_FORWARD, /*honorCutlist*/false);
     }
     else if (StateIsLiveTV(GetState(ctx)))
     {
@@ -7066,7 +7111,7 @@ void TV::ChangeChannel(PlayerContext *ctx, uint chanid, const QString &chan)
     bool getit = false;
     if (ctx->recorder)
     {
-        if ((ctx->pseudoLiveTVState == kPseudoRecording) || chanid)
+        if (ctx->pseudoLiveTVState == kPseudoRecording)
         {
             getit = true;
         }
@@ -8690,7 +8735,7 @@ void TV::customEvent(QEvent *e)
         else if (message == ACTION_SWITCHANGLE)
             DoSwitchAngle(ctx, value);
         else if (message == ACTION_SEEKABSOLUTE)
-            DoSeekAbsolute(ctx, value);
+            DoSeekAbsolute(ctx, value, /*honorCutlist*/true);
         ReturnPlayerLock(ctx);
     }
 
@@ -8915,8 +8960,7 @@ void TV::customEvent(QEvent *e)
         for (uint i = 0; mctx && (i < player.size()); i++)
         {
             PlayerContext *ctx = GetPlayer(mctx, i);
-            PrepareToExitPlayer(ctx, __LINE__, db_playback_exit_prompt == 1 ||
-                                               db_playback_exit_prompt == 2);
+            PrepareToExitPlayer(ctx, __LINE__);
         }
 
         SetExitPlayer(true, true);
@@ -10068,7 +10112,7 @@ void TV::OSDDialogEvent(int result, QString text, QString action)
         DoTogglePause(actx, true);
     else if (action == ACTION_STOP)
     {
-        PrepareToExitPlayer(actx, __LINE__, false);
+        PrepareToExitPlayer(actx, __LINE__);
         SetExitPlayer(true, true);
     }
     else if (action == ACTION_JUMPFFWD)
@@ -11970,7 +12014,9 @@ void TV::DoJumpFFWD(PlayerContext *ctx)
     else if (GetNumChapters(ctx) > 0)
         DoJumpChapter(ctx, 9999);
     else
-        DoSeek(ctx, ctx->jumptime * 60, tr("Jump Ahead"));
+        DoSeek(ctx, ctx->jumptime * 60, tr("Jump Ahead"),
+               /*timeIsOffset*/true,
+               /*honorCutlist*/true);
 }
 
 void TV::DoJumpRWND(PlayerContext *ctx)
@@ -11980,7 +12026,9 @@ void TV::DoJumpRWND(PlayerContext *ctx)
     else if (GetNumChapters(ctx) > 0)
         DoJumpChapter(ctx, -1);
     else
-        DoSeek(ctx, -ctx->jumptime * 60, tr("Jump Back"));
+        DoSeek(ctx, -ctx->jumptime * 60, tr("Jump Back"),
+               /*timeIsOffset*/true,
+               /*honorCutlist*/true);
 }
 
 /*  \fn TV::DVDJumpBack(PlayerContext*)
@@ -12006,7 +12054,9 @@ void TV::DVDJumpBack(PlayerContext *ctx)
         uint chapterLength = dvdrb->GetChapterLength();
         if ((titleLength == chapterLength) && chapterLength > 300)
         {
-            DoSeek(ctx, -ctx->jumptime * 60, tr("Jump Back"));
+            DoSeek(ctx, -ctx->jumptime * 60, tr("Jump Back"),
+                   /*timeIsOffset*/true,
+                   /*honorCutlist*/true);
         }
         else
         {
@@ -12049,7 +12099,9 @@ void TV::DVDJumpForward(PlayerContext *ctx)
              (currentTime < (chapterLength - (ctx->jumptime * 60))) &&
              chapterLength > 300)
         {
-            DoSeek(ctx, ctx->jumptime * 60, tr("Jump Ahead"));
+            DoSeek(ctx, ctx->jumptime * 60, tr("Jump Ahead"),
+                   /*timeIsOffset*/true,
+                   /*honorCutlist*/true);
         }
         else
         {
@@ -12319,7 +12371,7 @@ bool TV::HandleOSDVideoExit(PlayerContext *ctx, QString action)
     }
     else if (action == "SAVEPOSITIONANDEXIT" && bookmark_ok)
     {
-        PrepareToExitPlayer(ctx, __LINE__);
+        PrepareToExitPlayer(ctx, __LINE__, kBookmarkAlways);
         SetExitPlayer(true, true);
     }
     else if (action == "KEEPWATCHING" && !near_end)

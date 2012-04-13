@@ -1951,6 +1951,18 @@ NULL
     if (dbver == "1299")
     {
         const char *updates[] = {
+"ALTER TABLE recordmatch ADD COLUMN findid INT NOT NULL DEFAULT 0",
+"ALTER TABLE recordmatch ADD INDEX (recordid, findid)",
+NULL
+};
+
+        if (!performActualUpdate(updates, "1300", dbver))
+            return false;
+    }
+
+    if (dbver == "1300")
+    {
+        const char *updates[] = {
 "ALTER TABLE channel ADD COLUMN iptvid SMALLINT(6) UNSIGNED;",
 "CREATE TABLE iptv_channel ("
 "  iptvid SMALLINT(6) UNSIGNED NOT NULL auto_increment,"
@@ -1966,7 +1978,7 @@ NULL
 NULL
 };
 
-        if (!performActualUpdate(updates, "1300", dbver))
+        if (!performActualUpdate(updates, "1301", dbver))
             return false;
     }
 

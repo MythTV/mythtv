@@ -66,6 +66,16 @@ class MTV_PUBLIC DeleteMap
     bool     IsTemporaryMark(uint64_t frame) const;
     bool     HasTemporaryMark(void) const;
     uint64_t GetLastFrame(uint64_t total) const;
+    uint64_t TranslatePositionAbsToRel(uint64_t absPosition) const {
+        return TranslatePositionAbsToRel(m_deleteMap, absPosition);
+    }
+    uint64_t TranslatePositionRelToAbs(uint64_t relPosition) const {
+        return TranslatePositionRelToAbs(m_deleteMap, relPosition);
+    }
+    static uint64_t TranslatePositionAbsToRel(const frm_dir_map_t &deleteMap,
+                                              uint64_t absPosition);
+    static uint64_t TranslatePositionRelToAbs(const frm_dir_map_t &deleteMap,
+                                              uint64_t relPosition);
 
     void TrackerReset(uint64_t frame, uint64_t total);
     bool TrackerWantsToJump(uint64_t frame, uint64_t total, uint64_t &to);

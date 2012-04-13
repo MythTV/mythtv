@@ -422,6 +422,8 @@ bool BumpScope::draw(QPainter *p, const QColor &back)
         return false;
     }
 
+    (void)back;
+
     m_ilx = m_x;
     m_ily = m_y;
 

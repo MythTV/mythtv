@@ -8,7 +8,7 @@
 #include "mythcorecontext.h"
 
 // libmythtv
-#include "scheduledrecording.h" // For signalChange()
+#include "scheduledrecording.h" // For RescheduleMatch()
 #include "playgroup.h" // For GetInitialName()
 #include "recordingprofile.h" // For constants
 #include "mythmiscutil.h"
@@ -380,7 +380,8 @@ bool RecordingRule::Save(bool sendSig)
         m_recordID = query.lastInsertId().toInt();
 
     if (sendSig)
-        ScheduledRecording::signalChange(m_recordID);
+        ScheduledRecording::RescheduleMatch(m_recordID, 0, 0, QDateTime(),
+            QString("SaveRule %1").arg(m_title));
 
     return true;
 }
@@ -408,7 +409,8 @@ bool RecordingRule::Delete(bool sendSig)
     }
 
     if (sendSig)
-        ScheduledRecording::signalChange(m_recordID);
+        ScheduledRecording::RescheduleMatch(m_recordID, 0, 0, QDateTime(),
+            QString("DeleteRule %1").arg(m_title));
 
     // Set m_recordID to zero, the rule is no longer in the database so it's
     // not valid. Should you want, this allows a rule to be removed from the

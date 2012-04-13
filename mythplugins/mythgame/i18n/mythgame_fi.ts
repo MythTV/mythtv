@@ -2,6 +2,50 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="fi_FI">
 <context>
+    <name>GameHandler</name>
+    <message>
+        <source>%1 appears to be missing.
+Remove it from the database?</source>
+        <translation>Tiedostoa %1 ei ole olemassa.
+Poistetaanko se tietokannasta?</translation>
+    </message>
+    <message>
+        <source>No</source>
+        <translation>Ei</translation>
+    </message>
+    <message>
+        <source>No to all</source>
+        <translation>Ei kaikkiin</translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation>Kyllä</translation>
+    </message>
+    <message>
+        <source>Yes to all</source>
+        <translation>Kyllä kaikkiin</translation>
+    </message>
+    <message>
+        <source>This will clear all game metadata from the database. Are you sure you want to do this?</source>
+        <translation>Poistetaan kaikki metatiedot pelitietokannasta. Oletko varma?</translation>
+    </message>
+</context>
+<context>
+    <name>GameScanner</name>
+    <message>
+        <source>Verifying game files...</source>
+        <translation>Tarkistetaan pelitiedostoja...</translation>
+    </message>
+    <message>
+        <source>Updating game database...</source>
+        <translation>Päivitetään pelitietokantaa...</translation>
+    </message>
+    <message>
+        <source>Searching for games...</source>
+        <translation>Etsitään pelejä...</translation>
+    </message>
+</context>
+<context>
     <name>GameUI</name>
     <message>
         <source>Favorites</source>
@@ -34,6 +78,10 @@
     <message>
         <source>Cancel</source>
         <translation>Peruuta</translation>
+    </message>
+    <message>
+        <source>Scan For Changes</source>
+        <translation>Etsi muutoksia</translation>
     </message>
     <message>
         <source>Show Information</source>
@@ -76,7 +124,7 @@
     </message>
     <message>
         <source>Show incremental search dialog</source>
-        <translation>Näytä inkrementaalinen hakudialogi</translation>
+        <translation>Näytä inkrementaalisen haun ikkuna</translation>
     </message>
     <message>
         <source>Incremental search find next match</source>
@@ -95,11 +143,19 @@
     </message>
     <message>
         <source>Edit..</source>
-        <translation>Muokkaa..</translation>
+        <translation type="obsolete">Muokkaa..</translation>
     </message>
     <message>
         <source>Delete..</source>
-        <translation>Poista..</translation>
+        <translation type="obsolete">Poista..</translation>
+    </message>
+    <message>
+        <source>Edit...</source>
+        <translation>Muokkaa...</translation>
+    </message>
+    <message>
+        <source>Delete...</source>
+        <translation>Poista...</translation>
     </message>
     <message>
         <source>Are you sure you want to delete this item?</source>
@@ -125,8 +181,40 @@
         <translation>Pelien näyttämisjärjestys</translation>
     </message>
     <message>
+        <source>Favorite display order</source>
+        <translation>Suosikkien näyttämisjärjestys</translation>
+    </message>
+    <message>
+        <source>Order in which to sort the games marked as favorites - this is for all systems. Available choices: system, year, genre and gamename</source>
+        <translation>Järjestys, jolla suosikeiksi merkityt pelit järjestellään - pätee kaikille järjestelmille. Vaihtoehdot: järjestelmä, vuosi, lajityyppi ja pelin nimi</translation>
+    </message>
+    <message>
+        <source>Enabling this causes a game scan to gather CRC values and attempt to find out more detailed information about the game: NOTE this can greatly increase the time a game scan takes based on the amount of games scanned.</source>
+        <translation>Tämän mahdollistaminen aiheuttaa, että peli kerää CRC arvoja ja yrittää etsiä tarkempaa tietoa pelistä. Huom! Tämä voi nostaa pelien tarkistuksen viemää etsintäaikaa, pelien lukumäärästä riippuen, huomattavan paljon.</translation>
+    </message>
+    <message>
+        <source>Prompt for removal of deleted ROM(s)</source>
+        <translation>Vahvista poistettujen ROM:ien siivoaminen</translation>
+    </message>
+    <message>
+        <source>This enables a prompt for removing deleted ROMs from the database during a  game scan</source>
+        <translation>Tämä aktivoi varmistuksen kysymisen poistettujen ROM:n tuhoamiseksi tietokannasta pelien tarkistuksen yhteydessä</translation>
+    </message>
+    <message>
+        <source>Enabling this causes the filenames to be displayed in the game tree rather than the trimmed/looked up game name</source>
+        <translation>Tämä vaihtaa tiedostojen nimet näkyviin pelipuussa siistittyjen/haettujen nimien sijaan</translation>
+    </message>
+    <message>
         <source>MythGame Settings -- General</source>
         <translation>MythGame:n Asetukset -- Yleiset</translation>
+    </message>
+    <message>
+        <source>Allow games to span multiple ROMs/disks</source>
+        <translation>Salli pelien olla useilla ROM:eilla/levyillä</translation>
+    </message>
+    <message>
+        <source>Binary and optional parameters. Multiple commands separated with &apos;;&apos; . Use %s for the ROM name. %d1, %d2, %d3 and %d4 represent disks in a multidisk/game. %s auto appended if not specified</source>
+        <translation>Binääri- ja valinnaisasetukset. Useammat komennot erotellaan puolipisteellä, ( ; ). Käytä %s ROM:n nimeä varten. %d1, %d2, %d3 ja %d4 kuvaavat levyjä monilevypelissä. %s lisätään automaattisesti ellei muuten määritelty</translation>
     </message>
     <message>
         <source>Unknown</source>
@@ -138,11 +226,11 @@
     </message>
     <message>
         <source>Favourite display order</source>
-        <translation>Suosikkien näyttämisjärjestys</translation>
+        <translation type="obsolete">Suosikkien näyttämisjärjestys</translation>
     </message>
     <message>
         <source>Order in which to sort the games marked as favourites - this is for all systems. Available choices: system, year, genre and gamename</source>
-        <translation>Järjstys, jolla suosikeiksi merkityt pelit järjestellään - kaikilla järjestelmillä. Vaihtoehdot: järjestelmä, vuosi, lajityyppi ja pelin nimi</translation>
+        <translation type="obsolete">Järjstys, jolla suosikeiksi merkityt pelit järjestellään - kaikilla järjestelmillä. Vaihtoehdot: järjestelmä, vuosi, lajityyppi ja pelin nimi</translation>
     </message>
     <message>
         <source>Indepth Game Scan</source>
@@ -150,7 +238,7 @@
     </message>
     <message>
         <source>Enabling this causes a game scan to gather crc values and attempt to find out more detailed information about the game: NOTE this can greatly increase the time a gamescan takes based on the amount of games scanned.</source>
-        <translation>Tämän mahdollistaminen aiheuttaa, että peli kerää crc arvoja ja yrittää etsiä tarkempaa tietoa pelistä. Huom! Tämä voi nostaa gamescannin viemää etsintäaikaa, pelien lukumäärästä riippuen, huomattavan paljon.</translation>
+        <translation type="obsolete">Tämän mahdollistaminen aiheuttaa, että peli kerää crc arvoja ja yrittää etsiä tarkempaa tietoa pelistä. Huom! Tämä voi nostaa gamescannin viemää etsintäaikaa, pelien lukumäärästä riippuen, huomattavan paljon.</translation>
     </message>
     <message>
         <source>Directory where Game Screenshots are stored</source>
@@ -178,7 +266,7 @@
     </message>
     <message>
         <source>Allow games to span multiple roms/disks</source>
-        <translation>Salli pelien olla useilla levyillä/rom-kuvilla</translation>
+        <translation type="obsolete">Salli pelien olla useilla levyillä/rom-kuvilla</translation>
     </message>
     <message>
         <source>This setting means that we will look for items like game.1.rom, game.2.rom and consider them a single game.</source>
@@ -189,6 +277,10 @@
         <translation>Komento</translation>
     </message>
     <message>
+        <source>Binary and optional parameters. Multiple commands separated with &apos;;&apos; . Use %s for the rom name. %d1, %d2, %d3 and %d4 represent disks in a multidisk/game. %s auto appended if not specified</source>
+        <translation type="obsolete">Binääri- ja valinnaisasetukset. Useammat komennot erotellaan puolipisteellä, ( ; ). Käytä %s ROM:n nimeä varten. %d1, %d2 ja %d3 kuvaavat levyjä monilevypelissä. %s lisätään automaattisesti ellei muuten määritelty</translation>
+    </message>
+    <message>
         <source>Type</source>
         <translation>Tyyppi</translation>
     </message>
@@ -197,8 +289,12 @@
         <translation>Pelin/Emulaattorin tyyppi. Tämä on enimmäkseen tietoperäisiä syitä varten ja ja sillä on hyvin vähän vaikutusta järjestelmäsi toimintaan.</translation>
     </message>
     <message>
+        <source>ROM Path</source>
+        <translation>ROM -polku</translation>
+    </message>
+    <message>
         <source>Rom Path</source>
-        <translation>Rom-kuvien Polku</translation>
+        <translation type="obsolete">Rom-kuvien Polku</translation>
     </message>
     <message>
         <source>Location of the ROM files for this emulator</source>
@@ -215,6 +311,10 @@
     <message>
         <source>File Extensions</source>
         <translation>Tiedostojen Päätteet</translation>
+    </message>
+    <message>
+        <source>A comma separated list of all file extensions for this emulator. Blank means any file under ROM PATH is considered to be used with this emulator</source>
+        <translation>Pilkuilla erotettu luettelo kaikista tiedostopäätteistä tälle emulaattorille. Tyhjä tarkoittaa minkä tahansa ROM -polusta löytyvän tiedoston käytön sallimista tälle emulaattorille</translation>
     </message>
     <message>
         <source>Game Player Setup</source>
@@ -274,11 +374,11 @@
     </message>
     <message>
         <source>Prompt for removal of deleted rom(s)</source>
-        <translation>Kysy poistetuista ROM:sta</translation>
+        <translation type="obsolete">Kysy poistetuista ROM:sta</translation>
     </message>
     <message>
         <source>This enables a prompt for removing deleted roms from the database during a  gamescan</source>
-        <translation>Tämä mahdollistaa varmistuksen kysymistä poistettujen ROM:n tuhoamiseksi tietokannasta gamescannin yhteydessä</translation>
+        <translation type="obsolete">Tämä mahdollistaa varmistuksen kysymistä poistettujen ROM:n tuhoamiseksi tietokannasta gamescannin yhteydessä</translation>
     </message>
     <message>
         <source>Display Files Names in Game Tree</source>
@@ -286,7 +386,7 @@
     </message>
     <message>
         <source>Enabling this causes the filenames to be displayed in the game tree rather than the trimmed/looked up gamename</source>
-        <translation>Tämän mahdollistaminen aiheuttaa tiedostonimen näyttämisen pelin järjestelmäpuussa, sen sijaan, että siinä näytetään putsattu/kaunisteltu pelinimi</translation>
+        <translation type="obsolete">Tämän mahdollistaminen aiheuttaa tiedostonimen näyttämisen pelin järjestelmäpuussa, sen sijaan, että siinä näytetään putsattu/kaunisteltu pelinimi</translation>
     </message>
     <message>
         <source>19xx</source>
@@ -294,43 +394,51 @@
     </message>
     <message>
         <source>0</source>
-        <translation></translation>
+        <translation>0</translation>
+    </message>
+    <message>
+        <source>Verifying %1 files...</source>
+        <translation>Tarkistetaan %1 tiedosto(j)a...</translation>
+    </message>
+    <message>
+        <source>Scanning for %1 games...</source>
+        <translation>Etsitään %1 peli(ä)...</translation>
     </message>
     <message>
         <source>No</source>
-        <translation>Ei</translation>
+        <translation type="obsolete">Ei</translation>
     </message>
     <message>
         <source>No to all</source>
-        <translation>Ei Kaikkiin</translation>
+        <translation type="obsolete">Ei Kaikkiin</translation>
     </message>
     <message>
         <source>Yes</source>
-        <translation>Kyllä</translation>
+        <translation type="obsolete">Kyllä</translation>
     </message>
     <message>
         <source>Yes to all</source>
-        <translation>Kyllä Kaikkiin</translation>
+        <translation type="obsolete">Kyllä Kaikkiin</translation>
     </message>
     <message>
         <source>File Missing</source>
-        <translation>Tiedosto Puuttuu</translation>
+        <translation type="obsolete">Tiedosto Puuttuu</translation>
     </message>
     <message>
         <source>%1 appears to be missing.
 Remove it from the database?</source>
-        <translation>Tiedostoa %1 ei ole olemassa.
+        <translation type="obsolete">Tiedostoa %1 ei ole olemassa.
 Poistetaanko se tietokannasta?</translation>
     </message>
     <message>
         <source>Are you sure?</source>
-        <translation>Oletko varma?</translation>
+        <translation type="obsolete">Oletko varma?</translation>
     </message>
     <message>
         <source>This will clear all Game Meta Data
 from the database. Are you sure you
 want to do this?</source>
-        <translation>Poistetaan kaikki metatiedot
+        <translation type="obsolete">Poistetaan kaikki metatiedot
 Pelitietokannasta. Oletko Varma?</translation>
     </message>
     <message>
@@ -339,7 +447,7 @@ Pelitietokannasta. Oletko Varma?</translation>
     </message>
     <message>
         <source>A Comma seperated list of all file extensions for this emulator. Blank means any file under ROM PATH is considered to be used with this emulator</source>
-        <translation>Pilkuilla erotettu luettelo kaikista tiedoston jatkeista tälle emulaattorille. Tyhjä tarkoittaa mitä tahansa tiedostoa, joka löytyy ROM:n kansiosta ja niitä pidetään käytettäväksi tälle emulaattorille</translation>
+        <translation type="obsolete">Pilkuilla erotettu luettelo kaikista tiedoston jatkeista tälle emulaattorille. Tyhjä tarkoittaa mitä tahansa tiedostoa, joka löytyy ROM:n kansiosta ja niitä pidetään käytettäväksi tälle emulaattorille</translation>
     </message>
     <message>
         <source>GAMEGEAR</source>
@@ -351,11 +459,11 @@ Pelitietokannasta. Oletko Varma?</translation>
     </message>
     <message>
         <source>Verifying %1 files</source>
-        <translation>Tarkistetaan %1 tiedostoa</translation>
+        <translation type="obsolete">Tarkistetaan %1 tiedostoa</translation>
     </message>
     <message>
         <source>Scanning for %1 game(s)...</source>
-        <translation>Selataan %1 peli(ä)...</translation>
+        <translation type="obsolete">Selataan %1 peli(ä)...</translation>
     </message>
     <message>
         <source>Hash filenames in display</source>
@@ -367,7 +475,7 @@ Pelitietokannasta. Oletko Varma?</translation>
     </message>
     <message>
         <source>Binary and optional parameters. Multiple commands seperated with &apos;;&apos; . Use %s for the rom name. %d1, %d2, %d3 and %d4 represent disks in a multidisk/game. %s auto appended if not specified</source>
-        <translation>Binääri- ja valinnaisasetukset. Monia komentoja, joita jaetaan puolipisteellä, ( ; ). Käytä % ROM:n nimeä varten. %d1, %d2 ja %d4 kuvastavat levyjä monilevypelissä. %:n automaattista liitäntää ei ole määritelty</translation>
+        <translation type="obsolete">Binääri- ja valinnaisasetukset. Monia komentoja, joita jaetaan puolipisteellä, ( ; ). Käytä % ROM:n nimeä varten. %d1, %d2 ja %d4 kuvastavat levyjä monilevypelissä. %:n automaattista liitäntää ei ole määritelty</translation>
     </message>
 </context>
 <context>
@@ -437,16 +545,20 @@ Pelitietokannasta. Oletko Varma?</translation>
         <translation>/polku/siihen/jutskaan.jpg</translation>
     </message>
     <message>
+        <source>Emulator:</source>
+        <translation>Emulaattori:</translation>
+    </message>
+    <message>
         <source>Released %1</source>
         <translation>Julkaistu %1</translation>
     </message>
     <message>
         <source>%DATE%, %TIME%</source>
-        <translation></translation>
+        <translation>%DATE%, %TIME%</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Peruuta</translation>
+        <translation>Peru</translation>
     </message>
     <message>
         <source>Edit Metadata</source>
@@ -510,7 +622,7 @@ Pelitietokannasta. Oletko Varma?</translation>
     </message>
     <message>
         <source>Rompath:</source>
-        <translation>Rompolku:</translation>
+        <translation type="obsolete">Rompolku:</translation>
     </message>
     <message>
         <source>System(s):</source>
@@ -518,7 +630,7 @@ Pelitietokannasta. Oletko Varma?</translation>
     </message>
     <message>
         <source>CRC:</source>
-        <translation></translation>
+        <translation>CRC:</translation>
     </message>
     <message>
         <source>Description:</source>
@@ -541,12 +653,16 @@ Pelitietokannasta. Oletko Varma?</translation>
         <translation>Pelitietoja</translation>
     </message>
     <message>
+        <source>ROM path:</source>
+        <translation>ROM -polku:</translation>
+    </message>
+    <message>
         <source>General Settings</source>
         <translation>Yleiset asetukset</translation>
     </message>
     <message>
         <source>Game folders and general options</source>
-        <translation>Pelihakemistot ja yleiset valinnat</translation>
+        <translation>Pelikansiot ja yleiset valinnat</translation>
     </message>
     <message>
         <source>Game Players</source>
@@ -571,6 +687,10 @@ Pelitietokannasta. Oletko Varma?</translation>
     <message>
         <source>Cover Art:</source>
         <translation>Kansikuva:</translation>
+    </message>
+    <message>
+        <source>Favorite</source>
+        <translation>Suosikki</translation>
     </message>
 </context>
 </TS>

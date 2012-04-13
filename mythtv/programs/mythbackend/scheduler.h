@@ -22,6 +22,7 @@ using namespace std;
 #include "mythdeque.h"
 #include "mythscheduler.h"
 #include "mthread.h"
+#include "scheduledrecording.h"
 
 class EncoderLink;
 class MainServer;
@@ -41,9 +42,18 @@ class Scheduler : public MThread, public MythScheduler
 
     void SetExpirer(AutoExpire *autoExpirer) { m_expirer = autoExpirer; }
 
-    void Reschedule(int recordid);
+    void Reschedule(const QStringList &request);
+    void RescheduleMatch(uint recordid, uint sourceid, uint mplexid,
+                         const QDateTime &maxstarttime, const QString &why)
+    { Reschedule(ScheduledRecording::BuildMatchRequest(recordid, sourceid, 
+                                               mplexid, maxstarttime, why)); };
+    void RescheduleCheck(const RecordingInfo &recinfo, const QString &why)
+    { Reschedule(ScheduledRecording::BuildCheckRequest(recinfo, why)); };
+    void ReschedulePlace(const QString &why)
+    { Reschedule(ScheduledRecording::BuildPlaceRequest(why)); };
+
     void AddRecording(const RecordingInfo&);
-    void FillRecordListFromDB(int recordid = -1);
+    void FillRecordListFromDB(uint recordid = 0);
     void FillRecordListFromMaster(void);
 
     void UpdateRecStatus(RecordingInfo *pginfo);
@@ -92,15 +102,19 @@ class Scheduler : public MThread, public MythScheduler
 
     bool VerifyCards(void);
 
+    void CreateTempTables(void);
+    void DeleteTempTables(void);
+    void UpdateDuplicates(void);
     bool FillRecordList(void);
-    void UpdateMatches(int recordid);
-    void UpdateManuals(int recordid);
+    void UpdateMatches(uint recordid, uint sourceid, uint mplexid, 
+                       const QDateTime maxstarttime);
+    void UpdateManuals(uint recordid);
     void BuildWorkList(void);
     bool ClearWorkList(void);
     void AddNewRecords(void);
     void AddNotListed(void);
-    void BuildNewRecordsQueries(int recordid, QStringList &from, QStringList &where,
-                                MSqlBindings &bindings);
+    void BuildNewRecordsQueries(uint recordid, QStringList &from, 
+                                QStringList &where, MSqlBindings &bindings);
     void PruneOverlaps(void);
     void BuildListMaps(void);
     void ClearListMaps(void);
@@ -150,6 +164,9 @@ class Scheduler : public MThread, public MythScheduler
         RecConstIter startIter, const RecList &reclist,
         int prerollseconds, int max_sleep /*ms*/);
     void OldRecordedFixups(void);
+    void ResetDuplicates(uint recordid, uint findid, const QString &title,
+                         const QString &subtitle, const QString &descrip,
+                         const QString &programid);
     bool HandleReschedule(void);
     bool HandleRunSchedulerStartup(
         int prerollseconds, int idleWaitForRecordingTime);
@@ -166,8 +183,17 @@ class Scheduler : public MThread, public MythScheduler
         int idleTimeoutSecs, int idleWaitForRecordingTime,
         bool &statuschanged);
 
+    void EnqueueMatch(uint recordid, uint sourceid, uint mplexid,
+                      const QDateTime maxstarttime, const QString &why)
+    { reschedQueue.enqueue(ScheduledRecording::BuildMatchRequest(recordid, 
+                                     sourceid, mplexid, maxstarttime, why)); };
+    void EnqueueCheck(const RecordingInfo &recinfo, const QString &why)
+    { reschedQueue.enqueue(ScheduledRecording::BuildCheckRequest(recinfo, 
+                                                                 why)); };
+    void EnqueuePlace(const QString &why)
+    { reschedQueue.enqueue(ScheduledRecording::BuildPlaceRequest(why)); };
 
-    MythDeque<int> reschedQueue;
+    MythDeque<QStringList> reschedQueue;
     mutable QMutex schedLock;
     QMutex recordmatchLock;
     QWaitCondition reschedWait;
@@ -175,7 +201,7 @@ class Scheduler : public MThread, public MythScheduler
     RecList worklist;
     RecList retrylist;
     RecList conflictlist;
-    QMap<int, RecList> recordidlistmap;
+    QMap<uint, RecList> recordidlistmap;
     QMap<QString, RecList> titlelistmap;
     InputGroupMap igrp;
 

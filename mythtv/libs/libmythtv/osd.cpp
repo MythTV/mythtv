@@ -344,6 +344,18 @@ void OSD::SetValues(const QString &window, QHash<QString,int> &map,
             found = true;
         }
     }
+    if (map.contains("relposition"))
+    {
+        MythUIProgressBar *bar = dynamic_cast<MythUIProgressBar *> (win->GetChild("relposition"));
+        if (bar)
+        {
+            bar->SetVisible(true);
+            bar->SetStart(0);
+            bar->SetTotal(1000);
+            bar->SetUsed(map.value("relposition"));
+            found = true;
+        }
+    }
 
     if (found)
         SetExpiry(window, timeout);

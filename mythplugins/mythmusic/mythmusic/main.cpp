@@ -473,6 +473,7 @@ static void showMiniPlayer(void)
         gPlayer->showMiniPlayer();
 }
 
+#ifdef FIXME  // the only call is likewise commented out and needs fixing
 static void handleMedia(MythMediaDevice *cd)
 {
     // if the music player is already playing ignore the event
@@ -537,6 +538,7 @@ static void handleMedia(MythMediaDevice *cd)
     else
         mythplugin_run();
 }
+#endif
 
 static void setupKeys(void)
 {
@@ -597,9 +599,9 @@ static void setupKeys(void)
         "Toggle track selection"), "T");
 
 
+#ifdef FIXME
 // FIXME need to find a way to stop the media monitor jumping to the main menu before
 // calling the handler
-#if 0
     REG_MEDIA_HANDLER(QT_TRANSLATE_NOOP("MythControls",
         "MythMusic Media Handler 1/2"), "", "", handleMedia,
         MEDIATYPE_AUDIO | MEDIATYPE_MIXED, QString::null);

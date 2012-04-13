@@ -95,6 +95,7 @@ NetworkControl::NetworkControl() :
     jumpMap["statusbox"]             = "Status Screen";
     jumpMap["deletebox"]             = "TV Recording Deletion";
     jumpMap["playbackbox"]           = "TV Recording Playback";
+    jumpMap["pbb"]                   = "TV Recording Playback";
 
     keyMap["up"]                     = Qt::Key_Up;
     keyMap["down"]                   = Qt::Key_Down;

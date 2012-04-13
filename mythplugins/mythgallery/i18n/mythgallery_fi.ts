@@ -9,6 +9,73 @@
     </message>
 </context>
 <context>
+    <name>GalleryFilterDialog</name>
+    <message>
+        <source>No files / directories found</source>
+        <translation type="obsolete">Ei löytynyt tiedostoja/hakemistoja</translation>
+    </message>
+    <message>
+        <source>Filter result : %1 directories found but no files</source>
+        <translation type="obsolete">Suodatuksen tulokset: %1 hakemistoa löytyi, mutta ei tiedostoja</translation>
+    </message>
+    <message>
+        <source>Filter result : %1 directories, %2 movie(s) found</source>
+        <translation type="obsolete">Suodatuksen tulokset: %1 hakemisto(a), %2 elokuva(a) löytyi</translation>
+    </message>
+    <message>
+        <source>Filter result : %1 directories, %2 image(s) found</source>
+        <translation type="obsolete">Suodatuksen tulokset: %1 hakemisto(a), %2 kuva(a) löytyi</translation>
+    </message>
+    <message>
+        <source>Filter result : %1 directories, %2 image(s) and %3 movie(s) found</source>
+        <translation type="obsolete">Suodatuksen tulokset: %1 hakemisto(a), %2 kuva(a), %3 elokuva(a) löytyi</translation>
+    </message>
+    <message>
+        <source>Filter result : %1 image(s) and %2 movie(s) found</source>
+        <translation>Suodatuksen tulokset: %1 kuva(a), %2 elokuva(a) löytyi</translation>
+    </message>
+    <message>
+        <source>Filter result : %1 image(s) found</source>
+        <translation>Suodatuksen tulokset: %1 kuva(a) löytyi</translation>
+    </message>
+    <message>
+        <source>Filter result : %1 movie(s) found</source>
+        <translation>Suodatuksen tulokset: %1 elokuva(a) löytyi</translation>
+    </message>
+    <message>
+        <source>Filter result : (unknown)</source>
+        <translation>Suodata tulos : (tuntematon)</translation>
+    </message>
+    <message>
+        <source>-- please be patient --</source>
+        <translation>-- kärsivällisyyttä --</translation>
+    </message>
+    <message>
+        <source>-- scanning current filter --</source>
+        <translation>-- haetaan nykyisellä suotimella --</translation>
+    </message>
+    <message>
+        <source>No files / folders found</source>
+        <translation>Ei löytynyt tiedostoja/kansioita</translation>
+    </message>
+    <message>
+        <source>Filter result : %1 folder(s) found but no files</source>
+        <translation>Suodatuksen tulokset: %1 hakemisto(a) löytyi, mutta ei tiedostoja</translation>
+    </message>
+    <message>
+        <source>Filter result : %1 folder(s), %2 movie(s) found</source>
+        <translation>Suodatuksen tulokset : %1 kansio(ta), %2 elokuva(a) löytyi</translation>
+    </message>
+    <message>
+        <source>Filter result : %1 folder(s), %2 image(s) found</source>
+        <translation>Suodatuksen tulokset : %1 kansio(ta), %2 kuva(a) löytyi</translation>
+    </message>
+    <message>
+        <source>Filter result : %1 folder(s), %2 image(s) and %3 movie(s) found</source>
+        <translation>Suodatuksen tulokset : %1 kuva(a), %2 kuva(a) ja %3 elokuva(a) löytyi</translation>
+    </message>
+</context>
+<context>
     <name>IconView</name>
     <message>
         <source>Error</source>
@@ -32,7 +99,7 @@
     </message>
     <message>
         <source>Settings</source>
-        <translation>Asetukset</translation>
+        <translation type="obsolete">Asetukset</translation>
     </message>
     <message>
         <source>Random</source>
@@ -59,6 +126,18 @@
         <translation>Valitse Kaikki</translation>
     </message>
     <message>
+        <source>Meta Data Options</source>
+        <translation>Metatieto asetukset</translation>
+    </message>
+    <message>
+        <source>Filter / Sort...</source>
+        <translation>Suodata / Järjestä...</translation>
+    </message>
+    <message>
+        <source>Settings...</source>
+        <translation>Asetukset...</translation>
+    </message>
+    <message>
         <source>Show Devices</source>
         <translation>Näytä Laitteet</translation>
     </message>
@@ -72,11 +151,11 @@
     </message>
     <message>
         <source>Create Dir</source>
-        <translation>Luo Kansio</translation>
+        <translation type="obsolete">Luo Kansio</translation>
     </message>
     <message>
         <source>Delete Current File or Folder</source>
-        <translation>Poista Nykyinen Tiedosto tai Kansio</translation>
+        <translation>Poista nykyinen tiedosto tai kansio</translation>
     </message>
     <message>
         <source>Deleting 1 folder, including any subfolders and files.</source>
@@ -87,16 +166,36 @@
         <translation>Poistetaan 1 kuva.</translation>
     </message>
     <message>
+        <source>Import pictures?</source>
+        <translation>Tuo kuvia?</translation>
+    </message>
+    <message>
+        <source>No</source>
+        <translation>Ei</translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation>Kyllä</translation>
+    </message>
+    <message>
+        <source>Nothing found to import</source>
+        <translation>Ei löydy mitään tuotavaa</translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation>OK</translation>
+    </message>
+    <message>
         <source>Deleting %1 images and folders, including any subfolders and files.</source>
         <translation>Poistetaan %1 kuvaa ja kansiota, mukaanlukien kaikki alikansiot ja tiedostot.</translation>
     </message>
     <message>
         <source>New Folder</source>
-        <translation>Uusi Kansio</translation>
+        <translation>Uusi kansio</translation>
     </message>
     <message>
         <source>Create New Folder</source>
-        <translation>Luo Uusi Kansio</translation>
+        <translation>Luo uusi kansio</translation>
     </message>
     <message>
         <source>Moving marked images...</source>
@@ -112,7 +211,7 @@
     </message>
     <message>
         <source>Failed to rename directory</source>
-        <translation>Ei saatu uudelleennimettyä kansiota</translation>
+        <translation type="obsolete">Ei saatu uudelleennimettyä kansiota</translation>
     </message>
     <message>
         <source>Failed to rename file</source>
@@ -132,15 +231,15 @@
     </message>
     <message>
         <source>Meta Data Menu</source>
-        <translation>Metatieto valikko</translation>
+        <translation type="obsolete">Metatieto valikko</translation>
     </message>
     <message>
         <source>Marking Menu</source>
-        <translation>Merkitsemisvalikko</translation>
+        <translation type="obsolete">Merkitsemisvalikko</translation>
     </message>
     <message>
         <source>File Menu</source>
-        <translation>Tiedostovalikko</translation>
+        <translation type="obsolete">Tiedostovalikko</translation>
     </message>
     <message>
         <source>Metadata Options</source>
@@ -164,11 +263,23 @@
     </message>
     <message>
         <source>No images found in this directory.</source>
-        <translation>Kuvia ei löytynyt tästä hakemistosta.</translation>
+        <translation type="obsolete">Kuvia ei löytynyt tästä hakemistosta.</translation>
     </message>
     <message>
         <source>Eject</source>
         <translation>Eject</translation>
+    </message>
+    <message>
+        <source>No images found in this folder.</source>
+        <translation>Kuvia ei löytynyt tästä kansiosta.</translation>
+    </message>
+    <message>
+        <source>Create folder</source>
+        <translation>Luo kansio</translation>
+    </message>
+    <message>
+        <source>Failed to rename folder</source>
+        <translation>Ei saatu uudelleennimettyä kansiota</translation>
     </message>
 </context>
 <context>
@@ -281,6 +392,14 @@
         <translation>Tämä on kaksoispisteillä erotettu lista tietopoluista. Jos listassa oleva polku on hakemisto, sen sisältö kopioidaan. Jos se on ajettava ohjelma, se ajetaan.</translation>
     </message>
     <message>
+        <source>Automatically load MythGallery to display pictures</source>
+        <translation>Lataa automaattisesti MythGallery näyttämään kuvia</translation>
+    </message>
+    <message>
+        <source>When a new CD-Rom or removable storage device containing pictures is detected then load MythGallery to display the content.</source>
+        <translation>Kun uusi kuvia sisältävä CD-Rom tai irroitettava tallennusmedia tunnistetaan, lataa MythGallery näyttämään sisältö.</translation>
+    </message>
+    <message>
         <source>Type of transition</source>
         <translation>Diaesityksen kuvanvaihtotyyli</translation>
     </message>
@@ -305,6 +424,22 @@
         <translation>Diaesityksen Viive</translation>
     </message>
     <message>
+        <source>Directory filter</source>
+        <translation>Hakemistosuodin</translation>
+    </message>
+    <message>
+        <source>Enter directory names to be excluded in browser. (multiple entries delimited with &apos;:&apos;)</source>
+        <translation>Anna selailussa vältettävät hakemistonimet (&apos;:&apos; -erottaa useammat nimet)</translation>
+    </message>
+    <message>
+        <source>Type filter</source>
+        <translation>Lajisuodin</translation>
+    </message>
+    <message>
+        <source>This is the type filter for the displayed thumbnails.</source>
+        <translation>Tämä on näytettävien kuvien lajisuodatin.</translation>
+    </message>
+    <message>
         <source>Use OpenGL transitions</source>
         <translation>Käytä OpenGL kuvanvaihtoa</translation>
     </message>
@@ -322,11 +457,11 @@
     </message>
     <message>
         <source>Command run to display movie files</source>
-        <translation>Komento videoiden toistoon</translation>
+        <translation type="obsolete">Komento videoiden toistoon</translation>
     </message>
     <message>
         <source>This command is executed whenever a movie file is selected</source>
-        <translation>Tämä komento suoritetaan kun elokuvatiedosto on valittuna</translation>
+        <translation type="obsolete">Tämä komento suoritetaan kun elokuvatiedosto on valittuna</translation>
     </message>
     <message>
         <source>Store thumbnails in image directory</source>
@@ -424,6 +559,54 @@ Tarkista että hakemisto on olemassa, on luettavissa ja asetus on oikein MythGal
         <source>degrees</source>
         <translation>astetta</translation>
     </message>
+    <message>
+        <source>All</source>
+        <translation>Kaikki</translation>
+    </message>
+    <message>
+        <source>Images only</source>
+        <translation>Vain kuvat</translation>
+    </message>
+    <message>
+        <source>Movies only</source>
+        <translation>Vain elokuvat</translation>
+    </message>
+    <message>
+        <source>Unsorted</source>
+        <translation>Järjestelemättömät</translation>
+    </message>
+    <message>
+        <source>Name (A-Z alpha)</source>
+        <translation>Nimi (A-Z alpha)</translation>
+    </message>
+    <message>
+        <source>Reverse Name (Z-A alpha)</source>
+        <translation>Käänteinen nimi (Z-A alpha)</translation>
+    </message>
+    <message>
+        <source>Mod Time (oldest first)</source>
+        <translation>Muutosaika (vanhin ensin)</translation>
+    </message>
+    <message>
+        <source>Reverse Mod Time (newest first)</source>
+        <translation>Käänteinen muutosaika (uusin ensin)</translation>
+    </message>
+    <message>
+        <source>Extension (A-Z alpha)</source>
+        <translation>Pääte (A-Z alpha)</translation>
+    </message>
+    <message>
+        <source>Reverse Extension (Z-A alpha)</source>
+        <translation>Käänteinen pääte (Z-A alpha)</translation>
+    </message>
+    <message>
+        <source>Filesize (smallest first)</source>
+        <translation>Tiedostokoko (pienin ensin)</translation>
+    </message>
+    <message>
+        <source>Reverse Filesize (largest first)</source>
+        <translation>Käänteinen tiedostokoko (suurin ensin)</translation>
+    </message>
 </context>
 <context>
     <name>SingleView</name>
@@ -436,15 +619,19 @@ Tarkista että hakemisto on olemassa, on luettavissa ja asetus on oikein MythGal
     <name>ThemeUI</name>
     <message>
         <source>%DATE%, %TIME%</source>
-        <translation></translation>
+        <translation>%DATE%, %TIME%</translation>
     </message>
     <message>
         <source>No images are present in the pictures folder.</source>
-        <translation>Kuvia ei löydy kuvahakemistosta.</translation>
+        <translation>Kuvia ei löydy kuvakansiosta.</translation>
     </message>
     <message>
         <source>Image Gallery</source>
         <translation>Kuvagalleria</translation>
+    </message>
+    <message>
+        <source>No images found in configured directory.  Are you sure you have set up the plugin properly?</source>
+        <translation>Kuvia ei löydy annetusta hakemistosta.  Onko asetuksesi liitännäiselle varmasti oikein?</translation>
     </message>
     <message>
         <source>SELECT: View</source>
@@ -453,6 +640,55 @@ Tarkista että hakemisto on olemassa, on luettavissa ja asetus on oikein MythGal
     <message>
         <source>MENU: Activate Menu</source>
         <translation>MENU: Aktivoi valikko</translation>
+    </message>
+    <message>
+        <source>Video Gallery</source>
+        <translation>Videogalleria</translation>
+    </message>
+    <message>
+        <source>Filter/sort images</source>
+        <translation>Suodata/järjestä kuvia</translation>
+    </message>
+    <message>
+        <source>Directory filter:</source>
+        <translation>Hakemistosuodin:</translation>
+    </message>
+    <message>
+        <source>Type filter:</source>
+        <translation>Lajisuodin:</translation>
+    </message>
+    <message>
+        <source>Check Filter</source>
+        <translation>Tarkista suodin</translation>
+    </message>
+    <message>
+        <source>Sort by:</source>
+        <translation>Järjestysperuste:</translation>
+    </message>
+    <message>
+        <source>Done</source>
+        <translation>Valmis</translation>
+    </message>
+    <message>
+        <source>Save as default</source>
+        <translation>Tallenna oletukseksi</translation>
+    </message>
+    <message>
+        <source>Folder filter :</source>
+        <oldsource>Directory filter :</oldsource>
+        <translation>Kansiosuodin:</translation>
+    </message>
+    <message>
+        <source>Type filter :</source>
+        <translation>Lajisuodin:</translation>
+    </message>
+    <message>
+        <source>NumImages_Text</source>
+        <translation type="obsolete">NumImages_Text</translation>
+    </message>
+    <message>
+        <source>Sort by :</source>
+        <translation>Järjestysperuste:</translation>
     </message>
 </context>
 </TS>

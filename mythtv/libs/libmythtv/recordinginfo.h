@@ -228,8 +228,6 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
     void ApplyTranscoderProfileChange(const QString &profile) const;//pi
     void ApplyTranscoderProfileChangeById(int);
 
-    static void signalChange(int recordid);
-
     RecStatusType oldrecstatus;
     RecStatusType savedrecstatus;
     bool future;

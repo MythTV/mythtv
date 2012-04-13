@@ -11,8 +11,8 @@ class MythBackend {
 
 // MYTH_PROTO_VERSION is defined in libmyth in mythtv/libs/libmyth/mythcontext.h
 // and should be the current MythTV protocol version.
-    static $protocol_version        = '72';
-    static $protocol_token          = 'D78EFD6F';
+    static $protocol_version        = '73';
+    static $protocol_token          = 'D7FE8D6F';
 
 // The character string used by the backend to separate records
     static $backend_separator       = '[]:[]';
@@ -205,7 +205,17 @@ class MythBackend {
  * need to indicate every record rule is affected, then use -1.
 /**/
     public function rescheduleRecording($recordid = -1) {
-        $this->sendCommand('RESCHEDULE_RECORDINGS '.$recordid);
+        if ($recordid == 0) {
+            $this->sendCommand(array('RESCHEDULE_RECORDINGS ', 
+                                     'CHECK 0 0 0 PHP',
+                                     '', '', '', '**any**'));
+        }
+        else {
+            if ($recordid == -1)
+                $recordid = 0;
+            $this->sendCommand(array('RESCHEDULE_RECORDINGS ', 
+                                     'MATCH '.$recordid.' 0 0 - PHP'));
+        }
         Cache::clear();
         if ($this->listenForEvent('SCHEDULE_CHANGE'))
             return true;

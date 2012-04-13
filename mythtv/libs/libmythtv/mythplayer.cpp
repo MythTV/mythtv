@@ -174,7 +174,7 @@ MythPlayer::MythPlayer(PlayerFlags flags)
       enableForcedSubtitles(false), disableForcedSubtitles(false),
       allowForcedSubtitles(true),
       // CC608/708
-      db_prefer708(true), cc608(this), cc708(this),
+      cc608(this), cc708(this),
       // MHEG/MHI Interactive TV visible in OSD
       itvVisible(false),
       interactiveTV(NULL),
@@ -227,7 +227,6 @@ MythPlayer::MythPlayer(PlayerFlags flags)
     captionsEnabledbyDefault = gCoreContext->GetNumSetting("DefaultCCMode");
     decode_extra_audio = gCoreContext->GetNumSetting("DecodeExtraAudio", 0);
     itvEnabled         = gCoreContext->GetNumSetting("EnableMHEG", 0);
-    db_prefer708       = gCoreContext->GetNumSetting("Prefer708Captions", 1);
     clearSavedPosition = gCoreContext->GetNumSetting("ClearSavedPosition", 1);
     endExitPrompt      = gCoreContext->GetNumSetting("EndOfRecordingExitPrompt");
     pip_default_loc    = (PIPLocation)gCoreContext->GetNumSetting("PIPLocation", kPIPTopLeft);
@@ -1667,19 +1666,19 @@ bool MythPlayer::HasCaptionTrack(int mode)
 
 int MythPlayer::NextCaptionTrack(int mode)
 {
-    // Text->TextStream->708/608->608/708->AVSubs->Teletext->NUV->None
+    // Text->TextStream->708->608->AVSubs->Teletext->NUV->None
     // NUV only offerred if PAL
     bool pal      = (vbimode == VBIMode::PAL_TT);
     int  nextmode = kDisplayNone;
 
     if (kDisplayTextSubtitle == mode)
         nextmode = kDisplayRawTextSubtitle;
-    if (kDisplayRawTextSubtitle == mode)
-        nextmode = db_prefer708 ? kDisplayCC708 : kDisplayCC608;
+    else if (kDisplayRawTextSubtitle == mode)
+        nextmode = kDisplayCC708;
     else if (kDisplayCC708 == mode)
-        nextmode = db_prefer708 ? kDisplayCC608 : kDisplayAVSubtitle;
+        nextmode = kDisplayCC608;
     else if (kDisplayCC608 == mode)
-        nextmode = db_prefer708 ? kDisplayAVSubtitle : kDisplayCC708;
+        nextmode = kDisplayAVSubtitle;
     else if (kDisplayAVSubtitle == mode)
         nextmode = kDisplayTeletextCaptions;
     else if (kDisplayTeletextCaptions == mode)
@@ -2371,21 +2370,7 @@ bool MythPlayer::Rewind(float seconds)
         return false;
 
     if (rewindtime <= 0)
-    {
-        uint64_t fp = framesPlayed;
-        uint64_t delta = (seconds * video_frame_rate);
-        uint64_t target = (fp >= delta ? fp - delta : 0);
-        if (IsInDelete(target))
-        {
-            target = GetNearestMark(target, false);
-            const int extraSecs = 5;
-            if (target >= extraSecs * video_frame_rate)
-                target -= extraSecs * video_frame_rate;
-            else
-                target = 0;
-        }
-        rewindtime = (long long)(fp - target);
-    }
+        rewindtime = (long long)(seconds * video_frame_rate);
     return (uint64_t)rewindtime >= framesPlayed;
 }
 
@@ -4686,62 +4671,75 @@ void MythPlayer::calcSliderPos(osdInfo &info, bool paddedFields)
     playbackLen = max(playbackLen, 1);
     secsplayed  = min((float)playbackLen, max(secsplayed, 0.0f));
 
-    info.values.insert("secondsplayed", (int)secsplayed);
-    info.values.insert("totalseconds", playbackLen);
-    info.values["position"] = (int)(1000.0f * (secsplayed / (float)playbackLen));
-
-    int phours = (int)secsplayed / 3600;
-    int pmins = ((int)secsplayed - phours * 3600) / 60;
-    int psecs = ((int)secsplayed - phours * 3600 - pmins * 60);
-
-    int shours = playbackLen / 3600;
-    int smins = (playbackLen - shours * 3600) / 60;
-    int ssecs = (playbackLen - shours * 3600 - smins * 60);
-
-    int secsbehind = max((playbackLen - (int) secsplayed), 0);
-    int sbhours = secsbehind / 3600;
-    int sbmins = (secsbehind - sbhours * 3600) / 60;
-    int sbsecs = (secsbehind - sbhours * 3600 - sbmins * 60);
-
-    QString text1, text2, text3;
-    if (paddedFields)
+    // Set the raw values, followed by the translated values.
+    for (int i = 0; i < 2 ; ++i)
     {
-        text1.sprintf("%02d:%02d:%02d", phours, pmins, psecs);
-        text2.sprintf("%02d:%02d:%02d", shours, smins, ssecs);
-        text3.sprintf("%02d:%02d:%02d", sbhours, sbmins, sbsecs);
-    }
-    else
-    {
-        if (shours > 0)
+        QString relPrefix = (i == 0 ? "" : "rel");
+        if (i > 0)
         {
-            text1.sprintf("%d:%02d:%02d", phours, pmins, psecs);
-            text2.sprintf("%d:%02d:%02d", shours, smins, ssecs);
+            playbackLen = deleteMap.TranslatePositionAbsToRel(playbackLen * video_frame_rate) /
+                video_frame_rate;
+            secsplayed = deleteMap.TranslatePositionAbsToRel(secsplayed * video_frame_rate) /
+                video_frame_rate;
+        }
+
+        info.values.insert(relPrefix + "secondsplayed", (int)secsplayed);
+        info.values.insert(relPrefix + "totalseconds", playbackLen);
+        info.values[relPrefix + "position"] = (int)(1000.0f * (secsplayed / (float)playbackLen));
+
+        int phours = (int)secsplayed / 3600;
+        int pmins = ((int)secsplayed - phours * 3600) / 60;
+        int psecs = ((int)secsplayed - phours * 3600 - pmins * 60);
+
+        int shours = playbackLen / 3600;
+        int smins = (playbackLen - shours * 3600) / 60;
+        int ssecs = (playbackLen - shours * 3600 - smins * 60);
+
+        int secsbehind = max((playbackLen - (int) secsplayed), 0);
+        int sbhours = secsbehind / 3600;
+        int sbmins = (secsbehind - sbhours * 3600) / 60;
+        int sbsecs = (secsbehind - sbhours * 3600 - sbmins * 60);
+
+        QString text1, text2, text3;
+        if (paddedFields)
+        {
+            text1.sprintf("%02d:%02d:%02d", phours, pmins, psecs);
+            text2.sprintf("%02d:%02d:%02d", shours, smins, ssecs);
+            text3.sprintf("%02d:%02d:%02d", sbhours, sbmins, sbsecs);
         }
         else
         {
-            text1.sprintf("%d:%02d", pmins, psecs);
-            text2.sprintf("%d:%02d", smins, ssecs);
+            if (shours > 0)
+            {
+                text1.sprintf("%d:%02d:%02d", phours, pmins, psecs);
+                text2.sprintf("%d:%02d:%02d", shours, smins, ssecs);
+            }
+            else
+            {
+                text1.sprintf("%d:%02d", pmins, psecs);
+                text2.sprintf("%d:%02d", smins, ssecs);
+            }
+
+            if (sbhours > 0)
+            {
+                text3.sprintf("%d:%02d:%02d", sbhours, sbmins, sbsecs);
+            }
+            else if (sbmins > 0)
+            {
+                text3.sprintf("%d:%02d", sbmins, sbsecs);
+            }
+            else
+            {
+                text3 = QObject::tr("%n second(s)", "", sbsecs);
+            }
         }
 
-        if (sbhours > 0)
-        {
-            text3.sprintf("%d:%02d:%02d", sbhours, sbmins, sbsecs);
-        }
-        else if (sbmins > 0)
-        {
-            text3.sprintf("%d:%02d", sbmins, sbsecs);
-        }
-        else
-        {
-            text3 = QObject::tr("%n second(s)", "", sbsecs);
-        }
+        info.text[relPrefix + "description"] = QObject::tr("%1 of %2").arg(text1).arg(text2);
+        info.text[relPrefix + "playedtime"] = text1;
+        info.text[relPrefix + "totaltime"] = text2;
+        info.text[relPrefix + "remainingtime"] = islive ? QString() : text3;
+        info.text[relPrefix + "behindtime"] = islive ? text3 : QString();
     }
-
-    info.text["description"] = QObject::tr("%1 of %2").arg(text1).arg(text2);
-    info.text["playedtime"] = text1;
-    info.text["totaltime"] = text2;
-    info.text["remainingtime"] = islive ? QString() : text3;
-    info.text["behindtime"] = islive ? text3 : QString();
 }
 
 int MythPlayer::GetNumChapters()
