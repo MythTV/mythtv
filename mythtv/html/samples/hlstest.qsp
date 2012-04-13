@@ -176,6 +176,7 @@ function listFiles() {
         $("#links").html("");
         var str = "<hr><form id='playform'>";
         str += "<i18n>Width</i18n>: <select name='Width'>" +
+                "<option value='0' selected>Auto</option>" +
                 "<option value='288'>288</option>" +
                 "<option value='400'>400</option>" +
                 "<option value='480' selected>480</option>" +
