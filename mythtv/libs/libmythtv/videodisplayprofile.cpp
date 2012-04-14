@@ -1172,7 +1172,9 @@ void VideoDisplayProfile::CreateOpenGLProfiles(const QString &hostname)
 void VideoDisplayProfile::CreateProfiles(const QString &hostname)
 {
     CreateNewProfiles(hostname);
+#if defined(USING_VDPAU)
     CreateVDPAUProfiles(hostname);
+#endif
 }
 
 QStringList VideoDisplayProfile::GetVideoRenderers(const QString &decoder)
