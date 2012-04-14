@@ -1173,6 +1173,23 @@ void VideoDisplayProfile::CreateOpenGLProfiles(const QString &hostname)
 }
 #endif
 
+#if defined(USING_GLVAAPI)
+void VideoDisplayProfile::CreateVAAPIProfiles(const QString &hostname)
+{
+    (void) QObject::tr("VAAPI Normal", "Sample: VAAPI average quality");
+    DeleteProfileGroup("VAAPI Normal", hostname);
+    uint groupid = CreateProfileGroup("VAAPI Normal", hostname);
+    CreateProfile(groupid, 1, ">", 0, 0, "", 0, 0,
+                  "vaapi", 2, true, "openglvaapi", "opengl2", true,
+                  "vaapibobdeint", "vaapionefield",
+                  "");
+    CreateProfile(groupid, 2, ">", 0, 0, "", 0, 0,
+                  "ffmpeg", 2, true, "opengl", "opengl2", true,
+                  "opengldoubleratekerneldeint", "openglkerneldeint",
+                  "");
+}
+#endif
+
 void VideoDisplayProfile::CreateProfiles(const QString &hostname)
 {
     CreateNewProfiles(hostname);

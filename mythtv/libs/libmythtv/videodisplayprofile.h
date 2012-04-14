@@ -158,6 +158,9 @@ class MTV_PUBLIC VideoDisplayProfile
 #if defined(USING_OPENGL_VIDEO)    
     static void        CreateOpenGLProfiles(const QString &hostname);
 #endif
+#if defined(USING_GLVAAPI)    
+    static void        CreateVAAPIProfiles(const QString &hostname);
+#endif
 
     static QStringList GetVideoRenderers(const QString &decoder);
     static QString     GetVideoRendererHelp(const QString &renderer);

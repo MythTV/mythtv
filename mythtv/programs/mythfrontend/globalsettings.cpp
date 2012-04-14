@@ -1179,6 +1179,14 @@ PlaybackProfileConfigs::PlaybackProfileConfigs(const QString &str) :
     }
 #endif
 
+#ifdef USING_GLVAAPI
+    if (!profiles.contains("VAAPI Normal"))
+    {
+        VideoDisplayProfile::CreateVAAPIProfiles(host);
+        profiles = VideoDisplayProfile::GetProfiles(host);
+    }
+#endif
+
     QString profile = VideoDisplayProfile::GetDefaultProfileName(host);
     if (!profiles.contains(profile))
     {
