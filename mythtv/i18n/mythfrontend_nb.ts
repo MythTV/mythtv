@@ -23852,7 +23852,7 @@ Hvis du velger &quot;Bruk standardavspiller&quot; vil avspillerkommandoen for en
     <message>
         <location filename="../themes/themestrings.h" line="155"/>
         <source>%DATE%, %TIME%</source>
-        <translation>%DATO%, %TID%</translation>
+        <translation>%DATE%, %TIME%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="610"/>
