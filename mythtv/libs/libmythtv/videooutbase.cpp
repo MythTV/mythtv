@@ -38,10 +38,11 @@
 #endif
 
 #ifdef USING_VAAPI
-#include "videoout_openglvaapi.h"
 #include "videoout_nullvaapi.h"
 #endif
-
+#ifdef USING_GLVAAPI
+#include "videoout_openglvaapi.h"
+#endif
 #include "videoout_null.h"
 #include "dithertable.h"
 
@@ -96,9 +97,11 @@ void VideoOutput::GetRenderOptions(render_opts &opts)
 #endif // USING_VDPAU
 
 #ifdef USING_VAAPI
-    VideoOutputOpenGLVAAPI::GetRenderOptions(opts);
     VideoOutputNullVAAPI::GetRenderOptions(opts);
 #endif // USING_VAAPI
+#ifdef USING_GLVAAPI
+    VideoOutputOpenGLVAAPI::GetRenderOptions(opts);
+#endif // USING_GLVAAPI
 }
 
 /**
@@ -161,9 +164,9 @@ VideoOutput *VideoOutput::Create(
         renderers += VideoOutputVDPAU::GetAllowedRenderers(codec_id, video_dim);
 #endif // USING_VDPAU
 
-#ifdef USING_VAAPI
+#ifdef USING_GLVAAPI
         renderers += VideoOutputOpenGLVAAPI::GetAllowedRenderers(codec_id, video_dim);
-#endif // USING_VAAPI
+#endif // USING_GLVAAPI
     }
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "Allowed renderers: " +
@@ -226,12 +229,13 @@ VideoOutput *VideoOutput::Create(
 #endif // USING_VDPAU
 
 #ifdef USING_VAAPI
-        if (renderer == "openglvaapi")
-            vo = new VideoOutputOpenGLVAAPI();
         if (renderer == "nullvaapi")
             vo = new VideoOutputNullVAAPI();
 #endif // USING_VAAPI
-
+#ifdef USING_GLVAAPI
+        if (renderer == "openglvaapi")
+            vo = new VideoOutputOpenGLVAAPI();
+#endif // USING_GLVAAPI        
 #ifdef USING_XV
         if (xvlist.contains(renderer))
             vo = new VideoOutputXv();
