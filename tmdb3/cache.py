@@ -102,6 +102,8 @@ class Cache( object ):
                     raise TMDBCacheError('Cache.Cached must be provided a '+\
                                          'callable object.')
                 return self.__class__(self.cache, self.callback, args[0])
+            elif self.inst.lifetime == 0:
+                return self.func(*args, **kwargs)
             else:
                 key = self.callback()
                 data = self.cache.get(key)
