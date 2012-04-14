@@ -47,6 +47,7 @@ from request import set_key, Request
 from util import Datapoint, Datalist, Datadict, Element
 from pager import PagedRequest
 from locales import get_locale, set_locale
+from tmdb_auth import get_session, set_session
 from tmdb_exceptions import *
 
 import json
@@ -61,6 +62,28 @@ class Configuration( Element ):
     def _populate(self):
         return Request('configuration')
 Configuration = Configuration()
+
+class Account( Element ):
+    session         = Datapoint('session', initarg=1, default=None)
+
+    def _populate_account(self):
+        if self.session is None:
+            self.session = get_session()
+        return Request('account', session_id=self.session.sessionid)
+
+    id              = Datapoint('id', poller=_populate_account)
+    adult           = Datapoint('include_adult', poller=_populate_account)
+    country         = Datapoint('iso_3166_1', poller=_populate_account)
+    language        = Datapoint('iso_639_1', poller=_populate_account)
+    name            = Datapoint('name', poller=_populate_account)
+    username        = Datapoint('username', poller=_populate_account)
+
+    @property
+    def locale(self):
+        return get_locale(self.language, self.country)
+
+    def __repr__(self):
+        return "<{0} {1.name}>".format(self.__class__.__name__, self)
 
 def searchMovie(query, locale=None, adult=False):
     return MovieSearchResult(
