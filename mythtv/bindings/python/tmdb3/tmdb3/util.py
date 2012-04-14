@@ -124,7 +124,7 @@ class Data( object ):
         return inst._data[self.field]
 
     def __set__(self, inst, value):
-        if value:
+        if value is not None:
             value = self.handler(value)
         else:
             value = self.default
