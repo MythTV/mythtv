@@ -81,11 +81,17 @@ class Request( urllib2.Request ):
         obj.lifetime = self.lifetime
         return obj
 
+    def add_data(self, data):
+        """Provide data to be sent with POST."""
+        urllib2.Request.add_data(self, urlencode(data))
+
     def open(self):
         """Open a file object to the specified URL."""
         try:
             if DEBUG:
                 print 'loading '+self.get_full_url()
+                if self.has_data():
+                    print '  '+self.get_data()
             return urllib2.urlopen(self)
         except urllib2.HTTPError, e:
             raise TMDBHTTPError(str(e))

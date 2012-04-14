@@ -22,7 +22,7 @@ for search and retrieval of text metadata and image URLs from TMDB.
 Preliminary API specifications can be found at
 http://help.themoviedb.org/kb/api/about-3"""
 
-__version__="v0.5.0"
+__version__="v0.6.0"
 # 0.1.0 Initial development
 # 0.2.0 Add caching mechanism for API queries
 # 0.2.1 Temporary work around for broken search paging
@@ -42,6 +42,7 @@ __version__="v0.5.0"
 # 0.4.5 Add locale fallthrough for images and alternate titles
 # 0.4.6 Add slice support for search results
 # 0.5.0 Rework cache framework and improve file cache performance
+# 0.6.0 Add user authentication support
 
 from request import set_key, Request
 from util import Datapoint, Datalist, Datadict, Element
@@ -64,26 +65,22 @@ class Configuration( Element ):
 Configuration = Configuration()
 
 class Account( Element ):
-    session         = Datapoint('session', initarg=1, default=None)
+    def _populate(self):
+        return Request('account', session_id=self._session.sessionid)
 
-    def _populate_account(self):
-        if self.session is None:
-            self.session = get_session()
-        return Request('account', session_id=self.session.sessionid)
-
-    id              = Datapoint('id', poller=_populate_account)
-    adult           = Datapoint('include_adult', poller=_populate_account)
-    country         = Datapoint('iso_3166_1', poller=_populate_account)
-    language        = Datapoint('iso_639_1', poller=_populate_account)
-    name            = Datapoint('name', poller=_populate_account)
-    username        = Datapoint('username', poller=_populate_account)
+    id              = Datapoint('id')
+    adult           = Datapoint('include_adult')
+    country         = Datapoint('iso_3166_1')
+    language        = Datapoint('iso_639_1')
+    name            = Datapoint('name')
+    username        = Datapoint('username')
 
     @property
     def locale(self):
         return get_locale(self.language, self.country)
 
     def __repr__(self):
-        return "<{0} {1.name}>".format(self.__class__.__name__, self)
+        return '<{0} "{1.name}">'.format(self.__class__.__name__, self)
 
 def searchMovie(query, locale=None, adult=False):
     return MovieSearchResult(
@@ -342,6 +339,28 @@ class Movie( Element ):
         return res
 
     @classmethod
+    def favorites(cls, session=None):
+        if session is None:
+            session = get_session()
+        account = Account(session=session)
+        res = MovieSearchResult(
+                    Request('account/{0}/favorite_movies'.format(account.id),
+                                session_id=session.sessionid))
+        res._name = "Favorites"
+        return res
+
+    @classmethod
+    def ratedmovies(cls, session=None):
+        if session is None:
+            session = get_session()
+        account = Account(session=session)
+        res = MovieSearchResult(
+                    Request('account/{0}/rated_movies'.format(account.id),
+                                session_id=session.sessionid))
+        res._name = "Movies You Rated"
+        return res
+
+    @classmethod
     def fromIMDB(cls, imdbid, locale=None):
         try:
             # assume string
@@ -413,6 +432,20 @@ class Movie( Element ):
     youtube_trailers = Datalist('youtube', handler=YoutubeTrailer, poller=_populate_trailers)
     apple_trailers   = Datalist('quicktime', handler=AppleTrailer, poller=_populate_trailers)
     translations     = Datalist('translations', handler=Translation, poller=_populate_translations)
+
+    def setFavorite(self, value):
+        req = Request('account/{0}/favorite'.format(Account(session=self._session).id), session_id=self._session.sessionid)
+        req.add_data({'movie_id':self.id, 'favorite':str(bool(value)).lower()})
+        req.lifetime = 0
+        req.readJSON()
+
+    def setRating(self, value):
+        if not (0 <= value <= 10):
+            raise TMDBError("Ratings must be between '0' and '10'.")
+        req = Request('movie/{0}/favorite'.format(self.id), session_id=self._session.sessionid)
+        req.lifetime = 0
+        req.add_data({'value':value})
+        req.readJSON()
 
     def __repr__(self):
         if self.title is not None:

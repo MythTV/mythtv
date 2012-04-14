@@ -60,6 +60,7 @@ class datetime( _pydatetime ):
         return cls(*dt)
 
 from request import Request
+from tmdb_exceptions import *
 
 syssession = None
 
@@ -89,14 +90,14 @@ class Session( object ):
     def sessionid(self):
         if self._sessionid is None:
             if self._authtoken is None:
-                raise RuntimeError("No Auth Token to produce Session for")
+                raise TMDBError("No Auth Token to produce Session for")
             # TODO: check authtokenexpiration against current time
             req = Request('authentication/session/new', \
                                             request_token=self._authtoken)
             req.lifetime = 0
             dat = req.readJSON()
             if not dat['success']:
-                raise RuntimeError("Session generation failed")
+                raise TMDBError("Session generation failed")
             self._sessionid = dat['session_id']
         return self._sessionid
 
@@ -113,13 +114,13 @@ class Session( object ):
     @property
     def authtoken(self):
         if self.authenticated:
-            raise RuntimeError("Session is already authenticated")
+            raise TMDBError("Session is already authenticated")
         if self._authtoken is None:
             req = Request('authentication/token/new')
             req.lifetime = 0
             dat = req.readJSON()
             if not dat['success']:
-                raise RuntimeError("Auth Token request failed")
+                raise TMDBError("Auth Token request failed")
             self._authtoken = dat['request_token']
             self._authtokenexpiration = datetime.fromIso(dat['expires_at'])
         return self._authtoken
