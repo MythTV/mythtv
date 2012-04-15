@@ -31,7 +31,6 @@ void RemoteGetAllExpiringRecordings(vector<ProgramInfo *> &expiringlist);
 MPUBLIC uint RemoteGetRecordingList(vector<ProgramInfo *> &reclist,
                                     QStringList &strList);
 MPUBLIC vector<ProgramInfo *> *RemoteGetConflictList(const ProgramInfo *pginfo);
-MPUBLIC vector<uint> RemoteRequestFreeRecorderList(void);
 MPUBLIC QDateTime RemoteGetPreviewLastModified(const ProgramInfo *pginfo);
 MPUBLIC QDateTime RemoteGetPreviewIfModified(
     const ProgramInfo &pginfo, const QString &cachefile);

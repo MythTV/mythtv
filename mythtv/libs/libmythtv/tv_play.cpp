@@ -2172,7 +2172,9 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
             if (reclist.size())
             {
                 RemoteEncoder *testrec = NULL;
-                testrec = RemoteRequestFreeRecorderFromList(reclist);
+                vector<uint> excluded_cardids;
+                testrec = RemoteRequestFreeRecorderFromList(reclist,
+                                                            excluded_cardids);
                 if (testrec && testrec->IsValidRecorder())
                 {
                     ctx->SetRecorder(testrec);
@@ -6366,13 +6368,11 @@ void TV::DoSkipCommercials(PlayerContext *ctx, int direction)
 void TV::SwitchSource(PlayerContext *ctx, uint source_direction)
 {
     QMap<uint,InputInfo> sources;
-    vector<uint> cardids = RemoteRequestFreeRecorderList();
     uint         cardid  = ctx->GetCardID();
-    cardids.push_back(cardid);
-    stable_sort(cardids.begin(), cardids.end());
-
     vector<uint> excluded_cardids;
     excluded_cardids.push_back(cardid);
+    vector<uint> cardids = RemoteRequestFreeRecorderList(excluded_cardids);
+    stable_sort(cardids.begin(), cardids.end());
 
     InfoMap info;
     ctx->recorder->GetChannelInfo(info);
@@ -6491,7 +6491,11 @@ void TV::SwitchCards(PlayerContext *ctx,
     }
 
     if (!reclist.empty())
-        testrec = RemoteRequestFreeRecorderFromList(reclist);
+    {
+        vector<uint> excluded_cardids;
+        excluded_cardids.push_back(ctx->GetCardID());
+        testrec = RemoteRequestFreeRecorderFromList(reclist, excluded_cardids);
+    }
 
     if (testrec && testrec->IsValidRecorder())
     {
@@ -7127,7 +7131,9 @@ void TV::ChangeChannel(PlayerContext *ctx, uint chanid, const QString &chan)
     if (reclist.size())
     {
         RemoteEncoder *testrec = NULL;
-        testrec = RemoteRequestFreeRecorderFromList(reclist);
+        vector<uint> excluded_cardids;
+        excluded_cardids.push_back(ctx->GetCardID());
+        testrec = RemoteRequestFreeRecorderFromList(reclist, excluded_cardids);
         if (!testrec || !testrec->IsValidRecorder())
         {
             ClearInputQueues(ctx, true);
@@ -7838,7 +7844,7 @@ QSet<uint> TV::IsTunableOn(
         excluded_cards.push_back(ctx->GetCardID());
 
     uint sourceid = ChannelUtil::GetSourceIDForChannel(chanid);
-    vector<uint> connected   = RemoteRequestFreeRecorderList();
+    vector<uint> connected   = RemoteRequestFreeRecorderList(excluded_cards);
     vector<uint> interesting = CardUtil::GetCardIDs(sourceid);
 
     // filter disconnected cards

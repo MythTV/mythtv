@@ -208,22 +208,6 @@ vector<ProgramInfo *> *RemoteGetConflictList(const ProgramInfo *pginfo)
     return retlist;
 }
 
-vector<uint> RemoteRequestFreeRecorderList(void)
-{
-    vector<uint> list;
-
-    QStringList strlist("GET_FREE_RECORDER_LIST");
-
-    if (!gCoreContext->SendReceiveStringList(strlist, true))
-        return list;
-
-    QStringList::const_iterator it = strlist.begin();
-    for (; it != strlist.end(); ++it) 
-        list.push_back((*it).toUInt());
-
-    return list;
-}
-
 QDateTime RemoteGetPreviewLastModified(const ProgramInfo *pginfo)
 {
     QDateTime retdatetime;
