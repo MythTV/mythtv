@@ -643,6 +643,7 @@ QString VideoDisplayProfile::GetDecoderName(const QString &decoder)
         dec_name["vdpau"]    = QObject::tr("NVidia VDPAU acceleration");
         dec_name["vaapi"]    = QObject::tr("VAAPI acceleration");
         dec_name["dxva2"]    = QObject::tr("Windows hardware acceleration");
+        dec_name["vda"]      = QObject::tr("Mac VDA hardware acceleration");
     }
 
     QString ret = decoder;
