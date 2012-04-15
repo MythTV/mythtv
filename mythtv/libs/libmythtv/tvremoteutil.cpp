@@ -163,7 +163,7 @@ vector<uint> RemoteRequestFreeRecorderList(const vector<uint> &excluded_cardids)
 
     return list;
 #endif
-    QVector<uint> result;
+    vector<uint> result;
     vector<uint> cards = CardUtil::GetCardList();
     for (uint i = 0; i < cards.size(); i++)
     {
@@ -171,7 +171,9 @@ vector<uint> RemoteRequestFreeRecorderList(const vector<uint> &excluded_cardids)
             RemoteRequestFreeInputList(cards[i], excluded_cardids);
         for (uint j = 0; j < inputs.size(); j++)
         {
-            if (!result.contains(inputs[j].cardid))
+            if (find(result.begin(),
+                     result.end(),
+                     inputs[j].cardid) == result.end())
                 result.push_back(inputs[j].cardid);
         }
     }
@@ -180,7 +182,7 @@ vector<uint> RemoteRequestFreeRecorderList(const vector<uint> &excluded_cardids)
         msg += QString(" %1").arg(result[k]);
     msg += "}";
     LOG(VB_CHANNEL, LOG_INFO, msg);
-    return result.toStdVector();
+    return result;
 }
 
 RemoteEncoder *RemoteRequestFreeRecorderFromList
