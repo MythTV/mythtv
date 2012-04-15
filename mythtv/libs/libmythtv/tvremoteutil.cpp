@@ -178,7 +178,7 @@ vector<uint> RemoteRequestFreeRecorderList(const vector<uint> &excluded_cardids)
         }
     }
     QString msg("RemoteRequestFreeRecorderList returned {");
-    for (int k = 0; k < result.size(); k++)
+    for (uint k = 0; k < result.size(); k++)
         msg += QString(" %1").arg(result[k]);
     msg += "}";
     LOG(VB_CHANNEL, LOG_INFO, msg);
