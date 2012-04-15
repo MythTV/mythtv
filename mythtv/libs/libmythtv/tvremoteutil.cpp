@@ -1,7 +1,6 @@
 #include <unistd.h>
 
 #include <QFile>
-#include <QVector>
 
 #include "tvremoteutil.h"
 #include "cardutil.h"
