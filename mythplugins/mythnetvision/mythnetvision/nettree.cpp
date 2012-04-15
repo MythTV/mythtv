@@ -472,7 +472,12 @@ void NetTree::showMenu(void)
 
     ResultItem *item = NULL;
     if (m_type == DLG_TREE)
-        item = qVariantValue<ResultItem *>(m_siteMap->GetCurrentNode()->GetData());
+    {
+        MythGenericTree *node = m_siteMap->GetCurrentNode();
+
+        if (node)
+            item = qVariantValue<ResultItem *>(node->GetData());
+    }
     else
     {
         MythGenericTree *node = GetNodePtrFromButton(m_siteButtonList->GetItemCurrent());
@@ -480,7 +485,6 @@ void NetTree::showMenu(void)
         if (node)
             item = qVariantValue<ResultItem *>(node->GetData());
     }
-
 
     if (item)
     {
