@@ -1,6 +1,7 @@
 #include <QTimer>
 #include <QtEndian>
 #include <QTcpSocket>
+#include <QNetworkInterface>
 
 #include "mthread.h"
 #include "mythlogging.h"
@@ -131,7 +132,7 @@ void MythRAOPDevice::Start(void)
     int baseport = m_setupPort;
     while (m_setupPort < baseport + RAOP_PORT_RANGE)
     {
-        if (listen(m_setupPort))
+        if (listen(QNetworkInterface::allAddresses(), m_setupPort, false))
         {
             LOG(VB_GENERAL, LOG_INFO, LOC +
                 QString("Listening for connections on port %1").arg(m_setupPort));
