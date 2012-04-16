@@ -18,6 +18,7 @@ HEADERS += cpu_detect.h
 HEADERS += FIRFilter.h
 HEADERS += RateTransposer.h
 HEADERS += TDStretch.h
+HEADERS += STTypes.h
 
 SOURCES += AAFilter.cpp
 SOURCES += FIRFilter.cpp
