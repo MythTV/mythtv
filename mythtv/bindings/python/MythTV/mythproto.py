@@ -657,7 +657,7 @@ class FileOps( BECache ):
 
     def getHash(self, file, sgroup, host=None):
         """FileOps.getHash(file, storagegroup, host) -> hash string"""
-        m = [file, sgroup]
+        m = ['QUERY_FILE_HASH', file, sgroup]
         if host:
             m.append(host)
         return self.backendCommand(BACKEND_SEP.join(m))
