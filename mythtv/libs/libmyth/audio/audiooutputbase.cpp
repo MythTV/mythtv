@@ -103,7 +103,7 @@ AudioOutputBase::AudioOutputBase(const AudioSettings &settings) :
     src_out(NULL),              kAudioSRCOutputSize(0),
     memory_corruption_test2(0xdeadbeef),
     memory_corruption_test3(0xdeadbeef),
-    m_configure_succeeded(true),m_length_last_data(0),
+    m_configure_succeeded(false),m_length_last_data(0),
     m_spdifenc(NULL)
 {
     src_in = (float *)AOALIGN(src_in_buf);
@@ -318,6 +318,12 @@ void AudioOutputBase::SetStretchFactorLocked(float lstretchfactor)
         return;
 
     stretchfactor = lstretchfactor;
+
+    int channels = needs_upmix || needs_downmix ?
+        configured_channels : source_channels;
+    if (channels < 1 || channels > 8)
+        return;
+
     eff_stretchfactor = (int)(100000.0f * lstretchfactor + 0.5);
     if (pSoundStretch)
     {
@@ -329,8 +335,7 @@ void AudioOutputBase::SetStretchFactorLocked(float lstretchfactor)
         VBGENERAL(QString("Using time stretch %1").arg(stretchfactor));
         pSoundStretch = new soundtouch::SoundTouch();
         pSoundStretch->setSampleRate(samplerate);
-        pSoundStretch->setChannels(needs_upmix || needs_downmix ?
-            configured_channels : source_channels);
+        pSoundStretch->setChannels(channels);
         pSoundStretch->setTempo(stretchfactor);
         pSoundStretch->setSetting(SETTING_SEQUENCE_MS, 35);
         /* If we weren't already processing we need to turn on float conversion
