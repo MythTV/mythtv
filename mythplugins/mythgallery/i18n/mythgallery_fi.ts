@@ -44,35 +44,35 @@
     </message>
     <message>
         <source>Filter result : (unknown)</source>
-        <translation type="unfinished"></translation>
+        <translation>Suodata tulos : (tuntematon)</translation>
     </message>
     <message>
         <source>-- please be patient --</source>
-        <translation type="unfinished"></translation>
+        <translation>-- kärsivällisyyttä --</translation>
     </message>
     <message>
         <source>-- scanning current filter --</source>
-        <translation type="unfinished"></translation>
+        <translation>-- haetaan nykyisellä suotimella --</translation>
     </message>
     <message>
         <source>No files / folders found</source>
-        <translation type="unfinished"></translation>
+        <translation>Ei löytynyt tiedostoja/kansioita</translation>
     </message>
     <message>
         <source>Filter result : %1 folder(s) found but no files</source>
-        <translation type="unfinished"></translation>
+        <translation>Suodatuksen tulokset: %1 hakemisto(a) löytyi, mutta ei tiedostoja</translation>
     </message>
     <message>
         <source>Filter result : %1 folder(s), %2 movie(s) found</source>
-        <translation type="unfinished"></translation>
+        <translation>Suodatuksen tulokset : %1 kansio(ta), %2 elokuva(a) löytyi</translation>
     </message>
     <message>
         <source>Filter result : %1 folder(s), %2 image(s) found</source>
-        <translation type="unfinished"></translation>
+        <translation>Suodatuksen tulokset : %1 kansio(ta), %2 kuva(a) löytyi</translation>
     </message>
     <message>
         <source>Filter result : %1 folder(s), %2 image(s) and %3 movie(s) found</source>
-        <translation type="unfinished"></translation>
+        <translation>Suodatuksen tulokset : %1 kuva(a), %2 kuva(a) ja %3 elokuva(a) löytyi</translation>
     </message>
 </context>
 <context>
@@ -271,15 +271,15 @@
     </message>
     <message>
         <source>No images found in this folder.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kuvia ei löytynyt tästä kansiosta.</translation>
     </message>
     <message>
         <source>Create folder</source>
-        <translation type="unfinished"></translation>
+        <translation>Luo kansio</translation>
     </message>
     <message>
         <source>Failed to rename folder</source>
-        <translation type="unfinished"></translation>
+        <translation>Ei saatu uudelleennimettyä kansiota</translation>
     </message>
 </context>
 <context>
@@ -676,7 +676,7 @@ Tarkista että hakemisto on olemassa, on luettavissa ja asetus on oikein MythGal
     <message>
         <source>Folder filter :</source>
         <oldsource>Directory filter :</oldsource>
-        <translation type="unfinished">Hakemistosuodin:</translation>
+        <translation>Kansiosuodin:</translation>
     </message>
     <message>
         <source>Type filter :</source>

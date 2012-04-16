@@ -1169,12 +1169,20 @@ PlaybackProfileConfigs::PlaybackProfileConfigs(const QString &str) :
     }
 #endif
 
-#ifdef USING_OPENGL
+#ifdef USING_OPENGL_VIDEO
     if (!profiles.contains("OpenGL Normal") &&
         !profiles.contains("OpenGL High Quality") &&
         !profiles.contains("OpenGL Slim"))
     {
         VideoDisplayProfile::CreateOpenGLProfiles(host);
+        profiles = VideoDisplayProfile::GetProfiles(host);
+    }
+#endif
+
+#ifdef USING_GLVAAPI
+    if (!profiles.contains("VAAPI Normal"))
+    {
+        VideoDisplayProfile::CreateVAAPIProfiles(host);
         profiles = VideoDisplayProfile::GetProfiles(host);
     }
 #endif
@@ -1500,19 +1508,6 @@ static HostCheckBox *DefaultCCMode()
                         "when playing back recordings or watching "
                         "Live TV. Closed Captioning can be turned on or off "
                         "by pressing \"T\" during playback."));
-    return gc;
-}
-
-static HostCheckBox *PreferCC708()
-{
-    HostCheckBox *gc = new HostCheckBox("Prefer708Captions");
-    gc->setLabel(QObject::tr("Prefer EIA-708 over EIA-608 captions"));
-    gc->setValue(true);
-    gc->setHelpText(
-        QObject::tr(
-            "If enabled, the newer EIA-708 captions will be preferred over "
-            "the older EIA-608 captions in ATSC streams."));
-
     return gc;
 }
 
@@ -3537,7 +3532,6 @@ OSDSettings::OSDSettings()
     osd->addChild(BrowseAllTuners());
     osd->addChild(CCBackground());
     osd->addChild(DefaultCCMode());
-    osd->addChild(PreferCC708());
     osd->addChild(SubtitleFont());
     osd->addChild(OSDCC708TextZoomPercentage());
     osd->addChild(SubtitleCodec());

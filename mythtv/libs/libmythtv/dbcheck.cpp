@@ -1960,6 +1960,28 @@ NULL
             return false;
     }
 
+    if (dbver == "1300")
+    {
+        const char *updates[] = {
+"ALTER TABLE channel ADD COLUMN iptvid SMALLINT(6) UNSIGNED;",
+"CREATE TABLE iptv_channel ("
+"  iptvid SMALLINT(6) UNSIGNED NOT NULL auto_increment,"
+"  chanid INT(10) UNSIGNED NOT NULL,"
+"  url TEXT NOT NULL,"
+"  type set('data', "
+"           'rfc2733-1','rfc2733-2', "
+"           'rfc5109-1','rfc5109-2', "
+"           'smpte2022-1','smpte2022-2'),"
+"  bitrate INT(10) UNSIGNED NOT NULL,"
+"  PRIMARY KEY (iptvid)"
+") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
+NULL
+};
+
+        if (!performActualUpdate(updates, "1301", dbver))
+            return false;
+    }
+
     return true;
 }
 

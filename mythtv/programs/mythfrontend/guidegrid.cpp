@@ -1390,11 +1390,11 @@ void GuideGrid::customEvent(QEvent *event)
         }
         else if (resultid == "guidemenu")
         {
-            if (resulttext == tr("Record"))
+            if (resulttext == tr("Record This"))
             {
                 quickRecord();
             }
-            else if (resulttext == tr("Change Channel"))
+            else if (resulttext == tr("Change to Channel"))
             {
                 enter();
             }

@@ -5,7 +5,7 @@
     <name>FunctionDialog</name>
     <message>
         <source>OK</source>
-        <translation></translation>
+        <translation>OK</translation>
     </message>
 </context>
 <context>
@@ -210,7 +210,7 @@
     </message>
     <message>
         <source>1/123</source>
-        <translation></translation>
+        <translation>1/123</translation>
     </message>
     <message>
         <source>Date:</source>
@@ -259,31 +259,32 @@
     <message>
         <source>[R] = Running
 [S] = Stopped</source>
-        <translation type="unfinished"></translation>
+        <translation>[R] = Käynnissä
+[S] = Pysäytetty</translation>
     </message>
     <message>
         <source>Select Camera:</source>
-        <translation type="unfinished"></translation>
+        <translation>Valitse kamera:</translation>
     </message>
     <message>
         <source>Select Date:</source>
-        <translation type="unfinished"></translation>
+        <translation>Valitse päivämäärä:</translation>
     </message>
     <message>
         <source>Test</source>
-        <translation type="unfinished"></translation>
+        <translation>Kokeile</translation>
     </message>
     <message>
         <source>Record</source>
-        <translation type="unfinished"></translation>
+        <translation>Tallenna</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Store</source>
-        <translation type="unfinished"></translation>
+        <translation>Tallenna</translation>
     </message>
 </context>
 <context>

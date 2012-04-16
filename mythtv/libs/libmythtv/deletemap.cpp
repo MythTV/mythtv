@@ -134,7 +134,23 @@ void DeleteMap::UpdateSeekAmount(int change, double framerate)
     }
 }
 
-/**
+static QString createTimeString(uint64_t frame, uint64_t total,
+                                double frame_rate, bool full_resolution)
+{
+    int secs   = (int)(frame / frame_rate);
+    int frames = frame - (int)(secs * frame_rate);
+    int totalSecs = (int)(total / frame_rate);
+    QString timestr;
+    if (totalSecs >= 3600)
+        timestr = QString::number(secs / 3600) + ":";
+    timestr += QString("%1").arg((secs / 60) % 60, 2, 10, QChar(48)) +
+        QString(":%1").arg(secs % 60, 2, 10, QChar(48));
+    if (full_resolution)
+        timestr += QString(".%1").arg(frames, 2, 10, QChar(48));
+    return timestr;
+}
+
+ /**
  * \brief Show and update the edit mode On Screen Display. The cut regions
  *        are only refreshed if the deleteMap has been updated.
  */
@@ -152,22 +168,25 @@ void DeleteMap::UpdateOSD(uint64_t frame, uint64_t total, double frame_rate,
     infoMap.detach();
     m_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
 
-    int secs   = (int)(frame / frame_rate);
-    int frames = frame - (int)(secs * frame_rate);
-    QString timestr = QString::number(secs / 3600) +
-                      QString(":%1").arg((secs / 60) % 60, 2, 10, QChar(48)) +
-                      QString(":%1").arg(secs % 60, 2, 10, QChar(48)) +
-                      QString(".%1").arg(frames, 2, 10, QChar(48));
-
     QString cutmarker = " ";
     if (IsInDelete(frame))
         cutmarker = QObject::tr("cut");
 
+    QString timestr = createTimeString(frame, total, frame_rate, true);
+    uint64_t relTotal = TranslatePositionAbsToRel(total);
+    QString relTimeDisplay = createTimeString(TranslatePositionAbsToRel(frame),
+                                              relTotal, frame_rate, false);
+    QString relLengthDisplay = createTimeString(relTotal,
+                                                relTotal, frame_rate, false);
     infoMap["timedisplay"]  = timestr;
     infoMap["framedisplay"] = QString::number(frame);
     infoMap["cutindicator"] = cutmarker;
     infoMap["title"]        = QObject::tr("Edit");
     infoMap["seekamount"]   = m_seekText;;
+    infoMap["reltimedisplay"] = relTimeDisplay;
+    infoMap["rellengthdisplay"] = relLengthDisplay;
+    infoMap["fulltimedisplay"] = timestr + " (" +
+        QObject::tr("%1 of %2").arg(relTimeDisplay).arg(relLengthDisplay) + ")";
 
     QHash<QString,float> posMap;
     posMap.insert("position", (float)((double)frame/(double)total));
@@ -838,4 +857,64 @@ bool DeleteMap::IsSaved(void) const
     }
 
     return currentMap == savedMap;
+}
+
+uint64_t DeleteMap::TranslatePositionAbsToRel(const frm_dir_map_t &deleteMap,
+                                              uint64_t absPosition)
+{
+    uint64_t subtraction = 0;
+    uint64_t startOfCutRegion = 0;
+    frm_dir_map_t::const_iterator i;
+    bool withinCut = false;
+    bool first = true;
+    for (i = deleteMap.constBegin(); i != deleteMap.constEnd(); ++i)
+    {
+        if (first)
+            withinCut = (i.value() == MARK_CUT_END);
+        first = false;
+        if (i.key() > absPosition)
+            break;
+        if (i.value() == MARK_CUT_START && !withinCut)
+        {
+            withinCut = true;
+            startOfCutRegion = i.key();
+        }
+        else if (i.value() == MARK_CUT_END && withinCut)
+        {
+            withinCut = false;
+            subtraction += (i.key() - startOfCutRegion);
+        }
+    }
+    if (withinCut)
+        subtraction += (absPosition - startOfCutRegion);
+    return absPosition - subtraction;
+}
+
+uint64_t DeleteMap::TranslatePositionRelToAbs(const frm_dir_map_t &deleteMap,
+                                              uint64_t relPosition)
+{
+    uint64_t addition = 0;
+    uint64_t startOfCutRegion = 0;
+    frm_dir_map_t::const_iterator i;
+    bool withinCut = false;
+    bool first = true;
+    for (i = deleteMap.constBegin(); i != deleteMap.constEnd(); ++i)
+    {
+        if (first)
+            withinCut = (i.value() == MARK_CUT_END);
+        first = false;
+        if (i.value() == MARK_CUT_START && !withinCut)
+        {
+            withinCut = true;
+            startOfCutRegion = i.key();
+            if (relPosition + addition <= startOfCutRegion)
+                break;
+        }
+        else if (i.value() == MARK_CUT_END && withinCut)
+        {
+            withinCut = false;
+            addition += (i.key() - startOfCutRegion);
+        }
+    }
+    return relPosition + addition;
 }

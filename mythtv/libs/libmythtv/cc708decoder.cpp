@@ -41,7 +41,7 @@ void CC708Decoder::decode_cc_data(uint cc_type, uint data1, uint data2)
     if (DTVCC_PACKET_START == cc_type)
     {
 #if 0
-        LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("CC ST data(0x%1 0x%2)")
+        LOG(VB_VBI, LOG_DEBUG, LOC + QString("CC ST data(0x%1 0x%2)")
                 .arg(data1,0,16).arg(data2,0,16));
 #endif
 
@@ -55,7 +55,7 @@ void CC708Decoder::decode_cc_data(uint cc_type, uint data1, uint data2)
     else if (DTVCC_PACKET_DATA == cc_type)
     {
 #if 0
-        LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("CC Ex data(0x%1 0x%2)")
+        LOG(VB_VBI, LOG_DEBUG, LOC + QString("CC Ex data(0x%1 0x%2)")
                 .arg(data1,0,16).arg(data2,0,16));
 #endif
 
@@ -198,7 +198,7 @@ static void parse_cc_service_stream(CC708Reader* cc, uint service_num)
     }
 
 #if 0
-    LOG(VB_GENERAL, LOG_ERR,
+    LOG(VB_VBI, LOG_ERR,
         QString("cc_ss delayed(%1) blk_start(%2) blk_size(%3)")
             .arg(cc->delayed) .arg(blk_start) .arg(blk_size));
 #endif
@@ -239,7 +239,7 @@ static void parse_cc_service_stream(CC708Reader* cc, uint service_num)
         }
 
 #if DEBUG_CC_SERVICE
-        LOG(VB_GENERAL, LOG_DEBUG, QString("i %1, blk_size %2").arg(i)
+        LOG(VB_VBI, LOG_DEBUG, QString("i %1, blk_size %2").arg(i)
                 .arg(blk_size));
 #endif
 
@@ -247,15 +247,15 @@ static void parse_cc_service_stream(CC708Reader* cc, uint service_num)
         if (old_i == i)
         {
 #if DEBUG_CC_SERVICE
-            LOG(VB_GENERAL, LOG_DEBUG, QString("old_i == i == %1").arg(i));
+            LOG(VB_VBI, LOG_DEBUG, QString("old_i == i == %1").arg(i));
             QString msg;
             for (int j = 0; j < blk_size; j++)
                 msg += QString("0x%1 ").arg(cc->buf[service_num][j], 0, 16);
-            LOG(VB_GENERAL, LOG_DEBUG, msg);
+            LOG(VB_VBI, LOG_DEBUG, msg);
 #endif
             if (blk_size - i > 10)
             {
-                LOG(VB_GENERAL, LOG_INFO, "eia-708 decoding error...");
+                LOG(VB_VBI, LOG_INFO, "eia-708 decoding error...");
                 cc->Reset(service_num);
                 cc->delayed[service_num] = 0;
                 i = cc->buf_size[service_num];
@@ -287,12 +287,12 @@ static void parse_cc_service_stream(CC708Reader* cc, uint service_num)
     {
         if (0 != (blk_size - i))
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("buffer error i(%1) buf_size(%2)")
+            LOG(VB_VBI, LOG_ERR, QString("buffer error i(%1) buf_size(%2)")
                 .arg(i).arg(blk_size));
             QString msg;
             for (i=0; i < blk_size; i++)
                 msg += QString("0x%1 ").arg(cc->buf[service_num][i], 0, 16);
-            LOG(VB_GENERAL, LOG_ERR, msg);
+            LOG(VB_VBI, LOG_ERR, msg);
         }
         cc->buf_size[service_num] = 0;
     }
@@ -491,7 +491,7 @@ static int handle_cc_c1(CC708Reader* cc, uint service_num, int i)
 #if DEBUG_CC_SERVICE
     else
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("handle_cc_c1: (NOT HANDLED) "
+        LOG(VB_VBI, LOG_ERR, QString("handle_cc_c1: (NOT HANDLED) "
                 "code(0x%1) i(%2) blk_size(%3)").arg(code, 2, 16, '0')
                 .arg(i).arg(blk_size));
     }
@@ -569,12 +569,12 @@ static void rightsize_buf(CC708Reader* cc, uint service_num, uint block_size)
         cc->buf_alloc[service_num] = (cc->buf[service_num]) ? new_alloc : 0;
 
 #if DEBUG_CC_SERVICE_2
-        LOG(VB_GENERAL, LOG_DEBUG, QString("rightsize_buf: srv %1 to %1 bytes")
+        LOG(VB_VBI, LOG_DEBUG, QString("rightsize_buf: srv %1 to %1 bytes")
                 .arg(service_num) .arg(cc->buf_alloc[service_num]));
 #endif
     }
     if (min_new_size >= cc->buf_alloc[service_num])
-        LOG(VB_GENERAL, LOG_ERR,
+        LOG(VB_VBI, LOG_ERR,
             QString("buffer resize error: min_new_size=%1, buf_alloc[%2]=%3")
             .arg(min_new_size)
             .arg(service_num)
@@ -596,7 +596,7 @@ static void append_cc(CC708Reader* cc, uint service_num,
         QString msg("append_cc: ");
         for (i = 0; i < cc->buf_size[service_num]; i++)
             msg += QString("0x%1").arg(cc->buf[service_num][i], 0, 16);
-        LOG(VB_GENERAL, LOG_DEBUG, msg);
+        LOG(VB_VBI, LOG_DEBUG, msg);
     }
 #endif
     parse_cc_service_stream(cc, service_num);
@@ -630,11 +630,11 @@ static void parse_cc_packet(CC708Reader* cb_cbs, CaptionPacket* pkt,
                           .arg(srv) .arg(seq_num);
         for (j = 0; j < pkt_size; j++)
             msg += QString("0x%1").arg(pkt_buf[j], 0, 16);
-        LOG(VB_GENERAL, LOG_DEBUG, msg);
+        LOG(VB_VBI, LOG_DEBUG, msg);
     }
 
     if (pkt_size >= 127)
-        LOG(VB_GENERAL, LOG_ERR,
+        LOG(VB_VBI, LOG_ERR,
             QString("Unexpected pkt_size=%1").arg(pkt_size));
 
     while (off < pkt_size && pkt_buf[off])
@@ -644,7 +644,7 @@ static void parse_cc_packet(CC708Reader* cb_cbs, CaptionPacket* pkt,
         block_data_offset = (0x7==service_number && block_size!=0) ?
             off+2 : off+1;
 #if DEBUG_CC_SERVICE_BLOCK
-        LOG(VB_GENERAL, LOG_DEBUG, 
+        LOG(VB_VBI, LOG_DEBUG, 
             QString("service_block size(%1) num(%2) off(%3)")
                 .arg(block_size) .arg(service_number) .arg(block_data_offset));
 #endif
@@ -652,7 +652,7 @@ static void parse_cc_packet(CC708Reader* cb_cbs, CaptionPacket* pkt,
         {
             int extended_service_number = pkt_buf[off+2] & 0x3f;
 #if DEBUG_CC_SERVICE_BLOCK
-            LOG(VB_GENERAL, LOG_DEBUG, QString("ext_svc_num(%1)")
+            LOG(VB_VBI, LOG_DEBUG, QString("ext_svc_num(%1)")
                    .arg(extended_service_number));
 #endif
             service_number =  extended_service_number;
@@ -669,7 +669,7 @@ static void parse_cc_packet(CC708Reader* cb_cbs, CaptionPacket* pkt,
                 for (i=0; i<block_size; i++)
                     msg += QString("0x%1 ")
                                .arg(pkt_buf[block_data_offset+i], 0, 16);
-                LOG(VB_GENERAL, LOG_DEBUG, msg);
+                LOG(VB_VBI, LOG_DEBUG, msg);
             }
 #endif
             append_cc(cb_cbs, service_number,
@@ -682,7 +682,7 @@ static void parse_cc_packet(CC708Reader* cb_cbs, CaptionPacket* pkt,
     if (off<pkt_size) // must end in null service block, if packet is not full.
     {
         if (pkt_buf[off] != 0)
-            LOG(VB_GENERAL, LOG_ERR,
+            LOG(VB_VBI, LOG_ERR,
                 QString("CEA-708 packet error: pkt_size=%1, pkt_buf[%2]=%3")
                 .arg(pkt_size).arg(off).arg(pkt_buf[off]));
     }

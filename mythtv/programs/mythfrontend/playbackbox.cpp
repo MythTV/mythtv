@@ -4254,7 +4254,8 @@ void PlaybackBox::HandleUpdateProgramInfoEvent(const ProgramInfo &evinfo)
     QString old_recgroup = m_programInfoCache.GetRecGroup(
         evinfo.GetChanID(), evinfo.GetRecordingStartTime());
 
-    m_programInfoCache.Update(evinfo);
+    if (!m_programInfoCache.Update(evinfo))
+        return;
 
     // If the recording group has changed, reload lists from the recently
     // updated cache; if not, only update UI for the updated item

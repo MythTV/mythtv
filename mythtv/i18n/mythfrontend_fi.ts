@@ -2176,11 +2176,11 @@
     </message>
     <message>
         <source>E </source>
-        <translation></translation>
+        <translation>E </translation>
     </message>
     <message>
         <source>C </source>
-        <translation></translation>
+        <translation>C </translation>
     </message>
 </context>
 <context>
@@ -2280,6 +2280,22 @@
     <message>
         <source>Searching for available artwork...</source>
         <translation>Etsitään saatavilla olevaa kuvitusta...</translation>
+    </message>
+    <message>
+        <source>Trying to automatically find this recording online...</source>
+        <translation>Yritetään automaattisesti löytää tallenne netistä...</translation>
+    </message>
+    <message>
+        <source>Trying to manually find this recording online...</source>
+        <translation>Yritetään manuaalisesti löytää tallenne netistä...</translation>
+    </message>
+    <message>
+        <source>No match found for this recording. You can try entering a TVDB/TMDB number, season, and episode manually.</source>
+        <translation>Tallenneteelle ei löydy osumaa. Voit koittaa syöttää TVDB/TMDB numeron, kauden ja jakson käsin.</translation>
+    </message>
+    <message>
+        <source>This number, season, and episode combination does not appear to be valid (or the site may be down). Check your information and try again.</source>
+        <translation>Tämä numero, kausi tai jakso -yhdistelmä ei vaikuta oikealle (tai sivusto on nurin). Tarkista tietosi ja koita uusiksi.</translation>
     </message>
 </context>
 <context>
@@ -3512,23 +3528,23 @@
     </message>
     <message>
         <source>The Video default view</source>
-        <translation>Videon oletusnäkymä</translation>
+        <translation type="obsolete">Videon oletusnäkymä</translation>
     </message>
     <message>
         <source>The Video video manager</source>
-        <translation>Videomanageri</translation>
+        <translation type="obsolete">Videomanageri</translation>
     </message>
     <message>
         <source>The Video video browser</source>
-        <translation>Videoselain</translation>
+        <translation type="obsolete">Videoselain</translation>
     </message>
     <message>
         <source>The Video video listings</source>
-        <translation>Videoluettelot</translation>
+        <translation type="obsolete">Videoluettelot</translation>
     </message>
     <message>
         <source>The Video video gallery</source>
-        <translation>Videogalleria</translation>
+        <translation type="obsolete">Videogalleria</translation>
     </message>
     <message>
         <source>Play an Optical Disc</source>
@@ -3557,6 +3573,26 @@
     <message>
         <source>Standby Mode</source>
         <translation>Virransäästötila</translation>
+    </message>
+    <message>
+        <source>The Video Default View</source>
+        <translation>Videoiden oletusnäkymä</translation>
+    </message>
+    <message>
+        <source>The Video Manager</source>
+        <translation>Videomanageri</translation>
+    </message>
+    <message>
+        <source>The Video Browser</source>
+        <translation>Videoselain</translation>
+    </message>
+    <message>
+        <source>The Video Listings</source>
+        <translation>Videoluettelot</translation>
+    </message>
+    <message>
+        <source>The Video Gallery</source>
+        <translation>Videogalleria</translation>
     </message>
 </context>
 <context>
@@ -5079,7 +5115,7 @@ Haluatko varmasti poistaa:</translation>
     </message>
     <message>
         <source>Delete Episode</source>
-        <translation></translation>
+        <translation>Poista jakso</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -6017,7 +6053,7 @@ Haluatko varmasti poistaa:</translation>
     </message>
     <message>
         <source>TV+Radio</source>
-        <translation></translation>
+        <translation>TV+Radio</translation>
     </message>
     <message>
         <source>TV - Adds A/V services only, TV+Radio - Adds all services with audio, All - Adds all services (including data only services).</source>
@@ -6111,7 +6147,7 @@ Useimmat DVB-C transponderit lähettävät 6,9 tai 6,875 miljoonaa symbolia seku
     </message>
     <message>
         <source>Roll-off</source>
-        <translation></translation>
+        <translation>Roll-off</translation>
     </message>
     <message>
         <source>Roll-off factor (Default: 0.35)</source>
@@ -7067,7 +7103,7 @@ Halutako jatkaa katsomista?</translation>
     <message>
         <source>t</source>
         <comment>RecStatusChar rsTuning</comment>
-        <translation></translation>
+        <translation>t</translation>
     </message>
     <message>
         <source>T</source>
@@ -7313,7 +7349,7 @@ Useimmat tv-kortit havaitsevat tämän automaattisesti.</translation>
     </message>
     <message>
         <source>Chile</source>
-        <translation></translation>
+        <translation>Chile</translation>
     </message>
     <message>
         <source>Denmark</source>
@@ -9562,7 +9598,7 @@ Check if the video exists</source>
     </message>
     <message>
         <source>Equestrian</source>
-        <translation></translation>
+        <translation>Equestrian</translation>
     </message>
     <message>
         <source>Pre-School Children&apos;s Programmes</source>
@@ -9755,7 +9791,7 @@ Useimmat DVB-S transponderit lähettävät 27.5 miljoonaa symbolia sekunnissa.</
     </message>
     <message>
         <source>Decoder to use to play back MPEG2 video.</source>
-        <translation>Koodinpurkaja, jolal toistetaan MPEG2 videoita.</translation>
+        <translation type="obsolete">Koodinpurkaja, jolal toistetaan MPEG2 videoita.</translation>
     </message>
     <message>
         <source>Standard will use ffmpeg library.</source>
@@ -10310,11 +10346,11 @@ Hakijasi ei anna kanavanumeroita, joten aseta ne manuaalisesti.</translation>
     </message>
     <message>
         <source>Default refresh rate when watching a video. Leave at &quot;Auto&quot; to automatically use the best available</source>
-        <translation>Videon katselun oletusvirkistystaajuus. Valitse &apos;Auto&apos; jos haluat käyttää parasta mahdollista.</translation>
+        <translation>Videon katselun oletusvirkistystaajuus. Valitse &apos;Auto&apos; jos haluat käyttää parasta mahdollista</translation>
     </message>
     <message>
         <source>Refresh rate when watching a video at a specific resolution. Leave at &quot;Auto&quot; to automatically use the best available</source>
-        <translation>Virkistystaajuus katsottaessa videota tietyllä resoluutiolla. Aseta &quot;Auto&quot; käyttääksesi automaattisesti parasta mahdollista.</translation>
+        <translation>Virkistystaajuus katsottaessa videota tietyllä resoluutiolla. Aseta &quot;Auto&quot; käyttääksesi automaattisesti parasta mahdollista</translation>
     </message>
     <message>
         <source>Aspect ratio when watching a video at a specific resolution.</source>
@@ -10326,11 +10362,11 @@ Hakijasi ei anna kanavanumeroita, joten aseta ne manuaalisesti.</translation>
     </message>
     <message>
         <source>Qt</source>
-        <translation type="obsolete">Qt</translation>
+        <translation>Qt</translation>
     </message>
     <message>
         <source>OpenGL</source>
-        <translation type="obsolete">OpenGL</translation>
+        <translation>OpenGL</translation>
     </message>
     <message>
         <source>Default &apos;Start Early&apos; minutes for new recording rules</source>
@@ -11110,12 +11146,12 @@ Käytä Eject-nappia aseman alareunassa.</translation>
     <message>
         <source>MPEG-2</source>
         <comment>Recording Profile MPEG-2</comment>
-        <translation></translation>
+        <translation>MPEG-2</translation>
     </message>
     <message>
         <source>RTjpeg/MPEG-4</source>
         <comment>Recording Profile RTjpeg/MPEG-4</comment>
-        <translation></translation>
+        <translation>RTjpeg/MPEG-4</translation>
     </message>
     <message>
         <source>FireWire Input</source>
@@ -11160,12 +11196,12 @@ Käytä Eject-nappia aseman alareunassa.</translation>
     <message>
         <source>Live TV</source>
         <comment>Recording Group Live TV</comment>
-        <translation></translation>
+        <translation>Live TV</translation>
     </message>
     <message>
         <source>Live TV</source>
         <comment>Storage Group Name</comment>
-        <translation></translation>
+        <translation>Live TV</translation>
     </message>
     <message>
         <source>Transcoders</source>
@@ -11317,7 +11353,7 @@ Käytä Eject-nappia aseman alareunassa.</translation>
     </message>
     <message>
         <source>7.1</source>
-        <translation></translation>
+        <translation>7.1</translation>
     </message>
     <message>
         <source>Speaker configuration</source>
@@ -11715,7 +11751,7 @@ ei voi olla tyhjä.</translation>
     </message>
     <message>
         <source>If enabled, a menu will be displayed allowing you to delete the recording when it has finished playing.</source>
-        <translation></translation>
+        <translation>Jos valittu, tallennuksen loputtua näytetään valikko jossa voit poistaa tallenteen sen toiston loputtua.</translation>
     </message>
     <message>
         <source>Jump to program OSD</source>
@@ -11879,7 +11915,7 @@ ei voi olla tyhjä.</translation>
     </message>
     <message>
         <source>Paint engine</source>
-        <translation type="obsolete">Piirtomoottori</translation>
+        <translation>Piirtomoottori</translation>
     </message>
     <message>
         <source>This selects what MythTV uses to draw. If you have decent hardware, select OpenGL.</source>
@@ -12200,24 +12236,22 @@ ei voi olla tyhjä.</translation>
     <message numerus="yes">
         <source>%n second(s)</source>
         <translation>
-            <numerusform>%n sekuntia
-        </numerusform>
-            <numerusform></numerusform>
+            <numerusform>%n sekunti</numerusform>
+            <numerusform>%n sekuntia</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n minute(s)</source>
         <translation>
-            <numerusform>%n minuuttia
-        </numerusform>
-            <numerusform></numerusform>
+            <numerusform>%n minuutti</numerusform>
+            <numerusform>%n minuuttia</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Found %n new non-conflicting %1 channel(s).</source>
         <translation>
-            <numerusform>Löytyi %n uutta ristiriidatonta kanava(a).</numerusform>
-            <numerusform></numerusform>
+            <numerusform>Löytyi %n uusi ristiriidaton kanava.</numerusform>
+            <numerusform>Löytyi %n uutta ristiriidatonta kanavaa.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -12491,23 +12525,23 @@ ei voi olla tyhjä.</translation>
     </message>
     <message>
         <source>One Field (1x, HW)</source>
-        <translation></translation>
+        <translation>One Field (1x, HW)</translation>
     </message>
     <message>
         <source>Temporal (1x, HW)</source>
-        <translation></translation>
+        <translation>Temporal (1x, HW)</translation>
     </message>
     <message>
         <source>Temporal (2x, HW)</source>
-        <translation></translation>
+        <translation>Temporal (2x, HW)</translation>
     </message>
     <message>
         <source>Advanced (1x, HW)</source>
-        <translation></translation>
+        <translation>Advanced (1x, HW)</translation>
     </message>
     <message>
         <source>Advanced (2x, HW)</source>
-        <translation></translation>
+        <translation>Advanced (2x, HW)</translation>
     </message>
     <message>
         <source>VDPAU High Quality</source>
@@ -13739,28 +13773,84 @@ Hakijasi ei anna kanavanumeroita, joten aseta ne manuaalisesti.</translation>
         <source>MythTV will listen for connections from the &quot;mythutil&quot; program on this port.</source>
         <translation>MythTV kuuntelee yhteyksiä &quot;mythutil&quot; ohjelmasta tässä portissa.</translation>
     </message>
+    <message>
+        <source> (Audio Description)</source>
+        <comment>Audio described for the visually impaired</comment>
+        <translation> (Äänien kuvaus)</translation>
+    </message>
+    <message>
+        <source> (Commentary)</source>
+        <comment>Audio commentary track</comment>
+        <translation> (Kommentointi)</translation>
+    </message>
+    <message>
+        <source>Processing method used to decode video.</source>
+        <translation>Prosessointitapa videopurulle.</translation>
+    </message>
+    <message>
+        <source>VDA will attempt to use the graphics hardware to accelerate video decoding. (H264 only, requires Mac OS 10.6.3)</source>
+        <translation>VDA koittaa käyttää grafiikkakiihdytystä nopeuttamaan videon purkua (vain H264, vaatii Mac OS 10.6.3)</translation>
+    </message>
+    <message>
+        <source>VDA High Quality</source>
+        <comment>Sample: VDA high quality</comment>
+        <translation>VDA Korkealaatuinen</translation>
+    </message>
+    <message>
+        <source>VDA Normal</source>
+        <comment>Sample: VDA average quality</comment>
+        <translation>VDA Normaali</translation>
+    </message>
+    <message>
+        <source>VDA Slim</source>
+        <comment>Sample: VDA low power GPU</comment>
+        <translation>VDA Heikkolaatuinen</translation>
+    </message>
+    <message>
+        <source>OpenGL High Quality</source>
+        <comment>Sample: OpenGL high quality</comment>
+        <translation>OpenGL Korkealaatuinen</translation>
+    </message>
+    <message>
+        <source>OpenGL Normal</source>
+        <comment>Sample: OpenGL average quality</comment>
+        <translation>OpenGL Normaali</translation>
+    </message>
+    <message>
+        <source>OpenGL Slim</source>
+        <comment>Sample: OpenGL low power GPU</comment>
+        <translation>OpenGL Heikkolaatuinen</translation>
+    </message>
+    <message>
+        <source>Direct3D</source>
+        <translation>Direct3D</translation>
+    </message>
+    <message>
+        <source>This selects what MythTV uses to draw. Choosing &apos;Auto&apos; is recommended, unless running on systems with broken OpenGL implementations (broken hardware or drivers or windowing systems) where only Qt works.</source>
+        <translation>Tämä valitsee mitä MythTV käyttää piirtoon. Auto -valinta on suositeltu, paitsi jos systeemissä on OpenGL rikki (laitteisto, ajurit tai ikkunointijärjestelmä rikki) ja vain Qt toimii.</translation>
+    </message>
 </context>
 <context>
     <name>RatingsToPL</name>
     <message>
         <source>G</source>
         <comment>PL 1 default search string.</comment>
-        <translation></translation>
+        <translation>G</translation>
     </message>
     <message>
         <source>PG</source>
         <comment>PL 2 default search string.</comment>
-        <translation></translation>
+        <translation>PG</translation>
     </message>
     <message>
         <source>PG-13</source>
         <comment>PL3 default search string.</comment>
-        <translation></translation>
+        <translation>PG-13</translation>
     </message>
     <message>
         <source>R:NC-17</source>
         <comment>PL4 default search string.</comment>
-        <translation></translation>
+        <translation>R:NC-17</translation>
     </message>
 </context>
 <context>
@@ -16050,19 +16140,19 @@ Valitse nykyinen tallennus</translation>
     </message>
     <message>
         <source>3. Video sources</source>
-        <translation>3. Kuvalähteet</translation>
+        <translation type="obsolete">3. Kuvalähteet</translation>
     </message>
     <message>
         <source>4. Input connections</source>
-        <translation>4. Tuloliitännät</translation>
+        <translation type="obsolete">4. Tuloliitännät</translation>
     </message>
     <message>
         <source>5. Channel Editor</source>
-        <translation>5. Kanavien muokkaaminen</translation>
+        <translation type="obsolete">5. Kanavien muokkaaminen</translation>
     </message>
     <message>
         <source>6. Storage Directories</source>
-        <translation>6. Tallennushakemistot</translation>
+        <translation type="obsolete">6. Tallennushakemistot</translation>
     </message>
     <message>
         <source>%alert_text%</source>
@@ -16434,7 +16524,7 @@ Valitse nykyinen tallennus</translation>
     </message>
     <message>
         <source>Recording Profiles</source>
-        <translation>Tallennusprofiilit</translation>
+        <translation type="obsolete">Tallennusprofiilit</translation>
     </message>
     <message>
         <source>Global recording priority and scheduling</source>
@@ -16510,7 +16600,7 @@ Valitse nykyinen tallennus</translation>
     </message>
     <message>
         <source>Movie Times</source>
-        <translation></translation>
+        <translation>Movie Times</translation>
     </message>
     <message>
         <source>NetFlix</source>
@@ -17059,7 +17149,7 @@ Valitse nykyinen tallennus</translation>
     </message>
     <message>
         <source>InetRef</source>
-        <translation></translation>
+        <translation>InetRef</translation>
     </message>
     <message>
         <source>Cover File</source>
@@ -17127,7 +17217,7 @@ Valitse nykyinen tallennus</translation>
     </message>
     <message>
         <source>IMDB ID:</source>
-        <translation></translation>
+        <translation>IMDB ID:</translation>
     </message>
     <message>
         <source>Video Browser</source>
@@ -17577,7 +17667,7 @@ Ajastaaksesi tallennuksen poistu tästä ikkunasta ja valitse &apos;Ohjelmaopas&
     </message>
     <message>
         <source>%DESCRIPTION%</source>
-        <translation></translation>
+        <translation>%DESCRIPTION%</translation>
     </message>
     <message>
         <source>Callsign</source>
@@ -17641,7 +17731,7 @@ Ajastaaksesi tallennuksen poistu tästä ikkunasta ja valitse &apos;Ohjelmaopas&
     </message>
     <message>
         <source>%DATE%, %TIME%</source>
-        <translation></translation>
+        <translation>%DATE%, %TIME%</translation>
     </message>
     <message>
         <source>Go up a level</source>
@@ -17794,7 +17884,7 @@ Ajastaaksesi tallennuksen poistu tästä ikkunasta ja valitse &apos;Ohjelmaopas&
     </message>
     <message>
         <source>XMLTV #:</source>
-        <translation></translation>
+        <translation>XMLTV #:</translation>
     </message>
     <message>
         <source>Frame %1</source>
@@ -17882,7 +17972,7 @@ Kun olet valmis, paina OK-näppäintä.</translation>
     </message>
     <message>
         <source>(%STARTTIME% - %ENDTIME%) %LONGREPEAT% %YEARSTARS%%DESCRIPTION%</source>
-        <translation></translation>
+        <translation>(%STARTTIME% - %ENDTIME%) %LONGREPEAT% %YEARSTARS%%DESCRIPTION%</translation>
     </message>
     <message>
         <source>Manually Schedule A Recording</source>
@@ -18071,7 +18161,6 @@ When you have completed your configuration, press &quot;OK&quot; to search.</sou
         <source>-%n</source>
         <translation>
             <numerusform>-%n</numerusform>
-            <numerusform>-%n</numerusform>
         </translation>
     </message>
     <message>
@@ -18081,7 +18170,6 @@ When you have completed your configuration, press &quot;OK&quot; to search.</sou
     <message numerus="yes">
         <source>+%n</source>
         <translation>
-            <numerusform>+%n</numerusform>
             <numerusform>+%n</numerusform>
         </translation>
     </message>
@@ -18635,7 +18723,7 @@ Ajastaaksesi tallennuksen poistu tästä ikkunasta ja valitse &apos;Ohjelmaopas&
     </message>
     <message>
         <source>%STARTDATE%   %STARTTIME% - %ENDTIME%</source>
-        <translation>%STARTDATE%   %STARTTIME% - %ENDTIME%</translation>
+        <translation type="obsolete">%STARTDATE%   %STARTTIME% - %ENDTIME%</translation>
     </message>
     <message>
         <source>%|&quot;SUBTITLE|&quot;% %|(STARS|) %%DESCRIPTION%</source>
@@ -18663,7 +18751,7 @@ Ajastaaksesi tallennuksen poistu tästä ikkunasta ja valitse &apos;Ohjelmaopas&
     </message>
     <message>
         <source>Programme Finder</source>
-        <translation type="obsolete">Ohjelmahaku</translation>
+        <translation>Ohjelmahaku</translation>
     </message>
     <message>
         <source>Programme Guide</source>
@@ -18687,7 +18775,7 @@ Ajastaaksesi tallennuksen poistu tästä ikkunasta ja valitse &apos;Ohjelmaopas&
     </message>
     <message>
         <source>7. System Events</source>
-        <translation>7. järjestelmätapahtumat</translation>
+        <translation type="obsolete">7. järjestelmätapahtumat</translation>
     </message>
     <message>
         <source>Search For</source>
@@ -18711,7 +18799,7 @@ Ajastaaksesi tallennuksen poistu tästä ikkunasta ja valitse &apos;Ohjelmaopas&
     </message>
     <message>
         <source>Video Num.:</source>
-        <translation></translation>
+        <translation>Video Num.:</translation>
     </message>
     <message>
         <source>Directed by</source>
@@ -18771,7 +18859,7 @@ Ajastaaksesi tallennuksen poistu tästä ikkunasta ja valitse &apos;Ohjelmaopas&
     </message>
     <message>
         <source>InetRef :</source>
-        <translation></translation>
+        <translation>InetRef :</translation>
     </message>
     <message>
         <source>Cover File :</source>
@@ -18859,7 +18947,7 @@ Ajastaaksesi tallennuksen poistu tästä ikkunasta ja valitse &apos;Ohjelmaopas&
     </message>
     <message>
         <source>%TIME%</source>
-        <translation></translation>
+        <translation>%TIME%</translation>
     </message>
     <message>
         <source>A blue theme.  Originally designed before the MythUI rewrite, MythCenter has been updated to take advantage of the new UI library while still maintaining the look and feel that long-time MythTV users are used to.</source>
@@ -18941,7 +19029,7 @@ pp KKKK vvvv</translation>
     </message>
     <message>
         <source>%DATE%</source>
-        <translation></translation>
+        <translation>%DATE%</translation>
     </message>
     <message>
         <source>hh:mm</source>
@@ -18957,7 +19045,7 @@ pp KKKK vvvv</translation>
     </message>
     <message>
         <source>Info</source>
-        <translation></translation>
+        <translation>Info</translation>
     </message>
     <message>
         <source>An earth toned theme, Terra was the first theme to use MythTV&apos;s new MythUI library and is designed to showcase some of the capabilities of the new user interface.</source>
@@ -18977,11 +19065,11 @@ pp KKKK vvvv</translation>
     </message>
     <message>
         <source>%STARTTIME%-%ENDTIME% : %LENMINS%</source>
-        <translation></translation>
+        <translation>%STARTTIME%-%ENDTIME% : %LENMINS%</translation>
     </message>
     <message>
         <source>%VIDEOWIDTH%x%VIDEOHEIGHT%, %VIDEOFRAMERATE%fps, %VIDEOCODECDESC%</source>
-        <translation></translation>
+        <translation>%VIDEOWIDTH%x%VIDEOHEIGHT%, %VIDEOFRAMERATE%fps, %VIDEOCODECDESC%</translation>
     </message>
     <message>
         <source>dddd
@@ -18991,7 +19079,7 @@ pp KKK vvvv</translation>
     </message>
     <message>
         <source>Twitter</source>
-        <translation></translation>
+        <translation>Twitter</translation>
     </message>
     <message>
         <source>Send and receive tweets</source>
@@ -19068,7 +19156,7 @@ pp KKK vvvv</translation>
     </message>
     <message>
         <source>Change the quality of your recordings</source>
-        <translation>Valitse laatu tallenteillesi</translation>
+        <translation type="obsolete">Valitse laatu tallenteillesi</translation>
     </message>
     <message>
         <source>Change MythTV key bindings.</source>
@@ -19200,7 +19288,7 @@ Jos valitset &quot;Käytä oletus toistinta,&quot; laajennoksen toistokomento j�
     </message>
     <message>
         <source>TMDB/TVDB #:</source>
-        <translation></translation>
+        <translation>TMDB/TVDB #:</translation>
     </message>
     <message>
         <source>Watched:</source>
@@ -19264,7 +19352,7 @@ Jos valitset &quot;Käytä oletus toistinta,&quot; laajennoksen toistokomento j�
     </message>
     <message>
         <source>TMDB:</source>
-        <translation></translation>
+        <translation>TMDB/TVDB #:</translation>
     </message>
     <message>
         <source>Parental Lvl:</source>
@@ -19592,23 +19680,23 @@ Jos valitset &quot;Käytä oletus toistinta,&quot; laajennoksen toistokomento j�
     </message>
     <message>
         <source>My speaker supports Dolby Digital</source>
-        <translation>Kaiuttimeni tukevat Dolby Digital:ia</translation>
+        <translation type="obsolete">Kaiuttimeni tukevat Dolby Digital:ia</translation>
     </message>
     <message>
         <source>My speaker supports DTS</source>
-        <translation>Kaiuttimeni tukevat DTS:ää</translation>
+        <translation type="obsolete">Kaiuttimeni tukevat DTS:ää</translation>
     </message>
     <message>
         <source>My speaker supports E-AC-3</source>
-        <translation>Kaiuttimeni tukevat E-AC-3:a</translation>
+        <translation type="obsolete">Kaiuttimeni tukevat E-AC-3:a</translation>
     </message>
     <message>
         <source>My speaker supports TrueHD</source>
-        <translation>Kaiuttimeni tukevat TrueHD:ta</translation>
+        <translation type="obsolete">Kaiuttimeni tukevat TrueHD:ta</translation>
     </message>
     <message>
         <source>My speaker supports DTS-HD</source>
-        <translation>Kaiuttimeni tukevat DTS-HD:ta</translation>
+        <translation type="obsolete">Kaiuttimeni tukevat DTS-HD:ta</translation>
     </message>
     <message>
         <source>Video Configuration</source>
@@ -19877,14 +19965,14 @@ Jos valitset &quot;Käytä oletus toistinta,&quot; laajennoksen toistokomento j�
         <source>Using the text areas below,you can change the recording title,subtitle,and description.
 
 Once you have completed your modifications,click the &quot;Save&quot; button.</source>
-        <translation>Alla olevia tekstikenttiä käyttämällä voit vaihtaa tallenteen nimeä, aliotsikkoa ja kuvausta.
+        <translation type="obsolete">Alla olevia tekstikenttiä käyttämällä voit vaihtaa tallenteen nimeä, aliotsikkoa ja kuvausta.
 
 Kun olet valmis, paina tallenna-näppäintä.</translation>
     </message>
     <message>
         <source>You Haven&apos;t Scheduled Any Programs To Be Recorded
  To schedule a recording,exit this screen and select &apos;Program Guide&apos; or &apos;Program Finder&apos;</source>
-        <translation>Et ole ajastanut yhtään tallennusta
+        <translation type="obsolete">Et ole ajastanut yhtään tallennusta
 Ajastaaksesi tallennuksen poistu tästä ikkunasta ja valitse &apos;Ohjelmaopas&apos; tai &apos;Ohjelmahaku&apos;</translation>
     </message>
     <message>
@@ -19897,7 +19985,7 @@ Ajastaaksesi tallennuksen poistu tästä ikkunasta ja valitse &apos;Ohjelmaopas&
     </message>
     <message>
         <source>Press Up/Down from letter list,to navigate to another list.  Press Left/Right from Show or Episode list to navigate to another list.</source>
-        <translation>Paina ylös/alas kirjainlistassa päästäksesi toiseen listaan.  Paina vasen/oikea esitys tai jakso listassa päästäksesi toiseen listaan.</translation>
+        <translation type="obsolete">Paina ylös/alas kirjainlistassa päästäksesi toiseen listaan.  Paina vasen/oikea esitys tai jakso listassa päästäksesi toiseen listaan.</translation>
     </message>
     <message>
         <source>Filter Options</source>
@@ -19937,7 +20025,7 @@ Ajastaaksesi tallennuksen poistu tästä ikkunasta ja valitse &apos;Ohjelmaopas&
     </message>
     <message>
         <source>Designed to show off some different element arrangements available in Myth 0.25.  Tested at 1280x720 and with FranÃÂ§ais</source>
-        <translation>Suunniteltu näyttämään Myth 0.25 :n tarjoamia erilaisia elementtien järjesteyjä .  Kokeiltu 1280x720 resoluutiolla ja ranskan kielellä</translation>
+        <translation type="obsolete">Suunniteltu näyttämään Myth 0.25 :n tarjoamia erilaisia elementtien järjesteyjä .  Kokeiltu 1280x720 resoluutiolla ja ranskan kielellä</translation>
     </message>
     <message>
         <source>Year: %1</source>
@@ -19949,7 +20037,7 @@ Ajastaaksesi tallennuksen poistu tästä ikkunasta ja valitse &apos;Ohjelmaopas&
     </message>
     <message>
         <source>No videos in library,or no files found.  If you have configured a video directory,press &quot;M&quot; (or the MENU key) and select &quot;Scan for Changes.&quot;</source>
-        <translation>Ei videoita kirjastossa, tai tiedostoja ei löydy. Jos olet asettanut videohakemiston, paina &quot;M&quot; (tai MENU näppäintä) ja valitse &quot;Etsi muutoksia.&quot;</translation>
+        <translation type="obsolete">Ei videoita kirjastossa, tai tiedostoja ei löydy. Jos olet asettanut videohakemiston, paina &quot;M&quot; (tai MENU näppäintä) ja valitse &quot;Etsi muutoksia.&quot;</translation>
     </message>
     <message>
         <source>Category: %1</source>
@@ -20085,7 +20173,7 @@ Ajastaaksesi tallennuksen poistu tästä ikkunasta ja valitse &apos;Ohjelmaopas&
     </message>
     <message>
         <source>This theme breaks away from many convetions. It uses squirrly fonts!</source>
-        <translation>Tämä teema rikkoo perinteitä. Se käyttää squirrly fontteja!</translation>
+        <translation type="obsolete">Tämä teema rikkoo perinteitä. Se käyttää squirrly fontteja!</translation>
     </message>
     <message>
         <source>blootube-ng is a theme based on the original blootube-wide by Justin Hornsby (justin.hornsby@gmail.com) which uses very large graphics associated with every menu entry. All changes where made to bring this theme forward to MythTV 0.24.</source>
@@ -20094,6 +20182,90 @@ Ajastaaksesi tallennuksen poistu tästä ikkunasta ja valitse &apos;Ohjelmaopas&
     <message>
         <source>Blue-abstract is a modern looking theme meant for widescreen HD displays. The blue background and the consistent layout makes it an attractive and elegant looking theme.</source>
         <translation>Blue-abstract on modernin näköinen teema tarkoitettu laajakuva HD näytöille. Sininen tausta ja johdonmukainen asettelu tekee siitä houkuttelevan ja elegantin näköisen teeman.</translation>
+    </message>
+    <message>
+        <source>3. Recording Profiles</source>
+        <translation>3. Tallennusprofiilit</translation>
+    </message>
+    <message>
+        <source>Configure the recording and transcoding quality (where applicable)</source>
+        <translation>Tallennuksen- ja jälkikäsittelyn laatuasetukset (missä käytettävissä)</translation>
+    </message>
+    <message>
+        <source>4. Video sources</source>
+        <translation>4. Videolähteet</translation>
+    </message>
+    <message>
+        <source>5. Input connections</source>
+        <translation>5. Tuloliitännät</translation>
+    </message>
+    <message>
+        <source>6. Channel Editor</source>
+        <translation>6. Kanavien muokkain</translation>
+    </message>
+    <message>
+        <source>7. Storage Directories</source>
+        <translation>7. Tallennushakemistot</translation>
+    </message>
+    <message>
+        <source>8. System Events</source>
+        <translation>8. järjestelmätapahtumat</translation>
+    </message>
+    <message>
+        <source>My audio subsystem supports Dolby Digital</source>
+        <translation>Äänentoistolaitteeni tukee Dolby Digital :ia</translation>
+    </message>
+    <message>
+        <source>My audio subsystem supports DTS</source>
+        <translation>Äänentoistolaitteeni tukee DTS:ää</translation>
+    </message>
+    <message>
+        <source>My audio subsystem supports E-AC-3</source>
+        <translation>Äänentoistolaitteeni tukee E-AC-3 :a</translation>
+    </message>
+    <message>
+        <source>My audio subsystem supports TrueHD</source>
+        <translation>Äänentoistolaitteeni tukee TrueHD:ta</translation>
+    </message>
+    <message>
+        <source>My audio subsystem supports DTS-HD</source>
+        <translation>Äänentoistolaitteeni tukee DTS HD :ta</translation>
+    </message>
+    <message>
+        <source>%STARTDATE%   %STARTTIME%% - |ENDTIME%</source>
+        <translation>%STARTDATE%   %STARTTIME%% - |ENDTIME%</translation>
+    </message>
+    <message>
+        <source>Using the text areas below, you can change the recording title, subtitle, and description.
+
+Once you have completed your modifications, click the &quot;Save&quot; button.</source>
+        <translation>Alla olevia tekstikenttiä käyttämällä voit vaihtaa tallenteen nimeä, aliotsikkoa ja kuvausta.
+
+Kun olet valmis, paina &quot;Tallenna&quot;-näppäintä.</translation>
+    </message>
+    <message>
+        <source>You Haven&apos;t Scheduled Any Programs To Be Recorded. To schedule a recording, exit this screen and select &apos;Program Guide&apos; or &apos;Program Finder&apos;</source>
+        <translation>Et ole ajastanut yhtään tallennusta. Ajastaaksesi tallennuksen poistu tästä ikkunasta ja valitse &apos;Ohjelmaopas&apos; tai &apos;Ohjelmahaku&apos;</translation>
+    </message>
+    <message>
+        <source>Press Up/Down from letter list, to navigate to another list.  Press Left/Right from Show or Episode list to navigate to another list.</source>
+        <translation>Paina ylös/alas kirjainlistassa päästäksesi toiseen listaan.  Paina vasen/oikea esitys tai jakso listassa päästäksesi toiseen listaan.</translation>
+    </message>
+    <message>
+        <source>Standby Mode</source>
+        <translation>Virransäästötila</translation>
+    </message>
+    <message>
+        <source>Designed to show off some different element arrangements available in Myth 0.25.  Tested at 1280x720 and with FranÃ§ais. Reminder: On Watch Recordings screen [Rew] and [FF] can be used to change the Rec. Group.</source>
+        <translation>Suunniteltu näyttämään joitain erilaisia Myth 0.25 tuomia elementtijärjestelyjä.  Kokeiltu1280x720 resoluutiolla ranskan kielellä. Muistutus: Katsottujen tallenteiden ruudussa [Rew] ja [FF] voidaan käyttää vaihtamaan tallennusryhmää.</translation>
+    </message>
+    <message>
+        <source>No videos in library, or no files found.  If you have configured a video directory, press MENU and select &quot;Scan for Changes.&quot;</source>
+        <translation>Ei videoita kirjastossa, tai tiedostoja ei löydy. Jos olet asettanut videohakemiston, paina MENU ja valitse &quot;Etsi muutoksia.&quot;</translation>
+    </message>
+    <message>
+        <source>Designed to show off some different element arrangements available in Myth 0.25.  Reminder: On Watch Recordings screen [Rew] and [FF] can be used to change the Rec. Group.</source>
+        <translation>Suunniteltu näyttämään joitain erilaisia Myth 0.25 tuomia elementtijärjestelyjä.  Muistutus: Katsottujen tallenteiden ruudussa [Rew] ja [FF] voidaan käyttää vaihtamaan tallennusryhmää.</translation>
     </message>
 </context>
 <context>
@@ -20312,7 +20484,7 @@ Ajastaaksesi tallennuksen poistu tästä ikkunasta ja valitse &apos;Ohjelmaopas&
     </message>
     <message>
         <source>Disable File Browse Mode</source>
-        <translation>Estä Tiedostojen selaus -tila</translation>
+        <translation type="obsolete">Estä Tiedostojen selaus -tila</translation>
     </message>
     <message>
         <source>Change Video Details</source>
@@ -20320,15 +20492,15 @@ Ajastaaksesi tallennuksen poistu tästä ikkunasta ja valitse &apos;Ohjelmaopas&
     </message>
     <message>
         <source>Enable File Browse Mode</source>
-        <translation>Mahdollista Tiedostojen selaus -tila</translation>
+        <translation type="obsolete">Mahdollista Tiedostojen selaus -tila</translation>
     </message>
     <message>
         <source>Disable Flat View</source>
-        <translation>Estä Litteä -näkymä</translation>
+        <translation type="obsolete">Estä Litteä -näkymä</translation>
     </message>
     <message>
         <source>Enable Flat View</source>
-        <translation>Mahdollista Litteä -näkymä</translation>
+        <translation type="obsolete">Mahdollista Litteä -näkymä</translation>
     </message>
     <message>
         <source>View Full Plot</source>
@@ -20512,7 +20684,7 @@ Ajastaaksesi tallennuksen poistu tästä ikkunasta ja valitse &apos;Ohjelmaopas&
     </message>
     <message>
         <source>Studio</source>
-        <translation></translation>
+        <translation>TMDB/TVDB #:</translation>
     </message>
     <message>
         <source>Folder</source>
@@ -20560,7 +20732,7 @@ Ajastaaksesi tallennuksen poistu tästä ikkunasta ja valitse &apos;Ohjelmaopas&
     </message>
     <message>
         <source> %1x%2</source>
-        <translation></translation>
+        <translation> %1x%2</translation>
     </message>
     <message>
         <source>Are you sure you want to delete:
@@ -20573,6 +20745,22 @@ Ajastaaksesi tallennuksen poistu tästä ikkunasta ja valitse &apos;Ohjelmaopas&
 %1</source>
         <translation>Haluatko varmasti poistaa:
 %1</translation>
+    </message>
+    <message>
+        <source>Show Directory Structure</source>
+        <translation>Näytä hakemistorakenne</translation>
+    </message>
+    <message>
+        <source>Hide Directory Structure</source>
+        <translation>Piilota hakemistorakenne</translation>
+    </message>
+    <message>
+        <source>Browse Library (recommended)</source>
+        <translation>Selaa kirjastoa (suositus)</translation>
+    </message>
+    <message>
+        <source>Browse Filesystem (slow)</source>
+        <translation>Selaa tiedostojärjestelmää (hidas)</translation>
     </message>
 </context>
 <context>

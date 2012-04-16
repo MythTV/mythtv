@@ -1070,6 +1070,7 @@ void VideoDisplayProfile::CreateNewProfiles(const QString &hostname)
                   "linearblend", "linearblend", "");
 }
 
+#if defined(USING_VDPAU)
 void VideoDisplayProfile::CreateVDPAUProfiles(const QString &hostname)
 {
     (void) QObject::tr("VDPAU High Quality", "Sample: VDPAU high quality");
@@ -1100,6 +1101,7 @@ void VideoDisplayProfile::CreateVDPAUProfiles(const QString &hostname)
                   "vdpaubobdeint", "vdpauonefield",
                   "vdpauskipchroma,vdpaucolorspace=auto");
 }
+#endif
 
 #if defined(Q_OS_MACX)
 void VideoDisplayProfile::CreateVDAProfiles(const QString &hostname)
@@ -1142,6 +1144,7 @@ void VideoDisplayProfile::CreateVDAProfiles(const QString &hostname)
 }
 #endif
 
+#if defined(USING_OPENGL_VIDEO)
 void VideoDisplayProfile::CreateOpenGLProfiles(const QString &hostname)
 {
     (void) QObject::tr("OpenGL High Quality", "Sample: OpenGL high quality");
@@ -1168,11 +1171,31 @@ void VideoDisplayProfile::CreateOpenGLProfiles(const QString &hostname)
                   "opengldoubleratelinearblend", "opengllinearblend",
                   "");
 }
+#endif
+
+#if defined(USING_GLVAAPI)
+void VideoDisplayProfile::CreateVAAPIProfiles(const QString &hostname)
+{
+    (void) QObject::tr("VAAPI Normal", "Sample: VAAPI average quality");
+    DeleteProfileGroup("VAAPI Normal", hostname);
+    uint groupid = CreateProfileGroup("VAAPI Normal", hostname);
+    CreateProfile(groupid, 1, ">", 0, 0, "", 0, 0,
+                  "vaapi", 2, true, "openglvaapi", "opengl2", true,
+                  "vaapibobdeint", "vaapionefield",
+                  "");
+    CreateProfile(groupid, 2, ">", 0, 0, "", 0, 0,
+                  "ffmpeg", 2, true, "opengl", "opengl2", true,
+                  "opengldoubleratekerneldeint", "openglkerneldeint",
+                  "");
+}
+#endif
 
 void VideoDisplayProfile::CreateProfiles(const QString &hostname)
 {
     CreateNewProfiles(hostname);
+#if defined(USING_VDPAU)
     CreateVDPAUProfiles(hostname);
+#endif
 }
 
 QStringList VideoDisplayProfile::GetVideoRenderers(const QString &decoder)
