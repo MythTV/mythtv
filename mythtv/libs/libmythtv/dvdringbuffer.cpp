@@ -504,7 +504,9 @@ uint64_t DVDRingBuffer::GetChapterTimes(uint title)
         for (uint i = 0; i < num - 1; i++)
             chapters.append((chaps[i] + 45000) / 90000);
     }
-    delete chaps;
+    // Assigned via calloc, must be free'd not deleted
+    if (chaps)
+        free(chaps);
     m_chapterMap.insert(title, chapters);
     return (duration + 45000) / 90000;
 }
