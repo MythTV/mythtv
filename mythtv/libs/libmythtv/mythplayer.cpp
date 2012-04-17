@@ -2317,9 +2317,6 @@ void MythPlayer::VideoStart(void)
             videoOutput, fr_int, rf_int, m_double_framerate);
     }
 
-    if (isDummy)
-        ChangeSpeed();
-
     InitAVSync();
     videosync->Start();
 }
@@ -3479,15 +3476,7 @@ void MythPlayer::ChangeSpeed(void)
     if (normal_speed && audio.HasAudioOut())
     {
         audio.SetStretchFactor(play_speed);
-        if (decoder)
-        {
-            bool disable = (play_speed < 0.99f) || (play_speed > 1.01f);
-            LOG(VB_PLAYBACK, LOG_INFO, LOC +
-                QString("Stretch Factor %1, %2 passthru ")
-                    .arg(audio.GetStretchFactor())
-                    .arg((disable) ? "disable" : "allow"));
-            decoder->SetDisablePassThrough(disable);
-        }
+        syncWithAudioStretch();
     }
 }
 
@@ -4903,7 +4892,7 @@ void MythPlayer::SetDecoder(DecoderBase *dec)
         }
         decoder_change_lock.unlock();
     }
-
+    syncWithAudioStretch();    
     totalDecoderPause = false;
 }
 
@@ -5098,6 +5087,21 @@ void MythPlayer::SaveTotalFrames(void)
         return;
 
     decoder->SaveTotalFrames();
+}
+
+void MythPlayer::syncWithAudioStretch()
+{
+    if (decoder && audio.HasAudioOut())
+    {
+        float stretch = audio.GetStretchFactor();
+        bool disable = (stretch < 0.99f) || (stretch > 1.01f);
+        LOG(VB_PLAYBACK, LOG_INFO, LOC +
+            QString("Stretch Factor %1, %2 passthru ")
+            .arg(audio.GetStretchFactor())
+            .arg((disable) ? "disable" : "allow"));
+        decoder->SetDisablePassThrough(disable);
+    }
+    return;
 }
 
 static unsigned dbg_ident(const MythPlayer *player)

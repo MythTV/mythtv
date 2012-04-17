@@ -282,6 +282,10 @@ class AudioOutputBase : public AudioOutput, public MThread
 
     // SPDIF Encoder for digital passthrough
     SPDIFEncoder     *m_spdifenc;
+
+    // Flag indicating if SetStretchFactor enabled audio float processing
+    bool m_forcedprocessing;
+    int m_previousbpf;
 };
 
 #endif

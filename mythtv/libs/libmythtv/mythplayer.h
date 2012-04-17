@@ -778,6 +778,9 @@ class MTV_PUBLIC MythPlayer
 
     // Debugging variables
     Jitterometer *output_jmeter;
+
+  private:
+    void syncWithAudioStretch();
 };
 
 #endif
