@@ -352,8 +352,6 @@ bool DVDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
         res = dvdnav_get_number_of_titles(m_dvdnav, &num_titles);
     }
 
-    int start_title = 1;
-
     if (res == DVDNAV_STATUS_ERR)
     {
         LOG(VB_GENERAL, LOG_ERR,
@@ -364,82 +362,9 @@ bool DVDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
         LOG(VB_GENERAL, LOG_INFO,
             LOC + QString("There are %1 titles on the disk")
                 .arg(num_titles));
-
-    /* The following causes a very long pause and leak in the order of 40MB/s
-       on some discs such as Lost Season 6 Disc 1.
-
-        ==3897== 14,916,912 bytes in 2,447 blocks are definitely lost in loss record 12,437 of 12,437
-        ==3897==    at 0x4C2561D: malloc (in /usr/lib64/valgrind/vgpreload_memcheck-amd64-linux.so)
-        ==3897==    at 0x4C2561D: malloc (in /usr/lib64/valgrind/vgpreload_memcheck-amd64-linux.so)
-        ==3897==    by 0x551EC56: ifoRead_PGC.part.7 (ifo_read.c:950)
-        ==3897==    by 0x551EC56: ifoRead_PGC.part.7 (ifo_read.c:950)
-        ==3897==    by 0x551F8A6: ifoRead_PGCIT_internal.part.8 (ifo_read.c:876)
-        ==3897==    by 0x551F8A6: ifoRead_PGCIT_internal.part.8 (ifo_read.c:876)
-        ==3897==    by 0x5521992: ifoRead_PGCIT (ifo_read.c:1843)
-        ==3897==    by 0x5521992: ifoRead_PGCIT (ifo_read.c:1843)
-        ==3897==    by 0x5522C0B: ifoOpen (ifo_read.c:343)
-        ==3897==    by 0x5522C0B: ifoOpen (ifo_read.c:343)
-        ==3897==    by 0x55134F9: dvdnav_describe_title_chapters (searching.c:742)
-        ==3897==    by 0x55134F9: dvdnav_describe_title_chapters (searching.c:742)
-        ==3897==    by 0x508AD58: DVDRingBuffer::GetChapterTimes(unsigned int) (dvdringbuffer.cpp:490)
-        ==3897==    by 0x508AD58: DVDRingBuffer::GetChapterTimes(unsigned int) (dvdringbuffer.cpp:490)
-        ==3897==    by 0x508B821: DVDRingBuffer::OpenFile(QString const&, unsigned int) (dvdringbuffer.cpp:375)
-        ==3897==    by 0x508B821: DVDRingBuffer::OpenFile(QString const&, unsigned int) (dvdringbuffer.cpp:375)
-        ==3897==    by 0x508CFBD: DVDRingBuffer::DVDRingBuffer(QString const&) (dvdringbuffer.cpp:128)
-        ==3897==    by 0x508CFBD: DVDRingBuffer::DVDRingBuffer(QString const&) (dvdringbuffer.cpp:128)
-        ==3897==    by 0x506D6C0: RingBuffer::Create(QString const&, bool, bool, int, bool) (ringbuffer.cpp:148)
-        ==3897==    by 0x506D6C0: RingBuffer::Create(QString const&, bool, bool, int, bool) (ringbuffer.cpp:148)
-        ==3897==    by 0x5213669: TV::HandleStateChange(PlayerContext*, PlayerContext*) (tv_play.cpp:2277)
-        ==3897==    by 0x5213669: TV::HandleStateChange(PlayerContext*, PlayerContext*) (tv_play.cpp:2277)
-        ==3897==    by 0x5215408: TV::Playback(ProgramInfo const&) (tv_play.cpp:2026)
-
-       It never has worked very well and should not be necessary so it should
-       remain disabled until a fix for the leak/delay is implemented, or
-       alternatively it should be removed entirely
-    */
-
-//         // We do this once and chose the first title with a reasonanble length,
-//         // cache the results for those we probe and probe the remainder as
-//         // needed
-//         if (!m_chapterMap.size())
-//         {
-//             for (int i = 1; i < num_titles + 1; i++)
-//             {
-//                 uint64_t duration = GetChapterTimes(i);
-//                 if (duration < 1 || !m_chapterMap.contains(i))
-//                     continue;
-//
-//                 LOG(VB_GENERAL, LOG_INFO, LOC +
-//                     QString("Title %1: chapters %2 duration %3")
-//                             .arg(i).arg(m_chapterMap.value(i).size())
-//                             .arg(duration));
-//
-//                 if (duration > 60)
-//                     break;
-//             }
-//         }
-//
-//         QMapIterator<uint, QList<uint64_t> > it(m_chapterMap);
-//         uint64_t longest = 0;
-//         while (it.hasNext())
-//         {
-//             it.next();
-//             if (it.value().size())
-//             {
-//                 uint title = it.key();
-//                 uint64_t last = it.value().last();
-//                 if (last > longest)
-//                 {
-//                     start_title = title;
-//                     longest = last;
-//                 }
-//             }
-//         }
      }
 
-    LOG(VB_GENERAL, LOG_INFO,
-        LOC + QString("Starting with title %1").arg(start_title));
-    dvdnav_title_play(m_dvdnav, start_title);
+    dvdnav_title_play(m_dvdnav, 1);
 
     // Check we aren't starting in a still frame (which will probably fail as
     // ffmpeg will be unable to create a decoder)
@@ -456,6 +381,9 @@ bool DVDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
     dvdnav_get_serial_string(m_dvdnav, &m_serialnumber);
     dvdnav_get_angle_info(m_dvdnav, &m_currentAngle, &m_currentTitleAngleCount);
     SetDVDSpeed();
+
+    // Populate the chapter list for this title, used in the OSD menu
+    GetChapterTimes(m_title);
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC +
             QString("DVD Serial Number %1").arg(m_serialnumber));
