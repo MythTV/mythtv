@@ -104,7 +104,7 @@ AudioOutputBase::AudioOutputBase(const AudioSettings &settings) :
     memory_corruption_test2(0xdeadbeef),
     memory_corruption_test3(0xdeadbeef),
     m_configure_succeeded(false),m_length_last_data(0),
-    m_spdifenc(NULL)
+    m_spdifenc(NULL),           m_forcedprocessing(false)
 {
     src_in = (float *)AOALIGN(src_in_buf);
     memset(&src_data,          0, sizeof(SRC_DATA));
@@ -321,16 +321,33 @@ void AudioOutputBase::SetStretchFactorLocked(float lstretchfactor)
 
     int channels = needs_upmix || needs_downmix ?
         configured_channels : source_channels;
-    if (channels < 1 || channels > 8)
+    if (channels < 1 || channels > 8 || !m_configure_succeeded)
         return;
 
+    bool willstretch = stretchfactor < 0.99f || stretchfactor > 1.01f;
     eff_stretchfactor = (int)(100000.0f * lstretchfactor + 0.5);
+
     if (pSoundStretch)
     {
-        VBGENERAL(QString("Changing time stretch to %1").arg(stretchfactor));
-        pSoundStretch->setTempo(stretchfactor);
+        if (!willstretch && m_forcedprocessing)
+        {
+            m_forcedprocessing = false;
+            processing = false;
+            delete pSoundStretch;
+            pSoundStretch = NULL;
+            VBGENERAL(QString("Cancelling time stretch"));
+            bytes_per_frame = m_previousbpf;
+            waud = raud = 0;
+            reset_active.Ref();
+        }
+        else
+        {
+            VBGENERAL(QString("Changing time stretch to %1")
+                      .arg(stretchfactor));
+            pSoundStretch->setTempo(stretchfactor);
+        }
     }
-    else if (stretchfactor != 1.0f)
+    else if (willstretch)
     {
         VBGENERAL(QString("Using time stretch %1").arg(stretchfactor));
         pSoundStretch = new soundtouch::SoundTouch();
@@ -344,6 +361,8 @@ void AudioOutputBase::SetStretchFactorLocked(float lstretchfactor)
         if (!processing)
         {
             processing = true;
+            m_forcedprocessing = true;
+            m_previousbpf = bytes_per_frame;
             bytes_per_frame = source_channels *
                               AudioOutputSettings::SampleSize(FORMAT_FLT);
             waud = raud = 0;
@@ -594,7 +613,7 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
 
     waud = raud = 0;
     reset_active.Clear();
-    actually_paused = processing = false;
+    actually_paused = processing = m_forcedprocessing = false;
 
     channels               = settings.channels;
     source_channels        = lsource_channels;
