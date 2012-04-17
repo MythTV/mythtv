@@ -1111,7 +1111,6 @@ void ProgLister::FillItemList(bool restorePosition, bool updateDisp)
     if (m_curView < 0)
         return;
 
-    bool oneChanid = false;
     QString where;
     QString qphrase = m_viewList[m_curView];
 
@@ -1228,7 +1227,6 @@ void ProgLister::FillItemList(bool restorePosition, bool updateDisp)
     }
     else if (m_type == plChannel) // list by channel
     {
-        oneChanid = true;
         where = "WHERE channel.visible = 1 "
             "  AND program.endtime > :PGILSTART "
             "  AND channel.chanid = :PGILPHRASE2 ";
@@ -1355,7 +1353,7 @@ void ProgLister::FillItemList(bool restorePosition, bool updateDisp)
     else
     {
         LoadFromScheduler(m_schedList);
-        LoadFromProgram(m_itemList, where, bindings, m_schedList, oneChanid);
+        LoadFromProgram(m_itemList, where, bindings, m_schedList);
     }
 
     const QRegExp prefixes(
