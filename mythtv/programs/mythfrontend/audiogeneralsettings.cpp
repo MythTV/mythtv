@@ -354,8 +354,7 @@ AudioOutputSettings AudioConfigSettings::UpdateCapabilities(
     m_MaxAudioChannels->resetMaxCount(3);
     for (int i = 1; i <= max_speakers; i++)
     {
-        if (invalid || settings.IsSupportedChannels(i) ||
-            settingsdigital.IsSupportedChannels(i))
+        if (invalid || settings.IsSupportedChannels(i))
         {
             QString txt;
 
@@ -416,8 +415,6 @@ void AudioConfigSettings::AudioAdvanced()
 
     if (audiosettings.exec() == kDialogCodeAccepted)
     {
-        // Rescan audio list to check of override digital device
-        AudioRescan();
         bool LPCM2 = settings.canFeature(FEATURE_LPCM) &&
             gCoreContext->GetNumSetting("StereoPCM", false);
             // restore speakers configure only of StereoPCM has changed and
