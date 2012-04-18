@@ -11,6 +11,7 @@ using namespace std;
 #include <QMutex>
 #include <QHash>
 #include <QRect>
+#include <QObject>
 #include "mythtvexp.h"
 #include "mythdeque.h"
 #include "tv.h"
@@ -42,8 +43,9 @@ typedef enum
 typedef deque<QString>         StringDeque;
 typedef QHash<QString,QString> InfoMap;
 
-class MTV_PUBLIC PlayerContext
+class MTV_PUBLIC PlayerContext : public QObject
 {
+    Q_OBJECT
   public:
     PlayerContext(const QString &inUseID = QString("Unknown"));
     ~PlayerContext();
