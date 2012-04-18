@@ -789,7 +789,7 @@ uint32_t dvdnav_describe_title_chapters(dvdnav_t *this, int32_t title, uint64_t 
 
 fail:
   pthread_mutex_unlock(&this->vm_lock);
-  if(!retval && ifo)
+  if(ifo)
     vm_ifo_close(ifo);
   if(!retval && tmp)
     free(tmp);
