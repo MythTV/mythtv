@@ -65,8 +65,12 @@ bool TeletextScreen::Create(void)
 void TeletextScreen::ClearScreen(void)
 {
     DeleteAllChildren();
-    for (int i = 0; i < m_rowImages.size(); i++)
-        delete m_rowImages.value(i);
+    QHash<int, QImage*>::iterator it = m_rowImages.begin();
+    for (; it != m_rowImages.end(); ++it)
+    {
+        if (*it)
+            delete (*it);
+    }
     m_rowImages.clear();
     SetRedraw();
 }
