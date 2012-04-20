@@ -1101,7 +1101,6 @@ void VideoDisplayProfile::CreateVDPAUProfiles(const QString &hostname)
                   "vdpauskipchroma,vdpaucolorspace=auto");
 }
 
-#if defined(Q_OS_MACX)
 void VideoDisplayProfile::CreateVDAProfiles(const QString &hostname)
 {
     (void) QObject::tr("VDA High Quality", "Sample: VDA high quality");
@@ -1140,7 +1139,6 @@ void VideoDisplayProfile::CreateVDAProfiles(const QString &hostname)
                   "opengldoubleratelinearblend", "opengllinearblend",
                   "");
 }
-#endif
 
 void VideoDisplayProfile::CreateOpenGLProfiles(const QString &hostname)
 {
