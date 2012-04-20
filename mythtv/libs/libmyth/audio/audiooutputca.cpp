@@ -892,7 +892,7 @@ AudioStreamBasicDescription *CoreAudioData::FormatsList(AudioStreamID s)
     }
 
     // Add a terminating ID:
-    list[listSize/sizeof(AudioStreamID)].mFormatID = 0;
+    list[listSize/sizeof(AudioStreamBasicDescription)].mFormatID = 0;
 
     return list;
 }
