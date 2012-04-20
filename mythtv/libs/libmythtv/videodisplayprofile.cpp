@@ -1071,7 +1071,6 @@ void VideoDisplayProfile::CreateNewProfiles(const QString &hostname)
                   "linearblend", "linearblend", "");
 }
 
-#if defined(USING_VDPAU)
 void VideoDisplayProfile::CreateVDPAUProfiles(const QString &hostname)
 {
     (void) QObject::tr("VDPAU High Quality", "Sample: VDPAU high quality");
@@ -1102,9 +1101,7 @@ void VideoDisplayProfile::CreateVDPAUProfiles(const QString &hostname)
                   "vdpaubobdeint", "vdpauonefield",
                   "vdpauskipchroma,vdpaucolorspace=auto");
 }
-#endif
 
-#if defined(Q_OS_MACX)
 void VideoDisplayProfile::CreateVDAProfiles(const QString &hostname)
 {
     (void) QObject::tr("VDA High Quality", "Sample: VDA high quality");
@@ -1143,9 +1140,7 @@ void VideoDisplayProfile::CreateVDAProfiles(const QString &hostname)
                   "opengldoubleratelinearblend", "opengllinearblend",
                   "");
 }
-#endif
 
-#if defined(USING_OPENGL_VIDEO)
 void VideoDisplayProfile::CreateOpenGLProfiles(const QString &hostname)
 {
     (void) QObject::tr("OpenGL High Quality", "Sample: OpenGL high quality");
@@ -1172,9 +1167,7 @@ void VideoDisplayProfile::CreateOpenGLProfiles(const QString &hostname)
                   "opengldoubleratelinearblend", "opengllinearblend",
                   "");
 }
-#endif
 
-#if defined(USING_GLVAAPI)
 void VideoDisplayProfile::CreateVAAPIProfiles(const QString &hostname)
 {
     (void) QObject::tr("VAAPI Normal", "Sample: VAAPI average quality");
@@ -1189,7 +1182,6 @@ void VideoDisplayProfile::CreateVAAPIProfiles(const QString &hostname)
                   "opengldoubleratekerneldeint", "openglkerneldeint",
                   "");
 }
-#endif
 
 void VideoDisplayProfile::CreateProfiles(const QString &hostname)
 {
