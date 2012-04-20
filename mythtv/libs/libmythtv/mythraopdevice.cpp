@@ -243,8 +243,8 @@ void MythRAOPDevice::deleteClient(void)
         if ((*it)->GetSocket()->state() == QTcpSocket::UnconnectedState)
         {
             LOG(VB_GENERAL, LOG_INFO, LOC + "Removing client connection.");
-            delete *it;
             m_clients.removeOne(*it);
+            delete *it;
             return;
         }
     }
