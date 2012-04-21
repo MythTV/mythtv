@@ -128,6 +128,7 @@ class MUI_PUBLIC MythUIButtonList : public MythUIType
 
     virtual bool keyPressEvent(QKeyEvent *);
     virtual bool gestureEvent(MythGestureEvent *event);
+    virtual void customEvent(QEvent *);
 
     enum MovementUnit { MoveItem, MoveColumn, MoveRow, MovePage, MoveMax,
                         MoveMid, MoveByAmount };
@@ -184,6 +185,9 @@ class MUI_PUBLIC MythUIButtonList : public MythUIType
     bool FindNext(void);
     bool FindPrev(void);
 
+    void LoadInBackground(int start = 0, int pageSize = 20);
+    int  StopLoad(void);
+
   public slots:
     void Select();
     void Deselect();
@@ -192,6 +196,7 @@ class MUI_PUBLIC MythUIButtonList : public MythUIType
     void itemSelected(MythUIButtonListItem* item);
     void itemClicked(MythUIButtonListItem* item);
     void itemVisible(MythUIButtonListItem* item);
+    void itemLoaded(MythUIButtonListItem* item);
 
   protected:
     enum ScrollStyle { ScrollFree, ScrollCenter, ScrollGroupCenter };
@@ -302,6 +307,7 @@ class MUI_PUBLIC MythUIButtonList : public MythUIType
     bool m_keepSelAtBottom;
 
     QList<MythUIButtonListItem*> m_itemList;
+    int m_nextItemLoaded;
 
     bool m_drawFromBottom;
 
