@@ -728,7 +728,6 @@ void RingBuffer::run(void)
     struct timeval lastread, now;
     int readtimeavg = 300;
     bool ignore_for_read_timing = true;
-    QString did_set_oldfile("");
 
     gettimeofday(&lastread, NULL); // this is just to keep gcc happy
 
@@ -845,14 +844,6 @@ void RingBuffer::run(void)
                 totfree = max(fill_min, readblocksize);
                 LOG(VB_FILE, LOG_DEBUG, LOC +
                     "Reading enough data to start playback");
-            }
-
-            if (did_set_oldfile != filename && remotefile && livetvchain &&
-                livetvchain->HasNext())
-            {
-                LOG(VB_FILE, LOG_DEBUG, LOC + QString("did_set_oldfile=%1").arg(did_set_oldfile));
-                remotefile->SetTimeout(true);
-                did_set_oldfile = filename;
             }
 
             LOG(VB_FILE, LOG_DEBUG, LOC +
