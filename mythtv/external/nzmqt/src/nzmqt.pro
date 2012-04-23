@@ -1,32 +1,32 @@
-#-------------------------------------------------
-#
-# Project created by QtCreator 2010-10-15T17:00:35
-#
-#-------------------------------------------------
+include ( ../../../settings.pro )
 
 QT       += core
 
 QT       -= gui
 
-TARGET = nzmqt
-CONFIG   += console
-CONFIG   -= app_bundle
+TARGET = mythnzmqt-$$LIBVERSION
+target.path = $${LIBDIR}
+#CONFIG   += console
+#CONFIG   -= app_bundle
+CONFIG += thread dll
+INSTALLS = target
 
-TEMPLATE = app
+TEMPLATE = lib
 
+QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 
 SOURCES += \
     main.cpp
 
 HEADERS += \
     ../include/nzmqt/nzmqt.hpp \
-    pubsub/PubSubServer.h \
-    pubsub/PubSubClient.h \
-    reqrep/ReqRepServer.h \
-    reqrep/ReqRepClient.h \
-    pushpull/PushPullWorker.h \
-    pushpull/PushPullVentilator.h \
-    pushpull/PushPullSink.h \
+#    pubsub/PubSubServer.h \
+#    pubsub/PubSubClient.h \
+#    reqrep/ReqRepServer.h \
+#    reqrep/ReqRepClient.h \
+#    pushpull/PushPullWorker.h \
+#    pushpull/PushPullVentilator.h \
+#    pushpull/PushPullSink.h \
     NzmqtApp.h \
     common/Tools.h
 
@@ -34,12 +34,13 @@ LIBS += -lzmq
 
 INCLUDEPATH += \
     ../include \
-    /opt/local/include
+    $${PREFIX}/include
 
 QMAKE_LIBDIR += \
-    /opt/local/lib
+    ${{LIBDIR}
 
-OTHER_FILES += \
-    ../README.markdown \
-    ../COPYING \
-    ../LICENSE.header
+inc.files += ../include/nzmqt/nzmqt.hpp
+inc.path  = $${PREFIX}/include/
+
+INSTALLS += inc
+
