@@ -24,9 +24,6 @@ void MythMetadataLookupCommandLineParser::LoadArguments(void)
                 "Batch update recorded program metadata. If a recording's "
                 "rule has an inetref but the recording does not, it will "
                 "be inherited.", "")
-         << add("--refresh-rules", "refresh-rules", false,
-                "Also update inetref for recording rules when metadata is "
-                "found for a recording (Best effort only, imperfect)", "")
          << add("--refresh-all-rules", "refresh-all-rules", false,
                 "Batch update metadata for recording rules. This will "
                 "set inetrefs for your recording rules based on an automated "
@@ -47,6 +44,18 @@ void MythMetadataLookupCommandLineParser::LoadArguments(void)
                 "This option will not overwrite any existing artwork. If a "
                 "rule or recording has not been looked up, this will attempt "
                 "to look it up. This is a very aggressive option!  Use with "
-                "care.", "") );
+                "care.", "") 
+         << new CommandLineArg("chanid")
+         << new CommandLineArg("jobid") );
+
+    add("--refresh-rules", "refresh-rules", false,
+        "Also update inetref for recording rules when metadata is "
+        "found for a recording (Best effort only, imperfect)", "")
+            ->SetBlocks("refresh-all")
+            ->SetBlocks("refresh-all-rules")
+            ->SetBlocks("refresh-all-artwork")
+            ->SetBlocks("refresh-all-artwork-dangerously")
+            ->SetChildOf("chanid")
+            ->SetChildOf("jobid");
 }
 
