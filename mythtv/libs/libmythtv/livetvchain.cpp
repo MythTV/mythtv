@@ -37,8 +37,6 @@ LiveTVChain::~LiveTVChain()
 
 QString LiveTVChain::InitializeNewChain(const QString &seed)
 {
-    QMutexLocker lock(&m_lock);
-
     QDateTime curdt = QDateTime::currentDateTime();
     m_id = QString("live-%1-%2").arg(seed).arg(curdt.toString(Qt::ISODate));
     return m_id;
@@ -46,22 +44,16 @@ QString LiveTVChain::InitializeNewChain(const QString &seed)
 
 void LiveTVChain::SetHostPrefix(const QString &prefix)
 {
-    QMutexLocker lock(&m_lock);
-
     m_hostprefix = prefix;
 }
 
 void LiveTVChain::SetCardType(const QString &type)
 {
-    QMutexLocker lock(&m_lock);
-
     m_cardtype = type;
 }
 
 void LiveTVChain::LoadFromExistingChain(const QString &id)
 {
-    QMutexLocker lock(&m_lock);
-
     m_id = id;
     ReloadAll();
 }
@@ -196,8 +188,6 @@ void LiveTVChain::DeleteProgram(ProgramInfo *pginfo)
 
 void LiveTVChain::BroadcastUpdate(void)
 {
-    QMutexLocker lock(&m_lock);
-
     QString message = QString("LIVETV_CHAIN UPDATE %1").arg(m_id);
     MythEvent me(message);
     gCoreContext->dispatch(me);
@@ -367,8 +357,6 @@ int LiveTVChain::GetLengthAtCurPos(void)
 
 int LiveTVChain::TotalSize(void) const
 {
-    QMutexLocker lock(&m_lock);
-
     return m_chain.count();
 }
 
@@ -385,8 +373,6 @@ void LiveTVChain::SetProgram(const ProgramInfo &pginfo)
 
 bool LiveTVChain::HasNext(void) const
 {
-    QMutexLocker lock(&m_lock);
-
     return ((int)m_chain.count() - 1 > m_curpos);
 }
 
@@ -411,9 +397,8 @@ void LiveTVChain::ClearSwitch(void)
 ProgramInfo *LiveTVChain::GetSwitchProgram(bool &discont, bool &newtype,
                                            int &newid)
 {
-    QMutexLocker lock(&m_lock);
-
     ReloadAll();
+    QMutexLocker lock(&m_lock);
 
     if (m_switchid < 0 || m_curpos == m_switchid)
     {
@@ -521,8 +506,6 @@ void LiveTVChain::SwitchTo(int num)
  */
 void LiveTVChain::SwitchToNext(bool up)
 {
-    QMutexLocker lock(&m_lock);
-
 #if 0
     LOG(VB_PLAYBACK, LOG_DEBUG, LOC + "SwitchToNext("<<(up?"up":"down")<<")");
 #endif
@@ -534,16 +517,12 @@ void LiveTVChain::SwitchToNext(bool up)
 
 void LiveTVChain::JumpTo(int num, int pos)
 {
-    QMutexLocker lock(&m_lock);
-
     m_jumppos = pos;
     SwitchTo(num);
 }
 
 void LiveTVChain::JumpToNext(bool up, int pos)
 {
-    QMutexLocker lock(&m_lock);
-
     m_jumppos = pos;
     SwitchToNext(up);
 }
@@ -553,8 +532,6 @@ void LiveTVChain::JumpToNext(bool up, int pos)
  */
 int LiveTVChain::GetJumpPos(void)
 {
-    QMutexLocker lock(&m_lock);
-
     int ret = m_jumppos;
     m_jumppos = 0;
     return ret;
