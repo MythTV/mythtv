@@ -4445,19 +4445,15 @@ bool TVRec::SwitchLiveTVRingBuffer(const QString & channum,
     pginfo->MarkAsInUse(true, kRecorderInUseID);
     pginfo->SaveAutoExpire(kLiveTVAutoExpire);
     pginfo->ApplyRecordRecGroupChange("LiveTV");
-#if 0
     tvchain->AppendNewProgram(pginfo, channel->GetCurrentName(),
                               channel->GetCurrentInput(), discont);
-#endif
-    bool delete_pg = false;
 
     if (set_rec && recorder)
     {
         recorder->SetNextRecording(pginfo, rb);
         if (discont)
             recorder->CheckForRingBufferSwitch();
-        //delete pginfo;
-        delete_pg = true;
+        delete pginfo;
         SetFlags(kFlagRingBufferReady);
     }
     else if (!set_rec)
@@ -4473,11 +4469,6 @@ bool TVRec::SwitchLiveTVRingBuffer(const QString & channum,
         curRecording = pginfo;
         SetRingBuffer(rb);
     }
-
-    tvchain->AppendNewProgram(pginfo, channel->GetCurrentName(),
-                              channel->GetCurrentInput(), discont);
-    if (delete_pg)
-        delete pginfo;
 
     return true;
 }
