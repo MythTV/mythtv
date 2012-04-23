@@ -553,6 +553,7 @@ void RingBuffer::KillReadAheadThread(void)
  */
 void RingBuffer::StopReads(void)
 {
+    LOG(VB_FILE, LOG_INFO, LOC + "StopReads()");
     stopreads = true;
     generalWait.wakeAll();
 }
@@ -563,6 +564,7 @@ void RingBuffer::StopReads(void)
  */
 void RingBuffer::StartReads(void)
 {
+    LOG(VB_FILE, LOG_INFO, LOC + "StartReads()");
     stopreads = false;
     generalWait.wakeAll();
 }
@@ -573,6 +575,7 @@ void RingBuffer::StartReads(void)
  */
 void RingBuffer::Pause(void)
 {
+    LOG(VB_FILE, LOG_INFO, LOC + "Pause()");
     StopReads();
 
     rwlock.lockForWrite();
@@ -586,6 +589,7 @@ void RingBuffer::Pause(void)
  */
 void RingBuffer::Unpause(void)
 {
+    LOG(VB_FILE, LOG_INFO, LOC + "Unpause()");
     StartReads();
 
     rwlock.lockForWrite();
@@ -724,7 +728,6 @@ void RingBuffer::run(void)
     struct timeval lastread, now;
     int readtimeavg = 300;
     bool ignore_for_read_timing = true;
-    bool did_set_oldfile = false;
 
     gettimeofday(&lastread, NULL); // this is just to keep gcc happy
 
@@ -843,13 +846,6 @@ void RingBuffer::run(void)
                     "Reading enough data to start playback");
             }
 
-            if (!did_set_oldfile && remotefile && livetvchain &&
-                livetvchain->HasNext())
-            {
-                remotefile->SetTimeout(true);
-                did_set_oldfile = true;
-            }
-
             LOG(VB_FILE, LOG_DEBUG, LOC +
                 QString("safe_read(...@%1, %2) -- begin")
                     .arg(rbwpos).arg(totfree));
@@ -922,7 +918,6 @@ void RingBuffer::run(void)
                     {
                         livetvchain->SwitchToNext(true);
                         setswitchtonext = true;
-                        did_set_oldfile = false;
                     }
                 }
                 else
@@ -1557,6 +1552,7 @@ void RingBuffer::SetWriteBufferMinWriteSize(int newMinSize)
  */
 void RingBuffer::SetOldFile(bool is_old)
 {
+    LOG(VB_FILE, LOG_INFO, LOC + QString("SetOldFile(%1)").arg(is_old));
     rwlock.lockForWrite();
     oldfile = is_old;
     rwlock.unlock();
