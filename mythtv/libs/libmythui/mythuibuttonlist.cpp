@@ -86,6 +86,8 @@ void MythUIButtonList::Const(void)
 
     m_buttontemplate = NULL;
 
+    m_nextItemLoaded = 0;
+
     SetCanTakeFocus(true);
 
     connect(this, SIGNAL(TakingFocus()), this, SLOT(Select()));
@@ -153,6 +155,7 @@ void MythUIButtonList::Reset()
     m_topPosition = 0;
     m_itemCount   = 0;
 
+    StopLoad();
     Update();
     MythUIType::Reset();
 }
@@ -2474,6 +2477,54 @@ bool MythUIButtonList::gestureEvent(MythGestureEvent *event)
     }
 
     return handled;
+}
+
+class NextButtonListPageEvent : public QEvent
+{
+  public:
+    NextButtonListPageEvent(int start, int pageSize) :
+        QEvent(kEventType), m_start(start), m_pageSize(pageSize) {}
+    const int m_start;
+    const int m_pageSize;
+    static Type kEventType;
+};
+
+QEvent::Type NextButtonListPageEvent::kEventType =
+    (QEvent::Type) QEvent::registerEventType();
+
+void MythUIButtonList::customEvent(QEvent *event)
+{
+    if (event->type() == NextButtonListPageEvent::kEventType)
+    {
+        NextButtonListPageEvent *npe =
+            dynamic_cast<NextButtonListPageEvent*>(event);
+        int cur = npe->m_start;
+        for (; cur < npe->m_start + npe->m_pageSize && cur < GetCount(); ++cur)
+        {
+            const int loginterval = (cur < 1000 ? 100 : 500);
+            if (cur % loginterval == 0)
+                LOG(VB_GENERAL, LOG_INFO,
+                    QString("Build background buttonlist item %1").arg(cur));
+            emit itemLoaded(GetItemAt(cur));
+        }
+        m_nextItemLoaded = cur;
+        if (cur < GetCount())
+            LoadInBackground(cur, npe->m_pageSize);
+    }
+}
+
+void MythUIButtonList::LoadInBackground(int start, int pageSize)
+{
+    m_nextItemLoaded = start;
+    QCoreApplication::
+        postEvent(this, new NextButtonListPageEvent(start, pageSize));
+}
+
+int MythUIButtonList::StopLoad(void)
+{
+    QCoreApplication::
+        removePostedEvents(this, NextButtonListPageEvent::kEventType);
+    return m_nextItemLoaded;
 }
 
 QPoint MythUIButtonList::GetButtonPosition(int column, int row) const

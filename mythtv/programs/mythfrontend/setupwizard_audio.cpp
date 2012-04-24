@@ -299,7 +299,7 @@ AudioOutputSettings AudioSetupWizard::UpdateCapabilities(bool restore, bool AC3)
                 {
                     MythUIButtonListItem *sixchan =
                         new MythUIButtonListItem(m_speakerNumberButtonList,
-                                                 "5.1 Channel Audio");
+                                                 QObject::tr("5.1 Channel Audio"));
                     sixchan->SetData(6);
                     break;
                 }
@@ -307,7 +307,7 @@ AudioOutputSettings AudioSetupWizard::UpdateCapabilities(bool restore, bool AC3)
                 {
                     MythUIButtonListItem *eightchan =
                         new MythUIButtonListItem(m_speakerNumberButtonList,
-                                                 "7.1 Channel Audio");
+                                                 QObject::tr("7.1 Channel Audio"));
                     eightchan->SetData(8);
                     break;
                 }

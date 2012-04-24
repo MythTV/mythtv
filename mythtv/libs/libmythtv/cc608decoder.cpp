@@ -301,7 +301,7 @@ void CC608Decoder::FormatCCField(int tc, int field, int data)
             {
                 case 0x00:          //attribute
 #if 0
-                    LOG(VB_GENERAL, LOG_DEBUG, 
+                    LOG(VB_VBI, LOG_DEBUG, 
                         QString("<ATTRIBUTE %1 %2>").arg(b1).arg(b2);
 #endif
                     break;
@@ -359,7 +359,7 @@ void CC608Decoder::FormatCCField(int tc, int field, int data)
                 case 0x04:          //misc
                 case 0x05:          //misc + F
 #if 0
-                    LOG(VB_GENERAL, LOG_DEBUG,
+                    LOG(VB_VBI, LOG_DEBUG,
                         QString("ccmode %1 cmd %2").arg(ccmode)
                             .arg(b2, 2, 16, '0'));
 #endif

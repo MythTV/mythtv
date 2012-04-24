@@ -1663,7 +1663,7 @@ zlib_encoder_select="zlib"
 zmbv_decoder_select="zlib"
 zmbv_encoder_select="zlib"
 
-vaapi_deps="va_va_h"
+vaapi_deps="va_va_h va_va_glx_h va_va_x11_h"
 vdpau_deps="vdpau_vdpau_h vdpau_vdpau_x11_h"
 
 # parsers
@@ -1796,7 +1796,7 @@ v4l1_deps="backend v4l2 linux_videodev_h"
 vdpau_deps="opengl vdpau_vdpau_h vdpau_vdpau_x11_h"
 xrandr_deps="x11"
 xv_deps="x11"
-vaapi_deps="x11 opengl"
+vaapi_deps="x11 opengl va_va_h va_va_glx_h va_va_x11_h"
 asi_deps="backend"
 
 <<BLOCKQUOTE
@@ -3956,14 +3956,9 @@ if enabled crystalhd; then
         disable crystalhd;
 fi
 
-if enabled vaapi; then
-    enabled va_va_h && enabled va_va_glx_h && enabled va_va_x11_h || disable vaapi
-    if enabled vaapi; then
-        check_cpp_condition va/va.h "VA_VERSION_HEX >= 0x001F0000" ||
-        { echolog "VAAPI requires libva >= 0.31.1" && disable vaapi; }
-    fi
-else
-    disable vaapi
+if enabled vaapi && enabled va_va_h && enabled va_va_glx_h && enabled va_va_x11_h; then
+    check_cpp_condition va/va.h "VA_VERSION_HEX >= 0x001F0000" ||
+    { echolog "VAAPI requires libva >= 0.31.1" && disable vaapi; }
 fi
 
 if enabled dxva2; then

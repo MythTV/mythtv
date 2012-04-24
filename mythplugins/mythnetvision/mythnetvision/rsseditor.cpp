@@ -223,12 +223,6 @@ void RSSEditPopup::slotSave(QNetworkReply* reply)
     QString author = m_authorEdit->GetText();
     QString file = m_thumbImage->GetFilename();
 
-    bool download;
-    if (m_download->GetCheckState() == MythUIStateType::Full)
-        download = true;
-    else
-        download = false;
-
     LOG(VB_GENERAL, LOG_DEBUG, QString("Text to Parse: %1").arg(text));
 
     QDomElement root = document.documentElement();

@@ -16,54 +16,54 @@
     <name>BurnThemeUI</name>
     <message>
         <source>Has an intro and contains a main menu with 4 recordings per page. Does not have a chapter selection submenu.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sisältää intron ja päävalikon jossa 4 tallennetta per sivu.Ei ole kappaleita alivalikkona. </translation>
     </message>
     <message>
         <source>Has an intro and contains a summary main menu with 10 recordings per page. Does not have a chapter selection submenu, recording titles, dates or category.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sisältää intron ja koostepäävalikon jossa 4 tallennetta per sivu.Ei ole kappaleita alivalikkona, tallenteiden nimiä, päivämääriä tai luokkaa.</translation>
     </message>
     <message>
         <source>Has an intro and contains a main menu with 6 recordings per page. Does not have a scene selection submenu.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sisältää intron ja päävalikon jossa 6 tallennetta per sivu.Ei ole kohtauksia alivalikkona.</translation>
     </message>
     <message>
         <source>Has an intro and contains a main menu with 3 recordings per page and a scene selection submenu with 8 chapters points. Shows a program details page before each recording.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sisältää intron ja koostepäävalikon jossa 3 tallennetta per sivu ja kohtaukset alivalikossa ja 8 kappalepistettä. Näyttää ohjelmatietosivun ennen jokaista tallennetta.</translation>
     </message>
     <message>
         <source>Has an intro and contains a main menu with 3 recordings per page and a scene selection submenu with 8 chapters points. Shows a program details page before each recording. Uses animated thumb images.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sisältää intron ja koostepäävalikon jossa 3 tallennetta per sivu ja kohtaukset alivalikossa ja 8 kappalepistettä. Näyttää ohjelmatietosivun ennen jokaista tallennetta. Animoi pienoiskuvat.</translation>
     </message>
     <message>
         <source>Has an intro and contains a main menu with 3 recordings per page and a scene selection submenu with 8 chapters points.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sisältää intron ja päävalikon jossa 3 tallennetta per sivu ja kohtausvalikon jossa 8 kappaletta alivalikkona. </translation>
     </message>
     <message>
         <source>Has an intro and contains a main menu with 3 recordings per page and a scene selection submenu with 8 chapters points. All the thumb images are animated.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sisältää intron ja päävalikon jossa 3 tallennetta per sivu ja 8:n kappaleen alivalikko. Kaikki pienoiskuvat on animoituja.</translation>
     </message>
     <message>
         <source>Creates an auto play DVD with no menus. Shows an intro movie then for each title shows a details page followed by the video in sequence.</source>
-        <translation type="unfinished"></translation>
+        <translation>Luo automaattisesti käynnistyvän DVD:n ilman menuja. Näyttää introvideon ja jokaiselle nimikkeelle näytetään lisätietosivu jota seuraa videot järjestyksessä.</translation>
     </message>
     <message>
         <source>Creates an auto play DVD with no menus and no intro.</source>
-        <translation type="unfinished"></translation>
+        <translation>Luo automaattisesti käynnistyvän DVD:n ilman valikkoja ja introja.</translation>
     </message>
 </context>
 <context>
     <name>DVDThemeSelector</name>
     <message>
         <source>No theme description file found!</source>
-        <translation type="unfinished"></translation>
+        <translation>Teeman kuvausta ei löydy!</translation>
     </message>
     <message>
         <source>Empty theme description!</source>
-        <translation type="unfinished"></translation>
+        <translation>Tyhjä teeman kuvaus!</translation>
     </message>
     <message>
         <source>Unable to open theme description file!</source>
-        <translation type="unfinished"></translation>
+        <translation>Ei saada teeman kuvaustiedostoa auki!</translation>
     </message>
 </context>
 <context>
@@ -78,7 +78,7 @@
     </message>
     <message>
         <source>Menu</source>
-        <translation></translation>
+        <translation>Menu</translation>
     </message>
     <message>
         <source>Remove Item</source>
@@ -218,7 +218,7 @@
     </message>
     <message>
         <source>Menu</source>
-        <translation></translation>
+        <translation>Menu</translation>
     </message>
     <message>
         <source>Don&apos;t Use Cut List</source>
@@ -614,7 +614,7 @@ Aseta tyhjä DVD asemaan ja valitse alla oleva optio.</translation>
     </message>
     <message>
         <source>Location where MythArchive should create its temporary work files. LOTS of free space required here.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sijainti minne MythArchive :n tulisi tallentaa väliaikaiset työtiedostonsa. Tarvitsee PALJON vapaata tilaa.</translation>
     </message>
 </context>
 <context>
@@ -651,7 +651,7 @@ Ole hyvä ja odota...</translation>
     </message>
     <message>
         <source>Menu</source>
-        <translation></translation>
+        <translation>Menu</translation>
     </message>
 </context>
 <context>
@@ -682,7 +682,7 @@ Ole hyvä ja odota...</translation>
     </message>
     <message>
         <source>DVD +/- RW</source>
-        <translation></translation>
+        <translation>DVD +/- RW</translation>
     </message>
     <message>
         <source>Rewritable DVD</source>
@@ -850,7 +850,7 @@ Ole hyvä ja odota...</translation>
     </message>
     <message>
         <source>1</source>
-        <translation></translation>
+        <translation>1</translation>
     </message>
     <message>
         <source>No videos available</source>
@@ -886,7 +886,7 @@ Ole hyvä ja odota...</translation>
     </message>
     <message>
         <source>Intro</source>
-        <translation></translation>
+        <translation>%DATE%, %TIME%</translation>
     </message>
     <message>
         <source>Find</source>
@@ -902,7 +902,7 @@ Ole hyvä ja odota...</translation>
     </message>
     <message>
         <source>Ok</source>
-        <translation></translation>
+        <translation>Ok</translation>
     </message>
     <message>
         <source>12.34 GB</source>
@@ -974,7 +974,7 @@ Ole hyvä ja odota...</translation>
     </message>
     <message>
         <source>0:00:00.00</source>
-        <translation></translation>
+        <translation>0:00:00.00</translation>
     </message>
     <message>
         <source>Seek Amount</source>
@@ -1138,11 +1138,11 @@ Ole hyvä ja odota...</translation>
     </message>
     <message>
         <source>Channel ID:</source>
-        <translation type="unfinished"></translation>
+        <translation>Kanava id:</translation>
     </message>
     <message>
         <source>Channel Number:</source>
-        <translation type="unfinished"></translation>
+        <translation>Kanavanumero:</translation>
     </message>
 </context>
 <context>
@@ -1153,7 +1153,7 @@ Ole hyvä ja odota...</translation>
     </message>
     <message>
         <source>Menu</source>
-        <translation></translation>
+        <translation>Menu</translation>
     </message>
     <message>
         <source>Exit, Save Thumbnails</source>
@@ -1192,7 +1192,7 @@ Ole hyvä ja odota...</translation>
     </message>
     <message>
         <source>Menu</source>
-        <translation></translation>
+        <translation>Menu</translation>
     </message>
 </context>
 </TS>

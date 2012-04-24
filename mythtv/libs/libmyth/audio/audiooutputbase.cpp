@@ -103,8 +103,8 @@ AudioOutputBase::AudioOutputBase(const AudioSettings &settings) :
     src_out(NULL),              kAudioSRCOutputSize(0),
     memory_corruption_test2(0xdeadbeef),
     memory_corruption_test3(0xdeadbeef),
-    m_configure_succeeded(true),m_length_last_data(0),
-    m_spdifenc(NULL)
+    m_configure_succeeded(false),m_length_last_data(0),
+    m_spdifenc(NULL),           m_forcedprocessing(false)
 {
     src_in = (float *)AOALIGN(src_in_buf);
     memset(&src_data,          0, sizeof(SRC_DATA));
@@ -170,7 +170,8 @@ void AudioOutputBase::InitSettings(const AudioSettings &settings)
     output_settings = GetOutputSettingsUsers(false);
     output_settingsdigital = GetOutputSettingsUsers(true);
 
-    max_channels = output_settings->BestSupportedChannels();
+    max_channels = max(output_settings->BestSupportedChannels(),
+                       output_settingsdigital->BestSupportedChannels());
     configured_channels = max_channels;
 
     upmix_default = max_channels > 2 ?
@@ -318,19 +319,41 @@ void AudioOutputBase::SetStretchFactorLocked(float lstretchfactor)
         return;
 
     stretchfactor = lstretchfactor;
+
+    int channels = needs_upmix || needs_downmix ?
+        configured_channels : source_channels;
+    if (channels < 1 || channels > 8 || !m_configure_succeeded)
+        return;
+
+    bool willstretch = stretchfactor < 0.99f || stretchfactor > 1.01f;
     eff_stretchfactor = (int)(100000.0f * lstretchfactor + 0.5);
+
     if (pSoundStretch)
     {
-        VBGENERAL(QString("Changing time stretch to %1").arg(stretchfactor));
-        pSoundStretch->setTempo(stretchfactor);
+        if (!willstretch && m_forcedprocessing)
+        {
+            m_forcedprocessing = false;
+            processing = false;
+            delete pSoundStretch;
+            pSoundStretch = NULL;
+            VBGENERAL(QString("Cancelling time stretch"));
+            bytes_per_frame = m_previousbpf;
+            waud = raud = 0;
+            reset_active.Ref();
+        }
+        else
+        {
+            VBGENERAL(QString("Changing time stretch to %1")
+                      .arg(stretchfactor));
+            pSoundStretch->setTempo(stretchfactor);
+        }
     }
-    else if (stretchfactor != 1.0f)
+    else if (willstretch)
     {
         VBGENERAL(QString("Using time stretch %1").arg(stretchfactor));
         pSoundStretch = new soundtouch::SoundTouch();
         pSoundStretch->setSampleRate(samplerate);
-        pSoundStretch->setChannels(needs_upmix || needs_downmix ?
-            configured_channels : source_channels);
+        pSoundStretch->setChannels(channels);
         pSoundStretch->setTempo(stretchfactor);
         pSoundStretch->setSetting(SETTING_SEQUENCE_MS, 35);
         /* If we weren't already processing we need to turn on float conversion
@@ -339,6 +362,8 @@ void AudioOutputBase::SetStretchFactorLocked(float lstretchfactor)
         if (!processing)
         {
             processing = true;
+            m_forcedprocessing = true;
+            m_previousbpf = bytes_per_frame;
             bytes_per_frame = source_channels *
                               AudioOutputSettings::SampleSize(FORMAT_FLT);
             waud = raud = 0;
@@ -589,7 +614,7 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
 
     waud = raud = 0;
     reset_active.Clear();
-    actually_paused = processing = false;
+    actually_paused = processing = m_forcedprocessing = false;
 
     channels               = settings.channels;
     source_channels        = lsource_channels;
@@ -637,7 +662,7 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
             .arg(output_settingsdigital->FeaturesToString())
             .arg(configured_channels)
             .arg(channels)
-            .arg(output_settings->IsSupportedChannels(channels))
+            .arg(OutputSettings(enc || passthru)->IsSupportedChannels(channels))
             .arg(max_channels));
 
     int dest_rate = 0;
@@ -646,7 +671,7 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
     // or if 48k override was checked in settings
     if ((samplerate != 48000 &&
          gCoreContext->GetNumSetting("Audio48kOverride", false)) ||
-         (enc && (samplerate > 48000 || (need_resampler && dest_rate > 48000))))
+         (enc && (samplerate > 48000)))
     {
         VBAUDIO("Forcing resample to 48 kHz");
         if (src_quality < 0)
@@ -654,8 +679,10 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
         need_resampler = true;
         dest_rate = 48000;
     }
-    else if (
-        (need_resampler = !OutputSettings(enc)->IsSupportedRate(samplerate)))
+        // this will always be false for passthrough audio as
+        // CanPassthrough() already tested these conditions
+    else if ((need_resampler =
+              !OutputSettings(enc || passthru)->IsSupportedRate(samplerate)))
     {
         dest_rate = OutputSettings(enc)->NearestSupportedRate(samplerate);
     }
@@ -738,7 +765,7 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
     if (need_resampler || needs_upmix || needs_downmix ||
         stretchfactor != 1.0f || (internal_vol && SWVolume()) ||
         (enc && output_format != FORMAT_S16) ||
-        !OutputSettings(enc)->IsSupportedFormat(output_format))
+        !OutputSettings(enc || passthru)->IsSupportedFormat(output_format))
     {
         VBAUDIO("Audio processing enabled");
         processing  = true;

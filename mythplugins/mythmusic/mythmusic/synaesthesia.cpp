@@ -253,11 +253,11 @@ void Synaesthesia::addPixel(int x, int y, int br1, int br2)
         return;
 
     unsigned char *p = output + x * 2 + y * m_outWidth * 2;
-    if (p[0] < 255 - br1)
+    if (p[0] + br1 < 255)
         p[0] += br1;
     else
         p[0] = 255;
-    if (p[1] < 255 - br2)
+    if (p[1] + br2 < 255)
         p[1] += br2;
     else
         p[1] = 255;
@@ -265,11 +265,11 @@ void Synaesthesia::addPixel(int x, int y, int br1, int br2)
 
 void Synaesthesia::addPixelFast(unsigned char *p, int br1, int br2)
 {
-    if (p[0] < 255 - br1)
+    if (p[0] + br1 < 255)
         p[0] += br1;
     else
         p[0] = 255;
-    if (p[1] < 255 - br2)
+    if (p[1] + br2 < 255)
         p[1] += br2;
     else
         p[1] = 255;
@@ -605,6 +605,8 @@ bool Synaesthesia::draw(QPainter *p, const QColor &back)
 {
     if (!m_outputImage)
         return true;
+
+    (void)back;
 
     register uint32_t *ptrOutput = (uint32_t *)output;
 

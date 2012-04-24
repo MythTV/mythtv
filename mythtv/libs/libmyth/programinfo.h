@@ -199,8 +199,7 @@ class MPUBLIC ProgramInfo
                 uint audioprops,
                 uint subtitletype,
 
-                const ProgramList &schedList,
-                bool               oneChanid);
+                const ProgramList &schedList);
     /// Constructs a basic ProgramInfo (used by RecordingInfo)
     ProgramInfo(const QString &title,
                 const QString &subtitle,
@@ -723,8 +722,7 @@ MPUBLIC bool LoadFromProgram(
     ProgramList        &destination,
     const QString      &sql,
     const MSqlBindings &bindings,
-    const ProgramList  &schedList,
-    bool                oneChanid);
+    const ProgramList  &schedList);
 
 MPUBLIC bool LoadFromOldRecorded(
     ProgramList        &destination,

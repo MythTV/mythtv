@@ -2105,8 +2105,8 @@ bool Scheduler::HandleReschedule(void)
             return false;
         }
 
-        LOG(VB_GENERAL, LOG_INFO, QString("Reschedule requested for %1 %2")
-            .arg(request[0]).arg((request.size() > 1) ? request[1] : ""));
+        LOG(VB_GENERAL, LOG_INFO, QString("Reschedule requested for %1")
+            .arg(request.join(" | ")));
 
         if (tokens[0] == "MATCH")
         {

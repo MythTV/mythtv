@@ -577,7 +577,7 @@ void ProgFinder::selectShowData(QString progTitle, int newCurShow)
     bindings[":ENDTIME"] = progStart.addSecs(50 - progStart.time().second());
 
     LoadFromScheduler(m_schedList);
-    LoadFromProgram(m_showData, querystr, bindings, m_schedList, false);
+    LoadFromProgram(m_showData, querystr, bindings, m_schedList);
 
     updateTimesList();
 

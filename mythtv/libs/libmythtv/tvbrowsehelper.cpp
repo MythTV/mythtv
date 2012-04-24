@@ -390,7 +390,7 @@ void TVBrowseHelper::GetNextProgramDB(
 
     ProgramList progList;
     ProgramList dummySched;
-    LoadFromProgram(progList, querystr, bindings, dummySched, false);
+    LoadFromProgram(progList, querystr, bindings, dummySched);
 
     if (progList.empty())
     {

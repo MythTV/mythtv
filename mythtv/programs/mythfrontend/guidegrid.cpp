@@ -706,7 +706,7 @@ ProgramList GuideGrid::GetProgramList(uint chanid) const
     bindings[":CHANID"]  = chanid;
 
     ProgramList dummy;
-    LoadFromProgram(proglist, querystr, bindings, dummy, false);
+    LoadFromProgram(proglist, querystr, bindings, dummy);
 
     return proglist;
 }
@@ -1083,7 +1083,7 @@ ProgramList *GuideGrid::getProgramListFromProgram(int chanNum)
         bindings[":ENDTS"] =
             m_currentEndTime.addSecs(0 - m_currentEndTime.time().second());
 
-        LoadFromProgram(*proglist, querystr, bindings, m_recList, false);
+        LoadFromProgram(*proglist, querystr, bindings, m_recList);
     }
 
     return proglist;
@@ -1391,11 +1391,11 @@ void GuideGrid::customEvent(QEvent *event)
         }
         else if (resultid == "guidemenu")
         {
-            if (resulttext == tr("Record"))
+            if (resulttext == tr("Record This"))
             {
                 quickRecord();
             }
-            else if (resulttext == tr("Change Channel"))
+            else if (resulttext == tr("Change to Channel"))
             {
                 enter();
             }

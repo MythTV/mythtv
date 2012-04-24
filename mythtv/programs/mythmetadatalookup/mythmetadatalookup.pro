@@ -14,6 +14,6 @@ INSTALLS = target
 QMAKE_CLEAN += $(TARGET)
 
 # Input
-HEADERS += lookup.h
-SOURCES += main.cpp lookup.cpp
+HEADERS += lookup.h commandlineparser.h
+SOURCES += main.cpp lookup.cpp commandlineparser.cpp
 

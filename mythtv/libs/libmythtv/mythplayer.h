@@ -381,6 +381,12 @@ class MTV_PUBLIC MythPlayer
     virtual long long CalcMaxFFTime(long long ff, bool setjump = true) const;
     long long CalcRWTime(long long rw) const;
     virtual void calcSliderPos(osdInfo &info, bool paddedFields = false);
+    uint64_t TranslatePositionAbsToRel(uint64_t absPosition) const {
+        return deleteMap.TranslatePositionAbsToRel(absPosition);
+    }
+    uint64_t TranslatePositionRelToAbs(uint64_t relPosition) const {
+        return deleteMap.TranslatePositionRelToAbs(relPosition);
+    }
 
     // Commercial stuff
     void SetAutoCommercialSkip(CommSkipMode autoskip)
@@ -696,7 +702,6 @@ class MTV_PUBLIC MythPlayer
     bool      allowForcedSubtitles;
 
     // CC608/708
-    bool db_prefer708;
     CC608Reader cc608;
     CC708Reader cc708;
 
@@ -778,6 +783,9 @@ class MTV_PUBLIC MythPlayer
 
     // Debugging variables
     Jitterometer *output_jmeter;
+
+  private:
+    void syncWithAudioStretch();
 };
 
 #endif

@@ -1476,12 +1476,7 @@ void MetadataOptions::PerformQuery()
 
 void MetadataOptions::OnSearchListSelection(MetadataLookup *lookup)
 {
-    if (!lookup)
-        return;
-
-    m_lookup = lookup;
-
-    m_metadataFactory->Lookup(lookup);
+    QueryComplete(lookup);
 }
 
 void MetadataOptions::OnImageSearchListSelection(ArtworkInfo info,

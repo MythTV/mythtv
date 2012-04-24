@@ -103,7 +103,7 @@
     </message>
     <message>
         <source>Podcast:</source>
-        <translation></translation>
+        <translation>Podcast:</translation>
     </message>
     <message>
         <source>OK</source>
@@ -180,7 +180,7 @@ Kun olet valmis, valitse&quot;OK&quot; tai &quot;Peruuta&quot; jatkaaksesi.</tra
     </message>
     <message>
         <source>Podcast:</source>
-        <translation></translation>
+        <translation>Podcast:</translation>
     </message>
     <message>
         <source>Genre:</source>

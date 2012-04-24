@@ -106,7 +106,7 @@ DTC::ProgramGuide *Guide::GetProgramGuide( const QDateTime &dtStartTime ,
 
     // ----------------------------------------------------------------------
 
-    LoadFromProgram( progList, sSQL, bindings, schedList, false );
+    LoadFromProgram( progList, sSQL, bindings, schedList );
 
     // ----------------------------------------------------------------------
     // Build Response
@@ -191,7 +191,7 @@ DTC::Program* Guide::GetProgramDetails( int              nChanId,
 
     ProgramList progList;
 
-    LoadFromProgram( progList, sSQL, bindings, schedList, false );
+    LoadFromProgram( progList, sSQL, bindings, schedList );
 
     if ( progList.size() == 0)
         throw( "Error Reading Program Info" );

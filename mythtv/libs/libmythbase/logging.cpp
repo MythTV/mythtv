@@ -1297,7 +1297,8 @@ int syslogGetFacility(QString facility)
 #else
     CODE *name;
     int i;
-    char *string = (char *)facility.toLocal8Bit().constData();
+    QByteArray ba = facility.toLocal8Bit();
+    char *string = (char *)ba.constData();
 
     for (i = 0, name = &facilitynames[0];
          name->c_name && strcmp(name->c_name, string); i++, name++);

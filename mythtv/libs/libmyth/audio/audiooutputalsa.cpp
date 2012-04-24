@@ -458,7 +458,7 @@ AudioOutputSettings* AudioOutputALSA::GetOutputSettings(bool passthrough)
     QMap<QString, QString> *alsadevs = GetDevices("pcm");
     while(1)
     {
-        QString real_device = (((passthru || enc) && m_discretedigital) ?
+        QString real_device = ((passthrough && m_discretedigital) ?
                                passthru_device : main_device);
 
         QString desc = alsadevs->value(real_device);

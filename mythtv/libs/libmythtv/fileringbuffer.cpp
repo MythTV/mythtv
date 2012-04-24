@@ -453,8 +453,8 @@ int FileRingBuffer::safe_read(int fd, void *data, uint sz)
             tot += ret;
         }
 
-        //if (oldfile)
-            //break;
+        if (oldfile)
+            break;
 
         if (ret == 0) // EOF returns 0
         {
@@ -465,7 +465,7 @@ int FileRingBuffer::safe_read(int fd, void *data, uint sz)
 
             // 0.36 second timeout for livetvchain with usleep(60000),
             // or 2.4 seconds if it's a new file less than 30 minutes old.
-            if (zerocnt >= (oldfile ? 4 : (livetvchain ? 6 : 40)))
+            if (zerocnt >= (livetvchain ? 6 : 40))
             {
                 break;
             }

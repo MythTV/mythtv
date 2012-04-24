@@ -1080,7 +1080,10 @@ void TVRec::TeardownRecorder(uint request_flags)
     }
 
     if (ringBuffer)
+    {
+        LOG(VB_FILE, LOG_INFO, LOC + "calling StopReads()");
         ringBuffer->StopReads();
+    }
 
     if (curRecording)
     {

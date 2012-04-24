@@ -394,7 +394,7 @@ Poistetaanko se tietokannasta?</translation>
     </message>
     <message>
         <source>0</source>
-        <translation></translation>
+        <translation>0</translation>
     </message>
     <message>
         <source>Verifying %1 files...</source>
@@ -630,7 +630,7 @@ Pelitietokannasta. Oletko Varma?</translation>
     </message>
     <message>
         <source>CRC:</source>
-        <translation></translation>
+        <translation>CRC:</translation>
     </message>
     <message>
         <source>Description:</source>
@@ -690,7 +690,7 @@ Pelitietokannasta. Oletko Varma?</translation>
     </message>
     <message>
         <source>Favorite</source>
-        <translation type="unfinished"></translation>
+        <translation>Suosikki</translation>
     </message>
 </context>
 </TS>
