@@ -15,12 +15,12 @@ extern "C" {
 #include "libavformat/avformat.h"
 }
 
-class QTextStream;
 class QTcpSocket;
 class QUdpSocket;
 class QTimer;
 class AudioOutput;
 class ServerPool;
+class NetStream;
 
 typedef QHash<QByteArray,QByteArray> RawHash;
 
@@ -42,6 +42,7 @@ class MythRAOPConnection : public QObject
   public slots:
     void readClient(void);
     void udpDataReady(QByteArray buf, QHostAddress peer, quint16 port);
+    void udpDataReady(void);
     void timeout(void);
     void audioRetry(void);
 
@@ -58,8 +59,9 @@ class MythRAOPConnection : public QObject
     void    ProcessAudio(uint64_t timenow);
     void    ResetAudio(void);
     void    ProcessRequest(const QList<QByteArray> &lines);
-    void    StartResponse(QTextStream *stream);
-    void    FinishResponse(QTextStream *stream, QTcpSocket *socket,
+    void    StartResponse(NetStream *stream,
+                          QByteArray &option, QByteArray &cseq);
+    void    FinishResponse(NetStream *stream, QTcpSocket *socket,
                            QByteArray &option, QByteArray &cseq);
     RawHash FindTags(const QList<QByteArray> &lines);
     bool    CreateDecoder(void);
@@ -72,13 +74,13 @@ class MythRAOPConnection : public QObject
     QTimer         *m_watchdogTimer;
     // comms socket
     QTcpSocket     *m_socket;
-    QTextStream    *m_textStream;
+    NetStream      *m_textStream;
     QByteArray      m_hardwareId;
     // incoming audio
     QHostAddress    m_peerAddress;
     int             m_dataPort;
     ServerPool     *m_dataSocket;
-    ServerPool     *m_clientControlSocket;
+    QUdpSocket     *m_clientControlSocket;
     int             m_clientControlPort;
     QMap<uint16_t,uint64_t> m_resends;
     // crypto
@@ -91,6 +93,7 @@ class MythRAOPConnection : public QObject
     AVCodecContext *m_codeccontext;
     QList<int>      m_audioFormat;
     int             m_sampleRate;
+    int             m_channels;
     typedef struct 
     {
         int16_t *samples;

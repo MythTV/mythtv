@@ -1,6 +1,3 @@
-// TODO
-// remove hardcoded frames per packet
-
 #include <QTimer>
 #include <QTcpSocket>
 #include <QUdpSocket>
@@ -22,6 +19,22 @@
 #define DEFAULT_SAMPLE_RATE 44100
 
 RSA* MythRAOPConnection::g_rsa = NULL;
+
+class NetStream : public QTextStream
+{
+public:
+    NetStream(QIODevice *device) : QTextStream(device)
+    {
+    };
+    NetStream &operator<<(const QString &str)
+    {
+        LOG(VB_GENERAL, LOG_DEBUG,
+            LOC + QString("Sending(%1): ").arg(str.length()) + str);
+        QTextStream *q = this;
+        *q << str;
+        return *this;
+    };
+};
 
 MythRAOPConnection::MythRAOPConnection(QObject *parent, QTcpSocket *socket,
                                        QByteArray id, int port)
@@ -87,7 +100,7 @@ MythRAOPConnection::~MythRAOPConnection()
 bool MythRAOPConnection::Init(void)
 {
     // connect up the request socket
-    m_textStream = new QTextStream(m_socket);
+    m_textStream = new NetStream(m_socket);
     m_textStream->setCodec("UTF-8");
     if (!connect(m_socket, SIGNAL(readyRead()), this, SLOT(readClient())))
     {
@@ -136,6 +149,24 @@ bool MythRAOPConnection::Init(void)
     m_watchdogTimer->start(10000);
 
     return true;
+}
+
+void MythRAOPConnection::udpDataReady(void)
+{
+    QUdpSocket *socket = dynamic_cast<QUdpSocket*>(sender());
+
+    while (socket->state() == QAbstractSocket::BoundState &&
+           socket->hasPendingDatagrams())
+    {
+        QByteArray buffer;
+        buffer.resize(socket->pendingDatagramSize());
+        QHostAddress sender;
+        quint16 senderPort;
+
+        socket->readDatagram(buffer.data(), buffer.size(),
+                             &sender, &senderPort);
+        udpDataReady(buffer, sender, senderPort);
+    }
 }
 
 void MythRAOPConnection::udpDataReady(QByteArray buf, QHostAddress peer,
@@ -191,7 +222,8 @@ void MythRAOPConnection::udpDataReady(QByteArray buf, QHostAddress peer,
             m_resends.remove(this_sequence);
         }
         else
-            LOG(VB_GENERAL, LOG_WARNING, LOC + "Received unexpected resent packet.");
+            LOG(VB_GENERAL, LOG_WARNING, LOC + QString("Received unexpected resent packet %1")
+                .arg(this_sequence));
     }
 
     ExpireResendRequests(timenow);
@@ -332,12 +364,13 @@ void MythRAOPConnection::ProcessSyncPacket(const QByteArray &buf, uint64_t timen
 
     if (m_audio)
     {
+        uint64_t total = averageaudio + averagequeue;
         LOG(VB_GENERAL, LOG_DEBUG, LOC +
             QString("Sync packet: Timestamp: %1 Current Audio ts: %2 (avsync %3ms) "
                     "Latency: audio %4 queue %5 total %6ms <-> target %7ms")
             .arg(m_lastSyncTimestamp).arg(m_audio->GetAudiotime()).arg(averageav, 0)
             .arg(averageaudio).arg(averagequeue)
-            .arg(averageaudio + averagequeue).arg(m_lastLatency));
+            .arg(total).arg(m_lastLatency));
     }
     m_latencyAudio = m_latencyQueued = m_latencyCounter = m_avSync = 0;
 }
@@ -463,78 +496,82 @@ void MythRAOPConnection::ProcessRequest(const QList<QByteArray> &lines)
         return;
     }
 
+    *m_textStream << "RTSP/1.0 200 OK\r\n";
+
+    if (tags.contains("Apple-Challenge"))
+    {
+        LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("Received Apple-Challenge"));
+
+        *m_textStream << "Apple-Response: ";
+        if (!LoadKey())
+            return;
+        int tosize = RSA_size(LoadKey());
+        unsigned char to[tosize];
+
+        QByteArray challenge = QByteArray::fromBase64(tags["Apple-Challenge"].data());
+        int challenge_size = challenge.size();
+        if (challenge_size != 16)
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                QString("Decoded challenge size %1, expected 16").arg(challenge_size));
+            if (challenge_size > 16)
+                challenge_size = 16;
+        }
+
+        int i = 0;
+        unsigned char from[38];
+        memcpy(from, challenge.data(), challenge_size);
+        i += challenge_size;
+        if (m_socket->localAddress().protocol() == QAbstractSocket::IPv4Protocol)
+        {
+            uint32_t ip = m_socket->localAddress().toIPv4Address();
+            ip = qToBigEndian(ip);
+            memcpy(from + i, &ip, 4);
+            i += 4;
+        }
+        else if (m_socket->localAddress().protocol() == QAbstractSocket::IPv6Protocol)
+        {
+            // NB IPv6 untested
+            Q_IPV6ADDR ip = m_socket->localAddress().toIPv6Address();
+            //ip = qToBigEndian(ip);
+            memcpy(from + i, &ip, 16);
+            i += 16;
+        }
+        memcpy(from + i, m_hardwareId.data(), RAOP_HARDWARE_ID_SIZE);
+        i += RAOP_HARDWARE_ID_SIZE;
+
+        int pad = 32 - i;
+        if (pad > 0)
+        {
+            memset(from + i, 0, pad);
+            i += pad;
+        }
+
+        LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("Full base64 response: '%1' size %2")
+            .arg(QByteArray((const char*)from, i).toBase64().data()).arg(i));
+
+        RSA_private_encrypt(i, from, to, LoadKey(), RSA_PKCS1_PADDING);
+
+        QByteArray base64 = QByteArray((const char*)to, tosize).toBase64();
+
+        for (int pos = base64.size() - 1; pos > 0; pos--)
+        {
+            if (base64[pos] == '=')
+                base64[pos] = ' ';
+            else
+                break;
+        }
+        LOG(VB_GENERAL, LOG_DEBUG, QString("tSize=%1 tLen=%2 tResponse=%3")
+            .arg(tosize).arg(base64.size()).arg(base64.data()));
+        *m_textStream << base64.trimmed() << "\r\n";
+    }
+
     QByteArray option = lines[0].left(lines[0].indexOf(" "));
 
     if (option == "OPTIONS")
     {
-        StartResponse(m_textStream);
-        if (tags.contains("Apple-Challenge"))
-        {
-            *m_textStream << "Apple-Response: ";
-            if (!LoadKey())
-                return;
-            int tosize = RSA_size(LoadKey());
-            unsigned char to[tosize];
-
-            QByteArray challenge = QByteArray::fromBase64(tags["Apple-Challenge"].data());
-            int challenge_size = challenge.size();
-            if (challenge_size != 16)
-            {
-                LOG(VB_GENERAL, LOG_ERR, LOC +
-                    QString("Decoded challenge size %1, expected 16").arg(challenge_size));
-                if (challenge_size > 16)
-                    challenge_size = 16;
-            }
-
-            int i = 0;
-            unsigned char from[38];
-            memcpy(from, challenge.data(), challenge_size);
-            i += challenge_size;
-            if (m_socket->localAddress().protocol() == QAbstractSocket::IPv4Protocol)
-            {
-                uint32_t ip = m_socket->localAddress().toIPv4Address();
-                ip = qToBigEndian(ip);
-                memcpy(from + i, &ip, 4);
-                i += 4;
-            }
-            else if (m_socket->localAddress().protocol() == QAbstractSocket::IPv6Protocol)
-            {
-                // NB IPv6 untested
-                Q_IPV6ADDR ip = m_socket->localAddress().toIPv6Address();
-                //ip = qToBigEndian(ip);
-                memcpy(from + i, &ip, 16);
-                i += 16;
-            }
-            memcpy(from + i, m_hardwareId.data(), RAOP_HARDWARE_ID_SIZE);
-            i += RAOP_HARDWARE_ID_SIZE;
-
-            int pad = 32 - i;
-            if (pad > 0)
-            {
-                memset(from + i, 0, pad);
-                i += pad;
-            }
-
-            LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("Full base64 response: '%1' size %2")
-                .arg(QByteArray((const char*)from, i).toBase64().data()).arg(i));
-
-            RSA_private_encrypt(i, from, to, LoadKey(), RSA_PKCS1_PADDING);
-
-            QByteArray base64 = QByteArray((const char*)to, tosize).toBase64();
-
-            for (int pos = base64.size() - 1; pos > 0; pos--)
-            {
-                if (base64[pos] == '=')
-                    base64[pos] = ' ';
-                else
-                    break;
-            }
-
-            *m_textStream << base64.trimmed() << "\r\n";
-        }
-
+        StartResponse(m_textStream, option, tags["CSeq"]);
         *m_textStream << "Public: ANNOUNCE, SETUP, RECORD, PAUSE, FLUSH, TEARDOWN, OPTIONS, GET_PARAMETER, SET_PARAMETER\r\n";
-        FinishResponse(m_textStream, m_socket, option, tags["Cseq"]);
     }
     else if (option == "ANNOUNCE")
     {
@@ -589,9 +626,7 @@ void MythRAOPConnection::ProcessRequest(const QList<QByteArray> &lines)
                     LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("Audio parameter: %1").arg(fmt));
             }
         }
-
-        StartResponse(m_textStream);
-        FinishResponse(m_textStream, m_socket, option, tags["Cseq"]);
+        StartResponse(m_textStream, option, tags["CSeq"]);
     }
     else if (option == "SETUP")
     {
@@ -617,14 +652,6 @@ void MythRAOPConnection::ProcessRequest(const QList<QByteArray> &lines)
                 QString("control port: %1 timing port: %2")
                     .arg(control_port).arg(timing_port));
 
-            StartResponse(m_textStream);
-            *m_textStream << "Transport: " << tags["Transport"];
-            *m_textStream << ";server_port=" << QString::number(m_dataPort) << "\r\n";
-            FinishResponse(m_textStream, m_socket, option, tags["Cseq"]);
-
-            if (OpenAudioDevice())
-                CreateDecoder();
-
             if (m_clientControlSocket)
             {
                 m_clientControlSocket->disconnect();
@@ -632,21 +659,31 @@ void MythRAOPConnection::ProcessRequest(const QList<QByteArray> &lines)
                 delete m_clientControlSocket;
             }
 
-            m_clientControlSocket = new ServerPool(this);
+            m_clientControlSocket = new QUdpSocket(this);
             if (!m_clientControlSocket->bind(control_port))
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC +
-                    QString("Failed to bind to client control port %1").arg(control_port));
+                    QString("Failed to bind to client control port %1. "
+                            "Control of audio stream may fail")
+                    .arg(control_port));
             }
             else
             {
                 LOG(VB_GENERAL, LOG_INFO, LOC +
                     QString("Bound to client control port %1").arg(control_port));
-                m_peerAddress = m_socket->peerAddress();
-                m_clientControlPort = control_port;
-                connect(m_clientControlSocket, SIGNAL(newDatagram(QByteArray, QHostAddress, quint16)),
-                        this,                  SLOT(udpDataReady(QByteArray, QHostAddress, quint16)));
             }
+
+            if (OpenAudioDevice())
+                CreateDecoder();
+
+            m_peerAddress = m_socket->peerAddress();
+            m_clientControlPort = control_port;
+            connect(m_clientControlSocket, SIGNAL(readyRead()), this, SLOT(udpDataReady()));
+
+            StartResponse(m_textStream, option, tags["CSeq"]);
+            *m_textStream << "Transport: " << tags["Transport"].data();
+            *m_textStream << ";server_port=" << QString::number(m_dataPort);
+            *m_textStream << "\r\nSession: MYTHTV\r\n";
         }
         else
         {
@@ -656,13 +693,24 @@ void MythRAOPConnection::ProcessRequest(const QList<QByteArray> &lines)
     }
     else if (option == "RECORD")
     {
-        StartResponse(m_textStream);
-        FinishResponse(m_textStream, m_socket, option, tags["Cseq"]);
+        StartResponse(m_textStream, option, tags["CSeq"]);
+    }
+    else if (option == "TEARDOWN")
+    {
+        *m_textStream << "Connection: close\r\n";
+        StartResponse(m_textStream, option, tags["CSeq"]);
+    }
+    else if (option == "FLUSH")
+    {
+        ResetAudio();
+        *m_textStream << "flush\r\n";
+        StartResponse(m_textStream, option, tags["CSeq"]);
     }
     else if (option == "SET_PARAMETER")
     {
         foreach (QByteArray line, lines)
         {
+            StartResponse(m_textStream, option, tags["CSeq"]);
             if (line.startsWith("volume:") && m_allowVolumeControl && m_audio)
             {
                 QByteArray rawvol = line.mid(7).trimmed();
@@ -674,43 +722,34 @@ void MythRAOPConnection::ProcessRequest(const QList<QByteArray> &lines)
                 m_audio->SetCurrentVolume((int)volume);
             }
         }
-
-        StartResponse(m_textStream);
-        FinishResponse(m_textStream, m_socket, option, tags["Cseq"]);
     }
-    else if (option == "FLUSH")
+    else
     {
-        ResetAudio();
-        StartResponse(m_textStream);
-        FinishResponse(m_textStream, m_socket, option, tags["Cseq"]);
+        LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("Command not handled: %1")
+            .arg(option.data()));
+        StartResponse(m_textStream, option, tags["CSeq"]);
     }
-    else if (option == "TEARDOWN")
-    {
-        StartResponse(m_textStream);
-        *m_textStream << "Connection: close\r\n";
-        FinishResponse(m_textStream, m_socket, option, tags["Cseq"]);
-    }
-
+    FinishResponse(m_textStream, m_socket, option, tags["CSeq"]);
 }
 
-void MythRAOPConnection::StartResponse(QTextStream *stream)
+void MythRAOPConnection::StartResponse(NetStream *stream,
+                                       QByteArray &option, QByteArray &cseq)
 {
     if (!stream)
         return;
-    *stream << "RTSP/1.0 200 OK\r\n";
-}
-
-void MythRAOPConnection::FinishResponse(QTextStream *stream, QTcpSocket *socket,
-                                        QByteArray &option, QByteArray &cseq)
-{
     LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("%1 sequence %2")
         .arg(option.data()).arg(cseq.data()));
     *stream << "Audio-Jack-Status: connected; type=analog\r\n";
     *stream << "CSeq: " << cseq << "\r\n";
+}
+
+void MythRAOPConnection::FinishResponse(NetStream *stream, QTcpSocket *socket,
+                                        QByteArray &option, QByteArray &cseq)
+{
     *stream << "\r\n";
     stream->flush();
-    LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("Send: %1")
-         .arg(socket->flush()));
+    LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("Finished %1 %2 , Send: %3")
+        .arg(option.data()).arg(cseq.data()).arg(socket->flush()));
 }
 
 RSA* MythRAOPConnection::LoadKey(void)
@@ -797,7 +836,7 @@ bool MythRAOPConnection::CreateDecoder(void)
             extradata[13] = (fs >> 16) & 0xff;
             extradata[14] = (fs >> 8)  & 0xff;
             extradata[15] = fs & 0xff;
-            extradata[16] = 2; // channels
+            extradata[16] = m_channels;       // channels
             extradata[17] = m_audioFormat[3]; // sample size
             extradata[18] = m_audioFormat[4]; // rice_historymult
             extradata[19] = m_audioFormat[5]; // rice_initialhistory
@@ -805,7 +844,7 @@ bool MythRAOPConnection::CreateDecoder(void)
         }
         m_codeccontext->extradata = extradata;
         m_codeccontext->extradata_size = 36;
-        m_codeccontext->channels = 2;
+        m_codeccontext->channels = m_channels;
         if (avcodec_open(m_codeccontext, m_codec) < 0)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to open ALAC decoder - going silent...");
@@ -834,6 +873,7 @@ bool MythRAOPConnection::OpenAudioDevice(void)
     CloseAudioDevice();
 
     m_sampleRate = m_audioFormat.size() >= 12 ? m_audioFormat[11] : DEFAULT_SAMPLE_RATE;
+    m_channels   = m_audioFormat[7] > 0 ? m_audioFormat[7] : 2;
     if (m_sampleRate < 1)
         m_sampleRate = DEFAULT_SAMPLE_RATE;
 
@@ -841,7 +881,7 @@ bool MythRAOPConnection::OpenAudioDevice(void)
                         ? gCoreContext->GetSetting("PassThruOutputDevice") : QString::null;
     QString device = gCoreContext->GetSetting("AudioOutputDevice");
 
-    m_audio = AudioOutput::OpenAudio(device, passthru, FORMAT_S16, 2,
+    m_audio = AudioOutput::OpenAudio(device, passthru, FORMAT_S16, m_channels,
                                      0, m_sampleRate, AUDIOOUTPUT_MUSIC,
                                      m_allowVolumeControl, false);
     if (!m_audio)

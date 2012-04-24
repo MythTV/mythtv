@@ -1,6 +1,5 @@
 #include <QTimer>
 #include <QtEndian>
-#include <QTcpSocket>
 #include <QNetworkInterface>
 
 #include "mthread.h"
@@ -146,11 +145,6 @@ void MythRAOPDevice::Start(void)
 
     // announce service
     m_bonjour = new BonjourRegister(this);
-    if (!m_bonjour)
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create Bonjour object.");
-        return;
-    }
 
     // give each frontend a unique name
     int multiple = m_setupPort - baseport;
@@ -177,6 +171,8 @@ void MythRAOPDevice::Start(void)
     txt.append(4); txt.append("vn=3");
     txt.append(9); txt.append("txtvers=1");
 
+    LOG(VB_GENERAL, LOG_INFO, QString("Registering service %1.%2 port %3 TXT %4")
+        .arg(QString(name)).arg(QString(type)).arg(m_setupPort).arg(QString(txt)));
     if (!m_bonjour->Register(m_setupPort, type, name, txt))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to register service.");
