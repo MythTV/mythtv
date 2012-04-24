@@ -308,21 +308,22 @@ bool ServerPool::listen(QList<QHostAddress> addrs, quint16 port,
             if (m_port == 0)
                 m_port = server->serverPort();
         }
-        else if (requireall)
-        {
-            LOG(VB_GENERAL, LOG_ERR, QString("Failed listening on TCP %1:%2")
-                    .arg(PRETTYIP(it)).arg(port));
-            close();
-            server->disconnect();
-            server->deleteLater();
-            return false;
-        }
         else
         {
-            LOG(VB_GENERAL, LOG_WARNING, QString("Failed listening on TCP %1:%2")
-                    .arg(PRETTYIP(it)).arg(port));
+            LOG(VB_GENERAL, LOG_ERR,
+                    QString("Failed listening on TCP %1:%2 - Error %3: %4")
+                        .arg(PRETTYIP(it))
+                        .arg(port)
+                        .arg(server->serverError())
+                        .arg(server->errorString()));
             server->disconnect();
             server->deleteLater();
+
+            if (requireall)
+            {
+                close();
+                return false;
+            }
         }
     }
 
@@ -365,21 +366,22 @@ bool ServerPool::bind(QList<QHostAddress> addrs, quint16 port,
                     .arg(PRETTYIP(it)).arg(port));
             m_udpSockets.append(socket);
         }
-        else if (requireall)
-        {
-            LOG(VB_GENERAL, LOG_ERR, QString("Failed binding to UDP %1:%2")
-                    .arg(PRETTYIP(it)).arg(port));
-            close();
-            socket->disconnect();
-            socket->deleteLater();
-            return false;
-        }
         else
         {
-            LOG(VB_GENERAL, LOG_WARNING, QString("Failed binding to UDP %1:%2")
-                    .arg(PRETTYIP(it)).arg(port));
+            LOG(VB_GENERAL, LOG_ERR,
+                    QString("Failed binding to UDP %1:%2 - Error %3: %4")
+                        .arg(PRETTYIP(it))
+                        .arg(port)
+                        .arg(socket->error())
+                        .arg(socket->errorString()));
             socket->disconnect();
             socket->deleteLater();
+
+            if (requireall)
+            {
+                close();
+                return false;
+            }
         }
     }
 

@@ -706,7 +706,7 @@ ProgramList GuideGrid::GetProgramList(uint chanid) const
     bindings[":CHANID"]  = chanid;
 
     ProgramList dummy;
-    LoadFromProgram(proglist, querystr, bindings, dummy, false);
+    LoadFromProgram(proglist, querystr, bindings, dummy);
 
     return proglist;
 }
@@ -1082,7 +1082,7 @@ ProgramList *GuideGrid::getProgramListFromProgram(int chanNum)
         bindings[":ENDTS"] =
             m_currentEndTime.addSecs(0 - m_currentEndTime.time().second());
 
-        LoadFromProgram(*proglist, querystr, bindings, m_recList, false);
+        LoadFromProgram(*proglist, querystr, bindings, m_recList);
     }
 
     return proglist;

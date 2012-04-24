@@ -248,7 +248,7 @@ RecordingInfo::RecordingInfo(
     bindings[":STARTTS2"] = query_startts;
 
     ::LoadFromScheduler(schedList);
-    LoadFromProgram(progList, querystr, bindings, schedList, false);
+    LoadFromProgram(progList, querystr, bindings, schedList);
 
     if (!progList.empty())
     {
@@ -341,7 +341,7 @@ RecordingInfo::RecordingInfo(
     bindings[":CHANID"]  = QString::number(_chanid);
     bindings[":STARTTS"] = desiredts.addSecs(50 - desiredts.time().second());
 
-    LoadFromProgram(progList, querystr, bindings, schedList, false);
+    LoadFromProgram(progList, querystr, bindings, schedList);
 
     if (!progList.empty())
         nextstart = (*progList.begin())->GetScheduledStartTime();

@@ -153,6 +153,7 @@ class VideoOutputXv : public VideoOutput
     bool                 xv_set_defaults;
     buffer_map_t         xv_buffers;
     bool                 xv_need_bobdeint_repaint;
+    bool                 xv_use_picture_controls;
     QMap<PictureAttribute,int> xv_attribute_min;
     QMap<PictureAttribute,int> xv_attribute_max;
     QMap<PictureAttribute,int> xv_attribute_def;

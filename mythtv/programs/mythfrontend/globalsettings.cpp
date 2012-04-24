@@ -1169,12 +1169,20 @@ PlaybackProfileConfigs::PlaybackProfileConfigs(const QString &str) :
     }
 #endif
 
-#ifdef USING_OPENGL
+#ifdef USING_OPENGL_VIDEO
     if (!profiles.contains("OpenGL Normal") &&
         !profiles.contains("OpenGL High Quality") &&
         !profiles.contains("OpenGL Slim"))
     {
         VideoDisplayProfile::CreateOpenGLProfiles(host);
+        profiles = VideoDisplayProfile::GetProfiles(host);
+    }
+#endif
+
+#ifdef USING_GLVAAPI
+    if (!profiles.contains("VAAPI Normal"))
+    {
+        VideoDisplayProfile::CreateVAAPIProfiles(host);
         profiles = VideoDisplayProfile::GetProfiles(host);
     }
 #endif

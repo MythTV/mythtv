@@ -38,10 +38,11 @@
 #endif
 
 #ifdef USING_VAAPI
-#include "videoout_openglvaapi.h"
 #include "videoout_nullvaapi.h"
 #endif
-
+#ifdef USING_GLVAAPI
+#include "videoout_openglvaapi.h"
+#endif
 #include "videoout_null.h"
 #include "dithertable.h"
 
@@ -96,9 +97,11 @@ void VideoOutput::GetRenderOptions(render_opts &opts)
 #endif // USING_VDPAU
 
 #ifdef USING_VAAPI
-    VideoOutputOpenGLVAAPI::GetRenderOptions(opts);
     VideoOutputNullVAAPI::GetRenderOptions(opts);
 #endif // USING_VAAPI
+#ifdef USING_GLVAAPI
+    VideoOutputOpenGLVAAPI::GetRenderOptions(opts);
+#endif // USING_GLVAAPI
 }
 
 /**
@@ -161,9 +164,9 @@ VideoOutput *VideoOutput::Create(
         renderers += VideoOutputVDPAU::GetAllowedRenderers(codec_id, video_dim);
 #endif // USING_VDPAU
 
-#ifdef USING_VAAPI
+#ifdef USING_GLVAAPI
         renderers += VideoOutputOpenGLVAAPI::GetAllowedRenderers(codec_id, video_dim);
-#endif // USING_VAAPI
+#endif // USING_GLVAAPI
     }
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "Allowed renderers: " +
@@ -226,12 +229,13 @@ VideoOutput *VideoOutput::Create(
 #endif // USING_VDPAU
 
 #ifdef USING_VAAPI
-        if (renderer == "openglvaapi")
-            vo = new VideoOutputOpenGLVAAPI();
         if (renderer == "nullvaapi")
             vo = new VideoOutputNullVAAPI();
 #endif // USING_VAAPI
-
+#ifdef USING_GLVAAPI
+        if (renderer == "openglvaapi")
+            vo = new VideoOutputOpenGLVAAPI();
+#endif // USING_GLVAAPI        
 #ifdef USING_XV
         if (xvlist.contains(renderer))
             vo = new VideoOutputXv();
@@ -1829,18 +1833,32 @@ void VideoOutput::InitDisplayMeasurements(uint width, uint height, bool resize)
 
 int VideoOutput::CalcHueBase(const QString &adaptor_name)
 {
+    int hue_adj = 50;
+
     // XVideo adjustments
     if ((adaptor_name == "ATI Radeon Video Overlay") ||
+        (adaptor_name == "XA G3D Textured Video") || /* ATI in VMWare*/
+        (adaptor_name == "Radeon Textured Video") || /* ATI */
+        (adaptor_name == "AMD Radeon AVIVO Video") || /* ATI */
         (adaptor_name == "XV_SWOV" /* VIA 10K & 12K */) ||
         (adaptor_name == "Savage Streams Engine" /* S3 Prosavage DDR-K */) ||
-        (adaptor_name == "SIS 300/315/330 series Video Overlay"))
+        (adaptor_name == "SIS 300/315/330 series Video Overlay") ||
+        adaptor_name.toLower().contains("xvba")) /* VAAPI */
     {
-        return 50;
+        hue_adj = 50;
+    }
+    else if (adaptor_name.left(4) == "NV17") /* nVidia */
+    {
+        hue_adj = 0;
+    }
+    else
+    {
+        LOG(VB_GENERAL, LOG_INFO, LOC +
+            QString("CalcHueBase(%1): Unknown adaptor, hue may be wrong.")
+            .arg(adaptor_name));
+        LOG(VB_GENERAL, LOG_INFO, LOC +
+            "Please open a ticket if you need to adjust the hue.");
     }
 
-    // VAAPI
-    if (adaptor_name.toLower().contains("xvba"))
-        return 50;
-
-    return 0; //< nVidia normal
+    return hue_adj;
 }

@@ -518,7 +518,7 @@ ProgramInfo::ProgramInfo(
     uint _audioproperties,
     uint _subtitleType,
 
-    const ProgramList &schedList, bool oneChanid) :
+    const ProgramList &schedList) :
     title(_title),
     subtitle(_subtitle),
     description(_description),
@@ -618,21 +618,25 @@ ProgramInfo::ProgramInfo(
         dupmethod   = s.dupmethod;
         findid      = s.findid;
 
-        if (s.recstatus == rsWillRecord || 
-            s.recstatus == rsRecording ||
+        if (chanstr != s.chanstr)
+        {
+            if (s.recstatus == rsWillRecord)
+                recstatus = rsOtherShowing;
+            else if (s.recstatus == rsRecording)
+                recstatus = rsOtherRecording;
+            else if (s.recstatus == rsTuning)
+                recstatus = rsOtherTuning;
+        }
+
+        // Stop recording keys on chanid (and recstarts).  If the
+        // recording is running, override the chanid, so we can stop
+        // it from any matching program.  Remove this hack when we
+        // replace chanid/recstartts as the primary key for the
+        // recorded and related tables with something better.
+        if (s.recstatus == rsRecording ||
             s.recstatus == rsTuning)
         {
-            if (oneChanid)
-            {
-                chanid   = s.chanid;
-                chanstr  = s.chanstr;
-                chansign = s.chansign;
-                channame = s.channame;
-            }
-            else if ((chanid != s.chanid) && (chanstr != s.chanstr))
-            {
-                recstatus = rsOtherShowing;
-            }
+            chanid = s.chanid;
         }
     }
 }
@@ -4576,7 +4580,7 @@ static bool FromProgramQuery(
 bool LoadFromProgram(
     ProgramList &destination,
     const QString &sql, const MSqlBindings &bindings,
-    const ProgramList &schedList, bool oneChanid)
+    const ProgramList &schedList)
 {
     destination.clear();
 
@@ -4622,7 +4626,7 @@ bool LoadFromProgram(
                 query.value(24).toInt(), // audioprop
                 query.value(25).toInt(), // subtitletypes
 
-                schedList, oneChanid));
+                schedList));
     }
 
     return true;

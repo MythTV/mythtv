@@ -1290,7 +1290,9 @@ void MythMainWindow::attach(QWidget *child)
         currentWidget()->setEnabled(false);
 
     d->widgetList.push_back(child);
+#ifndef Q_WS_MACX
     child->winId();
+#endif
     child->raise();
     child->setFocus();
     child->setMouseTracking(true);

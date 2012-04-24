@@ -407,6 +407,7 @@ using_frontend {
         LIBS    += -lva -lva-x11 -lva-glx
         using_opengl_video:HEADERS += videoout_openglvaapi.h
         using_opengl_video:SOURCES += videoout_openglvaapi.cpp
+        using_opengl_video:DEFINES += USING_GLVAAPI
     }
 
     # Misc. frontend

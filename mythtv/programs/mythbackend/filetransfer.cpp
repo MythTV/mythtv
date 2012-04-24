@@ -7,6 +7,7 @@
 #include "mythmiscutil.h"
 #include "mythsocket.h"
 #include "programinfo.h"
+#include "mythlogging.h"
 
 FileTransfer::FileTransfer(QString &filename, MythSocket *remote,
                            bool usereadahead, int timeout_ms) :
@@ -94,6 +95,7 @@ void FileTransfer::Stop(void)
     if (readthreadlive)
     {
         readthreadlive = false;
+        LOG(VB_FILE, LOG_INFO, "calling StopReads()");
         rbuffer->StopReads();
         QMutexLocker locker(&lock);
         readsLocked = true;
@@ -108,6 +110,7 @@ void FileTransfer::Stop(void)
 
 void FileTransfer::Pause(void)
 {
+    LOG(VB_FILE, LOG_INFO, "calling StopReads()");
     rbuffer->StopReads();
     QMutexLocker locker(&lock);
     readsLocked = true;
@@ -118,6 +121,7 @@ void FileTransfer::Pause(void)
 
 void FileTransfer::Unpause(void)
 {
+    LOG(VB_FILE, LOG_INFO, "calling StartReads()");
     rbuffer->StartReads();
     {
         QMutexLocker locker(&lock);

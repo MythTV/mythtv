@@ -147,9 +147,48 @@ RemoteEncoder *RemoteRequestNextFreeRecorder(int curr)
 /**
  * Given a list of recorder numbers, return the first available.
  */
-RemoteEncoder *RemoteRequestFreeRecorderFromList(
-    const QStringList &qualifiedRecorders)
+vector<uint> RemoteRequestFreeRecorderList(const vector<uint> &excluded_cardids)
 {
+#if 0
+    vector<uint> list;
+
+    QStringList strlist("GET_FREE_RECORDER_LIST");
+
+    if (!gCoreContext->SendReceiveStringList(strlist, true))
+        return list;
+
+    QStringList::const_iterator it = strlist.begin();
+    for (; it != strlist.end(); ++it) 
+        list.push_back((*it).toUInt());
+
+    return list;
+#endif
+    vector<uint> result;
+    vector<uint> cards = CardUtil::GetCardList();
+    for (uint i = 0; i < cards.size(); i++)
+    {
+        vector<InputInfo> inputs =
+            RemoteRequestFreeInputList(cards[i], excluded_cardids);
+        for (uint j = 0; j < inputs.size(); j++)
+        {
+            if (find(result.begin(),
+                     result.end(),
+                     inputs[j].cardid) == result.end())
+                result.push_back(inputs[j].cardid);
+        }
+    }
+    QString msg("RemoteRequestFreeRecorderList returned {");
+    for (uint k = 0; k < result.size(); k++)
+        msg += QString(" %1").arg(result[k]);
+    msg += "}";
+    LOG(VB_CHANNEL, LOG_INFO, msg);
+    return result;
+}
+
+RemoteEncoder *RemoteRequestFreeRecorderFromList
+(const QStringList &qualifiedRecorders, const vector<uint> &excluded_cardids)
+{
+#if 0
     QStringList strlist( "GET_FREE_RECORDER_LIST" );
 
     if (!gCoreContext->SendReceiveStringList(strlist, true))
@@ -168,6 +207,18 @@ RemoteEncoder *RemoteRequestFreeRecorderFromList(
         return RemoteGetExistingRecorder((*recIter).toInt());
     }
     // didn't find anything. just return NULL.
+    return NULL;
+#endif
+    vector<uint> freeRecorders =
+        RemoteRequestFreeRecorderList(excluded_cardids);
+    for (QStringList::const_iterator recIter = qualifiedRecorders.begin();
+         recIter != qualifiedRecorders.end(); ++recIter)
+    {
+        if (find(freeRecorders.begin(),
+                 freeRecorders.end(),
+                 (*recIter).toUInt()) != freeRecorders.end())
+            return RemoteGetExistingRecorder((*recIter).toInt());
+    }
     return NULL;
 }
 

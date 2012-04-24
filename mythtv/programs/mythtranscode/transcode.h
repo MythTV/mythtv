@@ -1,9 +1,10 @@
+#include <QPointer>
 #include "recordingprofile.h"
 #include "fifowriter.h"
 #include "transcodedefs.h"
 #include "programtypes.h"
+#include "playercontext.h"
 
-class PlayerContext;
 class ProgramInfo;
 class NuppelVideoRecorder;
 class MythPlayer;
@@ -49,7 +50,7 @@ class Transcode : public QObject
     int                     keyframedist;
     NuppelVideoRecorder    *nvr;
     MythPlayer             *player;
-    PlayerContext          *player_ctx;
+    QPointer<PlayerContext> player_ctx;
     RingBuffer             *inRingBuffer;
     RingBuffer             *outRingBuffer;
     FIFOWriter             *fifow;

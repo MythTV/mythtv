@@ -352,8 +352,6 @@ bool DVDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
         res = dvdnav_get_number_of_titles(m_dvdnav, &num_titles);
     }
 
-    int start_title = 1;
-
     if (res == DVDNAV_STATUS_ERR)
     {
         LOG(VB_GENERAL, LOG_ERR,
@@ -364,49 +362,9 @@ bool DVDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
         LOG(VB_GENERAL, LOG_INFO,
             LOC + QString("There are %1 titles on the disk")
                 .arg(num_titles));
+     }
 
-        // We do this once and chose the first title with a reasonanble length,
-        // cache the results for those we probe and probe the remainder as
-        // needed
-        if (!m_chapterMap.size())
-        {
-            for (int i = 1; i < num_titles + 1; i++)
-            {
-                uint64_t duration = GetChapterTimes(i);
-                if (duration < 1 || !m_chapterMap.contains(i))
-                    continue;
-
-                LOG(VB_GENERAL, LOG_INFO, LOC +
-                    QString("Title %1: chapters %2 duration %3")
-                            .arg(i).arg(m_chapterMap.value(i).size())
-                            .arg(duration));
-
-                if (duration > 60)
-                    break;
-            }
-        }
-
-        QMapIterator<uint, QList<uint64_t> > it(m_chapterMap);
-        uint64_t longest = 0;
-        while (it.hasNext())
-        {
-            it.next();
-            if (it.value().size())
-            {
-                uint title = it.key();
-                uint64_t last = it.value().last();
-                if (last > longest)
-                {
-                    start_title = title;
-                    longest = last;
-                }
-            }
-        }
-    }
-
-    LOG(VB_GENERAL, LOG_INFO,
-        LOC + QString("Starting with title %1").arg(start_title));
-    dvdnav_title_play(m_dvdnav, start_title);
+    dvdnav_title_play(m_dvdnav, 1);
 
     // Check we aren't starting in a still frame (which will probably fail as
     // ffmpeg will be unable to create a decoder)
@@ -423,6 +381,9 @@ bool DVDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
     dvdnav_get_serial_string(m_dvdnav, &m_serialnumber);
     dvdnav_get_angle_info(m_dvdnav, &m_currentAngle, &m_currentTitleAngleCount);
     SetDVDSpeed();
+
+    // Populate the chapter list for this title, used in the OSD menu
+    GetChapterTimes(m_title);
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC +
             QString("DVD Serial Number %1").arg(m_serialnumber));
@@ -504,7 +465,9 @@ uint64_t DVDRingBuffer::GetChapterTimes(uint title)
         for (uint i = 0; i < num - 1; i++)
             chapters.append((chaps[i] + 45000) / 90000);
     }
-    delete chaps;
+    // Assigned via calloc, must be free'd not deleted
+    if (chaps)
+        free(chaps);
     m_chapterMap.insert(title, chapters);
     return (duration + 45000) / 90000;
 }

@@ -111,7 +111,8 @@ void ScheduleCommon::EditRecording(ProgramInfo *pginfo)
 
     if (!ri.GetRecordingRuleID())
         EditScheduled(&ri);
-    else if (ri.GetRecordingStatus() <= rsWillRecord)
+    else if (ri.GetRecordingStatus() <= rsWillRecord ||
+             ri.GetRecordingStatus() == rsOtherShowing)
         ShowRecordingDialog(ri);
     else
         ShowNotRecordingDialog(ri);
@@ -215,7 +216,9 @@ void ScheduleCommon::ShowRecordingDialog(const RecordingInfo& recinfo)
             recinfo.GetRecordingEndTime() > now)
         {
             if (recinfo.GetRecordingStatus() != rsRecording &&
-                recinfo.GetRecordingStatus() != rsTuning)
+                recinfo.GetRecordingStatus() != rsTuning &&
+                recinfo.GetRecordingStatus() != rsOtherRecording && 
+                recinfo.GetRecordingStatus() != rsOtherTuning)
                 menuPopup->AddButton(tr("Reactivate"),
                                      qVariantFromValue(recinfo));
             else
@@ -239,6 +242,8 @@ void ScheduleCommon::ShowRecordingDialog(const RecordingInfo& recinfo)
 
                 if (recinfo.GetRecordingStatus() != rsRecording &&
                     recinfo.GetRecordingStatus() != rsTuning &&
+                    recinfo.GetRecordingStatus() != rsOtherRecording &&
+                    recinfo.GetRecordingStatus() != rsOtherTuning &&
                     recinfo.GetRecordingRuleType() != kFindOneRecord &&
                     !((recinfo.GetFindID() == 0 ||
                        !IsFindApplicable(recinfo)) &&
@@ -265,7 +270,9 @@ void ScheduleCommon::ShowRecordingDialog(const RecordingInfo& recinfo)
                 recinfo.GetRecordingRuleType() != kDontRecord)
             {
                 if (recinfo.GetRecordingStatus() == rsRecording ||
-                    recinfo.GetRecordingStatus() == rsTuning)
+                    recinfo.GetRecordingStatus() == rsTuning ||
+                    recinfo.GetRecordingStatus() == rsOtherRecording ||
+                    recinfo.GetRecordingStatus() == rsOtherTuning)
                 {
                     menuPopup->AddButton(tr("Modify Recording Options"),
                                          qVariantFromValue(recinfo));
@@ -288,7 +295,9 @@ void ScheduleCommon::ShowRecordingDialog(const RecordingInfo& recinfo)
                 recinfo.GetRecordingRuleType() == kDontRecord)
             {
                 if (recinfo.GetRecordingStatus() == rsRecording ||
-                    recinfo.GetRecordingStatus() == rsTuning)
+                    recinfo.GetRecordingStatus() == rsTuning ||
+                    recinfo.GetRecordingStatus() == rsOtherRecording ||
+                    recinfo.GetRecordingStatus() == rsOtherTuning)
                 {
                     menuPopup->AddButton(tr("Modify Recording Options"),
                                          qVariantFromValue(recinfo));
@@ -383,7 +392,6 @@ void ScheduleCommon::ShowNotRecordingDialog(const RecordingInfo& recinfo)
                 recinfo.GetRecordingStatus() == rsPreviousRecording ||
                 recinfo.GetRecordingStatus() == rsCurrentRecording ||
                 recinfo.GetRecordingStatus() == rsEarlierShowing ||
-                recinfo.GetRecordingStatus() == rsOtherShowing ||
                 recinfo.GetRecordingStatus() == rsNeverRecord ||
                 recinfo.GetRecordingStatus() == rsRepeat ||
                 recinfo.GetRecordingStatus() == rsInactive ||

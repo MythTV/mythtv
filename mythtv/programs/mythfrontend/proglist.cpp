@@ -44,6 +44,7 @@ ProgLister::ProgLister(MythScreenStack *parent, ProgListType pltype,
     m_viewTextList(),
 
     m_itemList(),
+    m_itemListSave(),
     m_schedList(),
 
     m_typeList(),
@@ -93,6 +94,7 @@ ProgLister::ProgLister(
     m_viewTextList(),
 
     m_itemList(),
+    m_itemListSave(),
     m_schedList(),
 
     m_typeList(),
@@ -115,6 +117,7 @@ ProgLister::ProgLister(
 ProgLister::~ProgLister()
 {
     m_itemList.clear();
+    m_itemListSave.clear();
     gCoreContext->removeListener(this);
 }
 
@@ -138,6 +141,12 @@ bool ProgLister::Create()
 
     connect(m_progList, SIGNAL(itemSelected(MythUIButtonListItem*)),
             this,       SLOT(  HandleSelected(  MythUIButtonListItem*)));
+
+    connect(m_progList, SIGNAL(itemVisible(MythUIButtonListItem*)),
+            this,       SLOT(  HandleVisible(  MythUIButtonListItem*)));
+
+    connect(m_progList, SIGNAL(itemLoaded(MythUIButtonListItem*)),
+            this,       SLOT(  HandleVisible(  MythUIButtonListItem*)));
 
     connect(m_progList, SIGNAL(itemClicked(MythUIButtonListItem*)),
             this,       SLOT(  HandleClicked()));
@@ -1111,7 +1120,6 @@ void ProgLister::FillItemList(bool restorePosition, bool updateDisp)
     if (m_curView < 0)
         return;
 
-    bool oneChanid = false;
     QString where;
     QString qphrase = m_viewList[m_curView];
 
@@ -1228,7 +1236,6 @@ void ProgLister::FillItemList(bool restorePosition, bool updateDisp)
     }
     else if (m_type == plChannel) // list by channel
     {
-        oneChanid = true;
         where = "WHERE channel.visible = 1 "
             "  AND program.endtime > :PGILSTART "
             "  AND channel.chanid = :PGILPHRASE2 ";
@@ -1346,7 +1353,14 @@ void ProgLister::FillItemList(bool restorePosition, bool updateDisp)
         selectedP = &selected;
     }
 
+    // Save a copy of m_itemList so that deletion of the ProgramInfo
+    // objects can be deferred until background processing of old
+    // ProgramInfo objects has completed.
+    m_itemListSave.clear();
+    m_itemListSave = m_itemList;
+    m_itemList.setAutoDelete(false);
     m_itemList.clear();
+    m_itemList.setAutoDelete(true);
 
     if (m_type == plPreviouslyRecorded)
     {
@@ -1355,7 +1369,7 @@ void ProgLister::FillItemList(bool restorePosition, bool updateDisp)
     else
     {
         LoadFromScheduler(m_schedList);
-        LoadFromProgram(m_itemList, where, bindings, m_schedList, oneChanid);
+        LoadFromProgram(m_itemList, where, bindings, m_schedList);
     }
 
     const QRegExp prefixes(
@@ -1493,19 +1507,16 @@ void ProgLister::RestoreSelection(const ProgramInfo *selected,
     m_progList->SetItemCurrent(i + 1, i + 1 - selectedOffset);
 }
 
-void ProgLister::UpdateButtonList(void)
+void ProgLister::HandleVisible(MythUIButtonListItem *item)
 {
-    ProgramList::const_iterator it = m_itemList.begin();
-    for (; it != m_itemList.end(); ++it)
+    ProgramInfo *pginfo = qVariantValue<ProgramInfo*>(item->GetData());
+
+    if (item->GetText("is_item_initialized").isNull())
     {
-        MythUIButtonListItem *item =
-            new MythUIButtonListItem(
-                m_progList, "", qVariantFromValue(*it));
-
         InfoMap infoMap;
-        (**it).ToMap(infoMap);
+        pginfo->ToMap(infoMap);
 
-        QString state = toUIState((**it).GetRecordingStatus());
+        QString state = toUIState(pginfo->GetRecordingStatus());
         if ((state == "warning") && (plPreviouslyRecorded == m_type))
             state = "disabled";
 
@@ -1513,17 +1524,28 @@ void ProgLister::UpdateButtonList(void)
 
         if (m_type == plTitle)
         {
-            QString tempSubTitle = (**it).GetSubtitle();
+            QString tempSubTitle = pginfo->GetSubtitle();
             if (tempSubTitle.trimmed().isEmpty())
-                tempSubTitle = (**it).GetTitle();
+                tempSubTitle = pginfo->GetTitle();
             item->SetText(tempSubTitle, "titlesubtitle", state);
         }
 
-        item->DisplayState(
-            QString::number((**it).GetStars(10)), "ratingstate");
+        item->DisplayState(QString::number(pginfo->GetStars(10)),
+                           "ratingstate");
 
         item->DisplayState(state, "status");
+
+        // Mark this button list item as initialized.
+        item->SetText("yes", "is_item_initialized");
     }
+}
+
+void ProgLister::UpdateButtonList(void)
+{
+    ProgramList::const_iterator it = m_itemList.begin();
+    for (; it != m_itemList.end(); ++it)
+        new MythUIButtonListItem(m_progList, "", qVariantFromValue(*it));
+    m_progList->LoadInBackground();
 
     if (m_positionText)
     {

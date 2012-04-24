@@ -53,10 +53,12 @@ extern "C" {
 #include "videoout_d3d.h"
 #endif
 
-#ifdef USING_VAAPI
+#ifdef USING_GLVAAPI
 #include "videoout_openglvaapi.h"
+#endif // USING_GLVAAPI
+#ifdef USING_VAAPI
 #include "vaapicontext.h"
-#endif // USING_VAAPI
+#endif
 
 extern "C" {
 #include "libavutil/avutil.h"
@@ -1845,7 +1847,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                         video_codec_id = vdpau_mcid;
                     }
 #endif // USING_VDPAU
-#ifdef USING_VAAPI
+#ifdef USING_GLVAAPI
                     MythCodecID vaapi_mcid;
                     PixelFormat pix_fmt = PIX_FMT_YUV420P;
                     vaapi_mcid = VideoOutputOpenGLVAAPI::GetBestSupportedCodec(
@@ -1862,7 +1864,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                             enc->pix_fmt = pix_fmt;
                         }
                     }
-#endif // USING_VAAPI
+#endif // USING_GLVAAPI
 #ifdef USING_DXVA2
                     MythCodecID dxva2_mcid;
                     PixelFormat pix_fmt = PIX_FMT_YUV420P;

@@ -105,7 +105,8 @@ void DeleteThread::ProcessNew(void)
         //    continue;
 
         QString path = handler->m_path;
-        const char *cpath = handler->m_path.toLocal8Bit().constData();
+        QByteArray cpath_ba = handler->m_path.toLocal8Bit();
+        const char *cpath = cpath_ba.constData();
 
         QFileInfo finfo(handler->m_path);
         if (finfo.isSymLink())
@@ -137,7 +138,8 @@ void DeleteThread::ProcessNew(void)
                 // an external directory with no link into mythtv
                 handler->DeleteSucceeded();
                 handler->m_path = tmppath;
-                cpath = handler->m_path.toLocal8Bit().constData();
+                cpath_ba = handler->m_path.toLocal8Bit();
+                cpath = cpath_ba.constData();
             }
             else
             {

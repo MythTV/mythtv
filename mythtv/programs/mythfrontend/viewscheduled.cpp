@@ -405,7 +405,10 @@ void ViewScheduled::FillList()
         QString state;
 
         const RecStatusType recstatus = pginfo->GetRecordingStatus();
-        if (recstatus == rsRecording)
+        if (recstatus == rsRecording      ||
+            recstatus == rsTuning         ||
+            recstatus == rsOtherRecording ||
+            recstatus == rsOtherTuning)
             state = "running";
         else if (recstatus == rsConflict  ||
                  recstatus == rsOffLine   ||
@@ -414,7 +417,8 @@ void ViewScheduled::FillList()
                  recstatus == rsAborted   ||
                  recstatus == rsMissed)
             state = "error";
-        else if (recstatus == rsWillRecord)
+        else if (recstatus == rsWillRecord ||
+                 recstatus == rsOtherShowing)
         {
             if ((m_curcard == 0 && m_curinput == 0) ||
                 pginfo->GetCardID() == m_curcard ||
@@ -427,7 +431,6 @@ void ViewScheduled::FillList()
             }
         }
         else if (recstatus == rsRepeat ||
-                 recstatus == rsOtherShowing ||
                  recstatus == rsNeverRecord ||
                  recstatus == rsDontRecord ||
                  (recstatus != rsDontRecord &&

@@ -117,13 +117,28 @@ bool AudioOutputDigitalEncoder::Init(
     av_context->bit_rate       = bitrate;
     av_context->sample_rate    = samplerate;
     av_context->channels       = channels;
-#if LIBAVCODEC_VERSION_INT > AV_VERSION_INT( 52, 113, 0 )
-    av_context->channel_layout = AV_CH_LAYOUT_5POINT1;
+    switch (channels)
+    {
+        case 1:
+            av_context->channel_layout = AV_CH_LAYOUT_MONO;
+            break;
+        case 2:
+            av_context->channel_layout = AV_CH_LAYOUT_STEREO;
+            break;
+        case 3:
+            av_context->channel_layout = AV_CH_LAYOUT_SURROUND;
+            break;
+        case 4:
+            av_context->channel_layout = AV_CH_LAYOUT_4POINT0;
+            break;
+        case 5:
+            av_context->channel_layout = AV_CH_LAYOUT_5POINT0;
+            break;
+        default:
+            av_context->channel_layout = AV_CH_LAYOUT_5POINT1;
+            break;
+    }
     av_context->sample_fmt     = AV_SAMPLE_FMT_S16;
-#else
-    av_context->channel_layout = CH_LAYOUT_5POINT1;
-    av_context->sample_fmt     = SAMPLE_FMT_S16;
-#endif
 
 // open it
     ret = avcodec_open(av_context, codec);
