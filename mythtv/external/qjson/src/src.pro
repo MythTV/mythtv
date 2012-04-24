@@ -1,11 +1,15 @@
+include ( ../../../settings.pro )
+
 QJSON_BASE = ..
 QJSON_SRCBASE = .
 
 TEMPLATE = lib
 QT      -= gui
-TARGET   = qjson
+TARGET   = mythqjson
+target.path = $${LIBDIR}
 DESTDIR  = $$QJSON_BASE/lib
 CONFIG += create_prl
+INSTALLS = target
 
 VERSION = 0.7.1
 
@@ -70,3 +74,9 @@ symbian: {
 
   DEPLOYMENT += QjsonDeployment
 }
+
+inc.files += $${PUBLIC_HEADERS}
+inc.path  = $${PREFIX}/include/qjson/
+
+INSTALLS += inc
+
