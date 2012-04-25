@@ -717,6 +717,7 @@ void LogServerThread::receivedMessage(const QList<QByteArray> &msg)
                     lock2.unlock();
                     logger = new SyslogLogger; // inserts into loggerMap
                     lock2.relock();
+                    logger->setupZMQSocket();
 
                     clients = new ClientList;
                     logRevClientMap.insert(logger, clients);
@@ -748,6 +749,7 @@ void LogServerThread::receivedMessage(const QList<QByteArray> &msg)
                     logger =
                         new DatabaseLogger(table.toLocal8Bit().constData());
                     lock2.relock();
+                    logger->setupZMQSocket();
 
                     clients = new ClientList;
                     logRevClientMap.insert(logger, clients);
@@ -916,7 +918,6 @@ void SyslogLogger::receivedMessage(const QList<QByteArray> &msg)
 
 void DatabaseLogger::receivedMessage(const QList<QByteArray> &msg)
 {
-    cout << "db" << endl;
     // Filter on the clientId
     QByteArray clientBa = msg.first();
     QString clientId = QString(clientBa.toHex());
