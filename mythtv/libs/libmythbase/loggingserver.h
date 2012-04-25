@@ -30,7 +30,7 @@ class LoggerBase : public QObject {
 
   public:
     /// \brief LoggerBase Constructor
-    LoggerBase(char *string);
+    LoggerBase(const char *string);
     /// \brief LoggerBase Deconstructor
     virtual ~LoggerBase();
     /// \brief Process a log message for the logger instance
@@ -41,37 +41,44 @@ class LoggerBase : public QObject {
     /// \brief Stop logging to the database
     virtual void stopDatabaseAccess(void) { }
     /// \brief Deal with an incoming log message
-    virtual void messageReceived(const QList<QByteArray>&) = 0;
   protected:
     char *m_handle; ///< semi-opaque handle for identifying instance
 };
 
 /// \brief File-based logger - used for logfiles and console
 class FileLogger : public LoggerBase {
+    Q_OBJECT
+
   public:
-    FileLogger(char *filename);
+    FileLogger(const char *filename);
     ~FileLogger();
     bool logmsg(LoggingItem *item);
     void reopen(void);
-    void messageReceived(const QList<QByteArray>&);
   private:
     bool m_opened;      ///< true when the logfile is opened
     int  m_fd;          ///< contains the file descriptor for the logfile
+    nzmqt::ZMQSocket *m_zmqSock;  ///< ZeroMQ feeding socket
+  protected slots:
+    void receivedMessage(const QList<QByteArray>&);
 };
 
 #ifndef _WIN32
 /// \brief Syslog-based logger (not available in Windows)
 class SyslogLogger : public LoggerBase {
+    Q_OBJECT
+
   public:
     SyslogLogger();
     ~SyslogLogger();
     bool logmsg(LoggingItem *item);
     /// \brief Unused for this logger.
     void reopen(void) { };
-    void messageReceived(const QList<QByteArray>&);
   private:
     char *m_application;    ///< C-string of the application name
     bool m_opened;          ///< true when syslog channel open.
+    nzmqt::ZMQSocket *m_zmqSock;  ///< ZeroMQ feeding socket
+  protected slots:
+    void receivedMessage(const QList<QByteArray>&);
 };
 #endif
 
@@ -79,14 +86,15 @@ class DBLoggerThread;
 
 /// \brief Database logger - logs to the MythTV database
 class DatabaseLogger : public LoggerBase {
+    Q_OBJECT
+
     friend class DBLoggerThread;
   public:
-    DatabaseLogger(char *table);
+    DatabaseLogger(const char *table);
     ~DatabaseLogger();
     bool logmsg(LoggingItem *item);
     void reopen(void) { };
     virtual void stopDatabaseAccess(void);
-    void messageReceived(const QList<QByteArray>&);
   protected:
     bool logqmsg(MSqlQuery &query, LoggingItem *item);
     void prepare(MSqlQuery &query);
@@ -103,6 +111,9 @@ class DatabaseLogger : public LoggerBase {
     QTime m_errorLoggingTime;   ///< Time when DB error logging was last done
     static const int kMinDisabledTime; ///< Minimum time to disable DB logging
                                        ///  (in ms)
+    nzmqt::ZMQSocket *m_zmqSock;  ///< ZeroMQ feeding socket
+  protected slots:
+    void receivedMessage(const QList<QByteArray>&);
 };
 
 
