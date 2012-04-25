@@ -55,7 +55,9 @@ extern "C" {
 static QMutex                  loggerListMutex;
 static QList<LoggerBase *>     loggerList;
 
-static LogServerThread        *logThread = NULL;
+LogServerThread               *logServerThread = NULL;
+static QMutex                  logThreadStartedMutex;
+static QWaitCondition          logThreadStarted;
 static bool                    logThreadFinished = false;
 
 #define TIMESTAMP_MAX 30
@@ -541,21 +543,32 @@ void LogServerThread::run(void)
     RunProlog();
 
     logThreadFinished = false;
+    QMutexLocker locker(&logThreadStartedMutex);
 
-    m_zmqContext = new nzmqt::PollingZMQContext(this, 4);
-    m_zmqContext->start();
+    m_zmqContext = nzmqt::createDefaultContext(this);
+    nzmqt::PollingZMQContext *ctx = static_cast<nzmqt::PollingZMQContext *>
+                                        (m_zmqContext);
+    ctx->start();
 
     m_zmqInSock = m_zmqContext->createSocket(nzmqt::ZMQSocket::TYP_ROUTER);
     connect(m_zmqInSock, SIGNAL(messageReceived(const QList<QByteArray>&)),
-            this, SLOT(messageReceived(const QList<QByteArray>&)));
+            SLOT(receivedMessage(const QList<QByteArray>&)));
     m_zmqInSock->bindTo("tcp://127.0.0.1:35327");
+    m_zmqInSock->bindTo("inproc://mylogs");
 
-    m_zmqPubSock = m_zmqContext->createSocket(nzmqt::ZMQSocket::TYP_PUB);
-    m_zmqPubSock->bindTo("inproc://loggers");
+//    m_zmqPubSock = m_zmqContext->createSocket(nzmqt::ZMQSocket::TYP_PUB);
+//    m_zmqPubSock->bindTo("inproc://loggers");
+
+    logThreadStarted.wakeAll();
+    locker.unlock();
+
+LOG(VB_GENERAL, LOG_INFO, "GOT here");
+cout << "Got here" << endl;
 
     while (!m_aborted)
     {
         msleep(1000);
+        cout << "Tick" << endl;
         // handle heartbeat...
     }
 
@@ -570,8 +583,9 @@ void LogServerThread::run(void)
 
 /// \brief  Handles messages received from logging clients
 /// \param  msg    The message received (can be multi-part)
-void LogServerThread::messageReceived(const QList<QByteArray> &msg)
+void LogServerThread::receivedMessage(const QList<QByteArray> &msg)
 {
+cout << "Received" << endl;
     QList<QByteArray>::const_iterator it = msg.begin();
     int i = 0;
     for (; it != msg.end(); ++it, i++)
@@ -579,7 +593,7 @@ void LogServerThread::messageReceived(const QList<QByteArray> &msg)
         QByteArray buf = *it;
         cout << i << ":\t" <<  buf.toHex().constData() << endl << "\t" << buf.constData() << endl;
     }
-    m_zmqPubSock->sendMessage(msg);
+//    m_zmqPubSock->sendMessage(msg);
 }
 
 
@@ -633,11 +647,11 @@ void logSighup( int signum, siginfo_t *info, void *secret )
 ///                     processes.
 void logServerStart(void)
 {
-    if (logThread && logThread->isRunning())
+    if (logServerThread && logServerThread->isRunning())
         return;
 
-    if (!logThread)
-        logThread = new LogServerThread();
+    if (!logServerThread)
+        logServerThread = new LogServerThread();
 
 #ifndef _WIN32
     /* Setup SIGHUP */
@@ -649,16 +663,19 @@ void logServerStart(void)
     sigaction( SIGHUP, &sa, NULL );
 #endif
 
-    logThread->start();
+    QMutexLocker locker(&logThreadStartedMutex);
+    logServerThread->start();
+    logThreadStarted.wait(locker.mutex());
+
 }
 
 /// \brief  Entry point for stopping logging for an application
 void logServerStop(void)
 {
-    if (logThread)
+    if (logServerThread)
     {
-        logThread->stop();
-        logThread->wait();
+        logServerThread->stop();
+        logServerThread->wait();
     }
 
 #ifndef _WIN32

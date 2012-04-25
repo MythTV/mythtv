@@ -84,6 +84,9 @@ int main(int argc, char *argv[])
     if (retval != GENERIC_EXIT_OK)
         return retval;
 
+    // Must be started before ConfigureLogging()
+    logServerStart();
+
     bool daemonize = cmdline.toBool("daemon");
     QString mask("general");
     if ((retval = cmdline.ConfigureLogging(mask, daemonize)) != GENERIC_EXIT_OK)
@@ -103,8 +106,6 @@ int main(int argc, char *argv[])
         cerr << "Failed to init MythContext, exiting." << endl;
         return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
-
-    logServerStart();
 
     while (true)
         usleep(100000);

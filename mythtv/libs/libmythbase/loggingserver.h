@@ -117,13 +117,14 @@ class LogServerThread : public QObject, public MThread
     ~LogServerThread();
     void run(void);
     void stop(void);
+    nzmqt::ZMQContext *getZMQContext(void) { return m_zmqContext; };
   private:
     bool m_aborted;                 ///< Flag to abort the thread.
-    nzmqt::PollingZMQContext *m_zmqContext; ///< ZeroMQ context
+    nzmqt::ZMQContext *m_zmqContext; ///< ZeroMQ context
     nzmqt::ZMQSocket *m_zmqInSock;  ///< ZeroMQ feeding socket
     nzmqt::ZMQSocket *m_zmqPubSock; ///< ZeroMQ publishing socket
   protected slots:
-    void messageReceived(const QList<QByteArray>&);
+    void receivedMessage(const QList<QByteArray>&);
 };
 
 class QWaitCondition;
@@ -169,6 +170,8 @@ class DBLoggerThread : public MThread
                                     ///  that the thread should stop ASAP.
                                     ///  Protected by m_queueMutex
 };
+
+extern LogServerThread *logServerThread;
 
 #endif
 

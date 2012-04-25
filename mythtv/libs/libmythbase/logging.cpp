@@ -17,6 +17,7 @@ using namespace std;
 
 #include "mythlogging.h"
 #include "logging.h"
+#include "loggingserver.h"
 #include "mythconfig.h"
 #include "mythdb.h"
 #include "mythcorecontext.h"
@@ -147,7 +148,7 @@ QByteArray LoggingItem::toByteArray(void)
     QJson::Serializer serializer;
     QByteArray json = serializer.serialize(variant);
 
-cout << json.constData() << endl;
+    //cout << json.constData() << endl;
 
     return json;
 }
@@ -218,7 +219,7 @@ LoggerThread::LoggerThread(QString filename, bool progress, bool quiet,
     m_waitEmpty(new QWaitCondition()),
     m_aborted(false), m_filename(filename), m_progress(progress),
     m_quiet(quiet), m_appname(QCoreApplication::applicationName()),
-    m_tablename(table), m_facility(facility)
+    m_tablename(table), m_facility(facility), m_pid(getpid())
 {
     char *debug = getenv("VERBOSE_THREADS");
     if (debug != NULL)
@@ -253,46 +254,62 @@ void LoggerThread::run(void)
 
     LOG(VB_GENERAL, LOG_INFO, "Added logging to the console");
 
-    m_zmqContext = new nzmqt::PollingZMQContext(this, 4);
-    m_zmqContext->start();
+    bool locallogs = (m_appname == MYTH_APPNAME_MYTHLOGSERVER);
+    if (locallogs)
+        m_zmqContext = logServerThread->getZMQContext();
+    else
+    {
+        m_zmqContext = nzmqt::createDefaultContext(this);
+        m_zmqContext->start();
+    }
 
-    m_zmqSocket = m_zmqContext->createSocket(nzmqt::ZMQSocket::TYP_DEALER);
-    m_zmqSocket->connectTo("tcp://127.0.0.1:35327");
-
+    m_zmqSocket = m_zmqContext->createSocket(nzmqt::ZMQSocket::TYP_DEALER,
+                                             this);
     connect(m_zmqSocket, SIGNAL(messageReceived(const QList<QByteArray>&)),
-            this, SLOT(messageReceived(const QList<QByteArray>&)));
+            SLOT(messageReceived(const QList<QByteArray>&)));
 
-    m_initialWaiting = true;
-    LoggingItem *item = LoggingItem::create(__FILE__, __FUNCTION__,
-                                            __LINE__, (LogLevel_t)LOG_DEBUG,
-                                            kInitializing);
-    if (item)
+    if (locallogs)
+        m_zmqSocket->connectTo("inproc://mylogs");
+    else
+        m_zmqSocket->connectTo("tcp://127.0.0.1:35327");
+
+    if (!locallogs)
     {
-        fillItem(item);
-        m_zmqSocket->sendMessage(item->toByteArray());
-        item->deleteItem();
+        m_initialWaiting = true;
+        LoggingItem *item = LoggingItem::create(__FILE__, __FUNCTION__,
+                                                __LINE__, (LogLevel_t)LOG_DEBUG,
+                                                kInitializing);
+        if (item)
+        {
+            fillItem(item);
+            m_zmqSocket->sendMessage(item->toByteArray());
+            item->deleteItem();
+        }
+
+        msleep(100);    // wait up to 100ms for mythlogserver to respond
+        if (m_initialWaiting && !locallogs)
+        {
+            // Got no response from mythlogserver, let's assume it's dead and 
+            // start // it up
+            m_initialWaiting = false;
+            LOG(VB_GENERAL, LOG_INFO, "Starting mythlogserver");
+
+            MythSystemMask mask = MythSystemMask(kMSDontBlockInputDevs |
+                                                 kMSDontDisableDrawing |
+                                                 kMSRunBackground |
+                                                 kMSRunShell);
+            QStringList args;
+            args << "--daemon";
+
+            MythSystem ms("mythlogserver", args, mask);
+            ms.Run();
+        }
+
+        LOG(VB_GENERAL, LOG_INFO,
+            "Added logging to mythlogserver at TCP:35327");
     }
-
-    msleep(100);    // wait up to 100ms for mythlogserver to respond
-    if (m_initialWaiting &&
-        QCoreApplication::applicationName() != MYTH_APPNAME_MYTHLOGSERVER)
-    {
-        // Got no response from mythlogserver, let's assume it's dead and start
-        // it up
-        m_initialWaiting = false;
-        LOG(VB_GENERAL, LOG_INFO, "Starting mythlogserver");
-
-        MythSystemMask mask = MythSystemMask(kMSDontBlockInputDevs |
-                                             kMSDontDisableDrawing |
-                                             kMSRunBackground | kMSRunShell);
-        QStringList args;
-        args << "--daemon";
-
-        MythSystem ms("mythlogserver", args, mask);
-        ms.Run();
-    }
-
-    LOG(VB_GENERAL, LOG_INFO, "Added logging to mythlogserver at TCP:35327");
+    else
+        LOG(VB_GENERAL, LOG_INFO, "Added logging to mythlogserver locally");
 
     QMutexLocker qLock(&logQueueMutex);
 
@@ -490,6 +507,8 @@ void LoggerThread::fillItem(LoggingItem *item)
     if (!item)
         return;
 
+    item->setPid(m_pid);
+    item->setThreadName(item->getThreadName());
     item->setAppName(m_appname);
     item->setTable(m_tablename);
     item->setLogFile(m_filename);

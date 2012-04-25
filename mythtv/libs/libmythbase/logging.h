@@ -188,8 +188,9 @@ class LoggerThread : public QObject, public MThread
     QString m_appname;      ///< Cached application name
     QString m_tablename;    ///< Cached table name for db logging
     int m_facility;         ///< Cached syslog facility (or -1 to disable)
+    pid_t m_pid;            ///< Cached pid value
 
-    nzmqt::PollingZMQContext *m_zmqContext; ///< ZeroMQ context to use in this logger
+    nzmqt::ZMQContext *m_zmqContext; ///< ZeroMQ context to use in this logger
     nzmqt::ZMQSocket  *m_zmqSocket;  ///< ZeroMQ socket to talk to mythlogserver
 
   protected slots:
