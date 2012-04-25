@@ -61,9 +61,9 @@ static QWaitCondition               logThreadStarted;
 static bool                         logThreadFinished = false;
 
 typedef QList<LoggerBase *> LoggerList;
-typedef QMap<QByteArray, LoggerList *> ClientMap;
+typedef QMap<QString, LoggerList *> ClientMap;
 
-typedef QList<QByteArray> ClientList;
+typedef QList<QString> ClientList;
 typedef QMap<LoggerBase *, ClientList *> RevClientMap;
 
 static QMutex                       logClientMapMutex;
@@ -96,8 +96,8 @@ LoggerBase::LoggerBase(const char *string)
         m_handle = NULL;
         loggerMap.insert(QString(""), this);
     }
-
 }
+
 
 /// \brief LoggerBase deconstructor.  Removes the logger instance from the
 ///        loggerMap.
@@ -120,14 +120,8 @@ FileLogger::FileLogger(const char *filename) :
     m_opened = (m_fd != -1);
     LOG(VB_GENERAL, LOG_INFO, QString("Added logging to %1")
              .arg(filename));
-
-    nzmqt::ZMQContext *ctx = logServerThread->getZMQContext();
-    m_zmqSock = ctx->createSocket(nzmqt::ZMQSocket::TYP_SUB, this);
-    connect(m_zmqSock, SIGNAL(messageReceived(const QList<QByteArray>&)),
-            SLOT(receivedMessage(const QList<QByteArray>&)));
-    m_zmqSock->subscribeTo("");
-    m_zmqSock->connectTo("inproc://loggers");
 }
+
 
 /// \brief FileLogger deconstructor - close the logfile
 FileLogger::~FileLogger()
@@ -136,6 +130,7 @@ FileLogger::~FileLogger()
     {
         LOG(VB_GENERAL, LOG_INFO, "Removed logging to the console");
     }
+
     delete m_zmqSock;
 }
 
@@ -208,6 +203,16 @@ bool FileLogger::logmsg(LoggingItem *item)
     return true;
 }
 
+void FileLogger::setupZMQSocket(void)
+{
+    nzmqt::ZMQContext *ctx = logServerThread->getZMQContext();
+    m_zmqSock = ctx->createSocket(nzmqt::ZMQSocket::TYP_SUB);
+    connect(m_zmqSock, SIGNAL(messageReceived(const QList<QByteArray>&)),
+            SLOT(receivedMessage(const QList<QByteArray>&)));
+    m_zmqSock->subscribeTo(QByteArray(""));
+    m_zmqSock->connectTo("inproc://loggers");
+}
+
 
 #ifndef _WIN32
 /// \brief SyslogLogger constructor
@@ -218,13 +223,6 @@ SyslogLogger::SyslogLogger() : LoggerBase(NULL), m_opened(false)
     m_opened = true;
 
     LOG(VB_GENERAL, LOG_INFO, "Added syslogging");
-
-    nzmqt::ZMQContext *ctx = logServerThread->getZMQContext();
-    m_zmqSock = ctx->createSocket(nzmqt::ZMQSocket::TYP_SUB, this);
-    connect(m_zmqSock, SIGNAL(messageReceived(const QList<QByteArray>&)),
-            SLOT(receivedMessage(const QList<QByteArray>&)));
-    m_zmqSock->subscribeTo("");
-    m_zmqSock->connectTo("inproc://loggers");
 }
 
 /// \brief SyslogLogger deconstructor.
@@ -232,6 +230,7 @@ SyslogLogger::~SyslogLogger()
 {
     LOG(VB_GENERAL, LOG_INFO, "Removing syslogging");
     closelog();
+
     delete m_zmqSock;
 }
 
@@ -253,7 +252,6 @@ bool SyslogLogger::logmsg(LoggingItem *item)
         else
             shortname = lev->shortname;
     }
-
     syslog(item->level() | item->facility(), "%s[%d]: %c %s %s:%d (%s) %s",
            item->rawAppName(), item->pid(), shortname, item->rawThreadName(),
            item->rawFile(), item->line(), item->rawFunction(),
@@ -262,6 +260,17 @@ bool SyslogLogger::logmsg(LoggingItem *item)
     return true;
 }
 #endif
+
+void SyslogLogger::setupZMQSocket(void)
+{
+    nzmqt::ZMQContext *ctx = logServerThread->getZMQContext();
+    m_zmqSock = ctx->createSocket(nzmqt::ZMQSocket::TYP_SUB);
+    connect(m_zmqSock, SIGNAL(messageReceived(const QList<QByteArray>&)),
+            SLOT(receivedMessage(const QList<QByteArray>&)));
+    m_zmqSock->subscribeTo(QByteArray(""));
+    m_zmqSock->connectTo("inproc://loggers");
+}
+
 
 const int DatabaseLogger::kMinDisabledTime = 1000;
 
@@ -286,13 +295,6 @@ DatabaseLogger::DatabaseLogger(const char *table) :
 
     m_opened = true;
     m_disabled = false;
-
-    nzmqt::ZMQContext *ctx = logServerThread->getZMQContext();
-    m_zmqSock = ctx->createSocket(nzmqt::ZMQSocket::TYP_SUB, this);
-    connect(m_zmqSock, SIGNAL(messageReceived(const QList<QByteArray>&)),
-            SLOT(receivedMessage(const QList<QByteArray>&)));
-    m_zmqSock->subscribeTo("");
-    m_zmqSock->connectTo("inproc://loggers");
 }
 
 /// \brief DatabaseLogger deconstructor
@@ -301,6 +303,7 @@ DatabaseLogger::~DatabaseLogger()
     LOG(VB_GENERAL, LOG_INFO, "Removing database logging");
 
     stopDatabaseAccess();
+
     delete m_zmqSock;
 }
 
@@ -354,6 +357,17 @@ bool DatabaseLogger::logmsg(LoggingItem *item)
     m_thread->enqueue(item);
     return true;
 }
+
+void DatabaseLogger::setupZMQSocket(void)
+{
+    nzmqt::ZMQContext *ctx = logServerThread->getZMQContext();
+    m_zmqSock = ctx->createSocket(nzmqt::ZMQSocket::TYP_SUB);
+    connect(m_zmqSock, SIGNAL(messageReceived(const QList<QByteArray>&)),
+            SLOT(receivedMessage(const QList<QByteArray>&)));
+    m_zmqSock->subscribeTo(QByteArray(""));
+    m_zmqSock->connectTo("inproc://loggers");
+}
+
 
 /// \brief Actually insert a log message from the queue into the database
 /// \param query    The database insert query to use
@@ -603,6 +617,9 @@ void LogServerThread::run(void)
     logThreadStarted.wakeAll();
     locker.unlock();
 
+    LoggerBase *logger = new SyslogLogger;
+    logger->setupZMQSocket();
+
     while (!m_aborted)
     {
         msleep(100);
@@ -623,8 +640,7 @@ void LogServerThread::run(void)
 /// \param  msg    The message received (can be multi-part)
 void LogServerThread::receivedMessage(const QList<QByteArray> &msg)
 {
-#if 1
-    //def DUMP_PACKET
+#ifdef DUMP_PACKET
     QList<QByteArray>::const_iterator it = msg.begin();
     int i = 0;
     for (; it != msg.end(); ++it, i++)
@@ -637,8 +653,8 @@ void LogServerThread::receivedMessage(const QList<QByteArray> &msg)
 #endif
 
     // First section is the client id
-    QByteArray clientId = msg.first();
-    clientId.detach();
+    QByteArray clientBa = msg.first();
+    QString clientId = QString(clientBa.toHex());
 
     QByteArray json     = msg.at(1);
     LoggingItem *item = LoggingItem::create(json);
@@ -648,6 +664,7 @@ void LogServerThread::receivedMessage(const QList<QByteArray> &msg)
 
         if (!logClientMap.contains(clientId))
         {
+            LOG(VB_GENERAL, LOG_INFO, QString("New Client: %1").arg(clientId));
             QMutexLocker lock2(&loggerMapMutex);
             QMutexLocker lock3(&logRevClientMapMutex);
 
@@ -657,6 +674,7 @@ void LogServerThread::receivedMessage(const QList<QByteArray> &msg)
 
             // FileLogger from logFile
             QString logfile = item->logFile();
+            logfile.detach();
             if (!logfile.isEmpty())
             {
                 ClientList *clients;
@@ -667,17 +685,23 @@ void LogServerThread::receivedMessage(const QList<QByteArray> &msg)
                     lock2.unlock();
                     // inserts into loggerMap
                     logger = new FileLogger(logfile.toLocal8Bit().constData());
+                    logger->moveToThread(logServerThread->qthread());
                     lock2.relock();
+                    logger->setupZMQSocket();
 
                     clients = new ClientList;
-                    clients->insert(0, clientId);
                     logRevClientMap.insert(logger, clients);
                 }
                 else
                 {
                     clients = logRevClientMap.value(logger);
-                    clients->insert(0, clientId);
+                    if (!clients)
+                    {
+                        clients = new ClientList;
+                        logRevClientMap.insert(logger, clients);
+                    }
                 }
+                clients->insert(0, clientId);
                 loggers->insert(0, logger);
             }
 
@@ -686,7 +710,7 @@ void LogServerThread::receivedMessage(const QList<QByteArray> &msg)
             if (facility > 0)
             {
                 ClientList *clients;
-                logger = loggerMap.value(NULL, NULL);
+                logger = loggerMap.value(QString(""), NULL);
                 if (!logger)
                 {
                     // Need to add a new SyslogLogger
@@ -695,14 +719,18 @@ void LogServerThread::receivedMessage(const QList<QByteArray> &msg)
                     lock2.relock();
 
                     clients = new ClientList;
-                    clients->insert(0, clientId);
                     logRevClientMap.insert(logger, clients);
                 }
                 else
                 {
                     clients = logRevClientMap.value(logger);
-                    clients->insert(0, clientId);
+                    if (!clients)
+                    {
+                        clients = new ClientList;
+                        logRevClientMap.insert(logger, clients);
+                    }
                 }
+                clients->insert(0, clientId);
                 loggers->insert(0, logger);
             }
 
@@ -722,14 +750,18 @@ void LogServerThread::receivedMessage(const QList<QByteArray> &msg)
                     lock2.relock();
 
                     clients = new ClientList;
-                    clients->insert(0, clientId);
                     logRevClientMap.insert(logger, clients);
                 }
                 else
                 {
                     clients = logRevClientMap.value(logger);
-                    clients->insert(0, clientId);
+                    if (!clients)
+                    {
+                        clients = new ClientList;
+                        logRevClientMap.insert(logger, clients);
+                    }
                 }
+                clients->insert(0, clientId);
                 loggers->insert(0, logger);
             }
 
@@ -771,7 +803,6 @@ void logSighup( int signum, siginfo_t *info, void *secret )
 
     /* SIGHUP was sent.  Close and reopen debug logfiles */
     QMutexLocker locker(&loggerMapMutex);
-
     QMap<QString, LoggerBase *>::iterator it;
     for (it = loggerMap.begin(); it != loggerMap.end(); ++it)
     {
@@ -835,6 +866,7 @@ void logServerStop(void)
     sigaction( SIGHUP, &sa, NULL );
 #endif
 
+    QMutexLocker locker(&loggerMapMutex);
     QMap<QString, LoggerBase *>::iterator it;
     for (it = loggerMap.begin(); it != loggerMap.end(); ++it)
     {
@@ -844,14 +876,15 @@ void logServerStop(void)
 
 void FileLogger::receivedMessage(const QList<QByteArray> &msg)
 {
-    cout << "file" << endl;
     // Filter on the clientId
-    QByteArray clientId = msg.first();
+    QByteArray clientBa = msg.first();
+    QString clientId = QString(clientBa.toHex());
+
     {
         QMutexLocker locker(&logRevClientMapMutex);
 
-        ClientList *clients = logRevClientMap[this];
-        if (!clients->contains(clientId))
+        ClientList *clients = logRevClientMap.value(this, NULL);
+        if (!clients || !clients->contains(clientId))
             return;
     }
 
@@ -863,14 +896,15 @@ void FileLogger::receivedMessage(const QList<QByteArray> &msg)
 
 void SyslogLogger::receivedMessage(const QList<QByteArray> &msg)
 {
-    cout << "syslog" << endl;
     // Filter on the clientId
-    QByteArray clientId = msg.first();
+    QByteArray clientBa = msg.first();
+    QString clientId = QString(clientBa.toHex());
+
     {
         QMutexLocker locker(&logRevClientMapMutex);
 
-        ClientList *clients = logRevClientMap[this];
-        if (!clients->contains(clientId))
+        ClientList *clients = logRevClientMap.value(this, NULL);
+        if (!clients || !clients->contains(clientId))
             return;
     }
 
@@ -884,12 +918,14 @@ void DatabaseLogger::receivedMessage(const QList<QByteArray> &msg)
 {
     cout << "db" << endl;
     // Filter on the clientId
-    QByteArray clientId = msg.first();
+    QByteArray clientBa = msg.first();
+    QString clientId = QString(clientBa.toHex());
+
     {
         QMutexLocker locker(&logRevClientMapMutex);
 
-        ClientList *clients = logRevClientMap[this];
-        if (!clients->contains(clientId))
+        ClientList *clients = logRevClientMap.value(this, NULL);
+        if (!clients || !clients->contains(clientId))
             return;
     }
 

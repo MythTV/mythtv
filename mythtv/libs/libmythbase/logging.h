@@ -61,8 +61,6 @@ class LoggingItem: public QObject
     Q_PROPERTY(QString table READ table WRITE setTable)
     Q_PROPERTY(QString logFile READ logFile WRITE setLogFile)
     Q_PROPERTY(QString message READ message WRITE setMessage)
-    Q_ENUMS(LoggingType)
-    Q_ENUMS(LogLevel_t)
 
     friend class LoggerThread;
     friend void LogPrintLine(uint64_t, LogLevel_t, const char *, int,

@@ -40,7 +40,7 @@ class LoggerBase : public QObject {
     virtual void reopen(void) = 0;
     /// \brief Stop logging to the database
     virtual void stopDatabaseAccess(void) { }
-    /// \brief Deal with an incoming log message
+    virtual void setupZMQSocket(void) = 0;
   protected:
     char *m_handle; ///< semi-opaque handle for identifying instance
 };
@@ -54,6 +54,7 @@ class FileLogger : public LoggerBase {
     ~FileLogger();
     bool logmsg(LoggingItem *item);
     void reopen(void);
+    void setupZMQSocket(void);
   private:
     bool m_opened;      ///< true when the logfile is opened
     int  m_fd;          ///< contains the file descriptor for the logfile
@@ -73,6 +74,7 @@ class SyslogLogger : public LoggerBase {
     bool logmsg(LoggingItem *item);
     /// \brief Unused for this logger.
     void reopen(void) { };
+    void setupZMQSocket(void);
   private:
     char *m_application;    ///< C-string of the application name
     bool m_opened;          ///< true when syslog channel open.
@@ -95,6 +97,7 @@ class DatabaseLogger : public LoggerBase {
     bool logmsg(LoggingItem *item);
     void reopen(void) { };
     virtual void stopDatabaseAccess(void);
+    void setupZMQSocket(void);
   protected:
     bool logqmsg(MSqlQuery &query, LoggingItem *item);
     void prepare(MSqlQuery &query);
