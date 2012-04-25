@@ -567,8 +567,8 @@ cout << "Got here" << endl;
 
     while (!m_aborted)
     {
-        msleep(1000);
-        cout << "Tick" << endl;
+        msleep(100);
+        exec();
         // handle heartbeat...
     }
 
