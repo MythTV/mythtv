@@ -84,6 +84,8 @@ contains(CONFIG_DARWIN, yes) {
 }
 
 INCLUDEPATH += $$unique(CONFIG_INCLUDEPATH)
+INCLUDEPATH += $$PREFIX/include
+INCLUDEPATH += $$PREFIX/include/qjson
 
 # remove warn_{on|off} from CONFIG since we set it in our CFLAGS
 CONFIG -= warn_on warn_off
@@ -156,5 +158,6 @@ EXTRA_LIBS += $$CONFIG_FIREWIRE_LIBS
 EXTRA_LIBS += $$LOCAL_LIBDIR_OGL
 EXTRA_LIBS += $$LOCAL_LIBDIR_X11
 EXTRA_LIBS += $$CONFIG_OPENGL_LIBS
+EXTRA_LIBS += -lzmq -lmythnzmqt -lmythqjson
 
 macx:using_firewire:using_backend:EXTRA_LIBS += -F$${CONFIG_MAC_AVC} -framework AVCVideoServices

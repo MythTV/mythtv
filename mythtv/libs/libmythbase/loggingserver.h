@@ -21,13 +21,16 @@ class QString;
 class MSqlQuery;
 class LoggingItem;
 
+MBASE_PUBLIC void logServerStart(void);
+MBASE_PUBLIC void logServerStop(void);
+
 /// \brief Base class for the various logging mechanisms
 class LoggerBase : public QObject {
     Q_OBJECT
 
   public:
     /// \brief LoggerBase Constructor
-    LoggerBase(char *string, int number);
+    LoggerBase(char *string);
     /// \brief LoggerBase Deconstructor
     virtual ~LoggerBase();
     /// \brief Process a log message for the logger instance
@@ -40,8 +43,7 @@ class LoggerBase : public QObject {
     /// \brief Deal with an incoming log message
     virtual void messageReceived(const QList<QByteArray>&) = 0;
   protected:
-    LoggerHandle_t m_handle; ///< semi-opaque handle for identifying instance
-    bool m_string;           ///< true if m_handle.string valid, false otherwise
+    char *m_handle; ///< semi-opaque handle for identifying instance
 };
 
 /// \brief File-based logger - used for logfiles and console
@@ -61,7 +63,7 @@ class FileLogger : public LoggerBase {
 /// \brief Syslog-based logger (not available in Windows)
 class SyslogLogger : public LoggerBase {
   public:
-    SyslogLogger(int facility, char *application);
+    SyslogLogger();
     ~SyslogLogger();
     bool logmsg(LoggingItem *item);
     /// \brief Unused for this logger.
@@ -124,6 +126,9 @@ class LogServerThread : public QObject, public MThread
     void messageReceived(const QList<QByteArray>&);
 };
 
+class QWaitCondition;
+#define MAX_QUEUE_LEN 1000
+
 /// \brief Thread that manages the queueing of logging inserts for the database.
 ///        The database logging gets throttled if it gets overwhelmed, and also
 ///        during startup.  Having a second queue allows the rest of the
@@ -141,7 +146,7 @@ class DBLoggerThread : public MThread
     bool enqueue(LoggingItem *item) 
     { 
         QMutexLocker qLock(&m_queueMutex); 
-        if (!aborted)
+        if (!m_aborted)
             m_queue->enqueue(item); 
         return true; 
     }
@@ -160,45 +165,7 @@ class DBLoggerThread : public MThread
     QWaitCondition *m_wait;         ///< Wait condition used for waiting
                                     ///  for the queue to not be full.
                                     ///  Protected by m_queueMutex
-    volatile bool aborted;          ///< Used during shutdown to indicate
-                                    ///  that the thread should stop ASAP.
-                                    ///  Protected by m_queueMutex
-};
-
-/// \brief Thread that manages the queueing of logging inserts to mythlogserver,
-///        and dealing with any messages sent back.
-class ZeroMQLoggerThread : public MThread
-{
-  public:
-    ZeroMQLoggerThread(ZeroMQLogger *logger);
-    ~ZeroMQLoggerThread();
-    void run(void);
-    void stop(void);
-    /// \brief Enqueues a LoggingItem onto the queue for the thread to 
-    ///        consume.
-    bool enqueue(LoggingItem *item) 
-    { 
-        QMutexLocker qLock(&m_queueMutex); 
-        if (!aborted)
-            m_queue->enqueue(item); 
-        return true; 
-    }
-
-    /// \brief Indicates when the queue is full
-    /// \return true when the queue is full
-    bool queueFull(void)
-    {
-        QMutexLocker qLock(&m_queueMutex); 
-        return (m_queue->size() >= MAX_QUEUE_LEN);
-    }
-  private:
-    ZeroMQLogger *m_logger;         ///< The associated logger instance
-    QMutex m_queueMutex;            ///< Mutex for protecting the queue
-    QQueue<LoggingItem *> *m_queue; ///< Queue of LoggingItems to insert
-    QWaitCondition *m_wait;         ///< Wait condition used for waiting
-                                    ///  for the queue to not be full.
-                                    ///  Protected by m_queueMutex
-    volatile bool aborted;          ///< Used during shutdown to indicate
+    volatile bool m_aborted;        ///< Used during shutdown to indicate
                                     ///  that the thread should stop ASAP.
                                     ///  Protected by m_queueMutex
 };

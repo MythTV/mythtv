@@ -49,7 +49,8 @@
 static void qt_exit(int)
 {
     signal(SIGINT, SIG_DFL);
-    QCoreApplication::exit(0);
+    signal(SIGTERM, SIG_DFL);
+    QCoreApplication::exit(GENERIC_EXIT_OK);
 }
 
 int main(int argc, char **argv)

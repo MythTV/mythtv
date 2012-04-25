@@ -28,6 +28,7 @@
 #define MYTH_APPNAME_MYTHMEDIASERVER "mythmediaserver"
 #define MYTH_APPNAME_MYTHMETADATALOOKUP "mythmetadatalookup"
 #define MYTH_APPNAME_MYTHUTIL "mythutil"
+#define MYTH_APPNAME_MYTHLOGSERVER "mythlogserver"
 
 class MDBManager;
 class MythCoreContextPrivate;

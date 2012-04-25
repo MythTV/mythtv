@@ -4,7 +4,7 @@ QT       += core
 
 QT       -= gui
 
-TARGET = mythnzmqt-$$LIBVERSION
+TARGET = mythnzmqt
 target.path = $${LIBDIR}
 #CONFIG   += console
 #CONFIG   -= app_bundle
@@ -20,13 +20,13 @@ SOURCES += \
 
 HEADERS += \
     ../include/nzmqt/nzmqt.hpp \
-#    pubsub/PubSubServer.h \
-#    pubsub/PubSubClient.h \
-#    reqrep/ReqRepServer.h \
-#    reqrep/ReqRepClient.h \
-#    pushpull/PushPullWorker.h \
-#    pushpull/PushPullVentilator.h \
-#    pushpull/PushPullSink.h \
+    pubsub/PubSubServer.h \
+    pubsub/PubSubClient.h \
+    reqrep/ReqRepServer.h \
+    reqrep/ReqRepClient.h \
+    pushpull/PushPullWorker.h \
+    pushpull/PushPullVentilator.h \
+    pushpull/PushPullSink.h \
     NzmqtApp.h \
     common/Tools.h
 
