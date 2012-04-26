@@ -191,15 +191,21 @@ class LoggerThread : public QObject, public MThread
     QString m_tablename;    ///< Cached table name for db logging
     int m_facility;         ///< Cached syslog facility (or -1 to disable)
     pid_t m_pid;            ///< Cached pid value
+    bool m_locallogs;       ///< Are we logging locally (i.e. this is the
+                            ///  mythlogserver itself)
+    qlonglong m_epoch;      ///< Time last heard from the server (seconds)
 
     nzmqt::ZMQContext *m_zmqContext;    ///< ZeroMQ context to use 
     nzmqt::ZMQSocket  *m_zmqSocket;     ///< ZeroMQ socket to talk to
                                         /// mythlogserver
   protected:
     bool logConsole(LoggingItem *item);
+    void launchLogServer(void);
+    void pingLogServer(void);
 
   protected slots:
     void messageReceived(const QList<QByteArray>&);
+    void checkHeartBeat(void);
 };
 
 #endif

@@ -66,7 +66,6 @@ typedef QList<LoggerBase *> LoggerList;
 typedef struct {
     LoggerList *list;
     qlonglong   epoch;
-    uint        usec;
 } LoggerListItem;
 typedef QMap<QString, LoggerListItem *> ClientMap;
 
@@ -696,6 +695,17 @@ void LogServerThread::run(void)
     RunEpilog();
 }
 
+/// \brief  Sends a ping message to the given client
+/// \param clientId The clientID for the logging client we wish to ping
+void LogServerThread::pingClient(QString clientId)
+{
+    LogMessage msg;
+    QByteArray clientBa = QByteArray::fromHex(clientId.toLocal8Bit());
+    msg << clientBa << QByteArray("");
+    m_zmqInSock->sendMessage(msg);
+}
+
+
 /// \brief  Handles heartbeat checking once a second.  If a client is not heard
 ///         from for at least 1 second, send it a heartbeat message which it
 ///         should send back.  If we haven't heard from it in 5s, shut down its
@@ -703,11 +713,10 @@ void LogServerThread::run(void)
 void LogServerThread::checkHeartBeats(void)
 {
     qlonglong epoch;
-    uint      usec;
     ClientList toDel;
 
     QMutexLocker lock(&logClientMapMutex);
-    loggingGetTimeStamp(&epoch, &usec);
+    loggingGetTimeStamp(&epoch, NULL);
 
     ClientMap::iterator it = logClientMap.begin();
     for( ; it != logClientMap.end(); ++it )
@@ -720,12 +729,9 @@ void LogServerThread::checkHeartBeats(void)
         {
             toDel.append(clientId);
         }
-        else if (age > 1)
+        else
         {
-            LogMessage msg;
-            QByteArray clientBa = QByteArray::fromHex(clientId.toLocal8Bit());
-            msg << clientBa << QByteArray("");
-            m_zmqInSock->sendMessage(msg);
+            pingClient(clientId);
         }
     }
 
@@ -798,14 +804,11 @@ void LogServerThread::forwardMessage(LogMessage *msg)
         if (!logItem)
         {
             // Send an initial ping so the client knows we are in the house
-            LogMessage msg;
-            QByteArray clientBa = QByteArray::fromHex(clientId.toLocal8Bit());
-            msg << clientBa << QByteArray("");
-            m_zmqInSock->sendMessage(msg);
+            pingClient(clientId);
         }
         else
         {
-            loggingGetTimeStamp(&logItem->epoch, &logItem->usec);
+            loggingGetTimeStamp(&logItem->epoch, NULL);
         }
         return;
     }
@@ -819,7 +822,7 @@ void LogServerThread::forwardMessage(LogMessage *msg)
 
         if (logItem)
         {
-            loggingGetTimeStamp(&logItem->epoch, &logItem->usec);
+            loggingGetTimeStamp(&logItem->epoch, NULL);
         }
         else
         {
@@ -929,7 +932,7 @@ void LogServerThread::forwardMessage(LogMessage *msg)
             }
 
             logItem = new LoggerListItem;
-            loggingGetTimeStamp(&logItem->epoch, &logItem->usec);
+            loggingGetTimeStamp(&logItem->epoch, NULL);
             logItem->list = loggers;
             logClientMap.insert(clientId, logItem);
 

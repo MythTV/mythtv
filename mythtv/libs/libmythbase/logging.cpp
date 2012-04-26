@@ -11,6 +11,7 @@
 #include <QMap>
 #include <QRegExp>
 #include <QVariantMap>
+#include <QTimer>
 #include <iostream>
 
 using namespace std;
@@ -118,13 +119,17 @@ void loggingGetTimeStamp(qlonglong *epoch, uint *usec)
     struct timeval  tv;
     gettimeofday(&tv, NULL);
     *epoch = tv.tv_sec;
-    *usec  = tv.tv_usec;
+    if (usec)
+        *usec  = tv.tv_usec;
 #else
     /* Stupid system has no gettimeofday, use less precise QDateTime */
     QDateTime date = QDateTime::currentDateTime();
-    QTime     time = date.time();
     *epoch = date.toTime_t();
-    *usec  = time.msec() * 1000;
+    if (usec)
+    {
+        QTime     time = date.time();
+        *usec  = time.msec() * 1000;
+    }
 #endif
 }
 
@@ -233,6 +238,7 @@ LoggerThread::LoggerThread(QString filename, bool progress, bool quiet,
             "Logging thread registration/deregistration enabled!");
         debugRegistration = true;
     }
+    m_locallogs = (m_appname == MYTH_APPNAME_MYTHLOGSERVER);
 
     moveToThread(qthread());
 }
@@ -259,8 +265,7 @@ void LoggerThread::run(void)
 
     LOG(VB_GENERAL, LOG_INFO, "Added logging to the console");
 
-    bool locallogs = (m_appname == MYTH_APPNAME_MYTHLOGSERVER);
-    if (locallogs)
+    if (m_locallogs)
         m_zmqContext = logServerThread->getZMQContext();
     else
     {
@@ -273,34 +278,23 @@ void LoggerThread::run(void)
     connect(m_zmqSocket, SIGNAL(messageReceived(const QList<QByteArray>&)),
             SLOT(messageReceived(const QList<QByteArray>&)));
 
-    if (locallogs)
+    if (m_locallogs)
         m_zmqSocket->connectTo("inproc://mylogs");
     else
         m_zmqSocket->connectTo("tcp://127.0.0.1:35327");
 
-    if (!locallogs)
+    if (!m_locallogs)
     {
         m_initialWaiting = true;
-        m_zmqSocket->sendMessage(QByteArray(""));
+        pingLogServer();
 
         // wait up to 100ms for mythlogserver to respond
         qApp->processEvents(QEventLoop::WaitForMoreEvents, 100);
-        if (m_initialWaiting && !locallogs)
+        if (m_initialWaiting)
         {
             // Got no response from mythlogserver, let's assume it's dead and 
             // start // it up
-            m_initialWaiting = false;
-            LOG(VB_GENERAL, LOG_INFO, "Starting mythlogserver");
-
-            MythSystemMask mask = MythSystemMask(kMSDontBlockInputDevs |
-                                                 kMSDontDisableDrawing |
-                                                 kMSRunBackground |
-                                                 kMSRunShell);
-            QStringList args;
-            args << "--daemon";
-
-            MythSystem ms("mythlogserver", args, mask);
-            ms.Run();
+            launchLogServer();
         }
 
         LOG(VB_GENERAL, LOG_INFO,
@@ -309,12 +303,20 @@ void LoggerThread::run(void)
     else
         LOG(VB_GENERAL, LOG_INFO, "Added logging to mythlogserver locally");
 
+    loggingGetTimeStamp(&m_epoch, NULL);
+    
+    QTimer *timer = new QTimer(this);
+    connect(timer, SIGNAL(timeout()), this, SLOT(checkHeartBeat()));
+    timer->start(1000);
+
     QMutexLocker qLock(&logQueueMutex);
 
     while (!m_aborted || !logQueue.isEmpty())
     {
-        qApp->processEvents();
+        qLock.unlock();
+        qApp->processEvents(QEventLoop::AllEvents, 10);
 
+        qLock.relock();
         if (logQueue.isEmpty())
         {
             m_waitEmpty->wakeAll();
@@ -333,10 +335,13 @@ void LoggerThread::run(void)
         qLock.relock();
     }
 
+    timer->stop();
+    delete timer;
+
     m_zmqSocket->setLinger(0);
     m_zmqSocket->close();
 
-    if (!locallogs)
+    if (!m_locallogs)
         delete m_zmqContext;
 
     logThreadFinished = true;
@@ -346,6 +351,48 @@ void LoggerThread::run(void)
     RunEpilog();
 }
 
+
+/// \brief  Handles heartbeat checking once a second.  If the server is not
+///         heard from for at least 5s, restart it
+void LoggerThread::checkHeartBeat(void)
+{
+    qlonglong epoch;
+
+    loggingGetTimeStamp(&epoch, NULL);
+    qlonglong age = (epoch - m_epoch) % 30;
+
+cout << "age " << age << endl;
+    if (age == 5)
+    {
+        launchLogServer();
+    }
+}
+
+/// \brief  Send a ping to the log server
+void LoggerThread::pingLogServer(void)
+{
+    m_zmqSocket->sendMessage(QByteArray(""));
+}
+
+/// \brief  Launches the logging server daemon
+void LoggerThread::launchLogServer(void)
+{
+    m_initialWaiting = false;
+    if (!m_locallogs)
+    {
+        LOG(VB_GENERAL, LOG_INFO, "Starting mythlogserver");
+
+        MythSystemMask mask = MythSystemMask(kMSDontBlockInputDevs |
+                                             kMSDontDisableDrawing |
+                                             kMSRunBackground |
+                                             kMSRunShell);
+        QStringList args;
+        args << "--daemon";
+
+        MythSystem ms("mythlogserver", args, mask);
+        ms.Run();
+    }
+}
 
 /// \brief  Handles messages received back from mythlogserver via ZeroMQ.
 ///         This is particularly used to receive the acknowledgement of the
@@ -359,7 +406,8 @@ void LoggerThread::run(void)
 void LoggerThread::messageReceived(const QList<QByteArray> &msg)
 {
     m_initialWaiting = false;
-    m_zmqSocket->sendMessage(QByteArray(""));
+    loggingGetTimeStamp(&m_epoch, NULL);
+    pingLogServer();
 }
 
 

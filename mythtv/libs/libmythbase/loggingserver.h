@@ -141,6 +141,7 @@ class LogServerThread : public QObject, public MThread
     nzmqt::ZMQSocket *m_zmqPubSock; ///< ZeroMQ publishing socket
 
     void forwardMessage(LogMessage *msg);
+    void pingClient(QString clientId);
   protected slots:
     void receivedMessage(const QList<QByteArray>&);
     void checkHeartBeats(void);
