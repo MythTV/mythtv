@@ -10,6 +10,7 @@
 #include <QStringList>
 #include <QMap>
 #include <QRegExp>
+#include <QTimer>
 #include <iostream>
 
 using namespace std;
@@ -61,7 +62,13 @@ static QWaitCondition               logThreadStarted;
 static bool                         logThreadFinished = false;
 
 typedef QList<LoggerBase *> LoggerList;
-typedef QMap<QString, LoggerList *> ClientMap;
+
+typedef struct {
+    LoggerList *list;
+    qlonglong   epoch;
+    uint        usec;
+} LoggerListItem;
+typedef QMap<QString, LoggerListItem *> ClientMap;
 
 typedef QList<QString> ClientList;
 typedef QMap<LoggerBase *, ClientList *> RevClientMap;
@@ -74,6 +81,7 @@ static RevClientMap                 logRevClientMap;
 
 static QMutex                       logMsgListMutex;
 static LogMessageList               logMsgList;
+static QWaitCondition               logMsgListNotEmpty;
 
 #define TIMESTAMP_MAX 30
 #define MAX_STRING_LENGTH (LOGLINE_MAX+120)
@@ -135,7 +143,9 @@ FileLogger::~FileLogger()
             .arg(m_handle));
     }
 
+    m_zmqSock->unsubscribeFrom(QByteArray(""));
     m_zmqSock->setLinger(0);
+    m_zmqSock->disconnect(this);
     m_zmqSock->close();
 }
 
@@ -236,7 +246,9 @@ SyslogLogger::~SyslogLogger()
     LOG(VB_GENERAL, LOG_INFO, "Removing syslogging");
     closelog();
 
+    m_zmqSock->unsubscribeFrom(QByteArray(""));
     m_zmqSock->setLinger(0);
+    m_zmqSock->disconnect(this);
     m_zmqSock->close();
 }
 
@@ -310,7 +322,9 @@ DatabaseLogger::~DatabaseLogger()
 
     stopDatabaseAccess();
 
+    m_zmqSock->unsubscribeFrom(QByteArray(""));
     m_zmqSock->setLinger(0);
+    m_zmqSock->disconnect(this);
     m_zmqSock->close();
 }
 
@@ -607,6 +621,8 @@ void LogServerThread::run(void)
     logThreadFinished = false;
     QMutexLocker locker(&logThreadStartedMutex);
 
+    qRegisterMetaType<QList<QByteArray> >("QList<QByteArray>");
+
     m_zmqContext = nzmqt::createDefaultContext(NULL);
     nzmqt::PollingZMQContext *ctx = static_cast<nzmqt::PollingZMQContext *>
                                         (m_zmqContext);
@@ -623,13 +639,23 @@ void LogServerThread::run(void)
 
     logThreadStarted.wakeAll();
     locker.unlock();
+    
+    QTimer *timer = new QTimer(this);
+    connect(timer, SIGNAL(timeout()), this, SLOT(checkHeartBeats()));
+    timer->start(1000);
 
     while (!m_aborted)
     {
-        qApp->processEvents();
+        qApp->processEvents(QEventLoop::WaitForMoreEvents, 10);
 
         {
             QMutexLocker lock(&logMsgListMutex);
+            if (logMsgList.isEmpty() &&
+                !logMsgListNotEmpty.wait(lock.mutex(), 90))
+            {
+                continue;
+            }
+
             while (!logMsgList.isEmpty())
             {
                 LogMessage *msg = logMsgList.takeFirst();
@@ -637,13 +663,12 @@ void LogServerThread::run(void)
                 delete msg;
             }
         }
-
-        msleep(100);
-
-        // handle heartbeat...
     }
 
     logThreadFinished = true;
+
+    timer->stop();
+    delete timer;
 
     m_zmqPubSock->setLinger(0);
     m_zmqPubSock->close();
@@ -668,6 +693,68 @@ void LogServerThread::run(void)
     RunEpilog();
 }
 
+/// \brief  Handles heartbeat checking once a second.  If a client is not heard
+///         from for at least 1 second, send it a heartbeat message which it
+///         should send back.  If we haven't heard from it in 5s, shut down its
+///         logging.
+void LogServerThread::checkHeartBeats(void)
+{
+    qlonglong epoch;
+    uint      usec;
+    ClientList toDel;
+
+    QMutexLocker lock(&logClientMapMutex);
+    loggingGetTimeStamp(&epoch, &usec);
+
+    ClientMap::iterator it = logClientMap.begin();
+    for( ; it != logClientMap.end(); ++it )
+    {
+        QString clientId        = it.key();
+        LoggerListItem *logItem = it.value();
+        qlonglong age = epoch - logItem->epoch;
+
+        if (age > 5)
+        {
+            toDel.append(clientId);
+        }
+        else if (age > 1)
+        {
+            LogMessage msg;
+            QByteArray clientBa = QByteArray::fromHex(clientId.toLocal8Bit());
+            msg << clientBa << QByteArray("");
+            m_zmqInSock->sendMessage(msg);
+        }
+    }
+
+    QMutexLocker lock2(&logRevClientMapMutex);
+    while (!toDel.isEmpty())
+    {
+        QString clientId = toDel.takeFirst();
+        LoggerListItem *item = logClientMap.take(clientId);
+        LoggerList *list = item->list;
+        delete item;
+
+        while (!list->isEmpty())
+        {
+            LoggerBase *logger = list->takeFirst();
+            ClientList *clientList = logRevClientMap.value(logger, NULL);
+            if (!clientList || clientList->size() == 1)
+            {
+                if (clientList)
+                {
+                    logRevClientMap.remove(logger);
+                    delete clientList;
+                }
+                delete logger;
+                continue;
+            }
+
+            clientList->removeAll(clientId);
+        }
+        delete list;
+    }
+}
+
 /// \brief  Handles messages received from logging clients
 /// \param  msg    The message received (can be multi-part)
 void LogServerThread::receivedMessage(const QList<QByteArray> &msg)
@@ -676,6 +763,7 @@ void LogServerThread::receivedMessage(const QList<QByteArray> &msg)
     QMutexLocker lock(&logMsgListMutex);
 
     logMsgList.append(message);
+    logMsgListNotEmpty.wakeAll();
 }
 
 void LogServerThread::forwardMessage(LogMessage *msg)
@@ -697,13 +785,39 @@ void LogServerThread::forwardMessage(LogMessage *msg)
     QString clientId = QString(clientBa.toHex());
 
     QByteArray json     = msg->at(1);
+
+    if (json.size() == 0)
+    {
+        // This is either a ping response or a first gasp
+        QMutexLocker lock(&logClientMapMutex);
+        LoggerListItem *logItem = logClientMap.value(clientId, NULL);
+        if (!logItem)
+        {
+            // Send an initial ping so the client knows we are in the house
+            LogMessage msg;
+            QByteArray clientBa = QByteArray::fromHex(clientId.toLocal8Bit());
+            msg << clientBa << QByteArray("");
+            m_zmqInSock->sendMessage(msg);
+        }
+        else
+        {
+            loggingGetTimeStamp(&logItem->epoch, &logItem->usec);
+        }
+        return;
+    }
+
     LoggingItem *item = LoggingItem::create(json);
 
     try
     {
         QMutexLocker lock(&logClientMapMutex);
+        LoggerListItem *logItem = logClientMap.value(clientId, NULL);
 
-        if (!logClientMap.contains(clientId))
+        if (logItem)
+        {
+            loggingGetTimeStamp(&logItem->epoch, &logItem->usec);
+        }
+        else
         {
             LOG(VB_GENERAL, LOG_INFO, QString("New Client: %1").arg(clientId));
             QMutexLocker lock2(&loggerMapMutex);
@@ -810,7 +924,10 @@ void LogServerThread::forwardMessage(LogMessage *msg)
                 loggers->insert(0, logger);
             }
 
-            logClientMap.insert(clientId, loggers);
+            logItem = new LoggerListItem;
+            loggingGetTimeStamp(&logItem->epoch, &logItem->usec);
+            logItem->list = loggers;
+            logClientMap.insert(clientId, logItem);
 
             msleep(10);
         }

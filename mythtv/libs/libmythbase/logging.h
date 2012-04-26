@@ -24,6 +24,7 @@ class LoggingItem;
 
 void loggingRegisterThread(const QString &name);
 void loggingDeregisterThread(void);
+void loggingGetTimeStamp(qlonglong *epoch, uint *usec);
 
 class QWaitCondition;
 

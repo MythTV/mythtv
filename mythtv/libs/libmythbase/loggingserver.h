@@ -143,6 +143,7 @@ class LogServerThread : public QObject, public MThread
     void forwardMessage(LogMessage *msg);
   protected slots:
     void receivedMessage(const QList<QByteArray>&);
+    void checkHeartBeats(void);
 };
 
 class QWaitCondition;

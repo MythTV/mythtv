@@ -112,6 +112,22 @@ void loglevelAdd(int value, QString name, char shortname);
 void verboseInit(void);
 void verboseHelp(void);
 
+void loggingGetTimeStamp(qlonglong *epoch, uint *usec)
+{
+#if HAVE_GETTIMEOFDAY
+    struct timeval  tv;
+    gettimeofday(&tv, NULL);
+    *epoch = tv.tv_sec;
+    *usec  = tv.tv_usec;
+#else
+    /* Stupid system has no gettimeofday, use less precise QDateTime */
+    QDateTime date = QDateTime::currentDateTime();
+    QTime     time = date.time();
+    *epoch = date.toTime_t();
+    *usec  = time.msec() * 1000;
+#endif
+}
+
 LoggingItem::LoggingItem()
 {
 }
@@ -122,18 +138,7 @@ LoggingItem::LoggingItem(const char *_file, const char *_function,
         m_line(_line), m_type(_type), m_level(_level), m_file(_file),
         m_function(_function), m_threadName(NULL)
 {
-#if HAVE_GETTIMEOFDAY
-    struct timeval  tv;
-    gettimeofday(&tv, NULL);
-    m_epoch = tv.tv_sec;
-    m_usec  = tv.tv_usec;
-#else
-    /* Stupid system has no gettimeofday, use less precise QDateTime */
-    QDateTime date = QDateTime::currentDateTime();
-    QTime     time = date.time();
-    m_epoch = date.toTime_t();
-    m_usec  = time.msec() * 1000;
-#endif
+    loggingGetTimeStamp(&m_epoch, &m_usec);
 
     m_message[0]='\0';
     m_message[LOGLINE_MAX]='\0';
@@ -276,15 +281,7 @@ void LoggerThread::run(void)
     if (!locallogs)
     {
         m_initialWaiting = true;
-        LoggingItem *item = LoggingItem::create(__FILE__, __FUNCTION__,
-                                                __LINE__, (LogLevel_t)LOG_DEBUG,
-                                                kInitializing);
-        if (item)
-        {
-            fillItem(item);
-            m_zmqSocket->sendMessage(item->toByteArray());
-            item->deleteItem();
-        }
+        m_zmqSocket->sendMessage(QByteArray(""));
 
         msleep(100);    // wait up to 100ms for mythlogserver to respond
         if (m_initialWaiting && !locallogs)
@@ -352,15 +349,14 @@ void LoggerThread::run(void)
 ///         kInitializing message which contains the filename of the log to
 ///         create and whether to log to db and syslog.  If this is not
 ///         received during startup, it is assumed that mythlogserver needs
-///         to be started.
+///         to be started.  Also, the server will hit us with an empty message
+///         when it hasn't heard from us within a second.  After no responses
+///         from us for 5s, the logs will be closed.
 /// \param  msg    The message received (can be multi-part)
 void LoggerThread::messageReceived(const QList<QByteArray> &msg)
 {
-    if (m_initialWaiting)
-    {
-        m_initialWaiting = false;
-        return;
-    }
+    m_initialWaiting = false;
+    m_zmqSocket->sendMessage(QByteArray(""));
 }
 
 
