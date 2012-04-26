@@ -283,7 +283,8 @@ void LoggerThread::run(void)
         m_initialWaiting = true;
         m_zmqSocket->sendMessage(QByteArray(""));
 
-        msleep(100);    // wait up to 100ms for mythlogserver to respond
+        // wait up to 100ms for mythlogserver to respond
+        qApp->processEvents(QEventLoop::WaitForMoreEvents, 100);
         if (m_initialWaiting && !locallogs)
         {
             // Got no response from mythlogserver, let's assume it's dead and 
