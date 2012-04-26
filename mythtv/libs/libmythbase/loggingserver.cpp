@@ -131,10 +131,12 @@ FileLogger::~FileLogger()
 {
     if( m_opened )
     {
-        LOG(VB_GENERAL, LOG_INFO, "Removed logging to the console");
+        LOG(VB_GENERAL, LOG_INFO, QString("Removed logging to %1")
+            .arg(m_handle));
     }
 
-    delete m_zmqSock;
+    m_zmqSock->setLinger(0);
+    m_zmqSock->close();
 }
 
 /// \brief Reopen the logfile after a SIGHUP.  Log files only (no console).
@@ -234,7 +236,8 @@ SyslogLogger::~SyslogLogger()
     LOG(VB_GENERAL, LOG_INFO, "Removing syslogging");
     closelog();
 
-    delete m_zmqSock;
+    m_zmqSock->setLinger(0);
+    m_zmqSock->close();
 }
 
 
@@ -307,7 +310,8 @@ DatabaseLogger::~DatabaseLogger()
 
     stopDatabaseAccess();
 
-    delete m_zmqSock;
+    m_zmqSock->setLinger(0);
+    m_zmqSock->close();
 }
 
 /// \brief Stop logging to the database and wait for the thread to stop.
@@ -603,7 +607,7 @@ void LogServerThread::run(void)
     logThreadFinished = false;
     QMutexLocker locker(&logThreadStartedMutex);
 
-    m_zmqContext = nzmqt::createDefaultContext(this);
+    m_zmqContext = nzmqt::createDefaultContext(NULL);
     nzmqt::PollingZMQContext *ctx = static_cast<nzmqt::PollingZMQContext *>
                                         (m_zmqContext);
     ctx->start();
@@ -641,8 +645,24 @@ void LogServerThread::run(void)
 
     logThreadFinished = true;
 
-    delete m_zmqPubSock;
-    delete m_zmqInSock;
+    m_zmqPubSock->setLinger(0);
+    m_zmqPubSock->close();
+    m_zmqInSock->setLinger(0);
+    m_zmqInSock->close();
+
+    LoggerList loggers;
+
+    {
+        QMutexLocker lock(&loggerMapMutex);
+        loggers = loggerMap.values();
+    }
+
+    while (!loggers.isEmpty())
+    {
+        LoggerBase *logger = loggers.takeFirst();
+        delete logger;
+    }
+
     delete m_zmqContext;
 
     RunEpilog();

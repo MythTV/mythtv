@@ -25,6 +25,8 @@ using namespace std;
 namespace {
     void cleanup()
     {
+        logStop();
+        logServerStop();
         delete gContext;
         gContext = NULL;
     }
@@ -52,7 +54,7 @@ static void qt_exit(int)
 {
     signal(SIGINT, SIG_DFL);
     signal(SIGTERM, SIG_DFL);
-    QCoreApplication::exit(GENERIC_EXIT_OK);
+    qApp->exit(GENERIC_EXIT_OK);
 }
 
 int main(int argc, char *argv[])
@@ -107,8 +109,7 @@ int main(int argc, char *argv[])
         return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
 
-    while (true)
-        usleep(100000);
+    qApp->exec();
 
     return GENERIC_EXIT_OK;
 }

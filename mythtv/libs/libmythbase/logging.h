@@ -5,6 +5,7 @@
 #include <QMutex>
 #include <QQueue>
 #include <QTime>
+#include <QPointer>
 
 #include <stdint.h>
 #include <time.h>
@@ -159,6 +160,9 @@ class LoggingItem: public QObject
 class LoggerThread : public QObject, public MThread
 {
     Q_OBJECT
+
+    friend void LogPrintLine(uint64_t, LogLevel_t, const char *, int,
+                             const char *, int, const char *, ... );
   public:
     LoggerThread(QString filename, bool progress, bool quiet, QString table,
                  int facility);
@@ -169,7 +173,6 @@ class LoggerThread : public QObject, public MThread
     void handleItem(LoggingItem *item);
     void fillItem(LoggingItem *item);
   private:
-    bool logConsole(LoggingItem *item);
     QWaitCondition *m_waitNotEmpty; ///< Condition variable for waiting
                                     ///  for the queue to not be empty
                                     ///  Protected by logQueueMutex
@@ -188,8 +191,11 @@ class LoggerThread : public QObject, public MThread
     int m_facility;         ///< Cached syslog facility (or -1 to disable)
     pid_t m_pid;            ///< Cached pid value
 
-    nzmqt::ZMQContext *m_zmqContext; ///< ZeroMQ context to use in this logger
-    nzmqt::ZMQSocket  *m_zmqSocket;  ///< ZeroMQ socket to talk to mythlogserver
+    nzmqt::ZMQContext *m_zmqContext;    ///< ZeroMQ context to use 
+    nzmqt::ZMQSocket  *m_zmqSocket;     ///< ZeroMQ socket to talk to
+                                        /// mythlogserver
+  protected:
+    bool logConsole(LoggingItem *item);
 
   protected slots:
     void messageReceived(const QList<QByteArray>&);

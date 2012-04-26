@@ -259,7 +259,7 @@ void LoggerThread::run(void)
         m_zmqContext = logServerThread->getZMQContext();
     else
     {
-        m_zmqContext = nzmqt::createDefaultContext(this);
+        m_zmqContext = nzmqt::createDefaultContext(NULL);
         m_zmqContext->start();
     }
 
@@ -333,8 +333,11 @@ void LoggerThread::run(void)
         qLock.relock();
     }
 
-    delete m_zmqSocket;
-    delete m_zmqContext;
+    m_zmqSocket->setLinger(0);
+    m_zmqSocket->close();
+
+    if (!locallogs)
+        delete m_zmqContext;
 
     logThreadFinished = true;
 
@@ -419,7 +422,8 @@ void LoggerThread::handleItem(LoggingItem *item)
     if (item->m_message[0] != '\0')
     {
         // Send it to mythlogserver
-        m_zmqSocket->sendMessage(item->toByteArray());
+        if (!logThreadFinished)
+            m_zmqSocket->sendMessage(item->toByteArray());
     }
 }
 
@@ -659,6 +663,7 @@ void LogPrintLine( uint64_t mask, LogLevel_t level, const char *file, int line,
             item = logQueue.dequeue();
             qLock.unlock();
             logThread->handleItem(item);
+            logThread->logConsole(item);
             item->deleteItem();
             qLock.relock();
         }
