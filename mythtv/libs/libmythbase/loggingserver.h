@@ -119,6 +119,8 @@ class DatabaseLogger : public LoggerBase {
     void receivedMessage(const QList<QByteArray>&);
 };
 
+typedef QList<QByteArray> LogMessage;
+typedef QList<LogMessage *> LogMessageList;
 
 /// \brief The logging thread that received the messages from the clients via
 ///        ZeroMQ and dispatches each LoggingItem to each logger instance via
@@ -137,6 +139,8 @@ class LogServerThread : public QObject, public MThread
     nzmqt::ZMQContext *m_zmqContext; ///< ZeroMQ context
     nzmqt::ZMQSocket *m_zmqInSock;  ///< ZeroMQ feeding socket
     nzmqt::ZMQSocket *m_zmqPubSock; ///< ZeroMQ publishing socket
+
+    void forwardMessage(LogMessage *msg);
   protected slots:
     void receivedMessage(const QList<QByteArray>&);
 };

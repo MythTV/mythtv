@@ -72,6 +72,9 @@ static ClientMap                    logClientMap;
 static QMutex                       logRevClientMapMutex;
 static RevClientMap                 logRevClientMap;
 
+static QMutex                       logMsgListMutex;
+static LogMessageList               logMsgList;
+
 #define TIMESTAMP_MAX 30
 #define MAX_STRING_LENGTH (LOGLINE_MAX+120)
 
@@ -617,13 +620,22 @@ void LogServerThread::run(void)
     logThreadStarted.wakeAll();
     locker.unlock();
 
-    LoggerBase *logger = new SyslogLogger;
-    logger->setupZMQSocket();
-
     while (!m_aborted)
     {
+        qApp->processEvents();
+
+        {
+            QMutexLocker lock(&logMsgListMutex);
+            while (!logMsgList.isEmpty())
+            {
+                LogMessage *msg = logMsgList.takeFirst();
+                forwardMessage(msg);
+                delete msg;
+            }
+        }
+
         msleep(100);
-        exec();
+
         // handle heartbeat...
     }
 
@@ -640,10 +652,18 @@ void LogServerThread::run(void)
 /// \param  msg    The message received (can be multi-part)
 void LogServerThread::receivedMessage(const QList<QByteArray> &msg)
 {
+    LogMessage *message = new LogMessage(msg);
+    QMutexLocker lock(&logMsgListMutex);
+
+    logMsgList.append(message);
+}
+
+void LogServerThread::forwardMessage(LogMessage *msg)
+{
 #ifdef DUMP_PACKET
-    QList<QByteArray>::const_iterator it = msg.begin();
+    QList<QByteArray>::const_iterator it = msg->begin();
     int i = 0;
-    for (; it != msg.end(); ++it, i++)
+    for (; it != msg->end(); ++it, i++)
     {
         QByteArray buf = *it;
         cout << i << ":\t" << buf.size() << endl << "\t" 
@@ -653,12 +673,13 @@ void LogServerThread::receivedMessage(const QList<QByteArray> &msg)
 #endif
 
     // First section is the client id
-    QByteArray clientBa = msg.first();
+    QByteArray clientBa = msg->first();
     QString clientId = QString(clientBa.toHex());
 
-    QByteArray json     = msg.at(1);
+    QByteArray json     = msg->at(1);
     LoggingItem *item = LoggingItem::create(json);
 
+    try
     {
         QMutexLocker lock(&logClientMapMutex);
 
@@ -716,6 +737,7 @@ void LogServerThread::receivedMessage(const QList<QByteArray> &msg)
                     // Need to add a new SyslogLogger
                     lock2.unlock();
                     logger = new SyslogLogger; // inserts into loggerMap
+                    logger->moveToThread(logServerThread->qthread());
                     lock2.relock();
                     logger->setupZMQSocket();
 
@@ -748,6 +770,7 @@ void LogServerThread::receivedMessage(const QList<QByteArray> &msg)
                     // inserts into loggerMap
                     logger =
                         new DatabaseLogger(table.toLocal8Bit().constData());
+                    logger->moveToThread(logServerThread->qthread());
                     lock2.relock();
                     logger->setupZMQSocket();
 
@@ -768,14 +791,18 @@ void LogServerThread::receivedMessage(const QList<QByteArray> &msg)
             }
 
             logClientMap.insert(clientId, loggers);
-        }
 
-        msleep(10);
+            msleep(10);
+        }
+    }
+    catch (...)
+    {
+        cout << "Exception occurred" << endl;
     }
 
     item->deleteItem();
 
-    m_zmqPubSock->sendMessage(msg);
+    m_zmqPubSock->sendMessage(*msg);
 }
 
 
