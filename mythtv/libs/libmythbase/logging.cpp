@@ -312,6 +312,8 @@ void LoggerThread::run(void)
 
     while (!m_aborted || !logQueue.isEmpty())
     {
+        qApp->processEvents();
+
         if (logQueue.isEmpty())
         {
             m_waitEmpty->wakeAll();

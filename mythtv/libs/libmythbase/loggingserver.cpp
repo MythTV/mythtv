@@ -147,6 +147,7 @@ FileLogger::~FileLogger()
     m_zmqSock->setLinger(0);
     m_zmqSock->disconnect(this);
     m_zmqSock->close();
+    delete m_zmqSock;
 }
 
 /// \brief Reopen the logfile after a SIGHUP.  Log files only (no console).
@@ -250,6 +251,7 @@ SyslogLogger::~SyslogLogger()
     m_zmqSock->setLinger(0);
     m_zmqSock->disconnect(this);
     m_zmqSock->close();
+    delete m_zmqSock;
 }
 
 
@@ -326,6 +328,7 @@ DatabaseLogger::~DatabaseLogger()
     m_zmqSock->setLinger(0);
     m_zmqSock->disconnect(this);
     m_zmqSock->close();
+    delete m_zmqSock;
 }
 
 /// \brief Stop logging to the database and wait for the thread to stop.
@@ -730,6 +733,7 @@ void LogServerThread::checkHeartBeats(void)
     while (!toDel.isEmpty())
     {
         QString clientId = toDel.takeFirst();
+        LOG(VB_GENERAL, LOG_INFO, QString("Expiring client %1").arg(clientId));
         LoggerListItem *item = logClientMap.take(clientId);
         LoggerList *list = item->list;
         delete item;
