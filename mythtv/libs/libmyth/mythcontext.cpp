@@ -341,7 +341,7 @@ bool MythContextPrivate::FindDatabase(bool prompt, bool noAutodetect)
     // In addition to the UI chooser, we can also try to autoSelect later,
     // but only if we're not doing manualSelect and there was no
     // valid config.xml
-    bool autoSelect = !manualSelect && !loaded;
+    bool autoSelect = !manualSelect && !loaded && !noAutodetect;
 
     // 2. If the user isn't forcing up the chooser UI, look for a default
     //    backend in config.xml, then test DB settings we've got so far:
