@@ -19,14 +19,16 @@ distclean:	${SUBDIRS_DISTCLEAN}
 FFmpeg-all FFmpeg-install FFmpeg-uninstall FFmpeg-clean FFmpeg-distclean:
 	${MAKE} -C FFmpeg ${@:FFmpeg-%=%} 
 
-zeromq-all:
-	(cd zeromq ; ./configure --prefix=${PREFIX})
+zeromq-all:	zeromq/Makefile
 	${MAKE} -C zeromq all
+
+zeromq/Makefile:	zeromq/configure
+	(cd zeromq ; ./configure --prefix=${PREFIX})
 
 zeromq-install zeromq-uninstall zeromq-clean zeromq-distclean:
 	${MAKE} -C zeromq ${@:zeromq-%=%} 
 
-nzmqt-all:
+nzmqt-all:	zeromq-all
 	(cd nzmqt/src ; ${QMAKE})
 	${MAKE} -C nzmqt/src all
 

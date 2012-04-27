@@ -6,8 +6,6 @@ TARGET = mythbase-$$LIBVERSION
 CONFIG += thread dll
 target.path = $${LIBDIR}
 INSTALLS = target
-INCLUDEPATH += $$PREFIX/include
-INCLUDEPATH += $$PREFIX/include/qjson
 
 QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 
@@ -125,4 +123,4 @@ QT += xml sql network
 
 include ( ../libs-targetfix.pro )
 
-LIBS += $$EXTRA_LIBS $$LATE_LIBS -lzmq -lmythqjson
+LIBS += $$EXTRA_LIBS $$LATE_LIBS

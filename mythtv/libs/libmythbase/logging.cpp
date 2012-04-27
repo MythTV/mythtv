@@ -56,10 +56,12 @@ extern "C" {
 #include <mach/mach.h>
 #endif
 
+// nzmqt
 #include "nzmqt.hpp"
-#include "qjson/qobjecthelper.h"
-#include "qjson/serializer.h"
-#include "qjson/parser.h"
+// QJson
+#include "QJson/QObjectHelper"
+#include "QJson/Serializer"
+#include "QJson/Parser"
 
 static QMutex                  logQueueMutex;
 static QQueue<LoggingItem *>   logQueue;

@@ -80,3 +80,12 @@ inc.path  = $${PREFIX}/include/qjson/
 
 INSTALLS += inc
 
+PUBLIC_CPPHEADERS += \
+  $$QJSON_BASE/include/QJson/QObjectHelper \
+  $$QJSON_BASE/include/QJson/Serializer \
+  $$QJSON_BASE/include/QJson/Parser
+
+cppinc.files += $${PUBLIC_CPPHEADERS}
+cppinc.path  += $${PREFIX}/include/QJson/
+
+INSTALLS += cppinc
