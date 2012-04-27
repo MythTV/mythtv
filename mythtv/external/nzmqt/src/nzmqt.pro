@@ -34,10 +34,10 @@ LIBS += -lzmq
 
 INCLUDEPATH += \
     ../include \
-    $${PREFIX}/include
+    ../../zeromq/include
 
 QMAKE_LIBDIR += \
-    ${{LIBDIR}
+    ../../zeromq/src/.libs
 
 inc.files += ../include/nzmqt/nzmqt.hpp
 inc.path  = $${PREFIX}/include/

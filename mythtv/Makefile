@@ -1,8 +1,7 @@
 include config.mak
 
-MAKE_SUBDIRS = external/FFmpeg external/zeromq
-QT_SUBDIRS   = libs filters html programs themes i18n locales external/qjson
-QT_SUBDIRS  += external/nzmqt/src
+MAKE_SUBDIRS = external
+QT_SUBDIRS   = libs filters html programs themes i18n locales
 
 ifdef CONFIG_BINDINGS_PERL
     MAKE_SUBDIRS += bindings/perl
@@ -40,7 +39,7 @@ libs/libmythbase/version.h:	version.sh force
 	sh version.sh $(PWD)
 
 # explicit subdir dependencies
-libs: external/FFmpeg
+libs: external
 filters: libs
 programs: libs filters
 
