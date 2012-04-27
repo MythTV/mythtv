@@ -772,8 +772,11 @@ int MythContextPrivate::ChooseBackend(const QString &error)
     TempMainWindow();
 
     // Tell the user what went wrong:
-    if (error.length())
+    if (!error.isEmpty())
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("Error: %1").arg(error));
         ShowOkPopup(error);
+    }
 
     LOG(VB_GENERAL, LOG_INFO, "Putting up the UPnP backend chooser");
 
