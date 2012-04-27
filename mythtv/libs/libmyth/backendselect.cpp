@@ -199,12 +199,12 @@ bool BackendSelection::ConnectBackend(DeviceLocation *dev)
     {
         case UPnPResult_Success:
             LOG(VB_UPNP, LOG_INFO, 
-                    QString("ConnectBackend() - success. New hostname: %1")
-                    .arg(m_DBparams->dbHostName));
+                QString("ConnectBackend() - success. New hostname: %1")
+                .arg(m_DBparams->dbHostName));
             return true;
 
         case UPnPResult_HumanInterventionRequired:
-            LOG(VB_UPNP, LOG_ERR, error);
+            LOG(VB_GENERAL, LOG_ERR, QString("Need Human: %1").arg(message));
             ShowOkPopup(message);
 
             if (TryDBfromURL("", dev->m_sLocation))
@@ -213,16 +213,16 @@ bool BackendSelection::ConnectBackend(DeviceLocation *dev)
             break;
 
         case UPnPResult_ActionNotAuthorized:
-            LOG(VB_UPNP, LOG_ERR, 
-                     QString("Access denied for %1. Wrong PIN?")
-                    .arg(backendName));
+            LOG(VB_GENERAL, LOG_ERR, 
+                QString("Access denied for %1. Wrong PIN?")
+                .arg(backendName));
             PromptForPassword();
             break;
 
         default:
-            LOG(VB_UPNP, LOG_ERR, 
-                     QString("GetConnectionInfo() failed for %1")
-                    .arg(backendName));
+            LOG(VB_GENERAL, LOG_ERR, 
+                QString("GetConnectionInfo() failed for %1 : %2")
+                .arg(backendName).arg(message));
             ShowOkPopup(message);
     }
 
