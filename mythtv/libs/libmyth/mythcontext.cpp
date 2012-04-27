@@ -327,10 +327,10 @@ bool MythContextPrivate::Init(const bool gui,
  * Despite its name, the disable argument currently only disables the chooser.
  * If set, autoconfigure will still be attempted in some situations.
  */
-bool MythContextPrivate::FindDatabase(const bool prompt, const bool noPrompt)
+bool MythContextPrivate::FindDatabase(bool prompt, bool noAutodetect)
 {
-    // The two bool. args actually form a Yes/Maybe/No (A tristate bool :-)
-    bool manualSelect = prompt && !noPrompt;
+    // We can only prompt if autodiscovery is enabled..
+    bool manualSelect = prompt && !noAutodetect;
 
     QString failure;
 
@@ -377,14 +377,11 @@ bool MythContextPrivate::FindDatabase(const bool prompt, const bool noPrompt)
                 goto DBfound;
         }
 
-        if (count > 1 || count == -1)     // Multiple BEs, or needs PIN.
-            manualSelect = !noPrompt;     // If allowed, prompt user
+        // Multiple BEs, or needs PIN.
+        manualSelect |= (count > 1 || count == -1);
     }
 
-    if (!m_gui)
-        manualSelect = false;  // no interactive command-line chooser yet
-
-
+    manualSelect &= m_gui;  // no interactive command-line chooser yet
 
     // Last, get the user to select a backend from a possible list:
     if (manualSelect)
