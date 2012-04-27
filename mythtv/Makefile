@@ -1,7 +1,8 @@
 include config.mak
 
-MAKE_SUBDIRS = external/FFmpeg
-QT_SUBDIRS   = libs filters html programs themes i18n locales
+MAKE_SUBDIRS = external/FFmpeg external/zeromq
+QT_SUBDIRS   = libs filters html programs themes i18n locales external/qjson
+QT_SUBDIRS  += external/nzmqt/src
 
 ifdef CONFIG_BINDINGS_PERL
     MAKE_SUBDIRS += bindings/perl
