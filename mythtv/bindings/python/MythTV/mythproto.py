@@ -784,7 +784,7 @@ class FreeSpace( DictData ):
     _field_order = [ 'host',         'path',     'islocal',
                     'disknumber',   'sgroupid', 'blocksize',
                     'totalspace', 'usedspace']
-    _field_type = [3, 3, 2, 0, 0, 0, 0, 0, 0, 0]
+    _field_type = [3, 3, 2, 0, 0, 0, 0, 0]
     def __str__(self):
         return "<FreeSpace '%s@%s' at %s>"\
                     % (self.path, self.host, hex(id(self)))
