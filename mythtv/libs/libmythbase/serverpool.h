@@ -76,7 +76,13 @@ class MBASE_PUBLIC ServerPool : public QObject
 
     void close(void);
 
-  signals:
+    // Utility functions
+    static int tryListeningPort(QTcpServer *server, int baseport,
+                                int range = 1, bool *isipv6 = NULL);
+    static int tryBindingPort(QUdpSocket *socket, int baseport,
+                              int range = 1, bool *isipv6 = NULL);
+
+signals:
     void newConnection(QTcpSocket *);
     void newDatagram(QByteArray, QHostAddress, quint16);
 
