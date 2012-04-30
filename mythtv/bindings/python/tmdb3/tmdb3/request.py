@@ -9,16 +9,19 @@
 #-----------------------
 
 from tmdb_exceptions import *
+from locales import get_locale
 from cache import Cache
 
+from urllib import urlencode
 import urllib2
-import urllib
 import json
 import os
 
 DEBUG = False
-
 cache = Cache(filename='pytmdb3.cache')
+
+#DEBUG = True
+#cache = Cache(engine='null')
 
 def set_key(key):
     """
@@ -54,8 +57,13 @@ class Request( urllib2.Request ):
         self._url = url.lstrip('/')
         self._kwargs = dict([(kwa,kwv) for kwa,kwv in kwargs.items()
                                         if kwv is not None])
-        url = '{0}{1}?{2}'.format(self._base_url, self._url,
-                                  urllib.urlencode(kwargs))
+
+        locale = get_locale()
+        kwargs = {}
+        for k,v in self._kwargs.items():
+            kwargs[k] = locale.encode(v)
+        url = '{0}{1}?{2}'.format(self._base_url, self._url, urlencode(kwargs))
+
         urllib2.Request.__init__(self, url)
         self.add_header('Accept', 'application/json')
         self.lifetime = 3600 # 1hr
@@ -73,11 +81,17 @@ class Request( urllib2.Request ):
         obj.lifetime = self.lifetime
         return obj
 
+    def add_data(self, data):
+        """Provide data to be sent with POST."""
+        urllib2.Request.add_data(self, urlencode(data))
+
     def open(self):
         """Open a file object to the specified URL."""
         try:
             if DEBUG:
                 print 'loading '+self.get_full_url()
+                if self.has_data():
+                    print '  '+self.get_data()
             return urllib2.urlopen(self)
         except urllib2.HTTPError, e:
             raise TMDBHTTPError(str(e))

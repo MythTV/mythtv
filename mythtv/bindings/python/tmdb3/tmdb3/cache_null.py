@@ -13,7 +13,7 @@ class NullEngine( CacheEngine ):
     """Non-caching engine for debugging."""
     name = 'null'
     def configure(self): pass
-    def get(self, key): return None
-    def put(self, key, value, lifetime): pass
+    def get(self, date): return []
+    def put(self, key, value, lifetime): return []
     def expire(self, key): pass
 

@@ -8,6 +8,7 @@
 
 from copy import copy
 from locales import get_locale
+from tmdb_auth import get_session
 
 class Poller( object ):
     """
@@ -124,12 +125,13 @@ class Data( object ):
         return inst._data[self.field]
 
     def __set__(self, inst, value):
-        if value:
+        if value is not None:
             value = self.handler(value)
         else:
             value = self.default
         if isinstance(value, Element):
             value._locale = inst._locale
+            value._session = inst._session
         inst._data[self.field] = value
 
     def sethandler(self, handler):
@@ -179,9 +181,13 @@ class Datalist( Data ):
                 val = self.handler(val)
                 if isinstance(val, Element):
                     val._locale = inst._locale
+                    val._session = inst._session
                 data.append(val)
             if self.sort:
-                data.sort(key=lambda x: getattr(x, self.sort))
+                if self.sort is True:
+                    data.sort()
+                else:
+                    data.sort(key=lambda x: getattr(x, self.sort))
         inst._data[self.field] = data
 
 class Datadict( Data ):
@@ -229,6 +235,7 @@ class Datadict( Data ):
                 val = self.handler(val)
                 if isinstance(val, Element):
                     val._locale = inst._locale
+                    val._session = inst._session
                 data[self.getkey(val)] = val
         inst._data[self.field] = data
 
@@ -309,6 +316,11 @@ class ElementType( type ):
             obj._locale = kwargs['locale']
         else:
             obj._locale = get_locale()
+
+        if 'session' in kwargs:
+            obj._session = kwargs['session']
+        else:
+            obj._session = get_session()
 
         obj._data = {}
         if 'raw' in kwargs:

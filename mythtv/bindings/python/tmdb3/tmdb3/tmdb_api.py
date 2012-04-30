@@ -22,7 +22,7 @@ for search and retrieval of text metadata and image URLs from TMDB.
 Preliminary API specifications can be found at
 http://help.themoviedb.org/kb/api/about-3"""
 
-__version__="v0.4.1"
+__version__="v0.6.1"
 # 0.1.0 Initial development
 # 0.2.0 Add caching mechanism for API queries
 # 0.2.1 Temporary work around for broken search paging
@@ -36,11 +36,20 @@ __version__="v0.4.1"
 # 0.3.7 Generalize caching mechanism, and allow controllability
 # 0.4.0 Add full locale support (language and country) and optional fall through
 # 0.4.1 Add custom classmethod for dealing with IMDB movie IDs
+# 0.4.2 Improve cache file selection for Windows systems
+# 0.4.3 Add a few missed Person properties
+# 0.4.4 Add support for additional Studio information
+# 0.4.5 Add locale fallthrough for images and alternate titles
+# 0.4.6 Add slice support for search results
+# 0.5.0 Rework cache framework and improve file cache performance
+# 0.6.0 Add user authentication support
+# 0.6.1 Add adult filtering for people searches
 
 from request import set_key, Request
 from util import Datapoint, Datalist, Datadict, Element
 from pager import PagedRequest
 from locales import get_locale, set_locale
+from tmdb_auth import get_session, set_session
 from tmdb_exceptions import *
 
 import json
@@ -56,6 +65,24 @@ class Configuration( Element ):
         return Request('configuration')
 Configuration = Configuration()
 
+class Account( Element ):
+    def _populate(self):
+        return Request('account', session_id=self._session.sessionid)
+
+    id              = Datapoint('id')
+    adult           = Datapoint('include_adult')
+    country         = Datapoint('iso_3166_1')
+    language        = Datapoint('iso_639_1')
+    name            = Datapoint('name')
+    username        = Datapoint('username')
+
+    @property
+    def locale(self):
+        return get_locale(self.language, self.country)
+
+    def __repr__(self):
+        return '<{0} "{1.name}">'.format(self.__class__.__name__, self)
+
 def searchMovie(query, locale=None, adult=False):
     return MovieSearchResult(
                     Request('search/movie', query=query, include_adult=adult),
@@ -70,13 +97,14 @@ class MovieSearchResult( PagedRequest ):
         super(MovieSearchResult, self).__init__(
                                 request.new(language=locale.language),
                                 lambda x: Movie(raw=x, locale=locale))
-    
+
     def __repr__(self):
         name = self._name if self._name else self._request._kwargs['query']
         return u"<Search Results: {0}>".format(name)
 
-def searchPerson(query):
-    return PeopleSearchResult(Request('search/person', query=query))
+def searchPerson(query, adult=False):
+    return PeopleSearchResult(Request('search/person', query=query,
+                                      include_adult=adult))
 
 class PeopleSearchResult( PagedRequest ):
     """Stores a list of search matches."""
@@ -104,6 +132,16 @@ class Image( Element ):
         url = Configuration.images['base_url'].rstrip('/')
         return url+'/{0}/{1}'.format(size, self.filename)
 
+    # sort preferring locale's language, but keep remaining ordering consistent
+    def __lt__(self, other):
+        return (self.language == self._locale.language) \
+                and (self.language != other.language)
+    def __gt__(self, other):
+        return (self.language != other.language) \
+                and (other.language == self._locale.language)
+    def __eq__(self, other):
+        return self.language == other.language
+
     def __repr__(self):
         return u"<{0.__class__.__name__} '{0.filename}'>".format(self)
 
@@ -116,10 +154,23 @@ class Poster( Image ):
 class Profile( Image ):
     def sizes(self):
         return Configuration.images['profile_sizes']
+class Logo( Image ):
+    def sizes(self):
+        return Configuration.images['logo_sizes']
 
 class AlternateTitle( Element ):
     country     = Datapoint('iso_3166_1')
     title       = Datapoint('title')
+
+    # sort preferring locale's country, but keep remaining ordering consistent
+    def __lt__(self, other):
+        return (self.country == self._locale.country) \
+                and (self.country != other.country)
+    def __gt__(self, other):
+        return (self.country != other.country) \
+                and (other.country == self._locale.country)
+    def __eq__(self, other):
+        return self.country == other.country
 
 class Person( Element ):
     id          = Datapoint('id', initarg=1)
@@ -132,6 +183,8 @@ class Person( Element ):
     homepage    = Datapoint('homepage')
     birthplace  = Datapoint('place_of_birth')
     profile     = Datapoint('profile_path', handler=Profile, raw=False)
+    adult       = Datapoint('adult')
+    aliases     = Datalist('also_known_as')
 
     def __repr__(self):
         return u"<{0} '{1.name}' at {2}>".\
@@ -222,11 +275,31 @@ class Genre( Element ):
         return u"<{0.__class__.__name__} '{0.name}'>".format(self)
 
 class Studio( Element ):
-    id      = Datapoint('id')
-    name    = Datapoint('name')
+    id              = Datapoint('id', initarg=1)
+    name            = Datapoint('name')
+    description     = Datapoint('description')
+    headquarters    = Datapoint('headquarters')
+    logo            = Datapoint('logo_path', handler=Logo, raw=False)
+    # FIXME: manage not-yet-defined handlers in a way that will propogate
+    #        locale information properly
+    parent          = Datapoint('parent_company', handler=lambda x: Studio(raw=x))
 
     def __repr__(self):
         return u"<{0.__class__.__name__} '{0.name}'>".format(self)
+
+    def _populate(self):
+        return Request('company/{0}'.format(self.id))
+    def _populate_movies(self):
+        return Request('company/{0}/movies'.format(self.id), language=self._locale.language)
+
+    # FIXME: add a cleaner way of adding types with no additional processing
+    @property
+    def movies(self):
+        if 'movies' not in self._data:
+            search = MovieSearchResult(self._populate_movies(), locale=self._locale)
+            search._name = "{0.name} Movies".format(self)
+            self._data['movies'] = search
+        return self._data['movies']
 
 class Country( Element ):
     code    = Datapoint('iso_3166_1')
@@ -265,6 +338,28 @@ class Movie( Element ):
     def toprated(cls, locale=None):
         res = MovieSearchResult(Request('movie/top-rated'), locale=locale)
         res._name = 'Top Rated'
+        return res
+
+    @classmethod
+    def favorites(cls, session=None):
+        if session is None:
+            session = get_session()
+        account = Account(session=session)
+        res = MovieSearchResult(
+                    Request('account/{0}/favorite_movies'.format(account.id),
+                                session_id=session.sessionid))
+        res._name = "Favorites"
+        return res
+
+    @classmethod
+    def ratedmovies(cls, session=None):
+        if session is None:
+            session = get_session()
+        account = Account(session=session)
+        res = MovieSearchResult(
+                    Request('account/{0}/rated_movies'.format(account.id),
+                                session_id=session.sessionid))
+        res._name = "Movies You Rated"
         return res
 
     @classmethod
@@ -313,11 +408,13 @@ class Movie( Element ):
     def _populate(self):
         return Request('movie/{0}'.format(self.id), language=self._locale.language)
     def _populate_titles(self):
-        return Request('movie/{0}/alternative_titles'.format(self.id), country=self._locale.country)
+        kwargs = {'country':self._locale.country} if not self._locale.fallthrough else {}
+        return Request('movie/{0}/alternative_titles'.format(self.id), **kwargs)
     def _populate_cast(self):
         return Request('movie/{0}/casts'.format(self.id))
     def _populate_images(self):
-        return Request('movie/{0}/images'.format(self.id), language=self._locale.language)
+        kwargs = {'language':self._locale.language} if not self._locale.fallthrough else {}
+        return Request('movie/{0}/images'.format(self.id), **kwargs)
     def _populate_keywords(self):
         return Request('movie/{0}/keywords'.format(self.id))
     def _populate_releases(self):
@@ -327,16 +424,30 @@ class Movie( Element ):
     def _populate_translations(self):
         return Request('movie/{0}/translations'.format(self.id))
 
-    alternate_titles = Datalist('titles', handler=AlternateTitle, poller=_populate_titles)
+    alternate_titles = Datalist('titles', handler=AlternateTitle, poller=_populate_titles, sort=True)
     cast             = Datalist('cast', handler=Cast, poller=_populate_cast, sort='order')
     crew             = Datalist('crew', handler=Crew, poller=_populate_cast)
-    backdrops        = Datalist('backdrops', handler=Backdrop, poller=_populate_images)
-    posters          = Datalist('posters', handler=Poster, poller=_populate_images)
+    backdrops        = Datalist('backdrops', handler=Backdrop, poller=_populate_images, sort=True)
+    posters          = Datalist('posters', handler=Poster, poller=_populate_images, sort=True)
     keywords         = Datalist('keywords', handler=Keyword, poller=_populate_keywords)
     releases         = Datadict('countries', handler=Release, poller=_populate_releases, attr='country')
     youtube_trailers = Datalist('youtube', handler=YoutubeTrailer, poller=_populate_trailers)
     apple_trailers   = Datalist('quicktime', handler=AppleTrailer, poller=_populate_trailers)
     translations     = Datalist('translations', handler=Translation, poller=_populate_translations)
+
+    def setFavorite(self, value):
+        req = Request('account/{0}/favorite'.format(Account(session=self._session).id), session_id=self._session.sessionid)
+        req.add_data({'movie_id':self.id, 'favorite':str(bool(value)).lower()})
+        req.lifetime = 0
+        req.readJSON()
+
+    def setRating(self, value):
+        if not (0 <= value <= 10):
+            raise TMDBError("Ratings must be between '0' and '10'.")
+        req = Request('movie/{0}/favorite'.format(self.id), session_id=self._session.sessionid)
+        req.lifetime = 0
+        req.add_data({'value':value})
+        req.readJSON()
 
     def __repr__(self):
         if self.title is not None:
