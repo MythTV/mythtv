@@ -22,7 +22,7 @@ for search and retrieval of text metadata and image URLs from TMDB.
 Preliminary API specifications can be found at
 http://help.themoviedb.org/kb/api/about-3"""
 
-__version__="v0.6.0"
+__version__="v0.6.1"
 # 0.1.0 Initial development
 # 0.2.0 Add caching mechanism for API queries
 # 0.2.1 Temporary work around for broken search paging
@@ -43,6 +43,7 @@ __version__="v0.6.0"
 # 0.4.6 Add slice support for search results
 # 0.5.0 Rework cache framework and improve file cache performance
 # 0.6.0 Add user authentication support
+# 0.6.1 Add adult filtering for people searches
 
 from request import set_key, Request
 from util import Datapoint, Datalist, Datadict, Element
@@ -101,8 +102,9 @@ class MovieSearchResult( PagedRequest ):
         name = self._name if self._name else self._request._kwargs['query']
         return u"<Search Results: {0}>".format(name)
 
-def searchPerson(query):
-    return PeopleSearchResult(Request('search/person', query=query))
+def searchPerson(query, adult=False):
+    return PeopleSearchResult(Request('search/person', query=query,
+                                      include_adult=adult))
 
 class PeopleSearchResult( PagedRequest ):
     """Stores a list of search matches."""
