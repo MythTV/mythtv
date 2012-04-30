@@ -768,7 +768,10 @@ void MythDownloadManager::authCallback(QNetworkReply *reply,
         return;
 
     if (dlInfo->m_authCallback)
+    {
+        LOG(VB_FILE, LOG_DEBUG, "Calling auth callback");
         dlInfo->m_authCallback(reply, authenticator, dlInfo->m_authArg);
+    }
 }
 
 /** \brief Download helper for download() blocking methods.
@@ -817,7 +820,11 @@ bool MythDownloadManager::downloadNow(MythDownloadInfo *dlInfo, bool deleteInfo)
         dlInfo->m_syncMode = false; // Let downloadFinished() cleanup for us
         if ((dlInfo->m_reply) &&
             (dlInfo->m_errorCode == QNetworkReply::NoError))
+        {
+            LOG(VB_FILE, LOG_DEBUG, 
+                LOC + QString("Aborting download - lack of data transfer"));
             dlInfo->m_reply->abort();
+        }
     }
     else if (deleteInfo)
     {
@@ -847,7 +854,11 @@ void MythDownloadManager::cancelDownload(const QString &url)
         {
             // this shouldn't happen
             if (dlInfo->m_reply)
+            {
+                LOG(VB_FILE, LOG_DEBUG, 
+                    LOC + QString("Aborting download - user request"));
                 dlInfo->m_reply->abort();
+            }
             lit.remove();
             delete dlInfo;
             dlInfo = NULL;
@@ -859,6 +870,8 @@ void MythDownloadManager::cancelDownload(const QString &url)
         dlInfo = m_downloadInfos[url];
         if (dlInfo->m_reply)
         {
+            LOG(VB_FILE, LOG_DEBUG, 
+                LOC + QString("Aborting download - user request"));
             m_downloadReplies.remove(dlInfo->m_reply);
             dlInfo->m_reply->abort();
         }
