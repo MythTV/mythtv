@@ -386,7 +386,7 @@ class Movie( Element ):
     budget          = Datapoint('budget')
     revenue         = Datapoint('revenue')
     releasedate     = Datapoint('release_date', handler=lambda x: \
-                                datetime.datetime.strptime(x, '%Y-%m-%d'))
+                                datetime.date(*[int(y) for y in x.split('-')]))
     homepage        = Datapoint('homepage')
     imdb            = Datapoint('imdb_id')
 
