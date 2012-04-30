@@ -452,3 +452,131 @@ void ServerPool::newUdpDatagram(void)
         emit newDatagram(buffer, sender, senderPort);
     }
 }
+
+/**
+ * tryListeningPort
+ *
+ * Description:
+ * Tells the server to listen for incoming connections on port port.
+ * The server will attempt to listen on all IPv6 and IPv4 interfaces.
+ * If IPv6 isn't available, the server will listen on all IPv4 network interfaces.
+ *
+ * Usage:
+ * server:   QTcpServer object to use
+ * baseport: port to listen on. If port is 0, a port is chosen automatically.
+ * range:    range of ports to try (default 1)
+ * isipv6:   is set to true if IPv6 was successful (default NULL)
+ *
+ * Returns port used on success; otherwise returns -1.
+ */
+int ServerPool::tryListeningPort(QTcpServer *server, int baseport,
+                                 int range, bool *isipv6)
+{
+    bool ipv6 = true;
+    // try a few ports in case the first is in use
+    int port = baseport;
+    while (port < baseport + range)
+    {
+        if (ipv6)
+        {
+            if (server->listen(QHostAddress::AnyIPv6, port))
+            {
+                break;
+            }
+            else
+            {
+                // did we fail because IPv6 isn't available?
+                QAbstractSocket::SocketError err = server->serverError();
+                if (err == QAbstractSocket::UnsupportedSocketOperationError)
+                {
+                    ipv6 = false;
+                }
+            }
+        }
+        if (!ipv6)
+        {
+            if (server->listen(QHostAddress::Any, port))
+            {
+                break;
+            }
+        }
+        port++;
+    }
+
+    if (isipv6)
+    {
+        *isipv6 = ipv6;
+    }
+
+    if (port >= baseport + range)
+    {
+        return -1;
+    }
+    if (port == 0)
+    {
+        port = server->serverPort();
+    }
+    return port;
+}
+
+/**
+ * tryBindingPort
+ *
+ * Description:
+ * Binds this socket for incoming connections on port port.
+ * The socket will attempt to bind on all IPv6 and IPv4 interfaces.
+ * If IPv6 isn't available, the socket will be bound to all IPv4 network interfaces.
+ *
+ * Usage:
+ * socket:   QUdpSocket object to use
+ * baseport: port to bind to.
+ * range:    range of ports to try (default 1)
+ * isipv6:   is set to true if IPv6 was successful (default NULL)
+ *
+ * Returns port used on success; otherwise returns -1.
+ */
+int ServerPool::tryBindingPort(QUdpSocket *socket, int baseport,
+                               int range, bool *isipv6)
+{
+    bool ipv6 = true;
+    // try a few ports in case the first is in use
+    int port = baseport;
+    while (port < baseport + range)
+    {
+        if (ipv6)
+        {
+            if (socket->bind(QHostAddress::AnyIPv6, port))
+            {
+                break;
+            }
+            else
+            {
+                // did we fail because IPv6 isn't available?
+                QAbstractSocket::SocketError err = socket->error();
+                if (err == QAbstractSocket::UnsupportedSocketOperationError)
+                {
+                    ipv6 = false;
+                }
+            }
+        }
+        if (!ipv6)
+        {
+            if (socket->bind(QHostAddress::Any, port))
+            {
+                break;
+            }
+        }
+        port++;
+    }
+
+    if (isipv6)
+    {
+        *isipv6 = ipv6;
+    }
+
+    if (port >= baseport + range)
+    {
+        return -1;
+    }
+    return port;
+}
