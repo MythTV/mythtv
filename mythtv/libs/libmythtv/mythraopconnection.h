@@ -20,7 +20,6 @@ class QTcpSocket;
 class QUdpSocket;
 class QTimer;
 class AudioOutput;
-class ServerPool;
 class NetStream;
 class AudioData;
 struct AudioData;
@@ -101,7 +100,6 @@ class MythRAOPConnection : public QObject
 
     // utility functions
     int64_t     AudioCardLatency(void);
-    int         findNextBindingPort(QUdpSocket *socket, int port);
     QStringList splitLines(const QByteArray &lines);
     QString     stringFromSeconds(int seconds);
     uint64_t    framesToMs(uint64_t frames);
@@ -116,7 +114,7 @@ class MythRAOPConnection : public QObject
     bool            m_incomingPartial;
     int32_t         m_incomingSize;
     QHostAddress    m_peerAddress;
-    ServerPool     *m_dataSocket;
+    QUdpSocket     *m_dataSocket;
     int             m_dataPort;
     QUdpSocket     *m_clientControlSocket;
     int             m_clientControlPort;

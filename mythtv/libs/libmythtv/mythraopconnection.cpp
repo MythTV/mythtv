@@ -144,32 +144,24 @@ bool MythRAOPConnection::Init(void)
     }
 
     // create the data socket
-    m_dataSocket = new ServerPool();
-    if (!connect(m_dataSocket, SIGNAL(newDatagram(QByteArray, QHostAddress, quint16)),
-                 this,         SLOT(udpDataReady(QByteArray, QHostAddress, quint16))))
+    m_dataSocket = new QUdpSocket();
+    if (!connect(m_dataSocket, SIGNAL(readyRead()), this, SLOT(udpDataReady())))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to connect data socket signal.");
         return false;
     }
 
     // try a few ports in case the first is in use
-    int baseport = m_dataPort;
-    while (m_dataPort < baseport + RAOP_PORT_RANGE)
-    {
-        if (m_dataSocket->bind(m_dataPort))
-        {
-            LOG(VB_GENERAL, LOG_INFO, LOC +
-                QString("Bound to port %1 for incoming data").arg(m_dataPort));
-            break;
-        }
-        m_dataPort++;
-    }
-
-    if (m_dataPort >= baseport + RAOP_PORT_RANGE)
+    int baseport = ServerPool::tryBindingPort(m_dataSocket, m_dataPort,
+                                              RAOP_PORT_RANGE);
+    if (baseport < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to bind to a port for data.");
         return false;
     }
+    m_dataPort = baseport;
+    LOG(VB_GENERAL, LOG_INFO, LOC +
+        QString("Bound to port %1 for incoming data").arg(m_dataPort));
 
     // load the private key
     if (!LoadKey())
@@ -920,11 +912,19 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
             else if (m_socket->localAddress().protocol() ==
                      QAbstractSocket::IPv6Protocol)
             {
-                // NB IPv6 untested
                 Q_IPV6ADDR ip = m_socket->localAddress().toIPv6Address();
-                //ip = qToBigEndian(ip);
-                memcpy(from + i, &ip, 16);
-                i += 16;
+                if(memcmp(&ip,
+                          "\x00\x00\x00\x00" "\x00\x00\x00\x00" "\x00\x00\xff\xff",
+                          12) == 0)
+                {
+                    memcpy(from + i, &ip[12], 4);
+                    i += 4;
+                }
+                else
+                {
+                    memcpy(from + i, &ip, 16);
+                    i += 16;
+                }
             }
             memcpy(from + i, m_hardwareId.constData(), RAOP_HARDWARE_ID_SIZE);
             i += RAOP_HARDWARE_ID_SIZE;
@@ -1059,8 +1059,10 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
             }
 
             m_clientControlSocket = new QUdpSocket(this);
-            int controlbind_port = findNextBindingPort(m_clientControlSocket,
-                                                       control_port);
+            int controlbind_port =
+                ServerPool::tryBindingPort(m_clientControlSocket,
+                                           control_port,
+                                           RAOP_PORT_RANGE);
             if (controlbind_port < 0)
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC +
@@ -1085,8 +1087,10 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
             }
 
             m_clientTimingSocket = new QUdpSocket(this);
-            int timingbind_port = findNextBindingPort(m_clientTimingSocket,
-                                                      timing_port);
+            int timingbind_port =
+            ServerPool::tryBindingPort(m_clientTimingSocket,
+                                       timing_port,
+                                       RAOP_PORT_RANGE);
             if (timingbind_port < 0)
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC +
@@ -1421,7 +1425,7 @@ bool MythRAOPConnection::CreateDecoder(void)
     m_codec = avcodec_find_decoder(CODEC_ID_ALAC);
     if (!m_codec)
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC 
+        LOG(VB_GENERAL, LOG_ERR, LOC
             + "Failed to create ALAC decoder- going silent...");
         return false;
     }
@@ -1561,22 +1565,3 @@ int64_t MythRAOPConnection::AudioCardLatency(void)
     return (int64_t)timestamp - (int64_t)audiots;
 }
 
-int MythRAOPConnection::findNextBindingPort(QUdpSocket *socket, int baseport)
-{
-    // try a few ports in case the first is in use
-    int port = baseport;
-    while (port < baseport + RAOP_PORT_RANGE)
-    {
-        if (socket->bind(port))
-        {
-            break;
-        }
-        port++;
-    }
-
-    if (port >= baseport + RAOP_PORT_RANGE)
-    {
-        return -1;
-    }
-    return port;
-}
