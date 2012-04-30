@@ -161,15 +161,18 @@ void MythRAOPDevice::Start(void)
     txt.append(6); txt.append("tp=UDP");
     txt.append(8); txt.append("sm=false");
     txt.append(8); txt.append("sv=false");
-    txt.append(4); txt.append("ek=1");
-    txt.append(6); txt.append("et=0,1");
-    txt.append(6); txt.append("cn=0,1");
-    txt.append(4); txt.append("ch=2");
-    txt.append(5); txt.append("ss=16");
-    txt.append(8); txt.append("sr=44100");
-    txt.append(8); txt.append("pw=false");
+    txt.append(4); txt.append("ek=1");      //
+    txt.append(6); txt.append("et=0,1");    // encryption type: no, RSA
+    txt.append(6); txt.append("cn=0,1");    // audio codec: pcm, alac
+    txt.append(4); txt.append("ch=2");      // audio channels
+    txt.append(5); txt.append("ss=16");     // sample size
+    txt.append(8); txt.append("sr=44100");  // sample rate
+    txt.append(8); txt.append("pw=false");  // no password
     txt.append(4); txt.append("vn=3");
-    txt.append(9); txt.append("txtvers=1");
+    txt.append(9); txt.append("txtvers=1"); // TXT record version 1
+    txt.append(8); txt.append("md=0,1,2");  // metadata-type: text, artwork, progress
+    txt.append(9); txt.append("vs=130.14");
+    txt.append(7); txt.append("da=true");
 
     LOG(VB_GENERAL, LOG_INFO, QString("Registering service %1.%2 port %3 TXT %4")
         .arg(QString(name)).arg(QString(type)).arg(m_setupPort).arg(QString(txt)));
@@ -224,7 +227,8 @@ void MythRAOPDevice::newConnection(QTcpSocket *client)
         return;
     }
 
-    LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to initialise client connection - closing.");
+    LOG(VB_GENERAL, LOG_ERR, LOC +
+        "Failed to initialise client connection - closing.");
     delete obj;
     client->disconnectFromHost();
     delete client;
