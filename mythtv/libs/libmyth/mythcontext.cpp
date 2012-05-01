@@ -795,46 +795,46 @@ int MythContextPrivate::ChooseBackend(const QString &error)
  */
 int MythContextPrivate::UPnPautoconf(const int milliSeconds)
 {
-    SSDPCacheEntries *backends = NULL;
-    int               count;
-    QString           loc = "UPnPautoconf() - ";
-    QTime             timer;
+    LOG(VB_GENERAL, LOG_INFO, QString("UPNP Search %1 secs")
+        .arg(milliSeconds / 1000));
 
-    SSDP::Instance()->PerformSearch( gBackendURI );
+    SSDP::Instance()->PerformSearch(gBackendURI, milliSeconds / 1000);
 
-    for (timer.start(); timer.elapsed() < milliSeconds; )
+    // Search for a total of 'milliSeconds' ms, sending new search packet
+    // about every 250 ms until less than one second remains.
+    MythTimer totalTime; totalTime.start();
+    MythTimer searchTime; searchTime.start();
+    while (totalTime.elapsed() < milliSeconds)
     {
         usleep(25000);
-        backends = SSDP::Instance()->Find( gBackendURI );
-        if (backends)
-            break;
-#if 0
-        putchar('.');
-#endif
+        int ttl = milliSeconds - totalTime.elapsed();
+        if ((searchTime.elapsed() > 249) && (ttl > 1000))
+        {
+            LOG(VB_GENERAL, LOG_INFO, QString("UPNP Search %1 secs")
+                .arg(ttl / 1000));
+            SSDP::Instance()->PerformSearch(gBackendURI, ttl / 1000);
+            searchTime.start();
+        }
     }
-#if 0
-    putchar('\n');
-#endif
+
+    SSDPCacheEntries *backends = SSDP::Instance()->Find(gBackendURI);
 
     if (!backends)
     {
-        LOG(VB_GENERAL, LOG_INFO, loc + "No UPnP backends found");
+        LOG(VB_GENERAL, LOG_INFO, "No UPnP backends found");
         return 0;
     }
 
-    count = backends->Count();
-    switch (count)
+    int count = backends->Count();
+    if (count)
     {
-        case 0:
-            LOG(VB_GENERAL, LOG_ALERT, loc +
-                "No UPnP backends found, but SSDP::Find() not NULL!");
-            break;
-        case 1:
-            LOG(VB_GENERAL, LOG_INFO, loc + "Found one UPnP backend");
-            break;
-        default:
-            LOG(VB_GENERAL, LOG_INFO, loc +
-                QString("More than one UPnP backend found (%1)") .arg(count));
+        LOG(VB_GENERAL, LOG_INFO,
+            QString("Found %1 UPnP backends").arg(count));
+    }
+    else
+    {
+        LOG(VB_GENERAL, LOG_ERR,
+            "No UPnP backends found, but SSDP::Find() not NULL");
     }
 
     if (count != 1)
