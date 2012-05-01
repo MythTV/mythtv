@@ -23,6 +23,8 @@
  *  methods to allow signalling for alternate socket types.
  */
 
+class PrivUdpSocket;
+
 class PrivTcpServer : public QTcpServer
 {
     Q_OBJECT
@@ -99,8 +101,8 @@ signals:
     QNetworkProxy   m_proxy;
 
     QList<PrivTcpServer*>   m_tcpServers;
-    QList<QUdpSocket*>      m_udpSockets;
-    QUdpSocket             *m_udpSend;
+    QList<PrivUdpSocket*>   m_udpSockets;
+    PrivUdpSocket          *m_lastUdpSocket;
 };
 
 #endif
