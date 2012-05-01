@@ -1,4 +1,3 @@
-
 #include <QNetworkAddressEntry>
 #include <QReadWriteLock>
 #include <QWriteLocker>
@@ -21,6 +20,36 @@ static QList<QNetworkAddressEntry> naList_4;
 static QList<QNetworkAddressEntry> naList_6;
 static QReadWriteLock naLock;
 
+class PrivUdpSocket : public QUdpSocket
+{
+public:
+    PrivUdpSocket(QObject *parent, QNetworkAddressEntry host) :
+        QUdpSocket(parent), m_host(host) { };
+    ~PrivUdpSocket() { };
+    QNetworkAddressEntry host()
+    {
+        return m_host;
+    };
+    bool contains(QHostAddress addr)
+    {
+        return contains(m_host, addr);
+    };
+    static bool contains(QNetworkAddressEntry host, QHostAddress addr)
+    {
+#if !defined(QT_NO_IPV6)
+        if (addr.protocol() == QAbstractSocket::IPv6Protocol &&
+            addr.isInSubnet(QHostAddress::parseSubnet("fe80::/10")) &&
+            host.ip().scopeId() != addr.scopeId())
+        {
+            return false;
+        }
+#endif
+        return addr.isInSubnet(host.ip(), host.prefixLength());
+    }
+private:
+    QNetworkAddressEntry m_host;
+};
+
 PrivTcpServer::PrivTcpServer(QObject *parent) : QTcpServer(parent)
 {
 }
@@ -32,7 +61,7 @@ void PrivTcpServer::incomingConnection(int socket)
 
 ServerPool::ServerPool(QObject *parent) : QObject(parent),
     m_listening(false), m_maxPendingConn(30), m_port(0),
-    m_proxy(QNetworkProxy::DefaultProxy), m_udpSend(NULL)
+    m_proxy(QNetworkProxy::DefaultProxy), m_lastUdpSocket(NULL)
 {
 }
 
@@ -69,6 +98,9 @@ void ServerPool::SelectDefaultListen(bool force)
     QList<QNetworkInterface>::const_iterator qni;
     for (qni = IFs.begin(); qni != IFs.end(); ++qni)
     {
+        if (qni->flags() & QNetworkInterface::IsRunning == 0)
+            continue;
+
         QList<QNetworkAddressEntry> IPs = qni->addressEntries();
         QList<QNetworkAddressEntry>::const_iterator qnai;
         for (qnai = IPs.begin(); qnai != IPs.end(); ++qnai)
@@ -137,20 +169,25 @@ void ServerPool::SelectDefaultListen(bool force)
             else if (config_v6.isNull() &&
                      (ip.protocol() == QAbstractSocket::IPv6Protocol))
             {
-                // IPv6 address is not defined, populate one
-                // put in additional block filtering here?
-                if (!ip.isInSubnet(QHostAddress::parseSubnet("fe80::/10")))
+                bool linklocal = false;
+                if (ip.isInSubnet(QHostAddress::parseSubnet("fe80::/10")))
                 {
-                    LOG(VB_GENERAL, LOG_DEBUG,
-                            QString("Adding '%1' to address list.")
-                                .arg(PRETTYIP_(ip)));
-                    naList_6.append(*qnai);
+                    // Link-local address, find its scope ID (interface name)
+                    QNetworkAddressEntry ae = *qnai;
+                    QHostAddress ha = ip;
+                    ha.setScopeId(qni->name());
+                    ae.setIp(ha);
+                    naList_6.append(ae);
+                    linklocal = true;
                 }
                 else
-                    LOG(VB_GENERAL, LOG_DEBUG, QString("Skipping link-local "
-                            "address during IPv6 autoselection: %1")
-                                .arg(PRETTYIP_(ip)));
-
+                {
+                    naList_6.append(*qnai);
+                }
+                LOG(VB_GENERAL, LOG_DEBUG,
+                        QString("Adding%1 '%2' to address list.")
+                    .arg(linklocal ? " link-local" : "")
+                            .arg(PRETTYIP_(ip)));
             }
 #endif
             else
@@ -267,7 +304,7 @@ void ServerPool::close(void)
         server->deleteLater();
     }
 
-    QUdpSocket *socket;
+    PrivUdpSocket *socket;
     while (!m_udpSockets.isEmpty())
     {
         socket = m_udpSockets.takeLast();
@@ -275,13 +312,7 @@ void ServerPool::close(void)
         socket->close();
         socket->deleteLater();
     }
-
-    if (m_udpSend)
-    {
-        delete m_udpSend;
-        m_udpSend = NULL;
-    }
-
+    m_lastUdpSocket = NULL;
     m_listening = false;
 }
 
@@ -356,15 +387,44 @@ bool ServerPool::bind(QList<QHostAddress> addrs, quint16 port,
 
     for (it = addrs.begin(); it != addrs.end(); ++it)
     {
-        QUdpSocket *socket = new QUdpSocket(this);
-        connect(socket, SIGNAL(readyRead()),
-                this,   SLOT(newUdpDatagram()));
+        QNetworkAddressEntry host;
+
+#if !defined(QT_NO_IPV6)
+        if (it->protocol() == QAbstractSocket::IPv6Protocol)
+        {
+            QList<QNetworkAddressEntry>::iterator iae;
+            for (iae = naList_6.begin(); iae != naList_6.end(); iae++)
+            {
+                if (PrivUdpSocket::contains(*iae, *it))
+                {
+                    host = *iae;
+                    break;
+                }
+            }
+        }
+        else
+#endif
+        {
+            QList<QNetworkAddressEntry>::iterator iae;
+            for (iae = naList_4.begin(); iae != naList_4.end(); iae++)
+            {
+                if (PrivUdpSocket::contains(*iae, *it))
+                {
+                    host = *iae;
+                    break;
+                }
+            }
+        }
+
+        PrivUdpSocket *socket = new PrivUdpSocket(this, host);
 
         if (socket->bind(*it, port))
         {
             LOG(VB_GENERAL, LOG_INFO, QString("Binding to UDP %1:%2")
                     .arg(PRETTYIP(it)).arg(port));
             m_udpSockets.append(socket);
+            connect(socket, SIGNAL(readyRead()),
+                    this,   SLOT(newUdpDatagram()));
         }
         else
         {
@@ -388,9 +448,6 @@ bool ServerPool::bind(QList<QHostAddress> addrs, quint16 port,
     if (m_udpSockets.size() == 0)
         return false;
 
-    if (!m_udpSend)
-        m_udpSend = new QUdpSocket();
-
     m_listening = true;
     return true;
 }
@@ -412,14 +469,38 @@ bool ServerPool::bind(quint16 port, bool requireall)
 qint64 ServerPool::writeDatagram(const char * data, qint64 size,
                                  const QHostAddress &addr, quint16 port)
 {
-    if (!m_listening || !m_udpSend)
+    if (!m_listening || m_udpSockets.size() == 0)
     {
         LOG(VB_GENERAL, LOG_ERR, "Trying to write datagram to disconnected "
                             "ServerPool instance.");
         return -1;
     }
 
-    return m_udpSend->writeDatagram(data, size, addr, port);
+    // check if can re-use the last one, so there's no need for a linear search
+    if (!m_lastUdpSocket || !m_lastUdpSocket->contains(addr))
+    {
+        // find the right socket to use
+        QList<PrivUdpSocket*>::iterator it;
+        for (it = m_udpSockets.begin(); it != m_udpSockets.end(); it++)
+        {
+            PrivUdpSocket *val = *it;
+            if (val->contains(addr))
+            {
+                m_lastUdpSocket = val;
+                break;
+            }
+        }
+    }
+    if (!m_lastUdpSocket)
+        return -1;
+
+    qint64 ret = m_lastUdpSocket->writeDatagram(data, size, addr, port);
+    if (ret != size)
+    {
+        LOG(VB_GENERAL, LOG_DEBUG, QString("Error = %1 : %2")
+                .arg(ret).arg(m_lastUdpSocket->error()));
+    }
+    return ret;
 }
 
 qint64 ServerPool::writeDatagram(const QByteArray &datagram,
