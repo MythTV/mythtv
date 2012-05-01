@@ -878,30 +878,36 @@ bool MythContextPrivate::DefaultUPnP(QString &error)
 
     // ----------------------------------------------------------------------
 
-    SSDP::Instance()->PerformSearch( gBackendURI );
+    int timeout_ms = 2000;
+    LOG(VB_GENERAL, LOG_INFO, QString("UPNP Search up to %1 secs")
+        .arg(timeout_ms / 1000));
+    SSDP::Instance()->PerformSearch(gBackendURI, timeout_ms / 1000);
 
     // ----------------------------------------------------------------------
     // We need to give the server time to respond...
     // ----------------------------------------------------------------------
 
     DeviceLocation *pDevLoc = NULL;
-    QTime           timer;
-
-    for (timer.start(); timer.elapsed() < 5000; )
+    MythTimer totalTime; totalTime.start();
+    MythTimer searchTime; searchTime.start();
+    while (totalTime.elapsed() < timeout_ms)
     {
-        usleep(25000);
         pDevLoc = SSDP::Instance()->Find( gBackendURI, USN );
 
         if (pDevLoc)
             break;
 
-#if 0
-        putchar('.');
-#endif
+        usleep(25000);
+
+        int ttl = timeout_ms - totalTime.elapsed();
+        if ((searchTime.elapsed() > 249) && (ttl > 1000))
+        {
+            LOG(VB_GENERAL, LOG_INFO, QString("UPNP Search up to %1 secs")
+                .arg(ttl / 1000));
+            SSDP::Instance()->PerformSearch(gBackendURI, ttl / 1000);
+            searchTime.start();
+        }
     }
-#if 0
-    putchar('\n');
-#endif
 
     // ----------------------------------------------------------------------
 
