@@ -539,6 +539,72 @@ void ServerPool::newUdpDatagram(void)
  *
  * Description:
  * Tells the server to listen for incoming connections on port port.
+ * The server will attempt to listen on all local interfaces.
+ *
+ * Usage:
+ * baseport: port to listen on.
+ * range:    range of ports to try (default 1)
+ *
+ * Returns port used on success; otherwise returns -1.
+ */
+int ServerPool::tryListeningPort(int baseport, int range)
+{
+    // try a few ports in case the first is in use
+    int port = baseport;
+    while (port < baseport + range)
+    {
+        if (listen(port))
+        {
+            break;
+        }
+        port++;
+    }
+
+    if (port >= baseport + range)
+    {
+        return -1;
+    }
+    return port;
+}
+
+/**
+ * tryBindingPort
+ *
+ * Description:
+ * Binds this socket for incoming connections on port port.
+ * The socket will attempt to bind on all local interfaces.
+ *
+ * Usage:
+ * baseport: port to bind to.
+ * range:    range of ports to try (default 1)
+ *
+ * Returns port used on success; otherwise returns -1.
+ */
+int ServerPool::tryBindingPort(int baseport, int range)
+{
+    // try a few ports in case the first is in use
+    int port = baseport;
+    while (port < baseport + range)
+    {
+        if (bind(port))
+        {
+            break;
+        }
+        port++;
+    }
+
+    if (port >= baseport + range)
+    {
+        return -1;
+    }
+    return port;
+}
+
+/**
+ * tryListeningPort
+ *
+ * Description:
+ * Tells the server to listen for incoming connections on port port.
  * The server will attempt to listen on all IPv6 and IPv4 interfaces.
  * If IPv6 isn't available, the server will listen on all IPv4 network interfaces.
  *
