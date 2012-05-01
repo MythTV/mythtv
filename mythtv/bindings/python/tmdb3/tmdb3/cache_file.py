@@ -169,7 +169,7 @@ class FileCacheObject( CacheObject ):
             try:
                 self._key, self._data = json.loads(self._buff.getvalue())
             except:
-                raise
+                pass
         return self._key
     @key.setter
     def key(self, value): self._key = value
