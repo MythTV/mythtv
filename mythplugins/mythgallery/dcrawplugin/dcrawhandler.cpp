@@ -14,6 +14,7 @@
 #include "exitcodes.h"
 #include "../mythgallery/galleryutil.h"
 #include "mythlogging.h"
+#include "mythmiscutil.h"
 
 namespace
 {
@@ -40,7 +41,7 @@ bool DcrawHandler::canRead() const
         // MythGallery anyway. So for simplicity we give up.
         return false;
 
-    QString command = "dcraw -i " + path;
+    QString command = QString("dcraw -i %1").arg(ShellEscape(path));
     return (myth_system(command) == GENERIC_EXIT_OK);
 }
 
@@ -55,13 +56,12 @@ bool DcrawHandler::read(QImage *image)
         // MythGallery anyway. So for simplicity we give up.
         return false;
 
-    path = "'" + path + "'";
     QStringList arguments;
     arguments << "-c" << "-w" << "-W";
 #ifdef ICC_PROFILE
-    arguments << "-p" << ICC_PROFILE;
+    arguments << "-p" << ShellEscape(ICC_PROFILE);
 #endif // ICC_PROFILE
-    arguments << path;
+    arguments << ShellEscape(path);
 
     uint flags = kMSRunShell | kMSStdOut | kMSBuffered;
     MythSystem ms("dcraw", arguments, flags);
@@ -81,7 +81,7 @@ int DcrawHandler::loadThumbnail(QImage *image, QString fileName)
 {
     QStringList arguments;
     arguments << "-e" << "-c";
-    arguments << "'" + fileName + "'";
+    arguments << ShellEscape(fileName);
 
     uint flags = kMSRunShell | kMSStdOut | kMSBuffered;
     MythSystem ms("dcraw", arguments, flags);

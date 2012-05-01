@@ -1412,21 +1412,9 @@ bool MythRemoveDirectory(QDir &aDir)
     return(has_err);
 }
 
-QString &ShellEscape(QString &string)
+QString ShellEscape(const QString &string)
 {
-    if (string.contains("\""))
-        string = string.replace("\"", "\\\"");
-
-    if (string.contains("\'"))
-        string = string.replace("\'", "\\\'");
-
-    if (string.contains(" "))
-    {
-        string.prepend("\"");
-        string.append("\"");
-    }
-
-    return string;
+    return QString("'%1'").arg(QString(string).replace("'", "'\\''"));
 }
 
 /**
