@@ -363,7 +363,6 @@ void LoggerThread::checkHeartBeat(void)
     loggingGetTimeStamp(&epoch, NULL);
     qlonglong age = (epoch - m_epoch) % 30;
 
-cout << "age " << age << endl;
     if (age == 5)
     {
         launchLogServer();

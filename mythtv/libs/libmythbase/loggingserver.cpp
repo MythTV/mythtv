@@ -75,6 +75,8 @@ typedef QMap<LoggerBase *, ClientList *> RevClientMap;
 static QMutex                       logClientMapMutex;
 static ClientMap                    logClientMap;
 
+static QAtomicInt                   logClientCount;
+
 static QMutex                       logRevClientMapMutex;
 static RevClientMap                 logRevClientMap;
 
@@ -642,9 +644,16 @@ void LogServerThread::run(void)
     logThreadStarted.wakeAll();
     locker.unlock();
     
-    QTimer *timer = new QTimer(this);
-    connect(timer, SIGNAL(timeout()), this, SLOT(checkHeartBeats()));
-    timer->start(1000);
+    m_heartbeatTimer = new QTimer(this);
+    connect(m_heartbeatTimer, SIGNAL(timeout()), this, SLOT(checkHeartBeats()));
+    m_heartbeatTimer->start(1000);
+
+    m_shutdownTimer = new QTimer(this);
+    m_shutdownTimer->setSingleShot(true);
+    connect(m_shutdownTimer, SIGNAL(timeout()),
+            this, SLOT(shutdownTimerExpired()));
+    LOG(VB_GENERAL, LOG_INFO, "Starting 5min shutdown timer");
+    m_shutdownTimer->start(5*60*1000);
 
     while (!m_aborted)
     {
@@ -669,8 +678,16 @@ void LogServerThread::run(void)
 
     logThreadFinished = true;
 
-    timer->stop();
-    delete timer;
+    m_heartbeatTimer->stop();
+    delete m_heartbeatTimer;
+
+    if (m_shutdownTimer)
+    {
+        if (m_shutdownTimer->isActive())
+            m_shutdownTimer->stop();
+        delete m_shutdownTimer;
+        m_shutdownTimer = NULL;
+    }
 
     m_zmqPubSock->setLinger(0);
     m_zmqPubSock->close();
@@ -706,6 +723,19 @@ void LogServerThread::pingClient(QString clientId)
 }
 
 
+/// \brief  Fires off when no clients are left (other than the current daemon)
+///         for 5 minutes.
+void LogServerThread::shutdownTimerExpired(void)
+{
+    m_shutdownTimer->stop();
+    delete m_shutdownTimer;
+    m_shutdownTimer = NULL;
+
+    LOG(VB_GENERAL, LOG_INFO, "Shutting down because of idleness");
+    msleep(500);
+    qApp->quit();
+}
+
 /// \brief  Handles heartbeat checking once a second.  If a client is not heard
 ///         from for at least 1 second, send it a heartbeat message which it
 ///         should send back.  If we haven't heard from it in 5s, shut down its
@@ -739,7 +769,9 @@ void LogServerThread::checkHeartBeats(void)
     while (!toDel.isEmpty())
     {
         QString clientId = toDel.takeFirst();
-        LOG(VB_GENERAL, LOG_INFO, QString("Expiring client %1").arg(clientId));
+        logClientCount.deref();
+        LOG(VB_GENERAL, LOG_INFO, QString("Expiring client %1 (#%2)")
+            .arg(clientId).arg(logClientCount));
         LoggerListItem *item = logClientMap.take(clientId);
         LoggerList *list = item->list;
         delete item;
@@ -762,6 +794,13 @@ void LogServerThread::checkHeartBeats(void)
             clientList->removeAll(clientId);
         }
         delete list;
+    }
+
+    // just this daemon left
+    if (logClientCount == 1 && m_shutdownTimer && !m_shutdownTimer->isActive())
+    {
+        LOG(VB_GENERAL, LOG_INFO, "Starting 5min shutdown timer");
+        m_shutdownTimer->start(5*60*1000);
     }
 }
 
@@ -826,7 +865,17 @@ void LogServerThread::forwardMessage(LogMessage *msg)
         }
         else
         {
-            LOG(VB_GENERAL, LOG_INFO, QString("New Client: %1").arg(clientId));
+            logClientCount.ref();
+            LOG(VB_GENERAL, LOG_INFO, QString("New Client: %1 (#%2)")
+                .arg(clientId).arg(logClientCount));
+
+            if (logClientCount > 1 && m_shutdownTimer &&
+                m_shutdownTimer->isActive())
+            {
+                LOG(VB_GENERAL, LOG_INFO, "Aborting shutdown timer");
+                m_shutdownTimer->stop();
+            }
+
             QMutexLocker lock2(&loggerMapMutex);
             QMutexLocker lock3(&logRevClientMapMutex);
 

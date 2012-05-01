@@ -135,16 +135,21 @@ class LogServerThread : public QObject, public MThread
     void stop(void);
     nzmqt::ZMQContext *getZMQContext(void) { return m_zmqContext; };
   private:
-    bool m_aborted;                 ///< Flag to abort the thread.
+    bool m_aborted;                  ///< Flag to abort the thread.
     nzmqt::ZMQContext *m_zmqContext; ///< ZeroMQ context
-    nzmqt::ZMQSocket *m_zmqInSock;  ///< ZeroMQ feeding socket
-    nzmqt::ZMQSocket *m_zmqPubSock; ///< ZeroMQ publishing socket
+    nzmqt::ZMQSocket *m_zmqInSock;   ///< ZeroMQ feeding socket
+    nzmqt::ZMQSocket *m_zmqPubSock;  ///< ZeroMQ publishing socket
+
+    QTimer *m_heartbeatTimer;        ///< 1s repeating timer for client
+                                     ///  heartbeats
+    QTimer *m_shutdownTimer;         ///< 5 min timer to shut down if no clients
 
     void forwardMessage(LogMessage *msg);
     void pingClient(QString clientId);
   protected slots:
     void receivedMessage(const QList<QByteArray>&);
     void checkHeartBeats(void);
+    void shutdownTimerExpired(void);
 };
 
 class QWaitCondition;
