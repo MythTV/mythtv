@@ -59,7 +59,6 @@ class MythRAOPConnection : public QObject
   public slots:
     void readClient(void);
     void udpDataReady(QByteArray buf, QHostAddress peer, quint16 port);
-    void udpDataReady(void);
     void timeout(void);
     void audioRetry(void);
 
@@ -73,7 +72,6 @@ class MythRAOPConnection : public QObject
     void     ExpireResendRequests(uint64_t timestamp);
     uint32_t decodeAudioPacket(uint8_t type, const QByteArray *buf,
                                QList<AudioData> *dest);
-    void     ProcessAudio();
     int      ExpireAudio(uint64_t timestamp);
     void     ResetAudio(void);
     void     ProcessRequest(const QStringList &header,
@@ -101,7 +99,6 @@ class MythRAOPConnection : public QObject
 
     // utility functions
     int64_t     AudioCardLatency(void);
-    int         findNextBindingPort(QUdpSocket *socket, int port);
     QStringList splitLines(const QByteArray &lines);
     QString     stringFromSeconds(int seconds);
     uint64_t    framesToMs(uint64_t frames);
@@ -118,9 +115,9 @@ class MythRAOPConnection : public QObject
     QHostAddress    m_peerAddress;
     ServerPool     *m_dataSocket;
     int             m_dataPort;
-    QUdpSocket     *m_clientControlSocket;
+    ServerPool     *m_clientControlSocket;
     int             m_clientControlPort;
-    QUdpSocket     *m_clientTimingSocket;
+    ServerPool     *m_clientTimingSocket;
     int             m_clientTimingPort;
 
     // incoming audio
@@ -174,6 +171,9 @@ class MythRAOPConnection : public QObject
     uint32_t        m_progressEnd;
     QByteArray      m_artwork;
     QByteArray      m_dmap;
+
+  private slots:
+    void ProcessAudio(void);
 };
 
 #endif // MYTHRAOPCONNECTION_H
