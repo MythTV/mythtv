@@ -78,6 +78,8 @@ class MBASE_PUBLIC ServerPool : public QObject
 
     void close(void);
 
+    int tryListeningPort(int baseport, int range = 1);
+    int tryBindingPort(int baseport, int range = 1);
     // Utility functions
     static int tryListeningPort(QTcpServer *server, int baseport,
                                 int range = 1, bool *isipv6 = NULL);
