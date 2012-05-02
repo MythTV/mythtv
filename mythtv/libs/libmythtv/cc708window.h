@@ -90,7 +90,7 @@ class CC708CharacterAttribute
     QColor actual_fg_color;
 
     CC708CharacterAttribute(bool isItalic, bool isBold, bool isUnderline,
-                            QColor fgColor, bool hasBackground) :
+                            QColor fgColor) :
         pen_size(k708AttrSizeStandard),
         offset(k708AttrOffsetNormal),
         text_tag(0), // "dialog", ignored
@@ -102,8 +102,7 @@ class CC708CharacterAttribute
         fg_color(k708AttrColorWhite), // will be overridden
         fg_opacity(k708AttrOpacitySolid), // solid
         bg_color(k708AttrColorBlack),
-        bg_opacity(hasBackground ? k708AttrOpacitySolid :
-                   k708AttrOpacityTransparent),
+        bg_opacity(k708AttrOpacitySolid),
         edge_color(k708AttrColorBlack),
         override_fg_color(true),
         actual_fg_color(fgColor)
