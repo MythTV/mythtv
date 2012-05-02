@@ -55,8 +55,26 @@ bool MythRAOPDevice::Create(void)
         gMythRAOPDeviceThread->start(QThread::LowestPriority);
     }
 
+
     LOG(VB_GENERAL, LOG_INFO, LOC + "Created RAOP device objects.");
     return true;
+}
+
+QString MythRAOPDevice::HardwareId()
+{
+    QString key = "AirPlayId";
+    QString id = gCoreContext->GetSetting(key);
+    int size = id.size();
+    if (size == 12)
+        return id;
+
+    QByteArray ba;
+    for (int i = 0; i < RAOP_HARDWARE_ID_SIZE; i++)
+        ba.append((random() % 80) + 33);
+    id = ba.toHex();
+
+    gCoreContext->SaveSetting(key, id);
+    return id;
 }
 
 void MythRAOPDevice::Cleanup(void)
@@ -83,8 +101,7 @@ MythRAOPDevice::MythRAOPDevice()
   : ServerPool(), m_name(QString("MythTV")), m_bonjour(NULL), m_valid(false),
     m_lock(new QMutex(QMutex::Recursive)), m_setupPort(5000)
 {
-    for (int i = 0; i < RAOP_HARDWARE_ID_SIZE; i++)
-        m_hardwareId.append((random() % 80) + 33);
+    m_hardwareId = QByteArray::fromHex(HardwareId().toAscii());
 }
 
 MythRAOPDevice::~MythRAOPDevice()
