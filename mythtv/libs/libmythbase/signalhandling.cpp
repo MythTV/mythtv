@@ -140,11 +140,15 @@ void SignalHandler::handleSignal(void)
         break;
     case SIGSEGV:
         LOG(VB_GENERAL, LOG_CRIT, "Received SIGSEGV");
-        qApp->quit();
+        signal(SIGSEGV, SIG_DFL);
+        usleep(100000);
+        raise(signum);
         break;
     case SIGABRT:
         LOG(VB_GENERAL, LOG_CRIT, "Received SIGABRT");
-        qApp->quit();
+        signal(SIGABRT, SIG_DFL);
+        usleep(100000);
+        raise(signum);
         break;
     case SIGUSR1:
         LOG(VB_GENERAL, LOG_CRIT, "Received SIGUSR1");
