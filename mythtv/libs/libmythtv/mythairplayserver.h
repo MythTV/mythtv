@@ -65,7 +65,7 @@ class MTV_PUBLIC MythAirplayServer : public ServerPool
     QString eventToString(AirplayEvent event);
     void GetPlayerStatus(bool &playing, float &speed, double &position,
                          double &duration);
-    QString GetMacAddress(QTcpSocket *socket);
+    QString GetMacAddress();
     void SendReverseEvent(QByteArray &session, AirplayEvent event);
 
     // Globals
