@@ -2,6 +2,7 @@
 #define LOGGINGSERVER_H_
 
 #include <QMutexLocker>
+#include <QSocketNotifier>
 #include <QMutex>
 #include <QQueue>
 #include <QTime>
@@ -128,6 +129,8 @@ typedef QList<LogMessage *> LogMessageList;
 class LogServerThread : public QObject, public MThread
 {
     Q_OBJECT;
+
+    friend void logSighup(int signum);
   public:
     LogServerThread();
     ~LogServerThread();
@@ -143,6 +146,8 @@ class LogServerThread : public QObject, public MThread
     QTimer *m_heartbeatTimer;        ///< 1s repeating timer for client
                                      ///  heartbeats
     QTimer *m_shutdownTimer;         ///< 5 min timer to shut down if no clients
+    QSocketNotifier *m_sighupNotifier;  ///< Notifier to synchronize to UNIX
+                                        ///  signal SIGHUP safely
 
     void forwardMessage(LogMessage *msg);
     void pingClient(QString clientId);
@@ -150,6 +155,7 @@ class LogServerThread : public QObject, public MThread
     void receivedMessage(const QList<QByteArray>&);
     void checkHeartBeats(void);
     void shutdownTimerExpired(void);
+    void handleSigHup(void);
 };
 
 class QWaitCondition;

@@ -216,11 +216,6 @@ bool setupTVs(bool ismaster, bool &error)
 
 void cleanup(void)
 {
-    signal(SIGTERM, SIG_DFL);
-#ifndef _MSC_VER
-    signal(SIGUSR1, SIG_DFL);
-#endif
-
     if (mainServer)
         mainServer->Stop();
 

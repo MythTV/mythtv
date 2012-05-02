@@ -38,6 +38,7 @@ using namespace std;
 #include "commandlineparser.h"
 #include "mythtranslation.h"
 #include "mythlogging.h"
+#include "signalhandling.h"
 
 // Commercial Flagging headers
 #include "CommDetectorBase.h"
@@ -1125,6 +1126,13 @@ int main(int argc, char *argv[])
         return retval;
 
     CleanupGuard callCleanup(cleanup);
+
+#ifndef _WIN32
+    QList<int> signallist;
+    signallist << SIGINT << SIGTERM << SIGSEGV << SIGABRT;
+    SignalHandler handler(signallist);
+#endif
+
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init( false, /*use gui*/
                          false, /*prompt for backend*/

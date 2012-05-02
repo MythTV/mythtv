@@ -20,6 +20,7 @@ using namespace std;
 #include "mythconfig.h"
 #include "mythcommandlineparser.h"
 #include "mythlogging.h"
+#include "signalhandling.h"
 
 #include "lookup.h"
 
@@ -136,6 +137,12 @@ int main(int argc, char *argv[])
     close(0);
 
     CleanupGuard callCleanup(cleanup);
+
+#ifndef _WIN32
+    QList<int> signallist;
+    signallist << SIGINT << SIGTERM << SIGSEGV << SIGABRT;
+    SignalHandler handler(signallist);
+#endif
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init(false))

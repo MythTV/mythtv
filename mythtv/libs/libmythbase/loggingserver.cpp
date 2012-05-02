@@ -11,6 +11,7 @@
 #include <QMap>
 #include <QRegExp>
 #include <QTimer>
+#include <QSocketNotifier>
 #include <iostream>
 
 using namespace std;
@@ -88,7 +89,8 @@ static QWaitCondition               logMsgListNotEmpty;
 #define MAX_STRING_LENGTH (LOGLINE_MAX+120)
 
 #ifndef _WIN32
-void logSighup( int signum, siginfo_t *info, void *secret );
+static int sighupFd[2];
+void logSighup(int signum);
 #endif
 
 
@@ -600,10 +602,25 @@ void DBLoggerThread::stop(void)
 
 
 
+#ifndef _WIN32
+/// \brief UNIX-side SIGHUP signal handler.  Hand it off to the Qt-size via
+///        a socketpair so Qt code can safely be used.
+
+void logSighup(int signum)
+{
+    (void)signum;
+    char a = 1;
+    int ret = ::write(sighupFd[0], &a, sizeof(a));
+    (void)ret;
+}
+#endif
+
 
 /// \brief LogServerThread constructor.
 LogServerThread::LogServerThread() :
-    MThread("LogServer"), m_aborted(false)
+    MThread("LogServer"), m_aborted(false), m_zmqContext(NULL),
+    m_zmqInSock(NULL), m_zmqPubSock(NULL), m_heartbeatTimer(NULL),
+    m_shutdownTimer(NULL), m_sighupNotifier(NULL)
 {
     moveToThread(qthread());
 }
@@ -624,6 +641,26 @@ void LogServerThread::run(void)
 
     logThreadFinished = false;
     QMutexLocker locker(&logThreadStartedMutex);
+
+#ifndef _WIN32
+    if (::socketpair(AF_UNIX, SOCK_STREAM, 0, sighupFd))
+    {
+        LOG(VB_GENERAL, LOG_ERR, "Couldn't create HUP socketpair");
+        qApp->quit();
+    }
+    m_sighupNotifier = new QSocketNotifier(sighupFd[1], QSocketNotifier::Read,
+                                           this);
+    connect(m_sighupNotifier, SIGNAL(activated(int)),
+            this, SLOT(handleSigHup()));
+
+    /* Setup SIGHUP */
+    LOG(VB_GENERAL, LOG_NOTICE, "Setting up SIGHUP handler");
+    struct sigaction sa;
+    sa.sa_handler = logSighup;
+    sigemptyset( &sa.sa_mask );
+    sa.sa_flags = SA_RESTART;
+    sigaction( SIGHUP, &sa, NULL );
+#endif
 
     qRegisterMetaType<QList<QByteArray> >("QList<QByteArray>");
 
@@ -678,6 +715,19 @@ void LogServerThread::run(void)
 
     logThreadFinished = true;
 
+    delete m_sighupNotifier;
+
+#ifndef _WIN32
+    ::close(sighupFd[0]);
+    ::close(sighupFd[1]);
+
+    /* Tear down SIGHUP */
+    sa.sa_handler = SIG_DFL;
+    sigemptyset( &sa.sa_mask );
+    sa.sa_flags = SA_RESTART;
+    sigaction( SIGHUP, &sa, NULL );
+#endif
+
     m_heartbeatTimer->stop();
     delete m_heartbeatTimer;
 
@@ -720,6 +770,30 @@ void LogServerThread::pingClient(QString clientId)
     QByteArray clientBa = QByteArray::fromHex(clientId.toLocal8Bit());
     msg << clientBa << QByteArray("");
     m_zmqInSock->sendMessage(msg);
+}
+
+/// \brief  SIGHUP handler - reopen all open logfiles for logrollers
+void LogServerThread::handleSigHup(void)
+{
+#ifndef _WIN32
+    m_sighupNotifier->setEnabled(false);
+
+    char tmp;
+    int ret = ::read(sighupFd[1], &tmp, sizeof(tmp));
+    (void)ret;
+
+    LOG(VB_GENERAL, LOG_INFO, "SIGHUP received, rolling log files.");
+
+    /* SIGHUP was sent.  Close and reopen debug logfiles */
+    QMutexLocker locker(&loggerMapMutex);
+    QMap<QString, LoggerBase *>::iterator it;
+    for (it = loggerMap.begin(); it != loggerMap.end(); ++it)
+    {
+        it.value()->reopen();
+    }
+
+    m_sighupNotifier->setEnabled(true);
+#endif
 }
 
 
@@ -1017,22 +1091,6 @@ static QTime memory_time;
 #endif
 
 
-#ifndef _WIN32
-/// \brief  SIGHUP handler - reopen all open logfiles for logrollers
-void logSighup( int signum, siginfo_t *info, void *secret )
-{
-    LOG(VB_GENERAL, LOG_INFO, "SIGHUP received, rolling log files.");
-
-    /* SIGHUP was sent.  Close and reopen debug logfiles */
-    QMutexLocker locker(&loggerMapMutex);
-    QMap<QString, LoggerBase *>::iterator it;
-    for (it = loggerMap.begin(); it != loggerMap.end(); ++it)
-    {
-        it.value()->reopen();
-    }
-}
-#endif
-
 
 /// \brief  Entry point to start logging for the application.  This will
 ///         start up all of the threads needed.
@@ -1054,16 +1112,6 @@ void logServerStart(void)
     if (!logServerThread)
         logServerThread = new LogServerThread();
 
-#ifndef _WIN32
-    /* Setup SIGHUP */
-    LOG(VB_GENERAL, LOG_NOTICE, "Setting up SIGHUP handler");
-    struct sigaction sa;
-    sa.sa_sigaction = logSighup;
-    sigemptyset( &sa.sa_mask );
-    sa.sa_flags = SA_RESTART | SA_SIGINFO;
-    sigaction( SIGHUP, &sa, NULL );
-#endif
-
     QMutexLocker locker(&logThreadStartedMutex);
     logServerThread->start();
     logThreadStarted.wait(locker.mutex());
@@ -1078,15 +1126,6 @@ void logServerStop(void)
         logServerThread->stop();
         logServerThread->wait();
     }
-
-#ifndef _WIN32
-    /* Tear down SIGHUP */
-    struct sigaction sa;
-    sa.sa_handler = SIG_DFL;
-    sigemptyset( &sa.sa_mask );
-    sa.sa_flags = SA_RESTART;
-    sigaction( SIGHUP, &sa, NULL );
-#endif
 
     QMutexLocker locker(&loggerMapMutex);
     QMap<QString, LoggerBase *>::iterator it;

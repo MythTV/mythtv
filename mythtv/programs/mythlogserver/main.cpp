@@ -21,6 +21,7 @@ using namespace std;
 #include "ringbuffer.h"
 #include "exitcodes.h"
 #include "loggingserver.h"
+#include "signalhandling.h"
 
 namespace {
     void cleanup()
@@ -48,13 +49,6 @@ namespace {
       private:
         CleanupFunc m_cleanFunction;
     };
-}
-
-static void qt_exit(int)
-{
-    signal(SIGINT, SIG_DFL);
-    signal(SIGTERM, SIG_DFL);
-    qApp->exit(GENERIC_EXIT_OK);
 }
 
 int main(int argc, char *argv[])
@@ -99,8 +93,12 @@ int main(int argc, char *argv[])
         close(0);
 
     CleanupGuard callCleanup(cleanup);
-    signal(SIGINT, qt_exit);
-    signal(SIGTERM, qt_exit);
+
+#ifndef _WIN32
+    QList<int> signallist;
+    signallist << SIGINT << SIGTERM << SIGSEGV << SIGABRT;
+    SignalHandler handler(signallist);
+#endif
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init(false))

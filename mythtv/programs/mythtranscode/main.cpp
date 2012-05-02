@@ -26,6 +26,7 @@ using namespace std;
 #include "mythlogging.h"
 #include "commandlineparser.h"
 #include "recordinginfo.h"
+#include "signalhandling.h"
 
 static void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist,
                         frm_dir_map_t *deleteMap, int &resultCode);
@@ -371,6 +372,13 @@ int main(int argc, char *argv[])
         passthru = true;
 
     CleanupGuard callCleanup(cleanup);
+
+#ifndef _WIN32
+    QList<int> signallist;
+    signallist << SIGINT << SIGTERM << SIGSEGV << SIGABRT;
+    SignalHandler handler(signallist);
+#endif
+
     //  Load the context
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init(false))

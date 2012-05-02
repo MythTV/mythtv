@@ -39,6 +39,7 @@
 #include "expertsettingseditor.h"
 #include "commandlineparser.h"
 #include "profilegroup.h"
+#include "signalhandling.h"
 
 using namespace std;
 
@@ -264,6 +265,12 @@ int main(int argc, char *argv[])
     }
 
     CleanupGuard callCleanup(cleanup);
+
+#ifndef _WIN32
+    QList<int> signallist;
+    signallist << SIGINT << SIGTERM << SIGSEGV << SIGABRT;
+    SignalHandler handler(signallist);
+#endif
 
 #ifdef Q_WS_MACX
     // Without this, we can't set focus to any of the CheckBoxSetting, and most
