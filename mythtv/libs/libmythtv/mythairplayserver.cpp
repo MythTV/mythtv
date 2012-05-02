@@ -327,51 +327,43 @@ void MythAirplayServer::Start(void)
     // start listening for connections
     // try a few ports in case the default is in use
     int baseport = m_setupPort;
-    while (m_setupPort < baseport + AIRPLAY_PORT_RANGE)
+    m_setupPort = tryListeningPort(m_setupPort, AIRPLAY_PORT_RANGE);
+    if (m_setupPort < 0)
     {
-        if (listen(QNetworkInterface::allAddresses(), m_setupPort, false))
-        {
-            LOG(VB_GENERAL, LOG_INFO, LOC +
-                QString("Listening for connections on port %1")
-                    .arg(m_setupPort));
-            break;
-        }
-        m_setupPort++;
-    }
-
-    if (m_setupPort >= baseport + AIRPLAY_PORT_RANGE)
         LOG(VB_GENERAL, LOG_ERR, LOC +
                 "Failed to find a port for incoming connections.");
-
-    // announce service
-    m_bonjour = new BonjourRegister(this);
-    if (!m_bonjour)
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create Bonjour object.");
-        return;
     }
-
-    // give each frontend a unique name
-    int multiple = m_setupPort - baseport;
-    if (multiple > 0)
-        m_name += QString::number(multiple);
-
-    QByteArray name = m_name.toUtf8();
-    name.append(" on ");
-    name.append(gCoreContext->GetHostName());
-    QByteArray type = "_airplay._tcp";
-    QByteArray txt;
-    txt.append(26); txt.append("deviceid=00:00:00:00:00:00");
-    txt.append(13); txt.append("features=0x77");
-    txt.append(16); txt.append("model=AppleTV2,1");
-    txt.append(14); txt.append("srcvers=101.28");
-
-    if (!m_bonjour->Register(m_setupPort, type, name, txt))
+    else
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to register service.");
-        return;
-    }
+        // announce service
+        m_bonjour = new BonjourRegister(this);
+        if (!m_bonjour)
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create Bonjour object.");
+            return;
+        }
 
+        // give each frontend a unique name
+        int multiple = m_setupPort - baseport;
+        if (multiple > 0)
+            m_name += QString::number(multiple);
+
+        QByteArray name = m_name.toUtf8();
+        name.append(" on ");
+        name.append(gCoreContext->GetHostName());
+        QByteArray type = "_airplay._tcp";
+        QByteArray txt;
+        txt.append(26); txt.append("deviceid=00:00:00:00:00:00");
+        txt.append(13); txt.append("features=0x77");
+        txt.append(16); txt.append("model=AppleTV2,1");
+        txt.append(14); txt.append("srcvers=101.28");
+
+        if (!m_bonjour->Register(m_setupPort, type, name, txt))
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to register service.");
+            return;
+        }
+    }
     m_valid = true;
     return;
 }
