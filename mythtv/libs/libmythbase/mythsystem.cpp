@@ -63,7 +63,23 @@ MythSystem::MythSystem(const QString &command, uint flags)
  */
 void MythSystem::SetCommand(const QString &command, uint flags)
 {
-    SetCommand(command, QStringList(), flags | kMSRunShell);
+    if (flags & kMSRunShell)
+        SetCommand(command, QStringList(), flags);
+    else
+    {
+        QString abscommand;
+        QStringList args;
+        if (!d->ParseShell(command, abscommand, args))
+        {
+            LOG(VB_GENERAL, LOG_ERR,
+                    QString("MythSystem(%1) command not understood")
+                            .arg(command));
+            m_status = GENERIC_EXIT_INVALID_CMDLINE;
+            return;
+        }
+
+        SetCommand(abscommand, args, flags);
+    }
 }
 
 
