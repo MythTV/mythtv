@@ -368,7 +368,7 @@ bool MythContextPrivate::FindDatabase(bool prompt, bool noAutodetect)
         int count = UPnPautoconf();
 
         if (count == 0)
-            failure = "No UPnP backends found";
+            failure = QObject::tr("No UPnP backends found", "Backend Setup");
 
         if (count == 1)
         {
@@ -682,7 +682,9 @@ QString MythContextPrivate::TestDBconnection(void)
     if (doPing && !ping(host, 3))  // Fail after trying for 3 seconds
     {
         SilenceDBerrors();
-        err = QObject::tr("Cannot find (ping) database host %1 on the network");
+        err = QObject::tr(
+            "Cannot find (ping) database host %1 on the network",
+            "Backend Setup");
         return err.arg(host);
     }
 
@@ -695,7 +697,7 @@ QString MythContextPrivate::TestDBconnection(void)
     if (!MSqlQuery::testDBConnection())
     {
         SilenceDBerrors();
-        return QObject::tr("Cannot login to database?");
+        return QObject::tr("Cannot login to database", "Backend Setup");
     }
 
 
