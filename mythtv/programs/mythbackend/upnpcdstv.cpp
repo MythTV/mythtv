@@ -71,7 +71,7 @@ UPnpCDSRootInfo UPnpCDSTv::g_RootNodes[] =
             "ORDER BY title",
         "WHERE title=:KEY", "starttime" },
         
-    {   "By Title",
+    {   "By Title (ordered by subtitle)",
         "title",
         "SELECT title as id, "
           "title as name, "
@@ -80,7 +80,7 @@ UPnpCDSRootInfo UPnpCDSTv::g_RootNodes[] =
             "%1 "
             "GROUP BY title "
             "ORDER BY title",
-        "WHERE title=:KEY", "title" },
+        "WHERE title=:KEY", "subtitle" },
 
     {   "By Genre",
         "category",
