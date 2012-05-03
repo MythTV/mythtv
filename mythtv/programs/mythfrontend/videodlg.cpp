@@ -3397,12 +3397,16 @@ void VideoDialog::VideoAutoSearch(MythGenericTree *node)
 
 void VideoDialog::ToggleWatched()
 {
-    VideoMetadata *metadata = GetMetadata(GetItemCurrent());
+    MythUIButtonListItem *item = GetItemCurrent();
+    if (!item)
+        return;
+
+    VideoMetadata *metadata = GetMetadata(item);
     if (metadata)
     {
         metadata->SetWatched(!metadata->GetWatched());
         metadata->UpdateDatabase();
-        GetItemCurrent()->DisplayState(WatchedToState(metadata->GetWatched()),
+        item->DisplayState(WatchedToState(metadata->GetWatched()),
                                        "watchedstate");
     }
 }
