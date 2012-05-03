@@ -49,6 +49,28 @@ UPnpCDSRootInfo UPnpCDSTv::g_RootNodes[] =
             "ORDER BY starttime DESC",
         "", "starttime DESC" },
 
+    {   "By Title (newest first)",
+        "title",
+        "SELECT title as id, "
+          "title as name, "
+          "count( title ) as children "
+            "FROM recorded "
+            "%1 "
+            "GROUP BY title "
+            "ORDER BY title",
+        "WHERE title=:KEY", "starttime DESC" },
+
+    {   "By Title (oldest first)",
+        "title",
+        "SELECT title as id, "
+          "title as name, "
+          "count( title ) as children "
+            "FROM recorded "
+            "%1 "
+            "GROUP BY title "
+            "ORDER BY title",
+        "WHERE title=:KEY", "starttime" },
+        
     {   "By Title",
         "title",
         "SELECT title as id, "
