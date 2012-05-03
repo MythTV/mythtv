@@ -96,6 +96,10 @@ void MythUtilCommandLineParser::LoadArguments(void)
                 "local database settings cache used by each program, causing "
                 "options to be re-read from the database upon next use.")
                 ->SetGroup("Backend")
+        << add("--parse-video-filename", "parsevideo", "", "",
+                "Diagnostic tool for testing filename formats against what "
+                "the Video Library name parser will detect them as.")
+                ->SetGroup("Backend")
 
         // jobutils.cpp
         << add("--queuejob", "queuejob", "",

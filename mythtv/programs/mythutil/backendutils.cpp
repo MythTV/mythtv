@@ -1,8 +1,12 @@
+// C++ includes
+#include <iostream>
+
 // libmyth* headers
 #include "exitcodes.h"
 #include "mythcorecontext.h"
 #include "mythlogging.h"
 #include "remoteutil.h"
+#include "videometadata.h"
 
 // local headers
 #include "backendutils.h"
@@ -79,6 +83,21 @@ static int ScanVideos(const MythUtilCommandLineParser &cmdline)
     return GENERIC_EXIT_CONNECT_ERROR;
 }
 
+static int ParseVideoFilename(const MythUtilCommandLineParser &cmdline)
+{
+    QString filename = cmdline.toString("parsevideo");
+    cout << "Title:    " << VideoMetadata::FilenameToMeta(filename, 1)
+                                            .toLocal8Bit().constData() << endl
+         << "Season:   " << VideoMetadata::FilenameToMeta(filename, 2)
+                                            .toLocal8Bit().constData() << endl
+         << "Episode:  " << VideoMetadata::FilenameToMeta(filename, 3)
+                                            .toLocal8Bit().constData() << endl
+         << "Subtitle: " << VideoMetadata::FilenameToMeta(filename, 4)
+                                            .toLocal8Bit().constData() << endl;
+
+    return GENERIC_EXIT_OK;
+}
+
 void registerBackendUtils(UtilMap &utilMap)
 {
     utilMap["clearcache"]           = &ClearSettingsCache;
@@ -86,6 +105,7 @@ void registerBackendUtils(UtilMap &utilMap)
     utilMap["resched"]              = &Reschedule;
     utilMap["scanvideos"]           = &ScanVideos;
     utilMap["systemevent"]          = &SendSystemEvent;
+    utilMap["parsevideo"]           = &ParseVideoFilename;
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
