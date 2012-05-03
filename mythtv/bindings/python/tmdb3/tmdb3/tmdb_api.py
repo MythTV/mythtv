@@ -22,7 +22,7 @@ for search and retrieval of text metadata and image URLs from TMDB.
 Preliminary API specifications can be found at
 http://help.themoviedb.org/kb/api/about-3"""
 
-__version__="v0.6.1"
+__version__="v0.6.2"
 # 0.1.0 Initial development
 # 0.2.0 Add caching mechanism for API queries
 # 0.2.1 Temporary work around for broken search paging
@@ -44,6 +44,7 @@ __version__="v0.6.1"
 # 0.5.0 Rework cache framework and improve file cache performance
 # 0.6.0 Add user authentication support
 # 0.6.1 Add adult filtering for people searches
+# 0.6.2 Add similar movie search for Movie objects
 
 from request import set_key, Request
 from util import Datapoint, Datalist, Datadict, Element, NameRepr, SearchRepr
@@ -459,6 +460,13 @@ class Movie( Element ):
         req.lifetime = 0
         req.add_data({'value':value})
         req.readJSON()
+
+    def getSimilar(self):
+        res = MovieSearchResult(Request('movie/{0}/similar_movies'\
+                                                            .format(self.id)),
+                                        locale=self._locale)
+        res._name = 'Similar to {0}'.format(self._printable_name())
+        return res
 
     def _printable_name(self):
         if self.title is not None:
