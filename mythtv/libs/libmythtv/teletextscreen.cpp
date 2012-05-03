@@ -10,6 +10,7 @@
 #include "mythuiimage.h"
 #include "mythpainter.h"
 #include "teletextscreen.h"
+#include "subtitlescreen.h"
 
 #define LOC QString("TeletextScreen: ")
 
@@ -678,15 +679,19 @@ void TeletextScreen::DrawStatus(void)
 bool TeletextScreen::InitialiseFont()
 {
     static bool initialised = false;
-    QString font = gCoreContext->GetSetting("DefaultSubtitleFont", "FreeMono");
+    //QString font = gCoreContext->GetSetting("DefaultSubtitleFont", "FreeMono");
     if (initialised)
     {
+        return true;
+#if 0
         if (gTTFont->face().family() == font)
             return true;
         delete gTTFont;
+#endif // 0
     }
 
     MythFontProperties *mythfont = new MythFontProperties();
+    QString font = SubtitleScreen::GetTeletextFontName();
     if (mythfont)
     {
         QFont newfont(font);

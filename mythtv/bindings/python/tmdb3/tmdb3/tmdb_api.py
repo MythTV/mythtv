@@ -59,6 +59,9 @@ import datetime
 
 DEBUG = False
 
+def process_date(datestr):
+    return datetime.date(*[int(x) for x in datestr.split('-')])
+
 class Configuration( Element ):
     images = Datapoint('images')
     def _populate(self):
@@ -176,10 +179,8 @@ class Person( Element ):
     id          = Datapoint('id', initarg=1)
     name        = Datapoint('name')
     biography   = Datapoint('biography')
-    dayofbirth  = Datapoint('birthday', default=None, handler=lambda x: \
-                                         datetime.datetime.strptime(x, '%Y-%m-%d'))
-    dayofdeath  = Datapoint('deathday', default=None, handler=lambda x: \
-                                         datetime.datetime.strptime(x, '%Y-%m-%d'))
+    dayofbirth  = Datapoint('birthday', default=None, handler=process_date)
+    dayofdeath  = Datapoint('deathday', default=None, handler=process_date)
     homepage    = Datapoint('homepage')
     birthplace  = Datapoint('place_of_birth')
     profile     = Datapoint('profile_path', handler=Profile, raw=False)
@@ -226,8 +227,7 @@ class Keyword( Element ):
 class Release( Element ):
     certification   = Datapoint('certification')
     country         = Datapoint('iso_3166_1')
-    releasedate     = Datapoint('release_date', handler=lambda x: \
-                                         datetime.datetime.strptime(x, '%Y-%m-%d'))
+    releasedate     = Datapoint('release_date', handler=process_date)
     def __repr__(self):
         return u"<Release {0.country}, {0.releasedate}>".format(self)
 
@@ -385,8 +385,7 @@ class Movie( Element ):
     runtime         = Datapoint('runtime')
     budget          = Datapoint('budget')
     revenue         = Datapoint('revenue')
-    releasedate     = Datapoint('release_date', handler=lambda x: \
-                                datetime.datetime.strptime(x, '%Y-%m-%d'))
+    releasedate     = Datapoint('release_date', handler=process_date)
     homepage        = Datapoint('homepage')
     imdb            = Datapoint('imdb_id')
 

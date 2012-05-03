@@ -9,11 +9,12 @@
 #               http://www.mythtv.org/wiki/MythVideo_Grabber_Script_Format
 #               http://help.themoviedb.org/kb/api/about-3
 #-----------------------
-__title__ = "TheMovieDB.org"
+__title__ = "TheMovieDB.org V3"
 __author__ = "Raymond Wagner"
-__version__ = "0.2.0"
+__version__ = "0.3.0"
 # 0.1.0 Initial version
 # 0.2.0 Add language support, move cache to home directory
+# 0.3.0 Enable version detection to allow use in MythTV
 
 from MythTV.tmdb3 import searchMovie, Movie, Collection, set_key, set_cache, set_locale
 from MythTV import VideoMetadata
@@ -32,9 +33,11 @@ def buildSingle(inetref):
                ['budget',       'budget'],      ['revenue',     'revenue']]
     m = VideoMetadata()
     for i,j in mapping:
-        setattr(m, i, getattr(movie, j))
+        if getattr(movie, j):
+            setattr(m, i, getattr(movie, j))
     m.inetref = str(movie.id)
-    m.year = movie.releasedate.year
+    if movie.releasedate:
+        m.year = movie.releasedate.year
     if movie.collection:
         m.collectionref = str(movie.collection.id)
     for country, release in movie.releases.items():
@@ -63,26 +66,47 @@ def buildSingle(inetref):
         m.images.append({'type':'coverart', 'url':poster.geturl(),
                         'thumb':poster.geturl(poster.sizes()[0])})
     tree.append(m.toXML())
-    sys.stdout.write(etree.tostring(tree, encoding='UTF-8', pretty_print=True))
+    sys.stdout.write(etree.tostring(tree, encoding='UTF-8', pretty_print=True,
+                                    xml_declaration=True))
     sys.exit()
 
 def buildList(query):
+    # TEMPORARY FIX:
+    # remove all dashes from queries to work around search behavior
+    # as negative to all text that comes afterwards
+    query = query.replace('-','')
     results = searchMovie(query)
     tree = etree.XML(u'<metadata></metadata>')
     mapping = [['runtime',      'runtime'],     ['title',       'originaltitle'],
                ['releasedate',  'releasedate'], ['tagline',     'tagline'],
                ['description',  'overview'],    ['homepage',    'homepage'],
                ['userrating',   'userrating'],  ['popularity',  'popularity']]
+
+    count = 0
     for res in results:
         m = VideoMetadata()
         for i,j in mapping:
-            setattr(m, i, getattr(res, j))
+            if getattr(res, j):
+                setattr(m, i, getattr(res, j))
         m.inetref = str(res.id)
-        m.year = res.releasedate.year
-        m.images.append({'type':'fanart', 'url':res.backdrop.geturl()})
-        m.images.append({'type':'coverart', 'url':res.poster.geturl()})
+        if res.releasedate:
+            m.year = res.releasedate.year
+        if res.backdrop:
+            b = res.backdrop
+            m.images.append({'type':'fanart', 'url':b.geturl(),
+                             'thumb':b.geturl(b.sizes()[0])})
+        if res.poster:
+            p = res.poster
+            m.images.append({'type':'coverart', 'url':p.geturl(),
+                             'thumb':p.geturl(p.sizes()[0])})
         tree.append(m.toXML())
-    sys.stdout.write(etree.tostring(tree, encoding='UTF-8', pretty_print=True))
+        count += 1
+        if count >= 60:
+            # page limiter, dont want to overload the server
+            break
+
+    sys.stdout.write(etree.tostring(tree, encoding='UTF-8', pretty_print=True,
+                                    xml_declaration=True))
     sys.exit(0)
 
 def buildCollection(inetref):
@@ -92,13 +116,16 @@ def buildCollection(inetref):
     m.collectionref = str(collection.id)
     m.title = collection.name
     if collection.backdrop:
-        m.images.append({'type':'fanart', 'url':collection.backdrop.geturl(),
-                  'thumb':collection.backdrop.geturl(collection.backdrop.sizes()[0])})
+        b = collection.backdrop
+        m.images.append({'type':'fanart', 'url':b.geturl(),
+                  'thumb':b.geturl(b.sizes()[0])})
     if collection.poster:
-        m.images.append({'type':'coverart', 'url':collection.poster.geturl(),
-                  'thumb':collection.poster.geturl(collection.poster.sizes()[0])})
+        p = collection.poster
+        m.images.append({'type':'coverart', 'url':p.geturl(),
+                  'thumb':p.geturl(p.sizes()[0])})
     tree.append(m.toXML())
-    sys.stdout.write(etree.tostring(tree, encoding='UTF-8', pretty_print=True))
+    sys.stdout.write(etree.tostring(tree, encoding='UTF-8', pretty_print=True,
+                                    xml_declaration=True))
     sys.exit()
 
 def buildVersion():
@@ -111,7 +138,8 @@ def buildVersion():
     etree.SubElement(version, "description").text = \
                                 'Search and metadata downloads for themoviedb.org'
     etree.SubElement(version, "version").text = __version__
-    sys.stdout.write(etree.tostring(version, encoding='UTF-8', pretty_print=True))
+    sys.stdout.write(etree.tostring(version, encoding='UTF-8', pretty_print=True,
+                                    xml_declaration=True))
     sys.exit(0)
 
 def main():
@@ -120,8 +148,8 @@ def main():
 
     parser = OptionParser()
 
-#    parser.add_option('-v', "--version", action="store_true", default=False,
-#                      dest="version", help="Display version and author")
+    parser.add_option('-v', "--version", action="store_true", default=False,
+                      dest="version", help="Display version and author")
     parser.add_option('-M', "--movielist", action="store_true", default=False,
                       dest="movielist", help="Get Movies matching search.")
     parser.add_option('-D', "--moviedata", action="store_true", default=False,
@@ -133,8 +161,8 @@ def main():
 
     opts, args = parser.parse_args()
 
-#    if opts.version:
-#        buildVersion()
+    if opts.version:
+        buildVersion()
 
     if opts.language:
         set_locale(language=opts.language, fallthrough=True)

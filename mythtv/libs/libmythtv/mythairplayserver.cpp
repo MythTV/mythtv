@@ -3,8 +3,6 @@
 // race on startup?
 // http date format and locale
 // GET scrub on iOS 5
-// binary plist for non mac
-// same mac address for bonjour service and server-info
 
 #include <QTcpSocket>
 #include <QNetworkInterface>
@@ -22,6 +20,7 @@
 
 #include "bonjourregister.h"
 #include "mythairplayserver.h"
+#include "mythraopdevice.h"
 
 MythAirplayServer* MythAirplayServer::gMythAirplayServer = NULL;
 MThread*           MythAirplayServer::gMythAirplayServerThread = NULL;
@@ -327,51 +326,43 @@ void MythAirplayServer::Start(void)
     // start listening for connections
     // try a few ports in case the default is in use
     int baseport = m_setupPort;
-    while (m_setupPort < baseport + AIRPLAY_PORT_RANGE)
+    m_setupPort = tryListeningPort(m_setupPort, AIRPLAY_PORT_RANGE);
+    if (m_setupPort < 0)
     {
-        if (listen(QNetworkInterface::allAddresses(), m_setupPort, false))
-        {
-            LOG(VB_GENERAL, LOG_INFO, LOC +
-                QString("Listening for connections on port %1")
-                    .arg(m_setupPort));
-            break;
-        }
-        m_setupPort++;
-    }
-
-    if (m_setupPort >= baseport + AIRPLAY_PORT_RANGE)
         LOG(VB_GENERAL, LOG_ERR, LOC +
                 "Failed to find a port for incoming connections.");
-
-    // announce service
-    m_bonjour = new BonjourRegister(this);
-    if (!m_bonjour)
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create Bonjour object.");
-        return;
     }
-
-    // give each frontend a unique name
-    int multiple = m_setupPort - baseport;
-    if (multiple > 0)
-        m_name += QString::number(multiple);
-
-    QByteArray name = m_name.toUtf8();
-    name.append(" on ");
-    name.append(gCoreContext->GetHostName());
-    QByteArray type = "_airplay._tcp";
-    QByteArray txt;
-    txt.append(26); txt.append("deviceid=00:00:00:00:00:00");
-    txt.append(13); txt.append("features=0x77");
-    txt.append(16); txt.append("model=AppleTV2,1");
-    txt.append(14); txt.append("srcvers=101.28");
-
-    if (!m_bonjour->Register(m_setupPort, type, name, txt))
+    else
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to register service.");
-        return;
-    }
+        // announce service
+        m_bonjour = new BonjourRegister(this);
+        if (!m_bonjour)
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create Bonjour object.");
+            return;
+        }
 
+        // give each frontend a unique name
+        int multiple = m_setupPort - baseport;
+        if (multiple > 0)
+            m_name += QString::number(multiple);
+
+        QByteArray name = m_name.toUtf8();
+        name.append(" on ");
+        name.append(gCoreContext->GetHostName());
+        QByteArray type = "_airplay._tcp";
+        QByteArray txt;
+        txt.append(26); txt.append("deviceid="); txt.append(GetMacAddress());
+        txt.append(14); txt.append("features=0x219");
+        txt.append(16); txt.append("model=AppleTV2,1");
+        txt.append(14); txt.append("srcvers=101.28");
+
+        if (!m_bonjour->Register(m_setupPort, type, name, txt))
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to register service.");
+            return;
+        }
+    }
     m_valid = true;
     return;
 }
@@ -524,7 +515,7 @@ void MythAirplayServer::HandleResponse(APHTTPRequest *req,
     {
         content_type = "text/x-apple-plist+xml\r\n";
         body = SERVER_INFO;
-        body.replace("%1", GetMacAddress(socket));
+        body.replace("%1", GetMacAddress());
         LOG(VB_GENERAL, LOG_INFO, body);
     }
     else if (req->GetURI() == "/scrub")
@@ -793,34 +784,20 @@ void MythAirplayServer::GetPlayerStatus(bool &playing, float &speed,
         duration = state["totalseconds"].toDouble();
 }
 
-QString MythAirplayServer::GetMacAddress(QTcpSocket *socket)
+QString MythAirplayServer::GetMacAddress()
 {
-    if (!socket)
-        return "";
+    QString id = MythRAOPDevice::HardwareId();
 
-    QString res("");
-    QString fallback("");
-
-    foreach(QNetworkInterface interface, QNetworkInterface::allInterfaces())
+    QString res;
+    for (int i = 1; i <= id.size(); i++)
     {
-        if (!(interface.flags() & QNetworkInterface::IsLoopBack))
+        res.append(id[i-1]);
+        if (i % 2 == 0 && i != id.size())
         {
-            fallback = interface.hardwareAddress();
-            QList<QNetworkAddressEntry> entries = interface.addressEntries();
-            foreach (QNetworkAddressEntry entry, entries)
-                if (entry.ip() == socket->localAddress())
-                    res = fallback;
+            res.append(':');
         }
     }
-
-    if (res.isEmpty())
-    {
-        LOG(VB_GENERAL, LOG_WARNING, LOC + "Using fallback MAC address.");
-        res = fallback;
-    }
-
-    if (res.isEmpty())
-        LOG(VB_GENERAL, LOG_ERR, LOC + "Didn't find MAC address.");
-
+    QByteArray ba = res.toAscii();
+    const char *t = ba.constData();
     return res;
 }

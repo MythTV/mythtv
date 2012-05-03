@@ -1405,23 +1405,6 @@ static HostSpinBox *OSDCC708TextZoomPercentage(void)
     return gs;
 }
 
-static HostComboBox *SubtitleFont()
-{
-    HostComboBox *hcb = new HostComboBox("DefaultSubtitleFont");
-    QFontDatabase db;
-    QStringList fonts = db.families();
-    QStringList hide  = db.families(QFontDatabase::Symbol);
-
-    hcb->setLabel(QObject::tr("Subtitle Font"));
-    hcb->setHelpText(QObject::tr("The font to use for text based subtitles."));
-    foreach (QString font, fonts)
-    {
-        if (!hide.contains(font))
-            hcb->addSelection(font, font, font.toLower() == "freemono");
-    }
-    return hcb;
-}
-
 static HostComboBox *SubtitleCodec()
 {
     HostComboBox *gc = new HostComboBox("SubtitleCodec");
@@ -1485,18 +1468,6 @@ static HostSpinBox *YScanDisplacement()
     gs->setHelpText(QObject::tr("Adjust this to move the image vertically."));
     return gs;
 };
-
-static HostCheckBox *CCBackground()
-{
-    HostCheckBox *gc = new HostCheckBox("CCBackground");
-    gc->setLabel(QObject::tr("Black background for closed captioning"));
-    gc->setValue(false);
-    gc->setHelpText(QObject::tr(
-                        "If enabled, captions will be displayed "
-                        "over a black background "
-                        "for better contrast."));
-    return gc;
-}
 
 static HostCheckBox *DefaultCCMode()
 {
@@ -3530,9 +3501,7 @@ OSDSettings::OSDSettings()
     osd->addChild(EnableMHEG());
     osd->addChild(PersistentBrowseMode());
     osd->addChild(BrowseAllTuners());
-    osd->addChild(CCBackground());
     osd->addChild(DefaultCCMode());
-    osd->addChild(SubtitleFont());
     osd->addChild(OSDCC708TextZoomPercentage());
     osd->addChild(SubtitleCodec());
     addChild(osd);

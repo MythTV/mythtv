@@ -5,7 +5,6 @@
 
 #include "mythlogging.h"
 #include "bonjourregister.h"
-#include "mythcorecontext.h"
 
 #define LOC QString("Bonjour: ")
 
@@ -42,13 +41,11 @@ bool BonjourRegister::Register(uint16_t port, const QByteArray &type,
         return true;
     }
 
-    QByteArray host(gCoreContext->GetSetting("BonjourHostname", "").toUtf8());
-    const char *host_ptr = host.size() > 0 ? host.constData() : NULL;
     uint16_t qport = qToBigEndian(port);
     DNSServiceErrorType res =
         DNSServiceRegister(&m_dnssref, 0, 0, (const char*)name.data(),
                            (const char*)type.data(),
-                           NULL, host_ptr, qport, txt.size(), (void*)txt.data(),
+                           NULL, 0, qport, txt.size(), (void*)txt.data(),
                            BonjourCallback, this);
 
     if (kDNSServiceErr_NoError != res)

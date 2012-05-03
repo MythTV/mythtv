@@ -582,6 +582,131 @@ MythSystemUnix::~MythSystemUnix(void)
 {
 }
 
+bool MythSystemUnix::ParseShell(const QString cmd, QString &abscmd,
+                                QStringList &args)
+{
+    QList<QChar> whitespace; whitespace << ' ' << '\t' << '\n' << '\r';
+    QList<QChar> whitechr; whitechr << 't' << 'n' << 'r';
+    QChar quote = '"',
+      hardquote = '\'',
+         escape = '\\';
+    bool quoted = false,
+     hardquoted = false,
+        escaped = false;
+
+    QString tmp;
+    QString::const_iterator i = cmd.begin();
+    while (i != cmd.end())
+    {
+        if (quoted || hardquoted)
+        {
+            if (escaped)
+            {
+                if ((quote == *i) || (escape == *i) ||
+                            whitespace.contains(*i))
+                    // pass through escape (\), quote ("), and any whitespace
+                    tmp += *i;
+                else if (whitechr.contains(*i))
+                    // process whitespace escape code, and pass character
+                    tmp += whitespace[whitechr.indexOf(*i)+1];
+                else
+                    // unhandled escape code, abort
+                    return false;
+
+                escaped = false;
+            }
+
+            else if (*i == escape)
+            {
+                if (hardquoted)
+                    // hard quotes (') pass everything
+                    tmp += *i;
+                else
+                    // otherwise, mark escaped to handle next character
+                    escaped = true;
+            }
+
+            else if ((quoted & (*i == quote)) ||
+                            (hardquoted && (*i == hardquote)))
+                // end of quoted sequence
+                quoted = hardquoted = false;
+
+            else
+                // pass through character
+                tmp += *i;
+        }
+
+        else if (escaped)
+        {
+            if ((*i == quote) || (*i == hardquote) || (*i == escape) ||
+                    whitespace.contains(*i))
+                // pass through special characters
+                tmp += *i;
+            else if (whitechr.contains(*i))
+                // process whitespace escape code, and pass character
+                tmp += whitespace[whitechr.indexOf(*i)+1];
+            else
+                // unhandled escape code, abort
+                return false;
+
+            escaped = false;
+        }
+
+        // handle quotes and escape characters
+        else if (quote == *i)
+            quoted = true;
+        else if (hardquote == *i)
+            hardquoted = true;
+        else if (escape == *i)
+            escaped = true;
+
+        // handle whitespace characters
+        else if (whitespace.contains(*i) && !tmp.isEmpty())
+        {
+            args << tmp;
+            tmp.clear();
+        }
+
+        else
+            // pass everything else
+            tmp += *i;
+
+        // step forward to next character
+        ++i;
+    }
+
+    if (quoted || hardquoted || escaped)
+        // command not terminated cleanly
+        return false;
+
+    if (!tmp.isEmpty())
+        // collect last argument
+        args << tmp;
+
+    if (args.isEmpty())
+        // this shouldnt happen
+        return false;
+
+    // grab the first argument to use as the command
+    abscmd = args.takeFirst();    
+    if (!abscmd.startsWith('/'))
+    {
+        // search for absolute path
+        QStringList path = QString(getenv("PATH")).split(':');
+        QStringList::const_iterator i = path.begin();
+        for (; i != path.end(); ++i)
+        {
+            QFile file(QString("%1/%2").arg(*i).arg(abscmd));
+            if (file.exists())
+            {
+                abscmd = file.fileName();
+                break;
+            }
+        }
+    }
+
+    return true;
+}
 
 void MythSystemUnix::Term(bool force)
 {

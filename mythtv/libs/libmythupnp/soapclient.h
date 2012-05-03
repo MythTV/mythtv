@@ -47,6 +47,12 @@ class UPNP_PUBLIC SOAPClient
     QString  GetNodeValue(const QDomNode &node,
                           const QString  &sName,
                           const QString  &sDefault) const;
+    QString  GetNodeValue(const QDomNode &node,
+                          const QString  &sName,
+                          const char *sDefault) const
+    {
+        return GetNodeValue(node, sName, QString(sDefault));
+    }
 
     QDomNode FindNode(const QString  &sName,
                       const QDomNode &baseNode) const;

@@ -429,8 +429,8 @@ void HouseKeeper::RunMFD(void)
     if (mfpath == "mythfilldatabase")
         mfpath = GetInstallPrefix() + "/bin/mythfilldatabase";
 
-    QString command = QString("%1 %2").arg(mfpath).arg(mfarg);
-    command += logPropagateArgs;
+    QString command = QString("%1 %2 %3").arg(mfpath).arg(logPropagateArgs)
+                        .arg(mfarg);
 
     {
         QMutexLocker locker(&fillDBLock);

@@ -456,7 +456,7 @@ void MythRAOPConnection::SendTimeRequest(void)
     *(uint32_t *)(req + 24) = qToBigEndian((uint32_t)t.tv_sec);
     *(uint32_t *)(req + 28) = qToBigEndian((uint32_t)t.tv_usec);
 
-    if (m_clientControlSocket->writeDatagram(req, sizeof(req), m_peerAddress, m_clientTimingPort) != sizeof(req))
+    if (m_clientTimingSocket->writeDatagram(req, sizeof(req), m_peerAddress, m_clientTimingPort) != sizeof(req))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to send resend time request.");
         return;
@@ -940,7 +940,7 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
         }
         StartResponse(m_textStream, option, tags["CSeq"]);
         *m_textStream << "Public: ANNOUNCE, SETUP, RECORD, PAUSE, FLUSH, "
-            "TEARDOWN, OPTIONS, GET_PARAMETER, SET_PARAMETER. POST, GET\r\n";
+            "TEARDOWN, OPTIONS, GET_PARAMETER, SET_PARAMETER, POST, GET\r\n";
     }
     else if (option == "ANNOUNCE")
     {
