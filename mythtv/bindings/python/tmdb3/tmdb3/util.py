@@ -10,6 +10,21 @@ from copy import copy
 from locales import get_locale
 from tmdb_auth import get_session
 
+class NameRepr( object ):
+    """Mixin for __repr__ methods using 'name' attribute."""
+    def __repr__(self):
+        return u"<{0.__class__.__name__} '{0.name}'>"\
+                                .format(self).encode('utf-8')
+
+class SearchRepr( object ):
+    """
+    Mixin for __repr__ methods for classes with '_name' and
+    '_request' attributes.
+    """
+    def __repr__(self):
+        name = self._name if self._name else self._request._kwargs['query']
+        return u"<Search Results: {0}>".format(name).encode('utf-8')
+
 class Poller( object ):
     """
     Wrapper for an optional callable to populate an Element derived class
@@ -91,10 +106,10 @@ class Data( object ):
         """
         This defines how the dictionary value is to be processed by the poller
             field   -- defines the dictionary key that filters what data this uses
-            initarg -- (optional) specifies that this field must be supplied when
-                       creating a new instance of the Element class this definition
-                       is mapped to. Takes an integer for the order it should be
-                       used in the input arguments
+            initarg -- (optional) specifies that this field must be supplied
+                       when creating a new instance of the Element class this
+                       definition is mapped to. Takes an integer for the order
+                       it should be used in the input arguments
             handler -- (optional) callable used to process the received value
                        before being stored in the Element object.
             poller  -- (optional) callable to be used if data is requested and
@@ -195,7 +210,8 @@ class Datadict( Data ):
     Response definition class for dictionary data
     This maps to a key in a JSON dictionary storing a dictionary of data
     """
-    def __init__(self, field, handler=None, poller=None, raw=True, key=None, attr=None):
+    def __init__(self, field, handler=None, poller=None, raw=True,
+                       key=None, attr=None):
         """
         This defines how the dictionary value is to be processed by the poller
             field   -- defines the dictionary key that filters what data this uses
