@@ -383,45 +383,37 @@ bool MythContextPrivate::FindDatabase(bool prompt, bool noAutodetect)
 
     manualSelect &= m_gui;  // no interactive command-line chooser yet
 
-    // Last, get the user to select a backend from a possible list:
-    if (manualSelect)
+    // Queries the user for the DB info
+    do
     {
-        switch (ChooseBackend(QString::null))
+        if (manualSelect)
         {
-            case -1:    // User asked to configure database manually
-                if (PromptForDatabaseParams(""))
+            // Get the user to select a backend from a possible list:
+            BackendSelection::Decision d = (BackendSelection::Decision)
+                ChooseBackend(failure);
+            switch (d)
+            {
+                case BackendSelection::kAcceptConfigure:
                     break;
-                else
-                    goto NoDBfound;   // User cancelled - changed their mind?
-
-            case 0:   // User cancelled. Exit application
-                goto NoDBfound;
-
-            case 1:    // User selected a backend, so m_DBparams
-                break; // should now contain the database details
-
-            default:
-                goto NoDBfound;
+                case BackendSelection::kManualConfigure:
+                    manualSelect = false;
+                    break;
+                case BackendSelection::kCancelConfigure:
+                    goto NoDBfound;
+            }
         }
-        failure = TestDBconnection();
-    }
 
-
-    // Queries the user for the DB info, using the command
-    // line or the GUI depending on the application.
-    while (!failure.isEmpty())
-    {
-        LOG(VB_GENERAL, LOG_ALERT, failure);
-        if (( manualSelect && ChooseBackend(failure)) ||
-            (!manualSelect && PromptForDatabaseParams(failure)))
+        if (!manualSelect)
         {
-            failure = TestDBconnection();
-            if (failure.length())
-                LOG(VB_GENERAL, LOG_ALERT, failure);
+            if (!PromptForDatabaseParams(failure))
+                goto NoDBfound;
         }
-        else
-            goto NoDBfound;
+
+        failure = TestDBconnection();
+        if (!failure.isEmpty())
+            LOG(VB_GENERAL, LOG_ALERT, failure);
     }
+    while (!failure.isEmpty());
 
 DBfound:
     LOG(VB_GENERAL, LOG_DEBUG, "FindDatabase() - Success!");
@@ -780,11 +772,12 @@ int MythContextPrivate::ChooseBackend(const QString &error)
 
     LOG(VB_GENERAL, LOG_INFO, "Putting up the UPnP backend chooser");
 
-    BackendSelection::prompt(&m_DBparams, m_pConfig);
+    BackendSelection::Decision ret =
+        BackendSelection::Prompt(&m_DBparams, m_pConfig);
 
     EndTempWindow();
 
-    return 1;
+    return (int)ret;
 }
 
 /**
