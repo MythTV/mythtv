@@ -3402,8 +3402,8 @@ void VideoDialog::ToggleWatched()
     {
         metadata->SetWatched(!metadata->GetWatched());
         metadata->UpdateDatabase();
-
-        refreshData();
+        GetItemCurrent()->DisplayState(WatchedToState(metadata->GetWatched()),
+                                       "watchedstate");
     }
 }
 
