@@ -2,7 +2,6 @@
 // locking ?
 // race on startup?
 // http date format and locale
-// GET scrub on iOS 5
 
 #include <QTcpSocket>
 #include <QNetworkInterface>
@@ -511,6 +510,46 @@ void MythAirplayServer::HandleResponse(APHTTPRequest *req,
         m_connections[session].controlSocket = socket;
     }
 
+    double position    = 0.0f;
+    double duration    = 0.0f;
+    float  playerspeed = 0.0f;
+    bool   playing     = false;
+    GetPlayerStatus(playing, playerspeed, position, duration);
+    // set initial position if it was set at start of playback.
+    if (duration > 0.01f && playing)
+    {
+        if (m_connections[session].initial_position > 0.0f)
+        {
+            position = duration * m_connections[session].initial_position;
+            MythEvent* me = new MythEvent(ACTION_SEEKABSOLUTE,
+                                          QStringList(QString::number((uint64_t)position)));
+            qApp->postEvent(GetMythMainWindow(), me);
+            m_connections[session].position = position;
+            m_connections[session].initial_position = -1.0f;
+            if(!m_connections[session].was_playing)
+            {
+                SendReverseEvent(session, AP_EVENT_PLAYING);
+            }
+        }
+        else if (position < .01f)
+        {
+            // Assume playback hasn't started yet, get saved position
+            position = m_connections[session].position;
+        }
+    }
+    if (!playing && m_connections[session].was_playing)
+    {
+        // playback got interrupted, notify client to stop
+        if (SendReverseEvent(session, AP_EVENT_STOPPED))
+        {
+            m_connections[session].was_playing = false;
+        }
+    }
+    else
+    {
+        m_connections[session].was_playing = playing;
+    }
+
     if (req->GetURI() == "/server-info")
     {
         content_type = "text/x-apple-plist+xml\r\n";
@@ -533,11 +572,7 @@ void MythAirplayServer::HandleResponse(APHTTPRequest *req,
         }
         else if (req->GetMethod() == "GET")
         {
-            double position   = 0.0f;
-            double duration   = 0.0f;
-            float playerspeed = 0.0f;
-            bool  playing     = false;
-            GetPlayerStatus(playing, playerspeed, position, duration);
+            content_type = "text/parameters\r\n";
             body = QString("duration: %1\r\nposition: %2\r\n")
                 .arg((double)duration, 0, 'f', 6, '0')
                 .arg((double)position, 0, 'f', 6, '0');
@@ -560,9 +595,8 @@ void MythAirplayServer::HandleResponse(APHTTPRequest *req,
     else if (req->GetURI() == "/stop")
     {
         m_connections[session].stopped = true;
-        // FIXME unpause playback and it will exit when the remote socket closes
         QKeyEvent* ke = new QKeyEvent(QEvent::KeyPress, 0,
-                                      Qt::NoModifier, ACTION_PLAY);
+                                      Qt::NoModifier, ACTION_STOP);
         qApp->postEvent(GetMythMainWindow(), (QEvent*)ke);
     }
     else if (req->GetURI() == "/photo" ||
@@ -576,11 +610,6 @@ void MythAirplayServer::HandleResponse(APHTTPRequest *req,
     }
     else if (req->GetURI() == "/rate")
     {
-        double dummy1     = 0.0f;
-        double dummy2     = 0.0f;
-        float playerspeed = 0.0f;
-        bool  playing     = false;
-        GetPlayerStatus(playing, playerspeed, dummy1, dummy2);
         float rate = req->GetQueryValue("value").toFloat();
         m_connections[session].speed = rate;
 
@@ -634,7 +663,8 @@ void MythAirplayServer::HandleResponse(APHTTPRequest *req,
             if (!file.isEmpty())
             {
                 m_connections[session].url = QUrl(file);
-                m_connections[session].position = start_pos;
+                m_connections[session].position = 0.0f;
+                m_connections[session].initial_position = start_pos;
 
                 MythEvent* me = new MythEvent(ACTION_HANDLEMEDIA,
                                               QStringList(file));
@@ -647,19 +677,13 @@ void MythAirplayServer::HandleResponse(APHTTPRequest *req,
                 "Ignoring playback - something else is playing.");
         }
 
-        SendReverseEvent(session, AP_EVENT_PLAYING);
+        SendReverseEvent(session, AP_EVENT_LOADING);
         LOG(VB_GENERAL, LOG_INFO, LOC + QString("File: '%1' start_pos '%2'")
             .arg(file.data()).arg(start_pos));
     }
     else if (req->GetURI() == "/playback-info")
     {
         content_type = "text/x-apple-plist+xml\r\n";
-
-        double position   = 0.0f;
-        double duration   = 0.0f;
-        float playerspeed = 0.0f;
-        bool  playing     = false;
-        GetPlayerStatus(playing, playerspeed, position, duration);
 
         if (!playing)
         {
@@ -714,15 +738,15 @@ void MythAirplayServer::HandleResponse(APHTTPRequest *req,
          .arg(socket->flush()).arg(reply.data()));
 }
 
-void MythAirplayServer::SendReverseEvent(QByteArray &session,
+bool MythAirplayServer::SendReverseEvent(QByteArray &session,
                                          AirplayEvent event)
 {
     if (!m_connections.contains(session))
-        return;
+        return false;
     if (m_connections[session].lastEvent == event)
-        return;
+        return false;
     if (!m_connections[session].reverseSocket)
-        return;
+        return false;
 
     QString body;
     if (AP_EVENT_PLAYING == event ||
@@ -755,6 +779,7 @@ void MythAirplayServer::SendReverseEvent(QByteArray &session,
     LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("Send reverse: %1 \n\n%2\n")
          .arg(m_connections[session].reverseSocket->flush())
          .arg(reply.data()));
+    return true;
 }
 
 QString MythAirplayServer::eventToString(AirplayEvent event)
@@ -797,7 +822,5 @@ QString MythAirplayServer::GetMacAddress()
             res.append(':');
         }
     }
-    QByteArray ba = res.toAscii();
-    const char *t = ba.constData();
     return res;
 }
