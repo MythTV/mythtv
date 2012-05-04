@@ -27,16 +27,18 @@ class AirplayConnection
   public:
     AirplayConnection()
       : controlSocket(NULL), reverseSocket(NULL), speed(1.0f),
-        position(0.0f), url(QUrl()), lastEvent(AP_EVENT_NONE),
-        stopped(false)
+        position(0.0f), initial_position(-1.0f), url(QUrl()),
+        lastEvent(AP_EVENT_NONE), stopped(false), was_playing(false)
     { }
     QTcpSocket  *controlSocket;
     QTcpSocket  *reverseSocket;
     float        speed;
     double       position;
+    double       initial_position;
     QUrl         url;
     AirplayEvent lastEvent;
     bool         stopped;
+    bool         was_playing;
 };
 
 class APHTTPRequest;
@@ -66,7 +68,7 @@ class MTV_PUBLIC MythAirplayServer : public ServerPool
     void GetPlayerStatus(bool &playing, float &speed, double &position,
                          double &duration);
     QString GetMacAddress();
-    void SendReverseEvent(QByteArray &session, AirplayEvent event);
+    bool SendReverseEvent(QByteArray &session, AirplayEvent event);
 
     // Globals
     static MythAirplayServer *gMythAirplayServer;
