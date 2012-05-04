@@ -42,31 +42,21 @@ using namespace std;
 class AudioBuffer
 {
   public:
-    AudioBuffer() : m_buffer(QByteArray()), m_time(-1) {};
+    AudioBuffer() : m_buffer(QByteArray()), m_frames(0), m_time(-1) {};
     AudioBuffer(const AudioBuffer &old) : m_buffer(old.m_buffer),
-        m_time(old.m_time) {};
+        m_frames(old.m_frames), m_time(old.m_time) {};
 
     ~AudioBuffer() {};
 
-    void appendData(unsigned char *buffer, int len, long long time)
+    void appendData(unsigned char *buffer, int len, int frames, long long time)
     {
         m_buffer.append((const char *)buffer, len);
+        m_frames += frames;
         m_time = time;
     }
 
-    void setData(unsigned char *buffer, int len, long long time)
-    {
-        m_buffer.clear();
-        appendData(buffer, len, time);
-    }
-
-    void clear(void)
-    {
-        m_buffer.clear();
-        m_time = -1;
-    }
-
     QByteArray m_buffer;
+    int m_frames;
     long long m_time;
 };
 
@@ -131,95 +121,43 @@ class AudioReencodeBuffer : public AudioOutput
     // timecode is in milliseconds.
     virtual bool AddData(void *buffer, int len, int64_t timecode, int frames)
     {
-        if (len == 0)
-            return true;
-
-        QMutexLocker locker(&m_bufferMutex);
-        AudioBuffer *ab = NULL;
         unsigned char *buf = (unsigned char *)buffer;
-        int savedlen = 0;
-        int firstlen = 0;
-
         if (m_audioFrameSize)
         {
-            savedlen = (m_saveBuffer ? m_saveBuffer->m_buffer.size() : 0);
-            if (savedlen)
-                firstlen = m_audioFrameSize - savedlen;
+            int index = 0;
 
-            int overage = (len + savedlen) % m_audioFrameSize;
-
-            LOG(VB_AUDIO, LOG_DEBUG, 
-                QString("len: %1, savedlen: %2, overage: %3")
-                .arg(len).arg(savedlen).arg(overage));
-
-            if (overage)
+            while (index < len)
             {
-                long long newtime = timecode + ((len / m_bytes_per_frame) /
-                                                (m_eff_audiorate / 1000));
-                if (overage < len)
+                if (!m_saveBuffer)
+                    m_saveBuffer = new AudioBuffer();
+
+                int part = min(len - index,
+                               m_audioFrameSize - m_saveBuffer->m_buffer.size());
+                timecode += ((part / m_bytes_per_frame) /
+                             (m_eff_audiorate / 1000));
+                m_saveBuffer->appendData(&buf[index], part, part / m_bytes_per_frame,
+                                         timecode);
+
+                if (m_saveBuffer->m_buffer.size() == m_audioFrameSize)
                 {
-                    if (!m_saveBuffer)
-                        ab = new AudioBuffer;
-                    else
-                        ab = m_saveBuffer;
-                    m_saveBuffer = new AudioBuffer; 
-                    len -= overage;
-                    m_saveBuffer->setData(&buf[len], overage, newtime);
+                    m_bufferList.append(m_saveBuffer);
+                    m_saveBuffer = NULL;
+                    m_last_audiotime = timecode;
                 }
-                else
-                {
-                    if (!m_saveBuffer)
-                        m_saveBuffer = new AudioBuffer; 
-                    m_saveBuffer->appendData(buf, len, newtime);
-                    len = 0;
-                }
+
+                index += part;
             }
-            else if (savedlen)
-            {
-                ab = m_saveBuffer;
-                m_saveBuffer = NULL;
-            }
-            else
-                ab = new AudioBuffer;
         }
         else
         {
-            ab = new AudioBuffer;
+            m_saveBuffer = new AudioBuffer();
+            timecode += (frames / (m_eff_audiorate / 1000));
+            m_saveBuffer->appendData(buf, len, frames, timecode);
+
+            m_bufferList.append(m_saveBuffer);
+            m_saveBuffer = NULL;
+            m_last_audiotime = timecode;
         }
-
-        if (!ab)
-            return true;
-
-        int bufflen = (m_audioFrameSize ? m_audioFrameSize : len);
-        int index = 0;
-
-        do
-        {
-            if (!len)
-                break;
-
-            int blocklen = (firstlen ? firstlen : bufflen);
-            blocklen = (blocklen > len ? len : blocklen);
-
-            m_last_audiotime = timecode + ((blocklen / m_bytes_per_frame) /
-                                           (m_eff_audiorate / 1000));
-            ab->appendData(&buf[index], blocklen, m_last_audiotime);
-            m_bufferList.append(ab);
-
-            timecode = m_last_audiotime;
-
-            LOG(VB_AUDIO, LOG_DEBUG, 
-                QString("blocklen: %1, index: %2, timecode: %3")
-                .arg(blocklen).arg(index).arg(timecode));
-
-            index += blocklen;
-            firstlen = 0;
-
-            ab = new AudioBuffer;
-        } while (index < len);
-
-        // The last buffer is actually unused
-        delete ab;
 
         return true;
     }
@@ -270,11 +208,11 @@ class AudioReencodeBuffer : public AudioOutput
             AudioBuffer *ab = *it;
 
             if (ab->m_time <= time)
-                samples += ab->m_buffer.size();
+                samples += ab->m_frames;
             else
                 break;
         }
-        return samples / m_bytes_per_frame;
+        return samples;
     }
 
     virtual void SetTimecode(int64_t timecode)
@@ -1734,7 +1672,7 @@ int Transcode::TranscodeFile(const QString &inputname,
                 AudioBuffer *ab = arb->GetData();
 
                 if (!cutter ||
-                    !cutter->InhibitUseAudioFrames(1, &totalAudio))
+                    !cutter->InhibitUseAudioFrames(ab->m_frames, &totalAudio))
                     fifow->FIFOWrite(1, ab->m_buffer.data(),
                                      ab->m_buffer.size());
 
