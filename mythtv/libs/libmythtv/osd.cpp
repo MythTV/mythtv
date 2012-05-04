@@ -440,7 +440,7 @@ void OSD::SetText(const QString &window, QHash<QString,QString> &map,
             if (!iconpath.isEmpty())
             {
                 QString iconurl =
-                                gCoreContext->GetMasterHostPrefix("ChannelIcon",
+                                gCoreContext->GetMasterHostPrefix("ChannelIcons",
                                                                   iconpath);
 
                 icon->SetFilename(iconurl);

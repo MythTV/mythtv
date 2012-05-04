@@ -32,7 +32,9 @@ extern "C" {
 extern const uint8_t *ff_find_start_code(const uint8_t *p, const uint8_t *end, uint32_t *state);
 }
 
-#define LOC      QString("DTVRec(%1): ").arg(tvrec->GetCaptureCardNum())
+#define LOC ((tvrec) ? \
+    QString("DTVRec(%1): ").arg(tvrec->GetCaptureCardNum()) : \
+    QString("DTVRec(0x%1): ").arg(intptr_t(this),0,16))
 
 const uint DTVRecorder::kMaxKeyFrameDistance = 80;
 

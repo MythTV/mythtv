@@ -13,6 +13,7 @@ class TMDBError( Exception ):
     KeyInvalid              = 30
     KeyRevoked              = 40
     RequestError            = 50
+    RequestInvalid          = 51
     PagingIssue             = 60
     CacheError              = 70
     CacheReadError          = 71
@@ -25,7 +26,7 @@ class TMDBError( Exception ):
 
     def __init__(self, msg=None, errno=0):
         self.errno = errno
-        if errno:
+        if errno == 0:
             self.errno = getattr(self, 'TMDB'+self.__class__.__name__, errno)
         self.args = (msg,)
 
@@ -44,6 +45,9 @@ class TMDBKeyRevoked( TMDBKeyInvalid ):
 class TMDBRequestError( TMDBError ):
     pass
 
+class TMDBRequestInvalid( TMDBRequestError ):
+    pass
+
 class TMDBPagingIssue( TMDBRequestError ):
     pass
 
@@ -52,19 +56,19 @@ class TMDBCacheError( TMDBRequestError ):
 
 class TMDBCacheReadError( TMDBCacheError ):
     def __init__(self, filename):
-        super(TMDBCachePermissionsError, self).__init__(
+        super(TMDBCacheReadError, self).__init__(
             "User does not have permission to access cache file: {0}.".format(filename))
         self.filename = filename
 
 class TMDBCacheWriteError( TMDBCacheError ):
     def __init__(self, filename):
-        super(TMDBCachePermissionsError, self).__init__(
+        super(TMDBCacheWriteError, self).__init__(
             "User does not have permission to write cache file: {0}.".format(filename))
         self.filename = filename
 
 class TMDBCacheDirectoryError( TMDBCacheError ):
     def __init__(self, filename):
-        super(TMDBCachePermissionsError, self).__init__(
+        super(TMDBCacheDirectoryError, self).__init__(
             "Directory containing cache file does not exist: {0}.".format(filename))
         self.filename = filename
 
@@ -72,7 +76,10 @@ class TMDBImageSizeError( TMDBError ):
     pass
 
 class TMDBHTTPError( TMDBError ):
-    pass
+    def __init__(self, err):
+        self.httperrno = err.code
+        self.response = err.fp.read()
+        super(TMDBHTTPError, self).__init__(str(err))
 
 class TMDBOffline( TMDBError ):
     pass

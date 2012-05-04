@@ -17,7 +17,8 @@ typedef enum RecordingTypes
     kOverrideRecord,
     kDontRecord,
     kFindDailyRecord,
-    kFindWeeklyRecord
+    kFindWeeklyRecord,
+    kTemplateRecord
 } RecordingType; // note stored in uin8_t in ProgramInfo
 MPUBLIC QString toString(RecordingType);
 MPUBLIC QString toRawString(RecordingType);

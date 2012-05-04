@@ -669,8 +669,14 @@
             <area>26,246,440,28</area>
         </textarea>
 
+        <textarea name="template" from="basetextarea">
+            <area>516,246,340,28</area>
+            <align>left</align>
+            <template>%Using |TEMPLATE| Template%</template>
+        </textarea>
+
         <textarea name="channel" from="basetextarea">
-            <area>1000,246,200,36</area>
+            <area>1000,246,200,28</area>
             <align>right</align>
         </textarea>
 

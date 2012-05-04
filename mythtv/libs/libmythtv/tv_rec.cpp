@@ -2661,7 +2661,7 @@ void TVRec::NotifySchedulerOfRecording(RecordingInfo *rec)
         rec->GetRecordingRule()->m_type = kSingleRecord;
     }
 
-    // + remove DefaultEndOffset which would mismatch the live session
+    // + remove any end offset which would mismatch the live session
     rec->GetRecordingRule()->m_endOffset = 0;
 
     // + save rsInactive recstatus to so that a reschedule call

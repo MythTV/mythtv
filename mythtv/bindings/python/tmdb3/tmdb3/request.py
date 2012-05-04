@@ -9,16 +9,19 @@
 #-----------------------
 
 from tmdb_exceptions import *
+from locales import get_locale
 from cache import Cache
 
+from urllib import urlencode
 import urllib2
-import urllib
 import json
 import os
 
 DEBUG = False
-
 cache = Cache(filename='pytmdb3.cache')
+
+#DEBUG = True
+#cache = Cache(engine='null')
 
 def set_key(key):
     """
@@ -54,8 +57,13 @@ class Request( urllib2.Request ):
         self._url = url.lstrip('/')
         self._kwargs = dict([(kwa,kwv) for kwa,kwv in kwargs.items()
                                         if kwv is not None])
-        url = '{0}{1}?{2}'.format(self._base_url, self._url,
-                                  urllib.urlencode(kwargs))
+
+        locale = get_locale()
+        kwargs = {}
+        for k,v in self._kwargs.items():
+            kwargs[k] = locale.encode(v)
+        url = '{0}{1}?{2}'.format(self._base_url, self._url, urlencode(kwargs))
+
         urllib2.Request.__init__(self, url)
         self.add_header('Accept', 'application/json')
         self.lifetime = 3600 # 1hr
@@ -73,14 +81,20 @@ class Request( urllib2.Request ):
         obj.lifetime = self.lifetime
         return obj
 
+    def add_data(self, data):
+        """Provide data to be sent with POST."""
+        urllib2.Request.add_data(self, urlencode(data))
+
     def open(self):
         """Open a file object to the specified URL."""
         try:
             if DEBUG:
                 print 'loading '+self.get_full_url()
+                if self.has_data():
+                    print '  '+self.get_data()
             return urllib2.urlopen(self)
         except urllib2.HTTPError, e:
-            raise TMDBHTTPError(str(e))
+            raise TMDBHTTPError(e)
 
     def read(self):
         """Return result from specified URL as a string."""
@@ -90,7 +104,21 @@ class Request( urllib2.Request ):
     def readJSON(self):
         """Parse result from specified URL as JSON data."""
         url = self.get_full_url()
-        data = json.load(self.open())
+        try:
+            # catch HTTP error from open()
+            data = json.load(self.open())
+        except TMDBHTTPError, e:
+            try:
+                # try to load whatever was returned
+                data = json.loads(e.response)
+            except:
+                # cannot parse json, just raise existing error
+                raise e
+            else:
+                # response parsed, try to raise error from TMDB
+                handle_status(data, url)
+            # no error from TMDB, just raise existing error
+            raise e
         handle_status(data, url)
         if DEBUG:
             import pprint
@@ -99,14 +127,14 @@ class Request( urllib2.Request ):
 
 status_handlers = {
     1: None,
-    2: TMDBRequestError('Invalid service - This service does not exist.'),
+    2: TMDBRequestInvalid('Invalid service - This service does not exist.'),
     3: TMDBRequestError('Authentication Failed - You do not have '+\
                         'permissions to access this service.'),
-    4: TMDBRequestError("Invalid format - This service doesn't exist "+\
+    4: TMDBRequestInvalid("Invalid format - This service doesn't exist "+\
                         'in that format.'),
-    5: TMDBRequestError('Invalid parameters - Your request parameters '+\
+    5: TMDBRequestInvalid('Invalid parameters - Your request parameters '+\
                         'are incorrect.'),
-    6: TMDBRequestError('Invalid id - The pre-requisite id is invalid '+\
+    6: TMDBRequestInvalid('Invalid id - The pre-requisite id is invalid '+\
                         'or not found.'),
     7: TMDBKeyInvalid('Invalid API key - You must be granted a valid key.'),
     8: TMDBRequestError('Duplicate entry - The data you tried to submit '+\
@@ -125,5 +153,6 @@ status_handlers = {
 def handle_status(data, query):
     status = status_handlers[data.get('status_code', 1)]
     if status is not None:
+        status.tmdberrno = data['status_code']
         status.query = query
         raise status

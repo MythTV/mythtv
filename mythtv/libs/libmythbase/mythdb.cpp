@@ -12,7 +12,6 @@ using namespace std;
 #include "mythdb.h"
 #include "mythdbcon.h"
 #include "mythlogging.h"
-#include "oldsettings.h"
 #include "mythdirs.h"
 #include "mythcorecontext.h"
 
@@ -21,6 +20,7 @@ static QMutex dbLock;
 
 // For thread safety reasons this is not a QString
 const char *kSentinelValue = "<settings_sentinel_value>";
+const char *kClearSettingValue = "<clear_setting_value>";
 
 MythDB *MythDB::getMythDB(void)
 {
@@ -72,8 +72,6 @@ class MythDBPrivate
     QString m_localhostname;
     MDBManager m_dbmanager;
 
-    Settings *m_settings;
-
     bool ignoreDatabase;
     bool suppressDBMessages;
 
@@ -93,10 +91,9 @@ class MythDBPrivate
 
 static const int settings_reserve = 61;
 
-MythDBPrivate::MythDBPrivate()
-    : m_settings(new Settings()),
-      ignoreDatabase(false), suppressDBMessages(true), useSettingsCache(false),
-      haveDBConnection(false), haveSchema(false)
+MythDBPrivate::MythDBPrivate() :
+    ignoreDatabase(false), suppressDBMessages(true), useSettingsCache(false),
+    haveDBConnection(false), haveSchema(false)
 {
     m_localhostname.clear();
     settingsCache.reserve(settings_reserve);
@@ -105,7 +102,6 @@ MythDBPrivate::MythDBPrivate()
 MythDBPrivate::~MythDBPrivate()
 {
     LOG(VB_DATABASE, LOG_INFO, "Destroying MythDBPrivate");
-    delete m_settings;
 }
 
 MythDB::MythDB()
@@ -121,11 +117,6 @@ MythDB::~MythDB()
 MDBManager *MythDB::GetDBManager(void)
 {
     return &(d->m_dbmanager);
-}
-
-Settings *MythDB::GetOldSettings(void)
-{
-    return d->m_settings;
 }
 
 QString MythDB::toCommaList(const QMap<QString, QVariant> &bindings,
@@ -266,10 +257,10 @@ bool MythDB::SaveSettingOnHost(const QString &key,
                                const QString &newValueRaw,
                                const QString &host)
 {
-    QString LOC  = QString("SaveSettingOnHost('%1') ").arg(key);
+    QString loc  = QString("SaveSettingOnHost('%1') ").arg(key);
     if (key.isEmpty())
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "- Illegal null key");
+        LOG(VB_GENERAL, LOG_ERR, loc + "- Illegal null key");
         return false;
     }
 
@@ -278,7 +269,12 @@ bool MythDB::SaveSettingOnHost(const QString &key,
     if (d->ignoreDatabase)
     {
         if (host.toLower() == d->m_localhostname)
-            OverrideSettingForSession(key, newValue);
+        {
+            if (newValue != kClearSettingValue)
+                OverrideSettingForSession(key, newValue);
+            else
+                ClearOverrideSettingForSession(key);
+        }
         return true;
     }
 
@@ -287,7 +283,7 @@ bool MythDB::SaveSettingOnHost(const QString &key,
         if (host.toLower() == d->m_localhostname)
             OverrideSettingForSession(key, newValue);
         if (!d->suppressDBMessages)
-            LOG(VB_GENERAL, LOG_ERR, LOC + "- No database yet");
+            LOG(VB_GENERAL, LOG_ERR, loc + "- No database yet");
         SingleSetting setting;
         setting.host = host;
         setting.key = key;
@@ -313,9 +309,19 @@ bool MythDB::SaveSettingOnHost(const QString &key,
         if (!host.isEmpty())
             query.bindValue(":HOSTNAME", host);
 
-        if (!query.exec() && !(GetMythDB()->SuppressDBMessages()))
-            MythDB::DBError("Clear setting", query);
+        if (!query.exec())
+        {
+            if (!GetMythDB()->SuppressDBMessages())
+                MythDB::DBError("Clear setting", query);
+        }
+        else
+        {
+            success = true;
+        }
+    }
 
+    if (success && (newValue != kClearSettingValue))
+    {
         if (!host.isEmpty())
             query.prepare("INSERT INTO settings (value,data,hostname) "
                           "VALUES ( :VALUE, :DATA, :HOSTNAME );");
@@ -328,14 +334,16 @@ bool MythDB::SaveSettingOnHost(const QString &key,
         if (!host.isEmpty())
             query.bindValue(":HOSTNAME", host);
 
-        if (query.exec())
-            success = true;
-        else if (!(GetMythDB()->SuppressDBMessages()))
-            MythDB::DBError(LOC + "- query failure: ", query);
+        if (!query.exec())
+        {
+            success = false;
+            if (!(GetMythDB()->SuppressDBMessages()))
+                MythDB::DBError(loc + "- query failure: ", query);
+        }
     }
-    else
+    else if (!success)
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "- database not open");
+        LOG(VB_GENERAL, LOG_ERR, loc + "- database not open");
     }
 
     ClearSettingsCache(host + ' ' + key);
@@ -343,10 +351,20 @@ bool MythDB::SaveSettingOnHost(const QString &key,
     return success;
 }
 
+bool MythDB::ClearSetting(const QString &key)
+{
+    return ClearSettingOnHost(key, d->m_localhostname);
+}
+
+bool MythDB::ClearSettingOnHost(const QString &key, const QString &host)
+{
+    return SaveSettingOnHost(key, kClearSettingValue, host);
+}
+
 QString MythDB::GetSetting(const QString &_key, const QString &defaultval)
 {
     QString key = _key.toLower();
-    QString value;
+    QString value = defaultval;
 
     d->settingsCacheLock.lockForRead();
     if (d->useSettingsCache)
@@ -369,17 +387,11 @@ QString MythDB::GetSetting(const QString &_key, const QString &defaultval)
     d->settingsCacheLock.unlock();
 
     if (d->ignoreDatabase || !HaveValidDatabase())
-        return defaultval;
+        return value;
 
     MSqlQuery query(MSqlQuery::InitCon());
     if (!query.isConnected())
-    {
-        if (!d->suppressDBMessages)
-            LOG(VB_GENERAL, LOG_ERR,
-                QString("Database not open while trying to load setting: %1")
-                .arg(key));
-        return d->m_settings->GetSetting(key, defaultval);
-    }
+        return value;
 
     query.prepare(
         "SELECT data "
@@ -403,10 +415,6 @@ QString MythDB::GetSetting(const QString &_key, const QString &defaultval)
         if (query.exec() && query.next())
         {
             value = query.value(0).toString();
-        }
-        else
-        {
-            value = d->m_settings->GetSetting(key, defaultval);
         }
     }
 
@@ -688,13 +696,6 @@ double MythDB::GetFloatSettingOnHost(const QString &key, const QString &host)
     return (retval == sentinel) ? 0.0 : retval.toDouble();
 }
 
-void MythDB::SetSetting(const QString &key, const QString &newValueRaw)
-{
-    QString newValue = (newValueRaw.isNull()) ? "" : newValueRaw;
-    d->m_settings->SetSetting(key, newValue);
-    ClearSettingsCache(key);
-}
-
 void MythDB::GetResolutionSetting(const QString &type,
                                        int &width, int &height,
                                        double &forced_aspect,
@@ -789,6 +790,29 @@ void MythDB::OverrideSettingForSession(
     d->settingsCacheLock.unlock();
 }
 
+/// \brief Clears session Overrides for the given setting.
+void MythDB::ClearOverrideSettingForSession(const QString &key)
+{
+    QString mk = key.toLower();
+    QString mk2 = d->m_localhostname + ' ' + mk;
+
+    d->settingsCacheLock.lockForWrite();
+
+    SettingsMap::iterator oit = d->overriddenSettings.find(mk);
+    if (oit != d->overriddenSettings.end())
+        d->overriddenSettings.erase(oit);
+
+    SettingsMap::iterator sit = d->settingsCache.find(mk);
+    if (sit != d->settingsCache.end())
+        d->settingsCache.erase(sit);
+
+    sit = d->settingsCache.find(mk2);
+    if (sit != d->settingsCache.end())
+        d->settingsCache.erase(sit);
+
+    d->settingsCacheLock.unlock();
+}
+
 static void clear(
     SettingsMap &cache, SettingsMap &overrides, const QString &myKey)
 {
@@ -855,189 +879,6 @@ void MythDB::ActivateSettingsCache(bool activate)
 
     d->useSettingsCache = activate;
     ClearSettingsCache();
-}
-
-bool MythDB::LoadDatabaseParamsFromDisk(DatabaseParams &params)
-{
-    Settings settings;
-    if (!settings.LoadSettingsFiles(
-            "mysql.txt", GetInstallPrefix(), GetConfDir()))
-    {
-        LOG(VB_GENERAL, LOG_ERR, "Unable to read configuration file mysql.txt");
-        return false;
-    }
-
-    params.dbHostName = settings.GetSetting("DBHostName");
-    params.dbHostPing = settings.GetSetting("DBHostPing") != "no";
-    params.dbPort     = settings.GetNumSetting("DBPort", 3306);
-    params.dbUserName = settings.GetSetting("DBUserName");
-    params.dbPassword = settings.GetSetting("DBPassword");
-    params.dbName     = settings.GetSetting("DBName");
-    params.dbType     = settings.GetSetting("DBType");
-
-    params.localHostName = settings.GetSetting("LocalHostName");
-    params.localEnabled  = !params.localHostName.isEmpty();
-
-    params.wolReconnect  =
-        settings.GetNumSetting("WOLsqlReconnectWaitTime");
-    params.wolEnabled = params.wolReconnect > 0;
-
-    params.wolRetry   = settings.GetNumSetting("WOLsqlConnectRetry");
-    params.wolCommand = settings.GetSetting("WOLsqlCommand");
-
-    return ValidateDatabaseParams(params, "mysql.txt");
-}
-
-bool MythDB::ValidateDatabaseParams(
-    const DatabaseParams &params, const QString &source)
-{
-    // Print some warnings if things look fishy..
-    QString msg = QString(" is not set in %1").arg(source);
-
-    if (params.dbHostName.isEmpty())
-    {
-        LOG(VB_GENERAL, LOG_ERR, "DBHostName" + msg);
-        return false;
-    }
-    if (params.dbUserName.isEmpty())
-    {
-        LOG(VB_GENERAL, LOG_ERR, "DBUserName" + msg);
-        return false;
-    }
-    if (params.dbPassword.isEmpty())
-    {
-        LOG(VB_GENERAL, LOG_ERR, "DBPassword" + msg);
-        return false;
-    }
-    if (params.dbName.isEmpty())
-    {
-        LOG(VB_GENERAL, LOG_ERR, "DBName" + msg);
-        return false;
-    }
-
-    return true;
-}
-
-// Sensible connection defaults.
-void MythDB::LoadDefaultDatabaseParams(DatabaseParams &params)
-{
-    params.dbHostName    = "localhost";
-    params.dbHostPing    = true;
-    params.dbPort        = 3306;
-    params.dbUserName    = "mythtv";
-    params.dbPassword    = "mythtv";
-    params.dbName        = "mythconverg";
-    params.dbType        = "QMYSQL";
-    params.localEnabled  = false;
-    params.localHostName = "my-unique-identifier-goes-here";
-    params.wolEnabled    = false;
-    params.wolReconnect  = 0;
-    params.wolRetry      = 5;
-    params.wolCommand    = "echo 'WOLsqlServerCommand not set'";
-}
-
-bool MythDB::SaveDatabaseParamsToDisk(
-    const DatabaseParams &params, const QString &confdir, bool overwrite)
-{
-    QString path = confdir + "/mysql.txt";
-    QFile   * f  = new QFile(path);
-
-    if (!overwrite && f->exists())
-    {
-        return false;
-    }
-
-    QString dirpath = confdir;
-    QDir createDir(dirpath);
-
-    if (!createDir.exists())
-    {
-        if (!createDir.mkdir(dirpath))
-        {
-            LOG(VB_GENERAL, LOG_ERR,
-                QString("Could not create %1").arg(dirpath));
-            return false;
-        }
-    }
-
-    if (!f->open(QIODevice::WriteOnly))
-    {
-        LOG(VB_GENERAL, LOG_ERR, QString("Could not open settings file %1 "
-                                         "for writing").arg(path));
-        return false;
-    }
-
-    LOG(VB_GENERAL, LOG_NOTICE, QString("Writing settings file %1").arg(path));
-    QTextStream s(f);
-    s << "DBHostName=" << params.dbHostName << endl;
-
-    s << "\n"
-      << "# By default, Myth tries to ping the DB host to see if it exists.\n"
-      << "# If your DB host or network doesn't accept pings, set this to no:\n"
-      << "#\n";
-
-    if (params.dbHostPing)
-        s << "#DBHostPing=no" << endl << endl;
-    else
-        s << "DBHostPing=no" << endl << endl;
-
-    if (params.dbPort)
-        s << "DBPort=" << params.dbPort << endl;
-
-    s << "DBUserName=" << params.dbUserName << endl
-      << "DBPassword=" << params.dbPassword << endl
-      << "DBName="     << params.dbName     << endl
-      << "DBType="     << params.dbType     << endl
-      << endl
-      << "# Set the following if you want to use something other than this\n"
-      << "# machine's real hostname for identifying settings in the database.\n"
-      << "# This is useful if your hostname changes often, as otherwise you\n"
-      << "# will need to reconfigure mythtv every time.\n"
-      << "# NO TWO HOSTS MAY USE THE SAME VALUE\n"
-      << "#\n";
-
-    if (params.localEnabled)
-        s << "LocalHostName=" << params.localHostName << endl;
-    else
-        s << "#LocalHostName=my-unique-identifier-goes-here\n";
-
-    s << endl
-      << "# If you want your frontend to be able to wake your MySQL server\n"
-      << "# using WakeOnLan, have a look at the following settings:\n"
-      << "#\n"
-      << "#\n"
-      << "# The time the frontend waits (in seconds) between reconnect tries.\n"
-      << "# This should be the rough time your MySQL server needs for startup\n"
-      << "#\n";
-
-    if (params.wolEnabled)
-        s << "WOLsqlReconnectWaitTime=" << params.wolReconnect << endl;
-    else
-        s << "#WOLsqlReconnectWaitTime=0\n";
-
-    s << "#\n"
-      << "#\n"
-      << "# This is the number of retries to wake the MySQL server\n"
-      << "# until the frontend gives up\n"
-      << "#\n";
-
-    if (params.wolEnabled)
-        s << "WOLsqlConnectRetry=" << params.wolRetry << endl;
-    else
-        s << "#WOLsqlConnectRetry=5\n";
-
-    s << "#\n"
-      << "#\n"
-      << "# This is the command executed to wake your MySQL server.\n"
-      << "#\n";
-
-    if (params.wolEnabled)
-        s << "WOLsqlCommand=" << params.wolCommand << endl;
-    else
-        s << "#WOLsqlCommand=echo 'WOLsqlServerCommand not set'\n";
-
-    f->close();
-    return true;
 }
 
 void MythDB::WriteDelayedSettings(void)

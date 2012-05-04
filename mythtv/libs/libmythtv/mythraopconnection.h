@@ -5,6 +5,7 @@
 #include <QMap>
 #include <QHash>
 #include <QHostAddress>
+#include <QStringList>
 
 #include <openssl/rsa.h>
 #include <openssl/pem.h>
@@ -21,8 +22,23 @@ class QTimer;
 class AudioOutput;
 class ServerPool;
 class NetStream;
+class AudioData;
+struct AudioData;
 
-typedef QHash<QByteArray,QByteArray> RawHash;
+typedef QHash<QString,QString> RawHash;
+
+struct AudioData
+{
+    int16_t    *data;
+    int32_t     length;
+    int32_t     frames;
+};
+
+struct AudioPacket
+{
+    uint16_t          seq;
+    QList<AudioData> *data;
+};
 
 class MythRAOPConnection : public QObject
 {
@@ -38,11 +54,11 @@ class MythRAOPConnection : public QObject
     QTcpSocket* GetSocket()   { return m_socket;   }
     int         GetDataPort() { return m_dataPort; }
     bool        HasAudio()    { return m_audio;    }
+    static QMap<QString,QString> decodeDMAP(const QByteArray &dmap);
 
   public slots:
     void readClient(void);
     void udpDataReady(QByteArray buf, QHostAddress peer, quint16 port);
-    void udpDataReady(void);
     void timeout(void);
     void audioRetry(void);
 
@@ -50,38 +66,61 @@ class MythRAOPConnection : public QObject
     static RSA* LoadKey(void);
 
   private:
-    uint64_t FramesToMs(uint64_t timestamp);
-    void    ProcessSyncPacket(const QByteArray &buf, uint64_t timenow);
-    void    SendResendRequest(uint64_t timenow, uint16_t expected,
-                              uint16_t got);
-    void    ExpireResendRequests(uint64_t timenow);
-    int     ExpireAudio(uint64_t timestamp);
-    void    ProcessAudio(uint64_t timenow);
-    void    ResetAudio(void);
-    void    ProcessRequest(const QList<QByteArray> &lines);
-    void    StartResponse(NetStream *stream,
-                          QByteArray &option, QByteArray &cseq);
-    void    FinishResponse(NetStream *stream, QTcpSocket *socket,
-                           QByteArray &option, QByteArray &cseq);
-    RawHash FindTags(const QList<QByteArray> &lines);
-    bool    CreateDecoder(void);
-    void    DestroyDecoder(void);
-    bool    OpenAudioDevice(void);
-    void    CloseAudioDevice(void);
-    void    StartAudioTimer(void);
-    void    StopAudioTimer(void);
+    void     ProcessSync(const QByteArray &buf);
+    void     SendResendRequest(uint64_t timestamp,
+                               uint16_t expected, uint16_t got);
+    void     ExpireResendRequests(uint64_t timestamp);
+    uint32_t decodeAudioPacket(uint8_t type, const QByteArray *buf,
+                               QList<AudioData> *dest);
+    int      ExpireAudio(uint64_t timestamp);
+    void     ResetAudio(void);
+    void     ProcessRequest(const QStringList &header,
+                            const QByteArray &content);
+    void     StartResponse(NetStream *stream,
+                           QString &option, QString &cseq);
+    void     FinishResponse(NetStream *stream, QTcpSocket *socket,
+                            QString &option, QString &cseq);
+    RawHash  FindTags(const QStringList &lines);
+    bool     CreateDecoder(void);
+    void     DestroyDecoder(void);
+    bool     OpenAudioDevice(void);
+    void     CloseAudioDevice(void);
+    void     StartAudioTimer(void);
+    void     StopAudioTimer(void);
+
+    // time sync
+    void     SendTimeRequest(void);
+    void     ProcessTimeResponse(const QByteArray &buf);
+    uint64_t NTPToLocal(uint32_t sec, uint32_t ticks);
+
+    // incoming data packet
+    bool    GetPacketType(const QByteArray &buf, uint8_t &type,
+                          uint16_t &seq, uint64_t &timestamp);
+
+    // utility functions
+    int64_t     AudioCardLatency(void);
+    QStringList splitLines(const QByteArray &lines);
+    QString     stringFromSeconds(int seconds);
+    uint64_t    framesToMs(uint64_t frames);
 
     QTimer         *m_watchdogTimer;
     // comms socket
     QTcpSocket     *m_socket;
     NetStream      *m_textStream;
     QByteArray      m_hardwareId;
-    // incoming audio
+    QStringList     m_incomingHeaders;
+    QByteArray      m_incomingContent;
+    bool            m_incomingPartial;
+    int32_t         m_incomingSize;
     QHostAddress    m_peerAddress;
-    int             m_dataPort;
     ServerPool     *m_dataSocket;
-    QUdpSocket     *m_clientControlSocket;
+    int             m_dataPort;
+    ServerPool     *m_clientControlSocket;
     int             m_clientControlPort;
+    ServerPool     *m_clientTimingSocket;
+    int             m_clientTimingPort;
+
+    // incoming audio
     QMap<uint16_t,uint64_t> m_resends;
     // crypto
     QByteArray      m_AESIV;
@@ -92,31 +131,49 @@ class MythRAOPConnection : public QObject
     AVCodec        *m_codec;
     AVCodecContext *m_codeccontext;
     QList<int>      m_audioFormat;
-    int             m_sampleRate;
     int             m_channels;
-    typedef struct 
-    {
-        int16_t *samples;
-        uint32_t frames;
-        uint32_t size;
-    } AudioFrame;
-            
-    QMap<uint64_t, AudioFrame>  m_audioQueue;
+    int             m_sampleSize;
+    int             m_frameRate;
+    int             m_framesPerPacket;
+    QTimer         *m_dequeueAudioTimer;
+
+    QMap<uint64_t, AudioPacket>  m_audioQueue;
     uint32_t        m_queueLength;
+    bool            m_streamingStarted;
     bool            m_allowVolumeControl;
+
+    // packet index, increase after each resend packet request
+    uint16_t        m_seqNum;
     // audio/packet sync
-    bool            m_seenPacket;
-    int16_t         m_lastPacketSequence;
-    uint64_t        m_lastPacketTimestamp;
-    uint64_t        m_lastSyncTime;
-    uint64_t        m_lastSyncTimestamp;
-    uint64_t        m_lastLatency;
-    uint64_t        m_latencyAudio;
-    uint64_t        m_latencyQueued;
-    uint64_t        m_latencyCounter;
-    int64_t         m_avSync;
+    uint16_t        m_lastSequence;
+    uint64_t        m_lastTimestamp;
+    uint64_t        m_currentTimestamp;
+    uint16_t        m_nextSequence;
+    uint64_t        m_nextTimestamp;
+    uint64_t        m_bufferLength;
+    uint64_t        m_timeLastSync;
+    int64_t         m_cardLatency;
+    int64_t         m_adjustedLatency;
+    bool            m_audioStarted;
+
+    // clock sync
+    uint64_t        m_masterTimeStamp;
+    uint64_t        m_deviceTimeStamp;
+    uint64_t        m_networkLatency;
+    int64_t         m_clockSkew;       // difference in ms between reference
+
     // audio retry timer
     QTimer         *m_audioTimer;
+
+    //Current Stream Info
+    uint32_t        m_progressStart;
+    uint32_t        m_progressCurrent;
+    uint32_t        m_progressEnd;
+    QByteArray      m_artwork;
+    QByteArray      m_dmap;
+
+  private slots:
+    void ProcessAudio(void);
 };
 
 #endif // MYTHRAOPCONNECTION_H

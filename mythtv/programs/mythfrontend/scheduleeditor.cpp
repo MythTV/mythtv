@@ -154,6 +154,10 @@ bool ScheduleEditor::Create()
     connect(m_cancelButton, SIGNAL(Clicked()), SLOT(Close()));
     connect(m_saveButton, SIGNAL(Clicked()), SLOT(Save()));
 
+    m_schedInfoButton->SetEnabled(!m_recordingRule->m_isTemplate);
+    m_previewButton->SetEnabled(!m_recordingRule->m_isTemplate);
+    m_metadataButton->SetEnabled(!m_recordingRule->m_isTemplate);
+
     BuildFocusList();
 
     if (!m_recordingRule->IsLoaded())
@@ -193,7 +197,20 @@ void ScheduleEditor::Load()
     RecordingType type = m_recordingRule->m_type;
 
     // Rules List
-    if (m_recordingRule->m_isOverride)
+    if (m_recordingRule->m_isTemplate)
+    {
+        if (m_recordingRule->m_category
+            .compare("Default", Qt::CaseInsensitive) != 0)
+        {
+            new MythUIButtonListItem(m_rulesList,
+                                     tr("Delete this recording rule template"),
+                                     ENUM_TO_QVARIANT(kNotRecording));
+        }
+        new MythUIButtonListItem(m_rulesList,
+                                 tr("Modify this recording rule template"),
+                                 ENUM_TO_QVARIANT(kTemplateRecord));
+    }
+    else if (m_recordingRule->m_isOverride)
     {
         new MythUIButtonListItem(m_rulesList,
                                  tr("Record this showing with normal options"),
@@ -258,6 +275,17 @@ void ScheduleEditor::Load()
     SetTextFromMap(progMap);
 }
 
+void ScheduleEditor::LoadTemplate(QString name)
+{
+    m_recordingRule->LoadTemplate(name);
+
+    InfoMap progMap;
+    m_recordingRule->ToMap(progMap);
+    if (m_recInfo)
+        m_recInfo->ToMap(progMap);
+    SetTextFromMap(progMap);
+}
+
 void ScheduleEditor::RuleChanged(MythUIButtonListItem *item)
 {
     if (!item)
@@ -282,7 +310,10 @@ void ScheduleEditor::Save()
         RecordingType type = static_cast<RecordingType>(item->GetData().toInt());
         if (type == kNotRecording)
         {
+            int recid = m_recordingRule->m_recordID;
             DeleteRule();
+            if (recid)
+                emit ruleDeleted(recid);
             Close();
             return;
         }
@@ -355,6 +386,33 @@ void ScheduleEditor::ShowSchedInfo()
         delete menuPopup;
 }
 
+bool ScheduleEditor::keyPressEvent(QKeyEvent *event)
+{
+    if (GetFocusWidget()->keyPressEvent(event))
+        return true;
+
+    bool handled = false;
+    QStringList actions;
+    handled = GetMythMainWindow()->
+        TranslateKeyPress("TV Frontend", event, actions);
+
+    for (int i = 0; i < actions.size() && !handled; i++)
+    {   
+        QString action = actions[i];
+        handled = true;
+
+        if (action == "MENU")
+            showMenu();
+        else
+            handled = false;
+    }
+
+    if (!handled && MythScreenType::keyPressEvent(event))
+        handled = true;
+
+    return handled;
+}
+
 void ScheduleEditor::customEvent(QEvent *event)
 {
     if (event->type() == DialogCompletionEvent::kEventType)
@@ -362,9 +420,21 @@ void ScheduleEditor::customEvent(QEvent *event)
         DialogCompletionEvent *dce = (DialogCompletionEvent*)(event);
 
         QString resultid  = dce->GetId();
+        QString resulttext = dce->GetResultText();
         int     buttonnum = dce->GetResult();
 
-        if (resultid == "schedinfo")
+        if (resultid == "menu")
+        {   
+            if (resulttext == tr("Use Template"))
+            {
+                showTemplateMenu();
+            }
+        }
+        else if (resultid == "templatemenu")
+        {
+            LoadTemplate(resulttext);
+        }
+        else if (resultid == "schedinfo")
         {
             switch (buttonnum)
             {
@@ -456,6 +526,59 @@ void ScheduleEditor::ShowMetadataOptions(void)
         mainStack->AddScreen(rad);
     else
         delete rad;
+}
+
+void ScheduleEditor::showMenu(void)
+{
+    QString label = tr("Options");
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+    MythDialogBox *menuPopup = 
+        new MythDialogBox(label, popupStack, "menuPopup");
+
+    if (menuPopup->Create())
+    {
+        menuPopup->SetReturnEvent(this, "menu");
+        menuPopup->AddButton(tr("Use Template"));
+        popupStack->AddScreen(menuPopup);
+    }
+    else
+    {
+        delete menuPopup;
+    }
+}
+
+void ScheduleEditor::showTemplateMenu(void)
+{   
+    QStringList templates = RecordingRule::GetTemplateNames();
+    if (templates.empty())
+    {
+        ShowOkPopup(tr("No templates available"));
+        return;
+    }
+
+    QString label = tr("Template Options");
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+    MythDialogBox *menuPopup = 
+        new MythDialogBox(label, popupStack, "menuPopup");   
+
+    if (menuPopup->Create())
+    {   
+        menuPopup->SetReturnEvent(this, "templatemenu");
+        while (!templates.empty())
+        {
+            QString name = templates.front();
+            if (name == "Default")
+                menuPopup->AddButton(tr("Default"));
+            else
+                menuPopup->AddButton(name);
+            templates.pop_front();
+        }
+        popupStack->AddScreen(menuPopup);
+    }
+    else
+    {
+        delete menuPopup;
+    }
 }
 
 ////////////////////////////////////////////////////////
