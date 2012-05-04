@@ -632,6 +632,7 @@ void SubtitleScreen::Pulse(void)
         DisplayRawTextSubtitles();
 
     OptimiseDisplayedArea();
+    MythScreenType::Pulse();
     m_refreshArea = false;
 }
 
