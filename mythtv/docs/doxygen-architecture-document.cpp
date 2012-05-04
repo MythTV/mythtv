@@ -576,7 +576,7 @@ Most MythTV programs follow a common sequence:
   <li>Initialise the MythContext, which:</li>
   <ul>
     <li>Tries to find a database on localhost,
-        or on the host specified in mysql.txt,</li>
+        or on the host specified in config.xml,</li>
     <li>Tries to locate exactly one backend host via UPnP,
         to find its database,</li>
     <li>If possible, displays a list of all backends located via UPnP

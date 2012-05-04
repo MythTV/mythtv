@@ -210,51 +210,6 @@ static HostComboBox *AutoCommercialSkip()
     return gc;
 }
 
-static GlobalCheckBox *AutoMetadataLookup()
-{
-    GlobalCheckBox *bc = new GlobalCheckBox("AutoMetadataLookup");
-    bc->setLabel(QObject::tr("Run metadata lookup"));
-    bc->setValue(true);
-    bc->setHelpText(QObject::tr("This is the default value used for the "
-                    "automatic metadata lookup setting when a new "
-                    "scheduled recording is created."));
-    return bc;
-}
-
-static GlobalCheckBox *AutoCommercialFlag()
-{
-    GlobalCheckBox *bc = new GlobalCheckBox("AutoCommercialFlag");
-    bc->setLabel(QObject::tr("Run commercial detection"));
-    bc->setValue(true);
-    bc->setHelpText(QObject::tr("This is the default value used for the "
-                    "automatic commercial detection setting when a new "
-                    "scheduled recording is created."));
-    return bc;
-}
-
-static GlobalCheckBox *AutoTranscode()
-{
-    GlobalCheckBox *bc = new GlobalCheckBox("AutoTranscode");
-    bc->setLabel(QObject::tr("Run transcoder"));
-    bc->setValue(false);
-    bc->setHelpText(QObject::tr("This is the default value used for the "
-                    "automatic-transcode setting when a new scheduled "
-                    "recording is created."));
-    return bc;
-}
-
-static GlobalComboBox *DefaultTranscoder()
-{
-    GlobalComboBox *bc = new GlobalComboBox("DefaultTranscoder");
-    bc->setLabel(QObject::tr("Default transcoder"));
-    RecordingProfile::fillSelections(bc, RecordingProfile::TranscoderGroup,
-                                     true);
-    bc->setHelpText(QObject::tr("This is the default value used for the "
-                    "transcoder setting when a new scheduled "
-                    "recording is created."));
-    return bc;
-}
-
 static GlobalSpinBox *DeferAutoTranscodeDays()
 {
     GlobalSpinBox *gs = new GlobalSpinBox("DeferAutoTranscodeDays", 0, 365, 1);
@@ -264,22 +219,6 @@ static GlobalSpinBox *DeferAutoTranscodeDays()
                     "completes instead of immediately afterwards."));
     gs->setValue(0);
     return gs;
-}
-
-static GlobalCheckBox *AutoRunUserJob(uint job_num)
-{
-    QString dbStr = QString("AutoRunUserJob%1").arg(job_num);
-    QString label = QObject::tr("Run user job #%1")
-        .arg(job_num);
-    GlobalCheckBox *bc = new GlobalCheckBox(dbStr);
-    bc->setLabel(label);
-    bc->setValue(false);
-    bc->setHelpText(QObject::tr("This is the default value used for the "
-                    "'Run %1' setting when a new scheduled "
-                    "recording is created.")
-                    .arg(gCoreContext->GetSetting(QString("UserJobDesc%1")
-                         .arg(job_num))));
-    return bc;
 }
 
 static GlobalCheckBox *AggressiveCommDetect()
@@ -448,17 +387,6 @@ static GlobalSpinBox *AutoExpireDayPriority()
     bs->setValue(3);
     return bs;
 };
-
-static GlobalCheckBox *AutoExpireDefault()
-{
-    GlobalCheckBox *bc = new GlobalCheckBox("AutoExpireDefault");
-    bc->setLabel(QObject::tr("Auto-Expire default"));
-    bc->setValue(true);
-    bc->setHelpText(QObject::tr("If enabled, any new recording schedules "
-                    "will be marked as eligible for auto-expiration. "
-                    "Existing schedules will keep their current value."));
-    return bc;
-}
 
 static GlobalSpinBox *AutoExpireLiveTVMaxAge()
 {
@@ -1405,23 +1333,6 @@ static HostSpinBox *OSDCC708TextZoomPercentage(void)
     return gs;
 }
 
-static HostComboBox *SubtitleFont()
-{
-    HostComboBox *hcb = new HostComboBox("DefaultSubtitleFont");
-    QFontDatabase db;
-    QStringList fonts = db.families();
-    QStringList hide  = db.families(QFontDatabase::Symbol);
-
-    hcb->setLabel(QObject::tr("Subtitle Font"));
-    hcb->setHelpText(QObject::tr("The font to use for text based subtitles."));
-    foreach (QString font, fonts)
-    {
-        if (!hide.contains(font))
-            hcb->addSelection(font, font, font.toLower() == "freemono");
-    }
-    return hcb;
-}
-
 static HostComboBox *SubtitleCodec()
 {
     HostComboBox *gc = new HostComboBox("SubtitleCodec");
@@ -1485,18 +1396,6 @@ static HostSpinBox *YScanDisplacement()
     gs->setHelpText(QObject::tr("Adjust this to move the image vertically."));
     return gs;
 };
-
-static HostCheckBox *CCBackground()
-{
-    HostCheckBox *gc = new HostCheckBox("CCBackground");
-    gc->setLabel(QObject::tr("Black background for closed captioning"));
-    gc->setValue(false);
-    gc->setHelpText(QObject::tr(
-                        "If enabled, captions will be displayed "
-                        "over a black background "
-                        "for better contrast."));
-    return gc;
-}
 
 static HostCheckBox *DefaultCCMode()
 {
@@ -2437,36 +2336,6 @@ static GlobalComboBox *GRSchedOpenEnd()
     bc->addSelection(QObject::tr("Always"), "2");
     bc->setValue(0);
     return bc;
-}
-
-static GlobalSpinBox *GRDefaultStartOffset()
-{
-    GlobalSpinBox *bs = new GlobalSpinBox("DefaultStartOffset",
-                                          -10, 30, 5, true);
-    bs->setLabel(QObject::tr("Default 'Start Early' minutes for new "
-                             "recording rules"));
-    bs->setHelpText(QObject::tr("Set this to '0' unless you expect that the "
-                    "majority of your show times will not match your TV "
-                    "listings. This sets the initial start early or start "
-                    "late time when rules are created. These can then be "
-                    "adjusted per recording rule."));
-    bs->setValue(0);
-    return bs;
-}
-
-static GlobalSpinBox *GRDefaultEndOffset()
-{
-    GlobalSpinBox *bs = new GlobalSpinBox("DefaultEndOffset",
-                                          -10, 30, 5, true);
-    bs->setLabel(QObject::tr("Default 'End Late' minutes for new "
-                             "recording rules"));
-    bs->setHelpText(QObject::tr("Set this to '0' unless you expect that the "
-                    "majority of your show times will not match your TV "
-                    "listings. This sets the initial end late or end early "
-                    "time when rules are created. These can then be adjusted "
-                    "per recording rule."));
-    bs->setValue(0);
-    return bs;
 }
 
 static GlobalSpinBox *GRPrefInputRecPriority()
@@ -3530,9 +3399,7 @@ OSDSettings::OSDSettings()
     osd->addChild(EnableMHEG());
     osd->addChild(PersistentBrowseMode());
     osd->addChild(BrowseAllTuners());
-    osd->addChild(CCBackground());
     osd->addChild(DefaultCCMode());
-    osd->addChild(SubtitleFont());
     osd->addChild(OSDCC708TextZoomPercentage());
     osd->addChild(SubtitleCodec());
     addChild(osd);
@@ -3564,7 +3431,6 @@ GeneralSettings::GeneralSettings()
 
     VerticalConfigurationGroup *expgrp0 =
         new VerticalConfigurationGroup(false, false, true, true);
-    expgrp0->addChild(AutoExpireDefault());
     expgrp0->addChild(RerecordWatched());
     expgrp0->addChild(AutoExpireWatchedPriority());
 
@@ -3591,29 +3457,7 @@ GeneralSettings::GeneralSettings()
     jobs->addChild(CommercialSkipMethod());
     jobs->addChild(CommFlagFast());
     jobs->addChild(AggressiveCommDetect());
-    jobs->addChild(DefaultTranscoder());
     jobs->addChild(DeferAutoTranscodeDays());
-
-    VerticalConfigurationGroup* autogrp0 =
-        new VerticalConfigurationGroup(false, false, true, true);
-    autogrp0->addChild(AutoMetadataLookup());
-    autogrp0->addChild(AutoCommercialFlag());
-    autogrp0->addChild(AutoTranscode());
-
-    VerticalConfigurationGroup* autogrp1 =
-        new VerticalConfigurationGroup(false, false, true, true);
-    autogrp0->addChild(AutoRunUserJob(1));
-    autogrp1->addChild(AutoRunUserJob(2));
-    autogrp1->addChild(AutoRunUserJob(3));
-    autogrp1->addChild(AutoRunUserJob(4));
-
-    HorizontalConfigurationGroup *autogrp =
-        new HorizontalConfigurationGroup(true, true, false, true);
-    autogrp->setLabel(
-        QObject::tr("Default Job Queue Settings for New Scheduled Recordings"));
-    autogrp->addChild(autogrp0);
-    autogrp->addChild(autogrp1);
-    jobs->addChild(autogrp);
 
     addChild(jobs);
 
@@ -3649,8 +3493,6 @@ GeneralRecPrioritiesSettings::GeneralRecPrioritiesSettings()
 
     sched->addChild(GRSchedMoveHigher());
     sched->addChild(GRSchedOpenEnd());
-    sched->addChild(GRDefaultStartOffset());
-    sched->addChild(GRDefaultEndOffset());
     sched->addChild(GRPrefInputRecPriority());
     sched->addChild(GRHDTVRecPriority());
     sched->addChild(GRWSRecPriority());

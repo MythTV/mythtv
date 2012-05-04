@@ -27,7 +27,22 @@ class Cache( object ):
     """
     def __init__(self, engine=None, *args, **kwargs):
         self._engine = None
+        self._data = {}
+        self._age = 0
         self.configure(engine, *args, **kwargs)
+
+    def _import(self, data=None):
+        if data is None:
+            data = self._engine.get(self._age)
+        for obj in sorted(data, key=lambda x: x.creation):
+            if not obj.expired:
+                self._data[obj.key] = obj
+                self._age = max(self._age, obj.creation)
+
+    def _expire(self):
+        for k,v in self._data.items():
+            if v.expired:
+                del self._data[k]
 
     def configure(self, engine, *args, **kwargs):
         if engine is None:
@@ -37,21 +52,23 @@ class Cache( object ):
         self._engine = Engines[engine](self)
         self._engine.configure(*args, **kwargs)
 
-    def put(self, key, data, lifetime=3600):
+    def put(self, key, data, lifetime=60*60*12):
         # pull existing data, so cache will be fresh when written back out
         if self._engine is None:
             raise TMDBCacheError("No cache engine configured")
-        self._engine.put(key, data, lifetime)
+        self._expire()
+        self._import(self._engine.put(key, data, lifetime))
 
     def get(self, key):
         if self._engine is None:
             raise TMDBCacheError("No cache engine configured")
-        return self._engine.get(key)
-
-        self._read()
-        if (key in self._cache) and (time.time() < self._cache[key][0]):
-            return self._cache[key][1]
-        return None
+        self._expire()
+        if key not in self._data:
+            self._import()
+        try:
+            return self._data[key].data
+        except:
+            return None
 
     def cached(self, callback):
         """
@@ -85,6 +102,8 @@ class Cache( object ):
                     raise TMDBCacheError('Cache.Cached must be provided a '+\
                                          'callable object.')
                 return self.__class__(self.cache, self.callback, args[0])
+            elif self.inst.lifetime == 0:
+                return self.func(*args, **kwargs)
             else:
                 key = self.callback()
                 data = self.cache.get(key)

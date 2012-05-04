@@ -2661,7 +2661,7 @@ void TVRec::NotifySchedulerOfRecording(RecordingInfo *rec)
         rec->GetRecordingRule()->m_type = kSingleRecord;
     }
 
-    // + remove DefaultEndOffset which would mismatch the live session
+    // + remove any end offset which would mismatch the live session
     rec->GetRecordingRule()->m_endOffset = 0;
 
     // + save rsInactive recstatus to so that a reschedule call
@@ -3002,7 +3002,21 @@ QString TVRec::SetInput(QString input, uint requestType)
  */
 void TVRec::SetChannel(QString name, uint requestType)
 {
-    QMutexLocker lock(&stateChangeLock);
+    if (TVRec::kFlagEITScan == requestType)
+    {
+        if (!stateChangeLock.tryLock())
+        {
+            LOG(VB_CHANNEL, LOG_INFO, LOC +
+                QString("SetChannel(%1, kFlagEITScan) -- "
+                        "couldn't get lock aborting").arg(name));
+            return;
+        }
+    }
+    else
+    {
+        stateChangeLock.lock();
+    }
+
     LOG(VB_CHANNEL, LOG_INFO, LOC +
         QString("SetChannel(%1) -- begin").arg(name));
 
@@ -3028,6 +3042,7 @@ void TVRec::SetChannel(QString name, uint requestType)
             WaitForEventThreadSleep();
     }
     LOG(VB_CHANNEL, LOG_INFO, LOC + QString("SetChannel(%1) -- end").arg(name));
+    stateChangeLock.unlock();
 }
 
 void TVRec::GetNextProgram(BrowseDirection direction,

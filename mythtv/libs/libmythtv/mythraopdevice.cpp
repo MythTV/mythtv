@@ -55,8 +55,26 @@ bool MythRAOPDevice::Create(void)
         gMythRAOPDeviceThread->start(QThread::LowestPriority);
     }
 
+
     LOG(VB_GENERAL, LOG_INFO, LOC + "Created RAOP device objects.");
     return true;
+}
+
+QString MythRAOPDevice::HardwareId()
+{
+    QString key = "AirPlayId";
+    QString id = gCoreContext->GetSetting(key);
+    int size = id.size();
+    if (size == 12)
+        return id;
+
+    QByteArray ba;
+    for (int i = 0; i < RAOP_HARDWARE_ID_SIZE; i++)
+        ba.append((random() % 80) + 33);
+    id = ba.toHex();
+
+    gCoreContext->SaveSetting(key, id);
+    return id;
 }
 
 void MythRAOPDevice::Cleanup(void)
@@ -83,8 +101,7 @@ MythRAOPDevice::MythRAOPDevice()
   : ServerPool(), m_name(QString("MythTV")), m_bonjour(NULL), m_valid(false),
     m_lock(new QMutex(QMutex::Recursive)), m_setupPort(5000)
 {
-    for (int i = 0; i < RAOP_HARDWARE_ID_SIZE; i++)
-        m_hardwareId.append((random() % 80) + 33);
+    m_hardwareId = QByteArray::fromHex(HardwareId().toAscii());
 }
 
 MythRAOPDevice::~MythRAOPDevice()
@@ -127,56 +144,56 @@ void MythRAOPDevice::Start(void)
     connect(this, SIGNAL(newConnection(QTcpSocket *)),
             this, SLOT(newConnection(QTcpSocket *)));
 
-    // start listening for connections (try a few ports in case the default is in use)
     int baseport = m_setupPort;
-    while (m_setupPort < baseport + RAOP_PORT_RANGE)
+    m_setupPort = tryListeningPort(m_setupPort, RAOP_PORT_RANGE);
+    // start listening for connections (try a few ports in case the default is in use)
+    if (m_setupPort < 0)
     {
-        if (listen(QNetworkInterface::allAddresses(), m_setupPort, false))
-        {
-            LOG(VB_GENERAL, LOG_INFO, LOC +
-                QString("Listening for connections on port %1").arg(m_setupPort));
-            break;
-        }
-        m_setupPort++;
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            "Failed to find a port for incoming connections.");
     }
-
-    if (m_setupPort >= baseport + RAOP_PORT_RANGE)
-        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to find a port for incoming connections.");
-
-    // announce service
-    m_bonjour = new BonjourRegister(this);
-
-    // give each frontend a unique name
-    int multiple = m_setupPort - baseport;
-    if (multiple > 0)
-        m_name += QString::number(multiple);
-
-    QByteArray name = m_hardwareId.toHex();
-    name.append("@");
-    name.append(m_name);
-    name.append(" on ");
-    name.append(gCoreContext->GetHostName());
-    QByteArray type = "_raop._tcp";
-    QByteArray txt;
-    txt.append(6); txt.append("tp=UDP");
-    txt.append(8); txt.append("sm=false");
-    txt.append(8); txt.append("sv=false");
-    txt.append(4); txt.append("ek=1");
-    txt.append(6); txt.append("et=0,1");
-    txt.append(6); txt.append("cn=0,1");
-    txt.append(4); txt.append("ch=2");
-    txt.append(5); txt.append("ss=16");
-    txt.append(8); txt.append("sr=44100");
-    txt.append(8); txt.append("pw=false");
-    txt.append(4); txt.append("vn=3");
-    txt.append(9); txt.append("txtvers=1");
-
-    LOG(VB_GENERAL, LOG_INFO, QString("Registering service %1.%2 port %3 TXT %4")
-        .arg(QString(name)).arg(QString(type)).arg(m_setupPort).arg(QString(txt)));
-    if (!m_bonjour->Register(m_setupPort, type, name, txt))
+    else
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to register service.");
-        return;
+        LOG(VB_GENERAL, LOG_INFO, LOC +
+            QString("Listening for connections on port %1").arg(m_setupPort));
+        // announce service
+        m_bonjour = new BonjourRegister(this);
+
+        // give each frontend a unique name
+        int multiple = m_setupPort - baseport;
+        if (multiple > 0)
+            m_name += QString::number(multiple);
+
+        QByteArray name = m_hardwareId.toHex();
+        name.append("@");
+        name.append(m_name);
+        name.append(" on ");
+        name.append(gCoreContext->GetHostName());
+        QByteArray type = "_raop._tcp";
+        QByteArray txt;
+        txt.append(6); txt.append("tp=UDP");
+        txt.append(8); txt.append("sm=false");
+        txt.append(8); txt.append("sv=false");
+        txt.append(4); txt.append("ek=1");      //
+        txt.append(6); txt.append("et=0,1");    // encryption type: no, RSA
+        txt.append(6); txt.append("cn=0,1");    // audio codec: pcm, alac
+        txt.append(4); txt.append("ch=2");      // audio channels
+        txt.append(5); txt.append("ss=16");     // sample size
+        txt.append(8); txt.append("sr=44100");  // sample rate
+        txt.append(8); txt.append("pw=false");  // no password
+        txt.append(4); txt.append("vn=3");
+        txt.append(9); txt.append("txtvers=1"); // TXT record version 1
+        txt.append(8); txt.append("md=0,1,2");  // metadata-type: text, artwork, progress
+        txt.append(9); txt.append("vs=130.14");
+        txt.append(7); txt.append("da=true");
+
+        LOG(VB_GENERAL, LOG_INFO, QString("Registering service %1.%2 port %3 TXT %4")
+            .arg(QString(name)).arg(QString(type)).arg(m_setupPort).arg(QString(txt)));
+        if (!m_bonjour->Register(m_setupPort, type, name, txt))
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to register service.");
+            return;
+        }
     }
 
     m_valid = true;
@@ -224,7 +241,8 @@ void MythRAOPDevice::newConnection(QTcpSocket *client)
         return;
     }
 
-    LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to initialise client connection - closing.");
+    LOG(VB_GENERAL, LOG_ERR, LOC +
+        "Failed to initialise client connection - closing.");
     delete obj;
     client->disconnectFromHost();
     delete client;

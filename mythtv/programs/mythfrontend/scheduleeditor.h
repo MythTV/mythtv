@@ -37,6 +37,7 @@ class ScheduleEditor : public ScheduleCommon
    ~ScheduleEditor();
 
     bool Create(void);
+    bool keyPressEvent(QKeyEvent *event);
     void customEvent(QEvent *event);
 
     /// Callback
@@ -44,6 +45,7 @@ class ScheduleEditor : public ScheduleCommon
 
   signals:
     void ruleSaved(int ruleId);
+    void ruleDeleted(int ruleId);
 
   protected slots:
     void RuleChanged(MythUIButtonListItem *item);
@@ -58,11 +60,15 @@ class ScheduleEditor : public ScheduleCommon
 
   private:
     void Load(void);
+    void LoadTemplate(QString name);
     void DeleteRule(void);
 
     void showPrevious(void);
     void showUpcomingByRule(void);
     void showUpcomingByTitle(void);
+
+    void showMenu(void);
+    void showTemplateMenu(void);
 
     RecordingInfo *m_recInfo;
     RecordingRule *m_recordingRule;

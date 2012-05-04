@@ -34,6 +34,7 @@ using namespace std;
 #include "DisplayRes.h"
 #include "signalmonitorvalue.h"
 #include "scheduledrecording.h"
+#include "recordingrule.h"
 #include "previewgenerator.h"
 #include "mythconfig.h"
 #include "livetvchain.h"
@@ -1014,7 +1015,6 @@ void TV::InitFromDB(void)
     kv["LiveTVIdleTimeout"]        = "0";
     kv["BrowseMaxForward"]         = "240";
     kv["PlaybackExitPrompt"]       = "0";
-    kv["AutoExpireDefault"]        = "0";
     kv["AutomaticSetWatched"]      = "0";
     kv["EndOfRecordingExitPrompt"] = "0";
     kv["JumpToProgramOSD"]         = "1";
@@ -1059,7 +1059,6 @@ void TV::InitFromDB(void)
     db_idle_timeout        = kv["LiveTVIdleTimeout"].toInt() * 60 * 1000;
     db_browse_max_forward  = kv["BrowseMaxForward"].toInt() * 60;
     db_playback_exit_prompt= kv["PlaybackExitPrompt"].toInt();
-    db_autoexpire_default  = kv["AutoExpireDefault"].toInt();
     db_auto_set_watched    = kv["AutomaticSetWatched"].toInt();
     db_end_of_rec_exit_prompt = kv["EndOfRecordingExitPrompt"].toInt();
     db_jump_prefer_osd     = kv["JumpToProgramOSD"].toInt();
@@ -1085,6 +1084,10 @@ void TV::InitFromDB(void)
 
     QString beVBI          = kv["VbiFormat"];
     QString feVBI          = kv["DecodeVBIFormat"];
+
+    RecordingRule record;
+    record.LoadTemplate("Default");
+    db_autoexpire_default  = record.m_autoExpire;
 
     if (db_use_channel_groups)
     {

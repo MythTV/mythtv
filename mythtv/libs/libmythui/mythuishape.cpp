@@ -55,6 +55,7 @@ void MythUIShape::SetLinePen(QPen pen)
 void MythUIShape::DrawSelf(MythPainter *p, int xoffset, int yoffset,
                            int alphaMod, QRect clipRect)
 {
+    int alpha = CalcAlpha(alphaMod);
     QRect area = GetArea();
     m_cropRect.CalculateArea(area);
 
@@ -64,11 +65,11 @@ void MythUIShape::DrawSelf(MythPainter *p, int xoffset, int yoffset,
     area.translate(xoffset, yoffset);
 
     if (m_type == "box")
-        p->DrawRect(area, m_fillBrush, m_linePen, alphaMod);
+        p->DrawRect(area, m_fillBrush, m_linePen, alpha);
     else if (m_type == "roundbox")
-        p->DrawRoundRect(area, m_cornerRadius, m_fillBrush, m_linePen, alphaMod);
+        p->DrawRoundRect(area, m_cornerRadius, m_fillBrush, m_linePen, alpha);
     else if (m_type == "ellipse")
-        p->DrawEllipse(area, m_fillBrush, m_linePen, alphaMod);
+        p->DrawEllipse(area, m_fillBrush, m_linePen, alpha);
 }
 
 /**

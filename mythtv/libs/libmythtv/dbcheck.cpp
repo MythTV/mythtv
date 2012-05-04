@@ -15,6 +15,7 @@ using namespace std;
 #include "diseqcsettings.h" // for convert_diseqc_db()
 #include "videodbcheck.h" // for 1267
 #include "compat.h"
+#include "recordingrule.h"
 
 // TODO convert all dates to UTC
 
@@ -1981,6 +1982,18 @@ NULL
 };
 
         if (!performActualUpdate(updates, "1301", dbver))
+            return false;
+    }
+
+    if (dbver == "1301")
+    {
+        // Create the Default recording rule template
+        RecordingRule record;
+        record.MakeTemplate("Default");
+        record.m_type = kTemplateRecord;
+        record.Save(false);
+
+        if (!UpdateDBVersionNumber("1302", dbver))
             return false;
     }
 

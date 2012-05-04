@@ -400,7 +400,6 @@ void MythThemedMenu::customEvent(QEvent *event)
                 QDateTime curr_time = MythDate::current();
                 QString last_time_stamp = 
                     MythDate::toString(curr_time, MythDate::kDatabase);
-                GetMythDB()->SetSetting(timestamp_setting, last_time_stamp);
                 GetMythDB()->SaveSetting(timestamp_setting, last_time_stamp);
                 buttonAction(item, true);
             }
@@ -897,9 +896,13 @@ bool MythThemedMenu::checkPinCode(const QString &password_setting)
         QDateTime last_time = MythDate::fromString(last_time_stamp);
         if (!last_time.isValid() || last_time.secsTo(curr_time) < 120)
         {
+<<<<<<< HEAD
             last_time_stamp = MythDate::toString(
                 curr_time, MythDate::kDatabase);
             GetMythDB()->SetSetting(timestamp_setting, last_time_stamp);
+=======
+            last_time_stamp = curr_time.toString(Qt::TextDate);
+>>>>>>> master
             GetMythDB()->SaveSetting(timestamp_setting, last_time_stamp);
             return true;
         }

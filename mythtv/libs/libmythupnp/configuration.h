@@ -32,7 +32,7 @@ class UPNP_PUBLIC Configuration
 
         virtual void    SetValue( const QString &sSetting, int     value   ) = 0; 
         virtual void    SetValue( const QString &sSetting, QString value   ) = 0; 
-
+        virtual void    ClearValue( const QString &sSetting )                = 0;
 };
 
 
@@ -73,7 +73,7 @@ class UPNP_PUBLIC XmlConfiguration : public Configuration
 
         virtual void    SetValue( const QString &sSetting, int     value   ); 
         virtual void    SetValue( const QString &sSetting, QString value   ); 
-
+        virtual void    ClearValue( const QString &sSetting );
 };
 
 //////////////////////////////////////////////////////////////////////////////
@@ -96,7 +96,7 @@ class UPNP_PUBLIC DBConfiguration : public Configuration
 
         virtual void    SetValue( const QString &sSetting, int     value   ); 
         virtual void    SetValue( const QString &sSetting, QString value   ); 
-
+        virtual void    ClearValue( const QString &sSetting );
 };
 
 #endif

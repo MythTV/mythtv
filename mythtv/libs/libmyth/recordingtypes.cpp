@@ -19,6 +19,7 @@ int RecTypePriority(RecordingType rectype)
         case kFindDailyRecord: return 8; break;
         case kChannelRecord:  return 9; break;
         case kAllRecord:      return 10; break;
+        case kTemplateRecord: return 0; break;
         default: return 11;
      }
 }
@@ -47,6 +48,8 @@ QString toString(RecordingType rectype)
         case kOverrideRecord:
         case kDontRecord:
             return QObject::tr("Override Recording");
+        case kTemplateRecord:
+            return QObject::tr("Template Recording");
         default:
             return QObject::tr("Not Recording");
     }
@@ -101,6 +104,8 @@ RecordingType recTypeFromString(QString type)
         return kFindDailyRecord;
     else if (type.toLower() == "find weekly" || type.toLower() == "findweekly")
         return kFindWeeklyRecord;
+    else if (type.toLower() == "template" || type.toLower() == "template")
+        return kTemplateRecord;
     else if (type.toLower() == "override recording" || type.toLower() == "override")
         return kOverrideRecord;
     else
@@ -133,6 +138,8 @@ QChar toQChar(RecordingType rectype)
         case kDontRecord:
             ret = QObject::tr("O", "RecTypeChar kOverrideRecord/kDontRecord");
             break;
+        case kTemplateRecord:
+            ret = QObject::tr("t", "RecTypeChar kTemplateRecord");   break;
         case kNotRecording:
         default:
             ret = " ";

@@ -3168,8 +3168,8 @@ bool MythPlayer::DecoderGetFrame(DecodeType decodetype, bool unsafe)
             }
             return false;
         }
-        videobuf_retries = 0;
     }
+    videobuf_retries = 0;
 
     if (!decoder_change_lock.tryLock(5))
         return false;

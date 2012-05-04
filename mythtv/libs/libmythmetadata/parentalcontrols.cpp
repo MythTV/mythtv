@@ -277,7 +277,6 @@ class ParentalLevelChangeCheckerPrivate : public QObject
             {
                 // Two minute window
                 last_time_stamp = curr_time.toString(Qt::ISODate);
-                gCoreContext->SetSetting("VideoPasswordTime", last_time_stamp);
                 gCoreContext->SaveSetting("VideoPasswordTime", last_time_stamp);
                 return true;
             }

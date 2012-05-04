@@ -1,11 +1,23 @@
 #ifndef MYTHDBPARAMS_H_
 #define MYTHDBPARAMS_H_
 
+#include <QString>
+
 #include "mythbaseexp.h"
 
 /// Structure containing the basic Database parameters
-struct MBASE_PUBLIC DatabaseParams
+class MBASE_PUBLIC DatabaseParams
 {
+  public:
+    DatabaseParams() { LoadDefaults(); }
+
+    void LoadDefaults(void);
+    bool IsValid(const QString &source = QString("Unknown")) const;
+
+    bool operator==(const DatabaseParams &other) const;
+    bool operator!=(const DatabaseParams &other) const
+        { return !((*this)==other); }
+
     QString dbHostName;         ///< database server
     bool    dbHostPing;         ///< Can we test connectivity using ping?
     int     dbPort;             ///< database port
@@ -21,6 +33,8 @@ struct MBASE_PUBLIC DatabaseParams
     int     wolReconnect;       ///< seconds to wait for reconnect
     int     wolRetry;           ///< times to retry to reconnect
     QString wolCommand;         ///< command to use for wake-on-lan
+
+    bool    forceSave;          ///< set to true to force a save of the settings file
 
     QString verVersion;         ///< git version string
     QString verBranch;          ///< git branch
