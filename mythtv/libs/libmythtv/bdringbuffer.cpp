@@ -286,14 +286,14 @@ bool BDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
     safefilename = filename;
 
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Opened BDRingBuffer device at %1")
-            .arg(filename.toLatin1().data()));
+            .arg(filename));
 
     // Ask mythiowrapper to update this object on file open progress. Opening
     // a bluray disc can involve opening several hundred files which can take
     // several minutes when the disc structure is remote. The callback allows
     // us to 'kick' the main UI - as the 'please wait' widget is still visible
     // at this stage
-    mythfile_open_register_callback(filename.toLatin1().data(), this,
+    mythfile_open_register_callback(filename.toLocal8Bit().data(), this,
                                     file_opened_callback);
 
     QMutexLocker locker(&m_infoLock);
@@ -306,12 +306,12 @@ bool BDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
     QByteArray keyarray = keyfile.toAscii();
     const char *keyfilepath = keyarray.data();
 
-    bdnav = bd_open(filename.toLatin1().data(), keyfilepath);
+    bdnav = bd_open(filename.toLocal8Bit().data(), keyfilepath);
 
     if (!bdnav)
     {
         rwlock.unlock();
-        mythfile_open_register_callback(filename.toLatin1().data(), this, NULL);
+        mythfile_open_register_callback(filename.toLocal8Bit().data(), this, NULL);
         return false;
     }
 
@@ -471,7 +471,7 @@ bool BDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
 
     rwlock.unlock();
 
-    mythfile_open_register_callback(filename.toLatin1().data(), this, NULL);
+    mythfile_open_register_callback(filename.toLocal8Bit().data(), this, NULL);
     return true;
 }
 
