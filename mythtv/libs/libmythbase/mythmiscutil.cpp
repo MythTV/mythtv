@@ -201,21 +201,9 @@ QString toString(const QDate &date, uint format)
 int calc_utc_offset(void)
 {
     QDateTime loc = QDateTime::currentDateTime();
-    QDateTime utc = QDateTime::currentDateTime().toUTC();
-
-    int utc_offset = (utc.time().secsTo(loc.time()) +
-                      utc.date().daysTo(loc.date()) * 60 * 60 * 24);
-
-    // clamp to nearest minute if within 10 seconds
-    int off = utc_offset % 60;
-    if (abs(off) < 10)
-        utc_offset -= off;
-    if (off < -50 && off > -60)
-        utc_offset -= 60 + off;
-    if (off > +50 && off < +60)
-        utc_offset += 60 - off;
-
-    return utc_offset;
+    QDateTime utc = loc.toUTC();
+    loc = QDateTime(loc.date(), loc.time(), Qt::UTC);
+    return utc.secsTo(loc);
 }
 
 static bool compare_zone_files(QFileInfo first_file_info,
