@@ -97,11 +97,6 @@ int main(int argc, char **argv)
 
     GetMythUI()->LoadQtConfig();
 
-#ifdef Q_WS_MACX
-    // Mac OS 10.4 and Qt 4.4 have window-focus problems
-    gCoreContext->SetSetting("RunFrontendInWindow", "1");
-#endif
-
     MythMainWindow *mainWindow = GetMythMainWindow();
     mainWindow->Init();
 
