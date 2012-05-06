@@ -449,6 +449,12 @@ void MythAirplayServer::HandleResponse(APHTTPRequest *req,
 {
     if (!socket)
         return;
+    QHostAddress addr = socket->peerAddress();
+    QByteArray session;
+    QByteArray header;
+    QString    body;
+    int status = HTTP_STATUS_OK;
+    QByteArray content_type;
 
     if (req->GetURI() != "/playback-info")
     {
@@ -466,16 +472,20 @@ void MythAirplayServer::HandleResponse(APHTTPRequest *req,
 
     if (!req->GetHeaders().contains("X-Apple-Session-ID"))
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "No session ID in http request.");
-        return;
+        LOG(VB_GENERAL, LOG_DEBUG, LOC +
+            QString("No session ID in http request. "
+                    "Connection from iTunes? Using IP %1").arg(addr.toString()));
+    }
+    else
+    {
+        session = req->GetHeaders()["X-Apple-Session-ID"];
     }
 
-    QByteArray session = req->GetHeaders()["X-Apple-Session-ID"];
-    QByteArray header;
-    QString    body;
-    int status = HTTP_STATUS_OK;
-    QByteArray content_type;
-
+    if (session.size() == 0)
+    {
+        // No session ID, use IP address instead
+        session = addr.toString().toAscii();
+    }
     if (!m_connections.contains(session))
     {
         AirplayConnection apcon;
@@ -491,24 +501,21 @@ void MythAirplayServer::HandleResponse(APHTTPRequest *req,
                 "Already have a different reverse socket for this connection.");
             return;
         }
-
         m_connections[session].reverseSocket = socket;
-
         status = HTTP_STATUS_SWITCHING_PROTOCOLS;
         header = "Upgrade: PTTH/1.0\r\nConnection: Upgrade\r\n";
+        SendResponse(socket, status, header, content_type, body);
+        return;
     }
-    else
-    {
-        QTcpSocket *s = m_connections[session].controlSocket;
-        if (s != socket && s != NULL)
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC +
-                "Already have a different control socket for this connection.");
-            return;
-        }
 
-        m_connections[session].controlSocket = socket;
+    QTcpSocket *s = m_connections[session].controlSocket;
+    if (s != socket && s != NULL)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            "Already have a different control socket for this connection.");
+        return;
     }
+    m_connections[session].controlSocket = socket;
 
     double position    = 0.0f;
     double duration    = 0.0f;
@@ -526,10 +533,6 @@ void MythAirplayServer::HandleResponse(APHTTPRequest *req,
             qApp->postEvent(GetMythMainWindow(), me);
             m_connections[session].position = position;
             m_connections[session].initial_position = -1.0f;
-            if(!m_connections[session].was_playing)
-            {
-                SendReverseEvent(session, AP_EVENT_PLAYING);
-            }
         }
         else if (position < .01f)
         {
@@ -677,7 +680,7 @@ void MythAirplayServer::HandleResponse(APHTTPRequest *req,
                 "Ignoring playback - something else is playing.");
         }
 
-        SendReverseEvent(session, AP_EVENT_LOADING);
+        SendReverseEvent(session, AP_EVENT_PLAYING);
         LOG(VB_GENERAL, LOG_INFO, LOC + QString("File: '%1' start_pos '%2'")
             .arg(file.data()).arg(start_pos));
     }
@@ -702,7 +705,13 @@ void MythAirplayServer::HandleResponse(APHTTPRequest *req,
                                                            AP_EVENT_PAUSED);
         }
     }
+    SendResponse(socket, status, header, content_type, body);
+}
 
+void MythAirplayServer::SendResponse(QTcpSocket *socket,
+                                     int status, QByteArray header,
+                                     QByteArray content_type, QString body)
+{
     QTextStream response(socket);
     response.setCodec("UTF-8");
     QByteArray reply;
@@ -735,7 +744,7 @@ void MythAirplayServer::HandleResponse(APHTTPRequest *req,
     response.flush();
 
     LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("Send: %1 \n\n%2\n")
-         .arg(socket->flush()).arg(reply.data()));
+        .arg(socket->flush()).arg(reply.data()));
 }
 
 bool MythAirplayServer::SendReverseEvent(QByteArray &session,

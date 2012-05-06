@@ -69,6 +69,9 @@ class MTV_PUBLIC MythAirplayServer : public ServerPool
                          double &duration);
     QString GetMacAddress();
     bool SendReverseEvent(QByteArray &session, AirplayEvent event);
+    void SendResponse(QTcpSocket *socket,
+                      int status, QByteArray header,
+                      QByteArray content_type, QString body);
 
     // Globals
     static MythAirplayServer *gMythAirplayServer;
