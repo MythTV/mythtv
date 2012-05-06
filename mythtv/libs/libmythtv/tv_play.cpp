@@ -7494,6 +7494,7 @@ void TV::UpdateOSDStatus(const PlayerContext *ctx, QString title, QString desc,
 {
     osdInfo info;
     info.values.insert("position", position);
+    info.values.insert("relposition", position);
     info.values.insert("previous", prev);
     info.values.insert("next",     next);
     info.text.insert("title", title);
