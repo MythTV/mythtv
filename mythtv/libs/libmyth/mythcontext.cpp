@@ -450,7 +450,7 @@ bool MythContextPrivate::LoadDatabaseSettings(void)
     m_DBparams.wolReconnect =
         m_pConfig->GetValue(kDefaultWOL + "SQLReconnectWaitTime", 0);
     m_DBparams.wolRetry =
-        m_pConfig->GetValue(kDefaultWOL + "SQLConnectRetry", 0);
+        m_pConfig->GetValue(kDefaultWOL + "SQLConnectRetry", 5);
     m_DBparams.wolCommand =
         m_pConfig->GetValue(kDefaultWOL + "Command", "");
 

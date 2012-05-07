@@ -1340,6 +1340,7 @@ void ProgramInfo::ToMap(InfoMap &progMap,
                         bool showrerecord,
                         uint star_range) const
 {
+    QLocale locale = gCoreContext->GetQLocale();
     // NOTE: Format changes and relevant additions made here should be
     //       reflected in RecordingRule
     QString channelFormat =
@@ -1454,13 +1455,10 @@ void ProgramInfo::ToMap(InfoMap &progMap,
     progMap["channel"] = ChannelText(channelFormat);
     progMap["longchannel"] = ChannelText(longChannelFormat);
 
-    QString tmpSize;
+    QString tmpSize = locale.toString(filesize * (1.0 / (1024.0 * 1024.0 * 1024.0)), 'f', 2);
+    progMap["filesize_str"] = QObject::tr("%1 GB", "GigaBytes").arg(tmpSize);
 
-    tmpSize.sprintf("%0.2f ", filesize * (1.0 / (1024.0 * 1024.0 * 1024.0)));
-    tmpSize += QObject::tr("GB", "GigaBytes");
-    progMap["filesize_str"] = tmpSize;
-
-    progMap["filesize"] = QString::number(filesize);
+    progMap["filesize"] = locale.toString((quint64)filesize);
 
     seconds = recstartts.secsTo(recendts);
     minutes = seconds / 60;

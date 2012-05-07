@@ -1,4 +1,3 @@
-#include <QUrl>
 #include "mythcorecontext.h"
 #include "mythlogging.h"
 
@@ -48,18 +47,17 @@ bool StreamingRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
     filename = lfilename;
 
     // TODO check whether local area file
-    QUrl url(filename);
-    QString ext = filename.right(3).toLower();
-    if (url.scheme().toLower() == "http" && (ext == "mp4" || ext == "m4v"))
+
+    int res = url_open(&m_context, filename.toAscii(), URL_RDONLY);
+    if (res >=0 && m_context &&
+        (!m_context->is_streamed && url_seek(m_context, 0, SEEK_SET) >= 0))
     {
+        m_streamed   = false;
         m_allowSeeks = true;
-        m_streamed   = false; // yes - counterintuitive
     }
 
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Trying %1 (allow seeks: %2")
         .arg(filename).arg(m_allowSeeks));
-
-    int res = url_open(&m_context, filename.toAscii(), URL_RDONLY);
 
     rwlock.unlock();
 

@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """Provides managed logging."""
 
-from static import LOGLEVEL, LOGMASK, LOGFACILITY
-from exceptions import MythError
+from MythTV.static import LOGLEVEL, LOGMASK, LOGFACILITY
+from MythTV.exceptions import MythError
 
 import os
 import syslog

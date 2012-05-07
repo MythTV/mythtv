@@ -75,7 +75,6 @@ void EITScanner::run(void)
     static const float rt[] = { 0.0f, 0.2f, 0.4f, 0.6f, 0.8f, };
 
     lock.lock();
-    exitThread = false;
 
     MythTimer t;
     uint eitCount = 0;
@@ -149,9 +148,17 @@ void EITScanner::run(void)
         }
 
         lock.lock();
-        if (!exitThread)
+        if ((activeScan || activeScanStopped) && !exitThread)
             exitThreadCond.wait(&lock, 400); // sleep up to 400 ms.
+
+        if (!activeScan && !activeScanStopped)
+        {
+            activeScanStopped = true;
+            activeScanCond.wakeAll();
+        }
     }
+    activeScanStopped = true;
+    activeScanCond.wakeAll();
     lock.unlock();
 }
 
@@ -271,13 +278,25 @@ void EITScanner::StartActiveScan(TVRec *_rec, uint max_seconds_per_source)
         // Add a little randomness to trigger time so multiple
         // cards will have a staggered channel changing time.
         activeScanTrigTime += random() % 29;
+        activeScanStopped = false;
         activeScan = true;
     }
 }
 
-void EITScanner::StopActiveScan()
+void EITScanner::StopActiveScan(void)
 {
+    QMutexLocker locker(&lock);
+
+    activeScanStopped = false;
     activeScan = false;
-    rec = NULL;
+    exitThreadCond.wakeAll();
+
+    locker.unlock();
     StopPassiveScan();
+    locker.relock();
+
+    while (!activeScan && !activeScanStopped)
+        activeScanCond.wait(&lock, 100);
+
+    rec = NULL;
 }
