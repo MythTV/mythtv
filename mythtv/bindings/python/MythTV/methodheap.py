@@ -4,15 +4,15 @@
 Provides base classes for accessing MythTV
 """
 
-from static import *
-from exceptions import *
-from logging import MythLog
-from connections import FEConnection, XMLConnection, BEEventConnection
-from utility import databaseSearch, datetime, check_ipv6
-from database import DBCache, DBData
-from system import SystemEvent
-from mythproto import BECache, FileOps, Program, FreeSpace, EventLock
-from dataheap import *
+from MythTV.static import *
+from MythTV.exceptions import *
+from MythTV.logging import MythLog
+from MythTV.connections import FEConnection, XMLConnection, BEEventConnection
+from MythTV.utility import databaseSearch, datetime, check_ipv6
+from MythTV.database import DBCache, DBData
+from MythTV.system import SystemEvent
+from MythTV.mythproto import BECache, FileOps, Program, FreeSpace, EventLock
+from MythTV.dataheap import *
 
 from datetime import timedelta
 from weakref import proxy
