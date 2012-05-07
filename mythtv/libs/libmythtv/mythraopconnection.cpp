@@ -660,7 +660,7 @@ void MythRAOPConnection::ProcessAudio()
             m_lastSequence++;
 
             QList<AudioData>::iterator it = frames.data->begin();
-            for (; it != frames.data->end(); it++)
+            for (; it != frames.data->end(); ++it)
             {
                 m_audio->AddData((char *)it->data, it->length,
                                  timestamp, it->frames);
@@ -694,7 +694,7 @@ int MythRAOPConnection::ExpireAudio(uint64_t timestamp)
             if (frames.data)
             {
                 QList<AudioData>::iterator it = frames.data->begin();
-                for (; it != frames.data->end(); it++)
+                for (; it != frames.data->end(); ++it)
                 {
                     av_free(it->data);
                 }
