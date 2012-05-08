@@ -27,7 +27,7 @@
  * Known FOURCCs: 'IV50'
  */
 
-#define ALT_BITSTREAM_READER_LE
+#define BITSTREAM_READER_LE
 #include "avcodec.h"
 #include "get_bits.h"
 #include "dsputil.h"
@@ -76,6 +76,8 @@ typedef struct {
     int             is_scalable;
     uint32_t        lock_word;
     IVIPicConfig    pic_conf;
+
+    int gop_invalid;
 } IVI5DecContext;
 
 
@@ -90,7 +92,7 @@ typedef struct {
  */
 static int decode_gop_header(IVI5DecContext *ctx, AVCodecContext *avctx)
 {
-    int             result, i, p, tile_size, pic_size_indx, mb_size, blk_size;
+    int             result, i, p, tile_size, pic_size_indx, mb_size, blk_size, is_scalable;
     int             quant_mat, blk_size_changed = 0;
     IVIBandDesc     *band, *band1, *band2;
     IVIPicConfig    pic_conf;
@@ -112,8 +114,8 @@ static int decode_gop_header(IVI5DecContext *ctx, AVCodecContext *avctx)
     /* num_levels * 3 + 1 */
     pic_conf.luma_bands   = get_bits(&ctx->gb, 2) * 3 + 1;
     pic_conf.chroma_bands = get_bits1(&ctx->gb)   * 3 + 1;
-    ctx->is_scalable = pic_conf.luma_bands != 1 || pic_conf.chroma_bands != 1;
-    if (ctx->is_scalable && (pic_conf.luma_bands != 4 || pic_conf.chroma_bands != 1)) {
+    is_scalable = pic_conf.luma_bands != 1 || pic_conf.chroma_bands != 1;
+    if (is_scalable && (pic_conf.luma_bands != 4 || pic_conf.chroma_bands != 1)) {
         av_log(avctx, AV_LOG_ERROR, "Scalability: unsupported subdivision! Luma bands: %d, chroma bands: %d\n",
                pic_conf.luma_bands, pic_conf.chroma_bands);
         return -1;
@@ -151,6 +153,7 @@ static int decode_gop_header(IVI5DecContext *ctx, AVCodecContext *avctx)
             return -1;
         }
         ctx->pic_conf = pic_conf;
+        ctx->is_scalable = is_scalable;
         blk_size_changed = 1; /* force reallocation of the internal structures */
     }
 
@@ -335,8 +338,10 @@ static int decode_pic_hdr(IVI5DecContext *ctx, AVCodecContext *avctx)
     ctx->frame_num = get_bits(&ctx->gb, 8);
 
     if (ctx->frame_type == FRAMETYPE_INTRA) {
+        ctx->gop_invalid = 1;
         if (decode_gop_header(ctx, avctx))
             return -1;
+        ctx->gop_invalid = 0;
     }
 
     if (ctx->frame_type != FRAMETYPE_NULL) {
@@ -445,13 +450,17 @@ static int decode_mb_info(IVI5DecContext *ctx, IVIBandDesc *band,
                           IVITile *tile, AVCodecContext *avctx)
 {
     int         x, y, mv_x, mv_y, mv_delta, offs, mb_offset,
-                mv_scale, blks_per_mb;
+                mv_scale, blks_per_mb, s;
     IVIMbInfo   *mb, *ref_mb;
     int         row_offset = band->mb_size * band->pitch;
 
     mb     = tile->mbs;
     ref_mb = tile->ref_mbs;
     offs   = tile->ypos * band->pitch + tile->xpos;
+
+    if (!ref_mb &&
+        ((band->qdelta_present && band->inherit_qdelta) || band->inherit_mv))
+        return AVERROR_INVALIDDATA;
 
     /* scale factor for motion vectors */
     mv_scale = (ctx->planes[0].bands[0].mb_size >> 3) - (band->mb_size >> 3);
@@ -481,7 +490,7 @@ static int decode_mb_info(IVI5DecContext *ctx, IVIBandDesc *band,
                 }
 
                 mb->mv_x = mb->mv_y = 0; /* no motion vector coded */
-                if (band->inherit_mv){
+                if (band->inherit_mv && ref_mb){
                     /* motion vector inheritance */
                     if (mv_scale) {
                         mb->mv_x = ivi_scale_mv(ref_mb->mv_x, mv_scale);
@@ -492,7 +501,7 @@ static int decode_mb_info(IVI5DecContext *ctx, IVIBandDesc *band,
                     }
                 }
             } else {
-                if (band->inherit_mv) {
+                if (band->inherit_mv && ref_mb) {
                     mb->type = ref_mb->type; /* copy mb_type from corresponding reference mb */
                 } else if (ctx->frame_type == FRAMETYPE_INTRA) {
                     mb->type = 0; /* mb_type is always INTRA for intra-frames */
@@ -518,7 +527,7 @@ static int decode_mb_info(IVI5DecContext *ctx, IVIBandDesc *band,
                 if (!mb->type) {
                     mb->mv_x = mb->mv_y = 0; /* there is no motion vector in intra-macroblocks */
                 } else {
-                    if (band->inherit_mv){
+                    if (band->inherit_mv && ref_mb){
                         /* motion vector inheritance */
                         if (mv_scale) {
                             mb->mv_x = ivi_scale_mv(ref_mb->mv_x, mv_scale);
@@ -539,6 +548,15 @@ static int decode_mb_info(IVI5DecContext *ctx, IVIBandDesc *band,
                         mb->mv_y = mv_y;
                     }
                 }
+            }
+
+            s= band->is_halfpel;
+            if (mb->type)
+            if ( x +  (mb->mv_x   >>s) +                 (y+               (mb->mv_y   >>s))*band->pitch < 0 ||
+                 x + ((mb->mv_x+s)>>s) + band->mb_size - 1
+                   + (y+band->mb_size - 1 +((mb->mv_y+s)>>s))*band->pitch > band->bufsize - 1) {
+                av_log(avctx, AV_LOG_ERROR, "motion vector %d %d outside reference\n", x*s + mb->mv_x, y*s + mb->mv_y);
+                return AVERROR_INVALIDDATA;
             }
 
             mb++;
@@ -629,7 +647,7 @@ static int decode_band(IVI5DecContext *ctx, int plane_num,
         FFSWAP(int16_t, band->rv_map->valtab[idx1], band->rv_map->valtab[idx2]);
     }
 
-#if IVI_DEBUG
+#ifdef DEBUG
     if (band->checksum_present) {
         uint16_t chksum = ivi_calc_band_checksum(band);
         if (chksum != band->checksum) {
@@ -713,6 +731,8 @@ static av_cold int decode_init(AVCodecContext *avctx)
     ctx->pic_conf.tile_height   = avctx->height;
     ctx->pic_conf.luma_bands    = ctx->pic_conf.chroma_bands = 1;
 
+    avcodec_get_frame_defaults(&ctx->frame);
+
     result = ff_ivi_init_planes(ctx->planes, &ctx->pic_conf);
     if (result) {
         av_log(avctx, AV_LOG_ERROR, "Couldn't allocate color planes!\n");
@@ -744,7 +764,7 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *data_size,
     ctx->frame_size = buf_size;
 
     result = decode_pic_hdr(ctx, avctx);
-    if (result) {
+    if (result || ctx->gop_invalid) {
         av_log(avctx, AV_LOG_ERROR,
                "Error while decoding picture header: %d\n", result);
         return -1;
@@ -757,7 +777,7 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *data_size,
 
     switch_buffers(ctx);
 
-    //START_TIMER;
+    //{ START_TIMER;
 
     if (ctx->frame_type != FRAMETYPE_NULL) {
         for (p = 0; p < 3; p++) {
@@ -772,10 +792,14 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *data_size,
         }
     }
 
-    //STOP_TIMER("decode_planes");
+    //STOP_TIMER("decode_planes"); }
 
     if (ctx->frame.data[0])
         avctx->release_buffer(avctx, &ctx->frame);
+
+    if(   avctx->width  != ctx->planes[0].width
+       || avctx->height != ctx->planes[0].height)
+        avcodec_set_dimensions(avctx, ctx->planes[0].width, ctx->planes[0].height);
 
     ctx->frame.reference = 0;
     if (avctx->get_buffer(avctx, &ctx->frame) < 0) {
@@ -809,7 +833,7 @@ static av_cold int decode_close(AVCodecContext *avctx)
     ff_ivi_free_buffers(&ctx->planes[0]);
 
     if (ctx->mb_vlc.cust_tab.table)
-        free_vlc(&ctx->mb_vlc.cust_tab);
+        ff_free_vlc(&ctx->mb_vlc.cust_tab);
 
     if (ctx->frame.data[0])
         avctx->release_buffer(avctx, &ctx->frame);

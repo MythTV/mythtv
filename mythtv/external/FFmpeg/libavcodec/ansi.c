@@ -81,6 +81,7 @@ static av_cold int decode_init(AVCodecContext *avctx)
     s->fg          = DEFAULT_FG_COLOR;
     s->bg          = DEFAULT_BG_COLOR;
 
+    avcodec_get_frame_defaults(&s->frame);
     if (!avctx->width || !avctx->height)
         avcodec_set_dimensions(avctx, 80<<3, 25<<4);
 
@@ -153,7 +154,7 @@ static void draw_char(AVCodecContext *avctx, int c)
 
 /**
  * Execute ANSI escape code
- * @param <0 error
+ * @return 0 on success, negative on error
  */
 static int execute_code(AVCodecContext * avctx, int c)
 {
@@ -181,6 +182,8 @@ static int execute_code(AVCodecContext * avctx, int c)
     case 'l': //reset screen mode
         if (s->nb_args < 2)
             s->args[0] = DEFAULT_SCREEN_MODE;
+        width = avctx->width;
+        height = avctx->height;
         switch(s->args[0]) {
         case 0: case 1: case 4: case 5: case 13: case 19: //320x200 (25 rows)
             s->font = ff_cga_font;
@@ -226,7 +229,7 @@ static int execute_code(AVCodecContext * avctx, int c)
                 av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
                 return ret;
             }
-            s->frame.pict_type           = FF_I_TYPE;
+            s->frame.pict_type           = AV_PICTURE_TYPE_I;
             s->frame.palette_has_changed = 1;
             memcpy(s->frame.data[1], ff_cga_palette, 16 * 4);
             erase_screen(avctx);
@@ -323,7 +326,7 @@ static int decode_frame(AVCodecContext *avctx,
         av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
         return ret;
     }
-    s->frame.pict_type           = FF_I_TYPE;
+    s->frame.pict_type           = AV_PICTURE_TYPE_I;
     s->frame.palette_has_changed = 1;
     memcpy(s->frame.data[1], ff_cga_palette, 16 * 4);
 

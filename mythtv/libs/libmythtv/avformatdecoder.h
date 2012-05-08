@@ -262,7 +262,7 @@ class AvFormatDecoder : public DecoderBase
     H264Parser *m_h264_parser;
 
     AVFormatContext *ic;
-    AVFormatParameters params;
+    // AVFormatParameters params;
 
     URLContext readcontext;
 
@@ -346,7 +346,8 @@ class AvFormatDecoder : public DecoderBase
     InteractiveTV    *itv;                ///< MHEG/MHP decoder
 
     // Audio
-    short int        *audioSamples;
+    AVFrame          *m_audioFrame;
+    uint8_t          *audioSamples;
     bool              disable_passthru;
 
     AudioInfo         audioIn;

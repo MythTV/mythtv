@@ -30,9 +30,13 @@
  */
 #include <time.h>
 #include "avformat.h"
+#include "internal.h"
 #include "libavcodec/dvdata.h"
 #include "libavutil/intreadwrite.h"
+#include "libavutil/mathematics.h"
+#include "libavutil/timecode.h"
 #include "dv.h"
+#include "libavutil/avassert.h"
 
 struct DVDemuxContext {
     const DVprofile*  sys;    /* Current DV profile. E.g.: 525/60, 625/50 */
@@ -85,6 +89,9 @@ static const uint8_t* dv_extract_pack(uint8_t* frame, enum dv_pack_type t)
     case dv_video_control:
         offs = (80*5 + 48 + 5);
         break;
+    case dv_timecode:
+        offs = (80*1 + 3 + 3);
+        break;
     default:
         return NULL;
     }
@@ -92,10 +99,14 @@ static const uint8_t* dv_extract_pack(uint8_t* frame, enum dv_pack_type t)
     return frame[offs] == t ? &frame[offs] : NULL;
 }
 
+static const int dv_audio_frequency[3] = {
+    48000, 44100, 32000,
+};
+
 /*
  * There's a couple of assumptions being made here:
  * 1. By default we silence erroneous (0x8000/16bit 0x800/12bit) audio samples.
- *    We can pass them upwards when ffmpeg will be ready to deal with them.
+ *    We can pass them upwards when libavcodec will be ready to deal with them.
  * 2. We don't do software emphasis.
  * 3. Audio is always returned as 16bit linear samples: 12bit nonlinear samples
  *    are converted into 16bit linear ones.
@@ -119,21 +130,29 @@ static int dv_extract_audio(uint8_t* frame, uint8_t* ppcm[4],
     if (quant > 1)
         return -1; /* unsupported quantization */
 
+    if (freq >= FF_ARRAY_ELEMS(dv_audio_frequency))
+        return AVERROR_INVALIDDATA;
+
     size = (sys->audio_min_samples[freq] + smpls) * 4; /* 2ch, 2bytes */
     half_ch = sys->difseg_size / 2;
 
     /* We work with 720p frames split in half, thus even frames have
      * channels 0,1 and odd 2,3. */
     ipcm = (sys->height == 720 && !(frame[1] & 0x0C)) ? 2 : 0;
-    pcm  = ppcm[ipcm++];
 
     /* for each DIF channel */
     for (chan = 0; chan < sys->n_difchan; chan++) {
+        av_assert0(ipcm<4);
+        pcm = ppcm[ipcm++];
+        if (!pcm)
+            break;
+
         /* for each DIF segment */
         for (i = 0; i < sys->difseg_size; i++) {
             frame += 6 * 80; /* skip DIF segment header */
             if (quant == 1 && i == half_ch) {
                 /* next stereo channel (12bit mode only) */
+                av_assert0(ipcm<4);
                 pcm = ppcm[ipcm++];
                 if (!pcm)
                     break;
@@ -176,11 +195,6 @@ static int dv_extract_audio(uint8_t* frame, uint8_t* ppcm[4],
                 frame += 16 * 80; /* 15 Video DIFs + 1 Audio DIF */
             }
         }
-
-        /* next stereo channel (50Mbps and 100Mbps only) */
-        pcm = ppcm[ipcm++];
-        if (!pcm)
-            break;
     }
 
     return size;
@@ -202,6 +216,18 @@ static int dv_extract_audio_info(DVDemuxContext* c, uint8_t* frame)
     stype = (as_pack[3] & 0x1f);      /* 0 - 2CH, 2 - 4CH, 3 - 8CH */
     quant =  as_pack[4] & 0x07;       /* 0 - 16bit linear, 1 - 12bit nonlinear */
 
+    if (freq >= FF_ARRAY_ELEMS(dv_audio_frequency)) {
+        av_log(c->fctx, AV_LOG_ERROR,
+               "Unrecognized audio sample rate index (%d)\n", freq);
+        return 0;
+    }
+
+    if (stype > 3) {
+        av_log(c->fctx, AV_LOG_ERROR, "stype %d is invalid\n", stype);
+        c->ach = 0;
+        return 0;
+    }
+
     /* note: ach counts PAIRS of channels (i.e. stereo channels) */
     ach = ((int[4]){  1,  0,  2,  4})[stype];
     if (ach == 1 && quant && freq == 2)
@@ -210,10 +236,10 @@ static int dv_extract_audio_info(DVDemuxContext* c, uint8_t* frame)
     /* Dynamic handling of the audio streams in DV */
     for (i = 0; i < ach; i++) {
        if (!c->ast[i]) {
-           c->ast[i] = av_new_stream(c->fctx, 0);
+           c->ast[i] = avformat_new_stream(c->fctx, NULL);
            if (!c->ast[i])
                break;
-           av_set_pts_info(c->ast[i], 64, 1, 30000);
+           avpriv_set_pts_info(c->ast[i], 64, 1, 30000);
            c->ast[i]->codec->codec_type = AVMEDIA_TYPE_AUDIO;
            c->ast[i]->codec->codec_id   = CODEC_ID_PCM_S16LE;
 
@@ -243,13 +269,11 @@ static int dv_extract_video_info(DVDemuxContext *c, uint8_t* frame)
     if (c->sys) {
         avctx = c->vst->codec;
 
-        av_set_pts_info(c->vst, 64, c->sys->time_base.num,
+        avpriv_set_pts_info(c->vst, 64, c->sys->time_base.num,
                         c->sys->time_base.den);
         avctx->time_base= c->sys->time_base;
-        if (!avctx->width){
-            avctx->width = c->sys->width;
-            avctx->height = c->sys->height;
-        }
+        if (!avctx->width)
+            avcodec_set_dimensions(avctx, c->sys->width, c->sys->height);
         avctx->pix_fmt = c->sys->pix_fmt;
 
         /* finding out SAR is a little bit messy */
@@ -265,11 +289,27 @@ static int dv_extract_video_info(DVDemuxContext *c, uint8_t* frame)
     return size;
 }
 
+static int dv_extract_timecode(DVDemuxContext* c, uint8_t* frame, char *tc)
+{
+    const uint8_t *tc_pack;
+
+    // For PAL systems, drop frame bit is replaced by an arbitrary
+    // bit so its value should not be considered. Drop frame timecode
+    // is only relevant for NTSC systems.
+    int prevent_df = c->sys->ltc_divisor == 25 || c->sys->ltc_divisor == 50;
+
+    tc_pack = dv_extract_pack(frame, dv_timecode);
+    if (!tc_pack)
+        return 0;
+    av_timecode_make_smpte_tc_string(tc, AV_RB32(tc_pack + 1), prevent_df);
+    return 1;
+}
+
 /*
  * The following 3 functions constitute our interface to the world
  */
 
-DVDemuxContext* dv_init_demux(AVFormatContext *s)
+DVDemuxContext* avpriv_dv_init_demux(AVFormatContext *s)
 {
     DVDemuxContext *c;
 
@@ -277,19 +317,13 @@ DVDemuxContext* dv_init_demux(AVFormatContext *s)
     if (!c)
         return NULL;
 
-    c->vst = av_new_stream(s, 0);
+    c->vst = avformat_new_stream(s, NULL);
     if (!c->vst) {
         av_free(c);
         return NULL;
     }
 
-    c->sys  = NULL;
-    c->fctx = s;
-    memset(c->ast, 0, sizeof(c->ast));
-    c->ach    = 0;
-    c->frames = 0;
-    c->abytes = 0;
-
+    c->fctx                   = s;
     c->vst->codec->codec_type = AVMEDIA_TYPE_VIDEO;
     c->vst->codec->codec_id   = CODEC_ID_DVVIDEO;
     c->vst->codec->bit_rate   = 25000000;
@@ -298,7 +332,7 @@ DVDemuxContext* dv_init_demux(AVFormatContext *s)
     return c;
 }
 
-int dv_get_packet(DVDemuxContext *c, AVPacket *pkt)
+int avpriv_dv_get_packet(DVDemuxContext *c, AVPacket *pkt)
 {
     int size = -1;
     int i;
@@ -315,14 +349,14 @@ int dv_get_packet(DVDemuxContext *c, AVPacket *pkt)
     return size;
 }
 
-int dv_produce_packet(DVDemuxContext *c, AVPacket *pkt,
-                      uint8_t* buf, int buf_size)
+int avpriv_dv_produce_packet(DVDemuxContext *c, AVPacket *pkt,
+                      uint8_t* buf, int buf_size, int64_t pos)
 {
     int size, i;
     uint8_t *ppcm[4] = {0};
 
     if (buf_size < DV_PROFILE_BYTES ||
-        !(c->sys = ff_dv_frame_profile(c->sys, buf, buf_size)) ||
+        !(c->sys = avpriv_dv_frame_profile(c->sys, buf, buf_size)) ||
         buf_size < c->sys->frame_size) {
           return -1;   /* Broken frame, or not enough data */
     }
@@ -331,11 +365,13 @@ int dv_produce_packet(DVDemuxContext *c, AVPacket *pkt,
     /* FIXME: in case of no audio/bad audio we have to do something */
     size = dv_extract_audio_info(c, buf);
     for (i = 0; i < c->ach; i++) {
+       c->audio_pkt[i].pos  = pos;
        c->audio_pkt[i].size = size;
        c->audio_pkt[i].pts  = c->abytes * 30000*8 / c->ast[i]->codec->bit_rate;
        ppcm[i] = c->audio_buf[i];
     }
-    dv_extract_audio(buf, ppcm, c->sys);
+    if (c->ach)
+        dv_extract_audio(buf, ppcm, c->sys);
 
     /* We work with 720p frames split in half, thus even frames have
      * channels 0,1 and odd 2,3. */
@@ -354,6 +390,7 @@ int dv_produce_packet(DVDemuxContext *c, AVPacket *pkt,
     size = dv_extract_video_info(c, buf);
     av_init_packet(pkt);
     pkt->data         = buf;
+    pkt->pos          = pos;
     pkt->size         = size;
     pkt->flags       |= AV_PKT_FLAG_KEY;
     pkt->stream_index = c->vst->id;
@@ -368,9 +405,9 @@ static int64_t dv_frame_offset(AVFormatContext *s, DVDemuxContext *c,
                               int64_t timestamp, int flags)
 {
     // FIXME: sys may be wrong if last dv_read_packet() failed (buffer is junk)
-    const DVprofile* sys = ff_dv_codec_profile(c->vst->codec);
+    const DVprofile* sys = avpriv_dv_codec_profile(c->vst->codec);
     int64_t offset;
-    int64_t size = url_fsize(s->pb) - s->data_offset;
+    int64_t size = avio_size(s->pb) - s->data_offset;
     int64_t max_offset = ((size-1) / sys->frame_size) * sys->frame_size;
 
     offset = sys->frame_size * timestamp;
@@ -381,7 +418,7 @@ static int64_t dv_frame_offset(AVFormatContext *s, DVDemuxContext *c,
     return offset + s->data_offset;
 }
 
-void dv_offset_reset(DVDemuxContext *c, int64_t frame_offset)
+void ff_dv_offset_reset(DVDemuxContext *c, int64_t frame_offset)
 {
     c->frames= frame_offset;
     if (c->ach)
@@ -400,38 +437,69 @@ typedef struct RawDVContext {
     uint8_t         buf[DV_MAX_FRAME_SIZE];
 } RawDVContext;
 
-static int dv_read_header(AVFormatContext *s,
-                          AVFormatParameters *ap)
+static int dv_read_timecode(AVFormatContext *s) {
+    int ret;
+    char timecode[AV_TIMECODE_STR_SIZE];
+    int64_t pos = avio_tell(s->pb);
+
+    // Read 3 DIF blocks: Header block and 2 Subcode blocks.
+    int partial_frame_size = 3 * 80;
+    uint8_t *partial_frame = av_mallocz(sizeof(*partial_frame) *
+                                        partial_frame_size);
+
+    RawDVContext *c = s->priv_data;
+    ret = avio_read(s->pb, partial_frame, partial_frame_size);
+    if (ret < 0)
+        goto finish;
+
+    if (ret < partial_frame_size) {
+        ret = -1;
+        goto finish;
+    }
+
+    ret = dv_extract_timecode(c->dv_demux, partial_frame, timecode);
+    if (ret)
+        av_dict_set(&s->metadata, "timecode", timecode, 0);
+    else if (ret < 0)
+        av_log(s, AV_LOG_ERROR, "Detected timecode is invalid");
+
+finish:
+    av_free(partial_frame);
+    avio_seek(s->pb, pos, SEEK_SET);
+    return ret;
+}
+
+static int dv_read_header(AVFormatContext *s)
 {
     unsigned state, marker_pos = 0;
     RawDVContext *c = s->priv_data;
 
-    c->dv_demux = dv_init_demux(s);
+    c->dv_demux = avpriv_dv_init_demux(s);
     if (!c->dv_demux)
         return -1;
 
-    state = get_be32(s->pb);
+    state = avio_rb32(s->pb);
     while ((state & 0xffffff7f) != 0x1f07003f) {
         if (url_feof(s->pb)) {
             av_log(s, AV_LOG_ERROR, "Cannot find DV header.\n");
             return -1;
         }
         if (state == 0x003f0700 || state == 0xff3f0700)
-            marker_pos = url_ftell(s->pb);
-        if (state == 0xff3f0701 && url_ftell(s->pb) - marker_pos == 80) {
-            url_fseek(s->pb, -163, SEEK_CUR);
-            state = get_be32(s->pb);
+            marker_pos = avio_tell(s->pb);
+        if (state == 0xff3f0701 && avio_tell(s->pb) - marker_pos == 80) {
+            avio_seek(s->pb, -163, SEEK_CUR);
+            state = avio_rb32(s->pb);
             break;
         }
-        state = (state << 8) | get_byte(s->pb);
+        state = (state << 8) | avio_r8(s->pb);
     }
     AV_WB32(c->buf, state);
 
-    if (get_buffer(s->pb, c->buf + 4, DV_PROFILE_BYTES - 4) <= 0 ||
-        url_fseek(s->pb, -DV_PROFILE_BYTES, SEEK_CUR) < 0)
+    if (avio_read(s->pb, c->buf + 4, DV_PROFILE_BYTES - 4) != DV_PROFILE_BYTES - 4 ||
+        avio_seek(s->pb, -DV_PROFILE_BYTES, SEEK_CUR) < 0)
         return AVERROR(EIO);
 
-    c->dv_demux->sys = ff_dv_frame_profile(c->dv_demux->sys, c->buf, DV_PROFILE_BYTES);
+    c->dv_demux->sys = avpriv_dv_frame_profile(c->dv_demux->sys, c->buf, DV_PROFILE_BYTES);
     if (!c->dv_demux->sys) {
         av_log(s, AV_LOG_ERROR, "Can't determine profile of DV input stream.\n");
         return -1;
@@ -439,6 +507,9 @@ static int dv_read_header(AVFormatContext *s,
 
     s->bit_rate = av_rescale_q(c->dv_demux->sys->frame_size, (AVRational){8,1},
                                c->dv_demux->sys->time_base);
+
+    if (s->pb->seekable)
+        dv_read_timecode(s);
 
     return 0;
 }
@@ -449,16 +520,17 @@ static int dv_read_packet(AVFormatContext *s, AVPacket *pkt)
     int size;
     RawDVContext *c = s->priv_data;
 
-    size = dv_get_packet(c->dv_demux, pkt);
+    size = avpriv_dv_get_packet(c->dv_demux, pkt);
 
     if (size < 0) {
+        int64_t pos = avio_tell(s->pb);
         if (!c->dv_demux->sys)
             return AVERROR(EIO);
         size = c->dv_demux->sys->frame_size;
-        if (get_buffer(s->pb, c->buf, size) <= 0)
+        if (avio_read(s->pb, c->buf, size) <= 0)
             return AVERROR(EIO);
 
-        size = dv_produce_packet(c->dv_demux, pkt, c->buf, size);
+        size = avpriv_dv_produce_packet(c->dv_demux, pkt, c->buf, size, pos);
     }
 
     return size;
@@ -471,10 +543,11 @@ static int dv_read_seek(AVFormatContext *s, int stream_index,
     DVDemuxContext *c = r->dv_demux;
     int64_t offset    = dv_frame_offset(s, c, timestamp, flags);
 
-    dv_offset_reset(c, offset / c->sys->frame_size);
+    if (avio_seek(s->pb, offset, SEEK_SET) < 0)
+        return -1;
 
-    offset = url_fseek(s->pb, offset, SEEK_SET);
-    return (offset < 0) ? offset : 0;
+    ff_dv_offset_reset(c, offset / c->sys->frame_size);
+    return 0;
 }
 
 static int dv_read_close(AVFormatContext *s)
@@ -519,14 +592,14 @@ static int dv_probe(AVProbeData *p)
 
 #if CONFIG_DV_DEMUXER
 AVInputFormat ff_dv_demuxer = {
-    "dv",
-    NULL_IF_CONFIG_SMALL("DV video format"),
-    sizeof(RawDVContext),
-    dv_probe,
-    dv_read_header,
-    dv_read_packet,
-    dv_read_close,
-    dv_read_seek,
+    .name           = "dv",
+    .long_name      = NULL_IF_CONFIG_SMALL("DV video format"),
+    .priv_data_size = sizeof(RawDVContext),
+    .read_probe     = dv_probe,
+    .read_header    = dv_read_header,
+    .read_packet    = dv_read_packet,
+    .read_close     = dv_read_close,
+    .read_seek      = dv_read_seek,
     .extensions = "dv,dif",
 };
 #endif

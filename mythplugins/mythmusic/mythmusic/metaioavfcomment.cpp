@@ -41,20 +41,19 @@ Metadata* MetaIOAVFComment::read(const QString &filename)
     int year = 0, tracknum = 0, length = 0;
 
     AVFormatContext* p_context = NULL;
-    AVFormatParameters* p_params = NULL;
     AVInputFormat* p_inputformat = NULL;
 
     QByteArray local8bit = filename.toLocal8Bit();
-    if ((av_open_input_file(&p_context, local8bit.constData(),
-                           p_inputformat, 0, p_params) < 0))
+    if ((avformat_open_input(&p_context, local8bit.constData(),
+                             p_inputformat, NULL) < 0))
     {
         return NULL;
     }
 
-    if (av_find_stream_info(p_context) < 0)
+    if (avformat_find_stream_info(p_context, NULL) < 0)
         return NULL;
 
-    AVMetadataTag *tag = av_metadata_get(p_context->metadata, "title", NULL, 0);
+    AVDictionaryEntry *tag = av_dict_get(p_context->metadata, "title", NULL, 0);
     if (!tag)
     {
         readFromFilename(filename, artist, album, title, genre, tracknum);
@@ -63,24 +62,24 @@ Metadata* MetaIOAVFComment::read(const QString &filename)
     {
         title = (char *)tag->value;
 
-        tag = av_metadata_get(p_context->metadata, "author", NULL, 0);
+        tag = av_dict_get(p_context->metadata, "author", NULL, 0);
         if (tag)
             artist += (char *)tag->value;
 
         // compilation_artist???
-        tag = av_metadata_get(p_context->metadata, "album", NULL, 0);
+        tag = av_dict_get(p_context->metadata, "album", NULL, 0);
         if (tag)
             album += (char *)tag->value;
 
-        tag = av_metadata_get(p_context->metadata, "genre", NULL, 0);
+        tag = av_dict_get(p_context->metadata, "genre", NULL, 0);
         if (tag)
             genre += (char *)tag->value;
 
-        tag = av_metadata_get(p_context->metadata, "year", NULL, 0);
+        tag = av_dict_get(p_context->metadata, "year", NULL, 0);
         if (tag)
             year = atoi(tag->value);
 
-        tag = av_metadata_get(p_context->metadata, "tracknum", NULL, 0);
+        tag = av_dict_get(p_context->metadata, "tracknum", NULL, 0);
         if (tag)
             tracknum = atoi(tag->value);
     }
@@ -92,7 +91,7 @@ Metadata* MetaIOAVFComment::read(const QString &filename)
 
     retdata->determineIfCompilation();
 
-    av_close_input_file(p_context);
+    avformat_close_input(&p_context);
 
     return retdata;
 }
@@ -106,23 +105,22 @@ Metadata* MetaIOAVFComment::read(const QString &filename)
 int MetaIOAVFComment::getTrackLength(const QString &filename)
 {
     AVFormatContext* p_context = NULL;
-    AVFormatParameters* p_params = NULL;
     AVInputFormat* p_inputformat = NULL;
 
     // Open the specified file and populate the metadata info
     QByteArray local8bit = filename.toLocal8Bit();
-    if ((av_open_input_file(&p_context, local8bit.constData(),
-                           p_inputformat, 0, p_params) < 0))
+    if ((avformat_open_input(&p_context, local8bit.constData(),
+                             p_inputformat, NULL) < 0))
     {
         return 0;
     }
 
-    if (av_find_stream_info(p_context) < 0)
+    if (avformat_find_stream_info(p_context, NULL) < 0)
         return 0;
 
     int rv = getTrackLength(p_context);
 
-    av_close_input_file(p_context);
+    avformat_close_input(&p_context);
 
     return rv;
 }

@@ -42,6 +42,7 @@
 #include <stdlib.h>
 
 #include "avcodec.h"
+#include "internal.h"
 #include "lcl.h"
 
 #include <zlib.h>
@@ -68,15 +69,20 @@ typedef struct LclEncContext {
  * Encode a frame
  *
  */
-static int encode_frame(AVCodecContext *avctx, unsigned char *buf, int buf_size, void *data){
+static int encode_frame(AVCodecContext *avctx, AVPacket *pkt,
+                        const AVFrame *pict, int *got_packet)
+{
     LclEncContext *c = avctx->priv_data;
-    AVFrame *pict = data;
     AVFrame * const p = &c->pic;
-    int i;
+    int i, ret;
     int zret; // Zlib return code
+    int max_size = deflateBound(&c->zstream, avctx->width * avctx->height * 3);
+
+    if ((ret = ff_alloc_packet2(avctx, pkt, max_size)) < 0)
+            return ret;
 
     *p = *pict;
-    p->pict_type= FF_I_TYPE;
+    p->pict_type= AV_PICTURE_TYPE_I;
     p->key_frame= 1;
 
     if(avctx->pix_fmt != PIX_FMT_BGR24){
@@ -89,8 +95,8 @@ static int encode_frame(AVCodecContext *avctx, unsigned char *buf, int buf_size,
         av_log(avctx, AV_LOG_ERROR, "Deflate reset error: %d\n", zret);
         return -1;
     }
-    c->zstream.next_out = buf;
-    c->zstream.avail_out = buf_size;
+    c->zstream.next_out  = pkt->data;
+    c->zstream.avail_out = pkt->size;
 
     for(i = avctx->height - 1; i >= 0; i--) {
         c->zstream.next_in = p->data[0]+p->linesize[0]*i;
@@ -107,7 +113,11 @@ static int encode_frame(AVCodecContext *avctx, unsigned char *buf, int buf_size,
         return -1;
     }
 
-    return c->zstream.total_out;
+    pkt->size   = c->zstream.total_out;
+    pkt->flags |= AV_PKT_FLAG_KEY;
+    *got_packet = 1;
+
+    return 0;
 }
 
 /*
@@ -171,13 +181,13 @@ static av_cold int encode_end(AVCodecContext *avctx)
 }
 
 AVCodec ff_zlib_encoder = {
-    "zlib",
-    AVMEDIA_TYPE_VIDEO,
-    CODEC_ID_ZLIB,
-    sizeof(LclEncContext),
-    encode_init,
-    encode_frame,
-    encode_end,
+    .name           = "zlib",
+    .type           = AVMEDIA_TYPE_VIDEO,
+    .id             = CODEC_ID_ZLIB,
+    .priv_data_size = sizeof(LclEncContext),
+    .init           = encode_init,
+    .encode2        = encode_frame,
+    .close          = encode_end,
     .pix_fmts = (const enum PixelFormat[]) { PIX_FMT_BGR24, PIX_FMT_NONE },
     .long_name = NULL_IF_CONFIG_SMALL("LCL (LossLess Codec Library) ZLIB"),
 };

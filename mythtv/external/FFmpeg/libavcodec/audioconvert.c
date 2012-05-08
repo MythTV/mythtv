@@ -31,24 +31,7 @@
 #include "avcodec.h"
 #include "audioconvert.h"
 
-#if FF_API_OLD_SAMPLE_FMT
-const char *avcodec_get_sample_fmt_name(int sample_fmt)
-{
-    return av_get_sample_fmt_name(sample_fmt);
-}
-
-enum AVSampleFormat avcodec_get_sample_fmt(const char* name)
-{
-    return av_get_sample_fmt(name);
-}
-
-void avcodec_sample_fmt_string (char *buf, int buf_size, int sample_fmt)
-{
-    av_get_sample_fmt_string(buf, buf_size, sample_fmt);
-}
-#endif
-
-int64_t avcodec_guess_channel_layout(int nb_channels, enum CodecID codec_id, const char *fmt_name)
+uint64_t avcodec_guess_channel_layout(int nb_channels, enum CodecID codec_id, const char *fmt_name)
 {
     switch(nb_channels) {
     case 1: return AV_CH_LAYOUT_MONO;
@@ -61,23 +44,6 @@ int64_t avcodec_guess_channel_layout(int nb_channels, enum CodecID codec_id, con
     default: return 0;
     }
 }
-
-#if FF_API_OLD_AUDIOCONVERT
-int64_t avcodec_get_channel_layout(const char *name)
-{
-    return av_get_channel_layout(name);
-}
-
-void avcodec_get_channel_layout_string(char *buf, int buf_size, int nb_channels, int64_t channel_layout)
-{
-    av_get_channel_layout_string(buf, buf_size, nb_channels, channel_layout);
-}
-
-int avcodec_channel_layout_num_channels(int64_t channel_layout)
-{
-    return av_get_channel_layout_nb_channels(channel_layout);
-}
-#endif
 
 struct AVAudioConvert {
     int in_channels, out_channels;
@@ -145,8 +111,8 @@ if(ctx->fmt_pair == ofmt + AV_SAMPLE_FMT_NB*ifmt){\
         else CONV(AV_SAMPLE_FMT_U8 , uint8_t, AV_SAMPLE_FMT_S32, (*(const int32_t*)pi>>24) + 0x80)
         else CONV(AV_SAMPLE_FMT_S16, int16_t, AV_SAMPLE_FMT_S32,  *(const int32_t*)pi>>16)
         else CONV(AV_SAMPLE_FMT_S32, int32_t, AV_SAMPLE_FMT_S32,  *(const int32_t*)pi)
-        else CONV(AV_SAMPLE_FMT_FLT, float  , AV_SAMPLE_FMT_S32,  *(const int32_t*)pi*(1.0 / (1<<31)))
-        else CONV(AV_SAMPLE_FMT_DBL, double , AV_SAMPLE_FMT_S32,  *(const int32_t*)pi*(1.0 / (1<<31)))
+        else CONV(AV_SAMPLE_FMT_FLT, float  , AV_SAMPLE_FMT_S32,  *(const int32_t*)pi*(1.0 / (1U<<31)))
+        else CONV(AV_SAMPLE_FMT_DBL, double , AV_SAMPLE_FMT_S32,  *(const int32_t*)pi*(1.0 / (1U<<31)))
         else CONV(AV_SAMPLE_FMT_U8 , uint8_t, AV_SAMPLE_FMT_FLT, av_clip_uint8(  lrintf(*(const float*)pi * (1<<7)) + 0x80))
         else CONV(AV_SAMPLE_FMT_S16, int16_t, AV_SAMPLE_FMT_FLT, av_clip_int16(  lrintf(*(const float*)pi * (1<<15))))
         else CONV(AV_SAMPLE_FMT_S32, int32_t, AV_SAMPLE_FMT_FLT, av_clipl_int32(llrintf(*(const float*)pi * (1U<<31))))

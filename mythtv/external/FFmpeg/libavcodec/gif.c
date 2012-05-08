@@ -43,6 +43,7 @@
 
 #include "avcodec.h"
 #include "bytestream.h"
+#include "internal.h"
 #include "lzw.h"
 
 /* The GIF format uses reversed order for bitstreams... */
@@ -62,7 +63,7 @@ static int gif_image_write_header(AVCodecContext *avctx,
                                   uint8_t **bytestream, uint32_t *palette)
 {
     int i;
-    unsigned int v;
+    unsigned int v, smallest_alpha = 0xFF, alpha_component = 0;
 
     bytestream_put_buffer(bytestream, "GIF", 3);
     bytestream_put_buffer(bytestream, "89a", 3);
@@ -77,6 +78,20 @@ static int gif_image_write_header(AVCodecContext *avctx,
     for(i=0;i<256;i++) {
         v = palette[i];
         bytestream_put_be24(bytestream, v);
+        if (v >> 24 < smallest_alpha) {
+            smallest_alpha = v >> 24;
+            alpha_component = i;
+        }
+    }
+
+    if (smallest_alpha < 128) {
+        bytestream_put_byte(bytestream, 0x21); /* Extension Introducer */
+        bytestream_put_byte(bytestream, 0xf9); /* Graphic Control Label */
+        bytestream_put_byte(bytestream, 0x04); /* block length */
+        bytestream_put_byte(bytestream, 0x01); /* Transparent Color Flag */
+        bytestream_put_le16(bytestream, 0x00); /* no delay */
+        bytestream_put_byte(bytestream, alpha_component);
+        bytestream_put_byte(bytestream, 0x00);
     }
 
     return 0;
@@ -141,20 +156,30 @@ static av_cold int gif_encode_init(AVCodecContext *avctx)
 }
 
 /* better than nothing gif encoder */
-static int gif_encode_frame(AVCodecContext *avctx, unsigned char *outbuf, int buf_size, void *data)
+static int gif_encode_frame(AVCodecContext *avctx, AVPacket *pkt,
+                            const AVFrame *pict, int *got_packet)
 {
     GIFContext *s = avctx->priv_data;
-    AVFrame *pict = data;
-    AVFrame *const p = (AVFrame *)&s->picture;
-    uint8_t *outbuf_ptr = outbuf;
-    uint8_t *end = outbuf + buf_size;
+    AVFrame *const p = &s->picture;
+    uint8_t *outbuf_ptr, *end;
+    int ret;
+
+    if ((ret = ff_alloc_packet2(avctx, pkt, avctx->width*avctx->height*7/5 + FF_MIN_BUFFER_SIZE)) < 0)
+        return ret;
+    outbuf_ptr = pkt->data;
+    end        = pkt->data + pkt->size;
 
     *p = *pict;
-    p->pict_type = FF_I_TYPE;
+    p->pict_type = AV_PICTURE_TYPE_I;
     p->key_frame = 1;
     gif_image_write_header(avctx, &outbuf_ptr, (uint32_t *)pict->data[1]);
     gif_image_write_image(avctx, &outbuf_ptr, end, pict->data[0], pict->linesize[0]);
-    return outbuf_ptr - outbuf;
+
+    pkt->size   = outbuf_ptr - pkt->data;
+    pkt->flags |= AV_PKT_FLAG_KEY;
+    *got_packet = 1;
+
+    return 0;
 }
 
 static int gif_encode_close(AVCodecContext *avctx)
@@ -167,13 +192,13 @@ static int gif_encode_close(AVCodecContext *avctx)
 }
 
 AVCodec ff_gif_encoder = {
-    "gif",
-    AVMEDIA_TYPE_VIDEO,
-    CODEC_ID_GIF,
-    sizeof(GIFContext),
-    gif_encode_init,
-    gif_encode_frame,
-    gif_encode_close,
+    .name           = "gif",
+    .type           = AVMEDIA_TYPE_VIDEO,
+    .id             = CODEC_ID_GIF,
+    .priv_data_size = sizeof(GIFContext),
+    .init           = gif_encode_init,
+    .encode2        = gif_encode_frame,
+    .close          = gif_encode_close,
     .pix_fmts= (const enum PixelFormat[]){PIX_FMT_RGB8, PIX_FMT_BGR8, PIX_FMT_RGB4_BYTE, PIX_FMT_BGR4_BYTE, PIX_FMT_GRAY8, PIX_FMT_PAL8, PIX_FMT_NONE},
     .long_name= NULL_IF_CONFIG_SMALL("GIF (Graphics Interchange Format)"),
 };

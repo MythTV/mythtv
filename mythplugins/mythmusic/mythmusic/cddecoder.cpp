@@ -273,6 +273,7 @@ bool CdDecoder::initialize()
     m_output_at = 0;
 
     setCDSpeed(2);
+
     m_inited = true;
 
     return m_inited;

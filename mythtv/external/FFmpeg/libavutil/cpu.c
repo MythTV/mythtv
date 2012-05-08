@@ -19,14 +19,18 @@
 #include "cpu.h"
 #include "config.h"
 
+static int flags, checked;
+
+void av_force_cpu_flags(int arg){
+    flags   = arg;
+    checked = arg != -1;
+}
+
 int av_get_cpu_flags(void)
 {
-    static int flags, checked;
-
     if (checked)
         return flags;
 
-    if (ARCH_ARM) flags = ff_get_cpu_flags_arm();
     if (ARCH_PPC) flags = ff_get_cpu_flags_ppc();
     if (ARCH_X86) flags = ff_get_cpu_flags_x86();
 
@@ -34,35 +38,57 @@ int av_get_cpu_flags(void)
     return flags;
 }
 
+void av_set_cpu_flags_mask(int mask)
+{
+    checked       = 0;
+    flags         = av_get_cpu_flags() & mask;
+    checked       = 1;
+}
+
 #ifdef TEST
 
 #undef printf
 #include <stdio.h>
 
+static const struct {
+    int flag;
+    const char *name;
+} cpu_flag_tab[] = {
+#if   ARCH_PPC
+    { AV_CPU_FLAG_ALTIVEC,   "altivec"    },
+#elif ARCH_X86
+    { AV_CPU_FLAG_MMX,       "mmx"        },
+    { AV_CPU_FLAG_MMX2,      "mmx2"       },
+    { AV_CPU_FLAG_SSE,       "sse"        },
+    { AV_CPU_FLAG_SSE2,      "sse2"       },
+    { AV_CPU_FLAG_SSE2SLOW,  "sse2(slow)" },
+    { AV_CPU_FLAG_SSE3,      "sse3"       },
+    { AV_CPU_FLAG_SSE3SLOW,  "sse3(slow)" },
+    { AV_CPU_FLAG_SSSE3,     "ssse3"      },
+    { AV_CPU_FLAG_ATOM,      "atom"       },
+    { AV_CPU_FLAG_SSE4,      "sse4.1"     },
+    { AV_CPU_FLAG_SSE42,     "sse4.2"     },
+    { AV_CPU_FLAG_AVX,       "avx"        },
+    { AV_CPU_FLAG_XOP,       "xop"        },
+    { AV_CPU_FLAG_FMA4,      "fma4"       },
+    { AV_CPU_FLAG_3DNOW,     "3dnow"      },
+    { AV_CPU_FLAG_3DNOWEXT,  "3dnowext"   },
+#endif
+    { 0 }
+};
+
 int main(void)
 {
     int cpu_flags = av_get_cpu_flags();
+    int i;
 
     printf("cpu_flags = 0x%08X\n", cpu_flags);
-    printf("cpu_flags = %s%s%s%s%s%s%s%s%s%s%s%s\n",
-#if   ARCH_ARM
-           cpu_flags & AV_CPU_FLAG_IWMMXT   ? "IWMMXT "     : "",
-#elif ARCH_PPC
-           cpu_flags & AV_CPU_FLAG_ALTIVEC  ? "ALTIVEC "    : "",
-#elif ARCH_X86
-           cpu_flags & AV_CPU_FLAG_MMX      ? "MMX "        : "",
-           cpu_flags & AV_CPU_FLAG_MMX2     ? "MMX2 "       : "",
-           cpu_flags & AV_CPU_FLAG_SSE      ? "SSE "        : "",
-           cpu_flags & AV_CPU_FLAG_SSE2     ? "SSE2 "       : "",
-           cpu_flags & AV_CPU_FLAG_SSE2SLOW ? "SSE2(slow) " : "",
-           cpu_flags & AV_CPU_FLAG_SSE3     ? "SSE3 "       : "",
-           cpu_flags & AV_CPU_FLAG_SSE3SLOW ? "SSE3(slow) " : "",
-           cpu_flags & AV_CPU_FLAG_SSSE3    ? "SSSE3 "      : "",
-           cpu_flags & AV_CPU_FLAG_SSE4     ? "SSE4.1 "     : "",
-           cpu_flags & AV_CPU_FLAG_SSE42    ? "SSE4.2 "     : "",
-           cpu_flags & AV_CPU_FLAG_3DNOW    ? "3DNow "      : "",
-           cpu_flags & AV_CPU_FLAG_3DNOWEXT ? "3DNowExt "   : "");
-#endif
+    printf("cpu_flags =");
+    for (i = 0; cpu_flag_tab[i].flag; i++)
+        if (cpu_flags & cpu_flag_tab[i].flag)
+            printf(" %s", cpu_flag_tab[i].name);
+    printf("\n");
+
     return 0;
 }
 

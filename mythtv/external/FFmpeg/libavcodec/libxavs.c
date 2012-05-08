@@ -24,8 +24,11 @@
 #include <string.h>
 #include <math.h>
 #include <stdint.h>
+#include <float.h>
 #include <xavs.h>
 #include "avcodec.h"
+#include "internal.h"
+#include "libavutil/opt.h"
 
 #define END_OF_STREAM 0x001
 
@@ -34,6 +37,7 @@
 #define XAVS_PART_B8X8 0x100 /* Analyze b16x8, b*/
 
 typedef struct XavsContext {
+    AVClass        *class;
     xavs_param_t    params;
     xavs_t         *enc;
     xavs_picture_t  pic;
@@ -41,6 +45,18 @@ typedef struct XavsContext {
     int             sei_size;
     AVFrame         out_pic;
     int             end_of_stream;
+    float crf;
+    int cqp;
+    int b_bias;
+    float cplxblur;
+    int direct_pred;
+    int aud;
+    int fast_pskip;
+    int mbtree;
+    int mixed_refs;
+
+    int64_t *pts_buffer;
+    int out_frame_count;
 } XavsContext;
 
 static void XAVS_log(void *p, int level, const char *fmt, va_list args)
@@ -58,13 +74,22 @@ static void XAVS_log(void *p, int level, const char *fmt, va_list args)
     av_vlog(p, level_map[level], fmt, args);
 }
 
-static int encode_nals(AVCodecContext *ctx, uint8_t *buf,
-                       int size, xavs_nal_t *nals,
-                       int nnal, int skip_sei)
+static int encode_nals(AVCodecContext *ctx, AVPacket *pkt,
+                       xavs_nal_t *nals, int nnal)
 {
     XavsContext *x4 = ctx->priv_data;
-    uint8_t *p = buf;
-    int i, s;
+    uint8_t *p;
+    int i, s, ret, size = x4->sei_size + FF_MIN_BUFFER_SIZE;
+
+    if (!nnal)
+        return 0;
+
+    for (i = 0; i < nnal; i++)
+        size += nals[i].i_payload;
+
+    if ((ret = ff_alloc_packet2(ctx, pkt, size)) < 0)
+        return ret;
+    p = pkt->data;
 
     /* Write the SEI as part of the first frame. */
     if (x4->sei_size > 0 && nnal > 0) {
@@ -74,30 +99,22 @@ static int encode_nals(AVCodecContext *ctx, uint8_t *buf,
     }
 
     for (i = 0; i < nnal; i++) {
-        /* Don't put the SEI in extradata. */
-        if (skip_sei && nals[i].i_type == NAL_SEI) {
-            x4->sei = av_malloc( 5 + nals[i].i_payload * 4 / 3 );
-            if (xavs_nal_encode(x4->sei, &x4->sei_size, 1, nals + i) < 0)
-                return -1;
-
-            continue;
-        }
         s = xavs_nal_encode(p, &size, 1, nals + i);
         if (s < 0)
             return -1;
         p += s;
     }
+    pkt->size = p - pkt->data;
 
-    return p - buf;
+    return 1;
 }
 
-static int XAVS_frame(AVCodecContext *ctx, uint8_t *buf,
-                      int bufsize, void *data)
+static int XAVS_frame(AVCodecContext *ctx, AVPacket *pkt,
+                      const AVFrame *frame, int *got_packet)
 {
     XavsContext *x4 = ctx->priv_data;
-    AVFrame *frame = data;
     xavs_nal_t *nal;
-    int nnal, i;
+    int nnal, i, ret;
     xavs_picture_t pic_out;
 
     x4->pic.img.i_csp   = XAVS_CSP_I420;
@@ -111,51 +128,71 @@ static int XAVS_frame(AVCodecContext *ctx, uint8_t *buf,
 
         x4->pic.i_pts  = frame->pts;
         x4->pic.i_type = XAVS_TYPE_AUTO;
+        x4->pts_buffer[ctx->frame_number % (ctx->max_b_frames+1)] = frame->pts;
     }
 
     if (xavs_encoder_encode(x4->enc, &nal, &nnal,
                             frame? &x4->pic: NULL, &pic_out) < 0)
     return -1;
 
-    bufsize = encode_nals(ctx, buf, bufsize, nal, nnal, 0);
+    ret = encode_nals(ctx, pkt, nal, nnal);
 
-    if (bufsize < 0)
+    if (ret < 0)
         return -1;
 
-    if (!bufsize && !frame && !(x4->end_of_stream)){
-        buf[bufsize]   = 0x0;
-        buf[bufsize+1] = 0x0;
-        buf[bufsize+2] = 0x01;
-        buf[bufsize+3] = 0xb1;
-        bufsize += 4;
-        x4->end_of_stream = END_OF_STREAM;
-        return bufsize;
+    if (!ret) {
+        if (!frame && !(x4->end_of_stream)) {
+            if ((ret = ff_alloc_packet2(ctx, pkt, 4)) < 0)
+                return ret;
+
+            pkt->data[0] = 0x0;
+            pkt->data[1] = 0x0;
+            pkt->data[2] = 0x01;
+            pkt->data[3] = 0xb1;
+            pkt->dts = 2*x4->pts_buffer[(x4->out_frame_count-1)%(ctx->max_b_frames+1)] -
+                       x4->pts_buffer[(x4->out_frame_count-2)%(ctx->max_b_frames+1)];
+            x4->end_of_stream = END_OF_STREAM;
+            *got_packet = 1;
+        }
+        return 0;
     }
-    /* FIXME: libxavs now provides DTS */
-    /* but AVFrame doesn't have a field for it. */
+
     x4->out_pic.pts = pic_out.i_pts;
+    pkt->pts = pic_out.i_pts;
+    if (ctx->has_b_frames) {
+        if (!x4->out_frame_count)
+            pkt->dts = pkt->pts - (x4->pts_buffer[1] - x4->pts_buffer[0]);
+        else
+            pkt->dts = x4->pts_buffer[(x4->out_frame_count-1)%(ctx->max_b_frames+1)];
+    } else
+        pkt->dts = pkt->pts;
 
     switch (pic_out.i_type) {
     case XAVS_TYPE_IDR:
     case XAVS_TYPE_I:
-        x4->out_pic.pict_type = FF_I_TYPE;
+        x4->out_pic.pict_type = AV_PICTURE_TYPE_I;
         break;
     case XAVS_TYPE_P:
-        x4->out_pic.pict_type = FF_P_TYPE;
+        x4->out_pic.pict_type = AV_PICTURE_TYPE_P;
         break;
     case XAVS_TYPE_B:
     case XAVS_TYPE_BREF:
-        x4->out_pic.pict_type = FF_B_TYPE;
+        x4->out_pic.pict_type = AV_PICTURE_TYPE_B;
         break;
     }
 
     /* There is no IDR frame in AVS JiZhun */
     /* Sequence header is used as a flag */
-    x4->out_pic.key_frame = pic_out.i_type == XAVS_TYPE_I;
+    if (pic_out.i_type == XAVS_TYPE_I) {
+        x4->out_pic.key_frame = 1;
+        pkt->flags |= AV_PKT_FLAG_KEY;
+    }
 
     x4->out_pic.quality   = (pic_out.i_qpplus1 - 1) * FF_QP2LAMBDA;
 
-    return bufsize;
+    x4->out_frame_count++;
+    *got_packet = ret;
+    return 0;
 }
 
 static av_cold int XAVS_close(AVCodecContext *avctx)
@@ -164,6 +201,7 @@ static av_cold int XAVS_close(AVCodecContext *avctx)
 
     av_freep(&avctx->extradata);
     av_free(x4->sei);
+    av_freep(&x4->pts_buffer);
 
     if (x4->enc)
         xavs_encoder_close(x4->enc);
@@ -181,33 +219,45 @@ static av_cold int XAVS_init(AVCodecContext *avctx)
     x4->params.pf_log               = XAVS_log;
     x4->params.p_log_private        = avctx;
     x4->params.i_keyint_max         = avctx->gop_size;
-    x4->params.rc.i_bitrate         = avctx->bit_rate       / 1000;
+    if (avctx->bit_rate) {
+        x4->params.rc.i_bitrate   = avctx->bit_rate / 1000;
+        x4->params.rc.i_rc_method = XAVS_RC_ABR;
+    }
     x4->params.rc.i_vbv_buffer_size = avctx->rc_buffer_size / 1000;
     x4->params.rc.i_vbv_max_bitrate = avctx->rc_max_rate    / 1000;
     x4->params.rc.b_stat_write      = avctx->flags & CODEC_FLAG_PASS1;
     if (avctx->flags & CODEC_FLAG_PASS2) {
         x4->params.rc.b_stat_read = 1;
     } else {
-        if (avctx->crf) {
+        if (x4->crf >= 0) {
             x4->params.rc.i_rc_method   = XAVS_RC_CRF;
-            x4->params.rc.f_rf_constant = avctx->crf;
-        } else if (avctx->cqp > -1) {
+            x4->params.rc.f_rf_constant = x4->crf;
+        } else if (x4->cqp >= 0) {
             x4->params.rc.i_rc_method   = XAVS_RC_CQP;
-            x4->params.rc.i_qp_constant = avctx->cqp;
+            x4->params.rc.i_qp_constant = x4->cqp;
         }
     }
 
-    /* if neither crf nor cqp modes are selected we have to enable the RC */
-    /* we do it this way because we cannot check if the bitrate has been set */
-    if (!(avctx->crf || (avctx->cqp > -1)))
-        x4->params.rc.i_rc_method = XAVS_RC_ABR;
+    if (x4->aud >= 0)
+        x4->params.b_aud                      = x4->aud;
+    if (x4->mbtree >= 0)
+        x4->params.rc.b_mb_tree               = x4->mbtree;
+    if (x4->direct_pred >= 0)
+        x4->params.analyse.i_direct_mv_pred   = x4->direct_pred;
+    if (x4->fast_pskip >= 0)
+        x4->params.analyse.b_fast_pskip       = x4->fast_pskip;
+    if (x4->mixed_refs >= 0)
+        x4->params.analyse.b_mixed_references = x4->mixed_refs;
+    if (x4->b_bias != INT_MIN)
+        x4->params.i_bframe_bias              = x4->b_bias;
+    if (x4->cplxblur >= 0)
+        x4->params.rc.f_complexity_blur = x4->cplxblur;
 
     x4->params.i_bframe          = avctx->max_b_frames;
     /* cabac is not included in AVS JiZhun Profile */
     x4->params.b_cabac           = 0;
 
     x4->params.i_bframe_adaptive = avctx->b_frame_strategy;
-    x4->params.i_bframe_bias     = avctx->bframebias;
 
     avctx->has_b_frames          = !!avctx->max_b_frames;
 
@@ -220,8 +270,6 @@ static av_cold int XAVS_init(AVCodecContext *avctx)
     x4->params.i_scenecut_threshold        = avctx->scenechange_threshold;
 
    // x4->params.b_deblocking_filter       = avctx->flags & CODEC_FLAG_LOOP_FILTER;
-    x4->params.i_deblocking_filter_alphac0 = avctx->deblockalpha;
-    x4->params.i_deblocking_filter_beta    = avctx->deblockbeta;
 
     x4->params.rc.i_qp_min                 = avctx->qmin;
     x4->params.rc.i_qp_max                 = avctx->qmax;
@@ -229,7 +277,6 @@ static av_cold int XAVS_init(AVCodecContext *avctx)
 
     x4->params.rc.f_qcompress       = avctx->qcompress; /* 0.0 => cbr, 1.0 => constant qp */
     x4->params.rc.f_qblur           = avctx->qblur;     /* temporally blur quants */
-    x4->params.rc.f_complexity_blur = avctx->complexityblur;
 
     x4->params.i_frame_reference    = avctx->refs;
 
@@ -241,20 +288,6 @@ static av_cold int XAVS_init(AVCodecContext *avctx)
     x4->params.i_fps_num            = avctx->time_base.den;
     x4->params.i_fps_den            = avctx->time_base.num;
     x4->params.analyse.inter        = XAVS_ANALYSE_I8x8 |XAVS_ANALYSE_PSUB16x16| XAVS_ANALYSE_BSUB16x16;
-    if (avctx->partitions) {
-        if (avctx->partitions & XAVS_PART_I8X8)
-            x4->params.analyse.inter |= XAVS_ANALYSE_I8x8;
-
-        if (avctx->partitions & XAVS_PART_P8X8)
-            x4->params.analyse.inter |= XAVS_ANALYSE_PSUB16x16;
-
-        if (avctx->partitions & XAVS_PART_B8X8)
-            x4->params.analyse.inter |= XAVS_ANALYSE_BSUB16x16;
-    }
-
-    x4->params.analyse.i_direct_mv_pred  = avctx->directpred;
-
-    x4->params.analyse.b_weighted_bipred = avctx->flags2 & CODEC_FLAG2_WPRED;
 
     switch (avctx->me_method) {
          case  ME_EPZS:
@@ -279,11 +312,9 @@ static av_cold int XAVS_init(AVCodecContext *avctx)
     x4->params.analyse.i_me_range = avctx->me_range;
     x4->params.analyse.i_subpel_refine    = avctx->me_subpel_quality;
 
-    x4->params.analyse.b_mixed_references = avctx->flags2 & CODEC_FLAG2_MIXED_REFS;
     x4->params.analyse.b_chroma_me        = avctx->me_cmp & FF_CMP_CHROMA;
     /* AVS P2 only enables 8x8 transform */
     x4->params.analyse.b_transform_8x8    = 1; //avctx->flags2 & CODEC_FLAG2_8X8DCT;
-    x4->params.analyse.b_fast_pskip       = avctx->flags2 & CODEC_FLAG2_FASTPSKIP;
 
     x4->params.analyse.i_trellis          = avctx->trellis;
     x4->params.analyse.i_noise_reduction  = avctx->noise_reduction;
@@ -303,14 +334,12 @@ static av_cold int XAVS_init(AVCodecContext *avctx)
 
     /* TAG:do we have MB tree RC method */
     /* what is the RC method we are now using? Default NO */
-    x4->params.rc.b_mb_tree               = !!(avctx->flags2 & CODEC_FLAG2_MBTREE);
     x4->params.rc.f_ip_factor             = 1 / fabs(avctx->i_quant_factor);
     x4->params.rc.f_pb_factor             = avctx->b_quant_factor;
     x4->params.analyse.i_chroma_qp_offset = avctx->chromaoffset;
 
     x4->params.analyse.b_psnr = avctx->flags & CODEC_FLAG_PSNR;
     x4->params.i_log_level    = XAVS_LOG_DEBUG;
-    x4->params.b_aud          = avctx->flags2 & CODEC_FLAG2_AUD;
     x4->params.i_threads      = avctx->thread_count;
     x4->params.b_interlaced   = avctx->flags & CODEC_FLAG_INTERLACED_DCT;
 
@@ -321,20 +350,69 @@ static av_cold int XAVS_init(AVCodecContext *avctx)
     if (!x4->enc)
         return -1;
 
+    if (!(x4->pts_buffer = av_mallocz((avctx->max_b_frames+1) * sizeof(*x4->pts_buffer))))
+        return AVERROR(ENOMEM);
+
     avctx->coded_frame = &x4->out_pic;
     /* TAG: Do we have GLOBAL HEADER in AVS */
     /* We Have PPS and SPS in AVS */
     if (avctx->flags & CODEC_FLAG_GLOBAL_HEADER) {
         xavs_nal_t *nal;
-        int nnal, s;
+        int nnal, s, i, size;
+        uint8_t *p;
 
         s = xavs_encoder_headers(x4->enc, &nal, &nnal);
 
-        avctx->extradata      = av_malloc(s);
-        avctx->extradata_size = encode_nals(avctx, avctx->extradata, s, nal, nnal, 1);
+        avctx->extradata = p = av_malloc(s);
+        for (i = 0; i < nnal; i++) {
+            /* Don't put the SEI in extradata. */
+            if (nal[i].i_type == NAL_SEI) {
+                x4->sei = av_malloc( 5 + nal[i].i_payload * 4 / 3 );
+                if (xavs_nal_encode(x4->sei, &x4->sei_size, 1, nal + i) < 0)
+                    return -1;
+
+                continue;
+            }
+            size = xavs_nal_encode(p, &s, 1, nal + i);
+            if (size < 0)
+                return -1;
+            p += size;
+        }
+        avctx->extradata_size = p - avctx->extradata;
     }
     return 0;
 }
+
+#define OFFSET(x) offsetof(XavsContext, x)
+#define VE AV_OPT_FLAG_VIDEO_PARAM | AV_OPT_FLAG_ENCODING_PARAM
+static const AVOption options[] = {
+    { "crf",           "Select the quality for constant quality mode",    OFFSET(crf),           AV_OPT_TYPE_FLOAT,  {-1 }, -1, FLT_MAX, VE },
+    { "qp",            "Constant quantization parameter rate control method",OFFSET(cqp),        AV_OPT_TYPE_INT,    {-1 }, -1, INT_MAX, VE },
+    { "b-bias",        "Influences how often B-frames are used",          OFFSET(b_bias),        AV_OPT_TYPE_INT,    {INT_MIN}, INT_MIN, INT_MAX, VE },
+    { "cplxblur",      "Reduce fluctuations in QP (before curve compression)", OFFSET(cplxblur), AV_OPT_TYPE_FLOAT,  {-1 }, -1, FLT_MAX, VE},
+    { "direct-pred",   "Direct MV prediction mode",                       OFFSET(direct_pred),   AV_OPT_TYPE_INT,    {-1 }, -1, INT_MAX, VE, "direct-pred" },
+    { "none",          NULL,      0,    AV_OPT_TYPE_CONST, { XAVS_DIRECT_PRED_NONE },     0, 0, VE, "direct-pred" },
+    { "spatial",       NULL,      0,    AV_OPT_TYPE_CONST, { XAVS_DIRECT_PRED_SPATIAL },  0, 0, VE, "direct-pred" },
+    { "temporal",      NULL,      0,    AV_OPT_TYPE_CONST, { XAVS_DIRECT_PRED_TEMPORAL }, 0, 0, VE, "direct-pred" },
+    { "auto",          NULL,      0,    AV_OPT_TYPE_CONST, { XAVS_DIRECT_PRED_AUTO },     0, 0, VE, "direct-pred" },
+    { "aud",           "Use access unit delimiters.",                     OFFSET(aud),           AV_OPT_TYPE_INT,    {-1 }, -1, 1, VE},
+    { "mbtree",        "Use macroblock tree ratecontrol.",                OFFSET(mbtree),        AV_OPT_TYPE_INT,    {-1 }, -1, 1, VE},
+    { "mixed-refs",    "One reference per partition, as opposed to one reference per macroblock", OFFSET(mixed_refs), AV_OPT_TYPE_INT, {-1}, -1, 1, VE },
+    { "fast-pskip",    NULL,                                              OFFSET(fast_pskip),    AV_OPT_TYPE_INT,    {-1 }, -1, 1, VE},
+    { NULL },
+};
+
+static const AVClass class = {
+    .class_name = "libxavs",
+    .item_name  = av_default_item_name,
+    .option     = options,
+    .version    = LIBAVUTIL_VERSION_INT,
+};
+
+static const AVCodecDefault xavs_defaults[] = {
+    { "b",                "0" },
+    { NULL },
+};
 
 AVCodec ff_libxavs_encoder = {
     .name           = "libxavs",
@@ -342,10 +420,11 @@ AVCodec ff_libxavs_encoder = {
     .id             = CODEC_ID_CAVS,
     .priv_data_size = sizeof(XavsContext),
     .init           = XAVS_init,
-    .encode         = XAVS_frame,
+    .encode2        = XAVS_frame,
     .close          = XAVS_close,
-    .capabilities   = CODEC_CAP_DELAY,
+    .capabilities   = CODEC_CAP_DELAY | CODEC_CAP_AUTO_THREADS,
     .pix_fmts       = (const enum PixelFormat[]) { PIX_FMT_YUV420P, PIX_FMT_NONE },
     .long_name      = NULL_IF_CONFIG_SMALL("libxavs - the Chinese Audio Video Standard Encoder"),
+    .priv_class     = &class,
+    .defaults       = xavs_defaults,
 };
-

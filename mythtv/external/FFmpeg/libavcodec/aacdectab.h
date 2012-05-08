@@ -36,11 +36,11 @@
 #include <stdint.h>
 
 /* @name ltp_coef
- * Table of the LTP coefficient (multiplied by 2)
+ * Table of the LTP coefficients
  */
 static const float ltp_coef[8] = {
-     1.141658,    1.393232,    1.626008,    1.822608,
-     1.969800,    2.135788,    2.2389202,   2.739066,
+    0.570829, 0.696616, 0.813004, 0.911304,
+    0.984900, 1.067894, 1.194601, 1.369533,
 };
 
 /* @name tns_tmp2_map
@@ -80,24 +80,24 @@ static const float * const tns_tmp2_map[4] = {
 
 static const int8_t tags_per_config[16] = { 0, 1, 1, 2, 3, 3, 4, 5, 0, 0, 0, 0, 0, 0, 0, 0 };
 
-static const uint8_t aac_channel_layout_map[7][5][2] = {
-    { { TYPE_SCE, 0 }, },
-    { { TYPE_CPE, 0 }, },
-    { { TYPE_CPE, 0 }, { TYPE_SCE, 0 }, },
-    { { TYPE_CPE, 0 }, { TYPE_SCE, 0 }, { TYPE_SCE, 1 }, },
-    { { TYPE_CPE, 0 }, { TYPE_SCE, 0 }, { TYPE_CPE, 1 }, },
-    { { TYPE_CPE, 0 }, { TYPE_SCE, 0 }, { TYPE_LFE, 0 }, { TYPE_CPE, 1 }, },
-    { { TYPE_CPE, 0 }, { TYPE_SCE, 0 }, { TYPE_LFE, 0 }, { TYPE_CPE, 2 }, { TYPE_CPE, 1 }, },
+static const uint8_t aac_channel_layout_map[7][5][3] = {
+    { { TYPE_SCE, 0, AAC_CHANNEL_FRONT }, },
+    { { TYPE_CPE, 0, AAC_CHANNEL_FRONT }, },
+    { { TYPE_SCE, 0, AAC_CHANNEL_FRONT }, { TYPE_CPE, 0, AAC_CHANNEL_FRONT }, },
+    { { TYPE_SCE, 0, AAC_CHANNEL_FRONT }, { TYPE_CPE, 0, AAC_CHANNEL_FRONT }, { TYPE_SCE, 1, AAC_CHANNEL_BACK }, },
+    { { TYPE_SCE, 0, AAC_CHANNEL_FRONT }, { TYPE_CPE, 0, AAC_CHANNEL_FRONT }, { TYPE_CPE, 1, AAC_CHANNEL_BACK }, },
+    { { TYPE_SCE, 0, AAC_CHANNEL_FRONT }, { TYPE_CPE, 0, AAC_CHANNEL_FRONT }, { TYPE_CPE, 1, AAC_CHANNEL_BACK }, { TYPE_LFE, 0, AAC_CHANNEL_LFE  }, },
+    { { TYPE_SCE, 0, AAC_CHANNEL_FRONT }, { TYPE_CPE, 0, AAC_CHANNEL_FRONT }, { TYPE_CPE, 1, AAC_CHANNEL_FRONT }, { TYPE_CPE, 2, AAC_CHANNEL_BACK }, { TYPE_LFE, 0, AAC_CHANNEL_LFE  }, },
 };
 
-static const int64_t aac_channel_layout[8] = {
+static const uint64_t aac_channel_layout[8] = {
     AV_CH_LAYOUT_MONO,
     AV_CH_LAYOUT_STEREO,
     AV_CH_LAYOUT_SURROUND,
     AV_CH_LAYOUT_4POINT0,
     AV_CH_LAYOUT_5POINT0_BACK,
     AV_CH_LAYOUT_5POINT1_BACK,
-    AV_CH_LAYOUT_7POINT1_WIDE,
+    AV_CH_LAYOUT_7POINT1_WIDE_BACK,
     0,
 };
 

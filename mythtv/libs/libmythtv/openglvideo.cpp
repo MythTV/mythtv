@@ -425,7 +425,7 @@ bool OpenGLVideo::AddFilter(OpenGLFilterType filter)
         return true;
 
     if (!(gl_features & kGLExtFBufObj) && (filter == kGLFilterResize) &&
-        filters.size())
+        !filters.empty())
     {
         LOG(VB_PLAYBACK, LOG_ERR, LOC +
             "GL_EXT_framebuffer_object not available "

@@ -285,7 +285,7 @@ static VideoFilter *new_filter(VideoFrameType inpixfmt,
     filter->vf.filter  = &crop;
 
 #ifdef MMX
-    if (av_get_cpu_flags() & FF_MM_MMX)
+    if (av_get_cpu_flags() & AV_CPU_FLAG_MMX)
         filter->vf.filter = &cropMMX;
 #endif
 
