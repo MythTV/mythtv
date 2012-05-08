@@ -74,7 +74,7 @@
         <fontdef name="708_2" face="DejaVu Serif"    from="provider">
         </fontdef>
 
-        <!-- Font tag 3: "Monospaced Serif" -->
+        <!-- Font tag 3: "Monospaced Sans Serif" -->
         <fontdef name="708_3" face="Droid Sans Mono" from="provider">
         </fontdef>
 
