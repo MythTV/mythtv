@@ -17,11 +17,11 @@
 ;*
 ;* You should have received a copy of the GNU Lesser General Public
 ;* License along with FFmpeg; if not, write to the Free Software
-;* 51, Inc., Foundation Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+;* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 ;******************************************************************************
 
-%include "x86inc.asm"
-%include "x86util.asm"
+%include "libavutil/x86/x86inc.asm"
+%include "libavutil/x86/x86util.asm"
 
 SECTION_RODATA
 
@@ -72,17 +72,17 @@ SECTION .text
 .next4rows
     movq         mm0, [r1   ]
     movq         mm1, [r1+r2]
+    add           r1, r4
     CHROMAMC_AVG mm0, [r0   ]
     CHROMAMC_AVG mm1, [r0+r2]
     movq     [r0   ], mm0
     movq     [r0+r2], mm1
     add           r0, r4
-    add           r1, r4
     movq         mm0, [r1   ]
     movq         mm1, [r1+r2]
+    add           r1, r4
     CHROMAMC_AVG mm0, [r0   ]
     CHROMAMC_AVG mm1, [r0+r2]
-    add           r1, r4
     movq     [r0   ], mm0
     movq     [r0+r2], mm1
     add           r0, r4
@@ -94,7 +94,7 @@ SECTION .text
 ; put/avg_h264_chroma_mc8_mmx_*(uint8_t *dst /*align 8*/, uint8_t *src /*align 1*/,
 ;                              int stride, int h, int mx, int my)
 cglobal %1_%2_chroma_mc8_%3, 6, 7, 0
-%ifdef ARCH_X86_64
+%if ARCH_X86_64
     movsxd        r2, r2d
 %endif
     mov          r6d, r5d
@@ -113,7 +113,7 @@ cglobal %1_%2_chroma_mc8_%3, 6, 7, 0
 %define rnd_1d_rv40 rnd_rv40_1d_tbl
 %define rnd_2d_rv40 rnd_rv40_2d_tbl
 %endif
-%ifdef ARCH_X86_64
+%if ARCH_X86_64
     mov          r10, r5
     and          r10, 6         ; &~1 for mx/my=[0,7]
     lea          r10, [r10*4+r4]
@@ -147,7 +147,7 @@ cglobal %1_%2_chroma_mc8_%3, 6, 7, 0
 %ifdef PIC
     lea          r11, [rnd_rv40_1d_tbl]
 %endif
-%ifndef ARCH_X86_64
+%if ARCH_X86_64 == 0
     mov           r5, r0m
 %endif
 %endif
@@ -198,7 +198,7 @@ cglobal %1_%2_chroma_mc8_%3, 6, 7, 0
 %ifdef PIC
     lea          r11, [rnd_rv40_2d_tbl]
 %endif
-%ifndef ARCH_X86_64
+%if ARCH_X86_64 == 0
     mov           r5, r0m
 %endif
 %endif
@@ -279,7 +279,7 @@ cglobal %1_%2_chroma_mc8_%3, 6, 7, 0
 
 %macro chroma_mc4_mmx_func 3
 cglobal %1_%2_chroma_mc4_%3, 6, 6, 0
-%ifdef ARCH_X86_64
+%if ARCH_X86_64
     movsxd        r2, r2d
 %endif
     pxor          m7, m7
@@ -364,7 +364,7 @@ cglobal %1_%2_chroma_mc4_%3, 6, 6, 0
 
 %macro chroma_mc2_mmx_func 3
 cglobal %1_%2_chroma_mc2_%3, 6, 7, 0
-%ifdef ARCH_X86_64
+%if ARCH_X86_64
     movsxd        r2, r2d
 %endif
 
@@ -452,7 +452,7 @@ chroma_mc4_mmx_func avg, rv40, 3dnow
 
 %macro chroma_mc8_ssse3_func 3
 cglobal %1_%2_chroma_mc8_%3, 6, 7, 8
-%ifdef ARCH_X86_64
+%if ARCH_X86_64
     movsxd        r2, r2d
 %endif
     mov          r6d, r5d
@@ -472,8 +472,8 @@ cglobal %1_%2_chroma_mc8_%3, 6, 7, 8
     mov          r6d, r4d
     shl          r4d, 8
     sub           r4, r6
-    add           r4, 8           ; x*288+8 = x<<8 | (8-x)
     mov           r6, 8
+    add           r4, 8           ; x*288+8 = x<<8 | (8-x)
     sub          r6d, r5d
     imul          r6, r4          ; (8-y)*(x*255+8) = (8-y)*x<<8 | (8-y)*(8-x)
     imul         r4d, r5d         ;    y *(x*255+8) =    y *x<<8 |    y *(8-x)
@@ -481,24 +481,23 @@ cglobal %1_%2_chroma_mc8_%3, 6, 7, 8
     movd          m7, r6d
     movd          m6, r4d
     movdqa        m5, [rnd_2d_%2]
+    movq          m0, [r1  ]
+    movq          m1, [r1+1]
     pshuflw       m7, m7, 0
     pshuflw       m6, m6, 0
+    punpcklbw     m0, m1
     movlhps       m7, m7
     movlhps       m6, m6
 
-    movq          m0, [r1     ]
-    movq          m1, [r1   +1]
-    punpcklbw     m0, m1
-    add           r1, r2
 .next2rows
-    movq          m1, [r1     ]
-    movq          m2, [r1   +1]
-    movq          m3, [r1+r2  ]
-    movq          m4, [r1+r2+1]
+    movq          m1, [r1+r2*1   ]
+    movq          m2, [r1+r2*1+1]
+    movq          m3, [r1+r2*2  ]
+    movq          m4, [r1+r2*2+1]
     lea           r1, [r1+r2*2]
     punpcklbw     m1, m2
-    punpcklbw     m3, m4
     movdqa        m2, m1
+    punpcklbw     m3, m4
     movdqa        m4, m3
     pmaddubsw     m0, m7
     pmaddubsw     m1, m6
@@ -508,8 +507,8 @@ cglobal %1_%2_chroma_mc8_%3, 6, 7, 8
     paddw         m2, m5
     paddw         m1, m0
     paddw         m3, m2
-    movdqa        m0, m4
     psrlw         m1, 6
+    movdqa        m0, m4
     psrlw         m3, 6
 %ifidn %1, avg
     movq          m2, [r0   ]
@@ -576,6 +575,7 @@ cglobal %1_%2_chroma_mc8_%3, 6, 7, 8
     movq          m1, [r1+r2  ]
     movdqa        m2, m1
     movq          m3, [r1+r2*2]
+    lea           r1, [r1+r2*2]
     punpcklbw     m0, m1
     punpcklbw     m2, m3
     pmaddubsw     m0, m7
@@ -594,21 +594,20 @@ cglobal %1_%2_chroma_mc8_%3, 6, 7, 8
     movhps   [r0+r2], m0
     sub          r3d, 2
     lea           r0, [r0+r2*2]
-    lea           r1, [r1+r2*2]
     jg .next2yrows
     REP_RET
 %endmacro
 
 %macro chroma_mc4_ssse3_func 3
 cglobal %1_%2_chroma_mc4_%3, 6, 7, 0
-%ifdef ARCH_X86_64
+%if ARCH_X86_64
     movsxd        r2, r2d
 %endif
     mov           r6, r4
     shl          r4d, 8
     sub          r4d, r6d
-    add          r4d, 8           ; x*288+8
     mov           r6, 8
+    add          r4d, 8           ; x*288+8
     sub          r6d, r5d
     imul         r6d, r4d         ; (8-y)*(x*255+8) = (8-y)*x<<8 | (8-y)*(8-x)
     imul         r4d, r5d         ;    y *(x*255+8) =    y *x<<8 |    y *(8-x)
@@ -616,17 +615,16 @@ cglobal %1_%2_chroma_mc4_%3, 6, 7, 0
     movd          m7, r6d
     movd          m6, r4d
     movq          m5, [pw_32]
+    movd          m0, [r1  ]
     pshufw        m7, m7, 0
+    punpcklbw     m0, [r1+1]
     pshufw        m6, m6, 0
 
-    movd          m0, [r1     ]
-    punpcklbw     m0, [r1   +1]
-    add           r1, r2
 .next2rows
-    movd          m1, [r1     ]
-    movd          m3, [r1+r2  ]
-    punpcklbw     m1, [r1   +1]
-    punpcklbw     m3, [r1+r2+1]
+    movd          m1, [r1+r2*1  ]
+    movd          m3, [r1+r2*2  ]
+    punpcklbw     m1, [r1+r2*1+1]
+    punpcklbw     m3, [r1+r2*2+1]
     lea           r1, [r1+r2*2]
     movq          m2, m1
     movq          m4, m3
@@ -638,8 +636,8 @@ cglobal %1_%2_chroma_mc4_%3, 6, 7, 0
     paddw         m2, m5
     paddw         m1, m0
     paddw         m3, m2
-    movq          m0, m4
     psrlw         m1, 6
+    movq          m0, m4
     psrlw         m3, 6
     packuswb      m1, m1
     packuswb      m3, m3

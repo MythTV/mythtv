@@ -20,6 +20,7 @@
 #include "mythuispinbox.h"
 #include "mythdialogbox.h"
 #include "recordinginfo.h"
+#include "recordingrule.h"
 #include "mythuihelper.h"
 #include "storagegroup.h"
 #include "mythuibutton.h"
@@ -4792,8 +4793,9 @@ void PlaybackBox::setRecGroup(QString newRecGroup)
         return;
     }
 
-    uint defaultAutoExpire =
-        gCoreContext->GetNumSetting("AutoExpireDefault", 0);
+    RecordingRule record;
+    record.LoadTemplate("Default");
+    uint defaultAutoExpire = record.m_autoExpire;
 
     if (m_op_on_playlist)
     {

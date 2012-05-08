@@ -29,10 +29,12 @@
 #include "tv_rec.h"
 
 extern "C" {
-extern const uint8_t *ff_find_start_code(const uint8_t *p, const uint8_t *end, uint32_t *state);
+#include "libavcodec/mpegvideo.h"
 }
 
-#define LOC      QString("DTVRec(%1): ").arg(tvrec->GetCaptureCardNum())
+#define LOC ((tvrec) ? \
+    QString("DTVRec(%1): ").arg(tvrec->GetCaptureCardNum()) : \
+    QString("DTVRec(0x%1): ").arg(intptr_t(this),0,16))
 
 const uint DTVRecorder::kMaxKeyFrameDistance = 80;
 
@@ -429,7 +431,7 @@ bool DTVRecorder::FindMPEG2Keyframes(const TSPacket* tspacket)
 
     while (bufptr < bufend)
     {
-        bufptr = ff_find_start_code(bufptr, bufend, &_start_code);
+        bufptr = avpriv_mpv_find_start_code(bufptr, bufend, &_start_code);
         bytes_left = bufend - bufptr;
         if ((_start_code & 0xffffff00) == 0x00000100)
         {
@@ -958,7 +960,8 @@ void DTVRecorder::FindPSKeyFrames(const uint8_t *buffer, uint len)
         bool hasKeyFrame  = false;
 
         const uint8_t *tmp = bufptr;
-        bufptr = ff_find_start_code(bufptr + skip, bufend, &_start_code);
+        bufptr =
+            avpriv_mpv_find_start_code(bufptr + skip, bufend, &_start_code);
         _audio_bytes_remaining = 0;
         _other_bytes_remaining = 0;
         _video_bytes_remaining -= std::min(

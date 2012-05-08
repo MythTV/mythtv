@@ -355,15 +355,7 @@ QMap<QString,QString> GetSettingsMap(MythSettingList &settings,
     QMap<QString,QString> result;
     MSqlQuery query(MSqlQuery::InitCon());
 
-    QString list = extract_query_list(settings, MythSetting::kFile);
-    if (!list.isEmpty())
-    {
-        result = GetConfigFileSettingValues();
-        if (result.isEmpty())
-            return result;
-    }
-
-    list = extract_query_list(settings, MythSetting::kHost);
+    QString list = extract_query_list(settings, MythSetting::kHost);
     QString qstr =
         "SELECT value, data "
         "FROM settings "
@@ -472,31 +464,6 @@ QString StringListToJSON(const QString &key,
         result = "{ }";
 
     return result;
-}
-
-QMap<QString,QString> GetConfigFileSettingValues(void)
-{
-    QMap<QString,QString> map;
-    DatabaseParams params;
-    if (!MythDB::LoadDatabaseParamsFromDisk(params))
-        MythDB::LoadDefaultDatabaseParams(params);
-
-    map["dbHostName"]           = params.dbHostName;
-    map["dbPort"]               = QString::number(params.dbPort);
-    map["dbPing"]               = QString::number(params.dbHostPing);
-    map["dbName"]               = params.dbName;
-    map["dbUserName"]           = params.dbUserName;
-    map["dbPassword"]           = params.dbPassword;
-    map["dbHostID"]             = params.localHostName;
-    map["dbWOLEnabled"]         =
-        QString::number(params.wolEnabled);
-    map["dbWOLReconnectCount"]  =
-        QString::number(params.wolReconnect);
-    map["dbWOLRetryCount"]      =
-        QString::number(params.wolRetry);
-    map["dbWOLCommand"]         = params.wolCommand;
-
-    return map;
 }
 
 bool parse_dom(MythSettingList &settings, const QDomElement &element,
@@ -706,19 +673,7 @@ bool load_settings(MythSettingList &settings, const QString &hostname)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
-    QString list = extract_query_list(settings, MythSetting::kFile);
-    if (!list.isEmpty())
-    {
-        QMap<QString,QString> map = GetConfigFileSettingValues();
-        if (map.isEmpty())
-            return false;
-
-        MythSettingList::const_iterator it = settings.begin();
-        for (; it != settings.end(); ++it)
-            fill_setting(*it, map, MythSetting::kFile);
-    }
-
-    list = extract_query_list(settings, MythSetting::kHost);
+    QString list = extract_query_list(settings, MythSetting::kHost);
     QString qstr =
         "SELECT value, data "
         "FROM settings "

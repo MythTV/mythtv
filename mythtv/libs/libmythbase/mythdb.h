@@ -9,7 +9,6 @@
 #include "mythdbparams.h"
 
 class MythDBPrivate;
-class Settings;
 class MDBManager;
 
 class MBASE_PUBLIC MythDB
@@ -17,7 +16,6 @@ class MBASE_PUBLIC MythDB
     friend class MSqlQuery;
   public:
     MDBManager *GetDBManager(void);
-    Settings *GetOldSettings(void);
 
     static QString GetError(const QString &where, const MSqlQuery &query);
     static void DBError(const QString &where, const MSqlQuery &query);
@@ -38,11 +36,14 @@ class MBASE_PUBLIC MythDB
     void ClearSettingsCache(const QString &key = QString());
     void ActivateSettingsCache(bool activate = true);
     void OverrideSettingForSession(const QString &key, const QString &newValue);
+    void ClearOverrideSettingForSession(const QString &key);
 
     void SaveSetting(const QString &key, int newValue);
     void SaveSetting(const QString &key, const QString &newValue);
     bool SaveSettingOnHost(const QString &key, const QString &newValue,
                            const QString &host);
+    bool ClearSetting(const QString &key);
+    bool ClearSettingOnHost(const QString &key, const QString &host);
 
     bool GetSettings(QMap<QString,QString> &_key_value_pairs);
 
@@ -71,8 +72,6 @@ class MBASE_PUBLIC MythDB
     void GetResolutionSetting(const QString &type, int &width, int &height,
                               int index=-1);
 
-    void SetSetting(const QString &key, const QString &newValue);
-
     void WriteDelayedSettings(void);
 
     void SetHaveDBConnection(bool connected);
@@ -84,13 +83,6 @@ class MBASE_PUBLIC MythDB
     static void destroyMythDB();
     static QString toCommaList(const QMap<QString, QVariant> &bindings,
                                uint indent = 0, uint softMaxColumn = 80);
-
-    static bool LoadDatabaseParamsFromDisk(DatabaseParams &params);
-    static bool ValidateDatabaseParams(
-        const DatabaseParams &params, const QString &source);
-    static void LoadDefaultDatabaseParams(DatabaseParams &params);
-    static bool SaveDatabaseParamsToDisk(
-        const DatabaseParams &params, const QString &confdir, bool overwrite);
 
   protected:
     MythDB();

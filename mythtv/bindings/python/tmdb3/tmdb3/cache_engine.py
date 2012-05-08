@@ -7,6 +7,9 @@
 # Purpose: Base cache engine class for collecting registered engines
 #-----------------------
 
+import time
+from weakref import ref
+
 class Engines( object ):
     def __init__(self):
         self._engines = {}
@@ -15,6 +18,8 @@ class Engines( object ):
         self._engines[engine.name] = engine
     def __getitem__(self, key):
         return self._engines[key]
+    def __contains__(self, key):
+        return self._engines.__contains__(key)
 Engines = Engines()
 
 class CacheEngineType( type ):
@@ -33,13 +38,35 @@ class CacheEngine( object ):
 
     name = 'unspecified'
     def __init__(self, parent):
-        self.parent = parent
+        self.parent = ref(parent)
     def configure(self):
         raise RuntimeError
-    def get(self, key):
+    def get(self, date):
         raise RuntimeError
     def put(self, key, value, lifetime):
         raise RuntimeError
     def expire(self, key):
         raise RuntimeError
+
+class CacheObject( object ):
+    """
+    Cache object class, containing one stored record.
+    """
+
+    def __init__(self, key, data, lifetime=0, creation=None):
+        self.key = key
+        self.data = data
+        self.lifetime = lifetime
+        self.creation = creation if creation is not None else time.time()
+
+    def __len__(self):
+        return len(self.data)
+
+    @property
+    def expired(self):
+        return (self.remaining == 0)
+
+    @property
+    def remaining(self):
+        return max((self.creation + self.lifetime) - time.time(), 0)
 

@@ -15,6 +15,7 @@
 #include <fcntl.h>
 #include <sched.h>
 #include <sys/time.h>
+#include <assert.h>
 
 // C++ headers
 #include <algorithm>
@@ -2446,7 +2447,6 @@ void MythPlayer::SwitchToProgram(void)
         return;
     }
 
-#if 0
     player_ctx->buffer->OpenFile(
         pginfo->GetPlaybackURL(), RingBuffer::kLiveTVOpenTimeout);
 
@@ -2461,7 +2461,6 @@ void MythPlayer::SwitchToProgram(void)
         delete pginfo;
         return;
     }
-#endif
 
     if (GetEof())
     {
@@ -2478,30 +2477,6 @@ void MythPlayer::SwitchToProgram(void)
         player_ctx->tvchain->SetProgram(*pginfo);
         if (decoder)
             decoder->SetProgramInfo(*pginfo);
-    }
-
-    player_ctx->buffer->OpenFile(
-        pginfo->GetPlaybackURL(), RingBuffer::kLiveTVOpenTimeout);
-
-    if (!player_ctx->buffer->IsOpen())
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "SwitchToProgram's OpenFile failed " +
-            QString("(card type: %1).")
-            .arg(player_ctx->tvchain->GetCardType(newid)));
-        LOG(VB_GENERAL, LOG_ERR, player_ctx->tvchain->toString());
-        SetEof(true);
-        SetErrored(QObject::tr("Error opening switch program buffer"));
-        delete pginfo;
-        return;
-    }
-
-    if (discontinuity || newtype)
-    {
-#if 0
-        player_ctx->tvchain->SetProgram(*pginfo);
-        if (decoder)
-            decoder->SetProgramInfo(*pginfo);
-#endif
 
         player_ctx->buffer->Reset(true);
         if (newtype)
@@ -3194,8 +3169,8 @@ bool MythPlayer::DecoderGetFrame(DecodeType decodetype, bool unsafe)
             }
             return false;
         }
-        videobuf_retries = 0;
     }
+    videobuf_retries = 0;
 
     if (!decoder_change_lock.tryLock(5))
         return false;

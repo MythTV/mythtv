@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 """Provides basic connection classes."""
 
-from static import SCHEMA_VERSION, PROTO_VERSION, PROTO_TOKEN, BACKEND_SEP
-from msearch import MSearch
-from logging import MythLog
-from exceptions import *
-from altdict import OrdDict
-from utility import deadlinesocket
+from MythTV.static import SCHEMA_VERSION, PROTO_VERSION, PROTO_TOKEN, BACKEND_SEP
+from MythTV.msearch import MSearch
+from MythTV.logging import MythLog
+from MythTV.exceptions import *
+from MythTV.altdict import OrdDict
+from MythTV.utility import deadlinesocket
 
 from time import sleep, time
 from select import select
@@ -120,8 +120,8 @@ class DBConnection( _Connection_Pool ):
         self.dbconn = dbconn
         self._refs = {}
 
-        self.log(MythLog.DATABASE, MythLog.INFO, "Attempting connection",
-            '\n'.join(["'%s': '%s'" % (k,v) for k,v in dbconn.items()]))
+        self.log(MythLog.DATABASE, MythLog.INFO,
+                        "Attempting connection: {0}".format(dbconn.ident))
         try:
             _Connection_Pool.__init__(self)
         except:
@@ -611,17 +611,10 @@ class XMLConnection( object ):
     def getConnectionInfo(self, pin=0):
         """Return dbconn dict from backend connection info."""
         dbconn = {'SecurityPin':pin}
-        conv = {'Host':'DBHostName',    'Port':'DBPort',
-                'UserName':'DBUserName','Password':'DBPassword',
-                'Name':'DBName'}
-
         try:
-            dat = self._request('Myth/GetConnectionInfo', Pin=pin).readJSON()
-            for k,v in dat['ConnectionInfo']['Database'].items():
-                if k in conv:
-                    dbconn[conv[k]] = v
+            dat = self._request('Myth/GetConnectionInfo', \
+                                        Pin='{0:0>4}'.format(pin)).readJSON()
+            return dat['ConnectionInfo']['Database']
         except:
-            raise
-            pass
+            return {}
 
-        return dbconn

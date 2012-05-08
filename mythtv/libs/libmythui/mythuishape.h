@@ -46,6 +46,7 @@ class MUI_PUBLIC MythUIShape : public MythUIType
 
     friend class MythUIProgressBar;
     friend class MythUIEditBar;
+    friend class SubtitleFormat;
 };
 
 #endif

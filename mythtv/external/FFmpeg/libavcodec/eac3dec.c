@@ -51,7 +51,7 @@
 #include "ac3_parser.h"
 #include "ac3dec.h"
 #include "ac3dec_data.h"
-#include "eac3dec_data.h"
+#include "eac3_data.h"
 
 /** gain adaptive quantization mode */
 typedef enum {
@@ -140,7 +140,7 @@ void ff_eac3_apply_spectral_extension(AC3DecodeContext *s)
            each band. */
         bin = s->spx_src_start_freq;
         for (bnd = 0; bnd < s->num_spx_bands; bnd++) {
-            float nscale = s->spx_noise_blend[ch][bnd] * rms_energy[bnd] * (1.0f/(1<<31));
+            float nscale = s->spx_noise_blend[ch][bnd] * rms_energy[bnd] * (1.0f / INT32_MIN);
             float sscale = s->spx_signal_blend[ch][bnd];
             for (i = 0; i < s->spx_band_sizes[bnd]; i++) {
                 float noise  = nscale * (int32_t)av_lfg_get(&s->dith_state);
@@ -410,7 +410,7 @@ int ff_eac3_parse_header(AC3DecodeContext *s)
 
     /* informational metadata */
     if (get_bits1(gbc)) {
-        skip_bits(gbc, 3); // skip bit stream mode
+        s->bitstream_mode = get_bits(gbc, 3);
         skip_bits(gbc, 2); // skip copyright bit and original bitstream bit
         if (s->channel_mode == AC3_CHMODE_STEREO) {
             skip_bits(gbc, 4); // skip Dolby surround and headphone mode
@@ -491,7 +491,7 @@ int ff_eac3_parse_header(AC3DecodeContext *s)
     s->skip_syntax       = get_bits1(gbc);
     parse_spx_atten_data = get_bits1(gbc);
 
-    /* coupling strategy occurance and coupling use per block */
+    /* coupling strategy occurrence and coupling use per block */
     num_cpl_blocks = 0;
     if (s->channel_mode > 1) {
         for (blk = 0; blk < s->num_blocks; blk++) {

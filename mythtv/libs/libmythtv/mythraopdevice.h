@@ -24,6 +24,7 @@ class MTV_PUBLIC MythRAOPDevice : public ServerPool
 
     MythRAOPDevice();
     bool NextInAudioQueue(MythRAOPConnection* conn);
+    static QString HardwareId();
 
   private slots:
     void Start();

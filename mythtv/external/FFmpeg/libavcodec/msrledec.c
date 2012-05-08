@@ -134,13 +134,13 @@ static int msrle_decode_8_16_24_32(AVCodecContext *avctx, AVPicture *pic, int de
     uint8_t *output, *output_end;
     const uint8_t* src = data;
     int p1, p2, line=avctx->height - 1, pos=0, i;
-    uint16_t av_uninit(pix16);
-    uint32_t av_uninit(pix32);
+    uint16_t pix16;
+    uint32_t pix32;
     unsigned int width= FFABS(pic->linesize[0]) / (depth >> 3);
 
-    output = pic->data[0] + (avctx->height - 1) * pic->linesize[0];
-    output_end = pic->data[0] + (avctx->height) * pic->linesize[0];
-    while(src < data + srcsize) {
+    output     = pic->data[0] + (avctx->height - 1) * pic->linesize[0];
+    output_end = pic->data[0] +  avctx->height      * pic->linesize[0];
+    while(src + 1 < data + srcsize) {
         p1 = *src++;
         if(p1 == 0) { //Escape code
             p2 = *src++;
@@ -171,6 +171,10 @@ static int msrle_decode_8_16_24_32(AVCodecContext *avctx, AVPicture *pic, int de
               ||(pic->linesize[0] < 0 && output + p2 * (depth >> 3) < output_end)) {
                 src += p2 * (depth >> 3);
                 continue;
+            }
+            if(data + srcsize - src < p2 * (depth >> 3)){
+                av_log(avctx, AV_LOG_ERROR, "Copy beyond input buffer\n");
+                return -1;
             }
             if ((depth == 8) || (depth == 24)) {
                 for(i = 0; i < p2 * (depth >> 3); i++) {
@@ -256,4 +260,3 @@ int ff_msrle_decode(AVCodecContext *avctx, AVPicture *pic, int depth,
         return -1;
     }
 }
-

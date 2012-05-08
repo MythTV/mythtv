@@ -975,6 +975,7 @@ void authenticationCallback(QNetworkReply *reply, QAuthenticator *auth,
 void DataDirectProcessor::authenticationCallback(QNetworkReply *reply,
                                                  QAuthenticator *auth)
 {
+    LOG(VB_FILE, LOG_DEBUG, "DataDirect auth callback");
     (void)reply;
     auth->setUser(GetUserID());
     auth->setPassword(GetPassword());

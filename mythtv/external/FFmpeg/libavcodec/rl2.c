@@ -20,11 +20,10 @@
  */
 
 /**
- * RL2 Video Decoder
  * @file
+ * RL2 Video Decoder
  * @author Sascha Sommer (saschasommer@freenet.de)
- * For more information about the RL2 format, visit:
- *   http://wiki.multimedia.cx/index.php?title=RL2
+ * @see http://wiki.multimedia.cx/index.php?title=RL2
  */
 
 #include <stdio.h>
@@ -52,7 +51,7 @@ typedef struct Rl2Context {
  * @param s rl2 context
  * @param in input buffer
  * @param size input buffer size
- * @param out ouput buffer
+ * @param out output buffer
  * @param stride stride of the output buffer
  * @param video_base offset of the rle data inside the frame
  */
@@ -134,6 +133,7 @@ static av_cold int rl2_decode_init(AVCodecContext *avctx)
     int i;
     s->avctx = avctx;
     avctx->pix_fmt = PIX_FMT_PAL8;
+    avcodec_get_frame_defaults(&s->frame);
 
     /** parse extra data */
     if(!avctx->extradata || avctx->extradata_size < EXTRADATA1_SIZE){
@@ -152,7 +152,7 @@ static av_cold int rl2_decode_init(AVCodecContext *avctx)
 
     /** initialize palette */
     for(i=0;i<AVPALETTE_COUNT;i++)
-        s->palette[i] = AV_RB24(&avctx->extradata[6 + i * 3]);
+        s->palette[i] = 0xFF << 24 | AV_RB24(&avctx->extradata[6 + i * 3]);
 
     /** decode background frame if present */
     back_size = avctx->extradata_size - EXTRADATA1_SIZE;
@@ -220,15 +220,13 @@ static av_cold int rl2_decode_end(AVCodecContext *avctx)
 
 
 AVCodec ff_rl2_decoder = {
-    "rl2",
-    AVMEDIA_TYPE_VIDEO,
-    CODEC_ID_RL2,
-    sizeof(Rl2Context),
-    rl2_decode_init,
-    NULL,
-    rl2_decode_end,
-    rl2_decode_frame,
-    CODEC_CAP_DR1,
+    .name           = "rl2",
+    .type           = AVMEDIA_TYPE_VIDEO,
+    .id             = CODEC_ID_RL2,
+    .priv_data_size = sizeof(Rl2Context),
+    .init           = rl2_decode_init,
+    .close          = rl2_decode_end,
+    .decode         = rl2_decode_frame,
+    .capabilities   = CODEC_CAP_DR1,
     .long_name = NULL_IF_CONFIG_SMALL("RL2 video"),
 };
-

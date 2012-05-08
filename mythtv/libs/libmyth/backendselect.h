@@ -19,9 +19,11 @@ struct DatabaseParams;
 //       location at this moment in time
 // Some common UPnP search and XML value strings
 const QString gBackendURI = "urn:schemas-mythtv-org:device:MasterMediaServer:1";
-const QString kDefaultBE  = "UPnP/MythFrontend/DefaultBackend/";
-const QString kDefaultPIN = kDefaultBE + "SecurityPin";
-const QString kDefaultUSN = kDefaultBE + "USN";
+const QString kDefaultDB  = "Database/";
+const QString kDefaultWOL = "WakeOnLAN/";
+const QString kDefaultMFE = "UPnP/MythFrontend/DefaultBackend/";
+const QString kDefaultPIN = kDefaultMFE + "SecurityPin";
+const QString kDefaultUSN = kDefaultMFE + "USN";
 
 typedef QMap <QString, DeviceLocation*> ItemMap;
 
@@ -37,6 +39,15 @@ class BackendSelection : public MythScreenType
     Q_OBJECT
 
   public:
+    typedef enum Decision
+    {
+        kManualConfigure = -1,
+        kCancelConfigure = 0,
+        kAcceptConfigure = +1,
+    } BackendDecision;
+    static Decision Prompt(
+        DatabaseParams *dbParams, Configuration *pConfig);
+
     BackendSelection(MythScreenStack *parent, DatabaseParams *params,
                      Configuration *pConfig, bool exitOnFinish = false);
     virtual ~BackendSelection();
@@ -44,17 +55,11 @@ class BackendSelection : public MythScreenType
     bool Create(void);
     void customEvent(QEvent *event);
 
-    static bool prompt(DatabaseParams *dbParams, Configuration *pConfig);
-
-  signals:
-//    void
-
-  public slots:
+  protected slots:
     void Accept(void);
     void Accept(MythUIButtonListItem *);
     void Manual(void);   ///< Linked to 'Configure Manually' button
     void Cancel(void);  ///< Linked to 'Cancel' button
-    void Close(void);
 
   private:
     void Load(void);
@@ -64,6 +69,7 @@ class BackendSelection : public MythScreenType
     void RemoveItem(QString URN);
     bool TryDBfromURL(const QString &error, QString URL);
     void PromptForPassword(void);
+    void Close(Decision);
 
     DatabaseParams *m_DBparams;
     Configuration  *m_pConfig;
@@ -81,7 +87,7 @@ class BackendSelection : public MythScreenType
 
     QMutex  m_mutex;
 
-    static bool m_backendChanged;
+    BackendDecision m_backendDecision;
 };
 
 Q_DECLARE_METATYPE(DeviceLocation*)

@@ -19,11 +19,11 @@
 ;*
 ;* You should have received a copy of the GNU Lesser General Public
 ;* License along with FFmpeg; if not, write to the Free Software
-;* 51, Inc., Foundation Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+;* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 ;******************************************************************************
 
-%include "x86inc.asm"
-%include "x86util.asm"
+%include "libavutil/x86/x86inc.asm"
+%include "libavutil/x86/x86util.asm"
 
 SECTION_RODATA
 
@@ -348,7 +348,7 @@ cglobal pred16x16_plane_%3_%1, 2, 7, %2
     lea          r3, [r0+r2*4-1]
     add          r4, r2
 
-%ifdef ARCH_X86_64
+%if ARCH_X86_64
 %define e_reg r11
 %else
 %define e_reg r0
@@ -369,7 +369,7 @@ cglobal pred16x16_plane_%3_%1, 2, 7, %2
     lea          r5, [r5+r6*4]
 
     movzx     e_reg, byte [r3        ]
-%ifdef ARCH_X86_64
+%if ARCH_X86_64
     movzx       r10, byte [r4+r2     ]
     sub         r10, e_reg
 %else
@@ -385,7 +385,7 @@ cglobal pred16x16_plane_%3_%1, 2, 7, %2
     movzx        r4, byte [e_reg+r2  ]
     movzx        r6, byte [r3        ]
     sub          r6, r4
-%ifdef ARCH_X86_64
+%if ARCH_X86_64
     lea          r6, [r10+r6*2]
     lea          r5, [r5+r6*2]
     add          r5, r6
@@ -395,7 +395,7 @@ cglobal pred16x16_plane_%3_%1, 2, 7, %2
 %endif
 
     movzx        r4, byte [e_reg     ]
-%ifdef ARCH_X86_64
+%if ARCH_X86_64
     movzx       r10, byte [r3   +r2  ]
     sub         r10, r4
     sub          r5, r10
@@ -409,7 +409,7 @@ cglobal pred16x16_plane_%3_%1, 2, 7, %2
     movzx        r4, byte [e_reg+r1  ]
     movzx        r6, byte [r3   +r2*2]
     sub          r6, r4
-%ifdef ARCH_X86_64
+%if ARCH_X86_64
     add          r6, r10
 %endif
     lea          r5, [r5+r6*8]
@@ -420,7 +420,7 @@ cglobal pred16x16_plane_%3_%1, 2, 7, %2
     lea          r5, [r5+r6*4]
     add          r5, r6           ; sum of V coefficients
 
-%ifndef ARCH_X86_64
+%if ARCH_X86_64 == 0
     mov          r0, r0m
 %endif
 
@@ -641,7 +641,7 @@ cglobal pred8x8_plane_%1, 2, 7, %2
     lea          r3, [r0     -1]
     add          r4, r2
 
-%ifdef ARCH_X86_64
+%if ARCH_X86_64
 %define e_reg r11
 %else
 %define e_reg r0
@@ -652,7 +652,7 @@ cglobal pred8x8_plane_%1, 2, 7, %2
     sub          r5, e_reg
 
     movzx     e_reg, byte [r3        ]
-%ifdef ARCH_X86_64
+%if ARCH_X86_64
     movzx       r10, byte [r4+r2     ]
     sub         r10, e_reg
     sub          r5, r10
@@ -666,7 +666,7 @@ cglobal pred8x8_plane_%1, 2, 7, %2
     movzx     e_reg, byte [r3+r1     ]
     movzx        r6, byte [r4+r2*2   ]
     sub          r6, e_reg
-%ifdef ARCH_X86_64
+%if ARCH_X86_64
     add          r6, r10
 %endif
     lea          r5, [r5+r6*4]
@@ -680,7 +680,7 @@ cglobal pred8x8_plane_%1, 2, 7, %2
     lea          r5, [r5+r6*8]
     sar          r5, 5
 
-%ifndef ARCH_X86_64
+%if ARCH_X86_64 == 0
     mov          r0, r0m
 %endif
 
@@ -836,7 +836,6 @@ PRED8x8_H ssse3
 ;-----------------------------------------------------------------------------
 ; void pred8x8_top_dc_mmxext(uint8_t *src, int stride)
 ;-----------------------------------------------------------------------------
-%ifdef CONFIG_GPL
 cglobal pred8x8_top_dc_mmxext, 2,5
     sub         r0, r1
     movq       mm0, [r0]
@@ -927,7 +926,6 @@ cglobal pred8x8_dc_mmxext, 2,5
     movq [r4+r1*1], m1
     movq [r4+r1*2], m1
     RET
-%endif
 
 ;-----------------------------------------------------------------------------
 ; void pred8x8_dc_rv40(uint8_t *src, int stride)
@@ -1083,7 +1081,6 @@ cglobal pred8x8_tm_vp8_ssse3, 2,3,6
 ;-----------------------------------------------------------------------------
 ; void pred8x8l_top_dc(uint8_t *src, int has_topleft, int has_topright, int stride)
 ;-----------------------------------------------------------------------------
-%ifdef CONFIG_GPL
 %macro PRED8x8L_TOP_DC 1
 cglobal pred8x8l_top_dc_%1, 4,4
     sub          r0, r3
@@ -1934,6 +1931,9 @@ cglobal pred8x8l_vertical_right_mmxext, 4,5
 
 %macro PRED8x8L_VERTICAL_RIGHT 1
 cglobal pred8x8l_vertical_right_%1, 4,5,7
+    ; manually spill XMM registers for Win64 because
+    ; the code here is initialized with INIT_MMX
+    WIN64_SPILL_XMM 7
     sub          r0, r3
     lea          r4, [r0+r3*2]
     movq        mm0, [r0+r3*1-8]
@@ -2476,7 +2476,6 @@ PRED8x8L_HORIZONTAL_DOWN sse2
 INIT_MMX
 %define PALIGNR PALIGNR_SSSE3
 PRED8x8L_HORIZONTAL_DOWN ssse3
-%endif
 
 ;-----------------------------------------------------------------------------
 ; void pred4x4_dc_mmxext(uint8_t *src, const uint8_t *topright, int stride)
@@ -2608,7 +2607,6 @@ cglobal pred4x4_vertical_vp8_mmxext, 3,3
 ;-----------------------------------------------------------------------------
 ; void pred4x4_down_left_mmxext(uint8_t *src, const uint8_t *topright, int stride)
 ;-----------------------------------------------------------------------------
-%ifdef CONFIG_GPL
 INIT_MMX
 cglobal pred4x4_down_left_mmxext, 3,3
     sub       r0, r2
@@ -2616,12 +2614,11 @@ cglobal pred4x4_down_left_mmxext, 3,3
     punpckldq m1, [r1]
     movq      m2, m1
     movq      m3, m1
-    movq      m4, m1
     psllq     m1, 8
     pxor      m2, m1
     psrlq     m2, 8
-    pxor      m3, m2
-    PRED4x4_LOWPASS m0, m1, m3, m4, m5
+    pxor      m2, m3
+    PRED4x4_LOWPASS m0, m1, m2, m3, m4
     lea       r1, [r0+r2*2]
     psrlq     m0, 8
     movd      [r0+r2*1], m0
@@ -2786,4 +2783,3 @@ cglobal pred4x4_down_right_mmxext, 3,3
     psrlq     m0, 8
     movh      [r0+r2*1], m0
     RET
-%endif

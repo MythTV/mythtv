@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """Provides tweaked dict-type classes."""
 
-from exceptions import MythError
-from utility import datetime
+from MythTV.exceptions import MythError
+from MythTV.utility import datetime
 
 from itertools import imap, izip
 from datetime import date

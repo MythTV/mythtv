@@ -412,7 +412,7 @@ static void filter_func(struct ThisFilter *p, uint8_t *dst, int dst_offsets[3],
         }
     }
 #if HAVE_MMX
-    if (p->mm_flags & FF_MM_MMX)
+    if (p->mm_flags & AV_CPU_FLAG_MMX)
         emms();
 #endif
 }
@@ -562,7 +562,7 @@ static VideoFilter *NewKernelDeintFilter(VideoFrameType inpixfmt,
     filter->line_filter_fast = &line_filter_c_fast;
 #if HAVE_MMX
     filter->mm_flags = av_get_cpu_flags();
-    if (filter->mm_flags & FF_MM_MMX)
+    if (filter->mm_flags & AV_CPU_FLAG_MMX)
     {
         filter->line_filter = &line_filter_mmx;
         filter->line_filter_fast = &line_filter_mmx_fast;

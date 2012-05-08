@@ -1,6 +1,4 @@
-/**
- * VP8 compatible video decoder
- *
+/*
  * Copyright (C) 2010 David Conrad
  * Copyright (C) 2010 Ronald S. Bultje
  *
@@ -19,6 +17,11 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+ */
+
+/**
+ * @file
+ * VP8 compatible video decoder
  */
 
 #ifndef AVCODEC_VP8DATA_H
@@ -685,4 +688,4 @@ static const uint8_t vp8_mv_default_prob[2][19] = {
       128, 130, 130,  74, 148, 180, 203, 236, 254, 254 }
 };
 
-#endif
+#endif /* AVCODEC_VP8DATA_H */

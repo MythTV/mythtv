@@ -346,7 +346,7 @@ void WelcomeDialog::updateScreen(void)
     else
     {
         // update recording
-        if (m_isRecording && m_tunerList.size())
+        if (m_isRecording && !m_tunerList.empty())
         {
             if (m_screenTunerNo >= m_tunerList.size())
                 m_screenTunerNo = 0;
@@ -389,7 +389,7 @@ void WelcomeDialog::updateScreen(void)
                 m_screenScheduledNo = 0;
 
             ProgramInfo progInfo = m_scheduledList[m_screenScheduledNo];
-            
+
             InfoMap infomap;
             progInfo.ToMap(infomap);
 

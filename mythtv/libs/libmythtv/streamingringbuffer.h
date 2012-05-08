@@ -5,6 +5,7 @@
 
 extern "C" {
 #include "libavformat/avformat.h"
+#include "libavformat/url.h"
 }
 
 class StreamingRingBuffer : public RingBuffer

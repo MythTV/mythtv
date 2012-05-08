@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """Provides decorator classes for assorted functions"""
 
-from logging import MythLog
-from exceptions import MythDBError, MythError
+from MythTV.logging import MythLog
+from MythTV.exceptions import MythDBError, MythError
 
 from cStringIO import StringIO
 from select import select, poll, POLLHUP, POLLIN, POLLOUT
@@ -1192,4 +1192,34 @@ class DequeBuffer( object ):
             cls._pollingthread.start()
         cls._pollingthread.add_pipe(buffer, pipe, mode)
 
+class QuickProperty( object ):
+    def __init__(self, maskedvar, default=None, handler=None):
+        self.varname = maskedvar
+        self.default = default
+        if handler is None:
+            handler = lambda x: x
+        self.handler = handler
 
+    def __get__(self, inst, owner):
+        if inst is None:
+            return self
+        if hasattr(inst, self.varname):
+            return getattr(inst, self.varname)
+        return self.default
+
+    def __set__(self, inst, value):
+        try:
+            value = self.handler(value)
+        except:
+            pass
+        else:
+            setattr(inst, self.varname, value)
+
+    def __call__(self, handler):
+        self.handler = handler
+        return self
+
+    def isDefault(self, inst):
+        if hasattr(inst, self.varname):
+            return False
+        return True

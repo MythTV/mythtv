@@ -4,12 +4,8 @@
 #include "mythlogging.h"
 
 extern "C" {
-// from libavcodec
-    extern const uint8_t *ff_find_start_code(const uint8_t * p,
-                                             const uint8_t *end,
-                                             uint32_t * state);
-
 #include "libavcodec/avcodec.h"
+#include "libavcodec/mpegvideo.h"
 #include "libavutil/internal.h"
 #include "libavcodec/golomb.h"
 }
@@ -410,7 +406,7 @@ uint32_t H264Parser::addBytes(const uint8_t  *bytes,
 
     while (startP < bytes + byte_count && !on_frame)
     {
-        endP = ff_find_start_code(startP,
+        endP = avpriv_mpv_find_start_code(startP,
                                   bytes + byte_count, &sync_accumulator);
 
         found_start_code = ((sync_accumulator & 0xffffff00) == 0x00000100);

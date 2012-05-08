@@ -90,6 +90,9 @@ class MBASE_PUBLIC MythSystemWindows : public MythSystemPrivate
         virtual void Signal(int sig);
         virtual void JumpAbort(void);
 
+        virtual bool ParseShell(const QString cmd, QString &abscmd,
+                                QStringList &args);
+
         friend class MythSystemManager;
         friend class MythSystemSignalManager;
         friend class MythSystemIOHandler;

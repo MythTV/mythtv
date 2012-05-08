@@ -66,7 +66,7 @@ uint calcTrackLength(const QString &musicFile)
 
     QByteArray inFileBA = musicFile.toLocal8Bit();
 
-    int ret = av_open_input_file(&inputFC, inFileBA.constData(), fmt, 0, NULL);
+    int ret = avformat_open_input(&inputFC, inFileBA.constData(), fmt, NULL);
 
     if (ret)
     {
@@ -76,13 +76,13 @@ uint calcTrackLength(const QString &musicFile)
     }
 
     // Getting stream information
-    ret = av_find_stream_info(inputFC);
+    ret = avformat_find_stream_info(inputFC, NULL);
 
     if (ret < 0)
     {
         LOG(VB_GENERAL, LOG_ERR,
             QString("calcTrackLength: Couldn't get stream info, error #%1").arg(ret));
-        av_close_input_file(inputFC);
+        avformat_close_input(&inputFC);
         inputFC = NULL;
         return 0;
     }
@@ -99,7 +99,7 @@ uint calcTrackLength(const QString &musicFile)
 
         switch (inputFC->streams[i]->codec->codec_type)
         {
-            case CODEC_TYPE_AUDIO:
+            case AVMEDIA_TYPE_AUDIO:
             {
                 AVPacket pkt;
                 av_init_packet(&pkt);
@@ -125,7 +125,7 @@ uint calcTrackLength(const QString &musicFile)
     }
 
     // Close input file
-    av_close_input_file(inputFC);
+    avformat_close_input(&inputFC);
     inputFC = NULL;
 
     return duration;

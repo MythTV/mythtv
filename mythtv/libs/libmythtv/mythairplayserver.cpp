@@ -2,9 +2,6 @@
 // locking ?
 // race on startup?
 // http date format and locale
-// GET scrub on iOS 5
-// binary plist for non mac
-// same mac address for bonjour service and server-info
 
 #include <QTcpSocket>
 #include <QNetworkInterface>
@@ -22,6 +19,7 @@
 
 #include "bonjourregister.h"
 #include "mythairplayserver.h"
+#include "mythraopdevice.h"
 
 MythAirplayServer* MythAirplayServer::gMythAirplayServer = NULL;
 MThread*           MythAirplayServer::gMythAirplayServerThread = NULL;
@@ -327,51 +325,43 @@ void MythAirplayServer::Start(void)
     // start listening for connections
     // try a few ports in case the default is in use
     int baseport = m_setupPort;
-    while (m_setupPort < baseport + AIRPLAY_PORT_RANGE)
+    m_setupPort = tryListeningPort(m_setupPort, AIRPLAY_PORT_RANGE);
+    if (m_setupPort < 0)
     {
-        if (listen(QNetworkInterface::allAddresses(), m_setupPort, false))
-        {
-            LOG(VB_GENERAL, LOG_INFO, LOC +
-                QString("Listening for connections on port %1")
-                    .arg(m_setupPort));
-            break;
-        }
-        m_setupPort++;
-    }
-
-    if (m_setupPort >= baseport + AIRPLAY_PORT_RANGE)
         LOG(VB_GENERAL, LOG_ERR, LOC +
                 "Failed to find a port for incoming connections.");
-
-    // announce service
-    m_bonjour = new BonjourRegister(this);
-    if (!m_bonjour)
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create Bonjour object.");
-        return;
     }
-
-    // give each frontend a unique name
-    int multiple = m_setupPort - baseport;
-    if (multiple > 0)
-        m_name += QString::number(multiple);
-
-    QByteArray name = m_name.toUtf8();
-    name.append(" on ");
-    name.append(gCoreContext->GetHostName());
-    QByteArray type = "_airplay._tcp";
-    QByteArray txt;
-    txt.append(26); txt.append("deviceid=00:00:00:00:00:00");
-    txt.append(13); txt.append("features=0x77");
-    txt.append(16); txt.append("model=AppleTV2,1");
-    txt.append(14); txt.append("srcvers=101.28");
-
-    if (!m_bonjour->Register(m_setupPort, type, name, txt))
+    else
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to register service.");
-        return;
-    }
+        // announce service
+        m_bonjour = new BonjourRegister(this);
+        if (!m_bonjour)
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create Bonjour object.");
+            return;
+        }
 
+        // give each frontend a unique name
+        int multiple = m_setupPort - baseport;
+        if (multiple > 0)
+            m_name += QString::number(multiple);
+
+        QByteArray name = m_name.toUtf8();
+        name.append(" on ");
+        name.append(gCoreContext->GetHostName());
+        QByteArray type = "_airplay._tcp";
+        QByteArray txt;
+        txt.append(26); txt.append("deviceid="); txt.append(GetMacAddress());
+        txt.append(14); txt.append("features=0x219");
+        txt.append(16); txt.append("model=AppleTV2,1");
+        txt.append(14); txt.append("srcvers=101.28");
+
+        if (!m_bonjour->Register(m_setupPort, type, name, txt))
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to register service.");
+            return;
+        }
+    }
     m_valid = true;
     return;
 }
@@ -459,6 +449,12 @@ void MythAirplayServer::HandleResponse(APHTTPRequest *req,
 {
     if (!socket)
         return;
+    QHostAddress addr = socket->peerAddress();
+    QByteArray session;
+    QByteArray header;
+    QString    body;
+    int status = HTTP_STATUS_OK;
+    QByteArray content_type;
 
     if (req->GetURI() != "/playback-info")
     {
@@ -476,16 +472,20 @@ void MythAirplayServer::HandleResponse(APHTTPRequest *req,
 
     if (!req->GetHeaders().contains("X-Apple-Session-ID"))
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "No session ID in http request.");
-        return;
+        LOG(VB_GENERAL, LOG_DEBUG, LOC +
+            QString("No session ID in http request. "
+                    "Connection from iTunes? Using IP %1").arg(addr.toString()));
+    }
+    else
+    {
+        session = req->GetHeaders()["X-Apple-Session-ID"];
     }
 
-    QByteArray session = req->GetHeaders()["X-Apple-Session-ID"];
-    QByteArray header;
-    QString    body;
-    int status = HTTP_STATUS_OK;
-    QByteArray content_type;
-
+    if (session.size() == 0)
+    {
+        // No session ID, use IP address instead
+        session = addr.toString().toAscii();
+    }
     if (!m_connections.contains(session))
     {
         AirplayConnection apcon;
@@ -501,30 +501,63 @@ void MythAirplayServer::HandleResponse(APHTTPRequest *req,
                 "Already have a different reverse socket for this connection.");
             return;
         }
-
         m_connections[session].reverseSocket = socket;
-
         status = HTTP_STATUS_SWITCHING_PROTOCOLS;
         header = "Upgrade: PTTH/1.0\r\nConnection: Upgrade\r\n";
+        SendResponse(socket, status, header, content_type, body);
+        return;
+    }
+
+    QTcpSocket *s = m_connections[session].controlSocket;
+    if (s != socket && s != NULL)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            "Already have a different control socket for this connection.");
+        return;
+    }
+    m_connections[session].controlSocket = socket;
+
+    double position    = 0.0f;
+    double duration    = 0.0f;
+    float  playerspeed = 0.0f;
+    bool   playing     = false;
+    GetPlayerStatus(playing, playerspeed, position, duration);
+    // set initial position if it was set at start of playback.
+    if (duration > 0.01f && playing)
+    {
+        if (m_connections[session].initial_position > 0.0f)
+        {
+            position = duration * m_connections[session].initial_position;
+            MythEvent* me = new MythEvent(ACTION_SEEKABSOLUTE,
+                                          QStringList(QString::number((uint64_t)position)));
+            qApp->postEvent(GetMythMainWindow(), me);
+            m_connections[session].position = position;
+            m_connections[session].initial_position = -1.0f;
+        }
+        else if (position < .01f)
+        {
+            // Assume playback hasn't started yet, get saved position
+            position = m_connections[session].position;
+        }
+    }
+    if (!playing && m_connections[session].was_playing)
+    {
+        // playback got interrupted, notify client to stop
+        if (SendReverseEvent(session, AP_EVENT_STOPPED))
+        {
+            m_connections[session].was_playing = false;
+        }
     }
     else
     {
-        QTcpSocket *s = m_connections[session].controlSocket;
-        if (s != socket && s != NULL)
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC +
-                "Already have a different control socket for this connection.");
-            return;
-        }
-
-        m_connections[session].controlSocket = socket;
+        m_connections[session].was_playing = playing;
     }
 
     if (req->GetURI() == "/server-info")
     {
         content_type = "text/x-apple-plist+xml\r\n";
         body = SERVER_INFO;
-        body.replace("%1", GetMacAddress(socket));
+        body.replace("%1", GetMacAddress());
         LOG(VB_GENERAL, LOG_INFO, body);
     }
     else if (req->GetURI() == "/scrub")
@@ -542,11 +575,7 @@ void MythAirplayServer::HandleResponse(APHTTPRequest *req,
         }
         else if (req->GetMethod() == "GET")
         {
-            double position   = 0.0f;
-            double duration   = 0.0f;
-            float playerspeed = 0.0f;
-            bool  playing     = false;
-            GetPlayerStatus(playing, playerspeed, position, duration);
+            content_type = "text/parameters\r\n";
             body = QString("duration: %1\r\nposition: %2\r\n")
                 .arg((double)duration, 0, 'f', 6, '0')
                 .arg((double)position, 0, 'f', 6, '0');
@@ -569,9 +598,8 @@ void MythAirplayServer::HandleResponse(APHTTPRequest *req,
     else if (req->GetURI() == "/stop")
     {
         m_connections[session].stopped = true;
-        // FIXME unpause playback and it will exit when the remote socket closes
         QKeyEvent* ke = new QKeyEvent(QEvent::KeyPress, 0,
-                                      Qt::NoModifier, ACTION_PLAY);
+                                      Qt::NoModifier, ACTION_STOP);
         qApp->postEvent(GetMythMainWindow(), (QEvent*)ke);
     }
     else if (req->GetURI() == "/photo" ||
@@ -585,11 +613,6 @@ void MythAirplayServer::HandleResponse(APHTTPRequest *req,
     }
     else if (req->GetURI() == "/rate")
     {
-        double dummy1     = 0.0f;
-        double dummy2     = 0.0f;
-        float playerspeed = 0.0f;
-        bool  playing     = false;
-        GetPlayerStatus(playing, playerspeed, dummy1, dummy2);
         float rate = req->GetQueryValue("value").toFloat();
         m_connections[session].speed = rate;
 
@@ -643,7 +666,8 @@ void MythAirplayServer::HandleResponse(APHTTPRequest *req,
             if (!file.isEmpty())
             {
                 m_connections[session].url = QUrl(file);
-                m_connections[session].position = start_pos;
+                m_connections[session].position = 0.0f;
+                m_connections[session].initial_position = start_pos;
 
                 MythEvent* me = new MythEvent(ACTION_HANDLEMEDIA,
                                               QStringList(file));
@@ -664,12 +688,6 @@ void MythAirplayServer::HandleResponse(APHTTPRequest *req,
     {
         content_type = "text/x-apple-plist+xml\r\n";
 
-        double position   = 0.0f;
-        double duration   = 0.0f;
-        float playerspeed = 0.0f;
-        bool  playing     = false;
-        GetPlayerStatus(playing, playerspeed, position, duration);
-
         if (!playing)
         {
             body = NOT_READY;
@@ -687,7 +705,13 @@ void MythAirplayServer::HandleResponse(APHTTPRequest *req,
                                                            AP_EVENT_PAUSED);
         }
     }
+    SendResponse(socket, status, header, content_type, body);
+}
 
+void MythAirplayServer::SendResponse(QTcpSocket *socket,
+                                     int status, QByteArray header,
+                                     QByteArray content_type, QString body)
+{
     QTextStream response(socket);
     response.setCodec("UTF-8");
     QByteArray reply;
@@ -720,18 +744,18 @@ void MythAirplayServer::HandleResponse(APHTTPRequest *req,
     response.flush();
 
     LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("Send: %1 \n\n%2\n")
-         .arg(socket->flush()).arg(reply.data()));
+        .arg(socket->flush()).arg(reply.data()));
 }
 
-void MythAirplayServer::SendReverseEvent(QByteArray &session,
+bool MythAirplayServer::SendReverseEvent(QByteArray &session,
                                          AirplayEvent event)
 {
     if (!m_connections.contains(session))
-        return;
+        return false;
     if (m_connections[session].lastEvent == event)
-        return;
+        return false;
     if (!m_connections[session].reverseSocket)
-        return;
+        return false;
 
     QString body;
     if (AP_EVENT_PLAYING == event ||
@@ -764,6 +788,7 @@ void MythAirplayServer::SendReverseEvent(QByteArray &session,
     LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("Send reverse: %1 \n\n%2\n")
          .arg(m_connections[session].reverseSocket->flush())
          .arg(reply.data()));
+    return true;
 }
 
 QString MythAirplayServer::eventToString(AirplayEvent event)
@@ -793,34 +818,18 @@ void MythAirplayServer::GetPlayerStatus(bool &playing, float &speed,
         duration = state["totalseconds"].toDouble();
 }
 
-QString MythAirplayServer::GetMacAddress(QTcpSocket *socket)
+QString MythAirplayServer::GetMacAddress()
 {
-    if (!socket)
-        return "";
+    QString id = MythRAOPDevice::HardwareId();
 
-    QString res("");
-    QString fallback("");
-
-    foreach(QNetworkInterface interface, QNetworkInterface::allInterfaces())
+    QString res;
+    for (int i = 1; i <= id.size(); i++)
     {
-        if (!(interface.flags() & QNetworkInterface::IsLoopBack))
+        res.append(id[i-1]);
+        if (i % 2 == 0 && i != id.size())
         {
-            fallback = interface.hardwareAddress();
-            QList<QNetworkAddressEntry> entries = interface.addressEntries();
-            foreach (QNetworkAddressEntry entry, entries)
-                if (entry.ip() == socket->localAddress())
-                    res = fallback;
+            res.append(':');
         }
     }
-
-    if (res.isEmpty())
-    {
-        LOG(VB_GENERAL, LOG_WARNING, LOC + "Using fallback MAC address.");
-        res = fallback;
-    }
-
-    if (res.isEmpty())
-        LOG(VB_GENERAL, LOG_ERR, LOC + "Didn't find MAC address.");
-
     return res;
 }

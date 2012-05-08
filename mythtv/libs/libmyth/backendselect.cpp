@@ -37,31 +37,28 @@ BackendSelection::~BackendSelection()
     m_devices.clear();
 }
 
-bool BackendSelection::m_backendChanged = false;
-
-bool BackendSelection::prompt(DatabaseParams *dbParams,
-                              Configuration  *pConfig)
+BackendSelection::Decision BackendSelection::Prompt(
+    DatabaseParams *dbParams, Configuration  *pConfig)
 {
-    m_backendChanged = false;
-
+    Decision ret = kCancelConfigure;
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
     if (!mainStack)
-        return false;
+        return ret;
 
-    BackendSelection *backendSettings = new BackendSelection(mainStack,
-                                                             dbParams,
-                                                             pConfig, true);
+    BackendSelection *backendSettings =
+        new BackendSelection(mainStack, dbParams, pConfig, true);
 
     if (backendSettings->Create())
     {
         mainStack->AddScreen(backendSettings, false);
         qApp->exec();
+        ret = backendSettings->m_backendDecision;
         mainStack->PopScreen(backendSettings, false);
     }
     else
         delete backendSettings;
 
-    return m_backendChanged;
+    return ret;
 }
 
 bool BackendSelection::Create(void)
@@ -97,7 +94,7 @@ void BackendSelection::Accept(MythUIButtonListItem *item)
     DeviceLocation *dev = qVariantValue<DeviceLocation *>(item->GetData());
 
     if (!dev)
-        Close();
+        Cancel();
 
     if (ConnectBackend(dev))  // this does a Release()
     {
@@ -108,7 +105,7 @@ void BackendSelection::Accept(MythUIButtonListItem *item)
             m_pConfig->SetValue(kDefaultUSN, m_USN);
             m_pConfig->Save();
         }
-        Close();
+        Close(kAcceptConfigure);
     }
 }
 
@@ -199,12 +196,12 @@ bool BackendSelection::ConnectBackend(DeviceLocation *dev)
     {
         case UPnPResult_Success:
             LOG(VB_UPNP, LOG_INFO, 
-                    QString("ConnectBackend() - success. New hostname: %1")
-                    .arg(m_DBparams->dbHostName));
+                QString("ConnectBackend() - success. New hostname: %1")
+                .arg(m_DBparams->dbHostName));
             return true;
 
         case UPnPResult_HumanInterventionRequired:
-            LOG(VB_UPNP, LOG_ERR, error);
+            LOG(VB_GENERAL, LOG_ERR, QString("Need Human: %1").arg(message));
             ShowOkPopup(message);
 
             if (TryDBfromURL("", dev->m_sLocation))
@@ -213,16 +210,16 @@ bool BackendSelection::ConnectBackend(DeviceLocation *dev)
             break;
 
         case UPnPResult_ActionNotAuthorized:
-            LOG(VB_UPNP, LOG_ERR, 
-                     QString("Access denied for %1. Wrong PIN?")
-                    .arg(backendName));
+            LOG(VB_GENERAL, LOG_ERR, 
+                QString("Access denied for %1. Wrong PIN?")
+                .arg(backendName));
             PromptForPassword();
             break;
 
         default:
-            LOG(VB_UPNP, LOG_ERR, 
-                     QString("GetConnectionInfo() failed for %1")
-                    .arg(backendName));
+            LOG(VB_GENERAL, LOG_ERR, 
+                QString("GetConnectionInfo() failed for %1 : %2")
+                .arg(backendName).arg(message));
             ShowOkPopup(message);
     }
 
@@ -231,12 +228,12 @@ bool BackendSelection::ConnectBackend(DeviceLocation *dev)
     return false;
 }
 
-void BackendSelection::Cancel()
+void BackendSelection::Cancel(void)
 {
-    Close();
+    Close(kCancelConfigure);
 }
 
-void BackendSelection::Load()
+void BackendSelection::Load(void)
 {
     SSDP::Instance()->AddListener(this);
     SSDP::Instance()->PerformSearch(gBackendURI);
@@ -259,7 +256,7 @@ void BackendSelection::Init(void)
 
 void BackendSelection::Manual(void)
 {
-    Close();
+    Close(kManualConfigure);
 }
 
 void BackendSelection::RemoveItem(QString USN)
@@ -361,8 +358,10 @@ void BackendSelection::PromptForPassword(void)
         delete pwDialog;
 }
 
-void BackendSelection::Close(void)
+void BackendSelection::Close(Decision d)
 {
+    m_backendDecision = d;
+
     if (m_exitOnFinish)
         qApp->quit();
     else

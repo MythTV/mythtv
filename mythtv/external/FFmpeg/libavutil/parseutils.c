@@ -21,14 +21,41 @@
  * misc parsing utilities
  */
 
-#include <strings.h>
 #include <sys/time.h>
 #include <time.h>
+
+#include "avstring.h"
+#include "avutil.h"
+#include "eval.h"
+#include "log.h"
+#include "random_seed.h"
 #include "parseutils.h"
-#include "libavutil/avutil.h"
-#include "libavutil/eval.h"
-#include "libavutil/avstring.h"
-#include "libavutil/random_seed.h"
+
+int av_parse_ratio(AVRational *q, const char *str, int max,
+                   int log_offset, void *log_ctx)
+{
+    char c;
+    int ret;
+    int64_t gcd;
+
+    if (sscanf(str, "%d:%d%c", &q->num, &q->den, &c) != 2) {
+        double d;
+        ret = av_expr_parse_and_eval(&d, str, NULL, NULL,
+                                     NULL, NULL, NULL, NULL,
+                                     NULL, log_offset, log_ctx);
+        if (ret < 0)
+            return ret;
+        *q = av_d2q(d, max);
+    }
+
+    gcd = av_gcd(FFABS(q->num), FFABS(q->den));
+    if (gcd) {
+        q->num /= gcd;
+        q->den /= gcd;
+    }
+
+    return 0;
+}
 
 typedef struct {
     const char *abbr;
@@ -95,7 +122,7 @@ int av_parse_video_size(int *width_ptr, int *height_ptr, const char *str)
 {
     int i;
     int n = FF_ARRAY_ELEMS(video_size_abbrs);
-    char *p;
+    const char *p;
     int width = 0, height = 0;
 
     for (i = 0; i < n; i++) {
@@ -107,10 +134,10 @@ int av_parse_video_size(int *width_ptr, int *height_ptr, const char *str)
     }
     if (i == n) {
         p = str;
-        width = strtol(p, &p, 10);
+        width = strtol(p, (void*)&p, 10);
         if (*p)
             p++;
-        height = strtol(p, &p, 10);
+        height = strtol(p, (void*)&p, 10);
     }
     if (width <= 0 || height <= 0)
         return AVERROR(EINVAL);
@@ -123,7 +150,6 @@ int av_parse_video_rate(AVRational *rate, const char *arg)
 {
     int i, ret;
     int n = FF_ARRAY_ELEMS(video_rate_abbrs);
-    double res;
 
     /* First, we check our abbreviation table */
     for (i = 0; i < n; ++i)
@@ -133,10 +159,8 @@ int av_parse_video_rate(AVRational *rate, const char *arg)
         }
 
     /* Then, we try to parse it as fraction */
-    if ((ret = av_expr_parse_and_eval(&res, arg, NULL, NULL, NULL, NULL, NULL, NULL,
-                                      NULL, 0, NULL)) < 0)
+    if ((ret = av_parse_ratio_quiet(rate, arg, 1001000)) < 0)
         return ret;
-    *rate = av_d2q(res, 1001000);
     if (rate->num <= 0 || rate->den <= 0)
         return AVERROR(EINVAL);
     return 0;
@@ -147,7 +171,7 @@ typedef struct {
     uint8_t     rgb_color[3];    ///< RGB values for the color
 } ColorEntry;
 
-static ColorEntry color_table[] = {
+static const ColorEntry color_table[] = {
     { "AliceBlue",            { 0xF0, 0xF8, 0xFF } },
     { "AntiqueWhite",         { 0xFA, 0xEB, 0xD7 } },
     { "Aqua",                 { 0x00, 0xFF, 0xFF } },
@@ -292,7 +316,7 @@ static ColorEntry color_table[] = {
 
 static int color_table_compare(const void *lhs, const void *rhs)
 {
-    return strcasecmp(lhs, ((const ColorEntry *)rhs)->name);
+    return av_strcasecmp(lhs, ((const ColorEntry *)rhs)->name);
 }
 
 #define ALPHA_SEP '@'
@@ -318,7 +342,7 @@ int av_parse_color(uint8_t *rgba_color, const char *color_string, int slen,
     len = strlen(color_string2);
     rgba_color[3] = 255;
 
-    if (!strcasecmp(color_string2, "random") || !strcasecmp(color_string2, "bikeshed")) {
+    if (!av_strcasecmp(color_string2, "random") || !av_strcasecmp(color_string2, "bikeshed")) {
         int rgba = av_get_random_seed();
         rgba_color[0] = rgba >> 24;
         rgba_color[1] = rgba >> 16;
@@ -399,10 +423,17 @@ static int date_get_num(const char **pp,
     return val;
 }
 
-/* small strptime for ffmpeg */
-static
-const char *small_strptime(const char *p, const char *fmt,
-                           struct tm *dt)
+/**
+ * Parse the input string p according to the format string fmt and
+ * store its results in the structure dt.
+ * This implementation supports only a subset of the formats supported
+ * by the standard strptime().
+ *
+ * @return a pointer to the first character not processed in this
+ * function call, or NULL in case the function fails to match all of
+ * the fmt string and therefore an error occurred
+ */
+static const char *small_strptime(const char *p, const char *fmt, struct tm *dt)
 {
     int c, val;
 
@@ -461,10 +492,9 @@ const char *small_strptime(const char *p, const char *fmt,
             p++;
         }
     }
-    return p;
 }
 
-static time_t mktimegm(struct tm *tm)
+time_t av_timegm(struct tm *tm)
 {
     time_t t;
 
@@ -483,11 +513,11 @@ static time_t mktimegm(struct tm *tm)
     return t;
 }
 
-int av_parse_time(int64_t *timeval, const char *datestr, int duration)
+int av_parse_time(int64_t *timeval, const char *timestr, int duration)
 {
     const char *p;
     int64_t t;
-    struct tm dt;
+    struct tm dt = { 0 };
     int i;
     static const char * const date_fmt[] = {
         "%Y-%m-%d",
@@ -505,19 +535,17 @@ int av_parse_time(int64_t *timeval, const char *datestr, int duration)
 #undef time
     time_t now = time(0);
 
-    len = strlen(datestr);
+    len = strlen(timestr);
     if (len > 0)
-        lastch = datestr[len - 1];
+        lastch = timestr[len - 1];
     else
         lastch = '\0';
     is_utc = (lastch == 'z' || lastch == 'Z');
 
-    memset(&dt, 0, sizeof(dt));
-
-    p = datestr;
+    p = timestr;
     q = NULL;
     if (!duration) {
-        if (!strncasecmp(datestr, "now", len)) {
+        if (!av_strncasecmp(timestr, "now", len)) {
             *timeval = (int64_t) now * 1000000;
             return 0;
         }
@@ -554,16 +582,16 @@ int av_parse_time(int64_t *timeval, const char *datestr, int duration)
             }
         }
     } else {
-        /* parse datestr as a duration */
+        /* parse timestr as a duration */
         if (p[0] == '-') {
             negative = 1;
             ++p;
         }
-        /* parse datestr as HH:MM:SS */
+        /* parse timestr as HH:MM:SS */
         q = small_strptime(p, time_fmt[0], &dt);
         if (!q) {
-            /* parse datestr as S+ */
-            dt.tm_sec = strtol(p, (char **)&q, 10);
+            /* parse timestr as S+ */
+            dt.tm_sec = strtol(p, (void *)&q, 10);
             if (q == p) {
                 /* the parsing didn't succeed */
                 *timeval = INT64_MIN;
@@ -585,7 +613,7 @@ int av_parse_time(int64_t *timeval, const char *datestr, int duration)
     } else {
         dt.tm_isdst = -1;       /* unknown */
         if (is_utc) {
-            t = mktimegm(&dt);
+            t = av_timegm(&dt);
         } else {
             t = mktime(&dt);
         }

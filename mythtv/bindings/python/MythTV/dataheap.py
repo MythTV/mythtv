@@ -4,13 +4,13 @@
 Provides data access classes for accessing and managing MythTV data
 """
 
-from static import *
-from exceptions import *
-from altdict import DictData, DictInvertCI
-from database import *
-from system import Grabber, InternetMetadata, VideoMetadata
-from mythproto import ftopen, FileOps, Program
-from utility import CMPRecord, CMPVideo, MARKUPLIST, datetime, ParseSet
+from MythTV.static import *
+from MythTV.exceptions import *
+from MythTV.altdict import DictData, DictInvertCI
+from MythTV.database import *
+from MythTV.system import Grabber, InternetMetadata, VideoMetadata
+from MythTV.mythproto import ftopen, FileOps, Program
+from MythTV.utility import CMPRecord, CMPVideo, MARKUPLIST, datetime, ParseSet
 
 import re
 import locale

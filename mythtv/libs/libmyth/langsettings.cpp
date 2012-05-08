@@ -187,13 +187,11 @@ void LanguageSelection::Save(void)
     MythUIButtonListItem *item = m_languageList->GetItemCurrent();
 
     QString langCode = item->GetData().toString();
-    gCoreContext->SetSetting("Language", langCode);
     gCoreContext->SaveSetting("Language", langCode);
 
     item = m_countryList->GetItemCurrent();
 
     QString countryCode = item->GetData().toString();
-    gCoreContext->SetSetting("Country", countryCode);
     gCoreContext->SaveSetting("Country", countryCode);
 
     if (m_language != langCode)
