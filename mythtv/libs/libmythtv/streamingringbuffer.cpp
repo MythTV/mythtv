@@ -17,7 +17,7 @@ StreamingRingBuffer::~StreamingRingBuffer()
 {
     rwlock.lockForWrite();
     if (m_context)
-        url_close(m_context);
+        ffurl_close(m_context);
     rwlock.unlock();
 }
 
@@ -48,9 +48,10 @@ bool StreamingRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
 
     // TODO check whether local area file
 
-    int res = url_open(&m_context, filename.toAscii(), URL_RDONLY);
+    int res = ffurl_open(&m_context, filename.toAscii(), AVIO_FLAG_READ,
+                         NULL, NULL);
     if (res >=0 && m_context &&
-        (!m_context->is_streamed && url_seek(m_context, 0, SEEK_SET) >= 0))
+        (!m_context->is_streamed && ffurl_seek(m_context, 0, SEEK_SET) >= 0))
     {
         m_streamed   = false;
         m_allowSeeks = true;
@@ -77,7 +78,7 @@ long long StreamingRingBuffer::Seek(long long pos, int whence, bool has_lock)
         return 0;
 
     poslock.lockForWrite();
-    int seek = url_seek(m_context, pos, whence);
+    int seek = ffurl_seek(m_context, pos, whence);
     poslock.unlock();
 
     if (seek < 0)
@@ -91,7 +92,7 @@ long long StreamingRingBuffer::Seek(long long pos, int whence, bool has_lock)
 int StreamingRingBuffer::safe_read(void *data, uint sz)
 {
     if (m_context)
-        return url_read_complete(m_context, (unsigned char*)data, sz);
+        return ffurl_read_complete(m_context, (unsigned char*)data, sz);
     return 0;
 }
 
@@ -100,7 +101,7 @@ long long StreamingRingBuffer::GetRealFileSize(void) const
     long long result = -1;
     rwlock.lockForRead();
     if (m_context)
-        result = url_filesize(m_context);
+        result = ffurl_size(m_context);
     rwlock.unlock();
     return result;
 }

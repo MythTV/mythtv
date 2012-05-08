@@ -92,7 +92,9 @@ SignalMonitor *SignalMonitor::Init(QString cardtype, int db_cardnum,
 
     {
         QMutexLocker locker(avcodeclock);
-        avcodec_init();
+#if 0
+        avcodec_register_all();
+#endif
     }
 
 #ifdef USING_DVB

@@ -84,6 +84,7 @@ enum BandType {
 #define IS_CODEBOOK_UNSIGNED(x) ((x - 1) & 10)
 
 enum ChannelPosition {
+    AAC_CHANNEL_OFF   = 0,
     AAC_CHANNEL_FRONT = 1,
     AAC_CHANNEL_SIDE  = 2,
     AAC_CHANNEL_BACK  = 3,
@@ -104,11 +105,11 @@ enum CouplingPoint {
  * Output configuration status
  */
 enum OCStatus {
-    OC_NONE,        //< Output unconfigured
-    OC_TRIAL_PCE,   //< Output configuration under trial specified by an inband PCE
-    OC_TRIAL_FRAME, //< Output configuration under trial specified by a frame header
-    OC_GLOBAL_HDR,  //< Output configuration set in a global header but not yet locked
-    OC_LOCKED,      //< Output configuration locked in place
+    OC_NONE,        ///< Output unconfigured
+    OC_TRIAL_PCE,   ///< Output configuration under trial specified by an inband PCE
+    OC_TRIAL_FRAME, ///< Output configuration under trial specified by a frame header
+    OC_GLOBAL_HDR,  ///< Output configuration set in a global header but not yet locked
+    OC_LOCKED,      ///< Output configuration locked in place
 };
 
 /**
@@ -224,10 +225,10 @@ typedef struct {
     float sf[120];                                  ///< scalefactors
     int sf_idx[128];                                ///< scalefactor indices (used by encoder)
     uint8_t zeroes[128];                            ///< band is not coded (used by encoder)
-    DECLARE_ALIGNED(16, float,   coeffs)[1024];     ///< coefficients for IMDCT
-    DECLARE_ALIGNED(16, float,   saved)[1024];      ///< overlap
-    DECLARE_ALIGNED(16, float,   ret)[2048];        ///< PCM output
-    DECLARE_ALIGNED(16, int16_t, ltp_state)[3072];  ///< time signal for LTP
+    DECLARE_ALIGNED(32, float,   coeffs)[1024];     ///< coefficients for IMDCT
+    DECLARE_ALIGNED(32, float,   saved)[1024];      ///< overlap
+    DECLARE_ALIGNED(32, float,   ret)[2048];        ///< PCM output
+    DECLARE_ALIGNED(16, float,   ltp_state)[3072];  ///< time signal for LTP
     PredictorState predictor_state[MAX_PREDICTORS];
 } SingleChannelElement;
 
@@ -251,6 +252,7 @@ typedef struct {
  */
 typedef struct {
     AVCodecContext *avctx;
+    AVFrame frame;
 
     MPEG4AudioConfig m4ac;
 
@@ -258,26 +260,26 @@ typedef struct {
     DynamicRangeControl che_drc;
 
     /**
-     * @defgroup elements Channel element related data.
+     * @name Channel element related data
      * @{
      */
-    enum ChannelPosition che_pos[4][MAX_ELEM_ID]; /**< channel element channel mapping with the
-                                                   *   first index as the first 4 raw data block types
-                                                   */
+    uint8_t layout_map[MAX_ELEM_ID*4][3];
+    int layout_map_tags;
     ChannelElement          *che[4][MAX_ELEM_ID];
     ChannelElement  *tag_che_map[4][MAX_ELEM_ID];
     int tags_mapped;
     /** @} */
 
     /**
-     * @defgroup temporary aligned temporary buffers (We do not want to have these on the stack.)
+     * @name temporary aligned temporary buffers
+     * (We do not want to have these on the stack.)
      * @{
      */
-    DECLARE_ALIGNED(16, float, buf_mdct)[2048];
+    DECLARE_ALIGNED(32, float, buf_mdct)[1024];
     /** @} */
 
     /**
-     * @defgroup tables   Computed / set up during initialization.
+     * @name Computed / set up during initialization
      * @{
      */
     FFTContext mdct;
@@ -289,17 +291,16 @@ typedef struct {
     /** @} */
 
     /**
-     * @defgroup output   Members used for output interleaving.
+     * @name Members used for output interleaving
      * @{
      */
     float *output_data[MAX_CHANNELS];                 ///< Points to each element's 'ret' buffer (PCM output).
-    float sf_scale;                                   ///< Pre-scale for correct IMDCT and dsp.float_to_int16.
-    int sf_offset;                                    ///< offset into pow2sf_tab as appropriate for dsp.float_to_int16
     /** @} */
 
-    DECLARE_ALIGNED(16, float, temp)[128];
+    DECLARE_ALIGNED(32, float, temp)[128];
 
     enum OCStatus output_configured;
+    int warned_num_aac_frames;
 } AACContext;
 
 #endif /* AVCODEC_AAC_H */

@@ -69,21 +69,18 @@ static int query_formats(AVFilterContext *ctx)
         PIX_FMT_BGR555BE,     PIX_FMT_BGR555LE,
         PIX_FMT_GRAY16BE,     PIX_FMT_GRAY16LE,
         PIX_FMT_YUV420P16LE,  PIX_FMT_YUV420P16BE,
-        PIX_FMT_YUV422P16LE,  PIX_FMT_YUV422P16BE,
         PIX_FMT_YUV444P16LE,  PIX_FMT_YUV444P16BE,
         PIX_FMT_NV12,         PIX_FMT_NV21,
         PIX_FMT_RGB8,         PIX_FMT_BGR8,
         PIX_FMT_RGB4_BYTE,    PIX_FMT_BGR4_BYTE,
-        PIX_FMT_YUV444P,      PIX_FMT_YUV422P,
+        PIX_FMT_YUV444P,      PIX_FMT_YUVJ444P,
         PIX_FMT_YUV420P,      PIX_FMT_YUVJ420P,
-        PIX_FMT_YUV411P,      PIX_FMT_YUV410P,
-        PIX_FMT_YUVJ444P,     PIX_FMT_YUVJ422P,
-        PIX_FMT_YUV440P,      PIX_FMT_YUVJ440P,
+        PIX_FMT_YUV410P,
         PIX_FMT_YUVA420P,     PIX_FMT_GRAY8,
         PIX_FMT_NONE
     };
 
-    avfilter_set_common_formats(ctx, avfilter_make_format_list(pix_fmts));
+    avfilter_set_common_pixel_formats(ctx, avfilter_make_format_list(pix_fmts));
     return 0;
 }
 
@@ -122,11 +119,11 @@ static void start_frame(AVFilterLink *inlink, AVFilterBufferRef *picref)
                                                  outlink->w, outlink->h);
     outlink->out_buf->pts = picref->pts;
 
-    if (picref->video->pixel_aspect.num == 0) {
-        outlink->out_buf->video->pixel_aspect = picref->video->pixel_aspect;
+    if (picref->video->sample_aspect_ratio.num == 0) {
+        outlink->out_buf->video->sample_aspect_ratio = picref->video->sample_aspect_ratio;
     } else {
-        outlink->out_buf->video->pixel_aspect.num = picref->video->pixel_aspect.den;
-        outlink->out_buf->video->pixel_aspect.den = picref->video->pixel_aspect.num;
+        outlink->out_buf->video->sample_aspect_ratio.num = picref->video->sample_aspect_ratio.den;
+        outlink->out_buf->video->sample_aspect_ratio.den = picref->video->sample_aspect_ratio.num;
     }
 
     avfilter_start_frame(outlink, avfilter_ref_buffer(outlink->out_buf, ~0));
@@ -195,6 +192,8 @@ static void end_frame(AVFilterLink *inlink)
     avfilter_unref_buffer(outpic);
 }
 
+static void null_draw_slice(AVFilterLink *link, int y, int h, int slice_dir) { }
+
 AVFilter avfilter_vf_transpose = {
     .name      = "transpose",
     .description = NULL_IF_CONFIG_SMALL("Transpose input video."),
@@ -204,13 +203,14 @@ AVFilter avfilter_vf_transpose = {
 
     .query_formats = query_formats,
 
-    .inputs    = (AVFilterPad[]) {{ .name            = "default",
+    .inputs    = (const AVFilterPad[]) {{ .name      = "default",
                                     .type            = AVMEDIA_TYPE_VIDEO,
                                     .start_frame     = start_frame,
+                                    .draw_slice      = null_draw_slice,
                                     .end_frame       = end_frame,
                                     .min_perms       = AV_PERM_READ, },
                                   { .name = NULL}},
-    .outputs   = (AVFilterPad[]) {{ .name            = "default",
+    .outputs   = (const AVFilterPad[]) {{ .name      = "default",
                                     .config_props    = config_props_output,
                                     .type            = AVMEDIA_TYPE_VIDEO, },
                                   { .name = NULL}},

@@ -21,8 +21,11 @@
 #include <string.h>
 #include "libavutil/avstring.h"
 #include "libavutil/base64.h"
+#include "libavutil/dict.h"
 #include "libavutil/parseutils.h"
+#include "libavutil/opt.h"
 #include "libavcodec/xiph.h"
+#include "libavcodec/mpeg4audio.h"
 #include "avformat.h"
 #include "internal.h"
 #include "avc.h"
@@ -85,7 +88,7 @@ static void sdp_write_header(char *buff, int size, struct sdp_session_level *s)
 static int resolve_destination(char *dest_addr, int size, char *type,
                                int type_size)
 {
-    struct addrinfo hints, *ai;
+    struct addrinfo hints = { 0 }, *ai;
     int is_multicast;
 
     av_strlcpy(type, "IP4", type_size);
@@ -95,7 +98,6 @@ static int resolve_destination(char *dest_addr, int size, char *type,
     /* Resolve the destination, since it must be written
      * as a numeric IP address in the SDP. */
 
-    memset(&hints, 0, sizeof(hints));
     if (getaddrinfo(dest_addr, NULL, &hints, &ai))
         return 0;
     getnameinfo(ai->ai_addr, ai->ai_addrlen, dest_addr, size,
@@ -153,6 +155,8 @@ static char *extradata2psets(AVCodecContext *c)
     char *psets, *p;
     const uint8_t *r;
     const char *pset_string = "; sprop-parameter-sets=";
+    uint8_t *orig_extradata = NULL;
+    int orig_extradata_size = 0;
 
     if (c->extradata_size > MAX_EXTRADATA_SIZE) {
         av_log(c, AV_LOG_ERROR, "Too much extradata!\n");
@@ -169,6 +173,15 @@ static char *extradata2psets(AVCodecContext *c)
 
             return NULL;
         }
+
+        orig_extradata_size = c->extradata_size;
+        orig_extradata = av_mallocz(orig_extradata_size +
+                                    FF_INPUT_BUFFER_PADDING_SIZE);
+        if (!orig_extradata) {
+            av_bitstream_filter_close(bsfc);
+            return NULL;
+        }
+        memcpy(orig_extradata, c->extradata, orig_extradata_size);
         av_bitstream_filter_filter(bsfc, c, NULL, &dummy_p, &dummy_int, NULL, 0, 0);
         av_bitstream_filter_close(bsfc);
     }
@@ -176,6 +189,7 @@ static char *extradata2psets(AVCodecContext *c)
     psets = av_mallocz(MAX_PSET_SIZE);
     if (psets == NULL) {
         av_log(c, AV_LOG_ERROR, "Cannot allocate memory for the parameter sets.\n");
+        av_free(orig_extradata);
         return NULL;
     }
     memcpy(psets, pset_string, strlen(pset_string));
@@ -204,6 +218,11 @@ static char *extradata2psets(AVCodecContext *c)
         }
         p += strlen(p);
         r = r1;
+    }
+    if (orig_extradata) {
+        av_free(c->extradata);
+        c->extradata      = orig_extradata;
+        c->extradata_size = orig_extradata_size;
     }
 
     return psets;
@@ -249,7 +268,7 @@ static char *xiph_extradata2config(AVCodecContext *c)
         return NULL;
     }
 
-    if (ff_split_xiph_headers(c->extradata, c->extradata_size,
+    if (avpriv_split_xiph_headers(c->extradata, c->extradata_size,
                               first_header_size, header_start,
                               header_len) < 0) {
         av_log(c, AV_LOG_ERROR, "Extradata corrupt.\n");
@@ -299,7 +318,72 @@ xiph_fail:
     return NULL;
 }
 
-static char *sdp_write_media_attributes(char *buff, int size, AVCodecContext *c, int payload_type)
+static int latm_context2profilelevel(AVCodecContext *c)
+{
+    /* MP4A-LATM
+     * The RTP payload format specification is described in RFC 3016
+     * The encoding specifications are provided in ISO/IEC 14496-3 */
+
+    int profile_level = 0x2B;
+
+    /* TODO: AAC Profile only supports AAC LC Object Type.
+     * Different Object Types should implement different Profile Levels */
+
+    if (c->sample_rate <= 24000) {
+        if (c->channels <= 2)
+            profile_level = 0x28; // AAC Profile, Level 1
+    } else if (c->sample_rate <= 48000) {
+        if (c->channels <= 2) {
+            profile_level = 0x29; // AAC Profile, Level 2
+        } else if (c->channels <= 5) {
+            profile_level = 0x2A; // AAC Profile, Level 4
+        }
+    } else if (c->sample_rate <= 96000) {
+        if (c->channels <= 5) {
+            profile_level = 0x2B; // AAC Profile, Level 5
+        }
+    }
+
+    return profile_level;
+}
+
+static char *latm_context2config(AVCodecContext *c)
+{
+    /* MP4A-LATM
+     * The RTP payload format specification is described in RFC 3016
+     * The encoding specifications are provided in ISO/IEC 14496-3 */
+
+    uint8_t config_byte[6];
+    int rate_index;
+    char *config;
+
+    for (rate_index = 0; rate_index < 16; rate_index++)
+        if (avpriv_mpeg4audio_sample_rates[rate_index] == c->sample_rate)
+            break;
+    if (rate_index == 16) {
+        av_log(c, AV_LOG_ERROR, "Unsupported sample rate\n");
+        return NULL;
+    }
+
+    config_byte[0] = 0x40;
+    config_byte[1] = 0;
+    config_byte[2] = 0x20 | rate_index;
+    config_byte[3] = c->channels << 4;
+    config_byte[4] = 0x3f;
+    config_byte[5] = 0xc0;
+
+    config = av_malloc(6*2+1);
+    if (!config) {
+        av_log(c, AV_LOG_ERROR, "Cannot allocate memory for the config info.\n");
+        return NULL;
+    }
+    ff_data_to_hex(config, config_byte, 6, 1);
+    config[12] = 0;
+
+    return config;
+}
+
+static char *sdp_write_media_attributes(char *buff, int size, AVCodecContext *c, int payload_type, AVFormatContext *fmt)
 {
     char *config = NULL;
 
@@ -319,6 +403,9 @@ static char *sdp_write_media_attributes(char *buff, int size, AVCodecContext *c,
              * actually specifies the maximum video size, but we only know
              * the current size. This is required for playback on Android
              * stagefright and on Samsung bada. */
+            if (!fmt || !fmt->oformat->priv_class ||
+                !av_opt_flag_is_set(fmt->priv_data, "rtpflags", "rfc2190") ||
+                c->codec_id == CODEC_ID_H263P)
             av_strlcatf(buff, size, "a=rtpmap:%d H263-2000/90000\r\n"
                                     "a=framesize:%d %d-%d\r\n",
                                     payload_type,
@@ -334,24 +421,35 @@ static char *sdp_write_media_attributes(char *buff, int size, AVCodecContext *c,
                                      payload_type, config ? config : "");
             break;
         case CODEC_ID_AAC:
-            if (c->extradata_size) {
-                config = extradata2config(c);
+            if (fmt && fmt->oformat && fmt->oformat->priv_class &&
+                av_opt_flag_is_set(fmt->priv_data, "rtpflags", "latm")) {
+                config = latm_context2config(c);
+                if (!config)
+                    return NULL;
+                av_strlcatf(buff, size, "a=rtpmap:%d MP4A-LATM/%d/%d\r\n"
+                                        "a=fmtp:%d profile-level-id=%d;cpresent=0;config=%s\r\n",
+                                         payload_type, c->sample_rate, c->channels,
+                                         payload_type, latm_context2profilelevel(c), config);
             } else {
-                /* FIXME: maybe we can forge config information based on the
-                 *        codec parameters...
-                 */
-                av_log(c, AV_LOG_ERROR, "AAC with no global headers is currently not supported.\n");
-                return NULL;
+                if (c->extradata_size) {
+                    config = extradata2config(c);
+                } else {
+                    /* FIXME: maybe we can forge config information based on the
+                     *        codec parameters...
+                     */
+                    av_log(c, AV_LOG_ERROR, "AAC with no global headers is currently not supported.\n");
+                    return NULL;
+                }
+                if (config == NULL) {
+                    return NULL;
+                }
+                av_strlcatf(buff, size, "a=rtpmap:%d MPEG4-GENERIC/%d/%d\r\n"
+                                        "a=fmtp:%d profile-level-id=1;"
+                                        "mode=AAC-hbr;sizelength=13;indexlength=3;"
+                                        "indexdeltalength=3%s\r\n",
+                                         payload_type, c->sample_rate, c->channels,
+                                         payload_type, config);
             }
-            if (config == NULL) {
-                return NULL;
-            }
-            av_strlcatf(buff, size, "a=rtpmap:%d MPEG4-GENERIC/%d/%d\r\n"
-                                    "a=fmtp:%d profile-level-id=1;"
-                                    "mode=AAC-hbr;sizelength=13;indexlength=3;"
-                                    "indexdeltalength=3%s\r\n",
-                                     payload_type, c->sample_rate, c->channels,
-                                     payload_type, config);
             break;
         case CODEC_ID_PCM_S16BE:
             if (payload_type >= RTP_PT_PRIVATE)
@@ -438,6 +536,14 @@ static char *sdp_write_media_attributes(char *buff, int size, AVCodecContext *c,
                                          payload_type,
                                          8000, c->channels);
             break;
+        case CODEC_ID_ADPCM_G726: {
+            if (payload_type >= RTP_PT_PRIVATE)
+                av_strlcatf(buff, size, "a=rtpmap:%d G726-%d/%d\r\n",
+                                         payload_type,
+                                         c->bits_per_coded_sample*8,
+                                         c->sample_rate);
+            break;
+        }
         default:
             /* Nothing special to do here... */
             break;
@@ -448,15 +554,12 @@ static char *sdp_write_media_attributes(char *buff, int size, AVCodecContext *c,
     return buff;
 }
 
-void ff_sdp_write_media(char *buff, int size, AVCodecContext *c, const char *dest_addr, const char *dest_type, int port, int ttl)
+void ff_sdp_write_media(char *buff, int size, AVCodecContext *c, const char *dest_addr, const char *dest_type, int port, int ttl, AVFormatContext *fmt)
 {
     const char *type;
     int payload_type;
 
-    payload_type = ff_rtp_get_payload_type(c);
-    if (payload_type < 0) {
-        payload_type = RTP_PT_PRIVATE + (c->codec_type == AVMEDIA_TYPE_AUDIO);
-    }
+    payload_type = ff_rtp_get_payload_type(fmt, c);
 
     switch (c->codec_type) {
         case AVMEDIA_TYPE_VIDEO   : type = "video"      ; break;
@@ -471,18 +574,17 @@ void ff_sdp_write_media(char *buff, int size, AVCodecContext *c, const char *des
         av_strlcatf(buff, size, "b=AS:%d\r\n", c->bit_rate / 1000);
     }
 
-    sdp_write_media_attributes(buff, size, c, payload_type);
+    sdp_write_media_attributes(buff, size, c, payload_type, fmt);
 }
 
-int avf_sdp_create(AVFormatContext *ac[], int n_files, char *buff, int size)
+int av_sdp_create(AVFormatContext *ac[], int n_files, char *buf, int size)
 {
-    AVMetadataTag *title = av_metadata_get(ac[0]->metadata, "title", NULL, 0);
-    struct sdp_session_level s;
+    AVDictionaryEntry *title = av_dict_get(ac[0]->metadata, "title", NULL, 0);
+    struct sdp_session_level s = { 0 };
     int i, j, port, ttl, is_multicast;
     char dst[32], dst_type[5];
 
-    memset(buff, 0, size);
-    memset(&s, 0, sizeof(struct sdp_session_level));
+    memset(buf, 0, size);
     s.user = "-";
     s.src_addr = "127.0.0.1";    /* FIXME: Properly set this */
     s.src_type = "IP4";
@@ -506,7 +608,7 @@ int avf_sdp_create(AVFormatContext *ac[], int n_files, char *buff, int size)
             }
         }
     }
-    sdp_write_header(buff, size, &s);
+    sdp_write_header(buf, size, &s);
 
     dst[0] = 0;
     for (i = 0; i < n_files; i++) {
@@ -518,11 +620,12 @@ int avf_sdp_create(AVFormatContext *ac[], int n_files, char *buff, int size)
                 ttl = 0;
         }
         for (j = 0; j < ac[i]->nb_streams; j++) {
-            ff_sdp_write_media(buff, size,
+            ff_sdp_write_media(buf, size,
                                   ac[i]->streams[j]->codec, dst[0] ? dst : NULL,
-                                  dst_type, (port > 0) ? port + j * 2 : 0, ttl);
+                                  dst_type, (port > 0) ? port + j * 2 : 0, ttl,
+                                  ac[i]);
             if (port <= 0) {
-                av_strlcatf(buff, size,
+                av_strlcatf(buf, size,
                                    "a=control:streamid=%d\r\n", i + j);
             }
         }
@@ -531,12 +634,12 @@ int avf_sdp_create(AVFormatContext *ac[], int n_files, char *buff, int size)
     return 0;
 }
 #else
-int avf_sdp_create(AVFormatContext *ac[], int n_files, char *buff, int size)
+int av_sdp_create(AVFormatContext *ac[], int n_files, char *buf, int size)
 {
     return AVERROR(ENOSYS);
 }
 
-void ff_sdp_write_media(char *buff, int size, AVCodecContext *c, const char *dest_addr, const char *dest_type, int port, int ttl)
+void ff_sdp_write_media(char *buff, int size, AVCodecContext *c, const char *dest_addr, const char *dest_type, int port, int ttl, AVFormatContext *fmt)
 {
 }
 #endif

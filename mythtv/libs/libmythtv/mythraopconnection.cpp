@@ -574,25 +574,27 @@ uint32_t MythRAOPConnection::decodeAudioPacket(uint8_t type,
     uint32_t frames_added = 0;
     while (tmp_pkt.size > 0)
     {
-        int decoded_data_size = AVCODEC_MAX_AUDIO_FRAME_SIZE;
-        int16_t *samples = (int16_t *)av_mallocz(AVCODEC_MAX_AUDIO_FRAME_SIZE);
-        int ret = avcodec_decode_audio3(ctx, samples, &decoded_data_size, &tmp_pkt);
+        AVFrame *frame = avcodec_alloc_frame();
+        int got_frame = 0;
+        int ret = avcodec_decode_audio4(ctx, frame, &got_frame, &tmp_pkt);
 
         if (ret < 0)
         {
+            LOG(VB_GENERAL, LOG_ERR, LOC + QString("Error decoding audio"));
             return -1;
         }
 
-        if (decoded_data_size > 0)
+        if (ret > 0 && got_frame)
         {
-            int frames = decoded_data_size /
-                (ctx->channels * av_get_bits_per_sample_fmt(ctx->sample_fmt)>>3);
+            int decoded_size =
+                av_samples_get_buffer_size(NULL, ctx->channels,
+                                           frame->nb_samples,
+                                           ctx->sample_fmt, 1);
+            frame->linesize[0] = decoded_size;
+            int frames = frame->nb_samples;
+
             frames_added += frames;
-            AudioData block;
-            block.data   = samples;
-            block.length = decoded_data_size;
-            block.frames = frames;
-            dest->append(block);
+            dest->append(frame);
         }
         tmp_pkt.data += ret;
         tmp_pkt.size -= ret;
@@ -662,8 +664,9 @@ void MythRAOPConnection::ProcessAudio()
             QList<AudioData>::iterator it = frames.data->begin();
             for (; it != frames.data->end(); ++it)
             {
-                m_audio->AddData((char *)it->data, it->length,
-                                 timestamp, it->frames);
+                AVFrame *frame = *it;
+                m_audio->AddData(frame->extended_data[0], frame->linesize[0],
+                                 timestamp, frame->nb_samples);
                 timestamp += m_audio->LengthLastData();
             }
             i++;
@@ -696,9 +699,9 @@ int MythRAOPConnection::ExpireAudio(uint64_t timestamp)
                 QList<AudioData>::iterator it = frames.data->begin();
                 for (; it != frames.data->end(); ++it)
                 {
-                    av_free(it->data);
+                    AVFrame *frame = *it;
+                    av_free((void *)frame);
                 }
-                delete frames.data;
             }
             m_audioQueue.remove(packet_it.key());
             res++;
@@ -1413,7 +1416,7 @@ bool MythRAOPConnection::CreateDecoder(void)
         return false;
     }
 
-    m_codeccontext = avcodec_alloc_context();
+    m_codeccontext = avcodec_alloc_context3(m_codec);
     if (m_codec && m_codeccontext)
     {
         unsigned char* extradata = new unsigned char[36];
@@ -1547,3 +1550,7 @@ int64_t MythRAOPConnection::AudioCardLatency(void)
     uint64_t audiots = m_audio->GetAudiotime();
     return (int64_t)timestamp - (int64_t)audiots;
 }
+
+/*
+ * vim:ts=4:sw=4:ai:et:si:sts=4
+ */

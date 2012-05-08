@@ -27,7 +27,7 @@ int 	zoom_filter_xmmx_supported (void);
 #include "mmx.h"
 
 int zoom_filter_xmmx_supported () {
-	return (mm_support()&0x8)>>3;
+    return (av_get_cpu_flags() & AV_CPU_FLAG_SSE) >> 3;
 }
 
 void zoom_filter_xmmx (int prevX, int prevY,

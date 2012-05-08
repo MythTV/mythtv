@@ -98,7 +98,6 @@ bool AudioOutputDigitalEncoder::Init(
             .arg(samplerate) .arg(channels));
 
     // We need to do this when called from mythmusic
-    avcodec_init();
     avcodec_register_all();
 #if LIBAVCODEC_VERSION_INT > AV_VERSION_INT( 52, 113, 0 )
     codec = avcodec_find_encoder_by_name("ac3_fixed");
@@ -111,7 +110,7 @@ bool AudioOutputDigitalEncoder::Init(
         return false;
     }
 
-    av_context                 = avcodec_alloc_context();
+    av_context                 = avcodec_alloc_context3(codec);
     avcodec_get_context_defaults3(av_context, codec);
 
     av_context->bit_rate       = bitrate;
@@ -141,7 +140,7 @@ bool AudioOutputDigitalEncoder::Init(
     av_context->sample_fmt     = AV_SAMPLE_FMT_S16;
 
 // open it
-    ret = avcodec_open(av_context, codec);
+    ret = avcodec_open2(av_context, codec, NULL);
     if (ret < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
@@ -211,15 +210,25 @@ size_t AudioOutputDigitalEncoder::Encode(void *buf, int len, AudioFormat format)
     int frames = inlen / sizeof(inbuf_t) / samples_per_frame;
     int i = 0;
 
+    AVFrame  *frame  = avcodec_alloc_frame();
+
     while (i < frames)
     {
-        int outsize = avcodec_encode_audio(
-            av_context,
-            (uint8_t *)m_encodebuffer,
-            sizeof(m_encodebuffer),
-            (short *)(in + i * samples_per_frame));
+        AVPacket packet;
+        packet.data = (uint8_t *)m_encodebuffer;
+        packet.size = sizeof(m_encodebuffer);
 
-        if (outsize < 0)
+	frame->data[0]     = (uint8_t *)&in[i * samples_per_frame];
+        frame->linesize[0] = inlen;
+	frame->nb_samples  = frames - i;
+        frame->format      = AV_SAMPLE_FMT_S16;
+
+	int got_packet = 0;
+
+        int outsize = avcodec_encode_audio2(av_context, &packet, frame,
+                                            &got_packet);
+
+        if (outsize < 0 || !got_packet)
         {
             LOG(VB_AUDIO, LOG_ERR, LOC + "AC-3 encode error");
             return outlen;
@@ -258,6 +267,8 @@ size_t AudioOutputDigitalEncoder::Encode(void *buf, int len, AudioFormat format)
         inlen  -= samples_per_frame * sizeof(inbuf_t);
         i++;
     }
+
+    av_free(frame);
 
     memmove(in, in + i * samples_per_frame, inlen);
     return outlen;

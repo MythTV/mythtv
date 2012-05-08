@@ -1513,10 +1513,10 @@ void MHIBitmap::CreateFromMPEG(const unsigned char *data, int length)
     if (!codec)
         return;
 
-    c = avcodec_alloc_context();
+    c = avcodec_alloc_context3(NULL);
     picture = avcodec_alloc_frame();
 
-    if (avcodec_open(c, codec) < 0)
+    if (avcodec_open2(c, codec, NULL) < 0)
         goto Close;
 
     // Copy the data into AVPacket

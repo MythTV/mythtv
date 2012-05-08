@@ -20,11 +20,11 @@ LIBS += -L../../libs/libmythmetadata
 LIBS += -L../../libs/libmythservicecontracts
 LIBS += -L../../libs/libmythprotoserver
 
-LIBS += -lmythtv-$$LIBVERSION
 LIBS += -lmythswscale
 LIBS += -lmythavformat
 LIBS += -lmythavcodec
 LIBS += -lmythavutil
+LIBS += -lmythtv-$$LIBVERSION
 LIBS += -lmythupnp-$$LIBVERSION
 LIBS += -lmythbase-$$LIBVERSION
 LIBS += -lmythui-$$LIBVERSION

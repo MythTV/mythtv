@@ -57,6 +57,12 @@
 #define INFINITY       (1.0/0.0)
 #endif
 
+/**
+ * @addtogroup lavu_math
+ * @{
+ */
+
+
 enum AVRounding {
     AV_ROUND_ZERO     = 0, ///< Round toward zero.
     AV_ROUND_INF      = 1, ///< Round away from zero.
@@ -90,6 +96,12 @@ int64_t av_rescale_rnd(int64_t a, int64_t b, int64_t c, enum AVRounding) av_cons
 int64_t av_rescale_q(int64_t a, AVRational bq, AVRational cq) av_const;
 
 /**
+ * Rescale a 64-bit integer by 2 rational numbers with specified rounding.
+ */
+int64_t av_rescale_q_rnd(int64_t a, AVRational bq, AVRational cq,
+                         enum AVRounding) av_const;
+
+/**
  * Compare 2 timestamps each in its own timebases.
  * The result of the function is undefined if one of the timestamps
  * is outside the int64_t range when represented in the others timebase.
@@ -108,5 +120,9 @@ int av_compare_ts(int64_t ts_a, AVRational tb_a, int64_t ts_b, AVRational tb_b);
  *         0                if a equals          b
  */
 int64_t av_compare_mod(uint64_t a, uint64_t b, uint64_t mod);
+
+/**
+ * @}
+ */
 
 #endif /* AVUTIL_MATHEMATICS_H */

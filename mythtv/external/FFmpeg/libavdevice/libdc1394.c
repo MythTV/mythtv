@@ -22,6 +22,12 @@
 
 #include "config.h"
 #include "libavformat/avformat.h"
+#include "libavformat/internal.h"
+#include "libavutil/log.h"
+#include "libavutil/mathematics.h"
+#include "libavutil/opt.h"
+#include "libavutil/parseutils.h"
+#include "libavutil/pixdesc.h"
 
 #if HAVE_LIBDC1394_2
 #include <dc1394/dc1394.h>
@@ -45,16 +51,21 @@
 #undef free
 
 typedef struct dc1394_data {
+    AVClass *class;
 #if HAVE_LIBDC1394_1
     raw1394handle_t handle;
     dc1394_cameracapture camera;
+    int channel;
 #elif HAVE_LIBDC1394_2
     dc1394_t *d;
     dc1394camera_t *camera;
     dc1394video_frame_t *frame;
 #endif
     int current_frame;
-    int fps;
+    int  frame_rate;        /**< frames per 1000 seconds (fps * 1000) */
+    char *video_size;       /**< String describing video size, set by a private option. */
+    char *pixel_format;     /**< Set by a private option. */
+    char *framerate;        /**< Set by a private option. */
 
     AVPacket packet;
 } dc1394_data;
@@ -86,41 +97,80 @@ struct dc1394_frame_rate {
     { 0, 0 } /* gotta be the last one */
 };
 
-static inline int dc1394_read_common(AVFormatContext *c, AVFormatParameters *ap,
+#define OFFSET(x) offsetof(dc1394_data, x)
+#define DEC AV_OPT_FLAG_DECODING_PARAM
+static const AVOption options[] = {
+#if HAVE_LIBDC1394_1
+    { "channel", "", offsetof(dc1394_data, channel), AV_OPT_TYPE_INT, {.dbl = 0}, 0, INT_MAX, AV_OPT_FLAG_DECODING_PARAM },
+#endif
+    { "video_size", "A string describing frame size, such as 640x480 or hd720.", OFFSET(video_size), AV_OPT_TYPE_STRING, {.str = "qvga"}, 0, 0, DEC },
+    { "pixel_format", "", OFFSET(pixel_format), AV_OPT_TYPE_STRING, {.str = "uyvy422"}, 0, 0, DEC },
+    { "framerate", "", OFFSET(framerate), AV_OPT_TYPE_STRING, {.str = "ntsc"}, 0, 0, DEC },
+    { NULL },
+};
+
+static const AVClass libdc1394_class = {
+    .class_name = "libdc1394 indev",
+    .item_name  = av_default_item_name,
+    .option     = options,
+    .version    = LIBAVUTIL_VERSION_INT,
+};
+
+
+static inline int dc1394_read_common(AVFormatContext *c,
                                      struct dc1394_frame_format **select_fmt, struct dc1394_frame_rate **select_fps)
 {
     dc1394_data* dc1394 = c->priv_data;
     AVStream* vst;
     struct dc1394_frame_format *fmt;
     struct dc1394_frame_rate *fps;
-    enum PixelFormat pix_fmt = ap->pix_fmt == PIX_FMT_NONE ? PIX_FMT_UYVY422 : ap->pix_fmt; /* defaults */
-    int width                = !ap->width ? 320 : ap->width;
-    int height               = !ap->height ? 240 : ap->height;
-    int frame_rate           = !ap->time_base.num ? 30000 : av_rescale(1000, ap->time_base.den, ap->time_base.num);
+    enum PixelFormat pix_fmt;
+    int width, height;
+    AVRational framerate;
+    int ret = 0;
+
+    if ((pix_fmt = av_get_pix_fmt(dc1394->pixel_format)) == PIX_FMT_NONE) {
+        av_log(c, AV_LOG_ERROR, "No such pixel format: %s.\n", dc1394->pixel_format);
+        ret = AVERROR(EINVAL);
+        goto out;
+    }
+
+    if ((ret = av_parse_video_size(&width, &height, dc1394->video_size)) < 0) {
+        av_log(c, AV_LOG_ERROR, "Could not parse video size '%s'.\n", dc1394->video_size);
+        goto out;
+    }
+    if ((ret = av_parse_video_rate(&framerate, dc1394->framerate)) < 0) {
+        av_log(c, AV_LOG_ERROR, "Could not parse framerate '%s'.\n", dc1394->framerate);
+        goto out;
+    }
+    dc1394->frame_rate = av_rescale(1000, framerate.num, framerate.den);
 
     for (fmt = dc1394_frame_formats; fmt->width; fmt++)
          if (fmt->pix_fmt == pix_fmt && fmt->width == width && fmt->height == height)
              break;
 
     for (fps = dc1394_frame_rates; fps->frame_rate; fps++)
-         if (fps->frame_rate == frame_rate)
+         if (fps->frame_rate == dc1394->frame_rate)
              break;
 
     if (!fps->frame_rate || !fmt->width) {
-        av_log(c, AV_LOG_ERROR, "Can't find matching camera format for %s, %dx%d@%d:1000fps\n", avcodec_get_pix_fmt_name(pix_fmt),
-                                                                                                width, height, frame_rate);
+        av_log(c, AV_LOG_ERROR, "Can't find matching camera format for %s, %dx%d@%d:1000fps\n", av_get_pix_fmt_name(pix_fmt),
+                                                                                                width, height, dc1394->frame_rate);
+        ret = AVERROR(EINVAL);
         goto out;
     }
 
     /* create a video stream */
-    vst = av_new_stream(c, 0);
-    if (!vst)
+    vst = avformat_new_stream(c, NULL);
+    if (!vst) {
+        ret = AVERROR(ENOMEM);
         goto out;
-    av_set_pts_info(vst, 64, 1, 1000);
+    }
+    avpriv_set_pts_info(vst, 64, 1, 1000);
     vst->codec->codec_type = AVMEDIA_TYPE_VIDEO;
     vst->codec->codec_id = CODEC_ID_RAWVIDEO;
-    vst->codec->time_base.den = fps->frame_rate;
-    vst->codec->time_base.num = 1000;
+    vst->codec->time_base.den = framerate.num;
+    vst->codec->time_base.num = framerate.den;
     vst->codec->width = fmt->width;
     vst->codec->height = fmt->height;
     vst->codec->pix_fmt = fmt->pix_fmt;
@@ -132,18 +182,16 @@ static inline int dc1394_read_common(AVFormatContext *c, AVFormatParameters *ap,
     dc1394->packet.flags |= AV_PKT_FLAG_KEY;
 
     dc1394->current_frame = 0;
-    dc1394->fps = fps->frame_rate;
 
     vst->codec->bit_rate = av_rescale(dc1394->packet.size * 8, fps->frame_rate, 1000);
     *select_fps = fps;
     *select_fmt = fmt;
-    return 0;
 out:
-    return -1;
+    return ret;
 }
 
 #if HAVE_LIBDC1394_1
-static int dc1394_v1_read_header(AVFormatContext *c, AVFormatParameters * ap)
+static int dc1394_v1_read_header(AVFormatContext *c)
 {
     dc1394_data* dc1394 = c->priv_data;
     AVStream* vst;
@@ -152,7 +200,7 @@ static int dc1394_v1_read_header(AVFormatContext *c, AVFormatParameters * ap)
     struct dc1394_frame_format *fmt = NULL;
     struct dc1394_frame_rate *fps = NULL;
 
-    if (dc1394_read_common(c,ap,&fmt,&fps) != 0)
+    if (dc1394_read_common(c, &fmt, &fps) != 0)
         return -1;
 
     /* Now let us prep the hardware. */
@@ -162,11 +210,11 @@ static int dc1394_v1_read_header(AVFormatContext *c, AVFormatParameters * ap)
         goto out;
     }
     camera_nodes = dc1394_get_camera_nodes(dc1394->handle, &res, 1);
-    if (!camera_nodes || camera_nodes[ap->channel] == DC1394_NO_CAMERA) {
-        av_log(c, AV_LOG_ERROR, "There's no IIDC camera on the channel %d\n", ap->channel);
+    if (!camera_nodes || camera_nodes[dc1394->channel] == DC1394_NO_CAMERA) {
+        av_log(c, AV_LOG_ERROR, "There's no IIDC camera on the channel %d\n", dc1394->channel);
         goto out_handle;
     }
-    res = dc1394_dma_setup_capture(dc1394->handle, camera_nodes[ap->channel],
+    res = dc1394_dma_setup_capture(dc1394->handle, camera_nodes[dc1394->channel],
                                    0,
                                    FORMAT_VGA_NONCOMPRESSED,
                                    fmt->frame_size_id,
@@ -212,7 +260,7 @@ static int dc1394_v1_read_packet(AVFormatContext *c, AVPacket *pkt)
 
     if (res == DC1394_SUCCESS) {
         dc1394->packet.data = (uint8_t *)(dc1394->camera.capture_buffer);
-        dc1394->packet.pts = (dc1394->current_frame * 1000000) / dc1394->fps;
+        dc1394->packet.pts = (dc1394->current_frame * 1000000) / dc1394->frame_rate;
         res = dc1394->packet.size;
     } else {
         av_log(c, AV_LOG_ERROR, "DMA capture failed\n");
@@ -237,7 +285,7 @@ static int dc1394_v1_close(AVFormatContext * context)
 }
 
 #elif HAVE_LIBDC1394_2
-static int dc1394_v2_read_header(AVFormatContext *c, AVFormatParameters * ap)
+static int dc1394_v2_read_header(AVFormatContext *c)
 {
     dc1394_data* dc1394 = c->priv_data;
     dc1394camera_list_t *list;
@@ -245,7 +293,7 @@ static int dc1394_v2_read_header(AVFormatContext *c, AVFormatParameters * ap)
     struct dc1394_frame_format *fmt = NULL;
     struct dc1394_frame_rate *fps = NULL;
 
-    if (dc1394_read_common(c,ap,&fmt,&fps) != 0)
+    if (dc1394_read_common(c, &fmt, &fps) != 0)
        return -1;
 
     /* Now let us prep the hardware. */
@@ -323,8 +371,8 @@ static int dc1394_v2_read_packet(AVFormatContext *c, AVPacket *pkt)
 
     res = dc1394_capture_dequeue(dc1394->camera, DC1394_CAPTURE_POLICY_WAIT, &dc1394->frame);
     if (res == DC1394_SUCCESS) {
-        dc1394->packet.data = (uint8_t *)(dc1394->frame->image);
-        dc1394->packet.pts = (dc1394->current_frame  * 1000000) / (dc1394->fps);
+        dc1394->packet.data = (uint8_t *) dc1394->frame->image;
+        dc1394->packet.pts  = dc1394->current_frame * 1000000 / dc1394->frame_rate;
         res = dc1394->frame->image_bytes;
     } else {
         av_log(c, AV_LOG_ERROR, "DMA capture failed\n");
@@ -355,7 +403,8 @@ AVInputFormat ff_libdc1394_demuxer = {
     .read_header    = dc1394_v2_read_header,
     .read_packet    = dc1394_v2_read_packet,
     .read_close     = dc1394_v2_close,
-    .flags          = AVFMT_NOFILE
+    .flags          = AVFMT_NOFILE,
+    .priv_class     = &libdc1394_class,
 };
 
 #endif
@@ -367,6 +416,7 @@ AVInputFormat ff_libdc1394_demuxer = {
     .read_header    = dc1394_v1_read_header,
     .read_packet    = dc1394_v1_read_packet,
     .read_close     = dc1394_v1_close,
-    .flags          = AVFMT_NOFILE
+    .flags          = AVFMT_NOFILE,
+    .priv_class     = &libdc1394_class,
 };
 #endif

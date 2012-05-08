@@ -609,7 +609,7 @@ static void add_bytes_altivec(uint8_t *dst, uint8_t *src, int w) {
 }
 
 /* next one assumes that ((line_size % 16) == 0) */
-void put_pixels16_altivec(uint8_t *block, const uint8_t *pixels, int line_size, int h)
+void ff_put_pixels16_altivec(uint8_t *block, const uint8_t *pixels, int line_size, int h)
 {
     register vector unsigned char pixelsv1, pixelsv2;
     register vector unsigned char pixelsv1B, pixelsv2B;
@@ -627,16 +627,6 @@ void put_pixels16_altivec(uint8_t *block, const uint8_t *pixels, int line_size, 
 // it's faster than -funroll-loops, but using
 // -funroll-loops w/ this is bad - 74 cycles again.
 // all this is on a 7450, tuning for the 7450
-#if 0
-    for (i = 0; i < h; i++) {
-        pixelsv1 = vec_ld(0, pixels);
-        pixelsv2 = vec_ld(16, pixels);
-        vec_st(vec_perm(pixelsv1, pixelsv2, perm),
-               0, block);
-        pixels+=line_size;
-        block +=line_size;
-    }
-#else
     for (i = 0; i < h; i += 4) {
         pixelsv1  = vec_ld( 0, pixels);
         pixelsv2  = vec_ld(15, pixels);
@@ -657,12 +647,11 @@ void put_pixels16_altivec(uint8_t *block, const uint8_t *pixels, int line_size, 
         pixels+=line_size_4;
         block +=line_size_4;
     }
-#endif
 }
 
 /* next one assumes that ((line_size % 16) == 0) */
 #define op_avg(a,b)  a = ( ((a)|(b)) - ((((a)^(b))&0xFEFEFEFEUL)>>1) )
-void avg_pixels16_altivec(uint8_t *block, const uint8_t *pixels, int line_size, int h)
+void ff_avg_pixels16_altivec(uint8_t *block, const uint8_t *pixels, int line_size, int h)
 {
     register vector unsigned char pixelsv1, pixelsv2, pixelsv, blockv;
     register vector unsigned char perm = vec_lvsl(0, pixels);
@@ -1382,8 +1371,10 @@ static void avg_pixels8_xy2_altivec(uint8_t *block, const uint8_t *pixels, int l
     }
 }
 
-void dsputil_init_altivec(DSPContext* c, AVCodecContext *avctx)
+void ff_dsputil_init_altivec(DSPContext* c, AVCodecContext *avctx)
 {
+    const int high_bit_depth = avctx->bits_per_raw_sample > 8;
+
     c->pix_abs[0][1] = sad16_x2_altivec;
     c->pix_abs[0][2] = sad16_y2_altivec;
     c->pix_abs[0][3] = sad16_xy2_altivec;
@@ -1396,19 +1387,21 @@ void dsputil_init_altivec(DSPContext* c, AVCodecContext *avctx)
     c->sse[0]= sse16_altivec;
     c->pix_sum = pix_sum_altivec;
     c->diff_pixels = diff_pixels_altivec;
+    c->add_bytes= add_bytes_altivec;
+    if (!high_bit_depth) {
     c->get_pixels = get_pixels_altivec;
     c->clear_block = clear_block_altivec;
-    c->add_bytes= add_bytes_altivec;
-    c->put_pixels_tab[0][0] = put_pixels16_altivec;
+    c->put_pixels_tab[0][0] = ff_put_pixels16_altivec;
     /* the two functions do the same thing, so use the same code */
-    c->put_no_rnd_pixels_tab[0][0] = put_pixels16_altivec;
-    c->avg_pixels_tab[0][0] = avg_pixels16_altivec;
+    c->put_no_rnd_pixels_tab[0][0] = ff_put_pixels16_altivec;
+    c->avg_pixels_tab[0][0] = ff_avg_pixels16_altivec;
     c->avg_pixels_tab[1][0] = avg_pixels8_altivec;
     c->avg_pixels_tab[1][3] = avg_pixels8_xy2_altivec;
     c->put_pixels_tab[1][3] = put_pixels8_xy2_altivec;
     c->put_no_rnd_pixels_tab[1][3] = put_no_rnd_pixels8_xy2_altivec;
     c->put_pixels_tab[0][3] = put_pixels16_xy2_altivec;
     c->put_no_rnd_pixels_tab[0][3] = put_no_rnd_pixels16_xy2_altivec;
+    }
 
     c->hadamard8_diff[0] = hadamard8_diff16_altivec;
     c->hadamard8_diff[1] = hadamard8_diff8x8_altivec;

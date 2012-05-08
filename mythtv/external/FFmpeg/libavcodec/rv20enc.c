@@ -29,7 +29,7 @@
 #include "h263.h"
 #include "put_bits.h"
 
-void rv20_encode_picture_header(MpegEncContext *s, int picture_number){
+void ff_rv20_encode_picture_header(MpegEncContext *s, int picture_number){
     put_bits(&s->pb, 2, s->pict_type); //I 0 vs. 1 ?
     put_bits(&s->pb, 1, 0);     /* unknown bit */
     put_bits(&s->pb, 5, s->qscale);
@@ -47,7 +47,7 @@ void rv20_encode_picture_header(MpegEncContext *s, int picture_number){
     assert(s->modified_quant==1);
     assert(s->loop_filter==1);
 
-    s->h263_aic= s->pict_type == FF_I_TYPE;
+    s->h263_aic= s->pict_type == AV_PICTURE_TYPE_I;
     if(s->h263_aic){
         s->y_dc_scale_table=
         s->c_dc_scale_table= ff_aic_dc_scale_table;
@@ -57,14 +57,17 @@ void rv20_encode_picture_header(MpegEncContext *s, int picture_number){
     }
 }
 
+FF_MPV_GENERIC_CLASS(rv20)
+
 AVCodec ff_rv20_encoder = {
-    "rv20",
-    AVMEDIA_TYPE_VIDEO,
-    CODEC_ID_RV20,
-    sizeof(MpegEncContext),
-    MPV_encode_init,
-    MPV_encode_picture,
-    MPV_encode_end,
+    .name           = "rv20",
+    .type           = AVMEDIA_TYPE_VIDEO,
+    .id             = CODEC_ID_RV20,
+    .priv_data_size = sizeof(MpegEncContext),
+    .init           = ff_MPV_encode_init,
+    .encode2        = ff_MPV_encode_picture,
+    .close          = ff_MPV_encode_end,
     .pix_fmts= (const enum PixelFormat[]){PIX_FMT_YUV420P, PIX_FMT_NONE},
     .long_name= NULL_IF_CONFIG_SMALL("RealVideo 2.0"),
+    .priv_class     = &rv20_class,
 };

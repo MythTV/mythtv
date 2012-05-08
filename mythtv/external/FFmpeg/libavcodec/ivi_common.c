@@ -26,7 +26,7 @@
  * Indeo5 decoders.
  */
 
-#define ALT_BITSTREAM_READER_LE
+#define BITSTREAM_READER_LE
 #include "avcodec.h"
 #include "get_bits.h"
 #include "ivi_common.h"
@@ -132,7 +132,7 @@ int ff_ivi_dec_huff_desc(GetBitContext *gb, int desc_coded, int which_tab,
                 ff_ivi_huff_desc_copy(&huff_tab->cust_desc, &new_huff);
 
                 if (huff_tab->cust_tab.table)
-                    free_vlc(&huff_tab->cust_tab);
+                    ff_free_vlc(&huff_tab->cust_tab);
                 result = ff_ivi_create_huff_from_desc(&huff_tab->cust_desc,
                         &huff_tab->cust_tab, 0);
                 if (result) {
@@ -209,6 +209,7 @@ int av_cold ff_ivi_init_planes(IVIPlaneDesc *planes, const IVIPicConfig *cfg)
             band->pitch    = width_aligned;
             band->bufs[0]  = av_malloc(buf_size);
             band->bufs[1]  = av_malloc(buf_size);
+            band->bufsize  = buf_size/2;
             if (!band->bufs[0] || !band->bufs[1])
                 return AVERROR(ENOMEM);
 
@@ -237,7 +238,7 @@ void av_cold ff_ivi_free_buffers(IVIPlaneDesc *planes)
             av_freep(&planes[p].bands[b].bufs[2]);
 
             if (planes[p].bands[b].blk_vlc.cust_tab.table)
-                free_vlc(&planes[p].bands[b].blk_vlc.cust_tab);
+                ff_free_vlc(&planes[p].bands[b].blk_vlc.cust_tab);
             for (t = 0; t < planes[p].bands[b].num_tiles; t++)
                 av_freep(&planes[p].bands[b].tiles[t].mbs);
             av_freep(&planes[p].bands[b].tiles);
@@ -260,6 +261,8 @@ int av_cold ff_ivi_init_tiles(IVIPlaneDesc *planes, int tile_width, int tile_hei
             t_width  >>= 1;
             t_height >>= 1;
         }
+        if(t_width<=0 || t_height<=0)
+            return AVERROR(EINVAL);
 
         for (b = 0; b < planes[p].num_bands; b++) {
             band = &planes[p].bands[b];
@@ -418,8 +421,8 @@ int ff_ivi_decode_blocks(GetBitContext *gb, IVIBandDesc *band, IVITile *tile)
                         break;
                     pos = band->scan[scan_pos];
 
-                    if (IVI_DEBUG && !val)
-                        av_log(NULL, AV_LOG_ERROR, "Val = 0 encountered!\n");
+                    if (!val)
+                        av_dlog(NULL, "Val = 0 encountered!\n");
 
                     q = (base_tab[pos] * quant) >> 9;
                     if (q > 1)
@@ -506,7 +509,7 @@ void ff_ivi_process_empty_tile(AVCodecContext *avctx, IVIBandDesc *band,
             if (band->inherit_qdelta && ref_mb)
                 mb->q_delta = ref_mb->q_delta;
 
-            if (band->inherit_mv) {
+            if (band->inherit_mv && ref_mb) {
                 /* motion vector inheritance */
                 if (mv_scale) {
                     mb->mv_x = ivi_scale_mv(ref_mb->mv_x, mv_scale);
@@ -563,7 +566,7 @@ void ff_ivi_process_empty_tile(AVCodecContext *avctx, IVIBandDesc *band,
 }
 
 
-#if IVI_DEBUG
+#ifdef DEBUG
 uint16_t ivi_calc_band_checksum (IVIBandDesc *band)
 {
     int         x, y;
@@ -610,6 +613,9 @@ void ff_ivi_output_plane(IVIPlaneDesc *plane, uint8_t *dst, int dst_pitch)
     int             x, y;
     const int16_t   *src  = plane->bands[0].buf;
     uint32_t        pitch = plane->bands[0].pitch;
+
+    if (!src)
+        return;
 
     for (y = 0; y < plane->height; y++) {
         for (x = 0; x < plane->width; x++)

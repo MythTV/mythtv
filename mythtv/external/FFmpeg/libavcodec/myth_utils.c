@@ -95,7 +95,9 @@ const char *ff_codec_id_string(enum CodecID codec_id)
         case CODEC_ID_QDRAW:            return "QDRAW";
         case CODEC_ID_VIXL:             return "VIXL";
         case CODEC_ID_QPEG:             return "QPEG";
+#if 0
         case CODEC_ID_XVID:             return "XVID";
+#endif
         case CODEC_ID_PNG:              return "PNG";
         case CODEC_ID_PPM:              return "PPM";
         case CODEC_ID_PBM:              return "PBM";
@@ -223,16 +225,16 @@ const char *ff_codec_id_string(enum CodecID codec_id)
 /** \fn codec_type_string(enum CodecType)
  *  returns a human readable string for the CodecType enum.
  */
-const char *ff_codec_type_string(enum CodecType codec_type)
+const char *ff_codec_type_string(enum AVMediaType codec_type)
 {
     switch (codec_type)
     {
-        case CODEC_TYPE_UNKNOWN:       return "Unknown";
-        case CODEC_TYPE_VIDEO:         return "Video";
-        case CODEC_TYPE_AUDIO:         return "Audio";
-        case CODEC_TYPE_DATA:          return "Data";
-        case CODEC_TYPE_SUBTITLE:      return "Subtitle";
-        case CODEC_TYPE_ATTACHMENT:    return "Attachment";
+        case AVMEDIA_TYPE_UNKNOWN:       return "Unknown";
+        case AVMEDIA_TYPE_VIDEO:         return "Video";
+        case AVMEDIA_TYPE_AUDIO:         return "Audio";
+        case AVMEDIA_TYPE_DATA:          return "Data";
+        case AVMEDIA_TYPE_SUBTITLE:      return "Subtitle";
+        case AVMEDIA_TYPE_ATTACHMENT:    return "Attachment";
     }
     return "Invalid Codec Type";
 };

@@ -28,6 +28,7 @@
 #include "avcodec.h"
 #include "get_bits.h"
 #include "golomb.h"
+#include "internal.h"
 #include "mathops.h"
 #include "dsputil.h"
 #include "mjpeg.h"
@@ -209,8 +210,7 @@ static inline void ls_encode_line(JLSState *state, PutBitContext *pb, void *last
 
 static void ls_store_lse(JLSState *state, PutBitContext *pb){
     /* Test if we have default params and don't need to store LSE */
-    JLSState state2;
-    memset(&state2, 0, sizeof(JLSState));
+    JLSState state2 = { 0 };
     state2.bpp = state->bpp;
     state2.near = state->near;
     ff_jpegls_reset_coding_parameters(&state2, 1);
@@ -227,31 +227,36 @@ static void ls_store_lse(JLSState *state, PutBitContext *pb){
     put_bits(pb, 16, state->reset);
 }
 
-static int encode_picture_ls(AVCodecContext *avctx, unsigned char *buf, int buf_size, void *data){
+static int encode_picture_ls(AVCodecContext *avctx, AVPacket *pkt,
+                             const AVFrame *pict, int *got_packet)
+{
     JpeglsContext * const s = avctx->priv_data;
-    AVFrame *pict = data;
-    AVFrame * const p= (AVFrame*)&s->picture;
+    AVFrame * const p = &s->picture;
     const int near = avctx->prediction_method;
     PutBitContext pb, pb2;
     GetBitContext gb;
     uint8_t *buf2, *zero, *cur, *last;
     JLSState *state;
-    int i, size;
+    int i, size, ret;
     int comps;
 
-    buf2 = av_malloc(buf_size);
-
-    init_put_bits(&pb, buf, buf_size);
-    init_put_bits(&pb2, buf2, buf_size);
-
     *p = *pict;
-    p->pict_type= FF_I_TYPE;
+    p->pict_type= AV_PICTURE_TYPE_I;
     p->key_frame= 1;
 
     if(avctx->pix_fmt == PIX_FMT_GRAY8 || avctx->pix_fmt == PIX_FMT_GRAY16)
         comps = 1;
     else
         comps = 3;
+
+    if ((ret = ff_alloc_packet2(avctx, pkt, avctx->width*avctx->height*comps*4 +
+                                    FF_MIN_BUFFER_SIZE)) < 0)
+        return ret;
+
+    buf2 = av_malloc(pkt->size);
+
+    init_put_bits(&pb, pkt->data, pkt->size);
+    init_put_bits(&pb2, buf2, pkt->size);
 
     /* write our own JPEG header, can't use mjpeg_picture_header */
     put_marker(&pb, SOI);
@@ -287,7 +292,9 @@ static int encode_picture_ls(AVCodecContext *avctx, unsigned char *buf, int buf_
 
     ls_store_lse(state, &pb);
 
-    zero = av_mallocz(p->linesize[0]);
+    zero = av_mallocz(FFABS(p->linesize[0]));
+    if (!zero)
+        return AVERROR(ENOMEM);
     last = zero;
     cur = p->data[0];
     if(avctx->pix_fmt == PIX_FMT_GRAY8){
@@ -357,7 +364,7 @@ static int encode_picture_ls(AVCodecContext *avctx, unsigned char *buf, int buf_
             put_bits(&pb, 8, v);
         }
     }
-    align_put_bits(&pb);
+    avpriv_align_put_bits(&pb);
     av_free(buf2);
 
     /* End of image */
@@ -366,7 +373,10 @@ static int encode_picture_ls(AVCodecContext *avctx, unsigned char *buf, int buf_
 
     emms_c();
 
-    return put_bits_count(&pb) >> 3;
+    pkt->size   = put_bits_count(&pb) >> 3;
+    pkt->flags |= AV_PKT_FLAG_KEY;
+    *got_packet = 1;
+    return 0;
 }
 
 static av_cold int encode_init_ls(AVCodecContext *ctx) {
@@ -383,13 +393,12 @@ static av_cold int encode_init_ls(AVCodecContext *ctx) {
 }
 
 AVCodec ff_jpegls_encoder = { //FIXME avoid MPV_* lossless JPEG should not need them
-    "jpegls",
-    AVMEDIA_TYPE_VIDEO,
-    CODEC_ID_JPEGLS,
-    sizeof(JpeglsContext),
-    encode_init_ls,
-    encode_picture_ls,
-    NULL,
-    .pix_fmts= (const enum PixelFormat[]){PIX_FMT_BGR24, PIX_FMT_RGB24, PIX_FMT_GRAY8, PIX_FMT_GRAY16, PIX_FMT_NONE},
-    .long_name= NULL_IF_CONFIG_SMALL("JPEG-LS"),
+    .name           = "jpegls",
+    .type           = AVMEDIA_TYPE_VIDEO,
+    .id             = CODEC_ID_JPEGLS,
+    .priv_data_size = sizeof(JpeglsContext),
+    .init           = encode_init_ls,
+    .encode2        = encode_picture_ls,
+    .pix_fmts       = (const enum PixelFormat[]){PIX_FMT_BGR24, PIX_FMT_RGB24, PIX_FMT_GRAY8, PIX_FMT_GRAY16, PIX_FMT_NONE},
+    .long_name      = NULL_IF_CONFIG_SMALL("JPEG-LS"),
 };

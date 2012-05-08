@@ -25,11 +25,12 @@ using namespace std;
 
 #include "minilzo.h"
 
-#if HAVE_BIGENDIAN
 extern "C" {
+#if HAVE_BIGENDIAN
 #include "bswap.h"
-}
 #endif
+#include "libavutil/opt.h"
+}
 
 #define LOC QString("NVD: ")
 
@@ -45,7 +46,6 @@ NuppelDecoder::NuppelDecoder(MythPlayer *parent,
       disablevideo(false), totalLength(0), totalFrames(0), effdsp(0),
       directframe(NULL),            decoded_video_frame(NULL),
       mpa_vidcodec(0), mpa_vidctx(0), mpa_audcodec(0), mpa_audctx(0),
-      audioSamples_buf(new short int[AVCODEC_MAX_AUDIO_FRAME_SIZE+16]),
       directrendering(false),
       lastct('1'), strm(0), buf(0), buf2(0),
       videosizetotal(0), videoframesread(0), setreadahead(false)
@@ -56,8 +56,7 @@ NuppelDecoder::NuppelDecoder(MythPlayer *parent,
     memset(&extradata, 0, sizeof(extendeddata));
     memset(&tmppicture, 0, sizeof(AVPicture));
     planes[0] = planes[1] = planes[2] = 0;
-    audioSamples = (short int*) (((long)audioSamples_buf + 15) & ~0xf);
-    memset(audioSamples, 0, AVCODEC_MAX_AUDIO_FRAME_SIZE * sizeof(short int));
+    m_audioFrame = avcodec_alloc_frame();
 
     // set parent class variables
     positionMapType = MARK_KEYFRAME;
@@ -72,7 +71,6 @@ NuppelDecoder::NuppelDecoder(MythPlayer *parent,
 
     {
         QMutexLocker locker(avcodeclock);
-        avcodec_init();
         avcodec_register_all();
     }
 
@@ -96,8 +94,8 @@ NuppelDecoder::~NuppelDecoder()
         delete [] buf2;
     if (strm_buf)
         delete [] strm_buf;
-    if (audioSamples_buf)
-        delete [] audioSamples_buf;
+
+    av_free(m_audioFrame);
 
     while (!StoredData.empty())
     {
@@ -641,8 +639,6 @@ int get_nuppel_buffer(struct AVCodecContext *c, AVFrame *pic)
     pic->opaque = nd->directframe;
     pic->type = FF_BUFFER_TYPE_USER;
 
-    pic->age = 256 * 256 * 256 * 64;
-
     return 1;
 }
 
@@ -703,13 +699,14 @@ bool NuppelDecoder::InitAVCodecVideo(int codec)
     if (mpa_vidctx)
         av_free(mpa_vidctx);
 
-    mpa_vidctx = avcodec_alloc_context();
+    mpa_vidctx = avcodec_alloc_context3(NULL);
 
     mpa_vidctx->codec_id = (enum CodecID)codec;
-    mpa_vidctx->codec_type = CODEC_TYPE_VIDEO;
+    mpa_vidctx->codec_type = AVMEDIA_TYPE_VIDEO;
     mpa_vidctx->width = video_width;
     mpa_vidctx->height = video_height;
-    mpa_vidctx->error_recognition = 2;
+    mpa_vidctx->err_recognition = AV_EF_CRCCHECK | AV_EF_BITSTREAM |
+                                  AV_EF_BUFFER;
     mpa_vidctx->bits_per_coded_sample = 12;
 
     if (directrendering)
@@ -722,13 +719,13 @@ bool NuppelDecoder::InitAVCodecVideo(int codec)
     }
     if (ffmpeg_extradatasize > 0)
     {
-        mpa_vidctx->flags |= CODEC_FLAG_EXTERN_HUFF;
+        av_opt_set_int(mpa_vidctx, "extern_huff", 1, 0);
         mpa_vidctx->extradata = ffmpeg_extradata;
         mpa_vidctx->extradata_size = ffmpeg_extradatasize;
     }
 
     QMutexLocker locker(avcodeclock);
-    if (avcodec_open(mpa_vidctx, mpa_vidcodec) < 0)
+    if (avcodec_open2(mpa_vidctx, mpa_vidcodec, NULL) < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Couldn't find lavc video codec");
         return false;
@@ -782,13 +779,13 @@ bool NuppelDecoder::InitAVCodecAudio(int codec)
     if (mpa_audctx)
         av_free(mpa_audctx);
 
-    mpa_audctx = avcodec_alloc_context();
+    mpa_audctx = avcodec_alloc_context3(NULL);
 
     mpa_audctx->codec_id = (enum CodecID)codec;
-    mpa_audctx->codec_type = CODEC_TYPE_AUDIO;
+    mpa_audctx->codec_type = AVMEDIA_TYPE_AUDIO;
 
     QMutexLocker locker(avcodeclock);
-    if (avcodec_open(mpa_audctx, mpa_audcodec) < 0)
+    if (avcodec_open2(mpa_audctx, mpa_audcodec, NULL) < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Couldn't find lavc audio codec");
         return false;
@@ -1264,19 +1261,27 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype)
                 pkt.data = strm;
                 pkt.size = frameheader.packetlength;
                 int ret = 0;
-                int data_size;
 
                 QMutexLocker locker(avcodeclock);
 
                 while (pkt.size > 0)
                 {
-                    data_size = AVCODEC_MAX_AUDIO_FRAME_SIZE;
-                    ret = avcodec_decode_audio3(mpa_audctx, audioSamples,
-                                                &data_size, &pkt);
+                    int got_frame = 0;
+                    ret = avcodec_decode_audio4(mpa_audctx, m_audioFrame,
+                                                &got_frame, &pkt);
 
-                    if (data_size)
-                        m_audio->AddAudioData((char *)audioSamples, data_size,
-                                              frameheader.timecode, 0);
+                    if (got_frame && ret > 0)
+                    {
+                        int data_size =
+                            av_samples_get_buffer_size(NULL,
+                                                       mpa_audctx->channels,
+                                                       m_audioFrame->nb_samples,
+                                                       mpa_audctx->sample_fmt,
+                                                       1);
+                        m_audio->AddAudioData(
+                            (char *)m_audioFrame->extended_data[0],
+                            data_size, frameheader.timecode, 0);
+                    }
 
                     pkt.size -= ret;
                     pkt.data += ret;

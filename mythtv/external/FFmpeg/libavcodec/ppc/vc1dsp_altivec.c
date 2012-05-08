@@ -145,7 +145,6 @@ static void vc1_inv_trans_8x8_altivec(DCTELEM block[64])
     const vector  signed int vec_1s = vec_splat_s32(1);
     const vector unsigned int vec_1 = vec_splat_u32(1);
 
-
     src0 = vec_ld(  0, block);
     src1 = vec_ld( 16, block);
     src2 = vec_ld( 32, block);
