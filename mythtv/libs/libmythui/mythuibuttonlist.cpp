@@ -832,7 +832,10 @@ bool MythUIButtonList::DistributeButtons(void)
                            first_item, last_item, selected_column,
                            skip_cols, grow_left, true, &col_widths,
                            height, 0, 0, col_cnt, wrapped))
+        {
+            delete[] col_widths;
             return false;
+        }
 
         m_columns = col_cnt;
 
@@ -865,7 +868,10 @@ bool MythUIButtonList::DistributeButtons(void)
                                first_item, last_item, selected_column,
                                skip_cols, grow_left, true, &col_widths,
                                height, 0, 0, col_cnt, wrapped))
+            {
+                delete[] col_widths;
                 return false;
+            }
         }
 
         if (selected_column != -1)
