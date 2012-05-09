@@ -3,9 +3,11 @@
 
 #include <stdint.h> /* uint32_t */
 
-#ifdef __linux__
+#if HAVE_BYTESWAP_H
 #  include <byteswap.h> /* bswap_16|32|64 */
-#elif defined __APPLE__
+#elif HAVE_SYS_ENDIAN_H
+#  include <sys/endian.h>
+#elif CONFIG_DARWIN
 #  include <libkern/OSByteOrder.h> 
 #  define bswap_16(x) OSSwapInt16(x)
 #  define bswap_32(x) OSSwapInt32(x)
