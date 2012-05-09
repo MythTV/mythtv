@@ -574,27 +574,32 @@ uint32_t MythRAOPConnection::decodeAudioPacket(uint8_t type,
     uint32_t frames_added = 0;
     while (tmp_pkt.size > 0)
     {
-        AVFrame *frame = avcodec_alloc_frame();
+        uint8_t *samples = (uint8_t *)av_mallocz(AVCODEC_MAX_AUDIO_FRAME_SIZE);
+        AVFrame frame;
         int got_frame = 0;
-        int ret = avcodec_decode_audio4(ctx, frame, &got_frame, &tmp_pkt);
+
+        int ret = avcodec_decode_audio4(ctx, &frame, &got_frame, &tmp_pkt);
 
         if (ret < 0)
         {
-            LOG(VB_GENERAL, LOG_ERR, LOC + QString("Error decoding audio"));
+            av_free(samples);
             return -1;
         }
 
-        if (ret > 0 && got_frame)
+        if (got_frame)
         {
-            int decoded_size =
-                av_samples_get_buffer_size(NULL, ctx->channels,
-                                           frame->nb_samples,
-                                           ctx->sample_fmt, 1);
-            frame->linesize[0] = decoded_size;
-            int frames = frame->nb_samples;
+            // ALAC codec isn't planar
+            int data_size = av_samples_get_buffer_size(NULL, ctx->channels,
+                                                       frame.nb_samples,
+                                                       ctx->sample_fmt, 1);
+            memcpy(samples, frame.extended_data[0], data_size);
 
-            frames_added += frames;
-            dest->append(frame);
+            frames_added += frame.nb_samples;
+            AudioData block;
+            block.data    = samples;
+            block.length  = data_size;
+            block.frames  = frame.nb_samples;
+            dest->append(block);
         }
         tmp_pkt.data += ret;
         tmp_pkt.size -= ret;
@@ -664,9 +669,9 @@ void MythRAOPConnection::ProcessAudio()
             QList<AudioData>::iterator it = frames.data->begin();
             for (; it != frames.data->end(); ++it)
             {
-                AVFrame *frame = *it;
-                m_audio->AddData(frame->extended_data[0], frame->linesize[0],
-                                 timestamp, frame->nb_samples);
+                AudioData *data = &(*it);
+                m_audio->AddData((char *)data->data, data->length,
+                                 timestamp, data->frames);
                 timestamp += m_audio->LengthLastData();
             }
             i++;
@@ -699,9 +704,9 @@ int MythRAOPConnection::ExpireAudio(uint64_t timestamp)
                 QList<AudioData>::iterator it = frames.data->begin();
                 for (; it != frames.data->end(); ++it)
                 {
-                    AVFrame *frame = *it;
-                    av_free((void *)frame);
+                    av_free(it->data);
                 }
+                delete frames.data;
             }
             m_audioQueue.remove(packet_it.key());
             res++;
@@ -1417,7 +1422,7 @@ bool MythRAOPConnection::CreateDecoder(void)
     }
 
     m_codeccontext = avcodec_alloc_context3(m_codec);
-    if (m_codec && m_codeccontext)
+    if (m_codeccontext)
     {
         unsigned char* extradata = new unsigned char[36];
         memset(extradata, 0, 36);
@@ -1442,7 +1447,7 @@ bool MythRAOPConnection::CreateDecoder(void)
         m_codeccontext->extradata = extradata;
         m_codeccontext->extradata_size = 36;
         m_codeccontext->channels = m_channels;
-        if (avcodec_open(m_codeccontext, m_codec) < 0)
+        if (avcodec_open2(m_codeccontext, m_codec, NULL) < 0)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 "Failed to open ALAC decoder - going silent...");
@@ -1550,7 +1555,3 @@ int64_t MythRAOPConnection::AudioCardLatency(void)
     uint64_t audiots = m_audio->GetAudiotime();
     return (int64_t)timestamp - (int64_t)audiots;
 }
-
-/*
- * vim:ts=4:sw=4:ai:et:si:sts=4
- */

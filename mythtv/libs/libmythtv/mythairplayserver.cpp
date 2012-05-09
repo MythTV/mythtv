@@ -25,7 +25,7 @@ MythAirplayServer* MythAirplayServer::gMythAirplayServer = NULL;
 MThread*           MythAirplayServer::gMythAirplayServerThread = NULL;
 QMutex*            MythAirplayServer::gMythAirplayServerMutex = new QMutex(QMutex::Recursive);
 
-#define LOC QString("AirPay: ")
+#define LOC QString("AirPlay: ")
 
 #define HTTP_STATUS_OK                  200
 #define HTTP_STATUS_SWITCHING_PROTOCOLS 101
@@ -203,10 +203,11 @@ class APHTTPRequest
 
     void Check(void)
     {
-        LOG(VB_GENERAL, LOG_DEBUG, QString("HTTP Request:\n%1").arg(m_data.data()));
+        LOG(VB_GENERAL, LOG_DEBUG, LOC +
+            QString("HTTP Request:\n%1").arg(m_data.data()));
         if (m_readPos == m_data.size())
             return;
-        LOG(VB_GENERAL, LOG_WARNING,
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
             "AP HTTPRequest: Didn't read entire buffer.");
     }
 
@@ -458,12 +459,14 @@ void MythAirplayServer::HandleResponse(APHTTPRequest *req,
 
     if (req->GetURI() != "/playback-info")
     {
-        LOG(VB_GENERAL, LOG_INFO, QString("Method: %1 URI: %2")
+        LOG(VB_GENERAL, LOG_INFO, LOC +
+            QString("Method: %1 URI: %2")
             .arg(req->GetMethod().data()).arg(req->GetURI().data()));
     }
     else
     {
-        LOG(VB_GENERAL, LOG_DEBUG, QString("Method: %1 URI: %2")
+        LOG(VB_GENERAL, LOG_DEBUG, LOC +
+            QString("Method: %1 URI: %2")
             .arg(req->GetMethod().data()).arg(req->GetURI().data()));
     }
 
@@ -568,7 +571,8 @@ void MythAirplayServer::HandleResponse(APHTTPRequest *req,
             // this may be received before playback starts...
             uint64_t intpos = (uint64_t)pos;
             m_connections[session].position = pos;
-            LOG(VB_GENERAL, LOG_INFO, LOC + QString("Scrub: (post) seek to %1").arg(intpos));
+            LOG(VB_GENERAL, LOG_INFO, LOC +
+                QString("Scrub: (post) seek to %1").arg(intpos));
             MythEvent* me = new MythEvent(ACTION_SEEKABSOLUTE,
                                           QStringList(QString::number(intpos)));
             qApp->postEvent(GetMythMainWindow(), me);
@@ -605,7 +609,8 @@ void MythAirplayServer::HandleResponse(APHTTPRequest *req,
     else if (req->GetURI() == "/photo" ||
              req->GetURI() == "/slideshow-features")
     {
-        LOG(VB_GENERAL, LOG_INFO, LOC + "Slideshow functionality not implemented.");
+        LOG(VB_GENERAL, LOG_INFO, LOC +
+            "Slideshow functionality not implemented.");
     }
     else if (req->GetURI() == "/authorize")
     {
