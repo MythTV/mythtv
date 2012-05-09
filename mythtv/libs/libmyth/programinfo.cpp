@@ -2243,14 +2243,10 @@ QString ProgramInfo::GetPlaybackURL(
             {
                 host  = list.size() == 1 ? list[0]   : list[1];
                 group = list.size() == 1 ? QString() : list[0];
-                StorageGroup *sg = new StorageGroup(group, host);
-                if (sg)
-                {
-                    QString local = sg->FindFile(path);
-                    if (!local.isEmpty())
-                        if (sg->FileExists(local))
-                            return local;
-                }
+                StorageGroup sg = StorageGroup(group, host);
+                QString local = sg.FindFile(path);
+                if (!local.isEmpty() && sg.FileExists(local))
+                    return local;
             }
         }
         return fullpath;
