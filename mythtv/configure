@@ -2171,6 +2171,7 @@ enable x11
 enable xrandr
 enable xv
 disable indevs
+disable sdl
 
 # mythtv paths
 dvb_path_default="${sysroot}/usr/include"
