@@ -255,6 +255,8 @@ class AvFormatDecoder : public DecoderBase
     virtual void StreamChangeCheck(void) { }
     virtual void PostProcessTracks(void) { }
 
+    int DecodeAudio(AVCodecContext *ctx, uint8_t *buffer, int &data_size,
+                    AVPacket *pkt);
     PrivateDecoder *private_dec;
 
     bool is_db_ignored;
@@ -346,7 +348,6 @@ class AvFormatDecoder : public DecoderBase
     InteractiveTV    *itv;                ///< MHEG/MHP decoder
 
     // Audio
-    AVFrame          *m_audioFrame;
     uint8_t          *audioSamples;
     bool              disable_passthru;
 
