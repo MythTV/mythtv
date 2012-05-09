@@ -21,10 +21,12 @@
 #  define bswap_16(x) OSSwapInt16(x)
 #  define bswap_32(x) OSSwapInt32(x)
 #  define bswap_64(x) OSSwapInt64(x)
-#else
+#elif HAVE_BIGENDIAN
 #  error Byte swapping functions not defined for this platform
 #endif
 
+#ifdef bswap_32
+// TODO: Any reason we choose not to use bswap_64 for this?
 static __inline__ double bswap_dbl(double x)
 {
     union {
@@ -36,5 +38,6 @@ static __inline__ double bswap_dbl(double x)
     r.l[1] = bswap_32(w.l[0]);
     return r.d;
 }
+#endif
 
 #endif /* ndef MYTHTV_BSWAP_H */
