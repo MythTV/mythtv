@@ -350,10 +350,12 @@ class MythLog( LOGLEVEL, LOGMASK, LOGFACILITY ):
 
     def log(self, mask, level, message, detail=None):
         """
-        MythLog.log(mask, message, detail=None) -> None
+        MythLog.log(mask, level, message, detail=None) -> None
 
         'mask' sets the bitwise log mask, to be matched against the log
                     filter. If any bits match true, the message will be logged.
+        'level' is the logging level, which must be less than or equal to the
+                    current logging level for the message to be logged.
         'message' and 'detail' set the log message content using the format:
                 <timestamp> <module>: <message>
                         ---- or ----
