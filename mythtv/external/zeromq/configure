@@ -757,6 +757,8 @@ BUILD_PGM_TRUE
 pgm_basename
 OpenPGM_LIBS
 OpenPGM_CFLAGS
+PKG_CONFIG_LIBDIR
+PKG_CONFIG_PATH
 PKG_CONFIG
 subdirs
 pgm_srcdir
@@ -921,6 +923,8 @@ ASCIIDOC
 CPP
 CXXCPP
 PKG_CONFIG
+PKG_CONFIG_PATH
+PKG_CONFIG_LIBDIR
 OpenPGM_CFLAGS
 OpenPGM_LIBS'
 ac_subdirs_all='foreign/openpgm/build-staging/openpgm/pgm/'
@@ -1586,6 +1590,10 @@ Some influential environment variables:
   CPP         C preprocessor
   CXXCPP      C++ preprocessor
   PKG_CONFIG  path to pkg-config utility
+  PKG_CONFIG_PATH
+              directories to add to pkg-config's search path
+  PKG_CONFIG_LIBDIR
+              path overriding pkg-config's built-in search path
   OpenPGM_CFLAGS
               C compiler flags for OpenPGM, overriding pkg-config
   OpenPGM_LIBS
@@ -6346,13 +6354,13 @@ if test "${lt_cv_nm_interface+set}" = set; then :
 else
   lt_cv_nm_interface="BSD nm"
   echo "int some_variable = 0;" > conftest.$ac_ext
-  (eval echo "\"\$as_me:6349: $ac_compile\"" >&5)
+  (eval echo "\"\$as_me:6357: $ac_compile\"" >&5)
   (eval "$ac_compile" 2>conftest.err)
   cat conftest.err >&5
-  (eval echo "\"\$as_me:6352: $NM \\\"conftest.$ac_objext\\\"\"" >&5)
+  (eval echo "\"\$as_me:6360: $NM \\\"conftest.$ac_objext\\\"\"" >&5)
   (eval "$NM \"conftest.$ac_objext\"" 2>conftest.err > conftest.out)
   cat conftest.err >&5
-  (eval echo "\"\$as_me:6355: output\"" >&5)
+  (eval echo "\"\$as_me:6363: output\"" >&5)
   cat conftest.out >&5
   if $GREP 'External.*some_variable' conftest.out > /dev/null; then
     lt_cv_nm_interface="MS dumpbin"
@@ -7555,7 +7563,7 @@ ia64-*-hpux*)
   ;;
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 7558 "configure"' > conftest.$ac_ext
+  echo '#line 7566 "configure"' > conftest.$ac_ext
   if { { eval echo "\"\$as_me\":${as_lineno-$LINENO}: \"$ac_compile\""; } >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -9580,11 +9588,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:9583: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:9591: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:9587: \$? = $ac_status" >&5
+   echo "$as_me:9595: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -9919,11 +9927,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:9922: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:9930: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:9926: \$? = $ac_status" >&5
+   echo "$as_me:9934: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -10024,11 +10032,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:10027: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:10035: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:10031: \$? = $ac_status" >&5
+   echo "$as_me:10039: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -10079,11 +10087,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:10082: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:10090: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:10086: \$? = $ac_status" >&5
+   echo "$as_me:10094: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -12463,7 +12471,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 12466 "configure"
+#line 12474 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -12559,7 +12567,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 12562 "configure"
+#line 12570 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -14515,11 +14523,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:14518: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:14526: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:14522: \$? = $ac_status" >&5
+   echo "$as_me:14530: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -14614,11 +14622,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:14617: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:14625: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:14621: \$? = $ac_status" >&5
+   echo "$as_me:14629: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -14666,11 +14674,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:14669: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:14677: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:14673: \$? = $ac_status" >&5
+   echo "$as_me:14681: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -18849,6 +18857,11 @@ if test "x$with_system_pgm_ext" != "xno"; then
 
 
 
+
+
+
+
+
 if test "x$ac_cv_env_PKG_CONFIG_set" != "xset"; then
 	if test -n "$ac_tool_prefix"; then
   # Extract the first word of "${ac_tool_prefix}pkg-config", so it can be a program name with args.
@@ -18961,53 +18974,52 @@ $as_echo "yes" >&6; }
 $as_echo "no" >&6; }
 		PKG_CONFIG=""
 	fi
-
 fi
 
 pkg_failed=no
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for OpenPGM" >&5
 $as_echo_n "checking for OpenPGM... " >&6; }
 
-if test -n "$PKG_CONFIG"; then
-    if test -n "$OpenPGM_CFLAGS"; then
-        pkg_cv_OpenPGM_CFLAGS="$OpenPGM_CFLAGS"
-    else
-        if test -n "$PKG_CONFIG" && \
+if test -n "$OpenPGM_CFLAGS"; then
+    pkg_cv_OpenPGM_CFLAGS="$OpenPGM_CFLAGS"
+ elif test -n "$PKG_CONFIG"; then
+    if test -n "$PKG_CONFIG" && \
     { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"openpgm-5.1 >= 5.1\""; } >&5
   ($PKG_CONFIG --exists --print-errors "openpgm-5.1 >= 5.1") 2>&5
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; then
   pkg_cv_OpenPGM_CFLAGS=`$PKG_CONFIG --cflags "openpgm-5.1 >= 5.1" 2>/dev/null`
+		      test "x$?" != "x0" && pkg_failed=yes
 else
   pkg_failed=yes
 fi
-    fi
-else
-	pkg_failed=untried
+ else
+    pkg_failed=untried
 fi
-if test -n "$PKG_CONFIG"; then
-    if test -n "$OpenPGM_LIBS"; then
-        pkg_cv_OpenPGM_LIBS="$OpenPGM_LIBS"
-    else
-        if test -n "$PKG_CONFIG" && \
+if test -n "$OpenPGM_LIBS"; then
+    pkg_cv_OpenPGM_LIBS="$OpenPGM_LIBS"
+ elif test -n "$PKG_CONFIG"; then
+    if test -n "$PKG_CONFIG" && \
     { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"openpgm-5.1 >= 5.1\""; } >&5
   ($PKG_CONFIG --exists --print-errors "openpgm-5.1 >= 5.1") 2>&5
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; then
   pkg_cv_OpenPGM_LIBS=`$PKG_CONFIG --libs "openpgm-5.1 >= 5.1" 2>/dev/null`
+		      test "x$?" != "x0" && pkg_failed=yes
 else
   pkg_failed=yes
 fi
-    fi
-else
-	pkg_failed=untried
+ else
+    pkg_failed=untried
 fi
 
 
 
 if test $pkg_failed = yes; then
+   	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
 
 if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
         _pkg_short_errors_supported=yes
@@ -19015,9 +19027,9 @@ else
         _pkg_short_errors_supported=no
 fi
         if test $_pkg_short_errors_supported = yes; then
-	        OpenPGM_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "openpgm-5.1 >= 5.1"`
+	        OpenPGM_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors --cflags --libs "openpgm-5.1 >= 5.1" 2>&1`
         else
-	        OpenPGM_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "openpgm-5.1 >= 5.1"`
+	        OpenPGM_PKG_ERRORS=`$PKG_CONFIG --print-errors --cflags --libs "openpgm-5.1 >= 5.1" 2>&1`
         fi
 	# Put the nasty error message in config.log where it belongs
 	echo "$OpenPGM_PKG_ERRORS" >&5
@@ -19031,9 +19043,10 @@ installed software in a non-standard prefix.
 
 Alternatively, you may set the environment variables OpenPGM_CFLAGS
 and OpenPGM_LIBS to avoid the need to call pkg-config.
-See the pkg-config man page for more details.
-" "$LINENO" 5
+See the pkg-config man page for more details." "$LINENO" 5
 elif test $pkg_failed = untried; then
+     	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
 	{ { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
 $as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
 as_fn_error "The pkg-config script could not be found or is too old.  Make sure it
@@ -19051,7 +19064,7 @@ else
 	OpenPGM_LIBS=$pkg_cv_OpenPGM_LIBS
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
-	:
+
 fi
 
 $as_echo "#define ZMQ_HAVE_OPENPGM 1" >>confdefs.h
