@@ -1291,6 +1291,7 @@ HAVE_LIST="
     asm_types_h
     attribute_may_alias
     attribute_packed
+    byteswap_h
     cbrtf
     closesocket
     cmov
@@ -1374,6 +1375,7 @@ HAVE_LIST="
     symver_gnu_asm
     sysconf
     sysctl
+    sys_endian_h
     sys_mman_h
     sys_param_h
     sys_resource_h
