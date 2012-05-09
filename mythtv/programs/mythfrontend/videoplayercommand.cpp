@@ -15,14 +15,6 @@
 
 namespace
 {
-    QString ShellEscape(const QString &src)
-    {
-        return QString(src)
-                .replace(QRegExp("\""), "\\\"")
-                .replace(QRegExp("`"), "\\`")
-                .replace(QRegExp("\\$"), "\\$");
-    }
-
     QString ExpandPlayCommand(const QString &command, const QString &filename)
     {
         // If handler contains %d, substitute default player command
@@ -44,7 +36,7 @@ namespace
             tmp.replace(QRegExp("%d"), default_handler);
         }
 
-        QString arg = QString("\"%1\"").arg(ShellEscape(filename));
+        QString arg = ShellEscape(filename);
 
         if (tmp.contains("%s"))
             return tmp.replace(QRegExp("%s"), arg);

@@ -281,8 +281,7 @@ void Search::executeSearch(const QString &script, const QString &query, uint pag
     }
 
     args.append("-S");
-    QString term = query;
-    args.append(ShellEscape(term));
+    args.append(ShellEscape(query));
 
     LOG(VB_GENERAL, LOG_DEBUG, LOC +
         QString("Internet Search Query: %1 %2") .arg(cmd).arg(args.join(" ")));

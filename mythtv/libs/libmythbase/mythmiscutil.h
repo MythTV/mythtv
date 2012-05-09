@@ -110,7 +110,7 @@ MBASE_PUBLIC QString xml_indent(uint level);
  MBASE_PUBLIC  bool myth_ioprio(int val); // range -1..8, smaller is higher priority
 
  MBASE_PUBLIC  bool MythRemoveDirectory(QDir &aDir);
- MBASE_PUBLIC  QString &ShellEscape(QString &string);
+ MBASE_PUBLIC  QString ShellEscape(const QString &string);
 
  MBASE_PUBLIC  void setHttpProxy(void);
 
