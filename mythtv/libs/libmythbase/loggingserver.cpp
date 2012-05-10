@@ -654,7 +654,7 @@ void LogServerThread::run(void)
             this, SLOT(handleSigHup()));
 
     /* Setup SIGHUP */
-    LOG(VB_GENERAL, LOG_NOTICE, "Setting up SIGHUP handler");
+    LOG(VB_GENERAL, LOG_INFO, "Setup SIGHUP handler");
     struct sigaction sa;
     sa.sa_handler = logSighup;
     sigemptyset( &sa.sa_mask );
@@ -678,9 +678,11 @@ void LogServerThread::run(void)
     m_zmqPubSock = m_zmqContext->createSocket(nzmqt::ZMQSocket::TYP_PUB);
     m_zmqPubSock->bindTo("inproc://loggers");
 
-    logThreadStarted.wakeAll();
+    // cerr << "wake all" << endl;
     locker.unlock();
-    
+    logThreadStarted.wakeAll();
+    // cerr << "unlock" << endl;
+ 
     m_heartbeatTimer = new QTimer(this);
     connect(m_heartbeatTimer, SIGNAL(timeout()), this, SLOT(checkHeartBeats()));
     m_heartbeatTimer->start(1000);
@@ -1112,10 +1114,12 @@ void logServerStart(void)
     if (!logServerThread)
         logServerThread = new LogServerThread();
 
+    // cerr << "starting server" << endl;
     QMutexLocker locker(&logThreadStartedMutex);
     logServerThread->start();
     logThreadStarted.wait(locker.mutex());
-
+    locker.unlock();
+    // cerr << "done starting server" << endl;
 }
 
 /// \brief  Entry point for stopping logging for an application
@@ -1133,6 +1137,15 @@ void logServerStop(void)
     {
         it.value()->stopDatabaseAccess();
     }
+}
+
+void logServerWait(void)
+{
+    // cerr << "waiting" << endl;
+    QMutexLocker locker(&logThreadStartedMutex);
+    logThreadStarted.wait(locker.mutex());
+    locker.unlock();
+    // cerr << "done waiting" << endl;
 }
 
 void FileLogger::receivedMessage(const QList<QByteArray> &msg)

@@ -24,6 +24,7 @@ class LoggingItem;
 
 MBASE_PUBLIC void logServerStart(void);
 MBASE_PUBLIC void logServerStop(void);
+void logServerWait(void);
 
 /// \brief Base class for the various logging mechanisms
 class LoggerBase : public QObject {

@@ -80,13 +80,12 @@ int main(int argc, char *argv[])
     if (retval != GENERIC_EXIT_OK)
         return retval;
 
-    // Must be started before ConfigureLogging()
-    logServerStart();
-
     bool daemonize = cmdline.toBool("daemon");
     QString mask("general");
     if ((retval = cmdline.ConfigureLogging(mask, daemonize)) != GENERIC_EXIT_OK)
         return retval;
+
+    logServerStart();
 
     if (daemonize)
         // Don't listen to console input if daemonized

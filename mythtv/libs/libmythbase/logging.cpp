@@ -268,7 +268,10 @@ void LoggerThread::run(void)
     LOG(VB_GENERAL, LOG_INFO, "Added logging to the console");
 
     if (m_locallogs)
+    {
+        logServerWait();
         m_zmqContext = logServerThread->getZMQContext();
+    }
     else
     {
         m_zmqContext = nzmqt::createDefaultContext(NULL);
