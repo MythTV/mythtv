@@ -585,12 +585,6 @@ static void setupKeys(void)
         "Decrease rating"),            "7");
     REG_KEY("Music", "REFRESH",    QT_TRANSLATE_NOOP("MythControls",
         "Refresh music tree"),         "8");
-    REG_KEY("Music", "FILTER",     QT_TRANSLATE_NOOP("MythControls",
-        "Filter All My Music"),        "F");
-    REG_KEY("Music", "INCSEARCH",     QT_TRANSLATE_NOOP("MythControls",
-        "Show incremental search dialog"),     "Ctrl+S");
-    REG_KEY("Music", "INCSEARCHNEXT", QT_TRANSLATE_NOOP("MythControls",
-        "Incremental search find next match"), "Ctrl+N");
     REG_KEY("Music", "SPEEDUP",    QT_TRANSLATE_NOOP("MythControls",
         "Increase Play Speed"),   "W");
     REG_KEY("Music", "SPEEDDOWN",  QT_TRANSLATE_NOOP("MythControls",
