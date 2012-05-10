@@ -489,12 +489,10 @@ void PlaylistEditorView::ShowMenu(void)
         {
             menu = createPlaylistMenu();
         }
-        else if (mnode->getAction() == "album" ||
-                 mnode->getAction() == "artist" ||
-                 mnode->getAction() == "compartist" ||
-                 mnode->getAction() == "genre" ||
-                 mnode->getAction() == "year" ||
-                 mnode->getAction() == "rating")
+        else if (mnode->getAction() == "trackid")
+        {
+        }
+        else
         {
             menu = createPlaylistOptionsMenu();
 
@@ -680,21 +678,7 @@ void PlaylistEditorView::treeItemClicked(MythUIButtonListItem *item)
     if (!mnode)
         return;
 
-    if (mnode->getAction() == "smartplaylists" ||
-        mnode->getAction() == "smartplaylistcategory" ||
-        mnode->getAction() == "playlists" ||
-        mnode->getAction() == "smartplaylist" ||
-        mnode->getAction() == "playlist" ||
-        mnode->getAction() == "album" ||
-        mnode->getAction() == "artist" ||
-        mnode->getAction() == "compartist" ||
-        mnode->getAction() == "genre" ||
-        mnode->getAction() == "year" ||
-        mnode->getAction() == "rating")
-    {
-        ShowMenu();
-    }
-    else if (mnode->getAction() == "trackid")
+    if (mnode->getAction() == "trackid")
     {
         if (gPlayer->getPlaylist()->checkTrack(mnode->getInt()))
         {
@@ -709,6 +693,8 @@ void PlaylistEditorView::treeItemClicked(MythUIButtonListItem *item)
             mnode->setCheck(MythUIButtonListItem::FullChecked);
         }
     }
+    else
+        ShowMenu();
 }
 
 
