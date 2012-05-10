@@ -317,6 +317,8 @@ void SubtitleFormat::Load(const QString &family,
                                resultBG, testBG);
     if (!IsUnlocked(prefix, kSubAttrPixelsize))
         m_pixelSizeMap[prefix] = resultFont->GetFace()->pixelSize();
+
+    delete negFont;
 }
 
 QSet<QString> SubtitleFormat::Diff(const QString &family,
