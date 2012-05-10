@@ -389,7 +389,7 @@ void MythWebView::keyPressEvent(QKeyEvent *event)
 
     // if the QWebView widget has focus then all keypresses from a regular
     // keyboard get sent here first
-    if (editHasFocus || (m_parentBrowser && m_parentBrowser->IsInputToggled()))
+    if (editHasFocus || m_parentBrowser->IsInputToggled())
     {
         // input is toggled so pass all keypresses to the QWebView's handler
         QWebView::keyPressEvent(event);
