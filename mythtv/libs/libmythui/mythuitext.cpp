@@ -601,8 +601,8 @@ bool MythUIText::GetNarrowWidth(const QStringList & paragraphs,
     MythRect textrect(m_Area);
     qreal    height, last_line_width, lines;
     int      best_width, too_narrow, last_width = -1;
-    int      num_lines, line_height;
-    int      attempt;
+    int      num_lines, line_height = 0;
+    int      attempt = 0;
     Qt::TextElideMode cutdown = m_Cutdown;
     m_Cutdown = Qt::ElideNone;
 
@@ -620,6 +620,9 @@ bool MythUIText::GetNarrowWidth(const QStringList & paragraphs,
 
         LayoutParagraphs(paragraphs, textoption, width, height,
                          min_rect, last_line_width, num_lines, false);
+
+        if (num_lines <= 0)
+            return false;
 
         if (height > m_drawRect.height())
         {
