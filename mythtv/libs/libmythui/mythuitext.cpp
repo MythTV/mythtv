@@ -25,28 +25,24 @@ MythUIText::MythUIText(MythUIType *parent, const QString &name)
       m_drawRect(),                                  m_cursorPos(-1, -1),
       m_Message(""),                                 m_CutMessage(""),
       m_DefaultMessage(""),                          m_TemplateText(""),
-      m_Cutdown(Qt::ElideRight),
+      m_ShrinkNarrow(true),                          m_Cutdown(Qt::ElideRight),
+      m_MultiLine(false),                            m_Ascent(0),
+      m_Descent(0),                                  m_leftBearing(0),
+      m_rightBearing(0),                             m_Leading(1),
+      m_extraLeading(0),                             m_lineHeight(0),
+      m_textCursor(-1),
       m_Font(new MythFontProperties()),              m_colorCycling(false),
       m_startColor(),                                m_endColor(),
       m_numSteps(0),                                 m_curStep(0),
       curR(0.0),              curG(0.0),             curB(0.0),
-      incR(0.0),              incG(0.0),             incB(0.0)
+      incR(0.0),              incG(0.0),             incB(0.0),
+      m_scrollPause(ScrollBounceDelay),              m_scrollOffset(0),
+      m_scrollBounce(false),                         m_scrolling(false),
+      m_scrollDirection(ScrollNone),                 m_textCase(CaseNormal)
 {
 #if 0 // Not currently used
     m_usingAltArea = false;
 #endif
-    m_ShrinkNarrow = true;
-    m_MultiLine = false;
-    m_scrollPause = ScrollBounceDelay;
-    m_scrollBounce = false;
-    m_scrolling = false;
-    m_scrollDirection = ScrollNone;
-    m_textCase = CaseNormal;
-    m_Ascent = m_Descent = m_leftBearing = m_rightBearing = 0;
-    m_Leading = 1;
-    m_extraLeading = 0;
-    m_lineHeight = 0;
-    m_textCursor = -1;
     m_EnableInitiator = true;
 
     m_FontStates.insert("default", MythFontProperties());

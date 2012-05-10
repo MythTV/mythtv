@@ -3563,11 +3563,12 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool selecte
 //---------------------------------------------------------
 SearchButtonListDialog::SearchButtonListDialog(MythScreenStack *parent, const char *name,
                                                MythUIButtonList *parentList, QString searchText)
-    : MythScreenType(parent, name, false)
+    : MythScreenType(parent, name, false),
+        m_startsWith(false),            m_parentList(parentList),
+        m_searchText(searchText),       m_searchEdit(NULL),
+        m_prevButton(NULL),             m_nextButton(NULL),
+        m_searchState(NULL)
 {
-    m_parentList = parentList;
-    m_searchText = searchText;
-    m_startsWith = false;
 }
 
 SearchButtonListDialog::~SearchButtonListDialog(void)

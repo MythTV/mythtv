@@ -824,6 +824,7 @@ QWebView *MythWebView::createWindow(QWebPage::WebWindowType type)
  */
 MythUIWebBrowser::MythUIWebBrowser(MythUIType *parent, const QString &name)
                  : MythUIType(parent, name),
+      m_parentScreen(NULL),
       m_browser(NULL),       m_image(NULL),
       m_active(false),       m_wasActive(false),
       m_initialized(false),  m_lastUpdateTime(QTime()),
