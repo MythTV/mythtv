@@ -592,6 +592,18 @@ static void setupKeys(void)
     REG_KEY("Music", "MARK",       QT_TRANSLATE_NOOP("MythControls",
         "Toggle track selection"), "T");
 
+    // switch to view key bindings
+    REG_KEY("Music", "SWITCHTOPLAYLIST",              QT_TRANSLATE_NOOP("MythControls",
+        "Switch to the current playlist view"), "");
+    REG_KEY("Music", "SWITCHTOPLAYLISTEDITORTREE",    QT_TRANSLATE_NOOP("MythControls",
+        "Switch to the playlist editor tree view"), "");
+    REG_KEY("Music", "SWITCHTOPLAYLISTEDITORGALLERY", QT_TRANSLATE_NOOP("MythControls",
+        "Switch to the playlist editor gallery view"), "");
+    REG_KEY("Music", "SWITCHTOSEARCH",                QT_TRANSLATE_NOOP("MythControls",
+        "Switch to the search view"), "");
+    REG_KEY("Music", "SWITCHTOVISUALISER",            QT_TRANSLATE_NOOP("MythControls",
+        "Switch to the fullscreen visualiser view"), "");
+
 
 #ifdef FIXME
 // FIXME need to find a way to stop the media monitor jumping to the main menu before

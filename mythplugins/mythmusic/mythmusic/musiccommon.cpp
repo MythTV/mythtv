@@ -667,6 +667,16 @@ bool MusicCommon::keyPressEvent(QKeyEvent *e)
                     m_movingTracksState->DisplayState((m_moveTrackMode ? "on" : "off"));
             }
         }
+        else if (action == "SWITCHTOPLAYLIST" && m_currentView != MV_PLAYLIST)
+            switchView(MV_PLAYLIST);
+        else if (action == "SWITCHTOPLAYLISTEDITORTREE" && m_currentView != MV_PLAYLISTEDITORTREE)
+            switchView(MV_PLAYLISTEDITORTREE);
+        else if (action == "SWITCHTOPLAYLISTEDITORGALLERY" && m_currentView != MV_PLAYLISTEDITORGALLERY)
+            switchView(MV_PLAYLISTEDITORGALLERY);
+        else if (action == "SWITCHTOSEARCH" && m_currentView != MV_SEARCH)
+            switchView(MV_SEARCH);
+        else if (action == "SWITCHTOVISUALISER" && m_currentView != MV_VISUALIZER)
+            switchView(MV_VISUALIZER);
         else
             handled = false;
     }
