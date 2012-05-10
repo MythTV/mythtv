@@ -112,7 +112,7 @@ int JoystickMenuThread::Init(QString &config_file)
         return(rc);
     }
 
-    ioctl(m_fd, JSIOCGBUTTONS, &m_buttonCount);
+    rc = ioctl(m_fd, JSIOCGBUTTONS, &m_buttonCount);
     if (rc == -1)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
