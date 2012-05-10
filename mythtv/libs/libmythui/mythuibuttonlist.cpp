@@ -614,6 +614,8 @@ bool MythUIButtonList::DistributeRow(int &first_button, int &last_button,
         realButton = m_ButtonList[buttonIdx];
         buttonstate = dynamic_cast<MythUIGroup *>
                       (realButton->GetCurrentState());
+        if (!buttonstate)
+            break;
         width = minButtonWidth(buttonstate->GetArea());
 
         if ((*col_widths)[col_idx] < width)
@@ -1182,6 +1184,9 @@ bool MythUIButtonList::DistributeButtons(void)
                 realButton = m_ButtonList[buttonIdx];
                 buttonstate = dynamic_cast<MythUIGroup *>
                               (realButton->GetCurrentState());
+                if (!buttonstate)
+                    break; // Not continue
+
                 MythRect area = buttonstate->GetArea();
 
                 // Center button within width of column
@@ -1876,7 +1881,7 @@ int MythUIButtonList::PageDown(void)
         buttonstate = dynamic_cast<MythUIGroup *>
                       (realButton->GetCurrentState());
 
-        if (buttonstate == NULL)
+        if (!buttonstate)
         {
             LOG(VB_GENERAL, LOG_ERR,
                 "PageDown: Failed to query buttonlist state");
@@ -1890,7 +1895,8 @@ int MythUIButtonList::PageDown(void)
         buttonItem->SetToRealButton(realButton, false);
         buttonstate = dynamic_cast<MythUIGroup *>
                       (realButton->GetCurrentState());
-        total += m_itemHorizSpacing + buttonstate->GetArea().height();
+        if (buttonstate)
+            total += m_itemHorizSpacing + buttonstate->GetArea().height();
     }
 
     return num_items - 1;
@@ -2503,7 +2509,7 @@ void MythUIButtonList::customEvent(QEvent *event)
     if (event->type() == NextButtonListPageEvent::kEventType)
     {
         NextButtonListPageEvent *npe =
-            dynamic_cast<NextButtonListPageEvent*>(event);
+            static_cast<NextButtonListPageEvent*>(event);
         int cur = npe->m_start;
         for (; cur < npe->m_start + npe->m_pageSize && cur < GetCount(); ++cur)
         {
