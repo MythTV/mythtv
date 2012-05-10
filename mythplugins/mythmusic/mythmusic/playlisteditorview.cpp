@@ -659,10 +659,10 @@ void PlaylistEditorView::createRootNode(void )
     }
     node->SetData(qVariantFromValue(compTracks));
 
-#if 0
     node = new MusicGenericTree(m_rootNode, tr("Directory"), "directory");
     node->setDrawArrow(true);
-#endif
+    node->SetData(qVariantFromValue(gMusicData->all_music->getAllMetadata()));
+
     node = new MusicGenericTree(m_rootNode, tr("Playlists"), "playlists");
     node->setDrawArrow(true);
 
@@ -780,6 +780,11 @@ void PlaylistEditorView::treeItemVisible(MythUIButtonListItem *item)
         else if (mnode->getAction() == "compilations")
         {
             state = "compilations";
+            artFile="blank.png";
+        }
+        else if (mnode->getAction() == "directory")
+        {
+            state = "directory";
             artFile="blank.png";
         }
         else if (mnode->getAction() == "playlists")
@@ -1079,6 +1084,79 @@ void PlaylistEditorView::filterTracks(MusicGenericTree *node)
             ++i;
         }
 
+    }
+    else if (node->getAction() == "directory")
+    {
+        QMap<QString, MetadataPtrList*> map;
+
+        // which directories have we already filtered by
+        QString dir;
+        MusicGenericTree *climber = node;
+        while (climber)
+        {
+            dir = climber->GetText() + '/' + dir;
+            climber = (MusicGenericTree *) climber->getParent();
+        }
+
+        // remove the top two nodes
+        QString top2 = "Root Music Node/" + tr("Directory") + '/';
+        if (dir.startsWith(top2))
+            dir = dir.mid(top2.length());
+
+        for (int x = 0; x < tracks->count(); x++)
+        {
+            Metadata *mdata = tracks->at(x);
+            if (mdata)
+            {
+                QString filename = mdata->Filename(false);
+
+                if (filename.startsWith(dir))
+                    filename = filename.mid(dir.length());
+
+                QStringList dirs = filename.split("/");
+
+                QString key = dirs.count() > 1 ? dirs[0] : "[TRACK]" + dirs[0];
+                if (map.contains(key))
+                {
+                    MetadataPtrList *filteredTracks = map.value(key);
+                    filteredTracks->append(mdata);
+                }
+                else
+                {
+                    MetadataPtrList *filteredTracks = new MetadataPtrList;
+                    m_deleteList.append(filteredTracks);
+                    filteredTracks->append(mdata);
+                    map.insert(key, filteredTracks);
+                }
+            }
+        }
+
+        // add directories first
+        QMap<QString, MetadataPtrList*>::const_iterator i = map.constBegin();
+        while (i != map.constEnd())
+        {
+            if (!i.key().startsWith("[TRACK]"))
+            {
+                MusicGenericTree *newnode = new MusicGenericTree(node, i.key(), "directory");
+                newnode->SetData(qVariantFromValue(i.value()));
+            }
+            ++i;
+        }
+
+        // now add tracks
+        i = map.constBegin();
+        while (i != map.constEnd())
+        {
+            if (i.key().startsWith("[TRACK]"))
+            {
+                MusicGenericTree *newnode = new MusicGenericTree(node, i.key().mid(7), "trackid");
+                newnode->setInt(i.value()->at(0)->ID());
+                newnode->setDrawArrow(false);
+                bool hasTrack = gPlayer->getPlaylist()->checkTrack(newnode->getInt());
+                newnode->setCheck( hasTrack ? MythUIButtonListItem::FullChecked : MythUIButtonListItem::NotChecked);
+            }
+            ++i;
+        }
     }
     else if (node->getAction() == "artist" || node->getAction() == "compartist" ||
              node->getAction() == "album" || node->getAction() == "genre" ||
