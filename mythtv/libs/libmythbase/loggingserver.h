@@ -129,7 +129,7 @@ typedef QList<LogMessage *> LogMessageList;
 ///        ZeroMQ.
 class LogServerThread : public QObject, public MThread
 {
-    Q_OBJECT;
+    Q_OBJECT
 
     friend void logSighup(int signum);
   public:

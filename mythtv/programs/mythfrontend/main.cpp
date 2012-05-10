@@ -1487,14 +1487,6 @@ int main(int argc, char **argv)
 
     CleanupGuard callCleanup(cleanup);
 
-#ifndef _WIN32
-    QList<int> signallist;
-    signallist << SIGINT << SIGTERM << SIGSEGV << SIGABRT;
-    SignalHandler handler(signallist);
-    handler.AddHandler(SIGUSR1, handleSIGUSR1);
-    handler.AddHandler(SIGUSR2, handleSIGUSR2);
-#endif
-
 #ifdef Q_WS_MACX
     // Without this, we can't set focus to any of the CheckBoxSetting, and most
     // of the MythPushButton widgets, and they don't use the themed background.
@@ -1502,6 +1494,14 @@ int main(int argc, char **argv)
 #endif
     new QApplication(argc, argv);
     QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHFRONTEND);
+
+#ifndef _WIN32
+    QList<int> signallist;
+    signallist << SIGINT << SIGTERM << SIGSEGV << SIGABRT;
+    SignalHandler handler(signallist);
+    handler.AddHandler(SIGUSR1, handleSIGUSR1);
+    handler.AddHandler(SIGUSR2, handleSIGUSR2);
+#endif
 
     int retval;
     if ((retval = cmdline.ConfigureLogging()) != GENERIC_EXIT_OK)

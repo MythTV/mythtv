@@ -266,12 +266,6 @@ int main(int argc, char *argv[])
 
     CleanupGuard callCleanup(cleanup);
 
-#ifndef _WIN32
-    QList<int> signallist;
-    signallist << SIGINT << SIGTERM << SIGSEGV << SIGABRT;
-    SignalHandler handler(signallist);
-#endif
-
 #ifdef Q_WS_MACX
     // Without this, we can't set focus to any of the CheckBoxSetting, and most
     // of the MythPushButton widgets, and they don't use the themed background.
@@ -279,6 +273,12 @@ int main(int argc, char *argv[])
 #endif
     new QApplication(argc, argv, use_display);
     QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHTV_SETUP);
+
+#ifndef _WIN32
+    QList<int> signallist;
+    signallist << SIGINT << SIGTERM << SIGSEGV << SIGABRT;
+    SignalHandler handler(signallist);
+#endif
 
     if (cmdline.toBool("display"))
         display = cmdline.toString("display");
