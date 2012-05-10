@@ -145,7 +145,7 @@ int main(int argc, char *argv[])
     {
         // refresh-all is default behavior if no other arguments given
         lookup->CopyRuleInetrefsToRecordings();
-        lookup->HandleAllRecordings("refresh-rules");
+        lookup->HandleAllRecordings(cmdline.toBool("refresh-rules"));
     }
 
     while (lookup->StillWorking())
