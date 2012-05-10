@@ -591,6 +591,10 @@ static void setupKeys(void)
         "Decrease Play Speed"),   "X");
     REG_KEY("Music", "MARK",       QT_TRANSLATE_NOOP("MythControls",
         "Toggle track selection"), "T");
+    REG_KEY("Music", "TOGGLESHUFFLE", QT_TRANSLATE_NOOP("MythControls",
+        "Toggle shuffle mode"),    "");
+    REG_KEY("Music", "TOGGLEREPEAT",  QT_TRANSLATE_NOOP("MythControls",
+        "Toggle repeat mode"),     "");
 
     // switch to view key bindings
     REG_KEY("Music", "SWITCHTOPLAYLIST",              QT_TRANSLATE_NOOP("MythControls",
