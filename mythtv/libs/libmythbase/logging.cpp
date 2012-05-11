@@ -278,10 +278,13 @@ void LoggerThread::run(void)
         m_zmqContext->start();
     }
 
+    qRegisterMetaType<QList<QByteArray> >("QList<QByteArray>");
+
     m_zmqSocket = m_zmqContext->createSocket(nzmqt::ZMQSocket::TYP_DEALER,
                                              this);
     connect(m_zmqSocket, SIGNAL(messageReceived(const QList<QByteArray>&)),
-            SLOT(messageReceived(const QList<QByteArray>&)));
+            SLOT(messageReceived(const QList<QByteArray>&)),
+            Qt::QueuedConnection);
 
     if (m_locallogs)
         m_zmqSocket->connectTo("inproc://mylogs");
@@ -302,7 +305,8 @@ void LoggerThread::run(void)
     loggingGetTimeStamp(&m_epoch, NULL);
     
     QTimer *timer = new QTimer(this);
-    connect(timer, SIGNAL(timeout()), this, SLOT(checkHeartBeat()));
+    connect(timer, SIGNAL(timeout()), this, SLOT(checkHeartBeat()),
+            Qt::QueuedConnection);
     timer->start(1000);
 
     QMutexLocker qLock(&logQueueMutex);
@@ -379,6 +383,7 @@ void LoggerThread::checkHeartBeat(void)
 /// \brief  Send a ping to the log server
 void LoggerThread::pingLogServer(void)
 {
+    // cout << "pong" << endl;
     m_zmqSocket->sendMessage(QByteArray(""));
 }
 
@@ -414,6 +419,7 @@ void LoggerThread::launchLogServer(void)
 void LoggerThread::messageReceived(const QList<QByteArray> &msg)
 {
     m_initialWaiting = false;
+    // cout << "ping" << endl;
     loggingGetTimeStamp(&m_epoch, NULL);
     pingLogServer();
 }

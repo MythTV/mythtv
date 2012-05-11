@@ -633,25 +633,32 @@ namespace nzmqt
         // This method is public because it can be called directly if you need to.
         inline void poll(long timeout_ = 0)
         {
-            QMutexLocker lock(&m_pollItemsMutex);
+            int cnt;
+            do {
+                QMutexLocker lock(&m_pollItemsMutex);
 
-            if (m_pollItems.empty())
-                return;
+                if (m_pollItems.empty())
+                    return;
 
-            zmq::poll(&m_pollItems[0], m_pollItems.size(), timeout_);
+                cnt = zmq::poll(&m_pollItems[0], m_pollItems.size(), timeout_);
+                if (cnt <= 0)
+                    return;
 
-            PollItems::iterator poIt = m_pollItems.begin();
-            Sockets::iterator soIt = m_sockets.begin();
-            while (poIt != m_pollItems.end())
-            {
-                if (poIt->revents & ZMQSocket::EVT_POLLIN)
+                PollItems::iterator poIt = m_pollItems.begin();
+                Sockets::iterator soIt = m_sockets.begin();
+                int i = 0;
+                while (i < cnt && poIt != m_pollItems.end())
                 {
-                    QList<QByteArray> message = (*soIt)->receiveMessage();
-                    (*soIt)->onMessageReceived(message);
+                    if (poIt->revents & ZMQSocket::EVT_POLLIN)
+                    {
+                        QList<QByteArray> message = (*soIt)->receiveMessage();
+                        (*soIt)->onMessageReceived(message);
+                        i++;
+                    }
+                    ++soIt;
+                    ++poIt;
                 }
-                ++soIt;
-                ++poIt;
-            }
+            } while (cnt > 0);
         }
 
     protected:
