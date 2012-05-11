@@ -431,9 +431,9 @@ static bool performActualUpdate(
  *
  *   If the "DBSchemaVer" property equals the currentDatabase version this
  *   returns true immediately. If not, we try to do a database backup,
- *   prompt the user for permission to do the upgrade,
- *   lock the schemalock table, call doUpgradeTVDatabaseSchema()
- *   to do the actual update, and then we unlock the schemalock table.
+ *   if interactive prompt the user for permission to do the upgrade,
+ *   and if permitted or non-interactive with a successful backup
+ *   do the actual update.
  *
  *   If the program running this function is killed while
  *   this is running then the schema may be corrupted.
@@ -446,74 +446,81 @@ bool UpgradeTVDatabaseSchema(const bool upgradeAllowed,
 #ifdef IGNORE_SCHEMA_VER_MISMATCH
     return true;
 #endif
-    SchemaUpgradeWizard  * DBup;
+    SchemaUpgradeWizard *schema_wizard = NULL;
 
-
+    // Suppress DB messages and turn of the settings cache,
+    // These are likely to confuse the users and the code, respectively.
     GetMythDB()->SetSuppressDBMessages(true);
     gCoreContext->ActivateSettingsCache(false);
 
-    DBup = SchemaUpgradeWizard::Get("DBSchemaVer", "MythTV",
-                                    currentDatabaseVersion);
-
-    // There may be a race condition where another program (e.g. mythbackend)
-    // is upgrading, so wait up to 5 seconds for a more accurate version:
-    DBup->CompareAndWait(5);
-
-    if (DBup->versionsBehind == 0)  // same schema
+    // Get the schema upgrade lock
+    MSqlQuery query(MSqlQuery::InitCon());
+    bool locked = DBUtil::TryLockSchema(query, 1);
+    for (uint i = 0; i < 2*60 && !locked; i++)
     {
-        gCoreContext->ActivateSettingsCache(true);
-        GetMythDB()->SetSuppressDBMessages(false);
-        return true;
+        LOG(VB_GENERAL, LOG_INFO, "Waiting for database schema upgrade lock");
+        locked = DBUtil::TryLockSchema(query, 1);
+        if (locked)
+            LOG(VB_GENERAL, LOG_INFO, "Got schema upgrade lock");
+    }
+    if (!locked)
+    {
+        LOG(VB_GENERAL, LOG_INFO, "Failed to get schema upgrade lock");
+        goto upgrade_error_exit;
     }
 
+    // Determine if an upgrade is needed
+    schema_wizard = SchemaUpgradeWizard::Get(
+        "DBSchemaVer", "MythTV", currentDatabaseVersion);
+    if (schema_wizard->Compare() == 0) // DB schema is what we need it to be..
+        goto upgrade_ok_exit;
+
     if (!upgradeAllowed)
-        LOG(VB_GENERAL, LOG_ERR, "Not allowed to upgrade the database.");
+        LOG(VB_GENERAL, LOG_WARNING, "Not allowed to upgrade the database.");
 
     // Pop up messages, questions, warnings, etc.
-    switch (DBup->PromptForUpgrade("TV", upgradeAllowed,
-                                   upgradeIfNoUI, MINIMUM_DBMS_VERSION))
+    switch (schema_wizard->PromptForUpgrade(
+                "TV", upgradeAllowed, upgradeIfNoUI, MINIMUM_DBMS_VERSION))
     {
         case MYTH_SCHEMA_USE_EXISTING:
-            gCoreContext->ActivateSettingsCache(true);
-            GetMythDB()->SetSuppressDBMessages(false);
-            return true;
+            goto upgrade_ok_exit;
         case MYTH_SCHEMA_ERROR:
         case MYTH_SCHEMA_EXIT:
-            GetMythDB()->SetSuppressDBMessages(false);
-            return false;
+            goto upgrade_error_exit;
         case MYTH_SCHEMA_UPGRADE:
             break;
     }
 
-    MSqlQuery query(MSqlQuery::InitCon(MSqlQuery::kDedicatedConnection));
-    if (!query.exec(QString("ALTER DATABASE %1 DEFAULT"
-                            " CHARACTER SET utf8 COLLATE utf8_general_ci;")
-                    .arg(gCoreContext->GetDatabaseParams().dbName)))
-        MythDB::DBError("UpgradeTVDatabaseSchema -- alter charset", query);
+    LOG(VB_GENERAL, LOG_DEBUG, QString("Newest MythTV Schema Version : %1")
+        .arg(currentDatabaseVersion));
 
-
-    LOG(VB_GENERAL, LOG_CRIT, "Newest MythTV Schema Version : "+
-            currentDatabaseVersion);
-
-    if (!DBUtil::lockSchema(query))
+    // Upgrade the schema
+    if (!doUpgradeTVDatabaseSchema())
     {
-        GetMythDB()->SetSuppressDBMessages(false);
-        return false;
+        LOG(VB_GENERAL, LOG_ERR, "Database schema upgrade failed.");
+        goto upgrade_error_exit;
     }
 
-    bool ret = doUpgradeTVDatabaseSchema();
+    LOG(VB_GENERAL, LOG_INFO, "Database schema upgrade complete.");
 
-    if (ret)
-        LOG(VB_GENERAL, LOG_NOTICE,
-            "Database Schema upgrade complete, unlocking.");
-    else
-        LOG(VB_GENERAL, LOG_ERR, "Database Schema upgrade FAILED, unlocking.");
-
-    DBUtil::unlockSchema(query);
-    gCoreContext->ActivateSettingsCache(true);
-
+    // On any exit we want to re-enable the DB messages so errors
+    // are reported and we want to make sure the setting cache is
+    // enabled for good performance and we must unlock the schema
+    // lock. We use gotos with labels so it's impossible to miss
+    // these steps.
+  upgrade_ok_exit:
     GetMythDB()->SetSuppressDBMessages(false);
-    return ret;
+    gCoreContext->ActivateSettingsCache(true);
+    if (locked)
+        DBUtil::UnlockSchema(query);
+    return true;
+
+  upgrade_error_exit:
+    GetMythDB()->SetSuppressDBMessages(false);
+    gCoreContext->ActivateSettingsCache(true);
+    if (locked)
+        DBUtil::UnlockSchema(query);
+    return false;
 }
 
 /** \fn doUpgradeTVDatabaseSchema(void)
@@ -536,6 +543,17 @@ static bool doUpgradeTVDatabaseSchema(void)
     if (dbver == currentDatabaseVersion)
     {
         return true;
+    }
+
+    // Don't rely on this, please specify these when creating the database.
+    {
+        MSqlQuery query(MSqlQuery::InitCon());
+        if (!query.exec(QString("ALTER DATABASE %1 DEFAULT "
+                                "CHARACTER SET utf8 COLLATE utf8_general_ci;")
+                        .arg(gCoreContext->GetDatabaseParams().dbName)))
+        {
+            MythDB::DBError("UpgradeTVDatabaseSchema -- alter charset", query);
+        }
     }
 
     if (DBUtil::IsNewDatabase())
