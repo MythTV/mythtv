@@ -12293,7 +12293,7 @@ name cannot be blank.</translation>
     <message>
         <location filename="../libs/libmythmetadata/videometadata.cpp" line="1017"/>
         <source>Season</source>
-        <translation>Series</translation>
+        <translation>Series|Season</translation>
     </message>
     <message>
         <location filename="../libs/libmythmetadata/videometadata.cpp" line="1018"/>
