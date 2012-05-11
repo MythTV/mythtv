@@ -293,17 +293,8 @@ void LoggerThread::run(void)
         m_initialWaiting = true;
         pingLogServer();
 
-        // wait up to 100ms for mythlogserver to respond
-        qApp->processEvents(QEventLoop::WaitForMoreEvents, 100);
-        if (m_initialWaiting)
-        {
-            // Got no response from mythlogserver, let's assume it's dead and 
-            // start // it up
-            launchLogServer();
-        }
-
-        LOG(VB_GENERAL, LOG_INFO,
-            "Added logging to mythlogserver at TCP:35327");
+        // wait up to 150ms for mythlogserver to respond
+        QTimer::singleShot(150, this, SLOT(initialTimeout()));
     }
     else
         LOG(VB_GENERAL, LOG_INFO, "Added logging to mythlogserver locally");
@@ -356,6 +347,19 @@ void LoggerThread::run(void)
     RunEpilog();
 }
 
+/// \brief  Handles the initial startup timeout when waiting for the log server
+///         to show signs of life
+void LoggerThread::initialTimeout(void)
+{
+    if (m_initialWaiting)
+    {
+        // Got no response from mythlogserver, let's assume it's dead and 
+        // start it up
+        launchLogServer();
+    }
+
+    LOG(VB_GENERAL, LOG_INFO, "Added logging to mythlogserver at TCP:35327");
+}
 
 /// \brief  Handles heartbeat checking once a second.  If the server is not
 ///         heard from for at least 5s, restart it

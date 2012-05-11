@@ -182,7 +182,7 @@ class LoggerThread : public QObject, public MThread
                                     ///  Protected by logQueueMutex
     bool m_aborted;                 ///< Flag to abort the thread.
                                     ///  Protected by logQueueMutex
-    bool m_initialWaiting;          ///< Waiting for the initial response from
+    volatile bool m_initialWaiting; ///< Waiting for the initial response from
                                     ///  mythlogserver
     QString m_filename; ///< Filename of debug logfile
     bool m_progress;    ///< show only LOG_ERR and more important (console only)
@@ -198,6 +198,7 @@ class LoggerThread : public QObject, public MThread
     nzmqt::ZMQContext *m_zmqContext;    ///< ZeroMQ context to use 
     nzmqt::ZMQSocket  *m_zmqSocket;     ///< ZeroMQ socket to talk to
                                         /// mythlogserver
+
   protected:
     bool logConsole(LoggingItem *item);
     void launchLogServer(void);
@@ -206,6 +207,7 @@ class LoggerThread : public QObject, public MThread
   protected slots:
     void messageReceived(const QList<QByteArray>&);
     void checkHeartBeat(void);
+    void initialTimeout(void);
 };
 
 #endif
