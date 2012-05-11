@@ -55,8 +55,8 @@ SPDIFEncoder::SPDIFEncoder(QString muxer, int codec_id)
         return;
     }
 
-    m_oc->pb->seekable = 0;
-    m_oc->flags             |= AVFMT_NOFILE | AVFMT_FLAG_IGNIDX;
+    m_oc->pb->seekable    = 0;
+    m_oc->flags          |= AVFMT_NOFILE | AVFMT_FLAG_IGNIDX;
 
     m_stream = avformat_new_stream(m_oc, NULL);
     if (!m_stream)
@@ -66,7 +66,7 @@ SPDIFEncoder::SPDIFEncoder(QString muxer, int codec_id)
         return;
     }
 
-    m_stream->id = 1;
+    m_stream->id          = 1;
 
     AVCodecContext *codec = m_stream->codec;
 
@@ -92,10 +92,11 @@ SPDIFEncoder::~SPDIFEncoder(void)
 void SPDIFEncoder::WriteFrame(unsigned char *data, int size)
 {
     AVPacket packet;
-
     av_init_packet(&packet);
-    packet.data = data;
-    packet.size = size;
+    static int pts = 1; // to avoid warning "Encoder did not produce proper pts"
+    packet.pts  = pts++; 
+    packet.data    = data;
+    packet.size    = size;
 
     if (av_write_frame(m_oc, &packet) < 0)
     {

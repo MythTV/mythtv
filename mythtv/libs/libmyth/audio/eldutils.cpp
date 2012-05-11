@@ -27,18 +27,7 @@
 #include "eldutils.h"
 #include <sys/types.h>
 #include <inttypes.h>
-#if HAVE_BYTESWAP_H
-#include <byteswap.h>
-#elif HAVE_SYS_ENDIAN_H
-#include <sys/endian.h>
-#elif CONFIG_DARWIN
-#include <libkern/OSByteOrder.h>
-#define bswap_16 OSSwapInt16
-#define bswap_32 OSSwapInt32
-#define bswap_64 OSSwapInt64
-#elif HAVE_BIGENDIAN
-#error No bswap functions defined
-#endif
+#include "bswap.h"
 #include "audiooutputbase.h"
 #include <QString>
 

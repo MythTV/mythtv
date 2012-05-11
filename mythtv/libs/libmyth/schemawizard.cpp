@@ -119,70 +119,24 @@ int SchemaUpgradeWizard::Compare(void)
 #if TESTING
     //DBver = "9" + DBver + "-testing";
     DBver += "-testing";
-return 0;
+    return 0;
 #endif
 
-    return versionsBehind = m_newSchemaVer.toInt() - DBver.toUInt();
-}
-
-int SchemaUpgradeWizard::CompareAndWait(const int seconds)
-{
-    if (Compare() > 0)  // i.e. if DB is older than expected
+    if (m_newSchemaVer == DBver)
     {
-        QString message = tr("%1 database schema is old. Waiting to see if DB "
-                             "is being upgraded.").arg(m_schemaName);
-
-        LOG(VB_GENERAL, LOG_CRIT, message);
-
-        MSqlQuery query(MSqlQuery::InitCon(MSqlQuery::kDedicatedConnection));
-        bool      backupRunning  = false;
-        bool      upgradeRunning = false;
-
-        MythTimer elapsedTimer;
-        elapsedTimer.start();
-        while (versionsBehind && (elapsedTimer.elapsed() < seconds * 1000))
-        {
-            sleep(1);
-
-            if (IsBackupInProgress())
-            {
-                LOG(VB_GENERAL, LOG_CRIT,
-                         "Waiting for Database Backup to complete.");
-                if (!backupRunning)
-                {
-                    elapsedTimer.restart();
-                    backupRunning = true;
-                }
-                continue;
-            }
-
-            if (!lockSchema(query))
-            {
-                LOG(VB_GENERAL, LOG_CRIT,
-                         "Waiting for Database Upgrade to complete.");
-                if (!upgradeRunning)
-                {
-                    elapsedTimer.restart();
-                    upgradeRunning = true;
-                }
-                continue;
-            }
-
-            Compare();
-            unlockSchema(query);
-
-            if (m_expertMode)
-                break;
-        }
-
-        if (versionsBehind)
-            LOG(VB_GENERAL, LOG_CRIT, "Timed out waiting.");
-        else
-            LOG(VB_GENERAL, LOG_CRIT,
-                     "Schema version was upgraded while we were waiting.");
+        versionsBehind = 0;
     }
-    // else DB is same version, or newer. Either way, we won't upgrade it
-
+    else
+    {
+        // Branch DB versions may not be integer version numbers.
+        bool new_ok, old_ok;
+        int new_version = m_newSchemaVer.toInt(&new_ok);
+        int old_version = DBver.toInt(&old_ok);
+        if (new_ok && old_ok)
+            versionsBehind = new_version - old_version;
+        else
+            versionsBehind = 5000;
+    }
     return versionsBehind;
 }
 

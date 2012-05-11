@@ -614,6 +614,8 @@ bool MythUIButtonList::DistributeRow(int &first_button, int &last_button,
         realButton = m_ButtonList[buttonIdx];
         buttonstate = dynamic_cast<MythUIGroup *>
                       (realButton->GetCurrentState());
+        if (!buttonstate)
+            break;
         width = minButtonWidth(buttonstate->GetArea());
 
         if ((*col_widths)[col_idx] < width)
@@ -832,7 +834,10 @@ bool MythUIButtonList::DistributeButtons(void)
                            first_item, last_item, selected_column,
                            skip_cols, grow_left, true, &col_widths,
                            height, 0, 0, col_cnt, wrapped))
+        {
+            delete[] col_widths;
             return false;
+        }
 
         m_columns = col_cnt;
 
@@ -865,7 +870,10 @@ bool MythUIButtonList::DistributeButtons(void)
                                first_item, last_item, selected_column,
                                skip_cols, grow_left, true, &col_widths,
                                height, 0, 0, col_cnt, wrapped))
+            {
+                delete[] col_widths;
                 return false;
+            }
         }
 
         if (selected_column != -1)
@@ -1176,6 +1184,9 @@ bool MythUIButtonList::DistributeButtons(void)
                 realButton = m_ButtonList[buttonIdx];
                 buttonstate = dynamic_cast<MythUIGroup *>
                               (realButton->GetCurrentState());
+                if (!buttonstate)
+                    break; // Not continue
+
                 MythRect area = buttonstate->GetArea();
 
                 // Center button within width of column
@@ -1870,7 +1881,7 @@ int MythUIButtonList::PageDown(void)
         buttonstate = dynamic_cast<MythUIGroup *>
                       (realButton->GetCurrentState());
 
-        if (buttonstate == NULL)
+        if (!buttonstate)
         {
             LOG(VB_GENERAL, LOG_ERR,
                 "PageDown: Failed to query buttonlist state");
@@ -1884,7 +1895,8 @@ int MythUIButtonList::PageDown(void)
         buttonItem->SetToRealButton(realButton, false);
         buttonstate = dynamic_cast<MythUIGroup *>
                       (realButton->GetCurrentState());
-        total += m_itemHorizSpacing + buttonstate->GetArea().height();
+        if (buttonstate)
+            total += m_itemHorizSpacing + buttonstate->GetArea().height();
     }
 
     return num_items - 1;
@@ -2497,7 +2509,7 @@ void MythUIButtonList::customEvent(QEvent *event)
     if (event->type() == NextButtonListPageEvent::kEventType)
     {
         NextButtonListPageEvent *npe =
-            dynamic_cast<NextButtonListPageEvent*>(event);
+            static_cast<NextButtonListPageEvent*>(event);
         int cur = npe->m_start;
         for (; cur < npe->m_start + npe->m_pageSize && cur < GetCount(); ++cur)
         {
@@ -3551,11 +3563,12 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool selecte
 //---------------------------------------------------------
 SearchButtonListDialog::SearchButtonListDialog(MythScreenStack *parent, const char *name,
                                                MythUIButtonList *parentList, QString searchText)
-    : MythScreenType(parent, name, false)
+    : MythScreenType(parent, name, false),
+        m_startsWith(false),            m_parentList(parentList),
+        m_searchText(searchText),       m_searchEdit(NULL),
+        m_prevButton(NULL),             m_nextButton(NULL),
+        m_searchState(NULL)
 {
-    m_parentList = parentList;
-    m_searchText = searchText;
-    m_startsWith = false;
 }
 
 SearchButtonListDialog::~SearchButtonListDialog(void)
