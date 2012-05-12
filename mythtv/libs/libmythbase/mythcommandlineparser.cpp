@@ -395,7 +395,7 @@ bool CommandLineArg::Set(QString opt)
 
       case QVariant::Int:
         if (m_stored.isNull())
-            m_stored = QVariant(m_default.toInt() + 1);
+            m_stored = QVariant(1);
         else
             m_stored = QVariant(m_stored.toInt() + 1);
         break;
