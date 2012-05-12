@@ -400,7 +400,7 @@ void LoggerThread::launchLogServer(void)
                                              kMSRunBackground |
                                              kMSRunShell);
         QStringList args;
-        args << "--daemon";
+        args << "--daemon" << logPropagateArgs;
 
         MythSystem ms("mythlogserver", args, mask);
         ms.Run();
