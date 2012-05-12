@@ -620,7 +620,11 @@ namespace nzmqt
             if (m_stopped)
                 return;
 
-            poll();
+            try {
+                poll();
+            } catch (ZMQException e) {
+		qWarning("Exception during poll: %s\n", e.what());
+            }
 
             if (!m_stopped)
                 QTimer::singleShot(m_interval, this, SLOT(run()));

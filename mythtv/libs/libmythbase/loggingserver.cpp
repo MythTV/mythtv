@@ -1282,9 +1282,10 @@ void LogForwardThread::forwardMessage(LogMessage *msg)
             item->deleteItem();
         }
     }
-    catch (...)
+    catch (nzmqt::ZMQException e)
     {
-        cout << "Exception occurred" << endl;
+        LOG(VB_GENERAL, LOG_ERR, QString("Exception during socket setup: %1")
+            .arg(e.what()));
     }
 
 
