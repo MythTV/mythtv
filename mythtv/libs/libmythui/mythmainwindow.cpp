@@ -342,7 +342,8 @@ MythMainWindow *MythMainWindow::getMainWindow(const bool useDB)
 
 void MythMainWindow::destroyMainWindow(void)
 {
-    gCoreContext->SetGUIObject(NULL);
+    if (gCoreContext)
+        gCoreContext->SetGUIObject(NULL);
     delete mainWin;
     mainWin = NULL;
 }
