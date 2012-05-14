@@ -1501,6 +1501,7 @@ int main(int argc, char **argv)
     SignalHandler handler(signallist);
     handler.AddHandler(SIGUSR1, handleSIGUSR1);
     handler.AddHandler(SIGUSR2, handleSIGUSR2);
+    signal(SIGHUP, SIG_IGN);
 #endif
 
     int retval;

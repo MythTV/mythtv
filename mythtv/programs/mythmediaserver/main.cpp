@@ -110,6 +110,7 @@ int main(int argc, char *argv[])
     QList<int> signallist;
     signallist << SIGINT << SIGTERM << SIGSEGV << SIGABRT;
     SignalHandler handler(signallist);
+    signal(SIGHUP, SIG_IGN);
 #endif
 
     gContext = new MythContext(MYTH_BINARY_VERSION);

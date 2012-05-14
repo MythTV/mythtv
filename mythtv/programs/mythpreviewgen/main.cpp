@@ -206,6 +206,7 @@ int main(int argc, char **argv)
     QList<int> signallist;
     signallist << SIGINT << SIGTERM << SIGSEGV << SIGABRT;
     SignalHandler handler(signallist);
+    signal(SIGHUP, SIG_IGN);
 #endif
 
     if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
