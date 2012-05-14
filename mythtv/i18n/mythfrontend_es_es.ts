@@ -23220,7 +23220,7 @@ Finalmente, podrá probar, activar inmediatamente, guardar o cancelar su regla.<
     <message>
         <location filename="../themes/themestrings.h" line="155"/>
         <source>%DATE%, %TIME%</source>
-        <translation>%FECHA%, %HORA%</translation>
+        <translation>%DATE%, %TIME%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="747"/>
