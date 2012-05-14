@@ -132,13 +132,7 @@
         <group name="infopanel" from="baseinfopanel">
             <area>0,440,1250,260</area>
         </group>
-<!--
-        <imagetype name="animation">
-            <area>40,40,105,105</area>
-            <filepattern low="0" high="24">busyimages/%1.png</filepattern>
-            <delay>250</delay>
-        </imagetype>
--->
+
     </window>
 
     <window name="playlisteditorview_tree" include="music-base.xml">
@@ -338,20 +332,6 @@
     <!-- used in the visualiser screen to show some track details after a track change -->
     <window name="trackinfo_popup">
         <area>-1,500,1000,190</area>
-
-        <animation trigger="AboutToShow">
-            <section>
-                <alpha start="0" end="255" easingcurve="OutQuart"/>
-                <zoom start="0" end="100" easingcurve="OutQuart"/>
-            </section>
-        </animation>
-
-        <animation trigger="AboutToHide">
-            <section>
-                <alpha start="255" end="0" easingcurve="InQuart"/>
-                <zoom start="100" end="0" easingcurve="InQuart"/>
-            </section>
-        </animation>
 
         <shape name="background" from="basebackground">
             <area>0,0,1000,190</area>
@@ -1030,20 +1010,6 @@
     <window name="miniplayer">
         <area>-1,5,590,190</area>
 
-        <animation trigger="AboutToShow">
-            <section>
-                <alpha start="0" end="255" easingcurve="OutQuart"/>
-                <zoom start="0" end="100" easingcurve="OutQuart"/>
-            </section>
-        </animation>
-
-        <animation trigger="AboutToHide">
-            <section>
-                <alpha start="255" end="0" easingcurve="InQuart"/>
-                <zoom start="100" end="0" easingcurve="InQuart"/>
-            </section>
-        </animation>
-
         <imagetype name="track_info_background">
             <filename>miniplayer_background.png</filename>
             <area>10,10,569,170</area>
@@ -1101,20 +1067,6 @@
 
     <window name="volume_popup">
         <area>-1,-1,620,165</area>
-
-        <animation trigger="AboutToShow">
-            <section>
-                <alpha start="0" end="255" easingcurve="OutQuart"/>
-                <zoom start="0" end="100" easingcurve="OutQuart"/>
-            </section>
-        </animation>
-
-        <animation trigger="AboutToHide">
-            <section>
-                <alpha start="255" end="0" easingcurve="InQuart"/>
-                <zoom start="100" end="0" easingcurve="InQuart"/>
-            </section>
-        </animation>
 
         <imagetype name="backimg">
             <area>0,0,620,165</area>
@@ -1689,20 +1641,6 @@
     <window name="criteriaroweditor">
         <area>-1,-1,500,500</area>
 
-        <animation trigger="AboutToShow">
-            <section>
-                <alpha start="0" end="255" easingcurve="OutQuart"/>
-                <zoom start="0" end="100" easingcurve="OutQuart"/>
-            </section>
-        </animation>
-
-        <animation trigger="AboutToHide">
-            <section>
-                <alpha start="255" end="0" easingcurve="InQuart"/>
-                <zoom start="100" end="0" easingcurve="InQuart"/>
-            </section>
-        </animation>
-
         <imagetype name="box">
             <position>0,0</position>
             <filename>mythdialogbox-background.png</filename>
@@ -1777,20 +1715,6 @@
     <!-- popup to edit the date in a smartplaylist criteria row -->
     <window name="dateeditordialog">
         <area>-1,-1,500,500</area>
-
-        <animation trigger="AboutToShow">
-            <section>
-                <alpha start="0" end="255" easingcurve="OutQuart"/>
-                <zoom start="0" end="100" easingcurve="OutQuart"/>
-            </section>
-        </animation>
-
-        <animation trigger="AboutToHide">
-            <section>
-                <alpha start="255" end="0" easingcurve="InQuart"/>
-                <zoom start="100" end="0" easingcurve="InQuart"/>
-            </section>
-        </animation>
 
         <imagetype name="box">
             <position>0,0</position>
@@ -1892,20 +1816,6 @@
     <!-- popup to edit the smartplaylist order by clause-->
     <window name="orderbydialog">
         <area>-1,-1,470,500</area>
-
-        <animation trigger="AboutToShow">
-            <section>
-                <alpha start="0" end="255" easingcurve="OutQuart"/>
-                <zoom start="0" end="100" easingcurve="OutQuart"/>
-            </section>
-        </animation>
-
-        <animation trigger="AboutToHide">
-            <section>
-                <alpha start="255" end="0" easingcurve="InQuart"/>
-                <zoom start="100" end="0" easingcurve="InQuart"/>
-            </section>
-        </animation>
 
         <imagetype name="box">
             <area>0,0,470,500</area>
@@ -2160,20 +2070,6 @@
     <!-- shows some information for the currently selected or playing track -->
     <window name="trackdetail_popup">
         <area>-1,-1,1178,674</area>
-
-        <animation trigger="AboutToShow">
-            <section>
-                <alpha duration="750" start="0" end="255" easingcurve="OutCubic"/>
-                <zoom duration="750" start="0" end="100" easingcurve="OutCubic"/>
-            </section>
-        </animation>
-
-        <animation trigger="AboutToHide">
-            <section>
-                <alpha duration="1000" start="255" end="0" easingcurve="InQuart"/>
-                <zoom duration="1000" start="100" end="0" easingcurve="InQuart"/>
-            </section>
-        </animation>
 
         <shape name="background" from="basebackground">
             <area>0,0,1178,674</area>

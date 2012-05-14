@@ -691,20 +691,6 @@
     <window name="MythPopupBox">
         <area>-1,-1,500,500</area>
 
-        <animation trigger="AboutToShow">
-            <section>
-                <alpha start="0" end="255" easingcurve="OutQuart"/>
-                <zoom start="0" end="100" easingcurve="OutQuart"/>
-            </section>
-        </animation>
-
-        <animation trigger="AboutToHide">
-            <section>
-                <alpha start="255" end="0" easingcurve="InQuart"/>
-                <zoom start="100" end="0" easingcurve="InQuart"/>
-            </section>
-        </animation>
-
         <imagetype name="backimg">
             <filename>mythdialogbox-background.png</filename>
         </imagetype>
@@ -745,20 +731,6 @@
 
     <!-- Fullscreen Dialogue Box -->
     <window name="MythDialogBox">
-
-        <animation trigger="AboutToShow">
-            <section>
-                <alpha start="0" end="255" easingcurve="OutQuart"/>
-                <zoom start="0" end="100" easingcurve="OutQuart"/>
-            </section>
-        </animation>
-
-        <animation trigger="AboutToHide">
-            <section>
-                <alpha start="255" end="0" easingcurve="InQuart"/>
-                <zoom start="100" end="0" easingcurve="InQuart"/>
-            </section>
-        </animation>
 
         <shape name="background" from="basebackground">
             <area>10,10,1260,700</area>
@@ -810,14 +782,6 @@
 
     <window name="MythBusyDialog">
         <area>-1,-1,588,170</area>
-
-        <animation trigger="AboutToHide">
-            <section>
-                <alpha start="255" end="0" easingcurve="InQuart"/>
-                <zoom start="100" end="0" easingcurve="InQuart"/>
-            </section>
-        </animation>
-
         <imagetype name="backimg">
             <area>0,0,587,170</area>
             <filename>mythprogressdialog-background.png</filename>
@@ -836,14 +800,6 @@
 
     <window name="MythProgressDialog">
         <area>-1,-1,588,170</area>
-
-        <animation trigger="AboutToHide">
-            <section>
-                <alpha start="255" end="0" easingcurve="InQuart"/>
-                <zoom start="100" end="0" easingcurve="InQuart"/>
-            </section>
-        </animation>
-
         <imagetype name="backimg">
             <area>0,0,587,170</area>
             <filename>mythprogressdialog-background.png</filename>
@@ -865,21 +821,6 @@
 
     <window name="MythConfirmationDialog">
         <area>-1,-1,588,170</area>
-
-        <animation trigger="AboutToShow">
-            <section>
-                <alpha start="0" end="255" easingcurve="OutQuart"/>
-                <zoom start="0" end="100" easingcurve="OutQuart"/>
-            </section>
-        </animation>
-
-        <animation trigger="AboutToHide">
-            <section>
-                <alpha start="255" end="0" easingcurve="InQuart"/>
-                <zoom start="100" end="0" easingcurve="InQuart"/>
-            </section>
-        </animation>
-
         <imagetype name="backimg">
             <area>0,0,587,170</area>
             <filename>mythprogressdialog-background.png</filename>
@@ -905,21 +846,6 @@
 
     <window name="MythTextInputDialog">
         <area>-1,-1,588,170</area>
-
-        <animation trigger="AboutToShow">
-            <section>
-                <alpha start="0" end="255" easingcurve="OutQuart"/>
-                <zoom start="0" end="100" easingcurve="OutQuart"/>
-            </section>
-        </animation>
-
-        <animation trigger="AboutToHide">
-            <section>
-                <alpha start="255" end="0" easingcurve="InQuart"/>
-                <zoom start="100" end="0" easingcurve="InQuart"/>
-            </section>
-        </animation>
-
         <imagetype name="backimg">
             <area>0,0,587,170</area>
             <filename>mythprogressdialog-background.png</filename>
@@ -942,21 +868,6 @@
 
     <window name="MythSearchDialog">
         <area>-1,-1,500,500</area>
-
-        <animation trigger="AboutToShow">
-            <section>
-                <alpha start="0" end="255" easingcurve="OutQuart"/>
-                <zoom start="0" end="100" easingcurve="OutQuart"/>
-            </section>
-        </animation>
-
-        <animation trigger="AboutToHide">
-            <section>
-                <alpha start="255" end="0" easingcurve="InQuart"/>
-                <zoom start="100" end="0" easingcurve="InQuart"/>
-            </section>
-        </animation>
-
         <imagetype name="backimg">
             <area>0,0,500,500</area>
             <filename>mythdialogbox-background.png</filename>
@@ -1008,21 +919,6 @@
 
     <window name="MythFileBrowser">
         <area>-1,-1,730,510</area>
-
-        <animation trigger="AboutToShow">
-            <section>
-                <alpha start="0" end="255" easingcurve="OutQuart"/>
-                <zoom start="0" end="100" easingcurve="OutQuart"/>
-            </section>
-        </animation>
-
-        <animation trigger="AboutToHide">
-            <section>
-                <alpha start="255" end="0" easingcurve="InQuart"/>
-                <zoom start="100" end="0" easingcurve="InQuart"/>
-            </section>
-        </animation>
-
         <imagetype name="backimg">
             <filename>mythfilebrowser-background.png</filename>
         </imagetype>
@@ -1121,20 +1017,6 @@
     <window name="MythTimeInputDialog">
         <area>-1,-1,580,165</area>
 
-        <animation trigger="AboutToShow">
-            <section>
-                <alpha start="0" end="255" easingcurve="OutQuart"/>
-                <zoom start="0" end="100" easingcurve="OutQuart"/>
-            </section>
-        </animation>
-
-        <animation trigger="AboutToHide">
-            <section>
-                <alpha start="255" end="0" easingcurve="InQuart"/>
-                <zoom start="100" end="0" easingcurve="InQuart"/>
-            </section>
-        </animation>
-
         <imagetype name="box">
             <filename>mythprogressdialog-background.png</filename>
         </imagetype>
@@ -1210,20 +1092,6 @@
     <window name="MythMetadataResults">
         <area>-1,-1,413,426</area>
 
-        <animation trigger="AboutToShow">
-            <section>
-                <alpha start="0" end="255" easingcurve="OutQuart"/>
-                <zoom start="0" end="100" easingcurve="OutQuart"/>
-            </section>
-        </animation>
-
-        <animation trigger="AboutToHide">
-            <section>
-                <alpha start="255" end="0" easingcurve="InQuart"/>
-                <zoom start="100" end="0" easingcurve="InQuart"/>
-            </section>
-        </animation>
-
         <imagetype name="box">
             <filename>mv_results_popup.png</filename>
         </imagetype>
@@ -1236,20 +1104,6 @@
 
     <window name="MythArtworkResults">
         <area>-1,-1,413,426</area>
-
-        <animation trigger="AboutToShow">
-            <section>
-                <alpha start="0" end="255" easingcurve="OutQuart"/>
-                <zoom start="0" end="100" easingcurve="OutQuart"/>
-            </section>
-        </animation>
-
-        <animation trigger="AboutToHide">
-            <section>
-                <alpha start="255" end="0" easingcurve="InQuart"/>
-                <zoom start="100" end="0" easingcurve="InQuart"/>
-            </section>
-        </animation>
 
         <imagetype name="box">
             <area>0,0,413,426</area>
