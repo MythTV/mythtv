@@ -367,9 +367,6 @@ bool doUpgradeVideoDatabaseSchema(void)
         LOG(VB_GENERAL, LOG_ERR,
             "Unrecognized video database schema version. "
             "Unable to upgrade database.");
-        LOG(VB_GENERAL, LOG_ERR,
-             "Please see mythplugins/mythvideo/README.database"
-             " for more information.");
         LOG(VB_GENERAL, LOG_ERR, QString("mythvideo.DBSchemaVer: '%1', "
             "VideoDBSchemaVer: '%2', DVDDBSchemaVer: '%3'").arg(dbver)
                 .arg(olddbver).arg(dvddbver));
