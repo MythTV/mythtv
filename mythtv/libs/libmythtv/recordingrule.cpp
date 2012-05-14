@@ -18,6 +18,11 @@ static inline QString null_to_empty(const QString &str)
     return str.isEmpty() ? "" : str;
 }
 
+// If the GetNumSetting() calls here are ever removed, update schema
+// upgrade 1302 in dbcheck.cpp to manually apply them to the Default
+// template.  Failing to do so will cause users upgrading from older
+// versions to lose those settings.
+
 RecordingRule::RecordingRule()
   : m_recordID(-1), m_parentRecID(0),
     m_isInactive(false),
@@ -65,12 +70,14 @@ RecordingRule::RecordingRule()
     m_recordTable("record"),
     m_tempID(0),
     m_isOverride(false),
+    m_isTemplate(false),
+    m_template(),
     m_progInfo(NULL),
     m_loaded(false)
 {
 }
 
-bool RecordingRule::Load()
+bool RecordingRule::Load(bool asTemplate)
 {
     if (m_recordID <= 0)
         return false;
@@ -95,40 +102,51 @@ bool RecordingRule::Load()
         return false;
     }
 
-    if (query.next())
+    if (!query.next())
+        return false;
+
+    // Schedule
+    if (!asTemplate)
     {
-        // Schedule
         m_type = static_cast<RecordingType>(query.value(0).toInt());
         m_searchType = static_cast<RecSearchType>(query.value(1).toInt());
-        m_recPriority = query.value(2).toInt();
-        m_prefInput = query.value(3).toInt();
-        m_startOffset = query.value(4).toInt();
-        m_endOffset = query.value(5).toInt();
-        m_dupMethod = static_cast<RecordingDupMethodType>
-                                                (query.value(6).toInt());
-        m_dupIn = static_cast<RecordingDupInType>(query.value(7).toInt());
-        m_filter = query.value(47).toUInt();
-        m_isInactive = query.value(8).toBool();
-        // Storage
-        m_recProfile = query.value(9).toString();
-        m_recGroup = query.value(10).toString();
-        m_storageGroup = query.value(11).toString();
-        m_playGroup = query.value(12).toString();
-        m_autoExpire = query.value(13).toBool();
-        m_maxEpisodes = query.value(14).toInt();
-        m_maxNewest = query.value(15).toBool();
-        // Post Process
-        m_autoCommFlag = query.value(16).toBool();
-        m_autoTranscode = query.value(17).toBool();
-        m_transcoder = query.value(18).toInt();
-        m_autoUserJob1 = query.value(19).toBool();
-        m_autoUserJob2 = query.value(20).toBool();
-        m_autoUserJob3 = query.value(21).toBool();
-        m_autoUserJob4 = query.value(22).toBool();
-        m_autoMetadataLookup = query.value(23).toBool();
-        // Original rule id for override rule
+    }
+    m_recPriority = query.value(2).toInt();
+    m_prefInput = query.value(3).toInt();
+    m_startOffset = query.value(4).toInt();
+    m_endOffset = query.value(5).toInt();
+    m_dupMethod = static_cast<RecordingDupMethodType>
+        (query.value(6).toInt());
+    m_dupIn = static_cast<RecordingDupInType>(query.value(7).toInt());
+    m_filter = query.value(47).toUInt();
+    m_isInactive = query.value(8).toBool();
+
+    // Storage
+    m_recProfile = query.value(9).toString();
+    m_recGroup = query.value(10).toString();
+    m_storageGroup = query.value(11).toString();
+    m_playGroup = query.value(12).toString();
+    m_autoExpire = query.value(13).toBool();
+    m_maxEpisodes = query.value(14).toInt();
+    m_maxNewest = query.value(15).toBool();
+
+    // Post Process
+    m_autoCommFlag = query.value(16).toBool();
+    m_autoTranscode = query.value(17).toBool();
+    m_transcoder = query.value(18).toInt();
+    m_autoUserJob1 = query.value(19).toBool();
+    m_autoUserJob2 = query.value(20).toBool();
+    m_autoUserJob3 = query.value(21).toBool();
+    m_autoUserJob4 = query.value(22).toBool();
+    m_autoMetadataLookup = query.value(23).toBool();
+
+    // Original rule id for override rule
+    if (!asTemplate)
         m_parentRecID = query.value(24).toInt();
-        // Recording metadata
+
+    // Recording metadata
+    if (!asTemplate)
+    {
         m_title = query.value(25).toString();
         m_subtitle = query.value(26).toString();
         m_description = query.value(27).toString();
@@ -142,27 +160,36 @@ bool RecordingRule::Load()
         m_seriesid = query.value(35).toString();
         m_programid = query.value(36).toString();
         m_inetref = query.value(37).toString();
-        // Associated data for rule types
+    }
+
+    // Associated data for rule types
+    if (!asTemplate)
+    {
         m_channelid = query.value(38).toInt();
         m_station = query.value(39).toString();
         m_findday = query.value(40).toInt();
         m_findtime = query.value(41).toTime();
         m_findid = query.value(42).toInt();
-        // Statistic fields - Used to generate statistics about particular rules
-        // and influence watch list weighting
+    }
+
+    // Statistic fields - Used to generate statistics about particular rules
+    // and influence watch list weighting
+    if (!asTemplate)
+    {
         m_nextRecording = query.value(43).toDateTime();
         m_lastRecorded = query.value(44).toDateTime();
         m_lastDeleted = query.value(45).toDateTime();
         m_averageDelay = query.value(46).toInt();
-
-        m_isOverride = (m_type == kOverrideRecord || m_type == kDontRecord);
-    }
-    else
-    {
-        return false;
     }
 
-    m_loaded = true;
+    m_isOverride = (m_type == kOverrideRecord || m_type == kDontRecord);
+    m_isTemplate = (m_type == kTemplateRecord);
+    m_template = (asTemplate || m_isTemplate) ? 
+        query.value(30).toString() : "";
+
+    if (!asTemplate)
+        m_loaded = true;
+
     return true;
 }
 
@@ -173,13 +200,14 @@ bool RecordingRule::LoadByProgram(const ProgramInfo* proginfo)
 
     m_progInfo = proginfo;
 
-    if (proginfo->GetRecordingRuleID())
-    {
-        m_recordID = proginfo->GetRecordingRuleID();
+    m_recordID = proginfo->GetRecordingRuleID();
+    if (m_recordID)
         Load();
-    }
+    else
+        LoadTemplate(proginfo->GetCategory(), proginfo->GetCategoryType());
 
-    if (m_searchType == kNoSearch || m_searchType == kManualSearch)
+    if (m_type != kTemplateRecord &&
+        (m_searchType == kNoSearch || m_searchType == kManualSearch))
     {
         AssignProgramInfo();
         if (!proginfo->GetRecordingRuleID())
@@ -221,6 +249,8 @@ bool RecordingRule::LoadBySearch(RecSearchType lsearch, QString textname,
     }
     else
     {
+        LoadTemplate("Default");
+
         QString searchType;
         m_searchType = lsearch;
         searchType = SearchTypeToString(m_searchType);
@@ -235,6 +265,66 @@ bool RecordingRule::LoadBySearch(RecSearchType lsearch, QString textname,
     }
 
     m_loaded = true;
+    return true;
+}
+
+bool RecordingRule::LoadTemplate(QString category, QString categoryType)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT recordid, category, "
+                  "       (category = :CAT1) AS catmatch, "
+                  "       (category = :CATTYPE1) AS typematch "
+                  "FROM record "
+                  "WHERE type = :TEMPLATE AND "
+                  "      (category = :CAT2 OR category = :CATTYPE2 "
+                  "       OR category = 'Default') "
+                  "ORDER BY catmatch DESC, typematch DESC"
+                  );
+    query.bindValue(":TEMPLATE", kTemplateRecord);
+    query.bindValue(":CAT1", category);
+    query.bindValue(":CAT2", category);
+    query.bindValue(":CATTYPE1", categoryType);
+    query.bindValue(":CATTYPE2", categoryType);
+
+    if (!query.exec())
+    {
+        MythDB::DBError("LoadByTemplate", query);
+        return false;
+    }
+
+    if (!query.next())
+        return false;
+
+    int savedRecordID = m_recordID;
+    m_recordID = query.value(0).toInt();
+    bool result = Load(true);
+    m_recordID = savedRecordID;
+
+    return result;
+}
+
+bool RecordingRule::MakeTemplate(QString category)
+{
+    if (m_recordID > 0)
+        return false;
+
+    if (category.compare(QObject::tr("Default"), Qt::CaseInsensitive) == 0)
+    {
+        category = "Default";
+        m_title = QObject::tr("Default (Template)");
+    }
+    else
+    {
+        m_title = category + QObject::tr(" (Template)");
+    }
+
+    LoadTemplate(category);
+    m_recordID = 0;
+    m_type = kNotRecording;
+    m_category = category;
+    m_loaded = true;
+    m_isTemplate = true;
+
     return true;
 }
 
@@ -422,13 +512,19 @@ bool RecordingRule::Delete(bool sendSig)
 
 void RecordingRule::ToMap(InfoMap &infoMap) const
 {
-    infoMap["title"] = m_title;
+    if (m_title == "Default (Template)")
+        infoMap["title"] = QObject::tr("Default (Template)");
+    else
+        infoMap["title"] = m_title;
     infoMap["subtitle"] = m_subtitle;
     infoMap["description"] = m_description;
     infoMap["season"] = QString::number(m_season);
     infoMap["episode"] = QString::number(m_episode);
 
-    infoMap["category"] = m_category;
+    if (m_category == "Default")
+        infoMap["category"] = QObject::tr("Default");
+    else
+        infoMap["category"] = m_category;
     infoMap["callsign"] = m_station;
 
     infoMap["starttime"] = MythTimeToString(m_starttime, kTime);
@@ -504,6 +600,11 @@ void RecordingRule::ToMap(InfoMap &infoMap) const
 
     infoMap["ruletype"] = toString(m_type);
     infoMap["rectype"] = toString(m_type);
+
+    if (m_template == "Default")
+        infoMap["template"] = QObject::tr("Default");
+    else
+        infoMap["template"] = m_template;
 }
 
 void RecordingRule::UseTempTable(bool usetemp, QString table)
@@ -654,3 +755,26 @@ QString RecordingRule::SearchTypeToString(const RecSearchType searchType)
     return searchTypeString;
 }
 
+QStringList RecordingRule::GetTemplateNames(void)
+{
+    QStringList result;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT category "
+                  "FROM record "
+                  "WHERE type = :TEMPLATE "
+                  "ORDER BY category = 'Default' DESC, category"
+                  );
+    query.bindValue(":TEMPLATE", kTemplateRecord);
+
+    if (!query.exec())
+    {
+        MythDB::DBError("LoadByTemplate", query);
+        return result;
+    }
+
+    while (query.next())
+        result << query.value(0).toString();
+
+    return result;
+}

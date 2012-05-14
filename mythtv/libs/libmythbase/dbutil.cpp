@@ -853,39 +853,20 @@ int DBUtil::CountClients(void)
     return count;
 }
 
-/**
- * \brief Try to get a lock on the table schemalock.
- *
- * To prevent upgrades by different programs of the same schema.
- * (<I>e.g.</I> when both mythbackend and mythfrontend start at the same time)
+/** \brief Try to get a lock on the table schemalock.
+ *  Prevents multiple upgrades by different programs of the same schema.
  */
-bool DBUtil::lockSchema(MSqlQuery &query)
+bool DBUtil::TryLockSchema(MSqlQuery &query, uint timeout_secs)
 {
-    if (!query.exec("CREATE TABLE IF NOT EXISTS "
-                      "schemalock ( schemalock int(1));"))
-    {
-        LOG(VB_GENERAL, LOG_CRIT,
-                QString("ERROR: Unable to create schemalock table: %1")
-                        .arg(MythDB::DBErrorMessage(query.lastError())));
-        return false;
-    }
-
-    if (!query.exec("LOCK TABLE schemalock WRITE;"))
-    {
-        LOG(VB_GENERAL, LOG_CRIT,
-                QString("ERROR: Unable to acquire database upgrade lock")
-                        .arg(MythDB::DBErrorMessage(query.lastError())));
-        return false;
-    }
-
-    return true;
+    query.prepare("SELECT GET_LOCK('schemaLock', :TIMEOUT)");
+    query.bindValue(":TIMEOUT", timeout_secs);
+    return query.exec() && query.first() && query.value(0).toBool();
 }
 
-void DBUtil::unlockSchema(MSqlQuery &query)
+void DBUtil::UnlockSchema(MSqlQuery &query)
 {
-    // Should this _just_ unlock schemalock?
-    if (!query.exec("UNLOCK TABLES;"))
-        MythDB::DBError("unlockSchema -- unlocking tables", query);
+    query.prepare("SELECT RELEASE_LOCK('schemaLock')");
+    query.exec();
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

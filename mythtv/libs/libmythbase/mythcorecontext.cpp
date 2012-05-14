@@ -60,9 +60,9 @@ class MythCoreContextPrivate : public QObject
     QObject         *m_GUIobject;
     QString          m_appBinaryVersion;
 
-    QMutex  m_localHostLock;      ///< Locking for thread-safe copying of:
-    QString m_localHostname;     ///< hostname from mysql.txt or gethostname()
-    QMutex  m_masterHostLock;
+    QMutex  m_localHostLock;     ///< Locking for m_localHostname
+    QString m_localHostname;     ///< hostname from config.xml or gethostname()
+    QMutex  m_masterHostLock;    ///< Locking for m_masterHostname
     QString m_masterHostname;    ///< master backend hostname
 
     QMutex      m_sockLock;      ///< protects both m_serverSock and m_eventSock
@@ -905,15 +905,15 @@ QString MythCoreContext::GetBackendServerIP(const QString &host)
         return addr6;
 }
 
-void MythCoreContext::SetSetting(const QString &key, const QString &newValue)
-{
-    d->m_database->SetSetting(key, newValue);
-}
-
 void MythCoreContext::OverrideSettingForSession(const QString &key,
                                                 const QString &value)
 {
     d->m_database->OverrideSettingForSession(key, value);
+}
+
+void MythCoreContext::ClearOverrideSettingForSession(const QString &key)
+{
+    d->m_database->ClearOverrideSettingForSession(key);
 }
 
 bool MythCoreContext::IsUIThread(void)
@@ -1151,7 +1151,7 @@ bool MythCoreContext::CheckProtoVersion(MythSocket *socket, uint timeout_ms,
         LOG(VB_GENERAL, LOG_CRIT, "Protocol version check failure.\n\t\t\t"
                 "The response to MYTH_PROTO_VERSION was empty.\n\t\t\t"
                 "This happens when the backend is too busy to respond,\n\t\t\t"
-                "or has deadlocked in due to bugs or hardware failure.");
+                "or has deadlocked due to bugs or hardware failure.");
 
         return false;
     }

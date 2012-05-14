@@ -176,21 +176,21 @@ static int GreedyHDeint (VideoFilter * f, VideoFrame * frame, int field)
 
 #ifdef MMX
     /* SSE Version has best quality. 3DNOW and MMX a litte bit impure */
-    if (filter->mm_flags & FF_MM_SSE)
+    if (filter->mm_flags & AV_CPU_FLAG_SSE)
     {
         greedyh_filter_sse(
             filter->deint_frame, 2 * frame->width,
             filter->frames[cur_frame], filter->frames[last_frame],
             bottom_field, field, frame->width, frame->height);
     }
-    else if (filter->mm_flags & FF_MM_3DNOW)
+    else if (filter->mm_flags & AV_CPU_FLAG_3DNOW)
     {
         greedyh_filter_3dnow(
             filter->deint_frame, 2 * frame->width,
             filter->frames[cur_frame], filter->frames[last_frame],
             bottom_field, field, frame->width, frame->height);
     }
-    else if (filter->mm_flags & FF_MM_MMX)
+    else if (filter->mm_flags & AV_CPU_FLAG_MMX)
     {
         greedyh_filter_mmx(
             filter->deint_frame, 2 * frame->width,

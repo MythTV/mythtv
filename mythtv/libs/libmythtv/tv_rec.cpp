@@ -152,7 +152,7 @@ bool TVRec::Init(void)
     SetRecordingStatus(rsUnknown, __LINE__);
 
     // configure the Channel instance
-    QString startchannel = GetStartChannel(cardid, 
+    QString startchannel = GetStartChannel(cardid,
                                            CardUtil::GetStartInput(cardid));
     if (!CreateChannel(startchannel, true))
         return false;
@@ -470,7 +470,7 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
 
     // If the needed input is in a shared input group, and we are
     // not canceling the recording anyway, check other recorders
-    if (!cancelNext && has_pending && pendinfo.possibleConflicts.size())
+    if (!cancelNext && has_pending && !pendinfo.possibleConflicts.empty())
     {
         LOG(VB_RECORD, LOG_INFO, LOC +
             "Checking input group recorders - begin");
@@ -965,7 +965,7 @@ void TVRec::HandleStateChange(void)
 
     if (desiredNextState == internalState)
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + 
+        LOG(VB_GENERAL, LOG_ERR, LOC +
             "HandleStateChange(): Null transition" + transMsg);
         changeState = false;
         return;
@@ -1208,7 +1208,7 @@ void TVRec::run(void)
     eitScanStartTime = QDateTime::currentDateTime();
     // check whether we should use the EITScanner in this TVRec instance
     if (CardUtil::IsEITCapable(genOpt.cardtype) &&
-        (!GetDTVChannel() || GetDTVChannel()->IsMaster()) && 
+        (!GetDTVChannel() || GetDTVChannel()->IsMaster()) &&
         (dvbOpt.dvb_eitscan || get_use_eit(cardid)))
     {
         scanner = new EITScanner(cardid);
@@ -1922,7 +1922,7 @@ bool TVRec::SetupDTVSignalMonitor(bool EITscan)
  *  \brief This creates a SignalMonitor instance and
  *         begins signal monitoring.
  *
- *   If the channel exists and there is something to monitor a 
+ *   If the channel exists and there is something to monitor a
  *   SignalMonitor instance is created and SignalMonitor::Start()
  *   is called to start the signal monitoring thread.
  *
@@ -2278,7 +2278,7 @@ bool TVRec::CheckChannelPrefix(const QString &prefix,
     // Now process the lists for the info we need...
     is_extra_char_useful = false;
     is_complete_valid_channel_on_rec = 0;
-    needed_spacer = "";
+    needed_spacer.clear();
 
     if (fchanid.empty())
         return false;
@@ -2661,7 +2661,7 @@ void TVRec::NotifySchedulerOfRecording(RecordingInfo *rec)
         rec->GetRecordingRule()->m_type = kSingleRecord;
     }
 
-    // + remove DefaultEndOffset which would mismatch the live session
+    // + remove any end offset which would mismatch the live session
     rec->GetRecordingRule()->m_endOffset = 0;
 
     // + save rsInactive recstatus to so that a reschedule call
@@ -3002,7 +3002,21 @@ QString TVRec::SetInput(QString input, uint requestType)
  */
 void TVRec::SetChannel(QString name, uint requestType)
 {
-    QMutexLocker lock(&stateChangeLock);
+    if (TVRec::kFlagEITScan == requestType)
+    {
+        if (!stateChangeLock.tryLock())
+        {
+            LOG(VB_CHANNEL, LOG_INFO, LOC +
+                QString("SetChannel(%1, kFlagEITScan) -- "
+                        "couldn't get lock aborting").arg(name));
+            return;
+        }
+    }
+    else
+    {
+        stateChangeLock.lock();
+    }
+
     LOG(VB_CHANNEL, LOG_INFO, LOC +
         QString("SetChannel(%1) -- begin").arg(name));
 
@@ -3028,6 +3042,7 @@ void TVRec::SetChannel(QString name, uint requestType)
             WaitForEventThreadSleep();
     }
     LOG(VB_CHANNEL, LOG_INFO, LOC + QString("SetChannel(%1) -- end").arg(name));
+    stateChangeLock.unlock();
 }
 
 void TVRec::GetNextProgram(BrowseDirection direction,
@@ -3157,10 +3172,10 @@ bool TVRec::GetChannelInfo(uint &chanid, uint &sourceid,
                            QString &callsign, QString &channum,
                            QString &channame, QString &xmltvid) const
 {
-    callsign = "";
-    channum  = "";
-    channame = "";
-    xmltvid  = "";
+    callsign.clear();
+    channum.clear();
+    channame.clear();
+    xmltvid.clear();
 
     if ((!chanid || !sourceid) && !channel)
         return false;

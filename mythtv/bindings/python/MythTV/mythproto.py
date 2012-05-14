@@ -4,15 +4,15 @@
 Provides connection cache and data handlers for accessing the backend.
 """
 
-from static import PROTO_VERSION, BACKEND_SEP, RECSTATUS, AUDIO_PROPS, \
-                   VIDEO_PROPS, SUBTITLE_TYPES
-from exceptions import MythError, MythDBError, MythBEError, MythFileError
-from logging import MythLog
-from altdict import DictData
-from connections import BEConnection, BEEventConnection
-from database import DBCache
-from utility import CMPRecord, datetime, \
-                    ParseEnum, CopyData, CopyData2, check_ipv6
+from MythTV.static import PROTO_VERSION, BACKEND_SEP, RECSTATUS, AUDIO_PROPS, \
+                          VIDEO_PROPS, SUBTITLE_TYPES
+from MythTV.exceptions import MythError, MythDBError, MythBEError, MythFileError
+from MythTV.logging import MythLog
+from MythTV.altdict import DictData
+from MythTV.connections import BEConnection, BEEventConnection
+from MythTV.database import DBCache
+from MythTV.utility import CMPRecord, datetime, \
+                           ParseEnum, CopyData, CopyData2, check_ipv6
 
 from datetime import date
 from time import sleep

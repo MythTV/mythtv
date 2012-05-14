@@ -179,20 +179,14 @@ void MythLocale::SaveLocaleDefaults(bool overwrite)
     {
         MythDB *mythDB = MythDB::getMythDB();
         if (overwrite || mythDB->GetSetting(it.key()).isEmpty())
-        {
-            mythDB->SetSetting(it.key(), it.value());
             mythDB->SaveSettingOnHost(it.key(), it.value(), "");
-        }
     }
 
     for (it = m_hostSettings.begin(); it != m_hostSettings.end(); ++it)
     {
         MythDB *mythDB = MythDB::getMythDB();
         if (overwrite || mythDB->GetSetting(it.key()).isEmpty())
-        {
-            mythDB->SetSetting(it.key(), it.value());
             mythDB->SaveSetting(it.key(), it.value());
-        }
     }
 }
 

@@ -110,9 +110,8 @@ class NuppelDecoder : public DecoderBase
     AVCodec *mpa_audcodec;
     AVCodecContext *mpa_audctx;
     AVPicture tmppicture;
+    AVFrame *m_audioFrame;
 
-    short int *audioSamples_buf;
-    short int *audioSamples;
     bool directrendering;
 
     char lastct;

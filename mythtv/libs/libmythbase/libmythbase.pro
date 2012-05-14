@@ -24,11 +24,11 @@ HEADERS += mythmiscutil.h mythhdd.h mythcdrom.h autodeletedeque.h dbutil.h
 HEADERS += mythhttppool.h mythhttphandler.h mythdeque.h mythlogging.h
 HEADERS += mythbaseutil.h referencecounter.h version.h mythcommandlineparser.h
 HEADERS += mythscheduler.h filesysteminfo.h hardwareprofile.h serverpool.h
-HEADERS += plist.h
+HEADERS += plist.h bswap.h
 
 SOURCES += mthread.cpp mthreadpool.cpp
 SOURCES += mythsocket.cpp mythsocketthread.cpp msocketdevice.cpp
-SOURCES += mythdbcon.cpp mythdb.cpp oldsettings.cpp
+SOURCES += mythdbcon.cpp mythdb.cpp mythdbparams.cpp oldsettings.cpp
 SOURCES += mythobservable.cpp mythevent.cpp httpcomms.cpp mcodecs.cpp
 SOURCES += mythdirs.cpp mythsignalingtimer.cpp
 SOURCES += lcddevice.cpp mythstorage.cpp remotefile.cpp
@@ -66,7 +66,7 @@ inc.files += mythtranslation.h iso639.h iso3166.h mythmedia.h mythmiscutil.h
 inc.files += mythcdrom.h autodeletedeque.h dbutil.h mythhttppool.h mythdeque.h
 inc.files += referencecounter.h mythcommandlineparser.h mthread.h mthreadpool.h
 inc.files += filesysteminfo.h hardwareprofile.h bonjourregister.h serverpool.h
-inc.files += plist.h
+inc.files += plist.h bswap.h
 
 # Allow both #include <blah.h> and #include <libmythbase/blah.h>
 inc2.path  = $${PREFIX}/include/mythtv/libmythbase

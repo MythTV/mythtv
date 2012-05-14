@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """Provides tools for UPNP searches"""
 
-from exceptions import MythError
-from logging import MythLog
+from MythTV.exceptions import MythError
+from MythTV.logging import MythLog
 
 from time import time
 import socket

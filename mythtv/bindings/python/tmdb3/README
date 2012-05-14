@@ -170,7 +170,7 @@ trailers offer multiple sizes.
 
 ## List of Available Data 
 
-  type              name
+  type                  name
 
 Collection:
   integer               id
@@ -210,6 +210,7 @@ Movie:
   list(Keyword)         keywords
   dict(Release)         releases            (indexed by country)
   list(Translation)     translations
+  list(Movie)           getSimilar()
 
 Movie classmethods
   Movie                 fromIMDB(imdbid)    special constructor for use with IMDb codes

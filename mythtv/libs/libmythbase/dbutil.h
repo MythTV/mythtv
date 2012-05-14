@@ -46,9 +46,8 @@ class MBASE_PUBLIC DBUtil
     static bool IsBackupInProgress(void);
     static int  CountClients(void);
 
-    static bool lockSchema(MSqlQuery &);
-    static void unlockSchema(MSqlQuery &);
-
+    static bool TryLockSchema(MSqlQuery &, uint timeout_secs);
+    static void UnlockSchema(MSqlQuery &);
 
     static const int kUnknownVersionNumber;
 

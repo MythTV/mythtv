@@ -262,9 +262,10 @@ private:
         fftwf_execute(loadR);
 #else
         ff_fft_permuteRC(fftContextForward, lt, (FFTComplex*)&dftL[0]);
+        av_fft_calc(fftContextForward, (FFTComplex*)&dftL[0]);
+
         ff_fft_permuteRC(fftContextForward, rt, (FFTComplex*)&dftR[0]);
-        ff_fft_calc(fftContextForward, (FFTComplex*)&dftL[0]);
-        ff_fft_calc(fftContextForward, (FFTComplex*)&dftR[0]);
+        av_fft_calc(fftContextForward, (FFTComplex*)&dftR[0]);
 #endif
 
         // 2. compare amplitude and phase of each DFT bin and produce the X/Y coordinates in the sound field
@@ -455,8 +456,8 @@ private:
             src[N-f][0] = src[f][0];
             src[N-f][1] = -src[f][1];   // complex conjugate
         }
-        ff_fft_permute(fftContextReverse, (FFTComplex*)&src[0]);
-        ff_fft_calc(fftContextReverse, (FFTComplex*)&src[0]);
+        av_fft_permute(fftContextReverse, (FFTComplex*)&src[0]);
+        av_fft_calc(fftContextReverse, (FFTComplex*)&src[0]);
 
         float* pT1   = &target[current_buf*halfN];
         float* pWnd1 = &wnd[0];

@@ -10,6 +10,8 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
+#include <unistd.h> // for fsync
+
 #include <iostream>
 
 #include <QDir>
@@ -20,6 +22,7 @@
 #include "mythlogging.h"
 #include "mythdb.h"
 #include "mythdirs.h"
+#include "compat.h"
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -87,14 +90,15 @@ bool XmlConfiguration::Save( void )
     if (m_sFileName.isEmpty())   // Special case. No file is created
         return true;
 
-    QString sName = m_sPath + '/' + m_sFileName;
+    QString config_temppath = m_sPath + '/' + m_sFileName + ".new";
+    QString config_filepath = m_sPath + '/' + m_sFileName;
+    QString config_origpath = m_sPath + '/' + m_sFileName + ".orig";
 
-    QFile file( sName );
+    QFile file(config_temppath);
     
     if (!file.exists())
     {
-        QDir createDir( m_sPath );
-
+        QDir createDir(m_sPath);
         if (!createDir.exists())
         {
             if (!createDir.mkdir(m_sPath))
@@ -106,21 +110,46 @@ bool XmlConfiguration::Save( void )
         }
     }
 
-    if (!file.open( QIODevice::WriteOnly | QIODevice::Truncate ))
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate))
     {
         LOG(VB_GENERAL, LOG_ERR,
-            QString("Could not open settings file %1 for writing").arg(sName));
+            QString("Could not open settings file %1 for writing")
+            .arg(config_temppath));
 
         return false;
     }
 
-    QTextStream ts( &file );
+    {
+        QTextStream ts(&file);
+        m_config.save(ts, 2);
+    }
 
-    m_config.save( ts, 2 );
+    file.flush();
+
+    fsync(file.handle());
 
     file.close();
 
-    return true;
+    bool ok = true;
+    if (QFile::exists(config_filepath))
+        ok = QFile::rename(config_filepath, config_origpath);
+
+    if (ok)
+    {
+        ok = file.rename(config_filepath);
+        if (ok)
+            QFile::remove(config_origpath);
+        else if (QFile::exists(config_origpath))
+            QFile::rename(config_origpath, config_filepath);
+    }
+
+    if (!ok)
+    {
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("Could not save settings file %1").arg(config_filepath));
+    }
+
+    return ok;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -257,6 +286,25 @@ void XmlConfiguration::SetValue( const QString &sSetting, QString sValue )
     }
 }
 
+//////////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////////
+
+void XmlConfiguration::ClearValue( const QString &sSetting )
+{
+    QDomNode node = FindNode(sSetting);
+    if (!node.isNull())
+    {
+        QDomNode parent = node.parentNode();
+        parent.removeChild(node);
+        while (parent.childNodes().count() == 0)
+        {
+            QDomNode next_parent = parent.parentNode();
+            next_parent.removeChild(parent);
+            parent = next_parent;
+        }
+    }
+}
 
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -323,4 +371,13 @@ void DBConfiguration::SetValue( const QString &sSetting, int nValue )
 void DBConfiguration::SetValue( const QString &sSetting, QString sValue ) 
 {
     GetMythDB()->SaveSetting( sSetting, sValue );
+}
+
+//////////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////////
+
+void DBConfiguration::ClearValue( const QString &sSetting )
+{
+    GetMythDB()->ClearSetting( sSetting );
 }

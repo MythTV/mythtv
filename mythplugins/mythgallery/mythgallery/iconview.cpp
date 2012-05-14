@@ -280,9 +280,9 @@ void IconView::LoadDirectory(const QString &dir)
                 m_childCountThread->start();
 
     if (m_noImagesText)
-        m_noImagesText->SetVisible((m_itemList.size() == 0));
+        m_noImagesText->SetVisible(m_itemList.isEmpty());
 
-    if (m_itemList.size() != 0)
+    if (!m_itemList.isEmpty())
     {
         UpdateText(m_imageList->GetItemCurrent());
         UpdateImage(m_imageList->GetItemCurrent());
@@ -443,7 +443,7 @@ bool IconView::keyPressEvent(QKeyEvent *event)
         QString action = actions[i];
         handled = true;
 
-        if (m_itemList.size() != 0)
+        if (!m_itemList.isEmpty())
         {
             if (action == "MENU")
             {
@@ -670,7 +670,7 @@ bool IconView::HandleSubDirEscape(const QString &parent)
 
     QDir curdir(m_currDir);
     QDir pdir(parent);
-    if ((curdir != pdir) && is_subdir(pdir, curdir) && m_history.size())
+    if ((curdir != pdir) && is_subdir(pdir, curdir) && !m_history.empty())
     {
         QString oldDirName = curdir.dirName();
         curdir.cdUp();

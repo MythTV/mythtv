@@ -13,6 +13,7 @@ trans.files += mythnews_fi.qm mythnews_nb.qm mythnews_ru.qm
 trans.files += mythnews_cs.qm mythnews_pl.qm mythnews_hu.qm
 trans.files += mythnews_en_gb.qm mythnews_en_us.qm mythnews_el.qm 
 trans.files += mythnews_en_ca.qm mythnews_es_es.qm
+trans.files += mythnews_bg.qm
 
 INSTALLS += trans
 

@@ -1404,7 +1404,7 @@ void VideoOutputXv::PrepareFrameMem(VideoFrame *buffer, FrameScanType /*scan*/)
 
         if (non_xv_fps < 25)
         {
-            non_xv_show_frame = 120 / non_xv_frames_shown + 1;
+            non_xv_show_frame = 120 / (non_xv_frames_shown + 1);
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 QString("\n***\n"
                     "* Your system is not capable of displaying the\n"

@@ -395,7 +395,7 @@ bool CommandLineArg::Set(QString opt)
 
       case QVariant::Int:
         if (m_stored.isNull())
-            m_stored = QVariant(m_default.toInt() + 1);
+            m_stored = QVariant(1);
         else
             m_stored = QVariant(m_stored.toInt() + 1);
         break;
@@ -2532,6 +2532,8 @@ int MythCommandLineParser::ConfigureLogging(QString mask, unsigned int progress)
         QString("%1 version: %2 [%3] www.mythtv.org")
         .arg(QCoreApplication::applicationName())
         .arg(MYTH_SOURCE_PATH).arg(MYTH_SOURCE_VERSION));
+    LOG(VB_GENERAL, LOG_CRIT, QString("Qt version: compile: %1, runtime: %2")
+        .arg(QT_VERSION_STR).arg(qVersion()));
     LOG(VB_GENERAL, LOG_NOTICE,
         QString("Enabled verbose msgs: %1").arg(verboseString));
 

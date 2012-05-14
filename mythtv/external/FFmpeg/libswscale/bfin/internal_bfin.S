@@ -30,11 +30,11 @@ and converts it to RGB565. R:5 bits, G:6 bits, B:5 bits.. packed into shorts.
 
 The following calculation is used for the conversion:
 
-  r = clipz((y-oy)*cy  + crv*(v-128))
-  g = clipz((y-oy)*cy  + cgv*(v-128) + cgu*(u-128))
-  b = clipz((y-oy)*cy  + cbu*(u-128))
+  r = clipz((y - oy) * cy  + crv * (v - 128))
+  g = clipz((y - oy) * cy  + cgv * (v - 128) + cgu * (u - 128))
+  b = clipz((y - oy) * cy  + cbu * (u - 128))
 
-y,u,v are prescaled by a factor of 4 i.e. left-shifted to gain precision.
+y, u, v are prescaled by a factor of 4 i.e. left-shifted to gain precision.
 
 
 New factorization to eliminate the truncation error which was
@@ -47,7 +47,7 @@ occurring due to the byteop3p.
 2) Scale operands up by a factor of 4 not 8 because Blackfin
    multiplies include a shift.
 
-3) Compute into the accumulators cy*yx0, cy*yx1.
+3) Compute into the accumulators cy * yx0, cy * yx1.
 
 4) Compute each of the linear equations:
      r = clipz((y - oy) * cy  + crv * (v - 128))
@@ -73,7 +73,7 @@ occurring due to the byteop3p.
 
 Where coeffs have the following layout in memory.
 
-uint32_t oy,oc,zero,cy,crv,rmask,cbu,bmask,cgu,cgv;
+uint32_t oy, oc, zero, cy, crv, rmask, cbu, bmask, cgu, cgv;
 
 coeffs is a pointer to oy.
 
@@ -466,8 +466,8 @@ DEFUN_END(yuv2rgb24_line)
 #define ARG_srcStride   40
 
 DEFUN(uyvytoyv12, mL3,  (const uint8_t *src, uint8_t *ydst, uint8_t *udst, uint8_t *vdst,
-                         long width, long height,
-                         long lumStride, long chromStride, long srcStride)):
+                         int width, int height,
+                         int lumStride, int chromStride, int srcStride)):
         link 0;
         [--sp] = (r7:4,p5:4);
 
@@ -539,8 +539,8 @@ DEFUN(uyvytoyv12, mL3,  (const uint8_t *src, uint8_t *ydst, uint8_t *udst, uint8
 DEFUN_END(uyvytoyv12)
 
 DEFUN(yuyvtoyv12, mL3,  (const uint8_t *src, uint8_t *ydst, uint8_t *udst, uint8_t *vdst,
-                         long width, long height,
-                         long lumStride, long chromStride, long srcStride)):
+                         int width, int height,
+                         int lumStride, int chromStride, int srcStride)):
         link 0;
         [--sp] = (r7:4,p5:4);
 

@@ -1,7 +1,4 @@
-/**
- * @file
- * VP5 and VP6 compatible video decoder (common features)
- *
+/*
  * Copyright (C) 2006  Aurelien Jacobs <aurel@gnuage.org>
  *
  * This file is part of FFmpeg.
@@ -19,6 +16,11 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+ */
+
+/**
+ * @file
+ * VP5 and VP6 compatible video decoder (common features)
  */
 
 #include "avcodec.h"
@@ -266,7 +268,7 @@ static void vp56_add_predictors_dc(VP56Context *s, VP56Frame ref_frame)
 
     for (b=0; b<6; b++) {
         VP56RefDc *ab = &s->above_blocks[s->above_block_idx[b]];
-        VP56RefDc *lb = &s->left_block[vp56_b6to4[b]];
+        VP56RefDc *lb = &s->left_block[ff_vp56_b6to4[b]];
         int count = 0;
         int dc = 0;
         int i;
@@ -286,12 +288,12 @@ static void vp56_add_predictors_dc(VP56Context *s, VP56Frame ref_frame)
                     count++;
                 }
         if (count == 0)
-            dc = s->prev_dc[vp56_b2p[b]][ref_frame];
+            dc = s->prev_dc[ff_vp56_b2p[b]][ref_frame];
         else if (count == 2)
             dc /= 2;
 
         s->block_coeff[b][idx] += dc;
-        s->prev_dc[vp56_b2p[b]][ref_frame] = s->block_coeff[b][idx];
+        s->prev_dc[ff_vp56_b2p[b]][ref_frame] = s->block_coeff[b][idx];
         ab->dc_coeff = s->block_coeff[b][idx];
         ab->ref_frame = ref_frame;
         lb->dc_coeff = s->block_coeff[b][idx];
@@ -399,6 +401,8 @@ static void vp56_decode_mb(VP56Context *s, int row, int col, int is_alpha)
 
     frame_current = s->framep[VP56_FRAME_CURRENT];
     frame_ref = s->framep[ref_frame];
+    if (mb_type != VP56_MB_INTRA && !frame_ref->data[0])
+        return;
 
     ab = 6*is_alpha;
     b_max = 6 - 2*is_alpha;
@@ -406,7 +410,7 @@ static void vp56_decode_mb(VP56Context *s, int row, int col, int is_alpha)
     switch (mb_type) {
         case VP56_MB_INTRA:
             for (b=0; b<b_max; b++) {
-                plane = vp56_b2p[b+ab];
+                plane = ff_vp56_b2p[b+ab];
                 s->dsp.idct_put(frame_current->data[plane] + s->block_offset[b],
                                 s->stride[plane], s->block_coeff[b]);
             }
@@ -415,7 +419,7 @@ static void vp56_decode_mb(VP56Context *s, int row, int col, int is_alpha)
         case VP56_MB_INTER_NOVEC_PF:
         case VP56_MB_INTER_NOVEC_GF:
             for (b=0; b<b_max; b++) {
-                plane = vp56_b2p[b+ab];
+                plane = ff_vp56_b2p[b+ab];
                 off = s->block_offset[b];
                 s->dsp.put_pixels_tab[1][0](frame_current->data[plane] + off,
                                             frame_ref->data[plane] + off,
@@ -435,7 +439,7 @@ static void vp56_decode_mb(VP56Context *s, int row, int col, int is_alpha)
             for (b=0; b<b_max; b++) {
                 int x_off = b==1 || b==3 ? 8 : 0;
                 int y_off = b==2 || b==3 ? 8 : 0;
-                plane = vp56_b2p[b+ab];
+                plane = ff_vp56_b2p[b+ab];
                 vp56_mc(s, b, plane, frame_ref->data[plane], s->stride[plane],
                         16*col+x_off, 16*row+y_off);
                 s->dsp.idct_add(frame_current->data[plane] + s->block_offset[b],
@@ -463,6 +467,7 @@ static int vp56_size_changed(AVCodecContext *avctx)
     s->mb_height = (avctx->coded_height+15) / 16;
 
     if (s->mb_width > 1000 || s->mb_height > 1000) {
+        avcodec_set_dimensions(avctx, 0, 0);
         av_log(avctx, AV_LOG_ERROR, "picture too big\n");
         return -1;
     }
@@ -511,8 +516,20 @@ int ff_vp56_decode_frame(AVCodecContext *avctx, void *data, int *data_size,
         if (!res)
             return -1;
 
+        if (res == 2) {
+            int i;
+            for (i = 0; i < 4; i++) {
+                if (s->frames[i].data[0])
+                    avctx->release_buffer(avctx, &s->frames[i]);
+            }
+            if (is_alpha) {
+                avcodec_set_dimensions(avctx, 0, 0);
+                return -1;
+            }
+        }
+
         if (!is_alpha) {
-            p->reference = 1;
+            p->reference = 3;
             if (avctx->get_buffer(avctx, p) < 0) {
                 av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
                 return -1;
@@ -526,18 +543,19 @@ int ff_vp56_decode_frame(AVCodecContext *avctx, void *data, int *data_size,
         }
 
         if (p->key_frame) {
-            p->pict_type = FF_I_TYPE;
+            p->pict_type = AV_PICTURE_TYPE_I;
             s->default_models_init(s);
             for (block=0; block<s->mb_height*s->mb_width; block++)
                 s->macroblocks[block].type = VP56_MB_INTRA;
         } else {
-            p->pict_type = FF_P_TYPE;
+            p->pict_type = AV_PICTURE_TYPE_P;
             vp56_parse_mb_type_models(s);
             s->parse_vector_models(s);
             s->mb_type = VP56_MB_INTER_NOVEC_PF;
         }
 
-        s->parse_coeff_models(s);
+        if (s->parse_coeff_models(s))
+            goto next;
 
         memset(s->prev_dc, 0, sizeof(s->prev_dc));
         s->prev_dc[1][VP56_FRAME_CURRENT] = 128;
@@ -601,8 +619,9 @@ int ff_vp56_decode_frame(AVCodecContext *avctx, void *data, int *data_size,
             }
         }
 
+    next:
         if (p->key_frame || golden_frame) {
-            if (s->framep[VP56_FRAME_GOLDEN]->data[0] &&
+            if (s->framep[VP56_FRAME_GOLDEN]->data[0] && s->framep[VP56_FRAME_GOLDEN] != p &&
                 s->framep[VP56_FRAME_GOLDEN] != s->framep[VP56_FRAME_GOLDEN2])
                 avctx->release_buffer(avctx, s->framep[VP56_FRAME_GOLDEN]);
             s->framep[VP56_FRAME_GOLDEN] = p;
@@ -649,12 +668,14 @@ av_cold void ff_vp56_init(AVCodecContext *avctx, int flip, int has_alpha)
 
     if (avctx->idct_algo == FF_IDCT_AUTO)
         avctx->idct_algo = FF_IDCT_VP3;
-    dsputil_init(&s->dsp, avctx);
+    ff_dsputil_init(&s->dsp, avctx);
     ff_vp56dsp_init(&s->vp56dsp, avctx->codec->id);
     ff_init_scantable(s->dsp.idct_permutation, &s->scantable,ff_zigzag_direct);
 
-    for (i=0; i<4; i++)
+    for (i=0; i<4; i++) {
         s->framep[i] = &s->frames[i];
+        avcodec_get_frame_defaults(&s->frames[i]);
+    }
     s->framep[VP56_FRAME_UNUSED] = s->framep[VP56_FRAME_GOLDEN];
     s->framep[VP56_FRAME_UNUSED2] = s->framep[VP56_FRAME_GOLDEN2];
     s->edge_emu_buffer_alloc = NULL;

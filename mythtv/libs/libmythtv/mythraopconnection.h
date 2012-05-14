@@ -22,14 +22,12 @@ class QTimer;
 class AudioOutput;
 class ServerPool;
 class NetStream;
-class AudioData;
-struct AudioData;
 
 typedef QHash<QString,QString> RawHash;
 
 struct AudioData
 {
-    int16_t    *data;
+    uint8_t    *data;
     int32_t     length;
     int32_t     frames;
 };

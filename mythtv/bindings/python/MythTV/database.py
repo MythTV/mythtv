@@ -4,16 +4,16 @@
 Provides connection cache and data handlers for accessing the database.
 """
 
-from static import MythSchema
-from altdict import OrdDict, DictData
-from logging import MythLog
-from msearch import MSearch
-from utility import datetime, _donothing
-from exceptions import MythError, MythDBError
-from connections import DBConnection, LoggedCursor, XMLConnection
+from MythTV.static import MythSchema
+from MythTV.altdict import OrdDict, DictData
+from MythTV.logging import MythLog
+from MythTV.msearch import MSearch
+from MythTV.utility import datetime, _donothing, QuickProperty
+from MythTV.exceptions import MythError, MythDBError
+from MythTV.connections import DBConnection, LoggedCursor, XMLConnection
 
 from socket import gethostname
-from uuid import uuid4
+from uuid import UUID, uuid1, uuid4
 from lxml import etree
 import datetime as _pydt
 import time as _pyt
@@ -748,6 +748,273 @@ class DBDataCRef( DBDataRef ):
         self._populate()
         return [a.values()+[a._cref] for a in self.copy()]
 
+class DatabaseConfig( object ):
+    class _WakeOnLanConfig( object ):
+        def __init__(self):
+            self.enabled = False
+            self.waittime = 0
+            self.retrycount = 5
+            self.command = "echo 'WOLsqlServerCommand not set'"
+
+        def readXML(self, element):
+            self.enabled = bool(element.xpath('Enabled')[0].text)
+            self.waittime = int(element.xpath('SQLReconnectWaitTime')[0].text)
+            self.retrycount = int(element.xpath('SQLConnectRetry')[0].text)
+            self.command = element.xpath('Command')[0].text
+
+        def writeXML(self, element):
+            enabled = element.makeelement('Enabled')
+            enabled.text = '1' if self.enabled else '0'
+            element.append(enabled)
+
+            waittime = element.makeelement('SQLReconnectWaitTime')
+            waittime.text = str(self.waittime)
+            element.append(waittime)
+
+            retrycount = element.makeelement('SQLConnectRetry')
+            retrycount.text = str(self.retrycount)
+            element.append(retrycount)
+
+            command = element.makeelement('Command')
+            command.text = self.command
+            element.append(command)
+
+    _conf_trans = {'PingHost':'pinghost', 'Host':'hostname',
+                   'UserName':'username', 'Password':'password',
+                   'DatabaseName':'database', 'Port':'port'}
+
+    uuid =      QuickProperty('_uuid', uuid1(), UUID)
+    pinghost =  QuickProperty('_pinghost', False, bool)
+    port =      QuickProperty('_port', 3306, int)
+    pin =       QuickProperty('_pin', 0000, int)
+    hostname =  QuickProperty('_hostname', '127.0.0.1')
+    username =  QuickProperty('_username', 'mythtv')
+    password =  QuickProperty('_password', 'mythtv')
+    database =  QuickProperty('_database', 'mythconverg')
+
+    @QuickProperty('_profile', gethostname())
+    def profile(self, value):
+        if value == 'my-unique-identifier-goes-here':
+            raise Exception
+        return value
+
+    @property
+    def ident(self):
+        return "sql://{0.database}@{0.hostname}:{0.port}/".format(self)
+
+    def __init__(self, args, **kwargs):
+        self._default = True
+        self._allowwrite = False
+        self.wol = self._WakeOnLanConfig()
+
+        kwargs.update(args)
+        if len(kwargs):
+            self._default = False
+
+        for key,attr in (('LocalHostName', 'profile'),
+                         ('DBHostName', 'hostname'),
+                         ('DBUserName', 'username'),
+                         ('DBPassword', 'password'),
+                         ('DBName', 'database'),
+                         ('DBPort', 'port'),
+                         ('SecurityPin', 'pin')):
+            if key in kwargs:
+                setattr(self, attr, kwargs[key])
+
+    def __hash__(self):
+        return hash(self.ident)
+
+    def copy(self):
+        cls = self.__class__
+        obj = cls(())
+        for attr in ('uuid', 'pinghost', 'port', 'pin', 'hostname',
+                     'username', 'password', 'database', 'profile'):
+            if not getattr(cls, attr).isDefault(self):
+                setattr(obj, attr, getattr(self, attr))
+        return obj
+
+    def test(self, log):
+        # try using user-specified values
+        if not self._default:
+            log(log.GENERAL, log.DEBUG,
+                            "Trying user-specified database credentials.")
+            yield self
+
+        # try reading config files
+        confdir = os.environ.get('MYTHCONFDIR', '')
+        if confdir and (confdir != '/'):
+            obj = self.copy()
+            if obj.readXML(confdir):
+                log(log.GENERAL, log.DEBUG,
+                          "Trying database credentials from: {0}"\
+                                .format(os.path.join(confdir,'config.xml')))
+                yield obj
+            elif obj.readOldXML(confdir):
+                log(log.GENERAL, log.DEBUG,
+                          "Trying old format database credentials from: {0}"\
+                                .format(os.path.join(confdir,'config.xml')))
+                yield obj
+            else:
+                log(log.GENERAL, log.DEBUG,
+                          "Failed to read database credentials from: {0}"\
+                                .format(os.path.join(confdir,'config.xml')))
+
+        homedir = os.environ.get('HOME', '')
+        if homedir and (homedir != '/'):
+            obj = self.copy()
+            if obj.readXML(os.path.join(homedir,'.mythtv')):
+                log(log.GENERAL, log.DEBUG,
+                          "Trying database credentials from: {0}"\
+                                .format(os.path.join(confdir,'config.xml')))
+                yield obj
+            elif obj.readOldXML(os.path.join(homedir, '.mythtv')):
+                log(log.GENERAL, log.DEBUG,
+                          "Trying old format database credentials from: {0}"\
+                                .format(os.path.join(confdir,'config.xml')))
+                yield obj
+            else:
+                log(log.GENERAL, log.DEBUG,
+                          "Failed to read database credentials from: {0}"\
+                                .format(os.path.join(confdir,'config.xml')))
+
+        # try UPnP
+        for conn in XMLConnection.fromUPNP(5.0):
+            obj = self.copy()
+            if obj.readUPNP(conn):
+                log(log.GENERAL, log.DEBUG,
+                          "Trying database credentials from: {0}"\
+                                .format(conn.host))
+                yield obj
+            else:
+                log(log.GENERAL, log.DEBUG,
+                          "Failed to read database credentials from: {0}"\
+                                .format(conn.host))
+
+        # try defaults if user did not specify anything
+        if self._default:
+            log(log.GENERAL, log.DEBUG, "Trying default database credentials")
+            yield self
+
+    def readUPNP(self, conn):
+        self._allowwrite = True
+        dat = conn.getConnectionInfo(self.pin)
+        if len(dat) == 0:
+            return False
+
+        trans = {'Host':'hostname', 'Port':'port', 'UserName':'username',
+                 'Password':'password', 'Name':'database'}
+        for k,v in dat.items():
+            if k in trans:
+                setattr(self, trans[k], v)
+        return True
+
+    def readXML(self, confdir):
+        filename = os.path.join(confdir, 'config.xml')
+        if not os.access(filename, os.R_OK):
+            return False
+
+        try:
+            config = etree.parse(filename)
+
+            UDN = config.xpath('/Configuration/UPnP/UDN/MediaRenderer/text()')
+            if len(UDN):
+                self.uuid = UDN[0]
+
+            name = config.xpath('/Configuration/LocalHostName/text()')
+            if len(name):
+                self.profile = name[0]
+
+            for child in config.xpath('/Configuration/Database')[0]\
+                                                            .getchildren():
+                if child.tag in self._conf_trans:
+                    setattr(self, self._conf_trans[child.tag], child.text)
+
+            wol = config.xpath('/Configuration/WakeOnLan')
+            if len(wol):
+                self.wol.readXML(wol[0])
+        except:
+            return False
+        return True
+
+    def readOldXML(self, confdir):
+        self._allowwrite = True
+        filename = os.path.join(confdir, 'config.xml')
+        if not os.access(filename, os.R_OK):
+            return False
+
+        try:
+            config = etree.parse(filename)
+
+            UDN = config.xpath('/Configuration/UPnP/UDN/MediaRenderer/text()')
+            if len(UDN):
+                self.uuid = UDN[0]
+
+            trans = {'DBHostName':'hostname', 'DBUserName':'username',
+                     'DBPassword':'password', 'DBName':'database',
+                     'DBPort':'port'}
+            for child in config.xpath('/Configuration/UPnP/MythFrontend/'+\
+                                            'DefaultBackend')[0].getchildren():
+                if child.tag in trans:
+                    setattr(self, trans[child.tag], child.text)
+        except:
+            return False
+        return True
+
+    def writeXML(self, log):
+        # only write a new file if imported from UPNP
+        if not self._allowwrite:
+            return
+        self._allowwrite = False
+
+        doc = etree.Element('Configuration')
+
+        upnp = doc.makeelement('UPnP')
+        udn = doc.makeelement('UDN')
+        mr = doc.makeelement('MediaRenderer')
+        mr.text = str(self.uuid)
+        doc.append(upnp)
+        upnp.append(udn)
+        udn.append(mr)
+
+        lhost = doc.makeelement('LocalHostName')
+        if self.__class__.profile.isDefault(self):
+            lhost.text = 'my-unique-identifier-goes-here'
+        else:
+            lhost.text = self.profile
+        doc.append(lhost)
+
+        db = doc.makeelement('Database')
+        for tag,attr in self._conf_trans.items():
+            value = getattr(self, attr)
+            if attr == 'pinghost': value = 1 if value else 0
+
+            ele = doc.makeelement(tag)
+            ele.text = str(value)
+            db.append(ele)
+        doc.append(db)
+
+        wol = doc.makeelement('WakeOnLan')
+        self.wol.writeXML(wol)
+        doc.append(wol)
+
+        confdir = os.environ.get('MYTHCONFDIR', '')
+        if confdir and (confdir != '/'):
+            log(log.GENERAL, log.DEBUG, "Writing new database credentials: {0}"\
+                                .format(os.path.join(confdir,'config.xml')))
+            fp = open(os.path.join(confdir,'config.xml'), 'w')
+        else:
+            homedir = os.environ.get('HOME', '')
+            if homedir and (homedir != '/'):
+                log(log.GENERAL, log.DEBUG,
+                        "Writing new database credentials: {0}"\
+                                .format(os.path.join(confdir,'config.xml')))
+                fp = open(os.path.join(homedir, '.mythtv', 'config.xml'), 'w')
+            else:
+                raise MythError("Cannot find home directory to write to")
+
+        fp.write(etree.tostring(doc, pretty_print=True))
+        fp.close()
+
 class DBCache( MythSchema ):
     """
     DBCache(db=None, args=None, **kwargs) -> database connection object
@@ -784,7 +1051,7 @@ class DBCache( MythSchema ):
     def __repr__(self):
         return "<%s '%s' at %s>" % \
                 (str(self.__class__).split("'")[1].split(".")[-1],
-                 self.ident, hex(id(self)))
+                 self.dbconfig.ident, hex(id(self)))
 
     class _TableFields( OrdDict ):
         """Provides a dictionary-like list of table fieldnames"""
@@ -927,139 +1194,64 @@ class DBCache( MythSchema ):
         if db is not None:
             # load existing database connection
             self.log(MythLog.DATABASE, MythLog.DEBUG,
-                            "Loading existing connection", db.ident)
-            dbconn.update(db.dbconn)
-        if args is not None:
-            # load user defined arguments (takes dict, or key/value tuple)
-            self.log(MythLog.DATABASE, MythLog.INFO, "Loading user settings")
-            dbconn.update(args)
-        if 'SecurityPin' not in dbconn:
-            dbconn['SecurityPin'] = 0
-        if not self._check_dbconn(dbconn):
-            # insufficient information for connection given
-            # try to read from config.xml
+                            "Loading existing connection", db.dbconfig.ident)
+            self.dbconfig = db.dbconfig
 
-            # build list of possible config paths
-            home = os.environ.get('HOME','')
-            mythconfdir = os.environ.get('MYTHCONFDIR','')
-            config_dirs = []
-            if not (((home == '') | (home == '/')) &
-                    ((mythconfdir == '') | ('$HOME' in mythconfdir))):
-                if mythconfdir:
-                    config_dirs.append(os.path.expandvars(mythconfdir))
-                if home:
-                    config_dirs.append(os.path.expanduser('~/.mythtv/'))
-
-            for confdir in config_dirs:
-                conffile = os.path.join(confdir,'config.xml')
-                dbconn.update(self._readXML(conffile))
-
-                if self._check_dbconn(dbconn):
-                    self.log(MythLog.DATABASE, MythLog.INFO,
-                           "Using connection settings from %s" % conffile)
+        else:
+            # import settings from arguments, files, and UPnP
+            if args is None:
+                args = ()
+            dbconfig = DatabaseConfig(args, **dbconn)
+            for tmpconfig in dbconfig.test(self.log):
+                # loop over possible sets of settings
+                if tmpconfig in self.shared:
+                    # settings already in use, grab and break
+                    self.log(MythLog.DATABASE, MythLog.DEBUG,
+                            "Loading existing connection", tmpconfig.ident)
+                    self.dbconfig = tmpconfig
+                    break
+                elif self._testconfig(tmpconfig):
+                    # settings resulted in a valid connection, break
                     break
             else:
-                # fall back to UPnP
-                pin = dbconn['SecurityPin']
-                for xml in XMLConnection.fromUPNP(5.0):
-                    dbconn = xml.getConnectionInfo(pin)
-                    if self._check_dbconn(dbconn):
-                        break
-                else:
-                    raise MythDBError(MythError.DB_CREDENTIALS)
+                raise MythDBError(MythError.DB_CREDENTIALS)
 
-                # push data to new settings file
-                self._writeXML(dbconn)
+        # write configuration back into file, ignored if not old format
+        # or UPNP derived
+        self.dbconfig.writeXML(self.log)
 
-        if 'DBPort' in dbconn:
-            if dbconn['DBPort'] == '0':
-                dbconn['DBPort'] = 3306
-            else:
-                dbconn['DBPort'] = int(dbconn['DBPort'])
+        # apply the rest of object init if not already done
+        self._testconfig(self.dbconfig)
+                    
+    def _testconfig(self, dbconfig):
+        self.dbconfig = dbconfig
+        if dbconfig in self.shared:
+            self.db = self.shared[dbconfig]
         else:
-            dbconn['DBPort'] = 3306
-
-        if 'LocalHostName' in dbconn:
-            if dbconn['LocalHostName'] is None:
-                dbconn['LocalHostName'] = gethostname()
-        else:
-            dbconn['LocalHostName'] = gethostname()
-
-        self.dbconn = dbconn
-        self.ident = "sql://%s@%s:%d/" % \
-                (dbconn['DBName'],dbconn['DBHostName'],dbconn['DBPort'])
-        if self.ident in self.shared:
-            # reuse existing database connection
-            self.db = self.shared[self.ident]
-        else:
-            # attempt new connection
-            self.db = DBConnection(dbconn)
+            # no exising connection, test a new one
+            try:
+                # attempt new connection
+                self.db = DBConnection(dbconfig)
+            except:
+                # connection failed, report such so new settings can be tested
+                return False
 
             # check schema version
+            # do this outside the try so we can abort if told to connect
+            # to an invalid database
             self._check_schema(self._schema_value, self._schema_local,
                                self._schema_name)
 
             # add connection to cache
-            self.shared[self.ident] = self.db
+            self.shared[dbconfig] = self.db
+
+            # create special attributes
             self.db.tablefields = self._TableFields(self.db, self.db.log)
             self.db.settings = self._Settings(self.db, self.db.log)
 
-        # connect to table name cache
+        # connect special attributes to database
         self.tablefields = self.db.tablefields
         self.settings = self.db.settings
-
-    def _readXML(self, path):
-        dbconn = { 'DBHostName':None,  'DBName':None, 'DBUserName':None,
-                   'DBPassword':None,  'DBPort':0,    'LocalHostName':None}
-        try:
-            config = etree.parse(path).getroot()
-            for child in config.find('UPnP').find('MythFrontend').\
-                                find('DefaultBackend').getchildren():
-                if child.tag in dbconn:
-                    dbconn[child.tag] = child.text
-        except: pass
-        return dbconn
-
-    def _writeXML(self, dbconn):
-        doc = etree.Element('Configuration')
-        upnpnode = doc.makeelement('UPnP')
-        doc.append(upnpnode)
-
-        udnnode = doc.makeelement('UDN')
-        node = doc.makeelement('MediaRenderer')
-        node.text = str(uuid4())
-        udnnode.append(node)
-        upnpnode.append(udnnode)
-
-        fenode = doc.makeelement('MythFrontend')
-        benode = doc.makeelement('DefaultBackend')
-        benode.append(doc.makeelement('USN'))
-        for name in ('SecurityPin','DBHostName','DBUserName',
-                     'DBPassword','DBName','DBPort'):
-            node = doc.makeelement(name)
-            node.text = str(dbconn[name])
-            benode.append(node)
-        fenode.append(benode)
-        upnpnode.append(fenode)
-
-        confdir = os.path.expanduser('~/.mythtv')
-        mythconfdir = os.environ.get('MYTHCONFDIR','')
-        if mythconfdir:
-            confdir = os.path.expandvars(mythconfdir)
-        conffile = os.path.join(confdir,'config.xml')
-        if not os.access(confdir, os.F_OK):
-            os.mkdir(confdir,0755)
-        fp = open(conffile, 'w')
-        fp.write(etree.tostring(doc))
-        fp.close()
-
-    def _check_dbconn(self,dbconn):
-        reqs = ['DBHostName','DBName','DBUserName','DBPassword']
-        for req in reqs:
-            if req not in dbconn:
-                return False
-            if dbconn[req] is None:
-                return False
         return True
 
     def _check_schema(self, value, local, name='Database', update=None):
@@ -1115,7 +1307,7 @@ class DBCache( MythSchema ):
         return ip6
 
     def gethostname(self):
-        return self.dbconn['LocalHostName']
+        return self.dbconfig.profile
 
     def getMasterBackend(self):
         return self._gethostfromaddr(self.settings.NULL.MasterServerIP)

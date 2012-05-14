@@ -9,3 +9,4 @@ TRANSLATIONS += mythzoneminder_nb.ts mythzoneminder_de.ts mythzoneminder_pt.ts
 TRANSLATIONS += mythzoneminder_cs.ts mythzoneminder_es.ts mythzoneminder_fi.ts
 TRANSLATIONS += mythzoneminder_nl.ts mythzoneminder_pl.ts mythzoneminder_en_ca.ts
 TRANSLATIONS += mythzoneminder_es_es.ts
+TRANSLATIONS += mythzoneminder_bg.ts

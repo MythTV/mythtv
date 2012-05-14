@@ -117,7 +117,7 @@ class FormattedTextChunk
         : text(t), format(formatting), parent(p), isTeletext(teletext)
     {
     }
-    FormattedTextChunk(void) : parent(NULL) {}
+    FormattedTextChunk(void) : parent(NULL), isTeletext(false) {}
 
     QSize CalcSize(float layoutSpacing = 0.0f) const
     {

@@ -66,11 +66,11 @@ extern const uint16_t ff_mpeg4_intra_vlc[103][2];
 extern RLTable ff_mpeg4_rl_intra;
 
 /* Note this is identical to the intra rvlc except that it is reordered. */
-extern RLTable rvlc_rl_inter;
-extern RLTable rvlc_rl_intra;
+extern RLTable ff_rvlc_rl_inter;
+extern RLTable ff_rvlc_rl_intra;
 
-extern const uint16_t sprite_trajectory_tab[15][2];
-extern const uint8_t mb_type_b_tab[4][2];
+extern const uint16_t ff_sprite_trajectory_tab[15][2];
+extern const uint8_t ff_mb_type_b_tab[4][2];
 
 /* these matrixes will be permuted for the idct */
 extern const int16_t ff_mpeg4_default_intra_matrix[64];
@@ -80,15 +80,15 @@ extern const uint8_t ff_mpeg4_y_dc_scale_table[32];
 extern const uint8_t ff_mpeg4_c_dc_scale_table[32];
 extern const uint16_t ff_mpeg4_resync_prefix[8];
 
-extern const uint8_t mpeg4_dc_threshold[8];
+extern const uint8_t ff_mpeg4_dc_threshold[8];
 
-void mpeg4_encode_mb(MpegEncContext *s,
-                    DCTELEM block[6][64],
-                    int motion_x, int motion_y);
-void mpeg4_pred_ac(MpegEncContext * s, DCTELEM *block, int n,
-                   int dir);
+void ff_mpeg4_encode_mb(MpegEncContext *s,
+                        DCTELEM block[6][64],
+                        int motion_x, int motion_y);
+void ff_mpeg4_pred_ac(MpegEncContext * s, DCTELEM *block, int n,
+                      int dir);
 void ff_set_mpeg4_time(MpegEncContext * s);
-void mpeg4_encode_picture_header(MpegEncContext *s, int picture_number);
+void ff_mpeg4_encode_picture_header(MpegEncContext *s, int picture_number);
 
 int ff_mpeg4_decode_picture_header(MpegEncContext * s, GetBitContext *gb);
 void ff_mpeg4_encode_video_packet_header(MpegEncContext *s);
@@ -99,7 +99,7 @@ void ff_mpeg4_merge_partitions(MpegEncContext *s);
 void ff_clean_mpeg4_qscales(MpegEncContext *s);
 int ff_mpeg4_decode_partitions(MpegEncContext *s);
 int ff_mpeg4_get_video_packet_prefix_length(MpegEncContext *s);
-int mpeg4_decode_video_packet_header(MpegEncContext *s);
+int ff_mpeg4_decode_video_packet_header(MpegEncContext *s);
 void ff_mpeg4_init_direct_mv(MpegEncContext *s);
 
 /**
@@ -119,7 +119,7 @@ extern uint8_t ff_mpeg4_static_rl_table_store[3][2][2*MAX_RUN + MAX_LEVEL + 3];
 
 
 /**
- * predicts the dc.
+ * Predict the dc.
  * encoding quantized level -> quantized diff
  * decoding quantized diff -> quantized level
  * @param n block index (0-3 are luma, 4-5 are chroma)
@@ -174,7 +174,7 @@ static inline int ff_mpeg4_pred_dc(MpegEncContext * s, int n, int level, int *di
     }else{
         level += pred;
         ret= level;
-        if(s->error_recognition>=3){
+        if(s->err_recognition&(AV_EF_BITSTREAM|AV_EF_AGGRESSIVE)){
             if(level<0){
                 av_log(s->avctx, AV_LOG_ERROR, "dc<0 at %dx%d\n", s->mb_x, s->mb_y);
                 return -1;
@@ -196,4 +196,4 @@ static inline int ff_mpeg4_pred_dc(MpegEncContext * s, int n, int level, int *di
 
     return ret;
 }
-#endif
+#endif /* AVCODEC_MPEG4VIDEO_H */

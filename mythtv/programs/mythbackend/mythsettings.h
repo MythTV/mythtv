@@ -125,7 +125,6 @@ bool check_settings(MythSettingList &database_settings,
 QStringList           GetSettingValueList(const QString &type);
 QString               StringMapToJSON(const QMap<QString,QString> &map);
 QString               StringListToJSON(const QString &key, const QStringList &sList);
-QMap<QString,QString> GetConfigFileSettingValues();
 QMap<QString,QString> GetSettingsMap(MythSettingList &settings, const QString &hostname);
 
 #endif

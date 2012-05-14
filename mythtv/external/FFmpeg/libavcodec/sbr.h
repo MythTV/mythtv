@@ -32,6 +32,7 @@
 #include <stdint.h>
 #include "fft.h"
 #include "aacps.h"
+#include "sbrdsp.h"
 
 /**
  * Spectral Band Replication header - spectrum parameters that invoke a reset if they differ from the previous header.
@@ -42,7 +43,7 @@ typedef struct {
     uint8_t bs_xover_band;
 
     /**
-     * @defgroup bs_header_extra_1     Variables associated with bs_header_extra_1
+     * @name Variables associated with bs_header_extra_1
      * @{
      */
     uint8_t bs_freq_scale;
@@ -58,7 +59,7 @@ typedef struct {
  */
 typedef struct {
     /**
-     * @defgroup aac_bitstream     Main bitstream data variables
+     * @name Main bitstream data variables
      * @{
      */
     unsigned           bs_frame_class;
@@ -74,7 +75,7 @@ typedef struct {
     /** @} */
 
     /**
-     * @defgroup state         State variables
+     * @name State variables
      * @{
      */
     DECLARE_ALIGNED(16, float, synthesis_filterbank_samples)[SBR_SYNTHESIS_BUF_SIZE];
@@ -87,8 +88,9 @@ typedef struct {
     ///QMF values of the original signal
     float              W[2][32][32][2];
     ///QMF output of the HF adjustor
-    float              Y[2][38][64][2];
-    float              g_temp[42][48];
+    int                Ypos;
+    DECLARE_ALIGNED(16, float, Y)[2][38][64][2];
+    DECLARE_ALIGNED(16, float, g_temp)[42][48];
     float              q_temp[42][48];
     uint8_t            s_indexmapped[8][48];
     ///Envelope scalefactors
@@ -116,7 +118,7 @@ typedef struct {
     SpectrumParameters spectrum_params;
     int                bs_amp_res_header;
     /**
-     * @defgroup bs_header_extra_2     variables associated with bs_header_extra_2
+     * @name Variables associated with bs_header_extra_2
      * @{
      */
     unsigned           bs_limiter_bands;
@@ -131,6 +133,7 @@ typedef struct {
     unsigned           kx[2];
     ///M' and M respectively, M is the number of QMF subbands that use SBR.
     unsigned           m[2];
+    unsigned           kx_and_m_pushed;
     ///The number of frequency bands in f_master
     unsigned           n_master;
     SBRData            data[2];
@@ -155,15 +158,15 @@ typedef struct {
     uint8_t            patch_num_subbands[6];
     uint8_t            patch_start_subband[6];
     ///QMF low frequency input to the HF generator
-    float              X_low[32][40][2];
+    DECLARE_ALIGNED(16, float, X_low)[32][40][2];
     ///QMF output of the HF generator
-    float              X_high[64][40][2];
+    DECLARE_ALIGNED(16, float, X_high)[64][40][2];
     ///QMF values of the reconstructed signal
     DECLARE_ALIGNED(16, float, X)[2][2][38][64];
     ///Zeroth coefficient used to filter the subband signals
-    float              alpha0[64][2];
+    DECLARE_ALIGNED(16, float, alpha0)[64][2];
     ///First coefficient used to filter the subband signals
-    float              alpha1[64][2];
+    DECLARE_ALIGNED(16, float, alpha1)[64][2];
     ///Dequantized envelope scalefactors, remapped
     float              e_origmapped[7][48];
     ///Dequantized noise scalefactors, remapped
@@ -180,6 +183,7 @@ typedef struct {
     DECLARE_ALIGNED(16, float, qmf_filter_scratch)[5][64];
     FFTContext         mdct_ana;
     FFTContext         mdct;
+    SBRDSPContext      dsp;
 } SpectralBandReplication;
 
 #endif /* AVCODEC_SBR_H */
