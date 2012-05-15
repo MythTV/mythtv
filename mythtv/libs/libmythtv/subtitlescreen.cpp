@@ -871,7 +871,9 @@ void FormattedTextSubtitle::InitFromCC608(vector<CC608Text*> &buffers,
         parent->SetFontSizes(pixelSize, pixelSize, pixelSize);
         CC708CharacterAttribute def_attr(false, false, false, clr[0],
                                          useBackground);
-        QFont *font = parent->Get708Font(def_attr)->GetFace();
+        MythFontProperties *mythfont = parent->Get708Font(def_attr);
+        mythfont->SetOutline(!m_useBackground, Qt::black, 2, 255);
+        QFont *font = mythfont->GetFace();
         QFontMetrics fm(*font);
         fontwidth = fm.averageCharWidth();
         xmid = m_safeArea.width() / 2;
@@ -1303,6 +1305,7 @@ bool FormattedTextSubtitle::Draw(QList<MythUIType*> *imageCache,
             MythFontProperties *mythfont = parent->Get708Font((*chunk).format);
             if (!mythfont)
                 continue;
+            mythfont->SetOutline(!m_useBackground, Qt::black, 2, 255);
             QFontMetrics font(*(mythfont->GetFace()));
             // If the chunk starts with whitespace, the leading
             // whitespace ultimately gets lost due to the
