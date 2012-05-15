@@ -1366,28 +1366,16 @@ bool MetadataOptions::Create()
     connect(m_seasonSpin, SIGNAL(itemSelected(MythUIButtonListItem*)),
                           SLOT(ValuesChanged()));
 
+    // InetRef
+    m_inetrefEdit->SetText(m_recordingRule->m_inetref);
+
+    // Season
     m_seasonSpin->SetRange(0,9999,1,5);
+    m_seasonSpin->SetValue(m_recordingRule->m_season);
+
+    // Episode
     m_episodeSpin->SetRange(0,9999,1,10);
-
-    // InetRef/Seas/Ep (needs to be built from original rule, not pginfo)
-    if (m_recInfo)
-    {
-        RecordingRule *rule = new RecordingRule();
-        rule->m_recordID = m_recInfo->GetRecordingRuleID();
-        rule->Load();
-        m_inetrefEdit->SetText(rule->m_inetref);
-        m_seasonSpin->SetValue(rule->m_season);
-        m_episodeSpin->SetValue(rule->m_episode);
-
-        delete rule;
-        rule = NULL;
-    }
-    else
-    {
-        m_inetrefEdit->SetText(m_recordingRule->m_inetref);
-        m_seasonSpin->SetValue(m_recordingRule->m_season);
-        m_episodeSpin->SetValue(m_recordingRule->m_episode);
-    }
+    m_episodeSpin->SetValue(m_recordingRule->m_episode);
 
     if (m_coverart)
     {
