@@ -12,6 +12,9 @@ MythShutdownCommandLineParser::MythShutdownCommandLineParser() :
 
 void MythShutdownCommandLineParser::LoadArguments(void)
 {
+    add("-l", "oldlock", false, "disable shutdown", "")
+        ->SetRemoved("Please use the full argument '--lock' instead.");
+
     addHelp();
     addVersion();
     addLogging();
