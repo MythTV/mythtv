@@ -42,7 +42,8 @@ enum OSDFunctionalType
     kOSDFunctionalType_PictureAdjust,
     kOSDFunctionalType_SmartForward,
     kOSDFunctionalType_TimeStretchAdjust,
-    kOSDFunctionalType_AudioSyncAdjust
+    kOSDFunctionalType_AudioSyncAdjust,
+    kOSDFunctionalType_SubtitleZoomAdjust
 };
 
 enum OSDTimeout

@@ -478,6 +478,11 @@ class MTV_PUBLIC TV : public QObject
     void UpdateOSDAskAllowDialog(PlayerContext*);
     void SetUpdateOSDPosition(bool set_it);
 
+    // Captions/subtitles
+    bool SubtitleZoomHandleAction(PlayerContext *ctx,
+                                  const QStringList &actions);
+    void ChangeSubtitleZoom(PlayerContext *ctx, int dir);
+
     // PxP handling
     bool CreatePBP(PlayerContext *lctx, const ProgramInfo *info);
     bool CreatePIP(PlayerContext *lctx, const ProgramInfo *info);
@@ -666,6 +671,7 @@ class MTV_PUBLIC TV : public QObject
     mutable bool wantsToQuit;
     bool stretchAdjustment; ///< True if time stretch is turned on
     bool audiosyncAdjustment; ///< True if audiosync is turned on
+    bool subtitleZoomAdjustment; ///< True if subtitle zoom is turned on
     bool editmode;          ///< Are we in video editing mode
     bool zoomMode;
     bool sigMonMode;     ///< Are we in signal monitoring mode?
