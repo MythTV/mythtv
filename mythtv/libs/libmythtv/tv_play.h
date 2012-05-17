@@ -464,7 +464,7 @@ class MTV_PUBLIC TV : public QObject
     void UpdateOSDProgInfo(const PlayerContext*, const char *whichInfo);
     void UpdateOSDStatus(const PlayerContext *ctx, QString title, QString desc,
                          QString value, int type, QString units,
-                         int position = 0, int prev = 0, int next = 0,
+                         int position = 0,
                          enum OSDTimeout timeout = kOSDTimeout_Med);
     void UpdateOSDStatus(const PlayerContext *ctx, osdInfo &info,
                          int type, enum OSDTimeout timeout);

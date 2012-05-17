@@ -7519,13 +7519,11 @@ void TV::UpdateOSDStatus(const PlayerContext *ctx, osdInfo &info,
 
 void TV::UpdateOSDStatus(const PlayerContext *ctx, QString title, QString desc,
                          QString value, int type, QString units,
-                         int position, int prev, int next, OSDTimeout timeout)
+                         int position, OSDTimeout timeout)
 {
     osdInfo info;
     info.values.insert("position", position);
     info.values.insert("relposition", position);
-    info.values.insert("previous", prev);
-    info.values.insert("next",     next);
     info.text.insert("title", title);
     info.text.insert("description", desc);
     info.text.insert("value", value);
@@ -8424,7 +8422,7 @@ void TV::ChangeSubtitleZoom(PlayerContext *ctx, int dir)
         UpdateOSDStatus(ctx, tr("Adjust Subtitle Zoom"), tr("Subtitle Zoom"),
                         QString::number(newval),
                         kOSDFunctionalType_SubtitleZoomAdjust,
-                        "%", newval * 1000 / 200, 0, 0, kOSDTimeout_Long);
+                        "%", newval * 1000 / 200, kOSDTimeout_Long);
         SetUpdateOSDPosition(false);
         gCoreContext->SaveSetting("OSDCC708TextZoom", newval);
     }
