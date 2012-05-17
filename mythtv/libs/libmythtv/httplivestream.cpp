@@ -446,7 +446,7 @@ bool HTTPLiveStream::WritePlaylist(bool audioOnly, bool writeEndTag)
     while (i < tmpSegCount)
     {
         file.write(QString(
-            "#EXTINF:%1\n"
+            "#EXTINF:%1,\n"
             "%2%3\n"
             ).arg(m_segmentSize).arg(m_httpPrefixRel)
              .arg(GetFilename(segmentid + i, true, audioOnly, true)).toAscii());
