@@ -195,7 +195,11 @@ SOURCES += avfringbuffer.cpp        ThreadedFileWriter.cpp
 SOURCES += ringbuffer.cpp           fileringBuffer.cpp
 SOURCES += dvdringbuffer.cpp        bdringbuffer.cpp
 SOURCES += streamingringbuffer.cpp  metadataimagehelper.cpp
+
+#HLS player
 SOURCES += httplivestreambuffer.cpp
+using_libcrypto:DEFINES += USING_LIBCRYPTO
+using_libcrypto:LIBS    += -lcrypto
 
 # DiSEqC
 HEADERS += diseqc.h                 diseqcsettings.h
@@ -422,7 +426,6 @@ using_frontend {
         SOURCES += mythairplayserver.cpp
         using_libcrypto: HEADERS += mythraopdevice.h   mythraopconnection.h
         using_libcrypto: SOURCES += mythraopdevice.cpp mythraopconnection.cpp
-        using_libcrypto: LIBS    += -lcrypto
     }
 
     using_mheg {

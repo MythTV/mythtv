@@ -35,16 +35,15 @@
 #include "mythdownloadmanager.h"
 #include "mythlogging.h"
 
+#ifdef USING_LIBCRYPTO
 // encryption related stuff
-#include <openssl/rsa.h>
-#include <openssl/pem.h>
 #include <openssl/aes.h>
-
+#define AES_BLOCK_SIZE 16       // HLS only support AES-128
+#endif
 
 #define LOC QString("HLSBuffer: ")
 
 // Constants
-#define AES_BLOCK_SIZE 16       // HLS only support AES-128
 #define PLAYBACK_MINBUFFER 2  // number of segments to prefetch before playback starts
 #define PLAYBACK_READAHEAD 6  // number of segments download queue ahead of playback
 
@@ -87,16 +86,18 @@ class HLSSegment
 {
 public:
     HLSSegment(const int mduration, const int id, QString &title,
-                QString &uri, QString &current_key_path)
+               QString &uri, QString current_key_path = "")
     {
         m_duration      = mduration; /* seconds */
         m_id            = id;
         m_bandwidth     = 0;
         m_url           = uri;
-        m_keyloaded     = false;
-        m_psz_key_path  = current_key_path;
         m_played        = 0;
         m_title         = title;
+#ifdef USING_LIBCRYPTO
+        m_keyloaded     = false;
+        m_psz_key_path  = current_key_path;
+#endif
     }
 
     HLSSegment(const HLSSegment &rhs)
@@ -116,13 +117,15 @@ public:
         m_duration      = rhs.m_duration;
         m_bandwidth     = rhs.m_bandwidth;
         m_url           = rhs.m_url;
-        m_psz_key_path  = rhs.m_psz_key_path;
-        memcpy(&m_aeskey, &(rhs.m_aeskey), sizeof(m_aeskey));
-        m_keyloaded     = rhs.m_keyloaded;
         // keep the old data downloaded
         m_data          = m_data;
         m_played        = m_played;
         m_title         = rhs.m_title;
+#ifdef USING_LIBCRYPTO
+        m_psz_key_path  = rhs.m_psz_key_path;
+        memcpy(&m_aeskey, &(rhs.m_aeskey), sizeof(m_aeskey));
+        m_keyloaded     = rhs.m_keyloaded;
+#endif
         return *this;
     }
 
@@ -169,6 +172,7 @@ public:
         return RET_OK;
     }
 
+#ifdef USING_LIBCRYPTO
     int DownloadKey(void)
     {
         // must own lock
@@ -259,6 +263,7 @@ public:
         memcpy(&m_aeskey, &(segment.m_aeskey), sizeof(m_aeskey));
         m_keyloaded = segment.m_keyloaded;
     }
+#endif
 
     QString Url(void)
     {
@@ -320,11 +325,13 @@ private:
 
     QString     m_url;
     QString     m_psz_key_path; // URL key path
-    AES_KEY     m_aeskey;       // AES-128 key
-    bool        m_keyloaded;
     QByteArray  m_data;         // raw data
     int32_t     m_played;       // bytes counter of data already read from segment
     QMutex      m_lock;
+#ifdef USING_LIBCRYPTO
+    AES_KEY     m_aeskey;       // AES-128 key
+    bool        m_keyloaded;
+#endif
 };
 
 /* stream class */
@@ -342,7 +349,9 @@ public:
         m_version       = 1;    // default protocol version
         m_cache         = true;
         m_url           = uri;
+#ifdef USING_LIBCRYPTO
         m_ivloaded      = false;
+#endif
     }
 
     HLSStream(HLSStream &rhs, bool copy = true)
@@ -382,8 +391,10 @@ public:
         m_size          = rhs.m_size;
         m_url           = rhs.m_url;
         m_cache         = rhs.m_cache;
+#ifdef USING_LIBCRYPTO
         m_keypath       = rhs.m_keypath;
         m_ivloaded      = rhs.m_ivloaded;
+#endif
         return *this;
     }
 
@@ -508,8 +519,12 @@ public:
         QMutexLocker lock(&m_lock);
         QString psz_uri = relative_URI(m_url, uri);
         int id = NumSegments() + m_startsequence;
+        QString keypath;
+#ifdef USING_LIBCRYPTO
+        keypath = m_keypath;
+#endif
         HLSSegment *segment = new HLSSegment(duration, id, title,
-                                               psz_uri, m_keypath);
+                                             psz_uri, keypath);
         AppendSegment(segment);
     }
 
@@ -599,6 +614,7 @@ public:
                                      ((double)segment->Duration()));
         }
 
+#ifdef USING_LIBCRYPTO
         /* If the segment is encrypted, decode it */
         if (segment->HasKeyPath())
         {
@@ -619,6 +635,7 @@ public:
                 return RET_ERROR;
             }
         }
+#endif
         segment->Unlock();
 
         downloadduration = downloadduration < 1 ? 1 : downloadduration;
@@ -633,6 +650,7 @@ public:
         return RET_OK;
     }
 
+#ifdef USING_LIBCRYPTO
     /**
      * Will download all required segment AES-128 keys
      * Will try to re-use already downloaded keys if possible
@@ -667,6 +685,7 @@ public:
         }
         return RET_OK;
     }
+#endif
 
     int Id(void) const
     {
@@ -720,6 +739,7 @@ public:
     {
         return m_url;
     }
+#ifdef USING_LIBCRYPTO
     bool SetAESIV(QString &line)
     {
         /*
@@ -750,6 +770,7 @@ public:
     {
         m_keypath = x;
     }
+#endif
     void UpdateWith(HLSStream &upd)
     {
         QMutexLocker lock(&m_lock);
@@ -771,9 +792,11 @@ private:
     QString     m_url;                  // uri to m3u8
     QMutex      m_lock;
     bool        m_cache;                // allow caching
+#ifdef USING_LIBCRYPTO
     QString     m_keypath;              // URL path of the encrypted key
-    uint8_t     m_AESIV[AES_BLOCK_SIZE];// IV used when decypher the block
     bool        m_ivloaded;
+    uint8_t     m_AESIV[AES_BLOCK_SIZE];// IV used when decypher the block
+#endif
 };
 
 // Playback Stream Information
@@ -1717,6 +1740,7 @@ int HLSRingBuffer::ParseMediaSequence(HLSStream *hls, QString &line)
     return RET_OK;
 }
 
+
 int HLSRingBuffer::ParseKey(HLSStream *hls, QString &line)
 {
     /*
@@ -1752,6 +1776,7 @@ int HLSRingBuffer::ParseKey(HLSStream *hls, QString &line)
             }
         }
     }
+#ifdef USING_LIBCRYPTO
     else if (attr.startsWith(QLatin1String("AES-128")))
     {
         QString uri, iv;
@@ -1779,10 +1804,17 @@ int HLSRingBuffer::ParseKey(HLSStream *hls, QString &line)
             err = RET_ERROR;
         }
     }
+#endif
     else
     {
         LOG(VB_PLAYBACK, LOG_ERR, LOC +
-            "invalid encryption type, only NONE and AES-128 are supported supported.");
+            "invalid encryption type, only NONE "
+#ifdef USING_LIBCRYPTO
+            "and AES-128 are supported"
+#else
+            "is supported."
+#endif
+            );
         err = RET_ERROR;
     }
     return err;
@@ -2249,7 +2281,7 @@ bool HLSRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
 
     m_streamworker = new StreamWorker(this, startup, PLAYBACK_READAHEAD);
     m_streamworker->start();
-    
+
     /* Initialize HLS live stream thread */
     //if (m_live)
     {
