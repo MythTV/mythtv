@@ -166,6 +166,7 @@ HEADERS += avfringbuffer.h          ThreadedFileWriter.h
 HEADERS += ringbuffer.h             fileringbuffer.h
 HEADERS += dvdringbuffer.h          bdringbuffer.h
 HEADERS += streamingringbuffer.h    metadataimagehelper.h
+HEADERS += httplivestreambuffer.h
 
 SOURCES += recordinginfo.cpp
 SOURCES += dbcheck.cpp
@@ -194,6 +195,7 @@ SOURCES += avfringbuffer.cpp        ThreadedFileWriter.cpp
 SOURCES += ringbuffer.cpp           fileringBuffer.cpp
 SOURCES += dvdringbuffer.cpp        bdringbuffer.cpp
 SOURCES += streamingringbuffer.cpp  metadataimagehelper.cpp
+SOURCES += httplivestreambuffer.cpp
 
 # DiSEqC
 HEADERS += diseqc.h                 diseqcsettings.h
