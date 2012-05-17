@@ -44,8 +44,8 @@
 #define LOC QString("HLSBuffer: ")
 
 // Constants
-#define PLAYBACK_MINBUFFER 2  // number of segments to prefetch before playback starts
-#define PLAYBACK_READAHEAD 6  // number of segments download queue ahead of playback
+#define PLAYBACK_MINBUFFER 2    // number of segments to prefetch before playback starts
+#define PLAYBACK_READAHEAD 6    // number of segments download queue ahead of playback
 
 enum
 {
@@ -86,7 +86,7 @@ class HLSSegment
 {
 public:
     HLSSegment(const int mduration, const int id, QString &title,
-               QString &uri, QString current_key_path = "")
+               QString &uri, QString &current_key_path)
     {
         m_duration      = mduration; /* seconds */
         m_id            = id;
@@ -170,6 +170,58 @@ public:
             return RET_ERROR;
         }
         return RET_OK;
+    }
+
+    QString Url(void)
+    {
+        return m_url;
+    }
+
+    int32_t SizePlayed(void)
+    {
+        return m_played;
+    }
+
+    uint32_t Read(uint8_t *buffer, int32_t length)
+    {
+        int32_t left = m_data.size() - m_played;
+        if (length > left)
+        {
+            length = left;
+        }
+        if (buffer != NULL)
+        {
+            memcpy(buffer, m_data.constData() + m_played, length);
+        }
+        m_played += length;
+        return length;
+    }
+
+    void Reset(void)
+    {
+        m_played = 0;
+    }
+
+    void Clear(void)
+    {
+        m_played = 0;
+        m_data.clear();
+    }
+
+    QString Title(void)
+    {
+        return m_title;
+    }
+    void SetTitle(QString &x)
+    {
+        m_title = x;
+    }
+    /**
+     * provides pointer to raw segment data
+     */
+    const char *Data(void)
+    {
+        return m_data.constData();
     }
 
 #ifdef USING_LIBCRYPTO
@@ -263,59 +315,10 @@ public:
         memcpy(&m_aeskey, &(segment.m_aeskey), sizeof(m_aeskey));
         m_keyloaded = segment.m_keyloaded;
     }
+private:
+    AES_KEY     m_aeskey;       // AES-128 key
+    bool        m_keyloaded;
 #endif
-
-    QString Url(void)
-    {
-        return m_url;
-    }
-
-    int32_t SizePlayed(void)
-    {
-        return m_played;
-    }
-
-    uint32_t Read(uint8_t *buffer, int32_t length)
-    {
-        int32_t left = m_data.size() - m_played;
-        if (length > left)
-        {
-            length = left;
-        }
-        if (buffer != NULL)
-        {
-            memcpy(buffer, m_data.constData() + m_played, length);
-        }
-        m_played += length;
-        return length;
-    }
-
-    void Reset(void)
-    {
-        m_played = 0;
-    }
-
-    void Clear(void)
-    {
-        m_played = 0;
-        m_data.clear();
-    }
-
-    QString Title(void)
-    {
-        return m_title;
-    }
-    void SetTitle(QString &x)
-    {
-        m_title = x;
-    }
-    /**
-     * provides pointer to raw segment data
-     */
-    const char *Data(void)
-    {
-        return m_data.constData();
-    }
 
 private:
     int         m_id;           // unique sequence number
@@ -328,10 +331,6 @@ private:
     QByteArray  m_data;         // raw data
     int32_t     m_played;       // bytes counter of data already read from segment
     QMutex      m_lock;
-#ifdef USING_LIBCRYPTO
-    AES_KEY     m_aeskey;       // AES-128 key
-    bool        m_keyloaded;
-#endif
 };
 
 /* stream class */
@@ -519,12 +518,11 @@ public:
         QMutexLocker lock(&m_lock);
         QString psz_uri = relative_URI(m_url, uri);
         int id = NumSegments() + m_startsequence;
-        QString keypath;
-#ifdef USING_LIBCRYPTO
-        keypath = m_keypath;
+#ifndef USING_LIBCRYPTO
+        QString m_keypath;
 #endif
-        HLSSegment *segment = new HLSSegment(duration, id, title,
-                                             psz_uri, keypath);
+        HLSSegment *segment = new HLSSegment(duration, id, title, psz_uri,
+                                             m_keypath);
         AppendSegment(segment);
     }
 
@@ -649,44 +647,6 @@ public:
 
         return RET_OK;
     }
-
-#ifdef USING_LIBCRYPTO
-    /**
-     * Will download all required segment AES-128 keys
-     * Will try to re-use already downloaded keys if possible
-     */
-    int ManageSegmentKeys()
-    {
-        HLSSegment   *seg       = NULL;
-        HLSSegment   *prev_seg  = NULL;
-        int          count      = NumSegments();
-
-        for (int i = 0; i < count; i++)
-        {
-            prev_seg = seg;
-            seg = GetSegment(i);
-            if (seg == NULL )
-                continue;
-            if (!seg->HasKeyPath())
-                continue;   /* No key to load ? continue */
-            if (seg->KeyLoaded())
-                continue;   /* The key is already loaded */
-
-            /* if the key has not changed, and already available from previous segment,
-             * try to copy it, and don't load the key */
-            if (prev_seg && prev_seg->KeyLoaded() &&
-                (seg->KeyPath() == prev_seg->KeyPath()))
-            {
-                seg->CopyAESKey(*prev_seg);
-                continue;
-            }
-            if (seg->DownloadKey() != RET_OK)
-                return RET_ERROR;
-        }
-        return RET_OK;
-    }
-#endif
-
     int Id(void) const
     {
         return m_id;
@@ -739,7 +699,48 @@ public:
     {
         return m_url;
     }
+    void UpdateWith(HLSStream &upd)
+    {
+        QMutexLocker lock(&m_lock);
+        m_targetduration    = upd.m_targetduration < 0 ?
+                                m_targetduration : upd.m_targetduration;
+        m_cache             = upd.m_cache;
+    }
 #ifdef USING_LIBCRYPTO
+    /**
+     * Will download all required segment AES-128 keys
+     * Will try to re-use already downloaded keys if possible
+     */
+    int ManageSegmentKeys()
+    {
+        HLSSegment   *seg       = NULL;
+        HLSSegment   *prev_seg  = NULL;
+        int          count      = NumSegments();
+
+        for (int i = 0; i < count; i++)
+        {
+            prev_seg = seg;
+            seg = GetSegment(i);
+            if (seg == NULL )
+                continue;
+            if (!seg->HasKeyPath())
+                continue;   /* No key to load ? continue */
+            if (seg->KeyLoaded())
+                continue;   /* The key is already loaded */
+
+            /* if the key has not changed, and already available from previous segment,
+             * try to copy it, and don't load the key */
+            if (prev_seg && prev_seg->KeyLoaded() &&
+                (seg->KeyPath() == prev_seg->KeyPath()))
+            {
+                seg->CopyAESKey(*prev_seg);
+                continue;
+            }
+            if (seg->DownloadKey() != RET_OK)
+                return RET_ERROR;
+        }
+        return RET_OK;
+    }
     bool SetAESIV(QString &line)
     {
         /*
@@ -770,14 +771,11 @@ public:
     {
         m_keypath = x;
     }
+private:
+    QString     m_keypath;              // URL path of the encrypted key
+    bool        m_ivloaded;
+    uint8_t     m_AESIV[AES_BLOCK_SIZE];// IV used when decypher the block
 #endif
-    void UpdateWith(HLSStream &upd)
-    {
-        QMutexLocker lock(&m_lock);
-        m_targetduration    = upd.m_targetduration < 0 ?
-                                m_targetduration : upd.m_targetduration;
-        m_cache             = upd.m_cache;
-    }
 
 private:
     int         m_id;                   // program id
@@ -792,11 +790,6 @@ private:
     QString     m_url;                  // uri to m3u8
     QMutex      m_lock;
     bool        m_cache;                // allow caching
-#ifdef USING_LIBCRYPTO
-    QString     m_keypath;              // URL path of the encrypted key
-    bool        m_ivloaded;
-    uint8_t     m_AESIV[AES_BLOCK_SIZE];// IV used when decypher the block
-#endif
 };
 
 // Playback Stream Information
