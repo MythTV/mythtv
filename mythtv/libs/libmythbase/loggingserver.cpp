@@ -151,6 +151,9 @@ FileLogger::~FileLogger()
     {
         LOG(VB_GENERAL, LOG_INFO, QString("Removed logging to %1")
             .arg(m_handle));
+        close(m_fd);
+        m_fd = -1;
+        m_opened = false;
     }
 
     m_zmqSock->unsubscribeFrom(QByteArray(""));
