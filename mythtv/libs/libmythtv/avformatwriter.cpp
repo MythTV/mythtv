@@ -331,8 +331,8 @@ static void bswap_16_buf(short int *buf, int buf_cnt, int audio_channels)
 
 bool AVFormatWriter::WriteAudioFrame(unsigned char *buf, int fnum, int timecode)
 {
-    int sample_cnt = m_audioFrameSize / m_audioBytesPerSample;
 #if HAVE_BIGENDIAN
+    int sample_cnt = m_audioFrameSize / m_audioBytesPerSample;
     bswap_16_buf((short int*) buf, sample_cnt, m_audioChannels);
 #endif
 
