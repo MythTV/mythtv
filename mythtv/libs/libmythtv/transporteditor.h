@@ -36,6 +36,7 @@
 
 #include "mythtvexp.h"
 #include "settings.h"
+#include "inputselectorsetting.h"
 
 class VideoSourceSelector;
 class MultiplexID;
@@ -60,11 +61,14 @@ class TransportList : public ListBoxSetting, public TransientStorage
     void SetSourceID(const QString &_sourceid)
         { SetSourceID(_sourceid.toUInt()); }
 
+    void SetInput(const QString &cardids_inputname);
+
   private:
     ~TransportList() { }
 
   private:
     uint sourceid;
+    uint cardid;
     uint cardtype;
 };
 
@@ -88,6 +92,7 @@ class MTV_PUBLIC TransportListEditor : public QObject, public ConfigurationDialo
 
   private:
     VideoSourceSelector *m_videosource;
+    InputSelector       *m_input;
     TransportList       *m_list;
 };
 

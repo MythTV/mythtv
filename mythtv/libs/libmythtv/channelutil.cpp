@@ -829,10 +829,10 @@ int ChannelUtil::GetInputID(int source_id, int card_id)
     int input_id = -1;
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT cardinputid"
-                  " FROM cardinput"
-                  " WHERE sourceid = :SOURCEID"
-                  " AND cardid = :CARDID");
+    query.prepare("SELECT cardinputid "
+                  "FROM cardinput "
+                  "WHERE sourceid = :SOURCEID AND "
+                  "      cardid = :CARDID");
     query.bindValue(":SOURCEID", source_id);
     query.bindValue(":CARDID", card_id);
 
@@ -846,10 +846,12 @@ QStringList ChannelUtil::GetCardTypes(uint chanid)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT cardtype "
-                  "FROM capturecard, cardinput, channel "
-                  "WHERE channel.chanid   = :CHANID            AND "
-                  "      channel.sourceid = cardinput.sourceid AND "
-                  "      cardinput.cardid = capturecard.cardid "
+                  "FROM capturecard, cardinput, channel, videosourcemap as map "
+                  "WHERE channel.chanid   = :CHANID               AND "
+                  "      channel.sourceid = map.sourceid          AND "
+                  "      map.cardinputid  = cardinput.cardinputid AND "
+                  "      cardinput.cardid = capturecard.cardid    AND "
+                  "      map.type in ('main') "
                   "GROUP BY cardtype");
     query.bindValue(":CHANID", chanid);
 
@@ -977,12 +979,14 @@ QString ChannelUtil::GetChannelValueStr(const QString &channel_field,
     query.prepare(
         QString(
             "SELECT channel.%1 "
-            "FROM channel, capturecard, cardinput "
-            "WHERE channel.channum      = :CHANNUM           AND "
-            "      channel.sourceid     = cardinput.sourceid AND "
-            "      cardinput.inputname  = :INPUT             AND "
-            "      cardinput.cardid     = capturecard.cardid AND "
-            "      capturecard.cardid   = :CARDID ")
+            "FROM channel, capturecard, cardinput, videosourcemap as map "
+            "WHERE channel.channum      = :CHANNUM              AND "
+            "      channel.sourceid     = map.sourceid          AND "
+            "      map.cardinputid      = cardinput.cardinputid AND "
+            "      cardinput.inputname  = :INPUT                AND "
+            "      cardinput.cardid     = capturecard.cardid    AND "
+            "      capturecard.cardid   = :CARDID               AND "
+            "      map.type in ('main')")
         .arg(channel_field));
 
     query.bindValue(":CARDID",   cardid);
@@ -1090,12 +1094,14 @@ static QStringList get_valid_recorder_list(uint chanid)
     MSqlQuery query(MSqlQuery::InitCon());
     // We want to get the current source id for this recorder
     query.prepare(
-            "SELECT cardinput.cardid "
-            "FROM channel "
-            "LEFT JOIN cardinput ON channel.sourceid = cardinput.sourceid "
-            "WHERE channel.chanid = :CHANID AND "
-            "      cardinput.livetvorder > 0 "
-            "ORDER BY cardinput.livetvorder, cardinput.cardinputid");
+        "SELECT cardinput.cardid "
+        "FROM channel "
+        "LEFT JOIN videosourcemap ON channel.sourceid = videosourcemap.sourceid "
+        "LEFT JOIN cardinput ON videosourcemap.cardinputid = cardinput.cardinputid "
+        "WHERE channel.chanid = :CHANID  AND "
+        "      cardinput.livetvorder > 0 AND "
+        "      videosourcemap.type in ('main') "
+        "ORDER BY cardinput.livetvorder, cardinput.cardinputid");
     query.bindValue(":CHANID", chanid);
 
     if (!query.exec() || !query.isActive())
@@ -1126,9 +1132,11 @@ static QStringList get_valid_recorder_list(const QString &channum)
     query.prepare(
         "SELECT cardinput.cardid "
         "FROM channel "
-        "LEFT JOIN cardinput ON channel.sourceid = cardinput.sourceid "
+        "LEFT JOIN videosourcemap ON channel.sourceid = videosourcemap.sourceid "
+        "LEFT JOIN cardinput ON videosourcemap.cardinputid = cardinput.cardinputid "
         "WHERE channel.channum = :CHANNUM AND "
-        "      cardinput.livetvorder > 0 "
+        "      cardinput.livetvorder > 0 AND "
+        "      videosourcemap.type in ('main') "
         "ORDER BY cardinput.livetvorder, cardinput.cardinputid");
     query.bindValue(":CHANNUM", channum);
 
@@ -1833,70 +1841,7 @@ bool ChannelUtil::GetATSCChannel(uint sourceid, const QString &channum,
     return false;
 }
 
-bool ChannelUtil::GetChannelData(
-    uint    sourceid,         const QString &channum,
-    QString &tvformat,        QString       &modulation,
-    QString &freqtable,       QString       &freqid,
-    int     &finetune,        uint64_t      &frequency,
-    QString &dtv_si_std,      int           &mpeg_prog_num,
-    uint    &atsc_major,      uint          &atsc_minor,
-    uint    &dvb_transportid, uint          &dvb_networkid,
-    uint    &mplexid,
-    bool    &commfree)
-{
-    tvformat      = modulation = freqtable = QString::null;
-    freqid        = dtv_si_std = QString::null;
-    finetune      = 0;
-    frequency     = 0;
-    mpeg_prog_num = -1;
-    atsc_major    = atsc_minor = mplexid = 0;
-    dvb_networkid = dvb_transportid = 0;
-    commfree      = false;
-
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare(
-        "SELECT finetune, freqid, tvformat, freqtable, "
-        "       commmethod, mplexid, "
-        "       atsc_major_chan, atsc_minor_chan, serviceid "
-        "FROM channel, videosource "
-        "WHERE videosource.sourceid = channel.sourceid AND "
-        "      channum              = :CHANNUM         AND "
-        "      channel.sourceid     = :SOURCEID");
-    query.bindValue(":CHANNUM",  channum);
-    query.bindValue(":SOURCEID", sourceid);
-
-    if (!query.exec() || !query.isActive())
-    {
-        MythDB::DBError("GetChannelData", query);
-        return false;
-    }
-    else if (!query.next())
-    {
-        LOG(VB_GENERAL, LOG_ERR,
-            QString("GetChannelData() failed because it could not\n"
-                    "\t\t\tfind channel number '%1' in DB for source '%2'.")
-                .arg(channum).arg(sourceid));
-        return false;
-    }
-
-    finetune      = query.value(0).toInt();
-    freqid        = query.value(1).toString();
-    tvformat      = query.value(2).toString();
-    freqtable     = query.value(3).toString();
-    commfree      = (query.value(4).toInt() == -2);
-    mplexid       = query.value(5).toUInt();
-    atsc_major    = query.value(6).toUInt();
-    atsc_minor    = query.value(7).toUInt();
-    mpeg_prog_num = (query.value(8).isNull()) ? -1 : query.value(8).toInt();
-
-    if (!mplexid || (mplexid == 32767)) /* 32767 deals with old lineups */
-        return true;
-
-    return GetTuningParams(mplexid, modulation, frequency,
-                           dvb_transportid, dvb_networkid, dtv_si_std);
-}
-
-bool ChannelUtil::GetExtendedChannelData(
+bool ChannelUtil::GetChannelData(																	//TODO: MODIFIY THIS
     uint    sourceid,         const QString &channum,
     QString &tvformat,        QString       &modulation,
     QString &freqtable,       QString       &freqid,
@@ -1970,7 +1915,7 @@ bool ChannelUtil::GetExtendedChannelData(
                            dvb_transportid, dvb_networkid, dtv_si_std);
 }
 
-DBChanList ChannelUtil::GetChannelsInternal(
+DBChanList ChannelUtil::GetChannelsInternal(																	//TODO: MODIFIY THIS
     uint sourceid, bool vis_only, bool include_disconnected,
     const QString &grp, uint changrpid)
 {
@@ -1982,27 +1927,28 @@ DBChanList ChannelUtil::GetChannelsInternal(
         "SELECT channum, callsign, channel.chanid, "
         "       atsc_major_chan, atsc_minor_chan, "
         "       name, icon, mplexid, visible, "
-        "       channel.sourceid, cardinput.cardid, channelgroup.grpid "
+        "       channel.sourceid, cardinput.cardid, videosourcemap.type, channelgroup.grpid "
         "FROM channel "
-        "LEFT JOIN channelgroup ON channel.chanid     = channelgroup.chanid "
-        " %1  JOIN cardinput    ON cardinput.sourceid = channel.sourceid "
-        " %2  JOIN capturecard  ON cardinput.cardid   = capturecard.cardid ")
+        "LEFT JOIN channelgroup   ON channel.chanid          = channelgroup.chanid "
+    	"LEFT JOIN videosourcemap ON videosourcemap.sourceid = channel.sourceid "
+        " %1  JOIN cardinput      ON cardinput.cardinputid   = videosourcemap.cardinputid "
+        " %2  JOIN capturecard    ON cardinput.cardid        = capturecard.cardid "
+        "WHERE videosourcemap.type = 'main' ")
         .arg((include_disconnected) ? "LEFT" : "")
         .arg((include_disconnected) ? "LEFT" : "");
 
-    QString cond = " WHERE ";
+    QString cond = " AND ";
 
     if (sourceid)
     {
-        qstr += QString("WHERE channel.sourceid='%1' ").arg(sourceid);
+        qstr += QString("%1 channel.sourceid='%2' ").arg(cond).arg(sourceid);
         cond = " AND ";
     }
 
     // Select only channels from the specified channel group
     if (changrpid > 0)
     {
-        qstr += QString("%1 channelgroup.grpid = '%2' ")
-            .arg(cond).arg(changrpid);
+        qstr += QString("%1 channelgroup.grpid = '%2' ").arg(cond).arg(changrpid);
         cond = " AND ";
     }
 
@@ -2039,7 +1985,7 @@ DBChanList ChannelUtil::GetChannelsInternal(
             query.value(6).toString(),                    /* icon       */
             query.value(9).toUInt(),                      /* sourceid   */
             query.value(11).toUInt(),                     /* cardid     */
-            query.value(10).toUInt());                    /* grpid      */
+            query.value(12).toUInt());                    /* grpid      */
 
         list.push_back(chan);
     }

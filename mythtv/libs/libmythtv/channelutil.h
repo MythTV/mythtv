@@ -157,16 +157,7 @@ class MTV_PUBLIC ChannelUtil
     static int     GetChanID(uint sourceid, const QString &channum)
         { return GetChannelValueInt("chanid", sourceid, channum); }
     static bool    GetChannelData(
-        uint    sourceid,         const QString &channum,
-        QString &tvformat,        QString       &modulation,
-        QString &freqtable,       QString       &freqid,
-        int     &finetune,        uint64_t      &frequency,
-        QString &dtv_si_std,      int     &mpeg_prog_num,
-        uint    &atsc_major,      uint          &atsc_minor,
-        uint    &dvb_transportid, uint          &dvb_networkid,
-        uint    &mplexid,         bool          &commfree);
-    static bool    GetExtendedChannelData(
-        uint sourceid,            const QString &channum,
+        uint     sourceid,        const QString &channum,
         QString &tvformat,        QString       &modulation,
         QString &freqtable,       QString       &freqid,
         int     &finetune,        uint64_t      &frequency,

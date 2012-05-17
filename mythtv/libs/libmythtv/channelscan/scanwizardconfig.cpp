@@ -19,21 +19,22 @@
 #include "panedvbutilsimport.h"
 #include "paneexistingscanimport.h"
 
+#include "mythlogging.h"
+
 ScanWizardConfig::ScanWizardConfig(
     ScanWizard *_parent,
     uint    default_sourceid,  uint default_cardid,
     QString default_inputname) :
     VerticalConfigurationGroup(false, true, false, false),
-    videoSource(new VideoSourceSelector(
-                    default_sourceid, CardUtil::GetScanableCardTypes(), false)),
-    input(new InputSelector(default_cardid, default_inputname)),
+    videoSource(new VideoSourceSelector(default_sourceid, CardUtil::GetScanableCardTypes(), false, QString("'main','scan'"))),
+    input(new InputSelector(default_cardid, default_inputname, QString("'main','scan'"))),
     scanType(new ScanTypeSetting()),
     scanConfig(new ScanOptionalConfig(scanType)),
     services(new DesiredServices()),
     ftaOnly(new FreeToAirOnly()),
     trustEncSI(new TrustEncSISetting())
 {
-    setLabel(tr("Scan Configuration"));
+	setLabel(tr("Scan Configuration"));
 
     ConfigurationGroup *cfg =
         new HorizontalConfigurationGroup(false, false, true, true);

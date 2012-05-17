@@ -1137,9 +1137,12 @@ static bool get_use_eit(uint cardid)
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
         "SELECT SUM(useeit) "
-        "FROM videosource, cardinput "
-        "WHERE videosource.sourceid = cardinput.sourceid AND"
-        "      cardinput.cardid     = :CARDID");
+        "FROM videosource, cardinput, videosourcemap as map "
+        "WHERE videosource.sourceid  = map.sourceid    AND "
+        "      cardinput.cardinputid = map.cardinputid AND "
+    	"      cardinput.cardid      = :CARDID         AND "
+    	"      map.type in ('main','eit')");
+
     query.bindValue(":CARDID", cardid);
 
     if (!query.exec() || !query.isActive())
@@ -1157,9 +1160,11 @@ static bool is_dishnet_eit(uint cardid)
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
         "SELECT SUM(dishnet_eit) "
-        "FROM videosource, cardinput "
-        "WHERE videosource.sourceid = cardinput.sourceid AND"
-        "      cardinput.cardid     = :CARDID");
+        "FROM videosource, cardinput, videosourcemap as map "
+        "WHERE videosource.sourceid  = map.sourceid    AND "
+        "      cardinput.cardinputid = map.cardinputid AND "
+        "      cardinput.cardid      = :CARDID         AND "
+        "      map.type in ('main','eit')");
     query.bindValue(":CARDID", cardid);
 
     if (!query.exec() || !query.isActive())
@@ -1645,11 +1650,13 @@ QString TVRec::GetStartChannel(uint cardid, const QString &startinput)
     // get a valid channel on our current input.
     query.prepare(
         "SELECT channum "
-        "FROM capturecard, cardinput, channel "
-        "WHERE capturecard.cardid = cardinput.cardid   AND "
-        "      channel.sourceid   = cardinput.sourceid AND "
-        "      capturecard.cardid = :CARDID AND "
-        "      inputname          = :INPUTNAME");
+        "FROM capturecard, cardinput, channel, videosourcemap as map "
+        "WHERE capturecard.cardid    = cardinput.cardid AND "
+        "      cardinput.cardinputid = map.cardinputid  AND "
+        "      channel.sourceid      = map.sourceid     AND "
+        "      capturecard.cardid    = :CARDID          AND "
+        "      inputname             = :INPUTNAME       AND "
+        "      map.type in ('main')");
     query.bindValue(":CARDID",    cardid);
     query.bindValue(":INPUTNAME", startinput);
 
@@ -1671,12 +1678,14 @@ QString TVRec::GetStartChannel(uint cardid, const QString &startinput)
     // If we failed to get a channel on our current input,
     // widen search to any input.
     query.prepare(
-        "SELECT channum, inputname "
-        "FROM capturecard, cardinput, channel "
-        "WHERE capturecard.cardid = cardinput.cardid   AND "
-        "      channel.sourceid   = cardinput.sourceid AND "
-        "      capturecard.cardid = :CARDID");
-    query.bindValue(":CARDID", cardid);
+        "SELECT channum "
+        "FROM capturecard, cardinput, channel, videosourcemap as map "
+        "WHERE capturecard.cardid    = cardinput.cardid AND "
+        "      cardinput.cardinputid = map.cardinputid  AND "
+        "      channel.sourceid      = map.sourceid     AND "
+        "      capturecard.cardid    = :CARDID          AND "
+        "      map.type in ('main')");
+    query.bindValue(":CARDID",    cardid);
 
     if (!query.exec() || !query.isActive())
     {
@@ -2097,13 +2106,15 @@ bool TVRec::ShouldSwitchToAnotherCard(QString chanid)
 
     query.prepare(
         "SELECT channel.channum "
-        "FROM channel,cardinput "
-        "WHERE ( channel.chanid = :CHANID OR             "
-        "        ( channel.channum  = :CHANNUM AND       "
-        "          channel.callsign = :CALLSIGN    )     "
-        "      )                                     AND "
-        "      channel.sourceid = cardinput.sourceid AND "
-        "      cardinput.cardid = :CARDID");
+        "FROM channel, cardinput, videosourcemap as map     "
+        "WHERE ( channel.chanid = :CHANID OR                "
+        "        ( channel.channum  = :CHANNUM AND          "
+        "          channel.callsign = :CALLSIGN    )        "
+        "      )                                        AND "
+        "      channel.sourceid = map.sourceid          AND "
+        "      map.cardinputid  = cardinput.cardinputid AND "
+        "      cardinput.cardid = :CARDID               AND "
+        "      map.type in ('main') ");
     query.bindValue(":CHANID", chanid);
     query.bindValue(":CHANNUM", channelname);
     query.bindValue(":CALLSIGN", callsign);
@@ -2123,13 +2134,15 @@ bool TVRec::ShouldSwitchToAnotherCard(QString chanid)
     // We didn't find it on the current card, so now we check other cards.
     query.prepare(
         "SELECT channel.channum, cardinput.cardid "
-        "FROM channel,cardinput "
-        "WHERE ( channel.chanid = :CHANID OR              "
-        "        ( channel.channum  = :CHANNUM AND        "
-        "          channel.callsign = :CALLSIGN    )      "
-        "      )                                      AND "
-        "      channel.sourceid  = cardinput.sourceid AND "
-        "      cardinput.cardid != :CARDID");
+        "FROM channel, cardinput, videosourcemap as map     "
+        "WHERE ( channel.chanid = :CHANID OR                "
+        "        ( channel.channum  = :CHANNUM AND          "
+        "          channel.callsign = :CALLSIGN    )        "
+        "      )                                        AND "
+        "      channel.sourceid = map.sourceid          AND "
+        "      map.cardinputid  = cardinput.cardinputid AND "
+        "      cardinput.cardid != :CARDID              AND "
+        "      map.type in ('main') ");
     query.bindValue(":CHANID", chanid);
     query.bindValue(":CHANNUM", channelname);
     query.bindValue(":CALLSIGN", callsign);
@@ -2225,10 +2238,12 @@ bool TVRec::CheckChannelPrefix(const QString &prefix,
     MSqlQuery query(MSqlQuery::InitCon());
     QString basequery = QString(
         "SELECT channel.chanid, channel.channum, cardinput.cardid "
-        "FROM channel, capturecard, cardinput "
-        "WHERE channel.channum LIKE '%1%'            AND "
-        "      channel.sourceid = cardinput.sourceid AND "
-        "      cardinput.cardid = capturecard.cardid");
+        "FROM channel, capturecard, cardinput, videosourcemap as map "
+        "WHERE channel.channum LIKE '%1%'                 AND "
+        "      channel.sourceid      = map.sourceid       AND "
+        "      cardinput.cardinputid = map.cardinputid    AND "
+        "      cardinput.cardid      = capturecard.cardid AND "
+        "      map.type in ('main')");
 
     QString cardquery[2] =
     {
@@ -3461,8 +3476,15 @@ uint TVRec::TuningCheckForHWChange(const TuningRequest &request,
     if (request.program)
         request.program->QueryTuningInfo(channum, inputname);
 
+//need to pass maptype string based on request... could do it inline like this or something maybe??
+    QString maptypes = "'main'";			//TODO: TIDY UP THIS PIECE OF CODE.
+    if (request.flags & kFlagEITScan)
+        maptypes = "'main','eit'";
+//QString rawmod = (CardUtil::OFDM == cardtype) ?
+//    query.value(6).toString() : query.value(1).toString();
+
     if (!channum.isEmpty() && inputname.isEmpty())
-        channel->CheckChannel(channum, inputname);
+        channel->CheckChannel(channum, inputname, maptypes);
 
     if (!inputname.isEmpty())
     {
@@ -3588,6 +3610,12 @@ void TVRec::TuningShutdowns(const TuningRequest &request)
  */
 void TVRec::TuningFrequency(const TuningRequest &request)
 {
+    //////////////
+    QString maptypes = "'main'";			//TODO: TIDY UP THIS PIECE OF CODE.
+    if (request.flags & kFlagEITScan)
+        maptypes = "'main','eit'";
+    //////////////////////////
+
     DTVChannel *dtvchan = GetDTVChannel();
     if (dtvchan)
     {
@@ -3645,7 +3673,7 @@ void TVRec::TuningFrequency(const TuningRequest &request)
         if (!input.isEmpty())
             ok = channel->SwitchToInput(input, channum);
         else
-            ok = channel->SetChannelByString(channum);
+            ok = channel->SetChannelByString(channum, maptypes);			// THIS IS THE ONE BEING CALLED AT PRESENT... IT ALL HAPPENS FROM THIS FUNCT.
     }
 
     if (!ok)

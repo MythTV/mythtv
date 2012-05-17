@@ -189,10 +189,13 @@ bool Scheduler::VerifyCards(void)
     while (query.next())
     {
         subquery.prepare(
-            "SELECT cardinputid "
-            "FROM cardinput "
-            "WHERE sourceid = :SOURCEID "
+            "SELECT cardinput.cardinputid "
+            "FROM cardinput, videosourcemap "
+            "WHERE cardinput.cardinputid   = videosourcemap.cardinputid AND "
+            "      videosourcemap.sourceid = :SOURCEID AND "
+            "      videosourcemap.type     = 'main' "
             "ORDER BY cardinputid;");
+
         subquery.bindValue(":SOURCEID", query.value(0).toUInt());
 
         if (!subquery.exec())
@@ -3977,7 +3980,8 @@ void Scheduler::AddNewRecords(void)
         "     recordmatch.manualid  = p.manualid ) "
         "INNER JOIN channel AS c "
         "ON ( c.chanid = p.chanid ) "
-        "INNER JOIN cardinput ON (c.sourceid = cardinput.sourceid) "
+        "INNER JOIN videosourcemap ON (c.sourceid = videosourcemap.sourceid AND videosourcemap.type = 'main') "
+        "INNER JOIN cardinput ON (videosourcemap.cardinputid = cardinput.cardinputid) "
         "INNER JOIN capturecard ON (capturecard.cardid = cardinput.cardid) "
         "LEFT JOIN oldrecorded as oldrecstatus "
         "ON ( oldrecstatus.station   = c.callsign  AND "

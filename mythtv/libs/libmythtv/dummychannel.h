@@ -27,7 +27,7 @@ class DummyChannel : public ChannelBase
     void Close(void)    { return; }
 
     // Sets
-    bool SetChannelByString(const QString &chan)
+    bool SetChannelByString(const QString &chan, QString maptypes = "'main'")
         { m_curchannelname = chan; return true; }
 
     // Gets

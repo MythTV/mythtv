@@ -175,7 +175,7 @@ void DTVChannel::ReturnMasterLock(DTVChannelP &chan)
     }
 }
 
-bool DTVChannel::SetChannelByString(const QString &channum)
+bool DTVChannel::SetChannelByString(const QString &channum, QString maptypes)
 {
     QString loc = LOC + QString("SetChannelByString(%1): ").arg(channum);
     LOG(VB_CHANNEL, LOG_INFO, loc);
@@ -186,19 +186,18 @@ bool DTVChannel::SetChannelByString(const QString &channum)
     {
         LOG(VB_GENERAL, LOG_ERR, loc + "Channel object "
                 "will not open, can not change channels.");
-
         return false;
     }
 
     if (m_inputs.size() > 1)
     {
         QString inputName;
-        if (!CheckChannel(channum, inputName))
+
+        if (!CheckChannel(channum, inputName))  //...................... SHOULD THIS GET MAPTYPES... was not called initially at least....
         {
             LOG(VB_GENERAL, LOG_ERR, loc +
                     "CheckChannel failed.\n\t\t\tPlease verify the channel "
                     "in the 'mythtv-setup' Channel Editor.");
-
             return false;
         }
 
@@ -208,11 +207,9 @@ bool DTVChannel::SetChannelByString(const QString &channum)
         if (!inputName.isEmpty())
             return SwitchToInput(inputName, channum);
     }
-
     InputMap::const_iterator it = m_inputs.find(m_currentInputID);
     if (it == m_inputs.end())
         return false;
-
     uint mplexid_restriction;
     if (!IsInputAvailable(m_currentInputID, mplexid_restriction))
     {
@@ -220,7 +217,6 @@ bool DTVChannel::SetChannelByString(const QString &channum)
             QString("Requested channel '%1' is on input '%2' "
                     "which is in a busy input group")
                 .arg(channum).arg(m_currentInputID));
-
         return false;
     }
 
@@ -230,16 +226,56 @@ bool DTVChannel::SetChannelByString(const QString &channum)
     uint64_t frequency;
     int mpeg_prog_num;
     uint atsc_major, atsc_minor, mplexid, tsid, netid;
+    bool use_on_air_guide, visible;
+    QString xmltvid, default_authority, icon;
+
+////////////////////////////////////////////////////
+////////////////////////////////////////////////////
+// Look up the sourcemap based on cardid and then pass the cardid on
+// to getchanneldata along with a map.types string. Done :-)
+//cardid is: 	(*it)->cardid
+//m_currentInputID, GetCurrentInputNum()
+//maptpyes is: 	maptypes
+MSqlQuery query(MSqlQuery::InitCon());
+QString querystr =
+    "SELECT channel.sourceid "
+    "FROM videosourcemap as map, channel "
+    "WHERE channel.sourceid = map.sourceid AND "
+    "      map.cardinputid = :CARDINPUTID  AND "
+    "      map.type in (MAPTYPES)      AND "
+    "      channum = :CHANNUM ";
+querystr.replace("MAPTYPES", maptypes);
+query.prepare(querystr);
+query.bindValue(":CARDINPUTID", GetCurrentInputNum());
+query.bindValue(":CHANNUM",  channum);
+
+if (!query.exec() || !query.isActive())
+{
+    MythDB::DBError("LincsGetMapData", query);
+    //return false;
+}
+else if (!query.next())
+{
+    LOG(VB_GENERAL, LOG_ERR,
+        QString("LINC.......... blah blah blah linc query.next failed\n\n\n\n\n\n\n\n"));
+    //return false;
+}
+
+int variablesrcid = query.value(0).toInt();
+////////////////////////////////////////////////////
+////////////////////////////////////////////////////
+
+
 
     if (!ChannelUtil::GetChannelData(
-        (*it)->sourceid, channum,
+        /*(*it)->sourceid,*/variablesrcid, channum,
         tvformat, modulation, freqtable, freqid,
         finetune, frequency,
         si_std, mpeg_prog_num, atsc_major, atsc_minor, tsid, netid,
-        mplexid, m_commfree))
+        mplexid, m_commfree, use_on_air_guide, visible,
+        xmltvid, default_authority, icon))
     {
         LOG(VB_GENERAL, LOG_ERR, loc + "Unable to find channel in database.");
-
         return false;
     }
 
@@ -249,7 +285,6 @@ bool DTVChannel::SetChannelByString(const QString &channum)
             QString("Requested channel '%1' is not available because "
                     "the tuner is currently in use on another transport.")
                 .arg(channum));
-
         return false;
     }
 
@@ -387,7 +422,7 @@ bool DTVChannel::SetChannelByString(const QString &channum)
     // Setup filters & recording picture attributes for framegrabing recorders
     // now that the new curchannelname has been established.
     if (m_pParent)
-        m_pParent->SetVideoFiltersForChannel(GetCurrentSourceID(), channum);
+        m_pParent->SetVideoFiltersForChannel(GetCurrentSourceID(), channum);			//FIXME: LINC MIGHT BREAK THIS
     InitPictureAttributes();
 
     HandleScript(freqid);

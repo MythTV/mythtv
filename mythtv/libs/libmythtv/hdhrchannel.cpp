@@ -178,7 +178,7 @@ bool HDHRChannel::Tune(const DTVMultiplex &tuning, QString /*inputname*/)
     return false;
 }
 
-bool HDHRChannel::SetChannelByString(const QString &channum)
+bool HDHRChannel::SetChannelByString(const QString &channum, QString maptypes)
 {
     bool ok = DTVChannel::SetChannelByString(channum);
 

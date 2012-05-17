@@ -775,10 +775,10 @@ static bool clone_cardinputs(uint src_cardid, uint dst_cardid)
     for (uint i = 0; i < src_inputs.size(); i++)
     {
         query.prepare(
-            "SELECT sourceid,        inputname,       externalcommand, "
-            "       tunechan,        startchan,       displayname,     "
-            "       dishnet_eit,     recpriority,     quicktune,       "
-            "       schedorder,      livetvorder                       "
+            "SELECT inputname,   externalcommand, tunechan,    "
+            "       startchan,   displayname,     dishnet_eit, "
+            "       recpriority, quicktune,       schedorder,  "
+            "       livetvorder                                "
             "FROM cardinput "
             "WHERE cardinputid = :INPUTID");
         query.bindValue(":INPUTID", src_inputs[i]);
@@ -813,17 +813,16 @@ static bool clone_cardinputs(uint src_cardid, uint dst_cardid)
             // copy data from src[i] to dst[match]
             query2.prepare(
                 "UPDATE cardinput "
-                "SET sourceid        = :V0, "
-                "    inputname       = :V1, "
-                "    externalcommand = :V2, "
-                "    tunechan        = :V3, "
-                "    startchan       = :V4, "
-                "    displayname     = :V5, "
-                "    dishnet_eit     = :V6, "
-                "    recpriority     = :V7, "
-                "    quicktune       = :V8, "
-                "    schedorder      = :V9, "
-                "    livetvorder     = :V10 "
+                "SET inputname       = :V0, "
+                "    externalcommand = :V1, "
+                "    tunechan        = :V2, "
+                "    startchan       = :V3, "
+                "    displayname     = :V4, "
+                "    dishnet_eit     = :V5, "
+                "    recpriority     = :V6, "
+                "    quicktune       = :V7, "
+                "    schedorder      = :V8, "
+                "    livetvorder     = :V9 "
                 "WHERE cardinputid = :INPUTID");
 
             for (uint j = 0; j < 11; j++)
@@ -849,17 +848,16 @@ static bool clone_cardinputs(uint src_cardid, uint dst_cardid)
             query2.prepare(
                 "INSERT cardinput "
                 "SET cardid          = :CARDID, "
-                "    sourceid        = :V0, "
-                "    inputname       = :V1, "
-                "    externalcommand = :V2, "
-                "    tunechan        = :V3, "
-                "    startchan       = :V4, "
-                "    displayname     = :V5, "
-                "    dishnet_eit     = :V6, "
-                "    recpriority     = :V7, "
-                "    quicktune       = :V8, "
-                "    schedorder      = :V9, "
-                "    livetvorder     = :V10 ");
+                "    inputname       = :V0, "
+                "    externalcommand = :V1, "
+                "    tunechan        = :V2, "
+                "    startchan       = :V3, "
+                "    displayname     = :V4, "
+                "    dishnet_eit     = :V5, "
+                "    recpriority     = :V6, "
+                "    quicktune       = :V7, "
+                "    schedorder      = :V8, "
+                "    livetvorder     = :V9 ");
 
             query2.bindValue(":CARDID", dst_cardid);
             for (uint j = 0; j < 11; j++)
@@ -1026,14 +1024,17 @@ QString CardUtil::GetFirewireChangerModel(uint inputid)
     return fwnode;
 }
 
-vector<uint> CardUtil::GetCardIDs(uint sourceid)
+vector<uint> CardUtil::GetCardIDs(uint sourceid, QString maptypes)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
-    query.prepare(
+    query.prepare(QString(
         "SELECT DISTINCT cardid "
-        "FROM cardinput "
-        "WHERE sourceid = :SOURCEID");
+        "FROM cardinput, videosourcemap "
+        "WHERE videosourcemap.cardinputid = cardinput.cardinputid AND "
+    	"      videosourcemap.sourceid = :SOURCEID                AND "
+        "      videosourcemap.type in (%1) ").arg(maptypes));
+
     query.bindValue(":SOURCEID", sourceid);
 
     vector<uint> list;
@@ -1055,12 +1056,15 @@ int CardUtil::GetCardInputID(
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
-        "SELECT cardinputid, inputname "
-        "FROM channel, capturecard, cardinput "
-        "WHERE channel.channum      = :CHANNUM           AND "
-        "      channel.sourceid     = cardinput.sourceid AND "
-        "      cardinput.cardid     = capturecard.cardid AND "
-        "      capturecard.cardid   = :CARDID");
+        "SELECT DISTINCT cardinput.cardinputid, cardinput.inputname "
+        "FROM channel, capturecard, cardinput, videosourcemap "
+        "WHERE channel.channum            = :CHANNUM                AND "
+        "      channel.sourceid           = videosourcemap.sourceid AND "
+        "      videosourcemap.cardinputid = cardinput.cardinputid   AND "
+        "      videosourcemap.type in ('main')                      AND "
+        "      cardinput.cardid           = capturecard.cardid      AND "
+        "      capturecard.cardid         = :CARDID ");
+
     query.bindValue(":CHANNUM", channum);
     query.bindValue(":CARDID", cardid);
 
@@ -1117,17 +1121,20 @@ QString CardUtil::GetStartInput(uint nCardID)
     return str;
 }
 
-QStringList CardUtil::GetInputNames(uint cardid, uint sourceid)
+QStringList CardUtil::GetInputNames(uint cardid, uint sourceid, QString maptypes)
 {
     QStringList list;
     MSqlQuery query(MSqlQuery::InitCon());
 
     if (sourceid)
     {
-        query.prepare("SELECT inputname "
-                      "FROM cardinput "
-                      "WHERE sourceid = :SOURCEID AND "
-                      "      cardid   = :CARDID");
+        query.prepare(QString(
+        		      "SELECT inputname "
+                      "FROM cardinput, videosourcemap "
+                      "WHERE videosourcemap.sourceid = :SOURCEID AND "
+                      "      videosourcemap.cardinputid = cardinput.cardinputid AND "
+        		      "      cardid   = :CARDID AND "
+                      "      videosourcemap.type in (%1) ").arg(maptypes));
         query.bindValue(":SOURCEID", sourceid);
     }
     else
@@ -1158,8 +1165,10 @@ bool CardUtil::GetInputInfo(InputInfo &input, vector<uint> *groupids)
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT inputname, sourceid, cardid, livetvorder "
-                  "FROM cardinput "
-                  "WHERE cardinputid = :INPUTID");
+                  "FROM cardinput, videosourcemap as map "
+                  "WHERE cardinput.cardinputid = map.cardinputid AND "
+                  "      cardinput.cardinputid = :INPUTID        AND "
+                  "      map.type in ('main')");
     query.bindValue(":INPUTID", input.inputid);
 
     if (!query.exec())
@@ -1255,13 +1264,17 @@ uint CardUtil::GetInputID(uint cardid, const QString &inputname)
     return 0;
 }
 
-uint CardUtil::GetInputID(uint cardid, uint sourceid)
+uint CardUtil::GetInputID(uint cardid, uint sourceid, QString maptypes)
 {
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT cardinputid "
-                  "FROM cardinput "
-                  "WHERE sourceid  = :SOURCEID AND "
-                  "      cardid    = :CARDID");
+    query.prepare(QString(
+    		      "SELECT cardinput.cardinputid "
+                  "FROM cardinput, videosourcemap "
+                  "WHERE videosourcemap.sourceid  = :SOURCEID AND "
+                  "      videosourcemap.cardinputid = cardinput.cardinputid AND "
+                  "      cardid    = :CARDID AND "
+                  "      videosourcemap.type in (%1) ").arg(maptypes));
+
     query.bindValue(":SOURCEID", sourceid);
     query.bindValue(":CARDID",    cardid);
 
@@ -1278,8 +1291,9 @@ uint CardUtil::GetSourceID(uint inputid)
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
         "SELECT sourceid "
-        "FROM cardinput "
-        "WHERE cardinputid = :INPUTID");
+        "FROM videosourcemap "
+        "WHERE cardinputid = :INPUTID AND "
+        "      type in ('main')");
     query.bindValue(":INPUTID", inputid);
     if (!query.exec() || !query.isActive())
         MythDB::DBError("CardUtil::GetSourceID()", query);
@@ -1335,7 +1349,7 @@ vector<uint> CardUtil::GetInputIDs(uint cardid)
 }
 
 int CardUtil::CreateCardInput(const uint cardid,
-                              const uint sourceid,
+                              const uint sourceid,					//FIXME: THIS IS NO LONGER STORED IN CARDINPUT
                               const QString &inputname,
                               const QString &externalcommand,
                               const QString &changer_device,
@@ -1354,15 +1368,14 @@ int CardUtil::CreateCardInput(const uint cardid,
 
     query.prepare(
         "INSERT INTO cardinput "
-        "(cardid, sourceid, inputname, externalcommand, changer_device, "
+        "(cardid, inputname, externalcommand, changer_device, "
         "changer_model, tunechan, startchan, displayname, dishnet_eit, "
         "recpriority, quicktune, schedorder, livetvorder) "
-        "VALUES (:CARDID, :SOURCEID, :INPUTNAME, :EXTERNALCOMMAND, "
+        "VALUES (:CARDID, :INPUTNAME, :EXTERNALCOMMAND, "
         ":CHANGERDEVICE, :CHANGERMODEL, :TUNECHAN, :STARTCHAN, :DISPLAYNAME, "
         ":DISHNETEIT, :RECPRIORITY, :QUICKTUNE, :SCHEDORDER, :LIVETVORDER ) ");
 
     query.bindValue(":CARDID", cardid);
-    query.bindValue(":SOURCEID", sourceid);
     query.bindValue(":INPUTNAME", inputname);
     query.bindValue(":EXTERNALCOMMAND", externalcommand);
     query.bindValue(":CHANGERDEVICE", changer_device);
@@ -1415,6 +1428,58 @@ bool CardUtil::DeleteInput(uint inputid)
     return true;
 }
 
+bool CardUtil::DeleteVideoSourceMap(uint videosourcemapid)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "DELETE FROM videosourcemap "
+        "WHERE mapid = :MAPID");
+    query.bindValue(":MAPID", videosourcemapid);
+
+    if (!query.exec())
+    {
+        MythDB::DBError("DeleteVideoSourceMap", query);
+        return false;
+    }
+
+    return true;
+}
+
+bool CardUtil::DeleteUnusedInputs(void)
+{
+    MSqlQuery query(MSqlQuery::InitCon());			//FIXME: THIS WILL DELETE A CARD IF *ANY* LINKED MAPS HAVE A SOURCEID OF 0 OR NULL.
+    query.prepare("SELECT cardinput.cardinputid "
+                  "FROM cardinput "
+                  "LEFT JOIN videosourcemap "
+                  "ON (cardinput.cardinputid = videosourcemap.cardinputid) "
+                  "WHERE videosourcemap.sourceid = 0 OR "
+    		      "      videosourcemap.sourceid is NULL ");
+    if (!query.exec())
+    {
+        MythDB::DBError("DeleteUnusedInputs -- query disconnects", query);
+        return false;
+    }
+
+    bool ok = true;
+    while (query.next())
+    {
+        uint inputid = query.value(0).toUInt();
+        if (DeleteInput(inputid))
+        {
+            LOG(VB_GENERAL, LOG_NOTICE, QString("Removed unused input %1")
+                     .arg(inputid));
+        }
+        else
+        {
+            ok = false;
+            LOG(VB_GENERAL, LOG_ERR, QString("Failed to unused orphan input %1")
+                     .arg(inputid));
+        }
+    }
+
+    return ok;
+}
+
 bool CardUtil::DeleteOrphanInputs(void)
 {
     MSqlQuery query(MSqlQuery::InitCon());
@@ -1447,6 +1512,65 @@ bool CardUtil::DeleteOrphanInputs(void)
     }
 
     return ok;
+}
+
+bool CardUtil::DeleteOrphanVideoSourceMaps(void)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT *, mapid "
+                  "FROM videosourcemap "
+                  "LEFT JOIN cardinput "
+                  "ON (videosourcemap.cardinputid = cardinput.cardinputid) "
+    		      "LEFT JOIN videosource "
+    		      "ON (videosourcemap.sourceid = videosource.sourceid) "
+                  "WHERE cardinput.cardinputid IS NULL OR "
+                  "      videosource.sourceid  IS NULL ");
+
+    if (!query.exec())
+    {
+        MythDB::DBError("DeleteOrphanVideoSourceMaps -- query disconnects", query);
+        return false;
+    }
+
+    bool ok = true;
+    while (query.next())
+    {
+        uint videosourcemapid = query.value(0).toUInt();
+        if (DeleteVideoSourceMap(videosourcemapid))
+        {
+            LOG(VB_GENERAL, LOG_NOTICE, QString("Removed orphan videosource map %1")
+                     .arg(videosourcemapid));
+        }
+        else
+        {
+            ok = false;
+            LOG(VB_GENERAL, LOG_ERR, QString("Failed to remove orphan videosource map %1")
+                     .arg(videosourcemapid));
+        }
+    }
+
+    return ok;
+}
+
+bool CardUtil::CreateVideoSourceMap(const int SourceID, const int InputID, const QString &maptype)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "INSERT INTO videosourcemap "
+        "       (sourceid, cardinputid, type) "
+        "VALUES (:SOURCEID, :CARDINPUTID, :TYPE) ");
+
+    query.bindValue(":SOURCEID", SourceID);
+    query.bindValue(":CARDINPUTID", InputID);
+    query.bindValue(":TYPE", maptype);
+
+    if (!query.exec())
+    {
+        MythDB::DBError("CardUtil::CreateVideoSourceMap", query);
+        return false;
+    }
+    LOG(VB_GENERAL, LOG_DEBUG, QString("Created new videosourcemap for cardinputid %1").arg(InputID));
+    return true;
 }
 
 uint CardUtil::CreateInputGroup(const QString &name)
@@ -2063,7 +2187,8 @@ void CardUtil::GetCardInputs(
     const QString      &device,
     const QString      &cardtype,
     QStringList        &inputLabels,
-    vector<CardInput*> &cardInputs)
+    vector<CardInput*> &cardInputs,
+    const bool          longlabelfmt)
 {
     QStringList inputs;
     bool is_dtv = !IsEncoder(cardtype) && !IsUnscanable(cardtype);
@@ -2080,9 +2205,16 @@ void CardUtil::GetCardInputs(
     {
         CardInput *cardinput = new CardInput(is_dtv, false, false, cardid);
         cardinput->loadByInput(cardid, (*it));
-        inputLabels.push_back(
-            dev_label + QString(" (%1) -> %2")
-            .arg(*it).arg(cardinput->getSourceName()));
+
+        if (longlabelfmt)
+            inputLabels.push_back(
+                dev_label + QString(" (%1) -> %2")
+                .arg(*it).arg(cardinput->getSourceName()));
+        else
+        	inputLabels.push_back(
+                dev_label + QString(" (%1)")
+                .arg(*it));
+
         cardInputs.push_back(cardinput);
     }
 
@@ -2099,9 +2231,15 @@ void CardUtil::GetCardInputs(
         {
             CardInput *cardinput = new CardInput(is_dtv, true, false, cardid);
             cardinput->loadByInput(cardid, *it);
-            inputLabels.push_back(
-                dev_label + QString(" (%1) -> %2")
-                .arg(*it).arg(cardinput->getSourceName()));
+            if (longlabelfmt)
+                inputLabels.push_back(
+                    dev_label + QString(" (%1) -> %2")
+                    .arg(*it).arg(cardinput->getSourceName()));
+            else
+                inputLabels.push_back(
+                    dev_label + QString(" (%1)")
+                    .arg(*it));
+
             cardInputs.push_back(cardinput);
         }
 
@@ -2273,6 +2411,9 @@ bool CardUtil::DeleteCard(uint cardid)
         // delete any orphaned inputs & unused input groups
         DeleteOrphanInputs();
         UnlinkInputGroup(0,0);
+
+        // Delete any orphaned videosource maps
+        CardUtil::DeleteOrphanVideoSourceMaps();
     }
 
     return ok;

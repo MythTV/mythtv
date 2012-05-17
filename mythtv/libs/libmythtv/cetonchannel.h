@@ -37,7 +37,7 @@ class CetonChannel : public DTVChannel
         { return _tuner_types; }
 
     // Sets
-    virtual bool SetChannelByString(const QString &channum);
+    virtual bool SetChannelByString(const QString &channum, QString maptypes = "'main'");
 
     // ATSC/DVB scanning/tuning stuff
     bool Tune(const DTVMultiplex &tuning, QString inputname);

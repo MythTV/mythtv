@@ -209,13 +209,16 @@ bool ChannelBase::IsTunable(const QString &input, const QString &channum) const
     uint64_t frequency;
     int mpeg_prog_num;
     uint atsc_major, atsc_minor, mplexid, tsid, netid;
-    bool commfree;
+    bool commfree, use_on_air_guide, visible;
+    QString xmltvid, default_authority, icon;
 
     if (!ChannelUtil::GetChannelData((*it)->sourceid, channum,
                                      tvformat, modulation, freqtable, freqid,
                                      finetune, frequency, dtv_si_std,
                                      mpeg_prog_num, atsc_major, atsc_minor,
-                                     tsid, netid, mplexid, commfree))
+                                     tsid, netid, mplexid, commfree,
+                                     use_on_air_guide, visible, xmltvid,
+                                     default_authority, icon))
     {
         LOG(VB_GENERAL, LOG_ERR, loc + " " +
             QString("Failed to find channel in DB on input '%1' ")
@@ -919,12 +922,21 @@ bool ChannelBase::InitializeInputs(void)
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
-        "SELECT cardinputid, "
-        "       inputname,   startchan, "
-        "       tunechan,    externalcommand, "
-        "       sourceid,    livetvorder "
-        "FROM cardinput "
-        "WHERE cardid = :CARDID");
+        "SELECT cardinput.cardinputid, "
+        "       inputname, "
+        "       startchan, "
+        "       tunechan,  "
+        "       externalcommand, "
+        "       sourceid, "
+        "       livetvorder "
+        "FROM cardinput, videosourcemap "
+        "WHERE cardid = :CARDID AND "
+        "      cardinput.cardinputid = videosourcemap.cardinputid AND "
+        "      type = 'main'");
+    /////////////////////////////////////////
+    // MAY NEED TO WORK WITH THIS MORE.... //
+    /////////////////////////////////////////
+
     query.bindValue(":CARDID", cardid);
 
     if (!query.exec() || !query.isActive())
@@ -945,7 +957,7 @@ bool ChannelBase::InitializeInputs(void)
     QString order = gCoreContext->GetSetting("ChannelOrdering", "channum");
     while (query.next())
     {
-        uint sourceid = query.value(5).toUInt();
+        uint sourceid = query.value(5).toUInt();										//HERE IS WHERE A BLANKET SOURCEID IS BEING DETERMINED FOR THE CARD!!!!
         DBChanList channels = ChannelUtil::GetChannels(sourceid, false);
 
         ChannelUtil::SortChannels(channels, order);
@@ -1051,7 +1063,8 @@ int ChannelBase::GetStartInput(uint cardid)
 }
 
 bool ChannelBase::CheckChannel(const QString &channum,
-                               QString& inputName) const
+                               QString& inputName,
+                               QString maptypes) const
 {
     inputName = "";
 
@@ -1063,15 +1076,17 @@ bool ChannelBase::CheckChannel(const QString &channum,
     if (!query.isConnected())
         return false;
 
-    query.prepare(
+    query.prepare(QString(
         "SELECT channel.chanid "
-        "FROM channel, capturecard, cardinput "
-        "WHERE channel.channum      = :CHANNUM           AND "
-        "      channel.sourceid     = cardinput.sourceid AND "
-        "      cardinput.inputname  = :INPUT             AND "
-        "      cardinput.cardid     = capturecard.cardid AND "
-        "      capturecard.cardid   = :CARDID            AND "
-        "      capturecard.hostname = :HOSTNAME");
+        "FROM channel, capturecard, cardinput, videosourcemap "
+        "WHERE channel.channum      = :CHANNUM                    AND "
+        "      channel.sourceid     = videosourcemap.sourceid     AND "
+        "      videosourcemap.cardinputid = cardinput.cardinputid AND "
+        "      cardinput.inputname  = :INPUT                      AND "
+        "      cardinput.cardid     = capturecard.cardid          AND "
+        "      capturecard.cardid   = :CARDID                     AND "
+  	    "      capturecard.hostname = :HOSTNAME                   AND "
+        "      videosourcemap.type in (%1)").arg(maptypes));
     query.bindValue(":CHANNUM",  channum);
     query.bindValue(":INPUT",    channelinput);
     query.bindValue(":CARDID",   GetCardID());
@@ -1092,14 +1107,16 @@ bool ChannelBase::CheckChannel(const QString &channum,
     LOG(VB_CHANNEL, LOG_ERR, LOC + msg);
 
     // We didn't find it on the current input let's widen the search
-    query.prepare(
+    query.prepare(QString(
         "SELECT channel.chanid, cardinput.inputname "
-        "FROM channel, capturecard, cardinput "
-        "WHERE channel.channum      = :CHANNUM           AND "
-        "      channel.sourceid     = cardinput.sourceid AND "
-        "      cardinput.cardid     = capturecard.cardid AND "
-        "      capturecard.cardid   = :CARDID            AND "
-        "      capturecard.hostname = :HOSTNAME");
+        "FROM channel, capturecard, cardinput, videosourcemap "
+        "WHERE channel.channum      = :CHANNUM                    AND "
+        "      channel.sourceid     = videosourcemap.sourceid     AND "
+        "      videosourcemap.cardinputid = cardinput.cardinputid AND "
+        "      cardinput.cardid     = capturecard.cardid          AND "
+        "      capturecard.cardid   = :CARDID                     AND "
+      	"      capturecard.hostname = :HOSTNAME                   AND "
+        "      videosourcemap.type in (%1)").arg(maptypes));
     query.bindValue(":CHANNUM",  channum);
     query.bindValue(":CARDID",   GetCardID());
     query.bindValue(":HOSTNAME", gCoreContext->GetHostName());

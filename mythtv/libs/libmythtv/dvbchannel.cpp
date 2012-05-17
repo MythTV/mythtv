@@ -942,10 +942,12 @@ int DVBChannel::GetChanID() const
     MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare("SELECT chanid "
-                  "FROM channel, cardinput "
-                  "WHERE cardinput.sourceid = channel.sourceid AND "
-                  "      channel.channum = :CHANNUM AND "
-                  "      cardinput.cardid = :CARDID");
+                  "FROM channel, cardinput, videosourcemap as map "
+                  "WHERE channel.channum  = :CHANNUM             AND "
+                  "      channel.sourceid = map.sourceid         AND "
+                  "      map.cardinputid = cardinput.cardinputid AND"
+                  "      cardinput.cardid = :CARDID              AND "
+                  "      map.type in ('main')");
 
     query.bindValue(":CHANNUM", m_curchannelname);
     query.bindValue(":CARDID",  cardid);

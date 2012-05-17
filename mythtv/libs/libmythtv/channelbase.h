@@ -46,7 +46,7 @@ class ChannelBase
     virtual void Close(void) = 0;
     /// \brief Reports whether channel is already open
     virtual bool IsOpen(void) const = 0;
-    virtual bool SetChannelByString(const QString &chan) = 0;
+    virtual bool SetChannelByString(const QString &chan, QString maptypes = "'main'") = 0;
 
     // Methods that one might want to specialize
     virtual void SetFormat(const QString &/*format*/) {}
@@ -115,7 +115,7 @@ class ChannelBase
     virtual int  ChangePictureAttribute(
         PictureAdjustType, PictureAttribute, bool up) { return -1; }
 
-    bool CheckChannel(const QString &channum, QString& inputName) const;
+    bool CheckChannel(const QString &channum, QString& inputName, QString maptypes = "'main'") const;
 
     // \brief Set cardid for scanning
     void SetCardID(uint _cardid) { m_cardid = _cardid; }

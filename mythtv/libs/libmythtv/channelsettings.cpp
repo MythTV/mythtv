@@ -474,10 +474,12 @@ void ChannelOptionsCommon::sourceChanged(const QString& sourceid)
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT cardtype "
-                  "FROM capturecard, videosource, cardinput "
-                  "WHERE cardinput.sourceid   = videosource.sourceid AND "
-                  "      cardinput.cardid     = capturecard.cardid   AND "
-                  "      videosource.sourceid = :SOURCEID");
+                  "FROM capturecard, videosource, cardinput, videosourcemap as map "
+                  "WHERE videosource.sourceid = map.sourceid          AND "
+                  "      map.cardinputid      = cardinput.cardinputid AND "
+                  "      cardinput.cardid     = capturecard.cardid    AND "
+                  "      videosource.sourceid = :SOURCEID             AND "
+                  "      map.type in ('main')");
     query.bindValue(":SOURCEID", sourceid);
 
     if (!query.exec() || !query.isActive())

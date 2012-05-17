@@ -79,7 +79,7 @@ bool IPTVChannel::IsOpen(void) const
     return !m_freeboxchannels.empty();
 }
 
-bool IPTVChannel::SetChannelByString(const QString &channum)
+bool IPTVChannel::SetChannelByString(const QString &channum, QString maptypes)
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + "SetChannelByString() -- begin");
     QMutexLocker locker(&m_lock);

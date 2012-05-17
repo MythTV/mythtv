@@ -38,7 +38,7 @@ class HDHRChannel : public DTVChannel
     virtual bool IsMaster(void) const;
 
     // Sets
-    virtual bool SetChannelByString(const QString &channum);
+    virtual bool SetChannelByString(const QString &channum, QString maptypes = "'main'");
 
     // ATSC/DVB scanning/tuning stuff
     bool Tune(const DTVMultiplex &tuning, QString inputname);

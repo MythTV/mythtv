@@ -18,6 +18,8 @@ class CardInput;
 class CardID;
 class InputName;
 class SourceID;
+class SourceIDtest;
+class VideoSourceMapType;
 class DiSEqCDevTree;
 class DiSEqCDevSettings;
 class InputGroup;
@@ -50,6 +52,23 @@ static inline bool is_grabber_labs(const QString &grabber)
     return grabber == "datadirect";
 }
 
+class VideoSourceMapDBStorage : public SimpleDBStorage
+{
+  protected:
+	VideoSourceMapDBStorage(StorageUser     *_user,
+                            const CardInput &_parent,
+                            QString          _name) :
+        SimpleDBStorage(_user, "videosourcemap", _name), m_parent(_parent)
+    {
+    }
+    void fillSelections();
+protected:
+    virtual QString GetSetClause(MSqlBindings &bindings) const;
+    virtual QString GetWhereClause(MSqlBindings &bindings) const;
+private:
+    const CardInput& m_parent;
+};
+
 class VideoSourceDBStorage : public SimpleDBStorage
 {
   protected:
@@ -73,16 +92,17 @@ class VideoSourceSelector : public ComboBoxSetting, public TransientStorage
   public:
     VideoSourceSelector(uint           _initial_sourceid,
                         const QString &_card_types,
-                        bool           _must_have_mplexid);
+                        bool           _must_have_mplexid,
+                        QString        _maptypes = "'main'");
 
     virtual void Load(void);
-
     uint GetSourceID(void) const { return getValue().toUInt(); }
 
   private:
     uint    initial_sourceid;
     QString card_types;
     bool    must_have_mplexid;
+    QString maptypes;
 };
 
 class FreqTableSelector :
@@ -188,6 +208,42 @@ protected:
     UseEIT *useeit;
 };
 
+class CrossSourceCardInputSel :	public TransComboBoxSetting
+{
+    Q_OBJECT
+public:
+    CrossSourceCardInputSel(const char* _label,
+                            const char* _helptext,
+    		                const QString &_maptype,
+    		                const int _sourceid,
+    		                const VideoSource &_parent);
+    void fillSelections();
+    virtual void Save(void);
+    virtual void Load(void) { fillSelections(); }
+
+public:
+    vector<CardInput*> cardinputs;
+    QMap<QString, int> cardinputs_map;
+
+private:
+    QString            maptype;
+    uint               sourceid;
+    const VideoSource &parent;
+};
+
+class CrossSource_config: public VerticalConfigurationGroup
+{
+public:
+	CrossSource_config(const VideoSource& _parent);
+    virtual void Save();
+    virtual void Save(QString) { Save(); }
+
+protected:
+    UseEIT                  *useeit;
+    CrossSourceCardInputSel *eitcombobox;
+    CrossSourceCardInputSel *scancombobox;
+};
+
 class NoGrabber_config: public VerticalConfigurationGroup
 {
 public:
@@ -199,7 +255,6 @@ public:
 protected:
     UseEIT *useeit;
 };
-
 
 class XMLTVGrabber;
 class XMLTVConfig : public TriggeredConfigurationGroup
@@ -219,12 +274,12 @@ class XMLTVConfig : public TriggeredConfigurationGroup
     void LoadXMLTVGrabbers(QStringList name_list, QStringList prog_list);
 };
 
-class VideoSource : public ConfigurationWizard {
+class VideoSource : public ConfigurationWizard
+{
 public:
     VideoSource();
 
     int getSourceID(void) const { return id->intValue(); };
-
     void loadByID(int id);
 
     static void fillSelections(SelectSetting* setting);
@@ -244,7 +299,7 @@ public:
             ConfigurationWizard::Save(destination);
     }
 
-  private:
+private:
     class ID: public AutoIncrementDBSetting
     {
       public:
@@ -712,9 +767,6 @@ class MTV_PUBLIC VideoSourceEditor : public QObject, public ConfigurationDialog
     virtual MythDialog* dialogWidget(MythMainWindow* parent,
                                      const char* widgetName=0);
 
-    bool cardTypesInclude(const int& SourceID, 
-                          const QString& thecardtype);
-
     virtual DialogCode exec(void);
     virtual void Load(void);
     virtual void Save(void) { }
@@ -771,11 +823,12 @@ class CardInput : public QObject, public ConfigurationWizard
     ~CardInput();
 
     int getInputID(void) const { return id->intValue(); };
-
+    int getMapID(void) const { return sourcemapid->intValue(); };
+    bool setSourceMap(const QString &_maptype, const int _sourceid);
     void loadByID(int id);
     void loadByInput(int cardid, QString input);
+    void reload();
     QString getSourceName(void) const;
-
     virtual void Save(void);
     virtual void Save(QString /*destination*/) { Save(); }
 
@@ -786,6 +839,16 @@ class CardInput : public QObject, public ConfigurationWizard
     void SetSourceID(const QString &sourceid);
 
   private:
+    int findSourceMapID(void) const;
+    class SourceMapID: public AutoIncrementDBSetting
+    {
+      public:
+    	SourceMapID() : AutoIncrementDBSetting("videosourcemap", "mapid")
+        {
+            setVisible(false);
+            setName("VideoSourceMapID");
+        };
+    };
     class ID: public AutoIncrementDBSetting
     {
       public:
@@ -796,16 +859,19 @@ class CardInput : public QObject, public ConfigurationWizard
         }
     };
 
-    ID              *id;
-    CardID          *cardid;
-    InputName       *inputname;
-    SourceID        *sourceid;
-    StartingChannel *startchan;
-    TransButtonSetting *scan;
-    TransButtonSetting *srcfetch;
-    DiSEqCDevSettings  *externalInputSettings;
-    InputGroup         *inputgrp0;
-    InputGroup         *inputgrp1;
+    ID                  *id;
+    CardID              *cardid;
+    InputName           *inputname;
+    SourceMapID         *sourcemapid;
+    SourceID            *sourceid;
+    VideoSourceMapType  *sourcemaptype;
+    QString			     maptype;
+    StartingChannel     *startchan;
+    TransButtonSetting  *scan;
+    TransButtonSetting  *srcfetch;
+    DiSEqCDevSettings   *externalInputSettings;
+    InputGroup          *inputgrp0;
+    InputGroup          *inputgrp1;
 };
 
 class HDHomeRunDeviceID;
