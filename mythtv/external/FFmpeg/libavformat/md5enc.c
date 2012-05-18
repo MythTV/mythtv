@@ -21,6 +21,7 @@
 
 #include "libavutil/md5.h"
 #include "avformat.h"
+#include "internal.h"
 
 #define PRIVSIZE 512
 
@@ -36,8 +37,8 @@ static void md5_finish(struct AVFormatContext *s, char *buf)
     buf[offset] = '\n';
     buf[offset+1] = 0;
 
-    put_buffer(s->pb, buf, strlen(buf));
-    put_flush_packet(s->pb);
+    avio_write(s->pb, buf, strlen(buf));
+    avio_flush(s->pb);
 }
 
 #if CONFIG_MD5_MUXER
@@ -66,16 +67,15 @@ static int write_trailer(struct AVFormatContext *s)
 }
 
 AVOutputFormat ff_md5_muxer = {
-    "md5",
-    NULL_IF_CONFIG_SMALL("MD5 testing format"),
-    NULL,
-    "",
-    PRIVSIZE,
-    CODEC_ID_PCM_S16LE,
-    CODEC_ID_RAWVIDEO,
-    write_header,
-    write_packet,
-    write_trailer,
+    .name              = "md5",
+    .long_name         = NULL_IF_CONFIG_SMALL("MD5 testing format"),
+    .priv_data_size    = PRIVSIZE,
+    .audio_codec       = CODEC_ID_PCM_S16LE,
+    .video_codec       = CODEC_ID_RAWVIDEO,
+    .write_header      = write_header,
+    .write_packet      = write_packet,
+    .write_trailer     = write_trailer,
+    .flags             = AVFMT_NOTIMESTAMPS,
 };
 #endif
 
@@ -90,21 +90,20 @@ static int framemd5_write_packet(struct AVFormatContext *s, AVPacket *pkt)
     av_md5_init(s->priv_data);
     av_md5_update(s->priv_data, pkt->data, pkt->size);
 
-    snprintf(buf, sizeof(buf) - 64, "%d, %"PRId64", %d, ", pkt->stream_index, pkt->dts, pkt->size);
+    snprintf(buf, sizeof(buf) - 64, "%d, %10"PRId64", %10"PRId64", %8d, %8d, ",
+             pkt->stream_index, pkt->dts, pkt->pts, pkt->duration, pkt->size);
     md5_finish(s, buf);
     return 0;
 }
 
 AVOutputFormat ff_framemd5_muxer = {
-    "framemd5",
-    NULL_IF_CONFIG_SMALL("Per-frame MD5 testing format"),
-    NULL,
-    "",
-    PRIVSIZE,
-    CODEC_ID_PCM_S16LE,
-    CODEC_ID_RAWVIDEO,
-    NULL,
-    framemd5_write_packet,
-    NULL,
+    .name              = "framemd5",
+    .long_name         = NULL_IF_CONFIG_SMALL("Per-frame MD5 testing format"),
+    .priv_data_size    = PRIVSIZE,
+    .audio_codec       = CODEC_ID_PCM_S16LE,
+    .video_codec       = CODEC_ID_RAWVIDEO,
+    .write_header      = ff_framehash_write_header,
+    .write_packet      = framemd5_write_packet,
+    .flags             = AVFMT_VARIABLE_FPS,
 };
 #endif

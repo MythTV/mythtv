@@ -37,7 +37,8 @@ EITScanner::EITScanner(uint _cardnum)
       eitHelper(new EITHelper()), eventThread(new MThread("EIT", this)),
       exitThread(false),
       rec(NULL),                  activeScan(false),
-      activeScanTrigTime(0),      cardnum(_cardnum)
+      activeScanStopped(true),    activeScanTrigTime(0),
+      cardnum(_cardnum)
 {
     QStringList langPref = iso639_get_language_list();
     eitHelper->SetLanguagePreferences(langPref);

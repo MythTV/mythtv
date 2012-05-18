@@ -5,6 +5,10 @@
 #include "compat.h"
 #include "spdifencoder.h"
 #include "mythlogging.h"
+extern "C" {
+#include "libavformat/avformat.h"
+#include "libavutil/opt.h"
+}
 
 #define LOC QString("SPDIFEncoder: ")
 
@@ -42,47 +46,32 @@ SPDIFEncoder::SPDIFEncoder(QString muxer, int codec_id)
     }
     m_oc->oformat = fmt;
 
-    if (av_set_parameters(m_oc, NULL) < 0)
-    {
-        LOG(VB_AUDIO, LOG_ERR, LOC + "av_set_parameters");
-        Destroy();
-        return;
-    }
-
-    m_oc->pb = av_alloc_put_byte(m_buffer, sizeof(m_buffer), URL_RDONLY,
-                                 this, NULL, funcIO, NULL);
+    m_oc->pb = avio_alloc_context(m_buffer, sizeof(m_buffer), 0,
+                                  this, NULL, funcIO, NULL);
     if (!m_oc->pb)
     {
-        LOG(VB_AUDIO, LOG_ERR, LOC + "av_alloc_put_byte");
+        LOG(VB_AUDIO, LOG_ERR, LOC + "avio_alloc_context");
         Destroy();
         return;
     }
 
-    m_oc->pb->is_streamed    = true;
-    m_oc->flags             |= AVFMT_NOFILE | AVFMT_FLAG_IGNIDX;
+    m_oc->pb->seekable    = 0;
+    m_oc->flags          |= AVFMT_NOFILE | AVFMT_FLAG_IGNIDX;
 
-    if (av_set_parameters(m_oc, NULL) != 0)
-    {
-        LOG(VB_AUDIO, LOG_ERR, LOC + "av_set_parameters");
-        Destroy();
-        return;
-    }
-
-    m_stream = av_new_stream(m_oc, 1);
+    m_stream = avformat_new_stream(m_oc, NULL);
     if (!m_stream)
     {
-        LOG(VB_AUDIO, LOG_ERR, LOC + "av_new_stream");
+        LOG(VB_AUDIO, LOG_ERR, LOC + "avformat_new_stream");
         Destroy();
         return;
     }
 
-        // copy without decoding or reencoding
-    m_stream->stream_copy           = true;
+    m_stream->id          = 1;
 
     AVCodecContext *codec = m_stream->codec;
 
     codec->codec_id       = (CodecID)codec_id;
-    av_write_header(m_oc);
+    avformat_write_header(m_oc, NULL);
 
     LOG(VB_AUDIO, LOG_INFO, LOC + QString("Creating %1 encoder (for %2)")
             .arg(muxer).arg(ff_codec_id_string((CodecID)codec_id)));
@@ -103,10 +92,11 @@ SPDIFEncoder::~SPDIFEncoder(void)
 void SPDIFEncoder::WriteFrame(unsigned char *data, int size)
 {
     AVPacket packet;
-
     av_init_packet(&packet);
-    packet.data = data;
-    packet.size = size;
+    static int pts = 1; // to avoid warning "Encoder did not produce proper pts"
+    packet.pts  = pts++; 
+    packet.data    = data;
+    packet.size    = size;
 
     if (av_write_frame(m_oc, &packet) < 0)
     {
@@ -152,7 +142,7 @@ bool SPDIFEncoder::SetMaxHDRate(int rate)
     {
         return false;
     }
-    av_set_int(m_oc->priv_data, "dtshd_rate", rate);
+    av_opt_set_int(m_oc->priv_data, "dtshd_rate", rate, 0);
     return true;
 }
 

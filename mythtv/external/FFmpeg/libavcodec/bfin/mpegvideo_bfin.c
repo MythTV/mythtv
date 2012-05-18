@@ -61,8 +61,13 @@ static int dct_quantize_bfin (MpegEncContext *s,
         dc = block[0] = (block[0] + (q >> 1)) / q;
         start_i = 1;
         last_non_zero = 0;
-        bias = s->q_intra_matrix16[qscale][1];
-        qmat = s->q_intra_matrix16[qscale][0];
+        if(n<4){
+            bias = s->q_intra_matrix16[qscale][1];
+            qmat = s->q_intra_matrix16[qscale][0];
+        }else{
+            bias = s->q_chroma_intra_matrix16[qscale][1];
+            qmat = s->q_chroma_intra_matrix16[qscale][0];
+        }
 
     } else {
         start_i = 0;
@@ -141,8 +146,7 @@ static int dct_quantize_bfin (MpegEncContext *s,
     return last_non_zero;
 }
 
-void MPV_common_init_bfin (MpegEncContext *s)
+void ff_MPV_common_init_bfin (MpegEncContext *s)
 {
 /*     s->dct_quantize= dct_quantize_bfin; */
 }
-

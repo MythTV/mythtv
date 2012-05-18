@@ -871,7 +871,7 @@ bool MythSocket::Validate(uint timeout_ms, bool error_dialog_desired)
         LOG(VB_GENERAL, LOG_ERR, "Protocol version check failure.\n\t\t\t"
                 "The response to MYTH_PROTO_VERSION was empty.\n\t\t\t"
                 "This happens when the backend is too busy to respond,\n\t\t\t"
-                "or has deadlocked in due to bugs or hardware failure.");
+                "or has deadlocked due to bugs or hardware failure.");
         return false;
     }
     else if (strlist[0] == "REJECT" && strlist.size() >= 2)

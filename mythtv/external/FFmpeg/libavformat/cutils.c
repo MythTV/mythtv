@@ -1,5 +1,5 @@
 /*
- * Various simple utilities for ffmpeg system
+ * various simple utilities for libavformat
  * Copyright (c) 2000, 2001, 2002 Fabrice Bellard
  *
  * This file is part of FFmpeg.
@@ -21,33 +21,12 @@
 #include "avformat.h"
 #include "internal.h"
 
-/* add one element to a dynamic array */
-void ff_dynarray_add(intptr_t **tab_ptr, int *nb_ptr, intptr_t elem)
-{
-    /* see similar ffmpeg.c:grow_array() */
-    int nb, nb_alloc;
-    intptr_t *tab;
-
-    nb = *nb_ptr;
-    tab = *tab_ptr;
-    if ((nb & (nb - 1)) == 0) {
-        if (nb == 0)
-            nb_alloc = 1;
-        else
-            nb_alloc = nb * 2;
-        tab = av_realloc(tab, nb_alloc * sizeof(intptr_t));
-        *tab_ptr = tab;
-    }
-    tab[nb++] = elem;
-    *nb_ptr = nb;
-}
-
 #define ISLEAP(y) (((y) % 4 == 0) && (((y) % 100) != 0 || ((y) % 400) == 0))
 #define LEAPS_COUNT(y) ((y)/4 - (y)/100 + (y)/400)
 
 /* This is our own gmtime_r. It differs from its POSIX counterpart in a
    couple of places, though. */
-struct tm *brktimegm(time_t secs, struct tm *tm)
+struct tm *ff_brktimegm(time_t secs, struct tm *tm)
 {
     int days, y, ny, m;
     int md[] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };

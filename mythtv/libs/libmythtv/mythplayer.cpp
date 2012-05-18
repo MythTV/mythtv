@@ -15,6 +15,7 @@
 #include <fcntl.h>
 #include <sched.h>
 #include <sys/time.h>
+#include <assert.h>
 
 // C++ headers
 #include <algorithm>

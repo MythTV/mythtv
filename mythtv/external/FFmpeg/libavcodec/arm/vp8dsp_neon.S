@@ -1,4 +1,4 @@
-/**
+/*
  * VP8 NEON optimisations
  *
  * Copyright (c) 2010 Rob Clark <rob@ti.com>
@@ -22,6 +22,7 @@
  */
 
 #include "asm.S"
+#include "neon.S"
 
 function ff_vp8_luma_dc_wht_neon, export=1
         vld1.16         {q0-q1},  [r1,:128]
@@ -73,18 +74,6 @@ function ff_vp8_luma_dc_wht_neon, export=1
         vst1.16         {d2[3]},  [r0,:16], r3
         vst1.16         {d3[3]},  [r0,:16], r3
 
-        bx              lr
-endfunc
-
-function ff_vp8_luma_dc_wht_dc_neon, export=1
-        ldrsh           r2,  [r1]
-        mov             r3,  #0
-        add             r2,  r2,  #3
-        strh            r3,  [r1]
-        asr             r2,  r2,  #3
-    .rept 16
-        strh            r2,  [r0], #32
-    .endr
         bx              lr
 endfunc
 
@@ -454,23 +443,6 @@ endfunc
     .endif
 .endm
 
-.macro transpose8x16matrix
-        vtrn.32         q0,   q4
-        vtrn.32         q1,   q5
-        vtrn.32         q2,   q6
-        vtrn.32         q3,   q7
-
-        vtrn.16         q0,   q2
-        vtrn.16         q1,   q3
-        vtrn.16         q4,   q6
-        vtrn.16         q5,   q7
-
-        vtrn.8          q0,   q1
-        vtrn.8          q2,   q3
-        vtrn.8          q4,   q5
-        vtrn.8          q6,   q7
-.endm
-
 .macro  vp8_v_loop_filter16 name, inner=0, simple=0
 function ff_vp8_v_loop_filter16\name\()_neon, export=1
         vpush           {q4-q7}
@@ -605,7 +577,7 @@ function ff_vp8_h_loop_filter16\name\()_neon, export=1
         vld1.8          {d13},    [r0], r1
         vld1.8          {d15},    [r0], r1
 
-        transpose8x16matrix
+        transpose_8x8   q0,  q1,  q2,  q3,  q4,  q5,  q6,  q7
 
         vdup.8          q14, r2                 @ flim_E
     .if !\simple
@@ -616,7 +588,7 @@ function ff_vp8_h_loop_filter16\name\()_neon, export=1
 
         sub             r0,  r0,  r1, lsl #4    @ backup 16 rows
 
-        transpose8x16matrix
+        transpose_8x8   q0,  q1,  q2,  q3,  q4,  q5,  q6,  q7
 
         @ Store pixels:
         vst1.8          {d0},     [r0],     r1
@@ -670,7 +642,7 @@ function ff_vp8_h_loop_filter8uv\name\()_neon, export=1
         vld1.8          {d14},    [r0], r2
         vld1.8          {d15},    [r1], r2
 
-        transpose8x16matrix
+        transpose_8x8   q0,  q1,  q2,  q3,  q4,  q5,  q6,  q7
 
         vdup.8          q14, r3                 @ flim_E
         vdup.8          q15, r12                @ flim_I
@@ -681,7 +653,7 @@ function ff_vp8_h_loop_filter8uv\name\()_neon, export=1
         sub             r0,  r0,  r2, lsl #3    @ backup u 8 rows
         sub             r1,  r1,  r2, lsl #3    @ backup v 8 rows
 
-        transpose8x16matrix
+        transpose_8x8   q0,  q1,  q2,  q3,  q4,  q5,  q6,  q7
 
         @ Store pixels:
         vst1.8          {d0},     [r0], r2
@@ -739,23 +711,6 @@ function ff_put_vp8_pixels8_neon, export=1
         vst1.8          {d3},     [r0,:64], r1
         bgt             1b
         bx              lr
-endfunc
-
-function ff_put_vp8_pixels4_neon, export=1
-        ldr             r12, [sp, #0]           @ h
-        push            {r4-r6,lr}
-1:
-        subs            r12, r12, #4
-        ldr             r4,       [r2], r3
-        ldr             r5,       [r2], r3
-        ldr             r6,       [r2], r3
-        ldr             lr,       [r2], r3
-        str             r4,       [r0], r1
-        str             r5,       [r0], r1
-        str             r6,       [r0], r1
-        str             lr,       [r0], r1
-        bgt             1b
-        pop             {r4-r6,pc}
 endfunc
 
 /* 4/6-tap 8th-pel MC */
@@ -1293,6 +1248,8 @@ function ff_put_vp8_epel8_h4v6_neon, export=1
         add             sp,  sp,  #168+16
         pop             {r4,pc}
 endfunc
+
+.ltorg
 
 function ff_put_vp8_epel4_v6_neon, export=1
         sub             r2,  r2,  r3,  lsl #1

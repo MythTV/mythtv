@@ -98,7 +98,7 @@ void ServerPool::SelectDefaultListen(bool force)
     QList<QNetworkInterface>::const_iterator qni;
     for (qni = IFs.begin(); qni != IFs.end(); ++qni)
     {
-        if (qni->flags() & QNetworkInterface::IsRunning == 0)
+        if ((qni->flags() & QNetworkInterface::IsRunning) == 0)
             continue;
 
         QList<QNetworkAddressEntry> IPs = qni->addressEntries();
@@ -393,7 +393,7 @@ bool ServerPool::bind(QList<QHostAddress> addrs, quint16 port,
         if (it->protocol() == QAbstractSocket::IPv6Protocol)
         {
             QList<QNetworkAddressEntry>::iterator iae;
-            for (iae = naList_6.begin(); iae != naList_6.end(); iae++)
+            for (iae = naList_6.begin(); iae != naList_6.end(); ++iae)
             {
                 if (PrivUdpSocket::contains(*iae, *it))
                 {
@@ -406,7 +406,7 @@ bool ServerPool::bind(QList<QHostAddress> addrs, quint16 port,
 #endif
         {
             QList<QNetworkAddressEntry>::iterator iae;
-            for (iae = naList_4.begin(); iae != naList_4.end(); iae++)
+            for (iae = naList_4.begin(); iae != naList_4.end(); ++iae)
             {
                 if (PrivUdpSocket::contains(*iae, *it))
                 {
@@ -481,7 +481,7 @@ qint64 ServerPool::writeDatagram(const char * data, qint64 size,
     {
         // find the right socket to use
         QList<PrivUdpSocket*>::iterator it;
-        for (it = m_udpSockets.begin(); it != m_udpSockets.end(); it++)
+        for (it = m_udpSockets.begin(); it != m_udpSockets.end(); ++it)
         {
             PrivUdpSocket *val = *it;
             if (val->contains(addr))

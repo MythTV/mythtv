@@ -341,7 +341,7 @@ void MythUIStateType::RecalculateArea(bool recurse)
     {
         if (objectName().startsWith("buttonlist button"))
         {
-            MythUIButtonList *list = dynamic_cast<MythUIButtonList *>(m_Parent);
+            MythUIButtonList *list = static_cast<MythUIButtonList *>(m_Parent);
             m_ParentArea = list->GetButtonArea();
         }
         else

@@ -22,6 +22,7 @@
 
 #include <xvid.h>
 #include <unistd.h>
+#include "libavutil/file.h"
 #include "avcodec.h"
 #include "libxvid_internal.h"
 //#include "dsputil.h"
@@ -35,19 +36,19 @@ extern unsigned int xvid_debug;
 int ff_xvid_rate_control_init(MpegEncContext *s){
     char *tmp_name;
     int fd, i;
-    xvid_plg_create_t xvid_plg_create;
-    xvid_plugin_2pass2_t xvid_2pass2;
+    xvid_plg_create_t xvid_plg_create = { 0 };
+    xvid_plugin_2pass2_t xvid_2pass2  = { 0 };
 
 //xvid_debug=-1;
 
-    fd=ff_tempfile("xvidrc.", &tmp_name);
+    fd=av_tempfile("xvidrc.", &tmp_name, 0, s->avctx);
     if (fd == -1) {
         av_log(NULL, AV_LOG_ERROR, "Can't create temporary pass2 file.\n");
         return -1;
     }
 
     for(i=0; i<s->rc_context.num_entries; i++){
-        static const char *frame_types = " ipbs";
+        static const char frame_types[] = " ipbs";
         char tmp[256];
         RateControlEntry *rce;
 
@@ -58,12 +59,14 @@ int ff_xvid_rate_control_init(MpegEncContext *s){
             rce->skip_count, (rce->i_tex_bits + rce->p_tex_bits + rce->misc_bits+7)/8, (rce->header_bits+rce->mv_bits+7)/8);
 
 //av_log(NULL, AV_LOG_ERROR, "%s\n", tmp);
-        write(fd, tmp, strlen(tmp));
+        if (write(fd, tmp, strlen(tmp)) < 0) {
+            av_log(NULL, AV_LOG_ERROR, "Error %s writing 2pass logfile\n", strerror(errno));
+            return AVERROR(errno);
+        }
     }
 
     close(fd);
 
-    memset(&xvid_2pass2, 0, sizeof(xvid_2pass2));
     xvid_2pass2.version= XVID_MAKE_VERSION(1,1,0);
     xvid_2pass2.filename= tmp_name;
     xvid_2pass2.bitrate= s->avctx->bit_rate;
@@ -71,7 +74,6 @@ int ff_xvid_rate_control_init(MpegEncContext *s){
     xvid_2pass2.vbv_maxrate= s->avctx->rc_max_rate;
     xvid_2pass2.vbv_initial= s->avctx->rc_initial_buffer_occupancy;
 
-    memset(&xvid_plg_create, 0, sizeof(xvid_plg_create));
     xvid_plg_create.version= XVID_MAKE_VERSION(1,1,0);
     xvid_plg_create.fbase= s->avctx->time_base.den;
     xvid_plg_create.fincr= s->avctx->time_base.num;
@@ -85,9 +87,8 @@ int ff_xvid_rate_control_init(MpegEncContext *s){
 }
 
 float ff_xvid_rate_estimate_qscale(MpegEncContext *s, int dry_run){
-    xvid_plg_data_t xvid_plg_data;
+    xvid_plg_data_t xvid_plg_data = { 0 };
 
-    memset(&xvid_plg_data, 0, sizeof(xvid_plg_data));
     xvid_plg_data.version= XVID_MAKE_VERSION(1,1,0);
     xvid_plg_data.width = s->width;
     xvid_plg_data.height= s->height;
@@ -134,7 +135,7 @@ float ff_xvid_rate_estimate_qscale(MpegEncContext *s, int dry_run){
     if(!dry_run)
         s->rc_context.dry_run_qscale= 0;
 
-    if(s->pict_type == FF_B_TYPE) //FIXME this is not exactly identical to xvid
+    if(s->pict_type == AV_PICTURE_TYPE_B) //FIXME this is not exactly identical to xvid
         return xvid_plg_data.quant * FF_QP2LAMBDA * s->avctx->b_quant_factor + s->avctx->b_quant_offset;
     else
         return xvid_plg_data.quant * FF_QP2LAMBDA;
@@ -145,4 +146,3 @@ void ff_xvid_rate_control_uninit(MpegEncContext *s){
 
     xvid_plugin_2pass2(s->rc_context.non_lavc_opaque, XVID_PLG_DESTROY, &xvid_plg_destroy, NULL);
 }
-

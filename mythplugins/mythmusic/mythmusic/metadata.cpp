@@ -940,7 +940,7 @@ MetaIO* Metadata::getTagger(void)
         return &metaIOOggVorbis;
     else if (extension == "flac")
     {
-        if (metaIOID3.TagExists(Filename()))
+        if (metaIOID3.TagExists(Filename(true)))
             return &metaIOID3;
         else
             return &metaIOFLACVorbis;

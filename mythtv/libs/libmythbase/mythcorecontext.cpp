@@ -1151,7 +1151,7 @@ bool MythCoreContext::CheckProtoVersion(MythSocket *socket, uint timeout_ms,
         LOG(VB_GENERAL, LOG_CRIT, "Protocol version check failure.\n\t\t\t"
                 "The response to MYTH_PROTO_VERSION was empty.\n\t\t\t"
                 "This happens when the backend is too busy to respond,\n\t\t\t"
-                "or has deadlocked in due to bugs or hardware failure.");
+                "or has deadlocked due to bugs or hardware failure.");
 
         return false;
     }

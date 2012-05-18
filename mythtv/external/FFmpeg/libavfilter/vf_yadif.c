@@ -1,7 +1,6 @@
 /*
- * Copyright (C) 2006-2010 Michael Niedermayer <michaelni@gmx.at>
- *
- * This file is part of FFmpeg.
+ * Copyright (C) 2006-2011 Michael Niedermayer <michaelni@gmx.at>
+ *               2010      James Darnley <james.darnley@gmail.com>
  *
  * FFmpeg is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,6 +19,7 @@
 
 #include "libavutil/cpu.h"
 #include "libavutil/common.h"
+#include "libavutil/pixdesc.h"
 #include "avfilter.h"
 #include "yadif.h"
 
@@ -36,13 +36,19 @@ typedef struct {
     int mode;
 
     /**
-     *  0: bottom field first
-     *  1: top field first
+     *  0: top field first
+     *  1: bottom field first
      * -1: auto-detection
      */
     int parity;
 
     int frame_pending;
+
+    /**
+     *  0: deinterlace all frames
+     *  1: only deinterlace frames marked as interlaced
+     */
+    int auto_enable;
 
     AVFilterBufferRef *cur;
     AVFilterBufferRef *next;
@@ -50,69 +56,81 @@ typedef struct {
     AVFilterBufferRef *out;
     void (*filter_line)(uint8_t *dst,
                         uint8_t *prev, uint8_t *cur, uint8_t *next,
-                        int w, int refs, int parity, int mode);
+                        int w, int prefs, int mrefs, int parity, int mode);
+
+    const AVPixFmtDescriptor *csp;
 } YADIFContext;
+
+#define CHECK(j)\
+    {   int score = FFABS(cur[mrefs-1+(j)] - cur[prefs-1-(j)])\
+                  + FFABS(cur[mrefs  +(j)] - cur[prefs  -(j)])\
+                  + FFABS(cur[mrefs+1+(j)] - cur[prefs+1-(j)]);\
+        if (score < spatial_score) {\
+            spatial_score= score;\
+            spatial_pred= (cur[mrefs  +(j)] + cur[prefs  -(j)])>>1;\
+
+#define FILTER \
+    for (x = 0;  x < w; x++) { \
+        int c = cur[mrefs]; \
+        int d = (prev2[0] + next2[0])>>1; \
+        int e = cur[prefs]; \
+        int temporal_diff0 = FFABS(prev2[0] - next2[0]); \
+        int temporal_diff1 =(FFABS(prev[mrefs] - c) + FFABS(prev[prefs] - e) )>>1; \
+        int temporal_diff2 =(FFABS(next[mrefs] - c) + FFABS(next[prefs] - e) )>>1; \
+        int diff = FFMAX3(temporal_diff0>>1, temporal_diff1, temporal_diff2); \
+        int spatial_pred = (c+e)>>1; \
+        int spatial_score = FFABS(cur[mrefs-1] - cur[prefs-1]) + FFABS(c-e) \
+                          + FFABS(cur[mrefs+1] - cur[prefs+1]) - 1; \
+ \
+        CHECK(-1) CHECK(-2) }} }} \
+        CHECK( 1) CHECK( 2) }} }} \
+ \
+        if (mode < 2) { \
+            int b = (prev2[2*mrefs] + next2[2*mrefs])>>1; \
+            int f = (prev2[2*prefs] + next2[2*prefs])>>1; \
+            int max = FFMAX3(d-e, d-c, FFMIN(b-c, f-e)); \
+            int min = FFMIN3(d-e, d-c, FFMAX(b-c, f-e)); \
+ \
+            diff = FFMAX3(diff, min, -max); \
+        } \
+ \
+        if (spatial_pred > d + diff) \
+           spatial_pred = d + diff; \
+        else if (spatial_pred < d - diff) \
+           spatial_pred = d - diff; \
+ \
+        dst[0] = spatial_pred; \
+ \
+        dst++; \
+        cur++; \
+        prev++; \
+        next++; \
+        prev2++; \
+        next2++; \
+    }
 
 static void filter_line_c(uint8_t *dst,
                           uint8_t *prev, uint8_t *cur, uint8_t *next,
-                          int w, int refs, int parity, int mode)
+                          int w, int prefs, int mrefs, int parity, int mode)
 {
     int x;
     uint8_t *prev2 = parity ? prev : cur ;
     uint8_t *next2 = parity ? cur  : next;
-    for (x = 0;  x < w; x++) {
-        int c = cur[-refs];
-        int d = (prev2[0] + next2[0])>>1;
-        int e = cur[+refs];
-        int temporal_diff0 = FFABS(prev2[0] - next2[0]);
-        int temporal_diff1 =(FFABS(prev[-refs] - c) + FFABS(prev[+refs] - e) )>>1;
-        int temporal_diff2 =(FFABS(next[-refs] - c) + FFABS(next[+refs] - e) )>>1;
-        int diff = FFMAX3(temporal_diff0>>1, temporal_diff1, temporal_diff2);
-        int spatial_pred = (c+e)>>1;
-        int spatial_score = FFABS(cur[-refs-1] - cur[+refs-1]) + FFABS(c-e)
-                          + FFABS(cur[-refs+1] - cur[+refs+1]) - 1;
 
-#define CHECK(j)\
-    {   int score = FFABS(cur[-refs-1+j] - cur[+refs-1-j])\
-                  + FFABS(cur[-refs  +j] - cur[+refs  -j])\
-                  + FFABS(cur[-refs+1+j] - cur[+refs+1-j]);\
-        if (score < spatial_score) {\
-            spatial_score= score;\
-            spatial_pred= (cur[-refs  +j] + cur[+refs  -j])>>1;\
+    FILTER
+}
 
-        CHECK(-1) CHECK(-2) }} }}
-        CHECK( 1) CHECK( 2) }} }}
+static void filter_line_c_16bit(uint16_t *dst,
+                                uint16_t *prev, uint16_t *cur, uint16_t *next,
+                                int w, int prefs, int mrefs, int parity, int mode)
+{
+    int x;
+    uint16_t *prev2 = parity ? prev : cur ;
+    uint16_t *next2 = parity ? cur  : next;
+    mrefs /= 2;
+    prefs /= 2;
 
-        if (mode < 2) {
-            int b = (prev2[-2*refs] + next2[-2*refs])>>1;
-            int f = (prev2[+2*refs] + next2[+2*refs])>>1;
-#if 0
-            int a = cur[-3*refs];
-            int g = cur[+3*refs];
-            int max = FFMAX3(d-e, d-c, FFMIN3(FFMAX(b-c,f-e),FFMAX(b-c,b-a),FFMAX(f-g,f-e)) );
-            int min = FFMIN3(d-e, d-c, FFMAX3(FFMIN(b-c,f-e),FFMIN(b-c,b-a),FFMIN(f-g,f-e)) );
-#else
-            int max = FFMAX3(d-e, d-c, FFMIN(b-c, f-e));
-            int min = FFMIN3(d-e, d-c, FFMAX(b-c, f-e));
-#endif
-
-            diff = FFMAX3(diff, min, -max);
-        }
-
-        if (spatial_pred > d + diff)
-           spatial_pred = d + diff;
-        else if (spatial_pred < d - diff)
-           spatial_pred = d - diff;
-
-        dst[0] = spatial_pred;
-
-        dst++;
-        cur++;
-        prev++;
-        next++;
-        prev2++;
-        next2++;
-    }
+    FILTER
 }
 
 static void filter(AVFilterContext *ctx, AVFilterBufferRef *dstpic,
@@ -121,11 +139,17 @@ static void filter(AVFilterContext *ctx, AVFilterBufferRef *dstpic,
     YADIFContext *yadif = ctx->priv;
     int y, i;
 
-    for (i = 0; i < 3; i++) {
-        int is_chroma = !!i;
-        int w = dstpic->video->w >> is_chroma;
-        int h = dstpic->video->h >> is_chroma;
+    for (i = 0; i < yadif->csp->nb_components; i++) {
+        int w = dstpic->video->w;
+        int h = dstpic->video->h;
         int refs = yadif->cur->linesize[i];
+        int df = (yadif->csp->comp[i].depth_minus1 + 8) / 8;
+
+        if (i == 1 || i == 2) {
+        /* Why is this not part of the per-plane description thing? */
+            w >>= yadif->csp->log2_chroma_w;
+            h >>= yadif->csp->log2_chroma_h;
+        }
 
         for (y = 0; y < h; y++) {
             if ((y ^ parity) & 1) {
@@ -133,10 +157,11 @@ static void filter(AVFilterContext *ctx, AVFilterBufferRef *dstpic,
                 uint8_t *cur  = &yadif->cur ->data[i][y*refs];
                 uint8_t *next = &yadif->next->data[i][y*refs];
                 uint8_t *dst  = &dstpic->data[i][y*dstpic->linesize[i]];
-                yadif->filter_line(dst, prev, cur, next, w, refs, parity ^ tff, yadif->mode);
+                int     mode  = y==1 || y+2==h ? 2 : yadif->mode;
+                yadif->filter_line(dst, prev, cur, next, w, y+1<h ? refs : -refs, y ? -refs : refs, parity ^ tff, mode);
             } else {
                 memcpy(&dstpic->data[i][y*dstpic->linesize[i]],
-                       &yadif->cur->data[i][y*refs], w);
+                       &yadif->cur->data[i][y*refs], w*df);
             }
         }
     }
@@ -149,7 +174,7 @@ static AVFilterBufferRef *get_video_buffer(AVFilterLink *link, int perms, int w,
 {
     AVFilterBufferRef *picref;
     int width = FFALIGN(w, 32);
-    int height= FFALIGN(h+6, 32);
+    int height= FFALIGN(h+2, 32);
     int i;
 
     picref = avfilter_default_get_video_buffer(link, perms, width, height);
@@ -158,7 +183,7 @@ static AVFilterBufferRef *get_video_buffer(AVFilterLink *link, int perms, int w,
     picref->video->h = h;
 
     for (i = 0; i < 3; i++)
-        picref->data[i] += 3 * picref->linesize[i];
+        picref->data[i] += picref->linesize[i];
 
     return picref;
 }
@@ -176,9 +201,17 @@ static void return_frame(AVFilterContext *ctx, int is_second)
         tff = yadif->parity^1;
     }
 
-    if (is_second)
+    if (is_second) {
         yadif->out = avfilter_get_video_buffer(link, AV_PERM_WRITE | AV_PERM_PRESERVE |
                                                AV_PERM_REUSE, link->w, link->h);
+        avfilter_copy_buffer_ref_props(yadif->out, yadif->cur);
+        yadif->out->video->interlaced = 0;
+    }
+
+    if (!yadif->csp)
+        yadif->csp = &av_pix_fmt_descriptors[link->format];
+    if (yadif->csp->comp[0].depth_minus1 / 8 == 1)
+        yadif->filter_line = (void*)filter_line_c_16bit;
 
     filter(ctx, yadif->out, tff ^ !is_second, tff);
 
@@ -216,6 +249,14 @@ static void start_frame(AVFilterLink *link, AVFilterBufferRef *picref)
     if (!yadif->cur)
         return;
 
+    if (yadif->auto_enable && !yadif->cur->video->interlaced) {
+        yadif->out  = avfilter_ref_buffer(yadif->cur, AV_PERM_READ);
+        avfilter_unref_buffer(yadif->prev);
+        yadif->prev = NULL;
+        avfilter_start_frame(ctx->outputs[0], yadif->out);
+        return;
+    }
+
     if (!yadif->prev)
         yadif->prev = avfilter_ref_buffer(yadif->cur, AV_PERM_READ);
 
@@ -234,6 +275,12 @@ static void end_frame(AVFilterLink *link)
 
     if (!yadif->out)
         return;
+
+    if (yadif->auto_enable && !yadif->cur->video->interlaced) {
+        avfilter_draw_slice(ctx->outputs[0], 0, link->h, 1);
+        avfilter_end_frame(ctx->outputs[0]);
+        return;
+    }
 
     return_frame(ctx, 0);
 }
@@ -268,12 +315,15 @@ static int poll_frame(AVFilterLink *link)
 
     val = avfilter_poll_frame(link->src->inputs[0]);
 
-    if (val==1 && !yadif->next) { //FIXME change API to not requre this red tape
+    if (val >= 1 && !yadif->next) { //FIXME change API to not requre this red tape
         if ((ret = avfilter_request_frame(link->src->inputs[0])) < 0)
             return ret;
         val = avfilter_poll_frame(link->src->inputs[0]);
     }
-    assert(yadif->next);
+    assert(yadif->next || !val);
+
+    if (yadif->auto_enable && yadif->next && !yadif->next->video->interlaced)
+        return val;
 
     return val * ((yadif->mode&1)+1);
 }
@@ -291,11 +341,28 @@ static int query_formats(AVFilterContext *ctx)
 {
     static const enum PixelFormat pix_fmts[] = {
         PIX_FMT_YUV420P,
+        PIX_FMT_YUV422P,
+        PIX_FMT_YUV444P,
+        PIX_FMT_YUV410P,
+        PIX_FMT_YUV411P,
         PIX_FMT_GRAY8,
+        PIX_FMT_YUVJ420P,
+        PIX_FMT_YUVJ422P,
+        PIX_FMT_YUVJ444P,
+        AV_NE( PIX_FMT_GRAY16BE, PIX_FMT_GRAY16LE ),
+        PIX_FMT_YUV440P,
+        PIX_FMT_YUVJ440P,
+        AV_NE( PIX_FMT_YUV420P10BE, PIX_FMT_YUV420P10LE ),
+        AV_NE( PIX_FMT_YUV422P10BE, PIX_FMT_YUV422P10LE ),
+        AV_NE( PIX_FMT_YUV444P10BE, PIX_FMT_YUV444P10LE ),
+        AV_NE( PIX_FMT_YUV420P16BE, PIX_FMT_YUV420P16LE ),
+        AV_NE( PIX_FMT_YUV422P16BE, PIX_FMT_YUV422P16LE ),
+        AV_NE( PIX_FMT_YUV444P16BE, PIX_FMT_YUV444P16LE ),
+        PIX_FMT_YUVA420P,
         PIX_FMT_NONE
     };
 
-    avfilter_set_common_formats(ctx, avfilter_make_format_list(pix_fmts));
+    avfilter_set_common_pixel_formats(ctx, avfilter_make_format_list(pix_fmts));
 
     return 0;
 }
@@ -303,12 +370,14 @@ static int query_formats(AVFilterContext *ctx)
 static av_cold int init(AVFilterContext *ctx, const char *args, void *opaque)
 {
     YADIFContext *yadif = ctx->priv;
-    av_unused int cpu_flags = av_get_cpu_flags();
+    int cpu_flags = av_get_cpu_flags();
 
     yadif->mode = 0;
     yadif->parity = -1;
+    yadif->auto_enable = 0;
+    yadif->csp = NULL;
 
-    if (args) sscanf(args, "%d:%d", &yadif->mode, &yadif->parity);
+    if (args) sscanf(args, "%d:%d:%d", &yadif->mode, &yadif->parity, &yadif->auto_enable);
 
     yadif->filter_line = filter_line_c;
     if (HAVE_SSSE3 && cpu_flags & AV_CPU_FLAG_SSSE3)
@@ -318,7 +387,7 @@ static av_cold int init(AVFilterContext *ctx, const char *args, void *opaque)
     else if (HAVE_MMX && cpu_flags & AV_CPU_FLAG_MMX)
         yadif->filter_line = ff_yadif_filter_line_mmx;
 
-    av_log(ctx, AV_LOG_INFO, "mode:%d parity:%d\n", yadif->mode, yadif->parity);
+    av_log(ctx, AV_LOG_INFO, "mode:%d parity:%d auto_enable:%d\n", yadif->mode, yadif->parity, yadif->auto_enable);
 
     return 0;
 }
@@ -327,22 +396,23 @@ static void null_draw_slice(AVFilterLink *link, int y, int h, int slice_dir) { }
 
 AVFilter avfilter_vf_yadif = {
     .name          = "yadif",
-    .description   = NULL_IF_CONFIG_SMALL("Deinterlace the input image"),
+    .description   = NULL_IF_CONFIG_SMALL("Deinterlace the input image."),
 
     .priv_size     = sizeof(YADIFContext),
     .init          = init,
     .uninit        = uninit,
     .query_formats = query_formats,
 
-    .inputs    = (AVFilterPad[]) {{ .name             = "default",
+    .inputs    = (const AVFilterPad[]) {{ .name       = "default",
                                     .type             = AVMEDIA_TYPE_VIDEO,
                                     .start_frame      = start_frame,
                                     .get_video_buffer = get_video_buffer,
                                     .draw_slice       = null_draw_slice,
-                                    .end_frame        = end_frame, },
+                                    .end_frame        = end_frame,
+                                    .rej_perms        = AV_PERM_REUSE2, },
                                   { .name = NULL}},
 
-    .outputs   = (AVFilterPad[]) {{ .name             = "default",
+    .outputs   = (const AVFilterPad[]) {{ .name       = "default",
                                     .type             = AVMEDIA_TYPE_VIDEO,
                                     .poll_frame       = poll_frame,
                                     .request_frame    = request_frame, },

@@ -1,3 +1,4 @@
+
 #ifndef SCHEMA_WIZARD_H
 #define SCHEMA_WIZARD_H
 
@@ -18,34 +19,9 @@ enum MythSchemaUpgrade
     MYTH_SCHEMA_USE_EXISTING = 4
 };
 
-/**
- * \usage
- * #include <libmyth/schemawizard.h>
- * ...
- * {
- *     SchemaUpgradeWizard  * DBup;
- *
- *     gContext->ActivateSettingsCache(false);
- *     DBup = SchemaUpgradeWizard::Get("DBSchemaVer", "1123");
- *
- *     DBup->CompareAndWait(5);
- * 
- *     switch (DBup->PromptForUpgrade("Music", true, false, 5, 0, 2)
- *     {
- *         case MYTH_SCHEMA_EXIT:
- *         case MYTH_SCHEMA_ERROR:
- *             exit(GENERIC_EXIT_NOT_OK);
- *         case MYTH_SCHEMA_UPGRADE:
- *             if (!DBup->didBackup())
- *                 (void)DBup->BackupDB();
- *             // Upgrade schema
- *             break;
- *         case MYTH_SCHEMA_USE_EXISTING:
- *             break;
- *     }
- * }
+/** \brief Provides UI and helper functions for DB Schema updates.
+ *  See dbcheck.cpp's UpgradeTVDatabaseSchema() for usage.
  */
-
 class MPUBLIC SchemaUpgradeWizard : public QObject, public DBUtil
 {
     Q_OBJECT
@@ -61,9 +37,6 @@ class MPUBLIC SchemaUpgradeWizard : public QObject, public DBUtil
 
     /// How many schema versions old is the DB?
     int Compare(void);
-
-    /// Waits for DB backups/schema locks, to ensure accuracy
-    int CompareAndWait(const int seconds);
 
     /// Instead of creating a new wizard, use the existing one
     /// for its DB backup file & results and expert settings.

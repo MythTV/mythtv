@@ -48,17 +48,15 @@ class avfDecoder : public Decoder
     QString devicename;
 
     AVInputFormat *m_inputFormat;
-    AVFormatParameters m_params;
     AVFormatContext *m_inputContext;
     AVCodec *m_codec; // Codec
     AVCodecContext *m_audioDec;
 
     bool           m_inputIsFile;
     unsigned char *m_buffer;
-    ByteIOContext *m_byteIOContext;
+    AVIOContext *m_byteIOContext;
 
     int errcode;
-    int16_t *m_samples;
 };
 
 #endif

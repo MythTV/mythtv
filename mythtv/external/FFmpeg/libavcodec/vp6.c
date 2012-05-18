@@ -1,12 +1,5 @@
-/**
- * @file
- * VP6 compatible video decoder
- *
+/*
  * Copyright (C) 2006  Aurelien Jacobs <aurel@gnuage.org>
- *
- * The VP6F decoder accepts an optional 1 byte extradata. It is composed of:
- *  - upper 4bits: difference between encoded width and visible width
- *  - lower 4bits: difference between encoded height and visible height
  *
  * This file is part of FFmpeg.
  *
@@ -23,6 +16,15 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+ */
+
+/**
+ * @file
+ * VP6 compatible video decoder
+ *
+ * The VP6F decoder accepts an optional 1 byte extradata. It is composed of:
+ *  - upper 4 bits: difference between encoded width and visible width
+ *  - lower 4 bits: difference between encoded height and visible height
  */
 
 #include <stdlib.h>
@@ -75,6 +77,10 @@ static int vp6_parse_header(VP56Context *s, const uint8_t *buf, int buf_size,
         cols = buf[3];  /* number of stored macroblock cols */
         /* buf[4] is number of displayed macroblock rows */
         /* buf[5] is number of displayed macroblock cols */
+        if (!rows || !cols) {
+            av_log(s->avctx, AV_LOG_ERROR, "Invalid size %dx%d\n", cols << 4, rows << 4);
+            return 0;
+        }
 
         if (!s->macroblocks || /* first frame */
             16*cols != s->avctx->coded_width ||
@@ -95,7 +101,7 @@ static int vp6_parse_header(VP56Context *s, const uint8_t *buf, int buf_size,
             vrt_shift = 5;
         s->sub_version = sub_version;
     } else {
-        if (!s->sub_version)
+        if (!s->sub_version || !s->avctx->coded_width || !s->avctx->coded_height)
             return 0;
 
         if (separated_coeff || !s->filter_header) {
@@ -137,8 +143,11 @@ static int vp6_parse_header(VP56Context *s, const uint8_t *buf, int buf_size,
     if (coeff_offset) {
         buf      += coeff_offset;
         buf_size -= coeff_offset;
-        if (buf_size < 0)
+        if (buf_size < 0) {
+            if (s->framep[VP56_FRAME_CURRENT]->key_frame)
+                avcodec_set_dimensions(s->avctx, 0, 0);
             return 0;
+        }
         if (s->use_huffman) {
             s->parse_coeff = vp6_parse_coeff_huffman;
             init_get_bits(&s->gb, buf, buf_size<<3);
@@ -173,7 +182,7 @@ static void vp6_default_models_init(VP56Context *s)
     model->vector_sig[0] = 0x80;
     model->vector_sig[1] = 0x80;
 
-    memcpy(model->mb_types_stats, vp56_def_mb_types_stats, sizeof(model->mb_types_stats));
+    memcpy(model->mb_types_stats, ff_vp56_def_mb_types_stats, sizeof(model->mb_types_stats));
     memcpy(model->vector_fdv, vp6_def_fdv_vector_model, sizeof(model->vector_fdv));
     memcpy(model->vector_pdv, vp6_def_pdv_vector_model, sizeof(model->vector_pdv));
     memcpy(model->coeff_runv, vp6_def_runv_coeff_model, sizeof(model->coeff_runv));
@@ -213,8 +222,8 @@ static int vp6_huff_cmp(const void *va, const void *vb)
     return (a->count - b->count)*16 + (b->sym - a->sym);
 }
 
-static void vp6_build_huff_tree(VP56Context *s, uint8_t coeff_model[],
-                                const uint8_t *map, unsigned size, VLC *vlc)
+static int vp6_build_huff_tree(VP56Context *s, uint8_t coeff_model[],
+                               const uint8_t *map, unsigned size, VLC *vlc)
 {
     Node nodes[2*VP6_MAX_HUFF_SIZE], *tmp = &nodes[size];
     int a, b, i;
@@ -228,13 +237,13 @@ static void vp6_build_huff_tree(VP56Context *s, uint8_t coeff_model[],
         nodes[map[2*i+1]].count = b + !b;
     }
 
-    free_vlc(vlc);
-    /* then build the huffman tree accodring to probabilities */
-    ff_huff_build_tree(s->avctx, vlc, size, nodes, vp6_huff_cmp,
-                       FF_HUFFMAN_FLAG_HNODE_FIRST);
+    ff_free_vlc(vlc);
+    /* then build the huffman tree according to probabilities */
+    return ff_huff_build_tree(s->avctx, vlc, size, nodes, vp6_huff_cmp,
+                              FF_HUFFMAN_FLAG_HNODE_FIRST);
 }
 
-static void vp6_parse_coeff_models(VP56Context *s)
+static int vp6_parse_coeff_models(VP56Context *s)
 {
     VP56RangeCoder *c = &s->c;
     VP56Model *model = s->modelp;
@@ -279,15 +288,18 @@ static void vp6_parse_coeff_models(VP56Context *s)
 
     if (s->use_huffman) {
         for (pt=0; pt<2; pt++) {
-            vp6_build_huff_tree(s, model->coeff_dccv[pt],
-                                vp6_huff_coeff_map, 12, &s->dccv_vlc[pt]);
-            vp6_build_huff_tree(s, model->coeff_runv[pt],
-                                vp6_huff_run_map, 9, &s->runv_vlc[pt]);
+            if (vp6_build_huff_tree(s, model->coeff_dccv[pt],
+                                    vp6_huff_coeff_map, 12, &s->dccv_vlc[pt]))
+                return -1;
+            if (vp6_build_huff_tree(s, model->coeff_runv[pt],
+                                    vp6_huff_run_map, 9, &s->runv_vlc[pt]))
+                return -1;
             for (ct=0; ct<3; ct++)
                 for (cg = 0; cg < 6; cg++)
-                    vp6_build_huff_tree(s, model->coeff_ract[pt][ct][cg],
-                                        vp6_huff_coeff_map, 12,
-                                        &s->ract_vlc[pt][ct][cg]);
+                    if (vp6_build_huff_tree(s, model->coeff_ract[pt][ct][cg],
+                                            vp6_huff_coeff_map, 12,
+                                            &s->ract_vlc[pt][ct][cg]))
+                        return -1;
         }
         memset(s->nb_null, 0, sizeof(s->nb_null));
     } else {
@@ -297,6 +309,7 @@ static void vp6_parse_coeff_models(VP56Context *s)
             for (node=0; node<5; node++)
                 model->coeff_dcct[pt][ctx][node] = av_clip(((model->coeff_dccv[pt][node] * vp6_dccv_lc[ctx][node][0] + 128) >> 8) + vp6_dccv_lc[ctx][node][1], 1, 255);
     }
+    return 0;
 }
 
 static void vp6_parse_vector_adjustment(VP56Context *s, VP56mv *vect)
@@ -323,7 +336,7 @@ static void vp6_parse_vector_adjustment(VP56Context *s, VP56mv *vect)
             else
                 delta |= 8;
         } else {
-            delta = vp56_rac_get_tree(c, vp56_pva_tree,
+            delta = vp56_rac_get_tree(c, ff_vp56_pva_tree,
                                       model->vector_pdv[comp]);
         }
 
@@ -367,14 +380,14 @@ static void vp6_parse_coeff_huffman(VP56Context *s)
         if (b > 3) pt = 1;
         vlc_coeff = &s->dccv_vlc[pt];
 
-        for (coeff_idx=0; coeff_idx<64; ) {
+        for (coeff_idx = 0;;) {
             int run = 1;
             if (coeff_idx<2 && s->nb_null[coeff_idx][pt]) {
                 s->nb_null[coeff_idx][pt]--;
                 if (coeff_idx)
                     break;
             } else {
-                if (get_bits_count(&s->gb) >= s->gb.size_in_bits)
+                if (get_bits_left(&s->gb) <= 0)
                     return;
                 coeff = get_vlc2(&s->gb, vlc_coeff->table, 9, 3);
                 if (coeff == 0) {
@@ -391,7 +404,7 @@ static void vp6_parse_coeff_huffman(VP56Context *s)
                         s->nb_null[1][pt] = vp6_get_nb_null(s);
                     break;
                 } else {
-                    int coeff2 = vp56_coeff_bias[coeff];
+                    int coeff2 = ff_vp56_coeff_bias[coeff];
                     if (coeff > 4)
                         coeff2 += get_bits(&s->gb, coeff <= 9 ? coeff - 4 : 11);
                     ct = 1 + (coeff2 > 1);
@@ -404,6 +417,8 @@ static void vp6_parse_coeff_huffman(VP56Context *s)
                 }
             }
             coeff_idx+=run;
+            if (coeff_idx >= 64)
+                break;
             cg = FFMIN(vp6_coeff_groups[coeff_idx], 3);
             vlc_coeff = &s->ract_vlc[pt][ct][cg];
         }
@@ -426,20 +441,21 @@ static void vp6_parse_coeff(VP56Context *s)
 
         if (b > 3) pt = 1;
 
-        ctx = s->left_block[vp56_b6to4[b]].not_null_dc
+        ctx = s->left_block[ff_vp56_b6to4[b]].not_null_dc
               + s->above_blocks[s->above_block_idx[b]].not_null_dc;
         model1 = model->coeff_dccv[pt];
         model2 = model->coeff_dcct[pt][ctx];
 
-        for (coeff_idx=0; coeff_idx<64; ) {
+        coeff_idx = 0;
+        for (;;) {
             if ((coeff_idx>1 && ct==0) || vp56_rac_get_prob(c, model2[0])) {
                 /* parse a coeff */
                 if (vp56_rac_get_prob(c, model2[2])) {
                     if (vp56_rac_get_prob(c, model2[3])) {
-                        idx = vp56_rac_get_tree(c, vp56_pc_tree, model1);
-                        coeff = vp56_coeff_bias[idx+5];
-                        for (i=vp56_coeff_bit_length[idx]; i>=0; i--)
-                            coeff += vp56_rac_get_prob(c, vp56_coeff_parse_table[idx][i]) << i;
+                        idx = vp56_rac_get_tree(c, ff_vp56_pc_tree, model1);
+                        coeff = ff_vp56_coeff_bias[idx+5];
+                        for (i=ff_vp56_coeff_bit_length[idx]; i>=0; i--)
+                            coeff += vp56_rac_get_prob(c, ff_vp56_coeff_parse_table[idx][i]) << i;
                     } else {
                         if (vp56_rac_get_prob(c, model2[4]))
                             coeff = 3 + vp56_rac_get_prob(c, model1[5]);
@@ -472,12 +488,14 @@ static void vp6_parse_coeff(VP56Context *s)
                             run += vp56_rac_get_prob(c, model3[i+8]) << i;
                 }
             }
-
-            cg = vp6_coeff_groups[coeff_idx+=run];
+            coeff_idx += run;
+            if (coeff_idx >= 64)
+                break;
+            cg = vp6_coeff_groups[coeff_idx];
             model1 = model2 = model->coeff_ract[pt][ct][cg];
         }
 
-        s->left_block[vp56_b6to4[b]].not_null_dc =
+        s->left_block[ff_vp56_b6to4[b]].not_null_dc =
         s->above_blocks[s->above_block_idx[b]].not_null_dc = !!s->block_coeff[b][0];
     }
 }
@@ -597,52 +615,49 @@ static av_cold int vp6_decode_free(AVCodecContext *avctx)
     ff_vp56_free(avctx);
 
     for (pt=0; pt<2; pt++) {
-        free_vlc(&s->dccv_vlc[pt]);
-        free_vlc(&s->runv_vlc[pt]);
+        ff_free_vlc(&s->dccv_vlc[pt]);
+        ff_free_vlc(&s->runv_vlc[pt]);
         for (ct=0; ct<3; ct++)
             for (cg=0; cg<6; cg++)
-                free_vlc(&s->ract_vlc[pt][ct][cg]);
+                ff_free_vlc(&s->ract_vlc[pt][ct][cg]);
     }
     return 0;
 }
 
 AVCodec ff_vp6_decoder = {
-    "vp6",
-    AVMEDIA_TYPE_VIDEO,
-    CODEC_ID_VP6,
-    sizeof(VP56Context),
-    vp6_decode_init,
-    NULL,
-    vp6_decode_free,
-    ff_vp56_decode_frame,
-    CODEC_CAP_DR1,
+    .name           = "vp6",
+    .type           = AVMEDIA_TYPE_VIDEO,
+    .id             = CODEC_ID_VP6,
+    .priv_data_size = sizeof(VP56Context),
+    .init           = vp6_decode_init,
+    .close          = vp6_decode_free,
+    .decode         = ff_vp56_decode_frame,
+    .capabilities   = CODEC_CAP_DR1,
     .long_name = NULL_IF_CONFIG_SMALL("On2 VP6"),
 };
 
 /* flash version, not flipped upside-down */
 AVCodec ff_vp6f_decoder = {
-    "vp6f",
-    AVMEDIA_TYPE_VIDEO,
-    CODEC_ID_VP6F,
-    sizeof(VP56Context),
-    vp6_decode_init,
-    NULL,
-    vp6_decode_free,
-    ff_vp56_decode_frame,
-    CODEC_CAP_DR1,
+    .name           = "vp6f",
+    .type           = AVMEDIA_TYPE_VIDEO,
+    .id             = CODEC_ID_VP6F,
+    .priv_data_size = sizeof(VP56Context),
+    .init           = vp6_decode_init,
+    .close          = vp6_decode_free,
+    .decode         = ff_vp56_decode_frame,
+    .capabilities   = CODEC_CAP_DR1,
     .long_name = NULL_IF_CONFIG_SMALL("On2 VP6 (Flash version)"),
 };
 
 /* flash version, not flipped upside-down, with alpha channel */
 AVCodec ff_vp6a_decoder = {
-    "vp6a",
-    AVMEDIA_TYPE_VIDEO,
-    CODEC_ID_VP6A,
-    sizeof(VP56Context),
-    vp6_decode_init,
-    NULL,
-    vp6_decode_free,
-    ff_vp56_decode_frame,
-    CODEC_CAP_DR1,
+    .name           = "vp6a",
+    .type           = AVMEDIA_TYPE_VIDEO,
+    .id             = CODEC_ID_VP6A,
+    .priv_data_size = sizeof(VP56Context),
+    .init           = vp6_decode_init,
+    .close          = vp6_decode_free,
+    .decode         = ff_vp56_decode_frame,
+    .capabilities   = CODEC_CAP_DR1,
     .long_name = NULL_IF_CONFIG_SMALL("On2 VP6 (Flash version, with alpha channel)"),
 };

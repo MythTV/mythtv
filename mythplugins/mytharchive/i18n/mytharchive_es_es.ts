@@ -1317,17 +1317,17 @@ Por Favor, Espere...</translation>
 <context>
     <name>ThumbFinder</name>
     <message>
-        <location filename="../mytharchive/thumbfinder.cpp" line="939"/>
+        <location filename="../mytharchive/thumbfinder.cpp" line="938"/>
         <source>Exit, Save Thumbnails</source>
         <translation>Salir, Guardar Miniaturas</translation>
     </message>
     <message>
-        <location filename="../mytharchive/thumbfinder.cpp" line="940"/>
+        <location filename="../mytharchive/thumbfinder.cpp" line="939"/>
         <source>Exit, Don&apos;t Save Thumbnails</source>
         <translation>Salir, No Guardar Miniaturas</translation>
     </message>
     <message>
-        <location filename="../mytharchive/thumbfinder.cpp" line="932"/>
+        <location filename="../mytharchive/thumbfinder.cpp" line="931"/>
         <source>Menu</source>
         <translation>Menú</translation>
     </message>

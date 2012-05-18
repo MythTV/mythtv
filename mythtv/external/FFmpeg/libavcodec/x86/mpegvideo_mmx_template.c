@@ -98,7 +98,7 @@ static int RENAME(dct_quantize)(MpegEncContext *s,
     x86_reg last_non_zero_p1;
     int level=0, q; //=0 is because gcc says uninitialized ...
     const uint16_t *qmat, *bias;
-    DECLARE_ALIGNED(16, int16_t, temp_block)[64];
+    LOCAL_ALIGNED_16(int16_t, temp_block, [64]);
 
     assert((7&(int)(&temp_block[0])) == 0); //did gcc align it correctly?
 
@@ -110,28 +110,22 @@ static int RENAME(dct_quantize)(MpegEncContext *s,
 
     if (s->mb_intra) {
         int dummy;
-        if (n < 4)
+        if (n < 4){
             q = s->y_dc_scale;
-        else
+            bias = s->q_intra_matrix16[qscale][1];
+            qmat = s->q_intra_matrix16[qscale][0];
+        }else{
             q = s->c_dc_scale;
+            bias = s->q_chroma_intra_matrix16[qscale][1];
+            qmat = s->q_chroma_intra_matrix16[qscale][0];
+        }
         /* note: block[0] is assumed to be positive */
         if (!s->h263_aic) {
-#if 1
         __asm__ volatile (
                 "mul %%ecx                \n\t"
                 : "=d" (level), "=a"(dummy)
                 : "a" ((block[0]>>2) + q), "c" (ff_inverse[q<<1])
         );
-#else
-        __asm__ volatile (
-                "xorl %%edx, %%edx        \n\t"
-                "divw %%cx                \n\t"
-                "movzwl %%ax, %%eax       \n\t"
-                : "=a" (level)
-                : "a" ((block[0]>>2) + q), "c" (q<<1)
-                : "%edx"
-        );
-#endif
         } else
             /* For AIC we skip quant/dequant of INTRADC */
             level = (block[0] + 4)>>3;
@@ -139,8 +133,6 @@ static int RENAME(dct_quantize)(MpegEncContext *s,
         block[0]=0; //avoid fake overflow
 //        temp_block[0] = (block[0] + (q >> 1)) / q;
         last_non_zero_p1 = 1;
-        bias = s->q_intra_matrix16[qscale][1];
-        qmat = s->q_intra_matrix16[qscale][0];
     } else {
         last_non_zero_p1 = 0;
         bias = s->q_inter_matrix16[qscale][1];
@@ -179,7 +171,7 @@ static int RENAME(dct_quantize)(MpegEncContext *s,
             "movzb %%al, %%"REG_a"              \n\t" // last_non_zero_p1
             : "+a" (last_non_zero_p1)
             : "r" (block+64), "r" (qmat), "r" (bias),
-              "r" (inv_zigzag_direct16+64), "r" (temp_block+64)
+              "r" (ff_inv_zigzag_direct16+64), "r" (temp_block+64)
               XMM_CLOBBERS_ONLY("%xmm0", "%xmm1", "%xmm2", "%xmm3",
                                 "%xmm4", "%xmm5", "%xmm6", "%xmm7")
         );
@@ -213,7 +205,7 @@ static int RENAME(dct_quantize)(MpegEncContext *s,
             "movzb %%al, %%"REG_a"              \n\t" // last_non_zero_p1
             : "+a" (last_non_zero_p1)
             : "r" (block+64), "r" (qmat+64), "r" (bias+64),
-              "r" (inv_zigzag_direct16+64), "r" (temp_block+64)
+              "r" (ff_inv_zigzag_direct16+64), "r" (temp_block+64)
               XMM_CLOBBERS_ONLY("%xmm0", "%xmm1", "%xmm2", "%xmm3",
                                 "%xmm4", "%xmm5", "%xmm6", "%xmm7")
         );

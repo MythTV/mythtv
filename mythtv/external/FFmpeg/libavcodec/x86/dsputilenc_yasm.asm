@@ -18,11 +18,11 @@
 ;*
 ;* You should have received a copy of the GNU Lesser General Public
 ;* License along with FFmpeg; if not, write to the Free Software
-;* 51, Inc., Foundation Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+;* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 ;*****************************************************************************
 
-%include "x86inc.asm"
-%include "x86util.asm"
+%include "libavutil/x86/x86inc.asm"
+%include "libavutil/x86/x86util.asm"
 
 SECTION .text
 
@@ -59,12 +59,12 @@ SECTION .text
 %endmacro
 
 %macro HADAMARD8 0
-    SUMSUB_BADC       m0, m1, m2, m3
-    SUMSUB_BADC       m4, m5, m6, m7
-    SUMSUB_BADC       m0, m2, m1, m3
-    SUMSUB_BADC       m4, m6, m5, m7
-    SUMSUB_BADC       m0, m4, m1, m5
-    SUMSUB_BADC       m2, m6, m3, m7
+    SUMSUB_BADC       w, 0, 1, 2, 3
+    SUMSUB_BADC       w, 4, 5, 6, 7
+    SUMSUB_BADC       w, 0, 2, 1, 3
+    SUMSUB_BADC       w, 4, 6, 5, 7
+    SUMSUB_BADC       w, 0, 4, 1, 5
+    SUMSUB_BADC       w, 2, 6, 3, 7
 %endmacro
 
 %macro ABS1_SUM 3
@@ -245,7 +245,7 @@ hadamard8x8_diff_%1:
     lea                          r0, [r3*3]
     DIFF_PIXELS_8                r1, r2,  0, r3, r0, rsp+gprsize
     HADAMARD8
-%ifdef ARCH_X86_64
+%if ARCH_X86_64
     TRANSPOSE8x8W                 0,  1,  2,  3,  4,  5,  6,  7,  8
 %else
     TRANSPOSE8x8W                 0,  1,  2,  3,  4,  5,  6,  7, [rsp+gprsize], [rsp+mmsize+gprsize]
@@ -270,7 +270,7 @@ HADAMARD8_DIFF_MMX mmx2
 
 INIT_XMM
 %define ABS2 ABS2_MMX2
-%ifdef ARCH_X86_64
+%if ARCH_X86_64
 %define ABS_SUM_8x8 ABS_SUM_8x8_64
 %else
 %define ABS_SUM_8x8 ABS_SUM_8x8_32

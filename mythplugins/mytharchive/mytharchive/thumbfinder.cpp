@@ -564,8 +564,7 @@ bool ThumbFinder::initAVCodec(const QString &inFile)
 
     QByteArray inFileBA = inFile.toLocal8Bit();
 
-    int ret = av_open_input_file(
-        &m_inputFC, inFileBA.constData(), NULL, 0, NULL);
+    int ret = avformat_open_input(&m_inputFC, inFileBA.constData(), NULL, NULL);
 
     if (ret)
     {
@@ -574,11 +573,11 @@ bool ThumbFinder::initAVCodec(const QString &inFile)
     }
 
     // Getting stream information
-    if ((ret = av_find_stream_info(m_inputFC)) < 0)
+    if ((ret = avformat_find_stream_info(m_inputFC, NULL)) < 0)
     {
         LOG(VB_GENERAL, LOG_ERR,
             QString("Couldn't get stream info, error #%1").arg(ret));
-        av_close_input_file(m_inputFC);
+        avformat_close_input(&m_inputFC);
         m_inputFC = NULL;
         return false;
     }
@@ -591,7 +590,7 @@ bool ThumbFinder::initAVCodec(const QString &inFile)
     for (uint i = 0; i < m_inputFC->nb_streams; i++)
     {
         AVStream *st = m_inputFC->streams[i];
-        if (m_inputFC->streams[i]->codec->codec_type == CODEC_TYPE_VIDEO)
+        if (m_inputFC->streams[i]->codec->codec_type == AVMEDIA_TYPE_VIDEO)
         {
             m_startTime = -1;
             if (m_inputFC->streams[i]->start_time != (int) AV_NOPTS_VALUE)
@@ -630,7 +629,7 @@ bool ThumbFinder::initAVCodec(const QString &inFile)
     m_codecCtx->skip_frame = AVDISCARD_DEFAULT;
     m_codecCtx->skip_idct = AVDISCARD_DEFAULT;
     m_codecCtx->skip_loop_filter = AVDISCARD_DEFAULT;
-    m_codecCtx->error_recognition = FF_ER_CAREFUL;
+    m_codecCtx->err_recognition = AV_EF_CAREFUL;
     m_codecCtx->error_concealment = 3;
 
     // get decoder for video stream
@@ -644,7 +643,7 @@ bool ThumbFinder::initAVCodec(const QString &inFile)
     }
 
     // open codec
-    if (avcodec_open(m_codecCtx, m_codec) < 0)
+    if (avcodec_open2(m_codecCtx, m_codec, NULL) < 0)
     {
         LOG(VB_GENERAL, LOG_ERR,
             "ThumbFinder: Couldn't open codec for video stream");
@@ -839,7 +838,7 @@ bool ThumbFinder::getFrameImage(bool needKeyFrame, int64_t requiredPTS)
         {
             frameCount++;
 
-            keyFrame = pkt.flags & PKT_FLAG_KEY;
+            keyFrame = pkt.flags & AV_PKT_FLAG_KEY;
 
             if (m_startPTS == -1 && pkt.dts != (int64_t)AV_NOPTS_VALUE)
             {
@@ -923,7 +922,7 @@ void ThumbFinder::closeAVCodec()
     avcodec_close(m_codecCtx);
 
     // close the video file
-    av_close_input_file(m_inputFC);
+    avformat_close_input(&m_inputFC);
 }
 
 void ThumbFinder::showMenu()

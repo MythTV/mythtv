@@ -8,6 +8,10 @@
 #include <stdint.h>
 #endif
 
+#if HAVE_MMX || HAVE_AMD3DNOW
+#include "libavcodec/x86/mmx.h"
+#endif
+
 #include "../mm_arch.h"
 #if HAVE_ALTIVEC_H
     #include <altivec.h>
@@ -320,8 +324,8 @@ static int linearBlendFilter(VideoFilter *f, VideoFrame *frame, int  field)
         }
     }
 
-#if HAVE_MMX
-    if ((vf->mm_flags & FF_MM_MMXEXT) || (vf->mm_flags & FF_MM_3DNOW))
+#if HAVE_MMX || HAVE_AMD3DNOW
+    if ((vf->mm_flags & AV_CPU_FLAG_MMX2) || (vf->mm_flags & AV_CPU_FLAG_3DNOW))
         emms();
 #endif
 
@@ -353,11 +357,11 @@ static VideoFilter *new_filter(VideoFrameType inpixfmt,
     filter->vf.filter = &linearBlendFilter;
     filter->subfilter = &linearBlend;    /* Default, non accellerated */
     filter->mm_flags = av_get_cpu_flags();
-    if (HAVE_MMX && filter->mm_flags & FF_MM_MMXEXT)
+    if (HAVE_MMX && filter->mm_flags & AV_CPU_FLAG_MMX2)
         filter->subfilter = &linearBlendMMX;
-    else if (HAVE_AMD3DNOW && filter->mm_flags & FF_MM_3DNOW)
+    else if (HAVE_AMD3DNOW && filter->mm_flags & AV_CPU_FLAG_3DNOW)
         filter->subfilter = &linearBlend3DNow;
-    else if (HAVE_ALTIVEC && filter->mm_flags & FF_MM_ALTIVEC)
+    else if (HAVE_ALTIVEC && filter->mm_flags & AV_CPU_FLAG_ALTIVEC)
         filter->vf.filter = &linearBlendFilterAltivec;
 
     filter->vf.cleanup = NULL;

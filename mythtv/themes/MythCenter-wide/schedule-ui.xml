@@ -953,20 +953,6 @@
     <window name="phrasepopup">
         <area>-1,-1,500,500</area>
 
-        <animation trigger="AboutToShow">
-            <section>
-                <alpha start="0" end="255" easingcurve="OutQuart"/>
-                <zoom start="0" end="100" easingcurve="OutQuart"/>
-            </section>
-        </animation>
-
-        <animation trigger="AboutToHide">
-            <section>
-                <alpha start="255" end="0" easingcurve="InQuart"/>
-                <zoom start="100" end="0" easingcurve="InQuart"/>
-            </section>
-        </animation>
-
         <imagetype name="box">
             <filename>mythdialogbox-background.png</filename>
         </imagetype>
@@ -1023,20 +1009,6 @@
     <window name="timepopup">
         <area>-1,-1,580,166</area>
 
-        <animation trigger="AboutToShow">
-            <section>
-                <alpha start="0" end="255" easingcurve="OutQuart"/>
-                <zoom start="0" end="100" easingcurve="OutQuart"/>
-            </section>
-        </animation>
-
-        <animation trigger="AboutToHide">
-            <section>
-                <alpha start="255" end="0" easingcurve="InQuart"/>
-                <zoom start="100" end="0" easingcurve="InQuart"/>
-            </section>
-        </animation>
-
         <imagetype name="box">
             <filename>mythprogressdialog-background.png</filename>
         </imagetype>
@@ -1065,20 +1037,6 @@
 
     <window name="powersearchpopup">
         <area>-1,-1,500,500</area>
-
-        <animation trigger="AboutToShow">
-            <section>
-                <alpha start="0" end="255" easingcurve="OutQuart"/>
-                <zoom start="0" end="100" easingcurve="OutQuart"/>
-            </section>
-        </animation>
-
-        <animation trigger="AboutToHide">
-            <section>
-                <alpha start="255" end="0" easingcurve="InQuart"/>
-                <zoom start="100" end="0" easingcurve="InQuart"/>
-            </section>
-        </animation>
 
         <imagetype name="box">
             <filename>mythdialogbox-background.png</filename>
@@ -1128,20 +1086,6 @@
 
     <window name="editpowersearchpopup">
         <area>-1,-1,500,550</area>
-
-        <animation trigger="AboutToShow">
-            <section>
-                <alpha start="0" end="255" easingcurve="OutQuart"/>
-                <zoom start="0" end="100" easingcurve="OutQuart"/>
-            </section>
-        </animation>
-
-        <animation trigger="AboutToHide">
-            <section>
-                <alpha start="255" end="0" easingcurve="InQuart"/>
-                <zoom start="100" end="0" easingcurve="InQuart"/>
-            </section>
-        </animation>
 
         <imagetype name="box">
             <area>0,0,500,550</area>
@@ -1336,20 +1280,6 @@
 
     <window name="searchpopup" from="MythTextInputDialog">
         <area>-1,10,580,166</area>
-
-        <animation trigger="AboutToShow">
-            <section>
-                <alpha start="0" end="255" easingcurve="OutQuart"/>
-                <zoom start="0" end="100" easingcurve="OutQuart"/>
-            </section>
-        </animation>
-
-        <animation trigger="AboutToHide">
-            <section>
-                <alpha start="255" end="0" easingcurve="InQuart"/>
-                <zoom start="100" end="0" easingcurve="InQuart"/>
-            </section>
-        </animation>
 
         <imagetype name="backimg">
             <filename>mythprogressdialog-background.png</filename>

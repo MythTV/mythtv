@@ -1,5 +1,5 @@
-from logging import MythLog
-from exceptions import MythDBError
+from MythTV.logging import MythLog
+from MythTV.exceptions import MythDBError
 
 import os
 
@@ -16,11 +16,11 @@ __version__ = tuple(['oursql']+__version__)
 def dbconnect(dbconn, log):
     log(MythLog.DATABASE, MythLog.INFO,
                     'Spawning new database connection')
-    db = oursql.connect(        dbconn['DBHostName'],
-                                dbconn['DBUserName'],
-                                dbconn['DBPassword'],
-                        db=     dbconn['DBName'],
-                        port=   dbconn['DBPort'],
+    db = oursql.connect(        dbconn.hostname,
+                                dbconn.username,
+                                dbconn.password,
+                        db=     dbconn.database,
+                        port=   dbconn.port,
                         use_unicode=True,
                         charset='utf8',
                         autoping=True,

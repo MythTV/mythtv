@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """Provides tweaked dict-type classes."""
 
-from exceptions import MythError
-from utility import datetime
+from MythTV.exceptions import MythError
+from MythTV.utility import datetime
 
 from itertools import imap, izip
 from datetime import date
@@ -124,7 +124,7 @@ class DictData( OrdDict ):
 
     def __setitem__(self, key, value):
         if key not in self._field_order:
-                raise KeyError(str(name))
+                raise KeyError(str(key))
         dict.__setitem__(self, key, value)
 
     def __delattr__(self, name):

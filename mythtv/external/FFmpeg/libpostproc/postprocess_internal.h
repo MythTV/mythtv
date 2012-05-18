@@ -28,6 +28,7 @@
 
 #include <string.h>
 #include "libavutil/avutil.h"
+#include "libavutil/log.h"
 #include "postprocess.h"
 
 #define V_DEBLOCK       0x01
@@ -66,6 +67,7 @@
 
 #define TEMP_NOISE_FILTER               0x100000
 #define FORCE_QUANT                     0x200000
+#define BITEXACT                        0x1000000
 
 //use if you want a faster postprocessing code
 //cannot differentiate between chroma & luma filters (both on or both off)
@@ -99,7 +101,7 @@ typedef struct PPMode{
 
     int minAllowedY;                ///< for brigtness correction
     int maxAllowedY;                ///< for brihtness correction
-    float maxClippedThreshold;      ///< amount of "black" u r willing to loose to get a brightness corrected picture
+    float maxClippedThreshold;      ///< amount of "black" you are willing to lose to get a brightness-corrected picture
 
     int maxTmpNoise[3];             ///< for Temporal Noise Reducing filter (Maximal sum of abs differences)
 

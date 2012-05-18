@@ -13,9 +13,9 @@ using namespace std;
 #include "decoderbase.h"
 #include "programinfo.h"
 #include "livetvchain.h"
-#include "dvdringbuffer.h"
-#include "bdringbuffer.h"
 #include "iso639.h"
+#include "DVD/dvdringbuffer.h"
+#include "Bluray/bdringbuffer.h"
 
 #define LOC QString("Dec: ")
 

@@ -54,17 +54,16 @@ static int aea_read_probe(AVProbeData *p)
     return 0;
 }
 
-static int aea_read_header(AVFormatContext *s,
-                           AVFormatParameters *ap)
+static int aea_read_header(AVFormatContext *s)
 {
-    AVStream *st = av_new_stream(s, 0);
+    AVStream *st = avformat_new_stream(s, NULL);
     if (!st)
         return AVERROR(ENOMEM);
 
     /* Parse the amount of channels and skip to pos 2048(0x800) */
-    url_fskip(s->pb, 264);
-    st->codec->channels = get_byte(s->pb);
-    url_fskip(s->pb, 1783);
+    avio_skip(s->pb, 264);
+    st->codec->channels = avio_r8(s->pb);
+    avio_skip(s->pb, 1783);
 
 
     st->codec->codec_type     = AVMEDIA_TYPE_AUDIO;
@@ -95,15 +94,12 @@ static int aea_read_packet(AVFormatContext *s, AVPacket *pkt)
 }
 
 AVInputFormat ff_aea_demuxer = {
-    "aea",
-    NULL_IF_CONFIG_SMALL("MD STUDIO audio"),
-    0,
-    aea_read_probe,
-    aea_read_header,
-    aea_read_packet,
-    0,
-    pcm_read_seek,
+    .name           = "aea",
+    .long_name      = NULL_IF_CONFIG_SMALL("MD STUDIO audio"),
+    .read_probe     = aea_read_probe,
+    .read_header    = aea_read_header,
+    .read_packet    = aea_read_packet,
+    .read_seek      = ff_pcm_read_seek,
     .flags= AVFMT_GENERIC_INDEX,
     .extensions = "aea",
 };
-

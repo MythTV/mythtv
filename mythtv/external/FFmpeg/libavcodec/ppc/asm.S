@@ -44,8 +44,11 @@ X(\name):
 L(\name):
 .endm
 
-.macro movrel rd, sym
+.macro movrel rd, sym, gp
     ld      \rd, \sym@got(r2)
+.endm
+
+.macro get_got rd
 .endm
 
 #else /* ARCH_PPC64 */
@@ -65,7 +68,7 @@ X(\name):
 \name:
 .endm
 
-.macro movrel rd, sym
+.macro movrel rd, sym, gp
 #if CONFIG_PIC
     bcl             20, 31, lab_pic_\@
 lab_pic_\@:
@@ -75,6 +78,16 @@ lab_pic_\@:
 #else
     lis     \rd, \sym@ha
     la      \rd, \sym@l(\rd)
+#endif
+.endm
+
+.macro get_got rd
+#if CONFIG_PIC
+    bcl     20, 31, .Lgot\@
+.Lgot\@:
+    mflr    \rd
+    addis   \rd, \rd, _GLOBAL_OFFSET_TABLE_ - .Lgot\@@ha
+    addi    \rd, \rd, _GLOBAL_OFFSET_TABLE_ - .Lgot\@@l
 #endif
 .endm
 

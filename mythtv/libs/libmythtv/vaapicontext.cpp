@@ -565,8 +565,8 @@ bool VAAPIContext::InitBuffers(void)
     if (!m_surfaces || !m_surfaceData)
         return false;
 
-    memset(m_surfaces, 0, sizeof(m_surfaces));
-    memset(m_surfaceData, 0, sizeof(m_surfaceData));
+    memset(m_surfaces, 0, m_numSurfaces * sizeof(VASurfaceID));
+    memset(m_surfaceData, 0, m_numSurfaces * sizeof(vaapi_surface));
 
     INIT_ST;
     va_status = vaCreateSurfaces(m_ctx.display, m_size.width(), m_size.height(),

@@ -21,6 +21,7 @@
 
 #include "avcodec.h"
 #include "bytestream.h"
+#include "internal.h"
 #include "sgi.h"
 #include "rle.h"
 
@@ -41,22 +42,25 @@ static av_cold int encode_init(AVCodecContext *avctx)
     return 0;
 }
 
-static int encode_frame(AVCodecContext *avctx, unsigned char *buf,
-                        int buf_size, void *data)
+static int encode_frame(AVCodecContext *avctx, AVPacket *pkt,
+                        const AVFrame *frame, int *got_packet)
 {
     SgiContext *s = avctx->priv_data;
     AVFrame * const p = &s->picture;
-    uint8_t *offsettab, *lengthtab, *in_buf, *encode_buf;
-    int x, y, z, length, tablesize;
-    unsigned int width, height, depth, dimension;
-    unsigned char *orig_buf = buf, *end_buf = buf + buf_size;
+    uint8_t *offsettab, *lengthtab, *in_buf, *encode_buf, *buf;
+    int x, y, z, length, tablesize, ret;
+    unsigned int width, height, depth, dimension, bytes_per_channel, pixmax, put_be;
+    unsigned char *end_buf;
 
-    *p = *(AVFrame*)data;
-    p->pict_type = FF_I_TYPE;
+    *p = *frame;
+    p->pict_type = AV_PICTURE_TYPE_I;
     p->key_frame = 1;
 
     width  = avctx->width;
     height = avctx->height;
+    bytes_per_channel = 1;
+    pixmax = 0xFF;
+    put_be = HAVE_BIGENDIAN;
 
     switch (avctx->pix_fmt) {
     case PIX_FMT_GRAY8:
@@ -71,30 +75,60 @@ static int encode_frame(AVCodecContext *avctx, unsigned char *buf,
         dimension = SGI_MULTI_CHAN;
         depth     = SGI_RGBA;
         break;
+    case PIX_FMT_GRAY16LE:
+        put_be = !HAVE_BIGENDIAN;
+    case PIX_FMT_GRAY16BE:
+        avctx->coder_type = FF_CODER_TYPE_RAW;
+        bytes_per_channel = 2;
+        pixmax = 0xFFFF;
+        dimension = SGI_SINGLE_CHAN;
+        depth     = SGI_GRAYSCALE;
+        break;
+    case PIX_FMT_RGB48LE:
+        put_be = !HAVE_BIGENDIAN;
+    case PIX_FMT_RGB48BE:
+        avctx->coder_type = FF_CODER_TYPE_RAW;
+        bytes_per_channel = 2;
+        pixmax = 0xFFFF;
+        dimension = SGI_MULTI_CHAN;
+        depth     = SGI_RGB;
+        break;
+    case PIX_FMT_RGBA64LE:
+        put_be = !HAVE_BIGENDIAN;
+    case PIX_FMT_RGBA64BE:
+        avctx->coder_type = FF_CODER_TYPE_RAW;
+        bytes_per_channel = 2;
+        pixmax = 0xFFFF;
+        dimension = SGI_MULTI_CHAN;
+        depth     = SGI_RGBA;
+        break;
     default:
         return AVERROR_INVALIDDATA;
     }
 
     tablesize = depth * height * 4;
-    length = tablesize * 2 + SGI_HEADER_SIZE;
+    length = SGI_HEADER_SIZE;
+    if (avctx->coder_type == FF_CODER_TYPE_RAW)
+        length += depth * height * width;
+    else // assume ff_rl_encode() produces at most 2x size of input
+        length += tablesize * 2 + depth * height * (2 * width + 1);
 
-    if (buf_size < length) {
-        av_log(avctx, AV_LOG_ERROR, "buf_size too small(need %d, got %d)\n", length, buf_size);
-        return -1;
-    }
+    if ((ret = ff_alloc_packet2(avctx, pkt, bytes_per_channel * length)) < 0)
+        return ret;
+    buf     = pkt->data;
+    end_buf = pkt->data + pkt->size;
 
     /* Encode header. */
     bytestream_put_be16(&buf, SGI_MAGIC);
     bytestream_put_byte(&buf, avctx->coder_type != FF_CODER_TYPE_RAW); /* RLE 1 - VERBATIM 0*/
-    bytestream_put_byte(&buf, 1); /* bytes_per_channel */
+    bytestream_put_byte(&buf, bytes_per_channel);
     bytestream_put_be16(&buf, dimension);
     bytestream_put_be16(&buf, width);
     bytestream_put_be16(&buf, height);
     bytestream_put_be16(&buf, depth);
 
-    /* The rest are constant in this implementation. */
     bytestream_put_be32(&buf, 0L); /* pixmin */
-    bytestream_put_be32(&buf, 255L); /* pixmax */
+    bytestream_put_be32(&buf, pixmax);
     bytestream_put_be32(&buf, 0L); /* dummy */
 
     /* name */
@@ -124,7 +158,7 @@ static int encode_frame(AVCodecContext *avctx, unsigned char *buf,
             in_buf = p->data[0] + p->linesize[0] * (height - 1) + z;
 
             for (y = 0; y < height; y++) {
-                bytestream_put_be32(&offsettab, buf - orig_buf);
+                bytestream_put_be32(&offsettab, buf - pkt->data);
 
                 for (x = 0; x < width; x++)
                     encode_buf[x] = in_buf[depth * x];
@@ -144,11 +178,19 @@ static int encode_frame(AVCodecContext *avctx, unsigned char *buf,
         av_free(encode_buf);
     } else {
         for (z = 0; z < depth; z++) {
-            in_buf = p->data[0] + p->linesize[0] * (height - 1) + z;
+            in_buf = p->data[0] + p->linesize[0] * (height - 1) + z * bytes_per_channel;
 
             for (y = 0; y < height; y++) {
                 for (x = 0; x < width * depth; x += depth)
+                    if (bytes_per_channel == 1) {
                     bytestream_put_byte(&buf, in_buf[x]);
+                    } else {
+                        if (put_be) {
+                            bytestream_put_be16(&buf, ((uint16_t *)in_buf)[x]);
+                        } else {
+                            bytestream_put_le16(&buf, ((uint16_t *)in_buf)[x]);
+                        }
+                    }
 
                 in_buf -= p->linesize[0];
             }
@@ -156,17 +198,24 @@ static int encode_frame(AVCodecContext *avctx, unsigned char *buf,
     }
 
     /* total length */
-    return buf - orig_buf;
+    pkt->size = buf - pkt->data;
+    pkt->flags |= AV_PKT_FLAG_KEY;
+    *got_packet = 1;
+
+    return 0;
 }
 
 AVCodec ff_sgi_encoder = {
-    "sgi",
-    AVMEDIA_TYPE_VIDEO,
-    CODEC_ID_SGI,
-    sizeof(SgiContext),
-    encode_init,
-    encode_frame,
-    NULL,
-    .pix_fmts= (const enum PixelFormat[]){PIX_FMT_RGB24, PIX_FMT_RGBA, PIX_FMT_GRAY8, PIX_FMT_NONE},
+    .name           = "sgi",
+    .type           = AVMEDIA_TYPE_VIDEO,
+    .id             = CODEC_ID_SGI,
+    .priv_data_size = sizeof(SgiContext),
+    .init           = encode_init,
+    .encode2        = encode_frame,
+    .pix_fmts= (const enum PixelFormat[]){PIX_FMT_RGB24, PIX_FMT_RGBA,
+                                          PIX_FMT_RGB48LE, PIX_FMT_RGB48BE,
+                                          PIX_FMT_RGBA64LE, PIX_FMT_RGBA64BE,
+                                          PIX_FMT_GRAY16LE, PIX_FMT_GRAY16BE,
+                                          PIX_FMT_GRAY8, PIX_FMT_NONE},
     .long_name= NULL_IF_CONFIG_SMALL("SGI image"),
 };

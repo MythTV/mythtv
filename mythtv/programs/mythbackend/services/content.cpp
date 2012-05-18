@@ -37,8 +37,8 @@
 #include "mythmiscutil.h"
 #include "mythdownloadmanager.h"
 #include "metadataimagehelper.h"
-#include "httplivestream.h"
 #include "videometadatalistmanager.h"
+#include "HLS/httplivestream.h"
 
 /////////////////////////////////////////////////////////////////////////////
 //
