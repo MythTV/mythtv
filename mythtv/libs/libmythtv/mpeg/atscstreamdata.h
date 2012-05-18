@@ -92,8 +92,8 @@ class MTV_PUBLIC ATSCStreamData : virtual public MPEGStreamData
         { return HasCachedAnyTVCTs(current) || HasCachedAnyCVCTs(current); }
 
     const MasterGuideTable *GetCachedMGT(bool current = true) const;
-    const tvct_ptr_t        GetCachedTVCT(uint pid, bool current = true) const;
-    const cvct_ptr_t        GetCachedCVCT(uint pid, bool current = true) const;
+    tvct_ptr_t GetCachedTVCT(uint pid, bool current = true) const;
+    cvct_ptr_t GetCachedCVCT(uint pid, bool current = true) const;
 
     tvct_vec_t GetCachedTVCTs(bool current = true) const;
     cvct_vec_t GetCachedCVCTs(bool current = true) const;

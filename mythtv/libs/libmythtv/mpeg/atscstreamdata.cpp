@@ -773,7 +773,7 @@ const MasterGuideTable *ATSCStreamData::GetCachedMGT(bool current) const
     return mgt;
 }
 
-const tvct_ptr_t ATSCStreamData::GetCachedTVCT(uint pid, bool current) const
+tvct_ptr_t ATSCStreamData::GetCachedTVCT(uint pid, bool current) const
 {
     if (!current)
         LOG(VB_GENERAL, LOG_WARNING, "Currently we ignore \'current\' param");
@@ -789,7 +789,7 @@ const tvct_ptr_t ATSCStreamData::GetCachedTVCT(uint pid, bool current) const
     return tvct;
 }
 
-const cvct_ptr_t ATSCStreamData::GetCachedCVCT(uint pid, bool current) const
+cvct_ptr_t ATSCStreamData::GetCachedCVCT(uint pid, bool current) const
 {
     if (!current)
         LOG(VB_GENERAL, LOG_WARNING, "Currently we ignore \'current\' param");
