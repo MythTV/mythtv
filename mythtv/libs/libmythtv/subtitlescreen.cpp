@@ -7,7 +7,6 @@
 #include "mythuiimage.h"
 #include "mythpainter.h"
 #include "subtitlescreen.h"
-#include "bdringbuffer.h"
 
 #define LOC      QString("Subtitles: ")
 #define LOC_WARN QString("Subtitles Warning: ")
@@ -528,7 +527,7 @@ SubtitleScreen::SubtitleScreen(MythPlayer *player, const char * name,
     m_player(player),  m_subreader(NULL),   m_608reader(NULL),
     m_708reader(NULL), m_safeArea(QRect()),
     m_removeHTML(QRegExp("</?.+>")),        m_subtitleType(kDisplayNone),
-    m_textFontZoom(100),                    m_refreshArea(false),
+    m_textFontZoom(100), m_textFontZoomPrev(100), m_refreshArea(false),
     m_fontStretch(fontStretch),
     m_format(new SubtitleFormat)
 {
@@ -614,12 +613,14 @@ bool SubtitleScreen::Create(void)
     if (!m_708reader)
         LOG(VB_GENERAL, LOG_WARNING, LOC + "Failed to get CEA-708 reader.");
     m_textFontZoom  = gCoreContext->GetNumSetting("OSDCC708TextZoom", 100);
+    m_textFontZoomPrev = m_textFontZoom;
 
     return true;
 }
 
 void SubtitleScreen::Pulse(void)
 {
+    m_textFontZoom = gCoreContext->GetNumSetting("OSDCC708TextZoom", 100);
     ExpireSubtitles();
 
     DisplayAVSubtitles(); // allow forced subtitles to work
@@ -636,6 +637,7 @@ void SubtitleScreen::Pulse(void)
     OptimiseDisplayedArea();
     MythScreenType::Pulse();
     m_refreshArea = false;
+    m_textFontZoomPrev = m_textFontZoom;
 }
 
 void SubtitleScreen::ClearAllSubtitles(void)
@@ -867,7 +869,7 @@ void SubtitleScreen::DisplayTextSubtitles(void)
     if (!m_player || !m_subreader)
         return;
 
-    bool changed = false;
+    bool changed = (m_textFontZoom != m_textFontZoomPrev);
     VideoOutput *vo = m_player->GetVideoOutput();
     if (!vo)
         return;
@@ -1099,7 +1101,7 @@ void SubtitleScreen::DisplayCC608Subtitles(void)
     if (!m_608reader)
         return;
 
-    bool changed = false;
+    bool changed = (m_textFontZoom != m_textFontZoomPrev);
 
     if (!m_player || !m_player->GetVideoOutput())
         return;
@@ -1145,7 +1147,8 @@ void SubtitleScreen::DisplayCC708Subtitles(void)
         video_aspect = m_player->GetVideoAspect();
         QRect oldsafe = m_safeArea;
         m_safeArea = m_player->GetVideoOutput()->GetSafeRect();
-        changed = (oldsafe != m_safeArea);
+        changed = (oldsafe != m_safeArea ||
+                   m_textFontZoom != m_textFontZoomPrev);
         if (changed)
         {
             for (uint i = 0; i < 8; i++)

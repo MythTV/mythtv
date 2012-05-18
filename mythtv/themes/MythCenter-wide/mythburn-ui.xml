@@ -10,20 +10,6 @@ MythArchive GUI theme
     <window name="profilepopup">
         <area>-1,-1,413,426</area>
 
-        <animation trigger="AboutToShow">
-            <section>
-                <alpha duration="750" start="0" end="255" easingcurve="OutCubic"/>
-                <zoom duration="750" start="0" end="100" easingcurve="OutCubic"/>
-            </section>
-        </animation>
-
-        <animation trigger="AboutToHide">
-            <section>
-                <alpha duration="1000" start="255" end="0" easingcurve="InQuart"/>
-                <zoom duration="1000" start="100" end="0" easingcurve="InQuart"/>
-            </section>
-        </animation>
-
         <imagetype name="backimg">
             <area>0,0,413,426</area>
             <filename>mythdialogbox-background.png</filename>

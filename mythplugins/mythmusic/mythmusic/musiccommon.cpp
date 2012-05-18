@@ -287,9 +287,14 @@ void MusicCommon::updateRepeatMode(void)
                 break;
         }
     }
+
+    // need this to update the next track info
+    Metadata *curMeta = gPlayer->getCurrentMetadata();
+    if (curMeta)
+        updateTrackInfo(curMeta);
 }
 
-void MusicCommon::updateShuffleMode(void)
+void MusicCommon::updateShuffleMode(bool updateUIList)
 {
     if (m_shuffleState)
     {
@@ -326,6 +331,24 @@ void MusicCommon::updateShuffleMode(void)
                     lcd->setMusicShuffle(LCD::MUSIC_SHUFFLE_NONE);
                 break;
         }
+    }
+
+    if (updateUIList)
+    {
+        // store id of current track
+        int curTrackID = -1;
+        if (gPlayer->getCurrentMetadata())
+            curTrackID = gPlayer->getCurrentMetadata()->ID();
+
+        updateUIPlaylist();
+
+        if (!restorePosition(curTrackID))
+            playFirstTrack();
+
+        // need this to update the next track info
+        Metadata *curMeta = gPlayer->getCurrentMetadata();
+        if (curMeta)
+            updateTrackInfo(curMeta);
     }
 }
 
@@ -666,6 +689,26 @@ bool MusicCommon::keyPressEvent(QKeyEvent *e)
                 if (m_movingTracksState)
                     m_movingTracksState->DisplayState((m_moveTrackMode ? "on" : "off"));
             }
+        }
+        else if (action == "SWITCHTOPLAYLIST" && m_currentView != MV_PLAYLIST)
+            switchView(MV_PLAYLIST);
+        else if (action == "SWITCHTOPLAYLISTEDITORTREE" && m_currentView != MV_PLAYLISTEDITORTREE)
+            switchView(MV_PLAYLISTEDITORTREE);
+        else if (action == "SWITCHTOPLAYLISTEDITORGALLERY" && m_currentView != MV_PLAYLISTEDITORGALLERY)
+            switchView(MV_PLAYLISTEDITORGALLERY);
+        else if (action == "SWITCHTOSEARCH" && m_currentView != MV_SEARCH)
+            switchView(MV_SEARCH);
+        else if (action == "SWITCHTOVISUALISER" && m_currentView != MV_VISUALIZER)
+            switchView(MV_VISUALIZER);
+        else if (action == "TOGGLESHUFFLE")
+        {
+            gPlayer->toggleShuffleMode();
+            updateShuffleMode(true);
+        }
+        else if (action == "TOGGLEREPEAT")
+        {
+            gPlayer->toggleRepeatMode();
+            updateRepeatMode();
         }
         else
             handled = false;
@@ -1284,22 +1327,7 @@ void MusicCommon::customEvent(QEvent *event)
         {
             int mode = dce->GetData().toInt();
             gPlayer->setShuffleMode((MusicPlayer::ShuffleMode) mode);
-            updateShuffleMode();
-
-            // store id of current track
-            int curTrackID = -1;
-            if (gPlayer->getCurrentMetadata())
-                curTrackID = gPlayer->getCurrentMetadata()->ID();
-
-            updateUIPlaylist();
-
-            if (!restorePosition(curTrackID))
-                playFirstTrack();
-
-            // need this to update the next track info
-            Metadata *curMeta = gPlayer->getCurrentMetadata();
-            if (curMeta)
-                updateTrackInfo(curMeta);
+            updateShuffleMode(true);
         }
         else if (resultid == "exitmenu")
         {

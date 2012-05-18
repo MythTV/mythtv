@@ -340,12 +340,12 @@ bool HTTPLiveStream::WriteHTML(void)
         "  <body style='background-color:#FFFFFF;'>\n"
         "    <center>\n"
         "      <video controls>\n"
-        "        <source src='%2%3.m3u8' />\n"
+        "        <source src='%2.m3u8' />\n"
         "      </video>\n"
         "    </center>\n"
         "  </body>\n"
         "</html>\n"
-        ).arg(m_sourceFile).arg(m_httpPrefixRel).arg(m_outBaseEncoded)
+        ).arg(m_sourceFile).arg(m_outBaseEncoded)
          .toAscii());
 
     file.close();
@@ -379,16 +379,16 @@ bool HTTPLiveStream::WriteMetaPlaylist(void)
     file.write(QString(
         "#EXTM3U\n"
         "#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=%1\n"
-        "%2%3.m3u8\n"
+        "%2.m3u8\n"
         ).arg((int)((m_bitrate + m_audioBitrate) * 1.1))
-         .arg(m_httpPrefixRel).arg(m_outFileEncoded).toAscii());
+         .arg(m_outFileEncoded).toAscii());
 
     if (m_audioOnlyBitrate)
     {
         file.write(QString(
             "#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=%1\n"
-            "%2%3.m3u8\n"
-            ).arg((int)((m_audioOnlyBitrate) * 1.1)).arg(m_httpPrefixRel)
+            "%2.m3u8\n"
+            ).arg((int)((m_audioOnlyBitrate) * 1.1))
              .arg(m_audioOutFileEncoded).toAscii());
     }
 
@@ -446,9 +446,9 @@ bool HTTPLiveStream::WritePlaylist(bool audioOnly, bool writeEndTag)
     while (i < tmpSegCount)
     {
         file.write(QString(
-            "#EXTINF:%1\n"
-            "%2%3\n"
-            ).arg(m_segmentSize).arg(m_httpPrefixRel)
+            "#EXTINF:%1,\n"
+            "%2\n"
+            ).arg(m_segmentSize)
              .arg(GetFilename(segmentid + i, true, audioOnly, true)).toAscii());
 
         ++i;
@@ -497,13 +497,7 @@ bool HTTPLiveStream::UpdateSizeInfo(uint16_t width, uint16_t height,
         QString(".%1x%2_%3kV_%4kA").arg(width).arg(height)
                 .arg(m_bitrate/1000).arg(m_audioBitrate/1000);
     QString newFullURL = m_httpPrefix + newOutBase + ".m3u8";
-    QString newRelativeURL;
-
-    if (newFullURL.contains("/Content/GetFile"))
-        newRelativeURL = "/Content/GetFile?StorageGroup=Streaming&FileName=" +
-            newOutBase + ".m3u8";
-    else
-        newRelativeURL = newOutBase + ".m3u8";
+    QString newRelativeURL = m_httpPrefixRel + newOutBase + ".m3u8";
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
@@ -713,14 +707,21 @@ void HTTPLiveStream::SetOutputVars(void)
     }
 
     m_httpPrefix = gCoreContext->GetSetting("HTTPLiveStreamPrefix", QString(
-        "http://%1:%2/Content/GetFile?StorageGroup=Streaming&FileName=")
+        "http://%1:%2/StorageGroup/Streaming/")
         .arg(gCoreContext->GetSetting("MasterServerIP"))
         .arg(gCoreContext->GetSetting("BackendStatusPort")));
 
+    if (!m_httpPrefix.endsWith("/"))
+        m_httpPrefix.append("/");
+
     if (!gCoreContext->GetSetting("HTTPLiveStreamPrefixRel").isEmpty())
+    {
         m_httpPrefixRel = gCoreContext->GetSetting("HTTPLiveStreamPrefixRel");
-    else if (m_httpPrefix.contains("/Content/GetFile"))
-        m_httpPrefixRel = "/Content/GetFile?StorageGroup=Streaming&FileName=";
+        if (!m_httpPrefix.endsWith("/"))
+            m_httpPrefix.append("/");
+    }
+    else if (m_httpPrefix.contains("/StorageGroup/Streaming/"))
+        m_httpPrefixRel = "/StorageGroup/Streaming/";
     else
         m_httpPrefixRel = "";
 }

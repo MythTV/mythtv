@@ -158,6 +158,7 @@ External codec library options (used for mythffmpeg and streaming transcode):
   --enable-libvpx          enable VP8 encoding via libvpx [no]
   --enable-libxvid         enable Xvid encoding via xvidcore,
                            native MPEG-4/Xvid encoder exists [no]
+  --enable-sdl             enable Simple DirectMedia Layer (required for ffplay
 EOF
 
 #following is ffmpeg's configure help text
@@ -1206,6 +1207,7 @@ CONFIG_LIST="
     rtpdec
     runtime_cpudetect
     safe_bitstream_reader
+    sdl
     shared
     sinewin
     small
@@ -4827,6 +4829,7 @@ echo "faac                      ${libfaac-no}"
 echo "xvid                      ${libxvid-no}"
 echo "x264                      ${libx264-no}"
 echo "vpx                       ${libvpx-no}"
+echo "SDL                       ${sdl-no}"
 echo ""
 
 MYTH_CONFIG_H=libs/libmythbase/mythconfig.h

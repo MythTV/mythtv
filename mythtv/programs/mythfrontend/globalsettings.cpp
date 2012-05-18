@@ -1323,16 +1323,6 @@ static HostComboBox MUNUSED *DecodeVBIFormat()
     return gc;
 }
 
-static HostSpinBox *OSDCC708TextZoomPercentage(void)
-{
-    HostSpinBox *gs = new HostSpinBox("OSDCC708TextZoom", 50, 200, 5);
-    gs->setLabel(QObject::tr("Subtitle text zoom percentage"));
-    gs->setValue(100);
-    gs->setHelpText(QObject::tr("Use this to enlarge or shrink text based subtitles."));
-
-    return gs;
-}
-
 static HostComboBox *SubtitleCodec()
 {
     HostComboBox *gc = new HostComboBox("SubtitleCodec");
@@ -3400,7 +3390,6 @@ OSDSettings::OSDSettings()
     osd->addChild(PersistentBrowseMode());
     osd->addChild(BrowseAllTuners());
     osd->addChild(DefaultCCMode());
-    osd->addChild(OSDCC708TextZoomPercentage());
     osd->addChild(SubtitleCodec());
     addChild(osd);
 

@@ -1943,6 +1943,15 @@ NULL
     if (dbver == "1298")
     {
         LOG(VB_GENERAL, LOG_CRIT, "Upgrading to MythTV schema version 1299");
+
+        // DeletedMaxAge setting only exists if the user ever triggered the
+        // DeletedExpireOptions TriggeredConfigurationGroup (enabled
+        // AutoExpireInsteadOfDelete) and changed DeletedMaxAge from its
+        // default of zero, so "reset" it to ensure it's in the database before
+        // the update
+        QString deletedMaxAge = gCoreContext->GetSetting("DeletedMaxAge", "0");
+        gCoreContext->SaveSettingOnHost("DeletedMaxAge", deletedMaxAge, NULL);
+
         QString queryStr;
         if (gCoreContext->GetNumSetting("AutoExpireInsteadOfDelete", 0))
         {

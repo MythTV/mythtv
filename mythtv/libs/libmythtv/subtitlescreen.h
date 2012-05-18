@@ -85,6 +85,7 @@ class SubtitleScreen : public MythScreenType
     QHash<MythUIType*, long long> m_expireTimes;
     int                m_fontSize;
     int                m_textFontZoom; // valid for 708 & text subs
+    int                m_textFontZoomPrev;
     bool               m_refreshArea;
     QHash<int,QList<MythUIType*> > m_708imageCache;
     int                m_fontStretch;
