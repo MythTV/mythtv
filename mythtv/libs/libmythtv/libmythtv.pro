@@ -40,37 +40,6 @@ INCLUDEPATH += ../../external/FFmpeg
 INCLUDEPATH += $$DEPENDPATH
 INCLUDEPATH += $$POSTINC
 
-LIBS += -L../libmyth
-LIBS += -L../../external/FFmpeg/libavutil
-LIBS += -L../../external/FFmpeg/libavcodec
-LIBS += -L../../external/FFmpeg/libavformat
-LIBS += -L../../external/FFmpeg/libswscale
-LIBS += -L../libmythui -L../libmythupnp
-LIBS += -L../libmythbase
-LIBS += -L../libmythservicecontracts
-LIBS += -lmyth-$$LIBVERSION
-LIBS += -lmythswscale
-LIBS += -lmythavformat
-LIBS += -lmythavcodec
-LIBS += -lmythavutil
-LIBS += -lmythui-$$LIBVERSION       -lmythupnp-$$LIBVERSION
-LIBS += -lmythbase-$$LIBVERSION
-LIBS += -lmythservicecontracts-$$LIBVERSION
-using_mheg: LIBS += -L../libmythfreemheg -lmythfreemheg-$$LIBVERSION
-using_live: LIBS += -L../libmythlivemedia -lmythlivemedia-$$LIBVERSION
-using_hdhomerun: LIBS += -L../libmythhdhomerun -lmythhdhomerun-$$LIBVERSION
-using_backend: LIBS += -lmp3lame
-LIBS += $$EXTRA_LIBS $$QMAKE_LIBS_DYNLOAD
-
-POST_TARGETDEPS += ../libmyth/libmyth-$${MYTH_SHLIB_EXT}
-POST_TARGETDEPS += ../../external/FFmpeg/libavutil/$$avLibName(avutil)
-POST_TARGETDEPS += ../../external/FFmpeg/libavcodec/$$avLibName(avcodec)
-POST_TARGETDEPS += ../../external/FFmpeg/libavformat/$$avLibName(avformat)
-POST_TARGETDEPS += ../../external/FFmpeg/libswscale/$$avLibName(swscale)
-using_mheg: POST_TARGETDEPS += ../libmythfreemheg/libmythfreemheg-$${MYTH_SHLIB_EXT}
-using_live: POST_TARGETDEPS += ../libmythlivemedia/libmythlivemedia-$${MYTH_SHLIB_EXT}
-using_hdhomerun: POST_TARGETDEPS += ../libmythhdhomerun/libmythhdhomerun-$${MYTH_SHLIB_EXT}
-
 QMAKE_CXXFLAGS += $${FREETYPE_CFLAGS}
 QMAKE_LFLAGS_SHLIB += $${FREETYPE_LIBS}
 
@@ -715,6 +684,40 @@ mingw {
 
     LIBS += -lws2_32
 }
+
+# Dependencies and required libraries
+# Have them at the end in order to properly resolve on mingw platform
+# where the order is of significance
+LIBS += -L../libmyth
+LIBS += -L../../external/FFmpeg/libavutil
+LIBS += -L../../external/FFmpeg/libavcodec
+LIBS += -L../../external/FFmpeg/libavformat
+LIBS += -L../../external/FFmpeg/libswscale
+LIBS += -L../libmythui -L../libmythupnp
+LIBS += -L../libmythbase
+LIBS += -L../libmythservicecontracts
+LIBS += -lmyth-$$LIBVERSION
+LIBS += -lmythswscale
+LIBS += -lmythavformat
+LIBS += -lmythavcodec
+LIBS += -lmythavutil
+LIBS += -lmythui-$$LIBVERSION       -lmythupnp-$$LIBVERSION
+LIBS += -lmythbase-$$LIBVERSION
+LIBS += -lmythservicecontracts-$$LIBVERSION
+using_mheg: LIBS += -L../libmythfreemheg -lmythfreemheg-$$LIBVERSION
+using_live: LIBS += -L../libmythlivemedia -lmythlivemedia-$$LIBVERSION
+using_hdhomerun: LIBS += -L../libmythhdhomerun -lmythhdhomerun-$$LIBVERSION
+using_backend: LIBS += -lmp3lame
+LIBS += $$EXTRA_LIBS $$QMAKE_LIBS_DYNLOAD
+
+POST_TARGETDEPS += ../libmyth/libmyth-$${MYTH_SHLIB_EXT}
+POST_TARGETDEPS += ../../external/FFmpeg/libavutil/$$avLibName(avutil)
+POST_TARGETDEPS += ../../external/FFmpeg/libavcodec/$$avLibName(avcodec)
+POST_TARGETDEPS += ../../external/FFmpeg/libavformat/$$avLibName(avformat)
+POST_TARGETDEPS += ../../external/FFmpeg/libswscale/$$avLibName(swscale)
+using_mheg: POST_TARGETDEPS += ../libmythfreemheg/libmythfreemheg-$${MYTH_SHLIB_EXT}
+using_live: POST_TARGETDEPS += ../libmythlivemedia/libmythlivemedia-$${MYTH_SHLIB_EXT}
+using_hdhomerun: POST_TARGETDEPS += ../libmythhdhomerun/libmythhdhomerun-$${MYTH_SHLIB_EXT}
 
 include ( ../libs-targetfix.pro )
 
