@@ -705,7 +705,7 @@ void ComboBoxSetting::setVisible(bool b)
     }
 }
 
-void ComboBoxSetting::setValue(QString newValue)
+void ComboBoxSetting::setValue(const QString &newValue)
 {
     for (uint i = 0; i < values.size(); i++)
     {
@@ -873,6 +873,20 @@ QDate DateSetting::dateValue(void) const {
 
 void DateSetting::setValue(const QDate& newValue) {
     Setting::setValue(newValue.toString(Qt::ISODate));
+}
+
+void DateSetting::setValue(const QString &newValue)
+{
+    QDate date = QDate::fromString(newValue, Qt::ISODate);
+    if (date.isValid())
+        setValue(date);
+}
+
+void TimeSetting::setValue(const QString &newValue)
+{
+    QTime time = QTime::fromString(newValue, Qt::ISODate);
+    if (time.isValid())
+        setValue(time);
 }
 
 QWidget* CheckBoxSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
