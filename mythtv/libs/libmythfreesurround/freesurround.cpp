@@ -468,7 +468,7 @@ void FreeSurround::process_block()
 long long FreeSurround::getLatency() 
 {
     // returns in usec
-    if (latency_frames = 0)
+    if (latency_frames == 0)
         return 0;
     return decoder ? ((latency_frames + in_count)*1000000)/(2*srate) : 0;
 }
