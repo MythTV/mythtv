@@ -44,4 +44,6 @@ INSTALLS += installjar
 QMAKE_CLEAN += libmythbluray.jar
 }
 
+QT += xml
+
 include ( ../libs-targetfix.pro )
