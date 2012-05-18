@@ -33,10 +33,10 @@ using namespace std;
 #include "teletextdecoder.h"
 #include "subtitlereader.h"
 #include "interactivetv.h"
-#include "dvdringbuffer.h"
-#include "bdringbuffer.h"
 #include "videodisplayprofile.h"
 #include "mythuihelper.h"
+#include "DVD/dvdringbuffer.h"
+#include "Bluray/bdringbuffer.h"
 
 #include "lcddevice.h"
 

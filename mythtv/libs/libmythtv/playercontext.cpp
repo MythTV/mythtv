@@ -6,8 +6,6 @@
 
 #include "playercontext.h"
 #include "mythplayer.h"
-#include "mythdvdplayer.h"
-#include "mythbdplayer.h"
 #include "remoteencoder.h"
 #include "livetvchain.h"
 #include "ringbuffer.h"
@@ -18,6 +16,8 @@
 #include "videometadatautil.h"
 #include "metadataimagehelper.h"
 #include "mythlogging.h"
+#include "DVD/mythdvdplayer.h"
+#include "Bluray/mythbdplayer.h"
 
 #define LOC QString("playCtx: ")
 

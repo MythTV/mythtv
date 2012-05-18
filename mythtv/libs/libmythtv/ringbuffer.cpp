@@ -16,10 +16,7 @@
 
 #include "ThreadedFileWriter.h"
 #include "fileringbuffer.h"
-#include "dvdringbuffer.h"
-#include "bdringbuffer.h"
 #include "streamingringbuffer.h"
-#include "httplivestreambuffer.h"
 #include "livetvchain.h"
 #include "mythcontext.h"
 #include "ringbuffer.h"
@@ -28,6 +25,9 @@
 #include "compat.h"
 #include "mythmiscutil.h"
 #include "mythlogging.h"
+#include "DVD/dvdringbuffer.h"
+#include "Bluray/bdringbuffer.h"
+#include "HLS/httplivestreambuffer.h"
 
 // about one second at 35mbit
 #define BUFFER_SIZE_MINIMUM 4 * 1024 * 1024

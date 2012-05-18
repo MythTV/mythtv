@@ -39,8 +39,6 @@ using namespace std;
 #include "mythconfig.h"
 #include "livetvchain.h"
 #include "playgroup.h"
-#include "dvdringbuffer.h"
-#include "bdringbuffer.h"
 #include "datadirect.h"
 #include "sourceutil.h"
 #include "cardutil.h"
@@ -59,6 +57,8 @@ using namespace std;
 #include "tvbrowsehelper.h"
 #include "mythlogging.h"
 #include "mythuistatetracker.h"
+#include "DVD/dvdringbuffer.h"
+#include "Bluray/bdringbuffer.h"
 
 #if ! HAVE_ROUND
 #define round(x) ((int) ((x) + 0.5))

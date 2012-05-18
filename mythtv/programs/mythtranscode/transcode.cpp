@@ -27,7 +27,7 @@
 #include "programinfo.h"
 #include "mythdbcon.h"
 #include "avformatwriter.h"
-#include "httplivestream.h"
+#include "HLS/httplivestream.h"
 
 
 extern "C" {

@@ -22,8 +22,6 @@ contains(INCLUDEPATH, /usr/local/include) {
 DEPENDPATH  += .
 DEPENDPATH  += ../libmyth ../libmyth/audio
 DEPENDPATH  += ../libmythbase ../libmythhdhomerun
-DEPENDPATH  += ../libmythdvdnav/
-DEPENDPATH  += ../libmythbluray/
 DEPENDPATH  += ./dvbdev ./mpeg ./iptv ./channelscan ./visualisations
 DEPENDPATH  += ../libmythlivemedia/BasicUsageEnvironment/include
 DEPENDPATH  += ../libmythlivemedia/BasicUsageEnvironment
@@ -48,8 +46,6 @@ LIBS += -L../../external/FFmpeg/libavcodec
 LIBS += -L../../external/FFmpeg/libavformat
 LIBS += -L../../external/FFmpeg/libswscale
 LIBS += -L../libmythui -L../libmythupnp
-LIBS += -L../libmythdvdnav
-LIBS += -L../libmythbluray
 LIBS += -L../libmythbase
 LIBS += -L../libmythservicecontracts
 LIBS += -lmyth-$$LIBVERSION
@@ -58,8 +54,7 @@ LIBS += -lmythavformat
 LIBS += -lmythavcodec
 LIBS += -lmythavutil
 LIBS += -lmythui-$$LIBVERSION       -lmythupnp-$$LIBVERSION
-LIBS += -lmythdvdnav-$$LIBVERSION
-LIBS += -lmythbluray-$$LIBVERSION    -lmythbase-$$LIBVERSION
+LIBS += -lmythbase-$$LIBVERSION
 LIBS += -lmythservicecontracts-$$LIBVERSION
 using_mheg: LIBS += -L../libmythfreemheg -lmythfreemheg-$$LIBVERSION
 using_live: LIBS += -L../libmythlivemedia -lmythlivemedia-$$LIBVERSION
@@ -72,8 +67,6 @@ POST_TARGETDEPS += ../../external/FFmpeg/libavutil/$$avLibName(avutil)
 POST_TARGETDEPS += ../../external/FFmpeg/libavcodec/$$avLibName(avcodec)
 POST_TARGETDEPS += ../../external/FFmpeg/libavformat/$$avLibName(avformat)
 POST_TARGETDEPS += ../../external/FFmpeg/libswscale/$$avLibName(swscale)
-POST_TARGETDEPS += ../libmythdvdnav/libmythdvdnav-$${MYTH_LIB_EXT}
-POST_TARGETDEPS += ../libmythbluray/libmythbluray-$${MYTH_LIB_EXT}
 using_mheg: POST_TARGETDEPS += ../libmythfreemheg/libmythfreemheg-$${MYTH_SHLIB_EXT}
 using_live: POST_TARGETDEPS += ../libmythlivemedia/libmythlivemedia-$${MYTH_SHLIB_EXT}
 using_hdhomerun: POST_TARGETDEPS += ../libmythhdhomerun/libmythhdhomerun-$${MYTH_SHLIB_EXT}
@@ -164,9 +157,7 @@ HEADERS += recordingrule.h
 HEADERS += mythsystemevent.h
 HEADERS += avfringbuffer.h          ThreadedFileWriter.h
 HEADERS += ringbuffer.h             fileringbuffer.h
-HEADERS += dvdringbuffer.h          bdringbuffer.h
 HEADERS += streamingringbuffer.h    metadataimagehelper.h
-HEADERS += httplivestreambuffer.h
 
 SOURCES += recordinginfo.cpp
 SOURCES += dbcheck.cpp
@@ -193,13 +184,7 @@ SOURCES += recordingrule.cpp
 SOURCES += mythsystemevent.cpp
 SOURCES += avfringbuffer.cpp        ThreadedFileWriter.cpp
 SOURCES += ringbuffer.cpp           fileringBuffer.cpp
-SOURCES += dvdringbuffer.cpp        bdringbuffer.cpp
 SOURCES += streamingringbuffer.cpp  metadataimagehelper.cpp
-
-#HLS player
-SOURCES += httplivestreambuffer.cpp
-using_libcrypto:DEFINES += USING_LIBCRYPTO
-using_libcrypto:LIBS    += -lcrypto
 
 # DiSEqC
 HEADERS += diseqc.h                 diseqcsettings.h
@@ -212,10 +197,6 @@ SOURCES += datadirect.cpp
 # File Writer classes
 HEADERS += filewriterbase.h         avformatwriter.h
 SOURCES += filewriterbase.cpp       avformatwriter.cpp
-
-# HTTP Live Streaming
-HEADERS += httplivestream.h
-SOURCES += httplivestream.cpp
 
 # Teletext stuff
 HEADERS += teletextdecoder.h        teletextreader.h   vbilut.h
@@ -230,7 +211,7 @@ HEADERS += mpeg/mpegstreamdata.h    mpeg/atscstreamdata.h
 HEADERS += mpeg/dvbstreamdata.h     mpeg/scanstreamdata.h
 HEADERS += mpeg/mpegdescriptors.h   mpeg/atscdescriptors.h
 HEADERS += mpeg/sctedescriptors.h   mpeg/dvbdescriptors.h
-HEADERS += mpeg/splicedescriptors.h 
+HEADERS += mpeg/splicedescriptors.h
 HEADERS += mpeg/dishdescriptors.h   mpeg/premieredescriptors.h
 HEADERS += mpeg/atsc_huffman.h
 HEADERS += mpeg/freesat_huffman.h   mpeg/freesat_tables.h
@@ -278,6 +259,47 @@ inc.files += mythtvexp.h            metadataimagehelper.h
 
 INSTALLS += inc
 
+#DVD stuff
+DEPENDPATH  += ../libmythdvdnav/
+INCLUDEPATH += ../libmythdvdnav
+POST_TARGETDEPS += ../libmythdvdnav/libmythdvdnav-$${MYTH_LIB_EXT}
+HEADERS += DVD/dvdringbuffer.h
+SOURCES += DVD/dvdringbuffer.cpp
+using_frontend {
+    HEADERS += DVD/mythdvdplayer.h
+    SOURCES += DVD/mythdvdplayer.cpp
+    HEADERS += DVD/avformatdecoderdvd.h
+    SOURCES += DVD/avformatdecoderdvd.cpp
+}
+LIBS += -L../libmythdvdnav
+LIBS += -lmythdvdnav-$$LIBVERSION
+
+#Bluray stuff
+DEPENDPATH   += ../libmythbluray/
+INCLUDEPATH  += ../libmythbluray/
+POST_TARGETDEPS += ../libmythbluray/libmythbluray-$${MYTH_LIB_EXT}
+HEADERS += Bluray/bdringbuffer.h
+SOURCES += Bluray/bdringbuffer.cpp
+using_frontend {
+    HEADERS += Bluray/mythbdplayer.h
+    SOURCES += Bluray/mythbdplayer.cpp
+    HEADERS += Bluray/avformatdecoderbd.h
+    SOURCES += Bluray/avformatdecoderbd.cpp
+    HEADERS += Bluray/bdoverlayscreen.h
+    SOURCES += Bluray/bdoverlayscreen.cpp
+}
+LIBS += -L../libmythbluray
+LIBS += -lmythbluray-$$LIBVERSION
+
+#HLS stuff
+HEADERS += HLS/httplivestream.h
+SOURCES += HLS/httplivestream.cpp
+HEADERS += HLS/httplivestreambuffer.h
+SOURCES += HLS/httplivestreambuffer.cpp
+using_libcrypto:DEFINES += USING_LIBCRYPTO
+using_libcrypto:LIBS    += -lcrypto
+
+
 using_frontend {
     # Recording profile stuff
     HEADERS += profilegroup.h
@@ -285,20 +307,18 @@ using_frontend {
 
     # Video playback
     HEADERS += tv_play.h                mythplayer.h
-    HEADERS += mythdvdplayer.h          audioplayer.h
+    HEADERS += audioplayer.h
     HEADERS += mythccextractorplayer.h  teletextextractorreader.h
     HEADERS += playercontext.h
     HEADERS += tv_play_win.h            deletemap.h
     HEADERS += mythcommflagplayer.h     commbreakmap.h
-    HEADERS += mythbdplayer.h
     HEADERS += mythiowrapper.h          tvbrowsehelper.h
     SOURCES += tv_play.cpp              mythplayer.cpp
-    SOURCES += mythdvdplayer.cpp        audioplayer.cpp
+    SOURCES += audioplayer.cpp
     SOURCES += mythccextractorplayer.cpp teletextextractorreader.cpp
     SOURCES += playercontext.cpp
     SOURCES += tv_play_win.cpp          deletemap.cpp
     SOURCES += mythcommflagplayer.cpp   commbreakmap.cpp
-    SOURCES += mythbdplayer.cpp
     SOURCES += mythiowrapper.cpp        tvbrowsehelper.cpp
 
     # Text subtitle parser
@@ -308,11 +328,9 @@ using_frontend {
     # A/V decoders
     HEADERS += decoderbase.h
     HEADERS += nuppeldecoder.h          avformatdecoder.h
-    HEADERS += avformatdecoderbd.h      avformatdecoderdvd.h
     HEADERS += privatedecoder.h
     SOURCES += decoderbase.cpp
     SOURCES += nuppeldecoder.cpp        avformatdecoder.cpp
-    SOURCES += avformatdecoderbd.cpp    avformatdecoderdvd.cpp
     SOURCES += privatedecoder.cpp
 
     using_crystalhd {
@@ -335,10 +353,8 @@ using_frontend {
     # On screen display (video output overlay)
     HEADERS += osd.h                    teletextscreen.h
     HEADERS += subtitlescreen.h         interactivescreen.h
-    HEADERS += bdoverlayscreen.h
     SOURCES += osd.cpp                  teletextscreen.cpp
     SOURCES += subtitlescreen.cpp       interactivescreen.cpp
-    SOURCES += bdoverlayscreen.cpp
 
     # Video output
     HEADERS += videooutbase.h           videoout_null.h
@@ -422,10 +438,10 @@ using_frontend {
 
     using_libdns_sd {
         !macx: LIBS += -ldns_sd
-        HEADERS += mythairplayserver.h
-        SOURCES += mythairplayserver.cpp
-        using_libcrypto: HEADERS += mythraopdevice.h   mythraopconnection.h
-        using_libcrypto: SOURCES += mythraopdevice.cpp mythraopconnection.cpp
+        HEADERS += AirPlay/mythairplayserver.h
+        SOURCES += AirPlay/mythairplayserver.cpp
+        using_libcrypto: HEADERS += AirPlay/mythraopdevice.h   AirPlay/mythraopconnection.h
+        using_libcrypto: SOURCES += AirPlay/mythraopdevice.cpp AirPlay/mythraopconnection.cpp
     }
 
     using_mheg {
