@@ -2,7 +2,7 @@ include ( ../../settings.pro )
 
 TEMPLATE = lib
 TARGET = mythbluray-$$LIBVERSION
-CONFIG += thread staticlib warn_off
+CONFIG += thread staticlib warn_off xml
 CONFIG -= qt
 target.path = $${LIBDIR}
 
