@@ -444,13 +444,14 @@ void RecorderBase::AspectChange(uint aspect, long long frame)
 {
     MarkTypes mark = MARK_ASPECT_4_3;
     uint customAspect = 0;
-    if ((aspect == ASPECT_1_1 && m_videoHeight) || (aspect >= ASPECT_CUSTOM))
+    if (aspect == ASPECT_1_1 || aspect >= ASPECT_CUSTOM)
     {
-        mark = MARK_ASPECT_CUSTOM;
         if (aspect > 0x0F)
             customAspect = aspect;
-        else
+        else if (m_videoWidth && m_videoHeight)
             customAspect = m_videoWidth * 1000000 / m_videoHeight;
+
+        mark = (customAspect) ? MARK_ASPECT_CUSTOM : mark;
     }
     if (aspect == ASPECT_4_3)
         mark = MARK_ASPECT_4_3;
