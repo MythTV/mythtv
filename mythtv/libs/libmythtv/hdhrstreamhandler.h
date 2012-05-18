@@ -87,7 +87,7 @@ class HDHRStreamHandler : public StreamHandler
 
   private:
     hdhomerun_device_t     *_hdhomerun_device;
-    uint                    _tuner;
+    int                     _tuner;
     vector<DTVTunerType>    _tuner_types;
     HDHRTuneMode            _tune_mode; // debug self check
 
