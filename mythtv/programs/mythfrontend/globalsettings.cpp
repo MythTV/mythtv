@@ -161,16 +161,6 @@ static HostCheckBox *SmartForward()
     return gc;
 }
 
-static HostCheckBox *ExactSeeking()
-{
-    HostCheckBox *gc = new HostCheckBox("ExactSeeking");
-    gc->setLabel(QObject::tr("Seek to exact frame"));
-    gc->setValue(false);
-    gc->setHelpText(QObject::tr("If enabled, seeking is frame exact, but "
-                    "slower."));
-    return gc;
-}
-
 static GlobalComboBox *CommercialSkipMethod()
 {
     GlobalComboBox *bc = new GlobalComboBox("CommercialSkipMethod");
@@ -3343,7 +3333,6 @@ PlaybackSettings::PlaybackSettings()
     seek->addChild(SmartForward());
     seek->addChild(FFRewReposTime());
     seek->addChild(FFRewReverse());
-    seek->addChild(ExactSeeking());
     addChild(seek);
 
     VerticalConfigurationGroup* comms = new VerticalConfigurationGroup(false);

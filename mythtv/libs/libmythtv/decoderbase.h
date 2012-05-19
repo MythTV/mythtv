@@ -113,8 +113,8 @@ class DecoderBase
     virtual void SetEof(bool eof)  { ateof = eof;  }
     bool         GetEof(void) const { return ateof; }
 
-    void setExactSeeks(bool exact) { exactseeks = exact; }
-    bool getExactSeeks(void) const { return exactseeks;  }
+    void setSeekSnap(uint64_t snap)  { seeksnap = snap; }
+    uint64_t getSeekSnap(void) const { return seeksnap;  }
     void setLiveTVMode(bool live)  { livetv = live;      }
 
     // Must be done while player is paused.
@@ -270,7 +270,7 @@ class DecoderBase
     vector<PosMapEntry> m_positionMap;
     bool dontSyncPositionMap;
 
-    bool exactseeks;
+    uint64_t seeksnap;
     bool livetv;
     bool watchingrecording;
 

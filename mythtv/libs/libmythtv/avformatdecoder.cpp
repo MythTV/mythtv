@@ -576,7 +576,8 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame, bool discardFrames)
     long double seekts = desiredFrame * AV_TIME_BASE / fps;
     ts += (long long)seekts;
 
-    bool exactseeks = DecoderBase::getExactSeeks();
+    // XXX figure out how to do snapping in this case
+    bool exactseeks = !DecoderBase::getSeekSnap();
 
     int flags = (dorewind || exactseeks) ? AVSEEK_FLAG_BACKWARD : 0;
 

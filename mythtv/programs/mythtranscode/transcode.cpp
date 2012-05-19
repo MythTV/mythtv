@@ -930,7 +930,7 @@ int Transcode::TranscodeFile(const QString &inputname,
     player_ctx->SetPlayingInfo(m_proginfo);
     player_ctx->SetRingBuffer(inRingBuffer);
     player_ctx->SetPlayer(player);
-    player->SetPlayerInfo(NULL, NULL, true, player_ctx);
+    player->SetPlayerInfo(NULL, NULL, player_ctx);
 
     if (showprogress)
     {

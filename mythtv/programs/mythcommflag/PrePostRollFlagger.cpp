@@ -26,7 +26,6 @@ PrePostRollFlagger::PrePostRollFlagger(SkipType commDetectMethod,
 void PrePostRollFlagger::Init()
 {
     ClassicCommDetector::Init();
-    player->SetExactSeeks(true);
 }
 
 bool PrePostRollFlagger::go()
@@ -227,7 +226,6 @@ long long PrePostRollFlagger::findBreakInrange(long long startFrame,
     player->DiscardVideoFrame(player->GetRawVideoFrame(0));
 
     long long tmpStartFrame = startFrame;
-    player->SetExactSeeks(true);
     VideoFrame* f = player->GetRawVideoFrame(tmpStartFrame);
     float aspect = player->GetVideoAspect();
     currentFrameNumber = f->frameNumber;
