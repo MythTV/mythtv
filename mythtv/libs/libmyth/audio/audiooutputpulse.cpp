@@ -482,7 +482,7 @@ char *AudioOutputPulseAudio::ChooseHost(void)
 
     if ( !(!host || *host == 0 || strcmp(host,"default") == 0))
     {
-        if ((pulse_host = new char[strlen(host)]))
+        if ((pulse_host = new char[strlen(host) + 1]))
             strcpy(pulse_host, host);
         else
             VBERROR(fn_log_tag +
