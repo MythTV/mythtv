@@ -16,8 +16,6 @@
 
 #include "ThreadedFileWriter.h"
 #include "fileringbuffer.h"
-#include "dvdringbuffer.h"
-#include "bdringbuffer.h"
 #include "streamingringbuffer.h"
 #include "livetvchain.h"
 #include "mythcontext.h"
@@ -27,6 +25,9 @@
 #include "compat.h"
 #include "mythmiscutil.h"
 #include "mythlogging.h"
+#include "DVD/dvdringbuffer.h"
+#include "Bluray/bdringbuffer.h"
+#include "HLS/httplivestreambuffer.h"
 
 // about one second at 35mbit
 #define BUFFER_SIZE_MINIMUM 4 * 1024 * 1024
@@ -107,15 +108,20 @@ RingBuffer *RingBuffer::Create(
 
     bool dvddir  = false;
     bool bddir   = false;
-    bool httpurl = lower.startsWith("http://");
+    bool httpurl = lower.startsWith("http://") || lower.startsWith("https://");
     bool mythurl = lower.startsWith("myth://");
     bool bdurl   = lower.startsWith("bd:");
     bool dvdurl  = lower.startsWith("dvd:");
     bool dvdext  = lower.endsWith(".img") || lower.endsWith(".iso");
 
     if (httpurl)
+    {
+        if (HLSRingBuffer::TestForHTTPLiveStreaming(lfilename))
+        {
+            return new HLSRingBuffer(lfilename);
+        }
         return new StreamingRingBuffer(lfilename);
-
+    }
     if (!stream_only && mythurl)
     {
         struct stat fileInfo;

@@ -1,3 +1,4 @@
+#include <QUrl>
 #include "mythcorecontext.h"
 #include "mythlogging.h"
 
@@ -48,10 +49,16 @@ bool StreamingRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
 
     // TODO check whether local area file
 
-    int res = ffurl_open(&m_context, filename.toAscii(), AVIO_FLAG_READ,
+    QUrl url = filename;
+    if (url.path().endsWith(QLatin1String("m3u8"), Qt::CaseInsensitive))
+    {
+        url.setScheme("hls+http");
+    }
+
+    int res = ffurl_open(&m_context, url.toString().toAscii(), AVIO_FLAG_READ,
                          NULL, NULL);
     if (res >=0 && m_context &&
-        (!m_context->is_streamed && ffurl_seek(m_context, 0, SEEK_SET) >= 0))
+        !m_context->is_streamed && ffurl_seek(m_context, 0, SEEK_SET) >= 0)
     {
         m_streamed   = false;
         m_allowSeeks = true;

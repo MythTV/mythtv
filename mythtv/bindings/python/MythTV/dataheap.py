@@ -379,7 +379,7 @@ class Recorded( CMPRecord, DBDataWrite ):
 
         # pull direct matches
         for tag in ('title', 'subtitle', 'description', 'season', 'episode',
-                    'chanid', 'starttime', 'seriesid', 'programid', 'inetref',
+                    'chanid', 'seriesid', 'programid', 'inetref',
                     'recgroup', 'playgroup', 'seriesid', 'programid',
                     'storagegroup'):
             if metadata[tag] and _allow_change(self, tag, overwrite):
@@ -419,7 +419,7 @@ class Recorded( CMPRecord, DBDataWrite ):
 
         # pull direct matches
         for tag in ('title', 'subtitle', 'description', 'season', 'episode',
-                    'chanid', 'starttime', 'seriesid', 'programid', 'inetref',
+                    'chanid', 'seriesid', 'programid', 'inetref',
                     'recgroup', 'playgroup', 'seriesid', 'programid',
                     'storagegroup'):
             if self[tag]:

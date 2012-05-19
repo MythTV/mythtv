@@ -17,13 +17,13 @@
 #include "mythuistatetype.h"
 
 // libmythtv
-#include "bdringbuffer.h"
 #include "channelutil.h"
 #include "teletextscreen.h"
 #include "subtitlescreen.h"
 #include "interactivescreen.h"
-#include "bdoverlayscreen.h"
 #include "osd.h"
+#include "Bluray/bdringbuffer.h"
+#include "Bluray/bdoverlayscreen.h"
 
 #define LOC     QString("OSD: ")
 

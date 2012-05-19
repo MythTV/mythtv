@@ -159,6 +159,7 @@ External codec library options (used for mythffmpeg and streaming transcode):
   --enable-libvpx          enable VP8 encoding via libvpx [no]
   --enable-libxvid         enable Xvid encoding via xvidcore,
                            native MPEG-4/Xvid encoder exists [no]
+  --enable-sdl             enable Simple DirectMedia Layer (required for ffplay
 EOF
 
 #following is ffmpeg's configure help text
@@ -1207,6 +1208,7 @@ CONFIG_LIST="
     rtpdec
     runtime_cpudetect
     safe_bitstream_reader
+    sdl
     shared
     sinewin
     small
@@ -1291,6 +1293,7 @@ HAVE_LIST="
     asm_types_h
     attribute_may_alias
     attribute_packed
+    byteswap_h
     cbrtf
     closesocket
     cmov
@@ -1374,6 +1377,7 @@ HAVE_LIST="
     symver_gnu_asm
     sysconf
     sysctl
+    sys_endian_h
     sys_mman_h
     sys_param_h
     sys_resource_h
@@ -2171,6 +2175,7 @@ enable x11
 enable xrandr
 enable xv
 disable indevs
+disable sdl
 
 # mythtv paths
 dvb_path_default="${sysroot}/usr/include"
@@ -3848,9 +3853,6 @@ fi
 disabled  zlib || check_lib   zlib.h      zlibVersion -lz   || disable  zlib
 disabled bzlib || check_lib2 bzlib.h BZ2_bzlibVersion -lbz2 || disable bzlib
 
-# Attempt to use libudev for mediamonitor
-enabled libudev && check_lib2 libudev.h udev_new -ludev || disable libudev
-
 enabled ffmpeg_pthreads && enable pthreads
 
 # check for some common methods of building with pthread support
@@ -3881,6 +3883,9 @@ for thread in $THREADS_LIST; do
             thread_type="$thread"
     fi
 done
+
+# Attempt to use libudev for mediamonitor
+enabled libudev && check_lib2 libudev.h udev_new -ludev || disable libudev
 
 check_lib math.h sin -lm && LIBM="-lm"
 disabled crystalhd || check_lib libcrystalhd/libcrystalhd_if.h DtsCrystalHDVersion -lcrystalhd || disable crystalhd
@@ -4011,22 +4016,24 @@ enabled freetype2 ||
 
 
 ##########################################
-SDL_CONFIG="${cross_prefix}sdl-config"
-if check_pkg_config sdl SDL_events.h SDL_PollEvent; then
-    check_cpp_condition SDL.h "(SDL_MAJOR_VERSION<<16 | SDL_MINOR_VERSION<<8 | SDL_PATCHLEVEL) >= 0x010201" $sdl_cflags &&
-    enable sdl &&
-    check_struct SDL.h SDL_VideoInfo current_w $sdl_cflags && enable sdl_video_size
-else
-  if "${SDL_CONFIG}" --version > /dev/null 2>&1; then
-    sdl_cflags=$("${SDL_CONFIG}" --cflags)
-    sdl_libs=$("${SDL_CONFIG}" --libs)
-    check_func_headers SDL_version.h SDL_Linked_Version $sdl_cflags $sdl_libs &&
-    check_cpp_condition SDL.h "(SDL_MAJOR_VERSION<<16 | SDL_MINOR_VERSION<<8 | SDL_PATCHLEVEL) >= 0x010201" $sdl_cflags &&
-    enable sdl &&
-    check_struct SDL.h SDL_VideoInfo current_w $sdl_cflags && enable sdl_video_size
-  fi
+if enabled sdl ; then
+    SDL_CONFIG="${cross_prefix}sdl-config"
+    if check_pkg_config sdl SDL_events.h SDL_PollEvent; then
+        check_cpp_condition SDL.h "(SDL_MAJOR_VERSION<<16 | SDL_MINOR_VERSION<<8 | SDL_PATCHLEVEL) >= 0x010201" $sdl_cflags &&
+        enable sdl &&
+        check_struct SDL.h SDL_VideoInfo current_w $sdl_cflags && enable sdl_video_size
+    else
+      if "${SDL_CONFIG}" --version > /dev/null 2>&1; then
+        sdl_cflags=$("${SDL_CONFIG}" --cflags)
+        sdl_libs=$("${SDL_CONFIG}" --libs)
+        check_func_headers SDL_version.h SDL_Linked_Version $sdl_cflags $sdl_libs &&
+        check_cpp_condition SDL.h "(SDL_MAJOR_VERSION<<16 | SDL_MINOR_VERSION<<8 | SDL_PATCHLEVEL) >= 0x010201" $sdl_cflags &&
+        enable sdl &&
+        check_struct SDL.h SDL_VideoInfo current_w $sdl_cflags && enable sdl_video_size
+      fi
+    fi
+    enabled sdl && add_cflags $sdl_cflags && add_extralibs $sdl_libs
 fi
-enabled sdl && add_cflags $sdl_cflags && add_extralibs $sdl_libs
 
 texi2html -version > /dev/null 2>&1 && enable texi2html || disable texi2html
 
@@ -4827,6 +4834,7 @@ echo "faac                      ${libfaac-no}"
 echo "xvid                      ${libxvid-no}"
 echo "x264                      ${libx264-no}"
 echo "vpx                       ${libvpx-no}"
+echo "SDL                       ${sdl-no}"
 echo ""
 
 MYTH_CONFIG_H=libs/libmythbase/mythconfig.h

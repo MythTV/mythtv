@@ -71,36 +71,82 @@ bool UpgradeMusicDatabaseSchema(void)
 #ifdef IGNORE_SCHEMA_VER_MISMATCH
     return true;
 #endif
+    SchemaUpgradeWizard *schema_wizard = NULL;
 
-    SchemaUpgradeWizard  * DBup;
+    // Suppress DB messages and turn of the settings cache,
+    // These are likely to confuse the users and the code, respectively.
+    GetMythDB()->SetSuppressDBMessages(true);
+    gCoreContext->ActivateSettingsCache(false);
 
+    // Get the schema upgrade lock
+    MSqlQuery query(MSqlQuery::InitCon());
+    bool locked = DBUtil::TryLockSchema(query, 1);
+    for (uint i = 0; i < 2*60 && !locked; i++)
+    {
+        LOG(VB_GENERAL, LOG_INFO, "Waiting for database schema upgrade lock");
+        locked = DBUtil::TryLockSchema(query, 1);
+        if (locked)
+            LOG(VB_GENERAL, LOG_INFO, "Got schema upgrade lock");
+    }
+    if (!locked)
+    {
+        LOG(VB_GENERAL, LOG_INFO, "Failed to get schema upgrade lock");
+        goto upgrade_error_exit;
+    }
 
-    DBup = SchemaUpgradeWizard::Get("MusicDBSchemaVer", "MythMusic",
-                                    currentDatabaseVersion);
+    schema_wizard = SchemaUpgradeWizard::Get(
+        "MusicDBSchemaVer", "MythMusic", currentDatabaseVersion);
 
-    // There may be a race condition where another frontend is upgrading,
-    // so wait up to 3 seconds for a more accurate version:
-    DBup->CompareAndWait(3);
+    if (schema_wizard->Compare() == 0) // DB schema is what we need it to be..
+        goto upgrade_ok_exit;
 
-    if (DBup->versionsBehind == 0)  // same schema
-        return true;
-
-    if (DBup->DBver.isEmpty())
-        return doUpgradeMusicDatabaseSchema(DBup->DBver);
+    if (schema_wizard->DBver.isEmpty())
+    {
+        // We need to create a database from scratch
+        if (doUpgradeMusicDatabaseSchema(schema_wizard->DBver))
+            goto upgrade_ok_exit;
+        else
+            goto upgrade_error_exit;
+    }
 
     // Pop up messages, questions, warnings, et c.
-    switch (DBup->PromptForUpgrade("Music", true, false))
+    switch (schema_wizard->PromptForUpgrade("Music", true, false))
     {
         case MYTH_SCHEMA_USE_EXISTING:
-            return true;
+            goto upgrade_ok_exit;
         case MYTH_SCHEMA_ERROR:
         case MYTH_SCHEMA_EXIT:
-            return false;
+            goto upgrade_error_exit;
         case MYTH_SCHEMA_UPGRADE:
             break;
     }
 
-    return doUpgradeMusicDatabaseSchema(DBup->DBver);
+    if (!doUpgradeMusicDatabaseSchema(schema_wizard->DBver))
+    {
+        LOG(VB_GENERAL, LOG_ERR, "Database schema upgrade failed.");
+        goto upgrade_error_exit;
+    }
+
+    LOG(VB_GENERAL, LOG_INFO, "MythMusic database schema upgrade complete.");
+
+    // On any exit we want to re-enable the DB messages so errors
+    // are reported and we want to make sure the setting cache is
+    // enabled for good performance and we must unlock the schema
+    // lock. We use gotos with labels so it's impossible to miss
+    // these steps.
+  upgrade_ok_exit:
+    GetMythDB()->SetSuppressDBMessages(false);
+    gCoreContext->ActivateSettingsCache(true);
+    if (locked)
+        DBUtil::UnlockSchema(query);
+    return true;
+
+  upgrade_error_exit:
+    GetMythDB()->SetSuppressDBMessages(false);
+    gCoreContext->ActivateSettingsCache(true);
+    if (locked)
+        DBUtil::UnlockSchema(query);
+    return false;
 }
 
 

@@ -33,10 +33,10 @@ using namespace std;
 #include "teletextdecoder.h"
 #include "subtitlereader.h"
 #include "interactivetv.h"
-#include "dvdringbuffer.h"
-#include "bdringbuffer.h"
 #include "videodisplayprofile.h"
 #include "mythuihelper.h"
+#include "DVD/dvdringbuffer.h"
+#include "Bluray/bdringbuffer.h"
 
 #include "lcddevice.h"
 
@@ -181,6 +181,7 @@ static void myth_av_log(void *ptr, int level, const char* fmt, va_list vl)
         case AV_LOG_INFO:
             verbose_level = LOG_DEBUG;
             verbose_mask |= VB_LIBAV;
+            break;
         case AV_LOG_WARNING:
             verbose_mask |= VB_LIBAV;
             break;
@@ -302,8 +303,6 @@ AvFormatDecoder::AvFormatDecoder(MythPlayer *parent,
       // Interactive TV
       itv(NULL),
       // Audio
-      m_audioFrame(NULL),
-      audioSamples(NULL),
       disable_passthru(false),
       m_fps(0.0f),
       codec_is_mpeg(false)
@@ -312,7 +311,8 @@ AvFormatDecoder::AvFormatDecoder(MythPlayer *parent,
     memset(ccX08_in_pmt, 0, sizeof(ccX08_in_pmt));
     memset(ccX08_in_tracks, 0, sizeof(ccX08_in_tracks));
 
-    m_audioFrame = avcodec_alloc_frame();
+    audioSamples = (uint8_t *)av_mallocz(AVCODEC_MAX_AUDIO_FRAME_SIZE *
+                                         sizeof(int32_t));
     ccd608->SetIgnoreTimecode(true);
 
     bool debug = VERBOSE_LEVEL_CHECK(VB_LIBAV, LOG_ANY);
@@ -346,7 +346,7 @@ AvFormatDecoder::~AvFormatDecoder()
 
     sws_freeContext(sws_ctx);
 
-    av_free(m_audioFrame);
+    av_free(audioSamples);
 
     if (avfRingBuffer)
         delete avfRingBuffer;
@@ -4107,20 +4107,9 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
                     ctx->channels = m_audio->GetMaxChannels();
             }
 
-            avcodec_get_frame_defaults(m_audioFrame);
-            int got_frame = 0;
-
-            ret = avcodec_decode_audio4(ctx, m_audioFrame, &got_frame,
-                                        &tmp_pkt);
-            if (ret > 0 && got_frame)
-            {
-                decoded_size = ret;
-                already_decoded = true;
-                data_size = av_samples_get_buffer_size(NULL, ctx->channels,
-                                                       m_audioFrame->nb_samples,
-                                                       ctx->sample_fmt, 1);
-                audioSamples = m_audioFrame->extended_data[0];
-            }
+            ret = DecodeAudio(ctx, audioSamples, data_size, &tmp_pkt);
+            decoded_size = data_size;
+            already_decoded = true;
             reselectAudioTrack |= ctx->channels;
         }
 
@@ -4167,30 +4156,16 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
         {
             if (!already_decoded)
             {
-                decoded_size = -1;
                 if (m_audio->NeedDecodingBeforePassthrough())
                 {
-                    avcodec_get_frame_defaults(m_audioFrame);
-                    int got_frame = 0;
-
-                    ret = avcodec_decode_audio4(ctx, m_audioFrame, &got_frame,
-                                                &tmp_pkt);
-                    if (ret > 0 && got_frame)
-                    {
-                        decoded_size = ret;
-                        data_size =
-                            av_samples_get_buffer_size(NULL, ctx->channels,
-                                                       m_audioFrame->nb_samples,
-                                                       ctx->sample_fmt, 1);
-                        audioSamples = m_audioFrame->extended_data[0];
-                    }
+                    ret = DecodeAudio(ctx, audioSamples, data_size, &tmp_pkt);
+                    decoded_size = data_size;
                 }
+                else
+                    decoded_size = -1;
             }
-            else
-            {
-                audioSamples = tmp_pkt.data;
-                data_size = tmp_pkt.size;
-            }
+            memcpy(audioSamples, tmp_pkt.data, tmp_pkt.size);
+            data_size = tmp_pkt.size;
             // We have processed all the data, there can't be any left
             tmp_pkt.size = 0;
         }
@@ -4207,20 +4182,8 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
                 else
                     ctx->request_channels = 0;
 
-                avcodec_get_frame_defaults(m_audioFrame);
-                int got_frame = 0;
-
-                ret = avcodec_decode_audio4(ctx, m_audioFrame, &got_frame,
-                                            &tmp_pkt);
-                if (ret > 0 && got_frame)
-                {
-                    decoded_size = ret;
-                    data_size =
-                        av_samples_get_buffer_size(NULL, ctx->channels,
-                                                   m_audioFrame->nb_samples,
-                                                   ctx->sample_fmt, 1);
-                    audioSamples = m_audioFrame->extended_data[0];
-                }
+                ret = DecodeAudio(ctx, audioSamples, data_size, &tmp_pkt);
+                decoded_size = data_size;
             }
 
             // When decoding some audio streams the number of
@@ -4253,9 +4216,9 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
 
         long long temppts = lastapts;
 
-        if (audSubIdx != -1)
-            extract_mono_channel(audSubIdx, &audioOut, (char *)audioSamples,
-                                 data_size);
+        if (audSubIdx != -1 && !audioOut.do_passthru)
+            extract_mono_channel(audSubIdx, &audioOut,
+                                 (char *)audioSamples, data_size);
 
         int frames = (ctx->channels <= 0 || decoded_size < 0) ? -1 :
             decoded_size / (ctx->channels *
@@ -4283,6 +4246,39 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
     }
 
     return true;
+}
+
+int AvFormatDecoder::DecodeAudio(AVCodecContext *ctx,
+                                 uint8_t *buffer, int &data_size,
+                                 AVPacket *pkt)
+{
+    AVFrame frame;
+    int got_frame = 0;
+
+    int ret = avcodec_decode_audio4(ctx, &frame, &got_frame, pkt);
+    if (ret < 0 || !got_frame)
+    {
+        data_size = 0;
+        return ret;
+    }
+
+    int plane_size;
+    int planar = av_sample_fmt_is_planar(ctx->sample_fmt);
+    data_size = av_samples_get_buffer_size(&plane_size, ctx->channels,
+                                           frame.nb_samples,
+                                           ctx->sample_fmt, 1);
+    memcpy(buffer, frame.extended_data[0], plane_size);
+
+    if (planar && ctx->channels > 1)
+    {
+        uint8_t *out = buffer + plane_size;
+        for (int i = 1; i < ctx->channels; i++)
+        {
+            memcpy(out, frame.extended_data[i], plane_size);
+            out += plane_size;
+        }
+    }
+    return ret;
 }
 
 // documented in decoderbase.h

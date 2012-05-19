@@ -342,7 +342,8 @@ MythMainWindow *MythMainWindow::getMainWindow(const bool useDB)
 
 void MythMainWindow::destroyMainWindow(void)
 {
-    gCoreContext->SetGUIObject(NULL);
+    if (gCoreContext)
+        gCoreContext->SetGUIObject(NULL);
     delete mainWin;
     mainWin = NULL;
 }
@@ -2081,7 +2082,7 @@ bool MythMainWindow::eventFilter(QObject *, QEvent *e)
                 d->gestureTimer->stop();
                 d->gestureTimer->start(GESTURE_TIMEOUT);
 
-                d->gesture.record(dynamic_cast<QMouseEvent*>(e)->pos());
+                d->gesture.record(static_cast<QMouseEvent*>(e)->pos());
                 return true;
             }
             break;
@@ -2090,7 +2091,7 @@ bool MythMainWindow::eventFilter(QObject *, QEvent *e)
         {
             ResetIdleTimer();
             ShowMouseCursor(true);
-            QWheelEvent* qmw = dynamic_cast<QWheelEvent*>(e);
+            QWheelEvent* qmw = static_cast<QWheelEvent*>(e);
             int delta = qmw->delta();
             if (delta>0)
             {

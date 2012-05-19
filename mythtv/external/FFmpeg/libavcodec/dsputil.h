@@ -595,7 +595,7 @@ void ff_block_permute(DCTELEM *block, uint8_t *permutation, const uint8_t *scant
 void ff_set_cmp(DSPContext* c, me_cmp_func *cmp, int type);
 
 #define         BYTE_VEC32(c)   ((c)*0x01010101UL)
-#define         BYTE_VEC64(c)   ((c)*0x0001000100010001UL)
+#define         BYTE_VEC64(c)   ((c)*UINT64_C(0x0001000100010001))
 
 static inline uint32_t rnd_avg32(uint32_t a, uint32_t b)
 {

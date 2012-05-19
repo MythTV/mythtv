@@ -124,7 +124,7 @@ class DictData( OrdDict ):
 
     def __setitem__(self, key, value):
         if key not in self._field_order:
-                raise KeyError(str(name))
+                raise KeyError(str(key))
         dict.__setitem__(self, key, value)
 
     def __delattr__(self, name):

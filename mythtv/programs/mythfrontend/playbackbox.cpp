@@ -2649,6 +2649,7 @@ void PlaybackBox::ShowAvailabilityPopup(const ProgramInfo &pginfo)
             ShowOkPopup(tr("Recording Unavailable\n") + msg +
                         tr("This recording is currently being "
                            "deleted and is unavailable"));
+            break;
         case asDeleted:
             ShowOkPopup(tr("Recording Unavailable\n") + msg +
                         tr("This recording has been "

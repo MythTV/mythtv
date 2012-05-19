@@ -1502,7 +1502,7 @@ void MythUIImage::customEvent(QEvent *event)
         QString filename;
         bool aborted;
 
-        ImageLoadEvent *le = dynamic_cast<ImageLoadEvent *>(event);
+        ImageLoadEvent *le = static_cast<ImageLoadEvent *>(event);
 
         if (le->GetParent() != this)
             return;

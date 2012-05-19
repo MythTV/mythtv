@@ -235,7 +235,7 @@ VideoOutput *VideoOutput::Create(
 #ifdef USING_GLVAAPI
         if (renderer == "openglvaapi")
             vo = new VideoOutputOpenGLVAAPI();
-#endif // USING_GLVAAPI        
+#endif // USING_GLVAAPI
 #ifdef USING_XV
         if (xvlist.contains(renderer))
             vo = new VideoOutputXv();
@@ -255,12 +255,16 @@ VideoOutput *VideoOutput::Create(
             if (!widget)
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC + "No window for video output.");
+                delete vo;
+                vo = NULL;
                 return NULL;
             }
 
             if (!widget->winId())
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC + "No window for video output.");
+                delete vo;
+                vo = NULL;
                 return NULL;
             }
 

@@ -143,6 +143,11 @@ bool avfDecoder::initialize()
 
     m_inputIsFile = !input()->isSequential();
 
+    if (m_inputContext)
+        avformat_free_context(m_inputContext);
+
+    m_inputContext = avformat_alloc_context();
+
     // open device
     if (m_inputIsFile)
     {

@@ -98,7 +98,7 @@ void ServerPool::SelectDefaultListen(bool force)
     QList<QNetworkInterface>::const_iterator qni;
     for (qni = IFs.begin(); qni != IFs.end(); ++qni)
     {
-        if (qni->flags() & QNetworkInterface::IsRunning == 0)
+        if ((qni->flags() & QNetworkInterface::IsRunning) == 0)
             continue;
 
         QList<QNetworkAddressEntry> IPs = qni->addressEntries();

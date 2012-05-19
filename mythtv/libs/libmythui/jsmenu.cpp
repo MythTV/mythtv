@@ -112,7 +112,7 @@ int JoystickMenuThread::Init(QString &config_file)
         return(rc);
     }
 
-    ioctl(m_fd, JSIOCGBUTTONS, &m_buttonCount);
+    rc = ioctl(m_fd, JSIOCGBUTTONS, &m_buttonCount);
     if (rc == -1)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
@@ -124,10 +124,10 @@ int JoystickMenuThread::Init(QString &config_file)
     ** Allocate the arrays in which we track button and axis status
     **----------------------------------------------------------------------*/
     m_buttons = new int[m_buttonCount];
-    memset(m_buttons, '\0', sizeof(*m_buttons * m_buttonCount));
+    memset(m_buttons, '\0', m_buttonCount * sizeof(*m_buttons));
 
     m_axes = new int[m_axesCount];
-    memset(m_axes, '\0', sizeof(*m_axes * m_axesCount));
+    memset(m_axes, '\0', m_axesCount * sizeof(*m_axes));
 
     LOG(VB_GENERAL, LOG_INFO, LOC +
         QString("Initialization of %1 succeeded using config file %2")

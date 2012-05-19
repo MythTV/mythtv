@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <string.h>
 
+#include "mythcorecontext.h"
 #include "config.h"
 
 // libav headers
@@ -98,12 +99,10 @@ bool AudioOutputDigitalEncoder::Init(
             .arg(samplerate) .arg(channels));
 
     // We need to do this when called from mythmusic
+    avcodeclock->lock();
     avcodec_register_all();
-#if LIBAVCODEC_VERSION_INT > AV_VERSION_INT( 52, 113, 0 )
+    avcodeclock->unlock();
     codec = avcodec_find_encoder_by_name("ac3_fixed");
-#else
-    codec = avcodec_find_encoder(CODEC_ID_AC3);
-#endif
     if (!codec)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Could not find codec");
@@ -209,30 +208,31 @@ size_t AudioOutputDigitalEncoder::Encode(void *buf, int len, AudioFormat format)
 
     int frames = inlen / sizeof(inbuf_t) / samples_per_frame;
     int i = 0;
-
-    AVFrame  *frame  = avcodec_alloc_frame();
+    AVFrame *frame = avcodec_alloc_frame();
 
     while (i < frames)
     {
-        AVPacket packet;
-        packet.data = (uint8_t *)m_encodebuffer;
-        packet.size = sizeof(m_encodebuffer);
+        AVPacket pkt;
+        av_init_packet(&pkt);
+        pkt.data          = (uint8_t *)m_encodebuffer;
+        pkt.size          = sizeof(m_encodebuffer);
+        frame->nb_samples = av_context->frame_size;
+        frame->data[0]    = (uint8_t *)(in + i * samples_per_frame);
+        frame->pts        = AV_NOPTS_VALUE;
+        int got_packet    = 0;
+        int ret           = avcodec_encode_audio2(av_context, &pkt, frame,
+                                                  &got_packet);
+        int outsize       = pkt.size;
 
-	frame->data[0]     = (uint8_t *)&in[i * samples_per_frame];
-        frame->linesize[0] = inlen;
-	frame->nb_samples  = frames - i;
-        frame->format      = AV_SAMPLE_FMT_S16;
-
-	int got_packet = 0;
-
-        int outsize = avcodec_encode_audio2(av_context, &packet, frame,
-                                            &got_packet);
-
-        if (outsize < 0 || !got_packet)
+        if (ret < 0)
         {
             LOG(VB_AUDIO, LOG_ERR, LOC + "AC-3 encode error");
-            return outlen;
+            return ret;
         }
+        av_free_packet(&pkt);
+        i++;
+        if (!got_packet)
+            continue;
 
         if (!m_spdifenc)
         {
@@ -265,9 +265,7 @@ size_t AudioOutputDigitalEncoder::Encode(void *buf, int len, AudioFormat format)
         m_spdifenc->GetData((uint8_t *)out + outlen, data_size);
         outlen += data_size;
         inlen  -= samples_per_frame * sizeof(inbuf_t);
-        i++;
     }
-
     av_free(frame);
 
     memmove(in, in + i * samples_per_frame, inlen);

@@ -39,8 +39,6 @@ using namespace std;
 #include "mythconfig.h"
 #include "livetvchain.h"
 #include "playgroup.h"
-#include "dvdringbuffer.h"
-#include "bdringbuffer.h"
 #include "datadirect.h"
 #include "sourceutil.h"
 #include "cardutil.h"
@@ -59,6 +57,8 @@ using namespace std;
 #include "tvbrowsehelper.h"
 #include "mythlogging.h"
 #include "mythuistatetracker.h"
+#include "DVD/dvdringbuffer.h"
+#include "Bluray/bdringbuffer.h"
 
 #if ! HAVE_ROUND
 #define round(x) ((int) ((x) + 0.5))
@@ -932,6 +932,7 @@ TV::TV(void)
       wantsToQuit(true),
       stretchAdjustment(false),
       audiosyncAdjustment(false),
+      subtitleZoomAdjustment(false),
       editmode(false),     zoomMode(false),
       sigMonMode(false),
       endOfRecording(false),
@@ -1414,6 +1415,7 @@ TVState TV::GetState(int player_idx) const
     return ret;
 }
 
+// XXX what about subtitlezoom?
 void TV::GetStatus(void)
 {
     QVariantMap status;
@@ -3806,6 +3808,7 @@ bool TV::ProcessKeypress(PlayerContext *actx, QKeyEvent *e)
     handled = handled || PictureAttributeHandleAction(actx, actions);
     handled = handled || TimeStretchHandleAction(actx, actions);
     handled = handled || AudioSyncHandleAction(actx, actions);
+    handled = handled || SubtitleZoomHandleAction(actx, actions);
     handled = handled || DiscMenuHandleAction(actx, actions);
     handled = handled || ActiveHandleAction(
         actx, actions, isDVD, isMenuOrStill);
@@ -4029,6 +4032,30 @@ bool TV::AudioSyncHandleAction(PlayerContext *ctx,
     else if (has_action(ACTION_DOWN, actions))
         ChangeAudioSync(ctx, 10);
     else if (has_action(ACTION_TOGGELAUDIOSYNC, actions))
+        ClearOSD(ctx);
+    else
+        handled = false;
+
+    return handled;
+}
+
+bool TV::SubtitleZoomHandleAction(PlayerContext *ctx,
+                                  const QStringList &actions)
+{
+    if (!subtitleZoomAdjustment)
+        return false;
+
+    bool handled = true;
+
+    if (has_action(ACTION_LEFT, actions))
+        ChangeSubtitleZoom(ctx, -1);
+    else if (has_action(ACTION_RIGHT, actions))
+        ChangeSubtitleZoom(ctx, 1);
+    else if (has_action(ACTION_UP, actions))
+        ChangeSubtitleZoom(ctx, -10);
+    else if (has_action(ACTION_DOWN, actions))
+        ChangeSubtitleZoom(ctx, 10);
+    else if (has_action(ACTION_TOGGLESUBTITLEZOOM, actions))
         ClearOSD(ctx);
     else
         handled = false;
@@ -4407,6 +4434,8 @@ bool TV::ToggleHandleAction(PlayerContext *ctx,
         ToggleAdjustFill(ctx);
     else if (has_action(ACTION_TOGGELAUDIOSYNC, actions))
         ChangeAudioSync(ctx, 0);   // just display
+    else if (has_action(ACTION_TOGGLESUBTITLEZOOM, actions))
+        ChangeSubtitleZoom(ctx, 0);   // just display
     else if (has_action(ACTION_TOGGLEVISUALISATION, actions))
         EnableVisualisation(ctx, false, true /*toggle*/);
     else if (has_action(ACTION_ENABLEVISUALISATION, actions))
@@ -7490,13 +7519,11 @@ void TV::UpdateOSDStatus(const PlayerContext *ctx, osdInfo &info,
 
 void TV::UpdateOSDStatus(const PlayerContext *ctx, QString title, QString desc,
                          QString value, int type, QString units,
-                         int position, int prev, int next, OSDTimeout timeout)
+                         int position, OSDTimeout timeout)
 {
     osdInfo info;
     info.values.insert("position", position);
     info.values.insert("relposition", position);
-    info.values.insert("previous", prev);
-    info.values.insert("next",     next);
     info.text.insert("title", title);
     info.text.insert("description", desc);
     info.text.insert("value", value);
@@ -8372,6 +8399,33 @@ void TV::EnableUpmix(PlayerContext *ctx, bool enable, bool toggle)
 
     if (!browsehelper->IsBrowsing())
         SetOSDMessage(ctx, enabled ? tr("Upmixer On") : tr("Upmixer Off"));
+}
+
+void TV::ChangeSubtitleZoom(PlayerContext *ctx, int dir)
+{
+    ctx->LockDeletePlayer(__FILE__, __LINE__);
+    if (!ctx->player)
+    {
+        ctx->UnlockDeletePlayer(__FILE__, __LINE__);
+        return;
+    }
+
+    subtitleZoomAdjustment = true;
+    bool showing = ctx->player->GetCaptionsEnabled();
+    int newval = gCoreContext->GetNumSetting("OSDCC708TextZoom", 100) + dir;
+    newval = max(50, newval);
+    newval = min(200, newval);
+    ctx->UnlockDeletePlayer(__FILE__, __LINE__);
+
+    if (showing && !browsehelper->IsBrowsing())
+    {
+        UpdateOSDStatus(ctx, tr("Adjust Subtitle Zoom"), tr("Subtitle Zoom"),
+                        QString::number(newval),
+                        kOSDFunctionalType_SubtitleZoomAdjust,
+                        "%", newval * 1000 / 200, kOSDTimeout_Long);
+        SetUpdateOSDPosition(false);
+        gCoreContext->SaveSetting("OSDCC708TextZoom", newval);
+    }
 }
 
 // dir in 10ms jumps
@@ -9250,6 +9304,9 @@ void TV::HandleOSDClosed(int osdType)
             break;
         case kOSDFunctionalType_AudioSyncAdjust:
             audiosyncAdjustment = false;
+            break;
+        case kOSDFunctionalType_SubtitleZoomAdjust:
+            subtitleZoomAdjustment = false;
             break;
         case kOSDFunctionalType_Default:
             break;
@@ -10172,6 +10229,8 @@ void TV::OSDDialogEvent(int result, QString text, QString action)
     }
     else if (action.left(15) == ACTION_TOGGELAUDIOSYNC)
         ChangeAudioSync(actx, 0);
+    else if (action == ACTION_TOGGLESUBTITLEZOOM)
+        ChangeSubtitleZoom(actx, 0);
     else if (action == ACTION_TOGGLEVISUALISATION)
         EnableVisualisation(actx, false, true /*toggle*/);
     else if (action == ACTION_ENABLEVISUALISATION)
@@ -10879,6 +10938,9 @@ void TV::FillOSDMenuSubtitles(const PlayerContext *ctx, OSD *osd,
         }
         if (!ttm_tracks.empty())
             osd->DialogAddButton(tr("Toggle Teletext Menu"), "TOGGLETTM");
+        if (enabled)
+            osd->DialogAddButton(tr("Adjust Subtitle Zoom"),
+                                 ACTION_TOGGLESUBTITLEZOOM);
     }
     else if (category == "AVSUBTITLES")
     {
