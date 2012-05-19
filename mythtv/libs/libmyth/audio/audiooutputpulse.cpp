@@ -424,7 +424,7 @@ bool AudioOutputPulseAudio::ContextConnect(void)
     int chk = pa_context_connect(
         pcontext, pulse_host, (pa_context_flags_t)0, NULL);
 
-    delete(pulse_host);
+    delete[] pulse_host;
 
     if (chk < 0)
     {
