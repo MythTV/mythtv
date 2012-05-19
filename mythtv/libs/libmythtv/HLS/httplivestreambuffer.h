@@ -52,12 +52,13 @@ public:
                           uint retry_ms = kDefaultOpenTimeout);
     virtual long long Seek(long long pos, int whence, bool has_lock);
     virtual long long GetRealFileSize(void) const;
-    virtual bool IsStreamed(void)       { return true;   }
-    virtual bool IsSeekingAllowed(void);
-    virtual bool IsBookmarkAllowed(void) { return true; }
+    virtual bool IsStreamed(void)           { return false;   }
+    virtual bool IsSeekingAllowed(void)     { return !m_error; }
+    virtual bool IsBookmarkAllowed(void)    { return true; }
     static bool IsHTTPLiveStreaming(QByteArray *s);
     static bool TestForHTTPLiveStreaming(QString &filename);
-    bool SaveToDisk(QString filename);
+    bool SaveToDisk(QString filename, int segstart = 0, int segend = -1);
+    int NumStreams(void) const;
 
 protected:
     virtual int safe_read(void *data, uint i_read);
@@ -69,8 +70,7 @@ private:
     HLSStream *GetFirstStream(const StreamsList *streams = NULL);
     HLSStream *GetLastStream(const StreamsList *streams = NULL);
     HLSStream *FindStream(const HLSStream *hls_new, const StreamsList *streams = NULL);
-    HLSStream *CurrentStream(void);
-    int BandwidthAdaptation(int progid, uint64_t &bandwidth);
+    HLSStream *GetCurrentStream(void) const;
     QString ParseAttributes(QString &line, const char *attr);
     int ParseSegmentInformation(HLSStream *hls, QString &line,
                                 int &duration, QString &title);
@@ -90,7 +90,7 @@ private:
     int NumSegments(void) const;
     int ChooseSegment(int stream);
     int64_t SizeMedia(void) const;
-    int64_t CalculateOffset(int count, int64_t *max = NULL, int *segnum = NULL);
+    void AlignStreams(StreamsList *streams = NULL);
 
     // private member variables
     QString             m_m3u8;     // M3U8 url
@@ -107,10 +107,19 @@ private:
     bool                m_falsevod; // stream was incorrectly detected a VOD
     bool                m_error;    // parsing error
     bool                m_aesmsg;   // only print one time that the media is encrypted
+    int                 m_startup;  // starting segment (where seek start)
+    /**
+     * assumed bitrate of playback
+     * used for the purpose of calculating length and seek position.
+     * the value itself is irrelevant, as it's only used as a common reference
+     */
+    int64_t             m_bitrate;
+
     friend class StreamWorker;
     StreamWorker       *m_streamworker;
     friend class PlaylistWorker;
     PlaylistWorker     *m_playlistworker;
+    FILE               *m_fd;
 };
 
 #endif
