@@ -91,6 +91,7 @@ private:
     int NumSegments(void) const;
     int ChooseSegment(int stream);
     int64_t SizeMedia(void) const;
+    void WaitUntilBuffered(void);
     void SanitizeStreams(StreamsList *streams = NULL);
 
     // private member variables
@@ -102,7 +103,6 @@ private:
     /* state */
     StreamsList         m_streams;  // bandwidth adaptation
     mutable QMutex      m_lock;     // protect general class members
-    bool                m_cache;    // can cache files
     bool                m_meta;     // meta playlist
     bool                m_live;     // live stream? or vod?
     bool                m_falsevod; // stream was incorrectly detected a VOD
