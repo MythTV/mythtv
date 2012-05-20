@@ -852,6 +852,10 @@ VideoDialog::VideoDialog(MythScreenStack *lparent, QString lname,
     m_d->m_videoList->setCurrentVideoFilter(VideoFilterSettings(true,
                     lname));
 
+    m_d->m_parentalLevel.SetLevel(ParentalLevel(gCoreContext->
+                    GetNumSetting("VideoDefaultParentalLevel",
+                            ParentalLevel::plLowest)));
+    
     StorageGroup::ClearGroupToUseCache();
 }
 
@@ -1032,9 +1036,6 @@ bool VideoDialog::Create()
 
 void VideoDialog::Init()
 {
-    m_d->m_parentalLevel.SetLevel(ParentalLevel(gCoreContext->
-                    GetNumSetting("VideoDefaultParentalLevel",
-                            ParentalLevel::plLowest)));
     connect(&m_d->m_parentalLevel, SIGNAL(SigLevelChanged()),
             SLOT(reloadData()));
 }
