@@ -79,7 +79,7 @@ QDateTime fromString(const QString &dtstr)
 {
     QDateTime dt;
     if (dtstr.isEmpty())
-        return dt;
+        return as_utc(dt);
 
     if (!dtstr.contains("-") && dtstr.length() == 14)
     {
@@ -91,7 +91,7 @@ QDateTime fromString(const QString &dtstr)
         dt = QDateTime::fromString(dtstr, Qt::ISODate);
     }
 
-    return dt;
+    return as_utc(dt);
 }
 
 MBASE_PUBLIC QDateTime fromString(const QString &str, const QString &format)
