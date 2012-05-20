@@ -91,7 +91,7 @@ private:
     int NumSegments(void) const;
     int ChooseSegment(int stream);
     int64_t SizeMedia(void) const;
-    void AlignStreams(StreamsList *streams = NULL);
+    void SanitizeStreams(StreamsList *streams = NULL);
 
     // private member variables
     QString             m_m3u8;     // M3U8 url

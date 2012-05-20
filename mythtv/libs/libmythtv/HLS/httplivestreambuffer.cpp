@@ -1396,7 +1396,7 @@ private:
             /* Parse HLS m3u8 content. */
             err = m_parent->ParseM3U8(&buffer, streams);
         }
-        m_parent->AlignStreams(streams);
+        m_parent->SanitizeStreams(streams);
         return err;
     }
 
@@ -2292,7 +2292,7 @@ int HLSRingBuffer::ChooseSegment(int stream)
  * Streams may not be all starting at the same sequence number, so attempt
  * to align their starting sequence
  */
-void HLSRingBuffer::AlignStreams(StreamsList *streams)
+void HLSRingBuffer::SanitizeStreams(StreamsList *streams)
 {
     // no lock is required as, at this stage, no threads have either been started
     // or we are working on a stream list unique to PlaylistWorker
@@ -2303,9 +2303,16 @@ void HLSRingBuffer::AlignStreams(StreamsList *streams)
     QMap<int,int> idstart;
     int count = streams->size();
     // Find the highest starting sequence for each stream
-    for (int n = 0; n < count; n++)
+    for (int n = count - 1 ; n >= 0; n--)
     {
         HLSStream *hls = GetStream(n, streams);
+        if (hls->NumSegments() == 0)
+        {
+            streams->removeAt(n);
+            count--;
+            continue;   // remove it
+        }
+
         int id      = hls->Id();
         int start   = hls->StartSequence();
         if (!idstart.contains(id))
@@ -2324,8 +2331,6 @@ void HLSRingBuffer::AlignStreams(StreamsList *streams)
         HLSStream *hls = GetStream(n, streams);
         int id      = hls->Id();
         int seq     = hls->StartSequence();
-        if (hls->NumSegments() == 0)
-            continue;   // Invalid streams
         int newstart= idstart.value(id);
         int todrop  = newstart - seq;
         if (todrop == 0)
@@ -2382,11 +2387,11 @@ bool HLSRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
         return false;
     }
 
+    SanitizeStreams();
+    
     /* HLS standard doesn't provide any guaranty about streams
      being sorted by bitrate, so we sort them, higher bitrate being first */
     qSort(m_streams.begin(), m_streams.end(), HLSStream::IsGreater);
-
-    AlignStreams();
 
     // if we want as close to live. We should be selecting a further segment
     // m_live ? ChooseSegment(0) : 0;
