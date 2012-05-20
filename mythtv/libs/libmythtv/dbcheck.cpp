@@ -2084,6 +2084,12 @@ NULL
                         "ORDER BY %3")
                 .arg(utc_offset).arg((utc_offset > 0) ? "-airdate" : "airdate")
                 .toLocal8Bit());
+
+            updates_ba.push_back(
+                QString("UPDATE recorded "
+                        "set progstart = progstart + utc_offset %1 minute, "
+                        "    progend   = progend   + utc_offset %2 minute  ")
+                .arg(utc_offset).arg(utc_offset).toLocal8Bit());
         }
 
         // Convert DATETIME back to seperate DATE and TIME in record table
