@@ -34,12 +34,6 @@ AudioOutputPulseAudio::AudioOutputPulseAudio(const AudioSettings &settings) :
     for (unsigned int i = 0; i < PA_CHANNELS_MAX; ++i)
         volume_control.values[i] = PA_VOLUME_MUTED;
 
-    // FIXME What's this all about? It's a const method, it doesn't modify the
-    // state and we ignore the result
-    char *pulse_host = ChooseHost();
-    delete[] pulse_host;
-    //
-
     InitSettings(settings);
     if (settings.init)
         Reconfigure(settings);
