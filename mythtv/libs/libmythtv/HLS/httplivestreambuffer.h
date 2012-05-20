@@ -72,6 +72,7 @@ private:
     HLSStream *FindStream(const HLSStream *hls_new, const StreamsList *streams = NULL);
     HLSStream *GetCurrentStream(void) const;
     QString ParseAttributes(QString &line, const char *attr);
+    int ParseDecimalValue(QString &line, int &target);
     int ParseSegmentInformation(HLSStream *hls, QString &line,
                                 int &duration, QString &title);
     int ParseTargetDuration(HLSStream *hls, QString &line);

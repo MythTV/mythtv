@@ -323,6 +323,7 @@ public:
 private:
     AES_KEY     m_aeskey;       // AES-128 key
     bool        m_keyloaded;
+    QString     m_psz_key_path; // URL key path
 #endif
 
 private:
@@ -332,7 +333,6 @@ private:
     QString     m_title;        // human-readable informative title of the media segment
 
     QString     m_url;
-    QString     m_psz_key_path; // URL key path
     QByteArray  m_data;         // raw data
     int32_t     m_played;       // bytes counter of data already read from segment
     QMutex      m_lock;
@@ -1629,6 +1629,23 @@ QString HLSRingBuffer::ParseAttributes(QString &line, const char *attr)
     return QString();
 }
 
+/**
+ * Return the decimal argument in a line of type: blah:<decimal>
+ * presence of valud <decimal> is compulsory or it will return RET_ERROR
+ */
+int HLSRingBuffer::ParseDecimalValue(QString &line, int &target)
+{
+    int p = line.indexOf(QLatin1String(":"));
+    if (p < 0)
+        return RET_ERROR;
+    int i = p;
+    while (++i < line.size() && line[i].isNumber());
+    if (i == p + 1)
+        return RET_ERROR;
+    target = line.mid(p+1, i - p - 1).toInt();
+    return RET_OK;
+}
+
 int HLSRingBuffer::ParseSegmentInformation(HLSStream *hls, QString &line,
                                            int &duration, QString &title)
 {
@@ -1695,10 +1712,8 @@ int HLSRingBuffer::ParseTargetDuration(HLSStream *hls, QString &line)
      * where s is an integer indicating the target duration in seconds.
      */
     int duration       = -1;
-    QByteArray ba      = line.toUtf8();
-    const char *p_read = ba.constData();
-    int ret = sscanf(p_read, "#EXT-X-TARGETDURATION:%d", &duration);
-    if (ret != 1)
+
+    if (ParseDecimalValue(line, duration) != RET_OK)
     {
         LOG(VB_PLAYBACK, LOG_ERR, LOC + "expected #EXT-X-TARGETDURATION:<s>");
         return RET_ERROR;
@@ -1759,11 +1774,8 @@ int HLSRingBuffer::ParseMediaSequence(HLSStream *hls, QString &line)
      * be considered to be 0.
      */
     int sequence;
-    QByteArray ba = line.toUtf8();
-    const char *p_read = ba.constData();
 
-    int ret = sscanf(p_read, "#EXT-X-MEDIA-SEQUENCE:%d", &sequence);
-    if (ret != 1)
+    if (ParseDecimalValue(line, sequence) != RET_OK)
     {
         LOG(VB_PLAYBACK, LOG_ERR, LOC + "expected #EXT-X-MEDIA-SEQUENCE:<s>");
         return RET_ERROR;
@@ -1910,11 +1922,8 @@ int HLSRingBuffer::ParseVersion(QString &line, int &version)
      *
      * #EXT-X-VERSION:<n>
      */
-    QByteArray ba = line.toUtf8();
-    const char *p_read = ba.constData();
 
-    int ret = sscanf(p_read, "#EXT-X-VERSION:%d", &version);
-    if (ret != 1)
+    if (ParseDecimalValue(line, version) != RET_OK)
     {
         LOG(VB_PLAYBACK, LOG_ERR, LOC +
             "#EXT-X-VERSION: no protocol version found, should be version 1.");
@@ -2691,12 +2700,12 @@ long long HLSRingBuffer::Seek(long long pos, int whence, bool has_lock)
 
 long long HLSRingBuffer::GetReadPosition(void) const
 {
-    if (m_error < 0)
+    if (m_error)
         return 0;
     return m_playback->Offset();
 }
 
 bool HLSRingBuffer::IsOpen(void) const
 {
-    return !m_error && m_streams.size() > 0 && NumSegments() > 0;
+    return !m_error && !m_streams.isEmpty() && NumSegments() > 0;
 }
