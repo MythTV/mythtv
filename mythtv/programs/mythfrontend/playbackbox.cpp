@@ -4177,7 +4177,8 @@ void PlaybackBox::customEvent(QEvent *event)
                 m_artTimer[(uint)type]->start(s_artDelay[(uint)type]);
             }
         }
-        else if (message == "EXIT_TO_MENU")
+        else if (message == "EXIT_TO_MENU" ||
+                 message == "CANCEL_PLAYLIST")
         {
             m_playListPlay.clear();
         }
