@@ -10077,6 +10077,12 @@ void TV::OSDDialogEvent(int result, QString text, QString action)
         PrepareToExitPlayer(actx, __LINE__, false);
         SetExitPlayer(true, true);
     }
+    else if (action == "CANCELPLAYLIST")
+    {
+        setInPlayList(false);
+        MythEvent xe("CANCEL_PLAYLIST");
+        gCoreContext->dispatch(xe);
+    }
     else if (action == ACTION_JUMPFFWD)
         DoJumpFFWD(actx);
     else if (action == ACTION_JUMPRWND)
@@ -11339,6 +11345,8 @@ void TV::FillOSDMenuPlayback(const PlayerContext *ctx, OSD *osd,
         }
         if (!db_browse_always)
             osd->DialogAddButton(tr("Toggle Browse Mode"), "TOGGLEBROWSE");
+        if (inPlaylist)
+            osd->DialogAddButton(tr("Cancel Playlist"), "CANCELPLAYLIST");
         osd->DialogAddButton(tr("Playback data"),
                              ACTION_TOGGLEOSDDEBUG, false, false);
     }
