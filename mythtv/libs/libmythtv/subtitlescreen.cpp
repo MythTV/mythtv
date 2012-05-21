@@ -111,6 +111,7 @@ static const QString kSubWindowName("osd_subtitle");
 static const QString kSubFamily608     ("608");
 static const QString kSubFamily708     ("708");
 static const QString kSubFamilyText    ("text");
+static const QString kSubFamilyAV      ("AV");
 static const QString kSubFamilyTeletext("teletext");
 
 static const QString kSubAttrItalics  ("italics");
@@ -586,6 +587,10 @@ void SubtitleScreen::EnableSubtitles(int type, bool forced_only)
     case kDisplayCC708:
         m_family = kSubFamily708;
         break;
+    case kDisplayAVSubtitle:
+        m_family = kSubFamilyAV;
+        m_textFontZoom = m_textFontZoomPrev = 100;
+        break;
     }
 }
 
@@ -620,7 +625,6 @@ bool SubtitleScreen::Create(void)
 
 void SubtitleScreen::Pulse(void)
 {
-    m_textFontZoom = gCoreContext->GetNumSetting("OSDCC708TextZoom", 100);
     ExpireSubtitles();
 
     DisplayAVSubtitles(); // allow forced subtitles to work
@@ -1244,6 +1248,20 @@ MythFontProperties* SubtitleScreen::GetFont(CC708CharacterAttribute attr,
 {
     return m_format->GetFont(m_family, attr, m_fontSize,
                              teletext, m_textFontZoom, m_fontStretch);
+}
+
+void SubtitleScreen::SetZoom(int percent)
+{
+    m_textFontZoom = percent;
+    if (m_family != kSubFamilyAV)
+    {
+        gCoreContext->SaveSetting("OSDCC708TextZoom", percent);
+    }
+}
+
+int SubtitleScreen::GetZoom(void)
+{
+    return m_textFontZoom;
 }
 
 static QString srtColorString(QColor color)

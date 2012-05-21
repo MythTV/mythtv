@@ -39,6 +39,9 @@ class SubtitleScreen : public MythScreenType
     void ExpireSubtitles(void);
     void DisplayDVDButton(AVSubtitle* dvdButton, QRect &buttonPos);
 
+    void SetZoom(int percent);
+    int GetZoom(void);
+
     QSize CalcTextSize(const QString &text,
                        const CC708CharacterAttribute &format,
                        bool teletext,

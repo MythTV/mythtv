@@ -25,6 +25,7 @@ using namespace std;
 #include "remoteutil.h"
 #include "tvremoteutil.h"
 #include "mythplayer.h"
+#include "subtitlescreen.h"
 #include "DetectLetterbox.h"
 #include "programinfo.h"
 #include "vsync.h"
@@ -8410,9 +8411,14 @@ void TV::ChangeSubtitleZoom(PlayerContext *ctx, int dir)
         return;
     }
 
+    OSD *osd = GetOSDLock(ctx);
+    SubtitleScreen *subs = NULL;
+    if (osd)
+        subs = osd->InitSubtitles();
+    ReturnOSDLock(ctx, osd);
     subtitleZoomAdjustment = true;
     bool showing = ctx->player->GetCaptionsEnabled();
-    int newval = gCoreContext->GetNumSetting("OSDCC708TextZoom", 100) + dir;
+    int newval = (subs ? subs->GetZoom() : 100) + dir;
     newval = max(50, newval);
     newval = min(200, newval);
     ctx->UnlockDeletePlayer(__FILE__, __LINE__);
@@ -8424,7 +8430,8 @@ void TV::ChangeSubtitleZoom(PlayerContext *ctx, int dir)
                         kOSDFunctionalType_SubtitleZoomAdjust,
                         "%", newval * 1000 / 200, kOSDTimeout_Long);
         SetUpdateOSDPosition(false);
-        gCoreContext->SaveSetting("OSDCC708TextZoom", newval);
+        if (subs)
+            subs->SetZoom(newval);
     }
 }
 
