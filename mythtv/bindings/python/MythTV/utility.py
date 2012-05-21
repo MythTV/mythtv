@@ -5,7 +5,7 @@ from MythTV.logging import MythLog
 from MythTV.exceptions import MythDBError, MythError
 
 from cStringIO import StringIO
-from select import select, poll, POLLHUP, POLLIN, POLLOUT
+from select import select
 from time import time, mktime, sleep
 from datetime import datetime as _pydatetime
 from datetime import tzinfo as _pytzinfo
@@ -927,6 +927,153 @@ def check_ipv6(n):
     except socket.error:
         return False
 
+try:
+    from select import poll, POLLHUP, POLLIN, POLLOUT
+    class _PollingThread( Thread ):
+        """
+        This polling thread listens on selected pipes, and automatically reads
+        and writes data between the buffer and those pipes. This will self
+        terminate when there are no more pipes defined, and will need to be
+        restarted.
+        """
+        def __init__(self, group=None, target=None, name=None,
+                           args=(), kwargs={}):
+            self.inputqueue = Queue()
+            self.idletime = time()
+            super(_PollingThread, self).__init__(group,
+                        target, name, args, kwargs)
+        def add_pipe(self, buff, pipe, mode):
+            self.inputqueue.put((buff, pipe, mode))
+        def run(self):
+            poller = poll()
+            fds = {}
+            events = []
+            while True:
+                while not self.inputqueue.empty():
+                    # loop though the queue and add new pipes to the
+                    # poll object
+                    buff, pipe, mode = self.inputqueue.get()
+                    if 'r' in mode:
+                        poller.register(pipe.fileno(), POLLIN|POLLHUP)
+                    elif 'w' in mode:
+                        poller.register(pipe.fileno(), POLLOUT|POLLHUP)
+                    else:
+                        continue
+                    fds[pipe.fileno()] = (weakref.ref(buff), pipe)
+
+                for fd,event in poller.poll(0.1):
+                    # loop through file numbers and handle events
+                    buff, pipe = fds[fd]
+                    if buff() is None:
+                        # buffer object has closed out from underneath us
+                        # remove reference from poller
+                        pipe.close()
+                        del fds[fd]
+                        poller.unregister(fd)
+                        continue
+
+                    if event & POLLIN:
+                        # read as much data from the pipe as it has available
+                        buff().write(pipe.read(2**16))
+                    if event & POLLOUT:
+                        # write as much data to the pipe as there is space for
+                        # roll back buffer if data is not fully written
+                        data = buff().read(2**16)
+                        nbytes = pipe.write(data)
+                        if nbytes != len(data):
+                            buff()._rollback(len(data) - nbytes)
+                    if event & POLLHUP:
+                        # pipe has closed, and all reads have been processed
+                        # remove reference from poller
+                        buff().close()
+                        pipe.close()
+                        del fds[fd]
+                        poller.unregister(fd)
+
+                if len(fds) == 0:
+                    # no pipes referenced
+                    if self.idletime + 20 < time():
+                        # idle timeout reached, terminate
+                        break
+                    sleep(0.1)
+                else:
+                    self.idletime = time()
+except ImportError:
+    from select import kqueue, kevent, KQ_FILTER_READ, KQ_FILTER_WRITE, \
+                         KQ_EV_ADD, KQ_EV_DELETE, KQ_EV_EOF
+    class _PollingThread( Thread ):
+        """
+        This polling thread listens on selected pipes, and automatically reads
+        and writes data between the buffer and those pipes. This will self
+        terminate when there are no more pipes defined, and will need to be
+        restarted.
+        """
+        def __init__(self, group=None, target=None, name=None,
+                           args=(), kwargs={}):
+            self.inputqueue = Queue()
+            self.idletime = time()
+            super(_PollingThread, self).__init__(group,
+                        target, name, args, kwargs)
+        def add_pipe(self, buff, pipe, mode):
+            self.inputqueue.put((buff, pipe, mode))
+        def run(self):
+            poller = kqueue()
+            fds = {}
+            events = []
+            while True:
+                while not self.inputqueue.empty():
+                    # loop through the queue and gather new pipes to add the
+                    # kernel queue
+                    buff, pipe, mode = self.inputqueue.get()
+                    if 'r' in mode:
+                        events.append(kevent(pipe, KQ_FILTER_READ, KQ_EV_ADD))
+                    elif 'w' in mode:
+                        events.append(kevent(pipe, KQ_FILTER_WRITE, KQ_EV_ADD))
+                    else:
+                        continue
+                    fds[pipe.fileno()] = (weakref.ref(buff), pipe)
+
+                if len(events) == 0:
+                    events = None
+                events = poller.control(events, 16, 0.1)
+
+                for i in range(len(events)):
+                    # loop through response and handle events
+                    event = events.pop()
+                    buff, pipe = fds[event.ident]
+
+                    if buff() is None:
+                        # buffer object has closed out from underneath us
+                        # pipe will be automatically removed from kqueue
+                        pipe.close()
+                        del fds[event.ident]
+                        continue
+
+                    if (abs(event.filter) & abs(KQ_FILTER_READ)) and event.data:
+                        # new data has come in, push into the buffer
+                        buff().write(pipe.read(event.data))
+
+                    if (abs(event.filter) & abs(KQ_FILTER_WRITE)) and event.data:
+                        # space is available to write data
+                        pipe.write(buff().read(\
+                                    min(buff()._nbytes, event.data, 2**16)))
+
+                    if abs(event.flags) & abs(KQ_EV_EOF):
+                        # pipe has been closed and all IO has been processed
+                        # pipe will be automatically removed from kqueue
+                        buff().close()
+                        pipe.close()
+                        del fds[event.ident]
+
+                if len(fds) == 0:
+                    # no pipes referenced
+                    if self.idletime + 20 < time():
+                        # idle timeout reached, terminate
+                        break
+                    sleep(0.1)
+                else:
+                    self.idletime = time()
+
 class DequeBuffer( object ):
     """
     This is a chunked buffer, storing a sequence of buffer objects in a
@@ -987,75 +1134,6 @@ class DequeBuffer( object ):
             with self.lock:
                 self.buffer.close()
 
-    class _PollingThread( Thread ):
-        """
-        This polling thread listens on selected pipes, and automatically reads
-        and writes data between the buffer and those pipes. This will self
-        terminate when there are no more pipes defined, and will need to be
-        restarted.
-        """
-        def __init__(self, group=None, target=None, name=None,
-                           args=(), kwargs={}):
-            self.inputqueue = Queue()
-            self.idletime = time()
-            super(DequeBuffer._PollingThread, self).__init__(group,
-                        target, name, args, kwargs)
-        def add_pipe(self, buff, pipe, mode):
-            self.inputqueue.put((buff, pipe, mode))
-        def run(self):
-            poller = poll()
-            fds = {}
-            while True:
-                while not self.inputqueue.empty():
-                    # loop though the queue and add new pipes to the
-                    # poll object
-                    buff, pipe, mode = self.inputqueue.get()
-                    if 'r' in mode:
-                        poller.register(pipe.fileno(), POLLIN|POLLHUP)
-                    elif 'w' in mode:
-                        poller.register(pipe.fileno(), POLLOUT|POLLHUP)
-                    else:
-                        continue
-                    fds[pipe.fileno()] = (weakref.ref(buff), pipe)
-
-                for fd,event in poller.poll(0.1):
-                    # loop through file numbers and handle events
-                    buff, pipe = fds[fd]
-                    if buff() is None:
-                        # buffer object has closed out from underneath us
-                        # remove reference from poller
-                        pipe.close()
-                        del fds[fd]
-                        poller.unregister(fd)
-                        continue
-
-                    if event & POLLIN:
-                        # read as much data from the pipe as it has available
-                        buff().write(pipe.read(2**16))
-                    if event & POLLOUT:
-                        # write as much data to the pipe as there is space for
-                        # roll back buffer if data is not fully written
-                        data = buff().read(2**16)
-                        nbytes = pipe.write(data)
-                        if nbytes != len(data):
-                            buff()._rollback(len(data) - nbytes)
-                    if event & POLLHUP:
-                        # pipe has closed, and all reads have been processed
-                        # remove reference from poller
-                        buff().close()
-                        pipe.close()
-                        del fds[fd]
-                        poller.unregister(fd)
-
-                if len(fds) == 0:
-                    # no pipes referenced
-                    if self.idletime + 20 < time():
-                        # idle timeout reached, terminate
-                        break
-                    sleep(0.1)
-                else:
-                    self.idletime = time()
-
     _pollingthread = None
 
     def __init__(self, data=None, inp=None, out=None):
@@ -1102,7 +1180,7 @@ class DequeBuffer( object ):
             else:
                 # end of data or request reached, return
                 break
-        self._nbytes += data.tell()
+        self._nbytes -= data.tell()
         return data.getvalue()
 
     def write(self, data):
@@ -1187,7 +1265,7 @@ class DequeBuffer( object ):
 
         if (cls._pollingthread is None) or not cls._pollingthread.isAlive():
             # create new thread, and set it to not block shutdown
-            cls._pollingthread = cls._PollingThread()
+            cls._pollingthread = _PollingThread()
             cls._pollingthread.daemon = True
             cls._pollingthread.start()
         cls._pollingthread.add_pipe(buffer, pipe, mode)
