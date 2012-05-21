@@ -86,7 +86,7 @@ private:
     int ParseDiscontinuity(HLSStream *hls, QString &line);
     int ParseM3U8(const QByteArray *buffer, StreamsList *streams = NULL);
     int Prefetch(int count);
-    void SanityCheck(HLSSegment *segment);
+    void SanityCheck(HLSStream *hls, HLSSegment *segment);
     HLSSegment *GetSegment(int segnum, int timeout = 1000);
     int NumSegments(void) const;
     int ChooseSegment(int stream);
@@ -104,8 +104,6 @@ private:
     StreamsList         m_streams;  // bandwidth adaptation
     mutable QMutex      m_lock;     // protect general class members
     bool                m_meta;     // meta playlist
-    bool                m_live;     // live stream? or vod?
-    bool                m_falsevod; // stream was incorrectly detected a VOD
     bool                m_error;    // parsing error
     bool                m_aesmsg;   // only print one time that the media is encrypted
     int                 m_startup;  // starting segment (where seek start)
@@ -115,6 +113,12 @@ private:
      * the value itself is irrelevant, as it's only used as a common reference
      */
     int64_t             m_bitrate;
+    /**
+     * FFmpeg seek to the end of the stream in order to determine the length
+     * of the video. Set to boolean to true after we detected a seek to the end
+     * this will prevent waiting for new data in safe_read
+     */
+    bool                m_seektoend;
 
     friend class StreamWorker;
     StreamWorker       *m_streamworker;
