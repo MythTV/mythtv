@@ -21,9 +21,9 @@
 #ifndef AVCODEC_X86_MMX_H
 #define AVCODEC_X86_MMX_H
 
-/* Removed by MythTV. We will keep this file for a while :-)
-#warning Everything in this header is deprecated, use plain asm()! New code using this header will be rejected.
-*/
+#include <mythconfig.h>
+
+#if HAVE_MMX
 
 /*
  * The type of an value that fits in an MMX register (note that long
@@ -307,5 +307,6 @@ typedef        union {
 #define         punpcklqdq_r2r(regs,regd)   mmx_r2r (punpcklqdq, regs, regd)
 #define         punpckhqdq_r2r(regs,regd)   mmx_r2r (punpckhqdq, regs, regd)
 
+#endif
 
 #endif /* AVCODEC_X86_MMX_H */
