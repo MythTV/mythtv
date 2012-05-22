@@ -575,6 +575,7 @@ void SubtitleScreen::EnableSubtitles(int type, bool forced_only)
     ClearAllSubtitles();
     SetVisible(m_subtitleType != kDisplayNone);
     SetArea(MythRect());
+    m_textFontZoom  = gCoreContext->GetNumSetting("OSDCC708TextZoom", 100);
     switch (m_subtitleType)
     {
     case kDisplayTextSubtitle:
@@ -589,9 +590,10 @@ void SubtitleScreen::EnableSubtitles(int type, bool forced_only)
         break;
     case kDisplayAVSubtitle:
         m_family = kSubFamilyAV;
-        m_textFontZoom = m_textFontZoomPrev = 100;
+        m_textFontZoom = gCoreContext->GetNumSetting("OSDAVSubZoom", 100);
         break;
     }
+    m_textFontZoomPrev = m_textFontZoom;
 }
 
 void SubtitleScreen::DisableForcedSubtitles(void)
@@ -617,8 +619,6 @@ bool SubtitleScreen::Create(void)
         LOG(VB_GENERAL, LOG_WARNING, LOC + "Failed to get CEA-608 reader.");
     if (!m_708reader)
         LOG(VB_GENERAL, LOG_WARNING, LOC + "Failed to get CEA-708 reader.");
-    m_textFontZoom  = gCoreContext->GetNumSetting("OSDCC708TextZoom", 100);
-    m_textFontZoomPrev = m_textFontZoom;
 
     return true;
 }
@@ -1395,10 +1395,10 @@ MythFontProperties* SubtitleScreen::GetFont(CC708CharacterAttribute attr,
 void SubtitleScreen::SetZoom(int percent)
 {
     m_textFontZoom = percent;
-    if (m_family != kSubFamilyAV)
-    {
+    if (m_family == kSubFamilyAV)
+        gCoreContext->SaveSetting("OSDAVSubZoom", percent);
+    else
         gCoreContext->SaveSetting("OSDCC708TextZoom", percent);
-    }
 }
 
 int SubtitleScreen::GetZoom(void)
