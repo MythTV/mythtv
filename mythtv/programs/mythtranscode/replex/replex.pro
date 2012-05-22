@@ -34,6 +34,9 @@ isEmpty(QMAKE_EXTENSION_SHLIB) {
   QMAKE_EXTENSION_SHLIB=so
 }
 
+# llvm/xcode doesn't compile if -O3 is enabled (or any other -O for that matter)
+macx: QMAKE_CFLAGS -= -O3 -O2 -O1 -Os
+
 POST_TARGETDEPS += ../../../external/FFmpeg/libavutil/$$avLibName(avutil)
 POST_TARGETDEPS += ../../../external/FFmpeg/libavcodec/$$avLibName(avcodec)
 POST_TARGETDEPS += ../../../external/FFmpeg/libavformat/$$avLibName(avformat)
