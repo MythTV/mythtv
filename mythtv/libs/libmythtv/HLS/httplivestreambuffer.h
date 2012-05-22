@@ -98,7 +98,7 @@ private:
     QString             m_m3u8;     // M3U8 url
     QByteArray          m_peeked;
 
-    HLSPlayback       *m_playback;
+    HLSPlayback        *m_playback;
 
     /* state */
     StreamsList         m_streams;  // bandwidth adaptation
