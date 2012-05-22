@@ -15,7 +15,7 @@
 #include "filter.h"
 #include "frame.h"
 
-#ifdef HAVE_MMX
+#if HAVE_MMX
 
 #include "libavutil/mem.h"
 #include "libavcodec/dsputil.h"
@@ -35,7 +35,7 @@ typedef struct ThisFilter
 {
     VideoFilter vf;
 
-#ifdef HAVE_MMX
+#if HAVE_MMX
     int yfilt;
     int cfilt;
 
