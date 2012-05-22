@@ -918,17 +918,6 @@ static GlobalSpinBox *DeletedMaxAge()
     return bs;
 };
 
-static GlobalCheckBox *DeletedFifoOrder()
-{
-    GlobalCheckBox *cb = new GlobalCheckBox("DeletedFifoOrder");
-    cb->setLabel(QObject::tr("Expire in deleted order"));
-    cb->setValue(false);
-    cb->setHelpText(QObject::tr(
-                    "If enabled, delete recordings in the order which they were "
-                    "originally deleted."));
-    return cb;
-};
-
 class DeletedExpireOptions : public TriggeredConfigurationGroup
 {
     public:
@@ -942,7 +931,6 @@ class DeletedExpireOptions : public TriggeredConfigurationGroup
 
              HorizontalConfigurationGroup* settings =
                  new HorizontalConfigurationGroup(false);
-             settings->addChild(DeletedFifoOrder());
              settings->addChild(DeletedMaxAge());
              addTarget("1", settings);
 

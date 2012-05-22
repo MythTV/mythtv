@@ -933,8 +933,6 @@ void AutoExpire::FillDBOrdered(pginfolist_t &expireList, int expMethod)
             orderby = "starttime ASC";
             break;
         case emNormalDeletedPrograms:
-            if (gCoreContext->GetNumSetting("DeletedFifoOrder", 0) == 0)
-                return;
             msg = "Adding deleted programs in FIFO order";
             where = "recgroup = 'Deleted'";
             orderby = "lastmodified ASC";
