@@ -1211,7 +1211,8 @@ protected:
     void run(void)
     {
         double wait = 0.5;
-        int tries   = 0;
+        double factor = m_parent->GetCurrentStream()->Live() ? 1.0 : 2.0;
+
         QWaitCondition mcond;
 
         while (!m_interrupted)
@@ -1241,17 +1242,27 @@ protected:
             if (ReloadPlaylist() != RET_OK)
             {
                 /* No change in playlist, then backoff */
-                tries++;
-                if (tries == 1)       wait = 0.5;
-                else if (tries == 2)  wait = 1;
-                else if (tries >= 3)  wait = 2;
+                m_retries++;
+                if (m_retries == 1)       wait = 0.5;
+                else if (m_retries == 2)  wait = 1;
+                else if (m_retries >= 3)  wait = 2;
+
+                // If we haven't been able to reload the playlist after x times
+                // it probably means the stream got deleted, so abort
+                if (m_retries > PLAYLIST_FAILURE)
+                {
+                    LOG(VB_PLAYBACK, LOG_ERR, LOC +
+                        QString("reloading the playlist failed after %1 attempts."
+                                "aborting.").arg(PLAYLIST_FAILURE));
+                    m_parent->m_error = true;
+                }
 
                 /* Can we afford to backoff? */
                 if (m_parent->m_streamworker->CurrentPlaybackBuffer() < 3)
                 {
-                    if (tries == 0)
+                    if (m_retries == 1)
                         continue; // restart immediately if it's the first try
-                    tries = 0;
+                    m_retries = 0;
                     wait = 0.5;
                 }
             }
@@ -1259,7 +1270,7 @@ protected:
             {
                 // make streamworker process things
                 m_parent->m_streamworker->Wakeup();
-                tries = 0;
+                m_retries = 0;
                 wait = 0.5;
             }
 
@@ -1274,7 +1285,7 @@ protected:
             }
 
             /* determine next time to update playlist */
-            m_wakeup = ((int64_t)(hls->TargetDuration() * wait)
+            m_wakeup = ((int64_t)(hls->TargetDuration() * wait * factor)
                         * (int64_t)1000);
         }
     }
@@ -1293,20 +1304,9 @@ private:
         {
             LOG(VB_PLAYBACK, LOG_ERR, LOC + "reloading playlist failed");
             m_parent->FreeStreamsList(streams);
-
-            // If we haven't been able to reload the playlist after x times
-            // it probably means the stream got deleted, so abort
-            m_retries++;
-            if (m_retries > PLAYLIST_FAILURE)
-            {
-                LOG(VB_PLAYBACK, LOG_ERR, LOC +
-                    QString("reloading the playlist failed after %1 attempts."
-                            "aborting.").arg(PLAYLIST_FAILURE));
-                m_parent->m_error = true;
-            }
             return RET_ERROR;
         }
-        m_retries = 0;
+
         /* merge playlists */
         int count = streams->size();
         for (int n = 0; n < count; n++)
