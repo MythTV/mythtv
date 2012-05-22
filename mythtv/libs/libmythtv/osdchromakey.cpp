@@ -17,7 +17,7 @@
 
 #ifdef MMX
 extern "C" {
-#include "libavcodec/x86/mmx.h"
+#include "ffmpeg-mmx.h"
 }
 #endif
 

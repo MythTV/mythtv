@@ -1,7 +1,7 @@
 include $(SUBDIR)../config.mak
 
 NAME = swscale
-FFLIBS = avcodec avutil
+FFLIBS = avutil
 
 HEADERS = swscale.h
 

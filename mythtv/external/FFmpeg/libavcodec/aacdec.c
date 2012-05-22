@@ -716,10 +716,6 @@ static int decode_audio_specific_config(AACContext *ac,
             m4ac->object_type, m4ac->chan_config, m4ac->sampling_index,
             m4ac->sample_rate, m4ac->sbr, m4ac->ps);
 
-    av_dlog(avctx, "AOT %d chan config %d sampling index %d (%d) SBR %d PS %d\n",
-            m4ac->object_type, m4ac->chan_config, m4ac->sampling_index,
-            m4ac->sample_rate, m4ac->sbr, m4ac->ps);
-
     return get_bits_count(&gb);
 }
 
@@ -2597,8 +2593,6 @@ static int latm_decode_audio_specific_config(struct LATMContext *latmctx,
         av_log(avctx, AV_LOG_INFO, "audio config changed\n");
         latmctx->initialized = 0;
 
-        ac->m4ac= m4ac;
-
         esize = (bits_consumed+7) / 8;
 
         if (avctx->extradata_size < esize) {
@@ -2775,7 +2769,6 @@ static int latm_decode_frame(AVCodecContext *avctx, void *out,
             *got_frame_ptr = 0;
             return avpkt->size;
         } else {
-            aac_decode_close(avctx);
             if ((err = decode_audio_specific_config(
                     &latmctx->aac_ctx, avctx, &latmctx->aac_ctx.m4ac,
                     avctx->extradata, avctx->extradata_size*8, 1)) < 0)

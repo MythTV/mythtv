@@ -39,7 +39,7 @@
 #include "libavutil/parseutils.h"
 #include "riff.h"
 #include "audiointerleave.h"
-#include "mpegts.h"
+#include "mpegts-mythtv.h"
 #include "url.h"
 #include <sys/time.h>
 #include <time.h>
@@ -1022,7 +1022,7 @@ static void compute_pkt_fields(AVFormatContext *s, AVStream *st,
     // Note, if this is misbehaving for a H.264 file then possibly presentation_delayed is not set correctly.
     if(delay==1 && pkt->dts == pkt->pts && pkt->dts != AV_NOPTS_VALUE && presentation_delayed){
         av_log(s, AV_LOG_DEBUG, "invalid dts/pts combination %"PRIi64"\n", pkt->dts);
-        pkt->pts= AV_NOPTS_VALUE;
+        pkt->dts= AV_NOPTS_VALUE;
     }
 
     if (pkt->duration == 0) {
@@ -1283,8 +1283,8 @@ static int read_frame_internal(AVFormatContext *s, AVPacket *pkt)
         AVStream *st;
         AVPacket cur_pkt;
 
-        cur_pkt.data = NULL;
-        cur_pkt.size = 0;
+        av_destruct_packet_nofree(&cur_pkt);
+        av_init_packet(&cur_pkt);
 
         /* read next packet */
         ret = ff_read_packet(s, &cur_pkt);
@@ -2520,7 +2520,6 @@ int avformat_find_stream_info(AVFormatContext *ic, AVDictionary **options)
 
     count = 0;
     read_size = 0;
-
     for(;;) {
         if (ff_check_interrupt(&ic->interrupt_callback)){
             ret= AVERROR_EXIT;
@@ -3686,7 +3685,6 @@ int av_interleave_packet_per_dts(AVFormatContext *s, AVPacket *out,
 
 /**
  * Interleave an AVPacket correctly so it can be muxed.
- *
  * @param out the interleaved packet will be output here
  * @param in the input packet
  * @param flush 1 if no further packets are available as input and all
@@ -4012,7 +4010,6 @@ uint64_t ff_ntp_time(void)
 int av_get_frame_filename(char *buf, int buf_size,
                           const char *path, int number)
 {
-    struct tm time_r;
     const char *p;
     char *q, buf1[20], c;
     int nd, len, percentd_found;

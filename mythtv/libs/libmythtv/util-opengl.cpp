@@ -7,7 +7,7 @@
 
 #ifdef MMX
 extern "C" {
-#include "libavcodec/x86/mmx.h"
+#include "ffmpeg-mmx.h"
 }
 
 static mmx_t mmx_1s = {0xffffffffffffffffLL};

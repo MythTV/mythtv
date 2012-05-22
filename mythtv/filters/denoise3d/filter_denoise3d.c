@@ -29,7 +29,7 @@
 #define ABS(A) ( (A) > 0 ? (A) : -(A) )
 
 #ifdef MMX
-#include "libavcodec/x86/mmx.h"
+#include "ffmpeg-mmx.h"
 static const mmx_t mz = { 0x0LL };
 #endif
 

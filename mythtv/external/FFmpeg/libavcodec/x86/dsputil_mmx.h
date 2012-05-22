@@ -63,8 +63,8 @@ extern const xmm_reg  ff_pb_F8;
 extern const uint64_t ff_pb_FC;
 extern const xmm_reg  ff_pb_FE;
 
-extern const double __attribute__((visibility("hidden"))) ff_pd_1[2];
-extern const double __attribute__((visibility("hidden"))) ff_pd_2[2];
+extern const double ff_pd_1[2];
+extern const double ff_pd_2[2];
 
 #define LOAD4(stride,in,a,b,c,d)\
     "movq 0*"#stride"+"#in", "#a"\n\t"\

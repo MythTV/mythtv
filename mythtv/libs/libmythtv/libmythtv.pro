@@ -82,7 +82,7 @@ using_valgrind:DEFINES += USING_VALGRIND
 
 # mmx macros from avlib
 contains( HAVE_MMX, yes ) {
-    HEADERS += ../../external/FFmpeg/libavcodec/x86/mmx.h ../../external/FFmpeg/libavcodec/dsputil.h
+    HEADERS += ../libmythbase/ffmpeg-mmx.h ../../external/FFmpeg/libavcodec/dsputil.h
 }
 
 QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)

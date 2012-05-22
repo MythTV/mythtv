@@ -45,7 +45,7 @@
 
 #include "../mm_arch.h"
 #if HAVE_MMX
-#include "libavcodec/x86/mmx.h"
+#include "ffmpeg-mmx.h"
 #endif
 
 #include "aclib.h"
