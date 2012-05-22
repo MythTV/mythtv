@@ -788,7 +788,8 @@ void SubtitleScreen::DisplayAVSubtitles(void)
                     !display.width() || !display.height())
                 {
                     int sd_height = 576;
-                    if ((m_player->GetFrameRate() > 26.0f) && bottom <= 480)
+                    if ((m_player->GetFrameRate() > 26.0f ||
+                         m_player->GetFrameRate() < 24.0f) && bottom <= 480)
                         sd_height = 480;
                     int height = ((currentFrame->height <= sd_height) &&
                                   (bottom <= sd_height)) ? sd_height :
