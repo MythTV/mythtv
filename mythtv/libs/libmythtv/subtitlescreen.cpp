@@ -672,6 +672,7 @@ void SubtitleScreen::ClearDisplayedSubtitles(void)
         Clear708Cache(i);
     DeleteAllChildren();
     m_expireTimes.clear();
+    m_avsubCache.clear();
     SetRedraw();
 }
 
@@ -686,6 +687,7 @@ void SubtitleScreen::ExpireSubtitles(void)
         it.next();
         if (it.value() < now)
         {
+            m_avsubCache.remove(it.key());
             DeleteChild(it.key());
             it.remove();
             SetRedraw();
@@ -728,6 +730,25 @@ void SubtitleScreen::DisplayAVSubtitles(void)
 {
     if (!m_player || !m_subreader)
         return;
+
+    // Resize subtitles if the zoom factor has changed since the last
+    // update.
+    if (m_textFontZoom != m_textFontZoomPrev)
+    {
+        double factor = m_textFontZoom / (double)m_textFontZoomPrev;
+        QHash<MythUIType*, MythImage*>::iterator it;
+        for (it = m_avsubCache.begin(); it != m_avsubCache.end(); ++it)
+        {
+            MythUIImage *image = dynamic_cast<MythUIImage *>(it.key());
+            if (image)
+            {
+                QSize size = it.value()->size();
+                size *= factor;
+                it.value()->Resize(size);
+            }
+        }
+        m_refreshArea = true;
+    }
 
     AVSubtitles* subs = m_subreader->GetAVSubtitles();
     QMutexLocker lock(&(subs->lock));
@@ -994,6 +1015,7 @@ int SubtitleScreen::DisplayScaledAVSubtitles(const AVSubtitleRect *rect,
             uiimage->SetImage(image);
             uiimage->SetArea(MythRect(scaled));
             m_expireTimes.insert(uiimage, displayuntil);
+            m_avsubCache.insert(uiimage, image);
         }
     }
     if (uiimage)

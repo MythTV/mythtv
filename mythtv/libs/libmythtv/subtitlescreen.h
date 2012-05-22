@@ -90,6 +90,7 @@ class SubtitleScreen : public MythScreenType
     QRegExp            m_removeHTML;
     int                m_subtitleType;
     QHash<MythUIType*, long long> m_expireTimes;
+    QHash<MythUIType*, MythImage*> m_avsubCache;
     int                m_fontSize;
     int                m_textFontZoom; // valid for 708 & text subs
     int                m_textFontZoomPrev;
