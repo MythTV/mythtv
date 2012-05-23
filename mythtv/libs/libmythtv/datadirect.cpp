@@ -1238,7 +1238,7 @@ void DataDirectProcessor::CreateATempTable(const QString &ptablename,
     MSqlQuery query(MSqlQuery::DDCon());
     QString querystr;
     querystr = "CREATE TEMPORARY TABLE IF NOT EXISTS " + ptablename + " " +
-        ptablestruct + ";";
+        ptablestruct + " ENGINE=MyISAM;";
 
     if (!query.exec(querystr))
         MythDB::DBError("Creating temporary table", query);
