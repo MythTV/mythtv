@@ -639,7 +639,8 @@ bool FillData::Run(SourceList &sourcelist)
             grabber_capabilities_proc.Run(25);
             if (grabber_capabilities_proc.Wait() != GENERIC_EXIT_OK)
                 LOG(VB_GENERAL, LOG_ERR,
-                    QString("%1  --capabilities failed or we timed out waiting."                            " You may need to upgrade your xmltv grabber")
+                    QString("%1  --capabilities failed or we timed out waiting."                            
+                    " You may need to upgrade your xmltv grabber")
                         .arg(xmltv_grabber));
             else
             {
