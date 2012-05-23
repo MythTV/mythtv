@@ -244,7 +244,12 @@ static int config_props(AVFilterLink *inlink)
 
     for (comp = 0; comp < desc->nb_components; comp++) {
         double res;
-
+        int tcomp;
+        if (lut->is_rgb) {
+            for (tcomp = 0; lut->rgba_map[tcomp] != comp; tcomp++)
+                ;
+        } else
+            tcomp = comp;
         /* create the parsed expression */
         ret = av_expr_parse(&lut->comp_expr[comp], lut->comp_expr_str[comp],
                             var_names, funcs1_names, funcs1, NULL, NULL, 0, ctx);
@@ -273,8 +278,8 @@ static int config_props(AVFilterLink *inlink)
                        lut->comp_expr_str[comp], val, comp);
                 return AVERROR(EINVAL);
             }
-            lut->lut[comp][val] = av_clip((int)res, min[comp], max[comp]);
-            av_log(ctx, AV_LOG_DEBUG, "val[%d][%d] = %d\n", comp, val, lut->lut[comp][val]);
+            lut->lut[tcomp][val] = av_clip((int)res, min[comp], max[comp]);
+            av_log(ctx, AV_LOG_DEBUG, "val[%d][%d] = %d\n", comp, val, lut->lut[tcomp][val]);
         }
     }
 
@@ -289,7 +294,7 @@ static void draw_slice(AVFilterLink *inlink, int y, int h, int slice_dir)
     AVFilterBufferRef *inpic  = inlink ->cur_buf;
     AVFilterBufferRef *outpic = outlink->out_buf;
     uint8_t *inrow, *outrow, *inrow0, *outrow0;
-    int i, j, k, plane;
+    int i, j, plane;
 
     if (lut->is_rgb) {
         /* packed */
@@ -297,11 +302,21 @@ static void draw_slice(AVFilterLink *inlink, int y, int h, int slice_dir)
         outrow0 = outpic->data[0] + y * outpic->linesize[0];
 
         for (i = 0; i < h; i ++) {
+            int w = inlink->w;
+            const uint8_t (*tab)[256] = (const uint8_t (*)[256])lut->lut;
             inrow  = inrow0;
             outrow = outrow0;
-            for (j = 0; j < inlink->w; j++) {
-                for (k = 0; k < lut->step; k++)
-                    outrow[k] = lut->lut[lut->rgba_map[k]][inrow[k]];
+            for (j = 0; j < w; j++) {
+                outrow[0] = tab[0][inrow[0]];
+                if (lut->step>1) {
+                    outrow[1] = tab[1][inrow[1]];
+                    if (lut->step>2) {
+                        outrow[2] = tab[2][inrow[2]];
+                        if (lut->step>3) {
+                            outrow[3] = tab[3][inrow[3]];
+                        }
+                    }
+                }
                 outrow += lut->step;
                 inrow  += lut->step;
             }
@@ -318,8 +333,10 @@ static void draw_slice(AVFilterLink *inlink, int y, int h, int slice_dir)
             outrow = outpic->data[plane] + (y>>vsub) * outpic->linesize[plane];
 
             for (i = 0; i < h>>vsub; i ++) {
-                for (j = 0; j < inlink->w>>hsub; j++)
-                    outrow[j] = lut->lut[plane][inrow[j]];
+                const uint8_t *tab = lut->lut[plane];
+                int w = inlink->w>>hsub;
+                for (j = 0; j < w; j++)
+                    outrow[j] = tab[inrow[j]];
                 inrow  += inpic ->linesize[plane];
                 outrow += outpic->linesize[plane];
             }

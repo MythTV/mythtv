@@ -28,6 +28,11 @@ errfile="${outdir}/${test}.err"
 cmpfile="${outdir}/${test}.diff"
 repfile="${outdir}/${test}.rep"
 
+target_path(){
+    test ${1} = ${1#/} && p=${target_path}/
+    echo ${p}${1}
+}
+
 # $1=value1, $2=value2, $3=threshold
 # prints 0 if absolute difference between value1 and value2 is <= threshold
 compare(){
@@ -55,9 +60,17 @@ stddev(){
     do_tiny_psnr "$1" "$2" stddev
 }
 
+oneline(){
+    printf '%s\n' "$1" | diff -u -b - "$2"
+}
+
 run(){
     test "${V:-0}" -gt 0 && echo "$target_exec" $target_path/"$@" >&3
     $target_exec $target_path/"$@"
+}
+
+probefmt(){
+    run ffprobe -show_format_entry format_name -print_format default=nw=1:nk=1 -v 0 "$@"
 }
 
 avconv(){
@@ -86,12 +99,15 @@ pcm(){
 
 enc_dec_pcm(){
     out_fmt=$1
-    pcm_fmt=$2
-    shift 2
+    dec_fmt=$2
+    pcm_fmt=$3
+    src_file=$(target_path $4)
+    shift 4
     encfile="${outdir}/${test}.${out_fmt}"
     cleanfiles=$encfile
-    avconv -i $ref "$@" -f $out_fmt -y ${target_path}/${encfile} || return
-    avconv -i ${target_path}/${encfile} -c:a pcm_${pcm_fmt} -f wav -
+    encfile=$(target_path ${encfile})
+    avconv -i $src_file "$@" -f $out_fmt -y ${encfile} || return
+    avconv -i ${encfile} -c:a pcm_${pcm_fmt} -f ${dec_fmt} -
 }
 
 regtest(){
@@ -143,11 +159,12 @@ if [ $err -gt 128 ]; then
     test "${sig}" = "${sig%[!A-Za-z]*}" || unset sig
 fi
 
-if test -e "$ref"; then
+if test -e "$ref" || test $cmp = "oneline" ; then
     case $cmp in
-        diff)   diff -u -w "$ref" "$outfile"            >$cmpfile ;;
+        diff)   diff -u -b "$ref" "$outfile"            >$cmpfile ;;
         oneoff) oneoff     "$ref" "$outfile"            >$cmpfile ;;
         stddev) stddev     "$ref" "$outfile"            >$cmpfile ;;
+        oneline)oneline    "$ref" "$outfile"            >$cmpfile ;;
         null)   cat               "$outfile"            >$cmpfile ;;
     esac
     cmperr=$?

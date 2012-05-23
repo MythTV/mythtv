@@ -164,7 +164,7 @@ streams are delayed by @var{offset} seconds.
 Set the recording timestamp in the container.
 The syntax for @var{time} is:
 @example
-now|([(YYYY-MM-DD|YYYYMMDD)[T|t| ]]((HH[:MM[:SS[.m...]]])|(HH[MM[SS[.m...]]]))[Z|z])
+now|([(YYYY-MM-DD|YYYYMMDD)[T|t| ]]((HH:MM:SS[.m...])|(HHMMSS[.m...]))[Z|z])
 @end example
 If the value is "now" it takes the current time.
 Time is local time unless 'Z' or 'z' is appended, in which case it is
@@ -224,6 +224,9 @@ codec-dependent.
 @var{filter_graph} is a description of the filter graph to apply to
 the stream. Use @code{-filters} to show all the available filters
 (including also sources and sinks).
+
+See also the @option{-filter_complex} option if you want to create filter graphs
+with multiple inputs and/or outputs.
 @item -pre[:@var{stream_specifier}] @var{preset_name} (@emph{output,per-stream})
 Specify the preset for matching stream(s).
 
@@ -283,67 +286,6 @@ Set frame rate (Hz value, fraction or abbreviation), (default = 25). For output
 streams implies @code{-vsync cfr}.
 @item -s[:@var{stream_specifier}] @var{size} (@emph{input/output,per-stream})
 Set frame size. The format is @samp{wxh} (default - same as source).
-The following abbreviations are recognized:
-@table @samp
-@item sqcif
-128x96
-@item qcif
-176x144
-@item cif
-352x288
-@item 4cif
-704x576
-@item 16cif
-1408x1152
-@item qqvga
-160x120
-@item qvga
-320x240
-@item vga
-640x480
-@item svga
-800x600
-@item xga
-1024x768
-@item uxga
-1600x1200
-@item qxga
-2048x1536
-@item sxga
-1280x1024
-@item qsxga
-2560x2048
-@item hsxga
-5120x4096
-@item wvga
-852x480
-@item wxga
-1366x768
-@item wsxga
-1600x1024
-@item wuxga
-1920x1200
-@item woxga
-2560x1600
-@item wqsxga
-3200x2048
-@item wquxga
-3840x2400
-@item whsxga
-6400x4096
-@item whuxga
-7680x4800
-@item cga
-320x200
-@item ega
-640x350
-@item hd480
-852x480
-@item hd720
-1280x720
-@item hd1080
-1920x1080
-@end table
 
 @item -aspect[:@var{stream_specifier}] @var{aspect} (@emph{output,per-stream})
 Set the video display aspect ratio specified by @var{aspect}.
@@ -415,6 +357,14 @@ also sources and sinks).  This is an alias for @code{-filter:v}.
 @item -pix_fmt[:@var{stream_specifier}] @var{format} (@emph{input/output,per-stream})
 Set pixel format. Use @code{-pix_fmts} to show all the supported
 pixel formats.
+If the selected pixel format can not be selected, ffmpeg will print a
+warning and select the best pixel format supported by the encoder.
+If @var{pix_fmt} is prefixed by a @code{+}, ffmpeg will exit with an error
+if the requested pixel format can not be selected, and automatic conversions
+inside filter graphs are disabled.
+If @var{pix_fmt} is a single @code{+}, ffmpeg selects the same pixel format
+as the input (or graph output) and automatic conversions are disabled.
+
 @item -sws_flags @var{flags} (@emph{input/output})
 Set SwScaler flags.
 @item -vdt @var{n}
@@ -488,6 +438,11 @@ Set the audio codec. This is an alias for @code{-codec:a}.
 @item -sample_fmt[:@var{stream_specifier}] @var{sample_fmt} (@emph{output,per-stream})
 Set the audio sample format. Use @code{-sample_fmts} to get a list
 of supported sample formats.
+@item -af @var{filter_graph} (@emph{output})
+@var{filter_graph} is a description of the filter graph to apply to
+the input audio.
+Use the option "-filters" to show all the available filters (including
+also sources and sinks).  This is an alias for @code{-filter:a}.
 @end table
 
 @section Advanced Audio options:
@@ -522,7 +477,7 @@ Synchronize read on input.
 @section Advanced options
 
 @table @option
-@item -map [-]@var{input_file_id}[:@var{stream_specifier}][,@var{sync_file_id}[:@var{stream_specifier}]] (@emph{output})
+@item -map [-]@var{input_file_id}[:@var{stream_specifier}][,@var{sync_file_id}[:@var{stream_specifier}]] | @var{[linklabel]} (@emph{output})
 
 Designate one or more input streams as a source for the output file. Each input
 stream is identified by the input file index @var{input_file_id} and
@@ -537,6 +492,10 @@ the source for output stream 1, etc.
 
 A @code{-} character before the stream identifier creates a "negative" mapping.
 It disables matching streams from already created mappings.
+
+An alternative @var{[linklabel]} form will map outputs from complex filter
+graphs (see the @option{-filter_complex} option) to the output file.
+@var{linklabel} must correspond to a defined output link label in the graph.
 
 For example, to map ALL streams from the first input file to output
 @example
@@ -716,6 +675,9 @@ Show benchmarking information at the end of an encode.
 Shows CPU time used and maximum memory consumption.
 Maximum memory consumption is not supported on all systems,
 it will usually display as 0 if not supported.
+@item -benchmark_all (@emph{global})
+Show benchmarking information during the encode.
+Shows CPU time used in various steps (audio/video encode/decode).
 @item -timelimit @var{duration} (@emph{global})
 Exit after ffmpeg has been running for @var{duration} seconds.
 @item -dump (@emph{global})
@@ -763,6 +725,7 @@ Audio sync method. "Stretches/squeezes" the audio stream to match the timestamps
 the parameter is the maximum samples per second by which the audio is changed.
 -async 1 is a special case where only the start of the audio stream is corrected
 without any later correction.
+This option has been deprecated. Use the @code{asyncts} audio filter instead.
 @item -copyts
 Copy timestamps from input to output.
 @item -copytb @var{mode}
@@ -829,6 +792,44 @@ Specify Timecode for writing. @var{SEP} is ':' for non drop timecode and ';'
 @example
 ffmpeg -i input.mpg -timecode 01:02:03.04 -r 30000/1001 -s ntsc output.mpg
 @end example
+
+@item -filter_complex @var{filtergraph} (@emph{global})
+Define a complex filter graph, i.e. one with arbitrary number of inputs and/or
+outputs. For simple graphs -- those with one input and one output of the same
+type -- see the @option{-filter} options. @var{filtergraph} is a description of
+the filter graph, as described in @ref{Filtergraph syntax}.
+
+Input link labels must refer to input streams using the
+@code{[file_index:stream_specifier]} syntax (i.e. the same as @option{-map}
+uses). If @var{stream_specifier} matches multiple streams, the first one will be
+used. An unlabeled input will be connected to the first unused input stream of
+the matching type.
+
+Output link labels are referred to with @option{-map}. Unlabeled outputs are
+added to the first output file.
+
+For example, to overlay an image over video
+@example
+ffmpeg -i video.mkv -i image.png -filter_complex '[0:v][1:v]overlay[out]' -map
+'[out]' out.mkv
+@end example
+Here @code{[0:v]} refers to the first video stream in the first input file,
+which is linked to the first (main) input of the overlay filter. Similarly the
+first video stream in the second input is linked to the second (overlay) input
+of overlay.
+
+Assuming there is only one video stream in each input file, we can omit input
+labels, so the above is equivalent to
+@example
+ffmpeg -i video.mkv -i image.png -filter_complex 'overlay[out]' -map
+'[out]' out.mkv
+@end example
+
+Furthermore we can omit the output label and the single output from the filter
+graph will be added to the output file automatically, so we can simply write
+@example
+ffmpeg -i video.mkv -i image.png -filter_complex 'overlay' out.mkv
+@end example
 @end table
 
 @section Preset files
@@ -890,7 +891,7 @@ frame rate or decrease the frame size.
 @item
 If your computer is not fast enough, you can speed up the
 compression at the expense of the compression ratio. You can use
-'-me zero' to speed up motion estimation, and '-intra' to disable
+'-me zero' to speed up motion estimation, and '-g 0' to disable
 motion estimation completely (you have only I-frames, which means it
 is about as good as JPEG compression).
 
@@ -1077,11 +1078,19 @@ ffmpeg -f image2 -i foo-%03d.jpeg -r 12 -s WxH foo.avi
 The syntax @code{foo-%03d.jpeg} specifies to use a decimal number
 composed of three digits padded with zeroes to express the sequence
 number. It is the same syntax supported by the C printf function, but
-only formats accepting a normal integer are suitable. When importing
-an image sequence, -i also accepts shell-like wildcard patterns such as
-@code{foo-*.jpeg}, @code{foo-???.jpeg} or @code{foo-00[234]*.jpeg}.
-It will probably be necessary to escape these patterns so they do not
-get interpreted by your shell.
+only formats accepting a normal integer are suitable.
+
+When importing an image sequence, -i also supports expanding shell-like
+wildcard patterns (globbing) internally. To lower the chance of interfering
+with your actual file names and the shell's glob expansion, you are required
+to activate glob meta characters by prefixing them with a single @code{%}
+character, like in @code{foo-%*.jpeg}, @code{foo-%?%?%?.jpeg} or
+@code{foo-00%[234%]%*.jpeg}.
+If your filename actually contains a character sequence of a @code{%} character
+followed by a glob character, you must double the @code{%} character to escape
+it. Imagine your files begin with @code{%?-foo-}, then you could use a glob
+pattern like @code{%%?-foo-%*.jpeg}. For input patterns that could be both a
+printf or a glob pattern, ffmpeg will assume it is a glob pattern.
 
 @item
 You can put many streams of the same type in the output:
@@ -1109,6 +1118,7 @@ ffmpeg -i src.ext -lmax 21*QP2LAMBDA dst.ext
 @end itemize
 @c man end EXAMPLES
 
+@include syntax.texi
 @include eval.texi
 @include decoders.texi
 @include encoders.texi

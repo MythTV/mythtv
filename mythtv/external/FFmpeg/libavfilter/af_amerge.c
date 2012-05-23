@@ -25,6 +25,7 @@
 
 #include "libswresample/swresample.h" // only for SWR_CH_MAX
 #include "avfilter.h"
+#include "audio.h"
 #include "internal.h"
 
 #define QUEUE_SIZE 16
@@ -53,19 +54,19 @@ static int query_formats(AVFilterContext *ctx)
 {
     AMergeContext *am = ctx->priv;
     int64_t inlayout[2], outlayout;
-    const int packing_fmts[] = { AVFILTER_PACKED, -1 };
     AVFilterFormats *formats;
+    AVFilterChannelLayouts *layouts;
     int i;
 
     for (i = 0; i < 2; i++) {
-        if (!ctx->inputs[i]->in_chlayouts ||
-            !ctx->inputs[i]->in_chlayouts->format_count) {
+        if (!ctx->inputs[i]->in_channel_layouts ||
+            !ctx->inputs[i]->in_channel_layouts->nb_channel_layouts) {
             av_log(ctx, AV_LOG_ERROR,
                    "No channel layout for input %d\n", i + 1);
             return AVERROR(EINVAL);
         }
-        inlayout[i] = ctx->inputs[i]->in_chlayouts->formats[0];
-        if (ctx->inputs[i]->in_chlayouts->format_count > 1) {
+        inlayout[i] = ctx->inputs[i]->in_channel_layouts->channel_layouts[0];
+        if (ctx->inputs[i]->in_channel_layouts->nb_channel_layouts > 1) {
             char buf[256];
             av_get_channel_layout_string(buf, sizeof(buf), 0, inlayout[i]);
             av_log(ctx, AV_LOG_INFO, "Using \"%s\" for input %d\n", buf, i + 1);
@@ -95,18 +96,16 @@ static int query_formats(AVFilterContext *ctx)
                 if ((inlayout[i] >> c) & 1)
                     *(route[i]++) = out_ch_number++;
     }
-    formats = avfilter_make_all_formats(AVMEDIA_TYPE_AUDIO);
+    formats = avfilter_make_format_list(ff_packed_sample_fmts);
     avfilter_set_common_sample_formats(ctx, formats);
-    formats = avfilter_make_format_list(packing_fmts);
-    avfilter_set_common_packing_formats(ctx, formats);
     for (i = 0; i < 2; i++) {
-        formats = NULL;
-        avfilter_add_format(&formats, inlayout[i]);
-        avfilter_formats_ref(formats, &ctx->inputs[i]->out_chlayouts);
+        layouts = NULL;
+        ff_add_channel_layout(&layouts, inlayout[i]);
+        ff_channel_layouts_ref(layouts, &ctx->inputs[i]->out_channel_layouts);
     }
-    formats = NULL;
-    avfilter_add_format(&formats, outlayout);
-    avfilter_formats_ref(formats, &ctx->outputs[0]->in_chlayouts);
+    layouts = NULL;
+    ff_add_channel_layout(&layouts, outlayout);
+    ff_channel_layouts_ref(layouts, &ctx->outputs[0]->in_channel_layouts);
     return 0;
 }
 
@@ -141,11 +140,12 @@ static int request_frame(AVFilterLink *outlink)
 {
     AVFilterContext *ctx = outlink->src;
     AMergeContext *am = ctx->priv;
-    int i;
+    int i, ret;
 
     for (i = 0; i < 2; i++)
         if (!am->queue[i].nb_samples)
-            avfilter_request_frame(ctx->inputs[i]);
+            if ((ret = avfilter_request_frame(ctx->inputs[i])) < 0)
+                return ret;
     return 0;
 }
 
@@ -207,7 +207,7 @@ static void filter_samples(AVFilterLink *inlink, AVFilterBufferRef *insamples)
 
     nb_samples = FFMIN(am->queue[0].nb_samples,
                        am->queue[1].nb_samples);
-    outbuf = avfilter_get_audio_buffer(ctx->outputs[0], AV_PERM_WRITE,
+    outbuf = ff_get_audio_buffer(ctx->outputs[0], AV_PERM_WRITE,
                                        nb_samples);
     outs = outbuf->data[0];
     for (i = 0; i < 2; i++) {
@@ -219,7 +219,6 @@ static void filter_samples(AVFilterLink *inlink, AVFilterBufferRef *insamples)
     avfilter_copy_buffer_ref_props(outbuf, *inbuf[0]);
     outbuf->audio->nb_samples     = nb_samples;
     outbuf->audio->channel_layout = outlink->channel_layout;
-    outbuf->audio->planar         = outlink->planar;
 
     while (nb_samples) {
         ns = nb_samples;
@@ -263,7 +262,7 @@ static void filter_samples(AVFilterLink *inlink, AVFilterBufferRef *insamples)
                     am->queue[i].nb_buf * sizeof(**inbuf));
         }
     }
-    avfilter_filter_samples(ctx->outputs[0], outbuf);
+    ff_filter_samples(ctx->outputs[0], outbuf);
 }
 
 AVFilter avfilter_af_amerge = {

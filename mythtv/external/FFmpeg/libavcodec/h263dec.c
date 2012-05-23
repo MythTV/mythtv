@@ -151,7 +151,7 @@ static int get_consumed_bytes(MpegEncContext *s, int buf_size){
 
 static int decode_slice(MpegEncContext *s){
     const int part_mask= s->partitioned_frame ? (ER_AC_END|ER_AC_ERROR) : 0x7F;
-    const int mb_size= 16>>s->avctx->lowres;
+    const int mb_size = 16;
     s->last_resync_gb= s->gb;
     s->first_slice_line= 1;
 
@@ -438,12 +438,29 @@ retry:
         ret = ff_h263_decode_picture_header(s);
     }
 
+    if (ret < 0 || ret==FRAME_SKIPPED) {
+        if (   s->width  != avctx->coded_width
+            || s->height != avctx->coded_height) {
+                av_log(s->avctx, AV_LOG_WARNING, "Reverting picture dimensions change due to header decoding failure\n");
+                s->width = avctx->coded_width;
+                s->height= avctx->coded_height;
+        }
+    }
     if(ret==FRAME_SKIPPED) return get_consumed_bytes(s, buf_size);
 
     /* skip if the header was thrashed */
     if (ret < 0){
         av_log(s->avctx, AV_LOG_ERROR, "header damaged\n");
         return -1;
+    } else if ((s->width  != avctx->coded_width  ||
+                s->height != avctx->coded_height ||
+                (s->width  + 15) >> 4 != s->mb_width ||
+                (s->height + 15) >> 4 != s->mb_height) &&
+               (HAVE_THREADS && (s->avctx->active_thread_type & FF_THREAD_FRAME))) {
+        av_log_missing_feature(s->avctx, "Width/height/bit depth/chroma idc changing with threads is", 0);
+        s->width = avctx->coded_width;
+        s->height= avctx->coded_height;
+        return AVERROR_PATCHWELCOME;   // width / height changed during parallelized decoding
     }
 
     avctx->has_b_frames= !s->low_delay;
@@ -571,7 +588,6 @@ retry:
     if (s->codec_id == CODEC_ID_MPEG4 && s->xvid_build>=0 && avctx->idct_algo == FF_IDCT_AUTO && (av_get_cpu_flags() & AV_CPU_FLAG_MMX)) {
         avctx->idct_algo= FF_IDCT_XVIDMMX;
         ff_dct_common_init(s);
-        s->picture_number=0;
     }
 #endif
 
@@ -584,13 +600,6 @@ retry:
         || s->height != avctx->coded_height) {
         /* H.263 could change picture size any time */
         ParseContext pc= s->parse_context; //FIXME move these demuxng hack to avformat
-
-        if (HAVE_THREADS && (s->avctx->active_thread_type&FF_THREAD_FRAME)) {
-            av_log_missing_feature(s->avctx, "Width/height/bit depth/chroma idc changing with threads is", 0);
-            s->width = avctx->coded_width;
-            s->height= avctx->coded_height;
-            return -1;   // width / height changed during parallelized decoding
-        }
 
         s->parse_context.buffer=0;
         ff_MPV_common_end(s);
@@ -754,9 +763,9 @@ AVCodec ff_h263_decoder = {
     .init           = ff_h263_decode_init,
     .close          = ff_h263_decode_end,
     .decode         = ff_h263_decode_frame,
-    .capabilities   = CODEC_CAP_DRAW_HORIZ_BAND | CODEC_CAP_DR1 | CODEC_CAP_TRUNCATED | CODEC_CAP_DELAY,
-    .flush= ff_mpeg_flush,
-    .max_lowres= 3,
-    .long_name= NULL_IF_CONFIG_SMALL("H.263 / H.263-1996, H.263+ / H.263-1998 / H.263 version 2"),
-    .pix_fmts= ff_hwaccel_pixfmt_list_420,
+    .capabilities   = CODEC_CAP_DRAW_HORIZ_BAND | CODEC_CAP_DR1 |
+                      CODEC_CAP_TRUNCATED | CODEC_CAP_DELAY,
+    .flush          = ff_mpeg_flush,
+    .long_name      = NULL_IF_CONFIG_SMALL("H.263 / H.263-1996, H.263+ / H.263-1998 / H.263 version 2"),
+    .pix_fmts       = ff_hwaccel_pixfmt_list_420,
 };

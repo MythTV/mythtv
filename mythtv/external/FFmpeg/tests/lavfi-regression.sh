@@ -28,6 +28,11 @@ do_lavfi() {
     fi
 }
 
+do_lavfi_colormatrix() {
+    do_lavfi "${1}1" "$1=$4:$5,$1=$5:$3,$1=$3:$4,$1=$4:$3,$1=$3:$5,$1=$5:$2"
+    do_lavfi "${1}2" "$1=$2:$3,$1=$3:$2,$1=$2:$4,$1=$4:$2,$1=$2:$5,$1=$5:$4"
+}
+
 do_lavfi "crop"               "crop=iw-100:ih-100:100:100"
 do_lavfi "crop_scale"         "crop=iw-100:ih-100:100:100,scale=400:-1"
 do_lavfi "crop_scale_vflip"   "null,null,crop=iw-200:ih-200:200:200,crop=iw-20:ih-20:20:20,scale=200:200,scale=250:250,vflip,vflip,null,scale=200:200,crop=iw-100:ih-100:100:100,vflip,scale=200:200,null,vflip,crop=iw-100:ih-100:100:100,null"
@@ -35,7 +40,7 @@ do_lavfi "crop_vflip"         "crop=iw-100:ih-100:100:100,vflip"
 do_lavfi "drawbox"            "drawbox=224:24:88:72:#FF8010@0.5"
 do_lavfi "fade"               "fade=in:5:15,fade=out:30:15"
 do_lavfi "null"               "null"
-do_lavfi "overlay"            "split[m],scale=88:72,pad=96:80:4:4[o2];[m]fifo,[o2]overlay=240:16"
+do_lavfi "overlay"            "split[m],scale=88:72,pad=96:80:4:4[o2];[m]fifo[o1],[o1][o2]overlay=240:16"
 do_lavfi "pad"                "pad=iw*1.5:ih*1.5:iw*0.3:ih*0.2"
 do_lavfi "pp"                 "mp=pp=be/de/tn/l5/al"
 do_lavfi "pp2"                "mp=pp=be/fq:16/fa/lb"
@@ -54,6 +59,8 @@ do_lavfi "unsharp"            "unsharp=10:10:-1.5:10:10:-1.5"
 do_lavfi "vflip"              "vflip"
 do_lavfi "vflip_crop"         "vflip,crop=iw-100:ih-100:100:100"
 do_lavfi "vflip_vflip"        "vflip,vflip"
+
+do_lavfi_colormatrix "colormatrix" bt709 fcc bt601 smpte240m
 
 do_lavfi_pixfmts(){
     test ${test%_[bl]e} = pixfmts_$1 || return 0

@@ -72,6 +72,12 @@ typedef struct AVCodecInternal {
 #endif
 
     /**
+     * An audio frame with less than required samples has been submitted and
+     * padded with silence. Reject all subsequent frames.
+     */
+    int last_audio_frame;
+
+    /**
      * temporary buffer used for encoders to store their bitstream
      */
     uint8_t *byte_buffer;
@@ -153,6 +159,8 @@ int ff_alloc_packet(AVPacket *avpkt, int size);
 static av_always_inline int64_t ff_samples_to_time_base(AVCodecContext *avctx,
                                                         int64_t samples)
 {
+    if(samples == AV_NOPTS_VALUE)
+        return AV_NOPTS_VALUE;
     return av_rescale_q(samples, (AVRational){ 1, avctx->sample_rate },
                         avctx->time_base);
 }

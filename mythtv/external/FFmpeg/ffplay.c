@@ -40,7 +40,6 @@
 #include "libavformat/avformat.h"
 #include "libavdevice/avdevice.h"
 #include "libswscale/swscale.h"
-#include "libavcodec/audioconvert.h"
 #include "libavutil/opt.h"
 #include "libavcodec/avfft.h"
 #include "libswresample/swresample.h"
@@ -105,6 +104,7 @@ typedef struct VideoPicture {
     int skip;
     SDL_Overlay *bmp;
     int width, height; /* source height & width */
+    AVRational sample_aspect_ratio;
     int allocated;
     int reallocate;
     enum PixelFormat pix_fmt;
@@ -233,6 +233,11 @@ typedef struct VideoState {
 
     int refresh;
 } VideoState;
+
+typedef struct AllocEventProps {
+    VideoState *is;
+    AVFrame *frame;
+} AllocEventProps;
 
 static int opt_help(const char *opt, const char *arg);
 
@@ -667,21 +672,11 @@ static void video_image_display(VideoState *is)
 
     vp = &is->pictq[is->pictq_rindex];
     if (vp->bmp) {
-#if CONFIG_AVFILTER
-         if (vp->picref->video->sample_aspect_ratio.num == 0)
-             aspect_ratio = 0;
-         else
-             aspect_ratio = av_q2d(vp->picref->video->sample_aspect_ratio);
-#else
-
-        /* XXX: use variable in the frame */
-        if (is->video_st->sample_aspect_ratio.num)
-            aspect_ratio = av_q2d(is->video_st->sample_aspect_ratio);
-        else if (is->video_st->codec->sample_aspect_ratio.num)
-            aspect_ratio = av_q2d(is->video_st->codec->sample_aspect_ratio);
-        else
+        if (vp->sample_aspect_ratio.num == 0)
             aspect_ratio = 0;
-#endif
+        else
+            aspect_ratio = av_q2d(vp->sample_aspect_ratio);
+
         if (aspect_ratio <= 0.0)
             aspect_ratio = 1.0;
         aspect_ratio *= (float)vp->width / (float)vp->height;
@@ -935,6 +930,7 @@ static int video_open(VideoState *is, int force_set_video_mode)
 {
     int flags = SDL_HWSURFACE | SDL_ASYNCBLIT | SDL_HWACCEL;
     int w,h;
+    VideoPicture *vp = &is->pictq[is->pictq_rindex];
 
     if (is_full_screen) flags |= SDL_FULLSCREEN;
     else                flags |= SDL_RESIZABLE;
@@ -945,15 +941,9 @@ static int video_open(VideoState *is, int force_set_video_mode)
     } else if (!is_full_screen && screen_width) {
         w = screen_width;
         h = screen_height;
-#if CONFIG_AVFILTER
-    } else if (is->out_video_filter && is->out_video_filter->inputs[0]) {
-        w = is->out_video_filter->inputs[0]->w;
-        h = is->out_video_filter->inputs[0]->h;
-#else
-    } else if (is->video_st && is->video_st->codec->width) {
-        w = is->video_st->codec->width;
-        h = is->video_st->codec->height;
-#endif
+    } else if (vp->width) {
+        w = vp->width;
+        h = vp->height;
     } else {
         w = 640;
         h = 480;
@@ -1294,9 +1284,10 @@ display:
 
 /* allocate a picture (needs to do that in main thread to avoid
    potential locking problems */
-static void alloc_picture(void *opaque)
+static void alloc_picture(AllocEventProps *event_props)
 {
-    VideoState *is = opaque;
+    VideoState *is = event_props->is;
+    AVFrame *frame = event_props->frame;
     VideoPicture *vp;
 
     vp = &is->pictq[is->pictq_windex];
@@ -1308,15 +1299,13 @@ static void alloc_picture(void *opaque)
     if (vp->picref)
         avfilter_unref_buffer(vp->picref);
     vp->picref = NULL;
-
-    vp->width   = is->out_video_filter->inputs[0]->w;
-    vp->height  = is->out_video_filter->inputs[0]->h;
-    vp->pix_fmt = is->out_video_filter->inputs[0]->format;
-#else
-    vp->width   = is->video_st->codec->width;
-    vp->height  = is->video_st->codec->height;
-    vp->pix_fmt = is->video_st->codec->pix_fmt;
 #endif
+
+    vp->width   = frame->width;
+    vp->height  = frame->height;
+    vp->pix_fmt = frame->format;
+
+    video_open(event_props->is, 0);
 
     vp->bmp = SDL_CreateYUVOverlay(vp->width, vp->height,
                                    SDL_YV12_OVERLAY,
@@ -1379,22 +1368,22 @@ static int queue_picture(VideoState *is, AVFrame *src_frame, double pts1, int64_
 
     /* alloc or resize hardware picture buffer */
     if (!vp->bmp || vp->reallocate ||
-#if CONFIG_AVFILTER
-        vp->width  != is->out_video_filter->inputs[0]->w ||
-        vp->height != is->out_video_filter->inputs[0]->h) {
-#else
-        vp->width != is->video_st->codec->width ||
-        vp->height != is->video_st->codec->height) {
-#endif
+        vp->width  != src_frame->width ||
+        vp->height != src_frame->height) {
         SDL_Event event;
+        AllocEventProps event_props;
+
+        event_props.frame = src_frame;
+        event_props.is = is;
 
         vp->allocated  = 0;
         vp->reallocate = 0;
 
         /* the allocation must be done in the main thread to avoid
-           locking problems */
+           locking problems. We wait in this block for the event to complete,
+           so we can pass a pointer to event_props to it. */
         event.type = FF_ALLOC_EVENT;
-        event.user.data1 = is;
+        event.user.data1 = &event_props;
         SDL_PushEvent(&event);
 
         /* wait until the picture is allocated */
@@ -1438,6 +1427,7 @@ static int queue_picture(VideoState *is, AVFrame *src_frame, double pts1, int64_
         // FIXME use direct rendering
         av_picture_copy(&pict, (AVPicture *)src_frame,
                         vp->pix_fmt, vp->width, vp->height);
+        vp->sample_aspect_ratio = vp->picref->video->sample_aspect_ratio;
 #else
         sws_flags = av_get_int(sws_opts, "sws_flags", NULL);
         is->img_convert_ctx = sws_getCachedContext(is->img_convert_ctx,
@@ -1449,6 +1439,7 @@ static int queue_picture(VideoState *is, AVFrame *src_frame, double pts1, int64_
         }
         sws_scale(is->img_convert_ctx, src_frame->data, src_frame->linesize,
                   0, vp->height, pict.data, pict.linesize);
+        vp->sample_aspect_ratio = av_guess_sample_aspect_ratio(is->ic, is->video_st, src_frame);
 #endif
         /* update the bitmap content */
         SDL_UnlockYUVOverlay(vp->bmp);
@@ -1501,7 +1492,7 @@ static int get_video_frame(VideoState *is, AVFrame *frame, int64_t *pts, AVPacke
         int ret = 1;
 
         if (decoder_reorder_pts == -1) {
-            *pts = *(int64_t*)av_opt_ptr(avcodec_get_frame_class(), frame, "best_effort_timestamp");
+            *pts = av_frame_get_best_effort_timestamp(frame);
         } else if (decoder_reorder_pts) {
             *pts = frame->pkt_pts;
         } else {
@@ -1600,6 +1591,10 @@ static int input_get_buffer(AVCodecContext *codec, AVFrame *pic)
     pic->opaque = ref;
     pic->type   = FF_BUFFER_TYPE_USER;
     pic->reordered_opaque = codec->reordered_opaque;
+    pic->width               = codec->width;
+    pic->height              = codec->height;
+    pic->format              = codec->pix_fmt;
+    pic->sample_aspect_ratio = codec->sample_aspect_ratio;
     if (codec->pkt) pic->pkt_pts = codec->pkt->pts;
     else            pic->pkt_pts = AV_NOPTS_VALUE;
     return 0;
@@ -1677,18 +1672,19 @@ static int input_request_frame(AVFilterLink *link)
     if (priv->use_dr1 && priv->frame->opaque) {
         picref = avfilter_ref_buffer(priv->frame->opaque, ~0);
     } else {
-        picref = avfilter_get_video_buffer(link, AV_PERM_WRITE, link->w, link->h);
+        picref = avfilter_get_video_buffer(link, AV_PERM_WRITE, priv->frame->width, priv->frame->height);
         av_image_copy(picref->data, picref->linesize,
                       (const uint8_t **)(void **)priv->frame->data, priv->frame->linesize,
-                      picref->format, link->w, link->h);
+                      picref->format, priv->frame->width, priv->frame->height);
     }
     av_free_packet(&pkt);
 
     avfilter_copy_frame_props(picref, priv->frame);
+    picref->video->sample_aspect_ratio = av_guess_sample_aspect_ratio(priv->is->ic, priv->is->video_st, priv->frame);
     picref->pts = pts;
 
     avfilter_start_frame(link, picref);
-    avfilter_draw_slice(link, 0, link->h, 1);
+    avfilter_draw_slice(link, 0, picref->video->h, 1);
     avfilter_end_frame(link);
 
     return 0;
@@ -1740,11 +1736,11 @@ static AVFilter input_filter =
 
 static int configure_video_filters(AVFilterGraph *graph, VideoState *is, const char *vfilters)
 {
+    static const enum PixelFormat pix_fmts[] = { PIX_FMT_YUV420P, PIX_FMT_NONE };
     char sws_flags_str[128];
     int ret;
-    enum PixelFormat pix_fmts[] = { PIX_FMT_YUV420P, PIX_FMT_NONE };
     AVBufferSinkParams *buffersink_params = av_buffersink_params_alloc();
-    AVFilterContext *filt_src = NULL, *filt_out = NULL;
+    AVFilterContext *filt_src = NULL, *filt_out = NULL, *filt_format;;
     snprintf(sws_flags_str, sizeof(sws_flags_str), "flags=%d", sws_flags);
     graph->scale_sws_opts = av_strdup(sws_flags_str);
 
@@ -1753,16 +1749,26 @@ static int configure_video_filters(AVFilterGraph *graph, VideoState *is, const c
         return ret;
 
 #if FF_API_OLD_VSINK_API
-    ret = avfilter_graph_create_filter(&filt_out, avfilter_get_by_name("buffersink"), "out",
-                                       NULL, pix_fmts, graph);
+    ret = avfilter_graph_create_filter(&filt_out,
+                                       avfilter_get_by_name("buffersink"),
+                                       "out", NULL, pix_fmts, graph);
 #else
     buffersink_params->pixel_fmts = pix_fmts;
-    ret = avfilter_graph_create_filter(&filt_out, avfilter_get_by_name("buffersink"), "out",
-                                       NULL, buffersink_params, graph);
+    ret = avfilter_graph_create_filter(&filt_out,
+                                       avfilter_get_by_name("buffersink"),
+                                       "out", NULL, buffersink_params, graph);
 #endif
     av_freep(&buffersink_params);
     if (ret < 0)
         return ret;
+
+    if ((ret = avfilter_graph_create_filter(&filt_format,
+                                            avfilter_get_by_name("format"),
+                                            "format", "yuv420p", NULL, graph)) < 0)
+        return ret;
+    if ((ret = avfilter_link(filt_format, 0, filt_out, 0)) < 0)
+        return ret;
+
 
     if (vfilters) {
         AVFilterInOut *outputs = avfilter_inout_alloc();
@@ -1774,14 +1780,14 @@ static int configure_video_filters(AVFilterGraph *graph, VideoState *is, const c
         outputs->next    = NULL;
 
         inputs->name    = av_strdup("out");
-        inputs->filter_ctx = filt_out;
+        inputs->filter_ctx = filt_format;
         inputs->pad_idx = 0;
         inputs->next    = NULL;
 
         if ((ret = avfilter_graph_parse(graph, vfilters, &inputs, &outputs, NULL)) < 0)
             return ret;
     } else {
-        if ((ret = avfilter_link(filt_src, 0, filt_out, 0)) < 0)
+        if ((ret = avfilter_link(filt_src, 0, filt_format, 0)) < 0)
             return ret;
     }
 
@@ -1840,11 +1846,14 @@ static int video_thread(void *arg)
         if (picref) {
             avfilter_fill_frame_from_video_buffer_ref(frame, picref);
             pts_int = picref->pts;
+            tb      = filt_out->inputs[0]->time_base;
             pos     = picref->pos;
             frame->opaque = picref;
+
+            ret = 1;
         }
 
-        if (av_cmp_q(tb, is->video_st->time_base)) {
+        if (ret >= 0 && av_cmp_q(tb, is->video_st->time_base)) {
             av_unused int64_t pts1 = pts_int;
             pts_int = av_rescale_q(pts_int, tb, is->video_st->time_base);
             av_dlog(NULL, "video_thread(): "
@@ -1856,6 +1865,8 @@ static int video_thread(void *arg)
         ret = get_video_frame(is, frame, &pts_int, &pkt);
         pos = pkt.pos;
         av_free_packet(&pkt);
+        if (ret == 0)
+            continue;
 #endif
 
         if (ret < 0)
@@ -1882,6 +1893,7 @@ static int video_thread(void *arg)
     }
  the_end:
 #if CONFIG_AVFILTER
+    av_freep(&vfilters);
     avfilter_graph_free(&graph);
 #endif
     av_free(frame);
@@ -2125,7 +2137,8 @@ static int audio_decode_frame(VideoState *is, double *pts_ptr)
             /* if no pts, then compute it */
             pts = is->audio_clock;
             *pts_ptr = pts;
-            is->audio_clock += (double)data_size / (dec->channels * dec->sample_rate * av_get_bytes_per_sample(dec->sample_fmt));
+            is->audio_clock += (double)data_size /
+                (dec->channels * dec->sample_rate * av_get_bytes_per_sample(dec->sample_fmt));
 #ifdef DEBUG
             {
                 static double last_clock;
@@ -2368,9 +2381,9 @@ static void stream_component_close(VideoState *is, int stream_index)
         SDL_CloseAudio();
 
         packet_queue_end(&is->audioq);
+        av_free_packet(&is->audio_pkt);
         if (is->swr_ctx)
             swr_free(&is->swr_ctx);
-        av_free_packet(&is->audio_pkt);
         av_freep(&is->audio_buf1);
         is->audio_buf = NULL;
         av_freep(&is->frame);
@@ -2951,7 +2964,6 @@ static void event_loop(VideoState *cur_stream)
             do_exit(cur_stream);
             break;
         case FF_ALLOC_EVENT:
-            video_open(event.user.data1, 0);
             alloc_picture(event.user.data1);
             break;
         case FF_REFRESH_EVENT:

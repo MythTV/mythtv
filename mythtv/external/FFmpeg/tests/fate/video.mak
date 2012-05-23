@@ -14,7 +14,7 @@ FATE_VIDEO += fate-alg-mm
 fate-alg-mm: CMD = framecrc -i $(SAMPLES)/alg-mm/ibmlogo.mm -an -pix_fmt rgb24
 
 FATE_VIDEO += fate-amv
-fate-amv: CMD = framecrc -idct simple -i $(SAMPLES)/amv/MTV_high_res_320x240_sample_Penguin_Joke_MTV_from_WMV.amv -t 10
+fate-amv: CMD = framecrc -idct simple -i $(SAMPLES)/amv/MTV_high_res_320x240_sample_Penguin_Joke_MTV_from_WMV.amv -t 10 -an
 
 FATE_VIDEO += fate-ansi
 fate-ansi: CMD = framecrc -chars_per_frame 44100 -i $(SAMPLES)/ansi/TRE-IOM5.ANS -pix_fmt rgb24
@@ -36,6 +36,9 @@ fate-bfi: CMD = framecrc -i $(SAMPLES)/bfi/2287.bfi -pix_fmt rgb24
 
 FATE_VIDEO += fate-bink-video
 fate-bink-video: CMD = framecrc -i $(SAMPLES)/bink/hol2br.bik
+
+FATE_VIDEO += fate-bmv-video
+fate-bmv-video: CMD = framecrc -i $(SAMPLES)/bmv/SURFING-partial.BMV -pix_fmt rgb24 -an
 
 FATE_VIDEO += fate-cdgraphics
 fate-cdgraphics: CMD = framecrc -i $(SAMPLES)/cdgraphics/BrotherJohn.cdg -pix_fmt rgb24 -t 1
@@ -67,17 +70,17 @@ fate-cyberia-c93: CMD = framecrc -i $(SAMPLES)/cyberia-c93/intro1.c93 -t 3 -pix_
 FATE_VIDEO += fate-cyuv
 fate-cyuv: CMD = framecrc -i $(SAMPLES)/cyuv/cyuv.avi
 
-FATE_VIDEO += fate-delphine-cin
-fate-delphine-cin: CMD = framecrc -i $(SAMPLES)/delphine-cin/LOGO-partial.CIN -pix_fmt rgb24
+FATE_VIDEO += fate-delphine-cin-video
+fate-delphine-cin-video: CMD = framecrc -i $(SAMPLES)/delphine-cin/LOGO-partial.CIN -pix_fmt rgb24 -an
 
 FATE_VIDEO += fate-deluxepaint-anm
 fate-deluxepaint-anm: CMD = framecrc -i $(SAMPLES)/deluxepaint-anm/INTRO1.ANM -pix_fmt rgb24
 
 FATE_TRUEMOTION1 += fate-truemotion1-15
-fate-truemotion1-15: CMD = framecrc -i $(SAMPLES)/duck/phant2-940.duk -pix_fmt rgb24
+fate-truemotion1-15: CMD = framecrc -i $(SAMPLES)/duck/phant2-940.duk -pix_fmt rgb24 -an
 
 FATE_TRUEMOTION1 += fate-truemotion1-24
-fate-truemotion1-24: CMD = framecrc -i $(SAMPLES)/duck/sonic3dblast_intro-partial.avi -pix_fmt rgb24
+fate-truemotion1-24: CMD = framecrc -i $(SAMPLES)/duck/sonic3dblast_intro-partial.avi -pix_fmt rgb24 -an
 
 FATE_VIDEO += $(FATE_TRUEMOTION1)
 fate-truemotion1: $(FATE_TRUEMOTION1)
@@ -86,13 +89,16 @@ FATE_VIDEO += fate-truemotion2
 fate-truemotion2: CMD = framecrc -i $(SAMPLES)/duck/tm20.avi
 
 FATE_DXA += fate-dxa-feeble
-fate-dxa-feeble: CMD = framecrc -i $(SAMPLES)/dxa/meetsquid.dxa -t 2 -pix_fmt rgb24
+fate-dxa-feeble: CMD = framecrc -i $(SAMPLES)/dxa/meetsquid.dxa -t 2 -pix_fmt rgb24 -an
 
 FATE_DXA += fate-dxa-scummvm
 fate-dxa-scummvm: CMD = framecrc -i $(SAMPLES)/dxa/scummvm.dxa -pix_fmt rgb24
 
 FATE_VIDEO += $(FATE_DXA)
 fate-dxa: $(FATE_DXA)
+
+FATE_PCM += fate-film-cvid
+fate-film-cvid: CMD = framecrc -i $(SAMPLES)/film/logo-capcom.cpk -an
 
 FATE_FLIC += fate-flic-af11-palette-change
 fate-flic-af11-palette-change: CMD = framecrc -i $(SAMPLES)/fli/fli-engines.fli -t 3.3 -pix_fmt rgb24
@@ -113,7 +119,7 @@ FATE_VIDEO += fate-id-cin-video
 fate-id-cin-video: CMD = framecrc -i $(SAMPLES)/idcin/idlog-2MB.cin -pix_fmt rgb24
 
 FATE_VIDEO-$(CONFIG_AVFILTER) += fate-idroq-video-encode
-fate-idroq-video-encode: CMD = md5 -f image2 -vcodec pgmyuv -i $(SAMPLES)/ffmpeg-synthetic/vsynth1/%02d.pgm -sws_flags +bitexact -vf pad=512:512:80:112 -f RoQ -t 0.2
+fate-idroq-video-encode: CMD = md5 -f image2 -vcodec pgmyuv -i $(SAMPLES)/ffmpeg-synthetic/vsynth1/%02d.pgm -sws_flags +bitexact -vf pad=512:512:80:112 -f roq -t 0.2
 
 FATE_IFF += fate-iff-byterun1
 fate-iff-byterun1: CMD = framecrc -i $(SAMPLES)/iff/ASH.LBM -pix_fmt rgb24
@@ -127,11 +133,23 @@ fate-iff-ilbm: CMD = framecrc -i $(SAMPLES)/iff/lms-matriks.ilbm -pix_fmt rgb24
 FATE_VIDEO += $(FATE_IFF)
 fate-iff: $(FATE_IFF)
 
+FATE_VIDEO += fate-interplay-mve-8bit
+fate-interplay-mve-8bit: CMD = framecrc -i $(SAMPLES)/interplay-mve/interplay-logo-2MB.mve -pix_fmt rgb24 -an
+
+FATE_VIDEO += fate-interplay-mve-16bit
+fate-interplay-mve-16bit: CMD = framecrc -i $(SAMPLES)/interplay-mve/descent3-level5-16bit-partial.mve -pix_fmt rgb24 -an
+
 FATE_VIDEO += fate-kgv1
 fate-kgv1: CMD = framecrc -i $(SAMPLES)/kega/kgv1.avi -pix_fmt rgb555le -an
 
 FATE_VIDEO += fate-kmvc
 fate-kmvc: CMD = framecrc -i $(SAMPLES)/KMVC/LOGO1.AVI -an -t 3 -pix_fmt rgb24
+
+FATE_VIDEO += fate-mdec
+fate-mdec: CMD = framecrc -idct simple -i $(SAMPLES)/ea-dct/NFS2Esprit-partial.dct -an
+
+FATE_VIDEO += fate-mdec-v3
+fate-mdec-v3: CMD = framecrc -idct simple -i $(SAMPLES)/psx-str/abc000_cut.str -an
 
 FATE_VIDEO += fate-mimic
 fate-mimic: CMD = framecrc -idct simple -i $(SAMPLES)/mimic/mimic2-womanloveffmpeg.cam
@@ -145,6 +163,7 @@ fate-motionpixels: CMD = framecrc -i $(SAMPLES)/motion-pixels/INTRO-partial.MVI 
 FATE_VIDEO += fate-mpeg2-field-enc
 fate-mpeg2-field-enc: CMD = framecrc -flags +bitexact -dct fastint -idct simple -i $(SAMPLES)/mpeg2/mpeg2_field_encoding.ts -an
 
+# FIXME dropped frames in this test because of coarse timebase
 FATE_VIDEO += fate-nuv
 fate-nuv: CMD = framecrc -idct simple -i $(SAMPLES)/nuv/Today.nuv -an
 
@@ -157,8 +176,14 @@ fate-r210: CMD = framecrc -i $(SAMPLES)/r210/r210.avi -pix_fmt rgb48le
 FATE_VIDEO += fate-rl2
 fate-rl2: CMD = framecrc -i $(SAMPLES)/rl2/Z4915300.RL2 -pix_fmt rgb24 -an
 
-FATE_VIDEO += fate-smacker
-fate-smacker: CMD = framecrc -i $(SAMPLES)/smacker/wetlogo.smk -pix_fmt rgb24
+FATE_VIDEO += fate-roqvideo
+fate-roqvideo: CMD = framecrc -i $(SAMPLES)/idroq/idlogo.roq -an
+
+FATA_VIDEO += fate-sierra-vmd-video
+fate-sierra-vmd-video: CMD = framecrc -i $(SAMPLES)/vmd/12.vmd -pix_fmt rgb24 -an
+
+FATA_VIDEO += fate-smacker-video
+fate-smacker-video: CMD = framecrc -i $(SAMPLES)/smacker/wetlogo.smk -pix_fmt rgb24 -an
 
 FATE_VIDEO += fate-smc
 fate-smc: CMD = framecrc -i $(SAMPLES)/smc/cass_schi.qt -pix_fmt rgb24
@@ -168,6 +193,9 @@ fate-sp5x: CMD = framecrc -idct simple -i $(SAMPLES)/sp5x/sp5x_problem.avi
 
 FATE_VIDEO += fate-sub-srt
 fate-sub-srt: CMD = md5 -i $(SAMPLES)/sub/SubRip_capability_tester.srt -f ass
+
+FATE_VIDEO += fate-thp
+fate-thp: CMD = framecrc -idct simple -i $(SAMPLES)/thp/pikmin2-opening1-partial.thp -an
 
 FATE_VIDEO += fate-tiertex-seq
 fate-tiertex-seq: CMD = framecrc -i $(SAMPLES)/tiertex-seq/Gameover.seq -pix_fmt rgb24
@@ -204,7 +232,7 @@ FATE_VIDEO += fate-videoxl
 fate-videoxl: CMD = framecrc -i $(SAMPLES)/vixl/pig-vixl.avi
 
 FATE_VIDEO += fate-vqa-cc
-fate-vqa-cc: CMD = framecrc -i $(SAMPLES)/vqa/cc-demo1-partial.vqa -pix_fmt rgb24
+fate-vqa-cc: CMD = framecrc -i $(SAMPLES)/vqa/cc-demo1-partial.vqa -pix_fmt rgb24 -an
 
 FATE_VIDEO += fate-wc3movie-xan
 fate-wc3movie-xan: CMD = framecrc -i $(SAMPLES)/wc3movie/SC_32-part.MVE -pix_fmt rgb24
@@ -218,5 +246,5 @@ fate-yop: CMD = framecrc -i $(SAMPLES)/yop/test1.yop -pix_fmt rgb24 -an
 FATE_VIDEO += fate-xxan-wc4
 fate-xxan-wc4: CMD = framecrc -i $(SAMPLES)/wc4-xan/wc4trailer-partial.avi -an
 
-FATE_TESTS += $(FATE_VIDEO)
+FATE_SAMPLES_FFMPEG += $(FATE_VIDEO)
 fate-video: $(FATE_VIDEO)

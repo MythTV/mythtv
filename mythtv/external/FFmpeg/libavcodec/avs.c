@@ -162,6 +162,7 @@ static av_cold int avs_decode_init(AVCodecContext * avctx)
     AvsContext *const avs = avctx->priv_data;
     avctx->pix_fmt = PIX_FMT_PAL8;
     avcodec_get_frame_defaults(&avs->picture);
+    avcodec_set_dimensions(avctx, 318, 198);
     return 0;
 }
 
@@ -183,5 +184,5 @@ AVCodec ff_avs_decoder = {
     .decode         = avs_decode_frame,
     .close          = avs_decode_end,
     .capabilities   = CODEC_CAP_DR1,
-    .long_name = NULL_IF_CONFIG_SMALL("AVS (Audio Video Standard) video"),
+    .long_name      = NULL_IF_CONFIG_SMALL("AVS (Audio Video Standard) video"),
 };

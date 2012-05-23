@@ -47,7 +47,7 @@ static int txd_decode_frame(AVCodecContext *avctx, void *data, int *data_size,
     GetByteContext gb;
     AVFrame *picture = data;
     AVFrame * const p = &s->picture;
-    unsigned int version, w, h, d3d_format, depth, stride, mipmap_count, flags;
+    unsigned int version, w, h, d3d_format, depth, stride, flags;
     unsigned int y, v;
     uint8_t *ptr;
     uint32_t *pal;
@@ -59,8 +59,7 @@ static int txd_decode_frame(AVCodecContext *avctx, void *data, int *data_size,
     w               = bytestream2_get_le16(&gb);
     h               = bytestream2_get_le16(&gb);
     depth           = bytestream2_get_byte(&gb);
-    mipmap_count    = bytestream2_get_byte(&gb);
-    bytestream2_skip(&gb, 1);
+    bytestream2_skip(&gb, 2);
     flags           = bytestream2_get_byte(&gb);
 
     if (version < 8 || version > 9) {
@@ -171,5 +170,5 @@ AVCodec ff_txd_decoder = {
     .close          = txd_end,
     .decode         = txd_decode_frame,
     .capabilities   = CODEC_CAP_DR1,
-    .long_name = NULL_IF_CONFIG_SMALL("Renderware TXD (TeXture Dictionary) image"),
+    .long_name      = NULL_IF_CONFIG_SMALL("Renderware TXD (TeXture Dictionary) image"),
 };

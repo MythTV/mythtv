@@ -29,11 +29,13 @@
  * format handling
  */
 
-#include "libavutil/imgutils.h"
-#include "libavutil/opt.h"
-#include "libavcodec/avcodec.h"
-#include "libavutil/mathematics.h"
-#include "libavutil/samplefmt.h"
+#include <math.h>
+
+#include <libavutil/imgutils.h>
+#include <libavutil/opt.h>
+#include <libavcodec/avcodec.h>
+#include <libavutil/mathematics.h>
+#include <libavutil/samplefmt.h>
 
 #define INBUF_SIZE 4096
 #define AUDIO_INBUF_SIZE 20480
@@ -52,7 +54,7 @@ static void audio_encode_example(const char *filename)
     float t, tincr;
     uint8_t *outbuf;
 
-    printf("Audio encoding\n");
+    printf("Encode audio file %s\n", filename);
 
     /* find the MP2 encoder */
     codec = avcodec_find_encoder(CODEC_ID_MP2);
@@ -123,7 +125,7 @@ static void audio_decode_example(const char *outfilename, const char *filename)
 
     av_init_packet(&avpkt);
 
-    printf("Audio decoding\n");
+    printf("Decode audio file %s\n", filename);
 
     /* find the mpeg audio decoder */
     codec = avcodec_find_decoder(CODEC_ID_MP2);
@@ -211,12 +213,13 @@ static void video_encode_example(const char *filename, int codec_id)
 {
     AVCodec *codec;
     AVCodecContext *c= NULL;
-    int i, out_size, size, x, y, outbuf_size;
+    int i, out_size, x, y, outbuf_size;
     FILE *f;
     AVFrame *picture;
     uint8_t *outbuf;
+    int had_output=0;
 
-    printf("Video encoding\n");
+    printf("Encode video file %s\n", filename);
 
     /* find the mpeg1 video encoder */
     codec = avcodec_find_encoder(codec_id);
@@ -284,15 +287,17 @@ static void video_encode_example(const char *filename, int codec_id)
 
         /* encode the image */
         out_size = avcodec_encode_video(c, outbuf, outbuf_size, picture);
+        had_output |= out_size;
         printf("encoding frame %3d (size=%5d)\n", i, out_size);
         fwrite(outbuf, 1, out_size, f);
     }
 
     /* get the delayed frames */
-    for(; out_size; i++) {
+    for(; out_size || !had_output; i++) {
         fflush(stdout);
 
         out_size = avcodec_encode_video(c, outbuf, outbuf_size, NULL);
+        had_output |= out_size;
         printf("write frame %3d (size=%5d)\n", i, out_size);
         fwrite(outbuf, 1, out_size, f);
     }
@@ -346,7 +351,7 @@ static void video_decode_example(const char *outfilename, const char *filename)
     /* set end of buffer to 0 (this ensures that no overreading happens for damaged mpeg streams) */
     memset(inbuf + INBUF_SIZE, 0, FF_INPUT_BUFFER_PADDING_SIZE);
 
-    printf("Video decoding\n");
+    printf("Decode video file %s\n", filename);
 
     /* find the mpeg1 video decoder */
     codec = avcodec_find_decoder(CODEC_ID_MPEG1VIDEO);

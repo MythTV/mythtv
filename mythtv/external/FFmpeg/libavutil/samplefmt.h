@@ -22,7 +22,26 @@
 #include "avutil.h"
 
 /**
- * all in native-endian format
+ * Audio Sample Formats
+ *
+ * @par
+ * The data described by the sample format is always in native-endian order.
+ * Sample values can be expressed by native C types, hence the lack of a signed
+ * 24-bit sample format even though it is a common raw audio data format.
+ *
+ * @par
+ * The floating-point formats are based on full volume being in the range
+ * [-1.0, 1.0]. Any values outside this range are beyond full volume level.
+ *
+ * @par
+ * The data layout as used in av_samples_fill_arrays() and elsewhere in Libav
+ * (such as AVFrame in libavcodec) is as follows:
+ *
+ * For planar sample formats, each audio channel is in a separate data plane,
+ * and linesize is the buffer size, in bytes, for a single plane. All data
+ * planes must be the same size. For packed sample formats, only the first data
+ * plane is used, and samples for each channel are interleaved. In this case,
+ * linesize is the buffer size, in bytes, for the 1 plane.
  */
 enum AVSampleFormat {
     AV_SAMPLE_FMT_NONE = -1,
@@ -60,6 +79,28 @@ enum AVSampleFormat av_get_sample_fmt(const char *name);
  * input.
  */
 enum AVSampleFormat av_get_alt_sample_fmt(enum AVSampleFormat sample_fmt, int planar);
+
+/**
+ * Get the packed alternative form of the given sample format.
+ *
+ * If the passed sample_fmt is already in packed format, the format returned is
+ * the same as the input.
+ *
+ * @return  the packed alternative form of the given sample format or
+            AV_SAMPLE_FMT_NONE on error.
+ */
+enum AVSampleFormat av_get_packed_sample_fmt(enum AVSampleFormat sample_fmt);
+
+/**
+ * Get the planar alternative form of the given sample format.
+ *
+ * If the passed sample_fmt is already in planar format, the format returned is
+ * the same as the input.
+ *
+ * @return  the planar alternative form of the given sample format or
+            AV_SAMPLE_FMT_NONE on error.
+ */
+enum AVSampleFormat av_get_planar_sample_fmt(enum AVSampleFormat sample_fmt);
 
 /**
  * Generate a string corresponding to the sample format with
@@ -107,6 +148,7 @@ int av_sample_fmt_is_planar(enum AVSampleFormat sample_fmt);
  * @param nb_channels   the number of channels
  * @param nb_samples    the number of samples in a single channel
  * @param sample_fmt    the sample format
+ * @param align         buffer size alignment (0 = default, 1 = no alignment)
  * @return              required buffer size, or negative error code on failure
  */
 int av_samples_get_buffer_size(int *linesize, int nb_channels, int nb_samples,
@@ -124,16 +166,20 @@ int av_samples_get_buffer_size(int *linesize, int nb_channels, int nb_samples,
  * buffer for planar layout, or the aligned size of the buffer for all channels
  * for packed layout.
  *
+ * @see enum AVSampleFormat
+ * The documentation for AVSampleFormat describes the data layout.
+ *
  * @param[out] audio_data  array to be filled with the pointer for each channel
- * @param[out] linesize    calculated linesize
+ * @param[out] linesize    calculated linesize, may be NULL
  * @param buf              the pointer to a buffer containing the samples
  * @param nb_channels      the number of channels
  * @param nb_samples       the number of samples in a single channel
  * @param sample_fmt       the sample format
- * @param align            buffer size alignment (1 = no alignment required)
+ * @param align            buffer size alignment (0 = default, 1 = no alignment)
  * @return                 0 on success or a negative error code on failure
  */
-int av_samples_fill_arrays(uint8_t **audio_data, int *linesize, uint8_t *buf,
+int av_samples_fill_arrays(uint8_t **audio_data, int *linesize,
+                           const uint8_t *buf,
                            int nb_channels, int nb_samples,
                            enum AVSampleFormat sample_fmt, int align);
 
@@ -142,15 +188,45 @@ int av_samples_fill_arrays(uint8_t **audio_data, int *linesize, uint8_t *buf,
  * linesize accordingly.
  * The allocated samples buffer can be freed by using av_freep(&audio_data[0])
  *
+ * @see enum AVSampleFormat
+ * The documentation for AVSampleFormat describes the data layout.
+ *
  * @param[out] audio_data  array to be filled with the pointer for each channel
- * @param[out] linesize    aligned size for audio buffer(s)
+ * @param[out] linesize    aligned size for audio buffer(s), may be NULL
  * @param nb_channels      number of audio channels
  * @param nb_samples       number of samples per channel
- * @param align            buffer size alignment (1 = no alignment required)
+ * @param align            buffer size alignment (0 = default, 1 = no alignment)
  * @return                 0 on success or a negative error code on failure
  * @see av_samples_fill_arrays()
  */
 int av_samples_alloc(uint8_t **audio_data, int *linesize, int nb_channels,
                      int nb_samples, enum AVSampleFormat sample_fmt, int align);
+
+/**
+ * Copy samples from src to dst.
+ *
+ * @param dst destination array of pointers to data planes
+ * @param src source array of pointers to data planes
+ * @param dst_offset offset in samples at which the data will be written to dst
+ * @param src_offset offset in samples at which the data will be read from src
+ * @param nb_samples number of samples to be copied
+ * @param nb_channels number of audio channels
+ * @param sample_fmt audio sample format
+ */
+int av_samples_copy(uint8_t **dst, uint8_t * const *src, int dst_offset,
+                    int src_offset, int nb_samples, int nb_channels,
+                    enum AVSampleFormat sample_fmt);
+
+/**
+ * Fill an audio buffer with silence.
+ *
+ * @param audio_data  array of pointers to data planes
+ * @param offset      offset in samples at which to start filling
+ * @param nb_samples  number of samples to fill
+ * @param nb_channels number of audio channels
+ * @param sample_fmt  audio sample format
+ */
+int av_samples_set_silence(uint8_t **audio_data, int offset, int nb_samples,
+                           int nb_channels, enum AVSampleFormat sample_fmt);
 
 #endif /* AVUTIL_SAMPLEFMT_H */
