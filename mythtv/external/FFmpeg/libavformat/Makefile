@@ -18,6 +18,7 @@ OBJS = allformats.o         \
        sdp.o                \
        seek.o               \
        utils.o              \
+       utils-myth.o         \
 
 OBJS-$(CONFIG_NETWORK)                   += network.o
 

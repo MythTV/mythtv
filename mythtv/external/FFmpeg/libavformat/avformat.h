@@ -1102,7 +1102,6 @@ typedef struct AVPacketList {
     struct AVPacketList *next;
 } AVPacketList;
 
-#define MAX_STREAMS 100
 
 /**
  * @defgroup lavf_core Core functions
@@ -1563,10 +1562,6 @@ void av_set_pts_info(AVStream *s, int pts_wrap_bits,
                      unsigned int pts_num, unsigned int pts_den);
 #endif
 
-void av_estimate_timings(AVFormatContext *ic, int64_t old_offset);
-AVStream *av_add_stream(AVFormatContext *s, AVStream *st, int id);
-void av_remove_stream(AVFormatContext *s, int id, int remove_ts);
-
 #define AVSEEK_FLAG_BACKWARD 1 ///< seek backward
 #define AVSEEK_FLAG_BYTE     2 ///< seeking based on position in bytes
 #define AVSEEK_FLAG_ANY      4 ///< seek to any frame, even non-keyframes
@@ -1923,6 +1918,17 @@ const struct AVCodecTag *avformat_get_riff_audio_tags(void);
 /**
  * @}
  */
+
+/* MythTV changes */
+
+#define MAX_STREAMS 100
+
+void estimate_timings(AVFormatContext *ic, int64_t old_offset);
+void av_estimate_timings(AVFormatContext *ic, int64_t old_offset);
+AVStream *av_add_stream(AVFormatContext *s, AVStream *st, int id);
+void av_remove_stream(AVFormatContext *s, int id, int remove_ts);
+void flush_packet_queue(AVFormatContext *s);
+/* End MythTV changes */
 
 /**
  * @}
