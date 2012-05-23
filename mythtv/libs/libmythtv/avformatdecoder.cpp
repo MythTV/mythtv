@@ -3619,7 +3619,7 @@ QString AvFormatDecoder::GetTrackDesc(uint type, uint trackNo) const
 
         return QObject::tr("Subtitle") + QString(" %1: %2%3")
             .arg(trackNo + 1).arg(iso639_key_toName(lang_key))
-            .arg(forced ? " (forced)" : "");
+            .arg(forced ? QObject::tr(" (forced)") : "");
     }
     else
     {
