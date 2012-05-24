@@ -15,6 +15,8 @@
 #endif
 #include "H264Parser.h"
 
+#include "mythcorecontext.h"
+
 extern "C" {
 #include "libavformat/avformat.h"
 }
@@ -401,7 +403,7 @@ bool PrivateDecoderVDA::Init(const QString &decoder,
     {
         m_max_ref_frames = avctx->refs;
     }
-    if (interlaced)
+    if (interlaced && !gCoreContext->GetNumSetting("AllowVDAInterlace", false))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Possible interlaced content. Aborting");
         CFRelease(avc_cdata);
