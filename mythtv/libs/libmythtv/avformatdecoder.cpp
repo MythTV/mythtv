@@ -2180,7 +2180,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
     if (ringBuffer)
     {
         ringBuffer->SetBufferSizeFactors(unknownbitrate,
-                            QString(ic->iformat->name).contains("matroska"));
+                        ic && QString(ic->iformat->name).contains("matroska"));
     }
 
     PostProcessTracks();
