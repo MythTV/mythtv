@@ -1821,7 +1821,7 @@ void MainServer::HandleQueryRecording(QStringList &slist, PlaybackSock *pbs)
 
     QStringList strlist;
 
-    if (pginfo->GetChanID())
+    if (pginfo && pginfo->GetChanID())
     {
         strlist << "OK";
         pginfo->ToStringList(strlist);
