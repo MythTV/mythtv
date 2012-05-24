@@ -111,9 +111,8 @@ QString ProfileGroup::getName(int group)
                             .arg(group);
     result.prepare(querystr);
 
-    if (result.exec() && result.isActive() && result.size() > 0)
+    if (result.exec() && result.next())
     {
-        result.next();
         return result.value(0).toString();
     }
 
@@ -128,7 +127,7 @@ bool ProfileGroup::allowedGroupName(void)
                             .arg(getName()).arg(host->getValue());
     result.prepare(querystr);
 
-    if (result.exec() && result.isActive() && result.size() > 0)
+    if (result.exec() && result.next())
         return false;
     return true;
 }
@@ -285,9 +284,8 @@ void ProfileGroupEditor::callDelete(void)
                             "id = %1 AND is_default = 0;").arg(id);
     result.prepare(querystr);
 
-    if (result.exec() && result.isActive() && result.size() > 0)
+    if (result.exec() && result.next())
     {
-        result.next();
         QString message = QObject::tr("Delete profile group:") +
                           QString("\n'%1'?").arg(ProfileGroup::getName(id));
 
