@@ -1,11 +1,4 @@
 <Configuration>
-  <UPnP>
-    <MythFrontend>
-      <DefaultBackend>
-        <DBHostPing>no</DBHostPing>
-      </DefaultBackend>
-    </MythFrontend>
-  </UPnP>
   <LocalHostName>my-unique-identifier-goes-here</LocalHostName>
   <Database>
     <PingHost>1</PingHost>
