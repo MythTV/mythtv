@@ -537,10 +537,10 @@ bool Dvr::RemoveRecordSchedule ( uint nRecordId )
     if (nRecordId <= 0 )
         throw( QString("Record ID appears invalid."));
 
-    RecordingRule *pRule = new RecordingRule();
-    pRule->m_recordID = nRecordId;
+    RecordingRule pRule;
+    pRule.m_recordID = nRecordId;
 
-    bResult = pRule->Delete();
+    bResult = pRule.Delete();
 
     return bResult;
 }
@@ -598,6 +598,7 @@ DTC::RecRule* Dvr::GetRecordSchedule( uint nRecordId )
 
     DTC::RecRule *pRecRule = new DTC::RecRule();
     FillRecRuleInfo( pRecRule, pRule );
+    delete pRule;
 
     return pRecRule;
 }
@@ -609,14 +610,14 @@ bool Dvr::EnableRecordSchedule ( uint nRecordId )
     if (nRecordId <= 0 )
         throw( QString("Record ID appears invalid."));
 
-    RecordingRule *pRule = new RecordingRule();
-    pRule->m_recordID = nRecordId;
-    pRule->Load();
+    RecordingRule pRule;
+    pRule.m_recordID = nRecordId;
+    pRule.Load();
 
-    if (pRule->IsLoaded())
+    if (pRule.IsLoaded())
     {
-        pRule->m_isInactive = false;
-        pRule->Save();
+        pRule.m_isInactive = false;
+        pRule.Save();
         bResult = true;
     }
 
@@ -630,14 +631,14 @@ bool Dvr::DisableRecordSchedule( uint nRecordId )
     if (nRecordId <= 0 )
         throw( QString("Record ID appears invalid."));
 
-    RecordingRule *pRule = new RecordingRule();
-    pRule->m_recordID = nRecordId;
-    pRule->Load();
+    RecordingRule pRule;
+    pRule.m_recordID = nRecordId;
+    pRule.Load();
 
-    if (pRule->IsLoaded())
+    if (pRule.IsLoaded())
     {
-        pRule->m_isInactive = true;
-        pRule->Save();
+        pRule.m_isInactive = true;
+        pRule.Save();
         bResult = true;
     }
 
