@@ -74,9 +74,8 @@ QString FileServerHandler::LocalFilePath(const QUrl &url,
         query.prepare("SELECT icon FROM channel WHERE icon LIKE :FILENAME ;");
         query.bindValue(":FILENAME", QString("%/") + file);
 
-        if (query.exec() && query.isActive() && query.size())
+        if (query.exec() && query.next())
         {
-            query.next();
             lpath = query.value(0).toString();
         }
         else

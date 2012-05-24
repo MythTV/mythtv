@@ -194,9 +194,8 @@ bool Metadata::isInDatabase()
     query.bindValue(":FILENAME", sqlfilename);
     query.bindValue(":DIRECTORY", sqldir);
 
-    if (query.exec() && query.isActive() && query.size() > 0)
+    if (query.exec() && query.next())
     {
-        query.next();
 
         m_artist = query.value(0).toString();
         m_compilation_artist = query.value(1).toString();

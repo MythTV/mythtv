@@ -896,7 +896,6 @@ void SmartPlaylistEditor::loadFromDatabase(QString category, QString name)
 
     // load smartplaylist items
     SmartPLCriteriaRow *row;
-    uint rowCount;
 
     query.prepare("SELECT field, operator, value1, value2 "
                   "FROM music_smartplaylist_items WHERE smartplaylistid = :ID "
@@ -905,12 +904,9 @@ void SmartPlaylistEditor::loadFromDatabase(QString category, QString name)
     if (!query.exec())
         MythDB::DBError("Load smartplaylist items", query);
 
-    if (query.isActive() && query.size() > 0)
+    if (query.size() > 0)
     {
-        rowCount = query.size();
-
-        query.first();
-        for (uint x = 0; x < rowCount; x++)
+        while (query.next())
         {
             QString Field = query.value(0).toString();
             QString Operator = query.value(1).toString();
@@ -920,8 +916,6 @@ void SmartPlaylistEditor::loadFromDatabase(QString category, QString name)
             m_criteriaRows.append(row);
 
             new MythUIButtonListItem(m_criteriaList, row->toString(), qVariantFromValue(row));
-
-            query.next();
         }
     }
     else

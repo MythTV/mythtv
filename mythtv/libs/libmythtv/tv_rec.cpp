@@ -2085,13 +2085,12 @@ bool TVRec::ShouldSwitchToAnotherCard(QString chanid)
                   "FROM channel "
                   "WHERE channel.chanid = :CHANID");
     query.bindValue(":CHANID", chanid);
-    if (!query.exec() || !query.isActive() || query.size() == 0)
+    if (!query.exec() || !query.next())
     {
         MythDB::DBError("ShouldSwitchToAnotherCard", query);
         return false;
     }
 
-    query.next();
     QString channelname = query.value(0).toString();
     QString callsign = query.value(1).toString();
 
