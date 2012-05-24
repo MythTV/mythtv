@@ -981,7 +981,7 @@ void PlaybackBox::ItemVisible(MythUIButtonListItem *item)
     item->DisplayState(extract_commflag_state(*pginfo), "commflagged");
 
     MythUIButtonListItem *sel_item = item->parent()->GetItemCurrent();
-    if ((item != sel_item) && pginfo && item->GetImage("preview").isEmpty() &&
+    if ((item != sel_item) && item->GetImage("preview").isEmpty() &&
         (asAvailable == pginfo->GetAvailableStatus()))
     {
         QString token = m_helper.GetPreviewImage(*pginfo, true);
