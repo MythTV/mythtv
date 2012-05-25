@@ -4,6 +4,8 @@
  *  Distributed as part of MythTV under GPL v2 and later.
  */
 
+#include <algorithm>
+
 #include "iptvfeederlive.h"
 
 // MythTV headers
