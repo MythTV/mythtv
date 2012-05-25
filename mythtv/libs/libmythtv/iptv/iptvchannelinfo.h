@@ -8,6 +8,7 @@
 
 #include <QString>
 #include <QMap>
+#include "mythlogging.h"
 
 class IPTVChannelInfo
 {
@@ -20,11 +21,19 @@ class IPTVChannelInfo
     IPTVChannelInfo(const QString &name,
                     const QString &url,
                     const QString &xmltvid) :
-        m_name(name), m_url(url), m_xmltvid(xmltvid) {}
+        m_name(name), m_url(url), m_xmltvid(xmltvid)
+    {
+    }
 
     bool isValid(void) const
     {
         return !m_name.isEmpty() && !m_url.isEmpty();
+    }
+    
+    QString toString(void) const
+    {
+        return QString("IPTVChannelInfo: Name(%1) Url(%2) xmltvid(%3")
+        .arg(m_name).arg(m_url).arg(m_xmltvid);
     }
 
   public:

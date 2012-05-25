@@ -73,7 +73,7 @@ class DTVSignalMonitor : public SignalMonitor,
     /// Returns the scan stream data if it exists
     const ScanStreamData *GetScanStreamData() const;
 
-    bool IsAllGood(void) const;
+    virtual bool IsAllGood(void) const;
 
     // MPEG
     void HandlePAT(const ProgramAssociationTable*);

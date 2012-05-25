@@ -52,6 +52,7 @@ IPTVSignalMonitor::IPTVSignalMonitor(int db_cardnum,
     QMutexLocker locker(&statusLock);
     signalLock.SetValue((isLocked) ? 1 : 0);
     signalStrength.SetValue((isLocked) ? 100 : 0);
+    m_gotlock = false;
 }
 
 /** \fn IPTVSignalMonitor::~IPTVSignalMonitor()
@@ -61,6 +62,11 @@ IPTVSignalMonitor::~IPTVSignalMonitor()
 {
     GetChannel()->GetFeeder()->RemoveListener(this);
     Stop();
+    if (!m_gotlock)
+    {
+        DBG_SM("~IPTVSignalMonitor", "Didn't get a lock earlier, closing feed");
+        GetChannel()->GetFeeder()->Close();
+    }
 }
 
 IPTVChannel *IPTVSignalMonitor::GetChannel(void)
@@ -111,6 +117,19 @@ void IPTVSignalMonitor::AddData(
 {
     GetStreamData()->ProcessData((unsigned char*)data, dataSize);
 }
+
+bool IPTVSignalMonitor::IsAllGood(void) const
+{
+    QMutexLocker locker(&statusLock);
+
+    bool ret = DTVSignalMonitor::IsAllGood();
+    if (ret)
+    {
+        m_gotlock = true;
+    }
+    return ret;
+}
+
 
 /** \fn IPTVSignalMonitor::UpdateValues(void)
  *  \brief Fills in frontend stats and emits status Qt signals.

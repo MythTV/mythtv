@@ -29,6 +29,8 @@ class IPTVSignalMonitor : public DTVSignalMonitor, public TSDataListener
     virtual ~IPTVSignalMonitor();
 
     void Stop(void);
+    bool HasExtraSlowTuning(void) const { return true; }
+    bool IsAllGood(void) const;
 
     // implements TSDataListener
     void AddData(const unsigned char *data, unsigned int dataSize);
@@ -46,6 +48,9 @@ class IPTVSignalMonitor : public DTVSignalMonitor, public TSDataListener
   protected:
     volatile bool dtvMonitorRunning;
     IPTVTableMonitorThread *tableMonitorThread;
+
+  private:
+    mutable bool m_gotlock;
 };
 
 #endif // _IPTVSIGNALMONITOR_H_
