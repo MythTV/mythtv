@@ -99,7 +99,7 @@ void DecoderBase::SeekReset(long long, uint, bool, bool)
     readAdjust = 0;
 }
 
-void DecoderBase::setWatchingRecording(bool mode)
+void DecoderBase::SetWatchingRecording(bool mode)
 {
     bool wereWatchingRecording = watchingrecording;
 
@@ -522,7 +522,7 @@ bool DecoderBase::DoRewind(long long desiredFrame, bool discardFrames)
 
     // Do any Extra frame-by-frame seeking for exactseeks mode
     // And flush pre-seek frame if we are allowed to and need to..
-    int normalframes = desiredFrame - (framesPlayed - 1) > seeksnap
+    int normalframes = (uint64_t)(desiredFrame - (framesPlayed - 1)) > seeksnap
         ? desiredFrame - framesPlayed : 0;
     normalframes = max(normalframes, 0);
     SeekReset(lastKey, normalframes, true, discardFrames);
@@ -736,7 +736,7 @@ bool DecoderBase::DoFastForward(long long desiredFrame, bool discardFrames)
 
     // Do any Extra frame-by-frame seeking for exactseeks mode
     // And flush pre-seek frame if we are allowed to and need to..
-    int normalframes = desiredFrame - (framesPlayed - 1) > seeksnap
+    int normalframes = (uint64_t)(desiredFrame - (framesPlayed - 1)) > seeksnap
         ? desiredFrame - framesPlayed : 0;
     normalframes = max(normalframes, 0);
     SeekReset(lastKey, normalframes, needflush, discardFrames);

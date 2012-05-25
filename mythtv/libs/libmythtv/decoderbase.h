@@ -113,9 +113,9 @@ class DecoderBase
     virtual void SetEof(bool eof)  { ateof = eof;  }
     bool         GetEof(void) const { return ateof; }
 
-    void setSeekSnap(uint64_t snap)  { seeksnap = snap; }
-    uint64_t getSeekSnap(void) const { return seeksnap;  }
-    void setLiveTVMode(bool live)  { livetv = live;      }
+    void SetSeekSnap(uint64_t snap)  { seeksnap = snap; }
+    uint64_t GetSeekSnap(void) const { return seeksnap;  }
+    void SetLiveTVMode(bool live)  { livetv = live;      }
 
     // Must be done while player is paused.
     void SetProgramInfo(const ProgramInfo &pginfo);
@@ -124,7 +124,7 @@ class DecoderBase
     /// Disables AC3/DTS pass through
     virtual void SetDisablePassThrough(bool disable) { (void)disable; }
 
-    virtual void setWatchingRecording(bool mode);
+    virtual void SetWatchingRecording(bool mode);
     /// Demux, preprocess and possibly decode a frame of video/audio.
     virtual bool GetFrame(DecodeType) = 0;
     MythPlayer *GetPlayer() { return m_parent; }
@@ -177,7 +177,7 @@ class DecoderBase
     virtual void SeekReset(long long newkey, uint skipFrames,
                            bool doFlush, bool discardFrames);
 
-    void setTranscoding(bool value) { transcoding = value; };
+    void SetTranscoding(bool value) { transcoding = value; };
 
     bool IsErrored() const { return errored; }
 

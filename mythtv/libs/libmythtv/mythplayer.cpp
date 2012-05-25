@@ -325,7 +325,7 @@ void MythPlayer::SetWatchingRecording(bool mode)
 {
     watchingrecording = mode;
     if (decoder)
-        decoder->setWatchingRecording(mode);
+        decoder->SetWatchingRecording(mode);
 }
 
 bool MythPlayer::IsWatchingInprogress(void) const
@@ -965,10 +965,10 @@ int MythPlayer::OpenFile(uint retries)
         return -1;
     }
 
-    decoder->setSeekSnap(0);
-    decoder->setLiveTVMode(livetv);
-    decoder->setWatchingRecording(watchingrecording);
-    decoder->setTranscoding(transcoding);
+    decoder->SetSeekSnap(0);
+    decoder->SetLiveTVMode(livetv);
+    decoder->SetWatchingRecording(watchingrecording);
+    decoder->SetTranscoding(transcoding);
     CheckExtraAudioDecode();
 
     // Set 'no_video_decode' to true for audio only decodeing
@@ -3209,7 +3209,7 @@ void MythPlayer::SetTranscoding(bool value)
     transcoding = value;
 
     if (decoder)
-        decoder->setTranscoding(value);
+        decoder->SetTranscoding(value);
 }
 
 bool MythPlayer::AddPIPPlayer(MythPlayer *pip, PIPLocation loc, uint timeout)
@@ -3671,7 +3671,7 @@ void MythPlayer::WaitForSeek(uint64_t frame, uint64_t seeksnap_wanted)
     if (!decoder)
         return;
 
-    decoder->setSeekSnap(seeksnap_wanted);
+    decoder->SetSeekSnap(seeksnap_wanted);
 
     bool islivetvcur = (livetv && player_ctx->tvchain &&
                         !player_ctx->tvchain->HasNext());
@@ -4418,7 +4418,7 @@ void MythPlayer::InitForTranscode(bool copyaudio, bool copyvideo)
 
     if (decoder)
     {
-        decoder->setSeekSnap(0);
+        decoder->SetSeekSnap(0);
         decoder->SetLowBuffers(true);
     }
 }
