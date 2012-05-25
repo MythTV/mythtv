@@ -1967,7 +1967,9 @@ bool TVRec::SetupSignalMonitor(bool tablemon, bool EITscan, bool notify)
         }
 
         signalMonitor->AddListener(this);
-        signalMonitor->SetUpdateRate(kSignalMonitoringRate);
+        signalMonitor->SetUpdateRate(signalMonitor->HasExtraSlowTuning() ?
+                                     kSignalMonitoringRate * 5 :
+                                     kSignalMonitoringRate);
         signalMonitor->SetNotifyFrontend(notify);
 
         // Start the monitoring thread
