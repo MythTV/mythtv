@@ -144,7 +144,7 @@ class DecoderBase
     virtual bool IsCodecMPEG(void) const { return false; }
     virtual void WriteStoredData(RingBuffer *rb, bool storevid,
                                  long timecodeOffset) = 0;
-    virtual void ClearStoredData(void) { return; };
+    virtual void ClearStoredData(void) { return; }
     virtual void SetRawAudioState(bool state) { getrawframes = state; }
     virtual bool GetRawAudioState(void) const { return getrawframes; }
     virtual void SetRawVideoState(bool state) { getrawvideo = state; }
@@ -157,8 +157,8 @@ class DecoderBase
     uint GetRawBitrate(void) const { return bitrate; }
 
     virtual void UpdateFramesPlayed(void);
-    long long GetFramesRead(void) const { return framesRead; };
-    long long GetFramesPlayed(void) const { return framesPlayed; };
+    long long GetFramesRead(void) const { return framesRead; }
+    long long GetFramesPlayed(void) const { return framesPlayed; }
 
     virtual QString GetCodecDecoderName(void) const = 0;
     virtual QString GetRawEncodingType(void) { return QString(); }
@@ -177,7 +177,7 @@ class DecoderBase
     virtual void SeekReset(long long newkey, uint skipFrames,
                            bool doFlush, bool discardFrames);
 
-    void SetTranscoding(bool value) { transcoding = value; };
+    void SetTranscoding(bool value) { transcoding = value; }
 
     bool IsErrored() const { return errored; }
 
