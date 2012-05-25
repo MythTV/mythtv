@@ -628,8 +628,7 @@ void MythPlayer::ReinitVideo(void)
 
     if (textDisplayMode)
     {
-        DisableCaptions(textDisplayMode, false);
-        SetCaptionsEnabled(true, false);
+        EnableSubtitles(true);
     }
 }
 
