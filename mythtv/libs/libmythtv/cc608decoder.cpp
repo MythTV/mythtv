@@ -22,6 +22,7 @@ CC608Decoder::CC608Decoder(CC608Input *ccr)
       rbuf(new unsigned char[sizeof(ccsubtitle)+255]),
       vps_l(0),
       wss_flags(0),                 wss_valid(false),
+      xds_cur_service(-1),
       xds_crc_passed(0),            xds_crc_failed(0),
       xds_lock(QMutex::Recursive),
       xds_net_call(QString::null),  xds_net_name(QString::null),
@@ -196,7 +197,8 @@ void CC608Decoder::FormatCCField(int tc, int field, int data)
            goto skip;
     }
 
-    XDSDecode(field, b1, b2);
+    if (XDSDecode(field, b1, b2))
+        return;
 
     if (b1 & 0x60)
         // 0x20 <= b1 <= 0x7F
@@ -991,9 +993,10 @@ QString CC608Decoder::XDSDecodeString(const vector<unsigned char> &buf,
     for (uint i = start; (i < buf.size()) && (i < end); i++)
     {
         LOG(VB_VBI, LOG_INFO, QString("%1: 0x%2 -> 0x%3 %4")
-                .arg(i,2).arg(buf[i],2,16)
-                .arg(CharCC(buf[i]),2,16)
-                .arg(CharCC(buf[i])));
+            .arg(i,2)
+            .arg(buf[i],2,16,QChar('0'))
+            .arg(CharCC(buf[i]).unicode(),2,16,QChar('0'))
+            .arg(CharCC(buf[i])));
     }
 #endif // DEBUG_XDS
 
@@ -1152,33 +1155,87 @@ QString CC608Decoder::GetXDS(const QString &key) const
     return QString::null;
 }
 
-void CC608Decoder::XDSDecode(int /*field*/, int b1, int b2)
+static int b1_to_service[16] =
+{ -1, // 0x0
+  0, 0, //0x1,0x2 -- Current
+  1, 1, //0x3,0x4 -- Future
+  2, 2, //0x5,0x6 -- Channel
+  3, 3, //0x7,0x8 -- Misc
+  4, 4, //0x9,0xA -- Public Service
+  5, 5, //0xB,0xC -- Reserved
+  6, 6, //0xD,0xE -- Private Data
+  -1, // 0xF
+};
+
+bool CC608Decoder::XDSDecode(int field, int b1, int b2)
 {
+    if (field == 0)
+        return false; // XDS is only on second field
+
 #if DEBUG_XDS
     LOG(VB_VBI, LOG_INFO,
-        QString("XDSDecode: 0x%1 0x%2 (cp 0x%3) '%4%5' xds[%6]=%7")
-            .arg(b1,2,16).arg(b2,2,16).arg(xds_current_packet,0,16)
-            .arg(((int)CharCC(b1)>0x20) ? CharCC(b1) : QChar(' '))
-            .arg(((int)CharCC(b2)>0x20) ? CharCC(b2) : QChar(' '))
-            .arg(field).arg(xds[field]));
+        QString("XDSDecode: 0x%1 0x%2 '%3%4' xds[%5]=%6 in XDS %7")
+        .arg(b1,2,16,QChar('0')).arg(b2,2,16,QChar('0'))
+        .arg((CharCC(b1).unicode()>0x20) ? CharCC(b1) : QChar(' '))
+        .arg((CharCC(b2).unicode()>0x20) ? CharCC(b2) : QChar(' '))
+        .arg(field).arg(xds[field])
+        .arg(xds_cur_service));
+#else
+    (void) field;
 #endif // DEBUG_XDS
 
-    if (xds_buf.empty() && (b1 > 0x0f))
-        return; // waiting for start of XDS
-
-    // Supports non-interleaved XDS packet continuation by ignoring cont.
-    if ((b1 < 0x0f) && (b1 > 0x0f))
-        return;
-
-    xds_buf.push_back(b1);
-    xds_buf.push_back(b2);
-
-    if (b1 == 0x0f)
+    if (xds_cur_service < 0)
     {
-        if (XDSPacketCRC(xds_buf))
-            XDSPacketParse(xds_buf);
-        xds_buf.clear();
+        if (b1 > 0x0f)
+            return false;
+
+        xds_cur_service = b1_to_service[b1];
+
+        if (xds_cur_service < 0)
+            return false;
+
+        if (b1 & 1)
+        {
+            xds_buf[xds_cur_service].clear(); // if start of service clear buffer
+#if DEBUG_XDS
+            LOG(VB_VBI, LOG_INFO, QString("XDSDecode: Starting XDS %1").arg(xds_cur_service));
+#endif // DEBUG_XDS
+        }
     }
+    else if ((0x0 < b1) && (b1 < 0x0f))
+    { // switch to different service
+        xds_cur_service = b1_to_service[b1];
+#if DEBUG_XDS
+        LOG(VB_VBI, LOG_INFO, QString("XDSDecode: Resuming XDS %1").arg(xds_cur_service));
+#endif // DEBUG_XDS
+    }
+
+    if (xds_cur_service < 0)
+        return false;
+
+    xds_buf[xds_cur_service].push_back(b1);
+    xds_buf[xds_cur_service].push_back(b2);
+
+    if (b1 == 0x0f) // end of packet
+    {
+#if DEBUG_XDS
+        LOG(VB_VBI, LOG_INFO, QString("XDSDecode: Ending XDS %1").arg(xds_cur_service));
+#endif // DEBUG_XDS
+        if (XDSPacketCRC(xds_buf[xds_cur_service]))
+            XDSPacketParse(xds_buf[xds_cur_service]);
+        xds_buf[xds_cur_service].clear();
+        xds_cur_service = -1;
+    }
+    else if ((0x10 <= b1) && (b1 <= 0x1f)) // suspension of XDS packet
+    {
+#if DEBUG_XDS
+        LOG(VB_VBI, LOG_INFO, QString("XDSDecode: Suspending XDS %1 on 0x%2")
+            .arg(xds_cur_service).arg(b1,2,16,QChar('0')));
+#endif // DEBUG_XDS
+        xds_cur_service = -1;
+    }
+
+    return true;
 }
 
 void CC608Decoder::XDSPacketParse(const vector<unsigned char> &xds_buf)
@@ -1226,7 +1283,7 @@ bool CC608Decoder::XDSPacketCRC(const vector<unsigned char> &xds_buf)
     {
         xds_crc_failed++;
 
-        LOG(VB_VBI, LOG_ERR, QString("XDS: failed CRC %1/%2")
+        LOG(VB_VBI, LOG_ERR, QString("XDS: failed CRC %1 of %2")
                 .arg(xds_crc_failed).arg(xds_crc_failed + xds_crc_passed));
 
         return false;
