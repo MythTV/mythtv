@@ -883,7 +883,8 @@ static int FlagCommercials(ProgramInfo *program_info, int jobid,
 
     PlayerFlags flags = (PlayerFlags)(kAudioMuted   |
                                       kVideoIsNull  |
-                                      kDecodeLowRes |
+                                      /* Disabled due to libav bug 297 */
+                                      /* kDecodeLowRes | */
                                       kDecodeSingleThreaded |
                                       kDecodeNoLoopFilter);
     /* blank detector needs to be only sample center for this optimization. */

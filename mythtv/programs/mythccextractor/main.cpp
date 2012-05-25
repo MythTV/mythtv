@@ -75,7 +75,9 @@ static int RunCCExtract(const ProgramInfo &program_info)
 
     PlayerFlags flags = (PlayerFlags)(kVideoIsNull | kAudioMuted  |
                                       kDecodeNoLoopFilter | kDecodeFewBlocks |
-                                      kDecodeLowRes | kDecodeSingleThreaded |
+                                      /* Disabled due to libav bug 297 */
+                                      /* kDecodeLowRes | */
+                                      kDecodeSingleThreaded |
                                       kDecodeNoDecode);
     MythCCExtractorPlayer *ccp = new MythCCExtractorPlayer(flags, true, filename);
     PlayerContext *ctx = new PlayerContext(kCCExtractorInUseID);
