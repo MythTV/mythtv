@@ -684,8 +684,10 @@ QString CC608Decoder::ToASCII(const QString &cc608str, bool suppress_unknown)
                     if (!suppress_unknown)
                         ret += QString("[%1]").arg(cpu - 0x7000, 2, 16);
                 }
-                else
+                else if (cpu >= 0x20 && cpu <= 0x80)
                     ret += QString(cp.toLatin1());
+                if (!suppress_unknown)
+                    ret += QString("[%1]").arg(cpu - 0x7000, 2, 16);
         }
     }
 
