@@ -78,7 +78,7 @@ void MythCDROM::onDeviceMounted()
         m_MediaType = MEDIATYPE_DVD;
         m_Status = MEDIASTAT_USEABLE; 
     }
-    if (bd.exists())
+    else if (bd.exists())
     {
         LOG(VB_MEDIA, LOG_INFO, "Probable Blu-ray detected.");
         m_MediaType = MEDIATYPE_BD;
@@ -97,8 +97,10 @@ void MythCDROM::onDeviceMounted()
         m_Status = MEDIASTAT_USEABLE; 
     }
     else if (bad_dvd.exists())
+    {
         LOG(VB_GENERAL, LOG_ERR, 
             "DVD incorrectly mounted? (ISO9660 instead of UDF)");
+    }
     else
     {
         LOG(VB_GENERAL, LOG_ERR,
@@ -118,8 +120,7 @@ void MythCDROM::onDeviceMounted()
     if (m_AllowEject)
     {
         unlock();
-        if (m_MediaType == MEDIATYPE_DVD || m_MediaType == MEDIATYPE_VCD ||
-            m_MediaType == MEDIATYPE_BD)
+        if (m_MediaType == MEDIATYPE_DVD || m_MediaType == MEDIATYPE_VCD)
             unmount();
     }
 }
