@@ -130,6 +130,7 @@ class VideoPerformanceTest
             jitter->RecordCycleTime();
         }
         LOG(VB_GENERAL, LOG_INFO, "-----------------------------------");
+        delete jitter;
     }
 
   private:
