@@ -122,26 +122,41 @@ class AudioReencodeBuffer : public AudioOutput
     virtual bool AddData(void *buffer, int len, int64_t timecode, int frames)
     {
         unsigned char *buf = (unsigned char *)buffer;
+
+        // Test if target is using a fixed buffer size.
         if (m_audioFrameSize)
         {
             int index = 0;
+            int total_frames = 0;
 
+            // Target has a fixed buffer size, which may not match len.
+            // Redistribute the bytes into appropriately sized buffers.
             while (index < len)
             {
+                // See if we have some saved from last iteration in
+                // m_saveBuffer. If not create a new empty buffer.
                 if (!m_saveBuffer)
                     m_saveBuffer = new AudioBuffer();
 
+                // Use as many of the remaining frames as will fit in the space
+                // left in the buffer.
                 int part = min(len - index,
                                m_audioFrameSize - m_saveBuffer->m_buffer.size());
-                timecode += ((part / m_bytes_per_frame) /
-                             (m_eff_audiorate / 1000));
+                total_frames += part / m_bytes_per_frame;
+                timecode = total_frames * 1000 / m_eff_audiorate;
+                // Store frames in buffer, basing frame count on number of bytes,
+                // which works only for uncompressed data.
                 m_saveBuffer->appendData(&buf[index], part, part / m_bytes_per_frame,
                                          timecode);
 
+                // If we have filled the buffer...
                 if (m_saveBuffer->m_buffer.size() == m_audioFrameSize)
                 {
+                    // store the buffer
                     m_bufferList.append(m_saveBuffer);
+                    // mark m_saveBuffer as emtpy.
                     m_saveBuffer = NULL;
+                    // m_last_audiotime is updated iff we store a buffer.
                     m_last_audiotime = timecode;
                 }
 
@@ -150,8 +165,11 @@ class AudioReencodeBuffer : public AudioOutput
         }
         else
         {
+            // Target has no fixed buffer size. We can use a simpler algorithm
+            // and use 'frames' directly rather than 'len / m_bytes_per_frame',
+            // thus also covering the passthrough case.
             m_saveBuffer = new AudioBuffer();
-            timecode += (frames / (m_eff_audiorate / 1000));
+            timecode += frames * 1000 / m_eff_audiorate;
             m_saveBuffer->appendData(buf, len, frames, timecode);
 
             m_bufferList.append(m_saveBuffer);
