@@ -8,7 +8,7 @@ from static import *
 from exceptions import *
 from logging import MythLog
 from connections import FEConnection, XMLConnection, BEEventConnection
-from utility import databaseSearch, datetime, check_ipv6
+from utility import databaseSearch, datetime, check_ipv6, _donothing
 from database import DBCache, DBData
 from system import SystemEvent
 from mythproto import BECache, FileOps, Program, FreeSpace, EventLock
@@ -489,13 +489,11 @@ class Frontend( FEConnection ):
 
         def __init__(self, parent):
             self._parent = proxy(parent)
-            self._populated = False
             self._points = {}
 
         def _populate(self):
-            if not self._populated:
-                self._points = dict(self._parent.send('jump'))
-                self._populated = True
+            self._populate = _donothing
+            self._points = dict(self._parent.send('jump'))
 
         def __getitem__(self, key):
             self._populate()
@@ -505,6 +503,7 @@ class Frontend( FEConnection ):
                 return False
 
         def __getattr__(self, key):
+            self._populate()
             if key in self.__dict__:
                 return self.__dict__[key]
             return self.__getitem__(key)
@@ -534,13 +533,11 @@ class Frontend( FEConnection ):
 
         def __init__(self, parent):
             self._parent = proxy(parent)
-            self._populated = False
             self._keys = []
 
         def _populate(self):
-            if not self._populated:
-                self._keys = self._parent.send('key')
-                self._populated = True
+            self._populate = _donothing
+            self._keys = self._parent.send('key')
 
         def _sendLiteral(self, key):
             if (key in self._keys) or (key in self._alnum):
@@ -568,6 +565,7 @@ class Frontend( FEConnection ):
                 return False
 
         def __getattr__(self, key):
+            self._populate()
             if key in self.__dict__:
                 return self.__dict__[key]
             return self._sendLiteral(key)
