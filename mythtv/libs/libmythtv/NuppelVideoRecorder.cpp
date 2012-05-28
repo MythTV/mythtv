@@ -2972,6 +2972,8 @@ void NuppelVideoRecorder::WriteVideo(VideoFrame *frame, bool skipsync,
                     "WriteVideo : avcodec_encode_video() failed");
                 return;
             }
+
+            tmp = packet.size;
         }
     }
     else
