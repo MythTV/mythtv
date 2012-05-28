@@ -23,7 +23,7 @@ using namespace std;
 
 typedef struct RecPriorityInfo
 {
-    ChannelInfo *chan;
+	DBChannelInfo *chan;
     int cnt;
 } RecPriorityInfo;
 
@@ -32,9 +32,9 @@ class channelSort
     public:
         bool operator()(const RecPriorityInfo &a, const RecPriorityInfo &b)
         {
-            if (a.chan->chanstr.toInt() == b.chan->chanstr.toInt())
+            if (a.chan->channum.toInt() == b.chan->channum.toInt())
                 return(a.chan->sourceid > b.chan->sourceid);
-            return(a.chan->chanstr.toInt() > b.chan->chanstr.toInt());
+            return(a.chan->channum.toInt() > b.chan->channum.toInt());
         }
 };
 
@@ -44,7 +44,7 @@ class channelRecPrioritySort
         bool operator()(const RecPriorityInfo &a, const RecPriorityInfo &b)
         {
             if (a.chan->recpriority.toInt() == b.chan->recpriority.toInt())
-                return (a.chan->chanstr.toInt() > b.chan->chanstr.toInt());
+                return (a.chan->channum.toInt() > b.chan->channum.toInt());
             return (a.chan->recpriority.toInt() < b.chan->recpriority.toInt());
         }
 };
@@ -191,7 +191,7 @@ void ChannelRecPriority::changeRecPriority(int howMuch)
     if (!item)
         return;
 
-    ChannelInfo *chanInfo = qVariantValue<ChannelInfo *>(item->GetData());
+    DBChannelInfo *chanInfo = qVariantValue<DBChannelInfo *>(item->GetData());
 
     // inc/dec recording priority
     int tempRecPriority = chanInfo->recpriority.toInt() + howMuch;
@@ -225,11 +225,11 @@ void ChannelRecPriority::applyChannelRecPriorityChange(QString chanid,
 
 void ChannelRecPriority::saveRecPriority(void)
 {
-    QMap<QString, ChannelInfo>::Iterator it;
+    QMap<QString, DBChannelInfo>::Iterator it;
 
     for (it = m_channelData.begin(); it != m_channelData.end(); ++it)
     {
-        ChannelInfo *chanInfo = &(*it);
+    	DBChannelInfo *chanInfo = &(*it);
         QString key = QString::number(chanInfo->chanid);
 
         // if this channel's recording priority changed from when we entered
@@ -267,14 +267,14 @@ void ChannelRecPriority::FillList(void)
         int cnt = 999;
         while (result.next())
         {
-            ChannelInfo *chaninfo = new ChannelInfo;
+        	DBChannelInfo *chaninfo = new DBChannelInfo;
             chaninfo->chanid = result.value(0).toInt();
-            chaninfo->chanstr = result.value(1).toString();
+            chaninfo->channum = result.value(1).toString();
             chaninfo->sourceid = result.value(2).toInt();
             chaninfo->callsign = result.value(3).toString();
             chaninfo->iconpath = result.value(4).toString();
             chaninfo->recpriority = result.value(5).toString();
-            chaninfo->channame = result.value(6).toString();
+            chaninfo->name = result.value(6).toString();
             if (result.value(7).toInt() > 0)
                 m_visMap[chaninfo->chanid] = true;
             chaninfo->sourcename = srcMap[chaninfo->sourceid];
@@ -299,11 +299,11 @@ void ChannelRecPriority::updateList()
 {
     m_channelList->Reset();
 
-    QMap<QString, ChannelInfo*>::Iterator it;
+    QMap<QString, DBChannelInfo*>::Iterator it;
     MythUIButtonListItem *item;
     for (it = m_sortedChannel.begin(); it != m_sortedChannel.end(); ++it)
     {
-        ChannelInfo *chanInfo = *it;
+    	DBChannelInfo *chanInfo = *it;
 
         item = new MythUIButtonListItem(m_channelList, "",
                                                    qVariantFromValue(chanInfo));
@@ -312,7 +312,7 @@ void ChannelRecPriority::updateList()
         if (!m_visMap[chanInfo->chanid])
             fontState = "disabled";
 
-        item->SetText(chanInfo->GetFormatted(ChannelInfo::kChannelLong),
+        item->SetText(chanInfo->GetFormatted(DBChannelInfo::kChannelLong),
                                              fontState);
 
         InfoMap infomap;
@@ -347,15 +347,15 @@ void ChannelRecPriority::SortList()
 
     if (item)
     {
-        ChannelInfo *channelItem = qVariantValue<ChannelInfo *>(item->GetData());
+    	DBChannelInfo *channelItem = qVariantValue<DBChannelInfo *>(item->GetData());
         m_currentItem = channelItem;
     }
 
     int i, j;
     vector<RecPriorityInfo> sortingList;
-    QMap<QString, ChannelInfo>::iterator pit;
+    QMap<QString, DBChannelInfo>::iterator pit;
     vector<RecPriorityInfo>::iterator sit;
-    ChannelInfo *chanInfo;
+    DBChannelInfo *chanInfo;
     RecPriorityInfo *recPriorityInfo;
 
     // copy m_channelData into sortingList
@@ -401,7 +401,7 @@ void ChannelRecPriority::updateInfo(MythUIButtonListItem *item)
     if (!item)
         return;
 
-    ChannelInfo *channelItem = qVariantValue<ChannelInfo *>(item->GetData());
+    DBChannelInfo *channelItem = qVariantValue<DBChannelInfo *>(item->GetData());
     if (!m_channelData.isEmpty() && channelItem)
     {
         QString rectype;
@@ -416,7 +416,7 @@ void ChannelRecPriority::updateInfo(MythUIButtonListItem *item)
         SetTextFromMap(chanmap);
 
         if (m_chanstringText)
-            m_chanstringText->SetText(channelItem->GetFormatted(ChannelInfo::kChannelLong));
+            m_chanstringText->SetText(channelItem->GetFormatted(DBChannelInfo::kChannelLong));
     }
 
     MythUIText *norecordingText = dynamic_cast<MythUIText*>
@@ -433,7 +433,7 @@ void ChannelRecPriority::upcoming()
     if (!item)
         return;
 
-    ChannelInfo *chanInfo = qVariantValue<ChannelInfo *>(item->GetData());
+    DBChannelInfo *chanInfo = qVariantValue<DBChannelInfo *>(item->GetData());
 
     if (!chanInfo || chanInfo->chanid < 1)
         return;

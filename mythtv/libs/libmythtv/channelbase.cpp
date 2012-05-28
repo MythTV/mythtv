@@ -99,9 +99,9 @@ bool ChannelBase::Init(QString &inputname, QString &startchannel, bool setchan)
     QStringList::const_iterator it = start;
     while (it != inputs.end())
     {
-        DBChanList channels = GetChannels(*it);
+    	DBChanInfoList channels = GetChannels(*it);
 
-        DBChanList::const_iterator cit = channels.begin();
+    	DBChanInfoList::const_iterator cit = channels.begin();
         for (; cit != channels.end(); ++cit)
         {
             if ((*cit).channum == startchannel &&
@@ -126,7 +126,7 @@ bool ChannelBase::Init(QString &inputname, QString &startchannel, bool setchan)
     {
         uint mplexid_restriction = 0;
 
-        DBChanList channels = GetChannels(*it);
+        DBChanInfoList channels = GetChannels(*it);
         if (channels.size() &&
             IsInputAvailable(GetInputByName(*it), mplexid_restriction))
         {
@@ -134,7 +134,7 @@ bool ChannelBase::Init(QString &inputname, QString &startchannel, bool setchan)
                 channels, channels[0].chanid,
                 mplexid_restriction, CHANNEL_DIRECTION_UP);
 
-            DBChanList::const_iterator cit =
+            DBChanInfoList::const_iterator cit =
                 find(channels.begin(), channels.end(), chanid);
 
             if (chanid && cit != channels.end())
@@ -610,11 +610,11 @@ uint ChannelBase::GetInputCardID(int inputNum) const
     return 0;
 }
 
-DBChanList ChannelBase::GetChannels(int inputNum) const
+DBChanInfoList ChannelBase::GetChannels(int inputNum) const
 {
     int inputid = (inputNum > 0) ? inputNum : m_currentInputID;
 
-    DBChanList ret;
+    DBChanInfoList ret;
     InputMap::const_iterator it = m_inputs.find(inputid);
     if (it != m_inputs.end())
         ret = (*it)->channels;
@@ -622,7 +622,7 @@ DBChanList ChannelBase::GetChannels(int inputNum) const
     return ret;
 }
 
-DBChanList ChannelBase::GetChannels(const QString &inputname) const
+DBChanInfoList ChannelBase::GetChannels(const QString &inputname) const
 {
     int inputid = m_currentInputID;
     if (!inputname.isEmpty())
@@ -958,7 +958,7 @@ bool ChannelBase::InitializeInputs(void)
     while (query.next())
     {
         uint sourceid = query.value(5).toUInt();										//HERE IS WHERE A BLANKET SOURCEID IS BEING DETERMINED FOR THE CARD!!!!
-        DBChanList channels = ChannelUtil::GetChannels(sourceid, false);
+        DBChanInfoList channels = ChannelUtil::GetChannels(sourceid, false);
 
         ChannelUtil::SortChannels(channels, order);
 

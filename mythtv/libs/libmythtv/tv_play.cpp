@@ -1387,7 +1387,7 @@ void TV::UpdateChannelList(int groupID)
     if (groupID == channelGroupId)
         return;
 
-    DBChanList list;
+    DBChanInfoList list;
     if (groupID != -1)
     {
         list = ChannelUtil::GetChannels(
@@ -7245,7 +7245,7 @@ void TV::ChangeChannel(PlayerContext *ctx, uint chanid, const QString &chan)
         UpdateOSDInput(ctx);
 }
 
-void TV::ChangeChannel(const PlayerContext *ctx, const DBChanList &options)
+void TV::ChangeChannel(const PlayerContext *ctx, const DBChanInfoList &options)
 {
     for (uint i = 0; i < options.size(); i++)
     {
@@ -10229,11 +10229,11 @@ void TV::OSDDialogEvent(int result, QString text, QString action)
             if (actx->tvchain)
             {
                 QMutexLocker locker(&channelGroupLock);
-                const DBChanList &list = channelGroupChannelList;
+                const DBChanInfoList &list = channelGroupChannelList;
                 cur_channum = actx->tvchain->GetChannelName(-1);
                 new_channum = cur_channum;
 
-                DBChanList::const_iterator it = list.begin();
+                DBChanInfoList::const_iterator it = list.begin();
                 for (; it != list.end(); ++it)
                 {
                     if ((*it).channum == cur_channum)

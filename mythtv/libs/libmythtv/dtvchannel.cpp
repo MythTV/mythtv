@@ -229,41 +229,9 @@ bool DTVChannel::SetChannelByString(const QString &channum, QString maptypes)
     bool use_on_air_guide, visible;
     QString xmltvid, default_authority, icon;
 
-////////////////////////////////////////////////////
-////////////////////////////////////////////////////
-// Look up the sourcemap based on cardid and then pass the cardid on
-// to getchanneldata along with a map.types string. Done :-)
-//cardid is: 	(*it)->cardid
-//m_currentInputID, GetCurrentInputNum()
-//maptpyes is: 	maptypes
-MSqlQuery query(MSqlQuery::InitCon());
-QString querystr =
-    "SELECT channel.sourceid "
-    "FROM videosourcemap as map, channel "
-    "WHERE channel.sourceid = map.sourceid AND "
-    "      map.cardinputid = :CARDINPUTID  AND "
-    "      map.type in (MAPTYPES)      AND "
-    "      channum = :CHANNUM ";
-querystr.replace("MAPTYPES", maptypes);
-query.prepare(querystr);
-query.bindValue(":CARDINPUTID", GetCurrentInputNum());
-query.bindValue(":CHANNUM",  channum);
 
-if (!query.exec() || !query.isActive())
-{
-    MythDB::DBError("LincsGetMapData", query);
-    //return false;
-}
-else if (!query.next())
-{
-    LOG(VB_GENERAL, LOG_ERR,
-        QString("LINC.......... blah blah blah linc query.next failed\n\n\n\n\n\n\n\n"));
-    //return false;
-}
-
-int variablesrcid = query.value(0).toInt();
-////////////////////////////////////////////////////
-////////////////////////////////////////////////////
+int variablesrcid = 0;
+ChannelUtil::GetChannelSourceID(variablesrcid, channum, GetCurrentInputNum(), maptypes);
 
 
 

@@ -1841,7 +1841,7 @@ bool ChannelUtil::GetATSCChannel(uint sourceid, const QString &channum,
     return false;
 }
 
-bool ChannelUtil::GetChannelData(																	//TODO: MODIFIY THIS
+bool ChannelUtil::GetChannelData(
     uint    sourceid,         const QString &channum,
     QString &tvformat,        QString       &modulation,
     QString &freqtable,       QString       &freqid,
@@ -1915,11 +1915,11 @@ bool ChannelUtil::GetChannelData(																	//TODO: MODIFIY THIS
                            dvb_transportid, dvb_networkid, dtv_si_std);
 }
 
-DBChanList ChannelUtil::GetChannelsInternal(																	//TODO: MODIFIY THIS
+DBChanInfoList ChannelUtil::GetChannelsInternal(																	//TODO: MODIFIY THIS
     uint sourceid, bool vis_only, bool include_disconnected,
     const QString &grp, uint changrpid)
 {
-    DBChanList list;
+	DBChanInfoList list;
 
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -1973,7 +1973,7 @@ DBChanList ChannelUtil::GetChannelsInternal(																	//TODO: MODIFIY THI
         if (query.value(0).toString().isEmpty() || !query.value(2).toUInt())
             continue; // skip if channum blank, or chanid empty
 
-        DBChannel chan(
+        DBChannelInfo chan(
             query.value(0).toString(),                    /* channum    */
             query.value(1).toString(),                    /* callsign   */
             query.value(2).toUInt(),                      /* chanid     */
@@ -1991,6 +1991,36 @@ DBChanList ChannelUtil::GetChannelsInternal(																	//TODO: MODIFIY THI
     }
 
     return list;
+}
+
+bool ChannelUtil::GetChannelSourceID(uint sourceid, const QString channum, const uint cardinputid, QString maptypes)  //todo:finish
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    QString querystr =
+        "SELECT channel.sourceid "
+        "FROM videosourcemap as map, channel "
+        "WHERE channel.sourceid = map.sourceid AND "
+        "      map.cardinputid = :CARDINPUTID  AND "
+        "      map.type in (MAPTYPES)      AND "
+        "      channum = :CHANNUM ";
+    querystr.replace("MAPTYPES", maptypes);
+    query.prepare(querystr);
+    query.bindValue(":CARDINPUTID", cardinputid);
+    query.bindValue(":CHANNUM",  channum);
+
+    if (!query.exec() || !query.isActive())
+    {
+        MythDB::DBError("ChannelUtil::GetChannelSourceID", query);
+        return false;
+    }
+    else if (!query.next())
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("ChannelUtil::GetChannelSourceID failed because if could not\n "
+            "find a source map for channel number %1 on cardinputid %2").arg(channum).arg(cardinputid));
+    }
+
+    sourceid = query.value(0).toInt();
+    return true;
 }
 
 vector<uint> ChannelUtil::GetChanIDs(int sourceid)
@@ -2014,12 +2044,12 @@ vector<uint> ChannelUtil::GetChanIDs(int sourceid)
     return list;
 }
 
-inline bool lt_callsign(const DBChannel &a, const DBChannel &b)
+inline bool lt_callsign(const DBChannelInfo &a, const DBChannelInfo &b)
 {
     return QString::localeAwareCompare(a.callsign, b.callsign) < 0;
 }
 
-inline bool lt_smart(const DBChannel &a, const DBChannel &b)
+inline bool lt_smart(const DBChannelInfo &a, const DBChannelInfo &b)
 {
     static QMutex sepExprLock;
     static const QRegExp sepExpr(ChannelUtil::kATSCSeparators);
@@ -2127,7 +2157,7 @@ uint ChannelUtil::GetChannelCount(int sourceid)
     return query.size();
 }
 
-void ChannelUtil::SortChannels(DBChanList &list, const QString &order,
+void ChannelUtil::SortChannels(DBChanInfoList &list, const QString &order,
                                bool eliminate_duplicates)
 {
     bool cs = order.toLower() == "callsign";
@@ -2138,7 +2168,7 @@ void ChannelUtil::SortChannels(DBChanList &list, const QString &order,
 
     if (eliminate_duplicates && !list.empty())
     {
-        DBChanList tmp;
+    	DBChanInfoList tmp;
         tmp.push_back(list[0]);
         for (uint i = 1; i < list.size(); i++)
         {
@@ -2154,14 +2184,14 @@ void ChannelUtil::SortChannels(DBChanList &list, const QString &order,
 }
 
 uint ChannelUtil::GetNextChannel(
-    const DBChanList &sorted,
+    const DBChanInfoList &sorted,
     uint              old_chanid,
     uint              mplexid_restriction,
     int               direction,
     bool              skip_non_visible,
     bool              skip_same_channum_and_callsign)
 {
-    DBChanList::const_iterator it =
+	DBChanInfoList::const_iterator it =
         find(sorted.begin(), sorted.end(), old_chanid);
 
     if (it == sorted.end())
@@ -2170,7 +2200,7 @@ uint ChannelUtil::GetNextChannel(
     if (it == sorted.end())
         return 0; // no channels..
 
-    DBChanList::const_iterator start = it;
+    DBChanInfoList::const_iterator start = it;
 
     if (CHANNEL_DIRECTION_DOWN == direction)
     {

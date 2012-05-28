@@ -17,9 +17,9 @@
 #include "channelgroup.h"
 #include "sourceutil.h"
 
-DBChannel::DBChannel(const DBChannel &other) :
+DBChannelInfo::DBChannelInfo(const DBChannelInfo &other) :
     channum(other.channum),       callsign(other.callsign),
-    name(other.name),             icon(other.icon),
+    name(other.name),             iconpath(other.iconpath),
     chanid(other.chanid),
     major_chan(other.major_chan), minor_chan(other.minor_chan),
     mplexid((other.mplexid == 32767) ? 0 : other.mplexid),
@@ -28,29 +28,32 @@ DBChannel::DBChannel(const DBChannel &other) :
 {
 }
 
-DBChannel::DBChannel(
+DBChannelInfo::DBChannelInfo(
     const QString &_channum, const QString &_callsign,
     uint _chanid, uint _major_chan, uint _minor_chan,
     uint _mplexid, bool _visible,
-    const QString &_name, const QString &_icon,
+    const QString &_name, const QString &_iconpath,
     uint _sourceid, uint _cardid, uint _grpid) :
     channum(_channum),
     callsign(_callsign),
-    name(_name), icon((_icon == "none") ? QString() : _icon),
+    name(_name),
+    iconpath((_iconpath == "none") ? QString() : _iconpath),
     chanid(_chanid),
-    major_chan(_major_chan), minor_chan(_minor_chan),
+    major_chan(_major_chan),
+    minor_chan(_minor_chan),
     mplexid((_mplexid == 32767) ? 0 : _mplexid),
-    sourceid(_sourceid), cardid(_cardid), grpid(_grpid),
-    visible(_visible)
+    sourceid(_sourceid),
+    cardid(_cardid),
+    grpid(_grpid)
 {
 }
 
-DBChannel &DBChannel::operator=(const DBChannel &other)
+DBChannelInfo &DBChannelInfo::operator=(const DBChannelInfo &other)
 {
     channum    = other.channum;
     callsign   = other.callsign;
     name       = other.name;
-    icon       = other.icon;
+    iconpath   = other.iconpath;
     chanid     = other.chanid;
     major_chan = other.major_chan;
     minor_chan = other.minor_chan;
@@ -59,27 +62,31 @@ DBChannel &DBChannel::operator=(const DBChannel &other)
     cardid     = other.cardid;
     grpid      = other.grpid;
     visible    = other.visible;
+    favid      = other.favid;
+    sourcename = other.sourcename;
+    recpriority= other.recpriority;
 
     return *this;
 }
 
-void DBChannel::ToMap(InfoMap& infoMap) const
+void DBChannelInfo::ToMap(InfoMap& infoMap) const
 {
     infoMap["channelnumber"] = channum;
     infoMap["callsign"] = callsign;
     infoMap["channelname"] = name;
-    infoMap["channeliconpath"] = icon;
+    infoMap["channeliconpath"] = iconpath;
     infoMap["channelid"] = QString().setNum(chanid);
     infoMap["majorchan"] = QString().setNum(major_chan);
     infoMap["minorchan"] = QString().setNum(minor_chan);
     infoMap["mplexid"] = QString().setNum(mplexid);
     infoMap["channelvisible"] = visible ? QObject::tr("Yes") : QObject::tr("No");
-
     infoMap["channelgroupname"] = ChannelGroup::GetChannelGroupName(grpid);
     infoMap["channelsourcename"] = SourceUtil::GetSourceName(sourceid);
+    //infoMap["channelsourcename"] = sourcename;
+    infoMap["channelrecpriority"] = recpriority;
 }
 
-QString DBChannel::GetFormatted(const ChannelFormat &format) const
+QString DBChannelInfo::GetFormatted(const ChannelFormat &format) const
 {
     QString tmp;
 
@@ -98,43 +105,6 @@ QString DBChannel::GetFormatted(const ChannelFormat &format) const
 
     return tmp;
 }
-
-////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////
-
-QString ChannelInfo::GetFormatted(const ChannelFormat &format) const
-{
-    QString tmp;
-
-    if (format & kChannelLong)
-        tmp = gCoreContext->GetSetting("LongChannelFormat", "<num> <name>");
-    else // kChannelShort
-        tmp = gCoreContext->GetSetting("ChannelFormat", "<num> <sign>");
-
-
-    if (tmp.isEmpty())
-        return QString();
-
-    tmp.replace("<num>",  chanstr);
-    tmp.replace("<sign>", callsign);
-    tmp.replace("<name>", channame);
-
-    return tmp;
-}
-
-void ChannelInfo::ToMap(InfoMap& infoMap) const
-{
-    infoMap["callsign"] = callsign;
-    infoMap["channeliconpath"] = iconpath;
-    infoMap["chanstr"] = chanstr;
-    infoMap["channelname"] = channame;
-    infoMap["channelid"] = QString().setNum(chanid);
-    infoMap["channelsourcename"] = sourcename;
-    infoMap["channelrecpriority"] = recpriority;
-}
-
-////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////
 
 bool ChannelInsertInfo::SaveScan(uint scanid, uint transportid) const
 {

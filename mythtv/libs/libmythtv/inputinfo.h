@@ -7,7 +7,7 @@
 #include <QMap>
 
 // MythTV headers
-#include "channelutil.h" // for DBChanList
+#include "channelutil.h" // for DBChanInfoList
 
 class MTV_PUBLIC InputInfo
 {
@@ -79,7 +79,7 @@ class MTV_PUBLIC ChannelInputInfo : public InputInfo
                      uint    _sourceid,        uint    _cardid,
                      uint    _inputid,         uint    _mplexid,
                      uint    _livetvorder,
-                     const DBChanList &_channels) :
+                     const DBChanInfoList &_channels) :
         InputInfo(_name, _sourceid, _inputid, _cardid, _mplexid, _livetvorder),
         startChanNum(_startChanNum),
         tuneToChannel(_tuneToChannel),  externalChanger(_externalChanger),
@@ -93,14 +93,14 @@ class MTV_PUBLIC ChannelInputInfo : public InputInfo
     virtual void Clear(void);
 
   public:
-    QString      startChanNum;    ///< channel to start on
-    QString      tuneToChannel;   ///< for using a cable box & S-Video
-    QString      externalChanger; ///< for using a cable box...
-    DBChanList   channels;
-    vector<uint> groups;
-    int          inputNumV4L;
-    int          videoModeV4L1;
-    int          videoModeV4L2;
+    QString        startChanNum;    ///< channel to start on
+    QString        tuneToChannel;   ///< for using a cable box & S-Video
+    QString        externalChanger; ///< for using a cable box...
+    DBChanInfoList channels;
+    vector<uint>   groups;
+    int            inputNumV4L;
+    int            videoModeV4L1;
+    int            videoModeV4L2;
 };
 typedef QMap<uint, ChannelInputInfo*> InputMap;
 

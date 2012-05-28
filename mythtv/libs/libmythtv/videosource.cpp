@@ -2953,8 +2953,7 @@ void StartingChannel::SetSourceID(const QString &sourceid)
 
     // Get the existing starting channel
     QString startChan = CardUtil::GetStartingChannel(getInputID());
-
-    DBChanList channels = ChannelUtil::GetAllChannels(sourceid.toUInt());
+    DBChanInfoList channels = ChannelUtil::GetAllChannels(sourceid.toUInt());
 
     if (channels.empty())
     {
