@@ -19,13 +19,17 @@ class AnalogSignalMonitor : public SignalMonitor
     virtual void UpdateValues(void);
 
   private:
+    bool VerifyHDPVRaudio(int videofd);
     bool handleHDPVR(int videofd);
 
     bool     m_usingv4l2;
     QString  m_card;
     QString  m_driver;
     uint32_t m_version;
-    int      m_stage;
+    uint     m_width;
+    uint     m_stable_time;
+    uint     m_lock_cnt;
+    MythTimer m_timer;
 };
 
 #endif // _ANALOG_SIGNAL_MONITOR_H_
