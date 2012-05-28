@@ -18,7 +18,6 @@ class CardInput;
 class CardID;
 class InputName;
 class SourceID;
-class SourceIDtest;
 class VideoSourceMapType;
 class DiSEqCDevTree;
 class DiSEqCDevSettings;
@@ -228,6 +227,7 @@ public:
 private:
     QString            maptype;
     uint               sourceid;
+    int                initialcid;
     const VideoSource &parent;
 };
 
@@ -824,10 +824,11 @@ class CardInput : public QObject, public ConfigurationWizard
 
     int getInputID(void) const { return id->intValue(); };
     int getMapID(void) const { return sourcemapid->intValue(); };
-    bool setSourceMap(const QString &_maptype, const int _sourceid);
+    bool setSourceMap(const QString &_maptype, const int _sourceid, const int _initialcid);
     void loadByID(int id);
     void loadByInput(int cardid, QString input);
     void reload();
+    void SyncDB(void);
     QString getSourceName(void) const;
     virtual void Save(void);
     virtual void Save(QString /*destination*/) { Save(); }
@@ -858,14 +859,25 @@ class CardInput : public QObject, public ConfigurationWizard
             setName("CardInputID");
         }
     };
+    class SourceMapCID : public IntegerSetting, public VideoSourceMapDBStorage
+    {
+      public:
+    	SourceMapCID(const CardInput &parent) :
+            IntegerSetting(this), VideoSourceMapDBStorage(this, parent, "cardinputid")
+        {
+            setVisible(false);
+        }
+    };
 
     ID                  *id;
     CardID              *cardid;
     InputName           *inputname;
     SourceMapID         *sourcemapid;
     SourceID            *sourceid;
+    SourceMapCID        *sourcecid;
     VideoSourceMapType  *sourcemaptype;
     QString			     maptype;
+    uint                 initialcid;
     StartingChannel     *startchan;
     TransButtonSetting  *scan;
     TransButtonSetting  *srcfetch;

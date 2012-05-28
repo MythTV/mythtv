@@ -159,8 +159,6 @@ QString VideoSourceMapDBStorage::GetSetClause(MSqlBindings& bindings) const
 
     bindings.insert(colTag, user->GetDBValue());
 
-LOG(VB_GENERAL, LOG_INFO, QString("VideoSourceMapDBStorage::GetSetClause: Column = %1, Value = %2").arg(GetColumnName()).arg(user->GetDBValue()));
-
     return query;
 }
 
@@ -538,7 +536,8 @@ CrossSourceCardInputSel::CrossSourceCardInputSel(
 {
     setLabel(QObject::tr(_label));
     setHelpText(QObject::tr(_helptext));
-    LOG(VB_GENERAL, LOG_INFO, QString("CrossSourceCardInputSel::CrossSourceCardInputSel: maptype = %1, sourceid = %2").arg(maptype).arg(QString::number(sourceid)));
+    LOG(VB_GENERAL, LOG_DEBUG, QString("CrossSourceCardInputSel::CrossSourceCardInputSel: "
+        "maptype = %1, sourceid = %2").arg(maptype).arg(QString::number(sourceid)));
 };
 
 void CrossSourceCardInputSel::fillSelections()
@@ -548,6 +547,7 @@ void CrossSourceCardInputSel::fillSelections()
 
     addSelection("(None)", "0");
     cardinputs_map["(None)"] = -1;
+    initialcid = 0;
 
     // We do this manually because we want custom labels.  If
     // SelectSetting provided a facility to edit the labels, we
@@ -589,11 +589,12 @@ void CrossSourceCardInputSel::fillSelections()
 
         for (int i = 0; i < inputLabels.size(); i++, j++)
         {
-            addSelection(inputLabels[i], QString::number( cardInputs[i]->getInputID() ));
-        	if (cardInputs[i]->setSourceMap(maptype, sourceid))
+            int cardinputid = cardInputs[i]->getInputID();
+            addSelection(inputLabels[i], QString::number( cardinputid ));
+            if (cardInputs[i]->setSourceMap(maptype, sourceid, cardinputid))
         	{
-        		this->setValue( QString::number( cardInputs[i]->getInputID() ) );
-        	    LOG(VB_GENERAL, LOG_INFO, QString("CrossSourceCardInputSel::fillSelections: setValue for %1").arg(inputLabels[i]));
+                initialcid = cardinputid;
+                this->setValue( QString::number(initialcid));
         	}
     	    cardinputs.push_back(cardInputs[i]);
     	    cardinputs_map[inputLabels[i]] = j;
@@ -603,28 +604,24 @@ void CrossSourceCardInputSel::fillSelections()
 
 void CrossSourceCardInputSel::Save(void)
 {
-    // Clear cardinputid from the videosourcemap entry so that it will be updated with any new value
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("UPDATE videosourcemap "
-                  "SET cardinputid = 0 "
-                  "WHERE sourceid = :SOURCEID "
-                  "AND   type = :MAPTYPE ");
-    query.bindValue(":SOURCEID", sourceid);
-    query.bindValue(":MAPTYPE", maptype);
-    if (!query.exec())
-        MythDB::DBError("CrossSourceCardInputSel::Save", query);
-
     int val = cardinputs_map[ getSelectionLabel() ];
-
-    LOG(VB_GENERAL, LOG_INFO, QString("CrossSourceCardInputSel::Save: Label = %1, Val = %2").arg(getSelectionLabel()).arg(QString::number(val)));
-
     if ((val >= 0) && (cardinputs[val]))
     {
-       	LOG(VB_GENERAL, LOG_INFO, QString("CrossSourceCardInputSel::Save: Saving entry for sourceid %1").arg(QString::number(sourceid)));
-
-        cardinputs[val]->reload();											//Update id in event that cardinput didn't previously exist
-        cardinputs[val]->setSourceMap(maptype, parent.getSourceID());      	//Update sourceid in the event that videosource didn't previously exist.
+        cardinputs[val]->reload();                                      // Update id in event that cardinput didn't previously exist
+        cardinputs[val]->setSourceMap(maptype, sourceid, initialcid);   // Update sourceid in the event that videosource didn't previously exist.
         cardinputs[val]->Save();
+    }
+    else
+    {
+        // Remove entry and sync with cardinput clones
+        for (uint i = 0; i < cardinputs.size(); i++)
+        {
+            if (initialcid == cardinputs[i]->getInputID())
+            {
+                CardUtil::DeleteVideoSourceMap( cardinputs[i]->getMapID() );
+                cardinputs[i]->SyncDB();
+            }
+        }
     }
 }
 
@@ -675,10 +672,7 @@ void CrossSource_config::Save(void)
     eitcombobox->Save();
     scancombobox->Save();
     useeit->Save();
-    // Delete any orphaned or unused videosource maps
-    CardUtil::DeleteOrphanVideoSourceMaps();
-    // Delete any unused inputs
-    CardUtil::DeleteUnusedInputs();
+
 }
 
 NoGrabber_config::NoGrabber_config(const VideoSource& _parent) :
@@ -2953,6 +2947,7 @@ void StartingChannel::SetSourceID(const QString &sourceid)
 
     // Get the existing starting channel
     QString startChan = CardUtil::GetStartingChannel(getInputID());
+
     DBChanInfoList channels = ChannelUtil::GetAllChannels(sourceid.toUInt());
 
     if (channels.empty())
@@ -3058,6 +3053,9 @@ CardInput::CardInput(bool isDTVcard,  bool isDVBcard,
     inputname(new InputName(*this)),
     sourcemapid(new SourceMapID()),
     sourceid(new SourceID(*this)),
+
+    sourcecid(new SourceMapCID(*this)),
+
     sourcemaptype(new VideoSourceMapType(*this)),
     startchan(new StartingChannel(*this)),
     scan(new TransButtonSetting()),
@@ -3085,6 +3083,7 @@ CardInput::CardInput(bool isDTVcard,  bool isDVBcard,
     basic->addChild(new InputDisplayName(*this));
 
     basic->addChild(sourceid);
+    basic->addChild(sourcecid);
     basic->addChild(sourcemaptype);
 
     maptype = QString("main");
@@ -3180,16 +3179,33 @@ void CardInput::SetSourceID(const QString &sourceid)
 int CardInput::findSourceMapID(void) const
 {
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare(
-        "SELECT mapid "
-        "FROM videosourcemap "
-        "WHERE (cardinputid = :CARDINPUTID OR "
-        "       cardinputid = 0) "
-    	"AND   (type = :MAPTYPE OR "
-        "       type = '') "
-        "ORDER BY cardinputid");
-    query.bindValue(":CARDINPUTID", getInputID());
-    query.bindValue(":MAPTYPE", maptype);
+
+    if (sourceid->getValue() > 0)
+    {
+        query.prepare(
+            "SELECT mapid "
+            "FROM videosourcemap "
+            "WHERE cardinputid = :CARDINPUTID AND "
+            "      sourceid    = :SOURCEID    AND "
+            "     (type = :MAPTYPE            OR  "
+            "      type = '') ");
+
+        query.bindValue(":CARDINPUTID", initialcid);
+        query.bindValue(":SOURCEID", sourceid->getValue());
+        query.bindValue(":MAPTYPE", maptype);
+    }
+    else
+    {
+        query.prepare(
+            "SELECT mapid "
+            "FROM videosourcemap "
+            "WHERE cardinputid = :CARDINPUTID AND "
+            "     (type = :MAPTYPE            OR  "
+            "      type = '') ");
+
+        query.bindValue(":CARDINPUTID", initialcid);
+        query.bindValue(":MAPTYPE", maptype);
+    }
 
     if (!query.exec())
     {
@@ -3197,29 +3213,28 @@ int CardInput::findSourceMapID(void) const
     }
     else if (query.next())
     {
-    	LOG(VB_GENERAL, LOG_INFO, QString("CardInput::findSourceMapID = %1, filter = %2, maptype = %3, sourceid = %4, cardinputid = %5.")
+    	LOG(VB_GENERAL, LOG_DEBUG, QString("CardInput::findSourceMapID = %1, filter = %2, maptype = %3, sourceid = %4, cardinputid = %5.")
     			.arg(query.value(0).toString()).arg(maptype).arg(sourcemaptype->getValue()).arg(sourceid->getValue()).arg(getInputID()));
 
         return (query.value(0).toInt());
     }
-   	LOG(VB_GENERAL, LOG_INFO, QString("CardInput::findSourceMapID = 0, filter = %1, maptype = %2, sourceid = %3, cardinputid = %4.")
-    			.arg(maptype).arg(sourcemaptype->getValue()).arg(sourceid->getValue()).arg(getInputID()));
-   return 0;
+
+    return 0;
 }
 
-bool CardInput::setSourceMap(const QString &_maptype, const int _sourceid)
+bool CardInput::setSourceMap(const QString &_maptype, const int _sourceid, const int _initialcid)
 {
     maptype = _maptype;
+    initialcid = _initialcid;
+    sourceid->setValue(QString::number(_sourceid));
     loadByID(getInputID());
-    bool current = (sourceid->getValue().toInt() > 0);
 
-   	LOG(VB_GENERAL, LOG_INFO, QString("CardInput::setSourceMap: Filter = %1, maptype = %2, sourceid = %3, cardinputid = %4.")
-    			.arg(maptype).arg(sourcemaptype->getValue()).arg(sourceid->getValue()).arg(getInputID()));
+    bool exists = (sourceid->getValue().toInt() > 0);
 
     sourcemaptype->setValue(maptype);
     sourceid->setValue(QString::number(_sourceid));
 
-    return current;
+    return exists;
 }
 
 QString CardInput::getSourceName(void) const
@@ -3426,30 +3441,16 @@ void CardInput::reload(void)
 
 void CardInput::Save(void)
 {
-LOG(VB_GENERAL, LOG_INFO, QString("CardInput::Save - About to save..."));
-
     ConfigurationWizard::Save();
-
-LOG(VB_GENERAL, LOG_INFO, QString("CardInput::Save - Save finished. Now updating..."));
-
+    sourcecid->setValue(getInputID());
+    sourcecid->Save();
     externalInputSettings->Store(getInputID());
+    LOG(VB_GENERAL, LOG_DEBUG, QString("CardInput::Save - videosourcemap cardinputid updated with %1... now syncing card clones").arg(getInputID()));
+    SyncDB();
+}
 
-    // Update cardinputid from with a valid ID as it may be a new entry
-    // FIXME: Perhaps this could be replaced with a simpledbstorage class?
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("UPDATE videosourcemap "
-                  "SET cardinputid = :CARDINPUTID "
-                  "WHERE cardinputid = 0 "
-                  "AND   type = :MAPTYPE ");
-    query.bindValue(":CARDINPUTID", getInputID());
-    query.bindValue(":MAPTYPE", maptype);
-    if (!query.exec())
-        MythDB::DBError("CardInput::Save", query);
-
-LOG(VB_GENERAL, LOG_INFO, QString("CardInput::Save - videosourcemap cardinputid updated... now cleaning up"));
-
-    // FIXME: NEED TO CHECK CLONING WITH THE NEW SOURCEID MODEL
-
+void CardInput::SyncDB(void)
+{
     // Handle any cloning we may need to do
     uint src_cardid = cardid->getValue().toUInt();
     QString type = CardUtil::GetRawCardType(src_cardid);
@@ -3471,8 +3472,8 @@ LOG(VB_GENERAL, LOG_INFO, QString("CardInput::Save - videosourcemap cardinputid 
     CardUtil::DeleteOrphanVideoSourceMaps();
     // Delete any unused inputs
     CardUtil::DeleteUnusedInputs();
-LOG(VB_GENERAL, LOG_INFO, QString("CardInput::Save - Cleanup finished"));
 }
+
 
 int CardInputDBStorage::getInputID(void) const
 {

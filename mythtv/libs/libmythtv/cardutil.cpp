@@ -825,7 +825,7 @@ static bool clone_cardinputs(uint src_cardid, uint dst_cardid)
                 "    livetvorder     = :V9 "
                 "WHERE cardinputid = :INPUTID");
 
-            for (uint j = 0; j < 11; j++)
+            for (uint j = 0; j < 10; j++)
             {
                 query2.bindValue(QString(":V%1").arg(j),
                                  query.value(j).toString());
@@ -844,7 +844,6 @@ static bool clone_cardinputs(uint src_cardid, uint dst_cardid)
         else
         {
             // create new input for dst with data from src
-
             query2.prepare(
                 "INSERT cardinput "
                 "SET cardid          = :CARDID, "
@@ -860,7 +859,7 @@ static bool clone_cardinputs(uint src_cardid, uint dst_cardid)
                 "    livetvorder     = :V9 ");
 
             query2.bindValue(":CARDID", dst_cardid);
-            for (uint j = 0; j < 11; j++)
+            for (uint j = 0; j < 10; j++)
             {
                 query2.bindValue(QString(":V%1").arg(j),
                                  query.value(j).toString());
@@ -879,7 +878,7 @@ static bool clone_cardinputs(uint src_cardid, uint dst_cardid)
                 "WHERE cardid    = :CARDID AND "
                 "      inputname = :NAME");
             query2.bindValue(":CARDID", dst_cardid);
-            query2.bindValue(":NAME", query.value(1).toString());
+            query2.bindValue(":NAME", query.value(0).toString());
             if (!query2.exec())
             {
                 MythDB::DBError("clone_cardinput -- "
@@ -893,7 +892,6 @@ static bool clone_cardinputs(uint src_cardid, uint dst_cardid)
                 ok = false;
                 break;
             }
-
             dst_inputid = query2.value(0).toUInt();
         }
 
@@ -910,7 +908,6 @@ static bool clone_cardinputs(uint src_cardid, uint dst_cardid)
         if (diseqc.Load(src_inputs[i]))
             diseqc.Store(dst_inputid);
     }
-
     // delete extra inputs in dst
     for (uint i = 0; i < dst_inputs.size(); i++)
     {
@@ -918,6 +915,77 @@ static bool clone_cardinputs(uint src_cardid, uint dst_cardid)
             ok &= CardUtil::DeleteInput(dst_inputs[i]);
     }
 
+    return ok;
+}
+
+static bool clone_videosourcemap(uint src_cardid, uint dst_cardid)
+{
+    vector<uint> src_inputs = CardUtil::GetInputIDs(src_cardid);
+    vector<uint> dst_inputs = CardUtil::GetInputIDs(dst_cardid);
+    vector<QString> src_names;
+    vector<QString> dst_names;
+    QMap<uint,bool> dst_keep;
+
+    for (uint i = 0; i < src_inputs.size(); i++)
+        src_names.push_back(CardUtil::GetInputName(src_inputs[i]));
+
+    for (uint i = 0; i < dst_inputs.size(); i++)
+        dst_names.push_back(CardUtil::GetInputName(dst_inputs[i]));
+
+    bool ok = true;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    MSqlQuery query2(MSqlQuery::InitCon());
+
+    for (uint i = 0; i < src_inputs.size(); i++)
+    {
+    	// Remove clone videosourcemaps
+        MSqlQuery query3(MSqlQuery::InitCon());
+        query3.prepare(
+            "DELETE FROM videosourcemap "
+            "WHERE cardinputid = :INPUTID ");
+        query3.bindValue(":INPUTID", dst_inputs[i]);
+
+        if (!query3.exec())
+        {
+            MythDB::DBError("clone_videosourcemap()", query3);
+            ok = false;
+            break;
+        }
+
+        query.prepare(
+            "SELECT sourceid, type "
+            "FROM videosourcemap "
+            "WHERE cardinputid = :INPUTID");
+        query.bindValue(":INPUTID", src_inputs[i]);
+        if (!query.exec())
+        {
+            MythDB::DBError("clone_videosourcemap -- get data", query);
+            ok = false;
+            break;
+        }
+
+        while (query.next())
+        {
+            // create new input for dst with data from src
+            query2.prepare(
+                "INSERT videosourcemap "
+                "SET sourceid    = :V0,      "
+                "    cardinputid = :INPUTID, "
+                "    type        = :V1       ");
+
+            query2.bindValue(":V0", query.value(0).toString());
+            query2.bindValue(":V1", query.value(1).toString());
+            query2.bindValue(":INPUTID", dst_inputs[i]);
+
+            if (!query2.exec())
+            {
+                MythDB::DBError("clone_videosourcemap -- insert data", query2);
+                ok = false;
+                break;
+            }
+        }
+    }
     return ok;
 }
 
@@ -936,6 +1004,8 @@ bool CardUtil::CloneCard(uint src_cardid, uint orig_dst_cardid)
         DeleteCard(dst_cardid);
         return false;
     }
+
+    clone_videosourcemap(src_cardid, dst_cardid);
 
     return true;
 }
