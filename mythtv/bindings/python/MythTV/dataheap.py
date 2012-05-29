@@ -400,13 +400,13 @@ class Recorded( CMPRecord, DBDataWrite ):
                                         cast.job.lower().replace(' ','_'))))
 
         # pull images
-        for image in metadata.images:
-            if not hasattr(self.artwork, image.type):
-                pass
-            if getattr(self.artwork, image.type, ''):
-                continue
-            setattr(self.artwork, image.type, image.filename)
-            getattr(self.artwork, image.type).downloadFrom(image.url)
+#        for image in metadata.images:
+#            if not hasattr(self.artwork, image.type):
+#                pass
+#            if getattr(self.artwork, image.type, ''):
+#                continue
+#            setattr(self.artwork, image.type, image.filename)
+#            getattr(self.artwork, image.type).downloadFrom(image.url)
 
         self.update()
 
@@ -1034,10 +1034,10 @@ class Video( CMPVideo, VideoSchema, DBDataWrite ):
             metadata.countries.append(country.country)
 
         # pull images
-        for arttype in ['coverart', 'fanart', 'banner', 'screenshot']:
-            art = getattr(self, arttype)
-            if art:
-                metadata.images.append(OrdDict((('type',arttype), ('filename',art))))
+#        for arttype in ['coverart', 'fanart', 'banner', 'screenshot']:
+#            art = getattr(self, arttype)
+#            if art:
+#                metadata.images.append(OrdDict((('type',arttype), ('filename',art))))
 
         return metadata
 
