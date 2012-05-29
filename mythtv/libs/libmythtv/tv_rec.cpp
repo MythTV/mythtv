@@ -3002,21 +3002,7 @@ QString TVRec::SetInput(QString input, uint requestType)
  */
 void TVRec::SetChannel(QString name, uint requestType)
 {
-    if (TVRec::kFlagEITScan == requestType)
-    {
-        if (!stateChangeLock.tryLock())
-        {
-            LOG(VB_CHANNEL, LOG_INFO, LOC +
-                QString("SetChannel(%1, kFlagEITScan) -- "
-                        "couldn't get lock aborting").arg(name));
-            return;
-        }
-    }
-    else
-    {
-        stateChangeLock.lock();
-    }
-
+    QMutexLocker lock(&stateChangeLock);
     LOG(VB_CHANNEL, LOG_INFO, LOC +
         QString("SetChannel(%1) -- begin").arg(name));
 
@@ -3042,7 +3028,6 @@ void TVRec::SetChannel(QString name, uint requestType)
             WaitForEventThreadSleep();
     }
     LOG(VB_CHANNEL, LOG_INFO, LOC + QString("SetChannel(%1) -- end").arg(name));
-    stateChangeLock.unlock();
 }
 
 void TVRec::GetNextProgram(BrowseDirection direction,

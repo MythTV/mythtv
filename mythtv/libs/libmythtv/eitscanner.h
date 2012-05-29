@@ -54,13 +54,11 @@ class EITScanner : public QRunnable
 
     EITHelper       *eitHelper;
     MThread         *eventThread;
-    volatile bool    exitThread;
-    QWaitCondition   exitThreadCond; // protected by lock
+    bool             exitThread;
+    QWaitCondition   exitThreadCond;
 
     TVRec           *rec;
-    volatile bool    activeScan;
-    volatile bool    activeScanStopped; // protected by lock
-    QWaitCondition   activeScanCond; // protected by lock
+    bool             activeScan;
     QDateTime        activeScanNextTrig;
     uint             activeScanTrigTime;
     QStringList      activeScanChannels;
