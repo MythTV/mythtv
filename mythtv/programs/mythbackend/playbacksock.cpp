@@ -403,7 +403,7 @@ long long PlaybackSock::GetMaxBitrate(int capturecardnum)
     QStringList strlist(QString("QUERY_REMOTEENCODER %1").arg(capturecardnum));
     strlist << "GET_MAX_BITRATE";
 
-    if (SendReceiveStringList(strlist, 2))
+    if (SendReceiveStringList(strlist, 1))
         return strlist[0].toLongLong();
 
     return 20200000LL; // Peak bit rate for HD-PVR
