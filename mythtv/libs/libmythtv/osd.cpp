@@ -314,12 +314,12 @@ void OSD::LoadWindows(void)
                     QString("Loaded window %1").arg(window));
                 m_Children.insert(window, win);
             }
-        }
-        else
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC + QString("Failed to load window %1")
-                .arg(window));
-            delete win;
+            else
+            {
+                LOG(VB_GENERAL, LOG_ERR, LOC + QString("Failed to load window %1")
+                    .arg(window));
+                delete win;
+            }
         }
     }
 }
