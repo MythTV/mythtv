@@ -8,8 +8,8 @@
 
 // Mythdb headers
 #include "mythlogging.h"
+#include "mythdate.h"
 #include "mythdb.h"
-#include "mythmiscutil.h"
 
 // Mythui headers
 #include "mythsystem.h"

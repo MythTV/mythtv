@@ -45,6 +45,7 @@ using namespace std;
 #include "mythcorecontext.h"
 #include "mythmedia.h"
 #include "mythmiscutil.h"
+#include "mythdate.h"
 
 // libmythui headers
 #include "myththemebase.h"

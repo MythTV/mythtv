@@ -11,7 +11,7 @@
 #include <QTime>
 
 #include "mythlogging.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 
 #include "mythmainwindow.h"
 #include "mythfontproperties.h"
