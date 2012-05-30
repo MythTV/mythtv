@@ -1015,12 +1015,12 @@ void OSD::DialogShow(const QString &window, const QString &text, int updatefor)
                 }
                 m_Children.insert(window, m_Dialog);
             }
-        }
-        else
-        {
-            RevertUIScale();
-            delete dialog;
-            return;
+            else
+            {
+                RevertUIScale();
+                delete dialog;
+                return;
+            }
         }
         RevertUIScale();
     }
