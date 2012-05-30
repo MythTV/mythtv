@@ -118,8 +118,8 @@ Metadata* MetaIOWavPack::read(const QString &filename)
 
     if (metadata->Length() <= 0)
         metadata->setLength(getTrackLength(wpfile));
-    else
-        delete wpfile;
+
+    delete wpfile;
 
     return metadata;
 }
