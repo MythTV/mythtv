@@ -679,13 +679,13 @@ void CommandLineArg::SetParentOf(CommandLineArg *other, bool forward)
 {
     int i;
     bool replaced = false;
-    other->UpRef();
+    other->IncrRef();
 
     for (i = 0; i < m_children.size(); i++)
     {
         if (m_children[i]->m_name == other->m_name)
         {
-            m_children[i]->DownRef();
+            m_children[i]->DecrRef();
             m_children.replace(i, other);
             replaced = true;
             break;
@@ -708,13 +708,13 @@ void CommandLineArg::SetChildOf(CommandLineArg *other, bool forward)
 {
     int i;
     bool replaced = false;
-    other->UpRef();
+    other->IncrRef();
 
     for (i = 0; i < m_parents.size(); i++)
     {
         if (m_parents[i]->m_name == other->m_name)
         {
-            m_parents[i]->DownRef();
+            m_parents[i]->DecrRef();
             m_parents.replace(i, other);
             replaced = true;
             break;
@@ -737,13 +737,13 @@ void CommandLineArg::SetRequires(CommandLineArg *other, bool forward)
 {
     int i;
     bool replaced = false;
-    other->UpRef();
+    other->IncrRef();
 
     for (i = 0; i < m_requires.size(); i++)
     {
         if (m_requires[i]->m_name == other->m_name)
         {
-            m_requires[i]->DownRef();
+            m_requires[i]->DecrRef();
             m_requires.replace(i, other);
             replaced = true;
             break;
@@ -767,13 +767,13 @@ void CommandLineArg::SetBlocks(CommandLineArg *other, bool forward)
 {
     int i;
     bool replaced = false;
-    other->UpRef();
+    other->IncrRef();
 
     for (i = 0; i < m_blocks.size(); i++)
     {
         if (m_blocks[i]->m_name == other->m_name)
         {
-            m_blocks[i]->DownRef();
+            m_blocks[i]->DecrRef();
             m_blocks.replace(i, other);
             replaced = true;
             break;
@@ -808,7 +808,7 @@ void CommandLineArg::AllowOneOf(QList<CommandLineArg*> args)
         }
 
         if ((*i1)->m_type == QVariant::Invalid)
-            (*i1)->DownRef();
+            (*i1)->DecrRef();
     }
 }
 
@@ -970,19 +970,19 @@ void CommandLineArg::CleanupLinks(void)
 {
     // clear out interdependent pointers in preparation for deletion
     while (!m_parents.isEmpty())
-        m_parents.takeFirst()->DownRef();
+        m_parents.takeFirst()->DecrRef();
 
     while (!m_children.isEmpty())
-        m_children.takeFirst()->DownRef();
+        m_children.takeFirst()->DecrRef();
 
     while (!m_blocks.isEmpty())
-        m_blocks.takeFirst()->DownRef();
+        m_blocks.takeFirst()->DecrRef();
 
     while (!m_requires.isEmpty())
-        m_requires.takeFirst()->DownRef();
+        m_requires.takeFirst()->DecrRef();
 
     while (!m_requiredby.isEmpty())
-        m_requiredby.takeFirst()->DownRef();
+        m_requiredby.takeFirst()->DecrRef();
 }
 
 /** \brief Internal use. Print processed input in verbose mode.
@@ -1140,14 +1140,14 @@ MythCommandLineParser::~MythCommandLineParser()
     while (i != m_namedArgs.end())
     {
         (*i)->CleanupLinks();
-        (*i)->DownRef();
+        (*i)->DecrRef();
         i = m_namedArgs.erase(i);
     }
 
     i = m_optionedArgs.begin();
     while (i != m_optionedArgs.end())
     {
-        (*i)->DownRef();
+        (*i)->DecrRef();
         i = m_optionedArgs.erase(i);
     }
 }
@@ -1206,7 +1206,7 @@ CommandLineArg* MythCommandLineParser::add(QStringList arglist,
                 cerr << "Adding " << (*i).toLocal8Bit().constData()
                      << " as taking type '" << QVariant::typeToName(type)
                      << "'" << endl;
-            arg->UpRef();
+            arg->IncrRef();
             m_optionedArgs.insert(*i, arg);
         }
     }
@@ -1717,7 +1717,7 @@ bool MythCommandLineParser::ReconcileLinks(void)
                 }
             }
 
-            (*i2)->DownRef();
+            (*i2)->DecrRef();
             i2 = (*i1)->m_requiredby.erase(i2);
         }
 
@@ -1732,7 +1732,7 @@ bool MythCommandLineParser::ReconcileLinks(void)
 
             if (!m_namedArgs.contains((*i2)->m_name))
             {
-                (*i2)->DownRef();
+                (*i2)->DecrRef();
                 i2 = (*i1)->m_blocks.erase(i2);
                 continue; // if it doesnt exist, it cant block this command
             }

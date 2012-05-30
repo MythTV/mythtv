@@ -883,7 +883,8 @@ static int FlagCommercials(ProgramInfo *program_info, int jobid,
 
     PlayerFlags flags = (PlayerFlags)(kAudioMuted   |
                                       kVideoIsNull  |
-                                      kDecodeLowRes |
+                                      /* Disabled due to libav bug 297 */
+                                      /* kDecodeLowRes | */
                                       kDecodeSingleThreaded |
                                       kDecodeNoLoopFilter);
     /* blank detector needs to be only sample center for this optimization. */
@@ -898,7 +899,7 @@ static int FlagCommercials(ProgramInfo *program_info, int jobid,
     ctx->SetPlayingInfo(program_info);
     ctx->SetRingBuffer(tmprbuf);
     ctx->SetPlayer(cfp);
-    cfp->SetPlayerInfo(NULL, NULL, true, ctx);
+    cfp->SetPlayerInfo(NULL, NULL, ctx);
 
     if (useDB)
     {
@@ -1044,7 +1045,7 @@ static int RebuildSeekTable(ProgramInfo *pginfo, int jobid)
     ctx->SetPlayingInfo(pginfo);
     ctx->SetRingBuffer(tmprbuf);
     ctx->SetPlayer(cfp);
-    cfp->SetPlayerInfo(NULL, NULL, true, ctx);
+    cfp->SetPlayerInfo(NULL, NULL, ctx);
 
     if (progress)
     {

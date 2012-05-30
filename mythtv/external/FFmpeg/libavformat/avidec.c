@@ -704,7 +704,7 @@ static int avi_read_header(AVFormatContext *s)
 
                 if(size<(1<<30)){
                     st->codec->extradata_size= size;
-                    st->codec->extradata= av_malloc(st->codec->extradata_size + FF_INPUT_BUFFER_PADDING_SIZE);
+                    st->codec->extradata= av_mallocz(st->codec->extradata_size + FF_INPUT_BUFFER_PADDING_SIZE);
                     if (!st->codec->extradata) {
                         st->codec->extradata_size= 0;
                         return AVERROR(ENOMEM);
@@ -895,6 +895,10 @@ static int get_stream_idx(int *d){
     }
 }
 
+/**
+ *
+ * @param exit_early set to 1 to just gather packet position without making the changes needed to actually read & return the packet
+ */
 static int avi_sync(AVFormatContext *s, int exit_early)
 {
     AVIContext *avi = s->priv_data;
@@ -953,6 +957,11 @@ start_sync:
             AVIStream *ast;
             st = s->streams[n];
             ast = st->priv_data;
+
+            if (!ast) {
+                av_log(s, AV_LOG_WARNING, "Skiping foreign stream %d packet\n", n);
+                continue;
+            }
 
             if(s->nb_streams>=2){
                 AVStream *st1  = s->streams[1];
@@ -1125,6 +1134,7 @@ resync:
         err= av_get_packet(pb, pkt, size);
         if(err<0)
             return err;
+        size = err;
 
         if(ast->has_pal && pkt->data && pkt->size<(unsigned)INT_MAX/2){
             uint8_t *pal;
@@ -1235,6 +1245,7 @@ static int avi_read_idx1(AVFormatContext *s, int size)
     AVIStream *ast;
     unsigned int index, tag, flags, pos, len, first_packet = 1;
     unsigned last_pos= -1;
+    unsigned last_len= 0;
     int64_t idx1_pos, first_packet_pos = 0, data_offset = 0;
 
     nb_index_entries = size / 16;
@@ -1277,12 +1288,16 @@ static int avi_read_idx1(AVFormatContext *s, int size)
         av_dlog(s, "%d cum_len=%"PRId64"\n", len, ast->cum_len);
 
 
+        // even if we have only a single stream, we should
+        // switch to non-interleaved to get correct timestamps
         if(last_pos == pos)
             avi->non_interleaved= 1;
-        else if(len || !ast->sample_size)
+        if((last_pos != pos || !last_len) && (len || !ast->sample_size)) {
             av_add_index_entry(st, pos, ast->cum_len, len, 0, (flags&AVIIF_INDEX) ? AVINDEX_KEYFRAME : 0);
+        }
         ast->cum_len += get_duration(ast, len);
         last_pos= pos;
+        last_len= len;
     }
     return 0;
 }
@@ -1292,6 +1307,8 @@ static int guess_ni_flag(AVFormatContext *s){
     int64_t last_start=0;
     int64_t first_end= INT64_MAX;
     int64_t oldpos= avio_tell(s->pb);
+    int *idx;
+    int64_t min_pos, pos;
 
     for(i=0; i<s->nb_streams; i++){
         AVStream *st = s->streams[i];
@@ -1315,7 +1332,32 @@ static int guess_ni_flag(AVFormatContext *s){
             first_end= st->index_entries[n-1].pos;
     }
     avio_seek(s->pb, oldpos, SEEK_SET);
-    return last_start > first_end;
+    if (last_start > first_end)
+        return 1;
+    idx= av_mallocz(sizeof(*idx) * s->nb_streams);
+    for (min_pos=pos=0; min_pos!=INT64_MAX; pos= min_pos+1) {
+        int64_t max_dts = INT64_MIN/2, min_dts= INT64_MAX/2;
+        min_pos = INT64_MAX;
+
+        for (i=0; i<s->nb_streams; i++) {
+            AVStream *st = s->streams[i];
+            int n= st->nb_index_entries;
+            while (idx[i]<n && st->index_entries[idx[i]].pos < pos)
+                idx[i]++;
+            if (idx[i] < n) {
+                min_dts = FFMIN(min_dts, av_rescale_q(st->index_entries[idx[i]].timestamp, st->time_base, AV_TIME_BASE_Q));
+                min_pos = FFMIN(min_pos, st->index_entries[idx[i]].pos);
+            }
+            if (idx[i])
+                max_dts = FFMAX(max_dts, av_rescale_q(st->index_entries[idx[i]-1].timestamp, st->time_base, AV_TIME_BASE_Q));
+        }
+        if(max_dts - min_dts > 2*AV_TIME_BASE) {
+            av_free(idx);
+            return 1;
+        }
+    }
+    av_free(idx);
+    return 0;
 }
 
 static int avi_load_index(AVFormatContext *s)

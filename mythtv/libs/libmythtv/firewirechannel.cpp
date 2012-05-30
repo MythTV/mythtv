@@ -38,6 +38,12 @@ FirewireChannel::FirewireChannel(TVRec *parent, const QString &_videodevice,
 #endif // USING_OSX_FIREWIRE
 }
 
+FirewireChannel::~FirewireChannel()
+{
+    Close();
+    delete device;
+}
+
 bool FirewireChannel::Open(void)
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + "Open()");

@@ -161,16 +161,6 @@ static HostCheckBox *SmartForward()
     return gc;
 }
 
-static HostCheckBox *ExactSeeking()
-{
-    HostCheckBox *gc = new HostCheckBox("ExactSeeking");
-    gc->setLabel(QObject::tr("Seek to exact frame"));
-    gc->setValue(false);
-    gc->setHelpText(QObject::tr("If enabled, seeking is frame exact, but "
-                    "slower."));
-    return gc;
-}
-
 static GlobalComboBox *CommercialSkipMethod()
 {
     GlobalComboBox *bc = new GlobalComboBox("CommercialSkipMethod");
@@ -317,17 +307,6 @@ static GlobalSpinBox *DeletedMaxAge()
     return bs;
 };
 
-static GlobalCheckBox *DeletedFifoOrder()
-{
-    GlobalCheckBox *cb = new GlobalCheckBox("DeletedFifoOrder");
-    cb->setLabel(QObject::tr("Expire in deleted order"));
-    cb->setValue(false);
-    cb->setHelpText(QObject::tr(
-                    "If enabled, delete recordings in the order which they were "
-                    "originally deleted."));
-    return cb;
-};
-
 #if 0
 class DeletedExpireOptions : public TriggeredConfigurationGroup
 {
@@ -342,7 +321,6 @@ class DeletedExpireOptions : public TriggeredConfigurationGroup
 
              HorizontalConfigurationGroup* settings =
                  new HorizontalConfigurationGroup(false);
-             settings->addChild(DeletedFifoOrder());
              settings->addChild(DeletedMaxAge());
              addTarget("1", settings);
 
@@ -3343,7 +3321,6 @@ PlaybackSettings::PlaybackSettings()
     seek->addChild(SmartForward());
     seek->addChild(FFRewReposTime());
     seek->addChild(FFRewReverse());
-    seek->addChild(ExactSeeking());
     addChild(seek);
 
     VerticalConfigurationGroup* comms = new VerticalConfigurationGroup(false);
@@ -3436,7 +3413,6 @@ GeneralSettings::GeneralSettings()
 
     autoexp->addChild(expgrp);
 //    autoexp->addChild(new DeletedExpireOptions());
-    autoexp->addChild(DeletedFifoOrder());
     autoexp->addChild(DeletedMaxAge());
 
     addChild(autoexp);

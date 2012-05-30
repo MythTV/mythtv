@@ -675,9 +675,8 @@ bool VideoSourceEditor::cardTypesInclude(const int &sourceID,
     query.bindValue(":SOURCEID", sourceID);
     query.bindValue(":CARDTYPE", thecardtype);
 
-    if (query.exec() && query.isActive() && query.size() > 0)
+    if (query.exec() && query.next())
     {
-        query.next();
         int count = query.value(0).toInt();
 
         if (count > 0)

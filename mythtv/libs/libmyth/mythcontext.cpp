@@ -541,6 +541,7 @@ bool MythContextPrivate::SaveDatabaseParams(
         m_pConfig->ClearValue(kDefaultMFE + "DBPassword");
         m_pConfig->ClearValue(kDefaultMFE + "DBName");
         m_pConfig->ClearValue(kDefaultMFE + "DBPort");
+        m_pConfig->ClearValue(kDefaultMFE + "DBHostPing");
 
         // actually save the file
         m_pConfig->Save();

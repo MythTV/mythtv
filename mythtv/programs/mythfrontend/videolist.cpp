@@ -112,7 +112,7 @@ VideoMetadata *TreeNodeData::GetMetadata()
     if (m_d)
         return m_d->GetMetadata();
 
-    return 0;
+    return NULL;
 }
 
 const VideoMetadata *TreeNodeData::GetMetadata() const
@@ -120,7 +120,7 @@ const VideoMetadata *TreeNodeData::GetMetadata() const
     if (m_d)
         return m_d->GetMetadata();
 
-    return 0;
+    return NULL;
 }
 
 QString TreeNodeData::GetPath() const

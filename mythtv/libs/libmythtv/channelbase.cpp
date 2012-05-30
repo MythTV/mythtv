@@ -895,10 +895,9 @@ int ChannelBase::GetChanID() const
         return -1;
     }
 
-    if (query.size() <= 0)
+    if (!query.next())
         return -1;
 
-    query.next();
     return query.value(0).toInt();
 }
 
@@ -1108,9 +1107,8 @@ bool ChannelBase::CheckChannel(const QString &channum,
     {
         MythDB::DBError("checkchannel", query);
     }
-    else if (query.size() > 0)
+    else if (query.next())
     {
-        query.next();
         QString test = query.value(1).toString();
         if (test != QString::null)
             inputName = test;

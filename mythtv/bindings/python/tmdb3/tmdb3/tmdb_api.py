@@ -509,19 +509,3 @@ class Collection( NameRepr, Element ):
         return Request('collection/{0}'.format(self.id), \
                             language=self._locale.language)
 
-if __name__ == '__main__':
-    set_key('c27cb71cff5bd76e1a7a009380562c62') #MythTV API Key
-    DEBUG = True
-
-    banner = 'tmdb_api interactive shell.'
-    import code
-    try:
-        import readline, rlcompleter
-    except:
-        pass
-    else:
-        readline.parse_and_bind("tab: complete")
-        banner += ' TAB completion available.'
-    namespace = globals().copy()
-    namespace.update(locals())
-    code.InteractiveConsole(namespace).interact(banner)

@@ -25,6 +25,7 @@ using namespace std;
 #include "remoteutil.h"
 #include "tvremoteutil.h"
 #include "mythplayer.h"
+#include "subtitlescreen.h"
 #include "DetectLetterbox.h"
 #include "programinfo.h"
 #include "vsync.h"
@@ -8403,9 +8404,14 @@ void TV::ChangeSubtitleZoom(PlayerContext *ctx, int dir)
         return;
     }
 
+    OSD *osd = GetOSDLock(ctx);
+    SubtitleScreen *subs = NULL;
+    if (osd)
+        subs = osd->InitSubtitles();
+    ReturnOSDLock(ctx, osd);
     subtitleZoomAdjustment = true;
     bool showing = ctx->player->GetCaptionsEnabled();
-    int newval = gCoreContext->GetNumSetting("OSDCC708TextZoom", 100) + dir;
+    int newval = (subs ? subs->GetZoom() : 100) + dir;
     newval = max(50, newval);
     newval = min(200, newval);
     ctx->UnlockDeletePlayer(__FILE__, __LINE__);
@@ -8417,7 +8423,8 @@ void TV::ChangeSubtitleZoom(PlayerContext *ctx, int dir)
                         kOSDFunctionalType_SubtitleZoomAdjust,
                         "%", newval * 1000 / 200, kOSDTimeout_Long);
         SetUpdateOSDPosition(false);
-        gCoreContext->SaveSetting("OSDCC708TextZoom", newval);
+        if (subs)
+            subs->SetZoom(newval);
     }
 }
 
@@ -10174,6 +10181,12 @@ void TV::OSDDialogEvent(int result, QString text, QString action)
         PrepareToExitPlayer(actx, __LINE__);
         SetExitPlayer(true, true);
     }
+    else if (action == "CANCELPLAYLIST")
+    {
+        setInPlayList(false);
+        MythEvent xe("CANCEL_PLAYLIST");
+        gCoreContext->dispatch(xe);
+    }
     else if (action == ACTION_JUMPFFWD)
         DoJumpFFWD(actx);
     else if (action == ACTION_JUMPRWND)
@@ -11441,6 +11454,8 @@ void TV::FillOSDMenuPlayback(const PlayerContext *ctx, OSD *osd,
         }
         if (!db_browse_always)
             osd->DialogAddButton(tr("Toggle Browse Mode"), "TOGGLEBROWSE");
+        if (inPlaylist)
+            osd->DialogAddButton(tr("Cancel Playlist"), "CANCELPLAYLIST");
         osd->DialogAddButton(tr("Playback data"),
                              ACTION_TOGGLEOSDDEBUG, false, false);
     }

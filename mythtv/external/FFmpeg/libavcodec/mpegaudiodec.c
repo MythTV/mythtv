@@ -174,9 +174,12 @@ static void ff_region_offset2size(GranuleDef *g)
 
 static void ff_init_short_region(MPADecodeContext *s, GranuleDef *g)
 {
-    if (g->block_type == 2)
-        g->region_size[0] = (36 / 2);
-    else {
+    if (g->block_type == 2) {
+        if (s->sample_rate_index != 8)
+            g->region_size[0] = (36 / 2);
+        else
+            g->region_size[0] = (72 / 2);
+    } else {
         if (s->sample_rate_index <= 2)
             g->region_size[0] = (36 / 2);
         else if (s->sample_rate_index != 8)
@@ -201,14 +204,12 @@ static void ff_compute_band_indexes(MPADecodeContext *s, GranuleDef *g)
     if (g->block_type == 2) {
         if (g->switch_point) {
             /* if switched mode, we handle the 36 first samples as
-                long blocks.  For 8000Hz, we handle the 48 first
-                exponents as long blocks (XXX: check this!) */
+                long blocks.  For 8000Hz, we handle the 72 first
+                exponents as long blocks */
             if (s->sample_rate_index <= 2)
                 g->long_end = 8;
-            else if (s->sample_rate_index != 8)
-                g->long_end = 6;
             else
-                g->long_end = 4; /* 8000 Hz */
+                g->long_end = 6;
 
             g->short_start = 2 + (s->sample_rate_index != 8);
         } else {
@@ -1018,7 +1019,7 @@ static void reorder_block(MPADecodeContext *s, GranuleDef *g)
         if (s->sample_rate_index != 8)
             ptr = g->sb_hybrid + 36;
         else
-            ptr = g->sb_hybrid + 48;
+            ptr = g->sb_hybrid + 72;
     } else {
         ptr = g->sb_hybrid;
     }
@@ -1637,10 +1638,19 @@ static int decode_frame(AVCodecContext * avctx, void *data, int *got_frame_ptr,
     uint32_t header;
     int out_size;
 
+    while(buf_size && !*buf){
+        buf++;
+        buf_size--;
+    }
+
     if (buf_size < HEADER_SIZE)
         return AVERROR_INVALIDDATA;
 
     header = AV_RB32(buf);
+    if (header>>8 == AV_RB32("TAG")>>8) {
+        av_log(avctx, AV_LOG_DEBUG, "discarding ID3 tag\n");
+        return buf_size;
+    }
     if (ff_mpa_check_header(header) < 0) {
         av_log(avctx, AV_LOG_ERROR, "Header missing\n");
         return AVERROR_INVALIDDATA;
@@ -1737,6 +1747,10 @@ static int decode_frame_adu(AVCodecContext *avctx, void *data,
     s->frame_size = len;
 
     out_size = mp_decode_frame(s, NULL, buf, buf_size);
+    if (out_size < 0) {
+        av_log(avctx, AV_LOG_ERROR, "Error while decoding MPEG audio frame.\n");
+        return AVERROR_INVALIDDATA;
+    }
 
     *got_frame_ptr   = 1;
     *(AVFrame *)data = s->frame;
@@ -1902,7 +1916,7 @@ static int decode_frame_mp3on4(AVCodecContext *avctx, void *data,
     int fr, j, n, ch, ret;
 
     /* get output buffer */
-    s->frame->nb_samples = MPA_FRAME_SIZE;
+    s->frame->nb_samples = s->frames * MPA_FRAME_SIZE;
     if ((ret = avctx->get_buffer(avctx, s->frame)) < 0) {
         av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
         return ret;

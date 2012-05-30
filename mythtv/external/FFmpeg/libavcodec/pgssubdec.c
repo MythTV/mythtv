@@ -426,6 +426,9 @@ static int display_end_segment(AVCodecContext *avctx, void *data,
         sub->rects[rect]->nb_colors    = 256;
         sub->rects[rect]->pict.data[1] = av_mallocz(AVPALETTE_SIZE);
 
+        /* Copy the forced flag */
+        sub->rects[rect]->forced = (ctx->presentation.objects[rect].composition & 0x40) != 0;
+
         if (!ctx->forced_subs_only || ctx->presentation.objects[rect].composition & 0x40)
         memcpy(sub->rects[rect]->pict.data[1], ctx->clut, sub->rects[rect]->nb_colors * sizeof(uint32_t));
     }
@@ -530,6 +533,6 @@ AVCodec ff_pgssub_decoder = {
     .init           = init_decoder,
     .close          = close_decoder,
     .decode         = decode,
-    .long_name = NULL_IF_CONFIG_SMALL("HDMV Presentation Graphic Stream subtitles"),
+    .long_name      = NULL_IF_CONFIG_SMALL("HDMV Presentation Graphic Stream subtitles"),
     .priv_class     = &pgsdec_class,
 };

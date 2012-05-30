@@ -36,7 +36,7 @@
 #include "color.h"
 
 #if HAVE_MMX
-#include "libavcodec/x86/mmx.h"
+#include "ffmpeg-mmx.h"
 #endif
 
 void (*yv12_to_yuy2)

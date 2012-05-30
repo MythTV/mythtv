@@ -46,7 +46,7 @@ bool BaseRequestHandler::HandleAnnounce(MythSocket *socket,
 
     QStringList sl; sl << "OK";
     handler->SendStringList(sl);
-    handler->DownRef();
+    handler->DecrRef();
     handler = NULL;
 
     LOG(VB_GENERAL, LOG_DEBUG, QString("MainServer::ANN %1")

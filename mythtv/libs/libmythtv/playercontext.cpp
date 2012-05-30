@@ -374,8 +374,6 @@ bool PlayerContext::CreatePlayer(TV *tv, QWidget *widget,
                                  bool embed, const QRect &embedbounds,
                                  bool muted)
 {
-    int exact_seeking = gCoreContext->GetNumSetting("ExactSeeking", 0);
-
     if (HasPlayer())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
@@ -400,7 +398,7 @@ bool PlayerContext::CreatePlayer(TV *tv, QWidget *widget,
         gCoreContext->GetNumSetting("PassThruDeviceOverride", false) ?
         gCoreContext->GetSetting("PassThruOutputDevice") : QString::null;
 
-    player->SetPlayerInfo(tv, widget, exact_seeking, this);
+    player->SetPlayerInfo(tv, widget, this);
     AudioPlayer *audio = player->GetAudio();
     audio->SetAudioInfo(gCoreContext->GetSetting("AudioOutputDevice"),
                         passthru_device,

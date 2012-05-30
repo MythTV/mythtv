@@ -144,7 +144,7 @@ void ASIStreamHandler::run(void)
         return;
     }
 
-    DeviceReadBuffer *drb = new DeviceReadBuffer(this);
+    DeviceReadBuffer *drb = new DeviceReadBuffer(this, true, false);
     bool ok = drb->Setup(_device, _fd, _packet_size, _buf_size);
     if (!ok)
     {

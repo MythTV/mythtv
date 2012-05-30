@@ -139,8 +139,8 @@ Metadata* MetaIOFLACVorbis::read(const QString &filename)
 
     if (metadata->Length() <= 0)
         metadata->setLength(getTrackLength(flacfile));
-    else
-        delete flacfile;
+
+    delete flacfile;
 
     return metadata;
 }

@@ -263,8 +263,6 @@ void HouseKeeper::RunHouseKeeping(void)
                                            " 'schedulesdirect1' );");
 
                         if ((result.exec()) &&
-                            (result.isActive()) &&
-                            (result.size() > 0) &&
                             (result.next()) &&
                             (result.value(0).toInt() > 0))
                             grabberSupportsNextTime = true;
@@ -716,11 +714,11 @@ void HouseKeeper::CleanupProgramListings(void)
                   "WHERE type = :FINDONE AND oldfind.findid IS NOT NULL;");
     findq.bindValue(":FINDONE", kFindOneRecord);
 
-    if (findq.exec() && findq.size() > 0)
+    if (findq.exec())
     {
+        query.prepare("DELETE FROM record WHERE recordid = :RECORDID;");
         while (findq.next())
         {
-            query.prepare("DELETE FROM record WHERE recordid = :RECORDID;");
             query.bindValue(":RECORDID", findq.value(0).toInt());
             if (!query.exec())
                 MythDB::DBError("HouseKeeper Cleaning Program Listings", query);

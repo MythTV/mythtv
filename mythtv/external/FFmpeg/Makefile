@@ -34,6 +34,7 @@ ALLMANPAGES = $(BASENAMES:%=%.1)
 FFLIBS-$(CONFIG_AVDEVICE) += avdevice
 FFLIBS-$(CONFIG_AVFILTER) += avfilter
 FFLIBS-$(CONFIG_AVFORMAT) += avformat
+FFLIBS-$(CONFIG_AVRESAMPLE) += avresample
 FFLIBS-$(CONFIG_AVCODEC)  += avcodec
 FFLIBS-$(CONFIG_POSTPROC) += postproc
 FFLIBS-$(CONFIG_SWRESAMPLE)+= swresample
@@ -42,6 +43,7 @@ FFLIBS-$(CONFIG_SWSCALE)  += swscale
 FFLIBS := avutil
 
 DATA_FILES := $(wildcard $(SRC_PATH)/presets/*.ffpreset) $(SRC_PATH)/doc/ffprobe.xsd
+EXAMPLES_FILES := $(wildcard $(SRC_PATH)/doc/examples/*.c) $(SRC_PATH)/doc/examples/Makefile
 
 SKIPHEADERS = cmdutils_common_opts.h
 
@@ -72,7 +74,8 @@ config.h: .config
 
 SUBDIR_VARS := CLEANFILES EXAMPLES FFLIBS HOSTPROGS TESTPROGS TOOLS      \
                ARCH_HEADERS BUILT_HEADERS SKIPHEADERS                    \
-               ALTIVEC-OBJS ARMV6-OBJS MMX-OBJS NEON-OBJS YASM-OBJS      \
+               ALTIVEC-OBJS ARMV5TE-OBJS ARMV6-OBJS ARMVFP-OBJS MMI-OBJS \
+               MMX-OBJS NEON-OBJS VIS-OBJS YASM-OBJS                     \
                OBJS TESTOBJS
 
 define RESET
@@ -133,9 +136,10 @@ install-mythprogs: install-progs-yes $(MYTHPROGS)
 	$(Q)mkdir -p "$(BINDIR)"
 	$(INSTALL) -c -m 755 $(MYTHPROGS) "$(BINDIR)"
 
-install-data: $(DATA_FILES)
-	$(Q)mkdir -p "$(DATADIR)"
+install-data: $(DATA_FILES) $(EXAMPLES_FILES)
+	$(Q)mkdir -p "$(DATADIR)/examples"
 	$(INSTALL) -m 644 $(DATA_FILES) "$(DATADIR)"
+	$(INSTALL) -m 644 $(EXAMPLES_FILES) "$(DATADIR)/examples"
 
 uninstall: uninstall-libs uninstall-headers uninstall-progs uninstall-data
 
@@ -183,5 +187,5 @@ $(sort $(OBJDIRS)):
 # so this saves some time on slow systems.
 .SUFFIXES:
 
-.PHONY: all all-yes alltools *clean config examples install*
+.PHONY: all all-yes alltools check *clean config install*
 .PHONY: testprogs uninstall*

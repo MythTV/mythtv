@@ -46,7 +46,8 @@
 // Constants
 #define PLAYBACK_MINBUFFER 2    // number of segments to prefetch before playback starts
 #define PLAYBACK_READAHEAD 6    // number of segments download queue ahead of playback
-
+#define PLAYLIST_FAILURE   6    // number of consecutive failures after which
+                                // playback will abort
 enum
 {
     RET_ERROR = -1,
@@ -90,7 +91,7 @@ public:
     {
         m_duration      = mduration; /* seconds */
         m_id            = id;
-        m_bandwidth     = 0;
+        m_bitrate       = 0;
         m_url           = uri;
         m_played        = 0;
         m_title         = title;
@@ -115,7 +116,7 @@ public:
             return *this;
         m_id            = rhs.m_id;
         m_duration      = rhs.m_duration;
-        m_bandwidth     = rhs.m_bandwidth;
+        m_bitrate       = rhs.m_bitrate;
         m_url           = rhs.m_url;
         // keep the old data downloaded
         m_data          = m_data;
@@ -182,7 +183,7 @@ public:
         return m_played;
     }
 
-    uint32_t Read(uint8_t *buffer, int32_t length)
+    uint32_t Read(uint8_t *buffer, int32_t length, FILE *fd = NULL)
     {
         int32_t left = m_data.size() - m_played;
         if (length > left)
@@ -192,6 +193,11 @@ public:
         if (buffer != NULL)
         {
             memcpy(buffer, m_data.constData() + m_played, length);
+            // write data to disk if required
+            if (fd)
+            {
+                fwrite(m_data.constData() + m_played, length, 1, fd);
+            }
         }
         m_played += length;
         return length;
@@ -318,16 +324,16 @@ public:
 private:
     AES_KEY     m_aeskey;       // AES-128 key
     bool        m_keyloaded;
+    QString     m_psz_key_path; // URL key path
 #endif
 
 private:
     int         m_id;           // unique sequence number
     int         m_duration;     // segment duration (seconds)
-    uint64_t    m_bandwidth;    // bandwidth usage of segments (bits per second)
+    uint64_t    m_bitrate;      // bitrate of segment's content (bits per second)
     QString     m_title;        // human-readable informative title of the media segment
 
     QString     m_url;
-    QString     m_psz_key_path; // URL key path
     QByteArray  m_data;         // raw data
     int32_t     m_played;       // bytes counter of data already read from segment
     QMutex      m_lock;
@@ -338,12 +344,14 @@ private:
 class HLSStream
 {
 public:
-    HLSStream(const int mid, const uint64_t bw, QString &uri)
+    HLSStream(const int mid, const uint64_t bitrate, QString &uri)
     {
         m_id            = mid;
-        m_bandwidth     = bw;
+        m_bitrate       = bitrate;
         m_targetduration= -1;   // not known yet
-        m_size          = 0;
+        m_size          = 0LL;
+        m_duration      = 0LL;
+        m_live          = true;
         m_startsequence = 0;    // default is 0
         m_version       = 1;    // default protocol version
         m_cache         = true;
@@ -386,8 +394,10 @@ public:
         m_version       = rhs.m_version;
         m_startsequence = rhs.m_startsequence;
         m_targetduration= rhs.m_targetduration;
-        m_bandwidth     = rhs.m_bandwidth;
+        m_bitrate       = rhs.m_bitrate;
         m_size          = rhs.m_size;
+        m_duration      = rhs.m_duration;
+        m_live          = rhs.m_live;
         m_url           = rhs.m_url;
         m_cache         = rhs.m_cache;
 #ifdef USING_LIBCRYPTO
@@ -399,17 +409,17 @@ public:
 
     static bool IsGreater(const HLSStream *s1, const HLSStream *s2)
     {
-        return s1->Bandwidth() > s2->Bandwidth();
+        return s1->Bitrate() > s2->Bitrate();
     }
 
     bool operator<(HLSStream &b)
     {
-        return this->Bandwidth() < b.Bandwidth();
+        return this->Bitrate() < b.Bitrate();
     }
 
     bool operator>(HLSStream &b)
     {
-        return this->Bandwidth() > b.Bandwidth();
+        return this->Bitrate() > b.Bitrate();
     }
 
     /**
@@ -435,12 +445,18 @@ public:
             }
             else
             {
-                size += segment->Duration() * Bandwidth() / 8;
+                size += segment->Duration() * Bitrate() / 8;
             }
             segment->Unlock();
         }
         m_size = size;
         return m_size;
+    }
+
+    int64_t Duration(void)
+    {
+        QMutexLocker lock(&m_lock);
+        return m_duration;
     }
 
     void Clear(void)
@@ -469,7 +485,7 @@ public:
         return m_segments[wanted];
     }
 
-    HLSSegment *FindSegment(const int id)
+    HLSSegment *FindSegment(const int id, int *segnum = NULL)
     {
         int count = NumSegments();
         if (count <= 0)
@@ -480,37 +496,15 @@ public:
             if (segment == NULL)
                 break;
             if (segment->Id() == id)
+            {
+                if (segnum != NULL)
+                {
+                    *segnum = n;
+                }
                 return segment;
+            }
         }
         return NULL;
-    }
-
-    /**
-     * return the size in bytes of the wanted segment or -1 if segment doesn't
-     * exist.
-     * If the segment hasn't been downloaded yet, estimate its size according
-     * to the stream bandwidth
-     */
-    int64_t GetSegmentLength(int wanted)
-    {
-        QMutexLocker lock(&m_lock);
-        int length;
-        HLSSegment *segment = GetSegment(wanted);
-        if (segment == NULL)
-        {
-            return -1;
-        }
-        segment->Lock();
-        if (segment->Size() > 0)
-        {
-            length = segment->Size();
-        }
-        else
-        {
-            length = segment->Duration() * Bandwidth() / 8;
-        }
-        segment->Unlock();
-        return length;
     }
 
     void AddSegment(const int duration, QString &title, QString &uri)
@@ -524,11 +518,13 @@ public:
         HLSSegment *segment = new HLSSegment(duration, id, title, psz_uri,
                                              m_keypath);
         AppendSegment(segment);
+        m_duration += duration;
     }
 
     void RemoveSegment(HLSSegment *segment, bool willdelete = true)
     {
         QMutexLocker lock(&m_lock);
+        m_duration -= segment->Duration();
         if (willdelete)
         {
             delete segment;
@@ -548,6 +544,18 @@ public:
         return;
     }
 
+    void RemoveSegment(int segnum, bool willdelete = true)
+    {
+        QMutexLocker lock(&m_lock);
+        HLSSegment *segment = GetSegment(segnum);
+        m_duration -= segment->Duration();
+        if (willdelete)
+        {
+            delete segment;
+        }
+        m_segments.removeAt(segnum);
+        return;
+    }
     void RemoveListSegments(QMap<HLSSegment*,bool> &table)
     {
         QMap<HLSSegment*,bool>::iterator it;
@@ -559,9 +567,9 @@ public:
         }
     }
 
-    int DownloadSegmentData(int segmentnum, uint64_t &bandwidth, int stream)
+    int DownloadSegmentData(int segnum, uint64_t &bandwidth, int stream)
     {
-        HLSSegment *segment = GetSegment(segmentnum);
+        HLSSegment *segment = GetSegment(segnum);
         if (segment == NULL)
             return RET_ERROR;
 
@@ -574,19 +582,21 @@ public:
         }
 
         LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
-            QString("started download of segment %1/%2 using stream %3")
-            .arg(segment->Id()).arg(NumSegments()+m_startsequence).arg(stream));
+            QString("started download of segment %1 [%2/%3] using stream %4")
+            .arg(segnum).arg(segment->Id()).arg(NumSegments()+m_startsequence)
+            .arg(stream));
 
         /* sanity check - can we download this segment on time? */
-        if ((bandwidth > 0) && (m_bandwidth > 0))
+        if ((bandwidth > 0) && (m_bitrate > 0))
         {
-            uint64_t size = (segment->Duration() * m_bandwidth); /* bits */
+            uint64_t size = (segment->Duration() * m_bitrate); /* bits */
             int estimated = (int)(size / bandwidth);
             if (estimated > segment->Duration())
             {
                 LOG(VB_PLAYBACK, LOG_INFO, LOC +
-                    QString("downloading of segment %1 will take %2s, "
-                            "which is longer than its playback (%3s) at %4bit/s")
+                    QString("downloading of segment %1 [id:%2] will take %3s, "
+                            "which is longer than its playback (%4s) at %5bit/s")
+                    .arg(segnum)
                     .arg(segment->Id())
                     .arg(estimated)
                     .arg(segment->Duration())
@@ -598,17 +608,17 @@ public:
         if (segment->Download() != RET_OK)
         {
             LOG(VB_PLAYBACK, LOG_ERR, LOC +
-                QString("downloaded segment %1 from stream %2 failed")
-                .arg(segment->Id()).arg(m_id));
+                QString("downloaded segment %1 [id:%2] from stream %3 failed")
+                .arg(segnum).arg(segment->Id()).arg(m_id));
             segment->Unlock();
             return RET_ERROR;
         }
 
         uint64_t downloadduration = mdate() - start;
-        if (m_bandwidth == 0 && segment->Duration() > 0)
+        if (m_bitrate == 0 && segment->Duration() > 0)
         {
             /* Try to estimate the bandwidth for this stream */
-            m_bandwidth = (uint64_t)(((double)segment->Size() * 8) /
+            m_bitrate = (uint64_t)(((double)segment->Size() * 8) /
                                      ((double)segment->Duration()));
         }
 
@@ -639,7 +649,8 @@ public:
         downloadduration = downloadduration < 1 ? 1 : downloadduration;
         bandwidth = segment->Size() * 8 * 1000000ULL / downloadduration; /* bits / s */
         LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
-            QString("downloaded segment %1 took %2ms for %3 bytes: bandwidth:%4kiB/s")
+            QString("downloaded segment %1 [id:%2] took %3ms for %4 bytes: bandwidth:%5kiB/s")
+            .arg(segnum)
             .arg(segment->Id())
             .arg(downloadduration / 1000)
             .arg(segment->Size())
@@ -675,9 +686,9 @@ public:
     {
         m_targetduration = x;
     }
-    uint64_t Bandwidth(void) const
+    uint64_t Bitrate(void) const
     {
-        return m_bandwidth;
+        return m_bitrate;
     }
     bool Cache(void)
     {
@@ -686,6 +697,14 @@ public:
     void SetCache(bool x)
     {
         m_cache = x;
+    }
+    bool Live(void)
+    {
+        return m_live;
+    }
+    void SetLive(bool x)
+    {
+        m_live = x;
     }
     void Lock(void)
     {
@@ -703,7 +722,7 @@ public:
     {
         QMutexLocker lock(&m_lock);
         m_targetduration    = upd.m_targetduration < 0 ?
-                                m_targetduration : upd.m_targetduration;
+            m_targetduration : upd.m_targetduration;
         m_cache             = upd.m_cache;
     }
 #ifdef USING_LIBCRYPTO
@@ -782,9 +801,11 @@ private:
     int         m_version;              // protocol version should be 1
     int         m_startsequence;        // media starting sequence number
     int         m_targetduration;       // maximum duration per segment (s)
-    uint64_t    m_bandwidth;            // bandwidth usage of segments (bits per second)
+    uint64_t    m_bitrate;              // bitrate of stream content (bits per second)
     uint64_t    m_size;                 // stream length is calculated by taking the sum
-                                        // foreach segment of (segment->duration * hls->bandwidth/8)
+                                        // foreach segment of (segment->duration * hls->bitrate/8)
+    int64_t     m_duration;             // duration of the stream in seconds
+    bool        m_live;
 
     QList<HLSSegment*> m_segments;      // list of segments
     QString     m_url;                  // uri to m3u8
@@ -851,7 +872,7 @@ class StreamWorker : public MThread
 public:
     StreamWorker(HLSRingBuffer *parent, int startup, int buffer) : MThread("HLSStream"),
         m_parent(parent), m_interrupted(false), m_bandwidth(0), m_stream(0),
-        m_segment(startup), m_seek(-1), m_buffer(buffer),
+        m_segment(startup), m_buffer(buffer),
         m_sumbandwidth(0.0), m_countbandwidth(0)
     {
     }
@@ -874,22 +895,8 @@ public:
     void Seek(int val)
     {
         QMutexLocker lock(&m_lock);
-        m_seek = val;
+        m_segment = val;
         Wakeup();
-    }
-    bool IsSeeking(void)
-    {
-        // must own lock
-        return m_seek != -1;
-    }
-    bool SetFromSeek(void)
-    {
-        // must own lock
-        if (m_seek < 0)
-            return false;
-        m_segment = m_seek;
-        m_seek = -1;
-        return true;
     }
     bool IsAtEnd(bool lock = false)
     {
@@ -905,6 +912,25 @@ public:
         }
         return ret;
     }
+
+    /**
+     * check that we have at least [count] segments buffered from position [from]
+     */
+    bool GotBufferedSegments(int from, int count)
+    {
+        if (from + count > m_parent->NumSegments())
+            return false;
+
+        for (int i = from; i < from + count; i++)
+        {
+            if (StreamForSegment(i, false) < 0)
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
     int CurrentPlaybackBuffer(bool lock = true)
     {
         if (lock)
@@ -918,6 +944,11 @@ public:
         }
         return ret;
     }
+    int CurrentLiveBuffer(void)
+    {
+        QMutexLocker lock(&m_lock);
+        return m_parent->NumSegments() - m_segment;
+    }
     void SetBuffer(int val)
     {
         QMutexLocker lock(&m_lock);
@@ -928,6 +959,12 @@ public:
         QMutexLocker lock(&m_lock);
         m_segmap.insert(segnum, stream);
     }
+    void RemoveSegmentFromStream(int segnum)
+    {
+        QMutexLocker lock(&m_lock);
+        m_segmap.remove(segnum);
+    }
+
     /**
      * return the stream used to download a particular segment
      * or -1 if it was never downloaded
@@ -972,7 +1009,7 @@ public:
     {
         m_lock.unlock();
     }
-    uint64_t Bandwidth(void)
+    int64_t Bandwidth(void)
     {
         return m_bandwidth;
     }
@@ -996,24 +1033,26 @@ protected:
              * - we are at the end of the stream
              */
             Lock();
+            HLSStream *hls  = m_parent->GetStream(m_stream);
+            int dnldsegment = m_segment;
             int playsegment = m_parent->m_playback->Segment();
-            if ((!m_parent->m_live && (playsegment < m_segment - m_buffer)) ||
+            if ((!hls->Live() && (playsegment < dnldsegment - m_buffer)) ||
                 IsAtEnd())
             {
                 /* wait until
                  * 1- got interrupted
                  * 2- we are less than 6 segments ahead of playback
                  * 3- got asked to seek to a particular segment */
-                while (!m_interrupted && !IsSeeking() &&
+                while (!m_interrupted && (m_segment == dnldsegment) &&
                        (((m_segment - playsegment) > m_buffer) || IsAtEnd()))
                 {
                     WaitForSignal();
                     // do we have new segments available added by PlaylistWork?
-                    if (m_parent->m_live && !IsAtEnd())
+                    if (hls->Live() && !IsAtEnd())
                         break;
                     playsegment = m_parent->m_playback->Segment();
                 }
-                SetFromSeek();
+                dnldsegment = m_segment;
             }
             Unlock();
 
@@ -1023,11 +1062,10 @@ protected:
                 break;
             }
             // have we already downloaded the required segment?
-            if (StreamForSegment(m_segment) < 0)
+            if (StreamForSegment(dnldsegment) < 0)
             {
-                HLSStream *hls = m_parent->GetStream(m_stream);
                 uint64_t bw = m_bandwidth;
-                int err = hls->DownloadSegmentData(m_segment, bw, m_stream);
+                int err = hls->DownloadSegmentData(dnldsegment, bw, m_stream);
                 bw = AverageNewBandwidth(bw);
                 if (err != RET_OK)
                 {
@@ -1036,31 +1074,46 @@ protected:
                     retries++;
                     LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
                         QString("download failed, retry #%1").arg(retries));
-                    // should test which error, in the mean time, just retry
+                    if (retries == 1)   // first error
+                        continue;       // will retry immediately
+                    usleep(500000);     // sleep 0.5s
+                    if (retries == 2)   // and retry once again
+                        continue;
                     if (!m_parent->m_meta)
-                        continue; // no other stream to default to
-                    // error, should try another stream
-                    continue;
-                }
-
-                AddSegmentToStream(m_segment, m_stream);
-                if (m_parent->m_meta && hls->Bandwidth() != bw)
-                {
-                    int newstream = m_parent->BandwidthAdaptation(hls->Id(), bw);
-
-                    if (newstream >= 0 && newstream != m_stream)
                     {
-                        LOG(VB_PLAYBACK, LOG_INFO, LOC +
-                            QString("detected %1 bandwidth %2 stream changing "
-                                    "from stream %3 to stream %4")
-                            .arg(bw >= hls->Bandwidth() ? "faster" : "lower")
-                            .arg(bw).arg(m_stream).arg(newstream));
-                        m_stream = newstream;
+                        // no other stream to default to, skip packet
+                        retries = 0;
+                    }
+                    else
+                    {
+                        // TODO: should switch to another stream
+                        retries = 0;
+                    }
+                }
+                else
+                {
+                    LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
+                        QString("download completed, %1 segments ahead")
+                        .arg(CurrentLiveBuffer()));
+                    AddSegmentToStream(dnldsegment, m_stream);
+                    if (m_parent->m_meta && hls->Bitrate() != bw)
+                    {
+                        int newstream = BandwidthAdaptation(hls->Id(), bw);
+
+                        if (newstream >= 0 && newstream != m_stream)
+                        {
+                            LOG(VB_PLAYBACK, LOG_INFO, LOC +
+                                QString("switching to %1 bitrate %2 stream; changing "
+                                        "from stream %3 to stream %4")
+                                .arg(bw >= hls->Bitrate() ? "faster" : "lower")
+                                .arg(bw).arg(m_stream).arg(newstream));
+                            m_stream = newstream;
+                        }
                     }
                 }
             }
             Lock();
-            if (!SetFromSeek())
+            if (dnldsegment == m_segment)   // false if seek was called
             {
                 m_segment++;
             }
@@ -1070,13 +1123,44 @@ protected:
         }
     }
 
+    int BandwidthAdaptation(int progid, uint64_t &bandwidth)
+    {
+        int candidate = -1;
+        uint64_t bw = bandwidth;
+        uint64_t bw_candidate = 0;
+
+        int count = m_parent->NumStreams();
+        for (int n = 0; n < count; n++)
+        {
+            /* Select best bandwidth match */
+            HLSStream *hls = m_parent->GetStream(n);
+            if (hls == NULL)
+                break;
+
+            /* only consider streams with the same PROGRAM-ID */
+            if (hls->Id() == progid)
+            {
+                if ((bw >= hls->Bitrate()) &&
+                    (bw_candidate < hls->Bitrate()))
+                {
+                    LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
+                        QString("candidate stream %1 bitrate %2 >= %3")
+                        .arg(n).arg(bw).arg(hls->Bitrate()));
+                    bw_candidate = hls->Bitrate();
+                    candidate = n; /* possible candidate */
+                }
+            }
+        }
+        bandwidth = bw_candidate;
+        return candidate;
+    }
+
 private:
     HLSRingBuffer  *m_parent;
     bool            m_interrupted;
-    uint64_t        m_bandwidth;// measured average download bandwidth (bits per second)
+    int64_t         m_bandwidth;// measured average download bandwidth (bits per second)
     int             m_stream;   // current HLSStream
     int             m_segment;  // current segment for downloading
-    int             m_seek;     // segment requested by seek (default -1)
     int             m_buffer;   // buffer kept between download and playback
     QMap<int,int>   m_segmap;   // segment with streamid used for download
     mutable QMutex  m_lock;
@@ -1090,21 +1174,46 @@ class PlaylistWorker : public MThread
 {
 public:
     PlaylistWorker(HLSRingBuffer *parent, int64_t wait) : MThread("HLSStream"),
-        m_parent(parent), m_interrupted(false), m_tries(0)
+        m_parent(parent), m_interrupted(false), m_retries(0)
     {
-        m_last   = mdate();
-        m_wakeup = m_last + wait;
+        m_wakeup    = wait;
+        m_wokenup   = false;
     }
     void Cancel()
     {
         m_interrupted = true;
+        Wakeup();
         wait();
+    }
+
+    void Wakeup(void)
+    {
+        QMutexLocker lock(&m_lock);
+        m_wokenup = true;
+        // send a wake signal
+        m_waitcond.wakeAll();
+    }
+    void WaitForSignal(unsigned long time = ULONG_MAX)
+    {
+        // must own lock
+        m_waitcond.wait(&m_lock, time);
+    }
+    void Lock(void)
+    {
+        m_lock.lock();
+    }
+    void Unlock(void)
+    {
+        m_lock.unlock();
     }
 
 protected:
     void run(void)
     {
         double wait = 0.5;
+        double factor = m_parent->GetCurrentStream()->Live() ? 1.0 : 2.0;
+
+        QWaitCondition mcond;
 
         while (!m_interrupted)
         {
@@ -1116,51 +1225,68 @@ protected:
                 m_interrupted = true;
                 break;
             }
-            int64_t now = mdate();
-            if (now >= m_wakeup)
-            {
-                /* reload the m3u8 */
-                if (ReloadPlaylist() != RET_OK)
-                {
-                    /* No change in playlist, then backoff */
-                    m_tries++;
-                    if (m_tries == 1)       wait = 0.5;
-                    else if (m_tries == 2)  wait = 1;
-                    else if (m_tries >= 3)  wait = 2;
 
-                    /* Can we afford to backoff? */
-                    if (m_parent->m_streamworker->CurrentPlaybackBuffer() < 3)
-                    {
-                        if (m_tries == 0)
-                            continue; // restart immediately if it's the first try
-                        m_tries = 0;
-                        wait = 0.5;
-                    }
-                }
-                else
+            Lock();
+            if (!m_wokenup)
+            {
+                unsigned long waittime = m_wakeup < 100 ? 100 : m_wakeup;
+                LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
+                    QString("PlayListWorker refreshing in %1s")
+                    .arg(waittime / 1000));
+                WaitForSignal(waittime);
+            }
+            m_wokenup = false;
+            Unlock();
+
+            /* reload the m3u8 */
+            if (ReloadPlaylist() != RET_OK)
+            {
+                /* No change in playlist, then backoff */
+                m_retries++;
+                if (m_retries == 1)       wait = 0.5;
+                else if (m_retries == 2)  wait = 1;
+                else if (m_retries >= 3)  wait = 2;
+
+                // If we haven't been able to reload the playlist after x times
+                // it probably means the stream got deleted, so abort
+                if (m_retries > PLAYLIST_FAILURE)
                 {
-                    // make streamworker process things
-                    m_parent->m_streamworker->Wakeup();
-                    m_tries = 0;
+                    LOG(VB_PLAYBACK, LOG_ERR, LOC +
+                        QString("reloading the playlist failed after %1 attempts."
+                                "aborting.").arg(PLAYLIST_FAILURE));
+                    m_parent->m_error = true;
+                }
+
+                /* Can we afford to backoff? */
+                if (m_parent->m_streamworker->CurrentPlaybackBuffer() < 3)
+                {
+                    if (m_retries == 1)
+                        continue; // restart immediately if it's the first try
+                    m_retries = 0;
                     wait = 0.5;
                 }
-
-                HLSStream *hls = m_parent->CurrentStream();
-                if (hls == NULL)
-                {
-                    // an irrevocable error has occured. exit
-                    LOG(VB_PLAYBACK, LOG_ERR, LOC +
-                        "unable to retrieve current stream, aborting live playback");
-                    m_interrupted = true;
-                    break;
-                }
-
-                /* determine next time to update playlist */
-                m_last   = now;
-                m_wakeup = now + ((int64_t)(hls->TargetDuration() * wait)
-                                  * (int64_t)1000000);
             }
-            usleep(1000000); // sleep 1s
+            else
+            {
+                // make streamworker process things
+                m_parent->m_streamworker->Wakeup();
+                m_retries = 0;
+                wait = 0.5;
+            }
+
+            HLSStream *hls = m_parent->GetCurrentStream();
+            if (hls == NULL)
+            {
+                // an irrevocable error has occured. exit
+                LOG(VB_PLAYBACK, LOG_ERR, LOC +
+                    "unable to retrieve current stream, aborting live playback");
+                m_interrupted = true;
+                break;
+            }
+
+            /* determine next time to update playlist */
+            m_wakeup = ((int64_t)(hls->TargetDuration() * wait * factor)
+                        * (int64_t)1000);
         }
     }
 
@@ -1172,7 +1298,7 @@ private:
     {
         StreamsList *streams = new StreamsList;
 
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + "Reloading HLS live meta playlist");
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + "reloading HLS live meta playlist");
 
         if (GetHTTPLiveMetaPlaylist(streams) != RET_OK)
         {
@@ -1194,14 +1320,14 @@ private:
             {   /* new hls stream - append */
                 m_parent->m_streams.append(hls_new);
                 LOG(VB_PLAYBACK, LOG_INFO, LOC +
-                    QString("new HLS stream appended (id=%1, bandwidth=%2)")
-                    .arg(hls_new->Id()).arg(hls_new->Bandwidth()));
+                    QString("new HLS stream appended (id=%1, bitrate=%2)")
+                    .arg(hls_new->Id()).arg(hls_new->Bitrate()));
             }
             else if (UpdatePlaylist(hls_new, hls_old) != RET_OK)
             {
                 LOG(VB_PLAYBACK, LOG_ERR, LOC +
                     QString("failed updating HLS stream (id=%1, bandwidth=%2)")
-                    .arg(hls_new->Id()).arg(hls_new->Bandwidth()));
+                    .arg(hls_new->Id()).arg(hls_new->Bitrate()));
                 m_parent->FreeStreamsList(streams);
                 return RET_ERROR;
             }
@@ -1215,8 +1341,8 @@ private:
         int count = hls_new->NumSegments();
 
         LOG(VB_PLAYBACK, LOG_INFO, LOC +
-            QString("updated hls stream (program-id=%1, bandwidth=%2) has %3 segments")
-            .arg(hls_new->Id()).arg(hls_new->Bandwidth()).arg(count));
+            QString("updated hls stream (program-id=%1, bitrate=%2) has %3 segments")
+            .arg(hls_new->Id()).arg(hls_new->Bitrate()).arg(count));
         QMap<HLSSegment*,bool> table;
 
         for (int n = 0; n < count; n++)
@@ -1256,17 +1382,6 @@ private:
             }
             else
             {
-                // check if it was considered a VOD playlist before
-                // switch to live mode if changes are detected
-                // Some provider use the #EXT-X-ENDLIST incorrectly
-                if (!m_parent->m_live)
-                {
-                    m_parent->m_live     = true;
-                    m_parent->m_falsevod = true;
-                    LOG(VB_PLAYBACK, LOG_WARNING, LOC +
-                        "switching to live mode, HLS stream incorrectly tagged "
-                        "stream as VOD");
-                }
                 int last = hls->NumSegments() - 1;
                 HLSSegment *l = hls->GetSegment(last);
                 if (l == NULL)
@@ -1321,23 +1436,26 @@ private:
             /* Parse HLS m3u8 content. */
             err = m_parent->ParseM3U8(&buffer, streams);
         }
+        m_parent->SanitizeStreams(streams);
         return err;
     }
 
     // private variable members
     HLSRingBuffer * m_parent;
     bool            m_interrupted;
-    int64_t         m_last;       /* playlist last loaded */
-    int64_t         m_wakeup;     /* next reload time */
-    int             m_tries;      /* times it was not changed */
+    int64_t         m_wakeup;       // next reload time
+    int             m_retries;      // number of consecutive failures
+    bool            m_wokenup;
+    QMutex          m_lock;
+    QWaitCondition  m_waitcond;
 };
 
 HLSRingBuffer::HLSRingBuffer(const QString &lfilename) :
     RingBuffer(kRingBuffer_HLS),
     m_playback(new HLSPlayback()),
-    m_cache(false),         m_meta(false),          m_live(true),
-    m_falsevod(false),      m_error(false),         m_aesmsg(false),
-    m_streamworker(NULL),   m_playlistworker(NULL)
+    m_meta(false),          m_error(false),         m_aesmsg(false),
+    m_startup(0),           m_bitrate(0),           m_seektoend(false),
+    m_streamworker(NULL),   m_playlistworker(NULL), m_fd(NULL)
 {
     startreadahead = false;
     OpenFile(lfilename);
@@ -1360,6 +1478,10 @@ HLSRingBuffer::~HLSRingBuffer()
     }
     FreeStreamsList(&m_streams);
     delete m_playback;
+    if (m_fd)
+    {
+        fclose(m_fd);
+    }
 }
 
 void HLSRingBuffer::FreeStreamsList(StreamsList *streams)
@@ -1385,7 +1507,7 @@ HLSStream *HLSRingBuffer::GetStreamForSegment(int segnum)
     int stream = m_streamworker->StreamForSegment(segnum);
     if (stream < 0)
     {
-        return CurrentStream();
+        return GetCurrentStream();
     }
     return GetStream(stream);
 }
@@ -1423,7 +1545,7 @@ HLSStream *HLSRingBuffer::GetLastStream(const StreamsList *streams)
 }
 
 HLSStream *HLSRingBuffer::FindStream(const HLSStream *hls_new,
-                                      const StreamsList *streams)
+                                     const StreamsList *streams)
 {
     if (streams == NULL)
     {
@@ -1437,8 +1559,8 @@ HLSStream *HLSRingBuffer::FindStream(const HLSStream *hls_new,
         {
             /* compare */
             if ((hls->Id() == hls_new->Id()) &&
-                ((hls->Bandwidth() == hls_new->Bandwidth()) ||
-                 (hls_new->Bandwidth() == 0)))
+                ((hls->Bitrate() == hls_new->Bitrate()) ||
+                 (hls_new->Bitrate() == 0)))
             {
                 return hls;
             }
@@ -1450,45 +1572,13 @@ HLSStream *HLSRingBuffer::FindStream(const HLSStream *hls_new,
 /**
  * return the stream we are currently streaming from
  */
-HLSStream *HLSRingBuffer::CurrentStream(void)
+HLSStream *HLSRingBuffer::GetCurrentStream(void) const
 {
     if (!m_streamworker)
     {
         return NULL;
     }
     return GetStream(m_streamworker->CurrentStream());
-}
-
-int HLSRingBuffer::BandwidthAdaptation(int progid, uint64_t &bandwidth)
-{
-    int candidate = -1;
-    uint64_t bw = bandwidth;
-    uint64_t bw_candidate = 0;
-
-    int count = m_streams.size();
-    for (int n = 0; n < count; n++)
-    {
-        /* Select best bandwidth match */
-        HLSStream *hls = GetStream(n);
-        if (hls == NULL)
-            break;
-
-        /* only consider streams with the same PROGRAM-ID */
-        if (hls->Id() == progid)
-        {
-            if ((bw >= hls->Bandwidth()) &&
-                (bw_candidate < hls->Bandwidth()))
-            {
-                LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
-                    QString("candidate stream %1 bandwidth (bits/s) %2 >= %3")
-                    .arg(n).arg(bw).arg(hls->Bandwidth()));
-                bw_candidate = hls->Bandwidth();
-                candidate = n; /* possible candidate */
-            }
-        }
-    }
-    bandwidth = bw_candidate;
-    return candidate;
 }
 
 bool HLSRingBuffer::IsHTTPLiveStreaming(QByteArray *s)
@@ -1519,7 +1609,7 @@ bool HLSRingBuffer::IsHTTPLiveStreaming(QByteArray *s)
             line.startsWith(QLatin1String("#EXT-X-DISCONTINUITY"))   ||
             line.startsWith(QLatin1String("#EXT-X-VERSION")))
         {
-                return true;
+            return true;
         }
     }
     return false;
@@ -1580,8 +1670,25 @@ QString HLSRingBuffer::ParseAttributes(QString &line, const char *attr)
     return QString();
 }
 
+/**
+ * Return the decimal argument in a line of type: blah:<decimal>
+ * presence of valud <decimal> is compulsory or it will return RET_ERROR
+ */
+int HLSRingBuffer::ParseDecimalValue(QString &line, int &target)
+{
+    int p = line.indexOf(QLatin1String(":"));
+    if (p < 0)
+        return RET_ERROR;
+    int i = p;
+    while (++i < line.size() && line[i].isNumber());
+    if (i == p + 1)
+        return RET_ERROR;
+    target = line.mid(p+1, i - p - 1).toInt();
+    return RET_OK;
+}
+
 int HLSRingBuffer::ParseSegmentInformation(HLSStream *hls, QString &line,
-                                            int &duration, QString &title)
+                                           int &duration, QString &title)
 {
     /*
      * #EXTINF:<duration>,<title>
@@ -1646,10 +1753,8 @@ int HLSRingBuffer::ParseTargetDuration(HLSStream *hls, QString &line)
      * where s is an integer indicating the target duration in seconds.
      */
     int duration       = -1;
-    QByteArray ba      = line.toUtf8();
-    const char *p_read = ba.constData();
-    int ret = sscanf(p_read, "#EXT-X-TARGETDURATION:%d", &duration);
-    if (ret != 1)
+
+    if (ParseDecimalValue(line, duration) != RET_OK)
     {
         LOG(VB_PLAYBACK, LOG_ERR, LOC + "expected #EXT-X-TARGETDURATION:<s>");
         return RET_ERROR;
@@ -1708,26 +1813,20 @@ int HLSRingBuffer::ParseMediaSequence(HLSStream *hls, QString &line)
      * tag.  If the Playlist file does not contain an EXT-X-MEDIA-SEQUENCE
      * tag then the sequence number of the first URI in the playlist SHALL
      * be considered to be 0.
-    */
+     */
     int sequence;
-    QByteArray ba = line.toUtf8();
-    const char *p_read = ba.constData();
 
-    int ret = sscanf(p_read, "#EXT-X-MEDIA-SEQUENCE:%d", &sequence);
-    if (ret != 1)
+    if (ParseDecimalValue(line, sequence) != RET_OK)
     {
         LOG(VB_PLAYBACK, LOG_ERR, LOC + "expected #EXT-X-MEDIA-SEQUENCE:<s>");
         return RET_ERROR;
     }
 
-    if (hls->StartSequence() > 0)
+    if (hls->StartSequence() > 0 && !hls->Live())
     {
-        if (!m_live)
-        {
-            LOG(VB_PLAYBACK, LOG_ERR, LOC +
-                QString("EXT-X-MEDIA-SEQUENCE already present in playlist (new=%1, old=%2)")
-                .arg(sequence).arg(hls->StartSequence()));
-        }
+        LOG(VB_PLAYBACK, LOG_ERR, LOC +
+            QString("EXT-X-MEDIA-SEQUENCE already present in playlist (new=%1, old=%2)")
+            .arg(sequence).arg(hls->StartSequence()));
     }
     hls->SetStartSequence(sequence);
     return RET_OK;
@@ -1861,11 +1960,8 @@ int HLSRingBuffer::ParseVersion(QString &line, int &version)
      *
      * #EXT-X-VERSION:<n>
      */
-    QByteArray ba = line.toUtf8();
-    const char *p_read = ba.constData();
 
-    int ret = sscanf(p_read, "#EXT-X-VERSION:%d", &version);
-    if (ret != 1)
+    if (ParseDecimalValue(line, version) != RET_OK)
     {
         LOG(VB_PLAYBACK, LOG_ERR, LOC +
             "#EXT-X-VERSION: no protocol version found, should be version 1.");
@@ -1889,11 +1985,8 @@ int HLSRingBuffer::ParseEndList(HLSStream *hls)
      * added to the Playlist file.  It MAY occur anywhere in the Playlist
      * file; it MUST NOT occur more than once.  Its format is:
      */
-    m_live = m_falsevod;
-    if (!m_live)
-    {
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + "video on demand (vod) mode");
-    }
+    hls->SetLive(false);
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + "video on demand (vod) mode");
     return RET_OK;
 }
 
@@ -1946,9 +2039,6 @@ int HLSRingBuffer::ParseM3U8(const QByteArray *buffer, StreamsList *streams)
             version = 1;
         }
     }
-
-    /* Is it a live stream ? */
-    m_live = buffer->indexOf("#EXT-X-ENDLIST") < 0 ? true : m_falsevod;
 
     /* Is it a meta index file ? */
     bool meta = buffer->indexOf("#EXT-X-STREAM-INF") < 0 ? false : true;
@@ -2008,10 +2098,6 @@ int HLSRingBuffer::ParseM3U8(const QByteArray *buffer, StreamsList *streams)
     }
     else
     {
-        LOG(VB_PLAYBACK, LOG_INFO, LOC +
-            QString("%1 Playlist HLS protocol version: %2")
-            .arg(m_live ? "Live": "VOD").arg(version));
-
         HLSStream *hls = NULL;
         if (m_meta)
             hls = GetLastStream(streams);
@@ -2033,6 +2119,9 @@ int HLSRingBuffer::ParseM3U8(const QByteArray *buffer, StreamsList *streams)
             /* Store version */
             hls->SetVersion(version);
         }
+        LOG(VB_PLAYBACK, LOG_INFO, LOC +
+            QString("%1 Playlist HLS protocol version: %2")
+            .arg(hls->Live() ? "Live": "VOD").arg(version));
 
         // rewind
         stream.seek(0);
@@ -2112,20 +2201,21 @@ int HLSRingBuffer::Prefetch(int count)
     return RET_OK;
 }
 
-void HLSRingBuffer::SanityCheck(HLSSegment *segment)
+void HLSRingBuffer::SanityCheck(HLSStream *hls, HLSSegment *segment)
 {
+    bool live = hls->Live();
     /* sanity check */
     if ((m_streamworker->CurrentPlaybackBuffer() == 0) &&
-        (!m_streamworker->IsAtEnd(true) || m_live))
+        (!m_streamworker->IsAtEnd(true) || live))
     {
         LOG(VB_PLAYBACK, LOG_WARNING, LOC + "playback will stall");
     }
     else if ((m_streamworker->CurrentPlaybackBuffer() < PLAYBACK_MINBUFFER) &&
-             (!m_streamworker->IsAtEnd(true) || m_live))
+             (!m_streamworker->IsAtEnd(true) || live))
     {
         LOG(VB_PLAYBACK, LOG_WARNING, LOC + "playback in danger of stalling");
     }
-    else if (m_live && m_streamworker->IsAtEnd(true) &&
+    else if (live && m_streamworker->IsAtEnd(true) &&
              (m_streamworker->CurrentPlaybackBuffer() < PLAYBACK_MINBUFFER))
     {
         LOG(VB_PLAYBACK, LOG_WARNING, LOC + "playback will exit soon, starving for data");
@@ -2133,8 +2223,9 @@ void HLSRingBuffer::SanityCheck(HLSSegment *segment)
 }
 
 /**
- * Retrieve segment [segnum] from any available stream
- * Return NULL if segment couldn't be retrieved after 5s
+ * Retrieve segment [segnum] from any available streams.
+ * Assure that the segment has been downloaded
+ * Return NULL if segment couldn't be retrieved after timeout (in ms)
  */
 HLSSegment *HLSRingBuffer::GetSegment(int segnum, int timeout)
 {
@@ -2162,15 +2253,19 @@ HLSSegment *HLSRingBuffer::GetSegment(int segnum, int timeout)
             return NULL;
     }
     HLSStream *hls = GetStream(stream);
-    LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
-        QString("GetSegment[%1] stream[%2] (bitrate:%3)")
-        .arg(segnum).arg(stream).arg(hls->Bandwidth()));
     hls->Lock();
     segment = hls->GetSegment(segnum);
-    m_cache = hls->Cache();
     hls->Unlock();
-    SanityCheck(segment);
+    LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
+        QString("GetSegment %1 [%2] stream[%3] (bitrate:%4)")
+        .arg(segnum).arg(segment->Id()).arg(stream).arg(hls->Bitrate()));
+    SanityCheck(hls, segment);
     return segment;
+}
+
+int HLSRingBuffer::NumStreams(void) const
+{
+    return m_streams.size();
 }
 
 int HLSRingBuffer::NumSegments(void) const
@@ -2224,6 +2319,69 @@ int HLSRingBuffer::ChooseSegment(int stream)
     return wanted;
 }
 
+/**
+ * Streams may not be all starting at the same sequence number, so attempt
+ * to align their starting sequence
+ */
+void HLSRingBuffer::SanitizeStreams(StreamsList *streams)
+{
+    // no lock is required as, at this stage, no threads have either been started
+    // or we are working on a stream list unique to PlaylistWorker
+    if (streams == NULL)
+    {
+        streams = &m_streams;
+    }
+    QMap<int,int> idstart;
+    // Find the highest starting sequence for each stream
+    for (int n = streams->size() - 1 ; n >= 0; n--)
+    {
+        HLSStream *hls = GetStream(n, streams);
+        if (hls->NumSegments() == 0)
+        {
+            streams->removeAt(n);
+            continue;   // remove it
+        }
+
+        int id      = hls->Id();
+        int start   = hls->StartSequence();
+        if (!idstart.contains(id))
+        {
+            idstart.insert(id, start);
+        }
+        int start2  = idstart.value(id);
+        if (start > start2)
+        {
+            idstart.insert(id, start);
+        }
+    }
+    // Find the highest starting sequence for each stream
+    for (int n = 0; n < streams->size(); n++)
+    {
+        HLSStream *hls = GetStream(n, streams);
+        int id      = hls->Id();
+        int seq     = hls->StartSequence();
+        int newstart= idstart.value(id);
+        int todrop  = newstart - seq;
+        if (todrop == 0)
+        {
+            // perfect, leave it alone
+            continue;
+        }
+        if (todrop > hls->NumSegments() || todrop < 0)
+        {
+            LOG(VB_PLAYBACK, LOG_ERR, LOC +
+                QString("stream %1 [id=%2] can't be properly adjusted, ignoring")
+                .arg(n).arg(hls->Id()));
+            continue;
+        }
+        for (int i = 0; i < todrop; i++)
+        {
+            hls->RemoveSegment(0);
+        }
+        hls->SetStartSequence(newstart);
+    }
+}
+
 bool HLSRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
 {
     QWriteLocker lock(&rwlock);
@@ -2258,61 +2416,65 @@ bool HLSRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
         return false;
     }
 
+    SanitizeStreams();
+
     /* HLS standard doesn't provide any guaranty about streams
-     being sorted by bandwidth, so we sort them, higher bandwidth being first */
+     being sorted by bitrate, so we sort them, higher bitrate being first */
     qSort(m_streams.begin(), m_streams.end(), HLSStream::IsGreater);
 
-    int startup = m_live ? ChooseSegment(0) : 0;
-    if (m_live && startup < 0)
-    {
-        LOG(VB_PLAYBACK, LOG_WARNING, LOC +
-            "less data than 3 times 'target duration' available for "
-            "live playback, playback may stall");
-        startup = 0;
-    }
-    m_playback->SetSegment(startup);
+    // if we want as close to live. We should be selecting a further segment
+    // m_live ? ChooseSegment(0) : 0;
+//    if (m_live && m_startup < 0)
+//    {
+//        LOG(VB_PLAYBACK, LOG_WARNING, LOC +
+//            "less data than 3 times 'target duration' available for "
+//            "live playback, playback may stall");
+//        m_startup = 0;
+//    }
+    m_startup = 0;
+    m_playback->SetSegment(m_startup);
 
-    m_streamworker = new StreamWorker(this, startup, PLAYBACK_READAHEAD);
+    m_streamworker = new StreamWorker(this, m_startup, PLAYBACK_READAHEAD);
     m_streamworker->start();
 
-    /* Initialize HLS live stream thread */
-    //if (m_live)
-    {
-        HLSStream *hls  = GetStream(0);
-        int64_t wakeup   =
-            (int64_t)hls->TargetDuration() * PLAYBACK_MINBUFFER * 1000000ULL;
-        m_playlistworker = new PlaylistWorker(this, wakeup);
-        m_playlistworker->start();
-    }
-
-    if (Prefetch(PLAYBACK_MINBUFFER) != RET_OK)
+    if (Prefetch(min(NumSegments(), PLAYBACK_MINBUFFER)) != RET_OK)
     {
         LOG(VB_PLAYBACK, LOG_ERR, LOC +
             "fetching first segment failed or didn't complete within 10s.");
         m_error = true;
         return false;
     }
-    // set current stream position
-    HLSStream *hls = CurrentStream();
-    if (hls != NULL)
+
+    // set bitrate value used to calculate the size of the stream
+    HLSStream *hls  = GetCurrentStream();
+    m_bitrate       = hls->Bitrate();
+
+    // Set initial seek position (relative to m_startup)
+    m_playback->SetOffset(0);
+
+    /* Initialize HLS live stream thread */
+    //if (m_live)   // commented out as some streams are marked as VOD, yet
+    // aren't, they are updated over time
     {
-        int64_t offset = CalculateOffset(startup);
-        if (offset > 0)
-        {
-            m_playback->SetOffset(offset);
-        }
+        m_playlistworker = new PlaylistWorker(this, 0);
+        m_playlistworker->start();
     }
+
     return true;
 }
 
-bool HLSRingBuffer::SaveToDisk(QString filename)
+bool HLSRingBuffer::SaveToDisk(QString filename, int segstart, int segend)
 {
     // download it all
     FILE *fp = fopen(filename.toAscii().constData(), "w");
     if (fp == NULL)
         return false;
     int count = NumSegments();
-    for (int i = 0; i < count; i++)
+    if (segend < 0)
+    {
+        segend = count;
+    }
+    for (int i = segstart; i < segend; i++)
     {
         HLSSegment *segment = GetSegment(i);
         if (segment == NULL)
@@ -2326,6 +2488,7 @@ bool HLSRingBuffer::SaveToDisk(QString filename)
                 QString("download of %1 succeeded")
                 .arg(i));
             fwrite(segment->Data(), segment->Size(), 1, fp);
+            fflush(fp);
         }
     }
     fclose(fp);
@@ -2336,33 +2499,45 @@ int64_t HLSRingBuffer::SizeMedia(void) const
 {
     if (m_error)
         return -1;
-    int64_t size = 0;
-    int count = NumSegments();
-    for (int i = 0; i < count; i++)
-    {
-        int stream = m_streamworker->StreamForSegment(i);
-        if (stream < 0)
-        {
-            // segment not downloaded will estimate from stream bandwidth
-            stream = m_streamworker->CurrentStream();
-        }
-        HLSStream  *hls        = GetStream(stream);
-        HLSSegment *segment    = hls->GetSegment(i);
-        hls->Lock();
-        segment->Lock();
-        if (segment->Size() > 0)
-        {
-            size += (int64_t)segment->Size();
-        }
-        else
-        {
-            size += segment->Duration() * hls->Bandwidth() / 8;
-        }
-        segment->Unlock();
-        hls->Unlock();
-    }
+
+    HLSStream *hls = GetCurrentStream();
+    int64_t size = hls->Duration() * m_bitrate / 8;
 
     return size;
+}
+
+/**
+ * Wait until we have enough segments buffered to allow smooth playback
+ * Do not wait if VOD and at end of buffer
+ */
+void HLSRingBuffer::WaitUntilBuffered(void)
+{
+    bool live = GetCurrentStream()->Live();
+
+    // last seek was to end of media, we are just in seek mode so do not wait
+    if (m_seektoend)
+        return;
+
+    if (m_streamworker->GotBufferedSegments(m_playback->Segment(), 2) ||
+        (!live && (live || m_streamworker->IsAtEnd())))
+    {
+        return;
+    }
+
+    // danger of getting to the end... pause until we have some more
+    LOG(VB_PLAYBACK, LOG_INFO, LOC +
+        QString("pausing until we get sufficient data buffered"));
+    m_streamworker->Wakeup();
+    m_streamworker->Lock();
+    int retries = 0;
+    while (!m_error &&
+           (m_streamworker->CurrentPlaybackBuffer(false) < 2) &&
+           (live || (!live && !m_streamworker->IsAtEnd())))
+    {
+        m_streamworker->WaitForSignal(1000);
+        retries++;
+    }
+    m_streamworker->Unlock();
 }
 
 int HLSRingBuffer::safe_read(void *data, uint sz)
@@ -2375,21 +2550,34 @@ int HLSRingBuffer::safe_read(void *data, uint sz)
 
     do
     {
-        int segnum          = m_playback->Segment();
-        int stream          = m_streamworker->StreamForSegment(segnum);
-        HLSStream *hls     = GetStream(stream);
+        int segnum = m_playback->Segment();
+        if (segnum >= NumSegments())
+        {
+            m_playback->AddOffset(used);
+            return used;
+        }
+        int stream = m_streamworker->StreamForSegment(segnum);
+        if (stream < 0)
+        {
+            // we haven't downloaded this segment yet, likely that it was
+            // dropped (livetv?)
+            m_playback->IncrSegment();
+            continue;
+        }
+        HLSStream *hls = GetStream(stream);
         if (hls == NULL)
             break;
-        HLSSegment *segment= hls->GetSegment(segnum);
+        HLSSegment *segment = hls->GetSegment(segnum);
         if (segment == NULL)
             break;
 
         segment->Lock();
         if (segment->SizePlayed() == segment->Size())
         {
-            if (!m_cache || m_live)
+            if (!hls->Cache() || hls->Live())
             {
                 segment->Clear();
+                m_streamworker->RemoveSegmentFromStream(segnum);
             }
             else
             {
@@ -2406,33 +2594,19 @@ int HLSRingBuffer::safe_read(void *data, uint sz)
 
         if (segment->SizePlayed() == 0)
             LOG(VB_PLAYBACK, LOG_INFO, LOC +
-                QString("started reading segment %1 from stream %2 (%3 buffered)")
-                .arg(segment->Id()).arg(stream)
+                QString("started reading segment %1 [id:%2] from stream %3 (%4 buffered)")
+                .arg(segnum).arg(segment->Id()).arg(stream)
                 .arg(m_streamworker->CurrentPlaybackBuffer()));
 
-        int32_t len = segment->Read((uint8_t*)data + used, i_read);
+        int32_t len = segment->Read((uint8_t*)data + used, i_read, m_fd);
         used    += len;
         i_read  -= len;
         segment->Unlock();
     }
     while (i_read > 0);
 
-    if (m_live && (m_streamworker->CurrentPlaybackBuffer() < 1))
-    {
-        // danger of getting to the end... pause until we have some more
-        LOG(VB_PLAYBACK, LOG_INFO, LOC +
-            QString("pausing until we get sufficient data buffered"));
-        m_streamworker->Wakeup();
-        m_streamworker->Lock();
-        int retries = 0;
-        while (!m_error &&
-               (m_streamworker->CurrentPlaybackBuffer(false) < 1))
-        {
-            m_streamworker->WaitForSignal(1000);
-            retries++;
-        }
-        m_streamworker->Unlock();
-    }
+    WaitUntilBuffered();
+
     m_playback->AddOffset(used);
     return used;
 }
@@ -2443,62 +2617,30 @@ long long HLSRingBuffer::GetRealFileSize(void) const
     return SizeMedia();
 }
 
-int64_t HLSRingBuffer::CalculateOffset(int count, int64_t *max, int *segnum)
-{
-    int64_t length = 0LL;
-    int64_t prev_length = 0LL;
-    int n;
-    for (n = 0; n < count; n++)
-    {
-        HLSStream *hls = GetStreamForSegment(n);
-        if (hls == NULL)
-        {
-            return -1;
-        }
-        int64_t duration = hls->GetSegmentLength(n);
-        if (duration < 0)
-        {
-            return -1;
-        }
-        length += duration;
-
-        if (max && *max < length)
-        {
-            if (count - n >= 3 && segnum)
-            {
-                *segnum = n;
-                // seek within segment
-                //  segment->Read(NULL, stop - prev_length);
-                break;
-            }
-            /* Do not search in last 3 segments */
-            return -1;
-        }
-        prev_length = length;
-    }
-    // if we've reached the end of the stream
-    if (max && n == count)
-        *max = length;
-    return length;
-}
-
 long long HLSRingBuffer::Seek(long long pos, int whence, bool has_lock)
 {
     if (m_error)
         return -1;
 
     if (!IsSeekingAllowed())
-        return -1;
+    {
+        return m_playback->Offset();
+    }
+
+    int64_t starting = mdate();
 
     QWriteLocker lock(&poslock);
 
+    int totalsize = SizeMedia();
     int64_t where;
     switch (whence)
     {
         case SEEK_CUR:
             // return current location, nothing to do
             if (pos == 0)
+            {
                 return m_playback->Offset();
+            }
             where = m_playback->Offset() + pos;
             break;
         case SEEK_END:
@@ -2509,83 +2651,130 @@ long long HLSRingBuffer::Seek(long long pos, int whence, bool has_lock)
             where = pos;
             break;
     }
-    int64_t length = 0;
 
-    int count  = NumSegments();
-    int segnum = m_playback->Segment();
+    // We determine the duration at which it was really attempting to seek to
+    int64_t postime = (where * 8.0) / m_bitrate;
+    int count       = NumSegments();
+    int segnum      = m_playback->Segment();
+    HLSStream  *hls = GetStreamForSegment(segnum);
+    HLSSegment *segment;
 
-    /* restore current segment to start position */
-    HLSSegment *segment = GetSegment(segnum);
-    if (segnum == count || segment == NULL)
+    /* restore current segment's file position indicator to 0 */
+    segment = hls->GetSegment(segnum);
+    if (segment != NULL)
     {
-        ateof = true;
-        return SizeMedia();
+        segment->Lock();
+        segment->Reset();
+        segment->Unlock();
     }
-    segment->Lock();
-    segment->Reset();
-    segment->Unlock();
 
-    length = CalculateOffset(count, &where, &segnum);
-    if (length < 0)
-        return -1;
-    if (where == length)
+    if (where > totalsize)
     {
-        // we have reached the end of the stream rewind to the last 2 segments
-        segnum = count - PLAYBACK_MINBUFFER;
-        for (int i = count - PLAYBACK_MINBUFFER; i < count; i++)
+        // we're at the end, never let seek after last 3 segments
+        postime -= hls->TargetDuration() * 3;
+        if (postime < 0)
         {
-            HLSStream *hls = GetStreamForSegment(i);
-            if (hls == NULL)
-            {
-                return -1;
-            }
-            int64_t last = hls->GetSegmentLength(i);
-            if (last < 0)
-            {
-                return -1;
-            }
-            where -= last;
+            postime = 0;
         }
     }
+
+    // Find segment containing position
+    int64_t starttime   = 0LL;
+    int64_t endtime     = 0LL;
+    for (int n = m_startup; n < count; n++)
+    {
+        hls = GetStreamForSegment(n);
+        if (hls == NULL)
+        {
+            // error, should never happen, irrecoverable error
+            return -1;
+        }
+        segment = hls->GetSegment(n);
+        if (segment == NULL)
+        {
+            // stream doesn't contain segment error can't continue,
+            // unknown error
+            return -1;
+        }
+        endtime += segment->Duration();
+        if (postime < endtime)
+        {
+            segnum = n;
+            break;
+        }
+        starttime = endtime;
+    }
+
+    /*
+     * Live Mode exception:
+     * FFmpeg seek to the last segment in order to determine the size of the video
+     * so do not allow seeking to the last segment if in live mode as we don't care
+     * about the size
+     * Also do not allow to seek before the current playback segment as segment
+     * has been cleared from memory
+     * We only let determine the size if the bandwidth would allow fetching the
+     * the segments in less than 5s
+     */
+    if (hls->Live() && (segnum >= count - 1 || segnum < m_playback->Segment()) &&
+        ((hls->TargetDuration() * hls->Bitrate() / m_streamworker->Bandwidth()) > 5))
+    {
+        return m_playback->Offset();
+    }
+    m_seektoend = segnum >= count - 1;
+
     m_playback->SetSegment(segnum);
+
     m_streamworker->Seek(segnum);
+    m_playback->SetOffset(postime * m_bitrate / 8);
+
     m_streamworker->Lock();
 
     /* Wait for download to be finished and to buffer 3 segment */
     LOG(VB_PLAYBACK, LOG_INFO, LOC +
         QString("seek to segment %1").arg(segnum));
     int retries = 0;
-    while (!m_error && (m_streamworker->IsSeeking() ||
-           ((m_streamworker->CurrentPlaybackBuffer(false) < 3) &&
-            !m_streamworker->IsAtEnd())))
+
+    // see if we've already got the segment, and at least 2 buffered after
+    // then no need to wait for streamworker
+    while (!m_error &&
+           (!m_streamworker->GotBufferedSegments(segnum, 2) &&
+            (m_streamworker->CurrentPlaybackBuffer(false) < 2) &&
+            !m_streamworker->IsAtEnd()))
     {
         m_streamworker->WaitForSignal(); //1000);
         retries++;
     }
     m_streamworker->Unlock();
-    m_playback->SetOffset(where);
+
+    // now seek within found segment
+    int stream = m_streamworker->StreamForSegment(segnum);
+    if (stream < 0)
+    {
+        // segment didn't get downloaded (timeout?)
+        LOG(VB_PLAYBACK, LOG_ERR, LOC +
+            QString("seek error: segment %1 should have been downloaded, but didn't."
+                    " Playback will stall")
+            .arg(segnum));
+    }
+    else
+    {
+        int32_t skip = ((postime - starttime) * segment->Size()) / segment->Duration();
+        segment->Read(NULL, skip);
+    }
+    LOG(VB_PLAYBACK, LOG_INFO, LOC +
+        QString("seek completed in %1s").arg((mdate() - starting) / 1000000.0));
 
     return m_playback->Offset();
 }
 
 long long HLSRingBuffer::GetReadPosition(void) const
 {
-    if (m_error < 0)
+    if (m_error)
         return 0;
     return m_playback->Offset();
 }
 
-bool HLSRingBuffer::IsSeekingAllowed(void)
-{
-    if (m_error)
-        return false;
-
-    if (m_live)
-        return false;
-    return true;
-}
-
 bool HLSRingBuffer::IsOpen(void) const
 {
-    return m_streams.size() > 0 && !m_error;
+    return !m_error && !m_streams.isEmpty() && NumSegments() > 0;
 }

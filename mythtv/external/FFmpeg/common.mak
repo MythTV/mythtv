@@ -20,8 +20,7 @@ $(foreach VAR,$(SILENT),$(eval override $(VAR) = @$($(VAR))))
 $(eval INSTALL = @$(call ECHO,INSTALL,$$(^:$(SRC_DIR)/%=%)); $(INSTALL))
 endif
 
-ALLFFLIBS = avcodec avdevice avfilter avformat avutil postproc swscale swresample
-
+ALLFFLIBS = avcodec avdevice avfilter avformat avresample avutil postproc swscale swresample
 
 # NASM requires -I path terminated with /
 IFLAGS     := -I. -I$(SRC_PATH)/
@@ -74,11 +73,13 @@ COMPILE_S = $(call COMPILE,AS)
 $(OBJS):
 endif
 
-OBJS-$(HAVE_MMX) +=  $(MMX-OBJS-yes)
+include $(SRC_PATH)/arch.mak
 
 OBJS      += $(OBJS-yes)
 FFLIBS    := $(FFLIBS-yes) $(FFLIBS)
 TESTPROGS += $(TESTPROGS-yes)
+
+FFEXTRALIBS := $(addprefix -lmyth,$(addsuffix $(BUILDSUF),$(FFLIBS))) $(EXTRALIBS)
 
 EXAMPLES  := $(EXAMPLES:%=$(SUBDIR)%-example$(EXESUF))
 OBJS      := $(sort $(OBJS:%=$(SUBDIR)%))
@@ -89,9 +90,6 @@ HOSTPROGS := $(HOSTPROGS:%=$(SUBDIR)%$(HOSTEXESUF))
 TOOLS     += $(TOOLS-yes)
 TOOLOBJS  := $(TOOLS:%=tools/%.o)
 TOOLS     := $(TOOLS:%=tools/%$(EXESUF))
-
-FFEXTRALIBS := $(addprefix -lmyth,$(addsuffix $(BUILDSUF),$(FFLIBS))) $(EXTRALIBS)
-#FFLDFLAGS   := $(addprefix -L$(SRC_PATH_BARE)/external/FFmpeg/lib,$(ALLFFLIBS)) $(LDFLAGS)
 
 DEP_LIBS := $(foreach NAME,$(FFLIBS),lib$(NAME)/$($(CONFIG_SHARED:yes=S)LIBNAME))
 
@@ -117,6 +115,6 @@ OBJDIRS := $(OBJDIRS) $(dir $(OBJS) $(HOSTOBJS) $(TESTOBJS))
 
 CLEANSUFFIXES     = *.d *.o *~ *.ho *.map *.ver *.gcno *.gcda
 DISTCLEANSUFFIXES = *.pc
-LIBSUFFIXES       = *.a *.lib *.so *.so.* *.dylib *.dll *.def *.dll.a *.exp
+LIBSUFFIXES       = *.a *.lib *.so *.so.* *.dylib *.dll *.def *.dll.a
 
 -include $(wildcard $(OBJS:.o=.d) $(TESTOBJS:.o=.d))

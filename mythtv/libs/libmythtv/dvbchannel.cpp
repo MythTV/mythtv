@@ -956,10 +956,9 @@ int DVBChannel::GetChanID() const
         return -1;
     }
 
-    if (query.size() <= 0)
+    if (!query.next())
         return -1;
 
-    query.next();
     return query.value(0).toInt();
 }
 

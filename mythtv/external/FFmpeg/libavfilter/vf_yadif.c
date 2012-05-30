@@ -17,6 +17,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
+#include "libavutil/avassert.h"
 #include "libavutil/cpu.h"
 #include "libavutil/common.h"
 #include "libavutil/pixdesc.h"
@@ -59,6 +60,7 @@ typedef struct {
                         int w, int prefs, int mrefs, int parity, int mode);
 
     const AVPixFmtDescriptor *csp;
+    int eof;
 } YADIFContext;
 
 #define CHECK(j)\
@@ -216,11 +218,11 @@ static void return_frame(AVFilterContext *ctx, int is_second)
     filter(ctx, yadif->out, tff ^ !is_second, tff);
 
     if (is_second) {
-        if (yadif->next->pts != AV_NOPTS_VALUE &&
-            yadif->cur->pts != AV_NOPTS_VALUE) {
-            yadif->out->pts =
-                (yadif->next->pts&yadif->cur->pts) +
-                ((yadif->next->pts^yadif->cur->pts)>>1);
+        int64_t cur_pts  = yadif->cur->pts;
+        int64_t next_pts = yadif->next->pts;
+
+        if (next_pts != AV_NOPTS_VALUE && cur_pts != AV_NOPTS_VALUE) {
+            yadif->out->pts = cur_pts + next_pts;
         } else {
             yadif->out->pts = AV_NOPTS_VALUE;
         }
@@ -236,6 +238,8 @@ static void start_frame(AVFilterLink *link, AVFilterBufferRef *picref)
 {
     AVFilterContext *ctx = link->dst;
     YADIFContext *yadif = ctx->priv;
+
+    av_assert0(picref);
 
     if (yadif->frame_pending)
         return_frame(ctx, 1);
@@ -253,6 +257,8 @@ static void start_frame(AVFilterLink *link, AVFilterBufferRef *picref)
         yadif->out  = avfilter_ref_buffer(yadif->cur, AV_PERM_READ);
         avfilter_unref_buffer(yadif->prev);
         yadif->prev = NULL;
+        if (yadif->out->pts != AV_NOPTS_VALUE)
+            yadif->out->pts *= 2;
         avfilter_start_frame(ctx->outputs[0], yadif->out);
         return;
     }
@@ -265,6 +271,8 @@ static void start_frame(AVFilterLink *link, AVFilterBufferRef *picref)
 
     avfilter_copy_buffer_ref_props(yadif->out, yadif->cur);
     yadif->out->video->interlaced = 0;
+    if (yadif->out->pts != AV_NOPTS_VALUE)
+        yadif->out->pts *= 2;
     avfilter_start_frame(ctx->outputs[0], yadif->out);
 }
 
@@ -298,8 +306,21 @@ static int request_frame(AVFilterLink *link)
     do {
         int ret;
 
-        if ((ret = avfilter_request_frame(link->src->inputs[0])))
+        if (yadif->eof)
+            return AVERROR_EOF;
+
+        ret  = avfilter_request_frame(link->src->inputs[0]);
+
+        if (ret == AVERROR_EOF && yadif->cur) {
+            AVFilterBufferRef *next = avfilter_ref_buffer(yadif->next, AV_PERM_READ);
+            next->pts = yadif->next->pts * 2 - yadif->cur->pts;
+
+            start_frame(link->src->inputs[0], next);
+            end_frame(link->src->inputs[0]);
+            yadif->eof = 1;
+        } else if (ret < 0) {
             return ret;
+        }
     } while (!yadif->cur);
 
     return 0;
@@ -314,11 +335,15 @@ static int poll_frame(AVFilterLink *link)
         return 1;
 
     val = avfilter_poll_frame(link->src->inputs[0]);
+    if (val <= 0)
+        return val;
 
     if (val >= 1 && !yadif->next) { //FIXME change API to not requre this red tape
         if ((ret = avfilter_request_frame(link->src->inputs[0])) < 0)
             return ret;
         val = avfilter_poll_frame(link->src->inputs[0]);
+        if (val <= 0)
+            return val;
     }
     assert(yadif->next || !val);
 
@@ -359,6 +384,8 @@ static int query_formats(AVFilterContext *ctx)
         AV_NE( PIX_FMT_YUV422P16BE, PIX_FMT_YUV422P16LE ),
         AV_NE( PIX_FMT_YUV444P16BE, PIX_FMT_YUV444P16LE ),
         PIX_FMT_YUVA420P,
+        PIX_FMT_YUVA422P,
+        PIX_FMT_YUVA444P,
         PIX_FMT_NONE
     };
 
@@ -394,6 +421,16 @@ static av_cold int init(AVFilterContext *ctx, const char *args, void *opaque)
 
 static void null_draw_slice(AVFilterLink *link, int y, int h, int slice_dir) { }
 
+static int config_props(AVFilterLink *link)
+{
+    link->time_base.num = link->src->inputs[0]->time_base.num;
+    link->time_base.den = link->src->inputs[0]->time_base.den * 2;
+    link->w             = link->src->inputs[0]->w;
+    link->h             = link->src->inputs[0]->h;
+
+    return 0;
+}
+
 AVFilter avfilter_vf_yadif = {
     .name          = "yadif",
     .description   = NULL_IF_CONFIG_SMALL("Deinterlace the input image."),
@@ -415,6 +452,7 @@ AVFilter avfilter_vf_yadif = {
     .outputs   = (const AVFilterPad[]) {{ .name       = "default",
                                     .type             = AVMEDIA_TYPE_VIDEO,
                                     .poll_frame       = poll_frame,
-                                    .request_frame    = request_frame, },
+                                    .request_frame    = request_frame,
+                                    .config_props     = config_props, },
                                   { .name = NULL}},
 };

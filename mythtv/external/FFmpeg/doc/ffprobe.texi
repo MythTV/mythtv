@@ -106,6 +106,11 @@ stream.
 All the container format information is printed within a section with
 name "FORMAT".
 
+@item -show_format_entry @var{name}
+Like @option{-show_format}, but only prints the specified entry of the
+container format information, rather than all. This option may be given more
+than once, then all specified entries will be shown.
+
 @item -show_packets
 Show information about each packet contained in the input multimedia
 stream.
@@ -190,6 +195,22 @@ keyN=valN
 Metadata tags are printed as a line in the corresponding FORMAT or
 STREAM section, and are prefixed by the string "TAG:".
 
+This writer accepts options as a list of @var{key}=@var{value} pairs,
+separated by ":".
+
+A description of the accepted options follows.
+
+@table @option
+
+@item nokey, nk
+If set to 1 specify not to print the key of each field. Default value
+is 0.
+
+@item noprint_wrappers, nw
+If set to 1 specify not to print the section header and footer.
+Default value is 0.
+@end table
+
 @section compact
 Compact format.
 
@@ -273,6 +294,10 @@ XML based format.
 The XML output is described in the XML schema description file
 @file{ffprobe.xsd} installed in the FFmpeg datadir.
 
+An updated version of the schema can be retrieved at the url
+@url{http://www.ffmpeg.org/schema/ffprobe.xsd}, which redirects to the
+latest schema committed into the FFmpeg development source code tree.
+
 Note that the output issued will be compliant to the
 @file{ffprobe.xsd} schema only when no special global output options
 (@option{unit}, @option{prefix}, @option{byte_binary_prefix},
@@ -299,26 +324,31 @@ This option automatically sets @option{fully_qualified} to 1.
 
 For more information about the XML format, see
 @url{http://www.w3.org/XML/}.
+@c man end WRITERS
 
 @chapter Timecode
+@c man begin TIMECODE
 
 @command{ffprobe} supports Timecode extraction:
 
 @itemize
 
-@item MPEG1/2 timecode is extracted from the GOP, and is available in the video
+@item
+MPEG1/2 timecode is extracted from the GOP, and is available in the video
 stream details (@option{-show_streams}, see @var{timecode}).
 
-@item MOV timecode is extracted from tmcd track, so is available in the tmcd
+@item
+MOV timecode is extracted from tmcd track, so is available in the tmcd
 stream metadata (@option{-show_streams}, see @var{TAG:timecode}).
 
-@item DV and GXF timecodes are available in format metadata
+@item
+DV and GXF timecodes are available in format metadata
 (@option{-show_format}, see @var{TAG:timecode}).
 
 @end itemize
+@c man end TIMECODE
 
-@c man end WRITERS
-
+@include syntax.texi
 @include decoders.texi
 @include demuxers.texi
 @include protocols.texi

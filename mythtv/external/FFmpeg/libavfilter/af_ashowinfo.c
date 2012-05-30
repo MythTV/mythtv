@@ -26,6 +26,7 @@
 #include "libavutil/adler32.h"
 #include "libavutil/audioconvert.h"
 #include "libavutil/timestamp.h"
+#include "audio.h"
 #include "avfilter.h"
 
 typedef struct {
@@ -49,7 +50,7 @@ static void filter_samples(AVFilterLink *inlink, AVFilterBufferRef *samplesref)
     int linesize =
         samplesref->audio->nb_samples *
         av_get_bytes_per_sample(samplesref->format);
-    if (!samplesref->audio->planar) /* packed layout */
+    if (!av_sample_fmt_is_planar(samplesref->format))
         linesize *= av_get_channel_layout_nb_channels(samplesref->audio->channel_layout);
 
     for (plane = 0; samplesref->data[plane] && plane < 8; plane++) {
@@ -65,7 +66,7 @@ static void filter_samples(AVFilterLink *inlink, AVFilterBufferRef *samplesref)
 
     av_log(ctx, AV_LOG_INFO,
            "n:%d pts:%s pts_time:%s pos:%"PRId64" "
-           "fmt:%s chlayout:%s nb_samples:%d rate:%d planar:%d "
+           "fmt:%s chlayout:%s nb_samples:%d rate:%d "
            "checksum:%08X plane_checksum[%08X",
            showinfo->frame,
            av_ts2str(samplesref->pts), av_ts2timestr(samplesref->pts, &inlink->time_base),
@@ -74,7 +75,6 @@ static void filter_samples(AVFilterLink *inlink, AVFilterBufferRef *samplesref)
            chlayout_str,
            samplesref->audio->nb_samples,
            samplesref->audio->sample_rate,
-           samplesref->audio->planar,
            checksum,
            plane_checksum[0]);
 
@@ -83,7 +83,7 @@ static void filter_samples(AVFilterLink *inlink, AVFilterBufferRef *samplesref)
     av_log(ctx, AV_LOG_INFO, "]\n");
 
     showinfo->frame++;
-    avfilter_filter_samples(inlink->dst->outputs[0], samplesref);
+    ff_filter_samples(inlink->dst->outputs[0], samplesref);
 }
 
 AVFilter avfilter_af_ashowinfo = {
@@ -95,7 +95,7 @@ AVFilter avfilter_af_ashowinfo = {
 
     .inputs    = (const AVFilterPad[]) {{ .name       = "default",
                                     .type             = AVMEDIA_TYPE_AUDIO,
-                                    .get_audio_buffer = avfilter_null_get_audio_buffer,
+                                    .get_audio_buffer = ff_null_get_audio_buffer,
                                     .filter_samples   = filter_samples,
                                     .min_perms        = AV_PERM_READ, },
                                   { .name = NULL}},

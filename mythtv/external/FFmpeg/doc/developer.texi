@@ -14,12 +14,13 @@
 @section API
 @itemize @bullet
 @item libavcodec is the library containing the codecs (both encoding and
-decoding). Look at @file{libavcodec/apiexample.c} to see how to use it.
+decoding). Look at @file{doc/examples/decoding_encoding.c} to see how to use
+it.
 
 @item libavformat is the library containing the file format handling (mux and
 demux code for several formats). Look at @file{ffplay.c} to use it in a
-player. See @file{libavformat/output-example.c} to use it to generate
-audio or video streams.
+player. See @file{doc/examples/muxing.c} to use it to generate audio or video
+streams.
 
 @end itemize
 
@@ -187,6 +188,8 @@ the following snippet into your @file{.vimrc}:
 set expandtab
 set shiftwidth=4
 set softtabstop=4
+set cindent
+set cinoptions=(0
 " allow tabs in Makefiles
 autocmd FileType make set noexpandtab shiftwidth=8 softtabstop=8
 " Trailing whitespace and tabs are forbidden, so highlight them.
@@ -198,10 +201,16 @@ autocmd InsertEnter * match ForbiddenWhitespace /\t\|\s\+\%#\@@<!$/
 
 For Emacs, add these roughly equivalent lines to your @file{.emacs.d/init.el}:
 @example
-(setq c-default-style "k&r")
-(setq-default c-basic-offset 4)
-(setq-default indent-tabs-mode nil)
-(setq-default show-trailing-whitespace t)
+(c-add-style "ffmpeg"
+             '("k&r"
+               (c-basic-offset . 4)
+               (indent-tabs-mode nil)
+               (show-trailing-whitespace t)
+               (c-offsets-alist
+                (statement-cont . (c-lineup-assignments +)))
+               )
+             )
+(setq c-default-style "ffmpeg")
 @end example
 
 @section Development Policy

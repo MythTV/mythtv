@@ -113,9 +113,9 @@ class DecoderBase
     virtual void SetEof(bool eof)  { ateof = eof;  }
     bool         GetEof(void) const { return ateof; }
 
-    void setExactSeeks(bool exact) { exactseeks = exact; }
-    bool getExactSeeks(void) const { return exactseeks;  }
-    void setLiveTVMode(bool live)  { livetv = live;      }
+    void SetSeekSnap(uint64_t snap)  { seeksnap = snap; }
+    uint64_t GetSeekSnap(void) const { return seeksnap;  }
+    void SetLiveTVMode(bool live)  { livetv = live;      }
 
     // Must be done while player is paused.
     void SetProgramInfo(const ProgramInfo &pginfo);
@@ -124,7 +124,7 @@ class DecoderBase
     /// Disables AC3/DTS pass through
     virtual void SetDisablePassThrough(bool disable) { (void)disable; }
 
-    virtual void setWatchingRecording(bool mode);
+    virtual void SetWatchingRecording(bool mode);
     /// Demux, preprocess and possibly decode a frame of video/audio.
     virtual bool GetFrame(DecodeType) = 0;
     MythPlayer *GetPlayer() { return m_parent; }
@@ -144,7 +144,7 @@ class DecoderBase
     virtual bool IsCodecMPEG(void) const { return false; }
     virtual void WriteStoredData(RingBuffer *rb, bool storevid,
                                  long timecodeOffset) = 0;
-    virtual void ClearStoredData(void) { return; };
+    virtual void ClearStoredData(void) { return; }
     virtual void SetRawAudioState(bool state) { getrawframes = state; }
     virtual bool GetRawAudioState(void) const { return getrawframes; }
     virtual void SetRawVideoState(bool state) { getrawvideo = state; }
@@ -157,8 +157,8 @@ class DecoderBase
     uint GetRawBitrate(void) const { return bitrate; }
 
     virtual void UpdateFramesPlayed(void);
-    long long GetFramesRead(void) const { return framesRead; };
-    long long GetFramesPlayed(void) const { return framesPlayed; };
+    long long GetFramesRead(void) const { return framesRead; }
+    long long GetFramesPlayed(void) const { return framesPlayed; }
 
     virtual QString GetCodecDecoderName(void) const = 0;
     virtual QString GetRawEncodingType(void) { return QString(); }
@@ -177,7 +177,7 @@ class DecoderBase
     virtual void SeekReset(long long newkey, uint skipFrames,
                            bool doFlush, bool discardFrames);
 
-    void setTranscoding(bool value) { transcoding = value; };
+    void SetTranscoding(bool value) { transcoding = value; }
 
     bool IsErrored() const { return errored; }
 
@@ -270,7 +270,7 @@ class DecoderBase
     vector<PosMapEntry> m_positionMap;
     bool dontSyncPositionMap;
 
-    bool exactseeks;
+    uint64_t seeksnap;
     bool livetv;
     bool watchingrecording;
 

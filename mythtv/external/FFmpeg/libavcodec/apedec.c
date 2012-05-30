@@ -393,7 +393,7 @@ static inline int range_get_symbol(APEContext *ctx,
 }
 /** @} */ // group rangecoder
 
-static inline void update_rice(APERice *rice, int x)
+static inline void update_rice(APERice *rice, unsigned int x)
 {
     int lim = rice->k ? (1 << (rice->k + 4)) : 0;
     rice->ksum += ((x + 1) / 2) - ((rice->ksum + 16) >> 5);
@@ -406,7 +406,7 @@ static inline void update_rice(APERice *rice, int x)
 
 static inline int ape_decode_value(APEContext *ctx, APERice *rice)
 {
-    int x, overflow;
+    unsigned int x, overflow;
 
     if (ctx->fileversion < 3990) {
         int tmpk;
@@ -425,8 +425,8 @@ static inline int ape_decode_value(APEContext *ctx, APERice *rice)
             x = range_decode_bits(ctx, 16);
             x |= (range_decode_bits(ctx, tmpk - 16) << 16);
         } else {
-            av_log(ctx->avctx, AV_LOG_ERROR, "too many bits\n");
-            return -1;
+            av_log(ctx->avctx, AV_LOG_ERROR, "Too many bits: %d\n", tmpk);
+            return AVERROR_INVALIDDATA;
         }
         x += overflow << tmpk;
     } else {
@@ -993,7 +993,7 @@ AVCodec ff_ape_decoder = {
     .close          = ape_decode_close,
     .decode         = ape_decode_frame,
     .capabilities   = CODEC_CAP_SUBFRAMES | CODEC_CAP_DELAY | CODEC_CAP_DR1,
-    .flush = ape_flush,
-    .long_name = NULL_IF_CONFIG_SMALL("Monkey's Audio"),
+    .flush          = ape_flush,
+    .long_name      = NULL_IF_CONFIG_SMALL("Monkey's Audio"),
     .priv_class     = &ape_decoder_class,
 };

@@ -122,6 +122,8 @@ int MetaIOTagLib::getTrackLength(const QString &filename)
         LOG(VB_GENERAL, LOG_ERR,
             QString("MetaIOTagLib: Failed to read length "
                     "from '%1'. It may be corrupt.").arg(filename));
+
+    delete file;
     
     return milliseconds;
 }

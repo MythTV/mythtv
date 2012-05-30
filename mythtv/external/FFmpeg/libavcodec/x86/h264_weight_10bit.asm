@@ -155,12 +155,12 @@ WEIGHT_FUNC_HALF_MM sse4
 %if ARCH_X86_32
 DECLARE_REG_TMP 3
 %else
-DECLARE_REG_TMP 10
+DECLARE_REG_TMP 7
 %endif
 
 %macro BIWEIGHT_PROLOGUE 0
 .prologue
-    PROLOGUE 0,7,8
+    PROLOGUE 0,8,8
     movifnidn  r0, r0mp
     movifnidn  r1, r1mp
     movifnidn r2d, r2m

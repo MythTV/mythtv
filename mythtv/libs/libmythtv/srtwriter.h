@@ -29,6 +29,7 @@ class MTV_PUBLIC SRTWriter
     SRTWriter(const QString &fileName) :
         m_outFile(fileName), m_outStream(&m_outFile), m_srtCounter(0)
     {
+        m_outStream.setCodec("UTF-8");
         if (!m_outFile.open(QFile::WriteOnly))
         {
             LOG(VB_GENERAL, LOG_ERR, QString("Failed to create '%1'")

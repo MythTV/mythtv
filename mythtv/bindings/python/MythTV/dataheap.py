@@ -400,13 +400,13 @@ class Recorded( CMPRecord, DBDataWrite ):
                                         cast.job.lower().replace(' ','_'))))
 
         # pull images
-        for image in metadata.images:
-            if not hasattr(self.artwork, image.type):
-                pass
-            if getattr(self.artwork, image.type, ''):
-                continue
-            setattr(self.artwork, image.type, image.filename)
-            getattr(self.artwork, image.type).downloadFrom(image.url)
+#        for image in metadata.images:
+#            if not hasattr(self.artwork, image.type):
+#                pass
+#            if getattr(self.artwork, image.type, ''):
+#                continue
+#            setattr(self.artwork, image.type, image.filename)
+#            getattr(self.artwork, image.type).downloadFrom(image.url)
 
         self.update()
 
@@ -437,12 +437,12 @@ class Recorded( CMPRecord, DBDataWrite ):
             name = member.name
             role = ' '.join([word.capitalize() for word in member.role.split('_')])
             if role=='Writer': role = 'Author'
-            metadata.people.append({'name':name, 'job':role})
+            metadata.people.append(OrdDict((('name',name), ('job',role))))
 
         for arttype in ['coverart', 'fanart', 'banner']:
             art = getattr(self.artwork, arttype)
             if art:
-                metadata.images.append({'type':arttype, 'filename':art})
+                metadata.images.append(OrdDict((('type',arttype), ('filename',art))))
 
         return metadata
 
@@ -1019,11 +1019,11 @@ class Video( CMPVideo, VideoSchema, DBDataWrite ):
 
         # pull director
         if self.director:
-            metadata.people.append({'name':self.director, 'job':'Director'})
+            metadata.people.append(OrdDict((('name',self.director), ('job','Director'))))
 
         # pull actors
         for actor in self.cast:
-            metadata.people.append({'name':actor.cast, 'job':'Actor'})
+            metadata.people.append(OrdDict((('name',actor.cast), ('job','Actor'))))
 
         # pull genres
         for genre in self.genre:
@@ -1034,10 +1034,10 @@ class Video( CMPVideo, VideoSchema, DBDataWrite ):
             metadata.countries.append(country.country)
 
         # pull images
-        for arttype in ['coverart', 'fanart', 'banner', 'screenshot']:
-            art = getattr(self, arttype)
-            if art:
-                metadata.images.append({'type':arttype, 'filename':art})
+#        for arttype in ['coverart', 'fanart', 'banner', 'screenshot']:
+#            art = getattr(self, arttype)
+#            if art:
+#                metadata.images.append(OrdDict((('type',arttype), ('filename',art))))
 
         return metadata
 

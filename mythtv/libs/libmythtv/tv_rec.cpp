@@ -916,7 +916,7 @@ void TVRec::FinishedRecording(RecordingInfo *curRec, RecordingQuality *recq)
     curRec->FinishedRecording(!is_good || (recgrp == "LiveTV"));
 
     // send out REC_FINISHED message
-    SendMythSystemRecEvent("REC_FINISHED", curRecording);
+    SendMythSystemRecEvent("REC_FINISHED", curRec);
 
     // send out DONE_RECORDING message
     int secsSince = curRec->GetRecordingStartTime()
@@ -1967,7 +1967,9 @@ bool TVRec::SetupSignalMonitor(bool tablemon, bool EITscan, bool notify)
         }
 
         signalMonitor->AddListener(this);
-        signalMonitor->SetUpdateRate(kSignalMonitoringRate);
+        signalMonitor->SetUpdateRate(signalMonitor->HasExtraSlowTuning() ?
+                                     kSignalMonitoringRate * 5 :
+                                     kSignalMonitoringRate);
         signalMonitor->SetNotifyFrontend(notify);
 
         // Start the monitoring thread
@@ -2085,13 +2087,12 @@ bool TVRec::ShouldSwitchToAnotherCard(QString chanid)
                   "FROM channel "
                   "WHERE channel.chanid = :CHANID");
     query.bindValue(":CHANID", chanid);
-    if (!query.exec() || !query.isActive() || query.size() == 0)
+    if (!query.exec() || !query.next())
     {
         MythDB::DBError("ShouldSwitchToAnotherCard", query);
         return false;
     }
 
-    query.next();
     QString channelname = query.value(0).toString();
     QString callsign = query.value(1).toString();
 

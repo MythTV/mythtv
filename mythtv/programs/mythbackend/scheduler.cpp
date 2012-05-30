@@ -3197,7 +3197,9 @@ void Scheduler::UpdateManuals(uint recordid)
         return;
     }
 
-    query.next();
+    if (!query.next())
+        return;
+
     RecordingType rectype = RecordingType(query.value(0).toInt());
     QString title = query.value(1).toString();
     QString station = query.value(2).toString() ;

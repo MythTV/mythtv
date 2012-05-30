@@ -113,7 +113,7 @@ void ImportRecorder::run(void)
         ctx->SetPlayingInfo(curRecording);
         ctx->SetRingBuffer(rb);
         ctx->SetPlayer(cfp);
-        cfp->SetPlayerInfo(NULL, NULL, true, ctx);
+        cfp->SetPlayerInfo(NULL, NULL, ctx);
 
         cfp->RebuildSeekTable(false);
 

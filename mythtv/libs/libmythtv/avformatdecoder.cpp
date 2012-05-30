@@ -576,7 +576,8 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame, bool discardFrames)
     long double seekts = desiredFrame * AV_TIME_BASE / fps;
     ts += (long long)seekts;
 
-    bool exactseeks = DecoderBase::getExactSeeks();
+    // XXX figure out how to do snapping in this case
+    bool exactseeks = !DecoderBase::GetSeekSnap();
 
     int flags = (dorewind || exactseeks) ? AVSEEK_FLAG_BACKWARD : 0;
 
@@ -2179,7 +2180,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
     if (ringBuffer)
     {
         ringBuffer->SetBufferSizeFactors(unknownbitrate,
-                            QString(ic->iformat->name).contains("matroska"));
+                        ic && QString(ic->iformat->name).contains("matroska"));
     }
 
     PostProcessTracks();
@@ -3441,6 +3442,7 @@ bool AvFormatDecoder::ProcessSubtitlePacket(AVStream *curstream, AVPacket *pkt)
 
     avcodeclock->lock();
     int subIdx = selectedTrack[kTrackTypeSubtitle].av_stream_index;
+    bool isForcedTrack = selectedTrack[kTrackTypeSubtitle].forced;
     avcodeclock->unlock();
 
     int gotSubtitles = 0;
@@ -3473,6 +3475,8 @@ bool AvFormatDecoder::ProcessSubtitlePacket(AVStream *curstream, AVPacket *pkt)
 
     if (gotSubtitles)
     {
+        if (isForcedTrack)
+            subtitle.forced = true;
         subtitle.start_display_time += pts;
         subtitle.end_display_time += pts;
         LOG(VB_PLAYBACK | VB_TIMESTAMP, LOG_INFO, LOC +
@@ -3484,7 +3488,7 @@ bool AvFormatDecoder::ProcessSubtitlePacket(AVStream *curstream, AVPacket *pkt)
         bool forcedon = m_parent->GetSubReader(pkt->stream_index)->AddAVSubtitle(
                subtitle, curstream->codec->codec_id == CODEC_ID_XSUB,
                m_parent->GetAllowForcedSubtitles());
-        m_parent->EnableForcedSubtitles(forcedon);
+        m_parent->EnableForcedSubtitles(forcedon || isForcedTrack);
     }
 
     return true;
@@ -3615,7 +3619,7 @@ QString AvFormatDecoder::GetTrackDesc(uint type, uint trackNo) const
 
         return QObject::tr("Subtitle") + QString(" %1: %2%3")
             .arg(trackNo + 1).arg(iso639_key_toName(lang_key))
-            .arg(forced ? " (forced)" : "");
+            .arg(forced ? QObject::tr(" (forced)") : "");
     }
     else
     {

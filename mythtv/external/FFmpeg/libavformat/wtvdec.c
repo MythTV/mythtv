@@ -258,7 +258,7 @@ static AVIOContext * wtvfile_open2(AVFormatContext *s, const uint8_t *buf, int b
         dir_length  = AV_RL16(buf + 16);
         file_length = AV_RL64(buf + 24);
         name_size   = 2 * AV_RL32(buf + 32);
-        if (buf + 48 + name_size > buf_end) {
+        if (buf + 48 + (int64_t)name_size > buf_end || name_size<0) {
             av_log(s, AV_LOG_ERROR, "filename exceeds buffer size; remaining directory entries ignored\n");
             break;
         }
@@ -833,7 +833,7 @@ static int parse_chunks(AVFormatContext *s, int mode, int64_t seekts, int *len_p
             }
         } else if (!ff_guidcmp(g, ff_data_guid)) {
             int stream_index = ff_find_stream_index(s, sid);
-            if (mode == SEEK_TO_DATA && stream_index >= 0 && len > 32) {
+            if (mode == SEEK_TO_DATA && stream_index >= 0 && len > 32 && s->streams[stream_index]->priv_data) {
                 WtvStream *wst = s->streams[stream_index]->priv_data;
                 wst->seen_data = 1;
                 if (len_ptr) {

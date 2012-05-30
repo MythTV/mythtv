@@ -371,10 +371,19 @@ static int rv20_decode_picture_header(RVDecContext *rv)
             new_h= s->orig_height;
         }
         if(new_w != s->width || new_h != s->height){
+            AVRational old_aspect = s->avctx->sample_aspect_ratio;
             av_log(s->avctx, AV_LOG_DEBUG, "attempting to change resolution to %dx%d\n", new_w, new_h);
             if (av_image_check_size(new_w, new_h, 0, s->avctx) < 0)
                 return -1;
             ff_MPV_common_end(s);
+
+            // attempt to keep aspect during typical resolution switches
+            if (!old_aspect.num)
+                old_aspect = (AVRational){1, 1};
+            if (2 * new_w * s->height == new_h * s->width)
+                s->avctx->sample_aspect_ratio = av_mul_q(old_aspect, (AVRational){2, 1});
+            if (new_w * s->height == 2 * new_h * s->width)
+                s->avctx->sample_aspect_ratio = av_mul_q(old_aspect, (AVRational){1, 2});
             avcodec_set_dimensions(s->avctx, new_w, new_h);
             s->width  = new_w;
             s->height = new_h;
@@ -426,8 +435,7 @@ av_log(s->avctx, AV_LOG_DEBUG, "\n");*/
 //    s->obmc=1;
 //    s->umvplus=1;
     s->modified_quant=1;
-    if(!s->avctx->lowres)
-        s->loop_filter=1;
+    s->loop_filter=1;
 
     if(s->avctx->debug & FF_DEBUG_PICT_INFO){
             av_log(s->avctx, AV_LOG_INFO, "num:%5d x:%2d y:%2d type:%d qscale:%2d rnd:%d\n",
@@ -746,9 +754,8 @@ AVCodec ff_rv10_decoder = {
     .close          = rv10_decode_end,
     .decode         = rv10_decode_frame,
     .capabilities   = CODEC_CAP_DR1,
-    .max_lowres = 3,
-    .long_name = NULL_IF_CONFIG_SMALL("RealVideo 1.0"),
-    .pix_fmts= ff_pixfmt_list_420,
+    .long_name      = NULL_IF_CONFIG_SMALL("RealVideo 1.0"),
+    .pix_fmts       = ff_pixfmt_list_420,
 };
 
 AVCodec ff_rv20_decoder = {
@@ -760,8 +767,7 @@ AVCodec ff_rv20_decoder = {
     .close          = rv10_decode_end,
     .decode         = rv10_decode_frame,
     .capabilities   = CODEC_CAP_DR1 | CODEC_CAP_DELAY,
-    .flush= ff_mpeg_flush,
-    .max_lowres = 3,
-    .long_name = NULL_IF_CONFIG_SMALL("RealVideo 2.0"),
-    .pix_fmts= ff_pixfmt_list_420,
+    .flush          = ff_mpeg_flush,
+    .long_name      = NULL_IF_CONFIG_SMALL("RealVideo 2.0"),
+    .pix_fmts       = ff_pixfmt_list_420,
 };

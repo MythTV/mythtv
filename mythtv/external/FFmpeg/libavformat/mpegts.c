@@ -1929,16 +1929,14 @@ static int mpegts_read_header(AVFormatContext *s)
 {
     MpegTSContext *ts = s->priv_data;
     AVIOContext *pb = s->pb;
-    uint8_t buf[8*1024];
+    uint8_t buf[8*1024]={0};
     int len;
     int64_t pos;
 
     /* read the first 8192 bytes to get packet size */
     pos = avio_tell(pb);
     len = avio_read(pb, buf, sizeof(buf));
-    if (len != sizeof(buf))
-        goto fail;
-    ts->raw_packet_size = get_packet_size(buf, sizeof(buf));
+    ts->raw_packet_size = get_packet_size(buf, len);
     if (ts->raw_packet_size <= 0) {
         av_log(s, AV_LOG_WARNING, "Could not detect TS packet size, defaulting to non-FEC/DVHS\n");
         ts->raw_packet_size = TS_PACKET_SIZE;
@@ -2074,6 +2072,7 @@ static int mpegts_read_packet(AVFormatContext *s,
     MpegTSContext *ts = s->priv_data;
     int ret, i;
 
+    pkt->size = -1;
     ts->pkt = pkt;
     ret = handle_packets(ts, 0);
     if (ret < 0) {
@@ -2091,6 +2090,8 @@ static int mpegts_read_packet(AVFormatContext *s,
         }
     }
 
+    if (!ret && pkt->size < 0)
+        ret = AVERROR(EINTR);
     return ret;
 }
 
@@ -2107,7 +2108,7 @@ static int mpegts_read_close(AVFormatContext *s)
     return 0;
 }
 
-static int64_t mpegts_get_pcr(AVFormatContext *s, int stream_index,
+static av_unused int64_t mpegts_get_pcr(AVFormatContext *s, int stream_index,
                               int64_t *ppos, int64_t pos_limit)
 {
     MpegTSContext *ts = s->priv_data;
@@ -2319,9 +2320,9 @@ AVInputFormat ff_mpegts_demuxer = {
     .read_packet    = mpegts_read_packet,
     .read_close     = mpegts_read_close,
     .read_timestamp = mpegts_get_dts,
-    .flags = AVFMT_SHOW_IDS|AVFMT_TS_DISCONT,
+    .flags          = AVFMT_SHOW_IDS | AVFMT_TS_DISCONT,
 #ifdef USE_SYNCPOINT_SEARCH
-    .read_seek2 = read_seek2,
+    .read_seek2     = read_seek2,
 #endif
 };
 
@@ -2333,9 +2334,9 @@ AVInputFormat ff_mpegtsraw_demuxer = {
     .read_packet    = mpegts_raw_read_packet,
     .read_close     = mpegts_read_close,
     .read_timestamp = mpegts_get_dts,
-    .flags = AVFMT_SHOW_IDS|AVFMT_TS_DISCONT,
+    .flags          = AVFMT_SHOW_IDS | AVFMT_TS_DISCONT,
 #ifdef USE_SYNCPOINT_SEARCH
-    .read_seek2 = read_seek2,
+    .read_seek2     = read_seek2,
 #endif
-    .priv_class = &mpegtsraw_class,
+    .priv_class     = &mpegtsraw_class,
 };

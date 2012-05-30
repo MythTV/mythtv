@@ -3,31 +3,53 @@
 #ifndef MYTHREFCOUNT_H_
 #define MYTHREFCOUNT_H_
 
-#include <QObject>
-#include <QMutex>
+#include <QAtomicInt>
 #include "mythbaseexp.h"
 
-class MBASE_PUBLIC ReferenceCounter : public QObject
+/** \brief General purpose reference counter.
+ *
+ *  This class uses QAtomicInt for lockless reference counting.
+ *
+ */
+class MBASE_PUBLIC ReferenceCounter
 {
-    Q_OBJECT
   public:
+    /// Creates reference counter with an initial value of 1.
     ReferenceCounter(void);
-   ~ReferenceCounter(void) {};
 
-    virtual void UpRef(void);
-    virtual bool DownRef(void);
+    /// Increments reference count.
+    void IncrRef(void);
+
+    /// Decrements reference count and deletes on 0.
+    /// \return true if object is deleted
+    bool DecrRef(void);
+
+  protected:
+    /// Called on destruction, will warn if object deleted with
+    /// references in place. Set breakpoint here for debugging.
+    virtual ~ReferenceCounter(void);
+
   private:
-    QMutex m_refLock;
-    uint m_refCount;
+    QAtomicInt m_referenceCount;
 };
 
+/** \brief This decrements the reference on destruction.
+ *
+ *  This can be used to ensure a reference to an object is decrimented
+ *  at the end of the scope containing ReferenceLocker.
+ *
+ */
 class MBASE_PUBLIC ReferenceLocker
 {
   public:
-    ReferenceLocker(ReferenceCounter *counter, bool upref=true);
-   ~ReferenceLocker();
+    ReferenceLocker(ReferenceCounter *counter) : m_counter(counter) { }
+    ~ReferenceLocker()
+    {
+        if (m_counter)
+            m_counter->DecrRef();
+    }
   private:
-    ReferenceCounter *m_refObject;
+    ReferenceCounter *m_counter;
 };
 
 #endif

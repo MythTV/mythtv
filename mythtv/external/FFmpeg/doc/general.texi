@@ -13,7 +13,8 @@
 
 FFmpeg can be hooked up with a number of external libraries to add support
 for more formats. None of them are used by default, their use has to be
-explicitly requested by passing the appropriate flags to @file{./configure}.
+explicitly requested by passing the appropriate flags to
+@command{./configure}.
 
 @section OpenJPEG
 
@@ -372,6 +373,8 @@ following image formats are supported:
     @tab Microsoft BMP image
 @item DPX          @tab X @tab X
     @tab Digital Picture Exchange
+@item EXR          @tab   @tab X
+    @tab OpenEXR
 @item JPEG         @tab X @tab X
     @tab Progressive JPEG is not supported.
 @item JPEG 2000    @tab X @tab X
@@ -480,7 +483,7 @@ following image formats are supported:
 @item DFA                    @tab     @tab  X
     @tab Codec used in Chronomaster game.
 @item Dirac                  @tab  E  @tab  X
-    @tab supported through external libdirac/libschroedinger libraries
+    @tab supported through external library libschroedinger
 @item Deluxe Paint Animation @tab     @tab  X
 @item DNxHD                  @tab   X @tab  X
     @tab aka SMPTE VC3
@@ -835,7 +838,8 @@ performance on systems without hardware floating point support).
 @item SSA/ASS      @tab X @tab X @tab X @tab X
 @item DVB          @tab X @tab X @tab X @tab X
 @item DVD          @tab X @tab X @tab X @tab X
-@item MicroDVD     @tab X @tab X @tab   @tab
+@item JACOsub      @tab X @tab X @tab   @tab X
+@item MicroDVD     @tab X @tab X @tab   @tab X
 @item PGS          @tab   @tab   @tab   @tab X
 @item SubRip (SRT) @tab X @tab X @tab X @tab X
 @item XSUB         @tab   @tab   @tab X @tab X

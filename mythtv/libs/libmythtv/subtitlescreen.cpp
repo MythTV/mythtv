@@ -111,6 +111,7 @@ static const QString kSubWindowName("osd_subtitle");
 static const QString kSubFamily608     ("608");
 static const QString kSubFamily708     ("708");
 static const QString kSubFamilyText    ("text");
+static const QString kSubFamilyAV      ("AV");
 static const QString kSubFamilyTeletext("teletext");
 
 static const QString kSubAttrItalics  ("italics");
@@ -574,6 +575,7 @@ void SubtitleScreen::EnableSubtitles(int type, bool forced_only)
     ClearAllSubtitles();
     SetVisible(m_subtitleType != kDisplayNone);
     SetArea(MythRect());
+    m_textFontZoom  = gCoreContext->GetNumSetting("OSDCC708TextZoom", 100);
     switch (m_subtitleType)
     {
     case kDisplayTextSubtitle:
@@ -586,7 +588,12 @@ void SubtitleScreen::EnableSubtitles(int type, bool forced_only)
     case kDisplayCC708:
         m_family = kSubFamily708;
         break;
+    case kDisplayAVSubtitle:
+        m_family = kSubFamilyAV;
+        m_textFontZoom = gCoreContext->GetNumSetting("OSDAVSubZoom", 100);
+        break;
     }
+    m_textFontZoomPrev = m_textFontZoom;
 }
 
 void SubtitleScreen::DisableForcedSubtitles(void)
@@ -612,15 +619,12 @@ bool SubtitleScreen::Create(void)
         LOG(VB_GENERAL, LOG_WARNING, LOC + "Failed to get CEA-608 reader.");
     if (!m_708reader)
         LOG(VB_GENERAL, LOG_WARNING, LOC + "Failed to get CEA-708 reader.");
-    m_textFontZoom  = gCoreContext->GetNumSetting("OSDCC708TextZoom", 100);
-    m_textFontZoomPrev = m_textFontZoom;
 
     return true;
 }
 
 void SubtitleScreen::Pulse(void)
 {
-    m_textFontZoom = gCoreContext->GetNumSetting("OSDCC708TextZoom", 100);
     ExpireSubtitles();
 
     DisplayAVSubtitles(); // allow forced subtitles to work
@@ -668,6 +672,7 @@ void SubtitleScreen::ClearDisplayedSubtitles(void)
         Clear708Cache(i);
     DeleteAllChildren();
     m_expireTimes.clear();
+    m_avsubCache.clear();
     SetRedraw();
 }
 
@@ -682,6 +687,7 @@ void SubtitleScreen::ExpireSubtitles(void)
         it.next();
         if (it.value() < now)
         {
+            m_avsubCache.remove(it.key());
             DeleteChild(it.key());
             it.remove();
             SetRedraw();
@@ -725,6 +731,25 @@ void SubtitleScreen::DisplayAVSubtitles(void)
     if (!m_player || !m_subreader)
         return;
 
+    // Resize subtitles if the zoom factor has changed since the last
+    // update.
+    if (m_textFontZoom != m_textFontZoomPrev)
+    {
+        double factor = m_textFontZoom / (double)m_textFontZoomPrev;
+        QHash<MythUIType*, MythImage*>::iterator it;
+        for (it = m_avsubCache.begin(); it != m_avsubCache.end(); ++it)
+        {
+            MythUIImage *image = dynamic_cast<MythUIImage *>(it.key());
+            if (image)
+            {
+                QSize size = it.value()->size();
+                size *= factor;
+                it.value()->Resize(size);
+            }
+        }
+        m_refreshArea = true;
+    }
+
     AVSubtitles* subs = m_subreader->GetAVSubtitles();
     QMutexLocker lock(&(subs->lock));
     if (subs->buffers.empty() && (kDisplayAVSubtitle != m_subtitleType))
@@ -746,6 +771,14 @@ void SubtitleScreen::DisplayAVSubtitles(void)
         if (subtitle.start_display_time > currentFrame->timecode)
             break;
 
+        long long displayfor = subtitle.end_display_time -
+                               subtitle.start_display_time;
+        if (displayfor == 0)
+            displayfor = 60000;
+        displayfor = (displayfor < 50) ? 50 : displayfor;
+        long long late = currentFrame->timecode -
+                         subtitle.start_display_time;
+
         ClearDisplayedSubtitles();
         subs->buffers.pop_front();
         for (std::size_t i = 0; i < subtitle.num_rects; ++i)
@@ -762,11 +795,6 @@ void SubtitleScreen::DisplayAVSubtitles(void)
 
             if (displaysub && rect->type == SUBTITLE_BITMAP)
             {
-                // AVSubtitleRect's image data's not guaranteed to be 4 byte
-                // aligned.
-
-                QSize img_size(rect->w, rect->h);
-                QRect img_rect(rect->x, rect->y, rect->w, rect->h);
                 QRect display(rect->display_x, rect->display_y,
                               rect->display_w, rect->display_h);
 
@@ -777,10 +805,12 @@ void SubtitleScreen::DisplayAVSubtitles(void)
                 int right  = rect->x + rect->w;
                 int bottom = rect->y + rect->h;
                 if (subs->fixPosition || (currentFrame->height < bottom) ||
-                   (currentFrame->width  < right))
+                    (currentFrame->width  < right) ||
+                    !display.width() || !display.height())
                 {
                     int sd_height = 576;
-                    if ((m_player->GetFrameRate() > 26.0f) && bottom <= 480)
+                    if ((m_player->GetFrameRate() > 26.0f ||
+                         m_player->GetFrameRate() < 24.0f) && bottom <= 480)
                         sd_height = 480;
                     int height = ((currentFrame->height <= sd_height) &&
                                   (bottom <= sd_height)) ? sd_height :
@@ -793,60 +823,29 @@ void SubtitleScreen::DisplayAVSubtitles(void)
                     display = QRect(0, 0, width, height);
                 }
 
-                QRect scaled = videoOut->GetImageRect(img_rect, &display);
-                QImage qImage(img_size, QImage::Format_ARGB32);
-                for (int y = 0; y < rect->h; ++y)
+                // split into upper/lower to allow zooming
+                QRect bbox;
+                int uh = display.height() / 2 - rect->y;
+                int lh;
+                long long displayuntil = currentFrame->timecode + displayfor;
+                if (uh > 0)
                 {
-                    for (int x = 0; x < rect->w; ++x)
-                    {
-                        const uint8_t color = rect->pict.data[0][y*rect->pict.linesize[0] + x];
-                        const uint32_t pixel = *((uint32_t*)rect->pict.data[1]+color);
-                        qImage.setPixel(x, y, pixel);
-                    }
+                    bbox = QRect(0, 0, rect->w, uh);
+                    uh = DisplayScaledAVSubtitles(rect, bbox, true, display,
+                                                  subtitle.forced,
+                                                  QString("avsub%1t").arg(i),
+                                                  displayuntil, late);
                 }
-
-                if (scaled.size() != img_size)
+                else
+                    uh = 0;
+                lh = rect->h - uh;
+                if (lh > 0)
                 {
-                    qImage = qImage.scaled(scaled.width(), scaled.height(),
-                             Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-                }
-
-                MythPainter *osd_painter = videoOut->GetOSDPainter();
-                MythImage* image = NULL;
-                if (osd_painter)
-                   image = osd_painter->GetFormatImage();
-
-                long long displayfor = subtitle.end_display_time -
-                                       subtitle.start_display_time;
-                if (displayfor == 0)
-                    displayfor = 60000;
-                displayfor = (displayfor < 50) ? 50 : displayfor;
-                long long late = currentFrame->timecode -
-                                 subtitle.start_display_time;
-                MythUIImage *uiimage = NULL;
-                if (image)
-                {
-                    image->Assign(qImage);
-                    QString name = QString("avsub%1").arg(i);
-                    uiimage = new MythUIImage(this, name);
-                    if (uiimage)
-                    {
-                        m_refreshArea = true;
-                        uiimage->SetImage(image);
-                        uiimage->SetArea(MythRect(scaled));
-                        m_expireTimes.insert(uiimage,
-                                     currentFrame->timecode + displayfor);
-                    }
-                }
-                if (uiimage)
-                {
-                    LOG(VB_PLAYBACK, LOG_INFO, LOC +
-                        QString("Display %1AV subtitle for %2ms")
-                        .arg(subtitle.forced ? "FORCED " : "")
-                        .arg(displayfor));
-                    if (late > 50)
-                        LOG(VB_PLAYBACK, LOG_INFO, LOC +
-                            QString("AV Sub was %1ms late").arg(late));
+                    bbox = QRect(0, uh, rect->w, lh);
+                    lh = DisplayScaledAVSubtitles(rect, bbox, false, display,
+                                                  subtitle.forced,
+                                                  QString("avsub%1b").arg(i),
+                                                  displayuntil, late);
                 }
             }
 #ifdef USING_LIBASS
@@ -862,6 +861,175 @@ void SubtitleScreen::DisplayAVSubtitles(void)
 #ifdef USING_LIBASS
     RenderAssTrack(currentFrame->timecode);
 #endif
+}
+
+int SubtitleScreen::DisplayScaledAVSubtitles(const AVSubtitleRect *rect,
+                                             QRect &bbox, bool top,
+                                             QRect &display, int forced,
+                                             QString imagename,
+                                             long long displayuntil,
+                                             long long late)
+{
+    // split image vertically if it spans middle of display
+    // - split point is empty line nearest the middle
+    // crop image to reduce scaling time
+    int xmin, xmax, ymin, ymax;
+    int ylast, ysplit;
+    bool prev_empty = false;
+
+    // initialize to opposite edges
+    xmin = bbox.right();
+    xmax = bbox.left();
+    ymin = bbox.bottom();
+    ymax = bbox.top();
+    ylast = bbox.top();
+    ysplit = bbox.bottom();
+
+    // find bounds of active image
+    for (int y = bbox.top(); y <= bbox.bottom(); ++y)
+    {
+        if (y >= rect->h)
+        {
+            // end of image
+            if (!prev_empty)
+                ylast = y;
+            break;
+        }
+
+        bool empty = true;
+        for (int x = bbox.left(); x <= bbox.right(); ++x)
+        {
+            const uint8_t color =
+                rect->pict.data[0][y * rect->pict.linesize[0] + x];
+            const uint32_t pixel = *((uint32_t *)rect->pict.data[1] + color);
+            if (pixel & 0xff000000)
+            {
+                empty = false;
+                if (x < xmin)
+                    xmin = x;
+                if (x > xmax)
+                    xmax = x;
+            }
+        }
+
+        if (!empty)
+        {
+            if (y < ymin)
+                ymin = y;
+            if (y > ymax)
+                ymax = y;
+        }
+        else if (!prev_empty)
+        {
+            // remember uppermost empty line
+            ylast = y;
+        }
+        prev_empty = empty;
+    }
+
+    if (ymax <= ymin)
+        return 0;
+
+    if (top)
+    {
+        if (ylast < ymin)
+            // no empty lines
+            return 0;
+
+        if (ymax == bbox.bottom())
+        {
+            ymax = ylast;
+            ysplit = ylast;
+        }
+    }
+
+    // set new bounds
+    bbox.setLeft(xmin);
+    bbox.setRight(xmax);
+    bbox.setTop(ymin);
+    bbox.setBottom(ymax);
+
+    // copy active region
+    // AVSubtitleRect's image data's not guaranteed to be 4 byte
+    // aligned.
+
+    QRect orig_rect(bbox.left(), bbox.top(), bbox.width(), bbox.height());
+
+    QImage qImage(bbox.width(), bbox.height(), QImage::Format_ARGB32);
+    for (int y = 0; y < bbox.height(); ++y)
+    {
+        int ysrc = y + bbox.top();
+        for (int x = 0; x < bbox.width(); ++x)
+        {
+            int xsrc = x + bbox.left();
+            const uint8_t color =
+                rect->pict.data[0][ysrc * rect->pict.linesize[0] + xsrc];
+            const uint32_t pixel = *((uint32_t *)rect->pict.data[1] + color);
+            qImage.setPixel(x, y, pixel);
+        }
+    }
+
+    // translate to absolute coordinates
+    bbox.translate(rect->x, rect->y);
+
+    // scale and move according to zoom factor
+    bbox.setWidth(bbox.width() * m_textFontZoom / 100);
+    bbox.setHeight(bbox.height() * m_textFontZoom / 100);
+
+    VideoOutput *videoOut = m_player->GetVideoOutput();
+    QRect scaled = videoOut->GetImageRect(bbox, &display);
+
+    if (scaled.size() != orig_rect.size())
+        qImage = qImage.scaled(scaled.width(), scaled.height(),
+                               Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+
+    int hsize = m_safeArea.width();
+    int vsize = m_safeArea.height();
+
+    scaled.moveLeft(((100 - m_textFontZoom) * hsize / 2 +
+                     m_textFontZoom * scaled.left()) /
+                    100);
+    if (top)
+        // anchor up
+        scaled.moveTop(scaled.top() * m_textFontZoom / 100);
+    else
+        // anchor down
+        scaled.moveTop(((100 - m_textFontZoom) * vsize +
+                        m_textFontZoom * scaled.top()) /
+                       100);
+
+
+    MythPainter *osd_painter = videoOut->GetOSDPainter();
+    MythImage *image = NULL;
+    if (osd_painter)
+       image = osd_painter->GetFormatImage();
+
+    MythUIImage *uiimage = NULL;
+    if (image)
+    {
+        image->Assign(qImage);
+        uiimage = new MythUIImage(this, imagename);
+        if (uiimage)
+        {
+            m_refreshArea = true;
+            uiimage->SetImage(image);
+            uiimage->SetArea(MythRect(scaled));
+            m_expireTimes.insert(uiimage, displayuntil);
+            m_avsubCache.insert(uiimage, image);
+        }
+    }
+    if (uiimage)
+    {
+        LOG(VB_PLAYBACK, LOG_INFO, LOC +
+            QString("Display %1AV sub until %2ms")
+           .arg(forced ? "FORCED " : "")
+           .arg(displayuntil));
+        if (late > 50)
+            LOG(VB_PLAYBACK, LOG_INFO, LOC +
+                QString("AV Sub was %1ms late").arg(late));
+    }
+
+    return (ysplit + 1);
 }
 
 void SubtitleScreen::DisplayTextSubtitles(void)
@@ -1244,6 +1412,20 @@ MythFontProperties* SubtitleScreen::GetFont(CC708CharacterAttribute attr,
 {
     return m_format->GetFont(m_family, attr, m_fontSize,
                              teletext, m_textFontZoom, m_fontStretch);
+}
+
+void SubtitleScreen::SetZoom(int percent)
+{
+    m_textFontZoom = percent;
+    if (m_family == kSubFamilyAV)
+        gCoreContext->SaveSetting("OSDAVSubZoom", percent);
+    else
+        gCoreContext->SaveSetting("OSDCC708TextZoom", percent);
+}
+
+int SubtitleScreen::GetZoom(void)
+{
+    return m_textFontZoom;
 }
 
 static QString srtColorString(QColor color)

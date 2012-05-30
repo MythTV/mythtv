@@ -292,9 +292,8 @@ bool FillData::GrabDDData(Source source, int poffset,
 #endif
 
     query.prepare("SELECT count(*) from dd_v_program;");
-    if (query.exec() && query.size() > 0)
+    if (query.exec() && query.next())
     {
-        query.next();
         if (query.value(0).toInt() < 1)
         {
             LOG(VB_GENERAL, LOG_INFO, "Did not find any new program data.");
@@ -602,9 +601,8 @@ bool FillData::Run(SourceList &sourcelist)
              ":SRCID AND xmltvid != ''");
         query.bindValue(":SRCID", (*it).id);
 
-        if (query.exec() && query.size() > 0)
+        if (query.exec() && query.next())
         {
-            query.next();
             source_channels = query.value(0).toInt();
             if (source_channels > 0)
             {
@@ -637,7 +635,8 @@ bool FillData::Run(SourceList &sourcelist)
             grabber_capabilities_proc.Run(25);
             if (grabber_capabilities_proc.Wait() != GENERIC_EXIT_OK)
                 LOG(VB_GENERAL, LOG_ERR,
-                    QString("%1  --capabilities failed or we timed out waiting."                            " You may need to upgrade your xmltv grabber")
+                    QString("%1  --capabilities failed or we timed out waiting."                            
+                    " You may need to upgrade your xmltv grabber")
                         .arg(xmltv_grabber));
             else
             {

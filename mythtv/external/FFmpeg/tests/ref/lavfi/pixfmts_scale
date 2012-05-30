@@ -22,7 +22,7 @@ monob               cb62f31b701c6e987b574974d1b31e32
 monow               fd5d417ab7728acddffc06870661df61
 nv12                4676d59db43d657dc12841f6bc3ab452
 nv21                69c699510ff1fb777b118ebee1002f14
-pal8                6324fa058e1bc157ed7132bfe4022317
+pal8                0e7e9aee9f4f02f50cb72bee640843df
 rgb0                a01995946117e77b20e851506d64688c
 rgb24               13ff53ebeab74dc05492836f1cfbd2c1
 rgb444be            46e466b2709f62b2fffc63708063eaaf
@@ -62,7 +62,8 @@ yuv444p16le         a0c5d3c7bf3f181db503cf8e450d1335
 yuv444p9be          9ac2643ce7f7e5c4e17c8c9fd8494d4a
 yuv444p9le          896a1cc9cccca1ba410dd53942d33cc4
 yuva420p            8673a9131fb47de69788863f93a50eb7
-yuva444p            3268c6abe5e3cdbd16552a1eddced816
+yuva422p            c576dc435c7a22f0d17a7aec151ce26f
+yuva444p            d7a2d5bcdfb762f449a810856d1251fe
 yuvj420p            30427bd6caf5bda93a173dbebe759e09
 yuvj422p            fc8288f64fd149573f73cf8da05d8e6d
 yuvj440p            508ac7a9ddeb6d1794a1100ba7a1664c

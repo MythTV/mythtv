@@ -31,6 +31,7 @@
 #include <time.h>
 #include "avformat.h"
 #include "internal.h"
+#include "libavcodec/dv_profile.h"
 #include "libavcodec/dvdata.h"
 #include "libavutil/intreadwrite.h"
 #include "libavutil/mathematics.h"
@@ -600,6 +601,6 @@ AVInputFormat ff_dv_demuxer = {
     .read_packet    = dv_read_packet,
     .read_close     = dv_read_close,
     .read_seek      = dv_read_seek,
-    .extensions = "dv,dif",
+    .extensions     = "dv,dif",
 };
 #endif

@@ -235,17 +235,17 @@ class MTV_PUBLIC MPEGStreamData : public EITSource
     bool HasCachedAllPMTs(void) const;
     bool HasCachedAnyPMTs(void) const;
 
-    const pat_ptr_t GetCachedPAT(uint tsid, uint section_num) const;
-    pat_vec_t       GetCachedPATs(uint tsid) const;
-    pat_vec_t       GetCachedPATs(void) const;
-    pat_map_t       GetCachedPATMap(void) const;
+    pat_ptr_t GetCachedPAT(uint tsid, uint section_num) const;
+    pat_vec_t GetCachedPATs(uint tsid) const;
+    pat_vec_t GetCachedPATs(void) const;
+    pat_map_t GetCachedPATMap(void) const;
 
-    const cat_ptr_t GetCachedCAT(uint tsid, uint section_num) const;
-    cat_vec_t       GetCachedCATs(uint tsid) const;
-    cat_vec_t       GetCachedCATs(void) const;
-    cat_map_t       GetCachedCATMap(void) const;
+    cat_ptr_t GetCachedCAT(uint tsid, uint section_num) const;
+    cat_vec_t GetCachedCATs(uint tsid) const;
+    cat_vec_t GetCachedCATs(void) const;
+    cat_map_t GetCachedCATMap(void) const;
 
-    const pmt_ptr_t GetCachedPMT(uint program_num, uint section_num) const;
+    pmt_ptr_t GetCachedPMT(uint program_num, uint section_num) const;
     pmt_vec_t GetCachedPMTs(void) const;
     pmt_map_t GetCachedPMTMap(void) const;
 

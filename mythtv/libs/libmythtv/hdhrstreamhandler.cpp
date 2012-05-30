@@ -271,7 +271,33 @@ bool HDHRStreamHandler::Open(void)
         _tuner_types.clear();
         if (QString(model).toLower().contains("cablecard"))
         {
-            _tuner_types.push_back(DTVTunerType::kTunerTypeOCUR);
+            QString status_channel = "none";
+            hdhomerun_tuner_status_t t_status;
+
+            if (hdhomerun_device_get_oob_status(
+                    _hdhomerun_device, NULL, &t_status) < 0)
+            {
+                LOG(VB_GENERAL, LOG_ERR, LOC +
+                    "Failed to query Cable card OOB channel");
+            }
+            else
+            {
+                status_channel = QString(t_status.channel);
+                LOG(VB_RECORD, LOG_INFO, LOC +
+                    QString("Cable card OOB channel is '%1'")
+                    .arg(status_channel));
+            }
+
+            if (status_channel ==  "none")
+            {
+                LOG(VB_RECORD, LOG_INFO, LOC + "Cable card is not present");
+                _tuner_types.push_back(DTVTunerType::kTunerTypeATSC);
+            }
+            else
+            {
+                LOG(VB_RECORD, LOG_INFO, LOC + "Cable card is present");
+                _tuner_types.push_back(DTVTunerType::kTunerTypeOCUR);
+            }
         }
         else if (QString(model).toLower().contains("dvb"))
         {

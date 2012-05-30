@@ -89,6 +89,22 @@ static unsigned dbg_ident(const MythPlayer*);
 const int MythPlayer::kNightModeBrightenssAdjustment = 10;
 const int MythPlayer::kNightModeContrastAdjustment = 10;
 
+// Exact frame seeking, no inaccuracy allowed.
+const double MythPlayer::kInaccuracyNone = 0;
+
+// By default, when seeking, snap to a keyframe if the keyframe's
+// distance from the target frame is less than 10% of the total seek
+// distance.
+const double MythPlayer::kInaccuracyDefault = 0.1;
+
+// Allow greater inaccuracy (50%) in the cutlist editor (unless the
+// editor seek distance is set to 1 frame or 1 keyframe).
+const double MythPlayer::kInaccuracyEditor = 0.5;
+
+// Any negative value means completely inexact, i.e. seek to the
+// keyframe that is closest to the target.
+const double MythPlayer::kInaccuracyFull = -1.0;
+
 void DecoderThread::run(void)
 {
     RunProlog();
@@ -148,7 +164,7 @@ MythPlayer::MythPlayer(PlayerFlags flags)
       // Bookmark stuff
       bookmarkseek(0),
       // Seek
-      fftime(0),                    exactseeks(false),
+      fftime(0),
       // Playback misc.
       videobuf_retries(0),          framesPlayed(0),
       totalFrames(0),               totalLength(0),
@@ -309,7 +325,7 @@ void MythPlayer::SetWatchingRecording(bool mode)
 {
     watchingrecording = mode;
     if (decoder)
-        decoder->setWatchingRecording(mode);
+        decoder->SetWatchingRecording(mode);
 }
 
 bool MythPlayer::IsWatchingInprogress(void) const
@@ -612,8 +628,7 @@ void MythPlayer::ReinitVideo(void)
 
     if (textDisplayMode)
     {
-        DisableCaptions(textDisplayMode, false);
-        SetCaptionsEnabled(true, false);
+        EnableSubtitles(true);
     }
 }
 
@@ -949,10 +964,10 @@ int MythPlayer::OpenFile(uint retries)
         return -1;
     }
 
-    decoder->setExactSeeks(exactseeks);
-    decoder->setLiveTVMode(livetv);
-    decoder->setWatchingRecording(watchingrecording);
-    decoder->setTranscoding(transcoding);
+    decoder->SetSeekSnap(0);
+    decoder->SetLiveTVMode(livetv);
+    decoder->SetWatchingRecording(watchingrecording);
+    decoder->SetTranscoding(transcoding);
     CheckExtraAudioDecode();
 
     // Set 'no_video_decode' to true for audio only decodeing
@@ -2637,7 +2652,7 @@ void MythPlayer::JumpToProgram(void)
         nextpos = 0;
 
     if (nextpos > 10)
-        DoFastForward(nextpos, true, false);
+        DoJumpToFrame(nextpos, kInaccuracyNone);
 
     player_ctx->SetPlayerChangingBuffers(false);
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "JumpToProgram - end");
@@ -2681,7 +2696,7 @@ void MythPlayer::InitialSeek(void)
     // TODO handle initial commskip and/or cutlist skip as well
     if (bookmarkseek > 30)
     {
-        DoFastForward(bookmarkseek, true, false);
+        DoJumpToFrame(bookmarkseek, kInaccuracyNone);
         if (clearSavedPosition && !player_ctx->IsPIP())
             SetBookmark(true);
     }
@@ -2840,7 +2855,7 @@ void MythPlayer::EventLoop(void)
     {
         rewindtime = CalcRWTime(rewindtime);
         if (rewindtime > 0)
-            DoRewind(rewindtime);
+            DoRewind(rewindtime, kInaccuracyDefault);
     }
 
     // Handle fast forward
@@ -2849,7 +2864,7 @@ void MythPlayer::EventLoop(void)
         fftime = CalcMaxFFTime(fftime);
         if (fftime > 0)
         {
-            DoFastForward(fftime);
+            DoFastForward(fftime, kInaccuracyDefault);
             if (GetEof())
                return;
         }
@@ -2881,7 +2896,7 @@ void MythPlayer::EventLoop(void)
             if (!msg.isEmpty())
                 SetOSDStatus(msg, kOSDTimeout_Med);
             if (jump)
-                DoJumpToFrame(jumpto, true, true);
+                DoJumpToFrame(jumpto, kInaccuracyNone);
         }
         commBreakMap.SkipCommercials(0);
         return;
@@ -2899,7 +2914,7 @@ void MythPlayer::EventLoop(void)
         if (!msg.isEmpty())
             SetOSDStatus(msg, kOSDTimeout_Med);
         if (jump)
-            DoJumpToFrame(jumpto, true, true);
+            DoJumpToFrame(jumpto, kInaccuracyNone);
     }
 
     // Handle cutlist skipping
@@ -2916,7 +2931,7 @@ void MythPlayer::EventLoop(void)
         }
         else
         {
-            DoJumpToFrame(jumpto, true, true);
+            DoJumpToFrame(jumpto, kInaccuracyNone);
         }
     }
 }
@@ -3193,7 +3208,7 @@ void MythPlayer::SetTranscoding(bool value)
     transcoding = value;
 
     if (decoder)
-        decoder->setTranscoding(value);
+        decoder->SetTranscoding(value);
 }
 
 bool MythPlayer::AddPIPPlayer(MythPlayer *pip, PIPLocation loc, uint timeout)
@@ -3425,10 +3440,8 @@ void MythPlayer::ChangeSpeed(void)
     if (skip_changed && videoOutput)
     {
         videoOutput->SetPrebuffering(ffrew_skip == 1);
-        if (decoder)
-            decoder->setExactSeeks(exactseeks && ffrew_skip == 1);
         if (play_speed != 0.0f && !(last_speed == 0.0f && ffrew_skip == 1))
-            DoJumpToFrame(framesPlayed + fftime - rewindtime);
+            DoJumpToFrame(framesPlayed + fftime - rewindtime, kInaccuracyFull);
     }
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "Play speed: " +
@@ -3466,8 +3479,7 @@ void MythPlayer::ChangeSpeed(void)
     }
 }
 
-bool MythPlayer::DoRewind(uint64_t frames, bool override_seeks,
-                          bool seeks_wanted)
+bool MythPlayer::DoRewind(uint64_t frames, double inaccuracy)
 {
     if (player_ctx->buffer && !player_ctx->buffer->IsSeekingAllowed())
         return false;
@@ -3479,7 +3491,10 @@ bool MythPlayer::DoRewind(uint64_t frames, bool override_seeks,
     if (desiredFrame < video_frame_rate)
         limitKeyRepeat = true;
 
-    WaitForSeek(desiredFrame, override_seeks, seeks_wanted);
+    uint64_t seeksnap_wanted = -1;
+    if (inaccuracy != kInaccuracyFull)
+        seeksnap_wanted = frames * inaccuracy;
+    WaitForSeek(desiredFrame, seeksnap_wanted);
     rewindtime = 0;
     ClearAfterSeek();
     return true;
@@ -3618,8 +3633,7 @@ bool MythPlayer::IsNearEnd(void)
     return (framesLeft < (uint64_t)margin);
 }
 
-bool MythPlayer::DoFastForward(uint64_t frames, bool override_seeks,
-                               bool seeks_wanted)
+bool MythPlayer::DoFastForward(uint64_t frames, double inaccuracy)
 {
     if (player_ctx->buffer && !player_ctx->buffer->IsSeekingAllowed())
         return false;
@@ -3634,31 +3648,29 @@ bool MythPlayer::DoFastForward(uint64_t frames, bool override_seeks,
             desiredFrame = endcheck;
     }
 
-    WaitForSeek(desiredFrame, override_seeks, seeks_wanted);
+    uint64_t seeksnap_wanted = -1;
+    if (inaccuracy != kInaccuracyFull)
+        seeksnap_wanted = frames * inaccuracy;
+    WaitForSeek(desiredFrame, seeksnap_wanted);
     fftime = 0;
     ClearAfterSeek(false);
     return true;
 }
 
-void MythPlayer::DoJumpToFrame(uint64_t frame, bool override_seeks,
-                               bool seeks_wanted)
+void MythPlayer::DoJumpToFrame(uint64_t frame, double inaccuracy)
 {
     if (frame > framesPlayed)
-        DoFastForward(frame - framesPlayed, override_seeks, seeks_wanted);
+        DoFastForward(frame - framesPlayed, inaccuracy);
     else if (frame <= framesPlayed)
-        DoRewind(framesPlayed - frame, override_seeks, seeks_wanted);
+        DoRewind(framesPlayed - frame, inaccuracy);
 }
 
-void MythPlayer::WaitForSeek(uint64_t frame, bool override_seeks,
-                             bool seeks_wanted)
+void MythPlayer::WaitForSeek(uint64_t frame, uint64_t seeksnap_wanted)
 {
     if (!decoder)
         return;
 
-    bool after  = exactseeks && (ffrew_skip == 1);
-    bool before = override_seeks ? seeks_wanted :
-                           (allpaused && !deleteMap.IsEditing()) ? true: after;
-    decoder->setExactSeeks(before);
+    decoder->SetSeekSnap(seeksnap_wanted);
 
     bool islivetvcur = (livetv && player_ctx->tvchain &&
                         !player_ctx->tvchain->HasNext());
@@ -3699,7 +3711,6 @@ void MythPlayer::WaitForSeek(uint64_t frame, bool override_seeks,
             osd->HideWindow("osd_message");
         osdLock.unlock();
     }
-    decoder->setExactSeeks(after);
 }
 
 /** \fn MythPlayer::ClearAfterSeek(bool)
@@ -3738,13 +3749,11 @@ void MythPlayer::ClearAfterSeek(bool clearvideobuffers)
     ResetAVSync();
 }
 
-void MythPlayer::SetPlayerInfo(TV *tv, QWidget *widget,
-                               bool frame_exact_seek, PlayerContext *ctx)
+void MythPlayer::SetPlayerInfo(TV *tv, QWidget *widget, PlayerContext *ctx)
 {
     deleteMap.SetPlayerContext(ctx);
     m_tv = tv;
     parentWidget = widget;
-    exactseeks   = frame_exact_seek;
     player_ctx   = ctx;
     livetv       = ctx->tvchain;
 }
@@ -3834,11 +3843,13 @@ bool MythPlayer::HandleProgramEditorActions(QStringList &actions,
     {
         QString action = actions[i];
         handled = true;
+        int seekamount = deleteMap.GetSeekAmount();
         if (action == ACTION_LEFT)
         {
             if (deleteMap.GetSeekAmount() > 0)
             {
-                DoRewind(deleteMap.GetSeekAmount(), true, true);
+                DoRewind(seekamount, seekamount > 1 ?
+                         kInaccuracyEditor : kInaccuracyNone);
             }
             else
                 HandleArbSeek(false);
@@ -3847,7 +3858,8 @@ bool MythPlayer::HandleProgramEditorActions(QStringList &actions,
         {
             if (deleteMap.GetSeekAmount() > 0)
             {
-                DoFastForward(deleteMap.GetSeekAmount(), true, true);
+                DoFastForward(seekamount, seekamount > 1 ?
+                              kInaccuracyEditor : kInaccuracyNone);
             }
             else
                 HandleArbSeek(true);
@@ -3878,24 +3890,25 @@ bool MythPlayer::HandleProgramEditorActions(QStringList &actions,
 #define FFREW_MULTICOUNT 10
         else if (action == ACTION_BIGJUMPREW)
         {
-            if (deleteMap.GetSeekAmount() > 0)
-                DoRewind(deleteMap.GetSeekAmount() * FFREW_MULTICOUNT,
-                         true, true);
+            if (seekamount > 0)
+                DoRewind(seekamount * FFREW_MULTICOUNT, seekamount > 1 ?
+                         kInaccuracyEditor : kInaccuracyNone);
             else
             {
                 int fps = (int)ceil(video_frame_rate);
-                DoRewind(fps * FFREW_MULTICOUNT / 2, true, true);
+                DoRewind(fps * FFREW_MULTICOUNT / 2, kInaccuracyNone);
             }
         }
         else if (action == ACTION_BIGJUMPFWD)
         {
-            if (deleteMap.GetSeekAmount() > 0)
-                DoFastForward(deleteMap.GetSeekAmount() * FFREW_MULTICOUNT,
-                              true, true);
+            if (seekamount > 0)
+                DoFastForward(seekamount * FFREW_MULTICOUNT, seekamount > 1 ?
+                              kInaccuracyEditor : kInaccuracyNone);
             else
             {
                 int fps = (int)ceil(video_frame_rate);
-                DoFastForward(fps * FFREW_MULTICOUNT / 2, true, true);
+                DoFastForward(fps * FFREW_MULTICOUNT / 2,
+                              kInaccuracyNone);
             }
         }
         else if (action == ACTION_SELECT)
@@ -3995,31 +4008,19 @@ void MythPlayer::HandleArbSeek(bool right)
         long long framenum = deleteMap.GetNearestMark(framesPlayed,
                                                       totalFrames, right);
         if (right && (framenum > (int64_t)framesPlayed))
-            DoFastForward(framenum - framesPlayed, true, true);
+            DoFastForward(framenum - framesPlayed, kInaccuracyNone);
         else if (!right && ((int64_t)framesPlayed > framenum))
-            DoRewind(framesPlayed - framenum, true, true);
+            DoRewind(framesPlayed - framenum, kInaccuracyNone);
     }
     else
     {
         if (right)
         {
-#if 0
-            // 2012-02-29.  This logic doesn't seem to make sense for
-            // the current code.  Clean it out later if no one raises
-            // an issue with the replacement code.  Refs #10389.
-
-            // editKeyFrameDist is a workaround for when keyframe distance
-            // is set to one, and keyframe detection is disabled because
-            // the position map uses MARK_GOP_BYFRAME. (see DecoderBase)
-            float editKeyFrameDist = keyframedist <= 2 ? 18 : keyframedist;
-
-            DoFastForward((long long)(editKeyFrameDist * 1.1), true, false);
-#endif // 0
-            DoFastForward(2, true, false);
+            DoFastForward(2, kInaccuracyFull);
         }
         else
         {
-            DoRewind(2, true, false);
+            DoRewind(2, kInaccuracyFull);
         }
     }
 }
@@ -4305,7 +4306,7 @@ void MythPlayer::SeekForScreenGrab(uint64_t &number, uint64_t frameNum,
     if (hasFullPositionMap)
     {
         DiscardVideoFrame(videoOutput->GetLastDecodedFrame());
-        DoFastForward(number);
+        DoJumpToFrame(number, kInaccuracyNone);
     }
 }
 
@@ -4328,7 +4329,7 @@ VideoFrame* MythPlayer::GetRawVideoFrame(long long frameNumber)
 
     if (frameNumber >= 0)
     {
-        DoJumpToFrame(frameNumber, true, true);
+        DoJumpToFrame(frameNumber, kInaccuracyNone);
         ClearAfterSeek();
     }
 
@@ -4414,10 +4415,9 @@ void MythPlayer::InitForTranscode(bool copyaudio, bool copyvideo)
     if (copyaudio && decoder)
         decoder->SetRawAudioState(true);
 
-    SetExactSeeks(true);
     if (decoder)
     {
-        decoder->setExactSeeks(exactseeks);
+        decoder->SetSeekSnap(0);
         decoder->SetLowBuffers(true);
     }
 }
@@ -4465,7 +4465,7 @@ bool MythPlayer::TranscodeGetNextFrame(
                 return false;
 
             // For 0.25, move this to DoJumpToFrame(jumpto)
-            WaitForSeek(jumpto);
+            WaitForSeek(jumpto, 0);
             decoder->ClearStoredData();
             ClearAfterSeek();
             decoder->GetFrame(kDecodeAV);
@@ -4785,7 +4785,7 @@ bool MythPlayer::DoJumpChapter(int chapter)
         return false;
     }
 
-    DoJumpToFrame(desiredFrame);
+    DoJumpToFrame(desiredFrame, kInaccuracyNone);
     jumpchapter = 0;
     return true;
 }
