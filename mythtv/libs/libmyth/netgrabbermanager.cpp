@@ -8,8 +8,9 @@
 #include "mythcontext.h"
 #include "mythsystem.h"
 #include "exitcodes.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 #include "mythlogging.h"
+#include "mythsystem.h"
 
 #include "netgrabbermanager.h"
 #include "netutils.h"
@@ -282,7 +283,7 @@ void Search::executeSearch(const QString &script, const QString &query, uint pag
 
     args.append("-S");
     QString term = query;
-    args.append(ShellEscape(term));
+    args.append(MythSystem::ShellEscape(term));
 
     LOG(VB_GENERAL, LOG_DEBUG, LOC +
         QString("Internet Search Query: %1 %2") .arg(cmd).arg(args.join(" ")));

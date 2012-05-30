@@ -34,7 +34,8 @@
 #include "storagegroup.h"
 #include "dbutil.h"
 #include "hardwareprofile.h"
-#include "mythmiscutil.h"
+#include "mythtimezone.h"
+#include "mythdate.h"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -365,8 +366,8 @@ DTC::TimeZoneInfo *Myth::GetTimeZone(  )
 {
     DTC::TimeZoneInfo *pResults = new DTC::TimeZoneInfo();
 
-    pResults->setTimeZoneID( getTimeZoneID() );
-    pResults->setUTCOffset( calc_utc_offset() );
+    pResults->setTimeZoneID( MythTZ::getTimeZoneID() );
+    pResults->setUTCOffset( MythTZ::calc_utc_offset() );
     pResults->setCurrentDateTime( MythDate::current(true) );
 
     return pResults;

@@ -4,7 +4,7 @@
 #include <QtAlgorithms>
 
 // myth
-#include <mythmiscutil.h>
+#include <mythdate.h>
 #include <mythdb.h>
 #include <mythcontext.h>
 #include <mythdirs.h>

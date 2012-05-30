@@ -53,8 +53,9 @@ using namespace std;
 
 // MythTV headers
 #include <mythcommandlineparser.h>
-#include <mythcontext.h>
+#include <mythmiscutil.h>
 #include <mythcoreutil.h>
+#include <mythcontext.h>
 #include <mythversion.h>
 #include <exitcodes.h>
 #include <mythdb.h>
@@ -62,7 +63,7 @@ using namespace std;
 #include <mythdirs.h>
 #include <mythconfig.h>
 #include <mythsystem.h>
-#include <mythmiscutil.h>
+#include <mythdate.h>
 #include <mythlogging.h>
 
 extern "C" {

@@ -28,7 +28,7 @@ using namespace std;
 #include <mythdbcon.h>
 #include <mythuihelper.h>
 #include <mythmainwindow.h>
-#include <mythmiscutil.h>
+#include <mythdate.h>
 
 // zoneminder
 #include "zmplayer.h"

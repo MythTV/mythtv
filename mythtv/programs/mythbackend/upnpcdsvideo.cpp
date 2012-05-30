@@ -13,7 +13,7 @@
 // MythTV headers
 #include "upnpcdsvideo.h"
 #include "httprequest.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 #include "mythcorecontext.h"
 #include "storagegroup.h"
 

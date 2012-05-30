@@ -43,7 +43,7 @@ using namespace std;
 #include "mythcorecontext.h"
 #include "fifowriter.h"
 #include "filtermanager.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 #include "livetvchain.h"
 #include "decoderbase.h"
 #include "nuppeldecoder.h"
@@ -59,6 +59,7 @@ using namespace std;
 #include "mythimage.h"
 #include "mythuiimage.h"
 #include "mythlogging.h"
+#include "mythmiscutil.h"
 
 extern "C" {
 #include "vbitext/vbi.h"

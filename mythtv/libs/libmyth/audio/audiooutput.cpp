@@ -10,7 +10,7 @@ using namespace std;
 
 #include "mythconfig.h"
 #include "audiooutput.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 #include "compat.h"
 
 #include "audiooutputnull.h"

@@ -10,9 +10,9 @@
 #include <QWaitCondition>
 #include <QString>
 
+#include "mythtimer.h"
 #include "tspacket.h"
 #include "mthread.h"
-#include "mythmiscutil.h"
 
 class DeviceReaderCB
 {

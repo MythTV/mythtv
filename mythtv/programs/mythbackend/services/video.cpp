@@ -37,7 +37,7 @@
 #include "storagegroup.h"
 #include "remotefile.h"
 #include "globals.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 #include "serviceUtil.h"
 
 /////////////////////////////////////////////////////////////////////////////

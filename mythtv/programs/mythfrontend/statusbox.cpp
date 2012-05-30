@@ -8,10 +8,11 @@ using namespace std;
 
 #include "mythcorecontext.h"
 #include "filesysteminfo.h"
+#include "mythmiscutil.h"
 #include "mythdb.h"
 #include "mythlogging.h"
 #include "mythversion.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 
 #include "config.h"
 #include "remoteutil.h"

@@ -7,7 +7,7 @@
 // myth
 #include <mythcontext.h>
 #include <mythdirs.h>
-#include <mythmiscutil.h>
+#include <mythdate.h>
 
 // mytharchive
 #include "archivesettings.h"

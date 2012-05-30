@@ -5,12 +5,13 @@
 
 #include <QString>
 #include <QRect>
+#include <QHash>
 
 #include "libmythbluray/bluray.h"
 #include "libmythbluray/keys.h"
 
 #include "ringbuffer.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 
 /** \class BDRingBufferPriv
  *  \brief RingBuffer class for Blu-rays

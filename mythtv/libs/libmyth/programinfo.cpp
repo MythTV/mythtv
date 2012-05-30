@@ -21,18 +21,19 @@ using namespace std;
 #include <QDir>
 
 // MythTV headers
-#include "programinfo.h"
-#include "mythmiscutil.h"
+#include "programinfoupdater.h"
 #include "mythcorecontext.h"
-#include "dialogbox.h"
+#include "mythscheduler.h"
+#include "mythmiscutil.h"
+#include "storagegroup.h"
+#include "mythlogging.h"
+#include "programinfo.h"
+#include "remotefile.h"
 #include "remoteutil.h"
+#include "dialogbox.h"
+#include "mythdate.h"
 #include "netutils.h"
 #include "mythdb.h"
-#include "mythlogging.h"
-#include "storagegroup.h"
-#include "programinfoupdater.h"
-#include "mythscheduler.h"
-#include "remotefile.h"
 
 #define LOC      QString("ProgramInfo(%1): ").arg(GetBasename())
 

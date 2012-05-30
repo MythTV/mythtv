@@ -14,6 +14,7 @@ using namespace std;
 #include <QString>
 
 // MythTV headers
+#include "mythmiscutil.h"
 #include "mythcontext.h"
 #include "programinfo.h"
 #include "mythplayer.h"

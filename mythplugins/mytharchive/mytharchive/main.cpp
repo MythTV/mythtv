@@ -22,7 +22,7 @@ using namespace std;
 #include <mythversion.h>
 #include <mythplugin.h>
 #include <mythcoreutil.h>
-#include <mythmiscutil.h>
+#include <mythsystem.h>
 #include <myththemedmenu.h>
 #include <mythuihelper.h>
 #include <mythdialogbox.h>

@@ -34,7 +34,7 @@
 #include "backendutil.h"
 #include "httprequest.h"
 #include "serviceUtil.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 #include "mythdownloadmanager.h"
 #include "metadataimagehelper.h"
 #include "videometadatalistmanager.h"

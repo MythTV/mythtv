@@ -4,7 +4,7 @@
 #include <QMutex>
 
 #include "programtypes.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 
 const char *kPlayerInUseID           = "player";
 const char *kPIPPlayerInUseID        = "pipplayer";

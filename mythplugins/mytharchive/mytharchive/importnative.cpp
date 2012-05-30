@@ -18,7 +18,7 @@
 #include <mythdialogbox.h>
 #include <mythsystem.h>
 #include <exitcodes.h>
-#include <mythmiscutil.h>
+#include <mythdate.h>
 
 // mytharchive
 #include "importnative.h"

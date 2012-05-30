@@ -10,7 +10,7 @@ using namespace std;
 #include "mythsocket.h"
 #include "compat.h"
 #include "mythtimer.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 
 RemoteFile::RemoteFile(const QString &_path, bool write, bool useRA,
                        int _timeout_ms,

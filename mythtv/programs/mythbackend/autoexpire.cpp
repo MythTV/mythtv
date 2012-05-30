@@ -31,7 +31,7 @@ using namespace std;
 #include "programinfo.h"
 #include "mythcorecontext.h"
 #include "mythdb.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 #include "storagegroup.h"
 #include "remoteutil.h"
 #include "remoteencoder.h"

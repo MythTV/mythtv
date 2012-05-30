@@ -25,7 +25,7 @@
 #include <mythprogressdialog.h>
 #include <mythdialogbox.h>
 #include <mythlogging.h>
-#include <mythmiscutil.h>
+#include <mythdate.h>
 #include <netutils.h>
 
 // mytharchive

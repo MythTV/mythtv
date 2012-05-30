@@ -22,7 +22,7 @@
 #include "mythevent.h"
 #include "mythversion.h"
 #include "remotefile.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 
 #include "mythdownloadmanager.h"
 #include "mythlogging.h"

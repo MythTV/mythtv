@@ -39,7 +39,7 @@
 #include "compat.h"
 #include "mythlogging.h"
 #include "mythversion.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 
 #include "serializers/xmlSerializer.h"
 #include "serializers/soapSerializer.h"

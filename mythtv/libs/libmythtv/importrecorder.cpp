@@ -34,7 +34,7 @@
 #include "importrecorder.h"
 #include "mythdirs.h"
 #include "tv_rec.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 
 #define TVREC_CARDNUM \
         ((tvrec != NULL) ? QString::number(tvrec->GetCaptureCardNum()) : "NULL")

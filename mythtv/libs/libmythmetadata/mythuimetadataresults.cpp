@@ -3,8 +3,8 @@
 #include "mythuistatetype.h"
 #include "mythmainwindow.h"
 #include "mythdialogbox.h"
+#include "mythdate.h"
 #include "mythdirs.h"
-#include "mythmiscutil.h"
 
 #include "mythuimetadataresults.h"
 

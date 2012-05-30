@@ -23,6 +23,7 @@ using namespace std;
 
 // MythTV headers
 #include "mythmiscutil.h"
+#include "mythdate.h"
 #include "exitcodes.h"
 #include "mythcontext.h"
 #include "mythdb.h"

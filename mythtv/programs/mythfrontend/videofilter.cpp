@@ -10,7 +10,7 @@
 #include "dbaccess.h"
 #include "videometadatalistmanager.h"
 #include "videoutils.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 
 #include "videolist.h"
 #include "videofilter.h"

@@ -20,7 +20,7 @@
 // mythtv
 #include "mythcontext.h"
 #include "mythdbcon.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 #include "tv.h"
 #include "compat.h"
 

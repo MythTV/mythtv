@@ -36,6 +36,7 @@ using namespace std;
 #include "signalmonitorvalue.h"
 #include "scheduledrecording.h"
 #include "recordingrule.h"
+#include "mythmiscutil.h"
 #include "previewgenerator.h"
 #include "mythconfig.h"
 #include "livetvchain.h"

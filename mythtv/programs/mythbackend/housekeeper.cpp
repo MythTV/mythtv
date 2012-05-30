@@ -18,10 +18,11 @@ using namespace std;
 
 // MythTV headers
 #include "housekeeper.h"
+#include "mythsystem.h"
 #include "jobqueue.h"
 #include "mythcorecontext.h"
 #include "mythdb.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 #include "compat.h"
 #include "mythdirs.h"
 #include "programinfo.h"

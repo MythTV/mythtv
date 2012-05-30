@@ -5,7 +5,7 @@
 #include <QString>
 
 // MythTV headers
-#include "mythmiscutil.h"
+#include "mythdate.h"
 #include "mythdb.h"
 #include "scaninfo.h"
 #include "mythdbcon.h"

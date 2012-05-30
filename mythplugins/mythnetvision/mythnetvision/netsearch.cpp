@@ -23,7 +23,7 @@
 #include <metadata/videoutils.h>
 #include <rssparse.h>
 #include <mythcoreutil.h>
-#include <mythmiscutil.h>
+#include <mythdate.h>
 
 #include "netsearch.h"
 #include "netcommon.h"

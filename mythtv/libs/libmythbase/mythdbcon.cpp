@@ -20,7 +20,7 @@
 #include "mythsystem.h"
 #include "exitcodes.h"
 #include "mthread.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 
 #define DEBUG_RECONNECT 0
 #if DEBUG_RECONNECT

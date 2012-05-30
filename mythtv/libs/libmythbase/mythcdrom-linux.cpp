@@ -16,7 +16,7 @@
 #include "mythcdrom-linux.h"
 #include "mythconfig.h"      // for HAVE_BIGENDIAN
 #include "mythlogging.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 
 #ifdef USING_LIBUDF
 #include <cdio/udf.h>

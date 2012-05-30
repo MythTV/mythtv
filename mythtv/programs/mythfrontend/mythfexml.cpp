@@ -8,7 +8,7 @@
 #include "mythfexml.h"
 
 #include "mythcorecontext.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 #include "mythdbcon.h"
 
 #include "mythmainwindow.h"

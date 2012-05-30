@@ -11,7 +11,7 @@
 #include "scheduledrecording.h" // For RescheduleMatch()
 #include "playgroup.h" // For GetInitialName()
 #include "recordingprofile.h" // For constants
-#include "mythmiscutil.h"
+#include "mythdate.h"
 
 static inline QString null_to_empty(const QString &str)
 {

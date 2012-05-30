@@ -7,13 +7,13 @@
 // mythtv
 #include <mythcontext.h>
 #include <mythwidgets.h>
-#include <mythmiscutil.h>
+#include <mythdate.h>
 #include <mythdb.h>
 #include <mythdirs.h>
 #include <mythprogressdialog.h>
 #include <mythdownloadmanager.h>
 #include <mythlogging.h>
-#include <mythmiscutil.h>
+#include <mythdate.h>
 
 // mythmusic
 #include "metadata.h"

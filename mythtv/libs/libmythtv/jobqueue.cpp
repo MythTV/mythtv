@@ -20,7 +20,7 @@ using namespace std;
 #include "jobqueue.h"
 #include "programinfo.h"
 #include "mythcorecontext.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 #include "previewgenerator.h"
 #include "compat.h"
 #include "recordingprofile.h"
@@ -29,7 +29,9 @@ using namespace std;
 
 #include "mythdb.h"
 #include "mythdirs.h"
+#include "mythsystem.h"
 #include "mythlogging.h"
+#include "mythmiscutil.h"
 
 #ifndef O_STREAMING
 #define O_STREAMING 0

@@ -2,7 +2,7 @@
 #include <QDir>
 
 #include "mythdirs.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 
 #include "mythuiimageresults.h"
 

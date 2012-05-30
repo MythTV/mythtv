@@ -6,7 +6,7 @@
 #include <QDir>
 
 // MythTV headers
-#include <mythmiscutil.h>
+#include <mythdate.h>
 #include <mythdb.h>
 #include <mythcontext.h>
 #include <mythdialogs.h>

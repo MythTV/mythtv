@@ -22,7 +22,7 @@
 #include <QFileInfo>
 
 #include "mythlogging.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 #include "mthread.h"
 
 #ifdef USING_MINGW

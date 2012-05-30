@@ -17,17 +17,16 @@ using namespace std;
 #include <QMap>
 #include <QDir>
 
-// libmyth headers
+// MythTV headers
+#include "mythmiscutil.h"
 #include "exitcodes.h"
 #include "mythlogging.h"
 #include "mythdbcon.h"
 #include "compat.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 #include "mythdirs.h"
 #include "mythdb.h"
 #include "mythsystem.h"
-
-// libmythtv headers
 #include "videosource.h" // for is_grabber..
 
 // filldata headers

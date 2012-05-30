@@ -15,8 +15,9 @@
 #include "mythcontext.h"
 #include "remotefile.h"
 #include "mythconfig.h" // gives us HAVE_POSIX_FADVISE
+#include "mythtimer.h"
+#include "mythdate.h"
 #include "compat.h"
-#include "mythmiscutil.h"
 
 #if HAVE_POSIX_FADVISE < 1
 static int posix_fadvise(int, off_t, off_t, int) { return 0; }

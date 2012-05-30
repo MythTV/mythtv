@@ -39,6 +39,8 @@ using namespace std;
 #include <QNetworkProxy>
 
 #include "previewgeneratorqueue.h"
+#include "mythmiscutil.h"
+#include "mythsystem.h"
 #include "exitcodes.h"
 #include "mythcontext.h"
 #include "mythversion.h"
@@ -49,6 +51,7 @@ using namespace std;
 #include "scheduler.h"
 #include "backendutil.h"
 #include "programinfo.h"
+#include "mythtimezone.h"
 #include "recordinginfo.h"
 #include "recordingrule.h"
 #include "scheduledrecording.h"
@@ -2875,7 +2878,8 @@ void MainServer::HandleQueryTimeZone(PlaybackSock *pbs)
 {
     MythSocket *pbssock = pbs->getSocket();
     QStringList strlist;
-    strlist << getTimeZoneID() << QString::number(calc_utc_offset())
+    strlist << MythTZ::getTimeZoneID()
+            << QString::number(MythTZ::calc_utc_offset())
             << MythDate::current_iso_string(true);
 
     SendResponse(pbssock, strlist);

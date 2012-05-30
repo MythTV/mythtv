@@ -14,7 +14,7 @@ using namespace std;
 #include "config.h"
 #include "mythcontext.h"
 #include "exitcodes.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 #include "remotefile.h"
 #include "mythplugin.h"
 #include "backendselect.h"
@@ -38,6 +38,8 @@ using namespace std;
 #include "mythxmlclient.h"
 #include "upnp.h"
 #include "mythlogging.h"
+#include "mythsystem.h"
+#include "mythmiscutil.h"
 
 #ifdef USING_MINGW
 #include <unistd.h>

@@ -21,6 +21,7 @@ using namespace std;
 #include "recordingrule.h"
 #include "scheduledrecording.h"
 #include "mythmiscutil.h"
+#include "mythdate.h"
 #include "mythcorecontext.h"
 #include "dialogbox.h"
 #include "remoteutil.h"

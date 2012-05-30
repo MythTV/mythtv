@@ -13,18 +13,18 @@
 #include <QUrl>
 
 // MythTV headers
-#include <mythuitext.h>
-#include <mythuiimage.h>
-#include <mythdialogbox.h>
-#include <mythuibuttonlist.h>
 #include <mythprogressdialog.h>
-
+#include <mythuibuttonlist.h>
 #include <mythmainwindow.h>
-#include <mythmiscutil.h>
-#include <httpcomms.h>
+#include <mythdialogbox.h>
 #include <mythcontext.h>
-#include <mythdb.h>
+#include <mythuiimage.h>
+#include <mythsystem.h>
+#include <mythuitext.h>
+#include <httpcomms.h>
+#include <mythdate.h>
 #include <mythdirs.h>
+#include <mythdb.h>
 
 // MythNews headers
 #include "mythnews.h"

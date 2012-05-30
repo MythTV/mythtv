@@ -7,9 +7,10 @@
 #include <QString>
 
 #include "atscdescriptors.h"
+#include "mythmiscutil.h" // for xml_indent
 #include "mpegtables.h"
 #include "mythtvexp.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 
 // Some sample code is in pcHDTV's dtvscan.c,
 // accum_sect/dequeue_buf/atsc_tables.  We should stuff

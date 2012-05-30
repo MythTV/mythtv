@@ -19,7 +19,7 @@ using namespace std;
 #include "channelutil.h"
 #include "proglist.h"
 #include "mythdb.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 
 #define LOC      QString("ProgLister: ")
 #define LOC_WARN QString("ProgLister, Warning: ")

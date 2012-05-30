@@ -15,7 +15,7 @@
 #include "remotefile.h"
 #include "mythdownloadmanager.h"
 #include "mythlogging.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 
 QEvent::Type ImageDLEvent::kEventType =
     (QEvent::Type) QEvent::registerEventType();

@@ -20,14 +20,16 @@
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 
-#include <iostream>
-#include <fstream>
-#include <stdio.h>
+// C headers
 #include <stdlib.h>
-#include <algorithm>
-#include <sys/types.h>
-#include <unistd.h>
+#include <stdio.h>
 
+// POSIX headers
+#include <unistd.h>
+#include <signal.h>
+
+// System headers
+#include <sys/types.h>
 #ifndef _WIN32
 #include <sys/ioctl.h>
 #include <pwd.h>
@@ -37,8 +39,13 @@
 #endif
 #endif
 
+// C++ headers
+#include <algorithm>
+#include <iostream>
+#include <fstream>
 using namespace std;
 
+// Qt headers
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
@@ -59,6 +66,7 @@ using namespace std;
 #include "mythversion.h"
 #include "logging.h"
 #include "mythmiscutil.h"
+#include "mythdate.h"
 
 #define TERMWIDTH 79
 

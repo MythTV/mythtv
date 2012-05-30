@@ -6,17 +6,17 @@
 
 #include <cstdlib>
 
-#include "tv_rec.h"
-
+#include "scheduledrecording.h"
 #include "channelbase.h"
-#include "iso639.h"
+#include "mythlogging.h"
 #include "eitscanner.h"
 #include "eithelper.h"
-#include "scheduledrecording.h"
-#include "mythmiscutil.h"
-#include "mythdb.h"
-#include "mythlogging.h"
+#include "mythtimer.h"
+#include "mythdate.h"
 #include "mthread.h"
+#include "iso639.h"
+#include "mythdb.h"
+#include "tv_rec.h"
 
 #define LOC QString("EITScanner: ")
 #define LOC_ID QString("EITScanner (%1): ").arg(cardnum)

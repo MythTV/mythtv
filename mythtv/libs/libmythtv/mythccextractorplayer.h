@@ -9,6 +9,7 @@
 #include <QImage>
 #include <QPoint>
 #include <QHash>
+#include <QDir>
 
 #include "mythplayer.h"
 

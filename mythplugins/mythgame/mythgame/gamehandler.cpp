@@ -8,21 +8,18 @@
 #include <QDir>
 #include <QList>
 
-
-#include <mythdbcon.h>
-#include <mythmiscutil.h>
 #include <mythdb.h>
-
+#include <mythdbcon.h>
+#include <mythsystem.h>
 #include <mythcontext.h>
 #include <mythdialogs.h>
-
 #include <mythuihelper.h>
 #include <mythdialogbox.h>
 #include <mythmainwindow.h>
+#include <mythprogressdialog.h>
 
 #define LOC_ERR QString("MythGame:GAMEHANDLER Error: ")
 #define LOC QString("MythGame:GAMEHANDLER: ")
-#include <mythprogressdialog.h>
 
 static QList<GameHandler*> *handlers = NULL;
 

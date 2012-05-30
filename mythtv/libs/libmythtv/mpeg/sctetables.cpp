@@ -20,7 +20,7 @@
  */
 
 #include "sctetables.h"
-#include "mythmiscutil.h" // for xml_indent
+#include "mythdate.h" // for xml_indent
 
 QString CarrierDefinitionSubtable::toString(void) const
 {

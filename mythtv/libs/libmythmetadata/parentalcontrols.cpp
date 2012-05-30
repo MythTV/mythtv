@@ -1,6 +1,6 @@
 #include <map>
 
-#include "mythmiscutil.h"
+#include "mythdate.h"
 #include "mythcontext.h"
 #include "mythmainwindow.h"
 #include "mythscreenstack.h"

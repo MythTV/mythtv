@@ -104,6 +104,8 @@ class MBASE_PUBLIC MythSystem : public QObject
 
         friend class MythSystemPrivate;
 
+        static QString ShellEscape(const QString &str);
+
     signals:
         void started();
         void finished();

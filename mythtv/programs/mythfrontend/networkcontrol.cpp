@@ -10,6 +10,7 @@
 #include <QMap>
 
 #include "mythcorecontext.h"
+#include "mythmiscutil.h"
 #include "mythversion.h"
 #include "networkcontrol.h"
 #include "programinfo.h"

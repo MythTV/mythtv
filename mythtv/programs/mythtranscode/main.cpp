@@ -12,13 +12,14 @@ using namespace std;
 #include <QDir>
 
 // MythTV headers
+#include "mythmiscutil.h"
 #include "exitcodes.h"
 #include "programinfo.h"
 #include "jobqueue.h"
 #include "mythcontext.h"
 #include "mythdb.h"
 #include "mythversion.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 #include "transcode.h"
 #include "mpeg2fix.h"
 #include "remotefile.h"

@@ -48,6 +48,7 @@
 #include "main_helpers.h"
 #include "backendcontext.h"
 #include "mythtranslation.h"
+#include "mythtimezone.h"
 
 #include "mediaserver.h"
 #include "httpstatus.h"
@@ -419,6 +420,7 @@ int handle_command(const MythBackendCommandLineParser &cmdline)
     // This should never actually be reached..
     return GENERIC_EXIT_OK;
 }
+using namespace MythTZ;
 
 int connect_to_master(void)
 {

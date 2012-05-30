@@ -26,12 +26,14 @@ using namespace std;
 #include <QFile>
 #include <QMap>
 
+#include "mythmiscutil.h"
+#include "mythsystem.h"
 #include "scheduler.h"
 #include "encoderlink.h"
 #include "mainserver.h"
 #include "remoteutil.h"
 #include "backendutil.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 #include "exitcodes.h"
 #include "mythcontext.h"
 #include "mythdb.h"

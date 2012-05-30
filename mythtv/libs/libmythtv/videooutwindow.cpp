@@ -28,6 +28,7 @@
 #include "mythconfig.h"
 
 #include "videooutwindow.h"
+#include "mythmiscutil.h"
 #include "osd.h"
 #include "mythplayer.h"
 #include "videodisplayprofile.h"

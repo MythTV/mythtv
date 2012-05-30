@@ -7,7 +7,7 @@
 #include <QList>
 
 #include "mythcontext.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 
 #include "mythgenerictree.h"
 #include "videometadatalistmanager.h"

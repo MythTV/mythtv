@@ -16,6 +16,7 @@
 #include "mythcorecontext.h"
 #include "storagegroup.h"
 #include "mythmiscutil.h"
+#include "mythdate.h"
 #include "mythdb.h"
 #include "mythdirs.h"
 #include "mythlogging.h"

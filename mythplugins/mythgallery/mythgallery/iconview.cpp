@@ -35,9 +35,10 @@ using namespace std;
 #include <QFileInfo>
 
 // MythTV headers
-#include <mythmiscutil.h>
+#include <mythdate.h>
 #include <mythdbcon.h>
 #include <httpcomms.h>
+#include <mythsystem.h>
 #include <mythcontext.h>
 #include <mythlogging.h>
 #include <mythmainwindow.h>

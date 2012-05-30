@@ -29,13 +29,14 @@ using namespace std;
 // MythTV
 #include "mythdeque.h"
 #include "tv.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 #include "programinfo.h"
 #include "channelutil.h"
 #include "videoouttypes.h"
 #include "volumebase.h"
 #include "inputinfo.h"
 #include "channelgroup.h"
+#include "mythtimer.h"
 #include "osd.h"
 
 class QDateTime;

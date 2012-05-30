@@ -11,7 +11,7 @@
 #include "mythlogging.h"
 #include "mythsystem.h"
 #include "exitcodes.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 
 const QString SMOLT_SERVER_LOCATION =
                   QString("http://smolt.mythtv.org/");

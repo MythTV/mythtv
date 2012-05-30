@@ -2,7 +2,7 @@
 #include <QFile>
 
 // MythTV headers
-#include <mythmiscutil.h>
+#include <mythdate.h>
 #include <mythlogging.h>
 #include <mythdirs.h>
 

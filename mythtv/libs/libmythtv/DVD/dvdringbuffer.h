@@ -11,7 +11,7 @@
 #include <QRect>
 
 #include "ringbuffer.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 
 extern "C" {
 #include "libavcodec/avcodec.h"
