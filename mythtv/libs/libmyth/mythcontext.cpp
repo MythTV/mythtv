@@ -835,19 +835,20 @@ int MythContextPrivate::UPnPautoconf(const int milliSeconds)
 
     if (count != 1)
     {
-        backends->Release();
+        backends->DecrRef();
         return count;
     }
 
     // Get this backend's location:
     DeviceLocation *BE = backends->GetFirst();
-    backends->Release();
+    backends->DecrRef();
+    backends = NULL;
 
     // We don't actually know the backend's access PIN, so this will
     // only work for ones that have PIN access disabled (i.e. 0000)
     int ret = (UPnPconnect(BE, QString::null)) ? 1 : -1;
 
-    BE->Release();
+    BE->DecrRef();
 
     return ret;
 }
@@ -915,12 +916,11 @@ bool MythContextPrivate::DefaultUPnP(QString &error)
 
     if (UPnPconnect(pDevLoc, PIN))
     {
-        pDevLoc->Release();
-
+        pDevLoc->DecrRef();
         return true;
     }
 
-    pDevLoc->Release();
+    pDevLoc->DecrRef();
 
     error = "Cannot connect to default backend via UPnP. Wrong saved PIN?";
     return false;

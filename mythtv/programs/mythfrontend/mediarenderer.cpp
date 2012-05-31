@@ -107,21 +107,19 @@ class MythFrontendStatus : public HttpServerExtension
 
             EntryMap map;
             cache->GetEntryMap(map);
-            cache->Release();
+            cache->DecrRef();
             cache = NULL;
 
-            QMapIterator< QString, DeviceLocation * > i(map);
-            while (i.hasNext())
+            for (EntryMap::iterator it = map.begin(); it != map.end(); ++it)
             {
-                i.next();
-                QUrl url(i.value()->m_sLocation);
+                QUrl url((*it)->m_sLocation);
                 if (url.host() != ipaddress)
                 {
                     stream << "<br />" << url.host() << "&nbsp(<a href=\""
                            << url.toString(QUrl::RemovePath)
                            << "\">Status page</a>)\r\n";
                 }
-                i.value()->Release();
+                (*it)->DecrRef();
             }
             stream << "  </div>\r\n";
         }
@@ -140,19 +138,17 @@ class MythFrontendStatus : public HttpServerExtension
         {
             EntryMap map;
             cache->GetEntryMap(map);
-            cache->Release();
+            cache->DecrRef();
             cache = NULL;
 
-            QMapIterator< QString, DeviceLocation * > i(map);
-            while (i.hasNext())
+            for (EntryMap::iterator it = map.begin(); it != map.end(); ++it)
             {
-                i.next();
-                QUrl url(i.value()->m_sLocation);
+                QUrl url((*it)->m_sLocation);
                 stream << "<br />" << "Slave: " << url.host()
                        << "&nbsp(<a href=\""
                        << url.toString(QUrl::RemovePath)
                        << "\">Status page</a>)\r\n";
-                i.value()->Release();
+                (*it)->DecrRef();
             }
         }
 
