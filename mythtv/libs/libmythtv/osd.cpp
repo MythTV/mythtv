@@ -990,6 +990,7 @@ void OSD::DialogShow(const QString &window, const QString &text, int updatefor)
     {
         OverrideUIScale();
         MythScreenType *dialog;
+        
         if (window == OSD_DLG_EDITOR)
             dialog = new ChannelEditor(m_ParentObject, window.toLatin1());
         else if (window == OSD_DLG_CONFIRM)
@@ -997,31 +998,29 @@ void OSD::DialogShow(const QString &window, const QString &text, int updatefor)
         else
             dialog = new MythDialogBox(text, NULL, window.toLatin1(), false, true);
 
-        if (dialog)
+        dialog->SetPainter(m_CurrentPainter);
+        if (dialog->Create())
         {
-            dialog->SetPainter(m_CurrentPainter);
-            if (dialog->Create())
+            PositionWindow(dialog);
+            m_Dialog = dialog;
+            MythDialogBox *dbox = dynamic_cast<MythDialogBox*>(m_Dialog);
+            if (dbox)
+                dbox->SetReturnEvent(m_ParentObject, window);
+            MythConfirmationDialog *cbox = dynamic_cast<MythConfirmationDialog*>(m_Dialog);
+            if (cbox)
             {
-                PositionWindow(dialog);
-                m_Dialog = dialog;
-                MythDialogBox *dbox = dynamic_cast<MythDialogBox*>(m_Dialog);
-                if (dbox)
-                    dbox->SetReturnEvent(m_ParentObject, window);
-                MythConfirmationDialog *cbox = dynamic_cast<MythConfirmationDialog*>(m_Dialog);
-                if (cbox)
-                {
-                    cbox->SetReturnEvent(m_ParentObject, window);
-                    cbox->SetData("DIALOG_CONFIRM_X_X");
-                }
-                m_Children.insert(window, m_Dialog);
+                cbox->SetReturnEvent(m_ParentObject, window);
+                cbox->SetData("DIALOG_CONFIRM_X_X");
             }
-            else
-            {
-                RevertUIScale();
-                delete dialog;
-                return;
-            }
+            m_Children.insert(window, m_Dialog);
         }
+        else
+        {
+            RevertUIScale();
+            delete dialog;
+            return;
+        }
+            
         RevertUIScale();
     }
 
