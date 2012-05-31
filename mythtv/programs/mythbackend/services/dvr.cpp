@@ -525,9 +525,6 @@ int Dvr::AddRecordSchedule   ( int       nChanId,
 
     int recid = rule->m_recordID;
 
-    delete rule;
-    rule = NULL;
-
     return recid;
 }
 
