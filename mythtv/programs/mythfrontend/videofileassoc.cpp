@@ -244,7 +244,7 @@ class FileAssocDialogPrivate
             }
         }
 
-        return 0;
+        return NULL;
     }
 
     void SetSelectionOverride(UIDToFAPair::UID_type new_sel)

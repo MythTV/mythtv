@@ -1,54 +1,42 @@
 // -*- Mode: c++ -*-
 
 #include <QString>
-#include <QMutexLocker>
 #include "referencecounter.h"
 #include "mythlogging.h"
 
-ReferenceCounter::ReferenceCounter(void) :
-    m_refCount(1)
+ReferenceCounter::ReferenceCounter(void) : m_referenceCount(1)
 {
 }
 
-void ReferenceCounter::UpRef(void)
+ReferenceCounter::~ReferenceCounter(void)
 {
-    QMutexLocker mlock(&m_refLock);
-    m_refCount++;
-    LOG(VB_REFCOUNT, LOG_DEBUG, QString("%1(0x%2)::UpRef() -> %3")
-                    .arg(metaObject()->className())
-                    .arg((uint64_t)this,0,16)
-                    .arg(QString::number(m_refCount)));
-}
-
-bool ReferenceCounter::DownRef(void)
-{
-    m_refLock.lock();
-    m_refCount--;
-    LOG(VB_REFCOUNT, LOG_DEBUG, QString("%1(0x%2)::DownRef() -> %3")
-                    .arg(metaObject()->className())
-                    .arg((uint64_t)this,0,16)
-                    .arg(QString::number(m_refCount)));
-
-    if (m_refCount == 0)
+    if (0 != m_referenceCount)
     {
-        m_refLock.unlock();
+        LOG(VB_GENERAL, LOG_ERR,
+            "Object deleted with non-zero reference count!");
+    }
+}
+
+void ReferenceCounter::IncrRef(void)
+{
+    int val = m_referenceCount.fetchAndAddRelease(1);
+
+    LOG(VB_REFCOUNT, LOG_DEBUG, QString("(0x%2)::IncrRef() -> %3")
+        .arg(reinterpret_cast<intptr_t>(this),0,16).arg(val));
+}
+
+bool ReferenceCounter::DecrRef(void)
+{
+    int val = m_referenceCount.fetchAndAddRelaxed(-1);
+
+    LOG(VB_REFCOUNT, LOG_DEBUG, QString("(0x%2)::DecrRef() -> %3")
+        .arg(reinterpret_cast<intptr_t>(this),0,16).arg(val));
+
+    if (0 == val)
+    {
         delete this;
         return true;
     }
 
-    m_refLock.unlock();
     return false;
-}
-
-ReferenceLocker::ReferenceLocker(ReferenceCounter *counter, bool upref) :
-    m_refObject(counter)
-{
-    if (upref)
-        m_refObject->UpRef();
-}
-
-ReferenceLocker::~ReferenceLocker(void)
-{
-    m_refObject->DownRef();
-    m_refObject = NULL;
 }

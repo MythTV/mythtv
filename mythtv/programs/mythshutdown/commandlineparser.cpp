@@ -12,6 +12,9 @@ MythShutdownCommandLineParser::MythShutdownCommandLineParser() :
 
 void MythShutdownCommandLineParser::LoadArguments(void)
 {
+    add("-l", "oldlock", false, "disable shutdown", "")
+        ->SetRemoved("Please use the full argument '--lock' instead.");
+
     addHelp();
     addVersion();
     addLogging();
@@ -43,9 +46,7 @@ void MythShutdownCommandLineParser::LoadArguments(void)
                 "         1 - do check recording status\n\n"
                 " returns 0 - ok to shut down\n"
                 "         1 - not ok, idle check reset")
-         << add(QStringList( QStringList() << "-l" << "--lock" ),
-                "lock", false,
-                "disable shutdown", "")
+         << add("--lock" , "lock", false, "disable shutdown", "")
          << add(QStringList( QStringList() << "-u" << "--unlock" ),
                 "unlock", false,
                 "enable shutdown", "")

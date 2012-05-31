@@ -55,8 +55,8 @@ fate-aac-ap05_48: CMD = pcm -i $(SAMPLES)/aac/ap05_48.mp4
 fate-aac-ap05_48: REF = $(SAMPLES)/aac/ap05_48.s16
 
 FATE_AAC += fate-aac-latm_stereo_to_51
-fate-aac-latm_stereo_to_51: CMD = pcm -i $(SAMPLES)/aac/latm_stereo_to_51.ts -ac 6
-fate-aac-latm_stereo_to_51: REF = $(SAMPLES)/aac/latm_stereo_to_51.s16
+fate-aac-latm_stereo_to_51: CMD = pcm -i $(SAMPLES)/aac/latm_stereo_to_51.ts -channel_layout 5.1
+fate-aac-latm_stereo_to_51: REF = $(SAMPLES)/aac/latm_stereo_to_51_ref.s16
 
 fate-aac-ct%: CMD = pcm -i $(SAMPLES)/aac/CT_DecoderCheck/$(@:fate-aac-ct-%=%)
 fate-aac-ct%: REF = $(SAMPLES)/aac/CT_DecoderCheck/aacPlusv2.wav
@@ -71,7 +71,25 @@ FATE_AAC_CT = sbr_bc-ps_i.3gp  \
 
 FATE_AAC += $(FATE_AAC_CT:%=fate-aac-ct-%)
 
-FATE_TESTS += $(FATE_AAC)
-fate-aac: $(FATE_AAC)
+FATE_AAC_ENCODE += fate-aac-aref-encode
+fate-aac-aref-encode: $(AREF)
+fate-aac-aref-encode: CMD = enc_dec_pcm adts wav s16le $(REF) -strict -2 -c:a aac -b:a 512k
+fate-aac-aref-encode: CMP = stddev
+fate-aac-aref-encode: REF = ./tests/data/acodec.ref.wav
+fate-aac-aref-encode: CMP_SHIFT = -4096
+fate-aac-aref-encode: CMP_TARGET = 1862
+fate-aac-aref-encode: SIZE_TOLERANCE = 2464
+
+FATE_AAC_ENCODE += fate-aac-ln-encode
+fate-aac-ln-encode: CMD = enc_dec_pcm adts wav s16le $(REF) -strict -2 -c:a aac -b:a 512k
+fate-aac-ln-encode: CMP = stddev
+fate-aac-ln-encode: REF = $(SAMPLES)/audio-reference/luckynight_2ch_44kHz_s16.wav
+fate-aac-ln-encode: CMP_SHIFT = -4096
+fate-aac-ln-encode: CMP_TARGET = 65
+fate-aac-ln-encode: SIZE_TOLERANCE = 3560
+
+FATE_SAMPLES_FFMPEG += $(FATE_AAC) $(FATE_AAC_ENCODE)
+fate-aac: $(FATE_AAC) $(FATE_AAC_ENCODE)
+
 $(FATE_AAC): CMP = oneoff
 $(FATE_AAC): FUZZ = 2

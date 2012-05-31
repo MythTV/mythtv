@@ -38,11 +38,13 @@ class CustomEdit : public MythScreenType
     bool checkSyntax(void);
     void storeRule(bool is_search, bool is_new);
     void deleteRule(void);
+    QString evaluate(QString clause);
 
     ProgramInfo *m_pginfo;
     QString m_baseTitle;
 
     int m_maxex;
+    bool m_evaluate;
 
     QString m_seSuffix;
     QString m_exSuffix;

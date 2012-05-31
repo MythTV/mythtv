@@ -25,7 +25,8 @@ AudioSetupWizard::AudioSetupWizard(MythScreenStack *parent,
       m_ac3Check(NULL),                  m_eac3Check(NULL),
       m_truehdCheck(NULL),               m_dtshdCheck(NULL),
       m_testSpeakerButton(NULL),         m_nextButton(NULL),
-      m_prevButton(NULL),                m_lastAudioDevice("")
+      m_prevButton(NULL),                m_maxspeakers(2),
+      m_lastAudioDevice("")
 {
 }
 

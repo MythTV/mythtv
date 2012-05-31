@@ -43,12 +43,12 @@ void ChannelGroupStorage::Load(void)
 
     if (!query.exec() || !query.isActive())
         MythDB::DBError("ChannelGroupStorage::Load", query);
-    else
+    else if (query.next())
     {
-      query.next();
       grpid = query.value(0).toUInt();
 
-      qstr = "SELECT * FROM channelgroup WHERE grpid = :GRPID AND chanid = :CHANID";
+      qstr = "SELECT * FROM channelgroup WHERE grpid = :GRPID AND "
+             "chanid = :CHANID";
       query.prepare(qstr);
       query.bindValue(":GRPID",  grpid);
       query.bindValue(":CHANID", chanid);
@@ -188,8 +188,14 @@ void ChannelGroupEditor::doDelete(void)
         query.prepare("SELECT grpid FROM channelgroupnames WHERE name = :NAME;");
         query.bindValue(":NAME", name);
         if (!query.exec())
+        {
             MythDB::DBError("ChannelGroupEditor::doDelete", query);
-        query.next();
+            return;
+        }
+
+        if (!query.next())
+            return;
+
         uint grpid = query.value(0).toUInt();
 
         // Delete channels from this group

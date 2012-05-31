@@ -161,16 +161,6 @@ static HostCheckBox *SmartForward()
     return gc;
 }
 
-static HostCheckBox *ExactSeeking()
-{
-    HostCheckBox *gc = new HostCheckBox("ExactSeeking");
-    gc->setLabel(QObject::tr("Seek to exact frame"));
-    gc->setValue(false);
-    gc->setHelpText(QObject::tr("If enabled, seeking is frame exact, but "
-                    "slower."));
-    return gc;
-}
-
 static GlobalComboBox *CommercialSkipMethod()
 {
     GlobalComboBox *bc = new GlobalComboBox("CommercialSkipMethod");
@@ -317,17 +307,6 @@ static GlobalSpinBox *DeletedMaxAge()
     return bs;
 };
 
-static GlobalCheckBox *DeletedFifoOrder()
-{
-    GlobalCheckBox *cb = new GlobalCheckBox("DeletedFifoOrder");
-    cb->setLabel(QObject::tr("Expire in deleted order"));
-    cb->setValue(false);
-    cb->setHelpText(QObject::tr(
-                    "If enabled, delete recordings in the order which they were "
-                    "originally deleted."));
-    return cb;
-};
-
 #if 0
 class DeletedExpireOptions : public TriggeredConfigurationGroup
 {
@@ -342,7 +321,6 @@ class DeletedExpireOptions : public TriggeredConfigurationGroup
 
              HorizontalConfigurationGroup* settings =
                  new HorizontalConfigurationGroup(false);
-             settings->addChild(DeletedFifoOrder());
              settings->addChild(DeletedMaxAge());
              addTarget("1", settings);
 
@@ -1321,16 +1299,6 @@ static HostComboBox MUNUSED *DecodeVBIFormat()
                     "used during recording when decoding captions."));
 
     return gc;
-}
-
-static HostSpinBox *OSDCC708TextZoomPercentage(void)
-{
-    HostSpinBox *gs = new HostSpinBox("OSDCC708TextZoom", 50, 200, 5);
-    gs->setLabel(QObject::tr("Subtitle text zoom percentage"));
-    gs->setValue(100);
-    gs->setHelpText(QObject::tr("Use this to enlarge or shrink text based subtitles."));
-
-    return gs;
 }
 
 static HostComboBox *SubtitleCodec()
@@ -3353,7 +3321,6 @@ PlaybackSettings::PlaybackSettings()
     seek->addChild(SmartForward());
     seek->addChild(FFRewReposTime());
     seek->addChild(FFRewReverse());
-    seek->addChild(ExactSeeking());
     addChild(seek);
 
     VerticalConfigurationGroup* comms = new VerticalConfigurationGroup(false);
@@ -3400,7 +3367,6 @@ OSDSettings::OSDSettings()
     osd->addChild(PersistentBrowseMode());
     osd->addChild(BrowseAllTuners());
     osd->addChild(DefaultCCMode());
-    osd->addChild(OSDCC708TextZoomPercentage());
     osd->addChild(SubtitleCodec());
     addChild(osd);
 
@@ -3447,7 +3413,6 @@ GeneralSettings::GeneralSettings()
 
     autoexp->addChild(expgrp);
 //    autoexp->addChild(new DeletedExpireOptions());
-    autoexp->addChild(DeletedFifoOrder());
     autoexp->addChild(DeletedMaxAge());
 
     addChild(autoexp);

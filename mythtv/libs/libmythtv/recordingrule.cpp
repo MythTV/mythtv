@@ -726,7 +726,10 @@ unsigned RecordingRule::GetDefaultFilter(void)
         MythDB::DBError("GetDefaultFilter", query);
         return 0;
     }
-    query.next();
+
+    if (!query.next())
+        return 0;
+    
     return query.value(0).toUInt();
 }
 

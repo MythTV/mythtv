@@ -35,8 +35,10 @@
 #include "libavutil/opt.h"
 #include "libavutil/imgutils.h"
 #include "libavformat/avformat.h"
+#include "audio.h"
 #include "avcodec.h"
 #include "avfilter.h"
+#include "formats.h"
 
 typedef struct {
     /* common A/V fields */
@@ -368,13 +370,13 @@ static int amovie_query_formats(AVFilterContext *ctx)
     AVCodecContext *c = movie->codec_ctx;
 
     enum AVSampleFormat sample_fmts[] = { c->sample_fmt, -1 };
-    int packing_fmts[] = { AVFILTER_PACKED, -1 };
+    int sample_rates[] = { c->sample_rate, -1 };
     int64_t chlayouts[] = { c->channel_layout ? c->channel_layout :
                             av_get_default_channel_layout(c->channels), -1 };
 
     avfilter_set_common_sample_formats (ctx, avfilter_make_format_list(sample_fmts));
-    avfilter_set_common_packing_formats(ctx, avfilter_make_format_list(packing_fmts));
-    avfilter_set_common_channel_layouts(ctx, avfilter_make_format64_list(chlayouts));
+    ff_set_common_samplerates          (ctx, avfilter_make_format_list(sample_rates));
+    ff_set_common_channel_layouts(ctx, avfilter_make_format64_list(chlayouts));
 
     return 0;
 }
@@ -437,7 +439,7 @@ static int amovie_get_samples(AVFilterLink *outlink)
         if (data_size < 0)
             return data_size;
         movie->samplesref =
-            avfilter_get_audio_buffer(outlink, AV_PERM_WRITE, nb_samples);
+            ff_get_audio_buffer(outlink, AV_PERM_WRITE, nb_samples);
         memcpy(movie->samplesref->data[0], movie->frame->data[0], data_size);
         movie->samplesref->pts = movie->pkt.pts;
         movie->samplesref->pos = movie->pkt.pos;
@@ -463,7 +465,7 @@ static int amovie_request_frame(AVFilterLink *outlink)
             return ret;
     } while (!movie->samplesref);
 
-    avfilter_filter_samples(outlink, avfilter_ref_buffer(movie->samplesref, ~0));
+    ff_filter_samples(outlink, avfilter_ref_buffer(movie->samplesref, ~0));
     avfilter_unref_buffer(movie->samplesref);
     movie->samplesref = NULL;
 

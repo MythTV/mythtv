@@ -23,7 +23,7 @@
 #include "libavcodec/dsputil.h"
 
 #ifdef MMX
-#include "libavcodec/x86/mmx.h"
+#include "ffmpeg-mmx.h"
 #endif
 
 //static const char FILTER_NAME[] = "crop";

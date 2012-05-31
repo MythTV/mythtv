@@ -356,6 +356,7 @@ static int decode_dvd_subtitles(DVDSubContext *ctx, AVSubtitle *sub_header,
                 sub_header->rects[0]->h = h;
                 sub_header->rects[0]->type = SUBTITLE_BITMAP;
                 sub_header->rects[0]->pict.linesize[0] = w;
+                sub_header->rects[0]->forced = is_menu;
             }
         }
         if (next_cmd_pos < cmd_pos) {
@@ -567,5 +568,5 @@ AVCodec ff_dvdsub_decoder = {
     .priv_data_size = sizeof(DVDSubContext),
     .init           = dvdsub_init,
     .decode         = dvdsub_decode,
-    .long_name = NULL_IF_CONFIG_SMALL("DVD subtitles"),
+    .long_name      = NULL_IF_CONFIG_SMALL("DVD subtitles"),
 };

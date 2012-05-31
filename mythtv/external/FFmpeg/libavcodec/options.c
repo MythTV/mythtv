@@ -239,6 +239,8 @@ static const AVOption frame_options[]={
 {"width", "", FOFFSET(width), AV_OPT_TYPE_INT, {.dbl = 0 }, 0, INT_MAX, 0},
 {"height", "", FOFFSET(height), AV_OPT_TYPE_INT, {.dbl = 0 }, 0, INT_MAX, 0},
 {"format", "", FOFFSET(format), AV_OPT_TYPE_INT, {.dbl = -1 }, 0, INT_MAX, 0},
+{"channel_layout", "", FOFFSET(channel_layout), AV_OPT_TYPE_INT64, {.dbl = 0 }, 0, INT64_MAX, 0},
+{"sample_rate", "", FOFFSET(sample_rate), AV_OPT_TYPE_INT, {.dbl = 0 }, 0, INT_MAX, 0},
 {NULL},
 };
 
@@ -252,4 +254,28 @@ static const AVClass av_frame_class = {
 const AVClass *avcodec_get_frame_class(void)
 {
     return &av_frame_class;
+}
+
+#define SROFFSET(x) offsetof(AVSubtitleRect,x)
+
+static const AVOption subtitle_rect_options[]={
+{"x", "", SROFFSET(x), AV_OPT_TYPE_INT, {.dbl = 0 }, 0, INT_MAX, 0},
+{"y", "", SROFFSET(y), AV_OPT_TYPE_INT, {.dbl = 0 }, 0, INT_MAX, 0},
+{"w", "", SROFFSET(w), AV_OPT_TYPE_INT, {.dbl = 0 }, 0, INT_MAX, 0},
+{"h", "", SROFFSET(h), AV_OPT_TYPE_INT, {.dbl = 0 }, 0, INT_MAX, 0},
+{"type", "", SROFFSET(type), AV_OPT_TYPE_INT, {.dbl = 0 }, 0, INT_MAX, 0},
+{"forced", "", SROFFSET(forced), AV_OPT_TYPE_INT, {.dbl = 0}, 0, 1, 0},
+{NULL},
+};
+
+static const AVClass av_subtitle_rect_class = {
+    .class_name             = "AVSubtitleRect",
+    .item_name              = NULL,
+    .option                 = subtitle_rect_options,
+    .version                = LIBAVUTIL_VERSION_INT,
+};
+
+const AVClass *avcodec_get_subtitle_rect_class(void)
+{
+    return &av_subtitle_rect_class;
 }

@@ -1,7 +1,7 @@
+// -*- Mode: c++ -*-
+
 #ifndef _SOCKETHANDLER_H_
 #define _SOCKETHANDLER_H_
-
-using namespace std;
 
 #include <QString>
 #include <QMutex>
@@ -15,7 +15,6 @@ class MythSocketManager;
 
 class PROTOSERVER_PUBLIC SocketHandler : public ReferenceCounter
 {
-    Q_OBJECT
   public:
     SocketHandler(MythSocket *sock, MythSocketManager *parent,
                   QString hostname);

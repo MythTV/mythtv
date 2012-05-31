@@ -74,6 +74,7 @@ VideoSourceSelector::VideoSourceSelector(uint           _initial_sourceid,
 void VideoSourceSelector::Load(void)
 {
     MSqlQuery query(MSqlQuery::InitCon());
+
     QString querystr =
         "SELECT DISTINCT videosource.name, videosource.sourceid "
         "FROM cardinput, videosource, capturecard, videosourcemap ";
@@ -166,6 +167,7 @@ QString VideoSourceMapDBStorage::GetSetClause(MSqlBindings& bindings) const
 QString VideoSourceDBStorage::GetWhereClause(MSqlBindings &bindings) const
 {
     QString sourceidTag(":WHERESOURCEID");
+
     QString query("sourceid = " + sourceidTag);
 
     bindings.insert(sourceidTag, m_parent.getSourceID());
@@ -841,6 +843,29 @@ VideoSource::VideoSource()
     group->addChild(xmltv = new XMLTVConfig(*this));
     group->addChild(new FreqTableSelector(*this));
     addChild(group);
+}
+
+bool VideoSourceEditor::cardTypesInclude(const int &sourceID,
+                                         const QString &thecardtype)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT count(cardtype)"
+                  " FROM cardinput,capturecard "
+                  " WHERE capturecard.cardid = cardinput.cardid "
+                  " AND cardinput.sourceid= :SOURCEID "
+                  " AND capturecard.cardtype= :CARDTYPE ;");
+    query.bindValue(":SOURCEID", sourceID);
+    query.bindValue(":CARDTYPE", thecardtype);
+
+    if (query.exec() && query.next())
+    {
+        int count = query.value(0).toInt();
+
+        if (count > 0)
+            return true;
+    }
+
+    return false;
 }
 
 void VideoSource::fillSelections(SelectSetting* setting)
@@ -3330,9 +3355,11 @@ void CardInput::channelScanner(void)
                 .arg(cardtype));
         return;
     }
+
     ScanWizard *scanwizard = new ScanWizard(srcid, crdid, in);
     scanwizard->exec(false, true);
     scanwizard->deleteLater();
+
     if (SourceUtil::GetChannelCount(srcid))
         startchan->SetSourceID(QString::number(srcid));
     if (num_channels_before)

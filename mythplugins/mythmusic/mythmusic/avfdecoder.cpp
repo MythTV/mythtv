@@ -512,7 +512,9 @@ MetaIO* avfDecoder::doCreateTagger(void)
         if (file->TagExists(filename))
             return file;
         else
-            return new MetaIOFLACVorbis();  
+            delete file;
+
+        return new MetaIOFLACVorbis();
     }
     else if (extension == "m4a")
         return new MetaIOMP4();

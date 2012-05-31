@@ -109,7 +109,7 @@ namespace
         if (item)
             return item->GetData().value<MythGenericTree *>();
 
-        return 0;
+        return NULL;
     }
 
     VideoMetadata *GetMetadataPtrFromNode(MythGenericTree *node)
@@ -117,7 +117,7 @@ namespace
         if (node)
             return node->GetData().value<TreeNodeData>().GetMetadata();
 
-        return 0;
+        return NULL;
     }
 
     bool GetLocalVideoImage(const QString &video_uid, const QString &filename,
@@ -852,6 +852,10 @@ VideoDialog::VideoDialog(MythScreenStack *lparent, QString lname,
     m_d->m_videoList->setCurrentVideoFilter(VideoFilterSettings(true,
                     lname));
 
+    m_d->m_parentalLevel.SetLevel(ParentalLevel(gCoreContext->
+                    GetNumSetting("VideoDefaultParentalLevel",
+                            ParentalLevel::plLowest)));
+    
     StorageGroup::ClearGroupToUseCache();
 }
 
@@ -1032,9 +1036,6 @@ bool VideoDialog::Create()
 
 void VideoDialog::Init()
 {
-    m_d->m_parentalLevel.SetLevel(ParentalLevel(gCoreContext->
-                    GetNumSetting("VideoDefaultParentalLevel",
-                            ParentalLevel::plLowest)));
     connect(&m_d->m_parentalLevel, SIGNAL(SigLevelChanged()),
             SLOT(reloadData()));
 }
@@ -2344,7 +2345,7 @@ void VideoDialog::VideoMenu()
 
     MythUIButtonListItem *item = GetItemCurrent();
     MythGenericTree *node = GetNodePtrFromButton(item);
-    if (node && node->getInt() >= 0)
+    if (metadata)
     {
         if (!metadata->GetTrailer().isEmpty() ||
                 gCoreContext->GetNumSetting("mythvideo.TrailersRandomEnabled", 0) ||
@@ -2360,8 +2361,10 @@ void VideoDialog::VideoMenu()
         menu->AddItem(tr("Change Video Details"), NULL, CreateManageMenu());
         menu->AddItem(tr("Delete"), SLOT(RemoveVideo()));
     }
-    if (node && !(node->getInt() >= 0) && node->getInt() != kUpFolder)
+    else if (node && node->getInt() != kUpFolder)
+    {
         menu->AddItem(tr("Play Folder"), SLOT(playFolder()));
+    }
 
 
     m_menuPopup = new MythDialogBox(menu, m_popupStack, "videomenupopup");
@@ -3181,7 +3184,7 @@ VideoMetadata *VideoDialog::GetMetadata(MythUIButtonListItem *item)
             int nodeInt = node->getInt();
 
             if (nodeInt >= 0)
-            metadata = GetMetadataPtrFromNode(node);
+                metadata = GetMetadataPtrFromNode(node);
         }
     }
 

@@ -347,6 +347,7 @@ bool needsUpdate(GrabberScript* script, uint updateFreq)
 
 QDateTime lastUpdate(GrabberScript* script)
 {
+    QDateTime updated;
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT updated "
                   "FROM internetcontent "
@@ -354,13 +355,13 @@ QDateTime lastUpdate(GrabberScript* script)
                   "BY updated DESC LIMIT 1;");
     QFileInfo fi(script->GetCommandline());
     query.bindValue(":COMMAND", fi.fileName());
-    if (!query.exec() || !query.isActive()) {
+    if (!query.exec() || !query.isActive())
+    {
         MythDB::DBError("Tree last update in db", query);
     }
-
-    query.next();
-
-    QDateTime updated = query.value(0).toDateTime();
+    else if (query.next())
+        updated = query.value(0).toDateTime();
+    
     return updated;
 }
 
@@ -374,7 +375,8 @@ bool clearTreeItems(const QString &feedcommand)
         "WHERE feedtitle = :FEEDTITLE AND podcast = 0;");
     query.bindValue(":FEEDTITLE", feedcommand);
 
-    if (!query.exec() || !query.isActive()) {
+    if (!query.exec() || !query.isActive())
+    {
         MythDB::DBError("netcontent: clearing DB", query);
         return false;
     }
@@ -393,7 +395,8 @@ bool isTreeInUse(const QString &feedcommand)
     QFileInfo fi(feedcommand);
     query.bindValue(":COMMAND", fi.fileName());
 
-    if (!query.exec() || !query.isActive()) {
+    if (!query.exec() || !query.isActive())
+    {
         MythDB::DBError("netcontent:  isTreeInUse", query);
         return false;
     }
@@ -457,7 +460,8 @@ bool insertTreeArticleInDB(const QString &feedtitle, const QString &path,
     query.bindValue(":SEASON", item->GetSeason());
     query.bindValue(":EPISODE", item->GetEpisode());
 
-    if (!query.exec() || !query.isActive()) {
+    if (!query.exec() || !query.isActive())
+    {
         MythDB::DBError("netcontent: inserting article in DB", query);
         return false;
     }
@@ -481,7 +485,8 @@ QMultiMap<QPair<QString,QString>, ResultItem*> getTreeArticles(const QString &fe
                   "AND type = :TYPE ORDER BY title DESC;");
     query.bindValue(":FEEDTITLE", feedtitle);
     query.bindValue(":TYPE", type);
-    if (!query.exec() || !query.isActive()) {
+    if (!query.exec() || !query.isActive())
+    {
         MythDB::DBError("Tree find in db", query);
         return ret;
     }
@@ -544,6 +549,7 @@ bool findInDB(const QString& url, ArticleType type)
 
 RSSSite* findByURL(const QString& url, ArticleType type)
 {
+    RSSSite *tmp = NULL;
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT name,thumbnail,author,description,"
                   "commandline,download,updated FROM internetcontent "
@@ -551,26 +557,27 @@ RSSSite* findByURL(const QString& url, ArticleType type)
                   "AND podcast = 1;");
     query.bindValue(":URL", url);
     query.bindValue(":TYPE", type);
-    if (!query.exec() || !query.isActive()) {
+    if (!query.exec() || !query.next())
+    {
         MythDB::DBError("RSS find in db", query);
-        RSSSite *tmp = new RSSSite(QString(), QString(), (ArticleType)0, QString(),
-                       QString(), QString(), false,
-                       QDateTime());
-        return tmp;
+        tmp = new RSSSite(QString(), QString(), (ArticleType)0, QString(),
+                          QString(), QString(), false,
+                          QDateTime());
     }
     else
-        query.next();
+    {
+        QString title = query.value(0).toString();
+        QString image  = query.value(1).toString();
+        QString author = query.value(2).toString();
+        QString description = query.value(3).toString();
+        QString outurl = query.value(4).toString();
+        bool download = query.value(5).toInt();
+        QDateTime updated; query.value(6).toDate();
 
-    QString title = query.value(0).toString();
-    QString image  = query.value(1).toString();
-    QString author = query.value(2).toString();
-    QString description = query.value(3).toString();
-    QString outurl = query.value(4).toString();
-    bool download = query.value(5).toInt();
-    QDateTime updated; query.value(6).toDate();
+        tmp = new RSSSite(title, image, type, description, outurl,
+                        author, download, updated);
+    }
 
-    RSSSite *tmp = new RSSSite(title, image, type, description, outurl,
-                       author, download, updated);
     return tmp;
 }
 

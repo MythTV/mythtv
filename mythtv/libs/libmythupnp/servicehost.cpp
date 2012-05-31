@@ -52,8 +52,8 @@ QVariant MethodInfo::Invoke( Service *pService, const QStringMap &reqParams )
     void *param[ _MAX_PARAMS ];
     int   types[ _MAX_PARAMS ];
 
-    memset( param, 0, sizeof( param ));
-    memset( types, 0, sizeof( types ));
+    memset( param, 0, _MAX_PARAMS * sizeof(void *));
+    memset( types, 0, _MAX_PARAMS * sizeof(int));
 
     try
     {

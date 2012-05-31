@@ -351,9 +351,16 @@ typedef struct AVProbeData {
 #define AVFMT_NOGENSEARCH   0x4000 /**< Format does not allow to fallback to generic search */
 #define AVFMT_NO_BYTE_SEEK  0x8000 /**< Format does not allow seeking by bytes */
 #define AVFMT_ALLOW_FLUSH  0x10000 /**< Format allows flushing. If not set, the muxer will not receive a NULL packet in the write_packet function. */
-#define AVFMT_TS_NONSTRICT  0x8000000 /**< Format does not require strictly
-                                           increasing timestamps, but they must
-                                           still be monotonic */
+#if LIBAVFORMAT_VERSION_MAJOR <= 54
+#define AVFMT_TS_NONSTRICT 0x8020000 //we try to be compatible to the ABIs of ffmpeg and major forks
+#else
+#define AVFMT_TS_NONSTRICT 0x20000
+#endif
+                                   /**< Format does not require strictly
+                                        increasing timestamps, but they must
+                                        still be monotonic */
+
+#define AVFMT_SEEK_TO_PTS   0x4000000 /**< Seeking is based on PTS */
 
 /**
  * @addtogroup lavf_encoding
@@ -376,7 +383,8 @@ typedef struct AVOutputFormat {
     /**
      * can use flags: AVFMT_NOFILE, AVFMT_NEEDNUMBER, AVFMT_RAWPICTURE,
      * AVFMT_GLOBALHEADER, AVFMT_NOTIMESTAMPS, AVFMT_VARIABLE_FPS,
-     * AVFMT_NODIMENSIONS, AVFMT_NOSTREAMS, AVFMT_ALLOW_FLUSH
+     * AVFMT_NODIMENSIONS, AVFMT_NOSTREAMS, AVFMT_ALLOW_FLUSH,
+     * AVFMT_TS_NONSTRICT
      */
     int flags;
 
@@ -453,7 +461,7 @@ typedef struct AVInputFormat {
     /**
      * Can use flags: AVFMT_NOFILE, AVFMT_NEEDNUMBER, AVFMT_SHOW_IDS,
      * AVFMT_GENERIC_INDEX, AVFMT_TS_DISCONT, AVFMT_NOBINSEARCH,
-     * AVFMT_NOGENSEARCH, AVFMT_NO_BYTE_SEEK.
+     * AVFMT_NOGENSEARCH, AVFMT_NO_BYTE_SEEK, AVFMT_SEEK_TO_PTS.
      */
     int flags;
 
@@ -566,6 +574,7 @@ enum AVStreamParseType {
     AVSTREAM_PARSE_HEADERS,    /**< Only parse headers, do not repack. */
     AVSTREAM_PARSE_TIMESTAMPS, /**< full parsing and interpolation of timestamps for frames not starting on a packet boundary */
     AVSTREAM_PARSE_FULL_ONCE,  /**< full parsing and repack of the first frame only, only implemented for H.264 currently */
+    AVSTREAM_PARSE_FULL_RAW=MKTAG(0,'R','A','W'),       /**< full parsing and repack with timestamp generation for raw */
 };
 
 typedef struct AVIndexEntry {
@@ -782,15 +791,22 @@ typedef struct AVStream {
     int nb_index_entries;
     unsigned int index_entries_allocated_size;
 
+    /* mythtv addons */
+    int got_frame;
+
+    int component_tag; ///< Component tag given in PMT, for MythTV MHEG
+    /* end mythtv addons */
+
     /**
      * flag to indicate that probing is requested
      * NOT PART OF PUBLIC API
      */
     int request_probe;
-
-    int got_frame;
-
-    int component_tag; ///< Component tag given in PMT, for MythTV MHEG
+    /**
+     * Indicates that everything up to the next keyframe
+     * should be discarded.
+     */
+    int skip_to_keyframe;
 } AVStream;
 
 #define AV_PROGRAM_RUNNING 1
@@ -854,7 +870,7 @@ typedef struct AVFormatContext {
      */
     void *priv_data;
 
-    /*
+    /**
      * I/O context.
      *
      * decoding: either set by the user before avformat_open_input() (then
@@ -909,6 +925,7 @@ typedef struct AVFormatContext {
     unsigned int packet_size;
     int max_delay;
 
+    /* Myth addons */
     int build_index;
 
     /* mpeg-ts support */
@@ -916,6 +933,7 @@ typedef struct AVFormatContext {
     void *stream_change_data;
     const uint8_t *cur_pmt_sect;
     int cur_pmt_sect_len;
+    /* End Myth addons */
 
     int flags;
 #define AVFMT_FLAG_GENPTS       0x0001 ///< Generate missing pts even if it requires parsing future frames.
@@ -1095,6 +1113,8 @@ typedef struct AVFormatContext {
      */
 #define RAW_PACKET_BUFFER_SIZE 2500000
     int raw_packet_buffer_remaining_size;
+
+    int avio_flags;
 } AVFormatContext;
 
 typedef struct AVPacketList {
@@ -1102,7 +1122,6 @@ typedef struct AVPacketList {
     struct AVPacketList *next;
 } AVPacketList;
 
-#define MAX_STREAMS 100
 
 /**
  * @defgroup lavf_core Core functions
@@ -1563,10 +1582,6 @@ void av_set_pts_info(AVStream *s, int pts_wrap_bits,
                      unsigned int pts_num, unsigned int pts_den);
 #endif
 
-void av_estimate_timings(AVFormatContext *ic, int64_t old_offset);
-AVStream *av_add_stream(AVFormatContext *s, AVStream *st, int id);
-void av_remove_stream(AVFormatContext *s, int id, int remove_ts);
-
 #define AVSEEK_FLAG_BACKWARD 1 ///< seek backward
 #define AVSEEK_FLAG_BYTE     2 ///< seeking based on position in bytes
 #define AVSEEK_FLAG_ANY      4 ///< seek to any frame, even non-keyframes
@@ -1920,9 +1935,40 @@ const struct AVCodecTag *avformat_get_riff_video_tags(void);
  * @return the table mapping RIFF FourCCs for audio to CodecID.
  */
 const struct AVCodecTag *avformat_get_riff_audio_tags(void);
+
+/**
+ * Guesses the sample aspect ratio of a frame, based on both the stream and the
+ * frame aspect ratio.
+ *
+ * Since the frame aspect ratio is set by the codec but the stream aspect ratio
+ * is set by the demuxer, these two may not be equal. This function tries to
+ * return the value that you should use if you would like to display the frame.
+ *
+ * Basic logic is to use the stream aspect ratio if it is set to something sane
+ * otherwise use the frame aspect ratio. This way a container setting, which is
+ * usually easy to modify can override the coded value in the frames.
+ *
+ * @param format the format context which the stream is part of
+ * @param stream the stream which the frame is part of
+ * @param frame the frame with the aspect ratio to be determined
+ * @return the guessed (valid) sample_aspect_ratio, 0/1 if no idea
+ */
+AVRational av_guess_sample_aspect_ratio(AVFormatContext *format, AVStream *stream, AVFrame *frame);
+
 /**
  * @}
  */
+
+/* MythTV changes */
+
+#define MAX_STREAMS 100
+
+void estimate_timings(AVFormatContext *ic, int64_t old_offset);
+void av_estimate_timings(AVFormatContext *ic, int64_t old_offset);
+AVStream *av_add_stream(AVFormatContext *s, AVStream *st, int id);
+void av_remove_stream(AVFormatContext *s, int id, int remove_ts);
+void flush_packet_queue(AVFormatContext *s);
+/* End MythTV changes */
 
 /**
  * @}

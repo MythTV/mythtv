@@ -115,9 +115,8 @@ bool HouseKeeper::wantToRun(const QString &dbTag, int period, int minhour,
         result.prepare("SELECT lastrun FROM housekeeping WHERE tag = :TAG ;");
         result.bindValue(":TAG", dbTag);
 
-        if (result.exec() && result.isActive() && result.size() > 0)
+        if (result.exec() && result.next())
         {
-            result.next();
             lastrun = result.value(0).toDateTime();
 
             if ((lastrun.secsTo(now) > longEnough) &&
@@ -188,9 +187,8 @@ QDateTime HouseKeeper::getLastRun(const QString &dbTag)
     result.prepare("SELECT lastrun FROM housekeeping WHERE tag = :TAG ;");
     result.bindValue(":TAG", dbTag);
 
-    if (result.exec() && result.isActive() && result.size() > 0)
+    if (result.exec() && result.next())
     {
-        result.next();
         lastRun = result.value(0).toDateTime();
     }
 
@@ -267,8 +265,6 @@ void HouseKeeper::RunHouseKeeping(void)
                                            " 'schedulesdirect1' );");
 
                         if ((result.exec()) &&
-                            (result.isActive()) &&
-                            (result.size() > 0) &&
                             (result.next()) &&
                             (result.value(0).toInt() > 0))
                             grabberSupportsNextTime = true;
@@ -720,11 +716,11 @@ void HouseKeeper::CleanupProgramListings(void)
                   "WHERE type = :FINDONE AND oldfind.findid IS NOT NULL;");
     findq.bindValue(":FINDONE", kFindOneRecord);
 
-    if (findq.exec() && findq.size() > 0)
+    if (findq.exec())
     {
+        query.prepare("DELETE FROM record WHERE recordid = :RECORDID;");
         while (findq.next())
         {
-            query.prepare("DELETE FROM record WHERE recordid = :RECORDID;");
             query.bindValue(":RECORDID", findq.value(0).toInt());
             if (!query.exec())
                 MythDB::DBError("HouseKeeper Cleaning Program Listings", query);

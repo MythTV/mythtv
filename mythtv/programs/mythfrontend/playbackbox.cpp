@@ -981,7 +981,7 @@ void PlaybackBox::ItemVisible(MythUIButtonListItem *item)
     item->DisplayState(extract_commflag_state(*pginfo), "commflagged");
 
     MythUIButtonListItem *sel_item = item->parent()->GetItemCurrent();
-    if ((item != sel_item) && pginfo && item->GetImage("preview").isEmpty() &&
+    if ((item != sel_item) && item->GetImage("preview").isEmpty() &&
         (asAvailable == pginfo->GetAvailableStatus()))
     {
         QString token = m_helper.GetPreviewImage(*pginfo, true);
@@ -2649,6 +2649,7 @@ void PlaybackBox::ShowAvailabilityPopup(const ProgramInfo &pginfo)
             ShowOkPopup(tr("Recording Unavailable\n") + msg +
                         tr("This recording is currently being "
                            "deleted and is unavailable"));
+            break;
         case asDeleted:
             ShowOkPopup(tr("Recording Unavailable\n") + msg +
                         tr("This recording has been "
@@ -4176,7 +4177,8 @@ void PlaybackBox::customEvent(QEvent *event)
                 m_artTimer[(uint)type]->start(s_artDelay[(uint)type]);
             }
         }
-        else if (message == "EXIT_TO_MENU")
+        else if (message == "EXIT_TO_MENU" ||
+                 message == "CANCEL_PLAYLIST")
         {
             m_playListPlay.clear();
         }

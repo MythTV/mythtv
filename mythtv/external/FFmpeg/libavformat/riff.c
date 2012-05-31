@@ -118,6 +118,8 @@ const AVCodecTag ff_codec_bmp_tags[] = {
     { CODEC_ID_DVVIDEO,      MKTAG('d', 'v', 'c', ' ') },
     { CODEC_ID_DVVIDEO,      MKTAG('d', 'v', 'c', 's') },
     { CODEC_ID_DVVIDEO,      MKTAG('d', 'v', 'h', '1') },
+    { CODEC_ID_DVVIDEO,      MKTAG('S', 'L', '2', '5') },
+    { CODEC_ID_DVVIDEO,      MKTAG('S', 'L', 'D', 'V') },
     { CODEC_ID_MPEG1VIDEO,   MKTAG('m', 'p', 'g', '1') },
     { CODEC_ID_MPEG1VIDEO,   MKTAG('m', 'p', 'g', '2') },
     { CODEC_ID_MPEG2VIDEO,   MKTAG('m', 'p', 'g', '2') },
@@ -258,6 +260,7 @@ const AVCodecTag ff_codec_bmp_tags[] = {
     { CODEC_ID_VC1IMAGE,     MKTAG('W', 'V', 'P', '2') },
     { CODEC_ID_LOCO,         MKTAG('L', 'O', 'C', 'O') },
     { CODEC_ID_WNV1,         MKTAG('W', 'N', 'V', '1') },
+    { CODEC_ID_AASC,         MKTAG('A', 'A', 'S', '4') },
     { CODEC_ID_AASC,         MKTAG('A', 'A', 'S', 'C') },
     { CODEC_ID_INDEO2,       MKTAG('R', 'T', '2', '1') },
     { CODEC_ID_FRAPS,        MKTAG('F', 'P', 'S', '1') },
@@ -301,6 +304,7 @@ const AVCodecTag ff_codec_bmp_tags[] = {
     { CODEC_ID_ZEROCODEC,    MKTAG('Z', 'E', 'C', 'O') },
     { CODEC_ID_Y41P,         MKTAG('Y', '4', '1', 'P') },
     { CODEC_ID_FLIC,         MKTAG('A', 'F', 'L', 'C') },
+    { CODEC_ID_EXR,          MKTAG('e', 'x', 'r', ' ') },
     { CODEC_ID_NONE,         0 }
 };
 

@@ -58,7 +58,7 @@ enum OutputFormat {
 #define MAX_FCODE 7
 #define MAX_MV 2048
 
-#define MAX_THREADS 16
+#define MAX_THREADS 32
 
 #define MAX_PICTURE_COUNT 32
 
@@ -803,7 +803,7 @@ extern const enum PixelFormat ff_pixfmt_list_420[];
 extern const enum PixelFormat ff_hwaccel_pixfmt_list_420[];
 
 static inline void ff_update_block_index(MpegEncContext *s){
-    const int block_size= 8>>s->avctx->lowres;
+    const int block_size= 8 >> s->avctx->lowres;
 
     s->block_index[0]+=2;
     s->block_index[1]+=2;

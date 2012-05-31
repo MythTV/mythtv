@@ -16,6 +16,7 @@ using namespace std;
 #include "iptvfeederudp.h"
 #include "iptvfeederrtp.h"
 #include "iptvfeederfile.h"
+#include "iptvfeederhls.h"
 #include "mythcontext.h"
 #include "mythlogging.h"
 
@@ -68,6 +69,10 @@ bool IPTVFeederWrapper::InitFeeder(const QString &url)
     else if (IPTVFeederFile::IsFile(url))
     {
         tmp_feeder = new IPTVFeederFile();
+    }
+    else if (IPTVFeederHLS::IsHLS(url))
+    {
+        tmp_feeder = new IPTVFeederHLS();
     }
     else
     {

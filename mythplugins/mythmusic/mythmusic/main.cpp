@@ -585,18 +585,28 @@ static void setupKeys(void)
         "Decrease rating"),            "7");
     REG_KEY("Music", "REFRESH",    QT_TRANSLATE_NOOP("MythControls",
         "Refresh music tree"),         "8");
-    REG_KEY("Music", "FILTER",     QT_TRANSLATE_NOOP("MythControls",
-        "Filter All My Music"),        "F");
-    REG_KEY("Music", "INCSEARCH",     QT_TRANSLATE_NOOP("MythControls",
-        "Show incremental search dialog"),     "Ctrl+S");
-    REG_KEY("Music", "INCSEARCHNEXT", QT_TRANSLATE_NOOP("MythControls",
-        "Incremental search find next match"), "Ctrl+N");
     REG_KEY("Music", "SPEEDUP",    QT_TRANSLATE_NOOP("MythControls",
         "Increase Play Speed"),   "W");
     REG_KEY("Music", "SPEEDDOWN",  QT_TRANSLATE_NOOP("MythControls",
         "Decrease Play Speed"),   "X");
     REG_KEY("Music", "MARK",       QT_TRANSLATE_NOOP("MythControls",
         "Toggle track selection"), "T");
+    REG_KEY("Music", "TOGGLESHUFFLE", QT_TRANSLATE_NOOP("MythControls",
+        "Toggle shuffle mode"),    "");
+    REG_KEY("Music", "TOGGLEREPEAT",  QT_TRANSLATE_NOOP("MythControls",
+        "Toggle repeat mode"),     "");
+
+    // switch to view key bindings
+    REG_KEY("Music", "SWITCHTOPLAYLIST",              QT_TRANSLATE_NOOP("MythControls",
+        "Switch to the current playlist view"), "");
+    REG_KEY("Music", "SWITCHTOPLAYLISTEDITORTREE",    QT_TRANSLATE_NOOP("MythControls",
+        "Switch to the playlist editor tree view"), "");
+    REG_KEY("Music", "SWITCHTOPLAYLISTEDITORGALLERY", QT_TRANSLATE_NOOP("MythControls",
+        "Switch to the playlist editor gallery view"), "");
+    REG_KEY("Music", "SWITCHTOSEARCH",                QT_TRANSLATE_NOOP("MythControls",
+        "Switch to the search view"), "");
+    REG_KEY("Music", "SWITCHTOVISUALISER",            QT_TRANSLATE_NOOP("MythControls",
+        "Switch to the fullscreen visualiser view"), "");
 
 
 #ifdef FIXME

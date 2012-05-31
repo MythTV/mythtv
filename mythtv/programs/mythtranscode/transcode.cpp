@@ -27,7 +27,7 @@
 #include "programinfo.h"
 #include "mythdbcon.h"
 #include "avformatwriter.h"
-#include "httplivestream.h"
+#include "HLS/httplivestream.h"
 
 
 extern "C" {
@@ -930,7 +930,7 @@ int Transcode::TranscodeFile(const QString &inputname,
     player_ctx->SetPlayingInfo(m_proginfo);
     player_ctx->SetRingBuffer(inRingBuffer);
     player_ctx->SetPlayer(player);
-    player->SetPlayerInfo(NULL, NULL, true, player_ctx);
+    player->SetPlayerInfo(NULL, NULL, player_ctx);
 
     if (showprogress)
     {
@@ -1110,6 +1110,7 @@ int Transcode::TranscodeFile(const QString &inputname,
 
                 avfw2->SetContainer("mpegts");
                 avfw2->SetAudioCodec("libmp3lame");
+                //avfw2->SetAudioCodec("libfaac"); // --enable-libfaac to use this
                 avfw2->SetAudioBitrate(audioOnlyBitrate);
                 avfw2->SetAudioChannels(arb->m_channels);
                 avfw2->SetAudioBits(16);
@@ -1120,7 +1121,7 @@ int Transcode::TranscodeFile(const QString &inputname,
             avfw->SetContainer("mpegts");
             avfw->SetVideoCodec("libx264");
             avfw->SetAudioCodec("libmp3lame");
-            //avfw->SetAudioCodec("libfaac");
+            //avfw->SetAudioCodec("libfaac");  // --enable-libfaac to use this
 
             if (hlsStreamID == -1)
                 hls = new HTTPLiveStream(inputname, newWidth, newHeight,

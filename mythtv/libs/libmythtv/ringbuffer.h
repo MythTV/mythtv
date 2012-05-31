@@ -38,6 +38,7 @@ enum RingBufferType
     kRingBuffer_DVD,
     kRingBuffer_BD,
     kRingBuffer_HTTP,
+    kRingBuffer_HLS,
 };
 
 class MTV_PUBLIC RingBuffer : protected MThread

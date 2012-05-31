@@ -13,9 +13,9 @@ using namespace std;
 #include "decoderbase.h"
 #include "programinfo.h"
 #include "livetvchain.h"
-#include "dvdringbuffer.h"
-#include "bdringbuffer.h"
 #include "iso639.h"
+#include "DVD/dvdringbuffer.h"
+#include "Bluray/bdringbuffer.h"
 
 #define LOC QString("Dec: ")
 
@@ -38,7 +38,7 @@ DecoderBase::DecoderBase(MythPlayer *parent, const ProgramInfo &pginfo)
       m_positionMapLock(QMutex::Recursive),
       dontSyncPositionMap(false),
 
-      exactseeks(false), livetv(false), watchingrecording(false),
+      seeksnap(-1), livetv(false), watchingrecording(false),
 
       hasKeyFrameAdjustTable(false), lowbuffers(false),
       getrawframes(false), getrawvideo(false),
@@ -99,7 +99,7 @@ void DecoderBase::SeekReset(long long, uint, bool, bool)
     readAdjust = 0;
 }
 
-void DecoderBase::setWatchingRecording(bool mode)
+void DecoderBase::SetWatchingRecording(bool mode)
 {
     bool wereWatchingRecording = watchingrecording;
 
@@ -522,7 +522,8 @@ bool DecoderBase::DoRewind(long long desiredFrame, bool discardFrames)
 
     // Do any Extra frame-by-frame seeking for exactseeks mode
     // And flush pre-seek frame if we are allowed to and need to..
-    int normalframes = (exactseeks) ? desiredFrame - framesPlayed : 0;
+    int normalframes = (uint64_t)(desiredFrame - (framesPlayed - 1)) > seeksnap
+        ? desiredFrame - framesPlayed : 0;
     normalframes = max(normalframes, 0);
     SeekReset(lastKey, normalframes, true, discardFrames);
 
@@ -555,8 +556,21 @@ bool DecoderBase::DoRewindSeek(long long desiredFrame)
     PosMapEntry e;
     {
         QMutexLocker locker(&m_positionMapLock);
-        int pos_idx  = min(pre_idx, post_idx);
-        e = m_positionMap[pos_idx];
+        PosMapEntry e_pre  = m_positionMap[pre_idx];
+        PosMapEntry e_post = m_positionMap[post_idx];
+        int pos_idx = pre_idx;
+        e = e_pre;
+        if (((uint64_t) (GetKey(e_post) - desiredFrame)) <= seeksnap &&
+            framesPlayed - 1 > GetKey(e_post) &&
+            GetKey(e_post) - desiredFrame <= desiredFrame - GetKey(e_pre))
+        {
+            // Snap to the right if e_post is within snap distance and
+            // is at least as close a snap as e_pre.  Take into
+            // account that if framesPlayed has already reached
+            // e_post, we should only snap to the left.
+            pos_idx = post_idx;
+            e = e_post;
+        }
         lastKey = GetKey(e);
 
         // ??? Don't rewind past the beginning of the file
@@ -722,7 +736,8 @@ bool DecoderBase::DoFastForward(long long desiredFrame, bool discardFrames)
 
     // Do any Extra frame-by-frame seeking for exactseeks mode
     // And flush pre-seek frame if we are allowed to and need to..
-    int normalframes = (exactseeks) ? desiredFrame - framesPlayed : 0;
+    int normalframes = (uint64_t)(desiredFrame - (framesPlayed - 1)) > seeksnap
+        ? desiredFrame - framesPlayed : 0;
     normalframes = max(normalframes, 0);
     SeekReset(lastKey, normalframes, needflush, discardFrames);
 
@@ -755,12 +770,23 @@ void DecoderBase::DoFastForwardSeek(long long desiredFrame, bool &needflush)
     FindPosition(desiredFrame, hasKeyFrameAdjustTable, pre_idx, post_idx);
 
     // if exactseeks, use keyframe <= desiredFrame
-    uint pos_idx = (exactseeks) ? pre_idx : max(pre_idx, post_idx);
 
-    PosMapEntry e;
+    PosMapEntry e, e_pre, e_post;
     {
         QMutexLocker locker(&m_positionMapLock);
-        e = m_positionMap[pos_idx];
+        e_pre  = m_positionMap[pre_idx];
+        e_post = m_positionMap[post_idx];
+    }
+    e = e_pre;
+    if (((uint64_t) (GetKey(e_post) - desiredFrame)) <= seeksnap &&
+        (framesPlayed - 1 >= GetKey(e_pre) ||
+         GetKey(e_post) - desiredFrame < desiredFrame - GetKey(e_pre)))
+    {
+        // Snap to the right if e_post is within snap distance and is
+        // a closer snap than e_pre.  Take into account that if
+        // framesPlayed has already reached e_pre, we should only snap
+        // to the right.
+        e = e_post;
     }
     lastKey = GetKey(e);
 

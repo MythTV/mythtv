@@ -86,8 +86,10 @@ static av_cold int flic_decode_init(AVCodecContext *avctx)
     if (avctx->extradata_size != 0 &&
         avctx->extradata_size != 12 &&
         avctx->extradata_size != 128 &&
+        avctx->extradata_size != 256 &&
+        avctx->extradata_size != 904 &&
         avctx->extradata_size != 1024) {
-        av_log(avctx, AV_LOG_ERROR, "Expected extradata of 12, 128 or 1024 bytes\n");
+        av_log(avctx, AV_LOG_ERROR, "Unexpected extradata size %d\n", avctx->extradata_size);
         return AVERROR_INVALIDDATA;
     }
 
@@ -106,8 +108,11 @@ static av_cold int flic_decode_init(AVCodecContext *avctx)
             ptr += 4;
         }
         depth = 8;
-    } else if (avctx->extradata_size == 0) {
         /* FLI in MOV, see e.g. FFmpeg trac issue #626 */
+    } else if (avctx->extradata_size == 0 ||
+               avctx->extradata_size == 256 ||
+        /* see FFmpeg ticket #1234 */
+               avctx->extradata_size == 904) {
         s->fli_type = FLI_TYPE_CODE;
         depth = 8;
     } else {
@@ -803,5 +808,5 @@ AVCodec ff_flic_decoder = {
     .close          = flic_decode_end,
     .decode         = flic_decode_frame,
     .capabilities   = CODEC_CAP_DR1,
-    .long_name = NULL_IF_CONFIG_SMALL("Autodesk Animator Flic video"),
+    .long_name      = NULL_IF_CONFIG_SMALL("Autodesk Animator Flic video"),
 };

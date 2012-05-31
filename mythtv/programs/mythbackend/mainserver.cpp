@@ -1810,7 +1810,7 @@ void MainServer::HandleQueryRecording(QStringList &slist, PlaybackSock *pbs)
 
     QStringList strlist;
 
-    if (pginfo->GetChanID())
+    if (pginfo && pginfo->GetChanID())
     {
         strlist << "OK";
         pginfo->ToStringList(strlist);
@@ -2019,7 +2019,8 @@ void MainServer::DeleteRecordedFiles(DeleteStruct *ds)
     QString hostname;
     QString storagegroup;
     bool deleteInDB;
-    while (query.next()) {
+    while (query.next())
+    {
         basename = query.value(0).toString();
         hostname = query.value(1).toString();
         storagegroup = query.value(2).toString();
@@ -2238,7 +2239,7 @@ bool MainServer::TruncateAndClose(ProgramInfo *pginfo, int fd,
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT COUNT(cardid) FROM capturecard;");
-    if (query.exec() && query.isActive() && query.size() && query.next())
+    if (query.exec() && query.next())
         cards = query.value(0).toInt();
 
     // Time between truncation steps in milliseconds
@@ -3391,10 +3392,9 @@ void MainServer::HandleLockTuner(PlaybackSock *pbs, int cardid)
                           "WHERE cardid = :CARDID ;");
             query.bindValue(":CARDID", retval);
 
-            if (query.exec() && query.isActive() && query.size())
+            if (query.exec() && query.next())
             {
                 // Success
-                query.next();
                 strlist << QString::number(retval)
                         << query.value(0).toString()
                         << query.value(1).toString()
@@ -4341,7 +4341,7 @@ void MainServer::BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
     query.prepare(sql);
     query.bindValue(":HOSTNAME", gCoreContext->GetHostName());
 
-    if (query.exec() && query.isActive())
+    if (query.exec())
     {
         // If we don't have any dirs of our own, fallback to list of Default
         // dirs since that is what StorageGroup::Init() does.
@@ -5988,9 +5988,8 @@ QString MainServer::LocalFilePath(const QUrl &url, const QString &wantgroup)
         query.prepare("SELECT icon FROM channel WHERE icon LIKE :FILENAME ;");
         query.bindValue(":FILENAME", QString("%/") + file);
 
-        if (query.exec() && query.isActive() && query.size())
+        if (query.exec() && query.next())
         {
-            query.next();
             lpath = query.value(0).toString();
         }
         else

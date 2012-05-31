@@ -26,6 +26,7 @@
 #include "libavutil/avstring.h"
 #include "libavutil/dict.h"
 #include "libavutil/mathematics.h"
+#include "libavutil/opt.h"
 #include "avformat.h"
 #include "internal.h"
 #include "avio_internal.h"
@@ -35,6 +36,7 @@
 #include "avlanguage.h"
 
 typedef struct {
+    const AVClass *class;
     int asfid2avid[128];                 ///< conversion table from asf ID 2 AVStream ID
     ASFStream streams[128];              ///< it's max number and it's not that big
     uint32_t stream_bitrates[128];       ///< max number of streams, bitrate for each (for streaming)
@@ -72,7 +74,21 @@ typedef struct {
     int stream_index;
 
     ASFStream* asf_st;                   ///< currently decoded stream
+
+    int no_resync_search;
 } ASFContext;
+
+static const AVOption options[] = {
+    {"no_resync_search", "Don't try to resynchronize by looking for a certain optional start code", offsetof(ASFContext, no_resync_search), AV_OPT_TYPE_INT, {.dbl = 0}, 0, 1, AV_OPT_FLAG_DECODING_PARAM },
+    { NULL },
+};
+
+static const AVClass asf_class = {
+    .class_name = "asf demuxer",
+    .item_name  = av_default_item_name,
+    .option     = options,
+    .version    = LIBAVUTIL_VERSION_INT,
+};
 
 #undef NDEBUG
 #include <assert.h>
@@ -80,10 +96,6 @@ typedef struct {
 #define ASF_MAX_STREAMS 127
 #define FRAME_HEADER_SIZE 17
 // Fix Me! FRAME_HEADER_SIZE may be different.
-
-static const ff_asf_guid index_guid = {
-    0x90, 0x08, 0x00, 0x33, 0xb1, 0xe5, 0xcf, 0x11, 0x89, 0xf4, 0x00, 0xa0, 0xc9, 0x03, 0x49, 0xcb
-};
 
 #ifdef DEBUG
 static const ff_asf_guid stream_bitrate_guid = { /* (http://get.to/sdp) */
@@ -109,7 +121,7 @@ static void print_guid(const ff_asf_guid *g)
     else PRINT_IF_GUID(g, ff_asf_codec_comment_header);
     else PRINT_IF_GUID(g, ff_asf_codec_comment1_header);
     else PRINT_IF_GUID(g, ff_asf_data_header);
-    else PRINT_IF_GUID(g, index_guid);
+    else PRINT_IF_GUID(g, ff_asf_simple_index_header);
     else PRINT_IF_GUID(g, ff_asf_head1_guid);
     else PRINT_IF_GUID(g, ff_asf_head2_guid);
     else PRINT_IF_GUID(g, ff_asf_my_guid);
@@ -717,7 +729,9 @@ static int ff_asf_get_packet(AVFormatContext *s, AVIOContext *pb)
 
     // if we do not know packet size, allow skipping up to 32 kB
     off= 32768;
-    if (s->packet_size > 0)
+    if (asf->no_resync_search)
+        off = 3;
+    else if (s->packet_size > 0)
         off= (avio_tell(pb) - s->data_offset) % s->packet_size + 3;
 
     c=d=e=-1;
@@ -1215,7 +1229,7 @@ static void asf_build_simple_index(AVFormatContext *s, int stream_index)
 
     /* the data object can be followed by other top-level objects,
        skip them until the simple index object is reached */
-    while (ff_guidcmp(&g, &index_guid)) {
+    while (ff_guidcmp(&g, &ff_asf_simple_index_header)) {
         int64_t gsize= avio_rl64(s->pb);
         if (gsize < 24 || url_feof(s->pb)) {
             avio_seek(s->pb, current_pos, SEEK_SET);
@@ -1305,5 +1319,6 @@ AVInputFormat ff_asf_demuxer = {
     .read_close     = asf_read_close,
     .read_seek      = asf_read_seek,
     .read_timestamp = asf_read_pts,
-    .flags = AVFMT_NOBINSEARCH | AVFMT_NOGENSEARCH,
+    .flags          = AVFMT_NOBINSEARCH | AVFMT_NOGENSEARCH,
+    .priv_class     = &asf_class,
 };

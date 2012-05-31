@@ -21,6 +21,8 @@ LookerUpper::LookerUpper() :
 
 LookerUpper::~LookerUpper()
 {
+    while (!m_busyRecList.isEmpty())
+        delete m_busyRecList.takeFirst();
 }
 
 bool LookerUpper::StillWorking()
@@ -82,6 +84,8 @@ void LookerUpper::HandleAllRecordings(bool updaterules)
             m_busyRecList.append(pginfo);
             m_metadataFactory->Lookup(pginfo, false, false, false);
         }
+        else
+            delete pginfo;
     }
 }
 
@@ -105,6 +109,8 @@ void LookerUpper::HandleAllRecordingRules()
             m_busyRecList.append(pginfo);
             m_metadataFactory->Lookup(pginfo, false, false, true);
         }
+        else
+            delete pginfo;
     }
 }
 
@@ -140,8 +146,10 @@ void LookerUpper::HandleAllArtwork(bool aggressive)
 
                 m_busyRecList.append(pginfo);
                 m_metadataFactory->Lookup(pginfo, false, true, true);
+                continue;
             }
         }
+        delete pginfo;
     }
 
     // Now, Attempt to fill in the gaps for recordings
@@ -180,8 +188,10 @@ void LookerUpper::HandleAllArtwork(bool aggressive)
 
                 m_busyRecList.append(pginfo);
                 m_metadataFactory->Lookup(pginfo, false, true, aggressive);
+                continue;
             }
         }
+        delete pginfo;
     }
 
 }
@@ -212,10 +222,10 @@ void LookerUpper::CopyRuleInetrefsToRecordings()
                 msg += " has no inetref, but its recording rule does. Copying...";
                 LOG(VB_GENERAL, LOG_INFO, msg);
                 pginfo->SaveInetRef(rule->m_inetref);
-                delete rule;
             }
-            delete pginfo;
+            delete rule;
         }
+        delete pginfo;
     }
 }
 

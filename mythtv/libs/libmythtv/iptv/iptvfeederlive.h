@@ -32,6 +32,9 @@ class IPTVFeederLive : public IPTVFeeder
     void Run(void);
     void Stop(void);
 
+    void AddListener(TSDataListener*);
+    void RemoveListener(TSDataListener*);
+
   protected:
     bool InitEnv(void);
     void FreeEnv(void);

@@ -821,11 +821,11 @@ void StatusBox::doTunerStatus()
             strlist << "GET_SLEEPSTATUS";
 
             gCoreContext->SendReceiveStringList(strlist);
-            state = strlist[0].toInt();
+            int sleepState = strlist[0].toInt();
 
-            if (state == -1)
+            if (sleepState == -1)
                 status = tr("has an error");
-            else if (state == sStatus_Undefined)
+            else if (sleepState == sStatus_Undefined)
                 status = tr("is unavailable");
             else
                 status = tr("is asleep");

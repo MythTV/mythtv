@@ -4,6 +4,8 @@
  *  Distributed as part of MythTV under GPL v2 and later.
  */
 
+#include <algorithm>
+
 #include "iptvfeederlive.h"
 
 // MythTV headers
@@ -91,3 +93,49 @@ void IPTVFeederLive::Stop(void)
         _cond.wait(&_lock, 500);
     LOG(VB_RECORD, LOG_INFO, LOC + "Stop() -- end");
 }
+
+void IPTVFeederLive::AddListener(TSDataListener *item)
+{
+    LOG(VB_RECORD, LOG_INFO, LOC + QString("AddListener(0x%1) -- begin")
+        .arg((uint64_t)item,0,16));
+    if (!item)
+    {
+        LOG(VB_RECORD, LOG_INFO, LOC + QString("AddListener(0x%1) -- end")
+            .arg((uint64_t)item,0,16));
+        return;
+    }
+
+    // avoid duplicates
+    RemoveListener(item);
+
+    // add to local list
+    QMutexLocker locker(&_lock);
+    _listeners.push_back(item);
+
+    LOG(VB_RECORD, LOG_INFO, LOC + QString("AddListener(0x%1) -- end")
+        .arg((uint64_t)item,0,16));
+}
+
+void IPTVFeederLive::RemoveListener(TSDataListener *item)
+{
+    LOG(VB_RECORD, LOG_INFO, LOC + QString("RemoveListener(0x%1) -- begin")
+        .arg((uint64_t)item,0,16));
+    QMutexLocker locker(&_lock);
+    vector<TSDataListener*>::iterator it =
+    find(_listeners.begin(), _listeners.end(), item);
+
+    if (it == _listeners.end())
+    {
+        LOG(VB_RECORD, LOG_INFO, LOC + QString("RemoveListener(0x%1) -- end 1")
+            .arg((uint64_t)item,0,16));
+        return;
+    }
+
+    // remove from local list..
+    *it = *_listeners.rbegin();
+    _listeners.resize(_listeners.size() - 1);
+
+    LOG(VB_RECORD, LOG_INFO, LOC + QString("RemoveListener(0x%1) -- end 2")
+        .arg((uint64_t)item,0,16));
+}
+

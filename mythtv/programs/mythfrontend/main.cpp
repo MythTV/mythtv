@@ -38,7 +38,6 @@ using namespace std;
 #include "grabbersettings.h"
 #include "playgroup.h"
 #include "networkcontrol.h"
-#include "dvdringbuffer.h"
 #include "scheduledrecording.h"
 #include "mythsystemevent.h"
 #include "hardwareprofile.h"
@@ -85,14 +84,18 @@ using namespace std;
 #include "videometadatasettings.h"
 #include "videolist.h"
 
+// DVD
+#include "DVD/dvdringbuffer.h"
+
+// AirPlay
 #ifdef USING_RAOP
-#include "mythraopdevice.h"
+#include "AirPlay/mythraopdevice.h"
 #endif
 
 #ifdef USING_LIBDNS_SD
 #include <QScopedPointer>
 #include "bonjourregister.h"
-#include "mythairplayserver.h"
+#include "AirPlay/mythairplayserver.h"
 #endif
 
 static ExitPrompter   *exitPopup = NULL;

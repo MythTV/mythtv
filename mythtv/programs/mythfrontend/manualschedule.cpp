@@ -200,6 +200,12 @@ void ManualSchedule::recordClicked(void)
     QDateTime endts = m_startDateTime
         .addSecs(max(m_durationSpin->GetIntValue() * 60, 60));
 
+    if (m_channelList->GetCurrentPos() >= m_chanids.size())
+    {
+        LOG(VB_GENERAL, LOG_ERR, "Channel out of range.");
+        return; // this can happen if there are no channels..
+    }
+
     ProgramInfo p(m_titleEdit->GetText().trimmed(),
                   m_chanids[m_channelList->GetCurrentPos()],
                   m_startDateTime, endts);

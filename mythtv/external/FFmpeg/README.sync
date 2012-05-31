@@ -1,4 +1,49 @@
 This code was resynced upstream to:
 
-git://source.ffmpeg.org/ffmpeg.git at SHA1 d3db8988d on March 31, 2010
+git://source.ffmpeg.org/ffmpeg.git at SHA1 d3db8988d on March 31, 2012
 
+git://source.ffmpeg.org/ffmpeg.git at SHA1 ea5dab58e on May 23, 2012
+
+List of files modified from original FFmpeg:
+Makefile
+README.sync
+common.mak
+configure
+libavcodec/Makefile
+libavcodec/avcodec.h
+libavcodec/dsputil.h
+libavcodec/dvbsub_parser.c
+libavcodec/dvbsubdec.c
+libavcodec/dvdsubdec.c
+libavcodec/get_bits.h
+libavcodec/golomb.h
+libavcodec/h264_refs.c
+libavcodec/libavcodec.v
+libavcodec/mpeg12.c
+libavcodec/mpeg4videodec.c
+libavcodec/mpeg4videoenc.c
+libavcodec/mpegaudio_parser.c
+libavcodec/mpegaudiodec.c
+libavcodec/mpegaudiodecheader.c
+libavcodec/mpegvideo.c
+libavcodec/mpegvideo.h
+libavcodec/myth_utils.c
+libavcodec/pcm.c
+libavcodec/pgssubdec.c
+libavformat/Makefile
+libavformat/allformats.c
+libavformat/avformat.h
+libavformat/mpeg.c
+libavformat/mpeg.h
+libavformat/mpegts-mythtv.c  <- new file
+libavformat/mpegts-mythtv.h  <- new file
+libavformat/mpegts.c
+libavformat/mpegts.h
+libavformat/nuv.c  <- could be ignored, whitespace only
+libavformat/utils-myth.c  <- new file
+libavformat/utils.c
+libavresample/libavresample.v
+libavutil/bswap.h
+libpostproc/Makefile
+libpostproc/postprocess.c
+library.mak

@@ -1308,6 +1308,7 @@ int JobQueue::GetJobsInQueue(QMap<int, JobQueueEntry> &jobs, int findJobs)
         // -1 indicates the chanid is empty
         if (query.value(1).toInt() == -1)
         {
+            thisJob.chanid = 0;
             logInfo = QString("jobID #%1").arg(thisJob.id);
         }
         else

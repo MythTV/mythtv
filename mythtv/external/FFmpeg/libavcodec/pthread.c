@@ -467,7 +467,6 @@ static int update_context_from_user(AVCodecContext *dst, AVCodecContext *src)
     dst->release_buffer = src->release_buffer;
 
     dst->opaque   = src->opaque;
-    dst->dsp_mask = src->dsp_mask;
     dst->debug    = src->debug;
     dst->debug_mv = src->debug_mv;
 
@@ -614,11 +613,12 @@ int ff_thread_decode_frame(AVCodecContext *avctx,
      * If we're still receiving the initial packets, don't return a frame.
      */
 
-    if (fctx->delaying && avpkt->size) {
+    if (fctx->delaying) {
         if (fctx->next_decoding >= (avctx->thread_count-1)) fctx->delaying = 0;
 
         *got_picture_ptr=0;
-        return avpkt->size;
+        if (avpkt->size)
+            return avpkt->size;
     }
 
     /*
@@ -1051,6 +1051,11 @@ static void validate_thread_parameters(AVCodecContext *avctx)
         avctx->thread_count       = 1;
         avctx->active_thread_type = 0;
     }
+
+    if (avctx->thread_count > MAX_AUTO_THREADS)
+        av_log(avctx, AV_LOG_WARNING,
+               "Application has requested %d threads. Using a thread count greater than %d is not recommended.\n",
+               avctx->thread_count, MAX_AUTO_THREADS);
 }
 
 int ff_thread_init(AVCodecContext *avctx)

@@ -15,11 +15,11 @@
 #include "filter.h"
 #include "frame.h"
 
-#ifdef HAVE_MMX
+#if HAVE_MMX
 
 #include "libavutil/mem.h"
 #include "libavcodec/dsputil.h"
-#include "libavcodec/x86/mmx.h"
+#include "ffmpeg-mmx.h"
 
 static const mmx_t mm_cpool[] = {
     { w: {1, 1, 1, 1} },
@@ -35,7 +35,7 @@ typedef struct ThisFilter
 {
     VideoFilter vf;
 
-#ifdef HAVE_MMX
+#if HAVE_MMX
     int yfilt;
     int cfilt;
 

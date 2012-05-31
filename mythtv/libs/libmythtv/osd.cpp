@@ -17,13 +17,13 @@
 #include "mythuistatetype.h"
 
 // libmythtv
-#include "bdringbuffer.h"
 #include "channelutil.h"
 #include "teletextscreen.h"
 #include "subtitlescreen.h"
 #include "interactivescreen.h"
-#include "bdoverlayscreen.h"
 #include "osd.h"
+#include "Bluray/bdringbuffer.h"
+#include "Bluray/bdoverlayscreen.h"
 
 #define LOC     QString("OSD: ")
 
@@ -314,12 +314,12 @@ void OSD::LoadWindows(void)
                     QString("Loaded window %1").arg(window));
                 m_Children.insert(window, win);
             }
-        }
-        else
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC + QString("Failed to load window %1")
-                .arg(window));
-            delete win;
+            else
+            {
+                LOG(VB_GENERAL, LOG_ERR, LOC + QString("Failed to load window %1")
+                    .arg(window));
+                delete win;
+            }
         }
     }
 }
@@ -1015,12 +1015,12 @@ void OSD::DialogShow(const QString &window, const QString &text, int updatefor)
                 }
                 m_Children.insert(window, m_Dialog);
             }
-        }
-        else
-        {
-            RevertUIScale();
-            delete dialog;
-            return;
+            else
+            {
+                RevertUIScale();
+                delete dialog;
+                return;
+            }
         }
         RevertUIScale();
     }

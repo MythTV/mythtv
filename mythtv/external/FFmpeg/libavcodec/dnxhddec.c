@@ -82,6 +82,10 @@ static int dnxhd_init_vlc(DNXHDContext *ctx, int cid)
             av_log(ctx->avctx, AV_LOG_ERROR, "unsupported cid %d\n", cid);
             return -1;
         }
+        if (ff_dnxhd_cid_table[index].bit_depth != ctx->bit_depth) {
+            av_log(ctx->avctx, AV_LOG_ERROR, "bit depth mismatches %d %d\n", ff_dnxhd_cid_table[index].bit_depth, ctx->bit_depth);
+            return AVERROR_INVALIDDATA;
+        }
         ctx->cid_table = &ff_dnxhd_cid_table[index];
 
         ff_free_vlc(&ctx->ac_vlc);
@@ -429,5 +433,5 @@ AVCodec ff_dnxhd_decoder = {
     .close          = dnxhd_decode_close,
     .decode         = dnxhd_decode_frame,
     .capabilities   = CODEC_CAP_DR1 | CODEC_CAP_FRAME_THREADS,
-    .long_name = NULL_IF_CONFIG_SMALL("VC3/DNxHD"),
+    .long_name      = NULL_IF_CONFIG_SMALL("VC3/DNxHD"),
 };

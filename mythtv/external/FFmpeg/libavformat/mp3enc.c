@@ -94,6 +94,8 @@ typedef struct MP3Context {
     uint32_t seen;
     uint32_t pos;
     uint64_t bag[VBR_NUM_BAGS];
+    int initial_bitrate;
+    int has_variable_bitrate;
 
     /* index of the audio stream */
     int audio_stream_idx;
@@ -119,31 +121,35 @@ static int mp3_write_xing(AVFormatContext *s)
     int64_t          xing_offset;
     int32_t          header, mask;
     MPADecodeHeader  c;
-    int              srate_idx, i, channels;
+    int              srate_idx, ver = 0, i, channels;
     int              needed;
 
     if (!s->pb->seekable)
         return 0;
 
-    for (i = 0; i < FF_ARRAY_ELEMS(avpriv_mpa_freq_tab); i++)
-        if (avpriv_mpa_freq_tab[i] == codec->sample_rate) {
-            srate_idx = i;
-            break;
-        }
+    for (i = 0; i < FF_ARRAY_ELEMS(avpriv_mpa_freq_tab); i++) {
+        const uint16_t base_freq = avpriv_mpa_freq_tab[i];
+        if      (codec->sample_rate == base_freq)     ver = 0x3; // MPEG 1
+        else if (codec->sample_rate == base_freq / 2) ver = 0x2; // MPEG 2
+        else if (codec->sample_rate == base_freq / 4) ver = 0x0; // MPEG 2.5
+        else continue;
+        srate_idx = i;
+        break;
+    }
     if (i == FF_ARRAY_ELEMS(avpriv_mpa_freq_tab)) {
-        av_log(s, AV_LOG_ERROR, "Unsupported sample rate.\n");
+        av_log(s, AV_LOG_WARNING, "Unsupported sample rate, not writing Xing header.\n");
         return -1;
     }
 
     switch (codec->channels) {
     case 1:  channels = MPA_MONO;                                          break;
     case 2:  channels = MPA_STEREO;                                        break;
-    default: av_log(s, AV_LOG_ERROR, "Unsupported number of channels.\n"); return -1;
+    default: av_log(s, AV_LOG_WARNING, "Unsupported number of channels, not writing Xing header.\n"); return -1;
     }
 
     /* dummy MPEG audio header */
     header  =  0xff                                  << 24; // sync
-    header |= (0x7 << 5 | 0x3 << 3 | 0x1 << 1 | 0x1) << 16; // sync/mpeg-1/layer 3/no crc*/
+    header |= (0x7 << 5 | ver << 3 | 0x1 << 1 | 0x1) << 16; // sync/audio-version/layer 3/no crc*/
     header |= (srate_idx << 2) <<  8;
     header |= channels << 6;
 
@@ -238,6 +244,16 @@ static void mp3_fix_xing(AVFormatContext *s)
     int i;
 
     avio_flush(s->pb);
+
+    /* replace "Xing" identification string with "Info" for CBR files. */
+    if (!mp3->has_variable_bitrate) {
+        int64_t tag_offset = mp3->frames_offset
+            - 4   // frames/size/toc flags
+            - 4;  // xing tag
+        avio_seek(s->pb, tag_offset, SEEK_SET);
+        avio_wb32(s->pb, MKBETAG('I', 'n', 'f', 'o'));
+    }
+
     avio_seek(s->pb, mp3->frames_offset, SEEK_SET);
     avio_wb32(s->pb, mp3->frames);
     avio_wb32(s->pb, mp3->size);
@@ -260,12 +276,19 @@ static int mp3_write_packet_internal(AVFormatContext *s, AVPacket *pkt)
         return ff_raw_write_packet(s, pkt);
     else {
         MP3Context  *mp3 = s->priv_data;
-#ifdef FILTER_VBR_HEADERS
         MPADecodeHeader c;
-        int base;
+        int av_unused base;
 
-        ff_mpegaudio_decode_header(&c, AV_RB32(pkt->data));
+        avpriv_mpegaudio_decode_header(&c, AV_RB32(pkt->data));
 
+        if (!mp3->initial_bitrate)
+            mp3->initial_bitrate = c.bit_rate;
+        if (!mp3->has_variable_bitrate) {
+            if ((c.bit_rate == 0) || (mp3->initial_bitrate != c.bit_rate))
+                mp3->has_variable_bitrate = 1;
+        }
+
+#ifdef FILTER_VBR_HEADERS
         /* filter out XING and INFO headers. */
         base = 4 + xing_offtbl[c.lsf == 1][c.nb_channels == 1];
 
@@ -485,6 +508,6 @@ AVOutputFormat ff_mp3_muxer = {
     .write_packet      = mp3_write_packet,
     .write_trailer     = mp3_write_trailer,
     .flags             = AVFMT_NOTIMESTAMPS,
-    .priv_class = &mp3_muxer_class,
+    .priv_class        = &mp3_muxer_class,
 };
 #endif
