@@ -63,6 +63,7 @@ URLProtocol AVF_RingBuffer_Protocol = {
     NULL, // read_pause
     NULL, // read_seek
     NULL, // get_file_handle
+    NULL, // shutdown
     0,    // priv_data_size
     NULL, // priv_data_class
     URL_PROTOCOL_FLAG_NETWORK,    // flags

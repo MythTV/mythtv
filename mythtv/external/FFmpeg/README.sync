@@ -1,8 +1,8 @@
 This code was resynced upstream to:
 
-git://source.ffmpeg.org/ffmpeg.git at SHA1 d3db8988d on March 31, 2012
-
-git://source.ffmpeg.org/ffmpeg.git at SHA1 ea5dab58e on May 23, 2012
+git://source.ffmpeg.org/ffmpeg.git at SHA1 d3db8988d on March 31, 2012 (Beirdo)
+git://source.ffmpeg.org/ffmpeg.git at SHA1 ea5dab58e on May 23, 2012 (jya)
+git://source.ffmpeg.org/ffmpeg.git at SHA1 cc4d80c on June 1st, 2012 (jya)
 
 List of files modified from original FFmpeg:
 Makefile

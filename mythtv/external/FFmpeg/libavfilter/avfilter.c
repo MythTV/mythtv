@@ -202,7 +202,6 @@ int avfilter_config_links(AVFilterContext *filter)
                     link->sample_aspect_ratio = inlink ?
                         inlink->sample_aspect_ratio : (AVRational){1,1};
 
-#if 1
                 if (inlink) {
                     if (!link->w)
                         link->w = inlink->w;
@@ -233,7 +232,6 @@ int avfilter_config_links(AVFilterContext *filter)
                     link->time_base = (AVRational) {1, link->sample_rate};
             }
 
-#endif
             if ((config_link = link->dstpad->config_props))
                 if ((ret = config_link(link)) < 0)
                     return ret;
@@ -375,10 +373,9 @@ static const char *filter_name(void *p)
 }
 
 static const AVClass avfilter_class = {
-    "AVFilter",
-    filter_name,
-    NULL,
-    LIBAVUTIL_VERSION_INT,
+    .class_name = "AVFilter",
+    .item_name  = filter_name,
+    .version    = LIBAVUTIL_VERSION_INT,
 };
 
 int avfilter_open(AVFilterContext **filter_ctx, AVFilter *filter, const char *inst_name)
