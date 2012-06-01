@@ -27,7 +27,7 @@ int SSDPCacheEntries::g_nAllocated = 0;       // Debugging only
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 
-SSDPCacheEntries::SSDPCacheEntries()
+SSDPCacheEntries::SSDPCacheEntries() : ReferenceCounter("SSDPCacheEntries")
 {
     g_nAllocated++;    // Should be atomic increment
 }

@@ -38,7 +38,8 @@ UPnpSearchTask::UPnpSearchTask( int          nServicePort,
                                 QHostAddress peerAddress,
                                 int          nPeerPort,  
                                 QString      sST, 
-                                QString      sUDN )
+                                QString      sUDN ) :
+    Task("UPnpSearchTask")
 {
     m_PeerAddress = peerAddress;
     m_nPeerPort   = nPeerPort;

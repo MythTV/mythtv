@@ -236,7 +236,9 @@ class UPNP_PUBLIC DeviceLocation : public ReferenceCounter
         DeviceLocation( const QString &sURI,
                         const QString &sUSN,
                         const QString &sLocation,
-                        TaskTime       ttExpires ) : m_pDeviceDesc( NULL      ),
+                        TaskTime       ttExpires ) : ReferenceCounter(
+                                                         "DeviceLocation"     ),
+                                                     m_pDeviceDesc( NULL      ),
                                                      m_sURI       ( sURI      ),
                                                      m_sUSN       ( sUSN      ),
                                                      m_sLocation  ( sLocation ),
