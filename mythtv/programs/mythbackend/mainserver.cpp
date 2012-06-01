@@ -1571,16 +1571,20 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
             ft = new FileTransfer(filename, socket, writemode);
         }
         else
+        {
             ft = new FileTransfer(filename, socket, usereadahead, timeout_ms);
+        }
+
+        ft->IncrRef();
 
         sockListLock.lockForWrite();
         fileTransferList.push_back(ft);
         sockListLock.unlock();
 
         retlist << QString::number(socket->socket());
-        ft->UpRef();
         retlist << QString::number(ft->GetFileSize());
-        ft->DownRef();
+
+        ft->DecrRef();
 
         if (checkfiles.size())
         {
@@ -5023,7 +5027,7 @@ void MainServer::HandleFileTransferQuery(QStringList &slist,
         return;
     }
 
-    ft->UpRef();
+    ft->IncrRef();
     sockListLock.unlock();
 
     if (command == "IS_OPEN")
@@ -5074,7 +5078,7 @@ void MainServer::HandleFileTransferQuery(QStringList &slist,
         retlist << "ok";
     }
 
-    ft->DownRef();
+    ft->DecrRef();
 
     SendResponse(pbssock, retlist);
 }
@@ -5775,7 +5779,7 @@ void MainServer::connectionClosed(MythSocket *socket)
         MythSocket *sock = (*ft)->getSocket();
         if (sock == socket)
         {
-            (*ft)->DownRef();
+            (*ft)->DecrRef();
             fileTransferList.erase(ft);
             sockListLock.unlock();
             return;
