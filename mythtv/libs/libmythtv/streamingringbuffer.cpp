@@ -41,6 +41,7 @@ bool StreamingRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
     avcodeclock->lock();
     av_register_all();
     avcodeclock->unlock();
+    RingBuffer::AVFormatInitNetwork();
 
     rwlock.lockForWrite();
 

@@ -1622,7 +1622,9 @@ bool HLSRingBuffer::TestForHTTPLiveStreaming(QString &filename)
     av_register_all();
     avcodeclock->unlock();
     URLContext *context;
+
     // Do a peek on the URL to test the format
+    RingBuffer::AVFormatInitNetwork();
     int ret = ffurl_open(&context, filename.toAscii(),
                          AVIO_FLAG_READ, NULL, NULL);
     if (ret >= 0)
