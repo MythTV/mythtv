@@ -767,6 +767,9 @@ class MTV_PUBLIC VideoSourceEditor : public QObject, public ConfigurationDialog
     virtual MythDialog* dialogWidget(MythMainWindow* parent,
                                      const char* widgetName=0);
 
+    bool cardTypesInclude(const int& SourceID,
+                          const QString& thecardtype);
+
     virtual DialogCode exec(void);
     virtual void Load(void);
     virtual void Save(void) { }
