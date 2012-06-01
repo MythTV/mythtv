@@ -439,7 +439,7 @@ class Recorded( CMPRecord, DBDataWrite ):
             if role=='Writer': role = 'Author'
             metadata.people.append(OrdDict((('name',name), ('job',role))))
 
-        for arttype in ['coverart', 'fanart', 'banner']:
+#        for arttype in ['coverart', 'fanart', 'banner']:
 #            art = getattr(self.artwork, arttype)
 #            if art:
 #                metadata.images.append(OrdDict((('type',arttype), ('filename',art))))
