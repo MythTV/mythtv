@@ -51,7 +51,7 @@ EncoderLink::EncoderLink(int capturecardnum, PlaybackSock *lsock,
     lastWakeTime    = QDateTime::currentDateTime();
 
     if (sock)
-        sock->UpRef();
+        sock->IncrRef();
 }
 
 /** \fn EncoderLink::EncoderLink(int, TVRec *)
@@ -92,7 +92,7 @@ void EncoderLink::SetSocket(PlaybackSock *lsock)
 {
     if (lsock)
     {
-        lsock->UpRef();
+        lsock->IncrRef();
 
         if (gCoreContext->GetSettingOnHost("SleepCommand", hostname).isEmpty())
             SetSleepStatus(sStatus_Undefined);
@@ -108,7 +108,7 @@ void EncoderLink::SetSocket(PlaybackSock *lsock)
     }
 
     if (sock)
-        sock->DownRef();
+        sock->DecrRef();
     sock = lsock;
 }
 
