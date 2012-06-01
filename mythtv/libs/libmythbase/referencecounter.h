@@ -28,11 +28,12 @@ class MBASE_PUBLIC ReferenceCounter
     ReferenceCounter(const QString &debugName);
 
     /// Increments reference count.
-    void IncrRef(void);
+    /// \return last reference count
+    virtual int IncrRef(void);
 
     /// Decrements reference count and deletes on 0.
-    /// \return true if object is deleted
-    bool DecrRef(void);
+    /// \return last reference count, 0 if deleted
+    virtual int DecrRef(void);
 
   protected:
     /// Called on destruction, will warn if object deleted with

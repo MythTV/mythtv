@@ -23,7 +23,7 @@ ReferenceCounter::~ReferenceCounter(void)
     }
 }
 
-void ReferenceCounter::IncrRef(void)
+int ReferenceCounter::IncrRef(void)
 {
     int val = m_referenceCount.fetchAndAddRelease(1) + 1;
 
@@ -34,9 +34,11 @@ void ReferenceCounter::IncrRef(void)
     LOG(VB_REFCOUNT, LOG_DEBUG, QString("(0x%2)::IncrRef() -> %3")
         .arg(reinterpret_cast<intptr_t>(this),0,16).arg(val));
 #endif
+
+    return val;
 }
 
-bool ReferenceCounter::DecrRef(void)
+int ReferenceCounter::DecrRef(void)
 {
     int val = m_referenceCount.fetchAndAddRelaxed(-1) - 1;
 
@@ -51,8 +53,8 @@ bool ReferenceCounter::DecrRef(void)
     if (0 == val)
     {
         delete this;
-        return true;
+        return val;
     }
 
-    return false;
+    return val;
 }
