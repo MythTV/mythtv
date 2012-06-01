@@ -241,7 +241,8 @@ class SimpleOAuthClient(oauth.OAuthClient):
         Requests a request token and return it on success.
         """
         oauth_request = oauth.OAuthRequest.from_consumer_and_token(self.consumer,
-                                                                 http_url=self.request_token_url)
+                                                                 http_url=self.request_token_url,
+                                                                 callback="oob")
         oauth_request.sign_request(HMAC_SHA1, self.consumer, None)
         self.token = self._fetch_token(oauth_request)
 
