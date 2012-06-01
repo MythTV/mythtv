@@ -315,8 +315,9 @@ int64_t ffurl_seek(URLContext *h, int64_t pos, int whence)
     return ret;
 }
 
-int ffurl_close(URLContext *h)
+int ffurl_closep(URLContext **hh)
 {
+    URLContext *h= *hh;
     int ret = 0;
     if (!h) return 0; /* can happen when ffurl_open fails */
 
@@ -329,11 +330,17 @@ int ffurl_close(URLContext *h)
     if (h->prot->priv_data_size) {
         if (h->prot->priv_data_class)
             av_opt_free(h->priv_data);
-        av_free(h->priv_data);
+        av_freep(&h->priv_data);
     }
-    av_free(h);
+    av_freep(hh);
     return ret;
 }
+
+int ffurl_close(URLContext *h)
+{
+    return ffurl_closep(&h);
+}
+
 
 int avio_check(const char *url, int flags)
 {
