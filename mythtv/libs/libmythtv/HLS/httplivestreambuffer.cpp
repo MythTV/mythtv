@@ -2367,7 +2367,7 @@ void HLSRingBuffer::SanitizeStreams(StreamsList *streams)
             // perfect, leave it alone
             continue;
         }
-        if (todrop > hls->NumSegments() || todrop < 0)
+        if (todrop >= hls->NumSegments() || todrop < 0)
         {
             LOG(VB_PLAYBACK, LOG_ERR, LOC +
                 QString("stream %1 [id=%2] can't be properly adjusted, ignoring")
