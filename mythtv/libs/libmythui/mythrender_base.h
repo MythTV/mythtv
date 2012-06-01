@@ -1,8 +1,11 @@
 #ifndef MYTHRENDER_H_
 #define MYTHRENDER_H_
 
-#include <QSize>
+#include <QString>
 #include <QMutex>
+#include <QSize>
+
+#include "referencecounter.h"
 
 typedef enum
 {
@@ -14,39 +17,18 @@ typedef enum
     kRenderOpenGL2ES,
 } RenderType;
 
-class MythRender
+class MythRender : public ReferenceCounter
 {
   public:
-    MythRender(RenderType type)
-      : m_type(type), m_size(QSize()), m_errored(false), m_refCount(0)
+    MythRender(RenderType type) :
+        ReferenceCounter(QString("MythRender:%1").arg(type)),
+        m_type(type), m_size(QSize()), m_errored(false)
     {
-        UpRef();
     }
 
-    bool IsShared(void) const
-    {
-        return m_refCount > 1;
-    }
-
-    void UpRef(void)
-    {
-        m_refLock.lock();
-        m_refCount++;
-        m_refLock.unlock();
-    }
-
-    void DownRef(void)
-    {
-        m_refLock.lock();
-        m_refCount--;
-        if (m_refCount <= 0)
-        {
-            m_refLock.unlock();
-            delete this;
-            return;
-        }
-        m_refLock.unlock();
-   }
+    /// Warning: The reference count can be decremented between
+    /// the call to this function and the use of it's value.
+    bool IsShared(void) const { return m_referenceCount > 1; }
 
     RenderType Type(void) const { return m_type;    }
     bool  IsErrored(void) const { return m_errored; }
@@ -59,8 +41,6 @@ class MythRender
     RenderType  m_type;
     QSize       m_size;
     bool        m_errored;
-    QMutex      m_refLock;
-    int         m_refCount;
 };
 
 #endif

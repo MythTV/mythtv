@@ -40,7 +40,7 @@ class MBASE_PUBLIC ReferenceCounter
     /// references in place. Set breakpoint here for debugging.
     virtual ~ReferenceCounter(void);
 
-  private:
+  protected:
 #ifdef EXTRA_DEBUG
     const QString m_debugName;
 #endif
