@@ -424,7 +424,7 @@ void TeletextScreen::DrawLine(const uint8_t *page, uint row, int lang)
                 endbox = true;
                 goto ctrl;
             case 0x0b: // start box
-                if (x < kTeletextColumns - 1 && ((page[x + 1] & 0x7F) != 0x0b))
+                if (x < kTeletextColumns - 1 && ((page[x + 1] & 0x7F) == 0x0b))
                     startbox = true;
                 goto ctrl;
             case 0x0c: // normal height
