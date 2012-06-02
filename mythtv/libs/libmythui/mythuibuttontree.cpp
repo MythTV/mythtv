@@ -633,6 +633,30 @@ bool MythUIButtonTree::keyPressEvent(QKeyEvent *event)
     return handled;
 }
 
+bool MythUIButtonTree::gestureEvent(MythGestureEvent *event)
+{
+    bool handled = false;
+
+    if (event->gesture() == MythGestureEvent::Click)
+    {
+        // We want the relative position of the click
+        QPoint position = event->GetPosition() -
+                          m_Parent->GetArea().topLeft();
+
+        MythUIType *type = GetChildAt(position, false, false);
+
+        if (!type)
+            return false;
+
+        MythUIButtonList *list = dynamic_cast<MythUIButtonList *>(type);
+
+        if (list)
+            handled = list->gestureEvent(event);
+    }
+
+    return handled;
+}
+
 /*!
  * \copydoc MythUIType::ParseElement()
  */
