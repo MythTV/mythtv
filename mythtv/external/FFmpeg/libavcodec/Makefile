@@ -30,7 +30,7 @@ OBJS = allcodecs.o                                                      \
        resample2.o                                                      \
        simple_idct.o                                                    \
        utils.o                                                          \
-       myth_utils.o                                                     \
+       utils-mythtv.o                                                   \
 
 # parts needed for many different codecs
 OBJS-$(CONFIG_AANDCT)                  += aandcttab.o

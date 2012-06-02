@@ -28,7 +28,7 @@ libavcodec/mpegaudiodec.c
 libavcodec/mpegaudiodecheader.c
 libavcodec/mpegvideo.c
 libavcodec/mpegvideo.h
-libavcodec/myth_utils.c
+libavcodec/utils-mythtv.c <- new file
 libavcodec/pcm.c
 libavcodec/pgssubdec.c
 libavformat/Makefile
@@ -41,7 +41,7 @@ libavformat/mpegts-mythtv.h  <- new file
 libavformat/mpegts.c
 libavformat/mpegts.h
 libavformat/nuv.c  <- could be ignored, whitespace only
-libavformat/utils-myth.c  <- new file
+libavformat/utils-mythtv.c  <- new file
 libavformat/utils.c
 libavresample/libavresample.v
 libavutil/bswap.h
