@@ -453,6 +453,8 @@ HostComboBox *AudioConfigSettings::AudioUpmixType()
 {
     HostComboBox *gc = new HostComboBox("AudioUpmixType",false);
     gc->setLabel(QObject::tr("Upmix Quality"));
+    gc->addSelection(QObject::tr("Passive"), "0");
+    gc->addSelection(QObject::tr("Hall"), "3");
     gc->addSelection(QObject::tr("Good"), "1");
     gc->addSelection(QObject::tr("Best"), "2", true);  // default
     gc->setHelpText(QObject::tr("Set the audio surround-upconversion quality."));

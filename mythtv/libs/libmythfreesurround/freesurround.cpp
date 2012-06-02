@@ -42,6 +42,8 @@ static const unsigned default_block_size = SURROUND_BUFSIZE;
 // Gain of center and lfe channels in passive mode (sqrt 0.5)
 static const float center_level = 0.707107; 
 static const float m3db = 0.7071067811865476f;           // 3dB  = SQRT(2)
+static const float m6db = 0.5;                           // 6dB  = SQRT(4)
+static const float m7db = 0.44721359549996;              // 7dB  = SQRT(5)
 
 unsigned int block_size = default_block_size;
 
@@ -245,8 +247,14 @@ uint FreeSurround::putFrames(void* buffer, uint numFrames, uint numChannels)
             switch (surround_mode)
             {
                 case SurroundModePassive:
+                case SurroundModePassiveHall:
                     for (i = 0; i < numFrames && ic < bs; i++,ic++)
-                        bufs->l[ic] = bufs->c[ic] = bufs->r[ic] = samples[i];
+                    {
+                        // should be -7dB to keep power level the same
+                        // but we bump the level a tad.
+                        bufs->c[ic] = bufs->l[ic] = bufs->r[ic] = samples[i] * m6db;
+                        bufs->ls[ic] = bufs->rs[ic] = bufs->c[ic];
+                    }
                     process = false;
                     break;
                 default:
@@ -267,9 +275,24 @@ uint FreeSurround::putFrames(void* buffer, uint numFrames, uint numChannels)
                         float lt      = *samples++;
                         float rt      = *samples++;
                         bufs->l[ic]   = lt;
-                        bufs->lfe[ic] = bufs->c[ic]  = (lt+rt) * center_level;
+                        bufs->lfe[ic] = bufs->c[ic] = (lt+rt) * m3db;
                         bufs->r[ic]   = rt;
-                        bufs->ls[ic]  = bufs->rs[ic] = (lt-rt) * center_level;
+                        // surround channels receive out-of-phase
+                        bufs->ls[ic]  = (rt-lt) * 0.5;
+                        bufs->rs[ic]  = (lt-rt) * 0.5;
+                    }
+                    process = false;
+                    break;
+                case SurroundModePassiveHall:
+                    for (i = 0; i < numFrames && ic < bs; i++,ic++)
+                    {
+                        float lt      = *samples++;
+                        float rt      = *samples++;
+                        bufs->l[ic]   = lt * m3db;
+                        bufs->lfe[ic] = bufs->c[ic] = (lt+rt) * m3db;
+                        bufs->r[ic]   = rt * m3db;
+                        bufs->ls[ic]  = bufs->l[ic];
+                        bufs->rs[ic]  = bufs->r[ic];
                     }
                     process = false;
                     break;
