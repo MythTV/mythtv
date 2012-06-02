@@ -84,10 +84,10 @@ static const AVOption options[]={
                                                         , OFFSET(min_compensation),AV_OPT_TYPE_FLOAT ,{.dbl=FLT_MAX               }, 0      , FLT_MAX   , PARAM },
 {"min_hard_comp"        , "Minimum difference between timestamps and audio data (in seconds) to trigger padding/trimming the data."
                                                    , OFFSET(min_hard_compensation),AV_OPT_TYPE_FLOAT ,{.dbl=0.1                   }, 0      , INT_MAX   , PARAM },
-{"comp_duration"        , "Duration (in seconds) over which data is stretched/squeezeed to make it match the timestamps."
+{"comp_duration"        , "Duration (in seconds) over which data is stretched/squeezed to make it match the timestamps."
                                               , OFFSET(soft_compensation_duration),AV_OPT_TYPE_FLOAT ,{.dbl=1                     }, 0      , INT_MAX   , PARAM },
-{"max_soft_comp"        , "Maximum factor by which data is stretched/squeezeed to make it match the timestamps."
-                                                   , OFFSET(max_soft_compensation),AV_OPT_TYPE_FLOAT ,{.dbl=0                     }, 0      , INT_MAX   , PARAM },
+{"max_soft_comp"        , "Maximum factor by which data is stretched/squeezed to make it match the timestamps."
+                                                   , OFFSET(max_soft_compensation),AV_OPT_TYPE_FLOAT ,{.dbl=0                     }, INT_MIN, INT_MAX   , PARAM },
 
 {0}
 };
@@ -226,7 +226,7 @@ int swr_init(struct SwrContext *s){
         }else if(av_get_planar_sample_fmt(s->in_sample_fmt) <= AV_SAMPLE_FMT_FLTP){
             s->int_sample_fmt= AV_SAMPLE_FMT_FLTP;
         }else{
-            av_log(s, AV_LOG_DEBUG, "Using double precission mode\n");
+            av_log(s, AV_LOG_DEBUG, "Using double precision mode\n");
             s->int_sample_fmt= AV_SAMPLE_FMT_DBLP;
         }
     }
@@ -629,6 +629,7 @@ int swr_convert(struct SwrContext *s, uint8_t *out_arg[SWR_CH_MAX], int out_coun
         av_freep(&tmp.data);
         if(s->drop_output || !out_arg)
             return 0;
+        in_count = 0;
     }
 
     if(!in_arg){
@@ -770,7 +771,8 @@ int64_t swr_next_pts(struct SwrContext *s, int64_t pts){
                 }
             } else if(s->soft_compensation_duration && s->max_soft_compensation) {
                 int duration = s->out_sample_rate * s->soft_compensation_duration;
-                int comp = av_clipf(fdelta, -s->max_soft_compensation, s->max_soft_compensation) * duration ;
+                double max_soft_compensation = s->max_soft_compensation / (s->max_soft_compensation < 0 ? -s->in_sample_rate : 1);
+                int comp = av_clipf(fdelta, -max_soft_compensation, max_soft_compensation) * duration ;
                 av_log(s, AV_LOG_VERBOSE, "compensating audio timestamp drift:%f compensation:%d in:%d\n", fdelta, comp, duration);
                 swr_set_compensation(s, comp, duration);
             }

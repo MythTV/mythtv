@@ -1441,7 +1441,7 @@ void GuideGrid::customEvent(QEvent *event)
             {
                 editSchedule();
             }
-            else if (resulttext == tr("Upcoming"))
+            else if (resulttext == tr("Show Upcoming"))
             {
                 upcoming();
             }

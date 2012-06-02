@@ -809,24 +809,23 @@ bool AvFormatDecoder::CanHandle(char testbuf[kDecoderProbeBufferSize],
 
 void AvFormatDecoder::InitByteContext(void)
 {
-    int buf_size = ringBuffer->BestBufferSize();
-    int streamed = ringBuffer->IsStreamed();
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Buffer size: %1, streamed %2")
-                                   .arg(buf_size).arg(streamed));
-
-    readcontext.prot = &AVF_RingBuffer_Protocol;
-    readcontext.flags = AVIO_FLAG_READ;
-    readcontext.is_streamed = streamed;
+    int buf_size                = ringBuffer->BestBufferSize();
+    int streamed                = ringBuffer->IsStreamed();
+    readcontext.prot            = AVFRingBuffer::GetRingBufferURLProtocol();
+    readcontext.flags           = AVIO_FLAG_READ;
+    readcontext.is_streamed     = streamed;
     readcontext.max_packet_size = 0;
-    readcontext.priv_data = avfRingBuffer;
-    unsigned char* buffer = (unsigned char *)av_malloc(buf_size);
-    ic->pb = avio_alloc_context(buffer, buf_size, 0,
-                                &readcontext,
-                                AVF_Read_Packet,
-                                AVF_Write_Packet,
-                                AVF_Seek_Packet);
+    readcontext.priv_data       = avfRingBuffer;
+    unsigned char* buffer       = (unsigned char *)av_malloc(buf_size);
+    ic->pb                      = avio_alloc_context(buffer, buf_size, 0,
+                                                     &readcontext,
+                                                     AVFRingBuffer::AVF_Read_Packet,
+                                                     AVFRingBuffer::AVF_Write_Packet,
+                                                     AVFRingBuffer::AVF_Seek_Packet);
 
-    ic->pb->seekable = !streamed;
+    ic->pb->seekable            = !streamed;
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Buffer size: %1, streamed %2")
+        .arg(buf_size).arg(streamed));
 }
 
 extern "C" void HandleStreamChange(void *data)

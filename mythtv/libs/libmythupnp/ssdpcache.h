@@ -13,13 +13,16 @@
 #ifndef __SSDPCLIENT_H__
 #define __SSDPCLIENT_H__
 
-#include "upnpexp.h"
-#include "mythobservable.h"
-
+// Qt headers
 #include <QObject>
+#include <QMutex>
 #include <QMap>
 
+// MythTV headers
+#include "referencecounter.h"
+#include "mythobservable.h"
 #include "upnpdevice.h"
+#include "upnpexp.h"
 
 /// Key == Unique Service Name (USN)
 typedef QMap< QString, DeviceLocation * > EntryMap;
@@ -28,7 +31,7 @@ typedef QMap< QString, DeviceLocation * > EntryMap;
 // QDict Implementation that uses RefCounted pointers
 /////////////////////////////////////////////////////////////////////////////
 
-class UPNP_PUBLIC SSDPCacheEntries : public RefCounted
+class UPNP_PUBLIC SSDPCacheEntries : public ReferenceCounter
 {
   protected:
     /// Destructor protected to enforce Release method usage

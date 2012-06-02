@@ -411,6 +411,8 @@ void Eventing::NotifySubscriber( SubscriberInfo *pInfo )
 
         TaskQueue::Instance()->AddTask( 250, pEventTask );
 
+        pEventTask->DecrRef();
+
         // ------------------------------------------------------------------
         // Update the subscribers Key & last Notified fields
         // ------------------------------------------------------------------

@@ -3444,7 +3444,7 @@ void TV::HandleSpeedChangeTimerEvent(void)
         update_msg |= ctx->HandlePlayerSpeedChangeEOF() && (ctx == actx);
     }
 
-    if (update_msg)
+    if (actx && update_msg)
     {
         UpdateOSDSeekMessage(actx, actx->GetPlayMessage(), kOSDTimeout_Med);
     }
@@ -3687,7 +3687,7 @@ bool TV::ProcessKeypress(PlayerContext *actx, QKeyEvent *e)
         handled |= GetMythMainWindow()->TranslateKeyPress(
                    "TV Editing", e, actions);
 
-        if (!handled)
+        if (!handled && actx->player)
         {
             if (has_action("MENU", actions))
             {
@@ -3701,8 +3701,7 @@ bool TV::ProcessKeypress(PlayerContext *actx, QKeyEvent *e)
                 else
                 {
                     actx->LockDeletePlayer(__FILE__, __LINE__);
-                    if (actx->player)
-                        actx->player->DisableEdit(0);
+                    actx->player->DisableEdit(0);
                     actx->UnlockDeletePlayer(__FILE__, __LINE__);
                 }
                 handled = true;
@@ -3725,7 +3724,7 @@ bool TV::ProcessKeypress(PlayerContext *actx, QKeyEvent *e)
             }
         }
         if (handled)
-            editmode = actx->player->GetEditMode();
+            editmode = (actx->player && actx->player->GetEditMode());
     }
 
     if (handled)
@@ -3796,7 +3795,7 @@ bool TV::ProcessKeypress(PlayerContext *actx, QKeyEvent *e)
     handled = false;
 
     bool isDVD = actx->buffer && actx->buffer->IsDVD();
-    bool isMenuOrStill = actx->buffer->IsInDiscMenuOrStillFrame();
+    bool isMenuOrStill = actx->buffer && actx->buffer->IsInDiscMenuOrStillFrame();
 
     handled = handled || BrowseHandleAction(actx, actions);
     handled = handled || ManualZoomHandleAction(actx, actions);
@@ -5228,10 +5227,11 @@ bool TV::PIPAddPlayer(PlayerContext *mctx, PlayerContext *pipctx)
         return false;
 
     bool ok = false, addCondition = false;
+    bool is_using_null = false;
     pipctx->LockDeletePlayer(__FILE__, __LINE__);
     if (pipctx->player)
     {
-        bool is_using_null = pipctx->player->UsingNullVideo();
+        is_using_null = pipctx->player->UsingNullVideo();
         pipctx->UnlockDeletePlayer(__FILE__, __LINE__);
 
         if (is_using_null)
@@ -5257,7 +5257,7 @@ bool TV::PIPAddPlayer(PlayerContext *mctx, PlayerContext *pipctx)
 
     LOG(VB_GENERAL, LOG_ERR,
         QString("AddPIPPlayer null: %1 IsPIP: %2 addCond: %3 ok: %4")
-            .arg(pipctx->player->UsingNullVideo())
+            .arg(is_using_null)
             .arg(pipctx->IsPIP()).arg(addCondition).arg(ok));
 
     return ok;
@@ -5861,6 +5861,9 @@ void TV::DoTogglePause(PlayerContext *ctx, bool showOSD)
 
 bool TV::DoPlayerSeek(PlayerContext *ctx, float time)
 {
+    if (!ctx || !ctx->buffer)
+        return false;
+    
     if (time > -0.001f && time < +0.001f)
         return false;
 
@@ -5969,10 +5972,13 @@ bool TV::SeekHandleAction(PlayerContext *actx, const QStringList &actions,
 void TV::DoSeek(PlayerContext *ctx, float time, const QString &mesg,
                 bool timeIsOffset, bool honorCutlist)
 {
+    if (!ctx->player)
+        return;
+    
     bool limitkeys = false;
 
     ctx->LockDeletePlayer(__FILE__, __LINE__);
-    if (ctx->player && ctx->player->GetLimitKeyRepeat())
+    if (ctx->player->GetLimitKeyRepeat())
         limitkeys = true;
     ctx->UnlockDeletePlayer(__FILE__, __LINE__);
 

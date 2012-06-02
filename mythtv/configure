@@ -195,7 +195,7 @@ Configuration options:
   --disable-swscale        disable libswscale build
   --enable-postproc        enable GPLed postprocessing support [no]
   --disable-avfilter       disable video filter support [no]
-  --disable-avresample     disable libavresample build [no]
+  --enable-avresample      enable libavresample build [no]
   --disable-pthreads       disable pthreads [auto]
   --enable-w32threads      use Win32 threads [no]
   --enable-x11grab         enable X11 grabbing [no]
@@ -1984,11 +1984,13 @@ aconvert_filter_deps="swresample"
 amovie_filter_deps="avcodec avformat"
 aresample_filter_deps="swresample"
 ass_filter_deps="libass"
+asyncts_filter_deps="avresample"
 blackframe_filter_deps="gpl"
 boxblur_filter_deps="gpl"
 colormatrix_filter_deps="gpl"
 cropdetect_filter_deps="gpl"
 delogo_filter_deps="gpl"
+deshake_filter_deps="avcodec"
 drawtext_filter_deps="libfreetype"
 frei0r_filter_deps="frei0r dlopen"
 frei0r_filter_extralibs='$ldl'
@@ -2015,13 +2017,14 @@ avformat_deps="avcodec"
 postproc_deps="gpl"
 
 # programs
+ffmpeg_deps="avcodec avfilter avformat swscale swresample"
+ffmpeg_select="buffersink_filter format_filter aformat_filter
+             setpts_filter"
 ffplay_deps="avcodec avformat swscale swresample sdl"
 ffplay_select="buffersink_filter rdft"
 ffprobe_deps="avcodec avformat"
 ffserver_deps="avformat ffm_muxer fork rtp_protocol rtsp_demuxer"
 ffserver_extralibs='$ldl'
-ffmpeg_deps="avcodec avfilter avformat swscale swresample format_filter"
-ffmpeg_select="buffersink_filter"
 
 doc_deps="texi2html"
 
@@ -2066,56 +2069,6 @@ test_deps(){
 mxf_d10_test_deps="avfilter"
 seek_lavf_mxf_d10_test_deps="mxf_d10_test"
 
-test_deps _encoder _decoder                                             \
-    adpcm_ima_qt                                                        \
-    adpcm_ima_wav                                                       \
-    adpcm_ms                                                            \
-    adpcm_swf                                                           \
-    adpcm_yamaha=adpcm_yam                                              \
-    alac                                                                \
-    asv1                                                                \
-    asv2                                                                \
-    bmp                                                                 \
-    dnxhd="dnxhd_1080i dnxhd_720p dnxhd_720p_rd"                        \
-    dvvideo="dv dv_411 dv50"                                            \
-    ffv1                                                                \
-    flac                                                                \
-    flashsv                                                             \
-    flv                                                                 \
-    adpcm_g726=g726                                                     \
-    gif                                                                 \
-    h261                                                                \
-    h263="h263 h263p"                                                   \
-    huffyuv                                                             \
-    jpegls                                                              \
-    mjpeg="jpg mjpeg ljpeg"                                             \
-    mp2                                                                 \
-    mpeg1video="mpeg mpeg1b"                                            \
-    mpeg2video="mpeg2 mpeg2_422 mpeg2_idct_int mpeg2_ilace mpeg2_ivlc_qprd" \
-    mpeg2video="mpeg2thread mpeg2thread_ilace"                          \
-    mpeg4="mpeg4 mpeg4_adap mpeg4_qpel mpeg4_qprd mpeg4adv mpeg4nr"     \
-    mpeg4="mpeg4thread error rc"                                        \
-    msmpeg4v3=msmpeg4                                                   \
-    msmpeg4v2                                                           \
-    pbm=pbmpipe                                                         \
-    pcx                                                                 \
-    pgm="pgm pgmpipe"                                                   \
-    png                                                                 \
-    ppm="ppm ppmpipe"                                                   \
-    rawvideo="rgb yuv"                                                  \
-    roq                                                                 \
-    rv10                                                                \
-    rv20                                                                \
-    sgi                                                                 \
-    snow="snow snowll"                                                  \
-    svq1                                                                \
-    targa=tga                                                           \
-    tiff                                                                \
-    wmav1                                                               \
-    wmav2                                                               \
-    wmv1                                                                \
-    wmv2                                                                \
-
 test_deps _muxer _demuxer                                               \
     aiff                                                                \
     pcm_alaw=alaw                                                       \
@@ -2141,7 +2094,6 @@ test_deps _muxer _demuxer                                               \
     wav                                                                 \
     yuv4mpegpipe=yuv4mpeg                                               \
 
-ac3_fixed_test_deps="ac3_fixed_encoder ac3_decoder"
 colormatrix1_test_deps="colormatrix_filter"
 colormatrix2_test_deps="colormatrix_filter"
 flashsv2_test_deps="zlib"
@@ -2241,7 +2193,6 @@ enable avcodec
 enable avdevice
 enable avfilter
 enable avformat
-enable avresample
 enable avutil
 enable postproc
 enable stripping
@@ -2392,14 +2343,13 @@ FILTER_LIST=$(find_things   filter   FILTER   external/FFmpeg/libavfilter/allfil
 #find_tests(){
 #    map "echo ${2}\${v}_test" $(ls "$source_path"/tests/ref/$1 | grep -v '[^-a-z0-9_]')
 #}
-
-#ACODEC_TESTS=$(find_tests acodec)
-#VCODEC_TESTS=$(find_tests vsynth1)
+#
+#LAVF_FATE_TESTS=$(find_tests lavf-fate)
 #LAVF_TESTS=$(find_tests lavf)
 #LAVFI_TESTS=$(find_tests lavfi)
 #SEEK_TESTS=$(find_tests seek seek_)
-
-#pcm_test_deps=$(map 'echo ${v%_*}_decoder $v' $(filter pcm_* $ENCODER_LIST))
+#
+#ALL_TESTS="$LAVF_FATE_TESTS $LAVF_TESTS $LAVFI_TESTS $SEEK_TESTS"
 
 for n in $COMPONENT_LIST; do
     v=$(toupper ${n%s})_LIST
@@ -3680,14 +3630,20 @@ die_license_disabled() {
     enabled $1 || { enabled $2 && die "$2 is $1 and --enable-$1 is not specified."; }
 }
 
+die_license_disabled_gpl() {
+    enabled $1 || { enabled $2 && die "$2 is incompatible with the gpl and --enable-$1 is not specified."; }
+}
+
+#die_license_disabled gpl libcdio
+#die_license_disabled gpl libutvideo
 die_license_disabled gpl libx264
 die_license_disabled gpl libxavs
 die_license_disabled gpl libxvid
-die_license_disabled gpl postproc
 die_license_disabled gpl x11grab
 
 die_license_disabled nonfree libaacplus
 die_license_disabled nonfree libfaac
+#enabled gpl && die_license_disabled_gpl nonfree openssl
 
 die_license_disabled version3 libopencore_amrnb
 die_license_disabled version3 libopencore_amrwb
@@ -5304,8 +5260,6 @@ print_config CONFIG_ "$config_files" $CONFIG_LIST       \
                                      $MYTHTV_CONFIG_LIST \
 
 cat >> $TMPMAK <<EOF
-ACODEC_TESTS=$(print_enabled -n _test $ACODEC_TESTS)
-VCODEC_TESTS=$(print_enabled -n _test $VCODEC_TESTS)
 LAVF_TESTS=$(print_enabled   -n _test $LAVF_TESTS)
 LAVFI_TESTS=$(print_enabled  -n _test $LAVFI_TESTS)
 SEEK_TESTS=$(print_enabled   -n _test $SEEK_TESTS)

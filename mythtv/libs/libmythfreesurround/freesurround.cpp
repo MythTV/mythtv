@@ -40,8 +40,10 @@ using namespace std;
 // our default internal block size, in floats
 static const unsigned default_block_size = SURROUND_BUFSIZE;
 // Gain of center and lfe channels in passive mode (sqrt 0.5)
-static const float center_level = 0.707107; 
+static const float center_level = 0.707107;
 static const float m3db = 0.7071067811865476f;           // 3dB  = SQRT(2)
+static const float m6db = 0.5;                           // 6dB  = SQRT(4)
+static const float m7db = 0.44721359549996;              // 7dB  = SQRT(5)
 
 unsigned int block_size = default_block_size;
 
@@ -92,7 +94,7 @@ public:
             freelist.push_back(i->second);
             pool.erase(i);
         }
-    }    
+    }
 public:
     callback construct;            // object constructor callback
     std::list<void*> freelist;     // list of available objects
@@ -102,11 +104,11 @@ public:
 // buffers which we usually need (and want to share between plugin lifespans)
 struct buffers
 {
-    buffers(unsigned int s): 
+    buffers(unsigned int s):
         l(s),r(s),c(s),ls(s),rs(s),lfe(s), rls(s), rrs(s) { }
     void resize(unsigned int s)
     {
-        l.resize(s); r.resize(s); lfe.resize(s); 
+        l.resize(s); r.resize(s); lfe.resize(s);
         ls.resize(s); rs.resize(s); c.resize(s);
         rls.resize(s); rrs.resize(s);
     }
@@ -192,20 +194,20 @@ void FreeSurround::SetParams()
     {
         decoder->steering_mode(params.steering);
         decoder->phase_mode(params.phasemode);
-        decoder->surround_coefficients(params.coeff_a, params.coeff_b);                
+        decoder->surround_coefficients(params.coeff_a, params.coeff_b);
         decoder->separation(params.front_sep/100.0,params.rear_sep/100.0);
     }
 }
 
-FreeSurround::fsurround_params::fsurround_params(int32_t center_width, 
-                                                 int32_t dimension) : 
-    center_width(center_width), 
+FreeSurround::fsurround_params::fsurround_params(int32_t center_width,
+                                                 int32_t dimension) :
+    center_width(center_width),
     dimension(dimension),
     coeff_a(0.8165),coeff_b(0.5774),
     phasemode(0),
     steering(1),
     front_sep(100),
-    rear_sep(100) 
+    rear_sep(100)
 {
 }
 
@@ -245,8 +247,14 @@ uint FreeSurround::putFrames(void* buffer, uint numFrames, uint numChannels)
             switch (surround_mode)
             {
                 case SurroundModePassive:
+                case SurroundModePassiveHall:
                     for (i = 0; i < numFrames && ic < bs; i++,ic++)
-                        bufs->l[ic] = bufs->c[ic] = bufs->r[ic] = samples[i];
+                    {
+                        // should be -7dB to keep power level the same
+                        // but we bump the level a tad.
+                        bufs->c[ic] = bufs->l[ic] = bufs->r[ic] = samples[i] * m6db;
+                        bufs->ls[ic] = bufs->rs[ic] = bufs->c[ic];
+                    }
                     process = false;
                     break;
                 default:
@@ -256,7 +264,7 @@ uint FreeSurround::putFrames(void* buffer, uint numFrames, uint numChannels)
                     break;
             }
             channels = 6;
-            break;  
+            break;
 
         case 2:
             switch (surround_mode)
@@ -267,9 +275,24 @@ uint FreeSurround::putFrames(void* buffer, uint numFrames, uint numChannels)
                         float lt      = *samples++;
                         float rt      = *samples++;
                         bufs->l[ic]   = lt;
-                        bufs->lfe[ic] = bufs->c[ic]  = (lt+rt) * center_level;
+                        bufs->lfe[ic] = bufs->c[ic] = (lt+rt) * m3db;
                         bufs->r[ic]   = rt;
-                        bufs->ls[ic]  = bufs->rs[ic] = (lt-rt) * center_level;
+                        // surround channels receive out-of-phase
+                        bufs->ls[ic]  = (rt-lt) * 0.5;
+                        bufs->rs[ic]  = (lt-rt) * 0.5;
+                    }
+                    process = false;
+                    break;
+                case SurroundModePassiveHall:
+                    for (i = 0; i < numFrames && ic < bs; i++,ic++)
+                    {
+                        float lt      = *samples++;
+                        float rt      = *samples++;
+                        bufs->l[ic]   = lt * m3db;
+                        bufs->lfe[ic] = bufs->c[ic] = (lt+rt) * m3db;
+                        bufs->r[ic]   = rt * m3db;
+                        bufs->ls[ic]  = bufs->l[ic];
+                        bufs->rs[ic]  = bufs->r[ic];
                     }
                     process = false;
                     break;
@@ -283,7 +306,7 @@ uint FreeSurround::putFrames(void* buffer, uint numFrames, uint numChannels)
                     break;
             }
             channels = 6;
-            break;            
+            break;
 
         case 5:
             for (i = 0; i < numFrames && ic < bs; i++,ic++)
@@ -382,11 +405,11 @@ uint FreeSurround::receiveFrames(void *buffer, uint maxFrames)
         float *lfe = &bufs->lfe[outindex];
         float *rls = &bufs->rls[outindex];
         float *rrs = &bufs->rrs[outindex];
-        for (i = 0; i < maxFrames; i++) 
+        for (i = 0; i < maxFrames; i++)
         {
 //            printf("1:%f 2:%f 3:%f 4:%f 5:%f 6:%f 7:%f 8:%f\n",
 //                   *l, *r, *c, *lfe, *rls, *rrs, *ls, *rs);
-            
+
             // 3F4-LFE   L   R   C    LFE  Rls  Rrs  LS   RS
             *output++ = *l++;
             *output++ = *r++;
@@ -411,7 +434,7 @@ uint FreeSurround::receiveFrames(void *buffer, uint maxFrames)
             float *ls  = &outputs[3][outindex];
             float *rs  = &outputs[4][outindex];
             float *lfe = &outputs[5][outindex];
-            for (i = 0; i < maxFrames; i++) 
+            for (i = 0; i < maxFrames; i++)
             {
                 *output++ = *l++;
                 *output++ = *r++;
@@ -431,7 +454,7 @@ uint FreeSurround::receiveFrames(void *buffer, uint maxFrames)
             float *ls  = &bufs->ls[outindex];
             float *rs  = &bufs->rs[outindex];
             float *lfe = &bufs->lfe[outindex];
-            for (i = 0; i < maxFrames; i++) 
+            for (i = 0; i < maxFrames; i++)
             {
                 *output++ = *l++;
                 *output++ = *r++;
@@ -453,9 +476,9 @@ uint FreeSurround::receiveFrames(void *buffer, uint maxFrames)
 void FreeSurround::process_block()
 {
     // process the data
-    try 
+    try
     {
-        if (decoder) 
+        if (decoder)
         {
             decoder->decode(params.center_width/100.0,params.dimension/100.0);
         }
@@ -465,7 +488,7 @@ void FreeSurround::process_block()
     }
 }
 
-long long FreeSurround::getLatency() 
+long long FreeSurround::getLatency()
 {
     // returns in usec
     if (latency_frames == 0)
@@ -476,13 +499,13 @@ long long FreeSurround::getLatency()
 void FreeSurround::flush()
 {
     if (decoder)
-        decoder->flush(); 
+        decoder->flush();
     bufs->clear();
 }
 
 // load the lib and initialize the interface
-void FreeSurround::open() 
-{        
+void FreeSurround::open()
+{
     if (!decoder)
     {
         decoder = (fsurround_decoder*)dp.acquire((void*)1);
@@ -494,7 +517,7 @@ void FreeSurround::open()
     SetParams();
 }
 
-void FreeSurround::close() 
+void FreeSurround::close()
 {
     if (decoder)
     {

@@ -10,20 +10,32 @@ extern "C" {
 
 extern URLProtocol AVF_RingBuffer_Protocol;
 
-extern int AVF_Write_Packet(void *opaque, uint8_t *buf, int buf_size);
-extern int AVF_Read_Packet(void *opaque, uint8_t *buf, int buf_size);
-extern int64_t AVF_Seek_Packet(void *opaque, int64_t offset, int whence);
-
 class AVFRingBuffer
 {
-  public:
+public:
     AVFRingBuffer(RingBuffer *rbuffer = NULL) { m_rbuffer = rbuffer; }
+    void                SetRingBuffer(RingBuffer *rbuffer)
+    {
+        m_rbuffer = rbuffer;
+    }
+    RingBuffer         *GetRingBuffer(void)
+    {
+        return m_rbuffer;
+    }
+    static URLProtocol *GetRingBufferURLProtocol(void);
+    static int          AVF_Write_Packet(void *opaque, uint8_t *buf, int buf_size);
+    static int          AVF_Read_Packet(void *opaque, uint8_t *buf, int buf_size);
+    static int64_t      AVF_Seek_Packet(void *opaque, int64_t offset, int whence);
+    static int          AVF_Open(URLContext *h, const char *filename, int flags);
+    static int          AVF_Read(URLContext *h, uint8_t *buf, int buf_size);
+    static int          AVF_Write(URLContext *h, const uint8_t *buf, int buf_size);
+    static int64_t      AVF_Seek(URLContext *h, int64_t offset, int whence);
+    static int          AVF_Close(URLContext *h);
 
-    void SetRingBuffer(RingBuffer *rbuffer) { m_rbuffer = rbuffer; }
-    RingBuffer *GetRingBuffer(void)         { return m_rbuffer; }
-
-  private:
-    RingBuffer *m_rbuffer;
+private:
+    RingBuffer         *m_rbuffer;
+    static bool         m_avrprotocol_initialised;
+    static URLProtocol  m_avfrURL;
 };
 
 #endif

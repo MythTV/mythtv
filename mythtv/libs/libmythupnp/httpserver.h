@@ -33,7 +33,6 @@
 #include "serverpool.h"
 #include "httprequest.h"
 #include "mthreadpool.h"
-#include "refcounted.h"
 #include "upnputil.h"
 #include "compat.h"
 

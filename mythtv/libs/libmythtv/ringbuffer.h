@@ -152,6 +152,8 @@ class MTV_PUBLIC RingBuffer : protected MThread
     static const int kDefaultOpenTimeout;
     static const int kLiveTVOpenTimeout;
 
+    static void AVFormatInitNetwork(void);
+
   protected:
     RingBuffer(RingBufferType rbtype);
 
@@ -253,6 +255,9 @@ class MTV_PUBLIC RingBuffer : protected MThread
     static QMutex subExtLock;
     static QStringList subExt;
     static QStringList subExtNoCheck;
+
+  private:
+    static bool gAVformat_net_initialised;
 };
 
 #endif // _RINGBUFFER_H_

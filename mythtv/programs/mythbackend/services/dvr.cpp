@@ -35,6 +35,7 @@
 #include "remoteutil.h"
 
 #include "serviceUtil.h"
+#include <mythscheduler.h>
 
 extern QMap<int, EncoderLink *> tvList;
 extern AutoExpire  *expirer;
@@ -357,7 +358,7 @@ DTC::ProgramList* Dvr::GetUpcomingList( int  nStartIndex,
     pPrograms->setAsOf          ( QDateTime::currentDateTime() );
     pPrograms->setVersion       ( MYTH_BINARY_VERSION );
     pPrograms->setProtoVer      ( MYTH_PROTO_VERSION  );
-
+    
     return pPrograms;
 }
 
@@ -565,8 +566,6 @@ DTC::RecRuleList* Dvr::GetRecordScheduleList( int nStartIndex,
             DTC::RecRule *pRecRule = pRecRules->AddNewRecRule();
 
             FillRecRuleInfo( pRecRule, info->GetRecordingRule() );
-
-            delete info;
         }
     }
 
@@ -579,6 +578,12 @@ DTC::RecRuleList* Dvr::GetRecordScheduleList( int nStartIndex,
     pRecRules->setVersion       ( MYTH_BINARY_VERSION );
     pRecRules->setProtoVer      ( MYTH_PROTO_VERSION  );
 
+    while (!recList.empty())
+    {
+        delete recList.back();
+        recList.pop_back();
+    }
+    
     return pRecRules;
 }
 
@@ -587,13 +592,12 @@ DTC::RecRule* Dvr::GetRecordSchedule( uint nRecordId )
     if (nRecordId <= 0 )
         throw( QString("Record ID appears invalid."));
 
-    RecordingRule *pRule = new RecordingRule();
-    pRule->m_recordID = nRecordId;
-    pRule->Load();
+    RecordingRule rule;
+    rule.m_recordID = nRecordId;
+    rule.Load();
 
     DTC::RecRule *pRecRule = new DTC::RecRule();
-    FillRecRuleInfo( pRecRule, pRule );
-    delete pRule;
+    FillRecRuleInfo( pRecRule, &rule );
 
     return pRecRule;
 }

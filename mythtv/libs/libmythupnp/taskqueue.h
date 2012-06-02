@@ -24,8 +24,11 @@
 // C++ headers
 #include <map>
 
+// Qt headers
+#include <QMutex>
+
 // MythTV headers
-#include "refcounted.h"
+#include "referencecounter.h"
 #include "upnputil.h"
 #include "mthread.h"
 #include "upnpexp.h"
@@ -47,7 +50,7 @@ typedef std::multimap< TaskTime, Task *> TaskMap;
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 
-class Task : public RefCounted 
+class Task : public ReferenceCounter
 {
     protected:
         static long m_nTaskCount;
@@ -62,7 +65,7 @@ class Task : public RefCounted
 
     public:
 
-                        Task(); 
+                        Task(const QString &debugName); 
 
                 long    Id() const { return( m_nTaskId ); }
 

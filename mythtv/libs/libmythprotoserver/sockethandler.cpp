@@ -8,7 +8,8 @@ using namespace std;
 
 SocketHandler::SocketHandler(MythSocket *sock, MythSocketManager *parent,
                   QString hostname) :
-        ReferenceCounter(), m_blockShutdown(false), m_standardEvents(false),
+        ReferenceCounter("SocketHandler"),
+        m_blockShutdown(false), m_standardEvents(false),
         m_systemEvents(false), m_socket(sock), m_parent(parent),
         m_hostname(hostname)
 {

@@ -1,8 +1,9 @@
 This code was resynced upstream to:
 
-git://source.ffmpeg.org/ffmpeg.git at SHA1 d3db8988d on March 31, 2012
-
-git://source.ffmpeg.org/ffmpeg.git at SHA1 ea5dab58e on May 23, 2012
+git://source.ffmpeg.org/ffmpeg.git at SHA1 d3db8988d on March 31, 2012 (Beirdo)
+git://source.ffmpeg.org/ffmpeg.git at SHA1 ea5dab58e on May 23, 2012 (jya)
+git://source.ffmpeg.org/ffmpeg.git at SHA1 cc4d80c on June 1st, 2012 (jya)
+git://source.ffmpeg.org/ffmpeg.git at SHA1 f218121 on June 1st, 2012 (jya)
 
 List of files modified from original FFmpeg:
 Makefile
@@ -27,7 +28,7 @@ libavcodec/mpegaudiodec.c
 libavcodec/mpegaudiodecheader.c
 libavcodec/mpegvideo.c
 libavcodec/mpegvideo.h
-libavcodec/myth_utils.c
+libavcodec/utils-mythtv.c <- new file
 libavcodec/pcm.c
 libavcodec/pgssubdec.c
 libavformat/Makefile
@@ -40,7 +41,7 @@ libavformat/mpegts-mythtv.h  <- new file
 libavformat/mpegts.c
 libavformat/mpegts.h
 libavformat/nuv.c  <- could be ignored, whitespace only
-libavformat/utils-myth.c  <- new file
+libavformat/utils-mythtv.c  <- new file
 libavformat/utils.c
 libavresample/libavresample.v
 libavutil/bswap.h

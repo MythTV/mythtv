@@ -14,13 +14,13 @@ using namespace std;
 #define LOC QString("PlaybackSock: ")
 #define LOC_ERR QString("PlaybackSock, Error: ")
 
-PlaybackSock::PlaybackSock(MainServer *parent, MythSocket *lsock,
-                           QString lhostname, PlaybackSockEventsMode eventsMode)
+PlaybackSock::PlaybackSock(
+    MainServer *parent, MythSocket *lsock,
+    QString lhostname, PlaybackSockEventsMode eventsMode) :
+    ReferenceCounter("PlaybackSock")
 {
     m_parent = parent;
     QString localhostname = gCoreContext->GetHostName();
-
-    refCount = 0;
 
     sock = lsock;
     hostname = lhostname;
@@ -42,25 +42,6 @@ PlaybackSock::PlaybackSock(MainServer *parent, MythSocket *lsock,
 PlaybackSock::~PlaybackSock()
 {
     sock->DownRef();
-}
-
-void PlaybackSock::UpRef(void)
-{
-    QMutexLocker locker(&refLock);
-    refCount++;
-}
-
-bool PlaybackSock::DownRef(void)
-{
-    QMutexLocker locker(&refLock);
-
-    refCount--;
-    if (refCount < 0)
-    {
-        m_parent->DeletePBS(this);
-        return true;
-    }
-    return false;
 }
 
 bool PlaybackSock::wantsEvents(void) const

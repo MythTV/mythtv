@@ -74,7 +74,7 @@ VideoOutputOpenGL::~VideoOutputOpenGL()
     TearDown();
 
     if (gl_context)
-        gl_context->DownRef();
+        gl_context->DecrRef();
     gl_context = NULL;
     gl_context_lock.unlock();
 }
@@ -303,7 +303,7 @@ bool VideoOutputOpenGL::SetupContext(void)
     gl_context = dynamic_cast<MythRenderOpenGL*>(win->GetRenderDevice());
     if (gl_context)
     {
-        gl_context->UpRef();
+        gl_context->IncrRef();
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "Using main UI render context");
         return true;
     }
@@ -325,7 +325,7 @@ bool VideoOutputOpenGL::SetupContext(void)
 
     LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create MythRenderOpenGL device.");
     if (gl_context)
-        gl_context->DownRef();
+        gl_context->DecrRef();
     gl_context = NULL;
     return false;
 }

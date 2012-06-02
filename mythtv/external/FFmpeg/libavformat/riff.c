@@ -199,6 +199,7 @@ const AVCodecTag ff_codec_bmp_tags[] = {
     { CODEC_ID_RAWVIDEO,     MKTAG('Y', 'U', 'V', '9') },
     { CODEC_ID_RAWVIDEO,     MKTAG('Y', 'V', 'U', '9') },
     { CODEC_ID_RAWVIDEO,     MKTAG('a', 'u', 'v', '2') },
+    { CODEC_ID_RAWVIDEO,     MKTAG('Y', 'V', 'Y', 'U') },
     { CODEC_ID_FRWU,         MKTAG('F', 'R', 'W', 'U') },
     { CODEC_ID_R10K,         MKTAG('R', '1', '0', 'k') },
     { CODEC_ID_R210,         MKTAG('r', '2', '1', '0') },
@@ -652,10 +653,11 @@ enum CodecID ff_wav_codec_get_id(unsigned int tag, int bps)
     return id;
 }
 
-int ff_get_bmp_header(AVIOContext *pb, AVStream *st)
+int ff_get_bmp_header(AVIOContext *pb, AVStream *st, unsigned *esize)
 {
     int tag1;
-    avio_rl32(pb); /* size */
+    if(esize) *esize = avio_rl32(pb);
+    else               avio_rl32(pb);
     st->codec->width = avio_rl32(pb);
     st->codec->height = (int32_t)avio_rl32(pb);
     avio_rl16(pb); /* planes */

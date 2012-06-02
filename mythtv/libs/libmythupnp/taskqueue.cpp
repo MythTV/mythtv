@@ -38,7 +38,7 @@ long Task::m_nTaskCount = 0;
 //
 /////////////////////////////////////////////////////////////////////////////
 
-Task::Task()
+Task::Task(const QString &debugName) : ReferenceCounter(debugName)
 {
     m_nTaskId = m_nTaskCount++;
 }
@@ -137,7 +137,7 @@ void TaskQueue::run( )
             try
             {
                 pTask->Execute( this );
-                pTask->Release();
+                pTask->DecrRef();
             }
             catch( ... )
             {
@@ -166,7 +166,7 @@ void TaskQueue::Clear( )
                           ++it )
     {
         if ((*it).second != NULL)
-            (*it).second->Release();
+            (*it).second->DecrRef();
     }
 
     m_mapTasks.clear();
@@ -194,11 +194,10 @@ void TaskQueue::AddTask( long msec, Task *pTask )
 
 void TaskQueue::AddTask( TaskTime ttKey, Task *pTask )
 {
-
     if (pTask != NULL)
     {
-        m_mutex.lock(); 
-        pTask->AddRef();
+        m_mutex.lock();
+        pTask->IncrRef();
         m_mapTasks.insert( TaskMap::value_type( ttKey, pTask ));
         m_mutex.unlock();
     }
