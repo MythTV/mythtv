@@ -5,13 +5,13 @@ TEMPLATE = subdirs
 
 # Directories
 SUBDIRS += invert linearblend denoise3d quickdnr kerneldeint crop force
-SUBDIRS += adjust onefield bobdeint ivtc yadif fieldorder
+SUBDIRS += adjust onefield bobdeint ivtc greedyhdeint yadif fieldorder
 
 contains(CONFIG_POSTPROC, yes): SUBDIRS += postprocess
 
-# greeydy doesn't compile on 32 bits
-contains( QMAKE_CXXFLAGS, "x86_64" ) {
-    SUBDIRS += greedyhdeint
+# greeydy doesn't compile on mac 32 bits
+macx:!contains( QMAKE_CXXFLAGS, "x86_64" ) {
+    SUBDIRS -= greedyhdeint
 }
 
 # This filter is currently broken.
