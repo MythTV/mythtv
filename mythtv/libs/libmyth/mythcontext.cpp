@@ -86,10 +86,8 @@ class MythContextPrivate : public QObject
 
     void ShowConnectionFailurePopup(bool persistent);
     void HideConnectionFailurePopup(void);
-    void ConnectFailurePopupClosed(void);
 
     void ShowVersionMismatchPopup(uint remoteVersion);
-    void VersionMismatchPopupClosed(void);
 
   public:
     MythContext *parent;
@@ -1016,11 +1014,10 @@ void MythContextPrivate::ShowConnectionFailurePopup(bool persistent)
 
 void MythContextPrivate::HideConnectionFailurePopup(void)
 {
-    if (MBEconnectPopup)
-    {
-        MBEconnectPopup->Close();
-        MBEconnectPopup = NULL;
-    }
+    MythConfirmationDialog *dlg = this->MBEconnectPopup;
+    this->MBEconnectPopup = NULL;
+    if (dlg)
+        dlg->Close();
 }
 
 void MythContextPrivate::ShowVersionMismatchPopup(uint remote_version)
