@@ -766,13 +766,14 @@ void NetSearch::slotItemChanged()
     {
         MythUIButtonListItem *item = m_siteList->GetItemCurrent();
 
-        ResultItem *res = new ResultItem(item->GetText(), QString(), QString(),
-              QString(), QString(), QString(), QString(), QDateTime(),
-              0, 0, -1, QString(), QStringList(), QString(), QStringList(), 0, 0, QString(),
-              0, QStringList(), 0, 0, 0);
+        ResultItem res(item->GetText(), QString(), QString(),
+                       QString(), QString(), QString(), QString(),
+                       QDateTime(), 0, 0, -1, QString(), QStringList(),
+                       QString(), QStringList(), 0, 0, QString(),
+                       0, QStringList(), 0, 0, 0);
 
         MetadataMap metadataMap;
-        res->toMap(metadataMap);
+        res.toMap(metadataMap);
         SetTextFromMap(metadataMap);
 
         if (m_thumbImage)
