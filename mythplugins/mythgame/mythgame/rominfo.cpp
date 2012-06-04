@@ -369,7 +369,7 @@ QList<RomInfo*> RomInfo::GetAllRomInfo()
 
 RomInfo *RomInfo::GetRomInfoById(int id)
 {
-    RomInfo *ret = new RomInfo();
+    RomInfo *ret = NULL;
 
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -382,10 +382,7 @@ RomInfo *RomInfo::GetRomInfoById(int id)
     query.bindValue(":INTID", id);
 
     if (!query.exec())
-    {
         MythDB::DBError("GetRomInfoById", query);
-        return ret;
-    }
 
     if (query.next())
     {
@@ -411,6 +408,9 @@ RomInfo *RomInfo::GetRomInfoById(int id)
                            query.value(12).toString(),
                            query.value(17).toString());
     }
+
+    if (!ret)
+        ret = new RomInfo();
 
     return ret;
 }
