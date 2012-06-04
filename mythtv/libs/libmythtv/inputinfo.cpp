@@ -5,10 +5,10 @@
 
 InputInfo::InputInfo(
     const QString &_name,
-    uint _sourceid, uint _inputid, uint _cardid, uint _mplexid,
+    uint _mainsourceid, uint _inputid, uint _cardid, uint _mplexid,
     uint _livetvorder) :
     name(_name),
-    sourceid(_sourceid),
+    mainsourceid(_mainsourceid),
     inputid(_inputid),
     cardid(_cardid),
     mplexid(_mplexid),
@@ -19,7 +19,7 @@ InputInfo::InputInfo(
 
 InputInfo::InputInfo(const InputInfo &other) :
     name(other.name),
-    sourceid(other.sourceid),
+    mainsourceid(other.mainsourceid),
     inputid(other.inputid),
     cardid(other.cardid),
     mplexid(other.mplexid),
@@ -32,7 +32,7 @@ InputInfo &InputInfo::operator=(const InputInfo &other)
 {
     name     = other.name;
     name.detach();
-    sourceid = other.sourceid;
+    mainsourceid = other.mainsourceid;
     inputid  = other.inputid;
     cardid   = other.cardid;
     mplexid  = other.mplexid;
@@ -58,11 +58,11 @@ bool InputInfo::FromStringList(QStringList::const_iterator &it,
     name     = (name == "<EMPTY>") ? QString::null : name;
     NEXT();
 
-    sourceid = (*it).toUInt(); NEXT();
-    inputid  = (*it).toUInt(); NEXT();
-    cardid   = (*it).toUInt(); NEXT();
-    mplexid  = (*it).toUInt(); NEXT();
-    livetvorder = (*it).toUInt(); ++it;
+    mainsourceid = (*it).toUInt(); NEXT();
+    inputid      = (*it).toUInt(); NEXT();
+    cardid       = (*it).toUInt(); NEXT();
+    mplexid      = (*it).toUInt(); NEXT();
+    livetvorder  = (*it).toUInt(); ++it;
 
     return true;
 }
@@ -71,7 +71,7 @@ bool InputInfo::FromStringList(QStringList::const_iterator &it,
 void InputInfo::ToStringList(QStringList &list) const
 {
     list.push_back(name.isEmpty() ? "<EMPTY>" : name);
-    list.push_back(QString::number(sourceid));
+    list.push_back(QString::number(mainsourceid));
     list.push_back(QString::number(inputid));
     list.push_back(QString::number(cardid));
     list.push_back(QString::number(mplexid));
@@ -80,9 +80,9 @@ void InputInfo::ToStringList(QStringList &list) const
 
 TunedInputInfo::TunedInputInfo(
     const QString &_name,
-    uint _sourceid, uint _inputid, uint _cardid, uint _mplexid,
+    uint _mainsourceid, uint _inputid, uint _cardid, uint _mplexid,
     uint _livetvorder, uint _chanid) :
-    InputInfo(_name, _sourceid, _inputid, _cardid, _mplexid, _livetvorder), 
+    InputInfo(_name, _mainsourceid, _inputid, _cardid, _mplexid, _livetvorder),
     chanid(_chanid)
 {
 }

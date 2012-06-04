@@ -346,7 +346,7 @@ ChannelUtil::GetChannelSourceID(variablesrcid, channum, GetCurrentInputNum(), ma
     {
         // We need to pull the pid_cache since there are no tuning tables
         pid_cache_t pid_cache;
-        int chanid = ChannelUtil::GetChanID((*it)->sourceid, channum);
+        int chanid = ChannelUtil::GetChanID((*it)->mainsourceid, channum);
         ChannelUtil::GetCachedPids(chanid, pid_cache);
         if (pid_cache.empty())
         {

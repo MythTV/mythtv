@@ -1250,10 +1250,10 @@ bool CardUtil::GetInputInfo(InputInfo &input, vector<uint> *groupids)
     if (!query.next())
         return false;
 
-    input.name     = query.value(0).toString();
-    input.sourceid = query.value(1).toUInt();
-    input.cardid   = query.value(2).toUInt();
-    input.livetvorder = query.value(3).toUInt();
+    input.name         = query.value(0).toString();
+    input.mainsourceid = query.value(1).toUInt();
+    input.cardid       = query.value(2).toUInt();
+    input.livetvorder  = query.value(3).toUInt();
 
     if (groupids)
         *groupids = GetInputGroups(input.inputid);
@@ -1419,7 +1419,6 @@ vector<uint> CardUtil::GetInputIDs(uint cardid)
 }
 
 int CardUtil::CreateCardInput(const uint cardid,
-                              const uint sourceid,					//FIXME: THIS IS NO LONGER STORED IN CARDINPUT
                               const QString &inputname,
                               const QString &externalcommand,
                               const QString &changer_device,
@@ -1517,7 +1516,7 @@ bool CardUtil::DeleteVideoSourceMap(uint videosourcemapid)
 
 bool CardUtil::DeleteUnusedInputs(void)
 {
-    MSqlQuery query(MSqlQuery::InitCon());			//FIXME: THIS WILL DELETE A CARD IF *ANY* LINKED MAPS HAVE A SOURCEID OF 0 OR NULL.
+    MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT cardinput.cardinputid "
                   "FROM cardinput "
                   "LEFT JOIN videosourcemap "

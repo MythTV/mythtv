@@ -261,7 +261,6 @@ class MTV_PUBLIC CardUtil
 
     // Input creation and deletion
     static int           CreateCardInput(const uint cardid,
-                                         const uint sourceid,
                                          const QString &inputname,
                                          const QString &externalcommand,
                                          const QString &changer_device,

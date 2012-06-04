@@ -502,7 +502,7 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
             }
 
             if (is_busy &&
-                ((sourceid != busy_input.sourceid) ||
+                ((sourceid != busy_input.mainsourceid) ||
                  (mplexid  != busy_input.mplexid)))
             {
                 states.push_back((TVState) RemoteGetState(cardids[i]));

@@ -143,7 +143,7 @@ IPTVChannelInfo IPTVChannel::GetChanInfo(
             LOG(VB_GENERAL, LOG_ERR, msg);
             return dummy;
         }
-        sourceid = (*it)->sourceid;
+        sourceid = (*it)->mainsourceid;
     }
 
     MSqlQuery query(MSqlQuery::InitCon());

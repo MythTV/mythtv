@@ -212,7 +212,7 @@ bool ChannelBase::IsTunable(const QString &input, const QString &channum) const
     bool commfree, use_on_air_guide, visible;
     QString xmltvid, default_authority, icon;
 
-    if (!ChannelUtil::GetChannelData((*it)->sourceid, channum,
+    if (!ChannelUtil::GetChannelData((*it)->mainsourceid, channum,
                                      tvformat, modulation, freqtable, freqid,
                                      finetune, frequency, dtv_si_std,
                                      mpeg_prog_num, atsc_major, atsc_minor,
@@ -248,7 +248,7 @@ uint ChannelBase::GetNextChannel(uint chanid, int direction) const
         if (it == m_inputs.end())
             return 0;
 
-        chanid = ChannelUtil::GetChanID((*it)->sourceid, m_curchannelname);
+        chanid = ChannelUtil::GetChanID((*it)->mainsourceid, m_curchannelname);
     }
 
     uint mplexid_restriction = 0;
@@ -264,7 +264,7 @@ uint ChannelBase::GetNextChannel(const QString &channum, int direction) const
     if (it == m_inputs.end())
         return 0;
 
-    uint chanid = ChannelUtil::GetChanID((*it)->sourceid, channum);
+    uint chanid = ChannelUtil::GetChanID((*it)->mainsourceid, channum);
     return GetNextChannel(chanid, direction);
 }
 
@@ -298,7 +298,7 @@ int ChannelBase::GetNextInputNum(void) const
         }
         skip_incr = false;
 
-        if ((*it)->sourceid)
+        if ((*it)->mainsourceid)
             break;
     }
 
@@ -315,7 +315,7 @@ QStringList ChannelBase::GetConnectedInputs(void) const
 
     InputMap::const_iterator it = m_inputs.begin();
     for (; it != m_inputs.end(); ++it)
-        if ((*it)->sourceid)
+        if ((*it)->mainsourceid)
             list.push_back((*it)->name);
 
     return list;
@@ -460,13 +460,13 @@ static bool is_input_group_busy(
     bool is_busy_input = false;
 
     for (uint i = 0; i < conflicts.size() && !is_busy_input; i++)
-        is_busy_input = (in.sourceid != conflicts[i].sourceid);
+        is_busy_input = (in.mainsourceid != conflicts[i].mainsourceid);
 
     if (is_busy_input)
         return true;
 
     // If the source's channels aren't digitally tuned then there is a conflict
-    is_busy_input = !SourceUtil::HasDigitalChannel(in.sourceid);
+    is_busy_input = !SourceUtil::HasDigitalChannel(in.mainsourceid);
     if (!is_busy_input && conflicts[0].chanid)
     {
         MSqlQuery query(MSqlQuery::InitCon());
@@ -890,7 +890,7 @@ int ChannelBase::GetChanID() const
                   "WHERE channum  = :CHANNUM AND "
                   "      sourceid = :SOURCEID");
     query.bindValue(":CHANNUM", m_curchannelname);
-    query.bindValue(":SOURCEID", (*it)->sourceid);
+    query.bindValue(":SOURCEID", (*it)->mainsourceid);
 
     if (!query.exec() || !query.isActive())
     {
@@ -932,9 +932,9 @@ bool ChannelBase::InitializeInputs(void)
         "WHERE cardid = :CARDID AND "
         "      cardinput.cardinputid = videosourcemap.cardinputid AND "
         "      type = 'main'");
-    /////////////////////////////////////////
-    // MAY NEED TO WORK WITH THIS MORE.... //
-    /////////////////////////////////////////
+    ///////////////////////////////////////////////
+    // TODO: MAY NEED TO WORK WITH THIS MORE.... //
+    ///////////////////////////////////////////////
 
     query.bindValue(":CARDID", cardid);
 
@@ -956,15 +956,15 @@ bool ChannelBase::InitializeInputs(void)
     QString order = gCoreContext->GetSetting("ChannelOrdering", "channum");
     while (query.next())
     {
-        uint sourceid = query.value(5).toUInt();										//HERE IS WHERE A BLANKET SOURCEID IS BEING DETERMINED FOR THE CARD!!!!
-        DBChanInfoList channels = ChannelUtil::GetChannels(sourceid, false);
+        uint mainsourceid = query.value(5).toUInt();										//HERE IS WHERE A BLANKET SOURCEID IS BEING DETERMINED FOR THE CARD!!!!
+        DBChanInfoList channels = ChannelUtil::GetChannels(mainsourceid, false);
 
         ChannelUtil::SortChannels(channels, order);
 
         m_inputs[query.value(0).toUInt()] = new ChannelInputInfo(
             query.value(1).toString(), query.value(2).toString(),
             query.value(3).toString(), query.value(4).toString(),
-            sourceid,                  cardid,
+            mainsourceid,              cardid,
             query.value(0).toUInt(),   query.value(5).toUInt(),
             0,                         channels);
 
@@ -994,7 +994,7 @@ bool ChannelBase::InitializeInputs(void)
         LOG(VB_CHANNEL, LOG_INFO, LOC +
             QString("Input #%1: '%2' schan(%3) sourceid(%4) ccid(%5)")
             .arg(it.key()).arg((*it)->name).arg((*it)->startChanNum)
-            .arg((*it)->sourceid).arg((*it)->cardid));
+            .arg((*it)->mainsourceid).arg((*it)->cardid));
     }
     LOG(VB_CHANNEL, LOG_INFO, LOC + QString("Current Input #%1: '%2'")
         .arg(GetCurrentInputNum()).arg(GetCurrentInput()));
@@ -1016,7 +1016,7 @@ void ChannelBase::Renumber(uint sourceid,
         bool skip = ((*it)->name.isEmpty()                ||
                      (*it)->startChanNum.isEmpty()        ||
                      (*it)->startChanNum != oldChanNum ||
-                     (*it)->sourceid     != sourceid);
+                     (*it)->mainsourceid     != sourceid);
         if (!skip)
             (*it)->startChanNum = newChanNum;
     }
