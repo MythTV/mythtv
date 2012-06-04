@@ -115,7 +115,7 @@ void GameScannerThread::updateDB()
         if (!(*p).indb)
         {
             RomInfo add(0, (*p).romfile, (*p).system,
-                        (*p).romname, "", "", "", (*p).rompath,
+                        (*p).romname, "", "", false, (*p).rompath,
                         "", "", 0, (*p).gametype, 0, "", "", "",
                         "", "", "", "", "");
             add.SaveToDatabase();
