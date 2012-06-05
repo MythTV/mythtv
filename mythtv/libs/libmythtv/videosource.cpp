@@ -561,7 +561,6 @@ void CrossSourceCardInputSel::fillSelections()
         "WHERE hostname = :HOSTNAME "
         "ORDER BY cardid");
     query.bindValue(":HOSTNAME", gCoreContext->GetHostName());
-
     if (!query.exec())
     {
         MythDB::DBError("CardInputEditor::load", query);
@@ -584,7 +583,6 @@ void CrossSourceCardInputSel::fillSelections()
 
         QStringList        inputLabels;
         vector<CardInput*> cardInputs;
-
         CardUtil::GetCardInputs(cardid, videodevice, cardtype,
                                 inputLabels, cardInputs, false);
 
@@ -3104,11 +3102,12 @@ CardInput::CardInput(bool isDTVcard,  bool isDVBcard,
     basic->addChild(inputname);
     basic->addChild(new InputDisplayName(*this));
 
+    maptype = QString("main");
+    initialcid = 0;
+
     basic->addChild(sourceid);
     basic->addChild(sourcecid);
     basic->addChild(sourcemaptype);
-
-    maptype = QString("main");
 
     if (!isDTVcard)
     {
@@ -3199,9 +3198,8 @@ void CardInput::SetSourceID(const QString &sourceid)
 
 int CardInput::findSourceMapID(void) const
 {
-    MSqlQuery query(MSqlQuery::InitCon());
-
-    if (sourceid->getValue() > 0)
+	MSqlQuery query(MSqlQuery::InitCon());
+    if (sourceid->getValue().toInt() > 0)
     {
         query.prepare(
             "SELECT mapid "
@@ -3224,7 +3222,7 @@ int CardInput::findSourceMapID(void) const
             "     (type = :MAPTYPE            OR  "
             "      type = '') ");
 
-        query.bindValue(":CARDINPUTID", initialcid);
+        query.bindValue(":CARDINPUTID", getInputID());
         query.bindValue(":MAPTYPE", maptype);
     }
 
@@ -3247,6 +3245,8 @@ bool CardInput::setSourceMap(const QString &_maptype, const int _sourceid, const
 {
     maptype = _maptype;
     initialcid = _initialcid;
+
+    // load desired sourceid into variable as this will be used in findmapid query
     sourceid->setValue(QString::number(_sourceid));
     loadByID(getInputID());
 
