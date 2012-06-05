@@ -66,7 +66,6 @@ class MUI_PUBLIC MythRenderVDPAU : public MythRender
     bool        CreateDummy(void);
 
     MythRenderVDPAU();
-   ~MythRenderVDPAU();
 
     uint GetColorKey(void)         { return m_colorKey;  }
     void SetPreempted(void)        { m_preempted = true; }
@@ -138,6 +137,7 @@ class MUI_PUBLIC MythRenderVDPAU : public MythRender
     void  Decode(uint id, struct vdpau_render_state *render);
 
   private:
+    virtual ~MythRenderVDPAU();
     bool CreateDevice(void);
     bool GetProcs(void);
     bool CreatePresentationQueue(void);

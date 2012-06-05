@@ -9,5 +9,10 @@ SUBDIRS += adjust onefield bobdeint ivtc greedyhdeint yadif fieldorder
 
 contains(CONFIG_POSTPROC, yes): SUBDIRS += postprocess
 
+# greeydy doesn't compile on mac 32 bits
+macx:!contains( QMAKE_CXXFLAGS, "x86_64" ) {
+    SUBDIRS -= greedyhdeint
+}
+
 # This filter is currently broken.
 # SUBDIRS += convert
