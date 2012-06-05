@@ -567,7 +567,7 @@ void ProgDetails::loadPage(void)
     if (statusDate.isValid())
         s += " " + MythDate::toString(statusDate, MythDate::kDateFull | MythDate::kAddYear);
 
-    addItem("MYTHTV_STATUS", QString("MythTV " + tr("Status")), s);
+    addItem("MYTHTV_STATUS", tr("MythTV Status"), s);
 
     QString recordingRule;
     QString lastRecorded;
