@@ -5,6 +5,7 @@
 #include <QCoreApplication>
 #include <QWaitCondition>
 #include <QDateTime>
+#include <QLocale>
 #include <QTimer>
 #include <QMap>
 
@@ -1255,30 +1256,29 @@ void PlaybackBox::UpdateUsageUI(void)
     double freeSpaceTotal = (double) m_helper.GetFreeSpaceTotalMB();
     double freeSpaceUsed  = (double) m_helper.GetFreeSpaceUsedMB();
 
+    QLocale locale = gCoreContext->GetQLocale();
     InfoMap usageMap;
-    usageMap["diskspacetotal"] = QString().sprintf("%0.2f",
-                                                   freeSpaceTotal / 1024.0);
-    usageMap["diskspaceused"] = QString().sprintf("%0.2f",
-                                                  freeSpaceUsed / 1024.0);
-    usageMap["diskspacefree"] = QString().sprintf("%0.2f",
-                                    (freeSpaceTotal - freeSpaceUsed) / 1024.0);
-
-    QString usestr;
+    usageMap["diskspacetotal"] = locale.toString((freeSpaceTotal / 1024.0),
+                                               'f', 2);
+    usageMap["diskspaceused"] = locale.toString((freeSpaceUsed / 1024.0),
+                                               'f', 2);
+    usageMap["diskspacefree"] = locale.toString(
+                                    ((freeSpaceTotal - freeSpaceUsed) / 1024.0),
+                                    'f', 2);
 
     double perc = 0.0;
     if (freeSpaceTotal > 0.0)
         perc = (100.0 * freeSpaceUsed) / freeSpaceTotal;
 
-    usageMap["diskspacepercentused"] = QString().number((int)perc);
-    usageMap["diskspacepercentfree"] = QString().number(100 - (int)perc);
+    usageMap["diskspacepercentused"] = QString::number((int)perc);
+    usageMap["diskspacepercentfree"] = QString::number(100 - (int)perc);
 
-    usestr.sprintf("%d", (int)perc);
-    usestr = usestr + tr("% used");
+    QString size = locale.toString(((freeSpaceTotal - freeSpaceUsed) / 1024.0),
+                                   'f', 2);
 
-    QString size;
-    size.sprintf("%0.2f", (freeSpaceTotal - freeSpaceUsed) / 1024.0);
-    QString rep = tr(", %1 GB free").arg(size);
-    usestr = usestr + rep;
+    QString usestr = tr("%1% used, %2 GB free", "Diskspace")
+                                                .arg(QString::number((int)perc))
+                                                .arg(size);
 
     if (freereportText)
         freereportText->SetText(usestr);
