@@ -41,7 +41,7 @@ using namespace std;
 #define INT_FROM_LIST(x)     do { NEXT_STR(); (x) = ts.toLongLong(); } while (0)
 #define ENUM_FROM_LIST(x, y) do { NEXT_STR(); (x) = ((y)ts.toInt()); } while (0)
 #define DATETIME_FROM_LIST(x) \
-    do { NEXT_STR(); (x).setTime_t(ts.toUInt()); } while (0)
+    do { NEXT_STR(); x = fromTime_t(ts.toUInt()); } while (0)
 #define STR_FROM_LIST(x)     do { NEXT_STR(); (x) = ts; } while (0)
 
 #define LOC QString("FileSystemInfo: ")

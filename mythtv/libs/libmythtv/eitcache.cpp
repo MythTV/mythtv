@@ -11,6 +11,7 @@
 #include "mythcontext.h"
 #include "mythdb.h"
 #include "mythlogging.h"
+#include "mythdate.h"
 
 #define LOC QString("EITCache: ")
 
@@ -22,7 +23,7 @@ EITCache::EITCache()
       entryCnt(0), pruneCnt(0), prunedHitCnt(0), wrongChannelHitCnt(0)
 {
     // 24 hours ago
-    lastPruneTime = QDateTime::currentDateTime().toUTC().toTime_t() - 86400;
+    lastPruneTime = MythDate::current().toUTC().toTime_t() - 86400;
 }
 
 EITCache::~EITCache()
@@ -162,7 +163,7 @@ static bool lock_channel(int chanid, uint lastPruneTime)
     }
     else
     {
-        uint now = QDateTime::currentDateTime().toTime_t();
+        uint now = MythDate::current().toTime_t();
         qstr = "INSERT INTO eit_cache "
                "       ( chanid,  endtime,  status) "
                "VALUES (:CHANID, :ENDTIME, :STATUS)";
@@ -199,7 +200,7 @@ static void unlock_channel(int chanid, uint updated)
         MythDB::DBError("Error deleting channel lock", query);
 
     // inserting statistics
-    uint now = QDateTime::currentDateTime().toTime_t();
+    uint now = MythDate::current().toTime_t();
     qstr = "REPLACE INTO eit_cache "
            "       ( chanid,  eventid,  endtime,  status) "
            "VALUES (:CHANID, :EVENTID, :ENDTIME, :STATUS)";
@@ -379,8 +380,7 @@ uint EITCache::PruneOldEntries(uint timestamp)
 {
     if (VERBOSE_LEVEL_CHECK(VB_EIT, LOG_INFO))
     {
-        QDateTime tmptime;
-        tmptime.setTime_t(timestamp);
+        QDateTime tmptime = MythDate::fromTime_t(timestamp);
         LOG(VB_EIT, LOG_INFO,
             LOC + "Pruning all entries that ended before UTC " +
             tmptime.toString(Qt::ISODate));

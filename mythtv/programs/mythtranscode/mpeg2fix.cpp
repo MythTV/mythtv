@@ -22,6 +22,7 @@
 #include <QFileInfo>
 
 #include "mythlogging.h"
+#include "mythdate.h"
 #include "mthread.h"
 
 #ifdef USING_MINGW
@@ -261,7 +262,7 @@ MPEG2fixup::MPEG2fixup(const QString &inf, const QString &outf,
         }
         else
             status_update_time = 5;
-        statustime = QDateTime::currentDateTime();
+        statustime = MythDate::current();
         statustime = statustime.addSecs(status_update_time);
 
         const QFileInfo finfo(inf);
@@ -1291,7 +1292,7 @@ int MPEG2fixup::GetFrame(AVPacket *pkt)
         }
         pkt->duration = framenum++;
         if ((showprogress || update_status) &&
-            QDateTime::currentDateTime() > statustime)
+            MythDate::current() > statustime)
         {
             float percent_done = 100.0 * pkt->pos / filesize;
             if (update_status)
@@ -1301,7 +1302,7 @@ int MPEG2fixup::GetFrame(AVPacket *pkt)
                         .arg(percent_done, 0, 'f', 1));
             if (check_abort && check_abort())
                 return REENCODE_STOPPED;
-            statustime = QDateTime::currentDateTime();
+            statustime = MythDate::current();
             statustime = statustime.addSecs(status_update_time);
         }
 

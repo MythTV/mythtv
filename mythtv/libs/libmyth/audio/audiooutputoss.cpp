@@ -24,7 +24,8 @@ using namespace std;
 
 #include "mythcorecontext.h"
 #include "audiooutputoss.h"
-#include "mythmiscutil.h"
+#include "mythtimer.h"
+#include "mythdate.h"
 
 AudioOutputOSS::AudioOutputOSS(const AudioSettings &settings) :
     AudioOutputBase(settings),

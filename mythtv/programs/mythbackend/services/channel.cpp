@@ -126,7 +126,7 @@ DTC::ChannelInfoList* Channel::GetChannelInfoList( int nSourceID,
     pChannelInfos->setCurrentPage   ( curPage         );
     pChannelInfos->setTotalPages    ( totalPages      );
     pChannelInfos->setTotalAvailable( chanList.size() );
-    pChannelInfos->setAsOf          ( QDateTime::currentDateTime() );
+    pChannelInfos->setAsOf          ( MythDate::current() );
     pChannelInfos->setVersion       ( MYTH_BINARY_VERSION );
     pChannelInfos->setProtoVer      ( MYTH_PROTO_VERSION  );
 
@@ -305,7 +305,7 @@ DTC::VideoSourceList* Channel::GetVideoSourceList()
         pVideoSource->setNITId         ( query.value(9).toInt()       );
     }
 
-    pList->setAsOf          ( QDateTime::currentDateTime() );
+    pList->setAsOf          ( MythDate::current() );
     pList->setVersion       ( MYTH_BINARY_VERSION );
     pList->setProtoVer      ( MYTH_PROTO_VERSION  );
 
@@ -581,7 +581,7 @@ DTC::VideoMultiplexList* Channel::GetVideoMultiplexList( int nSourceID,
     pVideoMultiplexes->setCurrentPage   ( curPage         );
     pVideoMultiplexes->setTotalPages    ( totalPages      );
     pVideoMultiplexes->setTotalAvailable( muxCount        );
-    pVideoMultiplexes->setAsOf          ( QDateTime::currentDateTime() );
+    pVideoMultiplexes->setAsOf          ( MythDate::current() );
     pVideoMultiplexes->setVersion       ( MYTH_BINARY_VERSION );
     pVideoMultiplexes->setProtoVer      ( MYTH_PROTO_VERSION  );
 

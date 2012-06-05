@@ -9,6 +9,7 @@ using namespace std;
 #include <QMutex>
 #include <QSize>
 
+#include "referencecounter.h"
 #include "programinfo.h" // For RecStatusType
 #include "inputinfo.h"
 
@@ -23,15 +24,12 @@ typedef enum {
     kPBSEvents_SystemOnly = 3
 } PlaybackSockEventsMode;
 
-class PlaybackSock
+class PlaybackSock : public ReferenceCounter
 {
   public:
     PlaybackSock(MainServer *parent, MythSocket *lsock,
                  QString lhostname, PlaybackSockEventsMode eventsMode);
     virtual ~PlaybackSock();
-
-    void UpRef(void);
-    bool DownRef(void);
 
     void SetDisconnected(void) { disconnected = true; }
     bool IsDisconnected(void) const { return disconnected; }
@@ -118,13 +116,10 @@ class PlaybackSock
     bool backend;
     bool mediaserver;
 
-    QMutex refLock;
     QMutex sockLock;
 
     bool expectingreply;
     bool disconnected;
-
-    int refCount;
 
     MainServer *m_parent;
 };

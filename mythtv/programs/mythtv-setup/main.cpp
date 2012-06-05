@@ -348,7 +348,6 @@ int main(int argc, char *argv[])
 
     if (use_display)
     {
-        gCoreContext->OverrideSettingForSession("Theme", DEFAULT_UI_THEME);
         GetMythUI()->LoadQtConfig();
 
         QString fileprefix = GetConfDir();
@@ -462,7 +461,8 @@ int main(int argc, char *argv[])
             printf("%5i %6i %8i %8s    %20s\n",
                    scans[i].scanid,   scans[i].cardid,
                    scans[i].sourceid, (scans[i].processed) ? "yes" : "no",
-                   scans[i].scandate.toString().toAscii().constData());
+                   scans[i].scandate.toString(Qt::ISODate)
+                   .toAscii().constData());
         }
         cout<<endl;
 

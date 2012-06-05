@@ -6,12 +6,13 @@
 #include <QRegExp>
 
 #include "mythcorecontext.h"
+#include "mythmiscutil.h"
 #include "mythcontext.h"
 #include "mythdb.h"
 #include "storagegroup.h"
 #include "remotefile.h"
 #include "remoteutil.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 #include "mythlogging.h"
 #include "globals.h"
 #include "dbaccess.h"
@@ -1175,8 +1176,8 @@ void VideoMetadata::toMap(MetadataMap &metadataMap)
     metadataMap["playcount"] = QString::number(GetPlayCount());
     metadataMap["year"] = GetDisplayYear(GetYear());
 
-    metadataMap["releasedate"] = MythDateToString(GetReleaseDate(), kDateFull |
-                                                                    kAddYear);
+    metadataMap["releasedate"] = MythDate::toString(
+        GetReleaseDate(), MythDate::kDateFull | MythDate::kAddYear);
 
     metadataMap["userrating"] = GetDisplayUserRating(GetUserRating());
 
@@ -1199,8 +1200,8 @@ void VideoMetadata::toMap(MetadataMap &metadataMap)
 
     GetStateMap(metadataMap);
 
-    metadataMap["insertdate"] = MythDateToString(GetInsertdate(), kDateFull |
-                                                                  kAddYear);
+    metadataMap["insertdate"] = MythDate::toString(
+        GetInsertdate(), MythDate::kDateFull | MythDate::kAddYear);
     metadataMap["inetref"] = GetInetRef();
     metadataMap["homepage"] = GetHomepage();
     metadataMap["child_id"] = QString::number(GetChildID());

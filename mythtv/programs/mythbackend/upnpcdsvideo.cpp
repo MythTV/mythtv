@@ -13,7 +13,7 @@
 // MythTV headers
 #include "upnpcdsvideo.h"
 #include "httprequest.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 #include "mythcorecontext.h"
 #include "storagegroup.h"
 
@@ -357,7 +357,7 @@ void UPnpCDSVideo::AddItem( const UPnpCDSRequest    *pRequest,
     }
     QFileInfo fInfo( sFullFileName );
 
-    pItem->SetPropValue( "date", dtInsertDate.toString( "yyyy-MM-dd"));
+    pItem->SetPropValue( "date", dtInsertDate.toString("yyyy-MM-dd"));
     pResults->Add( pItem );
 
     // ----------------------------------------------------------------------

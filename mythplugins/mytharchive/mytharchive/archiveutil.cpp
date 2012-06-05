@@ -19,7 +19,7 @@ using namespace std;
 #include <programinfo.h>
 #include <mythmainwindow.h>
 #include <mythdialogbox.h>
-#include <mythmiscutil.h>
+#include <mythdate.h>
 #include <mythsystem.h>
 #include <exitcodes.h>
 #include <mythlogging.h>
@@ -191,7 +191,7 @@ ProgramInfo *getProgramInfoForFile(const QString &inFile)
     if (bIsMythRecording)
     {
         uint chanid = chanID.toUInt();
-        QDateTime recstartts = myth_dt_from_string(startTime);
+        QDateTime recstartts = MythDate::fromString(startTime);
         pinfo = new ProgramInfo(chanid, recstartts);
         if (pinfo->GetChanID())
         {

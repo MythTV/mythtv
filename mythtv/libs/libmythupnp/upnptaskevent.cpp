@@ -27,7 +27,8 @@
 
 UPnpEventTask::UPnpEventTask( QHostAddress peerAddress,
                               int          nPeerPort,  
-                              QByteArray  *pPayload )
+                              QByteArray  *pPayload ) :
+    Task("UPnpEventTask")
 {
     m_PeerAddress = peerAddress;
     m_nPeerPort   = nPeerPort;

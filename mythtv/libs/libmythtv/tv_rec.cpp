@@ -34,7 +34,7 @@
 #include "jobqueue.h"
 #include "mythdb.h"
 #include "tv_rec.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 #include "osd.h"
 
 #define DEBUG_CHANNEL_PREFIX 0 /**< set to 1 to channel prefixing */
@@ -299,7 +299,7 @@ void TVRec::RecordPending(const ProgramInfo *rcinfo, int secsleft,
 
     PendingInfo pending;
     pending.info            = new ProgramInfo(*rcinfo);
-    pending.recordingStart  = QDateTime::currentDateTime().addSecs(secsleft);
+    pending.recordingStart  = MythDate::current().addSecs(secsleft);
     pending.hasLaterShowing = hasLater;
     pending.ask             = true;
     pending.doNotAsk        = false;
@@ -432,8 +432,8 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
 
         msg = QString("updating recording: %1 %2 %3 %4")
             .arg(curRecording->GetTitle()).arg(curRecording->GetChanID())
-            .arg(curRecording->GetRecordingStartTime(ISODate))
-            .arg(curRecording->GetRecordingEndTime(ISODate));
+            .arg(curRecording->GetRecordingStartTime(MythDate::ISODate))
+            .arg(curRecording->GetRecordingEndTime(MythDate::ISODate));
         LOG(VB_RECORD, LOG_INFO, LOC + msg);
 
         ClearFlags(kFlagCancelNextRecording);
@@ -616,8 +616,8 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
     {
         msg = QString("Wanted to record: %1 %2 %3 %4\n\t\t\t")
             .arg(rcinfo->GetTitle()).arg(rcinfo->GetChanID())
-            .arg(rcinfo->GetRecordingStartTime(ISODate))
-            .arg(rcinfo->GetRecordingEndTime(ISODate));
+            .arg(rcinfo->GetRecordingStartTime(MythDate::ISODate))
+            .arg(rcinfo->GetRecordingEndTime(MythDate::ISODate));
 
         if (cancelNext)
         {
@@ -634,8 +634,8 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
         if (curRecording && internalState == kState_RecordingOnly)
             msg += QString("\n\t\t\tCurrently recording: %1 %2 %3 %4")
                 .arg(curRecording->GetTitle()).arg(curRecording->GetChanID())
-                .arg(curRecording->GetRecordingStartTime(ISODate))
-                .arg(curRecording->GetRecordingEndTime(ISODate));
+                .arg(curRecording->GetRecordingStartTime(MythDate::ISODate))
+                .arg(curRecording->GetRecordingEndTime(MythDate::ISODate));
 
         LOG(VB_GENERAL, LOG_INFO, LOC + msg);
     }
@@ -821,7 +821,7 @@ void TVRec::FinishedRecording(RecordingInfo *curRec, RecordingQuality *recq)
         curRec->SetRecordingStatus(rsRecorded);
     else if (curRec->GetRecordingStatus() != rsRecorded)
         curRec->SetRecordingStatus(rsFailed);
-    curRec->SetRecordingEndTime(mythCurrentDateTime());
+    curRec->SetRecordingEndTime(MythDate::current(true));
     is_good &= (curRec->GetRecordingStatus() == rsRecorded);
 
     // Figure out if this was already done for this recording
@@ -830,7 +830,7 @@ void TVRec::FinishedRecording(RecordingInfo *curRec, RecordingQuality *recq)
     static QHash<QString,QDateTime> finRecMap;
     {
         QMutexLocker locker(&finRecLock);
-        QDateTime now = QDateTime::currentDateTime();
+        QDateTime now = MythDate::current();
         QDateTime expired = now.addSecs(-60*5);
         QHash<QString,QDateTime>::iterator it = finRecMap.begin();
         while (it != finRecMap.end())
@@ -906,9 +906,9 @@ void TVRec::FinishedRecording(RecordingInfo *curRec, RecordingQuality *recq)
         MythEvent me(QString("UPDATE_RECORDING_STATUS %1 %2 %3 %4 %5")
                      .arg(curRec->GetCardID())
                      .arg(curRec->GetChanID())
-                     .arg(curRec->GetScheduledStartTime(ISODate))
+                     .arg(curRec->GetScheduledStartTime(MythDate::ISODate))
                      .arg(curRec->GetRecordingStatus())
-                     .arg(curRec->GetRecordingEndTime(ISODate)));
+                     .arg(curRec->GetRecordingEndTime(MythDate::ISODate)));
         gCoreContext->dispatch(me);
     }
 
@@ -916,11 +916,11 @@ void TVRec::FinishedRecording(RecordingInfo *curRec, RecordingQuality *recq)
     curRec->FinishedRecording(!is_good || (recgrp == "LiveTV"));
 
     // send out REC_FINISHED message
-    SendMythSystemRecEvent("REC_FINISHED", curRecording);
+    SendMythSystemRecEvent("REC_FINISHED", curRec);
 
     // send out DONE_RECORDING message
     int secsSince = curRec->GetRecordingStartTime()
-        .secsTo(QDateTime::currentDateTime());
+        .secsTo(MythDate::current());
     QString message = QString("DONE_RECORDING %1 %2 %3")
         .arg(cardid).arg(secsSince).arg(GetFramesWritten());
     MythEvent me(message);
@@ -930,7 +930,7 @@ void TVRec::FinishedRecording(RecordingInfo *curRec, RecordingQuality *recq)
     if ((recgrp == "LiveTV") || (fsize < 1000) ||
         (curRec->GetRecordingStatus() != rsRecorded) ||
         (curRec->GetRecordingStartTime().secsTo(
-            QDateTime::currentDateTime()) < 120))
+            MythDate::current()) < 120))
     {
         JobQueue::RemoveJobsFromMask(JOB_COMMFLAG,  autoRunJobs);
         JobQueue::RemoveJobsFromMask(JOB_TRANSCODE, autoRunJobs);
@@ -1017,7 +1017,7 @@ void TVRec::HandleStateChange(void)
     internalState = nextState;
     changeState = false;
 
-    eitScanStartTime = QDateTime::currentDateTime();
+    eitScanStartTime = MythDate::current();
     if (scanner && (internalState == kState_None))
         eitScanStartTime = eitScanStartTime.addSecs(eitCrawlIdleStart);
     else
@@ -1205,7 +1205,7 @@ void TVRec::run(void)
     SetFlags(kFlagRunMainLoop);
     ClearFlags(kFlagExitPlayer | kFlagFinishRecording);
 
-    eitScanStartTime = QDateTime::currentDateTime();
+    eitScanStartTime = MythDate::current();
     // check whether we should use the EITScanner in this TVRec instance
     if (CardUtil::IsEITCapable(genOpt.cardtype) &&
         (!GetDTVChannel() || GetDTVChannel()->IsMaster()) &&
@@ -1258,7 +1258,7 @@ void TVRec::run(void)
         QDateTime recEnd = (!pendingRecordings.empty()) ?
             recordEndTime.addSecs(60) : recordEndTime;
         if ((GetState() == kState_RecordingOnly) &&
-            (QDateTime::currentDateTime() > recEnd ||
+            (MythDate::current() > recEnd ||
              HasFlags(kFlagFinishRecording)))
         {
             ChangeState(kState_None);
@@ -1293,7 +1293,7 @@ void TVRec::run(void)
         // Check for the end of the current program..
         if (GetState() == kState_WatchingLiveTV)
         {
-            QDateTime now   = QDateTime::currentDateTime();
+            QDateTime now   = MythDate::current();
             bool has_finish = HasFlags(kFlagFinishRecording);
             bool has_rec    = pseudoLiveTVRecording;
             bool enable_ui  = true;
@@ -1316,8 +1316,8 @@ void TVRec::run(void)
                         "Switching Buffer (" +
                         QString("!has_rec(%1) && ").arg(has_rec) +
                         QString("!rec_soon(%1) && (").arg(rec_soon) +
-                        now.toString(Qt::ISODate) + " >= " +
-                        curRecording->GetScheduledEndTime(ISODate) +
+                        MythDate::toString(now, MythDate::ISODate) + " >= " +
+                        curRecording->GetScheduledEndTime(MythDate::ISODate) +
                         QString("(%1) ))")
                         .arg(now >= curRecording->GetScheduledEndTime()));
 
@@ -1355,7 +1355,7 @@ void TVRec::run(void)
         }
 
         if (scanner && channel &&
-            QDateTime::currentDateTime() > eitScanStartTime)
+            MythDate::current() > eitScanStartTime)
         {
             if (!dvbOpt.dvb_eitscan)
             {
@@ -1373,7 +1373,7 @@ void TVRec::run(void)
             {
                 scanner->StartActiveScan(this, eitTransportTimeout);
                 SetFlags(kFlagEITScannerRunning);
-                eitScanStartTime = QDateTime::currentDateTime().addYears(1);
+                eitScanStartTime = MythDate::current().addYears(1);
             }
         }
 
@@ -1475,7 +1475,7 @@ void TVRec::HandlePendingRecordings(void)
     for (it = pendingRecordings.begin(); it != pendingRecordings.end();)
     {
         next = it; ++next;
-        if (QDateTime::currentDateTime() > (*it).recordingStart.addSecs(30))
+        if (MythDate::current() > (*it).recordingStart.addSecs(30))
         {
             LOG(VB_RECORD, LOG_INFO, LOC + "Deleting stale pending recording " +
                 QString("%1 '%2'")
@@ -1507,7 +1507,7 @@ void TVRec::HandlePendingRecordings(void)
             continue;
 
         int timeuntil = ((*it).doNotAsk) ?
-            -1: QDateTime::currentDateTime().secsTo((*it).recordingStart);
+            -1: MythDate::current().secsTo((*it).recordingStart);
 
         if (has_rec)
             (*it).canceled = true;
@@ -1967,7 +1967,9 @@ bool TVRec::SetupSignalMonitor(bool tablemon, bool EITscan, bool notify)
         }
 
         signalMonitor->AddListener(this);
-        signalMonitor->SetUpdateRate(kSignalMonitoringRate);
+        signalMonitor->SetUpdateRate(signalMonitor->HasExtraSlowTuning() ?
+                                     kSignalMonitoringRate * 5 :
+                                     kSignalMonitoringRate);
         signalMonitor->SetNotifyFrontend(notify);
 
         // Start the monitoring thread
@@ -2085,13 +2087,12 @@ bool TVRec::ShouldSwitchToAnotherCard(QString chanid)
                   "FROM channel "
                   "WHERE channel.chanid = :CHANID");
     query.bindValue(":CHANID", chanid);
-    if (!query.exec() || !query.isActive() || query.size() == 0)
+    if (!query.exec() || !query.next())
     {
         MythDB::DBError("ShouldSwitchToAnotherCard", query);
         return false;
     }
 
-    query.next();
     QString channelname = query.value(0).toString();
     QString callsign = query.value(1).toString();
 
@@ -2413,7 +2414,7 @@ bool TVRec::IsBusy(TunedInputInfo *busy_input, int time_buffer) const
 
     if (!busy_input->inputid && has_pending)
     {
-        int timeLeft = QDateTime::currentDateTime()
+        int timeLeft = MythDate::current()
             .secsTo(pendinfo.recordingStart);
 
         if (timeLeft <= time_buffer)
@@ -2743,9 +2744,9 @@ void TVRec::SetLiveRecording(int recording)
     MythEvent me(QString("UPDATE_RECORDING_STATUS %1 %2 %3 %4 %5")
                  .arg(curRecording->GetCardID())
                  .arg(curRecording->GetChanID())
-                 .arg(curRecording->GetScheduledStartTime(ISODate))
+                 .arg(curRecording->GetScheduledStartTime(MythDate::ISODate))
                  .arg(recstat)
-                 .arg(curRecording->GetRecordingEndTime(ISODate)));
+                 .arg(curRecording->GetRecordingEndTime(MythDate::ISODate)));
 
     gCoreContext->dispatch(me);
 }
@@ -3804,9 +3805,9 @@ MPEGStreamData *TVRec::TuningSignalCheck(void)
         MythEvent me(QString("UPDATE_RECORDING_STATUS %1 %2 %3 %4 %5")
                     .arg(curRecording->GetCardID())
                     .arg(curRecording->GetChanID())
-                    .arg(curRecording->GetScheduledStartTime(ISODate))
+                    .arg(curRecording->GetScheduledStartTime(MythDate::ISODate))
                     .arg(newRecStatus)
-                    .arg(curRecording->GetRecordingEndTime(ISODate)));
+                    .arg(curRecording->GetRecordingEndTime(MythDate::ISODate)));
         gCoreContext->dispatch(me);
     }
 
@@ -4129,13 +4130,13 @@ void TVRec::TuningRestartRecorder(void)
         ProgramInfo *rcinfo1 = pseudoLiveTVRecording;
         QString msg1 = QString("Recording: %1 %2 %3 %4")
             .arg(rcinfo1->GetTitle()).arg(rcinfo1->GetChanID())
-            .arg(rcinfo1->GetRecordingStartTime(ISODate))
-            .arg(rcinfo1->GetRecordingEndTime(ISODate));
+            .arg(rcinfo1->GetRecordingStartTime(MythDate::ISODate))
+            .arg(rcinfo1->GetRecordingEndTime(MythDate::ISODate));
         ProgramInfo *rcinfo2 = tvchain->GetProgramAt(-1);
         QString msg2 = QString("Recording: %1 %2 %3 %4")
             .arg(rcinfo2->GetTitle()).arg(rcinfo2->GetChanID())
-            .arg(rcinfo2->GetRecordingStartTime(ISODate))
-            .arg(rcinfo2->GetRecordingEndTime(ISODate));
+            .arg(rcinfo2->GetRecordingStartTime(MythDate::ISODate))
+            .arg(rcinfo2->GetRecordingEndTime(MythDate::ISODate));
         delete rcinfo2;
         LOG(VB_RECORD, LOG_INFO, LOC + "Pseudo LiveTV recording starting." +
                 "\n\t\t\t" + msg1 + "\n\t\t\t" + msg2);
@@ -4322,7 +4323,7 @@ bool TVRec::GetProgramRingBufferForLiveTV(RecordingInfo **pginfo,
     else
     {
         prog = new RecordingInfo(
-            chanid, mythCurrentDateTime(), true, hoursMax);
+            chanid, MythDate::current(true), true, hoursMax);
     }
 
     prog->SetCardID(cardid);
@@ -4339,7 +4340,7 @@ bool TVRec::GetProgramRingBufferForLiveTV(RecordingInfo **pginfo,
     }
 
     if (!pseudoLiveTVRecording)
-        prog->SetRecordingStartTime(mythCurrentDateTime());
+        prog->SetRecordingStartTime(MythDate::current(true));
 
     prog->SetStorageGroup("LiveTV");
 

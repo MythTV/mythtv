@@ -19,7 +19,7 @@
 #define GENERIC_EXIT_PERMISSIONS_ERROR  136 ///< File permissions error
 #define GENERIC_EXIT_CONNECT_ERROR      137 ///< Can't connect to master backend
 #define GENERIC_EXIT_SETUP_ERROR        138 ///< Incorrectly setup system
-#define GENERIC_EXIT_INVALID_TIMEZONE   139 ///< Invalid timezone
+#define GENERIC_EXIT_INVALID_TIME       139 ///< Invalid time
 #define GENERIC_EXIT_KILLED             140 ///< Process killed or stopped
 #define GENERIC_EXIT_TIMEOUT            141 ///< Process timed out
 #define GENERIC_EXIT_RUNNING            142 ///< Process is running

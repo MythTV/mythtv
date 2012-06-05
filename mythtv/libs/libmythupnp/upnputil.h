@@ -93,6 +93,9 @@ inline NameValue::NameValue(const NameValue &nv) :
 
 inline NameValue& NameValue::operator=(const NameValue &nv)
 {
+    if (this == &nv)
+        return *this;
+
     sName  = nv.sName;
     sValue = nv.sValue;
 

@@ -34,8 +34,6 @@ AudioOutputPulseAudio::AudioOutputPulseAudio(const AudioSettings &settings) :
     for (unsigned int i = 0; i < PA_CHANNELS_MAX; ++i)
         volume_control.values[i] = PA_VOLUME_MUTED;
 
-    ChooseHost();
-
     InitSettings(settings);
     if (settings.init)
         Reconfigure(settings);
@@ -424,7 +422,7 @@ bool AudioOutputPulseAudio::ContextConnect(void)
     int chk = pa_context_connect(
         pcontext, pulse_host, (pa_context_flags_t)0, NULL);
 
-    delete(pulse_host);
+    delete[] pulse_host;
 
     if (chk < 0)
     {
@@ -482,7 +480,7 @@ char *AudioOutputPulseAudio::ChooseHost(void)
 
     if ( !(!host || *host == 0 || strcmp(host,"default") == 0))
     {
-        if ((pulse_host = new char[strlen(host)]))
+        if ((pulse_host = new char[strlen(host) + 1]))
             strcpy(pulse_host, host);
         else
             VBERROR(fn_log_tag +

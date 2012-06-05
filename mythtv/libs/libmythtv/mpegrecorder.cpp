@@ -36,7 +36,7 @@ extern "C" {
 #include "programinfo.h"
 #include "recordingprofile.h"
 #include "tv_rec.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 #include "cardutil.h"
 
 // ivtv header
@@ -1001,8 +1001,8 @@ void MpegRecorder::run(void)
 
         if (_device_read_buffer)
         {
-            len = _device_read_buffer->Read(
-                    &(buffer[remainder]), bufferSize - remainder);
+            len = _device_read_buffer->Read
+                  (&(buffer[remainder]), bufferSize - remainder);
 
             // Check for DRB errors
             if (_device_read_buffer->IsErrored())
@@ -1318,6 +1318,7 @@ bool MpegRecorder::StartEncoding(void)
     if (_device_read_buffer)
     {
         _device_read_buffer->Reset(videodevice.toAscii().constData(), readfd);
+        _device_read_buffer->SetRequestPause(false);
         _device_read_buffer->Start();
     }
 
@@ -1337,6 +1338,9 @@ void MpegRecorder::StopEncoding(void)
     memset(&command, 0, sizeof(struct v4l2_encoder_cmd));
     command.cmd   = V4L2_ENC_CMD_STOP;
     command.flags = V4L2_ENC_CMD_STOP_AT_GOP_END;
+
+    if (_device_read_buffer)
+        _device_read_buffer->SetRequestPause(true);
 
     bool stopped = 0 == ioctl(readfd, VIDIOC_ENCODER_CMD, &command);
     if (stopped)
@@ -1362,7 +1366,7 @@ void MpegRecorder::StopEncoding(void)
     }
 
     // close the fd so streamoff/streamon work in V4LChannel
-    close(readfd);   
+    close(readfd);
     readfd = -1;
 }
 

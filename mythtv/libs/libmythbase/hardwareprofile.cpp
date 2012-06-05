@@ -11,6 +11,7 @@
 #include "mythlogging.h"
 #include "mythsystem.h"
 #include "exitcodes.h"
+#include "mythdate.h"
 
 const QString SMOLT_SERVER_LOCATION =
                   QString("http://smolt.mythtv.org/");
@@ -24,7 +25,7 @@ HardwareProfile::HardwareProfile() :
     m_uuid = gCoreContext->GetSetting("HardwareProfileUUID");
     m_publicuuid = gCoreContext->GetSetting("HardwareProfilePublicUUID");
     QString lastupdate = gCoreContext->GetSetting("HardwareProfileLastUpdated");
-    m_lastUpdate = QDateTime::fromString(lastupdate, Qt::ISODate);
+    m_lastUpdate = MythDate::fromString(lastupdate);
 }
 
 HardwareProfile::~HardwareProfile()
@@ -156,7 +157,7 @@ bool HardwareProfile::WritePrivateUUIDToFile(QString uuid)
 bool HardwareProfile::NeedsUpdate(void) const
 {
     if (!m_lastUpdate.isNull() &&
-        (m_lastUpdate.addMonths(1) < QDateTime::currentDateTime()) &&
+        (m_lastUpdate.addMonths(1) < MythDate::current()) &&
         !m_uuid.isEmpty())
     {
         LOG(VB_GENERAL, LOG_INFO,
@@ -191,7 +192,7 @@ bool HardwareProfile::SubmitProfile(void)
         gCoreContext->SaveSetting("HardwareProfileUUID", GetPrivateUUID());
         gCoreContext->SaveSetting("HardwareProfilePublicUUID", GetPublicUUID());
         gCoreContext->SaveSetting("HardwareProfileLastUpdated",
-                                  QDateTime::currentDateTime().toString(Qt::ISODate));
+                                  MythDate::current_iso_string());
         return true;
     }
     else
@@ -219,7 +220,7 @@ bool HardwareProfile::DeleteProfile(void)
         gCoreContext->SaveSetting("HardwareProfileUUID", "");
         gCoreContext->SaveSetting("HardwareProfilePublicUUID", "");
         gCoreContext->SaveSetting("HardwareProfileLastUpdated",
-                                  QDateTime::currentDateTime().toString(Qt::ISODate));
+                                  MythDate::current_iso_string());
         return true;
     }
     else

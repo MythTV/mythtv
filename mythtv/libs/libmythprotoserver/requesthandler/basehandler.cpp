@@ -12,6 +12,7 @@ using namespace std;
 #include "mythmiscutil.h"
 #include "mythlogging.h"
 #include "mythcorecontext.h"
+#include "mythtimezone.h"
 
 #include "requesthandler/basehandler.h"
 
@@ -46,7 +47,7 @@ bool BaseRequestHandler::HandleAnnounce(MythSocket *socket,
 
     QStringList sl; sl << "OK";
     handler->SendStringList(sl);
-    handler->DownRef();
+    handler->DecrRef();
     handler = NULL;
 
     LOG(VB_GENERAL, LOG_DEBUG, QString("MainServer::ANN %1")
@@ -174,8 +175,9 @@ bool BaseRequestHandler::HandleQueryMemStats(SocketHandler *sock)
 bool BaseRequestHandler::HandleQueryTimeZone(SocketHandler *sock)
 {
     QStringList strlist;
-    strlist << getTimeZoneID() << QString::number(calc_utc_offset())
-            << mythCurrentDateTime().toString(Qt::ISODate);
+    strlist << MythTZ::getTimeZoneID()
+            << QString::number(MythTZ::calc_utc_offset())
+            << MythDate::current_iso_string(true);
 
     sock->SendStringList(strlist);
     return true;

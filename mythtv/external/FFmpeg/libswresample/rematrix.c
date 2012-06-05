@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 Michael Niedermayer (michaelni@gmx.at)
+ * Copyright (C) 2011-2012 Michael Niedermayer (michaelni@gmx.at)
  *
  * This file is part of libswresample
  *
@@ -27,6 +27,18 @@
 #define SAMPLE float
 #define COEFF float
 #define RENAME(x) x ## _float
+#include "rematrix_template.c"
+#undef SAMPLE
+#undef RENAME
+#undef R
+#undef ONE
+#undef COEFF
+
+#define ONE (1.0)
+#define R(x) x
+#define SAMPLE double
+#define COEFF double
+#define RENAME(x) x ## _double
 #include "rematrix_template.c"
 #undef SAMPLE
 #undef RENAME
@@ -184,8 +196,15 @@ static int auto_matrix(SwrContext *s)
 
     if(unaccounted & AV_CH_SIDE_LEFT){
         if(s->out_ch_layout & AV_CH_BACK_LEFT){
-            matrix[ BACK_LEFT][ SIDE_LEFT]+= 1.0;
-            matrix[BACK_RIGHT][SIDE_RIGHT]+= 1.0;
+            /* if back channels do not exist in the input, just copy side
+               channels to back channels, otherwise mix side into back */
+            if (s->in_ch_layout & AV_CH_BACK_LEFT) {
+                matrix[BACK_LEFT ][SIDE_LEFT ] += M_SQRT1_2;
+                matrix[BACK_RIGHT][SIDE_RIGHT] += M_SQRT1_2;
+            } else {
+                matrix[BACK_LEFT ][SIDE_LEFT ] += 1.0;
+                matrix[BACK_RIGHT][SIDE_RIGHT] += 1.0;
+            }
         }else if(s->out_ch_layout & AV_CH_BACK_CENTER){
             matrix[BACK_CENTER][ SIDE_LEFT]+= M_SQRT1_2;
             matrix[BACK_CENTER][SIDE_RIGHT]+= M_SQRT1_2;
@@ -209,6 +228,17 @@ static int auto_matrix(SwrContext *s)
         }else
             av_assert0(0);
     }
+    /* mix LFE into front left/right or center */
+    if (unaccounted & AV_CH_LOW_FREQUENCY) {
+        if (s->out_ch_layout & AV_CH_FRONT_CENTER) {
+            matrix[FRONT_CENTER][LOW_FREQUENCY] += s->lfe_mix_level;
+        } else if (s->out_ch_layout & AV_CH_FRONT_LEFT) {
+            matrix[FRONT_LEFT ][LOW_FREQUENCY] += s->lfe_mix_level * M_SQRT1_2;
+            matrix[FRONT_RIGHT][LOW_FREQUENCY] += s->lfe_mix_level * M_SQRT1_2;
+        } else
+            av_assert0(0);
+    }
+
     for(out_i=i=0; i<64; i++){
         double sum=0;
         int in_i=0;
@@ -227,8 +257,8 @@ static int auto_matrix(SwrContext *s)
     if(s->rematrix_volume  < 0)
         maxcoef = -s->rematrix_volume;
 
-    if((   s->out_sample_fmt < AV_SAMPLE_FMT_FLT
-        || s->int_sample_fmt < AV_SAMPLE_FMT_FLT) && maxcoef > 1.0){
+    if((   av_get_packed_sample_fmt(s->out_sample_fmt) < AV_SAMPLE_FMT_FLT
+        || av_get_packed_sample_fmt(s->int_sample_fmt) < AV_SAMPLE_FMT_FLT) && maxcoef > 1.0){
         for(i=0; i<SWR_CH_MAX; i++)
             for(j=0; j<SWR_CH_MAX; j++){
                 s->matrix[i][j] /= maxcoef;
@@ -253,12 +283,43 @@ static int auto_matrix(SwrContext *s)
 
 int swri_rematrix_init(SwrContext *s){
     int i, j;
+    int nb_in  = av_get_channel_layout_nb_channels(s->in_ch_layout);
+    int nb_out = av_get_channel_layout_nb_channels(s->out_ch_layout);
 
     if (!s->rematrix_custom) {
         int r = auto_matrix(s);
         if (r)
             return r;
     }
+    if (s->midbuf.fmt == AV_SAMPLE_FMT_S16P){
+        s->native_matrix = av_mallocz(nb_in * nb_out * sizeof(int));
+        s->native_one    = av_mallocz(sizeof(int));
+        for (i = 0; i < nb_out; i++)
+            for (j = 0; j < nb_in; j++)
+                ((int*)s->native_matrix)[i * nb_in + j] = lrintf(s->matrix[i][j] * 32768);
+        *((int*)s->native_one) = 32768;
+        s->mix_1_1_f = copy_s16;
+        s->mix_2_1_f = sum2_s16;
+    }else if(s->midbuf.fmt == AV_SAMPLE_FMT_FLTP){
+        s->native_matrix = av_mallocz(nb_in * nb_out * sizeof(float));
+        s->native_one    = av_mallocz(sizeof(float));
+        for (i = 0; i < nb_out; i++)
+            for (j = 0; j < nb_in; j++)
+                ((float*)s->native_matrix)[i * nb_in + j] = s->matrix[i][j];
+        *((float*)s->native_one) = 1.0;
+        s->mix_1_1_f = copy_float;
+        s->mix_2_1_f = sum2_float;
+    }else if(s->midbuf.fmt == AV_SAMPLE_FMT_DBLP){
+        s->native_matrix = av_mallocz(nb_in * nb_out * sizeof(double));
+        s->native_one    = av_mallocz(sizeof(double));
+        for (i = 0; i < nb_out; i++)
+            for (j = 0; j < nb_in; j++)
+                ((double*)s->native_matrix)[i * nb_in + j] = s->matrix[i][j];
+        *((double*)s->native_one) = 1.0;
+        s->mix_1_1_f = copy_double;
+        s->mix_2_1_f = sum2_double;
+    }else
+        av_assert0(0);
     //FIXME quantize for integeres
     for (i = 0; i < SWR_CH_MAX; i++) {
         int ch_in=0;
@@ -272,6 +333,11 @@ int swri_rematrix_init(SwrContext *s){
     return 0;
 }
 
+void swri_rematrix_free(SwrContext *s){
+    av_freep(&s->native_matrix);
+    av_freep(&s->native_one);
+}
+
 int swri_rematrix(SwrContext *s, AudioData *out, AudioData *in, int len, int mustcopy){
     int out_i, in_i, i, j;
 
@@ -281,32 +347,25 @@ int swri_rematrix(SwrContext *s, AudioData *out, AudioData *in, int len, int mus
     for(out_i=0; out_i<out->ch_count; out_i++){
         switch(s->matrix_ch[out_i][0]){
         case 0:
-            memset(out->ch[out_i], 0, len * (s->int_sample_fmt == AV_SAMPLE_FMT_FLT ? sizeof(float) : sizeof(int16_t)));
+            memset(out->ch[out_i], 0, len * av_get_bytes_per_sample(s->int_sample_fmt));
             break;
         case 1:
             in_i= s->matrix_ch[out_i][1];
-            if(mustcopy || s->matrix[out_i][in_i]!=1.0){
-                if(s->int_sample_fmt == AV_SAMPLE_FMT_FLT){
-                    copy_float((float  *)out->ch[out_i], (const float  *)in->ch[in_i], s->matrix  [out_i][in_i], len);
-                }else
-                    copy_s16  ((int16_t*)out->ch[out_i], (const int16_t*)in->ch[in_i], s->matrix32[out_i][in_i], len);
+            if(s->matrix[out_i][in_i]!=1.0){
+                s->mix_1_1_f(out->ch[out_i], in->ch[in_i], s->native_matrix, in->ch_count*out_i + in_i, len);
+            }else if(mustcopy){
+                memcpy(out->ch[out_i], in->ch[in_i], len*out->bps);
             }else{
                 out->ch[out_i]= in->ch[in_i];
             }
             break;
-        case 2:
-            if(s->int_sample_fmt == AV_SAMPLE_FMT_FLT){
-                sum2_float((float  *)out->ch[out_i], (const float  *)in->ch[ s->matrix_ch[out_i][1] ],           (const float  *)in->ch[ s->matrix_ch[out_i][2] ],
-                                 s->matrix[out_i][ s->matrix_ch[out_i][1] ], s->matrix[out_i][ s->matrix_ch[out_i][2] ],
-                           len);
-            }else{
-                sum2_s16  ((int16_t*)out->ch[out_i], (const int16_t*)in->ch[ s->matrix_ch[out_i][1] ],           (const int16_t*)in->ch[ s->matrix_ch[out_i][2] ],
-                                 s->matrix32[out_i][ s->matrix_ch[out_i][1] ], s->matrix32[out_i][ s->matrix_ch[out_i][2] ],
-                           len);
-            }
-            break;
+        case 2: {
+            int in_i1 = s->matrix_ch[out_i][1];
+            int in_i2 = s->matrix_ch[out_i][2];
+            s->mix_2_1_f(out->ch[out_i], in->ch[in_i1], in->ch[in_i2], s->native_matrix, in->ch_count*out_i + in_i1, in->ch_count*out_i + in_i2, len);
+            break;}
         default:
-            if(s->int_sample_fmt == AV_SAMPLE_FMT_FLT){
+            if(s->int_sample_fmt == AV_SAMPLE_FMT_FLTP){
                 for(i=0; i<len; i++){
                     float v=0;
                     for(j=0; j<s->matrix_ch[out_i][0]; j++){
@@ -314,6 +373,15 @@ int swri_rematrix(SwrContext *s, AudioData *out, AudioData *in, int len, int mus
                         v+= ((float*)in->ch[in_i])[i] * s->matrix[out_i][in_i];
                     }
                     ((float*)out->ch[out_i])[i]= v;
+                }
+            }else if(s->int_sample_fmt == AV_SAMPLE_FMT_DBLP){
+                for(i=0; i<len; i++){
+                    double v=0;
+                    for(j=0; j<s->matrix_ch[out_i][0]; j++){
+                        in_i= s->matrix_ch[out_i][1+j];
+                        v+= ((double*)in->ch[in_i])[i] * s->matrix[out_i][in_i];
+                    }
+                    ((double*)out->ch[out_i])[i]= v;
                 }
             }else{
                 for(i=0; i<len; i++){

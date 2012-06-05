@@ -64,7 +64,6 @@ class MUI_PUBLIC MythRenderD3D9 : public MythRender
     static void* ResolveAddress(const char* lib, const char* proc);
 
     MythRenderD3D9();
-    ~MythRenderD3D9();
 
     bool Create(QSize size, HWND window);
     bool Test(bool &reset);
@@ -99,6 +98,7 @@ class MUI_PUBLIC MythRenderD3D9 : public MythRender
     void                    ReleaseBuffer(IDirect3DSurface9* surface);
 
   private:
+    virtual ~MythRenderD3D9();
     bool                    SetTexture(IDirect3DDevice9* dev,
                                        IDirect3DTexture9 *texture,
                                        int num = 0);

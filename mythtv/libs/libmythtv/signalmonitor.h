@@ -52,6 +52,7 @@ class SignalMonitor : protected MThread
     bool HasFlags(uint64_t _flags)   const;
     bool HasAnyFlag(uint64_t _flags) const;
     uint64_t GetFlags(void)          const { return flags; }
+    virtual bool HasExtraSlowTuning(void) const { return false; }
 
     // // // // // // // // // // // // // // // // // // // // // // // //
     // Gets  // // // // // // // // // // // // // // // // // // // // //

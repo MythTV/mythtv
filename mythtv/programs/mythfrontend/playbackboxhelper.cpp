@@ -173,8 +173,7 @@ bool PBHEventHandler::event(QEvent *e)
             while (list.size() >= 4)
             {
                 uint      chanid        = list[0].toUInt();
-                QDateTime recstartts    = QDateTime::fromString(
-                    list[1], Qt::ISODate);
+                QDateTime recstartts    = MythDate::fromString(list[1]);
                 bool      forceDelete   = list[2].toUInt();
                 bool      forgetHistory = list[3].toUInt();
 
@@ -209,8 +208,7 @@ bool PBHEventHandler::event(QEvent *e)
             while (list.size() >= 2)
             {
                 uint      chanid        = list[0].toUInt();
-                QDateTime recstartts    = QDateTime::fromString(
-                    list[1], Qt::ISODate);
+                QDateTime recstartts    = MythDate::fromString(list[1]);
 
                 bool ok = RemoteUndeleteRecording(chanid, recstartts);
 
@@ -288,7 +286,7 @@ bool PBHEventHandler::event(QEvent *e)
             {
                 foundFile = info.url;
                 QMutexLocker locker(&m_pbh.m_lock);
-                m_pbh.m_artworkFilenameCache[cacheKey] = foundFile;
+                m_pbh.m_artworkCache[cacheKey] = foundFile;
             }
 
             if (!foundFile.isEmpty())
@@ -443,9 +441,9 @@ QString PlaybackBoxHelper::LocateArtwork(
     QMutexLocker locker(&m_lock);
 
     QHash<QString,QString>::const_iterator it =
-        m_artworkFilenameCache.find(cacheKey);
+        m_artworkCache.find(cacheKey);
 
-    if (it != m_artworkFilenameCache.end())
+    if (it != m_artworkCache.end())
         return *it;
 
     QStringList list(inetref);

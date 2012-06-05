@@ -20,6 +20,7 @@
 // mythtv
 #include "mythcontext.h"
 #include "mythdbcon.h"
+#include "mythdate.h"
 #include "tv.h"
 #include "compat.h"
 
@@ -1909,9 +1910,15 @@ void LCDProcClient::dostdclock()
         return;
 
     if (lcd_showrecstatus && isRecording)
-         outputCenteredText("Time", tr("RECORDING"), "topWidget", 1);
+    {
+        outputCenteredText("Time", tr("RECORDING"), "topWidget", 1);
+    }
     else
-        outputCenteredText("Time", QDate::currentDate().toString(dateformat), "topWidget", 1);
+    {
+        outputCenteredText(
+            "Time", MythDate::current().toLocalTime().toString(dateformat),
+            "topWidget", 1);
+    }
 
     QString aString;
     int x, y;
@@ -2013,12 +2020,12 @@ void LCDProcClient::outputRecStatus(void)
         //assignScrollingList(list, "RecStatus", "textWidget3", 3);
 
         //  LINE 4 - hh:mm-hh:mm + Progress Bar
-        status = tuner.startTime.toString("hh:mm") + "-" +
-                 tuner.endTime.toString("hh:mm");
+        status = tuner.startTime.toLocalTime().toString("hh:mm") + "-" +
+            tuner.endTime.toLocalTime().toString("hh:mm");
         outputLeftText("RecStatus", status, "textWidget4", 4);
 
         int length = tuner.startTime.secsTo(tuner.endTime);
-        int delta = tuner.startTime.secsTo(QDateTime::currentDateTime());
+        int delta = tuner.startTime.secsTo(MythDate::current());
         double rec_progress = (double) delta / length;
 
         aString = "widget_set RecStatus progressBar 13 ";
@@ -2037,8 +2044,9 @@ void LCDProcClient::outputRecStatus(void)
         if (!tuner.subtitle.isEmpty())
             status += "|(" + tuner.subtitle + ")";
 
-        status += "|" + tuner.startTime.toString("hh:mm") + " to " +
-                  tuner.endTime.toString("hh:mm");
+        status += "|" + tuner.startTime.toLocalTime().toString("hh:mm")
+            + " to " +
+            tuner.endTime.toLocalTime().toString("hh:mm");
 
         list = formatScrollerText(status);
         assignScrollingList(list, "RecStatus", "textWidget1", 1);
@@ -2046,7 +2054,7 @@ void LCDProcClient::outputRecStatus(void)
         if (lcdHeight > 1)
         {
             int length = tuner.startTime.secsTo(tuner.endTime);
-            int delta = tuner.startTime.secsTo(QDateTime::currentDateTime());
+            int delta = tuner.startTime.secsTo(MythDate::current());
             double rec_progress = (double) delta / length;
 
             aString = "widget_set RecStatus progressBar 1 ";

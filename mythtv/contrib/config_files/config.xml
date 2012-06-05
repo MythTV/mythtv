@@ -1,21 +1,18 @@
 <Configuration>
-  <UPnP>
-    <MythFrontend>
-      <DefaultBackend>
-<!--
-Set the <LocalHostName> hostname override below only if you want to use
-something other than the machine's real hostname for identifying settings
-in the database.  This is useful if your hostname changes often, as
-otherwise you'll need to reconfigure mythtv every time.
-
-NO TWO HOSTS MAY USE THE SAME VALUE
--->
-        <DBHostName>127.0.0.1</DBHostName>
-        <DBUserName>mythtv</DBUserName>
-        <DBPassword>mythtv</DBPassword>
-        <DBName>mythconverg</DBName>
-        <DBPort>0</DBPort>
-      </DefaultBackend>
-    </MythFrontend>
-  </UPnP>
+  <LocalHostName>my-unique-identifier-goes-here</LocalHostName>
+  <Database>
+    <PingHost>1</PingHost>
+    <Host>127.0.0.1</Host>
+    <UserName>mythtv</UserName>
+    <Password>mythtv</Password>
+    <DatabaseName>mythconverg</DatabaseName>
+    <Port>3306</Port>
+  </Database>
+  <WakeOnLAN>
+    <Enabled>0</Enabled>
+    <SQLReconnectWaitTime>0</SQLReconnectWaitTime>
+    <SQLConnectRetry>5</SQLConnectRetry>
+    <Command>echo 'WOLsqlServerCommand not set'</Command>
+  </WakeOnLAN>
 </Configuration>
+

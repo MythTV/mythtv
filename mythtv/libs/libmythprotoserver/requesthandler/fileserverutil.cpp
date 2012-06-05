@@ -17,12 +17,13 @@
 #include "programinfo.h"
 
 DeleteHandler::DeleteHandler(void) :
-    ReferenceCounter(), m_fd(-1), m_size(0)
+    ReferenceCounter("DeleteHandler"), m_fd(-1), m_size(0)
 {
 }
 
 DeleteHandler::DeleteHandler(QString filename) :
-    ReferenceCounter(), m_path(filename), m_fd(-1), m_size(0)
+    ReferenceCounter(QString("DeleteHandler:%1").arg(filename)),
+    m_path(filename), m_fd(-1), m_size(0)
 {
 }
 
@@ -46,7 +47,7 @@ QString GetPlaybackURL(ProgramInfo *pginfo, bool storePath)
     QString result = "";
     QMutexLocker locker(&recordingPathLock);
     QString cacheKey = QString("%1:%2").arg(pginfo->GetChanID())
-        .arg(pginfo->GetRecordingStartTime(ISODate));
+        .arg(pginfo->GetRecordingStartTime(MythDate::ISODate));
     if ((recordingPathCache.contains(cacheKey)) &&
         (QFile::exists(recordingPathCache[cacheKey])))
     {

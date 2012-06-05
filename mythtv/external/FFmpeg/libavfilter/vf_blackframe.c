@@ -28,6 +28,8 @@
  */
 
 #include "avfilter.h"
+#include "internal.h"
+#include "video.h"
 
 typedef struct {
     unsigned int bamount; ///< black amount
@@ -110,6 +112,7 @@ static void end_frame(AVFilterLink *inlink)
 
     blackframe->frame++;
     blackframe->nblack = 0;
+    avfilter_unref_buffer(picref);
     avfilter_end_frame(inlink->dst->outputs[0]);
 }
 
@@ -125,8 +128,8 @@ AVFilter avfilter_vf_blackframe = {
     .inputs    = (const AVFilterPad[]) {{ .name       = "default",
                                     .type             = AVMEDIA_TYPE_VIDEO,
                                     .draw_slice       = draw_slice,
-                                    .get_video_buffer = avfilter_null_get_video_buffer,
-                                    .start_frame      = avfilter_null_start_frame,
+                                    .get_video_buffer = ff_null_get_video_buffer,
+                                    .start_frame      = ff_null_start_frame_keep_ref,
                                     .end_frame        = end_frame, },
                                   { .name = NULL}},
 

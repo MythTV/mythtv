@@ -503,13 +503,13 @@ static int encode_frame(AVCodecContext *avctx, AVPacket *avpkt,
     samples = (const int16_t *)frame->data[0];
     for (i = 0; i < PCM_SAMPLES; i ++) { /* i is the decimated sample number */
         for (channel = 0; channel < c->prim_channels + 1; channel++) {
-            /* Get 32 PCM samples */
-            for (k = 0; k < 32; k++) { /* k is the sample number in a 32-sample block */
-                c->pcm[k] = samples[avctx->channels * (32 * i + k) + channel] << 16;
-            }
-            /* Put subband samples into the proper place */
             real_channel = c->channel_order_tab[channel];
             if (real_channel >= 0) {
+                /* Get 32 PCM samples */
+                for (k = 0; k < 32; k++) { /* k is the sample number in a 32-sample block */
+                    c->pcm[k] = samples[avctx->channels * (32 * i + k) + channel] << 16;
+                }
+                /* Put subband samples into the proper place */
                 qmf_decompose(c, c->pcm, &c->subband[i][real_channel][0], real_channel);
             }
         }
@@ -534,11 +534,18 @@ static int encode_init(AVCodecContext *avctx)
 {
     DCAContext *c = avctx->priv_data;
     int i;
+    uint64_t layout = avctx->channel_layout;
 
     c->prim_channels = avctx->channels;
     c->lfe_channel   = (avctx->channels == 3 || avctx->channels == 6);
 
-    switch (avctx->channel_layout) {
+    if (!layout) {
+        av_log(avctx, AV_LOG_WARNING, "No channel layout specified. The "
+                                      "encoder will guess the layout, but it "
+                                      "might be incorrect.\n");
+        layout = av_get_default_channel_layout(avctx->channels);
+    }
+    switch (layout) {
     case AV_CH_LAYOUT_STEREO:       c->a_mode = 2; c->num_channel = 2; break;
     case AV_CH_LAYOUT_5POINT0:      c->a_mode = 9; c->num_channel = 9; break;
     case AV_CH_LAYOUT_5POINT1:      c->a_mode = 9; c->num_channel = 9; break;

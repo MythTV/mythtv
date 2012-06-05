@@ -9,7 +9,7 @@
 #undef mm_flags
 #endif
 
-#ifdef MMX 
+#if HAVE_MMX 
   #include "libavutil/x86_cpu.h"
 #else 
   #define emms()    ; 

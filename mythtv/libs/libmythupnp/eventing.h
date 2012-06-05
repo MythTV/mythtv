@@ -107,6 +107,7 @@ class UPNP_PUBLIC  StateVariableBase
             m_sName   = sName;
             gettimeofday( (&m_ttLastChanged), NULL );
         }
+        virtual ~StateVariableBase() {};
 
         virtual QString ToString() = 0;
 };

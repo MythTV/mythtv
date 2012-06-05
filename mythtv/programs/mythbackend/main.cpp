@@ -17,6 +17,7 @@
 #include "mythsystemevent.h"
 #include "backendcontext.h"
 #include "main_helpers.h"
+#include "mythmiscutil.h"
 #include "storagegroup.h"
 #include "housekeeper.h"
 #include "mediaserver.h"

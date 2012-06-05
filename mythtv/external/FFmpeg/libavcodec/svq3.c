@@ -906,7 +906,7 @@ static av_cold int svq3_decode_init(AVCodecContext *avctx)
                 int offset = (get_bits_count(&gb)+7)>>3;
                 uint8_t *buf;
 
-                if ((uint64_t)watermark_width*4 > UINT_MAX/watermark_height)
+                if (watermark_height<=0 || (uint64_t)watermark_width*4 > UINT_MAX/watermark_height)
                     return -1;
 
                 buf = av_malloc(buf_len);
@@ -1139,7 +1139,8 @@ AVCodec ff_svq3_decoder = {
     .init           = svq3_decode_init,
     .close          = svq3_decode_end,
     .decode         = svq3_decode_frame,
-    .capabilities   = CODEC_CAP_DRAW_HORIZ_BAND | CODEC_CAP_DR1 | CODEC_CAP_DELAY,
-    .long_name = NULL_IF_CONFIG_SMALL("Sorenson Vector Quantizer 3 / Sorenson Video 3 / SVQ3"),
-    .pix_fmts= (const enum PixelFormat[]){PIX_FMT_YUVJ420P, PIX_FMT_NONE},
+    .capabilities   = CODEC_CAP_DRAW_HORIZ_BAND | CODEC_CAP_DR1 |
+                      CODEC_CAP_DELAY,
+    .long_name      = NULL_IF_CONFIG_SMALL("Sorenson Vector Quantizer 3 / Sorenson Video 3 / SVQ3"),
+    .pix_fmts       = (const enum PixelFormat[]){ PIX_FMT_YUVJ420P, PIX_FMT_NONE },
 };

@@ -191,7 +191,7 @@ retry:
     }
     if (c->codec_frameheader) {
         int w, h, q, res;
-        if (buf[0] != 'V' || buf_size < 12) {
+        if (buf_size < 12 || buf[0] != 'V') {
             av_log(avctx, AV_LOG_ERROR, "invalid nuv video frame (wrong codec_tag?)\n");
             return AVERROR_INVALIDDATA;
         }
@@ -295,5 +295,5 @@ AVCodec ff_nuv_decoder = {
     .close          = decode_end,
     .decode         = decode_frame,
     .capabilities   = CODEC_CAP_DR1,
-    .long_name = NULL_IF_CONFIG_SMALL("NuppelVideo/RTJPEG"),
+    .long_name      = NULL_IF_CONFIG_SMALL("NuppelVideo/RTJPEG"),
 };

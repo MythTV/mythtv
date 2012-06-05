@@ -161,7 +161,8 @@ void VideoOutputVDPAU::DeleteRender(void)
         if (m_decoder)
             m_render->DestroyDecoder(m_decoder);
 
-        delete m_render;
+        m_render->DecrRef();
+        m_render = NULL;
     }
 
     m_checked_output_surfaces = false;

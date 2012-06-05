@@ -14,7 +14,7 @@
 // libmyth headers
 #include "exitcodes.h"
 #include "mythcorecontext.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 
 // libmythtv headers
 #include "programinfo.h"
@@ -27,7 +27,7 @@
 
 XMLTVParser::XMLTVParser() : isJapan(false), current_year(0)
 {
-    current_year = QDate::currentDate().toString("yyyy").toUInt();
+    current_year = MythDate::current().date().toString("yyyy").toUInt();
 }
 
 static uint ELFHash(const QByteArray &ba)
@@ -191,7 +191,8 @@ static void fromXMLTVDate(QString &timestr, QDateTime &dt, int localTimezoneOffs
         return;
     }
 
-    dt = QDateTime(QDate(year, month, day),QTime(hour, min, sec));
+    dt = QDateTime(QDate(year, month, day),QTime(hour, min, sec),
+                   Qt::LocalTime);
 
     if ((split.size() > 1) && (localTimezoneOffset <= 840))
     {
@@ -208,14 +209,16 @@ static void fromXMLTVDate(QString &timestr, QDateTime &dt, int localTimezoneOffs
 
     if (localTimezoneOffset < -840)
     {
-        dt = MythUTCToLocal(dt);
+        dt.setTimeSpec(Qt::UTC);
     }
     else if (abs(localTimezoneOffset) <= 840)
     {
         dt = dt.addSecs(localTimezoneOffset * 60 );
     }
 
-    timestr = dt.toString("yyyyMMddhhmmss");
+    dt = dt.toUTC();
+
+    timestr = MythDate::toString(dt, MythDate::kFilename);
 }
 
 static void parseCredits(QDomElement &element, ProgInfo *pginfo)

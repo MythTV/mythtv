@@ -12,6 +12,9 @@ INSTALLS = target
 QMAKE_CLEAN += $(TARGET)
 QMAKE_CFLAGS += -w
 
+# llvm/xcode doesn't compile if -O3 is enabled (or any other -O for that matter)
+macx: QMAKE_CFLAGS -= -O3 -O2 -O1 -Os
+
 # Input
 SOURCES += main.cpp transcode.cpp mpeg2fix.cpp helper.c
 SOURCES += commandlineparser.cpp

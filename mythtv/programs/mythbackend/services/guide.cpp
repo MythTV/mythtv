@@ -37,18 +37,20 @@ extern Scheduler   *sched;
 //
 /////////////////////////////////////////////////////////////////////////////
 
-DTC::ProgramGuide *Guide::GetProgramGuide( const QDateTime &dtStartTime ,
-                                           const QDateTime &dtEndTime   ,
+DTC::ProgramGuide *Guide::GetProgramGuide( const QDateTime &rawStartTime ,
+                                           const QDateTime &rawEndTime   ,
                                            int              nStartChanId,
                                            int              nNumChannels,
                                            bool             bDetails      )
 {     
-
-    if (!dtStartTime.isValid())
+    if (!rawStartTime.isValid())
         throw( "StartTime is invalid" );
 
-    if (!dtEndTime.isValid())
+    if (!rawEndTime.isValid())
         throw( "EndTime is invalid" );
+
+    QDateTime dtStartTime = rawStartTime.toUTC();
+    QDateTime dtEndTime = rawEndTime.toUTC();
 
     if (dtEndTime < dtStartTime)
         throw( "EndTime is before StartTime");
@@ -149,7 +151,7 @@ DTC::ProgramGuide *Guide::GetProgramGuide( const QDateTime &dtStartTime ,
     pGuide->setDetails      ( bDetails      );
     
     pGuide->setCount        ( progList.size());
-    pGuide->setAsOf         ( QDateTime::currentDateTime() );
+    pGuide->setAsOf         ( MythDate::current() );
     
     pGuide->setVersion      ( MYTH_BINARY_VERSION );
     pGuide->setProtoVer     ( MYTH_PROTO_VERSION  );
@@ -162,11 +164,13 @@ DTC::ProgramGuide *Guide::GetProgramGuide( const QDateTime &dtStartTime ,
 /////////////////////////////////////////////////////////////////////////////
 
 DTC::Program* Guide::GetProgramDetails( int              nChanId,
-                                        const QDateTime &dtStartTime )
+                                        const QDateTime &rawStartTime )
                                           
 {
-    if (!dtStartTime.isValid())
+    if (!rawStartTime.isValid())
         throw( "StartTime is invalid" );
+
+    QDateTime dtStartTime = rawStartTime.toUTC();
 
     // ----------------------------------------------------------------------
     // -=>TODO: Add support for getting Recorded Program Info

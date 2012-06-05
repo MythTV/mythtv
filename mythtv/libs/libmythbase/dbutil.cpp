@@ -16,6 +16,7 @@
 #include "mythcorecontext.h"
 #include "storagegroup.h"
 #include "mythmiscutil.h"
+#include "mythdate.h"
 #include "mythdb.h"
 #include "mythdirs.h"
 #include "mythlogging.h"
@@ -108,21 +109,20 @@ bool DBUtil::IsBackupInProgress(void)
 
     backupStartTimeStr.replace(" ", "T");
 
-    QDateTime backupStartTime =
-        QDateTime::fromString(backupStartTimeStr, Qt::ISODate);
+    QDateTime backupStartTime = MythDate::fromString(backupStartTimeStr);
 
     // No end time set
     if (backupEndTimeStr.isEmpty())
     {
         // If DB Backup started less then 10 minutes ago, assume still running
-        if (backupStartTime.secsTo(QDateTime::currentDateTime()) < 600)
+        if (backupStartTime.secsTo(MythDate::current()) < 600)
         {
             LOG(VB_DATABASE, LOG_INFO,
                 QString("DBUtil::BackupInProgress(): Found "
                     "database backup start time of %1 which was %2 seconds "
                     "ago, therefore it appears the backup is still running.")
                     .arg(backupStartTimeStr)
-                    .arg(backupStartTime.secsTo(QDateTime::currentDateTime())));
+                    .arg(backupStartTime.secsTo(MythDate::current())));
             return true;
         }
         else
@@ -132,7 +132,7 @@ bool DBUtil::IsBackupInProgress(void)
                     "The backup started %2 seconds ago and should have "
                     "finished by now therefore it appears it is not running .")
                     .arg(backupStartTimeStr)
-                    .arg(backupStartTime.secsTo(QDateTime::currentDateTime())));
+                    .arg(backupStartTime.secsTo(MythDate::current())));
             return false;
         }
     }
@@ -140,8 +140,7 @@ bool DBUtil::IsBackupInProgress(void)
     {
         backupEndTimeStr.replace(" ", "T");
 
-        QDateTime backupEndTime =
-            QDateTime::fromString(backupEndTimeStr, Qt::ISODate);
+        QDateTime backupEndTime = MythDate::fromString(backupEndTimeStr);
 
         if (backupEndTime >= backupStartTime)
         {
@@ -152,7 +151,7 @@ bool DBUtil::IsBackupInProgress(void)
                     .arg(backupEndTimeStr).arg(backupStartTimeStr));
             return false;
         }
-        else if (backupStartTime.secsTo(QDateTime::currentDateTime()) > 600)
+        else if (backupStartTime.secsTo(MythDate::current()) > 600)
         {
             LOG(VB_DATABASE, LOG_ERR,
                 QString("DBUtil::BackupInProgress(): "
@@ -160,7 +159,7 @@ bool DBUtil::IsBackupInProgress(void)
                     "The backup started %2 seconds ago and should have "
                     "finished by now therefore it appears it is not running")
                     .arg(backupStartTimeStr)
-                    .arg(backupStartTime.secsTo(QDateTime::currentDateTime())));
+                    .arg(backupStartTime.secsTo(MythDate::current())));
             return false;
         }
         else
@@ -238,9 +237,9 @@ MythDBBackupStatus DBUtil::BackupDB(QString &filename, bool disableRotation)
     bool result = false;
     MSqlQuery query(MSqlQuery::InitCon());
 
-    gCoreContext->SaveSettingOnHost("BackupDBLastRunStart",
-                                QDateTime::currentDateTime()
-                                .toString("yyyy-MM-dd hh:mm:ss"), NULL);
+    gCoreContext->SaveSettingOnHost(
+        "BackupDBLastRunStart",
+        MythDate::toString(MythDate::current(), MythDate::kDatabase), NULL);
 
     if (!backupScript.isEmpty())
     {
@@ -253,9 +252,9 @@ MythDBBackupStatus DBUtil::BackupDB(QString &filename, bool disableRotation)
     if (!result)
         result = DoBackup(filename);
 
-    gCoreContext->SaveSettingOnHost("BackupDBLastRunEnd",
-                                QDateTime::currentDateTime()
-                                .toString("yyyy-MM-dd hh:mm:ss"), NULL);
+    gCoreContext->SaveSettingOnHost(
+        "BackupDBLastRunEnd",
+        MythDate::toString(MythDate::current(), MythDate::kDatabase), NULL);
 
     if (query.isConnected())
     {
@@ -477,8 +476,7 @@ QStringList DBUtil::GetTables(const QStringList &engines)
  */
 QString DBUtil::CreateBackupFilename(QString prefix, QString extension)
 {
-    QDateTime now = QDateTime::currentDateTime();
-    QString time = now.toString("yyyyMMddhhmmss");
+    QString time = MythDate::toString(MythDate::current(), MythDate::kFilename);
     return QString("%1-%2%3").arg(prefix).arg(time).arg(extension);
 }
 

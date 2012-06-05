@@ -30,7 +30,8 @@ public:
     {
         SurroundModePassive,
         SurroundModeActiveSimple,
-        SurroundModeActiveLinear
+        SurroundModeActiveLinear,
+        SurroundModePassiveHall
     } SurroundMode;
 public:
     FreeSurround(uint srate, bool moviemode, SurroundMode mode);

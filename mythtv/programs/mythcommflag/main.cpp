@@ -23,6 +23,7 @@ using namespace std;
 
 // MythTV headers
 #include "mythmiscutil.h"
+#include "mythdate.h"
 #include "exitcodes.h"
 #include "mythcontext.h"
 #include "mythdb.h"
@@ -144,7 +145,7 @@ static QString get_filename(ProgramInfo *program_info)
 
 static int QueueCommFlagJob(uint chanid, QDateTime starttime, bool rebuild)
 {
-    QString startstring = starttime.toString("yyyyMMddhhmmss");
+    QString startstring = MythDate::toString(starttime, MythDate::kFilename);
     const ProgramInfo pginfo(chanid, starttime);
 
     if (!pginfo.GetChanID())
@@ -200,7 +201,7 @@ static int CopySkipListToCutList(uint chanid, QDateTime starttime)
     frm_dir_map_t cutlist;
     frm_dir_map_t::const_iterator it;
 
-    QString startstring = starttime.toString("yyyyMMddhhmmss");
+    QString startstring = MythDate::toString(starttime, MythDate::kFilename);
     const ProgramInfo pginfo(chanid, starttime);
 
     if (!pginfo.GetChanID())
@@ -224,7 +225,7 @@ static int CopySkipListToCutList(uint chanid, QDateTime starttime)
 
 static int ClearSkipList(uint chanid, QDateTime starttime)
 {
-    QString startstring = starttime.toString("yyyyMMddhhmmss");
+    QString startstring = MythDate::toString(starttime, MythDate::kFilename);
     const ProgramInfo pginfo(chanid, starttime);
 
     if (!pginfo.GetChanID())
@@ -258,7 +259,7 @@ static int SetCutList(uint chanid, QDateTime starttime, QString newCutList)
         cutlist[cutpair[1].toInt()] = MARK_CUT_END;
     }
 
-    QString startstring = starttime.toString("yyyyMMddhhmmss");
+    QString startstring = MythDate::toString(starttime, MythDate::kFilename);
     const ProgramInfo pginfo(chanid, starttime);
 
     if (!pginfo.GetChanID())
@@ -282,7 +283,7 @@ static int GetMarkupList(QString list, uint chanid, QDateTime starttime)
     frm_dir_map_t::const_iterator it;
     QString result;
 
-    QString startstring = starttime.toString("yyyyMMddhhmmss");
+    QString startstring = MythDate::toString(starttime, MythDate::kFilename);
     const ProgramInfo pginfo(chanid, starttime);
 
     if (!pginfo.GetChanID())
@@ -385,7 +386,7 @@ static void print_comm_flag_output(
             tmp = QString("commercialBreakListFor: %1 on %2 @ %3")
                 .arg(program_info->GetTitle())
                 .arg(program_info->GetChanID())
-                .arg(program_info->GetRecordingStartTime(ISODate));
+                .arg(program_info->GetRecordingStartTime(MythDate::ISODate));
         }
         else
         {
@@ -521,7 +522,7 @@ static void incomingCustomEvent(QEvent* e)
 
             message = QString("mythcommflag: Received a "
                               "COMMFLAG_REQUEST event for chanid %1 @ %2.  ")
-                .arg(chanid).arg(recstartts.toString());
+                .arg(chanid).arg(recstartts.toString(Qt::ISODate));
 
             if ((global_program_info->GetChanID()             == chanid) &&
                 (global_program_info->GetRecordingStartTime() == recstartts))
@@ -898,11 +899,11 @@ static int FlagCommercials(ProgramInfo *program_info, int jobid,
     ctx->SetPlayingInfo(program_info);
     ctx->SetRingBuffer(tmprbuf);
     ctx->SetPlayer(cfp);
-    cfp->SetPlayerInfo(NULL, NULL, true, ctx);
+    cfp->SetPlayerInfo(NULL, NULL, ctx);
 
     if (useDB)
     {
-        if (program_info->GetRecordingEndTime() > QDateTime::currentDateTime())
+        if (program_info->GetRecordingEndTime() > MythDate::current())
         {
             gCoreContext->ConnectToMasterServer();
 
@@ -953,7 +954,7 @@ static int FlagCommercials( uint chanid, const QDateTime &starttime,
                             int jobid, const QString &outputfilename,
                             bool fullSpeed )
 {
-    QString startstring = starttime.toString("yyyyMMddhhmmss");
+    QString startstring = MythDate::toString(starttime, MythDate::kFilename);
     ProgramInfo pginfo(chanid, starttime);
 
     if (!pginfo.GetChanID())
@@ -1044,7 +1045,7 @@ static int RebuildSeekTable(ProgramInfo *pginfo, int jobid)
     ctx->SetPlayingInfo(pginfo);
     ctx->SetRingBuffer(tmprbuf);
     ctx->SetPlayer(cfp);
-    cfp->SetPlayerInfo(NULL, NULL, true, ctx);
+    cfp->SetPlayerInfo(NULL, NULL, ctx);
 
     if (progress)
     {
@@ -1096,7 +1097,7 @@ int main(int argc, char *argv[])
     int result = GENERIC_EXIT_OK;
 
 //    QString allStart = "19700101000000";
-//    QString allEnd   = QDateTime::currentDateTime().toString("yyyyMMddhhmmss");
+//    QString allEnd   = MythDate::current().toString("yyyyMMddhhmmss");
     int jobType = JOB_NONE;
 
     if (!cmdline.Parse(argc, argv))
@@ -1267,8 +1268,7 @@ int main(int argc, char *argv[])
 
             while (query.next())
             {
-                starttime = QDateTime::fromString(query.value(1).toString(),
-                                                        Qt::ISODate);
+                starttime = MythDate::fromString(query.value(1).toString());
                 chanid = query.value(0).toUInt();
 
                 if (!cmdline.toBool("force") && !cmdline.toBool("rebuild"))

@@ -398,6 +398,25 @@ void MythSystem::JumpAbort(void)
     d->JumpAbort();
 }
 
+QString MythSystem::ShellEscape(const QString &in)
+{
+    QString out = in;
+
+    if (out.contains("\""))
+        out = out.replace("\"", "\\\"");
+
+    if (out.contains("\'"))
+        out = out.replace("\'", "\\\'");
+
+    if (out.contains(" "))
+    {
+        out.prepend("\"");
+        out.append("\"");
+    }
+
+    return out;
+}
+
 uint myth_system(const QString &command, uint flags, uint timeout)
 {
     flags |= kMSRunShell | kMSAutoCleanup;

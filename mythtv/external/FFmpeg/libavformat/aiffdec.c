@@ -322,6 +322,8 @@ static int aiff_read_packet(AVFormatContext *s,
     if (res < 0)
         return res;
 
+    if (size >= st->codec->block_align)
+        pkt->flags &= ~AV_PKT_FLAG_CORRUPT;
     /* Only one stream in an AIFF file */
     pkt->stream_index = 0;
     pkt->duration     = (res / st->codec->block_align) * aiff->block_duration;
@@ -336,5 +338,5 @@ AVInputFormat ff_aiff_demuxer = {
     .read_header    = aiff_read_header,
     .read_packet    = aiff_read_packet,
     .read_seek      = ff_pcm_read_seek,
-    .codec_tag= (const AVCodecTag* const []){ff_codec_aiff_tags, 0},
+    .codec_tag      = (const AVCodecTag* const []){ ff_codec_aiff_tags, 0 },
 };

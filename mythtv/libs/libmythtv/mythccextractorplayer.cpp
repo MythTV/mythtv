@@ -23,6 +23,7 @@
 #include <iostream>
 using namespace std;
 
+#include <QFileInfo>
 #include <QPainter>
 
 #include "teletextextractorreader.h"

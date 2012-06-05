@@ -37,7 +37,8 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-UPnpNotifyTask::UPnpNotifyTask( int nServicePort ) 
+UPnpNotifyTask::UPnpNotifyTask( int nServicePort ) :
+    Task("UPnpNotifyTask")
 {
     m_nServicePort = nServicePort;
     m_eNTS         = NTS_alive;

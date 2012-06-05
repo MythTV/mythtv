@@ -41,7 +41,6 @@ class MUI_PUBLIC MythVDPAUPainter : public MythPainter
     uint GetTextureFromCache(MythImage *im);
 
     MythRenderVDPAU            *m_render;
-    bool                        m_created_render;
     uint                        m_target;
     bool                        m_swap_control;
 

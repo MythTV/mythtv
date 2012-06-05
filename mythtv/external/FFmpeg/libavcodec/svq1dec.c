@@ -647,6 +647,9 @@ static int svq1_decode_frame(AVCodecContext *avctx,
   if (s->f_code != 0x20) {
     uint32_t *src = (uint32_t *) (buf + 4);
 
+    if (buf_size < 36)
+        return AVERROR_INVALIDDATA;
+
     for (i=0; i < 4; i++) {
       src[i] = ((src[i] << 16) | (src[i] >> 16)) ^ src[7 - i];
     }
@@ -818,7 +821,7 @@ AVCodec ff_svq1_decoder = {
     .close          = svq1_decode_end,
     .decode         = svq1_decode_frame,
     .capabilities   = CODEC_CAP_DR1,
-    .flush= ff_mpeg_flush,
-    .pix_fmts= (const enum PixelFormat[]){PIX_FMT_YUV410P, PIX_FMT_NONE},
-    .long_name= NULL_IF_CONFIG_SMALL("Sorenson Vector Quantizer 1 / Sorenson Video 1 / SVQ1"),
+    .flush          = ff_mpeg_flush,
+    .pix_fmts       = (const enum PixelFormat[]){ PIX_FMT_YUV410P, PIX_FMT_NONE },
+    .long_name      = NULL_IF_CONFIG_SMALL("Sorenson Vector Quantizer 1 / Sorenson Video 1 / SVQ1"),
 };

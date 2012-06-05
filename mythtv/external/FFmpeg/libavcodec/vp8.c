@@ -108,7 +108,7 @@ static void vp8_decode_flush(AVCodecContext *avctx)
 
 static int update_dimensions(VP8Context *s, int width, int height)
 {
-    if (width  != s->avctx->width ||
+    if (width  != s->avctx->width || ((width+15)/16 != s->mb_width || (height+15)/16 != s->mb_height) && s->macroblocks_base ||
         height != s->avctx->height) {
         if (av_image_check_size(width, height, 0, s->avctx))
             return AVERROR_INVALIDDATA;
@@ -333,7 +333,7 @@ static int decode_frame_header(VP8Context *s, const uint8_t *buf, int buf_size)
     }
 
     if (!s->macroblocks_base || /* first frame */
-        width != s->avctx->width || height != s->avctx->height) {
+        width != s->avctx->width || height != s->avctx->height || (width+15)/16 != s->mb_width || (height+15)/16 != s->mb_height) {
         if ((ret = update_dimensions(s, width, height)) < 0)
             return ret;
     }
@@ -708,56 +708,58 @@ void decode_mb_mode(VP8Context *s, VP8Macroblock *mb, int mb_x, int mb_y, uint8_
  * @return 0 if no coeffs were decoded
  *         otherwise, the index of the last coeff decoded plus one
  */
-static int decode_block_coeffs_internal(VP56RangeCoder *c, DCTELEM block[16],
+static int decode_block_coeffs_internal(VP56RangeCoder *r, DCTELEM block[16],
                                         uint8_t probs[16][3][NUM_DCT_TOKENS-1],
                                         int i, uint8_t *token_prob, int16_t qmul[2])
 {
+    VP56RangeCoder c = *r;
     goto skip_eob;
     do {
         int coeff;
-        if (!vp56_rac_get_prob_branchy(c, token_prob[0]))   // DCT_EOB
-            return i;
+        if (!vp56_rac_get_prob_branchy(&c, token_prob[0]))   // DCT_EOB
+            break;
 
 skip_eob:
-        if (!vp56_rac_get_prob_branchy(c, token_prob[1])) { // DCT_0
+        if (!vp56_rac_get_prob_branchy(&c, token_prob[1])) { // DCT_0
             if (++i == 16)
-                return i; // invalid input; blocks should end with EOB
+                break; // invalid input; blocks should end with EOB
             token_prob = probs[i][0];
             goto skip_eob;
         }
 
-        if (!vp56_rac_get_prob_branchy(c, token_prob[2])) { // DCT_1
+        if (!vp56_rac_get_prob_branchy(&c, token_prob[2])) { // DCT_1
             coeff = 1;
             token_prob = probs[i+1][1];
         } else {
-            if (!vp56_rac_get_prob_branchy(c, token_prob[3])) { // DCT 2,3,4
-                coeff = vp56_rac_get_prob_branchy(c, token_prob[4]);
+            if (!vp56_rac_get_prob_branchy(&c, token_prob[3])) { // DCT 2,3,4
+                coeff = vp56_rac_get_prob_branchy(&c, token_prob[4]);
                 if (coeff)
-                    coeff += vp56_rac_get_prob(c, token_prob[5]);
+                    coeff += vp56_rac_get_prob(&c, token_prob[5]);
                 coeff += 2;
             } else {
                 // DCT_CAT*
-                if (!vp56_rac_get_prob_branchy(c, token_prob[6])) {
-                    if (!vp56_rac_get_prob_branchy(c, token_prob[7])) { // DCT_CAT1
-                        coeff  = 5 + vp56_rac_get_prob(c, vp8_dct_cat1_prob[0]);
+                if (!vp56_rac_get_prob_branchy(&c, token_prob[6])) {
+                    if (!vp56_rac_get_prob_branchy(&c, token_prob[7])) { // DCT_CAT1
+                        coeff  = 5 + vp56_rac_get_prob(&c, vp8_dct_cat1_prob[0]);
                     } else {                                    // DCT_CAT2
                         coeff  = 7;
-                        coeff += vp56_rac_get_prob(c, vp8_dct_cat2_prob[0]) << 1;
-                        coeff += vp56_rac_get_prob(c, vp8_dct_cat2_prob[1]);
+                        coeff += vp56_rac_get_prob(&c, vp8_dct_cat2_prob[0]) << 1;
+                        coeff += vp56_rac_get_prob(&c, vp8_dct_cat2_prob[1]);
                     }
                 } else {    // DCT_CAT3 and up
-                    int a = vp56_rac_get_prob(c, token_prob[8]);
-                    int b = vp56_rac_get_prob(c, token_prob[9+a]);
+                    int a = vp56_rac_get_prob(&c, token_prob[8]);
+                    int b = vp56_rac_get_prob(&c, token_prob[9+a]);
                     int cat = (a<<1) + b;
                     coeff  = 3 + (8<<cat);
-                    coeff += vp8_rac_get_coeff(c, ff_vp8_dct_cat_prob[cat]);
+                    coeff += vp8_rac_get_coeff(&c, ff_vp8_dct_cat_prob[cat]);
                 }
             }
             token_prob = probs[i+1][2];
         }
-        block[zigzag_scan[i]] = (vp8_rac_get(c) ? -coeff : coeff) * qmul[!!i];
+        block[zigzag_scan[i]] = (vp8_rac_get(&c) ? -coeff : coeff) * qmul[!!i];
     } while (++i < 16);
 
+    *r = c;
     return i;
 }
 #endif
@@ -1834,6 +1836,8 @@ static int vp8_decode_update_thread_context(AVCodecContext *dst, const AVCodecCo
         (s_src->mb_width != s->mb_width || s_src->mb_height != s->mb_height)) {
         free_buffers(s);
         s->maps_are_invalid = 1;
+        s->mb_width  = s_src->mb_width;
+        s->mb_height = s_src->mb_height;
     }
 
     s->prob[0] = s_src->prob[!s_src->update_probabilities];
@@ -1851,16 +1855,16 @@ static int vp8_decode_update_thread_context(AVCodecContext *dst, const AVCodecCo
 }
 
 AVCodec ff_vp8_decoder = {
-    .name           = "vp8",
-    .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = CODEC_ID_VP8,
-    .priv_data_size = sizeof(VP8Context),
-    .init           = vp8_decode_init,
-    .close          = vp8_decode_free,
-    .decode         = vp8_decode_frame,
-    .capabilities   = CODEC_CAP_DR1 | CODEC_CAP_FRAME_THREADS,
-    .flush = vp8_decode_flush,
-    .long_name = NULL_IF_CONFIG_SMALL("On2 VP8"),
+    .name                  = "vp8",
+    .type                  = AVMEDIA_TYPE_VIDEO,
+    .id                    = CODEC_ID_VP8,
+    .priv_data_size        = sizeof(VP8Context),
+    .init                  = vp8_decode_init,
+    .close                 = vp8_decode_free,
+    .decode                = vp8_decode_frame,
+    .capabilities          = CODEC_CAP_DR1 | CODEC_CAP_FRAME_THREADS,
+    .flush                 = vp8_decode_flush,
+    .long_name             = NULL_IF_CONFIG_SMALL("On2 VP8"),
     .init_thread_copy      = ONLY_IF_THREADS_ENABLED(vp8_decode_init_thread_copy),
     .update_thread_context = ONLY_IF_THREADS_ENABLED(vp8_decode_update_thread_context),
 };

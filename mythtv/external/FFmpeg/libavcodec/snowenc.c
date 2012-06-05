@@ -153,7 +153,6 @@ static void dwt_quantize(SnowContext *s, Plane *p, DWTELEM *buffer, int width, i
 
 #endif /* QUANTIZE2==1 */
 
-#if CONFIG_SNOW_ENCODER
 static av_cold int encode_init(AVCodecContext *avctx)
 {
     SnowContext *s = avctx->priv_data;
@@ -1713,6 +1712,10 @@ redo_frame:
     else
         s->spatial_decomposition_count= 5;
 
+    while(   !(width >>(s->chroma_h_shift + s->spatial_decomposition_count))
+          || !(height>>(s->chroma_v_shift + s->spatial_decomposition_count)))
+        s->spatial_decomposition_count--;
+
     s->m.pict_type = pic->pict_type;
     s->qbias = pic->pict_type == AV_PICTURE_TYPE_P ? 2 : 0;
 
@@ -1924,10 +1927,9 @@ AVCodec ff_snow_encoder = {
     .init           = encode_init,
     .encode2        = encode_frame,
     .close          = encode_end,
-    .long_name = NULL_IF_CONFIG_SMALL("Snow"),
+    .long_name      = NULL_IF_CONFIG_SMALL("Snow"),
     .priv_class     = &snowenc_class,
 };
-#endif
 
 
 #ifdef TEST
@@ -1955,7 +1957,7 @@ int main(void){
         buffer[0][i] = buffer[1][i] = av_lfg_get(&prng) % 54321 - 12345;
 
     ff_spatial_dwt(buffer[0], width, height, width, s.spatial_decomposition_type, s.spatial_decomposition_count);
-    ff_spatial_idwt(buffer[0], width, height, width, s.spatial_decomposition_type, s.spatial_decomposition_count);
+    ff_spatial_idwt((IDWTELEM*)buffer[0], width, height, width, s.spatial_decomposition_type, s.spatial_decomposition_count);
 
     for(i=0; i<width*height; i++)
         if(buffer[0][i]!= buffer[1][i]) printf("fsck: %6d %12d %7d\n",i, buffer[0][i], buffer[1][i]);
@@ -1966,7 +1968,7 @@ int main(void){
         buffer[0][i] = buffer[1][i] = av_lfg_get(&prng) % 54321 - 12345;
 
     ff_spatial_dwt(buffer[0], width, height, width, s.spatial_decomposition_type, s.spatial_decomposition_count);
-    ff_spatial_idwt(buffer[0], width, height, width, s.spatial_decomposition_type, s.spatial_decomposition_count);
+    ff_spatial_idwt((IDWTELEM*)buffer[0], width, height, width, s.spatial_decomposition_type, s.spatial_decomposition_count);
 
     for(i=0; i<width*height; i++)
         if(FFABS(buffer[0][i] - buffer[1][i])>20) printf("fsck: %6d %12d %7d\n",i, buffer[0][i], buffer[1][i]);
@@ -1992,7 +1994,7 @@ int main(void){
 
                 memset(buffer[0], 0, sizeof(int)*width*height);
                 buf[w/2 + h/2*stride]= 256*256;
-                ff_spatial_idwt(buffer[0], width, height, width, s.spatial_decomposition_type, s.spatial_decomposition_count);
+                ff_spatial_idwt((IDWTELEM*)buffer[0], width, height, width, s.spatial_decomposition_type, s.spatial_decomposition_count);
                 for(y=0; y<height; y++){
                     for(x=0; x<width; x++){
                         int64_t d= buffer[0][x + y*width];

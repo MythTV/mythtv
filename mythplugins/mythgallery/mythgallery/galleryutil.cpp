@@ -23,7 +23,7 @@
 // myth
 #include <mythcontext.h>
 #include <mythdbcon.h>
-#include <mythmiscutil.h>
+#include <mythdate.h>
 #include <mythdirs.h>
 #include <mythdb.h>
 #include <mythuihelper.h>

@@ -27,7 +27,7 @@ int SSDPCacheEntries::g_nAllocated = 0;       // Debugging only
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 
-SSDPCacheEntries::SSDPCacheEntries()
+SSDPCacheEntries::SSDPCacheEntries() : ReferenceCounter("SSDPCacheEntries")
 {
     g_nAllocated++;    // Should be atomic increment
 }
@@ -47,14 +47,14 @@ void SSDPCacheEntries::Clear(void)
     for (; it != m_mapEntries.end(); ++it)
     {
         if ((*it))
-            (*it)->Release();
+            (*it)->DecrRef();
     }
 
     m_mapEntries.clear();
 }
 
 /// Finds the Device in the cache, returns NULL when absent
-/// \note Caller must call Release on non-NULL DeviceLocation when done with it.
+/// \note Caller must call DecrRef on non-NULL DeviceLocation when done with it.
 DeviceLocation *SSDPCacheEntries::Find(const QString &sUSN)
 {
     QMutexLocker locker(&m_mutex);
@@ -62,25 +62,25 @@ DeviceLocation *SSDPCacheEntries::Find(const QString &sUSN)
     EntryMap::iterator it = m_mapEntries.find(GetNormalizedUSN(sUSN));
     DeviceLocation *pEntry = (it != m_mapEntries.end()) ? *it : NULL;
     if (pEntry)
-        pEntry->AddRef();
+        pEntry->IncrRef();
 
     return pEntry;
 }
 
 /// Returns random entry in cache, returns NULL when list is empty
-/// \note Caller must call Release on non-NULL DeviceLocation when done with it.
+/// \note Caller must call DecrRef on non-NULL DeviceLocation when done with it.
 DeviceLocation *SSDPCacheEntries::GetFirst(void)
 {
     QMutexLocker locker(&m_mutex);
     if (m_mapEntries.empty())
         return NULL;
     DeviceLocation *loc = *m_mapEntries.begin();
-    loc->AddRef();
+    loc->IncrRef();
     return loc;
 }
 
 /// Returns a copy of the EntryMap
-/// \note Caller must call Release() on each entry in the map.
+/// \note Caller must call DecrRef() on each entry in the map.
 void SSDPCacheEntries::GetEntryMap(EntryMap &map)
 {
     QMutexLocker locker(&m_mutex);
@@ -88,7 +88,7 @@ void SSDPCacheEntries::GetEntryMap(EntryMap &map)
     EntryMap::const_iterator it = m_mapEntries.begin();
     for (; it != m_mapEntries.end(); ++it)
     {
-        (*it)->AddRef();
+        (*it)->IncrRef();
         map.insert(it.key(), *it);
     }
 }
@@ -98,9 +98,9 @@ void SSDPCacheEntries::Insert(const QString &sUSN, DeviceLocation *pEntry)
 {
     QMutexLocker locker(&m_mutex);
 
-    pEntry->AddRef();
+    pEntry->IncrRef();
 
-    // Since insert overrights anything already there
+    // Since insert overwrites anything already there
     // we need to see if the key already exists and release
     // it's reference if it does.
 
@@ -108,7 +108,7 @@ void SSDPCacheEntries::Insert(const QString &sUSN, DeviceLocation *pEntry)
 
     EntryMap::iterator it = m_mapEntries.find(usn);
     if ((it != m_mapEntries.end()) && (*it != NULL))
-        (*it)->Release();
+        (*it)->DecrRef();
 
     m_mapEntries[usn] = pEntry;
 
@@ -130,7 +130,7 @@ void SSDPCacheEntries::Remove( const QString &sUSN )
             LOG(VB_UPNP, LOG_INFO,
                 QString("SSDP Cache removing USN: %1 Location %2")
                     .arg((*it)->m_sUSN).arg((*it)->m_sLocation));
-            (*it)->Release();
+            (*it)->DecrRef();
         }
 
         // -=>TODO: Need to somehow call SSDPCache::NotifyRemove
@@ -156,7 +156,7 @@ uint SSDPCacheEntries::RemoveStale(const TaskTime &ttNow)
         {
             // Note: locking is not required above since we hold
             // one reference to each entry and are holding m_mutex.
-            (*it)->Release();
+            (*it)->DecrRef();
 
             // -=>TODO: Need to somehow call SSDPCache::NotifyRemove
 
@@ -184,7 +184,7 @@ QTextStream &SSDPCacheEntries::OutputXML(
         if (*it == NULL)
             continue;
 
-        // Note: AddRef,Release not required since SSDPCacheEntries
+        // Note: IncrRef,DecrRef not required since SSDPCacheEntries
         // holds one reference to each entry and we are holding m_mutex.
         os << "<Service usn='" << (*it)->m_sUSN 
            << "' expiresInSecs='" << (*it)->ExpiresInSecs()
@@ -208,7 +208,7 @@ void SSDPCacheEntries::Dump(uint &nEntryCount) const
         if (*it == NULL)
             continue;
 
-        // Note: AddRef,Release not required since SSDPCacheEntries
+        // Note: IncrRef,DecrRef not required since SSDPCacheEntries
         // holds one reference to each entry and we are holding m_mutex.
         LOG(VB_UPNP, LOG_DEBUG, QString(" * \t\t%1\t | %2\t | %3 ")
                 .arg((*it)->m_sUSN) .arg((*it)->ExpiresInSecs())
@@ -254,8 +254,9 @@ SSDPCache::SSDPCache()
     // Add Task to keep SSDPCache purged of stale entries.
     // ----------------------------------------------------------------------
 
-    TaskQueue::Instance()->AddTask( new SSDPCacheTask() );
-
+    SSDPCacheTask *task = new SSDPCacheTask();
+    TaskQueue::Instance()->AddTask(task);
+    task->DecrRef();
 }      
 
 /////////////////////////////////////////////////////////////////////////////
@@ -284,27 +285,27 @@ void SSDPCache::Clear(void)
     for (; it != m_cache.end(); ++it)
     {
         if (*it)
-            (*it)->Release();
+            (*it)->DecrRef();
     }
 
     m_cache.clear();
 }
 
 /// Finds the SSDPCacheEntries in the cache, returns NULL when absent
-/// \note Caller must call Release on non-NULL when done with it.
+/// \note Caller must call DecrRef on non-NULL when done with it.
 SSDPCacheEntries *SSDPCache::Find(const QString &sURI)
 {
     QMutexLocker locker(&m_mutex);
 
     SSDPCacheEntriesMap::iterator it = m_cache.find(sURI);
     if (it != m_cache.end() && (*it != NULL))
-        (*it)->AddRef();
+        (*it)->IncrRef();
 
     return (it != m_cache.end()) ? *it : NULL;
 }
 
 /// Finds the Device in the cache, returns NULL when absent
-/// \note Caller must call Release on non-NULL when done with it.
+/// \note Caller must call DecrRef on non-NULL when done with it.
 DeviceLocation *SSDPCache::Find(const QString &sURI, const QString &sUSN)
 {
     DeviceLocation   *pEntry   = NULL;
@@ -313,7 +314,7 @@ DeviceLocation *SSDPCache::Find(const QString &sURI, const QString &sUSN)
     if (pEntries != NULL)
     {
         pEntry = pEntries->Find(sUSN);
-        pEntries->Release();
+        pEntries->DecrRef();
     }
 
     return pEntry;
@@ -347,11 +348,10 @@ void SSDPCache::Add( const QString &sURI,
         if (it == m_cache.end() || (*it == NULL))
         {
             pEntries = new SSDPCacheEntries();
-            pEntries->AddRef();
             it = m_cache.insert(sURI, pEntries);
         }
         pEntries = *it;
-        pEntries->AddRef();
+        pEntries->IncrRef();
     }
 
     // --------------------------------------------------------------
@@ -369,10 +369,10 @@ void SSDPCache::Add( const QString &sURI,
     {
         pEntry->m_sLocation = sLocation;
         pEntry->m_ttExpires = ttExpires;
-        pEntry->Release();
     }
 
-    pEntries->Release();
+    pEntry->DecrRef();
+    pEntries->DecrRef();
 }
      
 /////////////////////////////////////////////////////////////////////////////
@@ -395,17 +395,17 @@ void SSDPCache::Remove( const QString &sURI, const QString &sUSN )
 
         if (pEntries != NULL)
         {
-            pEntries->AddRef();
+            pEntries->IncrRef();
 
             pEntries->Remove( sUSN );
 
             if (pEntries->Count() == 0)
             {
-                pEntries->Release();
+                pEntries->DecrRef();
                 m_cache.erase(it);
             }
 
-            pEntries->Release();
+            pEntries->DecrRef();
         }
     }
 
@@ -443,14 +443,14 @@ int SSDPCache::RemoveStale()
 
         if (pEntries != NULL)
         {
-            pEntries->AddRef();
+            pEntries->IncrRef();
 
             nCount += pEntries->RemoveStale( ttNow );
      
             if (pEntries->Count() == 0)
                 lstKeys.append( it.key() );
 
-            pEntries->Release();
+            pEntries->DecrRef();
         }
     }
 
@@ -473,7 +473,7 @@ int SSDPCache::RemoveStale()
 
         if (*it)
         {
-            (*it)->Release();
+            (*it)->DecrRef();
             m_cache.erase(it);
         }
     }

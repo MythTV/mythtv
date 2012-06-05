@@ -17,17 +17,16 @@ using namespace std;
 #include <QMap>
 #include <QDir>
 
-// libmyth headers
+// MythTV headers
+#include "mythmiscutil.h"
 #include "exitcodes.h"
 #include "mythlogging.h"
 #include "mythdbcon.h"
 #include "compat.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 #include "mythdirs.h"
 #include "mythdb.h"
 #include "mythsystem.h"
-
-// libmythtv headers
 #include "videosource.h" // for is_grabber..
 
 // filldata headers
@@ -39,7 +38,7 @@ using namespace std;
 
 bool updateLastRunEnd(MSqlQuery &query)
 {
-    QDateTime qdtNow = QDateTime::currentDateTime();
+    QDateTime qdtNow = MythDate::current();
     query.prepare("UPDATE settings SET data = :ENDTIME "
                   "WHERE value='mythfilldatabaseLastRunEnd'");
 
@@ -55,7 +54,7 @@ bool updateLastRunEnd(MSqlQuery &query)
 
 bool updateLastRunStart(MSqlQuery &query)
 {
-    QDateTime qdtNow = QDateTime::currentDateTime();
+    QDateTime qdtNow = MythDate::current();
     query.prepare("UPDATE settings SET data = :STARTTIME "
                   "WHERE value='mythfilldatabaseLastRunStart'");
 
@@ -240,15 +239,16 @@ bool FillData::GrabDDData(Source source, int poffset,
         }
         else
         {
-            QDateTime fromdatetime = QDateTime(pdate).toUTC().addDays(poffset);
+            QDateTime fromdatetime =
+                QDateTime(pdate, QTime(0,0), Qt::UTC).addDays(poffset);
             QDateTime todatetime = fromdatetime.addDays(1);
 
             LOG(VB_GENERAL, LOG_INFO, QString("Grabbing data for %1 offset %2")
                                           .arg(pdate.toString())
                                           .arg(poffset));
             LOG(VB_GENERAL, LOG_INFO, QString("From %1 to %2 (UTC)")
-                                          .arg(fromdatetime.toString())
-                                          .arg(todatetime.toString()));
+                .arg(fromdatetime.toString(Qt::ISODate))
+                .arg(todatetime.toString(Qt::ISODate)));
 
             if (!ddprocessor.GrabData(fromdatetime, todatetime))
             {
@@ -268,8 +268,8 @@ bool FillData::GrabDDData(Source source, int poffset,
 
     LOG(VB_GENERAL, LOG_INFO,
         QString("Grab complete.  Actual data from %1 to %2 (UTC)")
-            .arg(ddprocessor.GetDDProgramsStartAt().toString())
-            .arg(ddprocessor.GetDDProgramsEndAt().toString()));
+        .arg(ddprocessor.GetDDProgramsStartAt().toString(Qt::ISODate))
+        .arg(ddprocessor.GetDDProgramsEndAt().toString(Qt::ISODate)));
 
     updateLastRunEnd(query);
 
@@ -291,9 +291,8 @@ bool FillData::GrabDDData(Source source, int poffset,
 #endif
 
     query.prepare("SELECT count(*) from dd_v_program;");
-    if (query.exec() && query.size() > 0)
+    if (query.exec() && query.next())
     {
-        query.next();
         if (query.value(0).toInt() < 1)
         {
             LOG(VB_GENERAL, LOG_INFO, "Did not find any new program data.");
@@ -307,13 +306,13 @@ bool FillData::GrabDDData(Source source, int poffset,
     }
 
     LOG(VB_GENERAL, LOG_INFO, "Clearing data for source.");
-    QDateTime fromlocaldt = ddprocessor.GetDDProgramsStartAt(true);
-    QDateTime tolocaldt = ddprocessor.GetDDProgramsEndAt(true);
+    QDateTime from = ddprocessor.GetDDProgramsStartAt();
+    QDateTime to = ddprocessor.GetDDProgramsEndAt();
 
     LOG(VB_GENERAL, LOG_INFO, QString("Clearing from %1 to %2 (localtime)")
-                                  .arg(fromlocaldt.toString())
-                                  .arg(tolocaldt.toString()));
-    ProgramData::ClearDataBySource(source.id, fromlocaldt, tolocaldt, true);
+        .arg(from.toLocalTime().toString(Qt::ISODate))
+        .arg(to.toLocalTime().toString(Qt::ISODate)));
+    ProgramData::ClearDataBySource(source.id, from, to, true);
     LOG(VB_GENERAL, LOG_INFO, "Data for source cleared.");
 
     LOG(VB_GENERAL, LOG_INFO, "Updating programs.");
@@ -484,7 +483,7 @@ bool FillData::GrabDataFromDDFile(
     const QString &lineupid, QDate *qCurrentDate)
 {
     QDate *currentd = qCurrentDate;
-    QDate qcd = QDate::currentDate();
+    QDate qcd = MythDate::current().date();
     if (!currentd)
         currentd = &qcd;
 
@@ -555,14 +554,11 @@ bool FillData::Run(SourceList &sourcelist)
                       "AND manualid = 0 AND c.xmltvid != '';");
         query.bindValue(":SRCID", (*it).id);
 
-        if (query.exec() && query.size() > 0)
+        if (query.exec() && query.next())
         {
-            query.next();
-
             if (!query.isNull(0))
-                GuideDataBefore = 
-                    QDateTime::fromString(query.value(0).toString(),
-                                          Qt::ISODate);
+                GuideDataBefore =
+                    MythDate::fromString(query.value(0).toString());
         }
 
         channel_update_run = false;
@@ -604,9 +600,8 @@ bool FillData::Run(SourceList &sourcelist)
              ":SRCID AND xmltvid != ''");
         query.bindValue(":SRCID", (*it).id);
 
-        if (query.exec() && query.size() > 0)
+        if (query.exec() && query.next())
         {
-            query.next();
             source_channels = query.value(0).toInt();
             if (source_channels > 0)
             {
@@ -639,7 +634,8 @@ bool FillData::Run(SourceList &sourcelist)
             grabber_capabilities_proc.Run(25);
             if (grabber_capabilities_proc.Wait() != GENERIC_EXIT_OK)
                 LOG(VB_GENERAL, LOG_ERR,
-                    QString("%1  --capabilities failed or we timed out waiting."                            " You may need to upgrade your xmltv grabber")
+                    QString("%1  --capabilities failed or we timed out waiting."                            
+                    " You may need to upgrade your xmltv grabber")
                         .arg(xmltv_grabber));
             else
             {
@@ -704,7 +700,7 @@ bool FillData::Run(SourceList &sourcelist)
                 DataDirectUpdateChannels(*it);
             else
             {
-                QDate qCurrentDate = QDate::currentDate();
+                QDate qCurrentDate = MythDate::current().date();
                 if (!GrabData(*it, 0, &qCurrentDate))
                     ++failures;
             }
@@ -718,7 +714,7 @@ bool FillData::Run(SourceList &sourcelist)
                  is_grabber_datadirect(xmltv_grabber))
         {
 
-            QDate qCurrentDate = QDate::currentDate();
+            QDate qCurrentDate = MythDate::current().date();
 
             // We'll keep grabbing until it returns nothing
             // Max days currently supported is 21
@@ -747,9 +743,9 @@ bool FillData::Run(SourceList &sourcelist)
                 // We need to check and see if the current date has changed
                 // since we started in this loop.  If it has, we need to adjust
                 // the value of 'i' to compensate for this.
-                if (QDate::currentDate() != qCurrentDate)
+                if (MythDate::current().date() != qCurrentDate)
                 {
-                    QDate newDate = QDate::currentDate();
+                    QDate newDate = MythDate::current().date();
                     i += (newDate.daysTo(qCurrentDate));
                     if (i < 0)
                         i = 0;
@@ -965,13 +961,10 @@ bool FillData::Run(SourceList &sourcelist)
                       "AND manualid = 0 AND c.xmltvid != '';");
         query.bindValue(":SRCID", (*it).id);
 
-        if (query.exec() && query.size() > 0)
+        if (query.exec() && query.next())
         {
-            query.next();
-
             if (!query.isNull(0))
-                GuideDataAfter = QDateTime::fromString(
-                                     query.value(0).toString(), Qt::ISODate);
+                GuideDataAfter = MythDate::fromString(query.value(0).toString());
         }
 
         if (GuideDataAfter == GuideDataBefore)

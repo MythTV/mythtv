@@ -6,17 +6,17 @@
 
 #include <cstdlib>
 
-#include "tv_rec.h"
-
+#include "scheduledrecording.h"
 #include "channelbase.h"
-#include "iso639.h"
+#include "mythlogging.h"
 #include "eitscanner.h"
 #include "eithelper.h"
-#include "scheduledrecording.h"
-#include "mythmiscutil.h"
-#include "mythdb.h"
-#include "mythlogging.h"
+#include "mythtimer.h"
+#include "mythdate.h"
 #include "mthread.h"
+#include "iso639.h"
+#include "mythdb.h"
+#include "tv_rec.h"
 
 #define LOC QString("EITScanner: ")
 #define LOC_ID QString("EITScanner (%1): ").arg(cardnum)
@@ -29,7 +29,7 @@
  */
 
 QMutex     EITScanner::resched_lock;
-QDateTime  EITScanner::resched_next_time      = QDateTime::currentDateTime();
+QDateTime  EITScanner::resched_next_time      = MythDate::current();
 const uint EITScanner::kMinRescheduleInterval = 150;
 
 EITScanner::EITScanner(uint _cardnum)
@@ -116,7 +116,7 @@ void EITScanner::run(void)
             RescheduleRecordings();
         }
 
-        if (activeScan && (QDateTime::currentDateTime() > activeScanNextTrig))
+        if (activeScan && (MythDate::current() > activeScanNextTrig))
         {
             // if there have been any new events, tell scheduler to run.
             if (eitCount)
@@ -140,7 +140,7 @@ void EITScanner::run(void)
                         .arg(*activeScanNextChan));
             }
 
-            activeScanNextTrig = QDateTime::currentDateTime()
+            activeScanNextTrig = MythDate::current()
                 .addSecs(activeScanTrigTime);
             ++activeScanNextChan;
 
@@ -174,7 +174,7 @@ void EITScanner::RescheduleRecordings(void)
     if (!resched_lock.tryLock())
         return;
 
-    if (resched_next_time > QDateTime::currentDateTime())
+    if (resched_next_time > MythDate::current())
     {
         LOG(VB_EIT, LOG_INFO, LOC + "Rate limiting reschedules..");
         resched_lock.unlock();
@@ -182,7 +182,7 @@ void EITScanner::RescheduleRecordings(void)
     }
 
     resched_next_time =
-        QDateTime::currentDateTime().addSecs(kMinRescheduleInterval);
+        MythDate::current().addSecs(kMinRescheduleInterval);
     resched_lock.unlock();
 
     ScheduledRecording::RescheduleMatch(0, 0, 0, QDateTime(), "EITScanner");
@@ -274,7 +274,7 @@ void EITScanner::StartActiveScan(TVRec *_rec, uint max_seconds_per_source)
         uint randomStart = random() % activeScanChannels.size();
         activeScanNextChan = activeScanChannels.begin()+randomStart;
 
-        activeScanNextTrig = QDateTime::currentDateTime();
+        activeScanNextTrig = MythDate::current();
         activeScanTrigTime = max_seconds_per_source;
         // Add a little randomness to trigger time so multiple
         // cards will have a staggered channel changing time.

@@ -2,6 +2,7 @@
 #include <QDir>
 
 #include "mythdirs.h"
+#include "mythdate.h"
 
 #include "mythuiimageresults.h"
 
@@ -104,7 +105,7 @@ void ImageSearchResultsDialog::cleanCacheDir()
         QString filename = QString("%1/%2").arg(cache).arg(*i);
         QFileInfo fi(filename);
         QDateTime lastmod = fi.lastModified();
-        if (lastmod.addDays(2) < QDateTime::currentDateTime())
+        if (lastmod.addDays(2) < MythDate::current())
         {
             LOG(VB_GENERAL, LOG_DEBUG, QString("Deleting file %1")
                   .arg(filename));

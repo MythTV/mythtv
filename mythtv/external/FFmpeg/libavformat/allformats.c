@@ -125,6 +125,7 @@ void av_register_all(void)
     REGISTER_DEMUXER  (ISS, iss);
     REGISTER_DEMUXER  (IV8, iv8);
     REGISTER_MUXDEMUX (IVF, ivf);
+    REGISTER_MUXDEMUX (JACOSUB, jacosub);
     REGISTER_DEMUXER  (JV, jv);
     REGISTER_MUXDEMUX (LATM, latm);
     REGISTER_DEMUXER  (LMLM4, lmlm4);
@@ -154,11 +155,11 @@ void av_register_all(void)
     REGISTER_MUXER    (MPEG2VIDEO, mpeg2video);
     REGISTER_MUXER    (MPEG2VOB, mpeg2vob);
     REGISTER_DEMUXER  (MPEGPS, mpegps);
+//    REGISTER_MUXDEMUX (MPEGTS, mpegts);
     REGISTER_MUXER    (MPEGTS, mpegts);
-//    REGISTER_DEMUXER  (MPEGTS, mpegts);
     REGISTER_DEMUXER  (MPEGTS, mythtv_mpegts);
+//    REGISTER_DEMUXER  (MPEGTSRAW, mpegtsraw);
     REGISTER_DEMUXER  (MPEGTSRAW, mythtv_mpegtsraw);
-    REGISTER_DEMUXER  (MPEGTSRAW, mpegtsraw);
     REGISTER_DEMUXER  (MPEGVIDEO, mpegvideo);
     REGISTER_MUXER    (MPJPEG, mpjpeg);
     REGISTER_DEMUXER  (MSNWC_TCP, msnwc_tcp);
@@ -280,6 +281,7 @@ void av_register_all(void)
     REGISTER_PROTOCOL (PIPE, pipe);
     REGISTER_PROTOCOL (RTMP, rtmp);
     REGISTER_PROTOCOL (RTP, rtp);
+    REGISTER_PROTOCOL (SCTP, sctp);
     REGISTER_PROTOCOL (TCP, tcp);
     REGISTER_PROTOCOL (TLS, tls);
     REGISTER_PROTOCOL (UDP, udp);

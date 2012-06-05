@@ -33,7 +33,7 @@
 
 #if HAVE_MMX
 extern "C" {
-#include "libavcodec/x86/mmx.h"
+#include "ffmpeg-mmx.h"
 }
 #define CPU_MMXEXT 0
 #define CPU_MMX 1

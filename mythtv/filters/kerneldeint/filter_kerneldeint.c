@@ -25,7 +25,7 @@
 #define CLAMP(A,L,U) ((A)>(U)?(U):((A)<(L)?(L):(A)))
 
 #if HAVE_MMX
-#include "libavcodec/x86/mmx.h"
+#include "ffmpeg-mmx.h"
 #define THRESHOLD 12
 static const mmx_t mm_lthr = { w:{ -THRESHOLD, -THRESHOLD,
                                    -THRESHOLD, -THRESHOLD} };

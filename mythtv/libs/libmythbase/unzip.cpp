@@ -1355,7 +1355,7 @@ QDateTime UnzipPrivate::convertDateTime(const unsigned char date[2], const unsig
 	quint16 minutes = ((time[1] << 3) & 56) | ((time[0] >> 5) & 7);
 	quint16 seconds = (time[0] & 31) * 2;
 
-	dt.setDate(QDate(1980 + year, month, day));
-	dt.setTime(QTime(hour, minutes, seconds));
+	dt = QDateTime(QDate(1980 + year, month, day),
+                QTime(hour, minutes, seconds), Qt::UTC);
 	return dt;
 }

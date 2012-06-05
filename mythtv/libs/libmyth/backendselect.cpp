@@ -28,10 +28,8 @@ BackendSelection::~BackendSelection()
     ItemMap::iterator it;
     for (it = m_devices.begin(); it != m_devices.end(); ++it)
     {
-        DeviceLocation *dev = *it;
-
-        if (dev)
-            dev->Release();
+        if (*it)
+            (*it)->DecrRef();
     }
 
     m_devices.clear();
@@ -132,7 +130,7 @@ void BackendSelection::AddItem(DeviceLocation *dev)
     // The devices' USN should be unique. Don't add if it is already there:
     if (m_devices.find(USN) == m_devices.end())
     {
-        dev->AddRef();
+        dev->IncrRef();
         m_devices.insert(USN, dev);
 
         m_mutex.unlock();
@@ -167,8 +165,6 @@ void BackendSelection::AddItem(DeviceLocation *dev)
     }
     else
         m_mutex.unlock();
-
-    dev->Release();
 }
 
 /**
@@ -246,11 +242,14 @@ void BackendSelection::Init(void)
     {
         EntryMap ourMap;
         pEntries->GetEntryMap(ourMap);
-        pEntries->Release();
+        pEntries->DecrRef();
 
         EntryMap::const_iterator it;
         for (it = ourMap.begin(); it != ourMap.end(); ++it)
-            AddItem(*it);   // this does an (*it)->Release()
+        {
+            AddItem(*it);
+            (*it)->DecrRef();
+        }
     }
 }
 
@@ -267,11 +266,8 @@ void BackendSelection::RemoveItem(QString USN)
 
     if (it != m_devices.end())
     {
-        DeviceLocation *dev = *it;
-
-        if (dev)
-            dev->Release();
-
+        if (*it)
+            (*it)->DecrRef();
         m_devices.erase(it);
     }
 
@@ -312,7 +308,10 @@ void BackendSelection::customEvent(QEvent *event)
         {
             DeviceLocation *devLoc = SSDP::Instance()->Find(URI, URN);
             if (devLoc)
-                AddItem(devLoc);   // this does a Release()
+            {
+                AddItem(devLoc);
+                devLoc->DecrRef();
+            }
         }
         else if (message.startsWith("SSDP_REMOVE"))
         {

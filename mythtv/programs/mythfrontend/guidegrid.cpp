@@ -23,7 +23,7 @@ using namespace std;
 #include "tv_play.h"
 #include "tv_rec.h"
 #include "customedit.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 #include "remoteutil.h"
 #include "channelutil.h"
 #include "cardutil.h"
@@ -253,7 +253,7 @@ GuideGrid::GuideGrid(MythScreenStack *parent,
             m_programInfos[y][x] = NULL;
     }
 
-    m_originalStartTime = QDateTime::currentDateTime();
+    m_originalStartTime = MythDate::current();
 
     int secsoffset = -((m_originalStartTime.time().minute() % 30) * 60 +
                         m_originalStartTime.time().second());
@@ -523,7 +523,7 @@ bool GuideGrid::keyPressEvent(QKeyEvent *event)
                 ProgramInfo *pginfo =
                     m_programInfos[m_currentRow][m_currentCol];
                 int secsTillStart =
-                    (pginfo) ? QDateTime::currentDateTime().secsTo(
+                    (pginfo) ? MythDate::current().secsTo(
                         pginfo->GetScheduledStartTime()) : 0;
                 if (pginfo && (pginfo->GetTitle() != kUnknownTitle) &&
                     ((secsTillStart / 60) >= m_selectRecThreshold))
@@ -1036,17 +1036,18 @@ void GuideGrid::fillTimeInfos()
         mins = 5 * (mins / 5);
         if (mins % 30 == 0)
         {
-            QString timeStr = MythDateTimeToString(starttime, kTime);
-
+            QString timeStr = MythDate::toString(starttime, MythDate::kTime);
+            
             InfoMap infomap;
             infomap["starttime"] = timeStr;
-
-            QTime endtime = starttime.time().addSecs(60 * 30);
-
-            infomap["endtime"] = MythTimeToString(endtime, kTime);
+            
+            QDateTime endtime = starttime.addSecs(60 * 30);
+            
+            infomap["endtime"] = MythDate::toString(endtime, MythDate::kTime);
 
             MythUIButtonListItem *item =
-                                new MythUIButtonListItem(m_timeList, timeStr);
+                new MythUIButtonListItem(m_timeList, timeStr);
+
             item->SetTextFromMap(infomap);
         }
 
@@ -1125,7 +1126,7 @@ void GuideGrid::fillProgramRowInfos(unsigned int row, bool useExistingData)
 
     QDateTime ts = m_currentStartTime;
 
-    QDateTime tnow = QDateTime::currentDateTime();
+    QDateTime tnow = MythDate::current();
     int progPast = 0;
     if (tnow > m_currentEndTime)
         progPast = 100;
@@ -1440,7 +1441,7 @@ void GuideGrid::customEvent(QEvent *event)
             {
                 editSchedule();
             }
-            else if (resulttext == tr("Upcoming"))
+            else if (resulttext == tr("Show Upcoming"))
             {
                 upcoming();
             }
@@ -1498,10 +1499,10 @@ void GuideGrid::customEvent(QEvent *event)
 void GuideGrid::updateDateText(void)
 {
     if (m_dateText)
-        m_dateText->SetText(MythDateTimeToString(m_currentStartTime, kDateShort));
+        m_dateText->SetText(MythDate::toString(m_currentStartTime, MythDate::kDateShort));
     if (m_longdateText)
-        m_longdateText->SetText(MythDateTimeToString(m_currentStartTime,
-                                                 (kDateFull | kSimplify)));
+        m_longdateText->SetText(MythDate::toString(m_currentStartTime,
+                                                 (MythDate::kDateFull | MythDate::kSimplify)));
 }
 
 void GuideGrid::updateChannels(void)

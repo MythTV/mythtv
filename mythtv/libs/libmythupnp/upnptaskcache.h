@@ -39,7 +39,7 @@ class SSDPCacheTask : public Task
 
     public:
 
-        SSDPCacheTask()
+        SSDPCacheTask() : Task("SSDPCacheTask")
         {
             m_nExecuteCount = 0;
             m_nInterval     = 1000 *

@@ -36,6 +36,7 @@
 // MythTV headers
 #include "channelscanmiscsettings.h"
 #include "scaninfo.h"
+#include "mythdate.h"
 
 class PaneExistingScanImport : public VerticalConfigurationGroup
 {
@@ -60,7 +61,8 @@ class PaneExistingScanImport : public VerticalConfigurationGroup
             if (scans[i].sourceid != sourceid)
                 continue;
 
-            QString scanDate = scans[i].scandate.toString();
+            QString scanDate = MythDate::toString(
+                scans[i].scandate, MythDate::kDateTimeFull);
             QString proc     = (scans[i].processed) ?
                 QObject::tr("processed") : QObject::tr("unprocessed");
 

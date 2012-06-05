@@ -9,7 +9,7 @@
 #include "mythlogging.h"
 #include "httpcomms.h"
 #include "importicons.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 
 // MythUI
 #include "mythuitext.h"
@@ -164,7 +164,7 @@ void ImportIconsWizard::manualSearch()
     if (!search(escape_csv(str)))
         m_statusText->SetText(tr("No matches found for %1") .arg(str));
     else
-        m_statusText->SetText("");
+        m_statusText->Reset();
 }
 
 void ImportIconsWizard::skip()
@@ -207,14 +207,12 @@ void ImportIconsWizard::menuSelection(MythUIButtonListItem *item)
 
     if (checkAndDownload(entry.strLogo, entry2.strChanId))
     {
-        if (m_statusText)
-            m_statusText->SetText(tr("Icon for %1 was downloaded successfully.")
+        m_statusText->SetText(tr("Icon for %1 was downloaded successfully.")
                                     .arg(entry2.strName));
     }
     else
     {
-        if (m_statusText)
-            m_statusText->SetText(tr("Failed to download the icon for %1.")
+        m_statusText->SetText(tr("Failed to download the icon for %1.")
                                     .arg(entry2.strName));
     }
 
@@ -450,7 +448,7 @@ bool ImportIconsWizard::doLoad()
         m_statusText->SetText(tr("No matches found for %1")
                               .arg((*m_missingIter).strName));
     else
-        m_statusText->SetText("");
+        m_statusText->Reset();
 
     return true;
 }
@@ -747,8 +745,7 @@ bool ImportIconsWizard::submit()
         str.startsWith("Error", Qt::CaseInsensitive))
     {
         LOG(VB_GENERAL, LOG_ERR, QString("Error from submit : %1").arg(str));
-        if (m_statusText)
-            m_statusText->SetText(tr("Failed to submit icon choices."));
+        m_statusText->SetText(tr("Failed to submit icon choices."));
         return false;
     }
     else
@@ -783,8 +780,7 @@ bool ImportIconsWizard::submit()
             QString("Icon Import: working submit : atsc=%1 callsign=%2 "
                     "dvb=%3 tv=%4 xmltvid=%5")
                 .arg(atsc).arg(callsign).arg(dvb).arg(tv).arg(xmltvid));
-        if (m_statusText)
-            m_statusText->SetText(tr("Icon choices submitted successfully."));
+        m_statusText->SetText(tr("Icon choices submitted successfully."));
         return true;
     }
 }

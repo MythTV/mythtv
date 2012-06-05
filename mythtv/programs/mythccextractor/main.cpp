@@ -83,7 +83,7 @@ static int RunCCExtract(const ProgramInfo &program_info)
     ctx->SetRingBuffer(tmprbuf);
     ctx->SetPlayer(ccp);
 
-    ccp->SetPlayerInfo(NULL, NULL, true, ctx);
+    ccp->SetPlayerInfo(NULL, NULL, ctx);
     if (ccp->OpenFile() < 0)
     {
         cerr << "Failed to open " << qPrintable(filename) << endl;

@@ -44,6 +44,8 @@ using namespace std;
 #include "mythsignalingtimer.h"
 #include "mythcorecontext.h"
 #include "mythmedia.h"
+#include "mythmiscutil.h"
+#include "mythdate.h"
 
 // libmythui headers
 #include "myththemebase.h"
@@ -860,7 +862,8 @@ bool MythMainWindow::SaveScreenShot(const QImage &image, QString filename)
     {
         QString fpath = GetMythDB()->GetSetting("ScreenShotPath", "/tmp");
         filename = QString("%1/myth-screenshot-%2.png").arg(fpath)
-         .arg(QDateTime::currentDateTime().toString("yyyy-MM-ddThh-mm-ss.zzz"));
+            .arg(MythDate::toString(
+                     MythDate::current(), MythDate::kScreenShotFilename));
     }
 
     QString extension = filename.section('.', -1, -1);

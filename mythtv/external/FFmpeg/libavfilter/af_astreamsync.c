@@ -25,6 +25,7 @@
 
 #include "libavutil/eval.h"
 #include "avfilter.h"
+#include "audio.h"
 #include "internal.h"
 
 #define QUEUE_SIZE 16
@@ -80,17 +81,15 @@ static int query_formats(AVFilterContext *ctx)
 {
     int i;
     AVFilterFormats *formats;
+    AVFilterChannelLayouts *layouts;
 
     for (i = 0; i < 2; i++) {
         formats = ctx->inputs[i]->in_formats;
         avfilter_formats_ref(formats, &ctx->inputs[i]->out_formats);
         avfilter_formats_ref(formats, &ctx->outputs[i]->in_formats);
-        formats = ctx->inputs[i]->in_packing;
-        avfilter_formats_ref(formats, &ctx->inputs[i]->out_packing);
-        avfilter_formats_ref(formats, &ctx->outputs[i]->in_packing);
-        formats = ctx->inputs[i]->in_chlayouts;
-        avfilter_formats_ref(formats, &ctx->inputs[i]->out_chlayouts);
-        avfilter_formats_ref(formats, &ctx->outputs[i]->in_chlayouts);
+        layouts = ctx->inputs[i]->in_channel_layouts;
+        ff_channel_layouts_ref(layouts, &ctx->inputs[i]->out_channel_layouts);
+        ff_channel_layouts_ref(layouts, &ctx->outputs[i]->in_channel_layouts);
     }
     return 0;
 }
@@ -119,7 +118,7 @@ static void send_out(AVFilterContext *ctx, int out_id)
             av_q2d(ctx->outputs[out_id]->time_base) * buf->pts;
     as->var_values[VAR_T1 + out_id] += buf->audio->nb_samples /
                                    (double)ctx->inputs[out_id]->sample_rate;
-    avfilter_filter_samples(ctx->outputs[out_id], buf);
+    ff_filter_samples(ctx->outputs[out_id], buf);
     queue->nb--;
     queue->tail = (queue->tail + 1) % QUEUE_SIZE;
     if (as->req[out_id])

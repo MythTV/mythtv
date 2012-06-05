@@ -371,6 +371,12 @@ int ff_h264_decode_seq_parameter_set(H264Context *h){
     }
 
     sps->log2_max_frame_num= get_ue_golomb(&s->gb) + 4;
+    if (sps->log2_max_frame_num < 4 || sps->log2_max_frame_num > 16) {
+        av_log(h->s.avctx, AV_LOG_ERROR, "illegal log2_max_frame_num %d\n",
+               sps->log2_max_frame_num);
+        goto fail;
+    }
+
     sps->poc_type= get_ue_golomb_31(&s->gb);
 
     if(sps->poc_type == 0){ //FIXME #define
@@ -516,6 +522,9 @@ int ff_h264_decode_picture_parameter_set(H264Context *h, int bit_length){
     if(pps_id >= MAX_PPS_COUNT) {
         av_log(h->s.avctx, AV_LOG_ERROR, "pps_id (%d) out of range\n", pps_id);
         return -1;
+    } else if (h->sps.bit_depth_luma > 10) {
+        av_log(h->s.avctx, AV_LOG_ERROR, "Unimplemented luma bit depth=%d (max=10)\n", h->sps.bit_depth_luma);
+        return AVERROR_PATCHWELCOME;
     }
 
     pps= av_mallocz(sizeof(PPS));

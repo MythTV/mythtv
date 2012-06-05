@@ -390,7 +390,8 @@ av_cold int ff_MPV_encode_init(AVCodecContext *avctx)
 
     if ((!avctx->rc_max_rate) != (!avctx->rc_buffer_size)) {
         av_log(avctx, AV_LOG_ERROR, "Either both buffer size and max rate or neither must be specified\n");
-        return -1;
+        if (avctx->rc_max_rate && !avctx->rc_buffer_size)
+            return -1;
     }
 
     if (avctx->rc_min_rate && avctx->rc_max_rate != avctx->rc_min_rate) {
@@ -477,6 +478,42 @@ av_cold int ff_MPV_encode_init(AVCodecContext *avctx)
                avctx->sample_aspect_ratio.num, avctx->sample_aspect_ratio.den);
         av_reduce(&avctx->sample_aspect_ratio.num, &avctx->sample_aspect_ratio.den,
                    avctx->sample_aspect_ratio.num,  avctx->sample_aspect_ratio.den, 255);
+    }
+
+    if ((s->codec_id == CODEC_ID_H263  ||
+         s->codec_id == CODEC_ID_H263P) &&
+        (avctx->width  > 2048 ||
+         avctx->height > 1152 )) {
+        av_log(avctx, AV_LOG_ERROR, "H.263 does not support resolutions above 2048x1152\n");
+        return -1;
+    }
+    if ((s->codec_id == CODEC_ID_H263  ||
+         s->codec_id == CODEC_ID_H263P) &&
+        ((avctx->width &3) ||
+         (avctx->height&3) )) {
+        av_log(avctx, AV_LOG_ERROR, "w/h must be a multiple of 4\n");
+        return -1;
+    }
+
+    if (s->codec_id == CODEC_ID_MPEG1VIDEO &&
+        (avctx->width  > 4095 ||
+         avctx->height > 4095 )) {
+        av_log(avctx, AV_LOG_ERROR, "MPEG-1 does not support resolutions above 4095x4095\n");
+        return -1;
+    }
+
+    if (s->codec_id == CODEC_ID_MPEG2VIDEO &&
+        (avctx->width  > 16383 ||
+         avctx->height > 16383 )) {
+        av_log(avctx, AV_LOG_ERROR, "MPEG-2 does not support resolutions above 16383x16383\n");
+        return -1;
+    }
+
+    if ((s->codec_id == CODEC_ID_WMV1 ||
+         s->codec_id == CODEC_ID_WMV2) &&
+         avctx->width & 1) {
+         av_log(avctx, AV_LOG_ERROR, "width must be multiple of 2\n");
+         return -1;
     }
 
     if ((s->flags & (CODEC_FLAG_INTERLACED_DCT | CODEC_FLAG_INTERLACED_ME)) &&
@@ -1589,12 +1626,12 @@ vbv_retry:
         avctx->frame_bits  = s->frame_bits;
 
         pkt->pts = s->current_picture.f.pts;
-        if (!s->low_delay) {
+        if (!s->low_delay && s->pict_type != AV_PICTURE_TYPE_B) {
             if (!s->current_picture.f.coded_picture_number)
                 pkt->dts = pkt->pts - s->dts_delta;
             else
                 pkt->dts = s->reordered_pts;
-            s->reordered_pts = s->input_picture[0]->f.pts;
+            s->reordered_pts = pkt->pts;
         } else
             pkt->dts = pkt->pts;
         if (s->current_picture.f.key_frame)
@@ -1790,11 +1827,11 @@ static av_always_inline void encode_mb_internal(MpegEncContext *s,
         ptr_y = ebuf;
         s->dsp.emulated_edge_mc(ebuf + 18 * wrap_y, ptr_cb, wrap_c, 8,
                                 mb_block_height, mb_x * 8, mb_y * 8,
-                                s->width >> 1, s->height >> 1);
+                                (s->width+1) >> 1, (s->height+1) >> 1);
         ptr_cb = ebuf + 18 * wrap_y;
         s->dsp.emulated_edge_mc(ebuf + 18 * wrap_y + 8, ptr_cr, wrap_c, 8,
                                 mb_block_height, mb_x * 8, mb_y * 8,
-                                s->width >> 1, s->height >> 1);
+                                (s->width+1) >> 1, (s->height+1) >> 1);
         ptr_cr = ebuf + 18 * wrap_y + 8;
     }
 
@@ -4204,9 +4241,9 @@ AVCodec ff_h263p_encoder = {
     .init           = ff_MPV_encode_init,
     .encode2        = ff_MPV_encode_picture,
     .close          = ff_MPV_encode_end,
-    .capabilities = CODEC_CAP_SLICE_THREADS,
-    .pix_fmts= (const enum PixelFormat[]){PIX_FMT_YUV420P, PIX_FMT_NONE},
-    .long_name= NULL_IF_CONFIG_SMALL("H.263+ / H.263-1998 / H.263 version 2"),
+    .capabilities   = CODEC_CAP_SLICE_THREADS,
+    .pix_fmts       = (const enum PixelFormat[]){ PIX_FMT_YUV420P, PIX_FMT_NONE },
+    .long_name      = NULL_IF_CONFIG_SMALL("H.263+ / H.263-1998 / H.263 version 2"),
     .priv_class     = &h263p_class,
 };
 
@@ -4220,8 +4257,8 @@ AVCodec ff_msmpeg4v2_encoder = {
     .init           = ff_MPV_encode_init,
     .encode2        = ff_MPV_encode_picture,
     .close          = ff_MPV_encode_end,
-    .pix_fmts= (const enum PixelFormat[]){PIX_FMT_YUV420P, PIX_FMT_NONE},
-    .long_name= NULL_IF_CONFIG_SMALL("MPEG-4 part 2 Microsoft variant version 2"),
+    .pix_fmts       = (const enum PixelFormat[]){ PIX_FMT_YUV420P, PIX_FMT_NONE },
+    .long_name      = NULL_IF_CONFIG_SMALL("MPEG-4 part 2 Microsoft variant version 2"),
     .priv_class     = &msmpeg4v2_class,
 };
 
@@ -4235,8 +4272,8 @@ AVCodec ff_msmpeg4v3_encoder = {
     .init           = ff_MPV_encode_init,
     .encode2        = ff_MPV_encode_picture,
     .close          = ff_MPV_encode_end,
-    .pix_fmts= (const enum PixelFormat[]){PIX_FMT_YUV420P, PIX_FMT_NONE},
-    .long_name= NULL_IF_CONFIG_SMALL("MPEG-4 part 2 Microsoft variant version 3"),
+    .pix_fmts       = (const enum PixelFormat[]){ PIX_FMT_YUV420P, PIX_FMT_NONE },
+    .long_name      = NULL_IF_CONFIG_SMALL("MPEG-4 part 2 Microsoft variant version 3"),
     .priv_class     = &msmpeg4v3_class,
 };
 
@@ -4250,7 +4287,7 @@ AVCodec ff_wmv1_encoder = {
     .init           = ff_MPV_encode_init,
     .encode2        = ff_MPV_encode_picture,
     .close          = ff_MPV_encode_end,
-    .pix_fmts= (const enum PixelFormat[]){PIX_FMT_YUV420P, PIX_FMT_NONE},
-    .long_name= NULL_IF_CONFIG_SMALL("Windows Media Video 7"),
+    .pix_fmts       = (const enum PixelFormat[]){ PIX_FMT_YUV420P, PIX_FMT_NONE },
+    .long_name      = NULL_IF_CONFIG_SMALL("Windows Media Video 7"),
     .priv_class     = &wmv1_class,
 };

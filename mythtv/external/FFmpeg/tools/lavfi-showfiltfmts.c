@@ -22,6 +22,7 @@
 #include "libavutil/pixdesc.h"
 #include "libavutil/samplefmt.h"
 #include "libavfilter/avfilter.h"
+#include "libavfilter/formats.h"
 
 static void print_formats(AVFilterContext *filter_ctx)
 {
@@ -46,21 +47,13 @@ static void print_formats(AVFilterContext *filter_ctx)
                        i, filter_ctx->filter->inout##puts[i].name,      \
                        av_get_sample_fmt_name(fmts->formats[j]));       \
                                                                         \
-            fmts = filter_ctx->inout##puts[i]->outin##_chlayouts;       \
+            fmts = filter_ctx->inout##puts[i]->outin##_channel_layouts; \
             for (j = 0; j < fmts->format_count; j++) {                  \
                 char buf[256];                                          \
                 av_get_channel_layout_string(buf, sizeof(buf), -1,      \
                                              fmts->formats[j]);         \
                 printf(#INOUT "PUT[%d] %s: chlayout:%s\n",              \
                        i, filter_ctx->filter->inout##puts[i].name, buf); \
-            }                                                           \
-                                                                        \
-            fmts = filter_ctx->inout##puts[i]->outin##_packing;         \
-            for (j = 0; j < fmts->format_count; j++) {                  \
-                printf(#INOUT "PUT[%d] %s: packing:%s\n",               \
-                       i, filter_ctx->filter->inout##puts[i].name,      \
-                       fmts->formats[j] == AVFILTER_PACKED ?            \
-                                           "packed" : "planar");        \
             }                                                           \
         }                                                               \
     }                                                                   \
@@ -122,7 +115,7 @@ int main(int argc, char **argv)
     if (filter->query_formats)
         filter->query_formats(filter_ctx);
     else
-        avfilter_default_query_formats(filter_ctx);
+        ff_default_query_formats(filter_ctx);
 
     print_formats(filter_ctx);
 

@@ -1015,7 +1015,7 @@ void LogTimeStamp( struct tm *tm, uint32_t *usec )
     *usec  = tv.tv_usec;
 #else
     /* Stupid system has no gettimeofday, use less precise QDateTime */
-    QDateTime date = QDateTime::currentDateTime();
+    QDateTime date = MythDate::current();
     QTime     time = date.time();
     epoch = date.toTime_t();
     *usec = time.msec() * 1000;

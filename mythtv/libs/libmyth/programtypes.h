@@ -256,11 +256,4 @@ typedef enum AutoExpireTypes {
     kLiveTVAutoExpire = 10000
 } AutoExpireType;
 
-typedef enum MythDateFormats {
-    TextDate  = Qt::TextDate,
-    ISODate   = Qt::ISODate,
-    LocalDate = Qt::LocalDate,
-    MythDate  = 0x100,
-} MythDateFormat;
-
 #endif // _PROGRAM_INFO_TYPES_H_

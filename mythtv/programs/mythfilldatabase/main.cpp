@@ -14,7 +14,7 @@ using namespace std;
 #include "mythcontext.h"
 #include "mythdb.h"
 #include "mythversion.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 #include "mythtranslation.h"
 
 #include "mythconfig.h"
@@ -22,6 +22,7 @@ using namespace std;
 // libmythtv headers
 #include "commandlineparser.h"
 #include "scheduledrecording.h"
+#include "mythmiscutil.h"
 #include "remoteutil.h"
 #include "videosource.h" // for is_grabber..
 #include "dbcheck.h"
@@ -385,8 +386,7 @@ int main(int argc, char *argv[])
         {
             if (!query.isNull(0))
                 GuideDataBefore =
-                    QDateTime::fromString(query.value(0).toString(),
-                                          Qt::ISODate);
+                    MythDate::fromString(query.value(0).toString());
         }
 
         if (!fill_data.GrabDataFromFile(fromfile_id, fromfile_name))
@@ -405,8 +405,7 @@ int main(int argc, char *argv[])
         {
             if (!query.isNull(0))
                 GuideDataAfter =
-                    QDateTime::fromString(query.value(0).toString(),
-                                          Qt::ISODate);
+                    MythDate::fromString(query.value(0).toString());
         }
 
         if (GuideDataAfter == GuideDataBefore)

@@ -37,7 +37,7 @@
 #include "storagegroup.h"
 #include "remotefile.h"
 #include "globals.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 #include "serviceUtil.h"
 
 /////////////////////////////////////////////////////////////////////////////
@@ -94,7 +94,7 @@ DTC::VideoMetadataInfoList* Video::GetVideoList( bool bDescending,
     pVideoMetadataInfos->setCurrentPage   ( curPage         );
     pVideoMetadataInfos->setTotalPages    ( totalPages      );
     pVideoMetadataInfos->setTotalAvailable( videos.size()   );
-    pVideoMetadataInfos->setAsOf          ( QDateTime::currentDateTime() );
+    pVideoMetadataInfos->setAsOf          ( MythDate::current() );
     pVideoMetadataInfos->setVersion       ( MYTH_BINARY_VERSION );
     pVideoMetadataInfos->setProtoVer      ( MYTH_PROTO_VERSION  );
 
@@ -189,7 +189,9 @@ DTC::VideoLookupList* Video::LookupVideo( const QString    &Title,
             pVideoLookup->setInetref(lookup->GetInetref());
             pVideoLookup->setCollectionref(lookup->GetCollectionref());
             pVideoLookup->setHomePage(lookup->GetHomepage());
-            pVideoLookup->setReleaseDate(QDateTime(lookup->GetReleaseDate()));
+            pVideoLookup->setReleaseDate(
+                QDateTime(lookup->GetReleaseDate(),
+                          QTime(0,0),Qt::LocalTime).toUTC());
             pVideoLookup->setUserRating(lookup->GetUserRating());
             pVideoLookup->setLength(lookup->GetRuntime());
             pVideoLookup->setLanguage(lookup->GetLanguage());
@@ -250,7 +252,7 @@ DTC::VideoLookupList* Video::LookupVideo( const QString    &Title,
     }
 
     pVideoLookups->setCount         ( list.count()                 );
-    pVideoLookups->setAsOf          ( QDateTime::currentDateTime() );
+    pVideoLookups->setAsOf          ( MythDate::current() );
     pVideoLookups->setVersion       ( MYTH_BINARY_VERSION          );
     pVideoLookups->setProtoVer      ( MYTH_PROTO_VERSION           );
 
@@ -330,7 +332,9 @@ bool Video::AddVideo( const QString &sFileName,
                           0.0, VIDEO_RATING_DEFAULT, 0, 0,
                           VideoMetadata::FilenameToMeta(sFileName, 2).toInt(),
                           VideoMetadata::FilenameToMeta(sFileName, 3).toInt(),
-                          QDate::currentDate(), 0, ParentalLevel::plLowest);
+                          MythDate::current().date(), 0,
+                          ParentalLevel::plLowest);
+
     newFile.SetHost(sHostName);
     newFile.SaveToDatabase();
 

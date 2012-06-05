@@ -53,8 +53,9 @@ using namespace std;
 
 // MythTV headers
 #include <mythcommandlineparser.h>
-#include <mythcontext.h>
+#include <mythmiscutil.h>
 #include <mythcoreutil.h>
+#include <mythcontext.h>
 #include <mythversion.h>
 #include <exitcodes.h>
 #include <mythdb.h>
@@ -62,7 +63,7 @@ using namespace std;
 #include <mythdirs.h>
 #include <mythconfig.h>
 #include <mythsystem.h>
-#include <mythmiscutil.h>
+#include <mythdate.h>
 #include <mythlogging.h>
 
 extern "C" {
@@ -302,14 +303,16 @@ static int burnISOImage(int mediaType, bool bEraseDVDRW, bool nativeFormat)
 
 static int doBurnDVD(int mediaType, bool bEraseDVDRW, bool nativeFormat)
 {
-    gCoreContext->SaveSetting("MythArchiveLastRunStart",
-        QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm"));
+    gCoreContext->SaveSetting(
+        "MythArchiveLastRunStart",
+        MythDate::toString(MythDate::current(), MythDate::kDatabase));
     gCoreContext->SaveSetting("MythArchiveLastRunStatus", "Running");
 
     int res = burnISOImage(mediaType, bEraseDVDRW, nativeFormat);
 
-    gCoreContext->SaveSetting("MythArchiveLastRunEnd",
-        QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm"));
+    gCoreContext->SaveSetting(
+        "MythArchiveLastRunEnd",
+        MythDate::toString(MythDate::current(), MythDate::kDatabase));
     gCoreContext->SaveSetting("MythArchiveLastRunStatus", "Success");
     return res;
 }
@@ -1790,13 +1793,18 @@ static void clearArchiveTable(void)
 static int doNativeArchive(const QString &jobFile)
 {
     gCoreContext->SaveSetting("MythArchiveLastRunType", "Native Export");
-    gCoreContext->SaveSetting("MythArchiveLastRunStart", QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm"));
+    gCoreContext->SaveSetting(
+        "MythArchiveLastRunStart",
+        MythDate::toString(MythDate::current(), MythDate::kDatabase));
     gCoreContext->SaveSetting("MythArchiveLastRunStatus", "Running");
 
     NativeArchive na;
     int res = na.doNativeArchive(jobFile);
-    gCoreContext->SaveSetting("MythArchiveLastRunEnd", QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm"));
-    gCoreContext->SaveSetting("MythArchiveLastRunStatus", (res == 0 ? "Success" : "Failed"));
+    gCoreContext->SaveSetting(
+        "MythArchiveLastRunEnd",
+        MythDate::toString(MythDate::current(), MythDate::kDatabase));
+    gCoreContext->SaveSetting("MythArchiveLastRunStatus",
+                              (res == 0 ? "Success" : "Failed"));
 
     // clear the archiveitems table if succesful
     if (res == 0)

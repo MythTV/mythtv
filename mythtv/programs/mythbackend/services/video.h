@@ -23,7 +23,6 @@
 #define VIDEO_H
 
 #include <QScriptEngine>
-#include <QDateTime>
 
 #include "videometadatalistmanager.h"
 

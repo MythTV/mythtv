@@ -20,6 +20,7 @@
 #include "mythsystem.h"
 #include "exitcodes.h"
 #include "mthread.h"
+#include "mythdate.h"
 
 #define DEBUG_RECONNECT 0
 #if DEBUG_RECONNECT
@@ -79,7 +80,7 @@ MSqlDatabase::MSqlDatabase(const QString &name)
         LOG(VB_GENERAL, LOG_ERR, "Unable to init db connection.");
         return;
     }
-    m_lastDBKick = QDateTime::currentDateTime().addSecs(-60);
+    m_lastDBKick = MythDate::current().addSecs(-60);
 }
 
 MSqlDatabase::~MSqlDatabase()
@@ -178,6 +179,9 @@ bool MSqlDatabase::OpenDatabase(bool skipdb)
                     QString("Connected to database '%1' at host: %2")
                             .arg(m_db.databaseName()).arg(m_db.hostName()));
 
+            // Make sure NOW() returns time in UTC...
+            m_db.exec("SET @@local.time_zone='+00:00'");
+
             // WriteDelayed depends on SetHaveDBConnection() and SetHaveSchema()
             // both being called with true, so order is important here.
             GetMythDB()->SetHaveDBConnection(true);
@@ -219,7 +223,7 @@ bool MSqlDatabase::OpenDatabase(bool skipdb)
 
 bool MSqlDatabase::KickDatabase(void)
 {
-    m_lastDBKick = QDateTime::currentDateTime().addSecs(-60);
+    m_lastDBKick = MythDate::current().addSecs(-60);
 
     if (!m_db.isOpen())
         m_db.open();
@@ -337,7 +341,7 @@ void MDBManager::pushConnection(MSqlDatabase *db)
 
     if (db)
     {
-        db->m_lastDBKick = QDateTime::currentDateTime();
+        db->m_lastDBKick = MythDate::current();
         m_pool[QThread::currentThread()].push_front(db);
     }
 
@@ -352,7 +356,7 @@ void MDBManager::PurgeIdleConnections(bool leaveOne)
 
     leaveOne = leaveOne || (gCoreContext && gCoreContext->IsUIThread());
 
-    QDateTime now = QDateTime::currentDateTime();
+    QDateTime now = MythDate::current();
     DBList &list = m_pool[QThread::currentThread()];
     DBList::iterator it = list.begin();
 
@@ -393,7 +397,7 @@ void MDBManager::PurgeIdleConnections(bool leaveOne)
             ++m_connCount;
             LOG(VB_GENERAL, LOG_INFO,
                     QString("New DB connection, total: %1").arg(m_connCount));
-            newDb->m_lastDBKick = QDateTime::currentDateTime();
+            newDb->m_lastDBKick = MythDate::current();
         }
 
         LOG(VB_DATABASE, LOG_INFO, "Deleting idle DB connection...");

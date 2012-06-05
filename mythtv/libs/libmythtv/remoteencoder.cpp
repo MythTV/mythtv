@@ -4,7 +4,7 @@
 
 #include "remoteencoder.h"
 #include "programinfo.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 #include "mythcorecontext.h"
 #include "signalmonitor.h"
 #include "videooutbase.h"

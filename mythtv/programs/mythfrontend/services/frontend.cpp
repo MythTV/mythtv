@@ -276,6 +276,7 @@ void Frontend::InitialiseActions(void)
                 gActionDescriptions[context].append(desc);
             }
         }
+        delete bindings;
     }
     gActionList.removeDuplicates();
     gActionList.sort();

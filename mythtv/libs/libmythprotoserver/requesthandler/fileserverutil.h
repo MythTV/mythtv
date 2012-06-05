@@ -14,7 +14,6 @@ class DeleteThread;
 
 class PROTOSERVER_PUBLIC DeleteHandler : public ReferenceCounter
 {
-    Q_OBJECT
   public:
     DeleteHandler(void);
     DeleteHandler(QString filename);

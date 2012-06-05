@@ -114,11 +114,11 @@ void GameScannerThread::updateDB()
     {
         if (!(*p).indb)
         {
-            RomInfo *add = new RomInfo(0, (*p).romfile, (*p).system,
-                               (*p).romname, "", "", "", (*p).rompath,
-                               "", "", 0, (*p).gametype, 0, "", "", "",
-                               "", "", "", "", "");
-            add->SaveToDatabase();
+            RomInfo add(0, (*p).romfile, (*p).system,
+                        (*p).romname, "", "", false, (*p).rompath,
+                        "", "", 0, (*p).gametype, 0, "", "", "",
+                        "", "", "", "", "");
+            add.SaveToDatabase();
             m_DBDataChanged = true;
         }
         if (m_HasGUI)

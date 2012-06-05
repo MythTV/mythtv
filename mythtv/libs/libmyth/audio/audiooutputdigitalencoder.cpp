@@ -185,7 +185,6 @@ size_t AudioOutputDigitalEncoder::Encode(void *buf, int len, AudioFormat format)
             (realloc(in, in_size, required_len));
         if (!tmp)
         {
-            free(in);
             in = NULL;
             in_size = 0;
             LOG(VB_AUDIO, LOG_ERR, LOC +
@@ -251,7 +250,6 @@ size_t AudioOutputDigitalEncoder::Encode(void *buf, int len, AudioFormat format)
                 (realloc(out, out_size, required_len));
             if (!tmp)
             {
-                free(out);
                 out = NULL;
                 out_size = 0;
                 LOG(VB_AUDIO, LOG_ERR, LOC +

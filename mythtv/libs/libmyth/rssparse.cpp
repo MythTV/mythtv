@@ -12,7 +12,7 @@
 #include "netutils.h"
 #include "mythcontext.h"
 #include "mythdirs.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 
 using namespace std;
 
@@ -39,7 +39,7 @@ ResultItem::ResultItem(const QString& title, const QString& subtitle,
     if (!date.isNull())
         m_date = date;
     else
-        m_date = QDateTime::fromString("0000-00-00T00:00:00", Qt::ISODate);
+        m_date = QDateTime();
     m_time = time;
     m_rating = rating;
     m_filesize = filesize;
@@ -59,7 +59,7 @@ ResultItem::ResultItem(const QString& title, const QString& subtitle,
 
 ResultItem::ResultItem()
 {
-    m_date = QDateTime::fromString("0000-00-00T00:00:00", Qt::ISODate);
+    m_date = QDateTime();
 }
 
 ResultItem::~ResultItem()
@@ -79,7 +79,7 @@ void ResultItem::toMap(MetadataMap &metadataMap)
     if (m_date.isNull())
         metadataMap["date"] = QString();
     else
-        metadataMap["date"] = MythDateTimeToString(m_date, kDateFull);
+        metadataMap["date"] = MythDate::toString(m_date, MythDate::kDateFull);
 
     if (m_time.toInt() == 0)
         metadataMap["length"] = QString();
@@ -786,7 +786,7 @@ ResultItem* Parse::ParseItem(const QDomElement& item) const
     if (!date.isValid() || date.isNull())
         date = GetDCDateTime(item);
     if (!date.isValid() || date.isNull())
-        date = QDateTime::currentDateTime();
+        date = MythDate::current();
 
     // Parse the insane iTunes duration (HH:MM:SS or H:MM:SS or MM:SS or M:SS or SS)
     QDomNodeList dur = item.elementsByTagNameNS(ITunes, "duration");
@@ -1046,7 +1046,7 @@ QDateTime Parse::RFC822TimeToQDateTime(const QString& t) const
         return QDateTime();
     result = result.addSecs(hoursShift * 3600 * (-1) + minutesShift *60 * (-1));
     result.setTimeSpec(Qt::UTC);
-    return result.toLocalTime();
+    return result;
 }
 
 QDateTime Parse::FromRFC3339(const QString& t) const
@@ -1054,7 +1054,7 @@ QDateTime Parse::FromRFC3339(const QString& t) const
     int hoursShift = 0, minutesShift = 0;
     if (t.size() < 19)
         return QDateTime();
-    QDateTime result = QDateTime::fromString(t.left(19).toUpper(), "yyyy-MM-ddTHH:mm:ss");
+    QDateTime result = MythDate::fromString(t.left(19).toUpper());
     QRegExp fractionalSeconds("(\\.)(\\d+)");
     if (fractionalSeconds.indexIn(t) > -1)
     {
@@ -1066,7 +1066,7 @@ QDateTime Parse::FromRFC3339(const QString& t) const
                 fractional *= 10;
             if (fractional <10)
                 fractional *= 100;
-            result.addMSecs(fractional);
+            result = result.addMSecs(fractional);
         }
     }
     QRegExp timeZone("(\\+|\\-)(\\d\\d)(:)(\\d\\d)$");
@@ -1080,7 +1080,7 @@ QDateTime Parse::FromRFC3339(const QString& t) const
         result = result.addSecs(hoursShift * 3600 * multiplier + minutesShift * 60 * multiplier);
     }
     result.setTimeSpec(Qt::UTC);
-    return result.toLocalTime();
+    return result;
 }
 
 QList<Enclosure> Parse::GetEnclosures(const QDomElement& entry) const

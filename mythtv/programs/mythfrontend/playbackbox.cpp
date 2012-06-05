@@ -35,7 +35,7 @@
 #include "netutils.h"
 #include "mythdirs.h"
 #include "mythdb.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 #include "tv.h"
 
 //  Mythfrontend
@@ -330,7 +330,7 @@ static void push_onto_del(QStringList &list, const ProgramInfo &pginfo)
 {
     list.clear();
     list.push_back(QString::number(pginfo.GetChanID()));
-    list.push_back(pginfo.GetRecordingStartTime(ISODate));
+    list.push_back(pginfo.GetRecordingStartTime(MythDate::ISODate));
     list.push_back(QString() /* force Delete */);
     list.push_back(QString()); /* forget history */
 }
@@ -345,7 +345,7 @@ static bool extract_one_del(
     }
 
     chanid     = list[0].toUInt();
-    recstartts = QDateTime::fromString(list[1], Qt::ISODate);
+    recstartts = MythDate::fromString(list[1]);
 
     list.pop_front();
     list.pop_front();
@@ -981,7 +981,7 @@ void PlaybackBox::ItemVisible(MythUIButtonListItem *item)
     item->DisplayState(extract_commflag_state(*pginfo), "commflagged");
 
     MythUIButtonListItem *sel_item = item->parent()->GetItemCurrent();
-    if ((item != sel_item) && pginfo && item->GetImage("preview").isEmpty() &&
+    if ((item != sel_item) && item->GetImage("preview").isEmpty() &&
         (asAvailable == pginfo->GetAvailableStatus()))
     {
         QString token = m_helper.GetPreviewImage(*pginfo, true);
@@ -1841,7 +1841,7 @@ bool PlaybackBox::UpdateUILists(void)
 
     if (!m_progLists[m_watchGroupLabel].empty())
     {
-        QDateTime now = QDateTime::currentDateTime();
+        QDateTime now = MythDate::current();
         int baseValue = m_watchListMaxAge * 2 / 3;
 
         QMap<int, int> recType;
@@ -1864,9 +1864,12 @@ bool PlaybackBox::UpdateUILists(void)
                 maxEpisodes[recid] = query.value(2).toInt();
                 avgDelay[recid] = query.value(3).toInt();
 
-                QDateTime next_record = query.value(4).toDateTime();
-                QDateTime last_record = query.value(5).toDateTime();
-                QDateTime last_delete = query.value(6).toDateTime();
+                QDateTime next_record =
+                    MythDate::as_utc(query.value(4).toDateTime());
+                QDateTime last_record =
+                    MythDate::as_utc(query.value(5).toDateTime());
+                QDateTime last_delete =
+                    MythDate::as_utc(query.value(6).toDateTime());
 
                 // Time between the last and next recordings
                 spanHours[recid] = 1000;
@@ -2066,8 +2069,8 @@ bool PlaybackBox::UpdateUILists(void)
             }
 
             LOG(VB_FILE, LOG_INFO, QString(" %1  %2  %3")
-                    .arg(MythDateTimeToString((*pit)->GetScheduledStartTime(),
-                                              kDateShort))
+                    .arg(MythDate::toString((*pit)->GetScheduledStartTime(),
+                                            MythDate::kDateShort))
                     .arg((*pit)->GetRecordingPriority2())
                     .arg((*pit)->GetTitle()));
 
@@ -2542,8 +2545,7 @@ void PlaybackBox::ShowDeletePopup(DeletePopupType type)
     else if (m_delList.size() >= 4)
     {
         delItem = FindProgramInUILists(
-            m_delList[0].toUInt(),
-            QDateTime::fromString(m_delList[1], Qt::ISODate));
+            m_delList[0].toUInt(), MythDate::fromString(m_delList[1]));
     }
 
     if (!delItem)
@@ -2649,6 +2651,7 @@ void PlaybackBox::ShowAvailabilityPopup(const ProgramInfo &pginfo)
             ShowOkPopup(tr("Recording Unavailable\n") + msg +
                         tr("This recording is currently being "
                            "deleted and is unavailable"));
+            break;
         case asDeleted:
             ShowOkPopup(tr("Recording Unavailable\n") + msg +
                         tr("This recording has been "
@@ -3195,8 +3198,9 @@ QString PlaybackBox::CreateProgramInfoString(const ProgramInfo &pginfo) const
     QDateTime recendts   = pginfo.GetRecordingEndTime();
 
     QString timedate = QString("%1 - %2")
-        .arg(MythDateTimeToString(recstartts, kDateTimeFull | kSimplify))
-        .arg(MythDateTimeToString(recendts, kTime));
+        .arg(MythDate::toString(
+                 recstartts, MythDate::kDateTimeFull | MythDate::kSimplify))
+        .arg(MythDate::toString(recendts, MythDate::kTime));
 
     QString title = pginfo.GetTitle();
 
@@ -3401,7 +3405,7 @@ void PlaybackBox::PlaylistDelete(bool forgetHistory)
         {
             tmpItem->SetAvailableStatus(asPendingDelete, "PlaylistDelete");
             list.push_back(QString::number(tmpItem->GetChanID()));
-            list.push_back(tmpItem->GetRecordingStartTime(ISODate));
+            list.push_back(tmpItem->GetRecordingStartTime(MythDate::ISODate));
             list.push_back(forceDeleteStr);
             list.push_back(forgetHistory ? "1" : "0");
 
@@ -3706,7 +3710,7 @@ void PlaybackBox::processNetworkControlCommand(const QString &command)
             }
 
             uint chanid = tokens[3].toUInt();
-            QDateTime recstartts = myth_dt_from_string(tokens[4]);
+            QDateTime recstartts = MythDate::fromString(tokens[4]);
             ProgramInfo pginfo(chanid, recstartts);
 
             if (pginfo.GetChanID())
@@ -3879,7 +3883,7 @@ void PlaybackBox::customEvent(QEvent *event)
             if (tokens.size() >= 4)
             {
                 chanid = tokens[2].toUInt();
-                recstartts = QDateTime::fromString(tokens[3], Qt::ISODate);
+                recstartts = MythDate::fromString(tokens[3]);
             }
 
             if ((tokens.size() >= 2) && tokens[1] == "UPDATE")
@@ -3945,7 +3949,7 @@ void PlaybackBox::customEvent(QEvent *event)
             if (tokens.size() >= 4)
             {
                 chanid     = tokens[1].toUInt();
-                recstartts = QDateTime::fromString(tokens[2], Qt::ISODate);
+                recstartts = MythDate::fromString(tokens[2]);
                 filesize   = tokens[3].toLongLong(&ok);
             }
             if (chanid && recstartts.isValid() && ok)
@@ -3979,8 +3983,7 @@ void PlaybackBox::customEvent(QEvent *event)
             {
                 ProgramInfo *pginfo = m_programInfoCache.GetProgramInfo(
                         me->ExtraDataList()[i+0].toUInt(),
-                        QDateTime::fromString(
-                            me->ExtraDataList()[i+1], Qt::ISODate));
+                        MythDate::fromString(me->ExtraDataList()[i+1]));
 
                 if (!pginfo)
                     continue;
@@ -3989,7 +3992,8 @@ void PlaybackBox::customEvent(QEvent *event)
                 QString forgetHistoryStr = me->ExtraDataList()[i+3];
 
                 list.push_back(QString::number(pginfo->GetChanID()));
-                list.push_back(pginfo->GetRecordingStartTime(ISODate));
+                list.push_back(
+                    pginfo->GetRecordingStartTime(MythDate::ISODate));
                 list.push_back(forceDeleteStr);
                 list.push_back(forgetHistoryStr);
                 pginfo->SetAvailableStatus(asPendingDelete,
@@ -4018,8 +4022,7 @@ void PlaybackBox::customEvent(QEvent *event)
             {
                 ProgramInfo *pginfo = m_programInfoCache.GetProgramInfo(
                         me->ExtraDataList()[i+0].toUInt(),
-                        QDateTime::fromString(
-                            me->ExtraDataList()[i+1], Qt::ISODate));
+                        MythDate::fromString(me->ExtraDataList()[i+1]));
                 if (pginfo)
                 {
                     pginfo->SetAvailableStatus(asAvailable, "DELETE_FAILURES");
@@ -4176,7 +4179,8 @@ void PlaybackBox::customEvent(QEvent *event)
                 m_artTimer[(uint)type]->start(s_artDelay[(uint)type]);
             }
         }
-        else if (message == "EXIT_TO_MENU")
+        else if (message == "EXIT_TO_MENU" ||
+                 message == "CANCEL_PLAYLIST")
         {
             m_playListPlay.clear();
         }

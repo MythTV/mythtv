@@ -63,8 +63,8 @@ extern const xmm_reg  ff_pb_F8;
 extern const uint64_t ff_pb_FC;
 extern const xmm_reg  ff_pb_FE;
 
-extern const double __attribute__((visibility("hidden"))) ff_pd_1[2];
-extern const double __attribute__((visibility("hidden"))) ff_pd_2[2];
+extern const double ff_pd_1[2];
+extern const double ff_pd_2[2];
 
 #define LOAD4(stride,in,a,b,c,d)\
     "movq 0*"#stride"+"#in", "#a"\n\t"\
@@ -198,6 +198,11 @@ void ff_avg_cavs_qpel16_mc00_mmx2(uint8_t *dst, uint8_t *src, int stride);
 
 void ff_put_vc1_mspel_mc00_mmx(uint8_t *dst, const uint8_t *src, int stride, int rnd);
 void ff_avg_vc1_mspel_mc00_mmx2(uint8_t *dst, const uint8_t *src, int stride, int rnd);
+
+void ff_put_rv40_qpel8_mc33_mmx(uint8_t *block, uint8_t *pixels, int line_size);
+void ff_put_rv40_qpel16_mc33_mmx(uint8_t *block, uint8_t *pixels, int line_size);
+void ff_avg_rv40_qpel8_mc33_mmx(uint8_t *block, uint8_t *pixels, int line_size);
+void ff_avg_rv40_qpel16_mc33_mmx(uint8_t *block, uint8_t *pixels, int line_size);
 
 void ff_mmx_idct(DCTELEM *block);
 void ff_mmxext_idct(DCTELEM *block);

@@ -48,6 +48,7 @@
 #include "main_helpers.h"
 #include "backendcontext.h"
 #include "mythtranslation.h"
+#include "mythtimezone.h"
 
 #include "mediaserver.h"
 #include "httpstatus.h"
@@ -419,6 +420,7 @@ int handle_command(const MythBackendCommandLineParser &cmdline)
     // This should never actually be reached..
     return GENERIC_EXIT_OK;
 }
+using namespace MythTZ;
 
 int connect_to_master(void)
 {
@@ -459,35 +461,40 @@ int connect_to_master(void)
             }
         }
 
-        QStringList tzCheck("QUERY_TIME_ZONE");
+        QStringList timeCheck;
         if (tempMonitorConnection)
         {
-            tempMonitorConnection->writeStringList(tzCheck);
-            tempMonitorConnection->readStringList(tzCheck);
+            timeCheck.push_back("QUERY_TIME");
+            tempMonitorConnection->writeStringList(timeCheck);
+            tempMonitorConnection->readStringList(timeCheck);
         }
-        if (tzCheck.size() && !checkTimeZone(tzCheck))
+        if (timeCheck.size() < 3)
         {
-            // Check for different time zones, different offsets, different
-            // times
-            LOG(VB_GENERAL, LOG_ERR, "The time and/or time zone settings on "
-                    "this system do not match those in use on the master "
-                    "backend. Please ensure all frontend and backend "
-                    "systems are configured to use the same time zone and "
-                    "have the current time properly set.");
+            return GENERIC_EXIT_SOCKET_ERROR;
+        }
+        tempMonitorConnection->writeStringList(tempMonitorDone);
+
+        QDateTime our_time = MythDate::current();
+        QDateTime master_time = MythDate::fromString(timeCheck[2]);
+        int timediff = abs(our_time.secsTo(master_time));
+
+        if (timediff > 300)
+        {
             LOG(VB_GENERAL, LOG_ERR,
-                    "Unable to run with invalid time settings. Exiting.");
-            tempMonitorConnection->writeStringList(tempMonitorDone);
+                QString("Current time on the master backend differs by "
+                        "%1 seconds from time on this system. Exiting.")
+                .arg(timediff));
             tempMonitorConnection->DownRef();
-            return GENERIC_EXIT_INVALID_TIMEZONE;
+            return GENERIC_EXIT_INVALID_TIME;
         }
-        else
+
+        if (timediff > 20)
         {
-            LOG(VB_GENERAL, LOG_INFO,
-                QString("Backend is running in %1 time zone.")
-                    .arg(getTimeZoneID()));
+            LOG(VB_GENERAL, LOG_WARNING,
+                    QString("Time difference between the master "
+                            "backend and this system is %1 seconds.")
+                .arg(timediff));
         }
-        if (tempMonitorConnection)
-            tempMonitorConnection->writeStringList(tempMonitorDone);
     }
     if (tempMonitorConnection)
         tempMonitorConnection->DownRef();

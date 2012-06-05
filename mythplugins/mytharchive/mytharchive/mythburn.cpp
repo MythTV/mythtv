@@ -25,8 +25,9 @@
 #include <mythuicheckbox.h>
 #include <mythuibuttonlist.h>
 #include <mythuiprogressbar.h>
-#include <mythmiscutil.h>
+#include <mythdate.h>
 #include <mythsystem.h>
+#include <mythmiscutil.h>
 #include <exitcodes.h>
 
 // mytharchive

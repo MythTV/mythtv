@@ -18,7 +18,9 @@ using namespace std;
 #include <QTimer>
 
 #include "previewgeneratorqueue.h"
+#include "mythmiscutil.h"
 #include "mythconfig.h"
+#include "mythsystem.h"
 #include "tv.h"
 #include "proglist.h"
 #include "progfind.h"

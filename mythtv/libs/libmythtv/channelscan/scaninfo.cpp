@@ -5,6 +5,7 @@
 #include <QString>
 
 // MythTV headers
+#include "mythdate.h"
 #include "mythdb.h"
 #include "scaninfo.h"
 #include "mythdbcon.h"
@@ -35,7 +36,7 @@ uint SaveScan(const ScanDTVTransportList &scan)
     const vector<ScanInfo> list = LoadScanList();
     for (uint i = 0; i < list.size(); i++)
     {
-        if (list[i].scandate > QDateTime::currentDateTime().addDays(-14))
+        if (list[i].scandate > MythDate::current().addDays(-14))
             continue;
         if ((list[i].cardid == cardid) && (list[i].sourceid == sourceid))
             ScanInfo::DeleteScan(list[i].scanid);
@@ -47,7 +48,7 @@ uint SaveScan(const ScanDTVTransportList &scan)
         "VALUES                  (:CARDID, :SOURCEID, :SCANDATE) ");
     query.bindValue(":CARDID",   cardid);
     query.bindValue(":SOURCEID", sourceid);
-    query.bindValue(":SCANDATE", QDateTime::currentDateTime());
+    query.bindValue(":SCANDATE", MythDate::current());
 
     if (!query.exec())
     {
@@ -270,7 +271,7 @@ vector<ScanInfo> LoadScanList(void)
                      query.value(1).toUInt(),
                      query.value(2).toUInt(),
                      (bool) query.value(3).toUInt(),
-                     query.value(4).toDateTime()));
+                     MythDate::as_utc(query.value(4).toDateTime())));
     }
 
     return list;
