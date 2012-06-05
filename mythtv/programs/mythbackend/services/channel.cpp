@@ -67,6 +67,7 @@ DTC::ChannelInfoList* Channel::GetChannelInfoList( int nSourceID,
         QString channum = ChannelUtil::GetChanNum(chanid);
         QString format, modulation, freqtable, freqid, dtv_si_std,
                 xmltvid, default_authority, icon;
+        uint testchanid;																		//todo:needless
         int finetune, program_number;
         uint64_t frequency;
         uint atscmajor, atscminor, transportid, networkid, mplexid;
@@ -74,7 +75,7 @@ DTC::ChannelInfoList* Channel::GetChannelInfoList( int nSourceID,
         bool eit = false;
         bool visible = true;
 
-        if (ChannelUtil::GetChannelData( nSourceID, channum, format, modulation,
+        if (ChannelUtil::GetChannelData( nSourceID, channum, testchanid, format, modulation,	//todo: ALREADY HAVE CHANID SO JUST PUTTING TESCHANID THROUGH THE FUNCTION AGAIN...
                             freqtable, freqid, finetune, frequency,
                             dtv_si_std, program_number, atscmajor,
                             atscminor, transportid, networkid, mplexid,
@@ -149,13 +150,14 @@ DTC::ChannelInfo* Channel::GetChannelInfo( int nChanID )
     QString format, modulation, freqtable, freqid, dtv_si_std,
             xmltvid, default_authority, icon;
     int finetune, program_number;
+    uint testchanid;																			//todo:needless
     uint64_t frequency;
     uint atscmajor, atscminor, transportid, networkid, mplexid;
     bool commfree = false;
     bool eit = false;
     bool visible = true;
 
-    if (ChannelUtil::GetChannelData( sourceid, channum, format, modulation,
+    if (ChannelUtil::GetChannelData( sourceid, channum, testchanid, format, modulation,			//todo: do something about testchanid
                             freqtable, freqid, finetune, frequency,
                             dtv_si_std, program_number, atscmajor,
                             atscminor, transportid, networkid, mplexid,

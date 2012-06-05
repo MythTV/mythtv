@@ -193,7 +193,7 @@ bool DTVChannel::SetChannelByString(const QString &channum, QString maptypes)
     {
         QString inputName;
 
-        if (!CheckChannel(channum, inputName))  //...................... SHOULD THIS GET MAPTYPES... was not called initially at least....
+        if (!CheckChannel(channum, inputName, maptypes))
         {
             LOG(VB_GENERAL, LOG_ERR, loc +
                     "CheckChannel failed.\n\t\t\tPlease verify the channel "
@@ -223,22 +223,20 @@ bool DTVChannel::SetChannelByString(const QString &channum, QString maptypes)
     // Fetch tuning data from the database.
     QString tvformat, modulation, freqtable, freqid, si_std;
     int finetune;
+    uint chanid;
     uint64_t frequency;
     int mpeg_prog_num;
     uint atsc_major, atsc_minor, mplexid, tsid, netid;
     bool use_on_air_guide, visible;
     QString xmltvid, default_authority, icon;
 
-
-int variablesrcid = 0;
-ChannelUtil::GetChannelSourceID(variablesrcid, channum, GetCurrentInputNum(), maptypes);
-
-
+    uint chsourceid = 0;
+    ChannelUtil::GetChannelSourceID(chsourceid, channum, GetCurrentInputNum(), maptypes);
 
     if (!ChannelUtil::GetChannelData(
-        /*(*it)->sourceid,*/variablesrcid, channum,
-        tvformat, modulation, freqtable, freqid,
-        finetune, frequency,
+        chsourceid, channum,
+        chanid, tvformat, modulation, freqtable,
+        freqid, finetune, frequency,
         si_std, mpeg_prog_num, atsc_major, atsc_minor, tsid, netid,
         mplexid, m_commfree, use_on_air_guide, visible,
         xmltvid, default_authority, icon))
@@ -346,7 +344,6 @@ ChannelUtil::GetChannelSourceID(variablesrcid, channum, GetCurrentInputNum(), ma
     {
         // We need to pull the pid_cache since there are no tuning tables
         pid_cache_t pid_cache;
-        int chanid = ChannelUtil::GetChanID((*it)->mainsourceid, channum);
         ChannelUtil::GetCachedPids(chanid, pid_cache);
         if (pid_cache.empty())
         {
@@ -386,6 +383,7 @@ ChannelUtil::GetChannelSourceID(variablesrcid, channum, GetCurrentInputNum(), ma
 
     // Set the current channum to the new channel's channum
     m_curchannelname = channum;
+    m_chanID = chanid;
 
     // Setup filters & recording picture attributes for framegrabing recorders
     // now that the new curchannelname has been established.

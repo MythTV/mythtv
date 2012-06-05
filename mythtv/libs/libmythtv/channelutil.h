@@ -157,17 +157,18 @@ class MTV_PUBLIC ChannelUtil
     static int     GetChanID(uint sourceid, const QString &channum)
         { return GetChannelValueInt("chanid", sourceid, channum); }
     static bool    GetChannelData(
-        uint     sourceid,        const QString &channum,
-        QString &tvformat,        QString       &modulation,
-        QString &freqtable,       QString       &freqid,
-        int     &finetune,        uint64_t      &frequency,
-        QString &dtv_si_std,      int           &mpeg_prog_num,
-        uint    &atsc_major,      uint          &atsc_minor,
-        uint    &dvb_transportid, uint          &dvb_networkid,
-        uint    &mplexid,         bool          &commfree,
-        bool    &use_on_air_guide,bool          &visible,
-        QString &xmltvid,         QString       &default_authority,
-        QString &icon);
+        uint     sourceid,           const QString &channum,
+        uint     &chanid,            QString &tvformat,
+        QString  &modulation,        QString &freqtable,
+        QString  &freqid,            int     &finetune,
+        uint64_t &frequency,         QString &dtv_si_std,
+        int      &mpeg_prog_num,     uint    &atsc_major,
+        uint     &atsc_minor,        uint    &dvb_transportid,
+        uint     &dvb_networkid,     uint    &mplexid,
+        bool     &commfree,          bool    &use_on_air_guide,
+        bool     &visible,           QString &xmltvid,
+        QString  &default_authority, QString &icon);
+
     static int     GetProgramNumber(uint sourceid, const QString &channum)
         { return GetChannelValueInt("serviceid", sourceid, channum); }
     static QString GetVideoFilters(uint sourceid, const QString &channum)
@@ -186,7 +187,7 @@ class MTV_PUBLIC ChannelUtil
     {
         return GetChannelsInternal(sourceid, false, true, QString(), 0);
     }
-    static bool    GetChannelSourceID(uint sourceid, const QString channum, const uint cardinputid, QString maptypes = "main");
+    static bool    GetChannelSourceID(uint &sourceid, const QString channum, const uint cardinputid, QString maptypes = "main");
     static vector<uint> GetChanIDs(int sourceid = -1);
     static uint    GetChannelCount(int sourceid = -1);
     static void    SortChannels(DBChanInfoList &list, const QString &order,

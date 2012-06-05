@@ -1835,21 +1835,22 @@ bool ChannelUtil::GetATSCChannel(uint sourceid, const QString &channum,
 }
 
 bool ChannelUtil::GetChannelData(
-    uint    sourceid,         const QString &channum,
-    QString &tvformat,        QString       &modulation,
-    QString &freqtable,       QString       &freqid,
-    int     &finetune,        uint64_t      &frequency,
-    QString &dtv_si_std,      int           &mpeg_prog_num,
-    uint    &atsc_major,      uint          &atsc_minor,
-    uint    &dvb_transportid, uint          &dvb_networkid,
-    uint    &mplexid,         bool          &commfree,
-    bool    &use_on_air_guide,bool          &visible,
-    QString &xmltvid,         QString       &default_authority,
-    QString &icon)
+    uint     sourceid,           const QString &channum,
+    uint     &chanid,            QString &tvformat,
+    QString  &modulation,        QString &freqtable,
+    QString  &freqid,            int     &finetune,
+    uint64_t &frequency,         QString &dtv_si_std,
+    int      &mpeg_prog_num,     uint    &atsc_major,
+    uint     &atsc_minor,        uint    &dvb_transportid,
+    uint     &dvb_networkid,     uint    &mplexid,
+    bool     &commfree,          bool    &use_on_air_guide,
+    bool     &visible,           QString &xmltvid,
+    QString  &default_authority, QString &icon)
 {
     tvformat          = modulation = freqtable = QString::null;
-    freqid            = dtv_si_std = xmltvid = QString::null;
+    freqid            = dtv_si_std = xmltvid   = QString::null;
     default_authority = icon       = QString::null;
+    chanid           = 0;
     finetune         = 0;
     frequency        = 0;
     mpeg_prog_num    = -1;
@@ -1861,7 +1862,7 @@ bool ChannelUtil::GetChannelData(
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
-        "SELECT finetune, freqid, tvformat, freqtable, "
+        "SELECT chanid, finetune, freqid, tvformat, freqtable, "
         "       commmethod, mplexid, "
         "       atsc_major_chan, atsc_minor_chan, serviceid, "
         "       useonairguide, visible, xmltvid, default_authority, icon "
@@ -1886,20 +1887,21 @@ bool ChannelUtil::GetChannelData(
         return false;
     }
 
-    finetune          = query.value(0).toInt();
-    freqid            = query.value(1).toString();
-    tvformat          = query.value(2).toString();
-    freqtable         = query.value(3).toString();
-    commfree          = (query.value(4).toInt() == -2);
-    mplexid           = query.value(5).toUInt();
-    atsc_major        = query.value(6).toUInt();
-    atsc_minor        = query.value(7).toUInt();
-    mpeg_prog_num     = query.value(8).toUInt();
-    use_on_air_guide  = query.value(9).toBool();
-    visible           = query.value(10).toBool();
-    xmltvid           = query.value(11).toString();
-    default_authority = query.value(12).toString();
-    icon              = query.value(13).toString();
+    chanid            = query.value(0).toInt();
+    finetune          = query.value(1).toInt();
+    freqid            = query.value(2).toString();
+    tvformat          = query.value(3).toString();
+    freqtable         = query.value(4).toString();
+    commfree          = (query.value(5).toInt() == -2);
+    mplexid           = query.value(6).toUInt();
+    atsc_major        = query.value(7).toUInt();
+    atsc_minor        = query.value(8).toUInt();
+    mpeg_prog_num     = query.value(9).toUInt();
+    use_on_air_guide  = query.value(10).toBool();
+    visible           = query.value(11).toBool();
+    xmltvid           = query.value(12).toString();
+    default_authority = query.value(13).toString();
+    icon              = query.value(14).toString();
 
     if (!mplexid || (mplexid == 32767)) /* 32767 deals with old lineups */
         return true;
@@ -1986,7 +1988,7 @@ DBChanInfoList ChannelUtil::GetChannelsInternal(																	//TODO: MODIFIY
     return list;
 }
 
-bool ChannelUtil::GetChannelSourceID(uint sourceid, const QString channum, const uint cardinputid, QString maptypes)  //todo:finish
+bool ChannelUtil::GetChannelSourceID(uint &sourceid, const QString channum, const uint cardinputid, QString maptypes)  //todo:finish
 {
     MSqlQuery query(MSqlQuery::InitCon());
     QString querystr =
@@ -2011,8 +2013,7 @@ bool ChannelUtil::GetChannelSourceID(uint sourceid, const QString channum, const
         LOG(VB_GENERAL, LOG_ERR, QString("ChannelUtil::GetChannelSourceID failed because if could not\n "
             "find a source map for channel number %1 on cardinputid %2").arg(channum).arg(cardinputid));
     }
-
-    sourceid = query.value(0).toInt();
+    sourceid = query.value(0).toUInt();
     return true;
 }
 

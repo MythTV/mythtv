@@ -65,7 +65,8 @@ class ChannelBase
     virtual QString GetInputByNum(int capchannel) const;
     virtual QString GetCurrentName(void) const
         { return m_curchannelname; }
-    virtual int GetChanID(void) const;
+    virtual int GetChanID(void) const
+        { return m_chanID; }
     virtual int GetCurrentInputNum(void) const
         { return m_currentInputID; }
     virtual QString GetCurrentInput(void) const
@@ -158,6 +159,7 @@ class ChannelBase
 
     TVRec   *m_pParent;
     QString  m_curchannelname;
+    int      m_chanID;
     int      m_currentInputID;
     bool     m_commfree;
     uint     m_cardid;

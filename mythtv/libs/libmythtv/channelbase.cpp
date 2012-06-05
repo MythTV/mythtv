@@ -47,7 +47,7 @@ using namespace std;
 #define LOC QString("ChannelBase(%1): ").arg(GetCardID())
 
 ChannelBase::ChannelBase(TVRec *parent) :
-    m_pParent(parent), m_curchannelname(""),
+    m_pParent(parent), m_curchannelname(""), m_chanID(0),
     m_currentInputID(-1), m_commfree(false), m_cardid(0),
     m_system(NULL), m_system_status(0)
 {
@@ -205,6 +205,7 @@ bool ChannelBase::IsTunable(const QString &input, const QString &channum) const
 
     // Fetch tuning data from the database.
     QString tvformat, modulation, freqtable, freqid, dtv_si_std;
+    uint chanid;
     int finetune;
     uint64_t frequency;
     int mpeg_prog_num;
@@ -212,7 +213,7 @@ bool ChannelBase::IsTunable(const QString &input, const QString &channum) const
     bool commfree, use_on_air_guide, visible;
     QString xmltvid, default_authority, icon;
 
-    if (!ChannelUtil::GetChannelData((*it)->mainsourceid, channum,
+    if (!ChannelUtil::GetChannelData((*it)->mainsourceid, channum, chanid,
                                      tvformat, modulation, freqtable, freqid,
                                      finetune, frequency, dtv_si_std,
                                      mpeg_prog_num, atsc_major, atsc_minor,
@@ -243,13 +244,7 @@ bool ChannelBase::IsTunable(const QString &input, const QString &channum) const
 uint ChannelBase::GetNextChannel(uint chanid, int direction) const
 {
     if (!chanid)
-    {
-        InputMap::const_iterator it = m_inputs.find(m_currentInputID);
-        if (it == m_inputs.end())
-            return 0;
-
-        chanid = ChannelUtil::GetChanID((*it)->mainsourceid, m_curchannelname);
-    }
+        chanid = m_chanID;
 
     uint mplexid_restriction = 0;
     IsInputAvailable(m_currentInputID, mplexid_restriction);
@@ -878,32 +873,6 @@ int ChannelBase::GetCardID(void) const
     return (tmpcardid <= 0) ? -1 : tmpcardid;
 }
 
-int ChannelBase::GetChanID() const
-{
-    InputMap::const_iterator it = m_inputs.find(m_currentInputID);
-    if (it == m_inputs.end())
-        return false;
-
-    MSqlQuery query(MSqlQuery::InitCon());
-
-    query.prepare("SELECT chanid FROM channel "
-                  "WHERE channum  = :CHANNUM AND "
-                  "      sourceid = :SOURCEID");
-    query.bindValue(":CHANNUM", m_curchannelname);
-    query.bindValue(":SOURCEID", (*it)->mainsourceid);
-
-    if (!query.exec() || !query.isActive())
-    {
-        MythDB::DBError("fetching chanid", query);
-        return -1;
-    }
-
-    if (!query.next())
-        return -1;
-
-    return query.value(0).toInt();
-}
-
 /** \fn ChannelBase::InitializeInputs(void)
  *  \brief Fills in input map from DB
  */
@@ -932,9 +901,6 @@ bool ChannelBase::InitializeInputs(void)
         "WHERE cardid = :CARDID AND "
         "      cardinput.cardinputid = videosourcemap.cardinputid AND "
         "      type = 'main'");
-    ///////////////////////////////////////////////
-    // TODO: MAY NEED TO WORK WITH THIS MORE.... //
-    ///////////////////////////////////////////////
 
     query.bindValue(":CARDID", cardid);
 
@@ -956,7 +922,7 @@ bool ChannelBase::InitializeInputs(void)
     QString order = gCoreContext->GetSetting("ChannelOrdering", "channum");
     while (query.next())
     {
-        uint mainsourceid = query.value(5).toUInt();										//HERE IS WHERE A BLANKET SOURCEID IS BEING DETERMINED FOR THE CARD!!!!
+        uint mainsourceid = query.value(5).toUInt();
         DBChanInfoList channels = ChannelUtil::GetChannels(mainsourceid, false);
 
         ChannelUtil::SortChannels(channels, order);
