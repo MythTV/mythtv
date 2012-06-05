@@ -2087,8 +2087,8 @@ NULL
 
             updates_ba.push_back(
                 QString("UPDATE recorded "
-                        "set progstart = progstart + utc_offset %1 minute, "
-                        "    progend   = progend   + utc_offset %2 minute  ")
+                        "set progstart = progstart + interval %1 minute, "
+                        "    progend   = progend   + interval %2 minute  ")
                 .arg(utc_offset).arg(utc_offset).toLocal8Bit());
         }
 
