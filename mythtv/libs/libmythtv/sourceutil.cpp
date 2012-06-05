@@ -169,16 +169,18 @@ bool SourceUtil::GetListingsLoginData(uint sourceid,
     return true;
 }
 
-static QStringList get_cardtypes(uint sourceid)
+static QStringList get_cardtypes(uint sourceid, QString maptypes = "'main'")
 {
     QStringList list;
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare(
+    query.prepare(QString(
         "SELECT cardtype, inputname "
-        "FROM capturecard, cardinput "
-        "WHERE capturecard.cardid = cardinput.cardid AND "
-        "      cardinput.sourceid = :SOURCEID");
+        "FROM capturecard, cardinput, videosourcemap "
+        "WHERE capturecard.cardid      = cardinput.cardid           AND "
+        "      cardinput.cardinputid   = videosourcemap.cardinputid AND "
+        "      videosourcemap.sourceid = :SOURCEID                  AND "
+        "      videosourcemap.type in (%1) ").arg(maptypes));
     query.bindValue(":SOURCEID", sourceid);
 
     if (!query.exec() || !query.isActive())

@@ -7,17 +7,17 @@
 #include <QMap>
 
 // MythTV headers
-#include "channelutil.h" // for DBChanList
+#include "channelutil.h" // for DBChanInfoList
 
 class MTV_PUBLIC InputInfo
 {
   public:
     InputInfo() : name(QString::null),
-                  sourceid(0), inputid(0), cardid(0), mplexid(0), 
+                  mainsourceid(0), inputid(0), cardid(0), mplexid(0),
                   livetvorder(0) {}
     InputInfo(const QString &name,
-              uint sourceid, uint inputid, uint cardid, uint mplexid, 
-              uint livetvorder);
+              uint _mainsourceid, uint _inputid, uint _cardid, uint _mplexid,
+              uint _livetvorder);
     InputInfo(const InputInfo &other);
     InputInfo &operator=(const InputInfo &other);
     virtual ~InputInfo() {}
@@ -36,12 +36,12 @@ class MTV_PUBLIC InputInfo
         { return name == _name; }
 
   public:
-    QString name;     ///< input name
-    uint    sourceid; ///< associated channel listings source
-    uint    inputid;  ///< unique key in DB for this input
-    uint    cardid;   ///< card id associated with input
-    uint    mplexid;  ///< mplexid restriction if applicable
-    uint    livetvorder; ///< order for live TV use
+    QString name;         ///< input name
+    uint    mainsourceid; ///< associated channel listings source
+    uint    inputid;      ///< unique key in DB for this input
+    uint    cardid;       ///< card id associated with input
+    uint    mplexid;      ///< mplexid restriction if applicable
+    uint    livetvorder;  ///< order for live TV use
 };
 
 class MTV_PUBLIC TunedInputInfo : public InputInfo
@@ -49,8 +49,8 @@ class MTV_PUBLIC TunedInputInfo : public InputInfo
   public:
     TunedInputInfo() : chanid(0) { }
     TunedInputInfo(const QString &name,
-                   uint _sourceid, uint _inputid,
-                   uint _cardid,   uint _mplexid, uint _livetvorder, 
+                   uint _mainsourceid, uint _inputid,
+                   uint _cardid, uint _mplexid, uint _livetvorder,
                    uint _chanid);
     TunedInputInfo(const TunedInputInfo &other);
     TunedInputInfo &operator=(const TunedInputInfo &other);
@@ -76,11 +76,11 @@ class MTV_PUBLIC ChannelInputInfo : public InputInfo
         videoModeV4L1(0),               videoModeV4L2(0) {}
     ChannelInputInfo(QString _name,            QString _startChanNum,
                      QString _tuneToChannel,   QString _externalChanger,
-                     uint    _sourceid,        uint    _cardid,
+                     uint    _mainsourceid,    uint    _cardid,
                      uint    _inputid,         uint    _mplexid,
                      uint    _livetvorder,
-                     const DBChanList &_channels) :
-        InputInfo(_name, _sourceid, _inputid, _cardid, _mplexid, _livetvorder),
+                     const DBChanInfoList &_channels) :
+        InputInfo(_name, _mainsourceid, _inputid, _cardid, _mplexid, _livetvorder),
         startChanNum(_startChanNum),
         tuneToChannel(_tuneToChannel),  externalChanger(_externalChanger),
         channels(_channels),
@@ -93,14 +93,14 @@ class MTV_PUBLIC ChannelInputInfo : public InputInfo
     virtual void Clear(void);
 
   public:
-    QString      startChanNum;    ///< channel to start on
-    QString      tuneToChannel;   ///< for using a cable box & S-Video
-    QString      externalChanger; ///< for using a cable box...
-    DBChanList   channels;
-    vector<uint> groups;
-    int          inputNumV4L;
-    int          videoModeV4L1;
-    int          videoModeV4L2;
+    QString        startChanNum;    ///< channel to start on
+    QString        tuneToChannel;   ///< for using a cable box & S-Video
+    QString        externalChanger; ///< for using a cable box...
+    DBChanInfoList channels;
+    vector<uint>   groups;
+    int            inputNumV4L;
+    int            videoModeV4L1;
+    int            videoModeV4L2;
 };
 typedef QMap<uint, ChannelInputInfo*> InputMap;
 

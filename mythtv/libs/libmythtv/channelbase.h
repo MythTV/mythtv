@@ -46,7 +46,7 @@ class ChannelBase
     virtual void Close(void) = 0;
     /// \brief Reports whether channel is already open
     virtual bool IsOpen(void) const = 0;
-    virtual bool SetChannelByString(const QString &chan) = 0;
+    virtual bool SetChannelByString(const QString &chan, QString maptypes = "'main'") = 0;
 
     // Methods that one might want to specialize
     virtual void SetFormat(const QString &/*format*/) {}
@@ -65,7 +65,8 @@ class ChannelBase
     virtual QString GetInputByNum(int capchannel) const;
     virtual QString GetCurrentName(void) const
         { return m_curchannelname; }
-    virtual int GetChanID(void) const;
+    virtual int GetChanID(void) const
+        { return m_chanID; }
     virtual int GetCurrentInputNum(void) const
         { return m_currentInputID; }
     virtual QString GetCurrentInput(void) const
@@ -76,12 +77,13 @@ class ChannelBase
     virtual QString GetNextInputStartChan(void)
         { return m_inputs[GetNextInputNum()]->startChanNum; }
     virtual uint GetCurrentSourceID(void) const
-        { return m_inputs[GetCurrentInputNum()]->sourceid; }
+        { return m_inputs[GetCurrentInputNum()]->mainsourceid; }
     virtual uint GetSourceID(int inputID) const
-        { return m_inputs[inputID]->sourceid; }
+        { return m_inputs[inputID]->mainsourceid; }
+
     virtual uint GetInputCardID(int inputNum) const;
-    virtual DBChanList GetChannels(int inputNum) const;
-    virtual DBChanList GetChannels(const QString &inputname) const;
+    virtual DBChanInfoList GetChannels(int inputNum) const;
+    virtual DBChanInfoList GetChannels(const QString &inputname) const;
     virtual vector<InputInfo> GetFreeInputs(
         const vector<uint> &excluded_cards) const;
     virtual QStringList GetConnectedInputs(void) const;
@@ -115,7 +117,7 @@ class ChannelBase
     virtual int  ChangePictureAttribute(
         PictureAdjustType, PictureAttribute, bool up) { return -1; }
 
-    bool CheckChannel(const QString &channum, QString& inputName) const;
+    bool CheckChannel(const QString &channum, QString& inputName, QString maptypes = "'main'") const;
 
     // \brief Set cardid for scanning
     void SetCardID(uint _cardid) { m_cardid = _cardid; }
@@ -156,11 +158,12 @@ class ChannelBase
 
     TVRec   *m_pParent;
     QString  m_curchannelname;
+    int      m_chanID;
     int      m_currentInputID;
     bool     m_commfree;
     uint     m_cardid;
     InputMap m_inputs;
-    DBChanList m_allchannels; ///< channels across all inputs
+    DBChanInfoList m_allchannels; ///< channels across all inputs
 
     QMutex         m_system_lock;
     MythSystem    *m_system;

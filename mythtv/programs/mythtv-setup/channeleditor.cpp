@@ -489,7 +489,7 @@ void ChannelEditor::menu()
 void ChannelEditor::scan(void)
 {
 #ifdef USING_BACKEND
-    ScanWizard *scanwizard = new ScanWizard(m_sourceFilter);
+    ScanWizard *scanwizard = new ScanWizard(max(m_sourceFilter,0));
     scanwizard->exec(false, true);
     scanwizard->deleteLater();
 

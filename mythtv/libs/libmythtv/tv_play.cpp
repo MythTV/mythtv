@@ -1389,7 +1389,7 @@ void TV::UpdateChannelList(int groupID)
     if (groupID == channelGroupId)
         return;
 
-    DBChanList list;
+    DBChanInfoList list;
     if (groupID != -1)
     {
         list = ChannelUtil::GetChannels(
@@ -1836,7 +1836,7 @@ void TV::ShowOSDAskAllow(PlayerContext *ctx)
                 (*it).is_conflicting = true;
             else if (!CardUtil::IsTunerShared(cardid, (*it).info->GetCardID()))
                 (*it).is_conflicting = true;
-            else if ((busy_input.sourceid == (uint)(*it).info->GetSourceID()) &&
+            else if ((busy_input.mainsourceid == (uint)(*it).info->GetSourceID()) &&
                      (busy_input.mplexid  == (uint)(*it).info->QueryMplexID()))
                 (*it).is_conflicting = false;
             else
@@ -6473,11 +6473,11 @@ void TV::SwitchSource(PlayerContext *ctx, uint source_direction)
         for (uint i = 0; i < inputs.size(); i++)
         {
             // prefer the current card's input in sources list
-            if ((sources.find(inputs[i].sourceid) == sources.end()) ||
+            if ((sources.find(inputs[i].mainsourceid) == sources.end()) ||
                 ((cardid == inputs[i].cardid) &&
-                 (cardid != sources[inputs[i].sourceid].cardid)))
+                 (cardid != sources[inputs[i].mainsourceid].cardid)))
             {
-                sources[inputs[i].sourceid] = inputs[i];
+                sources[inputs[i].mainsourceid] = inputs[i];
             }
         }
     }
@@ -7281,7 +7281,7 @@ void TV::ChangeChannel(PlayerContext *ctx, uint chanid, const QString &chan)
         UpdateOSDInput(ctx);
 }
 
-void TV::ChangeChannel(const PlayerContext *ctx, const DBChanList &options)
+void TV::ChangeChannel(const PlayerContext *ctx, const DBChanInfoList &options)
 {
     for (uint i = 0; i < options.size(); i++)
     {
@@ -7986,7 +7986,7 @@ QSet<uint> TV::IsTunableOn(
 
         for (uint j = 0; j < inputs.size(); j++)
         {
-            if (inputs[j].sourceid != sourceid)
+            if (inputs[j].mainsourceid != sourceid)
                 continue;
 
             if (inputs[j].mplexid &&
@@ -10307,11 +10307,11 @@ void TV::OSDDialogEvent(int result, QString text, QString action)
             if (actx->tvchain)
             {
                 QMutexLocker locker(&channelGroupLock);
-                const DBChanList &list = channelGroupChannelList;
+                const DBChanInfoList &list = channelGroupChannelList;
                 cur_channum = actx->tvchain->GetChannelName(-1);
                 new_channum = cur_channum;
 
-                DBChanList::const_iterator it = list.begin();
+                DBChanInfoList::const_iterator it = list.begin();
                 for (; it != list.end(); ++it)
                 {
                     if ((*it).channum == cur_channum)
@@ -11231,8 +11231,8 @@ void TV::FillOSDMenuSource(const PlayerContext *ctx, OSD *osd,
                     continue;
 
                 for (uint i = 0; i < inputs.size(); i++)
-                    if (!sources.contains(inputs[i].sourceid))
-                       sources[inputs[i].sourceid] = inputs[i];
+                    if (!sources.contains(inputs[i].mainsourceid))
+                       sources[inputs[i].mainsourceid] = inputs[i];
             }
             // Get other sources available on this card
             vector<uint> currentinputs = CardUtil::GetInputIDs(cardid);
@@ -11243,9 +11243,9 @@ void TV::FillOSDMenuSource(const PlayerContext *ctx, OSD *osd,
                     InputInfo info;
                     info.inputid = currentinputs[i];
                     if (CardUtil::GetInputInfo(info))
-                        if (!sources.contains(info.sourceid) &&
+                        if (!sources.contains(info.mainsourceid) &&
                             info.livetvorder)
-                            sources[info.sourceid] = info;
+                            sources[info.mainsourceid] = info;
                 }
             }
             // delete current source from list
@@ -11275,7 +11275,7 @@ void TV::FillOSDMenuSource(const PlayerContext *ctx, OSD *osd,
             for (uint i = 0; i < inputs.size(); i++)
             {
                 if ((inputs[i].cardid   == cardid) &&
-                    (inputs[i].sourceid == sourceid))
+                    (inputs[i].mainsourceid == sourceid))
                 {
                     testsize = 1;
                     break;
@@ -11326,7 +11326,7 @@ void TV::FillOSDMenuSource(const PlayerContext *ctx, OSD *osd,
             {
                 // don't add current input to list
                 if ((inputs[i].cardid   == cardid) &&
-                    (inputs[i].sourceid == sourceid))
+                    (inputs[i].mainsourceid == sourceid))
                 {
                     continue;
                 }
@@ -11350,7 +11350,7 @@ void TV::FillOSDMenuSource(const PlayerContext *ctx, OSD *osd,
         QMap<uint,InputInfo>::const_iterator sit = sources.begin();
         for (; sit != sources.end(); ++sit)
         {
-            osd->DialogAddButton(SourceUtil::GetSourceName((*sit).sourceid),
+            osd->DialogAddButton(SourceUtil::GetSourceName((*sit).mainsourceid),
                                  QString("SWITCHTOINPUT_%1").arg((*sit).inputid));
         }
     }

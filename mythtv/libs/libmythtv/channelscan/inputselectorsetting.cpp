@@ -33,9 +33,9 @@
 #include "mythdb.h"
 
 InputSelector::InputSelector(
-    uint _default_cardid, const QString &_default_inputname) :
+    uint _default_cardid, const QString &_default_inputname, QString _maptypes) :
     ComboBoxSetting(this), sourceid(0), default_cardid(_default_cardid),
-    default_inputname(_default_inputname)
+    default_inputname(_default_inputname), maptypes(_maptypes)
 {
     default_inputname.detach();
     setLabel(tr("Input"));
@@ -49,14 +49,15 @@ void InputSelector::Load(void)
         return;
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare(
+    query.prepare(QString(
         "SELECT capturecard.cardid, cardtype, videodevice, inputname "
-        "FROM capturecard, cardinput, videosource "
-        "WHERE cardinput.sourceid = videosource.sourceid AND "
-        "      hostname           = :HOSTNAME            AND "
-        "      cardinput.sourceid = :SOURCEID            AND "
-        "      cardinput.cardid   = capturecard.cardid");
-
+        "FROM capturecard, cardinput, videosource, videosourcemap "
+        "WHERE hostname                = :HOSTNAME                  AND "
+        "      capturecard.cardid      = cardinput.cardid           AND "
+        "      cardinput.cardinputid   = videosourcemap.cardinputid AND "
+        "      videosourcemap.sourceid = videosource.sourceid       AND "
+        "      videosource.sourceid    = :SOURCEID                  AND "
+        "      videosourcemap.type in (%1) ").arg(maptypes));
     query.bindValue(":HOSTNAME", gCoreContext->GetHostName());
     query.bindValue(":SOURCEID", sourceid);
 

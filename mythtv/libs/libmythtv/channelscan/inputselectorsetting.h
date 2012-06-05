@@ -37,7 +37,7 @@ class InputSelector : public ComboBoxSetting, public TransientStorage
     Q_OBJECT
 
   public:
-    InputSelector(uint _default_cardid, const QString &_default_inputname);
+    InputSelector(uint _default_cardid, const QString &_default_inputname, QString _maptypes = "'main'");
 
     virtual void Load(void);
 
@@ -56,6 +56,7 @@ class InputSelector : public ComboBoxSetting, public TransientStorage
     uint    sourceid;
     uint    default_cardid;
     QString default_inputname;
+    QString maptypes;
 };
 
 #endif // _INPUT_SELECTOR_SETTING_H_

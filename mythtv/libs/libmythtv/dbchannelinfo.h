@@ -17,18 +17,18 @@ using namespace std;
 #include "mythtvexp.h"
 #include "programtypes.h"
 
-// TODO: Refactor DBChannel and ChannelInfo into a single class
-
-class MTV_PUBLIC DBChannel
+class MTV_PUBLIC DBChannelInfo
 {
   public:
-    DBChannel(const DBChannel&);
-    DBChannel(const QString &_channum, const QString &_callsign,
-              uint _chanid, uint _major_chan, uint _minor_chan,
+	DBChannelInfo() : chanid(0), sourceid(0), favid(0) {}
+	DBChannelInfo(const DBChannelInfo&);
+    DBChannelInfo(const QString &_channum, const QString &_callsign,
+              uint _chanid,  uint _major_chan, uint _minor_chan,
               uint _mplexid, bool _visible,
-              const QString &_name, const QString &_icon,
+              const QString &_name, const QString &_iconpath,
               uint _sourceid, uint _cardid, uint _grpid);
-    DBChannel& operator=(const DBChannel&);
+
+	DBChannelInfo& operator=(const DBChannelInfo&);
 
     bool operator == (uint _chanid) const
         { return chanid == _chanid; }
@@ -36,41 +36,28 @@ class MTV_PUBLIC DBChannel
     enum ChannelFormat { kChannelShort, kChannelLong };
     QString GetFormatted(const ChannelFormat &format) const;
     void ToMap(InfoMap &infoMap) const;
-
   public:
     QString channum;
     QString callsign;
-    QString name;
-    QString icon;
     uint    chanid;
+
+    QString name;
+    QString iconpath;
+
     uint    major_chan;
     uint    minor_chan;
     uint    mplexid;
+
     uint    sourceid;
     uint    cardid;
     uint    grpid;
     bool    visible;
-};
-typedef vector<DBChannel> DBChanList;
 
-class MTV_PUBLIC ChannelInfo
-{
- public:
-    ChannelInfo() : chanid(-1), sourceid(-1), favid(-1) {}
-    enum ChannelFormat { kChannelShort, kChannelLong };
-    QString GetFormatted(const ChannelFormat &format) const;
-    void ToMap(InfoMap &infoMap) const;
-
-    QString callsign;
-    QString iconpath;
-    QString chanstr;
-    QString channame;
-    int chanid;
-    int sourceid;
-    QString sourcename;
     int favid;
+    QString sourcename;
     QString recpriority;
 };
+typedef vector<DBChannelInfo> DBChanInfoList;
 
 class MTV_PUBLIC ChannelInsertInfo
 {
@@ -177,6 +164,6 @@ class MTV_PUBLIC ChannelInsertInfo
 };
 typedef vector<ChannelInsertInfo> ChannelInsertInfoList;
 
-Q_DECLARE_METATYPE(ChannelInfo*)
+Q_DECLARE_METATYPE(DBChannelInfo*)
 
 #endif // DB_CHANNEL_INFO_H_

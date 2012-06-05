@@ -5,7 +5,7 @@
 
 #include "programinfo.h"
 
-class ChannelInfo;
+class DBChannelInfo;
 
 class MythUIText;
 class MythUIImage;
@@ -50,8 +50,8 @@ class ChannelRecPriority : public MythScreenType
 
     void saveRecPriority(void);
 
-    QMap<QString, ChannelInfo> m_channelData;
-    QMap<QString, ChannelInfo*> m_sortedChannel;
+    QMap<QString, DBChannelInfo> m_channelData;
+    QMap<QString, DBChannelInfo*> m_sortedChannel;
     QMap<QString, QString> m_origRecPriorityData;
     QMap<int, bool> m_visMap;
 
@@ -69,7 +69,7 @@ class ChannelRecPriority : public MythScreenType
 
     SortType m_sortType;
 
-    ChannelInfo *m_currentItem;
+    DBChannelInfo *m_currentItem;
 };
 
 #endif

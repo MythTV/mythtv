@@ -27,6 +27,10 @@ void SimpleDBStorage::Load(void)
             user->SetDBValue(result);
         }
     }
+    else
+    {
+        initval.clear();
+    }
 }
 
 void SimpleDBStorage::Save(QString _table)

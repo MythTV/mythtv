@@ -283,11 +283,19 @@ int Capture::AddCardInput       ( const uint nCardId,
                                   const uint nSchedOrder,
                                   const uint nLiveTVOrder)
 {
+/////////////////////////////////
+/////////////////////////////////
+// FIXME: SourceID has been removed from the cardinput table and is now in the videosourcemap table.
+//        Could some who knows the services api possibly correct this please?
+/*
     if ( nCardId < 1 || nSourceId < 1 || sInputName.isEmpty() )
         throw( QString( "This API requires at least a card ID, a source ID, "
                         "and an input name." ));
+*/
+/////////////////////////////////
+/////////////////////////////////
 
-    int nResult = CardUtil::CreateCardInput(nCardId, nSourceId, sInputName,
+    int nResult = CardUtil::CreateCardInput(nCardId, /*nSourceId,*/ sInputName,
                       sExternalCommand, sChangerDevice, sChangerModel,
                       sHostName, sTuneChan, sStartChan, sDisplayName,
                       bDishnetEIT, nRecPriority, nQuicktune, nSchedOrder, 

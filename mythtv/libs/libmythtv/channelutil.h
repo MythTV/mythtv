@@ -157,32 +157,24 @@ class MTV_PUBLIC ChannelUtil
     static int     GetChanID(uint sourceid, const QString &channum)
         { return GetChannelValueInt("chanid", sourceid, channum); }
     static bool    GetChannelData(
-        uint    sourceid,         const QString &channum,
-        QString &tvformat,        QString       &modulation,
-        QString &freqtable,       QString       &freqid,
-        int     &finetune,        uint64_t      &frequency,
-        QString &dtv_si_std,      int     &mpeg_prog_num,
-        uint    &atsc_major,      uint          &atsc_minor,
-        uint    &dvb_transportid, uint          &dvb_networkid,
-        uint    &mplexid,         bool          &commfree);
-    static bool    GetExtendedChannelData(
-        uint sourceid,            const QString &channum,
-        QString &tvformat,        QString       &modulation,
-        QString &freqtable,       QString       &freqid,
-        int     &finetune,        uint64_t      &frequency,
-        QString &dtv_si_std,      int           &mpeg_prog_num,
-        uint    &atsc_major,      uint          &atsc_minor,
-        uint    &dvb_transportid, uint          &dvb_networkid,
-        uint    &mplexid,         bool          &commfree,
-        bool    &use_on_air_guide,bool          &visible,
-        QString &xmltvid,         QString       &default_authority,
-        QString &icon);
+        uint     sourceid,           const QString &channum,
+        uint     &chanid,            QString &tvformat,
+        QString  &modulation,        QString &freqtable,
+        QString  &freqid,            int     &finetune,
+        uint64_t &frequency,         QString &dtv_si_std,
+        int      &mpeg_prog_num,     uint    &atsc_major,
+        uint     &atsc_minor,        uint    &dvb_transportid,
+        uint     &dvb_networkid,     uint    &mplexid,
+        bool     &commfree,          bool    &use_on_air_guide,
+        bool     &visible,           QString &xmltvid,
+        QString  &default_authority, QString &icon);
+
     static int     GetProgramNumber(uint sourceid, const QString &channum)
         { return GetChannelValueInt("serviceid", sourceid, channum); }
     static QString GetVideoFilters(uint sourceid, const QString &channum)
         { return GetChannelValueStr("videofilters", sourceid, channum); }
 
-    static DBChanList GetChannels(
+    static DBChanInfoList GetChannels(
         uint sourceid, bool visible_only, 
         const QString &group_by = QString(), uint channel_groupid = 0)
     {
@@ -191,16 +183,17 @@ class MTV_PUBLIC ChannelUtil
     }
     /// Returns channels that are not connected to a capture card
     /// and channels that are not marked as visible.
-    static DBChanList GetAllChannels(uint sourceid)
+    static DBChanInfoList GetAllChannels(uint sourceid)
     {
         return GetChannelsInternal(sourceid, false, true, QString(), 0);
     }
+    static bool    GetChannelSourceID(uint &sourceid, const QString channum, const uint cardinputid, QString maptypes = "main");
     static vector<uint> GetChanIDs(int sourceid = -1);
     static uint    GetChannelCount(int sourceid = -1);
-    static void    SortChannels(DBChanList &list, const QString &order,
+    static void    SortChannels(DBChanInfoList &list, const QString &order,
                                 bool eliminate_duplicates = false);
 
-    static uint    GetNextChannel(const DBChanList &sorted,
+    static uint    GetNextChannel(const DBChanInfoList &sorted,
                                   uint old_chanid,
                                   uint mplexid_restriction,
                                   int  direction,
@@ -278,7 +271,7 @@ class MTV_PUBLIC ChannelUtil
     static const QString kATSCSeparators;
 
   private:
-    static DBChanList GetChannelsInternal(
+    static DBChanInfoList GetChannelsInternal(
         uint sourceid, bool visible_only, bool include_disconnected,
         const QString &group_by, uint channel_groupid);
     static QString GetChannelStringField(int chanid, const QString &field);

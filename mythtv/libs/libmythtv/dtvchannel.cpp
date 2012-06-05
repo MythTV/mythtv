@@ -175,7 +175,7 @@ void DTVChannel::ReturnMasterLock(DTVChannelP &chan)
     }
 }
 
-bool DTVChannel::SetChannelByString(const QString &channum)
+bool DTVChannel::SetChannelByString(const QString &channum, QString maptypes)
 {
     QString loc = LOC + QString("SetChannelByString(%1): ").arg(channum);
     LOG(VB_CHANNEL, LOG_INFO, loc);
@@ -193,7 +193,8 @@ bool DTVChannel::SetChannelByString(const QString &channum)
     if (m_inputs.size() > 1)
     {
         QString inputName;
-        if (!CheckChannel(channum, inputName))
+
+        if (!CheckChannel(channum, inputName, maptypes))
         {
             LOG(VB_GENERAL, LOG_ERR, loc +
                     "CheckChannel failed.\n\t\t\tPlease verify the channel "
@@ -227,16 +228,23 @@ bool DTVChannel::SetChannelByString(const QString &channum)
     // Fetch tuning data from the database.
     QString tvformat, modulation, freqtable, freqid, si_std;
     int finetune;
+    uint chanid;
     uint64_t frequency;
     int mpeg_prog_num;
     uint atsc_major, atsc_minor, mplexid, tsid, netid;
+    bool use_on_air_guide, visible;
+    QString xmltvid, default_authority, icon;
+
+    uint chsourceid = 0;
+    ChannelUtil::GetChannelSourceID(chsourceid, channum, GetCurrentInputNum(), maptypes);
 
     if (!ChannelUtil::GetChannelData(
-        (*it)->sourceid, channum,
-        tvformat, modulation, freqtable, freqid,
-        finetune, frequency,
+        chsourceid, channum,
+        chanid, tvformat, modulation, freqtable,
+        freqid, finetune, frequency,
         si_std, mpeg_prog_num, atsc_major, atsc_minor, tsid, netid,
-        mplexid, m_commfree))
+        mplexid, m_commfree, use_on_air_guide, visible,
+        xmltvid, default_authority, icon))
     {
         LOG(VB_GENERAL, LOG_ERR, loc + "Unable to find channel in database.");
 
@@ -343,7 +351,6 @@ bool DTVChannel::SetChannelByString(const QString &channum)
     {
         // We need to pull the pid_cache since there are no tuning tables
         pid_cache_t pid_cache;
-        int chanid = ChannelUtil::GetChanID((*it)->sourceid, channum);
         ChannelUtil::GetCachedPids(chanid, pid_cache);
         if (pid_cache.empty())
         {
@@ -383,6 +390,7 @@ bool DTVChannel::SetChannelByString(const QString &channum)
 
     // Set the current channum to the new channel's channum
     m_curchannelname = channum;
+    m_chanID = chanid;
 
     // Setup filters & recording picture attributes for framegrabing recorders
     // now that the new curchannelname has been established.

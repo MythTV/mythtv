@@ -67,6 +67,7 @@ DTC::ChannelInfoList* Channel::GetChannelInfoList( int nSourceID,
         QString channum = ChannelUtil::GetChanNum(chanid);
         QString format, modulation, freqtable, freqid, dtv_si_std,
                 xmltvid, default_authority, icon;
+        uint _chanid;
         int finetune, program_number;
         uint64_t frequency;
         uint atscmajor, atscminor, transportid, networkid, mplexid;
@@ -74,7 +75,7 @@ DTC::ChannelInfoList* Channel::GetChannelInfoList( int nSourceID,
         bool eit = false;
         bool visible = true;
 
-        if (ChannelUtil::GetExtendedChannelData( nSourceID, channum, format, modulation,
+        if (ChannelUtil::GetChannelData( nSourceID, channum, _chanid, format, modulation,
                             freqtable, freqid, finetune, frequency,
                             dtv_si_std, program_number, atscmajor,
                             atscminor, transportid, networkid, mplexid,
@@ -149,13 +150,14 @@ DTC::ChannelInfo* Channel::GetChannelInfo( int nChanID )
     QString format, modulation, freqtable, freqid, dtv_si_std,
             xmltvid, default_authority, icon;
     int finetune, program_number;
+    uint _chanid;
     uint64_t frequency;
     uint atscmajor, atscminor, transportid, networkid, mplexid;
     bool commfree = false;
     bool eit = false;
     bool visible = true;
 
-    if (ChannelUtil::GetExtendedChannelData( sourceid, channum, format, modulation,
+    if (ChannelUtil::GetChannelData( sourceid, channum, _chanid, format, modulation,
                             freqtable, freqid, finetune, frequency,
                             dtv_si_std, program_number, atscmajor,
                             atscminor, transportid, networkid, mplexid,

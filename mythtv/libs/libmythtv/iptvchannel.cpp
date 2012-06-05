@@ -79,7 +79,7 @@ bool IPTVChannel::IsOpen(void) const
     return !m_freeboxchannels.empty();
 }
 
-bool IPTVChannel::SetChannelByString(const QString &channum)
+bool IPTVChannel::SetChannelByString(const QString &channum, QString maptypes)
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + QString("SetChannelByString(%1) -- begin")
         .arg(channum));
@@ -143,7 +143,7 @@ IPTVChannelInfo IPTVChannel::GetChanInfo(
             LOG(VB_GENERAL, LOG_ERR, msg);
             return dummy;
         }
-        sourceid = (*it)->sourceid;
+        sourceid = (*it)->mainsourceid;
     }
 
     MSqlQuery query(MSqlQuery::InitCon());

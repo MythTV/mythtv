@@ -97,15 +97,20 @@ void TransportList::fillSelections(void)
     if (!sourceid)
         return;
 
+    QString cardtypestr = CardUtil::GetRawCardType(cardid);
+    if (cardtypestr == "DVB")
+        cardtypestr = CardUtil::ProbeSubTypeName(cardid);
+
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
         "SELECT mplexid, modulation, frequency, "
         "       symbolrate, networkid, transportid, constellation "
-        "FROM dtv_multiplex, videosource "
+        "FROM dtv_multiplex "
         "WHERE dtv_multiplex.sourceid = :SOURCEID AND "
-        "      dtv_multiplex.sourceid = videosource.sourceid "
+        "      dtv_multiplex.modulation = :MODULATION "
         "ORDER by networkid, transportid, frequency, mplexid");
     query.bindValue(":SOURCEID", sourceid);
+    query.bindValue(":MODULATION", cardtypestr);
 
     if (!query.exec() || !query.isActive())
     {
@@ -149,7 +154,7 @@ void TransportList::fillSelections(void)
     }
 }
 
-static CardUtil::CARD_TYPES get_cardtype(uint sourceid)
+static CardUtil::CARD_TYPES get_cardtype(uint sourceid, uint cardid)
 {
     vector<uint> cardids;
 
@@ -157,10 +162,14 @@ static CardUtil::CARD_TYPES get_cardtype(uint sourceid)
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
         "SELECT capturecard.cardid "
-        "FROM cardinput, capturecard "
+        "FROM cardinput, capturecard, videosourcemap "
         "WHERE capturecard.cardid = cardinput.cardid AND "
-        "      cardinput.sourceid = :SOURCEID AND "
+        "    cardinput.cardid = :CARDID AND "
+        "    cardinput.cardinputid = videosourcemap.cardinputid AND "
+        "    videosourcemap.sourceid = :SOURCEID AND "
+        "    videosourcemap.type in ('main','scan') AND "
         "    capturecard.hostname = :HOSTNAME");
+    query.bindValue("CARDID", cardid);
     query.bindValue(":SOURCEID", sourceid);
     query.bindValue(":HOSTNAME", gCoreContext->GetHostName());
 
@@ -220,30 +229,6 @@ static CardUtil::CARD_TYPES get_cardtype(uint sourceid)
     if (cardtypes.empty())
         return CardUtil::ERROR_PROBE;
 
-    for (uint i = 1; i < cardtypes.size(); i++)
-    {
-        CardUtil::CARD_TYPES typeA = cardtypes[i - 1];
-        typeA = (CardUtil::HDHOMERUN == typeA) ? CardUtil::ATSC : typeA;
-        typeA = (CardUtil::MPEG      == typeA) ? CardUtil::V4L  : typeA;
-
-        CardUtil::CARD_TYPES typeB = cardtypes[i + 0];
-        typeB = (CardUtil::HDHOMERUN == typeB) ? CardUtil::ATSC : typeB;
-        typeB = (CardUtil::MPEG      == typeB) ? CardUtil::V4L  : typeB;
-
-        if (typeA == typeB)
-            continue;
-
-        MythPopupBox::showOkPopup(
-            GetMythMainWindow(), 
-            QObject::tr("Transport Editor"), 
-            QObject::tr(
-                "The Video Sources to which this Transport is connected "
-                "are incompatible, please create seperate video sources "
-                "for these cards. "));
-
-        return CardUtil::ERROR_PROBE;
-    }
-
     return cardtypes[0];
 }
 
@@ -255,33 +240,48 @@ void TransportList::SetSourceID(uint _sourceid)
 #endif
 
     if (!_sourceid)
-    {
         sourceid = 0;
-    }
     else
-    {
-        cardtype = get_cardtype(_sourceid);
-        sourceid = ((CardUtil::ERROR_OPEN    == cardtype) ||
-                    (CardUtil::ERROR_UNKNOWN == cardtype) ||
-                    (CardUtil::ERROR_PROBE   == cardtype)) ? 0 : _sourceid;
-    }
+    	sourceid = _sourceid;
+}
 
+void TransportList::SetInput(const QString &cardids_inputname)
+{
+#if 0
+    LOG(VB_GENERAL, LOG_DEBUG, QString("TransportList::SetInput(%1)")
+                                   .arg(_cardid));
+#endif
+    uint _cardid;
+    QString inputname = QString::null;
+    if (InputSelector::Parse(cardids_inputname, _cardid, inputname))
+    {
+        cardtype = get_cardtype(sourceid, _cardid);
+        cardid = ((CardUtil::ERROR_OPEN    == cardtype) ||
+                  (CardUtil::ERROR_UNKNOWN == cardtype) ||
+                  (CardUtil::ERROR_PROBE   == cardtype)) ? 0 : _cardid;
+    }
     fillSelections();
 }
 
 TransportListEditor::TransportListEditor(uint sourceid) :
-    m_videosource(new VideoSourceSelector(sourceid, QString::null, false)),
+    m_videosource(new VideoSourceSelector(sourceid, QString::null, false, QString("'main','scan'"))),
+    m_input(new InputSelector(0, QString::null, QString("'main','scan'"))),
     m_list(new TransportList())
 {
     setLabel(tr("Multiplex Editor"));
 
-    m_list->SetSourceID(m_videosource->GetSourceID());
-
     addChild(m_videosource);
+    addChild(m_input);
     addChild(m_list);
 
     connect(m_videosource, SIGNAL(valueChanged(const QString&)),
             m_list,        SLOT(  SetSourceID( const QString&)));
+
+    connect(m_videosource, SIGNAL(valueChanged(const QString&)),
+            m_input,       SLOT(  SetSourceID( const QString&)));
+
+    connect(m_input,       SIGNAL(valueChanged(const QString&)),
+    		m_list,        SLOT(  SetInput(    const QString&)));
 
     connect(m_list, SIGNAL(accepted(int)),            this, SLOT(Edit()));
     connect(m_list, SIGNAL(menuButtonPressed(int)),   this, SLOT(Menu()));
@@ -298,8 +298,10 @@ DialogCode TransportListEditor::exec(void)
 
 void TransportListEditor::Edit(void)
 {
+    uint cardid   = m_input->GetCardID();
     uint sourceid = m_videosource->getValue().toUInt();
-    CardUtil::CARD_TYPES cardtype = get_cardtype(sourceid);
+    LOG(VB_GENERAL, LOG_DEBUG, QString("TransportListEditor::Edit() \n\n get_cardtype called with cardid = %1 and sourceid = %2").arg(cardid).arg(sourceid));
+    CardUtil::CARD_TYPES cardtype = get_cardtype(sourceid, cardid);
 
     if ((CardUtil::ERROR_OPEN    != cardtype) &&
         (CardUtil::ERROR_UNKNOWN != cardtype) &&

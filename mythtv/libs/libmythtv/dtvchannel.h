@@ -38,7 +38,7 @@ class DTVChannel : public ChannelBase
     virtual ~DTVChannel();
 
     // Commands
-    virtual bool SetChannelByString(const QString &chan);
+    virtual bool SetChannelByString(const QString &chan, QString maptypes = "'main'");
 
     /// \brief To be used by the channel scanner and possibly the EIT scanner.
     virtual bool TuneMultiplex(uint mplexid, QString inputname);

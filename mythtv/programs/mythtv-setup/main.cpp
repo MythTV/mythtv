@@ -361,7 +361,7 @@ int main(int argc, char *argv[])
     {
         bool okCardID = scanCardId;
 
-        QStringList inputnames = CardUtil::GetInputNames(scanCardId);
+        QStringList inputnames = CardUtil::GetInputNames(scanCardId, 0, QString("'main','scan'"));
         okCardID &= !inputnames.empty();
 
         if (scanInputName.isEmpty())

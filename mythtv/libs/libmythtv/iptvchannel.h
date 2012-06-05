@@ -27,7 +27,7 @@ class IPTVChannel : public DTVChannel
     // Commands
     bool Open(void);
     void Close(void);
-    bool SetChannelByString(const QString &channum);
+    bool SetChannelByString(const QString &channum, QString maptypes = "'main'");
 
     // Gets
     bool IsOpen(void) const;

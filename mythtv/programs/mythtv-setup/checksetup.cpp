@@ -181,8 +181,10 @@ bool checkChannelPresets(QStringList &probs)
 
     MSqlQuery query(MSqlQuery::InitCon());
 
-    query.prepare("SELECT cardid, startchan, sourceid, inputname"
-                  " FROM cardinput;");
+    query.prepare("SELECT cardid, startchan, sourceid, inputname "
+                  "FROM   cardinput, videosourcemap "
+                  "WHERE  cardinput.cardinputid = videosourcemap.cardinputid AND "
+                  "       videosourcemap.type   = 'main';");
 
     if (!query.exec() || !query.isActive())
     {

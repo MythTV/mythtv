@@ -261,7 +261,6 @@ class MTV_PUBLIC CardUtil
 
     // Input creation and deletion
     static int           CreateCardInput(const uint cardid,
-                                         const uint sourceid,
                                          const QString &inputname,
                                          const QString &externalcommand,
                                          const QString &changer_device,
@@ -277,12 +276,13 @@ class MTV_PUBLIC CardUtil
                                          const uint livetvorder);
 
     static bool         DeleteInput(uint inputid);
+    static bool         DeleteVideoSourceMap(uint inputid);
+    static bool         CreateVideoSourceMap(const int SourceID, const int InputID, const QString &maptype);
 
     // Other input functions
-
-    static vector<uint> GetCardIDs(uint sourceid);
+    static vector<uint> GetCardIDs(uint sourceid, QString maptypes = "'main'");
     static QString      GetStartInput(uint cardid);
-    static QStringList  GetInputNames(uint cardid, uint sourceid = 0);
+    static QStringList  GetInputNames(uint cardid, uint sourceid = 0, QString maptypes = "'main'");
     static bool         GetInputInfo(InputInfo &info,
                                      vector<uint> *groupids = NULL);
     static uint         GetCardID(uint inputid);
@@ -296,9 +296,11 @@ class MTV_PUBLIC CardUtil
     static vector<uint> GetAllInputIDs(void);
     static vector<uint> GetInputIDs(uint cardid);
     static uint         GetInputID(uint cardid, const QString &inputname);
-    static uint         GetInputID(uint cardid, uint sourceid);
+    static uint         GetInputID(uint cardid, uint sourceid, QString maptypes = "'main'");
     static uint         GetSourceID(uint inputid);
+    static bool         DeleteUnusedInputs(void);
     static bool         DeleteOrphanInputs(void);
+    static bool         DeleteOrphanVideoSourceMaps(void);
 
     static bool         SetInputValue(const QString &col, uint iid,
                                  int val)
@@ -331,7 +333,8 @@ class MTV_PUBLIC CardUtil
                                       const QString      &device,
                                       const QString      &cardtype,
                                       QStringList        &inputLabels,
-                                      vector<CardInput*> &cardInputs);
+                                      vector<CardInput*> &cardInputs,
+                                      const bool          longlabelfmt);
 
     // General info from OS
     static QStringList  ProbeVideoDevices(const QString &rawtype);

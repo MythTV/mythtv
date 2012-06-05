@@ -124,7 +124,7 @@ unsigned int ChannelData::promptForChannelUpdates(
                                        (*chaninfo).tvformat);
 
     (*chaninfo).iconpath = getResponse("Choose a channel icon image (any path "
-                                       "name) ",(*chaninfo).iconpath);
+                                   "name) ",(*chaninfo).iconpath);
 
     return(chanid);
 }

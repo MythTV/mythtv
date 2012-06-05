@@ -104,7 +104,7 @@ bool CetonChannel::Tune(const DTVMultiplex &tuning, QString /*inputname*/)
     return false;
 }
 
-bool CetonChannel::SetChannelByString(const QString &channum)
+bool CetonChannel::SetChannelByString(const QString &channum, QString maptypes)
 {
     bool ok = DTVChannel::SetChannelByString(channum);
 

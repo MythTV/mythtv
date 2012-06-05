@@ -232,22 +232,23 @@ void EITScanner::StartActiveScan(TVRec *_rec, uint max_seconds_per_source)
 
     if (!activeScanChannels.size())
     {
-        // TODO get input name and use it in crawl.
+    	// TODO get input name and use it in crawl.
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare(
             "SELECT channum, MIN(chanid) "
-            "FROM channel, cardinput, capturecard, videosource "
-            "WHERE cardinput.sourceid   = channel.sourceid AND "
-            "      videosource.sourceid = channel.sourceid AND "
-            "      capturecard.cardid   = cardinput.cardid AND "
-            "      channel.mplexid        IS NOT NULL      AND "
-            "      useonairguide        = 1                AND "
-            "      useeit               = 1                AND "
-            "      channum             != ''               AND "
-            "      cardinput.cardid     = :CARDID "
+            "FROM channel, cardinput, capturecard, videosource, videosourcemap "
+            "WHERE capturecard.cardid   = cardinput.cardid            AND "
+            "      cardinput.cardinputid = videosourcemap.cardinputid AND "
+            "      videosourcemap.sourceid = videosource.sourceid     AND "
+            "      videosource.sourceid = channel.sourceid            AND "
+       		"      channel.mplexid        IS NOT NULL                 AND "
+      	    "      useonairguide        = 1                           AND "
+            "      useeit               = 1                           AND "
+            "      channum             != ''                          AND "
+            "      cardinput.cardid     = :CARDID                     AND "
+            "      videosourcemap.type in ('main','eit') "
             "GROUP BY mplexid "
-            "ORDER BY cardinput.sourceid, mplexid, "
-            "         atsc_major_chan, atsc_minor_chan ");
+            "ORDER BY mplexid, atsc_major_chan, atsc_minor_chan ");
         query.bindValue(":CARDID", rec->GetCaptureCardNum());
 
         if (!query.exec() || !query.isActive())

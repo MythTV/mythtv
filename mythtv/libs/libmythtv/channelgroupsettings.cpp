@@ -94,10 +94,10 @@ ChannelGroupConfig::ChannelGroupConfig(QString _name)
     VerticalConfigurationGroup   *cgroup;
     HorizontalConfigurationGroup *columns;
 
-    DBChanList chanlist = ChannelUtil::GetChannels(0, true, "channum, callsign");
+    DBChanInfoList chanlist = ChannelUtil::GetChannels(0, true, "channum, callsign");
     ChannelUtil::SortChannels(chanlist, "channum", true);
 
-    DBChanList::iterator it = chanlist.begin();
+    DBChanInfoList::iterator it = chanlist.begin();
     int i,j = 0;
     int p = 1;
     int pages = (int)((float)chanlist.size() / 8.0 / 3.0 + 0.5);

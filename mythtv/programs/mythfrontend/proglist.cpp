@@ -770,13 +770,13 @@ void ProgLister::FillViewList(const QString &view)
 
     if (m_type == plChannel) // list by channel
     {
-        DBChanList channels = ChannelUtil::GetChannels(
+    	DBChanInfoList channels = ChannelUtil::GetChannels(
             0, true, "channum, chanid");
         ChannelUtil::SortChannels(channels, m_channelOrdering, true);
 
         for (uint i = 0; i < channels.size(); ++i)
         {
-            QString chantext = channels[i].GetFormatted(DBChannel::kChannelShort);
+            QString chantext = channels[i].GetFormatted(DBChannelInfo::kChannelShort);
 
             m_viewList.push_back(QString::number(channels[i].chanid));
             m_viewTextList.push_back(chantext);

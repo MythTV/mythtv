@@ -59,11 +59,13 @@ static const uint kDefaultMultirecCount = 2;
 
 VideoSourceSelector::VideoSourceSelector(uint           _initial_sourceid,
                                          const QString &_card_types,
-                                         bool           _must_have_mplexid) :
+                                         bool           _must_have_mplexid,
+                                         QString        _maptypes) :
     ComboBoxSetting(this),
     initial_sourceid(_initial_sourceid),
     card_types(_card_types),
-    must_have_mplexid(_must_have_mplexid)
+    must_have_mplexid(_must_have_mplexid),
+    maptypes(_maptypes)
 {
     card_types.detach();
     setLabel(tr("Video Source"));
@@ -75,16 +77,18 @@ void VideoSourceSelector::Load(void)
 
     QString querystr =
         "SELECT DISTINCT videosource.name, videosource.sourceid "
-        "FROM cardinput, videosource, capturecard";
+        "FROM cardinput, videosource, capturecard, videosourcemap ";
 
     querystr += (must_have_mplexid) ? ", channel " : " ";
 
-    querystr +=
-        "WHERE cardinput.sourceid   = videosource.sourceid AND "
-        "      cardinput.cardid     = capturecard.cardid   AND "
-        "      capturecard.hostname = :HOSTNAME ";
+    querystr += QString(
+        "WHERE cardinput.cardinputid   = videosourcemap.cardinputid AND "
+        "      videosourcemap.sourceid = videosource.sourceid       AND "
+        "      cardinput.cardid        = capturecard.cardid         AND "
+        "      capturecard.hostname    = :HOSTNAME                  AND "
+    	"      videosourcemap.type in (%1) ").arg(maptypes);
 
-    if (!card_types.isEmpty())
+	if (!card_types.isEmpty())
     {
         querystr += QString(" AND capturecard.cardtype in %1 ")
             .arg(card_types);
@@ -138,6 +142,26 @@ class InstanceCount : public TransSpinBoxSetting
         setValue(cnt);
     };
 };
+
+QString VideoSourceMapDBStorage::GetWhereClause(MSqlBindings &bindings) const
+{
+	QString mapidTag(":WHEREMAPID");
+    QString query("mapid = " + mapidTag);
+
+    bindings.insert(mapidTag, m_parent.getMapID());
+
+    return query;
+}
+
+QString VideoSourceMapDBStorage::GetSetClause(MSqlBindings& bindings) const
+{
+    QString colTag(":SET" + GetColumnName().toUpper());
+    QString query(GetColumnName() + " = " + colTag);
+
+    bindings.insert(colTag, user->GetDBValue());
+
+    return query;
+}
 
 QString VideoSourceDBStorage::GetWhereClause(MSqlBindings &bindings) const
 {
@@ -501,6 +525,157 @@ void EITOnly_config::Save(void)
     useeit->Save();
 }
 
+CrossSourceCardInputSel::CrossSourceCardInputSel(
+    const char* _label,
+    const char* _helptext,
+	const QString &_maptype,
+	const int _sourceid,
+	const VideoSource &_parent) :
+	parent(_parent),
+	maptype(_maptype),
+	sourceid(_sourceid)
+{
+    setLabel(QObject::tr(_label));
+    setHelpText(QObject::tr(_helptext));
+    LOG(VB_GENERAL, LOG_DEBUG, QString("CrossSourceCardInputSel::CrossSourceCardInputSel: "
+        "maptype = %1, sourceid = %2").arg(maptype).arg(QString::number(sourceid)));
+};
+
+void CrossSourceCardInputSel::fillSelections()
+{
+    clearSelections();
+    cardinputs.clear();
+
+    addSelection("(None)", "0");
+    cardinputs_map["(None)"] = -1;
+    initialcid = 0;
+
+    // We do this manually because we want custom labels.  If
+    // SelectSetting provided a facility to edit the labels, we
+    // could use CaptureCard::fillSelections
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "SELECT cardid, videodevice, cardtype "
+        "FROM capturecard "
+        "WHERE hostname = :HOSTNAME "
+        "ORDER BY cardid");
+    query.bindValue(":HOSTNAME", gCoreContext->GetHostName());
+
+    if (!query.exec())
+    {
+        MythDB::DBError("CardInputEditor::load", query);
+        return;
+    }
+
+    uint j = 0;
+    QMap<QString, uint> device_refs;
+
+    while (query.next())
+    {
+        uint    cardid      = query.value(0).toUInt();
+        QString videodevice = query.value(1).toString();
+        QString cardtype    = query.value(2).toString();
+
+        bool sharable = CardUtil::IsTunerSharingCapable(cardtype.toUpper());
+
+        if (sharable && (1 != ++device_refs[videodevice]))
+            continue;
+
+        QStringList        inputLabels;
+        vector<CardInput*> cardInputs;
+
+        CardUtil::GetCardInputs(cardid, videodevice, cardtype,
+                                inputLabels, cardInputs, false);
+
+        for (int i = 0; i < inputLabels.size(); i++, j++)
+        {
+            int cardinputid = cardInputs[i]->getInputID();
+            addSelection(inputLabels[i], QString::number( cardinputid ));
+            if (cardInputs[i]->setSourceMap(maptype, sourceid, cardinputid))
+        	{
+                initialcid = cardinputid;
+                this->setValue( QString::number(initialcid));
+        	}
+    	    cardinputs.push_back(cardInputs[i]);
+    	    cardinputs_map[inputLabels[i]] = j;
+        }
+    }
+}
+
+void CrossSourceCardInputSel::Save(void)
+{
+    int val = cardinputs_map[ getSelectionLabel() ];
+    if ((val >= 0) && (cardinputs[val]))
+    {
+        cardinputs[val]->reload();                                      // Update id in event that cardinput didn't previously exist
+        cardinputs[val]->setSourceMap(maptype, sourceid, initialcid);   // Update sourceid in the event that videosource didn't previously exist.
+        cardinputs[val]->Save();
+    }
+    else
+    {
+        // Remove entry and sync with cardinput clones
+        for (uint i = 0; i < cardinputs.size(); i++)
+        {
+            if (initialcid == cardinputs[i]->getInputID())
+            {
+                CardUtil::DeleteVideoSourceMap( cardinputs[i]->getMapID() );
+                cardinputs[i]->SyncDB();
+            }
+        }
+    }
+}
+
+CrossSource_config::CrossSource_config(const VideoSource& _parent) :
+    VerticalConfigurationGroup(false, false, true, true)
+{
+	useeit = new UseEIT(_parent);
+    useeit->setValue(true);
+    useeit->setVisible(false);
+    addChild(useeit);
+
+    TransLabelSetting *label;
+    label=new TransLabelSetting();
+    label->setValue(QObject::tr("Use cross sourced EIT guide data."));
+    addChild(label);
+
+    eitcombobox = new CrossSourceCardInputSel(
+        "EIT input connection",
+    	"Selects the digital input to collect EIT guide data from.",
+        "eit",
+        _parent.getSourceID(),
+        _parent);
+    addChild(eitcombobox);
+
+    scancombobox = new CrossSourceCardInputSel(
+        "Scanner input connection",
+        "Selects the digital input to use when running a channel scan on this source. "
+        "This is useful for populating the digital transports of each channel, as "
+        "required for receiving EIT guide data.",
+        "scan",
+        _parent.getSourceID(),
+        _parent);
+    addChild(scancombobox);
+
+    label=new TransLabelSetting();
+    label->setValue(
+        QObject::tr("This will usually only work with ATSC or DVB channels,"));
+    addChild(label);
+
+    label=new TransLabelSetting();
+    label->setValue(
+        QObject::tr("and generally provides data only for the next few days."));
+    addChild(label);
+}
+
+void CrossSource_config::Save(void)
+{
+    eitcombobox->Save();
+    scancombobox->Save();
+    useeit->Save();
+
+}
+
 NoGrabber_config::NoGrabber_config(const VideoSource& _parent) :
     VerticalConfigurationGroup(false, false, false, false)
 {
@@ -538,6 +713,7 @@ void XMLTVConfig::Load(void)
     addTarget("schedulesdirect1",
               new DataDirect_config(parent, DD_SCHEDULES_DIRECT));
     addTarget("eitonly",   new EITOnly_config(parent));
+    addTarget("eitmixed",  new CrossSource_config(parent));
     addTarget("/bin/true", new NoGrabber_config(parent));
 
     grabber->addSelection(
@@ -547,11 +723,15 @@ void XMLTVConfig::Load(void)
     grabber->addSelection(
         QObject::tr("Transmitted guide only (EIT)"), "eitonly");
 
+    grabber->addSelection(
+        QObject::tr("Cross sourced DTV/Analogue mix"), "eitmixed");
+
     grabber->addSelection(QObject::tr("No grabber"), "/bin/true");
 
     QString validValues;
     validValues += "schedulesdirect1";
     validValues += "eitonly";
+    validValues += "eitmixed";
     validValues += "/bin/true";
 
     QString gname, d1, d2, d3;
@@ -612,6 +792,7 @@ void XMLTVConfig::LoadXMLTVGrabbers(
     QString validValues;
     validValues += "schedulesdirect1";
     validValues += "eitonly";
+    validValues += "eitmixed";
     validValues += "/bin/true";
 
     for (uint i = 0; i < grabber->size(); i++)
@@ -2549,11 +2730,35 @@ class InputDisplayName : public LineEditSetting, public CardInputDBStorage
     };
 };
 
-class SourceID : public ComboBoxSetting, public CardInputDBStorage
+class VideoSourceMapType : public ComboBoxSetting, public VideoSourceMapDBStorage
+{
+  public:
+	VideoSourceMapType(const CardInput &parent) :
+        ComboBoxSetting(this), VideoSourceMapDBStorage(this, parent, "type")
+    {
+        setLabel(QObject::tr("Videosource map type"));
+        setVisible(false);
+    };
+
+    virtual void Load(void)
+    {
+        fillSelections();
+        VideoSourceMapDBStorage::Load();
+    };
+
+    void fillSelections() {
+        clearSelections();
+        addSelection(QObject::tr("Main"), "main");
+        addSelection(QObject::tr("EIT"), "eit");
+        addSelection(QObject::tr("Scan"), "scan");
+    };
+};
+
+class SourceID : public ComboBoxSetting, public VideoSourceMapDBStorage
 {
   public:
     SourceID(const CardInput &parent) :
-        ComboBoxSetting(this), CardInputDBStorage(this, parent, "sourceid")
+        ComboBoxSetting(this), VideoSourceMapDBStorage(this, parent, "sourceid")
     {
         setLabel(QObject::tr("Video source"));
         addSelection(QObject::tr("(None)"), "0");
@@ -2562,7 +2767,7 @@ class SourceID : public ComboBoxSetting, public CardInputDBStorage
     virtual void Load(void)
     {
         fillSelections();
-        CardInputDBStorage::Load();
+        VideoSourceMapDBStorage::Load();
     };
 
     void fillSelections() {
@@ -2767,7 +2972,7 @@ void StartingChannel::SetSourceID(const QString &sourceid)
     // Get the existing starting channel
     QString startChan = CardUtil::GetStartingChannel(getInputID());
 
-    DBChanList channels = ChannelUtil::GetAllChannels(sourceid.toUInt());
+    DBChanInfoList channels = ChannelUtil::GetAllChannels(sourceid.toUInt());
 
     if (channels.empty())
     {
@@ -2870,7 +3075,10 @@ CardInput::CardInput(bool isDTVcard,  bool isDVBcard,
     id(new ID()),
     cardid(new CardID(*this)),
     inputname(new InputName(*this)),
+    sourcemapid(new SourceMapID()),
     sourceid(new SourceID(*this)),
+    sourcecid(new SourceMapCID(*this)),
+    sourcemaptype(new VideoSourceMapType(*this)),
     startchan(new StartingChannel(*this)),
     scan(new TransButtonSetting()),
     srcfetch(new TransButtonSetting()),
@@ -2879,6 +3087,7 @@ CardInput::CardInput(bool isDTVcard,  bool isDVBcard,
     inputgrp1(new InputGroup(*this, 1))
 {
     addChild(id);
+    addChild(sourcemapid);
 
     if (CardUtil::IsInNeedOfExternalInputConf(_cardid))
     {
@@ -2894,7 +3103,12 @@ CardInput::CardInput(bool isDTVcard,  bool isDVBcard,
     basic->addChild(cardid);
     basic->addChild(inputname);
     basic->addChild(new InputDisplayName(*this));
+
     basic->addChild(sourceid);
+    basic->addChild(sourcecid);
+    basic->addChild(sourcemaptype);
+
+    maptype = QString("main");
 
     if (!isDTVcard)
     {
@@ -2981,6 +3195,67 @@ void CardInput::SetSourceID(const QString &sourceid)
     scan->setEnabled(enable && !raw_card_type.isEmpty() &&
                      !CardUtil::IsUnscanable(raw_card_type));
     srcfetch->setEnabled(enable);
+}
+
+int CardInput::findSourceMapID(void) const
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    if (sourceid->getValue() > 0)
+    {
+        query.prepare(
+            "SELECT mapid "
+            "FROM videosourcemap "
+            "WHERE cardinputid = :CARDINPUTID AND "
+            "      sourceid    = :SOURCEID    AND "
+            "     (type = :MAPTYPE            OR  "
+            "      type = '') ");
+
+        query.bindValue(":CARDINPUTID", initialcid);
+        query.bindValue(":SOURCEID", sourceid->getValue());
+        query.bindValue(":MAPTYPE", maptype);
+    }
+    else
+    {
+        query.prepare(
+            "SELECT mapid "
+            "FROM videosourcemap "
+            "WHERE cardinputid = :CARDINPUTID AND "
+            "     (type = :MAPTYPE            OR  "
+            "      type = '') ");
+
+        query.bindValue(":CARDINPUTID", initialcid);
+        query.bindValue(":MAPTYPE", maptype);
+    }
+
+    if (!query.exec())
+    {
+    	MythDB::DBError("CardInput::findSourceMapID", query);
+    }
+    else if (query.next())
+    {
+    	LOG(VB_GENERAL, LOG_DEBUG, QString("CardInput::findSourceMapID = %1, filter = %2, maptype = %3, sourceid = %4, cardinputid = %5.")
+    			.arg(query.value(0).toString()).arg(maptype).arg(sourcemaptype->getValue()).arg(sourceid->getValue()).arg(getInputID()));
+
+        return (query.value(0).toInt());
+    }
+
+    return 0;
+}
+
+bool CardInput::setSourceMap(const QString &_maptype, const int _sourceid, const int _initialcid)
+{
+    maptype = _maptype;
+    initialcid = _initialcid;
+    sourceid->setValue(QString::number(_sourceid));
+    loadByID(getInputID());
+
+    bool exists = (sourceid->getValue().toInt() > 0);
+
+    sourcemaptype->setValue(maptype);
+    sourceid->setValue(QString::number(_sourceid));
+
+    return exists;
 }
 
 QString CardInput::getSourceName(void) const
@@ -3157,6 +3432,7 @@ QString CardInputDBStorage::GetSetClause(MSqlBindings &bindings) const
 void CardInput::loadByID(int inputid)
 {
     id->setValue(inputid);
+    sourcemapid->setValue(findSourceMapID());
     externalInputSettings->Load(inputid);
     ConfigurationWizard::Load();
 }
@@ -3181,24 +3457,23 @@ void CardInput::loadByInput(int _cardid, QString _inputname)
     }
 }
 
+void CardInput::reload(void)
+{
+	this->loadByInput(cardid->getValue().toUInt(), inputname->getValue());
+}
+
 void CardInput::Save(void)
 {
+    ConfigurationWizard::Save();
+    sourcecid->setValue(getInputID());
+    sourcecid->Save();
+    externalInputSettings->Store(getInputID());
+    LOG(VB_GENERAL, LOG_DEBUG, QString("CardInput::Save - videosourcemap cardinputid updated with %1... now syncing card clones").arg(getInputID()));
+    SyncDB();
+}
 
-    if (sourceid->getValue() == "0")
-    {
-        // "None" is represented by the lack of a row
-        MSqlQuery query(MSqlQuery::InitCon());
-        query.prepare("DELETE FROM cardinput WHERE cardinputid = :INPUTID");
-        query.bindValue(":INPUTID", getInputID());
-        if (!query.exec())
-            MythDB::DBError("CardInput::Save", query);
-    }
-    else
-    {
-        ConfigurationWizard::Save();
-        externalInputSettings->Store(getInputID());
-    }
-
+void CardInput::SyncDB(void)
+{
     // Handle any cloning we may need to do
     uint src_cardid = cardid->getValue().toUInt();
     QString type = CardUtil::GetRawCardType(src_cardid);
@@ -3216,7 +3491,12 @@ void CardInput::Save(void)
     CardUtil::DeleteOrphanInputs();
     // Delete any unused input groups
     CardUtil::UnlinkInputGroup(0,0);
+    // Delete any orphaned or unused videosource maps
+    CardUtil::DeleteOrphanVideoSourceMaps();
+    // Delete any unused inputs
+    CardUtil::DeleteUnusedInputs();
 }
+
 
 int CardInputDBStorage::getInputID(void) const
 {
@@ -3528,7 +3808,7 @@ void CardInputEditor::Load(void)
         vector<CardInput*> cardInputs;
 
         CardUtil::GetCardInputs(cardid, videodevice, cardtype,
-                                inputLabels, cardInputs);
+                                inputLabels, cardInputs, true);
 
         for (int i = 0; i < inputLabels.size(); i++, j++)
         {
