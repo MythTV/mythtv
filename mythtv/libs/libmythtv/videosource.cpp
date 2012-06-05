@@ -163,7 +163,6 @@ QString VideoSourceMapDBStorage::GetSetClause(MSqlBindings& bindings) const
     return query;
 }
 
-
 QString VideoSourceDBStorage::GetWhereClause(MSqlBindings &bindings) const
 {
     QString sourceidTag(":WHERESOURCEID");
@@ -3078,9 +3077,7 @@ CardInput::CardInput(bool isDTVcard,  bool isDVBcard,
     inputname(new InputName(*this)),
     sourcemapid(new SourceMapID()),
     sourceid(new SourceID(*this)),
-
     sourcecid(new SourceMapCID(*this)),
-
     sourcemaptype(new VideoSourceMapType(*this)),
     startchan(new StartingChannel(*this)),
     scan(new TransButtonSetting()),
@@ -3112,7 +3109,6 @@ CardInput::CardInput(bool isDTVcard,  bool isDVBcard,
     basic->addChild(sourcemaptype);
 
     maptype = QString("main");
-
 
     if (!isDTVcard)
     {

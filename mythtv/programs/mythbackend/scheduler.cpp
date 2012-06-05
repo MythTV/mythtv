@@ -195,7 +195,6 @@ bool Scheduler::VerifyCards(void)
             "      videosourcemap.sourceid = :SOURCEID AND "
             "      videosourcemap.type     = 'main' "
             "ORDER BY cardinputid;");
-
         subquery.bindValue(":SOURCEID", query.value(0).toUInt());
 
         if (!subquery.exec())

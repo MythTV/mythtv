@@ -236,7 +236,7 @@ uint TVBrowseHelper::GetChanId(
 {
     if (pref_sourceid)
     {
-    	DBChanInfoList::const_iterator it = db_all_channels.begin();
+        DBChanInfoList::const_iterator it = db_all_channels.begin();
         for (; it != db_all_channels.end(); ++it)
         {
             if ((*it).sourceid == pref_sourceid && (*it).channum == channum)
@@ -246,7 +246,7 @@ uint TVBrowseHelper::GetChanId(
 
     if (pref_cardid)
     {
-    	DBChanInfoList::const_iterator it = db_all_channels.begin();
+        DBChanInfoList::const_iterator it = db_all_channels.begin();
         for (; it != db_all_channels.end(); ++it)
         {
             if ((*it).cardid == pref_cardid && (*it).channum == channum)
@@ -256,7 +256,7 @@ uint TVBrowseHelper::GetChanId(
 
     if (db_browse_all_tuners)
     {
-    	DBChanInfoList::const_iterator it = db_all_channels.begin();
+        DBChanInfoList::const_iterator it = db_all_channels.begin();
         for (; it != db_all_channels.end(); ++it)
         {
             if ((*it).channum == channum)

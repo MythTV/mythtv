@@ -58,7 +58,6 @@ void InputSelector::Load(void)
         "      videosourcemap.sourceid = videosource.sourceid       AND "
         "      videosource.sourceid    = :SOURCEID                  AND "
         "      videosourcemap.type in (%1) ").arg(maptypes));
-
     query.bindValue(":HOSTNAME", gCoreContext->GetHostName());
     query.bindValue(":SOURCEID", sourceid);
 

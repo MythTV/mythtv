@@ -901,7 +901,6 @@ bool ChannelBase::InitializeInputs(void)
         "WHERE cardid = :CARDID AND "
         "      cardinput.cardinputid = videosourcemap.cardinputid AND "
         "      type = 'main'");
-
     query.bindValue(":CARDID", cardid);
 
     if (!query.exec() || !query.isActive())

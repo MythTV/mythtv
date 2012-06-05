@@ -298,16 +298,10 @@ DialogCode TransportListEditor::exec(void)
 
 void TransportListEditor::Edit(void)
 {
-    //uint cardid;
-    //QString inputname = QString::null;
-    //InputSelector::Parse(m_input->getValue(), cardid, inputname);
-
     uint cardid   = m_input->GetCardID();
     uint sourceid = m_videosource->getValue().toUInt();
-
-LOG(VB_GENERAL, LOG_DEBUG, QString("TransportListEditor::Edit() \n\n get_cardtype called with cardid = %1 and sourceid = %2").arg(cardid).arg(sourceid));
-
-CardUtil::CARD_TYPES cardtype = get_cardtype(sourceid, cardid);
+    LOG(VB_GENERAL, LOG_DEBUG, QString("TransportListEditor::Edit() \n\n get_cardtype called with cardid = %1 and sourceid = %2").arg(cardid).arg(sourceid));
+    CardUtil::CARD_TYPES cardtype = get_cardtype(sourceid, cardid);
 
     if ((CardUtil::ERROR_OPEN    != cardtype) &&
         (CardUtil::ERROR_UNKNOWN != cardtype) &&

@@ -95,6 +95,7 @@ class VideoSourceSelector : public ComboBoxSetting, public TransientStorage
                         QString        _maptypes = "'main'");
 
     virtual void Load(void);
+
     uint GetSourceID(void) const { return getValue().toUInt(); }
 
   private:
@@ -256,6 +257,7 @@ protected:
     UseEIT *useeit;
 };
 
+
 class XMLTVGrabber;
 class XMLTVConfig : public TriggeredConfigurationGroup
 {
@@ -280,6 +282,7 @@ public:
     VideoSource();
 
     int getSourceID(void) const { return id->intValue(); };
+
     void loadByID(int id);
 
     static void fillSelections(SelectSetting* setting);
@@ -767,7 +770,7 @@ class MTV_PUBLIC VideoSourceEditor : public QObject, public ConfigurationDialog
     virtual MythDialog* dialogWidget(MythMainWindow* parent,
                                      const char* widgetName=0);
 
-    bool cardTypesInclude(const int& SourceID,
+    bool cardTypesInclude(const int& SourceID, 
                           const QString& thecardtype);
 
     virtual DialogCode exec(void);
@@ -833,6 +836,7 @@ class CardInput : public QObject, public ConfigurationWizard
     void reload();
     void SyncDB(void);
     QString getSourceName(void) const;
+
     virtual void Save(void);
     virtual void Save(QString /*destination*/) { Save(); }
 

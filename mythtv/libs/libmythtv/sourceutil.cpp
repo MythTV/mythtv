@@ -181,7 +181,6 @@ static QStringList get_cardtypes(uint sourceid, QString maptypes = "'main'")
         "      cardinput.cardinputid   = videosourcemap.cardinputid AND "
         "      videosourcemap.sourceid = :SOURCEID                  AND "
         "      videosourcemap.type in (%1) ").arg(maptypes));
-
     query.bindValue(":SOURCEID", sourceid);
 
     if (!query.exec() || !query.isActive())
@@ -286,7 +285,7 @@ bool SourceUtil::IsEncoder(uint sourceid, bool strict)
 {
     bool encoder = true;
 
-    QStringList types = get_cardtypes(sourceid);					//FIXME: MAY NEED TO PASS QString("'main','eit'") TO get_cardtypes
+    QStringList types = get_cardtypes(sourceid);
     QStringList::const_iterator it = types.begin();
     for (; it != types.end(); ++it)
         encoder &= CardUtil::IsEncoder(*it);
@@ -321,7 +320,7 @@ bool SourceUtil::IsEncoder(uint sourceid, bool strict)
 bool SourceUtil::IsUnscanable(uint sourceid)
 {
     bool unscanable = true;
-    QStringList types = get_cardtypes(sourceid);				//FIXME: MAY NEED TO PASS QString("'main','eit'") TO get_cardtypes
+    QStringList types = get_cardtypes(sourceid);
     QStringList::const_iterator it = types.begin();
     for (; it != types.end(); ++it)
         unscanable &= CardUtil::IsUnscanable(*it);

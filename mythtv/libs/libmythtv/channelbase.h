@@ -76,7 +76,6 @@ class ChannelBase
         { return m_inputs[GetNextInputNum()]->name; }
     virtual QString GetNextInputStartChan(void)
         { return m_inputs[GetNextInputNum()]->startChanNum; }
-
     virtual uint GetCurrentSourceID(void) const
         { return m_inputs[GetCurrentInputNum()]->mainsourceid; }
     virtual uint GetSourceID(int inputID) const

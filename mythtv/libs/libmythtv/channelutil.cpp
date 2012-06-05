@@ -1910,7 +1910,7 @@ bool ChannelUtil::GetChannelData(
                            dvb_transportid, dvb_networkid, dtv_si_std);
 }
 
-DBChanInfoList ChannelUtil::GetChannelsInternal(																	//TODO: MODIFIY THIS
+DBChanInfoList ChannelUtil::GetChannelsInternal(
     uint sourceid, bool vis_only, bool include_disconnected,
     const QString &grp, uint changrpid)
 {

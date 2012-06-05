@@ -186,6 +186,7 @@ bool DTVChannel::SetChannelByString(const QString &channum, QString maptypes)
     {
         LOG(VB_GENERAL, LOG_ERR, loc + "Channel object "
                 "will not open, can not change channels.");
+
         return false;
     }
 
@@ -198,6 +199,7 @@ bool DTVChannel::SetChannelByString(const QString &channum, QString maptypes)
             LOG(VB_GENERAL, LOG_ERR, loc +
                     "CheckChannel failed.\n\t\t\tPlease verify the channel "
                     "in the 'mythtv-setup' Channel Editor.");
+
             return false;
         }
 
@@ -207,9 +209,11 @@ bool DTVChannel::SetChannelByString(const QString &channum, QString maptypes)
         if (!inputName.isEmpty())
             return SwitchToInput(inputName, channum);
     }
+
     InputMap::const_iterator it = m_inputs.find(m_currentInputID);
     if (it == m_inputs.end())
         return false;
+
     uint mplexid_restriction;
     if (!IsInputAvailable(m_currentInputID, mplexid_restriction))
     {
@@ -217,6 +221,7 @@ bool DTVChannel::SetChannelByString(const QString &channum, QString maptypes)
             QString("Requested channel '%1' is on input '%2' "
                     "which is in a busy input group")
                 .arg(channum).arg(m_currentInputID));
+
         return false;
     }
 
@@ -242,6 +247,7 @@ bool DTVChannel::SetChannelByString(const QString &channum, QString maptypes)
         xmltvid, default_authority, icon))
     {
         LOG(VB_GENERAL, LOG_ERR, loc + "Unable to find channel in database.");
+
         return false;
     }
 
@@ -251,6 +257,7 @@ bool DTVChannel::SetChannelByString(const QString &channum, QString maptypes)
             QString("Requested channel '%1' is not available because "
                     "the tuner is currently in use on another transport.")
                 .arg(channum));
+
         return false;
     }
 
@@ -388,7 +395,7 @@ bool DTVChannel::SetChannelByString(const QString &channum, QString maptypes)
     // Setup filters & recording picture attributes for framegrabing recorders
     // now that the new curchannelname has been established.
     if (m_pParent)
-        m_pParent->SetVideoFiltersForChannel(GetCurrentSourceID(), channum);			//FIXME: LINC MIGHT BREAK THIS
+        m_pParent->SetVideoFiltersForChannel(GetCurrentSourceID(), channum);
     InitPictureAttributes();
 
     HandleScript(freqid);

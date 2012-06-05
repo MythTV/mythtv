@@ -844,6 +844,7 @@ static bool clone_cardinputs(uint src_cardid, uint dst_cardid)
         else
         {
             // create new input for dst with data from src
+
             query2.prepare(
                 "INSERT cardinput "
                 "SET cardid          = :CARDID, "
@@ -892,6 +893,7 @@ static bool clone_cardinputs(uint src_cardid, uint dst_cardid)
                 ok = false;
                 break;
             }
+
             dst_inputid = query2.value(0).toUInt();
         }
 
@@ -908,6 +910,7 @@ static bool clone_cardinputs(uint src_cardid, uint dst_cardid)
         if (diseqc.Load(src_inputs[i]))
             diseqc.Store(dst_inputid);
     }
+
     // delete extra inputs in dst
     for (uint i = 0; i < dst_inputs.size(); i++)
     {
@@ -1104,7 +1107,6 @@ vector<uint> CardUtil::GetCardIDs(uint sourceid, QString maptypes)
         "WHERE videosourcemap.cardinputid = cardinput.cardinputid AND "
     	"      videosourcemap.sourceid = :SOURCEID                AND "
         "      videosourcemap.type in (%1) ").arg(maptypes));
-
     query.bindValue(":SOURCEID", sourceid);
 
     vector<uint> list;
@@ -1134,7 +1136,6 @@ int CardUtil::GetCardInputID(
         "      videosourcemap.type in ('main')                      AND "
         "      cardinput.cardid           = capturecard.cardid      AND "
         "      capturecard.cardid         = :CARDID ");
-
     query.bindValue(":CHANNUM", channum);
     query.bindValue(":CARDID", cardid);
 
@@ -1344,7 +1345,6 @@ uint CardUtil::GetInputID(uint cardid, uint sourceid, QString maptypes)
                   "      videosourcemap.cardinputid = cardinput.cardinputid AND "
                   "      cardid    = :CARDID AND "
                   "      videosourcemap.type in (%1) ").arg(maptypes));
-
     query.bindValue(":SOURCEID", sourceid);
     query.bindValue(":CARDID",    cardid);
 
@@ -2274,7 +2274,6 @@ void CardUtil::GetCardInputs(
     {
         CardInput *cardinput = new CardInput(is_dtv, false, false, cardid);
         cardinput->loadByInput(cardid, (*it));
-
         if (longlabelfmt)
             inputLabels.push_back(
                 dev_label + QString(" (%1) -> %2")
@@ -2283,7 +2282,6 @@ void CardUtil::GetCardInputs(
         	inputLabels.push_back(
                 dev_label + QString(" (%1)")
                 .arg(*it));
-
         cardInputs.push_back(cardinput);
     }
 
@@ -2308,7 +2306,6 @@ void CardUtil::GetCardInputs(
                 inputLabels.push_back(
                     dev_label + QString(" (%1)")
                     .arg(*it));
-
             cardInputs.push_back(cardinput);
         }
 
@@ -2480,7 +2477,6 @@ bool CardUtil::DeleteCard(uint cardid)
         // delete any orphaned inputs & unused input groups
         DeleteOrphanInputs();
         UnlinkInputGroup(0,0);
-
         // Delete any orphaned videosource maps
         CardUtil::DeleteOrphanVideoSourceMaps();
     }

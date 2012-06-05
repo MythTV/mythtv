@@ -3477,12 +3477,9 @@ uint TVRec::TuningCheckForHWChange(const TuningRequest &request,
     if (request.program)
         request.program->QueryTuningInfo(channum, inputname);
 
-//need to pass maptype string based on request... could do it inline like this or something maybe??
-    QString maptypes = "'main'";			//TODO: TIDY UP THIS PIECE OF CODE.
+    QString maptypes = "'main'";
     if (request.flags & kFlagEITScan)
         maptypes = "'main','eit'";
-//QString rawmod = (CardUtil::OFDM == cardtype) ?
-//    query.value(6).toString() : query.value(1).toString();
 
     if (!channum.isEmpty() && inputname.isEmpty())
         channel->CheckChannel(channum, inputname, maptypes);
@@ -3611,11 +3608,9 @@ void TVRec::TuningShutdowns(const TuningRequest &request)
  */
 void TVRec::TuningFrequency(const TuningRequest &request)
 {
-    //////////////
-    QString maptypes = "'main'";			//TODO: TIDY UP THIS PIECE OF CODE.
+    QString maptypes = "'main'";
     if (request.flags & kFlagEITScan)
         maptypes = "'main','eit'";
-    //////////////////////////
 
     DTVChannel *dtvchan = GetDTVChannel();
     if (dtvchan)
