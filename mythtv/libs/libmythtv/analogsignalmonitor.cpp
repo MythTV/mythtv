@@ -51,7 +51,7 @@ bool AnalogSignalMonitor::VerifyHDPVRaudio(int videofd)
     }
 
     int  current_audio;
-    uint audio_enc = max(min(audtype - 1, qctrl.maximum), qctrl.minimum);
+    uint audio_enc = max(min(audtype, qctrl.maximum), qctrl.minimum);
 
     struct v4l2_ext_control  ext_ctrl;
     struct v4l2_ext_controls ext_ctrls;
@@ -73,24 +73,24 @@ bool AnalogSignalMonitor::VerifyHDPVRaudio(int videofd)
 
     current_audio = ext_ctrls.controls->value;
 
-    if (audtype - 1 != current_audio)
+    if (audtype != current_audio)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + QString("Audio desired %1, current %2 "
                                                "min %3 max %4")
-            .arg(audtype - 1)
+            .arg(audtype)
             .arg(current_audio)
             .arg(qctrl.minimum)
             .arg(qctrl.maximum)
             );
 
         ext_ctrl.id = V4L2_CID_MPEG_AUDIO_ENCODING;
-        ext_ctrl.value = audtype - 1;
+        ext_ctrl.value = audtype;
         if (ioctl(videofd, VIDIOC_S_EXT_CTRLS, &ext_ctrls) == 0)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + QString("Changed audio encoding "
                                                    "from %1 to %2.")
                 .arg(current_audio)
-                .arg(audtype - 1)
+                .arg(audtype)
                 );
         }
         else
@@ -99,7 +99,7 @@ bool AnalogSignalMonitor::VerifyHDPVRaudio(int videofd)
                                                    "encoding from %1 to %2."
                                                    + ENO)
                 .arg(current_audio)
-                .arg(audtype - 1)
+                .arg(audtype)
                 );
         }
 

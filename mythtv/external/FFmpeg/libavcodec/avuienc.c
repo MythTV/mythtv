@@ -35,6 +35,16 @@ static av_cold int avui_encode_init(AVCodecContext *avctx)
         av_log(avctx, AV_LOG_ERROR, "Could not allocate frame.\n");
         return AVERROR(ENOMEM);
     }
+    if (!(avctx->extradata = av_mallocz(24 + FF_INPUT_BUFFER_PADDING_SIZE)))
+        return AVERROR(ENOMEM);
+    avctx->extradata_size = 24;
+    memcpy(avctx->extradata, "\0\0\0\x18""APRGAPRG0001", 16);
+    if (avctx->field_order > AV_FIELD_PROGRESSIVE) {
+        avctx->extradata[19] = 2;
+    } else {
+        avctx->extradata[19] = 1;
+    }
+
 
     return 0;
 }
@@ -43,7 +53,9 @@ static int avui_encode_frame(AVCodecContext *avctx, AVPacket *pkt,
                              const AVFrame *pic, int *got_packet)
 {
     uint8_t *dst, *src = pic->data[0];
-    int i, j, skip, ret, size, interlaced = pic->interlaced_frame;
+    int i, j, skip, ret, size, interlaced;
+
+    interlaced = avctx->field_order > AV_FIELD_PROGRESSIVE;
 
     if (avctx->height == 486) {
         skip = 10;
@@ -54,14 +66,7 @@ static int avui_encode_frame(AVCodecContext *avctx, AVPacket *pkt,
     if ((ret = ff_alloc_packet2(avctx, pkt, size)) < 0)
         return ret;
     dst = pkt->data;
-    if (!(avctx->extradata = av_mallocz(24 + FF_INPUT_BUFFER_PADDING_SIZE)))
-        return AVERROR(ENOMEM);
-    avctx->extradata_size = 24;
-    memcpy(avctx->extradata, "\0\0\0\x18""APRGAPRG0001", 16);
-    if (interlaced) {
-        avctx->extradata[19] = 2;
-    } else {
-        avctx->extradata[19] = 1;
+    if (!interlaced) {
         dst += avctx->width * skip;
     }
 
@@ -102,6 +107,7 @@ AVCodec ff_avui_encoder = {
     .init         = avui_encode_init,
     .encode2      = avui_encode_frame,
     .close        = avui_encode_close,
+    .capabilities = CODEC_CAP_EXPERIMENTAL,
     .pix_fmts     = (const enum PixelFormat[]){ PIX_FMT_UYVY422, PIX_FMT_NONE },
     .long_name    = NULL_IF_CONFIG_SMALL("Avid Meridien Uncompressed"),
 };

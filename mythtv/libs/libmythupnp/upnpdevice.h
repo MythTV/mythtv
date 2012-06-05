@@ -20,7 +20,7 @@
 #include "compat.h"
 #include "upnpexp.h"
 #include "upnputil.h"
-#include "refcounted.h"
+#include "referencecounter.h"
 
 class UPnpDeviceDesc;
 class UPnpDevice;
@@ -198,7 +198,7 @@ class UPNP_PUBLIC UPnpDeviceDesc
 // DeviceLocation Class Definition/Implementation
 /////////////////////////////////////////////////////////////////////////////
 
-class UPNP_PUBLIC DeviceLocation : public RefCounted
+class UPNP_PUBLIC DeviceLocation : public ReferenceCounter
 {
     public:
 
@@ -236,7 +236,9 @@ class UPNP_PUBLIC DeviceLocation : public RefCounted
         DeviceLocation( const QString &sURI,
                         const QString &sUSN,
                         const QString &sLocation,
-                        TaskTime       ttExpires ) : m_pDeviceDesc( NULL      ),
+                        TaskTime       ttExpires ) : ReferenceCounter(
+                                                         "DeviceLocation"     ),
+                                                     m_pDeviceDesc( NULL      ),
                                                      m_sURI       ( sURI      ),
                                                      m_sUSN       ( sUSN      ),
                                                      m_sLocation  ( sLocation ),

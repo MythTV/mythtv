@@ -357,7 +357,7 @@ void FileSelector::cancelPressed()
     if (m_selectorType == FSTYPE_FILELIST)
         emit haveResult(true);
     else
-        emit haveResult("");
+        emit haveResult(QString());
     Close();
 }
 

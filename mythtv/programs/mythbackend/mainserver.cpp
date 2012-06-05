@@ -417,7 +417,7 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
         LOG(VB_GENERAL, LOG_ERR, "ProcessRequest unknown socket");
         return;
     }
-    pbs->UpRef();
+    pbs->IncrRef();
     sockListLock.unlock();
 
     if (command == "QUERY_RECORDINGS")
@@ -805,8 +805,7 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
         SendResponse(pbssock, strlist);
     }
 
-    // Decrease refcount..
-    pbs->DownRef();
+    pbs->DecrRef();
 }
 
 void MainServer::customEvent(QEvent *e)
@@ -1137,7 +1136,7 @@ void MainServer::customEvent(QEvent *e)
         vector<PlaybackSock *>::iterator it = playbackList.begin();
         for (; it != playbackList.end(); ++it)
         {
-            (*it)->UpRef();
+            (*it)->IncrRef();
             localPBSList.push_back(*it);
         }
         sockListLock.unlock();
@@ -1224,7 +1223,7 @@ void MainServer::customEvent(QEvent *e)
         for (iter = localPBSList.begin(); iter != localPBSList.end(); ++iter)
         {
             PlaybackSock *pbs = *iter;
-            pbs->DownRef();
+            pbs->DecrRef();
         }
     }
 }
@@ -1571,16 +1570,20 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
             ft = new FileTransfer(filename, socket, writemode);
         }
         else
+        {
             ft = new FileTransfer(filename, socket, usereadahead, timeout_ms);
+        }
+
+        ft->IncrRef();
 
         sockListLock.lockForWrite();
         fileTransferList.push_back(ft);
         sockListLock.unlock();
 
         retlist << QString::number(socket->socket());
-        ft->UpRef();
         retlist << QString::number(ft->GetFileSize());
-        ft->DownRef();
+
+        ft->DecrRef();
 
         if (checkfiles.size())
         {
@@ -1767,7 +1770,7 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
         }
 
         if (slave)
-            slave->DownRef();
+            slave->DecrRef();
 
         proginfo->ToStringList(outputlist);
     }
@@ -2311,7 +2314,7 @@ void MainServer::HandleCheckRecordingActive(QStringList &slist,
         if (slave)
         {
             result = slave->CheckRecordingActive(&pginfo);
-            slave->DownRef();
+            slave->DecrRef();
         }
     }
     else
@@ -2376,7 +2379,7 @@ void MainServer::DoHandleStopRecording(
                 SendResponse(pbssock, outputlist);
             }
 
-            slave->DownRef();
+            slave->DecrRef();
             return;
         }
         else
@@ -2529,7 +2532,7 @@ void MainServer::DoHandleDeleteRecording(
                 SendResponse(pbssock, outputlist);
             }
 
-            slave->DownRef();
+            slave->DecrRef();
             return;
         }
     }
@@ -2904,7 +2907,7 @@ void MainServer::HandleQueryCheckFile(QStringList &slist, PlaybackSock *pbs)
         if (slave)
         {
             exists = slave->CheckFile(&recinfo);
-            slave->DownRef();
+            slave->DecrRef();
 
             QStringList outputlist( QString::number(exists) );
             if (exists)
@@ -2985,7 +2988,7 @@ void MainServer::HandleQueryFileHash(QStringList &slist, PlaybackSock *pbs)
         if (slave)
         {
             hash = slave->GetFileHash(filename, storageGroup);
-            slave->DownRef();
+            slave->DecrRef();
         }
         else
         {
@@ -3003,7 +3006,7 @@ void MainServer::HandleQueryFileHash(QStringList &slist, PlaybackSock *pbs)
                 if (slave)
                 {
                     hash = slave->GetFileHash(filename, storageGroup);
-                    slave->DownRef();
+                    slave->DecrRef();
                 }
             }
         }
@@ -3256,7 +3259,7 @@ void MainServer::HandleSGGetFileList(QStringList &sList,
             LOG(VB_FILE, LOG_INFO, "HandleSGGetFileList: Getting remote info");
             strList = slave->GetSGFileList(wantHost, groupname, path,
                                            fileNamesOnly);
-            slave->DownRef();
+            slave->DecrRef();
             slaveUnreachable = false;
         }
         else
@@ -3318,7 +3321,7 @@ void MainServer::HandleSGFileQuery(QStringList &sList,
         {
             LOG(VB_FILE, LOG_INFO, "HandleSGFileQuery: Getting remote info");
             strList = slave->GetSGFileQuery(wantHost, groupname, filename);
-            slave->DownRef();
+            slave->DecrRef();
             slaveUnreachable = false;
         }
         else
@@ -4271,7 +4274,7 @@ void MainServer::HandleIsActiveBackendQuery(QStringList &slist,
         if (slave != NULL)
         {
             retlist << "TRUE";
-            slave->DownRef();
+            slave->DecrRef();
         }
         else
             retlist << "FALSE";
@@ -4438,7 +4441,7 @@ void MainServer::BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
                 continue;
 
             backendsCounted[pbs->getHostname()] = true;
-            pbs->UpRef();
+            pbs->IncrRef();
             localPlaybackList.push_back(pbs);
             allHostList += "," + pbs->getHostname();
         }
@@ -4448,7 +4451,7 @@ void MainServer::BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
         for (list<PlaybackSock *>::iterator p = localPlaybackList.begin() ;
              p != localPlaybackList.end() ; ++p) {
             (*p)->GetDiskSpace(strlist);
-            (*p)->DownRef();
+            (*p)->DecrRef();
         }
     }
 
@@ -5023,7 +5026,7 @@ void MainServer::HandleFileTransferQuery(QStringList &slist,
         return;
     }
 
-    ft->UpRef();
+    ft->IncrRef();
     sockListLock.unlock();
 
     if (command == "IS_OPEN")
@@ -5074,7 +5077,7 @@ void MainServer::HandleFileTransferQuery(QStringList &slist,
         retlist << "ok";
     }
 
-    ft->DownRef();
+    ft->DecrRef();
 
     SendResponse(pbssock, retlist);
 }
@@ -5384,7 +5387,7 @@ void MainServer::HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs)
                 outputlist = slave->GenPreviewPixmap(token, &pginfo);
             }
 
-            slave->DownRef();
+            slave->DecrRef();
 
             if (outputlist.empty() || outputlist[0] != "OK")
                 m_previewRequestedBy.remove(token);
@@ -5445,7 +5448,7 @@ void MainServer::HandlePixmapLastModified(QStringList &slist, PlaybackSock *pbs)
         if (slave)
         {
              QDateTime slavetime = slave->PixmapLastModified(&pginfo);
-             slave->DownRef();
+             slave->DecrRef();
 
              strlist = (slavetime.isValid()) ?
                  QStringList(QString::number(slavetime.toTime_t())) :
@@ -5600,7 +5603,7 @@ void MainServer::HandlePixmapGetIfModified(
 
         strlist = slave->ForwardRequest(slist);
 
-        slave->DownRef(); slave = NULL;
+        slave->DecrRef();
 
         if (!strlist.empty())
         {
@@ -5670,7 +5673,7 @@ void MainServer::connectionClosed(MythSocket *socket)
         {
             playbackList.erase(it);
             sockListLock.unlock();
-            masterServer->DownRef();
+            masterServer->DecrRef();
             masterServer = NULL;
             MythEvent me("LOCAL_RECONNECT_TO_MASTER");
             gCoreContext->dispatch(me);
@@ -5764,7 +5767,7 @@ void MainServer::connectionClosed(MythSocket *socket)
             // delay handling the disconnect until a little later. #9885
             SendSlaveDisconnectedEvent(disconnectedSlaves, needsReschedule);
 
-            pbs->DownRef();
+            pbs->DecrRef();
             return;
         }
     }
@@ -5775,7 +5778,7 @@ void MainServer::connectionClosed(MythSocket *socket)
         MythSocket *sock = (*ft)->getSocket();
         if (sock == socket)
         {
-            (*ft)->DownRef();
+            (*ft)->DecrRef();
             fileTransferList.erase(ft);
             sockListLock.unlock();
             return;
@@ -5805,7 +5808,7 @@ PlaybackSock *MainServer::GetSlaveByHostname(const QString &hostname)
              (gCoreContext->IsThisHost(hostname, pbs->getHostname()))))
         {
             sockListLock.unlock();
-            pbs->UpRef();
+            pbs->IncrRef();
             return pbs;
         }
     }
@@ -5830,7 +5833,7 @@ PlaybackSock *MainServer::GetMediaServerByHostname(const QString &hostname)
             ((pbs->getHostname().toLower() == hostname.toLower()) ||
              (gCoreContext->IsThisHost(hostname, pbs->getHostname()))))
         {
-            pbs->UpRef();
+            pbs->IncrRef();
             return pbs;
         }
     }

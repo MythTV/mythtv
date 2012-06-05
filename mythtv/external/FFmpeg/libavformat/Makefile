@@ -20,7 +20,7 @@ OBJS = allformats.o         \
        sdp.o                \
        seek.o               \
        utils.o              \
-       utils-myth.o         \
+       utils-mythtv.o       \
 
 OBJS-$(CONFIG_NETWORK)                   += network.o
 

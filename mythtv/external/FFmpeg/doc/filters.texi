@@ -145,20 +145,25 @@ aconvert=u8:auto
 Convert the input audio to one of the specified formats. The framework will
 negotiate the most appropriate format to minimize conversions.
 
-The filter accepts three lists of formats, separated by ":", in the form:
-"@var{sample_formats}:@var{channel_layouts}".
+The filter accepts the following named parameters:
+@table @option
 
-Elements in each list are separated by "," which has to be escaped in the
-filtergraph specification.
+@item sample_fmts
+A comma-separated list of requested sample formats.
 
-The special parameter "all", in place of a list of elements, signifies all
-supported formats.
+@item sample_rates
+A comma-separated list of requested sample rates.
 
-Some examples follow:
+@item channel_layouts
+A comma-separated list of requested channel layouts.
+
+@end table
+
+If a parameter is omitted, all values are allowed.
+
+For example to force the output to either unsigned 8-bit or signed 16-bit stereo:
 @example
-aformat=u8\\,s16:mono
-
-aformat=s16:mono\\,stereo
+aformat=sample_fmts\=u8\,s16:channel_layouts\=stereo
 @end example
 
 @section amerge
@@ -211,31 +216,43 @@ amovie=input.mkv:si=5 [a5];
 [x3][a5] amerge" -c:a pcm_s16le output.mkv
 @end example
 
-@section aformat
+@section amix
 
-Convert the input audio to one of the specified formats. The framework will
-negotiate the most appropriate format to minimize conversions.
+Mixes multiple audio inputs into a single output.
+
+For example
+@example
+ffmpeg -i INPUT1 -i INPUT2 -i INPUT3 -filter_complex amix=inputs=3:duration=first:dropout_transition=3 OUTPUT
+@end example
+will mix 3 input audio streams to a single output with the same duration as the
+first input and a dropout transition time of 3 seconds.
 
 The filter accepts the following named parameters:
 @table @option
 
-@item sample_fmts
-A comma-separated list of requested sample formats.
+@item inputs
+Number of inputs. If unspecified, it defaults to 2.
 
-@item sample_rates
-A comma-separated list of requested sample rates.
+@item duration
+How to determine the end-of-stream.
+@table @option
 
-@item channel_layouts
-A comma-separated list of requested channel layouts.
+@item longest
+Duration of longest input. (default)
+
+@item shortest
+Duration of shortest input.
+
+@item first
+Duration of first input.
 
 @end table
 
-If a parameter is omitted, all values are allowed.
+@item dropout_transition
+Transition time, in seconds, for volume renormalization when an input
+stream ends. The default value is 2 seconds.
 
-For example to force the output to either unsigned 8-bit or signed 16-bit stereo:
-@example
-aformat=sample_fmts\=u8\,s16:channel_layouts\=stereo
-@end example
+@end table
 
 @section anull
 

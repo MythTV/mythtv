@@ -302,7 +302,7 @@ int ffurl_write(URLContext *h, const unsigned char *buf, int size)
     if (h->max_packet_size && size > h->max_packet_size)
         return AVERROR(EIO);
 
-    return retry_transfer_wrapper(h, buf, size, size, (void*)h->prot->url_write);
+    return retry_transfer_wrapper(h, (unsigned char *)buf, size, size, (void*)h->prot->url_write);
 }
 
 int64_t ffurl_seek(URLContext *h, int64_t pos, int whence)
@@ -315,8 +315,9 @@ int64_t ffurl_seek(URLContext *h, int64_t pos, int whence)
     return ret;
 }
 
-int ffurl_close(URLContext *h)
+int ffurl_closep(URLContext **hh)
 {
+    URLContext *h= *hh;
     int ret = 0;
     if (!h) return 0; /* can happen when ffurl_open fails */
 
@@ -329,11 +330,17 @@ int ffurl_close(URLContext *h)
     if (h->prot->priv_data_size) {
         if (h->prot->priv_data_class)
             av_opt_free(h->priv_data);
-        av_free(h->priv_data);
+        av_freep(&h->priv_data);
     }
-    av_free(h);
+    av_freep(hh);
     return ret;
 }
+
+int ffurl_close(URLContext *h)
+{
+    return ffurl_closep(&h);
+}
+
 
 int avio_check(const char *url, int flags)
 {
@@ -374,6 +381,13 @@ int ffurl_get_file_handle(URLContext *h)
     if (!h->prot->url_get_file_handle)
         return -1;
     return h->prot->url_get_file_handle(h);
+}
+
+int ffurl_shutdown(URLContext *h, int flags)
+{
+    if (!h->prot->url_shutdown)
+        return AVERROR(EINVAL);
+    return h->prot->url_shutdown(h, flags);
 }
 
 int ff_check_interrupt(AVIOInterruptCB *cb)

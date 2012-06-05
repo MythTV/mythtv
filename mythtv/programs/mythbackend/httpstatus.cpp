@@ -297,20 +297,18 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
     {
         EntryMap map;
         fes->GetEntryMap(map);
-        fes->Release();
+        fes->DecrRef();
         fes = NULL;
 
         frontends.setAttribute( "count", map.size() );
-        QMapIterator< QString, DeviceLocation * > i(map);
-        while (i.hasNext())
+        for (EntryMap::iterator it = map.begin(); it != map.end(); ++it)
         {
-            i.next();
             QDomElement fe = pDoc->createElement("Frontend");
             frontends.appendChild(fe);
-            QUrl url(i.value()->m_sLocation);
+            QUrl url((*it)->m_sLocation);
             fe.setAttribute("name", url.host());
             fe.setAttribute("url",  url.toString(QUrl::RemovePath));
-            i.value()->Release();
+            (*it)->DecrRef();
         }
     }
 
@@ -345,14 +343,12 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
 
         EntryMap map;
         sbes->GetEntryMap(map);
-        sbes->Release();
+        sbes->DecrRef();
         sbes = NULL;
 
-        QMapIterator< QString, DeviceLocation * > i(map);
-        while (i.hasNext())
+        for (EntryMap::iterator it = map.begin(); it != map.end(); ++it)
         {
-            i.next();
-            QUrl url(i.value()->m_sLocation);
+            QUrl url((*it)->m_sLocation);
             if (url.host() != ipaddress)
             {
                 numbes++;
@@ -362,7 +358,7 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
                 mbe.setAttribute("name", url.host());
                 mbe.setAttribute("url" , url.toString(QUrl::RemovePath));
             }
-            i.value()->Release();
+            (*it)->DecrRef();
         }
     }
 

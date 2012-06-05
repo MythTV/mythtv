@@ -210,10 +210,10 @@ bool AVFormatWriter::OpenFile(void)
         return false;
     }
 
-    m_avfRingBuffer = new AVFRingBuffer(m_ringBuffer);
-    URLContext *uc = (URLContext *)m_ctx->pb->opaque;
-    uc->prot = &AVF_RingBuffer_Protocol;
-    uc->priv_data = (void *)m_avfRingBuffer;
+    m_avfRingBuffer     = new AVFRingBuffer(m_ringBuffer);
+    URLContext *uc      = (URLContext *)m_ctx->pb->opaque;
+    uc->prot            = AVFRingBuffer::GetRingBufferURLProtocol();
+    uc->priv_data       = (void *)m_avfRingBuffer;
 
     avformat_write_header(m_ctx, NULL);
 

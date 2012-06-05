@@ -1622,7 +1622,9 @@ bool HLSRingBuffer::TestForHTTPLiveStreaming(QString &filename)
     av_register_all();
     avcodeclock->unlock();
     URLContext *context;
+
     // Do a peek on the URL to test the format
+    RingBuffer::AVFormatInitNetwork();
     int ret = ffurl_open(&context, filename.toAscii(),
                          AVIO_FLAG_READ, NULL, NULL);
     if (ret >= 0)
@@ -2367,7 +2369,7 @@ void HLSRingBuffer::SanitizeStreams(StreamsList *streams)
             // perfect, leave it alone
             continue;
         }
-        if (todrop > hls->NumSegments() || todrop < 0)
+        if (todrop >= hls->NumSegments() || todrop < 0)
         {
             LOG(VB_PLAYBACK, LOG_ERR, LOC +
                 QString("stream %1 [id=%2] can't be properly adjusted, ignoring")

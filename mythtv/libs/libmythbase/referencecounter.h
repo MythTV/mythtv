@@ -3,7 +3,17 @@
 #ifndef MYTHREFCOUNT_H_
 #define MYTHREFCOUNT_H_
 
+// Uncomment this line for more useful reference counting debugging
+//#define EXTRA_DEBUG
+
 #include <QAtomicInt>
+
+#ifdef EXTRA_DEBUG
+#include <QString>
+#else
+class QString;
+#endif
+
 #include "mythbaseexp.h"
 
 /** \brief General purpose reference counter.
@@ -15,21 +25,25 @@ class MBASE_PUBLIC ReferenceCounter
 {
   public:
     /// Creates reference counter with an initial value of 1.
-    ReferenceCounter(void);
+    ReferenceCounter(const QString &debugName);
 
     /// Increments reference count.
-    void IncrRef(void);
+    /// \return last reference count
+    virtual int IncrRef(void);
 
     /// Decrements reference count and deletes on 0.
-    /// \return true if object is deleted
-    bool DecrRef(void);
+    /// \return last reference count, 0 if deleted
+    virtual int DecrRef(void);
 
   protected:
     /// Called on destruction, will warn if object deleted with
     /// references in place. Set breakpoint here for debugging.
     virtual ~ReferenceCounter(void);
 
-  private:
+  protected:
+#ifdef EXTRA_DEBUG
+    const QString m_debugName;
+#endif
     QAtomicInt m_referenceCount;
 };
 

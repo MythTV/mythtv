@@ -52,13 +52,9 @@ macx {
         FWKS += CoreVideo
     }
 
-    using_firewire:using_backend: FWKS += IOKit
+    FC = $$join(FWKS,",")
 
-    # The following trick shortens the command line, but depends on
-    # the shell expanding Csh-style braces. Luckily, Bash and Zsh do.
-    FC = $$join(FWKS,",","{","}")
-
-    QMAKE_CXXFLAGS += -F/System/Library/Frameworks/$${FC}.framework/Frameworks
+    QMAKE_CXXFLAGS += -F$${FC}
     LIBS           += -framework $$join(FWKS," -framework ")
 
     using_firewire:using_backend {
