@@ -57,8 +57,8 @@ uint calcTrackLength(const QString &musicFile)
     AVFormatContext *inputFC = NULL;
     AVInputFormat *fmt = NULL;
 
-    if (type)
-        fmt = av_find_input_format(type);
+//     if (type)
+//         fmt = av_find_input_format(type);
 
     // Open recording
     LOG(VB_GENERAL, LOG_DEBUG, QString("calcTrackLength: Opening '%1'")

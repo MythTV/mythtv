@@ -54,7 +54,7 @@ class MPUBLIC MusicGenericTree : public MythGenericTree
     QPointer<MusicButtonItem> m_buttonItem;
     MythUIButtonListItem::CheckState m_check;
     bool     m_showArrow;
-    bool     m_active;
+    //bool     m_active;
 };
 
 Q_DECLARE_METATYPE(MusicGenericTree*)

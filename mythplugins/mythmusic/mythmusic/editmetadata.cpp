@@ -524,15 +524,14 @@ void EditMetadataDialog::checkClicked(bool state)
 {
     if (!state)
     {
-        if (m_compArtistEdit)
-            m_compArtistEdit->SetText(m_metadata->Artist());
+        m_compArtistEdit->SetText(m_metadata->Artist());
     }
     else
     {
-        if (m_compArtistEdit->GetText().isEmpty() || m_compArtistEdit->GetText() == m_artistEdit->GetText())
+        if (m_compArtistEdit->GetText().isEmpty() ||
+            m_compArtistEdit->GetText() == m_artistEdit->GetText())
         {
-            if (m_compArtistEdit)
-                m_compArtistEdit->SetText(tr("Various Artists"));
+            m_compArtistEdit->SetText(tr("Various Artists"));
         }
     }
 }

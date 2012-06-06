@@ -62,8 +62,11 @@ void MetaIOTagLib::WriteGenericMetadata(Tag *tag,  const Metadata *metadata)
 */
 void MetaIOTagLib::ReadGenericMetadata(Tag *tag, Metadata *metadata)
 {
+    if (!tag || ! metadata)
+        return;
+
     // Basic Tags
-    if (metadata && tag && !tag->isEmpty())
+    if (!tag->isEmpty())
     {
         metadata->setTitle(TStringToQString(tag->title()).trimmed());
         metadata->setArtist(TStringToQString(tag->artist()).trimmed());
