@@ -817,7 +817,7 @@ int HttpStatus::PrintEncoderStatus( QTextStream &os, QDomElement encoders )
                                     os << "is ";
 
                                 os << "scheduled to end at "
-                                   << endTs.toString(timeformat);
+                                   << endTs.toLocalTime().toString(timeformat);
                             }
                         }
                     }
