@@ -470,12 +470,10 @@ void VideoScanner::finishedScan()
     QStringList failedHosts = m_scanThread->GetOfflineSGHosts();
     if (failedHosts.size() > 0)
     {
-        QString msg = tr("Failed to Scan SG Video Hosts") + ":\n\n";
-
-        for (int i = 0; i < failedHosts.size(); ++i)
-            msg += " " + failedHosts.at(i);
-
-        msg += "\n" + tr("If they no longer exist please remove them") + "\n\n";
+        QString hosts = failedHosts.join(" ");
+        QString msg = tr("Failed to Scan SG Video Hosts:\n\n%1\n\n"
+                         "If they no longer exist please remove them")
+                        .arg(hosts);
 
         ShowOkPopup(msg);
     }

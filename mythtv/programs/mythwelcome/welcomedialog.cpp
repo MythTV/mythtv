@@ -362,9 +362,9 @@ void WelcomeDialog::updateScreen(void)
                 if (!tuner.subtitle.isEmpty())
                     status += "\n("+tuner.subtitle+")";
                 status += "\n" +
-                    tuner.startTime.toLocalTime().toString(m_timeFormat) +
-                    " " + tr("to") + " " +
-                    tuner.endTime.toLocalTime().toString(m_timeFormat);
+                    QObject::tr("%1 to %2", "Time period, 'starttime to endtime'")
+                      .arg(MythDate::toString(tuner.startTime, MythDate::kTime))
+                      .arg(MythDate::toString(tuner.endTime, MythDate::kTime));
             }
             else
             {
