@@ -873,7 +873,7 @@ void TVRec::FinishedRecording(RecordingInfo *curRec, RecordingQuality *recq)
     if (HasFlags(kFlagDummyRecorderRunning))
     {
         curRec->FinishedRecording(true); // so end time is updated
-        SendMythSystemRecEvent("REC_FINISHED", curRecording);
+        SendMythSystemRecEvent("REC_FINISHED", curRec);
         return;
     }
 
