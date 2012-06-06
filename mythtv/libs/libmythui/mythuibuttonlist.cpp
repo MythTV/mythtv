@@ -2780,10 +2780,8 @@ void MythUIButtonList::CopyFrom(MythUIType *base)
 
     for (int i = 0; i < (int)m_itemsVisible; i++)
     {
-        MythUIType *deltype;
         QString name = QString("buttonlist button %1").arg(i);
-        deltype = GetChild(name);
-        delete deltype;
+        DeleteChild(name);
     }
 
     m_ButtonList.clear();
