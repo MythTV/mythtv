@@ -167,7 +167,7 @@ SubtitleFormat::~SubtitleFormat(void)
     for (int i = 0; i < m_cleanup.size(); ++i)
     {
         m_cleanup[i]->DeleteAllChildren();
-        delete m_cleanup[i];
+        m_cleanup[i]->deleteLater();
         m_cleanup[i] = NULL; // just to be safe
     }
 }

@@ -67,7 +67,6 @@ class MUI_PUBLIC MythUIType : public QObject, public XMLParseBase
 
   public:
     MythUIType(QObject *parent, const QString &name);
-    virtual ~MythUIType();
 
     virtual void Reset(void);
 
@@ -174,6 +173,7 @@ class MUI_PUBLIC MythUIType : public QObject, public XMLParseBase
     QMap<QString, QString> GetDependsMap() const { return m_dependsMap; }
 
   protected:
+    virtual ~MythUIType();
     virtual void customEvent(QEvent *);
 
   public slots:
