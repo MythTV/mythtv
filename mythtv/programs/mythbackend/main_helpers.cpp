@@ -464,7 +464,7 @@ int connect_to_master(void)
         QStringList timeCheck;
         if (tempMonitorConnection)
         {
-            timeCheck.push_back("QUERY_TIME");
+            timeCheck.push_back("QUERY_TIME_ZONE");
             tempMonitorConnection->writeStringList(timeCheck);
             tempMonitorConnection->readStringList(timeCheck);
         }
