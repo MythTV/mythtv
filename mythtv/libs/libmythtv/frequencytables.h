@@ -13,8 +13,6 @@ using namespace std;
 #include <QMap>
 
 // MythTV includes
-#include "dtvchannel.h"
-
 #include "mythtvexp.h"
 #include "dtvconfparser.h"
 #include "dtvconfparserhelpers.h"
