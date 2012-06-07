@@ -628,12 +628,7 @@ static qint64 GetFileSize(ProgramInfo *program_info)
     if (filename.startsWith("myth://"))
     {
         RemoteFile remotefile(filename, false, false, 0);
-        struct stat filestat;
-
-        if (remotefile.Exists(filename, &filestat))
-        {
-            size = filestat.st_size;
-        }
+        size = remotefile.GetFileSize();
     }
     else
     {
