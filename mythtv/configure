@@ -127,10 +127,10 @@ Advanced options (experts only):
   --x11-path=X11LOC        location of X11 include files [$x11_path_default]
   --disable-xrandr         disable X11 resolution switching
   --disable-xv             disable XVideo   (X11 video output accel.)
-  --enable-vdpau           enable NVidia VDPAU hardware acceleration.
-  --enable-crystalhd       enable Broadcom CrystalHD hardware decoder support
-  --enable-vaapi           enable VAAPI hardware accelerated video decoding
-  --enable-dxva2           enable hardware accelerated decoding on windows
+  --disable-vdpau          disable NVidia VDPAU hardware acceleration.
+  --disable-crystalhd      disable Broadcom CrystalHD hardware decoder support
+  --disable-vaapi          disable VAAPI hardware accelerated video decoding
+  --disable-dxva2          disable hardware accelerated decoding on windows
   --disable-opengl-video   disable OpenGL based video display
   --disable-quartz-video   disable Mac OS X CoreVideo based video display
   --disable-libass         disable libass SSA/ASS subtitle support
@@ -4333,11 +4333,6 @@ check_cpp_condition \
     vdpau/vdpau.h "defined VDP_DECODER_PROFILE_MPEG4_PART2_ASP" ||
     { echolog "Please upgrade to libvdpau >= 0.2 if you would like vdpau support." &&
       disable vdpau; }
-fi
-
-if enabled crystalhd; then
-    check_lib libcrystalhd/libcrystalhd_if.h DtsCrystalHDVersion -lcrystalhd ||
-        disable crystalhd;
 fi
 
 if enabled vaapi && enabled va_va_h && enabled va_va_glx_h && enabled va_va_x11_h; then
