@@ -102,7 +102,7 @@
         </textarea>
 
         <textarea name="channum" depends="!iconpath">
-            <area>35,95,80,30</area>
+            <area>20,95,110,30</area>
             <font>baseextralarge</font>
             <align>hcenter</align>
             <template>%CHANNUM%</template>
@@ -230,7 +230,7 @@
         </textarea>
 
         <textarea name="channum" depends="!iconpath">
-            <area>35,95,80,30</area>
+            <area>20,95,110,30</area>
             <font>baseextralarge</font>
             <align>hcenter</align>
             <template>%CHANNUM%</template>

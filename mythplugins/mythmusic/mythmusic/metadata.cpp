@@ -1502,7 +1502,11 @@ void AlbumArtImages::dumpToDatabase(void)
     query.bindValue(":SONGID", trackID);
     query.bindValue(":DIRECTORYID", directoryID);
 
-    query.exec();
+    if (!query.exec())
+    {
+        MythDB::DBError("AlbumArtImages::dumpToDatabase - "
+                            "deleting existing albumart", query);
+    }
 
     // now add the albumart to the db
     AlbumArtList::iterator it = m_imageList.begin();

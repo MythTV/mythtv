@@ -41,7 +41,6 @@ class MUI_PUBLIC MythD3D9Painter : public MythPainter
     D3D9Image* GetImageFromCache(MythImage *im);
 
     MythRenderD3D9               *m_render;
-    bool                          m_created_render;
     D3D9Image                    *m_target;
     bool                          m_swap_control;
     QMap<MythImage *, D3D9Image*> m_ImageBitmapMap;

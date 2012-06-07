@@ -12,11 +12,11 @@
 #define LOC QString("D3D9 Painter: ")
 
 MythD3D9Painter::MythD3D9Painter(MythRenderD3D9 *render) :
-    MythPainter(), m_render(render), m_created_render(true), m_target(NULL),
+    MythPainter(), m_render(render), m_target(NULL),
     m_swap_control(true)
 {
     if (m_render)
-        m_created_render = false;
+        m_render->IncrRef();
 }
 
 MythD3D9Painter::~MythD3D9Painter()
@@ -37,7 +37,6 @@ bool MythD3D9Painter::InitD3D9(QPaintDevice *parent)
     if (!m_render)
         return false;
 
-    m_created_render = true;
     if (m_render->Create(real_parent->size(), real_parent->winId()))
         return true;
 
@@ -57,9 +56,7 @@ void MythD3D9Painter::Teardown(void)
 
     if (m_render)
     {
-        if (m_created_render)
-            delete m_render;
-        m_created_render = true;
+        m_render->DecrRef();
         m_render = NULL;
     }
 }
