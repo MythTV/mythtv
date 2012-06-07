@@ -149,6 +149,10 @@ bool MythMediaDevice::performMountCmd(bool DoMount)
             {
                 // we cannot tell beforehand what the pmount mount point is
                 // so verify the mount status of the device
+                // In the case that m_DevicePath is a symlink to a device
+                // in /etc/fstab then pmount delegates to mount which
+                // performs the mount asynchronously so we must wait a bit
+                usleep(1000000);
                 if (!findMountPath())
                 {
                     LOG(VB_MEDIA, LOG_ERR, "performMountCmd() attempted to"
