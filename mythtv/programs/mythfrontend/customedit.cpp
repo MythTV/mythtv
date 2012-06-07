@@ -315,33 +315,38 @@ void CustomEdit::loadClauses()
 
     rule.title = tr("Anytime on a specific day of the week");
     rule.subtitle.clear();
-    rule.description = QString("DAYNAME(program.starttime) = '{DAYNAME}' ");
+    rule.description =
+      "DAYNAME(CONVERT_TZ(program.starttime, 'UTC', 'SYSTEM')) = '{DAYNAME}' ";
     new MythUIButtonListItem(m_clauseList, rule.title,
                              qVariantFromValue(rule));
 
     rule.title = tr("Only on weekdays (Monday through Friday)");
     rule.subtitle.clear();
-    rule.description = "WEEKDAY(program.starttime) < 5 ";
+    rule.description =
+        "WEEKDAY(CONVERT_TZ(program.starttime, 'UTC', 'SYSTEM')) < 5 ";
     new MythUIButtonListItem(m_clauseList, rule.title,
                              qVariantFromValue(rule));
 
     rule.title = tr("Only on weekends");
     rule.subtitle.clear();
-    rule.description = "WEEKDAY(program.starttime) >= 5 ";
+    rule.description =
+        "WEEKDAY(CONVERT_TZ(program.starttime, 'UTC', 'SYSTEM')) >= 5 ";
     new MythUIButtonListItem(m_clauseList, rule.title,
                              qVariantFromValue(rule));
 
-    rule.title = tr("Only in primetime");
+    rule.title = tr("Only in prime time");
     rule.subtitle.clear();
-    rule.description = QString("HOUR(program.starttime) >= 19 \n"
-                               "AND HOUR(program.starttime) < 23 ");
+    rule.description =
+        "HOUR(CONVERT_TZ(program.starttime, 'UTC', 'SYSTEM')) >= 19 "
+        "AND HOUR(CONVERT_TZ(program.starttime, 'UTC', 'SYSTEM')) < 23 ";
     new MythUIButtonListItem(m_clauseList, rule.title,
                              qVariantFromValue(rule));
 
-    rule.title = tr("Not in primetime");
+    rule.title = tr("Not in prime time");
     rule.subtitle.clear();
-    rule.description = QString("(HOUR(program.starttime) < 19 \n"
-                               "      OR HOUR(program.starttime) >= 23) ");
+    rule.description =
+        "(HOUR(CONVERT_TZ(program.starttime, 'UTC', 'SYSTEM')) < 19 "
+        "    OR HOUR(CONVERT_TZ(program.starttime, 'UTC', 'SYSTEM')) >= 23) ";
     new MythUIButtonListItem(m_clauseList, rule.title,
                              qVariantFromValue(rule));
 
@@ -516,18 +521,20 @@ void CustomEdit::loadClauses()
     rule.title =
         tr("SportsCenter Overnight (complete example - use FindDaily)");
     rule.subtitle.clear();
-    rule.description = "program.title = 'SportsCenter' \n"
-                       "AND HOUR(program.starttime) >= 2 \n"
-                       "AND HOUR(program.starttime) <= 6 ";
+    rule.description =
+        "program.title = 'SportsCenter' \n"
+        "AND HOUR(CONVERT_TZ(program.starttime, 'UTC', 'SYSTEM')) >= 2 \n"
+        "AND HOUR(CONVERT_TZ(program.starttime, 'UTC', 'SYSTEM')) <= 6 ";
     new MythUIButtonListItem(m_clauseList, rule.title,
                              qVariantFromValue(rule));
 
     rule.title = tr("Movie of the Week (complete example - use FindWeekly)");
     rule.subtitle.clear();
-    rule.description = "program.category_type='movie' \n"
-                  "AND program.stars >= 1.0 AND program.airdate >= 1965 \n"
-                  "AND DAYNAME(program.starttime) = 'Friday' \n"
-                  "AND HOUR(program.starttime) >= 12 ";
+    rule.description =
+        "program.category_type='movie' \n"
+        "AND program.stars >= 1.0 AND program.airdate >= 1965 \n"
+        "AND DAYNAME(CONVERT_TZ(program.starttime, 'UTC', 'SYSTEM')) = 'Friday' \n"
+        "AND HOUR(CONVERT_TZ(program.starttime, 'UTC', 'SYSTEM')) >= 12 ";
     new MythUIButtonListItem(m_clauseList, rule.title,
                              qVariantFromValue(rule));
 

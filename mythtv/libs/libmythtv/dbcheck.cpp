@@ -2173,6 +2173,43 @@ NULL
             return false;
     }
 
+    if (dbver == "1304")
+    {
+        QDateTime loc = QDateTime::currentDateTime();
+        QDateTime utc = loc.toUTC();
+        loc = QDateTime(loc.date(), loc.time(), Qt::UTC);
+        int utc_offset = loc.secsTo(utc) / 60;
+
+        QList<QByteArray> updates_ba;
+
+        updates_ba.push_back(
+"UPDATE recordfilter SET clause="
+"'HOUR(CONVERT_TZ(program.starttime, ''UTC'', ''SYSTEM'')) >= 19 AND "
+"HOUR(CONVERT_TZ(program.starttime, ''UTC'', ''SYSTEM'')) < 22' "
+"WHERE filterid=3");
+
+        updates_ba.push_back(QString(
+"UPDATE record SET "
+"findday = DAYOFWEEK(ADDTIME('2012-06-02 00:00:00', findtime) "
+"    + INTERVAL %1 MINUTE + INTERVAL findday DAY) "
+"WHERE findday > 0").arg(utc_offset).toLocal8Bit());
+
+        updates_ba.push_back(QString(
+"UPDATE record SET "
+"findtime = TIME(ADDTIME('2012-06-02 00:00:00', findtime) "
+"    + INTERVAL %1 MINUTE)").arg(utc_offset).toLocal8Bit());
+
+        // Convert update ByteArrays to NULL terminated char**
+        QList<QByteArray>::const_iterator it = updates_ba.begin();
+        vector<const char*> updates;
+        for (; it != updates_ba.end(); ++it)
+            updates.push_back((*it).constData());
+        updates.push_back(NULL);
+
+        if (!performActualUpdate(&updates[0], "1305", dbver))
+            return false;
+    }
+
     return true;
 }
 
