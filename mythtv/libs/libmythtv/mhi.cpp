@@ -531,7 +531,9 @@ bool MHIContext::OfferKey(QString key)
     { QMutexLocker locker(&m_keyLock);
     m_keyQueue.enqueue(action);}
     m_engine_wait.wakeAll();
-    return true;
+    // Accept the key except 'exit' (16) in 'always available' (3) state.
+    // This allows re-use of Esc as TEXTEXIT for RC's with a single backup button
+    return action != 16 || m_keyProfile != 3;
 }
 
 // Called from MythPlayer::VideoStart and MythPlayer::ReinitOSD
