@@ -1,3 +1,5 @@
+#include <signal.h> // for signal
+
 #ifndef _WIN32
 #include <QCoreApplication>
 #else
