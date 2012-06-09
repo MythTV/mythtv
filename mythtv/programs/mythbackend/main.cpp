@@ -4,6 +4,8 @@
 #include <QApplication>
 #endif
 
+#include <signal.h>
+
 #include <QFileInfo>
 #include <QRegExp>
 #include <QFile>
