@@ -228,7 +228,7 @@ class MUI_PUBLIC MythUIButtonList : public MythUIType
                         int & first_item, int & last_item,
                         int & selected_column, int & selected_row,
                         int & skip_cols, int ** col_widths,
-			QList<int> & row_heights,
+                        QList<int> & row_heights,
                         int & top_height, int & bottom_height,
                         bool & wrapped);
     bool DistributeButtons(void);
