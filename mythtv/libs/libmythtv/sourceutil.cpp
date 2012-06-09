@@ -505,17 +505,6 @@ bool SourceUtil::DeleteSource(uint sourceid)
         return false;
     }
 
-    // Delete the inputs associated with the source
-    query.prepare("DELETE FROM cardinput "
-                  "WHERE sourceid = :SOURCEID");
-    query.bindValue(":SOURCEID", sourceid);
-
-    if (!query.exec() || !query.isActive())
-    {
-        MythDB::DBError("Deleting cardinputs", query);
-        return false;
-    }
-
     // Delete the source itself
     query.prepare("DELETE FROM videosource "
                   "WHERE sourceid = :SOURCEID");
