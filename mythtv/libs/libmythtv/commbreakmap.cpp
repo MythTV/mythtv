@@ -1,3 +1,5 @@
+#include <time.h> // for time()
+
 #include "mythcontext.h"
 #include "programinfo.h"
 #include "playercontext.h"
