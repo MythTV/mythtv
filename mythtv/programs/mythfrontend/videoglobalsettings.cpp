@@ -214,6 +214,8 @@ struct VConfigPage : public ConfigPage
 
 class RatingsToPL : public TriggeredConfigurationGroup
 {
+    Q_OBJECT
+    
   public:
     RatingsToPL() : TriggeredConfigurationGroup(false)
     {

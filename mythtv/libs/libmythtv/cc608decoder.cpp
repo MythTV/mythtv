@@ -304,7 +304,7 @@ void CC608Decoder::FormatCCField(int tc, int field, int data)
                 case 0x00:          //attribute
 #if 0
                     LOG(VB_VBI, LOG_DEBUG, 
-                        QString("<ATTRIBUTE %1 %2>").arg(b1).arg(b2);
+                        QString("<ATTRIBUTE %1 %2>").arg(b1).arg(b2));
 #endif
                     break;
                 case 0x01:          //midrow or char

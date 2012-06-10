@@ -47,7 +47,7 @@ BufferedSocketDevice::BufferedSocketDevice( int nSocket  )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-BufferedSocketDevice::BufferedSocketDevice( MSocketDevice *pSocket /*= NULL*/,
+BufferedSocketDevice::BufferedSocketDevice( MSocketDevice *pSocket /* = NULL*/,
                                             bool bTakeOwnership /* = false */ )
 {
     m_pSocket            = pSocket;
