@@ -369,6 +369,24 @@ static void init_freq_tables(freq_table_map_t &fmap)
         DTVGuardInterval::kGuardIntervalAuto, DTVHierarchy::kHierarchyNone,
         DTVModulation::kModulationQAMAuto, 0, 0); // UHF 21-65
 
+    // Israel
+    fmap["dvbt_ofdm_il0"] = new FrequencyTable(
+        514000000, 514000000+1, 8000000, "Channel %1", 26,
+        DTVInversion::kInversionOff,
+        DTVBandwidth::kBandwidth8MHz, DTVCodeRate::kFECAuto,
+        DTVCodeRate::kFECAuto, DTVModulation::kModulationQAMAuto,
+        DTVTransmitMode::kTransmissionMode8K,
+        DTVGuardInterval::kGuardIntervalAuto, DTVHierarchy::kHierarchyNone,
+        DTVModulation::kModulationQAMAuto, 0, 0); // UHF 26 - central Israel
+    fmap["dvbt_ofdm_il1"] = new FrequencyTable(
+        538000000, 538000000+1, 8000000, "Channel %1", 29,
+        DTVInversion::kInversionOff,
+        DTVBandwidth::kBandwidth8MHz, DTVCodeRate::kFECAuto,
+        DTVCodeRate::kFECAuto, DTVModulation::kModulationQAMAuto,
+        DTVTransmitMode::kTransmissionModeAuto,
+        DTVGuardInterval::kGuardIntervalAuto, DTVHierarchy::kHierarchyNone,
+        DTVModulation::kModulationQAMAuto, 0, 0); // UHF 29 - North and Eilat area
+
     // Italy (Italia)
     fmap["dvbt_ofdm_it0"] = new FrequencyTable(
         177500000, 226500000, 7000000, "Channel %1", 5,
