@@ -47,8 +47,11 @@ class SingleValueImp
 
     virtual ~SingleValueImp() {}
 
+    mutable QMutex mutex;
+
     void load_data()
     {
+        QMutexLocker locker(&mutex);
         if (!m_ready)
         {
             fill_from_db();
@@ -271,8 +274,11 @@ class MultiValueImp
                 .arg(m_value_name).arg(m_table_name).arg(m_id_name);
     }
 
+    mutable QMutex mutex;
+
     void load_data()
     {
+        QMutexLocker locker(&mutex);
         if (!m_ready)
         {
             fill_from_db();
@@ -730,8 +736,11 @@ class FileAssociationsImp
         }
     }
 
+    mutable QMutex mutex;
+
     void load_data()
     {
+        QMutexLocker locker(&mutex);
         if (!m_ready)
         {
             fill_from_db();
