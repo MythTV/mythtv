@@ -26,12 +26,14 @@ using namespace std;
 #include <QFile>
 #include <QMap>
 
+#include "mythmiscutil.h"
+#include "mythsystem.h"
 #include "scheduler.h"
 #include "encoderlink.h"
 #include "mainserver.h"
 #include "remoteutil.h"
 #include "backendutil.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 #include "exitcodes.h"
 #include "mythcontext.h"
 #include "mythdb.h"
@@ -93,7 +95,7 @@ Scheduler::Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList,
         return;
     }
 
-    fsInfoCacheFillTime = QDateTime::currentDateTime().addSecs(-1000);
+    fsInfoCacheFillTime = MythDate::current().addSecs(-1000);
 
     if (doRun)
     {
@@ -323,7 +325,7 @@ static bool comp_priority(RecordingInfo *a, RecordingInfo *b)
     if (a->GetRecordingPriority() != b->GetRecordingPriority())
         return a->GetRecordingPriority() > b->GetRecordingPriority();
 
-    QDateTime pasttime = QDateTime::currentDateTime().addSecs(-30);
+    QDateTime pasttime = MythDate::current().addSecs(-30);
     int apast = (a->GetRecordingStartTime() < pasttime &&
                  !a->IsReactivated());
     int bpast = (b->GetRecordingStartTime() < pasttime &&
@@ -358,7 +360,7 @@ static bool comp_priority(RecordingInfo *a, RecordingInfo *b)
 bool Scheduler::FillRecordList(void)
 {
     schedMoveHigher = (bool)gCoreContext->GetNumSetting("SchedMoveHigher");
-    schedTime = QDateTime::currentDateTime();
+    schedTime = MythDate::current();
 
     LOG(VB_SCHEDULE, LOG_INFO, "BuildWorkList...");
     BuildWorkList();
@@ -511,7 +513,7 @@ void Scheduler::PrintList(RecList &list, bool onlyFutureRecordings)
     if (!VERBOSE_LEVEL_CHECK(VB_SCHEDULE, LOG_DEBUG))
         return;
 
-    QDateTime now = QDateTime::currentDateTime();
+    QDateTime now = MythDate::current();
 
     LOG(VB_SCHEDULE, LOG_INFO, "--- print list start ---");
     LOG(VB_SCHEDULE, LOG_INFO, "Title - Subtitle                    Ch Station "
@@ -552,8 +554,8 @@ void Scheduler::PrintRec(const RecordingInfo *p, const char *prefix)
         .arg(episode)
         .arg(p->GetChanNum().rightJustified(4, ' '))
         .arg(p->GetChannelSchedulingID().leftJustified(7, ' ', true))
-        .arg(p->GetRecordingStartTime().toString("dd hh:mm"))
-        .arg(p->GetRecordingEndTime().toString("hh:mm"))
+        .arg(p->GetRecordingStartTime().toLocalTime().toString("dd hh:mm"))
+        .arg(p->GetRecordingEndTime().toLocalTime().toString("hh:mm"))
         .arg(p->GetSourceID())
         .arg(p->GetCardID())
         .arg(p->GetInputID());
@@ -692,7 +694,7 @@ bool Scheduler::ChangeRecordingEnd(RecordingInfo *oldp, RecordingInfo *newp)
 
     if (specsched)
     {
-        if (newp->GetRecordingEndTime() < QDateTime::currentDateTime())
+        if (newp->GetRecordingEndTime() < MythDate::current())
         {
             oldp->SetRecordingStatus(rsRecorded);
             newp->SetRecordingStatus(rsRecorded);
@@ -709,7 +711,7 @@ bool Scheduler::ChangeRecordingEnd(RecordingInfo *oldp, RecordingInfo *newp)
         LOG(VB_GENERAL, LOG_ERR,
             QString("Failed to change end time on card %1 to %2")
                 .arg(oldp->GetCardID())
-                .arg(newp->GetRecordingEndTime(ISODate)));
+                .arg(newp->GetRecordingEndTime(MythDate::ISODate)));
         oldp->SetRecordingRuleType(oldrectype);
         oldp->SetRecordingRuleID(oldrecordid);
         oldp->SetRecordingEndTime(oldrecendts);
@@ -1489,7 +1491,7 @@ void Scheduler::UpdateNextRecord(void)
         while (query.next())
         {
             int recid = query.value(0).toInt();
-            QDateTime next_record = query.value(1).toDateTime();
+            QDateTime next_record = MythDate::as_utc(query.value(1).toDateTime());
 
             if (next_record == nextRecMap[recid])
                 continue;
@@ -1789,7 +1791,7 @@ void Scheduler::run(void)
     bool      blockShutdown   =
         gCoreContext->GetNumSetting("blockSDWUwithoutClient", 1);
     bool      firstRun        = true;
-    QDateTime lastSleepCheck  = QDateTime::currentDateTime().addDays(-1);
+    QDateTime lastSleepCheck  = MythDate::current().addDays(-1);
     RecIter   startIter       = reclist.begin();
     QDateTime idleSince       = QDateTime();
     int       maxSleep        = 60000; // maximum sleep time in milliseconds
@@ -1797,7 +1799,7 @@ void Scheduler::run(void)
 
     while (doRun)
     {
-        QDateTime curtime = QDateTime::currentDateTime();
+        QDateTime curtime = MythDate::current();
         bool statuschanged = false;
         int secs_to_next = (startIter != reclist.end()) ?
             curtime.secsTo((*startIter)->GetRecordingStartTime()) : 60*60;
@@ -1875,14 +1877,14 @@ void Scheduler::run(void)
             // Unless a recording is about to start, check for slaves
             // that can be put to sleep if it has been at least five
             // minutes since we last put slaves to sleep.
-            curtime = QDateTime::currentDateTime();
+            curtime = MythDate::current();
             secs_to_next = (startIter != reclist.end()) ?
                 curtime.secsTo((*startIter)->GetRecordingStartTime()) : 60*60;
             if ((secs_to_next > schedRunTime * 1.5f) &&
                 (lastSleepCheck.secsTo(curtime) > 300))
             {
                 PutInactiveSlavesToSleep();
-                lastSleepCheck = QDateTime::currentDateTime();
+                lastSleepCheck = MythDate::current();
             }
         }
 
@@ -1908,7 +1910,7 @@ void Scheduler::run(void)
         }
 
         /// Wake any slave backends that need waking
-        curtime = QDateTime::currentDateTime();
+        curtime = MythDate::current();
         for (RecIter it = startIter; it != reclist.end(); ++it)
         {
             int secsleft = curtime.secsTo((*it)->GetRecordingStartTime());
@@ -2121,8 +2123,7 @@ bool Scheduler::HandleReschedule(void)
             uint recordid = tokens[1].toUInt();
             uint sourceid = tokens[2].toUInt();
             uint mplexid = tokens[3].toUInt();
-            QDateTime maxstarttime = 
-                QDateTime::fromString(tokens[4], Qt::ISODate);
+            QDateTime maxstarttime = MythDate::fromString(tokens[4]);
             deleteFuture = true;
             runCheck = true;
             schedLock.unlock();
@@ -2222,7 +2223,7 @@ bool Scheduler::HandleReschedule(void)
                 matchTime, checkTime, placeTime);
     LOG(VB_GENERAL, LOG_INFO, msg);
 
-    fsInfoCacheFillTime = QDateTime::currentDateTime().addSecs(-1000);
+    fsInfoCacheFillTime = MythDate::current().addSecs(-1000);
 
     // Write changed entries to oldrecorded.
     RecIter it = reclist.begin();
@@ -2272,7 +2273,7 @@ bool Scheduler::HandleRunSchedulerStartup(
     }
 
     // have we been started automatically?
-    QDateTime curtime = QDateTime::currentDateTime();
+    QDateTime curtime = MythDate::current();
     if (WasStartedAutomatically() ||
         ((firstRunIter != reclist.end()) &&
          ((curtime.secsTo((*firstRunIter)->GetRecordingStartTime()) -
@@ -2307,7 +2308,7 @@ void Scheduler::HandleWakeSlave(RecordingInfo &ri, int prerollseconds)
 {
     static const int sysEventSecs[5] = { 120, 90, 60, 30, 0 };
 
-    QDateTime curtime = QDateTime::currentDateTime();
+    QDateTime curtime = MythDate::current();
     QDateTime nextrectime = ri.GetRecordingStartTime();
     int secsleft = curtime.secsTo(nextrectime);
 
@@ -2420,7 +2421,7 @@ bool Scheduler::HandleRecording(
     if (ri.GetRecordingStatus() != rsWillRecord)
     {
         if (ri.GetRecordingStatus() != ri.oldrecstatus &&
-            ri.GetRecordingStartTime() <= QDateTime::currentDateTime())
+            ri.GetRecordingStartTime() <= MythDate::current())
         {
             ri.AddHistory(false);
         }
@@ -2428,7 +2429,7 @@ bool Scheduler::HandleRecording(
     }
 
     QDateTime nextrectime = ri.GetRecordingStartTime();
-    QDateTime curtime     = QDateTime::currentDateTime();
+    QDateTime curtime     = MythDate::current();
     int       secsleft    = curtime.secsTo(nextrectime);
     QString   schedid     = ri.MakeUniqueSchedulerKey();
 
@@ -2555,9 +2556,10 @@ bool Scheduler::HandleRecording(
     if (secsleft > 0)
         return false;
 
-    QDateTime recstartts = mythCurrentDateTime().addSecs(30);
-    recstartts.setTime(
-        QTime(recstartts.time().hour(), recstartts.time().minute()));
+    QDateTime recstartts = MythDate::current(true).addSecs(30);
+    recstartts = QDateTime(
+        recstartts.date(),
+        QTime(recstartts.time().hour(), recstartts.time().minute()), Qt::UTC);
     ri.SetRecordingStartTime(recstartts);
 
     QString details = QString("%1: channel %2 on cardid %3, sourceid %4")
@@ -2621,7 +2623,7 @@ void Scheduler::HandleRecordingStatusChange(
     {
         MythEvent me(QString("FORCE_DELETE_RECORDING %1 %2")
                      .arg(ri.GetChanID())
-                     .arg(ri.GetRecordingStartTime(ISODate)));
+                     .arg(ri.GetRecordingStartTime(MythDate::ISODate)));
         gCoreContext->dispatch(me);
     }
 }
@@ -2649,7 +2651,7 @@ void Scheduler::HandleTuning(
             // If tuning is still taking place this long after we
             // started give up on it so the scheduler can try to
             // find another broadcast of the same material.
-            QDateTime curtime = QDateTime::currentDateTime();
+            QDateTime curtime = MythDate::current();
             if ((ri.GetRecordingStartTime().secsTo(curtime) > tuningTimeout) &&
                 (ri.GetScheduledStartTime().secsTo(curtime) > tuningTimeout))
             {
@@ -2686,7 +2688,7 @@ void Scheduler::HandleIdleShutdown(
         blockShutdown &= !m_mainServer->isClientConnected();
     else
     {
-        QDateTime curtime = QDateTime::currentDateTime();
+        QDateTime curtime = MythDate::current();
 
         // find out, if we are currently recording (or LiveTV)
         bool recording = false;
@@ -2901,8 +2903,8 @@ void Scheduler::ShutdownServer(int prerollseconds, QDateTime &idleSince)
                                   time_ts.setNum(restarttime.toTime_t()));
         }
         else
-            setwakeup_cmd.replace("$time",
-                                  restarttime.toString(wakeup_timeformat));
+            setwakeup_cmd.replace(
+                "$time", restarttime.toLocalTime().toString(wakeup_timeformat));
 
         LOG(VB_GENERAL, LOG_NOTICE,
             QString("Running the command to set the next "
@@ -2982,7 +2984,7 @@ void Scheduler::PutInactiveSlavesToSleep(void)
 
     LOG(VB_SCHEDULE, LOG_DEBUG, "Checking scheduler's reclist");
     RecIter recIter = reclist.begin();
-    QDateTime curtime = QDateTime::currentDateTime();
+    QDateTime curtime = MythDate::current();
     QStringList SlavesInUse;
     for ( ; recIter != reclist.end(); ++recIter)
     {
@@ -3019,7 +3021,7 @@ void Scheduler::PutInactiveSlavesToSleep(void)
     }
 
     LOG(VB_SCHEDULE, LOG_DEBUG, "  Checking inuseprograms table:");
-    QDateTime oneHourAgo = QDateTime::currentDateTime().addSecs(-61 * 60);
+    QDateTime oneHourAgo = MythDate::current().addSecs(-61 * 60);
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT DISTINCT hostname, recusage FROM inuseprograms "
                     "WHERE lastupdatetime > :ONEHOURAGO ;");
@@ -3131,7 +3133,7 @@ bool Scheduler::WakeUpSlave(QString slaveHostname, bool setWakingStatus)
         return false;
     }
 
-    QDateTime curtime = QDateTime::currentDateTime();
+    QDateTime curtime = MythDate::current();
     QMap<int, EncoderLink *>::Iterator enciter = m_tvList->begin();
     for (; enciter != m_tvList->end(); ++enciter)
     {
@@ -3197,14 +3199,17 @@ void Scheduler::UpdateManuals(uint recordid)
         return;
     }
 
-    query.next();
+    if (!query.next())
+        return;
+
     RecordingType rectype = RecordingType(query.value(0).toInt());
     QString title = query.value(1).toString();
     QString station = query.value(2).toString() ;
     QDateTime startdt = QDateTime(query.value(3).toDate(),
-                                  query.value(4).toTime());
-    int duration = startdt.secsTo(QDateTime(query.value(5).toDate(),
-                                            query.value(6).toTime())) / 60;
+                                  query.value(4).toTime(), Qt::UTC);
+    int duration = startdt.secsTo(
+        QDateTime(query.value(5).toDate(),
+                  query.value(6).toTime(), Qt::UTC)) / 60;
 
     query.prepare("SELECT chanid from channel "
                   "WHERE callsign = :STATION");
@@ -3236,17 +3241,16 @@ void Scheduler::UpdateManuals(uint recordid)
     case kTimeslotRecord:
         progcount = 13;
         skipdays = 1;
-        if (startdt.date().dayOfWeek() < 6)
-            weekday = true;
-        else
-            weekday = false;
-        startdt.setDate(QDate::currentDate());
+        weekday = (startdt.toLocalTime().date().dayOfWeek() < 6);
+        startdt = QDateTime(
+            MythDate::current().date(), startdt.time(), Qt::UTC);
         break;
     case kWeekslotRecord:
         progcount = 2;
         skipdays = 7;
         weekday = false;
-        weeksoff = (startdt.date().daysTo(QDate::currentDate()) + 6) / 7;
+        weeksoff = (startdt.date().daysTo(
+                        MythDate::current().date()) + 6) / 7;
         startdt = startdt.addDays(weeksoff * 7);
         break;
     default:
@@ -3259,7 +3263,7 @@ void Scheduler::UpdateManuals(uint recordid)
     {
         for (int i = 0; i < (int)chanidlist.size(); i++)
         {
-            if (weekday && startdt.date().dayOfWeek() >= 6)
+            if (weekday && startdt.toLocalTime().date().dayOfWeek() >= 6)
                 continue;
 
             query.prepare("REPLACE INTO program (chanid, starttime, endtime,"
@@ -3270,7 +3274,7 @@ void Scheduler::UpdateManuals(uint recordid)
             query.bindValue(":STARTTIME", startdt);
             query.bindValue(":ENDTIME", startdt.addSecs(duration * 60));
             query.bindValue(":TITLE", title);
-            query.bindValue(":SUBTITLE", startdt.toString());
+            query.bindValue(":SUBTITLE", startdt);
             query.bindValue(":RECORDID", recordid);
             if (!query.exec())
             {
@@ -3520,7 +3524,8 @@ void Scheduler::UpdateMatches(uint recordid, uint sourceid, uint mplexid,
     else if (query.size())
     {
         QDate epoch(1970, 1, 1);
-        int findtoday =  epoch.daysTo(QDate::currentDate()) + 719528;
+        int findtoday =
+            epoch.daysTo(MythDate::current().date()) + 719528;
         query.prepare("UPDATE record set findid = :FINDID "
                       "WHERE type = :FINDONE AND findid <= 0;");
         query.bindValue(":FINDID", findtoday);
@@ -4014,7 +4019,7 @@ void Scheduler::AddNewRecords(void)
         // don't bother with it.  This is essentially an early call to
         // PruneRedundants().
         uint recordid = result.value(17).toUInt();
-        QDateTime startts = result.value(2).toDateTime();
+        QDateTime startts = MythDate::as_utc(result.value(2).toDateTime());
         QString title = result.value(4).toString();
         QString callsign = result.value(8).toString();
         if (lastp && lastp->GetRecordingStatus() != rsUnknown
@@ -4055,9 +4060,9 @@ void Scheduler::AddNewRecords(void)
             result.value(12).toInt(),//recpriority
 
             startts,
-            result.value(3).toDateTime(),//endts
-            result.value(18).toDateTime(),//recstartts
-            result.value(19).toDateTime(),//recendts
+            MythDate::as_utc(result.value(3).toDateTime()),//endts
+            MythDate::as_utc(result.value(18).toDateTime()),//recstartts
+            MythDate::as_utc(result.value(19).toDateTime()),//recendts
 
             result.value(31).toDouble(),//stars
             (result.value(32).isNull()) ? QDate() :
@@ -4258,13 +4263,15 @@ void Scheduler::AddNotListed(void) {
             .arg(((dbend.tv_sec  - dbstart.tv_sec) * 1000000 +
                   (dbend.tv_usec - dbstart.tv_usec)) / 1000000.0));
 
-    QDateTime now = QDateTime::currentDateTime();
+    QDateTime now = MythDate::current();
 
     while (result.next())
     {
         RecordingType rectype = RecordingType(result.value(21).toInt());
-        QDateTime startts(result.value(16).toDate(), result.value(17).toTime());
-        QDateTime endts(  result.value(18).toDate(), result.value(19).toTime());
+        QDateTime startts(
+            result.value(16).toDate(), result.value(17).toTime(), Qt::UTC);
+        QDateTime endts(
+            result.value(18).toDate(), result.value(19).toTime(), Qt::UTC);
 
         if (rectype == kTimeslotRecord)
         {
@@ -4401,16 +4408,16 @@ void Scheduler::GetAllScheduled(RecList &proglist)
             rectype == kWeekslotRecord)
         {
             startts = QDateTime(result.value(16).toDate(),
-                                result.value(17).toTime());
+                                result.value(17).toTime(), Qt::UTC);
             endts = QDateTime(result.value(18).toDate(),
-                              result.value(19).toTime());
+                              result.value(19).toTime(), Qt::UTC);
         }
         else
         {
             // put currentDateTime() in time fields to prevent
             // Invalid date/time warnings later
-            startts = mythCurrentDateTime();
-            startts.setTime(QTime(0,0));
+            startts = QDateTime(
+                MythDate::current().date(), QTime(0,0), Qt::UTC);
             endts = startts;
         }
 
@@ -4530,7 +4537,7 @@ void Scheduler::GetNextLiveTVDir(uint cardid)
     if (!tv)
         return;
 
-    QDateTime cur = mythCurrentDateTime();
+    QDateTime cur = MythDate::current(true);
     QString recording_dir;
     int fsID = FillRecordingDir(
         "LiveTV",
@@ -4669,8 +4676,8 @@ int Scheduler::FillRecordingDir(
         while (query.next())
         {
             uint      recChanid = query.value(0).toUInt();
-            QDateTime recStart(   query.value(1).toDateTime());
-            QDateTime recEnd(     query.value(2).toDateTime());
+            QDateTime recStart(   MythDate::as_utc(query.value(1).toDateTime()));
+            QDateTime recEnd(     MythDate::as_utc(query.value(2).toDateTime()));
             QString   recUsage(   query.value(3).toString());
             QString   recHost(    query.value(4).toString());
             QString   recDir(     query.value(5).toString());
@@ -4764,7 +4771,7 @@ int Scheduler::FillRecordingDir(
                 (thispg->GetRecordingStatus() != rsWillRecord) ||
                 (thispg->GetCardID() == 0) ||
                 (recsCounted.contains(QString("%1:%2").arg(thispg->GetChanID())
-                    .arg(thispg->GetRecordingStartTime(ISODate)))) ||
+                    .arg(thispg->GetRecordingStartTime(MythDate::ISODate)))) ||
                 (thispg->GetPathname().isEmpty()))
             continue;
 
@@ -4779,7 +4786,7 @@ int Scheduler::FillRecordingDir(
                     QString("%1 @ %2 will record on %3:%4, FSID #%5, "
                             "weightPerRecording +%6.")
                         .arg(thispg->GetChanID())
-                        .arg(thispg->GetRecordingStartTime(ISODate))
+                        .arg(thispg->GetRecordingStartTime(MythDate::ISODate))
                         .arg(fs->getHostname()).arg(fs->getPath())
                         .arg(fs->getFSysID()).arg(weightPerRecording));
 
@@ -5043,7 +5050,7 @@ int Scheduler::FillRecordingDir(
 void Scheduler::FillDirectoryInfoCache(bool force)
 {
     if ((!force) &&
-        (fsInfoCacheFillTime > QDateTime::currentDateTime().addSecs(-180)))
+        (fsInfoCacheFillTime > MythDate::current().addSecs(-180)))
         return;
 
     QList<FileSystemInfo> fsInfos;
@@ -5065,7 +5072,7 @@ void Scheduler::FillDirectoryInfoCache(bool force)
         QString("FillDirectoryInfoCache: found %1 unique filesystems")
             .arg(fsMap.size()));
 
-    fsInfoCacheFillTime = QDateTime::currentDateTime();
+    fsInfoCacheFillTime = MythDate::current();
 }
 
 void Scheduler::SchedPreserveLiveTV(void)
@@ -5129,7 +5136,7 @@ bool Scheduler::WasStartedAutomatically()
     QDateTime startupTime = QDateTime();
     QString s = gCoreContext->GetSetting("MythShutdownWakeupTime", "");
     if (s.length())
-        startupTime = QDateTime::fromString(s, Qt::ISODate);
+        startupTime = MythDate::fromString(s);
 
     // if we don't have a valid startup time assume we were started manually
     if (startupTime.isValid())
@@ -5137,7 +5144,7 @@ bool Scheduler::WasStartedAutomatically()
         // if we started within 15mins of the saved wakeup time assume we
         // started automatically to record or for a daily wakeup/shutdown period
 
-        if (abs(startupTime.secsTo(QDateTime::currentDateTime())) < (15 * 60))
+        if (abs(startupTime.secsTo(MythDate::current())) < (15 * 60))
         {
             LOG(VB_SCHEDULE, LOG_INFO,
                 "Close to auto-start time, AUTO-Startup assumed");

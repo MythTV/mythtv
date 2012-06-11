@@ -31,6 +31,7 @@
 #include "eval.h"
 #include "dict.h"
 #include "log.h"
+#include "parseutils.h"
 
 #if FF_API_FIND_OPT
 //FIXME order them and do a bin search
@@ -80,7 +81,8 @@ static int read_number(const AVOption *o, void *dst, double *num, int *den, int6
 static int write_number(void *obj, const AVOption *o, void *dst, double num, int den, int64_t intnum)
 {
     if (o->max*den < num*intnum || o->min*den > num*intnum) {
-        av_log(obj, AV_LOG_ERROR, "Value %f for parameter '%s' out of range\n", num*intnum/den, o->name);
+        av_log(obj, AV_LOG_ERROR, "Value %f for parameter '%s' out of range\n",
+               num*intnum/den, o->name);
         return AVERROR(ERANGE);
     }
 
@@ -224,6 +226,7 @@ int av_set_string3(void *obj, const char *name, const char *val, int alloc, cons
 
 int av_opt_set(void *obj, const char *name, const char *val, int search_flags)
 {
+    int ret;
     void *dst, *target_obj;
     const AVOption *o = av_opt_find2(obj, name, NULL, 0, search_flags, &target_obj);
     if (!o || !target_obj)
@@ -241,6 +244,11 @@ int av_opt_set(void *obj, const char *name, const char *val, int search_flags)
     case AV_OPT_TYPE_FLOAT:
     case AV_OPT_TYPE_DOUBLE:
     case AV_OPT_TYPE_RATIONAL: return set_string_number(obj, o, val, dst);
+    case AV_OPT_TYPE_IMAGE_SIZE:
+        ret = av_parse_video_size(dst, ((int *)dst) + 1, val);
+        if (ret < 0)
+            av_log(obj, AV_LOG_ERROR, "Unable to parse option value \"%s\" as image size\n", val);
+        return ret;
     }
 
     av_log(obj, AV_LOG_ERROR, "Invalid option type.\n");
@@ -314,6 +322,35 @@ int av_opt_set_double(void *obj, const char *name, double val, int search_flags)
 int av_opt_set_q(void *obj, const char *name, AVRational val, int search_flags)
 {
     return set_number(obj, name, val.num, val.den, 1, search_flags);
+}
+
+int av_opt_set_bin(void *obj, const char *name, const uint8_t *val, int len, int search_flags)
+{
+    void *target_obj;
+    const AVOption *o = av_opt_find2(obj, name, NULL, 0, search_flags, &target_obj);
+    uint8_t *ptr;
+    uint8_t **dst;
+    int *lendst;
+
+    if (!o || !target_obj)
+        return AVERROR_OPTION_NOT_FOUND;
+
+    if (o->type != AV_OPT_TYPE_BINARY)
+        return AVERROR(EINVAL);
+
+    ptr = av_malloc(len);
+    if (!ptr)
+        return AVERROR(ENOMEM);
+
+    dst = (uint8_t **)(((uint8_t *)target_obj) + o->offset);
+    lendst = (int *)(dst + 1);
+
+    av_free(*dst);
+    *dst = ptr;
+    *lendst = len;
+    memcpy(ptr, val, len);
+
+    return 0;
 }
 
 #if FF_API_OLD_AVOPTIONS
@@ -394,6 +431,9 @@ int av_opt_get(void *obj, const char *name, int search_flags, uint8_t **out_val)
         for (i = 0; i < len; i++)
             snprintf(*out_val + i*2, 3, "%02X", bin[i]);
         return 0;
+    case AV_OPT_TYPE_IMAGE_SIZE:
+        ret = snprintf(buf, sizeof(buf), "%dx%d", ((int *)dst)[0], ((int *)dst)[1]);
+        break;
     default:
         return AVERROR(EINVAL);
     }
@@ -563,6 +603,9 @@ static void opt_list(void *obj, void *av_log_obj, const char *unit,
             case AV_OPT_TYPE_BINARY:
                 av_log(av_log_obj, AV_LOG_INFO, "%-7s ", "<binary>");
                 break;
+            case AV_OPT_TYPE_IMAGE_SIZE:
+                av_log(av_log_obj, AV_LOG_INFO, "%-7s ", "<image_size>");
+                break;
             case AV_OPT_TYPE_CONST:
             default:
                 av_log(av_log_obj, AV_LOG_INFO, "%-7s ", "");
@@ -640,6 +683,7 @@ void av_opt_set_defaults2(void *s, int mask, int flags)
             }
             break;
             case AV_OPT_TYPE_STRING:
+            case AV_OPT_TYPE_IMAGE_SIZE:
                 av_opt_set(s, opt->name, opt->default_val.str, 0);
                 break;
             case AV_OPT_TYPE_BINARY:
@@ -684,7 +728,7 @@ static int parse_key_value_pair(void *ctx, const char **buf,
         return AVERROR(EINVAL);
     }
 
-    av_log(ctx, AV_LOG_DEBUG, "Setting value '%s' for key '%s'\n", val, key);
+    av_log(ctx, AV_LOG_DEBUG, "Setting entry with key '%s' to value '%s'\n", key, val);
 
     ret = av_opt_set(ctx, key, val, 0);
     if (ret == AVERROR_OPTION_NOT_FOUND)

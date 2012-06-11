@@ -1,7 +1,10 @@
+
+#include "commbreakmap.h"
+
+#include <time.h> // for time()
+
 #include "mythcontext.h"
 #include "programinfo.h"
-#include "playercontext.h"
-#include "commbreakmap.h"
 
 #define LOC QString("CommBreakMap: ")
 
@@ -16,7 +19,7 @@ CommBreakMap::CommBreakMap(void)
 {
     commrewindamount = gCoreContext->GetNumSetting("CommRewindAmount",0);
     commnotifyamount = gCoreContext->GetNumSetting("CommNotifyAmount",0);
-    lastIgnoredManualSkip = QDateTime::currentDateTime().addSecs(-10);
+    lastIgnoredManualSkip = MythDate::current().addSecs(-10);
     autocommercialskip = (CommSkipMode)
         gCoreContext->GetNumSetting("AutoCommercialSkip", kCommSkipOff);
     maxskip = gCoreContext->GetNumSetting("MaximumCommercialSkip", 3600);
@@ -346,11 +349,11 @@ bool CommBreakMap::DoSkipCommercials(uint64_t &jumpToFrame,
     skipTime.sprintf("%d:%02d", skipped_seconds / 60,
                      abs(skipped_seconds) % 60);
 
-    if ((lastIgnoredManualSkip.secsTo(QDateTime::currentDateTime()) > 3) &&
+    if ((lastIgnoredManualSkip.secsTo(MythDate::current()) > 3) &&
         (abs(skipped_seconds) >= maxskip))
     {
         comm_msg = QObject::tr("Too Far %1").arg(skipTime);
-        lastIgnoredManualSkip = QDateTime::currentDateTime();
+        lastIgnoredManualSkip = MythDate::current();
         return false;
     }
     comm_msg = QObject::tr("Skip %1").arg(skipTime);

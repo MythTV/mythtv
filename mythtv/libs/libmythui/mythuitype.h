@@ -67,7 +67,6 @@ class MUI_PUBLIC MythUIType : public QObject, public XMLParseBase
 
   public:
     MythUIType(QObject *parent, const QString &name);
-    virtual ~MythUIType();
 
     virtual void Reset(void);
 
@@ -108,7 +107,9 @@ class MUI_PUBLIC MythUIType : public QObject, public XMLParseBase
     void Draw(MythPainter *p, int xoffset, int yoffset, int alphaMod = 255,
               QRect clipRegion = QRect());
 
-    virtual void SetPosition(int x, int y);
+    /// Convenience method, calls SetPosition(const MythPoint&)
+    /// Override that instead to change functionality.
+    void SetPosition(int x, int y);
     virtual void SetPosition(const MythPoint &pos);
     virtual MythPoint GetPosition(void) const;
     virtual void SetSize(const QSize &size);
@@ -172,6 +173,7 @@ class MUI_PUBLIC MythUIType : public QObject, public XMLParseBase
     QMap<QString, QString> GetDependsMap() const { return m_dependsMap; }
 
   protected:
+    virtual ~MythUIType();
     virtual void customEvent(QEvent *);
 
   public slots:

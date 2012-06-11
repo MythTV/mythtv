@@ -4,17 +4,18 @@
 
 #include "filetransfer.h"
 #include "ringbuffer.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 #include "mythsocket.h"
 #include "programinfo.h"
 #include "mythlogging.h"
 
 FileTransfer::FileTransfer(QString &filename, MythSocket *remote,
                            bool usereadahead, int timeout_ms) :
+    ReferenceCounter(QString("FileTransfer:%1").arg(filename)),
     readthreadlive(true), readsLocked(false),
     rbuffer(RingBuffer::Create(filename, false, usereadahead, timeout_ms, true)),
     sock(remote), ateof(false), lock(QMutex::NonRecursive),
-    refLock(QMutex::NonRecursive), refCount(0), writemode(false)
+    writemode(false)
 {
     pginfo = new ProgramInfo(filename);
     pginfo->MarkAsInUse(true, kFileTransferInUseID);
@@ -22,10 +23,11 @@ FileTransfer::FileTransfer(QString &filename, MythSocket *remote,
 }
 
 FileTransfer::FileTransfer(QString &filename, MythSocket *remote, bool write) :
+    ReferenceCounter(QString("FileTransfer:%1").arg(filename)),
     readthreadlive(true), readsLocked(false),
     rbuffer(RingBuffer::Create(filename, write)),
     sock(remote), ateof(false), lock(QMutex::NonRecursive),
-    refLock(QMutex::NonRecursive), refCount(0), writemode(write)
+    writemode(write)
 {
     pginfo = new ProgramInfo(filename);
     pginfo->MarkAsInUse(true, kFileTransferInUseID);
@@ -50,26 +52,6 @@ FileTransfer::~FileTransfer()
         pginfo->MarkAsInUse(false, kFileTransferInUseID);
         delete pginfo;
     }
-}
-
-void FileTransfer::UpRef(void)
-{
-    QMutexLocker locker(&refLock);
-    refCount++;
-}
-
-bool FileTransfer::DownRef(void)
-{
-    int count = 0;
-    {
-        QMutexLocker locker(&refLock);
-        count = --refCount;
-    }
-
-    if (count < 0)
-        delete this;
-    
-    return (count < 0);
 }
 
 bool FileTransfer::isOpen(void)

@@ -7,6 +7,7 @@
 
 // myth
 #include "mythcorecontext.h"
+#include "mythsystem.h"
 #include "mythdbcon.h"
 #include "mythdirs.h"
 

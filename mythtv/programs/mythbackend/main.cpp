@@ -1,8 +1,12 @@
+#include <signal.h> // for signal
+
 #ifndef _WIN32
 #include <QCoreApplication>
 #else
 #include <QApplication>
 #endif
+
+#include <signal.h>
 
 #include <QFileInfo>
 #include <QRegExp>
@@ -18,6 +22,7 @@
 #include "mythsystemevent.h"
 #include "backendcontext.h"
 #include "main_helpers.h"
+#include "mythmiscutil.h"
 #include "storagegroup.h"
 #include "housekeeper.h"
 #include "mediaserver.h"

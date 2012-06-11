@@ -149,9 +149,24 @@ int ff_vda_create_decoder(struct vda_context *vda_ctx,
 
     pthread_mutex_init(&vda_ctx->queue_mutex, NULL);
 
-    if (extradata[4]==0xFE) {
-        // convert 3 byte NAL sizes to 4 byte
-        extradata[4] = 0xFF;
+    /* Each VCL NAL in the bistream sent to the decoder
+     * is preceeded by a 4 bytes length header.
+     * Change the avcC atom header if needed, to signal headers of 4 bytes. */
+    if (extradata_size >= 4 && (extradata[4] & 0x03) != 0x03) {
+        uint8_t *rw_extradata;
+
+        if (!(rw_extradata = av_malloc(extradata_size)))
+            return AVERROR(ENOMEM);
+
+        memcpy(rw_extradata, extradata, extradata_size);
+
+        rw_extradata[4] |= 0x03;
+
+        avc_data = CFDataCreate(kCFAllocatorDefault, rw_extradata, extradata_size);
+
+        av_freep(&rw_extradata);
+    } else {
+        avc_data = CFDataCreate(kCFAllocatorDefault, extradata, extradata_size);
     }
 
     config_info = CFDictionaryCreateMutable(kCFAllocatorDefault,
@@ -159,10 +174,9 @@ int ff_vda_create_decoder(struct vda_context *vda_ctx,
                                             &kCFTypeDictionaryKeyCallBacks,
                                             &kCFTypeDictionaryValueCallBacks);
 
-    height = CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &vda_ctx->height);
-    width = CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &vda_ctx->width);
-    format = CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &vda_ctx->format);
-    avc_data = CFDataCreate(kCFAllocatorDefault, extradata, extradata_size);
+    height   = CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &vda_ctx->height);
+    width    = CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &vda_ctx->width);
+    format   = CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &vda_ctx->format);
 
     CFDictionarySetValue(config_info, kVDADecoderConfiguration_Height, height);
     CFDictionarySetValue(config_info, kVDADecoderConfiguration_Width, width);

@@ -12,12 +12,15 @@ using namespace std;
 #include <QMutex>
 #include <QWaitCondition>
 
+// MythTV headers
+#include "referencecounter.h"
+
 class ProgramInfo;
 class RingBuffer;
 class MythSocket;
 class QString;
 
-class FileTransfer
+class FileTransfer : public ReferenceCounter
 {
     friend class QObject; // quiet OSX gcc warning
 
@@ -32,9 +35,6 @@ class FileTransfer
     bool ReOpen(QString newFilename = "");
 
     void Stop(void);
-
-    void UpRef(void);
-    bool DownRef(void);
 
     void Pause(void);
     void Unpause(void);

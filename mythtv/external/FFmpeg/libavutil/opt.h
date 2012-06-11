@@ -44,7 +44,7 @@
  * This section describes how to add AVOptions capabilities to a struct.
  *
  * All AVOptions-related information is stored in an AVClass. Therefore
- * the first member of the struct must be a pointer to an AVClass describing it.
+ * the first member of the struct should be a pointer to an AVClass describing it.
  * The option field of the AVClass must be set to a NULL-terminated static array
  * of AVOptions. Each AVOption must have a non-empty name, a type, a default
  * value and for number-type AVOptions also a range of allowed values. It must
@@ -81,7 +81,7 @@
  * @endcode
  *
  * Next, when allocating your struct, you must ensure that the AVClass pointer
- * is set to the correct value. Then, av_opt_set_defaults() must be called to
+ * is set to the correct value. Then, av_opt_set_defaults() can be called to
  * initialize defaults. After that the struct is ready to be used with the
  * AVOptions API.
  *
@@ -225,6 +225,7 @@ enum AVOptionType{
     AV_OPT_TYPE_RATIONAL,
     AV_OPT_TYPE_BINARY,  ///< offset must point to a pointer immediately followed by an int for the length
     AV_OPT_TYPE_CONST = 128,
+    AV_OPT_TYPE_IMAGE_SIZE = MKBETAG('S','I','Z','E'), ///< offset must point to two consecutive integers
 #if FF_API_OLD_AVOPTIONS
     FF_OPT_TYPE_FLAGS = 0,
     FF_OPT_TYPE_INT,
@@ -561,6 +562,7 @@ int av_opt_set       (void *obj, const char *name, const char *val, int search_f
 int av_opt_set_int   (void *obj, const char *name, int64_t     val, int search_flags);
 int av_opt_set_double(void *obj, const char *name, double      val, int search_flags);
 int av_opt_set_q     (void *obj, const char *name, AVRational  val, int search_flags);
+int av_opt_set_bin   (void *obj, const char *name, const uint8_t *val, int size, int search_flags);
 /**
  * @}
  */

@@ -9,7 +9,7 @@
 #endif
 
 #if HAVE_MMX || HAVE_AMD3DNOW
-#include "libavcodec/x86/mmx.h"
+#include "ffmpeg-mmx.h"
 #endif
 
 #include "../mm_arch.h"

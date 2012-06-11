@@ -24,6 +24,8 @@
 /**
  * @file
  * memory buffer source API for video
+ *
+ * @deprecated use buffersrc.h instead.
  */
 
 #include "avfilter.h"
@@ -42,8 +44,23 @@
  * @param flags a combination of AV_VSRC_BUF_FLAG_* flags
  * @return >= 0 in case of success, a negative AVERROR code in case of
  * failure
+ *
+ * @deprecated use av_buffersrc_add_ref() instead.
  */
+attribute_deprecated
 int av_vsrc_buffer_add_video_buffer_ref(AVFilterContext *buffer_src,
                                         AVFilterBufferRef *picref, int flags);
+
+/**
+ * Get the number of failed requests.
+ *
+ * A failed request is when the request_frame method is called while no
+ * frame is present in the buffer.
+ * The number is reset when a frame is added.
+ *
+ * @deprecated use av_buffersrc_get_nb_failed_requests() instead.
+ */
+attribute_deprecated
+unsigned av_vsrc_buffer_get_nb_failed_requests(AVFilterContext *buffer_src);
 
 #endif /* AVFILTER_VSRC_BUFFER_H */

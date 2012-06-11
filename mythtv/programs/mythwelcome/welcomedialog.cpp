@@ -361,8 +361,10 @@ void WelcomeDialog::updateScreen(void)
                 status += "\n" + tuner.title;
                 if (!tuner.subtitle.isEmpty())
                     status += "\n("+tuner.subtitle+")";
-                status += "\n" + tuner.startTime.toString(m_timeFormat) +
-                          " " + tr("to") + " " + tuner.endTime.toString(m_timeFormat);
+                status += "\n" +
+                    QObject::tr("%1 to %2", "Time period, 'starttime to endtime'")
+                      .arg(MythDate::toString(tuner.startTime, MythDate::kTime))
+                      .arg(MythDate::toString(tuner.endTime, MythDate::kTime));
             }
             else
             {
@@ -515,7 +517,7 @@ void WelcomeDialog::updateStatusMessage(void)
 {
     m_statusList.clear();
 
-    QDateTime curtime = QDateTime::currentDateTime();
+    QDateTime curtime = MythDate::current();
 
     if (!m_isRecording && !m_nextRecordingStart.isNull() &&
         curtime.secsTo(m_nextRecordingStart) - m_preRollSeconds <
@@ -660,7 +662,7 @@ void WelcomeDialog::shutdownNow(void)
         return;
     }
 
-    QDateTime curtime = QDateTime::currentDateTime();
+    QDateTime curtime = MythDate::current();
 
     // don't shutdown if we are about to start recording
     if (!m_nextRecordingStart.isNull() &&
@@ -706,8 +708,8 @@ void WelcomeDialog::shutdownNow(void)
                                   time_ts.setNum(restarttime.toTime_t()));
         }
         else
-            setwakeup_cmd.replace("$time",
-                                  restarttime.toString(wakeup_timeformat));
+            setwakeup_cmd.replace(
+                "$time", restarttime.toLocalTime().toString(wakeup_timeformat));
 
         if (!setwakeup_cmd.isEmpty())
         {

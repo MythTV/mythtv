@@ -21,6 +21,7 @@ using namespace std;
 #include "recordingrule.h"
 #include "scheduledrecording.h"
 #include "mythmiscutil.h"
+#include "mythdate.h"
 #include "mythcorecontext.h"
 #include "dialogbox.h"
 #include "remoteutil.h"
@@ -321,9 +322,11 @@ RecordingInfo::RecordingInfo(
     }
 
     // Round endtime up to the next half-hour.
-    endts.setTime(QTime(endts.time().hour(),
-                        endts.time().minute() / kUnknownProgramLength
-                        * kUnknownProgramLength));
+    endts = QDateTime(
+        endts.date(),
+        QTime(endts.time().hour(),
+              endts.time().minute() / kUnknownProgramLength
+              * kUnknownProgramLength), Qt::UTC);
     endts = endts.addSecs(kUnknownProgramLength * 60);
 
     // if under a minute, bump it up to the next half hour
@@ -1167,8 +1170,8 @@ void RecordingInfo::AddHistory(bool resched, bool forcedup, bool future)
     RecStatusType rs = (GetRecordingStatus() == rsCurrentRecording &&
                         !future) ? rsPreviousRecording : GetRecordingStatus();
     LOG(VB_SCHEDULE, LOG_INFO, QString("AddHistory: %1/%2, %3, %4, %5/%6")
-            .arg(int(rs)).arg(int(oldrecstatus)).arg(future).arg(dup)
-            .arg(GetScheduledStartTime().toString()).arg(GetTitle()));
+        .arg(int(rs)).arg(int(oldrecstatus)).arg(future).arg(dup)
+        .arg(GetScheduledStartTime(MythDate::ISODate)).arg(GetTitle()));
     if (!future)
         oldrecstatus = GetRecordingStatus();
     if (dup)

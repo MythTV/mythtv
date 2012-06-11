@@ -65,7 +65,7 @@ const unsigned char MPEGStreamData::bit_sel[8] =
 MPEGStreamData::MPEGStreamData(int desiredProgram, bool cacheTables)
     : _sistandard("mpeg"),
       _have_CRC_bug(false),
-      _local_utc_offset(0), _si_time_offset_cnt(0),
+      _si_time_offset_cnt(0),
       _si_time_offset_indx(0),
       _eit_helper(NULL), _eit_rate(0.0f),
       _listening_disabled(false),
@@ -83,8 +83,6 @@ MPEGStreamData::MPEGStreamData(int desiredProgram, bool cacheTables)
       _pat_single_program(NULL), _pmt_single_program(NULL),
       _invalid_pat_seen(false), _invalid_pat_warning(false)
 {
-    _local_utc_offset = calc_utc_offset();
-
     memset(_si_time_offsets, 0, sizeof(_si_time_offsets));
 
     AddListeningPID(MPEG_PAT_PID);
@@ -1419,8 +1417,7 @@ bool MPEGStreamData::HasCachedAnyPMTs(void) const
     return _cached_pmts.size();
 }
 
-const pat_ptr_t MPEGStreamData::GetCachedPAT(
-    uint tsid, uint section_num) const
+pat_ptr_t MPEGStreamData::GetCachedPAT(uint tsid, uint section_num) const
 {
     QMutexLocker locker(&_cache_lock);
     ProgramAssociationTable *pat = NULL;
@@ -1464,8 +1461,7 @@ pat_vec_t MPEGStreamData::GetCachedPATs(void) const
     return pats;
 }
 
-const cat_ptr_t MPEGStreamData::GetCachedCAT(
-    uint tsid, uint section_num) const
+cat_ptr_t MPEGStreamData::GetCachedCAT(uint tsid, uint section_num) const
 {
     QMutexLocker locker(&_cache_lock);
     ConditionalAccessTable *cat = NULL;
@@ -1509,7 +1505,7 @@ cat_vec_t MPEGStreamData::GetCachedCATs(void) const
     return cats;
 }
 
-const pmt_ptr_t MPEGStreamData::GetCachedPMT(
+pmt_ptr_t MPEGStreamData::GetCachedPMT(
     uint program_num, uint section_num) const
 {
     QMutexLocker locker(&_cache_lock);

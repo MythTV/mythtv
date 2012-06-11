@@ -273,8 +273,8 @@ void DTVRecorder::BufferedWrite(const TSPacket &tspacket)
     if (curRecording && timeOfFirstDataIsSet.testAndSetRelaxed(0,1))
     {
         QMutexLocker locker(&statisticsLock);
-        timeOfFirstData = mythCurrentDateTime();
-        timeOfLatestData = mythCurrentDateTime();
+        timeOfFirstData = MythDate::current();
+        timeOfLatestData = MythDate::current();
         timeOfLatestDataTimer.start();
     }
 
@@ -293,7 +293,7 @@ void DTVRecorder::BufferedWrite(const TSPacket &tspacket)
                 .fetchAndStoreRelaxed(thresh * 9 / 8);
 
         timeOfLatestDataCount.fetchAndStoreRelaxed(1);
-        timeOfLatestData = mythCurrentDateTime();
+        timeOfLatestData = MythDate::current();
 
         LOG(VB_RECORD, LOG_DEBUG, LOC + QString("Updating timeOfLatestData ") +
             QString("elapsed(%1) interval(%2)")
@@ -615,12 +615,12 @@ void DTVRecorder::HandleTimestamps(int stream_id, int64_t pts, int64_t dts)
         if (!_ts_count[stream_id])
         {
             _ts_first[stream_id] = ts;
-            _ts_first_dt[stream_id] = mythCurrentDateTime();
+            _ts_first_dt[stream_id] = MythDate::current();
         }
         else if (ts < _ts_first[stream_id])
         {
             _ts_first[stream_id] = ts;
-            _ts_first_dt[stream_id] = mythCurrentDateTime();
+            _ts_first_dt[stream_id] = MythDate::current();
         }
     }
 

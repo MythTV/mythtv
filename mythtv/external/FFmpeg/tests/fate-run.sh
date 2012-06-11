@@ -21,12 +21,18 @@ cpuflags=${11:-all}
 cmp_shift=${12:-0}
 cmp_target=${13:-0}
 size_tolerance=${14:-0}
+cmp_unit=${15:-2}
 
 outdir="tests/data/fate"
 outfile="${outdir}/${test}"
 errfile="${outdir}/${test}.err"
 cmpfile="${outdir}/${test}.diff"
 repfile="${outdir}/${test}.rep"
+
+target_path(){
+    test ${1} = ${1#/} && p=${target_path}/
+    echo ${p}${1}
+}
 
 # $1=value1, $2=value2, $3=threshold
 # prints 0 if absolute difference between value1 and value2 is <= threshold
@@ -35,7 +41,7 @@ compare(){
 }
 
 do_tiny_psnr(){
-    psnr=$(tests/tiny_psnr "$1" "$2" 2 $cmp_shift 0)
+    psnr=$(tests/tiny_psnr "$1" "$2" $cmp_unit $cmp_shift 0)
     val=$(expr "$psnr" : ".*$3: *\([0-9.]*\)")
     size1=$(expr "$psnr" : '.*bytes: *\([0-9]*\)')
     size2=$(expr "$psnr" : '.*bytes:[ 0-9]*/ *\([0-9]*\)')
@@ -55,53 +61,88 @@ stddev(){
     do_tiny_psnr "$1" "$2" stddev
 }
 
+oneline(){
+    printf '%s\n' "$1" | diff -u -b - "$2"
+}
+
 run(){
     test "${V:-0}" -gt 0 && echo "$target_exec" $target_path/"$@" >&3
     $target_exec $target_path/"$@"
 }
 
-avconv(){
+probefmt(){
+    run ffprobe -show_format_entry format_name -print_format default=nw=1:nk=1 -v 0 "$@"
+}
+
+ffmpeg(){
     run ffmpeg -nostats -threads $threads -thread_type $thread_type -cpuflags $cpuflags "$@"
 }
 
 framecrc(){
-    avconv "$@" -f framecrc -
+    ffmpeg "$@" -f framecrc -
 }
 
 framemd5(){
-    avconv "$@" -f framemd5 -
+    ffmpeg "$@" -f framemd5 -
 }
 
 crc(){
-    avconv "$@" -f crc -
+    ffmpeg "$@" -f crc -
 }
 
 md5(){
-    avconv "$@" md5:
+    ffmpeg "$@" md5:
 }
 
 pcm(){
-    avconv "$@" -vn -f s16le -
+    ffmpeg "$@" -vn -f s16le -
 }
 
 enc_dec_pcm(){
     out_fmt=$1
-    pcm_fmt=$2
-    shift 2
+    dec_fmt=$2
+    pcm_fmt=$3
+    src_file=$(target_path $4)
+    shift 4
     encfile="${outdir}/${test}.${out_fmt}"
     cleanfiles=$encfile
-    avconv -i $ref "$@" -f $out_fmt -y ${target_path}/${encfile} || return
-    avconv -i ${target_path}/${encfile} -c:a pcm_${pcm_fmt} -f wav -
+    encfile=$(target_path ${encfile})
+    ffmpeg -i $src_file "$@" -f $out_fmt -y ${encfile} || return
+    ffmpeg -i ${encfile} -c:a pcm_${pcm_fmt} -f ${dec_fmt} -
+}
+
+FLAGS="-flags +bitexact -sws_flags +accurate_rnd+bitexact"
+DEC_OPTS="-threads $threads -idct simple $FLAGS"
+ENC_OPTS="-threads 1        -idct simple -dct fastint"
+
+enc_dec(){
+    src_fmt=$1
+    srcfile=$2
+    enc_fmt=$3
+    enc_opt=$4
+    dec_fmt=$5
+    dec_opt=$6
+    encfile="${outdir}/${test}.${enc_fmt}"
+    decfile="${outdir}/${test}.out.${dec_fmt}"
+    cleanfiles="$cleanfiles $decfile"
+    test "$7" = -keep || cleanfiles="$cleanfiles $encfile"
+    tsrcfile=$(target_path $srcfile)
+    tencfile=$(target_path $encfile)
+    tdecfile=$(target_path $decfile)
+    ffmpeg -f $src_fmt $DEC_OPTS -i $tsrcfile $ENC_OPTS $enc_opt $FLAGS \
+        -f $enc_fmt -y $tencfile || return
+    do_md5sum $encfile
+    echo $(wc -c $encfile)
+    ffmpeg $8 $DEC_OPTS -i $tencfile $ENC_OPTS $dec_opt $FLAGS \
+        -f $dec_fmt -y $tdecfile || return
+    do_md5sum $decfile
+    tests/tiny_psnr $srcfile $decfile $cmp_unit $cmp_shift
 }
 
 regtest(){
     t="${test#$2-}"
     ref=${base}/ref/$2/$t
     ${base}/${1}-regression.sh $t $2 $3 "$target_exec" "$target_path" "$threads" "$thread_type" "$cpuflags" "$samples"
-}
-
-codectest(){
-    regtest codec $1 tests/$1
 }
 
 lavffatetest(){
@@ -123,10 +164,10 @@ seektest(){
     case $t in
         image_*) file="tests/data/images/${t#image_}/%02d.${t#image_}" ;;
         *)       file=$(echo $t | tr _ '?')
-                 for d in acodec vsynth2 lavf; do
-                     test -f tests/data/$d/$file && break
+                 for d in fate/acodec- fate/vsynth2- lavf/; do
+                     test -f tests/data/$d$file && break
                  done
-                 file=$(echo tests/data/$d/$file)
+                 file=$(echo tests/data/$d$file)
                  ;;
     esac
     run libavformat/seek-test $target_path/$file
@@ -135,7 +176,7 @@ seektest(){
 mkdir -p "$outdir"
 
 exec 3>&2
-$command > "$outfile" 2>$errfile
+eval $command >"$outfile" 2>$errfile
 err=$?
 
 if [ $err -gt 128 ]; then
@@ -143,11 +184,12 @@ if [ $err -gt 128 ]; then
     test "${sig}" = "${sig%[!A-Za-z]*}" || unset sig
 fi
 
-if test -e "$ref"; then
+if test -e "$ref" || test $cmp = "oneline" ; then
     case $cmp in
-        diff)   diff -u -w "$ref" "$outfile"            >$cmpfile ;;
+        diff)   diff -u -b "$ref" "$outfile"            >$cmpfile ;;
         oneoff) oneoff     "$ref" "$outfile"            >$cmpfile ;;
         stddev) stddev     "$ref" "$outfile"            >$cmpfile ;;
+        oneline)oneline    "$ref" "$outfile"            >$cmpfile ;;
         null)   cat               "$outfile"            >$cmpfile ;;
     esac
     cmperr=$?

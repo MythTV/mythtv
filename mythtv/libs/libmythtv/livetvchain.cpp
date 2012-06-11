@@ -37,7 +37,7 @@ LiveTVChain::~LiveTVChain()
 
 QString LiveTVChain::InitializeNewChain(const QString &seed)
 {
-    QDateTime curdt = QDateTime::currentDateTime();
+    QDateTime curdt = MythDate::current();
     m_id = QString("live-%1-%2").arg(seed).arg(curdt.toString(Qt::ISODate));
     return m_id;
 }
@@ -67,9 +67,9 @@ void LiveTVChain::AppendNewProgram(ProgramInfo *pginfo, QString channum,
 
     LiveTVChainEntry newent;
     newent.chanid = pginfo->GetChanID();
-    newent.starttime = pginfo->GetRecordingStartTime();
-    newent.starttime.setTime(QTime(tmptime.hour(), tmptime.minute(),
-                                   tmptime.second()));
+    newent.starttime = QDateTime(
+        pginfo->GetRecordingStartTime().date(),
+        QTime(tmptime.hour(), tmptime.minute(), tmptime.second()), Qt::UTC);
     newent.discontinuity = discont;
     newent.hostprefix = m_hostprefix;
     newent.cardtype = m_cardtype;
@@ -101,9 +101,9 @@ void LiveTVChain::AppendNewProgram(ProgramInfo *pginfo, QString channum,
         MythDB::DBError("Chain: AppendNewProgram", query);
     else
         LOG(VB_RECORD, LOG_INFO, QString("Chain: Appended@%3 '%1_%2'")
-                .arg(newent.chanid)
-                .arg(newent.starttime.toString("yyyyMMddhhmmss"))
-                .arg(m_maxpos));
+            .arg(newent.chanid)
+            .arg(MythDate::toString(newent.starttime, MythDate::kFilename))
+            .arg(m_maxpos));
 
     m_maxpos++;
     BroadcastUpdate();
@@ -126,8 +126,8 @@ void LiveTVChain::FinishedRecording(ProgramInfo *pginfo)
         LOG(VB_RECORD, LOG_INFO,
             QString("Chain: Updated endtime for '%1_%2' to %3")
                 .arg(pginfo->GetChanID())
-                .arg(pginfo->GetRecordingStartTime(MythDate))
-                .arg(pginfo->GetRecordingEndTime(MythDate)));
+                .arg(pginfo->GetRecordingStartTime(MythDate::kFilename))
+                .arg(pginfo->GetRecordingEndTime(MythDate::kFilename)));
 
     QList<LiveTVChainEntry>::iterator it;
     for (it = m_chain.begin(); it != m_chain.end(); ++it)
@@ -228,8 +228,8 @@ void LiveTVChain::ReloadAll(void)
 
             LiveTVChainEntry entry;
             entry.chanid = query.value(0).toUInt();
-            entry.starttime = query.value(1).toDateTime();
-            entry.endtime = query.value(2).toDateTime();
+            entry.starttime = MythDate::as_utc(query.value(1).toDateTime());
+            entry.endtime = MythDate::as_utc(query.value(2).toDateTime());
             entry.discontinuity = query.value(3).toInt();
             entry.hostprefix = query.value(5).toString();
             entry.cardtype = query.value(6).toString();
@@ -291,7 +291,7 @@ ProgramInfo *LiveTVChain::EntryToProgram(const LiveTVChainEntry &entry)
 
     LOG(VB_GENERAL, LOG_ERR,
         QString("EntryToProgram(%1@%2) failed to get pginfo")
-            .arg(entry.chanid).arg(entry.starttime.toString()));
+        .arg(entry.chanid).arg(entry.starttime.toString(Qt::ISODate)));
     delete pginfo;
     return NULL;
 }
@@ -350,7 +350,7 @@ int LiveTVChain::GetLengthAtCurPos(void)
 
     entry = m_chain[m_curpos];
     if (m_curpos == ((int)m_chain.count() - 1))
-        return entry.starttime.secsTo(QDateTime::currentDateTime());
+        return entry.starttime.secsTo(MythDate::current());
     else
         return entry.starttime.secsTo(entry.endtime);
 }
@@ -493,7 +493,8 @@ void LiveTVChain::SwitchTo(int num)
         LiveTVChainEntry e;
         GetEntryAt(num, e);
         QString msg = QString("%1_%2")
-            .arg(e.chanid).arg(e.starttime.toString("yyyyMMddhhmmss"));
+            .arg(e.chanid)
+            .arg(MythDate::toString(e.starttime, MythDate::kFilename));
         LOG(VB_PLAYBACK, LOG_DEBUG,
             LOC + QString("Entry@%1: '%2')").arg(num).arg(msg));
     }

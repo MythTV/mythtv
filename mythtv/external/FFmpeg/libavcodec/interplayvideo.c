@@ -907,8 +907,9 @@ static void ipvideo_decode_opcodes(IpvideoContext *s)
         for (x = 0; x < s->avctx->width; x += 8) {
             opcode = get_bits(&gb, 4);
 
-            av_dlog(s->avctx, "block @ (%3d, %3d): encoding 0x%X, data ptr @ %p\n",
-                    x, y, opcode, s->stream_ptr.buffer);
+            av_dlog(s->avctx,
+                    "  block @ (%3d, %3d): encoding 0x%X, data ptr offset %d\n",
+                    x, y, opcode, bytestream2_tell(&s->stream_ptr));
 
             if (!s->is_16bpp) {
                 s->pixel_ptr = s->current_frame.data[0] + x
@@ -1026,5 +1027,5 @@ AVCodec ff_interplay_video_decoder = {
     .close          = ipvideo_decode_end,
     .decode         = ipvideo_decode_frame,
     .capabilities   = CODEC_CAP_DR1 | CODEC_CAP_PARAM_CHANGE,
-    .long_name = NULL_IF_CONFIG_SMALL("Interplay MVE video"),
+    .long_name      = NULL_IF_CONFIG_SMALL("Interplay MVE video"),
 };

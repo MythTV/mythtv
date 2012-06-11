@@ -81,7 +81,8 @@ bool IPTVChannel::IsOpen(void) const
 
 bool IPTVChannel::SetChannelByString(const QString &channum)
 {
-    LOG(VB_CHANNEL, LOG_INFO, LOC + "SetChannelByString() -- begin");
+    LOG(VB_CHANNEL, LOG_INFO, LOC + QString("SetChannelByString(%1) -- begin")
+        .arg(channum));
     QMutexLocker locker(&m_lock);
     LOG(VB_CHANNEL, LOG_INFO, LOC + "SetChannelByString() -- locked");
 
@@ -113,7 +114,8 @@ bool IPTVChannel::SetChannelByString(const QString &channum)
 
     HandleScript(channum /* HACK treat channum as freqid */);
 
-    LOG(VB_CHANNEL, LOG_INFO, LOC + "SetChannelByString() -- end");
+    LOG(VB_CHANNEL, LOG_INFO, LOC + QString("SetChannelByString(%1) = %2 -- end")
+        .arg(channum).arg(m_curchannelname));
     return true;
 }
 
@@ -146,7 +148,7 @@ IPTVChannelInfo IPTVChannel::GetChanInfo(
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
-        "SELECT freqid, name "
+        "SELECT name "
         "FROM channel "
         "WHERE channum  = :CHANNUM AND "
         "      sourceid = :SOURCEID");
@@ -163,24 +165,28 @@ IPTVChannelInfo IPTVChannel::GetChanInfo(
 
     while (query.next())
     {
-        // Try to map freqid or name to a channel in the map
-        const QString freqid = query.value(0).toString();
         fbox_chan_map_t::const_iterator it;
-        if (!freqid.isEmpty())
+        it = m_freeboxchannels.find(channum);
+        if (it != m_freeboxchannels.end())
         {
-            it = m_freeboxchannels.find(freqid);
-            if (it != m_freeboxchannels.end())
-                return *it;
+            LOG(VB_CHANNEL, LOG_DEBUG, LOC +
+                QString("Found: %1").arg((*it).toString()));
+            return *it;
         }
 
         // Try to map name to a channel in the map
-        const QString name = query.value(1).toString();
+        const QString name = query.value(0).toString();
         for (it = m_freeboxchannels.begin();
              it != m_freeboxchannels.end(); ++it)
         {
             if ((*it).m_name == name)
+            {
+                LOG(VB_CHANNEL, LOG_DEBUG, LOC +
+                    QString("Found: %1").arg((*it).toString()));
                 return *it;
+            }
         }
+        LOG(VB_CHANNEL, LOG_DEBUG, LOC + QString("Not Found"));
     }
 
     LOG(VB_GENERAL, LOG_ERR, msg);

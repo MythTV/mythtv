@@ -66,7 +66,7 @@ class PlaybackBoxHelper : public MThread
     uint64_t            m_freeSpaceUsedMB;
 
     // Artwork Variables //////////////////////////////////////////////////////
-    QHash<QString, QString>    m_artworkFilenameCache;
+    QHash<QString, QString>    m_artworkCache;
 };
 
 #endif // _FREE_SPACE_H_

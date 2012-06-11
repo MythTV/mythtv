@@ -472,7 +472,8 @@ bool DecoderHandler::createPlaylistForSingleFile(const QUrl &url)
 bool DecoderHandler::createPlaylistFromFile(const QUrl &url)
 {
     QFile f(QFileInfo(url.path()).absolutePath() + "/" + QFileInfo(url.path()).fileName());
-    f.open(QIODevice::ReadOnly);
+    if (!f.open(QIODevice::ReadOnly))
+        return false;
     QTextStream stream(&f);
 
     QString extension = QFileInfo(url.path()).suffix().toLower();
@@ -730,7 +731,7 @@ MusicSGIODevice::~MusicSGIODevice(void)
 
 bool MusicSGIODevice::open(int)
 {
-    return true;
+    return m_remotefile->isOpen();
 }
 
 bool MusicSGIODevice::seek(qint64 pos)

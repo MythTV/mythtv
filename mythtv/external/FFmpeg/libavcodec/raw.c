@@ -130,12 +130,15 @@ const PixelFormatTag ff_raw_pix_fmt_tags[] = {
     { PIX_FMT_YUV444P16LE, MKTAG('Y', '3',  0 , 16 ) },
     { PIX_FMT_YUV444P16BE, MKTAG(16 ,  0 , '3', 'Y') },
     { PIX_FMT_YUVA420P,    MKTAG('Y', '4', 11 ,  8 ) },
+    { PIX_FMT_YUVA422P,    MKTAG('Y', '4', 10 ,  8 ) },
+    { PIX_FMT_YUVA444P,    MKTAG('Y', '4',  0 ,  8 ) },
     { PIX_FMT_GRAY8A,      MKTAG('Y', '2',  0 ,  8 ) },
 
     /* quicktime */
     { PIX_FMT_UYVY422, MKTAG('2', 'v', 'u', 'y') },
     { PIX_FMT_UYVY422, MKTAG('2', 'V', 'u', 'y') },
     { PIX_FMT_UYVY422, MKTAG('A', 'V', 'U', 'I') }, /* FIXME merge both fields */
+    { PIX_FMT_UYVY422, MKTAG('b', 'x', 'y', 'v') },
     { PIX_FMT_YUYV422, MKTAG('y', 'u', 'v', '2') },
     { PIX_FMT_YUYV422, MKTAG('y', 'u', 'v', 's') },
     { PIX_FMT_YUYV422, MKTAG('D', 'V', 'O', 'O') }, /* Digital Voodoo SD 8 Bit */
@@ -143,8 +146,10 @@ const PixelFormatTag ff_raw_pix_fmt_tags[] = {
     { PIX_FMT_RGB565LE,MKTAG('L', '5', '6', '5') },
     { PIX_FMT_RGB565BE,MKTAG('B', '5', '6', '5') },
     { PIX_FMT_BGR24,   MKTAG('2', '4', 'B', 'G') },
+    { PIX_FMT_BGR24,   MKTAG('b', 'x', 'b', 'g') },
     { PIX_FMT_BGRA,    MKTAG('B', 'G', 'R', 'A') },
     { PIX_FMT_RGBA,    MKTAG('R', 'G', 'B', 'A') },
+    { PIX_FMT_RGB24,   MKTAG('b', 'x', 'r', 'g') },
     { PIX_FMT_ABGR,    MKTAG('A', 'B', 'G', 'R') },
     { PIX_FMT_GRAY16BE,MKTAG('b', '1', '6', 'g') },
     { PIX_FMT_RGB48BE, MKTAG('b', '4', '8', 'r') },
@@ -152,6 +157,7 @@ const PixelFormatTag ff_raw_pix_fmt_tags[] = {
     /* special */
     { PIX_FMT_RGB565LE,MKTAG( 3 ,  0 ,  0 ,  0 ) }, /* flipped RGB565LE */
     { PIX_FMT_YUV444P, MKTAG('Y', 'V', '2', '4') }, /* YUV444P, swapped UV */
+    { PIX_FMT_YUYV422, MKTAG('Y', 'V', 'Y', 'U') }, /* YUYV, swapped UV */
 
     { PIX_FMT_NONE, 0 },
 };

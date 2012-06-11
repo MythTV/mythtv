@@ -571,7 +571,7 @@ static int adpcm_encode_frame(AVCodecContext *avctx, AVPacket *avpkt,
         init_put_bits(&pb, dst, pkt_size * 8);
 
         for (ch = 0; ch < avctx->channels; ch++) {
-            put_bits(&pb, 9, (c->status[ch].prev_sample + 0x10000) >> 7);
+            put_bits(&pb, 9, (c->status[ch].prev_sample & 0xFFFF) >> 7);
             put_bits(&pb, 7,  c->status[ch].step_index);
             if (avctx->trellis > 0) {
                 uint8_t buf[64];
@@ -727,8 +727,8 @@ AVCodec ff_ ## name_ ## _encoder = {                        \
     .init           = adpcm_encode_init,                    \
     .encode2        = adpcm_encode_frame,                   \
     .close          = adpcm_encode_close,                   \
-    .sample_fmts    = (const enum AVSampleFormat[]) { AV_SAMPLE_FMT_S16,   \
-                                                      AV_SAMPLE_FMT_NONE}, \
+    .sample_fmts    = (const enum AVSampleFormat[]) { AV_SAMPLE_FMT_S16,    \
+                                                      AV_SAMPLE_FMT_NONE }, \
     .long_name      = NULL_IF_CONFIG_SMALL(long_name_),     \
 }
 

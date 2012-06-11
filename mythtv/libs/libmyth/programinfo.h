@@ -17,6 +17,7 @@
 #include "programtypes.h"
 #include "mythdbcon.h"
 #include "mythexp.h"
+#include "mythdate.h"
 
 /* If NUMPROGRAMLINES gets updated following files need
    updates and code changes:
@@ -345,36 +346,32 @@ class MPUBLIC ProgramInfo
     /// The scheduled start time of program.
     QDateTime GetScheduledStartTime(void) const { return startts; }
     /// The scheduled start time of program (with formatting).
-    QString GetScheduledStartTime(MythDateFormat fmt) const
+    QString GetScheduledStartTime(MythDate::Format fmt) const
     {
-        return (MythDate != fmt) ? startts.toString((Qt::DateFormat)fmt) :
-            startts.toString("yyyyMMddhhmmss");
+        return MythDate::toString(startts, fmt);
     }
     /// The scheduled end time of the program.
     QDateTime GetScheduledEndTime(void)   const { return endts; }
     /// The scheduled end time of the program (with formatting).
-    QString GetScheduledEndTime(MythDateFormat fmt) const
+    QString GetScheduledEndTime(MythDate::Format fmt) const
     {
-        return (MythDate != fmt) ? endts.toString((Qt::DateFormat)fmt) :
-            endts.toString("yyyyMMddhhmmss");
+        return MythDate::toString(endts, fmt);
     }
     /// Approximate time the recording started.
     QDateTime GetRecordingStartTime(void) const { return recstartts; }
     /// Approximate time the recording started (with formatting).
-    QString GetRecordingStartTime(MythDateFormat fmt) const
+    QString GetRecordingStartTime(MythDate::Format fmt) const
     {
-        return (MythDate != fmt) ? recstartts.toString((Qt::DateFormat)fmt) :
-            recstartts.toString("yyyyMMddhhmmss");
+        return MythDate::toString(recstartts, fmt);
     }
     /// Approximate time the recording should have ended, did end,
     /// or is intended to end.
     QDateTime GetRecordingEndTime(void)   const { return recendts; }
     /// Approximate time the recording should have ended, did end,
     /// or is intended to end (with formatting).
-    QString GetRecordingEndTime(MythDateFormat fmt) const
+    QString GetRecordingEndTime(MythDate::Format fmt) const
     {
-        return (MythDate != fmt) ? recendts.toString((Qt::DateFormat)fmt) :
-            recendts.toString("yyyyMMddhhmmss");
+        return MythDate::toString(recendts, fmt);
     }
     QString GetRecordingGroup(void)       const { return recgroup;     }
     QString GetPlaybackGroup(void)        const { return playgroup;    }
@@ -387,10 +384,9 @@ class MPUBLIC ProgramInfo
     }
     QDate   GetOriginalAirDate(void)      const { return originalAirDate; }
     QDateTime GetLastModifiedTime(void)   const { return lastmodified; }
-    QString GetLastModifiedTime(MythDateFormat fmt) const
+    QString GetLastModifiedTime(MythDate::Format fmt) const
     {
-        return (MythDate != fmt) ? lastmodified.toString((Qt::DateFormat)fmt) :
-            lastmodified.toString("yyyyMMddhhmmss");
+        return MythDate::toString(lastmodified, fmt);
     }
     uint64_t GetFilesize(void)            const { return filesize;     }
     QString GetSeriesID(void)             const { return seriesid;     }

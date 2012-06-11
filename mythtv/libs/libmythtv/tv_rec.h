@@ -312,6 +312,9 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
     QDateTime GetRecordEndTime(const ProgramInfo*) const;
     void CheckForRecGroupChange(void);
     void NotifySchedulerOfRecording(RecordingInfo*);
+    typedef enum { kAutoRunProfile, kAutoRunNone, } AutoRunInitType;
+    void InitAutoRunJobs(RecordingInfo*, AutoRunInitType,
+                         RecordingProfile *, int line);
 
     void SetRecordingStatus(
         RecStatusType new_status, int line, bool have_lock = false);
@@ -372,7 +375,7 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
     // Current recording info
     RecordingInfo *curRecording;
     QDateTime    recordEndTime;
-    int          autoRunJobs;
+    QHash<QString,int> autoRunJobs; // RecordingInfo::MakeUniqueKey()->autoRun
     int          overrecordseconds;
 
     // Pending recording info

@@ -10,7 +10,7 @@
 //myth
 #include "mythcontext.h"
 #include "mythdialogbox.h"
-#include "mythmiscutil.h"
+#include <mythdate.h>
 #include "mythmainwindow.h"
 #include "mythlogging.h"
 
@@ -332,8 +332,7 @@ void ZMClient::getEventList(const QString &monitorName, bool oldestFirst,
         item->monitorID = (*it++).toInt();
         item->monitorName = *it++;
         QString sDate = *it++;
-        QDateTime dt = QDateTime::fromString(sDate, Qt::ISODate);
-        item->startTime = dt;
+        item->startTime = MythDate::fromString(sDate);
         item->length = *it++;
         eventList->push_back(item);
     }

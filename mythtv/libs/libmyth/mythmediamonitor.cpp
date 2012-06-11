@@ -20,9 +20,11 @@ using namespace std;
 #include "mythdialogs.h"
 #include "mythconfig.h"
 #include "mythdialogbox.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 #include "mythlogging.h"
 #include "mythmainwindow.h"
+#include "mythsystem.h"
+#include "mythmiscutil.h"
 
 #ifdef USING_DARWIN_DA
 #include "mediamonitor-darwin.h"

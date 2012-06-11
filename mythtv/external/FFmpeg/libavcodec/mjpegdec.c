@@ -326,9 +326,7 @@ int ff_mjpeg_decode_sof(MJpegDecodeContext *s)
             av_log_ask_for_sample(s->avctx, "progressively coded interlaced pictures not supported\n");
             return AVERROR_INVALIDDATA;
         }
-        return 0;
-    }
-
+    } else{
     /* XXX: not complete test ! */
     pix_fmt_id = (s->h_count[0] << 28) | (s->v_count[0] << 24) |
                  (s->h_count[1] << 20) | (s->v_count[1] << 16) |
@@ -445,6 +443,7 @@ int ff_mjpeg_decode_sof(MJpegDecodeContext *s)
 
     if (len != (8 + (3 * nb_components)))
         av_log(s->avctx, AV_LOG_DEBUG, "decode_sof0: error, len(%d) mismatch\n", len);
+    }
 
     /* totally blank picture as progressive JPEG will only add details to it */
     if (s->progressive) {
@@ -974,6 +973,10 @@ static int mjpeg_decode_scan(MJpegDecodeContext *s, int nb_components, int Ah,
                "Can not flip image with CODEC_FLAG_EMU_EDGE set!\n");
         s->flipped = 0;
     }
+    if (s->flipped && s->avctx->lowres) {
+        av_log(s->avctx, AV_LOG_ERROR, "Can not flip image with lowres\n");
+        s->flipped = 0;
+    }
 
     for (i = 0; i < nb_components; i++) {
         int c   = s->comp_index[i];
@@ -1144,6 +1147,13 @@ int ff_mjpeg_decode_sos(MJpegDecodeContext *s, const uint8_t *mb_bitmask,
     const int block_size = s->lossless ? 1 : 8;
     int ilv, prev_shift;
 
+    if (!s->got_picture) {
+        av_log(s->avctx, AV_LOG_WARNING,
+                "Can not process SOS before SOF, skipping\n");
+        return -1;
+    }
+
+    av_assert0(s->picture_ptr->data[0]);
     /* XXX: verify len field validity */
     len = get_bits(&s->gb, 16);
     nb_components = get_bits(&s->gb, 8);
@@ -1695,11 +1705,6 @@ eoi_parser:
 
                 goto the_end;
             case SOS:
-                if (!s->got_picture) {
-                    av_log(avctx, AV_LOG_WARNING,
-                           "Can not process SOS before SOF, skipping\n");
-                    break;
-                    }
                 if (ff_mjpeg_decode_sos(s, NULL, NULL) < 0 &&
                     (avctx->err_recognition & AV_EF_EXPLODE))
                     return AVERROR_INVALIDDATA;

@@ -12,7 +12,8 @@
 #include "mthreadpool.h"
 #include "mythlogging.h"
 #include "exitcodes.h"
-#include "mythmiscutil.h" // for checkTimeZone()
+#include "mythtimezone.h"
+using namespace MythTZ;
 
 class Reconnect : public QRunnable
 {
@@ -32,7 +33,7 @@ class Reconnect : public QRunnable
 };
 
 BackendConnectionManager::BackendConnectionManager() :
-    QObject(), m_reconnecting(NULL), m_reconnect_timer(NULL), m_first_time(true)
+    QObject(), m_reconnecting(NULL), m_reconnect_timer(NULL)
 {
     gCoreContext->addListener(this);
 
@@ -73,39 +74,6 @@ void BackendConnectionManager::customEvent(QEvent *event)
         {
             delete m_reconnecting;
             m_reconnecting = NULL;
-            if (m_first_time && !checkTimeZone())
-            {
-                // Check for different time zones, 
-                // different offsets, different times
-                LOG(VB_GENERAL, LOG_ERR,
-                    "The time and/or time zone settings on this "
-                    "system do not match those in use on the master "
-                    "backend. Please ensure all frontend and backend "
-                    "systems are configured to use the same time "
-                    "zone and have the current time properly set.");
-                LOG(VB_GENERAL, LOG_ERR,
-                    "Unable to run with invalid time settings. Exiting.");
-                MythScreenStack *popupStack = GetMythMainWindow()->
-                                                 GetStack("popup stack");
-                QString message = tr("Your frontend and backend are configured "
-                                     "in different timezones.  You must "
-                                     "correct this mismatch to continue.");
-                MythConfirmationDialog *error = new MythConfirmationDialog(
-                                                    popupStack, message, false);
-                if (error->Create())
-                {
-                    QObject::connect(error, SIGNAL(haveResult(bool)), 
-                                     qApp, SLOT(quit()));
-                    popupStack->AddScreen(error);
-                }
-                else
-                {
-                    delete error;
-                    delete popupStack;
-                    qApp->exit(GENERIC_EXIT_INVALID_TIMEZONE);
-                }
-            }
-            m_first_time = false;
         }
         else if (message == "RECONNECT_FAILURE")
         {

@@ -23,7 +23,6 @@
 #define CAPTURE_H
 
 #include <QScriptEngine>
-#include <QDateTime>
 
 #include "services/captureServices.h"
 

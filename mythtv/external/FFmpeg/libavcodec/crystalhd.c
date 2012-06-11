@@ -656,8 +656,7 @@ static inline CopyRet copy_frame(AVCodecContext *avctx,
             pStride = 720;
         else if (width <= 1280)
             pStride = 1280;
-        else if (width <= 1080)
-            pStride = 1080;
+        else pStride = 1920;
         sStride = av_image_get_linesize(avctx->pix_fmt, pStride, 0);
     } else {
         sStride = bwidth;
@@ -714,11 +713,20 @@ static inline CopyRet copy_frame(AVCodecContext *avctx,
     }
 
     /*
-     * Testing has shown that in all cases where we don't want to return the
-     * full frame immediately, VDEC_FLAG_UNKNOWN_SRC is set.
+     * The logic here is purely based on empirical testing with samples.
+     * If we need a second field, it could come from a second input packet,
+     * or it could come from the same field-pair input packet at the current
+     * field. In the first case, we should return and wait for the next time
+     * round to get the second field, while in the second case, we should
+     * ask the decoder for it immediately.
+     *
+     * Testing has shown that we are dealing with the fieldpair -> two fields
+     * case if the VDEC_FLAG_UNKNOWN_SRC is not set or if the input picture
+     * type was PICT_FRAME (in this second case, the flag might still be set)
      */
     return priv->need_second_field &&
-           !(output->PicInfo.flags & VDEC_FLAG_UNKNOWN_SRC) ?
+           (!(output->PicInfo.flags & VDEC_FLAG_UNKNOWN_SRC) ||
+            pic_type == PICT_FRAME) ?
            RET_COPY_NEXT_FIELD : RET_OK;
 }
 
@@ -742,6 +750,56 @@ static inline CopyRet receive_frame(AVCodecContext *avctx,
         av_log(avctx, AV_LOG_VERBOSE, "CrystalHD: Initial format change\n");
         avctx->width  = output.PicInfo.width;
         avctx->height = output.PicInfo.height;
+        switch ( output.PicInfo.aspect_ratio ) {
+        case vdecAspectRatioSquare:
+            avctx->sample_aspect_ratio = (AVRational) {  1,  1};
+            break;
+        case vdecAspectRatio12_11:
+            avctx->sample_aspect_ratio = (AVRational) { 12, 11};
+            break;
+        case vdecAspectRatio10_11:
+            avctx->sample_aspect_ratio = (AVRational) { 10, 11};
+            break;
+        case vdecAspectRatio16_11:
+            avctx->sample_aspect_ratio = (AVRational) { 16, 11};
+            break;
+        case vdecAspectRatio40_33:
+            avctx->sample_aspect_ratio = (AVRational) { 40, 33};
+            break;
+        case vdecAspectRatio24_11:
+            avctx->sample_aspect_ratio = (AVRational) { 24, 11};
+            break;
+        case vdecAspectRatio20_11:
+            avctx->sample_aspect_ratio = (AVRational) { 20, 11};
+            break;
+        case vdecAspectRatio32_11:
+            avctx->sample_aspect_ratio = (AVRational) { 32, 11};
+            break;
+        case vdecAspectRatio80_33:
+            avctx->sample_aspect_ratio = (AVRational) { 80, 33};
+            break;
+        case vdecAspectRatio18_11:
+            avctx->sample_aspect_ratio = (AVRational) { 18, 11};
+            break;
+        case vdecAspectRatio15_11:
+            avctx->sample_aspect_ratio = (AVRational) { 15, 11};
+            break;
+        case vdecAspectRatio64_33:
+            avctx->sample_aspect_ratio = (AVRational) { 64, 33};
+            break;
+        case vdecAspectRatio160_99:
+            avctx->sample_aspect_ratio = (AVRational) {160, 99};
+            break;
+        case vdecAspectRatio4_3:
+            avctx->sample_aspect_ratio = (AVRational) {  4,  3};
+            break;
+        case vdecAspectRatio16_9:
+            avctx->sample_aspect_ratio = (AVRational) { 16,  9};
+            break;
+        case vdecAspectRatio221_1:
+            avctx->sample_aspect_ratio = (AVRational) {221,  1};
+            break;
+        }
         return RET_COPY_AGAIN;
     } else if (ret == BC_STS_SUCCESS) {
         int copy_ret = -1;

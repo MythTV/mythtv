@@ -31,6 +31,7 @@
 #include <time.h>
 #include "avformat.h"
 #include "internal.h"
+#include "libavcodec/dv_profile.h"
 #include "libavcodec/dvdata.h"
 #include "libavutil/intreadwrite.h"
 #include "libavutil/mathematics.h"
@@ -272,9 +273,6 @@ static int dv_extract_video_info(DVDemuxContext *c, uint8_t* frame)
         avpriv_set_pts_info(c->vst, 64, c->sys->time_base.num,
                         c->sys->time_base.den);
         avctx->time_base= c->sys->time_base;
-        if (!avctx->width)
-            avcodec_set_dimensions(avctx, c->sys->width, c->sys->height);
-        avctx->pix_fmt = c->sys->pix_fmt;
 
         /* finding out SAR is a little bit messy */
         vsc_pack = dv_extract_pack(frame, dv_video_control);
@@ -600,6 +598,6 @@ AVInputFormat ff_dv_demuxer = {
     .read_packet    = dv_read_packet,
     .read_close     = dv_read_close,
     .read_seek      = dv_read_seek,
-    .extensions = "dv,dif",
+    .extensions     = "dv,dif",
 };
 #endif

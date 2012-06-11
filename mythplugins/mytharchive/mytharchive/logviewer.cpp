@@ -227,9 +227,8 @@ QString LogViewer::getSetting(const QString &key)
         query.bindValue(":VALUE", key);
         query.bindValue(":HOSTNAME", gCoreContext->GetHostName());
 
-        if (query.exec() && query.isActive() && query.size() > 0)
+        if (query.exec() && query.next())
         {
-            query.next();
             return query.value(0).toString();
         }
     }

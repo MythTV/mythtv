@@ -6,6 +6,7 @@
 
 // myth
 #include <mythcontext.h>
+#include <mythdate.h>
 
 // mythzoneminder
 #include "zmsettings.h"
@@ -36,7 +37,7 @@ static HostComboBox *ZMDateFormat()
     HostComboBox *gc = new HostComboBox("ZoneMinderDateFormat");
     gc->setLabel(QObject::tr("Date format"));
 
-    QDate sampdate = QDate::currentDate();
+    QDate sampdate = MythDate::current().toLocalTime().date();
     QString sampleStr =
             QObject::tr("Samples are shown using today's date.");
 

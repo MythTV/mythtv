@@ -19,11 +19,11 @@
 #define LOC QString("VDPAU Painter: ")
 
 MythVDPAUPainter::MythVDPAUPainter(MythRenderVDPAU *render) :
-    MythPainter(), m_render(render), m_created_render(true), m_target(0),
+    MythPainter(), m_render(render), m_target(0),
     m_swap_control(true)
 {
     if (m_render)
-        m_created_render = false;
+        m_render->IncrRef();
 }
 
 MythVDPAUPainter::~MythVDPAUPainter()
@@ -44,7 +44,6 @@ bool MythVDPAUPainter::InitVDPAU(QPaintDevice *parent)
     if (!m_render)
         return false;
 
-    m_created_render = true;
     if (m_render->Create(real_parent->size(), real_parent->winId()))
         return true;
 
@@ -63,9 +62,7 @@ void MythVDPAUPainter::Teardown(void)
 
     if (m_render)
     {
-        if (m_created_render)
-            delete m_render;
-        m_created_render = true;
+        m_render->DecrRef();
         m_render = NULL;
     }
 }

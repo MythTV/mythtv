@@ -22,7 +22,7 @@
 #include <mythcontext.h>
 #include <mythdbcon.h>
 #include <mythmainwindow.h>
-#include <mythmiscutil.h>
+#include <mythdate.h>
 
 // zoneminder
 #include "zmevents.h"
@@ -204,7 +204,10 @@ void ZMEvents::updateUIList()
 
         item->SetText(event->eventName);
         item->SetText(event->monitorName, "camera" );
-        item->SetText(MythDateTimeToString(event->startTime, kDateTimeFull | kSimplify), "time");
+        item->SetText(
+            MythDate::toString(
+                event->startTime,
+                MythDate::kDateTimeFull | MythDate::kSimplify), "time");
         item->SetText(event->length, "length");
     }
 

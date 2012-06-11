@@ -7,8 +7,10 @@
 #include <QString>
 
 #include "atscdescriptors.h"
+#include "mythmiscutil.h" // for xml_indent
 #include "mpegtables.h"
 #include "mythtvexp.h"
+#include "mythdate.h"
 
 // Some sample code is in pcHDTV's dtvscan.c,
 // accum_sect/dequeue_buf/atsc_tables.  We should stuff
@@ -563,9 +565,7 @@ class MTV_PUBLIC EventInformationTable : public PSIPTable
     QDateTime StartTimeGPS(uint i) const
     {
         // Time in GPS seconds since 00:00:00 on January 6th, 1980 UTC
-        QDateTime dt;
-        dt.setTime_t(GPS_EPOCH + StartTimeRaw(i));
-        return dt;
+        return MythDate::fromTime_t(GPS_EPOCH + StartTimeRaw(i));
     }
     //   reserved               2   6.0    3
     //   ETM_location           2   6.2
@@ -707,9 +707,7 @@ class MTV_PUBLIC SystemTimeTable : public PSIPTable
     }
     QDateTime SystemTimeGPS(void) const
     {
-        QDateTime dt;
-        dt.setTime_t(GPS_EPOCH + GPSRaw());
-        return dt;
+        return MythDate::fromTime_t(GPS_EPOCH + GPSRaw());
     }
     time_t GPSUnix(void) const
         { return GPS_EPOCH + GPSRaw(); }

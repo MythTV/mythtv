@@ -42,7 +42,6 @@
 #include "put_bits.h"
 #include "simple_idct.h"
 #include "dvdata.h"
-#include "dvquant.h"
 
 typedef struct BlockInfo {
     const uint32_t *factor_table;
@@ -53,6 +52,8 @@ typedef struct BlockInfo {
     uint32_t partial_bit_buffer;
     int shift_offset;
 } BlockInfo;
+
+static const int dv_iweight_bits = 14;
 
 /* decode AC coefficients */
 static void dv_decode_ac(GetBitContext *gb, BlockInfo *mb, DCTELEM *block)
@@ -181,7 +182,7 @@ static int dv_decode_video_segment(AVCodecContext *avctx, void *arg)
                 mb->idct_put     = s->idct_put[dct_mode && log2_blocksize == 3];
                 mb->scan_table   = s->dv_zigzag[dct_mode];
                 mb->factor_table = &s->sys->idct_factor[(class1 == 3)*2*22*64 + dct_mode*22*64 +
-                                                        (quant + dv_quant_offset[class1])*64];
+                                                        (quant + ff_dv_quant_offset[class1])*64];
             }
             dc = dc << 2;
             /* convert to unsigned because 128 is not added in the
@@ -312,7 +313,7 @@ static int dvvideo_decode_frame(AVCodecContext *avctx,
                                  void *data, int *data_size,
                                  AVPacket *avpkt)
 {
-    const uint8_t *buf = avpkt->data;
+    uint8_t *buf = avpkt->data;
     int buf_size = avpkt->size;
     DVVideoContext *s = avctx->priv_data;
     const uint8_t* vsc_pack;
@@ -381,6 +382,6 @@ AVCodec ff_dvvideo_decoder = {
     .close          = dvvideo_close,
     .decode         = dvvideo_decode_frame,
     .capabilities   = CODEC_CAP_DR1 | CODEC_CAP_SLICE_THREADS,
-    .max_lowres = 3,
-    .long_name = NULL_IF_CONFIG_SMALL("DV (Digital Video)"),
+    .max_lowres     = 3,
+    .long_name      = NULL_IF_CONFIG_SMALL("DV (Digital Video)"),
 };

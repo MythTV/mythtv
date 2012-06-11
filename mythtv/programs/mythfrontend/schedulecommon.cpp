@@ -210,7 +210,7 @@ void ScheduleCommon::ShowRecordingDialog(const RecordingInfo& recinfo)
     {
         menuPopup->SetReturnEvent(this, "schedulerecording");
 
-        QDateTime now = QDateTime::currentDateTime();
+        QDateTime now = MythDate::current();
 
         if (recinfo.GetRecordingStartTime() < now &&
             recinfo.GetRecordingEndTime() > now)
@@ -350,8 +350,10 @@ void ScheduleCommon::ShowNotRecordingDialog(const RecordingInfo& recinfo)
         {
             ProgramInfo *p = *confList->begin();
             message += QString("%1 - %2  %3\n")
-                .arg(p->GetRecordingStartTime().toString(timeFormat))
-                .arg(p->GetRecordingEndTime().toString(timeFormat))
+                .arg(p->GetRecordingStartTime()
+                     .toLocalTime().toString(timeFormat))
+                .arg(p->GetRecordingEndTime()
+                     .toLocalTime().toString(timeFormat))
                 .arg(p->toString(ProgramInfo::kTitleSubtitle, " - "));
             delete p;
             confList->erase(confList->begin());
@@ -373,7 +375,7 @@ void ScheduleCommon::ShowNotRecordingDialog(const RecordingInfo& recinfo)
     {
         menuPopup->SetReturnEvent(this, "schedulenotrecording");
 
-        QDateTime now = QDateTime::currentDateTime();
+        QDateTime now = MythDate::current();
 
         if ((recinfo.GetRecordingStartTime() < now) &&
             (recinfo.GetRecordingEndTime() > now) &&
@@ -497,7 +499,7 @@ void ScheduleCommon::customEvent(QEvent *event)
             else if (resulttext == tr("Record anyway"))
             {
                 recInfo.ApplyRecordStateChange(kOverrideRecord);
-                if (recInfo.GetRecordingStartTime() < QDateTime::currentDateTime())
+                if (recInfo.GetRecordingStartTime() < MythDate::current())
                     recInfo.ReactivateRecording();
             }
             else if (resulttext == tr("Forget Previous"))
@@ -507,7 +509,7 @@ void ScheduleCommon::customEvent(QEvent *event)
             else if (resulttext == tr("Never record"))
             {
                 recInfo.SetRecordingStatus(rsNeverRecord);
-                recInfo.SetScheduledStartTime(QDateTime::currentDateTime());
+                recInfo.SetScheduledStartTime(MythDate::current());
                 recInfo.SetScheduledEndTime(recInfo.GetRecordingStartTime());
                 recInfo.AddHistory(true, true);
             }
@@ -545,7 +547,7 @@ void ScheduleCommon::customEvent(QEvent *event)
             else if (resulttext == tr("Never record"))
             {
                 recInfo.SetRecordingStatus(rsNeverRecord);
-                recInfo.SetScheduledStartTime(QDateTime::currentDateTime());
+                recInfo.SetScheduledStartTime(MythDate::current());
                 recInfo.SetScheduledEndTime(recInfo.GetRecordingStartTime());
                 recInfo.AddHistory(true, true);
             }

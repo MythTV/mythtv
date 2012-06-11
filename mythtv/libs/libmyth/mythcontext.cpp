@@ -14,7 +14,7 @@ using namespace std;
 #include "config.h"
 #include "mythcontext.h"
 #include "exitcodes.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 #include "remotefile.h"
 #include "mythplugin.h"
 #include "backendselect.h"
@@ -38,6 +38,8 @@ using namespace std;
 #include "mythxmlclient.h"
 #include "upnp.h"
 #include "mythlogging.h"
+#include "mythsystem.h"
+#include "mythmiscutil.h"
 
 #ifdef USING_MINGW
 #include <unistd.h>
@@ -541,6 +543,7 @@ bool MythContextPrivate::SaveDatabaseParams(
         m_pConfig->ClearValue(kDefaultMFE + "DBPassword");
         m_pConfig->ClearValue(kDefaultMFE + "DBName");
         m_pConfig->ClearValue(kDefaultMFE + "DBPort");
+        m_pConfig->ClearValue(kDefaultMFE + "DBHostPing");
 
         // actually save the file
         m_pConfig->Save();
@@ -834,19 +837,20 @@ int MythContextPrivate::UPnPautoconf(const int milliSeconds)
 
     if (count != 1)
     {
-        backends->Release();
+        backends->DecrRef();
         return count;
     }
 
     // Get this backend's location:
     DeviceLocation *BE = backends->GetFirst();
-    backends->Release();
+    backends->DecrRef();
+    backends = NULL;
 
     // We don't actually know the backend's access PIN, so this will
     // only work for ones that have PIN access disabled (i.e. 0000)
     int ret = (UPnPconnect(BE, QString::null)) ? 1 : -1;
 
-    BE->Release();
+    BE->DecrRef();
 
     return ret;
 }
@@ -914,12 +918,11 @@ bool MythContextPrivate::DefaultUPnP(QString &error)
 
     if (UPnPconnect(pDevLoc, PIN))
     {
-        pDevLoc->Release();
-
+        pDevLoc->DecrRef();
         return true;
     }
 
-    pDevLoc->Release();
+    pDevLoc->DecrRef();
 
     error = "Cannot connect to default backend via UPnP. Wrong saved PIN?";
     return false;

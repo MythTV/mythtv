@@ -4,6 +4,7 @@
 #include <QMutex>
 
 #include "programtypes.h"
+#include "mythdate.h"
 
 const char *kPlayerInUseID           = "player";
 const char *kPIPPlayerInUseID        = "pipplayer";
@@ -231,7 +232,7 @@ QString toDescription(RecStatusType recstatus, RecordingType rectype,
         return QObject::tr("This showing is not scheduled to record");
 
     QString message;
-    QDateTime now = QDateTime::currentDateTime();
+    QDateTime now = MythDate::current();
 
     if (recstatus <= rsWillRecord)
     {

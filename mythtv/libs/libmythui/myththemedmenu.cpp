@@ -27,6 +27,7 @@
 #include "mythdirs.h"
 #include "mythmedia.h"
 #include "mythversion.h"
+#include "mythdate.h"
 
 MythThemedMenuState::MythThemedMenuState(MythScreenStack *parent,
                                          const QString &name)
@@ -396,8 +397,9 @@ void MythThemedMenu::customEvent(QEvent *event)
             if (text == password)
             {
                 QString timestamp_setting = QString("%1Time").arg(button.password);
-                QDateTime curr_time = QDateTime::currentDateTime();
-                QString last_time_stamp = curr_time.toString(Qt::TextDate);
+                QDateTime curr_time = MythDate::current();
+                QString last_time_stamp = 
+                    MythDate::toString(curr_time, MythDate::kDatabase);
                 GetMythDB()->SaveSetting(timestamp_setting, last_time_stamp);
                 buttonAction(item, true);
             }
@@ -875,7 +877,7 @@ bool MythThemedMenu::findDepends(const QString &fileList)
 bool MythThemedMenu::checkPinCode(const QString &password_setting)
 {
     QString timestamp_setting = QString("%1Time").arg(password_setting);
-    QDateTime curr_time = QDateTime::currentDateTime();
+    QDateTime curr_time = MythDate::current();
     QString last_time_stamp = GetMythDB()->GetSetting(timestamp_setting);
     QString password = GetMythDB()->GetSetting(password_setting);
 
@@ -891,11 +893,11 @@ bool MythThemedMenu::checkPinCode(const QString &password_setting)
     }
     else
     {
-        QDateTime last_time = QDateTime::fromString(last_time_stamp,
-                                                    Qt::TextDate);
-        if (last_time.secsTo(curr_time) < 120)
+        QDateTime last_time = MythDate::fromString(last_time_stamp);
+        if (!last_time.isValid() || last_time.secsTo(curr_time) < 120)
         {
-            last_time_stamp = curr_time.toString(Qt::TextDate);
+            last_time_stamp = MythDate::toString(
+                curr_time, MythDate::kDatabase);
             GetMythDB()->SaveSetting(timestamp_setting, last_time_stamp);
             return true;
         }

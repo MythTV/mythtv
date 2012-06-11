@@ -20,7 +20,7 @@ using namespace std;
 #include "jobqueue.h"
 #include "programinfo.h"
 #include "mythcorecontext.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 #include "previewgenerator.h"
 #include "compat.h"
 #include "recordingprofile.h"
@@ -29,7 +29,9 @@ using namespace std;
 
 #include "mythdb.h"
 #include "mythdirs.h"
+#include "mythsystem.h"
 #include "mythlogging.h"
+#include "mythmiscutil.h"
 
 #ifndef O_STREAMING
 #define O_STREAMING 0
@@ -106,7 +108,7 @@ void JobQueue::customEvent(QEvent *e)
                 jobID = GetJobID(
                     tokens[2].toInt(),
                     tokens[3].toUInt(),
-                    QDateTime::fromString(tokens[4], Qt::ISODate));
+                    MythDate::fromString(tokens[4]));
             }
 
             runningJobsLock->lock();
@@ -315,7 +317,7 @@ void JobQueue::ProcessQueue(void)
                 }
 
                 // Is this job scheduled for the future
-                if (jobs[x].schedruntime > QDateTime::currentDateTime())
+                if (jobs[x].schedruntime > MythDate::current())
                 {
                     message = QString("Skipping '%1' job for %2, this job is "
                                       "not scheduled to run until %3.")
@@ -533,7 +535,7 @@ bool JobQueue::QueueJob(int jobType, uint chanid, const QDateTime &recstartts,
     int chanidInt = -1;
 
     if(!schedruntime.isValid())
-        schedruntime = QDateTime::currentDateTime();
+        schedruntime = MythDate::current();
 
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -630,13 +632,13 @@ bool JobQueue::QueueJobs(int jobTypes, uint chanid, const QDateTime &recstartts,
             QueueJob(JOB_COMMFLAG, chanid, recstartts, args, comment, host);
         if (jobTypes & JOB_TRANSCODE)
         {
-            QDateTime schedruntime = QDateTime::currentDateTime();
+            QDateTime schedruntime = MythDate::current();
 
             int defer = gCoreContext->GetNumSetting("DeferAutoTranscodeDays", 0);
             if (defer)
             {
-                schedruntime = schedruntime.addDays(defer);
-                schedruntime.setTime(QTime(0,0));
+                schedruntime = QDateTime(schedruntime.addDays(defer).date(),
+                                         QTime(0,0,0), Qt::UTC);
             }
 
             QueueJob(JOB_TRANSCODE, chanid, recstartts, args, comment, host,
@@ -702,7 +704,7 @@ bool JobQueue::GetJobInfoFromID(
         {
             jobType    = query.value(0).toInt();
             chanid     = query.value(1).toUInt();
-            recstartts = query.value(2).toDateTime();
+            recstartts = MythDate::as_utc(query.value(2).toDateTime());
             return true;
         }
     }
@@ -719,7 +721,7 @@ bool JobQueue::GetJobInfoFromID(
         jobID, jobType, chanid, tmpStarttime);
 
     if (result)
-        recstartts = tmpStarttime.toString("yyyyMMddhhmmss");
+        recstartts = MythDate::toString(tmpStarttime, MythDate::kFilename);
 
     return result;
 }
@@ -824,7 +826,7 @@ bool JobQueue::DeleteAllJobs(uint chanid, const QDateTime &recstartts)
         {
             message = QString("Waiting on %1 jobs still running for "
                               "chanid %2 @ %3").arg(query.size())
-                              .arg(chanid).arg(recstartts.toString());
+                .arg(chanid).arg(recstartts.toString(Qt::ISODate));
             LOG(VB_JOBQUEUE, LOG_INFO, LOC + message);
         }
 
@@ -863,7 +865,7 @@ bool JobQueue::DeleteAllJobs(uint chanid, const QDateTime &recstartts)
             QString( "In DeleteAllJobs: There are Jobs "
                      "left in the JobQueue that are still running for "
                      "chanid %1 @ %2.").arg(chanid)
-                .arg(recstartts.toString()));
+            .arg(recstartts.toString(Qt::ISODate)));
 
         while (query.next())
         {
@@ -1191,9 +1193,9 @@ bool JobQueue::InJobRunWindow(int orStartsWithinMins)
         else
         {
             // We passed the start time for today, try tomorrow
-            QDateTime curDateTime = QDateTime::currentDateTime();
-            QDateTime startDateTime = QDateTime(QDate::currentDate(),
-                                                queueStartTime).addDays(1);
+            QDateTime curDateTime = MythDate::current();
+            QDateTime startDateTime = QDateTime(
+                curDateTime.date(), queueStartTime, Qt::UTC).addDays(1);
 
             if (curDateTime.secsTo(startDateTime) <= (orStartsWithinMins * 60))
             {
@@ -1215,7 +1217,7 @@ bool JobQueue::HasRunningOrPendingJobs(int startingWithinMins)
            > 0 -  only consider pending starting within this time */
     QMap<int, JobQueueEntry> jobs;
     QMap<int, JobQueueEntry>::Iterator it;
-    QDateTime maxSchedRunTime = QDateTime::currentDateTime();
+    QDateTime maxSchedRunTime = MythDate::current();
     int tmpStatus = 0;
     bool checkForQueuedJobs = (startingWithinMins <= 0
                                 || InJobRunWindow(startingWithinMins));
@@ -1224,7 +1226,8 @@ bool JobQueue::HasRunningOrPendingJobs(int startingWithinMins)
         maxSchedRunTime = maxSchedRunTime.addSecs(startingWithinMins * 60);
         LOG(VB_JOBQUEUE, LOG_INFO, LOC +
             QString("HasRunningOrPendingJobs: checking for jobs "
-                    "starting before: %1").arg(maxSchedRunTime.toString()));
+                    "starting before: %1")
+            .arg(maxSchedRunTime.toString(Qt::ISODate)));
     }
 
     JobQueue::GetJobsInQueue(jobs, JOB_LIST_NOT_DONE);
@@ -1250,7 +1253,7 @@ bool JobQueue::HasRunningOrPendingJobs(int startingWithinMins)
                         LOG(VB_JOBQUEUE, LOG_INFO, LOC +
                             QString("HasRunningOrPendingJobs: found pending "
                                     "job scheduled to start at: %1")
-                                    .arg((*it).schedruntime.toString()));
+                            .arg((*it).schedruntime.toString(Qt::ISODate)));
                         return true;
                     }
                 }
@@ -1265,7 +1268,7 @@ int JobQueue::GetJobsInQueue(QMap<int, JobQueueEntry> &jobs, int findJobs)
 {
     JobQueueEntry thisJob;
     MSqlQuery query(MSqlQuery::InitCon());
-    QDateTime recentDate = QDateTime::currentDateTime().addSecs(-4 * 3600);
+    QDateTime recentDate = MythDate::current().addSecs(-4 * 3600);
     QString logInfo;
     int jobCount = 0;
     bool commflagWhileRecording =
@@ -1298,12 +1301,13 @@ int JobQueue::GetJobsInQueue(QMap<int, JobQueueEntry> &jobs, int findJobs)
         bool wantThisJob = false;
 
         thisJob.id = query.value(0).toInt();
-        thisJob.recstartts = query.value(2).toDateTime();
-        thisJob.schedruntime = query.value(13).toDateTime();
+        thisJob.recstartts = MythDate::as_utc(query.value(2).toDateTime());
+        thisJob.schedruntime = MythDate::as_utc(query.value(13).toDateTime());
         thisJob.type = query.value(4).toInt();
         thisJob.status = query.value(7).toInt();
-        thisJob.statustime = query.value(8).toDateTime();
-        thisJob.startts = thisJob.recstartts.toString("yyyyMMddhhmmss");
+        thisJob.statustime = MythDate::as_utc(query.value(8).toDateTime());
+        thisJob.startts = MythDate::toString(
+            thisJob.recstartts, MythDate::kFilename);
 
         // -1 indicates the chanid is empty
         if (query.value(1).toInt() == -1)
@@ -1318,7 +1322,7 @@ int JobQueue::GetJobsInQueue(QMap<int, JobQueueEntry> &jobs, int findJobs)
                               .arg(thisJob.startts);
         }
 
-        if ((query.value(12).toDateTime() > QDateTime::currentDateTime()) &&
+        if ((MythDate::as_utc(query.value(12).toDateTime()) > MythDate::current()) &&
             ((!commflagWhileRecording) ||
              ((thisJob.type != JOB_COMMFLAG) &&
               (thisJob.type != JOB_METADATA))))
@@ -1356,7 +1360,7 @@ int JobQueue::GetJobsInQueue(QMap<int, JobQueueEntry> &jobs, int findJobs)
                         .arg(JobText(thisJob.type))
                         .arg(logInfo).arg(StatusText(thisJob.status)));
 
-        thisJob.inserttime = query.value(3).toDateTime();
+        thisJob.inserttime = MythDate::as_utc(query.value(3).toDateTime());
         thisJob.cmds = query.value(5).toInt();
         thisJob.flags = query.value(6).toInt();
         thisJob.hostname = query.value(9).toString();
@@ -1569,7 +1573,7 @@ void JobQueue::RecoverQueue(bool justOld)
     if (jobs.size())
     {
         QMap<int, JobQueueEntry>::Iterator it;
-        QDateTime oldDate = QDateTime::currentDateTime().addDays(-1);
+        QDateTime oldDate = MythDate::current().addDays(-1);
         QString hostname = gCoreContext->GetHostName();
         int tmpStatus;
         int tmpCmds;
@@ -1622,8 +1626,8 @@ void JobQueue::RecoverQueue(bool justOld)
 void JobQueue::CleanupOldJobsInQueue()
 {
     MSqlQuery delquery(MSqlQuery::InitCon());
-    QDateTime donePurgeDate = QDateTime::currentDateTime().addDays(-2);
-    QDateTime errorsPurgeDate = QDateTime::currentDateTime().addDays(-4);
+    QDateTime donePurgeDate = MythDate::current().addDays(-2);
+    QDateTime errorsPurgeDate = MythDate::current().addDays(-4);
 
     delquery.prepare("DELETE FROM jobqueue "
                      "WHERE (status in (:FINISHED, :ABORTED, :CANCELLED) "
@@ -1667,7 +1671,8 @@ void JobQueue::ProcessJob(JobQueueEntry job)
         {
             LOG(VB_JOBQUEUE, LOG_ERR, LOC +
                 QString("Unable to retrieve program info for chanid %1 @ %2")
-                    .arg(job.chanid).arg(job.recstartts.toString()));
+                .arg(job.chanid)
+                .arg(job.recstartts.toString(Qt::ISODate)));
 
             ChangeJobStatus(jobID, JOB_ERRORED,
                             "Unable to retrieve Program Info from database");

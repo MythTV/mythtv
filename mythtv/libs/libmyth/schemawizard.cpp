@@ -4,12 +4,13 @@
 #include "dialogbox.h"
 #include "mythcorecontext.h"
 #include "schemawizard.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 
 #include "mythtimer.h"
 #include "mythlogging.h"
 #include "mythmainwindow.h"
 #include "mythuihelper.h"
+#include "mythmiscutil.h"
 #include "mythdb.h"
 
 

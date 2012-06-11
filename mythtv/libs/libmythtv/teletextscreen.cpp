@@ -335,6 +335,7 @@ void TeletextScreen::DrawLine(const uint8_t *page, uint row, int lang)
     bool hold;
     bool endbox;
     bool startbox;
+    bool withinbox;
 
     unsigned char last_ch = ' ';
     unsigned char ch;
@@ -376,6 +377,7 @@ void TeletextScreen::DrawLine(const uint8_t *page, uint row, int lang)
     hold = false;
     endbox = false;
     startbox = false;
+    withinbox = false;
     uint flof_link_count = 0;
     uint old_bgcolor = bgcolor;
 
@@ -393,12 +395,14 @@ void TeletextScreen::DrawLine(const uint8_t *page, uint row, int lang)
             if (kTTColorTransparent & bgcolor)
                 bgcolor = bgcolor & ~kTTColorTransparent;
             startbox = false;
+            withinbox = true;
         }
 
         if (endbox)
         {
             bgcolor = old_bgcolor;
             endbox = false;
+            withinbox = false;
         }
 
         SetForegroundColor(fgcolor);
@@ -425,7 +429,7 @@ void TeletextScreen::DrawLine(const uint8_t *page, uint row, int lang)
                 endbox = true;
                 goto ctrl;
             case 0x0b: // start box
-                if (x < kTeletextColumns - 1 && ((page[x + 1] & 0x7F) != 0x0b))
+                if (x < kTeletextColumns - 1 && ((page[x + 1] & 0x7F) == 0x0b))
                     startbox = true;
                 goto ctrl;
             case 0x0c: // normal height
@@ -506,19 +510,22 @@ void TeletextScreen::DrawLine(const uint8_t *page, uint row, int lang)
             if (m_teletextReader->IsTransparent())
                 SetBackgroundColor(kTTColorTransparent);
 
-            DrawBackground(x, row);
-            if (doubleheight && row < (uint)kTeletextRows)
-                DrawBackground(x, row + 1);
+            if (withinbox || !m_teletextReader->IsSubtitle())
+            {
+                DrawBackground(x, row);
+                if (doubleheight && row < (uint)kTeletextRows)
+                    DrawBackground(x, row + 1);
 
-            if ((mosaic) && (ch < 0x40 || ch > 0x5F))
-            {
-                SetBackgroundColor(newfgcolor);
-                DrawMosaic(x, row, ch, doubleheight);
-            }
-            else
-            {
-                char c2 = cvt_char(ch, lang);
-                DrawCharacter(x, row, c2, doubleheight);
+                if ((mosaic) && (ch < 0x40 || ch > 0x5F))
+                {
+                    SetBackgroundColor(newfgcolor);
+                    DrawMosaic(x, row, ch, doubleheight);
+                }
+                else
+                {
+                    char c2 = cvt_char(ch, lang);
+                    DrawCharacter(x, row, c2, doubleheight);
+                }
             }
         }
     }

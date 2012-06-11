@@ -43,7 +43,6 @@ class SourceManager : public QObject
     QList<ScriptInfo *>      m_scripts;  //all scripts
     QList<WeatherSource *>   m_sources;  //in-use scripts
     SourceMap m_sourcemap;
-    units_t m_units;
     void recurseDirs(QDir dir);
 };
 

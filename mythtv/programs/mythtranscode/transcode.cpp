@@ -878,7 +878,7 @@ int Transcode::TranscodeFile(const QString &inputname,
                              int AudioTrackNo,
                              bool passthru)
 {
-    QDateTime curtime = QDateTime::currentDateTime();
+    QDateTime curtime = MythDate::current();
     QDateTime statustime = curtime;
     int audioFrame = 0;
     Cutter *cutter = NULL;
@@ -930,7 +930,7 @@ int Transcode::TranscodeFile(const QString &inputname,
     player_ctx->SetPlayingInfo(m_proginfo);
     player_ctx->SetRingBuffer(inRingBuffer);
     player_ctx->SetPlayer(player);
-    player->SetPlayerInfo(NULL, NULL, true, player_ctx);
+    player->SetPlayerInfo(NULL, NULL, player_ctx);
 
     if (showprogress)
     {
@@ -2038,7 +2038,7 @@ int Transcode::TranscodeFile(const QString &inputname,
                     nvr->WriteVideo(&frame);
             }
         }
-        if (QDateTime::currentDateTime() > statustime)
+        if (MythDate::current() > statustime)
         {
             if (showprogress)
             {
@@ -2054,10 +2054,9 @@ int Transcode::TranscodeFile(const QString &inputname,
                 stopSignalled = true;
             }
 
-            statustime = QDateTime::currentDateTime();
-            statustime = statustime.addSecs(5);
+            statustime = MythDate::current().addSecs(5);
         }
-        if (QDateTime::currentDateTime() > curtime)
+        if (MythDate::current() > curtime)
         {
             if (honorCutList && m_proginfo && !hls &&
                 m_proginfo->QueryMarkupFlag(MARK_UPDATED_CUT))
@@ -2110,8 +2109,7 @@ int Transcode::TranscodeFile(const QString &inputname,
                             .arg(percentage).arg(flagFPS));
 
             }
-            curtime = QDateTime::currentDateTime();
-            curtime = curtime.addSecs(20);
+            curtime = MythDate::current().addSecs(20);
         }
 
         curFrameNum++;

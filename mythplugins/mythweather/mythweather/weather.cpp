@@ -11,7 +11,7 @@
 #include <mythcontext.h>
 
 #include <mythuitext.h>
-#include <mythmiscutil.h>
+#include <mythdate.h>
 
 // MythWeather headers
 #include "weatherScreen.h"

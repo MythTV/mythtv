@@ -62,8 +62,11 @@ void MetaIOTagLib::WriteGenericMetadata(Tag *tag,  const Metadata *metadata)
 */
 void MetaIOTagLib::ReadGenericMetadata(Tag *tag, Metadata *metadata)
 {
+    if (!tag || ! metadata)
+        return;
+
     // Basic Tags
-    if (metadata && tag && !tag->isEmpty())
+    if (!tag->isEmpty())
     {
         metadata->setTitle(TStringToQString(tag->title()).trimmed());
         metadata->setArtist(TStringToQString(tag->artist()).trimmed());
@@ -122,6 +125,8 @@ int MetaIOTagLib::getTrackLength(const QString &filename)
         LOG(VB_GENERAL, LOG_ERR,
             QString("MetaIOTagLib: Failed to read length "
                     "from '%1'. It may be corrupt.").arg(filename));
+
+    delete file;
     
     return milliseconds;
 }

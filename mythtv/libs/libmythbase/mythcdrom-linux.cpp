@@ -16,6 +16,8 @@
 #include "mythcdrom-linux.h"
 #include "mythconfig.h"      // for HAVE_BIGENDIAN
 #include "mythlogging.h"
+#include "mythdate.h"
+
 #ifdef USING_LIBUDF
 #include <cdio/udf.h>
 #endif
@@ -479,8 +481,7 @@ MythMediaStatus MythCDROMLinux::checkMedia()
                 else
                 {
                     m_VolumeID = "UNKNOWN";
-                    m_KeyID = m_VolumeID +
-                        QDateTime::currentDateTime().toString(Qt::ISODate);
+                    m_KeyID = m_VolumeID + MythDate::current_iso_string();
                 }
 
                 LOG(VB_MEDIA, LOG_INFO,

@@ -52,13 +52,9 @@ macx {
         FWKS += CoreVideo
     }
 
-    using_firewire:using_backend: FWKS += IOKit
+    FC = $$join(FWKS,",")
 
-    # The following trick shortens the command line, but depends on
-    # the shell expanding Csh-style braces. Luckily, Bash and Zsh do.
-    FC = $$join(FWKS,",","{","}")
-
-    QMAKE_CXXFLAGS += -F/System/Library/Frameworks/$${FC}.framework/Frameworks
+    QMAKE_CXXFLAGS += -F$${FC}
     LIBS           += -framework $$join(FWKS," -framework ")
 
     using_firewire:using_backend {
@@ -82,7 +78,7 @@ using_valgrind:DEFINES += USING_VALGRIND
 
 # mmx macros from avlib
 contains( HAVE_MMX, yes ) {
-    HEADERS += ../../external/FFmpeg/libavcodec/x86/mmx.h ../../external/FFmpeg/libavcodec/dsputil.h
+    HEADERS += ../libmythbase/ffmpeg-mmx.h ../../external/FFmpeg/libavcodec/dsputil.h
 }
 
 QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
@@ -567,6 +563,7 @@ using_backend {
         HEADERS += iptv/iptvfeederrtsp.h      iptv/iptvfeederudp.h
         HEADERS += iptv/iptvfeederfile.h      iptv/iptvfeederlive.h
         HEADERS += iptv/iptvfeederrtp.h       iptv/timeoutedtaskscheduler.h
+        HEADERS += iptv/iptvfeederhls.h
 
         SOURCES += iptvchannel.cpp            iptvrecorder.cpp
         SOURCES += iptvsignalmonitor.cpp
@@ -576,6 +573,7 @@ using_backend {
         SOURCES += iptv/iptvfeederrtsp.cpp    iptv/iptvfeederudp.cpp
         SOURCES += iptv/iptvfeederfile.cpp    iptv/iptvfeederlive.cpp
         SOURCES += iptv/iptvfeederrtp.cpp     iptv/timeoutedtaskscheduler.cpp
+        SOURCES += iptv/iptvfeederhls.cpp
 
         DEFINES += USING_IPTV
     }

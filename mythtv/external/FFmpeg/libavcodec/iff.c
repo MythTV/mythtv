@@ -191,7 +191,13 @@ static int extract_header(AVCodecContext *const avctx,
     const uint8_t *buf;
     unsigned buf_size;
     IffContext *s = avctx->priv_data;
-    int palette_size = avctx->extradata_size - AV_RB16(avctx->extradata);
+    int palette_size;
+
+    if (avctx->extradata_size < 2) {
+        av_log(avctx, AV_LOG_ERROR, "not enough extradata\n");
+        return AVERROR_INVALIDDATA;
+    }
+    palette_size = avctx->extradata_size - AV_RB16(avctx->extradata);
 
     if (avpkt) {
         int image_size;
@@ -207,8 +213,6 @@ static int extract_header(AVCodecContext *const avctx,
             return AVERROR_INVALIDDATA;
         }
     } else {
-        if (avctx->extradata_size < 2)
-            return AVERROR_INVALIDDATA;
         buf = avctx->extradata;
         buf_size = bytestream_get_be16(&buf);
         if (buf_size <= 1 || palette_size < 0) {
@@ -312,7 +316,12 @@ static av_cold int decode_init(AVCodecContext *avctx)
     int err;
 
     if (avctx->bits_per_coded_sample <= 8) {
-        int palette_size = avctx->extradata_size - AV_RB16(avctx->extradata);
+        int palette_size;
+
+        if (avctx->extradata_size >= 2)
+            palette_size = avctx->extradata_size - AV_RB16(avctx->extradata);
+        else
+            palette_size = 0;
         avctx->pix_fmt = (avctx->bits_per_coded_sample < 8) ||
                          (avctx->extradata_size >= 2 && palette_size) ? PIX_FMT_PAL8 : PIX_FMT_GRAY8;
     } else if (avctx->bits_per_coded_sample <= 32) {
@@ -474,7 +483,7 @@ static int decode_frame_ilbm(AVCodecContext *avctx,
     } else if ((res = avctx->get_buffer(avctx, &s->frame)) < 0) {
         av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
         return res;
-    } else if (avctx->bits_per_coded_sample <= 8 && avctx->pix_fmt != PIX_FMT_GRAY8) {
+    } else if (avctx->bits_per_coded_sample <= 8 && avctx->pix_fmt == PIX_FMT_PAL8) {
         if ((res = ff_cmap_read_palette(avctx, (uint32_t*)s->frame.data[1])) < 0)
             return res;
     }
@@ -683,7 +692,7 @@ AVCodec ff_iff_ilbm_decoder = {
     .close          = decode_end,
     .decode         = decode_frame_ilbm,
     .capabilities   = CODEC_CAP_DR1,
-    .long_name = NULL_IF_CONFIG_SMALL("IFF ILBM"),
+    .long_name      = NULL_IF_CONFIG_SMALL("IFF ILBM"),
 };
 
 AVCodec ff_iff_byterun1_decoder = {
@@ -695,5 +704,5 @@ AVCodec ff_iff_byterun1_decoder = {
     .close          = decode_end,
     .decode         = decode_frame_byterun1,
     .capabilities   = CODEC_CAP_DR1,
-    .long_name = NULL_IF_CONFIG_SMALL("IFF ByteRun1"),
+    .long_name      = NULL_IF_CONFIG_SMALL("IFF ByteRun1"),
 };

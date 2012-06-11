@@ -283,7 +283,8 @@ uint DBEvent::GetOverlappingPrograms(
             query.value(2).toString(),
             query.value(3).toString(),
             category_type,
-            query.value(5).toDateTime(), query.value(6).toDateTime(),
+            MythDate::as_utc(query.value(5).toDateTime()),
+            MythDate::as_utc(query.value(6).toDateTime()),
             query.value(7).toUInt(),
             query.value(8).toUInt(),
             query.value(9).toUInt(),
@@ -985,19 +986,21 @@ void ProgramData::FixProgramList(QList<ProgInfo*> &fixlist)
             else
             {
                 (*cur)->endtime = (*cur)->starttime;
-                if ((*cur)->endtime < QDateTime((*cur)->endtime.date(), QTime(6, 0)))
+                if ((*cur)->endtime < QDateTime(
+                        (*cur)->endtime.date(), QTime(6, 0), Qt::UTC))
                 {
-                    (*cur)->endtime.setTime(QTime(6, 0));
+                    (*cur)->endtime = QDateTime(
+                        (*cur)->endtime.date(), QTime(6, 0), Qt::UTC);
                 }
                 else
                 {
-                   (*cur)->endtime.setTime(QTime(0, 0));
-                   (*cur)->endtime.setDate((*cur)->endtime.date().addDays(1));
+                    (*cur)->endtime = QDateTime(
+                        (*cur)->endtime.date().addDays(1),
+                        QTime(0, 0), Qt::UTC);
                 }
 
-                QString    datestr = (*cur)->endtime.toString("yyyyMMddhhmmss");
-                QByteArray datearr = datestr.toAscii();
-                (*cur)->endts = QString(datearr.constData());
+                (*cur)->endts =
+                    MythDate::toString((*cur)->endtime, MythDate::kFilename);
             }
         }
 
@@ -1279,10 +1282,10 @@ bool ProgramData::DeleteOverlaps(
         {
             LOG(VB_XMLTV, LOG_INFO,
                 QString("Removing existing program: %1 - %2 %3 %4")
-                    .arg(query.value(1).toDateTime().toString(Qt::ISODate))
-                    .arg(query.value(2).toDateTime().toString(Qt::ISODate))
-                    .arg(pi.channel)
-                    .arg(query.value(0).toString()));
+                .arg(MythDate::as_utc(query.value(1).toDateTime()).toString(Qt::ISODate))
+                .arg(MythDate::as_utc(query.value(2).toDateTime()).toString(Qt::ISODate))
+                .arg(pi.channel)
+                .arg(query.value(0).toString()));
         } while (query.next());
     }
 

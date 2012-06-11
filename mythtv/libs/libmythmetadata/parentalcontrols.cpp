@@ -1,5 +1,6 @@
 #include <map>
 
+#include "mythdate.h"
 #include "mythcontext.h"
 #include "mythmainwindow.h"
 #include "mythscreenstack.h"
@@ -268,9 +269,8 @@ class ParentalLevelChangeCheckerPrivate : public QObject
         }
         else
         {
-            QDateTime curr_time = QDateTime::currentDateTime();
-            QDateTime last_time =
-                    QDateTime::fromString(last_time_stamp, Qt::ISODate);
+            QDateTime curr_time = MythDate::current();
+            QDateTime last_time = MythDate::fromString(last_time_stamp);
 
             if (ParentalLevel(last_parent_lvl) >= which_level &&
                 last_time.secsTo(curr_time) < 120)
@@ -328,8 +328,7 @@ class ParentalLevelChangeCheckerPrivate : public QObject
             if (password == *p)
             {
                 m_passwordOK = true;
-                QString time_stamp =
-                        QDateTime::currentDateTime().toString(Qt::ISODate);
+                QString time_stamp = MythDate::current_iso_string();
 
                 gCoreContext->SaveSetting("VideoPasswordTime", time_stamp);
                 gCoreContext->SaveSetting("VideoPasswordLevel", m_toLevel);

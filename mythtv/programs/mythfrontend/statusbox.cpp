@@ -8,10 +8,11 @@ using namespace std;
 
 #include "mythcorecontext.h"
 #include "filesysteminfo.h"
+#include "mythmiscutil.h"
 #include "mythdb.h"
 #include "mythlogging.h"
 #include "mythversion.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 
 #include "config.h"
 #include "remoteutil.h"
@@ -528,37 +529,38 @@ void StatusBox::doListingsStatus()
     int DaysOfData;
     QDateTime qdtNow, GuideDataThrough;
 
-    qdtNow = QDateTime::currentDateTime();
+    qdtNow = MythDate::current();
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT max(endtime) FROM program WHERE manualid=0;");
 
     if (query.exec() && query.next())
-        GuideDataThrough = QDateTime::fromString(query.value(0).toString(),
-                                                 Qt::ISODate);
+        GuideDataThrough = MythDate::fromString(query.value(0).toString());
 
     QString tmp = gCoreContext->GetSetting("mythfilldatabaseLastRunStart");
-    mfdLastRunStart = QDateTime::fromString(tmp, Qt::ISODate);
+    mfdLastRunStart = MythDate::fromString(tmp);
     tmp = gCoreContext->GetSetting("mythfilldatabaseLastRunEnd");
-    mfdLastRunEnd = QDateTime::fromString(tmp, Qt::ISODate);
+    mfdLastRunEnd = MythDate::fromString(tmp);
     tmp = gCoreContext->GetSetting("MythFillSuggestedRunTime");
-    mfdNextRunStart = QDateTime::fromString(tmp, Qt::ISODate);
-
+    mfdNextRunStart = MythDate::fromString(tmp);
+    
     mfdLastRunStatus = gCoreContext->GetSetting("mythfilldatabaseLastRunStatus");
     DataDirectMessage = gCoreContext->GetSetting("DataDirectMessage");
 
     AddLogLine(tr("Mythfrontend version: %1 (%2)").arg(MYTH_SOURCE_PATH)
                .arg(MYTH_SOURCE_VERSION), helpmsg);
     AddLogLine(tr("Last mythfilldatabase guide update:"), helpmsg);
-    tmp = tr("Started:   %1").arg(MythDateTimeToString(mfdLastRunStart,
-                                                    kDateTimeFull | kSimplify));
+    tmp = tr("Started:   %1").arg(
+        MythDate::toString(
+            mfdLastRunStart, MythDate::kDateTimeFull | MythDate::kSimplify));
     AddLogLine(tmp, helpmsg);
 
     if (mfdLastRunEnd >= mfdLastRunStart)
     {
-        tmp =
-            tr("Finished: %1").arg(MythDateTimeToString(mfdLastRunEnd,
-                                                    kDateTimeFull | kSimplify));
+        tmp = tr("Finished: %1")
+            .arg(MythDate::toString(
+                     mfdLastRunEnd,
+                     MythDate::kDateTimeFull | MythDate::kSimplify));
         AddLogLine(tmp, helpmsg);
     }
 
@@ -567,8 +569,10 @@ void StatusBox::doListingsStatus()
 
     if (mfdNextRunStart >= mfdLastRunStart)
     {
-        tmp = tr("Suggested Next: %1").arg(MythDateTimeToString(mfdNextRunStart,
-                                                    kDateTimeFull | kSimplify));
+        tmp = tr("Suggested Next: %1")
+            .arg(MythDate::toString(
+                     mfdNextRunStart,
+                     MythDate::kDateTimeFull | MythDate::kSimplify));
         AddLogLine(tmp, helpmsg);
     }
 
@@ -583,9 +587,11 @@ void StatusBox::doListingsStatus()
     }
     else
     {
-        AddLogLine(tr("There is guide data until %1")
-                   .arg(MythDateTimeToString(GuideDataThrough,
-                                             kDateTimeFull | kSimplify)), helpmsg);
+        AddLogLine(
+            tr("There is guide data until %1")
+            .arg(MythDate::toString(
+                     GuideDataThrough,
+                     MythDate::kDateTimeFull | MythDate::kSimplify)), helpmsg);
 
         AddLogLine(QString("(%1).").arg(tr("%n day(s)", "", DaysOfData)),
                    helpmsg);
@@ -821,11 +827,11 @@ void StatusBox::doTunerStatus()
             strlist << "GET_SLEEPSTATUS";
 
             gCoreContext->SendReceiveStringList(strlist);
-            state = strlist[0].toInt();
+            int sleepState = strlist[0].toInt();
 
-            if (state == -1)
+            if (sleepState == -1)
                 status = tr("has an error");
-            else if (state == sStatus_Undefined)
+            else if (sleepState == sStatus_Undefined)
                 status = tr("is unavailable");
             else
                 status = tr("is asleep");
@@ -896,11 +902,12 @@ void StatusBox::doLogEntries(void)
             line = QString("%1").arg(query.value(5).toString());
 
             detail = tr("On %1 from %2.%3\n%4\n")
-                        .arg(MythDateTimeToString(query.value(3).toDateTime(),
-                                                    kDateTimeShort))
-                        .arg(query.value(4).toString())
-                        .arg(query.value(1).toString())
-                        .arg(query.value(5).toString());
+                .arg(MythDate::toString(
+                         MythDate::as_utc(query.value(3).toDateTime()),
+                         MythDate::kDateTimeShort))
+                .arg(query.value(4).toString())
+                .arg(query.value(1).toString())
+                .arg(query.value(5).toString());
 
             QString tmp = query.value(6).toString();
             if (!tmp.isEmpty())
@@ -958,8 +965,9 @@ void StatusBox::doJobQueueStatus()
                 .arg(pginfo.GetTitle())
                 .arg(pginfo.GetChannelName())
                 .arg(pginfo.GetChanNum())
-                .arg(MythDateTimeToString(pginfo.GetRecordingStartTime(),
-                                          kDateTimeFull | kSimplify))
+                .arg(MythDate::toString(
+                         pginfo.GetRecordingStartTime(),
+                         MythDate::kDateTimeFull | MythDate::kSimplify))
                 .arg(tr("Job:"))
                 .arg(JobQueue::JobText((*it).type))
                 .arg(tr("Status: "))
@@ -968,17 +976,18 @@ void StatusBox::doJobQueueStatus()
             if ((*it).status != JOB_QUEUED)
                 detail += " (" + (*it).hostname + ')';
 
-            if ((*it).schedruntime > QDateTime::currentDateTime())
+            if ((*it).schedruntime > MythDate::current())
                 detail += '\n' + tr("Scheduled Run Time:") + ' ' +
-                    MythDateTimeToString((*it).schedruntime,
-                                         kDateTimeFull | kSimplify);
+                    MythDate::toString(
+                        (*it).schedruntime,
+                        MythDate::kDateTimeFull | MythDate::kSimplify);
             else
                 detail += '\n' + (*it).comment;
 
             line = QString("%1 @ %2").arg(pginfo.GetTitle())
-                                          .arg(MythDateTimeToString(
-                                              pginfo.GetRecordingStartTime(),
-                                              kDateTimeFull | kSimplify));
+                .arg(MythDate::toString(
+                         pginfo.GetRecordingStartTime(),
+                         MythDate::kDateTimeFull | MythDate::kSimplify));
 
             QString font;
             if ((*it).status == JOB_ERRORED)
@@ -1425,7 +1434,8 @@ void StatusBox::doAutoExpireList(bool updateExpList)
         QDateTime starttime = pginfo->GetRecordingStartTime();
         QDateTime endtime = pginfo->GetRecordingEndTime();
         contentLine =
-            MythDateTimeToString(starttime, kDateFull | kSimplify) + " - ";
+            MythDate::toString(
+                starttime, MythDate::kDateFull | MythDate::kSimplify) + " - ";
 
         contentLine +=
             "(" + ProgramInfo::i18n(pginfo->GetRecordingGroup()) + ") ";
@@ -1434,8 +1444,11 @@ void StatusBox::doAutoExpireList(bool updateExpList)
             " (" + sm_str(pginfo->GetFilesize() / 1024) + ")";
 
         detailInfo =
-            MythDateTimeToString(starttime, kDateTimeFull | kSimplify) + " - " +
-            MythDateTimeToString(endtime, kDateTimeFull | kSimplify);
+            MythDate::toString(
+                starttime, MythDate::kDateTimeFull | MythDate::kSimplify) +
+            " - " +
+            MythDate::toString(
+                endtime, MythDate::kDateTimeFull | MythDate::kSimplify);
 
         detailInfo += " (" + sm_str(pginfo->GetFilesize() / 1024) + ")";
 

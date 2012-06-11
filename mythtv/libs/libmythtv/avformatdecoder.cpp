@@ -576,7 +576,8 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame, bool discardFrames)
     long double seekts = desiredFrame * AV_TIME_BASE / fps;
     ts += (long long)seekts;
 
-    bool exactseeks = DecoderBase::getExactSeeks();
+    // XXX figure out how to do snapping in this case
+    bool exactseeks = !DecoderBase::GetSeekSnap();
 
     int flags = (dorewind || exactseeks) ? AVSEEK_FLAG_BACKWARD : 0;
 
@@ -808,24 +809,23 @@ bool AvFormatDecoder::CanHandle(char testbuf[kDecoderProbeBufferSize],
 
 void AvFormatDecoder::InitByteContext(void)
 {
-    int buf_size = ringBuffer->BestBufferSize();
-    int streamed = ringBuffer->IsStreamed();
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Buffer size: %1, streamed %2")
-                                   .arg(buf_size).arg(streamed));
-
-    readcontext.prot = &AVF_RingBuffer_Protocol;
-    readcontext.flags = AVIO_FLAG_READ;
-    readcontext.is_streamed = streamed;
+    int buf_size                = ringBuffer->BestBufferSize();
+    int streamed                = ringBuffer->IsStreamed();
+    readcontext.prot            = AVFRingBuffer::GetRingBufferURLProtocol();
+    readcontext.flags           = AVIO_FLAG_READ;
+    readcontext.is_streamed     = streamed;
     readcontext.max_packet_size = 0;
-    readcontext.priv_data = avfRingBuffer;
-    unsigned char* buffer = (unsigned char *)av_malloc(buf_size);
-    ic->pb = avio_alloc_context(buffer, buf_size, 0,
-                                &readcontext,
-                                AVF_Read_Packet,
-                                AVF_Write_Packet,
-                                AVF_Seek_Packet);
+    readcontext.priv_data       = avfRingBuffer;
+    unsigned char* buffer       = (unsigned char *)av_malloc(buf_size);
+    ic->pb                      = avio_alloc_context(buffer, buf_size, 0,
+                                                     &readcontext,
+                                                     AVFRingBuffer::AVF_Read_Packet,
+                                                     AVFRingBuffer::AVF_Write_Packet,
+                                                     AVFRingBuffer::AVF_Seek_Packet);
 
-    ic->pb->seekable = !streamed;
+    ic->pb->seekable            = !streamed;
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Buffer size: %1, streamed %2")
+        .arg(buf_size).arg(streamed));
 }
 
 extern "C" void HandleStreamChange(void *data)
@@ -2179,7 +2179,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
     if (ringBuffer)
     {
         ringBuffer->SetBufferSizeFactors(unknownbitrate,
-                            QString(ic->iformat->name).contains("matroska"));
+                        ic && QString(ic->iformat->name).contains("matroska"));
     }
 
     PostProcessTracks();
@@ -3441,6 +3441,7 @@ bool AvFormatDecoder::ProcessSubtitlePacket(AVStream *curstream, AVPacket *pkt)
 
     avcodeclock->lock();
     int subIdx = selectedTrack[kTrackTypeSubtitle].av_stream_index;
+    bool isForcedTrack = selectedTrack[kTrackTypeSubtitle].forced;
     avcodeclock->unlock();
 
     int gotSubtitles = 0;
@@ -3473,6 +3474,8 @@ bool AvFormatDecoder::ProcessSubtitlePacket(AVStream *curstream, AVPacket *pkt)
 
     if (gotSubtitles)
     {
+        if (isForcedTrack)
+            subtitle.forced = true;
         subtitle.start_display_time += pts;
         subtitle.end_display_time += pts;
         LOG(VB_PLAYBACK | VB_TIMESTAMP, LOG_INFO, LOC +
@@ -3484,7 +3487,7 @@ bool AvFormatDecoder::ProcessSubtitlePacket(AVStream *curstream, AVPacket *pkt)
         bool forcedon = m_parent->GetSubReader(pkt->stream_index)->AddAVSubtitle(
                subtitle, curstream->codec->codec_id == CODEC_ID_XSUB,
                m_parent->GetAllowForcedSubtitles());
-        m_parent->EnableForcedSubtitles(forcedon);
+        m_parent->EnableForcedSubtitles(forcedon || isForcedTrack);
     }
 
     return true;
@@ -3615,7 +3618,7 @@ QString AvFormatDecoder::GetTrackDesc(uint type, uint trackNo) const
 
         return QObject::tr("Subtitle") + QString(" %1: %2%3")
             .arg(trackNo + 1).arg(iso639_key_toName(lang_key))
-            .arg(forced ? " (forced)" : "");
+            .arg(forced ? QObject::tr(" (forced)") : "");
     }
     else
     {

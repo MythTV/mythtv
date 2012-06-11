@@ -19,7 +19,7 @@
 AnalogSignalMonitor::AnalogSignalMonitor(
     int db_cardnum, V4LChannel *_channel, uint64_t _flags) :
     SignalMonitor(db_cardnum, _channel, _flags),
-    m_usingv4l2(false), m_stage(0)
+    m_usingv4l2(false), m_width(0), m_stable_time(2000), m_lock_cnt(0)
 {
     int videofd = channel->GetFd();
     if (videofd >= 0)
@@ -36,90 +36,127 @@ AnalogSignalMonitor::AnalogSignalMonitor(
     }
 }
 
+bool AnalogSignalMonitor::VerifyHDPVRaudio(int videofd)
+{
+    struct v4l2_queryctrl qctrl;
+    qctrl.id = V4L2_CID_MPEG_AUDIO_ENCODING;
+
+    int audtype = V4L2_MPEG_AUDIO_ENCODING_AC3;
+
+    if (ioctl(videofd, VIDIOC_QUERYCTRL, &qctrl) != 0)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            "Unable to get supported audio codecs for verification." + ENO);
+        return false;
+    }
+
+    int  current_audio;
+    uint audio_enc = max(min(audtype, qctrl.maximum), qctrl.minimum);
+
+    struct v4l2_ext_control  ext_ctrl;
+    struct v4l2_ext_controls ext_ctrls;
+
+    memset(&ext_ctrl, 0, sizeof(struct v4l2_ext_control));
+    ext_ctrl.id = V4L2_CID_MPEG_AUDIO_ENCODING;
+
+    ext_ctrls.reserved[0] = ext_ctrls.reserved[1] = 0;
+    ext_ctrls.count = 1;
+    ext_ctrls.ctrl_class = V4L2_CTRL_CLASS_MPEG;
+    ext_ctrls.controls = &ext_ctrl;
+
+    if (ioctl(videofd, VIDIOC_G_EXT_CTRLS, &ext_ctrls) != 0)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            "Unable to get current audio codecs for verification." + ENO);
+        return false;
+    }
+
+    current_audio = ext_ctrls.controls->value;
+
+    if (audtype != current_audio)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Audio desired %1, current %2 "
+                                               "min %3 max %4")
+            .arg(audtype)
+            .arg(current_audio)
+            .arg(qctrl.minimum)
+            .arg(qctrl.maximum)
+            );
+
+        ext_ctrl.id = V4L2_CID_MPEG_AUDIO_ENCODING;
+        ext_ctrl.value = audtype;
+        if (ioctl(videofd, VIDIOC_S_EXT_CTRLS, &ext_ctrls) == 0)
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC + QString("Changed audio encoding "
+                                                   "from %1 to %2.")
+                .arg(current_audio)
+                .arg(audtype)
+                );
+        }
+        else
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC + QString("Failed to changed audio "
+                                                   "encoding from %1 to %2."
+                                                   + ENO)
+                .arg(current_audio)
+                .arg(audtype)
+                );
+        }
+
+        return false;
+    }
+
+    return true;
+}
+
+/* m_stable_time is used to designate how long we need to see a stable
+ * resolution reported from the HD-PVR driver, before we consider it a
+ * good lock.  In my testing 2 seconds is safe, while 1 second worked
+ * most of the time.  --jp
+ */
 bool AnalogSignalMonitor::handleHDPVR(int videofd)
 {
     struct v4l2_encoder_cmd command;
     struct pollfd polls;
 
-    if (m_stage == 0)
+    struct v4l2_format vfmt;
+    memset(&vfmt, 0, sizeof(vfmt));
+    vfmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+
+    if ((ioctl(videofd, VIDIOC_G_FMT, &vfmt) == 0) &&
+        vfmt.fmt.pix.width && m_width == vfmt.fmt.pix.width &&
+        VerifyHDPVRaudio(videofd))
     {
-        LOG(VB_RECORD, LOG_INFO, "hd-pvr start encoding");
-        // Tell it to start encoding, then wait for it to actually feed us
-        // some data.
-        memset(&command, 0, sizeof(struct v4l2_encoder_cmd));
-        command.cmd = V4L2_ENC_CMD_START;
-        if (ioctl(videofd, VIDIOC_ENCODER_CMD, &command) == 0)
-            m_stage = 1;
-        else
+        if (!m_timer.isRunning())
         {
-            LOG(VB_GENERAL, LOG_ERR, "Start encoding failed" + ENO);
-            command.cmd = V4L2_ENC_CMD_STOP;
-            ioctl(videofd, VIDIOC_ENCODER_CMD, &command);
+            LOG(VB_RECORD, LOG_ERR, QString("hd-pvr resolution %1 x %2")
+                .arg(vfmt.fmt.pix.width).arg(vfmt.fmt.pix.height));
+            ++m_lock_cnt;
+            m_timer.start();
         }
-    }
-
-    if (m_stage == 1)
-    {
-        LOG(VB_RECORD, LOG_INFO, "hd-pvr wait for data");
-
-        polls.fd      = videofd;
-        polls.events  = POLLIN;
-        polls.revents = 0;
-
-        if (poll(&polls, 1, 1500) > 0)
+        else if (m_timer.elapsed() > m_stable_time)
         {
-            m_stage = 2;
-            QMutexLocker locker(&statusLock);
-            signalStrength.SetValue(25);
-        }
-        else
-        {
-            LOG(VB_RECORD, LOG_INFO, "Poll timed-out.  Resetting");
-            memset(&command, 0, sizeof(struct v4l2_encoder_cmd));
-            command.cmd = V4L2_ENC_CMD_STOP;
-            ioctl(videofd, VIDIOC_ENCODER_CMD, &command);
-            m_stage = 0;
-
-            QMutexLocker locker(&statusLock);
-            signalStrength.SetValue(0);
-        }
-    }
-
-    if (m_stage == 2)
-    {
-        LOG(VB_RECORD, LOG_INFO, "hd-pvr data ready.  Stop encoding");
-
-        command.cmd = V4L2_ENC_CMD_STOP;
-        if (ioctl(videofd, VIDIOC_ENCODER_CMD, &command) == 0)
-            m_stage = 3;
-        else
-        {
-            QMutexLocker locker(&statusLock);
-            signalStrength.SetValue(50);
-        }
-    }
-
-    if (m_stage == 3)
-    {
-        struct v4l2_format vfmt;
-        memset(&vfmt, 0, sizeof(vfmt));
-        vfmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-
-        LOG(VB_RECORD, LOG_INFO, "hd-pvr waiting for valid resolution");
-        if ((ioctl(videofd, VIDIOC_G_FMT, &vfmt) == 0) && vfmt.fmt.pix.width)
-        {
-            LOG(VB_RECORD, LOG_INFO, QString("hd-pvr resolution %1 x %2")
-                    .arg(vfmt.fmt.pix.width).arg(vfmt.fmt.pix.height));
-            m_stage = 4;
+            LOG(VB_RECORD, LOG_ERR, QString("hd-pvr stable at %1 x %2")
+                .arg(vfmt.fmt.pix.width).arg(vfmt.fmt.pix.height));
+            m_timer.stop();
+            return true;
         }
         else
         {
             QMutexLocker locker(&statusLock);
-            signalStrength.SetValue(75);
+            signalStrength.SetValue(60 + m_lock_cnt);
         }
     }
+    else
+    {
+        LOG(VB_RECORD, LOG_ERR, "hd-pvr waiting for valid resolution");
+        m_width = vfmt.fmt.pix.width;
+        m_timer.stop();
+        QMutexLocker locker(&statusLock);
+        signalStrength.SetValue(20 + m_lock_cnt);
+    }
 
-    return (m_stage == 4);
+    return false;
 }
 
 void AnalogSignalMonitor::UpdateValues(void)

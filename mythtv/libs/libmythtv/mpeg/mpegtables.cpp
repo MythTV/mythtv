@@ -3,9 +3,9 @@
 
 #include "splicedescriptors.h"
 #include "atscdescriptors.h"
+#include "mythmiscutil.h" // for xml_indent
 #include "mythlogging.h"
 #include "mpegtables.h"
-#include "mythmiscutil.h" // for xml_indent
 
 const unsigned char DEFAULT_PAT_HEADER[8] =
 {

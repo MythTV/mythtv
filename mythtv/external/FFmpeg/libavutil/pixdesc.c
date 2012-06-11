@@ -220,6 +220,7 @@ const AVPixFmtDescriptor av_pix_fmt_descriptors[PIX_FMT_NB] = {
         .comp = {
             { 0, 0, 1, 0, 7 },        /* Y */
         },
+        .flags = PIX_FMT_PSEUDOPAL,
     },
     [PIX_FMT_MONOWHITE] = {
         .name = "monow",
@@ -563,6 +564,19 @@ const AVPixFmtDescriptor av_pix_fmt_descriptors[PIX_FMT_NB] = {
         .nb_components = 4,
         .log2_chroma_w = 1,
         .log2_chroma_h = 1,
+        .comp = {
+            { 0, 0, 1, 0, 7 },        /* Y */
+            { 1, 0, 1, 0, 7 },        /* U */
+            { 2, 0, 1, 0, 7 },        /* V */
+            { 3, 0, 1, 0, 7 },        /* A */
+        },
+        .flags = PIX_FMT_PLANAR,
+    },
+    [PIX_FMT_YUVA422P] = {
+        .name = "yuva422p",
+        .nb_components = 4,
+        .log2_chroma_w = 1,
+        .log2_chroma_h = 0,
         .comp = {
             { 0, 0, 1, 0, 7 },        /* Y */
             { 1, 0, 1, 0, 7 },        /* U */

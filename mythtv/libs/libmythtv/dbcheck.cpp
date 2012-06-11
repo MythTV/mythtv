@@ -17,6 +17,8 @@ using namespace std;
 #include "compat.h"
 #include "recordingrule.h"
 
+// TODO convert all dates to UTC
+
 #define MINIMUM_DBMS_VERSION 5,0,15
 
 const QString currentDatabaseVersion = MYTH_DATABASE_VERSION;
@@ -2019,6 +2021,192 @@ NULL
         record.Save(false);
 
         if (!UpdateDBVersionNumber("1302", dbver))
+            return false;
+    }
+
+    if (dbver == "1302")
+    {
+        QDateTime loc = QDateTime::currentDateTime();
+        QDateTime utc = loc.toUTC();
+        loc = QDateTime(loc.date(), loc.time(), Qt::UTC);
+        int utc_offset = loc.secsTo(utc) / 60;
+
+        QList<QByteArray> updates_ba;
+
+        // Convert DATE and TIME in record into DATETIME
+        const char *pre_sql[] = {
+            "CREATE TEMPORARY TABLE recordupdate ("
+            "recid INT, starttime DATETIME, endtime DATETIME)",
+            "INSERT INTO recordupdate (recid, starttime, endtime) "
+            "SELECT recordid, "
+            "       CONCAT(startdate, ' ', starttime), "
+            "       CONCAT(enddate, ' ', endtime) FROM record",
+        };
+        for (uint i = 0; i < sizeof(pre_sql)/sizeof(char*); i++)
+            updates_ba.push_back(QByteArray(pre_sql[i]));
+
+        // Convert various DATETIME fields from local time to UTC
+        if (0 != utc_offset)
+        {
+            const char *with_endtime[] = {
+                "program", "recorded", "oldrecorded", "recordupdate",
+            };
+            const char *without_endtime[] = {
+                "programgenres", "programrating", "credits",
+                "jobqueue",
+            };
+            QString order = (utc_offset > 0) ? "-starttime" : "starttime";
+
+            for (uint i = 0; i < sizeof(with_endtime)/sizeof(char*); i++)
+            {
+                updates_ba.push_back(
+                    QString("UPDATE %1 "
+                            "SET starttime = starttime + interval %2 minute, "
+                            "    endtime   = endtime   + interval %3 minute  "
+                            "ORDER BY %4")
+                    .arg(with_endtime[i]).arg(utc_offset).arg(utc_offset)
+                    .arg(order).toLocal8Bit());
+            }
+
+            for (uint i = 0; i < sizeof(without_endtime)/sizeof(char*); i++)
+            {
+                updates_ba.push_back(
+                    QString("UPDATE %1 "
+                            "SET starttime = starttime + interval %2 minute "
+                            "ORDER BY %3")
+                    .arg(without_endtime[i]).arg(utc_offset).arg(order)
+                    .toLocal8Bit());
+            }
+
+            updates_ba.push_back(
+                QString("UPDATE oldprogram "
+                        "SET airdate = airdate + interval %2 minute "
+                        "ORDER BY %3")
+                .arg(utc_offset).arg((utc_offset > 0) ? "-airdate" : "airdate")
+                .toLocal8Bit());
+
+            updates_ba.push_back(
+                QString("UPDATE recorded "
+                        "set progstart = progstart + interval %1 minute, "
+                        "    progend   = progend   + interval %2 minute  ")
+                .arg(utc_offset).arg(utc_offset).toLocal8Bit());
+        }
+
+        // Convert DATETIME back to seperate DATE and TIME in record table
+        const char *post_sql[] = {
+            "UPDATE record, recordupdate "
+            "SET record.startdate = DATE(recordupdate.starttime), "
+            "    record.starttime = TIME(recordupdate.starttime), "
+            "    record.enddate = DATE(recordupdate.endtime), "
+            "    record.endtime = TIME(recordupdate.endtime) "
+            "WHERE recordid = recid",
+            "DROP TABLE recordupdate",
+        };
+
+        for (uint i = 0; i < sizeof(post_sql)/sizeof(char*); i++)
+            updates_ba.push_back(QByteArray(post_sql[i]));
+
+        // Convert update ByteArrays to NULL terminated char**
+        QList<QByteArray>::const_iterator it = updates_ba.begin();
+        vector<const char*> updates;
+        for (; it != updates_ba.end(); ++it)
+            updates.push_back((*it).constData());
+        updates.push_back(NULL);
+
+        // do the actual update
+        if (!performActualUpdate(&updates[0], "1303", dbver))
+            return false;
+    }
+
+    if (dbver == "1303")
+    {
+        QDateTime loc = QDateTime::currentDateTime();
+        QDateTime utc = loc.toUTC();
+        loc = QDateTime(loc.date(), loc.time(), Qt::UTC);
+        int utc_offset = loc.secsTo(utc) / 60;
+
+        QList<QByteArray> updates_ba;
+
+        // Convert various DATETIME fields from local time to UTC
+        if (0 != utc_offset)
+        {
+            const char *with_endtime[] = {
+                "recordedprogram",
+            };
+            const char *without_endtime[] = {
+                "recordedseek", "recordedmarkup", "recordedrating",
+                "recordedcredits", 
+            };
+            QString order = (utc_offset > 0) ? "-starttime" : "starttime";
+
+            for (uint i = 0; i < sizeof(with_endtime)/sizeof(char*); i++)
+            {
+                updates_ba.push_back(
+                    QString("UPDATE %1 "
+                            "SET starttime = starttime + interval %2 minute, "
+                            "    endtime   = endtime   + interval %3 minute  "
+                            "ORDER BY %4")
+                    .arg(with_endtime[i]).arg(utc_offset).arg(utc_offset)
+                    .arg(order).toLocal8Bit());
+            }
+
+            for (uint i = 0; i < sizeof(without_endtime)/sizeof(char*); i++)
+            {
+                updates_ba.push_back(
+                    QString("UPDATE %1 "
+                            "SET starttime = starttime + interval %2 minute "
+                            "ORDER BY %3")
+                    .arg(without_endtime[i]).arg(utc_offset).arg(order)
+                    .toLocal8Bit());
+            }
+        }
+
+        // Convert update ByteArrays to NULL terminated char**
+        QList<QByteArray>::const_iterator it = updates_ba.begin();
+        vector<const char*> updates;
+        for (; it != updates_ba.end(); ++it)
+            updates.push_back((*it).constData());
+        updates.push_back(NULL);
+
+        // do the actual update
+        if (!performActualUpdate(&updates[0], "1304", dbver))
+            return false;
+    }
+
+    if (dbver == "1304")
+    {
+        QDateTime loc = QDateTime::currentDateTime();
+        QDateTime utc = loc.toUTC();
+        loc = QDateTime(loc.date(), loc.time(), Qt::UTC);
+        int utc_offset = loc.secsTo(utc) / 60;
+
+        QList<QByteArray> updates_ba;
+
+        updates_ba.push_back(
+"UPDATE recordfilter SET clause="
+"'HOUR(CONVERT_TZ(program.starttime, ''UTC'', ''SYSTEM'')) >= 19 AND "
+"HOUR(CONVERT_TZ(program.starttime, ''UTC'', ''SYSTEM'')) < 22' "
+"WHERE filterid=3");
+
+        updates_ba.push_back(QString(
+"UPDATE record SET "
+"findday = DAYOFWEEK(ADDTIME('2012-06-02 00:00:00', findtime) "
+"    + INTERVAL %1 MINUTE + INTERVAL findday DAY) "
+"WHERE findday > 0").arg(utc_offset).toLocal8Bit());
+
+        updates_ba.push_back(QString(
+"UPDATE record SET "
+"findtime = TIME(ADDTIME('2012-06-02 00:00:00', findtime) "
+"    + INTERVAL %1 MINUTE)").arg(utc_offset).toLocal8Bit());
+
+        // Convert update ByteArrays to NULL terminated char**
+        QList<QByteArray>::const_iterator it = updates_ba.begin();
+        vector<const char*> updates;
+        for (; it != updates_ba.end(); ++it)
+            updates.push_back((*it).constData());
+        updates.push_back(NULL);
+
+        if (!performActualUpdate(&updates[0], "1305", dbver))
             return false;
     }
 

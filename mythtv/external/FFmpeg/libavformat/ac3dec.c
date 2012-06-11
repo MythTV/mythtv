@@ -37,6 +37,8 @@ static int ac3_eac3_probe(AVProbeData *p, enum CodecID expected_codec_id)
     end = buf + p->buf_size;
 
     for(; buf < end; buf++) {
+        if(buf > p->buf && (buf[0] != 0x0B || buf[1] != 0x77) )
+            continue;
         buf2 = buf;
 
         for(frames = 0; buf2 < end; frames++) {
@@ -96,8 +98,8 @@ AVInputFormat ff_eac3_demuxer = {
     .read_probe     = eac3_probe,
     .read_header    = ff_raw_audio_read_header,
     .read_packet    = ff_raw_read_partial_packet,
-    .flags= AVFMT_GENERIC_INDEX,
-    .extensions = "eac3",
+    .flags          = AVFMT_GENERIC_INDEX,
+    .extensions     = "eac3",
     .raw_codec_id   = CODEC_ID_EAC3,
 };
 #endif

@@ -179,9 +179,9 @@ void FillRecRuleInfo( DTC::RecRule  *pRecRule,
     pRecRule->setEpisode        (  pRule->m_episode                );
     pRecRule->setCategory       (  pRule->m_category               );
     pRecRule->setStartTime      (  QDateTime(pRule->m_startdate,
-                                             pRule->m_starttime)   );
+                                             pRule->m_starttime, Qt::UTC));
     pRecRule->setEndTime        (  QDateTime(pRule->m_enddate,
-                                             pRule->m_endtime)     );
+                                             pRule->m_endtime, Qt::UTC));
     pRecRule->setSeriesId       (  pRule->m_seriesid               );
     pRecRule->setProgramId      (  pRule->m_programid              );
     pRecRule->setInetref        (  pRule->m_inetref                );
@@ -283,8 +283,12 @@ void FillVideoMetadataInfo (
     pVideoMetadataInfo->setInetref(pMetadata->GetInetRef());
     pVideoMetadataInfo->setCollectionref(pMetadata->GetCollectionRef());
     pVideoMetadataInfo->setHomePage(pMetadata->GetHomepage());
-    pVideoMetadataInfo->setReleaseDate(QDateTime(pMetadata->GetReleaseDate()));
-    pVideoMetadataInfo->setAddDate(QDateTime(pMetadata->GetInsertdate()));
+    pVideoMetadataInfo->setReleaseDate(
+        QDateTime(pMetadata->GetReleaseDate(),
+                  QTime(0,0),Qt::LocalTime).toUTC());
+    pVideoMetadataInfo->setAddDate(
+        QDateTime(pMetadata->GetInsertdate(),
+                  QTime(0,0),Qt::LocalTime).toUTC());
     pVideoMetadataInfo->setUserRating(pMetadata->GetUserRating());
     pVideoMetadataInfo->setLength(pMetadata->GetLength());
     pVideoMetadataInfo->setPlayCount(pMetadata->GetPlayCount());

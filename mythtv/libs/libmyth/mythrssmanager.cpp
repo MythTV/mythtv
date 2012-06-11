@@ -3,6 +3,7 @@
 #include <QFile>
 #include <QDir>
 
+#include "mythdate.h"
 #include "mythdirs.h"
 #include "mythcontext.h"
 #include "mythlogging.h"
@@ -200,7 +201,7 @@ unsigned int RSSSite::timeSinceLastUpdate(void) const
 {
     QMutexLocker locker(&m_lock);
 
-    QDateTime curTime(QDateTime::currentDateTime());
+    QDateTime curTime(MythDate::current());
     unsigned int min = m_updated.secsTo(curTime)/60;
     return min;
 }

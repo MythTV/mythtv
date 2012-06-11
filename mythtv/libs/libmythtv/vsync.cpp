@@ -155,7 +155,7 @@ int VideoSync::CalcDelay()
     int ret_val = m_nexttrigger - now;
 
 #if 0
-    LOG(VB_GENERAL, LOG_DEBUG, QString("delay %1").arg(ret_val);
+    LOG(VB_GENERAL, LOG_DEBUG, QString("delay %1").arg(ret_val));
 #endif
 
     if (ret_val > m_frame_interval * 4)

@@ -17,7 +17,7 @@ using namespace std;
 #include "premieretables.h"
 #include "dishdescriptors.h"
 #include "premieredescriptors.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 #include "programdata.h"
 #include "programinfo.h" // for subtitle types and audio and video properties
 #include "compat.h" // for gmtime_r on windows.
@@ -30,28 +30,15 @@ static uint get_chan_id_from_db(uint sourceid,
 static uint get_chan_id_from_db(uint sourceid,  uint serviceid,
                                 uint networkid, uint transportid);
 static void init_fixup(QMap<uint64_t,uint> &fix);
-static int calc_eit_utc_offset(void);
 
 #define LOC QString("EITHelper: ")
 
 EITHelper::EITHelper() :
     eitfixup(new EITFixUp()),
-    gps_offset(-1 * GPS_LEAP_SECONDS),          utc_offset(0),
+    gps_offset(-1 * GPS_LEAP_SECONDS),
     sourceid(0)
 {
     init_fixup(fixup);
-
-    utc_offset = calc_eit_utc_offset();
-
-    int sign    = utc_offset < 0 ? -1 : +1;
-    int diff    = abs(utc_offset);
-    int hours   = diff / (60 * 60);
-    int minutes = ((diff) / 60) % 60;
-    int seconds = diff % 60;
-    LOG(VB_EIT, LOG_INFO, LOC + QString("localtime offset %1%2:%3%4:%5%6 ")
-            .arg((sign < 0) ? "-" : "")
-            .arg(hours).arg(minutes/10).arg(minutes%10)
-            .arg(seconds/10).arg(seconds%10));
 }
 
 EITHelper::~EITHelper()
@@ -472,7 +459,7 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
             }
         }
 
-        QDateTime starttime = MythUTCToLocal(eit->StartTimeUTC(i));
+        QDateTime starttime = eit->StartTimeUTC(i);
         // fix starttime only if the duration is a multiple of a minute
         if (!(eit->DurationInSeconds(i) % 60))
             EITFixUp::TimeFix(starttime);
@@ -546,7 +533,7 @@ void EITHelper::AddEIT(const PremiereContentInformationTable *cit)
     uint version   = cit->Version();
     uint contentid = cit->ContentID();
     // fake endtime
-    uint endtime   = QDateTime::currentDateTime().addDays(1).toTime_t();
+    uint endtime   = MythDate::current().addDays(1).toTime_t();
 
     // Find Transmissions
     desc_list_t transmissions =
@@ -623,22 +610,8 @@ void EITHelper::CompleteEvent(uint atsc_major, uint atsc_minor,
     if (!chanid)
         return;
 
-    QDateTime starttime;
-    time_t off = GPS_EPOCH + gps_offset + utc_offset;
-    time_t tmp = event.start_time + off;
-    tm result;
-
-    if (gmtime_r(&tmp, &result))
-    {
-        starttime.setDate(QDate(result.tm_year + 1900,
-                                result.tm_mon + 1,
-                                result.tm_mday));
-        starttime.setTime(QTime(result.tm_hour, result.tm_min, result.tm_sec));
-    }
-    else
-    {
-        starttime.setTime_t(tmp - utc_offset);
-    }
+    QDateTime starttime = MythDate::fromTime_t(
+        event.start_time + GPS_EPOCH + gps_offset);
 
     // fix starttime only if the duration is a multiple of a minute
     if (!(event.length % 60))
@@ -990,20 +963,4 @@ static void init_fixup(QMap<uint64_t,uint> &fix)
         fix[ 1094LL << 32 | 1 << 16 | 17028 ] = // NT1
         fix[ 1100LL << 32 | 1 << 16 |  8710 ] = // NRJ 12
         EITFixUp::kEFixForceISO8859_15;
-}
-
-static int calc_eit_utc_offset(void)
-{
-    QString config_offset = gCoreContext->GetSetting("EITTimeOffset", "Auto");
-
-    if (config_offset == "Auto")
-        return calc_utc_offset();
-
-    if (config_offset == "None")
-        return 0;
-
-    int sign    = config_offset.left(1) == "-" ? -1 : +1;
-    int hours   = config_offset.mid(1,2).toInt();
-    int minutes = config_offset.right(2).toInt();
-    return sign * (hours * 60 * 60) + (minutes * 60);
 }

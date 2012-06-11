@@ -182,7 +182,7 @@ bool PreviewGeneratorQueue::event(QEvent *e)
                 (*it).lastBlockTime =
                     max(m_minBlockSeconds, (*it).lastBlockTime * 2);
                 (*it).blockRetryUntil =
-                    QDateTime::currentDateTime().addSecs((*it).lastBlockTime);
+                    MythDate::current().addSecs((*it).lastBlockTime);
             }
 
             QStringList list;
@@ -280,7 +280,7 @@ QString PreviewGeneratorQueue::GeneratePreviewImage(
         QDateTime cmp_ts;
         if (bookmark_ts.isValid())
             cmp_ts = bookmark_ts;
-        else if (QDateTime::currentDateTime() >= pginfo.GetRecordingEndTime())
+        else if (MythDate::current() >= pginfo.GetRecordingEndTime())
             cmp_ts = pginfo.GetLastModifiedTime();
         else
             cmp_ts = pginfo.GetRecordingStartTime();
@@ -336,7 +336,7 @@ QString PreviewGeneratorQueue::GeneratePreviewImage(
                     .arg(previewLastModified.toString(Qt::ISODate))
                     .arg(bookmark_ts.toString(Qt::ISODate))
                     .arg(alttext)
-                    .arg(pginfo.GetLastModifiedTime(ISODate)) +
+                    .arg(pginfo.GetLastModifiedTime(MythDate::ISODate)) +
                 QString("Title: %1\n\t\t\t")
                     .arg(pginfo.toString(ProgramInfo::kTitleSubtitle)) +
                 QString("File  '%1' \n\t\t\tCache '%2'")
@@ -507,7 +507,7 @@ bool PreviewGeneratorQueue::IsGeneratingPreview(const QString &key) const
         return false;
 
     if ((*it).blockRetryUntil.isValid())
-        return QDateTime::currentDateTime() < (*it).blockRetryUntil;
+        return MythDate::current() < (*it).blockRetryUntil;
 
     return (*it).gen;
 }
@@ -532,5 +532,5 @@ void PreviewGeneratorQueue::ClearPreviewGeneratorAttempts(const QString &key)
     m_previewMap[key].attempts = 0;
     m_previewMap[key].lastBlockTime = 0;
     m_previewMap[key].blockRetryUntil =
-        QDateTime::currentDateTime().addSecs(-60);
+        MythDate::current().addSecs(-60);
 }

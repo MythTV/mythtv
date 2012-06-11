@@ -15,6 +15,7 @@
 #include "mythevent.h"
 #include "remoteutil.h"
 #include "mythlogging.h"
+#include "mythdate.h"
 
 QEvent::Type VideoScanChanges::kEventType =
     (QEvent::Type) QEvent::registerEventType();
@@ -328,24 +329,25 @@ bool VideoScannerThread::updateDB(const FileCheckList &add, const PurgeList &rem
             }
             if (id == -1)
             {
-                VideoMetadata newFile(p->first, hash,
-                                 VIDEO_TRAILER_DEFAULT,
-                                 VIDEO_COVERFILE_DEFAULT,
-                                 VIDEO_SCREENSHOT_DEFAULT,
-                                 VIDEO_BANNER_DEFAULT,
-                                 VIDEO_FANART_DEFAULT,
-                                 VideoMetadata::FilenameToMeta(p->first, 1),
-                                 VideoMetadata::FilenameToMeta(p->first, 4),
-                                 QString(),
-                                 VIDEO_YEAR_DEFAULT,
-                                 QDate::fromString("0000-00-00","YYYY-MM-DD"),
-                                 VIDEO_INETREF_DEFAULT, 0, QString(),
-                                 VIDEO_DIRECTOR_DEFAULT, QString(), VIDEO_PLOT_DEFAULT,
-                                 0.0, VIDEO_RATING_DEFAULT, 0, 0,
-                                 VideoMetadata::FilenameToMeta(p->first, 2).toInt(),
-                                 VideoMetadata::FilenameToMeta(p->first, 3).toInt(),
-                                 QDate::currentDate(),
-                                 0, ParentalLevel::plLowest);
+                VideoMetadata newFile(
+                    p->first, hash,
+                    VIDEO_TRAILER_DEFAULT,
+                    VIDEO_COVERFILE_DEFAULT,
+                    VIDEO_SCREENSHOT_DEFAULT,
+                    VIDEO_BANNER_DEFAULT,
+                    VIDEO_FANART_DEFAULT,
+                    VideoMetadata::FilenameToMeta(p->first, 1),
+                    VideoMetadata::FilenameToMeta(p->first, 4),
+                    QString(),
+                    VIDEO_YEAR_DEFAULT,
+                    QDate::fromString("0000-00-00","YYYY-MM-DD"),
+                    VIDEO_INETREF_DEFAULT, 0, QString(),
+                    VIDEO_DIRECTOR_DEFAULT, QString(), VIDEO_PLOT_DEFAULT,
+                    0.0, VIDEO_RATING_DEFAULT, 0, 0,
+                    VideoMetadata::FilenameToMeta(p->first, 2).toInt(),
+                    VideoMetadata::FilenameToMeta(p->first, 3).toInt(),
+                    MythDate::current().date(),
+                    0, ParentalLevel::plLowest);
 
                 LOG(VB_GENERAL, LOG_INFO, QString("Adding : %1 : %2 : %3")
                         .arg(newFile.GetHost()).arg(newFile.GetFilename())
@@ -468,12 +470,10 @@ void VideoScanner::finishedScan()
     QStringList failedHosts = m_scanThread->GetOfflineSGHosts();
     if (failedHosts.size() > 0)
     {
-        QString msg = tr("Failed to Scan SG Video Hosts") + ":\n\n";
-
-        for (int i = 0; i < failedHosts.size(); ++i)
-            msg += " " + failedHosts.at(i);
-
-        msg += "\n" + tr("If they no longer exist please remove them") + "\n\n";
+        QString hosts = failedHosts.join(" ");
+        QString msg = tr("Failed to Scan SG Video Hosts:\n\n%1\n\n"
+                         "If they no longer exist please remove them")
+                        .arg(hosts);
 
         ShowOkPopup(msg);
     }

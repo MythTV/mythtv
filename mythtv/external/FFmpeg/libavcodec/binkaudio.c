@@ -91,9 +91,9 @@ static av_cold int decode_init(AVCodecContext *avctx)
         frame_len_bits = 11;
     }
 
-    if (avctx->channels > MAX_CHANNELS) {
-        av_log(avctx, AV_LOG_ERROR, "too many channels: %d\n", avctx->channels);
-        return -1;
+    if (avctx->channels < 1 || avctx->channels > MAX_CHANNELS) {
+        av_log(avctx, AV_LOG_ERROR, "invalid number of channels: %d\n", avctx->channels);
+        return AVERROR_INVALIDDATA;
     }
 
     s->version_b = avctx->extradata && avctx->extradata[3] == 'b';
@@ -367,7 +367,7 @@ AVCodec ff_binkaudio_rdft_decoder = {
     .close          = decode_end,
     .decode         = decode_frame,
     .capabilities   = CODEC_CAP_DELAY | CODEC_CAP_DR1,
-    .long_name = NULL_IF_CONFIG_SMALL("Bink Audio (RDFT)")
+    .long_name      = NULL_IF_CONFIG_SMALL("Bink Audio (RDFT)")
 };
 
 AVCodec ff_binkaudio_dct_decoder = {
@@ -379,5 +379,5 @@ AVCodec ff_binkaudio_dct_decoder = {
     .close          = decode_end,
     .decode         = decode_frame,
     .capabilities   = CODEC_CAP_DELAY | CODEC_CAP_DR1,
-    .long_name = NULL_IF_CONFIG_SMALL("Bink Audio (DCT)")
+    .long_name      = NULL_IF_CONFIG_SMALL("Bink Audio (DCT)")
 };

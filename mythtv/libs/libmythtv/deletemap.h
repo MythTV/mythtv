@@ -1,6 +1,8 @@
 #ifndef DELETEMAP_H
 #define DELETEMAP_H
 
+#include <QCoreApplication>
+
 #include "osd.h"
 #include "programinfo.h"
 #include "playercontext.h"
@@ -18,6 +20,7 @@ typedef struct DeleteMapUndoEntry
 
 class MTV_PUBLIC DeleteMap
 {
+    Q_DECLARE_TR_FUNCTIONS(DeleteMap)
   public:
     DeleteMap(): m_editing(false),
                  m_nextCutStartIsValid(false),

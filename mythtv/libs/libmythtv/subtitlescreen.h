@@ -39,6 +39,9 @@ class SubtitleScreen : public MythScreenType
     void ExpireSubtitles(void);
     void DisplayDVDButton(AVSubtitle* dvdButton, QRect &buttonPos);
 
+    void SetZoom(int percent);
+    int GetZoom(void);
+
     QSize CalcTextSize(const QString &text,
                        const CC708CharacterAttribute &format,
                        bool teletext,
@@ -62,6 +65,10 @@ class SubtitleScreen : public MythScreenType
   private:
     void OptimiseDisplayedArea(void);
     void DisplayAVSubtitles(void);
+    int  DisplayScaledAVSubtitles(const AVSubtitleRect *rect, QRect &bbox,
+                                  bool top, QRect &display, int forced,
+                                  QString imagename,
+                                  long long displayuntil, long long late);
     void DisplayTextSubtitles(void);
     void DisplayRawTextSubtitles(void);
     void DrawTextSubtitles(QStringList &wrappedsubs, uint64_t start,
@@ -83,6 +90,7 @@ class SubtitleScreen : public MythScreenType
     QRegExp            m_removeHTML;
     int                m_subtitleType;
     QHash<MythUIType*, long long> m_expireTimes;
+    QHash<MythUIType*, MythImage*> m_avsubCache;
     int                m_fontSize;
     int                m_textFontZoom; // valid for 708 & text subs
     int                m_textFontZoomPrev;

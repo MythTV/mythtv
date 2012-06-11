@@ -1,4 +1,7 @@
 /*
+ * Copyright 2010 S.N. Hemanth Meenakshisundaram <smeenaks ucsd edu>
+ * Copyright 2010 Stefano Sabatini <stefano.sabatini-lala poste it>
+ *
  * This file is part of FFmpeg.
  *
  * FFmpeg is free software; you can redistribute it and/or
@@ -24,6 +27,7 @@
 #include "libavutil/audioconvert.h"
 #include "libavutil/opt.h"
 
+#include "audio.h"
 #include "avfilter.h"
 #include "internal.h"
 
@@ -108,13 +112,13 @@ static int request_frame(AVFilterLink *outlink)
     AVFilterBufferRef *samplesref;
 
     samplesref =
-        avfilter_get_audio_buffer(outlink, AV_PERM_WRITE, null->nb_samples);
+        ff_get_audio_buffer(outlink, AV_PERM_WRITE, null->nb_samples);
     samplesref->pts = null->pts;
     samplesref->pos = -1;
     samplesref->audio->channel_layout = null->channel_layout;
     samplesref->audio->sample_rate = outlink->sample_rate;
 
-    avfilter_filter_samples(outlink, avfilter_ref_buffer(samplesref, ~0));
+    ff_filter_samples(outlink, avfilter_ref_buffer(samplesref, ~0));
     avfilter_unref_buffer(samplesref);
 
     null->pts += null->nb_samples;

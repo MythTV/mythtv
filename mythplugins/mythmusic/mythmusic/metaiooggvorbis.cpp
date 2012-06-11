@@ -136,8 +136,8 @@ Metadata* MetaIOOggVorbis::read(const QString &filename)
 
     if (metadata->Length() <= 0)
         metadata->setLength(getTrackLength(oggfile));
-    else
-        delete oggfile;
+
+    delete oggfile;
 
     return metadata;
 }
