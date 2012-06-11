@@ -44,3 +44,6 @@ inc.path  = $${PREFIX}/include/
 
 INSTALLS += inc
 
+mingw {
+    QMAKE_LIBDIR += $$[BUILDLIBDIR]
+}

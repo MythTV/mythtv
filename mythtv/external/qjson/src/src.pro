@@ -89,3 +89,8 @@ cppinc.files += $${PUBLIC_CPPHEADERS}
 cppinc.path  += $${PREFIX}/include/QJson/
 
 INSTALLS += cppinc
+
+mingw {
+    QMAKE_LIBDIR += $$[BUILDLIBDIR]
+}
+
