@@ -53,6 +53,7 @@ isEmpty(TARGET_OS) : win32 {
     # win32-packager.pl builds Qt under DOS, but MythTV is built in MinGW.
     # This corrects the moc tool path from a DOS-style to a unix style:
     QMAKE_MOC = $$[QT_INSTALL_BINS]/moc
+    QMAKE_LIBDIR += -L$${BUILDLIBDIR}
 }
 
 # if CYGWIN compile, set up flag in CONFIG
