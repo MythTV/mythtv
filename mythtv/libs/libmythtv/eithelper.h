@@ -5,6 +5,9 @@
 
 #include <stdint.h>
 
+#include <vector>
+using namespace std;
+
 // Qt includes
 #include <QMap>
 #include <QMutex>
@@ -69,7 +72,7 @@ class EITHelper
     void SetGPSOffset(uint _gps_offset) { gps_offset = 0 - _gps_offset; }
     void SetFixup(uint atsc_major, uint atsc_minor, uint eitfixup);
     void SetLanguagePreferences(const QStringList &langPref);
-    void SetSourceID(uint _sourceid);
+    void SetCardID(uint _cardid);
 
 #ifdef USING_BACKEND
     void AddEIT(uint atsc_major, uint atsc_minor,
@@ -90,8 +93,8 @@ class EITHelper
     void WriteEITCache(void);
 
   private:
-    uint GetChanID(uint atsc_major, uint atsc_minor);
-    uint GetChanID(uint serviceid, uint networkid, uint transportid);
+    vector<uint> GetChanIDs(uint atsc_major, uint atsc_minor);
+    vector<uint> GetChanIDs(uint serviceid, uint networkid, uint transportid);
 
     void CompleteEvent(uint atsc_major, uint atsc_minor,
                        const ATSCEvent &event,
@@ -106,7 +109,7 @@ class EITHelper
 
     int                     gps_offset;
     int                     utc_offset;
-    uint                    sourceid;
+    uint                    cardid;
     QMap<uint64_t,uint>     fixup;
     ATSCSRCToEvents         incomplete_events;
     ATSCSRCToETTs           unmatched_etts;

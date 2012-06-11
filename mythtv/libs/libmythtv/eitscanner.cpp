@@ -197,11 +197,10 @@ void EITScanner::StartPassiveScan(ChannelBase *_channel,
 {
     QMutexLocker locker(&lock);
 
-    uint sourceid = _channel->GetCurrentSourceID();
     eitSource     = _eitSource;
     channel       = _channel;
 
-    eitHelper->SetSourceID(sourceid);
+    eitHelper->SetCardID(cardnum);
     eitSource->SetEITHelper(eitHelper);
     eitSource->SetEITRate(1.0f);
 
@@ -223,12 +222,13 @@ void EITScanner::StopPassiveScan(void)
     channel = NULL;
 
     eitHelper->WriteEITCache();
-    eitHelper->SetSourceID(0);
+    eitHelper->SetCardID(0);
 }
 
 void EITScanner::StartActiveScan(TVRec *_rec, uint max_seconds_per_source)
 {
     rec = _rec;
+    eitHelper->SetCardID(cardnum);
 
     if (!activeScanChannels.size())
     {
@@ -241,7 +241,7 @@ void EITScanner::StartActiveScan(TVRec *_rec, uint max_seconds_per_source)
             "      cardinput.cardinputid = videosourcemap.cardinputid AND "
             "      videosourcemap.sourceid = videosource.sourceid     AND "
             "      videosource.sourceid = channel.sourceid            AND "
-       		"      channel.mplexid        IS NOT NULL                 AND "
+            "      channel.mplexid        IS NOT NULL                 AND "
       	    "      useonairguide        = 1                           AND "
             "      useeit               = 1                           AND "
             "      channum             != ''                          AND "
@@ -249,7 +249,7 @@ void EITScanner::StartActiveScan(TVRec *_rec, uint max_seconds_per_source)
             "      videosourcemap.type in ('main','eit') "
             "GROUP BY mplexid "
             "ORDER BY mplexid, atsc_major_chan, atsc_minor_chan ");
-        query.bindValue(":CARDID", rec->GetCaptureCardNum());
+        query.bindValue(":CARDID", cardnum);
 
         if (!query.exec() || !query.isActive())
         {
@@ -300,5 +300,6 @@ void EITScanner::StopActiveScan(void)
     while (!activeScan && !activeScanStopped)
         activeScanCond.wait(&lock, 100);
 
+    eitHelper->SetCardID(0);
     rec = NULL;
 }

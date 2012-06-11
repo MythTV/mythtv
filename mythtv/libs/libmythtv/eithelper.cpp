@@ -25,10 +25,6 @@ using namespace std;
 const uint EITHelper::kChunkSize = 20;
 EITCache *EITHelper::eitcache = new EITCache();
 
-static uint get_chan_id_from_db(uint sourceid,
-                                uint atscmajor, uint atscminor);
-static uint get_chan_id_from_db(uint sourceid,  uint serviceid,
-                                uint networkid, uint transportid);
 static void init_fixup(QMap<uint64_t,uint> &fix);
 static int calc_eit_utc_offset(void);
 
@@ -36,8 +32,7 @@ static int calc_eit_utc_offset(void);
 
 EITHelper::EITHelper() :
     eitfixup(new EITFixUp()),
-    gps_offset(-1 * GPS_LEAP_SECONDS),          utc_offset(0),
-    sourceid(0)
+    gps_offset(-1 * GPS_LEAP_SECONDS),          utc_offset(0)
 {
     init_fixup(fixup);
 
@@ -140,10 +135,10 @@ void EITHelper::SetLanguagePreferences(const QStringList &langPref)
     }
 }
 
-void EITHelper::SetSourceID(uint _sourceid)
+void EITHelper::SetCardID(uint _cardid)
 {
     QMutexLocker locker(&eitList_lock);
-    sourceid = _sourceid;
+    cardid = _cardid;
 }
 
 void EITHelper::AddEIT(uint atsc_major, uint atsc_minor,
@@ -308,187 +303,192 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
                   (uint64_t)eit->ServiceID());
     fix |= EITFixUp::kFixGenericDVB;
 
-    uint chanid = GetChanID(eit->ServiceID(), eit->OriginalNetworkID(),
-                            eit->TSID());
-    if (!chanid)
-        return;
+    vector<uint> chanids = GetChanIDs(eit->ServiceID(), eit->OriginalNetworkID(), eit->TSID());
 
-    uint tableid   = eit->TableID();
-    uint version   = eit->Version();
-    for (uint i = 0; i < eit->EventCount(); i++)
+    for (uint i = 0; i < chanids.size(); i++)
     {
-        // Skip event if we have already processed it before...
-        if (!eitcache->IsNewEIT(chanid, tableid, version, eit->EventID(i),
-                              eit->EndTimeUnixUTC(i)))
-        {
+        uint chanid = chanids[i];
+
+        if (!chanid)
             continue;
-        }
 
-        QString title         = QString("");
-        QString subtitle      = QString("");
-        QString description   = QString("");
-        QString category      = QString("");
-        uint category_type = kCategoryNone;
-        unsigned char subtitle_type=0, audio_props=0, video_props=0;
-
-        // Parse descriptors
-        desc_list_t list = MPEGDescriptor::Parse(
-            eit->Descriptors(i), eit->DescriptorsLength(i));
-
-        const unsigned char *dish_event_name = NULL;
-        if (EITFixUp::kFixDish & fix)
+        uint tableid   = eit->TableID();
+        uint version   = eit->Version();
+        for (uint i = 0; i < eit->EventCount(); i++)
         {
-            dish_event_name = MPEGDescriptor::Find(
-                    list, PrivateDescriptorID::dish_event_name);
-        }
-
-        if (dish_event_name)
-        {
-            DishEventNameDescriptor dend(dish_event_name);
-            if (dend.HasName())
-                title = dend.Name(descCompression);
-
-            const unsigned char *dish_event_description =
-                MPEGDescriptor::Find(
-                    list, PrivateDescriptorID::dish_event_description);
-            if (dish_event_description)
+            // Skip event if we have already processed it before...
+            if (!eitcache->IsNewEIT(chanid, tableid, version, eit->EventID(i),
+                                  eit->EndTimeUnixUTC(i)))
             {
-                DishEventDescriptionDescriptor dedd(dish_event_description);
-                if (dedd.HasDescription())
+                continue;
+            }
+
+            QString title         = QString("");
+            QString subtitle      = QString("");
+            QString description   = QString("");
+            QString category      = QString("");
+            uint category_type = kCategoryNone;
+            unsigned char subtitle_type=0, audio_props=0, video_props=0;
+
+            // Parse descriptors
+            desc_list_t list = MPEGDescriptor::Parse(
+                eit->Descriptors(i), eit->DescriptorsLength(i));
+
+            const unsigned char *dish_event_name = NULL;
+            if (EITFixUp::kFixDish & fix)
+            {
+                dish_event_name = MPEGDescriptor::Find(
+                        list, PrivateDescriptorID::dish_event_name);
+            }
+
+            if (dish_event_name)
+            {
+                DishEventNameDescriptor dend(dish_event_name);
+                if (dend.HasName())
+                    title = dend.Name(descCompression);
+
+                const unsigned char *dish_event_description =
+                    MPEGDescriptor::Find(
+                        list, PrivateDescriptorID::dish_event_description);
+                if (dish_event_description)
+                {
+                    DishEventDescriptionDescriptor dedd(dish_event_description);
+                    if (dedd.HasDescription())
                     description = dedd.Description(descCompression);
-            }
-        }
-        else
-        {
-            parse_dvb_event_descriptors(list, fix, languagePreferences,
-                                        title, subtitle, description);
-        }
-
-        parse_dvb_component_descriptors(list, subtitle_type, audio_props,
-                                        video_props);
-
-        QString programId = QString("");
-        QString seriesId  = QString("");
-        QString rating    = QString("");
-        QString rating_system = QString("");
-        QString advisory = QString("");
-        float stars = 0.0;
-        QDate originalairdate;
-
-        if (EITFixUp::kFixDish & fix)
-        {
-            const unsigned char *mpaa_data = MPEGDescriptor::Find(
-                list, PrivateDescriptorID::dish_event_mpaa);
-            if (mpaa_data)
-            {
-                DishEventMPAADescriptor mpaa(mpaa_data);
-                stars = mpaa.stars();
-
-                if (stars) // Only movies for now
-                {
-                    rating = mpaa.rating();
-                    rating_system = "MPAA";
-                    advisory = mpaa.advisory();
                 }
-            }
-
-            if (!stars) // Not MPAA rated, check VCHIP
-            {
-                const unsigned char *vchip_data = MPEGDescriptor::Find(
-                    list, PrivateDescriptorID::dish_event_vchip);
-                if (vchip_data)
-                {
-                    DishEventVCHIPDescriptor vchip(vchip_data);
-                    rating = vchip.rating();
-                    rating_system = "VCHIP";
-                    advisory = vchip.advisory();
-                }
-            }
-
-            if (!advisory.isEmpty() && !rating.isEmpty())
-                rating += ", " + advisory;
-            else if (!advisory.isEmpty())
-            {
-                rating = advisory;
-                rating_system = "advisory";
-            }
-
-            const unsigned char *tags_data = MPEGDescriptor::Find(
-                list, PrivateDescriptorID::dish_event_tags);
-            if (tags_data)
-            {
-                DishEventTagsDescriptor tags(tags_data);
-                seriesId  = tags.seriesid();
-                programId = tags.programid();
-                originalairdate = tags.originalairdate(); // future use
-
-                if (programId.startsWith("MV") || programId.startsWith("SP"))
-                    seriesId = "";
-            }
-
-            const unsigned char *properties_data = MPEGDescriptor::Find(
-                list, PrivateDescriptorID::dish_event_properties);
-            if (properties_data)
-            {
-                DishEventPropertiesDescriptor properties(properties_data);
-                subtitle_type |= properties.SubtitleProperties(descCompression);
-                audio_props   |= properties.AudioProperties(descCompression);
-            }
-        }
-
-        const unsigned char *content_data =
-            MPEGDescriptor::Find(list, DescriptorID::content);
-        if (content_data)
-        {
-            if ((EITFixUp::kFixDish & fix) || (EITFixUp::kFixBell & fix))
-            {
-                DishContentDescriptor content(content_data);
-                category_type = content.GetTheme();
-                if (EITFixUp::kFixDish & fix)
-                    category  = content.GetCategory();
             }
             else
             {
-                ContentDescriptor content(content_data);
-                category      = content.GetDescription(0);
-                category_type = content.GetMythCategory(0);
+                parse_dvb_event_descriptors(list, fix, languagePreferences,
+                                            title, subtitle, description);
             }
-        }
 
-        desc_list_t contentIds =
-            MPEGDescriptor::FindAll(list, DescriptorID::dvb_content_identifier);
-        for (uint j = 0; j < contentIds.size(); j++)
-        {
-            DVBContentIdentifierDescriptor desc(contentIds[j]);
-            if (desc.ContentEncoding() == 0)
+            parse_dvb_component_descriptors(list, subtitle_type, audio_props,
+                                            video_props);
+
+            QString programId = QString("");
+            QString seriesId  = QString("");
+            QString rating    = QString("");
+            QString rating_system = QString("");
+            QString advisory = QString("");
+            float stars = 0.0;
+            QDate originalairdate;
+
+            if (EITFixUp::kFixDish & fix)
             {
-                // The CRID is a URI.  It could contain UTF8 sequences encoded
-                // as %XX but there's no advantage in decoding them.
-                // The BBC currently uses private types 0x31 and 0x32.
-                if (desc.ContentType() == 0x01 || desc.ContentType() == 0x31)
-                    programId = desc.ContentId();
-                else if (desc.ContentType() == 0x02 || desc.ContentType() == 0x32)
-                    seriesId = desc.ContentId();
+                const unsigned char *mpaa_data = MPEGDescriptor::Find(
+                    list, PrivateDescriptorID::dish_event_mpaa);
+                if (mpaa_data)
+                {
+                    DishEventMPAADescriptor mpaa(mpaa_data);
+                    stars = mpaa.stars();
+
+                    if (stars) // Only movies for now
+                    {
+                        rating = mpaa.rating();
+                        rating_system = "MPAA";
+                        advisory = mpaa.advisory();
+                    }
+                }
+
+                if (!stars) // Not MPAA rated, check VCHIP
+                {
+                    const unsigned char *vchip_data = MPEGDescriptor::Find(
+                        list, PrivateDescriptorID::dish_event_vchip);
+                    if (vchip_data)
+                    {
+                        DishEventVCHIPDescriptor vchip(vchip_data);
+                        rating = vchip.rating();
+                        rating_system = "VCHIP";
+                        advisory = vchip.advisory();
+                    }
+                }
+
+                if (!advisory.isEmpty() && !rating.isEmpty())
+                    rating += ", " + advisory;
+                else if (!advisory.isEmpty())
+                {
+                    rating = advisory;
+                    rating_system = "advisory";
+                }
+
+                const unsigned char *tags_data = MPEGDescriptor::Find(
+                    list, PrivateDescriptorID::dish_event_tags);
+                if (tags_data)
+                {
+                    DishEventTagsDescriptor tags(tags_data);
+                    seriesId  = tags.seriesid();
+                    programId = tags.programid();
+                    originalairdate = tags.originalairdate(); // future use
+
+                    if (programId.startsWith("MV") || programId.startsWith("SP"))
+                        seriesId = "";
+                }
+
+                const unsigned char *properties_data = MPEGDescriptor::Find(
+                    list, PrivateDescriptorID::dish_event_properties);
+                if (properties_data)
+                {
+                    DishEventPropertiesDescriptor properties(properties_data);
+                    subtitle_type |= properties.SubtitleProperties(descCompression);
+                    audio_props   |= properties.AudioProperties(descCompression);
+                }
             }
+
+            const unsigned char *content_data =
+                MPEGDescriptor::Find(list, DescriptorID::content);
+            if (content_data)
+            {
+                if ((EITFixUp::kFixDish & fix) || (EITFixUp::kFixBell & fix))
+                {
+                    DishContentDescriptor content(content_data);
+                    category_type = content.GetTheme();
+                    if (EITFixUp::kFixDish & fix)
+                        category  = content.GetCategory();
+                }
+                else
+                {
+                    ContentDescriptor content(content_data);
+                    category      = content.GetDescription(0);
+                    category_type = content.GetMythCategory(0);
+                }
+            }
+
+            desc_list_t contentIds =
+                MPEGDescriptor::FindAll(list, DescriptorID::dvb_content_identifier);
+            for (uint j = 0; j < contentIds.size(); j++)
+            {
+                DVBContentIdentifierDescriptor desc(contentIds[j]);
+                if (desc.ContentEncoding() == 0)
+                {
+                    // The CRID is a URI.  It could contain UTF8 sequences encoded
+                    // as %XX but there's no advantage in decoding them.
+                    // The BBC currently uses private types 0x31 and 0x32.
+                    if (desc.ContentType() == 0x01 || desc.ContentType() == 0x31)
+                        programId = desc.ContentId();
+                    else if (desc.ContentType() == 0x02 || desc.ContentType() == 0x32)
+                        seriesId = desc.ContentId();
+                }
+            }
+
+            QDateTime starttime = MythUTCToLocal(eit->StartTimeUTC(i));
+            // fix starttime only if the duration is a multiple of a minute
+            if (!(eit->DurationInSeconds(i) % 60))
+                EITFixUp::TimeFix(starttime);
+            QDateTime endtime   = starttime.addSecs(eit->DurationInSeconds(i));
+
+            DBEventEIT *event = new DBEventEIT(
+                chanid,
+                title,     subtitle,      description,
+                category,  category_type,
+                starttime, endtime,       fix,
+                subtitle_type,
+                audio_props,
+                video_props, stars,
+                seriesId,  programId);
+
+            db_events.enqueue(event);
         }
-
-        QDateTime starttime = MythUTCToLocal(eit->StartTimeUTC(i));
-        // fix starttime only if the duration is a multiple of a minute
-        if (!(eit->DurationInSeconds(i) % 60))
-            EITFixUp::TimeFix(starttime);
-        QDateTime endtime   = starttime.addSecs(eit->DurationInSeconds(i));
-
-        DBEventEIT *event = new DBEventEIT(
-            chanid,
-            title,     subtitle,      description,
-            category,  category_type,
-            starttime, endtime,       fix,
-            subtitle_type,
-            audio_props,
-            video_props, stars,
-            seriesId,  programId);
-
-        db_events.enqueue(event);
     }
 }
 
@@ -552,6 +552,7 @@ void EITHelper::AddEIT(const PremiereContentInformationTable *cit)
     desc_list_t transmissions =
         MPEGDescriptor::FindAll(
             list, PrivateDescriptorID::premiere_content_transmission);
+
     for(uint j=0; j< transmissions.size(); j++)
     {
         PremiereContentTransmissionDescriptor transmission(transmissions[j]);
@@ -559,43 +560,49 @@ void EITHelper::AddEIT(const PremiereContentInformationTable *cit)
         uint tsid      = transmission.TSID();
         uint serviceid = transmission.ServiceID();
 
-        uint chanid = GetChanID(serviceid, networkid, tsid);
-
-        if (!chanid)
+        vector<uint> chanids = GetChanIDs(serviceid, networkid, tsid);
+        for (uint i = 0; i < chanids.size(); i++)
         {
-            LOG(VB_EIT, LOG_INFO, LOC +
-                QString("Premiere EIT for NIT %1, TID %2, SID %3, "
-                        "count %4, title: %5. Channel not found!")
-                    .arg(networkid).arg(tsid).arg(serviceid)
-                    .arg(transmission.TransmissionCount()).arg(title));
-            continue;
-        }
+        	uint chanid = chanids[i];
+            if (!chanid)
+                continue;
 
-        // Skip event if we have already processed it before...
-        if (!eitcache->IsNewEIT(chanid, tableid, version, contentid, endtime))
-        {
-            continue;
-        }
+            if (!chanid)
+            {
+                LOG(VB_EIT, LOG_INFO, LOC +
+                    QString("Premiere EIT for NIT %1, TID %2, SID %3, "
+                            "count %4, title: %5. Channel not found!")
+                        .arg(networkid).arg(tsid).arg(serviceid)
+                        .arg(transmission.TransmissionCount()).arg(title));
+                continue;
+            }
 
-        for (uint k=0; k<transmission.TransmissionCount(); ++k)
-        {
-            QDateTime starttime = transmission.StartTimeUTC(k);
-            // fix starttime only if the duration is a multiple of a minute
-            if (!(cit->DurationInSeconds() % 60))
-                EITFixUp::TimeFix(starttime);
-            QDateTime endtime   = starttime.addSecs(cit->DurationInSeconds());
+            // Skip event if we have already processed it before...
+            if (!eitcache->IsNewEIT(chanid, tableid, version, contentid, endtime))
+            {
+                continue;
+            }
 
-            DBEventEIT *event = new DBEventEIT(
-                chanid,
-                title,     subtitle,      description,
-                category,  category_type,
-                starttime, endtime,       fix,
-                subtitle_type,
-                audio_props,
-                video_props, 0.0,
-                "",  "");
+            for (uint k=0; k<transmission.TransmissionCount(); ++k)
+            {
+                QDateTime starttime = transmission.StartTimeUTC(k);
+                // fix starttime only if the duration is a multiple of a minute
+                if (!(cit->DurationInSeconds() % 60))
+                    EITFixUp::TimeFix(starttime);
+                QDateTime endtime   = starttime.addSecs(cit->DurationInSeconds());
 
-            db_events.enqueue(event);
+                DBEventEIT *event = new DBEventEIT(
+                    chanid,
+                    title,     subtitle,      description,
+                    category,  category_type,
+                    starttime, endtime,       fix,
+                    subtitle_type,
+                    audio_props,
+                    video_props, 0.0,
+                    "",  "");
+
+                db_events.enqueue(event);
+            }
         }
     }
 }
@@ -619,156 +626,127 @@ void EITHelper::CompleteEvent(uint atsc_major, uint atsc_minor,
                               const ATSCEvent &event,
                               const QString   &ett)
 {
-    uint chanid = GetChanID(atsc_major, atsc_minor);
-    if (!chanid)
-        return;
-
-    QDateTime starttime;
-    time_t off = GPS_EPOCH + gps_offset + utc_offset;
-    time_t tmp = event.start_time + off;
-    tm result;
-
-    if (gmtime_r(&tmp, &result))
+    vector<uint> chanids = GetChanIDs(atsc_major, atsc_minor);
+    for (uint i = 0; i < chanids.size(); i++)
     {
-        starttime.setDate(QDate(result.tm_year + 1900,
-                                result.tm_mon + 1,
-                                result.tm_mday));
-        starttime.setTime(QTime(result.tm_hour, result.tm_min, result.tm_sec));
+    	uint chanid = chanids[i];
+        if (!chanid)
+            continue;
+
+        QDateTime starttime;
+        time_t off = GPS_EPOCH + gps_offset + utc_offset;
+        time_t tmp = event.start_time + off;
+        tm result;
+
+        if (gmtime_r(&tmp, &result))
+        {
+            starttime.setDate(QDate(result.tm_year + 1900,
+                                    result.tm_mon + 1,
+                                    result.tm_mday));
+            starttime.setTime(QTime(result.tm_hour, result.tm_min, result.tm_sec));
+        }
+        else
+        {
+            starttime.setTime_t(tmp - utc_offset);
+        }
+
+        // fix starttime only if the duration is a multiple of a minute
+        if (!(event.length % 60))
+            EITFixUp::TimeFix(starttime);
+        QDateTime endtime = starttime.addSecs(event.length);
+
+        desc_list_t list = MPEGDescriptor::Parse(event.desc, event.desc_length);
+        unsigned char subtitle_type =
+            MPEGDescriptor::Find(list, DescriptorID::caption_service) ?
+            SUB_HARDHEAR : SUB_UNKNOWN;
+        unsigned char audio_properties = AUD_UNKNOWN;
+        unsigned char video_properties = VID_UNKNOWN;
+
+        uint atsc_key = (atsc_major << 16) | atsc_minor;
+
+        QMutexLocker locker(&eitList_lock);
+        QString title = event.title;
+        QString subtitle = ett;
+        db_events.enqueue(new DBEventEIT(chanid, title, subtitle,
+                                         starttime, endtime,
+                                         fixup.value(atsc_key), subtitle_type,
+                                         audio_properties, video_properties));
     }
-    else
-    {
-        starttime.setTime_t(tmp - utc_offset);
-    }
-
-    // fix starttime only if the duration is a multiple of a minute
-    if (!(event.length % 60))
-        EITFixUp::TimeFix(starttime);
-    QDateTime endtime = starttime.addSecs(event.length);
-
-    desc_list_t list = MPEGDescriptor::Parse(event.desc, event.desc_length);
-    unsigned char subtitle_type =
-        MPEGDescriptor::Find(list, DescriptorID::caption_service) ?
-        SUB_HARDHEAR : SUB_UNKNOWN;
-    unsigned char audio_properties = AUD_UNKNOWN;
-    unsigned char video_properties = VID_UNKNOWN;
-
-    uint atsc_key = (atsc_major << 16) | atsc_minor;
-
-    QMutexLocker locker(&eitList_lock);
-    QString title = event.title;
-    QString subtitle = ett;
-    db_events.enqueue(new DBEventEIT(chanid, title, subtitle,
-                                     starttime, endtime,
-                                     fixup.value(atsc_key), subtitle_type,
-                                     audio_properties, video_properties));
 }
 
-uint EITHelper::GetChanID(uint atsc_major, uint atsc_minor)
+vector<uint> EITHelper::GetChanIDs(uint atsc_major, uint atsc_minor)
 {
-    uint64_t key;
-    key  = ((uint64_t) sourceid);
-    key |= ((uint64_t) atsc_minor) << 16;
-    key |= ((uint64_t) atsc_major) << 32;
-
-    ServiceToChanID::const_iterator it = srv_to_chanid.find(key);
-    if (it != srv_to_chanid.end())
-        return max(*it, 0);
-
-    uint chanid = get_chan_id_from_db(sourceid, atsc_major, atsc_minor);
-    if (chanid)
-        srv_to_chanid[key] = chanid;
-
-    return chanid;
-}
-
-uint EITHelper::GetChanID(uint serviceid, uint networkid, uint tsid)
-{
-    uint64_t key;
-    key  = ((uint64_t) sourceid);
-    key |= ((uint64_t) serviceid) << 16;
-    key |= ((uint64_t) networkid) << 32;
-    key |= ((uint64_t) tsid)      << 48;
-
-    ServiceToChanID::const_iterator it = srv_to_chanid.find(key);
-    if (it != srv_to_chanid.end())
-        return max(*it, 0);
-
-    uint chanid = get_chan_id_from_db(sourceid, serviceid, networkid, tsid);
-    if (chanid)
-        srv_to_chanid[key] = chanid;
-
-    return chanid;
-}
-
-static uint get_chan_id_from_db(uint sourceid,
-                                uint atsc_major, uint atsc_minor)
-{
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare(
-            "SELECT chanid, useonairguide "
-            "FROM channel "
-            "WHERE atsc_major_chan = :MAJORCHAN AND "
-            "      atsc_minor_chan = :MINORCHAN AND "
-            "      sourceid        = :SOURCEID");
-    query.bindValue(":MAJORCHAN", atsc_major);
-    query.bindValue(":MINORCHAN", atsc_minor);
-    query.bindValue(":SOURCEID",  sourceid);
-
-    if (!query.exec() || !query.isActive())
-        MythDB::DBError("Looking up chanid 1", query);
-    else if (query.next())
-    {
-        bool useOnAirGuide = query.value(1).toBool();
-        return (useOnAirGuide) ? query.value(0).toUInt() : 0;
-    }
-
-    return 0;
-}
-
-// Figure out the chanid for this channel
-static uint get_chan_id_from_db(uint sourceid, uint serviceid,
-                                uint networkid, uint transportid)
-{
-    uint chanid = 0;
-    bool useOnAirGuide = false;
     MSqlQuery query(MSqlQuery::InitCon());
 
     // DVB Link to chanid
     QString qstr =
-        "SELECT chanid, useonairguide, channel.sourceid "
-        "FROM channel, dtv_multiplex "
-        "WHERE serviceid        = :SERVICEID   AND "
-        "      networkid        = :NETWORKID   AND "
-        "      transportid      = :TRANSPORTID AND "
-        "      channel.mplexid  = dtv_multiplex.mplexid";
+        "SELECT chanid, useonairguide "
+        "FROM channel, dtv_multiplex, cardinput, videosourcemap as map "
+        "WHERE atsc_major_chan       = :MAJORCHAN      AND "
+        "      atsc_minor_chan       = :MINORCHAN      AND "
+    	"      channel.sourceid      = map.sourceid    AND "
+    	"      cardinput.cardinputid = map.cardinputid AND "
+    	"      emap.type in ('main', 'eit')            AND "
+    	"      cardinput.cardid      = :CARDID             ";
+
+    query.prepare(qstr);
+    query.bindValue(":MAJORCHAN", atsc_major);
+    query.bindValue(":MINORCHAN", atsc_minor);
+    query.bindValue(":CARDID",      cardid);
+
+    vector<uint> list;
+
+    if (!query.exec() || !query.isActive())
+    {
+        MythDB::DBError("Looking up chanID", query);
+        return list;
+    }
+
+    while (query.next())
+    {
+        if (query.value(1).toBool())
+    	    list.push_back(query.value(0).toUInt());
+    }
+    return list;
+}
+
+vector<uint> EITHelper::GetChanIDs(uint serviceid, uint networkid, uint tsid)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    // DVB Link to chanid
+    QString qstr =
+        "SELECT chanid, useonairguide "
+        "FROM channel, dtv_multiplex, cardinput, videosourcemap as map "
+        "WHERE serviceid             = :SERVICEID      AND "
+        "      networkid             = :NETWORKID      AND "
+        "      transportid           = :TRANSPORTID    AND "
+        "      channel.mplexid       = dtv_multiplex.mplexid AND "
+    	"      channel.sourceid      = map.sourceid    AND "
+    	"      cardinput.cardinputid = map.cardinputid AND "
+    	"      map.type in ('main', 'eit')             AND "
+    	"      cardinput.cardid      = :CARDID             ";
 
     query.prepare(qstr);
     query.bindValue(":SERVICEID",   serviceid);
     query.bindValue(":NETWORKID",   networkid);
-    query.bindValue(":TRANSPORTID", transportid);
+    query.bindValue(":TRANSPORTID", tsid);
+    query.bindValue(":CARDID",      cardid);
+
+    vector<uint> list;
 
     if (!query.exec() || !query.isActive())
+    {
         MythDB::DBError("Looking up chanID", query);
+        return list;
+    }
 
     while (query.next())
     {
-        // Check to see if we are interested in this channel
-        chanid        = query.value(0).toUInt();
-        useOnAirGuide = query.value(1).toBool();
-        if (sourceid == query.value(2).toUInt())
-            return useOnAirGuide ? chanid : 0;
+        if (query.value(1).toBool())
+    	    list.push_back(query.value(0).toUInt());
     }
-
-    if (query.size() > 1) {
-        LOG(VB_EIT, LOG_INFO,
-            LOC + QString("found %1 channels for networdid %2, "
-                          "transportid %3, serviceid %4 but none "
-                          "for current sourceid %5.")
-                .arg(query.size()).arg(networkid).arg(transportid)
-                .arg(serviceid).arg(sourceid));
-    }
-
-    return useOnAirGuide ? chanid : 0;
+    return list;
 }
 
 static void init_fixup(QMap<uint64_t,uint> &fix)
