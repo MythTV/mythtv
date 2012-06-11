@@ -125,7 +125,7 @@ void loggingGetTimeStamp(qlonglong *epoch, uint *usec)
         *usec  = tv.tv_usec;
 #else
     /* Stupid system has no gettimeofday, use less precise QDateTime */
-    QDateTime date = QDateTime::currentDateTime();
+    QDateTime date = MythDate::current();
     *epoch = date.toTime_t();
     if (usec)
     {
