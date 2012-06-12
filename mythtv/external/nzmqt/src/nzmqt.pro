@@ -31,6 +31,7 @@ HEADERS += \
     common/Tools.h
 
 LIBS += -lzmq
+LIBS += $${LATE_LIBS}
 
 INCLUDEPATH += \
     ../include \
@@ -43,7 +44,3 @@ inc.files += ../include/nzmqt/nzmqt.hpp
 inc.path  = $${PREFIX}/include/
 
 INSTALLS += inc
-
-mingw {
-    QMAKE_LIBDIR += $$[BUILDLIBDIR]
-}

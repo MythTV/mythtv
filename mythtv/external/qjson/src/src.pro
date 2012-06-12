@@ -22,6 +22,8 @@ macx: CONFIG += lib_bundle
 QJSON_CPP = $$QJSON_SRCBASE
 INCLUDEPATH += $$QJSON_CPP
 
+LIBS += $${LATE_LIBS}
+
 PRIVATE_HEADERS += \
   json_parser.hh \
   json_scanner.h \
@@ -89,8 +91,4 @@ cppinc.files += $${PUBLIC_CPPHEADERS}
 cppinc.path  += $${PREFIX}/include/QJson/
 
 INSTALLS += cppinc
-
-mingw {
-    QMAKE_LIBDIR += $$[BUILDLIBDIR]
-}
 
