@@ -20,6 +20,14 @@
             to change/override.
           -->
 
+        <!--
+	    Define a black background which is used below for 608 and
+	    text subtitles.  If a background is not used, it is
+	    recommended to use a 2-pixel outline or shadow in the
+	    fontdef, in order to provide sufficient contrast.  Note
+	    that 708 captions providers almost always specify an
+	    explicit black background.
+	  -->
         <shape name="black_background" from="provider">
           <type>box</type>
           <fill color="#000000" alpha="255" />
