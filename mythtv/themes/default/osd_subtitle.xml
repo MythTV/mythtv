@@ -71,7 +71,7 @@
         </fontdef>
 
         <!-- Font tag 2: "Proportional Serif" -->
-        <fontdef name="708_2" face="DejaVu Serif"    from="provider">
+        <fontdef name="708_2" face="Droid Serif"     from="provider">
         </fontdef>
 
         <!-- Font tag 3: "Monospaced Sans Serif" -->
@@ -79,7 +79,7 @@
         </fontdef>
 
         <!-- Font tag 4: "Proportional Sans Serif" -->
-        <fontdef name="708_4" face="Liberation Sans" from="provider">
+        <fontdef name="708_4" face="Droid Sans"      from="provider">
         </fontdef>
 
         <!-- Font tag 5: "Casual" -->
@@ -87,11 +87,13 @@
         </fontdef>
 
         <!-- Font tag 6: "Cursive" -->
-        <fontdef name="708_6" face="URW Chancery L"  from="provider">
+        <fontdef name="708_6" face="TeX Gyre Chorus" from="provider">
         </fontdef>
 
         <!-- Font tag 7: "Small Capitals" -->
-        <fontdef name="708_7" face="Impact"          from="provider">
+	<!-- Note: The Qt property QFont::SmallCaps is automatically
+	     applied to this font. -->
+        <fontdef name="708_7" face="Droid Serif"     from="provider">
         </fontdef>
 
     </window>
