@@ -847,10 +847,12 @@ bool VideoSourceEditor::cardTypesInclude(const int &sourceID,
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT count(cardtype)"
-                  " FROM cardinput,capturecard "
-                  " WHERE capturecard.cardid = cardinput.cardid "
-                  " AND cardinput.sourceid= :SOURCEID "
-                  " AND capturecard.cardtype= :CARDTYPE ;");
+                  " FROM cardinput,capturecard, videosourcemap as map"
+                  " WHERE capturecard.cardid    = cardinput.cardid AND "
+                  "       cardinput.cardinputid = map.cardinputid  AND "
+                  "       map.sourceid          = :SOURCEID        AND "
+                  "       map.type in ('main')                     AND "
+                  "       capturecard.cardtype = 'DVB' ");
     query.bindValue(":SOURCEID", sourceID);
     query.bindValue(":CARDTYPE", thecardtype);
 
