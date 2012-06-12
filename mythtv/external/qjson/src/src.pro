@@ -11,7 +11,9 @@ DESTDIR  = $$QJSON_BASE/lib
 CONFIG += create_prl
 INSTALLS = target
 
-VERSION = 0.7.1
+!mingw {
+  VERSION = 0.7.1
+}
 
 windows: {
   DEFINES += QJSON_MAKEDLL
