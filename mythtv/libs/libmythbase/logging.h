@@ -31,7 +31,8 @@ typedef union {
 } LoggerHandle_t;
 
 /// \brief Base class for the various logging mechanisms
-class LoggerBase : public QObject {
+class LoggerBase : public QObject
+{
     Q_OBJECT
 
   public:
@@ -52,7 +53,8 @@ class LoggerBase : public QObject {
 };
 
 /// \brief File-based logger - used for logfiles and console
-class FileLogger : public LoggerBase {
+class FileLogger : public LoggerBase
+{
   public:
     FileLogger(char *filename, bool progress, int quiet);
     ~FileLogger();
@@ -67,7 +69,8 @@ class FileLogger : public LoggerBase {
 
 #ifndef _WIN32
 /// \brief Syslog-based logger (not available in Windows)
-class SyslogLogger : public LoggerBase {
+class SyslogLogger : public LoggerBase
+{
   public:
     SyslogLogger(int facility);
     ~SyslogLogger();
@@ -83,7 +86,8 @@ class SyslogLogger : public LoggerBase {
 class DBLoggerThread;
 
 /// \brief Database logger - logs to the MythTV database
-class DatabaseLogger : public LoggerBase {
+class DatabaseLogger : public LoggerBase
+{
     friend class DBLoggerThread;
   public:
     DatabaseLogger(char *table);
