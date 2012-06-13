@@ -57,13 +57,13 @@ MMulticastSocketDevice::MMulticastSocketDevice(
     m_imr.imr_interface.s_addr = htonl(INADDR_ANY);
 
     if (setsockopt(socket(), IPPROTO_IP, IP_ADD_MEMBERSHIP,
-                   &m_imr, sizeof( m_imr )) < 0)
+                   (const char *)&m_imr, sizeof( m_imr )) < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "setsockopt - IP_ADD_MEMBERSHIP " + ENO);
     }
 
     if (setsockopt(socket(), IPPROTO_IP, IP_MULTICAST_TTL,
-                   &ttl, sizeof(ttl)) < 0)
+                   (const char *)&ttl, sizeof(ttl)) < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "setsockopt - IP_MULTICAST_TTL " + ENO);
     }
@@ -107,7 +107,7 @@ qint64 MMulticastSocketDevice::writeBlock(
 
             uint32_t interface_addr = (*it).toIPv4Address();
             setsockopt(socket(), IPPROTO_IP, IP_MULTICAST_IF,
-                       &interface_addr, sizeof(interface_addr));
+                       (const char *)&interface_addr, sizeof(interface_addr));
             retx = MSocketDevice::writeBlock(data, len, host, port);
 #if 0
             LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("writeBlock on %1 %2")
