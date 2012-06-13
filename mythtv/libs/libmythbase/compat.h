@@ -35,7 +35,9 @@
 #  include <io.h>
 # endif
 
+#ifdef THIS_IS_BORKED
 # define setsockopt(a, b, c, d, e) setsockopt(a, b, c, (const char*)(d), e)
+#endif
 # undef close
 # include <stdio.h>        // for snprintf(), used by inline dlerror()
 # include <unistd.h>       // for usleep()
