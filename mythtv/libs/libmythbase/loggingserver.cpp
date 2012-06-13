@@ -293,7 +293,6 @@ bool SyslogLogger::logmsg(LoggingItem *item)
 
     return true;
 }
-#endif
 
 void SyslogLogger::setupZMQSocket(void)
 {
@@ -305,7 +304,7 @@ void SyslogLogger::setupZMQSocket(void)
     m_zmqSock->subscribeTo(QByteArray(""));
     m_zmqSock->connectTo("inproc://loggers");
 }
-
+#endif
 
 const int DatabaseLogger::kMinDisabledTime = 1000;
 
@@ -857,6 +856,7 @@ void FileLogger::receivedMessage(const QList<QByteArray> &msg)
     item->deleteItem();
 }
 
+#ifndef _WIN32
 void SyslogLogger::receivedMessage(const QList<QByteArray> &msg)
 {
     // Filter on the clientId
@@ -876,6 +876,7 @@ void SyslogLogger::receivedMessage(const QList<QByteArray> &msg)
     logmsg(item);
     item->deleteItem();
 }
+#endif
 
 void DatabaseLogger::receivedMessage(const QList<QByteArray> &msg)
 {
@@ -1213,6 +1214,7 @@ void LogForwardThread::forwardMessage(LogMessage *msg)
                 loggers->insert(0, logger);
             }
 
+#ifndef _WIN32
             // SyslogLogger from facility
             int facility = item->facility();
             if (facility > 0)
@@ -1243,6 +1245,7 @@ void LogForwardThread::forwardMessage(LogMessage *msg)
                 clients->insert(0, clientId);
                 loggers->insert(0, logger);
             }
+#endif
 
             // DatabaseLogger from table
             QString table = item->table();
