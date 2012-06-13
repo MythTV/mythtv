@@ -27,7 +27,8 @@ MBASE_PUBLIC void logServerStop(void);
 void logServerWait(void);
 
 /// \brief Base class for the various logging mechanisms
-class LoggerBase : public QObject {
+class LoggerBase : public QObject
+{
     Q_OBJECT
 
   public:
@@ -48,7 +49,8 @@ class LoggerBase : public QObject {
 };
 
 /// \brief File-based logger - used for logfiles and console
-class FileLogger : public LoggerBase {
+class FileLogger : public LoggerBase
+{
     Q_OBJECT
 
   public:
@@ -66,7 +68,8 @@ class FileLogger : public LoggerBase {
 };
 
 /// \brief Syslog-based logger (not available in Windows)
-class SyslogLogger : public LoggerBase {
+class SyslogLogger : public LoggerBase
+{
     Q_OBJECT
 
   public:
@@ -87,7 +90,8 @@ class SyslogLogger : public LoggerBase {
 class DBLoggerThread;
 
 /// \brief Database logger - logs to the MythTV database
-class DatabaseLogger : public LoggerBase {
+class DatabaseLogger : public LoggerBase
+{
     Q_OBJECT
 
     friend class DBLoggerThread;
