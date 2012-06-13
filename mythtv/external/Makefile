@@ -37,6 +37,8 @@ nzmqt-install nzmqt-uninstall nzmqt-clean nzmqt-distclean:
 
 qjson-all:
 	(cd qjson ; ${QMAKE})
+	-[ -f qjson/include/QJson ] && \
+	  (cd qjson/include ; ${RM} QJson ; ${LN_S} ../src QJson)
 	${MAKE} -C qjson all
 
 qjson-install qjson-uninstall qjson-clean qjson-distclean:
