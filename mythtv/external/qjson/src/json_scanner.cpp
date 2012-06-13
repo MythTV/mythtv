@@ -29,6 +29,8 @@
 
 #include <cassert>
 
+bool ishexnstring(const QString& string);
+
 bool ishexnstring(const QString& string) {
   for (int i = 0; i < string.length(); i++) {
     if (isxdigit(string[i] == 0))
