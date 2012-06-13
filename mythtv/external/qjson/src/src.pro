@@ -80,14 +80,14 @@ symbian: {
 }
 
 inc.files += $${PUBLIC_HEADERS}
-inc.path  = $${PREFIX}/include/qjson/
+inc.path  = $${PREFIX}/include/QJson/
 
 INSTALLS += inc
 
 PUBLIC_CPPHEADERS += \
-  $$QJSON_BASE/include/QJson/QObjectHelper \
-  $$QJSON_BASE/include/QJson/Serializer \
-  $$QJSON_BASE/include/QJson/Parser
+  QObjectHelper \
+  Serializer \
+  Parser
 
 cppinc.files += $${PUBLIC_CPPHEADERS}
 cppinc.path  += $${PREFIX}/include/QJson/
