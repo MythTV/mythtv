@@ -7,7 +7,9 @@
 #include <signal.h>
 #include <unistd.h>
 #include <sys/types.h>
+#ifndef _WIN32
 #include <sys/socket.h>
+#endif
 #include <iostream>
 
 using namespace std;
