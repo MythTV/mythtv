@@ -14,6 +14,7 @@
 
 using namespace std;
 
+#include "compat.h"
 #include "mythlogging.h"
 #include "exitcodes.h"
 #include "signalhandling.h"
@@ -127,6 +128,7 @@ void SignalHandler::handleSignal(void)
     char a;
     int ret = ::read(sigFd[1], &a, sizeof(a));
     int signum = (int)a;
+    (void)ret;
 
     switch (signum)
     {
