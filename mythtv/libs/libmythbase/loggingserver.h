@@ -65,7 +65,6 @@ class FileLogger : public LoggerBase {
     void receivedMessage(const QList<QByteArray>&);
 };
 
-#ifndef _WIN32
 /// \brief Syslog-based logger (not available in Windows)
 class SyslogLogger : public LoggerBase {
     Q_OBJECT
@@ -84,7 +83,6 @@ class SyslogLogger : public LoggerBase {
   protected slots:
     void receivedMessage(const QList<QByteArray>&);
 };
-#endif
 
 class DBLoggerThread;
 

@@ -304,6 +304,28 @@ void SyslogLogger::setupZMQSocket(void)
     m_zmqSock->subscribeTo(QByteArray(""));
     m_zmqSock->connectTo("inproc://loggers");
 }
+#else
+
+// Windows doesn't have syslog support
+
+SyslogLogger::SyslogLogger() : LoggerBase(NULL), m_opened(false)
+{
+}
+
+SyslogLogger::~SyslogLogger()
+{
+}
+
+bool SyslogLogger::logmsg(LoggingItem *item)
+{
+    (void)item;
+    return false;
+}
+
+void SyslogLogger::setupZMQSocket(void)
+{
+}
+
 #endif
 
 const int DatabaseLogger::kMinDisabledTime = 1000;
@@ -876,6 +898,16 @@ void SyslogLogger::receivedMessage(const QList<QByteArray> &msg)
     logmsg(item);
     item->deleteItem();
 }
+
+#else
+
+// Windows doesn't have syslog support
+
+void SyslogLogger::receivedMessage(const QList<QByteArray> &msg)
+{
+    (void)msg;
+}
+
 #endif
 
 void DatabaseLogger::receivedMessage(const QList<QByteArray> &msg)
