@@ -14,6 +14,7 @@
 #include <QDir>
 #include <QMap>
 
+#include "signalhandling.h"
 #include "commandlineparser.h"
 #include "scheduledrecording.h"
 #include "previewgenerator.h"
@@ -50,12 +51,6 @@
 #else
     #define UNUSED_FILENO 3
 #endif
-
-static void qt_exit(int)
-{
-    signal(SIGINT, SIG_DFL);
-    QCoreApplication::exit(0);
-}
 
 int main(int argc, char **argv)
 {
@@ -104,8 +99,13 @@ int main(int argc, char **argv)
         close(0);
 
     CleanupGuard callCleanup(cleanup);
-    signal(SIGINT, qt_exit);
-    signal(SIGTERM, qt_exit);
+
+#ifndef _WIN32
+    QList<int> signallist;
+    signallist << SIGINT << SIGTERM << SIGSEGV << SIGABRT;
+    SignalHandler handler(signallist);
+    signal(SIGHUP, SIG_IGN);
+#endif
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init(false))

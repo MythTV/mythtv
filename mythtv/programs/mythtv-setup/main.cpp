@@ -39,6 +39,7 @@
 #include "expertsettingseditor.h"
 #include "commandlineparser.h"
 #include "profilegroup.h"
+#include "signalhandling.h"
 
 using namespace std;
 
@@ -272,6 +273,13 @@ int main(int argc, char *argv[])
 #endif
     new QApplication(argc, argv, use_display);
     QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHTV_SETUP);
+
+#ifndef _WIN32
+    QList<int> signallist;
+    signallist << SIGINT << SIGTERM << SIGSEGV << SIGABRT;
+    SignalHandler handler(signallist);
+    signal(SIGHUP, SIG_IGN);
+#endif
 
     if (cmdline.toBool("display"))
         display = cmdline.toString("display");

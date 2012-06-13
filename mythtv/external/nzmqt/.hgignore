@@ -1,0 +1,7 @@
+syntax: glob
+Debug
+Release
+**.user
+**.orig
+**.DS_Store
+

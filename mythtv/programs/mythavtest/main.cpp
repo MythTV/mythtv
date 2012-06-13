@@ -22,6 +22,7 @@ using namespace std;
 #include "compat.h"
 #include "dbcheck.h"
 #include "mythlogging.h"
+#include "signalhandling.h"
 
 // libmythui
 #include "mythuihelper.h"

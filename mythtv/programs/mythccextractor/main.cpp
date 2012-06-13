@@ -18,6 +18,7 @@ using namespace std;
 #include "programinfo.h"
 #include "ringbuffer.h"
 #include "exitcodes.h"
+#include "signalhandling.h"
 
 namespace {
     void cleanup()
@@ -139,6 +140,13 @@ int main(int argc, char *argv[])
     }
 
     CleanupGuard callCleanup(cleanup);
+
+#ifndef _WIN32
+    QList<int> signallist;
+    signallist << SIGINT << SIGTERM << SIGSEGV << SIGABRT;
+    SignalHandler handler(signallist);
+    signal(SIGHUP, SIG_IGN);
+#endif
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init(
