@@ -12,6 +12,7 @@
 
 #include "mythraopdevice.h"
 #include "mythraopconnection.h"
+#include "mythairplayserver.h"
 
 #define LOC QString("RAOP Conn: ")
 #define MAX_PACKET_SIZE  2048
@@ -915,8 +916,8 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
                     i += 16;
                 }
             }
-            memcpy(from + i, m_hardwareId.constData(), RAOP_HARDWARE_ID_SIZE);
-            i += RAOP_HARDWARE_ID_SIZE;
+            memcpy(from + i, m_hardwareId.constData(), AIRPLAY_HARDWARE_ID_SIZE);
+            i += AIRPLAY_HARDWARE_ID_SIZE;
 
             int pad = 32 - i;
             if (pad > 0)

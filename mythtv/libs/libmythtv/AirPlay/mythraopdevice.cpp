@@ -9,6 +9,7 @@
 #include "bonjourregister.h"
 #include "mythraopconnection.h"
 #include "mythraopdevice.h"
+#include "mythairplayserver.h"
 
 MythRAOPDevice* MythRAOPDevice::gMythRAOPDevice = NULL;
 MThread*        MythRAOPDevice::gMythRAOPDeviceThread = NULL;
@@ -60,23 +61,6 @@ bool MythRAOPDevice::Create(void)
     return true;
 }
 
-QString MythRAOPDevice::HardwareId()
-{
-    QString key = "AirPlayId";
-    QString id = gCoreContext->GetSetting(key);
-    int size = id.size();
-    if (size == 12)
-        return id;
-
-    QByteArray ba;
-    for (int i = 0; i < RAOP_HARDWARE_ID_SIZE; i++)
-        ba.append((random() % 80) + 33);
-    id = ba.toHex();
-
-    gCoreContext->SaveSetting(key, id);
-    return id;
-}
-
 void MythRAOPDevice::Cleanup(void)
 {
     LOG(VB_GENERAL, LOG_INFO, LOC + "Cleaning up.");
@@ -101,7 +85,7 @@ MythRAOPDevice::MythRAOPDevice()
   : ServerPool(), m_name(QString("MythTV")), m_bonjour(NULL), m_valid(false),
     m_lock(new QMutex(QMutex::Recursive)), m_setupPort(5000)
 {
-    m_hardwareId = QByteArray::fromHex(HardwareId().toAscii());
+    m_hardwareId = QByteArray::fromHex(AirPlayHardwareId().toAscii());
 }
 
 MythRAOPDevice::~MythRAOPDevice()
