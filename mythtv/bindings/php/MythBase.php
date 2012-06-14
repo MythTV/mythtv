@@ -47,7 +47,7 @@ class MythBase {
 
     public function __destruct() {
         if (!is_null($this->cacheKey))
-            Cache::setObject($this->cacheKey, &$this, $this->cacheLifetime);
+            Cache::setObject($this->cacheKey, $this, $this->cacheLifetime);
         $this->cacheKey = null;
     }
 
