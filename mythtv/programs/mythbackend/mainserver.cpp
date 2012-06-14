@@ -3033,7 +3033,7 @@ void MainServer::HandleQueryFileHash(QStringList &slist, PlaybackSock *pbs)
 
 /**
  * \addtogroup myth_network_protocol
- * \par        QUERY_FILE_EXISTS \e storagegroup \e filename
+ * \par        QUERY_FILE_EXISTS \e filename \e storagegroup
  */
 void MainServer::HandleQueryFileExists(QStringList &slist, PlaybackSock *pbs)
 {

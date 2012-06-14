@@ -554,7 +554,7 @@ QList<FileSystemInfo> FileServerHandler::QueryAllFileSystems(void)
 
 /**
  * \addtogroup myth_network_protocol
- * \par        QUERY_FILE_EXISTS \e storagegroup \e filename
+ * \par        QUERY_FILE_EXISTS \e filename \e storagegroup
  */
 bool FileServerHandler::HandleQueryFileExists(SocketHandler *socket,
                                               QStringList &slist)
