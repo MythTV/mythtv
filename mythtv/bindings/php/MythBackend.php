@@ -206,14 +206,14 @@ class MythBackend {
 /**/
     public function rescheduleRecording($recordid = -1) {
         if ($recordid == 0) {
-            $this->sendCommand(array('RESCHEDULE_RECORDINGS ', 
+            $this->sendCommand(array('RESCHEDULE_RECORDINGS ',
                                      'CHECK 0 0 0 PHP',
                                      '', '', '', '**any**'));
         }
         else {
             if ($recordid == -1)
                 $recordid = 0;
-            $this->sendCommand(array('RESCHEDULE_RECORDINGS ', 
+            $this->sendCommand(array('RESCHEDULE_RECORDINGS ',
                                      'MATCH '.$recordid.' 0 0 - PHP'));
         }
         Cache::clear();
@@ -241,7 +241,7 @@ class MythBackend {
        }
 
        $opts['http']['header'] = "Accept: application/json\r\n";
-       
+
        return $this->httpRequest($path, $args, $opts);
    }
 
