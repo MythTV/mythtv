@@ -95,7 +95,7 @@ static FmtConv Fmt_List_ARGB32[] =
     FMT_NULL
 };
 
-ConstFilterInfo filter_table[] =
+const FilterInfo filter_table[] =
 {
     {
         filter_init: &new_force_yv12,

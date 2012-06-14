@@ -142,8 +142,8 @@ bool FilterManager::LoadFilterLib(const QString &path)
         dlhandles[path] = dlhandle;
     }
 
-    const ConstFilterInfo *filtInfo = (const ConstFilterInfo*)
-        dlsym(dlhandle, "filter_table");
+    const FilterInfo *filtInfo =
+        (const FilterInfo*) dlsym(dlhandle, "filter_table");
 
     if (!filtInfo)
     {
@@ -522,8 +522,8 @@ VideoFilter * FilterManager::LoadFilter(const FilterInfo *FiltInfo,
         return NULL;
     }
 
-    const ConstFilterInfo *filtInfo
-        = (const ConstFilterInfo*)dlsym(handle, "filter_table");
+    const FilterInfo *filtInfo =
+        (const FilterInfo*) dlsym(handle, "filter_table");
 
     if (!filtInfo || !filtInfo->filter_init)
     {
