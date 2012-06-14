@@ -3681,9 +3681,9 @@ if ! is_qmake5 $qmake ; then
   if ! expr $($qmake -query QT_VERSION) : "4\.[6-9]\.[0-9]" >/dev/null; then
       die "Qt4.6 or newer is required to build MythTV."
   fi
+else
+    check_cxxflags -DHAVE_QT5
 fi
-
-echo qmake: $qmake
 
 enabled pic && enable_pic
 

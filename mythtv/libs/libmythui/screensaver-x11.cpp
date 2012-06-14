@@ -4,7 +4,6 @@
 // QT headers
 #include <QDateTime>
 #include <QTimer>
-#include <QX11Info>
 
 // Mythdb headers
 #include "mythlogging.h"

@@ -28,7 +28,11 @@ class MythRender : public ReferenceCounter
 
     /// Warning: The reference count can be decremented between
     /// the call to this function and the use of it's value.
-    bool IsShared(void) const { return m_referenceCount > 1; }
+    bool IsShared(void) const
+    {
+        return const_cast<QAtomicInt&>(m_referenceCount)
+            .fetchAndAddOrdered(0) > 1;
+    }
 
     RenderType Type(void) const { return m_type;    }
     bool  IsErrored(void) const { return m_errored; }
