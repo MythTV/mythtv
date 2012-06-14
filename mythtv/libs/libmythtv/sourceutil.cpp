@@ -469,10 +469,10 @@ int SourceUtil::CreateSource( QString sourcename,
         return -1;
     }
 
-    uint sourceid = -1;
+    int sourceid = -1; /* must be int not uint because of return type. */
 
     if (query.next())
-        sourceid = query.value(0).toUInt();
+        sourceid = query.value(0).toInt();
 
     return sourceid;
 }
