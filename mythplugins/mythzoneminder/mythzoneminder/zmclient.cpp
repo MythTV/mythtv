@@ -91,7 +91,7 @@ bool ZMClient::connectToHost(const QString &lhostname, unsigned int lport)
                 .arg(m_hostname).arg(m_port).arg(count));
         if (m_socket)
         {
-            m_socket->DownRef();
+            m_socket->DecrRef();
             m_socket = NULL;
         }
 
@@ -99,7 +99,7 @@ bool ZMClient::connectToHost(const QString &lhostname, unsigned int lport)
         //m_socket->setCallbacks(this);
         if (!m_socket->connect(m_hostname, m_port))
         {
-            m_socket->DownRef();
+            m_socket->DecrRef();
             m_socket = NULL;
         }
         else
@@ -243,7 +243,8 @@ ZMClient::~ZMClient()
 
     if (m_socket)
     {
-        m_socket->DownRef();
+        m_socket->DecrRef();
+        m_socket = NULL;
         m_zmclientReady = false;
     }
 
