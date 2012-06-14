@@ -180,7 +180,9 @@ bool MSqlDatabase::OpenDatabase(bool skipdb)
                             .arg(m_db.databaseName()).arg(m_db.hostName()));
 
             // Make sure NOW() returns time in UTC...
-            m_db.exec("SET @@local.time_zone='+00:00'");
+            m_db.exec("SET @@session.time_zone='+00:00'");
+            // Disable strict mode
+            m_db.exec("SET @@session.sql_mode=''");
 
             // WriteDelayed depends on SetHaveDBConnection() and SetHaveSchema()
             // both being called with true, so order is important here.
