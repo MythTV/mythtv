@@ -23,6 +23,7 @@ package MythTV;
     use DBI;
     use HTTP::Request;
     use LWP::UserAgent;
+    use Time::Local;
 
 # Load the UPNP libraries if we have them, but die nicely if we don't.
     BEGIN {
@@ -799,8 +800,10 @@ EOF
         }
     # Otherwise, format it as necessary.  We have to use MySQL here because
     # Date::Manip is not aware of DST differences.  Yay.  Blech.
+        my @t = localtime(time);
+        my $offset = timegm(@t) - timelocal(@t);
         my $sh = $self->{'dbh'}->prepare('SELECT FROM_UNIXTIME(?)');
-        $sh->execute($time);
+        $sh->execute($time + $offset);
         ($time) = $sh->fetchrow_array();
         $time =~ s/\s/T/;
         return $time;
@@ -814,7 +817,9 @@ EOF
         my $sh = $self->{'dbh'}->prepare('SELECT UNIX_TIMESTAMP(?)');
         $sh->execute($time);
         ($time) = $sh->fetchrow_array();
-        return $time;
+        my @t = localtime(time);
+        my $offset = timegm(@t) - timelocal(@t);
+        return $time - $offset;
     }
 
 # Create a new MythTV::Program object
