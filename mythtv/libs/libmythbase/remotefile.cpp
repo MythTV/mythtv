@@ -42,9 +42,15 @@ RemoteFile::~RemoteFile()
 {
     Close();
     if (controlSock)
-        controlSock->DownRef();
+    {
+        controlSock->DecrRef();
+        controlSock = NULL;
+    }
     if (sock)
-        sock->DownRef();
+    {
+        sock->DecrRef();
+        sock = NULL;
+    }
 }
 
 MythSocket *RemoteFile::openSocket(bool control)
@@ -83,7 +89,7 @@ MythSocket *RemoteFile::openSocket(bool control)
     {
         LOG(VB_GENERAL, LOG_ERR, loc +
             QString("Could not connect to server %1:%2") .arg(host).arg(port));
-        lsock->DownRef();
+        lsock->DecrRef();
         return NULL;
     }
 
@@ -96,7 +102,7 @@ MythSocket *RemoteFile::openSocket(bool control)
     {
         LOG(VB_GENERAL, LOG_ERR, loc +
             QString("Failed validation to server %1:%2").arg(host).arg(port));
-        lsock->DownRef();
+        lsock->DecrRef();
         return NULL;
     }
 #endif
@@ -110,7 +116,7 @@ MythSocket *RemoteFile::openSocket(bool control)
             LOG(VB_GENERAL, LOG_ERR, loc +
                 QString("Could not read string list from server %1:%2")
                     .arg(host).arg(port));
-            lsock->DownRef();
+            lsock->DecrRef();
             return NULL;
         }
     }
@@ -159,7 +165,7 @@ MythSocket *RemoteFile::openSocket(bool control)
 
     if (strlist.empty() || strlist[0] == "ERROR")
     {
-        lsock->DownRef();
+        lsock->DecrRef();
         lsock = NULL;
         if (strlist.empty())
         {
@@ -244,12 +250,12 @@ void RemoteFile::Close(void)
 
     if (sock)
     {
-        sock->DownRef();
+        sock->DecrRef();
         sock = NULL;
     }
     if (controlSock)
     {
-        controlSock->DownRef();
+        controlSock->DecrRef();
         controlSock = NULL;
     }
 

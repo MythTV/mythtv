@@ -41,14 +41,17 @@ MythSocketThread *MythSocket::s_readyread_thread = NULL;
 
 QMap<QString, QHostAddress::SpecialAddress> MythSocket::s_loopback_cache;
 
-MythSocket::MythSocket(int socket, MythSocketCBs *cb)
-    : MSocketDevice(MSocketDevice::Stream),            m_cb(cb),
-      m_useReadyReadCallback(true),
-      m_state(Idle),         m_addr(),                 m_port(0),
-      m_ref_count(0),        m_notifyread(false),      m_expectingreply(false),
-      m_isValidated(false),  m_isAnnounced(false)
+MythSocket::MythSocket(int socket, MythSocketCBs *cb) :
+    MSocketDevice(MSocketDevice::Stream),
+    ReferenceCounter(QString("MythSocket(%1)").arg(socket)),
+    m_cb(cb),                   m_useReadyReadCallback(true),
+    m_state(Idle),
+    m_addr(),                   m_port(0),
+    m_notifyread(false),        m_expectingreply(false),
+    m_isValidated(false),       m_isAnnounced(false)
 {
     LOG(VB_SOCKET, LOG_DEBUG, LOC + "new socket");
+
     if (socket > -1)
     {
         setSocket(socket);
@@ -92,35 +95,18 @@ void MythSocket::setCallbacks(MythSocketCBs *cb)
         s_readyread_thread->RemoveFromReadyRead(this);
 }
 
-void MythSocket::UpRef(void)
+int MythSocket::DecrRef(void)
 {
-    QMutexLocker locker(&m_ref_lock);
-    m_ref_count++;
-    LOG(VB_SOCKET, LOG_DEBUG, LOC + QString("UpRef: %1").arg(m_ref_count));
-}
+    int ref = ReferenceCounter::DecrRef();
 
-bool MythSocket::DownRef(void)
-{
-    m_ref_lock.lock();
-    int ref = --m_ref_count;
-    m_ref_lock.unlock();
-
-    LOG(VB_SOCKET, LOG_DEBUG, LOC + QString("DownRef: %1").arg(ref));
-
-    if (m_cb && ref == 0)
+    if (m_cb && ref == 1)
     {
         m_cb = NULL;
         s_readyread_thread->RemoveFromReadyRead(this);
-        // thread will downref & delete obj
-        return true;
-    }
-    else if (ref < 0)
-    {
-        delete this;
-        return true;
+        // ready read thread will call DecrRef() & delete obj
     }
 
-    return false;
+    return ref;
 }
 
 MythSocket::State MythSocket::state(void) const

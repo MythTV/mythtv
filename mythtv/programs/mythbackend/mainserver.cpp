@@ -130,15 +130,26 @@ class ProcessRequestRunnable : public QRunnable
     ProcessRequestRunnable(MainServer &parent, MythSocket *sock) :
         m_parent(parent), m_sock(sock)
     {
-        m_sock->UpRef();
+        m_sock->IncrRef();
+    }
+
+    virtual ~ProcessRequestRunnable()
+    {
+        if (m_sock)
+        {
+            m_sock->DecrRef();
+            m_sock = NULL;
+        }
     }
 
     virtual void run(void)
     {
         m_parent.ProcessRequest(m_sock);
-        m_sock->DownRef();
+        m_sock->DecrRef();
+        m_sock = NULL;
     }
 
+  private:
     MainServer &m_parent;
     MythSocket *m_sock;
 };
@@ -6083,7 +6094,7 @@ void MainServer::reconnectTimeout(void)
     {
         LOG(VB_GENERAL, LOG_NOTICE, "Connection to master server timed out.");
         masterServerReconnect->start(kMasterServerReconnectTimeout);
-        masterServerSock->DownRef();
+        masterServerSock->DecrRef();
         return;
     }
 
@@ -6091,7 +6102,7 @@ void MainServer::reconnectTimeout(void)
     {
         LOG(VB_GENERAL, LOG_ERR, "Could not connect to master server.");
         masterServerReconnect->start(kMasterServerReconnectTimeout);
-        masterServerSock->DownRef();
+        masterServerSock->DecrRef();
         return;
     }
 
@@ -6128,8 +6139,7 @@ void MainServer::reconnectTimeout(void)
         strlist.empty() || strlist[0] == "ERROR")
     {
         masterServerSock->Unlock(); // DownRef will delete socket...
-        masterServerSock->DownRef();
-        masterServerSock = NULL;
+        masterServerSock->DecrRef(); masterServerSock = NULL;
         if (strlist.empty())
         {
             LOG(VB_GENERAL, LOG_ERR, LOC +

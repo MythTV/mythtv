@@ -41,7 +41,8 @@ PlaybackSock::PlaybackSock(
 
 PlaybackSock::~PlaybackSock()
 {
-    sock->DownRef();
+    sock->DecrRef();
+    sock = NULL;
 }
 
 bool PlaybackSock::wantsEvents(void) const
@@ -76,8 +77,8 @@ bool PlaybackSock::SendReceiveStringList(
 {
     bool ok = false;
 
+    sock->IncrRef();
     sock->Lock();
-    sock->UpRef();
 
     {
         QMutexLocker locker(&sockLock);
@@ -105,7 +106,7 @@ bool PlaybackSock::SendReceiveStringList(
     }
 
     sock->Unlock();
-    sock->DownRef();
+    sock->DecrRef();
 
     if (!ok)
     {
