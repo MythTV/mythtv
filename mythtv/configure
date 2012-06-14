@@ -3666,17 +3666,24 @@ enable_pic() {
     add_asflags  -fPIC
 }
 
-is_qmake4(){
-    $1 --version 2>&1 | egrep -q -e "Qt version 4\.[6-9]\.[0-9]"
+is_qmake5(){
+    $1 --version 2>&1 | egrep -q -e "Qt version 5\.[0-9]\.[0-9]"
 }
 
-if ! is_qmake4 $qmake; then
-    is_qmake4 qmake-qt4 && qmake=qmake-qt4 || die "qmake for Qt4.6 or newer not found.\nPlease specify the correct qmake with --qmake="
+is_qmake4(){
+    $1 --version 2>&1 | egrep -q -e "Qt version 4\.[0-9]\.[0-9]"
+}
+
+if ! is_qmake5 $qmake ; then
+  if ! is_qmake4 $qmake; then
+      is_qmake4 qmake-qt4 && qmake=qmake-qt4 || die "qmake for Qt4.6 or newer not found.\nPlease specify the correct qmake with --qmake="
+  fi
+  if ! expr $($qmake -query QT_VERSION) : "4\.[6-9]\.[0-9]" >/dev/null; then
+      die "Qt4.6 or newer is required to build MythTV."
+  fi
 fi
 
-if ! expr $($qmake -query QT_VERSION) : "4\.[6-9]\.[0-9]" >/dev/null; then
-    die "Qt4.6 or newer is required to build MythTV."
-fi
+echo qmake: $qmake
 
 enabled pic && enable_pic
 
