@@ -106,19 +106,19 @@ class LoggingItem: public QObject
     void setLevel(const int val)            { m_level = (LogLevel_t)val; };
     void setFacility(const int val)         { m_facility = val; };
     void setEpoch(const qlonglong val)      { m_epoch = val; };
-    void setFile(const QString val)
+    void setFile(const QString &val)
             { m_file = strdup(val.toLocal8Bit().constData()); };
-    void setFunction(const QString val)
+    void setFunction(const QString &val)
             { m_function = strdup(val.toLocal8Bit().constData()); };
-    void setThreadName(const QString val)
+    void setThreadName(const QString &val)
             { m_threadName = strdup(val.toLocal8Bit().constData()); };
-    void setAppName(const QString val)
+    void setAppName(const QString &val)
             { m_appName = strdup(val.toLocal8Bit().constData()); };
-    void setTable(const QString val)
+    void setTable(const QString &val)
             { m_table = strdup(val.toLocal8Bit().constData()); };
-    void setLogFile(const QString val)
+    void setLogFile(const QString &val)
             { m_logFile = strdup(val.toLocal8Bit().constData()); };
-    void setMessage(const QString val)        
+    void setMessage(const QString &val)        
     {
         strncpy(m_message, val.toLocal8Bit().constData(), LOGLINE_MAX);
         m_message[LOGLINE_MAX] = '\0';
@@ -154,6 +154,7 @@ class LoggingItem: public QObject
     LoggingItem();
     LoggingItem(const char *_file, const char *_function,
                 int _line, LogLevel_t _level, LoggingType _type);
+    ~LoggingItem();
 };
 
 /// \brief The logging thread that consumes the logging queue and dispatches

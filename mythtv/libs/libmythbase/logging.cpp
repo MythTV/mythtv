@@ -142,8 +142,8 @@ LoggingItem::LoggingItem()
 LoggingItem::LoggingItem(const char *_file, const char *_function,
                          int _line, LogLevel_t _level, LoggingType _type) :
         m_threadId((uint64_t)(QThread::currentThreadId())),
-        m_line(_line), m_type(_type), m_level(_level), m_file(_file),
-        m_function(_function), m_threadName(NULL)
+        m_line(_line), m_type(_type), m_level(_level),
+        m_file(strdup(_file)), m_function(strdup(_function)), m_threadName(NULL)
 {
     loggingGetTimeStamp(&m_epoch, &m_usec);
 
@@ -153,6 +153,26 @@ LoggingItem::LoggingItem(const char *_file, const char *_function,
     refcount.ref();
 }
 
+LoggingItem::~LoggingItem()
+{
+    if (m_file)
+        free((void *)m_file);
+
+    if (m_function)
+        free((void *)m_function);
+
+    if (m_threadName)
+        free(m_threadName);
+
+    if (m_appName)
+        free((void *)m_appName);
+
+    if (m_table)
+        free((void *)m_table);
+
+    if (m_logFile)
+        free((void *)m_logFile);
+}
 
 QByteArray LoggingItem::toByteArray(void)
 {
@@ -176,8 +196,8 @@ char *LoggingItem::getThreadName(void)
 
     QMutexLocker locker(&logThreadMutex);
     char *name = logThreadHash.value(m_threadId, (char *)unknown);
-    m_threadName = name;
-    return name;
+    m_threadName = strdup(name);
+    return m_threadName;
 }
 
 /// \brief Get the thread ID of the thread that produced the LoggingItem
@@ -664,8 +684,6 @@ void LoggingItem::deleteItem(void)
 {
     if (!refcount.deref())
     {
-        if (m_threadName)
-            free(m_threadName);
         item_count.deref();
         this->deleteLater();
     }

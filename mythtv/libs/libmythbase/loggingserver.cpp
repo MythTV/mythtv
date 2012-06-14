@@ -135,7 +135,7 @@ LoggerBase::~LoggerBase()
 /// \brief FileLogger constructor
 /// \param filename Filename of the logfile.
 FileLogger::FileLogger(const char *filename) :
-        LoggerBase(filename), m_opened(false), m_fd(-1)
+        LoggerBase(filename), m_opened(false), m_fd(-1), m_zmqSock(NULL)
 {
     m_fd = open(filename, O_WRONLY|O_CREAT|O_APPEND, 0664);
     m_opened = (m_fd != -1);
@@ -247,7 +247,8 @@ void FileLogger::setupZMQSocket(void)
 #ifndef _WIN32
 /// \brief SyslogLogger constructor
 /// \param facility Syslog facility to use in logging
-SyslogLogger::SyslogLogger() : LoggerBase(NULL), m_opened(false)
+SyslogLogger::SyslogLogger() : 
+    LoggerBase(NULL), m_opened(false), m_zmqSock(NULL)
 {
     openlog(NULL, LOG_NDELAY, 0 );
     m_opened = true;
@@ -308,7 +309,8 @@ void SyslogLogger::setupZMQSocket(void)
 
 // Windows doesn't have syslog support
 
-SyslogLogger::SyslogLogger() : LoggerBase(NULL), m_opened(false)
+SyslogLogger::SyslogLogger() :
+    LoggerBase(NULL), m_opened(false), m_zmqSock(NULL)
 {
 }
 
@@ -333,7 +335,8 @@ const int DatabaseLogger::kMinDisabledTime = 1000;
 /// \brief DatabaseLogger constructor
 /// \param table C-string of the database table to log to
 DatabaseLogger::DatabaseLogger(const char *table) :
-    LoggerBase(table), m_opened(false), m_loggingTableExists(false)
+    LoggerBase(table), m_opened(false), m_loggingTableExists(false),
+    m_zmqSock(NULL)
 {
     m_query = QString(
         "INSERT INTO %1 "
