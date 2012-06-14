@@ -2014,6 +2014,7 @@ NULL
 
     if (dbver == "1301")
     {
+        LOG(VB_GENERAL, LOG_CRIT, "Upgrading to MythTV schema version 1302");
         // Create the Default recording rule template
         RecordingRule record;
         record.MakeTemplate("Default");
