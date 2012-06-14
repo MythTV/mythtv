@@ -2826,9 +2826,17 @@ test -n "$cc_type" && enable $cc_type ||
     warn "Unknown C compiler $cc, unable to select optimal CFLAGS"
 
 
-if   $cxx -v 2>&1 | grep -qi ^gcc; then
+if $cxx -v 2>&1 | grep -qi ^gcc; then
     cxx_type=gxx
     gxx_version=$($cxx -dumpversion)
+elif $cxx --version 2>/dev/null | grep -q Intel; then
+    cxx_type=icpc
+    gxx_version="AV_STRINGIFY(__INTEL_COMPILER)"
+    cxx_ident=$($cxx --version | head -n1)
+    icpc_version=$($cxx -dumpversion)
+    speed_cxxflags='-O3'
+    size_cxxflags='-Os'
+    noopt_cxxflags='-O1'
 fi
 
 test -n "$cxx_type" && enable $cxx_type ||
@@ -4350,10 +4358,10 @@ enabled debug && add_cxxflags -g"$debuglevel"
 #check_cflags -Wdeclaration-after-statement
 check_cflags -Wall
 check_cflags -Wno-parentheses
-check_cflags -Wno-switch
+disabled icc && check_cflags -Wno-switch
 ! disabled optimizations && check_cflags -Wdisabled-optimization
 check_cflags -Wpointer-arith
-check_cflags -Wredundant-decls
+disabled icc && check_cflags -Wredundant-decls
 check_cflags -Wno-pointer-sign
 check_cflags -Wwrite-strings
 check_cflags -Wtype-limits
@@ -4364,11 +4372,8 @@ check_cflags -Wstrict-prototypes
 enabled extra_warnings && check_cflags -Winline
 # C++ Flags
 check_cxxflags -Wall
-check_cxxflags -Wno-switch
 check_cxxflags -Wpointer-arith
-check_cxxflags -Wredundant-decls
 check_cxxflags -Wno-non-virtual-dtor
-check_cxxflags -funit-at-a-time
 #needed for INT64_C in libs/libavformat under g++
 check_cxxflags -D__STDC_CONSTANT_MACROS
 check_cxxflags -D__STDC_LIMIT_MACROS
@@ -4710,6 +4715,10 @@ if enabled gxx; then
     if expr "$gxx_version" : '4\.[3-9]' > /dev/null; then
         check_cxxflags -Wmissing-declarations
     fi
+    check_cxxflags -Wno-switch
+    check_cxxflags -Wredundant-decls
+    check_cxxflags -Woverloaded-virtual
+    check_cxxflags -funit-at-a-time
 fi
 
 # Check for python dependencies
