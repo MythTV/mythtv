@@ -6,7 +6,7 @@
 #endif
 
 #import <CoreFoundation/CFDictionary.h> 
-#import "ApplicationServices/ApplicationServices.h"
+#import <ApplicationServices/ApplicationServices.h>
 #include <QWindowsStyle>
 #include "mythuiexp.h"
 
