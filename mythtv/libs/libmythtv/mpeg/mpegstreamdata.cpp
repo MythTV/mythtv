@@ -1280,7 +1280,7 @@ bool MPEGStreamData::HasAllPMTSections(uint prog_num) const
 
 bool MPEGStreamData::HasProgram(uint progNum) const
 {
-    pmt_ptr_t pmt = GetCachedPMT(progNum, 0);
+    const pmt_ptr_t pmt = GetCachedPMT(progNum, 0);
     bool hasit = pmt;
     ReturnCachedTable(pmt);
 
@@ -1417,7 +1417,7 @@ bool MPEGStreamData::HasCachedAnyPMTs(void) const
     return _cached_pmts.size();
 }
 
-pat_ptr_t MPEGStreamData::GetCachedPAT(uint tsid, uint section_num) const
+const pat_ptr_t MPEGStreamData::GetCachedPAT(uint tsid, uint section_num) const
 {
     QMutexLocker locker(&_cache_lock);
     ProgramAssociationTable *pat = NULL;
@@ -1461,7 +1461,7 @@ pat_vec_t MPEGStreamData::GetCachedPATs(void) const
     return pats;
 }
 
-cat_ptr_t MPEGStreamData::GetCachedCAT(uint tsid, uint section_num) const
+const cat_ptr_t MPEGStreamData::GetCachedCAT(uint tsid, uint section_num) const
 {
     QMutexLocker locker(&_cache_lock);
     ConditionalAccessTable *cat = NULL;
@@ -1505,7 +1505,7 @@ cat_vec_t MPEGStreamData::GetCachedCATs(void) const
     return cats;
 }
 
-pmt_ptr_t MPEGStreamData::GetCachedPMT(
+const pmt_ptr_t MPEGStreamData::GetCachedPMT(
     uint program_num, uint section_num) const
 {
     QMutexLocker locker(&_cache_lock);

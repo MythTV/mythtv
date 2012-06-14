@@ -773,12 +773,12 @@ const MasterGuideTable *ATSCStreamData::GetCachedMGT(bool current) const
     return mgt;
 }
 
-tvct_ptr_t ATSCStreamData::GetCachedTVCT(uint pid, bool current) const
+const tvct_ptr_t ATSCStreamData::GetCachedTVCT(uint pid, bool current) const
 {
     if (!current)
         LOG(VB_GENERAL, LOG_WARNING, "Currently we ignore \'current\' param");
 
-    TerrestrialVirtualChannelTable *tvct = NULL;
+    tvct_ptr_t tvct = NULL;
 
     _cache_lock.lock();
     tvct_cache_t::const_iterator it = _cached_tvcts.find(pid);
@@ -789,12 +789,12 @@ tvct_ptr_t ATSCStreamData::GetCachedTVCT(uint pid, bool current) const
     return tvct;
 }
 
-cvct_ptr_t ATSCStreamData::GetCachedCVCT(uint pid, bool current) const
+const cvct_ptr_t ATSCStreamData::GetCachedCVCT(uint pid, bool current) const
 {
     if (!current)
         LOG(VB_GENERAL, LOG_WARNING, "Currently we ignore \'current\' param");
 
-    CableVirtualChannelTable *cvct = NULL;
+    cvct_ptr_t cvct = NULL;
 
     _cache_lock.lock();
     cvct_cache_t::const_iterator it = _cached_cvcts.find(pid);
