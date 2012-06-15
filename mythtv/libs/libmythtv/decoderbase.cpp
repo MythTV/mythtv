@@ -977,27 +977,37 @@ int DecoderBase::AutoSelectTrack(uint type)
 
     if (selTrack < 0 && numStreams)
     {
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + "Trying to select track (w/lang)");
-        // Find first track stream that matches a language in
-        // order of most preferred to least preferred language.
-        vector<int>::iterator it = languagePreference.begin();
-        for (; it != languagePreference.end() && (selTrack < 0); ++it)
+        // Select the best track.  Primary attribute is to favor a
+        // forced track.  Secondary attribute is language preference,
+        // in order of most preferred to least preferred language.
+        // Third attribute is track order, preferring the earliest
+        // track.
+        LOG(VB_PLAYBACK, LOG_INFO,
+            LOC + "Trying to select track (w/lang & forced)");
+        const int kForcedWeight   = (1 << 20);
+        const int kLanguageWeight = (1 << 10);
+        const int kPositionWeight = (1 << 0);
+        int bestScore = -1;
+        selTrack = 0;
+        for (uint i = 0; i < numStreams; i++)
         {
-            for (uint i = 0; i < numStreams; i++)
+            int forced = (tracks[type][i].forced ? 1 : 0);
+            int position = numStreams - i;
+            int language = 0;
+            for (int j = 0; language == 0 && j < languagePreference.size(); ++j)
             {
-                if (*it == tracks[type][i].language)
-                {
-                    selTrack = i;
-                    break;
-                }
+                if (tracks[type][i].language == languagePreference[j])
+                    language = languagePreference.size() - j;
+            }
+            int score = kForcedWeight * forced
+                + kLanguageWeight * language
+                + kPositionWeight * position;
+            if (score > bestScore)
+            {
+                bestScore = score;
+                selTrack = i;
             }
         }
-    }
-
-    if (selTrack < 0 && numStreams)
-    {
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + "Selecting first track");
-        selTrack = 0;
     }
 
     int oldTrack = currentTrack[type];
