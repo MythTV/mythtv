@@ -486,8 +486,8 @@ MythSocket *MythCoreContext::ConnectEventSocket(const QString &hostname,
             LOG(VB_GENERAL, LOG_ERR, LOC + "Timeout connecting "
                                            "event socket to master backend");
 
-        m_eventSock->DownRef();
         m_eventSock->Unlock();
+        m_eventSock->DownRef();
         m_eventSock = NULL;
         return NULL;
     }
