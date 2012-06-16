@@ -19,7 +19,6 @@ windows: {
   DEFINES += QJSON_MAKEDLL
 }
 
-#
 # MythTV OS X build fix. We want a dynamic library (like all our other libs),
 # and not something like ../lib/mythqjson.framework/Versions/0/mythqjson
 # so comment out this line:
