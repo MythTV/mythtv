@@ -232,8 +232,8 @@ class MUI_PUBLIC MythUIButtonList : public MythUIType
                         int & top_height, int & bottom_height,
                         bool & wrapped);
     bool DistributeButtons(void);
-    void SetPosition(void);
-    void SetPositionArrowStates(void);
+    void CalculateButtonPositions(void);
+    void CalculateArrowStates(void);
     void SetScrollBarPosition(void);
     void ItemVisible(MythUIButtonListItem *item);
 

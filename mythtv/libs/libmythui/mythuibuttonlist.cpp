@@ -1250,7 +1250,7 @@ bool MythUIButtonList::DistributeButtons(void)
     return true;
 }
 
-void MythUIButtonList::SetPosition(void)
+void MythUIButtonList::CalculateButtonPositions(void)
 {
     if (m_ButtonList.size() == 0)
         return;
@@ -1380,7 +1380,7 @@ void MythUIButtonList::SanitizePosition(void)
         m_selPosition = (m_wrapStyle > WrapNone) ? 0 : m_itemList.size() - 1;
 }
 
-void MythUIButtonList::SetPositionArrowStates()
+void MythUIButtonList::CalculateArrowStates()
 {
     if (!m_initialized)
         Init();
@@ -1398,7 +1398,7 @@ void MythUIButtonList::SetPositionArrowStates()
     m_ButtonToItem.clear();
 
     if (m_arrange == ArrangeFixed)
-        SetPosition();
+        CalculateButtonPositions();
     else
         DistributeButtons();
 
@@ -1621,7 +1621,7 @@ uint MythUIButtonList::GetVisibleCount()
 {
     if (m_needsUpdate)
     {
-        SetPositionArrowStates();
+        CalculateArrowStates();
         SetScrollBarPosition();
     }
 
@@ -2720,7 +2720,7 @@ void MythUIButtonList::DrawSelf(MythPainter *, int, int, int, QRect)
 {
     if (m_needsUpdate)
     {
-        SetPositionArrowStates();
+        CalculateArrowStates();
         SetScrollBarPosition();
     }
 }
