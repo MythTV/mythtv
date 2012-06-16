@@ -61,6 +61,14 @@
         <depends>mythmusic</depends>
     </button>
 
+   <button>
+      <type>MUSIC_PLAY</type>
+      <text>Listen to Radio Stream</text>
+        <description>Play radio streams</description>
+        <action>JUMP Play radio stream</action>
+        <depends>mythmusic</depends>
+   </button>
+
     <button>
         <type>MENU_PLUGINS</type>
         <text>Plugins</text>

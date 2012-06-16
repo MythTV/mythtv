@@ -8,7 +8,7 @@
 
    <button>
       <type>STREAM_PLAY</type>
-      <text>Play Streams</text>
+      <text>Play Radio Streams</text>
       <action>STREAM_PLAY</action>
    </button>
 
