@@ -70,8 +70,8 @@ MMulticastSocketDevice::MMulticastSocketDevice(
 
     setAddressReusable(true);
 
-    if (bind(m_address, m_port) < 0)
-        LOG(VB_GENERAL, LOG_ERR, LOC + "bind failed " + ENO);
+    if (!bind(m_address, m_port))
+        LOG(VB_GENERAL, LOG_ERR, LOC + "bind failed");
 }
 
 MMulticastSocketDevice::~MMulticastSocketDevice()
