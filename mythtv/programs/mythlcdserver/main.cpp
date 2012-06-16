@@ -23,6 +23,7 @@ using namespace std;
 #include "compat.h"
 #include "mythtranslation.h"
 #include "commandlineparser.h"
+#include "signalhandling.h"
 
 #include "lcdserver.h"
 
@@ -95,6 +96,13 @@ int main(int argc, char **argv)
             return GENERIC_EXIT_INVALID_CMDLINE;
         }
     }
+
+#ifndef _WIN32
+    QList<int> signallist;
+    signallist << SIGINT << SIGTERM << SIGSEGV << SIGABRT;
+    SignalHandler handler(signallist);
+    signal(SIGHUP, SIG_IGN);
+#endif
 
     //  Get the MythTV context and db hooks
     gContext = new MythContext(MYTH_BINARY_VERSION);

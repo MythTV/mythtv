@@ -1,0 +1,8 @@
+Release 0.7
+-----------
+* Introduced enumeration types for several ZMQ constants for type-safety.
+* Added a new polling based implementation that works for all ZMQ communication protocols.
+* Dropped support for REQ-REP protocol for old 'QSocketNotifier' based implementation.
+* Added some more convenience methods to 'ZMQSocket' class.
+* Old and new socket implementations now emit a signal with a received message as parameter.
+

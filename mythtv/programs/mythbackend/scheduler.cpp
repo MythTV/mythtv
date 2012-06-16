@@ -3205,11 +3205,11 @@ void Scheduler::UpdateManuals(uint recordid)
     RecordingType rectype = RecordingType(query.value(0).toInt());
     QString title = query.value(1).toString();
     QString station = query.value(2).toString() ;
-    QDateTime startdt = QDateTime(query.value(3).toDate(),
-                                  query.value(4).toTime(), Qt::UTC);
-    int duration = startdt.secsTo(
+    QDateTime lstartdt = QDateTime(query.value(3).toDate(),
+                               query.value(4).toTime(), Qt::UTC).toLocalTime();
+    int duration = lstartdt.secsTo(
         QDateTime(query.value(5).toDate(),
-                  query.value(6).toTime(), Qt::UTC)) / 60;
+                  query.value(6).toTime(), Qt::UTC).toLocalTime());
 
     query.prepare("SELECT chanid from channel "
                   "WHERE callsign = :STATION");
@@ -3241,17 +3241,17 @@ void Scheduler::UpdateManuals(uint recordid)
     case kTimeslotRecord:
         progcount = 13;
         skipdays = 1;
-        weekday = (startdt.toLocalTime().date().dayOfWeek() < 6);
-        startdt = QDateTime(
-            MythDate::current().date(), startdt.time(), Qt::UTC);
+        weekday = (lstartdt.date().dayOfWeek() < 6);
+        lstartdt = QDateTime(MythDate::current().toLocalTime().date(),
+                            lstartdt.time(), Qt::LocalTime);
         break;
     case kWeekslotRecord:
         progcount = 2;
         skipdays = 7;
         weekday = false;
-        weeksoff = (startdt.date().daysTo(
-                        MythDate::current().date()) + 6) / 7;
-        startdt = startdt.addDays(weeksoff * 7);
+        weeksoff = (lstartdt.date()
+                    .daysTo(MythDate::current().toLocalTime().date()) + 6) / 7;
+        lstartdt = lstartdt.addDays(weeksoff * 7);
         break;
     default:
         LOG(VB_GENERAL, LOG_ERR,
@@ -3263,7 +3263,7 @@ void Scheduler::UpdateManuals(uint recordid)
     {
         for (int i = 0; i < (int)chanidlist.size(); i++)
         {
-            if (weekday && startdt.toLocalTime().date().dayOfWeek() >= 6)
+            if (weekday && lstartdt.toLocalTime().date().dayOfWeek() >= 6)
                 continue;
 
             query.prepare("REPLACE INTO program (chanid, starttime, endtime,"
@@ -3271,10 +3271,10 @@ void Scheduler::UpdateManuals(uint recordid)
                           "VALUES (:CHANID, :STARTTIME, :ENDTIME, :TITLE,"
                           " :SUBTITLE, :RECORDID, 1)");
             query.bindValue(":CHANID", chanidlist[i]);
-            query.bindValue(":STARTTIME", startdt);
-            query.bindValue(":ENDTIME", startdt.addSecs(duration * 60));
+            query.bindValue(":STARTTIME", lstartdt.toUTC());
+            query.bindValue(":ENDTIME", lstartdt.toUTC().addSecs(duration));
             query.bindValue(":TITLE", title);
-            query.bindValue(":SUBTITLE", startdt);
+            query.bindValue(":SUBTITLE", lstartdt);
             query.bindValue(":RECORDID", recordid);
             if (!query.exec())
             {
@@ -3282,7 +3282,7 @@ void Scheduler::UpdateManuals(uint recordid)
                 return;
             }
         }
-        startdt = startdt.addDays(skipdays);
+        lstartdt = lstartdt.addDays(skipdays);
     }
 }
 
@@ -3433,12 +3433,12 @@ static QString progfindid = QString(
 "  WHEN %1 "
 "   THEN RECTABLE.findid "
 "  WHEN %2 "
-"   THEN to_days(date_sub(program.starttime, interval "
-"                time_format(RECTABLE.findtime, '%H:%i') hour_minute)) "
+"   THEN to_days(date_sub(convert_tz(program.starttime, 'UTC', 'SYSTEM'), "
+"            interval time_format(RECTABLE.findtime, '%H:%i') hour_minute)) "
 "  WHEN %3 "
-"   THEN floor((to_days(date_sub(program.starttime, interval "
-"               time_format(RECTABLE.findtime, '%H:%i') hour_minute)) - "
-"               RECTABLE.findday)/7) * 7 + RECTABLE.findday "
+"   THEN floor((to_days(date_sub(convert_tz(program.starttime, 'UTC', "
+"            'SYSTEM'), interval time_format(RECTABLE.findtime, '%H:%i') "
+"            hour_minute)) - RECTABLE.findday)/7) * 7 + RECTABLE.findday "
 "  WHEN %4 "
 "   THEN RECTABLE.findid "
 "  ELSE 0 "
@@ -3572,15 +3572,15 @@ void Scheduler::UpdateMatches(uint recordid, uint sourceid, uint mplexid,
 "  AND "
 "  ((RECTABLE.type = %5) " // channelrecord
 "   OR"
-"   ((TIME_TO_SEC(RECTABLE.starttime) = TIME_TO_SEC(program.starttime)) " // timeslot matches
+"   (( TIME(CONVERT_TZ(ADDTIME(RECTABLE.startdate, RECTABLE.starttime), 'UTC', 'SYSTEM')) = TIME(CONVERT_TZ(program.starttime, 'UTC', 'SYSTEM'))) " // timeslot matches
 "    AND "
 "    ((RECTABLE.type = %6) " // timeslotrecord
 "     OR"
-"     ((DAYOFWEEK(RECTABLE.startdate) = DAYOFWEEK(program.starttime) "
+"     ((DAYOFWEEK(CONVERT_TZ(ADDTIME(RECTABLE.startdate, RECTABLE.starttime), 'UTC', 'SYSTEM')) = DAYOFWEEK(CONVERT_TZ(program.starttime, 'UTC', 'SYSTEM')) "
 "      AND "
 "      ((RECTABLE.type = %7) " // weekslotrecord
 "       OR"
-"       ((TO_DAYS(RECTABLE.startdate) = TO_DAYS(program.starttime)) " // date matches
+"       ((ADDTIME(RECTABLE.startdate, RECTABLE.starttime) = program.starttime) " // date/time matches
 "        AND (RECTABLE.type <> %8)" // single,override,don't,etc.
 "        )"
 "       )"

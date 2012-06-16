@@ -331,11 +331,6 @@ void HouseKeeper::RunHouseKeeping(void)
             updateLastrun(dbTag);
         }
 
-        if (wantToRun("DBCleanup", 1, 0, 24))
-        {
-            gCoreContext->GetDBManager()->PurgeIdleConnections();
-        }
-
         initialRun = false;
 
         locker.relock();

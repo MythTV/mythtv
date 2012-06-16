@@ -1,9 +1,15 @@
 #ifndef BREAKMAP_H
 #define BREAKMAP_H
 
+#include "tv.h"
+#include "programtypes.h"
+#include "playercontext.h"
+
 #include <QMutex>
 #include <QMap>
-#include "tv.h"
+
+#include <compat.h>
+#include <stdint.h>
 
 class NuppelVideoPlayer;
 

@@ -1244,7 +1244,7 @@ bool DTVRecorder::ProcessTSPacket(const TSPacket &tspacket)
         int v = _continuity_error_count.fetchAndAddRelaxed(1) + 1;
         double erate = v * 100.0 / _packet_count.fetchAndAddRelaxed(0);
         LOG(VB_RECORD, LOG_WARNING, LOC +
-            QString("PID 0x%1 discontinuity detected ((%2+1)%16!=%3) %4\%")
+            QString("PID 0x%1 discontinuity detected ((%2+1)\%16!=%3) %4\%")
                 .arg(pid,0,16).arg(old_cnt,2)
                 .arg(tspacket.ContinuityCounter(),2)
                 .arg(erate));
@@ -1316,7 +1316,7 @@ bool DTVRecorder::ProcessAVTSPacket(const TSPacket &tspacket)
         int v = _continuity_error_count.fetchAndAddRelaxed(1) + 1;
         double erate = v * 100.0 / _packet_count.fetchAndAddRelaxed(0);
         LOG(VB_RECORD, LOG_WARNING, LOC +
-            QString("A/V PID 0x%1 discontinuity detected ((%2+1)%16!=%3) %4\%")
+            QString("A/V PID 0x%1 discontinuity detected ((%2+1)\%16!=%3) %4\%")
                 .arg(pid,0,16).arg(old_cnt).arg(tspacket.ContinuityCounter())
                 .arg(erate,5,'f',2));
     }

@@ -19,6 +19,7 @@ using namespace std;
 #include "remoteutil.h"
 #include "mythevent.h"
 #include "mythdirs.h"
+#include "compat.h" // for random()
 
 #define LOC      QString("PlaybackBoxHelper: ")
 #define LOC_WARN QString("PlaybackBoxHelper Warning: ")

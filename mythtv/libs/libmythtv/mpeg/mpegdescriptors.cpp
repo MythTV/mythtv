@@ -429,6 +429,8 @@ QString MPEGDescriptor::toString() const
         SET_STRING(CueIdentifierDescriptor);
     else if (DescriptorID::scte_revision_detection == DescriptorTag())
         SET_STRING(RevisionDetectionDescriptor);
+    else if (DescriptorID::teletext == DescriptorTag())
+        SET_STRING(TeletextDescriptor);
     /// POSSIBLY UNSAFE ! -- begin
     else if (PrivateDescriptorID::dvb_uk_channel_list == DescriptorTag())
         SET_STRING(UKChannelListDescriptor);

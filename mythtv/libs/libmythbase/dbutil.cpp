@@ -867,4 +867,20 @@ void DBUtil::UnlockSchema(MSqlQuery &query)
     query.exec();
 }
 
+/** \fn CheckTimeZoneSupport(void)
+ *  \brief Check if MySQL has working timz zone support.
+ */
+bool DBUtil::CheckTimeZoneSupport(void)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT CONVERT_TZ(NOW(), 'SYSTEM', 'UTC')");
+    if (!query.exec() || !query.next())
+    {
+        LOG(VB_GENERAL, LOG_ERR, "MySQL time zone support check failed");
+        return false;
+    }
+
+    return !query.value(0).isNull();
+}
+
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

@@ -1098,7 +1098,7 @@ bool cCiDateTime::SendDateTime(void)
      int D = tm_gmt.tm_mday;
      int L = (M == 1 || M == 2) ? 1 : 0;
      int MJD = 14956 + D + int((Y - L) * 365.25) + int((M + 1 + L * 12) * 30.6001);
-#define DEC2BCD(d) (((d / 10) << 4) + (d % 10))
+#define DEC2BCD(d) (uint8_t(((d / 10) << 4) + (d % 10)))
      struct tTime { unsigned short mjd; uint8_t h, m, s; short offset; };
      tTime T = { mjd : htons(MJD), h : DEC2BCD(tm_gmt.tm_hour), m : DEC2BCD(tm_gmt.tm_min), s : DEC2BCD(tm_gmt.tm_sec), offset : htons(tm_loc.tm_gmtoff / 60) };
      dbgprotocol("%d: ==> Date Time\n", SessionId());

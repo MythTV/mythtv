@@ -720,7 +720,7 @@ static FmtConv FmtList[] =
     FMT_NULL
 };
 
-ConstFilterInfo filter_table[] =
+const FilterInfo filter_table[] =
 {
     {
             filter_init: &YadifDeintFilter,
@@ -735,7 +735,8 @@ ConstFilterInfo filter_table[] =
             descript:   "combines data from several fields to deinterlace with less motion blur",
             formats:    FmtList,
             libname:    NULL
-    },FILT_NULL
+    },
+    FILT_NULL
 };
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

@@ -46,6 +46,7 @@ using namespace std;
 #include "commandlineparser.h"
 #include "mythsystemevent.h"
 #include "mythlogging.h"
+#include "signalhandling.h"
 
 #define LOC      QString("MythPreviewGen: ")
 #define LOC_WARN QString("MythPreviewGen, Warning: ")
@@ -200,6 +201,13 @@ int main(int argc, char **argv)
     close(0);
 
     CleanupGuard callCleanup(cleanup);
+
+#ifndef _WIN32
+    QList<int> signallist;
+    signallist << SIGINT << SIGTERM << SIGSEGV << SIGABRT;
+    SignalHandler handler(signallist);
+    signal(SIGHUP, SIG_IGN);
+#endif
 
     if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
         LOG(VB_GENERAL, LOG_WARNING, LOC + "Unable to ignore SIGPIPE");

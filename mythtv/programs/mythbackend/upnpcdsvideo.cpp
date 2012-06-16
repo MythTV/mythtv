@@ -38,7 +38,7 @@ UPnpCDSRootInfo UPnpCDSVideo::g_RootNodes[] =
 int UPnpCDSVideo::g_nRootCount = 1;
 
 //int UPnpCDSVideo::g_nRootCount;
-//= sizeof( g_RootNodes ) / sizeof( UPnpCDSRootInfo );
+// = sizeof( g_RootNodes ) / sizeof( UPnpCDSRootInfo );
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -47,7 +47,7 @@ int UPnpCDSVideo::g_nRootCount = 1;
 UPnpCDSRootInfo *UPnpCDSVideo::GetRootInfo( int nIdx )
 {
     if ((nIdx >=0 ) && ( nIdx < g_nRootCount ))
-        return &(g_RootNodes[ nIdx ]); 
+        return &(g_RootNodes[nIdx]);
 
     return NULL;
 }

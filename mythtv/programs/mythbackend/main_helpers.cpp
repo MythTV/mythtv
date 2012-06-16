@@ -36,6 +36,7 @@
 #include "mythcontext.h"
 #include "mythversion.h"
 #include "mythdb.h"
+#include "dbutil.h"
 #include "exitcodes.h"
 #include "compat.h"
 #include "storagegroup.h"
@@ -217,11 +218,6 @@ bool setupTVs(bool ismaster, bool &error)
 
 void cleanup(void)
 {
-    signal(SIGTERM, SIG_DFL);
-#ifndef _MSC_VER
-    signal(SIGUSR1, SIG_DFL);
-#endif
-
     if (mainServer)
         mainServer->Stop();
 
@@ -444,7 +440,7 @@ int connect_to_master(void)
         if (tempMonitorAnnounce.empty() ||
             tempMonitorAnnounce[0] == "ERROR")
         {
-            tempMonitorConnection->DownRef();
+            tempMonitorConnection->DecrRef();
             tempMonitorConnection = NULL;
             if (tempMonitorAnnounce.empty())
             {
@@ -484,7 +480,7 @@ int connect_to_master(void)
                 QString("Current time on the master backend differs by "
                         "%1 seconds from time on this system. Exiting.")
                 .arg(timediff));
-            tempMonitorConnection->DownRef();
+            tempMonitorConnection->DecrRef();
             return GENERIC_EXIT_INVALID_TIME;
         }
 
@@ -497,7 +493,7 @@ int connect_to_master(void)
         }
     }
     if (tempMonitorConnection)
-        tempMonitorConnection->DownRef();
+        tempMonitorConnection->DecrRef();
 
     return GENERIC_EXIT_OK;
 }
@@ -533,6 +529,13 @@ void print_warnings(const MythBackendCommandLineParser &cmdline)
 
 int run_backend(MythBackendCommandLineParser &cmdline)
 {
+    if (!DBUtil::CheckTimeZoneSupport())
+    {
+        LOG(VB_GENERAL, LOG_ERR, "MySQL time zone support is not missing.  "
+            "Please install it and try again.");
+        return GENERIC_EXIT_DB_NOTIMEZONE;
+    }
+
     bool ismaster = gCoreContext->IsMasterHost();
 
     if (!UpgradeTVDatabaseSchema(ismaster, ismaster))

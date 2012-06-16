@@ -21,6 +21,7 @@ using namespace std;
 #include "mythlogging.h"
 #include "commandlineparser.h"
 #include "programinfo.h"
+#include "signalhandling.h"
 
 static void setGlobalSetting(const QString &key, const QString &value)
 {
@@ -782,6 +783,13 @@ int main(int argc, char **argv)
     QString mask("none");
     if ((retval = cmdline.ConfigureLogging(mask)) != GENERIC_EXIT_OK)
         return retval;
+
+#ifndef _WIN32
+    QList<int> signallist;
+    signallist << SIGINT << SIGTERM << SIGSEGV << SIGABRT;
+    SignalHandler handler(signallist);
+    signal(SIGHUP, SIG_IGN);
+#endif
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init(false))

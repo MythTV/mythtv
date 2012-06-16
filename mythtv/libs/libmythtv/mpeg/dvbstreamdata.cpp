@@ -832,7 +832,7 @@ const nit_ptr_t DVBStreamData::GetCachedNIT(
     return nit;
 }
 
-const nit_vec_t DVBStreamData::GetCachedNIT(bool current) const
+nit_vec_t DVBStreamData::GetCachedNIT(bool current) const
 {
     QMutexLocker locker(&_cache_lock);
 
@@ -866,7 +866,7 @@ const sdt_ptr_t DVBStreamData::GetCachedSDT(
     return sdt;
 }
 
-const sdt_vec_t DVBStreamData::GetCachedSDTs(bool current) const
+sdt_vec_t DVBStreamData::GetCachedSDTs(bool current) const
 {
     QMutexLocker locker(&_cache_lock);
 

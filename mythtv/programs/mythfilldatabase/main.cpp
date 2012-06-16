@@ -28,6 +28,7 @@ using namespace std;
 #include "dbcheck.h"
 #include "mythsystemevent.h"
 #include "mythlogging.h"
+#include "signalhandling.h"
 
 // filldata headers
 #include "filldata.h"
@@ -343,6 +344,13 @@ int main(int argc, char *argv[])
     }
 
     CleanupGuard callCleanup(cleanup);
+
+#ifndef _WIN32
+    QList<int> signallist;
+    signallist << SIGINT << SIGTERM << SIGSEGV << SIGABRT;
+    SignalHandler handler(signallist);
+    signal(SIGHUP, SIG_IGN);
+#endif
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init(false))

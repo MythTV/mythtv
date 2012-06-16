@@ -104,7 +104,7 @@ void MythSocketThread::AddToReadyRead(MythSocket *sock)
     }
     StartReadyReadThread();
 
-    sock->UpRef();
+    sock->IncrRef();
 
     {
         QMutexLocker locker(&m_readyread_lock);
@@ -337,7 +337,7 @@ void MythSocketThread::run(void)
             for (it = m_readyread_downref_list.begin();
                  it != m_readyread_downref_list.end(); ++it)
             {
-                (*it)->DownRef();
+                (*it)->DecrRef();
             }
             m_readyread_downref_list.clear();
             downref_tm = tm.elapsed();

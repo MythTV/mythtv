@@ -34,13 +34,14 @@ class ProcessRequestRunnable : public QRunnable
     ProcessRequestRunnable(MythSocketManager &parent, MythSocket *sock) :
         m_parent(parent), m_sock(sock)
     {
-        m_sock->UpRef();
+        m_sock->IncrRef();
     }
 
     virtual void run(void)
     {
         m_parent.ProcessRequest(m_sock);
-        m_sock->DownRef();
+        m_sock->DecrRef();
+        m_sock = NULL;
     }
 
     MythSocketManager &m_parent;

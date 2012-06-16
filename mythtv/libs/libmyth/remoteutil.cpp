@@ -473,7 +473,7 @@ bool RemoteGetFileList(QString host, QString path, QStringList* list,
         if (sock)
         {
             ok = sock->SendReceiveStringList(*list);
-            sock->DownRef();
+            sock->DecrRef();
         }
         else
             list->clear();

@@ -28,6 +28,7 @@
 #include "compat.h"
 #include "mythsystemevent.h"
 #include "mythlogging.h"
+#include "signalhandling.h"
 
 #define LOC      QString("MythJobQueue: ")
 #define LOC_WARN QString("MythJobQueue, Warning: ")
@@ -106,6 +107,13 @@ int main(int argc, char *argv[])
         return retval;
 
     CleanupGuard callCleanup(cleanup);
+
+#ifndef _WIN32
+    QList<int> signallist;
+    signallist << SIGINT << SIGTERM << SIGSEGV << SIGABRT;
+    SignalHandler handler(signallist);
+    signal(SIGHUP, SIG_IGN);
+#endif
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init(false))

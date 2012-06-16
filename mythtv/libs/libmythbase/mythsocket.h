@@ -5,6 +5,7 @@
 #include <QStringList>
 #include <QMutex>
 
+#include "referencecounter.h"
 #include "msocketdevice.h"
 #include "mythsocket_cb.h"
 #include "mythbaseexp.h"
@@ -15,7 +16,8 @@ class QString;
 class QHostAddress;
 class MythSocketThread;
 
-class MBASE_PUBLIC MythSocket : public MSocketDevice
+class MBASE_PUBLIC MythSocket :
+    public MSocketDevice, public ReferenceCounter
 {
     friend class MythSocketThread;
     friend class QList<MythSocket*>;
@@ -35,8 +37,7 @@ class MBASE_PUBLIC MythSocket : public MSocketDevice
     bool closedByRemote(void);
     void deleteLater(void);
 
-    void UpRef(void);
-    bool DownRef(void);
+    virtual int DecrRef(void); // ReferenceCounter
 
     State   state(void) const;
     QString stateToString(void) const { return stateToString(state()); }
@@ -96,10 +97,8 @@ class MBASE_PUBLIC MythSocket : public MSocketDevice
     State           m_state;
     QHostAddress    m_addr;
     quint16         m_port;
-    int             m_ref_count;
 
     bool            m_notifyread;
-    QMutex          m_ref_lock;
     mutable QMutex  m_lock; // externally accessible lock
 
     bool            m_expectingreply;

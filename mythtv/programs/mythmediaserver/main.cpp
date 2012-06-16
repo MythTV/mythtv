@@ -22,6 +22,7 @@
 #include "mythversion.h"
 #include "mythsystemevent.h"
 #include "commandlineparser.h"
+#include "signalhandling.h"
 
 #include "controlrequesthandler.h"
 #include "requesthandler/basehandler.h"
@@ -104,6 +105,13 @@ int main(int argc, char *argv[])
         return retval;
 
     CleanupGuard callCleanup(cleanup);
+
+#ifndef _WIN32
+    QList<int> signallist;
+    signallist << SIGINT << SIGTERM << SIGSEGV << SIGABRT;
+    SignalHandler handler(signallist);
+    signal(SIGHUP, SIG_IGN);
+#endif
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init(false))

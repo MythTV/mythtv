@@ -1344,15 +1344,11 @@ bool MythRenderVDPAU::DrawBitmap(uint id, uint target,
             height = std::min(src->height(), height);
         }
 
-        vdest.x0 = dst->x();
-        vdest.y0 = dst->y();
+        vdest.x0 = (dst->x() < 0) ? 0 : dst->x();
+        vdest.y0 = (dst->y() < 0) ? 0 : dst->y();
         vdest.x1 = dst->x() + width;
         vdest.y1 = dst->y() + height;
 
-        if (vdest.x0 < 0)
-            vdest.x0 = 0;
-        if (vdest.y0 < 0)
-            vdest.y0 = 0;
     }
 
     if (src)

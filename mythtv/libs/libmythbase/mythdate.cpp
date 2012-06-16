@@ -114,8 +114,6 @@ QString toString(const QDate &date, uint format)
 
     if (format & (kDateFull | kDateShort))
     {
-        QDate now = current().date();
-
         QString stringformat;
         if (format & kDateShort)
             stringformat = gCoreContext->GetSetting("ShortDateFormat", "ddd d");
@@ -130,6 +128,7 @@ QString toString(const QDate &date, uint format)
 
         if (format & ~kDateShort)
         {
+            QDate now = current().toLocalTime().date();
             if ((format & kSimplify) && (now == date))
                 result = QObject::tr("Today");
             else if ((format & kSimplify) && (now.addDays(-1) == date))

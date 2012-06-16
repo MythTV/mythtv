@@ -13,6 +13,7 @@
 #include "mythconfig.h"
 #include "mythcontext.h"
 #include "mythdbcon.h"
+#include "dbutil.h"
 #include "mythlogging.h"
 #include "mythversion.h"
 #include "langsettings.h"
@@ -39,6 +40,7 @@
 #include "expertsettingseditor.h"
 #include "commandlineparser.h"
 #include "profilegroup.h"
+#include "signalhandling.h"
 
 using namespace std;
 
@@ -273,6 +275,13 @@ int main(int argc, char *argv[])
     new QApplication(argc, argv, use_display);
     QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHTV_SETUP);
 
+#ifndef _WIN32
+    QList<int> signallist;
+    signallist << SIGINT << SIGTERM << SIGSEGV << SIGABRT;
+    SignalHandler handler(signallist);
+    signal(SIGHUP, SIG_IGN);
+#endif
+
     if (cmdline.toBool("display"))
         display = cmdline.toString("display");
     if (cmdline.toBool("geometry"))
@@ -505,6 +514,13 @@ int main(int argc, char *argv[])
     {
         if (!reloadTheme())
             return GENERIC_EXIT_NO_THEME;
+    }
+
+    if (!DBUtil::CheckTimeZoneSupport())
+    {
+        LOG(VB_GENERAL, LOG_ERR, "MySQL time zone support is not missing.  "
+            "Please install it and try again.");
+        return GENERIC_EXIT_DB_NOTIMEZONE;
     }
 
     if (!UpgradeTVDatabaseSchema(true))

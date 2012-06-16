@@ -12,6 +12,8 @@ class MThread;
 class BonjourRegister;
 
 #define AIRPLAY_PORT_RANGE 100
+#define AIRPLAY_HARDWARE_ID_SIZE 6
+QString AirPlayHardwareId();
 
 enum AirplayEvent
 {

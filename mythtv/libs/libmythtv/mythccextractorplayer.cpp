@@ -364,7 +364,7 @@ void MythCCExtractorPlayer::Process608Captions(uint flags)
 
                 QString lang = iso639_key_to_str3(langCode);
                 lang = iso639_is_key_undefined(langCode) ? "und" : lang;
-                
+
                 QString service_key = QString("cc%1").arg(idx + 1);
                 QString filename = QString("%1.%2%3-%4.%5.srt")
                     .arg(m_baseName).arg(stream_id_str).arg("608")
@@ -558,7 +558,7 @@ void MythCCExtractorPlayer::IngestTeletext(void)
                                to_string_list(*subpage));
             }
         }
-        
+
         (*ttxit).reader->ClearUpdatedPages();
     }
 }
@@ -579,12 +579,21 @@ void MythCCExtractorPlayer::ProcessTeletext(void)
             if ((*it).empty())
                 continue; // Skip empty subtitle streams.
 
-            int page = it.key();
+            uint page = it.key();
 
             if (!(*ttxit).srtwriters[page])
             {
-                QString filename = QString("%1.%2ttx-0x%3.srt")
+                int langCode = 0;
+                AvFormatDecoder *avd = dynamic_cast<AvFormatDecoder *>(decoder);
+
+                if (avd)
+                    langCode = avd->GetTeletextLanguage(page);
+
+                QString lang = iso639_key_to_str3(langCode);
+                lang = iso639_is_key_undefined(langCode) ? "und" : lang;
+                QString filename = QString("%1-%2.%3ttx-0x%4.srt")
                     .arg(m_baseName)
+                    .arg(lang)
                     .arg(stream_id_str)
                     .arg(page, 3, 16, QChar('0'));
 
@@ -646,7 +655,7 @@ void MythCCExtractorPlayer::IngestDVBSubtitles(void)
             subtitles->buffers.pop_front();
 
             const QSize v_size =
-                QSize(GetVideoSize().width()*4, GetVideoSize().height()*4); 
+                QSize(GetVideoSize().width()*4, GetVideoSize().height()*4);
             QImage sub_pict(v_size, QImage::Format_ARGB32);
             sub_pict.fill(0);
 
@@ -715,9 +724,19 @@ void MythCCExtractorPlayer::ProcessDVBSubtitles(uint flags)
 {
     // Process (DVB) subtitle streams.
     DVBSubInfo::iterator subit = m_dvbsub_info.begin();
+    int subtitleStreamCount = 0;
     for (; subit != m_dvbsub_info.end(); ++subit)
     {
-        QString dir_name = QString(m_baseName + ".dvb-%1").arg(subit.key());
+        int langCode = 0;
+        AvFormatDecoder *avd = dynamic_cast<AvFormatDecoder *>(decoder);
+        int idx = subit.key();
+        if (avd)
+            langCode = avd->GetSubtitleLanguage(subtitleStreamCount, idx);
+        subtitleStreamCount++;
+
+        QString lang = iso639_key_to_str3(langCode);
+        lang = iso639_is_key_undefined(langCode) ? "und" : lang;
+        QString dir_name = QString(m_baseName + "-%1.dvb-%2").arg(lang).arg(subit.key());
         if (!m_workingDir.exists(dir_name) && !m_workingDir.mkdir(dir_name))
         {
             LOG(VB_GENERAL, LOG_ERR, QString("Can't create directory '%1'")

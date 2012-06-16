@@ -1605,7 +1605,7 @@ void MythMainWindow::BindKey(const QString &context, const QString &action,
     if (!d->keyContexts.contains(context))
         d->keyContexts.insert(context, new KeyContext());
 
-    for (unsigned int i = 0; i < keyseq.count(); i++)
+    for (unsigned int i = 0; i < (uint)keyseq.count(); i++)
     {
         int keynum = keyseq[i];
         keynum &= ~Qt::UNICODE_ACCEL;
@@ -1752,7 +1752,7 @@ void MythMainWindow::BindJump(const QString &destination, const QString &key)
 
     QKeySequence keyseq(key);
 
-    for (unsigned int i = 0; i < keyseq.count(); i++)
+    for (unsigned int i = 0; i < (uint)keyseq.count(); i++)
     {
         int keynum = keyseq[i];
         keynum &= ~Qt::UNICODE_ACCEL;
