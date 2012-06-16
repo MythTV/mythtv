@@ -140,7 +140,7 @@ class MUI_PUBLIC MythUIButtonList : public MythUIType
     void Update();
 
     virtual void SetValue(int value) { MoveToNamedPosition(QString::number(value)); }
-    virtual void SetValue(QString value) { MoveToNamedPosition(value); }
+    virtual void SetValue(const QString &value) { MoveToNamedPosition(value); }
     void SetValueByData(QVariant data);
     virtual int  GetIntValue() const;
     virtual QString  GetValue() const;
