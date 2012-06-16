@@ -36,6 +36,7 @@
 #include "mythcontext.h"
 #include "mythversion.h"
 #include "mythdb.h"
+#include "dbutil.h"
 #include "exitcodes.h"
 #include "compat.h"
 #include "storagegroup.h"
@@ -528,6 +529,13 @@ void print_warnings(const MythBackendCommandLineParser &cmdline)
 
 int run_backend(MythBackendCommandLineParser &cmdline)
 {
+    if (!DBUtil::CheckTimeZoneSupport())
+    {
+        LOG(VB_GENERAL, LOG_ERR, "MySQL time zone support is not missing.  "
+            "Please install it and try again.");
+        return GENERIC_EXIT_DB_NOTIMEZONE;
+    }
+
     bool ismaster = gCoreContext->IsMasterHost();
 
     if (!UpgradeTVDatabaseSchema(ismaster, ismaster))

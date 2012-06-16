@@ -2061,36 +2061,42 @@ NULL
             for (uint i = 0; i < sizeof(with_endtime)/sizeof(char*); i++)
             {
                 updates_ba.push_back(
-                    QString("UPDATE %1 "
-                            "SET starttime = starttime + interval %2 minute, "
-                            "    endtime   = endtime   + interval %3 minute  "
-                            "ORDER BY %4")
-                    .arg(with_endtime[i]).arg(utc_offset).arg(utc_offset)
-                    .arg(order).toLocal8Bit());
+                         QString("UPDATE %1 "
+                                 "SET starttime = "
+                                 "    CONVERT_TZ(starttime, 'SYSTEM', 'UTC'), "
+                                 "    endtime   = "
+                                 "    CONVERT_TZ(endtime, 'SYSTEM', 'UTC') "
+                                 "ORDER BY %4")
+                         .arg(with_endtime[i])
+                         .arg(order).toLocal8Bit());
             }
 
             for (uint i = 0; i < sizeof(without_endtime)/sizeof(char*); i++)
             {
                 updates_ba.push_back(
-                    QString("UPDATE %1 "
-                            "SET starttime = starttime + interval %2 minute "
-                            "ORDER BY %3")
-                    .arg(without_endtime[i]).arg(utc_offset).arg(order)
-                    .toLocal8Bit());
+                          QString("UPDATE %1 "
+                                  "SET starttime = "
+                                  "    CONVERT_TZ(starttime, 'SYSTEM', 'UTC') "
+                                  "ORDER BY %3")
+                          .arg(without_endtime[i]).arg(order)
+                          .toLocal8Bit());
             }
 
             updates_ba.push_back(
-                QString("UPDATE oldprogram "
-                        "SET airdate = airdate + interval %2 minute "
-                        "ORDER BY %3")
-                .arg(utc_offset).arg((utc_offset > 0) ? "-airdate" : "airdate")
-                .toLocal8Bit());
+                         QString("UPDATE oldprogram "
+                                 "SET airdate = "
+                                 "    CONVERT_TZ(airdate, 'SYSTEM', 'UTC') "
+                                 "ORDER BY %3")
+                         .arg((utc_offset > 0) ? "-airdate" : 
+                              "airdate").toLocal8Bit());
 
             updates_ba.push_back(
-                QString("UPDATE recorded "
-                        "set progstart = progstart + interval %1 minute, "
-                        "    progend   = progend   + interval %2 minute  ")
-                .arg(utc_offset).arg(utc_offset).toLocal8Bit());
+                         QString("UPDATE recorded "
+                                 "set progstart = "
+                                 "    CONVERT_TZ(progstart, 'SYSTEM', 'UTC'), "
+                                 "    progend   = "
+                                 "    CONVERT_TZ(progend, 'SYSTEM', 'UTC') ")
+                         .toLocal8Bit());
         }
 
         // Convert DATETIME back to seperate DATE and TIME in record table
@@ -2143,22 +2149,20 @@ NULL
             for (uint i = 0; i < sizeof(with_endtime)/sizeof(char*); i++)
             {
                 updates_ba.push_back(
-                    QString("UPDATE %1 "
-                            "SET starttime = starttime + interval %2 minute, "
-                            "    endtime   = endtime   + interval %3 minute  "
-                            "ORDER BY %4")
-                    .arg(with_endtime[i]).arg(utc_offset).arg(utc_offset)
-                    .arg(order).toLocal8Bit());
+                     QString("UPDATE %1 "
+                     "SET starttime = CONVERT_TZ(starttime, 'SYSTEM', 'UTC'), "
+                     "    endtime   = CONVERT_TZ(endtime, 'SYSTEM', 'UTC') "
+                     "ORDER BY %4")
+                     .arg(with_endtime[i]).arg(order).toLocal8Bit());
             }
 
             for (uint i = 0; i < sizeof(without_endtime)/sizeof(char*); i++)
             {
                 updates_ba.push_back(
-                    QString("UPDATE %1 "
-                            "SET starttime = starttime + interval %2 minute "
-                            "ORDER BY %3")
-                    .arg(without_endtime[i]).arg(utc_offset).arg(order)
-                    .toLocal8Bit());
+                      QString("UPDATE %1 "
+                      "SET starttime = CONVERT_TZ(starttime, 'SYSTEM', 'UTC') "
+                      "ORDER BY %3")
+                      .arg(without_endtime[i]).arg(order).toLocal8Bit());
             }
         }
 
@@ -2176,11 +2180,6 @@ NULL
 
     if (dbver == "1304")
     {
-        QDateTime loc = QDateTime::currentDateTime();
-        QDateTime utc = loc.toUTC();
-        loc = QDateTime(loc.date(), loc.time(), Qt::UTC);
-        int utc_offset = loc.secsTo(utc) / 60;
-
         QList<QByteArray> updates_ba;
 
         updates_ba.push_back(
@@ -2190,15 +2189,16 @@ NULL
 "WHERE filterid=3");
 
         updates_ba.push_back(QString(
-"UPDATE record SET "
-"findday = DAYOFWEEK(ADDTIME('2012-06-02 00:00:00', findtime) "
-"    + INTERVAL %1 MINUTE + INTERVAL findday DAY) "
-"WHERE findday > 0").arg(utc_offset).toLocal8Bit());
+"UPDATE record SET findday = "
+"    DAYOFWEEK(CONVERT_TZ(ADDTIME('2012-06-02 00:00:00', findtime), "
+"                         'SYSTEM', 'UTC') + INTERVAL findday DAY) "
+"WHERE findday > 0").toLocal8Bit());
 
         updates_ba.push_back(QString(
-"UPDATE record SET "
-"findtime = TIME(ADDTIME('2012-06-02 00:00:00', findtime) "
-"    + INTERVAL %1 MINUTE)").arg(utc_offset).toLocal8Bit());
+"UPDATE record SET findtime = "
+"    TIME(CONVERT_TZ(ADDTIME('2012-06-02 00:00:00', findtime), "
+"                    'SYSTEM', 'UTC')) ")
+                             .toLocal8Bit());
 
         // Convert update ByteArrays to NULL terminated char**
         QList<QByteArray>::const_iterator it = updates_ba.begin();
@@ -2208,6 +2208,35 @@ NULL
         updates.push_back(NULL);
 
         if (!performActualUpdate(&updates[0], "1305", dbver))
+            return false;
+    }
+
+    if (dbver == "1305")
+    {
+        // Reverse the findday/findtime changes from above since those
+        // values need to be kept in local time.
+
+        QList<QByteArray> updates_ba;
+
+        updates_ba.push_back(QString(
+"UPDATE record SET findday = "
+"    DAYOFWEEK(CONVERT_TZ(ADDTIME('2012-06-02 00:00:00', findtime), "
+"                         'UTC', 'SYSTEM') + INTERVAL findday DAY) "
+"WHERE findday > 0").toLocal8Bit());
+
+        updates_ba.push_back(QString(
+"UPDATE record SET findtime = "
+"    TIME(CONVERT_TZ(ADDTIME('2012-06-02 00:00:00', findtime), "
+"                    'UTC', 'SYSTEM')) ").toLocal8Bit());
+
+        // Convert update ByteArrays to NULL terminated char**
+        QList<QByteArray>::const_iterator it = updates_ba.begin();
+        vector<const char*> updates;
+        for (; it != updates_ba.end(); ++it)
+            updates.push_back((*it).constData());
+        updates.push_back(NULL);
+
+        if (!performActualUpdate(&updates[0], "1306", dbver))
             return false;
     }
 

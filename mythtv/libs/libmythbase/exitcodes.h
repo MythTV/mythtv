@@ -33,5 +33,6 @@
 #define GENERIC_EXIT_DEADLOCK           150 ///< Transcode deadlock detected
 #define GENERIC_EXIT_IN_USE             151 ///< Recording in use, can't flag
 #define GENERIC_EXIT_START              152 ///< MythSystem process starting
+#define GENERIC_EXIT_DB_NOTIMEZONE      153 ///< Missing DB time zone support
 
 #endif // __MYTH_EXIT_CODES__

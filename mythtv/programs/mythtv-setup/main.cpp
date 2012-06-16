@@ -13,6 +13,7 @@
 #include "mythconfig.h"
 #include "mythcontext.h"
 #include "mythdbcon.h"
+#include "dbutil.h"
 #include "mythlogging.h"
 #include "mythversion.h"
 #include "langsettings.h"
@@ -513,6 +514,13 @@ int main(int argc, char *argv[])
     {
         if (!reloadTheme())
             return GENERIC_EXIT_NO_THEME;
+    }
+
+    if (!DBUtil::CheckTimeZoneSupport())
+    {
+        LOG(VB_GENERAL, LOG_ERR, "MySQL time zone support is not missing.  "
+            "Please install it and try again.");
+        return GENERIC_EXIT_DB_NOTIMEZONE;
     }
 
     if (!UpgradeTVDatabaseSchema(true))

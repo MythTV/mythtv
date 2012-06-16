@@ -36,7 +36,8 @@ RecordingRule::RecordingRule()
     m_channelid(0),
     m_findday(-1),
     m_findtime(QTime::fromString("00:00:00", Qt::ISODate)),
-    m_findid(QDate(1970, 1, 1).daysTo(MythDate::current().date()) + 719528),
+    m_findid(QDate(1970, 1, 1).daysTo(MythDate::current().toLocalTime().date())
+             + 719528),
     m_type(kNotRecording),
     m_searchType(kNoSearch),
     m_recPriority(0),
@@ -262,9 +263,10 @@ bool RecordingRule::LoadBySearch(RecSearchType lsearch, QString textname,
         m_title = ltitle;
         m_subtitle = from;
         m_description = forwhat;
-        m_findday = (m_startdate.dayOfWeek() + 1) % 7;
+        QDate ldate = MythDate::current().toLocalTime().date();
+        m_findday = (ldate.dayOfWeek() + 1) % 7;
         QDate epoch(1970, 1, 1);
-        m_findid = epoch.daysTo(m_startdate) + 719528;
+        m_findid = epoch.daysTo(ldate) + 719528;
     }
 
     m_loaded = true;
@@ -579,9 +581,10 @@ void RecordingRule::ToMap(InfoMap &infoMap) const
 
     if (m_type == kFindDailyRecord || m_type == kFindWeeklyRecord)
     {
-        QDateTime dt =
-            QDateTime(MythDate::current().date(), m_findtime, Qt::UTC);
-        QString findfrom = MythDate::toString(dt, MythDate::kTime);
+        QDateTime ldt =
+            QDateTime(MythDate::current().toLocalTime().date(), m_findtime,
+                      Qt::LocalTime);
+        QString findfrom = MythDate::toString(ldt, MythDate::kTime);
         if (m_type == kFindWeeklyRecord)
         {
             int daynum = (m_findday + 5) % 7 + 1;
@@ -703,12 +706,13 @@ void RecordingRule::AssignProgramInfo()
     if (m_findday < 0)
     {
         m_findday =
-            (m_progInfo->GetScheduledStartTime().date().dayOfWeek() + 1) % 7;
-        m_findtime = m_progInfo->GetScheduledStartTime().time();
+            (m_progInfo->GetScheduledStartTime().toLocalTime().date()
+             .dayOfWeek() + 1) % 7;
+        m_findtime = m_progInfo->GetScheduledStartTime().toLocalTime().time();
 
         QDate epoch(1970, 1, 1);
         m_findid = epoch.daysTo(
-            m_progInfo->GetScheduledStartTime().date()) + 719528;
+            m_progInfo->GetScheduledStartTime().toLocalTime().date()) + 719528;
     }
     else
     {
@@ -718,7 +722,8 @@ void RecordingRule::AssignProgramInfo()
         {
             QDate epoch(1970, 1, 1);
             m_findid = epoch.daysTo(
-                m_progInfo->GetScheduledStartTime().date()) + 719528;
+                m_progInfo->GetScheduledStartTime().toLocalTime().date())
+                + 719528;
         }
     }
     m_category = m_progInfo->GetCategory();
