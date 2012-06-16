@@ -27,13 +27,13 @@
 
 QEvent::Type DecoderHandlerEvent::Ready = (QEvent::Type) QEvent::registerEventType();
 QEvent::Type DecoderHandlerEvent::Meta = (QEvent::Type) QEvent::registerEventType();
-QEvent::Type DecoderHandlerEvent::Info = (QEvent::Type) QEvent::registerEventType();
+QEvent::Type DecoderHandlerEvent::BufferStatus = (QEvent::Type) QEvent::registerEventType();
 QEvent::Type DecoderHandlerEvent::OperationStart = (QEvent::Type) QEvent::registerEventType();
 QEvent::Type DecoderHandlerEvent::OperationStop = (QEvent::Type) QEvent::registerEventType();
 QEvent::Type DecoderHandlerEvent::Error = (QEvent::Type) QEvent::registerEventType();
 
 DecoderHandlerEvent::DecoderHandlerEvent(Type t, const Metadata &meta)
-    : MythEvent(t), m_msg(NULL), m_meta(NULL)
+    : MythEvent(t), m_msg(NULL), m_meta(NULL), m_available(0), m_maxSize(0)
 { 
     m_meta = new Metadata(meta);
 }
@@ -57,7 +57,16 @@ MythEvent* DecoderHandlerEvent::clone(void) const
     if (m_meta)
         result->m_meta = new Metadata(*m_meta);
 
+    result->m_available = m_available;
+    result->m_maxSize = m_maxSize;
+
     return result;
+}
+
+void DecoderHandlerEvent::getBufferStatus(int *available, int *maxSize) const
+{
+    *available = m_available;
+    *maxSize = m_maxSize;
 }
 
 /**********************************************************************/
@@ -86,11 +95,6 @@ void DecoderIOFactory::doFailed(const QString &message)
 {
     m_handler->doOperationStop();
     m_handler->doFailed(getUrl(), message);
-}
-
-void DecoderIOFactory::doInfo(const QString &message)
-{
-    m_handler->doInfo(message);
 }
 
 void DecoderIOFactory::doOperationStart(const QString &name)
@@ -201,7 +205,7 @@ void DecoderIOFactoryUrl::start(void)
 
     m_started = false;
 
-    doOperationStart("Fetching remote file");
+    doOperationStart(tr("Fetching remote file"));
 
     m_reply = m_accessManager->get(QNetworkRequest(getUrl()));
 
@@ -266,12 +270,6 @@ void DecoderIOFactoryUrl::readyRead(void)
         m_reply->setReadBufferSize(DecoderIOFactory::DefaultPrebufferSize);
         doStart();
     }
-
-#if 0
-    LOG(VB_GENERAL, LOG_DEBUG,
-        QString("DecoderIOFactoryUrl::readyRead file size: %1")
-            .arg(m_bytesWritten));
-#endif
 }
 
 void DecoderIOFactoryUrl::doStart(void)
@@ -319,7 +317,19 @@ void DecoderHandler::start(Metadata *mdata)
     else
         url.setUrl(mdata->Filename());
 
-    bool result = createPlaylist(url);
+    createPlaylist(url);
+}
+
+void DecoderHandler::doStart(bool result)
+{
+    doOperationStop();
+
+    QUrl url;
+    if (QFileInfo(m_meta->Filename()).isAbsolute())
+        url = QUrl::fromLocalFile(m_meta->Filename());
+    else
+        url.setUrl(m_meta->Filename());
+
     if (m_state == LOADING && result)
     {
         for (int ii = 0; ii < m_playlist.size(); ii++)
@@ -329,7 +339,7 @@ void DecoderHandler::start(Metadata *mdata)
     }
     else
     {
-        if (m_state != STOPPED)
+        if (m_state == STOPPED)
         {
             doFailed(url, "Could not get playlist");
         }
@@ -428,16 +438,55 @@ void DecoderHandler::stop(void)
     m_state = STOPPED;
 }
 
-void DecoderHandler::customEvent(QEvent *e)
+void DecoderHandler::customEvent(QEvent *event)
 {
-    if (class DecoderHandlerEvent *event = dynamic_cast<DecoderHandlerEvent*>(e)) 
+    if (DecoderHandlerEvent *dhe = dynamic_cast<DecoderHandlerEvent*>(event))
     {
         // Proxy all DecoderHandlerEvents
-        return dispatch(*event);
+        return dispatch(*dhe);
+    }
+    else if (event->type() == MythEvent::MythEventMessage)
+    {
+        MythEvent *me = (MythEvent *)event;
+        QStringList tokens = me->Message().split(" ", QString::SkipEmptyParts);
+
+        if (tokens.isEmpty())
+            return;
+
+        if (tokens[0] == "DOWNLOAD_FILE")
+        {
+            QStringList args = me->ExtraDataList();
+
+            if (tokens[1] == "UPDATE")
+            {
+            }
+            else if (tokens[1] == "FINISHED")
+            {
+                QString downloadUrl = args[0];
+                int fileSize  = args[2].toInt();
+                int errorCode = args[4].toInt();
+                QString filename = args[1];
+
+                if ((errorCode != 0) || (fileSize == 0))
+                {
+                    LOG(VB_GENERAL, LOG_ERR, QString("DecoderHandler: failed to download playlist from '%1'")
+                        .arg(downloadUrl));
+                    QUrl url(downloadUrl);
+                    m_state = STOPPED;
+                    doOperationStop();
+                    doFailed(url, "Could not get playlist");
+                }
+                else
+                {
+                    QUrl fileUrl(filename);
+                    createPlaylistFromFile(fileUrl);
+                }
+            }
+        }
     }
 }
 
-bool DecoderHandler::createPlaylist(const QUrl &url)
+void DecoderHandler::createPlaylist(const QUrl &url)
 {
     QString extension = QFileInfo(url.path()).suffix();
     LOG(VB_NETWORK, LOG_INFO,
@@ -447,15 +496,17 @@ bool DecoderHandler::createPlaylist(const QUrl &url)
     if (extension == "pls" || extension == "m3u")
     {
         if (url.scheme() == "file" || QFileInfo(url.toString()).isAbsolute())
-            return createPlaylistFromFile(url);
+            createPlaylistFromFile(url);
         else
-            return createPlaylistFromRemoteUrl(url);
+            createPlaylistFromRemoteUrl(url);
+
+        return;
     }
 
-    return createPlaylistForSingleFile(url);
+    createPlaylistForSingleFile(url);
 }
 
-bool DecoderHandler::createPlaylistForSingleFile(const QUrl &url)
+void DecoderHandler::createPlaylistForSingleFile(const QUrl &url)
 {
     PlayListFileEntry *entry = new PlayListFileEntry;
 
@@ -466,49 +517,51 @@ bool DecoderHandler::createPlaylistForSingleFile(const QUrl &url)
 
     m_playlist.add(entry);
 
-    return m_playlist.size() > 0;
+    doStart((m_playlist.size() > 0));
 }
 
-bool DecoderHandler::createPlaylistFromFile(const QUrl &url)
+void DecoderHandler::createPlaylistFromFile(const QUrl &url)
 {
     QFile f(QFileInfo(url.path()).absolutePath() + "/" + QFileInfo(url.path()).fileName());
     if (!f.open(QIODevice::ReadOnly))
-        return false;
+        return;
     QTextStream stream(&f);
 
     QString extension = QFileInfo(url.path()).suffix().toLower();
 
-    if (PlayListFile::parse(&m_playlist, &stream, extension) <= 0)
-        return false;
+    PlayListFile::parse(&m_playlist, &stream, extension);
 
-    return m_playlist.size() > 0;
+    doStart((m_playlist.size() > 0));
 }
 
-bool DecoderHandler::createPlaylistFromRemoteUrl(const QUrl &url) 
+void DecoderHandler::createPlaylistFromRemoteUrl(const QUrl &url) 
 {
     LOG(VB_NETWORK, LOG_INFO,
         QString("Retrieving playlist from '%1'").arg(url.toString()));
 
-    doOperationStart("Retrieving playlist");
-
-    QByteArray data;
-
-    if (!GetMythDownloadManager()->download(url.toString(), &data))
-    {
-        LOG(VB_GENERAL, LOG_ERR, QString("DecoderHandler:: Failed to download playlist from: %1").arg(url.toString()));
-        doOperationStop();
-        return false;
-    }
-
-    doOperationStop();
-
-    QTextStream stream(&data, QIODevice::ReadOnly);
+    doOperationStart(tr("Retrieving playlist"));
 
     QString extension = QFileInfo(url.path()).suffix().toLower();
+    QString saveFilename = GetConfDir() + "/MythMusic/playlist." + extension;
+    GetMythDownloadManager()->queueDownload(url.toString(), saveFilename, this);
 
-    bool result = PlayListFile::parse(&m_playlist, &stream, extension) > 0;
+    //TODO should find a better way to do this
+    QTime time;
+    time.start();
+    while (m_state == LOADING)
+    {
+        if (time.elapsed() > 30000)
+        {
+            doOperationStop();
+            GetMythDownloadManager()->cancelDownload(url.toString());
+            LOG(VB_GENERAL, LOG_ERR, QString("DecoderHandler:: Timed out trying to download playlist from: %1")
+                .arg(url.toString()));
+            m_state = STOPPED;
+        }
 
-    return result;
+        qApp->processEvents();
+        usleep(500);
+    }
 }
 
 void DecoderHandler::doConnectDecoder(const QUrl &url, const QString &format) 
@@ -538,15 +591,8 @@ void DecoderHandler::doConnectDecoder(const QUrl &url, const QString &format)
 void DecoderHandler::doFailed(const QUrl &url, const QString &message)
 {
     LOG(VB_NETWORK, LOG_ERR,
-        QString("DecoderHandler: Unsupported file format: '%1' - %2")
-            .arg(url.toString()).arg(message));
+        QString("DecoderHandler error: '%1' - %2").arg(message).arg(url.toString()));
     DecoderHandlerEvent ev(DecoderHandlerEvent::Error, new QString(message));
-    dispatch(ev);
-}
-
-void DecoderHandler::doInfo(const QString &message)
-{
-    DecoderHandlerEvent ev(DecoderHandlerEvent::Info, new QString(message));
     dispatch(ev);
 }
 

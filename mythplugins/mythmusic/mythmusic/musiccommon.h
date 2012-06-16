@@ -61,8 +61,6 @@ class MPUBLIC MusicCommon : public MythScreenType
 
     virtual void ShowMenu(void);
 
-    //bool onMediaEvent(MythMediaDevice *pDev);
-
   protected slots:
 
     void play(void);
@@ -75,8 +73,6 @@ class MPUBLIC MusicCommon : public MythScreenType
     void seek(int);
     void stopAll(void);
     void changeRating(bool increase);
-//    void editPlaylist(void);
-//    void nextAuto(void);
 
     void searchButtonList(void);
     MythMenu* createMainMenu(void);
@@ -105,6 +101,7 @@ class MPUBLIC MusicCommon : public MythScreenType
     void showExitMenu(void);
     void showPlaylistOptionsMenu(bool addMainMenu = false);
 
+  protected:
     QString getTimeString(int exTime, int maxTime);
     void updateProgressBar(void);
     void setTrackOnLCD(Metadata *mdata);

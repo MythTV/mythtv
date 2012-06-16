@@ -38,22 +38,27 @@ class DecoderHandlerEvent : public MythEvent
 {
   public:
     DecoderHandlerEvent(Type t)
-        : MythEvent(t), m_msg(0), m_meta(0) {}
+        : MythEvent(t), m_msg(0), m_meta(0), m_available(0), m_maxSize(0) {}
 
     DecoderHandlerEvent(Type t, QString *e)
-        : MythEvent(t), m_msg(e), m_meta(0) {}
+        : MythEvent(t), m_msg(e), m_meta(0), m_available(0), m_maxSize(0) {}
+
+    DecoderHandlerEvent(Type t, int available, int maxSize)
+        : MythEvent(t), m_msg(0), m_meta(0), 
+          m_available(available), m_maxSize(maxSize) {}
 
     DecoderHandlerEvent(Type t, const Metadata &m);
     ~DecoderHandlerEvent();
 
     QString *getMessage(void) const { return m_msg; }
     Metadata *getMetadata(void) const { return m_meta; }
+    void getBufferStatus(int *available, int *maxSize) const;
 
     virtual MythEvent *clone(void) const;
 
     static Type Ready;
     static Type Meta;
-    static Type Info;
+    static Type BufferStatus;
     static Type OperationStart;
     static Type OperationStop;
     static Type Error;
@@ -61,6 +66,8 @@ class DecoderHandlerEvent : public MythEvent
   private:
     QString  *m_msg;
     Metadata *m_meta;
+    int       m_available;
+    int       m_maxSize;
 };
 
 /** \brief Class for starting stream decoding.
@@ -105,13 +112,13 @@ class DecoderHandler : public QObject, public MythObservable
     void doOperationStop(void);
     void doConnectDecoder(const QUrl &url, const QString &format);
     void doFailed(const QUrl &url, const QString &message);
-    void doInfo(const QString &message);
+    void doStart(bool result);
 
   private:
-    bool createPlaylist(const QUrl &url);
-    bool createPlaylistForSingleFile(const QUrl &url);
-    bool createPlaylistFromFile(const QUrl &url);
-    bool createPlaylistFromRemoteUrl(const QUrl &url);
+    void createPlaylist(const QUrl &url);
+    void createPlaylistForSingleFile(const QUrl &url);
+    void createPlaylistFromFile(const QUrl &url);
+    void createPlaylistFromRemoteUrl(const QUrl &url);
 
     bool haveIOFactory(void) { return m_io_factory != NULL; }
     DecoderIOFactory *getIOFactory(void) { return m_io_factory; }
@@ -156,7 +163,6 @@ class DecoderIOFactory : public QObject, public MythObservable
     void doConnectDecoder(const QString &format);
     Decoder *getDecoder(void);
     void doFailed(const QString &message);
-    void doInfo(const QString &message);
     void doOperationStart(const QString &name);
     void doOperationStop(void);
     Metadata& getMetadata() { return m_meta; }

@@ -122,10 +122,12 @@ void PlaylistContainer::load()
     query.prepare("SELECT playlist_id FROM music_playlists "
                   "WHERE playlist_name != :DEFAULT"
                   " AND playlist_name != :BACKUP "
+                  " AND playlist_name != :STREAM "
                   " AND (hostname = '' OR hostname = :HOST) "
                   "ORDER BY playlist_name;");
     query.bindValue(":DEFAULT", "default_playlist_storage");
     query.bindValue(":BACKUP", "backup_playlist_storage");
+    query.bindValue(":STREAM", "stream_playlist");
     query.bindValue(":HOST", my_host);
 
     if (!query.exec())
@@ -211,6 +213,7 @@ void PlaylistContainer::save(void)
 
     active_playlist->savePlaylist("default_playlist_storage", my_host);
     backup_playlist->savePlaylist("backup_playlist_storage", my_host);
+    stream_playlist->savePlaylist("stream_playlist", my_host);
 }
 
 void PlaylistContainer::createNewPlaylist(QString name)

@@ -129,7 +129,6 @@ ImportMusicDialog::~ImportMusicDialog()
 
     delete m_tracks;
 
-    // do we need to do a resync
     if (m_somethingWasImported)
         emit importFinished();
 }
