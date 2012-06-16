@@ -23,7 +23,7 @@
 #include "mythuihelper.h"
 #include "mythmainwindow.h"
 
-MythUIHelper *MythImage::m_ui = NULL;
+MythUIHelper *MythImage::s_ui = NULL;
 
 MythImage::MythImage(MythPainter *parent)
 {
@@ -49,8 +49,8 @@ MythImage::MythImage(MythPainter *parent)
     m_FileName = "";
 
     m_cached = false;
-    if (!m_ui)
-        m_ui = GetMythUI();
+    if (!s_ui)
+        s_ui = GetMythUI();
 }
 
 MythImage::~MythImage()
@@ -62,8 +62,8 @@ MythImage::~MythImage()
 void MythImage::UpRef(void)
 {
     QMutexLocker locker(&m_RefCountLock);
-    if (m_ui && m_cached && m_RefCount == 1)
-        m_ui->ExcludeFromCacheSize(this);
+    if (s_ui && m_cached && m_RefCount == 1)
+        s_ui->ExcludeFromCacheSize(this);
     m_RefCount++;
 }
 
@@ -71,12 +71,12 @@ bool MythImage::DownRef(void)
 {
     m_RefCountLock.lock();
     m_RefCount--;
-    if (m_ui && m_cached)
+    if (s_ui && m_cached)
     {
         if (m_RefCount == 1)
-            m_ui->IncludeInCacheSize(this);
+            s_ui->IncludeInCacheSize(this);
         else if (m_RefCount == 0)
-            m_ui->ExcludeFromCacheSize(this);
+            s_ui->ExcludeFromCacheSize(this);
     }
 
     if (m_RefCount <= 0)
@@ -98,12 +98,12 @@ int MythImage::RefCount(void)
 void MythImage::SetIsInCache(bool bCached)
 {
     QMutexLocker locker(&m_RefCountLock);
-    if (m_ui && m_RefCount == 1)
+    if (s_ui && m_RefCount == 1)
     {
         if (!m_cached && bCached)
-            m_ui->IncludeInCacheSize(this);
+            s_ui->IncludeInCacheSize(this);
         else if (m_cached && !bCached)
-            m_ui->ExcludeFromCacheSize(this);
+            s_ui->ExcludeFromCacheSize(this);
     }
     m_cached = bCached;
 }
@@ -111,11 +111,11 @@ void MythImage::SetIsInCache(bool bCached)
 void MythImage::Assign(const QImage &img)
 {
     QMutexLocker locker(&m_RefCountLock);
-    if (m_ui && m_RefCount == 1 && m_cached)
-        m_ui->ExcludeFromCacheSize(this);
+    if (s_ui && m_RefCount == 1 && m_cached)
+        s_ui->ExcludeFromCacheSize(this);
     *(static_cast<QImage *> (this)) = img;
-    if (m_ui && m_RefCount == 1 && m_cached)
-        m_ui->IncludeInCacheSize(this);
+    if (s_ui && m_RefCount == 1 && m_cached)
+        s_ui->IncludeInCacheSize(this);
     SetChanged();
 }
 

@@ -107,8 +107,9 @@ class MUI_PUBLIC MythImage : public QImage
 
     QString m_FileName;
 
-    static MythUIHelper *m_ui;
     bool m_cached;
+
+    static MythUIHelper *s_ui;
 };
 
 #endif
