@@ -19,7 +19,11 @@ windows: {
   DEFINES += QJSON_MAKEDLL
 }
 
-macx: CONFIG += lib_bundle
+#
+# MythTV OS X build fix. We want a dynamic library (like all our other libs),
+# and not something like ../lib/mythqjson.framework/Versions/0/mythqjson
+# so comment out this line:
+#macx: CONFIG += lib_bundle
 
 QJSON_CPP = $$QJSON_SRCBASE
 INCLUDEPATH += $$QJSON_CPP
