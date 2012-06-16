@@ -2,7 +2,7 @@
 #include "mythuieditbar.h"
 
 MythUIEditBar::MythUIEditBar(MythUIType *parent, const QString &name)
-    : MythUIType(parent, name), m_position(0.0), m_total(1.0)
+    : MythUIType(parent, name), m_editPosition(0.0), m_total(1.0)
 {
 }
 
@@ -28,15 +28,15 @@ void MythUIEditBar::SetTotal(double total)
         Display();
 }
 
-void MythUIEditBar::SetPosition(double position)
+void MythUIEditBar::SetEditPosition(double position)
 {
     float newpos = position / m_total;
 
     if (newpos < 0.0f || newpos > 1.0f)
         return;
 
-    bool changed = m_position != newpos;
-    m_position = newpos;
+    bool changed = m_editPosition != newpos;
+    m_editPosition = newpos;
 
     if (changed)
         Display();
@@ -54,9 +54,9 @@ void MythUIEditBar::SetTotal(long long total)
     SetTotal((double)total);
 }
 
-void MythUIEditBar::SetPosition(long long position)
+void MythUIEditBar::SetEditPosition(long long position)
 {
-    SetPosition((double)position);
+    SetEditPosition((double)position);
 }
 
 void MythUIEditBar::AddRegion(long long start, long long end)
@@ -111,7 +111,7 @@ void MythUIEditBar::Display(void)
     if (position && keeparea.isValid())
     {
         int offset = position->GetArea().width() / 2;
-        int newx   = (int)(((float)keeparea.width() * m_position) + 0.5f);
+        int newx   = (int)(((float)keeparea.width() * m_editPosition) + 0.5f);
         int newy   = position->GetArea().top();
         position->SetPosition(newx - offset, newy);
         position->SetVisible(true);
@@ -308,7 +308,7 @@ void MythUIEditBar::CopyFrom(MythUIType *base)
     if (!editbar)
         return;
 
-    m_position = editbar->m_position;
+    m_editPosition = editbar->m_editPosition;
 
     QListIterator<QPair<float, float> > it(m_regions);
 

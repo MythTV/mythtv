@@ -19,10 +19,10 @@ class MUI_PUBLIC MythUIEditBar : public MythUIType
    ~MythUIEditBar();
 
     void SetTotal(double total);
-    void SetPosition(double position);
+    void SetEditPosition(double position);
+    void SetEditPosition(long long position);
     void AddRegion(double start, double end);
     void SetTotal(long long total);
-    void SetPosition(long long position);
     void AddRegion(long long start, long long end);
     void ClearRegions(void);
     void Display(void);
@@ -41,7 +41,7 @@ class MUI_PUBLIC MythUIEditBar : public MythUIType
     void CalcInverseRegions(void);
     void ClearImages(void);
 
-    float  m_position;
+    float  m_editPosition;
     double m_total;
     QList<QPair<float,float> > m_regions;
     QList<QPair<float,float> > m_invregions;

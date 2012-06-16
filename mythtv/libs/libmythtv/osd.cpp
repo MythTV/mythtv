@@ -373,7 +373,7 @@ void OSD::SetValues(const QString &window, QHash<QString,float> &map,
     {
         MythUIEditBar *edit = dynamic_cast<MythUIEditBar *> (win->GetChild("editbar"));
         if (edit)
-            edit->SetPosition(map.value("position"));
+            edit->SetEditPosition(map.value("position"));
     }
 
     if (found)
