@@ -59,6 +59,7 @@ bool OutboundRequestHandler::DoConnectToMaster(void)
     if (!m_socket->Validate())
     {
         LOG(VB_GENERAL, LOG_NOTICE, "Unable to confirm protocol version with backend.");
+        m_socket->Unlock();
         m_socket->DownRef();
         m_socket = NULL;
         return false;
@@ -68,6 +69,7 @@ bool OutboundRequestHandler::DoConnectToMaster(void)
     if (!AnnounceSocket())
     {
         LOG(VB_GENERAL, LOG_NOTICE, "Announcement to upstream master backend failed.");
+        m_socket->Unlock();
         m_socket->DownRef();
         m_socket = NULL;
         return false;
