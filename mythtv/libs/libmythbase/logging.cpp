@@ -418,7 +418,6 @@ void LoggerThread::launchLogServer(void)
 
         MythSystemMask mask = MythSystemMask(kMSDontBlockInputDevs |
                                              kMSDontDisableDrawing |
-                                             kMSRunBackground |
                                              kMSRunShell);
         QStringList args;
         args << "--daemon" << logPropagateArgs;
