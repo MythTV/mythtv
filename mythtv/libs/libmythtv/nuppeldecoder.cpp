@@ -906,6 +906,12 @@ bool NuppelDecoder::DecodeFrame(struct rtframeheader *frameheader,
         if (!mpa_vidcodec)
             InitAVCodecVideo(frameheader->comptype - '3');
 
+        if (!mpa_vidctx)
+        {
+            LOG(VB_PLAYBACK, LOG_ERR, LOC + "NULL mpa_vidctx");
+            return false;
+        }
+
         MythAVFrame mpa_pic;
         if (!mpa_pic)
             return false;
