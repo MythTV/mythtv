@@ -1675,7 +1675,7 @@ void JobQueue::ProcessJob(JobQueueEntry job)
                 .arg(job.recstartts.toString(Qt::ISODate)));
 
             ChangeJobStatus(jobID, JOB_ERRORED,
-                            tr("Unable to retrieve Program Info from database"));
+                            tr("Unable to retrieve program info from database"));
 
             delete pginfo;
 
@@ -2035,7 +2035,7 @@ void JobQueue::DoTranscodeThread(int jobID)
                 {
                     filesize = st.size();
                     /*: %1 is transcoder name, %2 is the original file size 
-		        and %3 is the current file size */
+                        and %3 is the current file size */
                     QString comment = QString(tr("%1: %2 => %3"))
                                             .arg(transcoderName)
                                             .arg(PrettyPrint(origfilesize))
