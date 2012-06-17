@@ -38,7 +38,7 @@ DecoderBase::DecoderBase(MythPlayer *parent, const ProgramInfo &pginfo)
       m_positionMapLock(QMutex::Recursive),
       dontSyncPositionMap(false),
 
-      seeksnap(-1), livetv(false), watchingrecording(false),
+      seeksnap(UINT64_MAX), livetv(false), watchingrecording(false),
 
       hasKeyFrameAdjustTable(false), lowbuffers(false),
       getrawframes(false), getrawvideo(false),
