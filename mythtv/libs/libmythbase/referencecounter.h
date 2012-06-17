@@ -5,6 +5,8 @@
 
 // Uncomment this line for more useful reference counting debugging
 //#define EXTRA_DEBUG
+// Uncomment the DEBUG define lines in referencecounter.cpp for
+// even more debugging.
 
 #include <QAtomicInt>
 
@@ -35,6 +37,8 @@ class MBASE_PUBLIC ReferenceCounter
     /// \return last reference count, 0 if deleted
     virtual int DecrRef(void);
 
+    /// Print out any leaks if that level of debugging is enabled.
+    static void PrintDebug(void);
   protected:
     /// Called on destruction, will warn if object deleted with
     /// references in place. Set breakpoint here for debugging.
