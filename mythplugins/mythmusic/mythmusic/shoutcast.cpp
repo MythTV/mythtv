@@ -75,7 +75,12 @@ class ShoutCastRequest
                       "Host: %HOST%\r\n"
                       "User-Agent: MythMusic/%VERSION%\r\n"
                       "Accept: */*\r\n");
-        hdr.replace("%PATH%", url.path());
+
+        QString path = url.path();
+        if (url.hasQuery())
+            path += '?' + url.encodedQuery();
+
+        hdr.replace("%PATH%", path);
         hdr.replace("%HOST%", url.host());
         hdr.replace("%VERSION%", MYTH_BINARY_VERSION);
 
@@ -117,7 +122,11 @@ class IceCastRequest
                       "User-Agent: MythMusic/%VERSION%\r\n"
                       "Accept: */*\r\n");
 
-        hdr.replace("%PATH%", url.path());
+        QString path = url.path();
+        if (url.hasQuery())
+            path += '?' + url.encodedQuery();
+
+        hdr.replace("%PATH%", path);
         hdr.replace("%HOST%", url.host());
         hdr.replace("%VERSION%", MYTH_BINARY_VERSION);
 
