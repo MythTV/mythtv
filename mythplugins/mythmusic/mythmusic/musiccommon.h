@@ -38,7 +38,8 @@ enum MusicView
     MV_ARTISTINFO,
     MV_ALBUMINFO,
     MV_TRACKINFO,
-    MV_RADIO
+    MV_RADIO,
+    MV_MINIPLAYER
 };
 
 Q_DECLARE_METATYPE(MusicView);
