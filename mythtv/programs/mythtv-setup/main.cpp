@@ -518,7 +518,7 @@ int main(int argc, char *argv[])
 
     if (!DBUtil::CheckTimeZoneSupport())
     {
-        LOG(VB_GENERAL, LOG_ERR, "MySQL time zone support is not missing.  "
+        LOG(VB_GENERAL, LOG_ERR, "MySQL time zone support is missing.  "
             "Please install it and try again.");
         return GENERIC_EXIT_DB_NOTIMEZONE;
     }

@@ -18,6 +18,7 @@ class ImageLoadThread;
 
 /*!
  * \class ImageLoader
+ * \note ImageProperties must only be used in the UI thread.
  */
 class ImageProperties
 {
@@ -28,8 +29,23 @@ class ImageProperties
 
     ImageProperties &operator=(const ImageProperties &other);
 
-    void SetMaskImage(MythImage* image);
-    MythImage* GetMaskImage() { return maskImage; }
+    void SetMaskImage(MythImage *image);
+    QRect GetMaskImageRect(void)
+    {
+        QRect rect;
+        if (maskImage)
+            rect = maskImage->rect();
+        return rect;
+    }
+    QImage GetMaskImageSubset(const QRect &imageArea)
+    {
+        if (maskImage)
+            return maskImage->copy(imageArea);
+
+        QImage img(imageArea.size(), QImage::Format_ARGB32);
+        img.fill(0xFFFFFFFF);
+        return img;
+    }
 
     QString filename;
 

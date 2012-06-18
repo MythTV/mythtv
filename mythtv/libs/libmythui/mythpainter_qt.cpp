@@ -15,12 +15,13 @@
 class MythQtImage : public MythImage
 {
   public:
-    MythQtImage(MythPainter *parent) : MythImage(parent),
-                m_Pixmap(NULL), m_bRegenPixmap(false) { }
-   ~MythQtImage() { }
+    MythQtImage(MythQtPainter *parent) :
+        MythImage(parent, "MythQtImage"),
+        m_Pixmap(NULL), m_bRegenPixmap(false) { }
 
     void SetChanged(bool change = true);
     QPixmap *GetPixmap(void) { return m_Pixmap; }
+    void SetPixmap(QPixmap *p) { m_Pixmap = p; }
 
     bool NeedsRegen(void) { return m_bRegenPixmap; }
     void RegeneratePixmap(void);
@@ -145,6 +146,9 @@ void MythQtPainter::DeleteFormatImagePriv(MythImage *im)
 
     QMutexLocker locker(&m_imageDeleteLock);
     if (qim->GetPixmap())
+    {
         m_imageDeleteList.push_back(qim->GetPixmap());
+        qim->SetPixmap(NULL);
+    }
 }
 

@@ -552,7 +552,7 @@ bool DeleteMap::IsInDelete(uint64_t frame) const
         return true;
 
     int      lasttype  = MARK_UNSET;
-    uint64_t lastframe = -1;
+    uint64_t lastframe = UINT64_MAX;
     for (it = m_deleteMap.begin() ; it != m_deleteMap.end(); ++it)
     {
         if (it.key() > frame)

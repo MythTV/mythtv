@@ -18,6 +18,7 @@ using namespace std;
 #include <QTimer>
 
 #include "previewgeneratorqueue.h"
+#include "referencecounter.h"
 #include "mythmiscutil.h"
 #include "mythconfig.h"
 #include "mythsystem.h"
@@ -265,6 +266,8 @@ namespace
 
         delete gContext;
         gContext = NULL;
+
+        ReferenceCounter::PrintDebug();
 
         delete qApp;
     }

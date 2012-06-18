@@ -4,36 +4,36 @@
 <context>
     <name>GameHandler</name>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="226"/>
+        <location filename="../mythgame/gamehandler.cpp" line="223"/>
         <source>%1 appears to be missing.
 Remove it from the database?</source>
         <translation>%1 parece que no existe.
 ¿Eliminarlo de la base de datos?</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="233"/>
-        <location filename="../mythgame/gamehandler.cpp" line="616"/>
+        <location filename="../mythgame/gamehandler.cpp" line="230"/>
+        <location filename="../mythgame/gamehandler.cpp" line="613"/>
         <source>No</source>
         <translation>No</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="234"/>
+        <location filename="../mythgame/gamehandler.cpp" line="231"/>
         <source>No to all</source>
         <translation>No a todo</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="235"/>
-        <location filename="../mythgame/gamehandler.cpp" line="617"/>
+        <location filename="../mythgame/gamehandler.cpp" line="232"/>
+        <location filename="../mythgame/gamehandler.cpp" line="614"/>
         <source>Yes</source>
         <translation>Sí</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="236"/>
+        <location filename="../mythgame/gamehandler.cpp" line="233"/>
         <source>Yes to all</source>
         <translation>Sí a todo</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="609"/>
+        <location filename="../mythgame/gamehandler.cpp" line="606"/>
         <source>This will clear all game metadata from the database. Are you sure you want to do this?</source>
         <translation>Esto eliminará de la base de datos todos los metadatos de los juegos. ¿Seguro que desea hacerlo?</translation>
     </message>
@@ -255,17 +255,17 @@ Remove it from the database?</source>
         <translation>Configuración de MythGame -- General</translation>
     </message>
     <message>
+        <location filename="../mythgame/gamehandler.cpp" line="153"/>
+        <location filename="../mythgame/gamehandler.cpp" line="154"/>
+        <location filename="../mythgame/gamehandler.cpp" line="155"/>
         <location filename="../mythgame/gamehandler.cpp" line="156"/>
         <location filename="../mythgame/gamehandler.cpp" line="157"/>
-        <location filename="../mythgame/gamehandler.cpp" line="158"/>
-        <location filename="../mythgame/gamehandler.cpp" line="159"/>
-        <location filename="../mythgame/gamehandler.cpp" line="160"/>
-        <location filename="../mythgame/gamehandler.cpp" line="413"/>
+        <location filename="../mythgame/gamehandler.cpp" line="410"/>
+        <location filename="../mythgame/gamehandler.cpp" line="411"/>
         <location filename="../mythgame/gamehandler.cpp" line="414"/>
-        <location filename="../mythgame/gamehandler.cpp" line="417"/>
-        <location filename="../mythgame/gamehandler.cpp" line="418"/>
-        <location filename="../mythgame/gamehandler.cpp" line="419"/>
-        <location filename="../mythgame/gamehandler.cpp" line="425"/>
+        <location filename="../mythgame/gamehandler.cpp" line="415"/>
+        <location filename="../mythgame/gamehandler.cpp" line="416"/>
+        <location filename="../mythgame/gamehandler.cpp" line="422"/>
         <source>Unknown</source>
         <translation>Desconocido</translation>
     </message>
@@ -415,25 +415,25 @@ Remove it from the database?</source>
         <translation>Nombre de este Juego y/o Emulador</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="155"/>
-        <location filename="../mythgame/gamehandler.cpp" line="416"/>
+        <location filename="../mythgame/gamehandler.cpp" line="152"/>
+        <location filename="../mythgame/gamehandler.cpp" line="413"/>
         <source>19xx</source>
         <translation>19xx</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="161"/>
-        <location filename="../mythgame/gamehandler.cpp" line="420"/>
+        <location filename="../mythgame/gamehandler.cpp" line="158"/>
+        <location filename="../mythgame/gamehandler.cpp" line="417"/>
         <source>0</source>
         <translation>0</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="511"/>
+        <location filename="../mythgame/gamehandler.cpp" line="508"/>
         <source>Verifying %1 files...</source>
         <translation>Verificando %1 archivos...</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="714"/>
-        <location filename="../mythgame/gamehandler.cpp" line="742"/>
+        <location filename="../mythgame/gamehandler.cpp" line="711"/>
+        <location filename="../mythgame/gamehandler.cpp" line="739"/>
         <source>Scanning for %1 games...</source>
         <translation>Buscando %1 juegos...</translation>
     </message>
@@ -448,7 +448,7 @@ Remove it from the database?</source>
         <translation>GAMEGEAR</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="382"/>
+        <location filename="../mythgame/gamehandler.cpp" line="379"/>
         <source>Updating %1(%2) ROM database</source>
         <translation>Actualizando %1(%2) bases de datos de ROMs</translation>
     </message>

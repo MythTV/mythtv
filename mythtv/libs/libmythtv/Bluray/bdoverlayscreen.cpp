@@ -120,6 +120,7 @@ void BDOverlayScreen::DisplayBDOverlay(BDOverlay *overlay)
             LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("Added %1 (%2 tot)")
                 .arg(hash).arg(m_overlayMap.size()));
         }
+        image->DecrRef();
     }
 
     SetRedraw();

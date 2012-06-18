@@ -1005,13 +1005,19 @@ void LogForwardThread::run(void)
             }
 
             int processed = 0;
-            while (!logMsgList.isEmpty() && processed < 100)
+            while (!logMsgList.isEmpty())
             {
                 processed++;
                 LogMessage *msg = logMsgList.takeFirst();
                 lock.unlock();
                 forwardMessage(msg);
                 delete msg;
+
+                // Force a processEvents every 128 messages so a busy queue
+                // doesn't preclude timer notifications, etc.
+                if (processed & 127 == 0)
+                    qApp->processEvents(QEventLoop::AllEvents, 10);
+
                 lock.relock();
             }
         }

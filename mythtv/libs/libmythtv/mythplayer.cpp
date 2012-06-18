@@ -116,7 +116,7 @@ void DecoderThread::run(void)
     RunEpilog();
 }
 
-static const int toCaptionType(int type)
+static int toCaptionType(int type)
 {
     if (kTrackTypeCC608 == type)            return kDisplayCC608;
     if (kTrackTypeCC708 == type)            return kDisplayCC708;
@@ -127,7 +127,7 @@ static const int toCaptionType(int type)
     return 0;
 }
 
-static const int toTrackType(int type)
+static int toTrackType(int type)
 {
     if (kDisplayCC608 == type)            return kTrackTypeCC608;
     if (kDisplayCC708 == type)            return kTrackTypeCC708;
@@ -3492,7 +3492,7 @@ bool MythPlayer::DoRewind(uint64_t frames, double inaccuracy)
     if (desiredFrame < video_frame_rate)
         limitKeyRepeat = true;
 
-    uint64_t seeksnap_wanted = -1;
+    uint64_t seeksnap_wanted = UINT64_MAX;
     if (inaccuracy != kInaccuracyFull)
         seeksnap_wanted = frames * inaccuracy;
     WaitForSeek(desiredFrame, seeksnap_wanted);
@@ -3649,7 +3649,7 @@ bool MythPlayer::DoFastForward(uint64_t frames, double inaccuracy)
             desiredFrame = endcheck;
     }
 
-    uint64_t seeksnap_wanted = -1;
+    uint64_t seeksnap_wanted = UINT64_MAX;
     if (inaccuracy != kInaccuracyFull)
         seeksnap_wanted = frames * inaccuracy;
     WaitForSeek(desiredFrame, seeksnap_wanted);

@@ -35,9 +35,17 @@ void MythYUVAPainter::DrawText(const QRect &dest, const QString &msg, int flags,
     MythFontProperties *converted = GetConvertedFont(font);
     if (converted)
     {
+        // We pull an image here, in the hopes that when DrawText
+        // pulls an image this will still be in the cache and have
+        // the right properties.
         MythImage *im = GetImageFromString(msg, flags, dest, *converted);
         if (im)
+        {
             im->SetToYUV();
+            im->DecrRef();
+            im = NULL;
+        }
+
         MythQImagePainter::DrawText(dest, msg, flags, *converted,
                                     alpha, boundRect);
     }
@@ -51,9 +59,16 @@ void MythYUVAPainter::DrawRect(const QRect &area, const QBrush &fillBrush,
     QPen pen(linePen);
     pen.setColor(rgb_to_yuv(pen.color()));
 
+    // We pull an image here, in the hopes that when DrawRect
+    // pulls an image this will still be in the cache and have
+    // the right properties.
     MythImage *im = GetImageFromRect(area, 0, 0, brush, pen);
     if (im)
+    {
         im->SetToYUV();
+        im->DecrRef();
+        im = NULL;
+    }
 
     MythQImagePainter::DrawRect(area, brush, pen, alpha);
 }
@@ -67,9 +82,16 @@ void MythYUVAPainter::DrawRoundRect(const QRect &area, int cornerRadius,
     QPen pen(linePen);
     pen.setColor(rgb_to_yuv(pen.color()));
 
+    // We pull an image here, in the hopes that when DrawRect
+    // pulls an image this will still be in the cache and have
+    // the right properties.
     MythImage *im = GetImageFromRect(area, cornerRadius, 0, brush, pen);
     if (im)
+    {
         im->SetToYUV();
+        im->DecrRef();
+        im = NULL;
+    }
 
     MythQImagePainter::DrawRoundRect(area, cornerRadius, brush, pen, alpha);
 }
@@ -82,9 +104,16 @@ void MythYUVAPainter::DrawEllipse(const QRect &area, const QBrush &fillBrush,
     QPen pen(linePen);
     pen.setColor(rgb_to_yuv(pen.color()));
 
+    // We pull an image here, in the hopes that when DrawRect
+    // pulls an image this will still be in the cache and have
+    // the right properties.
     MythImage *im = GetImageFromRect(area, 0, 1, brush, pen);
     if (im)
+    {
         im->SetToYUV();
+        im->DecrRef();
+        im = NULL;
+    }
 
     MythQImagePainter::DrawEllipse(area, brush, pen, alpha);
 }

@@ -1675,7 +1675,7 @@ void JobQueue::ProcessJob(JobQueueEntry job)
                 .arg(job.recstartts.toString(Qt::ISODate)));
 
             ChangeJobStatus(jobID, JOB_ERRORED,
-                            "Unable to retrieve Program Info from database");
+                            tr("Unable to retrieve program info from database"));
 
             delete pginfo;
 
@@ -1705,7 +1705,7 @@ void JobQueue::ProcessJob(JobQueueEntry job)
     if (pginfo && pginfo->GetRecordingGroup() == "Deleted")
     {
         ChangeJobStatus(jobID, JOB_CANCELLED,
-                        "Program has been deleted");
+                        tr("Program has been deleted"));
         RemoveRunningJob(jobID);
     }
     else if ((job.type == JOB_TRANSCODE) ||
@@ -1730,7 +1730,7 @@ void JobQueue::ProcessJob(JobQueueEntry job)
     else
     {
         ChangeJobStatus(jobID, JOB_ERRORED,
-                        "UNKNOWN JobType, unable to process!");
+                        tr("UNKNOWN JobType, unable to process!"));
         RemoveRunningJob(jobID);
     }
 
@@ -2001,7 +2001,7 @@ void JobQueue::DoTranscodeThread(int jobID)
             (result == GENERIC_EXIT_CMD_NOT_FOUND))
         {
             ChangeJobStatus(jobID, JOB_ERRORED,
-                "ERROR: Unable to find mythtranscode, check backend logs.");
+                tr("ERROR: Unable to find mythtranscode, check backend logs."));
             program_info->SaveTranscodeStatus(TRANSCODING_NOT_TRANSCODED);
 
             msg = QString("Transcode %1").arg(StatusText(GetJobStatus(jobID)));
@@ -2025,7 +2025,7 @@ void JobQueue::DoTranscodeThread(int jobID)
         {
             if (status == JOB_FINISHED)
             {
-                ChangeJobStatus(jobID, JOB_FINISHED, "Finished.");
+                ChangeJobStatus(jobID, JOB_FINISHED, tr("Finished."));
                 retry = false;
 
                 filename = program_info->GetPlaybackURL(false, true);
@@ -2034,8 +2034,9 @@ void JobQueue::DoTranscodeThread(int jobID)
                 if (st.exists())
                 {
                     filesize = st.size();
-
-                    QString comment = QString("%1: %2 => %3")
+                    /*: %1 is transcoder name, %2 is the original file size 
+                        and %3 is the current file size */
+                    QString comment = QString(tr("%1: %2 => %3"))
                                             .arg(transcoderName)
                                             .arg(PrettyPrint(origfilesize))
                                             .arg(PrettyPrint(filesize));
@@ -2070,7 +2071,7 @@ void JobQueue::DoTranscodeThread(int jobID)
                 program_info->SaveTranscodeStatus(TRANSCODING_NOT_TRANSCODED);
 
                 QString comment =
-                    QString("exit status %1, job status was \"%2\"")
+                    QString(tr("exit status %1, job status was \"%2\""))
                     .arg(result)
                     .arg(StatusText(status));
 
@@ -2092,7 +2093,7 @@ void JobQueue::DoTranscodeThread(int jobID)
     {
         LOG(VB_JOBQUEUE, LOG_ERR, LOC + "Retry limit exceeded for transcoder, "
                                         "setting job status to errored.");
-        ChangeJobStatus(jobID, JOB_ERRORED, "Retry limit exceeded");
+        ChangeJobStatus(jobID, JOB_ERRORED, tr("Retry limit exceeded"));
     }
 
     RemoveRunningJob(jobID);
@@ -2144,8 +2145,8 @@ void JobQueue::DoMetadataLookupThread(int jobID)
         LOG(VB_GENERAL, LOG_ERR, LOC + msg);
 
         ChangeJobStatus(jobID, JOB_ERRORED,
-                        "Could not open new database connection for "
-                        "metadata lookup.");
+                        tr("Could not open new database connection for "
+                        "metadata lookup."));
 
         delete program_info;
         return;
@@ -2269,8 +2270,8 @@ void JobQueue::DoFlagCommercialsThread(int jobID)
         LOG(VB_GENERAL, LOG_ERR, LOC + msg);
 
         ChangeJobStatus(jobID, JOB_ERRORED,
-                        "Could not open new database connection for "
-                        "commercial detector.");
+                        tr("Could not open new database connection for "
+                        "commercial detector."));
 
         delete program_info;
         return;
@@ -2436,7 +2437,7 @@ void JobQueue::DoUserJobThread(int jobID)
                                             .arg(getenv("PATH")));
 
         ChangeJobStatus(jobID, JOB_ERRORED,
-            "ERROR: Unable to find executable, check backend logs.");
+            tr("ERROR: Unable to find executable, check backend logs."));
     }
     else if (result != 0)
     {
@@ -2444,7 +2445,7 @@ void JobQueue::DoUserJobThread(int jobID)
         LOG(VB_GENERAL, LOG_ERR, LOC + msg);
 
         ChangeJobStatus(jobID, JOB_ERRORED,
-            "ERROR: User Job returned non-zero, check logs.");
+            tr("ERROR: User Job returned non-zero, check logs."));
     }
     else
     {
@@ -2460,7 +2461,7 @@ void JobQueue::DoUserJobThread(int jobID)
 
         LOG(VB_GENERAL, LOG_INFO, LOC + QString(msg.toLocal8Bit().constData()));
 
-        ChangeJobStatus(jobID, JOB_FINISHED, "Successfully Completed.");
+        ChangeJobStatus(jobID, JOB_FINISHED, tr("Successfully Completed."));
 
         if (pginfo)
             pginfo->SendUpdateEvent();
