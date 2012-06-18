@@ -526,6 +526,7 @@ void MHIContext::UpdateOSD(InteractiveScreen *osdWindow,
             uiimage->SetArea(MythRect(data->m_x, data->m_y,
                              data->m_image.width(), data->m_image.height()));
         }
+        image->DecrRef();
     }
     osdWindow->OptimiseDisplayedArea();
     // N.B. bypasses OSD class hence no expiry set

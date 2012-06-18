@@ -249,7 +249,7 @@ void ImportIconsWizard::itemChanged(MythUIButtonListItem *item)
     if (m_preview)
     {
         m_preview->Reset();
-        QString iconpath = item->GetImage("icon");
+        QString iconpath = item->GetImageFilename("icon");
         if (!iconpath.isEmpty())
         {
             m_preview->SetFilename(iconpath);

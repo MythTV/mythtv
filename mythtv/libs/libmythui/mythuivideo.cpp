@@ -29,7 +29,7 @@ MythUIVideo::~MythUIVideo()
 {
     if (m_image)
     {
-        m_image->DownRef();
+        m_image->DecrRef();
         m_image = NULL;
     }
 }
@@ -41,7 +41,7 @@ void MythUIVideo::Reset(void)
 {
     if (m_image)
     {
-        m_image->DownRef();
+        m_image->DecrRef();
         m_image = NULL;
     }
 

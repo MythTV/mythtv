@@ -390,7 +390,7 @@ void ZMLivePlayer::getMonitorList(void)
 
 Player::Player() :
     m_frameImage(NULL), m_statusText(NULL), m_cameraText(NULL),
-    m_image(NULL), m_rgba(NULL)
+    m_rgba(NULL)
 {
 }
 
@@ -470,17 +470,10 @@ void Player::updateFrame(const unsigned char* buffer)
 
     QImage image(m_rgba, m_monitor.width, m_monitor.height, QImage::Format_ARGB32);
 
-    if (m_image)
-    {
-        m_image->DownRef();
-        m_image = NULL;
-    }
-
-    m_image = GetMythMainWindow()->GetCurrentPainter()->GetFormatImage();
-    m_image->Assign(image);
-    m_image->UpRef();
-
-    m_frameImage->SetImage(m_image);
+    MythImage *img = GetMythMainWindow()->GetCurrentPainter()->GetFormatImage();
+    img->Assign(image);
+    m_frameImage->SetImage(img);
+    img->DecrRef();
 }
 
 void Player::updateStatus(void)

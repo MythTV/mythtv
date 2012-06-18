@@ -3031,15 +3031,15 @@ MythUIButtonListItem::~MythUIButtonListItem()
         m_parent->RemoveItem(this);
 
     if (m_image)
-        m_image->DownRef();
+        m_image->DecrRef();
 
-    QMapIterator<QString, MythImage *> it(m_images);
-
-    while (it.hasNext())
+    QMap<QString, MythImage*>::iterator it;
+    for (it = m_images.begin(); it != m_images.end(); ++it)
     {
-        it.next();
-        it.value()->DownRef();
+        if (*it)
+            (*it)->DecrRef();
     }
+    m_images.clear();
 }
 
 void MythUIButtonListItem::SetText(const QString &text, const QString &name,
@@ -3174,36 +3174,32 @@ void MythUIButtonListItem::SetFontState(const QString &state,
         m_parent->Update();
 }
 
-void MythUIButtonListItem::setImage(MythImage *image, const QString &name)
+void MythUIButtonListItem::SetImage(MythImage *image, const QString &name)
 {
+    if (image)
+        image->IncrRef();
+
     if (!name.isEmpty())
     {
-        if (m_images.contains(name))
+        QMap<QString, MythImage*>::iterator it = m_images.find(name);
+        if (it != m_images.end())
         {
-            if (m_images.value(name))
-                m_images.value(name)->DownRef();
+            (*it)->DecrRef();
+            if (image)
+                *it = image;
+            else
+                m_images.erase(it);
         }
-
-        if (image)
+        else if (image)
         {
-            m_images.insert(name, image);
-            image->UpRef();
+            m_images[name] = image;
         }
-        else
-            m_images.remove(name);
     }
     else
     {
-        if (image == m_image)
-            return;
-
         if (m_image)
-            m_image->DownRef();
-
+            m_image->DecrRef();
         m_image = image;
-
-        if (image)
-            image->UpRef();
     }
 
     if (m_parent)
@@ -3216,15 +3212,20 @@ void MythUIButtonListItem::SetImageFromMap(const InfoMap &imageMap)
     m_imageFilenames = imageMap;
 }
 
-MythImage *MythUIButtonListItem::getImage(const QString &name)
+MythImage *MythUIButtonListItem::GetImage(const QString &name)
 {
     if (!name.isEmpty())
     {
-        if (m_images.contains(name))
-            return m_images.value(name);
+        QMap<QString, MythImage*>::iterator it = m_images.find(name);
+        if (it != m_images.end())
+        {
+            (*it)->IncrRef();
+            return (*it);
+        }
     }
-    else
+    else if (m_image)
     {
+        m_image->IncrRef();
         return m_image;
     }
 
@@ -3261,7 +3262,7 @@ void MythUIButtonListItem::SetImage(
         m_parent->Update();
 }
 
-QString MythUIButtonListItem::GetImage(const QString &name) const
+QString MythUIButtonListItem::GetImageFilename(const QString &name) const
 {
     if (name.isEmpty())
         return m_imageFilename;

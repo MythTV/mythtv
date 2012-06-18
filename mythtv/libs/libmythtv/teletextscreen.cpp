@@ -108,7 +108,7 @@ void TeletextScreen::OptimiseDisplayedArea(void)
     while (it.hasNext())
     {
         it.next();
-        MythImage* image = osd_painter->GetFormatImage();
+        MythImage *image = osd_painter->GetFormatImage();
         if (!image || !it.value())
             continue;
 
@@ -122,6 +122,7 @@ void TeletextScreen::OptimiseDisplayedArea(void)
             uiimage->SetArea(MythRect(0, row * m_rowHeight,
                                       m_safeArea.width(), m_rowHeight * 2));
         }
+        image->DecrRef();
     }
 
     QRegion visible;

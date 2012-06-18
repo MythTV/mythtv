@@ -1020,6 +1020,8 @@ int SubtitleScreen::DisplayScaledAVSubtitles(const AVSubtitleRect *rect,
             m_expireTimes.insert(uiimage, displayuntil);
             m_avsubCache.insert(uiimage, image);
         }
+        image->DecrRef();
+        image = NULL;
     }
     if (uiimage)
     {
@@ -1407,6 +1409,7 @@ void SubtitleScreen::AddScaledImage(QImage &img, QRect &pos)
             uiimage->SetImage(image);
             uiimage->SetArea(MythRect(scaled));
         }
+        image->DecrRef();
     }
 }
 
@@ -2341,6 +2344,7 @@ void SubtitleScreen::RenderAssTrack(uint64_t timecode)
                 uiimage->SetImage(image);
                 uiimage->SetArea(MythRect(img_rect));
             }
+            image->DecrRef();
         }
         images = images->next;
         count++;

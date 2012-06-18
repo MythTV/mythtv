@@ -15,6 +15,7 @@
 #include <QStyleFactory>
 #include <QSize>
 #include <QFile>
+#include <QAtomicInt>
 
 #include "mythdirs.h"
 #include "mythlogging.h"
@@ -110,10 +111,9 @@ public:
     QMap<QString, MythImage *> imageCache;
     QMap<QString, uint> CacheTrack;
     QMutex *m_cacheLock;
-    size_t m_cacheSize;
-    QMutex *m_cacheSizeLock;
 
-    uint maxImageCacheSize;
+    QAtomicInt m_cacheSize;
+    QAtomicInt m_maxCacheSize;
 
     // The part of the screen(s) allocated for the GUI. Unless
     // overridden by the user, defaults to drawable area above.
@@ -155,8 +155,8 @@ MythUIHelperPrivate::MythUIHelperPrivate(MythUIHelper *p)
       m_wmult(1.0), m_hmult(1.0), m_pixelAspectRatio(-1.0),
       m_xbase(0), m_ybase(0), m_height(0), m_width(0),
       m_baseWidth(800), m_baseHeight(600), m_isWide(false),
-      m_cacheLock(new QMutex(QMutex::Recursive)), m_cacheSize(0),
-      m_cacheSizeLock(new QMutex(QMutex::Recursive)),
+      m_cacheLock(new QMutex(QMutex::Recursive)),
+      m_cacheSize(0), m_maxCacheSize(20 * 1024 * 1024),
       m_screenxbase(0), m_screenybase(0), m_screenwidth(0), m_screenheight(0),
       screensaver(NULL), screensaverEnabled(false), display_res(NULL),
       screenSetup(false), m_imageThreadPool(new MThreadPool("MythUIHelper")),
@@ -172,14 +172,13 @@ MythUIHelperPrivate::~MythUIHelperPrivate()
     {
         i.next();
         i.value()->SetIsInCache(false);
-        i.value()->DownRef();
+        i.value()->DecrRef();
         i.remove();
     }
 
     CacheTrack.clear();
 
     delete m_cacheLock;
-    delete m_cacheSizeLock;
     delete m_imageThreadPool;
     delete m_qtThemeSettings;
     delete screensaver;
@@ -399,14 +398,12 @@ void MythUIHelper::Init(MythUIMenuCallbacks &cbs)
     d->Init();
     d->callbacks = cbs;
 
-    d->m_cacheSizeLock->lock();
-    d->maxImageCacheSize = GetMythDB()->GetNumSetting("UIImageCacheSize", 20)
-                           * 1024 * 1024;
-    d->m_cacheSizeLock->unlock();
+    d->m_maxCacheSize.fetchAndStoreRelease(
+        GetMythDB()->GetNumSetting("UIImageCacheSize", 20) * 1024 * 1024);
 
     LOG(VB_GUI, LOG_INFO, LOC +
         QString("MythUI Image Cache size set to %1 bytes")
-        .arg(d->maxImageCacheSize));
+        .arg(d->m_maxCacheSize.fetchAndAddRelease(0)));
 }
 
 MythUIMenuCallbacks *MythUIHelper::GetMenuCBs(void)
@@ -501,15 +498,13 @@ void MythUIHelper::UpdateImageCache(void)
     {
         i.next();
         i.value()->SetIsInCache(false);
-        i.value()->DownRef();
+        i.value()->DecrRef();
         i.remove();
     }
 
     d->CacheTrack.clear();
 
-    d->m_cacheSizeLock->lock();
-    d->m_cacheSize = 0;
-    d->m_cacheSizeLock->unlock();
+    d->m_cacheSize.fetchAndStoreOrdered(0);
 
     ClearOldImageCache();
 }
@@ -521,6 +516,7 @@ MythImage *MythUIHelper::GetImageFromCache(const QString &url)
     if (d->imageCache.contains(url))
     {
         d->CacheTrack[url] = MythDate::current().toTime_t();
+        d->imageCache[url]->IncrRef();
         return d->imageCache[url];
     }
 
@@ -538,22 +534,14 @@ MythImage *MythUIHelper::GetImageFromCache(const QString &url)
 
 void MythUIHelper::IncludeInCacheSize(MythImage *im)
 {
-    if (!im)
-        return;
-
-    d->m_cacheSizeLock->lock();
-    d->m_cacheSize += im->numBytes();
-    d->m_cacheSizeLock->unlock();
+    if (im)
+        d->m_cacheSize.fetchAndAddOrdered(im->numBytes());
 }
 
 void MythUIHelper::ExcludeFromCacheSize(MythImage *im)
 {
-    if (!im)
-        return;
-
-    d->m_cacheSizeLock->lock();
-    d->m_cacheSize -= im->numBytes();
-    d->m_cacheSizeLock->unlock();
+    if (im)
+        d->m_cacheSize.fetchAndAddOrdered(-im->numBytes());
 }
 
 MythImage *MythUIHelper::CacheImage(const QString &url, MythImage *im,
@@ -582,12 +570,11 @@ MythImage *MythUIHelper::CacheImage(const QString &url, MythImage *im,
 
     // delete the oldest cached images until we fall below threshold.
     QMutexLocker locker(d->m_cacheLock);
-    d->m_cacheSizeLock->lock();
 
-    while (d->m_cacheSize + im->numBytes() >= d->maxImageCacheSize &&
+    while (d->m_cacheSize.fetchAndAddOrdered(0) + im->numBytes() >=
+           d->m_maxCacheSize.fetchAndAddOrdered(0) &&
            d->imageCache.size())
     {
-        d->m_cacheSizeLock->unlock();
         QMap<QString, MythImage *>::iterator it = d->imageCache.begin();
         uint oldestTime = MythDate::current().toTime_t();
         QString oldestKey = it.key();
@@ -596,12 +583,15 @@ MythImage *MythUIHelper::CacheImage(const QString &url, MythImage *im,
 
         for (; it != d->imageCache.end(); ++it)
         {
-            if (d->CacheTrack[it.key()] < oldestTime &&
-                (it.value()->RefCount() == 1))
+            if (d->CacheTrack[it.key()] < oldestTime)
             {
-                oldestTime = d->CacheTrack[it.key()];
-                oldestKey = it.key();
-                count++;
+                if ((2 == it.value()->IncrRef()) && (it.value() != im))
+                {
+                    oldestTime = d->CacheTrack[it.key()];
+                    oldestKey = it.key();
+                    count++;
+                }
+                it.value()->DecrRef();
             }
         }
 
@@ -612,28 +602,25 @@ MythImage *MythUIHelper::CacheImage(const QString &url, MythImage *im,
         {
             LOG(VB_GUI | VB_FILE, LOG_INFO, LOC +
                 QString("Cache too big (%1), removing :%2:")
-                .arg(d->m_cacheSize + im->numBytes()).arg(oldestKey));
+                .arg(d->m_cacheSize.fetchAndAddOrdered(0) + im->numBytes())
+                .arg(oldestKey));
 
-            d->imageCache[oldestKey]->DownRef();
+            d->imageCache[oldestKey]->SetIsInCache(false);
+            d->imageCache[oldestKey]->DecrRef();
             d->imageCache.remove(oldestKey);
             d->CacheTrack.remove(oldestKey);
-
-            d->m_cacheSizeLock->lock();
         }
         else
         {
-            d->m_cacheSizeLock->lock();
             break;
         }
     }
-
-    d->m_cacheSizeLock->unlock();
 
     QMap<QString, MythImage *>::iterator it = d->imageCache.find(url);
 
     if (it == d->imageCache.end())
     {
-        im->UpRef();
+        im->IncrRef();
         d->imageCache[url] = im;
         d->CacheTrack[url] = MythDate::current().toTime_t();
 
@@ -658,7 +645,7 @@ void MythUIHelper::RemoveFromCacheByURL(const QString &url)
     if (it != d->imageCache.end())
     {
         d->imageCache[url]->SetIsInCache(false);
-        d->imageCache[url]->DownRef();
+        d->imageCache[url]->DecrRef();
         d->imageCache.remove(url);
         d->CacheTrack.remove(url);
     }
@@ -1514,6 +1501,7 @@ MythImage *MythUIHelper::LoadCacheImage(QString srcfile, QString label,
         if (d->imageCache.contains(label) &&
             d->CacheTrack[label] + kImageCacheTimeout > now)
         {
+            d->imageCache[label]->IncrRef();
             return d->imageCache[label];
         }
     }
@@ -1561,7 +1549,8 @@ MythImage *MythUIHelper::LoadCacheImage(QString srcfile, QString label,
                         QString("LoadCacheImage: Could not load :%1")
                         .arg(cachefilepath));
 
-                    ret->DownRef();
+                    ret->SetIsInCache(false);
+                    ret->DecrRef();
                     ret = NULL;
                 }
                 else

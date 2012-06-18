@@ -1619,7 +1619,7 @@ void MusicCommon::customEvent(QEvent *event)
                 if (mdata && mdata->ID() == trackID)
                 {
                     // reload the albumart image if one has already been loaded for this track
-                    if (!item->GetImage().isEmpty())
+                    if (!item->GetImageFilename().isEmpty())
                     {
                         QString artFile = mdata->getAlbumArtFile();
                         if (artFile.isEmpty())
@@ -1793,7 +1793,7 @@ void MusicCommon::playlistItemVisible(MythUIButtonListItem *item)
     Metadata *mdata = qVariantValue<Metadata*> (item->GetData());
     if (mdata)
     {
-        if (item->GetImage().isEmpty())
+        if (item->GetImageFilename().isEmpty())
         {
             QString artFile = mdata->getAlbumArtFile();
             if (artFile.isEmpty())

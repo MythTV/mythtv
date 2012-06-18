@@ -70,6 +70,9 @@ class MUI_PUBLIC MythPainter
     virtual void PushTransformation(const UIEffects &zoom, QPointF center = QPointF());
     virtual void PopTransformation(void) { }
 
+    /// Returns a blank reference counted image in the format required
+    /// for the Draw functions for this painter.
+    /// \note The reference count is set for one use, call DecrRef() to delete.
     MythImage *GetFormatImage();
     void DeleteFormatImage(MythImage *im);
 
@@ -100,6 +103,7 @@ class MUI_PUBLIC MythPainter
                                 const QBrush &fillBrush,
                                 const QPen &linePen);
 
+    /// Creates a reference counted image, call DecrRef() to delete.
     virtual MythImage* GetFormatImagePriv(void) = 0;
     virtual void DeleteFormatImagePriv(MythImage *im) = 0;
     void ExpireImages(int max = 0);
@@ -111,8 +115,8 @@ class MUI_PUBLIC MythPainter
     int m_MaxHardwareCacheSize;
 
   private:
-    int m_SoftwareCacheSize;
-    int m_MaxSoftwareCacheSize;
+    int64_t m_SoftwareCacheSize;
+    int64_t m_MaxSoftwareCacheSize;
 
     QList<MythImage*> m_allocatedImages;
     QMutex            m_allocationLock;
