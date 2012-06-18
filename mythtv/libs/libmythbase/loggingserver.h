@@ -13,6 +13,7 @@
 
 #include "mythbaseexp.h"  //  MBASE_PUBLIC , etc.
 #include "verbosedefs.h"
+#include "mythsignalingtimer.h"
 #include "mthread.h"
 #include "nzmqt.hpp"
 
@@ -147,8 +148,8 @@ class LogServerThread : public QObject, public MThread
     nzmqt::ZMQContext *m_zmqContext; ///< ZeroMQ context
     nzmqt::ZMQSocket *m_zmqInSock;   ///< ZeroMQ feeding socket
 
-    QTimer *m_heartbeatTimer;        ///< 1s repeating timer for client
-                                     ///  heartbeats
+    MythSignalingTimer *m_heartbeatTimer; ///< 1s repeating timer for client
+                                          ///  heartbeats
 
   protected slots:
     void receivedMessage(const QList<QByteArray>&);
@@ -177,7 +178,8 @@ class LogForwardThread : public QObject, public MThread
     QSocketNotifier *m_sighupNotifier;  ///< Notifier to synchronize to UNIX
                                         ///  signal SIGHUP safely
 
-    QTimer *m_shutdownTimer;         ///< 5 min timer to shut down if no clients
+    MythSignalingTimer *m_shutdownTimer;    ///< 5 min timer to shut down if no
+                                            /// clients
 
     void forwardMessage(LogMessage *msg);
     void expireClients(void);

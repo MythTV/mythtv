@@ -29,6 +29,8 @@ class MBASE_PUBLIC MythSignalingTimer : private QObject, private MThread
 
     virtual bool blockSignals(bool block)
         { return QObject::blockSignals(block); }
+    bool isActive(void) const
+        { return dorun; }
 
   signals:
     void timeout(void);

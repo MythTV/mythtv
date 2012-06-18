@@ -10,7 +10,6 @@
 #include <QStringList>
 #include <QMap>
 #include <QRegExp>
-#include <QTimer>
 #include <QSocketNotifier>
 #include <iostream>
 
@@ -22,6 +21,7 @@ using namespace std;
 #include "mythconfig.h"
 #include "mythdb.h"
 #include "mythcorecontext.h"
+#include "mythsignalingtimer.h"
 #include "dbutil.h"
 #include "exitcodes.h"
 #include "compat.h"
@@ -705,9 +705,7 @@ void LogServerThread::run(void)
     // cerr << "unlock" << endl;
  
     msgsSinceHeartbeat = 0;
-    m_heartbeatTimer = new QTimer(this);
-    connect(m_heartbeatTimer, SIGNAL(timeout()), this, SLOT(checkHeartBeats()),
-            Qt::QueuedConnection);
+    m_heartbeatTimer = new MythSignalingTimer(this, SLOT(checkHeartBeats()));
     m_heartbeatTimer->start(1000);
 
     exec();
@@ -985,10 +983,8 @@ void LogForwardThread::run(void)
     m_zmqPubSock = m_zmqContext->createSocket(nzmqt::ZMQSocket::TYP_PUB, this);
     m_zmqPubSock->bindTo("inproc://loggers");
 
-    m_shutdownTimer = new QTimer(this);
-    m_shutdownTimer->setSingleShot(true);
-    connect(m_shutdownTimer, SIGNAL(timeout()),
-            this, SLOT(shutdownTimerExpired()), Qt::QueuedConnection);
+    m_shutdownTimer = new MythSignalingTimer(this,
+                                             SLOT(shutdownTimerExpired()));
     LOG(VB_GENERAL, LOG_INFO, "Starting 5min shutdown timer");
     m_shutdownTimer->start(5*60*1000);
 
@@ -1015,7 +1011,7 @@ void LogForwardThread::run(void)
 
                 // Force a processEvents every 128 messages so a busy queue
                 // doesn't preclude timer notifications, etc.
-                if (processed & 127 == 0)
+                if ((processed & 127) == 0)
                     qApp->processEvents(QEventLoop::AllEvents, 10);
 
                 lock.relock();

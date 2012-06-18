@@ -11,7 +11,6 @@
 #include <QMap>
 #include <QRegExp>
 #include <QVariantMap>
-#include <QTimer>
 #include <iostream>
 
 using namespace std;
@@ -24,6 +23,7 @@ using namespace std;
 #include "mythdirs.h"
 #include "mythcorecontext.h"
 #include "mythsystem.h"
+#include "mythsignalingtimer.h"
 #include "dbutil.h"
 #include "exitcodes.h"
 #include "compat.h"
@@ -144,7 +144,8 @@ LoggingItem::LoggingItem(const char *_file, const char *_function,
                          int _line, LogLevel_t _level, LoggingType _type) :
         m_threadId((uint64_t)(QThread::currentThreadId())),
         m_line(_line), m_type(_type), m_level(_level),
-        m_file(strdup(_file)), m_function(strdup(_function)), m_threadName(NULL)
+        m_file(strdup(_file)), m_function(strdup(_function)),
+        m_threadName(NULL), m_appName(NULL), m_table(NULL), m_logFile(NULL)
 {
     loggingGetTimeStamp(&m_epoch, &m_usec);
 
@@ -252,7 +253,9 @@ LoggerThread::LoggerThread(QString filename, bool progress, bool quiet,
     m_waitEmpty(new QWaitCondition()),
     m_aborted(false), m_filename(filename), m_progress(progress),
     m_quiet(quiet), m_appname(QCoreApplication::applicationName()),
-    m_tablename(table), m_facility(facility), m_pid(getpid())
+    m_tablename(table), m_facility(facility), m_pid(getpid()),
+    m_zmqContext(NULL), m_zmqSocket(NULL), m_initialTimer(NULL), 
+    m_heartbeatTimer(NULL)
 {
     char *debug = getenv("VERBOSE_THREADS");
     if (debug != NULL)
@@ -269,6 +272,18 @@ LoggerThread::LoggerThread(QString filename, bool progress, bool quiet,
 /// \brief LoggerThread destructor.  Triggers the deletion of all loggers.
 LoggerThread::~LoggerThread()
 {
+    if (m_initialTimer)
+    {
+        m_initialTimer->stop();
+        delete m_initialTimer;
+    }
+
+    if (m_heartbeatTimer)
+    {
+        m_heartbeatTimer->stop();
+        delete m_heartbeatTimer;
+    }
+
     stop();
     wait();
 
@@ -318,17 +333,16 @@ void LoggerThread::run(void)
         pingLogServer();
 
         // wait up to 150ms for mythlogserver to respond
-        QTimer::singleShot(150, this, SLOT(initialTimeout()));
+        m_initialTimer = new MythSignalingTimer(this, SLOT(initialTimeout()));
+        m_initialTimer->start(150);
     }
     else
         LOG(VB_GENERAL, LOG_INFO, "Added logging to mythlogserver locally");
 
     loggingGetTimeStamp(&m_epoch, NULL);
     
-    QTimer *timer = new QTimer(this);
-    connect(timer, SIGNAL(timeout()), this, SLOT(checkHeartBeat()),
-            Qt::QueuedConnection);
-    timer->start(1000);
+    m_heartbeatTimer = new MythSignalingTimer(this, SLOT(checkHeartBeat()));
+    m_heartbeatTimer->start(1000);
 
     QMutexLocker qLock(&logQueueMutex);
 
@@ -356,8 +370,9 @@ void LoggerThread::run(void)
         qLock.relock();
     }
 
-    timer->stop();
-    delete timer;
+    m_heartbeatTimer->stop();
+    delete m_heartbeatTimer;
+    m_heartbeatTimer = NULL;
 
     m_zmqSocket->setLinger(0);
     m_zmqSocket->close();
@@ -376,6 +391,10 @@ void LoggerThread::run(void)
 ///         to show signs of life
 void LoggerThread::initialTimeout(void)
 {
+    m_initialTimer->stop();
+    delete m_initialTimer;
+    m_initialTimer = NULL;
+
     if (m_initialWaiting)
     {
         // Got no response from mythlogserver, let's assume it's dead and 
