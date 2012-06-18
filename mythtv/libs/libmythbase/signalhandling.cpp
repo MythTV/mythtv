@@ -153,8 +153,15 @@ void SignalHandler::signalHandler(int signum)
     // One must not return from SEGV, ILL, BUS or FPE. When these
     // are raised by the program itself they will immediately get
     // re-raised on return.
+    //
+    // We also handle SIGABRT the same way. While it is safe to
+    // return from the signal handler for SIGABRT doing so means
+    // SIGABRT will fail when the UI thread is deadlocked; but
+    // SIGABRT is the signal one uses to get a core of a
+    // deadlocked program.
     if ((signum == SIGSEGV) || (signum == SIGILL) ||
-        (signum == SIGBUS)  || (signum == SIGFPE))
+        (signum == SIGBUS)  || (signum == SIGFPE) ||
+        (signum == SIGABRT))
     {
         // Wait for UI event loop to handle this, however we may be
         // blocking it if this signal occured in the UI thread.
@@ -211,7 +218,6 @@ void SignalHandler::handleSignal(void)
         signal(SIGABRT, SIG_DFL);
         usleep(100000);
         s_exit_program = true;
-        raise(signum);
         break;
     case SIGUSR1:
         LOG(VB_GENERAL, LOG_CRIT, "Received SIGUSR1");
