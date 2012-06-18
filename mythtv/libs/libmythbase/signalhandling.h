@@ -23,6 +23,8 @@ class MBASE_PUBLIC SignalHandler: public QObject
 
     void AddHandler(int signal, void (*handler)(void));
 
+    static bool IsExiting(void) { return s_exit_program; }
+
     // Unix signal handler.
     static void signalHandler(int signum);
 
