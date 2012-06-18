@@ -59,6 +59,7 @@ Scheduler::Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList,
     recordTable(tmptable),
     priorityTable("powerpriority"),
     schedLock(),
+    m_queueLock(),
     reclist_changed(false),
     specsched(master_sched),
     schedMoveHigher(false),
@@ -1633,7 +1634,7 @@ void Scheduler::GetAllScheduled(QStringList &strList)
 
 void Scheduler::Reschedule(const QStringList &request)
 {
-    QMutexLocker locker(&schedLock);
+    QMutexLocker locker(&m_queueLock);
     reschedQueue.enqueue(request);
     reschedWait.wakeOne();
 }
@@ -1778,10 +1779,10 @@ void Scheduler::run(void)
     // wait for slaves to connect
     sleep(3);
 
-    QMutexLocker lockit(&schedLock);
-
-    reschedQueue.clear();
+    ClearRequestQueue();
     EnqueueMatch(0, 0, 0, QDateTime(), "SchedulerInit");
+
+    QMutexLocker lockit(&schedLock);
 
     int       prerollseconds  = 0;
     int       wakeThreshold   = 300;
@@ -1820,7 +1821,7 @@ void Scheduler::run(void)
         }
         else
         {
-            if (reschedQueue.empty())
+            if (!HaveQueuedRequests())
             {
                 int sched_sleep = (secs_to_next - schedRunTime - 1) * 1000;
                 sched_sleep = min(sched_sleep, maxSleep);
@@ -1833,9 +1834,9 @@ void Scheduler::run(void)
                 if (!doRun)
                     break;
             }
-
+            
             QTime t; t.start();
-            if (!reschedQueue.empty() && HandleReschedule())
+            if (HaveQueuedRequests() && HandleReschedule())
             {
                 statuschanged = true;
                 startIter = reclist.begin();
@@ -1853,6 +1854,7 @@ void Scheduler::run(void)
                 tuningTimeout =
                     gCoreContext->GetNumSetting("tuningTimeout", 180);
             }
+            
             int e = t.elapsed();
             if (e > 0)
             {
@@ -2093,10 +2095,12 @@ bool Scheduler::HandleReschedule(void)
     QString msg;
     bool deleteFuture = false;
     bool runCheck = false;
-
-    while (!reschedQueue.empty())
+    
+    while (HaveQueuedRequests())
     {
+        m_queueLock.lock();
         QStringList request = reschedQueue.dequeue();
+        m_queueLock.unlock();
         QStringList tokens;
         if (request.size() >= 1)
             tokens = request[0].split(' ', QString::SkipEmptyParts);
