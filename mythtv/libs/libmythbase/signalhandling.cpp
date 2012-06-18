@@ -4,6 +4,7 @@
 #include <QList>
 
 #include <stdint.h>
+#include <stdlib.h> // for free
 #include <signal.h>
 #include <unistd.h>
 #include <sys/types.h>
