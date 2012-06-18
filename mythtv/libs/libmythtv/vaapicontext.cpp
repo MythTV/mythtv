@@ -74,13 +74,14 @@ VAProfile preferredProfile(MythCodecID codec)
     return VAProfileMPEG2Simple; // error
 }
 
-class VAAPIDisplay
+class VAAPIDisplay : ReferenceCounter
 {
   protected:
-    VAAPIDisplay(VAAPIDisplayType display_type)
-      : m_va_disp_type(display_type),
+    VAAPIDisplay(VAAPIDisplayType display_type) :
+        ReferenceCounter("VAAPIDisplay"),
+        m_va_disp_type(display_type),
         m_va_disp(NULL), m_x_disp(NULL),
-        m_ref_count(0), m_driver(QString()) { }
+        m_driver() { }
   public:
    ~VAAPIDisplay()
     {
@@ -155,7 +156,6 @@ class VAAPIDisplay
         }
         if (ok)
         {
-            UpRef();
             LOG(VB_PLAYBACK, LOG_INFO, LOC +
                 QString("Created VAAPI %1 display")
                 .arg(m_va_disp_type == kVADisplayGLX ? "GLX" : "X11"));
@@ -163,25 +163,19 @@ class VAAPIDisplay
         return ok;
     }
 
-    void UpRef(void)
+    virtual int DecrRef(void)
     {
-        XLOCK(m_x_disp, m_ref_count++)
-    }
+        QMutexLocker locker(&s_VAAPIDisplayLock);
 
-    void DownRef(void)
-    {
-        m_x_disp->Lock();
-        m_ref_count--;
-        if (m_ref_count <= 0)
+        VAAPIDisplay *tmp = this;
+        int cnt = ReferenceCounter::DecrRef();
+        if (cnt == 0)
         {
-            if (gVAAPIDisplay == this)
-                gVAAPIDisplay = NULL;
+            if (s_VAAPIDisplay == tmp)
+                s_VAAPIDisplay = NULL;
             LOG(VB_PLAYBACK, LOG_INFO, LOC + "Deleting VAAPI display.");
-            m_x_disp->Unlock();
-            delete this;
-            return;
         }
-        m_x_disp->Unlock();
+        return cnt;
     }
 
     QString GetDriver(void)
@@ -191,38 +185,40 @@ class VAAPIDisplay
         return ret;
     }
 
-    static VAAPIDisplay* GetDisplay(VAAPIDisplayType display_type)
+    static VAAPIDisplay *GetDisplay(VAAPIDisplayType display_type)
     {
-        if (gVAAPIDisplay)
+        QMutexLocker locker(&s_VAAPIDisplayLock);
+
+        if (s_VAAPIDisplay)
         {
-            if (gVAAPIDisplay->m_va_disp_type != display_type)
+            if (s_VAAPIDisplay->m_va_disp_type != display_type)
             {
                 LOG(VB_GENERAL, LOG_ERR, "Already have a VAAPI display "
                     "of a different type - aborting");
                 return NULL;
             }
-            gVAAPIDisplay->UpRef();
-            return gVAAPIDisplay;
+            s_VAAPIDisplay->IncrRef();
+            return s_VAAPIDisplay;
         }
 
-        gVAAPIDisplay = new VAAPIDisplay(display_type);
-        if (gVAAPIDisplay && gVAAPIDisplay->Create())
-            return gVAAPIDisplay;
+        s_VAAPIDisplay = new VAAPIDisplay(display_type);
+        if (s_VAAPIDisplay && s_VAAPIDisplay->Create())
+            return s_VAAPIDisplay;
 
-        delete gVAAPIDisplay;
-        gVAAPIDisplay = NULL;
+        s_VAAPIDisplay->DecrRef();
         return NULL;
     }
 
-    static VAAPIDisplay *gVAAPIDisplay;
+    static QMutex        s_VAAPIDisplayLock;
+    static VAAPIDisplay *s_VAAPIDisplay;
     VAAPIDisplayType     m_va_disp_type;
     void                *m_va_disp;
     MythXDisplay        *m_x_disp;
-    int                  m_ref_count;
     QString              m_driver;
 };
 
-VAAPIDisplay* VAAPIDisplay::gVAAPIDisplay = NULL;
+QMutex VAAPIDisplay::s_VAAPIDisplayLock(QMutex::Recursive);
+VAAPIDisplay *VAAPIDisplay::s_VAAPIDisplay = NULL;
 
 bool VAAPIContext::IsFormatAccelerated(QSize size, MythCodecID codec,
                                        PixelFormat &pix_fmt)
@@ -296,7 +292,7 @@ VAAPIContext::~VAAPIContext()
     if (m_display)
     {
         m_display->m_x_disp->Unlock();
-        m_display->DownRef();
+        m_display->DecrRef();
     }
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "Deleted context");
