@@ -748,7 +748,9 @@ void LogServerThread::checkHeartBeats(void)
 {
     qlonglong epoch;
 
+    // cout << "pre-lock 1" << endl;
     QMutexLocker lock(&logClientMapMutex);
+    // cout << "pre-lock 2" << endl;
     QMutexLocker lock2(&logClientToDelMutex);
     loggingGetTimeStamp(&epoch, NULL);
 
@@ -1091,6 +1093,8 @@ void LogForwardThread::expireClients(void)
         LOG(VB_GENERAL, LOG_INFO, QString("Expiring client %1 (#%2)")
             .arg(clientId).arg(logClientCount));
         LoggerListItem *item = logClientMap.take(clientId);
+        if (!item)
+            continue;
         LoggerList *list = item->list;
         delete item;
 
@@ -1171,8 +1175,9 @@ void LogForwardThread::forwardMessage(LogMessage *msg)
     if (json.size() == 0)
     {
         // This is either a ping response or a first gasp
-        QMutexLocker lock(&logClientMapMutex);
+        logClientMapMutex.lock();
         LoggerListItem *logItem = logClientMap.value(clientId, NULL);
+        logClientMapMutex.unlock();
         if (!logItem)
         {
             // Send an initial ping so the client knows we are in the house
