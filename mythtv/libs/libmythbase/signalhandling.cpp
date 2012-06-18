@@ -20,6 +20,10 @@ using namespace std;
 #include "exitcodes.h"
 #include "signalhandling.h"
 
+#ifndef SIGBUS /* for windows compilation */
+#define SIGBUS SIGSEGV
+#endif
+
 int SignalHandler::sigFd[2];
 volatile bool SignalHandler::s_exit_program = false;
 
