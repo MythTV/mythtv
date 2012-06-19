@@ -136,7 +136,8 @@ void loggingGetTimeStamp(qlonglong *epoch, uint *usec)
 #endif
 }
 
-LoggingItem::LoggingItem()
+LoggingItem::LoggingItem() : m_file(NULL), m_function(NULL), m_threadName(NULL),
+        m_appName(NULL), m_table(NULL), m_logFile(NULL)
 {
 }
 
