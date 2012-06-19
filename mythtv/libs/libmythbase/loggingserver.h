@@ -44,8 +44,8 @@ class LoggerBase : public QObject
     virtual void reopen(void) = 0;
     /// \brief Stop logging to the database
     virtual void stopDatabaseAccess(void) { }
-    virtual void setupZMQSocket(void) = 0;
   protected:
+    virtual bool setupZMQSocket(void) = 0;
     char *m_handle; ///< semi-opaque handle for identifying instance
 };
 
@@ -59,7 +59,9 @@ class FileLogger : public LoggerBase
     ~FileLogger();
     bool logmsg(LoggingItem *item);
     void reopen(void);
-    void setupZMQSocket(void);
+    static FileLogger *create(QString filename, QMutex *mutex);
+  protected:
+    bool setupZMQSocket(void);
   private:
     bool m_opened;      ///< true when the logfile is opened
     int  m_fd;          ///< contains the file descriptor for the logfile
@@ -79,7 +81,9 @@ class SyslogLogger : public LoggerBase
     bool logmsg(LoggingItem *item);
     /// \brief Unused for this logger.
     void reopen(void) { };
-    void setupZMQSocket(void);
+    static SyslogLogger *create(QMutex *mutex);
+  protected:
+    bool setupZMQSocket(void);
   private:
     bool m_opened;          ///< true when syslog channel open.
     nzmqt::ZMQSocket *m_zmqSock;  ///< ZeroMQ feeding socket
@@ -101,7 +105,9 @@ class DatabaseLogger : public LoggerBase
     bool logmsg(LoggingItem *item);
     void reopen(void) { };
     virtual void stopDatabaseAccess(void);
-    void setupZMQSocket(void);
+    static DatabaseLogger *create(QString table, QMutex *mutex);
+  protected:
+    bool setupZMQSocket(void);
   protected:
     bool logqmsg(MSqlQuery &query, LoggingItem *item);
     void prepare(MSqlQuery &query);

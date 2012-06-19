@@ -303,29 +303,37 @@ void LoggerThread::run(void)
 
     LOG(VB_GENERAL, LOG_INFO, "Added logging to the console");
 
-    if (m_locallogs)
+    try
     {
-        logServerWait();
-        m_zmqContext = logServerThread->getZMQContext();
+        if (m_locallogs)
+        {
+            logServerWait();
+            m_zmqContext = logServerThread->getZMQContext();
+        }
+        else
+        {
+            m_zmqContext = nzmqt::createDefaultContext(NULL);
+            m_zmqContext->start();
+        }
+
+        qRegisterMetaType<QList<QByteArray> >("QList<QByteArray>");
+
+        m_zmqSocket = m_zmqContext->createSocket(nzmqt::ZMQSocket::TYP_DEALER,
+                                                 this);
+        connect(m_zmqSocket, SIGNAL(messageReceived(const QList<QByteArray>&)),
+                SLOT(messageReceived(const QList<QByteArray>&)),
+                Qt::QueuedConnection);
+
+        if (m_locallogs)
+            m_zmqSocket->connectTo("inproc://mylogs");
+        else
+            m_zmqSocket->connectTo("tcp://127.0.0.1:35327");
     }
-    else
+    catch (nzmqt::ZMQException &e)
     {
-        m_zmqContext = nzmqt::createDefaultContext(NULL);
-        m_zmqContext->start();
+        cerr << "Exception during logging socket setup: " << e.what() << endl;
+        qApp->quit();
     }
-
-    qRegisterMetaType<QList<QByteArray> >("QList<QByteArray>");
-
-    m_zmqSocket = m_zmqContext->createSocket(nzmqt::ZMQSocket::TYP_DEALER,
-                                             this);
-    connect(m_zmqSocket, SIGNAL(messageReceived(const QList<QByteArray>&)),
-            SLOT(messageReceived(const QList<QByteArray>&)),
-            Qt::QueuedConnection);
-
-    if (m_locallogs)
-        m_zmqSocket->connectTo("inproc://mylogs");
-    else
-        m_zmqSocket->connectTo("tcp://127.0.0.1:35327");
 
     if (!m_locallogs)
     {
