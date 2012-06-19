@@ -379,6 +379,10 @@ void LoggerThread::run(void)
         qLock.relock();
     }
 
+    // This must be before the timer stop below or we deadlock when the timer
+    // thread tries to deregister, and we wait for it.
+    logThreadFinished = true;
+
     m_heartbeatTimer->stop();
     delete m_heartbeatTimer;
     m_heartbeatTimer = NULL;
@@ -388,8 +392,6 @@ void LoggerThread::run(void)
 
     if (!m_locallogs)
         delete m_zmqContext;
-
-    logThreadFinished = true;
 
     qLock.unlock();
 
