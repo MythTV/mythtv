@@ -399,11 +399,14 @@
         </shape>
         <textarea name="title">
             <font>medium</font>
-            <area>10,10,870,40</area>
+            <area>10,10,130,40</area>
             <align>left,vcenter</align>
         </textarea>
+        <imagetype name="audiograph">
+            <area>140,4,500,44</area>
+        </imagetype>
         <textarea name="seekamount" from="title">
-            <area>10,10,870,40</area>
+            <area>640,10,240,40</area>
             <align>right,vcenter</align>
         </textarea>
         <textarea name="timedisplay" from="title">

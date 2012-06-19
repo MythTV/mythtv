@@ -28,6 +28,7 @@
 #include "deletemap.h"
 #include "commbreakmap.h"
 #include "audioplayer.h"
+#include "audiooutputgraph.h"
 
 #include "mythtvexp.h"
 
@@ -179,6 +180,7 @@ class MTV_PUBLIC MythPlayer
     int     GetFFRewSkip(void) const          { return ffrew_skip; }
     float   GetPlaySpeed(void) const          { return play_speed; }
     AudioPlayer* GetAudio(void)               { return &audio; }
+    const AudioOutputGraph& GetAudioGraph() const { return m_audiograph; }
     float   GetAudioStretchFactor(void)       { return audio.GetStretchFactor(); }
     float   GetNextPlaySpeed(void) const      { return next_play_speed; }
     int     GetLength(void) const             { return totalLength; }
@@ -193,6 +195,7 @@ class MTV_PUBLIC MythPlayer
                                       int divisor = 1000) const;
     virtual  int64_t GetTotalSeconds(bool honorCutList,
                                      int divisor = 1000) const;
+    int64_t  GetLatestVideoTimecode() const   { return m_latestVideoTimecode; }
     virtual  uint64_t GetBookmark(void);
     QString   GetError(void) const;
     bool      IsErrorRecoverable(void) const
@@ -691,6 +694,7 @@ class MTV_PUBLIC MythPlayer
     long long totalLength;
     int64_t   totalDuration;
     long long rewindtime;
+    int64_t   m_latestVideoTimecode;
 
     // -- end state stuff --
 
@@ -759,6 +763,7 @@ class MTV_PUBLIC MythPlayer
 
     // Audio stuff
     AudioPlayer audio;
+    AudioOutputGraph m_audiograph;
 
     // Picture-in-Picture
     PIPMap         pip_players;

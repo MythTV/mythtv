@@ -35,6 +35,7 @@ class MTV_PUBLIC DeleteMap
     void SetSeekAmount(float amount) { m_seekamount = amount; }
 
     void UpdateOSD(uint64_t frame, double frame_rate, OSD *osd);
+    void UpdateOSD(int64_t timecode, OSD *osd);
 
     bool IsEditing(void) const { return m_editing; }
     void SetEditing(bool edit, OSD *osd = NULL);

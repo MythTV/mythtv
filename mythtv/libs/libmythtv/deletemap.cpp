@@ -217,6 +217,11 @@ void DeleteMap::UpdateOSD(uint64_t frame, double frame_rate, OSD *osd)
     m_cachedTotalForOSD = total;
 }
 
+void DeleteMap::UpdateOSD(int64_t timecode, OSD *osd)
+{
+    osd->SetGraph("osd_program_editor", "audiograph", timecode);
+}
+
 /// Set the edit mode and optionally hide the edit mode OSD.
 void DeleteMap::SetEditing(bool edit, OSD *osd)
 {

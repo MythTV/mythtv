@@ -614,6 +614,21 @@ void OSD::SetRegions(const QString &window, frm_dir_map_t &map,
     bar->Display();
 }
 
+void OSD::SetGraph(const QString &window, const QString &graph, int64_t timecode)
+{
+    MythScreenType *win = GetWindow(window);
+    if (!win)
+        return;
+
+    MythUIImage *image = dynamic_cast<MythUIImage* >(win->GetChild(graph));
+    if (!image)
+        return;
+
+    MythImage* mi = m_parent->GetAudioGraph().GetImage(timecode);
+    if (mi)
+        image->SetImage(mi);
+}
+
 bool OSD::DrawDirect(MythPainter* painter, QSize size, bool repaint)
 {
     if (!painter)

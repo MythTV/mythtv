@@ -170,6 +170,7 @@ MythPlayer::MythPlayer(PlayerFlags flags)
       totalFrames(0),               totalLength(0),
       totalDuration(0),
       rewindtime(0),
+      m_latestVideoTimecode(-1),
       // Input Video Attributes
       video_disp_dim(0,0), video_dim(0,0),
       video_frame_rate(29.97f), video_aspect(4.0f / 3.0f),
@@ -1147,6 +1148,7 @@ void MythPlayer::ReleaseNextVideoFrame(VideoFrame *buffer,
     if (wrap)
         WrapTimecode(timecode, TC_VIDEO);
     buffer->timecode = timecode;
+    m_latestVideoTimecode = timecode;
 
     if (videoOutput)
         videoOutput->ReleaseFrame(buffer);
@@ -2065,6 +2067,14 @@ void MythPlayer::RefreshPauseFrame(void)
         {
             videoOutput->UpdatePauseFrame(disp_timecode);
             needNewPauseFrame = false;
+
+            if (deleteMap.IsEditing())
+            {
+                osdLock.lock();
+                if (osd)
+                    deleteMap.UpdateOSD(GetLatestVideoTimecode(), osd);
+                osdLock.unlock();
+            }
         }
         else
         {
@@ -3333,7 +3343,7 @@ void MythPlayer::DecoderLoop(bool pause)
             continue;
         }
 
-        DecodeType dt = (audio.HasAudioOut() && normal_speed) ?
+        DecodeType dt = deleteMap.IsEditing() || (audio.HasAudioOut() && normal_speed) ?
             kDecodeAV : kDecodeVideo;
 
         DecoderGetFrame(dt);
@@ -3366,7 +3376,7 @@ bool MythPlayer::DecoderGetFrameFFREW(void)
     {
         DecoderGetFrameREW();
     }
-    return decoder->GetFrame(kDecodeVideo);
+    return decoder->GetFrame(deleteMap.IsEditing() ? kDecodeAV : kDecodeVideo);
 }
 
 bool MythPlayer::DecoderGetFrameREW(void)
@@ -4046,6 +4056,12 @@ bool MythPlayer::EnableEdit(void)
     if (!osd)
         return false;
 
+    m_audiograph.SetPainter(videoOutput->GetOSDPainter());
+    int sample_rate = GetAudio()->GetSampleRate();
+    m_audiograph.SetSampleRate(sample_rate);
+    m_audiograph.SetSampleCount((unsigned)(sample_rate / video_frame_rate));
+    GetAudio()->addVisual(&m_audiograph);
+
     speedBeforeEdit = play_speed;
     pausedBeforeEdit = Pause();
     deleteMap.SetEditing(true);
@@ -4097,6 +4113,8 @@ void MythPlayer::DisableEdit(int howToSave)
     if (player_ctx->playingInfo)
         player_ctx->playingInfo->SaveEditing(false);
     player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
+    GetAudio()->removeVisual(&m_audiograph);
+    m_audiograph.Reset();
     if (!pausedBeforeEdit)
         Play(speedBeforeEdit);
     else

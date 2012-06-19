@@ -511,10 +511,13 @@
             <cornerradius>12</cornerradius>
         </shape>
         <textarea name="title">
-            <area>10,10,600,30</area>
+            <area>10,10,130,30</area>
             <align>left,top</align>
             <font>small</font>
         </textarea>
+        <imagetype name="audiograph">
+            <area>140,4,630,34</area>
+        </imagetype>
         <textarea name="seekamount" from="title">
             <area>770,10,300,30</area>
             <align>right,top</align>

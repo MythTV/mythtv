@@ -173,6 +173,7 @@ class OSD
                  OSDTimeout timeout);
     void SetRegions(const QString &window, frm_dir_map_t &map,
                  long long total);
+    void SetGraph(const QString &window, const QString &graph, int64_t timecode);
     bool IsWindowVisible(const QString &window);
 
     bool DialogVisible(QString window = QString());

@@ -32,6 +32,7 @@ HEADERS += audio/audioconvert.h
 HEADERS += audio/audiooutputdigitalencoder.h audio/spdifencoder.h
 HEADERS += audio/audiosettings.h audio/audiooutputsettings.h audio/pink.h
 HEADERS += audio/volumebase.h audio/eldutils.h
+HEADERS += audiooutputgraph.h
 HEADERS += backendselect.h dbsettings.h dbsettings_private.h dialogbox.h
 HEADERS += langsettings.h
 HEADERS += mythconfigdialogs.h mythconfiggroups.h
@@ -56,7 +57,7 @@ SOURCES += audio/audiooutpututil.cpp audio/audiooutputdownmix.cpp
 SOURCES += audio/audioconvert.cpp
 SOURCES += audio/audiosettings.cpp audio/audiooutputsettings.cpp audio/pink.c
 SOURCES += audio/volumebase.cpp audio/eldutils.cpp
-
+SOURCES += audiooutputgraph.cpp
 SOURCES += backendselect.cpp dbsettings.cpp dialogbox.cpp
 SOURCES += langsettings.cpp
 SOURCES += mythconfigdialogs.cpp mythconfiggroups.cpp

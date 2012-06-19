@@ -386,6 +386,10 @@
             <value>Video Editor</value>
         </textarea>
 
+        <imagetype name="audiograph">
+            <area>250,30,290,34</area>
+        </imagetype>
+
         <textarea name="timedisplay">
             <area>540,38,200,30</area>
             <font>basesmall</font>

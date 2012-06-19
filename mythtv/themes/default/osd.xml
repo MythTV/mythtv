@@ -511,12 +511,15 @@
             <cornerradius>12</cornerradius>
         </shape>
         <textarea name="title">
-            <area>6,8,375,25</area>
+            <area>6,8,120,25</area>
             <align>left,top</align>
             <font>small</font>
         </textarea>
+        <imagetype name="audiograph">
+            <area>126,2,412,23</area>
+        </imagetype>
         <textarea name="seekamount" from="title">
-            <area>481,8,187,25</area>
+            <area>538,8,130,25</area>
             <align>right,top</align>
         </textarea>
         <textarea name="timedisplay" from="title">
