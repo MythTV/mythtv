@@ -81,7 +81,6 @@ class SyslogLogger : public LoggerBase
     void reopen(void) { };
     void setupZMQSocket(void);
   private:
-    char *m_application;    ///< C-string of the application name
     bool m_opened;          ///< true when syslog channel open.
     nzmqt::ZMQSocket *m_zmqSock;  ///< ZeroMQ feeding socket
   protected slots:
