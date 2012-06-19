@@ -403,8 +403,9 @@ bool SyslogLogger::logmsg(LoggingItem *item)
     return false;
 }
 
-void SyslogLogger::setupZMQSocket(void)
+bool SyslogLogger::setupZMQSocket(void)
 {
+    return false;
 }
 
 #endif
