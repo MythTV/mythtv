@@ -1505,7 +1505,8 @@ int main(int argc, char **argv)
 
 #ifndef _WIN32
     QList<int> signallist;
-    signallist << SIGINT << SIGTERM << SIGSEGV << SIGABRT;
+    signallist << SIGINT << SIGTERM << SIGSEGV << SIGABRT << SIGBUS << SIGFPE
+               << SIGILL;
     SignalHandler handler(signallist);
     handler.AddHandler(SIGUSR1, handleSIGUSR1);
     handler.AddHandler(SIGUSR2, handleSIGUSR2);
