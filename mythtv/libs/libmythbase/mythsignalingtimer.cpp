@@ -23,7 +23,7 @@
 MythSignalingTimer::MythSignalingTimer(
     QObject *parent, const char *slot) :
     QObject(parent), MThread("SignalingTimer"),
-    dorun(false), running(false), microsec(0)
+    dorun(false), running(false), millisec(0)
 {
     connect(this, SIGNAL(timeout()), parent, slot,
             Qt::QueuedConnection);
@@ -40,7 +40,7 @@ void MythSignalingTimer::start(int msec)
     if (msec <= 0)
         return;
 
-    microsec = 1000 * msec;
+    millisec = msec;
 
     QMutexLocker locker(&startStopLock);
     if (!running)
@@ -64,6 +64,8 @@ void MythSignalingTimer::stop(void)
     if (running)
     {
         dorun = false;
+        timerWait.wakeAll();
+        locker.unlock();
         wait();
     }
 }
@@ -74,8 +76,8 @@ void MythSignalingTimer::run(void)
     RunProlog();
     while (dorun)
     {
-        usleep(microsec);
-        if (dorun)
+        QMutexLocker lock(&startStopLock);
+        if (dorun && !timerWait.wait(lock.mutex(), millisec))
             emit timeout();
     }
     RunEpilog();

@@ -23,7 +23,7 @@ zeromq-all:	zeromq/Makefile
 	${MAKE} -C zeromq all
 
 zeromq/Makefile:	zeromq/configure
-	(cd zeromq ; ./configure --prefix=${PREFIX})
+	(cd zeromq ; ./configure --without-documentation --prefix=${PREFIX})
 
 zeromq-install zeromq-uninstall zeromq-clean zeromq-distclean:
 	${MAKE} -C zeromq ${@:zeromq-%=%} 

@@ -75,12 +75,6 @@ extern "C" {
         HDHRSignalMonitor, SignalMonitorValue
  */
 
-static void ALRMhandler(int /*sig*/)
-{
-     LOG(VB_GENERAL, LOG_NOTICE, "SignalMonitor: Got SIGALRM");
-     signal(SIGINT, ALRMhandler);
-}
-
 SignalMonitor *SignalMonitor::Init(QString cardtype, int db_cardnum,
                                    ChannelBase *channel)
 {

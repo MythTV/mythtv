@@ -13,6 +13,7 @@
 
 #include "mythbaseexp.h"  //  MBASE_PUBLIC , etc.
 #include "verbosedefs.h"
+#include "mythsignalingtimer.h"
 #include "mthread.h"
 #include "nzmqt.hpp"
 
@@ -199,6 +200,9 @@ class LoggerThread : public QObject, public MThread
     nzmqt::ZMQContext *m_zmqContext;    ///< ZeroMQ context to use 
     nzmqt::ZMQSocket  *m_zmqSocket;     ///< ZeroMQ socket to talk to
                                         /// mythlogserver
+
+    MythSignalingTimer *m_initialTimer; ///< Timer for the initial startup
+    MythSignalingTimer *m_heartbeatTimer;   ///< Timer for 1s heartbeats
 
   protected:
     bool logConsole(LoggingItem *item);

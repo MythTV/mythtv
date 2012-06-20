@@ -800,10 +800,8 @@ EOF
         }
     # Otherwise, format it as necessary.  We have to use MySQL here because
     # Date::Manip is not aware of DST differences.  Yay.  Blech.
-        my @t = localtime(time);
-        my $offset = timegm(@t) - timelocal(@t);
         my $sh = $self->{'dbh'}->prepare('SELECT FROM_UNIXTIME(?)');
-        $sh->execute($time + $offset);
+        $sh->execute($time);    # Assumed to be a correct epoch time (in GMT)
         ($time) = $sh->fetchrow_array();
         $time =~ s/\s/T/;
         return $time;
