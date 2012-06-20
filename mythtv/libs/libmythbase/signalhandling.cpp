@@ -115,6 +115,7 @@ SignalHandler::~SignalHandler()
 
 void SignalHandler::AddHandler(int signum, void (*handler)(void))
 {
+#ifndef _WIN32
     struct sigaction sa;
     sa.sa_handler = SignalHandler::signalHandler;
     sigemptyset(&sa.sa_mask);
@@ -129,6 +130,7 @@ void SignalHandler::AddHandler(int signum, void (*handler)(void))
     LOG(VB_GENERAL, LOG_INFO, QString("Setup %1 handler").arg(signame));
 
     free((void *)signame);
+#endif
 }
 
 void SignalHandler::signalHandler(int signum)
