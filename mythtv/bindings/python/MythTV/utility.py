@@ -961,7 +961,7 @@ try:
                         continue
                     fds[pipe.fileno()] = (weakref.ref(buff), pipe)
 
-                for fd,event in poller.poll(0.1):
+                for fd,event in poller.poll(100):
                     # loop through file numbers and handle events
                     buff, pipe = fds[fd]
                     if buff() is None:
