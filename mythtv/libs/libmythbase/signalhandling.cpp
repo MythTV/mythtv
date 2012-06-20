@@ -191,6 +191,7 @@ void SignalHandler::signalHandler(int signum)
 
 void SignalHandler::handleSignal(void)
 {
+#ifndef _WIN32
     m_notifier->setEnabled(false);
 
     char a;
@@ -212,9 +213,7 @@ void SignalHandler::handleSignal(void)
         break;
     case SIGSEGV:
     case SIGABRT:
-#ifndef _WIN32
     case SIGBUS:
-#endif
     case SIGFPE:
     case SIGILL:
         usleep(100000);
@@ -235,6 +234,7 @@ void SignalHandler::handleSignal(void)
     }
 
     m_notifier->setEnabled(true);
+#endif
 }
 
 /*
