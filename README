@@ -129,6 +129,10 @@ on-demand as used, rather than when the object is created.
   >>> Studio(1)
   <Studio 'Lucasfilm'>
 
+The Genre class cannot be called by id directly, however it does have a getAll
+classmethod, capable of returning all available genres for a specified
+language.
+
 ## Image Behavior
 
 TheMovieDb currently offers three types of artwork: backdrops, posters, and
@@ -220,7 +224,7 @@ Movie:
   list(Translation)     translations
   list(Movie)           getSimilar()
 
-Movie classmethods
+Movie classmethods:
   Movie                 fromIMDB(imdbid)    special constructor for use with IMDb codes
   Movie                 latest()            gets latest movie added to database
   list(Movie)           nowplaying()        content currently in theater
@@ -287,6 +291,10 @@ Translation:
 Genre:
   integer               id
   string                name
+  list(Movie)           movies
+
+Genre classmethods:
+  list(Genre)           getAll(language)    returns list of all genres
 
 Studio:
   integer               id
