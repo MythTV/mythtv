@@ -79,10 +79,10 @@ This is not yet supported.
 
 ## Searching
 
-There are currently two search methods available for use: movies and people.
-Search results from TheMovieDb are sent iteratively, twenty results per page.
-The search methods provided by the PyTMDB3 module return list-like structures
-that will automatically grab new pages as needed.
+There are currently three search methods available for use: movies, people, 
+and studios. Search results from TheMovieDb are sent iteratively, twenty
+results per page. The search methods provided by the PyTMDB3 module return
+list-like structures that will automatically grab new pages as needed.
 
   >>> from tmdb3 import searchMovie
   >>> res = searchMovie('A New Hope')
@@ -103,6 +103,14 @@ out. The people search method behaves similarly.
   <Search Results: Hanks>
   >>> res[0]
   <Person 'Tom Hanks'>
+
+  >>> from tmdb import searchStudio
+  >>> res = searchStudio('Sony Pictures')
+  >>> res
+  <Search Results: Sony Pictures>
+  >>> res[0]
+  <Studio 'Sony Pictures'>
+
 
 ## Direct Queries
 

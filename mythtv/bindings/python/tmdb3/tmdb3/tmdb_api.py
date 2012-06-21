@@ -45,6 +45,7 @@ __version__="v0.6.2"
 # 0.6.0 Add user authentication support
 # 0.6.1 Add adult filtering for people searches
 # 0.6.2 Add similar movie search for Movie objects
+# 0.6.3 Add Studio search
 
 from request import set_key, Request
 from util import Datapoint, Datalist, Datadict, Element, NameRepr, SearchRepr
@@ -109,6 +110,16 @@ class PeopleSearchResult( SearchRepr, PagedRequest ):
     def __init__(self, request):
         super(PeopleSearchResult, self).__init__(request,
                                 lambda x: Person(raw=x))
+
+def searchStudio(query):
+    return StudioSearchResult(Request('search/company', query=query))
+
+class StudioSearchResult( SearchRepr, PagedRequest ):
+    """Stores a list of search matches."""
+    _name = None
+    def __init__(self, request):
+        super(StudioSearchResult, self).__init__(request,
+                                lambda x: Studio(raw=x))
 
 class Image( Element ):
     filename        = Datapoint('file_path', initarg=1,
