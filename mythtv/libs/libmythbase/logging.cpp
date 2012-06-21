@@ -488,6 +488,11 @@ void LoggerThread::handleItem(LoggingItem *item)
         item->m_tid = item->getThreadTid();
 
         QMutexLocker locker(&logThreadMutex);
+        if (logThreadHash.contains(item->m_threadId))
+        {
+            char *threadName = logThreadHash.take(item->m_threadId);
+            free(threadName);
+        }
         logThreadHash[item->m_threadId] = strdup(item->m_threadName);
 
         if (debugRegistration)
