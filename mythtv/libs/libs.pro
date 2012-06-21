@@ -21,6 +21,7 @@ libmythui.depends = libmythbase
 libmythupnp.depends = libmythbase
 libmyth.depends =  libmythbase libmythui libmythupnp
 libmyth.depends += libmythsamplerate libmythsoundtouch libmythfreesurround
+libmythservicecontracts.depends = libmythbase
 libmythupnp.depends = libmythbase libmythservicecontracts
 
 LIBMYTHTVDEPS = $$SUBDIRS
