@@ -328,7 +328,7 @@ class ElementType( type ):
 
     def __call__(cls, *args, **kwargs):
         obj = cls.__new__(cls)
-        if 'locale' in kwargs:
+        if ('locale' in kwargs) and (kwargs['locale'] is not None):
             obj._locale = kwargs['locale']
         else:
             obj._locale = get_locale()
