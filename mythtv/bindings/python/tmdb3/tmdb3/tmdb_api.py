@@ -22,7 +22,7 @@ for search and retrieval of text metadata and image URLs from TMDB.
 Preliminary API specifications can be found at
 http://help.themoviedb.org/kb/api/about-3"""
 
-__version__="v0.6.2"
+__version__="v0.6.4"
 # 0.1.0 Initial development
 # 0.2.0 Add caching mechanism for API queries
 # 0.2.1 Temporary work around for broken search paging
@@ -46,6 +46,7 @@ __version__="v0.6.2"
 # 0.6.1 Add adult filtering for people searches
 # 0.6.2 Add similar movie search for Movie objects
 # 0.6.3 Add Studio search
+# 0.6.4 Add Genre list and associated Movie search
 
 from request import set_key, Request
 from util import Datapoint, Datalist, Datadict, Element, NameRepr, SearchRepr
@@ -285,6 +286,28 @@ class Translation( Element ):
 class Genre( NameRepr, Element ):
     id      = Datapoint('id')
     name    = Datapoint('name')
+
+    def _populate_movies(self):
+        return Request('genre/{0}/movies'.format(self.id), \
+                            language=self._locale.language)
+
+    @property
+    def movies(self):
+        if 'movies' not in self._data:
+            search = MovieSearchResult(self._populate_movies(), \
+                                                locale=self._locale)
+            search._name = "{0.name} Movies".format(self)
+            self._data['movies'] = search
+        return self._data['movies']
+
+    @classmethod
+    def getAll(cls, locale=None):
+        class GenreList( Element ):
+            genres = Datalist('genres', handler=Genre)
+            def _populate(self):
+                return Request('genre/list', language=self._locale.language)
+        return GenreList(locale=locale).genres
+        
 
 class Studio( NameRepr, Element ):
     id              = Datapoint('id', initarg=1)
