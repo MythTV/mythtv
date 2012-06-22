@@ -402,9 +402,12 @@ void LoggerThread::run(void)
 ///         to show signs of life
 void LoggerThread::initialTimeout(void)
 {
-    m_initialTimer->stop();
-    delete m_initialTimer;
-    m_initialTimer = NULL;
+    if (m_initialTimer)
+    {
+        m_initialTimer->stop();
+        delete m_initialTimer;
+        m_initialTimer = NULL;
+    }
 
     if (m_initialWaiting)
     {
