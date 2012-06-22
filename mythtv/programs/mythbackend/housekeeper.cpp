@@ -202,7 +202,6 @@ void HouseKeeper::RunHouseKeeping(void)
         houseKeepingWait.wakeAll();
     }
 
-    int period, maxhr, minhr;
     QString dbTag;
     bool initialRun = true;
 
@@ -242,18 +241,6 @@ void HouseKeeper::RunHouseKeeping(void)
                 }
                 else
                 {
-                    period = 1;
-                    minhr = gCoreContext->GetNumSetting("MythFillMinHour", -1);
-                    if (minhr == -1)
-                    {
-                        minhr = 0;
-                        maxhr = 24;
-                    }
-                    else
-                    {
-                        maxhr = gCoreContext->GetNumSetting("MythFillMaxHour", 24);
-                    }
-
                     bool grabberSupportsNextTime = false;
                     MSqlQuery result(MSqlQuery::InitCon());
                     if (result.isConnected())
@@ -266,12 +253,15 @@ void HouseKeeper::RunHouseKeeping(void)
                         if ((result.exec()) &&
                             (result.next()) &&
                             (result.value(0).toInt() > 0))
-                            grabberSupportsNextTime = true;
+                        {
+                            grabberSupportsNextTime =
+                                gCoreContext->GetNumSetting(
+                                    "MythFillGrabberSuggestsTime", 1);
+                        }
                     }
 
                     bool runMythFill = false;
-                    if (grabberSupportsNextTime &&
-                        gCoreContext->GetNumSetting("MythFillGrabberSuggestsTime", 1))
+                    if (grabberSupportsNextTime)
                     {
                         QDateTime nextRun = MythDate::fromString(
                             gCoreContext->GetSetting("MythFillSuggestedRunTime",
@@ -283,10 +273,35 @@ void HouseKeeper::RunHouseKeeping(void)
                             (lastRun.secsTo(now) > (3 * 60 * 60)))
                             runMythFill = true;
                     }
-                    else if (wantToRun("MythFillDB", period, minhr, maxhr,
-                                       initialRun))
+                    else
                     {
-                        runMythFill = true;
+                        QDate date = QDate::currentDate();
+                        int minhr = gCoreContext->GetNumSetting(
+                            "MythFillMinHour", -1);
+                        int maxhr = gCoreContext->GetNumSetting(
+                            "MythFillMaxHour", 23) % 24;
+                        if (minhr == -1)
+                        {
+                            minhr = 0;
+                            maxhr = 23;
+                        }
+                        else
+                        {
+                            minhr %= 24;
+                        }
+
+                        QDateTime umin =
+                            QDateTime(date, QTime(minhr,0)).toUTC();
+                        QDateTime umax =
+                            QDateTime(date, QTime(maxhr,0)).toUTC();
+
+                        if (umax == umin)
+                            umax.addSecs(60*60);
+
+                        runMythFill = wantToRun(
+                            "MythFillDB", 1,
+                            umin.time().hour(), umax.time().hour(),
+                            initialRun);
                     }
 
                     if (runMythFill)
