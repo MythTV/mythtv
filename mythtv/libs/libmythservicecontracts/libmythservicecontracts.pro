@@ -50,7 +50,7 @@ INCLUDEPATH += ./services
 INCLUDEPATH += ../libmyth
 INCLUDEPATH += ../libmythbase
 
-LIBS += -L../libmythbase -lmythbase-$$LIBVERSION $$EXTRA_LIBS
+LIBS += $$EXTRA_LIBS
 
 inc.path = $${PREFIX}/include/mythtv/libmythservicecontracts/
 inc.files = serviceexp.h service.h datacontracthelper.h
