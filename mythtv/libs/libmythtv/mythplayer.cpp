@@ -5008,7 +5008,8 @@ void MythPlayer::ToggleNightMode(void)
 bool MythPlayer::CanVisualise(void)
 {
     if (videoOutput)
-        return videoOutput->CanVisualise(&audio, NULL);
+        return videoOutput->
+            CanVisualise(&audio, GetMythMainWindow()->GetRenderDevice());
     return false;
 }
 
