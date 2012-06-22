@@ -39,6 +39,7 @@
 #include "globals.h"
 #include "mythdate.h"
 #include "serviceUtil.h"
+#include "mythmiscutil.h"
 
 /////////////////////////////////////////////////////////////////////////////
 //
