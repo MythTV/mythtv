@@ -76,9 +76,13 @@ void MythSignalingTimer::run(void)
     RunProlog();
     while (dorun)
     {
-        QMutexLocker lock(&startStopLock);
-        if (dorun && !timerWait.wait(lock.mutex(), millisec))
+        QMutexLocker locker(&startStopLock);
+        if (dorun && !timerWait.wait(locker.mutex(), millisec))
+        {
+            locker.unlock();
             emit timeout();
+            locker.relock();
+        }
     }
     RunEpilog();
     running = false;
