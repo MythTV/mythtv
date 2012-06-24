@@ -106,7 +106,7 @@ class MUI_PUBLIC MythPainter
     /// Creates a reference counted image, call DecrRef() to delete.
     virtual MythImage* GetFormatImagePriv(void) = 0;
     virtual void DeleteFormatImagePriv(MythImage *im) = 0;
-    void ExpireImages(int max = 0);
+    void ExpireImages(int64_t max = 0);
 
     void CheckFormatImage(MythImage *im);
 
