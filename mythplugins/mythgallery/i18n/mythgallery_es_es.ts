@@ -296,113 +296,113 @@
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mythgallery/main.cpp" line="87"/>
+        <location filename="../mythgallery/main.cpp" line="88"/>
         <source>Image viewer / slideshow</source>
         <translation>Visor de imágenes / presentación</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="92"/>
+        <location filename="../mythgallery/main.cpp" line="93"/>
         <source>Start/Stop Slideshow</source>
         <translation>Iniciar/Detener Presentación</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="94"/>
+        <location filename="../mythgallery/main.cpp" line="95"/>
         <source>Go to the first image in thumbnail view</source>
         <translation>Ir a la primera imagen en vista miniatura</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="96"/>
+        <location filename="../mythgallery/main.cpp" line="97"/>
         <source>Go to the last image in thumbnail view</source>
         <translation>Ir a la última imagen en vista miniatura</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="98"/>
+        <location filename="../mythgallery/main.cpp" line="99"/>
         <source>Start Slideshow in thumbnail view</source>
         <translation>Iniciar Presentación en vista miniatura</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="89"/>
-        <location filename="../mythgallery/main.cpp" line="100"/>
+        <location filename="../mythgallery/main.cpp" line="90"/>
+        <location filename="../mythgallery/main.cpp" line="101"/>
         <source>Start Random Slideshow in thumbnail view</source>
         <translation>Iniciar Presentación Aleatoria en vista miniatura</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="103"/>
+        <location filename="../mythgallery/main.cpp" line="104"/>
         <source>Rotate image right 90 degrees</source>
         <translation>Rotar imagen 90° a la derecha</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="105"/>
+        <location filename="../mythgallery/main.cpp" line="106"/>
         <source>Rotate image left 90 degrees</source>
         <translation>Rotar imagen 90°.a la izquierda</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="107"/>
+        <location filename="../mythgallery/main.cpp" line="108"/>
         <source>Zoom image out</source>
         <translation>Alejar la imagen</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="109"/>
+        <location filename="../mythgallery/main.cpp" line="110"/>
         <source>Zoom image in</source>
         <translation>Acercar la imagen</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="111"/>
+        <location filename="../mythgallery/main.cpp" line="112"/>
         <source>Scroll image up</source>
         <translation>Desplazar la imagen hacia arriba</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="113"/>
+        <location filename="../mythgallery/main.cpp" line="114"/>
         <source>Scroll image left</source>
         <translation>Desplazar la imagen hacia la izquierda</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="115"/>
+        <location filename="../mythgallery/main.cpp" line="116"/>
         <source>Scroll image right</source>
         <translation>Desplazar la imagen hacia la derecha</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="117"/>
+        <location filename="../mythgallery/main.cpp" line="118"/>
         <source>Scroll image down</source>
         <translation>Desplazar la imagen hacia abajo</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="119"/>
+        <location filename="../mythgallery/main.cpp" line="120"/>
         <source>Recenter image</source>
         <translation>Volver a centrar la imagen</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="121"/>
+        <location filename="../mythgallery/main.cpp" line="122"/>
         <source>Full-size (un-zoom) image</source>
         <translation>Imagen a tamaño completo (sin acercar/alejar)</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="123"/>
+        <location filename="../mythgallery/main.cpp" line="124"/>
         <source>Go to the upper-left corner of the image</source>
         <translation>Ir a la esquina superior izquierda de la imagen</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="125"/>
+        <location filename="../mythgallery/main.cpp" line="126"/>
         <source>Go to the lower-right corner of the image</source>
         <translation>Ir a la esquina inferior derecha de la imagen</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="127"/>
+        <location filename="../mythgallery/main.cpp" line="128"/>
         <source>Mark image</source>
         <translation>Marcar imagen</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="129"/>
+        <location filename="../mythgallery/main.cpp" line="130"/>
         <source>Toggle scale to fullscreen/scale to fit</source>
         <translation>Conmutar pantalla completa/hasta rellenar</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="131"/>
+        <location filename="../mythgallery/main.cpp" line="132"/>
         <source>MythGallery Media Handler 1/2</source>
         <translation>Gestor de medios MythGallery 1/2</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="134"/>
+        <location filename="../mythgallery/main.cpp" line="143"/>
         <source>MythGallery Media Handler 2/2</source>
         <translation>Gestor de medios MythGallery 2/2</translation>
     </message>
@@ -565,69 +565,13 @@
         <translation>Configuración de MythGallery (General)</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="52"/>
+        <location filename="../mythgallery/main.cpp" line="53"/>
         <source>MythGallery cannot find its start directory.
 %1
 Check the directory exists, is readable and the setting is correct on MythGallery&apos;s settings page.</source>
         <translation>MythGallery no puede encontrar el directorio de inicio
  %1
 Compruebe que el directorio exista, sea legible y la configuración de MythGallery sea correcta.</translation>
-    </message>
-    <message>
-        <location filename="../mythgallery/thumbview.cpp" line="127"/>
-        <source>Folder: </source>
-        <translation>Carpeta: </translation>
-    </message>
-    <message>
-        <location filename="../mythgallery/thumbview.cpp" line="128"/>
-        <source>Created: </source>
-        <translation>Creada: </translation>
-    </message>
-    <message>
-        <location filename="../mythgallery/thumbview.cpp" line="129"/>
-        <source>Modified: </source>
-        <translation>Modificada: </translation>
-    </message>
-    <message>
-        <location filename="../mythgallery/thumbview.cpp" line="131"/>
-        <source>Bytes</source>
-        <translation>Bytes</translation>
-    </message>
-    <message>
-        <location filename="../mythgallery/thumbview.cpp" line="132"/>
-        <source>Width</source>
-        <translation>Ancho</translation>
-    </message>
-    <message>
-        <location filename="../mythgallery/thumbview.cpp" line="133"/>
-        <location filename="../mythgallery/thumbview.cpp" line="135"/>
-        <source>pixels</source>
-        <translation>píxeles</translation>
-    </message>
-    <message>
-        <location filename="../mythgallery/thumbview.cpp" line="134"/>
-        <source>Height</source>
-        <translation>Alto</translation>
-    </message>
-    <message>
-        <location filename="../mythgallery/thumbview.cpp" line="136"/>
-        <source>Pixel Count</source>
-        <translation>Número de Píxeles</translation>
-    </message>
-    <message>
-        <location filename="../mythgallery/thumbview.cpp" line="137"/>
-        <source>megapixels</source>
-        <translation>megapíxeles</translation>
-    </message>
-    <message>
-        <location filename="../mythgallery/thumbview.cpp" line="139"/>
-        <source>Rotation Angle</source>
-        <translation>Ángulo de Rotación</translation>
-    </message>
-    <message>
-        <location filename="../mythgallery/thumbview.cpp" line="140"/>
-        <source>degrees</source>
-        <translation>grados</translation>
     </message>
     <message>
         <location filename="../mythgallery/galleryfilterdlg.cpp" line="138"/>
@@ -785,6 +729,63 @@ Compruebe que el directorio exista, sea legible y la configuración de MythGalle
         <location filename="themestrings.h" line="18"/>
         <source>Save as default</source>
         <translation>Guardar como predeterminado</translation>
+    </message>
+</context>
+<context>
+    <name>ThumbItem</name>
+    <message>
+        <location filename="../mythgallery/thumbview.cpp" line="127"/>
+        <source>Folder: %1</source>
+        <translation>Carpeta: %1</translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/thumbview.cpp" line="129"/>
+        <source>Created: %1</source>
+        <extracomment>%1 is the creation date</extracomment>
+        <translation>Creada el: %1</translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/thumbview.cpp" line="131"/>
+        <source>Modified: %1</source>
+        <extracomment>%1 is the modification date</extracomment>
+        <translation>Modificada el: %1</translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../mythgallery/thumbview.cpp" line="132"/>
+        <source>Size: %n bytes</source>
+        <translation>
+            <numerusform>Tamaño: %n bytes</numerusform>
+            <numerusform>Tamaño: %n byte</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../mythgallery/thumbview.cpp" line="133"/>
+        <source>Width: %n pixel(s)</source>
+        <translation>
+            <numerusform>Ancho: %n píxel</numerusform>
+            <numerusform>Ancho: %n píxeles</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../mythgallery/thumbview.cpp" line="134"/>
+        <source>Height: %n pixel(s)</source>
+        <translation>
+            <numerusform>Alto: %n píxel</numerusform>
+            <numerusform>Ancho: %n píxeles</numerusform>
+        </translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/thumbview.cpp" line="135"/>
+        <source>Pixel Count: %1 megapixels</source>
+        <translation>Número de píxeles: %1 megapíxeles</translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../mythgallery/thumbview.cpp" line="137"/>
+        <source>Rotation Angle: %n degree(s)</source>
+        <translation>
+            <numerusform>Ángulo de rotación: %n grado</numerusform>
+            <numerusform>Ángulo de rotación: %n grados</numerusform>
+        </translation>
     </message>
 </context>
 </TS>
