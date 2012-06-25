@@ -5039,23 +5039,8 @@ void MainServer::HandleFileTransferQuery(QStringList &slist,
 
     ft->IncrRef();
     sockListLock.unlock();
-
-    if (command == "IS_OPEN")
-    {
-        bool isopen = ft->isOpen();
-
-        retlist << QString::number(isopen);
-    }
-    else if (command == "REOPEN")
-    {
-        retlist << QString::number(ft->ReOpen(slist[2]));
-    }
-    else if (command == "DONE")
-    {
-        ft->Stop();
-        retlist << "ok";
-    }
-    else if (command == "REQUEST_BLOCK")
+    
+    if (command == "REQUEST_BLOCK")
     {
         int size = slist[2].toInt();
 
@@ -5075,6 +5060,21 @@ void MainServer::HandleFileTransferQuery(QStringList &slist,
 
         long long ret = ft->Seek(curpos, pos, whence);
         retlist << QString::number(ret);
+    }
+    else if (command == "IS_OPEN")
+    {
+        bool isopen = ft->isOpen();
+
+        retlist << QString::number(isopen);
+    }
+    else if (command == "REOPEN")
+    {
+        retlist << QString::number(ft->ReOpen(slist[2]));
+    }
+    else if (command == "DONE")
+    {
+        ft->Stop();
+        retlist << "ok";
     }
     else if (command == "SET_TIMEOUT")
     {
