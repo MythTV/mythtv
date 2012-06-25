@@ -354,7 +354,14 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
     pbs->UpRef();
     sockListLock.unlock();
 
-    if (command == "QUERY_RECORDINGS")
+    if (command == "QUERY_FILETRANSFER")
+    {
+        if (tokens.size() != 2)
+            VERBOSE(VB_IMPORTANT, "Bad QUERY_FILETRANSFER");
+        else
+            HandleFileTransferQuery(listline, tokens, pbs);
+    }
+    else if (command == "QUERY_RECORDINGS")
     {
         if (tokens.size() != 2)
             VERBOSE(VB_IMPORTANT, "Bad QUERY_RECORDINGS query");
@@ -545,13 +552,6 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
     else if (command == "GET_RECORDER_NUM")
     {
         HandleGetRecorderNum(listline, pbs);
-    }
-    else if (command == "QUERY_FILETRANSFER")
-    {
-        if (tokens.size() != 2)
-            VERBOSE(VB_IMPORTANT, "Bad QUERY_FILETRANSFER");
-        else
-            HandleFileTransferQuery(listline, tokens, pbs);
     }
     else if (command == "QUERY_GENPIXMAP2")
     {
