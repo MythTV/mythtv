@@ -3801,7 +3801,7 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
                 retlist += QString::number(*it);
             }
             if (retlist.empty())
-                retlist << "ok";
+                retlist << "OK";
         }
     }
     else if (command == "GET_RECORDING")
@@ -3821,7 +3821,7 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
     else if (command == "FRONTEND_READY")
     {
         enc->FrontendReady();
-        retlist << "ok";
+        retlist << "OK";
     }
     else if (command == "CANCEL_NEXT_RECORDING")
     {
@@ -3829,7 +3829,7 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
         LOG(VB_GENERAL, LOG_NOTICE,
             QString("Received: CANCEL_NEXT_RECORDING %1").arg(cancel));
         enc->CancelNextRecording(cancel == "1");
-        retlist << "ok";
+        retlist << "OK";
     }
     else if (command == "SPAWN_LIVETV")
     {
@@ -3845,7 +3845,7 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
         chain->SetHostSocket(pbssock);
 
         enc->SpawnLiveTV(chain, slist[3].toInt(), slist[4]);
-        retlist << "ok";
+        retlist << "OK";
     }
     else if (command == "STOP_LIVETV")
     {
@@ -3867,18 +3867,18 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
     else if (command == "PAUSE")
     {
         enc->PauseRecorder();
-        retlist << "ok";
+        retlist << "OK";
     }
     else if (command == "FINISH_RECORDING")
     {
         enc->FinishRecording();
-        retlist << "ok";
+        retlist << "OK";
     }
     else if (command == "SET_LIVE_RECORDING")
     {
         int recording = slist[2].toInt();
         enc->SetLiveRecording(recording);
-        retlist << "ok";
+        retlist << "OK";
     }
     else if (command == "GET_FREE_INPUTS")
     {
@@ -3913,20 +3913,20 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
     {
         QString changroup = slist[2];
         enc->ToggleChannelFavorite(changroup);
-        retlist << "ok";
+        retlist << "OK";
     }
     else if (command == "CHANGE_CHANNEL")
     {
         ChannelChangeDirection direction =
             (ChannelChangeDirection) slist[2].toInt();
         enc->ChangeChannel(direction);
-        retlist << "ok";
+        retlist << "OK";
     }
     else if (command == "SET_CHANNEL")
     {
         QString name = slist[2];
         enc->SetChannel(name);
-        retlist << "ok";
+        retlist << "OK";
     }
     else if (command == "SET_SIGNAL_MONITORING_RATE")
     {
@@ -4061,7 +4061,7 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
     else
     {
         LOG(VB_GENERAL, LOG_ERR, QString("Unknown command: %1").arg(command));
-        retlist << "ok";
+        retlist << "OK";
     }
 
     SendResponse(pbssock, retlist);
@@ -5022,7 +5022,7 @@ void MainServer::HandleFileTransferQuery(QStringList &slist,
         {
             // if there is an error opening the file, we may not have a
             // FileTransfer instance for this connection.
-            retlist << "ok";
+            retlist << "OK";
         }
         else
         {
@@ -5074,18 +5074,18 @@ void MainServer::HandleFileTransferQuery(QStringList &slist,
     else if (command == "DONE")
     {
         ft->Stop();
-        retlist << "ok";
+        retlist << "OK";
     }
     else if (command == "SET_TIMEOUT")
     {
         bool fast = slist[2].toInt();
         ft->SetTimeout(fast);
-        retlist << "ok";
+        retlist << "OK";
     }
     else
     {
         LOG(VB_GENERAL, LOG_ERR, QString("Unknown command: %1").arg(command));
-        retlist << "ok";
+        retlist << "OK";
     }
 
     ft->DecrRef();
