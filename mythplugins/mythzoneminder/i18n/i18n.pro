@@ -13,6 +13,7 @@ trans.files += mythzoneminder_cs.qm mythzoneminder_es.qm mythzoneminder_fi.qm
 trans.files += mythzoneminder_nl.qm mythzoneminder_pl.qm mythzoneminder_en_ca.qm
 trans.files += mythzoneminder_es_es.qm
 trans.files += mythzoneminder_bg.qm
+trans.files += mythzoneminder_it.qm
 
 INSTALLS += trans
 

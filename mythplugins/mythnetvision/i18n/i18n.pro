@@ -12,6 +12,7 @@ trans.files += mythnetvision_pt.qm mythnetvision_nb.qm mythnetvision_de.qm
 trans.files += mythnetvision_cs.qm mythnetvision_es.qm mythnetvision_fi.qm
 trans.files += mythnetvision_ja.qm mythnetvision_pl.qm mythnetvision_en_ca.qm
 trans.files += mythnetvision_es_es.qm
+trans.files += mythnetvision_it.qm
 
 INSTALLS += trans
 

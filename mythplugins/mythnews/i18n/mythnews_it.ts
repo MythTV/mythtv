@@ -65,12 +65,12 @@
     <message>
         <location filename="../mythnews/mythnews.cpp" line="933"/>
         <source>Add News Site</source>
-        <translation>Aggiungi</translation>
+        <translation>Aggiungere sito di notizie</translation>
     </message>
     <message>
         <location filename="../mythnews/mythnews.cpp" line="935"/>
         <source>Delete News Site</source>
-        <translation>Elimina</translation>
+        <translation>Eliminare sito di notizie</translation>
     </message>
     <message>
         <location filename="../mythnews/mythnews.cpp" line="918"/>
@@ -83,12 +83,12 @@
     <message>
         <location filename="../mythnews/mythnewseditor.cpp" line="81"/>
         <source>Edit Site Details</source>
-        <translation>Modifica Dettagli Sito</translation>
+        <translation>Modifica dettagli sito</translation>
     </message>
     <message>
         <location filename="../mythnews/mythnewseditor.cpp" line="81"/>
         <source>Enter Site Details</source>
-        <translation>Immissione Dettagli Sito</translation>
+        <translation>Immissione dettagli sito</translation>
     </message>
     <message>
         <location filename="../mythnews/mythnewseditor.cpp" line="85"/>
@@ -143,12 +143,12 @@
     <message>
         <location filename="../mythnews/newssite.cpp" line="253"/>
         <source>Showing Cached News.</source>
-        <translation>Mostrate le notizie in cache.</translation>
+        <translation>Mostrare le notizie in cache.</translation>
     </message>
     <message>
         <location filename="../mythnews/newssite.cpp" line="274"/>
         <source>XML-file is not valid RSS-feed</source>
-        <translation>Il file XML non √® un RSS feed valido</translation>
+        <translation>Il file XML non è un RSS feed valido</translation>
     </message>
     <message>
         <location filename="../mythnews/newssite.cpp" line="218"/>
@@ -176,9 +176,9 @@
         <source>You can edit the name, URL, and icon path for the selected RSS Feed on this screen.  You can also designate the item as a podcast.
 
 When you have finished editing, select &quot;OK&quot; or &quot;Cancel&quot; to continue.</source>
-        <translation>Si pu√≤ modificare il nuome la URL, il persorso all&apos;icona per il feed RSS. Si pu√≤ anche segnare l&apos;oggetto come podcast
+        <translation>Si può modificare il nome, la URL, il persorso all&apos;icona per il feed RSS. Si può anche segnare l&apos;oggetto come podcast
 
-Quando √® terminata la modifica, selezionare &quot;Ok&quot; o &quot;Annulla&quot; per continuare.</translation>
+Quando è terminata la modifica, selezionare &quot;Ok&quot; o &quot;Annulla&quot; per continuare.</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="4"/>

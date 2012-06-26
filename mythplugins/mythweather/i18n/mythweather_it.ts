@@ -5,7 +5,7 @@
     <name>GlobalSetup</name>
     <message>
         <source>Finish</source>
-        <translation>Fine</translation>
+        <translation>Finito</translation>
     </message>
 </context>
 <context>
@@ -20,11 +20,11 @@
     </message>
     <message>
         <source>Searching ... Results: %1</source>
-        <translation>Ricerca ... Risultati: %1</translation>
+        <translation>Ricerca ... risultati: %1</translation>
     </message>
     <message>
         <source>Search Complete. Results: %1</source>
-        <translation>Ricerca Completa. Risultati: %1</translation>
+        <translation>Ricerca completa. Risultati: %1</translation>
     </message>
     <message>
         <source>Source: %1</source>
@@ -35,7 +35,7 @@
     <name>MythControls</name>
     <message>
         <source>Weather forecasts</source>
-        <translation>Previsioni</translation>
+        <translation>Previsioni meteo</translation>
     </message>
     <message>
         <source>Pause current page</source>
@@ -43,14 +43,14 @@
     </message>
     <message>
         <source>Search List</source>
-        <translation>Lista di ricerca</translation>
+        <translation>Elenco di ricerca</translation>
     </message>
 </context>
 <context>
     <name>QObject</name>
     <message>
         <source>Current Conditions</source>
-        <translation>Condizioni Attuali</translation>
+        <translation>Condizioni attuali</translation>
     </message>
     <message>
         <source>Three Day Forecast</source>
@@ -62,11 +62,11 @@
     </message>
     <message>
         <source>Severe Weather Alerts</source>
-        <translation>Allerta Meteo</translation>
+        <translation>Allerta meteo</translation>
     </message>
     <message>
         <source>Six Day Forecast</source>
-        <translation>Previsioni a 6 giorni</translation>
+        <translation>Previsioni a sei giorni</translation>
     </message>
     <message>
         <source>Static Map</source>
@@ -74,22 +74,22 @@
     </message>
     <message>
         <source>Animated Map</source>
-        <translation>Mappa Animata</translation>
+        <translation>Mappa animata</translation>
     </message>
 </context>
 <context>
     <name>ScreenSetup</name>
     <message>
         <source>Active Screens</source>
-        <translation>Pannelli Attivi</translation>
+        <translation>Pannelli attivi</translation>
     </message>
     <message>
         <source>Inactive Screens</source>
-        <translation>Pannelli Inattivi</translation>
+        <translation>Pannelli inattivi</translation>
     </message>
     <message>
         <source>Finish</source>
-        <translation>Fine</translation>
+        <translation>Finito</translation>
     </message>
     <message>
         <source>Add desired screen to the Active Screens list by pressing SELECT.</source>
@@ -113,7 +113,7 @@
     </message>
     <message>
         <source>Location: </source>
-        <translation>località:</translation>
+        <translation>Località:</translation>
     </message>
     <message>
         <source>Not Defined</source>
@@ -141,15 +141,15 @@
     </message>
     <message>
         <source>Manipulate Screen</source>
-        <translation>Modifica Pannelli</translation>
+        <translation>Modifica pannelli</translation>
     </message>
     <message>
         <source>Move Up</source>
-        <translation>Spostare Su</translation>
+        <translation>Spostare su</translation>
     </message>
     <message>
         <source>Move Down</source>
-        <translation>Spostare Giù</translation>
+        <translation>Spostare giù</translation>
     </message>
     <message>
         <source>Remove</source>
@@ -161,7 +161,7 @@
     </message>
     <message>
         <source>Change Units</source>
-        <translation>Cambiare Unità</translation>
+        <translation>Cambiare unità</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -176,14 +176,14 @@
     </message>
     <message>
         <source>Script %1 is still running when trying to do update, Make sure it isn&apos;t hanging, make sure timeout values are sane... Not running this time around</source>
-        <translation>Lo script %1 è ancora in esecuzione, Assicurarsi che non sia bloccato, che i valori di timeout siano corretti... Non sarà eseguito questa volta</translation>
+        <translation>Lo script %1 è ancora in esecuzione, assicurarsi che non sia bloccato, che i valori di timeout siano corretti... non sarà eseguito questa volta</translation>
     </message>
 </context>
 <context>
     <name>SourceSetup</name>
     <message>
         <source>Finish</source>
-        <translation>Fine</translation>
+        <translation>Finito</translation>
     </message>
     <message>
         <source>Author: </source>
@@ -245,7 +245,7 @@
     </message>
     <message>
         <source>Light Rain</source>
-        <translation>Leggero pioggia</translation>
+        <translation>Leggera pioggia</translation>
     </message>
     <message>
         <source>Showers</source>
@@ -281,11 +281,11 @@
     </message>
     <message>
         <source>AM Clouds/PM Sun</source>
-        <translation>Nuvoloso di mattina/Sole di pomeriggio</translation>
+        <translation>Nuvoloso di mattina/sole di pomeriggio</translation>
     </message>
     <message>
         <source>Isolated T-Storms</source>
-        <translation>Isolati Temporali</translation>
+        <translation>Isolati temporali</translation>
     </message>
     <message>
         <source>Scattered Thunderstorms</source>
@@ -297,11 +297,11 @@
     </message>
     <message>
         <source>PM Showers/Wind</source>
-        <translation>Pioggia di pomeriggio/Vento</translation>
+        <translation>Pioggia di pomeriggio/vento</translation>
     </message>
     <message>
         <source>Rain/Snow Showers</source>
-        <translation>Pioggia/Acquazzoni della neve</translation>
+        <translation>Pioggia/acquazzoni della neve</translation>
     </message>
     <message>
         <source>Few Snow Showers</source>
@@ -309,11 +309,11 @@
     </message>
     <message>
         <source>Cloudy/Wind</source>
-        <translation>Nuvoloso/Vento</translation>
+        <translation>Nuvoloso/vento</translation>
     </message>
     <message>
         <source>Flurries/Wind</source>
-        <translation>Turbini di neve/Vento</translation>
+        <translation>Turbini di neve/vento</translation>
     </message>
     <message>
         <source>Mostly Cloudy/Windy</source>
@@ -321,27 +321,27 @@
     </message>
     <message>
         <source>Rain/Thunder</source>
-        <translation>Pioggia/Tuoni</translation>
+        <translation>Pioggia/tuoni</translation>
     </message>
     <message>
         <source>Partly Cloudy/Windy</source>
-        <translation>Parzialmente nuvoloso/Ventoso</translation>
+        <translation>Parzialmente nuvoloso/ventoso</translation>
     </message>
     <message>
         <source>AM Rain/Snow Showers</source>
-        <translation>Pioggia/Acquazzoni della neve di mattina</translation>
+        <translation>Pioggia/acquazzoni della neve di mattina</translation>
     </message>
     <message>
         <source>Light Rain/Wind</source>
-        <translation>Leggero pioggia/Vento</translation>
+        <translation>Leggero pioggia/vento</translation>
     </message>
     <message>
         <source>Showers/Wind</source>
-        <translation>Aquazzone/Vento</translation>
+        <translation>Aquazzone/vento</translation>
     </message>
     <message>
         <source>Mostly Sunny/Wind</source>
-        <translation>Abbastanza soleggiato/Vento</translation>
+        <translation>Abbastanza soleggiato/vento</translation>
     </message>
     <message>
         <source>Flurries</source>
@@ -349,11 +349,11 @@
     </message>
     <message>
         <source>Rain/Wind</source>
-        <translation>Pioggia/Vento</translation>
+        <translation>Pioggia/vento</translation>
     </message>
     <message>
         <source>Sct Flurries/Wind</source>
-        <translation>Turbini di neve/Vento sparso</translation>
+        <translation>Turbini di neve/vento sparso</translation>
     </message>
     <message>
         <source>Sct Strong Storms</source>
@@ -369,7 +369,7 @@
     </message>
     <message>
         <source>Sunny/Windy</source>
-        <translation>Soleggiato/Vento</translation>
+        <translation>Soleggiato/vento</translation>
     </message>
     <message>
         <source>AM Thunderstorms</source>
@@ -381,15 +381,15 @@
     </message>
     <message>
         <source>Iso T-Storms/Wind</source>
-        <translation>Isolati temporali/Vento</translation>
+        <translation>Isolati temporali/vento</translation>
     </message>
     <message>
         <source>Rain/Snow</source>
-        <translation>Pioggia/Neve</translation>
+        <translation>Pioggia/neve</translation>
     </message>
     <message>
         <source>Sct T-Storms/Wind</source>
-        <translation>Temporali/Vento sparso</translation>
+        <translation>Temporali/vento sparso</translation>
     </message>
     <message>
         <source>AM Showers/Wind</source>
@@ -401,7 +401,7 @@
     </message>
     <message>
         <source>Snow to Ice/Wind</source>
-        <translation>Da neve a ghiaccio/Vento</translation>
+        <translation>Da neve a ghiaccio/vento</translation>
     </message>
     <message>
         <source>Snow to Rain</source>
@@ -429,31 +429,31 @@
     </message>
     <message>
         <source>PM Rain/Snow</source>
-        <translation>Pioggia/Neve di pomeriggio</translation>
+        <translation>Pioggia/neve di pomeriggio</translation>
     </message>
     <message>
         <source>Few Showers/Wind</source>
-        <translation>Qualche pioggia/Vento</translation>
+        <translation>Qualche pioggia/vento</translation>
     </message>
     <message>
         <source>Snow/Wind</source>
-        <translation>Neve/Vento</translation>
+        <translation>Neve/vento</translation>
     </message>
     <message>
         <source>PM Rain/Snow Showers</source>
-        <translation>Pioggia di pomeriggio/Acquazzoni della neve</translation>
+        <translation>Pioggia di pomeriggio/acquazzoni della neve</translation>
     </message>
     <message>
         <source>PM Rain/Snow/Wind</source>
-        <translation>Pioggia/Neve/Vento di pomeriggio</translation>
+        <translation>Pioggia/neve/vento di pomeriggio</translation>
     </message>
     <message>
         <source>Rain/Snow Showers/Wind</source>
-        <translation>Pioggia/Acquazzoni della neve/Vento</translation>
+        <translation>Pioggia/acquazzoni della neve/vento</translation>
     </message>
     <message>
         <source>Rain/Snow/Wind</source>
-        <translation>Pioggia/Neve/Vento</translation>
+        <translation>Pioggia/neve/vento</translation>
     </message>
     <message>
         <source>Light Snow</source>
@@ -465,11 +465,11 @@
     </message>
     <message>
         <source>Few Snow Showers/Wind</source>
-        <translation>Qualche acquazzoni della neve/Vento</translation>
+        <translation>Qualche acquazzoni della neve/vento</translation>
     </message>
     <message>
         <source>Light Snow/Wind</source>
-        <translation>Leggero neve/Vento</translation>
+        <translation>Leggero neve/vento</translation>
     </message>
     <message>
         <source>Wintry Mix</source>
@@ -481,7 +481,7 @@
     </message>
     <message>
         <source>Hvy Rain/Freezing Rain</source>
-        <translation>Forte pioggia/Pioggia gelata</translation>
+        <translation>Forte pioggia/pioggia gelata</translation>
     </message>
     <message>
         <source>AM Light Snow</source>
@@ -489,11 +489,11 @@
     </message>
     <message>
         <source>Rain/Freezing Rain</source>
-        <translation>Pioggia/Pioggia gelata</translation>
+        <translation>Pioggia/pioggia gelata</translation>
     </message>
     <message>
         <source>T-Storms/Wind</source>
-        <translation>Temporali/Vento</translation>
+        <translation>Temporali/vento</translation>
     </message>
     <message>
         <source>Sprinkles</source>
@@ -505,23 +505,23 @@
     </message>
     <message>
         <source>AM Clouds/PM Sun/Wind</source>
-        <translation>Nuvoloso di mattina/Sole di pomeriggio/Vento</translation>
+        <translation>Nuvoloso di mattina/sole di pomeriggio/vento</translation>
     </message>
     <message>
         <source>AM Rain/Snow/Wind</source>
-        <translation>Pioggia/Neve/Vento di mattina</translation>
+        <translation>Pioggia/neve/vento di mattina</translation>
     </message>
     <message>
         <source>Rain to Snow/Wind</source>
-        <translation>Da pioggia a neve/Vento</translation>
+        <translation>Da pioggia a neve/vento</translation>
     </message>
     <message>
         <source>Snow to Wintry Mix</source>
-        <translation>Da Neve a tempo freddo</translation>
+        <translation>Da neve a tempo freddo</translation>
     </message>
     <message>
         <source>PM Snow Showers/Wind</source>
-        <translation>Acquazzoni della neve di pomeriggio/Vento</translation>
+        <translation>Acquazzoni della neve di pomeriggio/vento</translation>
     </message>
     <message>
         <source>Snow and Ice to Rain</source>
@@ -533,19 +533,19 @@
     </message>
     <message>
         <source>AM Rain/Ice</source>
-        <translation>Pioggia/Ghiaccio di mattina</translation>
+        <translation>Pioggia/ghiaccio di mattina</translation>
     </message>
     <message>
         <source>AM Snow Showers/Wind</source>
-        <translation>Acquazzoni della neve di mattina/Vento</translation>
+        <translation>Acquazzoni della neve di mattina/vento</translation>
     </message>
     <message>
         <source>AM Light Snow/Wind</source>
-        <translation>Leggero neve da mattina/Vento</translation>
+        <translation>Leggero neve da mattina/vento</translation>
     </message>
     <message>
         <source>PM Light Rain/Wind</source>
-        <translation>Leggero pioggia di pomeriggio/Vento</translation>
+        <translation>Leggero pioggia di pomeriggio/vento</translation>
     </message>
     <message>
         <source>AM Light Wintry Mix</source>
@@ -553,11 +553,11 @@
     </message>
     <message>
         <source>PM Light Snow/Wind</source>
-        <translation>Leggero neve/Vento di pomeriggio</translation>
+        <translation>Leggero neve/vento di pomeriggio</translation>
     </message>
     <message>
         <source>Heavy Rain/Wind</source>
-        <translation>Forte pioggia/Vento</translation>
+        <translation>Forte pioggia/vento</translation>
     </message>
     <message>
         <source>PM Snow Shower</source>
@@ -565,7 +565,7 @@
     </message>
     <message>
         <source>Snow to Rain/Wind</source>
-        <translation>Neve a pioggia/Vento</translation>
+        <translation>Neve a pioggia/vento</translation>
     </message>
     <message>
         <source>PM Light Rain/Ice</source>
@@ -581,7 +581,7 @@
     </message>
     <message>
         <source>Wintry Mix/Wind</source>
-        <translation>Tempo freddo/Vento</translation>
+        <translation>Tempo freddo/vento</translation>
     </message>
     <message>
         <source>PM Light Snow</source>
@@ -593,7 +593,7 @@
     </message>
     <message>
         <source>Strong Storms/Wind</source>
-        <translation>Forte temporali/Vento</translation>
+        <translation>Forte temporali/vento</translation>
     </message>
     <message>
         <source>PM Drizzle</source>
@@ -605,11 +605,11 @@
     </message>
     <message>
         <source>AM Light Rain/Wind</source>
-        <translation>Leggero pioggia/Vento di mattina</translation>
+        <translation>Leggero pioggia/vento di mattina</translation>
     </message>
     <message>
         <source>AM Rain/Wind</source>
-        <translation>Pioggia/Vento di mattina</translation>
+        <translation>Pioggia/vento di mattina</translation>
     </message>
     <message>
         <source>Wintry Mix to Snow</source>
@@ -617,7 +617,7 @@
     </message>
     <message>
         <source>Snow Showers/Windy</source>
-        <translation>Acquazzoni della neve/Ventoso</translation>
+        <translation>Acquazzoni della neve/ventoso</translation>
     </message>
     <message>
         <source>Light Rain Shower</source>
@@ -649,7 +649,7 @@
     </message>
     <message>
         <source>Light Snow Shower/ Windy</source>
-        <translation>Leggero acquazzone della neve/Ventoso</translation>
+        <translation>Leggero acquazzone della neve/ventoso</translation>
     </message>
     <message>
         <source>Clear</source>
@@ -729,7 +729,7 @@
     </message>
     <message>
         <source>NNW</source>
-        <translation>NNOTramontana/Maestro</translation>
+        <translation>NNO Tramontana/Maestro</translation>
     </message>
 </context>
 <context>
@@ -804,7 +804,7 @@
     </message>
     <message>
         <source>Precip</source>
-        <translation type="unfinished"></translation>
+        <translation>Precipitazioni</translation>
     </message>
     <message>
         <source>Screen Setup</source>
