@@ -373,7 +373,9 @@ bool FileServerHandler::HandleQuery(SocketHandler *socket, QStringList &commands
     bool handled = false;
     QString command = commands[0];
 
-    if (command == "QUERY_FREE_SPACE")
+    if (command == "QUERY_FILETRANSFER")
+        handled = HandleQueryFileTransfer(socket, commands, slist);
+    else if (command == "QUERY_FREE_SPACE")
         handled = HandleQueryFreeSpace(socket);
     else if (command == "QUERY_FREE_SPACE_LIST")
         handled = HandleQueryFreeSpaceList(socket);
@@ -389,8 +391,6 @@ bool FileServerHandler::HandleQuery(SocketHandler *socket, QStringList &commands
         handled = HandleGetFileList(socket, slist);
     else if (command == "QUERY_SG_FILEQUERY")
         handled = HandleFileQuery(socket, slist);
-    else if (command == "QUERY_FILETRANSFER")
-        handled = HandleQueryFileTransfer(socket, commands, slist);
     else if (command == "DOWNLOAD_FILE" || command == "DOWNLOAD_FILE_NOW")
         handled = HandleDownloadFile(socket, slist);
     return handled;
@@ -949,7 +949,7 @@ bool FileServerHandler::HandleQueryFileTransfer(SocketHandler *socket,
         if (!m_ftMap.contains(recnum))
         {
             if (slist[1] == "DONE")
-                res << "ok";
+                res << "OK";
             else
             {
                 LOG(VB_GENERAL, LOG_ERR,
@@ -966,16 +966,7 @@ bool FileServerHandler::HandleQueryFileTransfer(SocketHandler *socket,
         ft->IncrRef();
     }
 
-    if (slist[1] == "IS_OPEN")
-    {
-        res << QString::number(ft->isOpen());
-    }
-    else if (slist[1] == "DONE")
-    {
-        ft->Stop();
-        res << "ok";
-    }
-    else if (slist[1] == "REQUEST_BLOCK")
+    if (slist[1] == "REQUEST_BLOCK")
     {
         if (slist.size() != 3)
         {
@@ -1019,6 +1010,15 @@ bool FileServerHandler::HandleQueryFileTransfer(SocketHandler *socket,
             res << QString::number(ft->Seek(curpos, pos, whence));
         }
     }
+    else if (slist[1] == "IS_OPEN")
+    {
+        res << QString::number(ft->isOpen());
+    }
+    else if (slist[1] == "DONE")
+    {
+        ft->Stop();
+        res << "OK";
+    }
     else if (slist[1] == "SET_TIMEOUT")
     {
         if (slist.size() != 3)
@@ -1031,7 +1031,7 @@ bool FileServerHandler::HandleQueryFileTransfer(SocketHandler *socket,
         {
             bool fast = slist[2].toInt();
             ft->SetTimeout(fast);
-            res << "ok";
+            res << "OK";
         }
     }
     else

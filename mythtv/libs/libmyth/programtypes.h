@@ -1,6 +1,17 @@
 #ifndef _PROGRAM_INFO_TYPES_H_
 #define _PROGRAM_INFO_TYPES_H_
 
+//////////////////////////////////////////////////////////////////////
+//
+// WARNING
+//
+// The enums in this header are used in libmythservicecontracts,
+// and for database values: hence when removing something from
+// these enums leave a gap, and when adding a new value give it
+// a explicit integer value.
+// 
+//////////////////////////////////////////////////////////////////////
+
 // ANSI C
 #include <stdint.h> // for [u]int[32,64]_t
 

@@ -95,12 +95,6 @@ static QAtomicInt                   msgsSinceHeartbeat;
 #define TIMESTAMP_MAX 30
 #define MAX_STRING_LENGTH (LOGLINE_MAX+120)
 
-#ifndef _WIN32
-static int sighupFd[2];
-void logSighup(int signum);
-#endif
-
-
 /// \brief LoggerBase class constructor.  Adds the new logger instance to the
 ///        loggerMap.
 /// \param string a C-string of the handle for this instance (NULL if unused)
@@ -758,15 +752,18 @@ void DBLoggerThread::stop(void)
 
 
 #ifndef _WIN32
-/// \brief UNIX-side SIGHUP signal handler.  Hand it off to the Qt-size via
-///        a socketpair so Qt code can safely be used.
+/// \brief Signal handler for SIGHUP.  This passes it to the LogForwardThread
+///        for processing.
 
-void logSighup(int signum)
+void logSigHup(void)
 {
-    (void)signum;
-    char a = 1;
-    int ret = ::write(sighupFd[0], &a, sizeof(a));
-    (void)ret;
+    if (!logForwardThread)
+        return;
+
+    // This will be running in the thread that's used by SignalHandler
+    // Emit the signal which is connected to a slot that runs in the actual
+    // handling thread.
+    emit logForwardThread->incomingSigHup();
 }
 #endif
 
@@ -1064,7 +1061,7 @@ void DatabaseLogger::receivedMessage(const QList<QByteArray> &msg)
 /// \brief LogForwardThread constructor.
 LogForwardThread::LogForwardThread() :
     MThread("LogForward"), m_aborted(false), m_zmqContext(NULL),
-    m_zmqPubSock(NULL), m_sighupNotifier(NULL), m_shutdownTimer(NULL)
+    m_zmqPubSock(NULL), m_shutdownTimer(NULL)
 {
     moveToThread(qthread());
 }
@@ -1083,25 +1080,8 @@ void LogForwardThread::run(void)
 {
     RunProlog();
 
-#ifndef _WIN32
-    if (::socketpair(AF_UNIX, SOCK_STREAM, 0, sighupFd))
-    {
-        LOG(VB_GENERAL, LOG_ERR, "Couldn't create HUP socketpair");
-        qApp->quit();
-    }
-    m_sighupNotifier = new QSocketNotifier(sighupFd[1], QSocketNotifier::Read,
-                                           this);
-    connect(m_sighupNotifier, SIGNAL(activated(int)),
-            this, SLOT(handleSigHup()));
-
-    /* Setup SIGHUP */
-    LOG(VB_GENERAL, LOG_INFO, "Setup SIGHUP handler");
-    struct sigaction sa;
-    sa.sa_handler = logSighup;
-    sigemptyset( &sa.sa_mask );
-    sa.sa_flags = SA_RESTART;
-    sigaction( SIGHUP, &sa, NULL );
-#endif
+    connect(this, SIGNAL(incomingSigHup(void)), this, SLOT(handleSigHup(void)),
+            Qt::QueuedConnection);
 
     qRegisterMetaType<QList<QByteArray> >("QList<QByteArray>");
 
@@ -1150,19 +1130,6 @@ void LogForwardThread::run(void)
 
         expireClients();
     }
-
-    delete m_sighupNotifier;
-
-#ifndef _WIN32
-    ::close(sighupFd[0]);
-    ::close(sighupFd[1]);
-
-    /* Tear down SIGHUP */
-    sa.sa_handler = SIG_DFL;
-    sigemptyset( &sa.sa_mask );
-    sa.sa_flags = SA_RESTART;
-    sigaction( SIGHUP, &sa, NULL );
-#endif
 
     m_zmqPubSock->setLinger(0);
     m_zmqPubSock->close();
@@ -1258,12 +1225,6 @@ void LogForwardThread::expireClients(void)
 void LogForwardThread::handleSigHup(void)
 {
 #ifndef _WIN32
-    m_sighupNotifier->setEnabled(false);
-
-    char tmp;
-    int ret = ::read(sighupFd[1], &tmp, sizeof(tmp));
-    (void)ret;
-
     LOG(VB_GENERAL, LOG_INFO, "SIGHUP received, rolling log files.");
 
     /* SIGHUP was sent.  Close and reopen debug logfiles */
@@ -1273,8 +1234,6 @@ void LogForwardThread::handleSigHup(void)
     {
         it.value()->reopen();
     }
-
-    m_sighupNotifier->setEnabled(true);
 #endif
 }
 

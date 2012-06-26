@@ -537,12 +537,12 @@ void MythPainter::CheckFormatImage(MythImage *im)
     }
 }
 
-void MythPainter::ExpireImages(int max)
+void MythPainter::ExpireImages(int64_t max)
 {
     bool recompute = false;
     while (!m_StringExpireList.empty())
     {
-        if (m_SoftwareCacheSize > max)
+        if (m_SoftwareCacheSize < max)
             break;
 
         QString oldmsg = m_StringExpireList.front();

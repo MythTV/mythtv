@@ -347,7 +347,8 @@ int main(int argc, char *argv[])
 
 #ifndef _WIN32
     QList<int> signallist;
-    signallist << SIGINT << SIGTERM << SIGSEGV << SIGABRT;
+    signallist << SIGINT << SIGTERM << SIGSEGV << SIGABRT << SIGBUS << SIGFPE
+               << SIGILL;
     SignalHandler handler(signallist);
     signal(SIGHUP, SIG_IGN);
 #endif

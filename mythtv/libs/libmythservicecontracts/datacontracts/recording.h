@@ -14,7 +14,6 @@
 #include <QDateTime>
 #include <QString>
 
-#include "mythmiscutil.h"
 #include "serviceexp.h" 
 #include "datacontracthelper.h"   
 #include "programtypes.h"

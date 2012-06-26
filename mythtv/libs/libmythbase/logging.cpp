@@ -402,9 +402,12 @@ void LoggerThread::run(void)
 ///         to show signs of life
 void LoggerThread::initialTimeout(void)
 {
-    m_initialTimer->stop();
-    delete m_initialTimer;
-    m_initialTimer = NULL;
+    if (m_initialTimer)
+    {
+        m_initialTimer->stop();
+        delete m_initialTimer;
+        m_initialTimer = NULL;
+    }
 
     if (m_initialWaiting)
     {
@@ -488,6 +491,11 @@ void LoggerThread::handleItem(LoggingItem *item)
         item->m_tid = item->getThreadTid();
 
         QMutexLocker locker(&logThreadMutex);
+        if (logThreadHash.contains(item->m_threadId))
+        {
+            char *threadName = logThreadHash.take(item->m_threadId);
+            free(threadName);
+        }
         logThreadHash[item->m_threadId] = strdup(item->m_threadName);
 
         if (debugRegistration)
@@ -525,8 +533,8 @@ void LoggerThread::handleItem(LoggingItem *item)
                          (long long int)tid,
                          logThreadHash[item->m_threadId]);
             }
-            item->m_threadName = logThreadHash[item->m_threadId];
-            logThreadHash.remove(item->m_threadId);
+            char *threadName = logThreadHash.take(item->m_threadId);
+            free(threadName);
         }
     }
 

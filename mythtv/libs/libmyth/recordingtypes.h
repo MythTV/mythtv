@@ -1,6 +1,17 @@
 #ifndef RECORDINGTYPES_H_
 #define RECORDINGTYPES_H_
 
+//////////////////////////////////////////////////////////////////////
+//
+// WARNING
+//
+// The enums in this header are used in libmythservicecontracts,
+// and for database values: hence when removing something from
+// these enums leave a gap, and when adding a new value give it
+// a explicit integer value.
+// 
+//////////////////////////////////////////////////////////////////////
+
 #include <QString>
 
 #include "mythexp.h"
@@ -19,7 +30,7 @@ typedef enum RecordingTypes
     kFindDailyRecord,
     kFindWeeklyRecord,
     kTemplateRecord
-} RecordingType; // note stored in uin8_t in ProgramInfo
+} RecordingType; // note stored in uint8_t in ProgramInfo
 MPUBLIC QString toString(RecordingType);
 MPUBLIC QString toRawString(RecordingType);
 MPUBLIC QChar   toQChar( RecordingType);
@@ -33,7 +44,7 @@ typedef enum RecordingDupInTypes
     kDupsInOldRecorded  = 0x02,
     kDupsInAll          = 0x0F,
     kDupsNewEpi         = 0x10
-} RecordingDupInType; // note stored in uin8_t in ProgramInfo
+} RecordingDupInType; // note stored in uint8_t in ProgramInfo
 MPUBLIC QString toRawString(RecordingDupInType);
 MPUBLIC RecordingDupInType dupInFromString(QString);
 
@@ -44,7 +55,7 @@ typedef enum RecordingDupMethodType
     kDupCheckDesc     = 0x04,
     kDupCheckSubDesc  = 0x06,
     kDupCheckSubThenDesc = 0x08
-} RecordingDupMethodType; // note stored in uin8_t in ProgramInfo
+} RecordingDupMethodType; // note stored in uint8_t in ProgramInfo
 MPUBLIC QString toRawString(RecordingDupMethodType);
 MPUBLIC RecordingDupMethodType dupMethodFromString(QString);
 

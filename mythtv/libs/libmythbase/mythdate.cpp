@@ -1,3 +1,5 @@
+#include <QtGlobal>
+
 #include "mythcorecontext.h"
 #include "mythdate.h"
 
@@ -6,7 +8,11 @@ namespace MythDate
 
 QDateTime current(bool stripped)
 {
+#if QT_VERSION >= QT_VERSION_CHECK(4,7,0)
+    QDateTime rettime = QDateTime::currentDateTimeUtc();
+#else
     QDateTime rettime = QDateTime::currentDateTime().toUTC();
+#endif
     if (stripped)
         rettime = rettime.addMSecs(-rettime.time().msec());
     return rettime;

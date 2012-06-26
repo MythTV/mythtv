@@ -11,9 +11,9 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "xmlSerializer.h"
+#include "mythdate.h"
 
 #include <QMetaClassInfo>
-#include <QDateTime>
 
 // --------------------------------------------------------------------------
 // This version should be bumped if the serializer code is changed in a way
@@ -173,7 +173,9 @@ void XmlSerializer::RenderValue( const QString &sName, const QVariant &vValue )
             if (dt.isNull())
                 m_pXmlWriter->writeAttribute( "xsi:nil", "true" );
 
-            m_pXmlWriter->writeCharacters( dt.toUTC().toString(Qt::ISODate) );
+            m_pXmlWriter->writeCharacters( 
+                MythDate::toString( dt, MythDate::ISODate ) );
+
             break;
         }
 

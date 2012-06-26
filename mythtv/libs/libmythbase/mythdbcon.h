@@ -127,7 +127,7 @@ class MBASE_PUBLIC MSqlQuery : private QSqlQuery
   public:
     /// \brief Get DB connection from pool
     MSqlQuery(const MSqlQueryInfo &qi);
-    /// \brief Returns conneciton to pool
+    /// \brief Returns connection to pool
     ~MSqlQuery();
 
     /// \brief Only updated once during object creation
@@ -166,8 +166,8 @@ class MBASE_PUBLIC MSqlQuery : private QSqlQuery
     /** \brief Return the id of the last inserted row
      *
      * Note: Currently, this function is only implemented in Qt4 (in QSqlQuery
-     * and QSqlResult), and is implemented here until the switch to Qt4.  Also,
-     * the current implementation will only work for a DBMS that supports
+     * and QSqlResult) 
+     * The current implementation will only work for a DBMS that supports
      * the function LAST_INSERT_ID() (i.e. MySQL), and will _not_ work
      * in SQLite.
      */

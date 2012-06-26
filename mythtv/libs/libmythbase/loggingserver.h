@@ -168,7 +168,7 @@ class LogForwardThread : public QObject, public MThread
 {
     Q_OBJECT
 
-    friend void logSighup(int signum);
+    friend void logSigHup(void);
   public:
     LogForwardThread();
     ~LogForwardThread();
@@ -180,14 +180,13 @@ class LogForwardThread : public QObject, public MThread
     nzmqt::ZMQContext *m_zmqContext; ///< ZeroMQ context
     nzmqt::ZMQSocket *m_zmqPubSock;  ///< ZeroMQ publishing socket
 
-    QSocketNotifier *m_sighupNotifier;  ///< Notifier to synchronize to UNIX
-                                        ///  signal SIGHUP safely
-
     MythSignalingTimer *m_shutdownTimer;    ///< 5 min timer to shut down if no
                                             /// clients
 
     void forwardMessage(LogMessage *msg);
     void expireClients(void);
+  signals:
+    void incomingSigHup(void);
   protected slots:
     void handleSigHup(void);
     void shutdownTimerExpired(void);
@@ -242,6 +241,10 @@ class DBLoggerThread : public MThread
 };
 
 extern LogServerThread *logServerThread;
+
+#ifndef _WIN32
+MBASE_PUBLIC void logSigHup(void);
+#endif
 
 #endif
 

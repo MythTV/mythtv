@@ -79,10 +79,10 @@ This is not yet supported.
 
 ## Searching
 
-There are currently two search methods available for use: movies and people.
-Search results from TheMovieDb are sent iteratively, twenty results per page.
-The search methods provided by the PyTMDB3 module return list-like structures
-that will automatically grab new pages as needed.
+There are currently three search methods available for use: movies, people, 
+and studios. Search results from TheMovieDb are sent iteratively, twenty
+results per page. The search methods provided by the PyTMDB3 module return
+list-like structures that will automatically grab new pages as needed.
 
   >>> from tmdb3 import searchMovie
   >>> res = searchMovie('A New Hope')
@@ -104,6 +104,14 @@ out. The people search method behaves similarly.
   >>> res[0]
   <Person 'Tom Hanks'>
 
+  >>> from tmdb import searchStudio
+  >>> res = searchStudio('Sony Pictures')
+  >>> res
+  <Search Results: Sony Pictures>
+  >>> res[0]
+  <Studio 'Sony Pictures'>
+
+
 ## Direct Queries
 
 There are currently four data types that support direct access: collections,
@@ -120,6 +128,10 @@ on-demand as used, rather than when the object is created.
   <Person 'Mark Hamill'>
   >>> Studio(1)
   <Studio 'Lucasfilm'>
+
+The Genre class cannot be called by id directly, however it does have a getAll
+classmethod, capable of returning all available genres for a specified
+language.
 
 ## Image Behavior
 
@@ -212,7 +224,7 @@ Movie:
   list(Translation)     translations
   list(Movie)           getSimilar()
 
-Movie classmethods
+Movie classmethods:
   Movie                 fromIMDB(imdbid)    special constructor for use with IMDb codes
   Movie                 latest()            gets latest movie added to database
   list(Movie)           nowplaying()        content currently in theater
@@ -279,6 +291,10 @@ Translation:
 Genre:
   integer               id
   string                name
+  list(Movie)           movies
+
+Genre classmethods:
+  list(Genre)           getAll(language)    returns list of all genres
 
 Studio:
   integer               id

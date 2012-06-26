@@ -10,6 +10,7 @@
 
 #include "mythcorecontext.h"
 #include "mythlogging.h"
+#include "mythdate.h"
 #include "mythdb.h"
 
 MythUIClock::MythUIClock(MythUIType *parent, const QString &name)
@@ -35,7 +36,7 @@ MythUIClock::~MythUIClock()
  */
 void MythUIClock::Pulse(void)
 {
-    m_Time = QDateTime::currentDateTime();
+    m_Time = MythDate::current();
 
     if (m_nextUpdate.isNull() || (m_Time >= m_nextUpdate))
         MythUIText::SetText(GetTimeText());
@@ -52,11 +53,13 @@ void MythUIClock::Pulse(void)
  */
 QString MythUIClock::GetTimeText(void)
 {
-    QString newMsg = gCoreContext->GetQLocale().toString(m_Time, m_Format);
+    QDateTime dt = m_Time.toLocalTime();
+    QString newMsg = gCoreContext->GetQLocale().toString(dt, m_Format);
 
     m_nextUpdate = m_Time.addSecs(1);
-    m_nextUpdate = QDateTime(
-        m_Time.date(), m_Time.time().addMSecs(m_Time.time().msec()));
+    m_nextUpdate = QDateTime(m_Time.date(),
+                             m_Time.time().addMSecs(m_Time.time().msec()),
+                             Qt::UTC);
 
     return newMsg;
 }
