@@ -7,10 +7,12 @@
 #include "mythtvexp.h"
 
 typedef NetworkInformationTable* nit_ptr_t;
+typedef NetworkInformationTable const* nit_const_ptr_t;
 typedef vector<const NetworkInformationTable*>  nit_vec_t;
 typedef QMap<uint, nit_ptr_t>    nit_cache_t; // section->sdts
 
 typedef ServiceDescriptionTable* sdt_ptr_t;
+typedef ServiceDescriptionTable const* sdt_const_ptr_t;
 typedef vector<const ServiceDescriptionTable*>  sdt_vec_t;
 typedef QMap<uint, sdt_ptr_t>    sdt_cache_t; // tsid+section->sdts
 typedef QMap<uint, sdt_vec_t>    sdt_map_t;   // tsid->sdts
@@ -185,9 +187,9 @@ class MTV_PUBLIC DVBStreamData : virtual public MPEGStreamData
     bool HasCachedAnySDTs(bool current = true) const;
     bool HasCachedAllSDTs(bool current = true) const;
 
-    const nit_ptr_t GetCachedNIT(uint section_num, bool current = true) const;
+    nit_const_ptr_t GetCachedNIT(uint section_num, bool current = true) const;
     nit_vec_t GetCachedNIT(bool current = true) const;
-    const sdt_ptr_t GetCachedSDT(uint tsid, uint section_num,
+    sdt_const_ptr_t GetCachedSDT(uint tsid, uint section_num,
                            bool current = true) const;
     sdt_vec_t GetCachedSDTs(bool current = true) const;
 

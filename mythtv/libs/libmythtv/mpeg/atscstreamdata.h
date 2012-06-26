@@ -8,7 +8,9 @@
 
 typedef QMap<uint, uint_vec_t>          pid_tsid_vec_t;
 typedef TerrestrialVirtualChannelTable* tvct_ptr_t;
+typedef TerrestrialVirtualChannelTable const* tvct_const_ptr_t;
 typedef CableVirtualChannelTable*       cvct_ptr_t;
+typedef CableVirtualChannelTable const* cvct_const_ptr_t;
 typedef vector<const TerrestrialVirtualChannelTable*> tvct_vec_t;
 typedef vector<const CableVirtualChannelTable*>       cvct_vec_t;
 typedef QMap<uint, tvct_ptr_t>          tvct_cache_t;
@@ -92,8 +94,8 @@ class MTV_PUBLIC ATSCStreamData : virtual public MPEGStreamData
         { return HasCachedAnyTVCTs(current) || HasCachedAnyCVCTs(current); }
 
     const MasterGuideTable *GetCachedMGT(bool current = true) const;
-    const tvct_ptr_t GetCachedTVCT(uint pid, bool current = true) const;
-    const cvct_ptr_t GetCachedCVCT(uint pid, bool current = true) const;
+    tvct_const_ptr_t GetCachedTVCT(uint pid, bool current = true) const;
+    cvct_const_ptr_t GetCachedCVCT(uint pid, bool current = true) const;
 
     tvct_vec_t GetCachedTVCTs(bool current = true) const;
     cvct_vec_t GetCachedCVCTs(bool current = true) const;

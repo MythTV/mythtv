@@ -46,7 +46,7 @@ void DVBStreamData::SetDesiredService(uint netid, uint tsid, int serviceid)
 
     if (HasCachedAllSDT(tsid, true))
     {
-        const sdt_ptr_t first_sdt = GetCachedSDT(tsid, 0, true);
+        sdt_const_ptr_t first_sdt = GetCachedSDT(tsid, 0, true);
         uint networkID = first_sdt->OriginalNetworkID();
         if (networkID == netid)
         {
@@ -58,7 +58,7 @@ void DVBStreamData::SetDesiredService(uint netid, uint tsid, int serviceid)
             ReturnCachedTable(first_sdt);
             for (uint i = 1; i <= last_section; ++i)
             {
-                const sdt_ptr_t sdt = GetCachedSDT(_desired_tsid, i, true);
+                sdt_const_ptr_t sdt = GetCachedSDT(_desired_tsid, i, true);
                 ProcessSDT(_desired_tsid, sdt);
                 ReturnCachedTable(sdt);
             }
@@ -815,7 +815,7 @@ bool DVBStreamData::HasCachedAllSDTs(bool current) const
     return true;
 }
 
-const nit_ptr_t DVBStreamData::GetCachedNIT(
+nit_const_ptr_t DVBStreamData::GetCachedNIT(
     uint section_num, bool current) const
 {
     QMutexLocker locker(&_cache_lock);
@@ -840,7 +840,7 @@ nit_vec_t DVBStreamData::GetCachedNIT(bool current) const
 
     for (uint i = 0; i < 256; i++)
     {
-        nit_ptr_t nit = GetCachedNIT(i, current);
+        nit_const_ptr_t nit = GetCachedNIT(i, current);
         if (nit)
             nits.push_back(nit);
     }
@@ -848,7 +848,7 @@ nit_vec_t DVBStreamData::GetCachedNIT(bool current) const
     return nits;
 }
 
-const sdt_ptr_t DVBStreamData::GetCachedSDT(
+sdt_const_ptr_t DVBStreamData::GetCachedSDT(
     uint tsid, uint section_num, bool current) const
 {
     QMutexLocker locker(&_cache_lock);
