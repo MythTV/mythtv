@@ -533,8 +533,8 @@ void LoggerThread::handleItem(LoggingItem *item)
                          (long long int)tid,
                          logThreadHash[item->m_threadId]);
             }
-            item->m_threadName = logThreadHash[item->m_threadId];
-            logThreadHash.remove(item->m_threadId);
+            char *threadName = logThreadHash.take(item->m_threadId);
+            free(threadName);
         }
     }
 

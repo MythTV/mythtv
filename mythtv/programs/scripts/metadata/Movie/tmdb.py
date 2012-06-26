@@ -326,6 +326,7 @@ class moviedbQueries():
     def movieSearch(self, title):
         '''Search for movies that match the title and output their "tmdb#:Title" to stdout
         '''
+        title.replace("-"," ")
         try:
             data = self.config['moviedb'].searchTitle(title)
         except TmdbMovieOrPersonNotFound, msg:
