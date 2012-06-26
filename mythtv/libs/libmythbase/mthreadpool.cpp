@@ -97,6 +97,7 @@ class MPoolThread : public MThread
 
             GetMythDB()->GetDBManager()->PurgeIdleConnections(false);
             QCoreApplication::processEvents();
+            QCoreApplication::sendPostedEvents(0, QEvent::DeferredDelete);
 
             t.start();
 
