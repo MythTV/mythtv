@@ -4715,6 +4715,13 @@ if enabled gxx; then
     check_cxxflags -Wredundant-decls
     check_cxxflags -Woverloaded-virtual
     check_cxxflags -funit-at-a-time
+elif enabled icpc; then
+    # 192: icpc confused by Qt %0-%99 in strings
+    # 592: variable is used before its value is set (triggers on (void)x;)
+    # 913: ignoring invalid multibyte character sequence,
+    #      icpc and g++ do the right thing for char 0x80-0xFF
+    # 13200: ignore EMMS instruction required, filters do the right thing
+    check_cxxflags -wd192,592,913,13200
 fi
 
 # Check for python dependencies
