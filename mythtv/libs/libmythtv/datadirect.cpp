@@ -72,7 +72,7 @@ DataDirectLineupMap::DataDirectLineupMap() :
 
 DataDirectSchedule::DataDirectSchedule() :
     programid(""),              stationid(""),
-    time()           ,          duration(),
+    time(),                     duration(),
     repeat(false),              isnew(false),
     stereo(false),              dolby(false),
     subtitled(false),
