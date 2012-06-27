@@ -4655,6 +4655,10 @@ if enabled icc; then
     # 10148: ignoring unknown option -Wno-parentheses
     # 10156: ignoring option '-W'; no argument required
     check_cflags -wd144,167,556,1292,1419,10006,10148,10156
+    # -wd: Disable the following warnings for MythTV
+    # 913: ignoring invalid multibyte character sequence,
+    #      icpc and g++ do the right thing for char 0x80-0xFF
+    check_cflags -wd913
     # 11030: Warning unknown option --as-needed
     # 10156: ignoring option '-export'; no argument required
     check_ldflags -wd10156,11030
