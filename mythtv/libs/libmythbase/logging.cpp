@@ -259,8 +259,8 @@ LoggerThread::LoggerThread(QString filename, bool progress, bool quiet,
     char *debug = getenv("VERBOSE_THREADS");
     if (debug != NULL)
     {
-        LOG(VB_GENERAL, LOG_NOTICE,
-            "Logging thread registration/deregistration enabled!");
+//        LOG(VB_GENERAL, LOG_NOTICE,
+//            "Logging thread registration/deregistration enabled!");
         debugRegistration = true;
     }
     m_locallogs = (m_appname == MYTH_APPNAME_MYTHLOGSERVER);
