@@ -198,9 +198,7 @@ char *LoggingItem::getThreadName(void)
         return m_threadName;
 
     QMutexLocker locker(&logThreadMutex);
-    char *name = logThreadHash.value(m_threadId, (char *)unknown);
-    m_threadName = strdup(name);
-    return m_threadName;
+    return logThreadHash.value(m_threadId, (char *)unknown);
 }
 
 /// \brief Get the thread ID of the thread that produced the LoggingItem
@@ -359,6 +357,7 @@ void LoggerThread::run(void)
     {
         qLock.unlock();
         qApp->processEvents(QEventLoop::AllEvents, 10);
+        qApp->sendPostedEvents(NULL, QEvent::DeferredDelete);
 
         qLock.relock();
         if (logQueue.isEmpty())
