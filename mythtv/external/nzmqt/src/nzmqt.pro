@@ -30,7 +30,7 @@ HEADERS += \
     NzmqtApp.h \
     common/Tools.h
 
-LIBS += -lzmq
+LIBS += -lmythzmq
 LIBS += $${LATE_LIBS}
 
 INCLUDEPATH += \
