@@ -1,5 +1,5 @@
 INCLUDES = -I$(top_builddir)/include
-LDADD = $(top_builddir)/src/libzmq.la
+LDADD = $(top_builddir)/src/libmythzmq.la
 
 noinst_PROGRAMS = test_pair_inproc \
                   test_pair_tcp \
