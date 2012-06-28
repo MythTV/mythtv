@@ -4655,13 +4655,19 @@ if enabled icc; then
     # 10148: ignoring unknown option -Wno-parentheses
     # 10156: ignoring option '-W'; no argument required
     check_cflags -wd144,167,556,1292,1419,10006,10148,10156
-    # -wd: Disable the following warnings for MythTV
-    # 913: ignoring invalid multibyte character sequence,
-    #      icpc and g++ do the right thing for char 0x80-0xFF
-    check_cflags -wd913
     # 11030: Warning unknown option --as-needed
     # 10156: ignoring option '-export'; no argument required
     check_ldflags -wd10156,11030
+    # -wd: Disable the following warnings for MythTV
+    # 177: function declared but never referenced (triggers on Q_OBJECT)
+    # 592: variable is used before its value is set (triggers on (void)x;)
+    # 913: ignoring invalid multibyte character sequence,
+    #      icpc and g++ do the right thing for char 0x80-0xFF
+    # 13200: ignore EMMS instruction required, filters do the right thing
+    check_cflags -wd177,592,913,13200
+    # -wd: Disable the following warnings for MythTV
+    # 10159: ignore invalid argument for option '-m'
+    check_ldflags -wd10159
     # Allow to compile with optimizations
     check_ldflags -march=$cpu
     # icc 11.0 and 11.1 work with ebp_available, but don't pass the test
@@ -4720,12 +4726,12 @@ if enabled gxx; then
     check_cxxflags -Woverloaded-virtual
     check_cxxflags -funit-at-a-time
 elif enabled icpc; then
+    # 177: function declared but never referenced (triggers on Q_OBJECT)
     # 192: icpc confused by Qt %0-%99 in strings
     # 592: variable is used before its value is set (triggers on (void)x;)
     # 913: ignoring invalid multibyte character sequence,
     #      icpc and g++ do the right thing for char 0x80-0xFF
-    # 13200: ignore EMMS instruction required, filters do the right thing
-    check_cxxflags -wd192,592,913,13200
+    check_cxxflags -wd177,192,592,913
 fi
 
 # Check for python dependencies
