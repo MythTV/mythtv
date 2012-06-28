@@ -2597,6 +2597,8 @@ class InputGroup : public TransComboBoxSetting
         }
     }
 
+    virtual void Save(QString /*destination*/) { Save(); }
+
   private:
     const CardInput &cardinput;
     uint             groupnum;

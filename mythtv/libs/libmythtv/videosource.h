@@ -101,7 +101,9 @@ class TransFreqTableSelector : public ComboBoxSetting, public TransientStorage
     TransFreqTableSelector(uint _sourceid);
 
     virtual void Load(void);
+
     virtual void Save(void);
+    virtual void Save(QString /*destination*/) { Save(); }
 
     void SetSourceID(uint _sourceid);
 
@@ -181,6 +183,7 @@ class EITOnly_config: public VerticalConfigurationGroup
 {
 public:
     EITOnly_config(const VideoSource& _parent);
+
     virtual void Save();
     virtual void Save(QString) { Save(); }
 
@@ -211,6 +214,7 @@ class XMLTVConfig : public TriggeredConfigurationGroup
 
     virtual void Load(void);
     virtual void Save(void);
+    virtual void Save(QString /*destination*/) { Save(); }
 
   private:
     const VideoSource &parent;
@@ -342,6 +346,7 @@ class EmptyVBIDevice : public LineEditSetting, public CaptureCardDBStorage
     {
         setVisible(false);
     };
+
     void Save(void)
     {
         SetSaveRequired();
@@ -550,7 +555,9 @@ class DVBConfigurationGroup : public VerticalConfigurationGroup
     ~DVBConfigurationGroup();
 
     virtual void Load(void);
+
     virtual void Save(void);
+    virtual void Save(QString /*destination*/) { Save(); }
     
   public slots:
     void probeCard(const QString& cardNumber);
@@ -627,6 +634,7 @@ public:
     void reload(void);
 
     virtual void Save(void);
+    virtual void Save(QString /*destination*/) { Save(); }
 
     uint GetInstanceCount(void) const { return instance_count; }
 
@@ -691,7 +699,9 @@ class MTV_PUBLIC CaptureCardEditor : public QObject, public ConfigurationDialog
                                      const char* widgetName=0);
     virtual DialogCode exec(void);
     virtual void Load(void);
+
     virtual void Save(void) { }
+    virtual void Save(QString destination) { }
 
   public slots:
     void menu(void);
@@ -718,6 +728,7 @@ class MTV_PUBLIC VideoSourceEditor : public QObject, public ConfigurationDialog
     virtual DialogCode exec(void);
     virtual void Load(void);
     virtual void Save(void) { }
+    virtual void Save(QString /*destination*/) { }
 
   public slots:
     void menu(void);
@@ -738,6 +749,7 @@ class MTV_PUBLIC CardInputEditor : public QObject, public ConfigurationDialog
     virtual DialogCode exec(void);
     virtual void Load(void);
     virtual void Save(void) { }
+    virtual void Save(QString /*destination*/) { }
 
   private:
     vector<CardInput*>  cardinputs;
