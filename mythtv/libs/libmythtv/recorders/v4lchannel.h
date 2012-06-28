@@ -42,6 +42,7 @@ class V4LChannel : public DTVChannel
     bool SwitchToInput(int newcapchannel, bool setstarting);
     bool Open(void);
     void Close(void);
+    using DTVChannel::Tune;
     bool Tune(const DTVMultiplex &tuning, QString inputname);
     bool Tune(uint64_t frequency, QString inputname);
     bool Tune(const QString &freqid, int finetune);
