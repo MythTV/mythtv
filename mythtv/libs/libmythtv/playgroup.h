@@ -25,6 +25,8 @@ class MTV_PUBLIC PlayGroupEditor : public QObject, public ConfigurationDialog
   public:
     PlayGroupEditor(void);
     virtual DialogCode exec(void);
+    virtual DialogCode exec(bool /*saveOnExec*/, bool /*doLoad*/)
+        { return exec(); }
     virtual void Load(void);
     virtual void Save(void) { }
     virtual void Save(QString) { }

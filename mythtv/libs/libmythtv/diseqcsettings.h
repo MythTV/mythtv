@@ -135,6 +135,8 @@ class DTVDeviceTreeWizard : public ConfigurationDialog
     DTVDeviceTreeWizard(DiSEqCDevTree &tree);
 
     virtual DialogCode exec(void);
+    virtual DialogCode exec(bool /*saveOnExec*/, bool /*doLoad*/)
+        { return exec(); }
 };
 
 class DTVDeviceConfigGroup : public VerticalConfigurationGroup

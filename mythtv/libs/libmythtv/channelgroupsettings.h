@@ -21,6 +21,8 @@ class MTV_PUBLIC ChannelGroupEditor : public QObject, public ConfigurationDialog
   public:
     ChannelGroupEditor(void);
     virtual DialogCode exec(void);
+    virtual DialogCode exec(bool /*saveOnExec*/, bool /*doLoad*/)
+        { return exec(); }
     virtual void Load(void);
     virtual void Save(void) { };
     virtual void Save(QString) { };

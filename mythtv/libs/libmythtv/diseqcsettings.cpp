@@ -203,6 +203,7 @@ class SwitchAddressSetting : public LineEditSetting, public Storage
     {
         m_switch.SetAddress(getValue().toUInt(0, 16));
     }
+    virtual void Save(QString /*destination*/) { Save(); }
 
   private:
     DiSEqCDevSwitch &m_switch;
@@ -506,6 +507,8 @@ class RotorPosConfig : public ConfigurationDialog
         while (ConfigurationDialog::exec() == kDialogCodeAccepted);
         return kDialogCodeRejected;
     }
+    virtual DialogCode exec(bool /*saveOnExec*/, bool /*doLoad*/)
+        { return exec(); }
 };
 
 //////////////////////////////////////// RotorConfig
