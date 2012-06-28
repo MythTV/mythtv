@@ -46,7 +46,7 @@ PlayerContext::PlayerContext(const QString &inUseID) :
     useNullVideo(false)
 {
     lastSignalMsgTime.start();
-    lastSignalMsgTime.addMSecs(-2 * kSMExitTimeout);
+    lastSignalMsgTime.addMSecs(-2 * (int)kSMExitTimeout);
 }
 
 PlayerContext::~PlayerContext()
