@@ -64,8 +64,11 @@ void TvPlayWindow::UpdateProgress(void)
  */
 bool TvPlayWindow::gestureEvent(MythGestureEvent *event)
 {
+    bool handled = false;
     if (event->gesture() == MythGestureEvent::Click)
     {
         LOG(VB_GENERAL, LOG_NOTICE, "TV Play Window Click");
+        handled = true;
     }
+    return handled;
 }
