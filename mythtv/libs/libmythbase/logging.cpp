@@ -198,9 +198,7 @@ char *LoggingItem::getThreadName(void)
         return m_threadName;
 
     QMutexLocker locker(&logThreadMutex);
-    char *name = logThreadHash.value(m_threadId, (char *)unknown);
-    m_threadName = strdup(name);
-    return m_threadName;
+    return logThreadHash.value(m_threadId, (char *)unknown);
 }
 
 /// \brief Get the thread ID of the thread that produced the LoggingItem
@@ -261,8 +259,8 @@ LoggerThread::LoggerThread(QString filename, bool progress, bool quiet,
     char *debug = getenv("VERBOSE_THREADS");
     if (debug != NULL)
     {
-        LOG(VB_GENERAL, LOG_NOTICE,
-            "Logging thread registration/deregistration enabled!");
+//        LOG(VB_GENERAL, LOG_NOTICE,
+//            "Logging thread registration/deregistration enabled!");
         debugRegistration = true;
     }
     m_locallogs = (m_appname == MYTH_APPNAME_MYTHLOGSERVER);
@@ -359,6 +357,7 @@ void LoggerThread::run(void)
     {
         qLock.unlock();
         qApp->processEvents(QEventLoop::AllEvents, 10);
+        qApp->sendPostedEvents(NULL, QEvent::DeferredDelete);
 
         qLock.relock();
         if (logQueue.isEmpty())

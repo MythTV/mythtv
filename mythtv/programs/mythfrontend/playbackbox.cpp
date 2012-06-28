@@ -1731,7 +1731,8 @@ bool PlaybackBox::UpdateUILists(void)
                 }
 
                 if ((m_viewMask & VIEW_WATCHLIST) &&
-                    (p->GetRecordingGroup() != "LiveTV"))
+                    p->GetRecordingGroup() != "LiveTV" &&
+                    p->GetRecordingGroup() != "Deleted")
                 {
                     if (m_watchListAutoExpire && !p->IsAutoExpirable())
                     {

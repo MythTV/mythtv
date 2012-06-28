@@ -6,5 +6,5 @@ includedir=@includedir@
 Name: libzmq
 Description: 0MQ c++ library
 Version: @VERSION@
-Libs: -L${libdir} -lzmq
+Libs: -L${libdir} -lmythzmq
 Cflags: -I${includedir}

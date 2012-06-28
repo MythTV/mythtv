@@ -29,16 +29,19 @@ typedef QMap<unsigned int, PSIPTable*>  pid_psip_map_t;
 typedef QMap<const PSIPTable*, int>     psip_refcnt_map_t;
 
 typedef ProgramAssociationTable*               pat_ptr_t;
+typedef ProgramAssociationTable const*         pat_const_ptr_t;
 typedef vector<const ProgramAssociationTable*> pat_vec_t;
 typedef QMap<uint, pat_vec_t>                  pat_map_t;
 typedef QMap<uint, ProgramAssociationTable*>   pat_cache_t;
 
 typedef ConditionalAccessTable*                cat_ptr_t;
+typedef ConditionalAccessTable const*          cat_const_ptr_t;
 typedef vector<const ConditionalAccessTable*>  cat_vec_t;
 typedef QMap<uint, cat_vec_t>                  cat_map_t;
 typedef QMap<uint, ConditionalAccessTable*>    cat_cache_t;
 
 typedef ProgramMapTable*                pmt_ptr_t;
+typedef ProgramMapTable const*          pmt_const_ptr_t;
 typedef vector<const ProgramMapTable*>  pmt_vec_t;
 typedef QMap<uint, pmt_vec_t>           pmt_map_t;
 typedef QMap<uint, ProgramMapTable*>    pmt_cache_t;
@@ -235,17 +238,17 @@ class MTV_PUBLIC MPEGStreamData : public EITSource
     bool HasCachedAllPMTs(void) const;
     bool HasCachedAnyPMTs(void) const;
 
-    const pat_ptr_t GetCachedPAT(uint tsid, uint section_num) const;
+    pat_const_ptr_t GetCachedPAT(uint tsid, uint section_num) const;
     pat_vec_t GetCachedPATs(uint tsid) const;
     pat_vec_t GetCachedPATs(void) const;
     pat_map_t GetCachedPATMap(void) const;
 
-    const cat_ptr_t GetCachedCAT(uint tsid, uint section_num) const;
+    cat_const_ptr_t GetCachedCAT(uint tsid, uint section_num) const;
     cat_vec_t GetCachedCATs(uint tsid) const;
     cat_vec_t GetCachedCATs(void) const;
     cat_map_t GetCachedCATMap(void) const;
 
-    const pmt_ptr_t GetCachedPMT(uint program_num, uint section_num) const;
+    pmt_const_ptr_t GetCachedPMT(uint program_num, uint section_num) const;
     pmt_vec_t GetCachedPMTs(void) const;
     pmt_map_t GetCachedPMTMap(void) const;
 

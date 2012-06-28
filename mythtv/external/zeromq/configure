@@ -19349,7 +19349,7 @@ fi
 
 
 
-ac_config_files="$ac_config_files Makefile src/Makefile doc/Makefile perf/Makefile src/libzmq.pc builds/msvc/Makefile tests/Makefile foreign/openpgm/Makefile builds/redhat/zeromq.spec"
+ac_config_files="$ac_config_files Makefile src/Makefile doc/Makefile perf/Makefile src/libmythzmq.pc builds/msvc/Makefile tests/Makefile foreign/openpgm/Makefile builds/redhat/zeromq.spec"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -20444,7 +20444,7 @@ do
     "src/Makefile") CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
     "doc/Makefile") CONFIG_FILES="$CONFIG_FILES doc/Makefile" ;;
     "perf/Makefile") CONFIG_FILES="$CONFIG_FILES perf/Makefile" ;;
-    "src/libzmq.pc") CONFIG_FILES="$CONFIG_FILES src/libzmq.pc" ;;
+    "src/libmythzmq.pc") CONFIG_FILES="$CONFIG_FILES src/libmythzmq.pc" ;;
     "builds/msvc/Makefile") CONFIG_FILES="$CONFIG_FILES builds/msvc/Makefile" ;;
     "tests/Makefile") CONFIG_FILES="$CONFIG_FILES tests/Makefile" ;;
     "foreign/openpgm/Makefile") CONFIG_FILES="$CONFIG_FILES foreign/openpgm/Makefile" ;;

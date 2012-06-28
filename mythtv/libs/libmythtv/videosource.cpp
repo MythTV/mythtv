@@ -981,11 +981,11 @@ class SkipBtAudio : public CheckBoxSetting, public CaptureCardDBStorage
    };
 };
 
-class DVBCardNum : public ComboBoxSetting, public CaptureCardDBStorage
+class DVBCardNum : public PathSetting, public CaptureCardDBStorage
 {
   public:
     DVBCardNum(const CaptureCard &parent) :
-        ComboBoxSetting(this),
+        PathSetting(this, true),
         CaptureCardDBStorage(this, parent, "videodevice")
     {
         setLabel(QObject::tr("DVB device"));

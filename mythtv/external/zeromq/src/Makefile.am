@@ -1,11 +1,11 @@
-lib_LTLIBRARIES = libzmq.la
+lib_LTLIBRARIES = libmythzmq.la
 
 pkgconfigdir = $(libdir)/pkgconfig
-pkgconfig_DATA = libzmq.pc
+pkgconfig_DATA = libmythzmq.pc
 
 include_HEADERS = ../include/zmq.h ../include/zmq.hpp ../include/zmq_utils.h
 
-libzmq_la_SOURCES = \
+libmythzmq_la_SOURCES = \
     array.hpp \
     atomic_counter.hpp \
     atomic_ptr.hpp \
@@ -141,16 +141,16 @@ libzmq_la_SOURCES = \
     zmq_listener.cpp
 
 if ON_MINGW
-libzmq_la_LDFLAGS = -no-undefined -avoid-version -version-info @LTVER@ @LIBZMQ_EXTRA_LDFLAGS@
+libmythzmq_la_LDFLAGS = -no-undefined -avoid-version -version-info @LTVER@ @LIBZMQ_EXTRA_LDFLAGS@
 else
-libzmq_la_LDFLAGS = -version-info @LTVER@ @LIBZMQ_EXTRA_LDFLAGS@
+libmythzmq_la_LDFLAGS = -version-info @LTVER@ @LIBZMQ_EXTRA_LDFLAGS@
 endif
 
-libzmq_la_CXXFLAGS = @LIBZMQ_EXTRA_CXXFLAGS@
+libmythzmq_la_CXXFLAGS = @LIBZMQ_EXTRA_CXXFLAGS@
 
 if BUILD_PGM
-libzmq_la_CPPFLAGS = -I$(top_srcdir)/@pgm_srcdir@/include/
-libzmq_la_LIBADD = $(top_srcdir)/@pgm_srcdir@/libpgm_noinst.la
+libmythzmq_la_CPPFLAGS = -I$(top_srcdir)/@pgm_srcdir@/include/
+libmythzmq_la_LIBADD = $(top_srcdir)/@pgm_srcdir@/libpgm_noinst.la
 endif
 
 dist-hook:

@@ -46,7 +46,7 @@ doc/*.3
 doc/*.7
 doc/*.html
 doc/*.xml
-src/libzmq.pc
+src/libmythzmq.pc
 bin/
 lib/
 builds/msvc/*.suo

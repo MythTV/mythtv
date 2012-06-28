@@ -418,9 +418,9 @@ class ImageLoadEvent : public QEvent
     MythImage *GetImage() const       { return m_image; }
     const QString GetBasefile() const { return m_basefile; }
     const QString GetFilename() const { return m_filename; }
-    const int GetNumber() const       { return m_number; }
+    int GetNumber() const             { return m_number; }
     AnimationFrames *GetAnimationFrames() const { return m_images; }
-    const bool GetAbortState() const { return m_aborted; }
+    bool GetAbortState() const        { return m_aborted; }
 
     static Type kEventType;
 

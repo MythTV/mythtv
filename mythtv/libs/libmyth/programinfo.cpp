@@ -790,7 +790,7 @@ ProgramInfo::ProgramInfo(const QString &_pathname,
     clear();
 
     QDateTime cur = MythDate::current();
-    recstartts = cur.addSecs((_length_in_minutes + 1) * -60);
+    recstartts = cur.addSecs(((int)_length_in_minutes + 1) * -60);
     recendts   = recstartts.addSecs(_length_in_minutes * 60);
     startts    = QDateTime(QDate(year,1,1),QTime(0,0,0), Qt::UTC);
     endts      = startts.addSecs(_length_in_minutes * 60);
