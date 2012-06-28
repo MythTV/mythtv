@@ -741,6 +741,11 @@ class VideoDevice : public PathSetting, public CaptureCardDBStorage
                               card, driver, false);
     };
 
+    void fillSelectionsFromDir(const QDir &dir, bool absPath = true)
+    {
+        fillSelectionsFromDir(dir, 0, 255, QString::null, QString::null, false);
+    }
+
     uint fillSelectionsFromDir(const QDir& dir,
                                uint minor_min, uint minor_max,
                                QString card, QString driver,
@@ -835,6 +840,11 @@ class VBIDevice : public PathSetting, public CaptureCardDBStorage
                 addSelection(getValue(),getValue(),true);
             }
         }
+    }
+
+    void fillSelectionsFromDir(const QDir &dir, bool absPath = true)
+    {
+        fillSelectionsFromDir(dir, QString::null, QString::null);
     }
 
     uint fillSelectionsFromDir(const QDir &dir, const QString &card,
