@@ -217,7 +217,7 @@ bool FirewireRecorder::PauseAndWait(int timeout)
     return IsPaused(true);
 }
 
-void FirewireRecorder::SetStreamData(void)
+void FirewireRecorder::InitStreamData(void)
 {
     _stream_data->AddMPEGSPListener(this);
 

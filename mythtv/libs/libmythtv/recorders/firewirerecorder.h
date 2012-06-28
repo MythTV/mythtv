@@ -52,9 +52,9 @@ class FirewireRecorder :
                                const QString &videodev,
                                const QString &audiodev,
                                const QString &vbidev);
-    void SetStreamData(void);
 
   protected:
+    virtual void InitStreamData(void);
     FirewireRecorder(TVRec *rec);
 
   private:

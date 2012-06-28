@@ -41,9 +41,6 @@ class MpegRecorder : public V4LRecorder,
     bool Open(void);
     int GetVideoFd(void) { return chanfd; }
 
-    // TS
-    virtual void SetStreamData(void);
-
     // TSPacketListener
     bool ProcessTSPacket(const TSPacket &tspacket);
 
@@ -52,6 +49,7 @@ class MpegRecorder : public V4LRecorder,
     virtual void PriorityEvent(int fd) { }
 
   private:
+    virtual void InitStreamData(void);
     void SetIntOption(RecordingProfile *profile, const QString &name);
     void SetStrOption(RecordingProfile *profile, const QString &name);
 

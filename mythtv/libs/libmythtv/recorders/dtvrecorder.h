@@ -51,7 +51,6 @@ class DTVRecorder :
     int GetVideoFd(void) { return _stream_fd; }
 
     virtual void SetNextRecording(const ProgramInfo*, RingBuffer*);
-    virtual void SetStreamData(void);
     virtual void SetStreamData(MPEGStreamData* sd);
     MPEGStreamData *GetStreamData(void) const { return _stream_data; }
 
@@ -90,6 +89,8 @@ class DTVRecorder :
     bool ProcessAVTSPacket(const TSPacket &tspacket);
 
   protected:
+    virtual void InitStreamData(void);
+
     void FinishRecording(void);
     void ResetForNewFile(void);
 

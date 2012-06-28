@@ -923,7 +923,7 @@ void MpegRecorder::run(void)
         int progNum = 1;
         MPEGStreamData *sd = new MPEGStreamData(progNum, true);
         sd->SetRecordingType(_recording_type);
-        DTVRecorder::SetStreamData(sd);
+        SetStreamData(sd);
 
         _stream_data->AddAVListener(this);
         _stream_data->AddWritingListener(this);
@@ -1135,7 +1135,7 @@ void MpegRecorder::run(void)
     {
         _stream_data->RemoveWritingListener(this);
         _stream_data->RemoveAVListener(this);
-        DTVRecorder::SetStreamData(NULL);
+        SetStreamData(NULL);
     }
 
     QMutexLocker locker(&pauseLock);
@@ -1370,7 +1370,7 @@ void MpegRecorder::StopEncoding(void)
     readfd = -1;
 }
 
-void MpegRecorder::SetStreamData(void)
+void MpegRecorder::InitStreamData(void)
 {
     _stream_data->AddMPEGSPListener(this);
     _stream_data->SetDesiredProgram(1);

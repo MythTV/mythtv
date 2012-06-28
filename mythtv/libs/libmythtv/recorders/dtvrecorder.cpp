@@ -243,10 +243,10 @@ void DTVRecorder::SetStreamData(MPEGStreamData *data)
         delete old_data;
 
     if (_stream_data)
-        SetStreamData();
+        InitStreamData();
 }
 
-void DTVRecorder::SetStreamData(void)
+void DTVRecorder::InitStreamData(void)
 {
     _stream_data->AddMPEGSPListener(this);
     _stream_data->AddMPEGListener(this);
