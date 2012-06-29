@@ -62,8 +62,6 @@ class FileTransfer : public ReferenceCounter
     vector<char> requestBuffer;
 
     QMutex lock;
-    QMutex refLock;
-    int refCount;
 
     bool writemode;
 };
