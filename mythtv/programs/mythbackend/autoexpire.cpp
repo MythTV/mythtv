@@ -164,8 +164,9 @@ void AutoExpire::CalcParams()
     }
 
     uint64_t maxKBperMin = 0;
-    uint64_t extraKB = gCoreContext->GetNumSetting("AutoExpireExtraSpace", 0) <<
-                     20;
+    uint64_t extraKB = static_cast<uint64_t>
+                        (gCoreContext->GetNumSetting("AutoExpireExtraSpace", 0))
+                          << 20;
 
     QMap<int, uint64_t> fsMap;
     QMap<int, vector<int> > fsEncoderMap;
