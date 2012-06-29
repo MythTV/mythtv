@@ -583,8 +583,6 @@ bool DatabaseLogger::logqmsg(MSqlQuery &query, LoggingItem *item)
         return false;
     }
 
-    item->DecrRef();
-
     return true;
 }
 
