@@ -136,13 +136,15 @@ void loggingGetTimeStamp(qlonglong *epoch, uint *usec)
 #endif
 }
 
-LoggingItem::LoggingItem() : m_file(NULL), m_function(NULL), m_threadName(NULL),
-        m_appName(NULL), m_table(NULL), m_logFile(NULL)
+LoggingItem::LoggingItem() : ReferenceCounter("LoggingItem"), m_file(NULL),
+        m_function(NULL), m_threadName(NULL), m_appName(NULL), m_table(NULL),
+        m_logFile(NULL)
 {
 }
 
 LoggingItem::LoggingItem(const char *_file, const char *_function,
                          int _line, LogLevel_t _level, LoggingType _type) :
+        ReferenceCounter("LoggingItem"),
         m_threadId((uint64_t)(QThread::currentThreadId())),
         m_line(_line), m_type(_type), m_level(_level),
         m_file(strdup(_file)), m_function(strdup(_function)),
@@ -153,7 +155,6 @@ LoggingItem::LoggingItem(const char *_file, const char *_function,
     m_message[0]='\0';
     m_message[LOGLINE_MAX]='\0';
     setThreadTid();
-    refcount.ref();
 }
 
 LoggingItem::~LoggingItem()
@@ -373,7 +374,7 @@ void LoggerThread::run(void)
         fillItem(item);
         handleItem(item);
         logConsole(item);
-        item->deleteItem();
+        item->DecrRef();
 
         qLock.relock();
     }
@@ -559,7 +560,7 @@ bool LoggerThread::logConsole(LoggingItem *item)
     if (!(item->m_type & kMessage))
         return false;
 
-    item->refcount.ref();
+    item->IncrRef();
 
     if (item->m_type & kStandardIO)
         snprintf( line, MAX_STRING_LENGTH, "%s", item->m_message );
@@ -591,7 +592,7 @@ bool LoggerThread::logConsole(LoggingItem *item)
     int result = write( 1, line, strlen(line) );
     (void)result;
 
-    item->deleteItem();
+    item->DecrRef();
 
     return true;
 }
@@ -637,14 +638,6 @@ void LoggerThread::fillItem(LoggingItem *item)
     item->setFacility(m_facility);
 }
 
-static QAtomicInt item_count;
-static QAtomicInt malloc_count;
-
-#define DEBUG_MEMORY 0
-#if DEBUG_MEMORY
-static int max_count = 0;
-static QTime memory_time;
-#endif
 
 /// \brief  Create a new LoggingItem
 /// \param  _file   filename of the source file where the log message is from
@@ -660,26 +653,6 @@ LoggingItem *LoggingItem::create(const char *_file,
 {
     LoggingItem *item = new LoggingItem(_file, _function, _line, _level, _type);
 
-    malloc_count.ref();
-
-#if DEBUG_MEMORY
-    int val = item_count.fetchAndAddRelaxed(1) + 1;
-    if (val == 0)
-        memory_time.start();
-    max_count = (val > max_count) ? val : max_count;
-    if (memory_time.elapsed() > 1000)
-    {
-        cout<<"current memory usage: "
-            <<val<<" * "<<sizeof(LoggingItem)<<endl;
-        cout<<"max memory usage: "
-            <<max_count<<" * "<<sizeof(LoggingItem)<<endl;
-        cout<<"malloc count: "<<(int)malloc_count<<endl;
-        memory_time.start();
-    }
-#else
-    item_count.ref();
-#endif
-
     return item;
 }
 
@@ -692,38 +665,7 @@ LoggingItem *LoggingItem::create(QByteArray &buf)
     LoggingItem *item = new LoggingItem;
     QJson::QObjectHelper::qvariant2qobject(variant.toMap(), item);
 
-    malloc_count.ref();
-
-#if DEBUG_MEMORY
-    int val = item_count.fetchAndAddRelaxed(1) + 1;
-    if (val == 0)
-        memory_time.start();
-    max_count = (val > max_count) ? val : max_count;
-    if (memory_time.elapsed() > 1000)
-    {
-        cout<<"current memory usage: "
-            <<val<<" * "<<sizeof(LoggingItem)<<endl;
-        cout<<"max memory usage: "
-            <<max_count<<" * "<<sizeof(LoggingItem)<<endl;
-        cout<<"malloc count: "<<(int)malloc_count<<endl;
-        memory_time.start();
-    }
-#else
-    item_count.ref();
-#endif
-
     return item;
-}
-
-/// \brief  Delete the LoggingItem once its reference count has run down
-/// \param  item    LoggingItem to delete.
-void LoggingItem::deleteItem(void)
-{
-    if (!refcount.deref())
-    {
-        item_count.deref();
-        this->deleteLater();
-    }
 }
 
 
@@ -780,7 +722,7 @@ void LogPrintLine( uint64_t mask, LogLevel_t level, const char *file, int line,
             qLock.unlock();
             logThread->handleItem(item);
             logThread->logConsole(item);
-            item->deleteItem();
+            item->DecrRef();
             qLock.relock();
         }
     }

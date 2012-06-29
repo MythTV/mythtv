@@ -206,8 +206,6 @@ bool FileLogger::logmsg(LoggingItem *item)
     if (!m_opened)
         return false;
 
-    item->refcount.ref();
-
     time_t epoch = item->epoch();
     struct tm tm;
     localtime_r(&epoch, &tm);
@@ -517,7 +515,6 @@ bool DatabaseLogger::logmsg(LoggingItem *item)
     if (m_disabled)
         return false;
 
-    item->refcount.ref();
     m_thread->enqueue(item);
     return true;
 }
@@ -586,7 +583,7 @@ bool DatabaseLogger::logqmsg(MSqlQuery &query, LoggingItem *item)
         return false;
     }
 
-    item->deleteItem();
+    item->DecrRef();
 
     return true;
 }
@@ -665,7 +662,7 @@ DBLoggerThread::~DBLoggerThread()
 
     QMutexLocker qLock(&m_queueMutex);
     while (!m_queue->empty())
-        m_queue->dequeue()->deleteItem();
+        m_queue->dequeue()->DecrRef();
     delete m_queue;
     delete m_wait;
     m_queue = NULL;
@@ -710,13 +707,14 @@ void DBLoggerThread::run(void)
             if (!item)
                 continue;
 
-            qLock.unlock();
-
             if (item->message()[0] != '\0')
             {
-                if (!m_logger->logqmsg(*query, item))
+                qLock.unlock();
+                bool logged = m_logger->logqmsg(*query, item);
+                qLock.relock();
+
+                if (!logged)
                 {
-                    qLock.relock();
                     m_queue->prepend(item);
                     m_wait->wait(qLock.mutex(), 100);
                     delete query;
@@ -725,17 +723,11 @@ void DBLoggerThread::run(void)
                     continue;
                 }
             }
-            else
-            {
-                item->deleteItem();
-            }
 
-            qLock.relock();
+            item->DecrRef();
         }
 
         delete query;
-
-        qLock.unlock();
     }
 
     RunEpilog();
@@ -1003,7 +995,7 @@ void FileLogger::receivedMessage(const QList<QByteArray> &msg)
     QByteArray json     = msg.at(1);
     LoggingItem *item = LoggingItem::create(json);
     logmsg(item);
-    item->deleteItem();
+    item->DecrRef();
 }
 
 #ifndef _WIN32
@@ -1024,7 +1016,7 @@ void SyslogLogger::receivedMessage(const QList<QByteArray> &msg)
     QByteArray json     = msg.at(1);
     LoggingItem *item = LoggingItem::create(json);
     logmsg(item);
-    item->deleteItem();
+    item->DecrRef();
 }
 
 #else
@@ -1054,7 +1046,8 @@ void DatabaseLogger::receivedMessage(const QList<QByteArray> &msg)
 
     QByteArray json     = msg.at(1);
     LoggingItem *item = LoggingItem::create(json);
-    logmsg(item);
+    if (!logmsg(item))
+        item->DecrRef();
 }
 
 
@@ -1101,6 +1094,7 @@ void LogForwardThread::run(void)
     while (!m_aborted)
     {
         qApp->processEvents(QEventLoop::AllEvents, 10);
+        qApp->sendPostedEvents(NULL, QEvent::DeferredDelete);
 
         {
             QMutexLocker lock(&logMsgListMutex);
@@ -1122,7 +1116,10 @@ void LogForwardThread::run(void)
                 // Force a processEvents every 128 messages so a busy queue
                 // doesn't preclude timer notifications, etc.
                 if ((processed & 127) == 0)
+                {
                     qApp->processEvents(QEventLoop::AllEvents, 10);
+                    qApp->sendPostedEvents(NULL, QEvent::DeferredDelete);
+                }
 
                 lock.relock();
             }
@@ -1361,7 +1358,7 @@ void LogForwardThread::forwardMessage(LogMessage *msg)
         logItem->list = loggers;
         logClientMap.insert(clientId, logItem);
 
-        item->deleteItem();
+        item->DecrRef();
     }
 
     m_zmqPubSock->sendMessage(*msg);
