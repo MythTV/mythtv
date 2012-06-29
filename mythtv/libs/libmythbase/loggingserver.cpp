@@ -911,17 +911,6 @@ void LogServerThread::stop(void)
     quit();
 }
 
-static QAtomicInt item_count;
-static QAtomicInt malloc_count;
-
-#define DEBUG_MEMORY 0
-#if DEBUG_MEMORY
-static int max_count = 0;
-static QTime memory_time;
-#endif
-
-
-
 /// \brief  Entry point to start logging for the application.  This will
 ///         start up all of the threads needed.
 /// \param  logfile Filename of the logfile to create.  Empty if no file.
