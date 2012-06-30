@@ -122,8 +122,25 @@ EITFixUp::EITFixUp()
                         "NRK2s historiekveld|Detektimen|Nattkino|Filmklassiker|Film|Kortfilm|P.skemorg[eo]n|"
                         "Radioteatret|Opera|P2-Akademiet|Nyhetsmorg[eo]n i P2 og Alltid Nyheter:): (.+)"),
       m_noPremiere("\\s+-\\s+(Sesongpremiere|Premiere|premiere)!?$"),
-      m_Stereo("\\b\\(?[sS]tereo\\)?\\b")
-
+      m_Stereo("\\b\\(?[sS]tereo\\)?\\b"),
+      m_dkEpisode("\\(([0-9]+)\\)"),
+      m_dkPart("\\(([0-9]+):([0-9]+)\\)"),
+      m_dkSubtitle1("^([^:]+): (.+)"),
+      m_dkSubtitle2("^([^:]+) - (.+)"),
+      m_dkSeason1("Sæson ([0-9]+)\\."),
+      m_dkSeason2("- år ([0-9]+)(?: :)"),
+      m_dkFeatures("Features:(.+)"),
+      m_dkWidescreen(" 16:9"),
+      m_dkDolby(" 5:1"),
+      m_dkSurround(" \\(\\(S\\)\\)"),
+      m_dkStereo(" S"),
+      m_dkReplay(" \\(G\\)"),
+      m_dkTxt(" TTV"),
+      m_dkHD(" HD"),
+      m_dkActors("(?:Medvirkende: |Medv\\.: )(.+)"),
+      m_dkPersonsSeparator("(, )|(og )"),
+      m_dkDirector("(?:Instr.: |Instrukt.r: )(.+)$"),
+      m_dkYear(" fra ([0-9]{4})[ \\.]")
 {
 }
 
@@ -182,6 +199,9 @@ void EITFixUp::Fix(DBEventEIT &event) const
 
     if (kFixNRK_DVBT & event.fixup)
         FixNRK_DVBT(event);
+
+    if (kFixDK & event.fixup)
+        FixDK(event);
 
     if (kFixCategory & event.fixup)
         FixCategory(event);
@@ -1776,3 +1796,188 @@ void EITFixUp::FixNRK_DVBT(DBEventEIT &event) const
     }
 }
 
+/** \fn EITFixUp::FixDK(DBEventEIT&) const
+ *  \brief Use this to clean YouSee's DVB-C guide in Denmark.
+ */
+void EITFixUp::FixDK(DBEventEIT &event) const
+{
+    // Source: YouSee Rules of Operation v1.16
+    // url: http://yousee.dk/~/media/pdf/CPE/Rules_Operation.ashx
+    int        position = -1;
+    int        episode = -1;
+    int        season = -1;
+    QRegExp    tmpRegEx;
+    // Title search
+    // episode and part/part total
+    tmpRegEx = m_dkEpisode;
+    position = event.title.indexOf(tmpRegEx);
+    if (position != -1)
+    {
+      episode = tmpRegEx.cap(1).toInt();
+      event.partnumber = tmpRegEx.cap(1).toInt();
+      event.title = event.title.replace(tmpRegEx, "");
+    }
+
+    tmpRegEx = m_dkPart;
+    position = event.title.indexOf(tmpRegEx);
+    if (position != -1)
+    {
+      episode = tmpRegEx.cap(1).toInt();
+      event.partnumber = tmpRegEx.cap(1).toInt();
+      event.parttotal = tmpRegEx.cap(2).toInt();
+      event.title = event.title.replace(tmpRegEx, "");
+    }
+
+    // subtitle delimiters
+    tmpRegEx = m_dkSubtitle1;
+    position = event.title.indexOf(tmpRegEx);
+    if (position != -1)
+    {
+      event.title = tmpRegEx.cap(1);
+      event.subtitle = tmpRegEx.cap(2);
+    }
+    else
+    {
+        tmpRegEx = m_dkSubtitle2;
+        if(event.title.indexOf(tmpRegEx) != -1)
+        {
+            event.title = tmpRegEx.cap(1);
+            event.subtitle = tmpRegEx.cap(2);
+        }
+    }
+    // Description search
+    // Season (Sæson [:digit:]+.) => episode = season episode number
+    // or year (- år [:digit:]+(\\)|:) ) => episode = total episode number
+    tmpRegEx = m_dkSeason1;
+    position = event.description.indexOf(tmpRegEx);
+    if (position != -1)
+    {
+      season = tmpRegEx.cap(1).toInt();
+    }
+    else
+    {
+        tmpRegEx = m_dkSeason2;
+        if(event.description.indexOf(tmpRegEx) !=  -1)
+        {
+            season = tmpRegEx.cap(1).toInt();
+        }
+    }
+
+    //Feature:
+    tmpRegEx = m_dkFeatures;
+    position = event.description.indexOf(tmpRegEx);
+    if (position != -1)
+    {
+        QString features = tmpRegEx.cap(1);
+        event.description = event.description.replace(tmpRegEx, "");
+        // 16:9
+        if (features.indexOf(m_dkWidescreen) !=  -1)
+            event.videoProps |= VID_WIDESCREEN;
+        // HDTV
+        if (features.indexOf(m_dkHD) !=  -1)
+            event.videoProps |= VID_HDTV;
+        // Dolby Digital surround
+        if (features.indexOf(m_dkDolby) !=  -1)
+            event.audioProps |= AUD_DOLBY;
+        // surround
+        if (features.indexOf(m_dkSurround) !=  -1)
+            event.audioProps |= AUD_SURROUND;
+        // stereo
+        if (features.indexOf(m_dkStereo) !=  -1)
+            event.audioProps |= AUD_STEREO;
+        // (G)
+        if (features.indexOf(m_dkReplay) !=  -1)
+            event.previouslyshown = true;
+        // TTV
+        if (features.indexOf(m_dkTxt) !=  -1)
+            event.subtitleType |= SUB_NORMAL;
+    }
+
+    // Series and program id
+    // programid is currently not transmitted
+    // YouSee doesn't use a default authority but uses the first byte after
+    // the / to indicate if the seriesid is global unique or unique on the
+    // service id
+    if (event.seriesId.length() >= 1 && event.seriesId[0] == '/')
+    {
+        QString newid;
+        if (event.seriesId[1] == '1')
+            newid = QString("%1%2").arg(event.chanid).
+                    arg(event.seriesId.mid(2,8));
+        else
+            newid = event.seriesId.mid(2,8);
+        event.seriesId = newid;
+    }
+
+    if (event.programId.length() >= 1 && event.programId[0] == '/')
+        event.programId[0]='_';
+
+    // Add season and episode number to subtitle
+    if(episode>0)
+    {
+        event.subtitle = QString("%1 (%2").arg(event.subtitle).arg(episode);
+        if (event.parttotal >0)
+            event.subtitle = QString("%1:%2").arg(event.subtitle).
+                    arg(event.parttotal);
+        if (season>0)
+        {
+            event.syndicatedepisodenumber =
+                    QString("E%1S%2").arg(episode).arg(season);
+            event.subtitle = QString("%1 Sæson %2").arg(event.subtitle).
+                    arg(season);
+        }
+        event.subtitle = QString("%1)").arg(event.subtitle);
+    }
+    // Find actors and director in description
+    tmpRegEx = m_dkDirector;
+    bool directorPresent = false;
+    position = event.description.indexOf(tmpRegEx);
+    if (position != -1)
+    {
+        QString tmpDirectorsString = tmpRegEx.cap(1);
+        const QStringList directors =
+            tmpDirectorsString.split(m_dkPersonsSeparator, QString::SkipEmptyParts);
+        QStringList::const_iterator it = directors.begin();
+        for (; it != directors.end(); ++it)
+        {
+            tmpDirectorsString = it->split(":").last().trimmed().
+                    remove(QRegExp("\\.$"));
+            if (tmpDirectorsString != "")
+                event.AddPerson(DBPerson::kDirector, tmpDirectorsString);
+        }
+        directorPresent = true;
+    }
+
+    tmpRegEx = m_dkActors;
+    position = event.description.indexOf(tmpRegEx);
+    if (position != -1)
+    {
+        QString tmpActorsString = tmpRegEx.cap(1);
+        if (directorPresent)
+            tmpActorsString = tmpActorsString.replace(m_dkDirector,"");
+        const QStringList actors =
+            tmpActorsString.split(m_dkPersonsSeparator, QString::SkipEmptyParts);
+        QStringList::const_iterator it = actors.begin();
+        for (; it != actors.end(); ++it)
+        {
+            tmpActorsString = it->split(":").last().trimmed().
+                    remove(QRegExp("\\.$"));
+            if (tmpActorsString != "")
+                event.AddPerson(DBPerson::kActor, tmpActorsString);
+        }
+    }
+    //find year
+    tmpRegEx = m_dkYear;
+    position = event.description.indexOf(tmpRegEx);
+    if (position != -1)
+    {
+        bool ok;
+        uint y = tmpRegEx.cap(1).toUInt(&ok);
+        if (ok)
+            event.originalairdate = QDate(y, 1, 1);
+    }
+    // Remove white spaces
+    event.description = event.description.trimmed();
+    event.title       = event.title.trimmed();
+    event.subtitle    = event.subtitle.trimmed();
+}

@@ -974,6 +974,9 @@ static void init_fixup(QMap<uint64_t,uint> &fix)
         fix[    15U << 16] = // DVB-C Welho
         EITFixUp::kFixFI | EITFixUp::kFixCategory;
 
+    // DVB-C YouSee (Denmark)
+    fix[65024U << 16] = EITFixUp::kFixDK;
+
     // DVB-S(2) Thor 0.8W Norwegian
     fix[70U << 16] = EITFixUp::kFixNO;
 
