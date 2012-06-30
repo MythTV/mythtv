@@ -23,7 +23,7 @@ class QString;
 class MSqlQuery;
 class LoggingItem;
 
-MBASE_PUBLIC void logServerStart(void);
+MBASE_PUBLIC bool logServerStart(void);
 MBASE_PUBLIC void logServerStop(void);
 void logServerWait(void);
 
