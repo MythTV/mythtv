@@ -23,7 +23,9 @@ zeromq-all:	zeromq/Makefile
 	${MAKE} -C zeromq all
 
 zeromq/Makefile:	zeromq/configure
-	(cd zeromq ; ./configure --without-documentation --prefix=${PREFIX})
+	(cd zeromq ; \
+	 ./configure --without-documentation --prefix=${PREFIX} \
+	             --includedir=${PREFIX}/include/mythtv/zeromq)
 
 zeromq-install zeromq-uninstall zeromq-clean zeromq-distclean:
 	${MAKE} -C zeromq ${@:zeromq-%=%} DESTDIR=${INSTALL_ROOT}

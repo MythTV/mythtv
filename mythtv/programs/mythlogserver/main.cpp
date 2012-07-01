@@ -28,8 +28,12 @@ namespace {
     {
         logStop();
         logServerStop();
-        delete gContext;
-        gContext = NULL;
+
+        if (gContext)
+        {
+            delete gContext;
+            gContext = NULL;
+        }
     }
 
     class CleanupGuard
@@ -85,13 +89,18 @@ int main(int argc, char *argv[])
     if ((retval = cmdline.ConfigureLogging(mask, daemonize)) != GENERIC_EXIT_OK)
         return retval;
 
-    logServerStart();
+    bool logging = logServerStart();
 
     if (daemonize)
         // Don't listen to console input if daemonized
         close(0);
 
+    gContext = NULL;
+
     CleanupGuard callCleanup(cleanup);
+
+    if (!logging)
+        return GENERIC_EXIT_OK;
 
 #ifndef _WIN32
     QList<int> signallist;
