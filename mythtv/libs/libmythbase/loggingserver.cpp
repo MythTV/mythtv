@@ -989,9 +989,9 @@ void logServerWait(void)
 {
     // cerr << "waiting" << endl;
     QMutexLocker locker(&logThreadStartedMutex);
-    while (!logThreadStarting ||
-           (logServerThread && logServerThread->isRunning()))
-        logThreadStarted.wait(locker.mutex(), 100);
+    while ((!logThreadStarting ||
+            (logServerThread && logServerThread->isRunning())) &&
+           !logThreadStarted.wait(locker.mutex(), 100));
     locker.unlock();
     // cerr << "done waiting" << endl;
 }
