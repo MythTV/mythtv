@@ -449,6 +449,7 @@ void LoggerThread::initialTimeout(void)
 ///         heard from for at least 5s, restart it
 void LoggerThread::checkHeartBeat(void)
 {
+    static bool launched = false;
     qlonglong epoch;
 
     loggingGetTimeStamp(&epoch, NULL);
@@ -456,7 +457,15 @@ void LoggerThread::checkHeartBeat(void)
 
     if (age == 5)
     {
-        launchLogServer();
+        if (!launched)
+        {
+            launchLogServer();
+            launched = true;
+        }
+    }
+    else
+    {
+        launched = false;
     }
 }
 
