@@ -1,3 +1,5 @@
+#include <QCoreApplication>
+
 #include <mythcontext.h>
 #include <mythdb.h>
 #include <mythdirs.h>
@@ -182,7 +184,9 @@ class GameType : public ComboBoxSetting, public GameDBStorage
         setLabel(QObject::tr("Type"));
         for (int i = 0; i < MAX_GAME_TYPES; i++)
         {
-            addSelection(GameTypeList[i].nameStr, GameTypeList[i].idStr);
+            addSelection(QCoreApplication::translate("(GameTypes)", 
+                         GameTypeList[i].nameStr.toUtf8()),
+                         GameTypeList[i].idStr);
         }
         setValue(0);
         setHelpText(QObject::tr("Type of Game/Emulator. Mostly for informational purposes and has little effect on the function of your system."));
