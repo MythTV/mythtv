@@ -140,18 +140,20 @@ class AudioReencodeBuffer : public AudioOutput
 
                 // Use as many of the remaining frames as will fit in the space
                 // left in the buffer.
-                int part = min(len - index,
-                               m_audioFrameSize - m_saveBuffer->m_buffer.size());
+                int bufsize = m_saveBuffer->m_buffer.size();
+                int part = min(len - index, m_audioFrameSize - bufsize);
                 total_frames += part / m_bytes_per_frame;
                 timecode = total_frames * 1000 / m_eff_audiorate;
-                // Store frames in buffer, basing frame count on number of bytes,
-                // which works only for uncompressed data.
-                m_saveBuffer->appendData(&buf[index], part, part / m_bytes_per_frame,
-                                         timecode);
+                // Store frames in buffer, basing frame count on number of
+                // bytes, which works only for uncompressed data.
+                m_saveBuffer->appendData(&buf[index], part,
+                                         part / m_bytes_per_frame, timecode);
 
                 // If we have filled the buffer...
                 if (m_saveBuffer->m_buffer.size() == m_audioFrameSize)
                 {
+                    QMutexLocker locker(&m_bufferMutex);
+
                     // store the buffer
                     m_bufferList.append(m_saveBuffer);
                     // mark m_saveBuffer as emtpy.
@@ -172,6 +174,7 @@ class AudioReencodeBuffer : public AudioOutput
             timecode += frames * 1000 / m_eff_audiorate;
             m_saveBuffer->appendData(buf, len, frames, timecode);
 
+            QMutexLocker locker(&m_bufferMutex);
             m_bufferList.append(m_saveBuffer);
             m_saveBuffer = NULL;
             m_last_audiotime = timecode;
