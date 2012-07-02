@@ -1933,6 +1933,12 @@ int Transcode::TranscodeFile(const QString &inputname,
 
                     delete ab;
                 }
+
+                LOG(VB_GENERAL, LOG_DEBUG, 
+                    QString("Processed %1 audio frames for timecode %2: %3 "
+                            "buffers, %4 bytes consumed")
+                    .arg(count) .arg(frame.timecode) .arg(buffersConsumed)
+                    .arg(bytesConsumed));
             }
 
             if (!avfMode)
