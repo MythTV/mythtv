@@ -171,6 +171,13 @@ void HttpStatus::GetStatusHTML( HTTPRequest *pRequest )
     PrintStatus( stream, &doc );
 }
 
+static QString setting_to_localtime(const char *setting)
+{
+    QString origDateString = gCoreContext->GetSetting(setting);
+    QDateTime origDate = MythDate::fromString(origDateString);
+    return MythDate::toString(origDate, MythDate::kDateTimeFull);
+}
+
 void HttpStatus::FillStatusXML( QDomDocument *pDoc )
 {
     QDateTime qdtNow          = MythDate::current();
@@ -535,9 +542,9 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
     }
 
     guide.setAttribute("start",
-        gCoreContext->GetSetting("mythfilldatabaseLastRunStart"));
+                       setting_to_localtime("mythfilldatabaseLastRunStart"));
     guide.setAttribute("end",
-        gCoreContext->GetSetting("mythfilldatabaseLastRunEnd"));
+                       setting_to_localtime("mythfilldatabaseLastRunEnd"));
     guide.setAttribute("status",
         gCoreContext->GetSetting("mythfilldatabaseLastRunStatus"));
     if (gCoreContext->GetNumSetting("MythFillGrabberSuggestsTime", 0))

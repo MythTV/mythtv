@@ -369,8 +369,9 @@ bool ImportIconsWizard::initialLoad(QString name)
 
     m_iter = m_listEntries.begin();
 
-    m_progressDialog = new MythUIProgressDialog(tr("Downloading, please wait..."),
-                                                m_popupStack, "IconImportInitProgress");
+    m_progressDialog = new MythUIProgressDialog(
+        tr("Downloading, please wait..."), m_popupStack,
+           "IconImportInitProgress");
 
     if (m_progressDialog->Create())
     {
@@ -385,10 +386,21 @@ bool ImportIconsWizard::initialLoad(QString name)
 
     while (!closeDialog && (m_iter != m_listEntries.end()))
     {
-        QString message = QString("Downloading %1 / %2 : ").arg(m_nCount+1)
-            .arg(m_listEntries.size()) + (*m_iter).strName;
+        /*: %1 is the current channel position,
+         *  %2 is the total number of channels,
+         *  %3 is the channel name
+         */
+        QString message = QString(tr("Downloading %1 / %2 : %3"))
+            .arg(m_nCount+1)
+            .arg(m_listEntries.size())
+            .arg((*m_iter).strName);
+
         if (m_missingEntries.size() > 0)
-            message.append(QString("\nCould not find %1 icons.").arg(m_missingEntries.size()));
+        {
+            message.append("\n");
+            message.append(tr("Could not find %n icon(s).", "", 
+                              m_missingEntries.size()));
+        }
 
         if (!findmissing((*m_iter).strIconCSV))
         {
@@ -723,7 +735,7 @@ void ImportIconsWizard::askSubmit(const QString& strParam)
 {
     m_strParam = strParam;
     QString message = tr("You now have the opportunity to transmit your "
-                         "choices  back to mythtv.org so that others can "
+                         "choices back to mythtv.org so that others can "
                          "benefit from your selections.");
 
     MythConfirmationDialog *confirmPopup =

@@ -8,12 +8,15 @@
 #include <QList>
 #include <QHash>
 #include <QPixmap>
+#include <QCoreApplication>
 
 class MythMediaDevice;
 class QPixmap;
 
 class ThumbItem
 {
+    Q_DECLARE_TR_FUNCTIONS (ThumbItem)
+
   public:
     ThumbItem() :
         m_name(QString::null), m_caption(QString::null),
