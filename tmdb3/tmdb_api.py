@@ -22,7 +22,7 @@ for search and retrieval of text metadata and image URLs from TMDB.
 Preliminary API specifications can be found at
 http://help.themoviedb.org/kb/api/about-3"""
 
-__version__="v0.6.5"
+__version__="v0.6.6"
 # 0.1.0 Initial development
 # 0.2.0 Add caching mechanism for API queries
 # 0.2.1 Temporary work around for broken search paging
@@ -48,6 +48,7 @@ __version__="v0.6.5"
 # 0.6.3 Add Studio search
 # 0.6.4 Add Genre list and associated Movie search
 # 0.6.5 Prevent data from being blanked out by subsequent queries
+# 0.6.6 Turn date processing errors into mutable warnings
 
 from request import set_key, Request
 from util import Datapoint, Datalist, Datadict, Element, NameRepr, SearchRepr
@@ -64,7 +65,18 @@ import datetime
 DEBUG = False
 
 def process_date(datestr):
-    return datetime.date(*[int(x) for x in datestr.split('-')])
+    try:
+        return datetime.date(*[int(x) for x in datestr.split('-')])
+    except TypeError:
+        import sys
+        import warnings
+        import traceback
+        _,_,tb = sys.exc_info()
+        f,l,_,_ = traceback.extract_tb(tb)[-1]
+        warnings.warn_explicit(('"{0}" is not a supported date format. '
+                'Please fix upstream data at http://www.themoviedb.org.')\
+              .format(datestr), Warning, f, l)
+        return None
 
 class Configuration( Element ):
     images = Datapoint('images')
