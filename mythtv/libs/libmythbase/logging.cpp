@@ -722,8 +722,6 @@ void LogPrintLine( uint64_t mask, LogLevel_t level, const char *file, int line,
 {
     va_list         arguments;
 
-    QMutexLocker qLock(&logQueueMutex);
-
     int type = kMessage;
     type |= (mask & VB_FLUSH) ? kFlush : 0;
     type |= (mask & VB_STDIO) ? kStandardIO : 0;
@@ -747,6 +745,8 @@ void LogPrintLine( uint64_t mask, LogLevel_t level, const char *file, int line,
 
     if (formatcopy)
         free(formatcopy);
+
+    QMutexLocker qLock(&logQueueMutex);
 
     logQueue.enqueue(item);
 
