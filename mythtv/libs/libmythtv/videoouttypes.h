@@ -358,8 +358,11 @@ inline QString toXVString(PictureAttribute pictureattribute)
           ret = "XV_SATURATION"; break;
       case kPictureAttribute_Hue:
           ret = "XV_HUE";        break;
+      case kPictureAttribute_StudioLevels:
       case kPictureAttribute_Volume:
-      case kPictureAttribute_MAX: break;
+      case kPictureAttribute_MAX:
+      default:
+          break;
     }
 
     if (ret.isEmpty())
