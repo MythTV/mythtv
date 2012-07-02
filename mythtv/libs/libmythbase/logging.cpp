@@ -261,8 +261,8 @@ LoggerThread::LoggerThread(QString filename, bool progress, bool quiet,
     char *debug = getenv("VERBOSE_THREADS");
     if (debug != NULL)
     {
-//        LOG(VB_GENERAL, LOG_NOTICE,
-//            "Logging thread registration/deregistration enabled!");
+        LOG(VB_GENERAL, LOG_NOTICE,
+            "Logging thread registration/deregistration enabled!");
         debugRegistration = true;
     }
     m_locallogs = (m_appname == MYTH_APPNAME_MYTHLOGSERVER);
@@ -850,7 +850,6 @@ void logStart(QString logfile, int progress, int quiet, int facility,
 
     QString table = dblog ? QString("logging") : QString("");
 
-    QMutexLocker qLock(&logQueueMutex);
     if (!logThread)
         logThread = new LoggerThread(logfile, progress, quiet, table, facility);
 
