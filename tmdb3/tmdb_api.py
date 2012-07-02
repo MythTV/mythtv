@@ -47,6 +47,7 @@ __version__="v0.6.4"
 # 0.6.2 Add similar movie search for Movie objects
 # 0.6.3 Add Studio search
 # 0.6.4 Add Genre list and associated Movie search
+# 0.6.5 Prevent data from being blanked out by subsequent queries
 
 from request import set_key, Request
 from util import Datapoint, Datalist, Datadict, Element, NameRepr, SearchRepr

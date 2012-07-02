@@ -84,6 +84,10 @@ class Poller( object ):
                     ((data[k] is not None) if callable(self.func) else True):
                 # argument received data, populate it
                 setattr(self.inst, v, data[k])
+            elif v in self.inst._data:
+                # argument did not receive data, but Element already contains
+                # some value, so skip this
+                continue
             elif set_nones:
                 # argument did not receive data, so fill it with None
                 # to indicate such and prevent a repeat scan
