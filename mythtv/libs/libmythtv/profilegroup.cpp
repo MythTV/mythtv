@@ -45,7 +45,7 @@ ProfileGroup::ProfileGroup()
     addChild(is_default = new Is_default(*this));
 
     ConfigurationGroup* profile = new VerticalConfigurationGroup(false);
-    profile->setLabel(QObject::tr("ProfileGroup"));
+    profile->setLabel(tr("ProfileGroup"));
     profile->addChild(name = new Name(*this));
     CardInfo *cardInfo = new CardInfo(*this);
     profile->addChild(cardInfo);
@@ -101,7 +101,7 @@ void ProfileGroup::fillSelections(SelectSetting* setting)
     }
 
     if (!tid.isEmpty())
-        setting->addSelection(QObject::tr("Transcoders"), tid);
+        setting->addSelection(tr("Transcoders"), tid);
 }
 
 QString ProfileGroup::getName(int group)
@@ -166,7 +166,7 @@ void ProfileGroupEditor::open(int id) {
     }
     else
     {
-        pgName = QString(QObject::tr("New Profile Group Name"));
+        pgName = tr("New Profile Group Name");
         profilegroup->setName(pgName);
         newgroup = true;
     }
@@ -234,7 +234,7 @@ void ProfileGroupEditor::Load(void)
 {
     listbox->clearSelections();
     ProfileGroup::fillSelections(listbox);
-    listbox->addSelection(QObject::tr("(Create new profile group)"), "0");
+    listbox->addSelection(tr("(Create new profile group)"), "0");
 }
 
 DialogCode ProfileGroupEditor::exec(void)
@@ -286,14 +286,14 @@ void ProfileGroupEditor::callDelete(void)
 
     if (result.exec() && result.next())
     {
-        QString message = QObject::tr("Delete profile group:") +
-                          QString("\n'%1'?").arg(ProfileGroup::getName(id));
+        QString message = QString(tr("Delete profile group:\n'%1'?"))
+                              .arg(ProfileGroup::getName(id));
 
         DialogCode value = MythPopupBox::Show2ButtonPopup(
             GetMythMainWindow(),
             "", message,
-            QObject::tr("Yes, delete group"),
-            QObject::tr("No, Don't delete group"), kDialogCodeButton1);
+            tr("Yes, delete group"),
+            tr("No, Don't delete group"), kDialogCodeButton1);
 
         if (kDialogCodeButton0 == value)
         {
