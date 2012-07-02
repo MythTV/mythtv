@@ -397,8 +397,8 @@ bool ImportIconsWizard::initialLoad(QString name)
 
         if (m_missingEntries.size() > 0)
         {
-	    message.append("\n");
-	    message.append(tr("Could not find %n icon(s).", "", 
+            message.append("\n");
+            message.append(tr("Could not find %n icon(s).", "", 
                               m_missingEntries.size()));
         }
 
