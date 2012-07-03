@@ -100,6 +100,7 @@ class MBASE_PUBLIC TransientStorage : public Storage
 
     virtual void Load(void) { }
     virtual void Save(void) { }
+    virtual void Save(QString /*destination*/) { }
 };
 
 class MBASE_PUBLIC HostDBStorage : public SimpleDBStorage

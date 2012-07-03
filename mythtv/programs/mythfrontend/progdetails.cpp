@@ -13,8 +13,7 @@
 #include "mythmainwindow.h"
 
 #include "progdetails.h"
-#include <mythmiscutil.h>
-
+#include "mythdate.h"
 
 #define LASTPAGE 2
 
@@ -384,7 +383,8 @@ void ProgDetails::loadPage(void)
     if (m_progInfo.GetOriginalAirDate().isValid() &&
         category_type != "movie")
     {
-        s = MythDateToString(m_progInfo.GetOriginalAirDate(), kDateFull | kAddYear);
+        s = MythDate::toString(m_progInfo.GetOriginalAirDate(),
+                               MythDate::kDateFull | MythDate::kAddYear);
     }
     addItem("ORIGINAL_AIRDATE", tr("Original Airdate"), s);
 
@@ -543,7 +543,7 @@ void ProgDetails::loadPage(void)
                 recstatus == rsNeverRecord ||
                 recstatus == rsRecorded)
             {
-                statusDate = query.value(1).toDateTime();
+                statusDate = MythDate::as_utc(query.value(1).toDateTime());
             }
         }
     }
@@ -565,9 +565,9 @@ void ProgDetails::loadPage(void)
     s = toString(recstatus, rectype);
 
     if (statusDate.isValid())
-        s += " " + MythDateTimeToString(statusDate, kDateFull | kAddYear);
+        s += " " + MythDate::toString(statusDate, MythDate::kDateFull | MythDate::kAddYear);
 
-    addItem("MYTHTV_STATUS", QString("MythTV " + tr("Status")), s);
+    addItem("MYTHTV_STATUS", tr("MythTV Status"), s);
 
     QString recordingRule;
     QString lastRecorded;
@@ -592,11 +592,13 @@ void ProgDetails::loadPage(void)
         if (query.exec() && query.next())
         {
             if (query.value(0).toDateTime().isValid())
-                lastRecorded = MythDateTimeToString(query.value(0).toDateTime(),
-                                                    kDateFull | kAddYear);
+                lastRecorded = MythDate::toString(
+                    MythDate::as_utc(query.value(0).toDateTime()),
+                    MythDate::kDateFull | MythDate::kAddYear);
             if (query.value(1).toDateTime().isValid())
-                nextRecording = MythDateTimeToString(query.value(1).toDateTime(),
-                                                    kDateFull | kAddYear);
+                nextRecording = MythDate::toString(
+                    MythDate::as_utc(query.value(1).toDateTime()),
+                    MythDate::kDateFull | MythDate::kAddYear);
             if (query.value(2).toInt() > 0)
                 averageTimeShift = tr("%n hour(s)", "",
                                                 query.value(2).toInt());
@@ -644,10 +646,11 @@ void ProgDetails::loadPage(void)
     s.clear();
     if (m_progInfo.GetFindID())
     {
-        QDate fdate(1970, 1, 1);
+        QDateTime fdate(QDate(1970, 1, 1),QTime(12,0,0));
         fdate = fdate.addDays((int)m_progInfo.GetFindID() - 719528);
         s = QString("%1 (%2)").arg(m_progInfo.GetFindID())
-            .arg(MythDateToString(fdate, kDateFull | kAddYear));
+            .arg(MythDate::toString(
+                     fdate, MythDate::kDateFull | MythDate::kAddYear));
     }
     addItem("FINDID", tr("Find ID"), s);
 

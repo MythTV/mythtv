@@ -3,19 +3,23 @@
 // Created     : Mar. 7, 2011
 //
 // Copyright (c) 2011 David Blain <dblain@mythtv.org>
-//                                          
-// This library is free software; you can redistribute it and/or 
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or at your option any later version of the LGPL.
 //
-// This library is distributed in the hope that it will be useful,
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
 //
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library.  If not, see <http://www.gnu.org/licenses/>.
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 //////////////////////////////////////////////////////////////////////////////
 
@@ -37,18 +41,20 @@ extern Scheduler   *sched;
 //
 /////////////////////////////////////////////////////////////////////////////
 
-DTC::ProgramGuide *Guide::GetProgramGuide( const QDateTime &dtStartTime ,
-                                           const QDateTime &dtEndTime   ,
+DTC::ProgramGuide *Guide::GetProgramGuide( const QDateTime &rawStartTime ,
+                                           const QDateTime &rawEndTime   ,
                                            int              nStartChanId,
                                            int              nNumChannels,
                                            bool             bDetails      )
 {     
-
-    if (!dtStartTime.isValid())
+    if (!rawStartTime.isValid())
         throw( "StartTime is invalid" );
 
-    if (!dtEndTime.isValid())
+    if (!rawEndTime.isValid())
         throw( "EndTime is invalid" );
+
+    QDateTime dtStartTime = rawStartTime.toUTC();
+    QDateTime dtEndTime = rawEndTime.toUTC();
 
     if (dtEndTime < dtStartTime)
         throw( "EndTime is before StartTime");
@@ -106,7 +112,7 @@ DTC::ProgramGuide *Guide::GetProgramGuide( const QDateTime &dtStartTime ,
 
     // ----------------------------------------------------------------------
 
-    LoadFromProgram( progList, sSQL, bindings, schedList, false );
+    LoadFromProgram( progList, sSQL, bindings, schedList );
 
     // ----------------------------------------------------------------------
     // Build Response
@@ -149,7 +155,7 @@ DTC::ProgramGuide *Guide::GetProgramGuide( const QDateTime &dtStartTime ,
     pGuide->setDetails      ( bDetails      );
     
     pGuide->setCount        ( progList.size());
-    pGuide->setAsOf         ( QDateTime::currentDateTime() );
+    pGuide->setAsOf         ( MythDate::current() );
     
     pGuide->setVersion      ( MYTH_BINARY_VERSION );
     pGuide->setProtoVer     ( MYTH_PROTO_VERSION  );
@@ -162,11 +168,13 @@ DTC::ProgramGuide *Guide::GetProgramGuide( const QDateTime &dtStartTime ,
 /////////////////////////////////////////////////////////////////////////////
 
 DTC::Program* Guide::GetProgramDetails( int              nChanId,
-                                        const QDateTime &dtStartTime )
+                                        const QDateTime &rawStartTime )
                                           
 {
-    if (!dtStartTime.isValid())
+    if (!rawStartTime.isValid())
         throw( "StartTime is invalid" );
+
+    QDateTime dtStartTime = rawStartTime.toUTC();
 
     // ----------------------------------------------------------------------
     // -=>TODO: Add support for getting Recorded Program Info
@@ -191,7 +199,7 @@ DTC::Program* Guide::GetProgramDetails( int              nChanId,
 
     ProgramList progList;
 
-    LoadFromProgram( progList, sSQL, bindings, schedList, false );
+    LoadFromProgram( progList, sSQL, bindings, schedList );
 
     if ( progList.size() == 0)
         throw( "Error Reading Program Info" );

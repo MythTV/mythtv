@@ -4,13 +4,13 @@
 Provides data access classes for accessing and managing MythTV data
 """
 
-from static import *
-from exceptions import *
-from altdict import DictData, DictInvertCI
-from database import *
-from system import Grabber, InternetMetadata, VideoMetadata
-from mythproto import ftopen, FileOps, Program
-from utility import CMPRecord, CMPVideo, MARKUPLIST, datetime, ParseSet
+from MythTV.static import *
+from MythTV.exceptions import *
+from MythTV.altdict import DictData, DictInvertCI
+from MythTV.database import *
+from MythTV.system import Grabber, InternetMetadata, VideoMetadata
+from MythTV.mythproto import ftopen, FileOps, Program
+from MythTV.utility import CMPRecord, CMPVideo, MARKUPLIST, datetime, ParseSet
 
 import re
 import locale
@@ -379,7 +379,7 @@ class Recorded( CMPRecord, DBDataWrite ):
 
         # pull direct matches
         for tag in ('title', 'subtitle', 'description', 'season', 'episode',
-                    'chanid', 'starttime', 'seriesid', 'programid', 'inetref',
+                    'chanid', 'seriesid', 'programid', 'inetref',
                     'recgroup', 'playgroup', 'seriesid', 'programid',
                     'storagegroup'):
             if metadata[tag] and _allow_change(self, tag, overwrite):
@@ -419,7 +419,7 @@ class Recorded( CMPRecord, DBDataWrite ):
 
         # pull direct matches
         for tag in ('title', 'subtitle', 'description', 'season', 'episode',
-                    'chanid', 'starttime', 'seriesid', 'programid', 'inetref',
+                    'chanid', 'seriesid', 'programid', 'inetref',
                     'recgroup', 'playgroup', 'seriesid', 'programid',
                     'storagegroup'):
             if self[tag]:
@@ -437,12 +437,12 @@ class Recorded( CMPRecord, DBDataWrite ):
             name = member.name
             role = ' '.join([word.capitalize() for word in member.role.split('_')])
             if role=='Writer': role = 'Author'
-            metadata.people.append({'name':name, 'job':role})
+            metadata.people.append(OrdDict((('name',name), ('job',role))))
 
-        for arttype in ['coverart', 'fanart', 'banner']:
-            art = getattr(self.artwork, arttype)
-            if art:
-                metadata.images.append({'type':arttype, 'filename':art})
+#        for arttype in ['coverart', 'fanart', 'banner']:
+#            art = getattr(self.artwork, arttype)
+#            if art:
+#                metadata.images.append(OrdDict((('type',arttype), ('filename',art))))
 
         return metadata
 
@@ -1019,11 +1019,11 @@ class Video( CMPVideo, VideoSchema, DBDataWrite ):
 
         # pull director
         if self.director:
-            metadata.people.append({'name':self.director, 'job':'Director'})
+            metadata.people.append(OrdDict((('name',self.director), ('job','Director'))))
 
         # pull actors
         for actor in self.cast:
-            metadata.people.append({'name':actor.cast, 'job':'Actor'})
+            metadata.people.append(OrdDict((('name',actor.cast), ('job','Actor'))))
 
         # pull genres
         for genre in self.genre:
@@ -1034,10 +1034,10 @@ class Video( CMPVideo, VideoSchema, DBDataWrite ):
             metadata.countries.append(country.country)
 
         # pull images
-        for arttype in ['coverart', 'fanart', 'banner', 'screenshot']:
-            art = getattr(self, arttype)
-            if art:
-                metadata.images.append({'type':arttype, 'filename':art})
+#        for arttype in ['coverart', 'fanart', 'banner', 'screenshot']:
+#            art = getattr(self, arttype)
+#            if art:
+#                metadata.images.append(OrdDict((('type',arttype), ('filename',art))))
 
         return metadata
 

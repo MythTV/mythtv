@@ -1,6 +1,6 @@
 include config.mak
 
-MAKE_SUBDIRS = external/FFmpeg
+MAKE_SUBDIRS = external
 QT_SUBDIRS   = libs filters html programs themes i18n locales
 
 ifdef CONFIG_BINDINGS_PERL
@@ -39,7 +39,7 @@ libs/libmythbase/version.h:	version.sh force
 	sh version.sh $(PWD)
 
 # explicit subdir dependencies
-libs: external/FFmpeg
+libs: external
 filters: libs
 programs: libs filters
 

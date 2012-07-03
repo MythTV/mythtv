@@ -29,7 +29,7 @@
 #define ABS(A) ( (A) > 0 ? (A) : -(A) )
 
 #ifdef MMX
-#include "libavcodec/x86/mmx.h"
+#include "ffmpeg-mmx.h"
 static const mmx_t mz = { 0x0LL };
 #endif
 
@@ -344,7 +344,7 @@ static int denoise3DFilter(VideoFilter *f, VideoFrame *frame, int field)
     TF_START;
 
 #ifdef MMX
-    if (filter->mm_flags & FF_MM_MMX)
+    if (filter->mm_flags & AV_CPU_FLAG_MMX)
         emms();
 #endif
 
@@ -366,7 +366,7 @@ static int denoise3DFilter(VideoFilter *f, VideoFrame *frame, int field)
                        filter->coefs[2] + 256,
                        filter->coefs[3] + 256);
 #ifdef MMX
-    if (filter->mm_flags & FF_MM_MMX)
+    if (filter->mm_flags & AV_CPU_FLAG_MMX)
         emms();
 #endif
 
@@ -419,7 +419,7 @@ static VideoFilter *NewDenoise3DFilter(VideoFrameType inpixfmt,
 
 #ifdef MMX
     filter->mm_flags = av_get_cpu_flags();
-    if (filter->mm_flags & FF_MM_MMX)
+    if (filter->mm_flags & AV_CPU_FLAG_MMX)
         filter->filtfunc = &denoiseMMX;
 #endif
 
@@ -471,7 +471,7 @@ static FmtConv FmtList[] =
     FMT_NULL
 };
 
-ConstFilterInfo filter_table[] =
+const FilterInfo filter_table[] =
 {
     {
         filter_init: &NewDenoise3DFilter,

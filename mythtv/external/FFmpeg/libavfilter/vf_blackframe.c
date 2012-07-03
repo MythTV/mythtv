@@ -28,12 +28,15 @@
  */
 
 #include "avfilter.h"
+#include "internal.h"
+#include "video.h"
 
 typedef struct {
     unsigned int bamount; ///< black amount
     unsigned int bthresh; ///< black threshold
     unsigned int frame;   ///< frame number
     unsigned int nblack;  ///< number of black pixels counted so far
+    unsigned int last_keyframe; ///< frame number of the last received key-frame
 } BlackFrameContext;
 
 static int query_formats(AVFilterContext *ctx)
@@ -44,7 +47,7 @@ static int query_formats(AVFilterContext *ctx)
         PIX_FMT_NONE
     };
 
-    avfilter_set_common_formats(ctx, avfilter_make_format_list(pix_fmts));
+    avfilter_set_common_pixel_formats(ctx, avfilter_make_format_list(pix_fmts));
     return 0;
 }
 
@@ -56,6 +59,7 @@ static av_cold int init(AVFilterContext *ctx, const char *args, void *opaque)
     blackframe->bthresh = 32;
     blackframe->nblack = 0;
     blackframe->frame = 0;
+    blackframe->last_keyframe = 0;
 
     if (args)
         sscanf(args, "%u:%u", &blackframe->bamount, &blackframe->bthresh);
@@ -95,14 +99,20 @@ static void end_frame(AVFilterLink *inlink)
     AVFilterBufferRef *picref = inlink->cur_buf;
     int pblack = 0;
 
+    if (picref->video->key_frame)
+        blackframe->last_keyframe = blackframe->frame;
+
     pblack = blackframe->nblack * 100 / (inlink->w * inlink->h);
     if (pblack >= blackframe->bamount)
-        av_log(ctx, AV_LOG_INFO, "frame:%u pblack:%u pos:%"PRId64" pts:%"PRId64" t:%f\n",
+        av_log(ctx, AV_LOG_INFO, "frame:%u pblack:%u pos:%"PRId64" pts:%"PRId64" t:%f "
+               "type:%c last_keyframe:%d\n",
                blackframe->frame, pblack, picref->pos, picref->pts,
-               picref->pts == AV_NOPTS_VALUE ? -1 : picref->pts * av_q2d(inlink->time_base));
+               picref->pts == AV_NOPTS_VALUE ? -1 : picref->pts * av_q2d(inlink->time_base),
+               av_get_picture_type_char(picref->video->pict_type), blackframe->last_keyframe);
 
     blackframe->frame++;
     blackframe->nblack = 0;
+    avfilter_unref_buffer(picref);
     avfilter_end_frame(inlink->dst->outputs[0]);
 }
 
@@ -115,15 +125,15 @@ AVFilter avfilter_vf_blackframe = {
 
     .query_formats = query_formats,
 
-    .inputs    = (AVFilterPad[]) {{ .name = "default",
+    .inputs    = (const AVFilterPad[]) {{ .name       = "default",
                                     .type             = AVMEDIA_TYPE_VIDEO,
                                     .draw_slice       = draw_slice,
-                                    .get_video_buffer = avfilter_null_get_video_buffer,
-                                    .start_frame      = avfilter_null_start_frame,
+                                    .get_video_buffer = ff_null_get_video_buffer,
+                                    .start_frame      = ff_null_start_frame_keep_ref,
                                     .end_frame        = end_frame, },
                                   { .name = NULL}},
 
-    .outputs   = (AVFilterPad[]) {{ .name             = "default",
+    .outputs   = (const AVFilterPad[]) {{ .name       = "default",
                                     .type             = AVMEDIA_TYPE_VIDEO },
                                   { .name = NULL}},
 };

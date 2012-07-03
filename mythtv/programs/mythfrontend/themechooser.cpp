@@ -15,7 +15,7 @@
 #include "mythdownloadmanager.h"
 #include "programtypes.h"
 #include "mythsystemevent.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 #include "mythversion.h"
 #include "mythlogging.h"
 #include "storagegroup.h"
@@ -203,7 +203,8 @@ void ThemeChooser::Load(void)
     if (QFile::exists(remoteThemesFile))
     {
         QFileInfo finfo(remoteThemesFile);
-        if (finfo.lastModified() < mythCurrentDateTime().addSecs(-600))
+        if (finfo.lastModified().toUTC() <
+            MythDate::current().addSecs(-600))
         {
             LOG(VB_GUI, LOG_INFO, LOC +
                 QString("%1 is over 10 minutes old, forcing "

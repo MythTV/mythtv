@@ -168,11 +168,11 @@ bool StereoScope::process( VisualNode *node )
     bool allZero = true;
 
 
-    if (node) 
+    if (node)
     {
         double index = 0;
         double const step = (double)SAMPLES_DEFAULT_SIZE / size.width();
-        for ( int i = 0; i < size.width(); i++) 
+        for ( int i = 0; i < size.width(); i++)
         {
             unsigned long indexTo = (unsigned long)(index + step);
             if (indexTo == (unsigned long)(index))
@@ -194,13 +194,13 @@ bool StereoScope::process( VisualNode *node )
                     if ( valL < 0. )
                         valL = 0.;
                 }
-                if (valR < 0.) 
+                if (valR < 0.)
                 {
                     valR += falloff;
                     if ( valR > 0. )
                         valR = 0.;
-                } 
-                else 
+                }
+                else
                 {
                     valR -= falloff;
                     if ( valR < 0. )
@@ -208,7 +208,7 @@ bool StereoScope::process( VisualNode *node )
                 }
             }
 #endif
-            for (unsigned long s = (unsigned long)index; s < indexTo && s < node->length; s++) 
+            for (unsigned long s = (unsigned long)index; s < indexTo && s < node->length; s++)
             {
                 double tmpL = ( ( node->left ?
                        double( node->left[s] ) : 0.) *
@@ -235,10 +235,10 @@ bool StereoScope::process( VisualNode *node )
             index = index + step;
         }
 #if RUBBERBAND
-    } 
-    else if (rubberband) 
+    }
+    else if (rubberband)
     {
-        for ( int i = 0; i < size.width(); i++) 
+        for ( int i = 0; i < size.width(); i++)
         {
             double valL = magnitudes[ i ];
             if (valL < 0) {
@@ -271,8 +271,8 @@ bool StereoScope::process( VisualNode *node )
             magnitudes[ i + size.width() ] = valR;
         }
 #endif
-    } 
-    else 
+    }
+    else
     {
         for ( int i = 0; (unsigned) i < magnitudes.size(); i++ )
             magnitudes[ i ] = 0.;
@@ -284,7 +284,7 @@ bool StereoScope::process( VisualNode *node )
 bool StereoScope::draw( QPainter *p, const QColor &back )
 {
     p->fillRect(0, 0, size.width(), size.height(), back);
-    for ( int i = 1; i < size.width(); i++ ) 
+    for ( int i = 1; i < size.width(); i++ )
     {
 #if TWOCOLOUR
     double r, g, b, per;
@@ -611,7 +611,7 @@ Spectrum::Spectrum()
     rplan = fftw_plan_dft_r2c_1d(FFTW_N, rin, (myth_fftw_complex_cast*)rout, FFTW_MEASURE);
 
     startColor = QColor(0,0,255);
-    targetColor = QColor(255,0,0); 
+    targetColor = QColor(255,0,0);
 }
 
 Spectrum::~Spectrum()
@@ -679,7 +679,7 @@ bool Spectrum::process(VisualNode *node)
     double *magnitudesp = magnitudes.data();
     double magL, magR, tmp;
 
-    if (node) 
+    if (node)
     {
         i = node->length;
         if (i > FFTW_N)
@@ -700,9 +700,9 @@ bool Spectrum::process(VisualNode *node)
 
     for (i = 0; (int)i < rects.size(); i++, w += analyzerBarWidth)
     {
-        magL = (log(sq(real(lout[index])) + sq(real(lout[FFTW_N - index]))) - 22.0) * 
+        magL = (log(sq(real(lout[index])) + sq(real(lout[FFTW_N - index]))) - 22.0) *
                scaleFactor;
-        magR = (log(sq(real(rout[index])) + sq(real(rout[FFTW_N - index]))) - 22.0) * 
+        magR = (log(sq(real(rout[index])) + sq(real(rout[FFTW_N - index]))) - 22.0) *
                scaleFactor;
 
         if (magL > size.height() / 2)
@@ -784,11 +784,11 @@ bool Spectrum::draw(QPainter *p, const QColor &back)
 
         per = clamp(per, 1.0, 0.0);
 
-        r = startColor.red() + 
+        r = startColor.red() +
             (targetColor.red() - startColor.red()) * (per * per);
-        g = startColor.green() + 
+        g = startColor.green() +
             (targetColor.green() - startColor.green()) * (per * per);
-        b = startColor.blue() + 
+        b = startColor.blue() +
             (targetColor.blue() - startColor.blue()) * (per * per);
 
         r = clamp(r, 255.0, 0.0);
@@ -848,14 +848,14 @@ void Squares::resize (const QSize &newsize) {
     size = newsize;
 }
 
-void Squares::drawRect(QPainter *p, QRect *rect, int i, int c, int w, int h) 
+void Squares::drawRect(QPainter *p, QRect *rect, int i, int c, int w, int h)
 {
     double r, g, b, per;
     int correction = (size.width() % rects.size ()) / 2;
     int x = ((i / 2) * w) + correction;
     int y;
 
-    if (i % 2 == 0) 
+    if (i % 2 == 0)
     {
         y = c - h;
         per = double(fake_height - rect->top()) / double(fake_height);
@@ -866,15 +866,15 @@ void Squares::drawRect(QPainter *p, QRect *rect, int i, int c, int w, int h)
         per = double(rect->bottom()) / double(fake_height);
     }
 
-    per = clamp(per, 1.0, 0.0);        
-    
-    r = startColor.red() + 
+    per = clamp(per, 1.0, 0.0);
+
+    r = startColor.red() +
         (targetColor.red() - startColor.red()) * (per * per);
-    g = startColor.green() + 
+    g = startColor.green() +
         (targetColor.green() - startColor.green()) * (per * per);
-    b = startColor.blue() + 
+    b = startColor.blue() +
         (targetColor.blue() - startColor.blue()) * (per * per);
-    
+
     r = clamp(r, 255.0, 0.0);
     g = clamp(g, 255.0, 0.0);
     b = clamp(b, 255.0, 0.0);
@@ -1496,7 +1496,7 @@ void AlbumArt::handleKeyPress(const QString &action)
 /// this is the time an image is shown in the albumart visualizer
 #define ALBUMARTCYCLETIME 10
 
-bool AlbumArt::needsUpdate() 
+bool AlbumArt::needsUpdate()
 {
     // if the track has changed we need to update the image
     if (gPlayer->getCurrentMetadata() && m_currentMetadata != gPlayer->getCurrentMetadata())
@@ -1536,7 +1536,7 @@ bool AlbumArt::draw(QPainter *p, const QColor &back)
         }
     }
 
-    if (m_image.isNull()) 
+    if (m_image.isNull())
     {
         drawWarning(p, back, m_size, QObject::tr("?"), 100);
         return true;
@@ -1581,7 +1581,7 @@ static class AlbumArtFactory : public VisFactory
 Blank::Blank()
     : VisualBase(true)
 {
-    m_fps = 20;
+    m_fps = 1;
 }
 
 Blank::~Blank()

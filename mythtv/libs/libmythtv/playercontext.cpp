@@ -6,8 +6,6 @@
 
 #include "playercontext.h"
 #include "mythplayer.h"
-#include "mythdvdplayer.h"
-#include "mythbdplayer.h"
 #include "remoteencoder.h"
 #include "livetvchain.h"
 #include "ringbuffer.h"
@@ -18,6 +16,8 @@
 #include "videometadatautil.h"
 #include "metadataimagehelper.h"
 #include "mythlogging.h"
+#include "DVD/mythdvdplayer.h"
+#include "Bluray/mythbdplayer.h"
 
 #define LOC QString("playCtx: ")
 
@@ -46,7 +46,7 @@ PlayerContext::PlayerContext(const QString &inUseID) :
     useNullVideo(false)
 {
     lastSignalMsgTime.start();
-    lastSignalMsgTime.addMSecs(-2 * kSMExitTimeout);
+    lastSignalMsgTime.addMSecs(-2 * (int)kSMExitTimeout);
 }
 
 PlayerContext::~PlayerContext()
@@ -87,7 +87,7 @@ void PlayerContext::SetInitialTVState(bool islivetv)
     else if (playingInfo)
     {
         int overrecordseconds = gCoreContext->GetNumSetting("RecordOverTime");
-        QDateTime curtime = QDateTime::currentDateTime();
+        QDateTime curtime = MythDate::current();
         QDateTime recendts = playingInfo->GetRecordingEndTime()
             .addSecs(overrecordseconds);
 
@@ -374,8 +374,6 @@ bool PlayerContext::CreatePlayer(TV *tv, QWidget *widget,
                                  bool embed, const QRect &embedbounds,
                                  bool muted)
 {
-    int exact_seeking = gCoreContext->GetNumSetting("ExactSeeking", 0);
-
     if (HasPlayer())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
@@ -400,7 +398,7 @@ bool PlayerContext::CreatePlayer(TV *tv, QWidget *widget,
         gCoreContext->GetNumSetting("PassThruDeviceOverride", false) ?
         gCoreContext->GetSetting("PassThruOutputDevice") : QString::null;
 
-    player->SetPlayerInfo(tv, widget, exact_seeking, this);
+    player->SetPlayerInfo(tv, widget, this);
     AudioPlayer *audio = player->GetAudio();
     audio->SetAudioInfo(gCoreContext->GetSetting("AudioOutputDevice"),
                         passthru_device,
@@ -893,8 +891,8 @@ void PlayerContext::SetPseudoLiveTV(
         new_rec = new ProgramInfo(*pi);
         QString msg = QString("Wants to record: %1 %2 %3 %4")
             .arg(new_rec->GetTitle()).arg(new_rec->GetChanNum())
-            .arg(new_rec->GetRecordingStartTime(ISODate))
-            .arg(new_rec->GetRecordingEndTime(ISODate));
+            .arg(new_rec->GetRecordingStartTime(MythDate::ISODate))
+            .arg(new_rec->GetRecordingEndTime(MythDate::ISODate));
         LOG(VB_PLAYBACK, LOG_INFO, LOC + msg);
     }
 
@@ -905,8 +903,8 @@ void PlayerContext::SetPseudoLiveTV(
     {
         QString msg = QString("Done recording: %1 %2 %3 %4")
             .arg(old_rec->GetTitle()).arg(old_rec->GetChanNum())
-            .arg(old_rec->GetRecordingStartTime(ISODate))
-            .arg(old_rec->GetRecordingEndTime(ISODate));
+            .arg(old_rec->GetRecordingStartTime(MythDate::ISODate))
+            .arg(old_rec->GetRecordingEndTime(MythDate::ISODate));
         LOG(VB_PLAYBACK, LOG_INFO, LOC + msg);
         delete old_rec;
     }

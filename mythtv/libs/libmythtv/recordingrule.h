@@ -5,6 +5,7 @@
 #include <QDateTime>
 #include <QDate>
 #include <QTime>
+#include <QStringList>
 
 // libmythbase
 #include "mythtvexp.h"
@@ -35,14 +36,16 @@ class MTV_PUBLIC RecordingRule
     RecordingRule();
    ~RecordingRule() {};
 
-    bool Load(void);
+    bool Load(bool asTemplate = false);
     bool LoadByProgram(const ProgramInfo* proginfo);
     bool LoadBySearch(RecSearchType lsearch, QString textname, QString forwhat,
                       QString from = "");
+    bool LoadTemplate(QString category, QString categoryType = "Default");
 
     bool ModifyPowerSearchByID(int rid, QString textname, QString forwhat,
                                QString from = "");
     bool MakeOverride(void);
+    bool MakeTemplate(QString category);
 
     bool Save(bool sendSig = true);
     bool Delete(bool sendSig = true);
@@ -57,6 +60,7 @@ class MTV_PUBLIC RecordingRule
         { return m_autoExpire ? kNormalAutoExpire : kDisableAutoExpire; }
 
     static QString SearchTypeToString(const RecSearchType searchType);
+    static QStringList GetTemplateNames(void);
 
     int m_recordID; /// Unique Recording Rule ID
     int m_parentRecID;
@@ -134,9 +138,16 @@ class MTV_PUBLIC RecordingRule
     // different options for override rules
     bool m_isOverride;
 
+    // Is this a template rule?  Purely for the benefit of the UI, we
+    // display all options for template rules
+    bool m_isTemplate;
+
   private:
     // Populate variables from a ProgramInfo object
     void AssignProgramInfo();
+
+    // Name of template used for new rule.
+    QString m_template;
 
     // Pointer for ProgramInfo, exists only if we loaded from ProgramInfo in
     // the first place

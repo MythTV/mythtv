@@ -17,7 +17,7 @@
 extern "C" {
 #include "libavcodec/avcodec.h"
 }
-#include "mythmiscutil.h"
+#include "mythdate.h"
 
 #ifdef USING_DVB
 #   include "dvbsignalmonitor.h"
@@ -75,12 +75,6 @@ extern "C" {
         HDHRSignalMonitor, SignalMonitorValue
  */
 
-static void ALRMhandler(int /*sig*/)
-{
-     LOG(VB_GENERAL, LOG_NOTICE, "SignalMonitor: Got SIGALRM");
-     signal(SIGINT, ALRMhandler);
-}
-
 SignalMonitor *SignalMonitor::Init(QString cardtype, int db_cardnum,
                                    ChannelBase *channel)
 {
@@ -92,7 +86,9 @@ SignalMonitor *SignalMonitor::Init(QString cardtype, int db_cardnum,
 
     {
         QMutexLocker locker(avcodeclock);
-        avcodec_init();
+#if 0
+        avcodec_register_all();
+#endif
     }
 
 #ifdef USING_DVB

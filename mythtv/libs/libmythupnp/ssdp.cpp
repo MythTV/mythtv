@@ -122,7 +122,10 @@ SSDP::~SSDP()
     wait();
 
     if (m_pNotifyTask != NULL)
-        m_pNotifyTask->Release();
+    {
+        m_pNotifyTask->DecrRef();
+        m_pNotifyTask = NULL;
+    }
 
     for (int nIdx = 0; nIdx < (int)NumberOfSockets; nIdx++ )
     {
@@ -153,12 +156,6 @@ void SSDP::EnableNotifications( int nServicePort )
         LOG(VB_UPNP, LOG_INFO,
             "SSDP::EnableNotifications() - creating new task");
         m_pNotifyTask = new UPnpNotifyTask( m_nServicePort ); 
-
-        // ------------------------------------------------------------------
-        // Let's make sure to hold on to a reference of the NotifyTask.
-        // ------------------------------------------------------------------
-
-        m_pNotifyTask->AddRef();
 
         // ------------------------------------------------------------------
         // First Send out Notification that we are leaving the network.
@@ -505,6 +502,8 @@ bool SSDP::ProcessSearchRequest( const QStringMap &sHeaders,
 
         TaskQueue::Instance()->AddTask( nNewMX, pTask );
 
+        pTask->DecrRef();
+
         return true;
     }
 
@@ -528,6 +527,8 @@ bool SSDP::ProcessSearchRequest( const QStringMap &sHeaders,
         pTask->Execute( NULL );
 
         TaskQueue::Instance()->AddTask( nNewMX, pTask );
+
+        pTask->DecrRef();
 
         return true;
     }

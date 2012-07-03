@@ -46,8 +46,9 @@ SOURCES += service.cpp
 INCLUDEPATH += ./datacontracts
 INCLUDEPATH += ./services
 
-# needed only for enums
-INCLUDEPATH += ../libmyth
+# needed only for enums in programtypes.h, recordingtypes.h
+DEPENDPATH += ../libmyth
+INCLUDEPATH += $$DEPENDPATH
 
 LIBS += $$EXTRA_LIBS
 

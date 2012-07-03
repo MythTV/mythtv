@@ -33,14 +33,13 @@
 #include "dsputil.h"
 #include "libavutil/lfg.h"
 
-#undef exit
 #undef printf
 
 #define WIDTH 64
 #define HEIGHT 64
 
-uint8_t img1[WIDTH * HEIGHT];
-uint8_t img2[WIDTH * HEIGHT];
+static uint8_t img1[WIDTH * HEIGHT];
+static uint8_t img2[WIDTH * HEIGHT];
 
 static void fill_random(uint8_t *tab, int size)
 {
@@ -49,11 +48,7 @@ static void fill_random(uint8_t *tab, int size)
 
     av_lfg_init(&prng, 1);
     for(i=0;i<size;i++) {
-#if 1
         tab[i] = av_lfg_get(&prng) % 256;
-#else
-        tab[i] = i;
-#endif
     }
 }
 
@@ -61,7 +56,6 @@ static void help(void)
 {
     printf("motion-test [-h]\n"
            "test motion implementations\n");
-    exit(1);
 }
 
 static int64_t gettime(void)
@@ -138,19 +132,19 @@ int main(int argc, char **argv)
         switch(c) {
         case 'h':
             help();
-            break;
+            return 1;
         }
     }
 
     printf("ffmpeg motion test\n");
 
-    ctx = avcodec_alloc_context();
+    ctx = avcodec_alloc_context3(NULL);
     ctx->dsp_mask = AV_CPU_FLAG_FORCE;
-    dsputil_init(&cctx, ctx);
+    ff_dsputil_init(&cctx, ctx);
     for (c = 0; c < flags_size; c++) {
         int x;
         ctx->dsp_mask = AV_CPU_FLAG_FORCE | flags[c];
-        dsputil_init(&mmxctx, ctx);
+        ff_dsputil_init(&mmxctx, ctx);
 
         for (x = 0; x < 2; x++) {
             printf("%s for %dx%d pixels\n", c ? "mmx2" : "mmx",

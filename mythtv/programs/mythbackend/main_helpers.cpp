@@ -36,6 +36,7 @@
 #include "mythcontext.h"
 #include "mythversion.h"
 #include "mythdb.h"
+#include "dbutil.h"
 #include "exitcodes.h"
 #include "compat.h"
 #include "storagegroup.h"
@@ -48,6 +49,7 @@
 #include "main_helpers.h"
 #include "backendcontext.h"
 #include "mythtranslation.h"
+#include "mythtimezone.h"
 
 #include "mediaserver.h"
 #include "httpstatus.h"
@@ -216,11 +218,6 @@ bool setupTVs(bool ismaster, bool &error)
 
 void cleanup(void)
 {
-    signal(SIGTERM, SIG_DFL);
-#ifndef _MSC_VER
-    signal(SIGUSR1, SIG_DFL);
-#endif
-
     if (mainServer)
         mainServer->Stop();
 
@@ -419,6 +416,7 @@ int handle_command(const MythBackendCommandLineParser &cmdline)
     // This should never actually be reached..
     return GENERIC_EXIT_OK;
 }
+using namespace MythTZ;
 
 int connect_to_master(void)
 {
@@ -442,7 +440,7 @@ int connect_to_master(void)
         if (tempMonitorAnnounce.empty() ||
             tempMonitorAnnounce[0] == "ERROR")
         {
-            tempMonitorConnection->DownRef();
+            tempMonitorConnection->DecrRef();
             tempMonitorConnection = NULL;
             if (tempMonitorAnnounce.empty())
             {
@@ -459,38 +457,43 @@ int connect_to_master(void)
             }
         }
 
-        QStringList tzCheck("QUERY_TIME_ZONE");
+        QStringList timeCheck;
         if (tempMonitorConnection)
         {
-            tempMonitorConnection->writeStringList(tzCheck);
-            tempMonitorConnection->readStringList(tzCheck);
+            timeCheck.push_back("QUERY_TIME_ZONE");
+            tempMonitorConnection->writeStringList(timeCheck);
+            tempMonitorConnection->readStringList(timeCheck);
         }
-        if (tzCheck.size() && !checkTimeZone(tzCheck))
+        if (timeCheck.size() < 3)
         {
-            // Check for different time zones, different offsets, different
-            // times
-            LOG(VB_GENERAL, LOG_ERR, "The time and/or time zone settings on "
-                    "this system do not match those in use on the master "
-                    "backend. Please ensure all frontend and backend "
-                    "systems are configured to use the same time zone and "
-                    "have the current time properly set.");
+            return GENERIC_EXIT_SOCKET_ERROR;
+        }
+        tempMonitorConnection->writeStringList(tempMonitorDone);
+
+        QDateTime our_time = MythDate::current();
+        QDateTime master_time = MythDate::fromString(timeCheck[2]);
+        int timediff = abs(our_time.secsTo(master_time));
+
+        if (timediff > 300)
+        {
             LOG(VB_GENERAL, LOG_ERR,
-                    "Unable to run with invalid time settings. Exiting.");
-            tempMonitorConnection->writeStringList(tempMonitorDone);
-            tempMonitorConnection->DownRef();
-            return GENERIC_EXIT_INVALID_TIMEZONE;
+                QString("Current time on the master backend differs by "
+                        "%1 seconds from time on this system. Exiting.")
+                .arg(timediff));
+            tempMonitorConnection->DecrRef();
+            return GENERIC_EXIT_INVALID_TIME;
         }
-        else
+
+        if (timediff > 20)
         {
-            LOG(VB_GENERAL, LOG_INFO,
-                QString("Backend is running in %1 time zone.")
-                    .arg(getTimeZoneID()));
+            LOG(VB_GENERAL, LOG_WARNING,
+                    QString("Time difference between the master "
+                            "backend and this system is %1 seconds.")
+                .arg(timediff));
         }
-        if (tempMonitorConnection)
-            tempMonitorConnection->writeStringList(tempMonitorDone);
     }
     if (tempMonitorConnection)
-        tempMonitorConnection->DownRef();
+        tempMonitorConnection->DecrRef();
 
     return GENERIC_EXIT_OK;
 }
@@ -526,6 +529,13 @@ void print_warnings(const MythBackendCommandLineParser &cmdline)
 
 int run_backend(MythBackendCommandLineParser &cmdline)
 {
+    if (!DBUtil::CheckTimeZoneSupport())
+    {
+        LOG(VB_GENERAL, LOG_ERR, "MySQL time zone support is missing.  "
+            "Please install it and try again.");
+        return GENERIC_EXIT_DB_NOTIMEZONE;
+    }
+
     bool ismaster = gCoreContext->IsMasterHost();
 
     if (!UpgradeTVDatabaseSchema(ismaster, ismaster))

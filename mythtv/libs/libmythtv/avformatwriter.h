@@ -49,6 +49,8 @@ class MTV_PUBLIC AVFormatWriter : public FileWriterBase
     AVFrame               *m_picture;
     AVFrame               *m_tmpPicture;
     AVPacket              *m_pkt;
+    AVFrame               *m_audPicture;
+    AVPacket              *m_audPkt;
     unsigned char         *m_videoOutBuf;
     int                    m_videoOutBufSize;
     unsigned int          *m_audioSamples;

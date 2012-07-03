@@ -24,6 +24,7 @@
  */
 
 #include "avfilter.h"
+#include "video.h"
 
 typedef struct BufPic {
     AVFilterBufferRef *picref;
@@ -76,7 +77,7 @@ static int request_frame(AVFilterLink *outlink)
     int ret;
 
     if (!fifo->root.next) {
-        if ((ret = avfilter_request_frame(outlink->src->inputs[0]) < 0))
+        if ((ret = avfilter_request_frame(outlink->src->inputs[0])) < 0)
             return ret;
     }
 
@@ -104,15 +105,15 @@ AVFilter avfilter_vf_fifo = {
 
     .priv_size = sizeof(FifoContext),
 
-    .inputs    = (AVFilterPad[]) {{ .name            = "default",
+    .inputs    = (const AVFilterPad[]) {{ .name      = "default",
                                     .type            = AVMEDIA_TYPE_VIDEO,
-                                    .get_video_buffer= avfilter_null_get_video_buffer,
+                                    .get_video_buffer= ff_null_get_video_buffer,
                                     .start_frame     = start_frame,
                                     .draw_slice      = draw_slice,
                                     .end_frame       = end_frame,
                                     .rej_perms       = AV_PERM_REUSE2, },
                                   { .name = NULL}},
-    .outputs   = (AVFilterPad[]) {{ .name            = "default",
+    .outputs   = (const AVFilterPad[]) {{ .name      = "default",
                                     .type            = AVMEDIA_TYPE_VIDEO,
                                     .request_frame   = request_frame, },
                                   { .name = NULL}},

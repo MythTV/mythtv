@@ -13,7 +13,7 @@
 #include "programinfo.h"
 #include "mythtvexp.h"
 #include "mthread.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 
 class PreviewGenerator;
 class QByteArray;

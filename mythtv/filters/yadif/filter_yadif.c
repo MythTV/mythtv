@@ -45,7 +45,7 @@
 
 #include "../mm_arch.h"
 #if HAVE_MMX
-#include "libavcodec/x86/mmx.h"
+#include "ffmpeg-mmx.h"
 #endif
 
 #include "aclib.h"
@@ -625,18 +625,18 @@ static VideoFilter * YadifDeintFilter(VideoFrameType inpixfmt,
 
     filter->filter_line = filter_line_c;
 #if HAVE_MMX
-    if (filter->mm_flags & FF_MM_MMX)
+    if (filter->mm_flags & AV_CPU_FLAG_MMX)
     {
         filter->filter_line = filter_line_mmx2;
     }
 
-    if (filter->mm_flags & FF_MM_SSE2)
+    if (filter->mm_flags & AV_CPU_FLAG_SSE2)
         fast_memcpy=fast_memcpy_SSE;
-    else if (filter->mm_flags & FF_MM_MMXEXT)
+    else if (filter->mm_flags & AV_CPU_FLAG_MMX2)
         fast_memcpy=fast_memcpy_MMX2;
-    else if (filter->mm_flags & FF_MM_3DNOW)
+    else if (filter->mm_flags & AV_CPU_FLAG_3DNOW)
         fast_memcpy=fast_memcpy_3DNow;
-    else if (filter->mm_flags & FF_MM_MMX)
+    else if (filter->mm_flags & AV_CPU_FLAG_MMX)
         fast_memcpy=fast_memcpy_MMX;
     else
 #endif
@@ -720,7 +720,7 @@ static FmtConv FmtList[] =
     FMT_NULL
 };
 
-ConstFilterInfo filter_table[] =
+const FilterInfo filter_table[] =
 {
     {
             filter_init: &YadifDeintFilter,
@@ -735,7 +735,8 @@ ConstFilterInfo filter_table[] =
             descript:   "combines data from several fields to deinterlace with less motion blur",
             formats:    FmtList,
             libname:    NULL
-    },FILT_NULL
+    },
+    FILT_NULL
 };
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

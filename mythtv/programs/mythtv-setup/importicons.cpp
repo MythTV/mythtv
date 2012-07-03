@@ -9,7 +9,7 @@
 #include "mythlogging.h"
 #include "httpcomms.h"
 #include "importicons.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 
 // MythUI
 #include "mythuitext.h"
@@ -164,7 +164,7 @@ void ImportIconsWizard::manualSearch()
     if (!search(escape_csv(str)))
         m_statusText->SetText(tr("No matches found for %1") .arg(str));
     else
-        m_statusText->SetText("");
+        m_statusText->Reset();
 }
 
 void ImportIconsWizard::skip()
@@ -207,14 +207,12 @@ void ImportIconsWizard::menuSelection(MythUIButtonListItem *item)
 
     if (checkAndDownload(entry.strLogo, entry2.strChanId))
     {
-        if (m_statusText)
-            m_statusText->SetText(tr("Icon for %1 was downloaded successfully.")
+        m_statusText->SetText(tr("Icon for %1 was downloaded successfully.")
                                     .arg(entry2.strName));
     }
     else
     {
-        if (m_statusText)
-            m_statusText->SetText(tr("Failed to download the icon for %1.")
+        m_statusText->SetText(tr("Failed to download the icon for %1.")
                                     .arg(entry2.strName));
     }
 
@@ -251,7 +249,7 @@ void ImportIconsWizard::itemChanged(MythUIButtonListItem *item)
     if (m_preview)
     {
         m_preview->Reset();
-        QString iconpath = item->GetImage("icon");
+        QString iconpath = item->GetImageFilename("icon");
         if (!iconpath.isEmpty())
         {
             m_preview->SetFilename(iconpath);
@@ -371,8 +369,9 @@ bool ImportIconsWizard::initialLoad(QString name)
 
     m_iter = m_listEntries.begin();
 
-    m_progressDialog = new MythUIProgressDialog(tr("Downloading, please wait..."),
-                                                m_popupStack, "IconImportInitProgress");
+    m_progressDialog = new MythUIProgressDialog(
+        tr("Downloading, please wait..."), m_popupStack,
+           "IconImportInitProgress");
 
     if (m_progressDialog->Create())
     {
@@ -387,10 +386,21 @@ bool ImportIconsWizard::initialLoad(QString name)
 
     while (!closeDialog && (m_iter != m_listEntries.end()))
     {
-        QString message = QString("Downloading %1 / %2 : ").arg(m_nCount+1)
-            .arg(m_listEntries.size()) + (*m_iter).strName;
+        /*: %1 is the current channel position,
+         *  %2 is the total number of channels,
+         *  %3 is the channel name
+         */
+        QString message = QString(tr("Downloading %1 / %2 : %3"))
+            .arg(m_nCount+1)
+            .arg(m_listEntries.size())
+            .arg((*m_iter).strName);
+
         if (m_missingEntries.size() > 0)
-            message.append(QString("\nCould not find %1 icons.").arg(m_missingEntries.size()));
+        {
+            message.append("\n");
+            message.append(tr("Could not find %n icon(s).", "", 
+                              m_missingEntries.size()));
+        }
 
         if (!findmissing((*m_iter).strIconCSV))
         {
@@ -450,7 +460,7 @@ bool ImportIconsWizard::doLoad()
         m_statusText->SetText(tr("No matches found for %1")
                               .arg((*m_missingIter).strName));
     else
-        m_statusText->SetText("");
+        m_statusText->Reset();
 
     return true;
 }
@@ -725,7 +735,7 @@ void ImportIconsWizard::askSubmit(const QString& strParam)
 {
     m_strParam = strParam;
     QString message = tr("You now have the opportunity to transmit your "
-                         "choices  back to mythtv.org so that others can "
+                         "choices back to mythtv.org so that others can "
                          "benefit from your selections.");
 
     MythConfirmationDialog *confirmPopup =
@@ -747,8 +757,7 @@ bool ImportIconsWizard::submit()
         str.startsWith("Error", Qt::CaseInsensitive))
     {
         LOG(VB_GENERAL, LOG_ERR, QString("Error from submit : %1").arg(str));
-        if (m_statusText)
-            m_statusText->SetText(tr("Failed to submit icon choices."));
+        m_statusText->SetText(tr("Failed to submit icon choices."));
         return false;
     }
     else
@@ -783,8 +792,7 @@ bool ImportIconsWizard::submit()
             QString("Icon Import: working submit : atsc=%1 callsign=%2 "
                     "dvb=%3 tv=%4 xmltvid=%5")
                 .arg(atsc).arg(callsign).arg(dvb).arg(tv).arg(xmltvid));
-        if (m_statusText)
-            m_statusText->SetText(tr("Icon choices submitted successfully."));
+        m_statusText->SetText(tr("Icon choices submitted successfully."));
         return true;
     }
 }

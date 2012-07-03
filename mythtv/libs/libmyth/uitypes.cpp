@@ -16,7 +16,7 @@ using namespace std;
 #include "mythdialogs.h"
 #include "mythcontext.h"
 #include "lcddevice.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 
 #include "mythfontproperties.h"
 #include "mythuihelper.h"

@@ -38,13 +38,16 @@ static int query_formats(AVFilterContext *ctx)
 {
     static const enum PixelFormat pix_fmts[] = {
         PIX_FMT_RGB48BE,      PIX_FMT_RGB48LE,
+        PIX_FMT_BGR48BE,      PIX_FMT_BGR48LE,
         PIX_FMT_ARGB,         PIX_FMT_RGBA,
         PIX_FMT_ABGR,         PIX_FMT_BGRA,
         PIX_FMT_RGB24,        PIX_FMT_BGR24,
         PIX_FMT_RGB565BE,     PIX_FMT_RGB565LE,
         PIX_FMT_RGB555BE,     PIX_FMT_RGB555LE,
+        PIX_FMT_RGB444BE,     PIX_FMT_RGB444LE,
         PIX_FMT_BGR565BE,     PIX_FMT_BGR565LE,
         PIX_FMT_BGR555BE,     PIX_FMT_BGR555LE,
+        PIX_FMT_BGR444BE,     PIX_FMT_BGR444LE,
         PIX_FMT_GRAY16BE,     PIX_FMT_GRAY16LE,
         PIX_FMT_YUV420P16LE,  PIX_FMT_YUV420P16BE,
         PIX_FMT_YUV422P16LE,  PIX_FMT_YUV422P16BE,
@@ -61,7 +64,7 @@ static int query_formats(AVFilterContext *ctx)
         PIX_FMT_NONE
     };
 
-    avfilter_set_common_formats(ctx, avfilter_make_format_list(pix_fmts));
+    avfilter_set_common_pixel_formats(ctx, avfilter_make_format_list(pix_fmts));
     return 0;
 }
 
@@ -75,6 +78,21 @@ static int config_props(AVFilterLink *inlink)
     flip->vsub = av_pix_fmt_descriptors[inlink->format].log2_chroma_h;
 
     return 0;
+}
+
+static void start_frame(AVFilterLink *inlink, AVFilterBufferRef *picref)
+{
+    AVFilterLink *outlink = inlink->dst->outputs[0];
+
+    outlink->out_buf =
+        avfilter_get_video_buffer(outlink, AV_PERM_WRITE, outlink->w, outlink->h);
+    avfilter_copy_buffer_ref_props(outlink->out_buf, picref);
+
+    /* copy palette if required */
+    if (av_pix_fmt_descriptors[inlink->format].flags & PIX_FMT_PAL)
+        memcpy(inlink->dst->outputs[0]->out_buf->data[1], picref->data[1], AVPALETTE_SIZE);
+
+    avfilter_start_frame(outlink, avfilter_ref_buffer(outlink->out_buf, ~0));
 }
 
 static void draw_slice(AVFilterLink *inlink, int y, int h, int slice_dir)
@@ -95,10 +113,8 @@ static void draw_slice(AVFilterLink *inlink, int y, int h, int slice_dir)
         for (i = 0; i < h>>vsub; i++) {
             switch (step) {
             case 1:
-            {
                 for (j = 0; j < (inlink->w >> hsub); j++)
                     outrow[j] = inrow[-j];
-            }
             break;
 
             case 2:
@@ -149,13 +165,14 @@ AVFilter avfilter_vf_hflip = {
     .priv_size = sizeof(FlipContext),
     .query_formats = query_formats,
 
-    .inputs    = (AVFilterPad[]) {{ .name            = "default",
+    .inputs    = (const AVFilterPad[]) {{ .name      = "default",
                                     .type            = AVMEDIA_TYPE_VIDEO,
+                                    .start_frame     = start_frame,
                                     .draw_slice      = draw_slice,
                                     .config_props    = config_props,
                                     .min_perms       = AV_PERM_READ, },
                                   { .name = NULL}},
-    .outputs   = (AVFilterPad[]) {{ .name            = "default",
+    .outputs   = (const AVFilterPad[]) {{ .name      = "default",
                                     .type            = AVMEDIA_TYPE_VIDEO, },
                                   { .name = NULL}},
 };

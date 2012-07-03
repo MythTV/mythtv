@@ -532,6 +532,12 @@ MythSystemWindows::~MythSystemWindows(void)
 {
 }
 
+bool MythSystemWindows::ParseShell(const QString cmd, QString &abscmd,
+                                   QStringList &args)
+{
+    return false;
+}
+
 void MythSystemWindows::Term(bool force)
 {
     if( (GetStatus() != GENERIC_EXIT_RUNNING) || (!m_child) )

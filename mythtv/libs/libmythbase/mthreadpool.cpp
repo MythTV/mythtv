@@ -96,7 +96,8 @@ class MPoolThread : public MThread
             loggingRegisterThread(objectName());
 
             GetMythDB()->GetDBManager()->PurgeIdleConnections(false);
-            QCoreApplication::processEvents();
+            qApp->processEvents();
+            qApp->sendPostedEvents(NULL, QEvent::DeferredDelete);
 
             t.start();
 

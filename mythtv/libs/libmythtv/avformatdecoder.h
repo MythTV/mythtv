@@ -176,6 +176,7 @@ class AvFormatDecoder : public DecoderBase
     virtual bool SetVideoByComponentTag(int tag);
 
     // Stream language info
+    virtual int GetTeletextLanguage(uint lang_idx) const;
     virtual int GetSubtitleLanguage(uint subtitle_index, uint stream_index);
     virtual int GetCaptionLanguage(TrackTypes trackType, int service_num);
     virtual int GetAudioLanguage(uint audio_index, uint stream_index);
@@ -255,6 +256,8 @@ class AvFormatDecoder : public DecoderBase
     virtual void StreamChangeCheck(void) { }
     virtual void PostProcessTracks(void) { }
 
+    int DecodeAudio(AVCodecContext *ctx, uint8_t *buffer, int &data_size,
+                    AVPacket *pkt);
     PrivateDecoder *private_dec;
 
     bool is_db_ignored;
@@ -262,7 +265,7 @@ class AvFormatDecoder : public DecoderBase
     H264Parser *m_h264_parser;
 
     AVFormatContext *ic;
-    AVFormatParameters params;
+    // AVFormatParameters params;
 
     URLContext readcontext;
 
@@ -346,7 +349,7 @@ class AvFormatDecoder : public DecoderBase
     InteractiveTV    *itv;                ///< MHEG/MHP decoder
 
     // Audio
-    short int        *audioSamples;
+    uint8_t          *audioSamples;
     bool              disable_passthru;
 
     AudioInfo         audioIn;

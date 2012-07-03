@@ -61,13 +61,13 @@ bool DeleteMap::Redo(void)
 QString DeleteMap::GetUndoMessage(void) const
 {
     return (HasUndo() ? m_undoStack[m_undoStackPointer].message :
-            QObject::tr("(Nothing to undo)"));
+            tr("(Nothing to undo)"));
 }
 
 QString DeleteMap::GetRedoMessage(void) const
 {
     return (HasRedo() ? m_undoStack[m_undoStackPointer + 1].message :
-            QObject::tr("(Nothing to redo)"));
+            tr("(Nothing to redo)"));
 }
 
 bool DeleteMap::HandleAction(QString &action, uint64_t frame,
@@ -79,7 +79,7 @@ bool DeleteMap::HandleAction(QString &action, uint64_t frame,
     else if (action == ACTION_DOWN)
         UpdateSeekAmount(-1, rate);
     else if (action == ACTION_CLEARMAP)
-        Clear(QObject::tr("Clear Cuts"));
+        Clear(tr("Clear Cuts"));
     else if (action == ACTION_INVERTMAP)
         ReverseAll(total);
     else if (action == "MOVEPREV")
@@ -87,10 +87,10 @@ bool DeleteMap::HandleAction(QString &action, uint64_t frame,
     else if (action == "MOVENEXT")
         MoveRelative(frame, total, true);
     else if (action == "CUTTOBEGINNING")
-        Add(frame, total, MARK_CUT_END, QObject::tr("Cut to Beginning"));
+        Add(frame, total, MARK_CUT_END, tr("Cut to Beginning"));
     else if (action == "CUTTOEND")
     {
-        Add(frame, total, MARK_CUT_START, QObject::tr("Cut to End"));
+        Add(frame, total, MARK_CUT_START, tr("Cut to End"));
         // If the recording is still in progress, add an explicit end
         // mark at the end.
         if (m_ctx->player && m_ctx->player->IsWatchingInprogress())
@@ -99,7 +99,8 @@ bool DeleteMap::HandleAction(QString &action, uint64_t frame,
     else if (action == "NEWCUT")
         NewCut(frame, total);
     else if (action == "DELETE")
-        Delete(frame, total, QObject::tr("Delete"));
+        //: Delete the current cut or preserved region
+        Delete(frame, total, tr("Delete"));
     else if (action == "UNDO")
         Undo();
     else if (action == "REDO")
@@ -120,21 +121,37 @@ void DeleteMap::UpdateSeekAmount(int change, double framerate)
     m_seekText = "";
     switch (m_seekamountpos)
     {
-        case 0: m_seekText = QObject::tr("cut point"); m_seekamount = -2; break;
-        case 1: m_seekText = QObject::tr("keyframe"); m_seekamount = -1; break;
-        case 2: m_seekText = QObject::tr("1 frame"); m_seekamount = 1; break;
-        case 3: m_seekText = QObject::tr("0.5 seconds"); m_seekamount = (int)roundf(framerate / 2); break;
-        case 4: m_seekText = QObject::tr("%n second(s)", "", 1); m_seekamount = (int)roundf(framerate); break;
-        case 5: m_seekText = QObject::tr("%n second(s)", "", 5); m_seekamount = (int)roundf(framerate * 5); break;
-        case 6: m_seekText = QObject::tr("%n second(s)", "", 20); m_seekamount = (int)roundf(framerate * 20); break;
-        case 7: m_seekText = QObject::tr("%n minute(s)", "", 1); m_seekamount = (int)roundf(framerate * 60); break;
-        case 8: m_seekText = QObject::tr("%n minute(s)", "", 5); m_seekamount = (int)roundf(framerate * 300); break;
-        case 9: m_seekText = QObject::tr("%n minute(s)", "", 10); m_seekamount = (int)roundf(framerate * 600); break;
-        default: m_seekText = QObject::tr("error"); m_seekamount = (int)roundf(framerate); break;
+        case 0: m_seekText = tr("cut point"); m_seekamount = -2; break;
+        case 1: m_seekText = tr("keyframe"); m_seekamount = -1; break;
+        case 2: m_seekText = tr("1 frame"); m_seekamount = 1; break;
+        case 3: m_seekText = tr("0.5 seconds"); m_seekamount = (int)roundf(framerate / 2); break;
+        case 4: m_seekText = tr("%n second(s)", "", 1); m_seekamount = (int)roundf(framerate); break;
+        case 5: m_seekText = tr("%n second(s)", "", 5); m_seekamount = (int)roundf(framerate * 5); break;
+        case 6: m_seekText = tr("%n second(s)", "", 20); m_seekamount = (int)roundf(framerate * 20); break;
+        case 7: m_seekText = tr("%n minute(s)", "", 1); m_seekamount = (int)roundf(framerate * 60); break;
+        case 8: m_seekText = tr("%n minute(s)", "", 5); m_seekamount = (int)roundf(framerate * 300); break;
+        case 9: m_seekText = tr("%n minute(s)", "", 10); m_seekamount = (int)roundf(framerate * 600); break;
+        default: m_seekText = tr("error"); m_seekamount = (int)roundf(framerate); break;
     }
 }
 
-/**
+static QString createTimeString(uint64_t frame, uint64_t total,
+                                double frame_rate, bool full_resolution)
+{
+    int secs   = (int)(frame / frame_rate);
+    int frames = frame - (int)(secs * frame_rate);
+    int totalSecs = (int)(total / frame_rate);
+    QString timestr;
+    if (totalSecs >= 3600)
+        timestr = QString::number(secs / 3600) + ":";
+    timestr += QString("%1").arg((secs / 60) % 60, 2, 10, QChar(48)) +
+        QString(":%1").arg(secs % 60, 2, 10, QChar(48));
+    if (full_resolution)
+        timestr += QString(".%1").arg(frames, 2, 10, QChar(48));
+    return timestr;
+}
+
+ /**
  * \brief Show and update the edit mode On Screen Display. The cut regions
  *        are only refreshed if the deleteMap has been updated.
  */
@@ -152,22 +169,26 @@ void DeleteMap::UpdateOSD(uint64_t frame, uint64_t total, double frame_rate,
     infoMap.detach();
     m_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
 
-    int secs   = (int)(frame / frame_rate);
-    int frames = frame - (int)(secs * frame_rate);
-    QString timestr = QString::number(secs / 3600) +
-                      QString(":%1").arg((secs / 60) % 60, 2, 10, QChar(48)) +
-                      QString(":%1").arg(secs % 60, 2, 10, QChar(48)) +
-                      QString(".%1").arg(frames, 2, 10, QChar(48));
-
     QString cutmarker = " ";
     if (IsInDelete(frame))
-        cutmarker = QObject::tr("cut");
+        cutmarker = tr("cut");
 
+    QString timestr = createTimeString(frame, total, frame_rate, true);
+    uint64_t relTotal = TranslatePositionAbsToRel(total);
+    QString relTimeDisplay = createTimeString(TranslatePositionAbsToRel(frame),
+                                              relTotal, frame_rate, false);
+    QString relLengthDisplay = createTimeString(relTotal,
+                                                relTotal, frame_rate, false);
     infoMap["timedisplay"]  = timestr;
     infoMap["framedisplay"] = QString::number(frame);
     infoMap["cutindicator"] = cutmarker;
-    infoMap["title"]        = QObject::tr("Edit");
+    infoMap["title"]        = tr("Edit");
     infoMap["seekamount"]   = m_seekText;;
+    infoMap["reltimedisplay"] = relTimeDisplay;
+    infoMap["rellengthdisplay"] = relLengthDisplay;
+    //: example: "13:24 (10:23 of 24:37)"
+    infoMap["fulltimedisplay"] = tr("%3 (%1 of %2)").arg(relTimeDisplay)
+        .arg(relLengthDisplay).arg(timestr);
 
     QHash<QString,float> posMap;
     posMap.insert("position", (float)((double)frame/(double)total));
@@ -236,7 +257,7 @@ void DeleteMap::ReverseAll(uint64_t total)
         Add(it.key(), it.value() == MARK_CUT_END ? MARK_CUT_START :
                                                    MARK_CUT_END);
     CleanMap(total);
-    Push(QObject::tr("Reverse Cuts"));
+    Push(tr("Reverse Cuts"));
 }
 
 /**
@@ -446,7 +467,7 @@ void DeleteMap::NewCut(uint64_t frame, uint64_t total)
         Add(frame, MARK_PLACEHOLDER);
 
     CleanMap(total);
-    Push(QObject::tr("New Cut"));
+    Push(tr("New Cut"));
 }
 
 /// Move the previous (!right) or next (right) cut to frame.
@@ -468,7 +489,8 @@ void DeleteMap::MoveRelative(uint64_t frame, uint64_t total, bool right)
         {
             // If on a mark, don't collapse a cut region to 0;
             // instead, delete the region
-            Delete(frame, total, QObject::tr("Delete"));
+            //: Delete the current cut or preserved region
+            Delete(frame, total, tr("Delete"));
             return;
         }
         else if (MARK_PLACEHOLDER == type)
@@ -495,7 +517,7 @@ void DeleteMap::Move(uint64_t frame, uint64_t to, uint64_t total)
         else if (frame == total)
             type = MARK_CUT_END;
     }
-    Add(to, total, type, QObject::tr("Move Mark"));
+    Add(to, total, type, tr("Move Mark"));
 }
 
 /// Private addition to the deleteMap.
@@ -530,7 +552,7 @@ bool DeleteMap::IsInDelete(uint64_t frame) const
         return true;
 
     int      lasttype  = MARK_UNSET;
-    uint64_t lastframe = -1;
+    uint64_t lastframe = UINT64_MAX;
     for (it = m_deleteMap.begin() ; it != m_deleteMap.end(); ++it)
     {
         if (it.key() > frame)
@@ -667,7 +689,7 @@ void DeleteMap::SetMap(const frm_dir_map_t &map)
     m_deleteMap.detach();
     // Can't save an undo point for SetMap() or transcodes fail.
     // Leaving as a marker for refactor.
-    //Push(QObject::tr("Set New Cut List"));
+    //Push(tr("Set New Cut List"));
 }
 
 /// Loads the given commercial break map into the deleteMap.
@@ -679,7 +701,7 @@ void DeleteMap::LoadCommBreakMap(uint64_t total, frm_dir_map_t &map)
         Add(it.key(), it.value() == MARK_COMM_START ?
                 MARK_CUT_START : MARK_CUT_END);
     CleanMap(total);
-    Push(QObject::tr("Load Detected Commercials"));
+    Push(tr("Load Detected Commercials"));
 }
 
 /// Loads the delete map from the database.
@@ -711,7 +733,7 @@ bool DeleteMap::LoadAutoSaveMap(uint64_t total)
     m_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
     CleanMap(total);
     if (result)
-        Push(QObject::tr("Load Auto-saved Cuts"));
+        Push(tr("Load Auto-saved Cuts"));
     else
         m_deleteMap = tmpDeleteMap;
 
@@ -838,4 +860,64 @@ bool DeleteMap::IsSaved(void) const
     }
 
     return currentMap == savedMap;
+}
+
+uint64_t DeleteMap::TranslatePositionAbsToRel(const frm_dir_map_t &deleteMap,
+                                              uint64_t absPosition)
+{
+    uint64_t subtraction = 0;
+    uint64_t startOfCutRegion = 0;
+    frm_dir_map_t::const_iterator i;
+    bool withinCut = false;
+    bool first = true;
+    for (i = deleteMap.constBegin(); i != deleteMap.constEnd(); ++i)
+    {
+        if (first)
+            withinCut = (i.value() == MARK_CUT_END);
+        first = false;
+        if (i.key() > absPosition)
+            break;
+        if (i.value() == MARK_CUT_START && !withinCut)
+        {
+            withinCut = true;
+            startOfCutRegion = i.key();
+        }
+        else if (i.value() == MARK_CUT_END && withinCut)
+        {
+            withinCut = false;
+            subtraction += (i.key() - startOfCutRegion);
+        }
+    }
+    if (withinCut)
+        subtraction += (absPosition - startOfCutRegion);
+    return absPosition - subtraction;
+}
+
+uint64_t DeleteMap::TranslatePositionRelToAbs(const frm_dir_map_t &deleteMap,
+                                              uint64_t relPosition)
+{
+    uint64_t addition = 0;
+    uint64_t startOfCutRegion = 0;
+    frm_dir_map_t::const_iterator i;
+    bool withinCut = false;
+    bool first = true;
+    for (i = deleteMap.constBegin(); i != deleteMap.constEnd(); ++i)
+    {
+        if (first)
+            withinCut = (i.value() == MARK_CUT_END);
+        first = false;
+        if (i.value() == MARK_CUT_START && !withinCut)
+        {
+            withinCut = true;
+            startOfCutRegion = i.key();
+            if (relPosition + addition <= startOfCutRegion)
+                break;
+        }
+        else if (i.value() == MARK_CUT_END && withinCut)
+        {
+            withinCut = false;
+            addition += (i.key() - startOfCutRegion);
+        }
+    }
+    return relPosition + addition;
 }

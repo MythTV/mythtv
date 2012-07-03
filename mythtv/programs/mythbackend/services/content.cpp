@@ -3,19 +3,23 @@
 // Created     : Mar. 7, 2011
 //
 // Copyright (c) 2011 David Blain <dblain@mythtv.org>
-//                                          
-// This library is free software; you can redistribute it and/or 
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or at your option any later version of the LGPL.
 //
-// This library is distributed in the hope that it will be useful,
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
 //
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library.  If not, see <http://www.gnu.org/licenses/>.
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 //////////////////////////////////////////////////////////////////////////////
 
@@ -34,11 +38,12 @@
 #include "backendutil.h"
 #include "httprequest.h"
 #include "serviceUtil.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 #include "mythdownloadmanager.h"
 #include "metadataimagehelper.h"
-#include "httplivestream.h"
 #include "videometadatalistmanager.h"
+#include "HLS/httplivestream.h"
+#include "mythmiscutil.h"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -258,13 +263,13 @@ QFileInfo Content::GetRecordingArtwork ( const QString   &sType,
 //
 /////////////////////////////////////////////////////////////////////////////
 
-DTC::ArtworkInfoList* Content::GetRecordingArtworkList( int              nChanId,
-                                                        const QDateTime &dStartTime  )
+DTC::ArtworkInfoList* Content::GetRecordingArtworkList(
+    int chanid, const QDateTime &recstarttsRaw)
 {
-    if (nChanId <= 0 || !dStartTime.isValid())
+    if (chanid <= 0 || !recstarttsRaw.isValid())
         throw( QString("Channel ID or StartTime appears invalid."));
 
-    ProgramInfo pInfo = ProgramInfo(nChanId, dStartTime);
+    ProgramInfo pInfo(chanid, recstarttsRaw.toUTC());
 
     return GetProgramArtworkList(pInfo.GetInetRef(), pInfo.GetSeason());
 }
@@ -422,36 +427,38 @@ QFileInfo Content::GetAlbumArt( int nId, int nWidth, int nHeight )
 /////////////////////////////////////////////////////////////////////////////
 
 QFileInfo Content::GetPreviewImage(        int        nChanId,
-                                     const QDateTime &dtStartTime,
+                                     const QDateTime &recstarttsRaw,
                                            int        nWidth,
                                            int        nHeight,
                                            int        nSecsIn )
 {
-    if (!dtStartTime.isValid())
+    if (!recstarttsRaw.isValid())
     {
         QString sMsg = QString("GetPreviewImage: bad start time '%1'")
-                          .arg( dtStartTime.toString() );
+            .arg(MythDate::toString(recstarttsRaw, MythDate::ISODate));
 
         LOG(VB_GENERAL, LOG_ERR, sMsg);
 
         throw sMsg;
     }
 
+    QDateTime recstartts = recstarttsRaw.toUTC();
+
     // ----------------------------------------------------------------------
     // Read Recording From Database
     // ----------------------------------------------------------------------
 
-    ProgramInfo pginfo( (uint)nChanId, dtStartTime);
+    ProgramInfo pginfo( (uint)nChanId, recstartts);
 
     if (!pginfo.GetChanID())
     {
         LOG(VB_GENERAL, LOG_ERR,
-            QString( "GetPreviewImage: no recording for start time '%1'" )
-                                 .arg( dtStartTime.toString() ));
+            QString("GetPreviewImage: No recording for '%1'")
+            .arg(ProgramInfo::MakeUniqueKey(nChanId, recstartts)));
         return QFileInfo();
     }
 
-    if ( pginfo.GetHostname().toLower() != gCoreContext->GetHostName().toLower())
+    if (pginfo.GetHostname().toLower() != gCoreContext->GetHostName().toLower())
     {
         QString sMsg =
             QString("GetPreviewImage: Wrong Host '%1' request from '%2'")
@@ -575,26 +582,28 @@ QFileInfo Content::GetPreviewImage(        int        nChanId,
 /////////////////////////////////////////////////////////////////////////////
 
 QFileInfo Content::GetRecording( int              nChanId,
-                                 const QDateTime &dtStartTime )
+                                 const QDateTime &recstarttsRaw )
 {
-    if (!dtStartTime.isValid())
+    if (!recstarttsRaw.isValid())
         throw( "StartTime is invalid" );
 
     // ------------------------------------------------------------------
     // Read Recording From Database
     // ------------------------------------------------------------------
 
-    ProgramInfo pginfo( (uint)nChanId, dtStartTime );
+    QDateTime recstartts = recstarttsRaw.toUTC();
+
+    ProgramInfo pginfo((uint)nChanId, recstartts);
 
     if (!pginfo.GetChanID())
     {
-        LOG( VB_UPNP, LOG_ERR, QString("GetRecording - for %1, %2 failed")
-                                    .arg( nChanId )
-                                    .arg( dtStartTime.toString() ));
+        LOG(VB_UPNP, LOG_ERR, QString("GetRecording - for '%1' failed")
+            .arg(ProgramInfo::MakeUniqueKey(nChanId, recstartts)));
+
         return QFileInfo();
     }
 
-    if ( pginfo.GetHostname().toLower() != gCoreContext->GetHostName().toLower())
+    if (pginfo.GetHostname().toLower() != gCoreContext->GetHostName().toLower())
     {
         // We only handle requests for local resources
 
@@ -920,33 +929,36 @@ DTC::LiveStreamInfoList *Content::GetFilteredLiveStreamList( const QString   &Fi
 //
 /////////////////////////////////////////////////////////////////////////////
 
-DTC::LiveStreamInfo *Content::AddRecordingLiveStream( int              nChanId,
-                                                      const QDateTime &dtStartTime,
-                                                      int              nMaxSegments,
-                                                      int              nWidth,
-                                                      int              nHeight,
-                                                      int              nBitrate,
-                                                      int              nAudioBitrate,
-                                                      int              nSampleRate )
+DTC::LiveStreamInfo *Content::AddRecordingLiveStream(
+    int              nChanId,
+    const QDateTime &recstarttsRaw,
+    int              nMaxSegments,
+    int              nWidth,
+    int              nHeight,
+    int              nBitrate,
+    int              nAudioBitrate,
+    int              nSampleRate )
 {
-    if (!dtStartTime.isValid())
+    if (!recstarttsRaw.isValid())
         throw( "StartTime is invalid" );
 
     // ------------------------------------------------------------------
     // Read Recording From Database
     // ------------------------------------------------------------------
 
-    ProgramInfo pginfo( (uint)nChanId, dtStartTime );
+    QDateTime recstartts = recstarttsRaw.toUTC();
+
+    ProgramInfo pginfo((uint)nChanId, recstartts);
 
     if (!pginfo.GetChanID())
     {
-        LOG( VB_UPNP, LOG_ERR, QString("AddRecordingLiveStream - for %1, %2 failed")
-                                    .arg( nChanId )
-                                    .arg( dtStartTime.toString() ));
+        LOG(VB_UPNP, LOG_ERR,
+            QString("AddRecordingLiveStream - for %1, %2 failed")
+            .arg(ProgramInfo::MakeUniqueKey(nChanId, recstartts)));
         return NULL;
     }
 
-    if ( pginfo.GetHostname().toLower() != gCoreContext->GetHostName().toLower())
+    if (pginfo.GetHostname().toLower() != gCoreContext->GetHostName().toLower())
     {
         // We only handle requests for local resources
 
@@ -970,7 +982,7 @@ DTC::LiveStreamInfo *Content::AddRecordingLiveStream( int              nChanId,
     {
         LOG( VB_UPNP, LOG_ERR, QString("AddRecordingLiveStream - for %1, %2 failed")
                                     .arg( nChanId )
-                                    .arg( dtStartTime.toString() ));
+                                    .arg( recstartts.toString() ));
         return NULL;
     }
 

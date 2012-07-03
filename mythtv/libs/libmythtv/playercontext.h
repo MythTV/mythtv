@@ -11,11 +11,15 @@ using namespace std;
 #include <QMutex>
 #include <QHash>
 #include <QRect>
+#include <QObject>
+
+// MythTV headers
+#include "videoouttypes.h"
+#include "mythtimer.h"
 #include "mythtvexp.h"
 #include "mythdeque.h"
+#include "mythdate.h"
 #include "tv.h"
-#include "videoouttypes.h"
-#include "mythmiscutil.h"
 
 class TV;
 class RemoteEncoder;

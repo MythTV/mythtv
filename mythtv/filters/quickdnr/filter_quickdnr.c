@@ -26,7 +26,7 @@
 #include "libavcodec/dsputil.h"
 
 #ifdef MMX
-#include "libavcodec/x86/mmx.h"
+#include "ffmpeg-mmx.h"
 #endif
 
 //Regular filter
@@ -522,7 +522,7 @@ static VideoFilter *new_filter(VideoFrameType inpixfmt,
     filter->vf.filter  = (double_threshold) ? &quickdnr2 : &quickdnr;
 
 #ifdef MMX
-    if (av_get_cpu_flags() > FF_MM_MMXEXT)
+    if (av_get_cpu_flags() > AV_CPU_FLAG_MMX2)
     {
         filter->vf.filter = (double_threshold) ? &quickdnr2MMX : &quickdnrMMX;
         for (i = 0; i < 8; i++)
@@ -587,7 +587,7 @@ static FmtConv FmtList[] =
     FMT_NULL
 };
 
-ConstFilterInfo filter_table[] =
+const FilterInfo filter_table[] =
 {
     {
         filter_init: &new_filter,

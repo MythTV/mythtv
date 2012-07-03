@@ -6,17 +6,17 @@
 
 #include <cstdlib>
 
-#include "tv_rec.h"
-
+#include "scheduledrecording.h"
 #include "channelbase.h"
-#include "iso639.h"
+#include "mythlogging.h"
 #include "eitscanner.h"
 #include "eithelper.h"
-#include "scheduledrecording.h"
-#include "mythmiscutil.h"
-#include "mythdb.h"
-#include "mythlogging.h"
+#include "mythtimer.h"
+#include "mythdate.h"
 #include "mthread.h"
+#include "iso639.h"
+#include "mythdb.h"
+#include "tv_rec.h"
 
 #define LOC QString("EITScanner: ")
 #define LOC_ID QString("EITScanner (%1): ").arg(cardnum)
@@ -29,7 +29,7 @@
  */
 
 QMutex     EITScanner::resched_lock;
-QDateTime  EITScanner::resched_next_time      = QDateTime::currentDateTime();
+QDateTime  EITScanner::resched_next_time      = MythDate::current();
 const uint EITScanner::kMinRescheduleInterval = 150;
 
 EITScanner::EITScanner(uint _cardnum)
@@ -37,7 +37,8 @@ EITScanner::EITScanner(uint _cardnum)
       eitHelper(new EITHelper()), eventThread(new MThread("EIT", this)),
       exitThread(false),
       rec(NULL),                  activeScan(false),
-      activeScanTrigTime(0),      cardnum(_cardnum)
+      activeScanStopped(true),    activeScanTrigTime(0),
+      cardnum(_cardnum)
 {
     QStringList langPref = iso639_get_language_list();
     eitHelper->SetLanguagePreferences(langPref);
@@ -75,7 +76,6 @@ void EITScanner::run(void)
     static const float rt[] = { 0.0f, 0.2f, 0.4f, 0.6f, 0.8f, };
 
     lock.lock();
-    exitThread = false;
 
     MythTimer t;
     uint eitCount = 0;
@@ -116,7 +116,7 @@ void EITScanner::run(void)
             RescheduleRecordings();
         }
 
-        if (activeScan && (QDateTime::currentDateTime() > activeScanNextTrig))
+        if (activeScan && (MythDate::current() > activeScanNextTrig))
         {
             // if there have been any new events, tell scheduler to run.
             if (eitCount)
@@ -140,7 +140,7 @@ void EITScanner::run(void)
                         .arg(*activeScanNextChan));
             }
 
-            activeScanNextTrig = QDateTime::currentDateTime()
+            activeScanNextTrig = MythDate::current()
                 .addSecs(activeScanTrigTime);
             ++activeScanNextChan;
 
@@ -149,9 +149,17 @@ void EITScanner::run(void)
         }
 
         lock.lock();
-        if (!exitThread)
+        if ((activeScan || activeScanStopped) && !exitThread)
             exitThreadCond.wait(&lock, 400); // sleep up to 400 ms.
+
+        if (!activeScan && !activeScanStopped)
+        {
+            activeScanStopped = true;
+            activeScanCond.wakeAll();
+        }
     }
+    activeScanStopped = true;
+    activeScanCond.wakeAll();
     lock.unlock();
 }
 
@@ -166,7 +174,7 @@ void EITScanner::RescheduleRecordings(void)
     if (!resched_lock.tryLock())
         return;
 
-    if (resched_next_time > QDateTime::currentDateTime())
+    if (resched_next_time > MythDate::current())
     {
         LOG(VB_EIT, LOG_INFO, LOC + "Rate limiting reschedules..");
         resched_lock.unlock();
@@ -174,7 +182,7 @@ void EITScanner::RescheduleRecordings(void)
     }
 
     resched_next_time =
-        QDateTime::currentDateTime().addSecs(kMinRescheduleInterval);
+        MythDate::current().addSecs(kMinRescheduleInterval);
     resched_lock.unlock();
 
     ScheduledRecording::RescheduleMatch(0, 0, 0, QDateTime(), "EITScanner");
@@ -266,18 +274,30 @@ void EITScanner::StartActiveScan(TVRec *_rec, uint max_seconds_per_source)
         uint randomStart = random() % activeScanChannels.size();
         activeScanNextChan = activeScanChannels.begin()+randomStart;
 
-        activeScanNextTrig = QDateTime::currentDateTime();
+        activeScanNextTrig = MythDate::current();
         activeScanTrigTime = max_seconds_per_source;
         // Add a little randomness to trigger time so multiple
         // cards will have a staggered channel changing time.
         activeScanTrigTime += random() % 29;
+        activeScanStopped = false;
         activeScan = true;
     }
 }
 
-void EITScanner::StopActiveScan()
+void EITScanner::StopActiveScan(void)
 {
+    QMutexLocker locker(&lock);
+
+    activeScanStopped = false;
     activeScan = false;
-    rec = NULL;
+    exitThreadCond.wakeAll();
+
+    locker.unlock();
     StopPassiveScan();
+    locker.relock();
+
+    while (!activeScan && !activeScanStopped)
+        activeScanCond.wait(&lock, 100);
+
+    rec = NULL;
 }

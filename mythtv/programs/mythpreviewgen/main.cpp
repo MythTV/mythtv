@@ -46,6 +46,7 @@ using namespace std;
 #include "commandlineparser.h"
 #include "mythsystemevent.h"
 #include "mythlogging.h"
+#include "signalhandling.h"
 
 #define LOC      QString("MythPreviewGen: ")
 #define LOC_WARN QString("MythPreviewGen, Warning: ")
@@ -105,7 +106,7 @@ int preview_helper(uint chanid, QDateTime starttime,
         {
             LOG(VB_GENERAL, LOG_ERR,
                 QString("Cannot locate recording made on '%1' at '%2'")
-                    .arg(chanid).arg(starttime.toString("yyyyMMddhhmmss")));
+                .arg(chanid).arg(starttime.toString(Qt::ISODate)));
             delete pginfo;
             return GENERIC_EXIT_NOT_OK;
         }
@@ -200,6 +201,14 @@ int main(int argc, char **argv)
     close(0);
 
     CleanupGuard callCleanup(cleanup);
+
+#ifndef _WIN32
+    QList<int> signallist;
+    signallist << SIGINT << SIGTERM << SIGSEGV << SIGABRT << SIGBUS << SIGFPE
+               << SIGILL;
+    SignalHandler handler(signallist);
+    signal(SIGHUP, SIG_IGN);
+#endif
 
     if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
         LOG(VB_GENERAL, LOG_WARNING, LOC + "Unable to ignore SIGPIPE");

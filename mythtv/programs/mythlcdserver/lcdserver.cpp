@@ -63,7 +63,7 @@
 #include <QDir>
 #include <QList>
 
-#include "mythmiscutil.h"
+#include "mythdate.h"
 #include "mythcontext.h"
 #include "lcddevice.h"
 

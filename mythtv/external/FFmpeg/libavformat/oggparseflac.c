@@ -22,6 +22,7 @@
 #include "libavcodec/get_bits.h"
 #include "libavcodec/flac.h"
 #include "avformat.h"
+#include "internal.h"
 #include "oggdec.h"
 
 #define OGG_FLAC_METADATA_TYPE_STREAMINFO 0x7F
@@ -55,17 +56,18 @@ flac_header (AVFormatContext * s, int idx)
         if (get_bits_long(&gb, 32) != FLAC_STREAMINFO_SIZE)
             return -1;
 
-        ff_flac_parse_streaminfo(st->codec, &si, streaminfo_start);
+        avpriv_flac_parse_streaminfo(st->codec, &si, streaminfo_start);
 
         st->codec->codec_type = AVMEDIA_TYPE_AUDIO;
         st->codec->codec_id = CODEC_ID_FLAC;
+        st->need_parsing = AVSTREAM_PARSE_HEADERS;
 
         st->codec->extradata =
             av_malloc(FLAC_STREAMINFO_SIZE + FF_INPUT_BUFFER_PADDING_SIZE);
         memcpy(st->codec->extradata, streaminfo_start, FLAC_STREAMINFO_SIZE);
         st->codec->extradata_size = FLAC_STREAMINFO_SIZE;
 
-        av_set_pts_info(st, 64, 1, st->codec->sample_rate);
+        avpriv_set_pts_info(st, 64, 1, st->codec->sample_rate);
     } else if (mdt == FLAC_METADATA_TYPE_VORBIS_COMMENT) {
         ff_vorbis_comment (s, &st->metadata, os->buf + os->pstart + 4, os->psize - 4);
     }

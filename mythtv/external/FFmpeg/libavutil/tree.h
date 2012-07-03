@@ -21,13 +21,23 @@
 /**
  * @file
  * A tree container.
- * Insertion, removal, finding equal, largest which is smaller than and
- * smallest which is larger than, all have O(log n) worst case complexity.
  * @author Michael Niedermayer <michaelni@gmx.at>
  */
 
 #ifndef AVUTIL_TREE_H
 #define AVUTIL_TREE_H
+
+/**
+ * @addtogroup lavu_tree AVTree
+ * @ingroup lavu_data
+ *
+ * Low complexity tree container
+ *
+ * Insertion, removal, finding equal, largest which is smaller than and
+ * smallest which is larger than, all have O(log n) worst case complexity.
+ * @{
+ */
+
 
 struct AVTreeNode;
 extern const int av_tree_node_size;
@@ -45,18 +55,21 @@ void *av_tree_find(const struct AVTreeNode *root, void *key, int (*cmp)(void *ke
 
 /**
  * Insert or remove an element.
+ *
  * If *next is NULL, then the supplied element will be removed if it exists.
- * If *next is not NULL, then the supplied element will be inserted, unless
+ * If *next is non-NULL, then the supplied element will be inserted, unless
  * it already exists in the tree.
+ *
  * @param rootp A pointer to a pointer to the root node of the tree; note that
  *              the root node can change during insertions, this is required
  *              to keep the tree balanced.
+ * @param key  pointer to the element key to insert in the tree
  * @param next Used to allocate and free AVTreeNodes. For insertion the user
  *             must set it to an allocated and zeroed object of at least
  *             av_tree_node_size bytes size. av_tree_insert() will set it to
  *             NULL if it has been consumed.
  *             For deleting elements *next is set to NULL by the user and
- *             av_tree_node_size() will set it to the AVTreeNode which was
+ *             av_tree_insert() will set it to the AVTreeNode which was
  *             used for the removed element.
  *             This allows the use of flat arrays, which have
  *             lower overhead compared to many malloced elements.
@@ -71,6 +84,7 @@ void *av_tree_find(const struct AVTreeNode *root, void *key, int (*cmp)(void *ke
  *                 return av_tree_insert(rootp, key, cmp, next);
  *             }
  *             @endcode
+ * @param cmp compare function used to compare elements in the tree
  * @return If no insertion happened, the found element; if an insertion or
  *         removal happened, then either key or NULL will be returned.
  *         Which one it is depends on the tree state and the implementation. You
@@ -91,5 +105,8 @@ void av_tree_destroy(struct AVTreeNode *t);
  */
 void av_tree_enumerate(struct AVTreeNode *t, void *opaque, int (*cmp)(void *opaque, void *elem), int (*enu)(void *opaque, void *elem));
 
+/**
+ * @}
+ */
 
 #endif /* AVUTIL_TREE_H */

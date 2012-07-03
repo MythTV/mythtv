@@ -28,6 +28,7 @@
 #define MYTH_APPNAME_MYTHMEDIASERVER "mythmediaserver"
 #define MYTH_APPNAME_MYTHMETADATALOOKUP "mythmetadatalookup"
 #define MYTH_APPNAME_MYTHUTIL "mythutil"
+#define MYTH_APPNAME_MYTHLOGSERVER "mythlogserver"
 
 class MDBManager;
 class MythCoreContextPrivate;
@@ -104,7 +105,7 @@ class MBASE_PUBLIC MythCoreContext : public MythObservable, public MythSocketCBs
     void AllowShutdown(void);
     bool IsBlockingClient(void) const; ///< is this client blocking shutdown
 
-    bool SendReceiveStringList(QStringList &strlist, bool quickTimeout = false,
+    bool SendReceiveStringList(QStringList &strlist, bool quicTimeout = false,
                                bool block = true);
     void SendMessage(const QString &message);
     void SendEvent(const MythEvent &event);
@@ -150,11 +151,10 @@ class MBASE_PUBLIC MythCoreContext : public MythObservable, public MythSocketCBs
     QString GetBackendServerIP(void);
     QString GetBackendServerIP(const QString &host);
 
-    void SetSetting(const QString &key, const QString &newValue);
-
     void ClearSettingsCache(const QString &myKey = QString(""));
     void ActivateSettingsCache(bool activate = true);
     void OverrideSettingForSession(const QString &key, const QString &value);
+    void ClearOverrideSettingForSession(const QString &key);
 
     void dispatch(const MythEvent &event);
     void dispatchNow(const MythEvent &event); // MDEPRECATED;

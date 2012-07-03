@@ -8,17 +8,22 @@ using namespace std;
 
 SocketHandler::SocketHandler(MythSocket *sock, MythSocketManager *parent,
                   QString hostname) :
-        ReferenceCounter(), m_blockShutdown(false), m_standardEvents(false),
+        ReferenceCounter("SocketHandler"),
+        m_blockShutdown(false), m_standardEvents(false),
         m_systemEvents(false), m_socket(sock), m_parent(parent),
         m_hostname(hostname)
 {
-    m_socket->UpRef();
+    if (m_socket)
+        m_socket->IncrRef();
 }
 
 SocketHandler::~SocketHandler()
 {
     if (m_socket)
-        m_socket->DownRef();
+    {
+        m_socket->DecrRef();
+        m_socket = NULL;
+    }
 }
 
 bool SocketHandler::SendStringList(QStringList &strlist, bool lock)

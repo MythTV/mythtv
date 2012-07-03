@@ -21,18 +21,19 @@ using namespace std;
 #include <QDir>
 
 // MythTV headers
-#include "programinfo.h"
-#include "mythmiscutil.h"
+#include "programinfoupdater.h"
 #include "mythcorecontext.h"
-#include "dialogbox.h"
+#include "mythscheduler.h"
+#include "mythmiscutil.h"
+#include "storagegroup.h"
+#include "mythlogging.h"
+#include "programinfo.h"
+#include "remotefile.h"
 #include "remoteutil.h"
+#include "dialogbox.h"
+#include "mythdate.h"
 #include "netutils.h"
 #include "mythdb.h"
-#include "mythlogging.h"
-#include "storagegroup.h"
-#include "programinfoupdater.h"
-#include "mythscheduler.h"
-#include "remotefile.h"
 
 #define LOC      QString("ProgramInfo(%1): ").arg(GetBasename())
 
@@ -115,7 +116,7 @@ ProgramInfo::ProgramInfo(void) :
 
     filesize(0ULL),
 
-    startts(mythCurrentDateTime()),
+    startts(MythDate::current(true)),
     endts(startts),
     recstartts(startts),
     recendts(startts),
@@ -202,7 +203,7 @@ ProgramInfo::ProgramInfo(const ProgramInfo &other) :
 
     originalAirDate(other.originalAirDate),
     lastmodified(other.lastmodified),
-    lastInUseTime(QDateTime::currentDateTime().addSecs(-4 * 60 * 60)),
+    lastInUseTime(MythDate::current().addSecs(-4 * 60 * 60)),
 
     prefinput(other.prefinput),
     recpriority2(other.recpriority2),
@@ -336,7 +337,7 @@ ProgramInfo::ProgramInfo(
 
     originalAirDate(_originalAirDate),
     lastmodified(_lastmodified),
-    lastInUseTime(QDateTime::currentDateTime().addSecs(-4 * 60 * 60)),
+    lastInUseTime(MythDate::current().addSecs(-4 * 60 * 60)),
 
     prefinput(0),
     recpriority2(0),
@@ -447,7 +448,7 @@ ProgramInfo::ProgramInfo(
 
     originalAirDate(),
     lastmodified(startts),
-    lastInUseTime(QDateTime::currentDateTime().addSecs(-4 * 60 * 60)),
+    lastInUseTime(MythDate::current().addSecs(-4 * 60 * 60)),
 
     prefinput(0),
     recpriority2(0),
@@ -518,7 +519,7 @@ ProgramInfo::ProgramInfo(
     uint _audioproperties,
     uint _subtitleType,
 
-    const ProgramList &schedList, bool oneChanid) :
+    const ProgramList &schedList) :
     title(_title),
     subtitle(_subtitle),
     description(_description),
@@ -618,21 +619,25 @@ ProgramInfo::ProgramInfo(
         dupmethod   = s.dupmethod;
         findid      = s.findid;
 
-        if (s.recstatus == rsWillRecord || 
-            s.recstatus == rsRecording ||
+        if (chanstr != s.chanstr)
+        {
+            if (s.recstatus == rsWillRecord)
+                recstatus = rsOtherShowing;
+            else if (s.recstatus == rsRecording)
+                recstatus = rsOtherRecording;
+            else if (s.recstatus == rsTuning)
+                recstatus = rsOtherTuning;
+        }
+
+        // Stop recording keys on chanid (and recstarts).  If the
+        // recording is running, override the chanid, so we can stop
+        // it from any matching program.  Remove this hack when we
+        // replace chanid/recstartts as the primary key for the
+        // recorded and related tables with something better.
+        if (s.recstatus == rsRecording ||
             s.recstatus == rsTuning)
         {
-            if (oneChanid)
-            {
-                chanid   = s.chanid;
-                chanstr  = s.chanstr;
-                chansign = s.chansign;
-                channame = s.channame;
-            }
-            else if ((chanid != s.chanid) && (chanstr != s.chanstr))
-            {
-                recstatus = rsOtherShowing;
-            }
+            chanid = s.chanid;
         }
     }
 }
@@ -700,7 +705,7 @@ ProgramInfo::ProgramInfo(
     stars(0.0f),
 
     originalAirDate(),
-    lastmodified(QDateTime::currentDateTime()),
+    lastmodified(MythDate::current()),
     lastInUseTime(lastmodified.addSecs(-4 * 60 * 60)),
 
     prefinput(0),
@@ -757,7 +762,7 @@ ProgramInfo::ProgramInfo(const QString &_pathname) :
 
     clear();
 
-    QDateTime cur = QDateTime::currentDateTime();
+    QDateTime cur = MythDate::current();
     recstartts = startts = cur.addSecs(-4 * 60 * 60 - 1);
     recendts   = endts   = cur.addSecs(-1);
 
@@ -784,12 +789,10 @@ ProgramInfo::ProgramInfo(const QString &_pathname,
 {
     clear();
 
-    QDateTime cur = QDateTime::currentDateTime();
-    recstartts = cur.addSecs((_length_in_minutes + 1) * -60);
+    QDateTime cur = MythDate::current();
+    recstartts = cur.addSecs(((int)_length_in_minutes + 1) * -60);
     recendts   = recstartts.addSecs(_length_in_minutes * 60);
-    startts.setDate(
-        QDate::fromString(QString("%1-01-01").arg(year), Qt::ISODate));
-    startts.setTime(QTime(0,0,0));
+    startts    = QDateTime(QDate(year,1,1),QTime(0,0,0), Qt::UTC);
     endts      = startts.addSecs(_length_in_minutes * 60);
 
     QString pn = _pathname;
@@ -858,7 +861,7 @@ ProgramInfo::ProgramInfo(const QString &_title, uint _chanid,
             gCoreContext->GetSetting("ChannelFormat", "<num> <sign>");
 
         title = QString("%1 - %2").arg(ChannelText(channelFormat))
-            .arg(MythDateTimeToString(startts, kTime));
+            .arg(MythDate::toString(startts, MythDate::kTime));
     }
 
     description = title =
@@ -940,7 +943,7 @@ void ProgramInfo::clone(const ProgramInfo &other,
     year = other.year;
     originalAirDate = other.originalAirDate;
     lastmodified = other.lastmodified;
-    lastInUseTime = QDateTime::currentDateTime().addSecs(-4 * 60 * 60);
+    lastInUseTime = MythDate::current().addSecs(-4 * 60 * 60);
 
     recstatus = other.recstatus;
 
@@ -1034,7 +1037,7 @@ void ProgramInfo::clear(void)
 
     filesize = 0ULL;
 
-    startts = mythCurrentDateTime();
+    startts = MythDate::current(true);
     endts = startts;
     recstartts = startts;
     recendts = startts;
@@ -1099,7 +1102,7 @@ bool ProgramInfo::ExtractKey(const QString &uniquekey,
     if (keyParts.size() != 2)
         return false;
     chanid     = keyParts[0].toUInt();
-    recstartts = QDateTime::fromString(keyParts[1], Qt::ISODate);
+    recstartts = MythDate::fromString(keyParts[1]);
     return chanid && recstartts.isValid();
 }
 
@@ -1117,7 +1120,7 @@ bool ProgramInfo::ExtractKeyFromPathname(
         QStringList ts = lr[1].split(".");
         if (chanid && !ts.empty())
         {
-            recstartts = myth_dt_from_string(ts[0]);
+            recstartts = MythDate::fromString(ts[0]);
             return recstartts.isValid();
         }
     }
@@ -1141,7 +1144,7 @@ bool ProgramInfo::QueryKeyFromPathname(
     if (query.exec() && query.next())
     {
         chanid     = query.value(0).toUInt();
-        recstartts = query.value(1).toDateTime();
+        recstartts = MythDate::as_utc(query.value(1).toDateTime());
         return true;
     }
 
@@ -1232,7 +1235,7 @@ void ProgramInfo::ToStringList(QStringList &list) const
 #define ENUM_FROM_LIST(x, y) do { NEXT_STR(); (x) = ((y)ts.toInt()); } while (0)
 
 #define DATETIME_FROM_LIST(x) \
-    do { NEXT_STR(); (x).setTime_t(ts.toUInt()); } while (0)
+    do { NEXT_STR(); x = MythDate::fromTime_t(ts.toUInt()); } while (0)
 #define DATE_FROM_LIST(x) \
     do { NEXT_STR(); (x) = ((ts.isEmpty()) || (ts == "0000-00-00")) ? \
                          QDate() : QDate::fromString(ts, Qt::ISODate); \
@@ -1336,6 +1339,7 @@ void ProgramInfo::ToMap(InfoMap &progMap,
                         bool showrerecord,
                         uint star_range) const
 {
+    QLocale locale = gCoreContext->GetQLocale();
     // NOTE: Format changes and relevant additions made here should be
     //       reflected in RecordingRule
     QString channelFormat =
@@ -1343,7 +1347,7 @@ void ProgramInfo::ToMap(InfoMap &progMap,
     QString longChannelFormat =
         gCoreContext->GetSetting("LongChannelFormat", "<num> <name>");
 
-    QDateTime timeNow = QDateTime::currentDateTime();
+    QDateTime timeNow = MythDate::current();
 
     int hours, minutes, seconds;
 
@@ -1400,49 +1404,54 @@ void ProgramInfo::ToMap(InfoMap &progMap,
         }
         else
         {
-            progMap["startdate"] = startts.toString("yyyy");
-            progMap["recstartdate"] = startts.toString("yyyy");
+            progMap["startdate"] = startts.toLocalTime().toString("yyyy");
+            progMap["recstartdate"] = startts.toLocalTime().toString("yyyy");
         }
     }
     else // if (IsRecording())
     {
-        progMap["starttime"] = MythDateTimeToString(startts, kTime);
-        progMap["startdate"] = MythDateTimeToString(startts, kDateFull | kSimplify);
-        progMap["shortstartdate"] = MythDateTimeToString(startts, kDateShort);
-        if (timeNow.date().year() != startts.date().year())
-            progMap["startyear"] = startts.toString("yyyy");
-        progMap["endtime"] = MythDateTimeToString(endts, kTime);
-        progMap["enddate"] = MythDateTimeToString(endts, kDateFull | kSimplify);
-        progMap["shortenddate"] = MythDateTimeToString(endts, kDateShort);
-        if (timeNow.date().year() != endts.date().year())
-            progMap["endyear"] = endts.toString("yyyy");
-        progMap["recstarttime"] = MythDateTimeToString(recstartts, kTime);
-        progMap["recstartdate"] = MythDateTimeToString(recstartts, kDateShort);
-        progMap["recendtime"] = MythDateTimeToString(recendts, kTime);
-        progMap["recenddate"] = MythDateTimeToString(recendts, kDateShort);
+        using namespace MythDate;
+        progMap["starttime"] = MythDate::toString(startts, kTime);
+        progMap["startdate"] =
+            MythDate::toString(startts, kDateFull | kSimplify);
+        progMap["shortstartdate"] = MythDate::toString(startts, kDateShort);
+        progMap["endtime"] = MythDate::toString(endts, kTime);
+        progMap["enddate"] = MythDate::toString(endts, kDateFull | kSimplify);
+        progMap["shortenddate"] = MythDate::toString(endts, kDateShort);
+        progMap["recstarttime"] = MythDate::toString(recstartts, kTime);
+        progMap["recstartdate"] = MythDate::toString(recstartts, kDateShort);
+        progMap["recendtime"] = MythDate::toString(recendts, kTime);
+        progMap["recenddate"] = MythDate::toString(recendts, kDateShort);
         progMap["startts"] = QString::number(startts.toTime_t());
         progMap["endts"]   = QString::number(endts.toTime_t());
+        if (timeNow.toLocalTime().date().year() !=
+            startts.toLocalTime().date().year())
+            progMap["startyear"] = startts.toLocalTime().toString("yyyy");
+        if (timeNow.toLocalTime().date().year() !=
+            endts.toLocalTime().date().year())
+            progMap["endyear"] = endts.toLocalTime().toString("yyyy");
     }
 
-    progMap["timedate"] = MythDateTimeToString(recstartts,
-                                            kDateTimeFull | kSimplify) + " - " +
-                          MythDateTimeToString(recendts, kTime);
+    using namespace MythDate;
+    progMap["timedate"] =
+        MythDate::toString(recstartts, kDateTimeFull | kSimplify) + " - " +
+        MythDate::toString(recendts, kTime);
 
-    progMap["shorttimedate"] = MythDateTimeToString(recstartts,
-                                            kDateTimeShort | kSimplify) + " - " +
-                               MythDateTimeToString(recendts, kTime);
+    progMap["shorttimedate"] =
+        MythDate::toString(recstartts, kDateTimeShort | kSimplify) + " - " +
+        MythDate::toString(recendts, kTime);
 
-    progMap["starttimedate"] = MythDateTimeToString(recstartts,
-                                            kDateTimeFull | kSimplify);
+    progMap["starttimedate"] =
+        MythDate::toString(recstartts, kDateTimeFull | kSimplify);
 
-    progMap["shortstarttimedate"] = MythDateTimeToString(recstartts,
-                                            kDateTimeShort | kSimplify);
+    progMap["shortstarttimedate"] =
+        MythDate::toString(recstartts, kDateTimeShort | kSimplify);
 
-    progMap["lastmodifiedtime"] = MythDateTimeToString(lastmodified, kTime);
-    progMap["lastmodifieddate"] = MythDateTimeToString(lastmodified,
-                                                       kDateFull | kSimplify);
-    progMap["lastmodified"] = MythDateTimeToString(lastmodified,
-                                            kDateTimeFull | kSimplify);
+    progMap["lastmodifiedtime"] = MythDate::toString(lastmodified, kTime);
+    progMap["lastmodifieddate"] =
+        MythDate::toString(lastmodified, kDateFull | kSimplify);
+    progMap["lastmodified"] =
+        MythDate::toString(lastmodified, kDateTimeFull | kSimplify);
 
     progMap["channum"] = chanstr;
     progMap["chanid"] = chanid;
@@ -1450,13 +1459,10 @@ void ProgramInfo::ToMap(InfoMap &progMap,
     progMap["channel"] = ChannelText(channelFormat);
     progMap["longchannel"] = ChannelText(longChannelFormat);
 
-    QString tmpSize;
+    QString tmpSize = locale.toString(filesize * (1.0 / (1024.0 * 1024.0 * 1024.0)), 'f', 2);
+    progMap["filesize_str"] = QObject::tr("%1 GB", "GigaBytes").arg(tmpSize);
 
-    tmpSize.sprintf("%0.2f ", filesize * (1.0 / (1024.0 * 1024.0 * 1024.0)));
-    tmpSize += QObject::tr("GB", "GigaBytes");
-    progMap["filesize_str"] = tmpSize;
-
-    progMap["filesize"] = QString::number(filesize);
+    progMap["filesize"] = locale.toString((quint64)filesize);
 
     seconds = recstartts.secsTo(recendts);
     minutes = seconds / 60;
@@ -1515,8 +1521,8 @@ void ProgramInfo::ToMap(InfoMap &progMap,
 
     progMap["recpriority"] = recpriority;
     progMap["recpriority2"] = recpriority2;
-    progMap["recordingggroup"] = (recgroup == "Default")
-                                            ? QObject::tr("Default") : recgroup;
+    progMap["recordinggroup"] = (recgroup == "Default")
+        ? QObject::tr("Default") : recgroup;
     progMap["playgroup"] = playgroup;
 
     if (storagegroup == "Default")
@@ -1546,7 +1552,9 @@ void ProgramInfo::ToMap(InfoMap &progMap,
         {
             progMap["longrepeat"] = QString("(%1 %2) ")
                 .arg(QObject::tr("Repeat"))
-                .arg(MythDateToString(originalAirDate, kDateFull | kAddYear));
+                .arg(MythDate::toString(
+                         originalAirDate,
+                         MythDate::kDateFull | MythDate::kAddYear));
         }
     }
     else
@@ -1584,8 +1592,10 @@ void ProgramInfo::ToMap(InfoMap &progMap,
     }
     else
     {
-        progMap["originalairdate"] = MythDateToString(originalAirDate, kDateFull);
-        progMap["shortoriginalairdate"] = MythDateToString(originalAirDate, kDateShort);
+        progMap["originalairdate"] = MythDate::toString(
+            originalAirDate, MythDate::kDateFull);
+        progMap["shortoriginalairdate"] = MythDate::toString(
+            originalAirDate, MythDate::kDateShort);
     }
 
     // 'mediatype' for a statetype, so untranslated
@@ -1679,11 +1689,11 @@ QString ProgramInfo::toString(const Verbosity v, QString sep, QString grp)
             break;
         case kRecordingKey:
             str = QString("%1 at %2")
-                .arg(GetChanID()).arg(GetRecordingStartTime(ISODate));
+                .arg(GetChanID()).arg(GetRecordingStartTime(MythDate::ISODate));
             break;
         case kSchedulingKey:
             str = QString("%1 @ %2")
-                .arg(GetChanID()).arg(GetScheduledStartTime(ISODate));
+                .arg(GetChanID()).arg(GetScheduledStartTime(MythDate::ISODate));
             break;
     }
 
@@ -1740,7 +1750,7 @@ bool ProgramInfo::LoadProgramFromRecorded(
         // These items are not initialized below so they need to be cleared
         // if we're loading in a different program into this ProgramInfo
         catType.clear();
-        lastInUseTime = QDateTime::currentDateTime().addSecs(-4 * 60 * 60);
+        lastInUseTime = MythDate::current().addSecs(-4 * 60 * 60);
         rectype = kNotRecording;
         oldrecstatus = rsUnknown;
         prefinput = 0;
@@ -1808,16 +1818,16 @@ bool ProgramInfo::LoadProgramFromRecorded(
 
     filesize     = query.value(20).toULongLong();
 
-    startts      = query.value(21).toDateTime();
-    endts        = query.value(22).toDateTime();
-    recstartts   = query.value(24).toDateTime();
-    recendts     = query.value(25).toDateTime();
+    startts      = MythDate::as_utc(query.value(21).toDateTime());
+    endts        = MythDate::as_utc(query.value(22).toDateTime());
+    recstartts   = MythDate::as_utc(query.value(24).toDateTime());
+    recendts     = MythDate::as_utc(query.value(25).toDateTime());
 
     stars        = clamp((float)query.value(23).toDouble(), 0.0f, 1.0f);
 
     year         = query.value(26).toUInt();
     originalAirDate = query.value(27).toDate();
-    lastmodified = query.value(28).toDateTime();
+    lastmodified = MythDate::as_utc(query.value(28).toDateTime());
     /**///lastInUseTime;
 
     recstatus    = rsRecorded;
@@ -2060,7 +2070,7 @@ void ProgramInfo::CheckProgramIDAuthorities(void)
  */
 QString ProgramInfo::CreateRecordBasename(const QString &ext) const
 {
-    QString starts = recstartts.toString("yyyyMMddhhmmss");
+    QString starts = MythDate::toString(recstartts, MythDate::kFilename);
 
     QString retval = QString("%1_%2.%3").arg(chanid)
                              .arg(starts).arg(ext);
@@ -2241,14 +2251,10 @@ QString ProgramInfo::GetPlaybackURL(
             {
                 host  = list.size() == 1 ? list[0]   : list[1];
                 group = list.size() == 1 ? QString() : list[0];
-                StorageGroup *sg = new StorageGroup(group, host);
-                if (sg)
-                {
-                    QString local = sg->FindFile(path);
-                    if (!local.isEmpty())
-                        if (sg->FileExists(local))
-                            return local;
-                }
+                StorageGroup sg = StorageGroup(group, host);
+                QString local = sg.FindFile(path);
+                if (!local.isEmpty() && sg.FileExists(local))
+                    return local;
             }
         }
         return fullpath;
@@ -2445,7 +2451,7 @@ QDateTime ProgramInfo::QueryBookmarkTimeStamp(void) const
     if (!query.exec())
         MythDB::DBError("ProgramInfo::GetBookmarkTimeStamp()", query);
     else if (query.next())
-        ts = query.value(0).toDateTime();
+        ts = MythDate::as_utc(query.value(0).toDateTime());
 
     return ts;
 }
@@ -2706,7 +2712,7 @@ bool ProgramInfo::QueryIsInUse(QStringList &byWho) const
     if (!IsRecording())
         return false;
 
-    QDateTime oneHourAgo = QDateTime::currentDateTime().addSecs(-61 * 60);
+    QDateTime oneHourAgo = MythDate::current().addSecs(-61 * 60);
     MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare("SELECT hostname, recusage FROM inuseprograms "
@@ -2941,7 +2947,7 @@ void ProgramInfo::UpdateLastDelete(bool setTime) const
 
     if (setTime)
     {
-        QDateTime timeNow = QDateTime::currentDateTime();
+        QDateTime timeNow = MythDate::current();
         int delay = recstartts.secsTo(timeNow) / 3600;
 
         if (delay > 200)
@@ -3858,7 +3864,7 @@ void ProgramInfo::UpdateInUseMark(bool force)
     if (inUseForWhat.isEmpty())
         return;
 
-    if (force || lastInUseTime.secsTo(QDateTime::currentDateTime()) > 15 * 60)
+    if (force || lastInUseTime.secsTo(MythDate::current()) > 15 * 60)
         MarkAsInUse(true);
 }
 
@@ -4118,7 +4124,7 @@ void ProgramInfo::MarkAsInUse(bool inuse, QString usedFor)
             MythDB::DBError("MarkAsInUse -- delete", query);
 
         inUseForWhat.clear();
-        lastInUseTime = mythCurrentDateTime().addSecs(-4 * 60 * 60);
+        lastInUseTime = MythDate::current(true).addSecs(-4 * 60 * 60);
         SendUpdateEvent();
         return;
     }
@@ -4128,7 +4134,7 @@ void ProgramInfo::MarkAsInUse(bool inuse, QString usedFor)
 
     QString recDir = DiscoverRecordingDirectory();
 
-    QDateTime inUseTime = mythCurrentDateTime();
+    QDateTime inUseTime = MythDate::current(true);
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
@@ -4194,7 +4200,7 @@ void ProgramInfo::MarkAsInUse(bool inuse, QString usedFor)
         return;
 
     // Let others know we changed status
-    QDateTime oneHourAgo = QDateTime::currentDateTime().addSecs(-61 * 60);
+    QDateTime oneHourAgo = MythDate::current().addSecs(-61 * 60);
     query.prepare("SELECT DISTINCT recusage "
                   "FROM inuseprograms "
                   "WHERE lastupdatetime >= :ONEHOURAGO AND "
@@ -4409,20 +4415,20 @@ void ProgramInfo::SubstituteMatches(QString &str)
     for (uint i = 0; i < sizeof(time_str)/sizeof(char*); i++)
     {
         str.replace(QString("%%1%").arg(time_str[i]),
-                    time_dtr[i]->toString("yyyyMMddhhmmss"));
+                    (time_dtr[i]->toLocalTime()).toString("yyyyMMddhhmmss"));
         str.replace(QString("%%1ISO%").arg(time_str[i]),
-                    time_dtr[i]->toString(Qt::ISODate));
+                    (time_dtr[i]->toLocalTime()).toString(Qt::ISODate));
         str.replace(QString("%%1UTC%").arg(time_str[i]),
-                    (time_dtr[i]->toUTC()).toString("yyyyMMddhhmmss"));
+                    time_dtr[i]->toString("yyyyMMddhhmmss"));
         str.replace(QString("%%1ISOUTC%").arg(time_str[i]),
-                    (time_dtr[i]->toUTC()).toString(Qt::ISODate));
+                    time_dtr[i]->toString(Qt::ISODate));
     }
 }
 
 QMap<QString,uint32_t> ProgramInfo::QueryInUseMap(void)
 {
     QMap<QString, uint32_t> inUseMap;
-    QDateTime oneHourAgo = QDateTime::currentDateTime().addSecs(-61 * 60);
+    QDateTime oneHourAgo = MythDate::current().addSecs(-61 * 60);
 
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -4436,7 +4442,8 @@ QMap<QString,uint32_t> ProgramInfo::QueryInUseMap(void)
     while (query.next())
     {
         QString inUseKey = ProgramInfo::MakeUniqueKey(
-            query.value(0).toUInt(), query.value(1).toDateTime());
+            query.value(0).toUInt(),
+            MythDate::as_utc(query.value(1).toDateTime()));
 
         QString inUseForWhat = query.value(2).toString();
 
@@ -4468,7 +4475,7 @@ QMap<QString,bool> ProgramInfo::QueryJobsRunning(int type)
     while (query.next())
     {
         uint      chanid     = query.value(0).toUInt();
-        QDateTime recstartts = query.value(1).toDateTime();
+        QDateTime recstartts = MythDate::as_utc(query.value(1).toDateTime());
         int       tmpStatus  = query.value(2).toInt();
         if ((tmpStatus != /*JOB_UNKNOWN*/ 0x0000) &&
             (tmpStatus != /*JOB_QUEUED*/ 0x0001) &&
@@ -4576,7 +4583,7 @@ static bool FromProgramQuery(
 bool LoadFromProgram(
     ProgramList &destination,
     const QString &sql, const MSqlBindings &bindings,
-    const ProgramList &schedList, bool oneChanid)
+    const ProgramList &schedList)
 {
     destination.clear();
 
@@ -4599,10 +4606,10 @@ bool LoadFromProgram(
                 query.value(9).toString(), // channame
                 query.value(12).toString(), // chanplaybackfilters
 
-                query.value(1).toDateTime(), // startts
-                query.value(2).toDateTime(), // endts
-                query.value(1).toDateTime(), // recstartts
-                query.value(2).toDateTime(), // recendts
+                MythDate::as_utc(query.value(1).toDateTime()), // startts
+                MythDate::as_utc(query.value(2).toDateTime()), // endts
+                MythDate::as_utc(query.value(1).toDateTime()), // recstartts
+                MythDate::as_utc(query.value(2).toDateTime()), // recendts
 
                 query.value(13).toString(), // seriesid
                 query.value(14).toString(), // programid
@@ -4622,7 +4629,7 @@ bool LoadFromProgram(
                 query.value(24).toInt(), // audioprop
                 query.value(25).toInt(), // subtitletypes
 
-                schedList, oneChanid));
+                schedList));
     }
 
     return true;
@@ -4686,8 +4693,10 @@ bool LoadFromOldRecorded(
             query.value(9).toString(), query.value(10).toString(),
             query.value(11).toString(),
 
-            query.value(1).toDateTime(), query.value(2).toDateTime(),
-            query.value(1).toDateTime(), query.value(2).toDateTime(),
+            MythDate::as_utc(query.value(1).toDateTime()),
+            MythDate::as_utc(query.value(2).toDateTime()),
+            MythDate::as_utc(query.value(1).toDateTime()),
+            MythDate::as_utc(query.value(2).toDateTime()),
 
             RecStatusType(query.value(17).toInt()),
             query.value(18).toUInt(),
@@ -4726,7 +4735,7 @@ bool LoadFromRecorded(
     destination.clear();
 
     QString     fs_db_name = "";
-    QDateTime   rectime    = QDateTime::currentDateTime().addSecs(
+    QDateTime   rectime    = MythDate::current().addSecs(
         -gCoreContext->GetNumSetting("RecordOverTime"));
 
     // ----------------------------------------------------------------------
@@ -4769,11 +4778,14 @@ bool LoadFromRecorded(
             hostname = gCoreContext->GetHostName();
 
         RecStatusType recstatus = rsRecorded;
-        QDateTime recstartts = query.value(24).toDateTime();
+        QDateTime recstartts = MythDate::as_utc(query.value(24).toDateTime());
 
         QString key = ProgramInfo::MakeUniqueKey(chanid, recstartts);
-        if (query.value(25).toDateTime() > rectime && recMap.contains(key))
+        if (MythDate::as_utc(query.value(25).toDateTime()) > rectime &&
+            recMap.contains(key))
+        {
             recstatus = rsRecording;
+        }
 
         bool save_not_commflagged = false;
         uint flags = 0;
@@ -4833,14 +4845,16 @@ bool LoadFromRecorded(
 
                 query.value(20).toULongLong(),
 
-                query.value(21).toDateTime(), query.value(22).toDateTime(),
-                query.value(24).toDateTime(), query.value(25).toDateTime(),
+                MythDate::as_utc(query.value(21).toDateTime()),
+                MythDate::as_utc(query.value(22).toDateTime()),
+                MythDate::as_utc(query.value(24).toDateTime()),
+                MythDate::as_utc(query.value(25).toDateTime()),
 
                 query.value(23).toDouble(),
 
                 query.value(26).toUInt(),
                 query.value(27).toDate(),
-                query.value(28).toDateTime(),
+                MythDate::as_utc(query.value(28).toDateTime()),
 
                 recstatus,
 

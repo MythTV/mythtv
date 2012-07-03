@@ -25,8 +25,7 @@
 #include "avcodec.h"
 
 /**
- * Default values for ASS style.
- * @defgroup ass_default
+ * @name Default values for ASS style
  * @{
  */
 #define ASS_DEFAULT_FONT        "Arial"
@@ -40,6 +39,27 @@
 /** @} */
 
 /**
+ * Generate a suitable AVCodecContext.subtitle_header for SUBTITLE_ASS.
+ *
+ * @param avctx pointer to the AVCodecContext
+ * @param font name of the default font face to use
+ * @param font_size default font size to use
+ * @param color default text color to use (ABGR)
+ * @param back_color default background color to use (ABGR)
+ * @param bold 1 for bold text, 0 for normal text
+ * @param italic 1 for italic text, 0 for normal text
+ * @param underline 1 for underline text, 0 for normal text
+ * @param alignment position of the text (left, center, top...), defined after
+ *                  the layout of the numpad (1-3 sub, 4-6 mid, 7-9 top)
+ * @return >= 0 on success otherwise an error code <0
+ */
+int ff_ass_subtitle_header(AVCodecContext *avctx,
+                           const char *font, int font_size,
+                           int color, int back_color,
+                           int bold, int italic, int underline,
+                           int alignment);
+
+/**
  * Generate a suitable AVCodecContext.subtitle_header for SUBTITLE_ASS
  * with default style.
  *
@@ -49,19 +69,13 @@
 int ff_ass_subtitle_header_default(AVCodecContext *avctx);
 
 /**
- * Initialize an AVSubtitle structure for use with ff_ass_add_rect().
- *
- * @param sub pointer to the AVSubtitle
- */
-void ff_ass_init(AVSubtitle *sub);
-
-/**
  * Add an ASS dialog line to an AVSubtitle as a new AVSubtitleRect.
  *
  * @param sub pointer to the AVSubtitle
  * @param dialog ASS dialog to add to sub
  * @param ts_start start timestamp for this dialog (in 1/100 second unit)
- * @param ts_end end timestamp for this dialog (in 1/100 second unit)
+ * @param duration duration for this dialog (in 1/100 second unit), can be -1
+ *                 to last until the end of the presentation
  * @param raw when set to 1, it indicates that dialog contains a whole ASS
  *                           dialog line which should be copied as is.
  *            when set to 0, it indicates that dialog contains only the Text
@@ -72,6 +86,6 @@ void ff_ass_init(AVSubtitle *sub);
  *         A negative value indicates an error.
  */
 int ff_ass_add_rect(AVSubtitle *sub, const char *dialog,
-                    int ts_start, int ts_end, int raw);
+                    int ts_start, int duration, int raw);
 
 #endif /* AVCODEC_ASS_H */

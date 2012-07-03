@@ -23,6 +23,9 @@ QMAKE_CFLAGS += -w
 LIBS += -L../../../external/FFmpeg/libavutil
 LIBS += -L../../../external/FFmpeg/libavcodec
 LIBS += -L../../../external/FFmpeg/libavformat
+LIBS += -L../../../external/zeromq/src/.libs
+LIBS += -L../../../external/nzmqt/src
+LIBS += -L../../../external/qjson/lib
 LIBS += -L../../../libs/libmythbase
 LIBS += -lmythavformat
 LIBS += -lmythavcodec
@@ -33,6 +36,9 @@ LIBS += $$EXTRA_LIBS
 isEmpty(QMAKE_EXTENSION_SHLIB) {
   QMAKE_EXTENSION_SHLIB=so
 }
+
+# llvm/xcode doesn't compile if -O3 is enabled (or any other -O for that matter)
+macx: QMAKE_CFLAGS -= -O3 -O2 -O1 -Os
 
 POST_TARGETDEPS += ../../../external/FFmpeg/libavutil/$$avLibName(avutil)
 POST_TARGETDEPS += ../../../external/FFmpeg/libavcodec/$$avLibName(avcodec)

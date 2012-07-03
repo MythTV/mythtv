@@ -23,6 +23,7 @@
 #include <metadata/videoutils.h>
 #include <rssparse.h>
 #include <mythcoreutil.h>
+#include <mythdate.h>
 
 #include "netsearch.h"
 #include "netcommon.h"
@@ -314,7 +315,7 @@ void NetSearch::cleanCacheDir()
         LOG(VB_GENERAL, LOG_DEBUG, QString("Deleting file %1").arg(filename));
         QFileInfo fi(filename);
         QDateTime lastmod = fi.lastModified();
-        if (lastmod.addDays(7) < QDateTime::currentDateTime())
+        if (lastmod.addDays(7) < MythDate::current())
             QFile::remove(filename);
     }
 }
@@ -520,10 +521,11 @@ void NetSearch::streamWebVideo()
         return;
     }
 
-    GetMythMainWindow()->HandleMedia("Internal", item->GetMediaURL(),
-           item->GetDescription(), item->GetTitle(), item->GetSubtitle(), QString(),
-           item->GetSeason(), item->GetEpisode(), QString(), item->GetTime().toInt(),
-           item->GetDate().toString("yyyy"));
+    GetMythMainWindow()->HandleMedia(
+        "Internal", item->GetMediaURL(),
+        item->GetDescription(), item->GetTitle(), item->GetSubtitle(),
+        QString(), item->GetSeason(), item->GetEpisode(), QString(),
+        item->GetTime().toInt(), item->GetDate().toString("yyyy"));
 }
 
 void NetSearch::showWebVideo()
@@ -742,7 +744,7 @@ void NetSearch::slotItemChanged()
         if (!item->GetThumbnail().isEmpty() && m_thumbImage)
         {
             MythUIButtonListItem *btn = m_searchResultList->GetItemCurrent();
-            QString filename = btn->GetImage();
+            QString filename = btn->GetImageFilename();
             if (filename.contains("%SHAREDIR%"))
                 filename.replace("%SHAREDIR%", GetShareDir());
             m_thumbImage->Reset();
@@ -766,18 +768,19 @@ void NetSearch::slotItemChanged()
     {
         MythUIButtonListItem *item = m_siteList->GetItemCurrent();
 
-        ResultItem *res = new ResultItem(item->GetText(), QString(), QString(),
-              QString(), QString(), QString(), QString(), QDateTime(),
-              0, 0, -1, QString(), QStringList(), QString(), QStringList(), 0, 0, QString(),
-              0, QStringList(), 0, 0, 0);
+        ResultItem res(item->GetText(), QString(), QString(),
+                       QString(), QString(), QString(), QString(),
+                       QDateTime(), 0, 0, -1, QString(), QStringList(),
+                       QString(), QStringList(), 0, 0, QString(),
+                       0, QStringList(), 0, 0, 0);
 
         MetadataMap metadataMap;
-        res->toMap(metadataMap);
+        res.toMap(metadataMap);
         SetTextFromMap(metadataMap);
 
         if (m_thumbImage)
         {
-            QString filename = item->GetImage();
+            QString filename = item->GetImageFilename();
             m_thumbImage->Reset();
             if (filename.contains("%SHAREDIR%"))
                 filename.replace("%SHAREDIR%", GetShareDir());

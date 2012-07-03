@@ -44,7 +44,7 @@ void StartPrompter::handleStart()
 void StartPrompter::leaveBackendRunning()
 {
     LOG(VB_GENERAL, LOG_INFO, "Continuing with backend running");
-    gCoreContext->SetSetting("AutoRestartBackend", "0");
+    gCoreContext->OverrideSettingForSession("AutoRestartBackend", "0");
 }
 
 void StartPrompter::stopBackend()
@@ -56,7 +56,7 @@ void StartPrompter::stopBackend()
     {
         myth_system(commandString);
     }
-    gCoreContext->SetSetting("AutoRestartBackend", "1");
+    gCoreContext->OverrideSettingForSession("AutoRestartBackend", "1");
 }
 
 void StartPrompter::backendRunningPrompt(void)

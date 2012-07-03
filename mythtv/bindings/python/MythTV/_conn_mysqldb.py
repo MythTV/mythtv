@@ -1,5 +1,5 @@
-from logging import MythLog
-from exceptions import MythDBError
+from MythTV.logging import MythLog
+from MythTV.exceptions import MythDBError
 
 from weakref import ref
 
@@ -16,11 +16,11 @@ __version__ = tuple(['MySQLdb']+list(MySQLdb.version_info))
 def dbconnect(dbconn, log):
     log(MythLog.DATABASE, MythLog.INFO,
                     'Spawning new database connection')
-    db = MySQLdb.connect(  user=   dbconn['DBUserName'],
-                           host=   dbconn['DBHostName'],
-                           passwd= dbconn['DBPassword'],
-                           db=     dbconn['DBName'],
-                           port=   dbconn['DBPort'],
+    db = MySQLdb.connect(  user=   dbconn.username,
+                           host=   dbconn.hostname,
+                           passwd= dbconn.password,
+                           db=     dbconn.database,
+                           port=   dbconn.port,
                            use_unicode=True,
                            charset='utf8')
     db.autocommit(True)

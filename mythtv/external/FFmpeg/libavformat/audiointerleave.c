@@ -21,6 +21,7 @@
  */
 
 #include "libavutil/fifo.h"
+#include "libavutil/mathematics.h"
 #include "avformat.h"
 #include "audiointerleave.h"
 #include "internal.h"
@@ -46,6 +47,10 @@ int ff_audio_interleave_init(AVFormatContext *s,
     if (!samples_per_frame)
         return -1;
 
+    if (!time_base.num) {
+        av_log(s, AV_LOG_ERROR, "timebase not set for audio interleave\n");
+        return -1;
+    }
     for (i = 0; i < s->nb_streams; i++) {
         AVStream *st = s->streams[i];
         AudioInterleaveContext *aic = st->priv_data;
@@ -112,10 +117,13 @@ int ff_audio_rechunk_interleave(AVFormatContext *s, AVPacket *out, AVPacket *pkt
             }
             av_fifo_generic_write(aic->fifo, pkt->data, pkt->size, NULL);
         } else {
+            int ret;
             // rewrite pts and dts to be decoded time line position
             pkt->pts = pkt->dts = aic->dts;
             aic->dts += pkt->duration;
-            ff_interleave_add_packet(s, pkt, compare_ts);
+            ret = ff_interleave_add_packet(s, pkt, compare_ts);
+            if (ret < 0)
+                return ret;
         }
         pkt = NULL;
     }
@@ -124,8 +132,12 @@ int ff_audio_rechunk_interleave(AVFormatContext *s, AVPacket *out, AVPacket *pkt
         AVStream *st = s->streams[i];
         if (st->codec->codec_type == AVMEDIA_TYPE_AUDIO) {
             AVPacket new_pkt;
-            while (ff_interleave_new_audio_packet(s, &new_pkt, i, flush))
-                ff_interleave_add_packet(s, &new_pkt, compare_ts);
+            int ret;
+            while (ff_interleave_new_audio_packet(s, &new_pkt, i, flush)) {
+                ret = ff_interleave_add_packet(s, &new_pkt, compare_ts);
+                if (ret < 0)
+                    return ret;
+            }
         }
     }
 

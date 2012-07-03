@@ -22,16 +22,20 @@
 #include "libavcodec/fft.h"
 
 void ff_fft_permute_sse(FFTContext *s, FFTComplex *z);
+void ff_fft_calc_avx(FFTContext *s, FFTComplex *z);
 void ff_fft_calc_sse(FFTContext *s, FFTComplex *z);
-void ff_fft_calc_3dn(FFTContext *s, FFTComplex *z);
-void ff_fft_calc_3dn2(FFTContext *s, FFTComplex *z);
+void ff_fft_calc_3dnow(FFTContext *s, FFTComplex *z);
+void ff_fft_calc_3dnow2(FFTContext *s, FFTComplex *z);
 
-void ff_imdct_calc_3dn(FFTContext *s, FFTSample *output, const FFTSample *input);
-void ff_imdct_half_3dn(FFTContext *s, FFTSample *output, const FFTSample *input);
-void ff_imdct_calc_3dn2(FFTContext *s, FFTSample *output, const FFTSample *input);
-void ff_imdct_half_3dn2(FFTContext *s, FFTSample *output, const FFTSample *input);
+void ff_imdct_calc_3dnow(FFTContext *s, FFTSample *output, const FFTSample *input);
+void ff_imdct_half_3dnow(FFTContext *s, FFTSample *output, const FFTSample *input);
+void ff_imdct_calc_3dnow2(FFTContext *s, FFTSample *output, const FFTSample *input);
+void ff_imdct_half_3dnow2(FFTContext *s, FFTSample *output, const FFTSample *input);
 void ff_imdct_calc_sse(FFTContext *s, FFTSample *output, const FFTSample *input);
 void ff_imdct_half_sse(FFTContext *s, FFTSample *output, const FFTSample *input);
+void ff_imdct_half_avx(FFTContext *s, FFTSample *output, const FFTSample *input);
 void ff_dct32_float_sse(FFTSample *out, const FFTSample *in);
+void ff_dct32_float_sse2(FFTSample *out, const FFTSample *in);
+void ff_dct32_float_avx(FFTSample *out, const FFTSample *in);
 
-#endif
+#endif /* AVCODEC_X86_FFT_H */

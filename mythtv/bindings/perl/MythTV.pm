@@ -8,7 +8,7 @@
 #
 
 # Version
-    $VERSION = '.25svn';
+    $VERSION = '.26git';
 
 # Load sub libraries
     use IO::Socket::INET::MythTV;
@@ -23,6 +23,7 @@ package MythTV;
     use DBI;
     use HTTP::Request;
     use LWP::UserAgent;
+    use Time::Local;
 
 # Load the UPNP libraries if we have them, but die nicely if we don't.
     BEGIN {
@@ -106,15 +107,15 @@ package MythTV;
 # Note: as of July 21, 2010, this is actually a string, to account for proto
 # versions of the form "58a".  This will get used if protocol versions are 
 # changed on a fixes branch ongoing.
-    our $PROTO_VERSION = "73";
-    our $PROTO_TOKEN = "D7FE8D6F";
+    our $PROTO_VERSION = "75";
+    our $PROTO_TOKEN = "SweetRock";
 
 # currentDatabaseVersion is defined in libmythtv in
 # mythtv/libs/libmythtv/dbcheck.cpp and should be the current MythTV core
 # schema version supported in the main code.  We need to check that the schema
 # version in the database is as expected by the bindings, which are expected
 # to be kept in sync with the main code.
-    our $SCHEMA_VERSION = "1300";
+    our $SCHEMA_VERSION = "1306";
 
 # NUMPROGRAMLINES is defined in mythtv/libs/libmythtv/programinfo.h and is
 # the number of items in a ProgramInfo QStringList group used by
@@ -246,26 +247,37 @@ package MythTV;
         print CONF <<EOF;
 <Configuration>
   <UPnP>
+    <UDN>
+      <MediaRenderer>$upnp->{usn}</MediaRenderer>
+    </UDN>
     <MythFrontend>
       <DefaultBackend>
         <USN>$upnp->{usn}</USN>
         <SecurityPin>$pin</SecurityPin>
-        <DBHostName>$upnp->{db_host}</DBHostName>
-        <DBUserName>$upnp->{db_user}</DBUserName>
-        <DBPassword>$upnp->{db_pass}</DBPassword>
-        <DBName>$upnp->{db_name}</DBName>
-        <DBPort>$upnp->{db_port}</DBPort>
       </DefaultBackend>
     </MythFrontend>
   </UPnP>
+  <LocalHostName>my-unique-identifier-goes-here</LocalHostName>
+  <Database>
+    <PingHost>1</PingHost>
+    <Host>$upnp->{db_host}</Host>
+    <UserName>$upnp->{db_user}</UserName>
+    <Password>$upnp->{db_pass}</Password>
+    <DatabaseName>$upnp->{db_name}</DatabaseName>
+    <Port>$upnp->{db_port}</Port>
+  </Database>
+  <WakeOnLAN>
+    <Enabled>0</Enabled>
+    <SQLReconnectWaitTime>0</SQLReconnectWaitTime>
+    <SQLConnectRetry>5</SQLConnectRetry>
+    <Command>echo 'WOLsqlServerCommand not set'</Command>
+  </WakeOnLAN>
 </Configuration>
 EOF
         close CONF;
     }
 
-# Read the mysql.txt file in use by MythTV.  It could be in a couple places,
-# so try the usual suspects in the same order that mythtv does in
-# libs/libmyth/mythcontext.cpp
+# Read the config.xml file in use by MythTV.
     our %mysql_conf = ('hostname' => hostname,
                        'db_host'  => 'localhost',
                        'db_port'  => '',
@@ -280,27 +292,35 @@ EOF
         if ($line =~ m#<SecurityPin>(.*?)</SecurityPin>#) {
             $mysql_conf{'upnp_pin'} = $1;
         }
-        elsif ($line =~ m#<DBHostName>(.*?)</DBHostName>#) {
+        elsif (($line =~ m#<Host>(.*?)</Host>#) ||
+               ($line =~ m#<DBHostName>(.*?)</DBHostName>#)) {
             $mysql_conf{'db_host'}  = $1;
         }
-        elsif ($line =~ m#<DBUserName>(.*?)</DBUserName>#) {
+        elsif (($line =~ m#<UserName>(.*?)</UserName>#) ||
+               ($line =~ m#<DBUserName>(.*?)</DBUserName>#)) {
             $mysql_conf{'db_user'}  = $1;
         }
-        elsif ($line =~ m#<DBPassword>(.*?)</DBPassword>#) {
+        elsif (($line =~ m#<Password>(.*?)</Password>#) ||
+               ($line =~ m#<DBPassword>(.*?)</DBPassword>#)) {
             $mysql_conf{'db_pass'}  = $1;
             $mysql_conf{'db_pass'} =~ s/&amp;/&/sg;
             $mysql_conf{'db_pass'} =~ s/&gt;/>/sg;
             $mysql_conf{'db_pass'} =~ s/&lt;/</sg;
         }
-        elsif ($line =~ m#<DBName>(.*?)</DBName>#) {
+        elsif (($line =~ m#<DatabaseName>(.*?)</DatabaseName>#) ||
+               ($line =~ m#<DBName>(.*?)</DBName>#)) {
             $mysql_conf{'db_name'}  = $1;
         }
-        elsif ($line =~ m#<DBPort>(\d*?)</DBPort>#) {
+        elsif (($line =~ m#<Port>(\d*?)</Port>#) ||
+               ($line =~ m#<DBPort>(.*?)</DBPort>#)) {
             $mysql_conf{'db_port'}  = $1;
         }
     # Hostname override.  Not sure if this is still valid or not
         elsif ($line =~ m#<LocalHostName>(.*?)</LocalHostName>#) {
-            $mysql_conf{'hostname'} = $1;
+            $profileoverride = $1;
+            if ($profileoverride ne "my-unique-identifier-goes-here") {
+                $mysql_conf{'hostname'} = $profileoverride;
+            }
         }
     }
     close CONF;
@@ -781,7 +801,7 @@ EOF
     # Otherwise, format it as necessary.  We have to use MySQL here because
     # Date::Manip is not aware of DST differences.  Yay.  Blech.
         my $sh = $self->{'dbh'}->prepare('SELECT FROM_UNIXTIME(?)');
-        $sh->execute($time);
+        $sh->execute($time);    # Assumed to be a correct epoch time (in GMT)
         ($time) = $sh->fetchrow_array();
         $time =~ s/\s/T/;
         return $time;
@@ -795,7 +815,9 @@ EOF
         my $sh = $self->{'dbh'}->prepare('SELECT UNIX_TIMESTAMP(?)');
         $sh->execute($time);
         ($time) = $sh->fetchrow_array();
-        return $time;
+        my @t = localtime(time);
+        my $offset = timegm(@t) - timelocal(@t);
+        return $time - $offset;
     }
 
 # Create a new MythTV::Program object

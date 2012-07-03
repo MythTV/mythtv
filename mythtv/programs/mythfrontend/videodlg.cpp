@@ -109,7 +109,7 @@ namespace
         if (item)
             return item->GetData().value<MythGenericTree *>();
 
-        return 0;
+        return NULL;
     }
 
     VideoMetadata *GetMetadataPtrFromNode(MythGenericTree *node)
@@ -117,7 +117,7 @@ namespace
         if (node)
             return node->GetData().value<TreeNodeData>().GetMetadata();
 
-        return 0;
+        return NULL;
     }
 
     bool GetLocalVideoImage(const QString &video_uid, const QString &filename,
@@ -378,7 +378,7 @@ namespace
             {
                 if (name != "fanart")
                 {
-                    if (filename.size())
+                    if (!filename.isEmpty())
                     {
                         image->SetFilename(filename);
                         image->Load();
@@ -730,11 +730,11 @@ class VideoDialogPrivate
 
     void AutomaticParentalAdjustment(VideoMetadata *metadata)
     {
-        if (metadata && m_rating_to_pl.size())
+        if (metadata && !m_rating_to_pl.empty())
         {
             QString rating = metadata->GetRating();
             for (parental_level_map::const_iterator p = m_rating_to_pl.begin();
-                    rating.length() && p != m_rating_to_pl.end(); ++p)
+                    !rating.isEmpty() && p != m_rating_to_pl.end(); ++p)
             {
                 if (rating.indexOf(p->first) != -1)
                 {
@@ -852,6 +852,10 @@ VideoDialog::VideoDialog(MythScreenStack *lparent, QString lname,
     m_d->m_videoList->setCurrentVideoFilter(VideoFilterSettings(true,
                     lname));
 
+    m_d->m_parentalLevel.SetLevel(ParentalLevel(gCoreContext->
+                    GetNumSetting("VideoDefaultParentalLevel",
+                            ParentalLevel::plLowest)));
+    
     StorageGroup::ClearGroupToUseCache();
 }
 
@@ -1032,9 +1036,6 @@ bool VideoDialog::Create()
 
 void VideoDialog::Init()
 {
-    m_d->m_parentalLevel.SetLevel(ParentalLevel(gCoreContext->
-                    GetNumSetting("VideoDefaultParentalLevel",
-                            ParentalLevel::plLowest)));
     connect(&m_d->m_parentalLevel, SIGNAL(SigLevelChanged()),
             SLOT(reloadData()));
 }
@@ -1148,7 +1149,7 @@ void VideoDialog::loadData()
 
                 if (m_d->m_type == DLG_GALLERY || m_d->m_type == DLG_BROWSER)
                 {
-                    if (lastTreeNodePath.size() > 0)
+                    if (!lastTreeNodePath.isEmpty())
                     {
                         MythGenericTree *node;
 
@@ -1356,7 +1357,7 @@ QString VideoDialog::RemoteImageCheck(QString host, QString filename)
 
     QStringList dirs = GetVideoDirsByHost(host);
 
-    if (dirs.size() > 0)
+    if (!dirs.isEmpty())
     {
         for (QStringList::const_iterator iter = dirs.begin();
              iter != dirs.end(); ++iter)
@@ -1381,7 +1382,7 @@ QString VideoDialog::RemoteImageCheck(QString host, QString filename)
                 break;
             }
 
-            if ((list.size() > 0) && (list.at(0) == fname))
+            if ((!list.isEmpty()) && (list.at(0) == fname))
                 result = generate_file_url("Videos", host, filename);
 
             if (!result.isEmpty())
@@ -1469,7 +1470,7 @@ QString VideoDialog::GetImageFromFolder(VideoMetadata *metadata)
 
             QStringList dirs = GetVideoDirsByHost(host);
 
-            if (dirs.size() > 0)
+            if (!dirs.isEmpty())
             {
                 for (QStringList::const_iterator iter = dirs.begin();
                      iter != dirs.end(); ++iter)
@@ -1491,7 +1492,7 @@ QString VideoDialog::GetImageFromFolder(VideoMetadata *metadata)
                             QRegExp rx(*pattern);
                             rx.setPatternSyntax(QRegExp::Wildcard);
                             QStringList matches = tmpList.filter(rx);
-                            if (matches.size() > 0)
+                            if (!matches.isEmpty())
                             {
                                 fList.clear();
                                 fList.append(subdir + "/" + matches.at(0).split("::").at(1));
@@ -1619,7 +1620,7 @@ QString VideoDialog::GetCoverImage(MythGenericTree *node)
 
                 QStringList dirs = GetVideoDirsByHost(host);
 
-                if (dirs.size() > 0)
+                if (!dirs.isEmpty())
                 {
                     for (QStringList::const_iterator iter = dirs.begin();
                          iter != dirs.end(); ++iter)
@@ -1642,7 +1643,7 @@ QString VideoDialog::GetCoverImage(MythGenericTree *node)
                                 QRegExp rx(*pattern);
                                 rx.setPatternSyntax(QRegExp::Wildcard);
                                 QStringList matches = tmpList.filter(rx);
-                                if (matches.size() > 0)
+                                if (!matches.isEmpty())
                                 {
                                     fList.clear();
                                     fList.append(subdir + "/" + matches.at(0).split("::").at(1));
@@ -2344,7 +2345,7 @@ void VideoDialog::VideoMenu()
 
     MythUIButtonListItem *item = GetItemCurrent();
     MythGenericTree *node = GetNodePtrFromButton(item);
-    if (node && node->getInt() >= 0)
+    if (metadata)
     {
         if (!metadata->GetTrailer().isEmpty() ||
                 gCoreContext->GetNumSetting("mythvideo.TrailersRandomEnabled", 0) ||
@@ -2360,8 +2361,10 @@ void VideoDialog::VideoMenu()
         menu->AddItem(tr("Change Video Details"), NULL, CreateManageMenu());
         menu->AddItem(tr("Delete"), SLOT(RemoveVideo()));
     }
-    if (node && !(node->getInt() >= 0) && node->getInt() != kUpFolder)
+    else if (node && node->getInt() != kUpFolder)
+    {
         menu->AddItem(tr("Play Folder"), SLOT(playFolder()));
+    }
 
 
     m_menuPopup = new MythDialogBox(menu, m_popupStack, "videomenupopup");
@@ -2592,7 +2595,7 @@ MythMenu *VideoDialog::CreateInfoMenu()
     VideoMetadata *metadata = GetMetadata(GetItemCurrent());
     if (metadata)
     {
-        if (metadata->GetCast().size())
+        if (!metadata->GetCast().empty())
             menu->AddItem(tr("View Cast"), SLOT(ShowCastDialog()));
         if (!metadata->GetHomepage().isEmpty())
             menu->AddItem(tr("View Homepage"), SLOT(ShowHomepage()));
@@ -3096,7 +3099,7 @@ void VideoDialog::playVideoWithTrailers()
             gCoreContext->GetNumSetting("mythvideo.TrailersRandomCount");
 
     int i = 0;
-    while (trailers.size() && i < trailersToPlay)
+    while (!trailers.isEmpty() && i < trailersToPlay)
     {
         ++i;
         QString trailer = trailers.takeAt(random() % trailers.size());
@@ -3181,7 +3184,7 @@ VideoMetadata *VideoDialog::GetMetadata(MythUIButtonListItem *item)
             int nodeInt = node->getInt();
 
             if (nodeInt >= 0)
-            metadata = GetMetadataPtrFromNode(node);
+                metadata = GetMetadataPtrFromNode(node);
         }
     }
 
@@ -3397,13 +3400,17 @@ void VideoDialog::VideoAutoSearch(MythGenericTree *node)
 
 void VideoDialog::ToggleWatched()
 {
-    VideoMetadata *metadata = GetMetadata(GetItemCurrent());
+    MythUIButtonListItem *item = GetItemCurrent();
+    if (!item)
+        return;
+
+    VideoMetadata *metadata = GetMetadata(item);
     if (metadata)
     {
         metadata->SetWatched(!metadata->GetWatched());
         metadata->UpdateDatabase();
-
-        refreshData();
+        item->DisplayState(WatchedToState(metadata->GetWatched()),
+                                       "watchedstate");
     }
 }
 

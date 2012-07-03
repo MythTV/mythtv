@@ -17,11 +17,11 @@
 ;*
 ;* You should have received a copy of the GNU Lesser General Public
 ;* License along with FFmpeg; if not, write to the Free Software
-;* 51, Inc., Foundation Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+;* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 ;******************************************************************************
 
-%include "x86inc.asm"
-%include "x86util.asm"
+%include "libavutil/x86/x86inc.asm"
+%include "libavutil/x86/x86util.asm"
 
 cextern pw_64
 
@@ -127,7 +127,7 @@ cglobal vp6_filter_diag4_%1, 5, 7, %2
     sub         rsp, 8*15
     movq         m6, [pw_64]
 %endif
-%ifdef ARCH_X86_64
+%if ARCH_X86_64
     movsxd       r2, r2d
 %endif
 

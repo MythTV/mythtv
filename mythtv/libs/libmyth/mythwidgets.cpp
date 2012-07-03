@@ -13,7 +13,7 @@ using namespace std;
 
 #include "mythwidgets.h"
 #include "mythcontext.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 #include "mythdialogs.h"
 #include "mythlogging.h"
 #include "mythmainwindow.h"

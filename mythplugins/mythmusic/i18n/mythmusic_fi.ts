@@ -906,15 +906,16 @@ Jatketaanko musiikin toistoa taustalla?</translation>
     <message>
         <source>MythMusic has encountered the following error:
 %1</source>
-        <translation type="unfinished"></translation>
+        <translation>MythMusic törmäsi seuraavaan virheeseen:
+%1</translation>
     </message>
     <message>
         <source>Tracks From Current Year</source>
-        <translation type="unfinished"></translation>
+        <translation>Tämänvuotiset kappaleet</translation>
     </message>
     <message>
         <source>%1 of %2</source>
-        <translation type="unfinished">%1 / %2</translation>
+        <translation>%1 / %2</translation>
     </message>
 </context>
 <context>
@@ -1384,8 +1385,8 @@ Jatketaanko musiikin toistoa taustalla?</translation>
     <message numerus="yes">
         <source>%n Star(s)</source>
         <translation>
+            <numerusform>%n tähti</numerusform>
             <numerusform>%n tähteä</numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message>
@@ -2134,11 +2135,11 @@ Tarkista että URL on oikein.</translation>
     </message>
     <message>
         <source>You need to tell me where to find your music on the &apos;General Settings&apos; page of MythMusic&apos;s settings pages.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sinun tulee kertoa minulle mistä musiikkisi löytyy &apos;Yleiset asetukset&apos; sivulla MythMusic :in asetuksissa.</translation>
     </message>
     <message>
         <source>Can&apos;t find your music directory. Have you set it correctly on the &apos;General Settings&apos; page of MythMusic&apos;s settings pages?</source>
-        <translation type="unfinished"></translation>
+        <translation>Musiikkihakemistoasi ei löydy. Oletko asettanut sen oikein &apos;Yleiset asetukset&apos; sivulla MythMusic :in asetuksissa.</translation>
     </message>
 </context>
 <context>
@@ -3612,43 +3613,43 @@ Haluatko lopullisesti poistaa tiedosto(n/t)?</translation>
     <name>Visualizers</name>
     <message>
         <source>BumpScope</source>
-        <translation type="unfinished"></translation>
+        <translation>BumpScope</translation>
     </message>
     <message>
         <source>Goom</source>
-        <translation type="unfinished"></translation>
+        <translation>Goom</translation>
     </message>
     <message>
         <source>Synaesthesia</source>
-        <translation type="unfinished"></translation>
+        <translation>Synaesthesia</translation>
     </message>
     <message>
         <source>StereoScope</source>
-        <translation type="unfinished"></translation>
+        <translation>StereoScope</translation>
     </message>
     <message>
         <source>MonoScope</source>
-        <translation type="unfinished"></translation>
+        <translation>MonoScope</translation>
     </message>
     <message>
         <source>Spectrum</source>
-        <translation type="unfinished"></translation>
+        <translation>Spectrum</translation>
     </message>
     <message>
         <source>Squares</source>
-        <translation type="unfinished"></translation>
+        <translation>Squares</translation>
     </message>
     <message>
         <source>Piano</source>
-        <translation type="unfinished"></translation>
+        <translation>Piano</translation>
     </message>
     <message>
         <source>AlbumArt</source>
-        <translation type="unfinished"></translation>
+        <translation>AlbumArt</translation>
     </message>
     <message>
         <source>Blank</source>
-        <translation type="unfinished"></translation>
+        <translation>Blank</translation>
     </message>
 </context>
 </TS>

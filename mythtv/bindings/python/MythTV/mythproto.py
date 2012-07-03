@@ -4,15 +4,15 @@
 Provides connection cache and data handlers for accessing the backend.
 """
 
-from static import PROTO_VERSION, BACKEND_SEP, RECSTATUS, AUDIO_PROPS, \
-                   VIDEO_PROPS, SUBTITLE_TYPES
-from exceptions import MythError, MythDBError, MythBEError, MythFileError
-from logging import MythLog
-from altdict import DictData
-from connections import BEConnection, BEEventConnection
-from database import DBCache
-from utility import CMPRecord, datetime, \
-                    ParseEnum, CopyData, CopyData2, check_ipv6
+from MythTV.static import PROTO_VERSION, BACKEND_SEP, RECSTATUS, AUDIO_PROPS, \
+                          VIDEO_PROPS, SUBTITLE_TYPES
+from MythTV.exceptions import MythError, MythDBError, MythBEError, MythFileError
+from MythTV.logging import MythLog
+from MythTV.altdict import DictData
+from MythTV.connections import BEConnection, BEEventConnection
+from MythTV.database import DBCache
+from MythTV.utility import CMPRecord, datetime, \
+                           ParseEnum, CopyData, CopyData2, check_ipv6
 
 from datetime import date
 from time import sleep
@@ -657,7 +657,7 @@ class FileOps( BECache ):
 
     def getHash(self, file, sgroup, host=None):
         """FileOps.getHash(file, storagegroup, host) -> hash string"""
-        m = [file, sgroup]
+        m = ['QUERY_FILE_HASH', file, sgroup]
         if host:
             m.append(host)
         return self.backendCommand(BACKEND_SEP.join(m))
@@ -794,7 +794,7 @@ class FreeSpace( DictData ):
     _field_order = [ 'host',         'path',     'islocal',
                     'disknumber',   'sgroupid', 'blocksize',
                     'totalspace', 'usedspace']
-    _field_type = [3, 3, 2, 0, 0, 0, 0, 0, 0, 0]
+    _field_type = [3, 3, 2, 0, 0, 0, 0, 0]
     def __str__(self):
         return "<FreeSpace '%s@%s' at %s>"\
                     % (self.path, self.host, hex(id(self)))

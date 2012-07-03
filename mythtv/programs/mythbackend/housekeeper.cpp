@@ -18,10 +18,11 @@ using namespace std;
 
 // MythTV headers
 #include "housekeeper.h"
+#include "mythsystem.h"
 #include "jobqueue.h"
 #include "mythcorecontext.h"
 #include "mythdb.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 #include "compat.h"
 #include "mythdirs.h"
 #include "programinfo.h"
@@ -100,9 +101,8 @@ bool HouseKeeper::wantToRun(const QString &dbTag, int period, int minhour,
     else
         longEnough = oneday / 8;
 
-    QDateTime now = QDateTime::currentDateTime();
-    QDateTime lastrun;
-    lastrun.setTime_t(0);
+    QDateTime now = MythDate::current();
+    QDateTime lastrun = MythDate::fromTime_t(0);
 
     if (minhour < 0)
         minhour = 0;
@@ -115,10 +115,9 @@ bool HouseKeeper::wantToRun(const QString &dbTag, int period, int minhour,
         result.prepare("SELECT lastrun FROM housekeeping WHERE tag = :TAG ;");
         result.bindValue(":TAG", dbTag);
 
-        if (result.exec() && result.isActive() && result.size() > 0)
+        if (result.exec() && result.next())
         {
-            result.next();
-            lastrun = result.value(0).toDateTime();
+            lastrun = MythDate::as_utc(result.value(0).toDateTime());
 
             if ((lastrun.secsTo(now) > longEnough) &&
                 (now.date().day() != lastrun.date().day()))
@@ -180,18 +179,16 @@ void HouseKeeper::updateLastrun(const QString &dbTag)
 
 QDateTime HouseKeeper::getLastRun(const QString &dbTag)
 {
-    QDateTime lastRun;
     MSqlQuery result(MSqlQuery::InitCon());
 
-    lastRun.setTime_t(0);
+    QDateTime lastRun = MythDate::fromTime_t(0);
 
     result.prepare("SELECT lastrun FROM housekeeping WHERE tag = :TAG ;");
     result.bindValue(":TAG", dbTag);
 
-    if (result.exec() && result.isActive() && result.size() > 0)
+    if (result.exec() && result.next())
     {
-        result.next();
-        lastRun = result.value(0).toDateTime();
+        lastRun = MythDate::as_utc(result.value(0).toDateTime());
     }
 
     return lastRun;
@@ -205,7 +202,6 @@ void HouseKeeper::RunHouseKeeping(void)
         houseKeepingWait.wakeAll();
     }
 
-    int period, maxhr, minhr;
     QString dbTag;
     bool initialRun = true;
 
@@ -245,18 +241,6 @@ void HouseKeeper::RunHouseKeeping(void)
                 }
                 else
                 {
-                    period = 1;
-                    minhr = gCoreContext->GetNumSetting("MythFillMinHour", -1);
-                    if (minhr == -1)
-                    {
-                        minhr = 0;
-                        maxhr = 24;
-                    }
-                    else
-                    {
-                        maxhr = gCoreContext->GetNumSetting("MythFillMaxHour", 24);
-                    }
-
                     bool grabberSupportsNextTime = false;
                     MSqlQuery result(MSqlQuery::InitCon());
                     if (result.isConnected())
@@ -267,31 +251,57 @@ void HouseKeeper::RunHouseKeeping(void)
                                            " 'schedulesdirect1' );");
 
                         if ((result.exec()) &&
-                            (result.isActive()) &&
-                            (result.size() > 0) &&
                             (result.next()) &&
                             (result.value(0).toInt() > 0))
-                            grabberSupportsNextTime = true;
+                        {
+                            grabberSupportsNextTime =
+                                gCoreContext->GetNumSetting(
+                                    "MythFillGrabberSuggestsTime", 1);
+                        }
                     }
 
                     bool runMythFill = false;
-                    if (grabberSupportsNextTime &&
-                        gCoreContext->GetNumSetting("MythFillGrabberSuggestsTime", 1))
+                    if (grabberSupportsNextTime)
                     {
-                        QDateTime nextRun = QDateTime::fromString(
+                        QDateTime nextRun = MythDate::fromString(
                             gCoreContext->GetSetting("MythFillSuggestedRunTime",
-                            "1970-01-01T00:00:00"), Qt::ISODate);
+                                                     "1970-01-01T00:00:00"));
                         QDateTime lastRun = getLastRun("MythFillDB");
-                        QDateTime now = QDateTime::currentDateTime();
+                        QDateTime now = MythDate::current();
 
                         if ((nextRun < now) &&
                             (lastRun.secsTo(now) > (3 * 60 * 60)))
                             runMythFill = true;
                     }
-                    else if (wantToRun("MythFillDB", period, minhr, maxhr,
-                                       initialRun))
+                    else
                     {
-                        runMythFill = true;
+                        QDate date = QDate::currentDate();
+                        int minhr = gCoreContext->GetNumSetting(
+                            "MythFillMinHour", -1);
+                        int maxhr = gCoreContext->GetNumSetting(
+                            "MythFillMaxHour", 23) % 24;
+                        if (minhr == -1)
+                        {
+                            minhr = 0;
+                            maxhr = 23;
+                        }
+                        else
+                        {
+                            minhr %= 24;
+                        }
+
+                        QDateTime umin =
+                            QDateTime(date, QTime(minhr,0)).toUTC();
+                        QDateTime umax =
+                            QDateTime(date, QTime(maxhr,0)).toUTC();
+
+                        if (umax == umin)
+                            umax.addSecs(60*60);
+
+                        runMythFill = wantToRun(
+                            "MythFillDB", 1,
+                            umin.time().hour(), umax.time().hour(),
+                            initialRun);
                     }
 
                     if (runMythFill)
@@ -336,11 +346,6 @@ void HouseKeeper::RunHouseKeeping(void)
             updateLastrun(dbTag);
         }
 
-        if (wantToRun("DBCleanup", 1, 0, 24))
-        {
-            gCoreContext->GetDBManager()->PurgeIdleConnections();
-        }
-
         initialRun = false;
 
         locker.relock();
@@ -358,7 +363,7 @@ void HouseKeeper::flushDBLogs()
     if (query.isConnected())
     {
         // Remove less-important logging after 1/2 * numdays days
-        QDateTime days = QDateTime::currentDateTime();
+        QDateTime days = MythDate::current();
         days = days.addDays(0 - (numdays / 2));
         QString sql = "DELETE FROM logging "
                       " WHERE application NOT IN (:MYTHBACKEND, :MYTHFRONTEND) "
@@ -369,19 +374,19 @@ void HouseKeeper::flushDBLogs()
         query.bindValue(":DAYS", days);
         LOG(VB_GENERAL, LOG_DEBUG,
             QString("Deleting helper application database log entries "
-                    "from before %1.") .arg(days.toString()));
+                    "from before %1.") .arg(days.toString(Qt::ISODate)));
         if (!query.exec())
             MythDB::DBError("Delete helper application log entries", query);
 
         // Remove backend/frontend logging after numdays days
-        days = QDateTime::currentDateTime();
+        days = MythDate::current();
         days = days.addDays(0 - numdays);
         sql = "DELETE FROM logging WHERE msgtime < :DAYS ;";
         query.prepare(sql);
         query.bindValue(":DAYS", days);
         LOG(VB_GENERAL, LOG_DEBUG,
             QString("Deleting database log entries from before %1.")
-                .arg(days.toString()));
+            .arg(days.toString(Qt::ISODate)));
         if (!query.exec())
             MythDB::DBError("Delete old log entries", query);
 
@@ -429,8 +434,8 @@ void HouseKeeper::RunMFD(void)
     if (mfpath == "mythfilldatabase")
         mfpath = GetInstallPrefix() + "/bin/mythfilldatabase";
 
-    QString command = QString("%1 %2").arg(mfpath).arg(mfarg);
-    command += logPropagateArgs;
+    QString command = QString("%1 %2 %3").arg(mfpath).arg(logPropagateArgs)
+                        .arg(mfarg);
 
     {
         QMutexLocker locker(&fillDBLock);
@@ -523,7 +528,7 @@ void HouseKeeper::CleanupMyOldRecordings(void)
 
 void HouseKeeper::CleanupAllOldInUsePrograms(void)
 {
-    QDateTime fourHoursAgo = QDateTime::currentDateTime().addSecs(-4 * 60 * 60);
+    QDateTime fourHoursAgo = MythDate::current().addSecs(-4 * 60 * 60);
     MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare("DELETE FROM inuseprograms "
@@ -535,7 +540,7 @@ void HouseKeeper::CleanupAllOldInUsePrograms(void)
 
 void HouseKeeper::CleanupOrphanedLivetvChains(void)
 {
-    QDateTime fourHoursAgo = QDateTime::currentDateTime().addSecs(-4 * 60 * 60);
+    QDateTime fourHoursAgo = MythDate::current().addSecs(-4 * 60 * 60);
     MSqlQuery query(MSqlQuery::InitCon());
     MSqlQuery deleteQuery(MSqlQuery::InitCon());
 
@@ -644,7 +649,7 @@ void HouseKeeper::CleanupRecordedTables(void)
         while (query.next())
         {
             deleteQuery.bindValue(":CHANID", query.value(0).toString());
-            deleteQuery.bindValue(":STARTTIME", query.value(1).toDateTime());
+            deleteQuery.bindValue(":STARTTIME", query.value(1));
             if (!deleteQuery.exec())
                 MythDB::DBError("HouseKeeper Cleaning Recorded Tables",
                                 deleteQuery);
@@ -720,11 +725,11 @@ void HouseKeeper::CleanupProgramListings(void)
                   "WHERE type = :FINDONE AND oldfind.findid IS NOT NULL;");
     findq.bindValue(":FINDONE", kFindOneRecord);
 
-    if (findq.exec() && findq.size() > 0)
+    if (findq.exec())
     {
+        query.prepare("DELETE FROM record WHERE recordid = :RECORDID;");
         while (findq.next())
         {
-            query.prepare("DELETE FROM record WHERE recordid = :RECORDID;");
             query.bindValue(":RECORDID", findq.value(0).toInt());
             if (!query.exec())
                 MythDB::DBError("HouseKeeper Cleaning Program Listings", query);

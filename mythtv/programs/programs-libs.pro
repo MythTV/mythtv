@@ -20,11 +20,11 @@ LIBS += -L../../libs/libmythmetadata
 LIBS += -L../../libs/libmythservicecontracts
 LIBS += -L../../libs/libmythprotoserver
 
-LIBS += -lmythtv-$$LIBVERSION
 LIBS += -lmythswscale
 LIBS += -lmythavformat
 LIBS += -lmythavcodec
 LIBS += -lmythavutil
+LIBS += -lmythtv-$$LIBVERSION
 LIBS += -lmythupnp-$$LIBVERSION
 LIBS += -lmythbase-$$LIBVERSION
 LIBS += -lmythui-$$LIBVERSION
@@ -64,6 +64,7 @@ DEPENDPATH += ../../libs/libmythlivemedia ../../libmythbase ../../libmythhdhomer
 DEPENDPATH +=../../libs/libmythservicecontracts ../../libs/libmythprotoserver
 
 using_opengl:CONFIG += opengl
+using_mingw:DEFINES += USING_MINGW
 
 macx:using_firewire:using_backend:LIBS += -F$${CONFIG_MAC_AVC} -framework AVCVideoServices
 macx:using_dvdv:LIBS += -lobjc

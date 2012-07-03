@@ -406,10 +406,10 @@ void MetadataLookup::toMap(MetadataMap &metadataMap)
     metadataMap["seriesid"] = m_seriesid;
     metadataMap["programid"] = m_programid;
     metadataMap["storagegroup"] = m_storagegroup;
-    metadataMap["startts"] = MythDateTimeToString(m_startts, kDateFull);
-    metadataMap["endts"] = MythDateTimeToString(m_endts, kDateFull);
-    metadataMap["recstartts"] = MythDateTimeToString(m_recstartts, kDateFull);
-    metadataMap["recendts"] = MythDateTimeToString(m_recendts, kDateFull);
+    metadataMap["startts"] = MythDate::toString(m_startts, MythDate::kDateFull);
+    metadataMap["endts"] = MythDate::toString(m_endts, MythDate::kDateFull);
+    metadataMap["recstartts"] = MythDate::toString(m_recstartts, MythDate::kDateFull);
+    metadataMap["recendts"] = MythDate::toString(m_recendts, MythDate::kDateFull);
     metadataMap["certification"] = m_certification;
     metadataMap["countries"] = m_countries.join(", ");
     metadataMap["popularity"] = QString::number(m_popularity);
@@ -420,8 +420,9 @@ void MetadataLookup::toMap(MetadataMap &metadataMap)
     metadataMap["system"] = m_system;
     metadataMap["year"] = QString::number(m_year);
 
-    metadataMap["releasedate"] = MythDateToString(m_releasedate, kDateFull);
-    metadataMap["lastupdated"] = MythDateTimeToString(m_lastupdated, kDateFull);
+    metadataMap["releasedate"] = MythDate::toString(
+        m_releasedate, MythDate::kDateFull);
+    metadataMap["lastupdated"] = MythDate::toString(m_lastupdated, MythDate::kDateFull);
 
     metadataMap["runtime"] = QObject::tr("%n minute(s)", "", m_runtime);
     metadataMap["runtimesecs"] = QObject::tr("%n second(s)", "", m_runtimesecs);
@@ -708,7 +709,7 @@ void CreateMetadataXMLItem(MetadataLookup *lookup,
         QDomElement startts = docroot.createElement("startts");
         item.appendChild(startts);
         startts.appendChild(docroot.createTextNode(
-                            lookup->GetStartTS().toString(RFC822)));
+                                lookup->GetStartTS().toString(RFC822)));
     }
     // End TS
     if (!lookup->GetEndTS().isNull())
@@ -1443,7 +1444,7 @@ QDateTime RFC822TimeToQDateTime(const QString& t)
         return QDateTime();
     result = result.addSecs(hoursShift * 3600 * (-1) + minutesShift *60 * (-1));
     result.setTimeSpec(Qt::UTC);
-    return result.toLocalTime();
+    return result;
 }
 
 MetaGrabberScript::MetaGrabberScript(

@@ -23,6 +23,8 @@
  *  methods to allow signalling for alternate socket types.
  */
 
+class PrivUdpSocket;
+
 class PrivTcpServer : public QTcpServer
 {
     Q_OBJECT
@@ -76,7 +78,15 @@ class MBASE_PUBLIC ServerPool : public QObject
 
     void close(void);
 
-  signals:
+    int tryListeningPort(int baseport, int range = 1);
+    int tryBindingPort(int baseport, int range = 1);
+    // Utility functions
+    static int tryListeningPort(QTcpServer *server, int baseport,
+                                int range = 1, bool *isipv6 = NULL);
+    static int tryBindingPort(QUdpSocket *socket, int baseport,
+                              int range = 1, bool *isipv6 = NULL);
+
+signals:
     void newConnection(QTcpSocket *);
     void newDatagram(QByteArray, QHostAddress, quint16);
 
@@ -93,8 +103,8 @@ class MBASE_PUBLIC ServerPool : public QObject
     QNetworkProxy   m_proxy;
 
     QList<PrivTcpServer*>   m_tcpServers;
-    QList<QUdpSocket*>      m_udpSockets;
-    QUdpSocket             *m_udpSend;
+    QList<PrivUdpSocket*>   m_udpSockets;
+    PrivUdpSocket          *m_lastUdpSocket;
 };
 
 #endif

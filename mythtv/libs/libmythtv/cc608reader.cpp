@@ -177,7 +177,7 @@ int CC608Reader::Update(unsigned char *inpos)
     if (subtitle.clr)
     {
 #if 0
-        LOG(VB_GENERAL, LOG_DEBUG, "erase displayed memory");
+        LOG(VB_VBI, LOG_DEBUG, "erase displayed memory");
 #endif
         ClearBuffers(false, true, streamIdx);
         if (!subtitle.len)
@@ -259,7 +259,7 @@ int CC608Reader::Update(unsigned char *inpos)
                 ccbuf->push_back(tmpcc);
 #if 0
                 if (ccbuf->size() > 4)
-                    LOG(VB_GENERAL, LOG_DEBUG, QString("CC overflow:  %1 %2 %3")
+                    LOG(VB_VBI, LOG_DEBUG, QString("CC overflow:  %1 %2 %3")
                             .arg(m_outputCol) .arg(m_outputRow)
                             .arg(m_outputText));
 #endif
@@ -504,7 +504,7 @@ void CC608Reader::AddTextData(unsigned char *buffer, int len,
 
     if (NumInputBuffers() >= MAXTBUFFER - 1)
     {
-        LOG(VB_GENERAL, LOG_ERR, "AddTextData(): Text buffer overflow");
+        LOG(VB_VBI, LOG_ERR, "AddTextData(): Text buffer overflow");
         return;
     }
 

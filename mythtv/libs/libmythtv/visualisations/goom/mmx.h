@@ -1,9 +1,7 @@
 #ifndef GOOM_MMX_H
 
 #include <mythconfig.h>
-#include "libavcodec/x86/mmx.h"
-
-int mm_support(void);
+#include "ffmpeg-mmx.h"
 
 #define MM_MMX    0x0001 /* standard MMX */
 #define MM_3DNOW  0x0004 /* AMD 3DNOW */

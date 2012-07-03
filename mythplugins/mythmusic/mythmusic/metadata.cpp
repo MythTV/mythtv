@@ -7,12 +7,13 @@
 // mythtv
 #include <mythcontext.h>
 #include <mythwidgets.h>
+#include <mythdate.h>
 #include <mythdb.h>
 #include <mythdirs.h>
 #include <mythprogressdialog.h>
 #include <mythdownloadmanager.h>
 #include <mythlogging.h>
-#include <mythmiscutil.h>
+#include <mythdate.h>
 
 // mythmusic
 #include "metadata.h"
@@ -133,7 +134,7 @@ void Metadata::UpdateModTime() const
     query.prepare("UPDATE music_songs SET date_modified = :DATE_MOD "
                   "WHERE song_id= :ID ;");
 
-    query.bindValue(":DATE_MOD", QDateTime::currentDateTime());
+    query.bindValue(":DATE_MOD", MythDate::current());
     query.bindValue(":ID", m_id);
 
     if (!query.exec())
@@ -194,9 +195,8 @@ bool Metadata::isInDatabase()
     query.bindValue(":FILENAME", sqlfilename);
     query.bindValue(":DIRECTORY", sqldir);
 
-    if (query.exec() && query.isActive() && query.size() > 0)
+    if (query.exec() && query.next())
     {
-        query.next();
 
         m_artist = query.value(0).toString();
         m_compilation_artist = query.value(1).toString();
@@ -438,11 +438,11 @@ void Metadata::dumpToDatabase()
     query.bindValue(":FILENAME", sqlfilename);
     query.bindValue(":RATING", m_rating);
     query.bindValue(":FORMAT", m_format);
-    query.bindValue(":DATE_MOD", QDateTime::currentDateTime());
+    query.bindValue(":DATE_MOD", MythDate::current());
     query.bindValue(":PLAYCOUNT", m_playcount);
 
     if (m_id < 1)
-        query.bindValue(":DATE_ADD",  QDateTime::currentDateTime());
+        query.bindValue(":DATE_ADD",  MythDate::current());
     else
         query.bindValue(":ID", m_id);
 
@@ -696,6 +696,7 @@ void Metadata::getField(const QString &field, QString *data)
 
 void Metadata::toMap(MetadataMap &metadataMap, const QString &prefix)
 {
+    using namespace MythDate;
     metadataMap[prefix + "artist"] = m_artist;
     metadataMap[prefix + "formatartist"] = FormatArtist();
     metadataMap[prefix + "compilationartist"] = m_compilation_artist;
@@ -717,13 +718,13 @@ void Metadata::toMap(MetadataMap &metadataMap, const QString &prefix)
         metadataMap[prefix + "length"] = QString().sprintf("%02d:%02d", em, es);
 
     if (m_lastplay.isValid())
-        metadataMap[prefix + "lastplayed"] = MythDateTimeToString(m_lastplay,
-                                                kDateFull | kSimplify | kAddYear);
+        metadataMap[prefix + "lastplayed"] =
+            MythDate::toString(m_lastplay, kDateFull | kSimplify | kAddYear);
     else
         metadataMap[prefix + "lastplayed"] = QObject::tr("Never Played");
 
-    metadataMap[prefix + "dateadded"] = MythDateTimeToString(m_dateadded,
-                                              kDateFull | kSimplify | kAddYear);
+    metadataMap[prefix + "dateadded"] = MythDate::toString(
+        m_dateadded, kDateFull | kSimplify | kAddYear);
 
     metadataMap[prefix + "playcount"] = QString::number(m_playcount);
     // FIXME we should use Filename() here but that will slow things down because of the hunt for the file
@@ -750,7 +751,7 @@ void Metadata::incRating()
 
 void Metadata::setLastPlay()
 {
-    m_templastplay = QDateTime::currentDateTime();
+    m_templastplay = MythDate::current();
     m_changed = true;
 }
 
@@ -938,7 +939,7 @@ MetaIO* Metadata::getTagger(void)
         return &metaIOOggVorbis;
     else if (extension == "flac")
     {
-        if (metaIOID3.TagExists(Filename()))
+        if (metaIOID3.TagExists(Filename(true)))
             return &metaIOID3;
         else
             return &metaIOFLACVorbis;
@@ -1501,7 +1502,11 @@ void AlbumArtImages::dumpToDatabase(void)
     query.bindValue(":SONGID", trackID);
     query.bindValue(":DIRECTORYID", directoryID);
 
-    query.exec();
+    if (!query.exec())
+    {
+        MythDB::DBError("AlbumArtImages::dumpToDatabase - "
+                            "deleting existing albumart", query);
+    }
 
     // now add the albumart to the db
     AlbumArtList::iterator it = m_imageList.begin();

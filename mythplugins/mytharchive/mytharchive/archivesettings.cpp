@@ -7,6 +7,7 @@
 // myth
 #include <mythcontext.h>
 #include <mythdirs.h>
+#include <mythdate.h>
 
 // mytharchive
 #include "archivesettings.h"
@@ -165,7 +166,7 @@ static HostComboBox *MythArchiveDateFormat()
     HostComboBox *gc = new HostComboBox("MythArchiveDateFormat");
     gc->setLabel(QObject::tr("Date format"));
 
-    QDate sampdate = QDate::currentDate();
+    QDate sampdate = MythDate::current().toLocalTime().date();
     QString sampleStr =
             QObject::tr("Samples are shown using today's date.");
 

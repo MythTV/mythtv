@@ -164,6 +164,9 @@ void MythGenericTree::DetachParent(void)
 
 void MythGenericTree::removeNode(MythGenericTree *child)
 {
+    if (!child)
+        return;
+
     if (m_selected_subnode == child)
         m_selected_subnode = NULL;
 

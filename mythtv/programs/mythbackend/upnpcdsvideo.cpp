@@ -13,7 +13,7 @@
 // MythTV headers
 #include "upnpcdsvideo.h"
 #include "httprequest.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 #include "mythcorecontext.h"
 #include "storagegroup.h"
 
@@ -38,7 +38,7 @@ UPnpCDSRootInfo UPnpCDSVideo::g_RootNodes[] =
 int UPnpCDSVideo::g_nRootCount = 1;
 
 //int UPnpCDSVideo::g_nRootCount;
-//= sizeof( g_RootNodes ) / sizeof( UPnpCDSRootInfo );
+// = sizeof( g_RootNodes ) / sizeof( UPnpCDSRootInfo );
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -47,7 +47,7 @@ int UPnpCDSVideo::g_nRootCount = 1;
 UPnpCDSRootInfo *UPnpCDSVideo::GetRootInfo( int nIdx )
 {
     if ((nIdx >=0 ) && ( nIdx < g_nRootCount ))
-        return &(g_RootNodes[ nIdx ]); 
+        return &(g_RootNodes[nIdx]);
 
     return NULL;
 }
@@ -357,7 +357,7 @@ void UPnpCDSVideo::AddItem( const UPnpCDSRequest    *pRequest,
     }
     QFileInfo fInfo( sFullFileName );
 
-    pItem->SetPropValue( "date", dtInsertDate.toString( "yyyy-MM-dd"));
+    pItem->SetPropValue( "date", dtInsertDate.toString("yyyy-MM-dd"));
     pResults->Add( pItem );
 
     // ----------------------------------------------------------------------

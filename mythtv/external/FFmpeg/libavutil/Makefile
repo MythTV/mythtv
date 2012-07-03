@@ -3,12 +3,15 @@ include $(SUBDIR)../config.mak
 NAME = avutil
 
 HEADERS = adler32.h                                                     \
+          aes.h                                                         \
           attributes.h                                                  \
+          audio_fifo.h                                                  \
           audioconvert.h                                                \
           avassert.h                                                    \
           avstring.h                                                    \
           avutil.h                                                      \
           base64.h                                                      \
+          bprint.h                                                      \
           bswap.h                                                       \
           common.h                                                      \
           cpu.h                                                         \
@@ -18,6 +21,7 @@ HEADERS = adler32.h                                                     \
           fifo.h                                                        \
           file.h                                                        \
           imgutils.h                                                    \
+          intfloat.h                                                    \
           intfloat_readwrite.h                                          \
           intreadwrite.h                                                \
           lfg.h                                                         \
@@ -26,6 +30,7 @@ HEADERS = adler32.h                                                     \
           mathematics.h                                                 \
           md5.h                                                         \
           mem.h                                                         \
+          dict.h                                                        \
           opt.h                                                         \
           parseutils.h                                                  \
           pixdesc.h                                                     \
@@ -33,15 +38,24 @@ HEADERS = adler32.h                                                     \
           random_seed.h                                                 \
           rational.h                                                    \
           samplefmt.h                                                   \
-          sha1.h                                                        \
+          sha.h                                                         \
+          timecode.h                                                    \
+          timestamp.h                                                   \
+
+ARCH_HEADERS = bswap.h                                                  \
+               intmath.h                                                \
+               intreadwrite.h                                           \
+               timer.h                                                  \
 
 BUILT_HEADERS = avconfig.h
 
 OBJS = adler32.o                                                        \
        aes.o                                                            \
+       audio_fifo.o                                                     \
        audioconvert.o                                                   \
        avstring.o                                                       \
        base64.o                                                         \
+       bprint.o                                                         \
        cpu.o                                                            \
        crc.o                                                            \
        des.o                                                            \
@@ -59,6 +73,7 @@ OBJS = adler32.o                                                        \
        mathematics.o                                                    \
        md5.o                                                            \
        mem.o                                                            \
+       dict.o                                                           \
        opt.o                                                            \
        parseutils.o                                                     \
        pixdesc.o                                                        \
@@ -67,20 +82,34 @@ OBJS = adler32.o                                                        \
        rc4.o                                                            \
        samplefmt.o                                                      \
        sha.o                                                            \
+       timecode.o                                                       \
        tree.o                                                           \
        utils.o                                                          \
 
-OBJS-$(ARCH_ARM) += arm/cpu.o
-OBJS-$(ARCH_PPC) += ppc/cpu.o
-OBJS-$(ARCH_X86) += x86/cpu.o
+TESTPROGS = adler32                                                     \
+            aes                                                         \
+            avstring                                                    \
+            base64                                                      \
+            bprint                                                      \
+            cpu                                                         \
+            crc                                                         \
+            des                                                         \
+            eval                                                        \
+            file                                                        \
+            fifo                                                        \
+            lfg                                                         \
+            lls                                                         \
+            md5                                                         \
+            opt                                                         \
+            pca                                                         \
+            parseutils                                                  \
+            random_seed                                                 \
+            rational                                                    \
+            sha                                                         \
+            tree                                                        \
 
-TESTPROGS = adler32 aes base64 cpu crc des lls md5 pca sha softfloat tree
 TESTPROGS-$(HAVE_LZO1X_999_COMPRESS) += lzo
 
-DIRS = arm bfin sh4 x86
-
-ARCH_HEADERS = bswap.h intmath.h intreadwrite.h timer.h
-
-include $(SUBDIR)../subdir.mak
+TOOLS = ffeval
 
 $(SUBDIR)lzo-test$(EXESUF): ELIBS = -llzo2

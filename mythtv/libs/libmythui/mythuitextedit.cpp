@@ -155,7 +155,7 @@ void MythUITextEdit::Finalize()
         m_Text->SetText("");
     }
 
-    if (m_cursorImage)
+    if (m_cursorImage && m_Text)
         m_cursorImage->SetPosition(m_Text->CursorPosition(0));
 }
 

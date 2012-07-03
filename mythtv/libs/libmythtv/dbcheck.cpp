@@ -15,6 +15,9 @@ using namespace std;
 #include "diseqcsettings.h" // for convert_diseqc_db()
 #include "videodbcheck.h" // for 1267
 #include "compat.h"
+#include "recordingrule.h"
+
+// TODO convert all dates to UTC
 
 #define MINIMUM_DBMS_VERSION 5,0,15
 
@@ -430,9 +433,9 @@ static bool performActualUpdate(
  *
  *   If the "DBSchemaVer" property equals the currentDatabase version this
  *   returns true immediately. If not, we try to do a database backup,
- *   prompt the user for permission to do the upgrade,
- *   lock the schemalock table, call doUpgradeTVDatabaseSchema()
- *   to do the actual update, and then we unlock the schemalock table.
+ *   if interactive prompt the user for permission to do the upgrade,
+ *   and if permitted or non-interactive with a successful backup
+ *   do the actual update.
  *
  *   If the program running this function is killed while
  *   this is running then the schema may be corrupted.
@@ -445,74 +448,81 @@ bool UpgradeTVDatabaseSchema(const bool upgradeAllowed,
 #ifdef IGNORE_SCHEMA_VER_MISMATCH
     return true;
 #endif
-    SchemaUpgradeWizard  * DBup;
+    SchemaUpgradeWizard *schema_wizard = NULL;
 
-
+    // Suppress DB messages and turn of the settings cache,
+    // These are likely to confuse the users and the code, respectively.
     GetMythDB()->SetSuppressDBMessages(true);
     gCoreContext->ActivateSettingsCache(false);
 
-    DBup = SchemaUpgradeWizard::Get("DBSchemaVer", "MythTV",
-                                    currentDatabaseVersion);
-
-    // There may be a race condition where another program (e.g. mythbackend)
-    // is upgrading, so wait up to 5 seconds for a more accurate version:
-    DBup->CompareAndWait(5);
-
-    if (DBup->versionsBehind == 0)  // same schema
+    // Get the schema upgrade lock
+    MSqlQuery query(MSqlQuery::InitCon());
+    bool locked = DBUtil::TryLockSchema(query, 1);
+    for (uint i = 0; i < 2*60 && !locked; i++)
     {
-        gCoreContext->ActivateSettingsCache(true);
-        GetMythDB()->SetSuppressDBMessages(false);
-        return true;
+        LOG(VB_GENERAL, LOG_INFO, "Waiting for database schema upgrade lock");
+        locked = DBUtil::TryLockSchema(query, 1);
+        if (locked)
+            LOG(VB_GENERAL, LOG_INFO, "Got schema upgrade lock");
+    }
+    if (!locked)
+    {
+        LOG(VB_GENERAL, LOG_INFO, "Failed to get schema upgrade lock");
+        goto upgrade_error_exit;
     }
 
+    // Determine if an upgrade is needed
+    schema_wizard = SchemaUpgradeWizard::Get(
+        "DBSchemaVer", "MythTV", currentDatabaseVersion);
+    if (schema_wizard->Compare() == 0) // DB schema is what we need it to be..
+        goto upgrade_ok_exit;
+
     if (!upgradeAllowed)
-        LOG(VB_GENERAL, LOG_ERR, "Not allowed to upgrade the database.");
+        LOG(VB_GENERAL, LOG_WARNING, "Not allowed to upgrade the database.");
 
     // Pop up messages, questions, warnings, etc.
-    switch (DBup->PromptForUpgrade("TV", upgradeAllowed,
-                                   upgradeIfNoUI, MINIMUM_DBMS_VERSION))
+    switch (schema_wizard->PromptForUpgrade(
+                "TV", upgradeAllowed, upgradeIfNoUI, MINIMUM_DBMS_VERSION))
     {
         case MYTH_SCHEMA_USE_EXISTING:
-            gCoreContext->ActivateSettingsCache(true);
-            GetMythDB()->SetSuppressDBMessages(false);
-            return true;
+            goto upgrade_ok_exit;
         case MYTH_SCHEMA_ERROR:
         case MYTH_SCHEMA_EXIT:
-            GetMythDB()->SetSuppressDBMessages(false);
-            return false;
+            goto upgrade_error_exit;
         case MYTH_SCHEMA_UPGRADE:
             break;
     }
 
-    MSqlQuery query(MSqlQuery::InitCon(MSqlQuery::kDedicatedConnection));
-    if (!query.exec(QString("ALTER DATABASE %1 DEFAULT"
-                            " CHARACTER SET utf8 COLLATE utf8_general_ci;")
-                    .arg(gCoreContext->GetDatabaseParams().dbName)))
-        MythDB::DBError("UpgradeTVDatabaseSchema -- alter charset", query);
+    LOG(VB_GENERAL, LOG_DEBUG, QString("Newest MythTV Schema Version : %1")
+        .arg(currentDatabaseVersion));
 
-
-    LOG(VB_GENERAL, LOG_CRIT, "Newest MythTV Schema Version : "+
-            currentDatabaseVersion);
-
-    if (!DBUtil::lockSchema(query))
+    // Upgrade the schema
+    if (!doUpgradeTVDatabaseSchema())
     {
-        GetMythDB()->SetSuppressDBMessages(false);
-        return false;
+        LOG(VB_GENERAL, LOG_ERR, "Database schema upgrade failed.");
+        goto upgrade_error_exit;
     }
 
-    bool ret = doUpgradeTVDatabaseSchema();
+    LOG(VB_GENERAL, LOG_INFO, "Database schema upgrade complete.");
 
-    if (ret)
-        LOG(VB_GENERAL, LOG_NOTICE,
-            "Database Schema upgrade complete, unlocking.");
-    else
-        LOG(VB_GENERAL, LOG_ERR, "Database Schema upgrade FAILED, unlocking.");
-
-    DBUtil::unlockSchema(query);
-    gCoreContext->ActivateSettingsCache(true);
-
+    // On any exit we want to re-enable the DB messages so errors
+    // are reported and we want to make sure the setting cache is
+    // enabled for good performance and we must unlock the schema
+    // lock. We use gotos with labels so it's impossible to miss
+    // these steps.
+  upgrade_ok_exit:
     GetMythDB()->SetSuppressDBMessages(false);
-    return ret;
+    gCoreContext->ActivateSettingsCache(true);
+    if (locked)
+        DBUtil::UnlockSchema(query);
+    return true;
+
+  upgrade_error_exit:
+    GetMythDB()->SetSuppressDBMessages(false);
+    gCoreContext->ActivateSettingsCache(true);
+    if (locked)
+        DBUtil::UnlockSchema(query);
+    return false;
 }
 
 /** \fn doUpgradeTVDatabaseSchema(void)
@@ -535,6 +545,17 @@ static bool doUpgradeTVDatabaseSchema(void)
     if (dbver == currentDatabaseVersion)
     {
         return true;
+    }
+
+    // Don't rely on this, please specify these when creating the database.
+    {
+        MSqlQuery query(MSqlQuery::InitCon());
+        if (!query.exec(QString("ALTER DATABASE %1 DEFAULT "
+                                "CHARACTER SET utf8 COLLATE utf8_general_ci;")
+                        .arg(gCoreContext->GetDatabaseParams().dbName)))
+        {
+            MythDB::DBError("UpgradeTVDatabaseSchema -- alter charset", query);
+        }
     }
 
     if (DBUtil::IsNewDatabase())
@@ -1924,6 +1945,15 @@ NULL
     if (dbver == "1298")
     {
         LOG(VB_GENERAL, LOG_CRIT, "Upgrading to MythTV schema version 1299");
+
+        // DeletedMaxAge setting only exists if the user ever triggered the
+        // DeletedExpireOptions TriggeredConfigurationGroup (enabled
+        // AutoExpireInsteadOfDelete) and changed DeletedMaxAge from its
+        // default of zero, so "reset" it to ensure it's in the database before
+        // the update
+        QString deletedMaxAge = gCoreContext->GetSetting("DeletedMaxAge", "0");
+        gCoreContext->SaveSettingOnHost("DeletedMaxAge", deletedMaxAge, NULL);
+
         QString queryStr;
         if (gCoreContext->GetNumSetting("AutoExpireInsteadOfDelete", 0))
         {
@@ -1957,6 +1987,256 @@ NULL
 };
 
         if (!performActualUpdate(updates, "1300", dbver))
+            return false;
+    }
+
+    if (dbver == "1300")
+    {
+        const char *updates[] = {
+"ALTER TABLE channel ADD COLUMN iptvid SMALLINT(6) UNSIGNED;",
+"CREATE TABLE iptv_channel ("
+"  iptvid SMALLINT(6) UNSIGNED NOT NULL auto_increment,"
+"  chanid INT(10) UNSIGNED NOT NULL,"
+"  url TEXT NOT NULL,"
+"  type set('data', "
+"           'rfc2733-1','rfc2733-2', "
+"           'rfc5109-1','rfc5109-2', "
+"           'smpte2022-1','smpte2022-2'),"
+"  bitrate INT(10) UNSIGNED NOT NULL,"
+"  PRIMARY KEY (iptvid)"
+") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
+NULL
+};
+
+        if (!performActualUpdate(updates, "1301", dbver))
+            return false;
+    }
+
+    if (dbver == "1301")
+    {
+        LOG(VB_GENERAL, LOG_CRIT, "Upgrading to MythTV schema version 1302");
+        // Create the Default recording rule template
+        RecordingRule record;
+        record.MakeTemplate("Default");
+        record.m_type = kTemplateRecord;
+        record.Save(false);
+
+        if (!UpdateDBVersionNumber("1302", dbver))
+            return false;
+    }
+
+    if (dbver == "1302")
+    {
+        QDateTime loc = QDateTime::currentDateTime();
+        QDateTime utc = loc.toUTC();
+        loc = QDateTime(loc.date(), loc.time(), Qt::UTC);
+        int utc_offset = loc.secsTo(utc) / 60;
+
+        QList<QByteArray> updates_ba;
+
+        // Convert DATE and TIME in record into DATETIME
+        const char *pre_sql[] = {
+            "CREATE TEMPORARY TABLE recordupdate ("
+            "recid INT, starttime DATETIME, endtime DATETIME)",
+            "INSERT INTO recordupdate (recid, starttime, endtime) "
+            "SELECT recordid, "
+            "       CONCAT(startdate, ' ', starttime), "
+            "       CONCAT(enddate, ' ', endtime) FROM record",
+        };
+        for (uint i = 0; i < sizeof(pre_sql)/sizeof(char*); i++)
+            updates_ba.push_back(QByteArray(pre_sql[i]));
+
+        // Convert various DATETIME fields from local time to UTC
+        if (0 != utc_offset)
+        {
+            const char *with_endtime[] = {
+                "program", "recorded", "oldrecorded", "recordupdate",
+            };
+            const char *without_endtime[] = {
+                "programgenres", "programrating", "credits",
+                "jobqueue",
+            };
+            QString order = (utc_offset > 0) ? "-starttime" : "starttime";
+
+            for (uint i = 0; i < sizeof(with_endtime)/sizeof(char*); i++)
+            {
+                updates_ba.push_back(
+                         QString("UPDATE %1 "
+                                 "SET starttime = "
+                                 "    CONVERT_TZ(starttime, 'SYSTEM', 'UTC'), "
+                                 "    endtime   = "
+                                 "    CONVERT_TZ(endtime, 'SYSTEM', 'UTC') "
+                                 "ORDER BY %4")
+                         .arg(with_endtime[i])
+                         .arg(order).toLocal8Bit());
+            }
+
+            for (uint i = 0; i < sizeof(without_endtime)/sizeof(char*); i++)
+            {
+                updates_ba.push_back(
+                          QString("UPDATE %1 "
+                                  "SET starttime = "
+                                  "    CONVERT_TZ(starttime, 'SYSTEM', 'UTC') "
+                                  "ORDER BY %3")
+                          .arg(without_endtime[i]).arg(order)
+                          .toLocal8Bit());
+            }
+
+            updates_ba.push_back(
+                         QString("UPDATE oldprogram "
+                                 "SET airdate = "
+                                 "    CONVERT_TZ(airdate, 'SYSTEM', 'UTC') "
+                                 "ORDER BY %3")
+                         .arg((utc_offset > 0) ? "-airdate" : 
+                              "airdate").toLocal8Bit());
+
+            updates_ba.push_back(
+                         QString("UPDATE recorded "
+                                 "set progstart = "
+                                 "    CONVERT_TZ(progstart, 'SYSTEM', 'UTC'), "
+                                 "    progend   = "
+                                 "    CONVERT_TZ(progend, 'SYSTEM', 'UTC') ")
+                         .toLocal8Bit());
+        }
+
+        // Convert DATETIME back to seperate DATE and TIME in record table
+        const char *post_sql[] = {
+            "UPDATE record, recordupdate "
+            "SET record.startdate = DATE(recordupdate.starttime), "
+            "    record.starttime = TIME(recordupdate.starttime), "
+            "    record.enddate = DATE(recordupdate.endtime), "
+            "    record.endtime = TIME(recordupdate.endtime) "
+            "WHERE recordid = recid",
+            "DROP TABLE recordupdate",
+        };
+
+        for (uint i = 0; i < sizeof(post_sql)/sizeof(char*); i++)
+            updates_ba.push_back(QByteArray(post_sql[i]));
+
+        // Convert update ByteArrays to NULL terminated char**
+        QList<QByteArray>::const_iterator it = updates_ba.begin();
+        vector<const char*> updates;
+        for (; it != updates_ba.end(); ++it)
+            updates.push_back((*it).constData());
+        updates.push_back(NULL);
+
+        // do the actual update
+        if (!performActualUpdate(&updates[0], "1303", dbver))
+            return false;
+    }
+
+    if (dbver == "1303")
+    {
+        QDateTime loc = QDateTime::currentDateTime();
+        QDateTime utc = loc.toUTC();
+        loc = QDateTime(loc.date(), loc.time(), Qt::UTC);
+        int utc_offset = loc.secsTo(utc) / 60;
+
+        QList<QByteArray> updates_ba;
+
+        // Convert various DATETIME fields from local time to UTC
+        if (0 != utc_offset)
+        {
+            const char *with_endtime[] = {
+                "recordedprogram",
+            };
+            const char *without_endtime[] = {
+                "recordedseek", "recordedmarkup", "recordedrating",
+                "recordedcredits", 
+            };
+            QString order = (utc_offset > 0) ? "-starttime" : "starttime";
+
+            for (uint i = 0; i < sizeof(with_endtime)/sizeof(char*); i++)
+            {
+                updates_ba.push_back(
+                     QString("UPDATE %1 "
+                     "SET starttime = CONVERT_TZ(starttime, 'SYSTEM', 'UTC'), "
+                     "    endtime   = CONVERT_TZ(endtime, 'SYSTEM', 'UTC') "
+                     "ORDER BY %4")
+                     .arg(with_endtime[i]).arg(order).toLocal8Bit());
+            }
+
+            for (uint i = 0; i < sizeof(without_endtime)/sizeof(char*); i++)
+            {
+                updates_ba.push_back(
+                      QString("UPDATE %1 "
+                      "SET starttime = CONVERT_TZ(starttime, 'SYSTEM', 'UTC') "
+                      "ORDER BY %3")
+                      .arg(without_endtime[i]).arg(order).toLocal8Bit());
+            }
+        }
+
+        // Convert update ByteArrays to NULL terminated char**
+        QList<QByteArray>::const_iterator it = updates_ba.begin();
+        vector<const char*> updates;
+        for (; it != updates_ba.end(); ++it)
+            updates.push_back((*it).constData());
+        updates.push_back(NULL);
+
+        // do the actual update
+        if (!performActualUpdate(&updates[0], "1304", dbver))
+            return false;
+    }
+
+    if (dbver == "1304")
+    {
+        QList<QByteArray> updates_ba;
+
+        updates_ba.push_back(
+"UPDATE recordfilter SET clause="
+"'HOUR(CONVERT_TZ(program.starttime, ''UTC'', ''SYSTEM'')) >= 19 AND "
+"HOUR(CONVERT_TZ(program.starttime, ''UTC'', ''SYSTEM'')) < 22' "
+"WHERE filterid=3");
+
+        updates_ba.push_back(QString(
+"UPDATE record SET findday = "
+"    DAYOFWEEK(CONVERT_TZ(ADDTIME('2012-06-02 00:00:00', findtime), "
+"                         'SYSTEM', 'UTC') + INTERVAL findday DAY) "
+"WHERE findday > 0").toLocal8Bit());
+
+        updates_ba.push_back(QString(
+"UPDATE record SET findtime = "
+"    TIME(CONVERT_TZ(ADDTIME('2012-06-02 00:00:00', findtime), "
+"                    'SYSTEM', 'UTC')) ")
+                             .toLocal8Bit());
+
+        // Convert update ByteArrays to NULL terminated char**
+        QList<QByteArray>::const_iterator it = updates_ba.begin();
+        vector<const char*> updates;
+        for (; it != updates_ba.end(); ++it)
+            updates.push_back((*it).constData());
+        updates.push_back(NULL);
+
+        if (!performActualUpdate(&updates[0], "1305", dbver))
+            return false;
+    }
+
+    if (dbver == "1305")
+    {
+        // Reverse the findday/findtime changes from above since those
+        // values need to be kept in local time.
+
+        QList<QByteArray> updates_ba;
+
+        updates_ba.push_back(QString(
+"UPDATE record SET findday = "
+"    DAYOFWEEK(CONVERT_TZ(ADDTIME('2012-06-02 00:00:00', findtime), "
+"                         'UTC', 'SYSTEM') + INTERVAL findday DAY) "
+"WHERE findday > 0").toLocal8Bit());
+
+        updates_ba.push_back(QString(
+"UPDATE record SET findtime = "
+"    TIME(CONVERT_TZ(ADDTIME('2012-06-02 00:00:00', findtime), "
+"                    'UTC', 'SYSTEM')) ").toLocal8Bit());
+
+        // Convert update ByteArrays to NULL terminated char**
+        QList<QByteArray>::const_iterator it = updates_ba.begin();
+        vector<const char*> updates;
+        for (; it != updates_ba.end(); ++it)
+            updates.push_back((*it).constData());
+        updates.push_back(NULL);
+
+        if (!performActualUpdate(&updates[0], "1306", dbver))
             return false;
     }
 

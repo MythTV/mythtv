@@ -64,7 +64,7 @@ void ATSCStreamData::SetDesiredChannel(int major, int minor)
     tvct_vec_t tvcts = GetCachedTVCTs();
     cvct_vec_t cvcts = GetCachedCVCTs();
 
-    if (mgt && (tvcts.size() || cvcts.size()))
+    if (mgt && (!tvcts.empty() || !cvcts.empty()))
     {
         const TerrestrialVirtualChannelTable *tvct = NULL;
         const CableVirtualChannelTable       *cvct = NULL;
@@ -387,7 +387,7 @@ bool ATSCStreamData::HandleTables(uint pid, const PSIPTable &psip)
         case TableID::NITscte:
         {
             SCTENetworkInformationTable nit(psip);
-            
+
             QMutexLocker locker(&_listener_lock);
             for (uint i = 0; i < _scte_main_listeners.size(); i++)
                 _scte_main_listeners[i]->HandleNIT(&nit);
@@ -397,7 +397,7 @@ bool ATSCStreamData::HandleTables(uint pid, const PSIPTable &psip)
         case TableID::NTT:
         {
             NetworkTextTable ntt(psip);
-            
+
             QMutexLocker locker(&_listener_lock);
             for (uint i = 0; i < _scte_main_listeners.size(); i++)
                 _scte_main_listeners[i]->HandleNTT(&ntt);
@@ -417,7 +417,7 @@ bool ATSCStreamData::HandleTables(uint pid, const PSIPTable &psip)
         case TableID::STTscte:
         {
             SCTESystemTimeTable stt(psip);
-            
+
             QMutexLocker locker(&_listener_lock);
             for (uint i = 0; i < _scte_main_listeners.size(); i++)
                 _scte_main_listeners[i]->HandleSTT(&stt);
@@ -429,7 +429,7 @@ bool ATSCStreamData::HandleTables(uint pid, const PSIPTable &psip)
         case TableID::PIM:
         {
             ProgramInformationMessageTable pim(psip);
-            
+
             QMutexLocker locker(&_listener_lock);
             for (uint i = 0; i < _scte_main_listeners.size(); i++)
                 _scte_main_listeners[i]->HandlePIM(&pim);
@@ -440,7 +440,7 @@ bool ATSCStreamData::HandleTables(uint pid, const PSIPTable &psip)
         case TableID::PNM:
         {
             ProgramNameMessageTable pnm(psip);
-            
+
             QMutexLocker locker(&_listener_lock);
             for (uint i = 0; i < _scte_main_listeners.size(); i++)
                 _scte_main_listeners[i]->HandlePNM(&pnm);
@@ -452,7 +452,7 @@ bool ATSCStreamData::HandleTables(uint pid, const PSIPTable &psip)
         case TableID::ADET:
         {
             AggregateDataEventTable adet(psip);
-            
+
             QMutexLocker locker(&_listener_lock);
             for (uint i = 0; i < _scte_main_listeners.size(); i++)
                 _scte_main_listeners[i]->HandleADET(&adet);
@@ -773,12 +773,12 @@ const MasterGuideTable *ATSCStreamData::GetCachedMGT(bool current) const
     return mgt;
 }
 
-const tvct_ptr_t ATSCStreamData::GetCachedTVCT(uint pid, bool current) const
+tvct_const_ptr_t ATSCStreamData::GetCachedTVCT(uint pid, bool current) const
 {
     if (!current)
         LOG(VB_GENERAL, LOG_WARNING, "Currently we ignore \'current\' param");
 
-    TerrestrialVirtualChannelTable *tvct = NULL;
+    tvct_ptr_t tvct = NULL;
 
     _cache_lock.lock();
     tvct_cache_t::const_iterator it = _cached_tvcts.find(pid);
@@ -789,12 +789,12 @@ const tvct_ptr_t ATSCStreamData::GetCachedTVCT(uint pid, bool current) const
     return tvct;
 }
 
-const cvct_ptr_t ATSCStreamData::GetCachedCVCT(uint pid, bool current) const
+cvct_const_ptr_t ATSCStreamData::GetCachedCVCT(uint pid, bool current) const
 {
     if (!current)
         LOG(VB_GENERAL, LOG_WARNING, "Currently we ignore \'current\' param");
 
-    CableVirtualChannelTable *cvct = NULL;
+    cvct_ptr_t cvct = NULL;
 
     _cache_lock.lock();
     cvct_cache_t::const_iterator it = _cached_cvcts.find(pid);

@@ -643,6 +643,7 @@ QString VideoDisplayProfile::GetDecoderName(const QString &decoder)
         dec_name["vdpau"]    = QObject::tr("NVidia VDPAU acceleration");
         dec_name["vaapi"]    = QObject::tr("VAAPI acceleration");
         dec_name["dxva2"]    = QObject::tr("Windows hardware acceleration");
+        dec_name["vda"]      = QObject::tr("Mac VDA hardware acceleration");
     }
 
     QString ret = decoder;
@@ -1101,7 +1102,6 @@ void VideoDisplayProfile::CreateVDPAUProfiles(const QString &hostname)
                   "vdpauskipchroma,vdpaucolorspace=auto");
 }
 
-#if defined(Q_OS_MACX)
 void VideoDisplayProfile::CreateVDAProfiles(const QString &hostname)
 {
     (void) QObject::tr("VDA High Quality", "Sample: VDA high quality");
@@ -1140,7 +1140,6 @@ void VideoDisplayProfile::CreateVDAProfiles(const QString &hostname)
                   "opengldoubleratelinearblend", "opengllinearblend",
                   "");
 }
-#endif
 
 void VideoDisplayProfile::CreateOpenGLProfiles(const QString &hostname)
 {
@@ -1169,10 +1168,24 @@ void VideoDisplayProfile::CreateOpenGLProfiles(const QString &hostname)
                   "");
 }
 
+void VideoDisplayProfile::CreateVAAPIProfiles(const QString &hostname)
+{
+    (void) QObject::tr("VAAPI Normal", "Sample: VAAPI average quality");
+    DeleteProfileGroup("VAAPI Normal", hostname);
+    uint groupid = CreateProfileGroup("VAAPI Normal", hostname);
+    CreateProfile(groupid, 1, ">", 0, 0, "", 0, 0,
+                  "vaapi", 2, true, "openglvaapi", "opengl2", true,
+                  "vaapibobdeint", "vaapionefield",
+                  "");
+    CreateProfile(groupid, 2, ">", 0, 0, "", 0, 0,
+                  "ffmpeg", 2, true, "opengl", "opengl2", true,
+                  "opengldoubleratekerneldeint", "openglkerneldeint",
+                  "");
+}
+
 void VideoDisplayProfile::CreateProfiles(const QString &hostname)
 {
     CreateNewProfiles(hostname);
-    CreateVDPAUProfiles(hostname);
 }
 
 QStringList VideoDisplayProfile::GetVideoRenderers(const QString &decoder)

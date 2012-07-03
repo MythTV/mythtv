@@ -446,7 +446,7 @@ Uusille tilauksille voit yksinkertaisesti syöttää URL:in ja painaa &quot;Tall
     </message>
     <message>
         <source>Select to change image</source>
-        <translation type="unfinished"></translation>
+        <translation>Valitse vaihtaaksesi kuvaa</translation>
     </message>
 </context>
 <context>

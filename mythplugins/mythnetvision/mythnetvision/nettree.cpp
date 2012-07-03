@@ -4,6 +4,7 @@
 #include <QtAlgorithms>
 
 // myth
+#include <mythdate.h>
 #include <mythdb.h>
 #include <mythcontext.h>
 #include <mythdirs.h>
@@ -205,7 +206,7 @@ void NetTree::cleanCacheDir()
         LOG(VB_GENERAL, LOG_DEBUG, QString("Deleting file %1").arg(filename));
         QFileInfo fi(filename);
         QDateTime lastmod = fi.lastModified();
-        if (lastmod.addDays(7) < QDateTime::currentDateTime())
+        if (lastmod.addDays(7) < MythDate::current())
             QFile::remove(filename);
     }
 }
@@ -472,7 +473,12 @@ void NetTree::showMenu(void)
 
     ResultItem *item = NULL;
     if (m_type == DLG_TREE)
-        item = qVariantValue<ResultItem *>(m_siteMap->GetCurrentNode()->GetData());
+    {
+        MythGenericTree *node = m_siteMap->GetCurrentNode();
+
+        if (node)
+            item = qVariantValue<ResultItem *>(node->GetData());
+    }
     else
     {
         MythGenericTree *node = GetNodePtrFromButton(m_siteButtonList->GetItemCurrent());
@@ -480,7 +486,6 @@ void NetTree::showMenu(void)
         if (node)
             item = qVariantValue<ResultItem *>(node->GetData());
     }
-
 
     if (item)
     {
@@ -749,10 +754,11 @@ void NetTree::streamWebVideo()
         return;
     }
 
-    GetMythMainWindow()->HandleMedia("Internal", item->GetMediaURL(),
-           item->GetDescription(), item->GetTitle(), item->GetSubtitle(), QString(),
-           item->GetSeason(), item->GetEpisode(), QString(), item->GetTime().toInt(),
-           item->GetDate().toString("yyyy"));
+    GetMythMainWindow()->HandleMedia(
+        "Internal", item->GetMediaURL(),
+        item->GetDescription(), item->GetTitle(), item->GetSubtitle(),
+        QString(), item->GetSeason(), item->GetEpisode(), QString(),
+        item->GetTime().toInt(), item->GetDate().toString("yyyy"));
 }
 
 void NetTree::showWebVideo()

@@ -13,6 +13,7 @@
 #include "mythconfig.h"
 #include "mythcontext.h"
 #include "mythdbcon.h"
+#include "dbutil.h"
 #include "mythlogging.h"
 #include "mythversion.h"
 #include "langsettings.h"
@@ -39,6 +40,7 @@
 #include "expertsettingseditor.h"
 #include "commandlineparser.h"
 #include "profilegroup.h"
+#include "signalhandling.h"
 
 using namespace std;
 
@@ -273,6 +275,14 @@ int main(int argc, char *argv[])
     new QApplication(argc, argv, use_display);
     QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHTV_SETUP);
 
+#ifndef _WIN32
+    QList<int> signallist;
+    signallist << SIGINT << SIGTERM << SIGSEGV << SIGABRT << SIGBUS << SIGFPE
+               << SIGILL;
+    SignalHandler handler(signallist);
+    signal(SIGHUP, SIG_IGN);
+#endif
+
     if (cmdline.toBool("display"))
         display = cmdline.toString("display");
     if (cmdline.toBool("geometry"))
@@ -348,7 +358,6 @@ int main(int argc, char *argv[])
 
     if (use_display)
     {
-        gCoreContext->SetSetting("Theme", DEFAULT_UI_THEME);
         GetMythUI()->LoadQtConfig();
 
         QString fileprefix = GetConfDir();
@@ -462,7 +471,8 @@ int main(int argc, char *argv[])
             printf("%5i %6i %8i %8s    %20s\n",
                    scans[i].scanid,   scans[i].cardid,
                    scans[i].sourceid, (scans[i].processed) ? "yes" : "no",
-                   scans[i].scandate.toString().toAscii().constData());
+                   scans[i].scandate.toString(Qt::ISODate)
+                   .toAscii().constData());
         }
         cout<<endl;
 
@@ -505,6 +515,13 @@ int main(int argc, char *argv[])
     {
         if (!reloadTheme())
             return GENERIC_EXIT_NO_THEME;
+    }
+
+    if (!DBUtil::CheckTimeZoneSupport())
+    {
+        LOG(VB_GENERAL, LOG_ERR, "MySQL time zone support is missing.  "
+            "Please install it and try again.");
+        return GENERIC_EXIT_DB_NOTIMEZONE;
     }
 
     if (!UpgradeTVDatabaseSchema(true))

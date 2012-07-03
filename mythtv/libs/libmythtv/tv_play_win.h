@@ -17,7 +17,7 @@ class TvPlayWindow : public MythScreenType
     TvPlayWindow(MythScreenStack *parent, const char *name);
    ~TvPlayWindow();
 
-    virtual void gestureEvent(MythUIType *, MythGestureEvent *);
+    virtual bool gestureEvent(MythGestureEvent *);
     virtual bool Create(void);
 
     void UpdateProgress(void);

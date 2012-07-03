@@ -14,7 +14,7 @@
 // libmyth headers
 #include "exitcodes.h"
 #include "mythcorecontext.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 
 // libmythtv headers
 #include "programinfo.h"
@@ -27,25 +27,27 @@
 
 XMLTVParser::XMLTVParser() : isJapan(false), current_year(0)
 {
-    current_year = QDate::currentDate().toString("yyyy").toUInt();
+    current_year = MythDate::current().date().toString("yyyy").toUInt();
 }
 
-static unsigned int ELFHash(const char *s)
+static uint ELFHash(const QByteArray &ba)
 {
-    /* ELF hash uses unsigned chars and unsigned arithmetic for portability */
-    const unsigned char *name = (const unsigned char *)s;
-    unsigned long h = 0, g;
+    const uchar *k = (const uchar *)ba.data();
+    uint h = 0;
+    uint g;
 
-    while (*name)
+    if (k)
     {
-        h = (h << 4) + (unsigned long)(*name++);
-        if ((g = (h & 0xF0000000UL))!=0)
-            h ^= (g >> 24);
-        h &= ~g;
-
+        while (*k)
+        {
+            h = (h << 4) + *k++;
+            if ((g = (h & 0xf0000000)) != 0)
+                h ^= g >> 24;
+            h &= ~g;
+        }
     }
 
-    return (int)h;
+    return h;
 }
 
 static QString getFirstText(QDomElement element)
@@ -189,7 +191,8 @@ static void fromXMLTVDate(QString &timestr, QDateTime &dt, int localTimezoneOffs
         return;
     }
 
-    dt = QDateTime(QDate(year, month, day),QTime(hour, min, sec));
+    dt = QDateTime(QDate(year, month, day),QTime(hour, min, sec),
+                   Qt::LocalTime);
 
     if ((split.size() > 1) && (localTimezoneOffset <= 840))
     {
@@ -206,14 +209,16 @@ static void fromXMLTVDate(QString &timestr, QDateTime &dt, int localTimezoneOffs
 
     if (localTimezoneOffset < -840)
     {
-        dt = MythUTCToLocal(dt);
+        dt.setTimeSpec(Qt::UTC);
     }
     else if (abs(localTimezoneOffset) <= 840)
     {
         dt = dt.addSecs(localTimezoneOffset * 60 );
     }
 
-    timestr = dt.toString("yyyyMMddhhmmss");
+    dt = dt.toUTC();
+
+    timestr = MythDate::toString(dt, MythDate::kFilename);
 }
 
 static void parseCredits(QDomElement &element, ProgInfo *pginfo)
@@ -533,8 +538,7 @@ ProgInfo *XMLTVParser::parseProgram(
         programid.append(uniqueid);
     else
     {
-        QString seriesid = QString::number(ELFHash(pginfo->title.toUtf8()
-                                               .constData()));
+        QString seriesid = QString::number(ELFHash(pginfo->title.toUtf8()));
         pginfo->seriesId = seriesid;
         programid.append(seriesid);
 

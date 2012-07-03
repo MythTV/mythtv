@@ -20,10 +20,6 @@ class RingBuffer;
 
 class FileTransfer : public SocketHandler
 {
-    Q_OBJECT
-
-    friend class QObject; // quiet OSX gcc warning
-
   public:
     FileTransfer(QString &filename, MythSocket *remote,
                  MythSocketManager *parent,

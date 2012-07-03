@@ -27,7 +27,13 @@ class MythBrowser : public MythScreenType
 
     void setDefaultSaveDirectory(const QString saveDir) { m_defaultSaveDir = saveDir; }
     void setDefaultSaveFilename(const QString saveFile) { m_defaultSaveFilename = saveFile; }
-    MythImage* getDefaultFavIcon(void) { return m_defaultFavIcon; }
+
+    MythImage *GetDefaultFavIcon(void)
+    {
+        if (m_defaultFavIcon)
+            m_defaultFavIcon->IncrRef();
+        return m_defaultFavIcon;
+    }
 
   public slots:
     void slotOpenURL(const QString &url);

@@ -36,7 +36,7 @@ $shift = "";
 %defs = ();
 $fnno = 1;
 $inf = "";
-$ibase = "";
+@ibase = ();
 
 while ($_ = shift) {
     if (/^-D(.*)$/) {
@@ -52,6 +52,8 @@ while ($_ = shift) {
         die "flags may only contain letters, digits, hyphens, dashes and underscores\n"
             unless $flag =~ /^[a-zA-Z0-9_-]+$/;
         $defs{$flag} = $value;
+    } elsif (/^-I(.*)$/) {
+        push @ibase, $1 ne "" ? $1 : shift;
     } elsif (/^-/) {
         usage();
     } else {
@@ -61,10 +63,12 @@ while ($_ = shift) {
     }
 }
 
+push @ibase, ".";
+
 if (defined $in) {
     $inf = gensym();
     open($inf, "<$in") or die "opening \"$in\": $!\n";
-    $ibase = $1 if $in =~ m|^(.+)/[^/]+$|;
+    push @ibase, $1 if $in =~ m|^(.+)/[^/]+$|;
 } else {
     $inf = \*STDIN;
 }
@@ -74,7 +78,7 @@ if (defined $out) {
 }
 
 while(defined $inf) {
-while(<$inf>) {
+INF: while(<$inf>) {
     # Certain commands are discarded without further processing.
     /^\@(?:
          [a-z]+index            # @*index: useful only in complete manual
@@ -104,11 +108,10 @@ while(<$inf>) {
         push @instack, $inf;
         $inf = gensym();
 
-        # Try cwd and $ibase.
-        open($inf, "<" . $1)
-            or open($inf, "<" . $ibase . "/" . $1)
-                or die "cannot open $1 or $ibase/$1: $!\n";
-        next;
+        for (@ibase) {
+            open($inf, "<" . $_ . "/" . $1) and next INF;
+        }
+        die "cannot open $1: $!\n";
     };
 
     # Look for blocks surrounded by @c man begin SECTION ... @c man end.
@@ -231,10 +234,12 @@ while(<$inf>) {
 
     # Single line command handlers.
 
-    /^\@(?:section|unnumbered|unnumberedsec|center)\s+(.+)$/
+    /^\@(?:section|unnumbered|unnumberedsec|center|heading)\s+(.+)$/
         and $_ = "\n=head2 $1\n";
-    /^\@subsection\s+(.+)$/
+    /^\@(?:subsection|subheading)\s+(.+)$/
         and $_ = "\n=head3 $1\n";
+    /^\@(?:subsubsection|subsubheading)\s+(.+)$/
+        and $_ = "\n=head4 $1\n";
 
     # Block command handlers:
     /^\@itemize\s*(\@[a-z]+|\*|-)?/ and do {
@@ -350,6 +355,7 @@ sub postprocess
     s/\(?\@xref\{(?:[^\}]*)\}(?:[^.<]|(?:<[^<>]*>))*\.\)?//g;
     s/\s+\(\@pxref\{(?:[^\}]*)\}\)//g;
     s/;\s+\@pxref\{(?:[^\}]*)\}//g;
+    s/\@ref\{([^\}]*)\}/$1/g;
     s/\@noindent\s*//g;
     s/\@refill//g;
     s/\@gol//g;

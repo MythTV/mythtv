@@ -39,6 +39,7 @@
 #include "compat.h"
 #include "mythlogging.h"
 #include "mythversion.h"
+#include "mythdate.h"
 
 #include "serializers/xmlSerializer.h"
 #include "serializers/soapSerializer.h"
@@ -62,6 +63,7 @@ static MIMETypes g_MIMETypes[] =
     { "qjs" , "application/javascript"     },
     { "txt" , "text/plain"                 },
     { "xml" , "text/xml"                   },
+    { "xslt", "text/xml"                   },
     { "pdf" , "application/pdf"            },
     { "avi" , "video/avi"                  },
     { "css" , "text/css"                   },
@@ -173,7 +175,7 @@ QString HTTPRequest::BuildHeader( long long nSize )
                        "Date: %4\r\n"
                        "Server: %5, UPnP/1.0, MythTV %6\r\n" )
         .arg(m_nMajor).arg(m_nMinor).arg(GetResponseStatus())
-        .arg(QDateTime::currentDateTime().toString("d MMM yyyy hh:mm:ss"))
+        .arg(MythDate::current().toString("d MMM yyyy hh:mm:ss"))
         .arg(HttpServer::GetPlatform()).arg(MYTH_BINARY_VERSION);
 
     sHeader += GetAdditionalHeaders();

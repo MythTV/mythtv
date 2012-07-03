@@ -127,6 +127,18 @@ void LanguageSelection::Load(void)
         }
     }
 
+    if (m_languageList->IsEmpty())
+    {
+        LOG(VB_GUI, LOG_ERR, "ERROR - Failed to load translations, at least "
+                             "one translation file MUST be installed.");
+        
+        item = new MythUIButtonListItem(m_languageList,
+                                        "English (United States)");
+        item->SetText("English (United States)", "language");
+        item->SetText("English (United States)", "nativelanguage");
+        item->SetData("en_US");
+    }
+
     if (!foundLanguage)
         m_languageList->SetValueByData("en_US");
 
@@ -186,14 +198,15 @@ void LanguageSelection::Save(void)
 {
     MythUIButtonListItem *item = m_languageList->GetItemCurrent();
 
+    if (!item)
+        Close();
+
     QString langCode = item->GetData().toString();
-    gCoreContext->SetSetting("Language", langCode);
     gCoreContext->SaveSetting("Language", langCode);
 
     item = m_countryList->GetItemCurrent();
 
     QString countryCode = item->GetData().toString();
-    gCoreContext->SetSetting("Country", countryCode);
     gCoreContext->SaveSetting("Country", countryCode);
 
     if (m_language != langCode)

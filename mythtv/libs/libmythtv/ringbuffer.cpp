@@ -16,8 +16,6 @@
 
 #include "ThreadedFileWriter.h"
 #include "fileringbuffer.h"
-#include "dvdringbuffer.h"
-#include "bdringbuffer.h"
 #include "streamingringbuffer.h"
 #include "livetvchain.h"
 #include "mythcontext.h"
@@ -25,8 +23,12 @@
 #include "mythconfig.h"
 #include "remotefile.h"
 #include "compat.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
+#include "mythtimer.h"
 #include "mythlogging.h"
+#include "DVD/dvdringbuffer.h"
+#include "Bluray/bdringbuffer.h"
+#include "HLS/httplivestreambuffer.h"
 
 // about one second at 35mbit
 #define BUFFER_SIZE_MINIMUM 4 * 1024 * 1024
@@ -44,6 +46,11 @@ const int  RingBuffer::kLiveTVOpenTimeout  = 10000;
 QMutex      RingBuffer::subExtLock;
 QStringList RingBuffer::subExt;
 QStringList RingBuffer::subExtNoCheck;
+
+extern "C" {
+#include "libavformat/avformat.h"
+}
+bool        RingBuffer::gAVformat_net_initialised = false;
 
 /*
   Locking relations:
@@ -91,7 +98,7 @@ QStringList RingBuffer::subExtNoCheck;
  *                      a pre-buffering thread, otherwise Start(void)
  *                      will start a pre-buffering thread.
  *  \param timeout_ms   if < 0, then we will not open the file.
- *                      Otherwise it's how long to try opening 
+ *                      Otherwise it's how long to try opening
  *                      the file after the first failure in
  *                      milliseconds before giving up.
  */
@@ -107,15 +114,20 @@ RingBuffer *RingBuffer::Create(
 
     bool dvddir  = false;
     bool bddir   = false;
-    bool httpurl = lower.startsWith("http://");
+    bool httpurl = lower.startsWith("http://") || lower.startsWith("https://");
     bool mythurl = lower.startsWith("myth://");
     bool bdurl   = lower.startsWith("bd:");
     bool dvdurl  = lower.startsWith("dvd:");
     bool dvdext  = lower.endsWith(".img") || lower.endsWith(".iso");
 
     if (httpurl)
+    {
+        if (HLSRingBuffer::TestForHTTPLiveStreaming(lfilename))
+        {
+            return new HLSRingBuffer(lfilename);
+        }
         return new StreamingRingBuffer(lfilename);
-
+    }
     if (!stream_only && mythurl)
     {
         struct stat fileInfo;
@@ -553,6 +565,7 @@ void RingBuffer::KillReadAheadThread(void)
  */
 void RingBuffer::StopReads(void)
 {
+    LOG(VB_FILE, LOG_INFO, LOC + "StopReads()");
     stopreads = true;
     generalWait.wakeAll();
 }
@@ -563,6 +576,7 @@ void RingBuffer::StopReads(void)
  */
 void RingBuffer::StartReads(void)
 {
+    LOG(VB_FILE, LOG_INFO, LOC + "StartReads()");
     stopreads = false;
     generalWait.wakeAll();
 }
@@ -573,6 +587,7 @@ void RingBuffer::StartReads(void)
  */
 void RingBuffer::Pause(void)
 {
+    LOG(VB_FILE, LOG_INFO, LOC + "Pause()");
     StopReads();
 
     rwlock.lockForWrite();
@@ -586,6 +601,7 @@ void RingBuffer::Pause(void)
  */
 void RingBuffer::Unpause(void)
 {
+    LOG(VB_FILE, LOG_INFO, LOC + "Unpause()");
     StartReads();
 
     rwlock.lockForWrite();
@@ -785,7 +801,7 @@ void RingBuffer::run(void)
         {
             // limit the read size
             if (readblocksize > totfree)
-                totfree = (int)(totfree / KB32) * KB32; // must be multiple of 32KB
+                totfree = (long long)(totfree / KB32) * KB32; // must be multiple of 32KB
             else
                 totfree = readblocksize;
 
@@ -797,7 +813,7 @@ void RingBuffer::run(void)
                     (now.tv_usec - lastread.tv_usec) / 1000;
                 readtimeavg = (readtimeavg * 9 + readinterval) / 10;
 
-                if (readtimeavg < 150 && 
+                if (readtimeavg < 150 &&
                     (uint)readblocksize < (BUFFER_SIZE_MINIMUM >>2) &&
                     readblocksize >= CHUNK /* low_buffers */)
                 {
@@ -841,9 +857,6 @@ void RingBuffer::run(void)
                 LOG(VB_FILE, LOG_DEBUG, LOC +
                     "Reading enough data to start playback");
             }
-
-            if (remotefile && livetvchain && livetvchain->HasNext())
-                remotefile->SetTimeout(true);
 
             LOG(VB_FILE, LOG_DEBUG, LOC +
                 QString("safe_read(...@%1, %2) -- begin")
@@ -943,7 +956,7 @@ void RingBuffer::run(void)
             generalWait.wakeAll();
             rwlock.unlock();
             usleep(5 * 1000);
-            rwlock.lockForRead();            
+            rwlock.lockForRead();
         }
         else
         {
@@ -959,7 +972,7 @@ void RingBuffer::run(void)
                 generalWait.wakeAll();
                 rwlock.unlock();
                 usleep(5 * 1000);
-                rwlock.lockForRead();            
+                rwlock.lockForRead();
             }
         }
     }
@@ -1551,6 +1564,7 @@ void RingBuffer::SetWriteBufferMinWriteSize(int newMinSize)
  */
 void RingBuffer::SetOldFile(bool is_old)
 {
+    LOG(VB_FILE, LOG_INFO, LOC + QString("SetOldFile(%1)").arg(is_old));
     rwlock.lockForWrite();
     oldfile = is_old;
     rwlock.unlock();
@@ -1633,6 +1647,17 @@ DVDRingBuffer *RingBuffer::DVD(void)
 BDRingBuffer  *RingBuffer::BD(void)
 {
     return dynamic_cast<BDRingBuffer*>(this);
+}
+
+void RingBuffer::AVFormatInitNetwork(void)
+{
+    QMutexLocker lock(avcodeclock);
+
+    if (!gAVformat_net_initialised)
+    {
+        avformat_network_init();
+        gAVformat_net_initialised = true;
+    }
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

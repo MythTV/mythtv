@@ -39,7 +39,7 @@ bool IPTVRecorder::Open(void)
     LOG(VB_RECORD, LOG_INFO, LOC + "Open() -- begin");
 
     if (_channel->GetFeeder()->IsOpen())
-        _channel->GetFeeder()->Close();
+        return true;    // already open
 
     IPTVChannelInfo chaninfo = _channel->GetCurrentChanInfo();
 
@@ -63,39 +63,15 @@ void IPTVRecorder::Close(void)
     LOG(VB_RECORD, LOG_INFO, LOC + "Close() -- end");
 }
 
-bool IPTVRecorder::PauseAndWait(int timeout)
+void IPTVRecorder::StopRecording(void)
 {
-    QMutexLocker locker(&pauseLock);
-    if (request_pause)
-    {
-        if (!IsPaused(true))
-        {
-            _channel->GetFeeder()->Stop();
-            _channel->GetFeeder()->Close();
-
-            paused = true;
-            pauseWait.wakeAll();
-            if (tvrec)
-                tvrec->RecorderPaused();
-        }
-
-        unpauseWait.wait(&pauseLock, timeout);
-    }
-
-    if (!request_pause && IsPaused(true))
-    {
-        paused = false;
-
-        if (recording && !_channel->GetFeeder()->IsOpen())
-            Open();
-
-        if (_stream_data)
-            _stream_data->Reset(_stream_data->DesiredProgram());
-
-        unpauseWait.wakeAll();
-    }
-
-    return IsPaused(true);
+    pauseLock.lock();
+    request_recording = false;
+    unpauseWait.wakeAll();
+    pauseLock.unlock();
+    
+    // we can't hold the pause lock while we wait for the IPTV feeder to stop
+    _channel->GetFeeder()->Stop();
 }
 
 void IPTVRecorder::run(void)
@@ -115,28 +91,13 @@ void IPTVRecorder::run(void)
         recordingWait.wakeAll();
     }
 
-    while (IsRecordingRequested() && !IsErrored())
-    {
-        if (PauseAndWait())
-            continue;
+    // Go into main RTSP loop, feeding data to AddData
+    _channel->GetFeeder()->Run();
 
-        if (!IsRecordingRequested())
-            break;
-
-        if (!_channel->GetFeeder()->IsOpen())
-        {
-            usleep(5000);
-            continue;
-        }
-
-        // Go into main RTSP loop, feeding data to AddData
-        _channel->GetFeeder()->Run();
-    }
+    Close();
 
     // Finish up...
     FinishRecording();
-    Close();
-
     QMutexLocker locker(&pauseLock);
     recording = false;
     recordingWait.wakeAll();

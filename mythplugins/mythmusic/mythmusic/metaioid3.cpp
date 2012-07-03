@@ -201,7 +201,7 @@ bool MetaIOID3::write(const Metadata* mdata)
         {
             tpe4frame = new TextIdentificationFrame(TagLib::ByteVector("TPE4"),
                                                     TagLib::String::UTF8);
-                                                    tag->addFrame(tpe4frame);
+            tag->addFrame(tpe4frame);
         }
         tpe4frame->setText(QStringToTString(mdata->CompilationArtist()));
 
@@ -215,7 +215,7 @@ bool MetaIOID3::write(const Metadata* mdata)
         {
             tpe2frame = new TextIdentificationFrame(TagLib::ByteVector("TPE2"),
                                                     TagLib::String::UTF8);
-                                                    tag->addFrame(tpe2frame);
+            tag->addFrame(tpe2frame);
         }
         tpe2frame->setText(QStringToTString(mdata->CompilationArtist()));
     }

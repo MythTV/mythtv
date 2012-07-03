@@ -34,13 +34,14 @@ class ProcessRequestRunnable : public QRunnable
     ProcessRequestRunnable(MythSocketManager &parent, MythSocket *sock) :
         m_parent(parent), m_sock(sock)
     {
-        m_sock->UpRef();
+        m_sock->IncrRef();
     }
 
     virtual void run(void)
     {
         m_parent.ProcessRequest(m_sock);
-        m_sock->DownRef();
+        m_sock->DecrRef();
+        m_sock = NULL;
     }
 
     MythSocketManager &m_parent;
@@ -123,7 +124,7 @@ void MythSocketManager::AddSocketHandler(SocketHandler *sock)
     if (m_socketMap.contains(sock->GetSocket()))
         return;
 
-    sock->UpRef();
+    sock->IncrRef();
     m_socketMap.insert(sock->GetSocket(), sock);
 }
 
@@ -134,7 +135,7 @@ SocketHandler *MythSocketManager::GetConnectionBySocket(MythSocket *sock)
         return NULL;
 
     SocketHandler *handler = m_socketMap[sock];
-    handler->UpRef();
+    handler->IncrRef();
     return handler;
 }
 
@@ -166,7 +167,7 @@ void MythSocketManager::connectionClosed(MythSocket *sock)
         if (m_socketMap.contains(sock))
         {
             SocketHandler *handler = m_socketMap.take(sock);
-            handler->DownRef();
+            handler->DecrRef();
         }
     }
 }
@@ -301,7 +302,7 @@ void MythSocketManager::ProcessRequestWork(MythSocket *sock)
         }
 
         SocketHandler *handler = GetConnectionBySocket(sock);
-        ReferenceLocker hlock(handler, false);
+        ReferenceLocker hlock(handler);
 
         QMap<QString, SocketRequestHandler*>::const_iterator i
                             = m_handlerMap.constBegin();

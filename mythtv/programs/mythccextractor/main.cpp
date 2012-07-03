@@ -18,6 +18,7 @@ using namespace std;
 #include "programinfo.h"
 #include "ringbuffer.h"
 #include "exitcodes.h"
+#include "signalhandling.h"
 
 namespace {
     void cleanup()
@@ -83,7 +84,7 @@ static int RunCCExtract(const ProgramInfo &program_info)
     ctx->SetRingBuffer(tmprbuf);
     ctx->SetPlayer(ccp);
 
-    ccp->SetPlayerInfo(NULL, NULL, true, ctx);
+    ccp->SetPlayerInfo(NULL, NULL, ctx);
     if (ccp->OpenFile() < 0)
     {
         cerr << "Failed to open " << qPrintable(filename) << endl;
@@ -139,6 +140,14 @@ int main(int argc, char *argv[])
     }
 
     CleanupGuard callCleanup(cleanup);
+
+#ifndef _WIN32
+    QList<int> signallist;
+    signallist << SIGINT << SIGTERM << SIGSEGV << SIGABRT << SIGBUS << SIGFPE
+               << SIGILL;
+    SignalHandler handler(signallist);
+    signal(SIGHUP, SIG_IGN);
+#endif
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init(

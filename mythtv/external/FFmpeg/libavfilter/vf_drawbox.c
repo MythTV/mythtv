@@ -28,13 +28,14 @@
 #include "libavutil/pixdesc.h"
 #include "libavutil/parseutils.h"
 #include "avfilter.h"
+#include "video.h"
 
 enum { Y, U, V, A };
 
 typedef struct {
     int x, y, w, h;
     unsigned char yuv_color[4];
-    int vsub, hsub;   //< chroma subsampling
+    int vsub, hsub;   ///< chroma subsampling
 } DrawBoxContext;
 
 static av_cold int init(AVFilterContext *ctx, const char *args, void *opaque)
@@ -70,7 +71,7 @@ static int query_formats(AVFilterContext *ctx)
         PIX_FMT_NONE
     };
 
-    avfilter_set_common_formats(ctx, avfilter_make_format_list(pix_fmts));
+    avfilter_set_common_pixel_formats(ctx, avfilter_make_format_list(pix_fmts));
     return 0;
 }
 
@@ -85,7 +86,7 @@ static int config_input(AVFilterLink *inlink)
     if (drawbox->h == 0) drawbox->h = inlink->h;
 
     av_log(inlink->dst, AV_LOG_INFO, "x:%d y:%d w:%d h:%d color:0x%02X%02X%02X%02X\n",
-           drawbox->w, drawbox->y, drawbox->w, drawbox->h,
+           drawbox->x, drawbox->y, drawbox->w, drawbox->h,
            drawbox->yuv_color[Y], drawbox->yuv_color[U], drawbox->yuv_color[V], drawbox->yuv_color[A]);
 
     return 0;
@@ -127,17 +128,17 @@ AVFilter avfilter_vf_drawbox = {
     .init      = init,
 
     .query_formats   = query_formats,
-    .inputs    = (AVFilterPad[]) {{ .name             = "default",
+    .inputs    = (const AVFilterPad[]) {{ .name       = "default",
                                     .type             = AVMEDIA_TYPE_VIDEO,
                                     .config_props     = config_input,
-                                    .get_video_buffer = avfilter_null_get_video_buffer,
-                                    .start_frame      = avfilter_null_start_frame,
+                                    .get_video_buffer = ff_null_get_video_buffer,
+                                    .start_frame      = ff_null_start_frame,
                                     .draw_slice       = draw_slice,
-                                    .end_frame        = avfilter_null_end_frame,
+                                    .end_frame        = ff_null_end_frame,
                                     .min_perms        = AV_PERM_WRITE | AV_PERM_READ,
                                     .rej_perms        = AV_PERM_PRESERVE },
                                   { .name = NULL}},
-    .outputs   = (AVFilterPad[]) {{ .name             = "default",
+    .outputs   = (const AVFilterPad[]) {{ .name       = "default",
                                     .type             = AVMEDIA_TYPE_VIDEO, },
                                   { .name = NULL}},
 };

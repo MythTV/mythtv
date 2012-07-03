@@ -53,7 +53,7 @@ void ff_h261_encode_picture_header(MpegEncContext * s, int picture_number){
     H261Context * h = (H261Context *) s;
     int format, temp_ref;
 
-    align_put_bits(&s->pb);
+    avpriv_align_put_bits(&s->pb);
 
     /* Update the pointer to last GOB */
     s->ptr_lastgob = put_bits_ptr(&s->pb);
@@ -128,7 +128,7 @@ static void h261_encode_motion(H261Context * h, int val){
     int sign, code;
     if(val==0){
         code = 0;
-        put_bits(&s->pb,h261_mv_tab[code][1],h261_mv_tab[code][0]);
+        put_bits(&s->pb,ff_h261_mv_tab[code][1],ff_h261_mv_tab[code][0]);
     }
     else{
         if(val > 15)
@@ -137,7 +137,7 @@ static void h261_encode_motion(H261Context * h, int val){
             val+=32;
         sign = val < 0;
         code = sign ? -val : val;
-        put_bits(&s->pb,h261_mv_tab[code][1],h261_mv_tab[code][0]);
+        put_bits(&s->pb,ff_h261_mv_tab[code][1],ff_h261_mv_tab[code][0]);
         put_bits(&s->pb,1,sign);
     }
 }
@@ -182,7 +182,7 @@ void ff_h261_encode_mb(MpegEncContext * s,
     }
 
     /* MB is not skipped, encode MBA */
-    put_bits(&s->pb, h261_mba_bits[(h->current_mba-h->previous_mba)-1], h261_mba_code[(h->current_mba-h->previous_mba)-1]);
+    put_bits(&s->pb, ff_h261_mba_bits[(h->current_mba-h->previous_mba)-1], ff_h261_mba_code[(h->current_mba-h->previous_mba)-1]);
 
     /* calculate MTYPE */
     if(!s->mb_intra){
@@ -200,9 +200,9 @@ void ff_h261_encode_mb(MpegEncContext * s,
     if(s->dquant)
         h->mtype++;
 
-    put_bits(&s->pb, h261_mtype_bits[h->mtype], h261_mtype_code[h->mtype]);
+    put_bits(&s->pb, ff_h261_mtype_bits[h->mtype], ff_h261_mtype_code[h->mtype]);
 
-    h->mtype = h261_mtype_map[h->mtype];
+    h->mtype = ff_h261_mtype_map[h->mtype];
 
     if(IS_QUANT(h->mtype)){
         ff_set_qscale(s,s->qscale+s->dquant);
@@ -222,7 +222,7 @@ void ff_h261_encode_mb(MpegEncContext * s,
 
     if(HAS_CBP(h->mtype)){
         assert(cbp>0);
-        put_bits(&s->pb,h261_cbp_tab[cbp-1][1],h261_cbp_tab[cbp-1][0]);
+        put_bits(&s->pb,ff_h261_cbp_tab[cbp-1][1],ff_h261_cbp_tab[cbp-1][0]);
     }
     for(i=0; i<6; i++) {
         /* encode each block */
@@ -240,7 +240,7 @@ void ff_h261_encode_init(MpegEncContext *s){
 
     if (!done) {
         done = 1;
-        init_rl(&h261_rl_tcoeff, ff_h261_rl_table_store);
+        ff_init_rl(&ff_h261_rl_tcoeff, ff_h261_rl_table_store);
     }
 
     s->min_qcoeff= -127;
@@ -251,7 +251,7 @@ void ff_h261_encode_init(MpegEncContext *s){
 
 
 /**
- * encodes a 8x8 block.
+ * Encode an 8x8 block.
  * @param block the 8x8 block
  * @param n block index (0-3 are luma, 4-5 are chroma)
  */
@@ -260,7 +260,7 @@ static void h261_encode_block(H261Context * h, DCTELEM * block, int n){
     int level, run, i, j, last_index, last_non_zero, sign, slevel, code;
     RLTable *rl;
 
-    rl = &h261_rl_tcoeff;
+    rl = &ff_h261_rl_tcoeff;
     if (s->mb_intra) {
         /* DC coef */
         level = block[0];
@@ -321,15 +321,17 @@ static void h261_encode_block(H261Context * h, DCTELEM * block, int n){
     }
 }
 
-AVCodec ff_h261_encoder = {
-    "h261",
-    AVMEDIA_TYPE_VIDEO,
-    CODEC_ID_H261,
-    sizeof(H261Context),
-    MPV_encode_init,
-    MPV_encode_picture,
-    MPV_encode_end,
-    .pix_fmts= (const enum PixelFormat[]){PIX_FMT_YUV420P, PIX_FMT_NONE},
-    .long_name= NULL_IF_CONFIG_SMALL("H.261"),
-};
+FF_MPV_GENERIC_CLASS(h261)
 
+AVCodec ff_h261_encoder = {
+    .name           = "h261",
+    .type           = AVMEDIA_TYPE_VIDEO,
+    .id             = CODEC_ID_H261,
+    .priv_data_size = sizeof(H261Context),
+    .init           = ff_MPV_encode_init,
+    .encode2        = ff_MPV_encode_picture,
+    .close          = ff_MPV_encode_end,
+    .pix_fmts       = (const enum PixelFormat[]){ PIX_FMT_YUV420P, PIX_FMT_NONE },
+    .long_name      = NULL_IF_CONFIG_SMALL("H.261"),
+    .priv_class     = &h261_class,
+};

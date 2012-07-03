@@ -47,8 +47,8 @@ void ff_h264_reset_sei(H264Context *h) {
 static int decode_picture_timing(H264Context *h){
     MpegEncContext * const s = &h->s;
     if(h->sps.nal_hrd_parameters_present_flag || h->sps.vcl_hrd_parameters_present_flag){
-        h->sei_cpb_removal_delay = get_bits(&s->gb, h->sps.cpb_removal_delay_length);
-        h->sei_dpb_output_delay = get_bits(&s->gb, h->sps.dpb_output_delay_length);
+        h->sei_cpb_removal_delay = get_bits_long(&s->gb, h->sps.cpb_removal_delay_length);
+        h->sei_dpb_output_delay = get_bits_long(&s->gb, h->sps.dpb_output_delay_length);
     }
     if(h->sps.pic_struct_present_flag){
         unsigned int i, num_clock_ts;
@@ -146,13 +146,13 @@ static int decode_buffering_period(H264Context *h){
     // NOTE: This is really so duplicated in the standard... See H.264, D.1.1
     if (sps->nal_hrd_parameters_present_flag) {
         for (sched_sel_idx = 0; sched_sel_idx < sps->cpb_cnt; sched_sel_idx++) {
-            h->initial_cpb_removal_delay[sched_sel_idx] = get_bits(&s->gb, sps->initial_cpb_removal_delay_length);
+            h->initial_cpb_removal_delay[sched_sel_idx] = get_bits_long(&s->gb, sps->initial_cpb_removal_delay_length);
             skip_bits(&s->gb, sps->initial_cpb_removal_delay_length); // initial_cpb_removal_delay_offset
         }
     }
     if (sps->vcl_hrd_parameters_present_flag) {
         for (sched_sel_idx = 0; sched_sel_idx < sps->cpb_cnt; sched_sel_idx++) {
-            h->initial_cpb_removal_delay[sched_sel_idx] = get_bits(&s->gb, sps->initial_cpb_removal_delay_length);
+            h->initial_cpb_removal_delay[sched_sel_idx] = get_bits_long(&s->gb, sps->initial_cpb_removal_delay_length);
             skip_bits(&s->gb, sps->initial_cpb_removal_delay_length); // initial_cpb_removal_delay_offset
         }
     }
@@ -164,18 +164,25 @@ static int decode_buffering_period(H264Context *h){
 int ff_h264_decode_sei(H264Context *h){
     MpegEncContext * const s = &h->s;
 
-    while(get_bits_count(&s->gb) + 16 < s->gb.size_in_bits){
+    while (get_bits_left(&s->gb) > 16) {
         int size, type;
 
         type=0;
         do{
+            if (get_bits_left(&s->gb) < 8)
+                return -1;
             type+= show_bits(&s->gb, 8);
         }while(get_bits(&s->gb, 8) == 255);
 
         size=0;
         do{
+            if (get_bits_left(&s->gb) < 8)
+                return -1;
             size+= show_bits(&s->gb, 8);
         }while(get_bits(&s->gb, 8) == 255);
+
+        if(s->avctx->debug&FF_DEBUG_STARTCODE)
+            av_log(h->s.avctx, AV_LOG_DEBUG, "SEI %d len:%d\n", type, size);
 
         switch(type){
         case SEI_TYPE_PIC_TIMING: // Picture timing SEI

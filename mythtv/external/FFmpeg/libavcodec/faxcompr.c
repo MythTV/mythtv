@@ -20,8 +20,8 @@
  */
 
 /**
- * CCITT Fax Group 3 and 4 decompression
  * @file
+ * CCITT Fax Group 3 and 4 decompression
  * @author Konstantin Shishkov
  */
 #include "avcodec.h"
@@ -110,11 +110,11 @@ av_cold void ff_ccitt_unpack_init(void)
     ccitt_vlc[1].table = code_table2;
     ccitt_vlc[1].table_allocated = 648;
     for(i = 0; i < 2; i++){
-        init_vlc_sparse(&ccitt_vlc[i], 9, CCITT_SYMS,
-                        ccitt_codes_lens[i], 1, 1,
-                        ccitt_codes_bits[i], 1, 1,
-                        ccitt_syms, 2, 2,
-                        INIT_VLC_USE_NEW_STATIC);
+        ff_init_vlc_sparse(&ccitt_vlc[i], 9, CCITT_SYMS,
+                           ccitt_codes_lens[i], 1, 1,
+                           ccitt_codes_bits[i], 1, 1,
+                           ccitt_syms, 2, 2,
+                           INIT_VLC_USE_NEW_STATIC);
     }
     INIT_VLC_STATIC(&ccitt_group3_2d_vlc, 9, 11,
                     ccitt_group3_2d_lens, 1, 1,
@@ -275,12 +275,17 @@ int ff_ccitt_unpack(AVCodecContext *avctx,
 {
     int j;
     GetBitContext gb;
-    int *runs, *ref, *runend;
+    int *runs, *ref = NULL, *runend;
     int ret;
     int runsize= avctx->width + 2;
+    int err = 0;
 
     runs = av_malloc(runsize * sizeof(runs[0]));
     ref  = av_malloc(runsize * sizeof(ref[0]));
+    if (!runs || ! ref) {
+        err = AVERROR(ENOMEM);
+        goto fail;
+    }
     ref[0] = avctx->width;
     ref[1] = 0;
     ref[2] = 0;
@@ -290,9 +295,8 @@ int ff_ccitt_unpack(AVCodecContext *avctx,
         if(compr == TIFF_G4){
             ret = decode_group3_2d_line(avctx, &gb, avctx->width, runs, runend, ref);
             if(ret < 0){
-                av_free(runs);
-                av_free(ref);
-                return -1;
+                err = -1;
+                goto fail;
             }
         }else{
             int g3d1 = (compr == TIFF_G3) && !(opts & 1);
@@ -313,7 +317,8 @@ int ff_ccitt_unpack(AVCodecContext *avctx,
         }
         dst += stride;
     }
+fail:
     av_free(runs);
     av_free(ref);
-    return 0;
+    return err;
 }

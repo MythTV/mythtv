@@ -34,6 +34,11 @@
 // Application local headers
 #include "mpegutils.h"
 
+extern "C" {
+#include "libavcodec/mpegvideo.h"
+}
+
+
 static QHash<uint,bool> extract_pids(const QString &pidsStr, bool required)
 {
     QHash<uint,bool> use_pid;
@@ -345,11 +350,6 @@ class PTSListener :
 };
 
 
-extern "C" {
-extern const uint8_t *ff_find_start_code(
-    const uint8_t *p, const uint8_t *end, uint32_t *state);
-}
-
 bool PTSListener::ProcessTSPacket(const TSPacket &tspacket)
 {
     // if packet contains start of PES packet, start
@@ -368,7 +368,7 @@ bool PTSListener::ProcessTSPacket(const TSPacket &tspacket)
 
     while (bufptr < bufend)
     {
-        bufptr = ff_find_start_code(bufptr, bufend, &m_start_code);
+        bufptr = avpriv_mpv_find_start_code(bufptr, bufend, &m_start_code);
         int bytes_left = bufend - bufptr;
         if ((m_start_code & 0xffffff00) == 0x00000100)
         {

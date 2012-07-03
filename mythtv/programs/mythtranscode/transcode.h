@@ -2,8 +2,8 @@
 #include "fifowriter.h"
 #include "transcodedefs.h"
 #include "programtypes.h"
+#include "playercontext.h"
 
-class PlayerContext;
 class ProgramInfo;
 class NuppelVideoRecorder;
 class MythPlayer;
@@ -42,15 +42,16 @@ class Transcode : public QObject
     bool GetProfile(QString profileName, QString encodingType, int height,
                     int frameRate);
     void ReencoderAddKFA(long curframe, long lastkey, long num_keyframes);
+    void SetPlayerContext(PlayerContext*);
+    PlayerContext *GetPlayerContext(void) { return ctx; }
+    MythPlayer *GetPlayer(void) { return (ctx) ? ctx->player : NULL; }
 
   private:
     ProgramInfo            *m_proginfo;
     RecordingProfile        profile;
     int                     keyframedist;
     NuppelVideoRecorder    *nvr;
-    MythPlayer             *player;
-    PlayerContext          *player_ctx;
-    RingBuffer             *inRingBuffer;
+    PlayerContext          *ctx;
     RingBuffer             *outRingBuffer;
     FIFOWriter             *fifow;
     KFATable               *kfa_table;

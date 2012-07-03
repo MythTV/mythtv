@@ -10,7 +10,7 @@
 
 #include "mythdb.h"
 #include "mythcorecontext.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 #include "checksetup.h"
 
 /// Check that a directory path exists and is writable
@@ -50,13 +50,12 @@ bool checkStoragePaths(QStringList &probs)
     MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare("SELECT count(groupname) FROM storagegroup;");
-    if (!query.exec() || !query.isActive() || query.size() < 1)
+    if (!query.exec() || !query.next())
     {
         MythDB::DBError("checkStoragePaths", query);
         return false;
     }
 
-    query.next();
     if (query.value(0).toInt() == 0)
     {
         QString trMesg =

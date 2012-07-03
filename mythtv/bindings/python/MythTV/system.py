@@ -4,11 +4,11 @@
 Provides base classes for managing system calls.
 """
 
-from exceptions import MythError, MythDBError, MythFileError
-from logging import MythLog
-from altdict import DictData, OrdDict
-from utility import levenshtein, DequeBuffer
-from database import DBCache
+from MythTV.exceptions import MythError, MythDBError, MythFileError
+from MythTV.logging import MythLog
+from MythTV.altdict import DictData, OrdDict
+from MythTV.utility import levenshtein, DequeBuffer
+from MythTV.database import DBCache
 
 from subprocess import Popen
 from select import select

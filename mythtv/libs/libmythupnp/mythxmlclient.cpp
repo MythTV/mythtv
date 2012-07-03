@@ -91,7 +91,17 @@ UPnPResultCode MythXMLClient::GetConnectionInfo( const QString &sPin, DatabasePa
         if ((pParams->verProtocol != MYTH_PROTO_VERSION) ||
             (pParams->verSchema   != MYTH_DATABASE_VERSION))
             // incompatible version, we cannot use this backend
+        {
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("MythXMLClient::GetConnectionInfo Failed - "
+                        "Version Mismatch (%1,%2) != (%3,%4)")
+                .arg(pParams->verProtocol)
+                .arg(pParams->verSchema)
+                .arg(MYTH_PROTO_VERSION)
+                .arg(MYTH_DATABASE_VERSION));
+            sMsg = QObject::tr("Version Mismatch", "UPNP Errors");
             return UPnPResult_ActionFailed;
+        }
 
         return UPnPResult_Success;
     }
@@ -110,8 +120,10 @@ UPnPResultCode MythXMLClient::GetConnectionInfo( const QString &sPin, DatabasePa
     {
         // Service calls no longer return UPnPResult codes, 
         // convert standard 501 to UPnPResult code for now.
+        sMsg = QObject::tr("Not Authorized", "UPNP Errors");
         return UPnPResult_ActionNotAuthorized;
     }
 
+    sMsg = QObject::tr("Unknown Error", "UPNP Errors");
     return UPnPResult_ActionFailed;
 }

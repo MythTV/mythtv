@@ -52,7 +52,7 @@ void DeleteThread::run(void)
         // this will only happen if the program is closing, so fast
         // deletion is not a problem
         QList<DeleteHandler*>::iterator i;
-        (*i)->DownRef();
+        (*i)->DecrRef();
     }
     else
         LOG(VB_FILE, LOG_DEBUG, "Delete thread self-terminating due to idle.");
@@ -75,7 +75,7 @@ bool DeleteThread::AddFile(QString path)
 
 bool DeleteThread::AddFile(DeleteHandler *handler)
 {
-    handler->UpRef();
+    handler->IncrRef();
     QMutexLocker lock(&m_newlock);
     m_newfiles << handler;
     return true;
@@ -86,7 +86,7 @@ void DeleteThread::ProcessNew(void)
     // loop through new files, unlinking and adding for deletion
     // until none are left
 
-    QDateTime ctime = QDateTime::currentDateTime();
+    QDateTime ctime = MythDate::current();
 
     while (true)
     {
@@ -105,7 +105,8 @@ void DeleteThread::ProcessNew(void)
         //    continue;
 
         QString path = handler->m_path;
-        const char *cpath = handler->m_path.toLocal8Bit().constData();
+        QByteArray cpath_ba = handler->m_path.toLocal8Bit();
+        const char *cpath = cpath_ba.constData();
 
         QFileInfo finfo(handler->m_path);
         if (finfo.isSymLink())
@@ -123,7 +124,7 @@ void DeleteThread::ProcessNew(void)
                         QString("Error deleting '%1' -> '%2': ")
                             .arg(handler->m_path).arg(tmppath) + ENO);
                     handler->DeleteFailed();
-                    handler->DownRef();
+                    handler->DecrRef();
                     continue;
                 }
 
@@ -137,7 +138,8 @@ void DeleteThread::ProcessNew(void)
                 // an external directory with no link into mythtv
                 handler->DeleteSucceeded();
                 handler->m_path = tmppath;
-                cpath = handler->m_path.toLocal8Bit().constData();
+                cpath_ba = handler->m_path.toLocal8Bit();
+                cpath = cpath_ba.constData();
             }
             else
             {
@@ -153,7 +155,7 @@ void DeleteThread::ProcessNew(void)
                 else
                     handler->DeleteFailed();
 
-                handler->DownRef();
+                handler->DecrRef();
                 continue;
             }
         }
@@ -168,7 +170,7 @@ void DeleteThread::ProcessNew(void)
                 QString("Error deleting '%1': could not open ")
                     .arg(handler->m_path) + ENO);
             handler->DeleteFailed();
-            handler->DownRef();
+            handler->DecrRef();
             continue;
         }
 
@@ -181,7 +183,7 @@ void DeleteThread::ProcessNew(void)
                     .arg(path) + ENO);
             handler->DeleteFailed();
             close(fd);
-            handler->DownRef();
+            handler->DecrRef();
             continue;
         }
 
@@ -203,7 +205,7 @@ void DeleteThread::ProcessOld(void)
     if (m_files.empty())
         return;
 
-    QDateTime ctime = QDateTime::currentDateTime();
+    QDateTime ctime = MythDate::current();
 
     // only operate on one file at a time
     // delete that file completely before moving onto the next
@@ -234,7 +236,7 @@ void DeleteThread::ProcessOld(void)
         {
             handler->Close();
             m_files.removeFirst();
-            handler->DownRef();
+            handler->DecrRef();
         }
 
         // fast delete can close out all, but slow delete needs

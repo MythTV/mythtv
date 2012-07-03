@@ -16,7 +16,7 @@
 #include "upnpscanner.h"
 #include "mythfexml.h"
 #include "compat.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 
 #include "serviceHosts/frontendServiceHost.h"
 
@@ -58,7 +58,7 @@ class MythFrontendStatus : public HttpServerExtension
             ipaddress = UPnp::g_IPAddrList.at(0);
 
         QString hostname   = gCoreContext->GetHostName();
-        QDateTime qdtNow   = QDateTime::currentDateTime();
+        QDateTime qdtNow   = MythDate::current();
         QString masterhost = gCoreContext->GetMasterHostName();
         QString masterip   = gCoreContext->GetSetting("MasterServerIP");
         QString masterport = gCoreContext->GetSettingOnHost("BackendStatusPort",
@@ -76,7 +76,7 @@ class MythFrontendStatus : public HttpServerExtension
            << "  <meta http-equiv=\"Content-Type\""
            << "content=\"text/html; charset=UTF-8\" />\r\n"
            << "  <title>MythFrontend Status - "
-           << MythDateTimeToString(qdtNow, kDateTimeShort) << " - "
+           << MythDate::toString(qdtNow, MythDate::kDateTimeShort) << " - "
            << MYTH_BINARY_VERSION << "</title>\r\n"
            << "  <link rel=\"stylesheet\" href=\"/css/site.css\"   type=\"text/css\">\r\n"
            << "  <link rel=\"stylesheet\" href=\"/css/Status.css\" type=\"text/css\">\r\n"
@@ -107,21 +107,19 @@ class MythFrontendStatus : public HttpServerExtension
 
             EntryMap map;
             cache->GetEntryMap(map);
-            cache->Release();
+            cache->DecrRef();
             cache = NULL;
 
-            QMapIterator< QString, DeviceLocation * > i(map);
-            while (i.hasNext())
+            for (EntryMap::iterator it = map.begin(); it != map.end(); ++it)
             {
-                i.next();
-                QUrl url(i.value()->m_sLocation);
+                QUrl url((*it)->m_sLocation);
                 if (url.host() != ipaddress)
                 {
                     stream << "<br />" << url.host() << "&nbsp(<a href=\""
                            << url.toString(QUrl::RemovePath)
                            << "\">Status page</a>)\r\n";
                 }
-                i.value()->Release();
+                (*it)->DecrRef();
             }
             stream << "  </div>\r\n";
         }
@@ -140,19 +138,17 @@ class MythFrontendStatus : public HttpServerExtension
         {
             EntryMap map;
             cache->GetEntryMap(map);
-            cache->Release();
+            cache->DecrRef();
             cache = NULL;
 
-            QMapIterator< QString, DeviceLocation * > i(map);
-            while (i.hasNext())
+            for (EntryMap::iterator it = map.begin(); it != map.end(); ++it)
             {
-                i.next();
-                QUrl url(i.value()->m_sLocation);
+                QUrl url((*it)->m_sLocation);
                 stream << "<br />" << "Slave: " << url.host()
                        << "&nbsp(<a href=\""
                        << url.toString(QUrl::RemovePath)
                        << "\">Status page</a>)\r\n";
-                i.value()->Release();
+                (*it)->DecrRef();
             }
         }
 

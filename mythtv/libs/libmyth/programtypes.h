@@ -1,6 +1,17 @@
 #ifndef _PROGRAM_INFO_TYPES_H_
 #define _PROGRAM_INFO_TYPES_H_
 
+//////////////////////////////////////////////////////////////////////
+//
+// WARNING
+//
+// The enums in this header are used in libmythservicecontracts,
+// and for database values: hence when removing something from
+// these enums leave a gap, and when adding a new value give it
+// a explicit integer value.
+// 
+//////////////////////////////////////////////////////////////////////
+
 // ANSI C
 #include <stdint.h> // for [u]int[32,64]_t
 
@@ -198,6 +209,8 @@ typedef enum SubtitleTypes {
 #define kSubtitlePropertyMask (0x0f<<kSubtitlePropertyOffset)
 
 typedef enum RecStatusTypes {
+    rsOtherRecording = -13,
+    rsOtherTuning = -12,
     rsMissedFuture = -11,
     rsTuning = -10,
     rsFailed = -9,
@@ -253,12 +266,5 @@ typedef enum AutoExpireTypes {
     kDeletedAutoExpire = 9999,
     kLiveTVAutoExpire = 10000
 } AutoExpireType;
-
-typedef enum MythDateFormats {
-    TextDate  = Qt::TextDate,
-    ISODate   = Qt::ISODate,
-    LocalDate = Qt::LocalDate,
-    MythDate  = 0x100,
-} MythDateFormat;
 
 #endif // _PROGRAM_INFO_TYPES_H_

@@ -65,8 +65,6 @@ class TVBrowseHelper : public MThread
 {
   public:
     TVBrowseHelper(TV      *tv,
-                   QString  time_format,
-                   QString  short_date_format,
                    uint     browse_max_forward,
                    bool     browse_all_tuners,
                    bool     use_channel_groups,
@@ -115,8 +113,6 @@ class TVBrowseHelper : public MThread
     TV               *m_tv;
     DBChanList        db_all_channels;
     DBChanList        db_all_visible_channels;
-    QString           db_time_format;
-    QString           db_short_date_format;
     uint              db_browse_max_forward;
     bool              db_browse_all_tuners;
     bool              db_use_channel_groups;

@@ -280,9 +280,21 @@ void Playlist::shuffleTracks(MusicPlayer::ShuffleMode shuffleMode)
                 while (weightIt != weightEnd)
                 {
                     pos += weightIt->second;
-                    if (pos >= hit) break;
+                    if (pos >= hit)
+                        break;
                     ++weightIt;
                 }
+
+                // FIXME If we don't exit here then we'll segfault, but it
+                //       probably won't give us the desired randomisation
+                //       either - There seems to be a flaw in this code, we
+                //       erase items from the map but never adjust
+                //       'totalWeights' so at a point 'pos' will never be
+                //       greater or equal to 'hit' and we will always hit the
+                //       end of the map
+                if (weightIt == weightEnd)
+                    break;
+
                 order[weightIt->first] = orderCpt;
                 totalWeights -= weightIt->second;
                 weights.erase(weightIt);

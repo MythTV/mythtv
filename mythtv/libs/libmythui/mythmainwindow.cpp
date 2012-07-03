@@ -44,6 +44,8 @@ using namespace std;
 #include "mythsignalingtimer.h"
 #include "mythcorecontext.h"
 #include "mythmedia.h"
+#include "mythmiscutil.h"
+#include "mythdate.h"
 
 // libmythui headers
 #include "myththemebase.h"
@@ -342,7 +344,8 @@ MythMainWindow *MythMainWindow::getMainWindow(const bool useDB)
 
 void MythMainWindow::destroyMainWindow(void)
 {
-    gCoreContext->SetGUIObject(NULL);
+    if (gCoreContext)
+        gCoreContext->SetGUIObject(NULL);
     delete mainWin;
     mainWin = NULL;
 }
@@ -859,7 +862,8 @@ bool MythMainWindow::SaveScreenShot(const QImage &image, QString filename)
     {
         QString fpath = GetMythDB()->GetSetting("ScreenShotPath", "/tmp");
         filename = QString("%1/myth-screenshot-%2.png").arg(fpath)
-         .arg(QDateTime::currentDateTime().toString("yyyy-MM-ddThh-mm-ss.zzz"));
+            .arg(MythDate::toString(
+                     MythDate::current(), MythDate::kScreenShotFilename));
     }
 
     QString extension = filename.section('.', -1, -1);
@@ -1290,7 +1294,9 @@ void MythMainWindow::attach(QWidget *child)
         currentWidget()->setEnabled(false);
 
     d->widgetList.push_back(child);
+#ifndef Q_WS_MACX
     child->winId();
+#endif
     child->raise();
     child->setFocus();
     child->setMouseTracking(true);
@@ -1599,7 +1605,7 @@ void MythMainWindow::BindKey(const QString &context, const QString &action,
     if (!d->keyContexts.contains(context))
         d->keyContexts.insert(context, new KeyContext());
 
-    for (unsigned int i = 0; i < keyseq.count(); i++)
+    for (unsigned int i = 0; i < (uint)keyseq.count(); i++)
     {
         int keynum = keyseq[i];
         keynum &= ~Qt::UNICODE_ACCEL;
@@ -1746,7 +1752,7 @@ void MythMainWindow::BindJump(const QString &destination, const QString &key)
 
     QKeySequence keyseq(key);
 
-    for (unsigned int i = 0; i < keyseq.count(); i++)
+    for (unsigned int i = 0; i < (uint)keyseq.count(); i++)
     {
         int keynum = keyseq[i];
         keynum &= ~Qt::UNICODE_ACCEL;
@@ -2079,7 +2085,7 @@ bool MythMainWindow::eventFilter(QObject *, QEvent *e)
                 d->gestureTimer->stop();
                 d->gestureTimer->start(GESTURE_TIMEOUT);
 
-                d->gesture.record(dynamic_cast<QMouseEvent*>(e)->pos());
+                d->gesture.record(static_cast<QMouseEvent*>(e)->pos());
                 return true;
             }
             break;
@@ -2088,7 +2094,7 @@ bool MythMainWindow::eventFilter(QObject *, QEvent *e)
         {
             ResetIdleTimer();
             ShowMouseCursor(true);
-            QWheelEvent* qmw = dynamic_cast<QWheelEvent*>(e);
+            QWheelEvent* qmw = static_cast<QWheelEvent*>(e);
             int delta = qmw->delta();
             if (delta>0)
             {

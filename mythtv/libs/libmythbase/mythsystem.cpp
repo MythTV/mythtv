@@ -63,7 +63,23 @@ MythSystem::MythSystem(const QString &command, uint flags)
  */
 void MythSystem::SetCommand(const QString &command, uint flags)
 {
-    SetCommand(command, QStringList(), flags | kMSRunShell);
+    if (flags & kMSRunShell)
+        SetCommand(command, QStringList(), flags);
+    else
+    {
+        QString abscommand;
+        QStringList args;
+        if (!d->ParseShell(command, abscommand, args))
+        {
+            LOG(VB_GENERAL, LOG_ERR,
+                    QString("MythSystem(%1) command not understood")
+                            .arg(command));
+            m_status = GENERIC_EXIT_INVALID_CMDLINE;
+            return;
+        }
+
+        SetCommand(abscommand, args, flags);
+    }
 }
 
 
@@ -380,6 +396,25 @@ void MythSystem::JumpAbort(void)
 
     LOG(VB_SYSTEM, LOG_DEBUG, "Triggering Abort on Jumppoint");
     d->JumpAbort();
+}
+
+QString MythSystem::ShellEscape(const QString &in)
+{
+    QString out = in;
+
+    if (out.contains("\""))
+        out = out.replace("\"", "\\\"");
+
+    if (out.contains("\'"))
+        out = out.replace("\'", "\\\'");
+
+    if (out.contains(" "))
+    {
+        out.prepend("\"");
+        out.append("\"");
+    }
+
+    return out;
 }
 
 uint myth_system(const QString &command, uint flags, uint timeout)

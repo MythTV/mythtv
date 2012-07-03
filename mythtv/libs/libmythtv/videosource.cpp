@@ -675,9 +675,8 @@ bool VideoSourceEditor::cardTypesInclude(const int &sourceID,
     query.bindValue(":SOURCEID", sourceID);
     query.bindValue(":CARDTYPE", thecardtype);
 
-    if (query.exec() && query.isActive() && query.size() > 0)
+    if (query.exec() && query.next())
     {
-        query.next();
         int count = query.value(0).toInt();
 
         if (count > 0)
@@ -972,11 +971,11 @@ class SkipBtAudio : public CheckBoxSetting, public CaptureCardDBStorage
    };
 };
 
-class DVBCardNum : public ComboBoxSetting, public CaptureCardDBStorage
+class DVBCardNum : public PathSetting, public CaptureCardDBStorage
 {
   public:
     DVBCardNum(const CaptureCard &parent) :
-        ComboBoxSetting(this),
+        PathSetting(this, true),
         CaptureCardDBStorage(this, parent, "videodevice")
     {
         setLabel(QObject::tr("DVB device"));

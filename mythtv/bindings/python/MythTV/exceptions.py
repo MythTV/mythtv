@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Provides custom error codes"""
 
-from static import ERRCODES
+from MythTV.static import ERRCODES
 
 class MythError( Exception, ERRCODES ):
     """

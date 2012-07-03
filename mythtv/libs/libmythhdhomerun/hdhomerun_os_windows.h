@@ -38,6 +38,7 @@
 #include <windows.h>
 #include <winsock2.h>
 #include <ws2tcpip.h>
+#include <wincrypt.h>
 #if !defined(USING_MINGW)
 #include <wspiapi.h>
 #endif

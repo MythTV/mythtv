@@ -4,16 +4,18 @@
 
 #include "filetransfer.h"
 #include "ringbuffer.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 #include "mythsocket.h"
 #include "programinfo.h"
+#include "mythlogging.h"
 
 FileTransfer::FileTransfer(QString &filename, MythSocket *remote,
                            bool usereadahead, int timeout_ms) :
+    ReferenceCounter(QString("FileTransfer:%1").arg(filename)),
     readthreadlive(true), readsLocked(false),
     rbuffer(RingBuffer::Create(filename, false, usereadahead, timeout_ms, true)),
     sock(remote), ateof(false), lock(QMutex::NonRecursive),
-    refLock(QMutex::NonRecursive), refCount(0), writemode(false)
+    writemode(false)
 {
     pginfo = new ProgramInfo(filename);
     pginfo->MarkAsInUse(true, kFileTransferInUseID);
@@ -21,10 +23,11 @@ FileTransfer::FileTransfer(QString &filename, MythSocket *remote,
 }
 
 FileTransfer::FileTransfer(QString &filename, MythSocket *remote, bool write) :
+    ReferenceCounter(QString("FileTransfer:%1").arg(filename)),
     readthreadlive(true), readsLocked(false),
     rbuffer(RingBuffer::Create(filename, write)),
     sock(remote), ateof(false), lock(QMutex::NonRecursive),
-    refLock(QMutex::NonRecursive), refCount(0), writemode(write)
+    writemode(write)
 {
     pginfo = new ProgramInfo(filename);
     pginfo->MarkAsInUse(true, kFileTransferInUseID);
@@ -51,26 +54,6 @@ FileTransfer::~FileTransfer()
     }
 }
 
-void FileTransfer::UpRef(void)
-{
-    QMutexLocker locker(&refLock);
-    refCount++;
-}
-
-bool FileTransfer::DownRef(void)
-{
-    int count = 0;
-    {
-        QMutexLocker locker(&refLock);
-        count = --refCount;
-    }
-
-    if (count < 0)
-        delete this;
-    
-    return (count < 0);
-}
-
 bool FileTransfer::isOpen(void)
 {
     if (rbuffer && rbuffer->IsOpen())
@@ -94,6 +77,7 @@ void FileTransfer::Stop(void)
     if (readthreadlive)
     {
         readthreadlive = false;
+        LOG(VB_FILE, LOG_INFO, "calling StopReads()");
         rbuffer->StopReads();
         QMutexLocker locker(&lock);
         readsLocked = true;
@@ -108,6 +92,7 @@ void FileTransfer::Stop(void)
 
 void FileTransfer::Pause(void)
 {
+    LOG(VB_FILE, LOG_INFO, "calling StopReads()");
     rbuffer->StopReads();
     QMutexLocker locker(&lock);
     readsLocked = true;
@@ -118,6 +103,7 @@ void FileTransfer::Pause(void)
 
 void FileTransfer::Unpause(void)
 {
+    LOG(VB_FILE, LOG_INFO, "calling StartReads()");
     rbuffer->StartReads();
     {
         QMutexLocker locker(&lock);

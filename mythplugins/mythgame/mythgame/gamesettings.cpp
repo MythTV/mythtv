@@ -1,10 +1,27 @@
+#include <QCoreApplication>
+
 #include <mythcontext.h>
 #include <mythdb.h>
 #include <mythdirs.h>
 
 #include "gamesettings.h"
 
-const QString GetGameExtensions(const QString GameType)
+const QString GetGameTypeName(const QString GameType)
+{
+    QString result = "";
+
+    for (int i = 0; i < MAX_GAME_TYPES; i++)
+    {
+        if (GameTypeList[i].idStr == GameType) {
+            result = QCoreApplication::translate("(GameTypes)", 
+                         GameTypeList[i].nameStr.toUtf8());
+            break;
+        }
+    }
+    return result;
+}
+
+const QString GetGameTypeExtensions(const QString GameType)
 {
     QString result = "";
 
@@ -182,7 +199,9 @@ class GameType : public ComboBoxSetting, public GameDBStorage
         setLabel(QObject::tr("Type"));
         for (int i = 0; i < MAX_GAME_TYPES; i++)
         {
-            addSelection(GameTypeList[i].nameStr, GameTypeList[i].idStr);
+            addSelection(QCoreApplication::translate("(GameTypes)", 
+                         GameTypeList[i].nameStr.toUtf8()),
+                         GameTypeList[i].idStr);
         }
         setValue(0);
         setHelpText(QObject::tr("Type of Game/Emulator. Mostly for informational purposes and has little effect on the function of your system."));
@@ -228,7 +247,7 @@ MythGamePlayerSettings::MythGamePlayerSettings()
     addChild(id = new ID());
 
     ConfigurationGroup *group = new VerticalConfigurationGroup(false, false);
-    group->setLabel(QObject::tr("Game Player Setup"));
+    group->setLabel(tr("Game Player Setup"));
     group->addChild(name = new Name(*this));
     group->addChild(new GameType(*this));
     group->addChild(new Command(*this));
@@ -246,10 +265,15 @@ void MythGamePlayerSettings::fillSelections(SelectSetting* setting)
 
     if (result.exec() && result.isActive() && result.size() > 0)
     {
+        //: %1 is the player/emulator name, %2 is the type of player/emulator
+        QString playerDisp = tr("%1 (%2)", "Game player/emulator display");
+
         while (result.next())
         {
-            setting->addSelection(result.value(0).toString() + " (" + result.value(2).toString() + ")",
-                                  result.value(1).toString());
+             setting->addSelection(QString(playerDisp)
+                .arg(result.value(0).toString())
+                .arg(GetGameTypeName(result.value(2).toString())),
+                result.value(1).toString());
         }
     }
 }

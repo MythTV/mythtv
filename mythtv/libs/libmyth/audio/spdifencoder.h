@@ -9,7 +9,6 @@ extern "C" {
 #include "libavcodec/avcodec.h"
 #include "libavformat/avformat.h"
 #include "libavcodec/audioconvert.h"
-#include "libavcodec/opt.h"
 }
 
 class MPUBLIC SPDIFEncoder

@@ -111,7 +111,8 @@ void ScheduleCommon::EditRecording(ProgramInfo *pginfo)
 
     if (!ri.GetRecordingRuleID())
         EditScheduled(&ri);
-    else if (ri.GetRecordingStatus() <= rsWillRecord)
+    else if (ri.GetRecordingStatus() <= rsWillRecord ||
+             ri.GetRecordingStatus() == rsOtherShowing)
         ShowRecordingDialog(ri);
     else
         ShowNotRecordingDialog(ri);
@@ -209,13 +210,15 @@ void ScheduleCommon::ShowRecordingDialog(const RecordingInfo& recinfo)
     {
         menuPopup->SetReturnEvent(this, "schedulerecording");
 
-        QDateTime now = QDateTime::currentDateTime();
+        QDateTime now = MythDate::current();
 
         if (recinfo.GetRecordingStartTime() < now &&
             recinfo.GetRecordingEndTime() > now)
         {
             if (recinfo.GetRecordingStatus() != rsRecording &&
-                recinfo.GetRecordingStatus() != rsTuning)
+                recinfo.GetRecordingStatus() != rsTuning &&
+                recinfo.GetRecordingStatus() != rsOtherRecording && 
+                recinfo.GetRecordingStatus() != rsOtherTuning)
                 menuPopup->AddButton(tr("Reactivate"),
                                      qVariantFromValue(recinfo));
             else
@@ -239,6 +242,8 @@ void ScheduleCommon::ShowRecordingDialog(const RecordingInfo& recinfo)
 
                 if (recinfo.GetRecordingStatus() != rsRecording &&
                     recinfo.GetRecordingStatus() != rsTuning &&
+                    recinfo.GetRecordingStatus() != rsOtherRecording &&
+                    recinfo.GetRecordingStatus() != rsOtherTuning &&
                     recinfo.GetRecordingRuleType() != kFindOneRecord &&
                     !((recinfo.GetFindID() == 0 ||
                        !IsFindApplicable(recinfo)) &&
@@ -265,7 +270,9 @@ void ScheduleCommon::ShowRecordingDialog(const RecordingInfo& recinfo)
                 recinfo.GetRecordingRuleType() != kDontRecord)
             {
                 if (recinfo.GetRecordingStatus() == rsRecording ||
-                    recinfo.GetRecordingStatus() == rsTuning)
+                    recinfo.GetRecordingStatus() == rsTuning ||
+                    recinfo.GetRecordingStatus() == rsOtherRecording ||
+                    recinfo.GetRecordingStatus() == rsOtherTuning)
                 {
                     menuPopup->AddButton(tr("Modify Recording Options"),
                                          qVariantFromValue(recinfo));
@@ -288,7 +295,9 @@ void ScheduleCommon::ShowRecordingDialog(const RecordingInfo& recinfo)
                 recinfo.GetRecordingRuleType() == kDontRecord)
             {
                 if (recinfo.GetRecordingStatus() == rsRecording ||
-                    recinfo.GetRecordingStatus() == rsTuning)
+                    recinfo.GetRecordingStatus() == rsTuning ||
+                    recinfo.GetRecordingStatus() == rsOtherRecording ||
+                    recinfo.GetRecordingStatus() == rsOtherTuning)
                 {
                     menuPopup->AddButton(tr("Modify Recording Options"),
                                          qVariantFromValue(recinfo));
@@ -341,8 +350,10 @@ void ScheduleCommon::ShowNotRecordingDialog(const RecordingInfo& recinfo)
         {
             ProgramInfo *p = *confList->begin();
             message += QString("%1 - %2  %3\n")
-                .arg(p->GetRecordingStartTime().toString(timeFormat))
-                .arg(p->GetRecordingEndTime().toString(timeFormat))
+                .arg(p->GetRecordingStartTime()
+                     .toLocalTime().toString(timeFormat))
+                .arg(p->GetRecordingEndTime()
+                     .toLocalTime().toString(timeFormat))
                 .arg(p->toString(ProgramInfo::kTitleSubtitle, " - "));
             delete p;
             confList->erase(confList->begin());
@@ -364,7 +375,7 @@ void ScheduleCommon::ShowNotRecordingDialog(const RecordingInfo& recinfo)
     {
         menuPopup->SetReturnEvent(this, "schedulenotrecording");
 
-        QDateTime now = QDateTime::currentDateTime();
+        QDateTime now = MythDate::current();
 
         if ((recinfo.GetRecordingStartTime() < now) &&
             (recinfo.GetRecordingEndTime() > now) &&
@@ -383,7 +394,6 @@ void ScheduleCommon::ShowNotRecordingDialog(const RecordingInfo& recinfo)
                 recinfo.GetRecordingStatus() == rsPreviousRecording ||
                 recinfo.GetRecordingStatus() == rsCurrentRecording ||
                 recinfo.GetRecordingStatus() == rsEarlierShowing ||
-                recinfo.GetRecordingStatus() == rsOtherShowing ||
                 recinfo.GetRecordingStatus() == rsNeverRecord ||
                 recinfo.GetRecordingStatus() == rsRepeat ||
                 recinfo.GetRecordingStatus() == rsInactive ||
@@ -489,7 +499,7 @@ void ScheduleCommon::customEvent(QEvent *event)
             else if (resulttext == tr("Record anyway"))
             {
                 recInfo.ApplyRecordStateChange(kOverrideRecord);
-                if (recInfo.GetRecordingStartTime() < QDateTime::currentDateTime())
+                if (recInfo.GetRecordingStartTime() < MythDate::current())
                     recInfo.ReactivateRecording();
             }
             else if (resulttext == tr("Forget Previous"))
@@ -499,7 +509,7 @@ void ScheduleCommon::customEvent(QEvent *event)
             else if (resulttext == tr("Never record"))
             {
                 recInfo.SetRecordingStatus(rsNeverRecord);
-                recInfo.SetScheduledStartTime(QDateTime::currentDateTime());
+                recInfo.SetScheduledStartTime(MythDate::current());
                 recInfo.SetScheduledEndTime(recInfo.GetRecordingStartTime());
                 recInfo.AddHistory(true, true);
             }
@@ -537,7 +547,7 @@ void ScheduleCommon::customEvent(QEvent *event)
             else if (resulttext == tr("Never record"))
             {
                 recInfo.SetRecordingStatus(rsNeverRecord);
-                recInfo.SetScheduledStartTime(QDateTime::currentDateTime());
+                recInfo.SetScheduledStartTime(MythDate::current());
                 recInfo.SetScheduledEndTime(recInfo.GetRecordingStartTime());
                 recInfo.AddHistory(true, true);
             }

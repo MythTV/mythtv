@@ -4,18 +4,22 @@
 //
 // Copyright (c) 2011 Robert McNamara <rmcnamara@mythtv.org>
 //
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or at your option any later version of the LGPL.
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
 //
-// This library is distributed in the hope that it will be useful,
+// This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
 //
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library.  If not, see <http://www.gnu.org/licenses/>.
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 //////////////////////////////////////////////////////////////////////////////
 
@@ -37,8 +41,9 @@
 #include "storagegroup.h"
 #include "remotefile.h"
 #include "globals.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 #include "serviceUtil.h"
+#include "mythmiscutil.h"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -94,7 +99,7 @@ DTC::VideoMetadataInfoList* Video::GetVideoList( bool bDescending,
     pVideoMetadataInfos->setCurrentPage   ( curPage         );
     pVideoMetadataInfos->setTotalPages    ( totalPages      );
     pVideoMetadataInfos->setTotalAvailable( videos.size()   );
-    pVideoMetadataInfos->setAsOf          ( QDateTime::currentDateTime() );
+    pVideoMetadataInfos->setAsOf          ( MythDate::current() );
     pVideoMetadataInfos->setVersion       ( MYTH_BINARY_VERSION );
     pVideoMetadataInfos->setProtoVer      ( MYTH_PROTO_VERSION  );
 
@@ -189,7 +194,9 @@ DTC::VideoLookupList* Video::LookupVideo( const QString    &Title,
             pVideoLookup->setInetref(lookup->GetInetref());
             pVideoLookup->setCollectionref(lookup->GetCollectionref());
             pVideoLookup->setHomePage(lookup->GetHomepage());
-            pVideoLookup->setReleaseDate(QDateTime(lookup->GetReleaseDate()));
+            pVideoLookup->setReleaseDate(
+                QDateTime(lookup->GetReleaseDate(),
+                          QTime(0,0),Qt::LocalTime).toUTC());
             pVideoLookup->setUserRating(lookup->GetUserRating());
             pVideoLookup->setLength(lookup->GetRuntime());
             pVideoLookup->setLanguage(lookup->GetLanguage());
@@ -250,7 +257,7 @@ DTC::VideoLookupList* Video::LookupVideo( const QString    &Title,
     }
 
     pVideoLookups->setCount         ( list.count()                 );
-    pVideoLookups->setAsOf          ( QDateTime::currentDateTime() );
+    pVideoLookups->setAsOf          ( MythDate::current() );
     pVideoLookups->setVersion       ( MYTH_BINARY_VERSION          );
     pVideoLookups->setProtoVer      ( MYTH_PROTO_VERSION           );
 
@@ -330,7 +337,9 @@ bool Video::AddVideo( const QString &sFileName,
                           0.0, VIDEO_RATING_DEFAULT, 0, 0,
                           VideoMetadata::FilenameToMeta(sFileName, 2).toInt(),
                           VideoMetadata::FilenameToMeta(sFileName, 3).toInt(),
-                          QDate::currentDate(), 0, ParentalLevel::plLowest);
+                          MythDate::current().date(), 0,
+                          ParentalLevel::plLowest);
+
     newFile.SetHost(sHostName);
     newFile.SaveToDatabase();
 

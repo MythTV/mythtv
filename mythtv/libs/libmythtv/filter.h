@@ -32,15 +32,6 @@ typedef struct FilterInfo_
     char *libname;
 } FilterInfo;
 
-typedef struct ConstFilterInfo_
-{
-    const init_filter filter_init;
-    const char *name;
-    const char *descript;
-    const FmtConv *formats;
-    const char *libname;
-} ConstFilterInfo;
-
 struct VideoFilter_
 {
     int (*filter)(struct VideoFilter_ *, VideoFrame *, int);

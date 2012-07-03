@@ -39,7 +39,7 @@
 #include "exitcodes.h"
 #include "jobqueue.h"
 #include "upnp.h"
-#include <mythmiscutil.h>
+#include "mythdate.h"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -171,19 +171,27 @@ void HttpStatus::GetStatusHTML( HTTPRequest *pRequest )
     PrintStatus( stream, &doc );
 }
 
+static QString setting_to_localtime(const char *setting)
+{
+    QString origDateString = gCoreContext->GetSetting(setting);
+    QDateTime origDate = MythDate::fromString(origDateString);
+    return MythDate::toString(origDate, MythDate::kDateTimeFull);
+}
+
 void HttpStatus::FillStatusXML( QDomDocument *pDoc )
 {
-    QDateTime qdtNow          = QDateTime::currentDateTime();
+    QDateTime qdtNow          = MythDate::current();
 
     // Add Root Node.
 
     QDomElement root = pDoc->createElement("Status");
     pDoc->appendChild(root);
 
-    root.setAttribute("date"    , MythDateTimeToString(qdtNow,
-                                                       kDateFull | kAddYear));
-    root.setAttribute("time"    , MythDateTimeToString(qdtNow, kTime));
-    root.setAttribute("ISODate" , qdtNow.toString(Qt::ISODate)  );
+    root.setAttribute("date"    , MythDate::toString(
+                          qdtNow, MythDate::kDateFull | MythDate::kAddYear));
+    root.setAttribute("time"    ,
+                      MythDate::toString(qdtNow, MythDate::kTime));
+    root.setAttribute("MythDate::ISODate" , qdtNow.toString(Qt::ISODate)  );
     root.setAttribute("version" , MYTH_BINARY_VERSION           );
     root.setAttribute("protoVer", MYTH_PROTO_VERSION            );
 
@@ -270,7 +278,7 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
     {
         if (((*itProg)->GetRecordingStatus() <= rsWillRecord) &&
             ((*itProg)->GetRecordingStartTime() >=
-             QDateTime::currentDateTime()))
+             MythDate::current()))
         {
             iNumRecordings++;
             FillProgramInfo(pDoc, scheduled, *itProg);
@@ -297,20 +305,18 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
     {
         EntryMap map;
         fes->GetEntryMap(map);
-        fes->Release();
+        fes->DecrRef();
         fes = NULL;
 
         frontends.setAttribute( "count", map.size() );
-        QMapIterator< QString, DeviceLocation * > i(map);
-        while (i.hasNext())
+        for (EntryMap::iterator it = map.begin(); it != map.end(); ++it)
         {
-            i.next();
             QDomElement fe = pDoc->createElement("Frontend");
             frontends.appendChild(fe);
-            QUrl url(i.value()->m_sLocation);
+            QUrl url((*it)->m_sLocation);
             fe.setAttribute("name", url.host());
             fe.setAttribute("url",  url.toString(QUrl::RemovePath));
-            i.value()->Release();
+            (*it)->DecrRef();
         }
     }
 
@@ -345,14 +351,12 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
 
         EntryMap map;
         sbes->GetEntryMap(map);
-        sbes->Release();
+        sbes->DecrRef();
         sbes = NULL;
 
-        QMapIterator< QString, DeviceLocation * > i(map);
-        while (i.hasNext())
+        for (EntryMap::iterator it = map.begin(); it != map.end(); ++it)
         {
-            i.next();
-            QUrl url(i.value()->m_sLocation);
+            QUrl url((*it)->m_sLocation);
             if (url.host() != ipaddress)
             {
                 numbes++;
@@ -362,7 +366,7 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
                 mbe.setAttribute("name", url.host());
                 mbe.setAttribute("url" , url.toString(QUrl::RemovePath));
             }
-            i.value()->Release();
+            (*it)->DecrRef();
         }
     }
 
@@ -534,14 +538,13 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
 
     if (query.exec() && query.next())
     {
-        GuideDataThrough = QDateTime::fromString(
-            query.value(0).toString(), Qt::ISODate);
+        GuideDataThrough = MythDate::fromString(query.value(0).toString());
     }
 
     guide.setAttribute("start",
-        gCoreContext->GetSetting("mythfilldatabaseLastRunStart"));
+                       setting_to_localtime("mythfilldatabaseLastRunStart"));
     guide.setAttribute("end",
-        gCoreContext->GetSetting("mythfilldatabaseLastRunEnd"));
+                       setting_to_localtime("mythfilldatabaseLastRunEnd"));
     guide.setAttribute("status",
         gCoreContext->GetSetting("mythfilldatabaseLastRunStatus"));
     if (gCoreContext->GetNumSetting("MythFillGrabberSuggestsTime", 0))
@@ -622,13 +625,9 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
 
 void HttpStatus::PrintStatus( QTextStream &os, QDomDocument *pDoc )
 {
-
-    QString shortdateformat = gCoreContext->GetSetting("ShortDateFormat", "M/d");
-    QString timeformat      = gCoreContext->GetSetting("TimeFormat", "h:mm AP");
-
     os.setCodec("UTF-8");
 
-    QDateTime qdtNow = QDateTime::currentDateTime();
+    QDateTime qdtNow = MythDate::current();
 
     QDomElement docElem = pDoc->documentElement();
 
@@ -641,9 +640,9 @@ void HttpStatus::PrintStatus( QTextStream &os, QDomDocument *pDoc )
        << "content=\"text/html; charset=UTF-8\" />\r\n"
        << "  <link rel=\"stylesheet\" href=\"/css/Status.css\" type=\"text/css\">\r\n"
        << "  <title>MythTV Status - "
-       << docElem.attribute( "date", qdtNow.toString(shortdateformat)  )
+       << docElem.attribute( "date", MythDate::toString(qdtNow, MythDate::kDateShort) )
        << " "
-       << docElem.attribute( "time", qdtNow.toString(timeformat) ) << " - "
+       << docElem.attribute( "time", MythDate::toString(qdtNow, MythDate::kTime) ) << " - "
        << docElem.attribute( "version", MYTH_BINARY_VERSION ) << "</title>\r\n"
        << "</head>\r\n"
        << "<body bgcolor=\"#fff\">\r\n"
@@ -709,7 +708,6 @@ void HttpStatus::PrintStatus( QTextStream &os, QDomDocument *pDoc )
 
 int HttpStatus::PrintEncoderStatus( QTextStream &os, QDomElement encoders )
 {
-    QString timeformat   = gCoreContext->GetSetting("TimeFormat", "h:mm AP");
     int     nNumEncoders = 0;
 
     if (encoders.isNull())
@@ -811,18 +809,18 @@ int HttpStatus::PrintEncoderStatus( QTextStream &os, QDomElement encoders )
 
                             if (!recording.isNull())
                             {
-                                QDateTime endTs = QDateTime::fromString(
-                                         recording.attribute( "recEndTs", "" ),
-                                         Qt::ISODate );
+                                QDateTime endTs = MythDate::fromString(
+                                    recording.attribute( "recEndTs", "" ));
 
                                 os << ". This recording ";
-                                if (endTs < QDateTime::currentDateTime())
+                                if (endTs < MythDate::current())
                                     os << "was ";
                                 else
                                     os << "is ";
 
                                 os << "scheduled to end at "
-                                   << endTs.toString(timeformat);
+                                   << MythDate::toString(endTs,
+                                                         MythDate::kTime);
                             }
                         }
                     }
@@ -854,10 +852,7 @@ int HttpStatus::PrintEncoderStatus( QTextStream &os, QDomElement encoders )
 
 int HttpStatus::PrintScheduled( QTextStream &os, QDomElement scheduled )
 {
-    QDateTime qdtNow          = QDateTime::currentDateTime();
-    QString   shortdateformat = gCoreContext->GetSetting("ShortDateFormat", "M/d");
-    QString   longdateformat  = gCoreContext->GetSetting("DateFormat", "M/d/yyyy");
-    QString   timeformat      = gCoreContext->GetSetting("TimeFormat", "h:mm AP");
+    QDateTime qdtNow          = MythDate::current();
 
     if (scheduled.isNull())
         return( 0 );
@@ -893,18 +888,19 @@ int HttpStatus::PrintScheduled( QTextStream &os, QDomElement scheduled )
             QDomNode recNode  = e.namedItem( "Recording" );
             QDomNode chanNode = e.namedItem( "Channel"   );
 
-            if ((e.tagName() == "Program") && !recNode.isNull() && !chanNode.isNull())
+            if ((e.tagName() == "Program") && !recNode.isNull() &&
+                !chanNode.isNull())
             {
                 QDomElement r =  recNode.toElement();
                 QDomElement c =  chanNode.toElement();
 
                 QString   sTitle       = e.attribute( "title"   , "" );
                 QString   sSubTitle    = e.attribute( "subTitle", "" );
-                QDateTime airDate      = QDateTime::fromString( e.attribute( "airdate" ,"" ), Qt::ISODate );
-                QDateTime startTs      = QDateTime::fromString( e.attribute( "startTime" ,"" ), Qt::ISODate );
-                QDateTime endTs        = QDateTime::fromString( e.attribute( "endTime"   ,"" ), Qt::ISODate );
-                QDateTime recStartTs   = QDateTime::fromString( r.attribute( "recStartTs","" ), Qt::ISODate );
-//                QDateTime recEndTs     = QDateTime::fromString( r.attribute( "recEndTs"  ,"" ), Qt::ISODate );
+                QDateTime airDate      = MythDate::fromString( e.attribute( "airdate" ,"" ));
+                QDateTime startTs      = MythDate::fromString( e.attribute( "startTime" ,"" ));
+                QDateTime endTs        = MythDate::fromString( e.attribute( "endTime"   ,"" ));
+                QDateTime recStartTs   = MythDate::fromString( r.attribute( "recStartTs","" ));
+//                QDateTime recEndTs     = MythDate::fromString( r.attribute( "recEndTs"  ,"" ));
                 int       nPreRollSecs = r.attribute( "preRollSeconds", "0" ).toInt();
                 int       nEncoderId   = r.attribute( "encoderId"     , "0" ).toInt();
                 QString   sProfile     = r.attribute( "recProfile"    , ""  );
@@ -943,28 +939,27 @@ int HttpStatus::PrintScheduled( QTextStream &os, QDomElement scheduled )
                     // Output HTML
 
                 os << "      <a href=\"#\">";
-                if (shortdateformat.indexOf("ddd") == -1) {
-                    // If day-of-week not already present somewhere, prepend it.
-                    os << recStartTs.addSecs(-nPreRollSecs).toString("ddd")
-                        << " ";
-                }
-                os << recStartTs.addSecs(-nPreRollSecs).toString(shortdateformat) << " "
-                   << recStartTs.addSecs(-nPreRollSecs).toString(timeformat) << " - ";
+                os << MythDate::toString(recStartTs.addSecs(-nPreRollSecs),
+                                         MythDate::kDateFull |
+                                         MythDate::kSimplify) << " "
+                   << MythDate::toString(recStartTs.addSecs(-nPreRollSecs),
+                                         MythDate::kTime) << " - ";
 
                 if (nEncoderId > 0)
                     os << "Encoder " << nEncoderId << " - ";
 
                 os << sChanName << " - " << sTitle << "<br />"
                    << "<span><strong>" << sTitle << "</strong> ("
-                   << startTs.toString(timeformat) << "-"
-                   << endTs.toString(timeformat) << ")<br />";
+                   << MythDate::toString(startTs, MythDate::kTime) << "-"
+                   << MythDate::toString(endTs, MythDate::kTime) << ")<br />";
 
                 if ( !sSubTitle.isEmpty())
                     os << "<em>" << sSubTitle << "</em><br /><br />";
 
                 if ( airDate.isValid())
                     os << "Orig. Airdate: "
-                       << airDate.toString(longdateformat)
+                       << MythDate::toString(airDate, MythDate::kDateFull |
+                                                      MythDate::kAddYear)
                        << "<br /><br />";
 
                 os << sDesc << "<br /><br />"
@@ -1065,9 +1060,6 @@ int HttpStatus::PrintBackends( QTextStream &os, QDomElement backends )
 
 int HttpStatus::PrintJobQueue( QTextStream &os, QDomElement jobs )
 {
-    QString   shortdateformat = gCoreContext->GetSetting("ShortDateFormat", "M/d");
-    QString   timeformat      = gCoreContext->GetSetting("TimeFormat", "h:mm AP");
-
     if (jobs.isNull())
         return( 0 );
 
@@ -1080,10 +1072,6 @@ int HttpStatus::PrintJobQueue( QTextStream &os, QDomElement jobs )
     {
         QString statusColor;
         QString jobColor;
-        QString timeDateFormat;
-
-        timeDateFormat = gCoreContext->GetSetting("DateFormat", "ddd MMMM d") +
-                         ' ' + gCoreContext->GetSetting("TimeFormat", "h:mm AP");
 
         os << "    Jobs currently in Queue or recently ended:\r\n<br />"
            << "    <div class=\"schedule\">\r\n";
@@ -1142,11 +1130,11 @@ int HttpStatus::PrintJobQueue( QTextStream &os, QDomElement jobs )
 
                     QString   sTitle       = p.attribute( "title"   , "" );       //.replace(QRegExp("\""), "&quot;");
                     QString   sSubTitle    = p.attribute( "subTitle", "" );
-                    QDateTime startTs      = QDateTime::fromString( p.attribute( "startTime" ,"" ), Qt::ISODate );
-                    QDateTime endTs        = QDateTime::fromString( p.attribute( "endTime"   ,"" ), Qt::ISODate );
-                    QDateTime recStartTs   = QDateTime::fromString( r.attribute( "recStartTs","" ), Qt::ISODate );
-                    QDateTime statusTime   = QDateTime::fromString( e.attribute( "statusTime","" ), Qt::ISODate );
-                    QDateTime schedRunTime = QDateTime::fromString( e.attribute( "schedTime","" ), Qt::ISODate );
+                    QDateTime startTs      = MythDate::fromString( p.attribute( "startTime" ,"" ));
+                    QDateTime endTs        = MythDate::fromString( p.attribute( "endTime"   ,"" ));
+                    QDateTime recStartTs   = MythDate::fromString( r.attribute( "recStartTs","" ));
+                    QDateTime statusTime   = MythDate::fromString( e.attribute( "statusTime","" ));
+                    QDateTime schedRunTime = MythDate::fromString( e.attribute( "schedTime","" ));
                     QString   sHostname    = e.attribute( "hostname", "master" );
                     QString   sComment     = "";
 
@@ -1155,30 +1143,33 @@ int HttpStatus::PrintJobQueue( QTextStream &os, QDomElement jobs )
                         sComment = text.nodeValue();
 
                     os << "<a href=\"javascript:void(0)\">"
-                       << recStartTs.toString("ddd") << " "
-                       << recStartTs.toString(shortdateformat) << " "
-                       << recStartTs.toString(timeformat) << " - "
+                       << MythDate::toString(recStartTs, MythDate::kDateFull |
+                                                         MythDate::kTime)
+                       << " - "
                        << sTitle << " - <font" << jobColor << ">"
                        << JobQueue::JobText( nType ) << "</font><br />"
                        << "<span><strong>" << sTitle << "</strong> ("
-                       << startTs.toString(timeformat) << "-"
-                       << endTs.toString(timeformat) << ")<br />";
+                       << MythDate::toString(startTs, MythDate::kTime) << "-"
+                       << MythDate::toString(endTs, MythDate::kTime) << ")<br />";
 
                     if (!sSubTitle.isEmpty())
                         os << "<em>" << sSubTitle << "</em><br /><br />";
 
                     os << "Job: " << JobQueue::JobText( nType ) << "<br />";
 
-                    if (schedRunTime > QDateTime::currentDateTime())
+                    if (schedRunTime > MythDate::current())
                         os << "Scheduled Run Time: "
-                           << schedRunTime.toString(timeDateFormat)
+                           << MythDate::toString(schedRunTime,
+                                                 MythDate::kDateFull |
+                                                 MythDate::kTime)
                            << "<br />";
 
                     os << "Status: <font" << statusColor << ">"
                        << JobQueue::StatusText( nStatus )
                        << "</font><br />"
                        << "Status Time: "
-                       << statusTime.toString(timeDateFormat)
+                       << MythDate::toString(statusTime, MythDate::kDateFull |
+                                                         MythDate::kTime)
                        << "<br />";
 
                     if ( nStatus != JOB_QUEUED)
@@ -1210,8 +1201,6 @@ int HttpStatus::PrintJobQueue( QTextStream &os, QDomElement jobs )
 
 int HttpStatus::PrintMachineInfo( QTextStream &os, QDomElement info )
 {
-    QString   shortdateformat = gCoreContext->GetSetting("ShortDateFormat", "M/d");
-    QString   timeformat      = gCoreContext->GetSetting("TimeFormat", "h:mm AP");
     QString   sRep;
 
     if (info.isNull())
@@ -1397,16 +1386,16 @@ int HttpStatus::PrintMachineInfo( QTextStream &os, QDomElement info )
 
         if (!e.isNull())
         {
-            QString datetimefmt = "yyyy-MM-dd hh:mm";
             int     nDays   = e.attribute( "guideDays", "0" ).toInt();
             QString sStart  = e.attribute( "start"    , ""  );
             QString sEnd    = e.attribute( "end"      , ""  );
             QString sStatus = e.attribute( "status"   , ""  );
-            QDateTime next  = QDateTime::fromString( e.attribute( "next"     , ""  ), Qt::ISODate);
-            QString sNext   = next.isNull() ? "" : next.toString(datetimefmt);
+            QDateTime next  = MythDate::fromString( e.attribute( "next"     , ""  ));
+            QString sNext   = next.isNull() ? "" :
+                                MythDate::toString(next, MythDate::kDatabase);
             QString sMsg    = "";
 
-            QDateTime thru  = QDateTime::fromString( e.attribute( "guideThru", ""  ), Qt::ISODate);
+            QDateTime thru  = MythDate::fromString( e.attribute( "guideThru", ""  ));
 
             QDomText  text  = e.firstChild().toText();
 
@@ -1432,10 +1421,10 @@ int HttpStatus::PrintMachineInfo( QTextStream &os, QDomElement info )
             if (!thru.isNull())
             {
                 os << "    There's guide data until "
-                   << QDateTime( thru ).toString(datetimefmt);
+                   << MythDate::toString(thru, MythDate::kDatabase);
 
                 if (nDays > 0)
-                    os << " (" << nDays << " day" << (nDays == 1 ? "" : "s" ) << ")";
+                    os << " " << QObject::tr("(%n day(s))", "", nDays);
 
                 os << ".";
 
@@ -1521,8 +1510,8 @@ void HttpStatus::FillProgramInfo(QDomDocument *pDoc,
     node.appendChild( program );
 
     program.setAttribute( "startTime"   ,
-                          pInfo->GetScheduledStartTime(ISODate));
-    program.setAttribute( "endTime"     , pInfo->GetScheduledEndTime(ISODate));
+                          pInfo->GetScheduledStartTime(MythDate::ISODate));
+    program.setAttribute( "endTime"     , pInfo->GetScheduledEndTime(MythDate::ISODate));
     program.setAttribute( "title"       , pInfo->GetTitle()   );
     program.setAttribute( "subTitle"    , pInfo->GetSubtitle());
     program.setAttribute( "category"    , pInfo->GetCategory());
@@ -1538,13 +1527,13 @@ void HttpStatus::FillProgramInfo(QDomDocument *pDoc,
         program.setAttribute( "fileSize"    ,
                               QString::number( pInfo->GetFilesize() ));
         program.setAttribute( "lastModified",
-                              pInfo->GetLastModifiedTime(ISODate) );
+                              pInfo->GetLastModifiedTime(MythDate::ISODate) );
         program.setAttribute( "programFlags", pInfo->GetProgramFlags() );
         program.setAttribute( "hostname"    , pInfo->GetHostname() );
 
         if (pInfo->GetOriginalAirDate().isValid())
-            program.setAttribute( "airdate"  , pInfo->GetOriginalAirDate()
-                                               .toString(Qt::ISODate) );
+            program.setAttribute(
+                "airdate", pInfo->GetOriginalAirDate().toString());
 
         QDomText textNode = pDoc->createTextNode( pInfo->GetDescription() );
         program.appendChild( textNode );
@@ -1573,9 +1562,9 @@ void HttpStatus::FillProgramInfo(QDomDocument *pDoc,
         recording.setAttribute( "recPriority"   ,
                                 pInfo->GetRecordingPriority() );
         recording.setAttribute( "recStartTs"    ,
-                                pInfo->GetRecordingStartTime(ISODate) );
+                                pInfo->GetRecordingStartTime(MythDate::ISODate) );
         recording.setAttribute( "recEndTs"      ,
-                                pInfo->GetRecordingEndTime(ISODate) );
+                                pInfo->GetRecordingEndTime(MythDate::ISODate) );
 
         if (bDetails)
         {

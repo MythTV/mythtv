@@ -29,10 +29,12 @@
 #include "tv_rec.h"
 
 extern "C" {
-extern const uint8_t *ff_find_start_code(const uint8_t *p, const uint8_t *end, uint32_t *state);
+#include "libavcodec/mpegvideo.h"
 }
 
-#define LOC      QString("DTVRec(%1): ").arg(tvrec->GetCaptureCardNum())
+#define LOC ((tvrec) ? \
+    QString("DTVRec(%1): ").arg(tvrec->GetCaptureCardNum()) : \
+    QString("DTVRec(0x%1): ").arg(intptr_t(this),0,16))
 
 const uint DTVRecorder::kMaxKeyFrameDistance = 80;
 
@@ -271,8 +273,8 @@ void DTVRecorder::BufferedWrite(const TSPacket &tspacket)
     if (curRecording && timeOfFirstDataIsSet.testAndSetRelaxed(0,1))
     {
         QMutexLocker locker(&statisticsLock);
-        timeOfFirstData = mythCurrentDateTime();
-        timeOfLatestData = mythCurrentDateTime();
+        timeOfFirstData = MythDate::current();
+        timeOfLatestData = MythDate::current();
         timeOfLatestDataTimer.start();
     }
 
@@ -291,7 +293,7 @@ void DTVRecorder::BufferedWrite(const TSPacket &tspacket)
                 .fetchAndStoreRelaxed(thresh * 9 / 8);
 
         timeOfLatestDataCount.fetchAndStoreRelaxed(1);
-        timeOfLatestData = mythCurrentDateTime();
+        timeOfLatestData = MythDate::current();
 
         LOG(VB_RECORD, LOG_DEBUG, LOC + QString("Updating timeOfLatestData ") +
             QString("elapsed(%1) interval(%2)")
@@ -429,7 +431,7 @@ bool DTVRecorder::FindMPEG2Keyframes(const TSPacket* tspacket)
 
     while (bufptr < bufend)
     {
-        bufptr = ff_find_start_code(bufptr, bufend, &_start_code);
+        bufptr = avpriv_mpv_find_start_code(bufptr, bufend, &_start_code);
         bytes_left = bufend - bufptr;
         if ((_start_code & 0xffffff00) == 0x00000100)
         {
@@ -613,12 +615,12 @@ void DTVRecorder::HandleTimestamps(int stream_id, int64_t pts, int64_t dts)
         if (!_ts_count[stream_id])
         {
             _ts_first[stream_id] = ts;
-            _ts_first_dt[stream_id] = mythCurrentDateTime();
+            _ts_first_dt[stream_id] = MythDate::current();
         }
         else if (ts < _ts_first[stream_id])
         {
             _ts_first[stream_id] = ts;
-            _ts_first_dt[stream_id] = mythCurrentDateTime();
+            _ts_first_dt[stream_id] = MythDate::current();
         }
     }
 
@@ -958,7 +960,8 @@ void DTVRecorder::FindPSKeyFrames(const uint8_t *buffer, uint len)
         bool hasKeyFrame  = false;
 
         const uint8_t *tmp = bufptr;
-        bufptr = ff_find_start_code(bufptr + skip, bufend, &_start_code);
+        bufptr =
+            avpriv_mpv_find_start_code(bufptr + skip, bufend, &_start_code);
         _audio_bytes_remaining = 0;
         _other_bytes_remaining = 0;
         _video_bytes_remaining -= std::min(
@@ -1241,7 +1244,7 @@ bool DTVRecorder::ProcessTSPacket(const TSPacket &tspacket)
         int v = _continuity_error_count.fetchAndAddRelaxed(1) + 1;
         double erate = v * 100.0 / _packet_count.fetchAndAddRelaxed(0);
         LOG(VB_RECORD, LOG_WARNING, LOC +
-            QString("PID 0x%1 discontinuity detected ((%2+1)%16!=%3) %4\%")
+            QString("PID 0x%1 discontinuity detected ((%2+1)\%16!=%3) %4\%")
                 .arg(pid,0,16).arg(old_cnt,2)
                 .arg(tspacket.ContinuityCounter(),2)
                 .arg(erate));
@@ -1313,7 +1316,7 @@ bool DTVRecorder::ProcessAVTSPacket(const TSPacket &tspacket)
         int v = _continuity_error_count.fetchAndAddRelaxed(1) + 1;
         double erate = v * 100.0 / _packet_count.fetchAndAddRelaxed(0);
         LOG(VB_RECORD, LOG_WARNING, LOC +
-            QString("A/V PID 0x%1 discontinuity detected ((%2+1)%16!=%3) %4\%")
+            QString("A/V PID 0x%1 discontinuity detected ((%2+1)\%16!=%3) %4\%")
                 .arg(pid,0,16).arg(old_cnt).arg(tspacket.ContinuityCounter())
                 .arg(erate,5,'f',2));
     }

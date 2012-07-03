@@ -5,6 +5,8 @@
 #include <signal.h>
 
 #include <QObject>
+#include <QString>
+#include <QStringList>
 #include <QMap>
 #include <QList>
 #include <QBuffer>
@@ -88,6 +90,9 @@ class MBASE_PUBLIC MythSystemUnix : public MythSystemPrivate
         virtual void Term(bool force=false);
         virtual void Signal(int sig);
         virtual void JumpAbort(void);
+
+        virtual bool ParseShell(const QString cmd, QString &abscmd,
+                                QStringList &args);
 
         friend class MythSystemManager;
         friend class MythSystemSignalManager;

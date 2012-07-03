@@ -15,11 +15,11 @@
 #include "filter.h"
 #include "frame.h"
 
-#ifdef HAVE_MMX
+#if HAVE_MMX
 
 #include "libavutil/mem.h"
 #include "libavcodec/dsputil.h"
-#include "libavcodec/x86/mmx.h"
+#include "ffmpeg-mmx.h"
 
 static const mmx_t mm_cpool[] = {
     { w: {1, 1, 1, 1} },
@@ -35,7 +35,7 @@ typedef struct ThisFilter
 {
     VideoFilter vf;
 
-#ifdef HAVE_MMX
+#if HAVE_MMX
     int yfilt;
     int cfilt;
 
@@ -213,7 +213,7 @@ static int fillTableMMX(uint8_t *table, mmx_t *shift, mmx_t *scale, mmx_t *min,
 
     fillTable(table, in_min, in_max, out_min, out_max, gamma);
     scalec = ((out_max - out_min) << 15)/(in_max - in_min);
-    if ((av_get_cpu_flags() & FF_MM_MMX) == 0 || gamma < 0.9999 || 
+    if ((av_get_cpu_flags() & AV_CPU_FLAG_MMX) == 0 || gamma < 0.9999 || 
         gamma > 1.00001 || scalec > 32767 << 7)
         return 0;
     shiftc = 2;
@@ -312,7 +312,7 @@ static FmtConv FmtList[] =
     FMT_NULL
 };
 
-ConstFilterInfo filter_table[] = 
+const FilterInfo filter_table[] =
 {
     {
         filter_init: &newAdjustFilter,

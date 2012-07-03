@@ -1,4 +1,5 @@
 /*
+ * Copyright (c) 2010 S.N. Hemanth Meenakshisundaram <smeenaks@ucsd.edu>
  * This file is part of FFmpeg.
  *
  * FFmpeg is free software; you can redistribute it and/or
@@ -21,6 +22,7 @@
  * null audio filter
  */
 
+#include "audio.h"
 #include "avfilter.h"
 
 AVFilter avfilter_af_anull = {
@@ -29,13 +31,13 @@ AVFilter avfilter_af_anull = {
 
     .priv_size = 0,
 
-    .inputs    = (AVFilterPad[]) {{ .name             = "default",
+    .inputs    = (const AVFilterPad[]) {{ .name       = "default",
                                     .type             = AVMEDIA_TYPE_AUDIO,
-                                    .get_audio_buffer = avfilter_null_get_audio_buffer,
-                                    .filter_samples   = avfilter_null_filter_samples },
+                                    .get_audio_buffer = ff_null_get_audio_buffer,
+                                    .filter_samples   = ff_null_filter_samples },
                                   { .name = NULL}},
 
-    .outputs   = (AVFilterPad[]) {{ .name             = "default",
+    .outputs   = (const AVFilterPad[]) {{ .name       = "default",
                                     .type             = AVMEDIA_TYPE_AUDIO, },
                                   { .name = NULL}},
 };

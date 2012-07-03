@@ -21,7 +21,7 @@ class MUI_PUBLIC MythUIButtonTree : public MythUIType
    ~MythUIButtonTree();
 
     virtual bool keyPressEvent(QKeyEvent *);
-    //virtual void gestureEvent(MythUIType *uitype, MythGestureEvent *event);
+    virtual bool gestureEvent(MythGestureEvent *event);
 
     bool AssignTree(MythGenericTree *tree);
     void Reset(void);

@@ -1,5 +1,7 @@
 
-using namespace std;
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 #include <QString>
 #include <QWriteLocker>
@@ -33,7 +35,7 @@ void FileServerHandler::connectionClosed(MythSocket *socket)
         {
             if ((*i)->GetSocket() == socket)
             {
-                (*i)->DownRef();
+                (*i)->DecrRef();
                 m_ftMap.remove(i.key());
                 return;
             }
@@ -49,7 +51,7 @@ void FileServerHandler::connectionClosed(MythSocket *socket)
         {
             if ((*i)->GetSocket() == socket)
             {
-                (*i)->DownRef();
+                (*i)->DecrRef();
                 m_fsMap.remove(i.key());
                 return;
             }
@@ -74,9 +76,8 @@ QString FileServerHandler::LocalFilePath(const QUrl &url,
         query.prepare("SELECT icon FROM channel WHERE icon LIKE :FILENAME ;");
         query.bindValue(":FILENAME", QString("%/") + file);
 
-        if (query.exec() && query.isActive() && query.size())
+        if (query.exec() && query.next())
         {
-            query.next();
             lpath = query.value(0).toString();
         }
         else
@@ -372,7 +373,9 @@ bool FileServerHandler::HandleQuery(SocketHandler *socket, QStringList &commands
     bool handled = false;
     QString command = commands[0];
 
-    if (command == "QUERY_FREE_SPACE")
+    if (command == "QUERY_FILETRANSFER")
+        handled = HandleQueryFileTransfer(socket, commands, slist);
+    else if (command == "QUERY_FREE_SPACE")
         handled = HandleQueryFreeSpace(socket);
     else if (command == "QUERY_FREE_SPACE_LIST")
         handled = HandleQueryFreeSpaceList(socket);
@@ -388,8 +391,6 @@ bool FileServerHandler::HandleQuery(SocketHandler *socket, QStringList &commands
         handled = HandleGetFileList(socket, slist);
     else if (command == "QUERY_SG_FILEQUERY")
         handled = HandleFileQuery(socket, slist);
-    else if (command == "QUERY_FILETRANSFER")
-        handled = HandleQueryFileTransfer(socket, commands, slist);
     else if (command == "DOWNLOAD_FILE" || command == "DOWNLOAD_FILE_NOW")
         handled = HandleDownloadFile(socket, slist);
     return handled;
@@ -553,7 +554,7 @@ QList<FileSystemInfo> FileServerHandler::QueryAllFileSystems(void)
 
 /**
  * \addtogroup myth_network_protocol
- * \par        QUERY_FILE_EXISTS \e storagegroup \e filename
+ * \par        QUERY_FILE_EXISTS \e filename \e storagegroup
  */
 bool FileServerHandler::HandleQueryFileExists(SocketHandler *socket,
                                               QStringList &slist)
@@ -845,7 +846,7 @@ bool FileServerHandler::HandleGetFileList(SocketHandler *socket,
             if (m_fsMap.contains(wantHost))
             {
                 remsock = m_fsMap[wantHost];
-                remsock->UpRef();
+                remsock->IncrRef();
             }
         }
 
@@ -855,7 +856,7 @@ bool FileServerHandler::HandleGetFileList(SocketHandler *socket,
             res << "QUERY_SG_GETFILELIST" << wantHost << groupname << path
                 << QString::number(fileNamesOnly);
             remsock->SendReceiveStringList(res);
-            remsock->DownRef();
+            remsock->DecrRef();
         }
         else
         {
@@ -910,7 +911,7 @@ bool FileServerHandler::HandleFileQuery(SocketHandler *socket,
             if (m_fsMap.contains(wantHost))
             {
                 remsock = m_fsMap[wantHost];
-                remsock->UpRef();
+                remsock->IncrRef();
             }
         }
 
@@ -918,7 +919,7 @@ bool FileServerHandler::HandleFileQuery(SocketHandler *socket,
         {
             res << "QUERY_SG_FILEQUERY" << wantHost << groupname << filename;
             remsock->SendReceiveStringList(res);
-            remsock->DownRef();
+            remsock->DecrRef();
         }
         else
         {
@@ -948,7 +949,7 @@ bool FileServerHandler::HandleQueryFileTransfer(SocketHandler *socket,
         if (!m_ftMap.contains(recnum))
         {
             if (slist[1] == "DONE")
-                res << "ok";
+                res << "OK";
             else
             {
                 LOG(VB_GENERAL, LOG_ERR,
@@ -962,19 +963,10 @@ bool FileServerHandler::HandleQueryFileTransfer(SocketHandler *socket,
         }
 
         ft = m_ftMap[recnum];
-        ft->UpRef();
+        ft->IncrRef();
     }
 
-    if (slist[1] == "IS_OPEN")
-    {
-        res << QString::number(ft->isOpen());
-    }
-    else if (slist[1] == "DONE")
-    {
-        ft->Stop();
-        res << "ok";
-    }
-    else if (slist[1] == "REQUEST_BLOCK")
+    if (slist[1] == "REQUEST_BLOCK")
     {
         if (slist.size() != 3)
         {
@@ -1018,6 +1010,15 @@ bool FileServerHandler::HandleQueryFileTransfer(SocketHandler *socket,
             res << QString::number(ft->Seek(curpos, pos, whence));
         }
     }
+    else if (slist[1] == "IS_OPEN")
+    {
+        res << QString::number(ft->isOpen());
+    }
+    else if (slist[1] == "DONE")
+    {
+        ft->Stop();
+        res << "OK";
+    }
     else if (slist[1] == "SET_TIMEOUT")
     {
         if (slist.size() != 3)
@@ -1030,7 +1031,7 @@ bool FileServerHandler::HandleQueryFileTransfer(SocketHandler *socket,
         {
             bool fast = slist[2].toInt();
             ft->SetTimeout(fast);
-            res << "ok";
+            res << "OK";
         }
     }
     else
@@ -1039,7 +1040,7 @@ bool FileServerHandler::HandleQueryFileTransfer(SocketHandler *socket,
         res << "ERROR" << "invalid_call";
     }
 
-    ft->DownRef();
+    ft->DecrRef();
     socket->SendStringList(res);
     return true;
 }

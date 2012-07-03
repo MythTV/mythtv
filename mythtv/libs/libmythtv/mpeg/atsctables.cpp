@@ -450,7 +450,7 @@ QString EventInformationTable::toString(void) const
     {
         str.append(QString(" Event #%1 ID(%2) start_time(%3) length(%4 sec)\n")
                    .arg(i,2,10).arg(EventID(i))
-                   .arg(StartTimeGPS(i).toString(Qt::LocalDate))
+                   .arg(StartTimeGPS(i).toString(Qt::ISODate))
                    .arg(LengthInSeconds(i)));
         str.append(QString("           ETM_loc(%1) Title(%2)\n").
                    arg(ETMLocation(i)).arg(title(i).toString()));

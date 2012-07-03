@@ -73,7 +73,7 @@ class CC608Decoder
 
     QString XDSDecodeString(const vector<unsigned char>&,
                             uint string, uint end) const;
-    void XDSDecode(int field, int b1, int b2);
+    bool XDSDecode(int field, int b1, int b2);
 
     bool XDSPacketParseProgram(const vector<unsigned char> &xds_buf,
                                bool future);
@@ -128,7 +128,8 @@ class CC608Decoder
     uint            wss_flags;
     bool            wss_valid;
 
-    vector<unsigned char> xds_buf;
+    int             xds_cur_service;
+    vector<unsigned char> xds_buf[7];
     uint            xds_crc_passed;
     uint            xds_crc_failed;
 

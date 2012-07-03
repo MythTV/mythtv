@@ -318,7 +318,7 @@ CommDetector2::CommDetector2(
     player(player_in),
     startts(startts_in),            endts(endts_in),
     recstartts(recstartts_in),      recendts(recendts_in),
-    isRecording(QDateTime::currentDateTime() < recendts),
+    isRecording(MythDate::current() < recendts),
     sendBreakMapUpdates(false),     breakMapUpdateRequested(false),
     finished(false),                currentFrameNumber(0),
     logoFinder(NULL),               logoMatcher(NULL),
@@ -663,7 +663,7 @@ bool CommDetector2::go(void)
             if (isRecording)
             {
                 waitForBuffer(&start, minlag,
-                        recstartts.secsTo(QDateTime::currentDateTime()) -
+                        recstartts.secsTo(MythDate::current()) -
                         totalFlagTime.elapsed() / 1000, player->GetFrameRate(),
                         fullSpeed);
             }

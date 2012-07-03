@@ -622,9 +622,8 @@ int ChannelUtil::GetBetterMplexID(int current_mplexid,
 
     if (!query.exec() || !query.isActive())
         MythDB::DBError("Getting mplexid global search", query);
-    else if (query.size())
+    else if (query.next())
     {
-        query.next();
         q_networkid   = query.value(0).toInt();
         q_transportid = query.value(1).toInt();
     }
@@ -682,19 +681,17 @@ int ChannelUtil::GetBetterMplexID(int current_mplexid,
         if (!query.exec() || !query.isActive())
             MythDB::DBError("Finding matching mplexid", query);
 
-        if (query.size() == 1)
+        if (query.size() == 1 && query.next())
         {
             LOG(VB_CHANSCAN, LOG_INFO,
                 QString("GetBetterMplexID(): query#%1 qsize(%2) "
                         "Returning %3")
                     .arg(i).arg(query.size()).arg(current_mplexid));
-            query.next();
             return query.value(0).toInt();
         }
 
-        if (query.size() > 1)
+        if (query.next())
         {
-            query.next();
             int ret = (i==0) ? current_mplexid : query.value(0).toInt();
             LOG(VB_CHANSCAN, LOG_INFO,
                 QString("GetBetterMplexID(): query#%1 qsize(%2) "
@@ -757,10 +754,10 @@ QString ChannelUtil::GetChannelStringField(int chan_id, const QString &field)
         MythDB::DBError("Selecting channel/dtv_multiplex 1", query);
         return QString::null;
     }
-    if (!query.size())
+    
+    if (!query.next())
         return QString::null;
-
-    query.next();
+    
     return query.value(0).toString();
 }
 
@@ -798,11 +795,9 @@ int ChannelUtil::GetSourceID(int db_mplexid)
         return -1;
     }
 
-    if (query.size() > 0)
-    {
-        query.next();
+    if (query.next())
         return query.value(0).toInt();
-    }
+        
     return -1;
 }
 
@@ -1798,11 +1793,9 @@ int ChannelUtil::GetServiceVersion(int mplexid)
         return false;
     }
 
-    if (query.size() > 0)
-    {
-        query.next();
+    if (query.next())
         return query.value(0).toInt();
-    }
+
     return -1;
 }
 

@@ -20,6 +20,7 @@
 #include "commandlineparser.h"
 #include "tv.h"
 #include "mythlogging.h"
+#include "signalhandling.h"
 
 // libmythui
 #include "mythmainwindow.h"
@@ -73,6 +74,14 @@ int main(int argc, char **argv)
     if (cmdline.toBool("setup"))
         bShowSettings = true;
 
+#ifndef _WIN32
+    QList<int> signallist;
+    signallist << SIGINT << SIGTERM << SIGSEGV << SIGABRT << SIGBUS << SIGFPE
+               << SIGILL;
+    SignalHandler handler(signallist);
+    signal(SIGHUP, SIG_IGN);
+#endif
+
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init())
     {
@@ -96,11 +105,6 @@ int main(int argc, char **argv)
     MythTranslation::load("mythfrontend");
 
     GetMythUI()->LoadQtConfig();
-
-#ifdef Q_WS_MACX
-    // Mac OS 10.4 and Qt 4.4 have window-focus problems
-    gCoreContext->SetSetting("RunFrontendInWindow", "1");
-#endif
 
     MythMainWindow *mainWindow = GetMythMainWindow();
     mainWindow->Init();

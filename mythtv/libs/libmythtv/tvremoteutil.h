@@ -37,11 +37,12 @@ MTV_PUBLIC void RemoteStopRecording(const ProgramInfo *pginfo);
 MTV_PUBLIC void RemoteCancelNextRecording(uint cardid, bool cancel);
 MTV_PUBLIC RemoteEncoder *RemoteRequestRecorder(void);
 MTV_PUBLIC RemoteEncoder *RemoteRequestNextFreeRecorder(int curr);
-MTV_PUBLIC
-RemoteEncoder *RemoteRequestFreeRecorderFromList(
-    const QStringList &qualifiedRecorders);
+MTV_PUBLIC RemoteEncoder *RemoteRequestFreeRecorderFromList
+(const QStringList &qualifiedRecorders, const vector<uint> &excluded_cardids);
 MTV_PUBLIC RemoteEncoder *RemoteGetExistingRecorder(const ProgramInfo *pginfo);
 MTV_PUBLIC RemoteEncoder *RemoteGetExistingRecorder(int recordernum);
+MTV_PUBLIC vector<uint>
+RemoteRequestFreeRecorderList(const vector<uint> &excluded_cardids);
 MTV_PUBLIC vector<InputInfo> RemoteRequestFreeInputList(
     uint cardid, const vector<uint> &excluded_cardids);
 MTV_PUBLIC InputInfo RemoteRequestBusyInputID(uint cardid);

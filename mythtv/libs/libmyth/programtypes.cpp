@@ -4,6 +4,7 @@
 #include <QMutex>
 
 #include "programtypes.h"
+#include "mythdate.h"
 
 const char *kPlayerInUseID           = "player";
 const char *kPIPPlayerInUseID        = "pipplayer";
@@ -44,10 +45,12 @@ QString toString(MarkTypes type)
 
 QString toUIState(RecStatusType recstatus)
 {
-    if (recstatus == rsRecorded     || recstatus == rsWillRecord)
+    if (recstatus == rsRecorded     || recstatus == rsWillRecord   ||
+        recstatus == rsOtherShowing)
         return "normal";
 
-    if (recstatus == rsRecording    || recstatus == rsTuning)
+    if (recstatus == rsRecording    || recstatus == rsTuning       ||
+        recstatus == rsOtherRecording || recstatus == rsOtherTuning)
         return "running";
 
     if (recstatus == rsConflict     || recstatus == rsOffLine      ||
@@ -57,7 +60,7 @@ QString toUIState(RecStatusType recstatus)
         return "error";
     }
 
-    if (recstatus == rsRepeat       || recstatus == rsOtherShowing ||
+    if (recstatus == rsRepeat       || 
         recstatus == rsNeverRecord  || recstatus == rsDontRecord   ||
         (recstatus != rsDontRecord && recstatus <= rsEarlierShowing))
     {
@@ -83,7 +86,7 @@ QString toString(RecStatusType recstatus, uint id)
             ret = QString::number(id);
             break;
         case rsTuning:
-            ret = QObject::tr("t", "RecStatusChar rsTuning");
+            ret = QString::number(id);
             break;
         case rsWillRecord:
             ret = QString::number(id);
@@ -110,7 +113,7 @@ QString toString(RecStatusType recstatus, uint id)
             ret = QObject::tr("M", "RecStatusChar rsMissed");
             break;
         case rsMissedFuture:
-            ret = QObject::tr("m", "RecStatusChar rsMissedFuture");
+            ret = "M";
             break;
         case rsConflict:
             ret = QObject::tr("C", "RecStatusChar rsConflict");
@@ -143,7 +146,13 @@ QString toString(RecStatusType recstatus, uint id)
             ret = QObject::tr("F", "RecStatusChar rsOffLine");
             break;
         case rsOtherShowing:
-            ret = QObject::tr("O", "RecStatusChar rsOtherShowing");
+            ret = QString::number(id);
+            break;
+        case rsOtherRecording:
+            ret = QString::number(id);
+            break;
+        case rsOtherTuning:
+            ret = QString::number(id);
             break;
     }
 
@@ -183,7 +192,7 @@ QString toString(RecStatusType recstatus, RecordingType rectype)
         case rsMissed:
             return QObject::tr("Missed");
         case rsMissedFuture:
-            return QObject::tr("Missed Future");
+            return "Missed Future";
         case rsConflict:
             return QObject::tr("Conflicting");
         case rsLaterShowing:
@@ -206,6 +215,10 @@ QString toString(RecStatusType recstatus, RecordingType rectype)
             return QObject::tr("Recorder Off-Line");
         case rsOtherShowing:
             return QObject::tr("Other Showing");
+        case rsOtherRecording:
+            return QObject::tr("Other Recording");
+        case rsOtherTuning:
+            return QObject::tr("Other Tuning");
     }
 
     return QObject::tr("Unknown");
@@ -219,7 +232,7 @@ QString toDescription(RecStatusType recstatus, RecordingType rectype,
         return QObject::tr("This showing is not scheduled to record");
 
     QString message;
-    QDateTime now = QDateTime::currentDateTime();
+    QDateTime now = MythDate::current();
 
     if (recstatus <= rsWillRecord)
     {
@@ -232,7 +245,15 @@ QString toDescription(RecStatusType recstatus, RecordingType rectype,
                 message = QObject::tr("This showing is being recorded.");
                 break;
             case rsTuning:
-                message = QObject::tr("The channel is being tuned.");
+                message = QObject::tr("The showing is being tuned.");
+                break;
+            case rsOtherRecording:
+                message = QObject::tr("This showing is being recorded on "
+                                      "a different channel.");
+                break;
+            case rsOtherTuning:
+                message = QObject::tr("The showing is being tuned on a "
+                                      "different channel.");
                 break;
             case rsRecorded:
                 message = QObject::tr("This showing was recorded.");
@@ -248,9 +269,9 @@ QString toDescription(RecStatusType recstatus, RecordingType rectype,
                     "master backend was hung or not running.");
                 break;
             case rsMissedFuture:
-                message = QObject::tr(
+                message = 
                     "This showing was not recorded because the "
-                    "master backend was hung or not running.");
+                    "master backend was hung or not running.";
                 break;
             case rsCancelled:
                 message = QObject::tr(

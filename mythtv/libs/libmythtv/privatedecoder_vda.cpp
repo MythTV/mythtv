@@ -181,7 +181,7 @@ const uint8_t *avc_find_startcode(const uint8_t *p, const uint8_t *end)
     return out;
 }
 
-const int avc_parse_nal_units(ByteIOContext *pb, const uint8_t *buf_in, int size)
+const int avc_parse_nal_units(AVIOContext *pb, const uint8_t *buf_in, int size)
 {
     const uint8_t *p = buf_in;
     const uint8_t *end = p + size;
@@ -193,8 +193,8 @@ const int avc_parse_nal_units(ByteIOContext *pb, const uint8_t *buf_in, int size
     {
         while (!*(nal_start++));
         nal_end = avc_find_startcode(nal_start, end);
-        put_be32(pb, nal_end - nal_start);
-        put_buffer(pb, nal_start, nal_end - nal_start);
+        avio_wb32(pb, nal_end - nal_start);
+        avio_write(pb, nal_start, nal_end - nal_start);
         size += 4 + nal_end - nal_start;
         nal_start = nal_end;
     }
@@ -204,19 +204,19 @@ const int avc_parse_nal_units(ByteIOContext *pb, const uint8_t *buf_in, int size
 const int avc_parse_nal_units_buf(const uint8_t *buf_in,
                                   uint8_t **buf, int *size)
 {
-    ByteIOContext *pb;
-    int ret = url_open_dyn_buf(&pb);
+    AVIOContext *pb;
+    int ret = avio_open_dyn_buf(&pb);
     if (ret < 0)
         return ret;
 
     avc_parse_nal_units(pb, buf_in, *size);
 
     av_freep(buf);
-    *size = url_close_dyn_buf(pb, buf);
+    *size = avio_close_dyn_buf(pb, buf);
     return 0;
 }
 
-const int isom_write_avcc(ByteIOContext *pb, const uint8_t *data, int len)
+const int isom_write_avcc(AVIOContext *pb, const uint8_t *data, int len)
 {
     // extradata from bytestream h264, convert to avcC atom data for bitstream
     if (len > 6)
@@ -261,26 +261,26 @@ const int isom_write_avcc(ByteIOContext *pb, const uint8_t *data, int len)
                 return -1;
             }
 
-            put_byte(pb, 1); /* version */
-            put_byte(pb, sps[1]); /* profile */
-            put_byte(pb, sps[2]); /* profile compat */
-            put_byte(pb, sps[3]); /* level */
-            put_byte(pb, 0xff); /* 6 bits reserved (111111) + 2 bits nal size length - 1 (11) */
-            put_byte(pb, 0xe1); /* 3 bits reserved (111) + 5 bits number of sps (00001) */
+            avio_w8(pb, 1); /* version */
+            avio_w8(pb, sps[1]); /* profile */
+            avio_w8(pb, sps[2]); /* profile compat */
+            avio_w8(pb, sps[3]); /* level */
+            avio_w8(pb, 0xff); /* 6 bits reserved (111111) + 2 bits nal size length - 1 (11) */
+            avio_w8(pb, 0xe1); /* 3 bits reserved (111) + 5 bits number of sps (00001) */
 
-            put_be16(pb, sps_size);
-            put_buffer(pb, sps, sps_size);
+            avio_wb16(pb, sps_size);
+            avio_write(pb, sps, sps_size);
             if (pps)
             {
-                put_byte(pb, 1); /* number of pps */
-                put_be16(pb, pps_size);
-                put_buffer(pb, pps, pps_size);
+                avio_w8(pb, 1); /* number of pps */
+                avio_wb16(pb, pps_size);
+                avio_write(pb, pps, pps_size);
             }
             av_free(start);
         }
         else
         {
-            put_buffer(pb, data, len);
+            avio_write(pb, data, len);
         }
     }
     return 0;
@@ -338,8 +338,8 @@ bool PrivateDecoderVDA::Init(const QString &decoder,
         {
             // video content is from x264 or from bytestream h264 (AnnexB format)
             // NAL reformating to bitstream format needed
-            ByteIOContext *pb;
-            if (url_open_dyn_buf(&pb) < 0)
+            AVIOContext *pb;
+            if (avio_open_dyn_buf(&pb) < 0)
             {
                 return false;
             }
@@ -349,7 +349,7 @@ bool PrivateDecoderVDA::Init(const QString &decoder,
             // unhook from ffmpeg's extradata
             extradata = NULL;
             // extract the avcC atom data into extradata then write it into avcCData for VDADecoder
-            extrasize = url_close_dyn_buf(pb, &extradata);
+            extrasize = avio_close_dyn_buf(pb, &extradata);
             // CFDataCreate makes a copy of extradata contents
             avc_cdata = CFDataCreate(kCFAllocatorDefault,
                                     (const uint8_t*)extradata, extrasize);
@@ -554,24 +554,24 @@ int  PrivateDecoderVDA::GetFrame(AVStream *stream,
         if (m_annexb)
         {
             // convert demuxer packet from bytestream (AnnexB) to bitstream
-            ByteIOContext *pb;
+            AVIOContext *pb;
             int demuxer_bytes;
             uint8_t *demuxer_content;
 
-            if(url_open_dyn_buf(&pb) < 0)
+            if(avio_open_dyn_buf(&pb) < 0)
             {
                 return result;
             }
             demuxer_bytes = avc_parse_nal_units(pb, pkt->data, pkt->size);
-            demuxer_bytes = url_close_dyn_buf(pb, &demuxer_content);
+            demuxer_bytes = avio_close_dyn_buf(pb, &demuxer_content);
             avc_demux = CFDataCreate(kCFAllocatorDefault, demuxer_content, demuxer_bytes);
             av_free(demuxer_content);
         }
         else if (m_convert_3byteTo4byteNALSize)
         {
             // convert demuxer packet from 3 byte NAL sizes to 4 byte
-            ByteIOContext *pb;
-            if (url_open_dyn_buf(&pb) < 0)
+            AVIOContext *pb;
+            if (avio_open_dyn_buf(&pb) < 0)
             {
                 return result;
             }
@@ -582,14 +582,14 @@ int  PrivateDecoderVDA::GetFrame(AVStream *stream,
             while (nal_start < end)
             {
                 nal_size = VDA_RB24(nal_start);
-                put_be32(pb, nal_size);
+                avio_wb32(pb, nal_size);
                 nal_start += 3;
-                put_buffer(pb, nal_start, nal_size);
+                avio_write(pb, nal_start, nal_size);
                 nal_start += nal_size;
             }
 
             uint8_t *demuxer_content;
-            int demuxer_bytes = url_close_dyn_buf(pb, &demuxer_content);
+            int demuxer_bytes = avio_close_dyn_buf(pb, &demuxer_content);
             avc_demux = CFDataCreate(kCFAllocatorDefault, demuxer_content, demuxer_bytes);
             av_free(demuxer_content);
         }

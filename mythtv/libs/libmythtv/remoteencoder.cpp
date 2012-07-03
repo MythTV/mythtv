@@ -4,7 +4,7 @@
 
 #include "remoteencoder.h"
 #include "programinfo.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 #include "mythcorecontext.h"
 #include "signalmonitor.h"
 #include "videooutbase.h"
@@ -26,7 +26,10 @@ RemoteEncoder::RemoteEncoder(int num, const QString &host, short port)
 RemoteEncoder::~RemoteEncoder()
 {
     if (controlSock)
-        controlSock->DownRef();
+    {
+        controlSock->DecrRef();
+        controlSock = NULL;
+    }
 }
 
 bool RemoteEncoder::Setup(void)
@@ -110,7 +113,7 @@ bool RemoteEncoder::SendReceiveStringList(
 
     if (backendError)
     {
-        controlSock->DownRef();
+        controlSock->DecrRef();
         controlSock = NULL;
         return false;
     }

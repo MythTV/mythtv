@@ -144,8 +144,8 @@ static int CopySkipListToCutList(const MythUtilCommandLineParser &cmdline)
             cutlist[it.key()] = MARK_CUT_END;
     pginfo.SaveCutList(cutlist);
 
-    cout << QString("Cutlist copied to Commercial Skip List\n")
-        .toLocal8Bit().constData();
+    cout << "Commercial Skip List copied to Cutlist\n";
+    LOG(VB_GENERAL, LOG_NOTICE, "Commercial Skip List copied to Cutlist");
 
     return GENERIC_EXIT_OK;
 }

@@ -15,8 +15,9 @@
 #include "mythcontext.h"
 #include "remotefile.h"
 #include "mythconfig.h" // gives us HAVE_POSIX_FADVISE
+#include "mythtimer.h"
+#include "mythdate.h"
 #include "compat.h"
-#include "mythmiscutil.h"
 
 #if HAVE_POSIX_FADVISE < 1
 static int posix_fadvise(int, off_t, off_t, int) { return 0; }
@@ -272,8 +273,8 @@ bool FileRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
             case 0:
             {
                 QFileInfo fi(filename);
-                oldfile = fi.lastModified()
-                    .secsTo(QDateTime::currentDateTime()) > 60;
+                oldfile = QDateTime(fi.lastModified().toUTC())
+                    .secsTo(MythDate::current()) > 60;
                 QString extension = fi.completeSuffix().toLower();
                 if (is_subtitle_possible(extension))
                     subtitlefilename = local_sub_filename(fi);
@@ -453,8 +454,8 @@ int FileRingBuffer::safe_read(int fd, void *data, uint sz)
             tot += ret;
         }
 
-        //if (oldfile)
-            //break;
+        if (oldfile)
+            break;
 
         if (ret == 0) // EOF returns 0
         {
@@ -465,7 +466,7 @@ int FileRingBuffer::safe_read(int fd, void *data, uint sz)
 
             // 0.36 second timeout for livetvchain with usleep(60000),
             // or 2.4 seconds if it's a new file less than 30 minutes old.
-            if (zerocnt >= (oldfile ? 4 : (livetvchain ? 6 : 40)))
+            if (zerocnt >= (livetvchain ? 6 : 40))
             {
                 break;
             }

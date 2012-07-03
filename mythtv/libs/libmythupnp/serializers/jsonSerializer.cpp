@@ -11,10 +11,10 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "jsonSerializer.h"
+#include "mythdate.h"
 
 #include <QTextCodec>
 #include <QVariant>
-#include <QDateTime>
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -147,8 +147,9 @@ void JSONSerializer::RenderValue( const QVariant &vValue )
         case QVariant::Map:         RenderMap       ( vValue.toMap()        );  break;
         case QVariant::DateTime:
         {
-            m_Stream << "\"" << Encode( vValue.toDateTime().toUTC()
-                     .toString(Qt::ISODate) ) << "\"";
+            m_Stream << "\"" << Encode( 
+                MythDate::toString( vValue.toDateTime(), MythDate::ISODate ) )
+                << "\"";
             break;
         }
         default:

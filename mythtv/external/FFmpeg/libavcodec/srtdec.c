@@ -94,7 +94,7 @@ static const char *srt_to_ass(AVCodecContext *avctx, char *out, char *out_end,
             break;
         case '<':
             tag_close = in[1] == '/';
-            if (sscanf(in+tag_close+1, "%128[^>]>%n%c", buffer, &len,&c) >= 2) {
+            if (sscanf(in+tag_close+1, "%127[^>]>%n%c", buffer, &len,&c) >= 2) {
                 if ((param = strchr(buffer, ' ')))
                     *param++ = 0;
                 if ((!tag_close && sptr < FF_ARRAY_ELEMS(stack)) ||
@@ -110,7 +110,7 @@ static const char *srt_to_ass(AVCodecContext *avctx, char *out, char *out_end,
                                     for (j=sptr-2; j>=0; j--)
                                         if (stack[j].param[i][0]) {
                                             out += snprintf(out, out_end-out,
-                                                            stack[j].param[i]);
+                                                            "%s", stack[j].param[i]);
                                             break;
                                         }
                         } else {
@@ -146,7 +146,7 @@ static const char *srt_to_ass(AVCodecContext *avctx, char *out, char *out_end,
                             for (i=0; i<PARAM_NUMBER; i++)
                                 if (stack[sptr].param[i][0])
                                     out += snprintf(out, out_end-out,
-                                                    stack[sptr].param[i]);
+                                                    "%s", stack[sptr].param[i]);
                         }
                     } else if (!buffer[1] && strspn(buffer, "bisu") == 1) {
                         out += snprintf(out, out_end-out,
@@ -216,15 +216,13 @@ static int srt_decode_frame(AVCodecContext *avctx,
     if (avpkt->size <= 0)
         return avpkt->size;
 
-    ff_ass_init(sub);
-
     while (ptr < end && *ptr) {
         ptr = read_ts(ptr, &ts_start, &ts_end, &x1, &y1, &x2, &y2);
         if (!ptr)
             break;
         ptr = srt_to_ass(avctx, buffer, buffer+sizeof(buffer), ptr,
                          x1, y1, x2, y2);
-        ff_ass_add_rect(sub, buffer, ts_start, ts_end, 0);
+        ff_ass_add_rect(sub, buffer, ts_start, ts_end-ts_start, 0);
     }
 
     *got_sub_ptr = sub->num_rects > 0;

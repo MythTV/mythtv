@@ -1,6 +1,11 @@
 #ifndef VERBOSEDEFS_H_
 #define VERBOSEDEFS_H_
 
+#ifdef __cplusplus
+#include <QMap>
+#include <QString>
+#include <QMutex>
+#endif
 #include <stdint.h>
 
 /// This file gets included in two different ways:
@@ -179,5 +184,30 @@ LOGLEVEL_MAP(LOG_INFO,    6, 'I')
 LOGLEVEL_MAP(LOG_DEBUG,   7, 'D')
 LOGLEVEL_MAP(LOG_UNKNOWN, 8, '-')
 LOGLEVEL_POSTAMBLE
+
+#ifndef _IMPLEMENT_VERBOSE
+#ifdef __cplusplus
+typedef struct {
+    uint64_t    mask;
+    QString     name;
+    bool        additive;
+    QString     helpText;
+} VerboseDef;
+typedef QMap<QString, VerboseDef *> VerboseMap;
+
+typedef struct {
+    int         value;
+    QString     name;
+    char        shortname;
+} LoglevelDef;
+typedef QMap<int, LoglevelDef *> LoglevelMap;
+
+extern VerboseMap verboseMap;
+extern QMutex verboseMapMutex;
+
+extern LoglevelMap loglevelMap;
+extern QMutex loglevelMapMutex;
+#endif
+#endif
 
 #endif

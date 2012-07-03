@@ -33,10 +33,10 @@ using namespace std;
 #include "teletextdecoder.h"
 #include "subtitlereader.h"
 #include "interactivetv.h"
-#include "dvdringbuffer.h"
-#include "bdringbuffer.h"
 #include "videodisplayprofile.h"
 #include "mythuihelper.h"
+#include "DVD/dvdringbuffer.h"
+#include "Bluray/bdringbuffer.h"
 
 #include "lcddevice.h"
 
@@ -53,17 +53,22 @@ extern "C" {
 #include "videoout_d3d.h"
 #endif
 
-#ifdef USING_VAAPI
+#ifdef USING_GLVAAPI
 #include "videoout_openglvaapi.h"
+#endif // USING_GLVAAPI
+#ifdef USING_VAAPI
 #include "vaapicontext.h"
-#endif // USING_VAAPI
+#endif
 
 extern "C" {
 #include "libavutil/avutil.h"
+#include "libavutil/log.h"
+#include "libavcodec/avcodec.h"
 #include "libavcodec/ac3_parser.h"
-extern const uint8_t *ff_find_start_code(const uint8_t *p, const uint8_t *end, uint32_t *state);
-extern void ff_read_frame_flush(AVFormatContext *s);
+#include "libavcodec/mpegvideo.h"
+#include "libavformat/avformat.h"
 #include "libavformat/avio.h"
+#include "libavformat/internal.h"
 #include "libswscale/swscale.h"
 #include "ivtv_myth.h"
 }
@@ -176,6 +181,7 @@ static void myth_av_log(void *ptr, int level, const char* fmt, va_list vl)
         case AV_LOG_INFO:
             verbose_level = LOG_DEBUG;
             verbose_mask |= VB_LIBAV;
+            break;
         case AV_LOG_WARNING:
             verbose_mask |= VB_LIBAV;
             break;
@@ -297,20 +303,16 @@ AvFormatDecoder::AvFormatDecoder(MythPlayer *parent,
       // Interactive TV
       itv(NULL),
       // Audio
-      audioSamples(NULL),
       disable_passthru(false),
       m_fps(0.0f),
       codec_is_mpeg(false)
 {
-    memset(&params, 0, sizeof(AVFormatParameters));
     memset(&readcontext, 0, sizeof(readcontext));
     memset(ccX08_in_pmt, 0, sizeof(ccX08_in_pmt));
     memset(ccX08_in_tracks, 0, sizeof(ccX08_in_tracks));
 
-    // using preallocated AVFormatContext for our own ByteIOContext
-    params.prealloced_context = 1;
-    audioSamples = (short int *)av_mallocz(AVCODEC_MAX_AUDIO_FRAME_SIZE *
-                                           sizeof(int32_t));
+    audioSamples = (uint8_t *)av_mallocz(AVCODEC_MAX_AUDIO_FRAME_SIZE *
+                                         sizeof(int32_t));
     ccd608->SetIgnoreTimecode(true);
 
     bool debug = VERBOSE_LEVEL_CHECK(VB_LIBAV, LOG_ANY);
@@ -344,7 +346,7 @@ AvFormatDecoder::~AvFormatDecoder()
 
     sws_freeContext(sws_ctx);
 
-    av_freep((void *)&audioSamples);
+    av_free(audioSamples);
 
     if (avfRingBuffer)
         delete avfRingBuffer;
@@ -384,7 +386,7 @@ void AvFormatDecoder::CloseContext()
 
         av_free(ic->pb->buffer);
         av_free(ic->pb);
-        av_close_input_file(ic);
+        avformat_close_input(&ic);
         ic = NULL;
         fmt->flags &= ~AVFMT_NOFILE;
     }
@@ -408,7 +410,7 @@ int64_t AvFormatDecoder::NormalizeVideoTimecode(int64_t timecode)
     for (uint i = 0; i < ic->nb_streams; i++)
     {
         AVStream *st1 = ic->streams[i];
-        if (st1 && st1->codec->codec_type == CODEC_TYPE_VIDEO)
+        if (st1 && st1->codec->codec_type == AVMEDIA_TYPE_VIDEO)
         {
             st = st1;
             break;
@@ -547,7 +549,7 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame, bool discardFrames)
     for (uint i = 0; i < ic->nb_streams; i++)
     {
         AVStream *st1 = ic->streams[i];
-        if (st1 && st1->codec->codec_type == CODEC_TYPE_VIDEO)
+        if (st1 && st1->codec->codec_type == AVMEDIA_TYPE_VIDEO)
         {
             st = st1;
             break;
@@ -574,7 +576,8 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame, bool discardFrames)
     long double seekts = desiredFrame * AV_TIME_BASE / fps;
     ts += (long long)seekts;
 
-    bool exactseeks = DecoderBase::getExactSeeks();
+    // XXX figure out how to do snapping in this case
+    bool exactseeks = !DecoderBase::GetSeekSnap();
 
     int flags = (dorewind || exactseeks) ? AVSEEK_FLAG_BACKWARD : 0;
 
@@ -806,24 +809,23 @@ bool AvFormatDecoder::CanHandle(char testbuf[kDecoderProbeBufferSize],
 
 void AvFormatDecoder::InitByteContext(void)
 {
-    int buf_size = ringBuffer->BestBufferSize();
-    int streamed = ringBuffer->IsStreamed();
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Buffer size: %1, streamed %2")
-                                   .arg(buf_size).arg(streamed));
-
-    readcontext.prot = &AVF_RingBuffer_Protocol;
-    readcontext.flags = 0;
-    readcontext.is_streamed = streamed;
+    int buf_size                = ringBuffer->BestBufferSize();
+    int streamed                = ringBuffer->IsStreamed();
+    readcontext.prot            = AVFRingBuffer::GetRingBufferURLProtocol();
+    readcontext.flags           = AVIO_FLAG_READ;
+    readcontext.is_streamed     = streamed;
     readcontext.max_packet_size = 0;
-    readcontext.priv_data = avfRingBuffer;
-    unsigned char* buffer = (unsigned char *)av_malloc(buf_size);
-    ic->pb = av_alloc_put_byte(buffer, buf_size, 0,
-                               &readcontext,
-                               AVF_Read_Packet,
-                               AVF_Write_Packet,
-                               AVF_Seek_Packet);
+    readcontext.priv_data       = avfRingBuffer;
+    unsigned char* buffer       = (unsigned char *)av_malloc(buf_size);
+    ic->pb                      = avio_alloc_context(buffer, buf_size, 0,
+                                                     &readcontext,
+                                                     AVFRingBuffer::AVF_Read_Packet,
+                                                     AVFRingBuffer::AVF_Write_Packet,
+                                                     AVFRingBuffer::AVF_Seek_Packet);
 
-    ic->pb->is_streamed = streamed;
+    ic->pb->seekable            = !streamed;
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Buffer size: %1, streamed %2")
+        .arg(buf_size).arg(streamed));
 }
 
 extern "C" void HandleStreamChange(void *data)
@@ -876,7 +878,7 @@ int AvFormatDecoder::FindStreamInfo(void)
 {
     QMutexLocker lock(avcodeclock);
     silence_ffmpeg_logging = true;
-    int retval = av_find_stream_info(ic);
+    int retval = avformat_find_stream_info(ic, NULL);
     silence_ffmpeg_logging = false;
     return retval;
 }
@@ -926,7 +928,9 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         return -1;
     }
 
+#if 0
     fmt->flags |= AVFMT_NOFILE;
+#endif
 
     ic = avformat_alloc_context();
     if (!ic)
@@ -937,11 +941,11 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
     InitByteContext();
 
-    int err = av_open_input_stream(&ic, ic->pb, filename, fmt, &params);
+    int err = avformat_open_input(&ic, filename, fmt, NULL);
     if (err < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
-            QString("avformat err(%1) on av_open_input_file call.").arg(err));
+            QString("avformat err(%1) on avformat_open_input call.").arg(err));
         return -1;
     }
 
@@ -956,7 +960,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Could not find codec parameters. " +
                 QString("file was \"%1\".").arg(filename));
-        av_close_input_file(ic);
+        avformat_close_input(&ic);
         ic = NULL;
         return -1;
     }
@@ -1259,12 +1263,11 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
     enc->draw_horiz_band = NULL;
     enc->slice_flags = 0;
 
-    enc->error_recognition = FF_ER_COMPLIANT;
+    enc->err_recognition = AV_EF_COMPLIANT;
     enc->workaround_bugs = FF_BUG_AUTODETECT;
     enc->error_concealment = FF_EC_GUESS_MVS | FF_EC_DEBLOCK;
     enc->idct_algo = FF_IDCT_AUTO;
     enc->debug = 0;
-    enc->rate_emu = 0;
     enc->error_rate = 0;
 
     AVCodec *codec = avcodec_find_decoder(enc->codec_id);
@@ -1390,9 +1393,11 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
                 case CODEC_ID_WMV2:
                     video_format = VIDEO_WMV;
                     break;
+#if 0
                 case CODEC_ID_XVID:
                     video_format = VIDEO_XVID;
                     break;
+#endif
                 default:
                     video_format = VIDEO_MPG;
                     break;
@@ -1644,8 +1649,9 @@ void AvFormatDecoder::ScanTeletextCaptions(int av_index)
 
 void AvFormatDecoder::ScanRawTextCaptions(int av_stream_index)
 {
-    AVMetadataTag *metatag = av_metadata_get(ic->streams[av_stream_index]->metadata,
-                                             "language", NULL, 0);
+    AVDictionaryEntry *metatag =
+        av_dict_get(ic->streams[av_stream_index]->metadata, "language", NULL,
+                    0);
     int lang = metatag ? get_canonical_lang(metatag->value) :
                          iso639_str3_to_key("und");
     LOG(VB_PLAYBACK, LOG_INFO, LOC +
@@ -1764,7 +1770,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
 
         switch (enc->codec_type)
         {
-            case CODEC_TYPE_VIDEO:
+            case AVMEDIA_TYPE_VIDEO:
             {
                 //assert(enc->codec_id);
                 if (!enc->codec_id)
@@ -1828,7 +1834,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                     // Needed for broken transmitters which mark
                     // MPEG2 streams as MPEG1 streams, and should
                     // be harmless for unbroken ones.
-                    if (CODEC_ID_MPEG1VIDEO == enc->codec_id)
+                    if (enc->codec_id == CODEC_ID_MPEG1VIDEO)
                         enc->codec_id = CODEC_ID_MPEG2VIDEO;
                     // HACK -- end
 #endif // USING_VDPAU
@@ -1845,7 +1851,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                         video_codec_id = vdpau_mcid;
                     }
 #endif // USING_VDPAU
-#ifdef USING_VAAPI
+#ifdef USING_GLVAAPI
                     MythCodecID vaapi_mcid;
                     PixelFormat pix_fmt = PIX_FMT_YUV420P;
                     vaapi_mcid = VideoOutputOpenGLVAAPI::GetBestSupportedCodec(
@@ -1862,7 +1868,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                             enc->pix_fmt = pix_fmt;
                         }
                     }
-#endif // USING_VAAPI
+#endif // USING_GLVAAPI
 #ifdef USING_DXVA2
                     MythCodecID dxva2_mcid;
                     PixelFormat pix_fmt = PIX_FMT_YUV420P;
@@ -1940,7 +1946,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
 
                 break;
             }
-            case CODEC_TYPE_AUDIO:
+            case AVMEDIA_TYPE_AUDIO:
             {
                 if (enc->codec)
                 {
@@ -1960,7 +1966,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 bitrate += enc->bit_rate;
                 break;
             }
-            case CODEC_TYPE_SUBTITLE:
+            case AVMEDIA_TYPE_SUBTITLE:
             {
                 if (enc->codec_id == CODEC_ID_DVB_TELETEXT)
                     ScanTeletextCaptions(i);
@@ -1972,7 +1978,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                         .arg(ff_codec_type_string(enc->codec_type)));
                 break;
             }
-            case CODEC_TYPE_DATA:
+            case AVMEDIA_TYPE_DATA:
             {
                 ScanTeletextCaptions(i);
                 bitrate += enc->bit_rate;
@@ -1980,7 +1986,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                         .arg(ff_codec_type_string(enc->codec_type)));
                 break;
             }
-            case CODEC_TYPE_ATTACHMENT:
+            case AVMEDIA_TYPE_ATTACHMENT:
             {
                 if (enc->codec_id == CODEC_ID_TTF)
                    tracks[kTrackTypeAttachment].push_back(
@@ -2001,13 +2007,13 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             }
         }
 
-        if (enc->codec_type != CODEC_TYPE_AUDIO &&
-            enc->codec_type != CODEC_TYPE_VIDEO &&
-            enc->codec_type != CODEC_TYPE_SUBTITLE)
+        if (enc->codec_type != AVMEDIA_TYPE_AUDIO &&
+            enc->codec_type != AVMEDIA_TYPE_VIDEO &&
+            enc->codec_type != AVMEDIA_TYPE_SUBTITLE)
             continue;
 
         // skip DVB teletext and text subs, there is no libavcodec decoder
-        if (enc->codec_type == CODEC_TYPE_SUBTITLE &&
+        if (enc->codec_type == AVMEDIA_TYPE_SUBTITLE &&
            (enc->codec_id   == CODEC_ID_DVB_TELETEXT ||
             enc->codec_id   == CODEC_ID_TEXT))
             continue;
@@ -2067,7 +2073,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 continue;
         }
         // select vdpau capable decoder if needed
-        else if (enc->codec_type == CODEC_TYPE_VIDEO &&
+        else if (enc->codec_type == AVMEDIA_TYPE_VIDEO &&
                  codec_is_vdpau(video_codec_id) && !CODEC_IS_VDPAU(codec))
         {
             codec = find_vdpau_decoder(codec, enc->codec_id);
@@ -2077,7 +2083,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
         {
             QMutexLocker locker(avcodeclock);
 
-            int open_val = avcodec_open(enc, codec);
+            int open_val = avcodec_open2(enc, codec, NULL);
             if (open_val < 0)
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC +
@@ -2101,7 +2107,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             }
         }
 
-        if (enc->codec_type == CODEC_TYPE_SUBTITLE)
+        if (enc->codec_type == AVMEDIA_TYPE_SUBTITLE)
         {
             bool forced = ic->streams[i]->disposition & AV_DISPOSITION_FORCED;
             int lang = GetSubtitleLanguage(subtitleStreamCount, i);
@@ -2118,7 +2124,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                     .arg(iso639_key_toName(lang)).arg(lang));
         }
 
-        if (enc->codec_type == CODEC_TYPE_AUDIO)
+        if (enc->codec_type == AVMEDIA_TYPE_AUDIO)
         {
             int lang = GetAudioLanguage(audioStreamCount, i);
             int channels  = ic->streams[i]->codec->channels;
@@ -2173,7 +2179,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
     if (ringBuffer)
     {
         ringBuffer->SetBufferSizeFactors(unknownbitrate,
-                            QString(ic->iformat->name).contains("matroska"));
+                        ic && QString(ic->iformat->name).contains("matroska"));
     }
 
     PostProcessTracks();
@@ -2234,14 +2240,25 @@ void AvFormatDecoder::DoFastForwardSeek(long long desiredFrame, bool &needflush)
     DecoderBase::DoFastForwardSeek(desiredFrame, needflush);
     return;
 }
+///Returns TeleText language
+int AvFormatDecoder::GetTeletextLanguage(uint lang_idx) const
+{
+    for (uint i = 0; i < (uint) tracks[kTrackTypeTeletextCaptions].size(); i++)
+    {
+        if (tracks[kTrackTypeTeletextCaptions][i].language_index == lang_idx)
+        {
+             return tracks[kTrackTypeTeletextCaptions][i].language;
+        }
+    }
 
+    return iso639_str3_to_key("und");
+}
 /// Returns DVD Subtitle language
 int AvFormatDecoder::GetSubtitleLanguage(uint subtitle_index, uint stream_index)
 {
     (void)subtitle_index;
-     AVMetadataTag *metatag =
-        av_metadata_get(ic->streams[stream_index]->metadata,
-                        "language", NULL, 0);
+    AVDictionaryEntry *metatag =
+        av_dict_get(ic->streams[stream_index]->metadata, "language", NULL, 0);
     return metatag ? get_canonical_lang(metatag->value) :
                      iso639_str3_to_key("und");
 }
@@ -2372,8 +2389,6 @@ int get_avf_buffer(struct AVCodecContext *c, AVFrame *pic)
     pic->opaque = frame;
     pic->type = FF_BUFFER_TYPE_USER;
 
-    pic->age = 256 * 256 * 256 * 64;
-
     pic->reordered_opaque = c->reordered_opaque;
 
     return 0;
@@ -2392,7 +2407,7 @@ void AvFormatDecoder::RemoveAudioStreams()
     for (uint i = 0; i < ic->nb_streams;)
     {
         AVStream *st = ic->streams[i];
-        if (st->codec->codec_type == CODEC_TYPE_AUDIO)
+        if (st->codec->codec_type == AVMEDIA_TYPE_AUDIO)
         {
             av_remove_stream(ic, st->id, 0);
             i--;
@@ -2437,8 +2452,6 @@ int get_avf_buffer_vdpau(struct AVCodecContext *c, AVFrame *pic)
 
     pic->opaque = frame;
     pic->type = FF_BUFFER_TYPE_USER;
-
-    pic->age = 256 * 256 * 256 * 64;
 
     frame->pix_fmt = c->pix_fmt;
 
@@ -2506,7 +2519,6 @@ int get_avf_buffer_dxva2(struct AVCodecContext *c, AVFrame *pic)
     pic->reordered_opaque = c->reordered_opaque;
     pic->opaque      = frame;
     pic->type        = FF_BUFFER_TYPE_USER;
-    pic->age         = 256 * 256 * 256 *64;
     frame->pix_fmt   = c->pix_fmt;
 
 #ifdef USING_DXVA2
@@ -2538,7 +2550,6 @@ int get_avf_buffer_vaapi(struct AVCodecContext *c, AVFrame *pic)
     pic->linesize[3] = 0;
     pic->opaque      = frame;
     pic->type        = FF_BUFFER_TYPE_USER;
-    pic->age         = 256 * 256 * 256 * 64;
     frame->pix_fmt   = c->pix_fmt;
 
 #ifdef USING_VAAPI
@@ -2815,7 +2826,7 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
 
     while (bufptr < bufend)
     {
-        bufptr = ff_find_start_code(bufptr, bufend, &start_code_state);
+        bufptr = avpriv_mpv_find_start_code(bufptr, bufend, &start_code_state);
 
         float aspect_override = -1.0f;
         if (ringBuffer->IsDVD())
@@ -2836,7 +2847,8 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
 
             uint  width  = seq->width()  >> context->lowres;
             uint  height = seq->height() >> context->lowres;
-            current_aspect = seq->aspect(context->sub_id == 1);
+            current_aspect = seq->aspect(context->codec_id ==
+                                         CODEC_ID_MPEG1VIDEO);
             if (aspect_override > 0.0f)
                 current_aspect = aspect_override;
             float seqFPS = seq->fps();
@@ -2881,14 +2893,14 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
             if (!seen_gop && seq_count > 1)
             {
                 HandleGopStart(pkt, true);
-                pkt->flags |= PKT_FLAG_KEY;
+                pkt->flags |= AV_PKT_FLAG_KEY;
             }
         }
         else if (GOP_START == start_code_state)
         {
             HandleGopStart(pkt, true);
             seen_gop = true;
-            pkt->flags |= PKT_FLAG_KEY;
+            pkt->flags |= AV_PKT_FLAG_KEY;
         }
     }
 }
@@ -2912,7 +2924,7 @@ bool AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)
 
         if (nal_size)
         {
-            if (pkt->flags & PKT_FLAG_KEY)
+            if (pkt->flags & AV_PKT_FLAG_KEY)
                 HandleGopStart(pkt, false);
             return true;
         }
@@ -2981,7 +2993,7 @@ bool AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)
         }
 
         HandleGopStart(pkt, true);
-        pkt->flags |= PKT_FLAG_KEY;
+        pkt->flags |= AV_PKT_FLAG_KEY;
     }
 
     return on_frame;
@@ -3002,7 +3014,7 @@ bool AvFormatDecoder::PreProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
     }
     else
     {
-        if (pkt->flags & PKT_FLAG_KEY)
+        if (pkt->flags & AV_PKT_FLAG_KEY)
         {
             HandleGopStart(pkt, false);
             seen_gop = true;
@@ -3018,7 +3030,7 @@ bool AvFormatDecoder::PreProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
     }
 
     if (framesRead == 0 && !justAfterChange &&
-        !(pkt->flags & PKT_FLAG_KEY))
+        !(pkt->flags & AV_PKT_FLAG_KEY))
     {
         av_free_packet(pkt);
         return false;
@@ -3441,6 +3453,7 @@ bool AvFormatDecoder::ProcessSubtitlePacket(AVStream *curstream, AVPacket *pkt)
 
     avcodeclock->lock();
     int subIdx = selectedTrack[kTrackTypeSubtitle].av_stream_index;
+    bool isForcedTrack = selectedTrack[kTrackTypeSubtitle].forced;
     avcodeclock->unlock();
 
     int gotSubtitles = 0;
@@ -3473,6 +3486,8 @@ bool AvFormatDecoder::ProcessSubtitlePacket(AVStream *curstream, AVPacket *pkt)
 
     if (gotSubtitles)
     {
+        if (isForcedTrack)
+            subtitle.forced = true;
         subtitle.start_display_time += pts;
         subtitle.end_display_time += pts;
         LOG(VB_PLAYBACK | VB_TIMESTAMP, LOG_INFO, LOC +
@@ -3484,7 +3499,7 @@ bool AvFormatDecoder::ProcessSubtitlePacket(AVStream *curstream, AVPacket *pkt)
         bool forcedon = m_parent->GetSubReader(pkt->stream_index)->AddAVSubtitle(
                subtitle, curstream->codec->codec_id == CODEC_ID_XSUB,
                m_parent->GetAllowForcedSubtitles());
-        m_parent->EnableForcedSubtitles(forcedon);
+        m_parent->EnableForcedSubtitles(forcedon || isForcedTrack);
     }
 
     return true;
@@ -3615,7 +3630,7 @@ QString AvFormatDecoder::GetTrackDesc(uint type, uint trackNo) const
 
         return QObject::tr("Subtitle") + QString(" %1: %2%3")
             .arg(trackNo + 1).arg(iso639_key_toName(lang_key))
-            .arg(forced ? " (forced)" : "");
+            .arg(forced ? QObject::tr(" (forced)") : "");
     }
     else
     {
@@ -3653,7 +3668,7 @@ void AvFormatDecoder::GetAttachmentData(uint trackNo, QByteArray &filename,
         return;
 
     int index = tracks[kTrackTypeAttachment][trackNo].av_stream_index;
-    AVMetadataTag *tag = av_metadata_get(ic->streams[index]->metadata,
+    AVDictionaryEntry *tag = av_dict_get(ic->streams[index]->metadata,
                                          "filename", NULL, 0);
     if (tag)
         filename  = QByteArray(tag->value);
@@ -4057,6 +4072,7 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
     avcodeclock->unlock();
 
     AVPacket tmp_pkt;
+    av_init_packet(&tmp_pkt);
     tmp_pkt.data = pkt->data;
     tmp_pkt.size = pkt->size;
 
@@ -4106,9 +4122,7 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
                     ctx->channels = m_audio->GetMaxChannels();
             }
 
-            data_size = AVCODEC_MAX_AUDIO_FRAME_SIZE;
-            ret = avcodec_decode_audio3(ctx, audioSamples,
-                                        &data_size, &tmp_pkt);
+            ret = DecodeAudio(ctx, audioSamples, data_size, &tmp_pkt);
             decoded_size = data_size;
             already_decoded = true;
             reselectAudioTrack |= ctx->channels;
@@ -4159,9 +4173,7 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
             {
                 if (m_audio->NeedDecodingBeforePassthrough())
                 {
-                    data_size = AVCODEC_MAX_AUDIO_FRAME_SIZE;
-                    ret = avcodec_decode_audio3(ctx, audioSamples, &data_size,
-                                                &tmp_pkt);
+                    ret = DecodeAudio(ctx, audioSamples, data_size, &tmp_pkt);
                     decoded_size = data_size;
                 }
                 else
@@ -4169,7 +4181,7 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
             }
             memcpy(audioSamples, tmp_pkt.data, tmp_pkt.size);
             data_size = tmp_pkt.size;
-             // We have processed all the data, there can't be any left
+            // We have processed all the data, there can't be any left
             tmp_pkt.size = 0;
         }
         else
@@ -4185,9 +4197,7 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
                 else
                     ctx->request_channels = 0;
 
-                data_size = AVCODEC_MAX_AUDIO_FRAME_SIZE;
-                ret = avcodec_decode_audio3(ctx, audioSamples, &data_size,
-                                            &tmp_pkt);
+                ret = DecodeAudio(ctx, audioSamples, data_size, &tmp_pkt);
                 decoded_size = data_size;
             }
 
@@ -4221,13 +4231,13 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
 
         long long temppts = lastapts;
 
-        if (audSubIdx != -1)
+        if (audSubIdx != -1 && !audioOut.do_passthru)
             extract_mono_channel(audSubIdx, &audioOut,
                                  (char *)audioSamples, data_size);
 
         int frames = (ctx->channels <= 0 || decoded_size < 0) ? -1 :
             decoded_size / (ctx->channels *
-                            av_get_bits_per_sample_fmt(ctx->sample_fmt)>>3);
+                            av_get_bytes_per_sample(ctx->sample_fmt));
         m_audio->AddAudioData((char *)audioSamples, data_size, temppts, frames);
         if (audioOut.do_passthru && !m_audio->NeedDecodingBeforePassthrough())
         {
@@ -4251,6 +4261,39 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
     }
 
     return true;
+}
+
+int AvFormatDecoder::DecodeAudio(AVCodecContext *ctx,
+                                 uint8_t *buffer, int &data_size,
+                                 AVPacket *pkt)
+{
+    AVFrame frame;
+    int got_frame = 0;
+
+    int ret = avcodec_decode_audio4(ctx, &frame, &got_frame, pkt);
+    if (ret < 0 || !got_frame)
+    {
+        data_size = 0;
+        return ret;
+    }
+
+    int plane_size;
+    int planar = av_sample_fmt_is_planar(ctx->sample_fmt);
+    data_size = av_samples_get_buffer_size(&plane_size, ctx->channels,
+                                           frame.nb_samples,
+                                           ctx->sample_fmt, 1);
+    memcpy(buffer, frame.extended_data[0], plane_size);
+
+    if (planar && ctx->channels > 1)
+    {
+        uint8_t *out = buffer + plane_size;
+        for (int i = 1; i < ctx->channels; i++)
+        {
+            memcpy(out, frame.extended_data[i], plane_size);
+            out += plane_size;
+        }
+    }
+    return ret;
 }
 
 // documented in decoderbase.h
@@ -4405,9 +4448,9 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
             continue;
         }
 
-        enum CodecType codec_type = curstream->codec->codec_type;
+        enum AVMediaType codec_type = curstream->codec->codec_type;
 
-        if (storevideoframes && codec_type == CODEC_TYPE_VIDEO)
+        if (storevideoframes && codec_type == AVMEDIA_TYPE_VIDEO)
         {
             av_dup_packet(pkt);
             storedPackets.append(pkt);
@@ -4415,7 +4458,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
             continue;
         }
 
-        if (codec_type == CODEC_TYPE_VIDEO &&
+        if (codec_type == AVMEDIA_TYPE_VIDEO &&
             pkt->stream_index == selectedTrack[kTrackTypeVideo].av_stream_index)
         {
             if (!PreProcessVideoPacket(curstream, pkt))
@@ -4431,7 +4474,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
             }
         }
 
-        if (codec_type == CODEC_TYPE_SUBTITLE &&
+        if (codec_type == AVMEDIA_TYPE_SUBTITLE &&
             curstream->codec->codec_id == CODEC_ID_TEXT)
         {
             ProcessRawTextPacket(pkt);
@@ -4439,7 +4482,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
             continue;
         }
 
-        if (codec_type == CODEC_TYPE_SUBTITLE &&
+        if (codec_type == AVMEDIA_TYPE_SUBTITLE &&
             curstream->codec->codec_id == CODEC_ID_DVB_TELETEXT)
         {
             ProcessDVBDataPacket(curstream, pkt);
@@ -4447,7 +4490,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
             continue;
         }
 
-        if (codec_type == CODEC_TYPE_DATA)
+        if (codec_type == AVMEDIA_TYPE_DATA)
         {
             ProcessDataPacket(curstream, pkt, decodetype);
             av_free_packet(pkt);
@@ -4470,7 +4513,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
 
         switch (codec_type)
         {
-            case CODEC_TYPE_AUDIO:
+            case AVMEDIA_TYPE_AUDIO:
             {
                 if (!ProcessAudioPacket(curstream, pkt, decodetype))
                     have_err = true;
@@ -4479,7 +4522,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
                 break;
             }
 
-            case CODEC_TYPE_VIDEO:
+            case AVMEDIA_TYPE_VIDEO:
             {
                 if (pkt->stream_index != selectedTrack[kTrackTypeVideo].av_stream_index)
                 {
@@ -4504,7 +4547,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
                 break;
             }
 
-            case CODEC_TYPE_SUBTITLE:
+            case AVMEDIA_TYPE_SUBTITLE:
             {
                 if (!ProcessSubtitlePacket(curstream, pkt))
                     have_err = true;
@@ -4702,11 +4745,11 @@ bool AvFormatDecoder::SetupAudioStream(void)
 
         switch (ctx->sample_fmt)
         {
-            case SAMPLE_FMT_U8:     fmt = FORMAT_U8;    break;
-            case SAMPLE_FMT_S16:    fmt = FORMAT_S16;   break;
-            case SAMPLE_FMT_FLT:    fmt = FORMAT_FLT;   break;
-            case SAMPLE_FMT_DBL:    fmt = FORMAT_NONE;  break;
-            case SAMPLE_FMT_S32:
+            case AV_SAMPLE_FMT_U8:     fmt = FORMAT_U8;    break;
+            case AV_SAMPLE_FMT_S16:    fmt = FORMAT_S16;   break;
+            case AV_SAMPLE_FMT_FLT:    fmt = FORMAT_FLT;   break;
+            case AV_SAMPLE_FMT_DBL:    fmt = FORMAT_NONE;  break;
+            case AV_SAMPLE_FMT_S32:
                 switch (ctx->bits_per_raw_sample)
                 {
                     case  0:    fmt = FORMAT_S32;   break;
@@ -4720,8 +4763,9 @@ bool AvFormatDecoder::SetupAudioStream(void)
 
         if (fmt == FORMAT_NONE)
         {
-            int bps = av_get_bits_per_sample_fmt(ctx->sample_fmt);
-            if (ctx->sample_fmt == SAMPLE_FMT_S32 && ctx->bits_per_raw_sample)
+            int bps = av_get_bytes_per_sample(ctx->sample_fmt) << 3;
+            if (ctx->sample_fmt == AV_SAMPLE_FMT_S32 &&
+                ctx->bits_per_raw_sample)
                 bps = ctx->bits_per_raw_sample;
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 QString("Unsupported sample format with %1 bits").arg(bps));
@@ -4838,7 +4882,7 @@ bool AvFormatDecoder::SetupAudioStream(void)
 void AvFormatDecoder::av_update_stream_timings_video(AVFormatContext *ic)
 {
     int64_t start_time, start_time1, end_time, end_time1;
-    int64_t duration, duration1;
+    int64_t duration, duration1, filesize;
     AVStream *st = NULL;
 
     start_time = INT64_MAX;
@@ -4847,7 +4891,7 @@ void AvFormatDecoder::av_update_stream_timings_video(AVFormatContext *ic)
     for (uint i = 0; i < ic->nb_streams; i++)
     {
         AVStream *st1 = ic->streams[i];
-        if (st1 && st1->codec->codec_type == CODEC_TYPE_VIDEO)
+        if (st1 && st1->codec->codec_type == AVMEDIA_TYPE_VIDEO)
         {
             st = st1;
             break;
@@ -4862,8 +4906,8 @@ void AvFormatDecoder::av_update_stream_timings_video(AVFormatContext *ic)
        if (start_time1 < start_time)
            start_time = start_time1;
        if (st->duration != (int64_t)AV_NOPTS_VALUE) {
-           end_time1 = start_time1
-                     + av_rescale_q(st->duration, st->time_base, AV_TIME_BASE_Q);
+           end_time1 = start_time1 +
+                      av_rescale_q(st->duration, st->time_base, AV_TIME_BASE_Q);
            if (end_time1 > end_time)
                end_time = end_time1;
        }
@@ -4882,9 +4926,9 @@ void AvFormatDecoder::av_update_stream_timings_video(AVFormatContext *ic)
     }
     if (duration != INT64_MIN) {
         ic->duration = duration;
-        if (ic->file_size > 0) {
+        if (ic->pb && (filesize = avio_size(ic->pb)) > 0) {
             /* compute the bitrate */
-            ic->bit_rate = (double)ic->file_size * 8.0 * AV_TIME_BASE /
+            ic->bit_rate = (double)filesize * 8.0 * AV_TIME_BASE /
                 (double)ic->duration;
         }
     }

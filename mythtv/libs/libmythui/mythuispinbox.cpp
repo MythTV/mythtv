@@ -80,7 +80,7 @@ void MythUISpinBox::SetRange(int low, int high, int step, uint pageMultiple)
             value = value + step;
     }
 
-    SetPositionArrowStates();
+    CalculateArrowStates();
 }
 
 /**

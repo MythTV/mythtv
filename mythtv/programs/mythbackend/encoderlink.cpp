@@ -10,7 +10,7 @@ using namespace std;
 #include "encoderlink.h"
 #include "playbacksock.h"
 #include "tv_rec.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 #include "previewgenerator.h"
 #include "storagegroup.h"
 #include "backendutil.h"
@@ -43,15 +43,15 @@ EncoderLink::EncoderLink(int capturecardnum, PlaybackSock *lsock,
       freeDiskSpaceKB(-1), tv(NULL), local(false), locked(false),
       sleepStatus(sStatus_Undefined), chanid(0)
 {
-    endRecordingTime = QDateTime::currentDateTime().addDays(-2);
+    endRecordingTime = MythDate::current().addDays(-2);
     startRecordingTime = endRecordingTime;
 
-    sleepStatusTime = QDateTime::currentDateTime();
-    lastSleepTime   = QDateTime::currentDateTime();
-    lastWakeTime    = QDateTime::currentDateTime();
+    sleepStatusTime = MythDate::current();
+    lastSleepTime   = MythDate::current();
+    lastWakeTime    = MythDate::current();
 
     if (sock)
-        sock->UpRef();
+        sock->IncrRef();
 }
 
 /** \fn EncoderLink::EncoderLink(int, TVRec *)
@@ -62,12 +62,12 @@ EncoderLink::EncoderLink(int capturecardnum, TVRec *ltv)
       freeDiskSpaceKB(-1), tv(ltv), local(true), locked(false),
       sleepStatus(sStatus_Undefined), chanid(0)
 {
-    endRecordingTime = QDateTime::currentDateTime().addDays(-2);
+    endRecordingTime = MythDate::current().addDays(-2);
     startRecordingTime = endRecordingTime;
 
-    sleepStatusTime = QDateTime::currentDateTime();
-    lastSleepTime   = QDateTime::currentDateTime();
-    lastWakeTime    = QDateTime::currentDateTime();
+    sleepStatusTime = MythDate::current();
+    lastSleepTime   = MythDate::current();
+    lastWakeTime    = MythDate::current();
 }
 
 /** \fn EncoderLink::~EncoderLink()
@@ -92,7 +92,7 @@ void EncoderLink::SetSocket(PlaybackSock *lsock)
 {
     if (lsock)
     {
-        lsock->UpRef();
+        lsock->IncrRef();
 
         if (gCoreContext->GetSettingOnHost("SleepCommand", hostname).isEmpty())
             SetSleepStatus(sStatus_Undefined);
@@ -108,7 +108,7 @@ void EncoderLink::SetSocket(PlaybackSock *lsock)
     }
 
     if (sock)
-        sock->DownRef();
+        sock->DecrRef();
     sock = lsock;
 }
 
@@ -118,7 +118,7 @@ void EncoderLink::SetSocket(PlaybackSock *lsock)
 void EncoderLink::SetSleepStatus(SleepStatus newStatus)
 {
     sleepStatus     = newStatus;
-    sleepStatusTime = QDateTime::currentDateTime();
+    sleepStatusTime = MythDate::current();
 }
 
 /** \fn EncoderLink::IsBusy(TunedInputInfo*,int)
@@ -351,7 +351,7 @@ bool EncoderLink::GoToSleep(void)
     if (IsLocal() || !sock)
         return false;
 
-    lastSleepTime = QDateTime::currentDateTime();
+    lastSleepTime = MythDate::current();
 
     return sock->GoToSleep();
 }
@@ -396,7 +396,7 @@ RecStatusType EncoderLink::StartRecording(const ProgramInfo *rec)
 
     if (retval != rsRecording && retval != rsTuning)
     {
-        endRecordingTime = QDateTime::currentDateTime().addDays(-2);
+        endRecordingTime = MythDate::current().addDays(-2);
         startRecordingTime = endRecordingTime;
         chanid = 0;
     }
@@ -420,7 +420,7 @@ RecStatusType EncoderLink::GetRecordingStatus(void)
 
     if (retval != rsRecording && retval != rsTuning)
     {
-        endRecordingTime = QDateTime::currentDateTime().addDays(-2);
+        endRecordingTime = MythDate::current().addDays(-2);
         startRecordingTime = endRecordingTime;
         chanid = 0;
     }
@@ -453,7 +453,7 @@ ProgramInfo *EncoderLink::GetRecording(void)
  */
 void EncoderLink::StopRecording(bool killFile)
 {
-    endRecordingTime = QDateTime::currentDateTime().addDays(-2);
+    endRecordingTime = MythDate::current().addDays(-2);
     startRecordingTime = endRecordingTime;
     chanid = 0;
 
@@ -478,7 +478,7 @@ void EncoderLink::FinishRecording(void)
     }
     else
     {
-        endRecordingTime = QDateTime::currentDateTime().addDays(-2);
+        endRecordingTime = MythDate::current().addDays(-2);
     }
 }
 

@@ -147,6 +147,7 @@ VideoOutputXv::VideoOutputXv()
       xv_port(-1),      xv_hue_base(0),
       xv_colorkey(0),   xv_draw_colorkey(false),
       xv_chroma(0),     xv_set_defaults(false),
+      xv_use_picture_controls(true),
 
       chroma_osd(NULL)
 {
@@ -610,6 +611,8 @@ bool VideoOutputXv::InitXVideo()
             .arg(adaptor_name));
 
     xv_hue_base = VideoOutput::CalcHueBase(adaptor_name);
+    xv_use_picture_controls =
+        adaptor_name != "Intel(R) Video Overlay";
 
     bool foundimageformat = false;
     int ids[] = { GUID_YV12_PLANAR, GUID_I420_PLANAR, GUID_IYUV_PLANAR, };
@@ -854,7 +857,9 @@ bool VideoOutputXv::InitSetupBuffers(void)
     if (xv_port && (VideoOutputSubType() >= XVideo))
         save_port_attributes(xv_port);
 
-    InitPictureAttributes();
+    // Initialize the picture controls if we need to..
+    if (xv_use_picture_controls)
+        InitPictureAttributes();
 
     return true;
 }
@@ -1399,7 +1404,7 @@ void VideoOutputXv::PrepareFrameMem(VideoFrame *buffer, FrameScanType /*scan*/)
 
         if (non_xv_fps < 25)
         {
-            non_xv_show_frame = 120 / non_xv_frames_shown + 1;
+            non_xv_show_frame = 120 / (non_xv_frames_shown + 1);
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 QString("\n***\n"
                     "* Your system is not capable of displaying the\n"
