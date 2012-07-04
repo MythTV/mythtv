@@ -2189,6 +2189,10 @@ void MythPlayer::DisplayNormalFrame(bool check_prebuffer)
     // clear the buffering state
     SetBuffering(false);
 
+    // If PiP then release the last shown frame to the decoding queue
+    if (player_ctx->IsPIP())
+        videoOutput->DoneDisplayingFrame(videoOutput->GetLastShownFrame());
+
     // retrieve the next frame
     videoOutput->StartDisplayingFrame();
     VideoFrame *frame = videoOutput->GetLastShownFrame();
@@ -2214,7 +2218,9 @@ void MythPlayer::DisplayNormalFrame(bool check_prebuffer)
     osdLock.unlock();
 
     AVSync(frame, 0);
-    videoOutput->DoneDisplayingFrame(frame);
+    // If PiP then keep this frame for MythPlayer::GetCurrentFrame
+    if (!player_ctx->IsPIP())
+        videoOutput->DoneDisplayingFrame(frame);
 }
 
 void MythPlayer::PreProcessNormalFrame(void)
