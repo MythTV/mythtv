@@ -57,7 +57,6 @@ Scheduler::Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList,
     recordTable(tmptable),
     priorityTable("powerpriority"),
     schedLock(),
-    m_queueLock(),
     reclist_changed(false),
     specsched(master_sched),
     schedMoveHigher(false),
@@ -594,9 +593,7 @@ void Scheduler::UpdateRecStatus(RecordingInfo *pginfo)
                 p->AddHistory(false);
                 if (resched)
                 {
-                    m_queueLock.lock();
                     reschedQueue.enqueue(0);
-                    m_queueLock.unlock();
                     reschedWait.wakeOne();
                 }
                 else
@@ -646,9 +643,7 @@ void Scheduler::UpdateRecStatus(uint cardid, uint chanid,
                 p->AddHistory(false);
                 if (resched)
                 {
-                    m_queueLock.lock();
                     reschedQueue.enqueue(0);
-                    m_queueLock.unlock();
                     reschedWait.wakeOne();
                 }
                 else
@@ -1620,7 +1615,7 @@ void Scheduler::GetAllScheduled(QStringList &strList)
 
 void Scheduler::Reschedule(int recordid)
 {
-    QMutexLocker locker(&m_queueLock);
+    QMutexLocker locker(&schedLock);
 
     if (recordid == -1)
         reschedQueue.clear();
@@ -1666,9 +1661,7 @@ void Scheduler::AddRecording(const RecordingInfo &pi)
     new_pi->GetRecordingRule();
 
     // Trigger reschedule..
-    m_queueLock.lock();
     reschedQueue.enqueue(pi.GetRecordingRuleID());
-    m_queueLock.unlock();
     reschedWait.wakeOne();
 }
 
@@ -1772,13 +1765,11 @@ void Scheduler::run(void)
     // wait for slaves to connect
     sleep(3);
 
-    ClearRequestQueue();
-    m_queueLock.lock();
-    reschedQueue.enqueue(-1);
-    m_queueLock.unlock();
-
     QMutexLocker lockit(&schedLock);
-    
+
+    reschedQueue.clear();
+    reschedQueue.enqueue(-1);
+
     int       prerollseconds  = 0;
     int       wakeThreshold   = 300;
     int       idleTimeoutSecs = 0;
@@ -1816,7 +1807,7 @@ void Scheduler::run(void)
         }
         else
         {
-            if (!HaveQueuedRequests())
+            if (reschedQueue.empty())
             {
                 int sched_sleep = (secs_to_next - schedRunTime - 1) * 1000;
                 sched_sleep = min(sched_sleep, maxSleep);
@@ -1831,7 +1822,7 @@ void Scheduler::run(void)
             }
 
             QTime t; t.start();
-            if (HaveQueuedRequests() && HandleReschedule())
+            if (!reschedQueue.empty() && HandleReschedule())
             {
                 statuschanged = true;
                 startIter = reclist.begin();
@@ -2012,11 +2003,9 @@ bool Scheduler::HandleReschedule(void)
     QString msg;
     bool deleteFuture = false;
 
-    while (HaveQueuedRequests())
+    while (!reschedQueue.empty())
     {
-        m_queueLock.lock();
         int recordid = reschedQueue.dequeue();
-        m_queueLock.unlock();
 
         LOG(VB_GENERAL, LOG_INFO, QString("Reschedule requested for id %1.")
                 .arg(recordid));
@@ -2024,7 +2013,7 @@ bool Scheduler::HandleReschedule(void)
         if (recordid != 0)
         {
             if (recordid == -1)
-                ClearRequestQueue();
+                reschedQueue.clear();
 
             deleteFuture = true;
             schedLock.unlock();
@@ -2067,9 +2056,7 @@ bool Scheduler::HandleReschedule(void)
     else
     {
         LOG(VB_GENERAL, LOG_INFO, "Reschedule interrupted, will retry");
-        m_queueLock.lock();
         reschedQueue.enqueue(0);
-        m_queueLock.lock();
         return false;
     }
 
@@ -2229,11 +2216,7 @@ void Scheduler::HandleWakeSlave(RecordingInfo &ri, int prerollseconds)
                 .arg(nexttv->GetHostName()).arg(ri.GetTitle()));
 
         if (!WakeUpSlave(nexttv->GetHostName()))
-        {
-            m_queueLock.lock();
             reschedQueue.enqueue(0);
-            m_queueLock.unlock();
-        }
     }
     else if ((nexttv->IsWaking()) &&
              ((secsleft - prerollseconds) < 210) &&
@@ -2246,11 +2229,7 @@ void Scheduler::HandleWakeSlave(RecordingInfo &ri, int prerollseconds)
                 .arg(nexttv->GetHostName()));
 
         if (!WakeUpSlave(nexttv->GetHostName(), false))
-        {
-            m_queueLock.lock();
             reschedQueue.enqueue(0);
-            m_queueLock.unlock();
-        }
     }
     else if ((nexttv->IsWaking()) &&
              ((secsleft - prerollseconds) < 150) &&
@@ -2270,9 +2249,7 @@ void Scheduler::HandleWakeSlave(RecordingInfo &ri, int prerollseconds)
                 (*it)->SetSleepStatus(sStatus_Undefined);
         }
 
-        m_queueLock.lock();
         reschedQueue.enqueue(0);
-        m_queueLock.unlock();
     }
 }
 
@@ -2310,9 +2287,7 @@ bool Scheduler::HandleRecording(
             livetvTime = (livetvTime < nextrectime) ?
                 nextrectime : livetvTime;
 
-            m_queueLock.lock();
             reschedQueue.enqueue(0);
-            m_queueLock.unlock();
         }
     }
 
@@ -2395,9 +2370,7 @@ bool Scheduler::HandleRecording(
                     enc->SetSleepStatus(sStatus_Undefined);
             }
 
-            m_queueLock.lock();
             reschedQueue.enqueue(0);
-            m_queueLock.unlock();
         }
 
         return false;
