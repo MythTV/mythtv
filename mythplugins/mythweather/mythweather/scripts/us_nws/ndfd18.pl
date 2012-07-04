@@ -18,9 +18,9 @@ use Date::Manip;
 our ($opt_v, $opt_t, $opt_T, $opt_l, $opt_u, $opt_d); 
 
 my $name = 'NDFD-18_Hour';
-my $version = 0.2;
-my $author = 'Lucien Dunning';
-my $email = 'ldunning@gmail.com';
+my $version = 0.3;
+my $author = 'Gavin Hurlbut & Lucien Dunning';
+my $email = 'gjhurlbu@gmail.com';
 my $updateTimeout = 15*60;
 my $retrieveTimeout = 30;
 my @types = ('18hrlocation',  'updatetime', 
@@ -116,7 +116,8 @@ if (open (CACHE, "$dir/ndfd18_cache_${latitude}_${longitude}")) {
 } 
 
 if ($getData) {
-    ($result, $creationdate) = NDFDParser::doParse($latitude, $longitude, $d1, $d2, $param);
+    my $unit = ($units eq "SI" ? "m" : "e");
+    ($result, $creationdate) = NDFDParser::doParse($latitude, $longitude, $d1, $d2, $unit, $param);
     # output cache
     open(CACHE, ">$dir/ndfd18_cache_${latitude}_${longitude}") or 
         die "cannot open cache ($dir/ndfd18_cache_${latitude}_${longitude}) for writing";
@@ -149,10 +150,6 @@ foreach my $time (sort keys %$result) {
     }
 
     print "time-${index}::" . UnixDate($time, "%i %p\n");
-    if ($units eq 'SI') {
-        $result->{$time}->{temperature_hourly} =
-            int( (5/9) * ($result->{$time}->{temperature_hourly}-32));
-    }
     print "temp-${index}::$result->{$time}->{temperature_hourly}\n";
     print "pop-${index}::$pop12 %\n";
     $icon = $result->{$time}->{'conditions-icon_forecast-NWS'};
