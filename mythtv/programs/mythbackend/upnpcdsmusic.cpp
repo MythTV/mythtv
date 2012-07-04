@@ -148,7 +148,7 @@ QString UPnpCDSMusic::GetItemListSQL( QString /* sColumn */ )
     return "SELECT song.song_id as intid, artist.artist_name as artist, "     \
            "album.album_name as album, song.name as title, "                  \
            "genre.genre, song.year, song.track as tracknum, "                 \
-           "song.description, song.filename, song.length "                    \
+           "song.description, song.filename, song.length, song.size "         \
            "FROM music_songs song "                                           \
            " join music_artists artist on artist.artist_id = song.artist_id " \
            " join music_albums album on album.album_id = song.album_id "      \
@@ -271,6 +271,7 @@ void UPnpCDSMusic::AddItem( const UPnpCDSRequest    *pRequest,
     QString        sDescription = query.value( 7).toString();
     QString        sFileName    = query.value( 8).toString();
     uint           nLength      = query.value( 9).toInt();
+    uint64_t       nFileSize    = (quint64)query.value(10).toULongLong();
 
 #if 0
     if ((nNodeIdx == 0) || (nNodeIdx == 1))
@@ -379,6 +380,8 @@ void UPnpCDSMusic::AddItem( const UPnpCDSRequest    *pRequest,
                   nLength % 60);
 
     pRes->AddAttribute( "duration"  , sDur      );
+    if (nFileSize > 0)
+        pRes->AddAttribute( "size"      , QString::number( nFileSize) );
 }
 
 // vim:ts=4:sw=4:ai:et:si:sts=4
