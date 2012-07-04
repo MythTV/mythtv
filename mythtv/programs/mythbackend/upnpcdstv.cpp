@@ -322,7 +322,7 @@ void UPnpCDSTv::AddItem( const UPnpCDSRequest    *pRequest,
 
     QString sURIParams = QString( "?ChanId=%1&amp;StartTime=%2" )
                             .arg( nChanid )
-                            .arg( dtStartTime.toUTC().toString(Qt::ISODate));
+                            .arg( dtStartTime.toString(Qt::ISODate));
 
     QString sId        = QString( "RecTv/0/item%1")
                             .arg( sURIParams );
