@@ -176,7 +176,8 @@ bool Metadata::isInDatabase()
 
     // Filename is the absolute path, we want the relative path
     QString musicdir = gCoreContext->GetSetting("MusicLocation");
-    sqldir.remove(musicdir);
+    if (sqldir.startsWith(musicdir))
+        sqldir.remove(0, musicdir.length());
     
     QString sqlfilename = m_filename.section('/', -1);
 
