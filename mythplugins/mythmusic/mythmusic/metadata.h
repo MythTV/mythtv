@@ -112,6 +112,7 @@ class Metadata
                    m_albumArt(NULL),
                    m_id(lid),
                    m_filename(lfilename),
+                   m_fileSize(0),
                    m_changed(false)
     {
         checkEmptyFields();
@@ -190,6 +191,9 @@ class Metadata
 
     QString Filename(bool find = true) const;
     void setFilename(const QString &lfilename) { m_filename = lfilename; }
+
+    uint64_t FileSize() const;
+    void setFileSize(uint64_t lfilesize) { m_fileSize = lfilesize; }
 
     QString Format() const { return m_format; }
     void setFormat(const QString &lformat) { m_format = lformat; }
@@ -276,6 +280,7 @@ class Metadata
 
     IdType   m_id;
     QString  m_filename;
+    uint64_t  m_fileSize;
     bool     m_changed;
 
     // Various formatting strings
