@@ -165,10 +165,16 @@ class Scheduler : public MThread, public MythScheduler
         bool &blockShutdown, QDateTime &idleSince, int prerollseconds,
         int idleTimeoutSecs, int idleWaitForRecordingTime,
         bool &statuschanged);
+    
+    bool HaveQueuedRequests(void)
+    {  QMutexLocker locker(&m_queueLock); return !reschedQueue.empty(); };
+    void ClearRequestQueue(void)
+    {  QMutexLocker locker(&m_queueLock); reschedQueue.clear(); };
 
 
     MythDeque<int> reschedQueue;
     mutable QMutex schedLock;
+    mutable QMutex m_queueLock;
     QMutex recordmatchLock;
     QWaitCondition reschedWait;
     RecList reclist;
