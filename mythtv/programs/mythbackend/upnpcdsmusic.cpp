@@ -266,7 +266,7 @@ void UPnpCDSMusic::AddItem( const UPnpCDSRequest    *pRequest,
     QString        sAlbum       = query.value( 2).toString();
     QString        sTitle       = query.value( 3).toString();
     QString        sGenre       = query.value( 4).toString();
-//    int            nYear        = query.value( 5).toInt();
+    int            nYear        = query.value( 5).toInt();
     int            nTrackNum    = query.value( 6).toInt();
     QString        sDescription = query.value( 7).toString();
     QString        sFileName    = query.value( 8).toString();
@@ -338,6 +338,8 @@ void UPnpCDSMusic::AddItem( const UPnpCDSRequest    *pRequest,
     pItem->SetPropValue( "artist"               ,  sArtist    );
     pItem->SetPropValue( "album"                ,  sAlbum     );
     pItem->SetPropValue( "originalTrackNumber"  ,  QString::number(nTrackNum));
+    if (nYear > 0 && nYear < 9999)
+        pItem->SetPropValue( "date",  QDate(nYear,1,1).toString(Qt::ISODate));
 
 #if 0
     pObject->AddProperty( new Property( "publisher"       , "dc"   ));
