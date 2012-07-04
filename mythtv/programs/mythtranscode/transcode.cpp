@@ -42,31 +42,21 @@ using namespace std;
 class AudioBuffer
 {
   public:
-    AudioBuffer() : m_buffer(QByteArray()), m_time(-1) {};
+    AudioBuffer() : m_buffer(QByteArray()), m_frames(0), m_time(-1) {};
     AudioBuffer(const AudioBuffer &old) : m_buffer(old.m_buffer),
-        m_time(old.m_time) {};
+        m_frames(old.m_frames), m_time(old.m_time) {};
 
     ~AudioBuffer() {};
 
-    void appendData(unsigned char *buffer, int len, long long time)
+    void appendData(unsigned char *buffer, int len, int frames, long long time)
     {
         m_buffer.append((const char *)buffer, len);
+        m_frames += frames;
         m_time = time;
     }
 
-    void setData(unsigned char *buffer, int len, long long time)
-    {
-        m_buffer.clear();
-        appendData(buffer, len, time);
-    }
-
-    void clear(void)
-    {
-        m_buffer.clear();
-        m_time = -1;
-    }
-
     QByteArray m_buffer;
+    int m_frames;
     long long m_time;
 };
 
@@ -131,95 +121,64 @@ class AudioReencodeBuffer : public AudioOutput
     // timecode is in milliseconds.
     virtual bool AddData(void *buffer, int len, int64_t timecode, int frames)
     {
-        if (len == 0)
-            return true;
-
-        QMutexLocker locker(&m_bufferMutex);
-        AudioBuffer *ab = NULL;
         unsigned char *buf = (unsigned char *)buffer;
-        int savedlen = 0;
-        int firstlen = 0;
 
+        // Test if target is using a fixed buffer size.
         if (m_audioFrameSize)
         {
-            savedlen = (m_saveBuffer ? m_saveBuffer->m_buffer.size() : 0);
-            if (savedlen)
-                firstlen = m_audioFrameSize - savedlen;
+            int index = 0;
+            int total_frames = 0;
 
-            int overage = (len + savedlen) % m_audioFrameSize;
-
-            LOG(VB_AUDIO, LOG_DEBUG, 
-                QString("len: %1, savedlen: %2, overage: %3")
-                .arg(len).arg(savedlen).arg(overage));
-
-            if (overage)
+            // Target has a fixed buffer size, which may not match len.
+            // Redistribute the bytes into appropriately sized buffers.
+            while (index < len)
             {
-                long long newtime = timecode + ((len / m_bytes_per_frame) /
-                                                (m_eff_audiorate / 1000));
-                if (overage < len)
+                // See if we have some saved from last iteration in
+                // m_saveBuffer. If not create a new empty buffer.
+                if (!m_saveBuffer)
+                    m_saveBuffer = new AudioBuffer();
+
+                // Use as many of the remaining frames as will fit in the space
+                // left in the buffer.
+                int bufsize = m_saveBuffer->m_buffer.size();
+                int part = min(len - index, m_audioFrameSize - bufsize);
+                total_frames += part / m_bytes_per_frame;
+                timecode = total_frames * 1000 / m_eff_audiorate;
+                // Store frames in buffer, basing frame count on number of
+                // bytes, which works only for uncompressed data.
+                m_saveBuffer->appendData(&buf[index], part,
+                                         part / m_bytes_per_frame, timecode);
+
+                // If we have filled the buffer...
+                if (m_saveBuffer->m_buffer.size() == m_audioFrameSize)
                 {
-                    if (!m_saveBuffer)
-                        ab = new AudioBuffer;
-                    else
-                        ab = m_saveBuffer;
-                    m_saveBuffer = new AudioBuffer; 
-                    len -= overage;
-                    m_saveBuffer->setData(&buf[len], overage, newtime);
+                    QMutexLocker locker(&m_bufferMutex);
+
+                    // store the buffer
+                    m_bufferList.append(m_saveBuffer);
+                    // mark m_saveBuffer as emtpy.
+                    m_saveBuffer = NULL;
+                    // m_last_audiotime is updated iff we store a buffer.
+                    m_last_audiotime = timecode;
                 }
-                else
-                {
-                    if (!m_saveBuffer)
-                        m_saveBuffer = new AudioBuffer; 
-                    m_saveBuffer->appendData(buf, len, newtime);
-                    len = 0;
-                }
+
+                index += part;
             }
-            else if (savedlen)
-            {
-                ab = m_saveBuffer;
-                m_saveBuffer = NULL;
-            }
-            else
-                ab = new AudioBuffer;
         }
         else
         {
-            ab = new AudioBuffer;
+            // Target has no fixed buffer size. We can use a simpler algorithm
+            // and use 'frames' directly rather than 'len / m_bytes_per_frame',
+            // thus also covering the passthrough case.
+            m_saveBuffer = new AudioBuffer();
+            timecode += frames * 1000 / m_eff_audiorate;
+            m_saveBuffer->appendData(buf, len, frames, timecode);
+
+            QMutexLocker locker(&m_bufferMutex);
+            m_bufferList.append(m_saveBuffer);
+            m_saveBuffer = NULL;
+            m_last_audiotime = timecode;
         }
-
-        if (!ab)
-            return true;
-
-        int bufflen = (m_audioFrameSize ? m_audioFrameSize : len);
-        int index = 0;
-
-        do
-        {
-            if (!len)
-                break;
-
-            int blocklen = (firstlen ? firstlen : bufflen);
-            blocklen = (blocklen > len ? len : blocklen);
-
-            m_last_audiotime = timecode + ((blocklen / m_bytes_per_frame) /
-                                           (m_eff_audiorate / 1000));
-            ab->appendData(&buf[index], blocklen, m_last_audiotime);
-            m_bufferList.append(ab);
-
-            timecode = m_last_audiotime;
-
-            LOG(VB_AUDIO, LOG_DEBUG, 
-                QString("blocklen: %1, index: %2, timecode: %3")
-                .arg(blocklen).arg(index).arg(timecode));
-
-            index += blocklen;
-            firstlen = 0;
-
-            ab = new AudioBuffer;
-        } while (index < len);
-
-        // The last buffer is actually unused
-        delete ab;
 
         return true;
     }
@@ -270,11 +229,11 @@ class AudioReencodeBuffer : public AudioOutput
             AudioBuffer *ab = *it;
 
             if (ab->m_time <= time)
-                samples += ab->m_buffer.size();
+                samples += ab->m_frames;
             else
                 break;
         }
-        return samples / m_bytes_per_frame;
+        return samples;
     }
 
     virtual void SetTimecode(int64_t timecode)
@@ -1717,7 +1676,7 @@ int Transcode::TranscodeFile(const QString &inputname,
                 AudioBuffer *ab = arb->GetData();
 
                 if (!cutter ||
-                    !cutter->InhibitUseAudioFrames(1, &totalAudio))
+                    !cutter->InhibitUseAudioFrames(ab->m_frames, &totalAudio))
                     fifow->FIFOWrite(1, ab->m_buffer.data(),
                                      ab->m_buffer.size());
 
@@ -1974,6 +1933,12 @@ int Transcode::TranscodeFile(const QString &inputname,
 
                     delete ab;
                 }
+
+                LOG(VB_GENERAL, LOG_DEBUG, 
+                    QString("Processed %1 audio frames for timecode %2: %3 "
+                            "buffers, %4 bytes consumed")
+                    .arg(count) .arg(frame.timecode) .arg(buffersConsumed)
+                    .arg(bytesConsumed));
             }
 
             if (!avfMode)

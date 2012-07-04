@@ -251,7 +251,8 @@ LoggerThread::LoggerThread(QString filename, bool progress, bool quiet,
     MThread("Logger"),
     m_waitNotEmpty(new QWaitCondition()),
     m_waitEmpty(new QWaitCondition()),
-    m_aborted(false), m_filename(filename), m_progress(progress),
+    m_aborted(false), m_initialWaiting(true),
+    m_filename(filename), m_progress(progress),
     m_quiet(quiet), m_appname(QCoreApplication::applicationName()),
     m_tablename(table), m_facility(facility), m_pid(getpid()),
     m_zmqContext(NULL), m_zmqSocket(NULL), m_initialTimer(NULL), 
@@ -260,8 +261,8 @@ LoggerThread::LoggerThread(QString filename, bool progress, bool quiet,
     char *debug = getenv("VERBOSE_THREADS");
     if (debug != NULL)
     {
-//        LOG(VB_GENERAL, LOG_NOTICE,
-//            "Logging thread registration/deregistration enabled!");
+        LOG(VB_GENERAL, LOG_NOTICE,
+            "Logging thread registration/deregistration enabled!");
         debugRegistration = true;
     }
     m_locallogs = (m_appname == MYTH_APPNAME_MYTHLOGSERVER);
@@ -721,8 +722,6 @@ void LogPrintLine( uint64_t mask, LogLevel_t level, const char *file, int line,
 {
     va_list         arguments;
 
-    QMutexLocker qLock(&logQueueMutex);
-
     int type = kMessage;
     type |= (mask & VB_FLUSH) ? kFlush : 0;
     type |= (mask & VB_STDIO) ? kStandardIO : 0;
@@ -746,6 +745,8 @@ void LogPrintLine( uint64_t mask, LogLevel_t level, const char *file, int line,
 
     if (formatcopy)
         free(formatcopy);
+
+    QMutexLocker qLock(&logQueueMutex);
 
     logQueue.enqueue(item);
 
@@ -849,7 +850,6 @@ void logStart(QString logfile, int progress, int quiet, int facility,
 
     QString table = dblog ? QString("logging") : QString("");
 
-    QMutexLocker qLock(&logQueueMutex);
     if (!logThread)
         logThread = new LoggerThread(logfile, progress, quiet, table, facility);
 
