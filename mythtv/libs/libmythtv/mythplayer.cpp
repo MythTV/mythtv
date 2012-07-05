@@ -8,7 +8,6 @@
 #include <cstdlib>
 #include <cerrno>
 #include <ctime>
-#include <cmath>
 
 // POSIX headers
 #include <unistd.h>
@@ -26,6 +25,7 @@ using namespace std;
 #include <QCoreApplication>
 #include <QKeyEvent>
 #include <QDir>
+#include <QtCore/qnumeric.h>
 
 // MythTV headers
 #include "mthread.h"
@@ -74,12 +74,6 @@ extern "C" {
 
 #if ! HAVE_ROUND
 #define round(x) ((int) ((x) + 0.5))
-#endif
-
-#if CONFIG_DARWIN
-extern "C" {
-int isnan(double);
-}
 #endif
 
 static unsigned dbg_ident(const MythPlayer*);
@@ -811,7 +805,7 @@ void MythPlayer::SetScanType(FrameScanType scan)
 void MythPlayer::SetVideoParams(int width, int height, double fps,
                                 FrameScanType scan)
 {
-    if (width < 1 || height < 1 || isnan(fps))
+    if (width < 1 || height < 1 || qIsNaN(fps))
         return;
 
     video_dim      = QSize((width + 15) & ~0xf, (height + 15) & ~0xf);
