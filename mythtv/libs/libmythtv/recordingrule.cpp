@@ -180,9 +180,9 @@ bool RecordingRule::Load(bool asTemplate)
     // and influence watch list weighting
     if (!asTemplate)
     {
-        m_nextRecording = query.value(43).toDateTime();
-        m_lastRecorded = query.value(44).toDateTime();
-        m_lastDeleted = query.value(45).toDateTime();
+        m_nextRecording = MythDate::as_utc(query.value(43).toDateTime());
+        m_lastRecorded = MythDate::as_utc(query.value(44).toDateTime());
+        m_lastDeleted = MythDate::as_utc(query.value(45).toDateTime());
         m_averageDelay = query.value(46).toInt();
     }
 

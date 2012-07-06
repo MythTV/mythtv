@@ -38,6 +38,7 @@
 #include "sourceutil.h"
 #include "cardutil.h"
 #include "datadirect.h"
+#include "mythdate.h"
 
 #include "serviceUtil.h"
 
@@ -562,7 +563,8 @@ DTC::VideoMultiplexList* Channel::GetVideoMultiplexList( int nSourceID,
             pVideoMultiplex->setRollOff(            query.value(19).toString()      );
             pVideoMultiplex->setSIStandard(         query.value(20).toString()      );
             pVideoMultiplex->setServiceVersion(     query.value(21).toInt()         );
-            pVideoMultiplex->setUpdateTimeStamp(    query.value(22).toDateTime()    );
+            pVideoMultiplex->setUpdateTimeStamp(
+                MythDate::as_utc(query.value(22).toDateTime()));
             pVideoMultiplex->setDefaultAuthority(   query.value(23).toString()      );
         }
     }
@@ -642,7 +644,8 @@ DTC::VideoMultiplex* Channel::GetVideoMultiplex( int nMplexID )
         pVideoMultiplex->setRollOff(            query.value(18).toString()      );
         pVideoMultiplex->setSIStandard(         query.value(19).toString()      );
         pVideoMultiplex->setServiceVersion(     query.value(20).toInt()         );
-        pVideoMultiplex->setUpdateTimeStamp(    query.value(21).toDateTime()    );
+        pVideoMultiplex->setUpdateTimeStamp(
+            MythDate::as_utc(query.value(21).toDateTime()));
         pVideoMultiplex->setDefaultAuthority(   query.value(22).toString()      );
     }
 

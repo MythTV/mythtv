@@ -29,6 +29,7 @@
 #include <QUrl>
 
 #include "mythcorecontext.h"
+#include "mythdate.h"
 #include "mythdirs.h"
 #include "mythtimer.h"
 #include "mthreadpool.h"
@@ -101,8 +102,8 @@ HTTPLiveStream::HTTPLiveStream(QString srcFile, uint16_t width, uint16_t height,
     m_bitrate(bitrate),
     m_audioBitrate(abitrate),    m_audioOnlyBitrate(aobitrate),
     m_sampleRate(srate),
-    m_created(QDateTime::currentDateTime()),
-    m_lastModified(QDateTime::currentDateTime()),
+    m_created(MythDate::current()),
+    m_lastModified(MythDate::current()),
     m_percentComplete(0),
     m_status(kHLSStatusUndefined)
 {
@@ -671,8 +672,8 @@ bool HTTPLiveStream::LoadFromDB(void)
     m_curSegment         = query.value(7).toUInt();
     m_segmentCount       = query.value(8).toUInt();
     m_percentComplete    = query.value(9).toUInt();
-    m_created            = query.value(10).toDateTime();
-    m_lastModified       = query.value(11).toDateTime();
+    m_created            = MythDate::as_utc(query.value(10).toDateTime());
+    m_lastModified       = MythDate::as_utc(query.value(11).toDateTime());
     m_relativeURL        = query.value(12).toString();
     m_fullURL            = query.value(13).toString();
     m_status             = (HTTPLiveStreamStatus)(query.value(14).toInt());

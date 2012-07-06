@@ -285,8 +285,8 @@ void UPnpCDSTv::AddItem( const UPnpCDSRequest    *pRequest,
                          MSqlQuery               &query )
 {
     int            nChanid      = query.value( 0).toInt();
-    QDateTime      dtStartTime  = query.value( 1).toDateTime();
-    QDateTime      dtEndTime    = query.value( 2).toDateTime();
+    QDateTime      dtStartTime  = MythDate::as_utc(query.value(1).toDateTime());
+    QDateTime      dtEndTime    = MythDate::as_utc(query.value(2).toDateTime());
     QString        sTitle       = query.value( 3).toString();
     QString        sSubtitle    = query.value( 4).toString();
     QString        sDescription = query.value( 5).toString();
@@ -296,8 +296,10 @@ void UPnpCDSTv::AddItem( const UPnpCDSRequest    *pRequest,
     uint64_t       nFileSize    = query.value( 9).toULongLong();
     QString        sBaseName    = query.value(10).toString();
 
-    QDateTime      dtProgStart  = query.value(11).toDateTime();
-    QDateTime      dtProgEnd    = query.value(12).toDateTime();
+    QDateTime      dtProgStart  =
+        MythDate::as_utc(query.value(11).toDateTime());
+    QDateTime      dtProgEnd    =
+        MythDate::as_utc(query.value(12).toDateTime());
     QString        sStorageGrp  = query.value(13).toString();
 
     // ----------------------------------------------------------------------
