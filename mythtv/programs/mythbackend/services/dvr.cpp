@@ -37,6 +37,7 @@
 #include "jobqueue.h"
 #include "encoderlink.h"
 #include "remoteutil.h"
+#include "mythdate.h"
 
 #include "serviceUtil.h"
 #include <mythscheduler.h>
@@ -323,13 +324,12 @@ DTC::ProgramList* Dvr::GetUpcomingList( int  nStartIndex,
     for(; it < tmpList.end(); ++it)
     {
         if (!bShowAll && ((*it)->GetRecordingStatus() <= rsWillRecord) &&
-            ((*it)->GetRecordingStartTime() >=
-             QDateTime::currentDateTime()))
+            ((*it)->GetRecordingStartTime() >= MythDate::current()))
         {
             recordingList.push_back(new RecordingInfo(**it));
         }
-        else if (bShowAll && ((*it)->GetRecordingStartTime() >=
-             QDateTime::currentDateTime()))
+        else if (bShowAll &&
+                 ((*it)->GetRecordingStartTime() >= MythDate::current()))
         {
             recordingList.push_back(new RecordingInfo(**it));
         }
@@ -383,8 +383,7 @@ DTC::ProgramList* Dvr::GetConflictList( int  nStartIndex,
     for(; it < tmpList.end(); ++it)
     {
         if (((*it)->GetRecordingStatus() == rsConflict) &&
-            ((*it)->GetRecordingStartTime() >=
-             QDateTime::currentDateTime()))
+            ((*it)->GetRecordingStartTime() >= MythDate::current()))
         {
             recordingList.push_back(new RecordingInfo(**it));
         }
