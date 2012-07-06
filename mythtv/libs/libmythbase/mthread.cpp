@@ -32,9 +32,10 @@ using namespace std;
 // MythTV headers
 #include "mythlogging.h"
 #include "mythdbcon.h"
-#include "mthread.h"
 #include "mythtimer.h"
+#include "mythdate.h"
 #include "logging.h"
+#include "mthread.h"
 #include "mythdb.h"
 
 bool is_current_thread(MThread *thread)
@@ -227,8 +228,7 @@ void MThread::RunEpilog(void)
 void MThread::ThreadSetup(const QString &name)
 {
     loggingRegisterThread(name);
-    qsrand(QDateTime::currentDateTime().toTime_t() ^
-           QTime::currentTime().msec());
+    qsrand(MythDate::current().toTime_t() ^ QTime::currentTime().msec());
 }
 
 void MThread::ThreadCleanup(void)
