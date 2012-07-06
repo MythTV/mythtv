@@ -635,8 +635,11 @@ void MythMainWindow::AddScreenStack(MythScreenStack *stack, bool main)
 
 void MythMainWindow::PopScreenStack()
 {
-    delete d->stackList.back();
+    MythScreenStack *stack = d->stackList.back();
     d->stackList.pop_back();
+    if (stack == d->mainStack)
+        d->mainStack = NULL;
+    delete stack;
 }
 
 int MythMainWindow::GetStackCount(void)
