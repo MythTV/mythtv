@@ -9,6 +9,7 @@
 #include <QKeyEvent>
 
 #include "mthread.h"
+#include "mythdate.h"
 #include "mythlogging.h"
 #include "mythcorecontext.h"
 #include "mythuiactions.h"
@@ -742,7 +743,7 @@ void MythAirplayServer::SendResponse(QTcpSocket *socket,
     reply.append(StatusToString(status));
     reply.append("\r\n");
     reply.append("DATE: ");
-    reply.append(QDateTime::currentDateTime().toString("ddd, d MMM yyyy hh:mm:ss"));
+    reply.append(MythDate::current().toString("ddd, d MMM yyyy hh:mm:ss"));
     reply.append(" GMT\r\n");
     if (header.size())
         reply.append(header);
