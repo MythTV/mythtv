@@ -575,25 +575,21 @@ MythConfirmationDialog  *ShowOkPopup(const QString &message, QObject *parent,
     MythConfirmationDialog  *pop;
     MythScreenStack         *stk = NULL;
 
+    MythMainWindow *win = GetMythMainWindow();
+
+    if (win)
+        stk = win->GetStack("popup stack");
+    else
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "no main window?");
+        return NULL;
+    }
 
     if (!stk)
     {
-        MythMainWindow *win = GetMythMainWindow();
-
-        if (win)
-            stk = win->GetStack("popup stack");
-        else
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC + "no main window?");
-            return NULL;
-        }
-
-        if (!stk)
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC + "no popup stack? "
-                                           "Is there a MythThemeBase?");
-            return NULL;
-        }
+        LOG(VB_GENERAL, LOG_ERR, LOC + "no popup stack? "
+                                       "Is there a MythThemeBase?");
+        return NULL;
     }
 
     pop = new MythConfirmationDialog(stk, message, showCancel);
