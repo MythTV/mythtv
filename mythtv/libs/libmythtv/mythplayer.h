@@ -114,6 +114,8 @@ class DecoderThread : public MThread
 
 class MTV_PUBLIC MythPlayer
 {
+    Q_DECLARE_TR_FUNCTIONS(MythPlayer)
+
     // Do NOT add a decoder class to this list
     friend class PlayerContext;
     friend class CC708Reader;
