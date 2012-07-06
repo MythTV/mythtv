@@ -359,7 +359,7 @@ DTC::ProgramList* Dvr::GetUpcomingList( int  nStartIndex,
     pPrograms->setStartIndex    ( nStartIndex     );
     pPrograms->setCount         ( nCount          );
     pPrograms->setTotalAvailable( recordingList.size() );
-    pPrograms->setAsOf          ( QDateTime::currentDateTime() );
+    pPrograms->setAsOf          ( MythDate::current() );
     pPrograms->setVersion       ( MYTH_BINARY_VERSION );
     pPrograms->setProtoVer      ( MYTH_PROTO_VERSION  );
     
@@ -413,7 +413,7 @@ DTC::ProgramList* Dvr::GetConflictList( int  nStartIndex,
     pPrograms->setStartIndex    ( nStartIndex     );
     pPrograms->setCount         ( nCount          );
     pPrograms->setTotalAvailable( recordingList.size() );
-    pPrograms->setAsOf          ( QDateTime::currentDateTime() );
+    pPrograms->setAsOf          ( MythDate::current() );
     pPrograms->setVersion       ( MYTH_BINARY_VERSION );
     pPrograms->setProtoVer      ( MYTH_PROTO_VERSION  );
 
@@ -577,7 +577,7 @@ DTC::RecRuleList* Dvr::GetRecordScheduleList( int nStartIndex,
     pRecRules->setStartIndex    ( nStartIndex     );
     pRecRules->setCount         ( nCount          );
     pRecRules->setTotalAvailable( recList.size() );
-    pRecRules->setAsOf          ( QDateTime::currentDateTime() );
+    pRecRules->setAsOf          ( MythDate::current() );
     pRecRules->setVersion       ( MYTH_BINARY_VERSION );
     pRecRules->setProtoVer      ( MYTH_PROTO_VERSION  );
 
