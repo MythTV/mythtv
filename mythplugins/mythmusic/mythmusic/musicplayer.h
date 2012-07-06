@@ -138,8 +138,6 @@ class MusicPlayer : public QObject, public MythObservable
 
     Metadata    *getCurrentMetadata(void);
     Metadata    *getNextMetadata(void);
-    Metadata    *getDisplayMetadata(void) { return &m_displayMetadata; }
-    void         refreshMetadata(void);
     void         sendMetadataChangedEvent(int trackID);
     void         sendTrackStatsChangedEvent(int trackID);
     void         sendAlbumArtChangedEvent(int trackID);
