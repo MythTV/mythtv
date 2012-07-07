@@ -22,7 +22,7 @@ for search and retrieval of text metadata and image URLs from TMDB.
 Preliminary API specifications can be found at
 http://help.themoviedb.org/kb/api/about-3"""
 
-__version__="v0.6.6"
+__version__="v0.6.7"
 # 0.1.0 Initial development
 # 0.2.0 Add caching mechanism for API queries
 # 0.2.1 Temporary work around for broken search paging
@@ -49,6 +49,7 @@ __version__="v0.6.6"
 # 0.6.4 Add Genre list and associated Movie search
 # 0.6.5 Prevent data from being blanked out by subsequent queries
 # 0.6.6 Turn date processing errors into mutable warnings
+# 0.6.7 Add support for searching by year
 
 from request import set_key, Request
 from util import Datapoint, Datalist, Datadict, Element, NameRepr, SearchRepr
@@ -99,10 +100,31 @@ class Account( NameRepr, Element ):
     def locale(self):
         return get_locale(self.language, self.country)
 
-def searchMovie(query, locale=None, adult=False):
-    return MovieSearchResult(
-                    Request('search/movie', query=query, include_adult=adult),
-                    locale=locale)
+def searchMovie(query, locale=None, adult=False, year=None):
+    kwargs = {'query':query, 'include_adult':adult}
+    if year is not None:
+        try:
+            kwargs['year'] = year.year
+        except AttributeError:
+            kwargs['year'] = year
+    return MovieSearchResult(Request('search/movie', **kwargs), locale=locale)
+
+def searchMovieWithYear(query, locale=None, adult=False):
+    year = None
+    if (len(query) > 6) and (query[-1] == ')') and (query[-6] == '('):
+        # simple syntax check, no need for regular expression
+        try:
+            year = int(query[-5:-1])
+        except ValueError:
+            pass
+        else:
+            if 1885 < year < 2050:
+                # strip out year from search
+                query = query[:-7]
+            else:
+                # sanity check on resolved year failed, pass through
+                year = None
+    return searchMovie(query, locale, adult, year)
 
 class MovieSearchResult( SearchRepr, PagedRequest ):
     """Stores a list of search matches."""

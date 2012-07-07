@@ -111,6 +111,16 @@ out. The people search method behaves similarly.
   >>> res[0]
   <Studio 'Sony Pictures'>
 
+The movieSearch() method accepts a 'year' keyword, tell tell TMDB to filter
+for movies of only that specific year. There is a helper method,
+movieSearchWithYear(), which will process the release year from movie names
+where the year is contained in parentheses, as in:
+
+  >>> from tmdb import searchMovieWithYear
+  >>> list(searchMovieWithYear('Star Wars (1977)'))
+  [<Movie 'Star Wars: Episode IV - A New Hope' (1977)>,
+                <Movie 'The Making of 'Star Wars'' (1977)>]
+
 
 ## Direct Queries
 
