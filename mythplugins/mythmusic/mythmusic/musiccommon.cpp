@@ -171,7 +171,7 @@ bool MusicCommon::CreateCommon(void)
     {
         // if we are playing but we are switching to a view from a different playmode
         // we need to restart playback in the new mode
-        if (m_currentView == MV_VISUALIZER)
+        if (m_currentView == MV_VISUALIZER || m_currentView == MV_MINIPLAYER)
         {
             // this view can be used in both play modes
         }
