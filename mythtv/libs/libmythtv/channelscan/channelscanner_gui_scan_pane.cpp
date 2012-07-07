@@ -129,7 +129,7 @@ void ChannelScannerGUIScanPane::SetStatusText(const QString &value)
 
 void ChannelScannerGUIScanPane::SetStatusTitleText(const QString &value)
 {
-    QString msg = tr("Scan Progress") + QString(" %1").arg(value);
+    QString msg = tr("Scan Progress %1").arg(value);
     setLabel(msg);
 }
 
