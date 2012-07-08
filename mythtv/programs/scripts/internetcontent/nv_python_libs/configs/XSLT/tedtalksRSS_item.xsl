@@ -22,7 +22,7 @@
         within a single Xslt file
     -->
     <xsl:template match="/">
-        <xsl:if test="//channel/link='http://www.ted.com/talks/browse'">
+        <xsl:if test="//channel/link='http://www.ted.com/talks/list'">
             <xml>
                 <xsl:call-template name='tedtalksRSS'/>
             </xml>
