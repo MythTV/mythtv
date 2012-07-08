@@ -310,6 +310,8 @@ void MythSystemManager::run(void)
                 LOG(VB_SYSTEM, LOG_ERR,
                     QString("Structure for child PID %1 already deleted!")
                     .arg(pid));
+                if (ms)
+                    ms->DecrRef();
                 continue;
             }
 
@@ -507,7 +509,10 @@ void MythSystemSignalManager::run(void)
             if (!ms)
                 continue;
 
-            ms->m_parent->HandlePostRun();
+            if (ms->m_parent)
+            {
+                ms->m_parent->HandlePostRun();
+            }
 
             if (ms->m_stdpipe[0] > 0)
                 writeThread->remove(ms->m_stdpipe[0]);
@@ -521,13 +526,16 @@ void MythSystemSignalManager::run(void)
                 readThread->remove(ms->m_stdpipe[2]);
             CLOSE(ms->m_stdpipe[2]);
 
-            if (ms->GetStatus() == GENERIC_EXIT_OK)
-                emit ms->finished();
-            else
-                emit ms->error(ms->GetStatus());
+            if (ms->m_parent)
+            {
+                if (ms->GetStatus() == GENERIC_EXIT_OK)
+                    emit ms->finished();
+                else
+                    emit ms->error(ms->GetStatus());
 
-            ms->disconnect();
-            ms->Unlock();
+                ms->disconnect();
+                ms->Unlock();
+            }
 
             ms->DecrRef();
         }
