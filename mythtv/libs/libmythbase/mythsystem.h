@@ -32,6 +32,9 @@ typedef enum MythSystemMask {
 #include <QBuffer>
 #include <QSemaphore>
 #include <QMap>
+#include <QPointer>
+
+#include "referencecounter.h"
 
 typedef QMap<QString, bool> Setting_t;
 
@@ -135,11 +138,13 @@ class MBASE_PUBLIC MythSystem : public QObject
         QBuffer     m_stdbuff[3];
 };
 
-class MBASE_PUBLIC MythSystemPrivate : public QObject
+class MBASE_PUBLIC MythSystemPrivate : public QObject, public ReferenceCounter
 {
     Q_OBJECT
 
     public:
+        MythSystemPrivate(const QString &debugName);
+
         virtual void Fork(time_t timeout) = 0;
         virtual void Manage() = 0;
 
@@ -151,7 +156,7 @@ class MBASE_PUBLIC MythSystemPrivate : public QObject
                                 QStringList &args) = 0;
 
     protected:
-        MythSystem *m_parent;
+        QPointer<MythSystem> m_parent;
 
         uint GetStatus()             { return m_parent->GetStatus(); };
         void SetStatus(uint status)  { m_parent->SetStatus(status); };

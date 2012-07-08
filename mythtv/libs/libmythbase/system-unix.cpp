@@ -305,7 +305,7 @@ void MythSystemManager::run(void)
 
             // Occasionally, the caller has deleted the structure from under
             // our feet.  If so, just log and move on.
-            if (!ms)
+            if (!ms || !ms->m_parent)
             {
                 LOG(VB_SYSTEM, LOG_ERR,
                     QString("Structure for child PID %1 already deleted!")
@@ -438,6 +438,7 @@ void MythSystemManager::run(void)
 void MythSystemManager::append(MythSystemUnix *ms)
 {
     m_mapLock.lock();
+    ms->IncrRef();
     m_pMap.insert(ms->m_pid, ms);
     m_mapLock.unlock();
 
@@ -526,13 +527,9 @@ void MythSystemSignalManager::run(void)
                 emit ms->error(ms->GetStatus());
 
             ms->disconnect();
-
-            bool cleanup = ms->m_parent->doAutoCleanup();
-
             ms->Unlock();
 
-            if( cleanup )
-                ms->deleteLater();
+            ms->DecrRef();
         }
     }
     RunEpilog();
@@ -542,7 +539,8 @@ void MythSystemSignalManager::run(void)
  * MythSystem method defines
  ******************************/
 
-MythSystemUnix::MythSystemUnix(MythSystem *parent)
+MythSystemUnix::MythSystemUnix(MythSystem *parent) :
+    MythSystemPrivate("MythSystemUnix")
 {
     m_parent = parent;
 

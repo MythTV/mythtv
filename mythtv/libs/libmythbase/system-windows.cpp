@@ -395,6 +395,7 @@ void MythSystemManager::ChildListRebuild()
 void MythSystemManager::append(MythSystemWindows *ms)
 {
     m_mapLock.lock();
+    ms->IncrRef();
     m_pMap.insert(ms->m_child, ms);
     ChildListRebuild();
     m_mapLock.unlock();
@@ -477,11 +478,9 @@ void MythSystemSignalManager::run(void)
                 emit ms->error(ms->GetStatus());
 
             ms->disconnect();
-
             ms->Unlock();
 
-            if( ms->m_parent->doAutoCleanup() )
-                delete ms;
+            ms->DecrRef();
         }
     }
 
@@ -492,7 +491,8 @@ void MythSystemSignalManager::run(void)
  * MythSystem method defines
  ******************************/
 
-MythSystemWindows::MythSystemWindows(MythSystem *parent)
+MythSystemWindows::MythSystemWindows(MythSystem *parent) :
+    MythSystemPrivate("MythSystemWindows")
 {
     m_parent = parent;
 
