@@ -496,38 +496,38 @@ MythSystemWindows::MythSystemWindows(MythSystem *parent) :
 {
     m_parent = parent;
 
-    connect( this, SIGNAL(started()), m_parent, SIGNAL(started()) );
-    connect( this, SIGNAL(finished()), m_parent, SIGNAL(finished()) );
-    connect( this, SIGNAL(error(uint)), m_parent, SIGNAL(error(uint)) );
-    connect( this, SIGNAL(readDataReady(int)), m_parent, SIGNAL(readDataReady(int)) );
+    connect(this, SIGNAL(started()), m_parent, SIGNAL(started()));
+    connect(this, SIGNAL(finished()), m_parent, SIGNAL(finished()));
+    connect(this, SIGNAL(error(uint)), m_parent, SIGNAL(error(uint)));
+    connect(this, SIGNAL(readDataReady(int)),
+            m_parent, SIGNAL(readDataReady(int)));
 
     // Start the threads if they haven't been started yet.
-    if( manager == NULL )
+    if (manager == NULL)
     {
         manager = new MythSystemManager;
         manager->start();
     }
 
-    if( smanager == NULL )
+    if (smanager == NULL)
     {
         smanager = new MythSystemSignalManager;
         smanager->start();
     }
 
-    if( readThread == NULL )
+    if (readThread == NULL)
     {
         readThread = new MythSystemIOHandler(true);
         readThread->start();
     }
 
-    if( writeThread == NULL )
+    if (writeThread == NULL)
     {
         writeThread = new MythSystemIOHandler(false);
         writeThread->start();
     }
 }
 
-// QBuffers may also need freeing
 MythSystemWindows::~MythSystemWindows(void)
 {
 }

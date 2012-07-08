@@ -484,18 +484,18 @@ void MythSystemSignalManager::run(void)
 {
     RunProlog();
     LOG(VB_GENERAL, LOG_INFO, "Starting process signal handler");
-    while( run_system )
+    while (run_system)
     {
         struct timespec ts;
         ts.tv_sec = 0;
         ts.tv_nsec = 50 * 1000 * 1000; // 50ms
         nanosleep(&ts, NULL); // sleep 50ms
 
-        while( run_system )
+        while (run_system)
         {
             // handle cleanup and signalling for closed processes
             listLock.lock();
-            if( msList.isEmpty() )
+            if (msList.isEmpty()) 
             {
                 listLock.unlock();
                 break;
@@ -521,7 +521,7 @@ void MythSystemSignalManager::run(void)
                 readThread->remove(ms->m_stdpipe[2]);
             CLOSE(ms->m_stdpipe[2]);
 
-            if( ms->GetStatus() == GENERIC_EXIT_OK )
+            if (ms->GetStatus() == GENERIC_EXIT_OK)
                 emit ms->finished();
             else
                 emit ms->error(ms->GetStatus());
@@ -544,10 +544,11 @@ MythSystemUnix::MythSystemUnix(MythSystem *parent) :
 {
     m_parent = parent;
 
-    connect( this, SIGNAL(started()), m_parent, SIGNAL(started()) );
-    connect( this, SIGNAL(finished()), m_parent, SIGNAL(finished()) );
-    connect( this, SIGNAL(error(uint)), m_parent, SIGNAL(error(uint)) );
-    connect( this, SIGNAL(readDataReady(int)), m_parent, SIGNAL(readDataReady(int)) );
+    connect(this, SIGNAL(started()), m_parent, SIGNAL(started()));
+    connect(this, SIGNAL(finished()), m_parent, SIGNAL(finished()));
+    connect(this, SIGNAL(error(uint)), m_parent, SIGNAL(error(uint)));
+    connect(this, SIGNAL(readDataReady(int)),
+            m_parent, SIGNAL(readDataReady(int)));
 
     // Start the threads if they haven't been started yet.
     if( manager == NULL )
@@ -575,7 +576,6 @@ MythSystemUnix::MythSystemUnix(MythSystem *parent) :
     }
 }
 
-// QBuffers may also need freeing
 MythSystemUnix::~MythSystemUnix(void)
 {
 }
