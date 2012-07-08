@@ -2260,7 +2260,6 @@ NULL
 "  `storagegroup`   VARCHAR(32) NOT NULL DEFAULT 'Default',"
 "  `filename`       VARCHAR(255) NOT NULL DEFAULT '',"
 "  PRIMARY KEY (`fileid`),"
-"  UNIQUE KEY path (`storagegroup`, `hostname`, `filename`)"
 ") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
 "CREATE TABLE videopart ("
 "  `fileid`         BIGINT(20) UNSIGNED NOT NULL,"
@@ -2270,6 +2269,9 @@ NULL
 ") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
 NULL
 };
+
+// removed "UNIQUE KEY path (`storagegroup`, `hostname`, `filename`)" from
+// scannerpath as a quick fix for key length constraints
 
         if (!performActualUpdate(&updates[0], "1307", dbver))
             return false;
