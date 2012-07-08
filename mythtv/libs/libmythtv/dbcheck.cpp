@@ -2240,6 +2240,41 @@ NULL
             return false;
     }
 
+    if (dbver == "1306")
+    {
+        // staging temporary tables to use with rewritten file scanner
+        // due to be replaced by finalized RecordedFile changes
+
+        const char *updates[] = {
+"CREATE TABLE scannerfile ("
+"  `fileid`         BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,"
+"  `filesize`       BIGINT(20) UNSIGNED NOT NULL DEFAULT 0,"
+"  `filehash`       VARCHAR(64) NOT NULL DEFAULT '',"
+"  `added`          DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,"
+"  PRIMARY KEY (`fileid`),"
+"  UNIQUE KEY filehash (`filehash`)"
+") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
+"CREATE TABLE scannerpath ("
+"  `fileid`         BIGINT(20) UNSIGNED NOT NULL,"
+"  `hostname`       VARCHAR(64) NOT NULL DEFAULT 'localhost',"
+"  `storagegroup`   VARCHAR(32) NOT NULL DEFAULT 'Default',"
+"  `filename`     VARCHAR(255) NOT NULL DEFAULT '',"
+"  PRIMARY KEY (`fileid`),"
+"  UNIQUE KEY path (`storagegroup`, `hostname`, `filename`)"
+") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
+"CREATE TABLE videopart ("
+"  `fileid`       BIGINT(20) UNSIGNED NOT NULL,"
+"  `videoid`      INT(10) UNSIGNED NOT NULL,"
+"  `order`        SMALLINT UNSIGNED NOT NULL DEFAULT 1,"
+"  PRIMARY KEY `part` (`videoid`, `order`)"
+") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
+NULL
+};
+
+        if (!performActualUpdate(&updates[0], "1307", dbver))
+            return false;
+    }
+
     return true;
 }
 
