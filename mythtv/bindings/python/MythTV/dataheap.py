@@ -612,6 +612,7 @@ class Job( DBDataWrite, JOBTYPE, JOBCMD, JOBFLAG, JOBSTATUS ):
     def fromRecorded(cls, rec, type, status=None, schedruntime=None,
                                hostname=None, args=None, flags=None):
         job = cls(db=rec._db)
+        job.type = type
         job.chanid = rec.chanid
         job.starttime = rec.starttime
         if status:
@@ -632,6 +633,7 @@ class Job( DBDataWrite, JOBTYPE, JOBCMD, JOBFLAG, JOBSTATUS ):
         if prog.rectype != prog.rsRecorded:
             raise MythError('Invalid recording type for Job.')
         job = cls(db=prog._db)
+        job.type = type
         job.chanid = prog.chanid
         job.starttime = prog.recstartts
         if status:
