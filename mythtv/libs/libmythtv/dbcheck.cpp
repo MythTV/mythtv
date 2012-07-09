@@ -2259,7 +2259,7 @@ NULL
 "  `hostname`       VARCHAR(64) NOT NULL DEFAULT 'localhost',"
 "  `storagegroup`   VARCHAR(32) NOT NULL DEFAULT 'Default',"
 "  `filename`       VARCHAR(255) NOT NULL DEFAULT '',"
-"  PRIMARY KEY (`fileid`),"
+"  PRIMARY KEY (`fileid`)"
 ") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
 "CREATE TABLE videopart ("
 "  `fileid`         BIGINT(20) UNSIGNED NOT NULL,"
