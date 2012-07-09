@@ -1265,8 +1265,8 @@ MuteState MusicPlayer::getMuteState(void) const
 
 void MusicPlayer::toMap(QHash<QString, QString> &map)
 {
-    map["volumemute"] = QString("%1%").arg(getVolume()) +
-                        (isMuted() ? " (" + tr("Muted") + ")" : "");
+    map["volumemute"] = isMuted() ? tr("%1% (Muted)", "Zero Audio Volume").arg(getVolume()) :
+                                    QString("%1%").arg(getVolume());
     map["volume"] = QString("%1").arg(getVolume());
     map["volumepercent"] = QString("%1%").arg(getVolume());
     map["mute"] = isMuted() ? tr("Muted") : "";
