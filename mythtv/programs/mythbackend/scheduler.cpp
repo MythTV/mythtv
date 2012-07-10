@@ -1977,7 +1977,8 @@ int Scheduler::CalcTimeToNextHandleRecordingEvent(
 
         int secs_to_next = curtime.secsTo((*i)->GetRecordingStartTime());
 
-        if (!recPendingList[(*i)->MakeUniqueSchedulerKey()])
+        if ((*i)->GetRecordingStatus() == rsWillRecord &&
+            !recPendingList[(*i)->MakeUniqueSchedulerKey()])
             secs_to_next -= 30;
 
         if (secs_to_next < 0)
