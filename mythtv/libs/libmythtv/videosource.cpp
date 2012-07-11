@@ -2020,8 +2020,7 @@ void CetonDeviceID::UpdateValues(void)
     }
 }
 
-CetonConfigurationGroup::CetonConfigurationGroup
-        (CaptureCard& a_parent) :
+CetonConfigurationGroup::CetonConfigurationGroup(CaptureCard& a_parent) :
     VerticalConfigurationGroup(false, true, false, false),
     parent(a_parent)
 {
@@ -2049,8 +2048,6 @@ CetonConfigurationGroup::CetonConfigurationGroup
 
     connect(deviceid, SIGNAL(LoadedIP(const QString&)),
             ip,       SLOT(  LoadValue(const QString&)));
-    connect(deviceid, SIGNAL(LoadedCard(const QString&)),
-            card,     SLOT(  LoadValue(const QString&)));
     connect(deviceid, SIGNAL(LoadedTuner(const QString&)),
             tuner,    SLOT(  LoadValue(const QString&)));
 

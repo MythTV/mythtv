@@ -427,7 +427,6 @@ class CetonConfigurationGroup : public VerticalConfigurationGroup
     TransLabelSetting   *desc;
     CetonDeviceID       *deviceid;
     CetonSetting        *ip;
-    CetonSetting        *card;
     CetonSetting        *tuner;
 };
 
