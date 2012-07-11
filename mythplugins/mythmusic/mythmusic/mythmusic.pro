@@ -39,7 +39,7 @@ HEADERS += filescanner.h musicplayer.h miniplayer.h
 HEADERS += playlistcontainer.h
 HEADERS += musiccommon.h decoderhandler.h pls.h shoutcast.h
 HEADERS += playlistview.h playlisteditorview.h 
-HEADERS += visualizerview.h searchview.h musicutils.h
+HEADERS += visualizerview.h searchview.h streamview.h musicutils.h
 HEADERS += generalsettings.h visualizationsettings.h
 HEADERS += importsettings.h playersettings.h ratingsettings.h
 
@@ -61,7 +61,7 @@ SOURCES += filescanner.cpp musicplayer.cpp miniplayer.cpp
 SOURCES += playlistcontainer.cpp
 SOURCES += musiccommon.cpp decoderhandler.cpp pls.cpp shoutcast.cpp
 SOURCES += playlistview.cpp playlisteditorview.cpp 
-SOURCES += visualizerview.cpp searchview.cpp musicutils.cpp
+SOURCES += visualizerview.cpp searchview.cpp streamview.cpp musicutils.cpp
 SOURCES += generalsettings.cpp visualizationsettings.cpp
 SOURCES += importsettings.cpp playersettings.cpp ratingsettings.cpp
 

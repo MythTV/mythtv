@@ -355,21 +355,20 @@ void WelcomeDialog::updateScreen(void)
 
             if (tuner.isRecording)
             {
-                status = QObject::tr("Tuner %1 is recording:\n")
-                    .arg(tuner.id);
+                status = tr("Tuner %1 is recording:").arg(tuner.id);
+                status += "\n";
                 status += tuner.channame;
                 status += "\n" + tuner.title;
                 if (!tuner.subtitle.isEmpty())
                     status += "\n("+tuner.subtitle+")";
                 status += "\n" +
-                    QObject::tr("%1 to %2", "Time period, 'starttime to endtime'")
-                      .arg(MythDate::toString(tuner.startTime, MythDate::kTime))
-                      .arg(MythDate::toString(tuner.endTime, MythDate::kTime));
+                    tr("%1 to %2", "Time period, 'starttime to endtime'")
+                        .arg(MythDate::toString(tuner.startTime, MythDate::kTime))
+                        .arg(MythDate::toString(tuner.endTime, MythDate::kTime));
             }
             else
             {
-                status = QObject::tr("Tuner %1 is not recording")
-                    .arg(tuner.id);
+                status = tr("Tuner %1 is not recording").arg(tuner.id);
             }
 
             if (m_screenTunerNo < m_tunerList.size() - 1)

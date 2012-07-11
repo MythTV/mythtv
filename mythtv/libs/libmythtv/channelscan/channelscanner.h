@@ -30,6 +30,9 @@
 #ifndef _CHANNEL_SCANNER_H_
 #define _CHANNEL_SCANNER_H_
 
+// Qt headers
+#include <QCoreApplication>
+
 // MythTV headers
 #include "mythtvexp.h"
 #include "dtvconfparser.h"
@@ -47,6 +50,8 @@ class ChannelBase;
 
 class MTV_PUBLIC ChannelScanner
 {
+    Q_DECLARE_TR_FUNCTIONS(ChannelScanner) 
+
     friend class ScanMonitor;
 
   public:

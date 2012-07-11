@@ -25,7 +25,9 @@
 #define LOC     QString("MythCDROMLinux:")
 
 // On a mixed-mode disc (audio+data), set this to 0 to mount the data portion:
+#ifndef ASSUME_WANT_AUDIO
 #define ASSUME_WANT_AUDIO 1
+#endif
 
 
 // Some features cannot be detected (reliably) using the standard
@@ -434,6 +436,15 @@ MythMediaStatus MythCDROMLinux::checkMedia()
     // If we have tried to mount and failed, don't keep trying
     if (m_Status == MEDIASTAT_ERROR)
     {
+        // Check if an external agent (like Gnome/KDE) mounted the disk
+        if (isMounted())
+        {
+            onDeviceMounted();
+            // pretend we're NOTMOUNTED so setStatus emits a signal
+            m_Status = MEDIASTAT_NOTMOUNTED;
+            return setStatus(MEDIASTAT_MOUNTED, OpenedHere);
+        }
+
         LOG(VB_MEDIA, LOG_DEBUG, "Disc is unmountable?");
         if (OpenedHere)
             closeDevice();
@@ -538,18 +549,23 @@ MythMediaStatus MythCDROMLinux::checkMedia()
             }
             case CDS_AUDIO:
                 LOG(VB_MEDIA, LOG_DEBUG, "found an audio disk");
+                // pretend we're NOTMOUNTED so setStatus emits a signal
+                m_Status = MEDIASTAT_NOTMOUNTED;
                 m_MediaType = MEDIATYPE_AUDIO;
                 return setStatus(MEDIASTAT_USEABLE, OpenedHere);
                 break;
             case CDS_MIXED:
-                m_MediaType = MEDIATYPE_MIXED;
                 LOG(VB_MEDIA, LOG_DEBUG, "found a mixed CD");
                 // Note: Mixed mode CDs require an explixit mount call
                 //       since we'll usually want the audio portion.
                 // undefine ASSUME_WANT_AUDIO to change this behavior.
-                #ifdef ASSUME_WANT_AUDIO
+                #if ASSUME_WANT_AUDIO
+                    // pretend we're NOTMOUNTED so setStatus emits a signal
+                    m_Status = MEDIASTAT_NOTMOUNTED;
+                    m_MediaType = MEDIATYPE_AUDIO;
                     return setStatus(MEDIASTAT_USEABLE, OpenedHere);
                 #else
+                    m_MediaType = MEDIATYPE_MIXED;
                     mount();
                     if (isMounted())
                     {

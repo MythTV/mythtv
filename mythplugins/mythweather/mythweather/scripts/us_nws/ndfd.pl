@@ -22,9 +22,9 @@ use Getopt::Std;
 our ($opt_v, $opt_t, $opt_T, $opt_l, $opt_u, $opt_d); 
 
 my $name = 'NDFD-6_day';
-my $version = 0.3;
-my $author = 'Lucien Dunning';
-my $email = 'ldunning@gmail.com';
+my $version = 0.4;
+my $author = 'Gavin Hurlbut & Lucien Dunning';
+my $email = 'gjhurlbu@gmail.com';
 my $updateTimeout = 15*60;
 my $retrieveTimeout = 30;
 my @types = ('3dlocation', '6dlocation',  'updatetime', 
@@ -119,7 +119,8 @@ if (open (CACHE, "$dir/ndfd_cache_${latitude}_${longitude}")) {
 } 
 
 if ($getData) {
-    ($result, $creationdate) = NDFDParser::doParse($latitude, $longitude, $d1, $d2, $param);
+    my $unit = ($units eq "SI" ? "m" : "e");
+    ($result, $creationdate) = NDFDParser::doParse($latitude, $longitude, $d1, $d2, $unit, $param);
     # output cache
     open(CACHE, ">$dir/ndfd_cache_${latitude}_${longitude}") or 
         die "cannot open cache ($dir/ndfd_cache_${latitude}_${longitude}) for writing";
@@ -171,17 +172,9 @@ foreach $time (sort(keys(%$result))) {
     }
     my $geticon = 0;
     if ($lowindex <= 5 && $result->{$time}->{temperature_minimum}) { 
-        if ($units eq 'SI') {
-            $result->{$time}->{temperature_minimum} =
-                int ( (5/9) * ($result->{$time}->{temperature_minimum}-32));
-        }
         print "low-${lowindex}::$result->{$time}->{temperature_minimum}\n";
         $lowindex++;
     } elsif ($hiindex <= 5 && $result->{$time}->{temperature_maximum}) {
-        if ($units eq 'SI') {
-            $result->{$time}->{temperature_maximum} =
-                int ( (5/9) * ($result->{$time}->{temperature_maximum}-32));
-        }
         print "high-${hiindex}::$result->{$time}->{temperature_maximum}\n";
         $hiindex++;
         $geticon = 1;

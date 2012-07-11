@@ -55,6 +55,8 @@ class ShoutCastIODevice : public MusicIODevice
     ShoutCastIODevice(void);
     ~ShoutCastIODevice(void);
 
+    State getState(void) { return m_state; }
+
     void connectToUrl(const QUrl &url);
     void close(void);
     bool flush(void);
@@ -72,6 +74,7 @@ class ShoutCastIODevice : public MusicIODevice
   signals:
     void meta(const QString &metadata);
     void changedState(ShoutCastIODevice::State newstate);
+    void bufferStatus(int available, int max);
 
   private slots:
     void socketHostFound(void);
@@ -122,6 +125,7 @@ class DecoderIOFactoryShoutCast : public DecoderIOFactory
     void periodicallyCheckBuffered(void);
     void shoutcastMeta(const QString &metadata);
     void shoutcastChangedState(ShoutCastIODevice::State newstate);
+    void shoutcastBufferStatus(int available, int maxSize);
 
   private:
     int checkResponseOK(void);
@@ -133,6 +137,8 @@ class DecoderIOFactoryShoutCast : public DecoderIOFactory
 
     ShoutCastIODevice *m_input;
     uint m_prebuffer;
+
+    QTime m_lastStatusTime;
 };
 
 #endif /* SHOUTCAST_H_ */

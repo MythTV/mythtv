@@ -11,7 +11,7 @@ using namespace std;
 #include "mythtv/mythdb.h"
 #include "mythtv/schemawizard.h"
 
-const QString currentDatabaseVersion = "1019";
+const QString currentDatabaseVersion = "1020";
 
 static bool doUpgradeMusicDatabaseSchema(QString &dbver);
 
@@ -851,6 +851,29 @@ QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;")
 };
 
         if (!performActualUpdate(updates, "1019", dbver))
+            return false;
+    }
+
+    if (dbver == "1019")
+    {
+        const QString updates[] = {
+"DROP TABLE IF EXISTS music_radios;",
+"CREATE TABLE music_radios ("
+"    intid INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,"
+"    station VARCHAR(128) NOT NULL,"
+"    channel VARCHAR(128) NOT NULL,"
+"    url VARCHAR(128) NOT NULL,"
+"    logourl VARCHAR(128) NOT NULL,"
+"    genre VARCHAR(128) NOT NULL,"
+"    metaformat VARCHAR(128) NOT NULL,"
+"    format VARCHAR(10) NOT NULL,"
+"    INDEX (station),"
+"    INDEX (channel)"
+");",
+""
+};
+
+        if (!performActualUpdate(updates, "1020", dbver))
             return false;
     }
 

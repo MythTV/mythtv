@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mythburntheme>
     <!-- Example theme for MythBurn 3 recordings per page, with scene selection submenu -->
+    <!-- try the bold fonts instead -->
     <fonts>
-        <font size="23">FreeSans.ttf</font>
-        <font size="18">FreeSans.ttf</font>
-        <font size="16">FreeSans.ttf</font>
+        <font size="23">FreeSansBold.ttf</font>
+        <font size="18">FreeSansBold.ttf</font>
+        <font size="16">FreeSansBold.ttf</font>
 	</fonts>
 
     <intro filename="mythlogo_intro.mpg"/>

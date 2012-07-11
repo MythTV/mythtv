@@ -18,9 +18,9 @@ use NWSLocation;
 our ($opt_v, $opt_t, $opt_T, $opt_l, $opt_u, $opt_d); 
 
 my $name = 'NWS-XML';
-my $version = 0.3;
-my $author = 'Lucien Dunning';
-my $email = 'ldunning@gmail.com';
+my $version = 0.4;
+my $author = 'Gavin Hurlbut & Lucien Dunning';
+my $email = 'gjhurlbu@gmail.com';
 my $updateTimeout = 15*60;
 my $retrieveTimeout = 30;
 my @types = ('cclocation', 'station_id', 'latitude', 'longitude',
@@ -80,9 +80,9 @@ if (!(defined $opt_u && defined $loc && !$loc eq "")) {
 
 my $units = $opt_u;
 
-my $base_url = 'http://www.weather.gov/data/current_obs/';
-
-my $response = get $base_url . $loc . '.xml';
+my $base_url = 'http://w1.weather.gov/xml/current_obs/';
+my $url = $base_url . $loc . '.xml';
+my $response = get $url;
 die unless defined $response;
 
 my $xml = XMLin($response);

@@ -73,7 +73,7 @@ void MythUIClock::SetText(const QString &text)
 
     if (txt.isEmpty())
     {
-        m_Time = QDateTime::currentDateTime();
+        m_Time = MythDate::current();
         txt = GetTimeText();
     }
 

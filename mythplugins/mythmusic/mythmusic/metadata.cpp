@@ -28,8 +28,6 @@
 #include "playlistcontainer.h"
 #include "musicutils.h"
 
-
-
 // this is the global MusicData object shared thoughout MythMusic
 MusicData  *gMusicData = NULL;
 
@@ -47,6 +45,45 @@ bool operator!=(const Metadata& a, const Metadata& b)
     if (a.Filename() != b.Filename())
         return true;
     return false;
+}
+
+// this ctor is for radio streams
+Metadata::Metadata(int lid, QString lstation, QString lchannel, QString lurl, 
+                   QString llogourl, QString lgenre, QString lmetaformat, QString lformat)
+         :  m_artist(""),
+            m_compilation_artist(""),
+            m_album(""),
+            m_title(""),
+            m_formattedartist(""),
+            m_formattedtitle(""),
+            m_genre(lgenre),
+            m_format(lformat),
+            m_year(0),
+            m_tracknum(0),
+            m_trackCount(0),
+            m_length(0),
+            m_rating(0),
+            m_directoryid(-1),
+            m_artistid(-1),
+            m_compartistid(-1),
+            m_albumid(-1),
+            m_genreid(-1),
+            m_lastplay(QDateTime()),
+            m_templastplay(QDateTime()),
+            m_dateadded(QDateTime()),
+            m_playcount(0),
+            m_tempplaycount(0),
+            m_compilation(0),
+            m_albumArt(NULL),
+            m_id(lid),
+            m_filename(lurl),
+            m_changed(false),
+            m_station(lstation),
+            m_channel(lchannel),
+            m_logoUrl(llogourl),
+            m_metaFormat(lmetaformat)
+{
+    setRepo(RT_Radio);
 }
 
 Metadata::~Metadata()
@@ -89,6 +126,11 @@ Metadata& Metadata::operator=(const Metadata &rhs)
     m_albumArt = NULL;
     m_format = rhs.m_format;
     m_changed = rhs.m_changed;
+    m_fileSize = rhs.m_fileSize;
+    m_station = rhs.m_station;
+    m_channel = rhs.m_channel;
+    m_logoUrl = rhs.m_logoUrl;
+    m_metaFormat = rhs.m_metaFormat;
 
     return *this;
 }
@@ -172,6 +214,11 @@ bool Metadata::isInDatabase()
     bool retval = false;
 
     QString sqldir = m_filename.section('/', 0, -2);
+
+    // Filename is the absolute path, we want the relative path
+    if (sqldir.startsWith(gMusicData->musicDir))
+        sqldir.remove(0, gMusicData->musicDir.length());
+    
     QString sqlfilename = m_filename.section('/', -1);
 
     MSqlQuery query(MSqlQuery::InitCon());
@@ -181,7 +228,7 @@ bool Metadata::isInDatabase()
     "music_songs.year, music_songs.track, music_songs.length, "
     "music_songs.song_id, music_songs.rating, music_songs.numplays, "
     "music_songs.lastplay, music_albums.compilation, music_songs.format, "
-    "music_songs.track_count "
+    "music_songs.track_count, music_songs.size "
     "FROM music_songs "
     "LEFT JOIN music_directories "
     "ON music_songs.directory_id=music_directories.directory_id "
@@ -213,6 +260,7 @@ bool Metadata::isInDatabase()
         m_compilation = (query.value(12).toInt() > 0);
         m_format = query.value(13).toString();
         m_trackCount = query.value(14).toInt();
+        m_fileSize = (quint64)query.value(15).toULongLong();
 
         retval = true;
     }
@@ -394,16 +442,16 @@ void Metadata::dumpToDatabase()
     if (m_id < 1)
     {
         strQuery = "INSERT INTO music_songs ( directory_id,"
-                   " artist_id, album_id,  name,         genre_id,"
-                   " year,      track,     length,       filename,"
-                   " rating,    format,    date_entered, date_modified,"
-                   " numplays,  track_count) "
+                   " artist_id, album_id,    name,         genre_id,"
+                   " year,      track,       length,       filename,"
+                   " rating,    format,      date_entered, date_modified,"
+                   " numplays,  track_count, size) "
                    "VALUES ( "
                    " :DIRECTORY, "
-                   " :ARTIST,   :ALBUM,    :TITLE,       :GENRE,"
-                   " :YEAR,     :TRACKNUM, :LENGTH,      :FILENAME,"
-                   " :RATING,   :FORMAT,   :DATE_ADD,    :DATE_MOD,"
-                   " :PLAYCOUNT,:TRACKCOUNT );";
+                   " :ARTIST,   :ALBUM,      :TITLE,       :GENRE,"
+                   " :YEAR,     :TRACKNUM,   :LENGTH,      :FILENAME,"
+                   " :RATING,   :FORMAT,     :DATE_ADD,    :DATE_MOD,"
+                   " :PLAYCOUNT,:TRACKCOUNT, :SIZE );";
     }
     else
     {
@@ -422,6 +470,7 @@ void Metadata::dumpToDatabase()
                    ", date_modified = :DATE_MOD "
                    ", numplays = :PLAYCOUNT "
                    ", track_count = :TRACKCOUNT "
+                   ", size = :SIZE "
                    "WHERE song_id= :ID ;";
     }
 
@@ -447,6 +496,7 @@ void Metadata::dumpToDatabase()
         query.bindValue(":ID", m_id);
 
     query.bindValue(":TRACKCOUNT", m_trackCount);
+    query.bindValue(":SIZE", (quint64)m_fileSize);
 
     if (!query.exec())
         MythDB::DBError("Metadata::dumpToDatabase - updating music_songs",
@@ -700,7 +750,12 @@ void Metadata::toMap(MetadataMap &metadataMap, const QString &prefix)
     metadataMap[prefix + "artist"] = m_artist;
     metadataMap[prefix + "formatartist"] = FormatArtist();
     metadataMap[prefix + "compilationartist"] = m_compilation_artist;
-    metadataMap[prefix + "album"] = m_album;
+
+    if (m_album.isEmpty() && gPlayer->getPlayMode() == MusicPlayer::PLAYMODE_RADIO)
+        metadataMap[prefix + "album"] = QString("%1 - %2").arg(m_station).arg(m_channel);
+    else
+        metadataMap[prefix + "album"] = m_album;
+
     metadataMap[prefix + "title"] = m_title;
     metadataMap[prefix + "formattitle"] = FormatTitle();
     metadataMap[prefix + "tracknum"] = (m_tracknum > 0 ? QString("%1").arg(m_tracknum) : "");
@@ -727,8 +782,21 @@ void Metadata::toMap(MetadataMap &metadataMap, const QString &prefix)
         m_dateadded, kDateFull | kSimplify | kAddYear);
 
     metadataMap[prefix + "playcount"] = QString::number(m_playcount);
-    // FIXME we should use Filename() here but that will slow things down because of the hunt for the file
-    metadataMap[prefix + "filename"] = gMusicData->musicDir + m_filename;
+
+    QLocale locale = gCoreContext->GetQLocale();
+    QString tmpSize = locale.toString(m_fileSize *
+                                      (1.0 / (1024.0 * 1024.0)), 'f', 2);
+    metadataMap[prefix + "filesize"] = tmpSize;
+
+    metadataMap[prefix + "filename"] = m_filename;
+
+    // radio stream
+    metadataMap[prefix + "station"] = m_station;
+    metadataMap[prefix + "channel"] = m_channel;
+    metadataMap[prefix + "genre"] = m_genre;
+    metadataMap[prefix + "url"] = m_filename;
+    metadataMap[prefix + "logourl"] = m_logoUrl;
+    metadataMap[prefix + "metadataformat"] = m_metaFormat;
 }
 
 void Metadata::decRating()
@@ -1058,7 +1126,8 @@ void AllMusic::resync()
                      "music_songs.track, music_songs.length, music_songs.directory_id, "
                      "CONCAT_WS('/', music_directories.path, music_songs.filename) AS filename, "
                      "music_songs.rating, music_songs.numplays, music_songs.lastplay, music_songs.date_entered, "
-                     "music_albums.compilation, music_songs.format, music_songs.track_count "
+                     "music_albums.compilation, music_songs.format, music_songs.track_count, "
+                     "music_songs.size "
                      "FROM music_songs "
                      "LEFT JOIN music_directories ON music_songs.directory_id=music_directories.directory_id "
                      "LEFT JOIN music_artists ON music_songs.artist_id=music_artists.artist_id "
@@ -1108,6 +1177,7 @@ void AllMusic::resync()
                 mdata->setArtistId(query.value(1).toInt());
                 mdata->setAlbumId(query.value(4).toInt());
                 mdata->setTrackCount(query.value(19).toInt());
+                mdata->setFileSize((quint64)query.value(20).toULongLong());
 
                 //  Don't delete mdata, as PtrList now owns it
                 m_all_music.append(mdata);
@@ -1228,6 +1298,167 @@ Metadata* AllMusic::getCDMetadata(int the_track)
     return NULL;
 }
 
+/**************************************************************************/
+
+AllStream::AllStream(void)
+{
+    loadStreams();
+}
+
+AllStream::~AllStream(void)
+{
+    while (!m_streamList.empty())
+    {
+        delete m_streamList.back();
+        m_streamList.pop_back();
+    }
+}
+
+bool AllStream::isValidID(Metadata::IdType an_id)
+{
+    for (int x = 0; x < m_streamList.count(); x++)
+    {
+        if (m_streamList.at(x)->ID() == an_id)
+            return true;
+    }
+
+    return false;
+}
+
+Metadata *AllStream::getMetadata(Metadata::IdType an_id)
+{
+    for (int x = 0; x < m_streamList.count(); x++)
+    {
+        if (m_streamList.at(x)->ID() == an_id)
+            return m_streamList.at(x);
+    }
+
+    return NULL;
+}
+
+void AllStream::loadStreams(void)
+{
+    while (!m_streamList.empty())
+    {
+        delete m_streamList.back();
+        m_streamList.pop_back();
+    }
+
+    QString aquery = "SELECT intid, station, channel, url, logourl, genre, metaformat, format "
+                     "FROM music_radios "
+                     "ORDER BY station,channel;";
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    if (!query.exec(aquery))
+        MythDB::DBError("AllStream::loadStreams", query);
+
+    if (query.isActive() && query.size() > 0)
+    {
+        while (query.next())
+        {
+            Metadata *mdata = new Metadata(
+                    query.value(0).toInt(),        // intid
+                    query.value(1).toString(),     // station
+                    query.value(2).toString(),     // channel
+                    query.value(3).toString(),     // url
+                    query.value(4).toString(),     // logourl
+                    query.value(5).toString(),     // genre
+                    query.value(6).toString(),     // metadataformat
+                    query.value(7).toString());    // format
+
+            mdata->setRepo(RT_Radio);
+
+            m_streamList.append(mdata);
+        }
+    }
+    else
+    {
+        LOG(VB_GENERAL, LOG_WARNING, "MythMusic hasn't found any radio streams!");
+    }
+}
+
+void AllStream::addStream(Metadata* mdata)
+{
+    // add the stream to the db
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("INSERT INTO music_radios (station, channel, url, logourl, genre, format, metaformat) " 
+                  "VALUES (:STATION, :CHANNEL, :URL, :LOGOURL, :GENRE, :FORMAT, :METAFORMAT);");
+    query.bindValue(":STATION", mdata->Station());
+    query.bindValue(":CHANNEL", mdata->Channel());
+    query.bindValue(":URL", mdata->Url());
+    query.bindValue(":LOGOURL", mdata->LogoUrl());
+    query.bindValue(":GENRE", mdata->Genre());
+    query.bindValue(":FORMAT", mdata->Format());
+    query.bindValue(":METAFORMAT", mdata->MetadataFormat());
+
+    if (!query.exec() || !query.isActive() || query.numRowsAffected() <= 0)
+    {
+        MythDB::DBError("music insert radio", query);
+        return;
+    }
+
+    mdata->setID(query.lastInsertId().toInt());
+    mdata->setRepo(RT_Radio);
+
+    loadStreams();
+    createPlaylist();
+}
+
+void AllStream::removeStream(Metadata* mdata)
+{
+    // remove the stream from the db
+    int id = ID_TO_ID(mdata->ID());
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("DELETE FROM music_radios WHERE intid = :ID");
+    query.bindValue(":ID", id);
+
+    if (!query.exec() || query.numRowsAffected() <= 0)
+    {
+        MythDB::DBError("AllStream::removeStream", query);
+        return;
+    }
+
+    loadStreams();
+    createPlaylist();
+}
+
+void AllStream::updateStream(Metadata* mdata)
+{
+    // update the stream in the db
+    int id = ID_TO_ID(mdata->ID());
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("UPDATE music_radios set station = :STATION, channel = :CHANNEL, url = :URL, "
+                  "logourl = :LOGOURL, genre = :GENRE, format = :FORMAT, metaformat = :METAFORMAT " 
+                  "WHERE intid = :ID");
+    query.bindValue(":STATION", mdata->Station());
+    query.bindValue(":CHANNEL", mdata->Channel());
+    query.bindValue(":URL", mdata->Url());
+    query.bindValue(":LOGOURL", mdata->LogoUrl());
+    query.bindValue(":GENRE", mdata->Genre());
+    query.bindValue(":FORMAT", mdata->Format());
+    query.bindValue(":METAFORMAT", mdata->MetadataFormat());
+    query.bindValue(":ID", id);
+
+    if (!query.exec() || !query.isActive() || query.numRowsAffected() <= 0)
+    {
+        MythDB::DBError("AllStream::updateStream", query);
+        return;
+    }
+
+    loadStreams();
+    createPlaylist();
+}
+
+void AllStream::createPlaylist(void)
+{
+    gMusicData->all_playlists->getStreamPlaylist()->removeAllTracks();
+
+    for (int x = 0; x < m_streamList.count(); x++)
+    {
+        Metadata *mdata = m_streamList.at(x);
+        gMusicData->all_playlists->getStreamPlaylist()->addTrack(mdata->ID(), false);
+    }
+}
 
 /**************************************************************************/
 
@@ -1263,13 +1494,14 @@ void AlbumArtImages::findImages(void)
     if (repo == RT_Radio)
     {
         MSqlQuery query(MSqlQuery::InitCon());
-        query.prepare("SELECT logourl FROM music_radios WHERE intid = :ID;");
-        query.bindValue(":ID", trackid);
+        query.prepare("SELECT logourl FROM music_radios WHERE url = :URL;");
+        query.bindValue(":URL", m_parent->Filename());
         if (query.exec())
         {
             while (query.next())
             {
                 QString logoUrl = query.value(0).toString();
+
                 AlbumArtImage *image = new AlbumArtImage();
                 image->id = -1;
                 image->filename = logoUrl;
@@ -1554,6 +1786,7 @@ MusicData::MusicData(void)
 {
     all_playlists = NULL;
     all_music = NULL;
+    all_streams = NULL;
     initialized = false;
 }
 
@@ -1569,6 +1802,12 @@ MusicData::~MusicData(void)
     {
         delete all_music;
         all_music = NULL;
+    }
+
+    if (all_streams)
+    {
+        delete all_streams;
+        all_streams = NULL;
     }
 }
 

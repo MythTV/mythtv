@@ -496,7 +496,7 @@ DTC::LogMessageList *Myth::GetLogs(  const QString   &HostName,
             pLogMessage->setFilename( query.value(5).toString() );
             pLogMessage->setLine( query.value(6).toInt() );
             pLogMessage->setFunction( query.value(7).toString() );
-            pLogMessage->setTime( query.value(8).toDateTime() );
+            pLogMessage->setTime(MythDate::as_utc(query.value(8).toDateTime()));
             pLogMessage->setLevel( logLevelGetName(
                                        (LogLevel_t)query.value(9).toInt()) );
             pLogMessage->setMessage( query.value(10).toString() );

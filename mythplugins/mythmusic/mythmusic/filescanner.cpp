@@ -266,6 +266,7 @@ void FileScanner::AddFileToDB(const QString &filename)
         LOG(VB_FILE, LOG_INFO,
             QString("Reading metadata from %1").arg(filename));
         Metadata *data = decoder->readMetadata();
+        data->setFileSize((quint64)QFileInfo(filename).size());
         if (data)
         {
             QString album_cache_string;
@@ -491,8 +492,20 @@ void FileScanner::UpdateFileInDB(const QString &filename)
 
         if (db_meta && disk_meta)
         {
+            if (db_meta->ID() <= 0)
+            {
+                LOG(VB_GENERAL, LOG_ERR, QString("Asked to update track with "
+                                                 "invalid ID - %1")
+                                                .arg(db_meta->ID()));
+                delete disk_meta;
+                delete db_meta;
+                return;
+            }
+            
             disk_meta->setID(db_meta->ID());
             disk_meta->setRating(db_meta->Rating());
+            if (db_meta->PlayCount() > disk_meta->PlayCount())
+                disk_meta->setPlaycount(db_meta->Playcount());
 
             QString album_cache_string;
 
@@ -518,6 +531,8 @@ void FileScanner::UpdateFileInDB(const QString &filename)
             if (gid > 0)
                 disk_meta->setGenreId(gid);
 
+            disk_meta->setFileSize((quint64)QFileInfo(filename).size());
+            
             // Commit track info to database
             disk_meta->dumpToDatabase();
 

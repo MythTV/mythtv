@@ -2,6 +2,7 @@
 #define PROFILEGROUP_H
 
 #include <QString>
+#include <QCoreApplication>
 
 #include "mythtvexp.h"
 #include "settings.h"
@@ -28,6 +29,8 @@ class ProfileGroupStorage : public SimpleDBStorage
 
 class ProfileGroup : public ConfigurationWizard
 {
+    Q_DECLARE_TR_FUNCTIONS(ProfileGroup)
+
     friend class ProfileGroupEditor;
   protected:
     class ID : public AutoIncrementDBSetting

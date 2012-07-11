@@ -10,6 +10,7 @@
 MiniPlayer::MiniPlayer(MythScreenStack *parent)
           : MusicCommon(parent, "music_miniplayer")
 {
+    m_currentView = MV_MINIPLAYER;
     m_displayTimer = new QTimer(this);
     m_displayTimer->setSingleShot(true);
     connect(m_displayTimer, SIGNAL(timeout()), this, SLOT(timerTimeout()));

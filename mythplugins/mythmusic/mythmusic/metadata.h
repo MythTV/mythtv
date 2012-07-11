@@ -2,7 +2,6 @@
 #define METADATA_H_
 
 // C/C++
-#include <vector>
 #include <iostream>
 #include <stdint.h>
 
@@ -15,10 +14,11 @@ using namespace std;
 #include <QImage>
 #include <QMetaType>
 
-
 // mythtv
 #include "mythexp.h"
 #include <mthread.h>
+
+
 
 // mythmusic
 
@@ -112,10 +112,19 @@ class Metadata
                    m_albumArt(NULL),
                    m_id(lid),
                    m_filename(lfilename),
-                   m_changed(false)
+                   m_fileSize(0),
+                   m_changed(false),
+                   m_station(""),
+                   m_channel(""),
+                   m_logoUrl(""),
+                   m_metaFormat("")
+
     {
         checkEmptyFields();
     }
+
+    Metadata(int lid, QString lstation, QString lchannel, QString lurl, QString llogourl,
+             QString lgenre, QString lmetaformat, QString lformat);
 
     ~Metadata();
 
@@ -191,6 +200,9 @@ class Metadata
     QString Filename(bool find = true) const;
     void setFilename(const QString &lfilename) { m_filename = lfilename; }
 
+    uint64_t FileSize() const;
+    void setFileSize(uint64_t lfilesize) { m_fileSize = lfilesize; }
+
     QString Format() const { return m_format; }
     void setFormat(const QString &lformat) { m_format = lformat; }
 
@@ -214,6 +226,21 @@ class Metadata
         m_formattedtitle.clear();
     }
     bool determineIfCompilation(bool cd = false);
+
+    void setStation(const QString &station) { m_station = station; }
+    QString Station(void) { return m_station; }
+
+    void setChannel(const QString &channel) { m_channel = channel; }
+    QString Channel(void) { return m_channel; }
+
+    void setUrl(const QString &url) { m_filename = url; }
+    QString Url(void) { return m_filename; }
+
+    void setLogoUrl(const QString &logourl) { m_logoUrl = logourl; }
+    QString LogoUrl(void) { return m_logoUrl; }
+
+    void setMetadataFormat(const QString &metaformat) { m_metaFormat = metaformat; }
+    QString MetadataFormat(void) { return m_metaFormat; }
 
     void setEmbeddedAlbumArt(AlbumArtList &albumart);
 
@@ -276,7 +303,14 @@ class Metadata
 
     IdType   m_id;
     QString  m_filename;
+    uint64_t  m_fileSize;
     bool     m_changed;
+
+    // radio stream stuff
+    QString m_station;
+    QString m_channel;
+    QString m_logoUrl;
+    QString m_metaFormat;
 
     // Various formatting strings
     static QString m_formatnormalfileartist;
@@ -369,6 +403,33 @@ class AllMusic
     double                   m_lastplayMax;
 };
 
+typedef QList<Metadata*> StreamList;
+
+class AllStream
+{
+  public:
+
+    AllStream(void);
+    ~AllStream();
+
+    void loadStreams(void);
+
+    bool isValidID(Metadata::IdType an_id);
+
+    Metadata*   getMetadata(Metadata::IdType an_id);
+
+    StreamList *getStreams(void) { return &m_streamList; }
+
+    void addStream(Metadata *mdata);
+    void removeStream(Metadata *mdata);
+    void updateStream(Metadata *mdata);
+
+    void createPlaylist(void);
+
+  private:
+    StreamList m_streamList;
+};
+
 //----------------------------------------------------------------------------
 
 class MusicData : public QObject
@@ -387,6 +448,7 @@ class MusicData : public QObject
     QString             musicDir;
     PlaylistContainer  *all_playlists;
     AllMusic           *all_music;
+    AllStream          *all_streams;
     bool                initialized;
 };
 

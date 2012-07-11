@@ -493,6 +493,7 @@ void LoggerThread::launchLogServer(void)
 
         MythSystem ms(GetInstallPrefix() + "/bin/mythlogserver", args, mask);
         ms.Run();
+        ms.Wait(0);
     }
 }
 

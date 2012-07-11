@@ -362,9 +362,32 @@ bool DVDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
         LOG(VB_GENERAL, LOG_INFO,
             LOC + QString("There are %1 titles on the disk")
                 .arg(num_titles));
-     }
+    }
 
-    dvdnav_title_play(m_dvdnav, 1);
+    int startTitle = 1;
+    dvdnav_status_t result;
+    while (startTitle <= num_titles)
+    {
+        result = dvdnav_title_play(m_dvdnav, startTitle);
+        if (result == DVDNAV_STATUS_OK)
+            break;
+        else if (startTitle < num_titles)
+            LOG(VB_GENERAL, LOG_WARNING, QString("Unable to play DVD title %1, "
+                                                 "trying next title")
+                                                    .arg(startTitle));
+        startTitle++;
+    }
+
+    if (result == DVDNAV_STATUS_ERR)
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("Unable to play any title on this "
+                                         "DVD. Disc may be damaged or "
+                                         "corrupted as a means of copy "
+                                         "protection."));
+
+        rwlock.unlock();
+        return false;
+    }
 
     // Check we aren't starting in a still frame (which will probably fail as
     // ffmpeg will be unable to create a decoder)

@@ -68,9 +68,13 @@ class MUI_PUBLIC MythUIButtonListItem
     bool HasImage(const QString &name="")
     {
         MythImage *img = GetImage(name);
-        bool ret = img;
-        img->DecrRef();
-        return ret;
+        if (img)
+        {
+            img->DecrRef();
+            return true;
+        }
+
+        return false;
     }
 
     void SetImage(const QString &filename, const QString &name="",
