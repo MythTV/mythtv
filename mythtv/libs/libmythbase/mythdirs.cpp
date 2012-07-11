@@ -40,11 +40,15 @@ void InitializeMythDirs(void)
         // executable directory. This can be fragile on Unix, so
         // use relative PREFIX values with care.
 
-        LOG(VB_GENERAL, LOG_DEBUG, 
-            "Relative PREFIX! (" + installprefix + ")\n\t\tappDir=" +
-            prefixDir.canonicalPath());
+        LOG(VB_GENERAL, LOG_DEBUG, QString("Relative PREFIX! (%1), appDir=%2")
+            .arg(installprefix) .arg(prefixDir.canonicalPath()));
 
-        prefixDir.cd(installprefix);
+        if (!prefixDir.cd(installprefix))
+        {
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("Relative PREFIX does not resolve, using %1")
+                .arg(prefixDir.canonicalPath()));
+        }
         installprefix = prefixDir.canonicalPath();
     }
 

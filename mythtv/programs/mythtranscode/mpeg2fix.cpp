@@ -1655,7 +1655,11 @@ int MPEG2fixup::ConvertToI(FrameList *orderedFrames, int headPos)
     {
         int i = GetFrameNum((*it));
         if ((spare = DecodeToFrame(i, headPos == 0)) == NULL)
-            return 1;
+        {
+            LOG(VB_GENERAL, LOG_WARNING,
+                QString("ConvertToI skipping undecoded frame #%1").arg(i));
+            continue;
+        }
 
         if (GetFrameTypeT(spare) == 'I')
             continue;
