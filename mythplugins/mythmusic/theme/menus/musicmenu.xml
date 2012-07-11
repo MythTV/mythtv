@@ -5,13 +5,13 @@
       <text>Play Music</text>
       <action>MUSIC_PLAY</action>
    </button>
-<!--
+
    <button>
       <type>STREAM_PLAY</type>
-      <text>Play Streams</text>
+      <text>Play Radio Streams</text>
       <action>STREAM_PLAY</action>
    </button>
-   -->
+
    <button>
       <type>MUSIC_PLAYLIST</type>
       <text>Select Music</text>
@@ -42,7 +42,7 @@
       <action>EJECT</action>
    </button>
 
-    <!-- Keep this in synch with mythtv/themes/defaultmenu/media_settings.xml -->
+   <!-- Keep this in synch with mythtv/themes/defaultmenu/media_settings.xml -->
    <button>
      <type>SETTINGS_MUSIC</type>
      <text>Music Settings</text>

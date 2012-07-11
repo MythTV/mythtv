@@ -4,6 +4,7 @@
 // qt
 #include <QDir>
 #include <QtPlugin>
+#include <QImageReader>
 
 // myth
 #include <mythcontext.h>
@@ -131,9 +132,17 @@ static void setupKeys(void)
     REG_MEDIA_HANDLER(QT_TRANSLATE_NOOP("MythControls",
         "MythGallery Media Handler 1/2"), "", "", handleMedia,
         MEDIATYPE_DATA | MEDIATYPE_MIXED, QString::null);
+    QString filt;
+    Q_FOREACH(QByteArray format, QImageReader::supportedImageFormats())
+    {
+        if (filt.isEmpty())
+            filt = format;
+        else
+            filt += "," + format;
+    }
     REG_MEDIA_HANDLER(QT_TRANSLATE_NOOP("MythControls",
         "MythGallery Media Handler 2/2"), "", "", handleMedia,
-        MEDIATYPE_MGALLERY, "gif,jpg,png");
+        MEDIATYPE_MGALLERY, filt);
 }
 
 int mythplugin_init(const char *libversion)

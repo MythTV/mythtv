@@ -2443,8 +2443,8 @@ QString MythCommandLineParser::GetLogFilePath(void)
 
     logdir  = finfo.filePath();
     logfile = QCoreApplication::applicationName() + "." +
-              QDateTime::currentDateTime().toString("yyyyMMddhhmmss") +
-              QString(".%1").arg(pid) + ".log";
+        MythDate::toString(MythDate::current(), MythDate::kFilename) +
+        QString(".%1").arg(pid) + ".log";
 
     SetValue("logdir", logdir);
     SetValue("logfile", logfile);

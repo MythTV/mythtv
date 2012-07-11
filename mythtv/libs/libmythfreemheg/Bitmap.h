@@ -69,6 +69,8 @@ class MHBitmap : public MHVisible
     int     m_nXDecodeOffset, m_nYDecodeOffset;
 
     MHBitmapDisplay  *m_pContent; // Pointer to current image if any.
+
+    void CreateContent(const unsigned char *p, int s, MHEngine *engine);
 };
 
 // Actions.

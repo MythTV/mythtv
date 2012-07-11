@@ -21,7 +21,10 @@ menufiles.files = menus/*.xml
 htmlfiles.path = $${PREFIX}/share/mythtv/themes/default/htmls
 htmlfiles.files = htmls/*.html
 
-INSTALLS += defaultfiles widefiles menufiles htmlfiles
+xmlfiles.path = $${PREFIX}/share/mythtv/mythmusic
+xmlfiles.files = ../mythmusic/streams.xml
+
+INSTALLS += defaultfiles widefiles menufiles htmlfiles xmlfiles
 
 # Input
 SOURCES += ../../themedummy.c

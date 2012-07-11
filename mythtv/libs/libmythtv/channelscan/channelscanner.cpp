@@ -173,7 +173,7 @@ void ChannelScanner::Scan(
         }
         else
         {
-            InformUser(QObject::tr("Error tuning to transport"));
+            InformUser(tr("Error tuning to transport"));
             Teardown();
         }
     }
@@ -206,7 +206,7 @@ void ChannelScanner::Scan(
         }
         else
         {
-            InformUser(QObject::tr("Error tuning to transport"));
+            InformUser(tr("Error tuning to transport"));
             Teardown();
         }
     }
@@ -228,8 +228,8 @@ void ChannelScanner::Scan(
     if (!ok)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to handle tune complete.");
-        InformUser(QObject::tr("Programmer Error: "
-                               "Failed to handle tune complete."));
+        InformUser(tr("Programmer Error: "
+                      "Failed to handle tune complete."));
     }
 }
 
@@ -261,10 +261,10 @@ DTVConfParser::return_t ChannelScanner::ImportDVBUtils(
     if (DTVConfParser::OK != ret)
     {
         QString msg = (DTVConfParser::ERROR_PARSE == ret) ?
-            QObject::tr("Failed to parse '%1'") :
+            QString(tr("Failed to parse '%1'")).arg(file) :
             ((DTVConfParser::ERROR_CARDTYPE == ret) ?
-             QString("Programmer Error : incorrect card type") :
-             QObject::tr("Failed to open '%1'"));
+             tr("Programmer Error : incorrect card type") :
+             QString(tr("Failed to open '%1'")).arg(file));
 
         InformUser(msg);
     }
@@ -309,7 +309,7 @@ void ChannelScanner::PreScanCommon(
     if (device.isEmpty())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "No Device");
-        InformUser(QObject::tr("Programmer Error: No Device"));
+        InformUser(tr("Programmer Error: No Device"));
         return;
     }
 
@@ -369,7 +369,7 @@ void ChannelScanner::PreScanCommon(
     if (!channel)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Channel not created");
-        InformUser(QObject::tr("Programmer Error: Channel not created"));
+        InformUser(tr("Programmer Error: Channel not created"));
         return;
     }
 
@@ -380,7 +380,7 @@ void ChannelScanner::PreScanCommon(
     if (!channel->Open())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Channel could not be opened");
-        InformUser(QObject::tr("Channel could not be opened."));
+        InformUser(tr("Channel could not be opened."));
         return;
     }
 

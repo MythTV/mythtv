@@ -39,6 +39,7 @@ using namespace std;
 #include "logging.h"
 #include "mthread.h"
 #include "serverpool.h"
+#include "mythdate.h"
 
 #define LOC      QString("MythCoreContext: ")
 
@@ -106,8 +107,7 @@ MythCoreContextPrivate::MythCoreContextPrivate(MythCoreContext *lparent,
       m_blockingClient(false)
 {
     MThread::ThreadSetup("CoreContext");
-    srandom(QDateTime::currentDateTime().toTime_t() ^
-            QTime::currentTime().msec());
+    srandom(MythDate::current().toTime_t() ^ QTime::currentTime().msec());
 }
 
 MythCoreContextPrivate::~MythCoreContextPrivate()

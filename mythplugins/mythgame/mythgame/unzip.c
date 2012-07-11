@@ -493,7 +493,7 @@ local void unzlocal_DosDateToTmuDate (ulDosDate, ptm)
 /*
   Get Info about the current file in the zipfile, with internal only info
 */
-local int unzlocal_GetCurrentFileInfoInternal OF((unzFile file,
+local int unzlocal_GetCurrentFileInfoInternal (unzFile file,
                                                   unz_file_info *pfile_info,
                                                   unz_file_info_internal 
                                                   *pfile_info_internal,
@@ -502,7 +502,7 @@ local int unzlocal_GetCurrentFileInfoInternal OF((unzFile file,
                                                   void *extraField,
 												  uLong extraFieldBufferSize,
                                                   char *szComment,
-												  uLong commentBufferSize));
+												  uLong commentBufferSize);
 
 local int unzlocal_GetCurrentFileInfoInternal (file,
                                               pfile_info,

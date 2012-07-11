@@ -52,11 +52,17 @@ void Playlist::copyTracks(Playlist *to_ptr, bool update_display) const
     }
 }
 
-
 /// Given a tracks ID, add that track to this playlist
 void Playlist::addTrack(int trackID, bool update_display)
 {
-    Metadata *mdata = gMusicData->all_music->getMetadata(trackID);
+    int repo = ID_TO_REPO(trackID);
+    Metadata *mdata = NULL;
+
+    if (repo == RT_Radio)
+        mdata = gMusicData->all_streams->getMetadata(trackID);
+    else
+        mdata = gMusicData->all_music->getMetadata(trackID);
+
     if (mdata)
         addTrack(mdata, update_display);
     else
@@ -529,8 +535,9 @@ void Playlist::loadPlaylist(QString a_name, QString a_host)
 
     MSqlQuery query(MSqlQuery::InitCon());
 
-    if (m_name == "default_playlist_storage" || m_name == "backup_playlist_storage"
-        || m_name == "stream_playlist")
+    if (m_name == "default_playlist_storage" ||
+        m_name == "backup_playlist_storage"  || 
+        m_name == "stream_playlist")
     {
         query.prepare("SELECT playlist_id, playlist_name, playlist_songs "
                       "FROM  music_playlists "
@@ -615,18 +622,38 @@ void Playlist::fillSongsFromSonglist(QString songList)
     for (; it != list.end(); ++it)
     {
         id = (*it).toUInt();
-        // check this is a valid track ID
-        if (gMusicData->all_music->isValidID(id))
+        int repo = ID_TO_REPO(id);
+        if (repo == RT_Radio)
         {
-            Metadata *mdata = gMusicData->all_music->getMetadata(id);
-            m_songs.push_back(mdata);
-            m_songMap.insert(id, mdata);
+            // check this is a valid stream ID
+            if (gMusicData->all_streams->isValidID(id))
+            {
+                Metadata *mdata = gMusicData->all_streams->getMetadata(id);
+                m_songs.push_back(mdata);
+                m_songMap.insert(id, mdata);
+            }
+            else
+            {
+                m_changed = true;
+
+                LOG(VB_GENERAL, LOG_ERR, LOC + QString("Got a bad track %1").arg(id));
+            }
         }
         else
         {
-            m_changed = true;
+            // check this is a valid track ID
+            if (gMusicData->all_music->isValidID(id))
+            {
+                Metadata *mdata = gMusicData->all_music->getMetadata(id);
+                m_songs.push_back(mdata);
+                m_songMap.insert(id, mdata);
+            }
+            else
+            {
+                m_changed = true;
 
-            LOG(VB_GENERAL, LOG_ERR, LOC + QString("Got a bad track %1").arg(id));
+                LOG(VB_GENERAL, LOG_ERR, LOC + QString("Got a bad track %1").arg(id));
+            }
         }
     }
 

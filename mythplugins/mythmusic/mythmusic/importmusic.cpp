@@ -129,7 +129,6 @@ ImportMusicDialog::~ImportMusicDialog()
 
     delete m_tracks;
 
-    // do we need to do a resync
     if (m_somethingWasImported)
         emit importFinished();
 }
@@ -431,6 +430,8 @@ void ImportMusicDialog::addPressed()
             }
         }
 
+        meta->setFileSize((quint64)QFileInfo(saveFilename).size());
+        
         // update the database
         meta->dumpToDatabase();
 

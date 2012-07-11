@@ -191,6 +191,7 @@ class MHBitmapDisplay
     // Creation functions
     virtual void CreateFromPNG(const unsigned char *data, int length) = 0;
     virtual void CreateFromMPEG(const unsigned char *data, int length) = 0;
+    virtual void CreateFromJPEG(const unsigned char *data, int length) = 0;
     // Scale the bitmap.  Only used for image derived from MPEG I-frames.
     virtual void ScaleImage(int newWidth, int newHeight) = 0;
     // Information about the image.

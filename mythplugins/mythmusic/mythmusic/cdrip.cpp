@@ -358,6 +358,7 @@ void CDRipperThread::run(void)
             if (m_tracks->at(trackno)->active)
             {
                 titleTrack->setFilename(outfile);
+                titleTrack->setFileSize((quint64)QFileInfo(outfile).size());
                 titleTrack->dumpToDatabase();
             }
         }

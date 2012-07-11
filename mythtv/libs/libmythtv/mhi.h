@@ -231,6 +231,9 @@ class MHIBitmap : public MHBitmapDisplay
     /// Create bitmap from single I frame MPEG
     virtual void CreateFromMPEG(const unsigned char *data, int length);
 
+    /// Create bitmap from JPEG
+    virtual void CreateFromJPEG(const unsigned char *data, int length);
+
     /** \fn MHIBitmap::Draw(int,int,QRect,bool)
      *  \brief Draw the completed drawing onto the display.
      *

@@ -29,7 +29,7 @@
 #define MAX_ALLOWED_HEADER_SIZE 1024 * 4
 #define MAX_ALLOWED_META_SIZE 1024 * 100
 #define MAX_REDIRECTS 3
-#define PREBUFFER_SECS 5
+#define PREBUFFER_SECS 10
 #define ICE_UDP_PORT 6000
 
 /****************************************************************************/
@@ -71,11 +71,19 @@ class ShoutCastRequest
     void setUrl(const QUrl &url)
     {
         QString hdr;
-        hdr = QString("GET %1 HTTP/1.1\r\n"
-                      "Host: %2\r\n"
-                      "User-Agent: MythMusic/%3\r\n"
-                      "Accept: */*\r\n")
-                      .arg(url.path()).arg(url.host().arg(MYTH_BINARY_VERSION));
+        hdr = QString("GET %PATH% HTTP/1.1\r\n"
+                      "Host: %HOST%\r\n"
+                      "User-Agent: MythMusic/%VERSION%\r\n"
+                      "Accept: */*\r\n");
+
+        QString path = url.path();
+        if (url.hasQuery())
+            path += '?' + url.encodedQuery();
+
+        hdr.replace("%PATH%", path);
+        hdr.replace("%HOST%", url.host());
+        hdr.replace("%VERSION%", MYTH_BINARY_VERSION);
+
         if (!url.userName().isEmpty() && !url.password().isEmpty()) 
         {
             QString authstring = url.userName() + ":" + url.password();
@@ -87,6 +95,8 @@ class ShoutCastRequest
         hdr += QString("TE: trailers\r\n"
                        "Icy-Metadata: 1\r\n"
                        "\r\n");
+
+        LOG(VB_NETWORK, LOG_INFO, QString("ShoutCastRequest: '%1'").arg(hdr));
 
         m_data = hdr.toAscii();
     }
@@ -107,11 +117,19 @@ class IceCastRequest
     void setUrl(const QUrl &url)
     {
         QString hdr;
-        hdr = QString("GET %1 HTTP/1.1\r\n"
-                      "Host: %2\r\n"
-                      "User-Agent: MythMusic/%3\r\n"
-                      "Accept: */*\r\n")
-                      .arg(url.path()).arg(url.host()).arg(MYTH_BINARY_VERSION);
+        hdr = QString("GET %PATH% HTTP/1.1\r\n"
+                      "Host: %HOST%\r\n"
+                      "User-Agent: MythMusic/%VERSION%\r\n"
+                      "Accept: */*\r\n");
+
+        QString path = url.path();
+        if (url.hasQuery())
+            path += '?' + url.encodedQuery();
+
+        hdr.replace("%PATH%", path);
+        hdr.replace("%HOST%", url.host());
+        hdr.replace("%VERSION%", MYTH_BINARY_VERSION);
+
         if (!url.userName().isEmpty() && !url.password().isEmpty()) 
         {
             QString authstring = url.userName() + ":" + url.password();
@@ -123,6 +141,8 @@ class IceCastRequest
         hdr += QString("TE: trailers\r\n"
                        "x-audiocast-udpport: %1\r\n"
                        "\r\n").arg(ICE_UDP_PORT);
+
+        LOG(VB_NETWORK, LOG_INFO, QString("IceCastRequest: '%1'").arg(hdr));
 
         m_data = hdr.toAscii();
     }
@@ -504,6 +524,9 @@ void ShoutCastIODevice::socketReadyRead(void)
     m_bytesDownloaded += data.size();
     m_buffer->write(data);
 
+    // send buffer status event
+    emit bufferStatus(m_buffer->readBufAvail(), DecoderIOFactory::DefaultBufferSize);
+
     if (!m_started && m_bytesDownloaded > DecoderIOFactory::DefaultPrebufferSize)
     {
         m_socket->setReadBufferSize(DecoderIOFactory::DefaultPrebufferSize);
@@ -511,7 +534,7 @@ void ShoutCastIODevice::socketReadyRead(void)
     }
 
     // if we are waiting for the HEADER and we have enough data process that
-    if (m_state == READING_HEADER && m_buffer->readBufAvail() >= MAX_ALLOWED_HEADER_SIZE)
+    if (m_state == READING_HEADER)
     {
         if (parseHeader())
         {
@@ -536,7 +559,8 @@ void ShoutCastIODevice::socketReadyRead(void)
                 {
                     LOG(VB_NETWORK, LOG_INFO, QString("Redirect to %1").arg(m_response->getLocation()));
                     m_socket->close();
-                    connectToUrl(m_url);
+                    QUrl redirectURL(m_response->getLocation());
+                    connectToUrl(redirectURL);
                     return;
                 }
             }
@@ -702,7 +726,7 @@ bool ShoutCastIODevice::parseMeta(void)
         return false;
     }
 
-    QString metadata_string(data);
+    QString metadata_string = QString::fromUtf8(data.constData());
 
     // avoid sending signals if the data hasn't changed
     if (m_last_metadata == metadata_string)
@@ -745,6 +769,8 @@ void DecoderIOFactoryShoutCast::makeIODevice(void)
             this,    SLOT(shoutcastMeta(const QString&)));
     connect(m_input, SIGNAL(changedState(ShoutCastIODevice::State)),
             this,    SLOT(shoutcastChangedState(ShoutCastIODevice::State)));
+    connect(m_input, SIGNAL(bufferStatus(int, int)),
+            this,    SLOT(shoutcastBufferStatus(int,int)));
 }
 
 void DecoderIOFactoryShoutCast::closeIODevice(void)
@@ -765,7 +791,7 @@ void DecoderIOFactoryShoutCast::start(void)
 {
     LOG(VB_PLAYBACK, LOG_INFO,
         QString("DecoderIOFactoryShoutCast %1").arg(getUrl().toString()));
-    doOperationStart("Connecting");
+    doOperationStart(tr("Connecting"));
 
     makeIODevice();
     m_input->connectToUrl(getUrl());
@@ -777,13 +803,6 @@ void DecoderIOFactoryShoutCast::stop(void)
         m_timer->disconnect();
 
     doOperationStop();
-
-    Metadata mdata(getMetadata());
-    mdata.setTitle("Stopped");
-    mdata.setArtist("");
-    mdata.setLength(-1);
-    DecoderHandlerEvent ev(DecoderHandlerEvent::Meta, mdata);
-    dispatch(ev);
 }
 
 void DecoderIOFactoryShoutCast::periodicallyCheckResponse(void)
@@ -840,6 +859,8 @@ void DecoderIOFactoryShoutCast::periodicallyCheckBuffered(void)
 
     m_timer->disconnect();
     m_timer->stop();
+
+    m_lastStatusTime.start();
 }
 
 void DecoderIOFactoryShoutCast::shoutcastMeta(const QString &metadata)
@@ -849,7 +870,7 @@ void DecoderIOFactoryShoutCast::shoutcastMeta(const QString &metadata)
             .arg(metadata));
     ShoutCastMetaParser parser;
     // FIXME: 
-    //parser.setMetaFormat(getMetadata().CompilationArtist());
+    //parser.setMetaFormat(getMetadata().MetadataFormat());
     parser.setMetaFormat("%a - %t");
 
     ShoutCastMetaMap meta_map = parser.parseMeta(metadata);
@@ -857,11 +878,27 @@ void DecoderIOFactoryShoutCast::shoutcastMeta(const QString &metadata)
     Metadata mdata = getMetadata();
     mdata.setTitle(meta_map["title"]);
     mdata.setArtist(meta_map["artist"]);
-    mdata.setAlbum(getMetadata().Album()); // meta_map["album"]
+    mdata.setAlbum(meta_map["album"]);
     mdata.setLength(-1);
 
     DecoderHandlerEvent ev(DecoderHandlerEvent::Meta, mdata);
     dispatch(ev);
+}
+
+void DecoderIOFactoryShoutCast::shoutcastBufferStatus(int available, int maxSize)
+{
+    if (m_lastStatusTime.elapsed() < 1000)
+        return;
+
+    if (m_input->getState() == ShoutCastIODevice::PLAYING ||
+        m_input->getState() == ShoutCastIODevice::STREAMING ||
+        m_input->getState() == ShoutCastIODevice::STREAMING_META)
+    {
+        DecoderHandlerEvent ev(DecoderHandlerEvent::BufferStatus, available, maxSize);
+        dispatch(ev);
+    }
+
+    m_lastStatusTime.restart();
 }
 
 void DecoderIOFactoryShoutCast::shoutcastChangedState(ShoutCastIODevice::State state)
@@ -870,20 +907,20 @@ void DecoderIOFactoryShoutCast::shoutcastChangedState(ShoutCastIODevice::State s
         .arg(ShoutCastIODevice::stateString(state)));
 
     if (state == ShoutCastIODevice::RESOLVING)
-        doOperationStart("Finding radio");
+        doOperationStart(tr("Finding radio stream"));
 
     if (state == ShoutCastIODevice::CANT_RESOLVE)
-        doFailed(QObject::tr("Cannot find radio.\nCheck the URL is correct."));
+        doFailed(tr("Cannot find radio.\nCheck the URL is correct."));
 
     if (state == ShoutCastIODevice::CONNECTING)
-        doOperationStart("Connecting to radio");
+        doOperationStart(tr("Connecting to radio stream"));
 
     if (state == ShoutCastIODevice::CANT_CONNECT)
-        doFailed(QObject::tr("Cannot connect to radio.\nCheck the URL is correct."));
+        doFailed(tr("Cannot connect to radio.\nCheck the URL is correct."));
 
     if (state == ShoutCastIODevice::CONNECTED)
     {
-        doOperationStart("Connected to radio");
+        doOperationStart(tr("Connected to radio stream"));
         m_timer->stop();
         m_timer->disconnect();
         connect(m_timer, SIGNAL(timeout()),
@@ -893,7 +930,7 @@ void DecoderIOFactoryShoutCast::shoutcastChangedState(ShoutCastIODevice::State s
 
     if (state == ShoutCastIODevice::PLAYING)
     {
-        doOperationStart("Buffering");
+        doOperationStart(tr("Buffering"));
     }
 
     if (state == ShoutCastIODevice::STOPPED)
@@ -918,9 +955,6 @@ int DecoderIOFactoryShoutCast::checkResponseOK()
 
     if (response.getStatus() != 200)
         return -1;
-    
-//    if (!response.isICY() || response.getStatus() != 200)
-//        return -1;
 
     return 0;
 }

@@ -498,7 +498,7 @@ void OSD::SetText(const QString &window, QHash<QString,QString> &map,
     {
         int startts = map["startts"].toInt();
         int endts   = map["endts"].toInt();
-        int nowts   = QDateTime::currentDateTime().toTime_t();
+        int nowts   = MythDate::current().toTime_t();
         if (startts > nowts)
         {
             bar->SetUsed(0);

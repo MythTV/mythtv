@@ -26,39 +26,67 @@ MediaMonitorWindows::MediaMonitorWindows(QObject* par,
 {
     char strDrives[128];
     if (!::GetLogicalDriveStrings(sizeof(strDrives), strDrives))
+    {
+        LOG(VB_GENERAL, LOG_ERR,
+            "Error. MediaMonitorWindows failed at GetLogicalDriveStrings.");
         return;
+    }
 
     for (char *driveName = strDrives; *driveName;
          driveName += strlen(driveName) + 1)
     {
-        uint type = ::GetDriveType(driveName);
-        if (type != DRIVE_REMOVABLE && type != DRIVE_CDROM)
-            continue;
-
         MythMediaDevice *media = NULL;
-
-        if (type == DRIVE_CDROM)
-            media = MythCDROM::get(this, driveName, false, allowEject);
-        else
-            media = MythHDD::Get(this, driveName, false, allowEject);
-
-        if (!media)
+        UINT type = ::GetDriveType(driveName);
+        switch (type)
         {
+        case DRIVE_CDROM:
+            LOG(VB_MEDIA, LOG_DEBUG,
+                QString("MediaMonitorWindows found cdrom '%1'").arg(driveName));
+            media = MythCDROM::get(this, driveName, false, allowEject);
+            break;
+        case DRIVE_REMOVABLE:
+            LOG(VB_MEDIA, LOG_DEBUG,
+                QString("MediaMonitorWindows found removeable '%1'")
+                    .arg(driveName));
+            media = MythHDD::Get(this, driveName, false, allowEject);
+            break;
+        case DRIVE_UNKNOWN:
+            LOG(VB_MEDIA, LOG_DEBUG,
+                QString("MediaMonitorWindows found unknown '%1'")
+                    .arg(driveName));
+            media = MythCDROM::get(this, driveName, false, allowEject);
+            break;
+        case DRIVE_NO_ROOT_DIR:
+            LOG(VB_MEDIA, LOG_DEBUG,
+                QString("MediaMonitorWindows found '%1' with no root dir")
+                    .arg(driveName));
+            media = MythCDROM::get(this, driveName, false, allowEject);
+            break;
+        default:
+            LOG(VB_MEDIA, LOG_INFO, QString("MediaMonitorWindows found '%1' type %2")
+                .arg(driveName).arg(type));
+        case DRIVE_FIXED:
+        case DRIVE_REMOTE:
+        case DRIVE_RAMDISK:
+            continue;
+        }
+
+        if (media)
+        {
+            // We store the volume name to improve
+            // user activities like ChooseAndEjectMedia().
+            char volumeName[MAX_PATH];
+            if (GetVolumeInformation(driveName, volumeName, MAX_PATH,
+                                     NULL, NULL, NULL, NULL, NULL))
+            {
+                media->setVolumeID(volumeName);
+            }
+
+            AddDevice(media);
+        }
+        else
             LOG(VB_GENERAL, LOG_ALERT,
                     "Error. Couldn't create MythMediaDevice.");
-            return;
-        }
-
-        // We store the volume name to improve
-        // user activities like ChooseAndEjectMedia().
-        char volumeName[MAX_PATH];
-        if (GetVolumeInformation(driveName, volumeName, MAX_PATH,
-                                 NULL, NULL, NULL, NULL, NULL))
-        {
-            media->setVolumeID(volumeName);
-        }
-
-        AddDevice(media);
     }
 
     LOG(VB_MEDIA, LOG_INFO, "Initial device list: " + listDevices());

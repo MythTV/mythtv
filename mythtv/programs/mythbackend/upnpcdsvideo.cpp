@@ -252,7 +252,8 @@ void UPnpCDSVideo::AddItem( const UPnpCDSRequest    *pRequest,
     // int             nSeason      = query.value(10).toInt();
     // int             nEpisode     = query.value(11).toInt();
     QString        sCoverArt    = query.value(12).toString();
-    QDateTime      dtInsertDate = query.value(13).toDateTime();
+    QDateTime      dtInsertDate =
+        MythDate::as_utc(query.value(13).toDateTime());
     QString        sHostName    = query.value(14).toString();
 
     // ----------------------------------------------------------------------
