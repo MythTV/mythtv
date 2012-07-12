@@ -4187,7 +4187,9 @@ void ProgramInfo::MarkAsInUse(bool inuse, QString usedFor)
         query.bindValue(":HOSTNAME",   gCoreContext->GetHostName());
         query.bindValue(":RECUSAGE",   inUseForWhat);
         query.bindValue(":UPDATETIME", inUseTime);
-        query.bindValue(":RECHOST",    hostname);
+        query.bindValue(":RECHOST",
+                        hostname.isEmpty() ? gCoreContext->GetHostName()
+                                           : hostname);
         query.bindValue(":RECDIR",     recDir);
 
         if (!query.exec())
