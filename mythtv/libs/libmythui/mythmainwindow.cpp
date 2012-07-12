@@ -44,6 +44,8 @@ using namespace std;
 #include "mythsignalingtimer.h"
 #include "mythcorecontext.h"
 #include "mythmedia.h"
+#include "mythmiscutil.h"
+#include "mythdate.h"
 
 // libmythui headers
 #include "myththemebase.h"
@@ -633,8 +635,11 @@ void MythMainWindow::AddScreenStack(MythScreenStack *stack, bool main)
 
 void MythMainWindow::PopScreenStack()
 {
-    delete d->stackList.back();
+    MythScreenStack *stack = d->stackList.back();
     d->stackList.pop_back();
+    if (stack == d->mainStack)
+        d->mainStack = NULL;
+    delete stack;
 }
 
 int MythMainWindow::GetStackCount(void)
@@ -860,7 +865,8 @@ bool MythMainWindow::SaveScreenShot(const QImage &image, QString filename)
     {
         QString fpath = GetMythDB()->GetSetting("ScreenShotPath", "/tmp");
         filename = QString("%1/myth-screenshot-%2.png").arg(fpath)
-         .arg(QDateTime::currentDateTime().toString("yyyy-MM-ddThh-mm-ss.zzz"));
+            .arg(MythDate::toString(
+                     MythDate::current(), MythDate::kScreenShotFilename));
     }
 
     QString extension = filename.section('.', -1, -1);
@@ -1602,7 +1608,7 @@ void MythMainWindow::BindKey(const QString &context, const QString &action,
     if (!d->keyContexts.contains(context))
         d->keyContexts.insert(context, new KeyContext());
 
-    for (unsigned int i = 0; i < keyseq.count(); i++)
+    for (unsigned int i = 0; i < (uint)keyseq.count(); i++)
     {
         int keynum = keyseq[i];
         keynum &= ~Qt::UNICODE_ACCEL;
@@ -1749,7 +1755,7 @@ void MythMainWindow::BindJump(const QString &destination, const QString &key)
 
     QKeySequence keyseq(key);
 
-    for (unsigned int i = 0; i < keyseq.count(); i++)
+    for (unsigned int i = 0; i < (uint)keyseq.count(); i++)
     {
         int keynum = keyseq[i];
         keynum &= ~Qt::UNICODE_ACCEL;

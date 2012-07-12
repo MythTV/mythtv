@@ -411,14 +411,13 @@ vector<VideoInfo *> *VideoSelector::getVideoListFromDB(void)
         }
     }
 
-    vector<VideoInfo*> *videoList = new vector<VideoInfo*>;
-
     query.prepare("SELECT intid, title, plot, length, filename, coverfile, "
                   "category, showlevel, subtitle, season, episode "
                   "FROM videometadata ORDER BY title,season,episode");
 
     if (query.exec() && query.size())
     {
+        vector<VideoInfo*> *videoList = new vector<VideoInfo*>;
         QString artist, genre, episode;
         while (query.next())
         {
@@ -449,14 +448,12 @@ vector<VideoInfo *> *VideoSelector::getVideoListFromDB(void)
                 info->category = "(None)";
             videoList->push_back(info);
         }
+        return videoList;
     }
-    else
-    {
-        LOG(VB_GENERAL, LOG_ERR, "VideoSelector: Failed to get any video's");
-        return NULL;
-    }
-
-    return videoList;
+    
+    
+    LOG(VB_GENERAL, LOG_ERR, "VideoSelector: Failed to get any video's");
+    return NULL;
 }
 
 void VideoSelector::getVideoList(void)

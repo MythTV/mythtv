@@ -18,6 +18,7 @@
 #include <mythdialogbox.h>
 #include <mythsystem.h>
 #include <exitcodes.h>
+#include <mythdate.h>
 
 // mytharchive
 #include "importnative.h"
@@ -84,7 +85,7 @@ static bool loadDetailsFromXML(const QString &filename, FileDetails *details)
                         details->subtitle = e.text();
 
                     if (e.tagName() == "starttime")
-                        details->startTime = QDateTime::fromString(e.text(), Qt::ISODate);
+                        details->startTime = MythDate::fromString(e.text());
 
                     if (e.tagName() == "description")
                         details->description = e.text();
@@ -253,7 +254,8 @@ void ArchiveFileSelector::itemSelected(MythUIButtonListItem *item)
         m_xmlFile = m_curDirectory + "/" + fileData->filename;
         m_progTitle->SetText(m_details.title);
         m_progSubtitle->SetText(m_details.subtitle);
-        m_progStartTime->SetText(m_details.startTime.toString("dd MMM yy (hh:mm)"));
+        m_progStartTime->SetText(m_details.startTime.toLocalTime()
+                                 .toString("dd MMM yy (hh:mm)"));
     }
     else
     {
@@ -376,7 +378,8 @@ bool ImportNative::Create(void)
 
     m_progTitle_text->SetText(m_details.title);
 
-    m_progDateTime_text->SetText(m_details.startTime.toString("dd MMM yy (hh:mm)"));
+    m_progDateTime_text->SetText(m_details.startTime.toLocalTime()
+                                 .toString("dd MMM yy (hh:mm)"));
     m_progDescription_text->SetText(
         (m_details.subtitle == "" ? m_details.subtitle + "\n" : "") + m_details.description);
 

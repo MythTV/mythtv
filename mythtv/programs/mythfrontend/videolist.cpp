@@ -7,7 +7,7 @@
 #include <QList>
 
 #include "mythcontext.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 
 #include "mythgenerictree.h"
 #include "videometadatalistmanager.h"
@@ -885,7 +885,9 @@ void VideoListImp::buildGroupList(metadata_list_type whence)
             case ltDBInsertDateGroup:
             {
                 QDate date = data->GetInsertdate();
-                groups.push_back(MythDateToString(date, kDateFull | kSimplify));
+                QString tmp = MythDate::toString(
+                    date, MythDate::kDateFull | MythDate::kSimplify);
+                groups.push_back(tmp);
                 break;
             }
             default:

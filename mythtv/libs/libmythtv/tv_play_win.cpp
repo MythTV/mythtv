@@ -62,10 +62,10 @@ void TvPlayWindow::UpdateProgress(void)
  *  \param uitype The mythuitype receiving the event
  *  \param event Mouse event
  */
-void TvPlayWindow::gestureEvent(MythUIType *uitype, MythGestureEvent *event)
+bool TvPlayWindow::gestureEvent(MythGestureEvent *event)
 {
     if (event->gesture() == MythGestureEvent::Click)
     {
-
+        LOG(VB_GENERAL, LOG_NOTICE, "TV Play Window Click");
     }
 }

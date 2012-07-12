@@ -72,9 +72,9 @@ def buildSingle(inetref):
 
 def buildList(query):
     # TEMPORARY FIX:
-    # remove all dashes from queries to work around search behavior
+    # replace all dashes from queries to work around search behavior
     # as negative to all text that comes afterwards
-    query = query.replace('-','')
+    query = query.replace('-',' ')
     results = searchMovie(query)
     tree = etree.XML(u'<metadata></metadata>')
     mapping = [['runtime',      'runtime'],     ['title',       'originaltitle'],

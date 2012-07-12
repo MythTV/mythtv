@@ -12,13 +12,14 @@ using namespace std;
 #include <QDir>
 
 // MythTV headers
+#include "mythmiscutil.h"
 #include "exitcodes.h"
 #include "programinfo.h"
 #include "jobqueue.h"
 #include "mythcontext.h"
 #include "mythdb.h"
 #include "mythversion.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 #include "transcode.h"
 #include "mpeg2fix.h"
 #include "remotefile.h"
@@ -26,6 +27,7 @@ using namespace std;
 #include "mythlogging.h"
 #include "commandlineparser.h"
 #include "recordinginfo.h"
+#include "signalhandling.h"
 
 static void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist,
                         frm_dir_map_t *deleteMap, int &resultCode);
@@ -109,14 +111,14 @@ static int QueueTranscodeJob(ProgramInfo *pginfo, QString profile,
     {
         LOG(VB_GENERAL, LOG_NOTICE,
             QString("Queued transcode job for chanid %1 @ %2")
-              .arg(pginfo->GetChanID())
-              .arg(pginfo->GetRecordingStartTime().toString("yyyyMMddhhmmss")));
+            .arg(pginfo->GetChanID())
+            .arg(pginfo->GetRecordingStartTime(MythDate::ISODate)));
         return GENERIC_EXIT_OK;
     }
 
     LOG(VB_GENERAL, LOG_ERR, QString("Error queuing job for chanid %1 @ %2")
-            .arg(pginfo->GetChanID())
-            .arg(pginfo->GetRecordingStartTime().toString("yyyyMMddhhmmss")));
+        .arg(pginfo->GetChanID())
+        .arg(pginfo->GetRecordingStartTime(MythDate::ISODate)));
     return GENERIC_EXIT_DB_ERROR;
 }
 
@@ -371,6 +373,15 @@ int main(int argc, char *argv[])
         passthru = true;
 
     CleanupGuard callCleanup(cleanup);
+
+#ifndef _WIN32
+    QList<int> signallist;
+    signallist << SIGINT << SIGTERM << SIGSEGV << SIGABRT << SIGBUS << SIGFPE
+               << SIGILL;
+    SignalHandler handler(signallist);
+    signal(SIGHUP, SIG_IGN);
+#endif
+
     //  Load the context
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init(false))
@@ -480,7 +491,7 @@ int main(int argc, char *argv[])
         {
             LOG(VB_GENERAL, LOG_ERR,
                 QString("Couldn't find recording for chanid %1 @ %2")
-                    .arg(chanid).arg(starttime.toString("yyyyMMddhhmmss")));
+                .arg(chanid).arg(starttime.toString(Qt::ISODate)));
             delete pginfo;
             return GENERIC_EXIT_NO_RECORDING_DATA;
         }

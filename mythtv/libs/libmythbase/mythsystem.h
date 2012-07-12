@@ -7,22 +7,23 @@
 
 typedef enum MythSystemMask {
     kMSNone               = 0x00000000,
-    kMSDontBlockInputDevs = 0x00000001, //< avoid blocking LIRC & Joystick Menu
-    kMSDontDisableDrawing = 0x00000002, //< avoid disabling UI drawing
-    kMSRunBackground      = 0x00000004, //< run child in the background
-    kMSProcessEvents      = 0x00000008, //< process events while waiting
-    kMSInUi               = 0x00000010, //< the parent is in the UI
-    kMSStdIn              = 0x00000020, //< allow access to stdin
-    kMSStdOut             = 0x00000040, //< allow access to stdout
-    kMSStdErr             = 0x00000080, //< allow access to stderr
-    kMSBuffered           = 0x00000100, //< buffer the IO channels
-    kMSRunShell           = 0x00000200, //< run process through shell
-    kMSNoRunShell         = 0x00000400, //< do NOT run process through shell
-    kMSAnonLog            = 0x00000800, //< anonymize the logs
-    kMSAbortOnJump        = 0x00001000, //< abort this process on a jumppoint
-    kMSSetPGID            = 0x00002000, //< set the process group id
-    kMSAutoCleanup        = 0x00004000, //< automatically delete if backgrounded
-    kMSLowExitVal         = 0x00008000, //< allow exit values 0-127 only
+    kMSDontBlockInputDevs = 0x00000001, ///< avoid blocking LIRC & Joystick Menu
+    kMSDontDisableDrawing = 0x00000002, ///< avoid disabling UI drawing
+    kMSRunBackground      = 0x00000004, ///< run child in the background
+    kMSProcessEvents      = 0x00000008, ///< process events while waiting
+    kMSInUi               = 0x00000010, ///< the parent is in the UI
+    kMSStdIn              = 0x00000020, ///< allow access to stdin
+    kMSStdOut             = 0x00000040, ///< allow access to stdout
+    kMSStdErr             = 0x00000080, ///< allow access to stderr
+    kMSBuffered           = 0x00000100, ///< buffer the IO channels
+    kMSRunShell           = 0x00000200, ///< run process through shell
+    kMSNoRunShell         = 0x00000400, ///< do NOT run process through shell
+    kMSAnonLog            = 0x00000800, ///< anonymize the logs
+    kMSAbortOnJump        = 0x00001000, ///< abort this process on a jumppoint
+    kMSSetPGID            = 0x00002000, ///< set the process group id
+    kMSAutoCleanup        = 0x00004000, ///< automatically delete if 
+                                        ///  backgrounded
+    kMSLowExitVal         = 0x00008000, ///< allow exit values 0-127 only
 } MythSystemFlag;
 
 #ifdef __cplusplus
@@ -31,6 +32,9 @@ typedef enum MythSystemMask {
 #include <QBuffer>
 #include <QSemaphore>
 #include <QMap>
+#include <QPointer>
+
+#include "referencecounter.h"
 
 typedef QMap<QString, bool> Setting_t;
 
@@ -104,6 +108,8 @@ class MBASE_PUBLIC MythSystem : public QObject
 
         friend class MythSystemPrivate;
 
+        static QString ShellEscape(const QString &str);
+
     signals:
         void started();
         void finished();
@@ -132,11 +138,13 @@ class MBASE_PUBLIC MythSystem : public QObject
         QBuffer     m_stdbuff[3];
 };
 
-class MBASE_PUBLIC MythSystemPrivate : public QObject
+class MBASE_PUBLIC MythSystemPrivate : public QObject, public ReferenceCounter
 {
     Q_OBJECT
 
     public:
+        MythSystemPrivate(const QString &debugName);
+
         virtual void Fork(time_t timeout) = 0;
         virtual void Manage() = 0;
 
@@ -148,7 +156,7 @@ class MBASE_PUBLIC MythSystemPrivate : public QObject
                                 QStringList &args) = 0;
 
     protected:
-        MythSystem *m_parent;
+        QPointer<MythSystem> m_parent;
 
         uint GetStatus()             { return m_parent->GetStatus(); };
         void SetStatus(uint status)  { m_parent->SetStatus(status); };

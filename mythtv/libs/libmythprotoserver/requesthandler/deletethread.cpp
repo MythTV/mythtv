@@ -86,7 +86,7 @@ void DeleteThread::ProcessNew(void)
     // loop through new files, unlinking and adding for deletion
     // until none are left
 
-    QDateTime ctime = QDateTime::currentDateTime();
+    QDateTime ctime = MythDate::current();
 
     while (true)
     {
@@ -205,7 +205,7 @@ void DeleteThread::ProcessOld(void)
     if (m_files.empty())
         return;
 
-    QDateTime ctime = QDateTime::currentDateTime();
+    QDateTime ctime = MythDate::current();
 
     // only operate on one file at a time
     // delete that file completely before moving onto the next

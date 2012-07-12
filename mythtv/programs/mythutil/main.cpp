@@ -20,6 +20,7 @@
 #include "jobutils.h"
 #include "markuputils.h"
 #include "messageutils.h"
+#include "signalhandling.h"
 
 
 int main(int argc, char *argv[])
@@ -74,6 +75,14 @@ int main(int argc, char *argv[])
 
     if (!cmdline.toBool("loglevel"))
         logLevel = defaultLevel;
+
+#ifndef _WIN32
+    QList<int> signallist;
+    signallist << SIGINT << SIGTERM << SIGSEGV << SIGABRT << SIGBUS << SIGFPE
+               << SIGILL;
+    SignalHandler handler(signallist);
+    signal(SIGHUP, SIG_IGN);
+#endif
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init(false))

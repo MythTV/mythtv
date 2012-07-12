@@ -8,7 +8,7 @@ using namespace std;
 #include "mainserver.h"
 
 #include "mythcorecontext.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 #include "inputinfo.h"
 
 #define LOC QString("PlaybackSock: ")
@@ -41,7 +41,8 @@ PlaybackSock::PlaybackSock(
 
 PlaybackSock::~PlaybackSock()
 {
-    sock->DownRef();
+    sock->DecrRef();
+    sock = NULL;
 }
 
 bool PlaybackSock::wantsEvents(void) const
@@ -76,8 +77,8 @@ bool PlaybackSock::SendReceiveStringList(
 {
     bool ok = false;
 
+    sock->IncrRef();
     sock->Lock();
-    sock->UpRef();
 
     {
         QMutexLocker locker(&sockLock);
@@ -105,7 +106,7 @@ bool PlaybackSock::SendReceiveStringList(
     }
 
     sock->Unlock();
-    sock->DownRef();
+    sock->DecrRef();
 
     if (!ok)
     {
@@ -295,13 +296,10 @@ QDateTime PlaybackSock::PixmapLastModified(const ProgramInfo *pginfo)
 
     SendReceiveStringList(strlist);
 
-    QDateTime datetime;
     if (!strlist.empty() && strlist[0] != "BAD")
-    {
-        uint timet = strlist[0].toUInt();
-        datetime.setTime_t(timet);
-    }
-    return datetime;
+        return MythDate::fromTime_t(strlist[0].toUInt());
+
+    return QDateTime();
 }
 
 bool PlaybackSock::CheckFile(ProgramInfo *pginfo)

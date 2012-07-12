@@ -23,7 +23,8 @@
 #include "mythconfig.h"
 #include "remotefile.h"
 #include "compat.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
+#include "mythtimer.h"
 #include "mythlogging.h"
 #include "DVD/dvdringbuffer.h"
 #include "Bluray/bdringbuffer.h"
@@ -800,7 +801,7 @@ void RingBuffer::run(void)
         {
             // limit the read size
             if (readblocksize > totfree)
-                totfree = (int)(totfree / KB32) * KB32; // must be multiple of 32KB
+                totfree = (long long)(totfree / KB32) * KB32; // must be multiple of 32KB
             else
                 totfree = readblocksize;
 

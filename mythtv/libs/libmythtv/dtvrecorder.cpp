@@ -273,8 +273,8 @@ void DTVRecorder::BufferedWrite(const TSPacket &tspacket)
     if (curRecording && timeOfFirstDataIsSet.testAndSetRelaxed(0,1))
     {
         QMutexLocker locker(&statisticsLock);
-        timeOfFirstData = mythCurrentDateTime();
-        timeOfLatestData = mythCurrentDateTime();
+        timeOfFirstData = MythDate::current();
+        timeOfLatestData = MythDate::current();
         timeOfLatestDataTimer.start();
     }
 
@@ -293,7 +293,7 @@ void DTVRecorder::BufferedWrite(const TSPacket &tspacket)
                 .fetchAndStoreRelaxed(thresh * 9 / 8);
 
         timeOfLatestDataCount.fetchAndStoreRelaxed(1);
-        timeOfLatestData = mythCurrentDateTime();
+        timeOfLatestData = MythDate::current();
 
         LOG(VB_RECORD, LOG_DEBUG, LOC + QString("Updating timeOfLatestData ") +
             QString("elapsed(%1) interval(%2)")
@@ -615,12 +615,12 @@ void DTVRecorder::HandleTimestamps(int stream_id, int64_t pts, int64_t dts)
         if (!_ts_count[stream_id])
         {
             _ts_first[stream_id] = ts;
-            _ts_first_dt[stream_id] = mythCurrentDateTime();
+            _ts_first_dt[stream_id] = MythDate::current();
         }
         else if (ts < _ts_first[stream_id])
         {
             _ts_first[stream_id] = ts;
-            _ts_first_dt[stream_id] = mythCurrentDateTime();
+            _ts_first_dt[stream_id] = MythDate::current();
         }
     }
 
@@ -1244,7 +1244,7 @@ bool DTVRecorder::ProcessTSPacket(const TSPacket &tspacket)
         int v = _continuity_error_count.fetchAndAddRelaxed(1) + 1;
         double erate = v * 100.0 / _packet_count.fetchAndAddRelaxed(0);
         LOG(VB_RECORD, LOG_WARNING, LOC +
-            QString("PID 0x%1 discontinuity detected ((%2+1)%16!=%3) %4\%")
+            QString("PID 0x%1 discontinuity detected ((%2+1)\%16!=%3) %4\%")
                 .arg(pid,0,16).arg(old_cnt,2)
                 .arg(tspacket.ContinuityCounter(),2)
                 .arg(erate));
@@ -1316,7 +1316,7 @@ bool DTVRecorder::ProcessAVTSPacket(const TSPacket &tspacket)
         int v = _continuity_error_count.fetchAndAddRelaxed(1) + 1;
         double erate = v * 100.0 / _packet_count.fetchAndAddRelaxed(0);
         LOG(VB_RECORD, LOG_WARNING, LOC +
-            QString("A/V PID 0x%1 discontinuity detected ((%2+1)%16!=%3) %4\%")
+            QString("A/V PID 0x%1 discontinuity detected ((%2+1)\%16!=%3) %4\%")
                 .arg(pid,0,16).arg(old_cnt).arg(tspacket.ContinuityCounter())
                 .arg(erate,5,'f',2));
     }

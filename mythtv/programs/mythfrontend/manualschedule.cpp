@@ -7,7 +7,7 @@
 // libmythbase
 #include "mythdbcon.h"
 #include "mythlogging.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 
 // libmyth
 #include "mythcorecontext.h"
@@ -31,7 +31,7 @@
 ManualSchedule::ManualSchedule(MythScreenStack *parent)
                : MythScreenType(parent, "ManualSchedule")
 {
-    m_nowDateTime = QDateTime::currentDateTime();
+    m_nowDateTime = MythDate::current();
     m_startDateTime = m_nowDateTime;
 
     m_daysahead = 0;
@@ -85,18 +85,20 @@ bool ManualSchedule::Create(void)
 
     for (uint index = 0; index <= 60; index++)
     {
-        QString dinfo = MythDateTimeToString(m_nowDateTime.addDays(index), kDateFull | kSimplify);
-        if (m_nowDateTime.addDays(index).date().dayOfWeek() < 6)
+        QString dinfo = MythDate::toString(
+            m_nowDateTime.addDays(index),
+            MythDate::kDateFull | MythDate::kSimplify);
+        if (m_nowDateTime.addDays(index).toLocalTime().date().dayOfWeek() < 6)
             dinfo += QString(" (%1)").arg(tr("5 weekdays if daily"));
         else
             dinfo += QString(" (%1)").arg(tr("7 days per week if daily"));
         new MythUIButtonListItem(m_startdateList, dinfo);
-        if (m_nowDateTime.addDays(index).toString("MMdd") ==
-            m_startDateTime.toString("MMdd"))
+        if (m_nowDateTime.addDays(index).toLocalTime().toString("MMdd") ==
+            m_startDateTime.toLocalTime().toString("MMdd"))
             m_startdateList->SetItemCurrent(m_startdateList->GetCount() - 1);
     }
 
-    QTime thisTime = m_nowDateTime.time();
+    QTime thisTime = m_nowDateTime.toLocalTime().time();
     thisTime = thisTime.addSecs((30 - (thisTime.minute() % 30)) * 60);
 
     if (thisTime < QTime(0,30))
@@ -171,26 +173,30 @@ void ManualSchedule::dateChanged(void)
 {
     disconnectSignals();
     m_daysahead = m_startdateList->GetCurrentPos();
-    m_startDateTime.setDate(m_nowDateTime.addDays(m_daysahead).date());
-
     int hr = m_starthourSpin->GetIntValue();
     int min = m_startminuteSpin->GetIntValue();
-    m_startDateTime.setTime(QTime(hr, min));
+
+    m_startDateTime = QDateTime(
+        m_nowDateTime.toLocalTime().addDays(m_daysahead).date(),
+        QTime(hr, min), Qt::LocalTime).toUTC();
 
     LOG(VB_SCHEDULE, LOG_INFO, QString("Start Date Time: %1")
-                                   .arg(m_startDateTime.toString()));
+        .arg(m_startDateTime.toString(Qt::ISODate)));
 
     // Note we allow start times up to one hour in the past so
     // if it is 20:25 the user can start a recording at 20:30
     // by first setting the hour and then the minute.
-    QDateTime tmp = QDateTime(m_startDateTime.date(),
-                              QTime(m_startDateTime.time().hour(),59,59));
+    QDateTime tmp = QDateTime(
+        m_startDateTime.toLocalTime().date(),
+        QTime(m_startDateTime.toLocalTime().time().hour(),59,59),
+        Qt::LocalTime).toUTC();
     if (tmp < m_nowDateTime)
     {
-        hr = m_nowDateTime.time().hour();
+        hr = m_nowDateTime.toLocalTime().time().hour();
         m_starthourSpin->SetValue(hr);
-        m_startDateTime.setDate(m_nowDateTime.date());
-        m_startDateTime.setTime(QTime(hr, min));
+        m_startDateTime =
+            QDateTime(m_nowDateTime.toLocalTime().date(),
+                      QTime(hr, min), Qt::LocalTime).toUTC();
     }
     connectSignals();
 }

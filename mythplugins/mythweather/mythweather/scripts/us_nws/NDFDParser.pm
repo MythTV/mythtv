@@ -177,7 +177,7 @@ sub timeChar {
 ########## Exported method to do parsing #################
 
 sub doParse {
-    my ($lat, $lon, $start, $end, $params) = @_;
+    my ($lat, $lon, $start, $end, $units, $params) = @_;
     my $product = "time-series";
 
     my $NDFD_XML = ndfdXML->NDFDgen(SOAP::Data->name("latitude" => $lat), 
@@ -185,6 +185,7 @@ sub doParse {
         SOAP::Data->name("product" => $product),
         SOAP::Data->name("startTime" => $start),
         SOAP::Data->name("endTime" => $end),
+        SOAP::Data->name("Unit" => $units),
         SOAP::Data->name("weatherParameters" => 
             \SOAP::Data->value(
                 SOAP::Data->type('boolean')->name("maxt" => $params->{maxt}),

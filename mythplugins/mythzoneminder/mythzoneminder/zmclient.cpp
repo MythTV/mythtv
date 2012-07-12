@@ -10,7 +10,7 @@
 //myth
 #include "mythcontext.h"
 #include "mythdialogbox.h"
-#include "mythmiscutil.h"
+#include <mythdate.h>
 #include "mythmainwindow.h"
 #include "mythlogging.h"
 
@@ -91,7 +91,7 @@ bool ZMClient::connectToHost(const QString &lhostname, unsigned int lport)
                 .arg(m_hostname).arg(m_port).arg(count));
         if (m_socket)
         {
-            m_socket->DownRef();
+            m_socket->DecrRef();
             m_socket = NULL;
         }
 
@@ -99,7 +99,7 @@ bool ZMClient::connectToHost(const QString &lhostname, unsigned int lport)
         //m_socket->setCallbacks(this);
         if (!m_socket->connect(m_hostname, m_port))
         {
-            m_socket->DownRef();
+            m_socket->DecrRef();
             m_socket = NULL;
         }
         else
@@ -243,7 +243,8 @@ ZMClient::~ZMClient()
 
     if (m_socket)
     {
-        m_socket->DownRef();
+        m_socket->DecrRef();
+        m_socket = NULL;
         m_zmclientReady = false;
     }
 
@@ -332,8 +333,7 @@ void ZMClient::getEventList(const QString &monitorName, bool oldestFirst,
         item->monitorID = (*it++).toInt();
         item->monitorName = *it++;
         QString sDate = *it++;
-        QDateTime dt = QDateTime::fromString(sDate, Qt::ISODate);
-        item->startTime = dt;
+        item->startTime = MythDate::fromString(sDate);
         item->length = *it++;
         eventList->push_back(item);
     }
@@ -511,7 +511,7 @@ void ZMClient::getEventFrame(Event *event, int frameNo, MythImage **image)
 {
     if (*image)
     {
-        (*image)->DownRef();
+        (*image)->DecrRef();
         *image = NULL;
     }
 
@@ -538,7 +538,6 @@ void ZMClient::getEventFrame(Event *event, int frameNo, MythImage **image)
 
     // get a MythImage
     *image = GetMythMainWindow()->GetCurrentPainter()->GetFormatImage();
-    (*image)->UpRef();
 
     // extract the image data and create a MythImage from it
     if (!(*image)->loadFromData(data, imageSize, "JPEG"))

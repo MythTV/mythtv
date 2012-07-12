@@ -31,7 +31,8 @@ BufferedSocketDevice::BufferedSocketDevice( int nSocket  )
 
     struct linger ling = {1, 1};
 
-    if ( setsockopt(socket(), SOL_SOCKET, SO_LINGER, &ling, sizeof(ling)) < 0) 
+    if ( setsockopt(socket(), SOL_SOCKET, SO_LINGER, (const char *)&ling,
+                    sizeof(ling)) < 0) 
         LOG(VB_GENERAL, LOG_ERR, 
             "BufferedSocketDevice: setsockopt - SO_LINGER: " + ENO);
 
@@ -47,7 +48,7 @@ BufferedSocketDevice::BufferedSocketDevice( int nSocket  )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-BufferedSocketDevice::BufferedSocketDevice( MSocketDevice *pSocket /*= NULL*/,
+BufferedSocketDevice::BufferedSocketDevice( MSocketDevice *pSocket /* = NULL*/,
                                             bool bTakeOwnership /* = false */ )
 {
     m_pSocket            = pSocket;

@@ -123,8 +123,10 @@ void ViewScheduleDiff::showStatus(MythUIButtonListItem *item)
                  pa->GetRecordingStatus() == rsRecording))
             {
                 message += QString("%1 - %2  %3\n")
-                    .arg(pa->GetRecordingStartTime().toString(timeFormat))
-                    .arg(pa->GetRecordingEndTime().toString(timeFormat))
+                    .arg(pa->GetRecordingStartTime()
+                         .toLocalTime().toString(timeFormat))
+                    .arg(pa->GetRecordingEndTime()
+                         .toLocalTime().toString(timeFormat))
                     .arg(pa->toString(ProgramInfo::kTitleSubtitle, " - "));
             }
         }
@@ -200,7 +202,7 @@ void ViewScheduleDiff::fillList(void)
     std::stable_sort(m_recListAfter.begin(), m_recListAfter.end(),
                      comp_recstart_less_than);
 
-    QDateTime now = QDateTime::currentDateTime();
+    QDateTime now = MythDate::current();
 
     ProgramList::iterator it = m_recListBefore.begin();
     while (it != m_recListBefore.end())

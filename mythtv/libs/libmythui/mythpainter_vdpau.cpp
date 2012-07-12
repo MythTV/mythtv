@@ -5,7 +5,6 @@
 #include <QCoreApplication>
 #include <QPainter>
 #include <QMutex>
-#include <QX11Info>
 
 // Mythdb headers
 #include "mythlogging.h"

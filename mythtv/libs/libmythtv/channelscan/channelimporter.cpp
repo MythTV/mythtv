@@ -481,15 +481,28 @@ ScanDTVTransportList ChannelImporter::InsertChannels(
 
                 chan.channel_id = (chanid > 0) ? chanid : chan.channel_id;
 
-                if (chan.channel_id && !chan.db_mplexid)
+                if (chan.channel_id)
                 {
                     uint tsid = chan.vct_tsid;
                     tsid = (tsid) ? tsid : chan.sdt_tsid;
                     tsid = (tsid) ? tsid : chan.pat_tsid;
                     tsid = (tsid) ? tsid : chan.vct_chan_tsid;
 
-                    chan.db_mplexid = ChannelUtil::CreateMultiplex(
-                        chan.source_id, transports[i], tsid, chan.orig_netid);
+                    if (!chan.db_mplexid)
+                    {
+                        chan.db_mplexid = ChannelUtil::CreateMultiplex(
+                            chan.source_id, transports[i], tsid, chan.orig_netid);
+                    }
+                    else
+                    {
+                        // Find the matching multiplex. This updates the
+                        // transport and network ID's in case the transport
+                        // was created manually
+                        int id = ChannelUtil::GetBetterMplexID(chan.db_mplexid,
+                                    tsid, chan.orig_netid);
+                        if (id >= 0)
+                            chan.db_mplexid = id;
+                    }
                 }
 
                 if (chan.channel_id && chan.db_mplexid)
@@ -637,6 +650,18 @@ ScanDTVTransportList ChannelImporter::UpdateChannels(
                     <<chan.chan_num.toAscii().constData()<<endl;
 
                 ChannelUtil::UpdateInsertInfoFromDB(chan);
+
+                // Find the matching multiplex. This updates the
+                // transport and network ID's in case the transport
+                // was created manually
+                uint tsid = chan.vct_tsid;
+                tsid = (tsid) ? tsid : chan.sdt_tsid;
+                tsid = (tsid) ? tsid : chan.pat_tsid;
+                tsid = (tsid) ? tsid : chan.vct_chan_tsid;
+                int id = ChannelUtil::GetBetterMplexID(chan.db_mplexid,
+                            tsid, chan.orig_netid);
+                if (id >= 0)
+                    chan.db_mplexid = id;
 
                 updated = ChannelUtil::UpdateChannel(
                     chan.db_mplexid,

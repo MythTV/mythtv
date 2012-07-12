@@ -35,9 +35,10 @@ using namespace std;
 #include <QFileInfo>
 
 // MythTV headers
-#include <mythmiscutil.h>
+#include <mythdate.h>
 #include <mythdbcon.h>
 #include <httpcomms.h>
+#include <mythsystem.h>
 #include <mythcontext.h>
 #include <mythlogging.h>
 #include <mythmainwindow.h>
@@ -1106,7 +1107,7 @@ void IconView::HandleImport(void)
 
     // Makes import directory samba/windows friendly (no colon)
     QString idirname = m_currDir + "/" +
-        QDateTime::currentDateTime().toString("yyyy-MM-dd_hh-mm-ss");
+        MythDate::current().toString("yyyy-MM-dd_hh-mm-ss");
 
     importdir.mkdir(idirname);
     importdir.setPath(idirname);

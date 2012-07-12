@@ -706,7 +706,7 @@ void PlaylistEditorView::treeItemVisible(MythUIButtonListItem *item)
     if (!mnode)
         return;
 
-    if (item->GetImage().isEmpty())
+    if (item->GetImageFilename().isEmpty())
     {
         QString artFile;
 

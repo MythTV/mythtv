@@ -8,7 +8,7 @@
 #include "mythcorecontext.h"
 #include "mythdb.h"
 #include "mythlogging.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 
 #define LOC QString("SGE(%1): ").arg(m_groupname)
 
@@ -302,11 +302,11 @@ void StorageGroupListEditor::doDelete(void)
     {
         if (name == "Default")
         {
-            message.append("\n" + tr("(from remote hosts)"));
+            message = tr("Delete '%1' Storage Group?\n(from remote hosts)").arg(dispGroup);
         }
         else
         {
-            message.append("\n" + tr("(from all hosts"));
+            message = tr("Delete '%1' Storage Group?\n(from all hosts)").arg(dispGroup);
         }
     }
 

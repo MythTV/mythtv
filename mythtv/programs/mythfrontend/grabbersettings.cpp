@@ -7,6 +7,7 @@
 
 // myth
 #include "mythcorecontext.h"
+#include "mythsystem.h"
 #include "mythdbcon.h"
 #include "mythdirs.h"
 
@@ -84,21 +85,6 @@ GrabberSettings::~GrabberSettings()
 
 void GrabberSettings::Load(void)
 {
-    QString busymessage = tr("Searching for data sources...");
-    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-    MythUIBusyDialog *busyPopup = new MythUIBusyDialog(busymessage, popupStack,
-                                                       "grabberbusydialog");
-
-    if (busyPopup->Create())
-    {
-        popupStack->AddScreen(busyPopup, false);
-    }
-    else
-    {
-        delete busyPopup;
-        busyPopup = NULL;
-    }
-
     QDir TVScriptPath = QString("%1metadata/Television/").arg(GetShareDir());
     QStringList TVScripts = TVScriptPath.entryList(QDir::Files);
     QDir MovieScriptPath = QString("%1metadata/Movie/").arg(GetShareDir());
@@ -186,12 +172,6 @@ void GrabberSettings::Load(void)
                 }
             }
         }
-    }
-
-    if (busyPopup)
-    {
-        busyPopup->Close();
-        busyPopup = NULL;
     }
 }
 

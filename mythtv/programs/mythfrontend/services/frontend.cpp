@@ -1,6 +1,8 @@
 #include <QCoreApplication>
 #include <QKeyEvent>
 
+#include <unistd.h> // for usleep
+
 #include "mythcorecontext.h"
 #include "keybindings.h"
 #include "mythlogging.h"

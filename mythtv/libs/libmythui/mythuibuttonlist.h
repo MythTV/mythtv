@@ -53,20 +53,34 @@ class MUI_PUBLIC MythUIButtonListItem
     void SetFontState(const QString &state, const QString &name="");
 
     /** Sets an image directly, should only be used in special circumstances
-     *  since it bypasses the cache
+     *  since it bypasses the cache.
      */
-    void setImage(MythImage *image, const QString &name="");
+    void SetImage(MythImage *image, const QString &name="");
 
     /** Gets a MythImage which has been assigned to this button item,
-     *  as with setImage() it should only be used in special circumstances
-     *  since it bypasses the cache
+     *  as with SetImage() it should only be used in special circumstances
+     *  since it bypasses the cache.
+     *  \note The reference count is set for one use, call DecrRef() to delete.
      */
-    MythImage *getImage(const QString &name="");
+    MythImage *GetImage(const QString &name="");
+
+    /// Returns true when the image exists.
+    bool HasImage(const QString &name="")
+    {
+        MythImage *img = GetImage(name);
+        if (img)
+        {
+            img->DecrRef();
+            return true;
+        }
+
+        return false;
+    }
 
     void SetImage(const QString &filename, const QString &name="",
                   bool force_reload = false);
     void SetImageFromMap(const InfoMap &imageMap);
-    QString GetImage(const QString &name="") const;
+    QString GetImageFilename(const QString &name="") const;
 
     void DisplayState(const QString &state, const QString &name);
     void SetStatesFromMap(const InfoMap &stateMap);
@@ -140,7 +154,7 @@ class MUI_PUBLIC MythUIButtonList : public MythUIType
     void Update();
 
     virtual void SetValue(int value) { MoveToNamedPosition(QString::number(value)); }
-    virtual void SetValue(QString value) { MoveToNamedPosition(value); }
+    virtual void SetValue(const QString &value) { MoveToNamedPosition(value); }
     void SetValueByData(QVariant data);
     virtual int  GetIntValue() const;
     virtual QString  GetValue() const;
@@ -228,12 +242,12 @@ class MUI_PUBLIC MythUIButtonList : public MythUIType
                         int & first_item, int & last_item,
                         int & selected_column, int & selected_row,
                         int & skip_cols, int ** col_widths,
-			QList<int> & row_heights,
+                        QList<int> & row_heights,
                         int & top_height, int & bottom_height,
                         bool & wrapped);
     bool DistributeButtons(void);
-    void SetPosition(void);
-    void SetPositionArrowStates(void);
+    void CalculateButtonPositions(void);
+    void CalculateArrowStates(void);
     void SetScrollBarPosition(void);
     void ItemVisible(MythUIButtonListItem *item);
 

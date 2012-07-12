@@ -587,7 +587,7 @@ static FmtConv FmtList[] =
     FMT_NULL
 };
 
-ConstFilterInfo filter_table[] =
+const FilterInfo filter_table[] =
 {
     {
         filter_init: &new_filter,

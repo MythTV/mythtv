@@ -9,6 +9,7 @@
 #include <QKeyEvent>
 
 #include "mthread.h"
+#include "mythdate.h"
 #include "mythlogging.h"
 #include "mythcorecontext.h"
 #include "mythuiactions.h"
@@ -19,7 +20,6 @@
 
 #include "bonjourregister.h"
 #include "mythairplayserver.h"
-#include "mythraopdevice.h"
 
 MythAirplayServer* MythAirplayServer::gMythAirplayServer = NULL;
 MThread*           MythAirplayServer::gMythAirplayServerThread = NULL;
@@ -107,6 +107,23 @@ QMutex*            MythAirplayServer::gMythAirplayServerMutex = new QMutex(QMute
 "<false/>\r\n"\
 "</dict>\r\n"\
 "</plist>\r\n")
+
+QString AirPlayHardwareId()
+{
+    QString key = "AirPlayId";
+    QString id = gCoreContext->GetSetting(key);
+    int size = id.size();
+    if (size == 12)
+        return id;
+
+    QByteArray ba;
+    for (int i = 0; i < AIRPLAY_HARDWARE_ID_SIZE; i++)
+        ba.append((random() % 80) + 33);
+    id = ba.toHex();
+
+    gCoreContext->SaveSetting(key, id);
+    return id;
+}
 
 class APHTTPRequest
 {
@@ -726,7 +743,7 @@ void MythAirplayServer::SendResponse(QTcpSocket *socket,
     reply.append(StatusToString(status));
     reply.append("\r\n");
     reply.append("DATE: ");
-    reply.append(QDateTime::currentDateTime().toString("ddd, d MMM yyyy hh:mm:ss"));
+    reply.append(MythDate::current().toString("ddd, d MMM yyyy hh:mm:ss"));
     reply.append(" GMT\r\n");
     if (header.size())
         reply.append(header);
@@ -825,7 +842,7 @@ void MythAirplayServer::GetPlayerStatus(bool &playing, float &speed,
 
 QString MythAirplayServer::GetMacAddress()
 {
-    QString id = MythRAOPDevice::HardwareId();
+    QString id = AirPlayHardwareId();
 
     QString res;
     for (int i = 1; i <= id.size(); i++)

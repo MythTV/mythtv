@@ -6,8 +6,9 @@
 #include <QDir>
 
 // MythTV headers
-#include <mythcontext.h>
+#include <mythdate.h>
 #include <mythdb.h>
+#include <mythcontext.h>
 #include <mythdialogs.h>
 #include <mythscreenstack.h>
 #include <mythprogressdialog.h>
@@ -141,7 +142,7 @@ void FileScanner::BuildFileList(QString &directory, MusicLoadedMap &music_files,
                 update_interval = 0;
             }
 
-            music_files[filename] = kFileSystem;
+            music_files[filename] = FileScanner::kFileSystem;
         }
     }
 }
@@ -200,26 +201,22 @@ int FileScanner::GetDirectoryId(const QString &directory, const int &parentid)
  *
  * \returns True if file has been modified, otherwise false
  */
-bool FileScanner::HasFileChanged(const QString &filename, const QString &date_modified)
+bool FileScanner::HasFileChanged(
+    const QString &filename, const QString &date_modified)
 {
-    struct stat stbuf;
-
-    QByteArray fname = filename.toLocal8Bit();
-    if (stat(fname.constData(), &stbuf) == 0)
+    QFileInfo fi(filename);
+    QDateTime dt = fi.lastModified();
+    if (dt.isValid())
     {
-        if (date_modified.isEmpty() ||
-            stbuf.st_mtime >
-            (time_t)QDateTime::fromString(date_modified,
-                                          Qt::ISODate).toTime_t())
-        {
-            return true;
-        }
+        QDateTime old_dt = MythDate::fromString(date_modified);
+        return !old_dt.isValid() || (dt > old_dt);
     }
-    else {
+    else
+    {
         LOG(VB_GENERAL, LOG_ERR, QString("Failed to stat file: %1")
                 .arg(filename));
+        return false;
     }
-    return false;
 }
 
 /*!
@@ -269,6 +266,7 @@ void FileScanner::AddFileToDB(const QString &filename)
         LOG(VB_FILE, LOG_INFO,
             QString("Reading metadata from %1").arg(filename));
         Metadata *data = decoder->readMetadata();
+        data->setFileSize((quint64)QFileInfo(filename).size());
         if (data)
         {
             QString album_cache_string;
@@ -494,8 +492,20 @@ void FileScanner::UpdateFileInDB(const QString &filename)
 
         if (db_meta && disk_meta)
         {
+            if (db_meta->ID() <= 0)
+            {
+                LOG(VB_GENERAL, LOG_ERR, QString("Asked to update track with "
+                                                 "invalid ID - %1")
+                                                .arg(db_meta->ID()));
+                delete disk_meta;
+                delete db_meta;
+                return;
+            }
+            
             disk_meta->setID(db_meta->ID());
             disk_meta->setRating(db_meta->Rating());
+            if (db_meta->PlayCount() > disk_meta->PlayCount())
+                disk_meta->setPlaycount(db_meta->Playcount());
 
             QString album_cache_string;
 
@@ -521,6 +531,8 @@ void FileScanner::UpdateFileInDB(const QString &filename)
             if (gid > 0)
                 disk_meta->setGenreId(gid);
 
+            disk_meta->setFileSize((quint64)QFileInfo(filename).size());
+            
             // Commit track info to database
             disk_meta->dumpToDatabase();
 
@@ -613,11 +625,11 @@ void FileScanner::SearchDir(QString &directory)
     uint counter = 0;
     for (iter = music_files.begin(); iter != music_files.end(); iter++)
     {
-        if (*iter == kFileSystem)
+        if (*iter == FileScanner::kFileSystem)
             AddFileToDB(iter.key());
-        else if (*iter == kDatabase)
+        else if (*iter == FileScanner::kDatabase)
             RemoveFileFromDB(iter.key ());
-        else if (*iter == kNeedUpdate)
+        else if (*iter == FileScanner::kNeedUpdate)
             UpdateFileInDB(iter.key());
 
         if (file_checking)
@@ -683,7 +695,7 @@ void FileScanner::ScanMusic(MusicLoadedMap &music_files)
             {
                 if ((iter = music_files.find(name)) != music_files.end())
                 {
-                    if (music_files[name] == kDatabase)
+                    if (music_files[name] == FileScanner::kDatabase)
                     {
                         if (file_checking)
                         {
@@ -693,13 +705,13 @@ void FileScanner::ScanMusic(MusicLoadedMap &music_files)
                         continue;
                     }
                     else if (HasFileChanged(name, query.value(1).toString()))
-                        music_files[name] = kNeedUpdate;
+                        music_files[name] = FileScanner::kNeedUpdate;
                     else
                         music_files.erase(iter);
                 }
                 else
                 {
-                    music_files[name] = kDatabase;
+                    music_files[name] = FileScanner::kDatabase;
                 }
             }
 
@@ -765,7 +777,7 @@ void FileScanner::ScanArtwork(MusicLoadedMap &music_files)
             {
                 if ((iter = music_files.find(name)) != music_files.end())
                 {
-                    if (music_files[name] == kDatabase)
+                    if (music_files[name] == FileScanner::kDatabase)
                     {
                         if (file_checking)
                         {
@@ -779,7 +791,7 @@ void FileScanner::ScanArtwork(MusicLoadedMap &music_files)
                 }
                 else
                 {
-                    music_files[name] = kDatabase;
+                    music_files[name] = FileScanner::kDatabase;
                 }
             }
             if (file_checking)

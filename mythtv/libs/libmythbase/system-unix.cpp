@@ -305,11 +305,13 @@ void MythSystemManager::run(void)
 
             // Occasionally, the caller has deleted the structure from under
             // our feet.  If so, just log and move on.
-            if (!ms)
+            if (!ms || !ms->m_parent)
             {
                 LOG(VB_SYSTEM, LOG_ERR,
                     QString("Structure for child PID %1 already deleted!")
                     .arg(pid));
+                if (ms)
+                    ms->DecrRef();
                 continue;
             }
 
@@ -438,6 +440,7 @@ void MythSystemManager::run(void)
 void MythSystemManager::append(MythSystemUnix *ms)
 {
     m_mapLock.lock();
+    ms->IncrRef();
     m_pMap.insert(ms->m_pid, ms);
     m_mapLock.unlock();
 
@@ -483,18 +486,18 @@ void MythSystemSignalManager::run(void)
 {
     RunProlog();
     LOG(VB_GENERAL, LOG_INFO, "Starting process signal handler");
-    while( run_system )
+    while (run_system)
     {
         struct timespec ts;
         ts.tv_sec = 0;
         ts.tv_nsec = 50 * 1000 * 1000; // 50ms
         nanosleep(&ts, NULL); // sleep 50ms
 
-        while( run_system )
+        while (run_system)
         {
             // handle cleanup and signalling for closed processes
             listLock.lock();
-            if( msList.isEmpty() )
+            if (msList.isEmpty()) 
             {
                 listLock.unlock();
                 break;
@@ -506,7 +509,10 @@ void MythSystemSignalManager::run(void)
             if (!ms)
                 continue;
 
-            ms->m_parent->HandlePostRun();
+            if (ms->m_parent)
+            {
+                ms->m_parent->HandlePostRun();
+            }
 
             if (ms->m_stdpipe[0] > 0)
                 writeThread->remove(ms->m_stdpipe[0]);
@@ -520,19 +526,18 @@ void MythSystemSignalManager::run(void)
                 readThread->remove(ms->m_stdpipe[2]);
             CLOSE(ms->m_stdpipe[2]);
 
-            if( ms->GetStatus() == GENERIC_EXIT_OK )
-                emit ms->finished();
-            else
-                emit ms->error(ms->GetStatus());
+            if (ms->m_parent)
+            {
+                if (ms->GetStatus() == GENERIC_EXIT_OK)
+                    emit ms->finished();
+                else
+                    emit ms->error(ms->GetStatus());
 
-            ms->disconnect();
+                ms->disconnect();
+                ms->Unlock();
+            }
 
-            bool cleanup = ms->m_parent->doAutoCleanup();
-
-            ms->Unlock();
-
-            if( cleanup )
-                ms->deleteLater();
+            ms->DecrRef();
         }
     }
     RunEpilog();
@@ -542,14 +547,16 @@ void MythSystemSignalManager::run(void)
  * MythSystem method defines
  ******************************/
 
-MythSystemUnix::MythSystemUnix(MythSystem *parent)
+MythSystemUnix::MythSystemUnix(MythSystem *parent) :
+    MythSystemPrivate("MythSystemUnix")
 {
     m_parent = parent;
 
-    connect( this, SIGNAL(started()), m_parent, SIGNAL(started()) );
-    connect( this, SIGNAL(finished()), m_parent, SIGNAL(finished()) );
-    connect( this, SIGNAL(error(uint)), m_parent, SIGNAL(error(uint)) );
-    connect( this, SIGNAL(readDataReady(int)), m_parent, SIGNAL(readDataReady(int)) );
+    connect(this, SIGNAL(started()), m_parent, SIGNAL(started()));
+    connect(this, SIGNAL(finished()), m_parent, SIGNAL(finished()));
+    connect(this, SIGNAL(error(uint)), m_parent, SIGNAL(error(uint)));
+    connect(this, SIGNAL(readDataReady(int)),
+            m_parent, SIGNAL(readDataReady(int)));
 
     // Start the threads if they haven't been started yet.
     if( manager == NULL )
@@ -577,7 +584,6 @@ MythSystemUnix::MythSystemUnix(MythSystem *parent)
     }
 }
 
-// QBuffers may also need freeing
 MythSystemUnix::~MythSystemUnix(void)
 {
 }

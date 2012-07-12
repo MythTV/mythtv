@@ -20,6 +20,7 @@
 
 #include "mythtimer.h"
 #include "compat.h"
+#include "mythdate.h"
 
 #define LOC QString("TFW(%1:%2): ").arg(filename).arg(fd)
 
@@ -243,7 +244,7 @@ uint ThreadedFileWriter::Write(const void *data, uint count)
     totalBufferUse += count;
     const char *cdata = (const char*) data;
     buf->data.insert(buf->data.end(), cdata, cdata+count);
-    buf->lastUsed = QDateTime::currentDateTime();
+    buf->lastUsed = MythDate::current();
 
     writeBuffers.push_back(buf);
 
@@ -488,7 +489,7 @@ void ThreadedFileWriter::DiskLoop(void)
 
         //////////////////////////////////////////
 
-        buf->lastUsed = QDateTime::currentDateTime();
+        buf->lastUsed = MythDate::current();
         emptyBuffers.push_back(buf);
 
         if (writeTimer.elapsed() > 1000)
@@ -534,7 +535,7 @@ void ThreadedFileWriter::DiskLoop(void)
 
 void ThreadedFileWriter::TrimEmptyBuffers(void)
 {
-    QDateTime cur = QDateTime::currentDateTime();
+    QDateTime cur = MythDate::current();
     QDateTime cur_m_60 = cur.addSecs(-60);
 
     QList<TFWBuffer*>::iterator it = emptyBuffers.begin();

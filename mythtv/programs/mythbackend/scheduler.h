@@ -185,16 +185,27 @@ class Scheduler : public MThread, public MythScheduler
 
     void EnqueueMatch(uint recordid, uint sourceid, uint mplexid,
                       const QDateTime maxstarttime, const QString &why)
-    { reschedQueue.enqueue(ScheduledRecording::BuildMatchRequest(recordid, 
-                                     sourceid, mplexid, maxstarttime, why)); };
+    { QMutexLocker locker(&m_queueLock);
+      reschedQueue.enqueue(ScheduledRecording::BuildMatchRequest(recordid,
+                                      sourceid, mplexid, maxstarttime, why)); };
     void EnqueueCheck(const RecordingInfo &recinfo, const QString &why)
-    { reschedQueue.enqueue(ScheduledRecording::BuildCheckRequest(recinfo, 
-                                                                 why)); };
+    { QMutexLocker locker(&m_queueLock);
+        reschedQueue.enqueue(ScheduledRecording::BuildCheckRequest(recinfo,
+                                                                    why)); };
     void EnqueuePlace(const QString &why)
-    { reschedQueue.enqueue(ScheduledRecording::BuildPlaceRequest(why)); };
+    { QMutexLocker locker(&m_queueLock);
+      reschedQueue.enqueue(ScheduledRecording::BuildPlaceRequest(why)); };
+
+    bool HaveQueuedRequests(void)
+    {  QMutexLocker locker(&m_queueLock); return !reschedQueue.empty(); };
+    void ClearRequestQueue(void)
+    {  QMutexLocker locker(&m_queueLock); reschedQueue.clear(); };
+
+    
 
     MythDeque<QStringList> reschedQueue;
     mutable QMutex schedLock;
+    mutable QMutex m_queueLock;
     QMutex recordmatchLock;
     QWaitCondition reschedWait;
     RecList reclist;

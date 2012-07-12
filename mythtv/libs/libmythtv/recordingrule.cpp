@@ -11,7 +11,7 @@
 #include "scheduledrecording.h" // For RescheduleMatch()
 #include "playgroup.h" // For GetInitialName()
 #include "recordingprofile.h" // For constants
-#include "mythmiscutil.h"
+#include "mythdate.h"
 
 static inline QString null_to_empty(const QString &str)
 {
@@ -28,15 +28,16 @@ RecordingRule::RecordingRule()
     m_isInactive(false),
     m_season(0),
     m_episode(0),
-    m_starttime(QTime::currentTime()),
-    m_startdate(QDate::currentDate()),
-    m_endtime(QTime::currentTime()),
-    m_enddate(QDate::currentDate()),
+    m_starttime(),
+    m_startdate(),
+    m_endtime(),
+    m_enddate(),
     m_inetref(), // String could be null when we trying to insert into DB
     m_channelid(0),
     m_findday(-1),
     m_findtime(QTime::fromString("00:00:00", Qt::ISODate)),
-    m_findid(QDate(1970, 1, 1).daysTo(QDate::currentDate()) + 719528),
+    m_findid(QDate(1970, 1, 1).daysTo(MythDate::current().toLocalTime().date())
+             + 719528),
     m_type(kNotRecording),
     m_searchType(kNoSearch),
     m_recPriority(0),
@@ -63,9 +64,9 @@ RecordingRule::RecordingRule()
     m_autoUserJob3(gCoreContext->GetNumSetting("AutoRunUserJob3", 0)),
     m_autoUserJob4(gCoreContext->GetNumSetting("AutoRunUserJob4", 0)),
     m_autoMetadataLookup(gCoreContext->GetNumSetting("AutoMetadataLookup", 1)),
-    m_nextRecording(QDateTime::fromString("0000-00-00T00:00:00", Qt::ISODate)),
-    m_lastRecorded(QDateTime::fromString("0000-00-00T00:00:00", Qt::ISODate)),
-    m_lastDeleted(QDateTime::fromString("0000-00-00T00:00:00", Qt::ISODate)),
+    m_nextRecording(MythDate::fromString("0000-00-00T00:00:00")),
+    m_lastRecorded(MythDate::fromString("0000-00-00T00:00:00")),
+    m_lastDeleted(MythDate::fromString("0000-00-00T00:00:00")),
     m_averageDelay(100),
     m_recordTable("record"),
     m_tempID(0),
@@ -75,6 +76,9 @@ RecordingRule::RecordingRule()
     m_progInfo(NULL),
     m_loaded(false)
 {
+    QDateTime dt = MythDate::current();
+    m_enddate = m_startdate = dt.date();
+    m_endtime = m_starttime = dt.time();
 }
 
 bool RecordingRule::Load(bool asTemplate)
@@ -176,9 +180,9 @@ bool RecordingRule::Load(bool asTemplate)
     // and influence watch list weighting
     if (!asTemplate)
     {
-        m_nextRecording = query.value(43).toDateTime();
-        m_lastRecorded = query.value(44).toDateTime();
-        m_lastDeleted = query.value(45).toDateTime();
+        m_nextRecording = MythDate::as_utc(query.value(43).toDateTime());
+        m_lastRecorded = MythDate::as_utc(query.value(44).toDateTime());
+        m_lastDeleted = MythDate::as_utc(query.value(45).toDateTime());
         m_averageDelay = query.value(46).toInt();
     }
 
@@ -259,9 +263,10 @@ bool RecordingRule::LoadBySearch(RecSearchType lsearch, QString textname,
         m_title = ltitle;
         m_subtitle = from;
         m_description = forwhat;
-        m_findday = (m_startdate.dayOfWeek() + 1) % 7;
+        QDate ldate = MythDate::current().toLocalTime().date();
+        m_findday = (ldate.dayOfWeek() + 1) % 7;
         QDate epoch(1970, 1, 1);
-        m_findid = epoch.daysTo(m_startdate) + 719528;
+        m_findid = epoch.daysTo(ldate) + 719528;
     }
 
     m_loaded = true;
@@ -527,17 +532,22 @@ void RecordingRule::ToMap(InfoMap &infoMap) const
         infoMap["category"] = m_category;
     infoMap["callsign"] = m_station;
 
-    infoMap["starttime"] = MythTimeToString(m_starttime, kTime);
-    infoMap["startdate"] = MythDateToString(m_startdate, kDateFull | kSimplify);
-    infoMap["endtime"] = MythTimeToString(m_endtime, kTime);
-    infoMap["enddate"] = MythDateToString(m_enddate, kDateFull | kSimplify);
+    QDateTime starttm(m_startdate, m_starttime, Qt::UTC);
+    infoMap["starttime"] = MythDate::toString(starttm, MythDate::kTime);
+    infoMap["startdate"] = MythDate::toString(
+        starttm, MythDate::kDateFull | MythDate::kSimplify);
+
+    QDateTime endtm(m_enddate, m_endtime, Qt::UTC);
+    infoMap["endtime"] = MythDate::toString(endtm, MythDate::kTime);
+    infoMap["enddate"] = MythDate::toString(
+        endtm, MythDate::kDateFull | MythDate::kSimplify);
 
     infoMap["inetref"] = m_inetref;
     infoMap["chanid"] = m_channelid;
     infoMap["channel"] = m_station;
 
-    QDateTime startts(m_startdate, m_starttime);
-    QDateTime endts(m_enddate, m_endtime);
+    QDateTime startts(m_startdate, m_starttime, Qt::UTC);
+    QDateTime endts(m_enddate, m_endtime, Qt::UTC);
 
     QString length;
     int hours, minutes, seconds;
@@ -560,17 +570,21 @@ void RecordingRule::ToMap(InfoMap &infoMap) const
         infoMap["lentime"] = minstring;
 
 
-    infoMap["timedate"] = MythDateTimeToString(startts,
-                                            kDateTimeFull | kSimplify) + " - " +
-                          MythDateTimeToString(endts, kTime);
+    infoMap["timedate"] = MythDate::toString(
+        startts, MythDate::kDateTimeFull | MythDate::kSimplify) + " - " +
+        MythDate::toString(endts, MythDate::kTime);
 
-    infoMap["shorttimedate"] = MythDateTimeToString(startts,
-                                            kDateTimeShort | kSimplify) + " - " +
-                               MythDateTimeToString(endts, kTime);
+    infoMap["shorttimedate"] =
+        MythDate::toString(
+            startts, MythDate::kDateTimeShort | MythDate::kSimplify) + " - " +
+        MythDate::toString(endts, MythDate::kTime);
 
     if (m_type == kFindDailyRecord || m_type == kFindWeeklyRecord)
     {
-        QString findfrom = MythTimeToString(m_findtime, kTime);
+        QDateTime ldt =
+            QDateTime(MythDate::current().toLocalTime().date(), m_findtime,
+                      Qt::LocalTime);
+        QString findfrom = MythDate::toString(ldt, MythDate::kTime);
         if (m_type == kFindWeeklyRecord)
         {
             int daynum = (m_findday + 5) % 7 + 1;
@@ -587,16 +601,22 @@ void RecordingRule::ToMap(InfoMap &infoMap) const
     if (m_searchType != kNoSearch)
         infoMap["searchforwhat"] = m_description;
 
-
+    using namespace MythDate;
     if (m_nextRecording.isValid())
-        infoMap["nextrecording"] = MythDateTimeToString(m_nextRecording,
-                                                        kDateFull | kAddYear);
+    {
+        infoMap["nextrecording"] = MythDate::toString(
+            m_nextRecording, kDateFull | kAddYear);
+    }
     if (m_lastRecorded.isValid())
-        infoMap["lastrecorded"] = MythDateTimeToString(m_lastRecorded,
-                                                       kDateFull | kAddYear);
+    {
+        infoMap["lastrecorded"] = MythDate::toString(
+            m_lastRecorded, kDateFull | kAddYear);
+    }
     if (m_lastDeleted.isValid())
-        infoMap["lastdeleted"] = MythDateTimeToString(m_lastDeleted,
-                                                      kDateFull | kAddYear);
+    {
+        infoMap["lastdeleted"] = MythDate::toString(
+            m_lastDeleted, kDateFull | kAddYear);
+    }
 
     infoMap["ruletype"] = toString(m_type);
     infoMap["rectype"] = toString(m_type);
@@ -686,12 +706,13 @@ void RecordingRule::AssignProgramInfo()
     if (m_findday < 0)
     {
         m_findday =
-            (m_progInfo->GetScheduledStartTime().date().dayOfWeek() + 1) % 7;
-        m_findtime = m_progInfo->GetScheduledStartTime().time();
+            (m_progInfo->GetScheduledStartTime().toLocalTime().date()
+             .dayOfWeek() + 1) % 7;
+        m_findtime = m_progInfo->GetScheduledStartTime().toLocalTime().time();
 
         QDate epoch(1970, 1, 1);
         m_findid = epoch.daysTo(
-            m_progInfo->GetScheduledStartTime().date()) + 719528;
+            m_progInfo->GetScheduledStartTime().toLocalTime().date()) + 719528;
     }
     else
     {
@@ -701,7 +722,8 @@ void RecordingRule::AssignProgramInfo()
         {
             QDate epoch(1970, 1, 1);
             m_findid = epoch.daysTo(
-                m_progInfo->GetScheduledStartTime().date()) + 719528;
+                m_progInfo->GetScheduledStartTime().toLocalTime().date())
+                + 719528;
         }
     }
     m_category = m_progInfo->GetCategory();

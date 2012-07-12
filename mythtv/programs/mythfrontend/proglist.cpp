@@ -19,7 +19,7 @@ using namespace std;
 #include "channelutil.h"
 #include "proglist.h"
 #include "mythdb.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 
 #define LOC      QString("ProgLister: ")
 #define LOC_WARN QString("ProgLister, Warning: ")
@@ -32,7 +32,7 @@ ProgLister::ProgLister(MythScreenStack *parent, ProgListType pltype,
     m_recid(0),
     m_title(),
     m_extraArg(extraArg),
-    m_startTime(QDateTime::currentDateTime()),
+    m_startTime(MythDate::current()),
     m_searchTime(m_startTime),
     m_channelOrdering(gCoreContext->GetSetting("ChannelOrdering", "channum")),
 
@@ -82,7 +82,7 @@ ProgLister::ProgLister(
     m_recid(recid),
     m_title(title),
     m_extraArg(),
-    m_startTime(QDateTime::currentDateTime()),
+    m_startTime(MythDate::current()),
     m_searchTime(m_startTime),
     m_channelOrdering(gCoreContext->GetSetting("ChannelOrdering", "channum")),
 
@@ -340,8 +340,8 @@ void ProgLister::SwitchToPreviousView(void)
     {
         m_searchTime = m_searchTime.addSecs(-3600);
         m_curView = 0;
-        m_viewList[m_curView]     = MythDateTimeToString(m_searchTime,
-                                                         kDateTimeFull | kSimplify);
+        m_viewList[m_curView]     = MythDate::toString(m_searchTime,
+                                                         MythDate::kDateTimeFull | MythDate::kSimplify);
         m_viewTextList[m_curView] = m_viewList[m_curView];
         LoadInBackground();
         return;
@@ -363,8 +363,8 @@ void ProgLister:: SwitchToNextView(void)
     {
         m_searchTime = m_searchTime.addSecs(3600);
         m_curView = 0;
-        m_viewList[m_curView] = MythDateTimeToString(m_searchTime,
-                                                     kDateTimeFull | kSimplify);
+        m_viewList[m_curView] = MythDate::toString(m_searchTime,
+                                                     MythDate::kDateTimeFull | MythDate::kSimplify);
         m_viewTextList[m_curView] = m_viewList[m_curView];
         LoadInBackground();
 
@@ -513,8 +513,8 @@ void ProgLister::SetViewFromTime(QDateTime searchTime)
 
     m_searchTime = searchTime;
     m_curView = 0;
-    m_viewList[m_curView] = MythDateTimeToString(m_searchTime,
-                                                 kDateTimeFull | kSimplify);
+    m_viewList[m_curView] = MythDate::toString(m_searchTime,
+                                                 MythDate::kDateTimeFull | MythDate::kSimplify);
     m_viewTextList[m_curView] = m_viewList[m_curView];
 
     LoadInBackground();
@@ -964,8 +964,8 @@ void ProgLister::FillViewList(const QString &view)
     else if (m_type == plTime)
     {
         m_curView = 0;
-        m_viewList.push_back(MythDateTimeToString(m_searchTime,
-                                                  kDateTimeFull | kSimplify));
+        m_viewList.push_back(MythDate::toString(m_searchTime,
+                                                  MythDate::kDateTimeFull | MythDate::kSimplify));
         m_viewTextList.push_back(m_viewList[m_curView]);
     }
     else if (m_type == plSQLSearch)

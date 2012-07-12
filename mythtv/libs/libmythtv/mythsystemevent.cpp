@@ -171,7 +171,7 @@ void MythSystemEventHandler::SubstituteMatches(const QStringList &tokens,
             if (++it == tokens.end())
                 break;
 
-            recstartts = QDateTime::fromString(*it, Qt::ISODate);
+            recstartts = MythDate::fromString(*it);
 
             if (!args.isEmpty())
                 args += " ";
@@ -200,7 +200,7 @@ void MythSystemEventHandler::SubstituteMatches(const QStringList &tokens,
     {
         command.replace(QString("%CHANID%"), QString::number(chanid));
         command.replace(QString("%STARTTIME%"),
-                        recstartts.toString("yyyyMMddhhmmss"));
+                        MythDate::toString(recstartts, MythDate::kFilename));
         command.replace(QString("%STARTTIMEISO%"),
                         recstartts.toString(Qt::ISODate));
     }
@@ -321,15 +321,19 @@ void MythSystemEventHandler::customEvent(QEvent *e)
 void SendMythSystemRecEvent(const QString msg, const RecordingInfo *pginfo)
 {
     if (pginfo)
+    {
         gCoreContext->SendSystemEvent(
             QString("%1 CARDID %2 CHANID %3 STARTTIME %4 RECSTATUS %5")
-                    .arg(msg).arg(pginfo->GetCardID())
-                    .arg(pginfo->GetChanID())
-                    .arg(pginfo->GetRecordingStartTime(ISODate))
-                    .arg(pginfo->GetRecordingStatus()));
+            .arg(msg).arg(pginfo->GetCardID())
+            .arg(pginfo->GetChanID())
+            .arg(pginfo->GetRecordingStartTime(MythDate::ISODate))
+            .arg(pginfo->GetRecordingStatus()));
+    }
     else
-        LOG(VB_GENERAL, LOG_ERR, LOC + "SendMythSystemRecEvent() called with "
-                                       "empty RecordingInfo");
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            "SendMythSystemRecEvent() called with empty RecordingInfo");
+    }
 }
 
 /** \fn SendMythSystemPlayEvent(const QString msg, const ProgramInfo *pginfo)
@@ -345,7 +349,7 @@ void SendMythSystemPlayEvent(const QString msg, const ProgramInfo *pginfo)
             QString("%1 HOSTNAME %2 CHANID %3 STARTTIME %4")
                     .arg(msg).arg(gCoreContext->GetHostName())
                     .arg(pginfo->GetChanID())
-                    .arg(pginfo->GetRecordingStartTime(ISODate)));
+                    .arg(pginfo->GetRecordingStartTime(MythDate::ISODate)));
     else
         LOG(VB_GENERAL, LOG_ERR, LOC + "SendMythSystemPlayEvent() called with "
                                        "empty ProgramInfo");

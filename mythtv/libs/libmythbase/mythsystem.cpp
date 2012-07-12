@@ -18,6 +18,7 @@
 #include <QCoreApplication>
 
 // libmythbase headers
+#include "referencecounter.h"
 #include "mythcorecontext.h"
 #include "mythevent.h"
 #include "mythlogging.h"
@@ -139,7 +140,7 @@ MythSystem::MythSystem(const MythSystem &other) :
 // QBuffers may also need freeing
 MythSystem::~MythSystem(void)
 {
-    delete d;
+    d->DecrRef();
 }
 
 
@@ -398,6 +399,30 @@ void MythSystem::JumpAbort(void)
     d->JumpAbort();
 }
 
+QString MythSystem::ShellEscape(const QString &in)
+{
+    QString out = in;
+
+    if (out.contains("\""))
+        out = out.replace("\"", "\\\"");
+
+    if (out.contains("\'"))
+        out = out.replace("\'", "\\\'");
+
+    if (out.contains(" "))
+    {
+        out.prepend("\"");
+        out.append("\"");
+    }
+
+    return out;
+}
+
+MythSystemPrivate::MythSystemPrivate(const QString &debugName) :
+    ReferenceCounter(debugName)
+{
+}
+
 uint myth_system(const QString &command, uint flags, uint timeout)
 {
     flags |= kMSRunShell | kMSAutoCleanup;
@@ -405,7 +430,7 @@ uint myth_system(const QString &command, uint flags, uint timeout)
     ms->Run(timeout);
     uint result = ms->Wait(0);
     if (!ms->GetSetting("RunInBackground"))
-        ms->deleteLater();
+        delete ms;
 
     return result;
 }

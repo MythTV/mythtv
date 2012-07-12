@@ -35,7 +35,7 @@ bool PrePostRollFlagger::go()
     int requiredHeadStart = requiredBuffer;
     bool wereRecording = stillRecording;
 
-    secsSince = startedAt.secsTo(QDateTime::currentDateTime());
+    secsSince = startedAt.secsTo(MythDate::current());
     while (stillRecording && (secsSince < requiredHeadStart))
     {
         emit statusUpdate(QObject::tr("Waiting to pass preroll + head start"));
@@ -45,7 +45,7 @@ bool PrePostRollFlagger::go()
             return false;
 
         sleep(5);
-        secsSince = startedAt.secsTo(QDateTime::currentDateTime());
+        secsSince = startedAt.secsTo(MythDate::current());
     }
 
     if (player->OpenFile() < 0)
@@ -76,7 +76,7 @@ bool PrePostRollFlagger::go()
     QTime flagTime;
     flagTime.start();
 
-    if (recordingStopsAt < QDateTime::currentDateTime() )
+    if (recordingStopsAt < MythDate::current() )
         myTotalFrames = player->GetTotalFrameCount();
     else
         myTotalFrames = (long long)(player->GetFrameRate() *
@@ -146,7 +146,7 @@ bool PrePostRollFlagger::go()
 
     if(stillRecording)
     {
-        while (QDateTime::currentDateTime() <= recordingStopsAt)
+        while (MythDate::current() <= recordingStopsAt)
         {
             emit breathe();
             if (m_bStop)
@@ -350,7 +350,7 @@ long long PrePostRollFlagger::findBreakInrange(long long startFrame,
         if (stillRecording)
         {
             int secondsRecorded =
-                recordingStartedAt.secsTo(QDateTime::currentDateTime());
+                recordingStartedAt.secsTo(MythDate::current());
             int secondsFlagged = (int)(framesProcessed / fps);
             int secondsBehind = secondsRecorded - secondsFlagged;
             long usecPerFrame = (long)(1.0 / player->GetFrameRate() * 1000000);

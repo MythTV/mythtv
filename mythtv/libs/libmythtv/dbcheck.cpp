@@ -17,6 +17,8 @@ using namespace std;
 #include "compat.h"
 #include "recordingrule.h"
 
+// TODO convert all dates to UTC
+
 #define MINIMUM_DBMS_VERSION 5,0,15
 
 const QString currentDatabaseVersion = MYTH_DATABASE_VERSION;
@@ -2027,6 +2029,7 @@ NULL
 
     if (dbver == "1301")
     {
+        LOG(VB_GENERAL, LOG_CRIT, "Upgrading to MythTV schema version 1302");
         // Create the Default recording rule template
         RecordingRule record;
         record.MakeTemplate("Default");
@@ -2038,6 +2041,258 @@ NULL
     }
 
     if (dbver == "1302")
+    {
+        QDateTime loc = QDateTime::currentDateTime();
+        QDateTime utc = loc.toUTC();
+        loc = QDateTime(loc.date(), loc.time(), Qt::UTC);
+        int utc_offset = loc.secsTo(utc) / 60;
+
+        QList<QByteArray> updates_ba;
+
+        // Convert DATE and TIME in record into DATETIME
+        const char *pre_sql[] = {
+            "CREATE TEMPORARY TABLE recordupdate ("
+            "recid INT, starttime DATETIME, endtime DATETIME)",
+            "INSERT INTO recordupdate (recid, starttime, endtime) "
+            "SELECT recordid, "
+            "       CONCAT(startdate, ' ', starttime), "
+            "       CONCAT(enddate, ' ', endtime) FROM record",
+        };
+        for (uint i = 0; i < sizeof(pre_sql)/sizeof(char*); i++)
+            updates_ba.push_back(QByteArray(pre_sql[i]));
+
+        // Convert various DATETIME fields from local time to UTC
+        if (0 != utc_offset)
+        {
+            const char *with_endtime[] = {
+                "program", "recorded", "oldrecorded", "recordupdate",
+            };
+            const char *without_endtime[] = {
+                "programgenres", "programrating", "credits",
+                "jobqueue",
+            };
+            QString order = (utc_offset > 0) ? "-starttime" : "starttime";
+
+            for (uint i = 0; i < sizeof(with_endtime)/sizeof(char*); i++)
+            {
+                updates_ba.push_back(
+                         QString("UPDATE %1 "
+                                 "SET starttime = "
+                                 "    CONVERT_TZ(starttime, 'SYSTEM', 'UTC'), "
+                                 "    endtime   = "
+                                 "    CONVERT_TZ(endtime, 'SYSTEM', 'UTC') "
+                                 "ORDER BY %4")
+                         .arg(with_endtime[i])
+                         .arg(order).toLocal8Bit());
+            }
+
+            for (uint i = 0; i < sizeof(without_endtime)/sizeof(char*); i++)
+            {
+                updates_ba.push_back(
+                          QString("UPDATE %1 "
+                                  "SET starttime = "
+                                  "    CONVERT_TZ(starttime, 'SYSTEM', 'UTC') "
+                                  "ORDER BY %3")
+                          .arg(without_endtime[i]).arg(order)
+                          .toLocal8Bit());
+            }
+
+            updates_ba.push_back(
+                         QString("UPDATE oldprogram "
+                                 "SET airdate = "
+                                 "    CONVERT_TZ(airdate, 'SYSTEM', 'UTC') "
+                                 "ORDER BY %3")
+                         .arg((utc_offset > 0) ? "-airdate" : 
+                              "airdate").toLocal8Bit());
+
+            updates_ba.push_back(
+                         QString("UPDATE recorded "
+                                 "set progstart = "
+                                 "    CONVERT_TZ(progstart, 'SYSTEM', 'UTC'), "
+                                 "    progend   = "
+                                 "    CONVERT_TZ(progend, 'SYSTEM', 'UTC') ")
+                         .toLocal8Bit());
+        }
+
+        // Convert DATETIME back to seperate DATE and TIME in record table
+        const char *post_sql[] = {
+            "UPDATE record, recordupdate "
+            "SET record.startdate = DATE(recordupdate.starttime), "
+            "    record.starttime = TIME(recordupdate.starttime), "
+            "    record.enddate = DATE(recordupdate.endtime), "
+            "    record.endtime = TIME(recordupdate.endtime) "
+            "WHERE recordid = recid",
+            "DROP TABLE recordupdate",
+        };
+
+        for (uint i = 0; i < sizeof(post_sql)/sizeof(char*); i++)
+            updates_ba.push_back(QByteArray(post_sql[i]));
+
+        // Convert update ByteArrays to NULL terminated char**
+        QList<QByteArray>::const_iterator it = updates_ba.begin();
+        vector<const char*> updates;
+        for (; it != updates_ba.end(); ++it)
+            updates.push_back((*it).constData());
+        updates.push_back(NULL);
+
+        // do the actual update
+        if (!performActualUpdate(&updates[0], "1303", dbver))
+            return false;
+    }
+
+    if (dbver == "1303")
+    {
+        QDateTime loc = QDateTime::currentDateTime();
+        QDateTime utc = loc.toUTC();
+        loc = QDateTime(loc.date(), loc.time(), Qt::UTC);
+        int utc_offset = loc.secsTo(utc) / 60;
+
+        QList<QByteArray> updates_ba;
+
+        // Convert various DATETIME fields from local time to UTC
+        if (0 != utc_offset)
+        {
+            const char *with_endtime[] = {
+                "recordedprogram",
+            };
+            const char *without_endtime[] = {
+                "recordedseek", "recordedmarkup", "recordedrating",
+                "recordedcredits", 
+            };
+            QString order = (utc_offset > 0) ? "-starttime" : "starttime";
+
+            for (uint i = 0; i < sizeof(with_endtime)/sizeof(char*); i++)
+            {
+                updates_ba.push_back(
+                     QString("UPDATE %1 "
+                     "SET starttime = CONVERT_TZ(starttime, 'SYSTEM', 'UTC'), "
+                     "    endtime   = CONVERT_TZ(endtime, 'SYSTEM', 'UTC') "
+                     "ORDER BY %4")
+                     .arg(with_endtime[i]).arg(order).toLocal8Bit());
+            }
+
+            for (uint i = 0; i < sizeof(without_endtime)/sizeof(char*); i++)
+            {
+                updates_ba.push_back(
+                      QString("UPDATE %1 "
+                      "SET starttime = CONVERT_TZ(starttime, 'SYSTEM', 'UTC') "
+                      "ORDER BY %3")
+                      .arg(without_endtime[i]).arg(order).toLocal8Bit());
+            }
+        }
+
+        // Convert update ByteArrays to NULL terminated char**
+        QList<QByteArray>::const_iterator it = updates_ba.begin();
+        vector<const char*> updates;
+        for (; it != updates_ba.end(); ++it)
+            updates.push_back((*it).constData());
+        updates.push_back(NULL);
+
+        // do the actual update
+        if (!performActualUpdate(&updates[0], "1304", dbver))
+            return false;
+    }
+
+    if (dbver == "1304")
+    {
+        QList<QByteArray> updates_ba;
+
+        updates_ba.push_back(
+"UPDATE recordfilter SET clause="
+"'HOUR(CONVERT_TZ(program.starttime, ''UTC'', ''SYSTEM'')) >= 19 AND "
+"HOUR(CONVERT_TZ(program.starttime, ''UTC'', ''SYSTEM'')) < 22' "
+"WHERE filterid=3");
+
+        updates_ba.push_back(QString(
+"UPDATE record SET findday = "
+"    DAYOFWEEK(CONVERT_TZ(ADDTIME('2012-06-02 00:00:00', findtime), "
+"                         'SYSTEM', 'UTC') + INTERVAL findday DAY) "
+"WHERE findday > 0").toLocal8Bit());
+
+        updates_ba.push_back(QString(
+"UPDATE record SET findtime = "
+"    TIME(CONVERT_TZ(ADDTIME('2012-06-02 00:00:00', findtime), "
+"                    'SYSTEM', 'UTC')) ")
+                             .toLocal8Bit());
+
+        // Convert update ByteArrays to NULL terminated char**
+        QList<QByteArray>::const_iterator it = updates_ba.begin();
+        vector<const char*> updates;
+        for (; it != updates_ba.end(); ++it)
+            updates.push_back((*it).constData());
+        updates.push_back(NULL);
+
+        if (!performActualUpdate(&updates[0], "1305", dbver))
+            return false;
+    }
+
+    if (dbver == "1305")
+    {
+        // Reverse the findday/findtime changes from above since those
+        // values need to be kept in local time.
+
+        QList<QByteArray> updates_ba;
+
+        updates_ba.push_back(QString(
+"UPDATE record SET findday = "
+"    DAYOFWEEK(CONVERT_TZ(ADDTIME('2012-06-02 00:00:00', findtime), "
+"                         'UTC', 'SYSTEM') + INTERVAL findday DAY) "
+"WHERE findday > 0").toLocal8Bit());
+
+        updates_ba.push_back(QString(
+"UPDATE record SET findtime = "
+"    TIME(CONVERT_TZ(ADDTIME('2012-06-02 00:00:00', findtime), "
+"                    'UTC', 'SYSTEM')) ").toLocal8Bit());
+
+        // Convert update ByteArrays to NULL terminated char**
+        QList<QByteArray>::const_iterator it = updates_ba.begin();
+        vector<const char*> updates;
+        for (; it != updates_ba.end(); ++it)
+            updates.push_back((*it).constData());
+        updates.push_back(NULL);
+
+        if (!performActualUpdate(&updates[0], "1306", dbver))
+            return false;
+    }
+
+    if (dbver == "1306")
+    {
+        // staging temporary tables to use with rewritten file scanner
+        // due to be replaced by finalized RecordedFile changes
+
+        const char *updates[] = {
+"CREATE TABLE scannerfile ("
+"  `fileid`         BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,"
+"  `filesize`       BIGINT(20) UNSIGNED NOT NULL DEFAULT 0,"
+"  `filehash`       VARCHAR(64) NOT NULL DEFAULT '',"
+"  `added`          TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,"
+"  PRIMARY KEY (`fileid`),"
+"  UNIQUE KEY filehash (`filehash`)"
+") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
+"CREATE TABLE scannerpath ("
+"  `fileid`         BIGINT(20) UNSIGNED NOT NULL,"
+"  `hostname`       VARCHAR(64) NOT NULL DEFAULT 'localhost',"
+"  `storagegroup`   VARCHAR(32) NOT NULL DEFAULT 'Default',"
+"  `filename`       VARCHAR(255) NOT NULL DEFAULT '',"
+"  PRIMARY KEY (`fileid`)"
+") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
+"CREATE TABLE videopart ("
+"  `fileid`         BIGINT(20) UNSIGNED NOT NULL,"
+"  `videoid`        INT(10) UNSIGNED NOT NULL,"
+"  `order`          SMALLINT UNSIGNED NOT NULL DEFAULT 1,"
+"  PRIMARY KEY `part` (`videoid`, `order`)"
+") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
+NULL
+};
+
+// removed "UNIQUE KEY path (`storagegroup`, `hostname`, `filename`)" from
+// scannerpath as a quick fix for key length constraints
+
+        if (!performActualUpdate(&updates[0], "1307", dbver))
+            return false;
+    }
+
+    if (dbver == "1307")
     {
        const char *updates[] = {
 "CREATE TABLE videosourcemap ("
@@ -2052,7 +2307,7 @@ NULL
 "ALTER TABLE cardinput DROP COLUMN sourceid;",
 NULL
 };
-        if (!performActualUpdate(updates, "1303", dbver))
+        if (!performActualUpdate(updates, "1308", dbver))
             return false;
     }
 
@@ -2136,6 +2391,7 @@ bool InitializeMythSchema(void)
 "CREATE TABLE cardinput ("
 "  cardinputid int(10) unsigned NOT NULL AUTO_INCREMENT,"
 "  cardid int(10) unsigned NOT NULL DEFAULT '0',"
+"  sourceid int(10) unsigned NOT NULL DEFAULT '0',"
 "  inputname varchar(32) NOT NULL DEFAULT '',"
 "  externalcommand varchar(128) DEFAULT NULL,"
 "  changer_device varchar(128) DEFAULT NULL,"
@@ -3160,13 +3416,6 @@ bool InitializeMythSchema(void)
 "  PRIMARY KEY (sourceid),"
 "  UNIQUE KEY `name` (`name`)"
 ") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
-"CREATE TABLE videosourcemap ("
-"  mapid int(10) unsigned NOT NULL AUTO_INCREMENT,"
-"  sourceid int(10) NOT NULL DEFAULT '0',"
-"  cardinputid int(10) NOT NULL DEFAULT '0',"
-"  type varchar(128) NOT NULL DEFAULT '',"
-"  PRIMARY KEY (mapid)"
-") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
 "CREATE TABLE videotypes ("
 "  intid int(10) unsigned NOT NULL AUTO_INCREMENT,"
 "  extension varchar(128) NOT NULL,"
@@ -3346,7 +3595,7 @@ bool InitializeMythSchema(void)
 "INSERT INTO settings VALUES ('mythfilldatabaseLastRunStatus','',NULL);",
 "INSERT INTO settings VALUES ('DataDirectMessage','',NULL);",
 "INSERT INTO settings VALUES ('HaveRepeats','0',NULL);",
-"INSERT INTO settings VALUES ('DBSchemaVer','1303',NULL);",
+"INSERT INTO settings VALUES ('DBSchemaVer','1299',NULL);",
 "INSERT INTO settings VALUES ('DefaultTranscoder','0',NULL);",
 "INSERT INTO videotypes VALUES (1,'txt','',1,0);",
 "INSERT INTO videotypes VALUES (2,'log','',1,0);",
@@ -3382,7 +3631,7 @@ NULL
 };
 
     QString dbver = "";
-    if (!performActualUpdate(updates, "1303", dbver))
+    if (!performActualUpdate(updates, "1299", dbver))
         return false;
     return true;
 }

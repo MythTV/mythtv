@@ -8,8 +8,9 @@
 #include "mythcontext.h"
 #include "mythsystem.h"
 #include "exitcodes.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 #include "mythlogging.h"
+#include "mythsystem.h"
 
 #include "netgrabbermanager.h"
 #include "netutils.h"
@@ -78,7 +79,7 @@ void GrabberScript::run()
             parseDBTree(m_title, QString(), QString(), channel, GetType());
             channel = channel.nextSiblingElement("channel");
         }
-        markTreeUpdated(this, QDateTime::currentDateTime());
+        markTreeUpdated(this, MythDate::current());
         LOG(VB_GENERAL, LOG_INFO, LOC +
             QString("Internet Content Source %1 completed processing, "
                     "marking as updated.").arg(m_title));
@@ -282,7 +283,7 @@ void Search::executeSearch(const QString &script, const QString &query, uint pag
 
     args.append("-S");
     QString term = query;
-    args.append(ShellEscape(term));
+    args.append(MythSystem::ShellEscape(term));
 
     LOG(VB_GENERAL, LOG_DEBUG, LOC +
         QString("Internet Search Query: %1 %2") .arg(cmd).arg(args.join(" ")));

@@ -1345,7 +1345,7 @@ void ProgramRecPriority::FillList(void)
             RecordingType recType = (RecordingType)result.value(5).toInt();
             int recTypeRecPriority = rtRecPriors[recType];
             int inactive = result.value(6).toInt();
-            QDateTime lastrec = result.value(7).toDateTime();
+            QDateTime lastrec = MythDate::as_utc(result.value(7).toDateTime());
             int avgd = result.value(8).toInt();
             QString profile = result.value(9).toString();
 
@@ -1400,7 +1400,7 @@ void ProgramRecPriority::countMatches()
     m_recMatch.clear();
     ProgramList schedList;
     LoadFromScheduler(schedList);
-    QDateTime now = QDateTime::currentDateTime();
+    QDateTime now = MythDate::current();
 
     ProgramList::const_iterator it = schedList.begin();
     for (; it != schedList.end(); ++it)
@@ -1575,15 +1575,16 @@ void ProgramRecPriority::UpdateList()
         item->SetText(QString::number(progInfo->recTypeRecPriority),
                       "rectypepriority", state);
 
-        QString tempDateTime = MythDateTimeToString(progInfo->last_record,
-                                                    kDateTimeFull | kSimplify |
-                                                    kAddYear);
+        QString tempDateTime = MythDate::toString(progInfo->last_record,
+                                                    MythDate::kDateTimeFull | MythDate::kSimplify |
+                                                    MythDate::kAddYear);
         item->SetText(tempDateTime, "lastrecorded", state);
-        QString tempDate = MythDateTimeToString(progInfo->last_record,
-                                                kDateFull | kSimplify |
-                                                kAddYear);
+        QString tempDate = MythDate::toString(progInfo->last_record,
+                                                MythDate::kDateFull | MythDate::kSimplify |
+                                                MythDate::kAddYear);
         item->SetText(tempDate, "lastrecordeddate", state);
-        QString tempTime = MythDateTimeToString(progInfo->last_record, kTime);
+        QString tempTime = MythDate::toString(
+            progInfo->last_record, MythDate::kTime);
         item->SetText(tempTime, "lastrecordedtime", state);
 
         QString channame = progInfo->channame;
@@ -1699,23 +1700,24 @@ void ProgramRecPriority::updateInfo(MythUIButtonListItem *item)
 
     if (m_lastRecordedText)
     {
-        QString tempDateTime = MythDateTimeToString(pgRecInfo->last_record,
-                                                    kDateTimeFull | kSimplify |
-                                                    kAddYear);
+        QString tempDateTime = MythDate::toString(pgRecInfo->last_record,
+                                                    MythDate::kDateTimeFull | MythDate::kSimplify |
+                                                    MythDate::kAddYear);
         m_lastRecordedText->SetText(tempDateTime);
     }
 
     if (m_lastRecordedDateText)
     {
-        QString tempDate = MythDateTimeToString(pgRecInfo->last_record,
-                                                kDateFull | kSimplify |
-                                                kAddYear);
+        QString tempDate = MythDate::toString(pgRecInfo->last_record,
+                                                MythDate::kDateFull | MythDate::kSimplify |
+                                                MythDate::kAddYear);
         m_lastRecordedDateText->SetText(tempDate);
     }
 
     if (m_lastRecordedTimeText)
     {
-        QString tempTime = MythDateTimeToString(pgRecInfo->last_record, kTime);
+        QString tempTime = MythDate::toString(
+            pgRecInfo->last_record, MythDate::kTime);
         m_lastRecordedTimeText->SetText(tempTime);
     }
 

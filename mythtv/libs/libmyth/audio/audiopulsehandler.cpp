@@ -2,10 +2,12 @@
 #include <QString>
 #include <QMutex>
 
+#include <unistd.h> // for usleep
+
 #include "audiopulsehandler.h"
+#include "mythmiscutil.h"
 #include "mythlogging.h"
 #include "mthread.h"
-#include "mythmiscutil.h"
 
 #define LOC QString("Pulse: ")
 

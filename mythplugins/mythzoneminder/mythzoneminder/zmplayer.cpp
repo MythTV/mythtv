@@ -28,7 +28,7 @@ using namespace std;
 #include <mythdbcon.h>
 #include <mythuihelper.h>
 #include <mythmainwindow.h>
-#include <mythmiscutil.h>
+#include <mythdate.h>
 
 // zoneminder
 #include "zmplayer.h"
@@ -174,7 +174,9 @@ void ZMPlayer::getEventInfo()
             .arg((*m_currentEvent) + 1)
             .arg(m_eventList->size()));
     m_cameraText->SetText(event->monitorName);
-    m_dateText->SetText(MythDateTimeToString(event->startTime, kDateTimeFull | kSimplify));
+    m_dateText->SetText(
+        MythDate::toString(
+            event->startTime, MythDate::kDateTimeFull | MythDate::kSimplify));
 
     // get frames data
     m_frameList->clear();

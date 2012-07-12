@@ -35,7 +35,6 @@
 #  include <io.h>
 # endif
 
-# define setsockopt(a, b, c, d, e) setsockopt(a, b, c, (const char*)(d), e)
 # undef close
 # include <stdio.h>        // for snprintf(), used by inline dlerror()
 # include <unistd.h>       // for usleep()

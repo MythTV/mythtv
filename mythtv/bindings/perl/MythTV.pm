@@ -23,6 +23,7 @@ package MythTV;
     use DBI;
     use HTTP::Request;
     use LWP::UserAgent;
+    use Time::Local;
 
 # Load the UPNP libraries if we have them, but die nicely if we don't.
     BEGIN {
@@ -106,15 +107,15 @@ package MythTV;
 # Note: as of July 21, 2010, this is actually a string, to account for proto
 # versions of the form "58a".  This will get used if protocol versions are 
 # changed on a fixes branch ongoing.
-    our $PROTO_VERSION = "74";
-    our $PROTO_TOKEN = "SingingPotato";
+    our $PROTO_VERSION = "75";
+    our $PROTO_TOKEN = "SweetRock";
 
 # currentDatabaseVersion is defined in libmythtv in
 # mythtv/libs/libmythtv/dbcheck.cpp and should be the current MythTV core
 # schema version supported in the main code.  We need to check that the schema
 # version in the database is as expected by the bindings, which are expected
 # to be kept in sync with the main code.
-    our $SCHEMA_VERSION = "1303";
+    our $SCHEMA_VERSION = "1308";
 
 # NUMPROGRAMLINES is defined in mythtv/libs/libmythtv/programinfo.h and is
 # the number of items in a ProgramInfo QStringList group used by
@@ -800,7 +801,7 @@ EOF
     # Otherwise, format it as necessary.  We have to use MySQL here because
     # Date::Manip is not aware of DST differences.  Yay.  Blech.
         my $sh = $self->{'dbh'}->prepare('SELECT FROM_UNIXTIME(?)');
-        $sh->execute($time);
+        $sh->execute($time);    # Assumed to be a correct epoch time (in GMT)
         ($time) = $sh->fetchrow_array();
         $time =~ s/\s/T/;
         return $time;
@@ -814,7 +815,9 @@ EOF
         my $sh = $self->{'dbh'}->prepare('SELECT UNIX_TIMESTAMP(?)');
         $sh->execute($time);
         ($time) = $sh->fetchrow_array();
-        return $time;
+        my @t = localtime(time);
+        my $offset = timegm(@t) - timelocal(@t);
+        return $time - $offset;
     }
 
 # Create a new MythTV::Program object

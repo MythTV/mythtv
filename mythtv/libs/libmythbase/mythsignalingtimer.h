@@ -5,6 +5,7 @@
 
 #include <stdint.h>
 
+#include <QWaitCondition>
 #include <QMutex>
 
 #include "mythbaseexp.h"
@@ -29,6 +30,8 @@ class MBASE_PUBLIC MythSignalingTimer : private QObject, private MThread
 
     virtual bool blockSignals(bool block)
         { return QObject::blockSignals(block); }
+    bool isActive(void) const
+        { return dorun; }
 
   signals:
     void timeout(void);
@@ -37,9 +40,10 @@ class MBASE_PUBLIC MythSignalingTimer : private QObject, private MThread
     virtual void run(void);
 
     QMutex            startStopLock;
+    QWaitCondition    timerWait;
     volatile bool     dorun;
     volatile bool     running;
-    volatile uint64_t microsec;
+    volatile uint64_t millisec;
 };
 
 #endif // _MYTH_SIGNALING_TIMER_H_

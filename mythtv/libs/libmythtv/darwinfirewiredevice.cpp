@@ -29,6 +29,7 @@ using namespace std;
 #include "darwinavcinfo.h"
 #include "mythlogging.h"
 #include "mthread.h"
+#include "mythtimer.h"
 
 // Apple Firewire example headers
 #include <AVCVideoServices/StringLogger.h>

@@ -12,11 +12,14 @@ using namespace std;
 #include <QHash>
 #include <QRect>
 #include <QObject>
+
+// MythTV headers
+#include "videoouttypes.h"
+#include "mythtimer.h"
 #include "mythtvexp.h"
 #include "mythdeque.h"
+#include "mythdate.h"
 #include "tv.h"
-#include "videoouttypes.h"
-#include "mythmiscutil.h"
 
 class TV;
 class RemoteEncoder;
@@ -43,9 +46,8 @@ typedef enum
 typedef deque<QString>         StringDeque;
 typedef QHash<QString,QString> InfoMap;
 
-class MTV_PUBLIC PlayerContext : public QObject
+class MTV_PUBLIC PlayerContext
 {
-    Q_OBJECT
   public:
     PlayerContext(const QString &inUseID = QString("Unknown"));
     ~PlayerContext();

@@ -4,18 +4,22 @@
 //
 // Copyright (c) 2011 Robert McNamara <rmcnamara@mythtv.org>
 //
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or at your option any later version of the LGPL.
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
 //
-// This library is distributed in the hope that it will be useful,
+// This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
 //
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library.  If not, see <http://www.gnu.org/licenses/>.
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 //////////////////////////////////////////////////////////////////////////////
 
@@ -34,6 +38,7 @@
 #include "sourceutil.h"
 #include "cardutil.h"
 #include "datadirect.h"
+#include "mythdate.h"
 
 #include "serviceUtil.h"
 
@@ -127,7 +132,7 @@ DTC::ChannelInfoList* Channel::GetChannelInfoList( int nSourceID,
     pChannelInfos->setCurrentPage   ( curPage         );
     pChannelInfos->setTotalPages    ( totalPages      );
     pChannelInfos->setTotalAvailable( chanList.size() );
-    pChannelInfos->setAsOf          ( QDateTime::currentDateTime() );
+    pChannelInfos->setAsOf          ( MythDate::current() );
     pChannelInfos->setVersion       ( MYTH_BINARY_VERSION );
     pChannelInfos->setProtoVer      ( MYTH_PROTO_VERSION  );
 
@@ -307,7 +312,7 @@ DTC::VideoSourceList* Channel::GetVideoSourceList()
         pVideoSource->setNITId         ( query.value(9).toInt()       );
     }
 
-    pList->setAsOf          ( QDateTime::currentDateTime() );
+    pList->setAsOf          ( MythDate::current() );
     pList->setVersion       ( MYTH_BINARY_VERSION );
     pList->setProtoVer      ( MYTH_PROTO_VERSION  );
 
@@ -560,7 +565,8 @@ DTC::VideoMultiplexList* Channel::GetVideoMultiplexList( int nSourceID,
             pVideoMultiplex->setRollOff(            query.value(19).toString()      );
             pVideoMultiplex->setSIStandard(         query.value(20).toString()      );
             pVideoMultiplex->setServiceVersion(     query.value(21).toInt()         );
-            pVideoMultiplex->setUpdateTimeStamp(    query.value(22).toDateTime()    );
+            pVideoMultiplex->setUpdateTimeStamp(
+                MythDate::as_utc(query.value(22).toDateTime()));
             pVideoMultiplex->setDefaultAuthority(   query.value(23).toString()      );
         }
     }
@@ -583,7 +589,7 @@ DTC::VideoMultiplexList* Channel::GetVideoMultiplexList( int nSourceID,
     pVideoMultiplexes->setCurrentPage   ( curPage         );
     pVideoMultiplexes->setTotalPages    ( totalPages      );
     pVideoMultiplexes->setTotalAvailable( muxCount        );
-    pVideoMultiplexes->setAsOf          ( QDateTime::currentDateTime() );
+    pVideoMultiplexes->setAsOf          ( MythDate::current() );
     pVideoMultiplexes->setVersion       ( MYTH_BINARY_VERSION );
     pVideoMultiplexes->setProtoVer      ( MYTH_PROTO_VERSION  );
 
@@ -640,7 +646,8 @@ DTC::VideoMultiplex* Channel::GetVideoMultiplex( int nMplexID )
         pVideoMultiplex->setRollOff(            query.value(18).toString()      );
         pVideoMultiplex->setSIStandard(         query.value(19).toString()      );
         pVideoMultiplex->setServiceVersion(     query.value(20).toInt()         );
-        pVideoMultiplex->setUpdateTimeStamp(    query.value(21).toDateTime()    );
+        pVideoMultiplex->setUpdateTimeStamp(
+            MythDate::as_utc(query.value(21).toDateTime()));
         pVideoMultiplex->setDefaultAuthority(   query.value(22).toString()      );
     }
 

@@ -31,16 +31,12 @@ static void format_time(int seconds, QString &tMin, QString &tHrsMin)
 
 TVBrowseHelper::TVBrowseHelper(
     TV      *tv,
-    QString  time_format,
-    QString  short_date_format,
     uint     browse_max_forward,
     bool     browse_all_tuners,
     bool     use_channel_groups,
     QString  db_channel_ordering) :
     MThread("TVBrowseHelper"),
     m_tv(tv),
-    db_time_format(time_format),
-    db_short_date_format(short_date_format),
     db_browse_max_forward(browse_max_forward),
     db_browse_all_tuners(browse_all_tuners),
     db_use_channel_groups(use_channel_groups),
@@ -90,7 +86,7 @@ bool TVBrowseHelper::BrowseStart(PlayerContext *ctx, bool skip_browse)
         m_ctx       = ctx;
         m_channum   = ctx->playingInfo->GetChanNum();
         m_chanid    = ctx->playingInfo->GetChanID();
-        m_starttime = ctx->playingInfo->GetScheduledStartTime(ISODate);
+        m_starttime = ctx->playingInfo->GetScheduledStartTime(MythDate::ISODate);
         ctx->UnlockPlayingInfo(__FILE__, __LINE__);
 
         if (!skip_browse)
@@ -295,19 +291,21 @@ void TVBrowseHelper::GetNextProgram(
         channum,   chanid,    seriesid,  programid);
 
     if (!starttime.isEmpty())
-        begts = QDateTime::fromString(starttime, Qt::ISODate);
+        begts = MythDate::fromString(starttime);
     else
-        begts = QDateTime::fromString(infoMap["dbstarttime"], Qt::ISODate);
+        begts = MythDate::fromString(infoMap["dbstarttime"]);
 
-    infoMap["starttime"] = begts.toString(db_time_format);
-    infoMap["startdate"] = begts.toString(db_short_date_format);
+    infoMap["starttime"] = MythDate::toString(begts, MythDate::kTime);
+    infoMap["startdate"] = MythDate::toString(
+        begts, MythDate::kDateFull | MythDate::kSimplify);
 
     infoMap["endtime"] = infoMap["enddate"] = "";
     if (!endtime.isEmpty())
     {
-        endts = QDateTime::fromString(endtime, Qt::ISODate);
-        infoMap["endtime"] = endts.toString(db_time_format);
-        infoMap["enddate"] = endts.toString(db_short_date_format);
+        endts = MythDate::fromString(endtime);
+        infoMap["endtime"] = MythDate::toString(endts, MythDate::kTime);
+        infoMap["enddate"] = MythDate::toString(
+            endts, MythDate::kDateFull | MythDate::kSimplify);
     }
 
     infoMap["lenmins"] = TV::tr("%n minute(s)", "", 0);
@@ -361,10 +359,9 @@ void TVBrowseHelper::GetNextProgramDB(
     infoMap["chanid"]  = QString::number(chanid);
     infoMap["channum"] = db_chanid_to_channum[chanid];
 
-    QDateTime nowtime = QDateTime::currentDateTime();
+    QDateTime nowtime = MythDate::current();
     QDateTime latesttime = nowtime.addSecs(6*60*60);
-    QDateTime browsetime = QDateTime::fromString(
-        infoMap["dbstarttime"], Qt::ISODate);
+    QDateTime browsetime = MythDate::fromString(infoMap["dbstarttime"]);
 
     MSqlBindings bindings;
     bindings[":CHANID"] = chanid;
@@ -404,7 +401,7 @@ void TVBrowseHelper::GetNextProgramDB(
     const ProgramInfo *prog = (direction == BROWSE_LEFT) ?
         progList[progList.size() - 1] : progList[0];
 
-    infoMap["dbstarttime"] = prog->GetScheduledStartTime(ISODate);
+    infoMap["dbstarttime"] = prog->GetScheduledStartTime(MythDate::ISODate);
 }
 
 inline static QString toString(const InfoMap &infoMap, const QString sep="\n")
@@ -461,9 +458,8 @@ void TVBrowseHelper::run()
 
         BrowseDirection direction = bi.m_dir;
 
-        QDateTime lasttime = QDateTime::fromString(
-            m_starttime, Qt::ISODate);
-        QDateTime curtime  = QDateTime::currentDateTime();
+        QDateTime lasttime = MythDate::fromString(m_starttime);
+        QDateTime curtime  = MythDate::current();
         if (lasttime < curtime)
             m_starttime = curtime.toString(Qt::ISODate);
 
@@ -575,8 +571,7 @@ void TVBrowseHelper::run()
         m_lock.unlock();
 
         // pull in additional data from the DB...
-        QDateTime startts = QDateTime::fromString(
-            m_starttime, Qt::ISODate);
+        QDateTime startts = MythDate::fromString(m_starttime);
         RecordingInfo recinfo(m_chanid, startts, false);
         recinfo.ToMap(infoMap);
         infoMap["iconpath"] = ChannelUtil::GetIcon(recinfo.GetChanID());

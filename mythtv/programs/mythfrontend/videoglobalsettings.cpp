@@ -231,13 +231,13 @@ class RatingsToPL : public TriggeredConfigurationGroup
         typedef std::map<ParentalLevel::Level, QString> r2pl_map;
         r2pl_map r2pl_defaults;
         r2pl_defaults.insert(r2pl_map::value_type(ParentalLevel::plLowest,
-                tr("G", "PL 1 default search string.")));
+                QObject::tr("G", "PL 1 default search string.")));
         r2pl_defaults.insert(r2pl_map::value_type(ParentalLevel::plLow,
-                tr("PG", "PL 2 default search string.")));
+                QObject::tr("PG", "PL 2 default search string.")));
         r2pl_defaults.insert(r2pl_map::value_type(ParentalLevel::plMedium,
-                tr("PG-13", "PL3 default search string.")));
+                QObject::tr("PG-13", "PL3 default search string.")));
         r2pl_defaults.insert(r2pl_map::value_type(ParentalLevel::plHigh,
-                tr("R:NC-17", "PL4 default search string.")));
+                QObject::tr("R:NC-17", "PL4 default search string.")));
 
         VerticalConfigurationGroup *vcg = new VerticalConfigurationGroup(true);
 

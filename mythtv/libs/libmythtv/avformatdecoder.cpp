@@ -2240,7 +2240,19 @@ void AvFormatDecoder::DoFastForwardSeek(long long desiredFrame, bool &needflush)
     DecoderBase::DoFastForwardSeek(desiredFrame, needflush);
     return;
 }
+///Returns TeleText language
+int AvFormatDecoder::GetTeletextLanguage(uint lang_idx) const
+{
+    for (uint i = 0; i < (uint) tracks[kTrackTypeTeletextCaptions].size(); i++)
+    {
+        if (tracks[kTrackTypeTeletextCaptions][i].language_index == lang_idx)
+        {
+             return tracks[kTrackTypeTeletextCaptions][i].language;
+        }
+    }
 
+    return iso639_str3_to_key("und");
+}
 /// Returns DVD Subtitle language
 int AvFormatDecoder::GetSubtitleLanguage(uint subtitle_index, uint stream_index)
 {

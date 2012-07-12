@@ -127,10 +127,10 @@ Advanced options (experts only):
   --x11-path=X11LOC        location of X11 include files [$x11_path_default]
   --disable-xrandr         disable X11 resolution switching
   --disable-xv             disable XVideo   (X11 video output accel.)
-  --enable-vdpau           enable NVidia VDPAU hardware acceleration.
-  --enable-crystalhd       enable Broadcom CrystalHD hardware decoder support
-  --enable-vaapi           enable VAAPI hardware accelerated video decoding
-  --enable-dxva2           enable hardware accelerated decoding on windows
+  --disable-vdpau          disable NVidia VDPAU hardware acceleration.
+  --disable-crystalhd      disable Broadcom CrystalHD hardware decoder support
+  --disable-vaapi          disable VAAPI hardware accelerated video decoding
+  --disable-dxva2          disable hardware accelerated decoding on windows
   --disable-opengl-video   disable OpenGL based video display
   --disable-quartz-video   disable Mac OS X CoreVideo based video display
   --disable-libass         disable libass SSA/ASS subtitle support
@@ -738,7 +738,7 @@ check_cxx(){
     log check_cxx "$@"
     cat > $TMPCPP
     log_file $TMPCPP
-    check_cmd $cxx $CPPFLAGS $CFLAGS $CXXFLAGS "$@" -c -o $TMPO $TMPCPP
+    check_cmd $cxx $CPPFLAGS $CXXFLAGS "$@" -c -o $TMPO $TMPCPP
 }
 
 check_cpp(){
@@ -2826,9 +2826,17 @@ test -n "$cc_type" && enable $cc_type ||
     warn "Unknown C compiler $cc, unable to select optimal CFLAGS"
 
 
-if   $cxx -v 2>&1 | grep -qi ^gcc; then
+if $cxx -v 2>&1 | grep -qi ^gcc; then
     cxx_type=gxx
     gxx_version=$($cxx -dumpversion)
+elif $cxx --version 2>/dev/null | grep -q Intel; then
+    cxx_type=icpc
+    gxx_version="AV_STRINGIFY(__INTEL_COMPILER)"
+    cxx_ident=$($cxx --version | head -n1)
+    icpc_version=$($cxx -dumpversion)
+    speed_cxxflags='-O3'
+    size_cxxflags='-Os'
+    noopt_cxxflags='-O1'
 fi
 
 test -n "$cxx_type" && enable $cxx_type ||
@@ -3666,16 +3674,23 @@ enable_pic() {
     add_asflags  -fPIC
 }
 
-is_qmake4(){
-    $1 --version 2>&1 | egrep -q -e "Qt version 4\.[6-9]\.[0-9]"
+is_qmake5(){
+    $1 --version 2>&1 | egrep -q -e "Qt version 5\.[0-9]\.[0-9]"
 }
 
-if ! is_qmake4 $qmake; then
-    is_qmake4 qmake-qt4 && qmake=qmake-qt4 || die "qmake for Qt4.6 or newer not found.\nPlease specify the correct qmake with --qmake="
-fi
+is_qmake4(){
+    $1 --version 2>&1 | egrep -q -e "Qt version 4\.[0-9]\.[0-9]"
+}
 
-if ! expr $($qmake -query QT_VERSION) : "4\.[6-9]\.[0-9]" >/dev/null; then
-    die "Qt4.6 or newer is required to build MythTV."
+if ! is_qmake5 $qmake ; then
+  if ! is_qmake4 $qmake; then
+      is_qmake4 qmake-qt4 && qmake=qmake-qt4 || die "qmake for Qt4.6 or newer not found.\nPlease specify the correct qmake with --qmake="
+  fi
+  if ! expr $($qmake -query QT_VERSION) : "4\.[6-9]\.[0-9]" >/dev/null; then
+      die "Qt4.6 or newer is required to build MythTV."
+  fi
+else
+    check_cxxflags -DHAVE_QT5
 fi
 
 enabled pic && enable_pic
@@ -4320,11 +4335,6 @@ check_cpp_condition \
       disable vdpau; }
 fi
 
-if enabled crystalhd; then
-    check_lib libcrystalhd/libcrystalhd_if.h DtsCrystalHDVersion -lcrystalhd ||
-        disable crystalhd;
-fi
-
 if enabled vaapi && enabled va_va_h && enabled va_va_glx_h && enabled va_va_x11_h; then
     check_cpp_condition va/va.h "VA_VERSION_HEX >= 0x001F0000" ||
     { echolog "VAAPI requires libva >= 0.31.1" && disable vaapi; }
@@ -4343,10 +4353,10 @@ enabled debug && add_cxxflags -g"$debuglevel"
 #check_cflags -Wdeclaration-after-statement
 check_cflags -Wall
 check_cflags -Wno-parentheses
-check_cflags -Wno-switch
+disabled icc && check_cflags -Wno-switch
 ! disabled optimizations && check_cflags -Wdisabled-optimization
 check_cflags -Wpointer-arith
-check_cflags -Wredundant-decls
+disabled icc && check_cflags -Wredundant-decls
 check_cflags -Wno-pointer-sign
 check_cflags -Wwrite-strings
 check_cflags -Wtype-limits
@@ -4357,11 +4367,8 @@ check_cflags -Wstrict-prototypes
 enabled extra_warnings && check_cflags -Winline
 # C++ Flags
 check_cxxflags -Wall
-check_cxxflags -Wno-switch
 check_cxxflags -Wpointer-arith
-check_cxxflags -Wredundant-decls
 check_cxxflags -Wno-non-virtual-dtor
-check_cxxflags -funit-at-a-time
 #needed for INT64_C in libs/libavformat under g++
 check_cxxflags -D__STDC_CONSTANT_MACROS
 check_cxxflags -D__STDC_LIMIT_MACROS
@@ -4529,7 +4536,8 @@ using namespace std;
 using namespace CEC;
 #include <libcec/cecloader.h>
 int main(void) {
-    if (CEC_LIB_VERSION_MAJOR < 1 && CEC_LIB_VERSION_MINOR < 5)
+    if (CEC_LIB_VERSION_MAJOR < 1 || (CEC_LIB_VERSION_MAJOR == 1 &&
+                                      CEC_LIB_VERSION_MINOR < 5))
         return 0;
     return (long) LibCecInit;
 }
@@ -4650,6 +4658,16 @@ if enabled icc; then
     # 11030: Warning unknown option --as-needed
     # 10156: ignoring option '-export'; no argument required
     check_ldflags -wd10156,11030
+    # -wd: Disable the following warnings for MythTV
+    # 177: function declared but never referenced (triggers on Q_OBJECT)
+    # 592: variable is used before its value is set (triggers on (void)x;)
+    # 913: ignoring invalid multibyte character sequence,
+    #      icpc and g++ do the right thing for char 0x80-0xFF
+    # 13200: ignore EMMS instruction required, filters do the right thing
+    check_cflags -wd177,592,913,13200
+    # -wd: Disable the following warnings for MythTV
+    # 10159: ignore invalid argument for option '-m'
+    check_ldflags -wd10159
     # Allow to compile with optimizations
     check_ldflags -march=$cpu
     # icc 11.0 and 11.1 work with ebp_available, but don't pass the test
@@ -4703,6 +4721,17 @@ if enabled gxx; then
     if expr "$gxx_version" : '4\.[3-9]' > /dev/null; then
         check_cxxflags -Wmissing-declarations
     fi
+    check_cxxflags -Wno-switch
+    check_cxxflags -Wredundant-decls
+    check_cxxflags -Woverloaded-virtual
+    check_cxxflags -funit-at-a-time
+elif enabled icpc; then
+    # 177: function declared but never referenced (triggers on Q_OBJECT)
+    # 192: icpc confused by Qt %0-%99 in strings
+    # 592: variable is used before its value is set (triggers on (void)x;)
+    # 913: ignoring invalid multibyte character sequence,
+    #      icpc and g++ do the right thing for char 0x80-0xFF
+    check_cxxflags -wd177,192,592,913
 fi
 
 # Check for python dependencies

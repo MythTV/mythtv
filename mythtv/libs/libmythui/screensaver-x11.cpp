@@ -4,10 +4,10 @@
 // QT headers
 #include <QDateTime>
 #include <QTimer>
-#include <QX11Info>
 
 // Mythdb headers
 #include "mythlogging.h"
+#include "mythdate.h"
 #include "mythdb.h"
 
 // Mythui headers
@@ -190,7 +190,7 @@ class ScreenSaverX11Private
         if (!IsScreenSaverRunning())
             return;
 
-        QDateTime current_time = QDateTime::currentDateTime();
+        QDateTime current_time = MythDate::current();
         if ((!m_last_deactivated.isValid()) ||
             (m_last_deactivated.secsTo(current_time) > 30))
         {

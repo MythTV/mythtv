@@ -21,6 +21,7 @@
 #include "upnptasksearch.h"
 #include "mythversion.h"
 #include "compat.h"
+#include "mythdate.h"
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
@@ -73,7 +74,7 @@ void UPnpSearchTask::SendMsg( MSocketDevice  *pSocket,
     else
         sUSN = sST;
 
-    QString sDate = QDateTime::currentDateTime().toString( "d MMM yyyy hh:mm:ss" );  
+    QString sDate = MythDate::current().toString( "d MMM yyyy hh:mm:ss" );
 
     QString sData = QString ( "CACHE-CONTROL: max-age=%1\r\n"
                               "DATE: %2\r\n"

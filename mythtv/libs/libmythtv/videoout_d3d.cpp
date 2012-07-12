@@ -113,7 +113,7 @@ void VideoOutputD3D::DestroyContext(void)
 
     if (m_render)
     {
-        delete m_render;
+        m_render->DecrRef();
         m_render = NULL;
     }
 }

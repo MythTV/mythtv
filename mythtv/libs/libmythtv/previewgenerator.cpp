@@ -26,13 +26,14 @@
 #include "mythsocket.h"
 #include "remotefile.h"
 #include "storagegroup.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 #include "playercontext.h"
 #include "mythdirs.h"
 #include "remoteutil.h"
 #include "mythsystem.h"
 #include "exitcodes.h"
 #include "mythlogging.h"
+#include "mythmiscutil.h"
 
 #define LOC QString("Preview: ")
 
@@ -192,7 +193,7 @@ bool PreviewGenerator::RunReal(void)
 bool PreviewGenerator::Run(void)
 {
     QString msg;
-    QDateTime dtm = QDateTime::currentDateTime();
+    QDateTime dtm = MythDate::current();
     QTime tm = QTime::currentTime();
     bool ok = false;
     QString command = GetInstallPrefix() + "/bin/mythpreviewgen";
@@ -234,7 +235,7 @@ bool PreviewGenerator::Run(void)
         }
         command += QString(" --chanid %1").arg(programInfo.GetChanID());
         command += QString(" --starttime %1")
-            .arg(programInfo.GetRecordingStartTime(MythDate));
+            .arg(programInfo.GetRecordingStartTime(MythDate::kFilename));
 
         if (!outFileName.isEmpty())
             command += QString(" --outfile \"%1\"").arg(outFileName);
@@ -428,7 +429,7 @@ bool PreviewGenerator::event(QEvent *e)
         return true; // could only happen with very broken client...
     }
 
-    QDateTime datetime = QDateTime::fromString(me->ExtraData(3), Qt::ISODate);
+    QDateTime datetime = MythDate::fromString(me->ExtraData(3));
     if (!datetime.isValid())
     {
         pixmapOk = false;
@@ -605,7 +606,7 @@ bool PreviewGenerator::LocalPreviewRun(void)
     int   width, height, sz;
     long long captime = captureTime;
 
-    QDateTime dt = QDateTime::currentDateTime();
+    QDateTime dt = MythDate::current();
 
     if (captime > 0)
         LOG(VB_GENERAL, LOG_INFO, "Preview from time spec");

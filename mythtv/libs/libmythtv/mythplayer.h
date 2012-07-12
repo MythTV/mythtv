@@ -114,6 +114,8 @@ class DecoderThread : public MThread
 
 class MTV_PUBLIC MythPlayer
 {
+    Q_DECLARE_TR_FUNCTIONS(MythPlayer)
+
     // Do NOT add a decoder class to this list
     friend class PlayerContext;
     friend class CC708Reader;
@@ -277,6 +279,9 @@ class MTV_PUBLIC MythPlayer
     void TracksChanged(uint trackType);
     void EnableSubtitles(bool enable);
     void EnableForcedSubtitles(bool enable);
+    bool ForcedSubtitlesFavored(void) const {
+        return allowForcedSubtitles && !captionsEnabledbyDefault;
+    }
     // How to handle forced Subtitles (i.e. when in a movie someone speaks
     // in a different language than the rest of the movie, subtitles are
     // forced on even if the user doesn't have them turned on.)

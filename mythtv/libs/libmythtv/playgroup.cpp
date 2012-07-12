@@ -1,3 +1,7 @@
+// Qt headers
+#include <QCoreApplication>
+
+// MythTV headers
 #include "mythdb.h"
 #include "playgroup.h"
 #include "programinfo.h"
@@ -5,6 +9,8 @@
 
 class PlayGroupConfig: public ConfigurationWizard
 {
+    Q_DECLARE_TR_FUNCTIONS(PlayGroupConfig)
+
  public:
     PlayGroupConfig(QString _name);
     QString getName(void) const { return name; }
@@ -46,12 +52,13 @@ class TitleMatch : public LineEditSetting, public PlayGroupDBStorage
     TitleMatch(const PlayGroupConfig& _parent):
         LineEditSetting(this), PlayGroupDBStorage(this, _parent, "titlematch")
     {
-        setLabel(QObject::tr("Title match (regex)"));
-        setHelpText(QObject::tr("Automatically set new recording rules to "
-                                "use this group if the title matches this "
-                                "regular expression.  For example, "
-                                "\"(News|CNN)\" would match any title in "
-                                "which \"News\" or \"CNN\" appears."));
+        setLabel(PlayGroupConfig::tr("Title match (regex)"));
+        setHelpText(PlayGroupConfig::tr("Automatically set new recording rules "
+                                         "to use this group if the title "
+                                         "matches this regular expression. "
+                                         "For example, \"(News|CNN)\" would "
+                                         "match any title in which \"News\" or "
+                                         "\"CNN\" appears."));
     };
 };
 
@@ -59,12 +66,12 @@ class SkipAhead : public SpinBoxSetting, public PlayGroupDBStorage
 {
   public:
     SkipAhead(const PlayGroupConfig& _parent):
-        SpinBoxSetting(this, 0, 600, 5, true,
-                       "(" + QObject::tr("default") + ")"),
-        PlayGroupDBStorage(this, _parent, "skipahead") {
-        setLabel(QObject::tr("Skip ahead (seconds)"));
-        setHelpText(QObject::tr("How many seconds to skip forward on a fast "
-                                "forward."));
+        SpinBoxSetting(this, 0, 600, 5, true, PlayGroupConfig::tr("(default)")),
+        PlayGroupDBStorage(this, _parent, "skipahead") 
+    {
+        setLabel(PlayGroupConfig::tr("Skip ahead (seconds)"));
+        setHelpText(PlayGroupConfig::tr("How many seconds to skip forward on "
+                                        "a fast forward."));
     };
 };
 
@@ -72,13 +79,12 @@ class SkipBack : public SpinBoxSetting, public PlayGroupDBStorage
 {
   public:
     SkipBack(const PlayGroupConfig& _parent):
-        SpinBoxSetting(this, 0, 600, 5, true,
-                       "(" + QObject::tr("default") + ")"),
+        SpinBoxSetting(this, 0, 600, 5, true, PlayGroupConfig::tr("(default)")),
         PlayGroupDBStorage(this, _parent, "skipback")
     {
-        setLabel(QObject::tr("Skip back (seconds)"));
-        setHelpText(QObject::tr("How many seconds to skip backward on a "
-                                "rewind."));
+        setLabel(PlayGroupConfig::tr("Skip back (seconds)"));
+        setHelpText(PlayGroupConfig::tr("How many seconds to skip backward on "
+                                        "a rewind."));
     };
 };
 
@@ -86,13 +92,13 @@ class JumpMinutes : public SpinBoxSetting, public PlayGroupDBStorage
 {
   public:
     JumpMinutes(const PlayGroupConfig& _parent):
-        SpinBoxSetting(this, 0, 30, 10, true,
-                       "(" + QObject::tr("default") + ")"),
+        SpinBoxSetting(this, 0, 30, 10, true, PlayGroupConfig::tr("(default)")),
         PlayGroupDBStorage(this, _parent, "jump")
     {
-        setLabel(QObject::tr("Jump amount (minutes)"));
-        setHelpText(QObject::tr("How many minutes to jump forward or backward "
-                    "when the jump keys are pressed."));
+        setLabel(PlayGroupConfig::tr("Jump amount (minutes)"));
+        setHelpText(PlayGroupConfig::tr("How many minutes to jump forward or "
+                                        "backward when the jump keys are "
+                                        "pressed."));
     };
 };
 
@@ -100,15 +106,16 @@ class TimeStretch : public SpinBoxSetting, public PlayGroupDBStorage
 {
   public:
     TimeStretch(const PlayGroupConfig& _parent):
-        SpinBoxSetting(this, 45, 200, 5, false,
-                       "(" + QObject::tr("default") + ")"),
+        SpinBoxSetting(this, 45, 200, 5, false, 
+            PlayGroupConfig::tr("(default)")),
         PlayGroupDBStorage(this, _parent, "timestretch")
     {
         setValue(45);
-        setLabel(QObject::tr("Time stretch (speed x 100)"));
-        setHelpText(QObject::tr("Initial playback speed with adjusted audio.  "
-                                "Use 100 for normal speed, 50 for half speed "
-                                "and 200 for double speed."));
+        setLabel(PlayGroupConfig::tr("Time stretch (speed x 100)"));
+        setHelpText(PlayGroupConfig::tr("Initial playback speed with adjusted "
+                                        "audio. Use 100 for normal speed, 50 "
+                                        "for half speed and 200 for double "
+                                        "speed."));
     };
 
     virtual void Load(void)
@@ -134,7 +141,8 @@ class TimeStretch : public SpinBoxSetting, public PlayGroupDBStorage
 PlayGroupConfig::PlayGroupConfig(QString _name) : name(_name)
 {
     ConfigurationGroup* cgroup = new VerticalConfigurationGroup(false);
-    cgroup->setLabel(getName() + " " + QObject::tr("Group", "Play Group"));
+    //: %1 is the name of the playgroup
+    cgroup->setLabel(tr("%1 Group", "Play Group").arg(getName()));
 
     cgroup->addChild(new TitleMatch(*this));
     cgroup->addChild(new SkipAhead(*this));
@@ -270,8 +278,7 @@ void PlayGroupEditor::doDelete(void)
     if (name == "__CREATE_NEW_GROUP__" || name == "Default")
         return;
 
-    QString message = tr("Delete playback group:") +
-        QString("\n'%1'?").arg(name);
+    QString message = tr("Delete playback group:\n'%1'?").arg(name);
 
     DialogCode value = MythPopupBox::Show2ButtonPopup(
         GetMythMainWindow(),

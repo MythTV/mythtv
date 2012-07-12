@@ -11,7 +11,7 @@
 #include <QTime>
 
 #include "mythlogging.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 
 #include "mythmainwindow.h"
 #include "mythfontproperties.h"
@@ -575,25 +575,21 @@ MythConfirmationDialog  *ShowOkPopup(const QString &message, QObject *parent,
     MythConfirmationDialog  *pop;
     MythScreenStack         *stk = NULL;
 
+    MythMainWindow *win = GetMythMainWindow();
+
+    if (win)
+        stk = win->GetStack("popup stack");
+    else
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "no main window?");
+        return NULL;
+    }
 
     if (!stk)
     {
-        MythMainWindow *win = GetMythMainWindow();
-
-        if (win)
-            stk = win->GetStack("popup stack");
-        else
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC + "no main window?");
-            return NULL;
-        }
-
-        if (!stk)
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC + "no popup stack? "
-                                           "Is there a MythThemeBase?");
-            return NULL;
-        }
+        LOG(VB_GENERAL, LOG_ERR, LOC + "no popup stack? "
+                                       "Is there a MythThemeBase?");
+        return NULL;
     }
 
     pop = new MythConfirmationDialog(stk, message, showCancel);
@@ -869,7 +865,8 @@ bool MythTimeInputDialog::Create()
     // Date
     if (kNoDate != (m_resolution & 0xF))
     {
-        QDate date(m_startTime.date());
+        const QDate startdate(m_startTime.toLocalTime().date());
+        QDate date(startdate);
 
         int limit = 0;
         if (m_resolution & kFutureDates)
@@ -891,12 +888,12 @@ bool MythTimeInputDialog::Create()
             if (m_resolution & kDay)
             {
                 date = date.addDays(1);
-                flags = kDateFull | kSimplify;
+                flags = MythDate::kDateFull | MythDate::kSimplify;
                 if (m_rangeLimit >= 356)
-                    flags |= kAddYear;
-                text = MythDateToString(date, flags);
+                    flags |= MythDate::kAddYear;
+                text = MythDate::toString(date, flags);
 
-                if (date == m_startTime.date())
+                if (date == startdate)
                     selected = true;
             }
             else if (m_resolution & kMonth)
@@ -904,15 +901,15 @@ bool MythTimeInputDialog::Create()
                 date = date.addMonths(1);
                 text = date.toString("MMM yyyy");
 
-                if ((date.month() == m_startTime.date().month()) &&
-                    (date.year() == m_startTime.date().year()))
+                if ((date.month() == startdate.month()) &&
+                    (date.year() == startdate.year()))
                     selected = true;
             }
             else if (m_resolution & kYear)
             {
                 date = date.addYears(1);
                 text = date.toString("yyyy");
-                if (date.year() == m_startTime.date().year())
+                if (date.year() == startdate.year())
                     selected = true;
             }
 
@@ -928,6 +925,8 @@ bool MythTimeInputDialog::Create()
     // Time
     if (kNoTime != (m_resolution & 0xF0))
     {
+        QDate startdate(m_startTime.toLocalTime().date());
+        QTime starttime(m_startTime.toLocalTime().time());
         QTime time(0,0,0);
         QString text;
         bool selected = false;
@@ -940,9 +939,10 @@ bool MythTimeInputDialog::Create()
             if (m_resolution & kMinutes)
             {
                 time = time.addSecs(60);
-                text = MythTimeToString(time, kTime);
+                QDateTime dt = QDateTime(startdate, time, Qt::LocalTime);
+                text = MythDate::toString(dt, MythDate::kTime);
 
-                if (time == m_startTime.time())
+                if (time == starttime)
                     selected = true;
             }
             else if (m_resolution & kHours)
@@ -950,7 +950,7 @@ bool MythTimeInputDialog::Create()
                 time = time.addSecs(60*60);
                 text = time.toString("hh:00");
 
-                if (time.hour() == m_startTime.time().hour())
+                if (time.hour() == starttime.hour())
                     selected = true;
             }
 
@@ -982,12 +982,10 @@ void MythTimeInputDialog::SetReturnEvent(QObject* retobject,
 
 void MythTimeInputDialog::okClicked(void)
 {
-    QDateTime dateTime;
     QDate date = m_dateList->GetDataValue().toDate();
     QTime time = m_timeList->GetDataValue().toTime();
 
-    dateTime.setDate(date);
-    dateTime.setTime(time);
+    QDateTime dateTime = QDateTime(date, time, Qt::LocalTime).toUTC();
 
     emit haveResult(dateTime);
 

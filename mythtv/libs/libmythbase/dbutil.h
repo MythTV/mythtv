@@ -49,6 +49,8 @@ class MBASE_PUBLIC DBUtil
     static bool TryLockSchema(MSqlQuery &, uint timeout_secs);
     static void UnlockSchema(MSqlQuery &);
 
+    static bool CheckTimeZoneSupport(void);
+
     static const int kUnknownVersionNumber;
 
   protected:

@@ -3,9 +3,9 @@ using namespace std;
 
 #include "recordingquality.h"
 #include "mythcorecontext.h"
+#include "mythmiscutil.h"
 #include "mythlogging.h"
 #include "programinfo.h"
-#include "mythmiscutil.h"
 
 static void merge_overlapping(RecordingGaps &gaps);
 static double score_gaps(const ProgramInfo*, const RecordingGaps&);

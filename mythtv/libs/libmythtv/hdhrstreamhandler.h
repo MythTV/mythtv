@@ -10,7 +10,7 @@ using namespace std;
 #include <QMutex>
 #include <QMap>
 
-#include "mythmiscutil.h"
+#include "mythdate.h"
 #include "DeviceReadBuffer.h"
 #include "mpegstreamdata.h"
 #include "streamhandler.h"

@@ -76,8 +76,8 @@ void* Service::ConvertToParameterPtr( int            nTypeId,
         case QMetaType::QDateTime   :
         {
             QDateTime dt = QDateTime::fromString( sValue, Qt::ISODate );
-            dt.setTimeSpec(Qt::UTC);
-            *(( QDateTime      *)pParam) = dt.toLocalTime();
+            dt.setTimeSpec( Qt::UTC );
+            *(( QDateTime      *)pParam) = dt;
             break;
         }
         case QMetaType::QTime       : *(( QTime          *)pParam) = QTime::fromString    ( sValue, Qt::ISODate ); break;

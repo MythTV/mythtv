@@ -11,7 +11,7 @@ using namespace std;
 #include <QMap>
 
 #include "streamhandler.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 
 class ASIStreamHandler;
 class DTVSignalMonitor;

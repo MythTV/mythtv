@@ -49,6 +49,8 @@ class MUI_PUBLIC MythUIHelper
     void LoadQtConfig(void);
     void UpdateImageCache(void);
 
+    /// Returns a reference counted image base on the URL.
+    /// \note The reference count is set for one use call DecrRef() to delete.
     MythImage *GetImageFromCache(const QString &url);
     MythImage *CacheImage(const QString &url, MythImage *im,
                           bool nodisk = false);
@@ -81,6 +83,8 @@ class MUI_PUBLIC MythUIHelper
 
     QPixmap *LoadScalePixmap(QString filename, bool fromcache = true);
     QImage *LoadScaleImage(QString filename, bool fromcache = true);
+    /// Returns a reference counted image from the cache.
+    /// \note The reference count is set for one use call DecrRef() to delete.
     MythImage *LoadCacheImage(QString srcfile, QString label,
                               MythPainter *painter,
                               ImageCacheMode cacheMode = kCacheNormal);

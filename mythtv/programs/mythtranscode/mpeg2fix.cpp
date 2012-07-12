@@ -22,6 +22,7 @@
 #include <QFileInfo>
 
 #include "mythlogging.h"
+#include "mythdate.h"
 #include "mthread.h"
 
 #ifdef USING_MINGW
@@ -261,7 +262,7 @@ MPEG2fixup::MPEG2fixup(const QString &inf, const QString &outf,
         }
         else
             status_update_time = 5;
-        statustime = QDateTime::currentDateTime();
+        statustime = MythDate::current();
         statustime = statustime.addSecs(status_update_time);
 
         const QFileInfo finfo(inf);
@@ -1200,7 +1201,7 @@ int MPEG2fixup::BuildFrame(AVPacket *pkt, QString fname)
     return 0;
 }
 
-#define MAX_FRAMES 2000
+#define MAX_FRAMES 20000
 MPEG2frame *MPEG2fixup::GetPoolFrame(AVPacket *pkt)
 {
     MPEG2frame *f;
@@ -1270,12 +1271,16 @@ int MPEG2fixup::GetFrame(AVPacket *pkt)
                 {
                     LOG(VB_GENERAL, LOG_ERR,
                         "Found end of file without finding any frames");
+                    av_free_packet(pkt);
                     return 1;
                 }
 
                 MPEG2frame *tmpFrame = GetPoolFrame(&vFrame.last()->pkt);
                 if (tmpFrame == NULL)
+                {
+                    av_free_packet(pkt);
                     return 1;
+                }
 
                 vFrame.append(tmpFrame);
                 real_file_end = true;
@@ -1291,7 +1296,7 @@ int MPEG2fixup::GetFrame(AVPacket *pkt)
         }
         pkt->duration = framenum++;
         if ((showprogress || update_status) &&
-            QDateTime::currentDateTime() > statustime)
+            MythDate::current() > statustime)
         {
             float percent_done = 100.0 * pkt->pos / filesize;
             if (update_status)
@@ -1301,7 +1306,7 @@ int MPEG2fixup::GetFrame(AVPacket *pkt)
                         .arg(percent_done, 0, 'f', 1));
             if (check_abort && check_abort())
                 return REENCODE_STOPPED;
-            statustime = QDateTime::currentDateTime();
+            statustime = MythDate::current();
             statustime = statustime.addSecs(status_update_time);
         }
 
@@ -1315,7 +1320,10 @@ int MPEG2fixup::GetFrame(AVPacket *pkt)
 
         MPEG2frame *tmpFrame = GetPoolFrame(pkt);
         if (tmpFrame == NULL)
+        {
+            av_free_packet(pkt);
             return 1;
+        }
 
         switch (inputFC->streams[pkt->stream_index]->codec->codec_type)
         {
@@ -1654,7 +1662,11 @@ int MPEG2fixup::ConvertToI(FrameList *orderedFrames, int headPos)
     {
         int i = GetFrameNum((*it));
         if ((spare = DecodeToFrame(i, headPos == 0)) == NULL)
-            return 1;
+        {
+            LOG(VB_GENERAL, LOG_WARNING,
+                QString("ConvertToI skipping undecoded frame #%1").arg(i));
+            continue;
+        }
 
         if (GetFrameTypeT(spare) == 'I')
             continue;

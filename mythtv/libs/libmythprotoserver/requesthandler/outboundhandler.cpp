@@ -32,7 +32,7 @@ void OutboundRequestHandler::ConnectToMaster(void)
 bool OutboundRequestHandler::DoConnectToMaster(void)
 {
     if (m_socket)
-        m_socket->DownRef();
+        m_socket->DecrRef();
 
     m_socket = new MythSocket();
 
@@ -48,7 +48,7 @@ bool OutboundRequestHandler::DoConnectToMaster(void)
     if (!m_socket->connect(server, port))
     {
         LOG(VB_GENERAL, LOG_ERR, "Failed to connect to master backend.");
-        m_socket->DownRef();
+        m_socket->DecrRef();
         m_socket = NULL;
         return false;
     }
@@ -59,7 +59,8 @@ bool OutboundRequestHandler::DoConnectToMaster(void)
     if (!m_socket->Validate())
     {
         LOG(VB_GENERAL, LOG_NOTICE, "Unable to confirm protocol version with backend.");
-        m_socket->DownRef();
+        m_socket->Unlock();
+        m_socket->DecrRef();
         m_socket = NULL;
         return false;
     }
@@ -68,7 +69,8 @@ bool OutboundRequestHandler::DoConnectToMaster(void)
     if (!AnnounceSocket())
     {
         LOG(VB_GENERAL, LOG_NOTICE, "Announcement to upstream master backend failed.");
-        m_socket->DownRef();
+        m_socket->Unlock();
+        m_socket->DecrRef();
         m_socket = NULL;
         return false;
     }
@@ -79,6 +81,7 @@ bool OutboundRequestHandler::DoConnectToMaster(void)
     handler->AllowSystemEvents(true);
     m_parent->AddSocketHandler(handler); // register socket for reception of events
     handler->DecrRef(); // drop local instance in counter
+    handler = NULL;
 
     m_socket->Unlock();
     m_parent->newConnection(m_socket); // configure callbacks

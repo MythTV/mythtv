@@ -108,7 +108,6 @@ class EITHelper
     static EITCache        *eitcache;
 
     int                     gps_offset;
-    int                     utc_offset;
     uint                    cardid;
     QMap<uint64_t,uint>     fixup;
     ATSCSRCToEvents         incomplete_events;

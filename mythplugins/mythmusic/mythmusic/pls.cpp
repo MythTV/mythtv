@@ -250,7 +250,7 @@ int PlayListFile::parsePLS(PlayListFile *pls, QTextStream *stream)
 int PlayListFile::parseM3U(PlayListFile *pls, QTextStream *stream)
 {
     QString data = stream->readAll();
-    QStringList lines = data.split("\r\n");
+    QStringList lines = data.split(QRegExp("[\r\n]"));
 
     QStringList::iterator it;
     for (it = lines.begin(); it != lines.end(); ++it)

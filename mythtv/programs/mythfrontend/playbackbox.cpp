@@ -5,6 +5,7 @@
 #include <QCoreApplication>
 #include <QWaitCondition>
 #include <QDateTime>
+#include <QLocale>
 #include <QTimer>
 #include <QMap>
 
@@ -35,7 +36,7 @@
 #include "netutils.h"
 #include "mythdirs.h"
 #include "mythdb.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 #include "tv.h"
 
 //  Mythfrontend
@@ -330,7 +331,7 @@ static void push_onto_del(QStringList &list, const ProgramInfo &pginfo)
 {
     list.clear();
     list.push_back(QString::number(pginfo.GetChanID()));
-    list.push_back(pginfo.GetRecordingStartTime(ISODate));
+    list.push_back(pginfo.GetRecordingStartTime(MythDate::ISODate));
     list.push_back(QString() /* force Delete */);
     list.push_back(QString()); /* forget history */
 }
@@ -345,7 +346,7 @@ static bool extract_one_del(
     }
 
     chanid     = list[0].toUInt();
-    recstartts = QDateTime::fromString(list[1], Qt::ISODate);
+    recstartts = MythDate::fromString(list[1]);
 
     list.pop_front();
     list.pop_front();
@@ -831,7 +832,7 @@ void PlaybackBox::UpdateUIListItem(MythUIButtonListItem *item,
 
     item->DisplayState(rating, "ratingstate");
 
-    QString oldimgfile = item->GetImage("preview");
+    QString oldimgfile = item->GetImageFilename("preview");
     if (oldimgfile.isEmpty() || force_preview_reload)
         m_preview_tokens.insert(m_helper.GetPreviewImage(*pginfo));
 
@@ -981,7 +982,7 @@ void PlaybackBox::ItemVisible(MythUIButtonListItem *item)
     item->DisplayState(extract_commflag_state(*pginfo), "commflagged");
 
     MythUIButtonListItem *sel_item = item->parent()->GetItemCurrent();
-    if ((item != sel_item) && item->GetImage("preview").isEmpty() &&
+    if ((item != sel_item) && item->GetImageFilename("preview").isEmpty() &&
         (asAvailable == pginfo->GetAvailableStatus()))
     {
         QString token = m_helper.GetPreviewImage(*pginfo, true);
@@ -992,7 +993,7 @@ void PlaybackBox::ItemVisible(MythUIButtonListItem *item)
         // now make sure selected item is still at the top of the queue
         ProgramInfo *sel_pginfo =
             qVariantValue<ProgramInfo*>(sel_item->GetData());
-        if (sel_pginfo && sel_item->GetImage("preview").isEmpty() &&
+        if (sel_pginfo && sel_item->GetImageFilename("preview").isEmpty() &&
             (asAvailable == sel_pginfo->GetAvailableStatus()))
         {
             m_preview_tokens.insert(
@@ -1255,30 +1256,29 @@ void PlaybackBox::UpdateUsageUI(void)
     double freeSpaceTotal = (double) m_helper.GetFreeSpaceTotalMB();
     double freeSpaceUsed  = (double) m_helper.GetFreeSpaceUsedMB();
 
+    QLocale locale = gCoreContext->GetQLocale();
     InfoMap usageMap;
-    usageMap["diskspacetotal"] = QString().sprintf("%0.2f",
-                                                   freeSpaceTotal / 1024.0);
-    usageMap["diskspaceused"] = QString().sprintf("%0.2f",
-                                                  freeSpaceUsed / 1024.0);
-    usageMap["diskspacefree"] = QString().sprintf("%0.2f",
-                                    (freeSpaceTotal - freeSpaceUsed) / 1024.0);
-
-    QString usestr;
+    usageMap["diskspacetotal"] = locale.toString((freeSpaceTotal / 1024.0),
+                                               'f', 2);
+    usageMap["diskspaceused"] = locale.toString((freeSpaceUsed / 1024.0),
+                                               'f', 2);
+    usageMap["diskspacefree"] = locale.toString(
+                                    ((freeSpaceTotal - freeSpaceUsed) / 1024.0),
+                                    'f', 2);
 
     double perc = 0.0;
     if (freeSpaceTotal > 0.0)
         perc = (100.0 * freeSpaceUsed) / freeSpaceTotal;
 
-    usageMap["diskspacepercentused"] = QString().number((int)perc);
-    usageMap["diskspacepercentfree"] = QString().number(100 - (int)perc);
+    usageMap["diskspacepercentused"] = QString::number((int)perc);
+    usageMap["diskspacepercentfree"] = QString::number(100 - (int)perc);
 
-    usestr.sprintf("%d", (int)perc);
-    usestr = usestr + tr("% used");
+    QString size = locale.toString(((freeSpaceTotal - freeSpaceUsed) / 1024.0),
+                                   'f', 2);
 
-    QString size;
-    size.sprintf("%0.2f", (freeSpaceTotal - freeSpaceUsed) / 1024.0);
-    QString rep = tr(", %1 GB free").arg(size);
-    usestr = usestr + rep;
+    QString usestr = tr("%1% used, %2 GB free", "Diskspace")
+                                                .arg(QString::number((int)perc))
+                                                .arg(size);
 
     if (freereportText)
         freereportText->SetText(usestr);
@@ -1731,7 +1731,8 @@ bool PlaybackBox::UpdateUILists(void)
                 }
 
                 if ((m_viewMask & VIEW_WATCHLIST) &&
-                    (p->GetRecordingGroup() != "LiveTV"))
+                    p->GetRecordingGroup() != "LiveTV" &&
+                    p->GetRecordingGroup() != "Deleted")
                 {
                     if (m_watchListAutoExpire && !p->IsAutoExpirable())
                     {
@@ -1841,7 +1842,7 @@ bool PlaybackBox::UpdateUILists(void)
 
     if (!m_progLists[m_watchGroupLabel].empty())
     {
-        QDateTime now = QDateTime::currentDateTime();
+        QDateTime now = MythDate::current();
         int baseValue = m_watchListMaxAge * 2 / 3;
 
         QMap<int, int> recType;
@@ -1864,9 +1865,12 @@ bool PlaybackBox::UpdateUILists(void)
                 maxEpisodes[recid] = query.value(2).toInt();
                 avgDelay[recid] = query.value(3).toInt();
 
-                QDateTime next_record = query.value(4).toDateTime();
-                QDateTime last_record = query.value(5).toDateTime();
-                QDateTime last_delete = query.value(6).toDateTime();
+                QDateTime next_record =
+                    MythDate::as_utc(query.value(4).toDateTime());
+                QDateTime last_record =
+                    MythDate::as_utc(query.value(5).toDateTime());
+                QDateTime last_delete =
+                    MythDate::as_utc(query.value(6).toDateTime());
 
                 // Time between the last and next recordings
                 spanHours[recid] = 1000;
@@ -2066,8 +2070,8 @@ bool PlaybackBox::UpdateUILists(void)
             }
 
             LOG(VB_FILE, LOG_INFO, QString(" %1  %2  %3")
-                    .arg(MythDateTimeToString((*pit)->GetScheduledStartTime(),
-                                              kDateShort))
+                    .arg(MythDate::toString((*pit)->GetScheduledStartTime(),
+                                            MythDate::kDateShort))
                     .arg((*pit)->GetRecordingPriority2())
                     .arg((*pit)->GetTitle()));
 
@@ -2542,8 +2546,7 @@ void PlaybackBox::ShowDeletePopup(DeletePopupType type)
     else if (m_delList.size() >= 4)
     {
         delItem = FindProgramInUILists(
-            m_delList[0].toUInt(),
-            QDateTime::fromString(m_delList[1], Qt::ISODate));
+            m_delList[0].toUInt(), MythDate::fromString(m_delList[1]));
     }
 
     if (!delItem)
@@ -3196,8 +3199,9 @@ QString PlaybackBox::CreateProgramInfoString(const ProgramInfo &pginfo) const
     QDateTime recendts   = pginfo.GetRecordingEndTime();
 
     QString timedate = QString("%1 - %2")
-        .arg(MythDateTimeToString(recstartts, kDateTimeFull | kSimplify))
-        .arg(MythDateTimeToString(recendts, kTime));
+        .arg(MythDate::toString(
+                 recstartts, MythDate::kDateTimeFull | MythDate::kSimplify))
+        .arg(MythDate::toString(recendts, MythDate::kTime));
 
     QString title = pginfo.GetTitle();
 
@@ -3402,7 +3406,7 @@ void PlaybackBox::PlaylistDelete(bool forgetHistory)
         {
             tmpItem->SetAvailableStatus(asPendingDelete, "PlaylistDelete");
             list.push_back(QString::number(tmpItem->GetChanID()));
-            list.push_back(tmpItem->GetRecordingStartTime(ISODate));
+            list.push_back(tmpItem->GetRecordingStartTime(MythDate::ISODate));
             list.push_back(forceDeleteStr);
             list.push_back(forgetHistory ? "1" : "0");
 
@@ -3707,7 +3711,7 @@ void PlaybackBox::processNetworkControlCommand(const QString &command)
             }
 
             uint chanid = tokens[3].toUInt();
-            QDateTime recstartts = myth_dt_from_string(tokens[4]);
+            QDateTime recstartts = MythDate::fromString(tokens[4]);
             ProgramInfo pginfo(chanid, recstartts);
 
             if (pginfo.GetChanID())
@@ -3880,7 +3884,7 @@ void PlaybackBox::customEvent(QEvent *event)
             if (tokens.size() >= 4)
             {
                 chanid = tokens[2].toUInt();
-                recstartts = QDateTime::fromString(tokens[3], Qt::ISODate);
+                recstartts = MythDate::fromString(tokens[3]);
             }
 
             if ((tokens.size() >= 2) && tokens[1] == "UPDATE")
@@ -3946,7 +3950,7 @@ void PlaybackBox::customEvent(QEvent *event)
             if (tokens.size() >= 4)
             {
                 chanid     = tokens[1].toUInt();
-                recstartts = QDateTime::fromString(tokens[2], Qt::ISODate);
+                recstartts = MythDate::fromString(tokens[2]);
                 filesize   = tokens[3].toLongLong(&ok);
             }
             if (chanid && recstartts.isValid() && ok)
@@ -3980,8 +3984,7 @@ void PlaybackBox::customEvent(QEvent *event)
             {
                 ProgramInfo *pginfo = m_programInfoCache.GetProgramInfo(
                         me->ExtraDataList()[i+0].toUInt(),
-                        QDateTime::fromString(
-                            me->ExtraDataList()[i+1], Qt::ISODate));
+                        MythDate::fromString(me->ExtraDataList()[i+1]));
 
                 if (!pginfo)
                     continue;
@@ -3990,7 +3993,8 @@ void PlaybackBox::customEvent(QEvent *event)
                 QString forgetHistoryStr = me->ExtraDataList()[i+3];
 
                 list.push_back(QString::number(pginfo->GetChanID()));
-                list.push_back(pginfo->GetRecordingStartTime(ISODate));
+                list.push_back(
+                    pginfo->GetRecordingStartTime(MythDate::ISODate));
                 list.push_back(forceDeleteStr);
                 list.push_back(forgetHistoryStr);
                 pginfo->SetAvailableStatus(asPendingDelete,
@@ -4019,8 +4023,7 @@ void PlaybackBox::customEvent(QEvent *event)
             {
                 ProgramInfo *pginfo = m_programInfoCache.GetProgramInfo(
                         me->ExtraDataList()[i+0].toUInt(),
-                        QDateTime::fromString(
-                            me->ExtraDataList()[i+1], Qt::ISODate));
+                        MythDate::fromString(me->ExtraDataList()[i+1]));
                 if (pginfo)
                 {
                     pginfo->SetAvailableStatus(asAvailable, "DELETE_FAILURES");
