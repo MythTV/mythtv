@@ -143,7 +143,7 @@ class AudioReencodeBuffer : public AudioOutput
                 int bufsize = m_saveBuffer->m_buffer.size();
                 int part = min(len - index, m_audioFrameSize - bufsize);
                 total_frames += part / m_bytes_per_frame;
-                timecode = total_frames * 1000 / m_eff_audiorate;
+                timecode += total_frames * 1000 / m_eff_audiorate;
                 // Store frames in buffer, basing frame count on number of
                 // bytes, which works only for uncompressed data.
                 m_saveBuffer->appendData(&buf[index], part,
