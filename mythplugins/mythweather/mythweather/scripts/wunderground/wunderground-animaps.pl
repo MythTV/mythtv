@@ -14,21 +14,48 @@ use lib dirname(abs_path($0 or $PROGRAM_NAME)),
 
 use utf8;
 use encoding 'utf8';
+use LWP::UserAgent;
 use Getopt::Std;
+use URI::Escape;
 use POSIX qw(strftime);
+use JSON;
+use Env qw(HOME MYTHCONFDIR);
 
 our ($opt_v, $opt_t, $opt_T, $opt_l, $opt_u, $opt_d, $opt_D); 
 
 my $name = 'wunderground-animaps';
-my $version = 0.1;
+my $version = 0.2;
 my $author = 'Gavin Hurlbut';
 my $email = 'gjhurlbu@gmail.com';
 my $updateTimeout = 15*60;
 my $retrieveTimeout = 30;
-my @types = ( 'amdesc', 'updatetime', 'animatedimage', 'copyright' );
+my @types = ( 'amdesc', 'updatetime', 'animatedimage', 'copyright', 
+              'copyrightlogo' );
 my $dir = "/tmp/wunderground";
 my $logdir = "/tmp/wunderground";
-my $config_file = dirname(abs_path($0 or $PROGRAM_NAME)) . "/maps.csv";
+
+my $conffile;
+
+if (defined $MYTHCONFDIR) {
+    $conffile = "$MYTHCONFDIR/MythWeather/wunderground.key";
+} 
+
+if ((!defined $MYTHCONFDIR) || ($conffile && !-f $conffile)) {
+    $conffile = "$HOME/.mythtv/MythWeather/wunderground.key";
+}
+
+if (!-f $conffile) {
+    print STDERR "You need to sign up for an API key from wunderground and " .
+                 "put it into\n" .
+                 $conffile . "\n\n" .
+                 "Visit: http://www.wunderground.com/weather/api/\n\n";
+    exit 1;
+}
+
+open IF, "<", $conffile or die "Couldn't read $conffile: $!\n";
+my $apikey = <IF>;
+close IF;
+chomp $apikey;
 
 binmode(STDOUT, ":utf8");
 
@@ -59,18 +86,22 @@ if (!-d $dir) {
 }
 
 if (defined $opt_l) {
-    my $search = shift;
-    $search = qr{(?i)^(.*?),(.*$search.*)$};
+    my $search = uri_escape(shift);
     log_print( $logdir, "-l $search\n" ); 
+    my $base_url = "http://api.wunderground.com/api/$apikey/geolookup/q/";
 
-    open my $fh, "<", $config_file or die "Couldn't open config file: $!\n";
-    while (<$fh>) {
-        if ( /$search/ ) {
-            my $code = uc $1;
-            print "${code}::$2\n";
+    my $hash = getCachedJSON($base_url . $search . ".json", $dir,
+                             $search . ".json", $updateTimeout, $logdir);
+
+    if (exists $hash->{'location'}) {
+        # Single match
+        my $loc = $hash->{'location'};
+        print_location($loc);
+    } elsif (exists $hash->{'response'}->{'results'}) {
+        for my $loc (@{$hash->{'response'}->{'results'}}) {
+            print_location($loc);
         }
     }
-    close $fh;
 
     exit 0;
 }
@@ -81,32 +112,30 @@ if (defined $opt_t) {
 }
 
 # we get here, we're doing an actual retrieval, everything must be defined
-my $loc = uc shift;
-if ( not defined $loc or $loc eq "" ) {
+my $rawloc = shift;
+if ( not defined $rawloc or $rawloc eq "" ) {
     die "Invalid usage";
 }
+my $loc = uri_escape($rawloc);
 
 my %attrib;
 
 log_print( $logdir, "-d $dir $loc\n" );
 
-my $search = qr{(?i)^$loc,(.*?)$};
-my @names;
+my $base_url = "http://api.wunderground.com/api/$apikey/geolookup/q/";
 
-open my $fh, "<", $config_file or die "Couldn't open config file: $!\n";
-while (<$fh>) {
-    push @names, $1 if ( /$search/ );
-}
-close $fh;
+my $hash = getCachedJSON($base_url . $loc . ".json", $dir,
+                         $loc . ".json", $updateTimeout, $logdir);
+my $location = location($hash->{'location'});
 
-$attrib{"amdesc"} = join( " / ", @names) . " Animated Radar Map";
+my $url = "http://api.wunderground.com/api/$apikey/animatedradar/q/$loc.gif?" .
+          "width=1024&height=768&newmaps=1&num=6&timelabel=1&timelabel.x=10&" .
+          "timelabel.y=758";
+$attrib{"amdesc"} = "$location Animated Radar Map";
 
-$attrib{"animatedimage"} = "http://radblast-mi.wunderground.com/cgi-bin/radar/".
-                           "WUNIDS_map?station=$loc&type=N0R&noclutter=0&".
-                           "showlabels=1&rainsnow=1&num=6&delay=200";
-
-
+$attrib{"animatedimage"} = $url;
 $attrib{"copyright"}  = "Weather data courtesy of Weather Underground, Inc.";
+$attrib{"copyrightlogo"} = "http://icons.wxug.com/logos/images/wundergroundLogo_4c.jpg";
 
 my $now = time;
 $attrib{"updatetime"} = format_date($now);
@@ -119,32 +148,7 @@ exit 0;
 #
 # Subroutines
 #
-sub nodeToHash {
-    my ($node, $prefix, $hashref) = @_;
-
-    my $nodename = $node->getName;
-    my @subnodelist = $node->getChildNodes;
-
-    if ( not defined $prefix or $prefix eq "" ) {
-        $prefix = $nodename;
-    } elsif ( defined $nodename ) {
-        $prefix = $prefix . "::" . $nodename;
-    }
-
-    foreach my $attr ( $node->getAttributes ) {
-        $prefix .= "::".$attr->getName."=".$attr->getData;
-    }
-
-    if ( $#subnodelist == 0 ) {
-        $hashref->{$prefix} = $node->string_value;
-    } else {
-        foreach my $subnode ( @subnodelist ) {
-            nodeToHash( $subnode, $prefix, $hashref );
-        }
-    }
-}
-
-sub getCachedFile {
+sub getCachedJSON {
     my ($url, $dir, $file, $timeout, $logdir) = @_;
 
     my $cachefile = "$dir/$file";
@@ -161,11 +165,21 @@ sub getCachedFile {
         $ua->env_proxy;
         $ua->default_header('Accept-Language' => "en");
 
-        my $response = $ua->get($url, ":content_file" => $cachefile);
+        my $response = $ua->get($url);
         if ( !$response->is_success ) {
             die $response->status_line;
         }
+
+        open OF, ">", $cachefile or die "Can't open $cachefile: $!\n";
+        print OF $response->content;
+        close OF;
     }
+
+    open OF, "<", $cachefile or die "Can't open $cachefile: $!\n";
+    my $json = do { local $/; <OF> };
+    my $hash = from_json($json);
+
+    return $hash;
 }
 
 sub format_date {
@@ -181,4 +195,22 @@ sub log_print {
     open OF, ">>$dir/wunderground.log";
     print OF @_;
     close OF;
+}
+
+sub location {
+    my $loc = shift;
+    my $location = $loc->{'city'};
+    $location .= ", " . $loc->{'state'} if $loc->{'state'};
+    $location .= ", " . $loc->{'country_name'} if $loc->{'country_name'};
+
+    return $location;
+}
+
+sub print_location {
+    my $loc = shift;
+
+    my $ident = $loc->{'l'};
+    $ident =~ s/^\/q\///;
+    my $location = location($loc);
+    print $ident."::$location\n";
 }

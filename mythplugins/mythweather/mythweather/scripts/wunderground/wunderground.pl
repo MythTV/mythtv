@@ -9,15 +9,15 @@ use encoding 'utf8';
 use LWP::UserAgent;
 use Getopt::Std;
 use URI::Escape;
-use XML::XPath;
-use XML::XPath::XMLParser;
 use POSIX qw(strftime);
 use File::Path;
+use JSON;
+use Env qw(HOME MYTHCONFDIR);
 
 our ($opt_v, $opt_t, $opt_T, $opt_l, $opt_u, $opt_d, $opt_D); 
 
 my $name = 'wunderground';
-my $version = 0.1;
+my $version = 0.2;
 my $author = 'Gavin Hurlbut';
 my $email = 'gjhurlbu@gmail.com';
 my $updateTimeout = 15*60;
@@ -27,7 +27,7 @@ my @types = ( '3dlocation', '6dlocation', 'cclocation', 'copyright',
               'high-0', 'high-1', 'high-2', 'high-3', 'high-4', 'high-5',
               'low-0', 'low-1', 'low-2', 'low-3', 'low-4', 'low-5',
               'icon-0', 'icon-1', 'icon-2', 'icon-3', 'icon-4', 'icon-5',
-              'observation_time', 'updatetime', 'station_id' );
+              'observation_time', 'updatetime', 'station_id', 'copyrightlogo' );
 my $dir = "/tmp/wunderground";
 my $logdir = "/tmp/wunderground";
 my %images = ( "clear" => "fair.png", "cloudy" => "cloudy.png",
@@ -38,6 +38,28 @@ my %images = ( "clear" => "fair.png", "cloudy" => "cloudy.png",
                "sleet" => "rainsnow.png", "snow" => "flurries.png",
                "sunny" => "sunny.png", "tstorms" => "thunshowers.png",
                "unknown" => "unknown.png" );
+my $conffile;
+
+if (defined $MYTHCONFDIR) {
+    $conffile = "$MYTHCONFDIR/MythWeather/wunderground.key";
+} 
+
+if ((!defined $MYTHCONFDIR) || ($conffile && !-f $conffile)) {
+    $conffile = "$HOME/.mythtv/MythWeather/wunderground.key";
+}
+
+if (!-f $conffile) {
+    print STDERR "You need to sign up for an API key from wunderground and " .
+                 "put it into\n" .
+                 $conffile . "\n\n" .
+                 "Visit: http://www.wunderground.com/weather/api/\n\n";
+    exit 1;
+}
+
+open IF, "<", $conffile or die "Couldn't read $conffile: $!\n";
+my $apikey = <IF>;
+close IF;
+chomp $apikey;
 
 binmode(STDOUT, ":utf8");
 
@@ -70,35 +92,18 @@ if (!-d $dir) {
 if (defined $opt_l) {
     my $search = uri_escape(shift);
     log_print( $logdir, "-l $search\n" ); 
-    my $base_url = 
-      'http://api.wunderground.com/auto/wui/geo/GeoLookupXML/index.xml?query=';
+    my $base_url = "http://api.wunderground.com/api/$apikey/geolookup/q/";
 
-    my $xp = getCachedXML($base_url . $search, $dir, $search . ".html",
-                          $updateTimeout, $logdir);
+    my $hash = getCachedJSON($base_url . $search . ".json", $dir,
+                             $search . ".json", $updateTimeout, $logdir);
 
-    # This can return two different types of responses.  One where there is a
-    # list of locations, and one where it's unique.
-    my $nodeset = $xp->find('/locations/location');
-    my $city;
-    my $state;
-    if( $nodeset->size == 0 ) {
-        # Single location
-        $city  = $xp->getNodeText('/location/city');
-        $state = $xp->getNodeText('/location/state');
-        if( not defined $state ) {
-            $state = "";
-        } else {
-            $state = ", $state";
-        }
-        print $city . "::$city$state, " . 
-              $xp->getNodeText('/location/country') . "\n";
-    } else {
-        # Multiple locations
-        foreach my $node ($nodeset->get_nodelist) {
-            my $type = $node->getAttribute('type');
-            next unless $type eq "CITY" or $type eq "INTLCITY";
-            $city = $xp->find("name", $node);
-            print "$city" . "::$city\n";
+    if (exists $hash->{'location'}) {
+        # Single match
+        my $loc = $hash->{'location'};
+        print_location($loc);
+    } elsif (exists $hash->{'response'}->{'results'}) {
+        for my $loc (@{$hash->{'response'}->{'results'}}) {
+            print_location($loc);
         }
     }
 
@@ -122,67 +127,60 @@ my $units = $opt_u;
 log_print( $logdir, "-u $units -d $dir $loc\n" );
 
 
-my $base_url = 
-     'http://api.wunderground.com/auto/wui/geo/ForecastXML/index.xml?query=';
+my $base_url =
+    "http://api.wunderground.com/api/$apikey/geolookup/forecast10day/q/";
 my $file = $loc;
-$file =~ s/\//-/g;
 
-my $xp = getCachedXML($base_url . $loc, $dir, $file . ".xml",
-                      $updateTimeout, $logdir);
+my $hash = getCachedJSON($base_url . $loc . ".json", $dir, $file . ".json",
+                         $updateTimeout, $logdir);
 
 $attrib{"station_id"} = $rawloc;
 
-my $nodeset;
-my $node;
-
-$attrib{"cclocation"}   = $rawloc;
-$attrib{"3dlocation"}   = $rawloc;
-$attrib{"6dlocation"}   = $rawloc;
+my $location = location($hash->{'location'});
+$attrib{"cclocation"} = $location;
+$attrib{"3dlocation"} = $location;
+$attrib{"6dlocation"} = $location;
 
 $attrib{"copyright"}  = "Weather data courtesy of Weather Underground, Inc.";
+$attrib{"copyrightlogo"} = "http://icons.wxug.com/logos/images/wundergroundLogo_4c.jpg";
 
 my $now = time;
 $attrib{"updatetime"} = format_date($now);
 
-$attrib{"observation_time"}  = $xp->getNodeText('/forecast/txt_forecast/date');
+$attrib{"observation_time"}  = $hash->{'forecast'}->{'txt_forecast'}->{'date'};
 
-my @forecast;
-$nodeset = $xp->find('/forecast/simpleforecast/forecastday');
-foreach $node ($nodeset->get_nodelist) {
-    my $hashref = {};
+my $forecast = $hash->{'forecast'}->{'simpleforecast'}->{'forecastday'};
 
-    nodeToHash( $node, "", $hashref );
-    push @forecast, $hashref;
-}
+#------
   
 my $day = 0;
 my $time = 0;
-#foreach my $hashref (@forecast) {
+#foreach my $hashref (@{$forecast}) {
 #    print "---------------\n";
 #    foreach my $key ( sort keys %$hashref ) {
 #        print $key . "::" . $hashref->{$key} . "\n";
 #    }
 #}
 
-foreach my $hashref (@forecast) {
-    my $fromtime = $hashref->{"forecastday::date::epoch"};
+foreach my $hashref (@{$forecast}) {
+    my $fromtime = $hashref->{'date'}->{'epoch'};
     if( $day < 6 ) {
         $attrib{"date-$day"} = format_date($fromtime);
-        my $icon = lc $hashref->{"forecastday::icon"};
+        my $icon = lc $hashref->{'icon'};
         $icon =~ s/^chance//;
         my $img = $images{$icon};
         if (not defined $img) {
             log_print( $dir, "Unknown image mapping: " . 
-                             $hashref->{"forecastday::icon"} . "\n" );
+                             $hashref->{'icon'} . "\n" );
             $img = $images{"unknown"};
         }
         $attrib{"icon-$day"} = $img;
         if ($units eq "SI") {
-            $attrib{"high-$day"} = $hashref->{"forecastday::high::celsius"};
-            $attrib{"low-$day"} = $hashref->{"forecastday::low::celsius"};
+            $attrib{"high-$day"} = $hashref->{'high'}->{'celsius'};
+            $attrib{"low-$day"}  = $hashref->{'low'}->{'celsius'};
         } else {
-            $attrib{"high-$day"} = $hashref->{"forecastday::high::fahrenheit"};
-            $attrib{"low-$day"} = $hashref->{"forecastday::low::fahrenheit"};
+            $attrib{"high-$day"} = $hashref->{'high'}->{'fahrenheit'};
+            $attrib{"low-$day"}  = $hashref->{'low'}->{'fahrenheit'};
         }
         $day++;
     }
@@ -196,36 +194,10 @@ exit 0;
 #
 # Subroutines
 #
-sub nodeToHash {
-    my ($node, $prefix, $hashref) = @_;
-
-    my $nodename = $node->getName;
-    my @subnodelist = $node->getChildNodes;
-
-    if ( not defined $prefix or $prefix eq "" ) {
-        $prefix = $nodename;
-    } elsif ( defined $nodename ) {
-        $prefix = $prefix . "::" . $nodename;
-    }
-
-    foreach my $attr ( $node->getAttributes ) {
-        $prefix .= "::".$attr->getName."=".$attr->getData;
-    }
-
-    if ( $#subnodelist == 0 ) {
-        $hashref->{$prefix} = $node->string_value;
-    } else {
-        foreach my $subnode ( @subnodelist ) {
-            nodeToHash( $subnode, $prefix, $hashref );
-        }
-    }
-}
-
-sub getCachedXML {
+sub getCachedJSON {
     my ($url, $dir, $file, $timeout, $logdir) = @_;
 
     my $cachefile = "$dir/$file";
-    my $xp;
 
     my $now = time();
 
@@ -244,14 +216,16 @@ sub getCachedXML {
             die $response->status_line;
         }
 
-        open OF, ">$cachefile" or die "Can't open $cachefile: $!\n";
+        open OF, ">", $cachefile or die "Can't open $cachefile: $!\n";
         print OF $response->content;
         close OF;
     }
 
-    $xp = XML::XPath->new(filename => $cachefile);
+    open OF, "<", $cachefile or die "Can't open $cachefile: $!\n";
+    my $json = do { local $/; <OF> };
+    my $hash = from_json($json);
 
-    return $xp;
+    return $hash;
 }
 
 sub format_date {
@@ -267,4 +241,22 @@ sub log_print {
     open OF, ">>$dir/wunderground.log";
     print OF @_;
     close OF;
+}
+
+sub location {
+    my $loc = shift;
+    my $location = $loc->{'city'};
+    $location .= ", " . $loc->{'state'} if $loc->{'state'};
+    $location .= ", " . $loc->{'country_name'} if $loc->{'country_name'};
+
+    return $location;
+}
+
+sub print_location {
+    my $loc = shift;
+
+    my $ident = $loc->{'l'};
+    $ident =~ s/^\/q\///;
+    my $location = location($loc);
+    print $ident."::$location\n";
 }

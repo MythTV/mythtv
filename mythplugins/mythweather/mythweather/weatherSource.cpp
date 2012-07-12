@@ -579,9 +579,10 @@ void WeatherSource::processData()
         if (temp.size() < 2)
         {
             LOG(VB_GENERAL, LOG_ERR,
-                "Unrecoverable error parsing script output " + temp.size());
+                QString("Unrecoverable error parsing script output %1")
+                .arg(temp.size()));
             LOG(VB_GENERAL, LOG_ERR, QString("data[%1]: '%2'")
-                    .arg(i).arg(data[i]));
+                .arg(i).arg(data[i]));
             return; // we don't emit signal
         }
 
