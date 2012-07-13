@@ -18,7 +18,7 @@ use Date::Manip;
 our ($opt_v, $opt_t, $opt_T, $opt_l, $opt_u, $opt_d); 
 
 my $name = 'NDFD-18_Hour';
-my $version = 0.3;
+my $version = 0.4;
 my $author = 'Gavin Hurlbut & Lucien Dunning';
 my $email = 'gjhurlbu@gmail.com';
 my $updateTimeout = 15*60;

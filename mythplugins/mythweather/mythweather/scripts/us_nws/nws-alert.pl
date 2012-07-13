@@ -141,7 +141,7 @@ sub getEffectiveWarnings {
 our ($opt_v, $opt_t, $opt_T, $opt_l, $opt_u, $opt_d); 
 
 my $name = 'NWS-Alerts';
-my $version = 0.4;
+my $version = 0.5;
 my $author = 'Gavin Hurlbut & Lucien Dunning';
 my $email = 'gjhurlbu@gmail.com';
 my $updateTimeout = 10*60;

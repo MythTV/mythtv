@@ -27,7 +27,7 @@ use Data::Dumper;
 our ($opt_v, $opt_t, $opt_T, $opt_l, $opt_u, $opt_d);
 
 my $name = 'ENVCAN';
-my $version = 0.4;
+my $version = 0.5;
 my $author  = 'Joe Ripley';
 my $email   = 'vitaminjoe@gmail.com';
 my $updateTimeout = 15*60;

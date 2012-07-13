@@ -26,7 +26,7 @@ use BBCLocation;
 our ($opt_v, $opt_t, $opt_T, $opt_l, $opt_u, $opt_d, $opt_D);
 
 my $name = 'BBC-Current-XML';
-my $version = 0.3;
+my $version = 0.4;
 my $author = 'Gavin Hurlbut / Stuart Morgan';
 my $email = 'gjhurlbu@gmail.com / stuart@tase.co.uk';
 my $updateTimeout = 120*60;

@@ -31,7 +31,7 @@ use Image::Magick;
 our ($opt_v, $opt_t, $opt_T, $opt_l, $opt_u, $opt_d); 
 
 my $name = 'ENVCAN-Static-Map';
-my $version = 0.1;
+my $version = 0.2;
 my $author = 'Gavin Hurlbut';
 my $email = 'gjhurlbu@gmail.com';
 my $updateTimeout = 10*60;
