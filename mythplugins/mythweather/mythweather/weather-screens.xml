@@ -15,6 +15,7 @@
         <datum name="weather_icon" />
         <datum name="observation_time" />
         <datum name="copyright" />
+        <datum name="copyrightlogo" />
     </screen>
 
     <screen name="Three Day Forecast">
@@ -33,6 +34,7 @@
         <datum name="high-2" />
         <datum name="updatetime" />
         <datum name="copyright" />
+        <datum name="copyrightlogo" />
     </screen>
 
     <screen name="Six Day Forecast">
@@ -63,6 +65,7 @@
         <datum name="low-5" />
         <datum name="updatetime" />
         <datum name="copyright" />
+        <datum name="copyrightlogo" />
     </screen>
 
     <!-- <screen name="Today's Forecast">
@@ -70,6 +73,7 @@
         <datum name="updatetime" />
         <datum name="today-desc" />
         <datum name="copyright" />
+        <datum name="copyrightlogo" />
     </screen> -->
 
     <screen name="Static Map" hasunits="no">
@@ -77,6 +81,7 @@
         <datum name="updatetime" />
         <datum name="map" />
         <datum name="copyright" />
+        <datum name="copyrightlogo" />
     </screen>
 
     <screen name="Animated Map" hasunits="no">
@@ -84,12 +89,14 @@
         <datum name="updatetime" />
         <datum name="animatedimage" />
         <datum name="copyright" />
+        <datum name="copyrightlogo" />
     </screen>
 
     <screen name="Severe Weather Alerts" hasunits="no">
         <datum name="swlocation" />
         <datum name="alerts" />
         <datum name="copyright" />
+        <datum name="copyrightlogo" />
     </screen>
 
     <screen name="18 Hour Forecast">
@@ -120,6 +127,7 @@
         <datum name="pop-5" />
         <datum name="updatetime" />
         <datum name="copyright" />
+        <datum name="copyrightlogo" />
     </screen>
 
     <!-- <screen name="Tomorrow's Outlook">
