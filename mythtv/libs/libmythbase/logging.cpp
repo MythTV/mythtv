@@ -864,6 +864,8 @@ void logStop(void)
     {
         logThread->stop();
         logThread->wait();
+        delete logThread;
+        logThread = NULL;
     }
 }
 
