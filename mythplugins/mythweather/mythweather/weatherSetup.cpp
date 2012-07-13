@@ -1030,7 +1030,7 @@ void LocationDialog::doSearch()
         for (rit = results.begin(); rit != results.end(); ++rit)
         {
             QStringList tmp = (*rit).split("::");
-            if (tmp.size < 2)
+            if (tmp.size() < 2)
             {
                 LOG(VB_GENERAL, LOG_WARNING,
                         QString("Invalid line in Location Search reponse "
