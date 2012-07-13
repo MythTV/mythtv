@@ -2497,7 +2497,11 @@ bool Scheduler::HandleRecording(
         return false;
     }
 
+    // Use this temporary copy of ri when schedLock is not held.  Be
+    // sure to update it as long as it is still needed whenever ri
+    // changes.
     RecordingInfo tempri(ri);
+
     schedLock.unlock();
     bool isBusyRecording = IsBusyRecording(&tempri);
     schedLock.lock();
@@ -2567,13 +2571,18 @@ bool Scheduler::HandleRecording(
                                 recording_dir,
                                 reclist);
         ri.SetPathname(recording_dir);
+        tempri.SetPathname(recording_dir);
     }
 
     if (!recPendingList[schedid])
     {
-        nexttv->RecordPending(&ri, max(secsleft, 0),
+        schedLock.unlock();
+        nexttv->RecordPending(&tempri, max(secsleft, 0),
                               hasLaterList.contains(schedid));
         recPendingList[schedid] = true;
+        schedLock.lock();
+        if (reclist_changed)
+            return reclist_changed;
     }
 
     if (secsleft > 0)
@@ -2584,6 +2593,7 @@ bool Scheduler::HandleRecording(
         recstartts.date(),
         QTime(recstartts.time().hour(), recstartts.time().minute()), Qt::UTC);
     ri.SetRecordingStartTime(recstartts);
+    tempri.SetRecordingStartTime(recstartts);
 
     QString details = QString("%1: channel %2 on cardid %3, sourceid %4")
         .arg(ri.toString(ProgramInfo::kTitleSubtitle))
@@ -2596,7 +2606,6 @@ bool Scheduler::HandleRecording(
     {
         if (ri.GetRecordingStatus() == rsWillRecord)
         {
-            tempri = ri;
             schedLock.unlock();
             recStatus = nexttv->StartRecording(&tempri);
             schedLock.lock();
