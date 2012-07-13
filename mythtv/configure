@@ -159,7 +159,7 @@ External codec library options (used for mythffmpeg and streaming transcode):
   --enable-libvpx          enable VP8 encoding via libvpx [no]
   --enable-libxvid         enable Xvid encoding via xvidcore,
                            native MPEG-4/Xvid encoder exists [no]
-  --enable-sdl             enable Simple DirectMedia Layer (required for ffplay
+  --enable-sdl             enable Simple DirectMedia Layer (required for ffplay)
 EOF
 
 #following is ffmpeg's configure help text
