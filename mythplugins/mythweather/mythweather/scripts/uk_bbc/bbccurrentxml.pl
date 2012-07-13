@@ -32,7 +32,7 @@ my $email = 'gjhurlbu@gmail.com / stuart@tase.co.uk';
 my $updateTimeout = 120*60;
 # 2 Hours, BBC updates infrequently ~3 hours
 my $retrieveTimeout = 30;
-my @types = ('cclocation', 'station_id', 'copyright',
+my @types = ('cclocation', 'station_id', 'copyright', 'copyrightlogo',
         'observation_time', 'weather', 'temp', 'relative_humidity',
         'wind_dir', 'pressure', 'visibility', 'weather_icon',
         'appt', 'wind_spdgst');
@@ -117,7 +117,7 @@ if (!$xml) {
 # The required elements which aren't provided by this feed
 printf "appt::NA\n";
 
-printf "copyright::From bbc.co.uk\n";
+printf "copyright::bbc.co.uk - ©2012 BBC\n";
 printf "station_id::" . $locid . "\n";
 my $location = $xml->{channel}->{title};
 $location =~ s/.*?Observations for (.*)$/$1/s;

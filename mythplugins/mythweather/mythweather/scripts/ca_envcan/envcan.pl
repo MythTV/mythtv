@@ -43,7 +43,7 @@ my @types = ('cclocation', 'station_id', 'copyright',
             'date-2', 'icon-2', 'low-2', 'high-2', 'updatetime',
             'date-3', 'icon-3', 'low-3', 'high-3',
             'date-4', 'icon-4', 'low-4', 'high-4',
-            'date-5', 'icon-5', 'low-5', 'high-5' );
+            'date-5', 'icon-5', 'low-5', 'high-5', 'copyrightlogo' );
 
 my $dir = "./";
 

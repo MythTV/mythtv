@@ -31,7 +31,8 @@ my @types = ('3dlocation', '6dlocation',  'updatetime',
         'high-0', 'high-1', 'high-2', 'high-3', 'high-4', 'high-5',
         'low-0', 'low-1', 'low-2', 'low-3', 'low-4', 'low-5',
         'icon-0', 'icon-1', 'icon-2', 'icon-3', 'icon-4', 'icon-5',
-        'date-0', 'date-1', 'date-2', 'date-3', 'date-4', 'date-5', 'copyright');
+        'date-0', 'date-1', 'date-2', 'date-3', 'date-4', 'date-5',
+        'copyright', 'copyrightlogo');
 my $dir = './';
 my $icon_file = dirname(abs_path($0 or $PROGRAM_NAME)) . "/icons";
 

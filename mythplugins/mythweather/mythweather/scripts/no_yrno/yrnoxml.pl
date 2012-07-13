@@ -37,7 +37,7 @@ my @types = ( '3dlocation',
               'temp-0', 'temp-1', 'temp-2', 'temp-3', 'temp-4', 'temp-5', 
               'time-0', 'time-1', 'time-2', 'time-3', 'time-4', 'time-5', 
               'pop-0', 'pop-1', 'pop-2', 'pop-3', 'pop-4', 'pop-5',
-              'updatetime', 'station_id' );
+              'updatetime', 'station_id', 'copyrightlogo' );
 my $dir = "/tmp/yrnoxml";
 my $logdir = "/tmp/yrnoxml";
 my %images = ( "partly cloudy" => "pcloudy.png", "cloudy" => "cloudy.png",

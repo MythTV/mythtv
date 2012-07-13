@@ -29,7 +29,8 @@ my @types = ('cclocation', 'station_id', 'latitude', 'longitude',
         'wind_dir', 'wind_degrees', 'wind_speed', 'wind_gust',
         'pressure_string', 'pressure', 'dewpoint_string', 'dewpoint',
         'heat_index_string', 'heat_index', 'windchill_string', 'windchill',
-        'visibility', 'weather_icon', 'appt', 'wind_spdgst', 'copyright');
+        'visibility', 'weather_icon', 'appt', 'wind_spdgst', 'copyright',
+        'copyrightlogo');
 my $dir = "./";
 my $icon_file = dirname(abs_path($0 or $PROGRAM_NAME)) . "/icons";
 

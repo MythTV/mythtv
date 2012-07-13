@@ -27,7 +27,8 @@ my @types = ('18hrlocation',  'updatetime',
         'temp-0', 'temp-1', 'temp-2', 'temp-3', 'temp-4', 'temp-5',
         '18icon-0', '18icon-1', '18icon-2', '18icon-3', '18icon-4', '18icon-5',
         'pop-0', 'pop-1', 'pop-2', 'pop-3', 'pop-4', 'pop-5',
-        'time-0', 'time-1', 'time-2', 'time-3', 'time-4', 'time-5', 'copyright');
+        'time-0', 'time-1', 'time-2', 'time-3', 'time-4', 'time-5',
+        'copyright', 'copyrightlogo');
 my $dir = './';
 my $icon_file = dirname(abs_path($0 or $PROGRAM_NAME)) . "/icons";
 

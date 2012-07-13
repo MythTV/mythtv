@@ -35,7 +35,8 @@ my $author = 'Joe Ripley';
 my $email = 'vitaminjoe@gmail.com';
 my $updateTimeout = 10*60;
 my $retrieveTimeout = 30;
-my @types = ('amdesc', 'updatetime', 'animatedimage', 'copyright');
+my @types = ('amdesc', 'updatetime', 'animatedimage', 'copyright',
+             'copyrightlogo');
 my $dir = "/tmp/envcan";
 
 getopts('Tvtlu:d:');

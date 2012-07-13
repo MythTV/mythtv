@@ -146,7 +146,8 @@ my $author = 'Gavin Hurlbut & Lucien Dunning';
 my $email = 'gjhurlbu@gmail.com';
 my $updateTimeout = 10*60;
 my $retrieveTimeout = 30;
-my @types = ('swlocation', 'updatetime', 'alerts', 'copyright');
+my @types = ('swlocation', 'updatetime', 'alerts', 'copyright',
+             'copyrightlogo');
 my $dir = "./";
 
 getopts('Tvtlu:d:');
