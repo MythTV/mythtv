@@ -20,6 +20,13 @@ static QList<QNetworkAddressEntry> naList_4;
 static QList<QNetworkAddressEntry> naList_6;
 static QReadWriteLock naLock;
 
+static QPair<QHostAddress, int> kLinkLocal  =
+                            QHostAddress::parseSubnet("169.254.0.0/16");
+#if !defined(QT_NO_IPV6)
+static QPair<QHostAddress, int> kLinkLocal6 =
+                            QHostAddress::parseSubnet("fe80::/10");
+#endif
+
 class PrivUdpSocket : public QUdpSocket
 {
 public:
@@ -38,7 +45,7 @@ public:
     {
 #if !defined(QT_NO_IPV6)
         if (addr.protocol() == QAbstractSocket::IPv6Protocol &&
-            addr.isInSubnet(QHostAddress::parseSubnet("fe80::/10")) &&
+            addr.isInSubnet(kLinkLocal6) &&
             host.ip().scopeId() != addr.scopeId())
         {
             return false;
@@ -92,6 +99,7 @@ void ServerPool::SelectDefaultListen(bool force)
     QHostAddress config_v6(gCoreContext->GetSetting("BackendServerIP6"));
     bool v6IsSet = config_v6.isNull() ? true : false;
 #endif
+    bool allowLinkLocal = gCoreContext->GetNumSetting("AllowLinkLocal") > 0;
 
     // loop through all available interfaces
     QList<QNetworkInterface> IFs = QNetworkInterface::allInterfaces();
@@ -102,97 +110,147 @@ void ServerPool::SelectDefaultListen(bool force)
             continue;
 
         QList<QNetworkAddressEntry> IPs = qni->addressEntries();
-        QList<QNetworkAddressEntry>::const_iterator qnai;
+        QList<QNetworkAddressEntry>::iterator qnai;
         for (qnai = IPs.begin(); qnai != IPs.end(); ++qnai)
         {
             QHostAddress ip = qnai->ip();
-            if (naList_4.contains(*qnai))
-                // already defined, skip
-                continue;
-            else if (!config_v4.isNull() && (ip == config_v4))
+#if !defined(QT_NO_IPV6)
+            if (ip.protocol() == QAbstractSocket::IPv4Protocol)
             {
-                // IPv4 address is defined, add it
-                LOG(VB_GENERAL, LOG_DEBUG,
-                        QString("Adding BackendServerIP to address list."));
-                naList_4.append(*qnai);
-                v4IsSet = true;
-            }
-            else if (ip == QHostAddress::LocalHost)
-            {
-                // always listen on LocalHost
-                LOG(VB_GENERAL, LOG_DEBUG,
-                        QString("Adding IPv4 loopback to address list."));
-                naList_4.append(*qnai);
-                if (!v4IsSet && (config_v4 == ip))
-                    v4IsSet = true;
-            }
-            else if (config_v4.isNull() &&
-                     (ip.protocol() == QAbstractSocket::IPv4Protocol))
-            {
-                // IPv4 address is not defined, populate one
-                // restrict autoconfiguration to RFC1918 private networks
-                if (ip.isInSubnet(QHostAddress::parseSubnet("10.0.0.0/8")) ||
-                    ip.isInSubnet(QHostAddress::parseSubnet("172.16.0.0/12")) ||
-                    ip.isInSubnet(QHostAddress::parseSubnet("192.168.0.0/16")))
+#endif
+                if (naList_4.contains(*qnai))
+                    // already defined, skip
+                    continue;
+
+                else if (!config_v4.isNull() && (ip == config_v4))
                 {
+                    // IPv4 address is defined, add it
                     LOG(VB_GENERAL, LOG_DEBUG,
-                            QString("Adding '%1' to address list.")
+                        QString("Adding BackendServerIP to address list."));
+                    naList_4.append(*qnai);
+                    v4IsSet = true;
+
+                }
+
+                else if (ip == QHostAddress::LocalHost)
+                {
+                    // always listen on LocalHost
+                    LOG(VB_GENERAL, LOG_DEBUG,
+                        QString("Adding IPv4 loopback to address list."));
+                    naList_4.append(*qnai);
+                    if (!v4IsSet && (config_v4 == ip))
+                        v4IsSet = true;
+                }
+
+                else if (ip.isInSubnet(kLinkLocal) && allowLinkLocal)
+                {
+                    // optionally listen on linklocal
+                    // the next clause will enable it anyway if no IP address
+                    // has been set
+                    LOG(VB_GENERAL, LOG_DEBUG,
+                            QString("Adding link-local '%1' to address list.")
+                                .arg(PRETTYIP_(ip)));
+                    naList_4.append(*qnai);
+                }
+
+                else if (config_v4.isNull())
+                {
+                    // IPv4 address is not defined, populate one
+                    // restrict autoconfiguration to RFC1918 private networks
+                    static QPair<QHostAddress, int>
+                       privNet1 = QHostAddress::parseSubnet("10.0.0.0/8"),
+                       privNet2 = QHostAddress::parseSubnet("172.16.0.0/12"),
+                       privNet3 = QHostAddress::parseSubnet("192.168.0.0/16");
+
+                    if (ip.isInSubnet(privNet1) || ip.isInSubnet(privNet2) ||
+                        ip.isInSubnet(privNet3))
+                    {
+                        LOG(VB_GENERAL, LOG_DEBUG,
+                                QString("Adding '%1' to address list.")
+                                    .arg(PRETTYIP_(ip)));
+                        naList_4.append(*qnai);
+                    }
+                    else if (ip.isInSubnet(kLinkLocal))
+                    {
+                        LOG(VB_GENERAL, LOG_DEBUG,
+                            QString("Adding link-local '%1' to address list.")
+                                    .arg(PRETTYIP_(ip)));
+                        naList_4.append(*qnai);
+                    }
+                    else
+                        LOG(VB_GENERAL, LOG_DEBUG, QString("Skipping "
+                           "non-private address during IPv4 autoselection: %1")
+                                    .arg(PRETTYIP_(ip)));
+                }
+
+                else
+                    LOG(VB_GENERAL, LOG_DEBUG, QString("Skipping address: %1")
+                                .arg(PRETTYIP_(ip)));
+
+#if !defined(QT_NO_IPV6)
+            }
+            else
+            {
+                if (ip.isInSubnet(kLinkLocal6))
+                {
+                    // set scope id for link local address
+                    ip.setScopeId(qni->name());
+                    qnai->setIp(ip);
+                }
+
+                if (naList_6.contains(*qnai))
+                    // already defined, skip
+                    continue;
+
+                else if ((!config_v6.isNull()) && (ip == config_v6))
+                {
+                // IPv6 address is defined, add it
+                    LOG(VB_GENERAL, LOG_DEBUG,
+                        QString("Adding BackendServerIP6 to address list."));
+                    naList_6.append(*qnai);
+                    v6IsSet = true;
+                }
+
+                else if (ip == QHostAddress::LocalHostIPv6)
+                {
+                // always listen on LocalHost
+                    LOG(VB_GENERAL, LOG_DEBUG,
+                            QString("Adding IPv6 loopback to address list."));
+                    naList_6.append(*qnai);
+                    if (!v6IsSet && (config_v6 == ip))
+                        v6IsSet = true;
+                }
+
+                else if (ip.isInSubnet(kLinkLocal6) && allowLinkLocal)
+                {
+                    // optionally listen on linklocal
+                    // the next clause will enable it anyway if no IP address
+                    // has been set
+                    LOG(VB_GENERAL, LOG_DEBUG,
+                            QString("Adding link-local '%1' to address list.")
                                 .arg(ip.toString()));
                     naList_4.append(*qnai);
                 }
-                else
-                    LOG(VB_GENERAL, LOG_DEBUG, QString("Skipping non-private "
-                            "address during IPv4 autoselection: %1")
-                                .arg(ip.toString()));
-            }
-#if !defined(QT_NO_IPV6)
-            else if (naList_6.contains(*qnai))
-                // already defined, skip
-                continue;
-            else if (!config_v6.isNull() && (ip == config_v6))
-            {
-                // IPv6 address is defined, add it
-                LOG(VB_GENERAL, LOG_DEBUG,
-                        QString("Adding BackendServerIP6 to address list."));
-                naList_6.append(*qnai);
-                v6IsSet = true;
-            }
-            else if (ip == QHostAddress::LocalHostIPv6)
-            {
-                // always listen on LocalHost
-                LOG(VB_GENERAL, LOG_DEBUG,
-                        QString("Adding IPv6 loopback to address list."));
-                naList_6.append(*qnai);
-                if (!v6IsSet && (config_v6 == ip))
-                    v6IsSet = true;
-            }
-            else if (config_v6.isNull() &&
-                     (ip.protocol() == QAbstractSocket::IPv6Protocol))
-            {
-                bool linklocal = false;
-                if (ip.isInSubnet(QHostAddress::parseSubnet("fe80::/10")))
+
+                else if (config_v6.isNull())
                 {
-                    // Link-local address, find its scope ID (interface name)
-                    QNetworkAddressEntry ae = *qnai;
-                    QHostAddress ha = ip;
-                    ha.setScopeId(qni->name());
-                    ae.setIp(ha);
-                    naList_6.append(ae);
-                    linklocal = true;
+                    if (ip.isInSubnet(kLinkLocal6))
+                        LOG(VB_GENERAL, LOG_DEBUG,
+                            QString("Adding link-local '%1' to address list.")
+                                .arg(PRETTYIP_(ip)));
+                    else
+                        LOG(VB_GENERAL, LOG_DEBUG,
+                            QString("Adding '%1' to address list.")
+                                .arg(PRETTYIP_(ip)));
+
+                    naList_4.append(*qnai);
                 }
+
                 else
-                {
-                    naList_6.append(*qnai);
-                }
-                LOG(VB_GENERAL, LOG_DEBUG,
-                        QString("Adding%1 '%2' to address list.")
-                    .arg(linklocal ? " link-local" : "")
-                            .arg(PRETTYIP_(ip)));
+                    LOG(VB_GENERAL, LOG_DEBUG, QString("Skipping address: %1")
+                                .arg(PRETTYIP_(ip)));
             }
 #endif
-            else
-                LOG(VB_GENERAL, LOG_DEBUG, QString("Skipping address: %1")
-                    .arg(PRETTYIP_(ip)));
         }
     }
 

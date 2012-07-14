@@ -13,6 +13,10 @@
         <td id='BackendServerIP6_cell'>&nbsp;
             <a href="javascript:showSettingHelp('BackendServerIP6')">[?]</a>
             </td></tr>
+    <tr><th align=right><i18n>Use Link-Local</i18n>:</th>
+        <td id='AllowLinkLocal_cell'>&nbsp;
+            <a href="javascript:showSettingHelp('AllowLinkLocal')">[?]</a>
+            </td></tr>
     <tr><th align=right><i18n>Security PIN</i18n>:</th>
         <td><input id='SecurityPin' type='password' size=10>
             <a href="javascript:showSettingHelp('SecurityPin')">[?]</a>
