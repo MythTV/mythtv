@@ -19,7 +19,7 @@ use File::Path;
 our ($opt_v, $opt_t, $opt_T, $opt_l, $opt_u, $opt_d, $opt_D); 
 
 my $name = 'yrno-XML';
-my $version = 0.3;
+my $version = 0.4;
 my $author = 'Gavin Hurlbut';
 my $email = 'gjhurlbu@gmail.com';
 my $updateTimeout = 15*60;
@@ -149,6 +149,7 @@ $nodeset = $xp->find('/weatherdata/credit/link');
 foreach $node ($nodeset->get_nodelist) {
     $attrib{"copyright"}  = $node->getAttribute("text");
 }
+$attrib{"copyrightlogo"} = "none";
 
 my $tzoffset;
 $nodeset = $xp->find('/weatherdata/location/timezone');

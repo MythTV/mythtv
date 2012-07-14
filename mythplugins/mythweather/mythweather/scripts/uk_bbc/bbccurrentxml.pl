@@ -26,7 +26,7 @@ use BBCLocation;
 our ($opt_v, $opt_t, $opt_T, $opt_l, $opt_u, $opt_d, $opt_D);
 
 my $name = 'BBC-Current-XML';
-my $version = 0.4;
+my $version = 0.5;
 my $author = 'Gavin Hurlbut / Stuart Morgan';
 my $email = 'gjhurlbu@gmail.com / stuart@tase.co.uk';
 my $updateTimeout = 120*60;
@@ -115,13 +115,13 @@ if (!$xml) {
 }
 
 # The required elements which aren't provided by this feed
-printf "appt::NA\n";
-
-printf "copyright::bbc.co.uk - ©2012 BBC\n";
-printf "station_id::" . $locid . "\n";
+print "appt::NA\n";
+print "copyright::bbc.co.uk - ©2012 BBC\n";
+print "copyrightlogo::none\n";
+print "station_id::" . $locid . "\n";
 my $location = $xml->{channel}->{title};
 $location =~ s/.*?Observations for (.*)$/$1/s;
-printf "cclocation::" . $location . "\n";
+print "cclocation::" . $location . "\n";
 
 my $item_title = $xml->{channel}->{item}->{title};
 

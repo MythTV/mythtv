@@ -22,9 +22,9 @@ use Getopt::Std;
 our ($opt_v, $opt_t, $opt_T, $opt_l, $opt_u, $opt_d); 
 
 my $name = 'NDFD-6_day';
-my $version = 0.5;
-my $author = 'Gavin Hurlbut & Lucien Dunning';
-my $email = 'gjhurlbu@gmail.com';
+my $version = 0.6;
+my $author = 'Gavin Hurlbut / Lucien Dunning';
+my $email = 'gjhurlbu@gmail.com / ldunning@gmail.com';
 my $updateTimeout = 15*60;
 my $retrieveTimeout = 30;
 my @types = ('3dlocation', '6dlocation',  'updatetime', 
@@ -152,8 +152,8 @@ my $date;
 
 printf "updatetime::Last Updated on %s\n", 
        UnixDate($creationdate, "%b %d, %I:%M %p %Z");
-
-printf "copyright::National Digital Forecast Database\n";
+print "copyright::National Digital Forecast Database\n";
+print "copyrightlogo::none\n";
 
 foreach $time (sort(keys(%$result))) {
     my $date;

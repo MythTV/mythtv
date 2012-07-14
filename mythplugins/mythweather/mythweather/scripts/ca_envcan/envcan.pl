@@ -28,8 +28,8 @@ our ($opt_v, $opt_t, $opt_T, $opt_l, $opt_u, $opt_d);
 
 my $name = 'ENVCAN';
 my $version = 0.5;
-my $author  = 'Joe Ripley';
-my $email   = 'vitaminjoe@gmail.com';
+my $author  = 'Joe Ripley / Gavin Hurlbut';
+my $email   = 'vitaminjoe@gmail.com / gjhurlbu@gmail.com';
 my $updateTimeout = 15*60;
 my $retrieveTimeout = 30;
 my @types = ('cclocation', 'station_id', 'copyright',
@@ -133,6 +133,8 @@ if ($getData) {
     print CACHE Data::Dumper->Dump([\%results], ['*results']);
 }
 
+$results{'copyrightlogo'} = "none";
+
 # do some quick conversions
 if ($units eq "ENG") { 
     $results{'temp'}       = int(((9/5) * $results{'temp'}) + 32);
@@ -156,7 +158,6 @@ if ($units eq "ENG") {
 } else {
     $results{'wind_spdgst'} = sprintf("%.2f (%.2f)", $results{'wind_speed'}, $results{'wind_gust'});
 }
-    
 
 foreach my $key (sort (keys %results)) {
     print "$key". "::";
@@ -166,4 +167,3 @@ foreach my $key (sort (keys %results)) {
         print $results{$key} ."\n";
     }
 }
-
