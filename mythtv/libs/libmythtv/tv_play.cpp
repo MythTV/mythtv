@@ -279,7 +279,10 @@ bool TV::StartTV(ProgramInfo *tvrec, uint flags)
 {
     TV *tv = GetTV();
     if (!tv)
+    {
+        gCoreContext->emitTVPlaybackAborted();
         return false;
+    }
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "StartTV() -- begin");
     bool startInGuide = flags & kStartTVInGuide;
@@ -290,7 +293,6 @@ bool TV::StartTV(ProgramInfo *tvrec, uint flags)
     bool playCompleted = false;
     ProgramInfo *curProgram = NULL;
     bool startSysEventSent = false;
-
 
     if (tvrec)
     {
@@ -311,6 +313,7 @@ bool TV::StartTV(ProgramInfo *tvrec, uint flags)
         sendPlaybackEnd();
         GetMythMainWindow()->PauseIdleTimer(false);
         delete curProgram;
+        gCoreContext->emitTVPlaybackAborted();
         return false;
     }
 
@@ -377,6 +380,8 @@ bool TV::StartTV(ProgramInfo *tvrec, uint flags)
         tv->setInPlayList(inPlaylist);
         tv->setUnderNetworkControl(initByNetworkCommand);
 
+        gCoreContext->emitTVPlaybackStarted();
+
         // Process Events
         LOG(VB_GENERAL, LOG_INFO, LOC + "Entering main playback loop.");
         tv->PlaybackLoop();
@@ -419,6 +424,8 @@ bool TV::StartTV(ProgramInfo *tvrec, uint flags)
 
     bool allowrerecord = tv->getAllowRerecord();
     bool deleterecording = tv->requestDelete;
+
+    gCoreContext->emitTVPlaybackStopped();
 
     ReleaseTV(tv);
 
@@ -1429,6 +1436,7 @@ void TV::GetStatus(void)
         status.insert("chanid",
                            QString::number(ctx->playingInfo->GetChanID()));
         status.insert("programid", ctx->playingInfo->GetProgramID());
+        status.insert("pathname", ctx->playingInfo->GetPathname());
     }
     ctx->UnlockPlayingInfo(__FILE__, __LINE__);
     osdInfo info;
@@ -1826,7 +1834,7 @@ void TV::ShowOSDAskAllow(PlayerContext *ctx)
         {
             if (!(*it).is_in_same_input_group)
                 (*it).is_conflicting = false;
-            else if ((cardid == (uint)(*it).info->GetCardID()))
+            else if (cardid == (uint)(*it).info->GetCardID())
                 (*it).is_conflicting = true;
             else if (!CardUtil::IsTunerShared(cardid, (*it).info->GetCardID()))
                 (*it).is_conflicting = true;
@@ -5762,6 +5770,7 @@ void TV::DoPlay(PlayerContext *ctx)
             SendMythSystemPlayEvent("PLAY_UNPAUSED", ctx->playingInfo);
 
         ctx->player->Play(ctx->ts_normal, true);
+        gCoreContext->emitTVPlaybackUnpaused();
         ctx->ff_rew_speed = 0;
     }
     ctx->UnlockDeletePlayer(__FILE__, __LINE__);
@@ -5838,6 +5847,34 @@ void TV::DoTogglePauseFinish(PlayerContext *ctx, float time, bool showOSD)
     SetSpeedChangeTimer(0, __LINE__);
 }
 
+/**
+ * \fn bool TV::IsPaused(void) [static]
+ * Returns true if a TV playback is currently going; otherwise returns false
+ */
+bool TV::IsPaused(void)
+{
+    if (!IsTVRunning())
+        return false;
+    
+    QMutexLocker lock(gTVLock);
+    PlayerContext *ctx = gTV->GetPlayerReadLock(0, __FILE__, __LINE__);
+
+    if (!ctx || ctx->IsErrored())
+    {
+        gTV->ReturnPlayerLock(ctx);
+        return false;
+    }
+    ctx->LockDeletePlayer(__FILE__, __LINE__);
+    bool paused = false;
+    if (ctx->player)
+    {
+        paused = ctx->player->IsPaused();
+    }
+    ctx->UnlockDeletePlayer(__FILE__, __LINE__);
+    gTV->ReturnPlayerLock(ctx);
+    return paused;
+}
+
 void TV::DoTogglePause(PlayerContext *ctx, bool showOSD)
 {
     bool ignore = false;
@@ -5857,13 +5894,15 @@ void TV::DoTogglePause(PlayerContext *ctx, bool showOSD)
 
     if (!ignore)
         DoTogglePauseFinish(ctx, DoTogglePauseStart(ctx), showOSD);
+    // Emit Pause or Unpaused signal
+    paused ? gCoreContext->emitTVPlaybackUnpaused() : gCoreContext->emitTVPlaybackPaused();
 }
 
 bool TV::DoPlayerSeek(PlayerContext *ctx, float time)
 {
     if (!ctx || !ctx->buffer)
         return false;
-    
+
     if (time > -0.001f && time < +0.001f)
         return false;
 
@@ -5974,7 +6013,7 @@ void TV::DoSeek(PlayerContext *ctx, float time, const QString &mesg,
 {
     if (!ctx->player)
         return;
-    
+
     bool limitkeys = false;
 
     ctx->LockDeletePlayer(__FILE__, __LINE__);
@@ -6013,12 +6052,14 @@ void TV::DoSeekAbsolute(PlayerContext *ctx, long long seconds,
     if (!ctx->player)
     {
         ctx->UnlockDeletePlayer(__FILE__, __LINE__);
+        gCoreContext->emitTVPlaybackSought((qint64)-1);
         return;
     }
     ctx->UnlockDeletePlayer(__FILE__, __LINE__);
     DoSeek(ctx, seconds, tr("Jump To"),
            /*timeIsOffset*/false,
            honorCutlist);
+    gCoreContext->emitTVPlaybackSought((qint64)seconds);
 }
 
 void TV::DoArbSeek(PlayerContext *ctx, ArbSeekWhence whence,
