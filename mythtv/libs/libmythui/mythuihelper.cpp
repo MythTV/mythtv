@@ -1307,7 +1307,7 @@ QImage *MythUIHelper::LoadScaleImage(QString filename, bool fromcache)
         (!filename.startsWith("ftp://")) &&
         (!filename.startsWith("myth://")))
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + QString("LoadScaleImage(%1)")
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("LoadScaleImage(%1) ")
             .arg(filename) + "Unable to find image file");
 
         return NULL;
