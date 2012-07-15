@@ -187,11 +187,9 @@ bool MythRAOPDevice::RegisterForBonjour(void)
     return m_bonjour->Register(m_setupPort, type, name, txt);
 }
 
-void MythRAOPDevice::GotNewConnection(void)
+void MythRAOPDevice::TVPlaybackStarting(void)
 {
-    QMutexLocker locker(m_lock);
-
-    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Receiving AirPlay connection Message"));
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Receiving new playback message"));
     DeleteAllClients(NULL);
 }
 
@@ -201,14 +199,6 @@ void MythRAOPDevice::newConnection(QTcpSocket *client)
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("New connection from %1:%2")
         .arg(client->peerAddress().toString()).arg(client->peerPort()));
 
-    if (MythAirplayServer::AirplaySharedInstance() != NULL)
-    {
-        QMetaObject::invokeMethod(MythAirplayServer::AirplaySharedInstance(),
-                                  "GotNewConnection",
-                                  Qt::BlockingQueuedConnection);
-        LOG(VB_GENERAL, LOG_INFO, LOC + QString("Sent RAOP connection Message"));
-    }
-
     MythRAOPConnection *obj =
             new MythRAOPConnection(this, client, m_hardwareId, 6000);
 
@@ -216,6 +206,7 @@ void MythRAOPDevice::newConnection(QTcpSocket *client)
     {
         m_clients.append(obj);
         connect(client, SIGNAL(disconnected()), this, SLOT(deleteClient()));
+        gCoreContext->RegisterForPlayback(this, SLOT(TVPlaybackStarting()));
         return;
     }
 

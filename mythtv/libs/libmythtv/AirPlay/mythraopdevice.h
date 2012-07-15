@@ -26,7 +26,7 @@ class MTV_PUBLIC MythRAOPDevice : public ServerPool
     void DeleteAllClients(MythRAOPConnection *keep);
 
   public slots:
-    void GotNewConnection(void);
+    void TVPlaybackStarting(void);
 
   private slots:
     void Start();

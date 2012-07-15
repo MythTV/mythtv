@@ -16,9 +16,6 @@ class BonjourRegister;
 #define AIRPLAY_HARDWARE_ID_SIZE 6
 QString AirPlayHardwareId();
 
-#define AIRPLAY_NEWCONNECTION "AIRPLAY_NEWCONNECTION"
-#define AIRPLAY_DISCONNECTED  "AIRPLAY_DISCONNECTED"
-
 enum AirplayEvent
 {
     AP_EVENT_NONE = -1,
@@ -62,9 +59,6 @@ class MTV_PUBLIC MythAirplayServer : public ServerPool
     { return gMythAirplayServer; }
 
     MythAirplayServer();
-
-  public slots:
-    void GotNewConnection(void);
 
   private slots:
     void Start();

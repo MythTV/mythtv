@@ -1057,6 +1057,7 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
         {
             // New client is trying to play audio, disconnect all the other clients
             ((MythRAOPDevice*)parent())->DeleteAllClients(this);
+            gCoreContext->WantingPlayback(parent());
 
             int control_port = 0;
             int timing_port = 0;

@@ -20,9 +20,6 @@
 
 #include "bonjourregister.h"
 #include "mythairplayserver.h"
-#ifdef USING_MYTHRAOP
-#include "mythraopdevice.h"
-#endif
 
 MythAirplayServer* MythAirplayServer::gMythAirplayServer = NULL;
 MThread*           MythAirplayServer::gMythAirplayServerThread = NULL;
@@ -387,13 +384,6 @@ void MythAirplayServer::Start(void)
     return;
 }
 
-void MythAirplayServer::GotNewConnection(void)
-{
-    LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("Receiving RAOP connection Message"));
-
-    DisconnectAllClients(QByteArray());
-}
-
 void MythAirplayServer::newConnection(QTcpSocket *client)
 {
     QMutexLocker locker(m_lock);
@@ -562,16 +552,6 @@ void MythAirplayServer::HandleResponse(APHTTPRequest *req,
         !m_connections[session].initialized)
     {
         // Got a full connection, disconnect any other clients
-#ifdef USING_MYTHRAOP
-        // Stop any RAOP (AirPlay audio) running
-        if (MythRAOPDevice::RAOPSharedInstance() != NULL)
-        {
-            QMetaObject::invokeMethod(MythRAOPDevice::RAOPSharedInstance(),
-                                      "GotNewConnection",
-                                      Qt::BlockingQueuedConnection);
-            LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("Sent AirPlay connection Message"));
-        }
-#endif
         DisconnectAllClients(session);
         m_connections[session].initialized = true;
     }
