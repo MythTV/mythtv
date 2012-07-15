@@ -700,7 +700,7 @@ bool MythNews::getHttpFile(const QString &sFilename, const QString &cmdURL)
     QString hostname;
     QString fileUrl = cmdURL;
 
-    createProgress(QObject::tr("Downloading media..."));
+    createProgress(tr("Downloading media..."));
     while (1)
     {
         QUrl qurl(fileUrl);

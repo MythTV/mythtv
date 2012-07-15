@@ -57,7 +57,8 @@ class MPUBLIC MediaMonitor : public QObject
     // To safely dereference the pointers returned by this function
     // first validate the pointer with ValidateAndLock(), if true is returned
     // it is safe to dereference the pointer. When finished call Unlock()
-    QList<MythMediaDevice*> GetRemovable(bool mounted=false);
+    QList<MythMediaDevice*> GetRemovable(bool showMounted = false,
+                                         bool showUsable = false);
     QList<MythMediaDevice*> GetMedias(MythMediaType mediatype);
     MythMediaDevice*        GetMedia(const QString &path);
 
@@ -101,7 +102,9 @@ class MPUBLIC MediaMonitor : public QObject
     static QString defaultDevice(const QString setting,
                                  const QString label,
                                  const char *hardCodedDefault);
-    MythMediaDevice *selectDrivePopup(const QString label, bool mounted=false);
+    MythMediaDevice *selectDrivePopup(const QString label,
+                                      bool showMounted = false,
+                                      bool showUsable = false);
 
   protected:
     QMutex                       m_DevicesLock;

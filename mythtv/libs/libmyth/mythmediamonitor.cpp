@@ -134,7 +134,8 @@ static const QString DevName(MythMediaDevice *d)
  *
  * Has to iterate through all devices to check if any are suitable.
  */
-QList<MythMediaDevice*> MediaMonitor::GetRemovable(bool showMounted)
+QList<MythMediaDevice*> MediaMonitor::GetRemovable(bool showMounted,
+                                                   bool showUsable)
 {
     QList <MythMediaDevice *>           drives;
     QList <MythMediaDevice *>::iterator it;
@@ -145,6 +146,9 @@ QList<MythMediaDevice*> MediaMonitor::GetRemovable(bool showMounted)
         // By default, we only list CD/DVD devices.
         // Caller can also request mounted drives to be listed (e.g. USB flash)
 
+        if (showUsable && !(*it)->isUsable())
+            continue;
+        
         if (QString(typeid(**it).name()).contains("MythCDROM") ||
                (showMounted && (*it)->isMounted(false)))
             drives.append(*it);
@@ -159,9 +163,11 @@ QList<MythMediaDevice*> MediaMonitor::GetRemovable(bool showMounted)
  * prevent drawing a list if there is only one drive, et cetera
  */
 MythMediaDevice * MediaMonitor::selectDrivePopup(const QString label,
-                                                 bool          showMounted)
+                                                 bool showMounted,
+                                                 bool showUsable)
 {
-    QList <MythMediaDevice *> drives = GetRemovable(showMounted);
+    QList <MythMediaDevice *> drives = GetRemovable(showMounted,
+                                                    showUsable);
 
     if (drives.count() == 0)
     {
@@ -183,8 +189,8 @@ MythMediaDevice * MediaMonitor::selectDrivePopup(const QString label,
         return drives.front();
     }
 
-    QStringList buttonmsgs;
     QList <MythMediaDevice *>::iterator it;
+    QStringList buttonmsgs;
     for (it = drives.begin(); it != drives.end(); ++it)
         buttonmsgs += DevName(*it);
     buttonmsgs += tr("Cancel");
@@ -824,10 +830,13 @@ QString MediaMonitor::defaultDevice(QString dbSetting,
 
         if (c_monitor)
         {
-            MythMediaDevice *d = c_monitor->selectDrivePopup(label);
+            MythMediaDevice *d = c_monitor->selectDrivePopup(label, false, true);
 
             if (d == (MythMediaDevice *) -1)    // User cancelled
+            {
+                device.clear(); // If user has explicitly cancelled return empty string
                 d = NULL;
+            }
 
             if (d && c_monitor->ValidateAndLock(d))
             {

@@ -236,6 +236,9 @@ QString WeatherScreen::formatDataItem(const QString &key, const QString &value)
         }
     }
 
+    if (key == "copyrightlogo" && value == "none")
+        return QString();
+
     return value;
 }
 
