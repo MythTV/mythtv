@@ -833,7 +833,10 @@ QString MediaMonitor::defaultDevice(QString dbSetting,
             MythMediaDevice *d = c_monitor->selectDrivePopup(label, false, true);
 
             if (d == (MythMediaDevice *) -1)    // User cancelled
+            {
+                device.clear(); // If user has explicitly cancelled return empty string
                 d = NULL;
+            }
 
             if (d && c_monitor->ValidateAndLock(d))
             {
