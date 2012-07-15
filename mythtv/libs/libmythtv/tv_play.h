@@ -137,6 +137,24 @@ class AskProgramInfo
     ProgramInfo *info;
 };
 
+/**
+ * \class TV
+ *
+ * \brief Control TV playback
+ * \qmlsignal TVPlaybackAborted(void)
+ *
+ * TV playback failed to start (typically, TV playback was started when another playback is currently going)
+ * \qmlsignal TVPlaybackStarted(void)
+ * TV playback has started, video is now playing
+ * \qmlsignal TVPlaybackStopped(void)
+ * TV playback has stopped and playback has exited
+ * \qmlsignal TVPlaybackUnpaused(void)
+ * TV playback has resumed, following a Pause action
+ * \qmlsignal TVPlaybackPaused(void)
+ * TV playback has been paused
+ * \qmlsignal TVPlaybackSought(qint position_seconds)
+ * Absolute seek has completed to position_seconds
+ */
 class MTV_PUBLIC TV : public QObject
 {
     friend class PlaybackBox;
@@ -151,10 +169,12 @@ class MTV_PUBLIC TV : public QObject
     Q_OBJECT
   public:
     // Check whether we already have a TV object
-    static bool    IsTVRunning(void);
+    static bool IsTVRunning(void);
+    static TV*  CurrentTVInstance(void) { return gTV; }
     // Start media playback
-    static bool    StartTV(ProgramInfo *tvrec = NULL,
+    static bool StartTV(ProgramInfo *tvrec = NULL,
                         uint flags = kStartTVNoFlags);
+    static bool IsPaused(void);
 
     // Public event handling
     bool event(QEvent *e);
@@ -186,6 +206,7 @@ class MTV_PUBLIC TV : public QObject
   public slots:
     void HandleOSDClosed(int osdType);
     void timerEvent(QTimerEvent*);
+    void StopPlayback(void);
 
   protected:
     // Protected event handling
@@ -201,10 +222,10 @@ class MTV_PUBLIC TV : public QObject
   private:
     TV();
    ~TV();
-    static TV*     GetTV(void);
-    static void    ReleaseTV(TV* tv);
-    static QMutex *gTVLock;
-    static TV     *gTV;
+    static TV*      GetTV(void);
+    static void     ReleaseTV(TV* tv);
+    static QMutex  *gTVLock;
+    static TV      *gTV;
 
     // Private initialisation
     bool Init(bool createWindow = true);

@@ -15,6 +15,8 @@
 #endif
 #include "H264Parser.h"
 
+#include <CoreServices/CoreServices.h>
+
 extern "C" {
 #include "libavformat/avformat.h"
 }
@@ -401,7 +403,18 @@ bool PrivateDecoderVDA::Init(const QString &decoder,
     {
         m_max_ref_frames = avctx->refs;
     }
-    if (interlaced)
+
+    bool isMountainLion = false;
+    SInt32 majorVersion, minorVersion;
+
+    Gestalt(gestaltSystemVersionMajor, &majorVersion);
+    Gestalt(gestaltSystemVersionMinor, &minorVersion);
+    if (majorVersion >= 10 && minorVersion >= 8)
+    {
+        isMountainLion = true;
+    }
+
+    if (!isMountainLion && interlaced)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Possible interlaced content. Aborting");
         CFRelease(avc_cdata);
