@@ -190,8 +190,8 @@ QString WeatherScreen::formatDataItem(const QString &key, const QString &value)
         key.startsWith("low") ||
         key.startsWith("high"))
     {
-       if ( (value == "NA") || (value == "N/A") )
-          return value;
+       if ((value == "NA") || (value == "N/A"))
+          return QString();
        else
           return value + getTemperatureUnit();
     }
