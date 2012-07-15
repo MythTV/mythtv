@@ -29,7 +29,7 @@ use MetOffCommon qw(:DEFAULT $apikey);
 our ($opt_v, $opt_t, $opt_T, $opt_l, $opt_u, $opt_d, $opt_D);
 
 my $name = 'MetOffice-Forecast-API';
-my $version = 0.1;
+my $version = 0.3;
 my $author = 'Stuart Morgan';
 my $email = 'smorgan@mythtv.org';
 
@@ -92,6 +92,11 @@ if (defined $opt_t) {
     exit 0;
 }
 
+my $units = "SI";
+if (defined $opt_u) {
+    $units = $opt_u;
+}
+
 my $locid = shift;
 # we get here, we're doing an actual retrieval, everything must be defined
 #my $locid = MetOffLocation::FindLoc(shift, $dir, $updateInterval, $logdir);
@@ -99,7 +104,6 @@ if (!(defined $locid && !$locid eq "")) {
     die "Invalid usage";
 }
 
-my $units = $opt_u;
 my $base_args = '?res=daily&key=' . $MetOffCommon::api_key;
 my $url = "";
 
@@ -128,7 +132,7 @@ printf "station_id::" . $locid . "\n";
 my $location = $xml->{DV}->{Location}->{name};
 printf "3dlocation::" . $location . "\n";
 printf "6dlocation::" . $location . "\n";
-printf "updatetime::Updated " . localtime() . "\n";
+printf "updatetime::" . localtime() . "\n";
 
 my $i = 0;
 my $item;
@@ -184,8 +188,8 @@ foreach $item (@{$xml->{DV}->{Location}->{Period}}) {
 
     printf "icon-" . $i . "::" . $iconname . ".png\n";
 
-    printf "low-" . $i . "::" . $nighttime->{Nm} . "\n";
-    printf "high-" . $i . "::" .  $daytime->{Dm} . "\n";
+    printf "low-" . $i . "::" . MetOffCommon::convert_temp($nighttime->{Nm}, $units) . "\n";
+    printf "high-" . $i . "::" .  MetOffCommon::convert_temp($daytime->{Dm}, $units) . "\n";
 
     $i++;
 }
