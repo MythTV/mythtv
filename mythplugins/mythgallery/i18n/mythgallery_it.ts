@@ -24,12 +24,12 @@
     <message>
         <location filename="../mythgallery/iconview.cpp" line="888"/>
         <source>Rotate CW</source>
-        <translation>Ruota a destra</translation>
+        <translation>Rotazione in senso orario</translation>
     </message>
     <message>
         <location filename="../mythgallery/iconview.cpp" line="889"/>
         <source>Rotate CCW</source>
-        <translation>Ruota a sinistra</translation>
+        <translation>Rotazione in senso antiorario</translation>
     </message>
     <message>
         <location filename="../mythgallery/iconview.cpp" line="922"/>
@@ -39,12 +39,12 @@
     <message>
         <location filename="../mythgallery/iconview.cpp" line="863"/>
         <source>Settings</source>
-        <translation>Opzioni</translation>
+        <translation>Impostazioni</translation>
     </message>
     <message>
         <location filename="../mythgallery/iconview.cpp" line="187"/>
         <source>No images found in this directory.</source>
-        <translation>Nessuna immagine nella directory.</translation>
+        <translation>Nessuna immagine trovata nella directory.</translation>
     </message>
     <message>
         <location filename="../mythgallery/iconview.cpp" line="377"/>
@@ -54,12 +54,12 @@
     <message>
         <location filename="../mythgallery/iconview.cpp" line="388"/>
         <source>Gallery Home</source>
-        <translation>Home Galleria</translation>
+        <translation>Galleria home</translation>
     </message>
     <message>
         <location filename="../mythgallery/iconview.cpp" line="845"/>
         <source>Gallery Options</source>
-        <translation>Opzioni Galleria</translation>
+        <translation>Opzioni galleria</translation>
     </message>
     <message>
         <location filename="../mythgallery/iconview.cpp" line="859"/>
@@ -79,22 +79,22 @@
     <message>
         <location filename="../mythgallery/iconview.cpp" line="862"/>
         <source>File Menu</source>
-        <translation>Menù File</translation>
+        <translation>Menù file</translation>
     </message>
     <message>
         <location filename="../mythgallery/iconview.cpp" line="879"/>
         <source>Metadata Options</source>
-        <translation>Opzioni Metadati</translation>
+        <translation>Opzioni metadati</translation>
     </message>
     <message>
         <location filename="../mythgallery/iconview.cpp" line="894"/>
         <source>Marking Options</source>
-        <translation>Opzioni Marcatori</translation>
+        <translation>Opzioni marcatori</translation>
     </message>
     <message>
         <location filename="../mythgallery/iconview.cpp" line="903"/>
         <source>Select One</source>
-        <translation>Seleziona</translation>
+        <translation>Selezionare</translation>
     </message>
     <message>
         <location filename="../mythgallery/iconview.cpp" line="904"/>
@@ -104,7 +104,7 @@
     <message>
         <location filename="../mythgallery/iconview.cpp" line="911"/>
         <source>File Options</source>
-        <translation>Opzioni File</translation>
+        <translation>Opzioni file</translation>
     </message>
     <message>
         <location filename="../mythgallery/iconview.cpp" line="921"/>
@@ -119,12 +119,12 @@
     <message>
         <location filename="../mythgallery/iconview.cpp" line="131"/>
         <source>MythGallery Directory &apos;%1&apos; does not exist or is unreadable.</source>
-        <translation>La Directory di MythGallery &apos;%1&apos; non esiste o non è leggibile.</translation>
+        <translation>La directory di MythGallery &apos;%1&apos; non esiste o non è leggibile.</translation>
     </message>
     <message>
         <location filename="../mythgallery/iconview.cpp" line="535"/>
         <source>The selected device is no longer available</source>
-        <translation>La periferica non è più disponibile</translation>
+        <translation>La periferica selezionata non è più disponibile</translation>
     </message>
     <message>
         <location filename="../mythgallery/iconview.cpp" line="906"/>
@@ -134,12 +134,12 @@
     <message>
         <location filename="../mythgallery/iconview.cpp" line="905"/>
         <source>Select All</source>
-        <translation>Tutti</translation>
+        <translation>Selezionare tutto</translation>
     </message>
     <message>
         <location filename="../mythgallery/iconview.cpp" line="920"/>
         <source>Show Devices</source>
-        <translation>Dispositivi</translation>
+        <translation>Mostrare dispositivi</translation>
     </message>
     <message>
         <location filename="../mythgallery/iconview.cpp" line="923"/>
@@ -154,17 +154,17 @@
     <message>
         <location filename="../mythgallery/iconview.cpp" line="926"/>
         <source>Create Dir</source>
-        <translation>Crea cartella</translation>
+        <translation>Creare cartella</translation>
     </message>
     <message>
         <location filename="../mythgallery/iconview.cpp" line="977"/>
         <source>Delete Current File or Folder</source>
-        <translation>Elimina la foto o la cartella corrente</translation>
+        <translation>Elimina il file o la cartella corrente</translation>
     </message>
     <message>
         <location filename="../mythgallery/iconview.cpp" line="979"/>
         <source>Deleting 1 folder, including any subfolders and files.</source>
-        <translation>Eliminazione di 1 cartella, incluse tutte le sottocartelle e files.</translation>
+        <translation>Eliminazione di 1 cartella, incluse tutte le sottocartelle e file.</translation>
     </message>
     <message>
         <location filename="../mythgallery/iconview.cpp" line="980"/>
@@ -174,7 +174,7 @@
     <message>
         <location filename="../mythgallery/iconview.cpp" line="1176"/>
         <source>Deleting %1 images and folders, including any subfolders and files.</source>
-        <translation>Eliminazione di %1 immagini e cartelle, incluse le sottocartelle.</translation>
+        <translation>Eliminazione di %1 immagini e cartelle, incluse le sottocartelle e i file.</translation>
     </message>
     <message>
         <location filename="../mythgallery/iconview.cpp" line="1239"/>
@@ -189,12 +189,12 @@
     <message>
         <location filename="../mythgallery/iconview.cpp" line="1357"/>
         <source>Moving marked images...</source>
-        <translation>Spostamento in corso...</translation>
+        <translation>Spostare le immagini marcate...</translation>
     </message>
     <message>
         <location filename="../mythgallery/iconview.cpp" line="1357"/>
         <source>Copying marked images...</source>
-        <translation>Copia in corso...</translation>
+        <translation>Copiare le immagini marcate...</translation>
     </message>
     <message>
         <location filename="../mythgallery/iconview.cpp" line="927"/>
@@ -218,12 +218,12 @@
     <message>
         <location filename="../mythgallery/main.cpp" line="63"/>
         <source>Image viewer / slideshow</source>
-        <translation>Visualizzatore / Slideshow</translation>
+        <translation>Visualizzatore immagini/ slideshow</translation>
     </message>
     <message>
         <location filename="../mythgallery/main.cpp" line="66"/>
         <source>Start/Stop Slideshow</source>
-        <translation>Avvia / Arresta Slideshow</translation>
+        <translation>Avvia / Arresta slideshow</translation>
     </message>
     <message>
         <location filename="../mythgallery/main.cpp" line="68"/>
@@ -243,7 +243,7 @@
     <message>
         <location filename="../mythgallery/main.cpp" line="74"/>
         <source>Start Random Slideshow in thumbnail view</source>
-        <translation>Avviare Slideshow casuale nella vista miniature</translation>
+        <translation>Avviare slideshow casuale nella vista miniature</translation>
     </message>
     <message>
         <location filename="../mythgallery/main.cpp" line="77"/>
@@ -298,7 +298,7 @@
     <message>
         <location filename="../mythgallery/main.cpp" line="97"/>
         <source>Go to the upper-left corner of the image</source>
-        <translation>Andare all&apos;angoilo superiore sinistro</translation>
+        <translation>Andare all&apos;angolo superiore sinistro</translation>
     </message>
     <message>
         <location filename="../mythgallery/main.cpp" line="99"/>
@@ -313,7 +313,7 @@
     <message>
         <location filename="../mythgallery/main.cpp" line="103"/>
         <source>Toggle scale to fullscreen/scale to fit</source>
-        <translation>Cambiare scala da fullscreen / adatta</translation>
+        <translation>Attivare/Disattivare scala da fullscreen / adatta</translation>
     </message>
     <message>
         <location filename="../mythgallery/main.cpp" line="105"/>
@@ -341,7 +341,7 @@
     <message>
         <location filename="../mythgallery/gallerysettings.cpp" line="73"/>
         <source>Paths to import images from</source>
-        <translation>Percorsi per importazione</translation>
+        <translation>Percorsi per importazione immagini da</translation>
     </message>
     <message>
         <location filename="../mythgallery/gallerysettings.cpp" line="127"/>
@@ -421,7 +421,7 @@
     <message>
         <location filename="../mythgallery/gallerysettings.cpp" line="173"/>
         <source>Recurse into directories</source>
-        <translation>Sfoglia le sottocartelle</translation>
+        <translation>Sfogliare le sottocartelle</translation>
     </message>
     <message>
         <location filename="../mythgallery/gallerysettings.cpp" line="174"/>
@@ -456,12 +456,12 @@
     <message>
         <location filename="../mythgallery/gallerysettings.cpp" line="185"/>
         <source>MythGallery Settings (Slideshow)</source>
-        <translation>Opzioni galleria foto (Slideshow)</translation>
+        <translation>Impostazioni MythGallery (slideshow)</translation>
     </message>
     <message>
         <location filename="../mythgallery/gallerysettings.cpp" line="215"/>
         <source>MythGallery Settings (General)</source>
-        <translation>Opzioni galleria foto (Generale)</translation>
+        <translation>Impostazioni MythGallery (generale)</translation>
     </message>
     <message>
         <location filename="../mythgallery/main.cpp" line="39"/>
@@ -501,7 +501,7 @@ Verificare che la directory esista, sia leggibile e le impostazioni nel setup di
         <location filename="../mythgallery/thumbview.cpp" line="133"/>
         <location filename="../mythgallery/thumbview.cpp" line="135"/>
         <source>pixels</source>
-        <translation>pixels</translation>
+        <translation>pixel</translation>
     </message>
     <message>
         <location filename="../mythgallery/thumbview.cpp" line="134"/>
@@ -547,7 +547,7 @@ Verificare che la directory esista, sia leggibile e le impostazioni nel setup di
     <message>
         <location filename="themestrings.h" line="3"/>
         <source>Image Gallery</source>
-        <translation>Galleria Immagini</translation>
+        <translation>Galleria immagini</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="4"/>
@@ -557,7 +557,7 @@ Verificare che la directory esista, sia leggibile e le impostazioni nel setup di
     <message>
         <location filename="themestrings.h" line="5"/>
         <source>MENU: Activate Menu</source>
-        <translation>MENU: Attiva Menù</translation>
+        <translation>MENU: attiva menù</translation>
     </message>
 </context>
 </TS>
