@@ -87,6 +87,9 @@ class MythCoreContextPrivate : public QObject
     MythScheduler *m_scheduler;
 
     bool m_blockingClient;
+
+    QMap<QObject *, QByteArray> m_playbackClients;
+    QMutex m_playbackLock;
 };
 
 MythCoreContextPrivate::MythCoreContextPrivate(MythCoreContext *lparent,
@@ -1362,6 +1365,73 @@ void MythCoreContext::WaitUntilSignals(const char *signal1, ...)
     va_end(vl);
 
     eventLoop.exec(QEventLoop::ExcludeUserInputEvents);
+}
+
+/**
+ * \fn void MythCoreContext::RegisterForPlayback(QObject *sender, const char *method)
+ * Register sender for TVPlaybackAboutToStart signal. Method will be called upon
+ * the signal being emitted.
+ * sender must call MythCoreContext::UnregisterForPlayback upon deletion
+ */
+void MythCoreContext::RegisterForPlayback(QObject *sender, const char *method)
+{
+    QMutexLocker lock(&d->m_playbackLock);
+
+    if (!d->m_playbackClients.contains(sender))
+    {
+        d->m_playbackClients.insert(sender, QByteArray(method));
+        connect(this, SIGNAL(TVPlaybackAboutToStart()),
+                sender, method,
+                Qt::BlockingQueuedConnection);
+    }
+}
+
+/**
+ * \fn void MythCoreContext::UnregisterForPlayback(QObject *sender)
+ * Unregister sender from being called when TVPlaybackAboutToStart signal
+ * is emitted
+ */
+void MythCoreContext::UnregisterForPlayback(QObject *sender)
+{
+    QMutexLocker lock(&d->m_playbackLock);
+
+    if (d->m_playbackClients.contains(sender))
+    {
+        QByteArray ba = d->m_playbackClients.value(sender);
+        const char *method = ba.constData();
+        disconnect(this, SIGNAL(TVPlaybackAboutToStart()),
+                   sender, method);
+        d->m_playbackClients.remove(sender);
+    }
+}
+
+/**
+ * \fn void MythCoreContext::WantingPlayback(QObject *sender)
+ * All the objects that have registered using MythCoreContext::RegisterForPlayback
+ * but sender will be called. The objet's registered method will be called
+ * in a blocking fashion, each of them being called one after the other
+ */
+void MythCoreContext::WantingPlayback(QObject *sender)
+{
+    QMutexLocker lock(&d->m_playbackLock);
+    bool found = false;
+    QByteArray ba;
+    const char *method;
+
+    if (d->m_playbackClients.contains(sender))
+    {
+        found = true;
+        ba = d->m_playbackClients.value(sender);
+        method = ba.constData();
+        disconnect(this, SIGNAL(TVPlaybackAboutToStart()), sender, method);
+    }
+    emit TVPlaybackAboutToStart();
+    if (found)
+    {
+        connect(this, SIGNAL(TVPlaybackAboutToStart()),
+                sender, method,
+                Qt::BlockingQueuedConnection);
+    }
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

@@ -169,6 +169,10 @@ class MBASE_PUBLIC MythCoreContext : public QObject, public MythObservable, publ
     QString GetLanguageAndVariant(void);
     void ResetLanguage(void);
 
+    void RegisterForPlayback(QObject *sender, const char *method);
+    void UnregisterForPlayback(QObject *sender);
+    void WantingPlayback(QObject *sender);
+
     // signal related methods
     void WaitUntilSignals(const char *signal1, ...);
     void emitTVPlaybackStarted(void)            { emit TVPlaybackStarted(); }
@@ -185,6 +189,7 @@ class MBASE_PUBLIC MythCoreContext : public QObject, public MythObservable, publ
     void TVPlaybackPaused(void);
     void TVPlaybackUnpaused(void);
     void TVPlaybackAborted(void);
+    void TVPlaybackAboutToStart(void);
 
   private:
     MythCoreContextPrivate *d;
