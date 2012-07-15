@@ -169,7 +169,7 @@ void WeatherScreen::prepareWidget(MythUIType *widget)
 
 QString WeatherScreen::formatDataItem(const QString &key, const QString &value)
 {
-    if (key == "relative_humidity")
+    if (key.startsWith("relative_humidity") || key.startsWith("pop"))
         return value + " %";
 
     if (key == "pressure")
@@ -178,9 +178,10 @@ QString WeatherScreen::formatDataItem(const QString &key, const QString &value)
     if (key == "visibility")
         return value + (m_units == ENG_UNITS ? " mi" : " km");
 
-    if (key == "temp" || key == "appt" || key.contains("low",Qt::CaseInsensitive) ||
-        key.contains("high",Qt::CaseInsensitive) ||
-        key.contains("temp",Qt::CaseInsensitive))
+    if (key.startsWith("temp") ||
+        key.startsWith("appt") ||
+        key.startsWith("low") ||
+        key.startsWith("high"))
     {
        if ((value == "NA") || (value == "N/A"))
           return QString();
@@ -188,12 +189,14 @@ QString WeatherScreen::formatDataItem(const QString &key, const QString &value)
           return value + getTemperatureUnit();
     }
 
-    if (key == "wind_gust" || key == "wind_spdgst" || key == "wind_speed")
+    if (key.startsWith("wind_gust") ||
+        key.startsWith("wind_spdgst") ||
+        key.startsWith("wind_speed"))
         return value + (m_units == ENG_UNITS ? " mph" : " km/h");
 
     /*The days of the week will be translated if the script sends elements from
      the enum DaysOfWeek.*/
-    if (key.startsWith("date-"))
+    if (key.startsWith("date"))
     {
         bool isNumber;
         value.toInt( &isNumber);
