@@ -11,6 +11,7 @@ use encoding 'utf8';
 use LWP::UserAgent;
 use LWP::Simple;
 use XML::Simple;
+use URI::Escape;
 use POSIX qw(strftime);
 #use Data::Dumper;
 
