@@ -182,8 +182,8 @@ QString WeatherScreen::formatDataItem(const QString &key, const QString &value)
         key.contains("high",Qt::CaseInsensitive) ||
         key.contains("temp",Qt::CaseInsensitive))
     {
-       if ( (value == "NA") || (value == "N/A") )
-          return value;
+       if ((value == "NA") || (value == "N/A"))
+          return QString();
        else
           return value + getTemperatureUnit();
     }
