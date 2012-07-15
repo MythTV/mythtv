@@ -3,7 +3,6 @@
 #include "rominfo.h"
 #include "rom_metadata.h"
 
-#include <QObject>
 #include <QRegExp>
 #include <QDir>
 #include <QList>
@@ -149,13 +148,13 @@ void GameHandler::GetMetadata(GameHandler *handler, QString rom, QString* Genre,
 #endif
 
     // Set our default values
-    *Year = QObject::tr("19xx");
-    *Country = QObject::tr("Unknown");
-    *GameName = QObject::tr("Unknown");
-    *Genre = QObject::tr("Unknown");
-    *Plot = QObject::tr("Unknown");
-    *Publisher = QObject::tr("Unknown");
-    *Version = QObject::tr("0");
+    *Year = tr("19xx", "Default game year");
+    *Country = tr("Unknown", "Unknown country");
+    *GameName = tr("Unknown", "Unknown game name");
+    *Genre = tr("Unknown", "Unknown genre");
+    *Plot = tr("Unknown", "Unknown plot");
+    *Publisher = tr("Unknown", "Unknown publisher");
+    *Version = tr("0", "Default game version");
     (*Fanart).clear();
     (*Boxart).clear();
 
@@ -180,8 +179,9 @@ void GameHandler::GetMetadata(GameHandler *handler, QString rom, QString* Genre,
 
     };
 
-    if ((*Genre == "Unknown") || (*Genre).isEmpty())
-        *Genre = QString("Unknown%1").arg( handler->GameType() );
+    if ((*Genre == tr("Unknown", "Unknown genre")) || (*Genre).isEmpty())
+        *Genre = tr("Unknown %1", "Unknown genre")
+            .arg( handler->GameType() );
 
 }
 
@@ -220,8 +220,10 @@ void GameHandler::promptForRemoval(GameScan scan)
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
     MythDialogBox *removalPopup = new MythDialogBox(
-        tr("%1 appears to be missing.\nRemove it from the database?")
-        .arg(filename), popupStack, "chooseSystemPopup");
+        //: %1 is the file name
+        tr("%1 appears to be missing.\n"
+           "Remove it from the database?")
+            .arg(filename), popupStack, "chooseSystemPopup");
 
     if (removalPopup->Create())
     {
@@ -376,9 +378,10 @@ void GameHandler::UpdateGameDB(GameHandler *handler)
     int counter = 0;
     MSqlQuery query(MSqlQuery::InitCon());
 
-    QString message = QObject::tr("Updating %1(%2) ROM database")
-                                    .arg(handler->SystemName())
-                                    .arg(handler->GameType());
+    //: %1 is the system name, %2 is the game type
+    QString message = tr("Updating %1 (%2) ROM database")
+                          .arg(handler->SystemName())
+                          .arg(handler->GameType());
 
     CreateProgress(message);
 
@@ -407,19 +410,21 @@ void GameHandler::UpdateGameDB(GameHandler *handler)
             }
             else
             {
-                Genre = QObject::tr("Unknown") + handler->GameType();
-                Country = QObject::tr("Unknown");
+                /*: %1 is the game type, when we don't know the genre we use the
+                 * game type */
+                Genre = tr("Unknown %1", "Unknown genre").arg(handler->GameType());
+                Country = tr("Unknown", "Unknown country");
                 CRC32.clear();
-                Year = QObject::tr("19xx");
-                GameName = QObject::tr("Unknown");
-                Plot = QObject::tr("Unknown");
-                Publisher = QObject::tr("Unknown");
-                Version = QObject::tr("0");
+                Year = tr("19xx", "Default game year");
+                GameName = tr("Unknown", "Unknown game name");
+                Plot = tr("Unknown", "Unknown plot");
+                Publisher = tr("Unknown", "Unknown publisher");
+                Version = tr("0", "Default game version");
                 Fanart.clear();
                 Boxart.clear();
             }
 
-            if (GameName == QObject::tr("Unknown"))
+            if (GameName == tr("Unknown", "Unknown game name"))
                 GameName = iter.value().GameName();
 
             int suffixPos = iter.value().Rom().lastIndexOf(QChar('.'));
@@ -505,8 +510,8 @@ void GameHandler::VerifyGameDB(GameHandler *handler)
         MythDB::DBError("GameHandler::VerifyGameDB - "
                         "select", query);
 
-    QString message = QObject::tr("Verifying %1 files...")
-                                    .arg(handler->SystemName());
+    //: %1 is the system name
+    QString message = tr("Verifying %1 files...").arg(handler->SystemName());
 
     CreateProgress(message);
 
@@ -603,9 +608,9 @@ int GameHandler::buildFileCount(QString directory, GameHandler *handler)
 void GameHandler::clearAllGameData(void)
 {
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-    MythDialogBox *clearPopup = new MythDialogBox(tr("This will clear all game metadata "
-                            "from the database. Are you sure you "
-                            "want to do this?"), popupStack, "clearAllPopup");
+    MythDialogBox *clearPopup = new MythDialogBox(
+        tr("This will clear all game metadata from the database. Are you sure "
+            "you want to do this?"), popupStack, "clearAllPopup");
 
     if (clearPopup->Create())
     {
@@ -623,7 +628,7 @@ void GameHandler::buildFileList(QString directory, GameHandler *handler,
 {
     QDir RomDir(directory);
 
-                                // If we can't read it's contents move on
+    // If we can't read its contents move on
     if (!RomDir.isReadable())
         return;
 
@@ -708,8 +713,9 @@ void GameHandler::processGames(GameHandler *handler)
     {
         MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
-        QString message = QObject::tr("Scanning for %1 games...")
-                                                .arg(handler->SystemName());
+        //: %1 is the system name
+        QString message = tr("Scanning for %1 games...")
+            .arg(handler->SystemName());
         MythUIBusyDialog *busyDialog = new MythUIBusyDialog(message, popupStack,
                                                 "gamescanbusy");
 
@@ -736,8 +742,8 @@ void GameHandler::processGames(GameHandler *handler)
     }
     else
     {
-        QString message = QObject::tr("Scanning for %1 games...")
-                                                .arg(handler->SystemName());
+        QString message = tr("Scanning for %1 games...")
+            .arg(handler->SystemName());
         CreateProgress(message);
 
         if (m_progressDlg)

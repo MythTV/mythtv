@@ -267,6 +267,7 @@ void GameUI::itemClicked(MythUIButtonListItem*)
         }
         else
         {
+            //: %1 is the game name
             QString msg = QString(tr("Choose System for:\n%1"))
                 .arg(node->getString());
             MythScreenStack *popupStack = GetMythMainWindow()->
@@ -919,6 +920,7 @@ void GameUI::gameSearch(MythGenericTree *node,
 
     if (!automode)
     {
+        //: %1 is the game name
         QString msg = tr("Fetching details for %1")
                            .arg(metadata->Gamename());
         createBusyDialog(msg);

@@ -1,8 +1,11 @@
 #ifndef GAMESETTINGS_H
 #define GAMESETTINGS_H
 
+// Qt headers
 #include <QString>
+#include <QCoreApplication>
 
+// MythTV headers
 #include <settings.h>
 #include <mythcontext.h>
 
@@ -57,6 +60,8 @@ class GameDBStorage : public SimpleDBStorage
 
 class MythGameGeneralSettings : public ConfigurationWizard
 {
+    Q_DECLARE_TR_FUNCTIONS(MythGameGeneralSettings)
+
   public:
     MythGameGeneralSettings();
 };
@@ -100,8 +105,9 @@ class MythGamePlayerSettings : public QObject, public ConfigurationWizard
         Name(const MythGamePlayerSettings &parent) :
             LineEditSetting(this), GameDBStorage(this, parent, "playername")
         {
-            setLabel(QObject::tr("Player Name"));
-            setHelpText(QObject::tr("Name of this Game and or Emulator"));
+            setLabel(MythGamePlayerSettings::tr("Player Name"));
+            setHelpText(MythGamePlayerSettings::tr("Name of this Game and or "
+                                                   "Emulator"));
         }
     };
 
