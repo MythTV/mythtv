@@ -206,6 +206,7 @@ class MTV_PUBLIC TV : public QObject
   public slots:
     void HandleOSDClosed(int osdType);
     void timerEvent(QTimerEvent*);
+    void StopPlayback(void);
 
   protected:
     // Protected event handling

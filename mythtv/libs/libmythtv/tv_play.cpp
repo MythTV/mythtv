@@ -272,6 +272,19 @@ void TV::ReleaseTV(TV* tv)
     gTV = NULL;
 }
 
+void TV::StopPlayback(void)
+{
+    if (TV::IsTVRunning())
+    {
+        QMutexLocker lock(gTVLock);
+
+        PlayerContext *ctx = gTV->GetPlayerReadLock(0, __FILE__, __LINE__);
+        PrepareToExitPlayer(ctx, __LINE__);
+        SetExitPlayer(true, true);
+        ReturnPlayerLock(ctx);
+    }
+}
+
 /**
  * \brief returns true if the recording completed when exiting.
  */
@@ -329,6 +342,9 @@ bool TV::StartTV(ProgramInfo *tvrec, uint flags)
         startSysEventSent = true;
         SendMythSystemPlayEvent("PLAY_STARTED", curProgram);
     }
+
+    // Notify others that we are about to play
+    gCoreContext->WantingPlayback(tv);
 
     QString playerError = QString::null;
     while (!quitAll)
@@ -1123,6 +1139,7 @@ void TV::InitFromDB(void)
     vbimode = VBIMode::Parse(!feVBI.isEmpty() ? feVBI : beVBI);
 
     gCoreContext->addListener(this);
+    gCoreContext->RegisterForPlayback(this, SLOT(StopPlayback()));
 
     QMutexLocker lock(&initFromDBLock);
     initFromDBDone = true;
@@ -1269,6 +1286,7 @@ TV::~TV(void)
         browsehelper->Stop();
 
     gCoreContext->removeListener(this);
+    gCoreContext->UnregisterForPlayback(this);
 
     if (GetMythMainWindow() && weDisabledGUI)
         GetMythMainWindow()->PopDrawDisabled();
@@ -5855,7 +5873,7 @@ bool TV::IsPaused(void)
 {
     if (!IsTVRunning())
         return false;
-    
+
     QMutexLocker lock(gTVLock);
     PlayerContext *ctx = gTV->GetPlayerReadLock(0, __FILE__, __LINE__);
 
