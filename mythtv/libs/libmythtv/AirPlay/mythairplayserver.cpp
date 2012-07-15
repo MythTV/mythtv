@@ -709,12 +709,12 @@ void MythAirplayServer::HandleResponse(APHTTPRequest *req,
 
         if (!file.isEmpty())
         {
+            m_pathname = file;
             StartPlayback(file);
             GetPlayerStatus(playing, playerspeed, position, duration, pathname);
             m_connections[session].url = QUrl(file);
             m_connections[session].position = start_pos * duration;
             SeekPosition(duration * start_pos);
-            m_pathname = file;
         }
 
         SendReverseEvent(session, AP_EVENT_PLAYING);
@@ -945,12 +945,11 @@ void MythAirplayServer::StartPlayback(const QString &pathname)
                                   QStringList(pathname));
     qApp->postEvent(GetMythMainWindow(), me);
     // Wait until we receive that the play has started
-    QEventLoop eventLoop;
-    connect(gCoreContext, SIGNAL(TVPlaybackStarted()), &eventLoop, SLOT(quit()));
-    connect(gCoreContext, SIGNAL(TVPlaybackAborted()), &eventLoop, SLOT(quit()));
-    eventLoop.exec(QEventLoop::ExcludeUserInputEvents);
+    gCoreContext->WaitUntilSignals(SIGNAL(TVPlaybackStarted()),
+                                   SIGNAL(TVPlaybackAborted()),
+                                   NULL);
     LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
-        QString("Playback started"));
+        QString("ACTION_HANDLEMEDIA completed"));
 }
 
 void MythAirplayServer::StopPlayback(void)
@@ -965,10 +964,9 @@ void MythAirplayServer::StopPlayback(void)
                                       Qt::NoModifier, ACTION_STOP);
         qApp->postEvent(GetMythMainWindow(), (QEvent*)ke);
         // Wait until we receive that playback has stopped
-        QEventLoop eventLoop;
-        connect(gCoreContext, SIGNAL(TVPlaybackStopped()), &eventLoop, SLOT(quit()));
-        connect(gCoreContext, SIGNAL(TVPlaybackAborted()), &eventLoop, SLOT(quit()));
-        eventLoop.exec(QEventLoop::ExcludeUserInputEvents);
+        gCoreContext->WaitUntilSignals(SIGNAL(TVPlaybackStopped()),
+                                       SIGNAL(TVPlaybackAborted()),
+                                       NULL);
         LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
             QString("ACTION_STOP completed"));
     }
@@ -992,11 +990,10 @@ void MythAirplayServer::SeekPosition(uint64_t position)
                                       QStringList(QString::number((uint64_t)position)));
         qApp->postEvent(GetMythMainWindow(), me);
         // Wait until we receive that the seek has completed
-        QEventLoop eventLoop;
-        connect(gCoreContext, SIGNAL(TVPlaybackSought(qint64)), &eventLoop, SLOT(quit()));
-        connect(gCoreContext, SIGNAL(TVPlaybackStopped()), &eventLoop, SLOT(quit()));
-        connect(gCoreContext, SIGNAL(TVPlaybackAborted()), &eventLoop, SLOT(quit()));
-        eventLoop.exec(QEventLoop::ExcludeUserInputEvents);
+        gCoreContext->WaitUntilSignals(SIGNAL(TVPlaybackSought(qint64)),
+                                       SIGNAL(TVPlaybackStopped()),
+                                       SIGNAL(TVPlaybackAborted()),
+                                       NULL);
         LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
             QString("ACTION_SEEKABSOLUTE completed"));
     }
@@ -1009,7 +1006,7 @@ void MythAirplayServer::SeekPosition(uint64_t position)
 
 void MythAirplayServer::PausePlayback(void)
 {
-    if (TV::IsTVRunning() && TV::CurrentTVInstance()->IsPaused())
+    if (TV::IsTVRunning() && !TV::CurrentTVInstance()->IsPaused())
     {
         LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
             QString("Sending ACTION_PAUSE for %1")
@@ -1019,11 +1016,10 @@ void MythAirplayServer::PausePlayback(void)
                                       Qt::NoModifier, ACTION_PAUSE);
         qApp->postEvent(GetMythMainWindow(), (QEvent*)ke);
         // Wait until we receive that playback has stopped
-        QEventLoop eventLoop;
-        connect(gCoreContext, SIGNAL(TVPlaybackPaused()), &eventLoop, SLOT(quit()));
-        connect(gCoreContext, SIGNAL(TVPlaybackStopped()), &eventLoop, SLOT(quit()));
-        connect(gCoreContext, SIGNAL(TVPlaybackAborted()), &eventLoop, SLOT(quit()));
-        eventLoop.exec(QEventLoop::ExcludeUserInputEvents);
+        gCoreContext->WaitUntilSignals(SIGNAL(TVPlaybackPaused()),
+                                       SIGNAL(TVPlaybackStopped()),
+                                       SIGNAL(TVPlaybackAborted()),
+                                       NULL);
         LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
             QString("ACTION_PAUSE completed"));
     }
@@ -1046,11 +1042,10 @@ void MythAirplayServer::UnpausePlayback(void)
                                       Qt::NoModifier, ACTION_PLAY);
         qApp->postEvent(GetMythMainWindow(), (QEvent*)ke);
         // Wait until we receive that playback has stopped
-        QEventLoop eventLoop;
-        connect(gCoreContext, SIGNAL(TVPlaybackUnpaused()), &eventLoop, SLOT(quit()));
-        connect(gCoreContext, SIGNAL(TVPlaybackStopped()), &eventLoop, SLOT(quit()));
-        connect(gCoreContext, SIGNAL(TVPlaybackAborted()), &eventLoop, SLOT(quit()));
-        eventLoop.exec(QEventLoop::ExcludeUserInputEvents);
+        gCoreContext->WaitUntilSignals(SIGNAL(TVPlaybackUnpaused()),
+                                       SIGNAL(TVPlaybackStopped()),
+                                       SIGNAL(TVPlaybackAborted()),
+                                       NULL);
         LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
             QString("ACTION_PLAY completed"));
     }
