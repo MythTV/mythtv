@@ -1015,8 +1015,15 @@ QString VideoMetadata::FilenameToMeta(const QString &file_name, int position)
     cleanFilename.replace(QRegExp("_"), " ");
     cleanFilename.replace(QRegExp("\\."), " ");
 
-    QString season_translation = QObject::tr("Season");
-    QString episode_translation = QObject::tr("Episode");
+    /*: Word(s) which should be recognized as "season" when parsing a video
+     * file name. To list more than one word, separate them with a '|'.
+     */
+    QString season_translation = tr("Season", "Metadata file name parsing");
+
+    /*: Word(s) which should be recognized as "episode" when parsing a video
+     * file name. To list more than one word, separate them with a '|'.
+     */
+    QString episode_translation = tr("Episode", "Metadata file name parsing");
 
     // Primary Regexp
     QString separator = "(?:\\s?(?:-|/)?\\s?)?";
@@ -1090,7 +1097,7 @@ namespace
 {
     const QRegExp &getTitleTrim(bool ignore_case)
     {
-        static QString pattern(QObject::tr("^(The |A |An )"));
+        static QString pattern(VideoMetadata::tr("^(The |A |An )"));
         static QRegExp prefixes_case(pattern, Qt::CaseSensitive);
         static QRegExp prefixes_nocase(pattern, Qt::CaseInsensitive);
         return ignore_case ? prefixes_nocase : prefixes_case;
