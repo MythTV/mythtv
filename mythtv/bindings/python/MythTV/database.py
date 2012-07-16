@@ -168,7 +168,9 @@ class DBData( DictData, MythSchema ):
         data = DictData._process(self, data)
         for key, val in self._db.tablefields[self._table].items():
             if (val.type == 'datetime') and (data[key] is not None):
-                data[key] = datetime.duck(data[key])
+                data[key] = datetime.fromDatetime(data[key])\
+                                    .replace(tzinfo=datetime.UTCTZ())\
+                                    .astimezone(datetime.localTZ())
         return data
 
     def _pull(self):
