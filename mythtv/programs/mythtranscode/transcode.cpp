@@ -690,7 +690,7 @@ Transcode::Transcode(ProgramInfo *pginfo) :
     hlsMode(false),                 hlsStreamID(-1),
     hlsDisableAudioOnly(false),
     hlsMaxSegments(0),
-    cmdContainer("mpegts"),         cmdAudioCodec("libmp3lame"),
+    cmdContainer("mpegts"),         cmdAudioCodec("aac"),
     cmdVideoCodec("libx264"),
     cmdWidth(480),                  cmdHeight(0),
     cmdBitrate(800000),             cmdAudioBitrate(64000)
@@ -1062,8 +1062,7 @@ int Transcode::TranscodeFile(const QString &inputname,
                 }
 
                 avfw2->SetContainer("mpegts");
-                avfw2->SetAudioCodec("libmp3lame");
-                //avfw2->SetAudioCodec("libfaac"); // --enable-libfaac to use this
+                avfw2->SetAudioCodec("aac");
                 avfw2->SetAudioBitrate(audioOnlyBitrate);
                 avfw2->SetAudioChannels(arb->m_channels);
                 avfw2->SetAudioBits(16);
@@ -1073,8 +1072,7 @@ int Transcode::TranscodeFile(const QString &inputname,
 
             avfw->SetContainer("mpegts");
             avfw->SetVideoCodec("libx264");
-            avfw->SetAudioCodec("libmp3lame");
-            //avfw->SetAudioCodec("libfaac");  // --enable-libfaac to use this
+            avfw->SetAudioCodec("aac");
 
             if (hlsStreamID == -1)
                 hls = new HTTPLiveStream(inputname, newWidth, newHeight,
