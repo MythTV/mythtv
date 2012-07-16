@@ -1,6 +1,6 @@
 include ../../../mythconfig.mak
 
-SUBDIRS  = ca_envcan no_yrno uk_bbc uk_metoffice us_nws wunderground
+SUBDIRS  = ca_envcan no_yrno uk_metoffice us_nws wunderground
 
 # Do not change anything below this line unless you really know what you are
 # doing.
