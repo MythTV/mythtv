@@ -2,6 +2,44 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="el_GR">
 <context>
+    <name>(Weather Screens)</name>
+    <message>
+        <location filename="../mythweather/weatherUtils.cpp" line="16"/>
+        <source>Current Conditions</source>
+        <translation>Παρούσες Συνθήκες</translation>
+    </message>
+    <message>
+        <location filename="../mythweather/weatherUtils.cpp" line="19"/>
+        <source>Three Day Forecast</source>
+        <translation>Τριήμερη Πρόβλεψη</translation>
+    </message>
+    <message>
+        <location filename="../mythweather/weatherUtils.cpp" line="22"/>
+        <source>18 Hour Forecast</source>
+        <translation>18ωρη Πρόβλεψη</translation>
+    </message>
+    <message>
+        <location filename="../mythweather/weatherUtils.cpp" line="25"/>
+        <source>Severe Weather Alerts</source>
+        <translation>Ειδοποιήσεις Έντονων Φαινομένων</translation>
+    </message>
+    <message>
+        <location filename="../mythweather/weatherUtils.cpp" line="28"/>
+        <source>Six Day Forecast</source>
+        <translation>Εξαήμερη Πρόβλεψη</translation>
+    </message>
+    <message>
+        <location filename="../mythweather/weatherUtils.cpp" line="31"/>
+        <source>Static Map</source>
+        <translation>Στατικός Χάρτης</translation>
+    </message>
+    <message>
+        <location filename="../mythweather/weatherUtils.cpp" line="34"/>
+        <source>Animated Map</source>
+        <translation>Κινούμενος Χάρτης</translation>
+    </message>
+</context>
+<context>
     <name>GlobalSetup</name>
     <message>
         <location filename="../mythweather/weatherSetup.cpp" line="56"/>
@@ -35,12 +73,12 @@
         <translation>Ψάχνω ... Αποτελέσματα: %1</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="1048"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="1058"/>
         <source>Search Complete. Results: %1</source>
         <translation>Ολοκλήρωση Αναζήτησης. Αποτελέσματα: %1</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="1069"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="1079"/>
         <source>Source: %1</source>
         <translation>Πηγή: %1</translation>
     </message>
@@ -68,39 +106,32 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../mythweather/weatherUtils.cpp" line="15"/>
         <source>Current Conditions</source>
-        <translation>Παρούσες Συνθήκες</translation>
+        <translation type="obsolete">Παρούσες Συνθήκες</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherUtils.cpp" line="17"/>
         <source>Three Day Forecast</source>
-        <translation>Τριήμερη Πρόβλεψη</translation>
+        <translation type="obsolete">Τριήμερη Πρόβλεψη</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherUtils.cpp" line="19"/>
         <source>18 Hour Forecast</source>
-        <translation>18ωρη Πρόβλεψη</translation>
+        <translation type="obsolete">18ωρη Πρόβλεψη</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherUtils.cpp" line="21"/>
         <source>Severe Weather Alerts</source>
-        <translation>Ειδοποιήσεις Έντονων Φαινομένων</translation>
+        <translation type="obsolete">Ειδοποιήσεις Έντονων Φαινομένων</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherUtils.cpp" line="23"/>
         <source>Six Day Forecast</source>
-        <translation>Εξαήμερη Πρόβλεψη</translation>
+        <translation type="obsolete">Εξαήμερη Πρόβλεψη</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherUtils.cpp" line="25"/>
         <source>Static Map</source>
-        <translation>Στατικός Χάρτης</translation>
+        <translation type="obsolete">Στατικός Χάρτης</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherUtils.cpp" line="27"/>
         <source>Animated Map</source>
-        <translation>Κινούμενος Χάρτης</translation>
+        <translation type="obsolete">Κινούμενος Χάρτης</translation>
     </message>
 </context>
 <context>
@@ -1265,37 +1296,37 @@ When you have completed your changes, click &quot;Finish&quot; to continue.</sou
 <context>
     <name>WeatherScreen</name>
     <message>
-        <location filename="../mythweather/weatherScreen.cpp" line="208"/>
+        <location filename="../mythweather/weatherScreen.cpp" line="215"/>
         <source>Sunday</source>
         <translation>Κυριακή</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherScreen.cpp" line="211"/>
+        <location filename="../mythweather/weatherScreen.cpp" line="218"/>
         <source>Monday</source>
         <translation>Δευτέρα</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherScreen.cpp" line="214"/>
+        <location filename="../mythweather/weatherScreen.cpp" line="221"/>
         <source>Tuesday</source>
         <translation>Τρίτη</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherScreen.cpp" line="217"/>
+        <location filename="../mythweather/weatherScreen.cpp" line="224"/>
         <source>Wednesday</source>
         <translation>Τετάρτη</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherScreen.cpp" line="220"/>
+        <location filename="../mythweather/weatherScreen.cpp" line="227"/>
         <source>Thursday</source>
         <translation>Πέμπτη</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherScreen.cpp" line="223"/>
+        <location filename="../mythweather/weatherScreen.cpp" line="230"/>
         <source>Friday</source>
         <translation>Παρασκευή</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherScreen.cpp" line="226"/>
+        <location filename="../mythweather/weatherScreen.cpp" line="233"/>
         <source>Saturday</source>
         <translation>Σάββατο</translation>
     </message>

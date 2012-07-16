@@ -11,10 +11,12 @@ use encoding 'utf8';
 use LWP::UserAgent;
 use LWP::Simple;
 use XML::Simple;
+use URI::Escape;
+use POSIX qw(strftime);
 #use Data::Dumper;
 
 
-our @EXPORT = qw(Search FindLoc);
+our @EXPORT = qw(Search convert_temp convert_speed time_format);
 our @EXPORT_OK = qw($apikey $copyrightstr $copyrightlogo $forecast_url);
 our $VERSION = 0.1;
 
@@ -87,6 +89,37 @@ sub log_print {
     open OF, ">>$dir/uk_metoff.log";
     print OF @_;
     close OF;
+}
+
+sub convert_temp {
+    my ( $degC, $units ) = @_;
+    my $deg;
+
+    if( $units ne "SI" ) {
+        $deg = int(($degC * 1.8) + 32.5); # °F
+    } else {
+        $deg = $degC;
+    }
+    return $deg;
+}
+
+sub convert_speed {
+    my ( $mph, $units ) = @_;
+
+    my $speed;
+
+    if( $units eq "SI") {
+        $speed = int($mph * 1.609344); # kph
+    } else {
+        $speed = $mph;
+    }
+    return $speed;
+}
+
+sub format_date {
+    my ($time) = @_;
+
+    return strftime '%a %e %b, %H:%M', localtime($time);
 }
 
 

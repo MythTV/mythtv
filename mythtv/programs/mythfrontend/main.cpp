@@ -662,8 +662,6 @@ static void jumpScreenVideoTree()    { RunVideoScreen(VideoDialog::DLG_TREE, tru
 static void jumpScreenVideoGallery() { RunVideoScreen(VideoDialog::DLG_GALLERY, true); }
 static void jumpScreenVideoDefault() { RunVideoScreen(VideoDialog::DLG_DEFAULT, true); }
 
-QString gDVDdevice;
-
 static void playDisc()
 {
     //
@@ -694,10 +692,7 @@ static void playDisc()
     }
     else
     {
-        QString dvd_device = gDVDdevice;
-
-        if (dvd_device.isEmpty())
-            dvd_device = MediaMonitor::defaultDVDdevice();
+        QString dvd_device = MediaMonitor::defaultDVDdevice();
 
         if (dvd_device.isEmpty())
             return;  // User cancelled in the Popup
@@ -759,39 +754,9 @@ static void handleDVDMedia(MythMediaDevice *dvd)
     if (!dvd)
         return;
 
-    QString newDevice = dvd->getDevicePath();
-
-    // Device insertion. Store it for later use
-    if (dvd->isUsable())
-        if (gDVDdevice.length() && gDVDdevice != newDevice)
-        {
-            // Multiple DVD devices. Clear the old one so the user has to
-            // select a disk to play (in MediaMonitor::defaultDVDdevice())
-
-            LOG(VB_MEDIA, LOG_INFO,
-                "MythVideo: Multiple DVD drives? Forgetting " + gDVDdevice);
-            gDVDdevice.clear();
-        }
-        else
-        {
-            gDVDdevice = newDevice;
-            LOG(VB_MEDIA, LOG_INFO,
-                "MythVideo: Storing DVD device " + gDVDdevice);
-        }
-    else
-    {
-        // Ejected/unmounted/error.
-
-        if (gDVDdevice.length() && gDVDdevice == newDevice)
-        {
-            LOG(VB_MEDIA, LOG_INFO,
-                "MythVideo: Forgetting existing DVD " + gDVDdevice);
-            gDVDdevice.clear();
-        }
-
+    if (!dvd->isUsable()) // This isn't infallible, on some drives both a mount and libudf fail
         return;
-    }
-
+    
     switch (gCoreContext->GetNumSetting("DVDOnInsertDVD", 1))
     {
         case 0 : // Do nothing

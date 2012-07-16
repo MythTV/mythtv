@@ -407,6 +407,7 @@ using_frontend {
         SOURCES += AirPlay/mythairplayserver.cpp
         using_libcrypto: HEADERS += AirPlay/mythraopdevice.h   AirPlay/mythraopconnection.h
         using_libcrypto: SOURCES += AirPlay/mythraopdevice.cpp AirPlay/mythraopconnection.cpp
+        using_libcrypto: DEFINES += USING_MYTHRAOP
     }
 
     using_mheg {
