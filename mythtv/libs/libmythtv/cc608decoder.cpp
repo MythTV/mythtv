@@ -5,8 +5,11 @@
 #include <algorithm>
 using namespace std;
 
+// Qt headers
 #include <QStringList>
+#include <QCoreApplication>
 
+// MythTV headers
 #include "format.h"
 #include "cc608decoder.h"
 #include "mythcontext.h"
@@ -1497,100 +1500,196 @@ bool CC608Decoder::XDSPacketParseChannel(const vector<unsigned char> &xds_buf)
 
 static void init_xds_program_type(QString xds_program_type[96])
 {
-    xds_program_type[0]  = QObject::tr("Education");
-    xds_program_type[1]  = QObject::tr("Entertainment");
-    xds_program_type[2]  = QObject::tr("Movie");
-    xds_program_type[3]  = QObject::tr("News");
-    xds_program_type[4]  = QObject::tr("Religious");
-    xds_program_type[5]  = QObject::tr("Sports");
-    xds_program_type[6]  = QObject::tr("Other");
-    xds_program_type[7]  = QObject::tr("Action");
-    xds_program_type[8]  = QObject::tr("Advertisement");
-    xds_program_type[9]  = QObject::tr("Animated");
-    xds_program_type[10] = QObject::tr("Anthology");
-    xds_program_type[11] = QObject::tr("Automobile");
-    xds_program_type[12] = QObject::tr("Awards");
-    xds_program_type[13] = QObject::tr("Baseball");
-    xds_program_type[14] = QObject::tr("Basketball");
-    xds_program_type[15] = QObject::tr("Bulletin");
-    xds_program_type[16] = QObject::tr("Business");
-    xds_program_type[17] = QObject::tr("Classical");
-    xds_program_type[18] = QObject::tr("College");
-    xds_program_type[19] = QObject::tr("Combat");
-    xds_program_type[20] = QObject::tr("Comedy");
-    xds_program_type[21] = QObject::tr("Commentary");
-    xds_program_type[22] = QObject::tr("Concert");
-    xds_program_type[23] = QObject::tr("Consumer");
-    xds_program_type[24] = QObject::tr("Contemporary");
-    xds_program_type[25] = QObject::tr("Crime");
-    xds_program_type[26] = QObject::tr("Dance");
-    xds_program_type[27] = QObject::tr("Documentary");
-    xds_program_type[28] = QObject::tr("Drama");
-    xds_program_type[29] = QObject::tr("Elementary");
-    xds_program_type[30] = QObject::tr("Erotica");
-    xds_program_type[31] = QObject::tr("Exercise");
-    xds_program_type[32] = QObject::tr("Fantasy");
-    xds_program_type[33] = QObject::tr("Farm");
-    xds_program_type[34] = QObject::tr("Fashion");
-    xds_program_type[35] = QObject::tr("Fiction");
-    xds_program_type[36] = QObject::tr("Food");
-    xds_program_type[37] = QObject::tr("Football");
-    xds_program_type[38] = QObject::tr("Foreign");
-    xds_program_type[39] = QObject::tr("Fund Raiser");
-    xds_program_type[40] = QObject::tr("Game/Quiz");
-    xds_program_type[41] = QObject::tr("Garden");
-    xds_program_type[42] = QObject::tr("Golf");
-    xds_program_type[43] = QObject::tr("Government");
-    xds_program_type[44] = QObject::tr("Health");
-    xds_program_type[45] = QObject::tr("High School");
-    xds_program_type[46] = QObject::tr("History");
-    xds_program_type[47] = QObject::tr("Hobby");
-    xds_program_type[48] = QObject::tr("Hockey");
-    xds_program_type[49] = QObject::tr("Home");
-    xds_program_type[50] = QObject::tr("Horror");
-    xds_program_type[51] = QObject::tr("Information");
-    xds_program_type[52] = QObject::tr("Instruction");
-    xds_program_type[53] = QObject::tr("International");
-    xds_program_type[54] = QObject::tr("Interview");
-    xds_program_type[55] = QObject::tr("Language");
-    xds_program_type[56] = QObject::tr("Legal");
-    xds_program_type[57] = QObject::tr("Live");
-    xds_program_type[58] = QObject::tr("Local");
-    xds_program_type[59] = QObject::tr("Math");
-    xds_program_type[60] = QObject::tr("Medical");
-    xds_program_type[61] = QObject::tr("Meeting");
-    xds_program_type[62] = QObject::tr("Military");
-    xds_program_type[63] = QObject::tr("Miniseries");
-    xds_program_type[64] = QObject::tr("Music");
-    xds_program_type[65] = QObject::tr("Mystery");
-    xds_program_type[66] = QObject::tr("National");
-    xds_program_type[67] = QObject::tr("Nature");
-    xds_program_type[68] = QObject::tr("Police");
-    xds_program_type[69] = QObject::tr("Politics");
-    xds_program_type[70] = QObject::tr("Premiere");
-    xds_program_type[71] = QObject::tr("Prerecorded");
-    xds_program_type[72] = QObject::tr("Product");
-    xds_program_type[73] = QObject::tr("Professional");
-    xds_program_type[74] = QObject::tr("Public");
-    xds_program_type[75] = QObject::tr("Racing");
-    xds_program_type[76] = QObject::tr("Reading");
-    xds_program_type[77] = QObject::tr("Repair");
-    xds_program_type[78] = QObject::tr("Repeat");
-    xds_program_type[79] = QObject::tr("Review");
-    xds_program_type[80] = QObject::tr("Romance");
-    xds_program_type[81] = QObject::tr("Science");
-    xds_program_type[82] = QObject::tr("Series");
-    xds_program_type[83] = QObject::tr("Service");
-    xds_program_type[84] = QObject::tr("Shopping");
-    xds_program_type[85] = QObject::tr("Soap Opera");
-    xds_program_type[86] = QObject::tr("Special");
-    xds_program_type[87] = QObject::tr("Suspense");
-    xds_program_type[88] = QObject::tr("Talk");
-    xds_program_type[89] = QObject::tr("Technical");
-    xds_program_type[90] = QObject::tr("Tennis");
-    xds_program_type[91] = QObject::tr("Travel");
-    xds_program_type[92] = QObject::tr("Variety");
-    xds_program_type[93] = QObject::tr("Video");
-    xds_program_type[94] = QObject::tr("Weather");
-    xds_program_type[95] = QObject::tr("Western");
+    xds_program_type[0]  = QCoreApplication::translate("(Categories)",
+                                                       "Education");
+    xds_program_type[1]  = QCoreApplication::translate("(Categories)",
+                                                       "Entertainment");
+    xds_program_type[2]  = QCoreApplication::translate("(Categories)",
+                                                       "Movie");
+    xds_program_type[3]  = QCoreApplication::translate("(Categories)",
+                                                       "News");
+    xds_program_type[4]  = QCoreApplication::translate("(Categories)",
+                                                       "Religious");
+    xds_program_type[5]  = QCoreApplication::translate("(Categories)",
+                                                       "Sports");
+    xds_program_type[6]  = QCoreApplication::translate("(Categories)",
+                                                       "Other");
+    xds_program_type[7]  = QCoreApplication::translate("(Categories)",
+                                                       "Action");
+    xds_program_type[8]  = QCoreApplication::translate("(Categories)",
+                                                       "Advertisement");
+    xds_program_type[9]  = QCoreApplication::translate("(Categories)",
+                                                       "Animated");
+    xds_program_type[10] = QCoreApplication::translate("(Categories)",
+                                                       "Anthology");
+    xds_program_type[11] = QCoreApplication::translate("(Categories)",
+                                                       "Automobile");
+    xds_program_type[12] = QCoreApplication::translate("(Categories)",
+                                                       "Awards");
+    xds_program_type[13] = QCoreApplication::translate("(Categories)",
+                                                       "Baseball");
+    xds_program_type[14] = QCoreApplication::translate("(Categories)",
+                                                       "Basketball");
+    xds_program_type[15] = QCoreApplication::translate("(Categories)",
+                                                       "Bulletin");
+    xds_program_type[16] = QCoreApplication::translate("(Categories)",
+                                                       "Business");
+    xds_program_type[17] = QCoreApplication::translate("(Categories)",
+                                                       "Classical");
+    xds_program_type[18] = QCoreApplication::translate("(Categories)",
+                                                       "College");
+    xds_program_type[19] = QCoreApplication::translate("(Categories)",
+                                                       "Combat");
+    xds_program_type[20] = QCoreApplication::translate("(Categories)",
+                                                       "Comedy");
+    xds_program_type[21] = QCoreApplication::translate("(Categories)",
+                                                       "Commentary");
+    xds_program_type[22] = QCoreApplication::translate("(Categories)",
+                                                       "Concert");
+    xds_program_type[23] = QCoreApplication::translate("(Categories)",
+                                                       "Consumer");
+    xds_program_type[24] = QCoreApplication::translate("(Categories)",
+                                                       "Contemporary");
+    xds_program_type[25] = QCoreApplication::translate("(Categories)",
+                                                       "Crime");
+    xds_program_type[26] = QCoreApplication::translate("(Categories)",
+                                                       "Dance");
+    xds_program_type[27] = QCoreApplication::translate("(Categories)",
+                                                       "Documentary");
+    xds_program_type[28] = QCoreApplication::translate("(Categories)",
+                                                       "Drama");
+    xds_program_type[29] = QCoreApplication::translate("(Categories)",
+                                                       "Elementary");
+    xds_program_type[30] = QCoreApplication::translate("(Categories)",
+                                                       "Erotica");
+    xds_program_type[31] = QCoreApplication::translate("(Categories)",
+                                                       "Exercise");
+    xds_program_type[32] = QCoreApplication::translate("(Categories)",
+                                                       "Fantasy");
+    xds_program_type[33] = QCoreApplication::translate("(Categories)",
+                                                       "Farm");
+    xds_program_type[34] = QCoreApplication::translate("(Categories)",
+                                                       "Fashion");
+    xds_program_type[35] = QCoreApplication::translate("(Categories)",
+                                                       "Fiction");
+    xds_program_type[36] = QCoreApplication::translate("(Categories)",
+                                                       "Food");
+    xds_program_type[37] = QCoreApplication::translate("(Categories)",
+                                                       "Football");
+    xds_program_type[38] = QCoreApplication::translate("(Categories)",
+                                                       "Foreign");
+    xds_program_type[39] = QCoreApplication::translate("(Categories)",
+                                                       "Fund Raiser");
+    xds_program_type[40] = QCoreApplication::translate("(Categories)",
+                                                       "Game/Quiz");
+    xds_program_type[41] = QCoreApplication::translate("(Categories)",
+                                                       "Garden");
+    xds_program_type[42] = QCoreApplication::translate("(Categories)",
+                                                       "Golf");
+    xds_program_type[43] = QCoreApplication::translate("(Categories)",
+                                                       "Government");
+    xds_program_type[44] = QCoreApplication::translate("(Categories)",
+                                                       "Health");
+    xds_program_type[45] = QCoreApplication::translate("(Categories)",
+                                                       "High School");
+    xds_program_type[46] = QCoreApplication::translate("(Categories)",
+                                                       "History");
+    xds_program_type[47] = QCoreApplication::translate("(Categories)",
+                                                       "Hobby");
+    xds_program_type[48] = QCoreApplication::translate("(Categories)",
+                                                       "Hockey");
+    xds_program_type[49] = QCoreApplication::translate("(Categories)",
+                                                       "Home");
+    xds_program_type[50] = QCoreApplication::translate("(Categories)",
+                                                       "Horror");
+    xds_program_type[51] = QCoreApplication::translate("(Categories)",
+                                                       "Information");
+    xds_program_type[52] = QCoreApplication::translate("(Categories)",
+                                                       "Instruction");
+    xds_program_type[53] = QCoreApplication::translate("(Categories)",
+                                                       "International");
+    xds_program_type[54] = QCoreApplication::translate("(Categories)",
+                                                       "Interview");
+    xds_program_type[55] = QCoreApplication::translate("(Categories)",
+                                                       "Language");
+    xds_program_type[56] = QCoreApplication::translate("(Categories)",
+                                                       "Legal");
+    xds_program_type[57] = QCoreApplication::translate("(Categories)",
+                                                       "Live");
+    xds_program_type[58] = QCoreApplication::translate("(Categories)",
+                                                       "Local");
+    xds_program_type[59] = QCoreApplication::translate("(Categories)",
+                                                       "Math");
+    xds_program_type[60] = QCoreApplication::translate("(Categories)",
+                                                       "Medical");
+    xds_program_type[61] = QCoreApplication::translate("(Categories)",
+                                                       "Meeting");
+    xds_program_type[62] = QCoreApplication::translate("(Categories)",
+                                                       "Military");
+    xds_program_type[63] = QCoreApplication::translate("(Categories)",
+                                                       "Miniseries");
+    xds_program_type[64] = QCoreApplication::translate("(Categories)",
+                                                       "Music");
+    xds_program_type[65] = QCoreApplication::translate("(Categories)",
+                                                       "Mystery");
+    xds_program_type[66] = QCoreApplication::translate("(Categories)",
+                                                       "National");
+    xds_program_type[67] = QCoreApplication::translate("(Categories)",
+                                                       "Nature");
+    xds_program_type[68] = QCoreApplication::translate("(Categories)",
+                                                       "Police");
+    xds_program_type[69] = QCoreApplication::translate("(Categories)",
+                                                       "Politics");
+    xds_program_type[70] = QCoreApplication::translate("(Categories)",
+                                                       "Premiere");
+    xds_program_type[71] = QCoreApplication::translate("(Categories)",
+                                                       "Prerecorded");
+    xds_program_type[72] = QCoreApplication::translate("(Categories)",
+                                                       "Product");
+    xds_program_type[73] = QCoreApplication::translate("(Categories)",
+                                                       "Professional");
+    xds_program_type[74] = QCoreApplication::translate("(Categories)",
+                                                       "Public");
+    xds_program_type[75] = QCoreApplication::translate("(Categories)",
+                                                       "Racing");
+    xds_program_type[76] = QCoreApplication::translate("(Categories)",
+                                                       "Reading");
+    xds_program_type[77] = QCoreApplication::translate("(Categories)",
+                                                       "Repair");
+    xds_program_type[78] = QCoreApplication::translate("(Categories)",
+                                                       "Repeat");
+    xds_program_type[79] = QCoreApplication::translate("(Categories)",
+                                                       "Review");
+    xds_program_type[80] = QCoreApplication::translate("(Categories)",
+                                                       "Romance");
+    xds_program_type[81] = QCoreApplication::translate("(Categories)",
+                                                       "Science");
+    xds_program_type[82] = QCoreApplication::translate("(Categories)",
+                                                       "Series");
+    xds_program_type[83] = QCoreApplication::translate("(Categories)",
+                                                       "Service");
+    xds_program_type[84] = QCoreApplication::translate("(Categories)",
+                                                       "Shopping");
+    xds_program_type[85] = QCoreApplication::translate("(Categories)",
+                                                       "Soap Opera");
+    xds_program_type[86] = QCoreApplication::translate("(Categories)",
+                                                       "Special");
+    xds_program_type[87] = QCoreApplication::translate("(Categories)",
+                                                       "Suspense");
+    xds_program_type[88] = QCoreApplication::translate("(Categories)",
+                                                       "Talk");
+    xds_program_type[89] = QCoreApplication::translate("(Categories)", 
+                                                       "Technical");
+    xds_program_type[90] = QCoreApplication::translate("(Categories)",
+                                                       "Tennis");
+    xds_program_type[91] = QCoreApplication::translate("(Categories)",
+                                                       "Travel");
+    xds_program_type[92] = QCoreApplication::translate("(Categories)",
+                                                       "Variety");
+    xds_program_type[93] = QCoreApplication::translate("(Categories)",
+                                                       "Video");
+    xds_program_type[94] = QCoreApplication::translate("(Categories)",
+                                                       "Weather");
+    xds_program_type[95] = QCoreApplication::translate("(Categories)",
+                                                       "Western");
 }
