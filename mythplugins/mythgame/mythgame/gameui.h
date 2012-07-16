@@ -30,7 +30,7 @@ class GameUI : public MythScreenType
     ~GameUI();
 
     bool Create();
-    void Load();
+    void BuildTree();
     bool keyPressEvent(QKeyEvent *event);
 
   public slots:

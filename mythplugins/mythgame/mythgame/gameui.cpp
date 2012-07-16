@@ -94,14 +94,14 @@ bool GameUI::Create()
 
     m_gameShowFileName = gCoreContext->GetSetting("GameShowFileNames").toInt();
 
-    Load();
+    BuildTree();
 
     BuildFocusList();
 
     return true;
 }
 
-void GameUI::Load()
+void GameUI::BuildTree()
 {
     m_gameTree = new MythGenericTree("game root", 0, false);
 
@@ -176,6 +176,7 @@ void GameUI::Load()
     m_gameTree->addNode(new_node);
 
     m_gameUITree->AssignTree(m_gameTree);
+    nodeChanged(m_gameUITree->GetCurrentNode());
 }
 
 bool GameUI::keyPressEvent(QKeyEvent *event)
@@ -879,7 +880,8 @@ void GameUI::updateChangedNode(MythGenericTree *node, RomInfo *romInfo)
 {
     resetOtherTrees(node);
 
-    if (node->getParent() == m_favouriteNode && romInfo->Favorite() == 0) {
+    if (node->getParent() == m_favouriteNode && romInfo->Favorite() == 0)
+    {
         // node is being removed
         m_gameUITree->SetCurrentNode(m_favouriteNode);
     }
@@ -1107,9 +1109,10 @@ void GameUI::reloadAllData(bool dbChanged)
 
     if (dbChanged)
     {
+        m_gameUITree->Reset();
         delete m_gameTree;
         m_gameTree = NULL;
-        Load();
+        BuildTree();
     }
 }
 
