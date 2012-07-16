@@ -151,6 +151,7 @@ bool Weather::SetupScreens()
     {
         if (m_firstSetup)
         {
+            m_firstSetup = false;
             // If no screens exist, run the setup
             MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
@@ -167,8 +168,6 @@ bool Weather::SetupScreens()
             {
                 delete ssetup;
             }
-
-            m_firstSetup = false;
         }
         else
         {
