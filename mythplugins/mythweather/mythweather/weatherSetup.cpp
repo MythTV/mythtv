@@ -392,13 +392,6 @@ void ScreenSetup::loadData()
 
 void ScreenSetup::saveData()
 {
-    if (m_activeList->GetCount() <= 0)
-    {
-        LOG(VB_GENERAL, LOG_ERR,
-            "No Active Screens are defined. Nothing Saved.");
-        return;
-    }
-
     // check if all active screens have sources/locations defined
     QStringList notDefined;
 
