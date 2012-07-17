@@ -53,9 +53,8 @@ class MythRAOPConnection : public QObject
     int         GetDataPort() { return m_dataPort; }
     bool        HasAudio()    { return m_audio;    }
     static QMap<QString,QString> decodeDMAP(const QByteArray &dmap);
-
-  protected:
     static RSA *LoadKey(void);
+    static QString RSALastError(void) { return g_rsaLastError; }
 
   private slots:
     void readClient(void);
@@ -128,6 +127,7 @@ class MythRAOPConnection : public QObject
     QByteArray      m_AESIV;
     AES_KEY         m_aesKey;
     static RSA     *g_rsa;
+    static QString  g_rsaLastError;
     // audio out
     AudioOutput    *m_audio;
     AVCodec        *m_codec;

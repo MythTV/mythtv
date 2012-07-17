@@ -18,6 +18,7 @@
 #define MAX_PACKET_SIZE  2048
 
 RSA *MythRAOPConnection::g_rsa = NULL;
+QString MythRAOPConnection::g_rsaLastError;
 
 // RAOP RTP packet type
 #define TIMING_REQUEST   0x52
@@ -78,7 +79,8 @@ MythRAOPConnection::MythRAOPConnection(QObject *parent, QTcpSocket *socket,
     m_masterTimeStamp(0),  m_deviceTimeStamp(0),     m_networkLatency(0),
     m_clockSkew(0),
     m_audioTimer(NULL),
-    m_progressStart(0),    m_progressCurrent(0),     m_progressEnd(0)
+    m_progressStart(0),    m_progressCurrent(0),     m_progressEnd(0),
+    m_authenticated(false)
 {
 }
 
@@ -1354,9 +1356,9 @@ RSA *MythRAOPConnection::LoadKey(void)
 
     if ( !file )
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Failed to read key from: %1")
-            .arg(GetConfDir() + sName));
+        g_rsaLastError = QObject::tr("Failed to read key from: %1").arg(GetConfDir() + sName);
         g_rsa = NULL;
+        LOG(VB_GENERAL, LOG_ERR, LOC + g_rsaLastError);
         return NULL;
     }
 
@@ -1365,13 +1367,15 @@ RSA *MythRAOPConnection::LoadKey(void)
 
     if (g_rsa)
     {
+        g_rsaLastError = "";
         LOG(VB_GENERAL, LOG_DEBUG, LOC +
             QString("Loaded RSA private key (%1)").arg(RSA_check_key(g_rsa)));
         return g_rsa;
     }
 
+    g_rsaLastError = QObject::tr("Failed to load RSA private key.");
     g_rsa = NULL;
-    LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to load RSA private key.");
+    LOG(VB_GENERAL, LOG_ERR, LOC + g_rsaLastError);
     return NULL;
 }
 

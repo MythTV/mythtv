@@ -92,14 +92,14 @@ using namespace std;
 #include "DVD/dvdringbuffer.h"
 
 // AirPlay
-#ifdef USING_RAOP
+#ifdef USING_AIRPLAY
 #include "AirPlay/mythraopdevice.h"
+#include "AirPlay/mythairplayserver.h"
 #endif
 
 #ifdef USING_LIBDNS_SD
 #include <QScopedPointer>
 #include "bonjourregister.h"
-#include "AirPlay/mythairplayserver.h"
 #endif
 
 static ExitPrompter   *exitPopup = NULL;
@@ -235,11 +235,8 @@ namespace
 
     void cleanup()
     {
-#ifdef USING_RAOP
+#ifdef USING_AIRPLAY
         MythRAOPDevice::Cleanup();
-#endif
-
-#ifdef USING_LIBDNS_SD
         MythAirplayServer::Cleanup();
 #endif
 
@@ -1564,13 +1561,17 @@ int main(int argc, char **argv)
         bonjour->Register(port, "_mythfrontend._tcp",
                                  name, dummy);
     }
-
-    if (getenv("MYTHTV_AIRPLAY"))
-        MythAirplayServer::Create();
 #endif
 
-#ifdef USING_RAOP
-    MythRAOPDevice::Create();
+#ifdef USING_AIRPLAY
+    if (gCoreContext->GetNumSetting("AirPlayEnabled", true))
+    {
+        MythRAOPDevice::Create();
+        if (!gCoreContext->GetNumSetting("AirPlayAudioOnly", false))
+        {
+            MythAirplayServer::Create();
+        }
+    }
 #endif
 
     LCD::SetupLCD();

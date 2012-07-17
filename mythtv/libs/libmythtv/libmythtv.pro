@@ -403,11 +403,13 @@ using_frontend {
 
     using_libdns_sd {
         !macx: LIBS += -ldns_sd
-        HEADERS += AirPlay/mythairplayserver.h
-        SOURCES += AirPlay/mythairplayserver.cpp
-        using_libcrypto: HEADERS += AirPlay/mythraopdevice.h   AirPlay/mythraopconnection.h
-        using_libcrypto: SOURCES += AirPlay/mythraopdevice.cpp AirPlay/mythraopconnection.cpp
-        using_libcrypto: DEFINES += USING_MYTHRAOP
+        using_libcrypto {
+            HEADERS += AirPlay/mythairplayserver.h
+            SOURCES += AirPlay/mythairplayserver.cpp
+            HEADERS += AirPlay/mythraopdevice.h   AirPlay/mythraopconnection.h
+            SOURCES += AirPlay/mythraopdevice.cpp AirPlay/mythraopconnection.cpp
+            DEFINES += USING_AIRPLAY
+        }
     }
 
     using_mheg {
