@@ -1,3 +1,4 @@
+#include <QLibrary>
 #include <algorithm>
 using namespace std;
 
@@ -796,6 +797,9 @@ void* MythRenderOpenGL::GetProcAddress(const QString &proc) const
     void *result;
     for (int i = 0; i < 4; i++)
     {
+        result = QLibrary::resolve("libGLESv2", (proc + exts[i]).toLatin1().data());
+        if (result)
+            break;
         result = getProcAddress(proc + exts[i]);
         if (result)
             break;
