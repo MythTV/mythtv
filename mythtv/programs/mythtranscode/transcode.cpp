@@ -493,11 +493,15 @@ class Cutter
 
     bool InhibitUseAudioFrames(int64_t frames, long *totalAudio)
     {
+        int64_t delta = audioFramesToCut - frames;
+        if (delta < 0)
+            delta = -delta;
+
         if (audioFramesToCut == 0)
         {
             return false;
         }
-        else if (abs(audioFramesToCut - frames) < audioFramesToCut)
+        else if (delta < audioFramesToCut)
         {
             // Drop the packet containing these frames if doing
             // so gets us closer to zero left to drop
@@ -1612,11 +1616,12 @@ int Transcode::TranscodeFile(const QString &inputname,
             int vidTime = (int)(curFrameNum * vidFrameTime + 0.5);
             int viddelta = frame.timecode - vidTime;
             int delta = viddelta - auddelta;
-            if (abs(delta) < 500 && abs(delta) >= vidFrameTime)
+            int absdelta = delta < 0 ? -delta : delta;
+            if (absdelta < 500 && absdelta >= vidFrameTime)
             {
                QString msg = QString("Audio is %1ms %2 video at # %3: "
                                      "auddelta=%4, viddelta=%5")
-                   .arg(abs(delta))
+                   .arg(absdelta)
                    .arg(((delta > 0) ? "ahead of" : "behind"))
                    .arg((int)curFrameNum)
                    .arg(auddelta)
