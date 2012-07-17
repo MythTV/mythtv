@@ -77,6 +77,9 @@ class MythRAOPConnection : public QObject
                             const QByteArray &content);
     void     FinishResponse(NetStream *stream, QTcpSocket *socket,
                             QString &option, QString &cseq);
+    void     FinishAuthenticationResponse(NetStream *stream, QTcpSocket *socket,
+                                          QString &cseq);
+
     RawHash  FindTags(const QStringList &lines);
     bool     CreateDecoder(void);
     void     DestroyDecoder(void);
@@ -173,6 +176,9 @@ class MythRAOPConnection : public QObject
     uint32_t        m_progressEnd;
     QByteArray      m_artwork;
     QByteArray      m_dmap;
+
+    //Authentication
+    QString         m_nonce;
 
   private slots:
     void ProcessAudio(void);

@@ -14,7 +14,11 @@ class BonjourRegister;
 
 #define AIRPLAY_PORT_RANGE 100
 #define AIRPLAY_HARDWARE_ID_SIZE 6
-QString AirPlayHardwareId();
+QString     AirPlayHardwareId(void);
+QString     GenerateNonce(void);
+QByteArray  DigestMd5Response(QString response, QString option,
+                              QString nonce, QString password,
+                              QByteArray &auth);
 
 enum AirplayEvent
 {
@@ -104,6 +108,9 @@ class MTV_PUBLIC MythAirplayServer : public ServerPool
     QList<QTcpSocket*> m_sockets;
     QHash<QByteArray,AirplayConnection> m_connections;
     QString          m_pathname;
+
+    //Authentication
+    QString          m_nonce;
 };
 
 #endif // MYTHAIRPLAYSERVER_H

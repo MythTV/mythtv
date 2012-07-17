@@ -79,8 +79,7 @@ MythRAOPConnection::MythRAOPConnection(QObject *parent, QTcpSocket *socket,
     m_masterTimeStamp(0),  m_deviceTimeStamp(0),     m_networkLatency(0),
     m_clockSkew(0),
     m_audioTimer(NULL),
-    m_progressStart(0),    m_progressCurrent(0),     m_progressEnd(0),
-    m_authenticated(false)
+    m_progressStart(0),    m_progressCurrent(0),     m_progressEnd(0)
 {
 }
 
@@ -876,8 +875,6 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
         return;
     }
 
-    *m_textStream << "RTSP/1.0 200 OK\r\n";
-
     QString option = header[0].left(header[0].indexOf(" "));
 
     // process RTP-info field
@@ -903,6 +900,36 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
         LOG(VB_GENERAL, LOG_INFO, LOC + QString("RTP-Info: seq=%1 rtptime=%2")
             .arg(RTPseq).arg(RTPtimestamp));
     }
+
+    if (gCoreContext->GetNumSetting("AirPlayPasswordEnabled", false))
+    {
+        if (m_nonce.isEmpty())
+        {
+            m_nonce = GenerateNonce();
+        }
+        if (!tags.contains("Authorization"))
+        {
+            // 60 seconds to enter password.
+            m_watchdogTimer->start(60000);
+            FinishAuthenticationResponse(m_textStream, m_socket, tags["CSeq"]);
+            return;
+        }
+
+        QByteArray auth;
+        if (DigestMd5Response(tags["Authorization"], option, m_nonce,
+                              gCoreContext->GetSetting("AirPlayPassword"),
+                              auth) == auth)
+        {
+            LOG(VB_GENERAL, LOG_INFO, LOC + "RAOP client authenticated");
+        }
+        else
+        {
+            LOG(VB_GENERAL, LOG_INFO, LOC + "RAOP authentication failed");
+            FinishAuthenticationResponse(m_textStream, m_socket, tags["CSeq"]);
+            return;
+        }
+    }
+    *m_textStream << "RTSP/1.0 200 OK\r\n";
 
     if (option == "OPTIONS")
     {
@@ -1025,7 +1052,6 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
                     }
                     delete [] decryptedkey;
                 }
-
             }
             else if (line.startsWith("a=aesiv:"))
             {
@@ -1324,6 +1350,23 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
     FinishResponse(m_textStream, m_socket, option, tags["CSeq"]);
 }
 
+void MythRAOPConnection::FinishAuthenticationResponse(NetStream *stream,
+                                                      QTcpSocket *socket,
+                                                      QString &cseq)
+{
+    if (!stream)
+        return;
+    *stream << "RTSP/1.0 401 Unauthorised\r\n";
+    *stream << "Server: AirTunes/130.14\r\n";
+    *stream << "WWW-Authenticate: Digest realm=\"raop\", ";
+    *stream << "nonce=\"" + m_nonce + "\"\r\n";
+    *stream << "CSeq: " << cseq << "\r\n";
+    *stream << "\r\n";
+    stream->flush();
+    LOG(VB_GENERAL, LOG_DEBUG, LOC +
+        QString("Finished Authentication request %2, Send: %3")
+        .arg(cseq).arg(socket->flush()));
+}
 
 void MythRAOPConnection::FinishResponse(NetStream *stream, QTcpSocket *socket,
                                         QString &option, QString &cseq)

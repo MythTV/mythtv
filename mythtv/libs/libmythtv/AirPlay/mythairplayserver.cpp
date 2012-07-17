@@ -7,6 +7,7 @@
 #include <QNetworkInterface>
 #include <QCoreApplication>
 #include <QKeyEvent>
+#include <QCryptographicHash>
 
 #include "mthread.h"
 #include "mythdate.h"
@@ -30,6 +31,7 @@ QMutex*            MythAirplayServer::gMythAirplayServerMutex = new QMutex(QMute
 #define HTTP_STATUS_OK                  200
 #define HTTP_STATUS_SWITCHING_PROTOCOLS 101
 #define HTTP_STATUS_NOT_IMPLEMENTED     501
+#define HTTP_STATUS_UNAUTHORIZED        401
 
 #define AIRPLAY_SERVER_VERSION_STR ""
 #define SERVER_INFO  QString("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n"\
@@ -123,6 +125,72 @@ QString AirPlayHardwareId()
 
     gCoreContext->SaveSetting(key, id);
     return id;
+}
+
+QString GenerateNonce(void)
+{
+    int nonceParts[4];
+    QString nonce;
+    QTime time = QTime::currentTime();
+    qsrand((uint)time.msec());
+    nonceParts[0] = qrand();
+    nonceParts[1] = qrand();
+    nonceParts[2] = qrand();
+    nonceParts[3] = qrand();
+
+    nonce =  QString::number(nonceParts[0], 16).toUpper();
+    nonce += QString::number(nonceParts[1], 16).toUpper();
+    nonce += QString::number(nonceParts[2], 16).toUpper();
+    nonce += QString::number(nonceParts[3], 16).toUpper();
+    return nonce;
+}
+
+QByteArray DigestMd5Response(QString response, QString option,
+                             QString nonce, QString password,
+                             QByteArray &auth)
+{
+    int authStart       = response.indexOf("response=\"") + 10;
+    int authLength      = response.indexOf("\"", authStart) - authStart;
+    auth                = response.mid(authStart, authLength).toAscii();
+
+    int uriStart        = response.indexOf("uri=\"") + 5;
+    int uriLength       = response.indexOf("\"", uriStart) - uriStart;
+    QByteArray uri      = response.mid(uriStart, uriLength).toAscii();
+
+    int userStart       = response.indexOf("username=\"") + 10;
+    int userLength      = response.indexOf("\"", userStart) - userStart;
+    QByteArray user     = response.mid(userStart, userLength).toAscii();
+
+    int realmStart      = response.indexOf("realm=\"") + 7;
+    int realmLength     = response.indexOf("\"", realmStart) - realmStart;
+    QByteArray realm    = response.mid(realmStart, realmLength).toAscii();
+
+    QByteArray passwd   = password.toAscii();
+
+    QCryptographicHash hash(QCryptographicHash::Md5);
+    hash.addData(user);
+    hash.addData(":", 1);
+    hash.addData(realm);
+    hash.addData(":", 1);
+    hash.addData(passwd);
+    QByteArray ha1 = hash.result();
+    ha1 = ha1.toHex();
+
+    // calculate H(A2)
+    hash.reset();
+    hash.addData(option.toAscii());
+    hash.addData(":", 1);
+    hash.addData(uri);
+    QByteArray ha2 = hash.result().toHex();
+
+    // calculate response
+    hash.reset();
+    hash.addData(ha1);
+    hash.addData(":", 1);
+    hash.addData(nonce.toAscii());
+    hash.addData(":", 1);
+    hash.addData(ha2);
+    return hash.result().toHex();
 }
 
 class APHTTPRequest
@@ -465,9 +533,10 @@ QByteArray MythAirplayServer::StatusToString(int status)
 {
     switch (status)
     {
-        case HTTP_STATUS_OK: return "OK";
-        case HTTP_STATUS_SWITCHING_PROTOCOLS: return "Switching Protocols";
-        case HTTP_STATUS_NOT_IMPLEMENTED: return "Not Implemented";
+        case HTTP_STATUS_OK:                    return "OK";
+        case HTTP_STATUS_SWITCHING_PROTOCOLS:   return "Switching Protocols";
+        case HTTP_STATUS_NOT_IMPLEMENTED:       return "Not Implemented";
+        case HTTP_STATUS_UNAUTHORIZED:          return "Unauthorized";
     }
     return "";
 }
@@ -584,6 +653,38 @@ void MythAirplayServer::HandleResponse(APHTTPRequest *req,
     else
     {
         m_connections[session].was_playing = playing;
+    }
+
+    if (gCoreContext->GetNumSetting("AirPlayPasswordEnabled", false))
+    {
+        if (m_nonce.isEmpty())
+        {
+            m_nonce = GenerateNonce();
+        }
+        header = QString("WWW-Authenticate: Digest realm=\"AirPlay\", "
+                         "nonce=\"%1\"\r\n").arg(m_nonce).toAscii();
+        if (!req->GetHeaders().contains("Authorization"))
+        {
+            SendResponse(socket, HTTP_STATUS_UNAUTHORIZED,
+                         header, content_type, body);
+            return;
+        }
+
+        QByteArray auth;
+        if (DigestMd5Response(req->GetHeaders()["Authorization"], req->GetMethod(), m_nonce,
+                              gCoreContext->GetSetting("AirPlayPassword"),
+                              auth) == auth)
+        {
+            LOG(VB_GENERAL, LOG_INFO, LOC + "AirPlay client authenticated");
+        }
+        else
+        {
+            LOG(VB_GENERAL, LOG_INFO, LOC + "AirPlay authentication failed");
+            SendResponse(socket, HTTP_STATUS_UNAUTHORIZED,
+                         header, content_type, body);
+            return;
+        }
+        header = "";
     }
 
     if (req->GetURI() == "/server-info")
@@ -751,10 +852,12 @@ void MythAirplayServer::SendResponse(QTcpSocket *socket,
         reply.append(content_type);
         reply.append("Content-Length: ");
         reply.append(QString::number(body.size()));
-        reply.append("\r\n");
     }
-
-    reply.append("\r\n");
+    else
+    {
+        reply.append("Content-Length: 0");
+    }
+    reply.append("\r\n\r\n");
 
     if (body.size())
         reply.append(body);

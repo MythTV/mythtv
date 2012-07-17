@@ -175,7 +175,14 @@ bool MythRAOPDevice::RegisterForBonjour(void)
     txt.append(4); txt.append("ch=2");      // audio channels
     txt.append(5); txt.append("ss=16");     // sample size
     txt.append(8); txt.append("sr=44100");  // sample rate
-    txt.append(8); txt.append("pw=false");  // no password
+    if (gCoreContext->GetNumSetting("AirPlayPasswordEnabled"))
+    {
+        txt.append(7); txt.append("pw=true");
+    }
+    else
+    {
+        txt.append(8); txt.append("pw=false");
+    }
     txt.append(4); txt.append("vn=3");
     txt.append(9); txt.append("txtvers=1"); // TXT record version 1
     txt.append(8); txt.append("md=0,1,2");  // metadata-type: text, artwork, progress
