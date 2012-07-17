@@ -340,18 +340,8 @@ bool AVFormatWriter::WriteAudioFrame(unsigned char *buf, int fnum, int timecode)
 
     if (m_audioStream->codec->sample_fmt == AV_SAMPLE_FMT_FLT)
     {
-#if 1
-        int i = 0;
-        float f = 1.0f / ((1<<15) - 1);
-        float *out = m_audioFltBuf;
-        short *in = (short int *)buf;
-
-        for (; i < (m_audioFrameSize * m_audioChannels); i++)
-            *out++ = *in++ * f;
-#else
         AudioOutputUtil::toFloat(FORMAT_S16, (void *)m_audioFltBuf, (void *)buf,
                                  m_audioFrameSize * 2 * m_audioChannels);
-#endif
         m_audPicture->data[0] = (unsigned char *)m_audioFltBuf;
     }
     else
