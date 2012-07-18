@@ -229,7 +229,7 @@ void ServerPool::SelectDefaultListen(bool force)
                     LOG(VB_GENERAL, LOG_DEBUG,
                             QString("Adding link-local '%1' to address list.")
                                 .arg(ip.toString()));
-                    naList_4.append(*qnai);
+                    naList_6.append(*qnai);
                 }
 
                 else if (config_v6.isNull())
@@ -243,7 +243,7 @@ void ServerPool::SelectDefaultListen(bool force)
                             QString("Adding '%1' to address list.")
                                 .arg(PRETTYIP_(ip)));
 
-                    naList_4.append(*qnai);
+                    naList_6.append(*qnai);
                 }
 
                 else
