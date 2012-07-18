@@ -11,6 +11,8 @@
 #include <openssl/pem.h>
 #include <openssl/aes.h>
 
+#include "mythtvexp.h"
+
 extern "C" {
 #include "libavcodec/avcodec.h"
 #include "libavformat/avformat.h"
@@ -38,7 +40,7 @@ struct AudioPacket
     QList<AudioData> *data;
 };
 
-class MythRAOPConnection : public QObject
+class MTV_PUBLIC MythRAOPConnection : public QObject
 {
     Q_OBJECT
 
