@@ -366,39 +366,39 @@
     </message>
     <message>
         <location filename="../mythzoneminder/zmevents.cpp" line="179"/>
-        <location filename="../mythzoneminder/zmevents.cpp" line="353"/>
-        <location filename="../mythzoneminder/zmevents.cpp" line="368"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="354"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="369"/>
         <source>All Cameras</source>
         <translation>Todas las Cámaras</translation>
     </message>
     <message>
         <location filename="../mythzoneminder/zmevents.cpp" line="182"/>
-        <location filename="../mythzoneminder/zmevents.cpp" line="377"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="378"/>
         <source>All Dates</source>
         <translation>Todas las Fechas</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="453"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="454"/>
         <source>Refresh</source>
         <translation>Refrescar</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="454"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="455"/>
         <source>Change View</source>
         <translation>Cambiar Vista</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="455"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="456"/>
         <source>Delete All</source>
         <translation>Eliminar Todos</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="467"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="468"/>
         <source>Delete All Events?</source>
         <translation>¿Eliminar Todos los Eventos?</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="468"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="469"/>
         <source>Deleting %1 events in this view.</source>
         <translation>Eliminando %1 eventos de esta vista.</translation>
     </message>

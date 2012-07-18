@@ -529,7 +529,7 @@ MythMediaStatus MythCDROMLinux::checkMedia()
                 if (isMounted())
                     onDeviceMounted();
                 else if (!mount()) // onDeviceMounted() called as side-effect
-                    return setStatus(MEDIASTAT_ERROR, OpenedHere);
+                    return setStatus(MEDIASTAT_NOTMOUNTED, OpenedHere);
 
                 if (isMounted())
                 {

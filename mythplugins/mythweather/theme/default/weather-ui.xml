@@ -40,7 +40,7 @@
         </textarea>
 
         <textarea name="update_text" from="basetextarea">
-            <area>30,531,740,33</area>
+            <area>30,531,520,33</area>
             <align>vcenter</align>
         </textarea>
     </window>
@@ -147,15 +147,20 @@
         </imagetype>
 
         <textarea name="observation_time" from="basetextarea">
-            <area>30,531,740,33</area>
+            <area>30,531,520,33</area>
             <align>vcenter</align>
         </textarea>
 
         <textarea name="copyright" from="basetextarea">
-            <area>30,558,740,33</area>
+            <area>30,558,520,33</area>
             <align>left,vcenter</align>
             <font>basesmaller</font>
         </textarea>
+
+        <imagetype name="copyrightlogo">
+            <area>530,531,240,60</area>
+            <preserveaspect>true</preserveaspect>
+        </imagetype>
 
     </window>
 
@@ -262,10 +267,15 @@
         </textarea>
 
         <textarea name="copyright" from="basetextarea">
-            <area>30,558,740,33</area>
+            <area>30,558,520,33</area>
             <align>left,vcenter</align>
             <font>basesmaller</font>
         </textarea>
+        
+        <imagetype name="copyrightlogo">
+            <area>530,531,240,60</area>
+            <preserveaspect>true</preserveaspect>
+        </imagetype>
 
     </window>
 
@@ -421,10 +431,15 @@
         </textarea>
 
         <textarea name="copyright" from="basetextarea">
-            <area>30,558,740,33</area>
+            <area>30,558,520,33</area>
             <align>left,vcenter</align>
             <font>basesmaller</font>
         </textarea>
+        
+        <imagetype name="copyrightlogo">
+            <area>530,531,240,60</area>
+            <preserveaspect>true</preserveaspect>
+        </imagetype>
 
     </window>
 
@@ -441,10 +456,15 @@
         </imagetype>
 
         <textarea name="copyright" from="basetextarea">
-            <area>30,558,740,33</area>
+            <area>30,558,520,33</area>
             <align>left,vcenter</align>
             <font>basesmaller</font>
         </textarea>
+        
+        <imagetype name="copyrightlogo">
+            <area>530,531,240,60</area>
+            <preserveaspect>true</preserveaspect>
+        </imagetype>
 
     </window>
 
@@ -462,10 +482,15 @@
         </imagetype>
 
         <textarea name="copyright" from="basetextarea">
-            <area>30,558,740,33</area>
+            <area>30,558,520,33</area>
             <align>left,vcenter</align>
             <font>basesmaller</font>
         </textarea>
+
+        <imagetype name="copyrightlogo">
+            <area>530,531,240,60</area>
+            <preserveaspect>true</preserveaspect>
+        </imagetype>
 
     </window>
 
@@ -484,10 +509,15 @@
         </textarea>
 
         <textarea name="copyright" from="basetextarea">
-            <area>30,558,740,33</area>
+            <area>30,558,520,33</area>
             <align>left,vcenter</align>
             <font>basesmaller</font>
         </textarea>
+
+        <imagetype name="copyrightlogo">
+            <area>530,531,240,60</area>
+            <preserveaspect>true</preserveaspect>
+        </imagetype>
 
     </window>
 
@@ -642,12 +672,16 @@
             <position>531,482</position>
         </textarea>
 
-
         <textarea name="copyright" from="basetextarea">
-            <area>30,558,740,33</area>
+            <area>30,558,520,33</area>
             <align>left,vcenter</align>
             <font>basesmaller</font>
         </textarea>
+
+        <imagetype name="copyrightlogo">
+            <area>530,531,240,60</area>
+            <preserveaspect>true</preserveaspect>
+        </imagetype>
 
     </window>
 

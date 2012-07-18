@@ -1,6 +1,7 @@
 // QT headers
 #include <QString>
 #include <QStringList>
+#include <QCoreApplication>
 
 #include <mythdirs.h>
 #include "mythmainwindow.h"
@@ -12,19 +13,26 @@
 static QString getScreenTitle(const QString &screenName)
 {
     if (screenName == "Current Conditions")
-        return QObject::tr("Current Conditions");
+        return QCoreApplication::translate("(Weather Screens)", 
+                                           "Current Conditions");
     if (screenName == "Three Day Forecast")
-        return QObject::tr("Three Day Forecast");
+        return QCoreApplication::translate("(Weather Screens)",
+                                           "Three Day Forecast");
     if (screenName == "18 Hour Forecast")
-        return QObject::tr("18 Hour Forecast");
+        return QCoreApplication::translate("(Weather Screens)",
+                                           "18 Hour Forecast");
     if (screenName == "Severe Weather Alerts")
-        return QObject::tr("Severe Weather Alerts");
+        return QCoreApplication::translate("(Weather Screens)",
+                                           "Severe Weather Alerts");
     if (screenName == "Six Day Forecast")
-        return QObject::tr("Six Day Forecast");
+        return QCoreApplication::translate("(Weather Screens)",
+                                           "Six Day Forecast");
     if (screenName == "Static Map")
-        return QObject::tr("Static Map");
+        return QCoreApplication::translate("(Weather Screens)",
+                                           "Static Map");
     if (screenName == "Animated Map")
-        return QObject::tr("Animated Map");
+        return QCoreApplication::translate("(Weather Screens)",
+                                           "Animated Map");
 
     return screenName;
 }

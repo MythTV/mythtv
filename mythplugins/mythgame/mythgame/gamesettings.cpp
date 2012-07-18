@@ -39,43 +39,51 @@ const QString GetGameTypeExtensions(const QString GameType)
 static HostLineEdit *GameAllTreeLevels()
 {
     HostLineEdit *gc = new HostLineEdit("GameAllTreeLevels");
-    gc->setLabel(QObject::tr("Game display order"));
+    gc->setLabel(MythGameGeneralSettings::tr("Game display order"));
     gc->setValue("system gamename");
-    gc->setHelpText(QObject::tr("Order in which to sort the games "
-                    "- this is for all systems. Available choices: "
-                    "system, year, genre and gamename"));
+    gc->setHelpText(MythGameGeneralSettings::tr("Order in which to sort the "
+                                                "games - this is for all "
+                                                "systems. Available choices: "
+                                                "system, year, genre and "
+                                                "gamename"));
     return gc;
 }
 
 static HostLineEdit *GameFavTreeLevels()
 {
     HostLineEdit *gc = new HostLineEdit("GameFavTreeLevels");
-    gc->setLabel(QObject::tr("Favorite display order"));
+    gc->setLabel(MythGameGeneralSettings::tr("Favorite display order"));
     gc->setValue("gamename");
-    gc->setHelpText(QObject::tr("Order in which to sort the games "
-                    "marked as favorites "
-                    "- this is for all systems. Available choices: "
-                    "system, year, genre and gamename"));
+    gc->setHelpText(MythGameGeneralSettings::tr("Order in which to sort the "
+                                                "games marked as favorites "
+                                                "- this is for all systems. "
+                                                "Available choices: system, "
+                                                "year, genre and gamename"));
     return gc;
 }
 
 static HostCheckBox *GameDeepScan()
 {
     HostCheckBox *gc = new HostCheckBox("GameDeepScan");
-    gc->setLabel(QObject::tr("Indepth Game Scan"));
-    gc->setHelpText(QObject::tr("Enabling this causes a game scan to gather CRC values and attempt to find out more"
-                    " detailed information about the game: NOTE this can greatly increase the time a game scan takes"
-                    " based on the amount of games scanned."));
+    gc->setLabel(MythGameGeneralSettings::tr("Indepth Game Scan"));
+    gc->setHelpText(
+        MythGameGeneralSettings::tr("Enabling this causes a game scan to "
+                                    "gather CRC values and attempt to find out "
+                                    "more detailed information about the game: "
+                                    "NOTE this can greatly increase the time a "
+                                    "game scan takes based on the amount of "
+                                    "games scanned."));
     return gc;
 }
 
 static HostCheckBox *GameRemovalPrompt()
 {
     HostCheckBox *gc = new HostCheckBox("GameRemovalPrompt");
-    gc->setLabel(QObject::tr("Prompt for removal of deleted ROM(s)"));
-    gc->setHelpText(QObject::tr("This enables a prompt for removing"
-                                " deleted ROMs from the database during a "
-                                " game scan"));
+    gc->setLabel(MythGameGeneralSettings::tr("Prompt for removal of deleted ROM(s)"));
+    gc->setHelpText(MythGameGeneralSettings::tr("This enables a prompt for "
+                                                "removing deleted ROMs from "
+                                                "the database during a game "
+                                                "scan"));
 
     return gc;
 }
@@ -83,54 +91,67 @@ static HostCheckBox *GameRemovalPrompt()
 static HostCheckBox *GameShowFileNames()
 {
     HostCheckBox *gc = new HostCheckBox("GameShowFileNames");
-    gc->setLabel(QObject::tr("Display Files Names in Game Tree"));
-    gc->setHelpText(QObject::tr("Enabling this causes the filenames to be displayed in the game tree rather than the trimmed/looked up game name"));
+    gc->setLabel(MythGameGeneralSettings::tr("Display Files Names in Game "
+                                             "Tree"));
+    gc->setHelpText(MythGameGeneralSettings::tr("Enabling this causes the "
+                                                "filenames to be displayed in "
+                                                "the game tree rather than the "
+                                                "trimmed/looked up game name"));
     return gc;
 }
 
 static HostCheckBox *GameTreeView()
 {
     HostCheckBox *gc = new HostCheckBox("GameTreeView");
-    gc->setLabel(QObject::tr("Hash filenames in display"));
+    gc->setLabel(MythGameGeneralSettings::tr("Hash filenames in display"));
     gc->setValue(0);
-    gc->setHelpText(QObject::tr("Enable hashing of names in the display tree. This can make navigating long lists a little faster"));
+    gc->setHelpText(MythGameGeneralSettings::tr("Enable hashing of names in "
+                                                "the display tree. This can "
+                                                "make navigating long lists "
+                                                "a little faster"));
     return gc;
 }
 
 static HostLineEdit *GetScreenshotDir()
 {
     HostLineEdit *gc = new HostLineEdit("mythgame.screenshotdir");
-    gc->setLabel(QObject::tr("Directory where Game Screenshots are stored"));
+    gc->setLabel(MythGameGeneralSettings::tr("Directory where Game Screenshots "
+                                             "are stored"));
     gc->setValue(GetConfDir() + "/MythGame/Screenshots");
-    gc->setHelpText(QObject::tr("This directory will be the default browse "
-                    "location when assigning screenshots."));
+    gc->setHelpText(MythGameGeneralSettings::tr("This directory will be the "
+                                                "default browse location when "
+                                                "assigning screenshots."));
     return gc;
 }
 
 static HostLineEdit *GetFanartDir()
 {
     HostLineEdit *gc = new HostLineEdit("mythgame.fanartdir");
-    gc->setLabel(QObject::tr("Directory where Game Fanart is stored"));
+    gc->setLabel(MythGameGeneralSettings::tr("Directory where Game Fanart is "
+                                             "stored"));
     gc->setValue(GetConfDir() + "/MythGame/Fanart");
-    gc->setHelpText(QObject::tr("This directory will be the default browse "
-                    "location when assigning fanart."));
+    gc->setHelpText(MythGameGeneralSettings::tr("This directory will be the "
+                                                "default browse location when "
+                                                "assigning fanart."));
     return gc;
 }
 
 static HostLineEdit *GetBoxartDir()
 {
     HostLineEdit *gc = new HostLineEdit("mythgame.boxartdir");
-    gc->setLabel(QObject::tr("Directory where Game Boxart is stored"));
+    gc->setLabel(MythGameGeneralSettings::tr("Directory where Game Boxart is "
+                                             "stored"));
     gc->setValue(GetConfDir() + "/MythGame/Boxart");
-    gc->setHelpText(QObject::tr("This directory will be the default browse "
-                    "location when assigning boxart."));
+    gc->setHelpText(MythGameGeneralSettings::tr("This directory will be the "
+                                                "default browse location when "
+                                                "assigning boxart."));
     return gc;
 }
 
 MythGameGeneralSettings::MythGameGeneralSettings()
 {
     VerticalConfigurationGroup *general = new VerticalConfigurationGroup(false);
-    general->setLabel(QObject::tr("MythGame Settings -- General"));
+    general->setLabel(tr("MythGame Settings -- General"));
     general->addChild(GameAllTreeLevels());
     general->addChild(GameFavTreeLevels());
     general->addChild(GameDeepScan());
@@ -174,8 +195,12 @@ class AllowMultipleRoms : public CheckBoxSetting, public GameDBStorage
     AllowMultipleRoms(const MythGamePlayerSettings &parent) :
         CheckBoxSetting(this), GameDBStorage(this, parent, "spandisks")
     {
-        setLabel(QObject::tr("Allow games to span multiple ROMs/disks"));
-        setHelpText(QObject::tr("This setting means that we will look for items like game.1.rom, game.2.rom and consider them a single game."));
+        setLabel(MythGamePlayerSettings::tr("Allow games to span multiple "
+                                            "ROMs/disks"));
+        setHelpText(MythGamePlayerSettings::tr("This setting means that we "
+                                               "will look for items like "
+                                               "game.1.rom, game.2.rom and "
+                                               "consider them a single game."));
     };
 };
 
@@ -185,8 +210,14 @@ class Command : public LineEditSetting, public GameDBStorage
     Command(const MythGamePlayerSettings &parent) :
         LineEditSetting(this), GameDBStorage(this, parent, "commandline")
     {
-        setLabel(QObject::tr("Command"));
-        setHelpText(QObject::tr("Binary and optional parameters. Multiple commands separated with \';\' . Use \%s for the ROM name. \%d1, \%d2, \%d3 and \%d4 represent disks in a multidisk/game. %s auto appended if not specified"));
+        setLabel(MythGamePlayerSettings::tr("Command"));
+        setHelpText(
+            MythGamePlayerSettings::tr("Binary and optional parameters. "
+                                       "Multiple commands separated with "
+                                       "\';\' . Use \%s for the ROM name. "
+                                       "\%d1, \%d2, \%d3 and \%d4 represent "
+                                       "disks in a multidisk/game. %s auto "
+                                       "appended if not specified"));
     };
 };
 
@@ -196,7 +227,8 @@ class GameType : public ComboBoxSetting, public GameDBStorage
     GameType(const MythGamePlayerSettings &parent) :
         ComboBoxSetting(this), GameDBStorage(this, parent, "gametype")
     {
-        setLabel(QObject::tr("Type"));
+        //: Game type
+        setLabel(MythGamePlayerSettings::tr("Type"));
         for (int i = 0; i < MAX_GAME_TYPES; i++)
         {
             addSelection(QCoreApplication::translate("(GameTypes)", 
@@ -204,7 +236,10 @@ class GameType : public ComboBoxSetting, public GameDBStorage
                          GameTypeList[i].idStr);
         }
         setValue(0);
-        setHelpText(QObject::tr("Type of Game/Emulator. Mostly for informational purposes and has little effect on the function of your system."));
+        setHelpText(MythGamePlayerSettings::tr("Type of Game/Emulator. Mostly "
+                                               "for informational purposes and "
+                                               "has little effect on the "
+                                               "function of your system."));
     };
 };
 
@@ -214,8 +249,9 @@ class RomPath : public LineEditSetting, public GameDBStorage
     RomPath(const MythGamePlayerSettings &parent) :
         LineEditSetting(this), GameDBStorage(this, parent, "rompath")
     {
-        setLabel(QObject::tr("ROM Path"));
-        setHelpText(QObject::tr("Location of the ROM files for this emulator"));
+        setLabel(MythGamePlayerSettings::tr("ROM Path"));
+        setHelpText(MythGamePlayerSettings::tr("Location of the ROM files for "
+                                               "this emulator"));
     };
 };
 
@@ -225,8 +261,10 @@ class WorkingDirPath : public LineEditSetting, public GameDBStorage
     WorkingDirPath(const MythGamePlayerSettings &parent) :
         LineEditSetting(this), GameDBStorage(this, parent, "workingpath")
     {
-        setLabel(QObject::tr("Working Directory"));
-        setHelpText(QObject::tr("Directory to change to before launching emulator. Blank is usually fine"));
+        setLabel(MythGamePlayerSettings::tr("Working Directory"));
+        setHelpText(MythGamePlayerSettings::tr("Directory to change to before "
+                                               "launching emulator. Blank is "
+                                               "usually fine"));
     };
 };
 
@@ -236,8 +274,13 @@ class Extensions : public LineEditSetting, public GameDBStorage
     Extensions(const MythGamePlayerSettings &parent) :
         LineEditSetting(this), GameDBStorage(this, parent, "extensions")
     {
-        setLabel(QObject::tr("File Extensions"));
-        setHelpText(QObject::tr("A comma separated list of all file extensions for this emulator. Blank means any file under ROM PATH is considered to be used with this emulator"));
+        setLabel(MythGamePlayerSettings::tr("File Extensions"));
+        setHelpText(MythGamePlayerSettings::tr("A comma separated list of all "
+                                               "file extensions for this "
+                                               "emulator. Blank means any file "
+                                               "under ROM PATH is considered "
+                                               "to be used with this "
+                                               "emulator"));
     };
 };
 
@@ -301,7 +344,7 @@ DialogCode MythGamePlayerEditor::exec(void)
 void MythGamePlayerEditor::Load(void)
 {
     listbox->clearSelections();
-    listbox->addSelection(QObject::tr("(New Game Player)"), "0");
+    listbox->addSelection(tr("(New Game Player)"), "0");
     MythGamePlayerSettings::fillSelections(listbox);
 }
 

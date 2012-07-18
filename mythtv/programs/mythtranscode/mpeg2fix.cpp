@@ -1201,7 +1201,7 @@ int MPEG2fixup::BuildFrame(AVPacket *pkt, QString fname)
     return 0;
 }
 
-#define MAX_FRAMES 2000
+#define MAX_FRAMES 20000
 MPEG2frame *MPEG2fixup::GetPoolFrame(AVPacket *pkt)
 {
     MPEG2frame *f;
@@ -1271,12 +1271,16 @@ int MPEG2fixup::GetFrame(AVPacket *pkt)
                 {
                     LOG(VB_GENERAL, LOG_ERR,
                         "Found end of file without finding any frames");
+                    av_free_packet(pkt);
                     return 1;
                 }
 
                 MPEG2frame *tmpFrame = GetPoolFrame(&vFrame.last()->pkt);
                 if (tmpFrame == NULL)
+                {
+                    av_free_packet(pkt);
                     return 1;
+                }
 
                 vFrame.append(tmpFrame);
                 real_file_end = true;
@@ -1316,7 +1320,10 @@ int MPEG2fixup::GetFrame(AVPacket *pkt)
 
         MPEG2frame *tmpFrame = GetPoolFrame(pkt);
         if (tmpFrame == NULL)
+        {
+            av_free_packet(pkt);
             return 1;
+        }
 
         switch (inputFC->streams[pkt->stream_index]->codec->codec_type)
         {

@@ -17,7 +17,8 @@
 #define LOC QString("RAOP Conn: ")
 #define MAX_PACKET_SIZE  2048
 
-RSA* MythRAOPConnection::g_rsa = NULL;
+RSA *MythRAOPConnection::g_rsa = NULL;
+QString MythRAOPConnection::g_rsaLastError;
 
 // RAOP RTP packet type
 #define TIMING_REQUEST   0x52
@@ -62,6 +63,7 @@ MythRAOPConnection::MythRAOPConnection(QObject *parent, QTcpSocket *socket,
     m_dataSocket(NULL),                              m_dataPort(port),
     m_clientControlSocket(NULL),                     m_clientControlPort(0),
     m_clientTimingSocket(NULL),                      m_clientTimingPort(0),
+    m_eventServer(NULL),
     m_audio(NULL),         m_codec(NULL),            m_codeccontext(NULL),
     m_channels(2),         m_sampleSize(16),         m_frameRate(44100),
     m_framesPerPacket(352),m_dequeueAudioTimer(NULL),
@@ -83,6 +85,41 @@ MythRAOPConnection::MythRAOPConnection(QObject *parent, QTcpSocket *socket,
 
 MythRAOPConnection::~MythRAOPConnection()
 {
+    CleanUp();
+
+    foreach (QTcpSocket *client, m_eventClients)
+    {
+        client->close();
+        client->deleteLater();
+    }
+    m_eventClients.clear();
+
+    if (m_eventServer)
+    {
+        m_eventServer->disconnect();
+        m_eventServer->close();
+        m_eventServer->deleteLater();
+        m_eventServer = NULL;
+    }
+
+    // delete main socket
+    if (m_socket)
+    {
+        m_socket->disconnect();
+        m_socket->close();
+        m_socket->deleteLater();
+        m_socket = NULL;
+    }
+
+    if (m_textStream)
+    {
+        delete m_textStream;
+        m_textStream = NULL;
+    }
+}
+
+void MythRAOPConnection::CleanUp(void)
+{
     // delete audio timer
     StopAudioTimer();
 
@@ -91,19 +128,22 @@ MythRAOPConnection::~MythRAOPConnection()
     {
         m_watchdogTimer->stop();
         delete m_watchdogTimer;
+        m_watchdogTimer = NULL;
     }
 
     if (m_dequeueAudioTimer)
     {
         m_dequeueAudioTimer->stop();
         delete m_dequeueAudioTimer;
+        m_dequeueAudioTimer = NULL;
     }
 
-    // delete main socket
-    if (m_socket)
+    if (m_clientTimingSocket)
     {
-        m_socket->close();
-        m_socket->deleteLater();
+        m_clientTimingSocket->disconnect();
+        m_clientTimingSocket->close();
+        delete m_clientTimingSocket;
+        m_clientTimingSocket = NULL;
     }
 
     // delete data socket
@@ -112,6 +152,7 @@ MythRAOPConnection::~MythRAOPConnection()
         m_dataSocket->disconnect();
         m_dataSocket->close();
         m_dataSocket->deleteLater();
+        m_dataSocket = NULL;
     }
 
     // client control socket
@@ -120,6 +161,7 @@ MythRAOPConnection::~MythRAOPConnection()
         m_clientControlSocket->disconnect();
         m_clientControlSocket->close();
         m_clientControlSocket->deleteLater();
+        m_clientControlSocket = NULL;
     }
 
     // close audio decoder
@@ -299,8 +341,8 @@ void MythRAOPConnection::ProcessSync(const QByteArray &buf)
 {
     bool    first       = (uint8_t)buf[0] == 0x90; // First sync is 0x90,0x55
     const char *req     = buf.constData();
-    uint64_t current_ts = qFromBigEndian(*(uint32_t*)(req + 4));
-    uint64_t next_ts    = qFromBigEndian(*(uint32_t*)(req + 16));
+    uint64_t current_ts = qFromBigEndian(*(uint32_t *)(req + 4));
+    uint64_t next_ts    = qFromBigEndian(*(uint32_t *)(req + 16));
 
     uint64_t current    = framesToMs(current_ts);
     uint64_t next       = framesToMs(next_ts);
@@ -478,8 +520,8 @@ void MythRAOPConnection::ProcessTimeResponse(const QByteArray &buf)
     timeval t1, t2;
     const char *req = buf.constData();
 
-    t1.tv_sec  = qFromBigEndian(*(uint32_t*)(req + 8));
-    t1.tv_usec = qFromBigEndian(*(uint32_t*)(req + 12));
+    t1.tv_sec  = qFromBigEndian(*(uint32_t *)(req + 8));
+    t1.tv_usec = qFromBigEndian(*(uint32_t *)(req + 12));
 
     gettimeofday(&t2, NULL);
     uint64_t time1, time2;
@@ -493,8 +535,8 @@ void MythRAOPConnection::ProcessTimeResponse(const QByteArray &buf)
 
     // now calculate the time difference between the client and us.
     // this is NTP time, where sec is in seconds, and ticks is in 1/2^32s
-    uint32_t sec    = qFromBigEndian(*(uint32_t*)(req + 24));
-    uint32_t ticks  = qFromBigEndian(*(uint32_t*)(req + 28));
+    uint32_t sec    = qFromBigEndian(*(uint32_t *)(req + 24));
+    uint32_t ticks  = qFromBigEndian(*(uint32_t *)(req + 28));
     // convert ticks into ms
     int64_t  master = NTPToLocal(sec, ticks);
     m_clockSkew     = master - time2;
@@ -534,7 +576,7 @@ bool MythRAOPConnection::GetPacketType(const QByteArray &buf, uint8_t &type,
         ptr += 4;
     }
     seq  = qFromBigEndian(*(uint16_t *)(ptr + 2));
-    timestamp = qFromBigEndian(*(uint32_t*)(ptr + 4));
+    timestamp = qFromBigEndian(*(uint32_t *)(ptr + 4));
     return true;
 }
 
@@ -560,7 +602,7 @@ uint32_t MythRAOPConnection::decodeAudioPacket(uint8_t type,
     unsigned char iv[16];
     unsigned char decrypted_data[MAX_PACKET_SIZE];
     memcpy(iv, m_AESIV.constData(), sizeof(iv));
-    AES_cbc_encrypt((const unsigned char*)data_in,
+    AES_cbc_encrypt((const unsigned char *)data_in,
                     decrypted_data, aeslen,
                     &m_aesKey, iv, AES_DECRYPT);
     memcpy(decrypted_data + aeslen, data_in + aeslen, len - aeslen);
@@ -735,13 +777,9 @@ void MythRAOPConnection::timeout(void)
 
 void MythRAOPConnection::audioRetry(void)
 {
-    if (!m_audio)
+    if (!m_audio && OpenAudioDevice())
     {
-        MythRAOPDevice* p = (MythRAOPDevice*)parent();
-        if (p && p->NextInAudioQueue(this) && OpenAudioDevice())
-        {
-            CreateDecoder();
-        }
+        CreateDecoder();
     }
 
     if (m_audio && m_codec && m_codeccontext)
@@ -778,7 +816,9 @@ void MythRAOPConnection::readClient(void)
             line = stream.readLine();
             if (line.size() == 0)
                 break;
-            LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("Header = %1").arg(line));
+            LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("Header(%1) = %2")
+                .arg(m_socket->peerAddress().toString())
+                .arg(line));
             m_incomingHeaders.append(line);
             if (line.contains("Content-Length:"))
             {
@@ -835,8 +875,6 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
         return;
     }
 
-    *m_textStream << "RTSP/1.0 200 OK\r\n";
-
     QString option = header[0].left(header[0].indexOf(" "));
 
     // process RTP-info field
@@ -862,6 +900,36 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
         LOG(VB_GENERAL, LOG_INFO, LOC + QString("RTP-Info: seq=%1 rtptime=%2")
             .arg(RTPseq).arg(RTPtimestamp));
     }
+
+    if (gCoreContext->GetNumSetting("AirPlayPasswordEnabled", false))
+    {
+        if (m_nonce.isEmpty())
+        {
+            m_nonce = GenerateNonce();
+        }
+        if (!tags.contains("Authorization"))
+        {
+            // 60 seconds to enter password.
+            m_watchdogTimer->start(60000);
+            FinishAuthenticationResponse(m_textStream, m_socket, tags["CSeq"]);
+            return;
+        }
+
+        QByteArray auth;
+        if (DigestMd5Response(tags["Authorization"], option, m_nonce,
+                              gCoreContext->GetSetting("AirPlayPassword"),
+                              auth) == auth)
+        {
+            LOG(VB_GENERAL, LOG_INFO, LOC + "RAOP client authenticated");
+        }
+        else
+        {
+            LOG(VB_GENERAL, LOG_INFO, LOC + "RAOP authentication failed");
+            FinishAuthenticationResponse(m_textStream, m_socket, tags["CSeq"]);
+            return;
+        }
+    }
+    *m_textStream << "RTSP/1.0 200 OK\r\n";
 
     if (option == "OPTIONS")
     {
@@ -928,12 +996,12 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
 
             LOG(VB_GENERAL, LOG_DEBUG, LOC +
                 QString("Full base64 response: '%1' size %2")
-                .arg(QByteArray((const char*)from, i).toBase64().constData())
+                .arg(QByteArray((const char *)from, i).toBase64().constData())
                 .arg(i));
 
             RSA_private_encrypt(i, from, to, LoadKey(), RSA_PKCS1_PADDING);
 
-            QByteArray base64 = QByteArray((const char*)to, tosize).toBase64();
+            QByteArray base64 = QByteArray((const char *)to, tosize).toBase64();
             delete[] to;
 
             for (int pos = base64.size() - 1; pos > 0; pos--)
@@ -947,7 +1015,6 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
                 .arg(tosize).arg(base64.size()).arg(base64.constData()));
             *m_textStream << base64.trimmed() << "\r\n";
         }
-        StartResponse(m_textStream, option, tags["CSeq"]);
         *m_textStream << "Public: ANNOUNCE, SETUP, RECORD, PAUSE, FLUSH, "
             "TEARDOWN, OPTIONS, GET_PARAMETER, SET_PARAMETER, POST, GET\r\n";
     }
@@ -969,13 +1036,13 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
                     int size = sizeof(char) * RSA_size(LoadKey());
                     char *decryptedkey = new char[size];
                     if (RSA_private_decrypt(decodedkey.size(),
-                                            (const unsigned char*)decodedkey.constData(),
-                                            (unsigned char*)decryptedkey,
+                                            (const unsigned char *)decodedkey.constData(),
+                                            (unsigned char *)decryptedkey,
                                             LoadKey(), RSA_PKCS1_OAEP_PADDING))
                     {
                         LOG(VB_GENERAL, LOG_DEBUG, LOC +
                             "Successfully decrypted AES key from RSA.");
-                        AES_set_decrypt_key((const unsigned char*)decryptedkey,
+                        AES_set_decrypt_key((const unsigned char *)decryptedkey,
                                             128, &m_aesKey);
                     }
                     else
@@ -985,7 +1052,6 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
                     }
                     delete [] decryptedkey;
                 }
-
             }
             else if (line.startsWith("a=aesiv:"))
             {
@@ -1012,16 +1078,20 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
                 m_frameRate       = m_audioFormat[11];
             }
         }
-        StartResponse(m_textStream, option, tags["CSeq"]);
     }
     else if (option == "SETUP")
     {
         if (tags.contains("Transport"))
         {
+            // New client is trying to play audio, disconnect all the other clients
+            ((MythRAOPDevice*)parent())->DeleteAllClients(this);
+            gCoreContext->WantingPlayback(parent());
+
             int control_port = 0;
             int timing_port = 0;
             QString data = tags["Transport"];
             QStringList items = data.split(";");
+            bool events = false;
 
             foreach (QString item, items)
             {
@@ -1029,6 +1099,8 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
                     control_port = item.mid(item.indexOf("=") + 1).trimmed().toUInt();
                 else if (item.startsWith("timing_port"))
                     timing_port  = item.mid(item.indexOf("=") + 1).trimmed().toUInt();
+                else if (item.startsWith("events"))
+                    events = true;
             }
 
             LOG(VB_GENERAL, LOG_INFO, LOC +
@@ -1099,6 +1171,42 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
                     this,
                     SLOT(udpDataReady(QByteArray, QHostAddress, quint16)));
 
+            if (m_eventServer)
+            {
+                // Should never get here, but just in case
+                QTcpSocket *client;
+                foreach (client, m_eventClients)
+                {
+                    client->disconnect();
+                    client->abort();
+                    delete client;
+                }
+                m_eventClients.clear();
+                m_eventServer->disconnect();
+                m_eventServer->close();
+                delete m_eventServer;
+                m_eventServer = NULL;
+            }
+
+            if (events)
+            {
+                m_eventServer = new ServerPool(this);
+                m_eventPort = m_eventServer->tryListeningPort(timing_port,
+                                                              RAOP_PORT_RANGE);
+                if (m_eventPort < 0)
+                {
+                    LOG(VB_GENERAL, LOG_ERR, LOC +
+                        "Failed to find a port for RAOP events server.");
+                }
+                else
+                {
+                    LOG(VB_GENERAL, LOG_INFO, LOC +
+                        QString("Listening for RAOP events on port %1").arg(m_eventPort));
+                    connect(m_eventServer, SIGNAL(newConnection(QTcpSocket *)),
+                            this, SLOT(newEventClient(QTcpSocket *)));
+                }
+            }
+
             if (OpenAudioDevice())
                 CreateDecoder();
 
@@ -1119,6 +1227,10 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
                 {
                     newdata += "timing_port=" + QString::number(timingbind_port);
                 }
+                else if (item.startsWith("events"))
+                {
+                    newdata += "event_port=" + QString::number(m_eventPort);
+                }
                 else
                 {
                     newdata += item;
@@ -1131,9 +1243,9 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
             }
             newdata += "server_port=" + QString::number(m_dataPort);
 
-            StartResponse(m_textStream, option, tags["CSeq"]);
-            *m_textStream << "Transport: " << newdata;
-            *m_textStream << "\r\nSession: MYTHTV\r\n";
+            *m_textStream << "Transport: " << newdata << "\r\n";
+            *m_textStream << "Session: 1\r\n";
+            *m_textStream << "Audio-Jack-Status: connected\r\n";
         }
         else
         {
@@ -1150,7 +1262,6 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
         }
         // Ask for master clock value to determine time skew and average network latency
         SendTimeRequest();
-        StartResponse(m_textStream, option, tags["CSeq"]);
     }
     else if (option == "FLUSH")
     {
@@ -1166,7 +1277,6 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
         *m_textStream << "RTP-Info: rtptime=" << QString::number(timestamp);
         m_streamingStarted = false;
         ResetAudio();
-        StartResponse(m_textStream, option, tags["CSeq"]);
     }
     else if (option == "SET_PARAMETER")
     {
@@ -1226,37 +1336,45 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
                     .arg(map["asal"]).arg(map["asfm"]));
             }
         }
-        StartResponse(m_textStream, option, tags["CSeq"]);
     }
     else if (option == "TEARDOWN")
     {
-        StartResponse(m_textStream, option, tags["CSeq"]);
-        *m_textStream << "Connection: close\r\n";
+        m_socket->disconnectFromHost();
+        return;
     }
     else
     {
         LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("Command not handled: %1")
             .arg(option));
-        StartResponse(m_textStream, option, tags["CSeq"]);
     }
     FinishResponse(m_textStream, m_socket, option, tags["CSeq"]);
 }
 
-
-void MythRAOPConnection::StartResponse(NetStream *stream,
-                                       QString &option, QString &cseq)
+void MythRAOPConnection::FinishAuthenticationResponse(NetStream *stream,
+                                                      QTcpSocket *socket,
+                                                      QString &cseq)
 {
     if (!stream)
         return;
-    LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("%1 sequence %2")
-        .arg(option).arg(cseq));
-    *stream << "Audio-Jack-Status: connected; type=analog\r\n";
+    *stream << "RTSP/1.0 401 Unauthorised\r\n";
+    *stream << "Server: AirTunes/130.14\r\n";
+    *stream << "WWW-Authenticate: Digest realm=\"raop\", ";
+    *stream << "nonce=\"" + m_nonce + "\"\r\n";
     *stream << "CSeq: " << cseq << "\r\n";
+    *stream << "\r\n";
+    stream->flush();
+    LOG(VB_GENERAL, LOG_DEBUG, LOC +
+        QString("Finished Authentication request %2, Send: %3")
+        .arg(cseq).arg(socket->flush()));
 }
 
 void MythRAOPConnection::FinishResponse(NetStream *stream, QTcpSocket *socket,
                                         QString &option, QString &cseq)
 {
+    if (!stream)
+        return;
+    *stream << "Server: AirTunes/130.14\r\n";
+    *stream << "CSeq: " << cseq << "\r\n";
     *stream << "\r\n";
     stream->flush();
     LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("Finished %1 %2 , Send: %3")
@@ -1268,7 +1386,7 @@ void MythRAOPConnection::FinishResponse(NetStream *stream, QTcpSocket *socket,
  * The RSA key is resident in memory for the entire duration of the application
  * as such RSA_free is never called on it.
  */
-RSA* MythRAOPConnection::LoadKey(void)
+RSA *MythRAOPConnection::LoadKey(void)
 {
     static QMutex lock;
     QMutexLocker locker(&lock);
@@ -1277,13 +1395,13 @@ RSA* MythRAOPConnection::LoadKey(void)
         return g_rsa;
 
     QString sName( "/RAOPKey.rsa" );
-    FILE * file = fopen(GetConfDir().toUtf8() + sName.toUtf8(), "rb");
+    FILE *file = fopen(GetConfDir().toUtf8() + sName.toUtf8(), "rb");
 
     if ( !file )
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Failed to read key from: %1")
-            .arg(GetConfDir() + sName));
+        g_rsaLastError = QObject::tr("Failed to read key from: %1").arg(GetConfDir() + sName);
         g_rsa = NULL;
+        LOG(VB_GENERAL, LOG_ERR, LOC + g_rsaLastError);
         return NULL;
     }
 
@@ -1292,13 +1410,15 @@ RSA* MythRAOPConnection::LoadKey(void)
 
     if (g_rsa)
     {
+        g_rsaLastError = "";
         LOG(VB_GENERAL, LOG_DEBUG, LOC +
             QString("Loaded RSA private key (%1)").arg(RSA_check_key(g_rsa)));
         return g_rsa;
     }
 
+    g_rsaLastError = QObject::tr("Failed to load RSA private key.");
     g_rsa = NULL;
-    LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to load RSA private key.");
+    LOG(VB_GENERAL, LOG_ERR, LOC + g_rsaLastError);
     return NULL;
 }
 
@@ -1425,7 +1545,7 @@ bool MythRAOPConnection::CreateDecoder(void)
     m_codeccontext = avcodec_alloc_context3(m_codec);
     if (m_codeccontext)
     {
-        unsigned char* extradata = new unsigned char[36];
+        unsigned char *extradata = new unsigned char[36];
         memset(extradata, 0, 36);
         if (m_audioFormat.size() < 12)
         {
@@ -1555,4 +1675,24 @@ int64_t MythRAOPConnection::AudioCardLatency(void)
     usleep(AUDIOCARD_BUFFER * 1000);
     uint64_t audiots = m_audio->GetAudiotime();
     return (int64_t)timestamp - (int64_t)audiots;
+}
+
+void MythRAOPConnection::newEventClient(QTcpSocket *client)
+{
+    LOG(VB_GENERAL, LOG_INFO, LOC +
+        QString("New connection from %1:%2 for RAOP events server.")
+        .arg(client->peerAddress().toString()).arg(client->peerPort()));
+
+    m_eventClients.append(client);
+    connect(client, SIGNAL(disconnected()), this, SLOT(deleteEventClient()));
+    return;
+}
+
+void MythRAOPConnection::deleteEventClient(void)
+{
+    QTcpSocket *client = static_cast<QTcpSocket *>(sender());
+
+    LOG(VB_GENERAL, LOG_DEBUG, LOC +
+        QString("%1:%2 disconnected from RAOP events server.")
+        .arg(client->peerAddress().toString()).arg(client->peerPort()));
 }

@@ -45,8 +45,9 @@ class MythScheduler;
  *   It also contains support for database error printing, and
  *   database message logging.
  */
-class MBASE_PUBLIC MythCoreContext : public MythObservable, public MythSocketCBs
+class MBASE_PUBLIC MythCoreContext : public QObject, public MythObservable, public MythSocketCBs
 {
+    Q_OBJECT
   public:
     MythCoreContext(const QString &binversion, QObject *eventHandler);
     virtual ~MythCoreContext();
@@ -167,6 +168,28 @@ class MBASE_PUBLIC MythCoreContext : public MythObservable, public MythSocketCBs
     QString GetLanguage(void);
     QString GetLanguageAndVariant(void);
     void ResetLanguage(void);
+
+    void RegisterForPlayback(QObject *sender, const char *method);
+    void UnregisterForPlayback(QObject *sender);
+    void WantingPlayback(QObject *sender);
+
+    // signal related methods
+    void WaitUntilSignals(const char *signal1, ...);
+    void emitTVPlaybackStarted(void)            { emit TVPlaybackStarted(); }
+    void emitTVPlaybackStopped(void)            { emit TVPlaybackStopped(); }
+    void emitTVPlaybackSought(qint64 position)  { emit TVPlaybackSought(position); }
+    void emitTVPlaybackPaused(void)             { emit TVPlaybackPaused(); }
+    void emitTVPlaybackUnpaused(void)           { emit TVPlaybackUnpaused(); }
+    void emitTVPlaybackAborted(void)            { emit TVPlaybackAborted(); }
+
+  signals:
+    void TVPlaybackStarted(void);
+    void TVPlaybackStopped(void);
+    void TVPlaybackSought(qint64 position);
+    void TVPlaybackPaused(void);
+    void TVPlaybackUnpaused(void);
+    void TVPlaybackAborted(void);
+    void TVPlaybackAboutToStart(void);
 
   private:
     MythCoreContextPrivate *d;

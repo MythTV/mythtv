@@ -9,7 +9,7 @@
 #include <QWaitCondition>
 #include <QMutex>
 #include <QMutexLocker>
-#include <QByteArray>
+#include <QtAlgorithms>
 
 #include "mythconfig.h"
 
@@ -39,25 +39,69 @@ using namespace std;
 
 #define LOC QString("Transcode: ")
 
+#define ABLOCK_SIZE   8192
+
 class AudioBuffer
 {
   public:
-    AudioBuffer() : m_buffer(QByteArray()), m_frames(0), m_time(-1) {};
-    AudioBuffer(const AudioBuffer &old) : m_buffer(old.m_buffer),
-        m_frames(old.m_frames), m_time(old.m_time) {};
+    AudioBuffer() : m_frames(0), m_time(-1)
+    {
+        m_size      = 0;
+        m_buffer    = (uint8_t *)av_malloc(ABLOCK_SIZE);
+        if (m_buffer == NULL)
+        {
+            throw std::bad_alloc();
+        }
+        m_realsize  = ABLOCK_SIZE;
+    }
 
-    ~AudioBuffer() {};
+    AudioBuffer(const AudioBuffer &old) : m_size(old.m_size),
+        m_realsize(old.m_realsize), m_frames(old.m_frames), m_time(old.m_time)
+    {
+        m_buffer = (uint8_t *)av_malloc(m_realsize);
+        if (m_buffer == NULL)
+        {
+            throw std::bad_alloc();
+        }
+        memcpy(m_buffer, old.m_buffer, m_size);
+    }
+
+    ~AudioBuffer()
+    {
+        av_free(m_buffer);
+    }
 
     void appendData(unsigned char *buffer, int len, int frames, long long time)
     {
-        m_buffer.append((const char *)buffer, len);
+        if ((m_size + len) > m_realsize)
+        {
+            // buffer is too small to fit all
+            // can't use av_realloc as it doesn't guarantee reallocated memory
+            // to be 16 bytes aligned
+            m_realsize = ((m_size + len) / ABLOCK_SIZE + 1 ) * ABLOCK_SIZE;
+            uint8_t *tmp = (uint8_t *)av_malloc(m_realsize);
+            if (tmp == NULL)
+            {
+                throw std::bad_alloc();
+            }
+            memcpy(tmp, m_buffer, m_size);
+            av_free(m_buffer);
+            m_buffer = tmp;
+        }
+        memcpy(m_buffer + m_size, buffer, len);
+        m_size   += len;
         m_frames += frames;
-        m_time = time;
+        m_time    = time;
     }
 
-    QByteArray m_buffer;
-    int m_frames;
-    long long m_time;
+    char *data(void) { return (char *)m_buffer; }
+    int   size(void) { return m_size; }
+
+    uint8_t    *m_buffer;
+    int         m_size;
+    int         m_realsize;
+    int         m_frames;
+    long long   m_time;
 };
 
 // This class is to act as a fake audio output device to store the data
@@ -104,12 +148,11 @@ class AudioReencodeBuffer : public AudioOutput
     virtual void Reset(void)
     {
         QMutexLocker locker(&m_bufferMutex);
-        for (QList<AudioBuffer *>::iterator it = m_bufferList.begin();
-             it != m_bufferList.end(); it = m_bufferList.erase(it))
+        foreach (AudioBuffer *ab, m_bufferList)
         {
-            AudioBuffer *ab = *it;
             delete ab;
         }
+        m_bufferList.clear();
     }
 
     // timecode is in milliseconds.
@@ -140,17 +183,17 @@ class AudioReencodeBuffer : public AudioOutput
 
                 // Use as many of the remaining frames as will fit in the space
                 // left in the buffer.
-                int bufsize = m_saveBuffer->m_buffer.size();
+                int bufsize = m_saveBuffer->size();
                 int part = min(len - index, m_audioFrameSize - bufsize);
                 total_frames += part / m_bytes_per_frame;
-                timecode = total_frames * 1000 / m_eff_audiorate;
+                timecode += total_frames * 1000 / m_eff_audiorate;
                 // Store frames in buffer, basing frame count on number of
                 // bytes, which works only for uncompressed data.
                 m_saveBuffer->appendData(&buf[index], part,
                                          part / m_bytes_per_frame, timecode);
 
                 // If we have filled the buffer...
-                if (m_saveBuffer->m_buffer.size() == m_audioFrameSize)
+                if (m_saveBuffer->size() == m_audioFrameSize)
                 {
                     QMutexLocker locker(&m_bufferMutex);
 
@@ -493,11 +536,15 @@ class Cutter
 
     bool InhibitUseAudioFrames(int64_t frames, long *totalAudio)
     {
+        int64_t delta = audioFramesToCut - frames;
+        if (delta < 0)
+            delta = -delta;
+
         if (audioFramesToCut == 0)
         {
             return false;
         }
-        else if (abs(audioFramesToCut - frames) < audioFramesToCut)
+        else if (delta < audioFramesToCut)
         {
             // Drop the packet containing these frames if doing
             // so gets us closer to zero left to drop
@@ -511,7 +558,7 @@ class Cutter
         else
         {
             // Don't drop this packet even though we still have frames to cut,
-            // because doing so would put us further out. Instead, inflate the 
+            // because doing so would put us further out. Instead, inflate the
             // callers record of how many audio frames have been output.
             *totalAudio += audioFramesToCut;
             audioFramesToCut = 0;
@@ -690,7 +737,7 @@ Transcode::Transcode(ProgramInfo *pginfo) :
     hlsMode(false),                 hlsStreamID(-1),
     hlsDisableAudioOnly(false),
     hlsMaxSegments(0),
-    cmdContainer("mpegts"),         cmdAudioCodec("libmp3lame"),
+    cmdContainer("mpegts"),         cmdAudioCodec("aac"),
     cmdVideoCodec("libx264"),
     cmdWidth(480),                  cmdHeight(0),
     cmdBitrate(800000),             cmdAudioBitrate(64000)
@@ -1062,8 +1109,7 @@ int Transcode::TranscodeFile(const QString &inputname,
                 }
 
                 avfw2->SetContainer("mpegts");
-                avfw2->SetAudioCodec("libmp3lame");
-                //avfw2->SetAudioCodec("libfaac"); // --enable-libfaac to use this
+                avfw2->SetAudioCodec("aac");
                 avfw2->SetAudioBitrate(audioOnlyBitrate);
                 avfw2->SetAudioChannels(arb->m_channels);
                 avfw2->SetAudioBits(16);
@@ -1073,8 +1119,7 @@ int Transcode::TranscodeFile(const QString &inputname,
 
             avfw->SetContainer("mpegts");
             avfw->SetVideoCodec("libx264");
-            avfw->SetAudioCodec("libmp3lame");
-            //avfw->SetAudioCodec("libfaac");  // --enable-libfaac to use this
+            avfw->SetAudioCodec("aac");
 
             if (hlsStreamID == -1)
                 hls = new HTTPLiveStream(inputname, newWidth, newHeight,
@@ -1614,11 +1659,12 @@ int Transcode::TranscodeFile(const QString &inputname,
             int vidTime = (int)(curFrameNum * vidFrameTime + 0.5);
             int viddelta = frame.timecode - vidTime;
             int delta = viddelta - auddelta;
-            if (abs(delta) < 500 && abs(delta) >= vidFrameTime)
+            int absdelta = delta < 0 ? -delta : delta;
+            if (absdelta < 500 && absdelta >= vidFrameTime)
             {
                QString msg = QString("Audio is %1ms %2 video at # %3: "
                                      "auddelta=%4, viddelta=%5")
-                   .arg(abs(delta))
+                   .arg(absdelta)
                    .arg(((delta > 0) ? "ahead of" : "behind"))
                    .arg((int)curFrameNum)
                    .arg(auddelta)
@@ -1677,8 +1723,7 @@ int Transcode::TranscodeFile(const QString &inputname,
 
                 if (!cutter ||
                     !cutter->InhibitUseAudioFrames(ab->m_frames, &totalAudio))
-                    fifow->FIFOWrite(1, ab->m_buffer.data(),
-                                     ab->m_buffer.size());
+                    fifow->FIFOWrite(1, ab->data(), ab->size());
 
                 delete ab;
             }
@@ -1884,7 +1929,7 @@ int Transcode::TranscodeFile(const QString &inputname,
                 for (loop = 0; loop < count; loop++)
                 {
                     AudioBuffer *ab = arb->GetData();
-                    unsigned char *buf = (unsigned char *)ab->m_buffer.data();
+                    unsigned char *buf = (unsigned char *)ab->data();
                     if (avfMode)
                     {
                         if (did_ff != 1)
@@ -1910,7 +1955,7 @@ int Transcode::TranscodeFile(const QString &inputname,
                     }
                     else
                     {
-                        nvr->SetOption("audioframesize", ab->m_buffer.size());
+                        nvr->SetOption("audioframesize", ab->size());
                         nvr->WriteAudio(buf, audioFrame++,
                                         ab->m_time - timecodeOffset);
                         if (nvr->IsErrored())
@@ -1929,12 +1974,12 @@ int Transcode::TranscodeFile(const QString &inputname,
                     }
 
                     ++buffersConsumed;
-                    bytesConsumed += ab->m_buffer.size();
+                    bytesConsumed += ab->size();
 
                     delete ab;
                 }
 
-                LOG(VB_GENERAL, LOG_DEBUG, 
+                LOG(VB_GENERAL, LOG_DEBUG,
                     QString("Processed %1 audio frames for timecode %2: %3 "
                             "buffers, %4 bytes consumed")
                     .arg(count) .arg(frame.timecode) .arg(buffersConsumed)

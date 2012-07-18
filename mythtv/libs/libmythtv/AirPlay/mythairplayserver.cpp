@@ -7,6 +7,7 @@
 #include <QNetworkInterface>
 #include <QCoreApplication>
 #include <QKeyEvent>
+#include <QCryptographicHash>
 
 #include "mthread.h"
 #include "mythdate.h"
@@ -30,6 +31,7 @@ QMutex*            MythAirplayServer::gMythAirplayServerMutex = new QMutex(QMute
 #define HTTP_STATUS_OK                  200
 #define HTTP_STATUS_SWITCHING_PROTOCOLS 101
 #define HTTP_STATUS_NOT_IMPLEMENTED     501
+#define HTTP_STATUS_UNAUTHORIZED        401
 
 #define AIRPLAY_SERVER_VERSION_STR ""
 #define SERVER_INFO  QString("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n"\
@@ -123,6 +125,72 @@ QString AirPlayHardwareId()
 
     gCoreContext->SaveSetting(key, id);
     return id;
+}
+
+QString GenerateNonce(void)
+{
+    int nonceParts[4];
+    QString nonce;
+    QTime time = QTime::currentTime();
+    qsrand((uint)time.msec());
+    nonceParts[0] = qrand();
+    nonceParts[1] = qrand();
+    nonceParts[2] = qrand();
+    nonceParts[3] = qrand();
+
+    nonce =  QString::number(nonceParts[0], 16).toUpper();
+    nonce += QString::number(nonceParts[1], 16).toUpper();
+    nonce += QString::number(nonceParts[2], 16).toUpper();
+    nonce += QString::number(nonceParts[3], 16).toUpper();
+    return nonce;
+}
+
+QByteArray DigestMd5Response(QString response, QString option,
+                             QString nonce, QString password,
+                             QByteArray &auth)
+{
+    int authStart       = response.indexOf("response=\"") + 10;
+    int authLength      = response.indexOf("\"", authStart) - authStart;
+    auth                = response.mid(authStart, authLength).toAscii();
+
+    int uriStart        = response.indexOf("uri=\"") + 5;
+    int uriLength       = response.indexOf("\"", uriStart) - uriStart;
+    QByteArray uri      = response.mid(uriStart, uriLength).toAscii();
+
+    int userStart       = response.indexOf("username=\"") + 10;
+    int userLength      = response.indexOf("\"", userStart) - userStart;
+    QByteArray user     = response.mid(userStart, userLength).toAscii();
+
+    int realmStart      = response.indexOf("realm=\"") + 7;
+    int realmLength     = response.indexOf("\"", realmStart) - realmStart;
+    QByteArray realm    = response.mid(realmStart, realmLength).toAscii();
+
+    QByteArray passwd   = password.toAscii();
+
+    QCryptographicHash hash(QCryptographicHash::Md5);
+    hash.addData(user);
+    hash.addData(":", 1);
+    hash.addData(realm);
+    hash.addData(":", 1);
+    hash.addData(passwd);
+    QByteArray ha1 = hash.result();
+    ha1 = ha1.toHex();
+
+    // calculate H(A2)
+    hash.reset();
+    hash.addData(option.toAscii());
+    hash.addData(":", 1);
+    hash.addData(uri);
+    QByteArray ha2 = hash.result().toHex();
+
+    // calculate response
+    hash.reset();
+    hash.addData(ha1);
+    hash.addData(":", 1);
+    hash.addData(nonce.toAscii());
+    hash.addData(":", 1);
+    hash.addData(ha2);
+    return hash.result().toHex();
 }
 
 class APHTTPRequest
@@ -405,6 +473,12 @@ void MythAirplayServer::deleteConnection(void)
     if (!m_sockets.contains(socket))
         return;
 
+    deleteConnection(socket);
+}
+
+void MythAirplayServer::deleteConnection(QTcpSocket *socket)
+{
+    // must have lock
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Removing connection %1:%2")
         .arg(socket->peerAddress().toString()).arg(socket->peerPort()));
     m_sockets.removeOne(socket);
@@ -419,10 +493,14 @@ void MythAirplayServer::deleteConnection(void)
         if (it.value().controlSocket == socket)
             it.value().controlSocket = NULL;
         if (!it.value().reverseSocket &&
-            !it.value().controlSocket &&
-            it.value().stopped)
+            !it.value().controlSocket)
         {
+            if (!it.value().stopped)
+            {
+                StopSession(it.key());
+            }
             remove = it.key();
+            break;
         }
     }
 
@@ -455,9 +533,10 @@ QByteArray MythAirplayServer::StatusToString(int status)
 {
     switch (status)
     {
-        case HTTP_STATUS_OK: return "OK";
-        case HTTP_STATUS_SWITCHING_PROTOCOLS: return "Switching Protocols";
-        case HTTP_STATUS_NOT_IMPLEMENTED: return "Not Implemented";
+        case HTTP_STATUS_OK:                    return "OK";
+        case HTTP_STATUS_SWITCHING_PROTOCOLS:   return "Switching Protocols";
+        case HTTP_STATUS_NOT_IMPLEMENTED:       return "Not Implemented";
+        case HTTP_STATUS_UNAUTHORIZED:          return "Unauthorized";
     }
     return "";
 }
@@ -537,28 +616,31 @@ void MythAirplayServer::HandleResponse(APHTTPRequest *req,
     }
     m_connections[session].controlSocket = socket;
 
+    if (m_connections[session].controlSocket != NULL &&
+        m_connections[session].reverseSocket != NULL &&
+        !m_connections[session].initialized)
+    {
+        // Got a full connection, disconnect any other clients
+        DisconnectAllClients(session);
+        m_connections[session].initialized = true;
+    }
+
     double position    = 0.0f;
     double duration    = 0.0f;
     float  playerspeed = 0.0f;
     bool   playing     = false;
-    GetPlayerStatus(playing, playerspeed, position, duration);
-    // set initial position if it was set at start of playback.
-    if (duration > 0.01f && playing)
+    QString pathname;
+    GetPlayerStatus(playing, playerspeed, position, duration, pathname);
+
+    if (playing && pathname != m_pathname)
     {
-        if (m_connections[session].initial_position > 0.0f)
-        {
-            position = duration * m_connections[session].initial_position;
-            MythEvent* me = new MythEvent(ACTION_SEEKABSOLUTE,
-                                          QStringList(QString::number((uint64_t)position)));
-            qApp->postEvent(GetMythMainWindow(), me);
-            m_connections[session].position = position;
-            m_connections[session].initial_position = -1.0f;
-        }
-        else if (position < .01f)
-        {
-            // Assume playback hasn't started yet, get saved position
-            position = m_connections[session].position;
-        }
+        // not ours
+        playing = false;
+    }
+    if (playing && duration > 0.01f && position < 0.01f)
+    {
+        // Assume playback hasn't started yet, get saved position
+        position = m_connections[session].position;
     }
     if (!playing && m_connections[session].was_playing)
     {
@@ -571,6 +653,38 @@ void MythAirplayServer::HandleResponse(APHTTPRequest *req,
     else
     {
         m_connections[session].was_playing = playing;
+    }
+
+    if (gCoreContext->GetNumSetting("AirPlayPasswordEnabled", false))
+    {
+        if (m_nonce.isEmpty())
+        {
+            m_nonce = GenerateNonce();
+        }
+        header = QString("WWW-Authenticate: Digest realm=\"AirPlay\", "
+                         "nonce=\"%1\"\r\n").arg(m_nonce).toAscii();
+        if (!req->GetHeaders().contains("Authorization"))
+        {
+            SendResponse(socket, HTTP_STATUS_UNAUTHORIZED,
+                         header, content_type, body);
+            return;
+        }
+
+        QByteArray auth;
+        if (DigestMd5Response(req->GetHeaders()["Authorization"], req->GetMethod(), m_nonce,
+                              gCoreContext->GetSetting("AirPlayPassword"),
+                              auth) == auth)
+        {
+            LOG(VB_GENERAL, LOG_INFO, LOC + "AirPlay client authenticated");
+        }
+        else
+        {
+            LOG(VB_GENERAL, LOG_INFO, LOC + "AirPlay authentication failed");
+            SendResponse(socket, HTTP_STATUS_UNAUTHORIZED,
+                         header, content_type, body);
+            return;
+        }
+        header = "";
     }
 
     if (req->GetURI() == "/server-info")
@@ -590,9 +704,7 @@ void MythAirplayServer::HandleResponse(APHTTPRequest *req,
             m_connections[session].position = pos;
             LOG(VB_GENERAL, LOG_INFO, LOC +
                 QString("Scrub: (post) seek to %1").arg(intpos));
-            MythEvent* me = new MythEvent(ACTION_SEEKABSOLUTE,
-                                          QStringList(QString::number(intpos)));
-            qApp->postEvent(GetMythMainWindow(), me);
+            SeekPosition(intpos);
         }
         else if (req->GetMethod() == "GET")
         {
@@ -618,10 +730,7 @@ void MythAirplayServer::HandleResponse(APHTTPRequest *req,
     }
     else if (req->GetURI() == "/stop")
     {
-        m_connections[session].stopped = true;
-        QKeyEvent* ke = new QKeyEvent(QEvent::KeyPress, 0,
-                                      Qt::NoModifier, ACTION_STOP);
-        qApp->postEvent(GetMythMainWindow(), (QEvent*)ke);
+        StopSession(session);
     }
     else if (req->GetURI() == "/photo" ||
              req->GetURI() == "/slideshow-features")
@@ -640,23 +749,19 @@ void MythAirplayServer::HandleResponse(APHTTPRequest *req,
 
         if (rate < 1.0f)
         {
-            SendReverseEvent(session, AP_EVENT_PAUSED);
             if (playerspeed > 0.0f)
             {
-                QKeyEvent* ke = new QKeyEvent(QEvent::KeyPress, 0,
-                                              Qt::NoModifier, ACTION_PAUSE);
-                qApp->postEvent(GetMythMainWindow(), (QEvent*)ke);
+                PausePlayback();
             }
+            SendReverseEvent(session, AP_EVENT_PAUSED);
         }
         else
         {
-            SendReverseEvent(session, AP_EVENT_PLAYING);
             if (playerspeed < 1.0f)
             {
-                QKeyEvent* ke = new QKeyEvent(QEvent::KeyPress, 0,
-                                              Qt::NoModifier, ACTION_PLAY);
-                qApp->postEvent(GetMythMainWindow(), (QEvent*)ke);
+                UnpausePlayback();
             }
+            SendReverseEvent(session, AP_EVENT_PLAYING);
         }
     }
     else if (req->GetURI() == "/play")
@@ -683,23 +788,14 @@ void MythAirplayServer::HandleResponse(APHTTPRequest *req,
             start_pos = headers["Start-Position"].toDouble();
         }
 
-        if (!TV::IsTVRunning())
+        if (!file.isEmpty())
         {
-            if (!file.isEmpty())
-            {
-                m_connections[session].url = QUrl(file);
-                m_connections[session].position = 0.0f;
-                m_connections[session].initial_position = start_pos;
-
-                MythEvent* me = new MythEvent(ACTION_HANDLEMEDIA,
-                                              QStringList(file));
-                qApp->postEvent(GetMythMainWindow(), me);
-            }
-        }
-        else
-        {
-            LOG(VB_GENERAL, LOG_WARNING, LOC +
-                "Ignoring playback - something else is playing.");
+            m_pathname = file;
+            StartPlayback(file);
+            GetPlayerStatus(playing, playerspeed, position, duration, pathname);
+            m_connections[session].url = QUrl(file);
+            m_connections[session].position = start_pos * duration;
+            SeekPosition(duration * start_pos);
         }
 
         SendReverseEvent(session, AP_EVENT_PLAYING);
@@ -734,6 +830,8 @@ void MythAirplayServer::SendResponse(QTcpSocket *socket,
                                      int status, QByteArray header,
                                      QByteArray content_type, QString body)
 {
+    if (!socket)
+        return;
     QTextStream response(socket);
     response.setCodec("UTF-8");
     QByteArray reply;
@@ -754,10 +852,12 @@ void MythAirplayServer::SendResponse(QTcpSocket *socket,
         reply.append(content_type);
         reply.append("Content-Length: ");
         reply.append(QString::number(body.size()));
-        reply.append("\r\n");
     }
-
-    reply.append("\r\n");
+    else
+    {
+        reply.append("Content-Length: 0");
+    }
+    reply.append("\r\n\r\n");
 
     if (body.size())
         reply.append(body);
@@ -826,10 +926,12 @@ QString MythAirplayServer::eventToString(AirplayEvent event)
 }
 
 void MythAirplayServer::GetPlayerStatus(bool &playing, float &speed,
-                                        double &position, double &duration)
+                                        double &position, double &duration,
+                                        QString &pathname)
 {
     QVariantMap state;
     MythUIStateTracker::GetFreshState(state);
+
     if (state.contains("state"))
         playing = state["state"].toString() != "idle";
     if (state.contains("playspeed"))
@@ -838,6 +940,8 @@ void MythAirplayServer::GetPlayerStatus(bool &playing, float &speed,
         position = state["secondsplayed"].toDouble();
     if (state.contains("totalseconds"))
         duration = state["totalseconds"].toDouble();
+    if (state.contains("pathname"))
+        pathname = state["pathname"].toString();
 }
 
 QString MythAirplayServer::GetMacAddress()
@@ -854,4 +958,183 @@ QString MythAirplayServer::GetMacAddress()
         }
     }
     return res;
+}
+
+void MythAirplayServer::StopSession(const QByteArray &session)
+{
+    m_connections[session].stopped = true;
+    double position    = 0.0f;
+    double duration    = 0.0f;
+    float  playerspeed = 0.0f;
+    bool   playing     = false;
+    QString pathname;
+    GetPlayerStatus(playing, playerspeed, position, duration, pathname);
+    if (pathname != m_pathname)
+    {
+        // not ours
+        return;
+    }
+    StopPlayback();
+}
+
+void MythAirplayServer::DisconnectAllClients(const QByteArray &session)
+{
+    QMutexLocker locker(m_lock);
+    QHash<QByteArray,AirplayConnection>::iterator it = m_connections.begin();
+
+    while (it != m_connections.end())
+    {
+        QTcpSocket *socket;
+
+        if (it.key() == session)
+        {
+            ++it;
+            continue;
+        }
+        if (!(*it).stopped)
+        {
+            StopSession(it.key());
+        }
+        socket = it.value().reverseSocket;
+        if (socket)
+        {
+            socket->disconnect();
+            socket->close();
+            m_sockets.removeOne(socket);
+            socket->deleteLater();
+        }
+        socket = it.value().controlSocket;
+        if (socket)
+        {
+            socket->disconnect();
+            socket->close();
+            m_sockets.removeOne(socket);
+            socket->deleteLater();
+        }
+        it = m_connections.erase(it);
+    }
+}
+
+void MythAirplayServer::StartPlayback(const QString &pathname)
+{
+    if (TV::IsTVRunning())
+    {
+        StopPlayback();
+    }
+    LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
+        QString("Sending ACTION_HANDLEMEDIA for %1")
+        .arg(pathname));
+    MythEvent* me = new MythEvent(ACTION_HANDLEMEDIA,
+                                  QStringList(pathname));
+    qApp->postEvent(GetMythMainWindow(), me);
+    // Wait until we receive that the play has started
+    gCoreContext->WaitUntilSignals(SIGNAL(TVPlaybackStarted()),
+                                   SIGNAL(TVPlaybackAborted()),
+                                   NULL);
+    LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
+        QString("ACTION_HANDLEMEDIA completed"));
+}
+
+void MythAirplayServer::StopPlayback(void)
+{
+    if (TV::IsTVRunning())
+    {
+        LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
+            QString("Sending ACTION_STOP for %1")
+            .arg(m_pathname));
+
+        QKeyEvent* ke = new QKeyEvent(QEvent::KeyPress, 0,
+                                      Qt::NoModifier, ACTION_STOP);
+        qApp->postEvent(GetMythMainWindow(), (QEvent*)ke);
+        // Wait until we receive that playback has stopped
+        gCoreContext->WaitUntilSignals(SIGNAL(TVPlaybackStopped()),
+                                       SIGNAL(TVPlaybackAborted()),
+                                       NULL);
+        LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
+            QString("ACTION_STOP completed"));
+    }
+    else
+    {
+        LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
+            QString("Playback not running, nothing to stop"));
+    }
+}
+
+void MythAirplayServer::SeekPosition(uint64_t position)
+{
+    if (TV::IsTVRunning())
+    {
+        LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
+            QString("Sending ACTION_SEEKABSOLUTE(%1) for %2")
+            .arg(position)
+            .arg(m_pathname));
+
+        MythEvent* me = new MythEvent(ACTION_SEEKABSOLUTE,
+                                      QStringList(QString::number((uint64_t)position)));
+        qApp->postEvent(GetMythMainWindow(), me);
+        // Wait until we receive that the seek has completed
+        gCoreContext->WaitUntilSignals(SIGNAL(TVPlaybackSought(qint64)),
+                                       SIGNAL(TVPlaybackStopped()),
+                                       SIGNAL(TVPlaybackAborted()),
+                                       NULL);
+        LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
+            QString("ACTION_SEEKABSOLUTE completed"));
+    }
+    else
+    {
+        LOG(VB_PLAYBACK, LOG_WARNING, LOC +
+            QString("Trying to seek when playback hasn't started"));
+    }
+}
+
+void MythAirplayServer::PausePlayback(void)
+{
+    if (TV::IsTVRunning() && !TV::CurrentTVInstance()->IsPaused())
+    {
+        LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
+            QString("Sending ACTION_PAUSE for %1")
+            .arg(m_pathname));
+
+        QKeyEvent* ke = new QKeyEvent(QEvent::KeyPress, 0,
+                                      Qt::NoModifier, ACTION_PAUSE);
+        qApp->postEvent(GetMythMainWindow(), (QEvent*)ke);
+        // Wait until we receive that playback has stopped
+        gCoreContext->WaitUntilSignals(SIGNAL(TVPlaybackPaused()),
+                                       SIGNAL(TVPlaybackStopped()),
+                                       SIGNAL(TVPlaybackAborted()),
+                                       NULL);
+        LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
+            QString("ACTION_PAUSE completed"));
+    }
+    else
+    {
+        LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
+            QString("Playback not running, nothing to pause"));
+    }
+}
+
+void MythAirplayServer::UnpausePlayback(void)
+{
+    if (TV::IsTVRunning())
+    {
+        LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
+            QString("Sending ACTION_PLAY for %1")
+            .arg(m_pathname));
+
+        QKeyEvent* ke = new QKeyEvent(QEvent::KeyPress, 0,
+                                      Qt::NoModifier, ACTION_PLAY);
+        qApp->postEvent(GetMythMainWindow(), (QEvent*)ke);
+        // Wait until we receive that playback has stopped
+        gCoreContext->WaitUntilSignals(SIGNAL(TVPlaybackUnpaused()),
+                                       SIGNAL(TVPlaybackStopped()),
+                                       SIGNAL(TVPlaybackAborted()),
+                                       NULL);
+        LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
+            QString("ACTION_PLAY completed"));
+    }
+    else
+    {
+        LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
+            QString("Playback not running, nothing to unpause"));
+    }
 }

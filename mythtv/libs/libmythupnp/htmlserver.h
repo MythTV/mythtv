@@ -28,7 +28,7 @@ class UPNP_PUBLIC HtmlServerExtension : public HttpServerExtension
 {
     private:
 
-        QString             m_sAbsoluteSharePath;
+        QString             m_sSharePath;
         ServerSideScripting m_Scripting;
         QString             m_IndexFilename;
 

@@ -1,5 +1,9 @@
 // -*- Mode: c++ -*-
 
+// Qt headers
+#include <QCoreApplication>
+
+// MythTV headers
 #include "dishdescriptors.h"
 #include "atsc_huffman.h"
 #include "programinfo.h" // for subtitle types and audio and video properties
@@ -373,171 +377,334 @@ void DishContentDescriptor::Init(void)
         return;
 
     // Dish/BEV "Themes"
-    themeDesc[kThemeMovie]     = "Movie";
-    themeDesc[kThemeSports]    = "Sports";
-    themeDesc[kThemeNews]      = "News/Business";
-    themeDesc[kThemeFamily]    = "Family/Children";
-    themeDesc[kThemeEducation] = "Education";
-    themeDesc[kThemeSeries]    = "Series/Special";
-    themeDesc[kThemeMusic]     = "Music/Art";
-    themeDesc[kThemeReligious] = "Religious";
+    themeDesc[kThemeMovie]     = QCoreApplication::translate("(Categories)",
+                                                             "Movie");
+    themeDesc[kThemeSports]    = QCoreApplication::translate("(Categories)",
+                                                             "Sports");
+    themeDesc[kThemeNews]      = QCoreApplication::translate("(Categories)",
+                                                             "News/Business");
+    themeDesc[kThemeFamily]    = QCoreApplication::translate("(Categories)",
+                                                             "Family/Children");
+    themeDesc[kThemeEducation] = QCoreApplication::translate("(Categories)",
+                                                             "Education");
+    themeDesc[kThemeSeries]    = QCoreApplication::translate("(Categories)",
+                                                             "Series/Special");
+    themeDesc[kThemeMusic]     = QCoreApplication::translate("(Categories)",
+                                                             "Music/Art");
+    themeDesc[kThemeReligious] = QCoreApplication::translate("(Categories)",
+                                                             "Religious");
 
     // Dish/BEV categories
-    dishCategoryDesc[0x01] = "Action";
-    dishCategoryDesc[0x02] = "Adults only";
-    dishCategoryDesc[0x03] = "Adventure";
-    dishCategoryDesc[0x04] = "Animals";
-    dishCategoryDesc[0x05] = "Animated";
-    dishCategoryDesc[0x07] = "Anthology";
-    dishCategoryDesc[0x08] = "Art";
-    dishCategoryDesc[0x09] = "Auto";
-    dishCategoryDesc[0x0a] = "Awards";
-    dishCategoryDesc[0x0b] = "Ballet";
-    dishCategoryDesc[0x0c] = "Baseball";
-    dishCategoryDesc[0x0d] = "Basketball";
-    dishCategoryDesc[0x11] = "Biography";
-    dishCategoryDesc[0x12] = "Boat";
-    dishCategoryDesc[0x14] = "Bowling";
-    dishCategoryDesc[0x15] = "Boxing";
-    dishCategoryDesc[0x16] = "Bus./financial";
-    dishCategoryDesc[0x1a] = "Children";
-    dishCategoryDesc[0x1b] = "Children-special";
-    dishCategoryDesc[0x1c] = "Children-news";
-    dishCategoryDesc[0x1d] = "Children-music";
-    dishCategoryDesc[0x1f] = "Collectibles";
-    dishCategoryDesc[0x20] = "Comedy";
-    dishCategoryDesc[0x21] = "Comedy-drama";
-    dishCategoryDesc[0x22] = "Computers";
-    dishCategoryDesc[0x23] = "Cooking";
-    dishCategoryDesc[0x24] = "Crime";
-    dishCategoryDesc[0x25] = "Crime drama";
-    dishCategoryDesc[0x27] = "Dance";
-    dishCategoryDesc[0x29] = "Docudrama";
-    dishCategoryDesc[0x2a] = "Documentary";
-    dishCategoryDesc[0x2b] = "Drama";
-    dishCategoryDesc[0x2c] = "Educational";
-    dishCategoryDesc[0x2f] = "Excercise";
-    dishCategoryDesc[0x31] = "Fantasy";
-    dishCategoryDesc[0x32] = "Fasion";
-    dishCategoryDesc[0x34] = "Fishing";
-    dishCategoryDesc[0x35] = "Football";
-    dishCategoryDesc[0x36] = "French";
-    dishCategoryDesc[0x37] = "Fundraiser";
-    dishCategoryDesc[0x38] = "Game show";
-    dishCategoryDesc[0x39] = "Golf";
-    dishCategoryDesc[0x3a] = "Gymnastics";
-    dishCategoryDesc[0x3b] = "Health";
-    dishCategoryDesc[0x3c] = "History";
-    dishCategoryDesc[0x3d] = "Historical drama";
-    dishCategoryDesc[0x3e] = "Hockey";
-    dishCategoryDesc[0x3f] = "Holiday";
-    dishCategoryDesc[0x40] = "Holiday-children";
-    dishCategoryDesc[0x41] = "Holiday-children special";
-    dishCategoryDesc[0x44] = "Holiday special";
-    dishCategoryDesc[0x45] = "Horror";
-    dishCategoryDesc[0x46] = "Horse racing";
-    dishCategoryDesc[0x47] = "House/garden";
-    dishCategoryDesc[0x49] = "How-to";
-    dishCategoryDesc[0x4b] = "Interview";
-    dishCategoryDesc[0x4d] = "Lacrosse";
-    dishCategoryDesc[0x4f] = "Martial Arts";
-    dishCategoryDesc[0x50] = "Medical";
-    dishCategoryDesc[0x51] = "Miniseries";
-    dishCategoryDesc[0x52] = "Motorsports";
-    dishCategoryDesc[0x53] = "Motorcycle";
-    dishCategoryDesc[0x54] = "Music";
-    dishCategoryDesc[0x55] = "Music special";
-    dishCategoryDesc[0x56] = "Music talk";
-    dishCategoryDesc[0x57] = "Musical";
-    dishCategoryDesc[0x58] = "Musical comedy";
-    dishCategoryDesc[0x5a] = "Mystery";
-    dishCategoryDesc[0x5b] = "Nature";
-    dishCategoryDesc[0x5c] = "News";
-    dishCategoryDesc[0x5f] = "Opera";
-    dishCategoryDesc[0x60] = "Outdoors";
-    dishCategoryDesc[0x63] = "Public affairs";
-    dishCategoryDesc[0x66] = "Reality";
-    dishCategoryDesc[0x67] = "Religious";
-    dishCategoryDesc[0x68] = "Rodeo";
-    dishCategoryDesc[0x69] = "Romance";
-    dishCategoryDesc[0x6a] = "Romance-comedy";
-    dishCategoryDesc[0x6b] = "Rugby";
-    dishCategoryDesc[0x6c] = "Running";
-    dishCategoryDesc[0x6e] = "Science";
-    dishCategoryDesc[0x6f] = "Science fiction";
-    dishCategoryDesc[0x70] = "Self improvement";
-    dishCategoryDesc[0x71] = "Shopping";
-    dishCategoryDesc[0x74] = "Skiing";
-    dishCategoryDesc[0x77] = "Soap";
-    dishCategoryDesc[0x7b] = "Soccor";
-    dishCategoryDesc[0x7c] = "Softball";
-    dishCategoryDesc[0x7d] = "Spanish";
-    dishCategoryDesc[0x7e] = "Special";
-    dishCategoryDesc[0x81] = "Sports non-event";
-    dishCategoryDesc[0x82] = "Sports talk";
-    dishCategoryDesc[0x83] = "Suspense";
-    dishCategoryDesc[0x85] = "Swimming";
-    dishCategoryDesc[0x86] = "Talk";
-    dishCategoryDesc[0x87] = "Tennis";
-    dishCategoryDesc[0x89] = "Track/field";
-    dishCategoryDesc[0x8a] = "Travel";
-    dishCategoryDesc[0x8b] = "Variety";
-    dishCategoryDesc[0x8c] = "Volleyball";
-    dishCategoryDesc[0x8d] = "War";
-    dishCategoryDesc[0x8e] = "Watersports";
-    dishCategoryDesc[0x8f] = "Weather";
-    dishCategoryDesc[0x90] = "Western";
-    dishCategoryDesc[0x92] = "Wrestling";
-    dishCategoryDesc[0x93] = "Yoga";
-    dishCategoryDesc[0x94] = "Agriculture";
-    dishCategoryDesc[0x95] = "Anime";
-    dishCategoryDesc[0x97] = "Arm Wrestling";
-    dishCategoryDesc[0x98] = "Arts/crafts";
-    dishCategoryDesc[0x99] = "Auction";
-    dishCategoryDesc[0x9a] = "Auto racing";
-    dishCategoryDesc[0x9b] = "Air racing";
-    dishCategoryDesc[0x9c] = "Badminton";
-    dishCategoryDesc[0xa0] = "Bicycle racing";
-    dishCategoryDesc[0xa1] = "Boat Racing";
-    dishCategoryDesc[0xa6] = "Community";
-    dishCategoryDesc[0xa7] = "Consumer";
-    dishCategoryDesc[0xaa] = "Debate";
-    dishCategoryDesc[0xac] = "Dog show";
-    dishCategoryDesc[0xad] = "Drag racing";
-    dishCategoryDesc[0xae] = "Entertainment";
-    dishCategoryDesc[0xaf] = "Environment";
-    dishCategoryDesc[0xb0] = "Equestrian";
-    dishCategoryDesc[0xb3] = "Field hockey";
-    dishCategoryDesc[0xb5] = "Football";
-    dishCategoryDesc[0xb6] = "Gay/lesbian";
-    dishCategoryDesc[0xb7] = "Handball";
-    dishCategoryDesc[0xb8] = "Home improvement";
-    dishCategoryDesc[0xb9] = "Hunting";
-    dishCategoryDesc[0xbb] = "Hydroplane racing";
-    dishCategoryDesc[0xc1] = "Law";
-    dishCategoryDesc[0xc3] = "Motorcycle racing";
-    dishCategoryDesc[0xc5] = "Newsmagazine";
-    dishCategoryDesc[0xc7] = "Paranormal";
-    dishCategoryDesc[0xc8] = "Parenting";
-    dishCategoryDesc[0xca] = "Performing arts";
-    dishCategoryDesc[0xcc] = "Politics";
-    dishCategoryDesc[0xcf] = "Pro wrestling";
-    dishCategoryDesc[0xd3] = "Sailing";
-    dishCategoryDesc[0xd4] = "Shooting";
-    dishCategoryDesc[0xd5] = "Sitcom";
-    dishCategoryDesc[0xd6] = "Skateboarding";
-    dishCategoryDesc[0xd9] = "Snowboarding";
-    dishCategoryDesc[0xdd] = "Standup";
-    dishCategoryDesc[0xdf] = "Surfing";
-    dishCategoryDesc[0xe0] = "Tennis";
-    dishCategoryDesc[0xe1] = "Triathlon";
-    dishCategoryDesc[0xe6] = "Card games";
-    dishCategoryDesc[0xe7] = "Poker";
-    dishCategoryDesc[0xea] = "Military";
-    dishCategoryDesc[0xeb] = "Technology";
-    dishCategoryDesc[0xec] = "Mixed martial arts";
-    dishCategoryDesc[0xed] = "Action sports";
-    dishCategoryDesc[0xff] = "Dish Network";
+    dishCategoryDesc[0x01] = QCoreApplication::translate("(Categories)",
+                                                         "Action");
+    dishCategoryDesc[0x02] = QCoreApplication::translate("(Categories)",
+                                                         "Adults only");
+    dishCategoryDesc[0x03] = QCoreApplication::translate("(Categories)",
+                                                         "Adventure");
+    dishCategoryDesc[0x04] = QCoreApplication::translate("(Categories)",
+                                                         "Animals");
+    dishCategoryDesc[0x05] = QCoreApplication::translate("(Categories)",
+                                                         "Animated");
+    dishCategoryDesc[0x07] = QCoreApplication::translate("(Categories)",
+                                                         "Anthology");
+    dishCategoryDesc[0x08] = QCoreApplication::translate("(Categories)",
+                                                         "Art");
+    dishCategoryDesc[0x09] = QCoreApplication::translate("(Categories)",
+                                                         "Auto");
+    dishCategoryDesc[0x0a] = QCoreApplication::translate("(Categories)",
+                                                         "Awards");
+    dishCategoryDesc[0x0b] = QCoreApplication::translate("(Categories)",
+                                                         "Ballet");
+    dishCategoryDesc[0x0c] = QCoreApplication::translate("(Categories)",
+                                                         "Baseball");
+    dishCategoryDesc[0x0d] = QCoreApplication::translate("(Categories)",
+                                                         "Basketball");
+    dishCategoryDesc[0x11] = QCoreApplication::translate("(Categories)",
+                                                         "Biography");
+    dishCategoryDesc[0x12] = QCoreApplication::translate("(Categories)",
+                                                         "Boat");
+    dishCategoryDesc[0x14] = QCoreApplication::translate("(Categories)",
+                                                         "Bowling");
+    dishCategoryDesc[0x15] = QCoreApplication::translate("(Categories)",
+                                                         "Boxing");
+    dishCategoryDesc[0x16] = QCoreApplication::translate("(Categories)",
+                                                         "Bus./financial");
+    dishCategoryDesc[0x1a] = QCoreApplication::translate("(Categories)",
+                                                         "Children");
+    dishCategoryDesc[0x1b] = QCoreApplication::translate("(Categories)",
+                                                         "Children-special");
+    dishCategoryDesc[0x1c] = QCoreApplication::translate("(Categories)",
+                                                         "Children-news");
+    dishCategoryDesc[0x1d] = QCoreApplication::translate("(Categories)",
+                                                         "Children-music");
+    dishCategoryDesc[0x1f] = QCoreApplication::translate("(Categories)",
+                                                         "Collectibles");
+    dishCategoryDesc[0x20] = QCoreApplication::translate("(Categories)",
+                                                         "Comedy");
+    dishCategoryDesc[0x21] = QCoreApplication::translate("(Categories)",
+                                                         "Comedy-drama");
+    dishCategoryDesc[0x22] = QCoreApplication::translate("(Categories)",
+                                                         "Computers");
+    dishCategoryDesc[0x23] = QCoreApplication::translate("(Categories)",
+                                                         "Cooking");
+    dishCategoryDesc[0x24] = QCoreApplication::translate("(Categories)",
+                                                         "Crime");
+    dishCategoryDesc[0x25] = QCoreApplication::translate("(Categories)",
+                                                         "Crime drama");
+    dishCategoryDesc[0x27] = QCoreApplication::translate("(Categories)",
+                                                         "Dance");
+    dishCategoryDesc[0x29] = QCoreApplication::translate("(Categories)",
+                                                         "Docudrama");
+    dishCategoryDesc[0x2a] = QCoreApplication::translate("(Categories)",
+                                                         "Documentary");
+    dishCategoryDesc[0x2b] = QCoreApplication::translate("(Categories)",
+                                                         "Drama");
+    dishCategoryDesc[0x2c] = QCoreApplication::translate("(Categories)",
+                                                         "Educational");
+    dishCategoryDesc[0x2f] = QCoreApplication::translate("(Categories)",
+                                                         "Excercise");
+    dishCategoryDesc[0x31] = QCoreApplication::translate("(Categories)",
+                                                         "Fantasy");
+    dishCategoryDesc[0x32] = QCoreApplication::translate("(Categories)",
+                                                         "Fasion");
+    dishCategoryDesc[0x34] = QCoreApplication::translate("(Categories)",
+                                                         "Fishing");
+    dishCategoryDesc[0x35] = QCoreApplication::translate("(Categories)",
+                                                         "Football");
+    dishCategoryDesc[0x36] = QCoreApplication::translate("(Categories)",
+                                                         "French");
+    dishCategoryDesc[0x37] = QCoreApplication::translate("(Categories)",
+                                                         "Fundraiser");
+    dishCategoryDesc[0x38] = QCoreApplication::translate("(Categories)",
+                                                         "Game show");
+    dishCategoryDesc[0x39] = QCoreApplication::translate("(Categories)",
+                                                         "Golf");
+    dishCategoryDesc[0x3a] = QCoreApplication::translate("(Categories)",
+                                                         "Gymnastics");
+    dishCategoryDesc[0x3b] = QCoreApplication::translate("(Categories)",
+                                                         "Health");
+    dishCategoryDesc[0x3c] = QCoreApplication::translate("(Categories)",
+                                                         "History");
+    dishCategoryDesc[0x3d] = QCoreApplication::translate("(Categories)",
+                                                         "Historical drama");
+    dishCategoryDesc[0x3e] = QCoreApplication::translate("(Categories)",
+                                                         "Hockey");
+    dishCategoryDesc[0x3f] = QCoreApplication::translate("(Categories)",
+                                                         "Holiday");
+    dishCategoryDesc[0x40] = QCoreApplication::translate("(Categories)",
+                                                         "Holiday-children");
+    dishCategoryDesc[0x41] = QCoreApplication::translate("(Categories)",
+                                "Holiday-children special");
+    dishCategoryDesc[0x44] = QCoreApplication::translate("(Categories)",
+                                                         "Holiday special");
+    dishCategoryDesc[0x45] = QCoreApplication::translate("(Categories)",
+                                                         "Horror");
+    dishCategoryDesc[0x46] = QCoreApplication::translate("(Categories)",
+                                                         "Horse racing");
+    dishCategoryDesc[0x47] = QCoreApplication::translate("(Categories)",
+                                                         "House/garden");
+    dishCategoryDesc[0x49] = QCoreApplication::translate("(Categories)",
+                                                         "How-to");
+    dishCategoryDesc[0x4b] = QCoreApplication::translate("(Categories)",
+                                                         "Interview");
+    dishCategoryDesc[0x4d] = QCoreApplication::translate("(Categories)",
+                                                         "Lacrosse");
+    dishCategoryDesc[0x4f] = QCoreApplication::translate("(Categories)",
+                                                         "Martial Arts");
+    dishCategoryDesc[0x50] = QCoreApplication::translate("(Categories)",
+                                                         "Medical");
+    dishCategoryDesc[0x51] = QCoreApplication::translate("(Categories)",
+                                                         "Miniseries");
+    dishCategoryDesc[0x52] = QCoreApplication::translate("(Categories)",
+                                                         "Motorsports");
+    dishCategoryDesc[0x53] = QCoreApplication::translate("(Categories)",
+                                                         "Motorcycle");
+    dishCategoryDesc[0x54] = QCoreApplication::translate("(Categories)",
+                                                         "Music");
+    dishCategoryDesc[0x55] = QCoreApplication::translate("(Categories)",
+                                                         "Music special");
+    dishCategoryDesc[0x56] = QCoreApplication::translate("(Categories)",
+                                                         "Music talk");
+    dishCategoryDesc[0x57] = QCoreApplication::translate("(Categories)",
+                                                         "Musical");
+    dishCategoryDesc[0x58] = QCoreApplication::translate("(Categories)",
+                                                         "Musical comedy");
+    dishCategoryDesc[0x5a] = QCoreApplication::translate("(Categories)",
+                                                         "Mystery");
+    dishCategoryDesc[0x5b] = QCoreApplication::translate("(Categories)",
+                                                         "Nature");
+    dishCategoryDesc[0x5c] = QCoreApplication::translate("(Categories)",
+                                                         "News");
+    dishCategoryDesc[0x5f] = QCoreApplication::translate("(Categories)",
+                                                         "Opera");
+    dishCategoryDesc[0x60] = QCoreApplication::translate("(Categories)",
+                                                         "Outdoors");
+    dishCategoryDesc[0x63] = QCoreApplication::translate("(Categories)",
+                                                         "Public affairs");
+    dishCategoryDesc[0x66] = QCoreApplication::translate("(Categories)",
+                                                         "Reality");
+    dishCategoryDesc[0x67] = QCoreApplication::translate("(Categories)",
+                                                         "Religious");
+    dishCategoryDesc[0x68] = QCoreApplication::translate("(Categories)",
+                                                         "Rodeo");
+    dishCategoryDesc[0x69] = QCoreApplication::translate("(Categories)",
+                                                         "Romance");
+    dishCategoryDesc[0x6a] = QCoreApplication::translate("(Categories)",
+                                                         "Romance-comedy");
+    dishCategoryDesc[0x6b] = QCoreApplication::translate("(Categories)",
+                                                         "Rugby");
+    dishCategoryDesc[0x6c] = QCoreApplication::translate("(Categories)",
+                                                         "Running");
+    dishCategoryDesc[0x6e] = QCoreApplication::translate("(Categories)",
+                                                         "Science");
+    dishCategoryDesc[0x6f] = QCoreApplication::translate("(Categories)",
+                                                         "Science fiction");
+    dishCategoryDesc[0x70] = QCoreApplication::translate("(Categories)",
+                                                         "Self improvement");
+    dishCategoryDesc[0x71] = QCoreApplication::translate("(Categories)",
+                                                         "Shopping");
+    dishCategoryDesc[0x74] = QCoreApplication::translate("(Categories)",
+                                                         "Skiing");
+    dishCategoryDesc[0x77] = QCoreApplication::translate("(Categories)",
+                                                         "Soap");
+    dishCategoryDesc[0x7b] = QCoreApplication::translate("(Categories)",
+                                                         "Soccer");
+    dishCategoryDesc[0x7c] = QCoreApplication::translate("(Categories)",
+                                                         "Softball");
+    dishCategoryDesc[0x7d] = QCoreApplication::translate("(Categories)",
+                                                         "Spanish");
+    dishCategoryDesc[0x7e] = QCoreApplication::translate("(Categories)",
+                                                         "Special");
+    dishCategoryDesc[0x81] = QCoreApplication::translate("(Categories)",
+                                                         "Sports non-event");
+    dishCategoryDesc[0x82] = QCoreApplication::translate("(Categories)",
+                                                         "Sports talk");
+    dishCategoryDesc[0x83] = QCoreApplication::translate("(Categories)",
+                                                         "Suspense");
+    dishCategoryDesc[0x85] = QCoreApplication::translate("(Categories)",
+                                                         "Swimming");
+    dishCategoryDesc[0x86] = QCoreApplication::translate("(Categories)",
+                                                         "Talk");
+    dishCategoryDesc[0x87] = QCoreApplication::translate("(Categories)",
+                                                         "Tennis");
+    dishCategoryDesc[0x89] = QCoreApplication::translate("(Categories)",
+                                                         "Track/field");
+    dishCategoryDesc[0x8a] = QCoreApplication::translate("(Categories)",
+                                                         "Travel");
+    dishCategoryDesc[0x8b] = QCoreApplication::translate("(Categories)",
+                                                         "Variety");
+    dishCategoryDesc[0x8c] = QCoreApplication::translate("(Categories)",
+                                                         "Volleyball");
+    dishCategoryDesc[0x8d] = QCoreApplication::translate("(Categories)", 
+                                                         "War");
+    dishCategoryDesc[0x8e] = QCoreApplication::translate("(Categories)",
+                                                         "Watersports");
+    dishCategoryDesc[0x8f] = QCoreApplication::translate("(Categories)",
+                                                         "Weather");
+    dishCategoryDesc[0x90] = QCoreApplication::translate("(Categories)",
+                                                         "Western");
+    dishCategoryDesc[0x92] = QCoreApplication::translate("(Categories)",
+                                                         "Wrestling");
+    dishCategoryDesc[0x93] = QCoreApplication::translate("(Categories)",
+                                                         "Yoga");
+    dishCategoryDesc[0x94] = QCoreApplication::translate("(Categories)",
+                                                         "Agriculture");
+    dishCategoryDesc[0x95] = QCoreApplication::translate("(Categories)",
+                                                         "Anime");
+    dishCategoryDesc[0x97] = QCoreApplication::translate("(Categories)",
+                                                         "Arm Wrestling");
+    dishCategoryDesc[0x98] = QCoreApplication::translate("(Categories)",
+                                                         "Arts/crafts");
+    dishCategoryDesc[0x99] = QCoreApplication::translate("(Categories)",
+                                                         "Auction");
+    dishCategoryDesc[0x9a] = QCoreApplication::translate("(Categories)",
+                                                         "Auto racing");
+    dishCategoryDesc[0x9b] = QCoreApplication::translate("(Categories)",
+                                                         "Air racing");
+    dishCategoryDesc[0x9c] = QCoreApplication::translate("(Categories)",
+                                                         "Badminton");
+    dishCategoryDesc[0xa0] = QCoreApplication::translate("(Categories)",
+                                                         "Bicycle racing");
+    dishCategoryDesc[0xa1] = QCoreApplication::translate("(Categories)",
+                                                         "Boat Racing");
+    dishCategoryDesc[0xa6] = QCoreApplication::translate("(Categories)",
+                                                         "Community");
+    dishCategoryDesc[0xa7] = QCoreApplication::translate("(Categories)",
+                                                         "Consumer");
+    dishCategoryDesc[0xaa] = QCoreApplication::translate("(Categories)",
+                                                         "Debate");
+    dishCategoryDesc[0xac] = QCoreApplication::translate("(Categories)",
+                                                         "Dog show");
+    dishCategoryDesc[0xad] = QCoreApplication::translate("(Categories)",
+                                                         "Drag racing");
+    dishCategoryDesc[0xae] = QCoreApplication::translate("(Categories)",
+                                                         "Entertainment");
+    dishCategoryDesc[0xaf] = QCoreApplication::translate("(Categories)",
+                                                         "Environment");
+    dishCategoryDesc[0xb0] = QCoreApplication::translate("(Categories)",
+                                                         "Equestrian");
+    dishCategoryDesc[0xb3] = QCoreApplication::translate("(Categories)",
+                                                         "Field hockey");
+    dishCategoryDesc[0xb5] = QCoreApplication::translate("(Categories)",
+                                                         "Football");
+    dishCategoryDesc[0xb6] = QCoreApplication::translate("(Categories)",
+                                                         "Gay/lesbian");
+    dishCategoryDesc[0xb7] = QCoreApplication::translate("(Categories)",
+                                                         "Handball");
+    dishCategoryDesc[0xb8] = QCoreApplication::translate("(Categories)",
+                                                         "Home improvement");
+    dishCategoryDesc[0xb9] = QCoreApplication::translate("(Categories)",
+                                                         "Hunting");
+    dishCategoryDesc[0xbb] = QCoreApplication::translate("(Categories)",
+                                                         "Hydroplane racing");
+    dishCategoryDesc[0xc1] = QCoreApplication::translate("(Categories)",
+                                                         "Law");
+    dishCategoryDesc[0xc3] = QCoreApplication::translate("(Categories)",
+                                                         "Motorcycle racing");
+    dishCategoryDesc[0xc5] = QCoreApplication::translate("(Categories)",
+                                                         "Newsmagazine");
+    dishCategoryDesc[0xc7] = QCoreApplication::translate("(Categories)",
+                                                         "Paranormal");
+    dishCategoryDesc[0xc8] = QCoreApplication::translate("(Categories)",
+                                                         "Parenting");
+    dishCategoryDesc[0xca] = QCoreApplication::translate("(Categories)",
+                                                         "Performing arts");
+    dishCategoryDesc[0xcc] = QCoreApplication::translate("(Categories)",
+                                                         "Politics");
+    dishCategoryDesc[0xcf] = QCoreApplication::translate("(Categories)",
+                                                         "Pro wrestling");
+    dishCategoryDesc[0xd3] = QCoreApplication::translate("(Categories)",
+                                                         "Sailing");
+    dishCategoryDesc[0xd4] = QCoreApplication::translate("(Categories)",
+                                                         "Shooting");
+    dishCategoryDesc[0xd5] = QCoreApplication::translate("(Categories)",
+                                                         "Sitcom");
+    dishCategoryDesc[0xd6] = QCoreApplication::translate("(Categories)",
+                                                         "Skateboarding");
+    dishCategoryDesc[0xd9] = QCoreApplication::translate("(Categories)",
+                                                         "Snowboarding");
+    dishCategoryDesc[0xdd] = QCoreApplication::translate("(Categories)",
+                                                         "Standup");
+    dishCategoryDesc[0xdf] = QCoreApplication::translate("(Categories)",
+                                                         "Surfing");
+    dishCategoryDesc[0xe0] = QCoreApplication::translate("(Categories)",
+                                                         "Tennis");
+    dishCategoryDesc[0xe1] = QCoreApplication::translate("(Categories)",
+                                                         "Triathlon");
+    dishCategoryDesc[0xe6] = QCoreApplication::translate("(Categories)",
+                                                         "Card games");
+    dishCategoryDesc[0xe7] = QCoreApplication::translate("(Categories)",
+                                                         "Poker");
+    dishCategoryDesc[0xea] = QCoreApplication::translate("(Categories)",
+                                                         "Military");
+    dishCategoryDesc[0xeb] = QCoreApplication::translate("(Categories)",
+                                                         "Technology");
+    dishCategoryDesc[0xec] = QCoreApplication::translate("(Categories)",
+                                                         "Mixed martial arts");
+    dishCategoryDesc[0xed] = QCoreApplication::translate("(Categories)",
+                                                         "Action sports");
+    dishCategoryDesc[0xff] = QCoreApplication::translate("(Categories)",
+                                                         "Dish Network");
 
     dishCategoryDescExists = true;
 }

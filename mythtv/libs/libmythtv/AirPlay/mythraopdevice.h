@@ -20,9 +20,13 @@ class MTV_PUBLIC MythRAOPDevice : public ServerPool
   public:
     static bool Create(void);
     static void Cleanup(void);
+    static MythRAOPDevice *RAOPSharedInstance(void) { return gMythRAOPDevice; }
 
     MythRAOPDevice();
-    bool NextInAudioQueue(MythRAOPConnection* conn);
+    void DeleteAllClients(MythRAOPConnection *keep);
+
+  public slots:
+    void TVPlaybackStarting(void);
 
   private slots:
     void Start();
@@ -32,6 +36,7 @@ class MTV_PUBLIC MythRAOPDevice : public ServerPool
   private:
     virtual ~MythRAOPDevice(void);
     void Teardown(void);
+    bool RegisterForBonjour(void);
 
     // Globals
     static MythRAOPDevice *gMythRAOPDevice;
@@ -45,6 +50,7 @@ class MTV_PUBLIC MythRAOPDevice : public ServerPool
     bool             m_valid;
     QMutex          *m_lock;
     int              m_setupPort;
+    int              m_basePort;
     QList<MythRAOPConnection*> m_clients;
 };
 

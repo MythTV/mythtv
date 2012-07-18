@@ -100,7 +100,7 @@ class DictData( OrdDict ):
                 locale.atof,
                 bool,
                 lambda x: x,
-                lambda x: datetime.fromTimestamp(x),
+                lambda x: datetime.fromTimestamp(x, datetime.UTCTZ()),
                 lambda x: date(*[int(y) for y in x.split('-')]),
                 lambda x: datetime.fromRfc(x)]
     _inv_trans = [  str,

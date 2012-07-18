@@ -106,5 +106,5 @@ using_oss: DEFINES += USING_OSS
 macx:      DEFINES += USING_COREAUDIO
 using_libdns_sd {
     DEFINES += USING_LIBDNS_SD
-    using_libcrypto: DEFINES += USING_RAOP
+    using_libcrypto: DEFINES += USING_AIRPLAY
 }

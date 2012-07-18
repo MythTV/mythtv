@@ -31,12 +31,12 @@ use Image::Magick;
 our ($opt_v, $opt_t, $opt_T, $opt_l, $opt_u, $opt_d); 
 
 my $name = 'ENVCAN-Static-Map';
-my $version = 0.1;
+my $version = 0.3;
 my $author = 'Gavin Hurlbut';
 my $email = 'gjhurlbu@gmail.com';
 my $updateTimeout = 10*60;
 my $retrieveTimeout = 30;
-my @types = ('smdesc', 'updatetime', 'map', 'copyright');
+my @types = ('smdesc', 'updatetime', 'map', 'copyright', 'copyrightlogo');
 my $dir = "/tmp/envcan";
 
 getopts('Tvtlu:d:');
@@ -125,3 +125,4 @@ print "map::$path.$ext\n";
 print "updatetime::Last Updated on " . 
       UnixDate("now", "%b %d, %I:%M %p %Z") . "\n";
 print "copyright::Environment Canada\n";
+print "copyrightlogo::none\n";

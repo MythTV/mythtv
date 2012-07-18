@@ -13,6 +13,7 @@ trans.files += mytharchive_sl.qm mytharchive_hu.qm mytharchive_en_us.qm
 trans.files += mytharchive_ru.qm mytharchive_el.qm mytharchive_pt.qm
 trans.files += mytharchive_pl.qm mytharchive_en_ca.qm mytharchive_es_es.qm
 trans.files += mytharchive_zh_hk.qm
+trans.files += mytharchive_it.qm
 
 INSTALLS += trans
 

@@ -30,12 +30,13 @@ use Image::Magick;
 our ($opt_v, $opt_t, $opt_T, $opt_l, $opt_u, $opt_d); 
 
 my $name = 'ENVCAN-Animated-Map';
-my $version = 0.4;
-my $author = 'Joe Ripley';
-my $email = 'vitaminjoe@gmail.com';
+my $version = 0.5;
+my $author = 'Joe Ripley / Gavin Hurlbut';
+my $email = 'vitaminjoe@gmail.com / gjhurlbu@gmail.com';
 my $updateTimeout = 10*60;
 my $retrieveTimeout = 30;
-my @types = ('amdesc', 'updatetime', 'animatedimage', 'copyright');
+my @types = ('amdesc', 'updatetime', 'animatedimage', 'copyright',
+             'copyrightlogo');
 my $dir = "/tmp/envcan";
 
 getopts('Tvtlu:d:');
@@ -128,3 +129,4 @@ print "animatedimage::$dir/$file.gif\n";
 print "updatetime::Last Updated on " . 
       UnixDate("now", "%b %d, %I:%M %p %Z") . "\n";
 print "copyright::Environment Canada\n";
+print "copyrightlogo::none\n";

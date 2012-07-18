@@ -48,7 +48,11 @@ void MythSignalingTimer::start(int msec)
         dorun = true;
         MThread::start();
         while (dorun && !running)
+        {
+            locker.unlock();
             usleep(10 * 1000);
+            locker.relock();
+        }
     }
 }
 

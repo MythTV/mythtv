@@ -1298,7 +1298,7 @@ QImage *MythUIHelper::LoadScaleImage(QString filename, bool fromcache)
     LOG(VB_GUI | VB_FILE, LOG_INFO,  LOC +
         QString("LoadScaleImage(%1)").arg(filename));
 
-    if (filename.isEmpty() || filename == "none")
+    if (filename.isEmpty())
         return NULL;
 
     if ((!FindThemeFile(filename)) &&
@@ -1307,7 +1307,7 @@ QImage *MythUIHelper::LoadScaleImage(QString filename, bool fromcache)
         (!filename.startsWith("ftp://")) &&
         (!filename.startsWith("myth://")))
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + QString("LoadScaleImage(%1)")
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("LoadScaleImage(%1) ")
             .arg(filename) + "Unable to find image file");
 
         return NULL;
@@ -1398,7 +1398,7 @@ QPixmap *MythUIHelper::LoadScalePixmap(QString filename, bool fromcache)
     LOG(VB_GUI | VB_FILE, LOG_INFO, LOC +
         QString("LoadScalePixmap(%1)").arg(filename));
 
-    if (filename.isEmpty() || filename == "none")
+    if (filename.isEmpty())
         return NULL;
 
     if (!FindThemeFile(filename) && (!filename.startsWith("myth:")))

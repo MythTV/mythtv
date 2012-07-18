@@ -1,6 +1,8 @@
 #include <QTimer>
 #include <QtEndian>
 #include <QNetworkInterface>
+#include <QCoreApplication>
+#include <QtAlgorithms>
 
 #include "mthread.h"
 #include "mythlogging.h"
@@ -11,9 +13,9 @@
 #include "mythraopdevice.h"
 #include "mythairplayserver.h"
 
-MythRAOPDevice* MythRAOPDevice::gMythRAOPDevice = NULL;
-MThread*        MythRAOPDevice::gMythRAOPDeviceThread = NULL;
-QMutex*         MythRAOPDevice::gMythRAOPDeviceMutex = new QMutex(QMutex::Recursive);
+MythRAOPDevice *MythRAOPDevice::gMythRAOPDevice = NULL;
+MThread        *MythRAOPDevice::gMythRAOPDeviceThread = NULL;
+QMutex         *MythRAOPDevice::gMythRAOPDeviceMutex = new QMutex(QMutex::Recursive);
 
 #define LOC QString("RAOP Device: ")
 
@@ -83,7 +85,7 @@ void MythRAOPDevice::Cleanup(void)
 
 MythRAOPDevice::MythRAOPDevice()
   : ServerPool(), m_name(QString("MythTV")), m_bonjour(NULL), m_valid(false),
-    m_lock(new QMutex(QMutex::Recursive)), m_setupPort(5000)
+    m_lock(new QMutex(QMutex::Recursive)), m_setupPort(5000), m_basePort(0)
 {
     m_hardwareId = QByteArray::fromHex(AirPlayHardwareId().toAscii());
 }
@@ -108,12 +110,7 @@ void MythRAOPDevice::Teardown(void)
     m_bonjour = NULL;
 
     // disconnect clients
-    foreach (MythRAOPConnection* client, m_clients)
-    {
-        disconnect(client->GetSocket(), 0, 0, 0);
-        delete client;
-    }
-    m_clients.clear();
+    DeleteAllClients(NULL);
 }
 
 void MythRAOPDevice::Start(void)
@@ -128,7 +125,7 @@ void MythRAOPDevice::Start(void)
     connect(this, SIGNAL(newConnection(QTcpSocket *)),
             this, SLOT(newConnection(QTcpSocket *)));
 
-    int baseport = m_setupPort;
+    m_basePort = m_setupPort;
     m_setupPort = tryListeningPort(m_setupPort, RAOP_PORT_RANGE);
     // start listening for connections (try a few ports in case the default is in use)
     if (m_setupPort < 0)
@@ -140,40 +137,8 @@ void MythRAOPDevice::Start(void)
     {
         LOG(VB_GENERAL, LOG_INFO, LOC +
             QString("Listening for connections on port %1").arg(m_setupPort));
-        // announce service
-        m_bonjour = new BonjourRegister(this);
 
-        // give each frontend a unique name
-        int multiple = m_setupPort - baseport;
-        if (multiple > 0)
-            m_name += QString::number(multiple);
-
-        QByteArray name = m_hardwareId.toHex();
-        name.append("@");
-        name.append(m_name);
-        name.append(" on ");
-        name.append(gCoreContext->GetHostName());
-        QByteArray type = "_raop._tcp";
-        QByteArray txt;
-        txt.append(6); txt.append("tp=UDP");
-        txt.append(8); txt.append("sm=false");
-        txt.append(8); txt.append("sv=false");
-        txt.append(4); txt.append("ek=1");      //
-        txt.append(6); txt.append("et=0,1");    // encryption type: no, RSA
-        txt.append(6); txt.append("cn=0,1");    // audio codec: pcm, alac
-        txt.append(4); txt.append("ch=2");      // audio channels
-        txt.append(5); txt.append("ss=16");     // sample size
-        txt.append(8); txt.append("sr=44100");  // sample rate
-        txt.append(8); txt.append("pw=false");  // no password
-        txt.append(4); txt.append("vn=3");
-        txt.append(9); txt.append("txtvers=1"); // TXT record version 1
-        txt.append(8); txt.append("md=0,1,2");  // metadata-type: text, artwork, progress
-        txt.append(9); txt.append("vs=130.14");
-        txt.append(7); txt.append("da=true");
-
-        LOG(VB_GENERAL, LOG_INFO, QString("Registering service %1.%2 port %3 TXT %4")
-            .arg(QString(name)).arg(QString(type)).arg(m_setupPort).arg(QString(txt)));
-        if (!m_bonjour->Register(m_setupPort, type, name, txt))
+        if (!RegisterForBonjour())
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to register service.");
             return;
@@ -184,14 +149,55 @@ void MythRAOPDevice::Start(void)
     return;
 }
 
-bool MythRAOPDevice::NextInAudioQueue(MythRAOPConnection *conn)
+bool MythRAOPDevice::RegisterForBonjour(void)
 {
-    QMutexLocker locker(m_lock);
-    QList<MythRAOPConnection *>::iterator it;
-    for (it = m_clients.begin(); it != m_clients.end(); ++it)
-        if (!(*it)->HasAudio())
-            return conn == (*it);
-    return true;
+    // announce service
+    m_bonjour = new BonjourRegister(this);
+
+    // give each frontend a unique name
+    int multiple = m_setupPort - m_basePort;
+    if (multiple > 0)
+        m_name += QString::number(multiple);
+
+    QByteArray name = m_hardwareId.toHex();
+    name.append("@");
+    name.append(m_name);
+    name.append(" on ");
+    name.append(gCoreContext->GetHostName());
+    QByteArray type = "_raop._tcp";
+    QByteArray txt;
+    txt.append(6); txt.append("tp=UDP");
+    txt.append(8); txt.append("sm=false");
+    txt.append(8); txt.append("sv=false");
+    txt.append(4); txt.append("ek=1");      //
+    txt.append(6); txt.append("et=0,1");    // encryption type: no, RSA
+    txt.append(6); txt.append("cn=0,1");    // audio codec: pcm, alac
+    txt.append(4); txt.append("ch=2");      // audio channels
+    txt.append(5); txt.append("ss=16");     // sample size
+    txt.append(8); txt.append("sr=44100");  // sample rate
+    if (gCoreContext->GetNumSetting("AirPlayPasswordEnabled"))
+    {
+        txt.append(7); txt.append("pw=true");
+    }
+    else
+    {
+        txt.append(8); txt.append("pw=false");
+    }
+    txt.append(4); txt.append("vn=3");
+    txt.append(9); txt.append("txtvers=1"); // TXT record version 1
+    txt.append(8); txt.append("md=0,1,2");  // metadata-type: text, artwork, progress
+    txt.append(9); txt.append("vs=130.14");
+    txt.append(7); txt.append("da=true");
+
+    LOG(VB_GENERAL, LOG_INFO, QString("Registering service %1.%2 port %3 TXT %4")
+        .arg(QString(name)).arg(QString(type)).arg(m_setupPort).arg(QString(txt)));
+    return m_bonjour->Register(m_setupPort, type, name, txt);
+}
+
+void MythRAOPDevice::TVPlaybackStarting(void)
+{
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Receiving new playback message"));
+    DeleteAllClients(NULL);
 }
 
 void MythRAOPDevice::newConnection(QTcpSocket *client)
@@ -200,28 +206,14 @@ void MythRAOPDevice::newConnection(QTcpSocket *client)
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("New connection from %1:%2")
         .arg(client->peerAddress().toString()).arg(client->peerPort()));
 
-    int port = 6000;
-    while (port < (6000 + RAOP_PORT_RANGE))
-    {
-        bool found = false;
-        foreach (MythRAOPConnection* client, m_clients)
-        {
-            if (client->GetDataPort() == port)
-            {
-                found = true;
-                port++;
-            }
-        }
-        if (!found)
-            break;
-    }
-
     MythRAOPConnection *obj =
-            new MythRAOPConnection(this, client, m_hardwareId, port);
+            new MythRAOPConnection(this, client, m_hardwareId, 6000);
+
     if (obj->Init())
     {
         m_clients.append(obj);
         connect(client, SIGNAL(disconnected()), this, SLOT(deleteClient()));
+        gCoreContext->RegisterForPlayback(this, SLOT(TVPlaybackStarting()));
         return;
     }
 
@@ -234,16 +226,45 @@ void MythRAOPDevice::newConnection(QTcpSocket *client)
 
 void MythRAOPDevice::deleteClient(void)
 {
+    LOG(VB_GENERAL, LOG_DEBUG, LOC + "Entering DeleteClient.");
     QMutexLocker locker(m_lock);
-    QList<MythRAOPConnection *>::iterator it;
-    for (it = m_clients.begin(); it != m_clients.end(); ++it)
+    QList<MythRAOPConnection *>::iterator it = m_clients.begin();
+
+    while (it != m_clients.end())
     {
         if ((*it)->GetSocket()->state() == QTcpSocket::UnconnectedState)
         {
             LOG(VB_GENERAL, LOG_INFO, LOC + "Removing client connection.");
-            m_clients.removeOne(*it);
             delete *it;
+            m_clients.erase(it);
             return;
         }
+        ++it;
     }
+    LOG(VB_GENERAL, LOG_DEBUG, LOC + "Exiting DeleteClient.");
+}
+
+void MythRAOPDevice::DeleteAllClients(MythRAOPConnection *keep)
+{
+    LOG(VB_GENERAL, LOG_DEBUG, LOC + "Entering DeleteAllClients.");
+    QMutexLocker locker(m_lock);
+
+    QList<MythRAOPConnection*>::iterator it = m_clients.begin();
+
+    while (it != m_clients.end())
+    {
+        MythRAOPConnection *client = *it;
+        if (client == keep)
+        {
+            ++it;
+            continue;
+        }
+        LOG(VB_GENERAL, LOG_INFO, LOC +
+            QString("Removing client connection %1:%2")
+            .arg(client->GetSocket()->peerAddress().toString())
+            .arg(client->GetSocket()->peerPort()));
+        delete *it;
+        it = m_clients.erase(it);
+    }
+    LOG(VB_GENERAL, LOG_DEBUG, LOC + "Exiting DeleteAllClients.");
 }

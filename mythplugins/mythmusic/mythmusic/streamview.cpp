@@ -30,11 +30,10 @@
 using namespace std;
 
 StreamView::StreamView(MythScreenStack *parent)
-         :MusicCommon(parent, "streamview")
+           :MusicCommon(parent, "streamview"),
+            m_streamList(NULL), m_noStreams(NULL), m_bufferStatus(NULL),
+            m_bufferProgress(NULL)
 {
-    m_streamList = NULL;
-    m_bufferStatus = NULL;
-    m_bufferProgress = NULL;
     m_currentView = MV_RADIO;
 }
 
@@ -590,10 +589,12 @@ void StreamView::deleteStream(Metadata *mdata)
 EditStreamMetadata::EditStreamMetadata(MythScreenStack *parentStack,
                                  StreamView *parent,
                                  Metadata *mdata)
-    : MythScreenType(parentStack, "editstreampopup")
+    : MythScreenType(parentStack, "editstreampopup"),
+        m_parent(parent), m_streamMeta(mdata),
+    m_stationEdit(NULL),  m_channelEdit(NULL), m_urlEdit(NULL),
+    m_logourlEdit(NULL),  m_formatEdit(NULL),  m_genreEdit(NULL),
+    m_searchButton(NULL), m_cancelButton(NULL), m_saveButton(NULL)
 {
-    m_parent = parent;
-    m_streamMeta = mdata;
 }
 
 bool EditStreamMetadata::Create()
@@ -695,7 +696,9 @@ void EditStreamMetadata::changeStreamMetadata(Metadata* mdata)
 
 SearchStream::SearchStream(MythScreenStack *parentStack,
                            EditStreamMetadata *parent)
-    : MythScreenType(parentStack, "searchstream")
+    : MythScreenType(parentStack, "searchstream"),
+    m_parent(NULL),  m_stationList(NULL), m_genreList(NULL),
+    m_channelEdit(NULL), m_streamList(NULL), m_matchesText(NULL)
 {
     m_parent = parent;
 }

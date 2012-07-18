@@ -19885,7 +19885,7 @@ Infine, testare, imediatamente attivare, archiviare o cancellare la regola.</tra
     <message>
         <location filename="../themes/themestrings.h" line="819"/>
         <source>%|&quot;SUBTITLE|&quot;%</source>
-        <translation>%|&quot;SOTTOTITOLO|&quot;%</translation>
+        <translation>%|&quot;SUBTITLE|&quot;%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="820"/>
@@ -20527,7 +20527,7 @@ Per programmare una registrazione, uscire da questa schermata e selezionare &apo
     <message>
         <location filename="../themes/themestrings.h" line="148"/>
         <source>%&quot;|SUBTITLE|&quot; %%LONGREPEAT%%(|STARS|) %%DESCRIPTION%</source>
-        <translation>%&quot;|SOTTOTITOLO|&quot; %%LONGREPEAT%%(|STELLE|) %%DESCRIPTION%</translation>
+        <translation>%&quot;|SUBTITLE|&quot; %%LONGREPEAT%%(|STARS|) %%DESCRIPTION%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="155"/>
@@ -20562,7 +20562,7 @@ Per programmare una registrazione, uscire da questa schermata e selezionare &apo
     <message>
         <location filename="../themes/themestrings.h" line="167"/>
         <source>%&quot;|SUBTITLE|&quot; %%(|STARS|) %%DESCRIPTION%</source>
-        <translation>%&quot;|SOTTOTITOLO|&quot; %%(|STELLE|) %%DESCRIPTION%</translation>
+        <translation>%&quot;|SUBTITLE|&quot; %%(|STARS|) %%DESCRIPTION%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="183"/>
@@ -20578,14 +20578,14 @@ Per programmare una registrazione, uscire da questa schermata e selezionare &apo
         <location filename="../themes/themestrings.h" line="200"/>
         <source>%&quot;|SUBTITLE|&quot;
 %%YEARSTARS| %%DESCRIPTION%</source>
-        <translation>%&quot;|SOTTOTITOLO|&quot;
+        <translation>%&quot;|SUBTITLE|&quot;
 %%YEARSTARS| %%DESCRIPTION%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="243"/>
         <source>%&quot;|SUBTITLE|&quot;
 %%LONGREPEAT%%(|STARS|) %%DESCRIPTION%</source>
-        <translation>%&quot;|SOTTOTITOLO|&quot;
+        <translation>%&quot;|SUBTITLE|&quot;
 %%LONGREPEAT%%(|STARS|) %%DESCRIPTION%</translation>
     </message>
     <message>
@@ -20823,7 +20823,7 @@ dd MMMM yyyy</translation>
     <message>
         <location filename="../themes/themestrings.h" line="434"/>
         <source>%&quot;|SUBTITLE|&quot; %%DESCRIPTION%</source>
-        <translation>%&quot;|SOTTOTITOLO|&quot; %%DESCRIPTION%</translation>
+        <translation>%&quot;|SUBTITLE|&quot; %%DESCRIPTION%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="436"/>
@@ -20870,7 +20870,7 @@ dd MMMM yyyy</translation>
     <message>
         <location filename="../themes/themestrings.h" line="480"/>
         <source>%Season - |SEASON| %% Episode - |EPISODE| %</source>
-        <translation>%Season - |STAGIONE| %% Episode - |EPISODIO| %</translation>
+        <translation>%Season - |SEASON| %% Episode - |EPISODE| %</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="486"/>
@@ -20998,7 +20998,7 @@ dd MMMM yyyy</translation>
     <message>
         <location filename="../themes/themestrings.h" line="886"/>
         <source>%|&quot;SUBTITLE|&quot;% %|(STARS|) %%DESCRIPTION%</source>
-        <translation>%|&quot;SOTTOTITOLO|&quot;% %|(STELLE|) %%DESCRIPTION%</translation>
+        <translation>%|&quot;SUBTITLE|&quot;% %|(STARS|) %%DESCRIPTION%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="887"/>
@@ -21087,7 +21087,7 @@ Una volta completate le modifiche, fare clic sull bottone &quot;Salva&quot;.</tr
     <message>
         <location filename="../themes/themestrings.h" line="905"/>
         <source>%|(STARS|) %%DESCRIPTION%</source>
-        <translation>%|(STELLE|) %%DESCRIPTION%</translation>
+        <translation>%|(STARS|) %%DESCRIPTION%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="906"/>
@@ -22321,7 +22321,7 @@ Se si seleziona &quot;Usare il riproduttore predefinito&quot; il comando del let
     <message>
         <location filename="../themes/themestrings.h" line="865"/>
         <source>%|RATING| %%|(STARS|) %%DESCRIPTION%</source>
-        <translation>%|VALUTAZIONE| %%|(STELLE|) %%DESCRIPTION%</translation>
+        <translation>>%|RATING| %%|(STARS|) %%DESCRIPTION%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="866"/>
@@ -23352,7 +23352,7 @@ Se si seleziona &quot;Usare il riproduttore predefinito&quot; il comando del let
     <message>
         <location filename="../themes/themestrings.h" line="843"/>
         <source>%|&quot;SUBTITLE|&quot;% %STARS% %DESCRIPTION%</source>
-        <translation>%|&quot;SOTTOTITOLO|&quot;% %STARS% %DESCRIPTION%</translation>
+        <translation>%|&quot;SUBTITLE|&quot;% %STARS% %DESCRIPTION%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="168"/>
@@ -23383,7 +23383,7 @@ Se si seleziona &quot;Usare il riproduttore predefinito&quot; il comando del let
         <location filename="../themes/themestrings.h" line="801"/>
         <source>%|&quot;SUBTITLE|&quot;%
 %YEARSTARS%%DESCRIPTION%</source>
-        <translation>%|&quot;SOTTOTITOLO|&quot;%
+        <translation>%|&quot;SUBTITLE|&quot;%
 %YEARSTARS%%DESCRIPTION%</translation>
     </message>
     <message>
@@ -23517,7 +23517,7 @@ Per programmare una registrazione, uscire da questa schermata e selezionare &apo
         <location filename="../themes/themestrings.h" line="827"/>
         <source>%|&quot;SUBTITLE|&quot;%
 %LONGREPEAT%%STARS| %%DESCRIPTION%</source>
-        <translation>%|&quot;SOTTOTITOLO|&quot;%
+        <translation>%|&quot;SUBTITLE|&quot;%
 %LONGREPEAT%%STARS| %%DESCRIPTION%</translation>
     </message>
     <message>
@@ -23543,7 +23543,7 @@ Per programmare una registrazione, uscire da questa schermata e selezionare &apo
     <message>
         <location filename="../themes/themestrings.h" line="805"/>
         <source>%|&quot;SUBTITLE|&quot;% %LONGREPEAT%%STARS| %%DESCRIPTION%</source>
-        <translation>%|&quot;SOTTOTITOLO|&quot;% %LONGREPEAT%%STARS| %%DESCRIPTION%</translation>
+        <translation>%|&quot;SUBTITLE|&quot;% %LONGREPEAT%%STARS| %%DESCRIPTION%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="364"/>

@@ -48,6 +48,11 @@
         <translation>%1 από %2 (%3 τοις εκατό)</translation>
     </message>
     <message>
+        <location filename="../mythnews/mythnews.cpp" line="703"/>
+        <source>Downloading media...</source>
+        <translation>Κατεβάζω στοιχεία...</translation>
+    </message>
+    <message>
         <location filename="../mythnews/mythnews.cpp" line="808"/>
         <source>No browser command set! MythNews needs MythBrowser to be installed.</source>
         <translation>Δεν έχει οριστεί Περιηγητής! Οι Ειδήσεις απαιτούν την εγκατάσταση του MythBrowser.</translation>
@@ -140,34 +145,34 @@
 <context>
     <name>NewsSite</name>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="226"/>
+        <location filename="../mythnews/newssite.cpp" line="227"/>
         <source>Retrieve Failed. </source>
         <translation>Αποτυχία Ενημέρωσης.</translation>
     </message>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="233"/>
-        <location filename="../mythnews/newssite.cpp" line="242"/>
-        <location filename="../mythnews/newssite.cpp" line="251"/>
+        <location filename="../mythnews/newssite.cpp" line="234"/>
+        <location filename="../mythnews/newssite.cpp" line="243"/>
+        <location filename="../mythnews/newssite.cpp" line="252"/>
         <source>Failed to retrieve news</source>
         <translation>Αποτυχία λήψης ειδήσεων</translation>
     </message>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="234"/>
+        <location filename="../mythnews/newssite.cpp" line="235"/>
         <source>No Cached News.</source>
         <translation>Δεν υπάρχουν αποθηκευμένες Ειδήσεις.</translation>
     </message>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="253"/>
+        <location filename="../mythnews/newssite.cpp" line="254"/>
         <source>Failed to read downloaded file.</source>
         <translation>Αποτυχία κατεβάσματος αρχείου.</translation>
     </message>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="261"/>
+        <location filename="../mythnews/newssite.cpp" line="262"/>
         <source>Showing Cached News.</source>
         <translation>Εμφάνιση Αποθηκευμένων Ειδήσεων.</translation>
     </message>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="282"/>
+        <location filename="../mythnews/newssite.cpp" line="283"/>
         <source>XML-file is not valid RSS-feed</source>
         <translation>Το αρχείο XML δεν είναι έγκυρη τροφοδοσία RSS</translation>
     </message>
@@ -175,9 +180,8 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="703"/>
         <source>Downloading media...</source>
-        <translation>Κατεβάζω στοιχεία...</translation>
+        <translation type="obsolete">Κατεβάζω στοιχεία...</translation>
     </message>
 </context>
 <context>

@@ -392,13 +392,6 @@ void ScreenSetup::loadData()
 
 void ScreenSetup::saveData()
 {
-    if (m_activeList->GetCount() <= 0)
-    {
-        LOG(VB_GENERAL, LOG_ERR,
-            "No Active Screens are defined. Nothing Saved.");
-        return;
-    }
-
     // check if all active screens have sources/locations defined
     QStringList notDefined;
 
@@ -1020,14 +1013,24 @@ void LocationDialog::doSearch()
         }
     }
 
-    for (int i = 0; i < result_cache.keys().size(); ++i)
+    QMap<ScriptInfo *, QStringList>::iterator it;
+    for (it = result_cache.begin(); it != result_cache.end(); ++it)
     {
-        si = result_cache.keys()[i];
-        QStringList results = result_cache[si];
+        si = it.key();
+        QStringList results = it.value();
         QString name = si->name;
-        for (int ii = 0; ii < results.size(); ++ii)
+        QStringList::iterator rit;
+        for (rit = results.begin(); rit != results.end(); ++rit)
         {
-            QStringList tmp = results[ii].split("::");
+            QStringList tmp = (*rit).split("::");
+            if (tmp.size() < 2)
+            {
+                LOG(VB_GENERAL, LOG_WARNING,
+                        QString("Invalid line in Location Search reponse "
+                                "from %1: %2")
+                                    .arg(name).arg(*rit));
+                continue;
+            }
             QString resultstring = QString("%1 (%2)").arg(tmp[1]).arg(name);
             MythUIButtonListItem *item =
                 new MythUIButtonListItem(m_locationList, resultstring);
