@@ -41,6 +41,19 @@ static HostLineEdit *LocalServerIP6()
     return gc;
 }
 
+static HostCheckBox *UseLinkLocal()
+{
+    HostCheckBox *hc = new HostCheckBox("AllowLinkLocal");
+    hc->setLabel(QObject::tr("Listen on Link-Local addresses"));
+    hc->setValue(true);
+    hc->setHelpText(QObject::tr("Enable servers on this machine to listen on "
+                    "link-local addresses. These are auto-configured "
+                    "addresses and not accessible outside the local network. "
+                    "This must be enabled for anything requiring Bonjour to "
+                    "work."));
+    return hc;
+};
+
 static HostLineEdit *LocalServerPort()
 {
     HostLineEdit *gc = new HostLineEdit("BackendServerPort");
@@ -856,6 +869,10 @@ BackendSettings::BackendSettings() {
               new HorizontalConfigurationGroup(false, false, true, true);
     localIP6->addChild(LocalServerIP6());
     localServer->addChild(localIP6);
+    HorizontalConfigurationGroup *localUseLL =
+              new HorizontalConfigurationGroup(false, false, true, true);
+    localUseLL->addChild(UseLinkLocal());
+    localServer->addChild(localUseLL);
     HorizontalConfigurationGroup* localPorts =
               new HorizontalConfigurationGroup(false, false, true, true);
     localPorts->addChild(LocalServerPort());

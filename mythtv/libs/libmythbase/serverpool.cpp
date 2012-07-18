@@ -99,7 +99,7 @@ void ServerPool::SelectDefaultListen(bool force)
     QHostAddress config_v6(gCoreContext->GetSetting("BackendServerIP6"));
     bool v6IsSet = config_v6.isNull() ? true : false;
 #endif
-    bool allowLinkLocal = gCoreContext->GetNumSetting("AllowLinkLocal") > 0;
+    bool allowLinkLocal = gCoreContext->GetNumSetting("AllowLinkLocal", true) > 0;
 
     // loop through all available interfaces
     QList<QNetworkInterface> IFs = QNetworkInterface::allInterfaces();
@@ -229,7 +229,7 @@ void ServerPool::SelectDefaultListen(bool force)
                     LOG(VB_GENERAL, LOG_DEBUG,
                             QString("Adding link-local '%1' to address list.")
                                 .arg(ip.toString()));
-                    naList_4.append(*qnai);
+                    naList_6.append(*qnai);
                 }
 
                 else if (config_v6.isNull())
@@ -243,7 +243,7 @@ void ServerPool::SelectDefaultListen(bool force)
                             QString("Adding '%1' to address list.")
                                 .arg(PRETTYIP_(ip)));
 
-                    naList_4.append(*qnai);
+                    naList_6.append(*qnai);
                 }
 
                 else
