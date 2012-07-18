@@ -4432,7 +4432,8 @@ bool TVRec::CreateLiveTVRingBuffer(const QString & channum)
     SetRingBuffer(rb);
 
     pginfo->SaveAutoExpire(kLiveTVAutoExpire);
-    pginfo->ApplyRecordRecGroupChange("LiveTV");
+    if (!pseudoLiveTVRecording)
+        pginfo->ApplyRecordRecGroupChange("LiveTV");
 
     bool discont = (tvchain->TotalSize() > 0);
     tvchain->AppendNewProgram(pginfo, channel->GetCurrentName(),
@@ -4488,7 +4489,8 @@ bool TVRec::SwitchLiveTVRingBuffer(const QString & channum,
 
     pginfo->MarkAsInUse(true, kRecorderInUseID);
     pginfo->SaveAutoExpire(kLiveTVAutoExpire);
-    pginfo->ApplyRecordRecGroupChange("LiveTV");
+    if (!pseudoLiveTVRecording)
+        pginfo->ApplyRecordRecGroupChange("LiveTV");
     tvchain->AppendNewProgram(pginfo, channel->GetCurrentName(),
                               channel->GetCurrentInput(), discont);
 
