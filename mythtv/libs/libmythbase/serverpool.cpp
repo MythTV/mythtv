@@ -99,7 +99,7 @@ void ServerPool::SelectDefaultListen(bool force)
     QHostAddress config_v6(gCoreContext->GetSetting("BackendServerIP6"));
     bool v6IsSet = config_v6.isNull() ? true : false;
 #endif
-    bool allowLinkLocal = gCoreContext->GetNumSetting("AllowLinkLocal") > 0;
+    bool allowLinkLocal = gCoreContext->GetNumSetting("AllowLinkLocal", true) > 0;
 
     // loop through all available interfaces
     QList<QNetworkInterface> IFs = QNetworkInterface::allInterfaces();
