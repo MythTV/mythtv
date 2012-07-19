@@ -4103,9 +4103,11 @@ if enabled pthreads; then
 fi
 
 # Check for libuuid for zeromq
-enabled libuuid && check_lib uuid/uuid.h uuid_generate -luuid || disable libuuid
-if disabled libuuid ; then
+if enabled libuuid ; then
+  check_lib uuid/uuid.h uuid_generate -luuid || disable libuuid
+  if disabled libuuid ; then
     die "ERROR: can not find libuuid. (debian uuid-dev; RedHat libuuid-devel)"
+  fi
 fi
 
 # Attempt to use libudev for mediamonitor
