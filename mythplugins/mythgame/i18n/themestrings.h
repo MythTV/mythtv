@@ -2,7 +2,6 @@
 // Do not edit
 
 void strings_null() {
-    ThemeUI::tr("Games");
     ThemeUI::tr("Play Games");
     ThemeUI::tr("System:");
     ThemeUI::tr("Year:");
@@ -43,6 +42,7 @@ void strings_null() {
     ThemeUI::tr("Game Name:");
     ThemeUI::tr("Description:");
     ThemeUI::tr("Boxart:");
+    ThemeUI::tr("Games");
     ThemeUI::tr("Favorite");
     ThemeUI::tr("No Plot.");
     ThemeUI::tr("General Settings");

@@ -11,6 +11,8 @@ void strings_null() {
     ThemeUI::tr("6. Channel Editor");
     ThemeUI::tr("7. Storage Directories");
     ThemeUI::tr("8. System Events");
+    ThemeUI::tr("Setup Wizard");
+    ThemeUI::tr("Perform basic configuration tasks");
     ThemeUI::tr("General");
     ThemeUI::tr("Core MythTV behavior and system settings");
     ThemeUI::tr("Appearance");
@@ -21,8 +23,6 @@ void strings_null() {
     ThemeUI::tr("Configure local audio output");
     ThemeUI::tr("Screen Setup Wizards");
     ThemeUI::tr("Compensate for TVs with overscan");
-    ThemeUI::tr("Setup Wizard");
-    ThemeUI::tr("Perform basic configuration tasks");
     ThemeUI::tr("System Event Handlers");
     ThemeUI::tr("Configure System Event handler commands");
     ThemeUI::tr("Artwork and Data Sources");
@@ -341,6 +341,7 @@ void strings_null() {
     ThemeUI::tr("Save as default");
     ThemeUI::tr("Appearance Wizard");
     ThemeUI::tr("Move the selected arrow to the corner of the TV screen.  Press SELECT to edit the other arrow.  Press MENU for options and ESC to quit.");
+    ThemeUI::tr("%Using |TEMPLATE| Template%");
     ThemeUI::tr("Select Time & Date");
     ThemeUI::tr("Search terms:");
     ThemeUI::tr("Search");
@@ -358,6 +359,7 @@ void strings_null() {
     ThemeUI::tr("%STARTTIME%-%ENDTIME%");
     ThemeUI::tr("%CHANNUM%");
     ThemeUI::tr("Channel Number");
+    ThemeUI::tr("%DATE% %TIME%");
     ThemeUI::tr("(1) Time (2) Title");
     ThemeUI::tr("Sample Clauses:");
     ThemeUI::tr("Automatically Look Up Metadata");
@@ -406,12 +408,12 @@ void strings_null() {
     ThemeUI::tr("Delete your hardware profile");
     ThemeUI::tr("Audio Configuration");
     ThemeUI::tr("Audio Device:");
-    ThemeUI::tr("Number of Speakers:");
     ThemeUI::tr("My audio subsystem supports Dolby Digital");
     ThemeUI::tr("My audio subsystem supports DTS");
     ThemeUI::tr("My audio subsystem supports E-AC-3");
     ThemeUI::tr("My audio subsystem supports TrueHD");
     ThemeUI::tr("My audio subsystem supports DTS-HD");
+    ThemeUI::tr("Number of Speakers:");
     ThemeUI::tr("Previous");
     ThemeUI::tr("Video Configuration");
     ThemeUI::tr("Video Playback Profile:");
@@ -550,6 +552,8 @@ void strings_null() {
     ThemeUI::tr("Browse your video library");
     ThemeUI::tr("Listen to Music");
     ThemeUI::tr("Browse your music library");
+    ThemeUI::tr("Listen to Radio Stream");
+    ThemeUI::tr("Play radio streams");
     ThemeUI::tr("Search Internet Video");
     ThemeUI::tr("Search popular video sites");
     ThemeUI::tr("Browse Internet Video");
@@ -613,7 +617,7 @@ void strings_null() {
     ThemeUI::tr("Twitter Timeline");
     ThemeUI::tr("Edit Channels");
     ThemeUI::tr("Modify, Add, and Delete television channels.");
-    ThemeUI::tr("Delete Source");
+    ThemeUI::tr("Delete Channels");
     ThemeUI::tr("Import Icons");
     ThemeUI::tr("Edit On Screen Display");
     ThemeUI::tr("Select the menu items you want to see by playback mode.");
@@ -669,6 +673,7 @@ void strings_null() {
     ThemeUI::tr("Using the text areas below, you can change the recording title, subtitle, and description.\n\nOnce you have completed your modifications, click the \"OK\" button.");
     ThemeUI::tr("Description:");
     ThemeUI::tr("(%STARTTIME% - %ENDTIME%) %LONGREPEAT% %YEARSTARS%%DESCRIPTION%");
+    ThemeUI::tr("%CHANNELNUMBER%\n%CALLSIGN%");
     ThemeUI::tr("Manually Schedule A Recording");
     ThemeUI::tr("To manually schedule a recording, enter a title (optional).  Then set the channel, date, start time, and duration of your recording.  Note that this recording will not have any listings data or other information provided by an EPG.");
     ThemeUI::tr("Date:");
@@ -893,6 +898,9 @@ void strings_null() {
     ThemeUI::tr("name");
     ThemeUI::tr("Select a clause from the list:");
     ThemeUI::tr("Press Up/Down from letter list, to navigate to another list.  Press Left/Right from Show or Episode list to navigate to another list.");
+    ThemeUI::tr("%Using the '|TEMPLATE|' template%");
+    ThemeUI::tr("Schedule Type:");
+    ThemeUI::tr("Repeats:");
     ThemeUI::tr("Filter Options");
     ThemeUI::tr("Select the filters that should be applied for this recording.");
     ThemeUI::tr("->");
@@ -922,12 +930,12 @@ void strings_null() {
     ThemeUI::tr("Browsable");
     ThemeUI::tr("Filter video list");
     ThemeUI::tr("Designed to show off some different element arrangements available in Myth 0.25.  Reminder: On Watch Recordings screen [Rew] and [FF] can be used to change the Rec. Group.");
-    ThemeUI::tr("Another Theme build on the new UI library Any suggestions or bugs to https://code.google.com/p/a-forest/ A special thank to Steve Adeff for his help on this project.");
+    ThemeUI::tr("Animation, transparency and fanart for mythtv 0.25");
     ThemeUI::tr("LCARS");
     ThemeUI::tr(" Retro Originally by Gerhard Aldorf MythUI version based on MythCenter by Jeroen Brosens Conversion of Retro to MythUI by Chris Candreva A generally blue theme. Icon style is realistic based on clasic, 'Retro' styles. ");
     ThemeUI::tr("TintedGlass is a transparent theme that is a little old school MythTV yet takes advantage of new MythUI features.");
     ThemeUI::tr("a nice transparent theme to use your own background if you want. just copy your favorite picture (be sure that its resolution is 1920x1200) to /usr/share/mythtv/themes/TransBlue/background.jpg");
-    ThemeUI::tr("A UI and OSD theme with focus for fanart, banners and cover display.");
+    ThemeUI::tr("A UI and OSD theme with focus on fanart, banners and cover display.");
     ThemeUI::tr("blootube-ng is a theme based on the original blootube-wide by Justin Hornsby (justin.hornsby@gmail.com) which uses very large graphics associated with every menu entry. All changes where made to bring this theme forward to MythTV 0.24.");
     ThemeUI::tr("Blue-abstract is a modern looking theme meant for widescreen HD displays. The blue background and the consistent layout makes it an attractive and elegant looking theme.");
 }
