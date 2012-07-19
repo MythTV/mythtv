@@ -237,13 +237,14 @@ bool AVFormatWriter::CloseFile(void)
 
 bool AVFormatWriter::NextFrameIsKeyFrame(void)
 {
-    if ((m_framesWritten % m_keyFrameDist) == 0)
+    if ((m_bufferedVideoFrameTypes.isEmpty()) ||
+        (m_bufferedVideoFrameTypes.first() == AV_PICTURE_TYPE_I))
         return true;
 
     return false;
 }
 
-bool AVFormatWriter::WriteVideoFrame(VideoFrame *frame)
+int AVFormatWriter::WriteVideoFrame(VideoFrame *frame)
 {
     AVCodecContext *c;
 
@@ -275,6 +276,9 @@ bool AVFormatWriter::WriteVideoFrame(VideoFrame *frame)
     int got_pkt = 0;
     int ret = 0;
 
+    m_bufferedVideoFrameTimes.push_back(frame->timecode);
+    m_bufferedVideoFrameTypes.push_back(m_picture->pict_type);
+
     av_init_packet(m_pkt);
     m_pkt->data = (unsigned char *)m_videoOutBuf;
     m_pkt->size = len;
@@ -285,18 +289,28 @@ bool AVFormatWriter::WriteVideoFrame(VideoFrame *frame)
                                       m_picture, &got_pkt); 
     }
 
-    if (ret < 0 || !got_pkt)
+    if (ret < 0)
     {
-#if 0
-        LOG(VB_RECORD, LOG_ERR, QString("WriteVideoFrame(): cs: %1, mfw: %2, tc: %3, fn: %4").arg(m_pkt->size).arg(m_framesWritten).arg(frame->timecode).arg(frame->frameNumber));
-#endif
-        return false;
+        LOG(VB_RECORD, LOG_ERR, "avcodec_encode_video2() failed");
+        return ret;
+    }
+
+    if (!got_pkt)
+    {
+        //LOG(VB_RECORD, LOG_DEBUG, QString("WriteVideoFrame(): Frame Buffered: cs: %1, mfw: %2, f->tc: %3, fn: %4, pt: %5").arg(m_pkt->size).arg(m_framesWritten).arg(frame->timecode).arg(frame->frameNumber).arg(m_picture->pict_type));
+        return ret;
     }
 
     if ((m_framesWritten % m_keyFrameDist) == 0)
         m_pkt->flags |= AV_PKT_FLAG_KEY;
 
     long long tc = frame->timecode;
+
+    if (!m_bufferedVideoFrameTimes.isEmpty())
+        tc = m_bufferedVideoFrameTimes.takeFirst();
+    if (!m_bufferedVideoFrameTypes.isEmpty())
+        m_bufferedVideoFrameTypes.pop_front();
+
     if (m_startingTimecodeOffset == -1)
         m_startingTimecodeOffset = tc;
     tc -= m_startingTimecodeOffset;
@@ -305,15 +319,16 @@ bool AVFormatWriter::WriteVideoFrame(VideoFrame *frame)
     m_pkt->dts = AV_NOPTS_VALUE;
     m_pkt->stream_index= m_videoStream->index;
 
-    // LOG(VB_RECORD, LOG_ERR, QString("WriteVideoFrame(): cs: %1, mfw: %2, pkt->pts: %3, tc: %4, fn: %5, pic->pts: %6").arg(m_pkt->size).arg(m_framesWritten).arg(m_pkt->pts).arg(frame->timecode).arg(frame->frameNumber).arg(m_picture->pts));
+    //LOG(VB_RECORD, LOG_DEBUG, QString("WriteVideoFrame(): cs: %1, mfw: %2, pkt->pts: %3, tc: %4, fn: %5, pic->pts: %6, f->tc: %7, pt: %8").arg(m_pkt->size).arg(m_framesWritten).arg(m_pkt->pts).arg(tc).arg(frame->frameNumber).arg(m_picture->pts).arg(frame->timecode).arg(m_picture->pict_type));
     ret = av_interleaved_write_frame(m_ctx, m_pkt);
     if (ret != 0)
         LOG(VB_RECORD, LOG_ERR, LOC + "WriteVideoFrame(): "
                 "av_interleaved_write_frame couldn't write Video");
 
+    frame->timecode = tc + m_startingTimecodeOffset;
     m_framesWritten++;
 
-    return true;
+    return 1;
 }
 
 #if HAVE_BIGENDIAN
@@ -327,7 +342,7 @@ static void bswap_16_buf(short int *buf, int buf_cnt, int audio_channels)
 }
 #endif
 
-bool AVFormatWriter::WriteAudioFrame(unsigned char *buf, int fnum, int timecode)
+int AVFormatWriter::WriteAudioFrame(unsigned char *buf, int fnum, long long &timecode)
 {
 #if HAVE_BIGENDIAN
     bswap_16_buf((short int*) buf, m_audioFrameSize, m_audioChannels);
@@ -356,21 +371,31 @@ bool AVFormatWriter::WriteAudioFrame(unsigned char *buf, int fnum, int timecode)
     m_audPicture->nb_samples = m_audioFrameSize;
     m_audPicture->format = m_audioStream->codec->sample_fmt;
 
+    m_bufferedAudioFrameTimes.push_back(timecode);
+
     {
         QMutexLocker locker(avcodeclock);
         ret = avcodec_encode_audio2(m_audioStream->codec, m_audPkt,
                                       m_audPicture, &got_packet);
     }
 
-    if (ret < 0 || !got_packet)
+    if (ret < 0)
     {
-#if 0
-        LOG(VB_RECORD, LOG_ERR, QString("WriteAudioFrame(): No Encoded Data: cs: %1, mfw: %2, tc: %3, fn: %4").arg(m_audPkt->size).arg(m_framesWritten).arg(timecode).arg(fnum));
-#endif
-        return false;
+        LOG(VB_RECORD, LOG_ERR, "avcodec_encode_audio2() failed");
+        return ret;
+    }
+
+    if (!got_packet)
+    {
+        //LOG(VB_RECORD, LOG_ERR, QString("WriteAudioFrame(): Frame Buffered: cs: %1, mfw: %2, f->tc: %3, fn: %4").arg(m_audPkt->size).arg(m_framesWritten).arg(timecode).arg(fnum));
+        return ret;
     }
 
     long long tc = timecode;
+
+    if (m_bufferedAudioFrameTimes.size())
+        tc = m_bufferedAudioFrameTimes.takeFirst();
+
     if (m_startingTimecodeOffset == -1)
         m_startingTimecodeOffset = tc;
     tc -= m_startingTimecodeOffset;
@@ -384,20 +409,21 @@ bool AVFormatWriter::WriteAudioFrame(unsigned char *buf, int fnum, int timecode)
     m_audPkt->flags |= AV_PKT_FLAG_KEY;
     m_audPkt->stream_index = m_audioStream->index;
 
-    // LOG(VB_RECORD, LOG_ERR, QString("WriteAudioFrame(): cs: %1, mfw: %2, pkt->pts: %3, tc: %4, fn: %5").arg(m_audPkt->size).arg(m_framesWritten).arg(m_audPkt->pts).arg(timecode).arg(fnum));
+    //LOG(VB_RECORD, LOG_ERR, QString("WriteAudioFrame(): cs: %1, mfw: %2, pkt->pts: %3, tc: %4, fn: %5, f->tc: %6").arg(m_audPkt->size).arg(m_framesWritten).arg(m_audPkt->pts).arg(tc).arg(fnum).arg(timecode));
 
     ret = av_interleaved_write_frame(m_ctx, m_audPkt);
     if (ret != 0)
         LOG(VB_RECORD, LOG_ERR, LOC + "WriteAudioFrame(): "
                 "av_interleaved_write_frame couldn't write Audio");
+    timecode = tc + m_startingTimecodeOffset;
 
-    return true;
+    return 1;
 }
 
-bool AVFormatWriter::WriteTextFrame(int vbimode, unsigned char *buf, int len,
-                                    int timecode, int pagenr)
+int AVFormatWriter::WriteTextFrame(int vbimode, unsigned char *buf, int len,
+                                   long long timecode, int pagenr)
 {
-    return true;
+    return 1;
 }
 
 bool AVFormatWriter::ReOpen(QString filename)
@@ -458,6 +484,7 @@ AVStream* AVFormatWriter::AddVideoStream(void)
     c->gop_size                   = m_keyFrameDist;
     c->pix_fmt                    = PIX_FMT_YUV420P;
     c->thread_count               = m_encodingThreadCount;
+    c->thread_type                = FF_THREAD_SLICE;
 
     if (c->codec_id == CODEC_ID_MPEG2VIDEO) {
         c->max_b_frames          = 2;

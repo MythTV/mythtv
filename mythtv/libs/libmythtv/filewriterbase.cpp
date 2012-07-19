@@ -40,18 +40,18 @@ FileWriterBase::~FileWriterBase()
 {
 }
 
-bool FileWriterBase::WriteVideoFrame(VideoFrame *frame)
+int FileWriterBase::WriteVideoFrame(VideoFrame *frame)
 {
     LOG(VB_RECORD, LOG_ERR, LOC + "WriteVideoFrame(): Shouldn't be here!");
 
-    return false;
+    return 1;
 }
 
-bool FileWriterBase::WriteAudioFrame(unsigned char *buf, int fnum, int timecode)
+int FileWriterBase::WriteAudioFrame(unsigned char *buf, int fnum, long long &timecode)
 {
     LOG(VB_RECORD, LOG_ERR, LOC + "WriteAudioFrame(): Shouldn't be here!");
 
-    return false;
+    return 1;
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

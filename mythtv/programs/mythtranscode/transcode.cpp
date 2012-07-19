@@ -170,7 +170,6 @@ class AudioReencodeBuffer : public AudioOutput
         if (m_audioFrameSize)
         {
             int index = 0;
-            int total_frames = 0;
 
             // Target has a fixed buffer size, which may not match len.
             // Redistribute the bytes into appropriately sized buffers.
@@ -185,12 +184,13 @@ class AudioReencodeBuffer : public AudioOutput
                 // left in the buffer.
                 int bufsize = m_saveBuffer->size();
                 int part = min(len - index, m_audioFrameSize - bufsize);
-                total_frames += part / m_bytes_per_frame;
-                timecode += total_frames * 1000 / m_eff_audiorate;
+                int out_frames = part / m_bytes_per_frame;
+                timecode += out_frames * 1000 / m_eff_audiorate;
+
                 // Store frames in buffer, basing frame count on number of
                 // bytes, which works only for uncompressed data.
                 m_saveBuffer->appendData(&buf[index], part,
-                                         part / m_bytes_per_frame, timecode);
+                                         out_frames, timecode);
 
                 // If we have filled the buffer...
                 if (m_saveBuffer->size() == m_audioFrameSize)
@@ -226,15 +226,22 @@ class AudioReencodeBuffer : public AudioOutput
         return true;
     }
 
-    AudioBuffer *GetData(void)
+    AudioBuffer *GetData(long long time)
     {
         QMutexLocker locker(&m_bufferMutex);
 
         if (m_bufferList.isEmpty())
             return NULL;
 
-        AudioBuffer *ab = m_bufferList.takeFirst();
-        return ab;
+        AudioBuffer *ab = m_bufferList.front();
+
+        if (ab->m_time <= time)
+        {
+            m_bufferList.pop_front();
+            return ab;
+        }
+
+        return NULL;
     }
 
     int GetCount(long long time)
@@ -1109,7 +1116,12 @@ int Transcode::TranscodeFile(const QString &inputname,
                 }
 
                 avfw2->SetContainer("mpegts");
-                avfw2->SetAudioCodec("aac");
+
+                if (gCoreContext->GetNumSetting("HLSAACAUDIO", 0))
+                    avfw2->SetAudioCodec("aac");
+                else
+                    avfw2->SetAudioCodec("libmp3lame");
+
                 avfw2->SetAudioBitrate(audioOnlyBitrate);
                 avfw2->SetAudioChannels(arb->m_channels);
                 avfw2->SetAudioBits(16);
@@ -1119,7 +1131,11 @@ int Transcode::TranscodeFile(const QString &inputname,
 
             avfw->SetContainer("mpegts");
             avfw->SetVideoCodec("libx264");
-            avfw->SetAudioCodec("aac");
+
+            if (gCoreContext->GetNumSetting("HLSAACAUDIO", 0))
+                avfw->SetAudioCodec("aac");
+            else
+                avfw->SetAudioCodec("libmp3lame");
 
             if (hlsStreamID == -1)
                 hls = new HTTPLiveStream(inputname, newWidth, newHeight,
@@ -1158,9 +1174,9 @@ int Transcode::TranscodeFile(const QString &inputname,
                 hlsSegmentSize = (int)(segmentSize * video_frame_rate);
             }
 
-            avfw->SetKeyFrameDist(90);
+            avfw->SetKeyFrameDist(30);
             if (avfw2)
-                avfw2->SetKeyFrameDist(90);
+                avfw2->SetKeyFrameDist(30);
 
             hls->AddSegment();
             avfw->SetFilename(hls->GetCurrentFilename());
@@ -1591,6 +1607,7 @@ int Transcode::TranscodeFile(const QString &inputname,
     long totalAudio = 0;
     int dropvideo = 0;
     long long lasttimecode = 0;
+    long long lastWrittenTime = 0;
     long long timecodeOffset = 0;
 
     float rateTimeConv = arb->m_eff_audiorate / 1000.0f;
@@ -1599,7 +1616,7 @@ int Transcode::TranscodeFile(const QString &inputname,
     VideoOutput *videoOutput = GetPlayer()->GetVideoOutput();
     bool is_key = 0;
     bool first_loop = true;
-    unsigned char *newFrame = new unsigned char[frame.size];
+    unsigned char *newFrame = (unsigned char *)av_malloc(frame.size);
     frame.buf = newFrame;
     AVPicture imageIn, imageOut;
     struct SwsContext  *scontext = NULL;
@@ -1717,10 +1734,9 @@ int Transcode::TranscodeFile(const QString &inputname,
                     .arg(arb->last_audiotime) .arg(buflen) .arg(audbufTime)
                     .arg(delta));
 #endif
-            while (arb->GetCount(frame.timecode))
+            AudioBuffer *ab = NULL;
+            while ((ab = arb->GetData(frame.timecode)) != NULL)
             {
-                AudioBuffer *ab = arb->GetData();
-
                 if (!cutter ||
                     !cutter->InhibitUseAudioFrames(ab->m_frames, &totalAudio))
                     fifow->FIFOWrite(1, ab->data(), ab->size());
@@ -1766,7 +1782,7 @@ int Transcode::TranscodeFile(const QString &inputname,
                                          "is not in raw audio mode.");
 
                 unlink(outputname.toLocal8Bit().constData());
-                delete [] newFrame;
+                av_free(newFrame);
                 SetPlayerContext(NULL);
                 if (frameQueue)
                     frameQueue->stop();
@@ -1862,6 +1878,7 @@ int Transcode::TranscodeFile(const QString &inputname,
                 }
 
                 nvr->WriteVideo(&frame, true, writekeyframe);
+                lastWrittenTime = frame.timecode;
             }
             GetPlayer()->GetCC608Reader()->FlushTxtBuffers();
         }
@@ -1920,22 +1937,22 @@ int Transcode::TranscodeFile(const QString &inputname,
             }
 
             // audio is fully decoded, so we need to reencode it
-            if (arb->GetCount(frame.timecode))
+            if (arb->GetCount(lastWrittenTime))
             {
-                int loop = 0;
                 int bytesConsumed = 0;
                 int buffersConsumed = 0;
-                int count = arb->GetCount(frame.timecode);
-                for (loop = 0; loop < count; loop++)
+                int count = 0;
+                AudioBuffer *ab = NULL;
+                while ((ab = arb->GetData(lastWrittenTime)) != NULL)
                 {
-                    AudioBuffer *ab = arb->GetData();
+                    count++;
                     unsigned char *buf = (unsigned char *)ab->data();
                     if (avfMode)
                     {
                         if (did_ff != 1)
                         {
-                            avfw->WriteAudioFrame(buf, audioFrame,
-                                                  ab->m_time - timecodeOffset);
+                            long long tc = ab->m_time - timecodeOffset;
+                            avfw->WriteAudioFrame(buf, audioFrame, tc);
 
                             if (avfw2)
                             {
@@ -1946,8 +1963,8 @@ int Transcode::TranscodeFile(const QString &inputname,
                                         avfw->GetTimecodeOffset());
                                 }
 
-                                avfw2->WriteAudioFrame(buf, audioFrame,
-                                                   ab->m_time - timecodeOffset);
+                                tc = ab->m_time - timecodeOffset;
+                                avfw2->WriteAudioFrame(buf, audioFrame, tc);
                             }
 
                             ++audioFrame;
@@ -1964,7 +1981,7 @@ int Transcode::TranscodeFile(const QString &inputname,
                                 "Transcode: Encountered irrecoverable error in "
                                 "NVR::WriteAudio");
 
-                            delete [] newFrame;
+                            av_free(newFrame);
                             SetPlayerContext(NULL);
                             if (frameQueue)
                                 frameQueue->stop();
@@ -2018,8 +2035,12 @@ int Transcode::TranscodeFile(const QString &inputname,
                         hlsSegmentFrames = 0;
                     }
 
-                    avfw->WriteVideoFrame(&frame);
-                    ++hlsSegmentFrames;
+                    if (avfw->WriteVideoFrame(&frame) > 0)
+                    {
+                        lastWrittenTime = frame.timecode;
+                        ++hlsSegmentFrames;
+                    }
+
                 }
             }
             else
@@ -2028,6 +2049,7 @@ int Transcode::TranscodeFile(const QString &inputname,
                     nvr->WriteVideo(&frame, true, true);
                 else
                     nvr->WriteVideo(&frame);
+                lastWrittenTime = frame.timecode;
             }
         }
         if (MythDate::current() > statustime)
@@ -2057,7 +2079,7 @@ int Transcode::TranscodeFile(const QString &inputname,
                     "Transcoding aborted, cutlist updated");
 
                 unlink(outputname.toLocal8Bit().constData());
-                delete [] newFrame;
+                av_free(newFrame);
                 SetPlayerContext(NULL);
                 if (frameQueue)
                     frameQueue->stop();
@@ -2072,7 +2094,7 @@ int Transcode::TranscodeFile(const QString &inputname,
                         "Transcoding STOPped by JobQueue");
 
                     unlink(outputname.toLocal8Bit().constData());
-                    delete [] newFrame;
+                    av_free(newFrame);
                     SetPlayerContext(NULL);
                     if (frameQueue)
                         frameQueue->stop();
@@ -2163,7 +2185,7 @@ int Transcode::TranscodeFile(const QString &inputname,
     if (frameQueue)
         frameQueue->stop();
 
-    delete [] newFrame;
+    av_free(newFrame);
     SetPlayerContext(NULL);
 
     return REENCODE_OK;
