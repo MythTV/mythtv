@@ -1548,6 +1548,7 @@ MYTHTV_HAVE_LIST='
     gettimeofday
     posix_fadvise
     libudev
+    libuuid
     stdint_h
     sync_file_range
     sys_endian_h
@@ -3540,6 +3541,7 @@ EOF
         ! disabled joystick_menu && enable joystick_menu
         enable dv1394
         enable libudev
+        enable libuuid
         ;;
     irix*)
         target_os=irix
@@ -4097,6 +4099,12 @@ done
 
 if enabled pthreads; then
   check_func pthread_cancel
+fi
+
+# Check for libuuid for zeromq
+enabled libuuid && check_lib uuid/uuid.h uuid_generate -luuid || disable libuuid
+if disabled libuuid ; then
+    die "ERROR: can not find libuuid. (debian uuid-dev; RedHat libuuid-devel)"
 fi
 
 # Attempt to use libudev for mediamonitor
