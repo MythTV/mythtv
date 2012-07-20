@@ -88,12 +88,12 @@ void MythTranscodeCommandLineParser::LoadArguments(void)
             "profile to the jobqueue. Accepts an optional string to define "
             "the hostname.", "");
 
-    add("--container", "container", "", "Output file container format", "")
-        ->SetChildOf("avf");
-    add("--acodec", "acodec", "", "Output file audio codec", "")
-        ->SetChildOf("avf");
-    add("--vcodec", "vcodec", "", "Output file video codec", "")
-        ->SetChildOf("avf");
+//    add("--container", "container", "", "Output file container format", "")
+//        ->SetChildOf("avf");
+//    add("--acodec", "acodec", "", "Output file audio codec", "")
+//        ->SetChildOf("avf");
+//    add("--vcodec", "vcodec", "", "Output file video codec", "")
+//        ->SetChildOf("avf");
     add("--width", "width", 0, "Output Video Width", "")
         ->SetChildOf("avf")
         ->SetChildOf("hls");
