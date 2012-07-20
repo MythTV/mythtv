@@ -462,11 +462,11 @@ void DishContentDescriptor::Init(void)
     dishCategoryDesc[0x2c] = QCoreApplication::translate("(Categories)",
                                                          "Educational");
     dishCategoryDesc[0x2f] = QCoreApplication::translate("(Categories)",
-                                                         "Excercise");
+                                                         "Exercise");
     dishCategoryDesc[0x31] = QCoreApplication::translate("(Categories)",
                                                          "Fantasy");
     dishCategoryDesc[0x32] = QCoreApplication::translate("(Categories)",
-                                                         "Fasion");
+                                                         "Fashion");
     dishCategoryDesc[0x34] = QCoreApplication::translate("(Categories)",
                                                          "Fishing");
     dishCategoryDesc[0x35] = QCoreApplication::translate("(Categories)",
