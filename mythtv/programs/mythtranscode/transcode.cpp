@@ -1939,13 +1939,9 @@ int Transcode::TranscodeFile(const QString &inputname,
             // audio is fully decoded, so we need to reencode it
             if (arb->GetCount(lastWrittenTime))
             {
-                int bytesConsumed = 0;
-                int buffersConsumed = 0;
-                int count = 0;
                 AudioBuffer *ab = NULL;
                 while ((ab = arb->GetData(lastWrittenTime)) != NULL)
                 {
-                    count++;
                     unsigned char *buf = (unsigned char *)ab->data();
                     if (avfMode)
                     {
@@ -1989,9 +1985,6 @@ int Transcode::TranscodeFile(const QString &inputname,
                             return REENCODE_ERROR;
                         }
                     }
-
-                    ++buffersConsumed;
-                    bytesConsumed += ab->size();
 
                     delete ab;
                 }
