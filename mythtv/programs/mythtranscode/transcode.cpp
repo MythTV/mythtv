@@ -914,6 +914,7 @@ int Transcode::TranscodeFile(const QString &inputname,
         {
             hls = new HTTPLiveStream(hlsStreamID);
             hls->UpdateStatus(kHLSStatusStarting);
+            hls->UpdateStatusMessage("Transcoding Starting");
             cmdWidth = hls->GetWidth();
             cmdHeight = hls->GetHeight();
             cmdBitrate = hls->GetBitrate();
@@ -1144,6 +1145,7 @@ int Transcode::TranscodeFile(const QString &inputname,
                                          segmentSize, audioOnlyBitrate);
 
             hls->UpdateStatus(kHLSStatusStarting);
+            hls->UpdateStatusMessage("Transcoding Starting");
             hls->UpdateSizeInfo(newWidth, newHeight, video_width, video_height);
 
             if ((hlsStreamID != -1) &&
@@ -1646,7 +1648,10 @@ int Transcode::TranscodeFile(const QString &inputname,
     VideoFrame *lastDecode = NULL;
 
     if (hls)
+    {
         hls->UpdateStatus(kHLSStatusRunning);
+        hls->UpdateStatusMessage("Transcoding");
+    }
 
     while ((!stopSignalled) &&
            (lastDecode = frameQueue->GetFrame(did_ff, is_key)))
