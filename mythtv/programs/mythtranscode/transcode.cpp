@@ -244,27 +244,6 @@ class AudioReencodeBuffer : public AudioOutput
         return NULL;
     }
 
-    int GetCount(long long time)
-    {
-        QMutexLocker locker(&m_bufferMutex);
-
-        if (m_bufferList.isEmpty())
-            return 0;
-
-        int count = 0;
-        for (QList<AudioBuffer *>::iterator it = m_bufferList.begin();
-             it != m_bufferList.end(); ++it)
-        {
-            AudioBuffer *ab = *it;
-
-            if (ab->m_time <= time)
-                count++;
-            else
-                break;
-        }
-        return count;
-    }
-
     long long GetSamples(long long time)
     {
         QMutexLocker locker(&m_bufferMutex);
@@ -914,6 +893,7 @@ int Transcode::TranscodeFile(const QString &inputname,
         {
             hls = new HTTPLiveStream(hlsStreamID);
             hls->UpdateStatus(kHLSStatusStarting);
+            hls->UpdateStatusMessage("Transcoding Starting");
             cmdWidth = hls->GetWidth();
             cmdHeight = hls->GetHeight();
             cmdBitrate = hls->GetBitrate();
@@ -1138,16 +1118,26 @@ int Transcode::TranscodeFile(const QString &inputname,
                 avfw->SetAudioCodec("libmp3lame");
 
             if (hlsStreamID == -1)
+            {
                 hls = new HTTPLiveStream(inputname, newWidth, newHeight,
                                          cmdBitrate,
                                          cmdAudioBitrate, hlsMaxSegments,
                                          segmentSize, audioOnlyBitrate);
 
+                hlsStreamID = hls->GetStreamID();
+                if (!hls || hlsStreamID == -1)
+                {
+                    LOG(VB_GENERAL, LOG_ERR, "Unable to create new stream");
+                    SetPlayerContext(NULL);
+                    return REENCODE_ERROR;
+                }
+            }
+
             hls->UpdateStatus(kHLSStatusStarting);
+            hls->UpdateStatusMessage("Transcoding Starting");
             hls->UpdateSizeInfo(newWidth, newHeight, video_width, video_height);
 
-            if ((hlsStreamID != -1) &&
-                (!hls->InitForWrite()))
+            if (!hls->InitForWrite())
             {
                 LOG(VB_GENERAL, LOG_ERR, "hls->InitForWrite() failed");
                 SetPlayerContext(NULL);
@@ -1646,7 +1636,10 @@ int Transcode::TranscodeFile(const QString &inputname,
     VideoFrame *lastDecode = NULL;
 
     if (hls)
+    {
         hls->UpdateStatus(kHLSStatusRunning);
+        hls->UpdateStatusMessage("Transcoding");
+    }
 
     while ((!stopSignalled) &&
            (lastDecode = frameQueue->GetFrame(did_ff, is_key)))
@@ -1937,70 +1930,54 @@ int Transcode::TranscodeFile(const QString &inputname,
             }
 
             // audio is fully decoded, so we need to reencode it
-            if (arb->GetCount(lastWrittenTime))
+            AudioBuffer *ab = NULL;
+            while ((ab = arb->GetData(lastWrittenTime)) != NULL)
             {
-                int bytesConsumed = 0;
-                int buffersConsumed = 0;
-                int count = 0;
-                AudioBuffer *ab = NULL;
-                while ((ab = arb->GetData(lastWrittenTime)) != NULL)
+                unsigned char *buf = (unsigned char *)ab->data();
+                if (avfMode)
                 {
-                    count++;
-                    unsigned char *buf = (unsigned char *)ab->data();
-                    if (avfMode)
+                    if (did_ff != 1)
                     {
-                        if (did_ff != 1)
+                        long long tc = ab->m_time - timecodeOffset;
+                        avfw->WriteAudioFrame(buf, audioFrame, tc);
+
+                        if (avfw2)
                         {
-                            long long tc = ab->m_time - timecodeOffset;
-                            avfw->WriteAudioFrame(buf, audioFrame, tc);
-
-                            if (avfw2)
+                            if ((avfw2->GetTimecodeOffset() == -1) &&
+                                (avfw->GetTimecodeOffset() != -1))
                             {
-                                if ((avfw2->GetTimecodeOffset() == -1) &&
-                                    (avfw->GetTimecodeOffset() != -1))
-                                {
-                                    avfw2->SetTimecodeOffset(
-                                        avfw->GetTimecodeOffset());
-                                }
-
-                                tc = ab->m_time - timecodeOffset;
-                                avfw2->WriteAudioFrame(buf, audioFrame, tc);
+                                avfw2->SetTimecodeOffset(
+                                    avfw->GetTimecodeOffset());
                             }
 
-                            ++audioFrame;
+                            tc = ab->m_time - timecodeOffset;
+                            avfw2->WriteAudioFrame(buf, audioFrame, tc);
                         }
+
+                        ++audioFrame;
                     }
-                    else
+                }
+                else
+                {
+                    nvr->SetOption("audioframesize", ab->size());
+                    nvr->WriteAudio(buf, audioFrame++,
+                                    ab->m_time - timecodeOffset);
+                    if (nvr->IsErrored())
                     {
-                        nvr->SetOption("audioframesize", ab->size());
-                        nvr->WriteAudio(buf, audioFrame++,
-                                        ab->m_time - timecodeOffset);
-                        if (nvr->IsErrored())
-                        {
-                            LOG(VB_GENERAL, LOG_ERR,
-                                "Transcode: Encountered irrecoverable error in "
-                                "NVR::WriteAudio");
+                        LOG(VB_GENERAL, LOG_ERR,
+                            "Transcode: Encountered irrecoverable error in "
+                            "NVR::WriteAudio");
 
-                            av_free(newFrame);
-                            SetPlayerContext(NULL);
-                            if (frameQueue)
-                                frameQueue->stop();
-                            delete ab;
-                            return REENCODE_ERROR;
-                        }
+                        av_free(newFrame);
+                        SetPlayerContext(NULL);
+                        if (frameQueue)
+                            frameQueue->stop();
+                        delete ab;
+                        return REENCODE_ERROR;
                     }
-
-                    ++buffersConsumed;
-                    bytesConsumed += ab->size();
-
-                    delete ab;
                 }
 
-                LOG(VB_GENERAL, LOG_DEBUG,
-                    QString("Processed %1 audio frames for timecode %2: %3 "
-                            "buffers, %4 bytes consumed")
-                    .arg(count) .arg(frame.timecode) .arg(buffersConsumed)
-                    .arg(bytesConsumed));
+                delete ab;
             }
 
             if (!avfMode)
