@@ -4,4 +4,6 @@ from singleton import Singleton, InputSingleton, CmpSingleton
 from dequebuffer import DequeBuffer
 from mixin import CMPVideo, CMPRecord
 
-from other import *
+from other import _donothing, SchemaUpdate, databaseSearch, deadlinesocket, \
+                  MARKUPLIST, levenshtein, ParseEnum, ParseSet, CopyData, \
+                  CopyData2, check_ipv6, QuickProperty
