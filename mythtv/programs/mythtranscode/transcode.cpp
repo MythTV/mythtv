@@ -1097,7 +1097,7 @@ int Transcode::TranscodeFile(const QString &inputname,
 
                 avfw2->SetContainer("mpegts");
 
-                if (gCoreContext->GetNumSetting("HLSAACAUDIO", 0))
+                if (gCoreContext->GetNumSetting("HLSAACAUDIO", 1))
                     avfw2->SetAudioCodec("aac");
                 else
                     avfw2->SetAudioCodec("libmp3lame");
@@ -1112,7 +1112,7 @@ int Transcode::TranscodeFile(const QString &inputname,
             avfw->SetContainer("mpegts");
             avfw->SetVideoCodec("libx264");
 
-            if (gCoreContext->GetNumSetting("HLSAACAUDIO", 0))
+            if (gCoreContext->GetNumSetting("HLSAACAUDIO", 1))
                 avfw->SetAudioCodec("aac");
             else
                 avfw->SetAudioCodec("libmp3lame");
