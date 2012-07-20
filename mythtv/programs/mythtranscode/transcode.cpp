@@ -726,7 +726,7 @@ Transcode::Transcode(ProgramInfo *pginfo) :
     cmdContainer("mpegts"),         cmdAudioCodec("aac"),
     cmdVideoCodec("libx264"),
     cmdWidth(480),                  cmdHeight(0),
-    cmdBitrate(800000),             cmdAudioBitrate(64000)
+    cmdBitrate(600000),             cmdAudioBitrate(64000)
 {
 }
 
@@ -1180,6 +1180,7 @@ int Transcode::TranscodeFile(const QString &inputname,
             avfw->SetAudioCodec(cmdAudioCodec);
             avfw->SetFilename(outputname);
             avfw->SetFramerate(video_frame_rate);
+            avfw->SetKeyFrameDist(30);
         }
 
         avfw->SetThreadCount(
@@ -2015,7 +2016,8 @@ int Transcode::TranscodeFile(const QString &inputname,
                     if (avfw->WriteVideoFrame(&frame) > 0)
                     {
                         lastWrittenTime = frame.timecode;
-                        ++hlsSegmentFrames;
+                        if (hls)
+                            ++hlsSegmentFrames;
                     }
 
                 }
@@ -2049,7 +2051,7 @@ int Transcode::TranscodeFile(const QString &inputname,
         }
         if (MythDate::current() > curtime)
         {
-            if (honorCutList && m_proginfo && !hls &&
+            if (honorCutList && m_proginfo && !avfMode &&
                 m_proginfo->QueryMarkupFlag(MARK_UPDATED_CUT))
             {
                 LOG(VB_GENERAL, LOG_NOTICE,
@@ -2117,7 +2119,7 @@ int Transcode::TranscodeFile(const QString &inputname,
         if (avfw2)
             avfw2->CloseFile();
 
-        if (!hls && m_proginfo)
+        if (!avfMode && m_proginfo)
         {
             m_proginfo->ClearPositionMap(MARK_KEYFRAME);
             m_proginfo->ClearPositionMap(MARK_GOP_START);

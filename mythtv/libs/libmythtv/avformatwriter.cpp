@@ -253,6 +253,7 @@ int AVFormatWriter::WriteVideoFrame(VideoFrame *frame)
     uint8_t *planes[3];
     int len = frame->size;
     unsigned char *buf = frame->buf;
+    int framesEncoded = m_framesWritten + m_bufferedVideoFrameTimes.size();
 
     planes[0] = buf;
     planes[1] = planes[0] + frame->width * frame->height;
@@ -265,10 +266,10 @@ int AVFormatWriter::WriteVideoFrame(VideoFrame *frame)
     m_picture->linesize[0] = frame->width;
     m_picture->linesize[1] = frame->width / 2;
     m_picture->linesize[2] = frame->width / 2;
-    m_picture->pts = m_framesWritten + 1;
+    m_picture->pts = framesEncoded + 1;
     m_picture->type = FF_BUFFER_TYPE_SHARED;
 
-    if ((m_framesWritten % m_keyFrameDist) == 0)
+    if ((framesEncoded % m_keyFrameDist) == 0)
         m_picture->pict_type = AV_PICTURE_TYPE_I;
     else
         m_picture->pict_type = AV_PICTURE_TYPE_NONE;
@@ -301,15 +302,16 @@ int AVFormatWriter::WriteVideoFrame(VideoFrame *frame)
         return ret;
     }
 
-    if ((m_framesWritten % m_keyFrameDist) == 0)
-        m_pkt->flags |= AV_PKT_FLAG_KEY;
-
     long long tc = frame->timecode;
 
     if (!m_bufferedVideoFrameTimes.isEmpty())
         tc = m_bufferedVideoFrameTimes.takeFirst();
     if (!m_bufferedVideoFrameTypes.isEmpty())
-        m_bufferedVideoFrameTypes.pop_front();
+    {
+        int pict_type = m_bufferedVideoFrameTypes.takeFirst();
+        if (pict_type == AV_PICTURE_TYPE_I)
+            m_pkt->flags |= AV_PKT_FLAG_KEY;
+    }
 
     if (m_startingTimecodeOffset == -1)
         m_startingTimecodeOffset = tc;
@@ -495,20 +497,9 @@ AVStream* AVFormatWriter::AddVideoStream(void)
     }
     else if (c->codec_id == CODEC_ID_H264)
     {
-        av_opt_set(c->priv_data, "profile", "baseline", 0);
 
-        if ((c->height <= 240) &&
-            (c->width  <= 320) &&
-            (c->bit_rate <= 768000))
-        {
-            c->level = 13;
-        }
-        else if (c->width >= 1024)
-        {
-            c->level = 41;
-            av_opt_set(c->priv_data, "profile", "high", 0);
-        }
-        else if (c->width >= 960)
+        if ((c->width > 480) ||
+            (c->bit_rate > 600000))
         {
             c->level = 31;
             av_opt_set(c->priv_data, "profile", "main", 0);
@@ -516,6 +507,7 @@ AVStream* AVFormatWriter::AddVideoStream(void)
         else
         {
             c->level = 30;
+            av_opt_set(c->priv_data, "profile", "baseline", 0);
         }
 
         c->coder_type            = 0;
