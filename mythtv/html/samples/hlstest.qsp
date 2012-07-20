@@ -42,6 +42,10 @@ function emptyCell() {
     return "<td>&nbsp;</td>";
 }
 
+function hidePlayer() {
+    $("#playerwrapper").hide();
+}
+
 function playStreamLink(url, width, height) {
     var jwpcall = 'playStreamInJWPlayer("' + url + '", ' + width + ', ' +
                   height + ');';
@@ -51,6 +55,8 @@ function playStreamLink(url, width, height) {
 
 var jwIsSetup = 0;
 function playStreamInJWPlayer(playlist, width, height) {
+    $("#playerwrapper").show();
+
     if (jwIsSetup) {
         jwplayer('player').load({file: playlist, provider: "/StorageGroup/3rdParty/JW_Player/adaptiveProvider.swf"});
         jwplayer('player').play();
@@ -286,7 +292,10 @@ function listRecordings() {
 <font size=+1><i18n>HTTP Live Stream Demo</i18n></font> <a href='javascript:void(0);' onClick='listLiveStreams()'><font size=-1>(<i18n>Refresh</i18n>)</font></a><br>
 <div id='LiveStreams'>
 </div>
-<div id='player'>
+<div id='playerwrapper' style='display: none'>
+<a href="#" onClick="javascript:hidePlayer();">Hide Player</a>
+    <div id='player'>
+    </div>
 </div>
 <br>
 <div>
