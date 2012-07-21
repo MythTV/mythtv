@@ -657,7 +657,7 @@ void VideoOutputOpenGL::Show(FrameScanType scan)
         return;
     }
 
-    if (gl_context)
+    if (gl_context && gl_context->format().doubleBuffer())
         gl_context->swapBuffers();
 }
 

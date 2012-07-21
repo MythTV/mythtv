@@ -195,8 +195,12 @@ void MythRenderOpenGL::makeCurrent()
 void MythRenderOpenGL::doneCurrent()
 {
     m_lock_level--;
+    // Calling doneCurrent is strictly not necessary and causes the next call
+    // to makeCurrent to take considerably longer
+#if 0
     if (m_lock_level == 0)
         QGLContext::doneCurrent();
+#endif
     if (m_lock_level < 0)
         LOG(VB_GENERAL, LOG_ERR, LOC + "Mis-matched calls to makeCurrent()");
     m_lock.unlock();
