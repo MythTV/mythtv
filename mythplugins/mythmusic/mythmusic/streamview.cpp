@@ -279,7 +279,7 @@ void StreamView::customEvent(QEvent *event)
     else if (event->type() == DecoderHandlerEvent::OperationStop)
     {
         if (m_bufferStatus)
-            m_bufferStatus->SetText("");
+            m_bufferStatus->Reset();
     }
     else if (event->type() == DialogCompletionEvent::kEventType)
     {

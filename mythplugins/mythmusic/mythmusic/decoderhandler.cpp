@@ -20,7 +20,6 @@
 #include "decoderhandler.h"
 #include "decoder.h"
 #include "metadata.h"
-#include "streaminput.h"
 #include "shoutcast.h"
 
 /**********************************************************************/
