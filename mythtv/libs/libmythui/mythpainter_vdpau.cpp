@@ -52,7 +52,8 @@ bool MythVDPAUPainter::InitVDPAU(QPaintDevice *parent)
 
 void MythVDPAUPainter::Teardown(void)
 {
-    ExpireImages();
+    MythPainter::Teardown();
+
     FreeResources();
 
     m_ImageBitmapMap.clear();

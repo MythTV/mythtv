@@ -46,7 +46,7 @@ bool MythD3D9Painter::InitD3D9(QPaintDevice *parent)
 
 void MythD3D9Painter::Teardown(void)
 {
-    ExpireImages();
+    MythPainter::Teardown();
     ClearCache();
     DeleteBitmaps();
 

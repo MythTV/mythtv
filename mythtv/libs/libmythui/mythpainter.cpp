@@ -21,20 +21,23 @@ MythPainter::MythPainter()
     SetMaximumCacheSizes(96, 96);
 }
 
-MythPainter::~MythPainter(void)
+void MythPainter::Teardown(void)
 {
-    QMutexLocker locker(&m_allocationLock);
-
     ExpireImages(0);
 
-    if (m_allocatedImages.isEmpty())
-        return;
+    QMutexLocker locker(&m_allocationLock);
 
-    LOG(VB_GENERAL, LOG_WARNING,
-        QString("MythPainter: %1 images not yet de-allocated.")
+    if (!m_allocatedImages.isEmpty())
+    {
+        LOG(VB_GENERAL, LOG_WARNING,
+            QString("MythPainter: %1 images not yet de-allocated.")
             .arg(m_allocatedImages.size()));
-    while (!m_allocatedImages.isEmpty())
-        m_allocatedImages.takeLast()->SetParent(NULL);
+    }
+
+    QSet<MythImage*>::iterator it = m_allocatedImages.begin();
+    for (; it !=  m_allocatedImages.end(); ++it)
+        (*it)->SetParent(NULL);
+    m_allocatedImages.clear();
 }
 
 void MythPainter::SetClipRect(const QRect &)
@@ -506,34 +509,29 @@ MythImage* MythPainter::GetImageFromRect(const QRect &area, int radius,
     return im;
 }
 
-MythImage *MythPainter::GetFormatImage()
+MythImage *MythPainter::GetFormatImage(void)
 {
-    m_allocationLock.lock();
+    QMutexLocker locker(&m_allocationLock);
     MythImage *result = GetFormatImagePriv();
     result->SetFileName("GetFormatImage");
-    m_allocatedImages.append(result);
-    m_allocationLock.unlock();
+    m_allocatedImages.insert(result);
     return result;
 }
 
 void MythPainter::DeleteFormatImage(MythImage *im)
 {
-    m_allocationLock.lock();
+    QMutexLocker locker(&m_allocationLock);
     DeleteFormatImagePriv(im);
-
-    while (m_allocatedImages.contains(im))
-        m_allocatedImages.removeOne(im);
-    m_allocationLock.unlock();
+    m_allocatedImages.remove(im);
 }
 
 void MythPainter::CheckFormatImage(MythImage *im)
 {
     if (im && !im->GetParent())
     {
-        m_allocationLock.lock();
-        m_allocatedImages.append(im);
+        QMutexLocker locker(&m_allocationLock);
+        m_allocatedImages.insert(im);
         im->SetParent(this);
-        m_allocationLock.unlock();
     }
 }
 

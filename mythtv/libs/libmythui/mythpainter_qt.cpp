@@ -61,6 +61,7 @@ MythQtPainter::MythQtPainter() :
 
 MythQtPainter::~MythQtPainter()
 {
+    Teardown();
     DeletePixmaps();
 }
 
