@@ -34,6 +34,11 @@ class MythUITextEdit;
 class MythUIProgressBar;
 class MythUIWebBrowser;
 
+#define QT_PAINTER      "qt"
+#define OPENGL_PAINTER  "opengl"
+#define AUTO_PAINTER    "auto"
+#define D3D9_PAINTER    "d3d9"
+
 typedef QHash<QString,QString> InfoMap;
 
 /**

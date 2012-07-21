@@ -37,7 +37,7 @@ class MUI_PUBLIC MythMainWindow : public QWidget
     friend class MythPainterWindowD3D9;
 
   public:
-    void Init(void);
+    void Init(QString forcedpainter = QString());
     void ReinitDone(void);
     void Show(void);
 

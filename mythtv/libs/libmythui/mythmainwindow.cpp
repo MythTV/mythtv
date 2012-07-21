@@ -933,7 +933,7 @@ bool MythMainWindow::event(QEvent *e)
     return QWidget::event(e);
 }
 
-void MythMainWindow::Init(void)
+void MythMainWindow::Init(QString forcedpainter)
 {
     GetMythUI()->GetScreenSettings(d->xbase, d->screenwidth, d->wmult,
                                    d->ybase, d->screenheight, d->hmult);
@@ -1003,18 +1003,19 @@ void MythMainWindow::Init(void)
         d->render = NULL;
     }
 
-    QString painter = GetMythDB()->GetSetting("ThemePainter", "qt");
+    QString painter = forcedpainter.isEmpty() ?
+        GetMythDB()->GetSetting("ThemePainter", QT_PAINTER) : forcedpainter;
 #ifdef USING_MINGW
-    if (painter == "auto" || painter == "d3d9")
+    if (painter == AUTO_PAINTER || painter == D3D9_PAINTER)
     {
-        LOG(VB_GENERAL, LOG_INFO, "Using the D3D9 painter");
+        LOG(VB_GENERAL, LOG_INFO, QString("Using the %1 painter").arg(D3D9_PAINTER));
         d->painter = new MythD3D9Painter();
         d->paintwin = new MythPainterWindowD3D9(this, d);
     }
 #endif
 #ifdef USE_OPENGL_PAINTER
-    if ((painter == "auto" && (!d->painter && !d->paintwin)) ||
-        painter.contains("opengl"))
+    if ((painter == AUTO_PAINTER && (!d->painter && !d->paintwin)) ||
+        painter.contains(OPENGL_PAINTER))
     {
         LOG(VB_GENERAL, LOG_INFO, "Trying the OpenGL painter");
         d->painter = new MythOpenGLPainter();
@@ -1031,7 +1032,7 @@ void MythMainWindow::Init(void)
                                          "Check your OpenGL installation.");
                 teardown = true;
             }
-            else if (painter == "auto" && gl && !gl->IsRecommendedRenderer())
+            else if (painter == AUTO_PAINTER && gl && !gl->IsRecommendedRenderer())
             {
                 LOG(VB_GENERAL, LOG_WARNING,
                     "OpenGL painter not recommended with this system's "
