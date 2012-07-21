@@ -314,7 +314,7 @@ int AVFormatWriter::WriteVideoFrame(VideoFrame *frame)
     }
 
     if (m_startingTimecodeOffset == -1)
-        m_startingTimecodeOffset = tc;
+        m_startingTimecodeOffset = tc - 1;
     tc -= m_startingTimecodeOffset;
 
     m_pkt->pts = tc * m_videoStream->time_base.den / m_videoStream->time_base.num / 1000;
@@ -372,6 +372,7 @@ int AVFormatWriter::WriteAudioFrame(unsigned char *buf, int fnum, long long &tim
     m_audPicture->linesize[0] = m_audioFrameSize;
     m_audPicture->nb_samples = m_audioFrameSize;
     m_audPicture->format = m_audioStream->codec->sample_fmt;
+    m_audPicture->extended_data = m_audPicture->data;
 
     m_bufferedAudioFrameTimes.push_back(timecode);
 
@@ -399,7 +400,7 @@ int AVFormatWriter::WriteAudioFrame(unsigned char *buf, int fnum, long long &tim
         tc = m_bufferedAudioFrameTimes.takeFirst();
 
     if (m_startingTimecodeOffset == -1)
-        m_startingTimecodeOffset = tc;
+        m_startingTimecodeOffset = tc - 1;
     tc -= m_startingTimecodeOffset;
 
     if (m_avVideoCodec)
