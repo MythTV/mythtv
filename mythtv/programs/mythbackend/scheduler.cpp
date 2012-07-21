@@ -690,7 +690,10 @@ bool Scheduler::ChangeRecordingEnd(RecordingInfo *oldp, RecordingInfo *newp)
     }
 
     EncoderLink *tv = (*m_tvList)[oldp->GetCardID()];
-    RecStatusType rs = tv->StartRecording(oldp);
+    RecordingInfo tempold(*oldp);
+    lockit.unlock();
+    RecStatusType rs = tv->StartRecording(&tempold);
+    lockit.relock();
     if (rs != rsRecording)
     {
         LOG(VB_GENERAL, LOG_ERR,
@@ -817,8 +820,6 @@ void Scheduler::SlaveDisconnected(uint cardid)
 
 void Scheduler::BuildWorkList(void)
 {
-    reclist_changed = false;
-
     RecIter i = reclist.begin();
     for (; i != reclist.end(); ++i)
     {
@@ -1792,11 +1793,13 @@ void Scheduler::run(void)
     QDateTime idleSince       = QDateTime();
     int       maxSleep        = 60000; // maximum sleep time in milliseconds
     int       schedRunTime    = 30; // max scheduler run time in seconds
+    bool      statuschanged   = false;
 
     while (doRun)
     {
+        reclist_changed = false;
+
         QDateTime curtime = QDateTime::currentDateTime();
-        bool statuschanged = false;
         int secs_to_next = (startIter != reclist.end()) ?
             curtime.secsTo((*startIter)->GetRecordingStartTime()) : 60*60;
 
@@ -1905,6 +1908,12 @@ void Scheduler::run(void)
                 **it, statuschanged, prerollseconds, tuningTimeout);
         }
 
+        // HandleRecording() and HandleTuning() temporarily unlocks
+        // schedLock.  If anything changed, reclist iterators could be
+        // invalidated so start over.
+        if (reclist_changed)
+            continue;
+
         /// Wake any slave backends that need waking
         curtime = QDateTime::currentDateTime();
         for (RecIter it = startIter; it != reclist.end(); ++it)
@@ -1930,6 +1939,8 @@ void Scheduler::run(void)
                                idleTimeoutSecs, idleWaitForRecordingTime,
                                statuschanged);
         }
+
+        statuschanged = false;
     }
 
     RunEpilog();
@@ -1960,7 +1971,8 @@ int Scheduler::CalcTimeToNextHandleRecordingEvent(
 
         int secs_to_next = curtime.secsTo((*i)->GetRecordingStartTime());
 
-        if (!recPendingList[(*i)->MakeUniqueSchedulerKey()])
+        if ((*i)->GetRecordingStatus() == rsWillRecord &&
+            !recPendingList[(*i)->MakeUniqueSchedulerKey()])
             secs_to_next -= 30;
 
         if (secs_to_next < 0)
@@ -2283,7 +2295,7 @@ bool Scheduler::HandleRecording(
     if (ri.GetRecordingStatus() == rsTuning)
     {
         HandleTuning(ri, statuschanged, tuningTimeout);
-        return false;
+        return reclist_changed;
     }
 
     if (ri.GetRecordingStatus() != rsWillRecord)
@@ -2351,7 +2363,18 @@ bool Scheduler::HandleRecording(
         return false;
     }
 
-    if ((prerollseconds > 0) && !IsBusyRecording(&ri))
+    // Use this temporary copy of ri when schedLock is not held.  Be
+    // sure to update it as long as it is still needed whenever ri
+    // changes.
+    RecordingInfo tempri(ri);
+
+    schedLock.unlock();
+    bool isBusyRecording = IsBusyRecording(&tempri);
+    schedLock.lock();
+    if (reclist_changed)
+        return reclist_changed;
+
+    if (prerollseconds > 0 && !isBusyRecording)
     {
         // Will use pre-roll settings only if no other
         // program is currently being recorded
@@ -2416,13 +2439,18 @@ bool Scheduler::HandleRecording(
                                 recording_dir,
                                 reclist);
         ri.SetPathname(recording_dir);
+        tempri.SetPathname(recording_dir);
     }
 
     if (!recPendingList[schedid])
     {
-        nexttv->RecordPending(&ri, max(secsleft, 0),
+        schedLock.unlock();
+        nexttv->RecordPending(&tempri, max(secsleft, 0),
                               hasLaterList.contains(schedid));
         recPendingList[schedid] = true;
+        schedLock.lock();
+        if (reclist_changed)
+            return reclist_changed;
     }
 
     if (secsleft > 0)
@@ -2432,6 +2460,7 @@ bool Scheduler::HandleRecording(
     recstartts.setTime(
         QTime(recstartts.time().hour(), recstartts.time().minute()));
     ri.SetRecordingStartTime(recstartts);
+    tempri.SetRecordingStartTime(recstartts);
 
     QString details = QString("%1: channel %2 on cardid %3, sourceid %4")
         .arg(ri.toString(ProgramInfo::kTitleSubtitle))
@@ -2444,8 +2473,9 @@ bool Scheduler::HandleRecording(
     {
         if (ri.GetRecordingStatus() == rsWillRecord)
         {
-            recStatus = nexttv->StartRecording(&ri);
-            ri.AddHistory(false);
+            schedLock.unlock();
+            recStatus = nexttv->StartRecording(&tempri);
+            schedLock.lock();
 
             // activate auto expirer
             if (m_expirer)
@@ -2456,7 +2486,7 @@ bool Scheduler::HandleRecording(
     HandleRecordingStatusChange(ri, recStatus, details);
     statuschanged = true;
 
-    return false;
+    return reclist_changed;
 }
 
 void Scheduler::HandleRecordingStatusChange(
@@ -2467,15 +2497,13 @@ void Scheduler::HandleRecordingStatusChange(
 
     ri.SetRecordingStatus(recStatus);
 
-    if (rsTuning != recStatus)
-    {
-        bool doSchedAfterStart =
-            ((rsRecording != recStatus) && (rsTuning != recStatus)) ||
-            schedAfterStartMap[ri.GetRecordingRuleID()] ||
-            (ri.GetParentRecordingRuleID() &&
-             schedAfterStartMap[ri.GetParentRecordingRuleID()]);
-        ri.AddHistory(doSchedAfterStart);
-    }
+    bool doSchedAfterStart =
+        recStatus != rsTuning &&
+        (recStatus != rsRecording ||
+         schedAfterStartMap[ri.GetRecordingRuleID()] ||
+         (ri.GetParentRecordingRuleID() &&
+          schedAfterStartMap[ri.GetParentRecordingRuleID()]));
+    ri.AddHistory(doSchedAfterStart);
 
     QString msg = (rsRecording == recStatus) ?
         QString("Started recording") :
@@ -2516,7 +2544,12 @@ void Scheduler::HandleTuning(
     }
     else if (tuningTimeout > 0)
     {
+        schedLock.unlock();
         recStatus = (*tvit)->GetRecordingStatus();
+        schedLock.lock();
+        if (reclist_changed)
+            return;
+
         if (rsTuning == recStatus)
         {
             // If tuning is still taking place this long after we

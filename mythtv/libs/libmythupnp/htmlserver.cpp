@@ -27,23 +27,18 @@ HtmlServerExtension::HtmlServerExtension( const QString sSharePath,
   : HttpServerExtension( "Html" , sSharePath),
     m_IndexFilename(sApplicationPrefix + "index")
 {
-    // Cache the absolute path for the share directory.
+    // Cache the canonical path for the share directory.
 
     QDir dir( sSharePath + "/html" );
-
-    dir.makeAbsolute();
-
-    m_sAbsoluteSharePath =  dir.absolutePath();
 
     if (getenv("MYTHHTMLDIR"))
     {
         QString sTempSharePath = getenv("MYTHHTMLDIR");
         if (!sTempSharePath.isEmpty())
-        {
             dir.setPath( sTempSharePath );
-            m_sAbsoluteSharePath = dir.absolutePath();
-        }
     }
+
+    m_sSharePath =  dir.canonicalPath();
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -66,7 +61,7 @@ bool HtmlServerExtension::ProcessRequest( HTTPRequest *pRequest )
             return( false );
 
         bool      bStorageGroupFile = false;
-        QFileInfo oInfo( m_sAbsoluteSharePath + pRequest->m_sResourceUrl );
+        QFileInfo oInfo( m_sSharePath + pRequest->m_sResourceUrl );
 
         if (oInfo.isDir())
         {
@@ -92,8 +87,6 @@ bool HtmlServerExtension::ProcessRequest( HTTPRequest *pRequest )
 
         if (bStorageGroupFile || oInfo.exists() == true )
         {
-            oInfo.makeAbsolute();
-
             QString sResName = oInfo.canonicalFilePath();
 
             // --------------------------------------------------------------
@@ -101,7 +94,7 @@ bool HtmlServerExtension::ProcessRequest( HTTPRequest *pRequest )
             // --------------------------------------------------------------
 
             if (( bStorageGroupFile ) ||
-                (sResName.startsWith( m_sAbsoluteSharePath, Qt::CaseInsensitive )))
+                (sResName.startsWith( m_sSharePath, Qt::CaseInsensitive )))
             {
                 if (oInfo.exists())
                 {
