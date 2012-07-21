@@ -63,7 +63,7 @@ LogForwardThread                   *logForwardThread = NULL;
 static QMutex                       logThreadStartedMutex;
 static QWaitCondition               logThreadStarted;
 static bool                         logThreadFinished = false;
-static bool                         logThreadStarting = false;
+static bool                         logThreadStarting = true;
 
 typedef QList<LoggerBase *> LoggerList;
 
@@ -818,6 +818,7 @@ void LogServerThread::run(void)
                 this, SLOT(pingClient(QString)), Qt::QueuedConnection);
 
         // cerr << "wake all" << endl;
+        logThreadStarting = false;
         locker.unlock();
         logThreadStarted.wakeAll();
         // cerr << "unlock" << endl;
@@ -859,6 +860,7 @@ void LogServerThread::run(void)
     if (abortThread)
     {
         // cerr << "wake all" << endl;
+        logThreadStarting = false;
         locker.unlock();
         logThreadStarted.wakeAll();
         qApp->processEvents();
@@ -952,10 +954,10 @@ bool logServerStart(void)
     if (logServerThread && logServerThread->isRunning())
         return true;
 
+    logThreadStarting = true;
+
     if (!logServerThread)
         logServerThread = new LogServerThread();
-
-    logThreadStarting = true;
 
     // cerr << "starting server" << endl;
     QMutexLocker locker(&logThreadStartedMutex);
@@ -989,9 +991,7 @@ void logServerWait(void)
 {
     // cerr << "waiting" << endl;
     QMutexLocker locker(&logThreadStartedMutex);
-    while ((!logThreadStarting ||
-            (logServerThread && logServerThread->isRunning())) &&
-           !logThreadStarted.wait(locker.mutex(), 100));
+    while (!logThreadStarted.wait(locker.mutex(), 100) && logThreadStarting);
     locker.unlock();
     // cerr << "done waiting" << endl;
 }
