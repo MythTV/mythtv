@@ -360,7 +360,7 @@ class ImageLoader
         QString frameFilename;
         int imageCount = 1;
 
-        MythImageReader *imageReader = new MythImageReader(filename);
+        MythImageReader *imageReader = new MythImageReader(imProps.filename);
 
         AnimationFrames *images = new AnimationFrames();
 
