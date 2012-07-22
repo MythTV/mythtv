@@ -293,6 +293,12 @@ void MusicPlayer::stop(bool stopAll)
         m_output = NULL;
     }
 
+    if (stopAll && m_cdWatcher)
+    {
+        m_cdWatcher->stop();
+        m_cdWatcher->wait();
+    }
+
     // because we don't actually stop the audio output we have to fake a Stopped
     // event so any listeners can act on it
     OutputEvent oe(OutputEvent::Stopped);
