@@ -4734,7 +4734,8 @@ if enabled gxx; then
     fi
     check_cxxflags -Wno-switch
     check_cxxflags -Wredundant-decls
-    check_cxxflags -Woverloaded-virtual
+# Disable for 0.26 release, since we plan to fix these post 0.26
+#    check_cxxflags -Woverloaded-virtual
     check_cxxflags -funit-at-a-time
 elif enabled icpc; then
     # 177: function declared but never referenced (triggers on Q_OBJECT)
