@@ -26,9 +26,13 @@ StreamHandler::StreamHandler(const QString &device) :
 
 StreamHandler::~StreamHandler()
 {
+    QMutexLocker locker1(&_listener_lock);
+    QMutexLocker locker2(&_start_stop_lock);
+
     if (!_stream_data_list.empty())
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "dtor & _stream_data_list not empty");
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            "dtor & _stream_data_list not empty");
     }
 
     // This should never be triggered.. just to be safe..
@@ -51,20 +55,19 @@ void StreamHandler::AddListener(MPEGStreamData *data,
         return;
     }
 
-    _listener_lock.lock();
+    QMutexLocker locker1(&_listener_lock);
+    QMutexLocker locker2(&_start_stop_lock);
 
     LOG(VB_RECORD, LOG_INFO, LOC + QString("AddListener(0x%1) -- locked")
                 .arg((uint64_t)data,0,16));
 
     if (_stream_data_list.empty())
     {
-        QMutexLocker locker(&_start_stop_lock);
         _allow_section_reader = allow_section_reader;
         _needs_buffering      = needs_buffering;
     }
     else
     {
-        QMutexLocker locker(&_start_stop_lock);
         _allow_section_reader &= allow_section_reader;
         _needs_buffering      |= needs_buffering;
     }
@@ -82,8 +85,6 @@ void StreamHandler::AddListener(MPEGStreamData *data,
 
     if (!output_file.isEmpty())
         AddNamedOutputFile(output_file);
-
-    _listener_lock.unlock();
 
     Start();
 
@@ -103,7 +104,8 @@ void StreamHandler::RemoveListener(MPEGStreamData *data)
         return;
     }
 
-    _listener_lock.lock();
+    QMutexLocker locker1(&_listener_lock);
+    QMutexLocker locker2(&_start_stop_lock);
 
     LOG(VB_RECORD, LOG_INFO, LOC + QString("RemoveListener(0x%1) -- locked")
                 .arg((uint64_t)data,0,16));
@@ -119,29 +121,25 @@ void StreamHandler::RemoveListener(MPEGStreamData *data)
 
     if (_stream_data_list.empty())
     {
-        _listener_lock.unlock();
         Stop();
-    }
-    else
-    {
-        _listener_lock.unlock();
     }
 
     LOG(VB_RECORD, LOG_INFO, LOC + QString("RemoveListener(0x%1) -- end")
                 .arg((uint64_t)data,0,16));
 }
 
+// Both the listener lock and the start_stop lock must be held when
+// this is called. The start_stop lock will be released while waiting
+// for the run() to set _running.
 void StreamHandler::Start(void)
 {
-    QMutexLocker locker(&_start_stop_lock);
-
     if (_running)
     {
         if ((_using_section_reader && !_allow_section_reader) ||
             (_needs_buffering      && !_using_buffering))
         {
             SetRunningDesired(false);
-            while (!_running_desired && _running)
+            while (!_error && _running)
                 _running_state_changed.wait(&_start_stop_lock, 100);
         }
     }
@@ -155,14 +153,8 @@ void StreamHandler::Start(void)
     SetRunningDesired(true);
     MThread::start();
 
-    while (!_running && !_error && _running_desired)
+    while (!_running && !_error)
         _running_state_changed.wait(&_start_stop_lock, 100);
-
-    if (!_running_desired)
-    {
-        LOG(VB_GENERAL, LOG_WARNING, LOC +
-            "Programmer Error: Stop called before Start finished");
-    }
 
     if (_error)
     {
@@ -171,21 +163,15 @@ void StreamHandler::Start(void)
     }
 }
 
+// Both the listener lock and the start_stop lock must be held when
+// this is called. The start_stop lock will be released while waiting
+// for the run() to clear _running.
 void StreamHandler::Stop(void)
 {
-    QMutexLocker locker(&_start_stop_lock);
+    SetRunningDesired(false);
 
-    do
-    {
-        SetRunningDesired(false);
-        while (!_running_desired && _running)
-            _running_state_changed.wait(&_start_stop_lock, 100);
-        if (_running_desired)
-        {
-            LOG(VB_GENERAL, LOG_WARNING, LOC +
-                "Programmer Error: Start called before Stop finished");
-        }
-    } while (_running_desired);
+    while (_running)
+        _running_state_changed.wait(&_start_stop_lock, 100);
 
     wait();
 }
