@@ -1196,7 +1196,11 @@ static bool resetTheme(QString themedir, const QString badtheme)
     MythTranslation::reload();
     gCoreContext->ReInitLocale();
     GetMythUI()->LoadQtConfig();
+#if CONFIG_DARWIN
+    GetMythMainWindow()->Init(OPENGL_PAINTER);
+#else
     GetMythMainWindow()->Init();
+#endif
 
     GetMythMainWindow()->ReinitDone();
 
@@ -1225,7 +1229,11 @@ static int reloadTheme(void)
     {
         menu->Close();
     }
+#if CONFIG_DARWIN
+    GetMythMainWindow()->Init(OPENGL_PAINTER);
+#else
     GetMythMainWindow()->Init();
+#endif
 
     GetMythMainWindow()->ReinitDone();
 
@@ -1602,7 +1610,11 @@ int main(int argc, char **argv)
     }
 
     MythMainWindow *mainWindow = GetMythMainWindow();
+#if CONFIG_DARWIN
+    mainWindow->Init(OPENGL_PAINTER);
+#else
     mainWindow->Init();
+#endif
     mainWindow->setWindowTitle(QObject::tr("MythTV Frontend"));
 
     // We must reload the translation after a language change and this

@@ -17,7 +17,7 @@ MythQImagePainter::MythQImagePainter() :
 
 MythQImagePainter::~MythQImagePainter()
 {
-    ExpireImages();
+    Teardown();
 }
 
 void MythQImagePainter::Begin(QPaintDevice *parent)

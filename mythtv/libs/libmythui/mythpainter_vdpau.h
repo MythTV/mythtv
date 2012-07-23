@@ -33,9 +33,9 @@ class MUI_PUBLIC MythVDPAUPainter : public MythPainter
   protected:
     virtual MythImage* GetFormatImagePriv(void) { return new MythImage(this); }
     virtual void DeleteFormatImagePriv(MythImage *im);
+    virtual void Teardown(void);
 
     bool InitVDPAU(QPaintDevice *parent);
-    void Teardown(void);
     void ClearCache(void);
     void DeleteBitmaps(void);
     uint GetTextureFromCache(MythImage *im);

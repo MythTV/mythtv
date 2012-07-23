@@ -39,8 +39,8 @@ void MythTranscodeCommandLineParser::LoadArguments(void)
     add(QStringList( QStringList() << "-e" << "--ostream" ), "ostream", "",
             "Output stream type: dvd, ts", "")
         ->SetGroup("Encoding");
-//    add("--avf", "avf", false, "Generate libavformat output file.", "")
-//        ->SetGroup("Encoding");
+    add("--avf", "avf", false, "Generate libavformat output file.", "")
+        ->SetGroup("Encoding");
     add("--hls", "hls", false, "Generate HTTP Live Stream output.", "")
         ->SetGroup("Encoding");
 
@@ -95,16 +95,16 @@ void MythTranscodeCommandLineParser::LoadArguments(void)
 //    add("--vcodec", "vcodec", "", "Output file video codec", "")
 //        ->SetChildOf("avf");
     add("--width", "width", 0, "Output Video Width", "")
-//        ->SetChildOf("avf")
+        ->SetChildOf("avf")
         ->SetChildOf("hls");
     add("--height", "height", 0, "Output Video Height", "")
-//        ->SetChildOf("avf")
+        ->SetChildOf("avf")
         ->SetChildOf("hls");
     add("--bitrate", "bitrate", 800, "Output Video Bitrate (Kbits)", "")
-//        ->SetChildOf("avf")
+        ->SetChildOf("avf")
         ->SetChildOf("hls");
     add("--audiobitrate", "audiobitrate", 64, "Output Audio Bitrate (Kbits)", "")
-//        ->SetChildOf("avf")
+        ->SetChildOf("avf")
         ->SetChildOf("hls");
     add("--maxsegments", "maxsegments", 0, "Max HTTP Live Stream segments", "")
         ->SetChildOf("hls");

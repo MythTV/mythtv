@@ -1068,9 +1068,9 @@ int64_t AudioOutputBase::GetAudiotime(void)
        of major post-stretched buffer contents
        processing latencies are catered for in AddData/SetAudiotime
        to eliminate race */
-    audiotime = audbuf_timecode - (
+    audiotime = audbuf_timecode - (effdsp && obpf ? (
         ((int64_t)(main_buffer + soundcard_buffer) * eff_stretchfactor) /
-        (effdsp * obpf));
+        (effdsp * obpf)) : 0);
 
     /* audiotime should never go backwards, but we might get a negative
        value if GetBufferedOnSoundcard() isn't updated by the driver very
@@ -1122,9 +1122,9 @@ void AudioOutputBase::SetAudiotime(int frames, int64_t timecode)
     }
 
     audbuf_timecode =
-        timecode + ((frames + processframes_unstretched * 100000) +
+        timecode + (effdsp ? ((frames + processframes_unstretched * 100000) +
                     (processframes_stretched * eff_stretchfactor)
-                   ) / effdsp;
+                   ) / effdsp : 0);
 
     // check for timecode wrap and reset audiotime if detected
     // timecode will always be monotonic asc if not seeked and reset

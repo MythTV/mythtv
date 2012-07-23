@@ -27,7 +27,6 @@ using namespace std;
 // MythMusic includes
 #include "metadata.h"
 #include "constants.h"
-#include "streaminput.h"
 #include "decoder.h"
 #include "mainvisual.h"
 #include "smartplaylist.h"

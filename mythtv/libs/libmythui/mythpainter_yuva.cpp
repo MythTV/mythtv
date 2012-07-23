@@ -11,6 +11,7 @@ QColor inline rgb_to_yuv(const QColor &original);
 
 MythYUVAPainter::~MythYUVAPainter()
 {
+    Teardown();
     foreach(MythFontProperties* font, m_convertedFonts)
         delete font;
 }

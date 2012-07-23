@@ -4,7 +4,7 @@
 <context>
     <name>FunctionDialog</name>
     <message>
-        <location filename="../mythzoneminder/zmconsole.cpp" line="69"/>
+        <location filename="../mythzoneminder/zmconsole.cpp" line="70"/>
         <source>OK</source>
         <translation></translation>
     </message>
@@ -30,57 +30,57 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../mythzoneminder/zmsettings.cpp" line="17"/>
+        <location filename="../mythzoneminder/zmsettings.cpp" line="18"/>
         <source>IP address of the MythZoneMinder server</source>
         <translation>MythZoneMinder serveri IP aadress</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmsettings.cpp" line="19"/>
+        <location filename="../mythzoneminder/zmsettings.cpp" line="20"/>
         <source>Enter the IP address of the MythZoneMinder server that this frontend should connect to.</source>
         <translation>Sisesta MythZoneMinder serveri IP aadress, millega see klient peaks ühenduma.</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmsettings.cpp" line="27"/>
+        <location filename="../mythzoneminder/zmsettings.cpp" line="28"/>
         <source>Port the server runs on</source>
         <translation>Port kus server kuulab</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmsettings.cpp" line="29"/>
+        <location filename="../mythzoneminder/zmsettings.cpp" line="30"/>
         <source>Unless you&apos;ve got good reason to, don&apos;t change this.</source>
         <translation>Kui sa ei tea täpselt mida teed, jäta see muutmata.</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmsettings.cpp" line="37"/>
+        <location filename="../mythzoneminder/zmsettings.cpp" line="38"/>
         <source>Date format</source>
         <translation>Kuupäeva formaat</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmsettings.cpp" line="41"/>
+        <location filename="../mythzoneminder/zmsettings.cpp" line="42"/>
         <source>Samples are shown using today&apos;s date.</source>
         <translation>Vaated kuvatakse tänase kuupäevaga.</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmsettings.cpp" line="47"/>
+        <location filename="../mythzoneminder/zmsettings.cpp" line="48"/>
         <source>Samples are shown using tomorrow&apos;s date.</source>
         <translation>Vaated kuvatakse homse kuupäevaga.</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmsettings.cpp" line="63"/>
+        <location filename="../mythzoneminder/zmsettings.cpp" line="64"/>
         <source>Your preferred date format to use on the events screens.</source>
         <translation>Eelistatud kuupäeva formaat sündmuste lehel.</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmsettings.cpp" line="71"/>
+        <location filename="../mythzoneminder/zmsettings.cpp" line="72"/>
         <source>Time format</source>
         <translation>Aja formaat</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmsettings.cpp" line="79"/>
+        <location filename="../mythzoneminder/zmsettings.cpp" line="80"/>
         <source>Your preferred time format to display on the events screens.</source>
         <translation>Eelistatud aja formaat sündmuste lehel.</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmsettings.cpp" line="87"/>
+        <location filename="../mythzoneminder/zmsettings.cpp" line="88"/>
         <source>MythZoneMinder Settings</source>
         <translation>MythZoneMinder seaded</translation>
     </message>
@@ -341,12 +341,12 @@
 <context>
     <name>ZMConsole</name>
     <message>
-        <location filename="../mythzoneminder/zmconsole.cpp" line="211"/>
+        <location filename="../mythzoneminder/zmconsole.cpp" line="212"/>
         <source>Running</source>
         <translation>Töötab</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmconsole.cpp" line="216"/>
+        <location filename="../mythzoneminder/zmconsole.cpp" line="217"/>
         <source>Stopped</source>
         <translation>Peatatud</translation>
     </message>
@@ -365,39 +365,39 @@
     </message>
     <message>
         <location filename="../mythzoneminder/zmevents.cpp" line="179"/>
-        <location filename="../mythzoneminder/zmevents.cpp" line="350"/>
-        <location filename="../mythzoneminder/zmevents.cpp" line="365"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="354"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="369"/>
         <source>All Cameras</source>
         <translation>Kõik kaamerad</translation>
     </message>
     <message>
         <location filename="../mythzoneminder/zmevents.cpp" line="182"/>
-        <location filename="../mythzoneminder/zmevents.cpp" line="374"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="378"/>
         <source>All Dates</source>
         <translation>Kõik kuupäevad</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="450"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="454"/>
         <source>Refresh</source>
         <translation>Värskenda</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="451"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="455"/>
         <source>Change View</source>
         <translation>Muuda vaadet</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="452"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="456"/>
         <source>Delete All</source>
         <translation>Kustuta kõik</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="464"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="468"/>
         <source>Delete All Events?</source>
         <translation>Kustutan kõik sündmused?</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="465"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="469"/>
         <source>Deleting %1 events in this view.</source>
         <translation>Kustutan selles vaates %1 sündmust.</translation>
     </message>
@@ -419,7 +419,7 @@
     <name>ZMPlayer</name>
     <message>
         <location filename="../mythzoneminder/zmplayer.cpp" line="107"/>
-        <location filename="../mythzoneminder/zmplayer.cpp" line="289"/>
+        <location filename="../mythzoneminder/zmplayer.cpp" line="291"/>
         <source>Pause</source>
         <translation>Paus</translation>
     </message>
@@ -439,8 +439,8 @@
         <translation>Järgmine</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmplayer.cpp" line="296"/>
-        <location filename="../mythzoneminder/zmplayer.cpp" line="375"/>
+        <location filename="../mythzoneminder/zmplayer.cpp" line="298"/>
+        <location filename="../mythzoneminder/zmplayer.cpp" line="377"/>
         <source>Play</source>
         <translation>Mängi</translation>
     </message>

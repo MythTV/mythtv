@@ -237,13 +237,14 @@ bool AVFormatWriter::CloseFile(void)
 
 bool AVFormatWriter::NextFrameIsKeyFrame(void)
 {
-    if ((m_framesWritten % m_keyFrameDist) == 0)
+    if ((m_bufferedVideoFrameTypes.isEmpty()) ||
+        (m_bufferedVideoFrameTypes.first() == AV_PICTURE_TYPE_I))
         return true;
 
     return false;
 }
 
-bool AVFormatWriter::WriteVideoFrame(VideoFrame *frame)
+int AVFormatWriter::WriteVideoFrame(VideoFrame *frame)
 {
     AVCodecContext *c;
 
@@ -252,6 +253,7 @@ bool AVFormatWriter::WriteVideoFrame(VideoFrame *frame)
     uint8_t *planes[3];
     int len = frame->size;
     unsigned char *buf = frame->buf;
+    int framesEncoded = m_framesWritten + m_bufferedVideoFrameTimes.size();
 
     planes[0] = buf;
     planes[1] = planes[0] + frame->width * frame->height;
@@ -264,16 +266,19 @@ bool AVFormatWriter::WriteVideoFrame(VideoFrame *frame)
     m_picture->linesize[0] = frame->width;
     m_picture->linesize[1] = frame->width / 2;
     m_picture->linesize[2] = frame->width / 2;
-    m_picture->pts = m_framesWritten + 1;
+    m_picture->pts = framesEncoded + 1;
     m_picture->type = FF_BUFFER_TYPE_SHARED;
 
-    if ((m_framesWritten % m_keyFrameDist) == 0)
+    if ((framesEncoded % m_keyFrameDist) == 0)
         m_picture->pict_type = AV_PICTURE_TYPE_I;
     else
         m_picture->pict_type = AV_PICTURE_TYPE_NONE;
 
     int got_pkt = 0;
     int ret = 0;
+
+    m_bufferedVideoFrameTimes.push_back(frame->timecode);
+    m_bufferedVideoFrameTypes.push_back(m_picture->pict_type);
 
     av_init_packet(m_pkt);
     m_pkt->data = (unsigned char *)m_videoOutBuf;
@@ -285,35 +290,47 @@ bool AVFormatWriter::WriteVideoFrame(VideoFrame *frame)
                                       m_picture, &got_pkt); 
     }
 
-    if (ret < 0 || !got_pkt)
+    if (ret < 0)
     {
-#if 0
-        LOG(VB_RECORD, LOG_ERR, QString("WriteVideoFrame(): cs: %1, mfw: %2, tc: %3, fn: %4").arg(m_pkt->size).arg(m_framesWritten).arg(frame->timecode).arg(frame->frameNumber));
-#endif
-        return false;
+        LOG(VB_RECORD, LOG_ERR, "avcodec_encode_video2() failed");
+        return ret;
     }
 
-    if ((m_framesWritten % m_keyFrameDist) == 0)
-        m_pkt->flags |= AV_PKT_FLAG_KEY;
+    if (!got_pkt)
+    {
+        //LOG(VB_RECORD, LOG_DEBUG, QString("WriteVideoFrame(): Frame Buffered: cs: %1, mfw: %2, f->tc: %3, fn: %4, pt: %5").arg(m_pkt->size).arg(m_framesWritten).arg(frame->timecode).arg(frame->frameNumber).arg(m_picture->pict_type));
+        return ret;
+    }
 
     long long tc = frame->timecode;
+
+    if (!m_bufferedVideoFrameTimes.isEmpty())
+        tc = m_bufferedVideoFrameTimes.takeFirst();
+    if (!m_bufferedVideoFrameTypes.isEmpty())
+    {
+        int pict_type = m_bufferedVideoFrameTypes.takeFirst();
+        if (pict_type == AV_PICTURE_TYPE_I)
+            m_pkt->flags |= AV_PKT_FLAG_KEY;
+    }
+
     if (m_startingTimecodeOffset == -1)
-        m_startingTimecodeOffset = tc;
+        m_startingTimecodeOffset = tc - 1;
     tc -= m_startingTimecodeOffset;
 
     m_pkt->pts = tc * m_videoStream->time_base.den / m_videoStream->time_base.num / 1000;
     m_pkt->dts = AV_NOPTS_VALUE;
     m_pkt->stream_index= m_videoStream->index;
 
-    // LOG(VB_RECORD, LOG_ERR, QString("WriteVideoFrame(): cs: %1, mfw: %2, pkt->pts: %3, tc: %4, fn: %5, pic->pts: %6").arg(m_pkt->size).arg(m_framesWritten).arg(m_pkt->pts).arg(frame->timecode).arg(frame->frameNumber).arg(m_picture->pts));
+    //LOG(VB_RECORD, LOG_DEBUG, QString("WriteVideoFrame(): cs: %1, mfw: %2, pkt->pts: %3, tc: %4, fn: %5, pic->pts: %6, f->tc: %7, pt: %8").arg(m_pkt->size).arg(m_framesWritten).arg(m_pkt->pts).arg(tc).arg(frame->frameNumber).arg(m_picture->pts).arg(frame->timecode).arg(m_picture->pict_type));
     ret = av_interleaved_write_frame(m_ctx, m_pkt);
     if (ret != 0)
         LOG(VB_RECORD, LOG_ERR, LOC + "WriteVideoFrame(): "
                 "av_interleaved_write_frame couldn't write Video");
 
+    frame->timecode = tc + m_startingTimecodeOffset;
     m_framesWritten++;
 
-    return true;
+    return 1;
 }
 
 #if HAVE_BIGENDIAN
@@ -327,7 +344,7 @@ static void bswap_16_buf(short int *buf, int buf_cnt, int audio_channels)
 }
 #endif
 
-bool AVFormatWriter::WriteAudioFrame(unsigned char *buf, int fnum, int timecode)
+int AVFormatWriter::WriteAudioFrame(unsigned char *buf, int fnum, long long &timecode)
 {
 #if HAVE_BIGENDIAN
     bswap_16_buf((short int*) buf, m_audioFrameSize, m_audioChannels);
@@ -355,6 +372,9 @@ bool AVFormatWriter::WriteAudioFrame(unsigned char *buf, int fnum, int timecode)
     m_audPicture->linesize[0] = m_audioFrameSize;
     m_audPicture->nb_samples = m_audioFrameSize;
     m_audPicture->format = m_audioStream->codec->sample_fmt;
+    m_audPicture->extended_data = m_audPicture->data;
+
+    m_bufferedAudioFrameTimes.push_back(timecode);
 
     {
         QMutexLocker locker(avcodeclock);
@@ -362,17 +382,25 @@ bool AVFormatWriter::WriteAudioFrame(unsigned char *buf, int fnum, int timecode)
                                       m_audPicture, &got_packet);
     }
 
-    if (ret < 0 || !got_packet)
+    if (ret < 0)
     {
-#if 0
-        LOG(VB_RECORD, LOG_ERR, QString("WriteAudioFrame(): No Encoded Data: cs: %1, mfw: %2, tc: %3, fn: %4").arg(m_audPkt->size).arg(m_framesWritten).arg(timecode).arg(fnum));
-#endif
-        return false;
+        LOG(VB_RECORD, LOG_ERR, "avcodec_encode_audio2() failed");
+        return ret;
+    }
+
+    if (!got_packet)
+    {
+        //LOG(VB_RECORD, LOG_ERR, QString("WriteAudioFrame(): Frame Buffered: cs: %1, mfw: %2, f->tc: %3, fn: %4").arg(m_audPkt->size).arg(m_framesWritten).arg(timecode).arg(fnum));
+        return ret;
     }
 
     long long tc = timecode;
+
+    if (m_bufferedAudioFrameTimes.size())
+        tc = m_bufferedAudioFrameTimes.takeFirst();
+
     if (m_startingTimecodeOffset == -1)
-        m_startingTimecodeOffset = tc;
+        m_startingTimecodeOffset = tc - 1;
     tc -= m_startingTimecodeOffset;
 
     if (m_avVideoCodec)
@@ -384,20 +412,21 @@ bool AVFormatWriter::WriteAudioFrame(unsigned char *buf, int fnum, int timecode)
     m_audPkt->flags |= AV_PKT_FLAG_KEY;
     m_audPkt->stream_index = m_audioStream->index;
 
-    // LOG(VB_RECORD, LOG_ERR, QString("WriteAudioFrame(): cs: %1, mfw: %2, pkt->pts: %3, tc: %4, fn: %5").arg(m_audPkt->size).arg(m_framesWritten).arg(m_audPkt->pts).arg(timecode).arg(fnum));
+    //LOG(VB_RECORD, LOG_ERR, QString("WriteAudioFrame(): cs: %1, mfw: %2, pkt->pts: %3, tc: %4, fn: %5, f->tc: %6").arg(m_audPkt->size).arg(m_framesWritten).arg(m_audPkt->pts).arg(tc).arg(fnum).arg(timecode));
 
     ret = av_interleaved_write_frame(m_ctx, m_audPkt);
     if (ret != 0)
         LOG(VB_RECORD, LOG_ERR, LOC + "WriteAudioFrame(): "
                 "av_interleaved_write_frame couldn't write Audio");
+    timecode = tc + m_startingTimecodeOffset;
 
-    return true;
+    return 1;
 }
 
-bool AVFormatWriter::WriteTextFrame(int vbimode, unsigned char *buf, int len,
-                                    int timecode, int pagenr)
+int AVFormatWriter::WriteTextFrame(int vbimode, unsigned char *buf, int len,
+                                   long long timecode, int pagenr)
 {
-    return true;
+    return 1;
 }
 
 bool AVFormatWriter::ReOpen(QString filename)
@@ -458,6 +487,7 @@ AVStream* AVFormatWriter::AddVideoStream(void)
     c->gop_size                   = m_keyFrameDist;
     c->pix_fmt                    = PIX_FMT_YUV420P;
     c->thread_count               = m_encodingThreadCount;
+    c->thread_type                = FF_THREAD_SLICE;
 
     if (c->codec_id == CODEC_ID_MPEG2VIDEO) {
         c->max_b_frames          = 2;
@@ -468,20 +498,9 @@ AVStream* AVFormatWriter::AddVideoStream(void)
     }
     else if (c->codec_id == CODEC_ID_H264)
     {
-        av_opt_set(c->priv_data, "profile", "baseline", 0);
 
-        if ((c->height <= 240) &&
-            (c->width  <= 320) &&
-            (c->bit_rate <= 768000))
-        {
-            c->level = 13;
-        }
-        else if (c->width >= 1024)
-        {
-            c->level = 41;
-            av_opt_set(c->priv_data, "profile", "high", 0);
-        }
-        else if (c->width >= 960)
+        if ((c->width > 480) ||
+            (c->bit_rate > 600000))
         {
             c->level = 31;
             av_opt_set(c->priv_data, "profile", "main", 0);
@@ -489,6 +508,7 @@ AVStream* AVFormatWriter::AddVideoStream(void)
         else
         {
             c->level = 30;
+            av_opt_set(c->priv_data, "profile", "baseline", 0);
         }
 
         c->coder_type            = 0;

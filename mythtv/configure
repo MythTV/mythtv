@@ -1546,6 +1546,7 @@ MYTHTV_HAVE_LIST='
     gettimeofday
     posix_fadvise
     libudev
+    libuuid
     stdint_h
     sync_file_range
     sys_endian_h
@@ -3486,6 +3487,7 @@ EOF
         enable  windows
         disable x11
         disable qtdbus
+        disable libuuid
         ###### Standard ffmpeg configure stuff follows:
         disable ffserver
         SLIBPREF="libmyth"
@@ -3536,6 +3538,7 @@ EOF
         ! disabled joystick_menu && enable joystick_menu
         enable dv1394
         enable libudev
+        enable libuuid
         ;;
     irix*)
         target_os=irix
@@ -4093,6 +4096,14 @@ done
 
 if enabled pthreads; then
   check_func pthread_cancel
+fi
+
+# Check for libuuid for zeromq
+if enabled libuuid ; then
+  check_lib uuid/uuid.h uuid_generate -luuid || disable libuuid
+  if disabled libuuid ; then
+    die "ERROR: can not find libuuid. (debian uuid-dev; RedHat libuuid-devel)"
+  fi
 fi
 
 # Attempt to use libudev for mediamonitor

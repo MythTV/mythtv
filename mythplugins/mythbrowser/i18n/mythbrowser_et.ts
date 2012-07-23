@@ -117,53 +117,53 @@ Kasuta lisamiseks &apos;Lisa järjehoidja&apos; menüü valikut</translation>
 <context>
     <name>MythBrowser</name>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="120"/>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="327"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="124"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="331"/>
         <source>Enter URL</source>
         <translation>Sisesta URL</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="252"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="256"/>
         <source>Loading...</source>
         <translation>Laadin...</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="316"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="320"/>
         <source>Actions</source>
         <translation>Tegevus</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="330"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="334"/>
         <source>Back</source>
         <translation>Tagasi</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="333"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="337"/>
         <source>Forward</source>
         <translation>Edasi</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="335"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="339"/>
         <source>Zoom In</source>
         <translation>Suurenda</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="336"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="340"/>
         <source>Zoom Out</source>
         <translation>Vähenda</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="337"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="341"/>
         <source>New Tab</source>
         <translation>Uus tab</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="340"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="344"/>
         <source>Delete Tab</source>
         <translation>Kustuta tab</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="342"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="346"/>
         <source>Add Bookmark</source>
         <translation>Lisa järjehoidja</translation>
     </message>
@@ -341,7 +341,7 @@ Jätkamiseks vajuta &quot;OK&quot; või &quot;Tühista&quot;.</translation>
 <context>
     <name>WebPage</name>
     <message>
-        <location filename="../mythbrowser/webpage.cpp" line="121"/>
+        <location filename="../mythbrowser/webpage.cpp" line="126"/>
         <source>Loading...</source>
         <translation>Laen...</translation>
     </message>

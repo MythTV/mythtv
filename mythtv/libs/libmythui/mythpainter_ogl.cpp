@@ -31,7 +31,7 @@ MythOpenGLPainter::MythOpenGLPainter(MythRenderOpenGL *render,
 
 MythOpenGLPainter::~MythOpenGLPainter()
 {
-    ExpireImages(0);
+    Teardown();
     FreeResources();
 }
 

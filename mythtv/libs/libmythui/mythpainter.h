@@ -7,6 +7,7 @@
 #include <QWidget>
 #include <QPaintDevice>
 #include <QMutex>
+#include <QSet>
 
 class QRect;
 class QRegion;
@@ -29,7 +30,14 @@ class MUI_PUBLIC MythPainter
 {
   public:
     MythPainter();
-    virtual ~MythPainter();
+    /** MythPainter destructor.
+     *
+     *  The MythPainter destructor does not cleanup, it is unsafe
+     *  to do cleanup in the MythPainter destructor because
+     *  DeleteImagePriv() is a pure virtual in this class. Instead
+     *  children should call MythPainter::Teardown() for cleanup.
+     */
+    virtual ~MythPainter() {}
 
     virtual QString GetName(void) = 0;
     virtual bool SupportsAnimation(void) = 0;
@@ -108,6 +116,10 @@ class MUI_PUBLIC MythPainter
     virtual void DeleteFormatImagePriv(MythImage *im) = 0;
     void ExpireImages(int64_t max = 0);
 
+    // This needs to be called by classes inheriting from MythPainter
+    // in the destructor.
+    virtual void Teardown(void);
+
     void CheckFormatImage(MythImage *im);
 
     QPaintDevice *m_Parent;
@@ -118,8 +130,8 @@ class MUI_PUBLIC MythPainter
     int64_t m_SoftwareCacheSize;
     int64_t m_MaxSoftwareCacheSize;
 
-    QList<MythImage*> m_allocatedImages;
-    QMutex            m_allocationLock;
+    QMutex           m_allocationLock;
+    QSet<MythImage*> m_allocatedImages;
 
     QMap<QString, MythImage *> m_StringToImageMap;
     std::list<QString>         m_StringExpireList;

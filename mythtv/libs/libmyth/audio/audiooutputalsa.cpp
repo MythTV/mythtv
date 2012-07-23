@@ -31,7 +31,7 @@ using namespace std;
 AudioOutputALSA::AudioOutputALSA(const AudioSettings &settings) :
     AudioOutputBase(settings),
     pcm_handle(NULL),
-    pbufsize(-1),
+    m_pbufsize(-1),
     m_card(-1),
     m_device(-1),
     m_subdevice(-1)
@@ -187,51 +187,11 @@ int AudioOutputALSA::GetPCMInfo(int &card, int &device, int &subdevice)
     return 0;
  }
 
-bool AudioOutputALSA::SetPreallocBufferSize(int size)
-{
-    int card, device, subdevice;
-    bool ret = true;
-
-    VBERROR(QString("Setting hardware audio buffer size to %1").arg(size));
-
-    if (GetPCMInfo(card, device, subdevice) < 0)
-        return false;
-
-    // We can not increase the size of the audio buffer while device is opened
-    // so make sure it is closed
-    if (pcm_handle != NULL)
-        CloseDevice();
-
-    QFile pfile(QString("/proc/asound/card%1/pcm%2p/sub%3/prealloc")
-                .arg(card).arg(device).arg(subdevice));
-
-    if (!pfile.open(QIODevice::ReadWrite))
-    {
-        VBERROR(QString("Error opening %1: %2. ")
-                .arg(pfile.fileName()).arg(pfile.errorString()));
-        VBERROR(QString("Try to manually increase audio buffer with: echo %1 "
-                        "| sudo tee %2").arg(size).arg(pfile.fileName()));
-        return false;
-    }
-
-    QByteArray content_ba = QString("%1\n").arg(size).toAscii();
-    if (pfile.write(content_ba.constData()) <= 0)
-    {
-        VBERROR(QString("Error writing to %1")
-                .arg(pfile.fileName()).arg(pfile.errorString()));
-        ret = false;
-    }
-
-    pfile.close();
-
-    return ret;
-}
-
 bool AudioOutputALSA::IncPreallocBufferSize(int requested, int buffer_time)
 {
     int card, device, subdevice;
-    bool ret = true;
-    pbufsize = 0;
+
+    m_pbufsize = 0;
 
     if (GetPCMInfo(card, device, subdevice) < 0)
         return false;
@@ -273,18 +233,14 @@ bool AudioOutputALSA::IncPreallocBufferSize(int requested, int buffer_time)
     if (size > max || !size)
     {
         size = max;
-        ret = false;
     }
 
     pfile.close();
     mfile.close();
 
-    if (SetPreallocBufferSize(size))
-        pbufsize = cur;
-    else
-        ret = false;
-
-    return ret;
+    VBERROR(QString("Try to manually increase audio buffer with: echo %1 "
+                    "| sudo tee %2").arg(size).arg(pf));
+    return false;
 }
 
 QByteArray *AudioOutputALSA::GetELD(int card, int device, int subdevice)
@@ -536,15 +492,6 @@ bool AudioOutputALSA::OpenDevice()
         CloseDevice();
         return false;
     }
-    else if (err > 0 && pbufsize < 0)
-    {
-        // We need to increase preallocated buffer size in the driver
-        // Set it and try again
-        if(!IncPreallocBufferSize(buffer_time, err))
-            VBERROR("Unable to sufficiently increase ALSA hardware buffer size"
-                    " - underruns are likely");
-        return OpenDevice();
-    }
 
     if (internal_vol && !OpenMixer())
         VBERROR("Unable to open audio mixer. Volume control disabled");
@@ -793,17 +740,52 @@ int AudioOutputALSA::SetParameters(snd_pcm_t *handle, snd_pcm_format_t format,
 
     /* set the buffer time */
     uint original_buffer_time = buffer_time;
+    bool canincrease = true;
     err = snd_pcm_hw_params_set_buffer_time_near(handle, params,
                                                  &buffer_time, NULL);
-    CHECKERR(QString("Unable to set buffer time %1").arg(buffer_time));
+    if (err < 0)
+    {
+        int dir         = -1;
+        int buftmp      = buffer_time;
+        int attempt     = 0;
+        do
+        {
+            err = snd_pcm_hw_params_set_buffer_time_near(handle, params,
+                                                         &buffer_time, &dir);
+            if (err < 0)
+            {
+                AERROR(QString("Unable to set buffer time to %1us, retrying")
+                       .arg(buffer_time));
+                    /*
+                     * with some drivers, snd_pcm_hw_params_set_buffer_time_near
+                     * only works once, if that's the case no point trying with
+                     * different values
+                     */
+                if ((buffer_time <= 100000) ||
+                    (attempt > 0 && buffer_time == buftmp))
+                {
+                    VBERROR("Couldn't set buffer time, giving up");
+                    return err;
+                }
+                buffer_time -= 100000;
+                canincrease  = false;
+                attempt++;
+            }
+        }
+        while (err < 0);
+    }
 
     /* See if we need to increase the prealloc'd buffer size
        If buffer_time is too small we could underrun - make 10% difference ok */
-    if ((buffer_time * 1.10f < (float)original_buffer_time) && pbufsize < 0)
+    if (buffer_time * 1.10f < (float)original_buffer_time)
     {
-        VBAUDIO(QString("Requested %1us got %2 buffer time")
+        VBERROR(QString("Requested %1us got %2 buffer time")
                 .arg(original_buffer_time).arg(buffer_time));
-        return buffer_time;
+        // We need to increase preallocated buffer size in the driver
+        if (canincrease && m_pbufsize < 0)
+        {
+            IncPreallocBufferSize(original_buffer_time, buffer_time);
+        }
     }
 
     VBAUDIO(QString("Buffer time = %1 us").arg(buffer_time));
@@ -1011,26 +993,44 @@ bool AudioOutputALSA::OpenMixer(void)
 QMap<QString, QString> *AudioOutputALSA::GetDevices(const char *type)
 {
     QMap<QString, QString> *alsadevs = new QMap<QString, QString>();
-    void **hints, **n;
-    char *name, *desc;
 
-    if (snd_device_name_hint(-1, type, &hints) < 0)
-        return alsadevs;
-    n = hints;
-
-    while (*n != NULL)
+    // Loop through the sound cards to get Alsa device hints.
+    // NB Don't use snd_device_name_hint(-1,..) since there is a potential
+    // access violation using this ALSA API with libasound.so.2.0.0.
+    // See http://code.google.com/p/chromium/issues/detail?id=95797
+    int card = -1;
+    while (!snd_card_next(&card) && card >= 0)
     {
-          name = snd_device_name_get_hint(*n, "NAME");
-          desc = snd_device_name_get_hint(*n, "DESC");
-          if (name && desc && strcmp(name, "null"))
-              alsadevs->insert(name, desc);
-          if (name)
-              free(name);
-          if (desc)
-              free(desc);
-          n++;
+        void** hints = NULL;
+        int error = snd_device_name_hint(card, type, &hints);
+        if (error == 0)
+        {
+            void *hint;
+            for (int i = 0; (hint = hints[i]) != NULL; ++i)
+            {
+                char *name = snd_device_name_get_hint(hint, "NAME");
+                if (name)
+                {
+                    char *desc = snd_device_name_get_hint(hint, "DESC");
+                    if (desc)
+                    {
+                        if (strcmp(name, "null"))
+                            alsadevs->insert(name, desc);
+                        free(desc);
+                    }
+                    free(name);
+                }
+            }
+
+            snd_device_name_free_hint(hints);
+        }
+        else
+        {
+            VBERROR(QString("Failed to get device hints for card %1, error %2")
+                    .arg(card).arg(error));
+        }
     }
-    snd_device_name_free_hint(hints);
+
         // Work around ALSA bug < 1.0.22 ; where snd_device_name_hint can corrupt
         // global ALSA memory context
 #if SND_LIB_MAJOR == 1

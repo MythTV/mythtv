@@ -34,8 +34,9 @@ class MUI_PUBLIC MythD3D9Painter : public MythPainter
   protected:
     virtual MythImage* GetFormatImagePriv(void) { return new MythImage(this); }
     virtual void DeleteFormatImagePriv(MythImage *im);
+    virtual void Teardown(void);
+
     bool InitD3D9(QPaintDevice *parent);
-    void Teardown(void);
     void ClearCache(void);
     void DeleteBitmaps(void);
     D3D9Image* GetImageFromCache(MythImage *im);

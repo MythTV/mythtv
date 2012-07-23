@@ -42,6 +42,10 @@ function emptyCell() {
     return "<td>&nbsp;</td>";
 }
 
+function hidePlayer() {
+    $("#playerwrapper").hide();
+}
+
 function playStreamLink(url, width, height) {
     var jwpcall = 'playStreamInJWPlayer("' + url + '", ' + width + ', ' +
                   height + ');';
@@ -51,6 +55,8 @@ function playStreamLink(url, width, height) {
 
 var jwIsSetup = 0;
 function playStreamInJWPlayer(playlist, width, height) {
+    $("#playerwrapper").show();
+
     if (jwIsSetup) {
         jwplayer('player').load({file: playlist, provider: "/StorageGroup/3rdParty/JW_Player/adaptiveProvider.swf"});
         jwplayer('player').play();
@@ -168,83 +174,133 @@ function addStream() {
     });
 }
 
+function getFormStart() {
+    var str = "";
+
+    str += "<hr><form id='playform'>";
+    str += "<i18n>Width</i18n>: <select name='Width'>" +
+            "<option value='0' selected>Auto</option>" +
+            "<option value='288'>288</option>" +
+            "<option value='400'>400</option>" +
+            "<option value='480' selected>480</option>" +
+            "<option value='640'>640</option>" +
+            "<option value='800'>800</option>" +
+            "<option value='960'>960</option>" +
+            "<option value='1024'>1024</option>" +
+            "<option value='1280'>1280</option>" +
+            "</select>";
+    str += "&nbsp;&nbsp;&nbsp;";
+    str += "<i18n>Height</i18n>: <select name='Height'>" +
+            "<option value='0' selected>Auto</option>" +
+            "<option value='320'>320</option>" +
+            "<option value='480'>480</option>" +
+            "<option value='540'>540</option>" +
+            "<option value='600'>600</option>" +
+            "<option value='768'>768</option>" +
+            "<option value='720'>720</option>" +
+            "</select><br>";
+    str += "<i18n>Bitrate</i18n>: <select name='Bitrate'>" +
+            "<option value='500000'>500k</option>" +
+            "<option value='600000'>600k</option>" +
+            "<option value='700000'>700k</option>" +
+            "<option value='800000' selected>800k</option>" +
+            "<option value='900000'>900k</option>" +
+            "<option value='1000000'>1000k</option>" +
+            "<option value='1500000'>1500k</option>" +
+            "<option value='2000000'>2000k</option>" +
+            "<option value='2500000'>2500k</option>" +
+            "<option value='3000000'>3000k</option>" +
+            "<option value='3500000'>3500k</option>" +
+            "</select>";
+    str += "&nbsp;&nbsp;&nbsp;";
+    str += "<i18n>Audio</i18n>: <select name='AudioBitrate'>" +
+            "<option value='32000'>32k</option>" +
+            "<option value='64000' selected>64k</option>" +
+            "<option value='96000'>96k</option>" +
+            "<option value='128000'>128k</option>" +
+            "<option value='192000'>192k</option>" +
+            "</select><br>";
+    str += "<input type=button onClick='addStream()' Value='<i18n>Add Stream</i18n>'>";
+    str += "<hr>";
+
+    return str;
+}
+
+function getFormEnd() {
+    var str = "";
+
+    str += "</form>";
+
+    return str;
+}
+
 function listFiles() {
     var group = $("#sgName").val();
     var filter = $("#sgFilter").val().toLowerCase();
     $("#links").html("<i18n>Loading</i18n>...");
     $.getJSON("/Content/GetFileList", { StorageGroup: group }, function(data) {
         $("#links").html("");
-        var str = "<hr><form id='playform'>";
-        str += "<i18n>Width</i18n>: <select name='Width'>" +
-                "<option value='0' selected>Auto</option>" +
-                "<option value='288'>288</option>" +
-                "<option value='400'>400</option>" +
-                "<option value='480' selected>480</option>" +
-                "<option value='640'>640</option>" +
-                "<option value='800'>800</option>" +
-                "<option value='960'>960</option>" +
-                "<option value='1024'>1024</option>" +
-                "<option value='1280'>1280</option>" +
-                "</select>";
-        str += "&nbsp;&nbsp;&nbsp;";
-        str += "<i18n>Height</i18n>: <select name='Height'>" +
-                "<option value='0' selected>Auto</option>" +
-                "<option value='320'>320</option>" +
-                "<option value='480'>480</option>" +
-                "<option value='540'>540</option>" +
-                "<option value='600'>600</option>" +
-                "<option value='768'>768</option>" +
-                "<option value='720'>720</option>" +
-                "</select><br>";
-        str += "<i18n>Bitrate</i18n>: <select name='Bitrate'>" +
-                "<option value='500000'>500k</option>" +
-                "<option value='600000'>600k</option>" +
-                "<option value='700000'>700k</option>" +
-                "<option value='800000' selected>800k</option>" +
-                "<option value='900000'>900k</option>" +
-                "<option value='1000000'>1000k</option>" +
-                "<option value='1500000'>1500k</option>" +
-                "<option value='2000000'>2000k</option>" +
-                "<option value='2500000'>2500k</option>" +
-                "<option value='3000000'>3000k</option>" +
-                "<option value='3500000'>3500k</option>" +
-                "</select>";
-        str += "&nbsp;&nbsp;&nbsp;";
-        str += "<i18n>Audio</i18n>: <select name='AudioBitrate'>" +
-                "<option value='32000'>32k</option>" +
-                "<option value='64000' selected>64k</option>" +
-                "<option value='96000'>96k</option>" +
-                "<option value='128000'>128k</option>" +
-                "<option value='192000'>192k</option>" +
-                "</select><br>";
-        str += "<input type=button onClick='addStream()' Value='<i18n>Add Stream</i18n>'>";
-        str += "<hr>";
+        var str = getFormStart();
 
         $.each(data.StringList, function(i, value) {
             if ((filter.length == 0) ||
                 (value.toLowerCase().indexOf(filter) >= 0)) {
-                var tmpGroup = "'" + group + "'";
                 var tmpValue = "'" + value + "'";
                 str +=
                     '<input type=radio Name="FileName" Value="' + value + '">' +
                     value + "<br>";
             }
         });
-        str += "</form>";
+
+        str += getFormEnd();
         $("#links").html(str);
     });
 }
+
+function listRecordings() {
+    var filter = $("#recFilter").val().toLowerCase();
+
+    $("#links").html("<i18n>Loading</i18n>...");
+    $.getJSON("/Dvr/GetRecordedList",
+              { Descending: 1, StartIndex: 0, nCount: 20000 }, function(data) {
+        $("#links").html("");
+
+        var str = getFormStart();
+
+        $.each(data.ProgramList.Programs, function(i, value) {
+            if ((filter.length == 0) ||
+                (value.SubTitle.toLowerCase().indexOf(filter) >= 0) ||
+                (value.Title.toLowerCase().indexOf(filter) >= 0) ||
+                (value.Description.toLowerCase().indexOf(filter) >= 0) ||
+                (value.FileName.toLowerCase().indexOf(filter) >= 0)
+               ) {
+                var tmpValue = "'" + value + "'";
+                str +=
+                    '<input type=radio Name="FileName" Value="' + value.FileName + '">' +
+                    value.Title + " - " + value.SubTitle + " (" + value.FileName + ")" + "<br>";
+            }
+        });
+
+        str += getFormEnd();
+
+        $("#links").html(str);
+    });
+}
+
 </script>
 
 <font size=+1><i18n>HTTP Live Stream Demo</i18n></font> <a href='javascript:void(0);' onClick='listLiveStreams()'><font size=-1>(<i18n>Refresh</i18n>)</font></a><br>
 <div id='LiveStreams'>
 </div>
-<div id='player'>
+<div id='playerwrapper' style='display: none'>
+<a href="#" onClick="javascript:hidePlayer();">Hide Player</a>
+    <div id='player'>
+    </div>
 </div>
 <br>
 <div>
-    <table border=0 cellspacing=2 cellpadding=2>
-    <i18n>Storage Group</i18n>:
+    <b><i18n>Storage Groups</i18n>:</b><br>
+    <i18n>Group</i18n>:
     <select id="sgName">
 <%
     var myth = new Myth();
@@ -270,7 +326,12 @@ function listFiles() {
     <i18n>Filter</i18n>: <input id='sgFilter' size=20>&nbsp;
     <input type='button' onClick='javascript:listFiles()' value='<i18n>List Files</i18n>'>
 </div>
-<br>
+<hr>
+<div>
+    <b><i18n>Recordings:</i18n></b><br>
+    <i18n>Filter</i18n>: <input id='recFilter' size=20>&nbsp;
+    <input type='button' onClick='javascript:listRecordings()' value='<i18n>List Recordings</i18n>'>
+</div>
 <div id="links"></div>
 
 </body>

@@ -1579,7 +1579,7 @@ static void init_xds_program_type(QString xds_program_type[96])
     xds_program_type[38] = QCoreApplication::translate("(Categories)",
                                                        "Foreign");
     xds_program_type[39] = QCoreApplication::translate("(Categories)",
-                                                       "Fund Raiser");
+                                                       "Fundraiser");
     xds_program_type[40] = QCoreApplication::translate("(Categories)",
                                                        "Game/Quiz");
     xds_program_type[41] = QCoreApplication::translate("(Categories)",

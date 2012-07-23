@@ -2,6 +2,44 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="nb_NO">
 <context>
+    <name>(Weather Screens)</name>
+    <message>
+        <location filename="../mythweather/weatherUtils.cpp" line="16"/>
+        <source>Current Conditions</source>
+        <translation>Været nå</translation>
+    </message>
+    <message>
+        <location filename="../mythweather/weatherUtils.cpp" line="19"/>
+        <source>Three Day Forecast</source>
+        <translation>Tredagers værvarsel</translation>
+    </message>
+    <message>
+        <location filename="../mythweather/weatherUtils.cpp" line="22"/>
+        <source>18 Hour Forecast</source>
+        <translation>18 timers værvarsel</translation>
+    </message>
+    <message>
+        <location filename="../mythweather/weatherUtils.cpp" line="25"/>
+        <source>Severe Weather Alerts</source>
+        <translation>Spesialvarsler</translation>
+    </message>
+    <message>
+        <location filename="../mythweather/weatherUtils.cpp" line="28"/>
+        <source>Six Day Forecast</source>
+        <translation>Seksdagers værvarsel</translation>
+    </message>
+    <message>
+        <location filename="../mythweather/weatherUtils.cpp" line="31"/>
+        <source>Static Map</source>
+        <translation>Statisk kart</translation>
+    </message>
+    <message>
+        <location filename="../mythweather/weatherUtils.cpp" line="34"/>
+        <source>Animated Map</source>
+        <translation>Animert kart</translation>
+    </message>
+</context>
+<context>
     <name>GlobalSetup</name>
     <message>
         <location filename="../mythweather/weatherSetup.cpp" line="56"/>
@@ -12,7 +50,7 @@
 <context>
     <name>LocationDialog</name>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="967"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="960"/>
         <source>Search</source>
         <translation>Søk</translation>
     </message>
@@ -25,22 +63,22 @@
         <translation type="obsolete">Søker ... Resultater: %1</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="978"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="971"/>
         <source>Searching...</source>
         <translation>Søker...</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="1000"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="993"/>
         <source>Searching... Results: %1</source>
         <translation>Søker ... Resultater: %1</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="1048"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="1051"/>
         <source>Search Complete. Results: %1</source>
         <translation>Søk ferdig. Resultater: %1</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="1069"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="1072"/>
         <source>Source: %1</source>
         <translation>Kilde: %1</translation>
     </message>
@@ -68,39 +106,32 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../mythweather/weatherUtils.cpp" line="15"/>
         <source>Current Conditions</source>
-        <translation>Været nå</translation>
+        <translation type="obsolete">Været nå</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherUtils.cpp" line="17"/>
         <source>Three Day Forecast</source>
-        <translation>Tredagers værvarsel</translation>
+        <translation type="obsolete">Tredagers værvarsel</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherUtils.cpp" line="19"/>
         <source>18 Hour Forecast</source>
-        <translation>18 timers værvarsel</translation>
+        <translation type="obsolete">18 timers værvarsel</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherUtils.cpp" line="21"/>
         <source>Severe Weather Alerts</source>
-        <translation>Spesialvarsler</translation>
+        <translation type="obsolete">Spesialvarsler</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherUtils.cpp" line="23"/>
         <source>Six Day Forecast</source>
-        <translation>Seksdagers værvarsel</translation>
+        <translation type="obsolete">Seksdagers værvarsel</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherUtils.cpp" line="25"/>
         <source>Static Map</source>
-        <translation>Statisk kart</translation>
+        <translation type="obsolete">Statisk kart</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherUtils.cpp" line="27"/>
         <source>Animated Map</source>
-        <translation>Animert kart</translation>
+        <translation type="obsolete">Animert kart</translation>
     </message>
 </context>
 <context>
@@ -137,13 +168,13 @@
     </message>
     <message>
         <location filename="../mythweather/weatherSetup.cpp" line="254"/>
-        <location filename="../mythweather/weatherSetup.cpp" line="601"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="594"/>
         <source>English Units</source>
         <translation>Engelske enheter</translation>
     </message>
     <message>
         <location filename="../mythweather/weatherSetup.cpp" line="254"/>
-        <location filename="../mythweather/weatherSetup.cpp" line="602"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="595"/>
         <source>SI Units</source>
         <translation>SI enheter</translation>
     </message>
@@ -184,38 +215,38 @@
         <translation>flytte skjermbilde opp eller ned; eller fjerne skjermbilde.</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="508"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="501"/>
         <source>Manipulate Screen</source>
         <translation>Endre skjermbilde</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="522"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="515"/>
         <source>Move Up</source>
         <translation>Flytt opp</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="523"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="516"/>
         <source>Move Down</source>
         <translation>Flytt ned</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="524"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="517"/>
         <source>Remove</source>
         <translation>Fjern</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="525"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="518"/>
         <source>Change Location</source>
         <translation>Endre plassering</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="527"/>
-        <location filename="../mythweather/weatherSetup.cpp" line="588"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="520"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="581"/>
         <source>Change Units</source>
         <translation>Endre enheter</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="528"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="521"/>
         <source>Cancel</source>
         <translation>Avbryt</translation>
     </message>
@@ -235,22 +266,22 @@
 <context>
     <name>SourceSetup</name>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="793"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="786"/>
         <source>Finish</source>
         <translation>Ferdig</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="907"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="900"/>
         <source>Author: </source>
         <translation>Forfatter: </translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="909"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="902"/>
         <source>Email: </source>
         <translation>E-post: </translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="910"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="903"/>
         <source>Version: </source>
         <translation>Versjon: </translation>
     </message>
@@ -926,67 +957,67 @@
 <context>
     <name>ThemeUI</name>
     <message>
-        <location filename="themestrings.h" line="6"/>
+        <location filename="themestrings.h" line="5"/>
         <source>Humidity</source>
         <translation>Luftfuktighet</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="7"/>
+        <location filename="themestrings.h" line="6"/>
         <source>Pressure</source>
         <translation>Trykk</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="8"/>
+        <location filename="themestrings.h" line="7"/>
         <source>Wind(Gust)</source>
         <translation>Vind(i kastene)</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="9"/>
+        <location filename="themestrings.h" line="8"/>
         <source>Wind Direction</source>
         <translation>Vindretning</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="10"/>
+        <location filename="themestrings.h" line="9"/>
         <source>Visibility</source>
         <translation>Sikt</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="11"/>
+        <location filename="themestrings.h" line="10"/>
         <source>Feels Like</source>
         <translation>Føles som</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="12"/>
+        <location filename="themestrings.h" line="27"/>
         <source>Last Updated %1</source>
         <translation>Sist oppdatert %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="13"/>
+        <location filename="themestrings.h" line="28"/>
         <source>High Temperature:  %1</source>
         <translation>Høy temperatur:  %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="14"/>
+        <location filename="themestrings.h" line="29"/>
         <source>Low Temperature:  %1</source>
         <translation>Lav temperatur:  %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="15"/>
+        <location filename="themestrings.h" line="30"/>
         <source>Temperature:  %1</source>
         <translation>Temperatur:  %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="16"/>
+        <location filename="themestrings.h" line="31"/>
         <source>Chance of Precipitation:  %1</source>
         <translation>Sjangse for nedbør:  %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="17"/>
+        <location filename="themestrings.h" line="32"/>
         <source>Weather Screen Settings</source>
         <translation>Innstillinger for værskjermbilde</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="18"/>
+        <location filename="themestrings.h" line="33"/>
         <source>This screen governs the behavior of the weather screens.  You can enable a background weather update which will run regardless of being on the weather screen, and configure how many seconds each screen will display.
 
 When you are done configuring the weather plugin, click &quot;Finish&quot; to continue.</source>
@@ -998,37 +1029,37 @@ When you are done configuring the Weather Plugin, click &quot;Finish&quot; to co
 Når du er ferdig med å konfigurere værtillegget må du klikke «Ferdig» for å fortsette.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="19"/>
+        <location filename="themestrings.h" line="34"/>
         <source>Retrieve data in background:</source>
         <translation>Laste ned data i bakgrunnen:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="21"/>
+        <location filename="themestrings.h" line="35"/>
         <source>OK</source>
         <translation>OK</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="22"/>
+        <location filename="themestrings.h" line="36"/>
         <source>Weather Setup</source>
         <translation>Væroppsett</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="23"/>
+        <location filename="themestrings.h" line="37"/>
         <source>Available Screens</source>
         <translation>Tilgjengelige skjermbilder</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="24"/>
+        <location filename="themestrings.h" line="38"/>
         <source>Active Screens</source>
         <translation>Aktive skjermbilder</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="25"/>
+        <location filename="themestrings.h" line="39"/>
         <source>Weather Script Settings</source>
         <translation>Innstillinger for værskript</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="26"/>
+        <location filename="themestrings.h" line="40"/>
         <source>This settings screen governs the behavior of individual weather scripts.  Select the script whose behavior you with to change and press the right arrow. Adjust the interval at which data is retrieved, and the timeout for accessing the site.
 
 When you have completed your changes, click &quot;Finish&quot; to continue.</source>
@@ -1037,117 +1068,117 @@ When you have completed your changes, click &quot;Finish&quot; to continue.</sou
 Når du er ferdig må du klikke «Ferdig» for å fortsette.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="29"/>
+        <location filename="themestrings.h" line="41"/>
         <source>Finish</source>
         <translation>Ferdig</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="30"/>
+        <location filename="themestrings.h" line="42"/>
         <source>Search</source>
         <translation>Søk</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="31"/>
+        <location filename="themestrings.h" line="43"/>
         <source>Enter Current Location</source>
         <translation>Skriv inn gjeldende plassering</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="32"/>
+        <location filename="themestrings.h" line="11"/>
         <source>Low</source>
         <translation>Lav</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="33"/>
+        <location filename="themestrings.h" line="12"/>
         <source>High</source>
         <translation>Høy</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="34"/>
+        <location filename="themestrings.h" line="13"/>
         <source>Weather Alerts</source>
         <translation>Spesialvarsler</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="35"/>
+        <location filename="themestrings.h" line="14"/>
         <source>Temp</source>
         <translation>Temp</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="36"/>
+        <location filename="themestrings.h" line="15"/>
         <source>Precip</source>
         <translation>Nedbør</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="37"/>
+        <location filename="themestrings.h" line="16"/>
         <source>Global Settings</source>
         <translation>Globale innstillinger</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="20"/>
+        <location filename="themestrings.h" line="17"/>
         <source>Seconds to display each page:</source>
         <translation>Sekunder hver side skal vises:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="38"/>
+        <location filename="themestrings.h" line="18"/>
         <source>Retrieve data in the background:</source>
         <translation>Last ned data i bakgrunnen:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="51"/>
+        <location filename="themestrings.h" line="19"/>
         <source>Screen Setup</source>
         <translation>Skjermbildeoppsett</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="52"/>
+        <location filename="themestrings.h" line="20"/>
         <source>Source Setup</source>
         <translation>Kildeoppsett</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="27"/>
+        <location filename="themestrings.h" line="21"/>
         <source>Data Retrieval Interval (minutes):</source>
         <translation>Datafangstintervall (minutter):</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="28"/>
+        <location filename="themestrings.h" line="22"/>
         <source>Source Update Timeout (seconds):</source>
         <translation>Tidsavbrudd for kildeoppdatering (sekunder):</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="53"/>
+        <location filename="themestrings.h" line="23"/>
         <source>Location Search</source>
         <translation>Kildesøk</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="42"/>
+        <location filename="themestrings.h" line="24"/>
         <source>Enter your current location, nearest large town or city. In some countries postal codes are also supported.</source>
         <translation>Skriv inn gjeldende plassering, nærmeste sted eller by.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="5"/>
+        <location filename="themestrings.h" line="26"/>
         <source>%DATE%, %TIME%</source>
         <translation>%DATE%, %TIME%</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="39"/>
+        <location filename="themestrings.h" line="44"/>
         <source>Weather Screen Setup</source>
         <translation>Oppsett for værskjermbilder</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="40"/>
+        <location filename="themestrings.h" line="45"/>
         <source>Weather Source Setup</source>
         <translation>Instillinger for værkilder</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="41"/>
+        <location filename="themestrings.h" line="46"/>
         <source>Source</source>
         <translation>Kilde</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="43"/>
+        <location filename="themestrings.h" line="25"/>
         <source>Enter Location:</source>
         <translation>Skriv inn plassering:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="44"/>
+        <location filename="themestrings.h" line="47"/>
         <source>Weather Location Search</source>
         <translation>Søk etter værlokasjon</translation>
     </message>
@@ -1160,32 +1191,32 @@ Når du er ferdig må du klikke «Ferdig» for å fortsette.</translation>
         <translation type="obsolete">Globalt oppsett</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="45"/>
+        <location filename="themestrings.h" line="48"/>
         <source>Humidity:</source>
         <translation>Luftfuktighet:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="46"/>
+        <location filename="themestrings.h" line="49"/>
         <source>Pressure:</source>
         <translation>Trykk:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="47"/>
+        <location filename="themestrings.h" line="50"/>
         <source>Wind(Gust):</source>
         <translation>Vind(i kastene):</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="48"/>
+        <location filename="themestrings.h" line="51"/>
         <source>Wind Direction:</source>
         <translation>Vindretning:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="49"/>
+        <location filename="themestrings.h" line="52"/>
         <source>Visibility:</source>
         <translation>Sikt:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="50"/>
+        <location filename="themestrings.h" line="53"/>
         <source>Feels Like:</source>
         <translation>Føles som:</translation>
     </message>
@@ -1215,33 +1246,32 @@ Når du er ferdig må du klikke «Ferdig» for å fortsette.</translation>
         <translation>Last ned data i bakgrunnen</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="59"/>
         <source>Enter your current location,nearest large town or city. In some countries postal codes are also supported.</source>
-        <translation>Skriv inn gjeldende plassering, nærmeste sted eller by. I noen land er postnummer også støttet.</translation>
+        <translation type="obsolete">Skriv inn gjeldende plassering, nærmeste sted eller by. I noen land er postnummer også støttet.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="60"/>
+        <location filename="themestrings.h" line="59"/>
         <source>General weather options</source>
         <oldsource>General weather plugin options</oldsource>
         <translation>Generelle innstillinger for værtillegg</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="61"/>
+        <location filename="themestrings.h" line="60"/>
         <source>Screen Settings</source>
         <translation>Skjermbildeinnstillinger</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="62"/>
+        <location filename="themestrings.h" line="61"/>
         <source>Choose which weather forecasts to display</source>
         <translation>Velg hvilke værvarsler som skal vises</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="63"/>
+        <location filename="themestrings.h" line="62"/>
         <source>Source Settings</source>
         <translation>Kildeinnstillinger</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="64"/>
+        <location filename="themestrings.h" line="63"/>
         <source>Configure the behavior of weather scripts</source>
         <translation>Konfigurer oppsett for værskript</translation>
     </message>
@@ -1254,7 +1284,7 @@ Når du er ferdig må du klikke «Ferdig» for å fortsette.</translation>
         <translation>Pauset</translation>
     </message>
     <message>
-        <location filename="../mythweather/weather.cpp" line="211"/>
+        <location filename="../mythweather/weather.cpp" line="210"/>
         <source>None of the configured screens are complete in this theme (missing copyright information).</source>
         <translation>Ingen konfigurerte skjermer er komplett for dette temaet (mangler informasjon om opphavsrett).</translation>
     </message>
@@ -1262,37 +1292,37 @@ Når du er ferdig må du klikke «Ferdig» for å fortsette.</translation>
 <context>
     <name>WeatherScreen</name>
     <message>
-        <location filename="../mythweather/weatherScreen.cpp" line="208"/>
+        <location filename="../mythweather/weatherScreen.cpp" line="218"/>
         <source>Sunday</source>
         <translation>Søndag</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherScreen.cpp" line="211"/>
+        <location filename="../mythweather/weatherScreen.cpp" line="221"/>
         <source>Monday</source>
         <translation>Mandag</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherScreen.cpp" line="214"/>
+        <location filename="../mythweather/weatherScreen.cpp" line="224"/>
         <source>Tuesday</source>
         <translation>Tirsdag</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherScreen.cpp" line="217"/>
+        <location filename="../mythweather/weatherScreen.cpp" line="227"/>
         <source>Wednesday</source>
         <translation>Onsdag</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherScreen.cpp" line="220"/>
+        <location filename="../mythweather/weatherScreen.cpp" line="230"/>
         <source>Thursday</source>
         <translation>Torsdag</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherScreen.cpp" line="223"/>
+        <location filename="../mythweather/weatherScreen.cpp" line="233"/>
         <source>Friday</source>
         <translation>Fredag</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherScreen.cpp" line="226"/>
+        <location filename="../mythweather/weatherScreen.cpp" line="236"/>
         <source>Saturday</source>
         <translation>Lørdag</translation>
     </message>
