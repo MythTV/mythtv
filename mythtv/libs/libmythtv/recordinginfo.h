@@ -1,6 +1,9 @@
 #ifndef _RECORDING_INFO_H_
 #define _RECORDING_INFO_H_
 
+#include <QDateTime>
+#include <QString>
+
 #include "mythtvexp.h"
 #include "programinfo.h"
 
@@ -206,6 +209,12 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
     void ApplyRecordRecPriorityChange(int);
     void ToggleRecord(void);
 
+    // Used in determining start and end for RecordingQuality determination
+    void SetDesiredStartTime(const QDateTime &dt) { desiredrecstartts = dt; }
+    void SetDesiredEndTime(const QDateTime &dt) { desiredrecendts = dt; }
+    QDateTime GetDesiredStartTime(void) const { return desiredrecstartts; }
+    QDateTime GetDesiredEndTime(void) const { return desiredrecendts; }
+
     // these five can be moved to programinfo
     void AddHistory(bool resched = true, bool forcedup = false, 
                     bool future = false);//pi
@@ -231,6 +240,8 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
     RecStatusType oldrecstatus;
     RecStatusType savedrecstatus;
     bool future;
+    QDateTime desiredrecstartts;
+    QDateTime desiredrecendts;
 
   private:
     mutable class RecordingRule *record;

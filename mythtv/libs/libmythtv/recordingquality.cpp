@@ -3,26 +3,28 @@ using namespace std;
 
 #include "recordingquality.h"
 #include "mythcorecontext.h"
+#include "recordinginfo.h"
 #include "mythmiscutil.h"
 #include "mythlogging.h"
-#include "programinfo.h"
 
 static void merge_overlapping(RecordingGaps &gaps);
-static double score_gaps(const ProgramInfo*, const RecordingGaps&);
+static double score_gaps(const RecordingInfo&, const RecordingGaps&);
+static QDateTime get_start(const RecordingInfo&);
+static QDateTime get_end(const RecordingInfo&);
 
 RecordingQuality::RecordingQuality(
-    const ProgramInfo *pi, const RecordingGaps &rg,
+    const RecordingInfo *ri, const RecordingGaps &rg,
     const QDateTime &first, const QDateTime &latest) :
     m_continuity_error_count(0), m_packet_count(0),
     m_overall_score(1.0), m_recording_gaps(rg)
 {
-    if (!pi)
+    if (!ri)
         return;
 
-    m_program_key = pi->MakeUniqueKey();
+    m_program_key = ri->MakeUniqueKey();
 
     // trim start
-    QDateTime start = pi->GetScheduledStartTime();
+    QDateTime start = get_start(*ri);
     while (!m_recording_gaps.empty() &&
            m_recording_gaps.first().GetStart() < start)
     {
@@ -34,7 +36,7 @@ RecordingQuality::RecordingQuality(
     }
 
     // trim end
-    QDateTime end = pi->GetScheduledEndTime();
+    QDateTime end = get_end(*ri);
     while (!m_recording_gaps.empty() &&
            m_recording_gaps.back().GetEnd() > end)
     {
@@ -58,7 +60,13 @@ RecordingQuality::RecordingQuality(
     stable_sort(m_recording_gaps.begin(), m_recording_gaps.end());
     merge_overlapping(m_recording_gaps);
 
-    m_overall_score = score_gaps(pi, m_recording_gaps);
+    m_overall_score = score_gaps(*ri, m_recording_gaps);
+
+    LOG(VB_RECORD, LOG_INFO,
+        QString("RecordingQuality() start(%1) end(%2) score(%3)")
+        .arg(MythDate::toString(start, MythDate::ISODate))
+        .arg(MythDate::toString(end, MythDate::ISODate))
+        .arg(m_overall_score));
 }
 
 void RecordingQuality::AddTSStatistics(
@@ -137,15 +145,15 @@ static void merge_overlapping(RecordingGaps &gaps)
     }
 }
 
-static double score_gaps(const ProgramInfo *pi, const RecordingGaps &gaps)
+static double score_gaps(const RecordingInfo &ri, const RecordingGaps &gaps)
 {
     RecordingGaps::const_iterator it = gaps.begin();
     if (it == gaps.end())
         return 1.0;
 
-    QDateTime start = pi->GetScheduledStartTime();
+    QDateTime start = get_start(ri);
 
-    double program_length = start.secsTo(pi->GetScheduledEndTime());
+    double program_length = start.secsTo(get_end(ri));
     if (program_length < 1.0)
         return 0.0;
 
@@ -190,3 +198,28 @@ static double score_gaps(const ProgramInfo *pi, const RecordingGaps &gaps)
     return (score > 0.0) ? score : 0.0;
 }
 
+static QDateTime get_start(const RecordingInfo &ri)
+{
+    if (ri.GetDesiredStartTime().isValid())
+    {
+        return (ri.GetScheduledStartTime() > ri.GetDesiredStartTime()) ?
+            ri.GetScheduledStartTime() : ri.GetDesiredStartTime();
+    }
+    else
+    {
+        return ri.GetScheduledStartTime();
+    }
+}
+
+static QDateTime get_end(const RecordingInfo &ri)
+{
+    if (ri.GetDesiredEndTime().isValid())
+    {
+        return (ri.GetScheduledEndTime() < ri.GetDesiredEndTime()) ?
+            ri.GetScheduledEndTime() : ri.GetDesiredEndTime();
+    }
+    else
+    {
+        return ri.GetScheduledEndTime();
+    }
+}

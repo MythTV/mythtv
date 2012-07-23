@@ -20,10 +20,10 @@
 class FireWireDBOptions;
 class GeneralDBOptions;
 class RecordingProfile;
+class RecordingInfo;
 class DVBDBOptions;
 class RecorderBase;
 class ChannelBase;
-class ProgramInfo;
 class RingBuffer;
 class TVRec;
 
@@ -63,7 +63,7 @@ class MTV_PUBLIC RecorderBase : public QRunnable
      *
      *  \sa ChannelNameChanged(const QString&)
      */
-    void SetRecording(const ProgramInfo *pginfo);
+    void SetRecording(const RecordingInfo *pginfo);
 
     /** \brief Tells recorder to use an externally created ringbuffer.
      *
@@ -116,7 +116,7 @@ class MTV_PUBLIC RecorderBase : public QRunnable
      *
      *   This calls TVRec::RingBufferChanged() when the switch happens.
      */
-    virtual void SetNextRecording(const ProgramInfo*, RingBuffer*) = 0;
+    virtual void SetNextRecording(const RecordingInfo*, RingBuffer*) = 0;
 
     /** \brief This is called between SetOptionsFromProfile() and
      *         run() to initialize any devices, etc.
@@ -276,7 +276,7 @@ class MTV_PUBLIC RecorderBase : public QRunnable
     uint           m_videoWidth;
     double         m_frameRate;
 
-    ProgramInfo   *curRecording;
+    RecordingInfo *curRecording;
 
     // For handling pausing + stop recording
     mutable QMutex pauseLock; // also used for request_recording and recording
@@ -294,7 +294,7 @@ class MTV_PUBLIC RecorderBase : public QRunnable
     // For RingBuffer switching
     QMutex         nextRingBufferLock;
     RingBuffer    *nextRingBuffer;
-    ProgramInfo   *nextRecording;
+    RecordingInfo *nextRecording;
 
     // Seektable  support
     MarkTypes      positionMapType;

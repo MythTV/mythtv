@@ -688,7 +688,7 @@ bool DTVRecorder::FindOtherKeyframes(const TSPacket *tspacket)
 }
 
 // documented in recorderbase.h
-void DTVRecorder::SetNextRecording(const ProgramInfo *progInf, RingBuffer *rb)
+void DTVRecorder::SetNextRecording(const RecordingInfo *progInf, RingBuffer *rb)
 {
     LOG(VB_RECORD, LOG_INFO, LOC + QString("SetNextRecord(0x%1, 0x%2)")
             .arg((uint64_t)progInf,0,16).arg((uint64_t)rb,0,16));
@@ -706,7 +706,7 @@ void DTVRecorder::SetNextRecording(const ProgramInfo *progInf, RingBuffer *rb)
 
     nextRecording = NULL;
     if (progInf)
-        nextRecording = new ProgramInfo(*progInf);
+        nextRecording = new RecordingInfo(*progInf);
 
     nextRingBuffer = rb;
     nextRingBufferLock.unlock();
