@@ -7,7 +7,7 @@
 
 #include "mythtvexp.h"
 
-class ProgramInfo;
+class RecordingInfo;
 
 class RecordingGap
 {
@@ -33,7 +33,7 @@ class MTV_PUBLIC RecordingQuality
 {
   public:
     RecordingQuality(
-        const ProgramInfo*, const RecordingGaps&,
+        const RecordingInfo*, const RecordingGaps&,
         const QDateTime &firstData, const QDateTime &latestData);
 
     void AddTSStatistics(int continuity_error_count, int packet_count);

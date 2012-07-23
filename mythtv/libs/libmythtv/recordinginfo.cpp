@@ -110,6 +110,8 @@ RecordingInfo::RecordingInfo(
     oldrecstatus(_oldrecstatus),
     savedrecstatus(rsUnknown),
     future(_future),
+    desiredrecstartts(_recstartts),
+    desiredrecendts(_recendts),
     record(NULL)
 {
     hostname = _hostname;
@@ -203,6 +205,8 @@ RecordingInfo::RecordingInfo(
     oldrecstatus(rsUnknown),
     savedrecstatus(rsUnknown),
     future(false),
+    desiredrecstartts(_recstartts),
+    desiredrecendts(_recendts),
     record(NULL)
 {
     recpriority = _recpriority;
@@ -379,6 +383,8 @@ void RecordingInfo::clone(const RecordingInfo &other,
         oldrecstatus   = other.oldrecstatus;
         savedrecstatus = other.savedrecstatus;
         future         = other.future;
+        desiredrecstartts = other.desiredrecstartts;
+        desiredrecendts = other.desiredrecendts;
     }
 }
 
@@ -403,6 +409,8 @@ void RecordingInfo::clone(const ProgramInfo &other,
     oldrecstatus   = rsUnknown;
     savedrecstatus = rsUnknown;
     future         = false;
+    desiredrecstartts = QDateTime();
+    desiredrecendts = QDateTime();
 }
 
 void RecordingInfo::clear(void)
@@ -415,6 +423,8 @@ void RecordingInfo::clear(void)
     oldrecstatus = rsUnknown;
     savedrecstatus = rsUnknown;
     future = false;
+    desiredrecstartts = QDateTime();
+    desiredrecendts = QDateTime();
 }
 
 

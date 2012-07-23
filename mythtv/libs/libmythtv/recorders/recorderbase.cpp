@@ -82,7 +82,7 @@ void RecorderBase::SetRingBuffer(RingBuffer *rbuf)
     weMadeBuffer = false;
 }
 
-void RecorderBase::SetRecording(const ProgramInfo *pginfo)
+void RecorderBase::SetRecording(const RecordingInfo *pginfo)
 {
     if (pginfo)
         LOG(VB_RECORD, LOG_INFO, LOC + QString("SetRecording(0x%1) title(%2)")
@@ -92,7 +92,7 @@ void RecorderBase::SetRecording(const ProgramInfo *pginfo)
 
     ProgramInfo *oldrec = curRecording;
     if (pginfo)
-        curRecording = new ProgramInfo(*pginfo);
+        curRecording = new RecordingInfo(*pginfo);
     else
         curRecording = NULL;
 

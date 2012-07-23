@@ -693,6 +693,8 @@ void TVRec::SetRecordingStatus(
 
 /** \fn TVRec::StopRecording(bool killFile)
  *  \brief Changes from a recording state to kState_None.
+ *  \note For the sake of recording quality measurements this is
+ *        treated as the desired end point of the recording.
  *  \sa StartRecording(const ProgramInfo *rec), FinishRecording()
  */
 void TVRec::StopRecording(bool killFile)
@@ -702,6 +704,8 @@ void TVRec::StopRecording(bool killFile)
         QMutexLocker lock(&stateChangeLock);
         if (killFile)
             SetFlags(kFlagKillRec);
+        else if (curRecording)
+            curRecording->SetDesiredEndTime(MythDate::current(true));
         ChangeState(RemoveRecording(GetState()));
         // wait for state change to take effect
         WaitForEventThreadSleep();
@@ -4145,8 +4149,9 @@ void TVRec::TuningRestartRecorder(void)
     {
         recorder->SetRingBuffer(ringBuffer);
         ProgramInfo *progInfo = tvchain->GetProgramAt(-1);
-        recorder->SetRecording(progInfo);
+        RecordingInfo recinfo(*progInfo);
         delete progInfo;
+        recorder->SetRecording(&recinfo);
     }
     recorder->Reset();
 
