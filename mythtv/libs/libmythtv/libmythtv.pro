@@ -565,7 +565,6 @@ using_backend {
         SOURCES += recorders/analogsignalmonitor.cpp
 
         DEFINES += USING_V4L2
-        using_v4l1:DEFINES += USING_V4L1
     }
 
     # Support for cable boxes that provide Firewire out

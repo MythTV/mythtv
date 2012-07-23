@@ -5002,7 +5002,7 @@ enabled stripping || strip="echo skipping strip"
 config_files="$TMPH $TMPMAK"
 
 if enabled backend; then
-  echo "Video4Linux sup.          ${v4l2-no} (v1 ${v4l1-no})"
+  echo "Video4Linux support       ${v4l2-no}"
   echo "ivtv support              ${ivtv-no}"
   echo "HD-PVR support            ${hdpvr-no}"
   echo "FireWire support          ${firewire-no}"

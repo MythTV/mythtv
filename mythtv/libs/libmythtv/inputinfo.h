@@ -72,8 +72,7 @@ class MTV_PUBLIC ChannelInputInfo : public InputInfo
     ChannelInputInfo() :
         startChanNum(QString::null),    tuneToChannel(QString::null),
         externalChanger(QString::null),
-        inputNumV4L(-1),
-        videoModeV4L1(0),               videoModeV4L2(0) {}
+        inputNumV4L(-1), videoModeV4L2(0) {}
     ChannelInputInfo(QString _name,            QString _startChanNum,
                      QString _tuneToChannel,   QString _externalChanger,
                      uint    _sourceid,        uint    _cardid,
@@ -85,7 +84,7 @@ class MTV_PUBLIC ChannelInputInfo : public InputInfo
         tuneToChannel(_tuneToChannel),  externalChanger(_externalChanger),
         channels(_channels),
         inputNumV4L(-1),
-        videoModeV4L1(0),               videoModeV4L2(0) {}
+        videoModeV4L2(0) {}
     ChannelInputInfo(const ChannelInputInfo &other);
     ChannelInputInfo &operator=(const ChannelInputInfo &other);
     virtual ~ChannelInputInfo() {}
@@ -99,7 +98,6 @@ class MTV_PUBLIC ChannelInputInfo : public InputInfo
     DBChanList   channels;
     vector<uint> groups;
     int          inputNumV4L;
-    int          videoModeV4L1;
     int          videoModeV4L2;
 };
 typedef QMap<uint, ChannelInputInfo*> InputMap;

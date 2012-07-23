@@ -16,7 +16,6 @@ using namespace std;
 
 class TVRec;
 
-typedef QMap<int,int>         VidModV4L1;
 typedef QMap<int,v4l2_std_id> VidModV4L2;
 
 /** \class V4LChannel
@@ -92,14 +91,12 @@ class V4LChannel : public DTVChannel
     int         totalChannels;
 
     QString     currentFormat;
-    bool        usingv4l2;      ///< Set to true if tuner accepts v4l2 commands
     bool        has_stream_io;
     bool        has_std_io;
     bool        has_async_io;
     bool        has_tuner;
     bool        has_sliced_vbi;
 
-    VidModV4L1  videomode_v4l1; ///< Current video mode if 'usingv4l2' is false
     VidModV4L2  videomode_v4l2; ///< Current video mode if 'usingv4l2' is true
 
     int         defaultFreqTable;
