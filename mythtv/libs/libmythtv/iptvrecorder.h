@@ -39,6 +39,8 @@ class IPTVRecorder : public DTVRecorder, public TSDataListener
 
     virtual bool IsExternalChannelChangeSupported(void) { return true; }
 
+    virtual void Pause(bool clear = true);
+
   private:
     bool ProcessTSPacket(const TSPacket &tspacket);
 

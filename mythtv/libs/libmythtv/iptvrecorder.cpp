@@ -65,13 +65,19 @@ void IPTVRecorder::Close(void)
 
 void IPTVRecorder::StopRecording(void)
 {
-    pauseLock.lock();
+    QMutexLocker locker(&pauseLock);
     request_recording = false;
+    if (_channel && _channel->GetFeeder())
+        _channel->GetFeeder()->Stop();
     unpauseWait.wakeAll();
-    pauseLock.unlock();
-    
-    // we can't hold the pause lock while we wait for the IPTV feeder to stop
-    _channel->GetFeeder()->Stop();
+}
+
+void IPTVRecorder::Pause(bool /*clear*/)
+{
+    QMutexLocker locker(&pauseLock);
+    request_pause = true;
+    if (_channel && _channel->GetFeeder())
+        _channel->GetFeeder()->Stop();
 }
 
 void IPTVRecorder::run(void)
@@ -92,8 +98,40 @@ void IPTVRecorder::run(void)
     }
 
     // Go into main RTSP loop, feeding data to AddData
-    _channel->GetFeeder()->Run();
+    while (IsRecordingRequested() && !IsErrored())
+    {
+        bool ok = true;
+        {
+            QMutexLocker locker(&pauseLock);
+            const int timeout = 100; // ms
+            if (request_pause)
+            {
+                if (!IsPaused(true))
+                {
+                    paused = true;
+                    _channel->GetFeeder()->Close();
+                    pauseWait.wakeAll();
+                    if (tvrec)
+                        tvrec->RecorderPaused();
+                }
 
+                unpauseWait.wait(&pauseLock, timeout);
+            }
+
+            if (!request_pause && IsPaused(true))
+            {
+                paused = false;
+                ok = Open();
+                unpauseWait.wakeAll();
+            }
+
+            if (IsPaused(true))
+                continue;
+        }
+
+        if (ok)
+            _channel->GetFeeder()->Run();
+    }
     Close();
 
     // Finish up...
@@ -101,6 +139,8 @@ void IPTVRecorder::run(void)
     QMutexLocker locker(&pauseLock);
     recording = false;
     recordingWait.wakeAll();
+    unpauseWait.wakeAll();
+    pauseWait.wakeAll();
 
     LOG(VB_RECORD, LOG_INFO, LOC + "run() -- end");
 }
@@ -133,10 +173,6 @@ void IPTVRecorder::AddData(const unsigned char *data, unsigned int dataSize)
     // data may be compose from more than one packet, loop to consume all data
     while (readIndex < dataSize)
     {
-        // If recorder is paused, stop there
-        if (IsPaused(false))
-            return;
-
         // Find the next TS Header in data
         int tsPos = IPTVRecorder_findTSHeader(
             data + readIndex, dataSize - readIndex);
