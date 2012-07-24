@@ -428,7 +428,7 @@
     <message>
         <location filename="strings.h" line="56"/>
         <source>Rain/Thunder</source>
-        <translation></translation>
+        <translation>Vihm/torm</translation>
     </message>
     <message>
         <location filename="strings.h" line="57"/>
@@ -534,7 +534,7 @@
     <message>
         <location filename="strings.h" line="77"/>
         <source>Snow to Rain</source>
-        <translation></translation>
+        <translation>Lumi vihmaks</translation>
     </message>
     <message>
         <location filename="strings.h" line="78"/>
@@ -864,82 +864,82 @@
     <message>
         <location filename="strings.h" line="16"/>
         <source>N</source>
-        <translation></translation>
+        <translation>N</translation>
     </message>
     <message>
         <location filename="strings.h" line="17"/>
         <source>NNE</source>
-        <translation></translation>
+        <translation>NNE</translation>
     </message>
     <message>
         <location filename="strings.h" line="18"/>
         <source>NE</source>
-        <translation></translation>
+        <translation>NE</translation>
     </message>
     <message>
         <location filename="strings.h" line="20"/>
         <source>E</source>
-        <translation></translation>
+        <translation>E</translation>
     </message>
     <message>
         <location filename="strings.h" line="22"/>
         <source>SE</source>
-        <translation></translation>
+        <translation>SE</translation>
     </message>
     <message>
         <location filename="strings.h" line="23"/>
         <source>SSE</source>
-        <translation></translation>
+        <translation>SSE</translation>
     </message>
     <message>
         <location filename="strings.h" line="24"/>
         <source>S</source>
-        <translation></translation>
+        <translation>S</translation>
     </message>
     <message>
         <location filename="strings.h" line="25"/>
         <source>SSW</source>
-        <translation></translation>
+        <translation>SSW</translation>
     </message>
     <message>
         <location filename="strings.h" line="26"/>
         <source>SW</source>
-        <translation></translation>
+        <translation>SW</translation>
     </message>
     <message>
         <location filename="strings.h" line="28"/>
         <source>W</source>
-        <translation></translation>
+        <translation>W</translation>
     </message>
     <message>
         <location filename="strings.h" line="30"/>
         <source>NW</source>
-        <translation></translation>
+        <translation>NW</translation>
     </message>
     <message>
         <location filename="strings.h" line="31"/>
         <source>NNW</source>
-        <translation></translation>
+        <translation>NNW</translation>
     </message>
     <message>
         <location filename="strings.h" line="19"/>
         <source>ENE</source>
-        <translation></translation>
+        <translation>ENE</translation>
     </message>
     <message>
         <location filename="strings.h" line="21"/>
         <source>ESE</source>
-        <translation></translation>
+        <translation>ESE</translation>
     </message>
     <message>
         <location filename="strings.h" line="27"/>
         <source>WSW</source>
-        <translation></translation>
+        <translation>WSW</translation>
     </message>
     <message>
         <location filename="strings.h" line="29"/>
         <source>WNW</source>
-        <translation></translation>
+        <translation>WNW</translation>
     </message>
 </context>
 <context>
