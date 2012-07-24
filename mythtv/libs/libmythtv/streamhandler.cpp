@@ -26,9 +26,15 @@ StreamHandler::StreamHandler(const QString &device) :
 
 StreamHandler::~StreamHandler()
 {
-    if (!_stream_data_list.empty())
+    QMutexLocker locker(&_add_rm_lock);
+
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "dtor & _stream_data_list not empty");
+        QMutexLocker locker2(&_listener_lock);
+        if (!_stream_data_list.empty())
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                "dtor & _stream_data_list not empty");
+        }
     }
 
     // This should never be triggered.. just to be safe..
@@ -41,6 +47,8 @@ void StreamHandler::AddListener(MPEGStreamData *data,
                                 bool needs_buffering,
                                 QString output_file)
 {
+    QMutexLocker locker(&_add_rm_lock);
+
     LOG(VB_RECORD, LOG_INFO, LOC + QString("AddListener(0x%1) -- begin")
                 .arg((uint64_t)data,0,16));
     if (!data)
@@ -93,6 +101,8 @@ void StreamHandler::AddListener(MPEGStreamData *data,
 
 void StreamHandler::RemoveListener(MPEGStreamData *data)
 {
+    QMutexLocker locker(&_add_rm_lock);
+
     LOG(VB_RECORD, LOG_INFO, LOC + QString("RemoveListener(0x%1) -- begin")
                 .arg((uint64_t)data,0,16));
     if (!data)
@@ -158,12 +168,6 @@ void StreamHandler::Start(void)
     while (!_running && !_error && _running_desired)
         _running_state_changed.wait(&_start_stop_lock, 100);
 
-    if (!_running_desired)
-    {
-        LOG(VB_GENERAL, LOG_WARNING, LOC +
-            "Programmer Error: Stop called before Start finished");
-    }
-
     if (_error)
     {
         LOG(VB_GENERAL, LOG_WARNING, LOC + "Start failed");
@@ -175,17 +179,9 @@ void StreamHandler::Stop(void)
 {
     QMutexLocker locker(&_start_stop_lock);
 
-    do
-    {
-        SetRunningDesired(false);
-        while (!_running_desired && _running)
-            _running_state_changed.wait(&_start_stop_lock, 100);
-        if (_running_desired)
-        {
-            LOG(VB_GENERAL, LOG_WARNING, LOC +
-                "Programmer Error: Start called before Stop finished");
-        }
-    } while (_running_desired);
+    SetRunningDesired(false);
+    while (_running)
+        _running_state_changed.wait(&_start_stop_lock, 100);
 
     wait();
 }
