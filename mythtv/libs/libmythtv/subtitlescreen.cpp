@@ -1119,6 +1119,8 @@ QString FormattedTextChunk::ToLogString(void) const
         .arg(format.boldface);
     str += QString("font=%1 ").arg(format.font_tag);
     str += QString(" text='%1'").arg(text);
+    if (isTeletext)
+        str += " DEPRECATED_608_TELETEXT";
     return str;
 }
 
