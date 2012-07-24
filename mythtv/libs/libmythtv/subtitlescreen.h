@@ -110,11 +110,11 @@ class FormattedTextChunk
 {
   public:
     FormattedTextChunk(const QString &t, CC708CharacterAttribute formatting,
-                       SubtitleScreen *p)
-        : text(t), format(formatting), parent(p)
+                       SubtitleScreen *p, bool teletext = false)
+        : text(t), format(formatting), parent(p), isTeletext(teletext)
     {
     }
-    FormattedTextChunk(void) : parent(NULL) {}
+    FormattedTextChunk(void) : parent(NULL), isTeletext(false) {}
 
     QSize CalcSize(float layoutSpacing = 0.0f) const
     {
@@ -130,6 +130,7 @@ class FormattedTextChunk
     QString text;
     CC708CharacterAttribute format;
     SubtitleScreen *parent; // where fonts and sizes are kept
+    bool isTeletext;
 };
 
 class FormattedTextLine
