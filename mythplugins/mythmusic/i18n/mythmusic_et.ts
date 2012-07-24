@@ -21,7 +21,7 @@
     <message>
         <location filename="../mythmusic/metadata.cpp" line="1609"/>
         <source>CD</source>
-        <translation></translation>
+        <translation>CD</translation>
     </message>
     <message>
         <location filename="../mythmusic/metadata.cpp" line="1610"/>
@@ -379,7 +379,7 @@ Kas URL on ikka õige.</translation>
         <location filename="../mythmusic/importmusic.cpp" line="950"/>
         <location filename="../mythmusic/importmusic.cpp" line="1124"/>
         <source>CD</source>
-        <translation></translation>
+        <translation>CD</translation>
     </message>
     <message>
         <location filename="../mythmusic/importmusic.cpp" line="952"/>

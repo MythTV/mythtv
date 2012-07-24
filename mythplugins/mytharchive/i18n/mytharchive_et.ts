@@ -19,8 +19,7 @@
     <message>
         <location filename="../mythburn/themes/burnthemestrings.h" line="5"/>
         <source>Has an intro and contains a main menu with 4 recordings per page. Does not have a chapter selection submenu.</source>
-        <translatorcomment>Omab introt ja peamenüüd 4 salvestusega lehe kohta. Ei oma peatükkide valiku alammenüüd.</translatorcomment>
-        <translation></translation>
+        <translation>Omab introt ja peamenüüd 4 salvestusega lehe kohta. Ei oma peatükkide valiku alammenüüd.</translation>
     </message>
     <message>
         <location filename="../mythburn/themes/burnthemestrings.h" line="6"/>
@@ -742,7 +741,7 @@ Palun oota...</translation>
     <message>
         <location filename="../mytharchive/archiveutil.cpp" line="42"/>
         <source>DVD +/- RW</source>
-        <translation></translation>
+        <translation>DVD +/- RW</translation>
     </message>
     <message>
         <location filename="../mytharchive/archiveutil.cpp" line="43"/>
@@ -831,12 +830,12 @@ Palun oota...</translation>
     <message>
         <location filename="themestrings.h" line="26"/>
         <source>PL:</source>
-        <translation></translation>
+        <translation>EL:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="88"/>
         <source>1</source>
-        <translation></translation>
+        <translation>1</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="27"/>

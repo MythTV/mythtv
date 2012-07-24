@@ -113,12 +113,12 @@
     <message>
         <location filename="../mythnews/mythnewseditor.cpp" line="91"/>
         <source>Podcast:</source>
-        <translation></translation>
+        <translation>Taskuhääling:</translation>
     </message>
     <message>
         <location filename="../mythnews/mythnewseditor.cpp" line="93"/>
         <source>OK</source>
-        <translation></translation>
+        <translation>OK</translation>
     </message>
     <message>
         <location filename="../mythnews/mythnewseditor.cpp" line="94"/>
@@ -185,7 +185,7 @@
         <source>You can edit the name, URL, and icon path for the selected RSS Feed on this screen.  You can also designate the item as a podcast.
 
 When you have finished editing, select &quot;OK&quot; or &quot;Cancel&quot; to continue.</source>
-        <translation>Siin saad muuta RSS uudisvoo nime, URL-i, logo ja asukohta. Samuti saad selle määrkida podcastiks.
+        <translation>Siin saad muuta RSS uudisvoo nime, URL-i, logo ja asukohta. Samuti saad selle määrkida taskuhäälinguks.
 Jätkamiseks vajuta &quot;OK&quot; või &quot;Tühista&quot;.</translation>
     </message>
     <message>
@@ -206,7 +206,7 @@ Jätkamiseks vajuta &quot;OK&quot; või &quot;Tühista&quot;.</translation>
     <message>
         <location filename="themestrings.h" line="15"/>
         <source>Podcast:</source>
-        <translation>Podcast:</translation>
+        <translation>Taskuhääling:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="16"/>
@@ -271,8 +271,7 @@ Jätkamiseks vajuta &quot;OK&quot; või &quot;Tühista&quot;.</translation>
     <message>
         <location filename="themestrings.h" line="25"/>
         <source>Contexts</source>
-        <translatorcomment>Kontekst</translatorcomment>
-        <translation></translation>
+        <translation>Kontekst</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="26"/>

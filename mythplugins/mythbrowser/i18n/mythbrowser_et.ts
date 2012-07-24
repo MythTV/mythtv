@@ -211,7 +211,7 @@ Kasuta lisamiseks &apos;Lisa järjehoidja&apos; menüü valikut</translation>
     <message>
         <location filename="themestrings.h" line="29"/>
         <source>URL</source>
-        <translation></translation>
+        <translation>URL</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="20"/>

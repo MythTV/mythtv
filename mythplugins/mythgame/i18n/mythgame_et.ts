@@ -363,7 +363,7 @@ Kustutada andmebaasist?</translation>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="83"/>
         <source>This enables a prompt for removing deleted ROMs from the database during a game scan</source>
-        <translation></translation>
+        <translation>Küsib üle mängude otsimisel avastautud kustutatud ROMi(de) eemaldamise andmebaasist</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="94"/>
@@ -474,9 +474,7 @@ Kustutada andmebaasist?</translation>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="200"/>
         <source>This setting means that we will look for items like game.1.rom, game.2.rom and consider them a single game.</source>
-        <translation>Selle lubamisel loetakse näiteks game.1.rom ja game.2.rom üheks mänguks.
-
-</translation>
+        <translation>Selle lubamisel loetakse näiteks game.1.rom ja game.2.rom üheks mänguks.</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="213"/>
@@ -949,7 +947,7 @@ Kustutada andmebaasist?</translation>
     <message>
         <location filename="themestrings.h" line="40"/>
         <source>CRC:</source>
-        <translation></translation>
+        <translation>CRC:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="43"/>

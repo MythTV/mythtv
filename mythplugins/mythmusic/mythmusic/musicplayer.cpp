@@ -109,6 +109,7 @@ MusicPlayer::~MusicPlayer()
         m_cdWatcher->stop();
         m_cdWatcher->wait();
         delete m_cdWatcher;
+        m_cdWatcher = NULL;
     }
 
     if (!hasClient())
