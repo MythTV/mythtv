@@ -22,16 +22,18 @@ QEvent::Type ScreenLoadCompletionEvent::kEventType =
 class ScreenLoadTask : public QRunnable
 {
   public:
-    ScreenLoadTask(MythScreenType *parent) : m_parent(parent) {}
+    ScreenLoadTask(MythScreenType &parent) : m_parent(parent) {}
 
   private:
-    void run()
+    void run(void)
     {
-        if (m_parent)
-            m_parent->LoadInForeground();
+        m_parent.Load();
+        m_parent.m_IsLoaded = true;
+        m_parent.m_IsLoading = false;
+        m_parent.m_LoadLock.unlock();
     }
 
-    MythScreenType *m_parent;
+    MythScreenType &m_parent;
 };
 
 MythScreenType::MythScreenType(MythScreenStack *parent, const QString &name,
@@ -79,6 +81,9 @@ MythScreenType::~MythScreenType()
 {
 //    gCoreContext->SendSystemEvent(
 //        QString("SCREEN_TYPE DESTROYED %1").arg(objectName()));
+
+    // locking ensures background screen load can finish running
+    QMutexLocker locker(&m_LoadLock);
 
     m_CurrentFocusWidget = NULL;
     emit Exiting();
@@ -294,18 +299,26 @@ void MythScreenType::Load(void)
 
 void MythScreenType::LoadInBackground(QString message)
 {
+    m_LoadLock.lock();
+
     m_IsLoading = true;
+    m_IsLoaded = false;
+
     m_ScreenStack->AllowReInit();
 
     OpenBusyPopup(message);
 
-    ScreenLoadTask *loadTask = new ScreenLoadTask(this);
+    ScreenLoadTask *loadTask = new ScreenLoadTask(*this);
     MThreadPool::globalInstance()->start(loadTask, "ScreenLoad");
 }
 
 void MythScreenType::LoadInForeground(void)
 {
+    QMutexLocker locker(&m_LoadLock);
+
     m_IsLoading = true;
+    m_IsLoaded = false;
+
     m_ScreenStack->AllowReInit();
     Load();
     m_IsLoaded = true;
@@ -365,6 +378,8 @@ bool MythScreenType::IsInitialized(void) const
 
 void MythScreenType::doInit(void)
 {
+    QMutexLocker locker(&m_LoadLock); // don't run while loading..
+
     CloseBusyPopup();
     Init();
     m_IsInitialized = true;
