@@ -378,9 +378,9 @@ void RingBuffer::CalcReadAheadThresh(void)
         readblocksize = max(rbs,readblocksize);
 
     // minumum seconds of buffering before allowing read
-    float secs_min = 0.25;
+    float secs_min = 0.35;
     // set the minimum buffering before allowing ffmpeg read
-    fill_min        = (uint) ((estbitrate * secs_min) * 0.125f);
+    fill_min  = (uint) ((estbitrate * 1000 * secs_min) * 0.125f);
     // make this a multiple of ffmpeg block size..
     if (fill_min >= CHUNK || rbs >= CHUNK)
     {
