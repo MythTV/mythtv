@@ -125,6 +125,35 @@ static float get_aspect(const AVCodecContext &ctx)
 
     return aspect_ratio;
 }
+static float get_aspect(H264Parser &p)
+{
+    static const float default_aspect = 4.0f / 3.0f;
+    int asp = p.aspectRatio();
+    switch (asp)
+    {
+        case 0: return default_aspect;
+        case 2: return 4.0f / 3.0f;
+        case 3: return 16.0f / 9.0f;
+        case 4: return 2.21f;
+        default: break;
+    }
+
+    float aspect_ratio = asp * 0.000001f;
+    if (aspect_ratio <= 0.0f || aspect_ratio > 6.0f)
+    {
+        if (p.pictureHeight() && p.pictureWidth())
+        {
+            aspect_ratio =
+                (float) p.pictureWidth() /(float) p.pictureHeight();
+        }
+        else
+        {
+            aspect_ratio = default_aspect;
+        }
+    }
+    return aspect_ratio;
+}
+
 
 int  get_avf_buffer(struct AVCodecContext *c, AVFrame *pic);
 void release_avf_buffer(struct AVCodecContext *c, AVFrame *pic);
@@ -2954,11 +2983,10 @@ bool AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)
             continue;
         }
 
-        current_aspect = get_aspect(*context);
-        QSize dim    = get_video_dim(*context);
-        uint  width  = dim.width();
-        uint  height = dim.height();
-        float seqFPS = normalized_fps(stream, context);
+        current_aspect = get_aspect(*m_h264_parser);
+        uint  width  = m_h264_parser->pictureWidth();
+        uint  height = m_h264_parser->pictureHeight();
+        float seqFPS = m_h264_parser->frameRate() * 0.001f;
 
         bool changed = (seqFPS > fps+0.01f) || (seqFPS < fps-0.01f);
         changed |= (width  != (uint)current_width );
