@@ -5,8 +5,11 @@
 #include "mythuitext.h"
 #include "mythuiutils.h"
 
+#include <QWaitCondition>
+#include <QMutex>
 #include <QHash>
 
+class ScreenLoadTask;
 class MythScreenStack;
 class MythUIBusyDialog;
 
@@ -39,6 +42,8 @@ class MUI_PUBLIC ScreenLoadCompletionEvent : public QEvent
 class MUI_PUBLIC MythScreenType : public MythUIType
 {
     Q_OBJECT
+
+    friend class ScreenLoadTask;
 
   public:
     MythScreenType(MythScreenStack *parent, const QString &name,
@@ -108,8 +113,10 @@ class MUI_PUBLIC MythScreenType : public MythUIType
 
     bool m_FullScreen;
     bool m_IsDeleting;
-    bool m_IsLoading;
-    bool m_IsLoaded;
+
+    QMutex m_LoadLock;
+    volatile bool m_IsLoading;
+    volatile bool m_IsLoaded;
     bool m_IsInitialized;
 
     MythUIType *m_CurrentFocusWidget;

@@ -399,6 +399,8 @@ static void write_section_data(AVFormatContext *s, MpegTSFilter *tss1,
             av_crc(av_crc_get_table(AV_CRC_32_IEEE), -1,
                    tss->section_buf, tss->section_h_size) == 0)
             tss->section_cb(tss1, tss->section_buf, tss->section_h_size);
+        else
+            av_log(s, AV_LOG_WARNING, "write_section_data: PID %#x CRC error\n", tss1->pid);
 
         if (tss->section_index > tss->section_h_size) {
             int left = tss->section_index - tss->section_h_size;
@@ -669,7 +671,7 @@ static void mpegts_push_section(MpegTSFilter *filter, const uint8_t *section, in
         return;
     }
 
-    if (sect->new_packet && pkt && sect->st) {
+    if (sect->new_packet && pkt && sect->st && pkt->size == 0) {
         int pktLen = section_len + 184; /* Add enough for a complete TS payload. */
         sect->new_packet = 0;
         av_free_packet(pkt);
@@ -2516,7 +2518,10 @@ static int handle_packet(MpegTSContext *ts, const uint8_t *packet)
             /* pointer field present */
             len = *p++;
             if (p + len > p_end)
+            {
+                av_log(s, AV_LOG_WARNING, "handle_packet: Last section data too long on PID=%#x, %d\n", pid, cc);
                 return 0;
+            }
             if (len && cc_ok) {
                 /* write remaining section bytes */
                 write_section_data(s, tss,

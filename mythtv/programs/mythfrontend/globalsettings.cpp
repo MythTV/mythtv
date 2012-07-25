@@ -726,7 +726,7 @@ void PlaybackProfileItemConfig::decoderChanged(const QString &dec)
     vidrend->clearSelections();
     for (it = renderers.begin(); it != renderers.end(); ++it)
     {
-        if (*it != "null")
+        if ((*it != "null") && (*it != "nullvaapi") && (*it != "nullvdpau"))
             vidrend->addSelection(*it, *it, (*it == prenderer));
     }
 

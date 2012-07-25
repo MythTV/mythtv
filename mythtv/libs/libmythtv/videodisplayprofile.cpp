@@ -1209,7 +1209,8 @@ QString VideoDisplayProfile::GetVideoRendererHelp(const QString &renderer)
     if (renderer.isEmpty())
         return msg;
 
-    if (renderer == "null")
+    if ((renderer == "null") || (renderer == "nullvaapi") ||
+        (renderer == "nullvdpau"))
         msg = QObject::tr(
             "Render video offscreen. Used internally.");
 
