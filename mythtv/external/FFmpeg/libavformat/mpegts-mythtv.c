@@ -669,7 +669,7 @@ static void mpegts_push_section(MpegTSFilter *filter, const uint8_t *section, in
         return;
     }
 
-    if (sect->new_packet && pkt && sect->st) {
+    if (sect->new_packet && pkt && sect->st && pkt->size == 0) {
         int pktLen = section_len + 184; /* Add enough for a complete TS payload. */
         sect->new_packet = 0;
         av_free_packet(pkt);
