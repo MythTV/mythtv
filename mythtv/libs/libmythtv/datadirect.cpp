@@ -1010,15 +1010,16 @@ bool DataDirectProcessor::DDPost(QString    ddurl,        QString   &inputFile,
         inputFile = QString("/tmp/mythtv_ddp_data");
     }
 
-    const QByteArray header = "Accept-Encoding";
-    const QByteArray value  = "gzip";
+    QHash<QByteArray, QByteArray> headers;
+    headers.insert("Accept-Encoding", "gzip");
+    headers.insert("Content-Type", "application/soap+xml; charset=utf-8");
 
     LOG(VB_GENERAL, LOG_INFO, "Downloading DataDirect feed");
 
     MythDownloadManager *manager = GetMythDownloadManager();
 
     if (!manager->postAuth(ddurl, &postdata, &::authenticationCallback, this,
-                           &header, &value))
+                           &headers))
     {
         err_txt = QString("Download error");
         return false;
@@ -1078,9 +1079,13 @@ bool DataDirectProcessor::GrabNextSuggestedTime(void)
     postdata += "</SOAP-ENV:Body>\n";
     postdata += "</SOAP-ENV:Envelope>\n";
 
+    QHash<QByteArray, QByteArray> headers;
+    headers.insert("Content-Type", "application/soap+xml; charset=utf-8");
+
     MythDownloadManager *manager = GetMythDownloadManager();
 
-    if (!manager->postAuth(ddurl, &postdata, &::authenticationCallback, this))
+    if (!manager->postAuth(ddurl, &postdata, &::authenticationCallback, this,
+                           &headers))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
             "GrabNextSuggestedTime: Could not download");

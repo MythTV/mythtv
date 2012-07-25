@@ -49,8 +49,7 @@ class MythDownloadInfo
         m_processReply(true),    m_done(false),        m_bytesReceived(0),
         m_bytesTotal(0),         m_lastStat(MythDate::current()),
         m_authCallback(NULL),    m_authArg(NULL),
-        m_header(NULL),          m_headerVal(NULL),
-        m_errorCode(QNetworkReply::NoError)
+        m_headers(NULL),         m_errorCode(QNetworkReply::NoError)
     {
         qRegisterMetaType<QNetworkReply::NetworkError>("QNetworkReply::NetworkError");
     }
@@ -88,8 +87,7 @@ class MythDownloadInfo
     QDateTime        m_lastStat;
     AuthCallback     m_authCallback;
     void            *m_authArg;
-    const QByteArray *m_header;
-    const QByteArray *m_headerVal;
+    const QHash<QByteArray, QByteArray> *m_headers;
 
     QNetworkReply::NetworkError m_errorCode;
 };
@@ -365,16 +363,14 @@ void MythDownloadManager::queueItem(const QString &url, QNetworkRequest *req,
  *  \param reload   Force reloading of the URL
  *  \param authCallback AuthCallback function for authentication
  *  \param authArg  Opaque argument for callback function
- *  \param header   Optional HTTP header to add to the request
- *  \param headerVal   Value for the optional HTTP header to add to the request
+ *  \param headers  Hash of optional HTTP header to add to the request
  */
 bool MythDownloadManager::processItem(const QString &url, QNetworkRequest *req,
                                       const QString &dest, QByteArray *data,
                                       const MRequestType reqType,
                                       const bool reload,
                                       AuthCallback authCallback, void *authArg,
-                                      const QByteArray *header,
-                                      const QByteArray *headerVal)
+                                   const QHash<QByteArray, QByteArray> *headers)
 {
     MythDownloadInfo *dlInfo = new MythDownloadInfo;
 
@@ -387,8 +383,7 @@ bool MythDownloadManager::processItem(const QString &url, QNetworkRequest *req,
     dlInfo->m_syncMode = true;
     dlInfo->m_authCallback = authCallback;
     dlInfo->m_authArg  = authArg;
-    dlInfo->m_header   = header;
-    dlInfo->m_headerVal =  headerVal;
+    dlInfo->m_headers  = headers;
 
     return downloadNow(dlInfo);
 }
@@ -509,16 +504,15 @@ bool MythDownloadManager::download(QNetworkRequest *req, QByteArray *data)
  *  \param reload  Whether to force reloading of the URL or not
  *  \param authCallback AuthCallback function for use with authentication
  *  \param authArg Opaque argument for callback function
- *  \param header  Optional HTTP header to add to the request
- *  \param headerVal Value for the optional HTTP header to add to the request
+ *  \param headers Hash of optional HTTP header to add to the request
  *  \return true if download was successful, false otherwise.
  */
 bool MythDownloadManager::downloadAuth(const QString &url, const QString &dest,
                const bool reload, AuthCallback authCallback, void *authArg,
-               const QByteArray *header, const QByteArray *headerVal)
+               const QHash<QByteArray, QByteArray> *headers)
 {
     return processItem(url, NULL, dest, NULL, kRequestGet, reload, authCallback,
-                       authArg, header, headerVal);
+                       authArg, headers);
 }
 
 
@@ -609,14 +603,12 @@ bool MythDownloadManager::post(QNetworkRequest *req, QByteArray *data)
  *  \param data     Location holding post and response data
  *  \param authCallback AuthCallback function for authentication
  *  \param authArg Opaque argument for callback function
- *  \param header  Optional HTTP header to add to the request
- *  \param headerVal Value for the optional HTTP header to add to the request
+ *  \param headers Hash of optional HTTP headers to add to the request
  *  \return true if post was successful, false otherwise.
  */
 bool MythDownloadManager::postAuth(const QString &url, QByteArray *data,
                                    AuthCallback authCallback, void *authArg,
-                                   const QByteArray *header,
-                                   const QByteArray *headerVal)
+                                   const QHash<QByteArray, QByteArray> *headers)
 {
     LOG(VB_FILE, LOG_DEBUG, LOC + QString("postAuth('%1', '%2')")
             .arg(url).arg((long long)data));
@@ -628,7 +620,7 @@ bool MythDownloadManager::postAuth(const QString &url, QByteArray *data,
     }
 
     return processItem(url, NULL, NULL, data, kRequestPost, false, authCallback,
-                       authArg, header, headerVal);
+                       authArg, headers);
 }
 
 /** \brief Triggers a myth:// URI download in the background via RemoteFile
@@ -718,10 +710,17 @@ void MythDownloadManager::downloadQNetworkRequest(MythDownloadInfo *dlInfo)
     request.setRawHeader("User-Agent",
                          "MythTV v" MYTH_BINARY_VERSION " MythDownloadManager");
 
-    if (dlInfo->m_header && dlInfo->m_headerVal &&
-        !dlInfo->m_header->isEmpty() && !dlInfo->m_headerVal->isEmpty())
+    if (dlInfo->m_headers)
     {
-        request.setRawHeader(*(dlInfo->m_header), *(dlInfo->m_headerVal));
+        QHash<QByteArray, QByteArray>::const_iterator it =
+            dlInfo->m_headers->constBegin();
+        for ( ; it != dlInfo->m_headers->constEnd(); ++it )
+        {
+            if (!it.key().isEmpty() && !it.value().isEmpty())
+            {
+                request.setRawHeader(it.key(), it.value());
+            }
+        }
     }
 
     switch (dlInfo->m_requestType)
