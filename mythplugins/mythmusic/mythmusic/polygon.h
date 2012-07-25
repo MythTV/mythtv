@@ -15,12 +15,12 @@ struct Bitmap {
     delete[] data;
     width = w;
     height = h;
-    data = new Pixel[w*h+extra];
+    data = new Pixel[2*w*h+extra];
     clear();
   }
   
   void clear() {
-    memset(data,0,sizeof(Pixel)*(width*height+extra));
+    memset(data,0,sizeof(Pixel)*(2*width*height+extra));
   }
 };
 #endif
