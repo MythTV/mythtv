@@ -36,24 +36,32 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
         oldrecstatus(rsUnknown),
         savedrecstatus(rsUnknown),
         future(false),
+        desiredrecstartts(),
+        desiredrecendts(),
         record(NULL) {}
     RecordingInfo(const RecordingInfo &other) :
         ProgramInfo(other),
         oldrecstatus(other.oldrecstatus),
         savedrecstatus(other.savedrecstatus),
         future(other.future),
+        desiredrecstartts(other.desiredrecstartts),
+        desiredrecendts(other.desiredrecendts),
         record(NULL) {}
     RecordingInfo(const ProgramInfo &other) :
         ProgramInfo(other),
         oldrecstatus(rsUnknown),
         savedrecstatus(rsUnknown),
         future(false),
+        desiredrecstartts(startts),
+        desiredrecendts(endts),
         record(NULL) {}
     RecordingInfo(uint _chanid, const QDateTime &_recstartts) :
         ProgramInfo(_chanid, _recstartts),
         oldrecstatus(rsUnknown),
         savedrecstatus(rsUnknown),
         future(false),
+        desiredrecstartts(startts),
+        desiredrecendts(endts),
         record(NULL) {}
     RecordingInfo(QStringList::const_iterator &it,
                   QStringList::const_iterator  end) :
@@ -61,6 +69,8 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
         oldrecstatus(rsUnknown),
         savedrecstatus(rsUnknown),
         future(false),
+        desiredrecstartts(startts),
+        desiredrecendts(endts),
         record(NULL) {}
     /// Create RecordingInfo from 'program'+'record'+'channel' tables,
     /// used in scheduler.cpp @ ~ 3296

@@ -57,7 +57,7 @@ class DTVRecorder :
 
     virtual void Reset(void);
     virtual void ClearStatistics(void);
-    virtual RecordingQuality *GetRecordingQuality(void) const;
+    virtual RecordingQuality *GetRecordingQuality(const RecordingInfo*) const;
 
     // MPEG Stream Listener
     void HandlePAT(const ProgramAssociationTable*);

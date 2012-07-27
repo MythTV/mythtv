@@ -260,7 +260,7 @@ ProgramInfo *TVRec::GetRecording(void)
     return tmppginfo;
 }
 
-/** \fn TVRec::RecordPending(const ProgramInfo*, int, bool)
+/** \fn TVRec::RecordPending(const RecordingInfo*, int, bool)
  *  \brief Tells TVRec "rcinfo" is the next pending recording.
  *
  *   When there is a pending recording and the frontend is in "Live TV"
@@ -324,12 +324,12 @@ void TVRec::RecordPending(const ProgramInfo *rcinfo, int secsleft,
     pendlock.relock();
 }
 
-/** \fn TVRec::SetPseudoLiveTVRecording(ProgramInfo*)
- *  \brief Sets the pseudo LiveTV ProgramInfo
+/** \fn TVRec::SetPseudoLiveTVRecording(RecordingInfo*)
+ *  \brief Sets the pseudo LiveTV RecordingInfo
  */
-void TVRec::SetPseudoLiveTVRecording(ProgramInfo *pi)
+void TVRec::SetPseudoLiveTVRecording(RecordingInfo *pi)
 {
-    ProgramInfo *old_rec = pseudoLiveTVRecording;
+    RecordingInfo *old_rec = pseudoLiveTVRecording;
     pseudoLiveTVRecording = pi;
     if (old_rec)
         delete old_rec;
@@ -401,8 +401,13 @@ void TVRec::CancelNextRecording(bool cancel)
  *  \sa EncoderLink::StartRecording(const ProgramInfo*)
  *      RecordPending(const ProgramInfo*, int, bool), StopRecording()
  */
-RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
+RecStatusType TVRec::StartRecording(const ProgramInfo *pginfo)
 {
+    RecordingInfo ri(*pginfo);
+    ri.SetDesiredStartTime(ri.GetRecordingStartTime());
+    ri.SetDesiredEndTime(ri.GetRecordingEndTime());
+    RecordingInfo *rcinfo = &ri;
+
     LOG(VB_RECORD, LOG_INFO, LOC + QString("StartRecording(%1)")
             .arg(rcinfo->toString(ProgramInfo::kTitleSubtitle)));
 
@@ -599,7 +604,7 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
     }
     else if (!cancelNext && (GetState() == kState_WatchingLiveTV))
     {
-        SetPseudoLiveTVRecording(new ProgramInfo(*rcinfo));
+        SetPseudoLiveTVRecording(new RecordingInfo(*rcinfo));
         recordEndTime = GetRecordEndTime(rcinfo);
         SetRecordingStatus(rsRecording, __LINE__);
 
@@ -705,7 +710,11 @@ void TVRec::StopRecording(bool killFile)
         if (killFile)
             SetFlags(kFlagKillRec);
         else if (curRecording)
-            curRecording->SetDesiredEndTime(MythDate::current(true));
+        {
+            QDateTime now = MythDate::current(true);
+            if (now < curRecording->GetDesiredEndTime())
+                curRecording->SetDesiredEndTime(now);
+        }
         ChangeState(RemoveRecording(GetState()));
         // wait for state change to take effect
         WaitForEventThreadSleep();
@@ -799,7 +808,7 @@ void TVRec::StartedRecording(RecordingInfo *curRec)
  *         programs. If the recording type is kFindOneRecord this find
  *         is removed.
  *  \sa ProgramInfo::FinishedRecording(bool prematurestop)
- *  \param curRec ProgramInfo or recording to mark as done
+ *  \param curRec RecordingInfo or recording to mark as done
  */
 void TVRec::FinishedRecording(RecordingInfo *curRec, RecordingQuality *recq)
 {
@@ -1091,7 +1100,7 @@ void TVRec::TeardownRecorder(uint request_flags)
         if (GetV4LChannel())
             channel->SetFd(-1);
 
-        recq = recorder->GetRecordingQuality();
+        recq = recorder->GetRecordingQuality(curRecording);
 
         QMutexLocker locker(&stateChangeLock);
         delete recorder;
@@ -2625,7 +2634,7 @@ void TVRec::CheckForRecGroupChange(void)
     if (recgrp != "LiveTV" && !pseudoLiveTVRecording)
     {
         // User wants this recording to continue
-        SetPseudoLiveTVRecording(new ProgramInfo(*curRecording));
+        SetPseudoLiveTVRecording(new RecordingInfo(*curRecording));
     }
     else if (recgrp == "LiveTV" && pseudoLiveTVRecording)
     {
@@ -3332,7 +3341,7 @@ void TVRec::SetRingBuffer(RingBuffer *rb)
 }
 
 void TVRec::RingBufferChanged(
-    RingBuffer *rb, ProgramInfo *pginfo, RecordingQuality *recq)
+    RingBuffer *rb, RecordingInfo *pginfo, RecordingQuality *recq)
 {
     LOG(VB_GENERAL, LOG_INFO, LOC + "RingBufferChanged()");
 
@@ -3747,7 +3756,7 @@ void TVRec::TuningFrequency(const TuningRequest &request)
     {
         // We need there to be a ringbuffer for these modes
         bool ok;
-        ProgramInfo *tmp = pseudoLiveTVRecording;
+        RecordingInfo *tmp = pseudoLiveTVRecording;
         pseudoLiveTVRecording = NULL;
 
         tvchain->SetCardType("DUMMY");
