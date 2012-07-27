@@ -446,14 +446,13 @@ void ScreenSetup::saveData()
             db2.prepare(query2);
             db2.bindValue(":DRAW", draworder);
             db2.bindValue(":HOST", gCoreContext->GetHostName());
-            if (!db2.exec())
+            if (!db2.exec() || !db2.next())
             {
                 LOG(VB_GENERAL, LOG_ERR, db2.executedQuery());
                 LOG(VB_GENERAL, LOG_ERR, db2.lastError().text());
                 return;
             }
-
-            db2.next();
+            
             int screen_id = db2.value(0).toInt();
 
             query2 = "INSERT INTO weatherdatalayout (location, dataitem, "
