@@ -1343,9 +1343,9 @@ bool DTVRecorder::ProcessAVTSPacket(const TSPacket &tspacket)
     return true;
 }
 
-RecordingQuality *DTVRecorder::GetRecordingQuality(void) const
+RecordingQuality *DTVRecorder::GetRecordingQuality(const RecordingInfo *r) const
 {
-    RecordingQuality *recq = RecorderBase::GetRecordingQuality();
+    RecordingQuality *recq = RecorderBase::GetRecordingQuality(r);
     recq->AddTSStatistics(
         _continuity_error_count.fetchAndAddRelaxed(0),
         _packet_count.fetchAndAddRelaxed(0));

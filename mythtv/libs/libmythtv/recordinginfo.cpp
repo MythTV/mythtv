@@ -110,8 +110,8 @@ RecordingInfo::RecordingInfo(
     oldrecstatus(_oldrecstatus),
     savedrecstatus(rsUnknown),
     future(_future),
-    desiredrecstartts(_recstartts),
-    desiredrecendts(_recendts),
+    desiredrecstartts(_startts),
+    desiredrecendts(_endts),
     record(NULL)
 {
     hostname = _hostname;
@@ -205,8 +205,8 @@ RecordingInfo::RecordingInfo(
     oldrecstatus(rsUnknown),
     savedrecstatus(rsUnknown),
     future(false),
-    desiredrecstartts(_recstartts),
-    desiredrecendts(_recendts),
+    desiredrecstartts(_startts),
+    desiredrecendts(_endts),
     record(NULL)
 {
     recpriority = _recpriority;
@@ -238,6 +238,8 @@ RecordingInfo::RecordingInfo(
     oldrecstatus(rsUnknown),
     savedrecstatus(rsUnknown),
     future(false),
+    desiredrecstartts(),
+    desiredrecendts(),
     record(NULL)
 {
     ProgramList schedList;
@@ -358,6 +360,9 @@ RecordingInfo::RecordingInfo(
 
     if (status)
         *status = kFakedLiveTVProgram;
+
+    desiredrecstartts = startts;
+    desiredrecendts = endts;
 }
 
 /// \brief Copies important fields from other RecordingInfo.

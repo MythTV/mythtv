@@ -225,7 +225,7 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
     /// \brief Returns true is "errored" is true, false otherwise.
     bool IsErrored(void)  const { return HasFlags(kFlagErrored); }
 
-    void RingBufferChanged(RingBuffer*, ProgramInfo*, RecordingQuality*);
+    void RingBufferChanged(RingBuffer*, RecordingInfo*, RecordingQuality*);
     void RecorderPaused(void);
 
     void SetNextLiveTVDir(QString dir);
@@ -245,7 +245,7 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
 
   private:
     void SetRingBuffer(RingBuffer *);
-    void SetPseudoLiveTVRecording(ProgramInfo*);
+    void SetPseudoLiveTVRecording(RecordingInfo*);
     void TeardownAll(void);
     void WakeEventLoop(void);
 
@@ -382,7 +382,7 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
     PendingMap   pendingRecordings;
 
     // Pseudo LiveTV recording
-    ProgramInfo *pseudoLiveTVRecording;
+    RecordingInfo *pseudoLiveTVRecording;
     QString      nextLiveTVDir;
     QMutex       nextLiveTVDirLock;
     QWaitCondition triggerLiveTVDir;

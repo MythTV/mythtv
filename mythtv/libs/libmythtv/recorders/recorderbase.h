@@ -179,7 +179,7 @@ class MTV_PUBLIC RecorderBase : public QRunnable
     virtual bool IsRecordingRequested(void);
 
     /// \brief Returns a report about the current recordings quality.
-    virtual RecordingQuality *GetRecordingQuality(void) const;
+    virtual RecordingQuality *GetRecordingQuality(const RecordingInfo*) const;
 
     // pausing interface
     virtual void Pause(bool clear = true);

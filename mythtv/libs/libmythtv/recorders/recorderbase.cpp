@@ -308,7 +308,7 @@ void RecorderBase::CheckForRingBufferSwitch(void)
     {
         FinishRecording();
 
-        recq = GetRecordingQuality();
+        recq = GetRecordingQuality(NULL);
 
         ResetForNewFile();
 
@@ -340,9 +340,16 @@ void RecorderBase::ClearStatistics(void)
     recordingGaps.clear();
 }
 
-RecordingQuality *RecorderBase::GetRecordingQuality(void) const
+RecordingQuality *RecorderBase::GetRecordingQuality(
+    const RecordingInfo *r) const
 {
     QMutexLocker locker(&statisticsLock);
+    if (r && curRecording &&
+        (r->MakeUniqueKey() == curRecording->MakeUniqueKey()))
+    {
+        curRecording->SetDesiredStartTime(r->GetDesiredStartTime());
+        curRecording->SetDesiredEndTime(r->GetDesiredEndTime());
+    }
     return new RecordingQuality(
         curRecording, recordingGaps,
         timeOfFirstData, timeOfLatestData);
