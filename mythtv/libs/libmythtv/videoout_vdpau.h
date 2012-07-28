@@ -71,6 +71,7 @@ class VideoOutputVDPAU : public VideoOutput
         { return VideoOutput::SetupVisualisation(audio, m_render, name); }
     virtual QStringList GetVisualiserList(void);
     virtual void ClearDummyFrame(VideoFrame* frame);
+    virtual void SetVideoFlip(void);
 
   private:
     virtual bool hasFullScreenOSD(void) const { return true; }

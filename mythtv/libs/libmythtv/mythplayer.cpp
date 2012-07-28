@@ -500,6 +500,9 @@ bool MythPlayer::InitVideo(void)
     if (embedding && pipState == kPIPOff)
         videoOutput->EmbedInWidget(embedRect);
 
+    if (decoder && decoder->GetVideoInverted())
+        videoOutput->SetVideoFlip();
+
     InitFilters();
 
     return true;
@@ -1048,6 +1051,10 @@ void MythPlayer::InitFilters(void)
 
     if (!videoFiltersOverride.isEmpty())
         filters = videoFiltersOverride;
+
+    AvFormatDecoder *afd = dynamic_cast<AvFormatDecoder *>(decoder);
+    if (afd && afd->GetVideoInverted() && !filters.contains("vflip"))
+        filters += ",vflip";
 
     filters.detach();
 

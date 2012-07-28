@@ -216,6 +216,7 @@ class DecoderBase
     void SaveTotalDuration(void);
     void ResetTotalDuration(void) { totalDuration = 0; }
     void SaveTotalFrames(void);
+    bool GetVideoInverted(void) const { return video_inverted; }
 
   protected:
     virtual int  AutoSelectTrack(uint type);
@@ -286,6 +287,7 @@ class DecoderBase
     bool waitingForChange;
     long long readAdjust;
     bool justAfterChange;
+    bool video_inverted;
 
     // Audio/Subtitle/EIA-608/EIA-708 stream selection
     bool        decodeAllSubtitles;

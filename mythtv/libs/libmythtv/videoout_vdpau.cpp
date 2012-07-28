@@ -1309,3 +1309,13 @@ QStringList VideoOutputVDPAU::GetVisualiserList(void)
         return VideoVisual::GetVisualiserList(m_render->Type());
     return VideoOutput::GetVisualiserList();
 }
+
+void VideoOutputVDPAU::SetVideoFlip(void)
+{
+    if (!m_render)
+    {
+        LOG(VB_PLAYBACK, LOG_ERR, QString("SetVideoFlip failed."));
+        return;
+    }
+    m_render->SetVideoFlip();
+}
