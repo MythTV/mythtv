@@ -788,7 +788,7 @@ int main(int argc, char **argv)
     QList<int> signallist;
     signallist << SIGINT << SIGTERM << SIGSEGV << SIGABRT << SIGBUS << SIGFPE
                << SIGILL;
-    SignalHandler handler(signallist);
+    SignalHandler::Init(signallist);
     signal(SIGHUP, SIG_IGN);
 #endif
 
@@ -797,6 +797,7 @@ int main(int argc, char **argv)
     {
         LOG(VB_GENERAL, LOG_ERR,
             "mythshutdown: Could not initialize MythContext. Exiting.");
+        SignalHandler::Done();
         return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
 
@@ -833,6 +834,8 @@ int main(int argc, char **argv)
         cmdline.PrintHelp();
 
     delete gContext;
+
+    SignalHandler::Done();
 
     return res;
 }

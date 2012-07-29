@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QSocketNotifier>
+#include <QMutex>
 #include <QList>
 #include <QMap>
 
@@ -19,10 +20,10 @@ class MBASE_PUBLIC SignalHandler: public QObject
     Q_OBJECT
 
   public:
-    SignalHandler(QList<int> &signallist, QObject *parent = NULL);
-    ~SignalHandler();
+    static void Init(QList<int> &signallist, QObject *parent = NULL);
+    static void Done(void);
 
-    void AddHandler(int signal, void (*handler)(void));
+    static void SetHandler(int signal, void (*handler)(void));
 
     static bool IsExiting(void) { return s_exit_program; }
 
@@ -34,12 +35,20 @@ class MBASE_PUBLIC SignalHandler: public QObject
     void handleSignal(void);
 
   private:
+    SignalHandler(QList<int> &signallist, QObject *parent);
+    ~SignalHandler();
+    void SetHandlerPrivate(int signal, void (*handler)(void));
+
     static int sigFd[2];
     static volatile bool s_exit_program;
     QSocketNotifier *m_notifier;
 
+    QMutex m_sigMapLock;
     QMap<int, void (*)(void)> m_sigMap;
     static QList<int> s_defaultHandlerList;
+
+    static QMutex s_singletonLock;
+    static SignalHandler *s_singleton;
 };
 
 #endif

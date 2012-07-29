@@ -267,6 +267,8 @@ namespace
         ReferenceCounter::PrintDebug();
 
         delete qApp;
+
+        SignalHandler::Done();
     }
 
     class CleanupGuard
@@ -1477,9 +1479,9 @@ int main(int argc, char **argv)
     QList<int> signallist;
     signallist << SIGINT << SIGTERM << SIGSEGV << SIGABRT << SIGBUS << SIGFPE
                << SIGILL;
-    SignalHandler handler(signallist);
-    handler.AddHandler(SIGUSR1, handleSIGUSR1);
-    handler.AddHandler(SIGUSR2, handleSIGUSR2);
+    SignalHandler::Init(signallist);
+    SignalHandler::SetHandler(SIGUSR1, handleSIGUSR1);
+    SignalHandler::SetHandler(SIGUSR2, handleSIGUSR2);
     signal(SIGHUP, SIG_IGN);
 #endif
 

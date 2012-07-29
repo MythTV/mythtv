@@ -225,6 +225,14 @@ int main(int argc, char *argv[])
     MythMainWindow *mainWindow = GetMythMainWindow();
     mainWindow->Init();
 
+#ifndef _WIN32
+    QList<int> signallist;
+    signallist << SIGINT << SIGTERM << SIGSEGV << SIGABRT << SIGBUS << SIGFPE
+               << SIGILL;
+    SignalHandler::Init(signallist);
+    signal(SIGHUP, SIG_IGN);
+#endif
+
     if (cmdline.toBool("test"))
     {
         int seconds = 5;
@@ -260,6 +268,8 @@ int main(int argc, char *argv[])
     DestroyMythMainWindow();
 
     delete gContext;
+
+    SignalHandler::Done();
 
     return GENERIC_EXIT_OK;
 }
