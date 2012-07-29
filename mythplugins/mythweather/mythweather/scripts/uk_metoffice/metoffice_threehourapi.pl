@@ -22,6 +22,7 @@ use Switch;
 
 use Date::Parse;
 use Date::Calc qw(Day_of_Week);
+use DateTime;
 use DateTime::Format::ISO8601;
 use File::Basename;
 use lib dirname($0);
@@ -142,6 +143,12 @@ foreach $item (@{$xml->{DV}->{Location}->{Period}}) {
 
         my $datetime = DateTime::Format::ISO8601->parse_datetime(substr($item->{val}, 0, -1));
         $datetime->add( minutes => $rep->{content} );
+        
+        if ($datetime <= DateTime->now()->subtract( hours => 3 )) # Ignore periods in past
+        {
+            next;
+        }
+        
         printf "time-" . $i . "::" .  MetOffCommon::format_date($datetime->epoch) . "\n";
         my $iconname = "unknown";
         switch ($rep->{W}) { # Weather Type
