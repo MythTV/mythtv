@@ -41,6 +41,7 @@
         <text>Setup</text>
         <description>Configure MythTV and plugins</description>
         <action>MENU main_settings.xml</action>
+        <password>SetupPinCode</password>
     </button>
 
 </mythmenu>
