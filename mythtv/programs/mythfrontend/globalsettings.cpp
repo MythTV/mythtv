@@ -1647,19 +1647,11 @@ static HostLineEdit *SetupPinCode()
     ge->setHelpText(QObject::tr("This PIN is used to control access to the "
                     "setup menus. If you want to use this feature, then "
                     "setting the value to all numbers will make your life "
-                    "much easier. Set it to blank to disable."));
-    return ge;
-}
-
-static HostCheckBox *SetupPinCodeRequired()
-{
-    HostCheckBox *gc = new HostCheckBox("SetupPinCodeRequired");
-    gc->setLabel(QObject::tr("Require setup PIN") + "    ");
-    gc->setValue(false);
-    gc->setHelpText(QObject::tr("If enabled, you will not be able to return "
+                    "much easier. Set it to blank to disable."
+                    "If enabled, you will not be able to return "
                     "to this screen and reset the Setup PIN without first "
                     "entering the current PIN."));
-    return gc;
+    return ge;
 }
 
 static HostComboBox *XineramaScreen()
@@ -3263,7 +3255,6 @@ MainGeneralSettings::MainGeneralSettings()
     VerticalConfigurationGroup *pin =
         new VerticalConfigurationGroup(false, true, false, false);
     pin->setLabel(QObject::tr("Settings Access"));
-    pin->addChild(SetupPinCodeRequired());
     pin->addChild(SetupPinCode());
     addChild(pin);
 
