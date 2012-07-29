@@ -26,6 +26,7 @@ void PreviewGeneratorQueue::TeardownPreviewGeneratorQueue()
     s_pgq->exit(0);
     s_pgq->wait();
     delete s_pgq;
+    s_pgq = NULL;
 }
 
 PreviewGeneratorQueue::PreviewGeneratorQueue(
