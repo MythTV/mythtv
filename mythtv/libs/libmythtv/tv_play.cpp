@@ -17,6 +17,7 @@ using namespace std;
 #include <QFile>
 #include <QDir>
 
+#include "signalhandling.h"
 #include "mythdb.h"
 #include "tv_play.h"
 #include "tv_rec.h"
@@ -1369,6 +1370,11 @@ void TV::PlaybackLoop(void)
     while (true)
     {
         qApp->processEvents();
+        if (SignalHandler::IsExiting())
+        {
+            wantsToQuit = true;
+            return;
+        }
 
         TVState state = GetState(0);
         if ((kState_Error == state) || (kState_None == state))

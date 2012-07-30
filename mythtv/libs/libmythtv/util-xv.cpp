@@ -1,12 +1,13 @@
-// POSIX headers
-#include <signal.h>
-
 // C++ headers
 #include <iostream>
 #include <cstdlib>
 using namespace std;
 
-// MythTH headers
+// Qt headers
+#include <QCoreApplication>
+
+// MythTV headers
+#include "signalhandling.h"
 #include "mythlogging.h"
 #include "mythxdisplay.h"
 #include "util-xv.h"
@@ -22,16 +23,24 @@ QMap<int,port_info> open_xv_ports;
 
 void close_all_xv_ports_signal_handler(int sig)
 {
-    LOG(VB_GENERAL, LOG_INFO, QString("Signal: %1").arg(sys_siglist[sig]));
+    LOG(VB_GENERAL, LOG_CRIT, QString("Signal: %1").arg(sys_siglist[sig]));
     QMap<int,port_info>::iterator it;
     for (it = open_xv_ports.begin(); it != open_xv_ports.end(); ++it)
     {
         restore_port_attributes((*it).port);
-        LOG(VB_GENERAL, LOG_INFO, QString("Ungrabbing XVideo port: %1")
+        LOG(VB_GENERAL, LOG_CRIT, QString("Ungrabbing XVideo port: %1")
             .arg((*it).port));
         XvUngrabPort((*it).disp->GetDisplay(), (*it).port, CurrentTime);
     }
-    exit(GENERIC_EXIT_NOT_OK);
+    QCoreApplication::exit(GENERIC_EXIT_NOT_OK);
+}
+static void close_all_xv_ports_signal_handler_SIGINT(void)
+{
+    close_all_xv_ports_signal_handler(SIGINT);
+}
+static void close_all_xv_ports_signal_handler_SIGTERM(void)
+{
+    close_all_xv_ports_signal_handler(SIGTERM);
 }
 
 void save_port_attributes(int port)
@@ -94,8 +103,10 @@ bool add_open_xv_port(MythXDisplay *disp, int port)
         QByteArray ascii_name = "XV_SET_DEFAULTS";
         const char *name = ascii_name.constData();
         ret = xv_is_attrib_supported(disp, port, name);
-        // TODO enable more catches after 0.19 is out -- dtk
-        signal(SIGINT,  close_all_xv_ports_signal_handler);
+        SignalHandler::SetHandler(
+            SIGINT, close_all_xv_ports_signal_handler_SIGINT);
+        SignalHandler::SetHandler(
+            SIGTERM, close_all_xv_ports_signal_handler_SIGTERM);
     }
     return ret;
 }
@@ -108,8 +119,8 @@ void del_open_xv_port(int port)
 
         if (!open_xv_ports.count())
         {
-            // TODO enable more catches 0.19 is out -- dtk
-            signal(SIGINT, SIG_DFL);
+            SignalHandler::SetHandler(SIGINT, NULL);
+            SignalHandler::SetHandler(SIGTERM, NULL);
         }
     }
 }
