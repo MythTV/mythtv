@@ -72,12 +72,19 @@ void IPTVFeederHLS::Run(void)
     m_interrupted = false;
     m_lock.unlock();
 
+    m_hls->Continue();
     while (!m_interrupted)
     {
         if (m_hls == NULL)
             break;
         m_lock.lock();
         uint size = m_hls->Read((void *)m_buffer, BUFFER_SIZE);
+        if (size < 0)
+        {
+            m_lock.unlock();
+            break;
+        }
+
         if (m_buffer[0] != 0x47)
         {
             LOG(VB_RECORD, LOG_INFO, LOC +
@@ -103,7 +110,11 @@ void IPTVFeederHLS::Stop(void)
 {
     LOG(VB_RECORD, LOG_INFO, LOC + "Stop() -- begin");
     QMutexLocker locker(&m_lock);
+
     m_interrupted = true;
+
+    if (m_hls)
+        m_hls->Interrupt();
 
     while (m_running)
         m_waitcond.wait(&m_lock, 500);
