@@ -52,7 +52,7 @@ static QString load_profile(QString,void*,RecordingInfo*,RecordingProfile&);
 static int init_jobs(const RecordingInfo *rec, RecordingProfile &profile,
                      bool on_host, bool transcode_bfr_comm, bool on_line_comm);
 static void apply_broken_dvb_driver_crc_hack(ChannelBase*, MPEGStreamData*);
-
+static int eit_start_rand(uint cardid, int eitTransportTimeout);
 
 /** \class TVRec
  *  \brief This is the coordinating class of the \ref recorder_subsystem.
@@ -161,7 +161,8 @@ bool TVRec::Init(void)
         gCoreContext->GetNumSetting("AutoTranscodeBeforeAutoCommflag", 0);
     earlyCommFlag     = gCoreContext->GetNumSetting("AutoCommflagWhileRecording", 0);
     runJobOnHostOnly  = gCoreContext->GetNumSetting("JobsRunOnRecordHost", 0);
-    eitTransportTimeout=gCoreContext->GetNumSetting("EITTransportTimeout", 5) * 60;
+    eitTransportTimeout =
+        max(gCoreContext->GetNumSetting("EITTransportTimeout", 5) * 60, 6);
     eitCrawlIdleStart = gCoreContext->GetNumSetting("EITCrawIdleStart", 60);
     audioSampleRateDB = gCoreContext->GetNumSetting("AudioSampleRate");
     overRecordSecNrml = gCoreContext->GetNumSetting("RecordOverTime");
@@ -1034,7 +1035,10 @@ void TVRec::HandleStateChange(void)
 
     eitScanStartTime = QDateTime::currentDateTime();
     if (scanner && (internalState == kState_None))
-        eitScanStartTime = eitScanStartTime.addSecs(eitCrawlIdleStart);
+    {
+        eitScanStartTime = eitScanStartTime.addSecs(
+            eitCrawlIdleStart + eit_start_rand(cardid, eitTransportTimeout));
+    }
     else
         eitScanStartTime = eitScanStartTime.addYears(1);
 }
@@ -1213,6 +1217,19 @@ static int no_capturecards(uint cardid)
     return -1;
 }
 
+static int eit_start_rand(uint cardid, int eitTransportTimeout)
+{
+    // randomize start time a bit
+    int timeout = random() % (eitTransportTimeout / 3);
+    // get the number of capture cards and the position of the current card
+    // to distribute the the scan start evenly over eitTransportTimeout
+    int card_pos = no_capturecards(cardid);
+    int no_cards = no_capturecards(0);
+    if (no_cards > 0 && card_pos >= 0)
+        timeout += eitTransportTimeout * card_pos / no_cards;
+    return timeout;
+}
+
 /// \brief Event handling method, contains event loop.
 void TVRec::run(void)
 {
@@ -1227,17 +1244,8 @@ void TVRec::run(void)
         (dvbOpt.dvb_eitscan || get_use_eit(cardid)))
     {
         scanner = new EITScanner(cardid);
-        uint timeout = eitCrawlIdleStart;
-        // get the number of capture cards and the position of the current card
-        // to distribute the the scan start evenly over eitTransportTimeout
-        int card_pos = no_capturecards(cardid);
-        int no_cards = no_capturecards(0);
-        if (no_cards > 0 && card_pos >= 0)
-            timeout += eitTransportTimeout * card_pos / no_cards;
-        else
-            timeout += random() % eitTransportTimeout;
-
-        eitScanStartTime = eitScanStartTime.addSecs(timeout);
+        eitScanStartTime = eitScanStartTime.addSecs(
+            eitCrawlIdleStart + eit_start_rand(cardid, eitTransportTimeout));
     }
     else
         eitScanStartTime = eitScanStartTime.addYears(1);
