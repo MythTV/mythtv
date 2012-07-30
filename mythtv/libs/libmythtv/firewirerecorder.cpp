@@ -210,6 +210,7 @@ bool FirewireRecorder::PauseAndWait(int timeout)
     {
         LOG(VB_RECORD, LOG_INFO, LOC +
             QString("PauseAndWait(%1) -- unpause").arg(timeout));
+        paused = false;
         StartStreaming();
         unpauseWait.wakeAll();
     }
