@@ -223,7 +223,11 @@ int main(int argc, char *argv[])
 #endif
 
     MythMainWindow *mainWindow = GetMythMainWindow();
+#if CONFIG_DARWIN
+    mainWindow->Init(OPENGL_PAINTER);
+#else
     mainWindow->Init();
+#endif
 
 #ifndef _WIN32
     QList<int> signallist;
