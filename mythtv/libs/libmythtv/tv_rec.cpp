@@ -3039,20 +3039,7 @@ QString TVRec::SetInput(QString input, uint requestType)
  */
 void TVRec::SetChannel(QString name, uint requestType)
 {
-    if (TVRec::kFlagEITScan == requestType)
-    {
-        if (!stateChangeLock.tryLock())
-        {
-            LOG(VB_CHANNEL, LOG_INFO, LOC +
-                QString("SetChannel(%1, kFlagEITScan) -- "
-                        "couldn't get lock aborting").arg(name));
-            return;
-        }
-    }
-    else
-    {
-        stateChangeLock.lock();
-    }
+    QMutexLocker locker(&stateChangeLock);
 
     LOG(VB_CHANNEL, LOG_INFO, LOC +
         QString("SetChannel(%1) -- begin").arg(name));
@@ -3067,6 +3054,16 @@ void TVRec::SetChannel(QString name, uint requestType)
     // Clear the RingBuffer reset flag, in case we wait for a reset below
     ClearFlags(kFlagRingBufferReady);
 
+    // Clear out any EITScan channel change requests
+    TuningQueue::iterator it = tuningRequests.begin();
+    while (it != tuningRequests.end())
+    {
+        if ((*it).flags & kFlagEITScan)
+            it = tuningRequests.erase(it);
+        else
+            ++it;
+    }
+
     // Actually add the tuning request to the queue, and
     // then wait for it to start tuning
     tuningRequests.enqueue(TuningRequest(requestType, name));
@@ -3079,7 +3076,35 @@ void TVRec::SetChannel(QString name, uint requestType)
             WaitForEventThreadSleep();
     }
     LOG(VB_CHANNEL, LOG_INFO, LOC + QString("SetChannel(%1) -- end").arg(name));
-    stateChangeLock.unlock();
+}
+
+/** \brief Queues up a channel change for the EITScanner.
+ *
+ *   Unlike the normal SetChannel() this does not block until
+ *   the channel change occurs to avoid a deadlock if
+ *   EITScanner::StopActiveScan() is called with the stateChangeLock
+ *   held while the EITScanner is calling TVRec::SetChannel().
+ */
+bool TVRec::QueueEITChannelChange(const QString &name)
+{
+    LOG(VB_CHANNEL, LOG_INFO, LOC +
+        QString("QueueEITChannelChange(%1) -- begin").arg(name));
+
+    bool ok = false;
+    if (stateChangeLock.tryLock())
+    {
+        if (tuningRequests.empty())
+        {
+            tuningRequests.enqueue(TuningRequest(kFlagEITScan, name));
+            ok = true;
+        }
+        stateChangeLock.unlock();
+    }
+
+    LOG(VB_CHANNEL, LOG_INFO, LOC +
+        QString("QueueEITChannelChange(%1) -- end --> %2").arg(name).arg(ok));
+
+    return ok;
 }
 
 void TVRec::GetNextProgram(BrowseDirection direction,

@@ -198,6 +198,7 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
     void ChangeChannel(ChannelChangeDirection dir)
         { SetChannel(QString("NextChannel %1").arg((int)dir)); }
     void SetChannel(QString name, uint requestType = kFlagDetect);
+    bool QueueEITChannelChange(const QString &name);
 
     int SetSignalMonitoringRate(int msec, int notifyFrontend = 1);
     int  GetPictureAttribute(PictureAttribute attr);
