@@ -140,15 +140,6 @@ void CetonRTP::ProcessIncomingData(void)
                 QString("RTP packet error. Expected %1 bytes, received %2")
                 .arg(bytesWaiting).arg(bytesRead));
         }
-        if (receivedFrom != _acceptFrom)
-        {
-            LOG(VB_RECORD, LOG_WARNING, LOC +
-                QString("Got packet from %1 instead of %2")
-                .arg(receivedFrom.toString(), _acceptFrom.toString()));
-
-            _readBuffer.resize(bufferSize);
-            continue;
-        }
 
         bufferSize += bytesWaiting;
         _thisRead += bytesWaiting;
