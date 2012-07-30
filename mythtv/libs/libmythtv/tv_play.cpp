@@ -5805,6 +5805,7 @@ void TV::DoPlay(PlayerContext *ctx)
     GetMythUI()->DisableScreensaver();
 
     SetSpeedChangeTimer(0, __LINE__);
+    gCoreContext->emitTVPlaybackPlaying();
 }
 
 float TV::DoTogglePauseStart(PlayerContext *ctx)
