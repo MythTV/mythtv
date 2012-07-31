@@ -640,8 +640,7 @@ void VideoFilterDialog::update_numvideo()
     }
     else
     {
-        m_numvideosText->SetText(
-                QString(tr("Result of this filter : No Videos")));
+        m_numvideosText->SetText(tr("Result of this filter : No Videos"));
     }
 }
 

@@ -348,7 +348,7 @@ void EditMetadataDialog::fillWidgets()
             i <= ParentalLevel::plHigh && i.good(); ++i)
     {
         button = new MythUIButtonListItem(m_levelList,
-                                    QString(tr("Level %1")).arg(i.GetLevel()));
+                                          tr("Level %1").arg(i.GetLevel()));
         button->SetData(i.GetLevel());
     }
     m_levelList->SetValueByData(m_workingMetadata->GetShowLevel());

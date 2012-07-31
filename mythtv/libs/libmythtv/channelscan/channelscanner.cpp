@@ -263,10 +263,10 @@ DTVConfParser::return_t ChannelScanner::ImportDVBUtils(
     if (DTVConfParser::OK != ret)
     {
         QString msg = (DTVConfParser::ERROR_PARSE == ret) ?
-            QString(tr("Failed to parse '%1'")).arg(file) :
+            tr("Failed to parse '%1'").arg(file) :
             ((DTVConfParser::ERROR_CARDTYPE == ret) ?
              tr("Programmer Error : incorrect card type") :
-             QString(tr("Failed to open '%1'")).arg(file));
+             tr("Failed to open '%1'").arg(file));
 
         InformUser(msg);
     }

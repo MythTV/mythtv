@@ -285,7 +285,7 @@ void ProgDetails::loadPage(void)
     QString attr;
 
     if (partnumber > 0)
-        attr += QString(tr("Part %1 of %2, ")).arg(partnumber).arg(parttotal);
+        attr += tr("Part %1 of %2, ").arg(partnumber).arg(parttotal);
 
     if (!rating.isEmpty() && rating != "NR")
         attr += rating + ", ";

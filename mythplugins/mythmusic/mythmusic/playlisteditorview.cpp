@@ -822,9 +822,8 @@ void PlaylistEditorView::treeNodeChanged(MythGenericTree *node)
 
     if (m_positionText)
     {
-        m_positionText->SetText(QString(tr("%1 of %2"))
-                                .arg(node->getPosition() + 1)
-                                .arg(node->siblingCount()));
+        m_positionText->SetText(tr("%1 of %2").arg(node->getPosition() + 1)
+                                              .arg(node->siblingCount()));
     }
 
     if (mnode->childCount() > 0 || mnode->getAction() == "trackid")

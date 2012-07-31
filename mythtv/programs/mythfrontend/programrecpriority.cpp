@@ -1554,7 +1554,7 @@ void ProgramRecPriority::UpdateList()
                                       progInfo->GetRecordingRuleType()));
         }
         else
-            matchInfo = QString(tr("Recording %1 of %2"))
+            matchInfo = tr("Recording %1 of %2")
                         .arg(m_recMatch[progInfo->GetRecordingRuleID()])
                         .arg(m_listMatch[progInfo->GetRecordingRuleID()]);
 
@@ -1665,7 +1665,7 @@ void ProgramRecPriority::updateInfo(MythUIButtonListItem *item)
                           pgRecInfo->GetRecordingRuleType()));
     }
     else
-        matchInfo = QString(tr("Recording %1 of %2"))
+        matchInfo = tr("Recording %1 of %2")
             .arg(m_recMatch[pgRecInfo->GetRecordingRuleID()])
             .arg(m_listMatch[pgRecInfo->GetRecordingRuleID()]);
 

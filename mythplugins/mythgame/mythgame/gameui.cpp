@@ -269,8 +269,7 @@ void GameUI::itemClicked(MythUIButtonListItem*)
         else
         {
             //: %1 is the game name
-            QString msg = QString(tr("Choose System for:\n%1"))
-                .arg(node->getString());
+            QString msg = tr("Choose System for:\n%1").arg(node->getString());
             MythScreenStack *popupStack = GetMythMainWindow()->
                                               GetStack("popup stack");
             MythDialogBox *chooseSystemPopup = new MythDialogBox(

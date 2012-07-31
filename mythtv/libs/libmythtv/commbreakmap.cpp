@@ -231,9 +231,9 @@ bool CommBreakMap::AutoCommercialSkip(uint64_t &jumpToFrame,
     skipTime.sprintf("%d:%02d", skipped_seconds / 60,
                      abs(skipped_seconds) % 60);
     if (kCommSkipOn == autocommercialskip)
-        comm_msg = QString(QObject::tr("Skip %1")).arg(skipTime);
+        comm_msg = QObject::tr("Skip %1").arg(skipTime);
     else
-        comm_msg = QString(QObject::tr("Commercial: %1")).arg(skipTime);
+        comm_msg = QObject::tr("Commercial: %1").arg(skipTime);
 
     if (kCommSkipOn == autocommercialskip)
     {

@@ -988,10 +988,10 @@ bool FillData::Run(SourceList &sourcelist)
     {
         if (nonewdata > 0 &&
             (total_sources != externally_handled))
-            status = QString(QObject::tr(
+            status = QObject::tr(
                      "mythfilldatabase ran, but did not insert "
                      "any new data into the Guide for %1 of %2 sources. "
-                     "This can indicate a potential grabber failure."))
+                     "This can indicate a potential grabber failure.")
                      .arg(nonewdata)
                      .arg(total_sources);
         else

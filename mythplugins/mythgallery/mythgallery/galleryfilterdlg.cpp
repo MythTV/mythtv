@@ -202,36 +202,36 @@ void GalleryFilterDialog::updateFilter()
     m_scanning = false;
 
     if (dir_count + img_count + mov_count == 0)
-        m_numImagesText->SetText(QString(tr("No files / folders found")));
+        m_numImagesText->SetText(tr("No files / folders found"));
     else if (dir_count > 0)
     {
         if (img_count + mov_count == 0)
-            m_numImagesText->SetText(QString(tr(
-                "Filter result : %1 folder(s) found but no files"))
+            m_numImagesText->SetText(tr(
+                "Filter result : %1 folder(s) found but no files")
                      .arg(dir_count));
         else if (img_count == 0)
-            m_numImagesText->SetText(QString(tr(
-                "Filter result : %1 folder(s), %2 movie(s) found"))
-                     .arg(dir_count) .arg(mov_count));
+            m_numImagesText->SetText(tr(
+                "Filter result : %1 folder(s), %2 movie(s) found")
+                     .arg(dir_count).arg(mov_count));
         else if (mov_count == 0)
-            m_numImagesText->SetText(QString(tr(
-                "Filter result : %1 folder(s), %2 image(s) found"))
-                     .arg(dir_count) .arg(img_count));
+            m_numImagesText->SetText(tr(
+                "Filter result : %1 folder(s), %2 image(s) found")
+                     .arg(dir_count).arg(img_count));
         else
-            m_numImagesText->SetText(QString(tr(
+            m_numImagesText->SetText(tr(
                 "Filter result : %1 folder(s), %2 image(s) and %3 movie(s) "
-                "found")) .arg(dir_count) .arg(img_count) .arg(mov_count));
+                "found").arg(dir_count).arg(img_count).arg(mov_count));
     }
     else if (img_count > 0 && mov_count > 0)
-        m_numImagesText->SetText(QString(tr(
-            "Filter result : %1 image(s) and %2 movie(s) found"))
-                 .arg(img_count) .arg(mov_count));
+        m_numImagesText->SetText(tr(
+            "Filter result : %1 image(s) and %2 movie(s) found")
+                 .arg(img_count).arg(mov_count));
     else if (mov_count == 0)
-        m_numImagesText->SetText(QString(tr(
-            "Filter result : %1 image(s) found")) .arg(img_count));
+        m_numImagesText->SetText(tr(
+            "Filter result : %1 image(s) found").arg(img_count));
     else
-        m_numImagesText->SetText(QString(tr(
-            "Filter result : %1 movie(s) found")) .arg(mov_count));
+        m_numImagesText->SetText(tr(
+            "Filter result : %1 movie(s) found").arg(mov_count));
 }
 
 void GalleryFilterDialog::setDirFilter(void)
