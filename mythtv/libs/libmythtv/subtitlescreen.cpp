@@ -922,7 +922,8 @@ void FormattedTextSubtitle::InitFromCC608(vector<CC608Text*> &buffers,
             CC708CharacterAttribute attr(isItalic, isBold, isUnderline,
                                          clr[min(max(0, color), 7)],
                                          useBackground);
-            FormattedTextChunk chunk(captionText, attr, parent);
+            FormattedTextChunk chunk(captionText, attr, parent,
+                                     cc->teletextmode);
             line.chunks += chunk;
             LOG(VB_VBI, LOG_INFO,
                 QString("Adding cc608 chunk (%1,%2): %3")
@@ -1089,6 +1090,7 @@ bool FormattedTextChunk::Split(FormattedTextChunk &newChunk)
             QString("Failed to split chunk '%1'").arg(text));
         return false;
     }
+    newChunk.isTeletext = isTeletext;
     newChunk.parent = parent;
     newChunk.format = format;
     newChunk.text = text.mid(lastSpace + 1).trimmed() + ' ';
@@ -1119,6 +1121,8 @@ QString FormattedTextChunk::ToLogString(void) const
         .arg(format.boldface);
     str += QString("font=%1 ").arg(format.font_tag);
     str += QString(" text='%1'").arg(text);
+    if (isTeletext)
+        str += " DEPRECATED_608_TELETEXT";
     return str;
 }
 

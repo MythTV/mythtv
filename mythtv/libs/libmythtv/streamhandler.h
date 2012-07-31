@@ -45,7 +45,9 @@ class PIDInfo
 typedef QMap<uint,PIDInfo*> PIDInfoMap;
 
 // locking order
-// _pid_lock -> _listener_lock -> _start_stop_lock
+// _pid_lock -> _listener_lock
+// _add_rm_lock -> _listener_lock
+//              -> _start_stop_lock
 
 class StreamHandler : protected MThread, public DeviceReaderCB
 {
@@ -100,6 +102,8 @@ class StreamHandler : protected MThread, public DeviceReaderCB
     QString           _device;
     bool              _needs_buffering;
     bool              _allow_section_reader;
+
+    QMutex            _add_rm_lock;
 
     mutable QMutex    _start_stop_lock;
     volatile bool     _running_desired;
