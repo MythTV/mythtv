@@ -409,7 +409,7 @@ int handle_command(const MythBackendCommandLineParser &cmdline)
         return (ok) ? GENERIC_EXIT_OK : GENERIC_EXIT_CONNECT_ERROR;
     }
 
-    if (!cmdline.toBool("printexpire"))
+    if (cmdline.toBool("printexpire"))
     {
         expirer = new AutoExpire();
         expirer->PrintExpireList(cmdline.toString("printexpire"));
