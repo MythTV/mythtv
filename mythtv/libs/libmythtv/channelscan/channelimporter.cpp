@@ -858,7 +858,7 @@ ScanDTVTransportList ChannelImporter::GetDBTransports(
                 ChannelInsertInfo &chan = transports[i].channels[j];
                 for (uint k = 0; k < newt.channels.size(); k++)
                 {
-                    if (newt.channels[k].IsSameChannel(chan))
+                    if (newt.channels[k].IsSameChannel(chan, true))
                     {
                         found_chan[k] = true;
                         chan.db_mplexid = mplexid;
