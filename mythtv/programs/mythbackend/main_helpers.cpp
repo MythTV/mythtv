@@ -50,6 +50,7 @@
 #include "backendcontext.h"
 #include "mythtranslation.h"
 #include "mythtimezone.h"
+#include "signalhandling.h"
 
 #include "mediaserver.h"
 #include "httpstatus.h"
@@ -268,6 +269,8 @@ void cleanup(void)
         unlink(pidfile.toAscii().constData());
         pidfile.clear();
     }
+
+    SignalHandler::Done();
 }
 
 int handle_command(const MythBackendCommandLineParser &cmdline)
@@ -406,7 +409,7 @@ int handle_command(const MythBackendCommandLineParser &cmdline)
         return (ok) ? GENERIC_EXIT_OK : GENERIC_EXIT_CONNECT_ERROR;
     }
 
-    if (!cmdline.toBool("printexpire"))
+    if (cmdline.toBool("printexpire"))
     {
         expirer = new AutoExpire();
         expirer->PrintExpireList(cmdline.toString("printexpire"));

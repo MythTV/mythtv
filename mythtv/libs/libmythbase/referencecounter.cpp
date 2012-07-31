@@ -28,52 +28,55 @@ static QMap<ReferenceCounter*,LeakInfo> leakMap;
 void ReferenceCounter::PrintDebug(void)
 {
     QReadLocker locker(&leakLock);
+    QList<uint64_t> logType;
+    QStringList logLines;
 
     uint cnt = 0;
     QMap<ReferenceCounter*,LeakInfo>::iterator it = leakMap.begin();
     for (; it != leakMap.end(); ++it)
-        cnt += (*it).name.startsWith("CommandLineArg") ? 0 : 1;
-
-    LOG((cnt) ? VB_GENERAL : VB_REFCOUNT, LOG_INFO,
-        QString("Leaked %1 reference counted objects").arg(cnt));
+    {
+        if ((*it).refCount.fetchAndAddOrdered(0) == 0)
+            continue;
+        if ((*it).name.startsWith("CommandLineArg"))
+            continue;
+        if (!it.key()->m_logDebug)
+            continue;
+        cnt += 1;
+    }
+    logType += (cnt) ? VB_GENERAL : VB_REFCOUNT;
+    logLines += QString("Leaked %1 reference counted objects").arg(cnt);
 
     for (it = leakMap.begin(); it != leakMap.end(); ++it)
     {
+        if ((*it).refCount.fetchAndAddOrdered(0) == 0)
+            continue;
         if ((*it).name.startsWith("CommandLineArg"))
             continue;
-        LOG(VB_REFCOUNT, LOG_INFO,
+        if (!it.key()->m_logDebug)
+            continue;
+
+        logType += VB_REFCOUNT;
+        logLines +=
             QString("  Leaked %1(0x%2) reference count %3")
             .arg((*it).name)
             .arg(reinterpret_cast<intptr_t>(it.key()),0,16)
-            .arg((*it).refCount));
-/// This part will not work on some non-Linux machines..
-#if defined(__linux__) || defined(__LINUX__)
-        MythImage *img = NULL;
-        if ((*it).name.startsWith("MythImage") ||
-            (*it).name.startsWith("MythQtImage"))
-        {
-            img = reinterpret_cast<MythImage*>(it.key());
-        }
-        if (img)
-        {
-            LOG(VB_REFCOUNT, LOG_INFO,
-                QString("  Image id %1 cache size %2 file '%3'")
-                .arg(img->GetID())
-                .arg(img->GetCacheSize())
-                .arg(img->GetFileName()));
-        }
-#endif
-///
+            .arg((*it).refCount);
     }
+
+    locker.unlock();
+
+    for (uint i = 0; i < (uint)logType.size() && i < (uint)logLines.size(); i++)
+        LOG(logType[i], LOG_INFO, logLines[i]);
 }
 #else
 void ReferenceCounter::PrintDebug(void) {}
 #endif
 
-ReferenceCounter::ReferenceCounter(const QString &debugName) :
+ReferenceCounter::ReferenceCounter(const QString &debugName, bool logDebug) :
 #ifdef EXTRA_DEBUG
     m_debugName(debugName),
 #endif
+    m_logDebug(logDebug),
     m_referenceCount(1)
 {
     (void) debugName;
@@ -100,13 +103,17 @@ int ReferenceCounter::IncrRef(void)
 {
     int val = m_referenceCount.fetchAndAddRelease(1) + 1;
 
+    if (m_logDebug)
+    {
 #ifdef EXTRA_DEBUG
-    LOG(VB_REFCOUNT, LOG_INFO, QString("%1(0x%2)::IncrRef() -> %3")
-        .arg(m_debugName).arg(reinterpret_cast<intptr_t>(this),0,16).arg(val));
+        LOG(VB_REFCOUNT, LOG_INFO, QString("%1(0x%2)::IncrRef() -> %3")
+            .arg(m_debugName).arg(reinterpret_cast<intptr_t>(this),0,16)
+            .arg(val));
 #else
-    LOG(VB_REFCOUNT, LOG_INFO, QString("(0x%2)::IncrRef() -> %3")
-        .arg(reinterpret_cast<intptr_t>(this),0,16).arg(val));
+        LOG(VB_REFCOUNT, LOG_INFO, QString("(0x%2)::IncrRef() -> %3")
+            .arg(reinterpret_cast<intptr_t>(this),0,16).arg(val));
 #endif
+    }
 
 #ifdef LEAK_DEBUG
     QReadLocker locker(&leakLock);
@@ -127,13 +134,17 @@ int ReferenceCounter::DecrRef(void)
     }
 #endif
 
+    if (m_logDebug)
+    {
 #ifdef EXTRA_DEBUG
-    LOG(VB_REFCOUNT, LOG_INFO, QString("%1(0x%2)::DecrRef() -> %3")
-        .arg(m_debugName).arg(reinterpret_cast<intptr_t>(this),0,16).arg(val));
+        LOG(VB_REFCOUNT, LOG_INFO, QString("%1(0x%2)::DecrRef() -> %3")
+            .arg(m_debugName).arg(reinterpret_cast<intptr_t>(this),0,16)
+            .arg(val));
 #else
-    LOG(VB_REFCOUNT, LOG_INFO, QString("(0x%2)::DecrRef() -> %3")
-        .arg(reinterpret_cast<intptr_t>(this),0,16).arg(val));
+        LOG(VB_REFCOUNT, LOG_INFO, QString("(0x%2)::DecrRef() -> %3")
+            .arg(reinterpret_cast<intptr_t>(this),0,16).arg(val));
 #endif
+    }
 
 #ifdef NO_DELETE_DEBUG
     if (val < 0)

@@ -76,6 +76,8 @@ static void cleanup()
     gContext = NULL;
 
     delete qApp;
+
+    SignalHandler::Done();
 }
 
 static void SetupMenuCallback(void* data, QString& selection)
@@ -286,7 +288,7 @@ int main(int argc, char *argv[])
     QList<int> signallist;
     signallist << SIGINT << SIGTERM << SIGSEGV << SIGABRT << SIGBUS << SIGFPE
                << SIGILL;
-    SignalHandler handler(signallist);
+    SignalHandler::Init(signallist);
     signal(SIGHUP, SIG_IGN);
 #endif
 

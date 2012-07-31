@@ -22,6 +22,8 @@ using namespace std;
 
 int SignalHandler::sigFd[2];
 volatile bool SignalHandler::s_exit_program = false;
+QMutex SignalHandler::s_singletonLock;
+SignalHandler *SignalHandler::s_singleton;
 
 // We may need to write out signal info using just the write() function
 // so we create an array of C strings + measure their lengths.
@@ -87,13 +89,15 @@ SignalHandler::SignalHandler(QList<int> &signallist, QObject *parent) :
             continue;
         }
 
-        AddHandler(signum, NULL);
+        SetHandlerPrivate(signum, NULL);
     }
 #endif
 }
 
 SignalHandler::~SignalHandler()
 {
+    s_singleton = NULL;
+
 #ifndef _WIN32
     if (m_notifier)
     {
@@ -102,6 +106,7 @@ SignalHandler::~SignalHandler()
         delete m_notifier;
     }
 
+    QMutexLocker locker(&m_sigMapLock);
     QMap<int, void (*)(void)>::iterator it = m_sigMap.begin();
     for ( ; it != m_sigMap.end(); ++it)
     {
@@ -113,23 +118,61 @@ SignalHandler::~SignalHandler()
 #endif
 }
 
-void SignalHandler::AddHandler(int signum, void (*handler)(void))
+void SignalHandler::Init(QList<int> &signallist, QObject *parent)
+{
+    QMutexLocker locker(&s_singletonLock);
+    if (!s_singleton)
+        s_singleton = new SignalHandler(signallist, parent);
+}
+
+void SignalHandler::Done(void)
+{
+    QMutexLocker locker(&s_singletonLock);
+    if (s_singleton)
+        delete s_singleton;
+}
+
+
+void SignalHandler::SetHandler(int signum, void (*handler)(void))
+{
+    QMutexLocker locker(&s_singletonLock);
+    if (s_singleton)
+        s_singleton->SetHandlerPrivate(signum, handler);
+}
+
+void SignalHandler::SetHandlerPrivate(int signum, void (*handler)(void))
 {
 #ifndef _WIN32
-    struct sigaction sa;
-    sa.sa_handler = SignalHandler::signalHandler;
-    sigemptyset(&sa.sa_mask);
-    sa.sa_flags = SA_RESTART;
-
     const char *signame = strsignal(signum);
-    signame = strdup(signame ? signame : "Unknown");
+    QString signal_name = signame ?
+        QString(signame) : QString("Unknown(%1)").arg(signum);
 
-    sig_str_init(signum, signame);
-    sigaction(signum, &sa, NULL);
-    m_sigMap.insert(signum, handler);
-    LOG(VB_GENERAL, LOG_INFO, QString("Setup %1 handler").arg(signame));
+    bool sa_handler_already_set = false;
+    {
+        QMutexLocker locker(&m_sigMapLock);
+        sa_handler_already_set = m_sigMap.contains(signum);
+        if (m_sigMap.value(signum, NULL) && (handler != NULL))
+        {
+            LOG(VB_GENERAL, LOG_WARNING, 
+                QString("Warning %1 signal handler overridden")
+                .arg(signal_name));
+        }
+        m_sigMap[signum] = handler;
+    }
 
-    free((void *)signame);
+    if (!sa_handler_already_set)
+    {
+        struct sigaction sa;
+        sa.sa_handler = SignalHandler::signalHandler;
+        sigemptyset(&sa.sa_mask);
+        sa.sa_flags = SA_RESTART;
+
+        sig_str_init(signum, qPrintable(signal_name));
+
+        sigaction(signum, &sa, NULL);
+    }
+
+    LOG(VB_GENERAL, LOG_INFO, QString("Setup %1 handler").arg(signal_name));
 #endif
 }
 
@@ -204,11 +247,20 @@ void SignalHandler::handleSignal(void)
     LOG(VB_GENERAL, LOG_CRIT, QString("Received %1").arg(signame));
     free((void *)signame);
 
+    void (*handler)(void) = NULL;
+
     switch (signum)
     {
     case SIGINT:
     case SIGTERM:
-        qApp->quit();
+        m_sigMapLock.lock();
+        handler = m_sigMap.value(signum, NULL);
+        m_sigMapLock.unlock();
+
+        if (handler)
+            handler();
+        else
+            QCoreApplication::exit(0);
         s_exit_program = true;
         break;
     case SIGSEGV:
@@ -220,7 +272,9 @@ void SignalHandler::handleSignal(void)
         s_exit_program = true;
         break;
     default:
-        void (*handler)(void) = m_sigMap.value(signum, NULL);
+        m_sigMapLock.lock();
+        handler = m_sigMap.value(signum, NULL);
+        m_sigMapLock.unlock();
         if (handler)
         {
             handler();

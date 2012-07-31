@@ -387,7 +387,7 @@ void IconView::UpdateText(MythUIButtonListItem *item)
     }
 
     if (m_positionText)
-        m_positionText->SetText(QString(tr("%1 of %2"))
+        m_positionText->SetText(tr("%1 of %2")
                                 .arg(m_imageList->GetCurrentPos() + 1)
                                 .arg(m_imageList->GetCount()));
 

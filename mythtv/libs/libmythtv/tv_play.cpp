@@ -17,6 +17,7 @@ using namespace std;
 #include <QFile>
 #include <QDir>
 
+#include "signalhandling.h"
 #include "mythdb.h"
 #include "tv_play.h"
 #include "tv_rec.h"
@@ -1369,6 +1370,11 @@ void TV::PlaybackLoop(void)
     while (true)
     {
         qApp->processEvents();
+        if (SignalHandler::IsExiting())
+        {
+            wantsToQuit = true;
+            return;
+        }
 
         TVState state = GetState(0);
         if ((kState_Error == state) || (kState_None == state))
@@ -5799,6 +5805,7 @@ void TV::DoPlay(PlayerContext *ctx)
     GetMythUI()->DisableScreensaver();
 
     SetSpeedChangeTimer(0, __LINE__);
+    gCoreContext->emitTVPlaybackPlaying();
 }
 
 float TV::DoTogglePauseStart(PlayerContext *ctx)
@@ -5993,8 +6000,8 @@ bool TV::SeekHandleAction(PlayerContext *actx, const QStringList &actions,
             actx->UnlockDeletePlayer(__FILE__, __LINE__);
             float time = (flags & kAbsolute) ?  direction :
                              direction * (1.001 / rate);
-            QString message = (flags & kRewind) ? QString(tr("Rewind")) :
-                                                 QString(tr("Forward"));
+            QString message = (flags & kRewind) ? tr("Rewind") :
+                                                  tr("Forward");
             DoSeek(actx, time, message,
                    /*timeIsOffset*/true,
                    /*honorCutlist*/!(flags & kIgnoreCutlist));
@@ -6145,14 +6152,14 @@ void TV::ChangeSpeed(PlayerContext *ctx, int direction)
 
     switch (ctx->ff_rew_speed)
     {
-        case  4: speed = 16.0;     mesg = QString(tr("Speed 16X"));   break;
-        case  3: speed = 8.0;      mesg = QString(tr("Speed 8X"));    break;
-        case  2: speed = 3.0;      mesg = QString(tr("Speed 3X"));    break;
-        case  1: speed = 2.0;      mesg = QString(tr("Speed 2X"));    break;
+        case  4: speed = 16.0;     mesg = tr("Speed 16X");   break;
+        case  3: speed = 8.0;      mesg = tr("Speed 8X");    break;
+        case  2: speed = 3.0;      mesg = tr("Speed 3X");    break;
+        case  1: speed = 2.0;      mesg = tr("Speed 2X");    break;
         case  0: speed = 1.0;      mesg = ctx->GetPlayMessage();      break;
-        case -1: speed = 1.0 / 3;  mesg = QString(tr("Speed 1/3X"));  break;
-        case -2: speed = 1.0 / 8;  mesg = QString(tr("Speed 1/8X"));  break;
-        case -3: speed = 1.0 / 16; mesg = QString(tr("Speed 1/16X")); break;
+        case -1: speed = 1.0 / 3;  mesg = tr("Speed 1/3X");  break;
+        case -2: speed = 1.0 / 8;  mesg = tr("Speed 1/8X");  break;
+        case -3: speed = 1.0 / 16; mesg = tr("Speed 1/16X"); break;
         case -4:
             DoTogglePause(ctx, true);
             return;

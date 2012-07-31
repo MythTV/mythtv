@@ -1125,7 +1125,7 @@ void MythAirplayServer::UnpausePlayback(void)
                                       Qt::NoModifier, ACTION_PLAY);
         qApp->postEvent(GetMythMainWindow(), (QEvent*)ke);
         // Wait until we receive that playback has stopped
-        gCoreContext->WaitUntilSignals(SIGNAL(TVPlaybackUnpaused()),
+        gCoreContext->WaitUntilSignals(SIGNAL(TVPlaybackPlaying()),
                                        SIGNAL(TVPlaybackStopped()),
                                        SIGNAL(TVPlaybackAborted()),
                                        NULL);

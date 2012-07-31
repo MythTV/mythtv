@@ -136,7 +136,8 @@ void loggingGetTimeStamp(qlonglong *epoch, uint *usec)
 #endif
 }
 
-LoggingItem::LoggingItem() : ReferenceCounter("LoggingItem"), m_file(NULL),
+LoggingItem::LoggingItem() :
+        ReferenceCounter("LoggingItem", false), m_file(NULL),
         m_function(NULL), m_threadName(NULL), m_appName(NULL), m_table(NULL),
         m_logFile(NULL)
 {
@@ -144,7 +145,7 @@ LoggingItem::LoggingItem() : ReferenceCounter("LoggingItem"), m_file(NULL),
 
 LoggingItem::LoggingItem(const char *_file, const char *_function,
                          int _line, LogLevel_t _level, LoggingType _type) :
-        ReferenceCounter("LoggingItem"),
+        ReferenceCounter("LoggingItem", false),
         m_threadId((uint64_t)(QThread::currentThreadId())),
         m_line(_line), m_type(_type), m_level(_level),
         m_file(strdup(_file)), m_function(strdup(_function)),

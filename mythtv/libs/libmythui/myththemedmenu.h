@@ -80,10 +80,9 @@ class MUI_PUBLIC MythThemedMenu : public MythThemedMenuState
 
     void ShowMenu();
     void aboutScreen();
-    MythDialogBox* m_menuPopup;
     void customEvent(QEvent *event);
     void mediaEvent(MythMediaEvent *event);
-
+    
   protected:
     virtual bool keyPressEvent(QKeyEvent *e);
 
@@ -120,6 +119,8 @@ class MUI_PUBLIC MythThemedMenu : public MythThemedMenuState
     bool m_wantpop;
 
     QString m_menumode;
+
+    MythDialogBox* m_menuPopup;
 };
 
 Q_DECLARE_METATYPE(ThemedButton)

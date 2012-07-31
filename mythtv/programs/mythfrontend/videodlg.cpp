@@ -2249,9 +2249,9 @@ void VideoDialog::UpdatePosition()
     if (!currentList)
         return;
 
-    CheckedSet(m_positionText, QString(tr("%1 of %2"))
-            .arg(currentList->GetCurrentPos() + 1)
-            .arg(currentList->GetCount()));
+    CheckedSet(m_positionText, tr("%1 of %2")
+                                    .arg(currentList->GetCurrentPos() + 1)
+                                    .arg(currentList->GetCount()));
 }
 
 /** \fn VideoDialog::UpdateText(MythUIButtonListItem *item)

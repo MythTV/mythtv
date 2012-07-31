@@ -133,11 +133,13 @@ void EITScanner::run(void)
             if (!(*activeScanNextChan).isEmpty())
             {
                 eitHelper->WriteEITCache();
-                rec->SetChannel(*activeScanNextChan, TVRec::kFlagEITScan);
-                LOG(VB_EIT, LOG_INFO,
-                    LOC_ID + QString("Now looking for EIT data on "
-                                     "multiplex of channel %1")
+                if (rec->QueueEITChannelChange(*activeScanNextChan))
+                {
+                    LOG(VB_EIT, LOG_INFO,
+                        LOC_ID + QString("Now looking for EIT data on "
+                                         "multiplex of channel %1")
                         .arg(*activeScanNextChan));
+                }
             }
 
             activeScanNextTrig = MythDate::current()

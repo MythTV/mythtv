@@ -80,7 +80,7 @@ int main(int argc, char *argv[])
     QList<int> signallist;
     signallist << SIGINT << SIGTERM << SIGSEGV << SIGABRT << SIGBUS << SIGFPE
                << SIGILL;
-    SignalHandler handler(signallist);
+    SignalHandler::Init(signallist);
     signal(SIGHUP, SIG_IGN);
 #endif
 
@@ -122,6 +122,8 @@ int main(int argc, char *argv[])
     }
 
     delete gContext;
+
+    SignalHandler::Done();
 
     return cmdResult;
 }

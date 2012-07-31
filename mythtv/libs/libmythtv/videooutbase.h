@@ -230,6 +230,9 @@ class VideoOutput
     /// \brief check if video underscan/overscan is allowed
     bool IsVideoScalingAllowed(void) const;
 
+    /// \brief Tells the player to flip the video frames for proper display
+    virtual void SetVideoFlip(void) { };
+
     /// \brief returns QRect of PIP based on PIPLocation
     virtual QRect GetPIPRect(PIPLocation location,
                              MythPlayer *pipplayer = NULL,

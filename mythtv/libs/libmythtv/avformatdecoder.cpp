@@ -70,6 +70,7 @@ extern "C" {
 #include "libavformat/avio.h"
 #include "libavformat/internal.h"
 #include "libswscale/swscale.h"
+#include "libavformat/isom.h"
 #include "ivtv_myth.h"
 }
 
@@ -1313,6 +1314,11 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
             SetLowBuffers(false);
         }
     }
+
+    AVDictionaryEntry *metatag =
+        av_dict_get(stream->metadata, "rotate", NULL, 0);
+    if (metatag && metatag->value && QString("180") == metatag->value)
+        video_inverted = true;
 
     if (CODEC_IS_VDPAU(codec))
     {
@@ -2988,11 +2994,11 @@ bool AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)
         uint  height = m_h264_parser->pictureHeight();
         float seqFPS = m_h264_parser->frameRate() * 0.001f;
 
-        bool changed = (seqFPS > fps+0.01f) || (seqFPS < fps-0.01f);
-        changed |= (width  != (uint)current_width );
-        changed |= (height != (uint)current_height);
+        bool res_changed = ((width  != (uint)current_width) ||
+                            (height != (uint)current_height));
+        bool fps_changed = (seqFPS > fps+0.01f) || (seqFPS < fps-0.01f);
 
-        if (changed)
+        if (fps_changed || res_changed)
         {
             m_parent->SetVideoParams(width, height, seqFPS, kScan_Detect);
 
@@ -3018,6 +3024,48 @@ bool AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)
                     QString("avFPS(%1) != seqFPS(%2)")
                         .arg(avFPS).arg(seqFPS));
             }
+
+            // HACK HACK HACK - begin
+
+            // The ffmpeg H.264 decoder currently does not support
+            // resolution changes when thread_count!=1, so we
+            // close and re-open the codec for resolution changes.
+
+            bool do_it = HAVE_THREADS && res_changed;
+            for (uint i = 0; do_it && (i < ic->nb_streams); i++)
+            {
+                AVCodecContext *enc = ic->streams[i]->codec;
+                if ((AVMEDIA_TYPE_VIDEO == enc->codec_type) &&
+                    (kCodec_H264 == video_codec_id) &&
+                    (enc->codec) && (enc->thread_count>1))
+                {
+                    QMutexLocker locker(avcodeclock);
+                    AVCodec *codec = enc->codec;
+                    avcodec_close(enc);
+                    int open_val = avcodec_open2(enc, codec, NULL);
+                    if (open_val < 0)
+                    {
+                        LOG(VB_GENERAL, LOG_ERR, LOC +
+                            QString("Could not re-open codec 0x%1, "
+                                    "id(%2) type(%3) "
+                                    "aborting. reason %4")
+                            .arg((uint64_t)enc,0,16)
+                            .arg(ff_codec_id_string(enc->codec_id))
+                            .arg(ff_codec_type_string(enc->codec_type))
+                            .arg(open_val));
+                    }
+                    else
+                    {
+                        LOG(VB_GENERAL, LOG_INFO, LOC +
+                            QString("Re-opened codec 0x%1, id(%2) type(%3)")
+                            .arg((uint64_t)enc,0,16)
+                            .arg(ff_codec_id_string(enc->codec_id))
+                            .arg(ff_codec_type_string(enc->codec_type)));
+                    }
+                }
+            }
+
+            // HACK HACK HACK - end
         }
 
         HandleGopStart(pkt, true);

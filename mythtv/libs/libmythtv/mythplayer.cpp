@@ -500,6 +500,9 @@ bool MythPlayer::InitVideo(void)
     if (embedding && pipState == kPIPOff)
         videoOutput->EmbedInWidget(embedRect);
 
+    if (decoder && decoder->GetVideoInverted())
+        videoOutput->SetVideoFlip();
+
     InitFilters();
 
     return true;
@@ -1049,6 +1052,10 @@ void MythPlayer::InitFilters(void)
     if (!videoFiltersOverride.isEmpty())
         filters = videoFiltersOverride;
 
+    AvFormatDecoder *afd = dynamic_cast<AvFormatDecoder *>(decoder);
+    if (afd && afd->GetVideoInverted() && !filters.contains("vflip"))
+        filters += ",vflip";
+
     filters.detach();
 
     videofiltersLock.lock();
@@ -1371,7 +1378,7 @@ void MythPlayer::DisableCaptions(uint mode, bool osd_msg)
 void MythPlayer::EnableCaptions(uint mode, bool osd_msg)
 {
     QMutexLocker locker(&osdLock);
-    QString msg = "";
+    QString msg;
     if ((kDisplayCC608 & mode) || (kDisplayCC708 & mode) ||
         (kDisplayAVSubtitle & mode) || kDisplayRawTextSubtitle & mode)
     {
@@ -1387,7 +1394,7 @@ void MythPlayer::EnableCaptions(uint mode, bool osd_msg)
         msg += tr("Text subtitles");
     }
     if (kDisplayNUVTeletextCaptions & mode)
-        msg += QString(tr("TXT %1")).arg(ttPageNum, 3, 16);
+        msg += tr("TXT %1").arg(ttPageNum, 3, 16);
     if (kDisplayTeletextCaptions & mode)
     {
         msg += decoder->GetTrackDesc(kTrackTypeTeletextCaptions,
@@ -3950,13 +3957,13 @@ bool MythPlayer::HandleProgramEditorActions(QStringList &actions,
             else if (handled && action == "UNDO")
             {
                 //: %1 is the undo message
-                SetOSDMessage(QString(tr("Undo - %1")).arg(undoMessage),
+                SetOSDMessage(tr("Undo - %1").arg(undoMessage),
                               kOSDTimeout_Short);
             }
             else if (handled && action == "REDO")
             {
                 //: %1 is the redo message
-                SetOSDMessage(QString(tr("Redo - %1")).arg(redoMessage),
+                SetOSDMessage(tr("Redo - %1").arg(redoMessage),
                               kOSDTimeout_Short);
             }
         }

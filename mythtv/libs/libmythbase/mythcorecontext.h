@@ -181,6 +181,7 @@ class MBASE_PUBLIC MythCoreContext : public QObject, public MythObservable, publ
     void emitTVPlaybackPaused(void)             { emit TVPlaybackPaused(); }
     void emitTVPlaybackUnpaused(void)           { emit TVPlaybackUnpaused(); }
     void emitTVPlaybackAborted(void)            { emit TVPlaybackAborted(); }
+    void emitTVPlaybackPlaying(void)            { emit TVPlaybackPlaying(); }
 
   signals:
     void TVPlaybackStarted(void);
@@ -190,6 +191,7 @@ class MBASE_PUBLIC MythCoreContext : public QObject, public MythObservable, publ
     void TVPlaybackUnpaused(void);
     void TVPlaybackAborted(void);
     void TVPlaybackAboutToStart(void);
+    void TVPlaybackPlaying(void);
 
   private:
     MythCoreContextPrivate *d;

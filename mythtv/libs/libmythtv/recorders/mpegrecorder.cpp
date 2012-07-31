@@ -1144,12 +1144,6 @@ void MpegRecorder::run(void)
     recordingWait.wakeAll();
 }
 
-void MpegRecorder::StopRecording(void)
-{
-    MpegRecorder::StopEncoding();
-    V4LRecorder::StopRecording();
-}
-
 bool MpegRecorder::ProcessTSPacket(const TSPacket &tspacket_real)
 {
     const uint pid = tspacket_real.PID();

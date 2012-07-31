@@ -390,10 +390,10 @@ bool ImportIconsWizard::initialLoad(QString name)
          *  %2 is the total number of channels,
          *  %3 is the channel name
          */
-        QString message = QString(tr("Downloading %1 / %2 : %3"))
-            .arg(m_nCount+1)
-            .arg(m_listEntries.size())
-            .arg((*m_iter).strName);
+        QString message = tr("Downloading %1 / %2 : %3")
+                            .arg(m_nCount+1)
+                            .arg(m_listEntries.size())
+                            .arg((*m_iter).strName);
 
         if (m_missingEntries.size() > 0)
         {
