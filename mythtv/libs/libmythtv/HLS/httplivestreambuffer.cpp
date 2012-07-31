@@ -1024,6 +1024,8 @@ public:
 protected:
     void run(void)
     {
+        RunProlog();
+
         int retries = 0;
         while (!m_interrupted)
         {
@@ -1121,6 +1123,8 @@ protected:
             // Signal we're done
             Wakeup();
         }
+
+        RunEpilog();
     }
 
     int BandwidthAdaptation(int progid, uint64_t &bandwidth)
@@ -1210,6 +1214,8 @@ public:
 protected:
     void run(void)
     {
+        RunProlog();
+
         double wait = 0.5;
         double factor = m_parent->GetCurrentStream()->Live() ? 1.0 : 2.0;
 
@@ -1288,6 +1294,8 @@ protected:
             m_wakeup = ((int64_t)(hls->TargetDuration() * wait * factor)
                         * (int64_t)1000);
         }
+
+        RunEpilog();
     }
 
 private:
