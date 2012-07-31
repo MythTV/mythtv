@@ -279,13 +279,12 @@ void GameUI::itemClicked(MythUIButtonListItem*)
             {
                 chooseSystemPopup->SetReturnEvent(this, "chooseSystemPopup");
                 QString all_systems = romInfo->AllSystems();
-                QStringList players = all_systems.split(",");
+                QStringList players = all_systems.split(',');
                 for (QStringList::Iterator it = players.begin();
                      it != players.end(); ++it)
                 {
                     chooseSystemPopup->AddButton(*it);
                 }
-                chooseSystemPopup->AddButton(tr("Cancel"));
                 popupStack->AddScreen(chooseSystemPopup);
             }
             else
