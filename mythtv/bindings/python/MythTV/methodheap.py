@@ -1199,7 +1199,7 @@ class MythXML( XMLConnection ):
         """
         Returns a list of Program objects for expiring shows on the backend.
         """
-        for prog in self._request('Dvr/GetExpiring')\
+        for prog in self._request('Dvr/GetExpiringList')\
                     .readJSON()['ProgramList']['Programs']:
             yield Program.fromJSON(prog, self.db)
 
