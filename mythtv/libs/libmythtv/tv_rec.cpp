@@ -4430,6 +4430,9 @@ bool TVRec::GetProgramRingBufferForLiveTV(RecordingInfo **pginfo,
         prog->SetPathname(sgroup.FindNextDirMostFree());
     }
 
+    if (!pseudoLiveTVRecording)
+        prog->ApplyRecordRecGroupChange("LiveTV");
+
     StartedRecording(prog);
 
     *rb = RingBuffer::Create(prog->GetPathname(), true);
