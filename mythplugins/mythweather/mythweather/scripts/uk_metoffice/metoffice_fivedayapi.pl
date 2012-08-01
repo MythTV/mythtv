@@ -139,6 +139,10 @@ my $item;
 
 foreach $item (@{$xml->{DV}->{Location}->{Period}}) {
 
+    if (ref($item->{Rep}) ne 'ARRAY') {
+        next;
+    }
+
     my ($ss,$mm,$hh,$day,$month,$year,$zone) = strptime($item->{val});
     $year += 1900; # Returns year as offset from 1900
     $month += 1; # Returns month starting at zero
