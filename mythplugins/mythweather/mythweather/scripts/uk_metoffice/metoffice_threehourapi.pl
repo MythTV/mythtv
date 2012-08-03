@@ -139,6 +139,10 @@ my $i = 0;
 
 foreach $item (@{$xml->{DV}->{Location}->{Period}}) {
 
+    if (ref($item->{Rep}) ne 'ARRAY') {
+        next;
+    }
+
     foreach my $rep (@{$item->{Rep}}) {
 
         my $datetime = DateTime::Format::ISO8601->parse_datetime(substr($item->{val}, 0, -1));

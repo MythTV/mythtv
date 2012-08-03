@@ -2040,6 +2040,8 @@ bool MythUIButtonList::MoveDown(MovementUnit unit, uint amount)
             break;
 
         case MoveRow:
+            if (m_itemList.empty() || m_columns < 1)
+                return true;
             if (m_scrollStyle != ScrollFree)
             {
                 m_selPosition += m_columns;

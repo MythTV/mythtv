@@ -97,8 +97,14 @@ DVBStreamHandler::DVBStreamHandler(const QString &dvb_device) :
 void DVBStreamHandler::SetRunningDesired(bool desired)
 {
     if (_drb && _running_desired && !desired)
+    {
+        StreamHandler::SetRunningDesired(desired);
         _drb->Stop();
-    StreamHandler::SetRunningDesired(desired);
+    }
+    else
+    {
+        StreamHandler::SetRunningDesired(desired);
+    }
 }
 
 void DVBStreamHandler::run(void)
@@ -179,9 +185,12 @@ void DVBStreamHandler::RunTS(void)
         drb->Start();
     }
 
-    SetRunning(true, _needs_buffering, false);
     {
+        // SetRunning() + set _drb
         QMutexLocker locker(&_start_stop_lock);
+        _running = true;
+        _using_buffering = _needs_buffering;
+        _using_section_reader = false;
         _drb = drb;
     }
 
@@ -209,7 +218,7 @@ void DVBStreamHandler::RunTS(void)
                 _error = true;
             }
 
-            if (drb->IsEOF())
+            if (drb->IsEOF() && _running_desired)
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC + "Device EOF detected");
                 _error = true;
