@@ -393,7 +393,7 @@ class AudioCompressionSettings : public TriggeredConfigurationGroup
 
         QString labelName;
         if (profName.isNull())
-            labelName = QString(QObject::tr("Audio Quality"));
+            labelName = QObject::tr("Audio Quality");
         else
             labelName = profName + "->" + QObject::tr("Audio Quality");
         setName(labelName);
@@ -1199,7 +1199,7 @@ RecordingProfile::RecordingProfile(QString profName)
     ConfigurationGroup* profile = new VerticalConfigurationGroup(false);
     QString labelName;
     if (profName.isNull())
-        labelName = QString(QObject::tr("Profile"));
+        labelName = QObject::tr("Profile");
     else
         labelName = profName + "->" + QObject::tr("Profile");
     profile->setLabel(labelName);

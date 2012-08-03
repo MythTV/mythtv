@@ -942,10 +942,9 @@ MythThemedDialog::MythThemedDialog(MythMainWindow *parent,
 
     if (!loadThemedWindow(window_name, theme_filename))
     {
-        QString msg =
-            QString(tr("Could not locate '%1' in theme '%2'."
-                       "\n\nReturning to the previous menu."))
-            .arg(window_name).arg(theme_filename);
+        QString msg = tr("Could not locate '%1' in theme '%2'."
+                       "\n\nReturning to the previous menu.")
+                        .arg(window_name).arg(theme_filename);
         MythPopupBox::showOkPopup(GetMythMainWindow(),
                                   tr("Missing UI Element"), msg);
         reject();

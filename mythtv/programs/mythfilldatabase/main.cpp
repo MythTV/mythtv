@@ -38,7 +38,7 @@ namespace
     {
         delete gContext;
         gContext = NULL;
-
+        SignalHandler::Done();
     }
 
     class CleanupGuard
@@ -349,7 +349,7 @@ int main(int argc, char *argv[])
     QList<int> signallist;
     signallist << SIGINT << SIGTERM << SIGSEGV << SIGABRT << SIGBUS << SIGFPE
                << SIGILL;
-    SignalHandler handler(signallist);
+    SignalHandler::Init(signallist);
     signal(SIGHUP, SIG_IGN);
 #endif
 

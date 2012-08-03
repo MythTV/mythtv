@@ -396,7 +396,8 @@ void ChannelInsertInfo::ImportExtraInfo(const ChannelInsertInfo &other)
         orig_netid         = other.orig_netid;
     if (other.netid && !netid)
         netid              = other.netid;
-    if (!other.si_standard.isEmpty() && si_standard.isEmpty())
+    if (!other.si_standard.isEmpty() &&
+        (si_standard.isEmpty() || ("mpeg" == si_standard)))
     {
         si_standard        = other.si_standard; si_standard.detach();
     }
@@ -426,7 +427,8 @@ void ChannelInsertInfo::ImportExtraInfo(const ChannelInsertInfo &other)
         decryption_status  = other.decryption_status;
 }
 
-bool ChannelInsertInfo::IsSameChannel(const ChannelInsertInfo &other) const
+bool ChannelInsertInfo::IsSameChannel(
+    const ChannelInsertInfo &other, bool relaxed) const
 {
     if (atsc_major_channel &&
         (atsc_major_channel == other.atsc_major_channel) &&
@@ -443,6 +445,17 @@ bool ChannelInsertInfo::IsSameChannel(const ChannelInsertInfo &other) const
     if (!orig_netid && !other.orig_netid &&
         (pat_tsid == other.pat_tsid) && (service_id == other.service_id))
         return true;
+
+    if (relaxed)
+    {
+        if (("mpeg" == si_standard || "mpeg" == other.si_standard ||
+             "dvb" == si_standard || "dvb" == other.si_standard ||
+             si_standard.isEmpty() || other.si_standard.isEmpty()) &&
+            (service_id == other.service_id))
+        {
+            return true;
+        }
+    }
 
     return false;
 }

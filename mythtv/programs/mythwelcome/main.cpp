@@ -78,7 +78,7 @@ int main(int argc, char **argv)
     QList<int> signallist;
     signallist << SIGINT << SIGTERM << SIGSEGV << SIGABRT << SIGBUS << SIGFPE
                << SIGILL;
-    SignalHandler handler(signallist);
+    SignalHandler::Init(signallist);
     signal(SIGHUP, SIG_IGN);
 #endif
 
@@ -87,6 +87,7 @@ int main(int argc, char **argv)
     {
         LOG(VB_GENERAL, LOG_ERR,
             "mythwelcome: Could not initialize MythContext. Exiting.");
+        SignalHandler::Done();
         return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
 
@@ -94,6 +95,7 @@ int main(int argc, char **argv)
     {
         LOG(VB_GENERAL, LOG_ERR,
             "mythwelcome: Could not open the database. Exiting.");
+        SignalHandler::Done();
         return -1;
     }
 
@@ -125,7 +127,12 @@ int main(int argc, char **argv)
         if (welcome->Create())
             mainStack->AddScreen(welcome, false);
         else
+        {
+            DestroyMythMainWindow();
+            delete gContext;
+            SignalHandler::Done();
             return -1;
+        }
 
         do
         {
@@ -137,6 +144,8 @@ int main(int argc, char **argv)
     DestroyMythMainWindow();
 
     delete gContext;
+
+    SignalHandler::Done();
 
     return 0;
 }

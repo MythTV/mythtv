@@ -2036,10 +2036,10 @@ void JobQueue::DoTranscodeThread(int jobID)
                     filesize = st.size();
                     /*: %1 is transcoder name, %2 is the original file size 
                         and %3 is the current file size */
-                    QString comment = QString(tr("%1: %2 => %3"))
-                                            .arg(transcoderName)
-                                            .arg(PrettyPrint(origfilesize))
-                                            .arg(PrettyPrint(filesize));
+                    QString comment = tr("%1: %2 => %3")
+                                        .arg(transcoderName)
+                                        .arg(PrettyPrint(origfilesize))
+                                        .arg(PrettyPrint(filesize));
                     ChangeJobComment(jobID, comment);
 
                     if (filesize > 0)
@@ -2070,10 +2070,9 @@ void JobQueue::DoTranscodeThread(int jobID)
             {
                 program_info->SaveTranscodeStatus(TRANSCODING_NOT_TRANSCODED);
 
-                QString comment =
-                    QString(tr("exit status %1, job status was \"%2\""))
-                    .arg(result)
-                    .arg(StatusText(status));
+                QString comment = tr("exit status %1, job status was \"%2\"")
+                                    .arg(result)
+                                    .arg(StatusText(status));
 
                 ChangeJobStatus(jobID, JOB_ERRORED, comment);
 

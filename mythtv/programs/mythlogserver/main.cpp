@@ -106,8 +106,8 @@ int main(int argc, char *argv[])
     QList<int> signallist;
     signallist << SIGINT << SIGTERM << SIGSEGV << SIGABRT << SIGBUS << SIGFPE
                << SIGILL;
-    SignalHandler handler(signallist);
-    handler.AddHandler(SIGHUP, logSigHup);
+    SignalHandler::Init(signallist);
+    SignalHandler::SetHandler(SIGHUP, logSigHup);
 #endif
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
@@ -118,6 +118,8 @@ int main(int argc, char *argv[])
     }
 
     qApp->exec();
+
+    SignalHandler::Done();
 
     return GENERIC_EXIT_OK;
 }

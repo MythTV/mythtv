@@ -44,6 +44,7 @@ DecoderBase::DecoderBase(MythPlayer *parent, const ProgramInfo &pginfo)
       getrawframes(false), getrawvideo(false),
       errored(false), waitingForChange(false), readAdjust(0),
       justAfterChange(false),
+      video_inverted(false),
       decodeAllSubtitles(false),
       // language preference
       languagePreference(iso639_get_language_key_list())

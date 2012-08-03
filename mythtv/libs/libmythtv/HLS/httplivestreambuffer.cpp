@@ -1024,6 +1024,8 @@ public:
 protected:
     void run(void)
     {
+        RunProlog();
+
         int retries = 0;
         while (!m_interrupted)
         {
@@ -1121,6 +1123,8 @@ protected:
             // Signal we're done
             Wakeup();
         }
+
+        RunEpilog();
     }
 
     int BandwidthAdaptation(int progid, uint64_t &bandwidth)
@@ -1210,6 +1214,8 @@ public:
 protected:
     void run(void)
     {
+        RunProlog();
+
         double wait = 0.5;
         double factor = m_parent->GetCurrentStream()->Live() ? 1.0 : 2.0;
 
@@ -1288,6 +1294,8 @@ protected:
             m_wakeup = ((int64_t)(hls->TargetDuration() * wait * factor)
                         * (int64_t)1000);
         }
+
+        RunEpilog();
     }
 
 private:
@@ -1455,7 +1463,8 @@ HLSRingBuffer::HLSRingBuffer(const QString &lfilename) :
     m_playback(new HLSPlayback()),
     m_meta(false),          m_error(false),         m_aesmsg(false),
     m_startup(0),           m_bitrate(0),           m_seektoend(false),
-    m_streamworker(NULL),   m_playlistworker(NULL), m_fd(NULL)
+    m_streamworker(NULL),   m_playlistworker(NULL), m_fd(NULL),
+    m_interrupted(false)
 {
     startreadahead = false;
     OpenFile(lfilename);
@@ -2532,7 +2541,7 @@ void HLSRingBuffer::WaitUntilBuffered(void)
     m_streamworker->Wakeup();
     m_streamworker->Lock();
     int retries = 0;
-    while (!m_error &&
+    while (!m_error && !m_interrupted &&
            (m_streamworker->CurrentPlaybackBuffer(false) < 2) &&
            (live || (!live && !m_streamworker->IsAtEnd())))
     {
@@ -2549,6 +2558,13 @@ int HLSRingBuffer::safe_read(void *data, uint sz)
 
     int used = 0;
     int i_read = sz;
+
+    WaitUntilBuffered();
+    if (m_interrupted)
+    {
+        LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("interrupted"));
+        return 0;
+    }
 
     do
     {
@@ -2605,9 +2621,10 @@ int HLSRingBuffer::safe_read(void *data, uint sz)
         i_read  -= len;
         segment->Unlock();
     }
-    while (i_read > 0);
+    while (i_read > 0 && !m_interrupted);
 
-    WaitUntilBuffered();
+    if (m_interrupted)
+        LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("interrupted"));
 
     m_playback->AddOffset(used);
     return used;
@@ -2738,14 +2755,17 @@ long long HLSRingBuffer::Seek(long long pos, int whence, bool has_lock)
 
     // see if we've already got the segment, and at least 2 buffered after
     // then no need to wait for streamworker
-    while (!m_error &&
+    while (!m_error && !m_interrupted &&
            (!m_streamworker->GotBufferedSegments(segnum, 2) &&
             (m_streamworker->CurrentPlaybackBuffer(false) < 2) &&
             !m_streamworker->IsAtEnd()))
     {
-        m_streamworker->WaitForSignal(); //1000);
+        m_streamworker->WaitForSignal(1000);
         retries++;
     }
+    if (m_interrupted)
+        LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("interrupted"));
+
     m_streamworker->Unlock();
 
     // now seek within found segment
@@ -2779,4 +2799,22 @@ long long HLSRingBuffer::GetReadPosition(void) const
 bool HLSRingBuffer::IsOpen(void) const
 {
     return !m_error && !m_streams.isEmpty() && NumSegments() > 0;
+}
+
+void HLSRingBuffer::Interrupt(void)
+{
+    QMutexLocker lock(&m_lock);
+
+    // segment didn't get downloaded (timeout?)
+    LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("requesting interrupt"));
+    m_interrupted = true;
+}
+
+void HLSRingBuffer::Continue(void)
+{
+    QMutexLocker lock(&m_lock);
+
+    // segment didn't get downloaded (timeout?)
+    LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("requesting restart"));
+    m_interrupted = false;
 }

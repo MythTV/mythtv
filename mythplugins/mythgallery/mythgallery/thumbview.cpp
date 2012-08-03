@@ -124,15 +124,15 @@ QString ThumbItem::GetDescription(const QString &status,
     if (!status.isEmpty())
         info += status;
 
-    info += "\n\n" + QString(tr("Folder: %1")).arg(fi.dir().dirName());
+    info += "\n\n" + tr("Folder: %1").arg(fi.dir().dirName());
     //: %1 is the creation date
-    info += "\n" + QString(tr("Created: %1")).arg(fi.created().toString());
+    info += "\n" + tr("Created: %1").arg(fi.created().toString());
     //: %1 is the modification date
-    info += "\n" + QString(tr("Modified: %1")).arg(fi.lastModified().toString());
+    info += "\n" + tr("Modified: %1").arg(fi.lastModified().toString());
     info += "\n" + tr("Size: %n bytes", "", fi.size());
     info += "\n" + tr("Width: %n pixel(s)", "", sz.width());
     info += "\n" + tr("Height: %n pixel(s)", "", sz.height());
-    info += "\n" + QString(tr("Pixel Count: %1 megapixels"))
+    info += "\n" + tr("Pixel Count: %1 megapixels")
         .arg((float) sz.width() * sz.height() * (1.0f/1000000.0f), 0, 'f', 2);
     info += "\n" + tr("Rotation Angle: %n degree(s)", "", angle);
 

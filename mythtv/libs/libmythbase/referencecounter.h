@@ -27,7 +27,7 @@ class MBASE_PUBLIC ReferenceCounter
 {
   public:
     /// Creates reference counter with an initial value of 1.
-    ReferenceCounter(const QString &debugName);
+    ReferenceCounter(const QString &debugName, bool logDebug = true);
 
     /// Increments reference count.
     /// \return last reference count
@@ -48,6 +48,12 @@ class MBASE_PUBLIC ReferenceCounter
 #ifdef EXTRA_DEBUG
     const QString m_debugName;
 #endif
+    /// This is used to suppress creating LoggingItem classes for
+    /// LoggingItem reference count changes. This is necessary to
+    /// prevent infinte recursion. If you need to debug LoggingItem
+    /// reference counting you need to print the messages to the
+    /// console by modifying IncrRef() and DecrRef().
+    bool m_logDebug;
     QAtomicInt m_referenceCount;
 };
 

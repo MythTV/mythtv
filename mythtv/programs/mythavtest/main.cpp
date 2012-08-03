@@ -223,7 +223,19 @@ int main(int argc, char *argv[])
 #endif
 
     MythMainWindow *mainWindow = GetMythMainWindow();
+#if CONFIG_DARWIN
+    mainWindow->Init(OPENGL_PAINTER);
+#else
     mainWindow->Init();
+#endif
+
+#ifndef _WIN32
+    QList<int> signallist;
+    signallist << SIGINT << SIGTERM << SIGSEGV << SIGABRT << SIGBUS << SIGFPE
+               << SIGILL;
+    SignalHandler::Init(signallist);
+    signal(SIGHUP, SIG_IGN);
+#endif
 
     if (cmdline.toBool("test"))
     {
@@ -260,6 +272,8 @@ int main(int argc, char *argv[])
     DestroyMythMainWindow();
 
     delete gContext;
+
+    SignalHandler::Done();
 
     return GENERIC_EXIT_OK;
 }

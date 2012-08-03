@@ -96,10 +96,8 @@ MythThemedMenu::MythThemedMenu(const QString &cdir, const QString &menufile,
                                bool allowreorder, MythThemedMenuState *state)
     : MythThemedMenuState(parent, name),
       m_state(state), m_allocedstate(false), m_foundtheme(false),
-      m_ignorekeys(false), m_wantpop(false)
+      m_ignorekeys(false), m_wantpop(false), m_menuPopup(NULL)
 {
-    m_menuPopup = NULL;
-
     if (!m_state)
     {
         m_state = new MythThemedMenuState(parent, "themedmenustate");
@@ -757,13 +755,8 @@ bool MythThemedMenu::handleAction(const QString &action, const QString &password
 {
     MythUIMenuCallbacks *cbs = GetMythUI()->GetMenuCBs();
 
-    if (((password == "SetupPinCode") &&
-         GetMythDB()->GetNumSetting("SetupPinCodeRequired", 0)) ||
-         (!password.isEmpty() && password != "SetupPinCode"))
-    {
-        if (!checkPinCode(password))
-            return true;
-    }
+    if (!password.isEmpty() && !checkPinCode(password))
+        return true;
 
     if (action.left(5) == "EXEC ")
     {

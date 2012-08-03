@@ -129,7 +129,7 @@ class MTV_PUBLIC ChannelInsertInfo
     ChannelInsertInfo(const ChannelInsertInfo &other) { (*this = other); }
     ChannelInsertInfo &operator=(const ChannelInsertInfo &other);
 
-    bool IsSameChannel(const ChannelInsertInfo&) const;
+    bool IsSameChannel(const ChannelInsertInfo&, bool relaxed = false) const;
 
     bool SaveScan(uint scanid, uint transportid) const;
 

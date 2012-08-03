@@ -454,16 +454,14 @@ bool FillData::GrabData(Source source, int offset, QDate *qCurrentDate)
         if (systemcall_status == GENERIC_EXIT_KILLED)
         {
             interrupted = true;
-            status =
-                QString(QObject::tr("FAILED: xmltv ran but was interrupted."));
+            status = QObject::tr("FAILED: XMLTV grabber ran but was interrupted.");
         }
         else
         {
-            status =
-                QString(QObject::tr("FAILED: xmltv returned error code %1."))
+            status = QObject::tr("FAILED: XMLTV grabber returned error code %1.")
                             .arg(systemcall_status);
             LOG(VB_GENERAL, LOG_ERR, LOC +
-                QString("xmltv returned error code %1")
+                QString("XMLTV grabber returned error code %1")
                     .arg(systemcall_status));
         }
     }
@@ -990,10 +988,10 @@ bool FillData::Run(SourceList &sourcelist)
     {
         if (nonewdata > 0 &&
             (total_sources != externally_handled))
-            status = QString(QObject::tr(
+            status = QObject::tr(
                      "mythfilldatabase ran, but did not insert "
                      "any new data into the Guide for %1 of %2 sources. "
-                     "This can indicate a potential grabber failure."))
+                     "This can indicate a potential grabber failure.")
                      .arg(nonewdata)
                      .arg(total_sources);
         else

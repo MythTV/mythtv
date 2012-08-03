@@ -69,13 +69,13 @@ static int BuildKeyframeIndex(MPEG2fixup *m2f, QString &infile,
     {
         if (jobID >= 0)
             JobQueue::ChangeJobComment(jobID,
-                QString(QObject::tr("Generating Keyframe Index")));
+                                       QObject::tr("Generating Keyframe Index"));
         int err = m2f->BuildKeyframeIndex(infile, posMap);
         if (err)
             return err;
         if (jobID >= 0)
             JobQueue::ChangeJobComment(jobID,
-                QString(QObject::tr("Transcode Completed")));
+                                       QObject::tr("Transcode Completed"));
     }
     return 0;
 }
@@ -128,7 +128,7 @@ namespace
     {
         delete gContext;
         gContext = NULL;
-
+        SignalHandler::Done();
     }
 
     class CleanupGuard
@@ -378,7 +378,7 @@ int main(int argc, char *argv[])
     QList<int> signallist;
     signallist << SIGINT << SIGTERM << SIGSEGV << SIGABRT << SIGBUS << SIGFPE
                << SIGILL;
-    SignalHandler handler(signallist);
+    SignalHandler::Init(signallist);
     signal(SIGHUP, SIG_IGN);
 #endif
 

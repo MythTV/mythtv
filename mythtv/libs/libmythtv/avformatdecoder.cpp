@@ -70,6 +70,7 @@ extern "C" {
 #include "libavformat/avio.h"
 #include "libavformat/internal.h"
 #include "libswscale/swscale.h"
+#include "libavformat/isom.h"
 #include "ivtv_myth.h"
 }
 
@@ -1313,6 +1314,11 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
             SetLowBuffers(false);
         }
     }
+
+    AVDictionaryEntry *metatag =
+        av_dict_get(stream->metadata, "rotate", NULL, 0);
+    if (metatag && metatag->value && QString("180") == metatag->value)
+        video_inverted = true;
 
     if (CODEC_IS_VDPAU(codec))
     {

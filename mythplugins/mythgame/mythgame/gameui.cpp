@@ -269,8 +269,7 @@ void GameUI::itemClicked(MythUIButtonListItem*)
         else
         {
             //: %1 is the game name
-            QString msg = QString(tr("Choose System for:\n%1"))
-                .arg(node->getString());
+            QString msg = tr("Choose System for:\n%1").arg(node->getString());
             MythScreenStack *popupStack = GetMythMainWindow()->
                                               GetStack("popup stack");
             MythDialogBox *chooseSystemPopup = new MythDialogBox(
@@ -280,13 +279,12 @@ void GameUI::itemClicked(MythUIButtonListItem*)
             {
                 chooseSystemPopup->SetReturnEvent(this, "chooseSystemPopup");
                 QString all_systems = romInfo->AllSystems();
-                QStringList players = all_systems.split(",");
+                QStringList players = all_systems.split(',');
                 for (QStringList::Iterator it = players.begin();
                      it != players.end(); ++it)
                 {
                     chooseSystemPopup->AddButton(*it);
                 }
-                chooseSystemPopup->AddButton(tr("Cancel"));
                 popupStack->AddScreen(chooseSystemPopup);
             }
             else

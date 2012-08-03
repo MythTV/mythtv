@@ -286,7 +286,7 @@ void ProfileGroupEditor::callDelete(void)
 
     if (result.exec() && result.next())
     {
-        QString message = QString(tr("Delete profile group:\n'%1'?"))
+        QString message = tr("Delete profile group:\n'%1'?")
                               .arg(ProfileGroup::getName(id));
 
         DialogCode value = MythPopupBox::Show2ButtonPopup(

@@ -60,6 +60,8 @@ public:
     bool SaveToDisk(QString filename, int segstart = 0, int segend = -1);
     int NumStreams(void) const;
     int Read(void *data, uint i_read) { return safe_read(data, i_read); }
+    void Interrupt(void);
+    void Continue(void);
 
 protected:
     virtual int safe_read(void *data, uint i_read);
@@ -126,6 +128,7 @@ private:
     friend class PlaylistWorker;
     PlaylistWorker     *m_playlistworker;
     FILE               *m_fd;
+    bool                m_interrupted;
 };
 
 #endif

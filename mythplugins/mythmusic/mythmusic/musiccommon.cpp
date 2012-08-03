@@ -1210,7 +1210,7 @@ void MusicCommon::customEvent(QEvent *event)
 
         LOG(VB_GENERAL, LOG_ERR, QString("%1 %2").arg(statusString)
             .arg(*aoe->errorMessage()));
-        ShowOkPopup(QString(tr("MythMusic has encountered the following error:\n%1"))
+        ShowOkPopup(tr("MythMusic has encountered the following error:\n%1")
                     .arg(*aoe->errorMessage()));
         stopAll();
     }
@@ -1252,7 +1252,7 @@ void MusicCommon::customEvent(QEvent *event)
         LOG(VB_GENERAL, LOG_ERR, QString("%1 %2").arg(statusString)
             .arg(*dxe->errorMessage()));
 
-        ShowOkPopup(QString(tr("MythMusic has encountered the following error:\n%1"))
+        ShowOkPopup(tr("MythMusic has encountered the following error:\n%1")
                     .arg(*dxe->errorMessage()));
     }
     else if (event->type() == DecoderHandlerEvent::Error)
@@ -1982,8 +1982,8 @@ void MusicCommon::updatePlaylistStats(void)
         QString playlistcurrent = QLocale::system().toString(m_currentTrack + 1);
         QString playlisttotal = QLocale::system().toString(trackCount);
 
-        map["playlistposition"] = QString(tr("%1 of %2")).arg(playlistcurrent)
-                                                     .arg(playlisttotal);
+        map["playlistposition"] = tr("%1 of %2").arg(playlistcurrent)
+                                                .arg(playlisttotal);
         map["playlistcurrent"] = playlistcurrent;
         map["playlistcount"] = playlisttotal;
         map["playlisttime"] = getTimeString(m_playlistPlayedTime + m_currentTime, m_playlistMaxTime);

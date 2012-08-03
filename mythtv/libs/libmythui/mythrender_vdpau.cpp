@@ -273,6 +273,7 @@ MythRenderVDPAU::MythRenderVDPAU()
     m_render_lock(QMutex::Recursive), m_decode_lock(QMutex::Recursive),
     m_display(NULL), m_window(0), m_device(0), m_surface(0),
     m_flipQueue(0),  m_flipTarget(0), m_flipReady(false), m_colorKey(0),
+    m_flipFrames(false),
     vdp_get_proc_address(NULL), vdp_get_error_string(NULL)
 {
     LOCK_ALL
@@ -1105,15 +1106,25 @@ bool MythRenderVDPAU::MixAndRend(uint id, VdpVideoMixerPictureStructure field,
     outRect.y0    = dst.top();
     outRect.x1    = dst.left() + dst.width();
     outRect.y1    = dst.top()  + dst.height();
-    srcRect.x0    = src.left();
-    srcRect.y0    = src.top();
-    srcRect.x1    = src.left() + src.width();
-    srcRect.y1    = src.top() +  src.height();
+    if (m_flipFrames)
+    {
+        // flip the image
+        srcRect.x0 = src.left() + src.width();
+        srcRect.y0 = src.top() +  src.height();
+        srcRect.x1 = src.left();
+        srcRect.y1 = src.top();
+    }
+    else
+    {
+        srcRect.x0 = src.left();
+        srcRect.y0 = src.top();
+        srcRect.x1 = src.left() + src.width();
+        srcRect.y1 = src.top() +  src.height();
+    }
     outRectVid.x0 = dst_vid.left();
     outRectVid.y0 = dst_vid.top();
     outRectVid.x1 = dst_vid.left() + dst_vid.width();
     outRectVid.y1 = dst_vid.top() +  dst_vid.height();
-
 
     vdp_st = vdp_video_mixer_render(mixer, VDP_INVALID_HANDLE,
                                     NULL, field, deint ? 2 : 0,
