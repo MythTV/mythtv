@@ -21,8 +21,8 @@
 #include "mythconfig.h"
 
 // locking order
-// stateChangeLock -> triggerEventLoopLock
-//                 -> pendingRecLock
+// setChannelLock -> stateChangeLock -> triggerEventLoopLock
+//                                   -> pendingRecLock
 
 class RingBuffer;
 class EITScanner;
@@ -354,6 +354,7 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
     FireWireDBOptions  fwOpt;
 
     // State variables
+    mutable QMutex setChannelLock;
     mutable QMutex stateChangeLock;
     mutable QMutex pendingRecLock;
     TVState        internalState;

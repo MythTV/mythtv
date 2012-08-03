@@ -3060,7 +3060,8 @@ QString TVRec::SetInput(QString input, uint requestType)
  */
 void TVRec::SetChannel(QString name, uint requestType)
 {
-    QMutexLocker locker(&stateChangeLock);
+    QMutexLocker locker1(&setChannelLock);
+    QMutexLocker locker2(&stateChangeLock);
 
     LOG(VB_CHANNEL, LOG_INFO, LOC +
         QString("SetChannel(%1) -- begin").arg(name));
@@ -3112,14 +3113,18 @@ bool TVRec::QueueEITChannelChange(const QString &name)
         QString("QueueEITChannelChange(%1) -- begin").arg(name));
 
     bool ok = false;
-    if (stateChangeLock.tryLock())
+    if (setChannelLock.tryLock())
     {
-        if (tuningRequests.empty())
+        if (stateChangeLock.tryLock())
         {
-            tuningRequests.enqueue(TuningRequest(kFlagEITScan, name));
-            ok = true;
+            if (tuningRequests.empty())
+            {
+                tuningRequests.enqueue(TuningRequest(kFlagEITScan, name));
+                ok = true;
+            }
+            stateChangeLock.unlock();
         }
-        stateChangeLock.unlock();
+        setChannelLock.unlock();
     }
 
     LOG(VB_CHANNEL, LOG_INFO, LOC +
