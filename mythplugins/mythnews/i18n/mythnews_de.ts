@@ -60,6 +60,11 @@
         <translation>%1 von %2 (%3%)</translation>
     </message>
     <message>
+        <location filename="../mythnews/mythnews.cpp" line="703"/>
+        <source>Downloading media...</source>
+        <translation>Lade Medien...</translation>
+    </message>
+    <message>
         <location filename="../mythnews/mythnews.cpp" line="808"/>
         <source>No browser command set! MythNews needs MythBrowser to be installed.</source>
         <translation>Es ist kein Webbrowser definiert! Für MythNews muss MythBrowser installiert sein.</translation>
@@ -148,34 +153,34 @@
 <context>
     <name>NewsSite</name>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="233"/>
-        <location filename="../mythnews/newssite.cpp" line="242"/>
-        <location filename="../mythnews/newssite.cpp" line="251"/>
+        <location filename="../mythnews/newssite.cpp" line="234"/>
+        <location filename="../mythnews/newssite.cpp" line="243"/>
+        <location filename="../mythnews/newssite.cpp" line="252"/>
         <source>Failed to retrieve news</source>
-        <translation>Fehler beim Abrufen der Nachrichten.</translation>
+        <translation>Fehler beim Abrufen der Nachrichten</translation>
     </message>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="234"/>
+        <location filename="../mythnews/newssite.cpp" line="235"/>
         <source>No Cached News.</source>
         <translation>Keine zwischengespeicherten Nachrichten.</translation>
     </message>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="253"/>
+        <location filename="../mythnews/newssite.cpp" line="254"/>
         <source>Failed to read downloaded file.</source>
         <translation>Fehler beim Lesen der geladenen Datei.</translation>
     </message>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="261"/>
+        <location filename="../mythnews/newssite.cpp" line="262"/>
         <source>Showing Cached News.</source>
         <translation>Zeige zwischengespeicherte Nachrichten.</translation>
     </message>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="282"/>
+        <location filename="../mythnews/newssite.cpp" line="283"/>
         <source>XML-file is not valid RSS-feed</source>
         <translation>Die XML-Datei ist kein gültiger RSS-Feed</translation>
     </message>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="226"/>
+        <location filename="../mythnews/newssite.cpp" line="227"/>
         <source>Retrieve Failed. </source>
         <translation>Empfang gescheitert. </translation>
     </message>
@@ -183,9 +188,8 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="703"/>
         <source>Downloading media...</source>
-        <translation>Lade Medien...</translation>
+        <translation type="obsolete">Lade Medien...</translation>
     </message>
 </context>
 <context>

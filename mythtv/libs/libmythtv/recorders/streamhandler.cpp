@@ -150,9 +150,11 @@ void StreamHandler::Start(void)
         if ((_using_section_reader && !_allow_section_reader) ||
             (_needs_buffering      && !_using_buffering))
         {
+            LOG(VB_RECORD, LOG_INFO, LOC + "Restarting StreamHandler");
             SetRunningDesired(false);
-            while (!_running_desired && _running)
-                _running_state_changed.wait(&_start_stop_lock, 100);
+            locker.unlock();
+            wait();
+            locker.relock();
         }
     }
 
@@ -170,19 +172,14 @@ void StreamHandler::Start(void)
 
     if (_error)
     {
-        LOG(VB_GENERAL, LOG_WARNING, LOC + "Start failed");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Start failed");
         SetRunningDesired(false);
     }
 }
 
 void StreamHandler::Stop(void)
 {
-    QMutexLocker locker(&_start_stop_lock);
-
     SetRunningDesired(false);
-    while (_running)
-        _running_state_changed.wait(&_start_stop_lock, 100);
-
     wait();
 }
 

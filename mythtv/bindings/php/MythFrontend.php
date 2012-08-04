@@ -253,7 +253,7 @@ class MythFrontend extends MythBase {
  * @param string $starttime
 /**/
     public function play_program($chanid, $starttime) {
-        $starttime = date('Y-m-d\TH:i:s', $starttime);
+        $starttime = gmdate('Y-m-d\TH:i:s', $starttime);
         return $this->send_play("program $chanid $starttime resume");
     }
     
