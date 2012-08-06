@@ -452,6 +452,8 @@ bool RingBuffer::IsNearEnd(double fps, uint vvf) const
     // telecom kilobytes (i.e. 1000 per k not 1024)
     uint   tmp = (uint) max(abs(rawbitrate * playspeed), 0.5f * rawbitrate);
     uint   kbits_per_sec = min(rawbitrate * 3, tmp);
+    if (kbits_per_sec == 0)
+        return false;
 
     double readahead_time   = sz / (kbits_per_sec * (1000.0/8.0));
 
