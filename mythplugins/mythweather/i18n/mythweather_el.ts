@@ -50,35 +50,27 @@
 <context>
     <name>LocationDialog</name>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="967"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="959"/>
         <source>Search</source>
         <translation>Αναζήτηση</translation>
     </message>
     <message>
-        <source>Searching ...</source>
-        <translation type="obsolete">Ψάχνω...</translation>
-    </message>
-    <message>
-        <source>Searching ... Results: %1</source>
-        <translation type="obsolete">Ψάχνω ... Αποτελέσματα: %1</translation>
-    </message>
-    <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="978"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="970"/>
         <source>Searching...</source>
         <translation>Ψάχνω...</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="1000"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="992"/>
         <source>Searching... Results: %1</source>
         <translation>Ψάχνω ... Αποτελέσματα: %1</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="1058"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="1050"/>
         <source>Search Complete. Results: %1</source>
         <translation>Ολοκλήρωση Αναζήτησης. Αποτελέσματα: %1</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="1079"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="1071"/>
         <source>Source: %1</source>
         <translation>Πηγή: %1</translation>
     </message>
@@ -101,37 +93,6 @@
         <location filename="../mythweather/main.cpp" line="59"/>
         <source>Search List</source>
         <translation>Λίστα Αναζήτησης</translation>
-    </message>
-</context>
-<context>
-    <name>QObject</name>
-    <message>
-        <source>Current Conditions</source>
-        <translation type="obsolete">Παρούσες Συνθήκες</translation>
-    </message>
-    <message>
-        <source>Three Day Forecast</source>
-        <translation type="obsolete">Τριήμερη Πρόβλεψη</translation>
-    </message>
-    <message>
-        <source>18 Hour Forecast</source>
-        <translation type="obsolete">18ωρη Πρόβλεψη</translation>
-    </message>
-    <message>
-        <source>Severe Weather Alerts</source>
-        <translation type="obsolete">Ειδοποιήσεις Έντονων Φαινομένων</translation>
-    </message>
-    <message>
-        <source>Six Day Forecast</source>
-        <translation type="obsolete">Εξαήμερη Πρόβλεψη</translation>
-    </message>
-    <message>
-        <source>Static Map</source>
-        <translation type="obsolete">Στατικός Χάρτης</translation>
-    </message>
-    <message>
-        <source>Animated Map</source>
-        <translation type="obsolete">Κινούμενος Χάρτης</translation>
     </message>
 </context>
 <context>
@@ -168,13 +129,13 @@
     </message>
     <message>
         <location filename="../mythweather/weatherSetup.cpp" line="254"/>
-        <location filename="../mythweather/weatherSetup.cpp" line="601"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="593"/>
         <source>English Units</source>
         <translation>Αγγλικές Μονάδες</translation>
     </message>
     <message>
         <location filename="../mythweather/weatherSetup.cpp" line="254"/>
-        <location filename="../mythweather/weatherSetup.cpp" line="602"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="594"/>
         <source>SI Units</source>
         <translation>Μετρικό Σύστημα</translation>
     </message>
@@ -215,38 +176,38 @@
         <translation>μετακίνηση οθόνης πάνω ή κάτω ή αφαίρεση οθόνης.</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="508"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="500"/>
         <source>Manipulate Screen</source>
         <translation>Μετατροπή Οθόνης</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="522"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="514"/>
         <source>Move Up</source>
         <translation>Προς τα Πάνω</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="523"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="515"/>
         <source>Move Down</source>
         <translation>Προς τα Κάτω</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="524"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="516"/>
         <source>Remove</source>
         <translation>Αφαίρεση</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="525"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="517"/>
         <source>Change Location</source>
         <translation>Αλλαγή Τοποθεσίας</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="527"/>
-        <location filename="../mythweather/weatherSetup.cpp" line="588"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="519"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="580"/>
         <source>Change Units</source>
         <translation>Αλλαγή Μονάδων</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="528"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="520"/>
         <source>Cancel</source>
         <translation>Ακύρωση</translation>
     </message>
@@ -258,30 +219,26 @@
         <source>Searching for scripts</source>
         <translation>Ψάχνω για σκριπτάκια</translation>
     </message>
-    <message>
-        <source>Script %1 is still running when trying to do update, Make sure it isn&apos;t hanging, make sure timeout values are sane... Not running this time around</source>
-        <translation type="obsolete">Το σκριπτάκι %1 τρέχει ενώ προσπαθώ να ενημερωθώ. Σιγουρευτείτε πως δεν κόλλησε, και πως τα όρια αναμονής έχουν λογικές τιμές... Δεν τρέχουν τώρα</translation>
-    </message>
 </context>
 <context>
     <name>SourceSetup</name>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="793"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="785"/>
         <source>Finish</source>
         <translation>Τέλος</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="907"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="899"/>
         <source>Author: </source>
         <translation>Συγγραφέας:</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="909"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="901"/>
         <source>Email: </source>
         <translation>Email:</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="910"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="902"/>
         <source>Version: </source>
         <translation>Έκδοση:</translation>
     </message>
@@ -1098,10 +1055,6 @@ When you have completed your changes, click &quot;Finish&quot; to continue.</sou
         <translation>Δώστε Τοποθεσία</translation>
     </message>
     <message>
-        <source>As of</source>
-        <translation type="obsolete">Την </translation>
-    </message>
-    <message>
         <location filename="themestrings.h" line="11"/>
         <source>Low</source>
         <translation>Χαμηλή</translation>
@@ -1142,17 +1095,9 @@ When you have completed your changes, click &quot;Finish&quot; to continue.</sou
         <translation>Τοποθεσία:</translation>
     </message>
     <message>
-        <source>Weather</source>
-        <translation type="obsolete">Καιρος</translation>
-    </message>
-    <message>
         <location filename="themestrings.h" line="15"/>
         <source>Precip</source>
         <translation>Κατακρήμνιση</translation>
-    </message>
-    <message>
-        <source>Global Setup</source>
-        <translation type="obsolete">Γενικες Ρυθμισεις</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="19"/>
@@ -1250,10 +1195,6 @@ When you have completed your changes, click &quot;Finish&quot; to continue.</sou
         <translation>Κατέβασμα δεδομένων στο παρασκήνιο</translation>
     </message>
     <message>
-        <source>Enter your current location,nearest large town or city. In some countries postal codes are also supported.</source>
-        <translation type="obsolete">Δώστε την τοποθεσία σας, ή την πλησιέστερη μεγάλη πόλη. Σε ορισμένες χώρες ισχύει και ο ΤΚ.</translation>
-    </message>
-    <message>
         <location filename="themestrings.h" line="59"/>
         <source>General weather options</source>
         <oldsource>General weather plugin options</oldsource>
@@ -1288,7 +1229,7 @@ When you have completed your changes, click &quot;Finish&quot; to continue.</sou
         <translation>Σε παύση</translation>
     </message>
     <message>
-        <location filename="../mythweather/weather.cpp" line="211"/>
+        <location filename="../mythweather/weather.cpp" line="210"/>
         <source>None of the configured screens are complete in this theme (missing copyright information).</source>
         <translation>Καμία από τις ρυθμισμένες οθόνες δεν είναι ολοκληρωμένη σ΄αυτό το Θέμα (λείπουν στοιχεία copyright).</translation>
     </message>
@@ -1296,37 +1237,37 @@ When you have completed your changes, click &quot;Finish&quot; to continue.</sou
 <context>
     <name>WeatherScreen</name>
     <message>
-        <location filename="../mythweather/weatherScreen.cpp" line="215"/>
+        <location filename="../mythweather/weatherScreen.cpp" line="218"/>
         <source>Sunday</source>
         <translation>Κυριακή</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherScreen.cpp" line="218"/>
+        <location filename="../mythweather/weatherScreen.cpp" line="221"/>
         <source>Monday</source>
         <translation>Δευτέρα</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherScreen.cpp" line="221"/>
+        <location filename="../mythweather/weatherScreen.cpp" line="224"/>
         <source>Tuesday</source>
         <translation>Τρίτη</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherScreen.cpp" line="224"/>
+        <location filename="../mythweather/weatherScreen.cpp" line="227"/>
         <source>Wednesday</source>
         <translation>Τετάρτη</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherScreen.cpp" line="227"/>
+        <location filename="../mythweather/weatherScreen.cpp" line="230"/>
         <source>Thursday</source>
         <translation>Πέμπτη</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherScreen.cpp" line="230"/>
+        <location filename="../mythweather/weatherScreen.cpp" line="233"/>
         <source>Friday</source>
         <translation>Παρασκευή</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherScreen.cpp" line="233"/>
+        <location filename="../mythweather/weatherScreen.cpp" line="236"/>
         <source>Saturday</source>
         <translation>Σάββατο</translation>
     </message>
