@@ -50,35 +50,27 @@
 <context>
     <name>LocationDialog</name>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="960"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="959"/>
         <source>Search</source>
         <translation>Søk</translation>
     </message>
     <message>
-        <source>Searching ...</source>
-        <translation type="obsolete">Søker ...</translation>
-    </message>
-    <message>
-        <source>Searching ... Results: %1</source>
-        <translation type="obsolete">Søker ... Resultater: %1</translation>
-    </message>
-    <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="971"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="970"/>
         <source>Searching...</source>
         <translation>Søker...</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="993"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="992"/>
         <source>Searching... Results: %1</source>
         <translation>Søker ... Resultater: %1</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="1051"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="1050"/>
         <source>Search Complete. Results: %1</source>
         <translation>Søk ferdig. Resultater: %1</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="1072"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="1071"/>
         <source>Source: %1</source>
         <translation>Kilde: %1</translation>
     </message>
@@ -101,37 +93,6 @@
         <location filename="../mythweather/main.cpp" line="59"/>
         <source>Search List</source>
         <translation>Søk i liste</translation>
-    </message>
-</context>
-<context>
-    <name>QObject</name>
-    <message>
-        <source>Current Conditions</source>
-        <translation type="obsolete">Været nå</translation>
-    </message>
-    <message>
-        <source>Three Day Forecast</source>
-        <translation type="obsolete">Tredagers værvarsel</translation>
-    </message>
-    <message>
-        <source>18 Hour Forecast</source>
-        <translation type="obsolete">18 timers værvarsel</translation>
-    </message>
-    <message>
-        <source>Severe Weather Alerts</source>
-        <translation type="obsolete">Spesialvarsler</translation>
-    </message>
-    <message>
-        <source>Six Day Forecast</source>
-        <translation type="obsolete">Seksdagers værvarsel</translation>
-    </message>
-    <message>
-        <source>Static Map</source>
-        <translation type="obsolete">Statisk kart</translation>
-    </message>
-    <message>
-        <source>Animated Map</source>
-        <translation type="obsolete">Animert kart</translation>
     </message>
 </context>
 <context>
@@ -168,13 +129,13 @@
     </message>
     <message>
         <location filename="../mythweather/weatherSetup.cpp" line="254"/>
-        <location filename="../mythweather/weatherSetup.cpp" line="594"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="593"/>
         <source>English Units</source>
         <translation>Engelske enheter</translation>
     </message>
     <message>
         <location filename="../mythweather/weatherSetup.cpp" line="254"/>
-        <location filename="../mythweather/weatherSetup.cpp" line="595"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="594"/>
         <source>SI Units</source>
         <translation>SI enheter</translation>
     </message>
@@ -215,38 +176,38 @@
         <translation>flytte skjermbilde opp eller ned; eller fjerne skjermbilde.</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="501"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="500"/>
         <source>Manipulate Screen</source>
         <translation>Endre skjermbilde</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="515"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="514"/>
         <source>Move Up</source>
         <translation>Flytt opp</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="516"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="515"/>
         <source>Move Down</source>
         <translation>Flytt ned</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="517"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="516"/>
         <source>Remove</source>
         <translation>Fjern</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="518"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="517"/>
         <source>Change Location</source>
         <translation>Endre plassering</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="520"/>
-        <location filename="../mythweather/weatherSetup.cpp" line="581"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="519"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="580"/>
         <source>Change Units</source>
         <translation>Endre enheter</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="521"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="520"/>
         <source>Cancel</source>
         <translation>Avbryt</translation>
     </message>
@@ -258,30 +219,26 @@
         <source>Searching for scripts</source>
         <translation>Søker etter skript</translation>
     </message>
-    <message>
-        <source>Script %1 is still running when trying to do update, Make sure it isn&apos;t hanging, make sure timeout values are sane... Not running this time around</source>
-        <translation type="obsolete">Skript %1 kjører fremdeles under forsøk på oppdatering, sjekk at skriptet ikke henger, og at verdiene for tidsavbrudd er fornuftige... Skriptet blir ikke kjørt denne gangen</translation>
-    </message>
 </context>
 <context>
     <name>SourceSetup</name>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="786"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="785"/>
         <source>Finish</source>
         <translation>Ferdig</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="900"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="899"/>
         <source>Author: </source>
         <translation>Forfatter: </translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="902"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="901"/>
         <source>Email: </source>
         <translation>E-post: </translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="903"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="902"/>
         <source>Version: </source>
         <translation>Versjon: </translation>
     </message>
@@ -1183,14 +1140,6 @@ Når du er ferdig må du klikke «Ferdig» for å fortsette.</translation>
         <translation>Søk etter værlokasjon</translation>
     </message>
     <message>
-        <source>Weather</source>
-        <translation type="obsolete">Vær</translation>
-    </message>
-    <message>
-        <source>Global Setup</source>
-        <translation type="obsolete">Globalt oppsett</translation>
-    </message>
-    <message>
         <location filename="themestrings.h" line="48"/>
         <source>Humidity:</source>
         <translation>Luftfuktighet:</translation>
@@ -1244,10 +1193,6 @@ Når du er ferdig må du klikke «Ferdig» for å fortsette.</translation>
         <location filename="themestrings.h" line="58"/>
         <source>Retrieve data in the background</source>
         <translation>Last ned data i bakgrunnen</translation>
-    </message>
-    <message>
-        <source>Enter your current location,nearest large town or city. In some countries postal codes are also supported.</source>
-        <translation type="obsolete">Skriv inn gjeldende plassering, nærmeste sted eller by. I noen land er postnummer også støttet.</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="59"/>
