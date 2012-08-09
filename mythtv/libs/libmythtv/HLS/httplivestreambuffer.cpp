@@ -1470,6 +1470,21 @@ HLSRingBuffer::HLSRingBuffer(const QString &lfilename) :
     OpenFile(lfilename);
 }
 
+HLSRingBuffer::HLSRingBuffer(const QString &lfilename, bool open) :
+    RingBuffer(kRingBuffer_HLS),
+    m_playback(new HLSPlayback()),
+    m_meta(false),          m_error(false),         m_aesmsg(false),
+    m_startup(0),           m_bitrate(0),           m_seektoend(false),
+    m_streamworker(NULL),   m_playlistworker(NULL), m_fd(NULL),
+    m_interrupted(false)
+{
+    startreadahead = false;
+    if (open)
+    {
+        OpenFile(lfilename);
+    }
+}
+
 HLSRingBuffer::~HLSRingBuffer()
 {
     QWriteLocker lock(&rwlock);
@@ -2195,7 +2210,7 @@ int HLSRingBuffer::Prefetch(int count)
         .arg(count));
     m_streamworker->Lock();
     m_streamworker->Wakeup();
-    while (!m_error && (retries < 20) &&
+    while (!m_error && !m_interrupted && (retries < 20) &&
            (m_streamworker->CurrentPlaybackBuffer(false) < count) &&
            !m_streamworker->IsAtEnd())
     {
