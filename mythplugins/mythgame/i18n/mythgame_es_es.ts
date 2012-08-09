@@ -4,62 +4,62 @@
 <context>
     <name>(GameTypes)</name>
     <message>
-        <location filename="../mythgame/gamesettings.h" line="21"/>
+        <location filename="../mythgame/gamesettings.h" line="24"/>
         <source>OTHER</source>
         <translation>OTRO</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamesettings.h" line="22"/>
+        <location filename="../mythgame/gamesettings.h" line="25"/>
         <source>AMIGA</source>
         <translation>AMIGA</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamesettings.h" line="23"/>
+        <location filename="../mythgame/gamesettings.h" line="26"/>
         <source>ATARI</source>
         <translation>ATARI</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamesettings.h" line="24"/>
+        <location filename="../mythgame/gamesettings.h" line="27"/>
         <source>GAMEGEAR</source>
         <translation>GAMEGEAR</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamesettings.h" line="25"/>
+        <location filename="../mythgame/gamesettings.h" line="28"/>
         <source>GENESIS/MEGADRIVE</source>
         <translation>GENESIS/MEGADRIVE</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamesettings.h" line="26"/>
+        <location filename="../mythgame/gamesettings.h" line="29"/>
         <source>MAME</source>
         <translation>MAME</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamesettings.h" line="27"/>
+        <location filename="../mythgame/gamesettings.h" line="30"/>
         <source>N64</source>
         <translation>N64</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamesettings.h" line="28"/>
+        <location filename="../mythgame/gamesettings.h" line="31"/>
         <source>NES</source>
         <translation>NES</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamesettings.h" line="29"/>
+        <location filename="../mythgame/gamesettings.h" line="32"/>
         <source>PC GAME</source>
         <translation>JUEGO DE PC</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamesettings.h" line="30"/>
+        <location filename="../mythgame/gamesettings.h" line="33"/>
         <source>PCE/TG16</source>
         <translation>PCE/TG16</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamesettings.h" line="31"/>
+        <location filename="../mythgame/gamesettings.h" line="34"/>
         <source>SEGA/MASTER SYSTEM</source>
         <translation>SISTEMA SEGA/MASTER</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamesettings.h" line="32"/>
+        <location filename="../mythgame/gamesettings.h" line="35"/>
         <source>SNES</source>
         <translation>SNES</translation>
     </message>
@@ -67,38 +67,116 @@
 <context>
     <name>GameHandler</name>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="223"/>
+        <location filename="../mythgame/gamehandler.cpp" line="151"/>
+        <location filename="../mythgame/gamehandler.cpp" line="418"/>
+        <source>19xx</source>
+        <comment>Default game year</comment>
+        <translation>19xx</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamehandler.cpp" line="152"/>
+        <location filename="../mythgame/gamehandler.cpp" line="416"/>
+        <source>Unknown</source>
+        <comment>Unknown country</comment>
+        <translation>Desconocido</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamehandler.cpp" line="153"/>
+        <location filename="../mythgame/gamehandler.cpp" line="419"/>
+        <location filename="../mythgame/gamehandler.cpp" line="427"/>
+        <source>Unknown</source>
+        <comment>Unknown game name</comment>
+        <translation>Desconocido</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamehandler.cpp" line="154"/>
+        <location filename="../mythgame/gamehandler.cpp" line="182"/>
+        <source>Unknown</source>
+        <comment>Unknown genre</comment>
+        <translation>Desconocido</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamehandler.cpp" line="155"/>
+        <location filename="../mythgame/gamehandler.cpp" line="420"/>
+        <source>Unknown</source>
+        <comment>Unknown plot</comment>
+        <translation>Desconocida</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamehandler.cpp" line="156"/>
+        <location filename="../mythgame/gamehandler.cpp" line="421"/>
+        <source>Unknown</source>
+        <comment>Unknown publisher</comment>
+        <translation>Desconocido</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamehandler.cpp" line="157"/>
+        <location filename="../mythgame/gamehandler.cpp" line="422"/>
+        <source>0</source>
+        <comment>Default game version</comment>
+        <translation>0</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamehandler.cpp" line="183"/>
+        <location filename="../mythgame/gamehandler.cpp" line="415"/>
+        <source>Unknown %1</source>
+        <comment>Unknown genre</comment>
+        <extracomment>%1 is the game type, when we don&apos;t know the genre we use the * game type</extracomment>
+        <translation>Desconocido %1</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamehandler.cpp" line="224"/>
         <source>%1 appears to be missing.
 Remove it from the database?</source>
+        <extracomment>%1 is the file name</extracomment>
         <translation>%1 parece que no existe.
 ¿Eliminarlo de la base de datos?</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="230"/>
-        <location filename="../mythgame/gamehandler.cpp" line="613"/>
+        <location filename="../mythgame/gamehandler.cpp" line="232"/>
+        <location filename="../mythgame/gamehandler.cpp" line="618"/>
         <source>No</source>
         <translation>No</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="231"/>
+        <location filename="../mythgame/gamehandler.cpp" line="233"/>
         <source>No to all</source>
         <translation>No a todo</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="232"/>
-        <location filename="../mythgame/gamehandler.cpp" line="614"/>
+        <location filename="../mythgame/gamehandler.cpp" line="234"/>
+        <location filename="../mythgame/gamehandler.cpp" line="619"/>
         <source>Yes</source>
         <translation>Sí</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="233"/>
+        <location filename="../mythgame/gamehandler.cpp" line="235"/>
         <source>Yes to all</source>
         <translation>Sí a todo</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="606"/>
+        <location filename="../mythgame/gamehandler.cpp" line="382"/>
+        <source>Updating %1 (%2) ROM database</source>
+        <extracomment>%1 is the system name, %2 is the game type</extracomment>
+        <translation>Actualizando la base de datos de las ROM de %1 (%2)</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamehandler.cpp" line="514"/>
+        <source>Verifying %1 files...</source>
+        <extracomment>%1 is the system name</extracomment>
+        <translation>Verificando %1 archivos...</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamehandler.cpp" line="612"/>
         <source>This will clear all game metadata from the database. Are you sure you want to do this?</source>
         <translation>Esto eliminará de la base de datos todos los metadatos de los juegos. ¿Seguro que desea hacerlo?</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamehandler.cpp" line="717"/>
+        <location filename="../mythgame/gamehandler.cpp" line="745"/>
+        <source>Scanning for %1 games...</source>
+        <extracomment>%1 is the system name</extracomment>
+        <translation>Buscando juegos de %1...</translation>
     </message>
 </context>
 <context>
@@ -152,14 +230,14 @@ Remove it from the database?</source>
         <translation>- Publicado por</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="270"/>
+        <location filename="../mythgame/gameui.cpp" line="272"/>
         <source>Choose System for:
 %1</source>
+        <extracomment>%1 is the game name</extracomment>
         <translation>Elegir Sistema para:
 %1</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="287"/>
         <location filename="../mythgame/gameui.cpp" line="540"/>
         <source>Cancel</source>
         <translation>Cancelar</translation>
@@ -201,8 +279,9 @@ Remove it from the database?</source>
         <translation>Editar Detalles</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="922"/>
+        <location filename="../mythgame/gameui.cpp" line="924"/>
         <source>Fetching details for %1</source>
+        <extracomment>%1 is the game name</extracomment>
         <translation>Obteniendo detalles para %1</translation>
     </message>
     <message>
@@ -240,114 +319,11 @@ Remove it from the database?</source>
     </message>
 </context>
 <context>
-    <name>MythGamePlayerEditor</name>
-    <message>
-        <location filename="../mythgame/gamesettings.cpp" line="329"/>
-        <source>Game Player Menu</source>
-        <translation>Menú Jugador</translation>
-    </message>
-    <message>
-        <location filename="../mythgame/gamesettings.cpp" line="330"/>
-        <source>Edit...</source>
-        <translation>Editar...</translation>
-    </message>
-    <message>
-        <location filename="../mythgame/gamesettings.cpp" line="330"/>
-        <source>Delete...</source>
-        <translation>Eliminar...</translation>
-    </message>
-    <message>
-        <location filename="../mythgame/gamesettings.cpp" line="354"/>
-        <source>Are you sure you want to delete this item?</source>
-        <translation>¿Seguro de borrar este elemento?</translation>
-    </message>
-    <message>
-        <location filename="../mythgame/gamesettings.cpp" line="356"/>
-        <source>Yes, delete It</source>
-        <translation>Sí, bórralo</translation>
-    </message>
-    <message>
-        <location filename="../mythgame/gamesettings.cpp" line="357"/>
-        <source>No, don&apos;t</source>
-        <translation>No, no lo hagas</translation>
-    </message>
-    <message>
-        <location filename="../mythgame/gamesettings.cpp" line="289"/>
-        <source>Game Players</source>
-        <translation>Número jugadores</translation>
-    </message>
-</context>
-<context>
-    <name>MythGamePlayerSettings</name>
-    <message>
-        <location filename="../mythgame/gamesettings.cpp" line="250"/>
-        <source>Game Player Setup</source>
-        <translation>Configuración del Emulador</translation>
-    </message>
-    <message>
-        <location filename="../mythgame/gamesettings.cpp" line="269"/>
-        <source>%1 (%2)</source>
-        <comment>Game player/emulator display</comment>
-        <extracomment>%1 is the player/emulator name, %2 is the type of player/emulator</extracomment>
-        <translation>%1 (%2)</translation>
-    </message>
-</context>
-<context>
-    <name>QObject</name>
+    <name>MythGameGeneralSettings</name>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="42"/>
         <source>Game display order</source>
         <translation>Orden al mostrar los juegos</translation>
-    </message>
-    <message>
-        <location filename="../mythgame/gamesettings.cpp" line="53"/>
-        <source>Favorite display order</source>
-        <translation>Orden al mostrar los favoritos</translation>
-    </message>
-    <message>
-        <location filename="../mythgame/gamesettings.cpp" line="55"/>
-        <source>Order in which to sort the games marked as favorites - this is for all systems. Available choices: system, year, genre and gamename</source>
-        <translation>Orden en el que mostrar los juegos marcados como favoritos - esto es válido para todos los sistemas. Opciones posibles: sistema, año, género y nombre</translation>
-    </message>
-    <message>
-        <location filename="../mythgame/gamesettings.cpp" line="66"/>
-        <source>Enabling this causes a game scan to gather CRC values and attempt to find out more detailed information about the game: NOTE this can greatly increase the time a game scan takes based on the amount of games scanned.</source>
-        <translation>Activarlo hace que la búsqueda de juegos recopile los valores CRC e intente obtener información más detallada sobre el juego: NOTA, esto puede incrementar mucho el tiempo de exploración, dependiendo de la cantidad de juegos analizados.</translation>
-    </message>
-    <message>
-        <location filename="../mythgame/gamesettings.cpp" line="75"/>
-        <source>Prompt for removal of deleted ROM(s)</source>
-        <translation>Preguntar por la eliminación de ROM(s) borradas</translation>
-    </message>
-    <message>
-        <location filename="../mythgame/gamesettings.cpp" line="76"/>
-        <source>This enables a prompt for removing deleted ROMs from the database during a  game scan</source>
-        <translation>Esto hará que se solicite la eliminación de la base de datos de las ROMs borradas durante la búsqueda de juegos</translation>
-    </message>
-    <message>
-        <location filename="../mythgame/gamesettings.cpp" line="87"/>
-        <source>Enabling this causes the filenames to be displayed in the game tree rather than the trimmed/looked up game name</source>
-        <translation>Activarlo hace que los nombres de archivo se muestren en el árbol de juegos en vez del nombre recortado/buscado del juego</translation>
-    </message>
-    <message>
-        <location filename="../mythgame/gamesettings.cpp" line="133"/>
-        <source>MythGame Settings -- General</source>
-        <translation>Configuración de MythGame -- General</translation>
-    </message>
-    <message>
-        <location filename="../mythgame/gamehandler.cpp" line="153"/>
-        <location filename="../mythgame/gamehandler.cpp" line="154"/>
-        <location filename="../mythgame/gamehandler.cpp" line="155"/>
-        <location filename="../mythgame/gamehandler.cpp" line="156"/>
-        <location filename="../mythgame/gamehandler.cpp" line="157"/>
-        <location filename="../mythgame/gamehandler.cpp" line="410"/>
-        <location filename="../mythgame/gamehandler.cpp" line="411"/>
-        <location filename="../mythgame/gamehandler.cpp" line="414"/>
-        <location filename="../mythgame/gamehandler.cpp" line="415"/>
-        <location filename="../mythgame/gamehandler.cpp" line="416"/>
-        <location filename="../mythgame/gamehandler.cpp" line="422"/>
-        <source>Unknown</source>
-        <translation>Desconocido</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="44"/>
@@ -355,351 +331,410 @@ Remove it from the database?</source>
         <translation>Orden en el que mostrar los juegos - esto es válido para todos los sistemas. Opciones posibles: sistema, año, género y nombre</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamesettings.cpp" line="65"/>
+        <location filename="../mythgame/gamesettings.cpp" line="55"/>
+        <source>Favorite display order</source>
+        <translation>Orden al mostrar los favoritos</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamesettings.cpp" line="57"/>
+        <source>Order in which to sort the games marked as favorites - this is for all systems. Available choices: system, year, genre and gamename</source>
+        <translation>Orden en el que mostrar los juegos marcados como favoritos - esto es válido para todos los sistemas. Opciones posibles: sistema, año, género y nombre</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamesettings.cpp" line="68"/>
         <source>Indepth Game Scan</source>
         <translation>Búsqueda Intensiva de Juegos</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamesettings.cpp" line="86"/>
-        <source>Display Files Names in Game Tree</source>
-        <translation>Mostrar Nombres de Archivo en el Árbol de Juegos</translation>
+        <location filename="../mythgame/gamesettings.cpp" line="70"/>
+        <source>Enabling this causes a game scan to gather CRC values and attempt to find out more detailed information about the game: NOTE this can greatly increase the time a game scan takes based on the amount of games scanned.</source>
+        <translation>Activarlo hace que la búsqueda de juegos recopile los valores CRC e intente obtener información más detallada sobre el juego: NOTA, esto puede incrementar mucho el tiempo de exploración, dependiendo de la cantidad de juegos analizados.</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamesettings.cpp" line="178"/>
-        <source>This setting means that we will look for items like game.1.rom, game.2.rom and consider them a single game.</source>
-        <translation>Este ajuste significa que buscaremos elementos como game.1.rom, game.2.rom y los consideraremos un solo juego.</translation>
+        <location filename="../mythgame/gamesettings.cpp" line="82"/>
+        <source>Prompt for removal of deleted ROM(s)</source>
+        <translation>Confirmar la eliminación de ROM(s) borradas</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamesettings.cpp" line="188"/>
-        <source>Command</source>
-        <translation>Orden</translation>
-    </message>
-    <message>
-        <location filename="../mythgame/gamesettings.cpp" line="177"/>
-        <source>Allow games to span multiple ROMs/disks</source>
-        <translation>Permitir que los juegos abarquen múltiples ROMs/discos</translation>
-    </message>
-    <message>
-        <location filename="../mythgame/gamesettings.cpp" line="189"/>
-        <source>Binary and optional parameters. Multiple commands separated with &apos;;&apos; . Use %s for the ROM name. %d1, %d2, %d3 and %d4 represent disks in a multidisk/game. %s auto appended if not specified</source>
-        <translation>Parámetros binarios y opcionales. Las órdenes múltiples se separan con &apos;;&apos;. Utilice %s para el nombre de la ROM. %d1, %d2, %d3 y %d4 representan discos en un juego multidisco. %s se añadirá automáticamente si no se especifica</translation>
-    </message>
-    <message>
-        <location filename="../mythgame/gamesettings.cpp" line="199"/>
-        <source>Type</source>
-        <translation>Tipo</translation>
-    </message>
-    <message>
-        <location filename="../mythgame/gamesettings.cpp" line="207"/>
-        <source>Type of Game/Emulator. Mostly for informational purposes and has little effect on the function of your system.</source>
-        <translation>Tipo de Juego/Emulador. Principalmente a efectos informativos; no tiene apenas efecto en el funcionamiento de su sistema.</translation>
-    </message>
-    <message>
-        <location filename="../mythgame/gamesettings.cpp" line="217"/>
-        <source>ROM Path</source>
-        <translation>Ruta de las ROM</translation>
-    </message>
-    <message>
-        <location filename="../mythgame/gamesettings.cpp" line="218"/>
-        <source>Location of the ROM files for this emulator</source>
-        <translation>Emplazamiento de los archivos ROM para este emulador</translation>
-    </message>
-    <message>
-        <location filename="../mythgame/gamesettings.cpp" line="228"/>
-        <source>Working Directory</source>
-        <translation>Directorio de Trabajo</translation>
-    </message>
-    <message>
-        <location filename="../mythgame/gamesettings.cpp" line="229"/>
-        <source>Directory to change to before launching emulator. Blank is usually fine</source>
-        <translation>Directorio al que cambiar antes de lanzar el emulador. Suele dejarse vacío</translation>
-    </message>
-    <message>
-        <location filename="../mythgame/gamesettings.cpp" line="239"/>
-        <source>File Extensions</source>
-        <translation>Extensiones de Archivo</translation>
-    </message>
-    <message>
-        <location filename="../mythgame/gamesettings.cpp" line="240"/>
-        <source>A comma separated list of all file extensions for this emulator. Blank means any file under ROM PATH is considered to be used with this emulator</source>
-        <translation>Una lista separada por comas de todas las extensiones de archivo válidas para este emulador. Dejarla vacía significa que cualquier archivo que se encuentre en la RUTA DE LAS ROMS se considera válido para su uso con este emulador</translation>
-    </message>
-    <message>
-        <location filename="../mythgame/gamesettings.cpp" line="304"/>
-        <source>(New Game Player)</source>
-        <translation>(Nuevo Emulador)</translation>
-    </message>
-    <message>
-        <location filename="../mythgame/gamesettings.h" line="103"/>
-        <source>Player Name</source>
-        <translation>Nombre del Emulador</translation>
-    </message>
-    <message>
-        <location filename="../mythgame/gamesettings.h" line="104"/>
-        <source>Name of this Game and or Emulator</source>
-        <translation>Nombre de este Juego y/o Emulador</translation>
-    </message>
-    <message>
-        <location filename="../mythgame/gamehandler.cpp" line="152"/>
-        <location filename="../mythgame/gamehandler.cpp" line="413"/>
-        <source>19xx</source>
-        <translation>19xx</translation>
-    </message>
-    <message>
-        <location filename="../mythgame/gamehandler.cpp" line="158"/>
-        <location filename="../mythgame/gamehandler.cpp" line="417"/>
-        <source>0</source>
-        <translation>0</translation>
-    </message>
-    <message>
-        <location filename="../mythgame/gamehandler.cpp" line="508"/>
-        <source>Verifying %1 files...</source>
-        <translation>Verificando %1 archivos...</translation>
-    </message>
-    <message>
-        <location filename="../mythgame/gamehandler.cpp" line="711"/>
-        <location filename="../mythgame/gamehandler.cpp" line="739"/>
-        <source>Scanning for %1 games...</source>
-        <translation>Buscando %1 juegos...</translation>
-    </message>
-    <message>
-        <location filename="../mythgame/gamehandler.cpp" line="379"/>
-        <source>Updating %1(%2) ROM database</source>
-        <translation>Actualizando %1(%2) bases de datos de ROMs</translation>
+        <location filename="../mythgame/gamesettings.cpp" line="83"/>
+        <source>This enables a prompt for removing deleted ROMs from the database during a game scan</source>
+        <translation>Pedir confirmación al eliminar de la base de datos las ROM borradas durante la búsqueda de juegos</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="94"/>
+        <source>Display Files Names in Game Tree</source>
+        <translation>Mostrar nombres de archivo en el Árbol de Juegos</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamesettings.cpp" line="96"/>
+        <source>Enabling this causes the filenames to be displayed in the game tree rather than the trimmed/looked up game name</source>
+        <translation>Activarlo hace que los nombres de archivo se muestren en el árbol de juegos en vez del nombre abreviado/buscado del juego</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamesettings.cpp" line="106"/>
         <source>Hash filenames in display</source>
         <translation>Mostrar nombres de archivo simplificados</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamesettings.cpp" line="96"/>
+        <location filename="../mythgame/gamesettings.cpp" line="108"/>
         <source>Enable hashing of names in the display tree. This can make navigating long lists a little faster</source>
-        <translatorcomment>En este contexto, &apos;hashing&apos; podría traducirse como &apos;simplificación&apos;, ya que ésa es la intención de la función.</translatorcomment>
         <translation>Activar la simplificación de nombres en el árbol de visualización. Esto hará que navegar por listas grandes sea un poco más rápido</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamesettings.cpp" line="103"/>
+        <location filename="../mythgame/gamesettings.cpp" line="118"/>
         <source>Directory where Game Screenshots are stored</source>
-        <translation>Directorio donde guardar las Capturas de Imágenes de los Juegos</translation>
+        <translation>Directorio donde guardar las capturas de imágenes de los juegos</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamesettings.cpp" line="105"/>
+        <location filename="../mythgame/gamesettings.cpp" line="121"/>
         <source>This directory will be the default browse location when assigning screenshots.</source>
-        <translation>Este directorio será el lugar de exploración por defecto al asignar capturas de imágenes.</translation>
+        <translation>Este directorio será el lugar de exploración predeterminado al asignar capturas de imágenes.</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamesettings.cpp" line="113"/>
+        <location filename="../mythgame/gamesettings.cpp" line="130"/>
         <source>Directory where Game Fanart is stored</source>
-        <translatorcomment>Una breve aclaración para los que no conozcan el término</translatorcomment>
-        <translation>Directorio donde guardar el Fanart (Grafismos de Terceros) de los Juegos</translation>
+        <translation>Directorio donde guardar los grafismos de terceros de los Juegos</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamesettings.cpp" line="115"/>
+        <location filename="../mythgame/gamesettings.cpp" line="133"/>
         <source>This directory will be the default browse location when assigning fanart.</source>
-        <translation>Este directorio sera el lugar de exploración por defecto al asignar fanart (grafismos de terceros).</translation>
+        <translation>Este directorio sera el lugar de exploración predeterminado al asignar grafismos de terceros.</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamesettings.cpp" line="123"/>
+        <location filename="../mythgame/gamesettings.cpp" line="142"/>
         <source>Directory where Game Boxart is stored</source>
-        <translation>Directorio donde se guardan las Carátulas de los Juegos</translation>
+        <translation>Directorio donde guardar las carátulas de los juegos</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamesettings.cpp" line="125"/>
+        <location filename="../mythgame/gamesettings.cpp" line="145"/>
         <source>This directory will be the default browse location when assigning boxart.</source>
-        <translation>Este directorio será el lugar de exploración por defecto al asignar carátulas.</translation>
+        <translation>Este directorio será el lugar de exploración predeterminado al asignar carátulas.</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamesettings.cpp" line="154"/>
+        <source>MythGame Settings -- General</source>
+        <translation>Configuración de MythGame -- General</translation>
+    </message>
+</context>
+<context>
+    <name>MythGamePlayerEditor</name>
+    <message>
+        <location filename="../mythgame/gamesettings.cpp" line="347"/>
+        <source>(New Game Player)</source>
+        <translation>(Nuevo Emulador)</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamesettings.cpp" line="372"/>
+        <source>Game Player Menu</source>
+        <translation>Menú Jugador</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamesettings.cpp" line="373"/>
+        <source>Edit...</source>
+        <translation>Editar...</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamesettings.cpp" line="373"/>
+        <source>Delete...</source>
+        <translation>Eliminar...</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamesettings.cpp" line="397"/>
+        <source>Are you sure you want to delete this item?</source>
+        <translation>¿Seguro de borrar este elemento?</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamesettings.cpp" line="399"/>
+        <source>Yes, delete It</source>
+        <translation>Sí, bórralo</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamesettings.cpp" line="400"/>
+        <source>No, don&apos;t</source>
+        <translation>No, no lo hagas</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamesettings.cpp" line="332"/>
+        <source>Game Players</source>
+        <translation>Número jugadores</translation>
+    </message>
+</context>
+<context>
+    <name>MythGamePlayerSettings</name>
+    <message>
+        <location filename="../mythgame/gamesettings.cpp" line="198"/>
+        <source>Allow games to span multiple ROMs/disks</source>
+        <translation>Permitir que los juegos abarquen múltiples ROMs/discos</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamesettings.cpp" line="200"/>
+        <source>This setting means that we will look for items like game.1.rom, game.2.rom and consider them a single game.</source>
+        <translation>Este ajuste significa que buscaremos elementos como game.1.rom, game.2.rom y los consideraremos un solo juego.</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamesettings.cpp" line="213"/>
+        <source>Command</source>
+        <translation>Orden</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamesettings.cpp" line="215"/>
+        <source>Binary and optional parameters. Multiple commands separated with &apos;;&apos; . Use %s for the ROM name. %d1, %d2, %d3 and %d4 represent disks in a multidisk/game. %s auto appended if not specified</source>
+        <translation>Parámetros binarios y opcionales. Las órdenes múltiples se separan con &apos;;&apos;. Utilice %s para el nombre de la ROM. %d1, %d2, %d3 y %d4 representan discos en un juego multidisco. %s se añadirá automáticamente si no se especifica</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamesettings.cpp" line="231"/>
+        <source>Type</source>
+        <extracomment>Game type</extracomment>
+        <translation>Tipo</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamesettings.cpp" line="239"/>
+        <source>Type of Game/Emulator. Mostly for informational purposes and has little effect on the function of your system.</source>
+        <translation>Tipo de Juego/Emulador. Principalmente a efectos informativos; no tiene apenas efecto en el funcionamiento de su sistema.</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamesettings.cpp" line="252"/>
+        <source>ROM Path</source>
+        <translation>Ruta de las ROM</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamesettings.cpp" line="253"/>
+        <source>Location of the ROM files for this emulator</source>
+        <translation>Emplazamiento de los archivos ROM para este emulador</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamesettings.cpp" line="264"/>
+        <source>Working Directory</source>
+        <translation>Directorio de Trabajo</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamesettings.cpp" line="265"/>
+        <source>Directory to change to before launching emulator. Blank is usually fine</source>
+        <translation>Directorio al que cambiar antes de lanzar el emulador. Suele dejarse vacío</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamesettings.cpp" line="277"/>
+        <source>File Extensions</source>
+        <translation>Extensiones de Archivo</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamesettings.cpp" line="278"/>
+        <source>A comma separated list of all file extensions for this emulator. Blank means any file under ROM PATH is considered to be used with this emulator</source>
+        <translation>Una lista separada por comas de todas las extensiones de archivo válidas para este emulador. Dejarla vacía significa que cualquier archivo que se encuentre en la RUTA DE LAS ROMS se considera válido para su uso con este emulador</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamesettings.cpp" line="293"/>
+        <source>Game Player Setup</source>
+        <translation>Configuración del Emulador</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamesettings.cpp" line="312"/>
+        <source>%1 (%2)</source>
+        <comment>Game player/emulator display</comment>
+        <extracomment>%1 is the player/emulator name, %2 is the type of player/emulator</extracomment>
+        <translation>%1 (%2)</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamesettings.h" line="108"/>
+        <source>Player Name</source>
+        <translation>Nombre del Emulador</translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gamesettings.h" line="109"/>
+        <source>Name of this Game and or Emulator</source>
+        <translation>Nombre de este Juego y/o Emulador</translation>
     </message>
 </context>
 <context>
     <name>ThemeUI</name>
     <message>
-        <location filename="themestrings.h" line="7"/>
+        <location filename="themestrings.h" line="6"/>
         <source>System:</source>
         <translation>Sistema:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="8"/>
+        <location filename="themestrings.h" line="7"/>
         <source>Year:</source>
         <translation>Año:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="9"/>
+        <location filename="themestrings.h" line="8"/>
         <source>Genre:</source>
         <translation>Género:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="10"/>
+        <location filename="themestrings.h" line="9"/>
         <source>Favorite:</source>
         <translation>Favorito:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="12"/>
+        <location filename="themestrings.h" line="11"/>
         <source>No</source>
         <translation>No</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="11"/>
+        <location filename="themestrings.h" line="10"/>
         <source>Yes</source>
         <translation>Sí</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="42"/>
+        <location filename="themestrings.h" line="41"/>
         <source>Edit Game Information</source>
         <translation>Editar Información del Juego</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="43"/>
+        <location filename="themestrings.h" line="42"/>
         <source>Game Name:</source>
         <translation>Nombre del Juego:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="22"/>
+        <location filename="themestrings.h" line="21"/>
         <source>Country:</source>
         <translation>País:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="23"/>
+        <location filename="themestrings.h" line="22"/>
         <source>Publisher:</source>
         <translation>Publicado Por:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="24"/>
+        <location filename="themestrings.h" line="23"/>
         <source>Plot:</source>
         <translation>Trama:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="26"/>
+        <location filename="themestrings.h" line="25"/>
         <source>Screenshot:</source>
         <translation>Captura:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="27"/>
+        <location filename="themestrings.h" line="26"/>
         <source>Fanart:</source>
         <translation>Fanart:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="45"/>
+        <location filename="themestrings.h" line="44"/>
         <source>Boxart:</source>
         <translation>Carátula:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="34"/>
+        <location filename="themestrings.h" line="33"/>
         <source>/path/to/the/thing.jpg</source>
         <translation>/ruta/al/archivo.jpg</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="13"/>
+        <location filename="themestrings.h" line="12"/>
         <source>Emulator:</source>
         <translation>Emulador:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="16"/>
+        <location filename="themestrings.h" line="15"/>
         <source>Released %1</source>
         <translation>Publicado %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="17"/>
+        <location filename="themestrings.h" line="16"/>
         <source>%DATE%, %TIME%</source>
         <translation>%DATE%,%TIME%</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="18"/>
+        <location filename="themestrings.h" line="17"/>
         <source>Cancel</source>
         <translation>Cancelar</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="19"/>
+        <location filename="themestrings.h" line="18"/>
         <source>Edit Metadata</source>
         <translation>Editar Metadatos</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="20"/>
+        <location filename="themestrings.h" line="19"/>
         <source>Modify your game&apos;s metadata.</source>
         <translation>Modificar los metadatos de su juego.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="21"/>
+        <location filename="themestrings.h" line="20"/>
         <source>Title:</source>
         <translation>Título:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="25"/>
+        <location filename="themestrings.h" line="24"/>
         <source>Cover Art:</source>
         <translation>Carátula:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="28"/>
+        <location filename="themestrings.h" line="27"/>
         <source>Game is a Favorite</source>
         <translation>Este juego es Favorito</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="29"/>
+        <location filename="themestrings.h" line="28"/>
         <source>Click here to search existing coverart...</source>
         <translation>Pulsar aquí para buscar carátulas existentes...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="30"/>
+        <location filename="themestrings.h" line="29"/>
         <source>Click here to search existing screenshots...</source>
         <translation>Pulsar aquí para buscar capturas existentes...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="31"/>
+        <location filename="themestrings.h" line="30"/>
         <source>Click here to search existing fanart...</source>
         <translation>Pulsar aquí para buscar fanart existentes...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="14"/>
+        <location filename="themestrings.h" line="13"/>
         <source>Done</source>
         <translation>Hecho</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="6"/>
+        <location filename="themestrings.h" line="5"/>
         <source>Play Games</source>
         <translation>Juegos</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="32"/>
+        <location filename="themestrings.h" line="31"/>
         <source>ROM Name:</source>
         <translation>Nombre de la ROM:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="33"/>
+        <location filename="themestrings.h" line="32"/>
         <source>ROM Path:</source>
         <translation>Ruta de las ROM:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="36"/>
+        <location filename="themestrings.h" line="35"/>
         <source>Game:</source>
         <translation>Juego:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="37"/>
+        <location filename="themestrings.h" line="36"/>
         <source>Type:</source>
         <translation>Tipo:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="38"/>
+        <location filename="themestrings.h" line="37"/>
         <source>Filename:</source>
         <translation>Nombre de Archivo:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="39"/>
+        <location filename="themestrings.h" line="38"/>
         <source>ROM path:</source>
         <oldsource>Rompath:</oldsource>
         <translation>Ruta de las ROM:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="40"/>
+        <location filename="themestrings.h" line="39"/>
         <source>System(s):</source>
         <translation>Sistema(s):</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="41"/>
+        <location filename="themestrings.h" line="40"/>
         <source>CRC:</source>
         <translation>CRC:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="44"/>
+        <location filename="themestrings.h" line="43"/>
         <source>Description:</source>
         <translation>Descripción:</translation>
     </message>
@@ -719,17 +754,17 @@ Remove it from the database?</source>
         <translation>Vaciar su biblioteca de juegos</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="15"/>
+        <location filename="themestrings.h" line="14"/>
         <source>Play</source>
         <translation>Jugar</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="35"/>
+        <location filename="themestrings.h" line="34"/>
         <source>Game Information</source>
         <translation>Información del Juego</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="5"/>
+        <location filename="themestrings.h" line="45"/>
         <source>Games</source>
         <translation>Juegos</translation>
     </message>

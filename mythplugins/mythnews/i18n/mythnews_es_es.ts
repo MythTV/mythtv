@@ -48,6 +48,11 @@
         <translation>%1 de %2 (%3 por ciento)</translation>
     </message>
     <message>
+        <location filename="../mythnews/mythnews.cpp" line="703"/>
+        <source>Downloading media...</source>
+        <translation>Descargando medios...</translation>
+    </message>
+    <message>
         <location filename="../mythnews/mythnews.cpp" line="808"/>
         <source>No browser command set! MythNews needs MythBrowser to be installed.</source>
         <translation>¡No hay ningún navegador configurado! MythNews necesita que MythBrowser esté instalado.</translation>
@@ -154,14 +159,6 @@
         <location filename="../mythnews/newssite.cpp" line="227"/>
         <source>Retrieve Failed. </source>
         <translation>Fallo en la Descarga.</translation>
-    </message>
-</context>
-<context>
-    <name>QObject</name>
-    <message>
-        <location filename="../mythnews/mythnews.cpp" line="703"/>
-        <source>Downloading media...</source>
-        <translation>Descargando medios...</translation>
     </message>
 </context>
 <context>
@@ -279,14 +276,6 @@ Cuando haya terminado la edición, seleccione &quot;Aceptar&quot; o &quot;Cancel
         <location filename="themestrings.h" line="26"/>
         <source>Actions</source>
         <translation>Acciones</translation>
-    </message>
-    <message>
-        <source>MythNews Configuration</source>
-        <translation type="obsolete">Configuración de MythNews</translation>
-    </message>
-    <message>
-        <source>Minutes</source>
-        <translation type="obsolete">Minutos</translation>
     </message>
 </context>
 </TS>
