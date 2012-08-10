@@ -65,19 +65,23 @@ void IPTVRecorder::Close(void)
 
 void IPTVRecorder::StopRecording(void)
 {
+    LOG(VB_RECORD, LOG_DEBUG, LOC + "StopRecording() -- begin");
     QMutexLocker locker(&pauseLock);
     request_recording = false;
     if (_channel && _channel->GetFeeder())
         _channel->GetFeeder()->Stop();
     unpauseWait.wakeAll();
+    LOG(VB_RECORD, LOG_DEBUG, LOC + "StopRecording() -- end");
 }
 
 void IPTVRecorder::Pause(bool /*clear*/)
 {
+    LOG(VB_RECORD, LOG_DEBUG, LOC + "Pause() -- begin");
     QMutexLocker locker(&pauseLock);
     request_pause = true;
     if (_channel && _channel->GetFeeder())
         _channel->GetFeeder()->Stop();
+    LOG(VB_RECORD, LOG_DEBUG, LOC + "Pause() -- end");
 }
 
 void IPTVRecorder::run(void)
