@@ -68,6 +68,18 @@ class MythDownloadInfo
         m_outFile.detach();
     }
 
+    bool IsDone(void)
+    {
+        QMutexLocker lock(&m_lock);
+        return m_done;
+    }
+
+    void SetDone(bool done)
+    {
+        QMutexLocker lock(&m_lock);
+        m_done = done;
+    }
+
     QString          m_url;
     QUrl             m_redirectedTo;
     QNetworkRequest *m_request;
@@ -90,6 +102,7 @@ class MythDownloadInfo
     const QHash<QByteArray, QByteArray> *m_headers;
 
     QNetworkReply::NetworkError m_errorCode;
+    QMutex           m_lock;
 };
 
 
@@ -797,7 +810,7 @@ bool MythDownloadManager::downloadNow(MythDownloadInfo *dlInfo, bool deleteInfo)
     //    their last progress update
     QDateTime startedAt = MythDate::current();
     m_infoLock->lock();
-    while ((!dlInfo->m_done) &&
+    while ((!dlInfo->IsDone()) &&
            (dlInfo->m_errorCode == QNetworkReply::NoError) &&
            (((!dlInfo->m_url.startsWith("myth://")) &&
              (dlInfo->m_lastStat.secsTo(MythDate::current()) < 10)) ||
@@ -810,11 +823,11 @@ bool MythDownloadManager::downloadNow(MythDownloadInfo *dlInfo, bool deleteInfo)
         m_queueWaitLock.unlock();
         m_infoLock->lock();
     }
-
+    bool done = dlInfo->IsDone();
     bool success =
-        dlInfo->m_done && (dlInfo->m_errorCode == QNetworkReply::NoError);
+       done && (dlInfo->m_errorCode == QNetworkReply::NoError);
 
-    if (!dlInfo->m_done)
+    if (!done)
     {
         dlInfo->m_data = NULL;      // Prevent downloadFinished() from updating
         dlInfo->m_syncMode = false; // Let downloadFinished() cleanup for us
@@ -860,8 +873,10 @@ void MythDownloadManager::cancelDownload(const QString &url)
                 dlInfo->m_reply->abort();
             }
             lit.remove();
-            delete dlInfo;
-            dlInfo = NULL;
+            dlInfo->m_lock.lock();
+            dlInfo->m_errorCode = QNetworkReply::OperationCanceledError;
+            dlInfo->m_done = true;
+            dlInfo->m_lock.unlock();
         }
     }
 
@@ -876,8 +891,10 @@ void MythDownloadManager::cancelDownload(const QString &url)
             dlInfo->m_reply->abort();
         }
         m_downloadInfos.remove(url);
-        delete dlInfo;
-        dlInfo = NULL;
+        dlInfo->m_lock.lock();
+        dlInfo->m_errorCode = QNetworkReply::OperationCanceledError;
+        dlInfo->m_done = true;
+        dlInfo->m_lock.unlock();
     }
 }
 
@@ -1131,7 +1148,7 @@ void MythDownloadManager::downloadFinished(MythDownloadInfo *dlInfo)
         if (reply)
             m_downloadReplies.remove(reply);
 
-        dlInfo->m_done = true;
+        dlInfo->SetDone(true);
 
         if (!dlInfo->m_syncMode)
         {
