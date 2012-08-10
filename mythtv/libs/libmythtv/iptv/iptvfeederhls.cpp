@@ -83,6 +83,12 @@ void IPTVFeederHLS::Run(void)
     {
         if (m_hls == NULL)
             break;
+        if (_listeners.empty())
+        {
+            // No-one is listening, no point emptying the HLS buffer
+            usleep(50000);
+            continue;
+        }
         m_lock.lock();
         uint size = m_hls->Read((void *)m_buffer, BUFFER_SIZE);
         if (size < 0)
