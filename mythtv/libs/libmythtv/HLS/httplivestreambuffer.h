@@ -130,6 +130,7 @@ private:
     PlaylistWorker     *m_playlistworker;
     FILE               *m_fd;
     bool                m_interrupted;
+    bool                m_killed;
 };
 
 #endif
