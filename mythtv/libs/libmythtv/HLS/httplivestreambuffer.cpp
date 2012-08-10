@@ -746,6 +746,19 @@ public:
             m_targetduration : upd.m_targetduration;
         m_cache             = upd.m_cache;
     }
+    void Cancel(void)
+    {
+        QMutexLocker lock(&m_lock);
+        QList<HLSSegment*>::iterator it = m_segments.begin();
+        for (; it != m_segments.end(); ++it)
+        {
+            if (*it)
+            {
+                (*it)->CancelDownload();
+            }
+        }
+    }
+
 #ifdef USING_LIBCRYPTO
     /**
      * Will download all required segment AES-128 keys
@@ -810,19 +823,6 @@ public:
     void SetKeyPath(QString &x)
     {
         m_keypath = x;
-    }
-
-    void Cancel(void)
-    {
-        QMutexLocker lock(&m_lock);
-        QList<HLSSegment*>::iterator it = m_segments.begin();
-        for (; it != m_segments.end(); ++it)
-        {
-            if (*it)
-            {
-                (*it)->CancelDownload();
-            }
-        }
     }
 
 private:
