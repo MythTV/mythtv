@@ -155,7 +155,7 @@ bool MythMediaDevice::performMountCmd(bool DoMount)
                                            " find mounted media, but failed?");
                     return false;
                 }
-                m_Status = MEDIASTAT_MOUNTED;
+                setStatus(MEDIASTAT_MOUNTED); // emit statusChanged
                 onDeviceMounted();
                 LOG(VB_GENERAL, LOG_INFO,
                         QString("Detected MediaType ") + MediaTypeString());
@@ -460,6 +460,10 @@ MythMediaStatus MythMediaDevice::setStatus( MythMediaStatus NewStatus,
     // depending on the old and new status.
     if (NewStatus != OldStatus)
     {
+        LOG(VB_MEDIA, LOG_DEBUG,
+            QString("MythMediaDevice::setStatus %1 %2->%3")
+            .arg(getDevicePath()).arg(MediaStatusStrings[OldStatus])
+            .arg(MediaStatusStrings[NewStatus]));
         switch (NewStatus)
         {
             // the disk is not / should not be mounted.
