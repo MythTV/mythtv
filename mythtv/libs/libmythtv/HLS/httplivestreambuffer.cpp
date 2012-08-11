@@ -2164,11 +2164,20 @@ int HLSRingBuffer::ParseM3U8(const QByteArray *buffer, StreamsList *streams)
                     HLSStream *hls = ParseStreamInformation(line, uri);
                     if (hls)
                     {
-                        streams->append(hls);
                         /* Download playlist file from server */
                         QByteArray buf;
                         bool ret = downloadURL(hls->Url(), &buf);
-                        if (!ret || m_killed)
+                        if (!ret)
+                        {
+                            LOG(VB_GENERAL, LOG_INFO, LOC +
+                                QString("Skipping invalid stream, couldn't download: %1")
+                                .arg(hls->Url()));
+                            delete hls;
+                            continue;
+                        }
+                        streams->append(hls);
+                        // One last chance to abort early
+                        if (m_killed)
                         {
                             err = RET_ERROR;
                             break;
