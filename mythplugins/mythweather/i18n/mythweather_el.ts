@@ -1102,12 +1102,12 @@ When you have completed your changes, click &quot;Finish&quot; to continue.</sou
     <message>
         <location filename="themestrings.h" line="19"/>
         <source>Screen Setup</source>
-        <translation>Ρυθμισεις Οθονης</translation>
+        <translation>Ρυθμίσεις Οθόνης</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="20"/>
         <source>Source Setup</source>
-        <translation>Ρυθμισεις Πηγων Προγνωσης</translation>
+        <translation>Ρυθμίσεις Πηγών Πρόγνωσης</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="23"/>
@@ -1147,7 +1147,7 @@ When you have completed your changes, click &quot;Finish&quot; to continue.</sou
     <message>
         <location filename="themestrings.h" line="16"/>
         <source>Global Settings</source>
-        <translation>Γενικες Ρυθμισεις</translation>
+        <translation>Γενικές Ρυθμίσεις</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="26"/>
@@ -1203,7 +1203,7 @@ When you have completed your changes, click &quot;Finish&quot; to continue.</sou
     <message>
         <location filename="themestrings.h" line="60"/>
         <source>Screen Settings</source>
-        <translation>Ρυθμισεις Οθονης</translation>
+        <translation>Ρυθμίσεις Οθόνης</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="61"/>
@@ -1213,7 +1213,7 @@ When you have completed your changes, click &quot;Finish&quot; to continue.</sou
     <message>
         <location filename="themestrings.h" line="62"/>
         <source>Source Settings</source>
-        <translation>Ρυθμισεις Πηγης Προγνωσης</translation>
+        <translation>Ρυθμίσεις Πηγής Πρόγνωσης</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="63"/>

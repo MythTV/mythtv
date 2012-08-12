@@ -6594,17 +6594,17 @@ Delete the current cut or preserved region</extracomment>
     <message>
         <location filename="../libs/libmythtv/mythsystemevent.cpp" line="396"/>
         <source>mythfilldatabase ran</source>
-        <translation>έτρεξε το mythfilldatabase</translation>
+        <translation>Έτρεξε το mythfilldatabase</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mythsystemevent.cpp" line="397"/>
         <source>Scheduler ran</source>
-        <translation>έτρεξε ο χρονοπρογραμματιστής</translation>
+        <translation>Έτρεξε ο χρονοπρογραμματιστής</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mythsystemevent.cpp" line="398"/>
         <source>Settings cache cleared</source>
-        <translation>εκκαθάριση ρυθμίσεων από την προσωρινή μνήμη</translation>
+        <translation>Εκκαθάριση ρυθμίσεων από την προσωρινή μνήμη</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mythsystemevent.cpp" line="399"/>
@@ -15980,6 +15980,21 @@ Check if the video exists</source>
         <translation>Ολοκληρώθηκε</translation>
     </message>
     <message>
+        <location filename="../programs/mythtranscode/main.cpp" line="829"/>
+        <source>Job errored, unable to find Program Info for job</source>
+        <translation>Σφάλμα εργασίας, δε βρέθηκαν τα στοιχεία εκπομπής για την εργασία</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythtranscode/main.cpp" line="1059"/>
+        <source>Job Aborted</source>
+        <translation>Η Εργασία Ακυρώθηκε</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythtranscode/main.cpp" line="1064"/>
+        <source>Unrecoverable error</source>
+        <translation>Μή ανακτήσιμο σφάλμα</translation>
+    </message>
+    <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="15"/>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="81"/>
         <source>IP address</source>
@@ -20066,7 +20081,7 @@ Directory From Storage Group?</source>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="12338"/>
         <source>Live TV</source>
-        <translation>Ζωντανα Τηλεόραση</translation>
+        <translation>Ζωντανά Τηλεόραση</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="12340"/>
@@ -21275,7 +21290,7 @@ Directory From Storage Group?</source>
     <message>
         <location filename="../themes/themestrings.h" line="28"/>
         <source>Artwork and Data Sources</source>
-        <translation>Πηγες Εικονων και Πληροφοριων</translation>
+        <translation>Πηγές Εικόνων και Πληροφοριών</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="29"/>
@@ -24149,7 +24164,7 @@ If you select &quot;Use Default Player,&quot; the player command set for the ext
     <message>
         <location filename="../themes/themestrings.h" line="493"/>
         <source>TV</source>
-        <translation>Τηλεoραση</translation>
+        <translation>Τηλεόραση</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="494"/>
@@ -24794,7 +24809,7 @@ dd MMM yyyy</translation>
     <message>
         <location filename="../themes/themestrings.h" line="26"/>
         <source>System Event Handlers</source>
-        <translation>Διαχειριση Γεγονοτων Συστηματος</translation>
+        <translation>Διαχείριση Γεγονότων Συστήματος</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="27"/>

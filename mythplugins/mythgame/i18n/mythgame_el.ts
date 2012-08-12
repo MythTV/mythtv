@@ -775,7 +775,7 @@ Remove it from the database?</source>
     <message>
         <location filename="themestrings.h" line="50"/>
         <source>Game Players</source>
-        <translation>Συστηματα Παιχνιδιων</translation>
+        <translation>Συστήματα Παιχνιδιών</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="51"/>
@@ -785,7 +785,7 @@ Remove it from the database?</source>
     <message>
         <location filename="themestrings.h" line="52"/>
         <source>Scan for Games</source>
-        <translation>Ανιχνευση για Παιχνιδια</translation>
+        <translation>Ανίχνευση για Παιχνίδια</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="53"/>
@@ -795,7 +795,7 @@ Remove it from the database?</source>
     <message>
         <location filename="themestrings.h" line="54"/>
         <source>Clear Game Data</source>
-        <translation>Εκκαθαριση Συλλογης</translation>
+        <translation>Εκκαθάριση Συλλογής</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="55"/>
