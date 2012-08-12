@@ -178,8 +178,6 @@ bool ScheduleEditor::Create()
         connect(m_cancelButton, SIGNAL(Clicked()), SLOT(Close()));
     connect(m_saveButton, SIGNAL(Clicked()), SLOT(Save()));
 
-    if (m_metadataButton)
-        m_metadataButton->SetEnabled(!m_recordingRule->m_isTemplate);
     if (m_schedInfoButton)
         m_schedInfoButton->SetEnabled(!m_recordingRule->m_isTemplate);
     if (m_previewButton)
@@ -357,6 +355,9 @@ void ScheduleEditor::RuleChanged(MythUIButtonListItem *item)
         m_storeOptButton->SetEnabled(isScheduled);
     if (m_postProcButton)
         m_postProcButton->SetEnabled(isScheduled);
+    if (m_metadataButton)
+        m_metadataButton->SetEnabled(isScheduled &&
+                                     !m_recordingRule->m_isTemplate);
 
     SchedOptMixin::RuleChanged();
     StoreOptMixin::RuleChanged();
