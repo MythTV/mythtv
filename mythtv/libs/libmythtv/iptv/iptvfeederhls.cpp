@@ -6,6 +6,8 @@
 //  Copyright (c) 2012 Bubblestuff Pty Ltd. All rights reserved.
 //
 
+#include <unistd.h>
+
 #include "iptvfeederhls.h"
 
 // MythTV headers
