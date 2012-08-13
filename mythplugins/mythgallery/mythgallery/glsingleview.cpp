@@ -222,7 +222,10 @@ void GLSingleView::paintGL(void)
         ThumbItem *item = m_itemList.at(m_pos);
 
         if (item)
+        {
             GalleryUtil::PlayVideo(item->GetPath());
+            makeCurrent();
+        }
 
         if (!m_slideshow_running && item)
         {
