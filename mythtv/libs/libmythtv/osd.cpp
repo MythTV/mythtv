@@ -609,7 +609,7 @@ bool OSD::DrawDirect(MythPainter* painter, QSize size, bool repaint)
     bool visible = false;
     bool redraw  = m_Refresh;
     m_Refresh    = false;
-    QDateTime now = MythDate::current();
+    QTime now = MythDate::current().time();
 
     CheckExpiry();
     QMap<QString,MythScreenType*>::const_iterator it;
@@ -621,7 +621,7 @@ bool OSD::DrawDirect(MythPainter* painter, QSize size, bool repaint)
             it.value()->Pulse();
             if (m_Effects && m_ExpireTimes.contains(it.value()))
             {
-                QDateTime expires = m_ExpireTimes.value(it.value());
+                QTime expires = m_ExpireTimes.value(it.value()).time();
                 int left = now.msecsTo(expires);
                 if (left < m_FadeTime)
                     (*it)->SetAlpha((255 * left) / m_FadeTime);
@@ -664,7 +664,7 @@ QRegion OSD::Draw(MythPainter* painter, QPaintDevice *device, QSize size,
     if (!painter || !device)
         return visible;
 
-    QDateTime now = MythDate::current();
+    QTime now = MythDate::current().time();
     CheckExpiry();
 
     // first update for alpha pulse and fade
@@ -682,7 +682,7 @@ QRegion OSD::Draw(MythPainter* painter, QPaintDevice *device, QSize size,
             it.value()->Pulse();
             if (m_Effects && m_ExpireTimes.contains(it.value()))
             {
-                QDateTime expires = m_ExpireTimes.value(it.value());
+                QTime expires = m_ExpireTimes.value(it.value()).time();
                 int left = now.msecsTo(expires);
                 if (left < m_FadeTime)
                     (*it)->SetAlpha((255 * left) / m_FadeTime);
