@@ -605,10 +605,19 @@ AVStream* AVFormatWriter::AddAudioStream(void)
     c->codec_id = m_ctx->oformat->audio_codec;
     c->codec_type = AVMEDIA_TYPE_AUDIO;
 
-    if (c->codec_id == CODEC_ID_MP3)
-        c->sample_fmt = AV_SAMPLE_FMT_S16;
+    if (!gCoreContext->GetSetting("HLSAUDIO").isEmpty())
+    {
+        if (gCoreContext->GetSetting("HLSAUDIO") == "aac")
+            c->sample_fmt = AV_SAMPLE_FMT_FLT;
+        else
+            c->sample_fmt = AV_SAMPLE_FMT_S16;
+    }
     else
+#if CONFIG_LIBMP3LAME_ENCODER || CONFIG_LIBFAAC_ENCODER
+        c->sample_fmt = AV_SAMPLE_FMT_S16;
+#else
         c->sample_fmt = AV_SAMPLE_FMT_FLT;
+#endif
 
     m_audioBytesPerSample = m_audioChannels *
         av_get_bytes_per_sample(c->sample_fmt);
