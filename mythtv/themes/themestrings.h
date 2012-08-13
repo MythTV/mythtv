@@ -932,6 +932,8 @@ void strings_null() {
     ThemeUI::tr("Designed to show off some different element arrangements available in Myth 0.25.  Reminder: On Watch Recordings screen [Rew] and [FF] can be used to change the Rec. Group.");
     ThemeUI::tr("Animation, transparency and fanart for mythtv 0.25");
     ThemeUI::tr("LCARS");
+    ThemeUI::tr("Inspired by MediaStream: The theme has been made to look like the original XBMC skin were posible. Looks best with the matching menu structure in the MythMediaStreamMenu folder as this theme its menu lay-out is tailored for this particular menu.");
+    ThemeUI::tr("Readability is a theme for MythTV 0.25 and above that focusses on showing UI elements in a way that is easily readable on a TV when viewed from a distance. It is based on the Mythbuntu theme, but also borrows from a number of XBMC theme (Aeon and Confluence) for inspiration.");
     ThemeUI::tr(" Retro Originally by Gerhard Aldorf MythUI version based on MythCenter by Jeroen Brosens Conversion of Retro to MythUI by Chris Candreva A generally blue theme. Icon style is realistic based on clasic, 'Retro' styles. ");
     ThemeUI::tr("TintedGlass is a transparent theme that is a little old school MythTV yet takes advantage of new MythUI features.");
     ThemeUI::tr("a nice transparent theme to use your own background if you want. just copy your favorite picture (be sure that its resolution is 1920x1200) to /usr/share/mythtv/themes/TransBlue/background.jpg");
