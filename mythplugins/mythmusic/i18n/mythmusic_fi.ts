@@ -183,6 +183,55 @@
     </message>
 </context>
 <context>
+    <name>DecoderHandler</name>
+    <message>
+        <source>Retrieving playlist</source>
+        <translation>Haetaan soittolistaa</translation>
+    </message>
+</context>
+<context>
+    <name>DecoderIOFactoryShoutCast</name>
+    <message>
+        <source>Connecting</source>
+        <translation>Yhdistetään</translation>
+    </message>
+    <message>
+        <source>Finding radio stream</source>
+        <translation>Etsitään radion suoratoistolähdettä</translation>
+    </message>
+    <message>
+        <source>Cannot find radio.
+Check the URL is correct.</source>
+        <translation>Radio ei löydy.
+Tarkista että URL on oikein.</translation>
+    </message>
+    <message>
+        <source>Connecting to radio stream</source>
+        <translation>Yhdistetään radion suoratoistolähteeseen</translation>
+    </message>
+    <message>
+        <source>Cannot connect to radio.
+Check the URL is correct.</source>
+        <translation>Radioon ei voida kytkeytyä.
+Tarkista että URL on oikein.</translation>
+    </message>
+    <message>
+        <source>Connected to radio stream</source>
+        <translation>Radion suoratoisto kytketty</translation>
+    </message>
+    <message>
+        <source>Buffering</source>
+        <translation>Puskuroi</translation>
+    </message>
+</context>
+<context>
+    <name>DecoderIOFactoryUrl</name>
+    <message>
+        <source>Fetching remote file</source>
+        <translation>Hakee etätiedostoa</translation>
+    </message>
+</context>
+<context>
     <name>EditAlbumartDialog</name>
     <message>
         <source>Change Image Type</source>
@@ -585,19 +634,19 @@ GENRE, ARTIST, ALBUM, TRACK, TITLE, YEAR</translation>
     <name>MusicCommon</name>
     <message>
         <source>Speed: </source>
-        <translation>Nopeus: </translation>
+        <translation type="obsolete">Nopeus: </translation>
     </message>
     <message>
         <source>Playing stream.</source>
-        <translation>Soittaa musiikkivirtaa.</translation>
+        <translation>Soittaa musiikkia suoratoistona.</translation>
     </message>
     <message>
         <source>Buffering stream.</source>
-        <translation>Puskuroi musiikkivirtaa.</translation>
+        <translation>Puskuroi musiikin suoratoistoa.</translation>
     </message>
     <message>
         <source>Stream paused.</source>
-        <translation>Musiikkivirta tauotettu.</translation>
+        <translation>Musiikin suoratoisto tauotettu.</translation>
     </message>
     <message>
         <source>kbps</source>
@@ -617,7 +666,11 @@ GENRE, ARTIST, ALBUM, TRACK, TITLE, YEAR</translation>
     </message>
     <message>
         <source>Stream stopped.</source>
-        <translation>Musiikkivirta lopetettu.</translation>
+        <translation>Suoratoisto lopetettu.</translation>
+    </message>
+    <message>
+        <source>Decoder Handler error.</source>
+        <translation>Virhe purkajassa.</translation>
     </message>
     <message>
         <source>Save To New Playlist</source>
@@ -678,6 +731,10 @@ GENRE, ARTIST, ALBUM, TRACK, TITLE, YEAR</translation>
     <message>
         <source>From CD</source>
         <translation>CD:ltä</translation>
+    </message>
+    <message>
+        <source>Play Radio Stream</source>
+        <translation>Soita radiota suoratoistona</translation>
     </message>
     <message>
         <source>More Options</source>
@@ -925,6 +982,11 @@ Jatketaanko musiikin toistoa taustalla?</translation>
         <translation type="obsolete">soittolistan juuri</translation>
     </message>
     <message>
+        <source>%1% (Muted)</source>
+        <comment>Zero Audio Volume</comment>
+        <translation>%1% (Mykistetty)</translation>
+    </message>
+    <message>
         <source>Muted</source>
         <translation>Mykistetty</translation>
     </message>
@@ -938,6 +1000,10 @@ Jatketaanko musiikin toistoa taustalla?</translation>
     <message>
         <source>Select music playlists</source>
         <translation>Valitse musiikin soittolistat</translation>
+    </message>
+    <message>
+        <source>Play radio stream</source>
+        <translation>Soita radio suoratoistona</translation>
     </message>
     <message>
         <source>Rip CD</source>
@@ -1017,15 +1083,15 @@ Jatketaanko musiikin toistoa taustalla?</translation>
     </message>
     <message>
         <source>Filter All My Music</source>
-        <translation>Suodata kaikki musiikkini</translation>
+        <translation type="obsolete">Suodata kaikki musiikkini</translation>
     </message>
     <message>
         <source>Show incremental search dialog</source>
-        <translation>Näytä inkrementaalisen haun ikkuna</translation>
+        <translation type="obsolete">Näytä inkrementaalisen haun ikkuna</translation>
     </message>
     <message>
         <source>Incremental search find next match</source>
-        <translation>Inkrementaalisen haun seuraava osuma</translation>
+        <translation type="obsolete">Inkrementaalisen haun seuraava osuma</translation>
     </message>
     <message>
         <source>Increase Play Speed</source>
@@ -1038,6 +1104,38 @@ Jatketaanko musiikin toistoa taustalla?</translation>
     <message>
         <source>Toggle track selection</source>
         <translation>Vaihtele kappaleen valintaa</translation>
+    </message>
+    <message>
+        <source>Toggle shuffle mode</source>
+        <translation>Sekoitustila päälle/pois</translation>
+    </message>
+    <message>
+        <source>Toggle repeat mode</source>
+        <translation>Toistotila päälle/pois</translation>
+    </message>
+    <message>
+        <source>Switch to the current playlist view</source>
+        <translation>Vaihda tämänhetkisen soittolistan näkymään</translation>
+    </message>
+    <message>
+        <source>Switch to the playlist editor tree view</source>
+        <translation>Vaihda soittolistan muokkauksen puunäkymään</translation>
+    </message>
+    <message>
+        <source>Switch to the playlist editor gallery view</source>
+        <translation>Vaihda soittolistan muokkauksen gallerianäkymään</translation>
+    </message>
+    <message>
+        <source>Switch to the search view</source>
+        <translation>Vaihda hakunäkymään</translation>
+    </message>
+    <message>
+        <source>Switch to the fullscreen visualiser view</source>
+        <translation>Vaihda kokoruudun visualisoijanäkymään</translation>
+    </message>
+    <message>
+        <source>Switch to the radio stream view</source>
+        <translation>Vaihda radion suoratoistonäkymään</translation>
     </message>
     <message>
         <source>MythMusic Media Handler 1/2</source>
@@ -1400,6 +1498,18 @@ Jatketaanko musiikin toistoa taustalla?</translation>
     <message>
         <source>** Empty Playlist!! **</source>
         <translation>** Tyhjä soittolista!! **</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to delete this Smart Playlist?
+Category: %1 - Name: %2</source>
+        <translation>Haluatko varmasti poistaa tämän älykkään listan?
+Kategoria: %1 - Nimi: %2</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to delete this Playlist?
+Name: %1</source>
+        <translation>Haluatko varmasti poistaa tämän soittolistan?
+Nimi: %1</translation>
     </message>
 </context>
 <context>
@@ -2120,13 +2230,13 @@ Jatketaanko musiikin toistoa taustalla?</translation>
     <message>
         <source>Cannot find radio.
 Check the URL is correct.</source>
-        <translation>Radio ei löydy.
+        <translation type="obsolete">Radio ei löydy.
 Tarkista että URL on oikein.</translation>
     </message>
     <message>
         <source>Cannot connect to radio.
 Check the URL is correct.</source>
-        <translation>Radioon ei voida kytkeytyä.
+        <translation type="obsolete">Radioon ei voida kytkeytyä.
 Tarkista että URL on oikein.</translation>
     </message>
     <message>
@@ -2139,7 +2249,7 @@ Tarkista että URL on oikein.</translation>
     </message>
     <message>
         <source>Can&apos;t find your music directory. Have you set it correctly on the &apos;General Settings&apos; page of MythMusic&apos;s settings pages?</source>
-        <translation>Musiikkihakemistoasi ei löydy. Oletko asettanut sen oikein &apos;Yleiset asetukset&apos; sivulla MythMusic :in asetuksissa.</translation>
+        <translation>Musiikkihakemistoasi ei löydy. Oletko asettanut sen oikein &apos;Yleiset asetukset&apos; sivulla MythMusic :in asetuksissa?</translation>
     </message>
 </context>
 <context>
@@ -2282,6 +2392,17 @@ Haluatko lopullisesti poistaa tiedosto(n/t)?</translation>
     <message>
         <source>Search Music Database (%1 matches)</source>
         <translation type="obsolete">Etsi musiikkitietokantaa (%1 vastaavuutta)</translation>
+    </message>
+</context>
+<context>
+    <name>SearchStream</name>
+    <message>
+        <source>&lt;All Stations&gt;</source>
+        <translation>&lt;Kaikki kanavat&gt;</translation>
+    </message>
+    <message>
+        <source>&lt;All Genres&gt;</source>
+        <translation>&lt;Kaikki lajit&gt;</translation>
     </message>
 </context>
 <context>
@@ -2662,6 +2783,35 @@ Haluatko lopullisesti poistaa tiedosto(n/t)?</translation>
     </message>
 </context>
 <context>
+    <name>StreamView</name>
+    <message>
+        <source>Stream Actions</source>
+        <translation>Suoratoiston toiminnot</translation>
+    </message>
+    <message>
+        <source>Add Stream</source>
+        <translation>Lisää suoratoisto</translation>
+    </message>
+    <message>
+        <source>Edit Stream</source>
+        <translation>Muokkaa suoratoistoa</translation>
+    </message>
+    <message>
+        <source>Remove Stream</source>
+        <translation>Poista suoratoisto</translation>
+    </message>
+    <message>
+        <source>More Options</source>
+        <translation>Lisää valintoja</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to delete this Stream?
+Station: %1 - Channel: %2</source>
+        <translation>Haluatko varmasti poistaa tämän suoratoistolähteen?
+Asema: %1 - Kanava: %2</translation>
+    </message>
+</context>
+<context>
     <name>ThemeUI</name>
     <message>
         <source>Please Wait...</source>
@@ -2874,6 +3024,58 @@ Haluatko lopullisesti poistaa tiedosto(n/t)?</translation>
     <message>
         <source>Ripper Settings</source>
         <translation>Tuontiasetukset</translation>
+    </message>
+    <message>
+        <source>Listen to Music</source>
+        <translation>Kuuntele musiikkia</translation>
+    </message>
+    <message>
+        <source>Press MENU to add some radio streams to play.</source>
+        <translation>Paina MENU lisätäksesi suoratoistoradioita kuunneltavaksi.</translation>
+    </message>
+    <message>
+        <source>%STATION% - %CHANNEL%</source>
+        <translation>%STATION% - %CHANNEL%</translation>
+    </message>
+    <message>
+        <source>Add/Edit Music Stream</source>
+        <translation>Lisää/Muokkaa suoratoistomusiikkia</translation>
+    </message>
+    <message>
+        <source>Station:</source>
+        <translation>Kanava:</translation>
+    </message>
+    <message>
+        <source>Search for Stream</source>
+        <translation>Etsi virtaa</translation>
+    </message>
+    <message>
+        <source>Channel:</source>
+        <translation>Kanava:</translation>
+    </message>
+    <message>
+        <source>URL:</source>
+        <translation>URL:</translation>
+    </message>
+    <message>
+        <source>Logo URL:</source>
+        <translation>Logon URL:</translation>
+    </message>
+    <message>
+        <source>Genres:</source>
+        <translation>Lajit:</translation>
+    </message>
+    <message>
+        <source>Metadata Format:</source>
+        <translation>Metatiedon formaatti:</translation>
+    </message>
+    <message>
+        <source>Search for Music Stream</source>
+        <translation>Etsi suoratoistomusiikkia</translation>
+    </message>
+    <message>
+        <source>%STATION% - %Channel%</source>
+        <translation>%STATION% - %Channel%</translation>
     </message>
     <message>
         <source>Play Music</source>
@@ -3158,6 +3360,42 @@ Haluatko lopullisesti poistaa tiedosto(n/t)?</translation>
     <message>
         <source>Click here to search existing genres...</source>
         <translation>Paina tästä etsiäksesi olemassa olevia lajeja...</translation>
+    </message>
+    <message>
+        <source>Track Title:</source>
+        <translation>Kappaleen nimi:</translation>
+    </message>
+    <message>
+        <source>Track Artist:</source>
+        <translation>Kappaleen artisti:</translation>
+    </message>
+    <message>
+        <source>Track:</source>
+        <translation>Kappale:</translation>
+    </message>
+    <message>
+        <source>Click Here to Select Artist</source>
+        <translation>Paina tästä valitaksesi artistin</translation>
+    </message>
+    <message>
+        <source>Click Here to Select Compilation</source>
+        <translation>Paina tästä valitaksesi kokoelman</translation>
+    </message>
+    <message>
+        <source>Click Here to Select Album</source>
+        <translation>Paina tästä valitaksesi albumin</translation>
+    </message>
+    <message>
+        <source>Click Here to Select Genre</source>
+        <translation>Paina tästä valitaksesi lajityypin</translation>
+    </message>
+    <message>
+        <source>-</source>
+        <translation>-</translation>
+    </message>
+    <message>
+        <source>+</source>
+        <translation>+</translation>
     </message>
     <message>
         <source>Scan</source>
@@ -3506,6 +3744,10 @@ Haluatko lopullisesti poistaa tiedosto(n/t)?</translation>
     <message>
         <source>Music visualization options</source>
         <translation>Musiikin visualisointiasetukset</translation>
+    </message>
+    <message>
+        <source>Play Radio Streams</source>
+        <translation>Soita suoratoistoradioita</translation>
     </message>
     <message>
         <source>Scan for New Music</source>

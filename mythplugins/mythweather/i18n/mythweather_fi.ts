@@ -2,6 +2,37 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="fi_FI">
 <context>
+    <name>(Weather Screens)</name>
+    <message>
+        <source>Current Conditions</source>
+        <translation>Nykyinen säätila</translation>
+    </message>
+    <message>
+        <source>Three Day Forecast</source>
+        <translation>Kolmen päivän ennuste</translation>
+    </message>
+    <message>
+        <source>18 Hour Forecast</source>
+        <translation>18 tunnin ennuste</translation>
+    </message>
+    <message>
+        <source>Severe Weather Alerts</source>
+        <translation>Vakavat säävaroitukset</translation>
+    </message>
+    <message>
+        <source>Six Day Forecast</source>
+        <translation>Kuuden päivän ennuste</translation>
+    </message>
+    <message>
+        <source>Static Map</source>
+        <translation>Staattinen kartta</translation>
+    </message>
+    <message>
+        <source>Animated Map</source>
+        <translation>Animoitu kartta</translation>
+    </message>
+</context>
+<context>
     <name>GlobalSetup</name>
     <message>
         <source>Finish</source>
@@ -58,31 +89,31 @@
     <name>QObject</name>
     <message>
         <source>Current Conditions</source>
-        <translation>Nykyinen säätila</translation>
+        <translation type="obsolete">Nykyinen säätila</translation>
     </message>
     <message>
         <source>Three Day Forecast</source>
-        <translation>Kolmen päivän ennuste</translation>
+        <translation type="obsolete">Kolmen päivän ennuste</translation>
     </message>
     <message>
         <source>18 Hour Forecast</source>
-        <translation>18 tunnin ennuste</translation>
+        <translation type="obsolete">18 tunnin ennuste</translation>
     </message>
     <message>
         <source>Severe Weather Alerts</source>
-        <translation>Vakavat säävaroitukset</translation>
+        <translation type="obsolete">Vakavat säävaroitukset</translation>
     </message>
     <message>
         <source>Six Day Forecast</source>
-        <translation>Kuuden päivän ennuste</translation>
+        <translation type="obsolete">Kuuden päivän ennuste</translation>
     </message>
     <message>
         <source>Static Map</source>
-        <translation>Staattinen kartta</translation>
+        <translation type="obsolete">Staattinen kartta</translation>
     </message>
     <message>
         <source>Animated Map</source>
-        <translation>Animoitu kartta</translation>
+        <translation type="obsolete">Animoitu kartta</translation>
     </message>
 </context>
 <context>

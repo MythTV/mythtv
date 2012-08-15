@@ -517,47 +517,47 @@ Tarkista että hakemisto on olemassa, on luettavissa ja asetus on oikein MythGal
     </message>
     <message>
         <source>Folder: </source>
-        <translation>Kansio: </translation>
+        <translation type="obsolete">Kansio: </translation>
     </message>
     <message>
         <source>Created: </source>
-        <translation>Luotu: </translation>
+        <translation type="obsolete">Luotu: </translation>
     </message>
     <message>
         <source>Modified: </source>
-        <translation>Muokattu: </translation>
+        <translation type="obsolete">Muokattu: </translation>
     </message>
     <message>
         <source>Bytes</source>
-        <translation>Tavua</translation>
+        <translation type="obsolete">Tavua</translation>
     </message>
     <message>
         <source>Width</source>
-        <translation>Leveys</translation>
+        <translation type="obsolete">Leveys</translation>
     </message>
     <message>
         <source>pixels</source>
-        <translation>pikseliä</translation>
+        <translation type="obsolete">pikseliä</translation>
     </message>
     <message>
         <source>Height</source>
-        <translation>Korkeus</translation>
+        <translation type="obsolete">Korkeus</translation>
     </message>
     <message>
         <source>Pixel Count</source>
-        <translation>Pikseleiden määrä</translation>
+        <translation type="obsolete">Pikseleiden määrä</translation>
     </message>
     <message>
         <source>megapixels</source>
-        <translation>megapikseliä</translation>
+        <translation type="obsolete">megapikseliä</translation>
     </message>
     <message>
         <source>Rotation Angle</source>
-        <translation>Käännöskulma</translation>
+        <translation type="obsolete">Käännöskulma</translation>
     </message>
     <message>
         <source>degrees</source>
-        <translation>astetta</translation>
+        <translation type="obsolete">astetta</translation>
     </message>
     <message>
         <source>All</source>
@@ -689,6 +689,55 @@ Tarkista että hakemisto on olemassa, on luettavissa ja asetus on oikein MythGal
     <message>
         <source>Sort by :</source>
         <translation>Järjestysperuste:</translation>
+    </message>
+</context>
+<context>
+    <name>ThumbItem</name>
+    <message>
+        <source>Folder: %1</source>
+        <translation>Kansio: %1</translation>
+    </message>
+    <message>
+        <source>Created: %1</source>
+        <extracomment>%1 is the creation date</extracomment>
+        <translation>Luotu: %1 </translation>
+    </message>
+    <message>
+        <source>Modified: %1</source>
+        <extracomment>%1 is the modification date</extracomment>
+        <translation>Muokattu: %1</translation>
+    </message>
+    <message numerus="yes">
+        <source>Size: %n bytes</source>
+        <translation>
+            <numerusform>Koko: %n tavu</numerusform>
+            <numerusform>Koko: %n tavua</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Width: %n pixel(s)</source>
+        <translation>
+            <numerusform>Leveys: %n pikseli</numerusform>
+            <numerusform>Leveys: %n pikseliä</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Height: %n pixel(s)</source>
+        <translation>
+            <numerusform>Korkeus: %n pikseli</numerusform>
+            <numerusform>Korkeus: %n pikseliä</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Pixel Count: %1 megapixels</source>
+        <translation>Pikseleiden määrä: %1 megapikseliä</translation>
+    </message>
+    <message numerus="yes">
+        <source>Rotation Angle: %n degree(s)</source>
+        <translation>
+            <numerusform>Käännöskulma: %n aste</numerusform>
+            <numerusform>Käännöskulma: %n astetta</numerusform>
+        </translation>
     </message>
 </context>
 </TS>

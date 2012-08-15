@@ -31,6 +31,10 @@
         <translation>Tuntematon</translation>
     </message>
     <message>
+        <source>Downloading media...</source>
+        <translation>Ladataan uutisia...</translation>
+    </message>
+    <message>
         <source>Manage Feeds</source>
         <translation>Hallitse syötteitä</translation>
     </message>
@@ -145,7 +149,7 @@
     <name>QObject</name>
     <message>
         <source>Downloading media...</source>
-        <translation>Ladataan uutisia...</translation>
+        <translation type="obsolete">Ladataan uutisia...</translation>
     </message>
 </context>
 <context>

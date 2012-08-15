@@ -20,7 +20,7 @@
     </message>
     <message>
         <source>Stream Video</source>
-        <translation>Striimaa video</translation>
+        <translation>Suoratoista video</translation>
     </message>
     <message>
         <source>Open Web Link</source>
@@ -99,7 +99,7 @@
     </message>
     <message>
         <source>Stream Video</source>
-        <translation>Striimaa video</translation>
+        <translation>Suoratoista video</translation>
     </message>
     <message>
         <source>Open Web Link</source>
