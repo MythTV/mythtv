@@ -213,6 +213,41 @@ Når du er ferdig å redigere, velg &quot;OK&quot; eller &quot;Avbryt&quot; for 
         <translation>Kanal:</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="27"/>
+        <source>NEWS</source>
+        <translation>NYHETER</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="28"/>
+        <source>Choose which news channels interest you</source>
+        <translation>Velg hvilke nyhetskanaler som interesserer deg</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="29"/>
+        <source>Name site:</source>
+        <translation>Navn for nettsted:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="30"/>
+        <source>Site icon:</source>
+        <translation>Ikon for nettsted:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="31"/>
+        <source>URL site:</source>
+        <translation>URL for nettsted:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="32"/>
+        <source>Save</source>
+        <translation>Lagre</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="33"/>
+        <source>News settings</source>
+        <translation>Innstillinger for nyhetssted</translation>
+    </message>
+    <message>
         <location filename="themestrings.h" line="7"/>
         <source>OK</source>
         <translation>OK</translation>

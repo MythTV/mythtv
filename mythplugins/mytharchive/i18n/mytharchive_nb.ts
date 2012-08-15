@@ -944,12 +944,212 @@ Vennligst vent...</translation>
         <translation>0:00:00.00</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="95"/>
+        <source>Write video to data dvd or file</source>
+        <translation>Skriv video til data-dvd eller fil</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="96"/>
+        <source>File</source>
+        <translation>Fil</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="97"/>
+        <source>Find Location</source>
+        <translation>Finn lokasjon</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="98"/>
+        <source>Navigation</source>
+        <translation>Navigasjon</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="99"/>
+        <source>Filesize</source>
+        <translation>Filstørrelse</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="100"/>
+        <source>Date (time)</source>
+        <translation>Dato (tid)</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="101"/>
+        <source>Show Videos</source>
+        <translation>Vis videoer</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="102"/>
+        <source>Parental Level</source>
+        <translation>Foreldrenivå</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="103"/>
+        <source>Archive Item:</source>
+        <translation>Arkiver element:</translation>
+    </message>
+    <message>
         <location filename="themestrings.h" line="104"/>
+        <source>Encoder Profile:</source>
+        <translation>Kodingsprofil:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="105"/>
+        <source>Current Size:</source>
+        <translation>Gjeldende størrelse:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="106"/>
+        <source>New Size:</source>
+        <translation>Ny størrelse:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="108"/>
+        <source>Not Applicable</source>
+        <translation>Ikke relevant</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="109"/>
+        <source>Intro:</source>
+        <translation>Intro:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="110"/>
+        <source>Main Menu:</source>
+        <translation>Hovedmeny:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="111"/>
+        <source>Chapter Menu:</source>
+        <translation>Kapittelmeny:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="112"/>
+        <source>Details:</source>
+        <translation>Detaljer:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="113"/>
+        <source>%date% / %profile%</source>
+        <translation>%date% / %profile%</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="114"/>
+        <source>Current size: %1</source>
+        <translation>Gjeldende størrelse: %1</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="115"/>
+        <source>Current Position:</source>
+        <translation>Gjeldende posisjon:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="116"/>
+        <source>Seek Amount:</source>
+        <translation>Søkemengde:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="117"/>
+        <source>increase seek amount</source>
+        <translation>Øk søkemengde</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="118"/>
+        <source>decrease seek amount</source>
+        <translation>reduser søkemengde</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="119"/>
+        <source>move left</source>
+        <translation>Flytt til venstre</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="120"/>
+        <source>move right</source>
+        <translation>Flytt til høyre</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="121"/>
+        <source>Read video from data dvd or file</source>
+        <translation>Les video fra data-dvd eller fil</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="122"/>
+        <source>Associated Channel</source>
+        <translation>Assosiert kanal</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="123"/>
+        <source>Archive Chan ID:</source>
+        <translation>Kanal ID for arkiv:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="124"/>
+        <source>Archive Chan No:</source>
+        <translation>Kanal nr for arkiv:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="125"/>
+        <source>Archive Callsign:</source>
+        <translation>Kallesignal for arkiv:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="126"/>
+        <source>Archive Name:</source>
+        <translation>Arkivnavn:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="127"/>
+        <source>Local Chan ID:</source>
+        <translation>Lokalt kanal-ID:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="128"/>
+        <source>Local Chan No:</source>
+        <translation>Lokalt kanal-nr:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="129"/>
+        <source>Local Callsign:</source>
+        <translation>Lokalt kallesignal:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="130"/>
+        <source>Local Name:</source>
+        <translation>Lokalt navn:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="131"/>
+        <source>Search Local</source>
+        <translation>Søk lokalt</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="132"/>
+        <source>Channel ID</source>
+        <translation>Kanal ID</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="133"/>
+        <source>Channel No</source>
+        <translation>Kanal nr</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="134"/>
+        <source>Callsign</source>
+        <translation>Kallesignal</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="135"/>
+        <source>Name</source>
+        <translation>Navn</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="144"/>
         <source>Channel ID:</source>
         <translation>Kanal ID:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="105"/>
+        <location filename="themestrings.h" line="145"/>
         <source>Channel Number:</source>
         <translation>Kanalnummer:</translation>
     </message>
@@ -1054,87 +1254,87 @@ Vennligst vent...</translation>
         <translation>En profil med utvidet avspillingstid som gir omtrent 6 timer med video på en enkeltlags DVD</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="95"/>
+        <location filename="themestrings.h" line="136"/>
         <source>Select Destination:</source>
         <translation>Velg destinasjon:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="96"/>
+        <location filename="themestrings.h" line="137"/>
         <source>Parental level: %1</source>
         <translation>Foreldrenivå: %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="97"/>
+        <location filename="themestrings.h" line="138"/>
         <source>Old size:</source>
         <translation>Gammel størrelse:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="98"/>
+        <location filename="themestrings.h" line="139"/>
         <source>New size:</source>
         <translation>Ny størrelse:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="99"/>
+        <location filename="themestrings.h" line="107"/>
         <source>Select a theme:</source>
         <translation>Velg et tema:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="100"/>
+        <location filename="themestrings.h" line="140"/>
         <source>Menu</source>
         <translation>Meny</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="101"/>
+        <location filename="themestrings.h" line="141"/>
         <source>Chapter</source>
         <translation>Kapittel</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="102"/>
+        <location filename="themestrings.h" line="142"/>
         <source>Detail</source>
         <translation>Detalj</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="103"/>
+        <location filename="themestrings.h" line="143"/>
         <source>Select File to Import</source>
         <translation>Velg fil som skal importeres</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="106"/>
+        <location filename="themestrings.h" line="146"/>
         <source>Create DVD</source>
         <translation>Lag DVD</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="107"/>
+        <location filename="themestrings.h" line="147"/>
         <source>Create Archive</source>
         <translation>Lag arkiv</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="108"/>
+        <location filename="themestrings.h" line="148"/>
         <source>Encode Video File</source>
         <translation>Kod videofil</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="109"/>
+        <location filename="themestrings.h" line="149"/>
         <source>Import Archive</source>
         <translation>Importer arkiv</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="110"/>
+        <location filename="themestrings.h" line="150"/>
         <source>Archive Utilities</source>
         <translation>Arkiv-verktøy</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="111"/>
+        <location filename="themestrings.h" line="151"/>
         <source>Show Log Viewer</source>
         <translation>Vis loggviser</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="112"/>
+        <location filename="themestrings.h" line="152"/>
         <source>Play Created DVD</source>
         <translation>Spill DVD som er laget</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="113"/>
+        <location filename="themestrings.h" line="153"/>
         <source>Burn DVD</source>
         <translation>Brenn DVD</translation>
     </message>

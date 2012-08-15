@@ -733,7 +733,7 @@ Fjerne den fra databasen?</translation>
         <translation>Beskrivelse:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="47"/>
+        <location filename="themestrings.h" line="45"/>
         <source>No Plot.</source>
         <translation>Ingen handling.</translation>
     </message>
@@ -753,7 +753,7 @@ Fjerne den fra databasen?</translation>
         <translation>Spillinformasjon</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="45"/>
+        <location filename="themestrings.h" line="46"/>
         <source>Games</source>
         <translation>Spill</translation>
     </message>
@@ -763,7 +763,7 @@ Fjerne den fra databasen?</translation>
         <translation>ROM sti:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="46"/>
+        <location filename="themestrings.h" line="47"/>
         <source>Favorite</source>
         <translation>Favoritt</translation>
     </message>

@@ -329,6 +329,41 @@ Når du er ferdig å redigere, velg &quot;OK&quot; eller &quot;Avbryt&quot; for 
     </message>
     <message>
         <location filename="themestrings.h" line="33"/>
+        <source>WEB BROWSER</source>
+        <translation>WEBLESER</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="34"/>
+        <source>BOOKMARK MANAGER</source>
+        <translation>BOKMERKEBEHANDLER</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="35"/>
+        <source>Choose a bookmark to show in the web browser</source>
+        <translation>Velg et bokmerke for å vise websiden</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="36"/>
+        <source>Browse the web</source>
+        <translation>Utforsk internett</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="37"/>
+        <source>URL Name:</source>
+        <translation>URL Navn:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="38"/>
+        <source>Search</source>
+        <translation>Søk</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="39"/>
+        <source>Save</source>
+        <translation>Lagre</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="40"/>
         <source>Enable plugins</source>
         <translation>Slå på tillegg</translation>
     </message>
