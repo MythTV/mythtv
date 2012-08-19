@@ -200,6 +200,8 @@ Collection:
   Backdrop              backdrop
   Poster                poster
   list(Movie)           members             (sorted by release date)
+  list(Backdrop)        backdrops
+  list(Poster)          posters
 
 Movie:
   integer               id
