@@ -235,6 +235,9 @@ Movie:
   dict(Release)         releases            (indexed by country)
   list(Translation)     translations
   list(Movie)           getSimilar()
+  None                  setFavorite(bool)   mark favorite status for current user
+  None                  setRating(int)      rate movie by current user
+  None                  setWatchlist(bool)  mark watchlist status for current user
 
 Movie classmethods:
   Movie                 fromIMDB(imdbid)    special constructor for use with IMDb codes
@@ -243,6 +246,9 @@ Movie classmethods:
   list(Movie)           mostpopular()       based off themoviedb.org page view counts
   list(Movie)           toprated()          based off themoviedb.org user ratings
   list(Movie)           upcoming()          curated list, typically contains 100 movies
+  list(Movie)           favorites()         current user's favorite movies
+  list(Movie)           ratedmovies()       movies rated by current user
+  list(Movie)           watchlist()         movies marked to watch by current user
 
 Person:
   integer               id

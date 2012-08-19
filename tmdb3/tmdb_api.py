@@ -22,7 +22,7 @@ for search and retrieval of text metadata and image URLs from TMDB.
 Preliminary API specifications can be found at
 http://help.themoviedb.org/kb/api/about-3"""
 
-__version__="v0.6.11"
+__version__="v0.6.12"
 # 0.1.0  Initial development
 # 0.2.0  Add caching mechanism for API queries
 # 0.2.1  Temporary work around for broken search paging
@@ -54,6 +54,7 @@ __version__="v0.6.11"
 # 0.6.9  Correct Movie image language filtering
 # 0.6.10 Add upcoming movie classmethod
 # 0.6.11 Fix URL for top rated Movie query
+# 0.6.12 Add support for Movie watchlist query and editing
 
 from request import set_key, Request
 from util import Datapoint, Datalist, Datadict, Element, NameRepr, SearchRepr
@@ -437,6 +438,17 @@ class Movie( Element ):
         return res
 
     @classmethod
+    def watchlist(cls, session=None):
+        if session is None:
+            session = get_session()
+        account = Account(session=session)
+        res = MovieSearchResult(
+                    Request('account/{0}/movie_watchlist'.format(account.id),
+                                session_id=session.sessionid))
+        res._name = "Movies You're Watching"
+        return res
+
+    @classmethod
     def fromIMDB(cls, imdbid, locale=None):
         try:
             # assume string
@@ -538,6 +550,15 @@ class Movie( Element ):
                             session_id=self._session.sessionid)
         req.lifetime = 0
         req.add_data({'value':value})
+        req.readJSON()
+
+    def setWatchlist(self, value):
+        req = Request('account/{0}/movie_watchlist'.format(\
+                                        Account(session=self._session).id),
+                            session_id=self._session.sessionid)
+        req.lifetime = 0
+        req.add_data({'movie_id':self.id,
+                      'movie_watchlist':str(bool(value)).lower()})
         req.readJSON()
 
     def getSimilar(self):
