@@ -22,36 +22,37 @@ for search and retrieval of text metadata and image URLs from TMDB.
 Preliminary API specifications can be found at
 http://help.themoviedb.org/kb/api/about-3"""
 
-__version__="v0.6.9"
-# 0.1.0 Initial development
-# 0.2.0 Add caching mechanism for API queries
-# 0.2.1 Temporary work around for broken search paging
-# 0.3.0 Rework backend machinery for managing OO interface to results
-# 0.3.1 Add collection support
-# 0.3.2 Remove MythTV key from results.py
-# 0.3.3 Add functional language support
-# 0.3.4 Re-enable search paging
-# 0.3.5 Add methods for grabbing current, popular, and top rated movies
-# 0.3.6 Rework paging mechanism
-# 0.3.7 Generalize caching mechanism, and allow controllability
-# 0.4.0 Add full locale support (language and country) and optional fall through
-# 0.4.1 Add custom classmethod for dealing with IMDB movie IDs
-# 0.4.2 Improve cache file selection for Windows systems
-# 0.4.3 Add a few missed Person properties
-# 0.4.4 Add support for additional Studio information
-# 0.4.5 Add locale fallthrough for images and alternate titles
-# 0.4.6 Add slice support for search results
-# 0.5.0 Rework cache framework and improve file cache performance
-# 0.6.0 Add user authentication support
-# 0.6.1 Add adult filtering for people searches
-# 0.6.2 Add similar movie search for Movie objects
-# 0.6.3 Add Studio search
-# 0.6.4 Add Genre list and associated Movie search
-# 0.6.5 Prevent data from being blanked out by subsequent queries
-# 0.6.6 Turn date processing errors into mutable warnings
-# 0.6.7 Add support for searching by year
-# 0.6.8 Add support for collection images
-# 0.6.9 Correct Movie image language filtering
+__version__="v0.6.10"
+# 0.1.0  Initial development
+# 0.2.0  Add caching mechanism for API queries
+# 0.2.1  Temporary work around for broken search paging
+# 0.3.0  Rework backend machinery for managing OO interface to results
+# 0.3.1  Add collection support
+# 0.3.2  Remove MythTV key from results.py
+# 0.3.3  Add functional language support
+# 0.3.4  Re-enable search paging
+# 0.3.5  Add methods for grabbing current, popular, and top rated movies
+# 0.3.6  Rework paging mechanism
+# 0.3.7  Generalize caching mechanism, and allow controllability
+# 0.4.0  Add full locale support (language and country) and optional fall through
+# 0.4.1  Add custom classmethod for dealing with IMDB movie IDs
+# 0.4.2  Improve cache file selection for Windows systems
+# 0.4.3  Add a few missed Person properties
+# 0.4.4  Add support for additional Studio information
+# 0.4.5  Add locale fallthrough for images and alternate titles
+# 0.4.6  Add slice support for search results
+# 0.5.0  Rework cache framework and improve file cache performance
+# 0.6.0  Add user authentication support
+# 0.6.1  Add adult filtering for people searches
+# 0.6.2  Add similar movie search for Movie objects
+# 0.6.3  Add Studio search
+# 0.6.4  Add Genre list and associated Movie search
+# 0.6.5  Prevent data from being blanked out by subsequent queries
+# 0.6.6  Turn date processing errors into mutable warnings
+# 0.6.7  Add support for searching by year
+# 0.6.8  Add support for collection images
+# 0.6.9  Correct Movie image language filtering
+# 0.6.10 Add upcoming movie classmethod.
 
 from request import set_key, Request
 from util import Datapoint, Datalist, Datadict, Element, NameRepr, SearchRepr
@@ -404,6 +405,12 @@ class Movie( Element ):
     def toprated(cls, locale=None):
         res = MovieSearchResult(Request('movie/top-rated'), locale=locale)
         res._name = 'Top Rated'
+        return res
+
+    @classmethod
+    def upcoming(cls, locale=None):
+        res = MovieSearchResult(Request('movie/upcoming'), locale=locale)
+        res._name = 'Upcoming'
         return res
 
     @classmethod

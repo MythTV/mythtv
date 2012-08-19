@@ -242,6 +242,7 @@ Movie classmethods:
   list(Movie)           nowplaying()        content currently in theater
   list(Movie)           mostpopular()       based off themoviedb.org page view counts
   list(Movie)           toprated()          based off themoviedb.org user ratings
+  list(Movie)           upcoming()          curated list, typically contains 100 movies
 
 Person:
   integer               id
