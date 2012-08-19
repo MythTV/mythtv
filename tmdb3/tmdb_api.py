@@ -22,7 +22,7 @@ for search and retrieval of text metadata and image URLs from TMDB.
 Preliminary API specifications can be found at
 http://help.themoviedb.org/kb/api/about-3"""
 
-__version__="v0.6.8"
+__version__="v0.6.9"
 # 0.1.0 Initial development
 # 0.2.0 Add caching mechanism for API queries
 # 0.2.1 Temporary work around for broken search paging
@@ -51,6 +51,7 @@ __version__="v0.6.8"
 # 0.6.6 Turn date processing errors into mutable warnings
 # 0.6.7 Add support for searching by year
 # 0.6.8 Add support for collection images
+# 0.6.9 Correct Movie image language filtering
 
 from request import set_key, Request
 from util import Datapoint, Datalist, Datadict, Element, NameRepr, SearchRepr
@@ -482,7 +483,7 @@ class Movie( Element ):
     def _populate_images(self):
         kwargs = {}
         if not self._locale.fallthrough:
-            kwargs['country'] = self._locale.country
+            kwargs['language'] = self._locale.language
         return Request('movie/{0}/images'.format(self.id), **kwargs)
     def _populate_keywords(self):
         return Request('movie/{0}/keywords'.format(self.id))
