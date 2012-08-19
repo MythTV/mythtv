@@ -6,12 +6,13 @@ import os_detect
 
 SMOON_URL = "http://smolt.mythtv.org/"
 SECURE = 0
-from user import home
-HW_UUID = home + "/.mythtv/HardwareProfile/hw-uuid"
-PUB_UUID= home +  "/.mythtv/HardwareProfile/pub-uuid"
-UUID_DB = home + '/.mythtv/HardwareProfile/uuiddb.cfg'
-ADMIN_TOKEN = home +  "/.mythtv/HardwareProfile/smolt_token"
 
+from MythTV import MythDB
+confdir = os.path.join(MythDB().dbconfig.confdir, 'HardwareProfile')
+HW_UUID     = os.path.join(confdir, 'hw-uuid')
+PUB_UUID    = os.path.join(confdir, 'pub-uuid')
+UUID_DB     = os.path.join(confdir, 'uuiddb.cfg')
+ADMIN_TOKEN = os.path.join(confdir, 'smolt_token')
 
 #These are the defaults taken from the source code.
 #fs_types = get_config_attr("FS_TYPES", ["ext2", "ext3", "xfs", "reiserfs"])
