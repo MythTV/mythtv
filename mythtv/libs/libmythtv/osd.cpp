@@ -609,7 +609,7 @@ bool OSD::DrawDirect(MythPainter* painter, QSize size, bool repaint)
     bool visible = false;
     bool redraw  = m_Refresh;
     m_Refresh    = false;
-    QTime now = QTime::currentTime();
+    QTime now = MythDate::current().time();
 
     CheckExpiry();
     QMap<QString,MythScreenType*>::const_iterator it;
@@ -664,7 +664,7 @@ QRegion OSD::Draw(MythPainter* painter, QPaintDevice *device, QSize size,
     if (!painter || !device)
         return visible;
 
-    QTime now = QTime::currentTime();
+    QTime now = MythDate::current().time();
     CheckExpiry();
 
     // first update for alpha pulse and fade
@@ -990,7 +990,7 @@ void OSD::DialogShow(const QString &window, const QString &text, int updatefor)
     {
         OverrideUIScale();
         MythScreenType *dialog;
-        
+
         if (window == OSD_DLG_EDITOR)
             dialog = new ChannelEditor(m_ParentObject, window.toLatin1());
         else if (window == OSD_DLG_CONFIRM)
@@ -1020,7 +1020,7 @@ void OSD::DialogShow(const QString &window, const QString &text, int updatefor)
             delete dialog;
             return;
         }
-            
+
         RevertUIScale();
     }
 

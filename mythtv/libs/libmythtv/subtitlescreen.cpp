@@ -1711,8 +1711,6 @@ QString FormattedTextChunk::ToLogString(void) const
         .arg(format.boldface);
     str += QString("font=%1 ").arg(format.font_tag);
     str += QString(" text='%1'").arg(text);
-    if (isTeletext)
-        str += " DEPRECATED_608_TELETEXT";
     return str;
 }
 
@@ -1962,6 +1960,8 @@ bool FormattedTextSubtitle::Draw(const QString &base,
             LOG(VB_VBI, LOG_INFO,
                 QString("Drawing chunk at (%1,%2): %3")
                 .arg(x).arg(y).arg((*chunk).ToLogString()));
+            if ((*chunk).isTeletext)
+                LOG(VB_GENERAL, LOG_INFO, "DEPRECATED_608_TELETEXT");
 
             x += chunk_sz.width();
             first = false;

@@ -4,12 +4,12 @@
 <context>
     <name>ArchiveFileSelector</name>
     <message>
-        <location filename="../mytharchive/importnative.cpp" line="211"/>
+        <location filename="../mytharchive/importnative.cpp" line="212"/>
         <source>Find File To Import</source>
         <translation>Εύρεση Αρχείου για Εισαγωγή</translation>
     </message>
     <message>
-        <location filename="../mytharchive/importnative.cpp" line="270"/>
+        <location filename="../mytharchive/importnative.cpp" line="272"/>
         <source>The selected item is not a valid archive file!</source>
         <translation>Το επιλεγμένο αρχείο δεν είναι έγκυρο αρχείο συμπίεσης!</translation>
     </message>
@@ -99,10 +99,6 @@
         <translation>Αφαίρεση Αντικειμένου</translation>
     </message>
     <message>
-        <source>Cancel</source>
-        <translation type="obsolete">Ακύρωση</translation>
-    </message>
-    <message>
         <location filename="../mytharchive/exportnative.cpp" line="536"/>
         <source>You don&apos;t have any videos!</source>
         <translation>Δεν έχετε ταινίες!</translation>
@@ -134,48 +130,32 @@
 <context>
     <name>ImportNative</name>
     <message>
-        <source>You need to select a valid chanID!</source>
-        <translation type="obsolete">Πρέπει να επιλέξετε έγκυρο αναγν. καναλιού!</translation>
-    </message>
-    <message>
-        <location filename="../mytharchive/importnative.cpp" line="430"/>
+        <location filename="../mytharchive/importnative.cpp" line="433"/>
         <source>You need to select a valid channel id!</source>
         <translation>Πρέπει να επιλέξετε έγκυρο αναγν. καναλιού!</translation>
     </message>
     <message>
-        <location filename="../mytharchive/importnative.cpp" line="465"/>
+        <location filename="../mytharchive/importnative.cpp" line="468"/>
         <source>It was not possible to import the Archive.  An error occured when running &apos;mytharchivehelper&apos;</source>
         <translation>Αδυναμία εισαγωγής του συμπιεσμένου αρχείου. Συνέβη σφάλμα κατά την εκτέλεση του &apos;mytharchivehelper&apos;</translation>
     </message>
     <message>
-        <location filename="../mytharchive/importnative.cpp" line="595"/>
+        <location filename="../mytharchive/importnative.cpp" line="598"/>
         <source>Select a channel id</source>
         <translation>Επιλογή αναγν. καναλιού</translation>
     </message>
     <message>
-        <location filename="../mytharchive/importnative.cpp" line="621"/>
+        <location filename="../mytharchive/importnative.cpp" line="624"/>
         <source>Select a channel number</source>
         <translation>Επιλογή αρ. καναλιού</translation>
     </message>
     <message>
-        <location filename="../mytharchive/importnative.cpp" line="647"/>
+        <location filename="../mytharchive/importnative.cpp" line="650"/>
         <source>Select a channel name</source>
         <translation>Επιλογή ονόματος καναλιού</translation>
     </message>
     <message>
-        <source>Select a ChanID</source>
-        <translation type="obsolete">Επιλογή Αναγν. Καναλιού</translation>
-    </message>
-    <message>
-        <source>Select a ChanNo</source>
-        <translation type="obsolete">Επιλογή Αρ. Καναλιού</translation>
-    </message>
-    <message>
-        <source>Select a Channel Name</source>
-        <translation type="obsolete">Επιλογή Ονόματος Καναλιού</translation>
-    </message>
-    <message>
-        <location filename="../mytharchive/importnative.cpp" line="673"/>
+        <location filename="../mytharchive/importnative.cpp" line="676"/>
         <source>Select a Callsign</source>
         <translation>Επιλογή Ονομασίας Καναλιού</translation>
     </message>
@@ -183,127 +163,103 @@
 <context>
     <name>LogViewer</name>
     <message>
-        <location filename="../mytharchive/logviewer.cpp" line="305"/>
+        <location filename="../mytharchive/logviewer.cpp" line="304"/>
         <source>Menu</source>
         <translation>Επιλογές</translation>
     </message>
     <message>
-        <location filename="../mytharchive/logviewer.cpp" line="313"/>
+        <location filename="../mytharchive/logviewer.cpp" line="312"/>
         <source>Don&apos;t Auto Update</source>
         <translation>Χωρίς Αυτόματη Ενημέρωση</translation>
     </message>
     <message>
-        <location filename="../mytharchive/logviewer.cpp" line="315"/>
+        <location filename="../mytharchive/logviewer.cpp" line="314"/>
         <source>Auto Update</source>
         <translation>Με Αυτόματη Ενημέρωση</translation>
     </message>
     <message>
-        <location filename="../mytharchive/logviewer.cpp" line="317"/>
+        <location filename="../mytharchive/logviewer.cpp" line="316"/>
         <source>Show Progress Log</source>
         <translation>Εμφάνιση Καταγραφής Προόδου</translation>
     </message>
     <message>
-        <location filename="../mytharchive/logviewer.cpp" line="318"/>
+        <location filename="../mytharchive/logviewer.cpp" line="317"/>
         <source>Show Full Log</source>
         <translation>Εμφάνιση Πλήρους Καταγραφής</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="obsolete">Ακύρωση</translation>
     </message>
 </context>
 <context>
     <name>MythBurn</name>
     <message>
-        <source>Using Cutlist</source>
-        <translation type="obsolete">Με χρήση Λίστας Κοψιμάτων</translation>
-    </message>
-    <message>
-        <source>Not Using Cutlist</source>
-        <translation type="obsolete">Χωρίς χρήση Λίστας Κοψιμάτων</translation>
-    </message>
-    <message>
-        <location filename="../mytharchive/mythburn.cpp" line="344"/>
-        <location filename="../mytharchive/mythburn.cpp" line="468"/>
+        <location filename="../mytharchive/mythburn.cpp" line="345"/>
+        <location filename="../mytharchive/mythburn.cpp" line="469"/>
         <source>Using Cut List</source>
         <translation>Με χρήση Λίστας Κοψιμάτων</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="349"/>
-        <location filename="../mytharchive/mythburn.cpp" line="473"/>
+        <location filename="../mytharchive/mythburn.cpp" line="350"/>
+        <location filename="../mytharchive/mythburn.cpp" line="474"/>
         <source>Not Using Cut List</source>
         <translation>Χωρίς χρήση Λίστας Κοψιμάτων</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="355"/>
-        <location filename="../mytharchive/mythburn.cpp" line="479"/>
+        <location filename="../mytharchive/mythburn.cpp" line="356"/>
+        <location filename="../mytharchive/mythburn.cpp" line="480"/>
         <source>No Cut List</source>
         <translation>Δεν υπάρχει Λίστα Κοψιμάτων</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="366"/>
+        <location filename="../mytharchive/mythburn.cpp" line="367"/>
         <source>You need to add at least one item to archive!</source>
         <translation>Πρέπει να προσθέσετε τουλάχιστον μία στο αρχείο συμπίεσης!</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="412"/>
+        <location filename="../mytharchive/mythburn.cpp" line="413"/>
         <source>Retrieving File Information. Please Wait...</source>
         <translation>Αναζητώ Στοιχεία για το Αρχείο. Παρακαλώ Περιμένετε...</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="482"/>
+        <location filename="../mytharchive/mythburn.cpp" line="483"/>
         <source>Encoder: </source>
         <translation>Κωδικοποίηση:</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="808"/>
+        <location filename="../mytharchive/mythburn.cpp" line="809"/>
         <source>Menu</source>
         <translation>Επιλογές</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="819"/>
+        <location filename="../mytharchive/mythburn.cpp" line="820"/>
         <source>Don&apos;t Use Cut List</source>
         <translation>Χωρίς χρήση Λίστας Κοψιμάτων</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="822"/>
+        <location filename="../mytharchive/mythburn.cpp" line="823"/>
         <source>Use Cut List</source>
         <translation>Με χρήση Λίστας Κοψιμάτων</translation>
     </message>
     <message>
-        <source>Don&apos;t Use Cutlist</source>
-        <translation type="obsolete">Χωρίς χρήση Λίστας Κοψιμάτων</translation>
-    </message>
-    <message>
-        <source>Use Cutlist</source>
-        <translation type="obsolete">Με χρήση Λίστας Κοψιμάτων</translation>
-    </message>
-    <message>
-        <location filename="../mytharchive/mythburn.cpp" line="826"/>
+        <location filename="../mytharchive/mythburn.cpp" line="827"/>
         <source>Remove Item</source>
         <translation>Αφαίρεση Αντικειμένου</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="827"/>
+        <location filename="../mytharchive/mythburn.cpp" line="828"/>
         <source>Edit Details</source>
         <translation>Επεξεργασία Λεπτομερειών</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="828"/>
+        <location filename="../mytharchive/mythburn.cpp" line="829"/>
         <source>Change Encoding Profile</source>
         <translation>Αλλαγή Προφίλ Κωδικοποίησης</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="829"/>
+        <location filename="../mytharchive/mythburn.cpp" line="830"/>
         <source>Edit Thumbnails</source>
         <translation>Επεξεργασία Μικρογραφιών</translation>
     </message>
     <message>
-        <source>Cancel</source>
-        <translation type="obsolete">Ακύρωση</translation>
-    </message>
-    <message>
-        <location filename="../mytharchive/mythburn.cpp" line="965"/>
+        <location filename="../mytharchive/mythburn.cpp" line="966"/>
         <source>It was not possible to create the DVD.  An error occured when running the scripts</source>
         <translation>Αδύνατη η δημιουργία του DVD. Προκλήθηκε σφάλμα κατά την εκτέλεση των scripts</translation>
     </message>
@@ -349,317 +305,297 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="18"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="19"/>
         <source>MythArchive Temp Directory</source>
         <translation>Φάκελος Προσωρινής Αποθήκευσης</translation>
     </message>
     <message>
-        <source>Location where MythArchive should create its temporory work files. LOTS of free space required here.</source>
-        <translation type="obsolete">Θέση όπου το MythArchive μπορεί να φτιάξει τα προσωρινά του αρχεία. Χρειάζεται ΠΟΛΥΣ χώρος.</translation>
-    </message>
-    <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="28"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="29"/>
         <source>MythArchive Share Directory</source>
         <translation>Κοινόχρηστος Φάκελος</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="30"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="31"/>
         <source>Location where MythArchive stores its scripts, intro movies and theme files</source>
         <translation>Θέση όπου το MythArchive αποθηκεύει τα scripts, τις εισαγωγικές ταινίες και τα αρχεία θεμάτων</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="38"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="39"/>
         <source>Video format</source>
         <translation>Πρότυπο ταινίας</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="41"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="42"/>
         <source>Video format for DVD recordings, PAL or NTSC.</source>
         <translation>Το πρότυπο για εγγραφές DVD: PAL ή NTSC.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="48"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="49"/>
         <source>File Selector Filter</source>
         <translation>Φίλτρο Επιλογής Αρχείων</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="50"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="51"/>
         <source>The file name filter to use in the file selector.</source>
         <translation>Το φίλτρο προς χρήση κατά την επιλογή αρχείων.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="57"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="58"/>
         <source>Location of DVD</source>
         <translation>Συσκευή DVD</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="59"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="60"/>
         <source>Which DVD drive to use when burning discs.</source>
         <translation>Ποιά συσκευή DVD θα χρησιμοποιείται για την εγγραφή των δίσκων.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="66"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="67"/>
         <source>DVD Drive Write Speed</source>
         <translation>Ταχύτητα Εγγραφής DVD</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="68"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="69"/>
         <source>This is the write speed to use when burning a DVD. Set to 0 to allow growisofs to choose the fastest available speed.</source>
         <translation>Είναι η ταχύτητα εγγραφής των DVD. Δώστε 0 για να επιτρέψετε στο growisofs να επιλέξει την ταχύτερη διαθέσιμη.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="76"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="77"/>
         <source>Command to play DVD</source>
         <translation>Εντολή αναπαραγωγής DVD</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="78"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="79"/>
         <source>Command to run when test playing a created DVD. &apos;Internal&apos; will use the internal MythTV player. %f will be replaced with the path to the created DVD structure eg. &apos;xine -pfhq --no-splash dvd:/%f&apos;.</source>
         <translation>Η εντολή που θα δοκιμάζει την αναπαραγωγή ενός δημιουργημένου DVD. Δίνοντας &apos;Internal&apos; θα χρησιμοποιείται το ενσωματωμένο πρόγραμμα του MythTV. To %f θα αντικατασταθεί με τη διαδρομή προς τη δομή του δημιουργημένου DVD. πχ  &apos;xine -pfhq --no-splash dvd:/%f&apos;.</translation>
     </message>
     <message>
-        <source>Always Encode to AC3</source>
-        <translation type="obsolete">Πάντα κωδικοποίηση σε AC3</translation>
-    </message>
-    <message>
-        <source>If set audio tracks will always be re-encoded to AC3 for better compatibility with DVD players in NTSC countries.</source>
-        <translation type="obsolete">Αν επιλεγεί, τα ηχητικά τμήματα θα επανακωδικοποιούνται πάντα σε AC3 για καλύτερη συμβατότητα με συσκευές DVD στις χώρες με NTSC σύστημα.</translation>
-    </message>
-    <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="87"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="88"/>
         <source>Copy remote files</source>
         <translation>Αντιγραφή απομακρυσμένων αρχείων</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="89"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="90"/>
         <source>If set files on remote filesystems will be copied over to the local filesystem before processing. Speeds processing and reduces bandwidth on the network</source>
         <translation>Αν επιλεγεί, τα αρχεία σε απομακρυσμένα συστήματα αρχείων θα αντιγραφούν στο τοπικό σύστημα πριν από την επεξεργασία. Επιταχύνει την διαδικασία και μειώνει το χρησιμοποιούμενο εύρος δικτύου</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="98"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="99"/>
         <source>Always Use Mythtranscode</source>
         <translation>Πάντα χρήση του Mythtranscode</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="100"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="101"/>
         <source>If set mpeg2 files will always be passed though mythtranscode to clean up any errors. May help to fix some audio problems. Ignored if &apos;Use ProjectX&apos; is set.</source>
         <translation>Αν επιλεγεί, τα αρχεία mpeg2 πάντα θα περνούν από το mythtranscode για καθαρισμό τυχόν σφαλμάτων. Πιθανώς να διορθώσει μερικά προβλήματα ήχου. Αγνοείται αν επιλέξετε &apos;Χρήση ProjectX&apos;.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="109"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="110"/>
         <source>Use ProjectX</source>
         <translation>Χρήση ProjectX</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="111"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="112"/>
         <source>If set ProjectX will be used to cut commercials and split mpeg2 files instead of mythtranscode and mythreplex.</source>
         <translation>Αν επιλεγεί, για το κόψιμο των διαφημίσεων και το χωρισμό των mpeg2 αρχείων θα χρησιμοποιείται το ProjectX αντί των mythtranscode και mythreplex.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="120"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="121"/>
         <source>Use FIFOs</source>
         <translation>Χρήση FIFOs</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="122"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="123"/>
         <source>The script will use FIFOs to pass the output of mplex into dvdauthor rather than creating intermediate files. Saves time and disk space during multiplex operations but not  supported on Windows platform</source>
         <translation>Το σκριπτάκι θα χρησιμοποιήσει τα αρχεία FIFO για να στείλει την έξοδο του mplex στο dvdauthor αντί να δημιουργήσει ενδιάμεσα αρχεία. Γλυτώνει χρόνο και χώρο στο δίσκο κατά τη διάρκεια των multiplex διαδικασιών αλλά δεν υποστηρίζεται στα Windows</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="132"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="133"/>
         <source>Add Subtitles</source>
         <translation>Προσθήκη Υποτίτλων</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="134"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="135"/>
         <source>If available this option will add subtitles to the final DVD. Requires &apos;Use ProjectX&apos; to be on.</source>
         <translation>Αν είναι διαθέσιμοι, η επιλογή θα τους προσθέσει στο τελικό DVD. Απαιτεί τη χρήση του ProjectX.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="142"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="143"/>
         <source>Main Menu Aspect Ratio</source>
         <translation>Λόγος Πλευρών Κεντρικών Επιλογών</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="146"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="147"/>
         <source>Aspect ratio to use when creating the main menu.</source>
         <translation>Ο λόγος πλευρών για το κεντρικό μενού του DVD.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="153"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="154"/>
         <source>Chapter Menu Aspect Ratio</source>
         <translation>Λόγος Πλευρών Μενού Κεφαλαίων</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="158"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="159"/>
         <source>Aspect ratio to use when creating the chapter menu. Video means use the same aspect ratio as the associated video.</source>
         <translation>Η αναλογία πλευρών για τη δημιουργία του μενού κεφαλαίων. &apos;Video&apos; σημαίνει να χρησιμοποιήσει την ίδια με τη σχετιζόμενη ταινία.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="166"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="167"/>
         <source>Date format</source>
         <translation>Μορφή Ημερομηνίας</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="170"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="171"/>
         <source>Samples are shown using today&apos;s date.</source>
         <translation>Εμφανίζονται δείγματα με βάση τη σημερινή ημερομηνία.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="176"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="177"/>
         <source>Samples are shown using tomorrow&apos;s date.</source>
         <translation>Εμφανίζονται δείγματα με βάση την αυριανή ημερομηνία.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="191"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="192"/>
         <source>Your preferred date format to use on DVD menus.</source>
         <translation>Η προτιμώμενη μορφή ημερομηνίας για χρήση στα μενού του DVD.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="199"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="200"/>
         <source>Time format</source>
         <translation>Μορφή Ώρας</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="205"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="206"/>
         <source>Your preferred time format to display on DVD menus. You must choose a format with &quot;AM&quot; or &quot;PM&quot; in it, otherwise your time display will be 24-hour or &quot;military&quot; time.</source>
         <translation>Η προτιμώμενη μορφή ώρας για εμφάνιση στα μενού του DVD. Πρέπει να επιλέξετε μια μορφή που να περιέχει &quot;AM&quot; ή &quot;PM&quot; αλλιώς θα φαίνεται σε 24ωρη βάση.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="214"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="215"/>
         <source>Default Encoder Profile</source>
         <translation>Προεπιλεγμένο Προφίλ Κωδικοποίησης</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="221"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="222"/>
         <source>Default encoding profile to use if a file needs re-encoding.</source>
         <translation>Για την περίπτωση που κάποιο αρχείο χρειάζεται επανακωδικοποίηση.</translation>
     </message>
     <message>
-        <source>FFmpeg Command</source>
-        <translation type="obsolete">Εντολή FFmpeg</translation>
-    </message>
-    <message>
-        <source>Command to run FFmpeg.</source>
-        <translation type="obsolete">Η εντολή που θα τρέξει το FFmpeg.</translation>
-    </message>
-    <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="20"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="21"/>
         <source>Location where MythArchive should create its temporary work files. LOTS of free space required here.</source>
         <translation>Θέση όπου το MythArchive μπορεί να φτιάξει τα προσωρινά του αρχεία. Χρειάζεται ΠΟΛΥΣ χώρος.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="229"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="230"/>
         <source>mplex Command</source>
         <translation>Εντολή mplex</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="231"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="232"/>
         <source>Command to run mplex</source>
         <translation>Η εντολή που θα τρέξει το mplex</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="238"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="239"/>
         <source>dvdauthor command</source>
         <translation>Εντολή dvdauthor</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="240"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="241"/>
         <source>Command to run dvdauthor.</source>
         <translation>Η εντολή που θα τρέξει το dvdauthor.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="247"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="248"/>
         <source>mkisofs command</source>
         <translation>Εντολή mkisofs</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="249"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="250"/>
         <source>Command to run mkisofs. (Used to create ISO images)</source>
         <translation>Η εντολή που θα τρέξει το mkisofs (Χρησιμοποιείται για τη δημιουργεία ειδώλων ISO)</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="256"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="257"/>
         <source>growisofs command</source>
         <translation>Εντολή growisofs</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="258"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="259"/>
         <source>Command to run growisofs. (Used to burn DVD&apos;s)</source>
         <translation>Η εντολή που θα τρέξει το mkisofs (Χρησιμοποιείται για την εγγραφή DVD)</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="265"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="266"/>
         <source>M2VRequantiser command</source>
         <translation>Εντολή M2VRequantiser</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="267"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="268"/>
         <source>Command to run M2VRequantiser. Optional - leave blank if you don&apos;t have M2VRequantiser installed.</source>
         <translation>Η εντολή που θα τρέξει το M2VRequantiser. Προεραιτική, αφήστε το κενό αν δεν το έχετε εγκατεστημένο.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="274"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="275"/>
         <source>jpeg2yuv command</source>
         <translation>Εντολή jpeg2yuv</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="276"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="277"/>
         <source>Command to run jpeg2yuv. Part of mjpegtools package</source>
         <translation>Η εντολή που θα τρέξει το jpeg2yuv. Ανήκει στο πακέτο mjpegtools</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="283"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="284"/>
         <source>spumux command</source>
         <translation>Εντολή spumux</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="285"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="286"/>
         <source>Command to run spumux. Part of dvdauthor package</source>
         <translation>Η εντολη που θα τρέξει το spumux. Ανήκει στο πακέτο dvdauthor</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="292"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="293"/>
         <source>mpeg2enc command</source>
         <translation>Εντολή mpeg2enc</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="294"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="295"/>
         <source>Command to run mpeg2enc. Part of mjpegtools package</source>
         <translation>Η εντολή που θα τρέξει το mpeg2enc. Ανήκει στο πακέτο mjpegtools</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="301"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="302"/>
         <source>projectx command</source>
         <translation>Εντολή projectx</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="303"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="304"/>
         <source>Command to run ProjectX. Will be used to cut commercials and split mpegs files instead of mythtranscode and mythreplex.</source>
         <translation>Η εντολή που θα τρέξει το ProjectX. Χρησιμοποιείται στην αφαίρεση διαφημίσεων και το διαχωρισμό των mpeg αρχείων αντί των mythtranscode και mythreplex.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="311"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="312"/>
         <source>MythArchive Settings</source>
-        <translation>Ρυθμίσεις MythArchive</translation>
+        <translation>Ρυθμίσεις Αρχειοθέτησης</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="322"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="323"/>
         <source>MythArchive Settings (2)</source>
-        <translation>Ρυθμίσεις MythArchive (2)</translation>
+        <translation>Ρυθμίσεις Αρχειοθέτησης (2)</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="332"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="333"/>
         <source>DVD Menu Settings</source>
         <translation>Ρυθμίσεις Μενού DVD</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="340"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="341"/>
         <source>MythArchive External Commands (1)</source>
         <translation>Εξωτερικές εντολές του MythArchive (1)</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="348"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="349"/>
         <source>MythArchive External Commands (2)</source>
         <translation>Εξωτερικές εντολές του MythArchive (2)</translation>
     </message>
@@ -705,46 +641,42 @@ Removing stale lock file.</source>
         <translation>Η τελευταία εκτέλεση απέτυχε να δημιουργήσει DVD.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1008"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1009"/>
         <source>You don&apos;t have any videos!</source>
         <translation>Δεν έχετε ταινίες!</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1155"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1156"/>
         <source>Cannot burn a DVD.
 The last run failed to create a DVD.</source>
         <translation>Δεν μπορώ να γράψω DVD.
 Η τελευταία εκτέλεση απέτυχε να δημιουργήσει DVD.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1161"/>
-        <location filename="../mytharchive/mythburn.cpp" line="1173"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1162"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1174"/>
         <source>Burn DVD</source>
         <translation>Εγγραφή DVD</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1162"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1163"/>
         <source>
 Place a blank DVD in the drive and select an option below.</source>
         <translation>
 Τοποθετήστε ένα κενό DVD στη συσκευή και διαλέξτε μια από τις παρακάτω επιλογές.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1174"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1175"/>
         <source>Burn DVD Rewritable</source>
         <translation>Εγγραφή Επανεγγράψιμου DVD</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1175"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1176"/>
         <source>Burn DVD Rewritable (Force Erase)</source>
         <translation>Εγγραφή Επανεγγράψιμου DVD (Αναγκαστική Διαγραφή)</translation>
     </message>
     <message>
-        <source>Cancel</source>
-        <translation type="obsolete">Ακύρωση</translation>
-    </message>
-    <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1231"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1232"/>
         <source>It was not possible to run mytharchivehelper to burn the DVD.</source>
         <translation>Δεν ήταν δυνατή η εκτέλεση του mytharchivehelper για εγγραφή του DVD.</translation>
     </message>
@@ -753,14 +685,10 @@ Place a blank DVD in the drive and select an option below.</source>
     <name>RecordingSelector</name>
     <message>
         <location filename="../mytharchive/recordingselector.cpp" line="113"/>
-        <location filename="../mytharchive/recordingselector.cpp" line="419"/>
-        <location filename="../mytharchive/recordingselector.cpp" line="524"/>
+        <location filename="../mytharchive/recordingselector.cpp" line="421"/>
+        <location filename="../mytharchive/recordingselector.cpp" line="526"/>
         <source>All Recordings</source>
         <translation>Όλες οι Εγγραφές</translation>
-    </message>
-    <message>
-        <source>Retrieving Recording List. Please Wait...</source>
-        <translation type="obsolete">Φορτώνω τη Λίστα Εγγραφών. Παρακαλώ Περιμένετε...</translation>
     </message>
     <message>
         <location filename="../mytharchive/recordingselector.cpp" line="134"/>
@@ -789,10 +717,6 @@ Please Wait...</source>
         <source>Select All</source>
         <translation>Επιλογή Όλων</translation>
     </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="obsolete">Ακύρωση</translation>
-    </message>
 </context>
 <context>
     <name>SelectDestination</name>
@@ -802,17 +726,9 @@ Please Wait...</source>
         <translation>DVD Μονής Επίστρωσης</translation>
     </message>
     <message>
-        <source>Single Layer DVD (4482Mb)</source>
-        <translation type="obsolete">DVD Μονής Επίστρωσης (4482Mb)</translation>
-    </message>
-    <message>
         <location filename="../mytharchive/archiveutil.cpp" line="38"/>
         <source>Dual Layer DVD</source>
         <translation>DVD Διπλής Επίστρωσης</translation>
-    </message>
-    <message>
-        <source>Dual Layer DVD (8964Mb)</source>
-        <translation type="obsolete">DVD Διπλής Επίστρωσης (8964Mb)</translation>
     </message>
     <message>
         <location filename="../mytharchive/archiveutil.cpp" line="35"/>
@@ -1221,7 +1137,7 @@ Please Wait...</source>
     <message>
         <location filename="themestrings.h" line="16"/>
         <source>Prev</source>
-        <translation>Προηγ</translation>
+        <translation>Προηγούμενο</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="91"/>
@@ -1344,10 +1260,6 @@ Please Wait...</source>
         <translation>Επιλέξτε Αρχείο προς Εισαγωγή</translation>
     </message>
     <message>
-        <source>Search</source>
-        <translation type="obsolete">Αναζήτηση</translation>
-    </message>
-    <message>
         <location filename="themestrings.h" line="54"/>
         <source>Add video</source>
         <translation>Προσθήκη Ταινίας</translation>
@@ -1365,12 +1277,12 @@ Please Wait...</source>
     <message>
         <location filename="themestrings.h" line="106"/>
         <source>Create DVD</source>
-        <translation>Δημιουργια DVD</translation>
+        <translation>Δημιουργία DVD</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="107"/>
         <source>Create Archive</source>
-        <translation>Δημιουργια Αρχειου Συμπιεσης</translation>
+        <translation>Δημιουργία Αρχείου Συμπίεσης</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="108"/>
@@ -1380,49 +1292,45 @@ Please Wait...</source>
     <message>
         <location filename="themestrings.h" line="109"/>
         <source>Import Archive</source>
-        <translation>Εισαγωγη Αρχειου Συμπιεσης</translation>
+        <translation>Εισαγωγή Αρχείου Συμπίεσης</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="110"/>
         <source>Archive Utilities</source>
-        <translation>Ευκολιες Αρχειοθετησης</translation>
+        <translation>Ευκολίες Αρχειοθέτησης</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="111"/>
         <source>Show Log Viewer</source>
-        <translation>Εμφανιση Προβολεα Καταγραφης</translation>
+        <translation>Εμφάνιση Προβολέα Καταγραφής</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="112"/>
         <source>Play Created DVD</source>
-        <translation>Αναπαραγωγη του γραμμένου DVD</translation>
+        <translation>Αναπαραγωγή του Δημιουργημένου DVD</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="113"/>
         <source>Burn DVD</source>
-        <translation>Εγγραφη του DVD</translation>
+        <translation>Εγγραφή του DVD</translation>
     </message>
 </context>
 <context>
     <name>ThumbFinder</name>
     <message>
-        <location filename="../mytharchive/thumbfinder.cpp" line="932"/>
+        <location filename="../mytharchive/thumbfinder.cpp" line="918"/>
         <source>Menu</source>
         <translation>Επιλογές</translation>
     </message>
     <message>
-        <location filename="../mytharchive/thumbfinder.cpp" line="939"/>
+        <location filename="../mytharchive/thumbfinder.cpp" line="925"/>
         <source>Exit, Save Thumbnails</source>
         <translation>Έξοδος, Αποθήκευση Μικρογραφιών</translation>
     </message>
     <message>
-        <location filename="../mytharchive/thumbfinder.cpp" line="940"/>
+        <location filename="../mytharchive/thumbfinder.cpp" line="926"/>
         <source>Exit, Don&apos;t Save Thumbnails</source>
         <translation>Έξοδος, Χωρίς Αποθήκευση Μικρογραφιών</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="obsolete">Ακύρωση</translation>
     </message>
 </context>
 <context>
@@ -1443,23 +1351,15 @@ Please Wait...</source>
         <translation>Επιλογή Όλων</translation>
     </message>
     <message>
-        <source>Cancel</source>
-        <translation type="obsolete">Ακύρωση</translation>
-    </message>
-    <message>
         <location filename="../mytharchive/videoselector.cpp" line="357"/>
-        <location filename="../mytharchive/videoselector.cpp" line="490"/>
+        <location filename="../mytharchive/videoselector.cpp" line="487"/>
         <source>All Videos</source>
         <translation>Όλες οι Ταινίες</translation>
     </message>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="547"/>
+        <location filename="../mytharchive/videoselector.cpp" line="544"/>
         <source>You need to enter a valid password for this parental level</source>
         <translation>Πρέπει να εισάγετε τον σωστό κωδικό γι΄αυτό το γονικό επίπεδο</translation>
-    </message>
-    <message>
-        <source>Parental Pin:</source>
-        <translation type="obsolete">Γονικό Pin:</translation>
     </message>
 </context>
 </TS>

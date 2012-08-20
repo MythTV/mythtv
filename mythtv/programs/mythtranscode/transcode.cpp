@@ -1097,10 +1097,18 @@ int Transcode::TranscodeFile(const QString &inputname,
 
                 avfw2->SetContainer("mpegts");
 
-                if (gCoreContext->GetNumSetting("HLSAACAUDIO", 1))
-                    avfw2->SetAudioCodec("aac");
+                if (!gCoreContext->GetSetting("HLSAUDIO").isEmpty())
+                    avfw2->SetAudioCodec(gCoreContext->GetSetting("HLSAUDIO"));
                 else
-                    avfw2->SetAudioCodec("libmp3lame");
+#if CONFIG_LIBFAAC_ENCODER
+                avfw2->SetAudioCodec("libfaac");
+#else
+# if CONFIG_LIBMP3LAME_ENCODER
+                avfw2->SetAudioCodec("libmp3lame");
+# else
+                avfw2->SetAudioCodec("aac");
+# endif
+#endif
 
                 avfw2->SetAudioBitrate(audioOnlyBitrate);
                 avfw2->SetAudioChannels(arb->m_channels);
@@ -1112,10 +1120,18 @@ int Transcode::TranscodeFile(const QString &inputname,
             avfw->SetContainer("mpegts");
             avfw->SetVideoCodec("libx264");
 
-            if (gCoreContext->GetNumSetting("HLSAACAUDIO", 1))
-                avfw->SetAudioCodec("aac");
+            if (!gCoreContext->GetSetting("HLSAUDIO").isEmpty())
+                avfw->SetAudioCodec(gCoreContext->GetSetting("HLSAUDIO"));
             else
+#if CONFIG_LIBFAAC_ENCODER
+                avfw->SetAudioCodec("libfaac");
+#else
+# if CONFIG_LIBMP3LAME_ENCODER
                 avfw->SetAudioCodec("libmp3lame");
+# else
+                avfw->SetAudioCodec("aac");
+# endif
+#endif
 
             if (hlsStreamID == -1)
             {

@@ -44,6 +44,7 @@ class HLSRingBuffer : public RingBuffer
 {
 public:
     HLSRingBuffer(const QString &lfilename);
+    HLSRingBuffer(const QString &lfilename, bool open);
     virtual ~HLSRingBuffer();
 
     virtual bool IsOpen(void) const;
@@ -129,6 +130,7 @@ private:
     PlaylistWorker     *m_playlistworker;
     FILE               *m_fd;
     bool                m_interrupted;
+    bool                m_killed;
 };
 
 #endif

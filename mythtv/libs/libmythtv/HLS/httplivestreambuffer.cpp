@@ -81,6 +81,12 @@ static bool downloadURL(QString url, QByteArray *buffer)
     return mdm->download(url, buffer);
 }
 
+static void cancelURL(QString url)
+{
+    MythDownloadManager *mdm = GetMythDownloadManager();
+    mdm->cancelDownload(url);
+}
+
 /* segment container */
 
 class HLSSegment
@@ -99,6 +105,7 @@ public:
         m_keyloaded     = false;
         m_psz_key_path  = current_key_path;
 #endif
+        m_downloading   = false;
     }
 
     HLSSegment(const HLSSegment &rhs)
@@ -127,6 +134,7 @@ public:
         memcpy(&m_aeskey, &(rhs.m_aeskey), sizeof(m_aeskey));
         m_keyloaded     = rhs.m_keyloaded;
 #endif
+        m_downloading   = rhs.m_downloading;
         return *this;
     }
 
@@ -163,7 +171,9 @@ public:
     int Download(void)
     {
         // must own lock
+        m_downloading = true;
         bool ret = downloadURL(m_url, &m_data);
+        m_downloading = false;
         // didn't succeed, clear buffer
         if (!ret)
         {
@@ -171,6 +181,16 @@ public:
             return RET_ERROR;
         }
         return RET_OK;
+    }
+
+    void CancelDownload(void)
+    {
+        if (m_downloading)
+        {
+            cancelURL(m_url);
+            QMutexLocker lock(&m_lock);
+            m_downloading = false;
+        }
     }
 
     QString Url(void)
@@ -337,6 +357,7 @@ private:
     QByteArray  m_data;         // raw data
     int32_t     m_played;       // bytes counter of data already read from segment
     QMutex      m_lock;
+    bool        m_downloading;
 };
 
 /* stream class */
@@ -725,6 +746,19 @@ public:
             m_targetduration : upd.m_targetduration;
         m_cache             = upd.m_cache;
     }
+    void Cancel(void)
+    {
+        QMutexLocker lock(&m_lock);
+        QList<HLSSegment*>::iterator it = m_segments.begin();
+        for (; it != m_segments.end(); ++it)
+        {
+            if (*it)
+            {
+                (*it)->CancelDownload();
+            }
+        }
+    }
+
 #ifdef USING_LIBCRYPTO
     /**
      * Will download all required segment AES-128 keys
@@ -790,6 +824,7 @@ public:
     {
         m_keypath = x;
     }
+
 private:
     QString     m_keypath;              // URL path of the encrypted key
     bool        m_ivloaded;
@@ -880,6 +915,18 @@ public:
     {
         m_interrupted = true;
         Wakeup();
+        m_lock.lock();
+        // Interrupt on-going downloads of all segments
+        int streams = m_parent->NumStreams();
+        for (int i = 0; i < streams; i++)
+        {
+            HLSStream *hls = m_parent->GetStream(i);
+            if (hls)
+            {
+                hls->Cancel();
+            }
+        }
+        m_lock.unlock();
         wait();
     }
     int CurrentStream(void)
@@ -1187,6 +1234,18 @@ public:
     {
         m_interrupted = true;
         Wakeup();
+        m_lock.lock();
+        // Interrupt on-going downloads of all stream playlists
+        int streams = m_parent->NumStreams();
+        for (int i = 0; i < streams; i++)
+        {
+            HLSStream *hls = m_parent->GetStream(i);
+            if (hls)
+            {
+                cancelURL(hls->Url());
+            }
+        }
+        m_lock.unlock();
         wait();
     }
 
@@ -1425,7 +1484,7 @@ private:
         int err = RET_ERROR;
 
         /* Duplicate HLS stream META information */
-        for (int i = 0; i < m_parent->m_streams.size(); i++)
+        for (int i = 0; i < m_parent->m_streams.size() && !m_interrupted; i++)
         {
             HLSStream *src, *dst;
             src = m_parent->GetStream(i);
@@ -1437,7 +1496,7 @@ private:
 
             /* Download playlist file from server */
             QByteArray buffer;
-            if (!downloadURL(dst->Url(), &buffer))
+            if (!downloadURL(dst->Url(), &buffer) || m_interrupted)
             {
                 return RET_ERROR;
             }
@@ -1464,15 +1523,32 @@ HLSRingBuffer::HLSRingBuffer(const QString &lfilename) :
     m_meta(false),          m_error(false),         m_aesmsg(false),
     m_startup(0),           m_bitrate(0),           m_seektoend(false),
     m_streamworker(NULL),   m_playlistworker(NULL), m_fd(NULL),
-    m_interrupted(false)
+    m_interrupted(false),   m_killed(false)
 {
     startreadahead = false;
     OpenFile(lfilename);
 }
 
+HLSRingBuffer::HLSRingBuffer(const QString &lfilename, bool open) :
+    RingBuffer(kRingBuffer_HLS),
+    m_playback(new HLSPlayback()),
+    m_meta(false),          m_error(false),         m_aesmsg(false),
+    m_startup(0),           m_bitrate(0),           m_seektoend(false),
+    m_streamworker(NULL),   m_playlistworker(NULL), m_fd(NULL),
+    m_interrupted(false),   m_killed(false)
+{
+    startreadahead = false;
+    if (open)
+    {
+        OpenFile(lfilename);
+    }
+}
+
 HLSRingBuffer::~HLSRingBuffer()
 {
     QWriteLocker lock(&rwlock);
+
+    m_killed = true;
 
     if (m_playlistworker)
     {
@@ -2062,7 +2138,7 @@ int HLSRingBuffer::ParseM3U8(const QByteArray *buffer, StreamsList *streams)
 
         /* M3U8 Meta Index file */
         stream.seek(0); // rewind
-        while (true)
+        while (!m_killed)
         {
             line = stream.readLine();
             if (line.isNull())
@@ -2088,11 +2164,20 @@ int HLSRingBuffer::ParseM3U8(const QByteArray *buffer, StreamsList *streams)
                     HLSStream *hls = ParseStreamInformation(line, uri);
                     if (hls)
                     {
-                        streams->append(hls);
                         /* Download playlist file from server */
                         QByteArray buf;
                         bool ret = downloadURL(hls->Url(), &buf);
                         if (!ret)
+                        {
+                            LOG(VB_GENERAL, LOG_INFO, LOC +
+                                QString("Skipping invalid stream, couldn't download: %1")
+                                .arg(hls->Url()));
+                            delete hls;
+                            continue;
+                        }
+                        streams->append(hls);
+                        // One last chance to abort early
+                        if (m_killed)
                         {
                             err = RET_ERROR;
                             break;
@@ -2195,7 +2280,7 @@ int HLSRingBuffer::Prefetch(int count)
         .arg(count));
     m_streamworker->Lock();
     m_streamworker->Wakeup();
-    while (!m_error && (retries < 20) &&
+    while (!m_error && !m_killed && (retries < 20) &&
            (m_streamworker->CurrentPlaybackBuffer(false) < count) &&
            !m_streamworker->IsAtEnd())
     {

@@ -62,22 +62,6 @@
         <translation>Slett mating</translation>
     </message>
     <message>
-        <source>Cancel</source>
-        <translation type="obsolete">Avbryt</translation>
-    </message>
-    <message>
-        <source>Edit News Site</source>
-        <translation type="obsolete">Rediger nyhetssted</translation>
-    </message>
-    <message>
-        <source>Add News Site</source>
-        <translation type="obsolete">Legg til nyhetssted</translation>
-    </message>
-    <message>
-        <source>Delete News Site</source>
-        <translation type="obsolete">Slett nyhetssted</translation>
-    </message>
-    <message>
         <location filename="../mythnews/mythnews.cpp" line="887"/>
         <source>Options</source>
         <translation>Innstillinger</translation>
@@ -178,13 +162,6 @@
     </message>
 </context>
 <context>
-    <name>QObject</name>
-    <message>
-        <source>Downloading media...</source>
-        <translation type="obsolete">Laster ned media...</translation>
-    </message>
-</context>
-<context>
     <name>ThemeUI</name>
     <message>
         <location filename="themestrings.h" line="6"/>
@@ -236,6 +213,41 @@ Når du er ferdig å redigere, velg &quot;OK&quot; eller &quot;Avbryt&quot; for 
         <translation>Kanal:</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="27"/>
+        <source>NEWS</source>
+        <translation>NYHETER</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="28"/>
+        <source>Choose which news channels interest you</source>
+        <translation>Velg hvilke nyhetskanaler som interesserer deg</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="29"/>
+        <source>Name site:</source>
+        <translation>Navn for nettsted:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="30"/>
+        <source>Site icon:</source>
+        <translation>Ikon for nettsted:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="31"/>
+        <source>URL site:</source>
+        <translation>URL for nettsted:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="32"/>
+        <source>Save</source>
+        <translation>Lagre</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="33"/>
+        <source>News settings</source>
+        <translation>Innstillinger for nyhetssted</translation>
+    </message>
+    <message>
         <location filename="themestrings.h" line="7"/>
         <source>OK</source>
         <translation>OK</translation>
@@ -269,14 +281,6 @@ Når du er ferdig å redigere, velg &quot;OK&quot; eller &quot;Avbryt&quot; for 
         <location filename="themestrings.h" line="26"/>
         <source>Actions</source>
         <translation>Aksjoner</translation>
-    </message>
-    <message>
-        <source>MythNews Configuration</source>
-        <translation type="obsolete">MythNews konfigurasjon</translation>
-    </message>
-    <message>
-        <source>Minutes</source>
-        <translation type="obsolete">Minutter</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="20"/>

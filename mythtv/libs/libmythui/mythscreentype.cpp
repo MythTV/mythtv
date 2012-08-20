@@ -16,6 +16,23 @@
 #include "mythuigroup.h"
 #include "mythlogging.h"
 
+class SemaphoreLocker
+{
+  public:
+    SemaphoreLocker(QSemaphore *lock) : m_lock(lock)
+    {
+        if (m_lock)
+            m_lock->acquire();
+    }
+    ~SemaphoreLocker()
+    {
+        if (m_lock)
+            m_lock->release();
+    }
+  private:
+    QSemaphore *m_lock;
+};
+
 QEvent::Type ScreenLoadCompletionEvent::kEventType =
     (QEvent::Type) QEvent::registerEventType();
 
@@ -30,15 +47,15 @@ class ScreenLoadTask : public QRunnable
         m_parent.Load();
         m_parent.m_IsLoaded = true;
         m_parent.m_IsLoading = false;
-        m_parent.m_LoadLock.unlock();
+        m_parent.m_LoadLock.release();
     }
 
     MythScreenType &m_parent;
 };
 
-MythScreenType::MythScreenType(MythScreenStack *parent, const QString &name,
-                               bool fullscreen)
-              : MythUIType(parent, name)
+MythScreenType::MythScreenType(
+    MythScreenStack *parent, const QString &name, bool fullscreen) :
+    MythUIType(parent, name), m_LoadLock(1)
 {
     m_FullScreen = fullscreen;
     m_CurrentFocusWidget = NULL;
@@ -57,9 +74,9 @@ MythScreenType::MythScreenType(MythScreenStack *parent, const QString &name,
 //        QString("SCREEN_TYPE CREATED %1").arg(name));
 }
 
-MythScreenType::MythScreenType(MythUIType *parent, const QString &name,
-                               bool fullscreen)
-              : MythUIType(parent, name)
+MythScreenType::MythScreenType(
+    MythUIType *parent, const QString &name, bool fullscreen) :
+    MythUIType(parent, name), m_LoadLock(1)
 {
     m_FullScreen = fullscreen;
     m_CurrentFocusWidget = NULL;
@@ -83,7 +100,7 @@ MythScreenType::~MythScreenType()
 //        QString("SCREEN_TYPE DESTROYED %1").arg(objectName()));
 
     // locking ensures background screen load can finish running
-    QMutexLocker locker(&m_LoadLock);
+    SemaphoreLocker locker(&m_LoadLock);
 
     m_CurrentFocusWidget = NULL;
     emit Exiting();
@@ -299,7 +316,7 @@ void MythScreenType::Load(void)
 
 void MythScreenType::LoadInBackground(QString message)
 {
-    m_LoadLock.lock();
+    m_LoadLock.acquire();
 
     m_IsLoading = true;
     m_IsLoaded = false;
@@ -314,7 +331,7 @@ void MythScreenType::LoadInBackground(QString message)
 
 void MythScreenType::LoadInForeground(void)
 {
-    QMutexLocker locker(&m_LoadLock);
+    SemaphoreLocker locker(&m_LoadLock);
 
     m_IsLoading = true;
     m_IsLoaded = false;
@@ -378,7 +395,7 @@ bool MythScreenType::IsInitialized(void) const
 
 void MythScreenType::doInit(void)
 {
-    QMutexLocker locker(&m_LoadLock); // don't run while loading..
+    SemaphoreLocker locker(&m_LoadLock); // don't run while loading..
 
     CloseBusyPopup();
     Init();

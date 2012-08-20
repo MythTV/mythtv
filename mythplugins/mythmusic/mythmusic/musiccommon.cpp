@@ -2107,8 +2107,6 @@ MythMenu* MusicCommon::createViewMenu(void)
         menu->AddItem(tr("Playlist Editor - Tree"), qVariantFromValue((int)MV_PLAYLISTEDITORTREE));
     if (m_currentView != MV_PLAYLISTEDITORGALLERY)
         menu->AddItem(tr("Playlist Editor - Gallery"), qVariantFromValue((int)MV_PLAYLISTEDITORGALLERY));
-    if (m_currentView != MV_VISUALIZER)
-        menu->AddItem(tr("Fullscreen Visualizer"), qVariantFromValue((int)MV_VISUALIZER));
     if (m_currentView != MV_SEARCH)
         menu->AddItem(tr("Search for Music"), qVariantFromValue((int)MV_SEARCH));
     if (m_currentView != MV_RADIO)

@@ -182,14 +182,6 @@ Remove it from the database?</source>
 <context>
     <name>GameScanner</name>
     <message>
-        <source>Verifying game files</source>
-        <translation type="obsolete">Έλεγχος αρχειών παιχνιδιών</translation>
-    </message>
-    <message>
-        <source>Updating game database</source>
-        <translation type="obsolete">Ενημερώνω τη βάση δεδομένων</translation>
-    </message>
-    <message>
         <location filename="../mythgame/gamescan.cpp" line="67"/>
         <source>Verifying game files...</source>
         <translation>Έλεγχος αρχείων παιχνιδιών...</translation>
@@ -238,11 +230,7 @@ Remove it from the database?</source>
         <translation>-   Κατά Εταιρία</translation>
     </message>
     <message>
-        <source>Choose System for</source>
-        <translation type="obsolete">Επιλέξτε Σύστημα για</translation>
-    </message>
-    <message>
-        <location filename="../mythgame/gameui.cpp" line="271"/>
+        <location filename="../mythgame/gameui.cpp" line="272"/>
         <source>Choose System for:
 %1</source>
         <extracomment>%1 is the game name</extracomment>
@@ -250,49 +238,48 @@ Remove it from the database?</source>
 %1</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="288"/>
-        <location filename="../mythgame/gameui.cpp" line="541"/>
+        <location filename="../mythgame/gameui.cpp" line="540"/>
         <source>Cancel</source>
         <translation>Ακύρωση</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="441"/>
-        <location filename="../mythgame/gameui.cpp" line="521"/>
+        <location filename="../mythgame/gameui.cpp" line="440"/>
+        <location filename="../mythgame/gameui.cpp" line="520"/>
         <source>Scan For Changes</source>
         <translation>Ανίχνευση για Αλλαγές</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="447"/>
-        <location filename="../mythgame/gameui.cpp" line="525"/>
+        <location filename="../mythgame/gameui.cpp" line="446"/>
+        <location filename="../mythgame/gameui.cpp" line="524"/>
         <source>Show Information</source>
         <translation>Προβολή Πληροφοριών</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="449"/>
-        <location filename="../mythgame/gameui.cpp" line="530"/>
+        <location filename="../mythgame/gameui.cpp" line="448"/>
+        <location filename="../mythgame/gameui.cpp" line="529"/>
         <source>Remove Favorite</source>
         <translation>Αφαίρεση Αγαπημένου</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="451"/>
-        <location filename="../mythgame/gameui.cpp" line="529"/>
+        <location filename="../mythgame/gameui.cpp" line="450"/>
+        <location filename="../mythgame/gameui.cpp" line="528"/>
         <source>Make Favorite</source>
         <translation>Προσθήκη Αγαπημένου</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="452"/>
-        <location filename="../mythgame/gameui.cpp" line="534"/>
+        <location filename="../mythgame/gameui.cpp" line="451"/>
+        <location filename="../mythgame/gameui.cpp" line="533"/>
         <source>Retrieve Details</source>
         <translation>Ανάκτηση Λεπτομερειών</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="453"/>
-        <location filename="../mythgame/gameui.cpp" line="517"/>
+        <location filename="../mythgame/gameui.cpp" line="452"/>
+        <location filename="../mythgame/gameui.cpp" line="516"/>
         <source>Edit Details</source>
         <translation>Επεξεργασία Λεπτομερειών</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="481"/>
+        <location filename="../mythgame/gameui.cpp" line="480"/>
         <source>Game Search</source>
         <translation>Αναζήτηση Παιχνιδιού</translation>
     </message>
@@ -447,14 +434,6 @@ Remove it from the database?</source>
         <translation>Επιλογές Συστημάτων Παιχνιδιού</translation>
     </message>
     <message>
-        <source>Edit..</source>
-        <translation type="obsolete">Επεξεργασία..</translation>
-    </message>
-    <message>
-        <source>Delete..</source>
-        <translation type="obsolete">Διαγραφή..</translation>
-    </message>
-    <message>
         <location filename="../mythgame/gamesettings.cpp" line="373"/>
         <source>Edit...</source>
         <translation>Επεξεργασία...</translation>
@@ -567,522 +546,209 @@ Remove it from the database?</source>
     </message>
 </context>
 <context>
-    <name>QObject</name>
-    <message>
-        <source>19xx</source>
-        <translation type="obsolete">19xx</translation>
-    </message>
-    <message>
-        <source>Unknown</source>
-        <translation type="obsolete">Άγνωστο</translation>
-    </message>
-    <message>
-        <source>0</source>
-        <translation type="obsolete">0</translation>
-    </message>
-    <message>
-        <source>Verifying %1 files...</source>
-        <translation type="obsolete">Επιβεβαίωση %1 αρχείων...</translation>
-    </message>
-    <message>
-        <source>Scanning for %1 games</source>
-        <translation type="obsolete">Ανίχνευση για παιχνίδια %1</translation>
-    </message>
-    <message>
-        <source>Scanning for %1 games...</source>
-        <translation type="obsolete">Ανίχνευση για παιχνίδια %1...</translation>
-    </message>
-    <message>
-        <source>No</source>
-        <translation type="obsolete">Όχι</translation>
-    </message>
-    <message>
-        <source>No to all</source>
-        <translation type="obsolete">Όχι σε όλα</translation>
-    </message>
-    <message>
-        <source>Yes</source>
-        <translation type="obsolete">Ναι</translation>
-    </message>
-    <message>
-        <source>Yes to all</source>
-        <translation type="obsolete">Ναι σε όλα</translation>
-    </message>
-    <message>
-        <source>File Missing</source>
-        <translation type="obsolete">Λείπει το Αρχείο</translation>
-    </message>
-    <message>
-        <source>%1 appears to be missing.
-Remove it from the database?</source>
-        <translation type="obsolete">Το %1 φαίνεται να λείπει.
-Να το αφαιρέσω από τη συλλογή;</translation>
-    </message>
-    <message>
-        <source>Updating %1(%2) ROM database</source>
-        <translation type="obsolete">Ενημέρωση %1 (%2) της βιβλιοθήκης ROM</translation>
-    </message>
-    <message>
-        <source>Verifying %1 files</source>
-        <translation type="obsolete">Επιβεβαίωση %1 αρχείων</translation>
-    </message>
-    <message>
-        <source>Are you sure?</source>
-        <translation type="obsolete">Είστε σίγουροι;</translation>
-    </message>
-    <message>
-        <source>This will clear all Game Meta Data
-from the database. Are you sure you
-want to do this?</source>
-        <translation type="obsolete">Αυτό θα διαγράψει όλες τις πληροφορίες 
-Παιχνιδιών από τη βάση δεδομένων
-Σίγουρα θέλετε να το κάνετε;</translation>
-    </message>
-    <message>
-        <source>Scanning for %1 game(s)...</source>
-        <translation type="obsolete">Ανιχνεύω για %1 παιχνίδια...</translation>
-    </message>
-    <message>
-        <source>Game display order</source>
-        <translation type="obsolete">Σειρά εμφάνισης παιχνιδιών</translation>
-    </message>
-    <message>
-        <source>Order in which to sort the games - this is for all systems. Available choices: system, year, genre and gamename</source>
-        <translation type="obsolete">Η σειρά ταξινόμησης των παιχνιδιών - ισχύει για όλα τα συστήματα. Διαθέσιμες επιλογές: system, year, genre and gamename</translation>
-    </message>
-    <message>
-        <source>Favourite display order</source>
-        <translation type="obsolete">Σειρά εμφάνισης Αγαπημένων</translation>
-    </message>
-    <message>
-        <source>Order in which to sort the games marked as favourites - this is for all systems. Available choices: system, year, genre and gamename</source>
-        <translation type="obsolete">Η σειρά ταξινόμησης των παιχνιδιών στη λίστα Αγαπημένων - ισχύει για όλα τα συστήματα. Διαθέσιμες επιλογές: system, year, genre and gamename</translation>
-    </message>
-    <message>
-        <source>Indepth Game Scan</source>
-        <translation type="obsolete">Λεπτομερής Αναζήτηση Παιχνιδιών</translation>
-    </message>
-    <message>
-        <source>Enabling this causes a game scan to gather crc values and attempt to find out more detailed information about the game: NOTE this can greatly increase the time a gamescan takes based on the amount of games scanned.</source>
-        <translation type="obsolete">Αν το επιλέξετε η αναζήτηση παιχνιδιών θα συγκεντρώσει στοιχεία ισοτιμίας (crc) προσπαθώντας να ανακαλύψει περισσότερες πληροφορίες για το παιχνίδι: ΣΗΜΕΙΩΣΗ μπορεί να αυξήσει σημαντικά το χρόνο ανίχνευσης, ανάλογα με το πλήθος των παιχνιδιών.</translation>
-    </message>
-    <message>
-        <source>Prompt for removal of deleted rom(s)</source>
-        <translation type="obsolete">Ερώτηση για αφαίρεση διαγραμμένων ROM</translation>
-    </message>
-    <message>
-        <source>This enables a prompt for removing deleted roms from the database during a  gamescan</source>
-        <translation type="obsolete">Κατά την ανίχνευση, επιτρέπει την ερώτηση για αφαίρεση από τη βάση δεδομένων των rom που έχουν διαγραφεί</translation>
-    </message>
-    <message>
-        <source>Display Files Names in Game Tree</source>
-        <translation type="obsolete">Εμφάνιση Ονομάτων Αρχείων στο Δένδρο Παιχνιδιών</translation>
-    </message>
-    <message>
-        <source>Enabling this causes the filenames to be displayed in the game tree rather than the trimmed/looked up gamename</source>
-        <translation type="obsolete">Αν το επιλέξετε θα φαίνονται τα ονόματα των αρχείων αντί για τα ονόματα των παιχνιδιών</translation>
-    </message>
-    <message>
-        <source>Favorite display order</source>
-        <translation type="obsolete">Σειρά εμφάνισης αγαπημένων</translation>
-    </message>
-    <message>
-        <source>Order in which to sort the games marked as favorites - this is for all systems. Available choices: system, year, genre and gamename</source>
-        <translation type="obsolete">Η σειρά ταξινόμησης των παιχνιδιών στη λίστα αγαπημένων - ισχύει για όλα τα συστήματα. Διαθέσιμες επιλογές: system, year, genre and gamename</translation>
-    </message>
-    <message>
-        <source>Enabling this causes a game scan to gather CRC values and attempt to find out more detailed information about the game: NOTE this can greatly increase the time a game scan takes based on the amount of games scanned.</source>
-        <translation type="obsolete">Αν το επιλέξετε η αναζήτηση παιχνιδιών θα συγκεντρώσει στοιχεία ισοτιμίας (crc) προσπαθώντας να ανακαλύψει περισσότερες πληροφορίες για το παιχνίδι: ΣΗΜΕΙΩΣΗ μπορεί να αυξήσει σημαντικά το χρόνο ανίχνευσης, ανάλογα με το πλήθος των παιχνιδιών.</translation>
-    </message>
-    <message>
-        <source>Prompt for removal of deleted ROM(s)</source>
-        <translation type="obsolete">Ερώτηση για αφαίρεση διαγραμμένης(ων) ROM</translation>
-    </message>
-    <message>
-        <source>This enables a prompt for removing deleted ROMs from the database during a  game scan</source>
-        <translation type="obsolete">Κατά την ανίχνευση, επιτρέπει την ερώτηση για αφαίρεση από τη βάση δεδομένων των rom που έχουν διαγραφεί</translation>
-    </message>
-    <message>
-        <source>Enabling this causes the filenames to be displayed in the game tree rather than the trimmed/looked up game name</source>
-        <translation type="obsolete">Αν το επιλέξετε θα φαίνονται τα ονόματα των αρχείων αντί για τα ονόματα των παιχνιδιών</translation>
-    </message>
-    <message>
-        <source>Hash filenames in display</source>
-        <translation type="obsolete">Σύντμηση εμφάνισης ονομάτων αρχείων</translation>
-    </message>
-    <message>
-        <source>Enable hashing of names in the display tree. This can make navigating long lists a little faster</source>
-        <translation type="obsolete">Επιτρέπει την σύντμηση των ονομάτων στο δένδρο εμφάνισης. Κάνει την πλοήγηση σε μεγάλες λίστες λίγο γρηγορότερη</translation>
-    </message>
-    <message>
-        <source>Directory where Game Screenshots are stored</source>
-        <translation type="obsolete">Φάκελος αποθήκευσης Στιγμιοτύπων Παιχνιδιών</translation>
-    </message>
-    <message>
-        <source>This directory will be the default browse location when assigning screenshots.</source>
-        <translation type="obsolete">Ο φάκελος αυτός θα είναι η προεπιλεγμένη θέση περιήγησης όταν ορίζετε στιγμιότυπα.</translation>
-    </message>
-    <message>
-        <source>Directory where Game Fanart is stored</source>
-        <translation type="obsolete">Φάκελος αποθήκευσης Εικόνων Παιχνιδιών</translation>
-    </message>
-    <message>
-        <source>This directory will be the default browse location when assigning fanart.</source>
-        <translation type="obsolete">Ο φάκελος αυτός θα είναι η προεπιλεγμένη θέση περιήγησης όταν ορίζετε εικόνες παιχνιδιών.</translation>
-    </message>
-    <message>
-        <source>Directory where Game Boxart is stored</source>
-        <translation type="obsolete">Φάκελος αποθήκευσης Εξωφύλλων Παιχνιδιών</translation>
-    </message>
-    <message>
-        <source>This directory will be the default browse location when assigning boxart.</source>
-        <translation type="obsolete">Ο φάκελος αυτός θα είναι η προεπιλεγμένη θέση περιήγησης όταν ορίζετε Εξώφυλλα.</translation>
-    </message>
-    <message>
-        <source>MythGame Settings -- General</source>
-        <translation type="obsolete">Ρυθμίσεις MythGame -- Γενικά</translation>
-    </message>
-    <message>
-        <source>Allow games to span multiple ROMs/disks</source>
-        <translation type="obsolete">Επιτρέπονται πολλαπλές roms/δίσκοι στα παιχνίδια</translation>
-    </message>
-    <message>
-        <source>Binary and optional parameters. Multiple commands separated with &apos;;&apos; . Use %s for the ROM name. %d1, %d2, %d3 and %d4 represent disks in a multidisk/game. %s auto appended if not specified</source>
-        <translation type="obsolete">Το εκτελέσιμο και προεραιτικές παράμετροι. Πολλαπλές εντολές χωρίζονται με &apos;,&apos;. Χρησιμοποιείστε το %s για το όνομα της rom. %d1, %d2, %d3 και %d4 αντιπροσωπεύουν πολλαπλούς δίσκους στο παιχνίδι. το %s προστίθεται αυτόματα αν δεν οριστεί</translation>
-    </message>
-    <message>
-        <source>ROM Path</source>
-        <translation type="obsolete">Διαδρομή ROM</translation>
-    </message>
-    <message>
-        <source>Allow games to span multiple roms/disks</source>
-        <translation type="obsolete">Επιτρέπονται πολλαπλές roms/δίσκοι στα παιχνίδια</translation>
-    </message>
-    <message>
-        <source>This setting means that we will look for items like game.1.rom, game.2.rom and consider them a single game.</source>
-        <translation type="obsolete">Σημαίνει πως θα ψάχνουμε για αντικείμενα όπως game.1.rom, game.2.rom και θα τα θεωρούμε ένα παιχνίδι.</translation>
-    </message>
-    <message>
-        <source>Command</source>
-        <translation type="obsolete">Εντολή</translation>
-    </message>
-    <message>
-        <source>Binary and optional parameters. Multiple commands separated with &apos;;&apos; . Use %s for the rom name. %d1, %d2, %d3 and %d4 represent disks in a multidisk/game. %s auto appended if not specified</source>
-        <translation type="obsolete">Το εκτελέσιμο και προεραιτικές παράμετροι. Πολλαπλές εντολές χωρίζονται με &apos;,&apos;. Χρησιμοποιείστε το %s για το όνομα της rom. %d1, %d2, %d3 και %d4 αντιπροσωπεύουν πολλαπλούς δίσκους στο παιχνίδι. το %s προστίθεται αυτόματα αν δεν οριστεί</translation>
-    </message>
-    <message>
-        <source>A comma separated list of all file extensions for this emulator. Blank means any file under ROM PATH is considered to be used with this emulator</source>
-        <translation type="obsolete">Μια λίστα των προεκτάσεων αρχείων γι΄αυτό τον προσομοιωτή, χωρισμένη με κόμμα. Κενή σημαίνει πως όλα τα αρχεία κάτω από τη Διαδρομή ROM θεωρούνται πως μπορεί να χρησιμοποιηθούν</translation>
-    </message>
-    <message>
-        <source>Binary and optional parameters. Multiple commands seperated with &apos;;&apos; . Use %s for the rom name. %d1, %d2, %d3 and %d4 represent disks in a multidisk/game. %s auto appended if not specified</source>
-        <translation type="obsolete">Το εκτελέσιμο και προεραιτικές παράμετροι. Πολλαπλές εντολές χωρίζονται με &apos;,&apos;. Χρησιμοποιείστε το %s για το όνομα της rom. %d1, %d2, %d3 και %d4 αντιπροσωπεύουν πολλαπλούς δίσκους στο παιχνίδι. το %s προστίθεται αυτόματα αν δεν οριστεί</translation>
-    </message>
-    <message>
-        <source>Type</source>
-        <translation type="obsolete">Τύπος</translation>
-    </message>
-    <message>
-        <source>Type of Game/Emulator. Mostly for informational purposes and has little effect on the function of your system.</source>
-        <translation type="obsolete">Τύπος του Παιχνιδιού/Προσομοιωτή. Κυρίως για ενημερωτικούς σκοπούς και λίγο επηρρεάζει την λειτουργία του συστήματος.</translation>
-    </message>
-    <message>
-        <source>Rom Path</source>
-        <translation type="obsolete">Διαδρομή Rom</translation>
-    </message>
-    <message>
-        <source>Location of the ROM files for this emulator</source>
-        <translation type="obsolete">Η Θέση των αρχείων ROM γι&apos;αυτό τον προσωμοιωτή</translation>
-    </message>
-    <message>
-        <source>Working Directory</source>
-        <translation type="obsolete">Φάκελος Εκκίνησης</translation>
-    </message>
-    <message>
-        <source>Directory to change to before launching emulator. Blank is usually fine</source>
-        <translation type="obsolete">Ο Φάκελος στον οποίο θα πηγαίνουμε πριν την εκκίνηση του προσωμοιωτή. Και άδειος συνήθως είναι ΟΚ</translation>
-    </message>
-    <message>
-        <source>File Extensions</source>
-        <translation type="obsolete">Προεκτάσεις Αρχείων</translation>
-    </message>
-    <message>
-        <source>A Comma seperated list of all file extensions for this emulator. Blank means any file under ROM PATH is considered to be used with this emulator</source>
-        <translation type="obsolete">Μια λίστα των προεκτάσεων αρχείων γι΄αυτό τον προσομοιωτή, χωρισμένη με κόμμα. Κενή σημαίνει πως όλα τα αρχεία κάτω από τη Διαδρομή ROM θεωρούνται πως μπορεί να χρησιμοποιηθούν</translation>
-    </message>
-    <message>
-        <source>Game Player Setup</source>
-        <translation type="obsolete">Ρύθμιση Προσομοιωτή Παιχνιδιών</translation>
-    </message>
-    <message>
-        <source>(New Game Player)</source>
-        <translation type="obsolete">(Νέος Προσομοιωτής)</translation>
-    </message>
-    <message>
-        <source>OTHER</source>
-        <translation type="obsolete">Άλλο</translation>
-    </message>
-    <message>
-        <source>AMIGA</source>
-        <translation type="obsolete">AMIGA</translation>
-    </message>
-    <message>
-        <source>ATARI</source>
-        <translation type="obsolete">ATARI</translation>
-    </message>
-    <message>
-        <source>GAMEGEAR</source>
-        <translation type="obsolete">GAMEGEAR</translation>
-    </message>
-    <message>
-        <source>GENESIS/MEGADRIVE</source>
-        <translation type="obsolete">GENESIS/MEGADRIVE</translation>
-    </message>
-    <message>
-        <source>MAME</source>
-        <translation type="obsolete">MAME</translation>
-    </message>
-    <message>
-        <source>N64</source>
-        <translation type="obsolete">N64</translation>
-    </message>
-    <message>
-        <source>NES</source>
-        <translation type="obsolete">NES</translation>
-    </message>
-    <message>
-        <source>PC GAME</source>
-        <translation type="obsolete">PC GAME</translation>
-    </message>
-    <message>
-        <source>PCE/TG16</source>
-        <translation type="obsolete">PCE/TG16</translation>
-    </message>
-    <message>
-        <source>SEGA/MASTER SYSYTEM</source>
-        <translation type="obsolete">SEGA/MASTER SYSTEM</translation>
-    </message>
-    <message>
-        <source>SNES</source>
-        <translation type="obsolete">SNES</translation>
-    </message>
-    <message>
-        <source>Player Name</source>
-        <translation type="obsolete">Όνομα Παιχνιδιού</translation>
-    </message>
-    <message>
-        <source>Name of this Game and or Emulator</source>
-        <translation type="obsolete">Όνομα του παιχνιδιού και/ή του Προσομοιωτή</translation>
-    </message>
-</context>
-<context>
     <name>ThemeUI</name>
     <message>
-        <location filename="themestrings.h" line="5"/>
+        <location filename="themestrings.h" line="45"/>
         <source>Games</source>
-        <translation>Παιχνιδια</translation>
+        <translation>Παιχνίδια</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="16"/>
+        <location filename="themestrings.h" line="15"/>
         <source>Released %1</source>
         <translation>Δημιουργία %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="17"/>
+        <location filename="themestrings.h" line="16"/>
         <source>%DATE%, %TIME%</source>
         <translation>%DATE%, %TIME%</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="18"/>
+        <location filename="themestrings.h" line="17"/>
         <source>Cancel</source>
         <translation>Ακύρωση</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="15"/>
+        <location filename="themestrings.h" line="14"/>
         <source>Play</source>
         <translation>Εκτέλεση</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="19"/>
+        <location filename="themestrings.h" line="18"/>
         <source>Edit Metadata</source>
         <translation>Επεξεργασία στοιχείων</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="20"/>
+        <location filename="themestrings.h" line="19"/>
         <source>Modify your game&apos;s metadata.</source>
         <translation>Αλλάξτε τις πληροφορίες για το παιχνίδι σας.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="21"/>
+        <location filename="themestrings.h" line="20"/>
         <source>Title:</source>
         <translation>Τίτλος:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="9"/>
+        <location filename="themestrings.h" line="8"/>
         <source>Genre:</source>
         <translation>Είδος:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="8"/>
+        <location filename="themestrings.h" line="7"/>
         <source>Year:</source>
         <translation>Έτος:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="13"/>
+        <location filename="themestrings.h" line="12"/>
         <source>Emulator:</source>
         <translation>Προσωμοιωτής:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="22"/>
+        <location filename="themestrings.h" line="21"/>
         <source>Country:</source>
         <translation>Χώρα:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="23"/>
+        <location filename="themestrings.h" line="22"/>
         <source>Publisher:</source>
         <translation>Εταιρία:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="24"/>
+        <location filename="themestrings.h" line="23"/>
         <source>Plot:</source>
         <translation>Πλοκή:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="25"/>
+        <location filename="themestrings.h" line="24"/>
         <source>Cover Art:</source>
         <translation>Εξώφυλλο:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="26"/>
+        <location filename="themestrings.h" line="25"/>
         <source>Screenshot:</source>
         <translation>Στιγμιότυπο:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="27"/>
+        <location filename="themestrings.h" line="26"/>
         <source>Fanart:</source>
         <translation>Εικόνα:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="28"/>
+        <location filename="themestrings.h" line="27"/>
         <source>Game is a Favorite</source>
         <translation>Είναι Αγαπημένο</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="29"/>
+        <location filename="themestrings.h" line="28"/>
         <source>Click here to search existing coverart...</source>
         <translation>Πατήστε για αναζήτηση στα υπάρχοντα εξώφυλλα...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="30"/>
+        <location filename="themestrings.h" line="29"/>
         <source>Click here to search existing screenshots...</source>
         <translation>Πατήστε για να ψάξετε στα υπάρχοντα στιγμιότυπα...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="31"/>
+        <location filename="themestrings.h" line="30"/>
         <source>Click here to search existing fanart...</source>
         <translation>Πατήστε για να ψάξετε στις υπάρχουσες εικόνες...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="14"/>
+        <location filename="themestrings.h" line="13"/>
         <source>Done</source>
         <translation>Εντάξει</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="6"/>
+        <location filename="themestrings.h" line="5"/>
         <source>Play Games</source>
         <translation>Εκτέλεση Παιχνιδιών</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="7"/>
+        <location filename="themestrings.h" line="6"/>
         <source>System:</source>
         <translation>Σύστημα:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="10"/>
+        <location filename="themestrings.h" line="9"/>
         <source>Favorite:</source>
         <translation>Αγαπημένο:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="12"/>
+        <location filename="themestrings.h" line="11"/>
         <source>No</source>
         <translation>Όχι</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="11"/>
+        <location filename="themestrings.h" line="10"/>
         <source>Yes</source>
         <translation>Ναι</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="32"/>
+        <location filename="themestrings.h" line="31"/>
         <source>ROM Name:</source>
         <translation>Όνομα ROM:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="33"/>
+        <location filename="themestrings.h" line="32"/>
         <source>ROM Path:</source>
         <translation>Διαδρομή ROM:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="34"/>
+        <location filename="themestrings.h" line="33"/>
         <source>/path/to/the/thing.jpg</source>
         <translation>/διαδρομή/προς/την/εικόνα.jpg</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="35"/>
+        <location filename="themestrings.h" line="34"/>
         <source>Game Information</source>
         <translation>Πληροφορίες Παιχνιδιού</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="36"/>
+        <location filename="themestrings.h" line="35"/>
         <source>Game:</source>
         <translation>Παιχνίδι:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="37"/>
+        <location filename="themestrings.h" line="36"/>
         <source>Type:</source>
         <translation>Τύπος:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="38"/>
+        <location filename="themestrings.h" line="37"/>
         <source>Filename:</source>
         <translation>Αρχείο:</translation>
     </message>
     <message>
-        <source>Rompath:</source>
-        <translation type="obsolete">ΔιαδρομήROM:</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="39"/>
+        <location filename="themestrings.h" line="38"/>
         <source>ROM path:</source>
         <translation>Διαδρομή ROM:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="40"/>
+        <location filename="themestrings.h" line="39"/>
         <source>System(s):</source>
         <translation>Σύστημα:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="41"/>
+        <location filename="themestrings.h" line="40"/>
         <source>CRC:</source>
         <translation>CRC:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="42"/>
+        <location filename="themestrings.h" line="41"/>
         <source>Edit Game Information</source>
         <translation>Επεξεργασία Πληροφοριών Παιχνιδιού</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="43"/>
+        <location filename="themestrings.h" line="42"/>
         <source>Game Name:</source>
         <translation>Όνομα Παιχνιδιού:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="44"/>
+        <location filename="themestrings.h" line="43"/>
         <source>Description:</source>
         <translation>Περιγραφή:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="45"/>
+        <location filename="themestrings.h" line="44"/>
         <source>Boxart:</source>
         <translation>Εξώφυλλο:</translation>
     </message>
@@ -1109,7 +775,7 @@ want to do this?</source>
     <message>
         <location filename="themestrings.h" line="50"/>
         <source>Game Players</source>
-        <translation>Συστηματα Παιχνιδιων</translation>
+        <translation>Συστήματα Παιχνιδιών</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="51"/>
@@ -1119,7 +785,7 @@ want to do this?</source>
     <message>
         <location filename="themestrings.h" line="52"/>
         <source>Scan for Games</source>
-        <translation>Ανιχνευση για Παιχνιδια</translation>
+        <translation>Ανίχνευση για Παιχνίδια</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="53"/>
@@ -1129,7 +795,7 @@ want to do this?</source>
     <message>
         <location filename="themestrings.h" line="54"/>
         <source>Clear Game Data</source>
-        <translation>Εκκαθαριση Συλλογης</translation>
+        <translation>Εκκαθάριση Συλλογής</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="55"/>

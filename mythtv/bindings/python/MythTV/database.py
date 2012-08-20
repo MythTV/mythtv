@@ -846,6 +846,7 @@ class DatabaseConfig( object ):
         confdir = os.environ.get('MYTHCONFDIR', '')
         if confdir and (confdir != '/'):
             obj = self.copy()
+            obj.confdir = confdir
             if obj.readXML(confdir):
                 log(log.GENERAL, log.DEBUG,
                           "Trying database credentials from: {0}"\
@@ -864,20 +865,21 @@ class DatabaseConfig( object ):
         homedir = os.environ.get('HOME', '')
         if homedir and (homedir != '/'):
             obj = self.copy()
+            obj.confdir = os.path.join(homedir, '.mythtv')
             if obj.readXML(os.path.join(homedir,'.mythtv')):
                 log(log.GENERAL, log.DEBUG,
                           "Trying database credentials from: {0}"\
-                                .format(os.path.join(confdir,'config.xml')))
+                                .format(os.path.join(homedir,'config.xml')))
                 yield obj
             elif obj.readOldXML(os.path.join(homedir, '.mythtv')):
                 log(log.GENERAL, log.DEBUG,
                           "Trying old format database credentials from: {0}"\
-                                .format(os.path.join(confdir,'config.xml')))
+                                .format(os.path.join(homedir,'config.xml')))
                 yield obj
             else:
                 log(log.GENERAL, log.DEBUG,
                           "Failed to read database credentials from: {0}"\
-                                .format(os.path.join(confdir,'config.xml')))
+                                .format(os.path.join(homedir,'config.xml')))
 
         # try UPnP
         for conn in XMLConnection.fromUPNP(5.0):
@@ -1004,13 +1006,15 @@ class DatabaseConfig( object ):
             log(log.GENERAL, log.DEBUG, "Writing new database credentials: {0}"\
                                 .format(os.path.join(confdir,'config.xml')))
             fp = open(os.path.join(confdir,'config.xml'), 'w')
+            self.confdir = confdir
         else:
             homedir = os.environ.get('HOME', '')
             if homedir and (homedir != '/'):
                 log(log.GENERAL, log.DEBUG,
                         "Writing new database credentials: {0}"\
-                                .format(os.path.join(confdir,'config.xml')))
+                                .format(os.path.join(homedir,'config.xml')))
                 fp = open(os.path.join(homedir, '.mythtv', 'config.xml'), 'w')
+                self.confdir = os.path.join(homedir, '.mythtv')
             else:
                 raise MythError("Cannot find home directory to write to")
 

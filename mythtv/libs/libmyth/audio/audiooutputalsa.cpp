@@ -993,44 +993,26 @@ bool AudioOutputALSA::OpenMixer(void)
 QMap<QString, QString> *AudioOutputALSA::GetDevices(const char *type)
 {
     QMap<QString, QString> *alsadevs = new QMap<QString, QString>();
+    void **hints, **n;
+    char *name, *desc;
 
-    // Loop through the sound cards to get Alsa device hints.
-    // NB Don't use snd_device_name_hint(-1,..) since there is a potential
-    // access violation using this ALSA API with libasound.so.2.0.0.
-    // See http://code.google.com/p/chromium/issues/detail?id=95797
-    int card = -1;
-    while (!snd_card_next(&card) && card >= 0)
+    if (snd_device_name_hint(-1, type, &hints) < 0)
+        return alsadevs;
+    n = hints;
+
+    while (*n != NULL)
     {
-        void** hints = NULL;
-        int error = snd_device_name_hint(card, type, &hints);
-        if (error == 0)
-        {
-            void *hint;
-            for (int i = 0; (hint = hints[i]) != NULL; ++i)
-            {
-                char *name = snd_device_name_get_hint(hint, "NAME");
-                if (name)
-                {
-                    char *desc = snd_device_name_get_hint(hint, "DESC");
-                    if (desc)
-                    {
-                        if (strcmp(name, "null"))
-                            alsadevs->insert(name, desc);
-                        free(desc);
-                    }
-                    free(name);
-                }
-            }
-
-            snd_device_name_free_hint(hints);
-        }
-        else
-        {
-            VBERROR(QString("Failed to get device hints for card %1, error %2")
-                    .arg(card).arg(error));
-        }
+          name = snd_device_name_get_hint(*n, "NAME");
+          desc = snd_device_name_get_hint(*n, "DESC");
+          if (name && desc && strcmp(name, "null"))
+              alsadevs->insert(name, desc);
+          if (name)
+              free(name);
+          if (desc)
+              free(desc);
+          n++;
     }
-
+    snd_device_name_free_hint(hints);
         // Work around ALSA bug < 1.0.22 ; where snd_device_name_hint can corrupt
         // global ALSA memory context
 #if SND_LIB_MAJOR == 1

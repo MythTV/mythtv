@@ -826,7 +826,7 @@ static void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist,
     if (!pginfo)
     {
         JobQueue::ChangeJobStatus(jobID, JOB_ERRORED,
-                  "Job errored, unable to find Program Info for job");
+            QObject::tr("Job errored, unable to find Program Info for job"));
         return;
     }
 
@@ -1055,12 +1055,13 @@ static void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist,
         unlink(fname_map.constData());
 
         if (status == JOB_ABORTING)                     // Stop command was sent
-            JobQueue::ChangeJobStatus(jobID, JOB_ABORTED, "Job Aborted");
+            JobQueue::ChangeJobStatus(jobID, JOB_ABORTED,
+                                      QObject::tr("Job Aborted"));
         else if (status != JOB_ERRORING)                // Recoverable error
             resultCode = GENERIC_EXIT_RESTART;
         else                                            // Unrecoverable error
             JobQueue::ChangeJobStatus(jobID, JOB_ERRORED,
-                                      "Unrecoverable error");
+                                      QObject::tr("Unrecoverable error"));
     }
 }
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

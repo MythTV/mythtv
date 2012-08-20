@@ -80,25 +80,13 @@ Use the &apos;Add Bookmark&apos; menu option to add new bookmarks</source>
         <source>Are you sure you want to delete the marked bookmarks?</source>
         <translation>Σίγουρα θέλετε να διαγράψετε τους σημαδεμένους σελειδοδείκτες;</translation>
     </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="obsolete">Ακύρωση</translation>
-    </message>
-    <message>
-        <source>Are you sure you want to delete the selected bookmark</source>
-        <translation type="obsolete">Σίγουρα θέλετε να διαγράψετε τον επιλεγμένο σελειδοδείκτη</translation>
-    </message>
-    <message>
-        <source>Are you sure you want to delete the marked bookmarks</source>
-        <translation type="obsolete">Σίγουρα θέλετε να διαγράψετε τον σημαδεμένο σελειδοδείκτη</translation>
-    </message>
 </context>
 <context>
     <name>BrowserConfig</name>
     <message>
         <location filename="../mythbrowser/bookmarkmanager.cpp" line="48"/>
         <source>MythBrowser Settings</source>
-        <translation>Επιλογες MythBrowser</translation>
+        <translation>Επιλογές MythBrowser</translation>
     </message>
     <message>
         <location filename="../mythbrowser/bookmarkmanager.cpp" line="131"/>
@@ -129,59 +117,55 @@ Use the &apos;Add Bookmark&apos; menu option to add new bookmarks</source>
 <context>
     <name>MythBrowser</name>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="120"/>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="327"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="124"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="331"/>
         <source>Enter URL</source>
         <translation>Δώστε διεύθυνση</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="252"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="256"/>
         <source>Loading...</source>
         <translation>Φορτώνω...</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="316"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="320"/>
         <source>Actions</source>
         <translation>Ενέργειες</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="330"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="334"/>
         <source>Back</source>
         <translation>Πίσω</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="333"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="337"/>
         <source>Forward</source>
-        <translation>Εμπρός</translation>
+        <translation>Μπροστά</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="335"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="339"/>
         <source>Zoom In</source>
         <translation>Μεγέθυνση</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="336"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="340"/>
         <source>Zoom Out</source>
         <translation>Σμίκρυνση</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="337"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="341"/>
         <source>New Tab</source>
         <translation>Νέα Καρτέλα</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="340"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="344"/>
         <source>Delete Tab</source>
         <translation>Διαγραφή Καρτέλας</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="342"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="346"/>
         <source>Add Bookmark</source>
         <translation>Προσθήκη Σελιδοδείκτη</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="obsolete">Ακύρωση</translation>
     </message>
 </context>
 <context>
@@ -357,7 +341,7 @@ When you have finished editing, select &quot;OK&quot; or &quot;Cancel&quot; to c
 <context>
     <name>WebPage</name>
     <message>
-        <location filename="../mythbrowser/webpage.cpp" line="121"/>
+        <location filename="../mythbrowser/webpage.cpp" line="126"/>
         <source>Loading...</source>
         <translation>Φορτώνω...</translation>
     </message>

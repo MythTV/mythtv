@@ -1030,11 +1030,11 @@ QString VideoMetadata::FilenameToMeta(const QString &file_name, int position)
     QString regexp = QString(
                   "^(.*[^s0-9])" // Title
                   "%1" // optional separator
-                  "(?:s|(?:%2))?" // season marker
+                  "(?:s|(?:Season|%2))?" // season marker
                   "%1" // optional separator
                   "(\\d{1,4})" // Season
                   "%1" // optional separator
-                  "(?:[ex/]|%3)" // episode marker
+                  "(?:[ex/]|Episode|%3)" // episode marker
                   "%1" // optional separator
                   "(\\d{1,3})" // Episode
                   "%1" // optional separator
@@ -1045,7 +1045,7 @@ QString VideoMetadata::FilenameToMeta(const QString &file_name, int position)
                   Qt::CaseInsensitive, QRegExp::RegExp2);
 
     // Cleanup Regexp
-    QString regexp2 = QString("(%1(?:%2%1\\d*%1)*%1)$")
+    QString regexp2 = QString("(%1(?:(?:Season|%2)%1\\d*%1)*%1)$")
                              .arg(separator).arg(season_translation);
     QRegExp title_parse(regexp2, Qt::CaseInsensitive, QRegExp::RegExp2);
 

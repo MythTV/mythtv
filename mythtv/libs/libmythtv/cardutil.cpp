@@ -1563,7 +1563,8 @@ bool CardUtil::UnlinkInputGroup(uint inputid, uint inputgroupid)
     {
         query.prepare(
             "DELETE FROM inputgroup "
-            "WHERE cardinputid = 0 ");
+            "WHERE cardinputid NOT IN "
+            "( SELECT cardinputid FROM cardinput )");
     }
     else
     {

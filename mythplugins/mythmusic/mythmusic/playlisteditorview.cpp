@@ -253,8 +253,8 @@ void PlaylistEditorView::customEvent(QEvent *event)
                 QString category = mnode->getParent()->getString();
                 QString name = mnode->getString();
 
-                ShowOkPopup(QString("Are you sure you want to delete this Smart Playlist?\n"
-                                    "Category: %1 - Name: %2").arg(category).arg(name),
+                ShowOkPopup(tr("Are you sure you want to delete this Smart Playlist?\n"
+                               "Category: %1 - Name: %2").arg(category).arg(name),
                             this, SLOT(deleteSmartPlaylist(bool)), true);
             }
             else if (resulttext == tr("Edit Smart Playlist"))
@@ -306,8 +306,8 @@ void PlaylistEditorView::customEvent(QEvent *event)
             {
                 QString name = mnode->getString();
 
-                ShowOkPopup(QString("Are you sure you want to delete this Playlist?\n"
-                                    "Name: %1").arg(name),
+                ShowOkPopup(tr("Are you sure you want to delete this Playlist?\n"
+                               "Name: %1").arg(name),
                             this, SLOT(deletePlaylist(bool)), true);
             }
             else if (resulttext == tr("Replace Tracks"))
@@ -426,8 +426,8 @@ bool PlaylistEditorView::keyPressEvent(QKeyEvent *event)
                         QString category = mnode->getParent()->getString();
                         QString name = mnode->getString();
 
-                        ShowOkPopup(QString("Are you sure you want to delete this Smart Playlist?\n"
-                                            "Category: %1 - Name: %2").arg(category).arg(name),
+                        ShowOkPopup(tr("Are you sure you want to delete this Smart Playlist?\n"
+                                       "Category: %1 - Name: %2").arg(category).arg(name),
                                     this, SLOT(deleteSmartPlaylist(bool)), true);
                         handled = true;
                     }
@@ -435,8 +435,8 @@ bool PlaylistEditorView::keyPressEvent(QKeyEvent *event)
                     {
                         QString name = mnode->getString();
 
-                        ShowOkPopup(QString("Are you sure you want to delete this Playlist?\n"
-                                            "Name: %1").arg(name),
+                        ShowOkPopup(tr("Are you sure you want to delete this Playlist?\n"
+                                       "Name: %1").arg(name),
                                     this, SLOT(deletePlaylist(bool)), true);
                         handled = true;
                     }

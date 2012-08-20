@@ -2283,14 +2283,16 @@ NULL
 /**
  * command to get the the initial database layout from an empty database:
  *
- * mysqldump --skip-comments --skip-opt --compact --skip-quote-names \
+ * mysqldump \
+ *     --skip-comments --skip-opt --compact --skip-quote-names \
  *     --create-options --ignore-table=mythconverg.schemalock mythconverg | \
  *   sed '/^\(SET\|INS\).*;$/d;/^\/\*!40101.*$/d;s/^.*[^;]$/"&"/;s/^).*;$/"&",/'
  *
  * command to get the initial data:
  *
- * mysqldump --skip-comments --skip-opt --compact --skip-quote-names -t \
- *           --ignore-table=mythconverg.logging mythconverg |
+ * mysqldump \
+ *     --skip-comments --skip-opt --compact --skip-quote-names -t \
+ *     --ignore-table=mythconverg.logging mythconverg |
  *   sed -e 's/^.*$/"&",/' -e 's#\\#\\\\#g'
  *
  * don't forget to delete host specific data
@@ -2400,6 +2402,7 @@ bool InitializeMythSchema(void)
 "  last_record datetime NOT NULL,"
 "  default_authority varchar(32) NOT NULL DEFAULT '',"
 "  commmethod int(11) NOT NULL DEFAULT '-1',"
+"  iptvid smallint(6) unsigned DEFAULT NULL,"
 "  PRIMARY KEY (chanid),"
 "  KEY channel_src (channum,sourceid),"
 "  KEY sourceid (sourceid,xmltvid,chanid),"
@@ -2715,6 +2718,14 @@ bool InitializeMythSchema(void)
 "  KEY chanid (chanid,starttime),"
 "  KEY recusage (recusage,lastupdatetime)"
 ") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
+"CREATE TABLE iptv_channel ("
+"  iptvid smallint(6) unsigned NOT NULL AUTO_INCREMENT,"
+"  chanid int(10) unsigned NOT NULL,"
+"  url text NOT NULL,"
+"  `type` set('data','rfc2733-1','rfc2733-2','rfc5109-1','rfc5109-2','smpte2022-1','smpte2022-2') DEFAULT NULL,"
+"  bitrate int(10) unsigned NOT NULL,"
+"  PRIMARY KEY (iptvid)"
+") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
 "CREATE TABLE jobqueue ("
 "  id int(11) NOT NULL AUTO_INCREMENT,"
 "  chanid int(10) NOT NULL DEFAULT '0',"
@@ -3024,7 +3035,7 @@ bool InitializeMythSchema(void)
 "  KEY maxepisodes (maxepisodes),"
 "  KEY search (search),"
 "  KEY `type` (`type`)"
-") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
+") ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;",
 "CREATE TABLE recorded ("
 "  chanid int(10) unsigned NOT NULL DEFAULT '0',"
 "  starttime datetime NOT NULL DEFAULT '0000-00-00 00:00:00',"
@@ -3204,8 +3215,25 @@ bool InitializeMythSchema(void)
 "  recduplicate tinyint(1) DEFAULT NULL,"
 "  findduplicate tinyint(1) DEFAULT NULL,"
 "  oldrecstatus int(11) DEFAULT NULL,"
+"  findid int(11) NOT NULL DEFAULT '0',"
 "  UNIQUE KEY recordid (recordid,chanid,starttime),"
-"  KEY chanid (chanid,starttime,manualid)"
+"  KEY chanid (chanid,starttime,manualid),"
+"  KEY recordid_2 (recordid,findid)"
+") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
+"CREATE TABLE scannerfile ("
+"  fileid bigint(20) unsigned NOT NULL AUTO_INCREMENT,"
+"  filesize bigint(20) unsigned NOT NULL DEFAULT '0',"
+"  filehash varchar(64) NOT NULL DEFAULT '',"
+"  added timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,"
+"  PRIMARY KEY (fileid),"
+"  UNIQUE KEY filehash (filehash)"
+") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
+"CREATE TABLE scannerpath ("
+"  fileid bigint(20) unsigned NOT NULL,"
+"  hostname varchar(64) NOT NULL DEFAULT 'localhost',"
+"  storagegroup varchar(32) NOT NULL DEFAULT 'Default',"
+"  filename varchar(255) NOT NULL DEFAULT '',"
+"  PRIMARY KEY (fileid)"
 ") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
 "CREATE TABLE settings ("
 "  `value` varchar(128) NOT NULL DEFAULT '',"
@@ -3360,6 +3388,12 @@ bool InitializeMythSchema(void)
 "  KEY idvideo (idvideo),"
 "  KEY idgenre (idgenre)"
 ") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
+"CREATE TABLE videopart ("
+"  fileid bigint(20) unsigned NOT NULL,"
+"  videoid int(10) unsigned NOT NULL,"
+"  `order` smallint(5) unsigned NOT NULL DEFAULT '1',"
+"  PRIMARY KEY (videoid,`order`)"
+") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
 "CREATE TABLE videopathinfo ("
 "  intid int(10) unsigned NOT NULL AUTO_INCREMENT,"
 "  path text,"
@@ -3479,10 +3513,11 @@ bool InitializeMythSchema(void)
 "INSERT INTO profilegroups VALUES (15,'ASI Recorder (DVEO)','ASI',1,NULL);",
 "INSERT INTO profilegroups VALUES (16,'OCUR Recorder (CableLabs)','OCUR',1,NULL);",
 "INSERT INTO profilegroups VALUES (17,'Ceton Recorder','CETON',1,NULL);",
+"INSERT INTO record VALUES (1,11,0,'21:57:44','2012-08-11','21:57:44','2012-08-11','Default (Template)','','',0,0,'Default','Default',0,0,0,0,0,0,'Default',6,15,'','','','',0,0,1,0,0,0,0,1,-1,'00:00:00',735091,0,0,0,'Default',0,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00','Default',100,0);",
 "INSERT INTO recordfilter VALUES (0,'New episode','program.previouslyshown = 0',0);",
 "INSERT INTO recordfilter VALUES (1,'Identifiable episode','program.generic = 0',0);",
 "INSERT INTO recordfilter VALUES (2,'First showing','program.first > 0',0);",
-"INSERT INTO recordfilter VALUES (3,'Prime time','HOUR(program.starttime) >= 19 AND HOUR(program.starttime) < 23',0);",
+"INSERT INTO recordfilter VALUES (3,'Prime time','HOUR(CONVERT_TZ(program.starttime, \\'UTC\\', \\'SYSTEM\\')) >= 19 AND HOUR(CONVERT_TZ(program.starttime, \\'UTC\\', \\'SYSTEM\\')) < 22',0);",
 "INSERT INTO recordfilter VALUES (4,'Commercial free','channel.commmethod = -2',0);",
 "INSERT INTO recordfilter VALUES (5,'High definition','program.hdtv > 0',0);",
 "INSERT INTO recordfilter VALUES (6,'This episode','(RECTABLE.programid <> \\'\\' AND program.programid = RECTABLE.programid) OR (RECTABLE.programid = \\'\\' AND program.subtitle = RECTABLE.subtitle AND program.description = RECTABLE.description)',0);",
@@ -3561,7 +3596,7 @@ bool InitializeMythSchema(void)
 "INSERT INTO settings VALUES ('mythfilldatabaseLastRunStatus','',NULL);",
 "INSERT INTO settings VALUES ('DataDirectMessage','',NULL);",
 "INSERT INTO settings VALUES ('HaveRepeats','0',NULL);",
-"INSERT INTO settings VALUES ('DBSchemaVer','1299',NULL);",
+"INSERT INTO settings VALUES ('DBSchemaVer','1307',NULL);",
 "INSERT INTO settings VALUES ('DefaultTranscoder','0',NULL);",
 "INSERT INTO videotypes VALUES (1,'txt','',1,0);",
 "INSERT INTO videotypes VALUES (2,'log','',1,0);",
@@ -3597,8 +3632,10 @@ NULL
 };
 
     QString dbver = "";
-    if (!performActualUpdate(updates, "1299", dbver))
+    if (!performActualUpdate(updates, "1307", dbver))
         return false;
+
+    GetMythDB()->SetHaveSchema(true);
     return true;
 }
 

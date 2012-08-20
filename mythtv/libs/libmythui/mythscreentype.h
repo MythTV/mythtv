@@ -5,8 +5,7 @@
 #include "mythuitext.h"
 #include "mythuiutils.h"
 
-#include <QWaitCondition>
-#include <QMutex>
+#include <QSemaphore>
 #include <QHash>
 
 class ScreenLoadTask;
@@ -114,7 +113,7 @@ class MUI_PUBLIC MythScreenType : public MythUIType
     bool m_FullScreen;
     bool m_IsDeleting;
 
-    QMutex m_LoadLock;
+    QSemaphore m_LoadLock;
     volatile bool m_IsLoading;
     volatile bool m_IsLoaded;
     bool m_IsInitialized;

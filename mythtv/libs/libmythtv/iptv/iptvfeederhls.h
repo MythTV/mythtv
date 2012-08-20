@@ -34,11 +34,13 @@ public:
 
 private:
     uint8_t        *m_buffer;
+    QString         m_url;
     HLSRingBuffer  *m_hls;
     mutable QMutex  m_lock;
     QWaitCondition  m_waitcond;
     bool            m_interrupted;
     bool            m_running;
+    bool            m_init;
 };
 
 #endif

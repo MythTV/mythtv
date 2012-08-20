@@ -386,9 +386,9 @@ void StreamView::removeStream(void)
     {
         Metadata *mdata = qVariantValue<Metadata*> (item->GetData());
 
-        ShowOkPopup(QString("Are you sure you want to delete this Stream?\n"
-                            "Station:%1 - Channel: %2")
-                            .arg(mdata->Station()).arg(mdata->Channel()),
+        ShowOkPopup(tr("Are you sure you want to delete this Stream?\n"
+                       "Station: %1 - Channel: %2")
+                       .arg(mdata->Station()).arg(mdata->Channel()),
                     this, SLOT(doRemoveStream(bool)), true);
     }
 }
