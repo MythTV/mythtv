@@ -13,6 +13,23 @@
 
 MythUDPListener::MythUDPListener()
 {
+    Enable();
+}
+
+void MythUDPListener::deleteLater(void)
+{
+    Disable();
+    disconnect();
+    QObject::deleteLater();
+}
+
+void MythUDPListener::Enable(void)
+{
+    if (m_socketPool)
+        return;
+
+    LOG(VB_GENERAL, LOG_INFO, LOC + "Enabling");
+
     m_socketPool = new ServerPool(this);
     connect(m_socketPool, SIGNAL(newDatagram(QByteArray, QHostAddress,
                                                 quint16)),
@@ -30,19 +47,12 @@ MythUDPListener::MythUDPListener()
     }
 }
 
-void MythUDPListener::deleteLater(void)
-{
-    TeardownAll();
-    disconnect();
-    QObject::deleteLater();
-}
-
-void MythUDPListener::TeardownAll(void)
+void MythUDPListener::Disable(void)
 {
     if (!m_socketPool)
         return;
 
-    LOG(VB_GENERAL, LOG_INFO, LOC + "Disconnecting");
+    LOG(VB_GENERAL, LOG_INFO, LOC + "Disabling");
 
     m_socketPool->close();
     delete m_socketPool;

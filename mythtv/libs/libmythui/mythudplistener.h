@@ -16,6 +16,9 @@ class MythUDPListener : public QObject
   public:
     MythUDPListener();
 
+    void Enable(void);
+    void Disable(void);
+
   public slots:
     virtual void deleteLater(void);
 
@@ -24,9 +27,9 @@ class MythUDPListener : public QObject
                  quint16 senderPort);
 
   private:
-    ~MythUDPListener(void) { TeardownAll(); }
+    ~MythUDPListener(void) { Disable(); }
 
-    void TeardownAll(void);
+    void TeardownAll(void) { Disable(); }
 
   private:
     ServerPool *m_socketPool;

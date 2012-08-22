@@ -24,5 +24,9 @@ QEvent::Type MythEvent::kUnlockInputDevicesEventType =
     (QEvent::Type) QEvent::registerEventType();
 QEvent::Type MythEvent::kUpdateBrowseInfoEventType =
     (QEvent::Type) QEvent::registerEventType();
+QEvent::Type MythEvent::kDisableUDPListenerEventType =
+    (QEvent::Type) QEvent::registerEventType();
+QEvent::Type MythEvent::kEnableUDPListenerEventType =
+    (QEvent::Type) QEvent::registerEventType();
 QEvent::Type ExternalKeycodeEvent::kEventType =
     (QEvent::Type) QEvent::registerEventType();
