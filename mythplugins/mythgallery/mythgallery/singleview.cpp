@@ -148,6 +148,12 @@ SingleView::SingleView(
 
 SingleView::~SingleView()
 {
+    if (m_slideshow_running)
+    {
+        GetMythMainWindow()->PauseIdleTimer(false);
+        GetMythUI()->RestoreScreensaver();
+    }
+
     if (m_effect_painter)
     {
         if (m_effect_painter->isActive())

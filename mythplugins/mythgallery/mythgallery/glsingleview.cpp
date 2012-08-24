@@ -155,6 +155,12 @@ void GLSingleView::CleanUp(void)
 {
     makeCurrent();
 
+    if (m_slideshow_running)
+    {  
+        GetMythMainWindow()->PauseIdleTimer(false);
+        GetMythUI()->RestoreScreensaver();
+    }
+
     if (m_slideshow_timer)
     {
         m_slideshow_timer->stop();
