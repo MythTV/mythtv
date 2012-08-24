@@ -137,6 +137,7 @@ SingleView::SingleView(
 
     if (slideShow)
     {
+        GetMythMainWindow()->PauseIdleTimer(true);
         m_slideshow_running = true;
         m_slideshow_timer->stop();
         m_slideshow_timer->setSingleShot(true);
@@ -333,6 +334,8 @@ void SingleView::keyPressEvent(QKeyEvent *e)
 {
     bool handled = false;
 
+    if (m_slideshow_running)
+        GetMythMainWindow()->PauseIdleTimer(false);
     bool wasRunning = m_slideshow_running;
     m_slideshow_timer->stop();
     m_caption_timer->stop();
@@ -524,6 +527,7 @@ void SingleView::keyPressEvent(QKeyEvent *e)
     }
     if (m_slideshow_running)
     {
+        GetMythMainWindow()->PauseIdleTimer(true);
         GetMythUI()->DisableScreensaver();
     }
 
