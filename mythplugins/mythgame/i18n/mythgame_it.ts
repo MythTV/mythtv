@@ -1,478 +1,481 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0">
+<TS version="2.0" language="it_IT">
 <context>
     <name>GameUI</name>
     <message>
         <source>All Games</source>
-        <translation type="unfinished"></translation>
+        <translation>Tutti i giochi</translation>
     </message>
     <message>
         <source>-   By Genre</source>
-        <translation type="unfinished"></translation>
+        <translation>-   Per genere</translation>
     </message>
     <message>
         <source>-   By Year</source>
-        <translation type="unfinished"></translation>
+        <translation>-   Per anno</translation>
     </message>
     <message>
         <source>-   By Name</source>
-        <translation type="unfinished"></translation>
+        <translation>-   Per nome</translation>
     </message>
     <message>
         <source>-   By Publisher</source>
-        <translation type="unfinished"></translation>
+        <translation>-   Per autore</translation>
     </message>
     <message>
         <source>Choose System for</source>
-        <translation type="unfinished"></translation>
+        <translation>Scegliere sistema per</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Annulla</translation>
     </message>
     <message>
         <source>Show Information</source>
-        <translation type="unfinished"></translation>
+        <translation>Mostrare informazioni</translation>
     </message>
     <message>
         <source>Remove Favorite</source>
-        <translation type="unfinished"></translation>
+        <translation>Rimuovere favoriti</translation>
     </message>
     <message>
         <source>Make Favorite</source>
-        <translation type="unfinished"></translation>
+        <translation>Rendere favorito</translation>
     </message>
     <message>
         <source>Edit Metadata</source>
-        <translation type="unfinished"></translation>
+        <translation>Modificare metadati</translation>
     </message>
     <message>
         <source>Game Search</source>
-        <translation type="unfinished"></translation>
+        <translation>Ricerca gioco</translation>
     </message>
 </context>
 <context>
     <name>MythControls</name>
     <message>
         <source>Game frontend</source>
-        <translation type="unfinished"></translation>
+        <translation>Game frontend</translation>
     </message>
     <message>
         <source>Toggle the current game as a favorite</source>
-        <translation type="unfinished"></translation>
+        <translation>Imposta/Rimuovi il gioco corrente come un favorito</translation>
     </message>
     <message>
         <source>Show incremental search dialog</source>
-        <translation type="unfinished"></translation>
+        <translation>Mostrare finestra di ricerca incrementale</translation>
     </message>
     <message>
         <source>Incremental search find next match</source>
-        <translation type="unfinished"></translation>
+        <translation>Ricerca incrementale trovare prosssima associazione</translation>
     </message>
 </context>
 <context>
     <name>MythGamePlayerEditor</name>
     <message>
         <source>Game Player Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Menù giocatore</translation>
     </message>
     <message>
         <source>Edit..</source>
-        <translation type="unfinished"></translation>
+        <translation>Modificare..</translation>
     </message>
     <message>
         <source>Delete..</source>
-        <translation type="unfinished"></translation>
+        <translation>Eliminare..</translation>
     </message>
     <message>
         <source>Are you sure you want to delete this item?</source>
-        <translation type="unfinished"></translation>
+        <translation>Essere veramente sicuri di eliminare questo oggetto?</translation>
     </message>
     <message>
         <source>Yes, delete It</source>
-        <translation type="unfinished"></translation>
+        <translation>Si, eliminare</translation>
     </message>
     <message>
         <source>No, don&apos;t</source>
-        <translation type="unfinished"></translation>
+        <translation>No</translation>
     </message>
     <message>
         <source>Game Players</source>
-        <translation type="unfinished"></translation>
+        <translation>Giocatori</translation>
     </message>
 </context>
 <context>
     <name>QObject</name>
     <message>
         <source>Game display order</source>
-        <translation type="unfinished"></translation>
+        <translation>Ordine di visualizzazione gioco</translation>
     </message>
     <message>
         <source>MythGame Settings -- General</source>
-        <translation type="unfinished"></translation>
+        <translation>Impostazioni MythGame - generale</translation>
     </message>
     <message>
         <source>Unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>Sconosciuto</translation>
     </message>
     <message>
         <source>Order in which to sort the games - this is for all systems. Available choices: system, year, genre and gamename</source>
-        <translation type="unfinished"></translation>
+        <translation>Ordine in cui ordinare i giochi - questo è per tutti i sistemi. Scelte disponibili: sistema, anno, genere e nome del gioco</translation>
     </message>
     <message>
         <source>Favourite display order</source>
-        <translation type="unfinished"></translation>
+        <translation>Ordinedi visualizzazione favorito</translation>
     </message>
     <message>
         <source>Order in which to sort the games marked as favourites - this is for all systems. Available choices: system, year, genre and gamename</source>
-        <translation type="unfinished"></translation>
+        <translation>Ordine in cui ordinare i giochi segnati come favoriti - questo è per tutti i sistemi. Scelte disponibili: sistema, anno, genere e nome del gioco</translation>
     </message>
     <message>
         <source>Indepth Game Scan</source>
-        <translation type="unfinished"></translation>
+        <translation>Scansione gioco aprofondita</translation>
     </message>
     <message>
         <source>Enabling this causes a game scan to gather crc values and attempt to find out more detailed information about the game: NOTE this can greatly increase the time a gamescan takes based on the amount of games scanned.</source>
-        <translation type="unfinished"></translation>
+        <translation>Abilitare questo causa una snsione del gioco per raccogliere valori crc e attendere di trovare maggiori informazioni dettagliate a rigurado del gioco. Nota questo può aumentare il tempo che si prende la scansione del gioco sul totale dei giochi scansionati.</translation>
     </message>
     <message>
         <source>Prompt for removal of deleted rom(s)</source>
-        <translation type="unfinished"></translation>
+        <translation>Prompt per la rimozione delle rom eliminate</translation>
     </message>
     <message>
         <source>This enables a prompt for removing deleted roms from the database during a  gamescan</source>
-        <translation type="unfinished"></translation>
+        <translation>Questo abilita un prompt per la rimozione dell rom eliminate dal database durante la scansione del gioco</translation>
     </message>
     <message>
         <source>Display Files Names in Game Tree</source>
-        <translation type="unfinished"></translation>
+        <translation>Visualizzazare i nome dei file nella struttura Game</translation>
     </message>
     <message>
         <source>Enabling this causes the filenames to be displayed in the game tree rather than the trimmed/looked up gamename</source>
-        <translation type="unfinished"></translation>
+        <translation>Abilitare questo causa che i nime dei file saranno visualizzati nella struttura game piuttosto che nome del gioco ridotto/ricercato</translation>
     </message>
     <message>
         <source>Allow games to span multiple roms/disks</source>
-        <translation type="unfinished"></translation>
+        <translation>Permette ai giochi di estendersi su rom/dischi multipli</translation>
     </message>
     <message>
         <source>This setting means that we will look for items like game.1.rom, game.2.rom and consider them a single game.</source>
-        <translation type="unfinished"></translation>
+        <translation>Questa impostazione significa che si vedranno per oggetti come gioco1.rom, gioco.2.rom e si considera come un gioco singolo.</translation>
     </message>
     <message>
         <source>Command</source>
-        <translation type="unfinished"></translation>
+        <translation>Comando</translation>
     </message>
     <message>
         <source>Type</source>
-        <translation type="unfinished"></translation>
+        <translation>Tipo</translation>
     </message>
     <message>
         <source>Type of Game/Emulator. Mostly for informational purposes and has little effect on the function of your system.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tipo di gioco/emulatore. Sopratutto per lo scopo informativo e ha un piccolo effetto sulla funzione del sistema.</translation>
     </message>
     <message>
         <source>Rom Path</source>
-        <translation type="unfinished"></translation>
+        <translation>Percorso rom</translation>
     </message>
     <message>
         <source>Location of the ROM files for this emulator</source>
-        <translation type="unfinished"></translation>
+        <translation>Percorso dei file ROM per questo emulatore</translation>
     </message>
     <message>
         <source>Working Directory</source>
-        <translation type="unfinished"></translation>
+        <translation>Directory di lavoro</translation>
     </message>
     <message>
         <source>Directory to change to before launching emulator. Blank is usually fine</source>
-        <translation type="unfinished"></translation>
+        <translation>Directory da passare prima di lanciare l&apos;emulatore. Vuoto di solito va bene</translation>
     </message>
     <message>
         <source>File Extensions</source>
-        <translation type="unfinished"></translation>
+        <translation>Estensioni file</translation>
     </message>
     <message>
         <source>Game Player Setup</source>
-        <translation type="unfinished"></translation>
+        <translation>Impostazione giocatore</translation>
     </message>
     <message>
         <source>(New Game Player)</source>
-        <translation type="unfinished"></translation>
+        <translation>(nuovo giocatore)</translation>
     </message>
     <message>
         <source>OTHER</source>
-        <translation type="unfinished"></translation>
+        <translation>ALTRO</translation>
     </message>
     <message>
         <source>MAME</source>
-        <translation type="unfinished"></translation>
+        <translation>MAME</translation>
     </message>
     <message>
         <source>NES</source>
-        <translation type="unfinished"></translation>
+        <translation>NES</translation>
     </message>
     <message>
         <source>SNES</source>
-        <translation type="unfinished"></translation>
+        <translation>SNES</translation>
     </message>
     <message>
         <source>N64</source>
-        <translation type="unfinished"></translation>
+        <translation>N64</translation>
     </message>
     <message>
         <source>PCE/TG16</source>
-        <translation type="unfinished"></translation>
+        <translation>N64</translation>
     </message>
     <message>
         <source>GENESIS/MEGADRIVE</source>
-        <translation type="unfinished"></translation>
+        <translation>GENESIS/MEGADRIVE</translation>
     </message>
     <message>
         <source>PC GAME</source>
-        <translation type="unfinished"></translation>
+        <translation>PC GAME</translation>
     </message>
     <message>
         <source>AMIGA</source>
-        <translation type="unfinished"></translation>
+        <translation>AMIGA</translation>
     </message>
     <message>
         <source>ATARI</source>
-        <translation type="unfinished"></translation>
+        <translation>ATARI</translation>
     </message>
     <message>
         <source>Player Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Nome giocatore</translation>
     </message>
     <message>
         <source>Name of this Game and or Emulator</source>
-        <translation type="unfinished"></translation>
+        <translation>Nome di questo gioco e o emulatore</translation>
     </message>
     <message>
         <source>19xx</source>
-        <translation type="unfinished"></translation>
+        <translation>V</translation>
     </message>
     <message>
         <source>0</source>
-        <translation type="unfinished"></translation>
+        <translation>0</translation>
     </message>
     <message>
         <source>No</source>
-        <translation type="unfinished"></translation>
+        <translation>No</translation>
     </message>
     <message>
         <source>No to all</source>
-        <translation type="unfinished"></translation>
+        <translation>No a tutto</translation>
     </message>
     <message>
         <source>Yes</source>
-        <translation type="unfinished"></translation>
+        <translation>Si</translation>
     </message>
     <message>
         <source>Yes to all</source>
-        <translation type="unfinished"></translation>
+        <translation>Si a tutto</translation>
     </message>
     <message>
         <source>File Missing</source>
-        <translation type="unfinished"></translation>
+        <translation>File mancante</translation>
     </message>
     <message>
         <source>%1 appears to be missing.
 Remove it from the database?</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 appare mancante.
+Rimuoverlo dal database?</translation>
     </message>
     <message>
         <source>Are you sure?</source>
-        <translation type="unfinished"></translation>
+        <translation>Essere sicuri?</translation>
     </message>
     <message>
         <source>This will clear all Game Meta Data
 from the database. Are you sure you
 want to do this?</source>
-        <translation type="unfinished"></translation>
+        <translation>Questo cancellerà tutti i metadati del gioco
+dal databse. Essere sicuri
+di volerlo fare?</translation>
     </message>
     <message>
         <source>SEGA/MASTER SYSYTEM</source>
-        <translation type="unfinished"></translation>
+        <translation>SEGA/MASTER SYSYTEM</translation>
     </message>
     <message>
         <source>A Comma seperated list of all file extensions for this emulator. Blank means any file under ROM PATH is considered to be used with this emulator</source>
-        <translation type="unfinished"></translation>
+        <translation>Una virgola separa l&apos;elenco di tutti l&apos;estensioni dei file per questo emulatore. Vuoto significa ogni file soto PERCORSO FILE è considerato per essere usato con questo emulatore</translation>
     </message>
     <message>
         <source>GAMEGEAR</source>
-        <translation type="unfinished"></translation>
+        <translation>GAMEGEAR</translation>
     </message>
     <message>
         <source>Updating %1(%2) ROM database</source>
-        <translation type="unfinished"></translation>
+        <translation>Aggiornamento %1 (%2) ROM database</translation>
     </message>
     <message>
         <source>Verifying %1 files</source>
-        <translation type="unfinished"></translation>
+        <translation>Verificando %1 file</translation>
     </message>
     <message>
         <source>Scanning for %1 game(s)...</source>
-        <translation type="unfinished"></translation>
+        <translation>Scansione per %1 gioco(chi)...</translation>
     </message>
     <message>
         <source>Hash filenames in display</source>
-        <translation type="unfinished"></translation>
+        <translation>Nome dei file hash nella visualizzazione</translation>
     </message>
     <message>
         <source>Enable hashing of names in the display tree. This can make navigating long lists a little faster</source>
-        <translation type="unfinished"></translation>
+        <translation>Abilitare hashing dei nomei della struttura visualizzazione. Questo può fare di un lungo elenco di navigazione poco più veloce</translation>
     </message>
     <message>
         <source>Binary and optional parameters. Multiple commands seperated with &apos;;&apos; . Use %s for the rom name. %d1, %d2, %d3 and %d4 represent disks in a multidisk/game. %s auto appended if not specified</source>
-        <translation type="unfinished"></translation>
+        <translation>Binario e parametri opzionali. Comandi multipli separati con &quot;;&quot; . Usare %s per in nome della rom. %d1, %d2, %d3 e %d4 rapresentando dischi in un multidisco/gioco. %s aggiunge automaticamente se non specificato</translation>
     </message>
     <message>
         <source>Directory where Game Screenshots are stored</source>
-        <translation type="unfinished"></translation>
+        <translation>Directory dove le schermate di gioco sono archiviate</translation>
     </message>
     <message>
         <source>This directory will be the default browse location when assigning screenshots.</source>
-        <translation type="unfinished"></translation>
+        <translation>Questa directory sarà il percorso di navifazione predefinito dove assegnare le schermate di gioco.</translation>
     </message>
     <message>
         <source>Directory where Game Fanart is stored</source>
-        <translation type="unfinished"></translation>
+        <translation>Directory dove Game Fanart sono archiviate</translation>
     </message>
     <message>
         <source>This directory will be the default browse location when assigning fanart.</source>
-        <translation type="unfinished"></translation>
+        <translation>Questa directory sarà il percorso di navigazione predefinito dove assegnare fanart.</translation>
     </message>
     <message>
         <source>Directory where Game Boxart is stored</source>
-        <translation type="unfinished"></translation>
+        <translation>Directory dove le copertine del gioco sono archiviate</translation>
     </message>
     <message>
         <source>This directory will be the default browse location when assigning boxart.</source>
-        <translation type="unfinished"></translation>
+        <translation>Questa directory sarà il percorso di navigazione predefinito dove assegnare la copertina del gioco.</translation>
     </message>
 </context>
 <context>
     <name>ThemeUI</name>
     <message>
         <source>System:</source>
-        <translation type="unfinished"></translation>
+        <translation>Sistema:</translation>
     </message>
     <message>
         <source>Year:</source>
-        <translation type="unfinished"></translation>
+        <translation>Anno:</translation>
     </message>
     <message>
         <source>Genre:</source>
-        <translation type="unfinished"></translation>
+        <translation>Genere:</translation>
     </message>
     <message>
         <source>Favorite:</source>
-        <translation type="unfinished"></translation>
+        <translation>Favorito:</translation>
     </message>
     <message>
         <source>No</source>
-        <translation type="unfinished"></translation>
+        <translation>No</translation>
     </message>
     <message>
         <source>Yes</source>
-        <translation type="unfinished"></translation>
+        <translation>Si</translation>
     </message>
     <message>
         <source>Edit Game Information</source>
-        <translation type="unfinished"></translation>
+        <translation>Modificare informazioni gioco</translation>
     </message>
     <message>
         <source>Game Name:</source>
-        <translation type="unfinished"></translation>
+        <translation>Nome gioco:</translation>
     </message>
     <message>
         <source>Country:</source>
-        <translation type="unfinished"></translation>
+        <translation>Paese:</translation>
     </message>
     <message>
         <source>Publisher:</source>
-        <translation type="unfinished"></translation>
+        <translation>Autore:</translation>
     </message>
     <message>
         <source>Plot:</source>
-        <translation type="unfinished"></translation>
+        <translation>Trama:</translation>
     </message>
     <message>
         <source>Screenshot:</source>
-        <translation type="unfinished"></translation>
+        <translation>Schermata:</translation>
     </message>
     <message>
         <source>Fanart:</source>
-        <translation type="unfinished"></translation>
+        <translation>Fanart:</translation>
     </message>
     <message>
         <source>Boxart:</source>
-        <translation type="unfinished"></translation>
+        <translation>Custodia:</translation>
     </message>
     <message>
         <source>/path/to/the/thing.jpg</source>
-        <translation type="unfinished"></translation>
+        <translation>/path/to/the/thing.jpg</translation>
     </message>
     <message>
         <source>Done</source>
-        <translation type="unfinished"></translation>
+        <translation>Fatto</translation>
     </message>
     <message>
         <source>Game:</source>
-        <translation type="unfinished"></translation>
+        <translation>Gioco:</translation>
     </message>
     <message>
         <source>Type:</source>
-        <translation type="unfinished"></translation>
+        <translation>Tipo:</translation>
     </message>
     <message>
         <source>Filename:</source>
-        <translation type="unfinished"></translation>
+        <translation>Nome del file:</translation>
     </message>
     <message>
         <source>Rompath:</source>
-        <translation type="unfinished"></translation>
+        <translation>Percorso Rom:</translation>
     </message>
     <message>
         <source>System(s):</source>
-        <translation type="unfinished"></translation>
+        <translation>Sistema:</translation>
     </message>
     <message>
         <source>CRC:</source>
-        <translation type="unfinished"></translation>
+        <translation>CRC:</translation>
     </message>
     <message>
         <source>No Plot.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nessuna trama.</translation>
     </message>
     <message>
         <source>Play</source>
-        <translation type="unfinished"></translation>
+        <translation>Giocare</translation>
     </message>
     <message>
         <source>Game Information</source>
-        <translation type="unfinished"></translation>
+        <translation>Informazioni gioco</translation>
     </message>
     <message>
         <source>Games</source>
-        <translation type="unfinished"></translation>
+        <translation>Giochi</translation>
     </message>
     <message>
         <source>General Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Impostazioni generali</translation>
     </message>
     <message>
         <source>Game Players</source>
-        <translation type="unfinished"></translation>
+        <translation>Giocatori</translation>
     </message>
     <message>
         <source>Scan for Games</source>
-        <translation type="unfinished"></translation>
+        <translation>Scansione per giochi</translation>
     </message>
     <message>
         <source>Clear Game Data</source>
-        <translation type="unfinished"></translation>
+        <translation>Cancellare dati gioco</translation>
     </message>
 </context>
 </TS>

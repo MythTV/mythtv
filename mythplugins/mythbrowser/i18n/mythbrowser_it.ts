@@ -28,7 +28,7 @@
 Use the &apos;Add Bookmark&apos; menu option to add new bookmarks</source>
         <translation>Nessun segnalibro definito.
 
-Usare l&apos;opzione di menù &quot;Aggiugere segnalibro&quot; per aggiungere nuovi segnalibri</translation>
+Usare l&apos;opzione di menù &quot;Aggiungere segnalibro&quot; per aggiungere nuovi segnalibri</translation>
     </message>
     <message>
         <location filename="../mythbrowser/bookmarkmanager.cpp" line="286"/>
