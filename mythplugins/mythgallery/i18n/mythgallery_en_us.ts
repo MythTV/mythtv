@@ -577,50 +577,6 @@ Check the directory exists, is readable and the setting is correct on MythGaller
 Check the directory exists, is readable and the setting is correct on MythGallery&apos;s settings page.</translation>
     </message>
     <message>
-        <source>Folder: </source>
-        <translation type="obsolete">Folder: </translation>
-    </message>
-    <message>
-        <source>Created: </source>
-        <translation type="obsolete">Created: </translation>
-    </message>
-    <message>
-        <source>Modified: </source>
-        <translation type="obsolete">Modified: </translation>
-    </message>
-    <message>
-        <source>Bytes</source>
-        <translation type="obsolete">Bytes</translation>
-    </message>
-    <message>
-        <source>Width</source>
-        <translation type="obsolete">Width</translation>
-    </message>
-    <message>
-        <source>pixels</source>
-        <translation type="obsolete">pixels</translation>
-    </message>
-    <message>
-        <source>Height</source>
-        <translation type="obsolete">Height</translation>
-    </message>
-    <message>
-        <source>Pixel Count</source>
-        <translation type="obsolete">Pixel Count</translation>
-    </message>
-    <message>
-        <source>megapixels</source>
-        <translation type="obsolete">megapixels</translation>
-    </message>
-    <message>
-        <source>Rotation Angle</source>
-        <translation type="obsolete">Rotation Angle</translation>
-    </message>
-    <message>
-        <source>degrees</source>
-        <translation type="obsolete">degrees</translation>
-    </message>
-    <message>
         <location filename="../mythgallery/galleryfilterdlg.cpp" line="138"/>
         <source>All</source>
         <translation>All</translation>

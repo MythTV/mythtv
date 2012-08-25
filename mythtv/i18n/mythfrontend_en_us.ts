@@ -1551,13 +1551,6 @@
     </message>
 </context>
 <context>
-    <name>BackendConnectionManager</name>
-    <message>
-        <source>Your frontend and backend are configured in different timezones.  You must correct this mismatch to continue.</source>
-        <translation type="obsolete">Your frontend and backend are configured in different timezones.  You must correct this mismatch to continue.</translation>
-    </message>
-</context>
-<context>
     <name>BackendSelection</name>
     <message>
         <location filename="../libs/libmyth/backendselect.cpp" line="279"/>
@@ -2089,14 +2082,6 @@
         <location filename="../programs/mythfrontend/customedit.cpp" line="330"/>
         <source>Only on weekends</source>
         <translation>Only on weekends</translation>
-    </message>
-    <message>
-        <source>Only in primetime</source>
-        <translation type="obsolete">Only in primetime</translation>
-    </message>
-    <message>
-        <source>Not in primetime</source>
-        <translation type="obsolete">Not in primetime</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/customedit.cpp" line="353"/>
@@ -2652,18 +2637,6 @@ Delete the current cut or preserved region</extracomment>
 </context>
 <context>
     <name>DeviceTree</name>
-    <message>
-        <source>The Cartesian latitude for your location.</source>
-        <translation type="obsolete">The Cartesian latitude for your location.</translation>
-    </message>
-    <message>
-        <source>Use negative numbers for southern and western coordinates.</source>
-        <translation type="obsolete">Use negative numbers for southern and western coordinates.</translation>
-    </message>
-    <message>
-        <source>The Cartesian longitude for your location.</source>
-        <translation type="obsolete">The Cartesian longitude for your location.</translation>
-    </message>
     <message>
         <location filename="../libs/libmythtv/diseqcsettings.cpp" line="22"/>
         <source>The Cartesian latitude for your location. Use negative numbers for southern and western coordinates.</source>
@@ -3357,14 +3330,6 @@ Delete the current cut or preserved region</extracomment>
 			The program guide will have nothing to show you.</translation>
     </message>
     <message>
-        <source>Change Channel</source>
-        <translation type="obsolete">Change Channel</translation>
-    </message>
-    <message>
-        <source>Record</source>
-        <translation type="obsolete">Record</translation>
-    </message>
-    <message>
         <location filename="../programs/mythfrontend/guidegrid.cpp" line="588"/>
         <source>Guide Options</source>
         <translation>Guide Options</translation>
@@ -3422,10 +3387,6 @@ Delete the current cut or preserved region</extracomment>
         <location filename="../programs/mythfrontend/guidegrid.cpp" line="1444"/>
         <source>Show Upcoming</source>
         <translation>Show Upcoming</translation>
-    </message>
-    <message>
-        <source>Upcoming</source>
-        <translation type="obsolete">Upcoming</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/guidegrid.cpp" line="647"/>
@@ -4355,10 +4316,6 @@ Delete the current cut or preserved region</extracomment>
         <translation>You now have the opportunity to transmit your choices back to mythtv.org so that others can benefit from your selections.</translation>
     </message>
     <message>
-        <source>You now have the opportunity to transmit your choices  back to mythtv.org so that others can benefit from your selections.</source>
-        <translation type="obsolete">You now have the opportunity to transmit your choices  back to mythtv.org so that others can benefit from your selections.</translation>
-    </message>
-    <message>
         <location filename="../programs/mythtv-setup/importicons.cpp" line="760"/>
         <source>Failed to submit icon choices.</source>
         <translation>Failed to submit icon choices.</translation>
@@ -4689,10 +4646,6 @@ Delete the current cut or preserved region</extracomment>
 </context>
 <context>
     <name>MetadataOptions</name>
-    <message>
-        <source>Trying to automatically find this recording online...</source>
-        <translation type="obsolete">Trying to automatically find this recording online...</translation>
-    </message>
     <message>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="1455"/>
         <source>Trying to manually find this recording online...</source>
@@ -6148,10 +6101,6 @@ Delete the current cut or preserved region</extracomment>
         <translation>This key binding conflicts with %1 in the %2 context. Do you want to bind it anyway?</translation>
     </message>
     <message>
-        <source>This key binding conflicts with %1 in the %2 context.</source>
-        <translation type="obsolete">This key binding conflicts with %1 in the %2 context.</translation>
-    </message>
-    <message>
         <location filename="../programs/mythfrontend/mythcontrols.cpp" line="575"/>
         <source>This action is mandatory and needs at least one key bound to it. Instead, try rebinding with another key.</source>
         <translation>This action is mandatory and needs at least one key bound to it. Instead, try rebinding with another key.</translation>
@@ -6160,14 +6109,6 @@ Delete the current cut or preserved region</extracomment>
         <location filename="../programs/mythfrontend/mythcontrols.cpp" line="266"/>
         <source>Save changes?</source>
         <translation>Save changes?</translation>
-    </message>
-    <message>
-        <source> Unable to bind key.</source>
-        <translation type="obsolete"> Unable to bind key.</translation>
-    </message>
-    <message>
-        <source> Do you want to bind it anyway?</source>
-        <translation type="obsolete"> Do you want to bind it anyway?</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/mythcontrols.cpp" line="734"/>
@@ -7126,10 +7067,6 @@ Returning to the previous menu.</translation>
         <translation>Enter group name or press SELECT to enter text via the On Screen Keyboard</translation>
     </message>
     <message>
-        <source>Delete playback group:</source>
-        <translation type="obsolete">Delete playback group:</translation>
-    </message>
-    <message>
         <location filename="../libs/libmythtv/playgroup.cpp" line="281"/>
         <source>Delete playback group:
 &apos;%1&apos;?</source>
@@ -7190,14 +7127,6 @@ Returning to the previous menu.</translation>
         <source>GB</source>
         <comment>GigaBytes</comment>
         <translation>GB</translation>
-    </message>
-    <message>
-        <source>% used</source>
-        <translation type="obsolete">% used</translation>
-    </message>
-    <message>
-        <source>, %1 GB free</source>
-        <translation type="obsolete">, %1 GB free</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="1417"/>
@@ -7927,13 +7856,6 @@ Are you sure you want to delete:</translation>
     </message>
 </context>
 <context>
-    <name>PostProcEditor</name>
-    <message>
-        <source>Run &apos;%1&apos;</source>
-        <translation type="obsolete">Run &apos;%1&apos;</translation>
-    </message>
-</context>
-<context>
     <name>PowerSearchPopup</name>
     <message>
         <location filename="../programs/mythfrontend/proglist_helpers.cpp" line="259"/>
@@ -8205,10 +8127,6 @@ Are you sure you want to delete:</translation>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="570"/>
         <source>MythTV Status</source>
         <translation>MythTV Status</translation>
-    </message>
-    <message>
-        <source>Status</source>
-        <translation type="obsolete">Status</translation>
     </message>
     <message numerus="yes">
         <location filename="../programs/mythfrontend/progdetails.cpp" line="603"/>
@@ -8912,14 +8830,6 @@ Are you sure you want to delete:</translation>
 <context>
     <name>QObject</name>
     <message>
-        <source>Season</source>
-        <translation type="obsolete">Season</translation>
-    </message>
-    <message>
-        <source>Episode</source>
-        <translation type="obsolete">Episode</translation>
-    </message>
-    <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="380"/>
         <source>^(The |A |An )</source>
         <translation>^(The |A |An )</translation>
@@ -8950,11 +8860,6 @@ Are you sure you want to delete:</translation>
         <location filename="../libs/libmyth/programinfo.cpp" line="868"/>
         <source>Manual Record</source>
         <translation>Manual Record</translation>
-    </message>
-    <message>
-        <source>GB</source>
-        <comment>GigaBytes</comment>
-        <translation type="obsolete">GB</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="1509"/>
@@ -9249,11 +9154,6 @@ Are you sure you want to delete:</translation>
         <translation>R</translation>
     </message>
     <message>
-        <source>t</source>
-        <comment>RecStatusChar rsTuning</comment>
-        <translation type="obsolete">t</translation>
-    </message>
-    <message>
         <location filename="../libs/libmyth/programtypes.cpp" line="95"/>
         <source>X</source>
         <comment>RecStatusChar rsDontRecord</comment>
@@ -9288,11 +9188,6 @@ Are you sure you want to delete:</translation>
         <source>M</source>
         <comment>RecStatusChar rsMissed</comment>
         <translation>M</translation>
-    </message>
-    <message>
-        <source>m</source>
-        <comment>RecStatusChar rsMissedFuture</comment>
-        <translation type="obsolete">m</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programtypes.cpp" line="119"/>
@@ -9355,11 +9250,6 @@ Are you sure you want to delete:</translation>
         <translation>F</translation>
     </message>
     <message>
-        <source>O</source>
-        <comment>RecStatusChar rsOtherShowing</comment>
-        <translation type="obsolete">O</translation>
-    </message>
-    <message>
         <location filename="../libs/libmyth/programtypes.cpp" line="171"/>
         <location filename="../libs/libmythtv/jobqueue.h" line="40"/>
         <source>Aborted</source>
@@ -9414,10 +9304,6 @@ Are you sure you want to delete:</translation>
         <location filename="../libs/libmyth/programtypes.cpp" line="193"/>
         <source>Missed</source>
         <translation>Missed</translation>
-    </message>
-    <message>
-        <source>Missed Future</source>
-        <translation type="obsolete">Missed Future</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programtypes.cpp" line="197"/>
@@ -9483,10 +9369,6 @@ Are you sure you want to delete:</translation>
         <location filename="../libs/libmyth/programtypes.cpp" line="245"/>
         <source>This showing is being recorded.</source>
         <translation>This showing is being recorded.</translation>
-    </message>
-    <message>
-        <source>The channel is being tuned.</source>
-        <translation type="obsolete">The channel is being tuned.</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programtypes.cpp" line="259"/>
@@ -10015,30 +9897,10 @@ Are you sure you want to delete:</translation>
         <translation>TXT File</translation>
     </message>
     <message>
-        <source>Failed to initialize video output</source>
-        <translation type="obsolete">Failed to initialize video output</translation>
-    </message>
-    <message>
-        <source>Failed to reinitialize video output</source>
-        <translation type="obsolete">Failed to reinitialize video output</translation>
-    </message>
-    <message>
-        <source>Need to switch video renderer.</source>
-        <translation type="obsolete">Need to switch video renderer.</translation>
-    </message>
-    <message>
         <location filename="../libs/libmythtv/audioplayer.cpp" line="138"/>
         <location filename="../programs/mythfrontend/audiogeneralsettings.cpp" line="598"/>
         <source>Unable to create AudioOutput.</source>
         <translation>Unable to create AudioOutput.</translation>
-    </message>
-    <message>
-        <source>TXT CAP</source>
-        <translation type="obsolete">TXT CAP</translation>
-    </message>
-    <message>
-        <source>Text subtitles</source>
-        <translation type="obsolete">Text subtitles</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="226"/>
@@ -10051,75 +9913,10 @@ Are you sure you want to delete:</translation>
         <translation>Off</translation>
     </message>
     <message>
-        <source>TXT</source>
-        <translation type="obsolete">TXT</translation>
-    </message>
-    <message>
         <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="225"/>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="553"/>
         <source>On</source>
         <translation>On</translation>
-    </message>
-    <message>
-        <source>No captions</source>
-        <comment>CC/Teletext/Subtitle text not available</comment>
-        <translation type="obsolete">No captions</translation>
-    </message>
-    <message>
-        <source>Forced Subtitles On</source>
-        <translation type="obsolete">Forced Subtitles On</translation>
-    </message>
-    <message>
-        <source>Forced Subtitles Off</source>
-        <translation type="obsolete">Forced Subtitles Off</translation>
-    </message>
-    <message>
-        <source>Failed to initialize A/V Sync</source>
-        <translation type="obsolete">Failed to initialize A/V Sync</translation>
-    </message>
-    <message>
-        <source>Serious error detected in Video Output</source>
-        <translation type="obsolete">Serious error detected in Video Output</translation>
-    </message>
-    <message>
-        <source>Video frame buffering failed too many times.</source>
-        <translation type="obsolete">Video frame buffering failed too many times.</translation>
-    </message>
-    <message>
-        <source>Error opening switch program buffer</source>
-        <translation type="obsolete">Error opening switch program buffer</translation>
-    </message>
-    <message>
-        <source>Error opening switch program file</source>
-        <translation type="obsolete">Error opening switch program file</translation>
-    </message>
-    <message>
-        <source>Error opening jump program file buffer</source>
-        <translation type="obsolete">Error opening jump program file buffer</translation>
-    </message>
-    <message>
-        <source>Error opening jump program file</source>
-        <translation type="obsolete">Error opening jump program file</translation>
-    </message>
-    <message>
-        <source>Error reopening video decoder</source>
-        <translation type="obsolete">Error reopening video decoder</translation>
-    </message>
-    <message>
-        <source>Irrecoverable recorder error</source>
-        <translation type="obsolete">Irrecoverable recorder error</translation>
-    </message>
-    <message>
-        <source>Searching</source>
-        <translation type="obsolete">Searching</translation>
-    </message>
-    <message>
-        <source>Using previously auto-saved cuts</source>
-        <translation type="obsolete">Using previously auto-saved cuts</translation>
-    </message>
-    <message>
-        <source>New cut added.</source>
-        <translation type="obsolete">New cut added.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="9652"/>
@@ -10130,22 +9927,6 @@ Are you sure you want to delete:</translation>
         <location filename="../libs/libmythtv/tv_play.cpp" line="9656"/>
         <source>Redo</source>
         <translation>Redo</translation>
-    </message>
-    <message>
-        <source>Enabled Studio Levels</source>
-        <translation type="obsolete">Enabled Studio Levels</translation>
-    </message>
-    <message>
-        <source>Disabled Studio Levels</source>
-        <translation type="obsolete">Disabled Studio Levels</translation>
-    </message>
-    <message>
-        <source>Enabled Night Mode</source>
-        <translation type="obsolete">Enabled Night Mode</translation>
-    </message>
-    <message>
-        <source>Disabled Night Mode</source>
-        <translation type="obsolete">Disabled Night Mode</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="4593"/>
@@ -10163,37 +9944,9 @@ Are you sure you want to delete:</translation>
         <translation>Bookmark Cleared</translation>
     </message>
     <message>
-        <source>No Seektable</source>
-        <translation type="obsolete">No Seektable</translation>
-    </message>
-    <message>
-        <source>(Nothing to undo)</source>
-        <translation type="obsolete">(Nothing to undo)</translation>
-    </message>
-    <message>
-        <source>(Nothing to redo)</source>
-        <translation type="obsolete">(Nothing to redo)</translation>
-    </message>
-    <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="9667"/>
         <source>Clear Cuts</source>
         <translation>Clear Cuts</translation>
-    </message>
-    <message>
-        <source>cut point</source>
-        <translation type="obsolete">cut point</translation>
-    </message>
-    <message>
-        <source>keyframe</source>
-        <translation type="obsolete">keyframe</translation>
-    </message>
-    <message>
-        <source>1 frame</source>
-        <translation type="obsolete">1 frame</translation>
-    </message>
-    <message>
-        <source>0.5 seconds</source>
-        <translation type="obsolete">0.5 seconds</translation>
     </message>
     <message numerus="yes">
         <location filename="../libs/libmythmetadata/metadatacommon.cpp" line="428"/>
@@ -10205,34 +9958,14 @@ Are you sure you want to delete:</translation>
         </translation>
     </message>
     <message>
-        <source>error</source>
-        <translation type="obsolete">error</translation>
-    </message>
-    <message>
-        <source>cut</source>
-        <translation type="obsolete">cut</translation>
-    </message>
-    <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="9669"/>
         <source>Reverse Cuts</source>
         <translation>Reverse Cuts</translation>
     </message>
     <message>
-        <source>New Cut</source>
-        <translation type="obsolete">New Cut</translation>
-    </message>
-    <message>
-        <source>Move Mark</source>
-        <translation type="obsolete">Move Mark</translation>
-    </message>
-    <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="9671"/>
         <source>Load Detected Commercials</source>
         <translation>Load Detected Commercials</translation>
-    </message>
-    <message>
-        <source>Load Auto-saved Cuts</source>
-        <translation type="obsolete">Load Auto-saved Cuts</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="8608"/>
@@ -10301,10 +10034,6 @@ Do you wish to continue watching?</translation>
         <translation>At End, cannot Skip.</translation>
     </message>
     <message>
-        <source>Not Flagged</source>
-        <translation type="obsolete">Not Flagged</translation>
-    </message>
-    <message>
         <location filename="../libs/libmythtv/commbreakmap.cpp" line="266"/>
         <source>Skipping Back.</source>
         <translation>Skipping Back.</translation>
@@ -10319,10 +10048,6 @@ Do you wish to continue watching?</translation>
         <location filename="../libs/libmythtv/commbreakmap.cpp" line="355"/>
         <source>Too Far %1</source>
         <translation>Too Far %1</translation>
-    </message>
-    <message>
-        <source>DVD Menu Not Available</source>
-        <translation type="obsolete">DVD Menu Not Available</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/jobqueue.h" line="25"/>
@@ -10701,10 +10426,6 @@ Do you wish to continue watching?</translation>
         <translation>Cannot login to database</translation>
     </message>
     <message>
-        <source>Cannot find (ping) database host %1 on the network</source>
-        <translation type="obsolete">Cannot find (ping) database host %1 on the network</translation>
-    </message>
-    <message>
         <location filename="../libs/libmyth/mythcontext.cpp" line="1108"/>
         <source>This application is not compatible with the installed MythTV libraries.</source>
         <translation>This application is not compatible with the installed MythTV libraries.</translation>
@@ -10713,10 +10434,6 @@ Do you wish to continue watching?</translation>
         <location filename="../libs/libmyth/mythcontext.cpp" line="1191"/>
         <source>Plugin %1 is not compatible with the installed MythTV libraries.</source>
         <translation>Plugin %1 is not compatible with the installed MythTV libraries.</translation>
-    </message>
-    <message>
-        <source>Cannot login to database?</source>
-        <translation type="obsolete">Cannot login to database?</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/mythcontext.cpp" line="1005"/>
@@ -10789,10 +10506,6 @@ You may have to use the eject button under its tray.</translation>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="2412"/>
         <source>Default</source>
         <translation>Default</translation>
-    </message>
-    <message>
-        <source>Title %1 chapter %2</source>
-        <translation type="obsolete">Title %1 chapter %2</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/avformatdecoder.cpp" line="3666"/>
@@ -10868,225 +10581,9 @@ You may have to use the eject button under its tray.</translation>
         <translation>, firmware: %2</translation>
     </message>
     <message>
-        <source>Education</source>
-        <translation type="obsolete">Education</translation>
-    </message>
-    <message>
-        <source>Entertainment</source>
-        <translation type="obsolete">Entertainment</translation>
-    </message>
-    <message>
-        <source>Movie</source>
-        <translation type="obsolete">Movie</translation>
-    </message>
-    <message>
-        <source>News</source>
-        <translation type="obsolete">News</translation>
-    </message>
-    <message>
-        <source>Religious</source>
-        <translation type="obsolete">Religious</translation>
-    </message>
-    <message>
         <location filename="../libs/libmythtv/eithelper.cpp" line="522"/>
         <source>Sports</source>
         <translation>Sports</translation>
-    </message>
-    <message>
-        <source>Other</source>
-        <translation type="obsolete">Other</translation>
-    </message>
-    <message>
-        <source>Action</source>
-        <translation type="obsolete">Action</translation>
-    </message>
-    <message>
-        <source>Advertisement</source>
-        <translation type="obsolete">Advertisement</translation>
-    </message>
-    <message>
-        <source>Animated</source>
-        <translation type="obsolete">Animated</translation>
-    </message>
-    <message>
-        <source>Anthology</source>
-        <translation type="obsolete">Anthology</translation>
-    </message>
-    <message>
-        <source>Automobile</source>
-        <translation type="obsolete">Automobile</translation>
-    </message>
-    <message>
-        <source>Awards</source>
-        <translation type="obsolete">Awards</translation>
-    </message>
-    <message>
-        <source>Baseball</source>
-        <translation type="obsolete">Baseball</translation>
-    </message>
-    <message>
-        <source>Basketball</source>
-        <translation type="obsolete">Basketball</translation>
-    </message>
-    <message>
-        <source>Bulletin</source>
-        <translation type="obsolete">Bulletin</translation>
-    </message>
-    <message>
-        <source>Business</source>
-        <translation type="obsolete">Business</translation>
-    </message>
-    <message>
-        <source>Classical</source>
-        <translation type="obsolete">Classical</translation>
-    </message>
-    <message>
-        <source>College</source>
-        <translation type="obsolete">College</translation>
-    </message>
-    <message>
-        <source>Combat</source>
-        <translation type="obsolete">Combat</translation>
-    </message>
-    <message>
-        <source>Comedy</source>
-        <translation type="obsolete">Comedy</translation>
-    </message>
-    <message>
-        <source>Commentary</source>
-        <translation type="obsolete">Commentary</translation>
-    </message>
-    <message>
-        <source>Concert</source>
-        <translation type="obsolete">Concert</translation>
-    </message>
-    <message>
-        <source>Consumer</source>
-        <translation type="obsolete">Consumer</translation>
-    </message>
-    <message>
-        <source>Contemporary</source>
-        <translation type="obsolete">Contemporary</translation>
-    </message>
-    <message>
-        <source>Crime</source>
-        <translation type="obsolete">Crime</translation>
-    </message>
-    <message>
-        <source>Dance</source>
-        <translation type="obsolete">Dance</translation>
-    </message>
-    <message>
-        <source>Documentary</source>
-        <translation type="obsolete">Documentary</translation>
-    </message>
-    <message>
-        <source>Drama</source>
-        <translation type="obsolete">Drama</translation>
-    </message>
-    <message>
-        <source>Elementary</source>
-        <translation type="obsolete">Elementary</translation>
-    </message>
-    <message>
-        <source>Erotica</source>
-        <translation type="obsolete">Erotica</translation>
-    </message>
-    <message>
-        <source>Exercise</source>
-        <translation type="obsolete">Exercise</translation>
-    </message>
-    <message>
-        <source>Fantasy</source>
-        <translation type="obsolete">Fantasy</translation>
-    </message>
-    <message>
-        <source>Farm</source>
-        <translation type="obsolete">Farm</translation>
-    </message>
-    <message>
-        <source>Fashion</source>
-        <translation type="obsolete">Fashion</translation>
-    </message>
-    <message>
-        <source>Fiction</source>
-        <translation type="obsolete">Fiction</translation>
-    </message>
-    <message>
-        <source>Food</source>
-        <translation type="obsolete">Food</translation>
-    </message>
-    <message>
-        <source>Football</source>
-        <translation type="obsolete">Football</translation>
-    </message>
-    <message>
-        <source>Foreign</source>
-        <translation type="obsolete">Foreign</translation>
-    </message>
-    <message>
-        <source>Fund Raiser</source>
-        <translation type="obsolete">Fund Raiser</translation>
-    </message>
-    <message>
-        <source>Game/Quiz</source>
-        <translation type="obsolete">Game/Quiz</translation>
-    </message>
-    <message>
-        <source>Garden</source>
-        <translation type="obsolete">Garden</translation>
-    </message>
-    <message>
-        <source>Golf</source>
-        <translation type="obsolete">Golf</translation>
-    </message>
-    <message>
-        <source>Government</source>
-        <translation type="obsolete">Government</translation>
-    </message>
-    <message>
-        <source>Health</source>
-        <translation type="obsolete">Health</translation>
-    </message>
-    <message>
-        <source>High School</source>
-        <translation type="obsolete">High School</translation>
-    </message>
-    <message>
-        <source>History</source>
-        <translation type="obsolete">History</translation>
-    </message>
-    <message>
-        <source>Hobby</source>
-        <translation type="obsolete">Hobby</translation>
-    </message>
-    <message>
-        <source>Hockey</source>
-        <translation type="obsolete">Hockey</translation>
-    </message>
-    <message>
-        <source>Home</source>
-        <translation type="obsolete">Home</translation>
-    </message>
-    <message>
-        <source>Horror</source>
-        <translation type="obsolete">Horror</translation>
-    </message>
-    <message>
-        <source>Information</source>
-        <translation type="obsolete">Information</translation>
-    </message>
-    <message>
-        <source>Instruction</source>
-        <translation type="obsolete">Instruction</translation>
-    </message>
-    <message>
-        <source>International</source>
-        <translation type="obsolete">International</translation>
-    </message>
-    <message>
-        <source>Interview</source>
-        <translation type="obsolete">Interview</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2505"/>
@@ -11094,161 +10591,9 @@ You may have to use the eject button under its tray.</translation>
         <translation>Language</translation>
     </message>
     <message>
-        <source>Legal</source>
-        <translation type="obsolete">Legal</translation>
-    </message>
-    <message>
-        <source>Live</source>
-        <translation type="obsolete">Live</translation>
-    </message>
-    <message>
-        <source>Local</source>
-        <translation type="obsolete">Local</translation>
-    </message>
-    <message>
-        <source>Math</source>
-        <translation type="obsolete">Math</translation>
-    </message>
-    <message>
-        <source>Medical</source>
-        <translation type="obsolete">Medical</translation>
-    </message>
-    <message>
-        <source>Meeting</source>
-        <translation type="obsolete">Meeting</translation>
-    </message>
-    <message>
-        <source>Military</source>
-        <translation type="obsolete">Military</translation>
-    </message>
-    <message>
-        <source>Miniseries</source>
-        <translation type="obsolete">Miniseries</translation>
-    </message>
-    <message>
-        <source>Music</source>
-        <translation type="obsolete">Music</translation>
-    </message>
-    <message>
-        <source>Mystery</source>
-        <translation type="obsolete">Mystery</translation>
-    </message>
-    <message>
-        <source>National</source>
-        <translation type="obsolete">National</translation>
-    </message>
-    <message>
-        <source>Nature</source>
-        <translation type="obsolete">Nature</translation>
-    </message>
-    <message>
-        <source>Police</source>
-        <translation type="obsolete">Police</translation>
-    </message>
-    <message>
-        <source>Politics</source>
-        <translation type="obsolete">Politics</translation>
-    </message>
-    <message>
-        <source>Premiere</source>
-        <translation type="obsolete">Premiere</translation>
-    </message>
-    <message>
-        <source>Prerecorded</source>
-        <translation type="obsolete">Prerecorded</translation>
-    </message>
-    <message>
-        <source>Product</source>
-        <translation type="obsolete">Product</translation>
-    </message>
-    <message>
-        <source>Professional</source>
-        <translation type="obsolete">Professional</translation>
-    </message>
-    <message>
-        <source>Public</source>
-        <translation type="obsolete">Public</translation>
-    </message>
-    <message>
-        <source>Racing</source>
-        <translation type="obsolete">Racing</translation>
-    </message>
-    <message>
-        <source>Reading</source>
-        <translation type="obsolete">Reading</translation>
-    </message>
-    <message>
-        <source>Repair</source>
-        <translation type="obsolete">Repair</translation>
-    </message>
-    <message>
-        <source>Review</source>
-        <translation type="obsolete">Review</translation>
-    </message>
-    <message>
-        <source>Romance</source>
-        <translation type="obsolete">Romance</translation>
-    </message>
-    <message>
-        <source>Science</source>
-        <translation type="obsolete">Science</translation>
-    </message>
-    <message>
-        <source>Series</source>
-        <translation type="obsolete">Series</translation>
-    </message>
-    <message>
-        <source>Service</source>
-        <translation type="obsolete">Service</translation>
-    </message>
-    <message>
-        <source>Shopping</source>
-        <translation type="obsolete">Shopping</translation>
-    </message>
-    <message>
-        <source>Soap Opera</source>
-        <translation type="obsolete">Soap Opera</translation>
-    </message>
-    <message>
-        <source>Special</source>
-        <translation type="obsolete">Special</translation>
-    </message>
-    <message>
-        <source>Suspense</source>
-        <translation type="obsolete">Suspense</translation>
-    </message>
-    <message>
-        <source>Talk</source>
-        <translation type="obsolete">Talk</translation>
-    </message>
-    <message>
-        <source>Technical</source>
-        <translation type="obsolete">Technical</translation>
-    </message>
-    <message>
-        <source>Tennis</source>
-        <translation type="obsolete">Tennis</translation>
-    </message>
-    <message>
-        <source>Travel</source>
-        <translation type="obsolete">Travel</translation>
-    </message>
-    <message>
-        <source>Variety</source>
-        <translation type="obsolete">Variety</translation>
-    </message>
-    <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="1610"/>
         <source>Video</source>
         <translation>Video</translation>
-    </message>
-    <message>
-        <source>Weather</source>
-        <translation type="obsolete">Weather</translation>
-    </message>
-    <message>
-        <source>Western</source>
-        <translation type="obsolete">Western</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelgroup.cpp" line="201"/>
@@ -11561,38 +10906,6 @@ You may have to use the eject button under its tray.</translation>
         <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="2057"/>
         <source>Skipping %1, not in imported channel map</source>
         <translation>Skipping %1, not in imported channel map</translation>
-    </message>
-    <message>
-        <source>Error tuning to transport</source>
-        <translation type="obsolete">Error tuning to transport</translation>
-    </message>
-    <message>
-        <source>Programmer Error: Failed to handle tune complete.</source>
-        <translation type="obsolete">Programmer Error: Failed to handle tune complete.</translation>
-    </message>
-    <message>
-        <source>Failed to parse &apos;%1&apos;</source>
-        <translation type="obsolete">Failed to parse &apos;%1&apos;</translation>
-    </message>
-    <message>
-        <source>Failed to open &apos;%1&apos;</source>
-        <translation type="obsolete">Failed to open &apos;%1&apos;</translation>
-    </message>
-    <message>
-        <source>Error starting scan</source>
-        <translation type="obsolete">Error starting scan</translation>
-    </message>
-    <message>
-        <source>Programmer Error: No Device</source>
-        <translation type="obsolete">Programmer Error: No Device</translation>
-    </message>
-    <message>
-        <source>Programmer Error: Channel not created</source>
-        <translation type="obsolete">Programmer Error: Channel not created</translation>
-    </message>
-    <message>
-        <source>Channel could not be opened.</source>
-        <translation type="obsolete">Channel could not be opened.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/frequencytablesetting.cpp" line="38"/>
@@ -12062,291 +11375,6 @@ You may have to use the eject button under its tray.</translation>
         <translation>Analog</translation>
     </message>
     <message>
-        <source>Detective/Thriller</source>
-        <translation type="obsolete">Detective/Thriller</translation>
-    </message>
-    <message>
-        <source>Adventure/Western/War</source>
-        <translation type="obsolete">Adventure/Western/War</translation>
-    </message>
-    <message>
-        <source>Science Fiction/Fantasy/Horror</source>
-        <translation type="obsolete">Science Fiction/Fantasy/Horror</translation>
-    </message>
-    <message>
-        <source>Soap/melodrama/folkloric</source>
-        <translation type="obsolete">Soap/melodrama/folkloric</translation>
-    </message>
-    <message>
-        <source>Serious/Classical/Religious/Historical Movie/Drama</source>
-        <translation type="obsolete">Serious/Classical/Religious/Historical Movie/Drama</translation>
-    </message>
-    <message>
-        <source>Adult</source>
-        <comment>Adult Movie</comment>
-        <translation type="obsolete">Adult</translation>
-    </message>
-    <message>
-        <source>News/weather report</source>
-        <translation type="obsolete">News/weather report</translation>
-    </message>
-    <message>
-        <source>News magazine</source>
-        <translation type="obsolete">News magazine</translation>
-    </message>
-    <message>
-        <source>Game Show</source>
-        <translation type="obsolete">Game Show</translation>
-    </message>
-    <message>
-        <source>Variety Show</source>
-        <translation type="obsolete">Variety Show</translation>
-    </message>
-    <message>
-        <source>Talk Show</source>
-        <translation type="obsolete">Talk Show</translation>
-    </message>
-    <message>
-        <source>Special Events (World Cup, World Series, etc)</source>
-        <translation type="obsolete">Special Events (World Cup, World Series, etc)</translation>
-    </message>
-    <message>
-        <source>Sports Magazines</source>
-        <translation type="obsolete">Sports Magazines</translation>
-    </message>
-    <message>
-        <source>Football (Soccer)</source>
-        <translation type="obsolete">Football (Soccer)</translation>
-    </message>
-    <message>
-        <source>Tennis/Squash</source>
-        <translation type="obsolete">Tennis/Squash</translation>
-    </message>
-    <message>
-        <source>Misc. Team Sports</source>
-        <translation type="obsolete">Misc. Team Sports</translation>
-    </message>
-    <message>
-        <source>Athletics</source>
-        <translation type="obsolete">Athletics</translation>
-    </message>
-    <message>
-        <source>Motor Sport</source>
-        <translation type="obsolete">Motor Sport</translation>
-    </message>
-    <message>
-        <source>Water Sport</source>
-        <translation type="obsolete">Water Sport</translation>
-    </message>
-    <message>
-        <source>Winter Sports</source>
-        <translation type="obsolete">Winter Sports</translation>
-    </message>
-    <message>
-        <source>Equestrian</source>
-        <translation type="obsolete">Equestrian</translation>
-    </message>
-    <message>
-        <source>Martial Sports</source>
-        <translation type="obsolete">Martial Sports</translation>
-    </message>
-    <message>
-        <source>Kids</source>
-        <translation type="obsolete">Kids</translation>
-    </message>
-    <message>
-        <source>Intelligent Programs</source>
-        <translation type="obsolete">Intelligent Programs</translation>
-    </message>
-    <message>
-        <source>Pre-School Children&apos;s Programs</source>
-        <translation type="obsolete">Pre-School Children&apos;s Programs</translation>
-    </message>
-    <message>
-        <source>Entertainment Programs for 6 to 14</source>
-        <translation type="obsolete">Entertainment Programs for 6 to 14</translation>
-    </message>
-    <message>
-        <source>Entertainment Programs for 10 to 16</source>
-        <translation type="obsolete">Entertainment Programs for 10 to 16</translation>
-    </message>
-    <message>
-        <source>Informational/Educational</source>
-        <translation type="obsolete">Informational/Educational</translation>
-    </message>
-    <message>
-        <source>Cartoons/Puppets</source>
-        <translation type="obsolete">Cartoons/Puppets</translation>
-    </message>
-    <message>
-        <source>Music/Ballet/Dance</source>
-        <translation type="obsolete">Music/Ballet/Dance</translation>
-    </message>
-    <message>
-        <source>Rock/Pop</source>
-        <translation type="obsolete">Rock/Pop</translation>
-    </message>
-    <message>
-        <source>Classical Music</source>
-        <translation type="obsolete">Classical Music</translation>
-    </message>
-    <message>
-        <source>Folk Music</source>
-        <translation type="obsolete">Folk Music</translation>
-    </message>
-    <message>
-        <source>Jazz</source>
-        <translation type="obsolete">Jazz</translation>
-    </message>
-    <message>
-        <source>Musical/Opera</source>
-        <translation type="obsolete">Musical/Opera</translation>
-    </message>
-    <message>
-        <source>Ballet</source>
-        <translation type="obsolete">Ballet</translation>
-    </message>
-    <message>
-        <source>Arts/Culture</source>
-        <translation type="obsolete">Arts/Culture</translation>
-    </message>
-    <message>
-        <source>Performing Arts</source>
-        <translation type="obsolete">Performing Arts</translation>
-    </message>
-    <message>
-        <source>Fine Arts</source>
-        <translation type="obsolete">Fine Arts</translation>
-    </message>
-    <message>
-        <source>Religion</source>
-        <translation type="obsolete">Religion</translation>
-    </message>
-    <message>
-        <source>Popular Culture/Traditional Arts</source>
-        <translation type="obsolete">Popular Culture/Traditional Arts</translation>
-    </message>
-    <message>
-        <source>Literature</source>
-        <translation type="obsolete">Literature</translation>
-    </message>
-    <message>
-        <source>Film/Cinema</source>
-        <translation type="obsolete">Film/Cinema</translation>
-    </message>
-    <message>
-        <source>Experimental Film/Video</source>
-        <translation type="obsolete">Experimental Film/Video</translation>
-    </message>
-    <message>
-        <source>Broadcasting/Press</source>
-        <translation type="obsolete">Broadcasting/Press</translation>
-    </message>
-    <message>
-        <source>New Media</source>
-        <translation type="obsolete">New Media</translation>
-    </message>
-    <message>
-        <source>Arts/Culture Magazines</source>
-        <translation type="obsolete">Arts/Culture Magazines</translation>
-    </message>
-    <message>
-        <source>Social/Policical/Economics</source>
-        <translation type="obsolete">Social/Policical/Economics</translation>
-    </message>
-    <message>
-        <source>Magazines/Reports/Documentary</source>
-        <translation type="obsolete">Magazines/Reports/Documentary</translation>
-    </message>
-    <message>
-        <source>Economics/Social Advisory</source>
-        <translation type="obsolete">Economics/Social Advisory</translation>
-    </message>
-    <message>
-        <source>Remarkable People</source>
-        <translation type="obsolete">Remarkable People</translation>
-    </message>
-    <message>
-        <source>Education/Science/Factual</source>
-        <translation type="obsolete">Education/Science/Factual</translation>
-    </message>
-    <message>
-        <source>Nature/animals/Environment</source>
-        <translation type="obsolete">Nature/animals/Environment</translation>
-    </message>
-    <message>
-        <source>Technology/Natural Sciences</source>
-        <translation type="obsolete">Technology/Natural Sciences</translation>
-    </message>
-    <message>
-        <source>Medicine/Physiology/Psychology</source>
-        <translation type="obsolete">Medicine/Physiology/Psychology</translation>
-    </message>
-    <message>
-        <source>Foreign Countries/Expeditions</source>
-        <translation type="obsolete">Foreign Countries/Expeditions</translation>
-    </message>
-    <message>
-        <source>Social/Spiritual Sciences</source>
-        <translation type="obsolete">Social/Spiritual Sciences</translation>
-    </message>
-    <message>
-        <source>Further Education</source>
-        <translation type="obsolete">Further Education</translation>
-    </message>
-    <message>
-        <source>Languages</source>
-        <translation type="obsolete">Languages</translation>
-    </message>
-    <message>
-        <source>Leisure/Hobbies</source>
-        <translation type="obsolete">Leisure/Hobbies</translation>
-    </message>
-    <message>
-        <source>Tourism/Travel</source>
-        <translation type="obsolete">Tourism/Travel</translation>
-    </message>
-    <message>
-        <source>Handicraft</source>
-        <translation type="obsolete">Handicraft</translation>
-    </message>
-    <message>
-        <source>Motoring</source>
-        <translation type="obsolete">Motoring</translation>
-    </message>
-    <message>
-        <source>Fitness &amp; Health</source>
-        <translation type="obsolete">Fitness &amp; Health</translation>
-    </message>
-    <message>
-        <source>Cooking</source>
-        <translation type="obsolete">Cooking</translation>
-    </message>
-    <message>
-        <source>Advertizement/Shopping</source>
-        <translation type="obsolete">Advertizement/Shopping</translation>
-    </message>
-    <message>
-        <source>Gardening</source>
-        <translation type="obsolete">Gardening</translation>
-    </message>
-    <message>
-        <source>Original Language</source>
-        <translation type="obsolete">Original Language</translation>
-    </message>
-    <message>
-        <source>Black &amp; White</source>
-        <translation type="obsolete">Black &amp; White</translation>
-    </message>
-    <message>
-        <source>&quot;Unpublished&quot; Programs</source>
-        <translation type="obsolete">&quot;Unpublished&quot; Programs</translation>
-    </message>
-    <message>
-        <source>Live Broadcast</source>
-        <translation type="obsolete">Live Broadcast</translation>
-    </message>
-    <message>
         <location filename="../libs/libmythtv/teletextscreen.cpp" line="650"/>
         <source>Page Not Available</source>
         <comment>Requested Teletext page not available</comment>
@@ -12356,83 +11384,6 @@ You may have to use the eject button under its tray.</translation>
         <location filename="../libs/libmythtv/playercontext.cpp" line="767"/>
         <source>Play</source>
         <translation>Play</translation>
-    </message>
-    <message>
-        <source>Title match (regex)</source>
-        <translation type="obsolete">Title match (regex)</translation>
-    </message>
-    <message>
-        <source>Automatically set new recording rules to use this group if the title matches this regular expression.  For example, &quot;(News|CNN)&quot; would match any title in which &quot;News&quot; or &quot;CNN&quot; appears.</source>
-        <translation type="obsolete">Automatically set new recording rules to use this group if the title matches this regular expression.  For example, &quot;(News|CNN)&quot; would match any title in which &quot;News&quot; or &quot;CNN&quot; appears.</translation>
-    </message>
-    <message>
-        <source>default</source>
-        <translation type="obsolete">default</translation>
-    </message>
-    <message>
-        <source>Skip ahead (seconds)</source>
-        <translation type="obsolete">Skip ahead (seconds)</translation>
-    </message>
-    <message>
-        <source>How many seconds to skip forward on a fast forward.</source>
-        <translation type="obsolete">How many seconds to skip forward on a fast forward.</translation>
-    </message>
-    <message>
-        <source>Skip back (seconds)</source>
-        <translation type="obsolete">Skip back (seconds)</translation>
-    </message>
-    <message>
-        <source>How many seconds to skip backward on a rewind.</source>
-        <translation type="obsolete">How many seconds to skip backward on a rewind.</translation>
-    </message>
-    <message>
-        <source>Jump amount (minutes)</source>
-        <translation type="obsolete">Jump amount (minutes)</translation>
-    </message>
-    <message>
-        <source>How many minutes to jump forward or backward when the jump keys are pressed.</source>
-        <translation type="obsolete">How many minutes to jump forward or backward when the jump keys are pressed.</translation>
-    </message>
-    <message>
-        <source>Time stretch (speed x 100)</source>
-        <translation type="obsolete">Time stretch (speed x 100)</translation>
-    </message>
-    <message>
-        <source>Initial playback speed with adjusted audio.  Use 100 for normal speed, 50 for half speed and 200 for double speed.</source>
-        <translation type="obsolete">Initial playback speed with adjusted audio.  Use 100 for normal speed, 50 for half speed and 200 for double speed.</translation>
-    </message>
-    <message>
-        <source>Group</source>
-        <comment>Play Group</comment>
-        <translation type="obsolete">Group</translation>
-    </message>
-    <message>
-        <source>ProfileGroup</source>
-        <translation type="obsolete">ProfileGroup</translation>
-    </message>
-    <message>
-        <source>Transcoders</source>
-        <translation type="obsolete">Transcoders</translation>
-    </message>
-    <message>
-        <source>New Profile Group Name</source>
-        <translation type="obsolete">New Profile Group Name</translation>
-    </message>
-    <message>
-        <source>(Create new profile group)</source>
-        <translation type="obsolete">(Create new profile group)</translation>
-    </message>
-    <message>
-        <source>Delete profile group:</source>
-        <translation type="obsolete">Delete profile group:</translation>
-    </message>
-    <message>
-        <source>Yes, delete group</source>
-        <translation type="obsolete">Yes, delete group</translation>
-    </message>
-    <message>
-        <source>No, Don&apos;t delete group</source>
-        <translation type="obsolete">No, Don&apos;t delete group</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/profilegroup.h" line="63"/>
@@ -14760,14 +13711,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation>FAILED: XMLTV grabber returned error code %1.</translation>
     </message>
     <message>
-        <source>FAILED: xmltv ran but was interrupted.</source>
-        <translation type="obsolete">FAILED: xmltv ran but was interrupted.</translation>
-    </message>
-    <message>
-        <source>FAILED: xmltv returned error code %1.</source>
-        <translation type="obsolete">FAILED: xmltv returned error code %1.</translation>
-    </message>
-    <message>
         <location filename="../programs/mythfilldatabase/filldata.cpp" line="991"/>
         <source>mythfilldatabase ran, but did not insert any new data into the Guide for %1 of %2 sources. This can indicate a potential grabber failure.</source>
         <translation>mythfilldatabase ran, but did not insert any new data into the Guide for %1 of %2 sources. This can indicate a potential grabber failure.</translation>
@@ -15062,14 +14005,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation>If enabled, then immediately after rewinding, only skip forward the same amount as skipping backwards.</translation>
     </message>
     <message>
-        <source>Seek to exact frame</source>
-        <translation type="obsolete">Seek to exact frame</translation>
-    </message>
-    <message>
-        <source>If enabled, seeking is frame exact, but slower.</source>
-        <translation type="obsolete">If enabled, seeking is frame exact, but slower.</translation>
-    </message>
-    <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="170"/>
         <source>This determines the method used by MythTV to detect when commercials start and end.</source>
         <translation>This determines the method used by MythTV to detect when commercials start and end.</translation>
@@ -15085,18 +14020,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation>Automatically Skip</translation>
     </message>
     <message>
-        <source>Run transcoder</source>
-        <translation type="obsolete">Run transcoder</translation>
-    </message>
-    <message>
-        <source>This is the default value used for the transcoder setting when a new scheduled recording is created.</source>
-        <translation type="obsolete">This is the default value used for the transcoder setting when a new scheduled recording is created.</translation>
-    </message>
-    <message>
-        <source>This is the default value used for the &apos;Run %1&apos; setting when a new scheduled recording is created.</source>
-        <translation type="obsolete">This is the default value used for the &apos;Run %1&apos; setting when a new scheduled recording is created.</translation>
-    </message>
-    <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="264"/>
         <source>Treat consecutive commercial breaks shorter than this as one break when skipping forward. Useful if you have to skip a few times during breaks. Applies to automatic skipping as well. Set to 0 to disable.</source>
         <translation>Treat consecutive commercial breaks shorter than this as one break when skipping forward. Useful if you have to skip a few times during breaks. Applies to automatic skipping as well. Set to 0 to disable.</translation>
@@ -15110,10 +14033,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="300"/>
         <source>Determines the maximum number of days before undeleting a recording will become impossible. A value of zero means the recording will be permanently deleted between 5 and 20 minutes later. A value of minus one means recordings will be retained until space is required. A recording will always be removed before this time if the space is needed for a new recording.</source>
         <translation>Determines the maximum number of days before undeleting a recording will become impossible. A value of zero means the recording will be permanently deleted between 5 and 20 minutes later. A value of minus one means recordings will be retained until space is required. A recording will always be removed before this time if the space is needed for a new recording.</translation>
-    </message>
-    <message>
-        <source>Expire in deleted order</source>
-        <translation type="obsolete">Expire in deleted order</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="319"/>
@@ -15356,10 +14275,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1373"/>
         <source>Always display closed captioning or subtitles</source>
         <translation>Always display closed captioning or subtitles</translation>
-    </message>
-    <message>
-        <source>Prefer EIA-708 over EIA-608 captions</source>
-        <translation type="obsolete">Prefer EIA-708 over EIA-608 captions</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1410"/>
@@ -15786,22 +14701,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation>Default channel group to be shown in the the EPGPressing GUIDE key will toggle channel group.</translation>
     </message>
     <message>
-        <source>Default &apos;Start Early&apos; minutes for new recording rules</source>
-        <translation type="obsolete">Default &apos;Start Early&apos; minutes for new recording rules</translation>
-    </message>
-    <message>
-        <source>Set this to &apos;0&apos; unless you expect that the majority of your show times will not match your TV listings. This sets the initial start early or start late time when rules are created. These can then be adjusted per recording rule.</source>
-        <translation type="obsolete">Set this to &apos;0&apos; unless you expect that the majority of your show times will not match your TV listings. This sets the initial start early or start late time when rules are created. These can then be adjusted per recording rule.</translation>
-    </message>
-    <message>
-        <source>Default &apos;End Late&apos; minutes for new recording rules</source>
-        <translation type="obsolete">Default &apos;End Late&apos; minutes for new recording rules</translation>
-    </message>
-    <message>
-        <source>Set this to &apos;0&apos; unless you expect that the majority of your show times will not match your TV listings. This sets the initial end late or end early time when rules are created. These can then be adjusted per recording rule.</source>
-        <translation type="obsolete">Set this to &apos;0&apos; unless you expect that the majority of your show times will not match your TV listings. This sets the initial end late or end early time when rules are created. These can then be adjusted per recording rule.</translation>
-    </message>
-    <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2307"/>
         <source>Additional priority when a showing matches the preferred input selected in the &apos;Scheduling Options&apos; section of the recording rule.</source>
         <translation>Additional priority when a showing matches the preferred input selected in the &apos;Scheduling Options&apos; section of the recording rule.</translation>
@@ -15987,30 +14886,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation>Automatically skip commercial breaks that have been flagged during automatic commercial detection or by the mythcommflag program, or just notify that a commercial has been detected.</translation>
     </message>
     <message>
-        <source>Run metadata lookup</source>
-        <translation type="obsolete">Run metadata lookup</translation>
-    </message>
-    <message>
-        <source>This is the default value used for the automatic metadata lookup setting when a new scheduled recording is created.</source>
-        <translation type="obsolete">This is the default value used for the automatic metadata lookup setting when a new scheduled recording is created.</translation>
-    </message>
-    <message>
-        <source>Run commercial detection</source>
-        <translation type="obsolete">Run commercial detection</translation>
-    </message>
-    <message>
-        <source>This is the default value used for the automatic commercial detection setting when a new scheduled recording is created.</source>
-        <translation type="obsolete">This is the default value used for the automatic commercial detection setting when a new scheduled recording is created.</translation>
-    </message>
-    <message>
-        <source>This is the default value used for the automatic-transcode setting when a new scheduled recording is created.</source>
-        <translation type="obsolete">This is the default value used for the automatic-transcode setting when a new scheduled recording is created.</translation>
-    </message>
-    <message>
-        <source>Default transcoder</source>
-        <translation type="obsolete">Default transcoder</translation>
-    </message>
-    <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="208"/>
         <source>Deferral days for auto transcode jobs</source>
         <translation>Deferral days for auto transcode jobs</translation>
@@ -16019,10 +14894,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="209"/>
         <source>If non-zero, automatic transcode jobs will be scheduled to run this many days after a recording completes instead of immediately afterwards.</source>
         <translation>If non-zero, automatic transcode jobs will be scheduled to run this many days after a recording completes instead of immediately afterwards.</translation>
-    </message>
-    <message>
-        <source>Run user job #%1</source>
-        <translation type="obsolete">Run user job #%1</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="219"/>
@@ -16090,10 +14961,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation>If enabled, move deleted recordings to the &apos;Deleted&apos; recgroup and turn on autoexpire instead of deleting immediately.</translation>
     </message>
     <message>
-        <source>If enabled, delete recordings in the order which they were originally deleted.</source>
-        <translation type="obsolete">If enabled, delete recordings in the order which they were originally deleted.</translation>
-    </message>
-    <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="338"/>
         <source>Auto-Expire method</source>
         <translation>Auto-Expire method</translation>
@@ -16137,14 +15004,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="364"/>
         <source>The number of days bonus a program gets for each priority point. This is only used when the Weighted time/priority Auto-Expire method is selected.</source>
         <translation>The number of days bonus a program gets for each priority point. This is only used when the Weighted time/priority Auto-Expire method is selected.</translation>
-    </message>
-    <message>
-        <source>Auto-Expire default</source>
-        <translation type="obsolete">Auto-Expire default</translation>
-    </message>
-    <message>
-        <source>If enabled, any new recording schedules will be marked as eligible for auto-expiration. Existing schedules will keep their current value.</source>
-        <translation type="obsolete">If enabled, any new recording schedules will be marked as eligible for auto-expiration. Existing schedules will keep their current value.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="374"/>
@@ -16239,17 +15098,9 @@ name cannot be blank.</translation>
         <translation>If enabled, this overrides the mythtv-setup setting used during recording when decoding captions.</translation>
     </message>
     <message>
-        <source>If enabled, captions will be displayed over a black background for better contrast.</source>
-        <translation type="obsolete">If enabled, captions will be displayed over a black background for better contrast.</translation>
-    </message>
-    <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1375"/>
         <source>If enabled, captions will be displayed when playing back recordings or watching Live TV. Closed Captioning can be turned on or off by pressing &quot;T&quot; during playback.</source>
         <translation>If enabled, captions will be displayed when playing back recordings or watching Live TV. Closed Captioning can be turned on or off by pressing &quot;T&quot; during playback.</translation>
-    </message>
-    <message>
-        <source>If enabled, the newer EIA-708 captions will be preferred over the older EIA-608 captions in ATSC streams.</source>
-        <translation type="obsolete">If enabled, the newer EIA-708 captions will be preferred over the older EIA-608 captions in ATSC streams.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1386"/>
@@ -16327,22 +15178,6 @@ name cannot be blank.</translation>
         <translation>Exit Live TV automatically if left idle for the specified number of minutes. 0 disables the timeout.</translation>
     </message>
     <message>
-        <source>Subtitle text zoom percentage</source>
-        <translation type="obsolete">Subtitle text zoom percentage</translation>
-    </message>
-    <message>
-        <source>Use this to enlarge or shrink text based subtitles.</source>
-        <translation type="obsolete">Use this to enlarge or shrink text based subtitles.</translation>
-    </message>
-    <message>
-        <source>Subtitle Font</source>
-        <translation type="obsolete">Subtitle Font</translation>
-    </message>
-    <message>
-        <source>The font to use for text based subtitles.</source>
-        <translation type="obsolete">The font to use for text based subtitles.</translation>
-    </message>
-    <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1554"/>
         <source>If enabled, you can use a virtual keyboard in MythTV&apos;s line edit boxes. To use, hit SELECT (Enter or Space) while a line edit is in focus.</source>
         <translation>If enabled, you can use a virtual keyboard in MythTV&apos;s line edit boxes. To use, hit SELECT (Enter or Space) while a line edit is in focus.</translation>
@@ -16371,18 +15206,6 @@ name cannot be blank.</translation>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1646"/>
         <source>Setup PIN code</source>
         <translation>Setup PIN code</translation>
-    </message>
-    <message>
-        <source>This PIN is used to control access to the setup menus. If you want to use this feature, then setting the value to all numbers will make your life much easier. Set it to blank to disable.</source>
-        <translation type="obsolete">This PIN is used to control access to the setup menus. If you want to use this feature, then setting the value to all numbers will make your life much easier. Set it to blank to disable.</translation>
-    </message>
-    <message>
-        <source>Require setup PIN</source>
-        <translation type="obsolete">Require setup PIN</translation>
-    </message>
-    <message>
-        <source>If enabled, you will not be able to return to this screen and reset the Setup PIN without first entering the current PIN.</source>
-        <translation type="obsolete">If enabled, you will not be able to return to this screen and reset the Setup PIN without first entering the current PIN.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1675"/>
@@ -16821,10 +15644,6 @@ name cannot be blank.</translation>
         <translation>General (Auto-Expire)</translation>
     </message>
     <message>
-        <source>Default Job Queue Settings for New Scheduled Recordings</source>
-        <translation type="obsolete">Default Job Queue Settings for New Scheduled Recordings</translation>
-    </message>
-    <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="3577"/>
         <source>Screen Settings</source>
         <translation>Screen Settings</translation>
@@ -17025,10 +15844,6 @@ name cannot be blank.</translation>
         <location filename="../programs/mythfrontend/audiogeneralsettings.cpp" line="480"/>
         <source>Enable if your amplifier or sound decoder supports DTS. You must use a digital connection. Uncheck if using an analog connection</source>
         <translation>Enable if your amplifier or sound decoder supports DTS. You must use a digital connection. Uncheck if using an analog connection</translation>
-    </message>
-    <message>
-        <source>Black background for closed captioning</source>
-        <translation type="obsolete">Black background for closed captioning</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1579"/>
@@ -18258,124 +17073,6 @@ Check if the video exists</translation>
         <translation>MythTV Setup</translation>
     </message>
     <message>
-        <source>Tuner %1 is recording:
-</source>
-        <translation type="obsolete">Tuner %1 is recording:
-</translation>
-    </message>
-    <message>
-        <source>Tuner %1 is not recording</source>
-        <translation type="obsolete">Tuner %1 is not recording</translation>
-    </message>
-    <message>
-        <source>Period</source>
-        <translation type="obsolete">Period</translation>
-    </message>
-    <message>
-        <source>start time</source>
-        <translation type="obsolete">start time</translation>
-    </message>
-    <message>
-        <source>Defines a period the master backend should be awake</source>
-        <translation type="obsolete">Defines a period the master backend should be awake</translation>
-    </message>
-    <message>
-        <source>Set both Start &amp; End times to 00:00 to disable.</source>
-        <translation type="obsolete">Set both Start &amp; End times to 00:00 to disable.</translation>
-    </message>
-    <message>
-        <source>end time</source>
-        <translation type="obsolete">end time</translation>
-    </message>
-    <message>
-        <source>Automatically Start mythfrontend</source>
-        <translation type="obsolete">Automatically Start mythfrontend</translation>
-    </message>
-    <message>
-        <source>Mythwelcome will automatically start mythfrontend if it is determined that it was not started to record a program.</source>
-        <translation type="obsolete">Mythwelcome will automatically start mythfrontend if it is determined that it was not started to record a program.</translation>
-    </message>
-    <message>
-        <source>Shutdown with Master Backend</source>
-        <translation type="obsolete">Shutdown with Master Backend</translation>
-    </message>
-    <message>
-        <source>Mythwelcome will automatically shutdown this computer when the master backend shuts down. Should only be set on frontend only machines</source>
-        <translation type="obsolete">Mythwelcome will automatically shutdown this computer when the master backend shuts down. Should only be set on frontend only machines</translation>
-    </message>
-    <message>
-        <source>Date Format</source>
-        <translation type="obsolete">Date Format</translation>
-    </message>
-    <message>
-        <source>This is the format to use to display the date. See http://doc.trolltech.com/3.3/qdate.html#toString for a list of valid format specifiers.</source>
-        <translation type="obsolete">This is the format to use to display the date. See http://doc.trolltech.com/3.3/qdate.html#toString for a list of valid format specifiers.</translation>
-    </message>
-    <message>
-        <source>MythWelcome Settings</source>
-        <translation type="obsolete">MythWelcome Settings</translation>
-    </message>
-    <message>
-        <source>Daily Wakeup/ShutDown Period</source>
-        <translation type="obsolete">Daily Wakeup/ShutDown Period</translation>
-    </message>
-    <message>
-        <source>Command to Set Wakeup Time</source>
-        <translation type="obsolete">Command to Set Wakeup Time</translation>
-    </message>
-    <message>
-        <source>Command to set the wakeup time in the BIOS. See the README file for more examples.</source>
-        <translation type="obsolete">Command to set the wakeup time in the BIOS. See the README file for more examples.</translation>
-    </message>
-    <message>
-        <source>The format of the time string passed to the &apos;Set Wakeup Time Command&apos; as $time. See QT::QDateTime.toString() for details. Set to &apos;time_t&apos; for seconds since epoch (use time_t for nvram_wakeup).</source>
-        <translation type="obsolete">The format of the time string passed to the &apos;Set Wakeup Time Command&apos; as $time. See QT::QDateTime.toString() for details. Set to &apos;time_t&apos; for seconds since epoch (use time_t for nvram_wakeup).</translation>
-    </message>
-    <message>
-        <source>nvram-wakeup Restart Command</source>
-        <translation type="obsolete">nvram-wakeup Restart Command</translation>
-    </message>
-    <message>
-        <source>Command to run if your bios requires you to reboot to allow nvram-wakeup settings to take effect. Leave blank if your bios does not require a reboot. See the README file for more examples.</source>
-        <translation type="obsolete">Command to run if your bios requires you to reboot to allow nvram-wakeup settings to take effect. Leave blank if your bios does not require a reboot. See the README file for more examples.</translation>
-    </message>
-    <message>
-        <source>Command to reboot</source>
-        <translation type="obsolete">Command to reboot</translation>
-    </message>
-    <message>
-        <source>Command to reboot computer.</source>
-        <translation type="obsolete">Command to reboot computer.</translation>
-    </message>
-    <message>
-        <source>Command to shutdown</source>
-        <translation type="obsolete">Command to shutdown</translation>
-    </message>
-    <message>
-        <source>Command to shutdown computer.</source>
-        <translation type="obsolete">Command to shutdown computer.</translation>
-    </message>
-    <message>
-        <source>Command to run to start the Frontend</source>
-        <translation type="obsolete">Command to run to start the Frontend</translation>
-    </message>
-    <message>
-        <source>Command to start mythfrontend.</source>
-        <translation type="obsolete">Command to start mythfrontend.</translation>
-    </message>
-    <message>
-        <source>Command to run Xterm</source>
-        <translation type="obsolete">Command to run Xterm</translation>
-    </message>
-    <message>
-        <source>Command to start an Xterm. Can be disabled by leaving this setting blank.</source>
-        <translation type="obsolete">Command to start an Xterm. Can be disabled by leaving this setting blank.</translation>
-    </message>
-    <message>
-        <source>MythShutdown/MythWelcome Settings</source>
-        <translation type="obsolete">MythShutdown/MythWelcome Settings</translation>
-    </message>
-    <message>
         <location filename="../programs/mythcommflag/CommDetector2.cpp" line="589"/>
         <source>Performing Logo Identification</source>
         <translation>Performing Logo Identification</translation>
@@ -18442,14 +17139,6 @@ Check if the video exists</translation>
         <location filename="../libs/libmythtv/channelscan/scanwizardconfig.h" line="93"/>
         <source>Scan Type</source>
         <translation>Scan Type</translation>
-    </message>
-    <message>
-        <source>Angle %1</source>
-        <translation type="obsolete">Angle %1</translation>
-    </message>
-    <message>
-        <source>Failed to switch title.</source>
-        <translation type="obsolete">Failed to switch title.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodbcheck.cpp" line="102"/>
@@ -18946,29 +17635,6 @@ Check if the video exists</translation>
     </message>
 </context>
 <context>
-    <name>RatingsToPL</name>
-    <message>
-        <source>G</source>
-        <comment>PL 1 default search string.</comment>
-        <translation type="obsolete">G</translation>
-    </message>
-    <message>
-        <source>PG</source>
-        <comment>PL 2 default search string.</comment>
-        <translation type="obsolete">PG</translation>
-    </message>
-    <message>
-        <source>PG-13</source>
-        <comment>PL3 default search string.</comment>
-        <translation type="obsolete">PG-13</translation>
-    </message>
-    <message>
-        <source>R:NC-17</source>
-        <comment>PL4 default search string.</comment>
-        <translation type="obsolete">R:NC-17</translation>
-    </message>
-</context>
-<context>
     <name>RawSettingsEditor</name>
     <message>
         <location filename="../libs/libmyth/rawsettingseditor.cpp" line="21"/>
@@ -19128,53 +17794,6 @@ Check if the video exists</translation>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="52"/>
         <source>High definition</source>
         <translation>High definition</translation>
-    </message>
-</context>
-<context>
-    <name>SchedOptEditor</name>
-    <message>
-        <source>Use any available input</source>
-        <translation type="obsolete">Use any available input</translation>
-    </message>
-    <message>
-        <source>Prefer input %1</source>
-        <translation type="obsolete">Prefer input %1</translation>
-    </message>
-    <message>
-        <source>Match duplicates using subtitle &amp; description</source>
-        <translation type="obsolete">Match duplicates using subtitle &amp; description</translation>
-    </message>
-    <message>
-        <source>Match duplicates using subtitle then description</source>
-        <translation type="obsolete">Match duplicates using subtitle then description</translation>
-    </message>
-    <message>
-        <source>Match duplicates using subtitle</source>
-        <translation type="obsolete">Match duplicates using subtitle</translation>
-    </message>
-    <message>
-        <source>Match duplicates using description</source>
-        <translation type="obsolete">Match duplicates using description</translation>
-    </message>
-    <message>
-        <source>Don&apos;t match duplicates</source>
-        <translation type="obsolete">Don&apos;t match duplicates</translation>
-    </message>
-    <message>
-        <source>Look for duplicates in current and previous recordings</source>
-        <translation type="obsolete">Look for duplicates in current and previous recordings</translation>
-    </message>
-    <message>
-        <source>Look for duplicates in current recordings only</source>
-        <translation type="obsolete">Look for duplicates in current recordings only</translation>
-    </message>
-    <message>
-        <source>Look for duplicates in previous recordings only</source>
-        <translation type="obsolete">Look for duplicates in previous recordings only</translation>
-    </message>
-    <message>
-        <source>Record new episodes only</source>
-        <translation type="obsolete">Record new episodes only</translation>
     </message>
 </context>
 <context>
@@ -19426,10 +18045,6 @@ Check if the video exists</translation>
         <translation>Default</translation>
     </message>
     <message>
-        <source>Record at any time on any channel</source>
-        <translation type="obsolete">Record at any time on any channel</translation>
-    </message>
-    <message>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="496"/>
         <source>Schedule Information</source>
         <translation>Schedule Information</translation>
@@ -19440,25 +18055,9 @@ Check if the video exists</translation>
         <source>Program Details</source>
         <translation>Program Details</translation>
     </message>
-    <message>
-        <source>Upcoming episodes</source>
-        <translation type="obsolete">Upcoming episodes</translation>
-    </message>
-    <message>
-        <source>Upcoming recordings</source>
-        <translation type="obsolete">Upcoming recordings</translation>
-    </message>
-    <message>
-        <source>Previously scheduled</source>
-        <translation type="obsolete">Previously scheduled</translation>
-    </message>
 </context>
 <context>
     <name>SchemaUpgradeWizard</name>
-    <message>
-        <source>%1 database schema is old. Waiting to see if DB is being upgraded.</source>
-        <translation type="obsolete">%1 database schema is old. Waiting to see if DB is being upgraded.</translation>
-    </message>
     <message>
         <location filename="../libs/libmyth/schemawizard.cpp" line="154"/>
         <source>Exit</source>
@@ -20234,15 +18833,6 @@ Directory From Storage Group?</translation>
 (from all hosts)</translation>
     </message>
     <message>
-        <source>(from remote hosts)</source>
-        <translation type="obsolete">(from remote hosts)</translation>
-    </message>
-    <message>
-        <source>(from all hosts</source>
-        <translatorcomment>Missing parenthesis? Typo?</translatorcomment>
-        <translation type="obsolete">(from all hosts</translation>
-    </message>
-    <message>
         <location filename="../libs/libmyth/storagegroupeditor.cpp" line="316"/>
         <source>Yes, delete group</source>
         <translation>Yes, delete group</translation>
@@ -20259,49 +18849,6 @@ Directory From Storage Group?</translation>
         <location filename="../libs/libmyth/storagegroupeditor.cpp" line="453"/>
         <source>(Create %1 group)</source>
         <translation>(Create %1 group)</translation>
-    </message>
-</context>
-<context>
-    <name>StoreOptEditor</name>
-    <message>
-        <source>Create New Recording Group. Enter group name: </source>
-        <translation type="obsolete">Create New Recording Group. Enter group name: </translation>
-    </message>
-    <message>
-        <source>Record using the %1 profile</source>
-        <translation type="obsolete">Record using the %1 profile</translation>
-    </message>
-    <message>
-        <source>Create a new recording group</source>
-        <translation type="obsolete">Create a new recording group</translation>
-    </message>
-    <message>
-        <source>Include in the &quot;%1&quot; recording group</source>
-        <translation type="obsolete">Include in the &quot;%1&quot; recording group</translation>
-    </message>
-    <message>
-        <source>Default</source>
-        <translation type="obsolete">Default</translation>
-    </message>
-    <message>
-        <source>Store in the &quot;%1&quot; storage group</source>
-        <translation type="obsolete">Store in the &quot;%1&quot; storage group</translation>
-    </message>
-    <message>
-        <source>Live TV</source>
-        <translation type="obsolete">Live TV</translation>
-    </message>
-    <message>
-        <source>Use &quot;%1&quot; playback group settings</source>
-        <translation type="obsolete">Use &quot;%1&quot; playback group settings</translation>
-    </message>
-    <message>
-        <source>Don&apos;t record if this would exceed the max episodes</source>
-        <translation type="obsolete">Don&apos;t record if this would exceed the max episodes</translation>
-    </message>
-    <message>
-        <source>Delete oldest if this would exceed the max episodes</source>
-        <translation type="obsolete">Delete oldest if this would exceed the max episodes</translation>
     </message>
 </context>
 <context>
@@ -21792,10 +20339,6 @@ Directory From Storage Group?</translation>
         <location filename="../themes/themestrings.h" line="619"/>
         <source>Modify, Add, and Delete television channels.</source>
         <translation>Modify, Add, and Delete television channels.</translation>
-    </message>
-    <message>
-        <source>Delete Source</source>
-        <translation type="obsolete">Delete Source</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="621"/>
@@ -24019,10 +22562,6 @@ Once you have completed your modifications, click the &quot;Save&quot; button.</
         <translation>Designed to show off some different element arrangements available in Myth 0.25.  Reminder: On Watch Recordings screen [Rew] and [FF] can be used to change the Rec. Group.</translation>
     </message>
     <message>
-        <source>Another Theme build on the new UI library Any suggestions or bugs to https://code.google.com/p/a-forest/ A special thank to Steve Adeff for his help on this project.</source>
-        <translation type="obsolete">Another Theme build on the new UI library Any suggestions or bugs to https://code.google.com/p/a-forest/ A special thank to Steve Adeff for his help on this project.</translation>
-    </message>
-    <message>
         <location filename="../themes/themestrings.h" line="934"/>
         <source>LCARS</source>
         <translation>LCARS</translation>
@@ -24052,10 +22591,6 @@ Once you have completed your modifications, click the &quot;Save&quot; button.</
         <location filename="../themes/themestrings.h" line="939"/>
         <source>a nice transparent theme to use your own background if you want. just copy your favorite picture (be sure that its resolution is 1920x1200) to /usr/share/mythtv/themes/TransBlue/background.jpg</source>
         <translation>a nice transparent theme to use your own background if you want. just copy your favorite picture (be sure that its resolution is 1920x1200) to /usr/share/mythtv/themes/TransBlue/background.jpg</translation>
-    </message>
-    <message>
-        <source>A UI and OSD theme with focus for fanart, banners and cover display.</source>
-        <translation type="obsolete">A UI and OSD theme with focus for fanart, banners and cover display.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="941"/>
@@ -27072,14 +25607,6 @@ dd MMM yyyy</translation>
 <context>
     <name>VideoScanner</name>
     <message>
-        <source>Failed to Scan SG Video Hosts</source>
-        <translation type="obsolete">Failed to Scan SG Video Hosts</translation>
-    </message>
-    <message>
-        <source>If they no longer exist please remove them</source>
-        <translation type="obsolete">If they no longer exist please remove them</translation>
-    </message>
-    <message>
         <location filename="../libs/libmythmetadata/videoscan.cpp" line="474"/>
         <source>Failed to Scan SG Video Hosts:
 
@@ -27325,10 +25852,6 @@ If they no longer exist please remove them</translation>
         <location filename="../programs/mythwelcome/welcomedialog.cpp" line="343"/>
         <source>Cannot connect to server!</source>
         <translation>Cannot connect to server!</translation>
-    </message>
-    <message>
-        <source>to</source>
-        <translation type="obsolete">to</translation>
     </message>
     <message>
         <location filename="../programs/mythwelcome/welcomedialog.cpp" line="358"/>

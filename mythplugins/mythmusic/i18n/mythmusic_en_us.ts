@@ -584,10 +584,6 @@ GENRE, ARTIST, ALBUM, TRACK, TITLE, YEAR</translation>
 <context>
     <name>MusicCommon</name>
     <message>
-        <source>Speed: </source>
-        <translation type="obsolete">Speed: </translation>
-    </message>
-    <message>
         <location filename="../mythmusic/musiccommon.cpp" line="1079"/>
         <source>Playing stream.</source>
         <translation>Playing stream.</translation>
@@ -1103,18 +1099,6 @@ Do you want to continue playing in the background?</translation>
         <translation>Refresh music tree</translation>
     </message>
     <message>
-        <source>Filter All My Music</source>
-        <translation type="obsolete">Filter All My Music</translation>
-    </message>
-    <message>
-        <source>Show incremental search dialog</source>
-        <translation type="obsolete">Show incremental search dialog</translation>
-    </message>
-    <message>
-        <source>Incremental search find next match</source>
-        <translation type="obsolete">Incremental search find next match</translation>
-    </message>
-    <message>
         <location filename="../mythmusic/main.cpp" line="618"/>
         <source>Increase Play Speed</source>
         <translation>Increase Play Speed</translation>
@@ -1580,18 +1564,6 @@ Name: %1</translation>
         <location filename="../mythmusic/shoutcast.cpp" line="856"/>
         <source>Unsupported content type for ShoutCast stream: %1</source>
         <translation>Unsupported content type for ShoutCast stream: %1</translation>
-    </message>
-    <message>
-        <source>Cannot find radio.
-Check the URL is correct.</source>
-        <translation type="obsolete">Cannot find radio.
-Check the URL is correct.</translation>
-    </message>
-    <message>
-        <source>Cannot connect to radio.
-Check the URL is correct.</source>
-        <translation type="obsolete">Cannot connect to radio.
-Check the URL is correct.</translation>
     </message>
     <message>
         <location filename="../mythmusic/smartplaylist.cpp" line="360"/>

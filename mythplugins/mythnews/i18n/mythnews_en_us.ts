@@ -162,13 +162,6 @@
     </message>
 </context>
 <context>
-    <name>QObject</name>
-    <message>
-        <source>Downloading media...</source>
-        <translation type="obsolete">Downloading media...</translation>
-    </message>
-</context>
-<context>
     <name>ThemeUI</name>
     <message>
         <location filename="themestrings.h" line="9"/>

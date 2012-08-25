@@ -96,37 +96,6 @@
     </message>
 </context>
 <context>
-    <name>QObject</name>
-    <message>
-        <source>Current Conditions</source>
-        <translation type="obsolete">Current Conditions</translation>
-    </message>
-    <message>
-        <source>Three Day Forecast</source>
-        <translation type="obsolete">Three Day Forecast</translation>
-    </message>
-    <message>
-        <source>18 Hour Forecast</source>
-        <translation type="obsolete">18 Hour Forecast</translation>
-    </message>
-    <message>
-        <source>Severe Weather Alerts</source>
-        <translation type="obsolete">Severe Weather Alerts</translation>
-    </message>
-    <message>
-        <source>Six Day Forecast</source>
-        <translation type="obsolete">Six Day Forecast</translation>
-    </message>
-    <message>
-        <source>Static Map</source>
-        <translation type="obsolete">Static Map</translation>
-    </message>
-    <message>
-        <source>Animated Map</source>
-        <translation type="obsolete">Animated Map</translation>
-    </message>
-</context>
-<context>
     <name>ScreenSetup</name>
     <message>
         <location filename="../mythweather/weatherSetup.cpp" line="151"/>
