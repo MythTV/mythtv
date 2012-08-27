@@ -2498,8 +2498,7 @@ void Scheduler::HandleRecordingStatusChange(
     ri.SetRecordingStatus(recStatus);
 
     bool doSchedAfterStart =
-        recStatus != rsTuning &&
-        (recStatus != rsRecording ||
+        ((recStatus != rsTuning && recStatus != rsRecording) ||
          schedAfterStartMap[ri.GetRecordingRuleID()] ||
          (ri.GetParentRecordingRuleID() &&
           schedAfterStartMap[ri.GetParentRecordingRuleID()]));
