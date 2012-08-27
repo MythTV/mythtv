@@ -128,24 +128,24 @@ if (!$xml) {
 }
 
 printf "copyright::" . $MetOffCommon::copyright_str . "\n";
-printf "copyrightlogo::" . $MetOffCommon::copyright_logo . "\n";
+#printf "copyrightlogo::" . $MetOffCommon::copyright_logo . "\n";
 printf "station_id::" . $locid . "\n";
 my $location = $xml->{DV}->{Location}->{name};
 printf "18hrlocation::" . $location . "\n";
 printf "updatetime::" . localtime() . "\n";
 
-my $item;
+my $period;
 my $i = 0;
 
-foreach $item (@{$xml->{DV}->{Location}->{Period}}) {
+foreach $period (@{$xml->{DV}->{Location}->{Period}}) {
 
-    if (ref($item->{Rep}) ne 'ARRAY') {
+    if (ref($period->{Rep}) ne 'ARRAY') {
         next;
     }
 
-    foreach my $rep (@{$item->{Rep}}) {
+    foreach my $rep (@{$period->{Rep}}) {
 
-        my $datetime = DateTime::Format::ISO8601->parse_datetime(substr($item->{val}, 0, -1));
+        my $datetime = DateTime::Format::ISO8601->parse_datetime(substr($period->{value}, 0, -1));
         $datetime->add( minutes => $rep->{content} );
         
         if ($datetime <= DateTime->now()->subtract( hours => 3 )) # Ignore periods in past
