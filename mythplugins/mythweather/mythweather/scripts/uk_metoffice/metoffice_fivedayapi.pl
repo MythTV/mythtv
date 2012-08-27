@@ -117,7 +117,6 @@ if (DateTime->now()->hour() >= 18) {
 my $end_date = $start_date->clone();
 $end_date->add( days => 5 );
 $base_args = $base_args . '&valid-from=' . $start_date . '&valid-to=' . $end_date;
-print $base_args . "\n";
 # END workaround
 
 my $url = "";
@@ -125,7 +124,6 @@ my $url = "";
 if ($locid =~ s/^(\d*)/$1/)
 {
     $url = $MetOffCommon::forecast_url . $1 . $base_args;
-    print $url . "\n";
 }
 else
 {
