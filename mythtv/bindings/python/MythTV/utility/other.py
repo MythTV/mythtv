@@ -3,17 +3,12 @@
 
 from MythTV.logging import MythLog
 from MythTV.exceptions import MythDBError, MythError
+from dt import datetime
 
 from cStringIO import StringIO
 from select import select
-from time import time, mktime, sleep
-from datetime import datetime as _pydatetime
-from datetime import tzinfo as _pytzinfo
-from datetime import timedelta
+from time import time
 from itertools import imap
-from threading import Thread, Lock
-from collections import deque
-from Queue import Queue
 import weakref
 import socket
 import re
@@ -168,6 +163,10 @@ class databaseSearch( object ):
 
     def __call__(self, **kwargs):
         where,fields,joinbit = self.parseInp(kwargs)
+
+        for i,val in enumerate(fields):
+            if isinstance(val, datetime):
+                fields[i] = val.asnaiveutc()
 
         # process query
         query = self.buildQuery(where, joinbit=joinbit)

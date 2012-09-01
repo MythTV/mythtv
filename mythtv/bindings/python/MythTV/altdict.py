@@ -100,17 +100,19 @@ class DictData( OrdDict ):
                 locale.atof,
                 bool,
                 lambda x: x,
-                lambda x: datetime.fromTimestamp(x, datetime.UTCTZ()),
+                lambda x: datetime.fromtimestamp(x, datetime.UTCTZ())\
+                                  .astimezone(datetime.localTZ()),
                 lambda x: date(*[int(y) for y in x.split('-')]),
-                lambda x: datetime.fromRfc(x)]
+                lambda x: datetime.fromRfc(x, datetime.UTCTZ())\
+                                  .astimezone(datetime.localTZ())]
     _inv_trans = [  str,
                     lambda x: locale.format("%0.6f", x),
                     lambda x: str(int(x)),
                     lambda x: x,
-                    lambda x: str(x.timestamp()),
-                    lambda x: x.isoformat(),
-                    lambda x: x.rfcformat()]
-                    
+                    lambda x: str(int(x.timestamp())),
+                    lambda x: x.utcisoformat(),
+                    lambda x: x.utcrfcformat()]
+
     def __setattr__(self, name, value):
         if name in self._localvars:
             self.__dict__[name] = value

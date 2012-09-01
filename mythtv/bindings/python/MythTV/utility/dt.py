@@ -8,9 +8,157 @@
 from datetime import datetime as _pydatetime, \
                      tzinfo as _pytzinfo, \
                      timedelta
+from collections import namedtuple
 import re
 import time
+import singleton
 time.tzset()
+
+class basetzinfo( _pytzinfo ):
+    """
+    Base timezone class that provides the methods required for interaction
+    with Python datetime utilities.  This class depends on subclasses to
+    populate the proper data fields with transition information.
+    """
+    _Transition = namedtuple('Transition', \
+                             'time utc local offset abbrev isdst')
+
+    def _get_transition(self, dt=None):
+        if dt is None:
+            dt = _pydatetime.now()
+        dt = (dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second)
+
+        for i, transition in enumerate(self._transitions):
+            if dt < transition.local[0:5]:
+                transition = self._transitions[i-1]
+                break
+        return transition
+
+    def utcoffset(self, dt=None):
+        return timedelta(0, self._get_transition(dt).offset)
+
+    def dst(self, dt=None):
+        transition = self._get_transition(dt)
+        if transition.isdst:
+            return timedelta(0,3600) # may need to find a more accurate value
+        return timedelta(0)
+
+    def tzname(self, dt=None):
+        return self._get_transition(dt).abbrev
+
+#class sqltzinfo( basetzinfo ):
+#    """
+#    Customized timezone class that can import timezone data from the MySQL
+#    database.
+#    """
+
+class posixtzinfo( basetzinfo ):
+    """
+    Customized timezone class that can import timezone data from the local
+    POSIX zoneinfo files.
+    """
+    __metaclass__ = singleton.InputSingleton
+    _Count = namedtuple('Count', \
+                        'gmt_indicators std_indicators leap_seconds '+\
+                        'transitions types abbrevs')
+
+    @staticmethod
+    def _get_version(fd):
+        """Confirm zoneinfo file magic string, and return version number."""
+        if fd.read(4) != 'TZif':
+            raise RuntimeError(("ZoneInfo file does not have proper "
+                                "magic string."))
+        version = fd.read(1) # read version number
+        fd.seek(15, 1) # skip reserved bytes
+        if version == '\0':
+            return 1
+        else:
+            return int(version) # should be 2
+
+    def _process(self, fd, version=1, skip=False):
+        from struct import unpack, calcsize
+        if version == 1:
+            ttmfmt = '!l'
+            lfmt = '!ll'
+        elif version == 2:
+            ttmfmt = '!q'
+            lfmt = '!ql'
+
+        counts = self._Count(*unpack('!llllll', fd.read(24)))
+        if skip:
+            fd.seek(counts.transitions * (calcsize(ttmfmt)+1) +\
+                    counts.types * 6 +\
+                    counts.abbrevs +\
+                    counts.leap_seconds * calcsize(lfmt) +\
+                    counts.std_indicators +\
+                    counts.gmt_indicators,\
+                    1)
+            return
+
+        transitions = []
+        for i in range(counts.transitions): # read in epoch time data
+            t = unpack(ttmfmt, fd.read(calcsize(ttmfmt)))[0]
+            tt = time.gmtime(t)
+            transitions.append([t, tt, None, None, None, None])
+
+        # read in transition type indexes
+        types = [None]*counts.transitions
+        for i in range(counts.transitions):
+            types[i] = unpack('!b', fd.read(1))[0]
+
+        # read in type definitions
+        for i in range(counts.types):
+            offset, isdst, _ = unpack('!lbB', fd.read(6))
+            for j in range(counts.transitions):
+                if types[j] == i:
+                    transitions[j][2] = time.gmtime(transitions[j][0]+offset)
+                    transitions[j][3] = offset
+                    transitions[j][5] = isdst
+
+        # read in type names
+        for i, name in enumerate(fd.read(counts.abbrevs)[:-1].split('\0')):
+            for j in range(counts.transitions):
+                if types[j] == i:
+                    transitions[j][4] = name
+
+        # skip leap second definitions
+        fd.seek(counts.leap_seconds + calcsize(lfmt), 1)
+        # skip std/wall indicators
+        fd.seek(counts.std_indicators, 1)
+        # skip utc/local indicators
+        fd.seek(counts.gmt_indicators, 1)
+
+        for i in range(counts.transitions):
+            transitions[i] = self._Transition(*transitions[i])
+        self._transitions = tuple(transitions)
+
+
+    def __init__(self, name=None):
+        if name is None:
+            fd = open('/etc/localtime')
+        else:
+            fd = open('/usr/share/zoneinfo/' + name)
+
+        version = self._get_version(fd)
+        if version == 2:
+            self._process(fd, skip=True)
+            self._get_version(fd)
+        self._process(fd, version)
+
+class offsettzinfo( _pytzinfo ):
+    """Customized timezone class that provides a simple static offset."""
+    @classmethod
+    def local(cls):
+        offset = -(time.timezone, time.altzone)[time.daylight]
+        return cls(sec=offset)
+    def __init__(self, direc='+', hr=0, min=0, sec=0):
+        sec = int(sec) + 60 * (int(min) + 60 * int(hr))
+        if direc == '-':
+            sec = -1*sec
+        self._offset = timedelta(seconds=sec)
+    def utcoffset(self, dt): return self._offset
+    def tzname(self, dt): return ''
+    def dst(self, dt): return timedelta(0)
 
 class datetime( _pydatetime ):
     """
@@ -30,40 +178,90 @@ class datetime( _pydatetime ):
                             '(:)?'
                             '(?P<tzmin>[0-9]{2})?'
                         ')?')
-
-    class _tzinfo( _pytzinfo):
-        def __init__(self, direc='+', hr=0, min=0):
-            if direc == '-':
-                hr = -1*int(hr)
-            self._offset = timedelta(hours=int(hr), minutes=int(min))
-        def utcoffset(self, dt): return self._offset
-        def tzname(self, dt): return ''
-        def dst(self, dt): return timedelta(0)
+    _rerfc = re.compile('(?P<dayname>[a-zA-Z]{3}), '
+                        '(?P<day>[0-9]{1,2}) '
+                        '(?P<month>[a-zA-Z]{3}) '
+                        '(?P<year>[0-9]{2,4}) '
+                        '(?P<hour>[0-9]{2})'
+                       ':(?P<min>[0-9]{2})'
+                      '(:(?P<sec>[0-9]{2}))?'
+                        '( )?(?P<tz>[A-Z]{2,3}|'
+                            '(?P<tzdirec>[-+])'
+                            '(?P<tzhour>[0-9]{2})'
+                            '(?P<tzmin>[0-9]{2})'
+                        ')?')
+    _localtz = None
 
     @classmethod
     def localTZ(cls):
-        offset = -(time.timezone, time.altzone)[time.daylight]
-        tz = cls._tzinfo(hr=offset/3600, min=(offset%3600)/60)
-        return tz
+        if cls._localtz is None:
+            try:
+                cls._localtz = posixtzinfo()
+            except:
+                cls._localtz = offsettzinfo.local()
+        return cls._localtz
 
     @classmethod
     def UTCTZ(cls):
-        return cls._tzinfo()
+        return offsettzinfo()
 
     @classmethod
-    def fromTimestamp(cls, posix, tz=None):
-        return cls.fromtimestamp(float(posix), tz)
+    def fromDatetime(cls, dt, tzinfo=None):
+        if tzinfo is None:
+            tzinfo = dt.tzinfo
+        return cls(dt.year, dt.month, dt.day, dt.hour, dt.minute,
+                   dt.second, dt.microsecond, tzinfo)
+
+# override existing classmethods to enforce use of timezone
+    @classmethod
+    def now(cls, tz=None):
+        if tz is None:
+            tz = cls.localTZ()
+        obj = super(datetime, cls).now(tz)
+        return cls.fromDatetime(obj)
 
     @classmethod
-    def frommythtime(cls, mtime):
-        return cls.strptime(str(mtime), '%Y%m%d%H%M%S')
+    def utcnow(cls):
+        obj = super(datetime, cls).utcnow()
+        return obj.replace(tzinfo=cls.UTCTZ())
 
     @classmethod
-    def fromIso(cls, isotime, sep='T'):
+    def fromtimestamp(cls, timestamp, tz=None):
+        if tz is None:
+            tz = cls.localTZ()
+        obj = super(datetime, cls).fromtimestamp(float(timestamp), tz)
+        return cls.fromDatetime(obj)
+
+    @classmethod
+    def utcfromtimestamp(cls, timestamp):
+        obj = super(datetime, cls).utcfromtimestamp(float(timestamp))
+        return obj.replace(tzinfo=cls.UTCTZ())
+
+    @classmethod
+    def strptime(cls, datestring, format, tzinfo=None):
+        obj = super(datetime, cls).strptime(datestring, format)
+        return cls.fromDatetime(obj, tzinfo)
+
+# new class methods for interfacing with MythTV
+    @classmethod
+    def fromnaiveutc(cls, dt):
+        return cls.fromDatetime(dt).replace(tzinfo=cls.UTCTZ())\
+                                   .astimezone(cls.localTZ())
+
+    @classmethod
+    def frommythtime(cls, mtime, tz=None):
+        if tz == 'UTC':
+            tz = cls.UTCTZ()
+        elif tz is None:
+            tz = cls.localTZ()
+        return cls.strptime(str(mtime), '%Y%m%d%H%M%S', tz)
+
+    @classmethod
+    def fromIso(cls, isotime, sep='T', tz=None):
         match = cls._reiso.match(isotime)
         if match is None:
-            raise TypeError("time data '%s' does not match ISO 8601 format" \
-                                % isotime)
+            raise TypeError("time data '{0}' does not match ISO 8601 format" \
+                                .format(isotime))
 
         dt = [int(a) for a in match.groups()[:5]]
         if match.group('sec') is not None:
@@ -76,25 +274,78 @@ class datetime( _pydatetime ):
 
         if match.group('tz'):
             if match.group('tz') == 'Z':
-                tz = cls._tzinfo()
+                try:
+                    tz = posixtzinfo('UTC')
+                except:
+                    tz = offsettzinfo()
             elif match.group('tzmin'):
-                tz = cls._tzinfo(*match.group('tzdirec','tzhour','tzmin'))
+                tz = offsettzinfo(*match.group('tzdirec','tzhour','tzmin'))
             else:
-                tz = cls._tzinfo(*match.group('tzdirec','tzhour'))
-            dt.append(tz)
-        else:
-            dt.append(cls.localTZ())
+                tz = offsettzinfo(*match.group('tzdirec','tzhour'))
+        elif tz == 'UTC':
+            tz = cls.UTCTZ()
+        elif tz is None:
+            tz = cls.localTZ()
+        dt.append(tz)
 
         return cls(*dt)
 
     @classmethod
-    def fromRfc(cls, rfctime):
-        return cls.strptime(rfctime.strip(), '%a, %d %b %Y %H:%M:%S %z')
+    def fromRfc(cls, rfctime, tz=None):
+        match = cls._rerfc.match(rfctime)
+        if match is None:
+            raise TypeError("time data '{0}' does not match RFC 822 format"\
+                                .format(rfctime))
 
-    @classmethod
-    def fromDatetime(cls, dt):
-        return cls(dt.year, dt.month, dt.day, dt.hour, dt.minute,
-                   dt.second, dt.microsecond, dt.tzinfo)
+        year = int(match.group('year'))
+        if year > 100:
+            dt = [year]
+        elif year > 30:
+            dt = [1900+year]
+        else:
+            dt = [2000+year]
+        dt.append(['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul',
+                   'Aug', 'Sep', 'Oct', 'Nov', 'Dec']\
+                        .index(match.group('month'))+1)
+        dt.append(int(match.group('day')))
+
+        dt.append(int(match.group('hour')))
+        dt.append(int(match.group('min')))
+        if match.group('sec') is not None:
+            dt.append(int(match.group('sec')))
+        else:
+            dt.append(0)
+
+        # microseconds
+        dt.append(0)
+
+        if match.group('tz'):
+            if match.group('tz') in ('UT', 'GMT'):
+                try:
+                    tz = posixtzinfo('UTC')
+                except:
+                    tz = offsettzinfo()
+            elif match.group('tz') == 'EDT':
+                tz = offsettzinfo(hr=-4)
+            elif match.group('tz') in ('EST', 'CDT'):
+                tz = offsettzinfo(hr=-5)
+            elif match.group('tz') in ('CST', 'MDT'):
+                tz = offsettzinfo(hr=-6)
+            elif match.group('tz') in ('MST', 'PDT'):
+                tz = offsettzinfo(hr=-7)
+            elif match.group('tz') == 'PST':
+                tz = offsettzinfo(hr=-8)
+            elif match.group('tzmin'):
+                tz = offsettzinfo(*match.group('tzdirec','tzhour','tzmin'))
+            else:
+                tz = offsettzinfo(*match.group('tzdirec','tzhour'))
+        elif tz == 'UTC':
+            tz = cls.UTCTZ()
+        elif tz is None:
+            tz = cls.localTZ()
+        dt.append(tz)
+
+        return cls(*tz)
 
     @classmethod
     def duck(cls, t):
@@ -105,9 +356,9 @@ class datetime( _pydatetime ):
         except: pass
         try:
             # existing built-in datetime
-            return cls.fromIso(t.isoformat())
+            return cls.fromDatetime(t)
         except: pass
-        for func in [cls.fromTimestamp, #epoch time
+        for func in [cls.fromtimestamp, #epoch time
                      cls.frommythtime, #iso time with integer characters only
                      cls.fromIso, #iso 8601 time
                      cls.fromRfc]: #rfc 822 time
@@ -117,29 +368,30 @@ class datetime( _pydatetime ):
                 pass
         raise TypeError("time data '%s' does not match supported formats"%t)
 
+    def __init__(self, year, month, day, hour=None, minute=None, second=None,
+                       microsecond=None, tzinfo=None):
+        if tzinfo is None:
+            tzinfo = self.localTZ()
+        super(datetime, self).__init__(year, month, day, hour, minute, second,\
+                                       microsecond, tzinfo)
+
     def mythformat(self):
-        return self.strftime('%Y%m%d%H%M%S')
+        return self.astimezone(self.UTCTZ()).strftime('%Y%m%d%H%M%S')
 
     def timestamp(self):
-        tt = self.astimezone(self.UTCTZ()).timetuple()
-        return int(time.mktime(self.timetuple()))
+        return time.mktime(self.timetuple()) + self.microsecond/1000000.
 
     def rfcformat(self):
         return self.strftime('%a, %d %b %Y %H:%M:%S %z')
 
-    @classmethod
-    def now(cls, tz=None):
-        if tz is None:
-            tz = cls.localTZ()
-        obj = super(datetime, cls).now(tz)
-        return cls.fromDatetime(obj)
+    def utcrfcformat(self):
+        return self.astimezone(self.UTCTZ()).strftime('%a, %d %b %Y %H:%M:%S')
 
-    @classmethod
-    def fromtimestamp(cls, timestamp, tz=None):
-        if tz is None:
-            tz = cls.localTZ()
-        obj = super(datetime, cls).fromtimestamp(tz)
-        return cls.fromDatetime(obj)
+    def utcisoformat(self):
+        return self.astimezone(self.UTCTZ()).isoformat().split('+')[0]
 
     def astimezone(self, tz):
         return self.fromDatetime(super(datetime, self).astimezone(tz))
+
+    def asnaiveutc(self):
+        return self.astimezone(self.UTCTZ()).replace(tzinfo=None)

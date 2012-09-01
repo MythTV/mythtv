@@ -1158,8 +1158,8 @@ class MythXML( XMLConnection ):
         """
         starttime = datetime.duck(starttime)
         endtime = datetime.duck(endtime)
-        args = {'StartTime':starttime.isoformat().rsplit('.',1)[0],
-                'EndTime':endtime.isoformat().rsplit('.',1)[0], 
+        args = {'StartTime':starttime.utcisoformat().rsplit('.',1)[0],
+                'EndTime':endtime.utcisoformat().rsplit('.',1)[0], 
                 'StartChanId':startchan, 'Details':1}
         if numchan:
             args['NumOfChannels'] = numchan
@@ -1215,7 +1215,7 @@ class MythXML( XMLConnection ):
     def getPreviewImage(self, chanid, starttime, width=None, \
                                                  height=None, secsin=None):
         starttime = datetime.duck(starttime)
-        args = {'ChanId':chanid, 'StartTime':starttime.isoformat()}
+        args = {'ChanId':chanid, 'StartTime':starttime.utcisoformat()}
         if width: args['Width'] = width
         if height: args['Height'] = height
         if secsin: args['SecsIn'] = secsin
