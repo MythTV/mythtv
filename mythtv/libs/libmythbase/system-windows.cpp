@@ -402,7 +402,6 @@ void MythSystemManager::append(MythSystemWindows *ms)
     ChildListRebuild();
     m_mapLock.unlock();
 
-    fdLock.lock();
     if( ms->GetSetting("UseStdin") )
         writeThread->insert(ms->m_stdpipe[0], ms->GetBuffer(0));
 
@@ -411,7 +410,9 @@ void MythSystemManager::append(MythSystemWindows *ms)
         FDType_t *fdType = new FDType_t;
         fdType->ms = ms;
         fdType->type = 1;
+        fdLock.lock();
         fdMap.insert( ms->m_stdpipe[1], fdType );
+        fdLock.unlock();
         readThread->insert(ms->m_stdpipe[1], ms->GetBuffer(1));
     }
 
@@ -420,10 +421,11 @@ void MythSystemManager::append(MythSystemWindows *ms)
         FDType_t *fdType = new FDType_t;
         fdType->ms = ms;
         fdType->type = 2;
+        fdLock.lock();
         fdMap.insert( ms->m_stdpipe[2], fdType );
+        fdLock.unlock();
         readThread->insert(ms->m_stdpipe[2], ms->GetBuffer(2));
     }
-    fdLock.unlock();
 }
 
 void MythSystemManager::jumpAbort(void)
