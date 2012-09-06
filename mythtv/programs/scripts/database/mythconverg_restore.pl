@@ -192,7 +192,7 @@ backup resource file (see RESOURCE FILE, below) and the MySQL option files
 The script can also be called using command-line arguments to specify the
 required information. If no database information file is specified, the script
 will attempt to determine the appropriate configuration by using the MythTV
-configuration file(s) (prefering config.xml, but falling back to mysql.txt if
+configuration file(s) (preferring config.xml, but falling back to mysql.txt if
 no config.xml exists). Once the MythTV configuration file has been parsed, the
 backup resource file (see RESOURCE FILE, below) will be parsed, then
 command-line arguments will be applied (thus overriding any values determined
