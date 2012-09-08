@@ -110,7 +110,7 @@ class DictData( OrdDict ):
                     lambda x: str(int(x)),
                     lambda x: x,
                     lambda x: str(int(x.timestamp())),
-                    lambda x: x.utcisoformat(),
+                    lambda x: x.isoformat(),
                     lambda x: x.utcrfcformat()]
 
     def __setattr__(self, name, value):
