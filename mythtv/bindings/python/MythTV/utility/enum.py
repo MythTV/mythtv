@@ -98,6 +98,23 @@ class BitwiseEnum( BaseEnum ):
         self.mode = other.mode
         return self
 
+    def __iter__(self):
+        if self.mode == 0:
+            yield self.__class__(0)
+        else:
+            mode = self.mode
+            for m in self._values.values():
+                if m.value == 0: continue
+                if (m.value&mode) == m.value:
+                    mode -= m.value
+                    yield self.__class__(m.value)
+
+    def __str__(self):
+        modes = []
+        for mode in self:
+            modes.append(self._values[mode.mode].friendly)
+        return '|'.join(modes)
+
     def __repr__(self):
-        return "<{0.__class__.__name__} {0.mode}>".format(self)
+        return "<{0.__class__.__name__} {0}>".format(self)
 
