@@ -24,15 +24,32 @@ class basetzinfo( _pytzinfo ):
                              'time utc local offset abbrev isdst')
 
     def _get_transition(self, dt=None):
+        try:
+            index = self.__last
+        except AttributeError:
+            index = 0
+
         if dt is None:
             dt = _pydatetime.now()
         dt = (dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second)
 
-        for i, transition in enumerate(self._transitions):
-            if dt < transition.local[0:5]:
-                transition = self._transitions[i-1]
-                break
-        return transition
+        direction = 0
+        while True:
+            if dt < self._transitions[index].local[0:5]:
+                if direction == 1:
+                    index -= 1
+                    break
+                else:
+                    direction = -1
+            else:
+                if direction == -1:
+                    break
+                else:
+                    direction = 1
+            index += direction
+
+        self.__last = index
+        return self._transitions[index]
 
     def utcoffset(self, dt=None):
         return timedelta(0, self._get_transition(dt).offset)
