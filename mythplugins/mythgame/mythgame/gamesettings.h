@@ -86,7 +86,9 @@ class MythGamePlayerSettings : public QObject, public ConfigurationWizard
     {
         if (name)
             ConfigurationWizard::Save();
-    };
+    }
+
+    virtual void Save(QString /*destination*/) { }
 
   private:
     class ID : public AutoIncrementDBSetting
@@ -128,10 +130,11 @@ class MPUBLIC MythGamePlayerEditor : public QObject, public ConfigurationDialog
     virtual MythDialog *dialogWidget(MythMainWindow *parent,
                                      const char     *widgetName=0);
 
-    virtual DialogCode exec(void);
+    virtual DialogCode exec(bool saveOnExec = true, bool doLoad = true);
 
     virtual void Load(void);
     virtual void Save(void) { }
+    virtual void Save(QString /*destination*/) { }
 
 public slots:
     void menu();
