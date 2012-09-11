@@ -113,14 +113,14 @@ void MHDynamicLineArt::SetLineColour(const MHColour &colour, MHEngine *)
     m_picture->SetLineColour(GetColour(m_LineColour));
 }
 
-void MHDynamicLineArt::SetLineWidth(int nWidth)
+void MHDynamicLineArt::SetLineWidth(int nWidth, MHEngine *)
 {
     m_nLineWidth = nWidth;
     m_picture->SetLineSize(m_nLineWidth);
 }
 
 // We don't actually use this at the moment.
-void MHDynamicLineArt::SetLineStyle(int nStyle)
+void MHDynamicLineArt::SetLineStyle(int nStyle, MHEngine *)
 {
     m_LineStyle = nStyle;
 }
