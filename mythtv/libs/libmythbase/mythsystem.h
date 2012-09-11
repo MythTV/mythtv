@@ -154,7 +154,7 @@ class MBASE_PUBLIC MythSystemPrivate : public QObject, public ReferenceCounter
         virtual void Signal(int sig) = 0;
         virtual void JumpAbort(void) = 0;
 
-        virtual bool ParseShell(const QString cmd, QString &abscmd,
+        virtual bool ParseShell(const QString &cmd, QString &abscmd,
                                 QStringList &args) = 0;
 
     protected:
