@@ -132,10 +132,7 @@ typedef struct
    IN assertion: the stream s has been sucessfully opened for reading.
 */
 
-
-local int unzlocal_getByte(fin,pi)
-	FILE *fin;
-	int *pi;
+local int unzlocal_getByte(FILE *fin, int *pi)
 {
     unsigned char c;
 	int err = fread(&c, 1, 1, fin);
@@ -157,9 +154,7 @@ local int unzlocal_getByte(fin,pi)
 /* ===========================================================================
    Reads a long in LSB order from the given gz_stream. Sets 
 */
-local int unzlocal_getShort (fin,pX)
-	FILE* fin;
-    uLong *pX;
+local int unzlocal_getShort(FILE *fin, uLong *pX)
 {
     uLong x ;
     int i = 0;
@@ -179,9 +174,7 @@ local int unzlocal_getShort (fin,pX)
     return err;
 }
 
-local int unzlocal_getLong (fin,pX)
-	FILE* fin;
-    uLong *pX;
+local int unzlocal_getLong(FILE *fin, uLong *pX)
 {
     uLong x ;
     int i = 0;
@@ -211,9 +204,8 @@ local int unzlocal_getLong (fin,pX)
 
 
 /* My own strcmpi / strcasecmp */
-local int strcmpcasenosensitive_internal (fileName1,fileName2)
-	const char* fileName1;
-	const char* fileName2;
+local int strcmpcasenosensitive_internal(
+    const char *fileName1, const char *fileName2)
 {
 	for (;;)
 	{
@@ -274,8 +266,7 @@ extern int ZEXPORT unzStringFileNameCompare (fileName1,fileName2,iCaseSensitivit
   Locate the Central directory of a zipfile (at the end, just before
     the global comment)
 */
-local uLong unzlocal_SearchCentralDir(fin)
-	FILE *fin;
+local uLong unzlocal_SearchCentralDir(FILE *fin)
 {
 	unsigned char* buf;
 	uLong uSizeFile;
@@ -475,9 +466,7 @@ extern int ZEXPORT unzGetGlobalInfo (file,pglobal_info)
 /*
    Translate date/time from Dos format to tm_unz (readable more easilty)
 */
-local void unzlocal_DosDateToTmuDate (ulDosDate, ptm)
-    uLong ulDosDate;
-    tm_unz* ptm;
+local void unzlocal_DosDateToTmuDate(uLong ulDosDate, tm_unz *ptm)
 {
     uLong uDate;
     uDate = (uLong)(ulDosDate>>16);
@@ -807,13 +796,11 @@ extern int ZEXPORT unzLocateFile (file, szFileName, iCaseSensitivity)
   store in *piSizeVar the size of extra info in local header
         (filename and size of extra field data)
 */
-local int unzlocal_CheckCurrentFileCoherencyHeader (s,piSizeVar,
-													poffset_local_extrafield,
-													psize_local_extrafield)
-	unz_s* s;
-	uInt* piSizeVar;
-	uLong *poffset_local_extrafield;
-	uInt  *psize_local_extrafield;
+local int unzlocal_CheckCurrentFileCoherencyHeader(
+    unz_s *s,
+    uInt  *piSizeVar,
+    uLong *poffset_local_extrafield,
+    uInt  *psize_local_extrafield)
 {
 	uLong uMagic,uData,uFlags;
 	uLong size_filename;
