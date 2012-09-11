@@ -12,12 +12,13 @@
 #include "mythlogging.h"
 #include "mythversion.h"
 
-BackendSelection::BackendSelection(MythScreenStack *parent, DatabaseParams *params,
-                                   Configuration *conf, bool exitOnFinish)
-    : MythScreenType(parent, "BackEnd Selection"),
-      m_DBparams(params), m_pConfig(conf), m_exitOnFinish(exitOnFinish),
-      m_backendList(NULL), m_manualButton(NULL), m_saveButton(NULL),
-      m_cancelButton(NULL)
+BackendSelection::BackendSelection(
+    MythScreenStack *parent, DatabaseParams *params,
+    Configuration *conf, bool exitOnFinish) :
+    MythScreenType(parent, "BackEnd Selection"),
+    m_DBparams(params), m_pConfig(conf), m_exitOnFinish(exitOnFinish),
+    m_backendList(NULL), m_manualButton(NULL), m_saveButton(NULL),
+    m_cancelButton(NULL), m_backendDecision(kCancelConfigure)
 {
 }
 
