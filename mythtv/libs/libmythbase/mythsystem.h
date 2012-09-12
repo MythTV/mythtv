@@ -24,6 +24,8 @@ typedef enum MythSystemMask {
     kMSAutoCleanup        = 0x00004000, ///< automatically delete if 
                                         ///  backgrounded
     kMSLowExitVal         = 0x00008000, ///< allow exit values 0-127 only
+    kMSDisableUDPListener = 0x00010000, ///< disable MythMessage UDP listener
+                                        ///  for the duration of application.
 } MythSystemFlag;
 
 #ifdef __cplusplus

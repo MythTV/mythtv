@@ -42,7 +42,7 @@ class InputSingleton( type ):
         insts = getattr(cls, attr)
 
         from inspect import getcallargs
-        instid = hash(getcallargs(cls, *args, **kwargs))
+        instid = hash(str(getcallargs(cls.__init__, args, kwargs)))
 
         if instid in insts:
             return insts[instid]

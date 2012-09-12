@@ -467,7 +467,8 @@ void ViewScheduled::FillList()
                 ProgramInfo &p = **it;
                 if (p.GetRecordingStatus() == rsConflict)
                 {
-                    m_conflictDate = p.GetRecordingStartTime().date();
+                    m_conflictDate = p.GetRecordingStartTime()
+                        .toLocalTime().date();
                     break;
                 }
             }

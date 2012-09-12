@@ -137,6 +137,7 @@ SingleView::SingleView(
 
     if (slideShow)
     {
+        GetMythMainWindow()->PauseIdleTimer(true);
         m_slideshow_running = true;
         m_slideshow_timer->stop();
         m_slideshow_timer->setSingleShot(true);
@@ -147,6 +148,12 @@ SingleView::SingleView(
 
 SingleView::~SingleView()
 {
+    if (m_slideshow_running)
+    {
+        GetMythMainWindow()->PauseIdleTimer(false);
+        GetMythUI()->RestoreScreensaver();
+    }
+
     if (m_effect_painter)
     {
         if (m_effect_painter->isActive())
@@ -333,6 +340,8 @@ void SingleView::keyPressEvent(QKeyEvent *e)
 {
     bool handled = false;
 
+    if (m_slideshow_running)
+        GetMythMainWindow()->PauseIdleTimer(false);
     bool wasRunning = m_slideshow_running;
     m_slideshow_timer->stop();
     m_caption_timer->stop();
@@ -524,6 +533,7 @@ void SingleView::keyPressEvent(QKeyEvent *e)
     }
     if (m_slideshow_running)
     {
+        GetMythMainWindow()->PauseIdleTimer(true);
         GetMythUI()->DisableScreensaver();
     }
 

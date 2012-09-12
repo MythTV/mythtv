@@ -80,6 +80,8 @@ class MBASE_PUBLIC MythEvent : public QEvent
     static Type kLockInputDevicesEventType;
     static Type kUnlockInputDevicesEventType;
     static Type kUpdateBrowseInfoEventType;
+    static Type kDisableUDPListenerEventType;
+    static Type kEnableUDPListenerEventType;
 
   private:
     QString message;

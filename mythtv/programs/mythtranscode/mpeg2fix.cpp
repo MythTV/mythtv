@@ -1530,7 +1530,7 @@ MPEG2frame *MPEG2fixup::FindFrameNum(int frameNum)
 
 void MPEG2fixup::RenumberFrames(int start_pos, int delta)
 {
-    int maxPos = vFrame.count();
+    int maxPos = vFrame.count() - 1;
     
     for (int pos = start_pos; pos < maxPos; pos++)
     {
@@ -1736,8 +1736,8 @@ int MPEG2fixup::InsertFrame(int frameNum, int64_t deltaPTS,
     
     inc2x33(&pkt.pts, ptsIncrement * GetNbFields(spare) / 2 + initPTS);
 
-    index = vFrame.indexOf(spare);
-    while (index < vFrame.count() - 1 &&
+    index = vFrame.indexOf(spare) + 1;
+    while (index < vFrame.count() &&
            GetFrameTypeT(vFrame.at(index)) == 'B')
         spare = vFrame.at(index++);
 
@@ -1762,7 +1762,8 @@ int MPEG2fixup::InsertFrame(int frameNum, int64_t deltaPTS,
 
     av_free(pkt.data);
 
-    // update frame # for all frames in this group
+    // update frame # for all later frames in this group
+    index++;
     RenumberFrames(index, increment);
 
     return increment;

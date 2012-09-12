@@ -25,9 +25,13 @@ our $VERSION = 0.1;
 # Free keys can be requested from
 # https://register.metoffice.gov.uk/register/ddc
 our $api_key = '40af3680-8fd5-4c68-a762-4a6fe107f4e2';
-our $copyright_str = '© Crown copyright 2012, the Met Office';
+# August 2012 - Terms changed the attribution string that must be displayed
+#our $copyright_str = '"© Crown copyright 2012, the Met Office";
+our $copyright_str = 'Contains public sector information licensed under the Open Government Licence';
+# August 2012 - Metoffice changed terms of use to forbid use of their logos in
+# applications using their data, therefore this should not be used!
 our $copyright_logo = 'http://www.metoffice.gov.uk/lib/template/logos/MO_Landscape_W.jpg';
-our $forecast_url = 'http://partner.metoffice.gov.uk/public/val/wxfcs/all/xml/';
+our $forecast_url = 'http://datapoint.metoffice.gov.uk/public/data/val/wxfcs/all/xml/';
 
 my @searchresults;
 my @resulturl;
