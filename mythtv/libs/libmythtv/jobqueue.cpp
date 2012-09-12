@@ -1067,8 +1067,8 @@ bool JobQueue::IsJobRunning(int jobType,
 {
     int tmpStatus = GetJobStatus(jobType, chanid, recstartts);
 
-    if ((tmpStatus != JOB_ERRORED) && (tmpStatus != JOB_UNKNOWN) &&
-        (tmpStatus != JOB_QUEUED) && (!(tmpStatus & JOB_DONE)))
+    if ((tmpStatus != JOB_UNKNOWN) && (tmpStatus != JOB_QUEUED) &&
+        (!(tmpStatus & JOB_DONE)))
         return true;
 
     return false;
@@ -1085,8 +1085,7 @@ bool JobQueue::IsJobQueuedOrRunning(
 {
     int tmpStatus = GetJobStatus(jobType, chanid, recstartts);
 
-    if ((tmpStatus != JOB_ERRORED) &&
-        (tmpStatus != JOB_UNKNOWN) && (!(tmpStatus & JOB_DONE)))
+    if ((tmpStatus != JOB_UNKNOWN) && (!(tmpStatus & JOB_DONE)))
         return true;
 
     return false;
