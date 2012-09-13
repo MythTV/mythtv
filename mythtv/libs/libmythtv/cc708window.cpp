@@ -231,7 +231,6 @@ void CC708Window::Clear(void)
 
 CC708Character &CC708Window::GetCCChar(void) const
 {
-    QMutexLocker locker(&lock);
     assert(exists);
     assert(text);
     assert(pen.row    < true_row_count);
@@ -338,18 +337,21 @@ void CC708Window::AddChar(QChar ch)
         changed = true;
         return;
     }
+    QMutexLocker locker(&lock);
 
     if (ch.toAscii() == 0x08)
     {
         DecrPenLocation();
-        GetCCChar().attr      = pen.attr;
-        GetCCChar().character = QChar(' ');
+        CC708Character& chr = GetCCChar();
+        chr.attr      = pen.attr;
+        chr.character = QChar(' ');
         changed = true;
         return;
     }
 
-    GetCCChar().attr      = pen.attr;
-    GetCCChar().character = ch;
+    CC708Character& chr = GetCCChar();
+    chr.attr      = pen.attr;
+    chr.character = ch;
     int c = pen.column;
     int r = pen.row;
     IncrPenLocation();
