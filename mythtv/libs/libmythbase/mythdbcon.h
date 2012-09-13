@@ -40,6 +40,7 @@ class MSqlDatabase
     QString GetConnectionName(void) const { return m_name; }
     QSqlDatabase db(void) const { return m_db; }
     bool Reconnect(void);
+    void InitSessionVars(void);
 
   private:
     QString m_name;
