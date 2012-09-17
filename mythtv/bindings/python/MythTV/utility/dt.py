@@ -24,16 +24,22 @@ class basetzinfo( _pytzinfo ):
                              'time utc local offset abbrev isdst')
 
     def _get_transition(self, dt=None):
-        try:
-            index = self.__last
-        except AttributeError:
-            index = 0
+        if len(self._transitions) == 0:
+            self._get_transition = self._get_transition_empty
+        elif len(self._transitions) == 1:
+            self._get_transition = self._get_transition_single
+        else:
+            self.__last = 0
+            self._get_transition = self._get_transition_search
+        return self._get_transition(dt)
 
+    def _get_transition_search(self, dt=None):
         if dt is None:
             dt = _pydatetime.now()
         dt = (dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second)
 
         direction = 0
+        index = self.__last
         while True:
             if dt < self._transitions[index].local[0:5]:
                 if direction == 1:
@@ -46,10 +52,24 @@ class basetzinfo( _pytzinfo ):
                     break
                 else:
                     direction = 1
+
             index += direction
+            if index >= len(self._transitions):
+                # out of bounds future, use final transition
+                index = len(self._transitions) - 1
+                break
+            elif index < 0:
+                # out of bounds past, undefined time frame
+                raise RuntimeError(("Timezone does not have sufficiently "
+                                    "old data for search: {0}").format(dt))
 
         self.__last = index
         return self._transitions[index]
+
+    def _get_transition_empty(self, dt=None):
+        return self._Transition(0, None, None, 0, 'UTC', False)
+    def _get_transition_single(self, dt=None):
+        return self._transitions[0]
 
     def utcoffset(self, dt=None):
         return timedelta(0, self._get_transition(dt).offset)
