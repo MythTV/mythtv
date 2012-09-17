@@ -121,16 +121,22 @@ class posixtzinfo( basetzinfo ):
         # read in transition type indexes
         types = [None]*counts.transitions
         for i in range(counts.transitions):
-            types[i] = unpack('!b', fd.read(1))[0]
+            types[i] = t = unpack('!b', fd.read(1))[0]
+            if t >= counts.types:
+                raise RuntimeError(("Transition has out-of-bounds definition "
+                            "index (given: {0}, max: {0}")\
+                                .format(t,counts.types-1))
 
         # read in type definitions
+        typedefs = []
         for i in range(counts.types):
             offset, isdst, _ = unpack('!lbB', fd.read(6))
-            for j in range(counts.transitions):
-                if types[j] == i:
-                    transitions[j][2] = time.gmtime(transitions[j][0]+offset)
-                    transitions[j][3] = offset
-                    transitions[j][5] = isdst
+            typedefs.append([offset, isdst])
+        for i in range(counts.transitions):
+            offset,isdst = typedefs[types[i]]
+            transitions[i][2] = time.gmtime(transitions[i][0] + offset)
+            transitions[i][3] = offset
+            transitions[i][5] = isdst
 
         # read in type names
         for i, name in enumerate(fd.read(counts.abbrevs)[:-1].split('\0')):
