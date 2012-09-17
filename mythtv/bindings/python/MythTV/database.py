@@ -132,6 +132,14 @@ class DBData( DictData, MythSchema ):
         dbdata._postinit()
         return dbdata
 
+    def __setitem__(self, key, value):
+        for k,v in self._db.tablefields[self._table].items():
+            if k == key:
+                if v.type in ('datetime','timestamp'):
+                    value = datetime.duck(value)
+                break
+        DictData.__setitem__(self, key, value)
+
     def _evalwheredat(self, wheredat=None):
         if wheredat is None:
             self._wheredat = eval(self._setwheredat)

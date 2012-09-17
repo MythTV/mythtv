@@ -127,6 +127,10 @@ class DictData( OrdDict ):
     def __setitem__(self, key, value):
         if key not in self._field_order:
                 raise KeyError(str(key))
+        if self._field_type != 'Pass':
+            ind = self._field_order.index(key)
+            if self._field_type[ind] in (4,6):
+                value = datetime.duck(value)
         dict.__setitem__(self, key, value)
 
     def __delattr__(self, name):
