@@ -468,7 +468,10 @@ class FEConnection( object ):
         for res in msearch.searchMythFE(timeout):
             ip, port = reLOC.match(res['location']).group(1,2)
             port = 6546
-            yield cls(ip, port)
+            try:
+                yield cls(ip, port)
+            except MythFEError:
+                pass
 
     @classmethod
     def testList(cls, felist):
