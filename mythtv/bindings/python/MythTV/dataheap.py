@@ -993,7 +993,8 @@ class Video( CMPVideo, VideoSchema, DBDataWrite ):
             for image in metadata.images:
                 if not hasattr(self, image.type):
                     continue
-                if getattr(self, image.type) and not overwrite:
+                current = getattr(self, image.type)
+                if current and (current != 'No Cover') and not overwrite:
                     continue
                 setattr(self, image.type, image.filename)
                 getattr(self, image.type).downloadFrom(image.url)
