@@ -963,7 +963,8 @@ class Video( CMPVideo, VideoSchema, DBDataWrite ):
 
         # pull direct tags
         for tag in ('title', 'subtitle', 'tagline', 'season', 'episode',
-                    'inetref', 'homepage', 'trailer', 'userrating', 'year'):
+                    'inetref', 'homepage', 'trailer', 'userrating', 'year',
+                    'releasedate'):
             if metadata[tag] and _allow_change(self, tag, overwrite):
                 self[tag] = metadata[tag]
 
@@ -1011,7 +1012,8 @@ class Video( CMPVideo, VideoSchema, DBDataWrite ):
 
         # pull direct tags
         for tag in ('title', 'subtitle', 'tagline', 'season', 'episode',
-                    'inetref', 'homepage', 'trailer', 'userrating', 'year'):
+                    'inetref', 'homepage', 'trailer', 'userrating', 'year',
+                    'releasedate'):
             if self[tag]:
                 metadata[tag] = self[tag]
 
