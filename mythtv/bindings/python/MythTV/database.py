@@ -133,7 +133,7 @@ class DBData( DictData, MythSchema ):
         return dbdata
 
     def __setitem__(self, key, value):
-        for k,v in self._db.tablefields[self._table].items():
+        for k,v in self._field_order.items():
             if k == key:
                 if v.type in ('datetime','timestamp'):
                     value = datetime.duck(value)
@@ -181,7 +181,7 @@ class DBData( DictData, MythSchema ):
 
     def _process(self, data):
         data = DictData._process(self, data)
-        for key, val in self._db.tablefields[self._table].items():
+        for key, val in self._field_order.items():
             if (val.type in ('datetime','timestamp')) \
                     and (data[key] is not None):
                 data[key] = datetime.fromnaiveutc(data[key])
@@ -331,6 +331,12 @@ class DBDataWrite( DBData ):
                 self._create(data, cursor)
             return
 
+        if data is not None:
+            for k,v in self._field_order.items():
+                if (k in data) and (data[k] is not None) and \
+                        (v.type in ('datetime','timestamp')):
+                    data[k] = datetime.duck(data[k])
+
         self._import(data)
         data = self._sanitize(dict(self))
         for key,val in data.items():
@@ -407,7 +413,13 @@ class DBDataWrite( DBData ):
 
         data = {}
         data.update(*args, **keywords)
-        dict.update(self, self._sanitize(data))
+        data = self._sanitize(data)
+
+        for k in data:
+            if self._field_order[k].type in ('datetime', 'timestamp'):
+                data[k] = datetime.duck(data[k])
+
+        dict.update(self, data)
         self._push()
 
     def delete(self):
