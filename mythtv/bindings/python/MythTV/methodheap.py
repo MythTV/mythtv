@@ -84,7 +84,7 @@ class MythBE( FileOps ):
 
     @FileOps._ProgramQuery('QUERY_GETALLPENDING', header_length=1, sorted=True,
                            recstatus=Program.rsConflict)
-    def getConflictedRecordings(self):
+    def getConflictedRecordings(self, pg):
         """
         Retuns a list of Program objects subject to conflicts in the schedule.
         """
