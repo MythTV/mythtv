@@ -954,6 +954,7 @@ void strings_null() {
     ThemeUI::tr("Find local screenshot");
     ThemeUI::tr("Browsable");
     ThemeUI::tr("Program Details");
+    ThemeUI::tr("Schedule Filter");
     ThemeUI::tr("Filter video list");
     ThemeUI::tr("%CHANNEL% (%STATION%)");
     ThemeUI::tr("Designed to show off some different element arrangements available in Myth 0.25.  Reminder: On Watch Recordings screen [Rew] and [FF] can be used to change the Rec. Group.");
