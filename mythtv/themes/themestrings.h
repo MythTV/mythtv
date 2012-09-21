@@ -966,5 +966,5 @@ void strings_null() {
     ThemeUI::tr("a nice transparent theme to use your own background if you want. just copy your favorite picture (be sure that its resolution is 1920x1200) to /usr/share/mythtv/themes/TransBlue/background.jpg");
     ThemeUI::tr("A UI and OSD theme with focus on fanart, banners and cover display.");
     ThemeUI::tr("blootube-ng is a theme based on the original blootube-wide by Justin Hornsby (justin.hornsby@gmail.com) which uses very large graphics associated with every menu entry. All changes where made to bring this theme forward to MythTV 0.24.");
-    ThemeUI::tr("Blue-abstract is a modern looking theme meant for widescreen HD displays. The blue background and the consistent layout makes it an attractive and elegant looking theme. This theme can be used with the development version of MythTV (master).");
+    ThemeUI::tr("Blue-abstract is a modern looking theme meant for widescreen HD displays. The blue background and the consistent layout makes it an attractive and elegant looking theme. This theme can be used with MythTV 0.26 and later.");
 }
