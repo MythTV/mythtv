@@ -105,7 +105,7 @@ int main(int argc, char *argv[])
 #ifndef _WIN32
     QList<int> signallist;
     signallist << SIGINT << SIGTERM << SIGSEGV << SIGABRT << SIGBUS << SIGFPE
-               << SIGILL;
+               << SIGILL << SIGRTMIN;
     SignalHandler::Init(signallist);
     SignalHandler::SetHandler(SIGHUP, logSigHup);
 #endif
