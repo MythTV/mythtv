@@ -191,7 +191,7 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
                           qdtNow, MythDate::kDateFull | MythDate::kAddYear));
     root.setAttribute("time"    ,
                       MythDate::toString(qdtNow, MythDate::kTime));
-    root.setAttribute("MythDate::ISODate" , qdtNow.toString(Qt::ISODate)  );
+    root.setAttribute("ISODate" , qdtNow.toString(Qt::ISODate)  );
     root.setAttribute("version" , MYTH_BINARY_VERSION           );
     root.setAttribute("protoVer", MYTH_PROTO_VERSION            );
 

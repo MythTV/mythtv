@@ -132,11 +132,26 @@ class DBData( DictData, MythSchema ):
         dbdata._postinit()
         return dbdata
 
+    def __setitem__(self, key, value):
+        for k,v in self._field_order.items():
+            if k == key:
+                if v.type in ('datetime','timestamp'):
+                    value = datetime.duck(value)
+                break
+        DictData.__setitem__(self, key, value)
+
     def _evalwheredat(self, wheredat=None):
         if wheredat is None:
             self._wheredat = eval(self._setwheredat)
         else:
             self._wheredat = tuple(wheredat)
+
+    def _getwheredat(self):
+        data = list(self._wheredat)
+        for i,val in enumerate(data):
+            if isinstance(val, datetime):
+                data[i] = val.asnaiveutc()
+        return data
 
     def _postinit(self):
         pass
@@ -166,18 +181,17 @@ class DBData( DictData, MythSchema ):
 
     def _process(self, data):
         data = DictData._process(self, data)
-        for key, val in self._db.tablefields[self._table].items():
-            if (val.type == 'datetime') and (data[key] is not None):
-                data[key] = datetime.fromDatetime(data[key])\
-                                    .replace(tzinfo=datetime.UTCTZ())\
-                                    .astimezone(datetime.localTZ())
+        for key, val in self._field_order.items():
+            if (val.type in ('datetime','timestamp')) \
+                    and (data[key] is not None):
+                data[key] = datetime.fromnaiveutc(data[key])
         return data
 
     def _pull(self):
         """Updates table with data pulled from database."""
         with self._db.cursor(self._log) as cursor:
             cursor.execute("""SELECT * FROM %s WHERE %s""" \
-                       % (self._table, self._where), self._wheredat)
+                       % (self._table, self._where), self._getwheredat())
             res = cursor.fetchall()
             if len(res) == 0:
                 raise MythError('DBData() could not read from database')
@@ -317,11 +331,19 @@ class DBDataWrite( DBData ):
                 self._create(data, cursor)
             return
 
+        if data is not None:
+            for k,v in self._field_order.items():
+                if (k in data) and (data[k] is not None) and \
+                        (v.type in ('datetime','timestamp')):
+                    data[k] = datetime.duck(data[k])
+
         self._import(data)
         data = self._sanitize(dict(self))
-        for key in data.keys():
-            if data[key] is None:
+        for key,val in data.items():
+            if val is None:
                 del data[key]
+            elif isinstance(val, datetime):
+                data[key] = val.asnaiveutc()
         fields = ', '.join(data.keys())
         format_string = ', '.join(['?' for d in data.values()])
         cursor.execute("""INSERT INTO %s (%s) VALUES(%s)""" \
@@ -367,12 +389,14 @@ class DBDataWrite( DBData ):
             if value == self._origdata[key]:
             # filter unchanged data
                 del data[key]
+            elif isinstance(value, datetime):
+                data[key] = value.asnaiveutc()
         if len(data) == 0:
             # no updates
             return
         format_string = ', '.join(['%s = ?' % d for d in data])
         sql_values = data.values()
-        sql_values.extend(self._wheredat)
+        sql_values.extend(self._getwheredat())
         with self._db.cursor(self._log) as cursor:
             cursor.execute("""UPDATE %s SET %s WHERE %s""" \
                     % (self._table, format_string, self._where), sql_values)
@@ -389,7 +413,13 @@ class DBDataWrite( DBData ):
 
         data = {}
         data.update(*args, **keywords)
-        dict.update(self, self._sanitize(data))
+        data = self._sanitize(data)
+
+        for k in data:
+            if self._field_order[k].type in ('datetime', 'timestamp'):
+                data[k] = datetime.duck(data[k])
+
+        dict.update(self, data)
         self._push()
 
     def delete(self):
@@ -846,6 +876,7 @@ class DatabaseConfig( object ):
         confdir = os.environ.get('MYTHCONFDIR', '')
         if confdir and (confdir != '/'):
             obj = self.copy()
+            obj.confdir = confdir
             if obj.readXML(confdir):
                 log(log.GENERAL, log.DEBUG,
                           "Trying database credentials from: {0}"\
@@ -864,20 +895,21 @@ class DatabaseConfig( object ):
         homedir = os.environ.get('HOME', '')
         if homedir and (homedir != '/'):
             obj = self.copy()
+            obj.confdir = os.path.join(homedir, '.mythtv')
             if obj.readXML(os.path.join(homedir,'.mythtv')):
                 log(log.GENERAL, log.DEBUG,
                           "Trying database credentials from: {0}"\
-                                .format(os.path.join(confdir,'config.xml')))
+                                .format(os.path.join(homedir,'config.xml')))
                 yield obj
             elif obj.readOldXML(os.path.join(homedir, '.mythtv')):
                 log(log.GENERAL, log.DEBUG,
                           "Trying old format database credentials from: {0}"\
-                                .format(os.path.join(confdir,'config.xml')))
+                                .format(os.path.join(homedir,'config.xml')))
                 yield obj
             else:
                 log(log.GENERAL, log.DEBUG,
                           "Failed to read database credentials from: {0}"\
-                                .format(os.path.join(confdir,'config.xml')))
+                                .format(os.path.join(homedir,'config.xml')))
 
         # try UPnP
         for conn in XMLConnection.fromUPNP(5.0):
@@ -1004,13 +1036,15 @@ class DatabaseConfig( object ):
             log(log.GENERAL, log.DEBUG, "Writing new database credentials: {0}"\
                                 .format(os.path.join(confdir,'config.xml')))
             fp = open(os.path.join(confdir,'config.xml'), 'w')
+            self.confdir = confdir
         else:
             homedir = os.environ.get('HOME', '')
             if homedir and (homedir != '/'):
                 log(log.GENERAL, log.DEBUG,
                         "Writing new database credentials: {0}"\
-                                .format(os.path.join(confdir,'config.xml')))
+                                .format(os.path.join(homedir,'config.xml')))
                 fp = open(os.path.join(homedir, '.mythtv', 'config.xml'), 'w')
+                self.confdir = os.path.join(homedir, '.mythtv')
             else:
                 raise MythError("Cannot find home directory to write to")
 

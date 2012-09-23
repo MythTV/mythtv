@@ -963,7 +963,8 @@ class Video( CMPVideo, VideoSchema, DBDataWrite ):
 
         # pull direct tags
         for tag in ('title', 'subtitle', 'tagline', 'season', 'episode',
-                    'inetref', 'homepage', 'trailer', 'userrating', 'year'):
+                    'inetref', 'homepage', 'trailer', 'userrating', 'year',
+                    'releasedate'):
             if metadata[tag] and _allow_change(self, tag, overwrite):
                 self[tag] = metadata[tag]
 
@@ -993,7 +994,8 @@ class Video( CMPVideo, VideoSchema, DBDataWrite ):
             for image in metadata.images:
                 if not hasattr(self, image.type):
                     continue
-                if getattr(self, image.type) and not overwrite:
+                current = getattr(self, image.type)
+                if current and (current != 'No Cover') and not overwrite:
                     continue
                 setattr(self, image.type, image.filename)
                 getattr(self, image.type).downloadFrom(image.url)
@@ -1010,7 +1012,8 @@ class Video( CMPVideo, VideoSchema, DBDataWrite ):
 
         # pull direct tags
         for tag in ('title', 'subtitle', 'tagline', 'season', 'episode',
-                    'inetref', 'homepage', 'trailer', 'userrating', 'year'):
+                    'inetref', 'homepage', 'trailer', 'userrating', 'year',
+                    'releasedate'):
             if self[tag]:
                 metadata[tag] = self[tag]
 

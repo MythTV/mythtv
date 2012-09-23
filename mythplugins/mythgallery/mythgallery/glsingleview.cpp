@@ -135,6 +135,7 @@ GLSingleView::GLSingleView(ThumbList itemList, int *pos, int slideShow,
 
     if (slideShow)
     {
+        GetMythMainWindow()->PauseIdleTimer(true);
         m_slideshow_running = true;
         m_slideshow_timer->stop();
         m_slideshow_timer->setSingleShot(true);
@@ -153,6 +154,12 @@ GLSingleView::~GLSingleView()
 void GLSingleView::CleanUp(void)
 {
     makeCurrent();
+
+    if (m_slideshow_running)
+    {  
+        GetMythMainWindow()->PauseIdleTimer(false);
+        GetMythUI()->RestoreScreensaver();
+    }
 
     if (m_slideshow_timer)
     {
@@ -270,6 +277,8 @@ void GLSingleView::keyPressEvent(QKeyEvent *e)
 {
     bool handled    = false;
 
+    if (m_slideshow_running)
+        GetMythMainWindow()->PauseIdleTimer(false);
     bool wasRunning = m_slideshow_running;
     m_slideshow_timer->stop();
     m_slideshow_running = false;
@@ -473,6 +482,7 @@ void GLSingleView::keyPressEvent(QKeyEvent *e)
 
     if (m_slideshow_running)
     {
+        GetMythMainWindow()->PauseIdleTimer(true);
         GetMythUI()->DisableScreensaver();
     }
 

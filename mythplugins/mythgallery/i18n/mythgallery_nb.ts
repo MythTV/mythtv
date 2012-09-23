@@ -675,27 +675,32 @@ Bekreft at mappen eksisterer, er lesbar og at innstillingene er korrekte.</trans
         <translation>MENY: Aktiver meny</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="11"/>
+        <location filename="themestrings.h" line="12"/>
+        <source>Adjust view for your picture library</source>
+        <translation>Juster visningen for ditt billedgalleri</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="20"/>
         <source>Video Gallery</source>
         <translation>Videogalleri</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="12"/>
+        <location filename="themestrings.h" line="21"/>
         <source>Filter/sort images</source>
         <translation>Filtrer/sorter bilder</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="13"/>
+        <location filename="themestrings.h" line="22"/>
         <source>Directory filter:</source>
         <translation>Katalogfilter:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="14"/>
+        <location filename="themestrings.h" line="15"/>
         <source>Type filter:</source>
         <translation>Typefilter:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="15"/>
+        <location filename="themestrings.h" line="17"/>
         <source>Check Filter</source>
         <translation>Sjekk filter</translation>
     </message>
@@ -705,28 +710,28 @@ Bekreft at mappen eksisterer, er lesbar og at innstillingene er korrekte.</trans
         <translation>Sorter etter:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="17"/>
+        <location filename="themestrings.h" line="18"/>
         <source>Done</source>
         <translation>Ferdig</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="18"/>
+        <location filename="themestrings.h" line="19"/>
         <source>Save as default</source>
         <translation>Lagre som standard</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="19"/>
+        <location filename="themestrings.h" line="23"/>
         <source>Folder filter :</source>
         <oldsource>Directory filter :</oldsource>
         <translation>Mappefilter:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="20"/>
+        <location filename="themestrings.h" line="24"/>
         <source>Type filter :</source>
         <translation>Typefilter:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="21"/>
+        <location filename="themestrings.h" line="25"/>
         <source>Sort by :</source>
         <translation>Sorter etter:</translation>
     </message>

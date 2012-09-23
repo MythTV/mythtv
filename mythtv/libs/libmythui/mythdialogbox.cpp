@@ -27,13 +27,13 @@ QEvent::Type DialogCompletionEvent::kEventType =
 
 
 MythMenu::MythMenu(const QString &text, QObject *retobject, const QString &resultid) :
-    m_parentMenu(NULL),  m_title(""), m_text(text), m_resultid(resultid), m_retObject(retobject)
+    m_parentMenu(NULL),  m_title(""), m_text(text), m_resultid(resultid), m_retObject(retobject), m_selectedItem(0)
 {
     Init();
 }
 
 MythMenu::MythMenu(const QString &title, const QString &text, QObject *retobject, const QString &resultid) :
-    m_parentMenu(NULL),  m_title(title), m_text(text), m_resultid(resultid), m_retObject(retobject)
+    m_parentMenu(NULL),  m_title(title), m_text(text), m_resultid(resultid), m_retObject(retobject), m_selectedItem(0)
 {
     Init();
 }

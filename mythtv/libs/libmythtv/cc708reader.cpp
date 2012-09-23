@@ -117,6 +117,7 @@ void CC708Reader::DisplayWindows(uint service_num, int window_map)
         if ((1 << i) & CC708DelayedDeletes[service_num & 63])
         {
             CC708Window &win = GetCCWin(service_num, i);
+            QMutexLocker locker(&win.lock);
 
             win.exists  = false;
             win.changed = true;

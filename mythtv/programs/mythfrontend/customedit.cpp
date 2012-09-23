@@ -542,7 +542,8 @@ void CustomEdit::loadClauses()
     rule.subtitle.clear();
     rule.description = "program.first > 0 \n"
                   "AND program.programid LIKE 'EP%0001' \n"
-                  "AND program.originalairdate = DATE(program.starttime) ";
+                  "AND program.originalairdate = "
+                  "DATE(CONVERT_TZ(program.starttime, 'UTC', 'SYSTEM')) ";
     new MythUIButtonListItem(m_clauseList, rule.title,
                              qVariantFromValue(rule));
 

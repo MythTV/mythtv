@@ -709,7 +709,7 @@ void MythDownloadManager::downloadQNetworkRequest(MythDownloadInfo *dlInfo)
                 if (loadDate.secsTo(now) <= 720)
                 {
                     dlInfo->m_preferCache = true;
-                    LOG(VB_NETWORK, LOG_DEBUG, QString("Prefering cache for %1")
+                    LOG(VB_NETWORK, LOG_DEBUG, QString("Preferring cache for %1")
                                                     .arg(qurl.toString()));
                 }
             }

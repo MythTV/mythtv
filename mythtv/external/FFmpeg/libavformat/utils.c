@@ -709,7 +709,7 @@ int ff_read_packet(AVFormatContext *s, AVPacket *pkt)
             }
         }
 
-        av_init_packet(pkt);
+        av_new_packet(pkt, 0);
         ret= s->iformat->read_packet(s, pkt);
         if (ret < 0) {
             if (!pktl || ret == AVERROR(EAGAIN))

@@ -163,7 +163,7 @@ the script using command-line arguments or with a database information file.
 If a database information file is specified, all command-line arguments will be
 ignored. If no database information file is specified, the script will attempt
 to determine the appropriate configuration by using the MythTV configuration
-file(s) (prefering config.xml, but falling back to mysql.txt if no config.xml
+file(s) (preferring config.xml, but falling back to mysql.txt if no config.xml
 exists). Once the MythTV configuration file has been parsed, the backup
 resource file (see RESOURCE FILE, below) will be parsed, then command-line
 arguments will be applied (thus overriding any values determined from the

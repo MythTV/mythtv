@@ -491,47 +491,152 @@ For nye abonnement, så trenger du kun å taste inn URL og klikke &quot;Lagre&qu
         <translation>Rating</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="51"/>
+        <location filename="themestrings.h" line="52"/>
+        <source>Search for:</source>
+        <translation>Søk etter:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="53"/>
+        <source>Length</source>
+        <translation>Lengde</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="54"/>
+        <source>Resolution</source>
+        <translation>Oppløsning</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="55"/>
+        <source>Size</source>
+        <translation>Størrelse</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="56"/>
+        <source>Download</source>
+        <translation>Last ned</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="57"/>
+        <source>Yes</source>
+        <translation>Ja</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="58"/>
+        <source>No</source>
+        <translation>Nei</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="59"/>
+        <source>Can&apos;t find any search scripts! This usually indicates missing search script prerequisites. Try running a script from the command line.</source>
+        <translation>Ingen søkeskript er funnet!  Dette betyr som oftest at noen prerekvisitter mangler.  Prøv å kjøre et skript fra kommandolinjen.</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="60"/>
+        <source>Browse Internet video</source>
+        <translation>Utforsk Internettvideo</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="61"/>
+        <source>Delete</source>
+        <translation>Slett</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="62"/>
+        <source>Preview</source>
+        <translation>Forhåndsvisning</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="63"/>
+        <source>BROWSE INTERNET VIDEO</source>
+        <translation>UTFORSK INTERNETT VIDEO</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="64"/>
+        <source>%TITLE% %SUBTITLE%</source>
+        <translation>%TITLE% %SUBTITLE%</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="65"/>
+        <source>You haven&apos;t added any Sites/RSS Feeds yet! To add a site, press MENU, then choose &quot;Scan/Manage Subscriptions,&quot; then &quot;Manage Site Subscriptions.&quot;</source>
+        <translation>Du har ikke lagt til noen nettsteder/RSS nyhetsmatinger enda!  For å legge til et nettsted, trykk MENY, velg så &quot;Søk/Administrer abonnement&quot;, og til slutt &quot;Administrer nettstedsabonnementer&quot;</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="66"/>
+        <source>Movie Details</source>
+        <translation>Filmdetaljer</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="67"/>
+        <source>None</source>
+        <translation>Ingen</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="68"/>
+        <source>N/A</source>
+        <translation>Ikke aktuelt</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="69"/>
+        <source>Movie URL</source>
+        <translation>URL for film</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="70"/>
+        <source>Season and Episode</source>
+        <translation>Sesong og episode</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="71"/>
+        <source>s00e00</source>
+        <translation>s00e00</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="72"/>
+        <source>VIDEO INTERNET GALLERY</source>
+        <translation>INTERNETT VIDEOGALLERI</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="73"/>
         <source>Search Internet Video</source>
         <translation>Søk etter Internettvideo</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="52"/>
+        <location filename="themestrings.h" line="74"/>
         <source>Select to change image</source>
         <translation>Velg for å endre bilde</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="53"/>
+        <location filename="themestrings.h" line="75"/>
         <source>Internet Video List</source>
         <translation>Internett videoliste</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="54"/>
+        <location filename="themestrings.h" line="76"/>
         <source>User Rating: %1</source>
         <translation>Brukerrating: %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="55"/>
+        <location filename="themestrings.h" line="77"/>
         <source>By: %1</source>
         <translation>Av: %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="56"/>
+        <location filename="themestrings.h" line="78"/>
         <source>Internet Video Gallery</source>
         <translation>Internett videogalleri</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="57"/>
+        <location filename="themestrings.h" line="79"/>
         <source>Search popular video sites</source>
         <translation>Søk i populære nettsteder</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="58"/>
+        <location filename="themestrings.h" line="80"/>
         <source>Browse Internet Video</source>
         <translation>Utforsk Internettvideo</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="59"/>
+        <location filename="themestrings.h" line="81"/>
         <source>Browse highlights and entire sites</source>
         <translation>Utforsk høydepunkter og hele nettsteder</translation>
     </message>

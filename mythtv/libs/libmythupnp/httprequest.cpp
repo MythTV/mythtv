@@ -86,7 +86,10 @@ static MIMETypes g_MIMETypes[] =
     { "mov" , "video/quicktime"            },
     { "mp4" , "video/mp4"                  },
     // This formerly was video/x-matroska, but got changed due to #8643
-    { "mkv" , "video/x-mkv"                },
+    // This was reverted from video/x-mkv, due to #10980
+    // See http://matroska.org/technical/specs/notes.html#MIME
+    // If you can't please everyone, may as well be correct as you piss some off
+    { "mkv" , "video/x-matroska"           },
     { "mka" , "audio/x-matroska"           },
     { "wmv" , "video/x-ms-wmv"             },
     // Defined: http://wiki.xiph.org/index.php/MIME_Types_and_File_Extensions

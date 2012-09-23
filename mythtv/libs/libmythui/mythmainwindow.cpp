@@ -2325,6 +2325,14 @@ void MythMainWindow::customEvent(QEvent *ce)
     {
         LockInputDevices(false);
     }
+    else if (ce->type() == MythEvent::kDisableUDPListenerEventType)
+    {
+        d->m_udpListener->Disable();
+    }
+    else if (ce->type() == MythEvent::kEnableUDPListenerEventType)
+    {
+        d->m_udpListener->Enable();
+    }
     else if ((MythEvent::Type)(ce->type()) == MythEvent::MythEventMessage)
     {
         MythEvent *me = (MythEvent *)ce;

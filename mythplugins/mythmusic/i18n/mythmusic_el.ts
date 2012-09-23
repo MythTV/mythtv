@@ -1243,6 +1243,14 @@ Do you want to continue playing in the background?</source>
         <translation>Αφαίρεση Έξυπνης Λίστας Αναπαραγωγής</translation>
     </message>
     <message>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="256"/>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="429"/>
+        <source>Are you sure you want to delete this Smart Playlist?
+Category: %1 - Name: %2</source>
+        <translation>Σίγουρα θέλετε να διαγράψετε αυτή την Έξυπνη Λίστα?
+Κατηγορία: %1 - Όνομα: %2 </translation>
+    </message>
+    <message>
         <location filename="../mythmusic/playlisteditorview.cpp" line="260"/>
         <location filename="../mythmusic/playlisteditorview.cpp" line="593"/>
         <source>Edit Smart Playlist</source>
@@ -1269,6 +1277,14 @@ Do you want to continue playing in the background?</source>
         <location filename="../mythmusic/playlisteditorview.cpp" line="545"/>
         <source>Remove Playlist</source>
         <translation>Αφαίρεση Λίστας Αναπαραγωγής</translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="309"/>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="438"/>
+        <source>Are you sure you want to delete this Playlist?
+Name: %1</source>
+        <translation>Σίγουρα θέλετε να διαγράψετε τη Λίστα;
+Όνομα: %1</translation>
     </message>
     <message>
         <location filename="../mythmusic/playlisteditorview.cpp" line="511"/>
@@ -1939,6 +1955,13 @@ Do you want to permanently delete the existing file(s)?</source>
         <location filename="../mythmusic/streamview.cpp" line="97"/>
         <source>More Options</source>
         <translation>Περισσότερες Επιλογές</translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/streamview.cpp" line="389"/>
+        <source>Are you sure you want to delete this Stream?
+Station: %1 - Channel: %2</source>
+        <translation>Σίγουρα θέλετε να διαγράψετε τη Ροή;
+Σταθμός: %1 - Κανάλι: %2</translation>
     </message>
 </context>
 <context>

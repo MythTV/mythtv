@@ -20,6 +20,7 @@ use Getopt::Std;
 use File::Path;
 use Switch;
 
+use DateTime;
 use Date::Parse;
 use Date::Calc qw(Day_of_Week);
 use File::Basename;
@@ -105,6 +106,19 @@ if (!(defined $locid && !$locid eq "")) {
 }
 
 my $base_args = '?res=daily&key=' . $MetOffCommon::api_key;
+
+# BEGIN workaround for API bug, may be removed when fixed, although it does no
+# harm and possibly some benefits to it such as 6 days instead of the default
+# 5
+my $start_date = DateTime->now()->set_hour(0)->set_minute(0)->set_second(0);
+if (DateTime->now()->hour() >= 18) {
+ $start_date->add( days => 1 );
+}
+my $end_date = $start_date->clone();
+$end_date->add( days => 5 );
+$base_args = $base_args . '&valid-from=' . $start_date . '&valid-to=' . $end_date;
+# END workaround
+
 my $url = "";
 
 if ($locid =~ s/^(\d*)/$1/)
@@ -127,7 +141,7 @@ if (!$xml) {
 }
 
 printf "copyright::" . $MetOffCommon::copyright_str . "\n";
-printf "copyrightlogo::" . $MetOffCommon::copyright_logo . "\n";
+#printf "copyrightlogo::" . $MetOffCommon::copyright_logo . "\n";
 printf "station_id::" . $locid . "\n";
 my $location = $xml->{DV}->{Location}->{name};
 printf "3dlocation::" . $location . "\n";
@@ -135,23 +149,23 @@ printf "6dlocation::" . $location . "\n";
 printf "updatetime::" . localtime() . "\n";
 
 my $i = 0;
-my $item;
+my $period;
 
-foreach $item (@{$xml->{DV}->{Location}->{Period}}) {
+foreach $period (@{$xml->{DV}->{Location}->{Period}}) {
 
-    if (ref($item->{Rep}) ne 'ARRAY') {
+    if (ref($period->{Rep}) ne 'ARRAY') {
         next;
     }
 
-    my ($ss,$mm,$hh,$day,$month,$year,$zone) = strptime($item->{val});
+    my ($ss,$mm,$hh,$day,$month,$year,$zone) = strptime($period->{value});
     $year += 1900; # Returns year as offset from 1900
     $month += 1; # Returns month starting at zero
     my $dow = Day_of_Week($year,$month,$day);
     $dow = $dow == 7 ? 0 : $dow;
     printf "date-" . $i . "::" . $dow . "\n";
 
-    my $daytime = $item->{Rep}[0];
-    my $nighttime = $item->{Rep}[1];
+    my $daytime = $period->{Rep}[0];
+    my $nighttime = $period->{Rep}[1];
     
     my $iconname = "unknown";
     switch ($daytime->{W}) { # Weather Type

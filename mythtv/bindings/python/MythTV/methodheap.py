@@ -84,7 +84,7 @@ class MythBE( FileOps ):
 
     @FileOps._ProgramQuery('QUERY_GETALLPENDING', header_length=1, sorted=True,
                            recstatus=Program.rsConflict)
-    def getConflictedRecordings(self):
+    def getConflictedRecordings(self, pg):
         """
         Retuns a list of Program objects subject to conflicts in the schedule.
         """
@@ -1113,25 +1113,6 @@ class MythXML( XMLConnection ):
                     raise MythDBError(MythError.DB_SETTING, 
                                         backend+': BackendStatusPort')
 
-    def getServDesc(self):
-        """
-        Returns a dictionary of valid pages, as well as input and output
-        arguments.
-        """
-        
-        #TODO - handle namespaces better
-        tree = self._queryTree('GetServDesc')
-        index = tree.tag.rindex('}')+1
-        find = lambda e,c: e.find('%s%s' % (tree.tag[:index], c))
-
-        for a in find(tree, 'actionList'):
-            act = [find(a,'name').text, {'in':[], 'out':[]}]
-            for arg in find(a, 'argumentList'):
-                argname = find(arg, 'name').text
-                argdirec = find(arg, 'direction').text
-                act[1][argdirec].append(argname)
-            yield act
-
     def getHosts(self):
         """Returns a list of unique hostnames found in the settings table."""
         return self._request('Myth/GetHosts')\
@@ -1158,8 +1139,8 @@ class MythXML( XMLConnection ):
         """
         starttime = datetime.duck(starttime)
         endtime = datetime.duck(endtime)
-        args = {'StartTime':starttime.isoformat().rsplit('.',1)[0],
-                'EndTime':endtime.isoformat().rsplit('.',1)[0], 
+        args = {'StartTime':starttime.utcisoformat().rsplit('.',1)[0],
+                'EndTime':endtime.utcisoformat().rsplit('.',1)[0], 
                 'StartChanId':startchan, 'Details':1}
         if numchan:
             args['NumOfChannels'] = numchan
@@ -1177,7 +1158,7 @@ class MythXML( XMLConnection ):
         Returns a Program object for the matching show.
         """
         starttime = datetime.duck(starttime)
-        args = {'ChanId': chanid, 'StartTime': starttime.isoformat()}
+        args = {'ChanId': chanid, 'StartTime': starttime.utcisoformat()}
         return Program.fromJSON(
                 self._request('Guide/GetProgramDetails', **args)\
                     .readJSON()['Program'],
@@ -1199,7 +1180,7 @@ class MythXML( XMLConnection ):
         """
         Returns a list of Program objects for expiring shows on the backend.
         """
-        for prog in self._request('Dvr/GetExpiring')\
+        for prog in self._request('Dvr/GetExpiringList')\
                     .readJSON()['ProgramList']['Programs']:
             yield Program.fromJSON(prog, self.db)
 
@@ -1215,7 +1196,7 @@ class MythXML( XMLConnection ):
     def getPreviewImage(self, chanid, starttime, width=None, \
                                                  height=None, secsin=None):
         starttime = datetime.duck(starttime)
-        args = {'ChanId':chanid, 'StartTime':starttime.isoformat()}
+        args = {'ChanId':chanid, 'StartTime':starttime.utcisoformat()}
         if width: args['Width'] = width
         if height: args['Height'] = height
         if secsin: args['SecsIn'] = secsin
