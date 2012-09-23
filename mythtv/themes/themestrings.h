@@ -865,7 +865,7 @@ void strings_null() {
     ThemeUI::tr("Schedule Options Editor");
     ThemeUI::tr("Storage Options Editor");
     ThemeUI::tr("Post Processing Editor");
-    ThemeUI::tr("For %ASPECT% displays. By %AUTHORNAME%.");
+    ThemeUI::tr("For %ASPECT% displays.% By |AUTHORNAME%% <|AUTHOREMAIL|>%.");
     ThemeUI::tr("= Update available");
     ThemeUI::tr("A sleek black theme that is the default theme for the Mythbuntu distribution. The Mythbuntu theme is inspired by ProjectGrayhem.");
     ThemeUI::tr("Background:");
