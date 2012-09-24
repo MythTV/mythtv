@@ -171,7 +171,7 @@ class MPEG2fixup
     void WriteFrame(QString filename, AVPacket *pkt);
     void WriteYUV(QString filename, const mpeg2_info_t *info);
     void WriteData(QString filename, uint8_t *data, int size);
-    int BuildFrame(AVPacket *pkt, QString fname);
+    bool BuildFrame(AVPacket *pkt, QString fname);
     MPEG2frame *GetPoolFrame(AVPacket *pkt);
     MPEG2frame *GetPoolFrame(MPEG2frame *f);
     int GetFrame(AVPacket *pkt);

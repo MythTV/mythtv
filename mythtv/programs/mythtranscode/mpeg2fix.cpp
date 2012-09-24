@@ -1063,7 +1063,7 @@ extern "C" {
 #include "helper.h"
 }
 
-int MPEG2fixup::BuildFrame(AVPacket *pkt, QString fname)
+bool MPEG2fixup::BuildFrame(AVPacket *pkt, QString fname)
 {
     const mpeg2_info_t *info;
     int outbuf_size;
@@ -1074,7 +1074,7 @@ int MPEG2fixup::BuildFrame(AVPacket *pkt, QString fname)
 
     info = mpeg2_info(img_decoder);
     if (!info->display_fbuf)
-        return 1;
+        return true;
 
     outbuf_size = info->sequence->width * info->sequence->height * 2;
 
@@ -1116,15 +1116,10 @@ int MPEG2fixup::BuildFrame(AVPacket *pkt, QString fname)
     {
         free(picture);
         LOG(VB_GENERAL, LOG_ERR, "Couldn't find MPEG2 encoder");
-        return 1;
+        return true;
     }
 
     c = avcodec_alloc_context3(NULL);
-
-    //We disable all optimizations for the time being.  There shouldn't be too
-    //much encoding going on, and the optimizations have been shown to cause
-    //corruption in some cases
-    c->dsp_mask = 0xffff;
 
     //NOTE: The following may seem wrong, but avcodec requires
     //sequence->progressive == frame->progressive
@@ -1164,19 +1159,29 @@ int MPEG2fixup::BuildFrame(AVPacket *pkt, QString fname)
     {
         free(picture);
         LOG(VB_GENERAL, LOG_ERR, "could not open codec");
-        return 1;
+        return true;
     }
 
     int got_packet = 0;
+    int ret;
+    bool initial = true;
 
-    int ret = avcodec_encode_video2(c, pkt, picture, &got_packet);
-
-    if (ret < 0 || !got_packet)
+    // Need to call this repeatedly as it seems to be pipelined.  The first
+    // call will return no packet, then the second one will flush it.  In case
+    // it becomes more pipelined, just loop until it creates a packet or errors
+    // out.
+    while (!got_packet)
     {
-        free(picture);
-        LOG(VB_GENERAL, LOG_ERR,
-            QString("avcodec_encode_video failed (%1)").arg(pkt->size));
-        return 1;
+        ret = avcodec_encode_video2(c, pkt, (initial ? picture : NULL),
+                                             &got_packet);
+
+        if (ret < 0)
+        {
+            free(picture);
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("avcodec_encode_video2 failed (%1)").arg(ret));
+            return true;
+        }
     }
 
     if (!fname.isEmpty())
@@ -1198,7 +1203,7 @@ int MPEG2fixup::BuildFrame(AVPacket *pkt, QString fname)
     av_freep(&c);
     av_freep(&picture);
 
-    return 0;
+    return false;
 }
 
 #define MAX_FRAMES 20000
