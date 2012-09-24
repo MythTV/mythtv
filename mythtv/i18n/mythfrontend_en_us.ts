@@ -21858,7 +21858,8 @@ Once you have completed your modifications, click the &quot;Save&quot; button.</
     <message>
         <location filename="../themes/themestrings.h" line="963"/>
         <source>Inspired by MediaStream: The theme has been made to look like the original XBMC skin were posible. Looks best with the matching menu called &apos;MythMediaStream&apos; as this menu lay-out and items are tailored for this particular theme.</source>
-        <translation>Inspired by MediaStream: The theme has been made to look like the original XBMC skin were posible. Looks best with the matching menu called &apos;MythMediaStream&apos; as this menu lay-out and items are tailored for this particular theme.</translation>
+        <translatorcomment>Typo (where)</translatorcomment>
+        <translation>Inspired by MediaStream: The theme has been made to look like the original XBMC skin where posible. Looks best with the matching menu called &apos;MythMediaStream&apos; as this menu lay-out and items are tailored for this particular theme.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="968"/>
