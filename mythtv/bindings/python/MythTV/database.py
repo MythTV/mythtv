@@ -692,7 +692,7 @@ class DBDataCRef( DBDataRef ):
         for i,v in enumerate(where):
             if isinstance(v, datetime):
                 where[i] = v.asnaiveutc()
-        self._refdat = tuple(where)
+        self._refdat = where
 
     def _populate(self, force=False, data=None):
         if self._populated and (not force):
