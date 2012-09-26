@@ -529,8 +529,13 @@ class DBDataRef( list ):
         self._setClassDefs(self._db)
         if bypass: return
 
-        self._refdat = where
         self._populated = False
+
+        where = list(where)
+        for i,v in enumerate(where):
+            if isinstance(v, datetime):
+                where[i] = v.asnaiveutc()
+        self._refdat = tuple(where)
 
     def _populate(self, force=False, data=None):
         if self._populated and (not force):
@@ -681,8 +686,13 @@ class DBDataCRef( DBDataRef ):
         self._setClassDefs(self._db)
         if bypass: return
 
-        self._refdat = list(where)
         self._populated = False
+
+        where = list(where)
+        for i,v in enumerate(where):
+            if isinstance(v, datetime):
+                where[i] = v.asnaiveutc()
+        self._refdat = tuple(where)
 
     def _populate(self, force=False, data=None):
         if self._populated and (not force):
