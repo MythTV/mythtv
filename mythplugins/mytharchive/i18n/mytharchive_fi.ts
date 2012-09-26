@@ -940,7 +940,7 @@ Ole hyvä ja odota...</translation>
         <translation>nimike tulee tähän</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="94"/>
+        <location filename="themestrings.h" line="93"/>
         <source>x.xx Gb</source>
         <translation>x,xx Gt</translation>
     </message>
@@ -1014,11 +1014,6 @@ Ole hyvä ja odota...</translation>
         <location filename="themestrings.h" line="86"/>
         <source>Video Category:</source>
         <translation>Videon luokka:</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="93"/>
-        <source>Ok</source>
-        <translation>Ok</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="78"/>
@@ -1216,47 +1211,47 @@ Ole hyvä ja odota...</translation>
         <translation>Lopeta</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="95"/>
+        <location filename="themestrings.h" line="94"/>
         <source>Select Destination:</source>
         <translation>Valitse kohde:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="96"/>
+        <location filename="themestrings.h" line="95"/>
         <source>Parental level: %1</source>
         <translation>Ikäluokitus: %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="97"/>
+        <location filename="themestrings.h" line="96"/>
         <source>Old size:</source>
         <translation>Vanha koko:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="98"/>
+        <location filename="themestrings.h" line="97"/>
         <source>New size:</source>
         <translation>Uusi koko:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="99"/>
+        <location filename="themestrings.h" line="98"/>
         <source>Select a theme:</source>
         <translation>Valitse teema:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="100"/>
+        <location filename="themestrings.h" line="99"/>
         <source>Menu</source>
         <translation>Valikko</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="101"/>
+        <location filename="themestrings.h" line="100"/>
         <source>Chapter</source>
         <translation>Kappale</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="102"/>
+        <location filename="themestrings.h" line="101"/>
         <source>Detail</source>
         <translation>Tieto</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="103"/>
+        <location filename="themestrings.h" line="102"/>
         <source>Select File to Import</source>
         <translation>Valitse tuotava tiedosto</translation>
     </message>
@@ -1266,52 +1261,52 @@ Ole hyvä ja odota...</translation>
         <translation>Lisää video</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="106"/>
+        <location filename="themestrings.h" line="105"/>
         <source>Create DVD</source>
         <translation>Luo DVD</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="107"/>
+        <location filename="themestrings.h" line="106"/>
         <source>Create Archive</source>
         <translation>Luo Arkisto</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="108"/>
+        <location filename="themestrings.h" line="107"/>
         <source>Encode Video File</source>
         <translation>Pakkaa video tiedosto</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="109"/>
+        <location filename="themestrings.h" line="108"/>
         <source>Import Archive</source>
         <translation>Tuo Arkisto</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="110"/>
+        <location filename="themestrings.h" line="109"/>
         <source>Archive Utilities</source>
         <translation>Arkistointi Työkalut</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="111"/>
+        <location filename="themestrings.h" line="110"/>
         <source>Show Log Viewer</source>
         <translation>Näytä lokinkatseluohjelma</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="112"/>
+        <location filename="themestrings.h" line="111"/>
         <source>Play Created DVD</source>
         <translation>Toista luotu DVD</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="113"/>
+        <location filename="themestrings.h" line="112"/>
         <source>Burn DVD</source>
         <translation>Polta DVD</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="104"/>
+        <location filename="themestrings.h" line="103"/>
         <source>Channel ID:</source>
         <translation>Kanava id:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="105"/>
+        <location filename="themestrings.h" line="104"/>
         <source>Channel Number:</source>
         <translation>Kanavanumero:</translation>
     </message>

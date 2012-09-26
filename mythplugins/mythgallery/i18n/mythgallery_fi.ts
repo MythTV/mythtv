@@ -4,7 +4,7 @@
 <context>
     <name>GLSingleView</name>
     <message>
-        <location filename="../mythgallery/glsingleview.cpp" line="229"/>
+        <location filename="../mythgallery/glsingleview.cpp" line="236"/>
         <source>Press SELECT to play again</source>
         <translation>Paina SELECT toistaaksesi uudelleen</translation>
     </message>
@@ -637,7 +637,7 @@ Tarkista että hakemisto on olemassa, on luettavissa ja asetus on oikein MythGal
 <context>
     <name>SingleView</name>
     <message>
-        <location filename="../mythgallery/singleview.cpp" line="204"/>
+        <location filename="../mythgallery/singleview.cpp" line="211"/>
         <source>Press SELECT to play again</source>
         <translation>Paina SELECT toistaaksesi uudelleen</translation>
     </message>
