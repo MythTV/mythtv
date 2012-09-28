@@ -1202,7 +1202,8 @@ Lorsque vous avez terminé de configurer le module météo, cliquez sur &quot;Te
     </message>
     <message>
         <location filename="themestrings.h" line="50"/>
-        <source>Wind(Gust):</source>
+        <source>Wind (Gust):</source>
+        <oldsource>Wind(Gust):</oldsource>
         <translation>Vent (Bourrasques) :</translation>
     </message>
     <message>

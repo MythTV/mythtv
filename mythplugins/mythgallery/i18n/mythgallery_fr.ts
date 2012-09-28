@@ -4,7 +4,7 @@
 <context>
     <name>GLSingleView</name>
     <message>
-        <location filename="../mythgallery/glsingleview.cpp" line="229"/>
+        <location filename="../mythgallery/glsingleview.cpp" line="236"/>
         <source>Press SELECT to play again</source>
         <translation>Appuyez sur SÉLECT pour rejouer</translation>
     </message>
@@ -640,7 +640,7 @@ Vérifiez que le répertoire existe et est accessible en lecture et que les rég
 <context>
     <name>SingleView</name>
     <message>
-        <location filename="../mythgallery/singleview.cpp" line="204"/>
+        <location filename="../mythgallery/singleview.cpp" line="211"/>
         <source>Press SELECT to play again</source>
         <translation>Veuillez appuyer sur SELECT pour rejouer</translation>
     </message>
