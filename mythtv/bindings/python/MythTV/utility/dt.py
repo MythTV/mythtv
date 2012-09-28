@@ -411,12 +411,22 @@ class datetime( _pydatetime ):
                 pass
         raise TypeError("time data '%s' does not match supported formats"%t)
 
-    def __init__(self, year, month, day, hour=None, minute=None, second=None,
-                       microsecond=None, tzinfo=None):
+    def __new__(cls, year, month, day, hour=None, minute=None, second=None,
+                      microsecond=None, tzinfo=None):
+        
         if tzinfo is None:
-            tzinfo = self.localTZ()
-        super(datetime, self).__init__(year, month, day, hour, minute, second,\
-                                       microsecond, tzinfo)
+            kwargs = {'tzinfo':cls.localTZ()}
+        else:
+            kwargs = {'tzinfo':tzinfo}
+        if hour is not None:
+            kwargs['hour'] = hour
+        if minute is not None:
+            kwargs['minute'] = minute
+        if second is not None:
+            kwargs['second'] = second
+        if microsecond is not None:
+            kwargs['microsecond'] = microsecond
+        return _pydatetime.__new__(cls, year, month, day, **kwargs)
 
     def mythformat(self):
         return self.astimezone(self.UTCTZ()).strftime('%Y%m%d%H%M%S')
