@@ -2721,6 +2721,11 @@ Stasjon: %1 - Kanal: %2</translation>
         <translation>Felt:</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="221"/>
+        <source>Search for:</source>
+        <translation>Søk etter:</translation>
+    </message>
+    <message>
         <location filename="themestrings.h" line="222"/>
         <source>%1 Matches found:</source>
         <translation>%1 treff funnet:</translation>
