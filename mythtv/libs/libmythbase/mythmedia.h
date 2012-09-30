@@ -119,9 +119,9 @@ class MBASE_PUBLIC MythMediaDevice : public QObject
 
     void clearData();
 
-    const char* MediaTypeString();
+    QString MediaTypeString();
 
-    static const char* MediaTypeString(MythMediaType type);
+    static QString MediaTypeString(uint type);
 
  signals:
     void statusChanged(MythMediaStatus oldStatus, MythMediaDevice* pMedia);

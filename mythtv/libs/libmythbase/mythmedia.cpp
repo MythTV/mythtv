@@ -192,7 +192,6 @@ bool MythMediaDevice::performMountCmd(bool DoMount)
  */
 MythMediaType MythMediaDevice::DetectMediaType(void)
 {
-    MythMediaType mediatype = MEDIATYPE_UNKNOWN;
     ext_cnt_t ext_cnt;
 
     if (!ScanMediaType(m_MountPath, ext_cnt))
@@ -200,10 +199,10 @@ MythMediaType MythMediaDevice::DetectMediaType(void)
         LOG(VB_MEDIA, LOG_NOTICE,
             QString("No files with extensions found in '%1'")
                 .arg(m_MountPath));
-        return mediatype;
+        return MEDIATYPE_UNKNOWN;
     }
 
-    QMap<uint, uint> media_cnts, media_cnt;
+    QMap<uint, uint> media_cnts;
 
     // convert raw counts to composite mediatype counts
     ext_cnt_t::const_iterator it = ext_cnt.begin();
@@ -215,28 +214,19 @@ MythMediaType MythMediaDevice::DetectMediaType(void)
     }
 
     // break composite mediatypes into constituent components
+    uint mediatype = 0;
+
     QMap<uint, uint>::const_iterator cit = media_cnts.begin();
     for (; cit != media_cnts.end(); ++cit)
     {
-        for (uint key = 0, j = 0; key != MEDIATYPE_END; j++)
+        for (uint key = 1; key != MEDIATYPE_END; key <<= 1)
         {
-            if ((key = 1 << j) & cit.key())
-                media_cnt[key] += *cit;
+            if (key & cit.key())
+                mediatype |= key;
         }
     }
 
-    // decide on mediatype based on which one has a handler for > # of files
-    uint max_cnt = 0;
-    for (cit = media_cnt.begin(); cit != media_cnt.end(); ++cit)
-    {
-        if (*cit > max_cnt)
-        {
-            mediatype = (MythMediaType) cit.key();
-            max_cnt   = *cit;
-        }
-    }
-
-    return mediatype;
+    return mediatype ? (MythMediaType)mediatype : MEDIATYPE_UNKNOWN;
 }
 
 /**
@@ -495,36 +485,46 @@ void MythMediaDevice::clearData()
     m_MediaType = MEDIATYPE_UNKNOWN;
 }
 
-const char* MythMediaDevice::MediaTypeString()
+QString MythMediaDevice::MediaTypeString()
 {
     return MediaTypeString(m_MediaType);
 }
 
-const char* MythMediaDevice::MediaTypeString(MythMediaType type)
+QString MythMediaDevice::MediaTypeString(uint type)
 {
-    // MythMediaType is currently a bitmask.  This code will only output the
-    // first matched type.
+    // MediaType is a bitmask.
+    QString mediatype;
+    for (uint u = MEDIATYPE_UNKNOWN; u != MEDIATYPE_END; u <<= 1)
+    {
+        QString s;
+        if (u & type & MEDIATYPE_UNKNOWN)
+            s = "MEDIATYPE_UNKNOWN";
+        else if (u & type & MEDIATYPE_DATA)
+            s = "MEDIATYPE_DATA";
+        else if (u & type & MEDIATYPE_MIXED)
+            s = "MEDIATYPE_MIXED";
+        else if (u & type & MEDIATYPE_AUDIO)
+            s = "MEDIATYPE_AUDIO";
+        else if (u & type & MEDIATYPE_DVD)
+            s = "MEDIATYPE_DVD";
+        else if (u & type & MEDIATYPE_BD)
+            s = "MEDIATYPE_BD";
+        else if (u & type & MEDIATYPE_VCD)
+            s = "MEDIATYPE_VCD";
+        else if (u & type & MEDIATYPE_MMUSIC)
+            s = "MEDIATYPE_MMUSIC";
+        else if (u & type & MEDIATYPE_MVIDEO)
+            s = "MEDIATYPE_MVIDEO";
+        else if (u & type & MEDIATYPE_MGALLERY)
+            s = "MEDIATYPE_MGALLERY";
+        else
+            continue;
 
-    if (type == MEDIATYPE_UNKNOWN)
-        return "MEDIATYPE_UNKNOWN";
-    if (type & MEDIATYPE_DATA)
-        return "MEDIATYPE_DATA";
-    if (type & MEDIATYPE_MIXED)
-        return "MEDIATYPE_MIXED";
-    if (type & MEDIATYPE_AUDIO)
-        return "MEDIATYPE_AUDIO";
-    if (type & MEDIATYPE_DVD)
-        return "MEDIATYPE_DVD";
-    if (type & MEDIATYPE_BD)
-        return "MEDIATYPE_BD";
-    if (type & MEDIATYPE_VCD)
-        return "MEDIATYPE_VCD";
-    if (type & MEDIATYPE_MMUSIC)
-        return "MEDIATYPE_MMUSIC";
-    if (type & MEDIATYPE_MVIDEO)
-        return "MEDIATYPE_MVIDEO";
-    if (type & MEDIATYPE_MGALLERY)
-        return "MEDIATYPE_MGALLERY";
+        if (mediatype.isEmpty())
+            mediatype = s;
+        else
+            mediatype += "|" + s;
+    }
 
-    return "MEDIATYPE_UNKNOWN";
+    return mediatype;
 }
