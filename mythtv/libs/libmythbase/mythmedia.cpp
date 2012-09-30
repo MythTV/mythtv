@@ -64,6 +64,8 @@ const char* MythMediaDevice::MediaErrorStrings[] =
 QEvent::Type MythMediaEvent::kEventType =
     (QEvent::Type) QEvent::registerEventType();
 
+ext_to_media_t MythMediaDevice::s_ext_to_media;
+
 MythMediaDevice::MythMediaDevice(QObject* par, const char* DevicePath,
                                  bool SuperMount,  bool AllowEject)
                : QObject(par)
@@ -208,9 +210,19 @@ MythMediaType MythMediaDevice::DetectMediaType(void)
     ext_cnt_t::const_iterator it = ext_cnt.begin();
     for (; it != ext_cnt.end(); ++it)
     {
-        ext_to_media_t::const_iterator found = m_ext_to_media.find(it.key());
-        if (found != m_ext_to_media.end())
+        ext_to_media_t::const_iterator found = s_ext_to_media.find(it.key());
+        if (found != s_ext_to_media.end())
+        {
+            LOG(VB_MEDIA, LOG_INFO, QString("DetectMediaType %1 (%2)")
+                .arg(MediaTypeString(found.value())).arg(it.key()));
             media_cnts[*found] += *it;
+        }
+        else
+        {
+            LOG(VB_MEDIA, LOG_NOTICE, QString(
+                    "DetectMediaType(this=0x%1) unknown file type %1")
+                .arg(quintptr(this),0,16).arg(it.key()));
+        }
     }
 
     // break composite mediatypes into constituent components
@@ -271,12 +283,13 @@ bool MythMediaDevice::ScanMediaType(const QString &directory, ext_cnt_t &cnt)
  *  \param mediatype  MythMediaType flag.
  *  \param extensions Comma separated list of extensions like 'mp3,ogg,flac'.
  */
+// static
 void MythMediaDevice::RegisterMediaExtensions(uint mediatype,
                                               const QString &extensions)
 {
     const QStringList list = extensions.split(",");
     for (QStringList::const_iterator it = list.begin(); it != list.end(); ++it)
-        m_ext_to_media[*it] |= mediatype;
+        s_ext_to_media[*it] |= mediatype;
 }
 
 MythMediaError MythMediaDevice::eject(bool open_close)

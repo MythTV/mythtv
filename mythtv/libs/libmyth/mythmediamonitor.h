@@ -64,7 +64,6 @@ class MPUBLIC MediaMonitor : public QObject
     QList<MythMediaDevice*> GetMedias(unsigned mediatypes);
     MythMediaDevice*        GetMedia(const QString &path);
 
-    void MonitorRegisterExtensions(uint mediaType, const QString &extensions);
     void RegisterMediaHandler(const QString  &destination,
                               const QString  &description,
                               const QString  &key,

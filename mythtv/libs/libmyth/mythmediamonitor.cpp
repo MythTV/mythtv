@@ -596,24 +596,6 @@ QList<MythMediaDevice*> MediaMonitor::GetMedias(unsigned mediatypes)
     return medias;
 }
 
-/** \fn MediaMonitor::MonitorRegisterExtensions(uint,const QString&)
- *  \brief Register the extension list on all known devices
- */
-void MediaMonitor::MonitorRegisterExtensions(uint mediatype,
-                                             const QString &extensions)
-{
-    LOG(VB_GENERAL, LOG_DEBUG,
-             QString("MonitorRegisterExtensions(0x%1, %2)")
-                 .arg(mediatype, 0, 16).arg(extensions));
-
-    QList<MythMediaDevice*>::iterator it = m_Devices.begin();
-    for (; it != m_Devices.end(); ++it)
-    {
-        if (*it)
-            (*it)->RegisterMediaExtensions(mediatype, extensions);
-    }
-}
-
 void MediaMonitor::RegisterMediaHandler(const QString  &destination,
                                         const QString  &description,
                                         const QString  &key,
@@ -628,7 +610,7 @@ void MediaMonitor::RegisterMediaHandler(const QString  &destination,
         QString msg = MythMediaDevice::MediaTypeString((MythMediaType)mediaType);
 
         if (extensions.length())
-            msg += QString(", ext(%1)").arg(extensions);
+            msg += QString(", ext(0x%1)").arg(extensions, 0, 16);
 
         LOG(VB_MEDIA, LOG_INFO,
                  "Registering '" + destination + "' as a media handler for " +
@@ -637,7 +619,7 @@ void MediaMonitor::RegisterMediaHandler(const QString  &destination,
         m_handlerMap[destination] = mhd;
 
         if (extensions.length())
-            MonitorRegisterExtensions(mediaType, extensions);
+            MythMediaDevice::RegisterMediaExtensions(mediaType, extensions);
     }
     else
     {

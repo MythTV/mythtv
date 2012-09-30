@@ -110,7 +110,7 @@ class MBASE_PUBLIC MythMediaDevice : public QObject
     bool isMounted(bool bVerify = true);
     bool findMountPath();
 
-    void RegisterMediaExtensions(uint mediatype,
+    static void RegisterMediaExtensions(uint mediatype,
                                  const QString& extensions);
 
 
@@ -169,7 +169,7 @@ class MBASE_PUBLIC MythMediaDevice : public QObject
                              ///  be private, but a subclass of a
                              ///  subclass needs it (MythCDRomLinux)
  private:
-    ext_to_media_t m_ext_to_media; ///< Map of extension to media type.
+    static ext_to_media_t s_ext_to_media; ///< Map of extension to media type.
 };
 
 class MBASE_PUBLIC MythMediaEvent : public QEvent
