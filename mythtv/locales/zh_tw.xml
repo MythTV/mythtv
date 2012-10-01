@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<mythlocale>
+  <!-- Global Settings -->
+    <!-- EIT, Subtitle, Audio Stream Language Preferences -->
+    <setting name="ISO639Language0" global="true">chi</setting>
+    <setting name="ISO639Language1" global="true">chi</setting>
+
+    <!-- Recording -->
+    <setting name="TVFormat" global="true">NTSC</setting>
+    <setting name="VbiFormat" global="true">None</setting>
+    <setting name="FreqTable" global="true">us-bcast</setting>
+
+    <!-- Scheduling -->
+
+    <!-- Advert Detection -->
+
+
+  <!-- Per-host Settings -->
+    <!-- Languages - Self Explanatory -->
+    <setting name="Language">zh_HK</setting> <!-- what translation to load -->
+
+    <!-- Country -->
+    <setting name="Country">TW</setting>
+
+    <!-- Date/Time format -->
+    <setting name="DateFormat">ddd M月d日</setting>
+    <setting name="TimeFormat">AP h:mm</setting>
+    <setting name="ShortDateFormat">M月d日</setting>
+
+    <!-- Playback -->
+    <setting name="EnableMHEG">1</setting>
+
+  <!-- Plugins -->
+    <!-- MythArchive -->
+    <setting name="MythArchiveVideoFormat">NTSC</setting>
+</mythlocale>
