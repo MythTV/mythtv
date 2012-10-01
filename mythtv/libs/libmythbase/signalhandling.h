@@ -14,6 +14,12 @@
 #include "mythbaseexp.h"  //  MBASE_PUBLIC , etc.
 #include "mthread.h"
 
+#ifdef _WIN32
+// Quick fix to let this compile for Windows:  we have it disabled on the 
+// calling side for Windows anyways, IIRC.
+typedef void siginfo_t;
+#endif
+
 typedef void (*SigHandlerFunc)(void);
 
 /// \brief A container object to handle UNIX signals in the Qt space correctly
