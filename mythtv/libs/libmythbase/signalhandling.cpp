@@ -65,7 +65,7 @@ SignalHandler::SignalHandler(QList<int> &signallist, QObject *parent) :
 
     m_sigStack = new char[SIGSTKSZ];
     stack_t stack;
-    stack.ss_sp = (void *)m_sigStack;
+    stack.ss_sp = m_sigStack;
     stack.ss_flags = 0;
     stack.ss_size = SIGSTKSZ;
 
@@ -209,7 +209,7 @@ void SignalHandler::signalHandler(int signum, siginfo_t *info, void *context)
     signalInfo.code   = (info ? info->si_code : 0);
     signalInfo.pid    = (info ? (int)info->si_pid : 0);
     signalInfo.uid    = (info ? (int)info->si_uid : 0);
-    signalInfo.value  = (info ? (uint64_t)info->si_ptr : 0);
+    signalInfo.value  = (info ? *(uint64_t *)&info->si_value : 0);
 
     // Keep trying if there's no room to write, but stop on error (-1)
     int index = 0;
