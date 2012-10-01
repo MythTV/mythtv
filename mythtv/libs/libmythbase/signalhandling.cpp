@@ -63,6 +63,7 @@ SignalHandler::SignalHandler(QList<int> &signallist, QObject *parent) :
     s_exit_program = false; // set here due to "C++ static initializer madness"
     sig_str_init();
 
+#ifndef _WIN32
     m_sigStack = new char[SIGSTKSZ];
     stack_t stack;
     stack.ss_sp = m_sigStack;
@@ -76,15 +77,14 @@ SignalHandler::SignalHandler(QList<int> &signallist, QObject *parent) :
         delete [] m_sigStack;
         m_sigStack = NULL;
     }
+#endif
 
     if (s_defaultHandlerList.isEmpty())
         s_defaultHandlerList << SIGINT << SIGTERM << SIGSEGV << SIGABRT
+                             << SIGFPE << SIGILL;
 #ifndef _WIN32
-                             << SIGBUS 
-#endif
-                             << SIGFPE << SIGILL << SIGRTMIN;
+        s_defaultHandlerList << SIGBUS << SIGRTMIN;
 
-#ifndef _WIN32
     if (::socketpair(AF_UNIX, SOCK_STREAM, 0, sigFd))
     {
         cerr << "Couldn't create socketpair" << endl;
@@ -203,6 +203,10 @@ typedef struct {
 void SignalHandler::signalHandler(int signum, siginfo_t *info, void *context)
 {
     SignalInfo signalInfo;
+
+#ifdef _WIN32
+    info = NULL;
+#endif
 
     (void)context;
     signalInfo.signum = signum;
