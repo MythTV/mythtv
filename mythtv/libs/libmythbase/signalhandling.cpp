@@ -204,16 +204,20 @@ void SignalHandler::signalHandler(int signum, siginfo_t *info, void *context)
 {
     SignalInfo signalInfo;
 
-#ifdef _WIN32
-    info = NULL;
-#endif
-
     (void)context;
     signalInfo.signum = signum;
+#ifdef _WIN32
+    (void)info;
+    signalInfo.code   = 0;
+    signalInfo.pid    = 0;
+    signalInfo.uid    = 0;
+    signalInfo.value  = 0;
+#else
     signalInfo.code   = (info ? info->si_code : 0);
     signalInfo.pid    = (info ? (int)info->si_pid : 0);
     signalInfo.uid    = (info ? (int)info->si_uid : 0);
     signalInfo.value  = (info ? *(uint64_t *)&info->si_value : 0);
+#endif
 
     // Keep trying if there's no room to write, but stop on error (-1)
     int index = 0;
