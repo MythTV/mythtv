@@ -1551,7 +1551,8 @@ void MythUIImage::customEvent(QEvent *event)
                      ++it)
                 {
                     MythImage *im = (*it).first;
-                    im->DecrRef();
+                    if (im)
+                        im->DecrRef();
                 }
 
                 delete animationFrames;
