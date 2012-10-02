@@ -30,7 +30,7 @@ The source of all cover art and screen shots are from those downloaded and maint
 Miro v2.0.3 or later must already be installed and configured and capable of downloading videos.
 '''
 
-__version__=u"v0.6.8"
+__version__=u"v0.6.9"
 # 0.1.0 Initial development
 # 0.2.0 Initial Alpha release for internal testing only
 # 0.2.1 Fixes from initial alpha test
@@ -209,6 +209,7 @@ __version__=u"v0.6.8"
 #           by MythVideo
 #       Fixed the options "-h, --help" command line display
 # 0.6.8 Sometimes Miro metadata has no video filename. Skip these invalid videos.
+# 0.6.9 Adjust to datetime issues with MythTV v0.26's move to UTC datatimes in DB
 
 examples_txt=u'''
 For examples, please see the Mirobridge's wiki page at http://www.mythtv.org/wiki/MiroBridge
@@ -216,8 +217,9 @@ For examples, please see the Mirobridge's wiki page at http://www.mythtv.org/wik
 
 # Common function imports
 import sys, os, re, locale, subprocess, locale, ConfigParser, codecs, shutil, struct
-import datetime, fnmatch, string, time, logging, traceback, platform, fnmatch, ConfigParser
-from datetime import date
+import fnmatch, string, time, logging, traceback, platform, fnmatch, ConfigParser
+from datetime import timedelta
+from dateutil.tz import tzutc, tzlocal
 from optparse import OptionParser
 from socket import gethostbyname
 import formatter
@@ -392,6 +394,7 @@ try:
     from MythTV import OldRecorded, Recorded, RecordedProgram, Record, Channel, \
                         MythDB, Video, MythVideo, MythBE, MythError, MythLog
     from MythTV.database import DBDataWrite
+    from MythTV.utility import datetime
     mythdb = None
     mythbeconn = None
     try:
@@ -634,7 +637,7 @@ def isMiroRunning():
     return False if Miro is NOT running
     '''
     try:
-        p = subprocess.Popen(u'ps aux | grep "miro.real"', shell=True, bufsize=4096, 
+        p = subprocess.Popen(u'ps aux | grep "miro.real"', shell=True, bufsize=4096,
                              stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                              close_fds=True)
     except:
@@ -676,34 +679,48 @@ def is_not_punct_char(char):
     return not is_punct_char(char)
 
 
-class delOldRecorded( OldRecorded ):
+def delOldRecorded(chanid, starttime, endtime, title, \
+                   subtitle, description):
     '''
-    Just delete an oldrecorded record. Never abort as sometimes a record may not exist.
-    This routine is not supported in the native python bindings as MiroBridge uses the 
-    oldrecorded table outside of its original intent.  return nothing
+    This routine is not supported in the native python bindings as MiroBridge uses the
+    oldrecorded table outside of its original intent.
+    return nothing
     '''
-    _table = 'oldrecorded'
-    def delete(self):
-        """
-        Delete video entry from database.
-        """
-        DBDataWrite.delete(self)
+    sql_cmd = u"""DELETE FROM `mythconverg`.`oldrecorded`
+                        WHERE `oldrecorded`.`chanid` = '%s'
+                          AND `oldrecorded`.`starttime` = '%s'
+                          AND `oldrecorded`.`endtime` = '%s';"""
+    sql_del_a_record(sql_cmd, (chanid, set_del_datatime(starttime), set_del_datatime(endtime)))
 # end delOldRecorded()
-MythDB.searchOldRecorded.handler = delOldRecorded
 
 
-class delRecorded( Recorded ):
+def delRecorded(chanid, starttime):
     '''Just delete a recorded record. Never abort as sometimes a record may not exist.
     return nothing
     '''
-    _table = 'recorded'
-    def delete(self):
-        """
-        Delete video entry from database.
-        """
-        DBDataWrite.delete(self)
+    sql_cmd = u"""DELETE FROM `mythconverg`.`recorded`
+                        WHERE `recorded`.`chanid` = %s
+                          AND `recorded`.`starttime` = '%s';"""
+    sql_del_a_record(sql_cmd, (chanid, set_del_datatime(starttime)))
 # end delRecorded()
-MythDB.searchRecorded.handler = delRecorded
+
+
+def set_del_datatime(rec_time):
+    ''' Set the SQL datetime so that the delRecorded and delOldrecorded
+    methods use UTC datetime values.
+    return rec_time
+    '''
+    #
+    return rec_time.replace(tzinfo=tzlocal()).astimezone(
+                    tzutc()).strftime("%Y-%m-%d %H:%M:%S")
+
+def sql_del_a_record(sql_cmd):
+    ## Get a MythTV data base cursor
+    cursor = mythdb.cursor()
+    cursor.execute(sql_cmd)
+    cursor.close()
+    #
+    return
 
 
 def hashFile(filename):
@@ -1170,8 +1187,9 @@ def getOldrecordedOrphans():
             try:
             # Sometimes a channel issues videos with identical publishing (starttime) dates.
             # Try to using additiional details to identify the correct oldrecord.
-                delOldRecorded((channel_id, data['starttime'], data['endtime'], data['title'],
-                                data['subtitle'], data['description'])).delete()
+                delOldRecorded(channel_id, data['starttime'],
+                                data['endtime'], data['title'],
+                                data['subtitle'], data['description'])
             except:
                 pass
 
@@ -1208,7 +1226,7 @@ def getStartEndTimes(duration, downloadedTime):
     return an array of initialised values if either duration or downloadedTime is invalid
     return an array of the video's start, end times and isotime
     '''
-    starttime = datetime.datetime.now()
+    starttime = datetime.now()
     end = starttime
     start_end = [starttime.strftime('%Y-%m-%d %H:%M:%S'),
                  starttime.strftime('%Y-%m-%d %H:%M:%S'),
@@ -1218,8 +1236,8 @@ def getStartEndTimes(duration, downloadedTime):
         try:
             dummy = downloadedTime.strftime('%Y-%m-%d')
         except ValueError:
-            downloadedTime = datetime.datetime.now()
-        end = downloadedTime+datetime.timedelta(seconds=duration)
+            downloadedTime = datetime.now()
+        end = downloadedTime+timedelta(seconds=duration)
         start_end[0] = downloadedTime.strftime('%Y-%m-%d %H:%M:%S')
         start_end[1] = end.strftime('%Y-%m-%d %H:%M:%S')
         start_end[2] = downloadedTime.strftime('%Y%m%d%H%M%S')
@@ -1229,8 +1247,8 @@ def getStartEndTimes(duration, downloadedTime):
     while True:
         if not len(list(mythdb.searchOldRecorded(chanid=channel_id, starttime=start_end[0]))):
             break
-        starttime = starttime + datetime.timedelta(0,1)
-        end = end + datetime.timedelta(0,1)
+        starttime = starttime + timedelta(0,1)
+        end = end + timedelta(0,1)
         start_end[0] = starttime.strftime('%Y-%m-%d %H:%M:%S')
         start_end[1] = end.strftime('%Y-%m-%d %H:%M:%S')
         start_end[2] = starttime.strftime('%Y%m%d%H%M%S')
@@ -1574,7 +1592,7 @@ def createChannelRecord(icon, channel_id, channel_num):
         data['icon'] = icon
     data['callsign'] = u'Miro'
     data['name'] = u'Miro'
-    data['last_record'] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    data['last_record'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
     if simulation:
         logger.info(u"Simulation: Create Miro channel record channel_id(%d) and channel_num(%d)" % \
@@ -1740,7 +1758,7 @@ def updateMythRecorded(items):
                 try:
                     # Attempting to clean up an recorded record and
                     # its associated video file (miro symlink)
-                    rtn = delRecorded((record['chanid'], record['starttime'])).delete()
+                    rtn = delRecorded(record['chanid'], record['starttime'])
                 except MythError, e:
                     pass
 
@@ -1750,9 +1768,9 @@ def updateMythRecorded(items):
                              record[u'starttime'].strftime('%Y%m%d%H%M%S'), u'png'))
 
                 try: # Attempting to clean up an orphaned oldrecorded record which may or may not exist
-                    rtn = delOldRecorded((record['chanid'], record['starttime'],
+                    rtn = delOldRecorded(record['chanid'], record['starttime'],
                                           record['endtime'], record['title'],
-                                          record['subtitle'], record['description'])).delete()
+                                          record['subtitle'], record['description'])
                 except Exception, e:
                     pass
 
@@ -1913,10 +1931,12 @@ def updateMythVideo(items):
                     try: # An orphaned oldrecorded record may not exist
                         for oldrecorded in mythdb.searchOldRecorded(title=record[u'title'],
                                                                     subtitle=record[u'subtitle'] ):
-                            rtn = delOldRecorded((channel_id, oldrecorded['starttime'], \
-                                                  oldrecorded['endtime'], oldrecorded['title'], \
-                                                  oldrecorded['subtitle'], oldrecorded['description'])).\
-                                        delete()
+                            rtn = delOldRecorded(channel_id,
+                                                oldrecorded['starttime'],
+                                                oldrecorded['endtime'],
+                                                oldrecorded['title'],
+                                                oldrecorded['subtitle'],
+                                                oldrecorded['description'])
                     except Exception, e:
                         pass
                 statistics[u'Total_Miro_MythVideos']-=1
