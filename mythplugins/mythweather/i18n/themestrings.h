@@ -47,7 +47,7 @@ void strings_null() {
     ThemeUI::tr("Weather Location Search");
     ThemeUI::tr("Humidity:");
     ThemeUI::tr("Pressure:");
-    ThemeUI::tr("Wind(Gust):");
+    ThemeUI::tr("Wind (Gust):");
     ThemeUI::tr("Wind Direction:");
     ThemeUI::tr("Visibility:");
     ThemeUI::tr("Feels Like:");

@@ -235,6 +235,13 @@ class Metadata( DictData ):
         if xml is not None:
             self._process(xml)
 
+    def __setitem__(self, key, value):
+        if key not in self._field_order:
+                raise KeyError(str(key))
+        if self._global_type[key] in (4,6):
+            value = datetime.duck(value)
+        dict.__setitem__(self, key, value)
+
     def _fillNone(self):
         DictData._fillNone(self)
         for subgroup in self._groups:

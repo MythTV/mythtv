@@ -13,28 +13,25 @@ If you are just looking for the code formatting standards,
 see the official %MythTV wiki article
 <a href="http://www.mythtv.org/wiki/index.php/Coding_Standards">
 coding standards</a>. If you are looking for the
-<a href="http://svn.mythtv.org/trac/wiki/TicketHowTo">bug tracker</a>,
+<a href="http://code.mythtv.org/trac/wiki/TicketHowTo">bug tracker</a>,
 it can be found on the official pages.
 If you haven't already, you should subscribe to
 the <a href="http://www.mythtv.org/mailman/listinfo/mythtv-dev/">
-developer mailing list</a> and the <a href="http://www.mythtv.org/mailman/listinfo/mythtv-commits/">SVN commits mailing list</a>
+developer mailing list</a> and the <a href="http://www.mythtv.org/mailman/listinfo/mythtv-commits/">Commits mailing list</a>
 
 If you just stumbled onto the developer pages
 by accident, maybe you want to go to the official
-<a href="http://www.mythtv.org/modules.php?name=MythInstall">%MythTV
-Installation page</a>. There is also a good unofficial
-<a href="http://wilsonet.com/mythtv/fcmyth.php">Fedora %MythTV installation</a> page,
-and a
-<a href="http://dev.gentoo.org/~cardoe/mythtv/">Gentoo %MythTV installation</a> page.
+<a href="http://www.mythtv.org/docs/">%MythTV
+ User Documentation</a> or <a href="http://wiki.mythtv.org/">%MythTV
+ Wiki</a>.
 
 If you are new to Qt programming it is essential that you keep in mind
 that almost all Qt objects are not thread-safe, including QString.
 Almost all Qt container objects, including QString, make shallow copies
 on assignment, the two copies of the object must only be used in one
 thread unless you use a lock on the object. You can use the
-<a href="http://doc.trolltech.com/3.1/qdeepcopy.html">QDeepCopy</a>
-template on most Qt containers to make a copy you can use in another
-thread.
+QString::detach() on a QString to force a deep copy to be made instead,
+which can then be used in another thread.
 
 There are some special dangers when
 \ref qobject_dangers "using QObject" outside the Qt event thread.
@@ -237,8 +234,6 @@ The database schema is documented \ref db_schema "here".
   <dt>mythgame    <dd>Launches PC games and game system emulators.
   <dt>mythmusic   <dd>A simple music player for your %TV.
   <dt>mythnews    <dd>Browses RSS news feeds.
-  <dt>mythvideo   <dd>Launch DVD players, and a browser for other video files
-                      (non-%MythTV recordings).
   <dt>mythweather <dd>Presents your local weather report.
   <dt>mythzoneminder<dd>Video surveilance system interface.
 </dl>

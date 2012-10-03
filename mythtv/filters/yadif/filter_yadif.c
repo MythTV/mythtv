@@ -724,15 +724,19 @@ const FilterInfo filter_table[] =
 {
     {
             filter_init: &YadifDeintFilter,
-            name:       "yadifdeint",
-            descript:   "combines data from several fields to deinterlace with less motion blur",
+            name:       (char*)"yadifdeint",
+            descript:   (char*)
+            "combines data from several fields to "
+            "deinterlace with less motion blur",
             formats:    FmtList,
             libname:    NULL
     },
     {
             filter_init: &YadifDeintFilter,
-            name:       "yadifdoubleprocessdeint",
-            descript:   "combines data from several fields to deinterlace with less motion blur",
+            name:       (char*)"yadifdoubleprocessdeint",
+            descript:   (char*)
+            "combines data from several fields to "
+            "deinterlace with less motion blur",
             formats:    FmtList,
             libname:    NULL
     },

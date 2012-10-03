@@ -179,10 +179,7 @@ bool MSqlDatabase::OpenDatabase(bool skipdb)
                     QString("Connected to database '%1' at host: %2")
                             .arg(m_db.databaseName()).arg(m_db.hostName()));
 
-            // Make sure NOW() returns time in UTC...
-            m_db.exec("SET @@session.time_zone='+00:00'");
-            // Disable strict mode
-            m_db.exec("SET @@session.sql_mode=''");
+            InitSessionVars();
 
             // WriteDelayed depends on SetHaveDBConnection() and SetHaveSchema()
             // both being called with true, so order is important here.
@@ -240,9 +237,20 @@ bool MSqlDatabase::Reconnect()
 
     bool open = m_db.isOpen();
     if (open)
+    {
         LOG(VB_GENERAL, LOG_INFO, "MySQL reconnected successfully");
+        InitSessionVars();
+    }
 
     return open;
+}
+
+void MSqlDatabase::InitSessionVars()
+{
+    // Make sure NOW() returns time in UTC...
+    m_db.exec("SET @@session.time_zone='+00:00'");
+    // Disable strict mode
+    m_db.exec("SET @@session.sql_mode=''");
 }
 
 // -----------------------------------------------------------------------

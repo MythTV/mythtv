@@ -316,8 +316,8 @@ const FilterInfo filter_table[] =
 {
     {
         filter_init: &newAdjustFilter,
-        name:       "adjust",
-        descript:   "adjust range and gamma of video",
+        name:       (char*)"adjust",
+        descript:   (char*)"adjust range and gamma of video",
         formats:    FmtList,
         libname:    NULL
     },

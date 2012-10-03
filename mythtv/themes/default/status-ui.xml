@@ -121,11 +121,11 @@
                     <!--<imagetype name="icon">-->
                     <shape name="iconplaceholder">
                         <area>30,10,80,80</area>
-                        <fill color="#CC0000" />
+                        <fill color="#666666" />
                     </shape>
                     <!-- </imagetype>-->
                     <textarea name="status">
-                        <area>130,15,220,60</area>
+                        <area>130,15,220,80</area>
                         <font>basemedium</font>
                         <value>Backend is idle</value>
                         <align>allcenter</align>
@@ -133,18 +133,27 @@
                     </textarea>
                 </state>
                 <state name="recording" from="idle">
+                    <shape name="iconplaceholder">
+                        <fill color="#80DF00" />
+                    </shape>
                     <textarea name="status">
                         <value>Backend is recording</value>
                     </textarea>
                 </state>
                 <state name="shuttingdown" from="idle">
+                    <shape name="iconplaceholder">
+                        <fill color="#FFFF33" />
+                    </shape>
                     <textarea name="status">
-                        <value>Backend is recording</value>
+                        <value>Backend is shutting down</value>
                     </textarea>
                 </state>
                 <state name="offline" from="idle">
+                    <shape name="iconplaceholder">
+                        <fill color="#800900" />
+                    </shape>
                     <textarea name="status">
-                        <value>Backend is recording</value>
+                        <value>Backend is offline</value>
                     </textarea>
                 </state>
             </statetype>

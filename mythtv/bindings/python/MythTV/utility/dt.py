@@ -24,16 +24,22 @@ class basetzinfo( _pytzinfo ):
                              'time utc local offset abbrev isdst')
 
     def _get_transition(self, dt=None):
-        try:
-            index = self.__last
-        except AttributeError:
-            index = 0
+        if len(self._transitions) == 0:
+            self._get_transition = self._get_transition_empty
+        elif len(self._transitions) == 1:
+            self._get_transition = self._get_transition_single
+        else:
+            self.__last = 0
+            self._get_transition = self._get_transition_search
+        return self._get_transition(dt)
 
+    def _get_transition_search(self, dt=None):
         if dt is None:
             dt = _pydatetime.now()
         dt = (dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second)
 
         direction = 0
+        index = self.__last
         while True:
             if dt < self._transitions[index].local[0:5]:
                 if direction == 1:
@@ -46,10 +52,24 @@ class basetzinfo( _pytzinfo ):
                     break
                 else:
                     direction = 1
+
             index += direction
+            if index >= len(self._transitions):
+                # out of bounds future, use final transition
+                index = len(self._transitions) - 1
+                break
+            elif index < 0:
+                # out of bounds past, undefined time frame
+                raise RuntimeError(("Timezone does not have sufficiently "
+                                    "old data for search: {0}").format(dt))
 
         self.__last = index
         return self._transitions[index]
+
+    def _get_transition_empty(self, dt=None):
+        return self._Transition(0, None, None, 0, 'UTC', False)
+    def _get_transition_single(self, dt=None):
+        return self._transitions[0]
 
     def utcoffset(self, dt=None):
         return timedelta(0, self._get_transition(dt).offset)
@@ -121,16 +141,22 @@ class posixtzinfo( basetzinfo ):
         # read in transition type indexes
         types = [None]*counts.transitions
         for i in range(counts.transitions):
-            types[i] = unpack('!b', fd.read(1))[0]
+            types[i] = t = unpack('!b', fd.read(1))[0]
+            if t >= counts.types:
+                raise RuntimeError(("Transition has out-of-bounds definition "
+                            "index (given: {0}, max: {0}")\
+                                .format(t,counts.types-1))
 
         # read in type definitions
+        typedefs = []
         for i in range(counts.types):
             offset, isdst, _ = unpack('!lbB', fd.read(6))
-            for j in range(counts.transitions):
-                if types[j] == i:
-                    transitions[j][2] = time.gmtime(transitions[j][0]+offset)
-                    transitions[j][3] = offset
-                    transitions[j][5] = isdst
+            typedefs.append([offset, isdst])
+        for i in range(counts.transitions):
+            offset,isdst = typedefs[types[i]]
+            transitions[i][2] = time.gmtime(transitions[i][0] + offset)
+            transitions[i][3] = offset
+            transitions[i][5] = isdst
 
         # read in type names
         for i, name in enumerate(fd.read(counts.abbrevs)[:-1].split('\0')):
@@ -385,12 +411,22 @@ class datetime( _pydatetime ):
                 pass
         raise TypeError("time data '%s' does not match supported formats"%t)
 
-    def __init__(self, year, month, day, hour=None, minute=None, second=None,
-                       microsecond=None, tzinfo=None):
+    def __new__(cls, year, month, day, hour=None, minute=None, second=None,
+                      microsecond=None, tzinfo=None):
+        
         if tzinfo is None:
-            tzinfo = self.localTZ()
-        super(datetime, self).__init__(year, month, day, hour, minute, second,\
-                                       microsecond, tzinfo)
+            kwargs = {'tzinfo':cls.localTZ()}
+        else:
+            kwargs = {'tzinfo':tzinfo}
+        if hour is not None:
+            kwargs['hour'] = hour
+        if minute is not None:
+            kwargs['minute'] = minute
+        if second is not None:
+            kwargs['second'] = second
+        if microsecond is not None:
+            kwargs['microsecond'] = microsecond
+        return _pydatetime.__new__(cls, year, month, day, **kwargs)
 
     def mythformat(self):
         return self.astimezone(self.UTCTZ()).strftime('%Y%m%d%H%M%S')

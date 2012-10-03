@@ -143,44 +143,44 @@
         <translation>ZoneMinder Live-avspiller</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="41"/>
+        <location filename="themestrings.h" line="62"/>
         <source>[R] = Running
 [S] = Stopped</source>
         <translation>[R] = Kjører 
 [S] = Stoppet</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="42"/>
+        <location filename="themestrings.h" line="55"/>
         <source>Select Camera:</source>
         <translation>Velg kamera:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="43"/>
+        <location filename="themestrings.h" line="56"/>
         <source>Select Date:</source>
         <translation>Velg dato:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="44"/>
+        <location filename="themestrings.h" line="63"/>
         <source>Test</source>
         <translation>Test</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="45"/>
+        <location filename="themestrings.h" line="64"/>
         <source>Record</source>
         <translation>Ta opp</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="46"/>
+        <location filename="themestrings.h" line="65"/>
         <source>Cancel</source>
         <translation>Avbryt</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="47"/>
+        <location filename="themestrings.h" line="66"/>
         <source>Store</source>
         <translation>Lagre</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="48"/>
+        <location filename="themestrings.h" line="67"/>
         <source>[x]</source>
         <translation>[x]</translation>
     </message>
@@ -310,17 +310,115 @@
         <translation>Monitor 4</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="41"/>
+        <source>Configure Zoneminder console</source>
+        <translation>Konfigurer ZoneMinder konsoll</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="42"/>
+        <source>Monitor Function</source>
+        <translation>Monitor funksjon</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="43"/>
+        <source>Save</source>
+        <translation>Lagre</translation>
+    </message>
+    <message numerus="yes">
+        <location filename="themestrings.h" line="44"/>
+        <source>%name%  -  Source: %zmastatus%, function: %zmcstatus%</source>
+        <translation>
+            <numerusform>%name%  -  Kilde: %zmastatus%, function: %zmcstatus%</numerusform>
+            <numerusform>%name%  -  Kilder: %zmastatus%, function: %zmcstatus%</numerusform>
+        </translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="45"/>
+        <source>(%eventcount%)</source>
+        <translation>(%eventcount%)</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="46"/>
+        <source>%eventcount% Events:  %zmastatus% - %zmcstatus% function</source>
+        <translation>%eventcount% Hendelser:  %zmastatus% - %zmcstatus% funksjon</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="47"/>
+        <source>CCTV Status</source>
+        <translation>CCTV Status</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="48"/>
+        <source>System Load</source>
+        <translation>Systemlast</translation>
+    </message>
+    <message>
         <location filename="themestrings.h" line="49"/>
+        <source>Disk Usage</source>
+        <translation>Diskbruk</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="50"/>
+        <source>CCTV Time</source>
+        <translation>CCTV Tid</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="51"/>
+        <source>CCTV Date</source>
+        <translation>CCTV Dato</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="52"/>
+        <source>0.12</source>
+        <translation>0.12</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="53"/>
+        <source>100%</source>
+        <translation>100%</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="54"/>
+        <source>Look at the Zoneminder events list</source>
+        <translation>Se på Zoneminder hendelsesliste</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="57"/>
+        <source>Event No:</source>
+        <translation>Hendelse nr:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="58"/>
+        <source>%camera%:  %time% (%length%)</source>
+        <translation>%camera%:  %time% (%length%)</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="59"/>
+        <source>Delete</source>
+        <translation>Slett</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="60"/>
+        <source>Play</source>
+        <translation>Spill</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="61"/>
+        <source>CCTV Live Player</source>
+        <translation>CCTV Live-avspiller</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="68"/>
         <source>Show Console</source>
         <translation>Vis konsoll</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="50"/>
+        <location filename="themestrings.h" line="69"/>
         <source>Show Live View</source>
         <translation>Vis live-visning</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="51"/>
+        <location filename="themestrings.h" line="70"/>
         <source>Show Events</source>
         <translation>Vis hendelser</translation>
     </message>

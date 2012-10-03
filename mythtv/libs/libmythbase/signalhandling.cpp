@@ -63,14 +63,28 @@ SignalHandler::SignalHandler(QList<int> &signallist, QObject *parent) :
     s_exit_program = false; // set here due to "C++ static initializer madness"
     sig_str_init();
 
+#ifndef _WIN32
+    m_sigStack = new char[SIGSTKSZ];
+    stack_t stack;
+    stack.ss_sp = m_sigStack;
+    stack.ss_flags = 0;
+    stack.ss_size = SIGSTKSZ;
+
+    // Carry on without the signal stack if it fails
+    if (sigaltstack(&stack, NULL) == -1)
+    {
+        cerr << "Couldn't create signal stack!" << endl;
+        delete [] m_sigStack;
+        m_sigStack = NULL;
+    }
+#endif
+
     if (s_defaultHandlerList.isEmpty())
         s_defaultHandlerList << SIGINT << SIGTERM << SIGSEGV << SIGABRT
-#ifndef _WIN32
-                             << SIGBUS 
-#endif
                              << SIGFPE << SIGILL;
-
 #ifndef _WIN32
+        s_defaultHandlerList << SIGBUS << SIGRTMIN;
+
     if (::socketpair(AF_UNIX, SOCK_STREAM, 0, sigFd))
     {
         cerr << "Couldn't create socketpair" << endl;
@@ -107,7 +121,7 @@ SignalHandler::~SignalHandler()
     }
 
     QMutexLocker locker(&m_sigMapLock);
-    QMap<int, void (*)(void)>::iterator it = m_sigMap.begin();
+    QMap<int, SigHandlerFunc>::iterator it = m_sigMap.begin();
     for ( ; it != m_sigMap.end(); ++it)
     {
         int signum = it.key();
@@ -133,14 +147,14 @@ void SignalHandler::Done(void)
 }
 
 
-void SignalHandler::SetHandler(int signum, void (*handler)(void))
+void SignalHandler::SetHandler(int signum, SigHandlerFunc handler)
 {
     QMutexLocker locker(&s_singletonLock);
     if (s_singleton)
         s_singleton->SetHandlerPrivate(signum, handler);
 }
 
-void SignalHandler::SetHandlerPrivate(int signum, void (*handler)(void))
+void SignalHandler::SetHandlerPrivate(int signum, SigHandlerFunc handler)
 {
 #ifndef _WIN32
     const char *signame = strsignal(signum);
@@ -163,9 +177,11 @@ void SignalHandler::SetHandlerPrivate(int signum, void (*handler)(void))
     if (!sa_handler_already_set)
     {
         struct sigaction sa;
-        sa.sa_handler = SignalHandler::signalHandler;
+        sa.sa_sigaction = SignalHandler::signalHandler;
         sigemptyset(&sa.sa_mask);
-        sa.sa_flags = SA_RESTART;
+        sa.sa_flags = SA_RESTART | SA_SIGINFO;
+        if (m_sigStack)
+            sa.sa_flags |= SA_ONSTACK;
 
         sig_str_init(signum, qPrintable(signal_name));
 
@@ -176,12 +192,46 @@ void SignalHandler::SetHandlerPrivate(int signum, void (*handler)(void))
 #endif
 }
 
-void SignalHandler::signalHandler(int signum)
+typedef struct {
+    int signum;
+    int code;
+    int pid;
+    int uid;
+    uint64_t value;
+} SignalInfo;
+
+void SignalHandler::signalHandler(int signum, siginfo_t *info, void *context)
 {
-    char a = (char)signum;
+    SignalInfo signalInfo;
+
+    (void)context;
+    signalInfo.signum = signum;
+#ifdef _WIN32
+    (void)info;
+    signalInfo.code   = 0;
+    signalInfo.pid    = 0;
+    signalInfo.uid    = 0;
+    signalInfo.value  = 0;
+#else
+    signalInfo.code   = (info ? info->si_code : 0);
+    signalInfo.pid    = (info ? (int)info->si_pid : 0);
+    signalInfo.uid    = (info ? (int)info->si_uid : 0);
+    signalInfo.value  = (info ? *(uint64_t *)&info->si_value : 0);
+#endif
 
     // Keep trying if there's no room to write, but stop on error (-1)
-    while (::write(sigFd[0], &a, 1) == 0);
+    int index = 0;
+    int size  = sizeof(SignalInfo);
+    char *buffer = (char *)&signalInfo;
+    do {
+        int written = ::write(sigFd[0], &buffer[index], size);
+        // If there's an error, the signal will not be seen be the application,
+        // but we can't keep trying.
+        if (written < 0)
+            break;
+        index += written;
+        size  -= written;
+    } while (size > 0);
 
     // One must not return from SEGV, ILL, BUS or FPE. When these
     // are raised by the program itself they will immediately get
@@ -237,17 +287,31 @@ void SignalHandler::handleSignal(void)
 #ifndef _WIN32
     m_notifier->setEnabled(false);
 
-    char a;
-    int ret = ::read(sigFd[1], &a, sizeof(a));
-    int signum = (int)a;
-    (void)ret;
+    SignalInfo signalInfo;
+    int ret = ::read(sigFd[1], &signalInfo, sizeof(SignalInfo));
+    bool infoComplete = (ret == sizeof(SignalInfo));
+    int signum = (infoComplete ? signalInfo.signum : 0);
 
-    const char *signame = strsignal(signum);
-    signame = strdup(signame ? signame : "Unknown");
-    LOG(VB_GENERAL, LOG_CRIT, QString("Received %1").arg(signame));
-    free((void *)signame);
+    if (infoComplete)
+    {
+        const char *signame = strsignal(signum);
+        signame = strdup(signame ? signame : "Unknown Signal");
+        LOG(VB_GENERAL, LOG_CRIT,
+            QString("Received %1: Code %2, PID %3, UID %4, Value 0x%5")
+            .arg(signame) .arg(signalInfo.code) .arg(signalInfo.pid)
+            .arg(signalInfo.uid) .arg(signalInfo.value,8,16,QChar('0')));
+        free((void *)signame);
+    }
 
-    void (*handler)(void) = NULL;
+    SigHandlerFunc handler = NULL;
+    bool allowNullHandler = false;
+    if (signum == SIGRTMIN)
+    {
+        // glibc idiots seem to have made SIGRTMIN a macro that expands to a
+        // function, so we can't do this in the switch below.
+        // This uses the default handler to just get us here and to ignore it.
+        allowNullHandler = true;
+    }
 
     switch (signum)
     {
@@ -279,7 +343,7 @@ void SignalHandler::handleSignal(void)
         {
             handler();
         }
-        else
+        else if (!allowNullHandler)
         {
             LOG(VB_GENERAL, LOG_CRIT, QString("Recieved unexpected signal %1")
                 .arg(signum));

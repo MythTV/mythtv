@@ -218,7 +218,7 @@
     <message>
         <location filename="../mythmusic/editmetadata.cpp" line="635"/>
         <source>Save to File and Database</source>
-        <translation>Salavare il file e il database</translation>
+        <translation>Salvare il file e il database</translation>
     </message>
     <message>
         <location filename="../mythmusic/editmetadata.cpp" line="640"/>
@@ -234,7 +234,7 @@
         <location filename="../mythmusic/editmetadata.cpp" line="683"/>
         <location filename="../mythmusic/editmetadata.cpp" line="705"/>
         <source>Are you sure you want to save the modified metadata to the file?</source>
-        <translation>Essere sicuri di salvare veramente i metadati modificati nel file?</translation>
+        <translation>Essere veramente sicuri di salvare i metadati modificati nel file?</translation>
     </message>
     <message>
         <location filename="../mythmusic/editmetadata.cpp" line="387"/>
@@ -274,7 +274,7 @@
         <location filename="../mythmusic/importmusic.cpp" line="843"/>
         <location filename="../mythmusic/importmusic.cpp" line="1009"/>
         <source>Back Cover</source>
-        <translation>Copertina anteriore</translation>
+        <translation>Copertina posteriore</translation>
     </message>
     <message>
         <location filename="../mythmusic/importmusic.cpp" line="845"/>
@@ -433,7 +433,7 @@ Impossibile copiare file in: %1</translation>
     <message>
         <location filename="../mythmusic/miniplayer.cpp" line="566"/>
         <source>Smart</source>
-        <translation>Smart</translation>
+        <translation>Veloce</translation>
     </message>
     <message>
         <location filename="../mythmusic/miniplayer.cpp" line="571"/>
@@ -507,7 +507,7 @@ Impossibile copiare file in: %1</translation>
     <message>
         <location filename="../mythmusic/musicplayer.cpp" line="623"/>
         <source>playlist root</source>
-        <translation>Radice della playlist</translation>
+        <translation>Radice principale dell'elenco di riproduzione</translation>
     </message>
 </context>
 <context>
@@ -520,7 +520,7 @@ Impossibile copiare file in: %1</translation>
     <message>
         <location filename="../mythmusic/main.cpp" line="378"/>
         <source>Select music playlists</source>
-        <translation>Selezionare le playlist musicali</translation>
+        <translation>Selezionare l'elenco di riproduzione musicali</translation>
     </message>
     <message>
         <location filename="../mythmusic/main.cpp" line="380"/>
@@ -653,7 +653,7 @@ Impossibile copiare file in: %1</translation>
     <message>
         <location filename="../mythmusic/playbackbox.cpp" line="123"/>
         <source>Edit Playlist</source>
-        <translation>Modifica la playlist</translation>
+        <translation>Modificare l'elenco di riproduzione musicale</translation>
     </message>
     <message>
         <location filename="../mythmusic/playbackbox.cpp" line="125"/>
@@ -663,7 +663,7 @@ Impossibile copiare file in: %1</translation>
     <message>
         <location filename="../mythmusic/playbackbox.cpp" line="136"/>
         <source>3 Edit Playlist</source>
-        <translation>3 modificare playlist</translation>
+        <translation>3 modificare l'elenco di riproduzione</translation>
     </message>
     <message>
         <location filename="../mythmusic/playbackbox.cpp" line="138"/>
@@ -725,7 +725,7 @@ Impossibile copiare file in: %1</translation>
     <message>
         <location filename="../mythmusic/playbackbox.cpp" line="612"/>
         <source>Smart playlists</source>
-        <translation>Playlist intelligenti</translation>
+        <translation>Elenco di riproduzione veloce</translation>
     </message>
     <message>
         <location filename="../mythmusic/playbackbox.cpp" line="626"/>
@@ -770,7 +770,7 @@ Impossibile copiare file in: %1</translation>
     <message>
         <location filename="../mythmusic/playbackbox.cpp" line="2344"/>
         <source>Update Playlist Options</source>
-        <translation>Aggiornare opzioni playlist</translation>
+        <translation>Aggiornare opzioni dell'elenco di riproduzione</translation>
     </message>
     <message>
         <location filename="../mythmusic/playbackbox.cpp" line="2347"/>
@@ -847,7 +847,7 @@ Continuare la riproduzione in background?</translation>
     <message>
         <location filename="../mythmusic/playbackbox.cpp" line="1588"/>
         <source>Smart</source>
-        <translation>Smart</translation>
+        <translation>Veloce</translation>
     </message>
     <message>
         <location filename="../mythmusic/playbackbox.cpp" line="1593"/>
@@ -1072,7 +1072,7 @@ Continuare la riproduzione in background?</translation>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="255"/>
         <source>Used in &quot;Smart&quot; Shuffle mode. This weighting affects how much strength is given to your rating of a given track when ordering a group of songs.</source>
-        <translation>Usato in &quot;Smart&quot; modalità casuale. Questo peso influisce sulla quantità della forza è data alla valutazione di una data traccia quando si ordina un gruppo di canzoni.</translation>
+        <translation>Usato in modalità casuale veloce. Questo peso influisce sulla quantità della forza è data alla valutazione di una data traccia quando si ordina un gruppo di canzoni.</translation>
     </message>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="265"/>
@@ -1082,7 +1082,7 @@ Continuare la riproduzione in background?</translation>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="267"/>
         <source>Used in &quot;Smart&quot; Shuffle mode. This weighting affects how much strength is given to how many times a given track has been played when ordering a group of songs.</source>
-        <translation>Usato in &quot;Smart&quot; modalità casuale. Questo peso influisce sulla quantità della forza è data al tempo di una data traccia è stata suonata quando si ordina un gruppo di canzoni.</translation>
+        <translation>Usato in modalità casuale veloce. Questo peso influisce sulla quantità della forza è data al tempo di una data traccia è stata suonata quando si ordina un gruppo di canzoni.</translation>
     </message>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="277"/>
@@ -1092,7 +1092,7 @@ Continuare la riproduzione in background?</translation>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="279"/>
         <source>Used in &quot;Smart&quot; Shuffle mode. This weighting affects how much strength is given to how long it has been since a given track was played when ordering a group of songs.</source>
-        <translation>Usato in &quot;Smart&quot; modalità casuale. Questo peso influisce sulla quantità della forza è data alla lunghezza di una data traccia è stata suonata quando si ordina un gruppo di canzoni.</translation>
+        <translation>Usato in modalità casuale veloce. Questo peso influisce sulla quantità della forza è data alla lunghezza di una data traccia è stata suonata quando si ordina un gruppo di canzoni.</translation>
     </message>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="289"/>
@@ -1102,7 +1102,7 @@ Continuare la riproduzione in background?</translation>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="291"/>
         <source>Used in &quot;Smart&quot; Shuffle mode. This weighting affects how much strength is given to good old (peudo-)randomness when ordering a group of songs.</source>
-        <translation>Usato in &quot;Smart&quot; modalità casuale. Questo peso influisce sulla quantità della forza è data al buon vecchio (pseudo-)casualità quando si ordina un gruppo di canzoni.</translation>
+        <translation>Usato in modalità casuale veloce. Questo peso influisce sulla quantità della forza è data al buon vecchio (pseudo-)casualità quando si ordina un gruppo di canzoni.</translation>
     </message>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="325"/>
@@ -1320,7 +1320,7 @@ Continuare la riproduzione in background?</translation>
     <message>
         <location filename="../mythmusic/playlistcontainer.cpp" line="184"/>
         <source>All My Playlists</source>
-        <translation>Tutte le playlist</translation>
+        <translation>Tutti gli elenchi di riproduzione</translation>
     </message>
     <message>
         <location filename="../mythmusic/playlistcontainer.cpp" line="191"/>
@@ -1482,7 +1482,7 @@ Continuare la riproduzione in background?</translation>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="154"/>
         <source>Automatically put a new CD on the playlist and start playing the CD.</source>
-        <translation>Inserimento automatico di un nuovo CD nella playlist e avvio riproduzione del CD.</translation>
+        <translation>Inserimento automatico di un nuovo CD nell'elenco di riproduzione e avvio riproduzione del CD.</translation>
     </message>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="491"/>
@@ -2079,7 +2079,7 @@ Essere sicuri di rimuovere la traccia esistente?</translation>
     <message>
         <location filename="../mythmusic/smartplaylist.cpp" line="1769"/>
         <source>Smart Playlists</source>
-        <translation>Playlist intelligenti</translation>
+        <translation>Elenco di riproduzione veloce</translation>
     </message>
     <message>
         <location filename="../mythmusic/smartplaylist.cpp" line="1801"/>
@@ -2124,7 +2124,7 @@ Essere sicuri di rimuovere la traccia esistente?</translation>
     <message>
         <location filename="../mythmusic/smartplaylist.cpp" line="1969"/>
         <source>Are you sure you want to delete this SmartPlaylist?</source>
-        <translation>Essere sicuri di cancellare veramente questa playlist intelligente?</translation>
+        <translation>Essere veramente sicuri di cancellare veramente questo elenco di riproduzione veloce?</translation>
     </message>
 </context>
 <context>
@@ -2132,7 +2132,7 @@ Essere sicuri di rimuovere la traccia esistente?</translation>
     <message>
         <location filename="../mythmusic/smartplaylist.cpp" line="908"/>
         <source>Smart Playlist Editor</source>
-        <translation>Editor di playlist intelligente</translation>
+        <translation>Editor di elenco di riproduzione veloce</translation>
     </message>
     <message>
         <location filename="../mythmusic/smartplaylist.cpp" line="922"/>
@@ -2202,7 +2202,7 @@ Essere sicuri di rimuovere la traccia esistente?</translation>
     <message>
         <location filename="../mythmusic/smartplaylist.cpp" line="1331"/>
         <source>Smart Playlist Categories</source>
-        <translation>Categorie playlist intelligente</translation>
+        <translation>Categorie elenco di riproduzione veloce</translation>
     </message>
     <message>
         <location filename="../mythmusic/smartplaylist.cpp" line="1340"/>
@@ -2227,7 +2227,7 @@ Essere sicuri di rimuovere la traccia esistente?</translation>
     <message>
         <location filename="../mythmusic/smartplaylist.cpp" line="1414"/>
         <source>It will also delete any Smart Playlists belonging to this category.</source>
-        <translation>Sarà anche eliminato ogni playlist intelligente appartenente a questa categoria.</translation>
+        <translation>Sarà anche eliminato ogni elenco di riproduzione veloce appartenente a questa categoria.</translation>
     </message>
 </context>
 <context>

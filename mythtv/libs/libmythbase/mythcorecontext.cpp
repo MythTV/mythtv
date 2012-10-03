@@ -1406,27 +1406,25 @@ void MythCoreContext::UnregisterForPlayback(QObject *sender)
 }
 
 /**
- * \fn void MythCoreContext::WantingPlayback(QObject *sender)
- * All the objects that have registered using MythCoreContext::RegisterForPlayback
- * but sender will be called. The objet's registered method will be called
+ * All the objects that have registered using
+ * MythCoreContext::RegisterForPlayback
+ * but sender will be called. The object's registered method will be called
  * in a blocking fashion, each of them being called one after the other
  */
 void MythCoreContext::WantingPlayback(QObject *sender)
 {
     QMutexLocker lock(&d->m_playbackLock);
-    bool found = false;
     QByteArray ba;
-    const char *method;
+    const char *method = NULL;
 
     if (d->m_playbackClients.contains(sender))
     {
-        found = true;
         ba = d->m_playbackClients.value(sender);
         method = ba.constData();
         disconnect(this, SIGNAL(TVPlaybackAboutToStart()), sender, method);
     }
     emit TVPlaybackAboutToStart();
-    if (found)
+    if (method)
     {
         connect(this, SIGNAL(TVPlaybackAboutToStart()),
                 sender, method,

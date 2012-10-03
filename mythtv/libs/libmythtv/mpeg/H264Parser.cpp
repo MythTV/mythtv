@@ -1293,6 +1293,18 @@ uint H264Parser::aspectRatio(void) const
             // 160:99
             aspect *= 1.6161616161616161;
             break;
+        case 14:
+            // 4:3
+            aspect *= 1.3333333333333333;
+            break;
+        case 15:
+            // 3:2
+            aspect *= 1.5;
+            break;
+        case 16:
+            // 2:1
+            aspect *= 2.0;
+            break;
         case EXTENDED_SAR:
             if (sar_height)
                 aspect *= sar_width / (double)sar_height;

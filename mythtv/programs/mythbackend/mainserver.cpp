@@ -246,6 +246,27 @@ MainServer::MainServer(bool master, int port,
 
     mythserver = new MythServer();
     mythserver->setProxy(QNetworkProxy::NoProxy);
+
+    // test to make sure listen addresses are available
+    // no reason to run the backend if the mainserver is not active
+    QHostAddress config_v4(gCoreContext->GetSetting("BackendServerIP"));
+    bool v4IsSet = config_v4.isNull() ? false : true;
+#if !defined(QT_NO_IPV6)
+    QHostAddress config_v6(gCoreContext->GetSetting("BackendServerIP6"));
+    bool v6IsSet = config_v6.isNull() ? false : true;
+#endif
+    QList<QHostAddress> listenAddrs = mythserver->DefaultListen();
+
+    if ((v4IsSet && !listenAddrs.contains(config_v4))
+#if !defined(QT_NO_IPV6)
+        || (v6IsSet && !listenAddrs.contains(config_v6))
+#endif
+       )
+    {
+        SetExitCode(GENERIC_EXIT_SOCKET_ERROR, false);
+        return;
+    }
+
     if (!mythserver->listen(port))
     {
         SetExitCode(GENERIC_EXIT_SOCKET_ERROR, false);

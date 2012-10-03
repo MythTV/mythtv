@@ -1166,7 +1166,8 @@ When you are done configuring the weather plugin, click &quot;Finish&quot; to co
     </message>
     <message>
         <location filename="themestrings.h" line="50"/>
-        <source>Wind(Gust):</source>
+        <source>Wind (Gust):</source>
+        <oldsource>Wind(Gust):</oldsource>
         <translation>Tuulenpuuska:</translation>
     </message>
     <message>

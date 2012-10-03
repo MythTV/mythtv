@@ -80,8 +80,8 @@ const FilterInfo filter_table[] =
 {
     {
         filter_init: &new_filter,
-        name:       "invert",
-        descript:   "inverts the colors of the input video",
+        name:       (char*)"invert",
+        descript:   (char*)"inverts the colors of the input video",
         formats:    FmtList,
         libname:    NULL
     },

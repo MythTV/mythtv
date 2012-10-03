@@ -90,7 +90,6 @@ void strings_null() {
     ThemeUI::tr("0 MB");
     ThemeUI::tr("sep 13, 2004 11:00 pm (1h 15m)");
     ThemeUI::tr("x.xx GB");
-    ThemeUI::tr("Ok");
     ThemeUI::tr("x.xx Gb");
     ThemeUI::tr("Select Destination:");
     ThemeUI::tr("Parental level: %1");

@@ -153,7 +153,7 @@ Advanced options (experts only):
 
 External codec library options (used for mythffmpeg and streaming transcode):
   --enable-libmp3lame      enable MP3 encoding via libmp3lame [no]
-  --enable-libfaac         enable AAC encoding vic libfaac [no]
+  --enable-libfaac         enable AAC encoding via libfaac [no]
   --enable-libx264         enable H.264 encoding via x264 [no]
   --enable-libvpx          enable VP8 encoding via libvpx [no]
   --enable-libxvid         enable Xvid encoding via xvidcore,
@@ -4730,8 +4730,7 @@ if enabled gxx; then
     fi
     check_cxxflags -Wno-switch
     check_cxxflags -Wredundant-decls
-# Disable for 0.26 release, since we plan to fix these post 0.26
-#    check_cxxflags -Woverloaded-virtual
+    check_cxxflags -Woverloaded-virtual
     check_cxxflags -funit-at-a-time
 elif enabled icpc; then
     # 177: function declared but never referenced (triggers on Q_OBJECT)

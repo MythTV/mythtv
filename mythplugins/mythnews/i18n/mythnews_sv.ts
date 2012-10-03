@@ -37,6 +37,11 @@
         <translation>Okänd</translation>
     </message>
     <message>
+        <location filename="../mythnews/mythnews.cpp" line="703"/>
+        <source>Downloading media...</source>
+        <translation>Laddar ned media...</translation>
+    </message>
+    <message>
         <location filename="../mythnews/mythnews.cpp" line="900"/>
         <source>Manage Feeds</source>
         <translation>Hantera flöden</translation>
@@ -55,22 +60,6 @@
         <location filename="../mythnews/mythnews.cpp" line="905"/>
         <source>Delete Feed</source>
         <translation>Ta bort flöde</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="obsolete">Avbryt</translation>
-    </message>
-    <message>
-        <source>Edit News Site</source>
-        <translation type="obsolete">Redigera nyhetsplats</translation>
-    </message>
-    <message>
-        <source>Add News Site</source>
-        <translation type="obsolete">Lägg till nyhetsplats</translation>
-    </message>
-    <message>
-        <source>Delete News Site</source>
-        <translation type="obsolete">Ta bort nyhetsplats</translation>
     </message>
     <message>
         <location filename="../mythnews/mythnews.cpp" line="887"/>
@@ -132,10 +121,6 @@
         <translation>OK</translation>
     </message>
     <message>
-        <source>Ok</source>
-        <translation type="obsolete">Ok</translation>
-    </message>
-    <message>
         <location filename="../mythnews/mythnewseditor.cpp" line="94"/>
         <source>Cancel</source>
         <translation>Avbryt</translation>
@@ -144,60 +129,52 @@
 <context>
     <name>NewsSite</name>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="226"/>
+        <location filename="../mythnews/newssite.cpp" line="227"/>
         <source>Retrieve Failed. </source>
         <translation>Hämtning misslyckades. </translation>
     </message>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="233"/>
-        <location filename="../mythnews/newssite.cpp" line="242"/>
-        <location filename="../mythnews/newssite.cpp" line="251"/>
+        <location filename="../mythnews/newssite.cpp" line="234"/>
+        <location filename="../mythnews/newssite.cpp" line="243"/>
+        <location filename="../mythnews/newssite.cpp" line="252"/>
         <source>Failed to retrieve news</source>
         <translation>Misslyckades med att hämta nyheter</translation>
     </message>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="234"/>
+        <location filename="../mythnews/newssite.cpp" line="235"/>
         <source>No Cached News.</source>
         <translation>Inga hämtade nyheter.</translation>
     </message>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="253"/>
+        <location filename="../mythnews/newssite.cpp" line="254"/>
         <source>Failed to read downloaded file.</source>
         <translation>Misslyckades med att läsa den hämtade filen.</translation>
     </message>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="261"/>
+        <location filename="../mythnews/newssite.cpp" line="262"/>
         <source>Showing Cached News.</source>
         <translation>Visar hämtade nyheter.</translation>
     </message>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="282"/>
+        <location filename="../mythnews/newssite.cpp" line="283"/>
         <source>XML-file is not valid RSS-feed</source>
         <translation>XML-filen är inte ett giltig RSS-flöde</translation>
     </message>
 </context>
 <context>
-    <name>QObject</name>
-    <message>
-        <location filename="../mythnews/mythnews.cpp" line="703"/>
-        <source>Downloading media...</source>
-        <translation>Laddar ned media...</translation>
-    </message>
-</context>
-<context>
     <name>ThemeUI</name>
     <message>
-        <location filename="themestrings.h" line="8"/>
+        <location filename="themestrings.h" line="9"/>
         <source>%DATE%, %TIME%</source>
         <translation>%DATE%, %TIME%</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="9"/>
+        <location filename="themestrings.h" line="10"/>
         <source>Edit RSS News Feeds</source>
         <translation>Redigera RSS-flöde</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="10"/>
+        <location filename="themestrings.h" line="11"/>
         <source>You can edit the name, URL, and icon path for the selected RSS Feed on this screen.  You can also designate the item as a podcast.
 
 When you have finished editing, select &quot;OK&quot; or &quot;Cancel&quot; to continue.</source>
@@ -206,32 +183,32 @@ When you have finished editing, select &quot;OK&quot; or &quot;Cancel&quot; to c
 Välj &quot;OK&quot; eller &quot;Avbryt&quot; för att fortsätta.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="11"/>
+        <location filename="themestrings.h" line="12"/>
         <source>Name:</source>
         <translation>Namn:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="12"/>
+        <location filename="themestrings.h" line="13"/>
         <source>URL:</source>
         <translation>URL:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="13"/>
+        <location filename="themestrings.h" line="14"/>
         <source>Icon:</source>
         <translation>Ikon:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="14"/>
+        <location filename="themestrings.h" line="15"/>
         <source>Podcast:</source>
         <translation>Podd-tv:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="15"/>
+        <location filename="themestrings.h" line="16"/>
         <source>Genre:</source>
         <translation>Genre:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="16"/>
+        <location filename="themestrings.h" line="17"/>
         <source>Channel:</source>
         <translation>Kanal:</translation>
     </message>
@@ -251,17 +228,17 @@ Välj &quot;OK&quot; eller &quot;Avbryt&quot; för att fortsätta.</translation>
         <translation>OK</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="17"/>
+        <location filename="themestrings.h" line="18"/>
         <source>News Subscriptions</source>
         <translation>Nyhetsprenumerationer</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="18"/>
+        <location filename="themestrings.h" line="19"/>
         <source>Choose the news sites you would like to read.</source>
         <translation>Välj vilka nyhetssajter som du vill läsa.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="20"/>
+        <location filename="themestrings.h" line="8"/>
         <source>News Settings</source>
         <translation>Nyheter</translation>
     </message>
@@ -286,10 +263,6 @@ Välj &quot;OK&quot; eller &quot;Avbryt&quot; för att fortsätta.</translation>
         <translation>Redigera RSS-flöde</translation>
     </message>
     <message>
-        <source>Ok</source>
-        <translation type="obsolete">Ok</translation>
-    </message>
-    <message>
         <location filename="themestrings.h" line="25"/>
         <source>Contexts</source>
         <translation>Sammanhang</translation>
@@ -300,15 +273,7 @@ Välj &quot;OK&quot; eller &quot;Avbryt&quot; för att fortsätta.</translation>
         <translation>Åtgärder</translation>
     </message>
     <message>
-        <source>MythNews Configuration</source>
-        <translation type="obsolete">MythNews-inställningar</translation>
-    </message>
-    <message>
-        <source>Minutes</source>
-        <translation type="obsolete">Minuter</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="19"/>
+        <location filename="themestrings.h" line="20"/>
         <source>News Feeds</source>
         <translation>Nyheter</translation>
     </message>

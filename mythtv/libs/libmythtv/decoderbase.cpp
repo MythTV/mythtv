@@ -997,7 +997,8 @@ int DecoderBase::AutoSelectTrack(uint type)
                           m_parent->ForcedSubtitlesFavored());
             int position = numStreams - i;
             int language = 0;
-            for (int j = 0; language == 0 && j < languagePreference.size(); ++j)
+            for (uint j = 0;
+                 (language == 0) && (j < languagePreference.size()); ++j)
             {
                 if (tracks[type][i].language == languagePreference[j])
                     language = languagePreference.size() - j;

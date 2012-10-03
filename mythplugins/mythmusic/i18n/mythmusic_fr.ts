@@ -1006,7 +1006,7 @@ Désirez-vous continuer à l&apos;écouter en arrière-plan ?</translation>
     <message>
         <location filename="../mythmusic/main.cpp" line="577"/>
         <source>Play radio stream</source>
-        <translation>Écouter une radio internet</translation>
+        <translation>Écouter une radio Internet</translation>
     </message>
     <message>
         <location filename="../mythmusic/main.cpp" line="579"/>
@@ -1252,7 +1252,7 @@ Désirez-vous continuer à l&apos;écouter en arrière-plan ?</translation>
         <location filename="../mythmusic/playlisteditorview.cpp" line="429"/>
         <source>Are you sure you want to delete this Smart Playlist?
 Category: %1 - Name: %2</source>
-        <translation>Êtes-vous sûr de vouloir supprimer cette liste de lecture 
+        <translation>Êtes-vous sûr de vouloir supprimer cette liste de lecture ?
 Catégorie : %1 - Nom : %2</translation>
     </message>
     <message>

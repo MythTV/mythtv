@@ -98,8 +98,10 @@ const FilterInfo filter_table[] =
 {
     {
         filter_init: &new_filter,
-        name:       "onefield",
-        descript:   "one-field-only deinterlace filter; parameter \"bottom\" for bottom field, otherwise top",
+        name:       (char*)"onefield",
+        descript:   (char*)
+        "one-field-only deinterlace filter; "
+        "parameter \"bottom\" for bottom field, otherwise top",
         formats:    FmtList,
         libname:    NULL,
     },
