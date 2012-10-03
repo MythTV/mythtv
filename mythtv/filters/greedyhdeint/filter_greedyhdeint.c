@@ -277,15 +277,15 @@ const FilterInfo filter_table[] =
 {
     {
             filter_init: &GreedyHDeintFilter,
-            name:       "greedyhdeint",
-            descript:   "combines data from several fields to deinterlace with less motion blur",
+            name:       (char*)"greedyhdeint",
+            descript:   (char*)"combines data from several fields to deinterlace with less motion blur",
             formats:    FmtList,
             libname:    NULL
     },
     {
             filter_init: &GreedyHDeintFilter,
-            name:       "greedyhdoubleprocessdeint",
-            descript:   "combines data from several fields to deinterlace with less motion blur",
+            name:       (char*)"greedyhdoubleprocessdeint",
+            descript:   (char*)"combines data from several fields to deinterlace with less motion blur",
             formats:    FmtList,
             libname:    NULL
     },FILT_NULL

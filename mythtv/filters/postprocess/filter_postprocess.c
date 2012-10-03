@@ -137,8 +137,8 @@ const FilterInfo filter_table[] =
 {
     {
         filter_init: &new_filter,
-        name:       "postprocess",
-        descript:   "FFMPEG's postprocessing filters",
+        name:       (char*)"postprocess",
+        descript:   (char*)"FFMPEG's postprocessing filters",
         formats:    FmtList,
         libname:    NULL
     },

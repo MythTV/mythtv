@@ -99,29 +99,29 @@ const FilterInfo filter_table[] =
 {
     {
         filter_init: &new_force_yv12,
-        name:       "forceyv12",
-        descript:   "forces use of YV12 video format",
+        name:       (char*)"forceyv12",
+        descript:   (char*)"forces use of YV12 video format",
         formats:    Fmt_List_YV12,
         libname:    NULL
     },
     {
         filter_init: &new_force_yuv422p,
-        name:       "forceyuv422p",
-        descript:   "forces use of YUV422P video format",
+        name:       (char*)"forceyuv422p",
+        descript:   (char*)"forces use of YUV422P video format",
         formats:    Fmt_List_YUV422P,
         libname:    NULL
     },
     {
         filter_init: &new_force_rgb24,
-        name:       "forcergb24",
-        descript:   "forces use of RGB24 video format",
+        name:       (char*)"forcergb24",
+        descript:   (char*)"forces use of RGB24 video format",
         formats:    Fmt_List_RGB24,
         libname:    NULL
     },
     {
         filter_init: &new_force_argb32,
-        name:       "forceargb32",
-        descript:   "forces use of ARGB32 video format",
+        name:       (char*)"forceargb32",
+        descript:   (char*)"forces use of ARGB32 video format",
         formats:    Fmt_List_ARGB32,
         libname:    NULL
     },

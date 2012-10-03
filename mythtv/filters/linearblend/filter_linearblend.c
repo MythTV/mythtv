@@ -379,8 +379,8 @@ const FilterInfo filter_table[] =
 {
     {
         filter_init: &new_filter,
-        name:       "linearblend",
-        descript:   "fast blending deinterlace filter",
+        name:       (char*)"linearblend",
+        descript:   (char*)"fast blending deinterlace filter",
         formats:    FmtList,
         libname:    NULL
     },

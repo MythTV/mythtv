@@ -230,8 +230,8 @@ const FilterInfo filter_table[] =
 {
     {
         filter_init: &FieldorderDeintFilter,
-        name:       "fieldorderdoubleprocessdeint",
-        descript:   "avoids synchronisation problems when matching an "
+        name:       (char*)"fieldorderdoubleprocessdeint",
+        descript:   (char*)"avoids synchronisation problems when matching an "
                     "interlaced video mode to an interlaced source",
         formats:    FmtList,
         libname:    NULL

@@ -475,8 +475,9 @@ const FilterInfo filter_table[] =
 {
     {
         filter_init: &NewDenoise3DFilter,
-        name:       "denoise3d",
-        descript:   "removes noise with a spatial and temporal low-pass filter",
+        name:       (char*)"denoise3d",
+        descript:   (char*)
+        "removes noise with a spatial and temporal low-pass filter",
         formats:    FmtList,
         libname:    NULL
     },

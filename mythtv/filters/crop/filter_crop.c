@@ -304,8 +304,8 @@ const FilterInfo filter_table[] =
 {
     {
         filter_init: &new_filter,
-        name:       "crop",
-        descript:   "crops picture by macroblock intervals",
+        name:       (char*)"crop",
+        descript:   (char*)"crops picture by macroblock intervals",
         formats:    FmtList,
         libname:    NULL
     },
