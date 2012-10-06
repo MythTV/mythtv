@@ -105,6 +105,23 @@ void MythSystem::SetCommand(const QString &command,
 
     ProcessFlags(flags);
 
+    // add logging arguments
+    if (GetSetting("PropagateLogs"))
+    {
+        if (m_args.isEmpty())
+        {
+            m_command += logPropagateArgs;
+            if (!logPropagateQuiet())
+                m_command += " --quiet";
+        }
+        else
+        {
+            m_args << logPropagateArgList;
+            if (!logPropagateQuiet())
+                m_args << "--quiet";
+        }
+    }
+
     // check for execute rights
     if (!GetSetting("UseShell") && access(command.toUtf8().constData(), X_OK))
     {
@@ -320,6 +337,8 @@ void MythSystem::ProcessFlags(uint flags)
         m_settings["AnonLog"] = true;
     if( flags & kMSLowExitVal )
         m_settings["OnlyLowExitVal"] = true;
+    if( flags & kMSPropagateLogs )
+        m_settings["PropagateLogs"] = true;
 }
 
 QByteArray  MythSystem::Read(int size)
