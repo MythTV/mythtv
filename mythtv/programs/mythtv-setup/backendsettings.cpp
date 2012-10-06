@@ -27,7 +27,7 @@ static HostLineEdit *LocalServerIP6()
 {
     HostLineEdit *gc = new HostLineEdit("BackendServerIP6");
     gc->setLabel(QObject::tr("IPv6 address"));
-    gc->setValue("::1");
+    gc->setValue("");
     gc->setHelpText(QObject::tr("Enter the IPv6 address of this machine. "
                     "Use an externally accessible address (ie, not "
                     "::1) if you are going to be running a frontend "
@@ -36,7 +36,11 @@ static HostLineEdit *LocalServerIP6()
     gc->setEnabled(false);
 #else
     if (ServerPool::DefaultListenIPv6().isEmpty())
+    {
         gc->setEnabled(false);
+    }
+    else if (ServerPool::DefaultListenIPv6().contains(QHostAddress("::1")))
+        gc->setValue("::1");
 #endif
     return gc;
 }
