@@ -392,12 +392,12 @@ class Grabber( System ):
                 this method will return a fully populated object.
         """
         try:
-            if inetref.season and inetref.episode:
+            if (inetref.season is not None) and (inetref.episode is not None):
                 args = (inetref.inetref, inetref.season, inetref.episode)
             else:
                 args = (inetref.inetref,)
         except:
-            if season and episode:
+            if (season is not None) and (episode is not None):
                 args = (inetref, season, episode)
             else:
                 args = (inetref,)
