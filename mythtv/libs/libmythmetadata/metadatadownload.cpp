@@ -450,6 +450,8 @@ MetadataLookupList MetadataDownload::handleGame(MetadataLookup* lookup)
     QStringList args;
     args.append(QString("-l")); // Language Flag
     args.append(gCoreContext->GetLanguage()); // UI Language
+    args.append(QString("-a"));
+    args.append(gCoreContext->GetLocale()->GetCountryCode());
 
     // If the inetref is populated, even in kLookupSearch mode,
     // become a kLookupData grab and use that.
@@ -495,6 +497,9 @@ MetadataLookupList MetadataDownload::handleMovie(MetadataLookup* lookup)
         args.append(QString("-l")); // Language Flag
         args.append(gCoreContext->GetLanguage()); // UI Language
 
+        args.append(QString("-a"));
+        args.append(gCoreContext->GetLocale()->GetCountryCode());
+
         // If the inetref is populated, even in kLookupSearch mode,
         // become a kLookupData grab and use that.
         if (lookup->GetStep() == kLookupSearch &&
@@ -532,6 +537,9 @@ MetadataLookupList MetadataDownload::handleTelevision(MetadataLookup* lookup)
     QStringList args;
     args.append(QString("-l")); // Language Flag
     args.append(gCoreContext->GetLanguage()); // UI Language
+    
+    args.append(QString("-a"));
+    args.append(gCoreContext->GetLocale()->GetCountryCode());
 
     // If the inetref is populated, even in kLookupSearch mode,
     // become a kLookupData grab and use that.
@@ -595,6 +603,10 @@ MetadataLookupList MetadataDownload::handleVideoUndetermined(
     QStringList args;
     args.append(QString("-l")); // Language Flag
     args.append(gCoreContext->GetLanguage()); // UI Language
+
+    args.append(QString("-a"));
+    args.append(gCoreContext->GetLocale()->GetCountryCode());
+
     args.append(QString("-N"));
     if (!lookup->GetInetref().isEmpty())
     {
@@ -634,6 +646,11 @@ MetadataLookupList MetadataDownload::handleRecordingGeneric(
 
     args.append(QString("-l")); // Language Flag
     args.append(gCoreContext->GetLanguage()); // UI Language
+
+    args.append(QString("-a"));
+    args.append(gCoreContext->GetLocale()->GetCountryCode());
+
+
     args.append("-M");
     QString title = lookup->GetTitle();
     args.append(title);
