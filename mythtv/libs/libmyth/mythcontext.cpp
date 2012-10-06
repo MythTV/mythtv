@@ -440,7 +440,7 @@ bool MythContextPrivate::LoadDatabaseSettings(void)
     m_DBparams.LoadDefaults();
 
     m_DBparams.localHostName = m_pConfig->GetValue("LocalHostName", "");
-
+    m_DBparams.dbHostPing = m_pConfig->GetValue(kDefaultDB + "PingHost", true);
     m_DBparams.dbHostName = m_pConfig->GetValue(kDefaultDB + "Host", "");
     m_DBparams.dbUserName = m_pConfig->GetValue(kDefaultDB + "UserName", "");
     m_DBparams.dbPassword = m_pConfig->GetValue(kDefaultDB + "Password", "");
