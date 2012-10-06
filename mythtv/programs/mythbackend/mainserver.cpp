@@ -257,12 +257,22 @@ MainServer::MainServer(bool master, int port,
 #endif
     QList<QHostAddress> listenAddrs = mythserver->DefaultListen();
 
+    #if !defined(QT_NO_IPV6)
+    if (v6IsSet && !listenAddrs.contains(config_v6))
+        LOG(VB_GENERAL, LOG_WARNING, "Unable to find IPv6 address to bind");
+    #endif
+
+    if (v4IsSet && !listenAddrs.contains(config_v4))
+        LOG(VB_GENERAL, LOG_WARNING, "Unable to find IPv4 address to bind");
+    
     if ((v4IsSet && !listenAddrs.contains(config_v4))
 #if !defined(QT_NO_IPV6)
-        || (v6IsSet && !listenAddrs.contains(config_v6))
+        && (v6IsSet && !listenAddrs.contains(config_v6))
 #endif
        )
     {
+        LOG(VB_GENERAL, LOG_ERR, "Unable to find either IPv4 or IPv6 "
+                                 "address we can bind to, exiting");
         SetExitCode(GENERIC_EXIT_SOCKET_ERROR, false);
         return;
     }
