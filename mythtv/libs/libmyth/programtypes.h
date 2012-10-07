@@ -178,7 +178,7 @@ typedef enum AudioProps {
 #define kAudioPropertyOffset 0
 #define kAudioPropertyMask (0x3f<<kAudioPropertyOffset)
 
-/// if VideoProps changes, the audioprop column in program and
+/// if VideoProps changes, the videoprop column in program and
 /// recordedprogram has to changed accordingly
 typedef enum VideoProps {
     // For backwards compatibility do not change 0 or 1
@@ -189,12 +189,13 @@ typedef enum VideoProps {
     VID_720           = 0x08,
     VID_1080          = 0x10,
     VID_DAMAGED       = 0x20,
-} VideoProperty; // has 6 bits in ProgramInfo::properties
-#define kVideoPropertyBits 6
+    VID_3DTV          = 0x40,
+} VideoProperty; // has 7 bits in ProgramInfo::properties
+#define kVideoPropertyBits 7
 #define kVideoPropertyOffset kAudioPropertyBits
 #define kVideoPropertyMask (0x3f<<kVideoPropertyOffset)
 
-/// if SubtitleTypes changes, the audioprop column in program and
+/// if SubtitleTypes changes, the subtitletypes column in program and
 /// recordedprogram has to changed accordingly
 typedef enum SubtitleTypes {
     // For backwards compatibility do not change 0 or 1

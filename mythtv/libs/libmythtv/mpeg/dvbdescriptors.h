@@ -439,6 +439,9 @@ class ComponentDescriptor : public MPEGDescriptor
             case 0x0B: case 0x0C:
             case 0x0F: case 0x10:
                 return VID_WIDESCREEN | VID_HDTV;
+            case 0x80: case 0x81:
+            case 0x82: case 0x83:
+                return VID_WIDESCREEN | VID_HDTV | VID_3DTV;
             default:
                 return VID_UNKNOWN;
         }
