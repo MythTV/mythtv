@@ -829,6 +829,17 @@ QString NetworkControl::processPlay(NetworkCommand *nc, int clientID)
         message = QString("NETWORK_CONTROL VOLUME %1")
                           .arg(nc->getArg(2).toLower());
     }
+    else if (is_abbrev("subtitles", nc->getArg(1), 2))
+    {
+	if (nc->getArgCount() < 3)
+	    message = QString("NETWORK_CONTROL SUBTITLES 0");
+	else if (!nc->getArg(2).toLower().contains(QRegExp("^\\d+$")))
+	    return QString("ERROR: See 'help %1' for usage information")
+		.arg(nc->getArg(0));
+	else
+	    message = QString("NETWORK_CONTROL SUBTITLES %1")
+		.arg(nc->getArg(2));
+    }
     else
         return QString("ERROR: See 'help %1' for usage information")
                        .arg(nc->getArg(0));
@@ -1117,6 +1128,7 @@ QString NetworkControl::processHelp(NetworkCommand *nc)
             "play speed 1/3x        - Playback at 1/3x speed\r\n"
             "play speed 1/2x        - Playback at 1/2x speed\r\n"
             "play stop              - Stop playback\r\n"
+            "play subtitles [#]     - Switch on indicated subtitle tracks\r\n"
             "play music play        - Resume playback (MythMusic)\r\n"
             "play music pause       - Pause playback (MythMusic)\r\n"
             "play music stop        - Stop Playback (MythMusic)\r\n"

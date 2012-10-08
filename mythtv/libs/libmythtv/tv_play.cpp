@@ -4898,6 +4898,81 @@ void TV::ProcessNetworkControlCommand(PlayerContext *ctx,
                            tokens[2] == "POSITIONWITHCUTLIST");
         }
     }
+    else if (tokens.size() >= 3 && tokens[1] == "SUBTITLES")
+    {
+	bool ok = false;
+	int track = tokens[2].toInt(&ok);
+
+	if(!ok)
+	    return;
+
+	if (track == 0) 
+	{
+	    ctx->player->SetCaptionsEnabled(false,true);
+	}
+	else 
+	{
+	    uint start  = 1;
+	    QStringList subs = ctx->player->GetTracks(kTrackTypeSubtitle);
+	    uint finish = start + subs.size();
+	    if ( track >= start && track < finish )
+	    {
+		ctx->player->SetTrack(kTrackTypeSubtitle,track-start);
+		ctx->player->EnableCaptions(kDisplayAVSubtitle);
+		return;
+	    }
+
+	    start = finish + 1;
+	    subs = ctx->player->GetTracks(kTrackTypeCC708);
+	    finish = start + subs.size();
+	    if ( track >= start && track < finish )
+	    {
+		ctx->player->SetTrack(kTrackTypeCC708,track-start);
+		ctx->player->EnableCaptions(kDisplayCC708);		
+		return;
+	    }
+
+	    start = finish + 1;
+	    subs = ctx->player->GetTracks(kTrackTypeCC608);
+	    finish = start + subs.size();
+	    if ( track >= start && track < finish )
+	    {
+		ctx->player->SetTrack(kTrackTypeCC608,track-start);
+		ctx->player->EnableCaptions(kDisplayCC608);
+		return;
+	    }
+
+	    start = finish + 1;
+	    subs = ctx->player->GetTracks(kTrackTypeTeletextCaptions);
+	    finish = start + subs.size();
+	    if ( track >= start && track < finish )
+	    {
+		ctx->player->SetTrack(kTrackTypeTeletextCaptions,track-start);
+		ctx->player->EnableCaptions(kDisplayTeletextCaptions);
+		return;
+	    }
+
+	    start = finish + 1;
+	    subs = ctx->player->GetTracks(kTrackTypeTeletextMenu);
+	    finish = start + subs.size();
+	    if ( track >= start && track < finish )
+	    {
+		ctx->player->SetTrack(kTrackTypeTeletextMenu,track-start);
+		ctx->player->EnableCaptions(kDisplayTeletextMenu);
+		return;
+	    }
+
+	    start = finish + 1;
+	    subs = ctx->player->GetTracks(kTrackTypeRawText);
+	    finish = start + subs.size();
+	    if ( track >= start && track < finish )
+	    {
+		ctx->player->SetTrack(kTrackTypeRawText,track-start);
+		ctx->player->EnableCaptions(kDisplayRawTextSubtitle);
+		return;
+	    }
+	}
+    }
     else if (tokens.size() >= 3 && tokens[1] == "VOLUME")
     {
         QRegExp re = QRegExp("(\\d+)%");
@@ -5024,6 +5099,107 @@ void TV::ProcessNetworkControlCommand(PlayerContext *ctx,
                     .arg(fplay)
                     .arg(rate);
             }
+
+	    infoStr += QString(" Subtitles:");
+
+	    uint subtype = ctx->player->GetCaptionMode();
+
+	    if(subtype == kDisplayNone)
+		infoStr += QString(" *0:[None]*");
+	    else
+		infoStr += QString(" 0:[None]");
+
+	    uint n = 1;
+
+	    QStringList subs = ctx->player->GetTracks(kTrackTypeSubtitle);
+	    for (uint i = 0; i < (uint)subs.size(); i++) 
+	    {
+		if ((subtype & kDisplayAVSubtitle) 
+		    && ctx->player->GetTrack(kTrackTypeSubtitle) == (int)i) 
+		    infoStr += QString(" *%1:[%2]*")
+			.arg(n)
+			.arg(subs[i]);
+		else
+		    infoStr += QString(" %1:[%2]")
+			.arg(n)
+			.arg(subs[i]);
+		n++;
+	    }
+
+	    subs = ctx->player->GetTracks(kTrackTypeCC708);
+	    for (uint i = 0; i < (uint)subs.size(); i++) 
+	    {
+		if ((subtype & kDisplayCC708) 
+		    && ctx->player->GetTrack(kTrackTypeCC708) == (int)i) 
+		    infoStr += QString(" *%1:[%2]*")
+			.arg(n)
+			.arg(subs[i]);
+		else
+		    infoStr += QString(" %1:[%2]")
+			.arg(n)
+			.arg(subs[i]);
+		n++;
+	    }
+
+	    subs = ctx->player->GetTracks(kTrackTypeCC608);
+	    for (uint i = 0; i < (uint)subs.size(); i++) 
+	    {
+		if ((subtype & kDisplayCC608) 
+		    && ctx->player->GetTrack(kTrackTypeCC608) == (int)i) 
+		    infoStr += QString(" *%1:[%2]*")
+			.arg(n)
+			.arg(subs[i]);
+		else
+		    infoStr += QString(" %1:[%2]")
+			.arg(n)
+			.arg(subs[i]);
+		n++;
+	    }
+
+	    subs = ctx->player->GetTracks(kTrackTypeTeletextCaptions);
+	    for (uint i = 0; i < (uint)subs.size(); i++) 
+	    {
+		if ((subtype & kDisplayTeletextCaptions) 
+		    && ctx->player->GetTrack(kTrackTypeTeletextCaptions) == (int)i) 
+		    infoStr += QString(" *%1:[%2]*")
+			.arg(n)
+			.arg(subs[i]);
+		else
+		    infoStr += QString(" %1:[%2]")
+			.arg(n)
+			.arg(subs[i]);
+		n++;
+	    }
+
+	    subs = ctx->player->GetTracks(kTrackTypeTeletextMenu);
+	    for (uint i = 0; i < (uint)subs.size(); i++) 
+	    {
+		if ((subtype & kDisplayTeletextMenu) 
+		    && ctx->player->GetTrack(kTrackTypeTeletextMenu) == (int)i) 
+		    infoStr += QString(" *%1:[%2]*")
+			.arg(n)
+			.arg(subs[i]);
+		else
+		    infoStr += QString(" %1:[%2]")
+			.arg(n)
+			.arg(subs[i]);
+		n++;
+	    }
+
+	    subs = ctx->player->GetTracks(kTrackTypeRawText);
+	    for (uint i = 0; i < (uint)subs.size(); i++) 
+	    {
+		if ((subtype & kDisplayRawTextSubtitle) 
+		    && ctx->player->GetTrack(kTrackTypeRawText) == (int)i) 
+		    infoStr += QString(" *%1:[%2]*")
+			.arg(n)
+			.arg(subs[i]);
+		else
+		    infoStr += QString(" %1:[%2]")
+			.arg(n)
+			.arg(subs[i]);
+		n++;
+	    }
 
             ctx->UnlockPlayingInfo(__FILE__, __LINE__);
 
