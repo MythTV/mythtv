@@ -974,6 +974,13 @@ void MHEngine::RequestExternalContent(MHIngredient *pRequester)
     CancelExternalContentRequest(pRequester);
 
     QString csPath = GetPathName(pRequester->m_ContentRef.m_ContentRef);
+
+    if (csPath.isEmpty())
+    {
+        MHLOG(MHLogWarning, "RequestExternalContent empty path");
+        return;
+    }
+    
     if (m_Context->CheckCarouselObject(csPath))
     {
         // Available now - pass it to the ingredient.
