@@ -615,6 +615,27 @@ int main(int argc, char *argv[])
         LOG(VB_GENERAL, LOG_INFO, QString("    Found %1").arg(found));
     }
 
+    if (grab_data)
+    {
+        LOG(VB_GENERAL, LOG_INFO, "Fixing missing original airdates.");
+        MSqlQuery query(MSqlQuery::InitCon());
+
+        query.prepare("UPDATE program p "
+                      "JOIN ( "
+                      "  SELECT programid, MAX(originalairdate) maxoad "
+                      "  FROM program "
+                      "  WHERE programid <> '' AND "
+                      "        originalairdate IS NOT NULL "
+                      "  GROUP BY programid ) oad "
+                      "  ON p.programid = oad.programid "
+                      "SET p.originalairdate = oad.maxoad "
+                      "WHERE p.originalairdate IS NULL");
+
+        if (query.exec())
+            LOG(VB_GENERAL, LOG_INFO,
+                QString("    Found %1").arg(query.numRowsAffected()));
+    }
+
     if (mark_repeats)
     {
         LOG(VB_GENERAL, LOG_INFO, "Marking repeats.");
