@@ -324,7 +324,7 @@ MainServer::MainServer(bool master, int port,
     masterFreeSpaceList << "0";
     masterFreeSpaceList << "0";
     
-    master ? masterFreeSpaceListUpdater = new FreeSpaceUpdater(*this) : NULL;
+    masterFreeSpaceListUpdater = (master ? new FreeSpaceUpdater(*this) : NULL);
     if (masterFreeSpaceListUpdater)
     {
         MThreadPool::globalInstance()->startReserved(
