@@ -2282,6 +2282,7 @@ NULL
         
         const char *updates[] = {
 "ALTER TABLE channel MODIFY COLUMN icon varchar(255) NOT NULL DEFAULT '';",
+"UPDATE channel SET icon='' WHERE icon='none';",
 NULL
 };
         if (!performActualUpdate(&updates[0], "1308", dbver))
