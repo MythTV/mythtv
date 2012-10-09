@@ -280,6 +280,7 @@ using_frontend {
     HEADERS += tv_play_win.h            deletemap.h
     HEADERS += mythcommflagplayer.h     commbreakmap.h
     HEADERS += mythiowrapper.h          tvbrowsehelper.h
+    HEADERS += netstream.h
     SOURCES += tv_play.cpp              mythplayer.cpp
     SOURCES += audioplayer.cpp
     SOURCES += mythccextractorplayer.cpp teletextextractorreader.cpp
@@ -287,6 +288,7 @@ using_frontend {
     SOURCES += tv_play_win.cpp          deletemap.cpp
     SOURCES += mythcommflagplayer.cpp   commbreakmap.cpp
     SOURCES += mythiowrapper.cpp        tvbrowsehelper.cpp
+    SOURCES += netstream.cpp
 
     # Text subtitle parser
     HEADERS += textsubtitleparser.h     xine_demux_sputext.h
@@ -423,8 +425,8 @@ using_frontend {
         SOURCES += dsmccbiop.cpp            dsmccobjcarousel.cpp
 
          # MHEG interaction channel
-        HEADERS += mhegic.h                 netstream.h
-        SOURCES += mhegic.cpp               netstream.cpp
+        HEADERS += mhegic.h
+        SOURCES += mhegic.cpp
 
         # MHEG/MHI stuff
         HEADERS += interactivetv.h          mhi.h
