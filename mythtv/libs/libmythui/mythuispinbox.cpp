@@ -97,8 +97,10 @@ void MythUISpinBox::AddSelection(int value, const QString &label)
     {
         item = GetItemByData(value);
         if (item)
+        {
             item->SetText(label);
-        return;
+            return;
+        }
     }
     
     int insertPos=-1;
