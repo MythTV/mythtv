@@ -359,12 +359,13 @@ bool EditMetadataDialog::Create(void)
         return false;
     }
 
-    m_yearSpin->SetRange(0, 9999, 1);
-    m_trackSpin->SetRange(0, 9999, 1);
+    m_yearSpin->SetRange(QDate::currentDate().year(), 1000, 1);
+    m_yearSpin->AddSelection(0, "None");
+    m_trackSpin->SetRange(0, 999, 1);
 
     if (m_ratingSpin)
     {
-        m_ratingSpin->SetRange(0, 10, 1);
+        m_ratingSpin->SetRange(0, 10, 1, 2);
         connect(m_ratingSpin, SIGNAL(itemSelected(MythUIButtonListItem*)),
                 SLOT(ratingSpinChanged(MythUIButtonListItem*)));
     }
