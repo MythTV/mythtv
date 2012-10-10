@@ -310,6 +310,78 @@ DTC::EncoderList* Dvr::GetEncoderList()
 //
 /////////////////////////////////////////////////////////////////////////////
 
+QStringList Dvr::GetRecGroupList()
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    QString querystr = QString("SELECT DISTINCT recgroup FROM record");
+
+    query.prepare(querystr);
+
+    QStringList result;
+    if (!query.exec())
+    {
+        MythDB::DBError("GetRecGroupList record", query);
+        return result;
+    }
+
+    while (query.next())
+        result << query.value(0).toString();
+
+    querystr = QString("SELECT DISTINCT recgroup FROM recorded");
+
+    query.prepare(querystr);
+
+    if (!query.exec())
+    {
+        MythDB::DBError("GetRecGroupList recorded", query);
+        return result;
+    }
+
+    while (query.next())
+    {
+        QString value = query.value(0).toString();
+
+        if (!result.contains(value))
+            result << value;
+    }
+
+    result.sort();
+
+    return result;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+QStringList Dvr::GetTitleList()
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    QString querystr = QString("SELECT DISTINCT title FROM recorded");
+
+    query.prepare(querystr);
+
+    QStringList result;
+    if (!query.exec())
+    {
+        MythDB::DBError("GetTitleList recorded", query);
+        return result;
+    }
+
+    while (query.next())
+        result << query.value(0).toString();
+
+    result.sort();
+
+    return result;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
 DTC::ProgramList* Dvr::GetUpcomingList( int  nStartIndex,
                                         int  nCount,
                                         bool bShowAll )

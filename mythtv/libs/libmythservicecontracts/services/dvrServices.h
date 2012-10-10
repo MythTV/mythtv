@@ -38,7 +38,7 @@
 class SERVICE_PUBLIC DvrServices : public Service  //, public QScriptable ???
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "1.5" );
+    Q_CLASSINFO( "version"    , "1.6" );
     Q_CLASSINFO( "RemoveRecordedItem_Method",                   "POST" )
     Q_CLASSINFO( "AddRecordSchedule_Method",                    "POST" )
     Q_CLASSINFO( "RemoveRecordSchedule_Method",                 "POST" )
@@ -87,6 +87,10 @@ class SERVICE_PUBLIC DvrServices : public Service  //, public QScriptable ???
                                                            bool             ShowAll    ) = 0;
 
         virtual DTC::EncoderList*  GetEncoderList        ( ) = 0;
+
+        virtual QStringList        GetRecGroupList       ( ) = 0;
+
+        virtual QStringList        GetTitleList          ( ) = 0;
 
         // Recording Rules
 
