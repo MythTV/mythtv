@@ -42,6 +42,9 @@
 -->
     <li><a href='#'><i18n>Information</i18n></a>
       <ul class="acitem collapsible">
+<!--
+        <li><a class='menuitem' href='#' onClick="javascript:loadContent('/misc/overview.qsp')"><i18n>Overview</i18n></a></li>
+-->
         <li><a class='menuitem' href='#' onClick="javascript:loadContent('/Status/GetStatusHTML')"><i18n>Backend Status</i18n></a></li>
         <li><a class='menuitem' href='#' onClick="javascript:loadMiscPage('viewlogs')"><i18n>View Logs</i18n></a></li>
       </ul>
