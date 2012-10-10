@@ -453,9 +453,20 @@ class _Mythtv_data:
 
         return myth_systemrole , mythremote
 
-
-
-
+    def ProcessLogUrgency(self):
+        c = _DB.cursor()
+        c.execute("""SELECT level,count(level) FROM logging GROUP BY level""")
+        levels = ('EMERG', 'ALERT', 'CRIT', 'ERR', 
+                  'WARNING', 'NOTICE', 'INFO') # ignore debugging from totals
+        counts = {}
+        total = 0.
+        for level,count in c.fetchall():
+            if level in range(len(levels)):
+                counts[levels[level]] = count
+                total += count
+        for k,v in counts.items():
+            counts[k] = v/total
+        return {'logurgency':counts}
 
     def get_data(self,gate):
         self._data = OrdDict()
@@ -469,7 +480,8 @@ class _Mythtv_data:
                      self.ProcessVideoProfile,
                      self.ProcessMySQL,
                      self.ProcessScheduler,
-                     self.Processtuners):
+                     self.Processtuners,
+                     self.ProcessLogUrgency):
             try:
                 self._data.update(func())
             except:
