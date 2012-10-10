@@ -105,16 +105,20 @@ bool HtmlServerExtension::ProcessRequest( HTTPRequest *pRequest )
                     // Is this a Qt Server Page (File contains script)...
                     // ------------------------------------------------------
 
-                    QString sSuffix = oInfo.suffix();
+                    QString sSuffix = oInfo.suffix().toLower();
 
-                    if ((sSuffix.compare( "qsp", Qt::CaseInsensitive ) == 0) ||
-                        (sSuffix.compare( "qjs", Qt::CaseInsensitive ) == 0)) 
+                    if ((sSuffix == "qsp") ||
+                        (sSuffix == "qxml") ||
+                        (sSuffix == "qjs" )) 
                     {
-                        pRequest->m_eResponseType = ResponseTypeHTML;
+                        if (sSuffix == "qxml")
+                          pRequest->m_eResponseType = ResponseTypeXML;
+                        else
+                          pRequest->m_eResponseType = ResponseTypeHTML;
 
                         QTextStream stream( &pRequest->m_response );
                         
-                        m_Scripting.EvaluatePage( &stream, sResName );
+                        m_Scripting.EvaluatePage( &stream, sResName, pRequest->m_mapParams );
 
                         return true;
 

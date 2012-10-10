@@ -63,6 +63,7 @@ static MIMETypes g_MIMETypes[] =
     { "qjs" , "application/javascript"     },
     { "txt" , "text/plain"                 },
     { "xml" , "text/xml"                   },
+    { "qxml", "text/xml"                   },
     { "xslt", "text/xml"                   },
     { "pdf" , "application/pdf"            },
     { "avi" , "video/avi"                  },

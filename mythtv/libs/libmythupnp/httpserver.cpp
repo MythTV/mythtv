@@ -182,6 +182,7 @@ void HttpServer::DelegateRequest(HTTPRequest *pRequest)
 {
     bool bProcessed = false;
 
+    LOG(VB_UPNP, LOG_DEBUG, QString("m_sBaseUrl: %1").arg( pRequest->m_sBaseUrl ));
     m_rwlock.lockForRead();
 
     QList< HttpServerExtension* > list = m_basePaths.values( pRequest->m_sBaseUrl );

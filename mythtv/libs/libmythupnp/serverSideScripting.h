@@ -14,6 +14,7 @@
 #define SERVERSIDESCRIPTING_H_
 
 #include "upnpexp.h"
+#include "upnputil.h"
 
 #include <QString> 
 #include <QMap>
@@ -59,7 +60,8 @@ class UPNP_PUBLIC ServerSideScripting
                                      const QMetaObject *pMetaObject,
                                      QScriptEngine::FunctionSignature  pFunction);
 
-        bool EvaluatePage( QTextStream *pOutStream, const QString &sFileName );
+        bool EvaluatePage( QTextStream *pOutStream, const QString &sFileName,
+                           const QStringMap &mapParams );
 
     protected:
 
