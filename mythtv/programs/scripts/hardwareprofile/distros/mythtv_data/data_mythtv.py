@@ -453,7 +453,20 @@ class _Mythtv_data:
 
         return myth_systemrole , mythremote
 
-
+    def ProcessLogUrgency(self):
+        c = _DB.cursor()
+        c.execute("""SELECT level,count(level) FROM logging GROUP BY level""")
+        levels = ('EMERG', 'ALERT', 'CRIT', 'ERR', 
+                  'WARNING', 'NOTICE', 'INFO') # ignore debugging from totals
+        counts = {}
+        total = 0.
+        for level,count in c.fetchall():
+            if level in range(len(levels)):
+                counts[levels[level]] = count
+                total += count
+        for k,v in counts.items():
+            counts[k] = v/total
+        return {'logurgency':counts}
 
 
 
@@ -470,6 +483,7 @@ class _Mythtv_data:
         self._data.update(self.ProcessMySQL())
         self._data.update(self.ProcessScheduler())
         self._data.update(self.Processtuners())
+        self._data.update(self.ProcessLogUrgency())
         
         self._data.theme          = _SETTINGS.Theme
         self._data.country          = _SETTINGS.Country
