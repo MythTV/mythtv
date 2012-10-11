@@ -88,6 +88,7 @@ typedef struct {
 
 LogPropagateOpts        logPropagateOpts;
 QString                 logPropagateArgs;
+QStringList             logPropagateArgList;
 
 #define TIMESTAMP_MAX 30
 #define MAX_STRING_LENGTH (LOGLINE_MAX+120)
@@ -776,22 +777,35 @@ void LogPrintLine( uint64_t mask, LogLevel_t level, const char *file, int line,
 ///        spawned from this one.
 void logPropagateCalc(void)
 {
+    logPropagateArgList.clear();
+
     QString mask = verboseString.trimmed();
     mask.replace(QRegExp(" "), ",");
     mask.remove(QRegExp("^,"));
     logPropagateArgs = " --verbose " + mask;
+    logPropagateArgList << "--verbose" << mask;
 
     if (logPropagateOpts.propagate)
+    {
         logPropagateArgs += " --logpath " + logPropagateOpts.path;
+        logPropagateArgList << "--logpath" << logPropagateOpts.path;
+    }
 
     QString name = logLevelGetName(logLevel);
     logPropagateArgs += " --loglevel " + name;
+    logPropagateArgList << "--loglevel" << name;
 
     for (int i = 0; i < logPropagateOpts.quiet; i++)
+    {
         logPropagateArgs += " --quiet";
+        logPropagateArgList << "--quiet";
+    }
 
     if (!logPropagateOpts.dblog)
+    {
         logPropagateArgs += " --nodblog";
+        logPropagateArgList << "--nodblog";
+    }
 
 #ifndef _WIN32
     if (logPropagateOpts.facility >= 0)
@@ -803,6 +817,7 @@ void logPropagateCalc(void)
               syslogname->c_val != logPropagateOpts.facility); syslogname++);
 
         logPropagateArgs += QString(" --syslog %1").arg(syslogname->c_name);
+        logPropagateArgList << "--syslog" << syslogname->c_name;
     }
 #endif
 }

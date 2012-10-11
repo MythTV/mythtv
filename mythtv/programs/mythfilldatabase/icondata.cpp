@@ -171,10 +171,9 @@ void IconData::UpdateSourceIcons(uint sourceid)
         "FROM (channel ch, callsignnetworkmap csm) "
         "RIGHT JOIN networkiconmap nim ON csm.network = nim.network "
         "WHERE ch.callsign = csm.callsign AND "
-        "      (icon = :NOICON OR icon = '') AND "
+        "      icon = '' AND "
         "      ch.sourceid = :SOURCEID");
     query.bindValue(":SOURCEID", sourceid);
-    query.bindValue(":NOICON", "none");
 
     if (!query.exec())
     {
@@ -556,6 +555,6 @@ void IconData::ResetIconMap(bool reset_icons)
 
     if (reset_icons)
     {
-        RunSimpleQuery("UPDATE channel SET icon = 'none'");
+        RunSimpleQuery("UPDATE channel SET icon = ''");
     }
 }

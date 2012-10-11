@@ -26,6 +26,8 @@ typedef enum MythSystemMask {
     kMSLowExitVal         = 0x00008000, ///< allow exit values 0-127 only
     kMSDisableUDPListener = 0x00010000, ///< disable MythMessage UDP listener
                                         ///  for the duration of application.
+    kMSPropagateLogs      = 0x00020000, ///< add arguments for MythTV log 
+                                        ///  propagation
 } MythSystemFlag;
 
 #ifdef __cplusplus

@@ -157,25 +157,19 @@ void MHBitmap::CreateContent(const unsigned char *data, int length, MHEngine *en
         nCHook = engine->GetDefaultBitmapCHook();
     }
 
-    // TODO: What if we can't convert it?
-    if (nCHook == 4)   // PNG.
+    switch (nCHook)
     {
+    case 4: // PNG.
         m_pContent->CreateFromPNG(data, length);
-    }
-    // CHook 5 seems to be used by the BBC on Freesat for an MPEG I-frame for the
-    // background but enabling it here results in it overlaying the video.
-    // Presumably it is not simply the same as CHook 2.
-    else if (nCHook == 2 /* ||nCHook == 5 */)   // MPEG I-frame.
-    {
+        break;
+    case 2: // MPEG I-frame.
+    case 5: // BBC/Freesat MPEG I-frame background
         m_pContent->CreateFromMPEG(data, length);
-    }
-    else if (nCHook == 6) // JPEG ISO/IEC 10918-1, JFIF file
-    {
+        break;
+    case 6: // JPEG ISO/IEC 10918-1, JFIF file
         m_pContent->CreateFromJPEG(data, length);
-    }
-    else
-    {
-        // 1,3,5,8 are reserved. 7= H.264 Intra Frame
+        break;
+    default: // 1,3,5,8 are reserved. 7= H.264 Intra Frame
         MHERROR(QString("Unknown bitmap content hook %1").arg(nCHook));
     }
 
@@ -236,7 +230,8 @@ void MHBitmap::Display(MHEngine *)
     }
 
     m_pContent->Draw(m_nPosX + m_nXDecodeOffset, m_nPosY + m_nYDecodeOffset,
-                     QRect(m_nPosX, m_nPosY, m_nBoxWidth, m_nBoxHeight), m_fTiling);
+            QRect(m_nPosX, m_nPosY, m_nBoxWidth, m_nBoxHeight), m_fTiling,
+            m_nContentHook == 5); // 'under video' if BBC MPEG I-frame background
 }
 
 // Return the region drawn by the bitmap.
@@ -260,7 +255,8 @@ QRegion MHBitmap::GetVisibleArea()
 QRegion MHBitmap::GetOpaqueArea()
 {
     // The area is empty unless the bitmap is opaque.
-    if (! m_fRunning || m_pContent == NULL || ! m_pContent->IsOpaque())
+    // and it's not a BBC MPEG I-frame background
+    if (! m_fRunning || m_nContentHook == 5 || m_pContent == NULL || ! m_pContent->IsOpaque())
     {
         return QRegion();
     }

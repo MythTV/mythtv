@@ -224,30 +224,41 @@ bool PreviewGenerator::Run(void)
     else
     {
         // This is where we fork and run mythpreviewgen to actually make preview
-        command += QString(" --size %1x%2")
-            .arg(outSize.width()).arg(outSize.height());
+        QStringList cmdargs;
+
+        cmdargs << "--size"
+                << QString("%1x%2").arg(outSize.width()).arg(outSize.height());
         if (captureTime >= 0)
         {
             if (timeInSeconds)
-                command += QString(" --seconds %1").arg(captureTime);
+                cmdargs << "--seconds";
             else
-                command += QString(" --frame %1").arg(captureTime);
+                cmdargs << "--frame";
+            cmdargs << QString::number(captureTime);
         }
-        command += QString(" --chanid %1").arg(programInfo.GetChanID());
-        command += QString(" --starttime %1")
-            .arg(programInfo.GetRecordingStartTime(MythDate::kFilename));
+        cmdargs << "--chanid"
+                << QString::number(programInfo.GetChanID())
+                << "--starttime"
+                << programInfo.GetRecordingStartTime(MythDate::kFilename);
 
         if (!outFileName.isEmpty())
-            command += QString(" --outfile \"%1\"").arg(outFileName);
-
-        command += logPropagateArgs;
-        if (!logPropagateQuiet())
-            command += " --quiet";
+            cmdargs << "--outfile" << outFileName;
 
         // Timeout in 30s
-        uint ret = myth_system(command, kMSDontBlockInputDevs |
+        MythSystem *ms = new MythSystem(command, cmdargs,
+                                        kMSDontBlockInputDevs |
                                         kMSDontDisableDrawing |
-                                        kMSProcessEvents, 30);
+                                        kMSProcessEvents      |
+                                        kMSNoRunShell         |
+                                        kMSAutoCleanup        |
+                                        kMSPropagateLogs);
+        ms->SetNice(10);
+        ms->SetIOPrio(7);
+
+        ms->Run(30);
+        uint ret = ms->Wait();
+        delete ms;
+
         if (ret != GENERIC_EXIT_OK)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + 

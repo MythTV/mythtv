@@ -24,6 +24,7 @@ class MUI_PUBLIC MythUISpinBox : public MythUIButtonList
 
     void SetValue(int val) { SetValueByData(val); }
     void SetValue(const QString &val) { SetValueByData(val.toInt()); }
+    void AddSelection (int value, const QString &label = "");
     QString GetValue(void) const { return GetDataValue().toString(); }
     int GetIntValue(void) const { return GetDataValue().toInt(); }
 

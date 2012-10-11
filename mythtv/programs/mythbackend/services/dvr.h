@@ -69,6 +69,11 @@ class Dvr : public DvrServices
 
         DTC::EncoderList* GetEncoderList      ( );
 
+        QStringList       GetRecGroupList     ( );
+
+        QStringList       GetTitleList        ( );
+
+
         // Recording Rules
 
         int               AddRecordSchedule   ( int       ChanId,
@@ -184,6 +189,9 @@ class ScriptableDvr : public QObject
 
         QObject* GetEncoderList     () { return m_obj.GetEncoderList(); }
 
+        QStringList GetRecGroupList () { return m_obj.GetRecGroupList(); }
+
+        QStringList GetTitleList    () { return m_obj.GetTitleList(); }
 
 };
 

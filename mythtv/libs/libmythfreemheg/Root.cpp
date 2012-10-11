@@ -44,7 +44,7 @@ void MHRoot::PrintMe(FILE *fd, int nTabs) const
 // An action was attempted on an object of a class which doesn't support this.
 void MHRoot::InvalidAction(const char *actionName)
 {
-    MHLOG(MHLogWarning, QString("Action \"%1\" is not understood by class \"%2\"").arg(actionName).arg(ClassName()));
+    MHLOG(MHLogWarning, QString("WARN Action \"%1\" is not understood by class \"%2\"").arg(actionName).arg(ClassName()));
     throw "Invalid Action";
 }
 

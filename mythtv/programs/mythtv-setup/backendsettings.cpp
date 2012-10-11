@@ -9,10 +9,17 @@
 #include <unistd.h>
 
 
-static HostLineEdit *LocalServerIP()
+static HostComboBox *LocalServerIP()
 {
-    HostLineEdit *gc = new HostLineEdit("BackendServerIP");
-    gc->setLabel(QObject::tr("IP address"));
+    HostComboBox *gc = new HostComboBox("BackendServerIP");
+    gc->setLabel(QObject::tr("IPv4 address"));
+    QList<QHostAddress> list = ServerPool::DefaultListenIPv4();
+    QList<QHostAddress>::iterator it;
+    for (it = list.begin(); it != list.end(); ++it)
+    {
+        gc->addSelection((*it).toString(), (*it).toString());
+    }
+
     gc->setValue("127.0.0.1");
     gc->setHelpText(QObject::tr("Enter the IP address of this machine. "
                     "Use an externally accessible address (ie, not "
@@ -23,21 +30,34 @@ static HostLineEdit *LocalServerIP()
     return gc;
 };
 
-static HostLineEdit *LocalServerIP6()
+static HostComboBox *LocalServerIP6()
 {
-    HostLineEdit *gc = new HostLineEdit("BackendServerIP6");
+    HostComboBox *gc = new HostComboBox("BackendServerIP6");
     gc->setLabel(QObject::tr("IPv6 address"));
-    gc->setValue("::1");
+    QList<QHostAddress> list = ServerPool::DefaultListenIPv6();
+    QList<QHostAddress>::iterator it;
+    for (it = list.begin(); it != list.end(); ++it)
+    {
+        gc->addSelection((*it).toString(), (*it).toString());
+    }
+
+#if defined(QT_NO_IPV6)
+    gc->setEnabled(false);
+    gc->setValue("");
+#else
+    if (list.isEmpty())
+    {
+        gc->setEnabled(false);
+        gc->setValue("");
+    }
+    else if (list.contains(QHostAddress("::1")))
+        gc->setValue("::1");
+#endif
+        
     gc->setHelpText(QObject::tr("Enter the IPv6 address of this machine. "
                     "Use an externally accessible address (ie, not "
                     "::1) if you are going to be running a frontend "
                     "on a different machine than this one."));
-#if defined(QT_NO_IPV6)
-    gc->setEnabled(false);
-#else
-    if (ServerPool::DefaultListenIPv6().isEmpty())
-        gc->setEnabled(false);
-#endif
     return gc;
 }
 

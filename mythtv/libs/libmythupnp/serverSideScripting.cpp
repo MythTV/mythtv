@@ -106,7 +106,8 @@ void ServerSideScripting::RegisterMetaObjectType( const QString &sName,
 //
 //////////////////////////////////////////////////////////////////////////////
 
-bool ServerSideScripting::EvaluatePage( QTextStream *pOutStream, const QString &sFileName )
+bool ServerSideScripting::EvaluatePage( QTextStream *pOutStream, const QString &sFileName,
+                                        const QStringMap &mapParams )
 {
     try
     {
@@ -163,6 +164,24 @@ bool ServerSideScripting::EvaluatePage( QTextStream *pOutStream, const QString &
         }
 
         // ------------------------------------------------------------------
+        // Build array of arguments passed to script
+        // ------------------------------------------------------------------
+
+        QString params = "ARGS = { ";
+        if (mapParams.size())
+        {
+            QMap<QString, QString>::const_iterator it = mapParams.begin();
+
+            for (; it != mapParams.end(); ++it)
+            {
+                params += QString("%1: '%2', ").arg(it.key()).arg(it.value());
+            }
+        }
+
+        params += " }";
+        m_engine.evaluate(params);
+
+        // ------------------------------------------------------------------
         // Execute function to render output
         // ------------------------------------------------------------------
 
@@ -170,6 +189,7 @@ bool ServerSideScripting::EvaluatePage( QTextStream *pOutStream, const QString &
 
         QScriptValueList args;
         args << m_engine.newQObject( &outStream );
+        args << m_engine.globalObject().property("ARGS");
 
         pInfo->m_oFunc.call( QScriptValue(), args );
 
@@ -213,7 +233,7 @@ QString ServerSideScripting::CreateMethodFromFile( const QString &sFileName )
         QTextStream stream( &scriptFile );
         QString sTransBuffer;
 
-        sCode << "(function( os ) {\n";
+        sCode << "(function( os, ARGS ) {\n";
 
         while( !stream.atEnd() )
         {
@@ -246,8 +266,6 @@ bool ServerSideScripting::ProcessLine( QTextStream &sCode,
                                        bool         bInCode,
                                        QString     &sTransBuffer )
 {
-    sLine = sLine.trimmed();
-
     QString sLowerLine = sLine.toLower();
 
     if (!sTransBuffer.isEmpty())
@@ -355,8 +373,6 @@ bool ServerSideScripting::ProcessLine( QTextStream &sCode,
 
                 if (bMatchFound) 
                     bInCode = true;
-                else
-                    bNewLine = false;
             }
         }
         else

@@ -70,8 +70,9 @@ MythScreenType::MythScreenType(
     // Can be overridden, of course, but default to full sized.
     m_Area = GetMythMainWindow()->GetUIScreenRect();
 
-//    gCoreContext->SendSystemEvent(
-//        QString("SCREEN_TYPE CREATED %1").arg(name));
+    if (QCoreApplication::applicationName() == MYTH_APPNAME_MYTHFRONTEND)
+        gCoreContext->SendSystemEvent(
+            QString("SCREEN_TYPE CREATED %1").arg(name));
 }
 
 MythScreenType::MythScreenType(
@@ -90,14 +91,16 @@ MythScreenType::MythScreenType(
 
     m_Area = GetMythMainWindow()->GetUIScreenRect();
 
-//    gCoreContext->SendSystemEvent(
-//        QString("SCREEN_TYPE CREATED %1").arg(name));
+    if (QCoreApplication::applicationName() == MYTH_APPNAME_MYTHFRONTEND)
+        gCoreContext->SendSystemEvent(
+                QString("SCREEN_TYPE CREATED %1").arg(name));
 }
 
 MythScreenType::~MythScreenType()
 {
-//    gCoreContext->SendSystemEvent(
-//        QString("SCREEN_TYPE DESTROYED %1").arg(objectName()));
+    if (QCoreApplication::applicationName() == MYTH_APPNAME_MYTHFRONTEND)
+        gCoreContext->SendSystemEvent(
+                QString("SCREEN_TYPE DESTROYED %1").arg(objectName()));
 
     // locking ensures background screen load can finish running
     SemaphoreLocker locker(&m_LoadLock);

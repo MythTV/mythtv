@@ -36,7 +36,7 @@ DBChannel::DBChannel(
     uint _sourceid, uint _cardid, uint _grpid) :
     channum(_channum),
     callsign(_callsign),
-    name(_name), icon((_icon == "none") ? QString() : _icon),
+    name(_name), icon(_icon),
     chanid(_chanid),
     major_chan(_major_chan), minor_chan(_minor_chan),
     mplexid((_mplexid == 32767) ? 0 : _mplexid),

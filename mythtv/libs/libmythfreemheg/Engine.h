@@ -117,6 +117,7 @@ class MHEngine: public MHEG {
     // Generate a UserAction event i.e. a key press.
     virtual void GenerateUserAction(int nCode);
     virtual void EngineEvent(int nCode);
+    virtual void StreamStarted(MHStream*, bool bStarted);
 
     // Called from an ingredient to request a load of external content.
     void RequestExternalContent(MHIngredient *pRequester);

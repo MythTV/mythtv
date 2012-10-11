@@ -18,8 +18,8 @@ MythTV mythbackend Internal Web Server
 <script language="JavaScript" type="text/javascript"  src="/js/jquery.min.js"></script>
 <script language="JavaScript" type="text/javascript"  src="/js/jquery-ui.min.js"></script>
 <script language="JavaScript" type="text/javascript"  src="/js/jquery.contextmenu.js"></script>
-<script language="JavaScript" type="text/javascript"  src="/js/ui-multiselect-en.js"></script>
 <script language="JavaScript" type="text/javascript"  src="/js/ui.multiselect.js"></script>
+<script language="JavaScript" type="text/javascript"  src="/js/ui-multiselect-en.js"></script>
 <script language="JavaScript" type="text/javascript"  src="/js/grid.locale-en.js"></script>
 <script language="JavaScript" type="text/javascript"  src="/js/jquery.jqGrid.min.js"></script>
 <script language="JavaScript" type="text/javascript"  src="/js/menu.js"></script>
@@ -32,7 +32,7 @@ $(document).ready(function() {
     loadDiv("menu-bg", "/menu.qsp");
     $('.menu').initMenu();
     showHostName();
-    loadContent("/misc/overview.qsp");
+    loadContent('/Status/GetStatusHTML');
 });
 
 </script>

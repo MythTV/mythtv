@@ -1522,17 +1522,13 @@ long long RingBuffer::WriterSeek(long long pos, int whence, bool has_lock)
 }
 
 /** \fn RingBuffer::WriterFlush(void)
- *  \brief Calls ThreadedFileWriter::Flush(void) and
- *         ThreadedFileWriter::Sync(void).
+ *  \brief Calls ThreadedFileWriter::Flush(void)
  */
 void RingBuffer::WriterFlush(void)
 {
     rwlock.lockForRead();
     if (tfw)
-    {
         tfw->Flush();
-        tfw->Sync();
-    }
     rwlock.unlock();
 }
 

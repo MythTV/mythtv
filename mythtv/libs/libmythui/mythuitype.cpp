@@ -478,7 +478,10 @@ void MythUIType::DrawSelf(MythPainter *, int, int, int, QRect)
 void MythUIType::Draw(MythPainter *p, int xoffset, int yoffset, int alphaMod,
                       QRect clipRect)
 {
-    m_DirtyRegion = QRegion(QRect(0, 0, 0, 0));
+    // NB m_DirtyRegion may be extended by HandleMovementPulse, SetRedraw
+    // or SetChildNeedsRedraw etc _AFTER_ GetDirtyArea is called.
+    // So clipRect may not include the whole of m_DirtyRegion
+    m_DirtyRegion -= QRegion(clipRect); // NB Qt >= 4.2
 
     if (!m_Visible || m_Vanished)
         return;

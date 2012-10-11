@@ -723,6 +723,23 @@ static uint get_chan_id_from_db(uint sourceid, uint serviceid,
     if (!query.exec() || !query.isActive())
         MythDB::DBError("Looking up chanID", query);
 
+    if (query.size() == 0) {
+        // Attempt fuzzy matching, by skipping the tsid
+        // DVB Link to chanid
+        QString qstr =
+            "SELECT chanid, useonairguide, channel.sourceid "
+            "FROM channel, dtv_multiplex "
+            "WHERE serviceid        = :SERVICEID   AND "
+            "      networkid        = :NETWORKID   AND "
+            "      channel.mplexid  = dtv_multiplex.mplexid";
+
+        query.prepare(qstr);
+        query.bindValue(":SERVICEID",   serviceid);
+        query.bindValue(":NETWORKID",   networkid);
+        if (!query.exec() || !query.isActive())
+            MythDB::DBError("Looking up chanID in fuzzy mode", query);
+    }
+
     while (query.next())
     {
         // Check to see if we are interested in this channel

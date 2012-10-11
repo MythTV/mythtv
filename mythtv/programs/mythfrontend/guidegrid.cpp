@@ -1668,7 +1668,9 @@ void GuideGrid::generateListings()
 
 void GuideGrid::ChannelGroupMenu(int mode)
 {
-    if (m_changrplist.empty())
+    ChannelGroupList channels = ChannelGroup::GetChannelGroups(mode == 0);
+    
+    if (channels.empty())
     {
       QString message = tr("You don't have any channel groups defined");
 
@@ -1695,19 +1697,19 @@ void GuideGrid::ChannelGroupMenu(int mode)
         {
             // add channel to group menu
             menuPopup->SetReturnEvent(this, "channelgrouptogglemenu");
-            ChannelGroupList channels = ChannelGroup::GetChannelGroups(true);
-            for (uint i = 0; i < channels.size(); ++i)
-                menuPopup->AddButton(channels[i].name);
         }
         else
         {
             // switch to channel group menu
             menuPopup->SetReturnEvent(this, "channelgroupmenu");
             menuPopup->AddButton(QObject::tr("All Channels"));
-            for (uint i = 0; i < m_changrplist.size(); ++i)
-                menuPopup->AddButton(m_changrplist[i].name);
         }
 
+        for (uint i = 0; i < channels.size(); ++i)
+        {
+            menuPopup->AddButton(channels[i].name);
+        }
+        
         popupStack->AddScreen(menuPopup);
     }
     else
@@ -1746,6 +1748,9 @@ void GuideGrid::toggleChannelFavorite(int grpid)
     else
         // Only allow delete if viewing the favorite group in question
         ChannelGroup::ToggleChannel(chanid, grpid, true);
+
+    //regenerate the list of non empty group in case it did change
+    m_changrplist = ChannelGroup::GetChannelGroups(false);
 
     // If viewing favorites, refresh because a channel was removed
     if (m_changrpid != -1)

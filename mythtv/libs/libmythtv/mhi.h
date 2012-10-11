@@ -16,11 +16,14 @@ using namespace std;
 #include <QString>
 #include <QMutex>
 #include <QImage>
+#include <QList>
+#include <QRect>
 
 // MythTV headers
 #include "../libmythfreemheg/freemheg.h"
 #include "interactivetv.h"
 #include "dsmcc.h"
+#include "mhegic.h"
 #include "mythcontext.h"
 #include "mythdbcon.h"
 #include "mythdeque.h"
@@ -99,7 +102,8 @@ class MHIContext : public MHContext, public QRunnable
     virtual void DrawBackground(const QRegion &reg);
     virtual void DrawVideo(const QRect &videoRect, const QRect &displayRect);
 
-    void DrawImage(int x, int y, const QRect &rect, const QImage &image);
+    void DrawImage(int x, int y, const QRect &rect, const QImage &image,
+        bool bScaled = false, bool bUnder = false);
 
     virtual int GetChannelIndex(const QString &str);
     /// Get netId etc from the channel index.
@@ -107,14 +111,27 @@ class MHIContext : public MHContext, public QRunnable
                                 int &transportId, int &serviceId);
     virtual bool TuneTo(int channel, int tuneinfo);
 
-    /// Begin playing audio from the specified stream
-    virtual bool BeginAudio(const QString &stream, int tag);
+    /// Begin playing the specified stream
+    virtual bool BeginStream(const QString &str, MHStream* notify);
+    virtual void EndStream();
+    // Called when the stream starts or stops
+    bool StreamStarted(bool bStarted = true);
+    /// Begin playing audio
+    virtual bool BeginAudio(int tag);
     /// Stop playing audio
-    virtual void StopAudio(void);
-    /// Begin displaying video from the specified stream
-    virtual bool BeginVideo(const QString &stream, int tag);
+    virtual void StopAudio();
+    /// Begin displaying video
+    virtual bool BeginVideo(int tag);
     /// Stop displaying video
-    virtual void StopVideo(void);
+    virtual void StopVideo();
+    // Get current stream position, -1 if unknown
+    virtual long GetStreamPos();
+    // Get current stream size, -1 if unknown
+    virtual long GetStreamMaxPos();
+    // Set current stream position
+    virtual long SetStreamPos(long);
+    // Play or pause a stream
+    virtual void StreamPlay(bool);
 
     // Get the context id strings.  The format of these strings is specified
     // by the UK MHEG profile.
@@ -123,9 +140,15 @@ class MHIContext : public MHContext, public QRunnable
     virtual const char *GetDSMCCId(void)
         { return "DSMMYT001"; } // DSMCC version.
 
+    // InteractionChannel
+    virtual int GetICStatus(); // 0= Active, 1= Inactive, 2= Disabled
+
     // Operations used by the display classes
     // Add an item to the display vector
-    void AddToDisplay(const QImage &image, int x, int y);
+    void AddToDisplay(const QImage &image, const QRect &rect, bool bUnder = false);
+    int ScaleX(int, bool roundup = false) const;
+    int ScaleY(int, bool roundup = false) const;
+    QRect Scale(const QRect &r) const;
 
     FT_Face GetFontFace(void) { return m_face; }
     bool IsFaceLoaded(void) { return m_face_loaded; }
@@ -134,8 +157,6 @@ class MHIContext : public MHContext, public QRunnable
 
     static const int StdDisplayWidth = 720;
     static const int StdDisplayHeight = 576;
-    int GetWidth(void) { return m_displayWidth; }
-    int GetHeight(void) { return m_displayHeight; }
 
   protected:
     void run(void); // QRunnable
@@ -150,6 +171,9 @@ class MHIContext : public MHContext, public QRunnable
     QMutex           m_dsmccLock;
     MythDeque<DSMCCPacket*> m_dsmccQueue;
 
+    MHInteractionChannel m_ic;  // Interaction channel
+    MHStream        *m_notify;
+
     QMutex           m_keyLock;
     MythDeque<int>   m_keyQueue;
     int              m_keyProfile;
@@ -161,10 +185,6 @@ class MHIContext : public MHContext, public QRunnable
     bool             m_stop;        // protected by m_runLock
     QMutex           m_display_lock;
     bool             m_updated;
-    int              m_displayWidth;
-    int              m_displayHeight;
-    float            m_xScale;
-    float            m_yScale;
 
     list<MHIImageData*> m_display; // List of items to display
 
@@ -185,7 +205,7 @@ class MHIContext : public MHContext, public QRunnable
     uint             m_lastNbiVersion;
     vector<unsigned char> m_nbiData;
 
-    QRect            m_videoRect;
+    QRect            m_videoRect, m_videoDisplayRect;
     QRect            m_displayRect;
 };
 
@@ -241,7 +261,7 @@ class MHIBitmap : public MHBitmapDisplay
      *  \param y     Vertical position of the image relative to the screen.
      *  \param rect  Bounding box for the image relative to the screen.
      */
-    virtual void Draw(int x, int y, QRect rect, bool tiled);
+    virtual void Draw(int x, int y, QRect rect, bool tiled, bool bUnder);
 
     /// Scale the bitmap.  Only used for image derived from MPEG I-frames.
     virtual void ScaleImage(int newWidth, int newHeight);

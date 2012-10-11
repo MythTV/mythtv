@@ -1698,6 +1698,10 @@ bool MythUIWebBrowser::ParseElement(
         QString duration = getFirstText(element);
         m_scrollAnimation.setDuration(duration.toInt());
     }
+    else if (element.tagName() == "acceptsfocus")
+    {
+        SetCanTakeFocus(parseBool(element));
+    }
     else
     {
         return MythUIType::ParseElement(filename, element, showWarnings);

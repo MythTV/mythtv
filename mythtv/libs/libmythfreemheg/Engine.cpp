@@ -32,6 +32,7 @@
 #include "Logging.h"
 #include "freemheg.h"
 #include "Visible.h"  // For MHInteractible
+#include "Stream.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -111,7 +112,7 @@ int MHEngine::RunAll()
 
             if (! Launch(startObj))
             {
-                MHLOG(MHLogWarning, "MHEG engine auto-boot failed");
+                MHLOG(MHLogNotifications, "NOTE Engine auto-boot failed");
                 return -1;
             }
         }
@@ -242,34 +243,63 @@ MHGroup *MHEngine::ParseProgram(QByteArray &text)
     return pRes;
 }
 
+// Determine protocol for a file
+enum EProtocol { kProtoUnknown, kProtoDSM, kProtoCI, kProtoHTTP, kProtoHybrid };
+static EProtocol PathProtocol(const QString& csPath)
+{
+    if (csPath.isEmpty() || csPath.startsWith("DSM:") || csPath.startsWith("~"))
+        return kProtoDSM;
+    if (csPath.startsWith("hybrid:"))
+        return kProtoHybrid;
+    if (csPath.startsWith("http:") || csPath.startsWith("https:"))
+        return kProtoHTTP;
+    if (csPath.startsWith("CI:"))
+        return kProtoCI;
+
+    int firstColon = csPath.indexOf(':'), firstSlash = csPath.indexOf('/');
+    if (firstColon > 0 && firstSlash > 0 && firstColon < firstSlash)
+        return kProtoUnknown;
+
+    return kProtoDSM;
+}
+
 // Launch and Spawn
 bool MHEngine::Launch(const MHObjectRef &target, bool fIsSpawn)
 {
-    QString csPath = GetPathName(target.m_GroupId); // Get path relative to root.
-
-    if (csPath.length() == 0)
-    {
-        return false;    // No file name.
-    }
-
     if (m_fInTransition)
     {
-        MHLOG(MHLogWarning, "Launch during transition - ignoring");
+        MHLOG(MHLogWarning, "WARN Launch during transition - ignoring");
         return false;
     }
 
-    QByteArray text;
+    if (target.m_GroupId.Size() == 0) return false; // No file name.
+    QString csPath = GetPathName(target.m_GroupId); // Get path relative to root.
 
     // Check that the file exists before we commit to the transition.
     // This may block if we cannot be sure whether the object is present.
+    QByteArray text;
     if (! m_Context->GetCarouselData(csPath, text))
     {
-        if (CurrentApp())
-        {
-            EventTriggered(CurrentApp(), EventEngineEvent, 2);    // GroupIDRefError
-        }
-
+        if (!m_fBooting)
+            EngineEvent(2); // GroupIDRefError
         return false;
+    }
+
+    MHApplication *pProgram = (MHApplication*)ParseProgram(text);
+    if (! pProgram)
+    {
+        MHLOG(MHLogWarning, "Empty application");
+        return false;
+    }
+    if (! pProgram->m_fIsApp)
+    {
+        MHLOG(MHLogWarning, "Expected an application");
+        delete pProgram;
+        return false;
+    }
+    if ((__mhlogoptions & MHLogScenes) && __mhlogStream != 0)   // Print it so we know what's going on.
+    {
+        pProgram->PrintMe(__mhlogStream, 0);
     }
 
     // Clear the action queue of anything pending.
@@ -298,18 +328,6 @@ bool MHEngine::Launch(const MHObjectRef &target, bool fIsSpawn)
             {
                 delete m_ApplicationStack.pop();    // Pop and delete the current app.
             }
-        }
-
-        MHApplication *pProgram = (MHApplication *)ParseProgram(text);
-
-        if ((__mhlogoptions & MHLogScenes) && __mhlogStream != 0)   // Print it so we know what's going on.
-        {
-            pProgram->PrintMe(__mhlogStream, 0);
-        }
-
-        if (! pProgram->m_fIsApp)
-        {
-            MHERROR("Expected an application");
         }
 
         // Save the path we use for this app.
@@ -351,7 +369,7 @@ void MHEngine::Quit()
 {
     if (m_fInTransition)
     {
-        MHLOG(MHLogWarning, "Quit during transition - ignoring");
+        MHLOG(MHLogWarning, "WARN Quit during transition - ignoring");
         return;
     }
 
@@ -395,7 +413,7 @@ void MHEngine::TransitionToScene(const MHObjectRef &target)
     if (m_fInTransition)
     {
         // TransitionTo is not allowed in OnStartUp or OnCloseDown actions.
-        MHLOG(MHLogWarning, "TransitionTo during transition - ignoring");
+        MHLOG(MHLogWarning, "WARN TransitionTo during transition - ignoring");
         return;
     }
 
@@ -405,20 +423,24 @@ void MHEngine::TransitionToScene(const MHObjectRef &target)
     }
 
     QString csPath = GetPathName(target.m_GroupId);
-    QByteArray text;
 
     // Check that the file exists before we commit to the transition.
-    if (! m_Context->GetCarouselData(csPath, text))
-    {
-        EventTriggered(CurrentApp(), EventEngineEvent, 2); // GroupIDRefError
+    // This may block if we cannot be sure whether the object is present.
+    QByteArray text;
+    if (! m_Context->GetCarouselData(csPath, text)) {
+        EngineEvent(2); // GroupIDRefError
         return;
     }
 
     // Parse and run the file.
     MHGroup *pProgram = ParseProgram(text);
 
+    if (!pProgram )
+        MHERROR("Empty scene");
+
     if (pProgram->m_fIsApp)
     {
+        delete pProgram;
         MHERROR("Expected a scene");
     }
 
@@ -482,7 +504,7 @@ void MHEngine::TransitionToScene(const MHObjectRef &target)
     m_Interacting = 0;
 
     // Switch to the new scene.
-    CurrentApp()->m_pCurrentScene = (MHScene *) pProgram;
+    CurrentApp()->m_pCurrentScene = static_cast< MHScene* >(pProgram);
     SetInputRegister(CurrentScene()->m_nEventReg);
     m_redrawRegion = QRegion(0, 0, CurrentScene()->m_nSceneCoordX, CurrentScene()->m_nSceneCoordY); // Redraw the whole screen
 
@@ -504,33 +526,27 @@ void MHEngine::SetInputRegister(int nReg)
 // Create a canonical path name.  The rules are given in the UK MHEG document.
 QString MHEngine::GetPathName(const MHOctetString &str)
 {
-    QString csPath;
-
-    if (str.Size() != 0)
-    {
-        csPath = QString::fromUtf8((const char *)str.Bytes(), str.Size());
-    }
-
-    if (csPath.left(4) == "DSM:")
-    {
-        csPath = csPath.mid(4);    // Remove DSM:
-    }
-
-    // If it has any other prefix this isn't a request for a carousel object.
-    int firstColon = csPath.indexOf(':'), firstSlash = csPath.indexOf('/');
-
-    if (firstColon > 0 && firstSlash > 0 && firstColon < firstSlash)
-    {
+    if (str.Size() == 0)
         return QString();
-    }
 
-    if (csPath.left(1) == "~")
+    QString csPath = QString::fromUtf8((const char *)str.Bytes(), str.Size());
+    switch (PathProtocol(csPath))
     {
-        csPath = csPath.mid(1);    // Remove ~
+    default:
+    case kProtoUnknown:
+    case kProtoHybrid:
+    case kProtoHTTP:
+    case kProtoCI:
+        return csPath;
+    case kProtoDSM:
+        break;
     }
 
-    // Ignore "CI://"
-    if (csPath.left(2) != "//")   //
+    if (csPath.startsWith("DSM:"))
+        csPath = csPath.mid(4); // Remove DSM:
+    else if (csPath.startsWith("~"))
+        csPath = csPath.mid(1); // Remove ~
+    if (!csPath.startsWith("//"))
     {
         // Add the current application's path name
         if (CurrentApp())
@@ -589,7 +605,7 @@ MHRoot *MHEngine::FindObject(const MHObjectRef &oRef, bool failOnNotFound)
         // an object that may or may not exist at a particular time.
         // Another case was a call to CallActionSlot with an object reference variable
         // that had been initialised to zero.
-        MHLOG(MHLogWarning, QString("Reference %1 not found").arg(oRef.m_nObjectNo));
+        MHLOG(MHLogWarning, QString("WARN Reference %1 not found").arg(oRef.m_nObjectNo));
         throw "FindObject failed";
     }
 
@@ -609,7 +625,7 @@ void MHEngine::RunActions()
         {
             if ((__mhlogoptions & MHLogActions) && __mhlogStream != 0)   // Debugging
             {
-                fprintf(__mhlogStream, "Action - ");
+                fprintf(__mhlogStream, "[freemheg] Action - ");
                 pAction->PrintMe(__mhlogStream, 0);
                 fflush(__mhlogStream);
             }
@@ -670,6 +686,7 @@ void MHEngine::EventTriggered(MHRoot *pSource, enum EventType ev, const MHUnion 
         case EventUserInput:
         case EventFocusMoved: // UK MHEG.  Generated by HyperText class
         case EventSliderValueChanged: // UK MHEG.  Generated by Slider class
+        default:
         {
             // Asynchronous events.  Add to the event queue.
             MHAsynchEvent *pEvent = new MHAsynchEvent;
@@ -678,6 +695,7 @@ void MHEngine::EventTriggered(MHRoot *pSource, enum EventType ev, const MHUnion 
             pEvent->eventData = evData;
             m_EventQueue.enqueue(pEvent);
         }
+        break;
     }
 }
 
@@ -921,6 +939,7 @@ void MHEngine::GenerateUserAction(int nCode)
         case 101: // Green
         case 102: // Yellow
         case 103: // Blue
+        case 300: // EPG
             EventTriggered(pScene, EventEngineEvent, nCode);
             break;
     }
@@ -939,7 +958,15 @@ void MHEngine::GenerateUserAction(int nCode)
 
 void MHEngine::EngineEvent(int nCode)
 {
-    EventTriggered(CurrentApp(), EventEngineEvent, nCode);
+    if (CurrentApp())
+        EventTriggered(CurrentApp(), EventEngineEvent, nCode);
+    else if (!m_fBooting)
+        MHLOG(MHLogWarning, QString("WARN EngineEvent %1 but no app").arg(nCode));
+}
+
+void MHEngine::StreamStarted(MHStream *stream, bool bStarted)
+{
+    EventTriggered(stream, bStarted ? EventStreamPlaying : EventStreamStopped);
 }
 
 // Called by an ingredient wanting external content.
@@ -954,27 +981,45 @@ void MHEngine::RequestExternalContent(MHIngredient *pRequester)
 
     // Remove any existing content requests for this ingredient.
     CancelExternalContentRequest(pRequester);
+
     QString csPath = GetPathName(pRequester->m_ContentRef.m_ContentRef);
 
-    // Is this actually a carousel object?  It could be a stream.  We should deal
-    // with that separately.
     if (csPath.isEmpty())
     {
         MHLOG(MHLogWarning, "RequestExternalContent empty path");
         return;
     }
-
-    QByteArray text;
-
-    if (m_Context->CheckCarouselObject(csPath) && m_Context->GetCarouselData(csPath, text))
+    
+    if (m_Context->CheckCarouselObject(csPath))
     {
         // Available now - pass it to the ingredient.
-        pRequester->ContentArrived((const unsigned char *)text.data(), text.size(), this);
+        QByteArray text;
+        if (m_Context->GetCarouselData(csPath, text))
+        {
+            // If the content is not recognized catch the exception and continue
+            try
+            {
+                pRequester->ContentArrived(
+                    reinterpret_cast< const unsigned char * >(text.constData()),
+                    text.size(), this);
+            }
+            catch (char const *)
+            {}
+        }
+        else
+        {
+            MHLOG(MHLogWarning, QString("WARN No file content %1 <= %2")
+                .arg(pRequester->m_ObjectReference.Printable()).arg(csPath));
+            if (kProtoHTTP == PathProtocol(csPath))
+                EngineEvent(203); // 203=RemoteNetworkError if 404 reply
+            EngineEvent(3); // ContentRefError
+        }
     }
     else
     {
         // Need to record this and check later.
-        MHLOG(MHLogLinks, QString("RequestExternalContent %1 pending").arg(csPath));
+        MHLOG(MHLogNotifications, QString("Waiting for %1 <= %2")
+            .arg(pRequester->m_ObjectReference.Printable()).arg(csPath.left(128)) );
         MHExternContent *pContent = new MHExternContent;
         pContent->m_FileName = csPath;
         pContent->m_pRequester = pRequester;
@@ -995,8 +1040,10 @@ void MHEngine::CancelExternalContentRequest(MHIngredient *pRequester)
 
         if (pContent->m_pRequester == pRequester)
         {
-            delete pContent;
+            MHLOG(MHLogNotifications, QString("Cancelled wait for %1")
+                .arg(pRequester->m_ObjectReference.Printable()) );
             it = m_ExternContentTable.erase(it);
+            delete pContent;
             return;
         }
         else
@@ -1009,40 +1056,57 @@ void MHEngine::CancelExternalContentRequest(MHIngredient *pRequester)
 // See if we can satisfy any of the outstanding requests.
 void MHEngine::CheckContentRequests()
 {
-    QList<MHExternContent *>::iterator it = m_ExternContentTable.begin();
-    MHExternContent *pContent;
-
+    QList<MHExternContent*>::iterator it = m_ExternContentTable.begin();
     while (it != m_ExternContentTable.end())
     {
-        pContent = *it;
-        QByteArray text;
-
-        if (m_Context->CheckCarouselObject(pContent->m_FileName) &&
-            m_Context->GetCarouselData(pContent->m_FileName, text))
+        MHExternContent *pContent = *it;
+        if (m_Context->CheckCarouselObject(pContent->m_FileName))
         {
-            // If the content is not recognized catch the exception and continue
-            try
+            // Remove from the list.
+            it = m_ExternContentTable.erase(it);
+
+            QByteArray text;
+            if (m_Context->GetCarouselData(pContent->m_FileName, text))
             {
-                MHLOG(MHLogLinks, QString("CheckContentRequests %1 arrived")
-                      .arg(pContent->m_FileName));
-                pContent->m_pRequester->ContentArrived((const unsigned char *)text.data(),
-                                                       text.size(), this);
+                MHLOG(MHLogNotifications, QString("Received %1 len %2")
+                    .arg(pContent->m_pRequester->m_ObjectReference.Printable())
+                    .arg(text.size()) );
+                // If the content is not recognized catch the exception and continue
+                try
+                {
+                    pContent->m_pRequester->ContentArrived(
+                        reinterpret_cast< const unsigned char * >(text.constData()),
+                        text.size(), this);
+                }
+                catch (char const *)
+                {}
             }
-            catch (char const *)
+            else
             {
+                MHLOG(MHLogWarning, QString("WARN No file content %1 <= %2")
+                    .arg(pContent->m_pRequester->m_ObjectReference.Printable())
+                    .arg(pContent->m_FileName));
+                if (kProtoHTTP == PathProtocol(pContent->m_FileName))
+                    EngineEvent(203); // 203=RemoteNetworkError if 404 reply
+                EngineEvent(3); // ContentRefError
             }
 
-            // Remove from the list.
             delete pContent;
-            it = m_ExternContentTable.erase(it);
         }
         else if (pContent->m_time.elapsed() > 60000) // TODO Get this from carousel
         {
-            MHLOG(MHLogWarning, QString("CheckContentRequests %1 timed out")
-                  .arg(pContent->m_FileName));
-            delete pContent;
+            // Remove from the list.
             it = m_ExternContentTable.erase(it);
-            EventTriggered(CurrentApp(), EventEngineEvent, 3); // ContentRefError
+
+            MHLOG(MHLogWarning, QString("WARN File timed out %1 <= %2")
+                .arg(pContent->m_pRequester->m_ObjectReference.Printable())
+                .arg(pContent->m_FileName));
+
+            if (kProtoHTTP == PathProtocol(pContent->m_FileName))
+                EngineEvent(203); // 203=RemoteNetworkError if 404 reply
+            EngineEvent(3); // ContentRefError
+
+            delete pContent;
         }
         else
         {
@@ -1120,6 +1184,8 @@ bool MHEngine::GetEngineSupport(const MHOctetString &feature)
 {
     QString csFeat = QString::fromUtf8((const char *)feature.Bytes(), feature.Size());
     QStringList strings = csFeat.split(QRegExp("[\\(\\,\\)]"));
+
+    MHLOG(MHLogNotifications, "NOTE GetEngineSupport " + csFeat);
 
     if (strings[0] == "ApplicationStacking" || strings[0] == "ASt")
     {
@@ -1241,7 +1307,11 @@ bool MHEngine::GetEngineSupport(const MHOctetString &feature)
     // We support bitmaps that are partially off screen (don't we?)
     if (strings[0] == "BitmapDecodeOffset" || strings[0] == "BDO")
     {
-        if (strings.count() >= 3 && strings[1] == "10" && (strings[2] == "0" || strings[2] == "1"))
+        if (strings.count() >= 3 && strings[1] == "2" && (strings[2] == "0" || strings[2] == "1"))
+        {
+            return true;
+        }
+        else if (strings.count() >= 2 && (strings[1] == "4" || strings[1] == "6"))
         {
             return true;
         }
@@ -1283,6 +1353,16 @@ bool MHEngine::GetEngineSupport(const MHOctetString &feature)
         {
             return false;
         }
+    }
+
+    // InteractionChannelExtension.
+    if (strings[0] == "ICProfile" || strings[0] == "ICP") {
+        if (strings.count() != 2) return false;
+        if (strings[1] == "0")
+            return true; // // InteractionChannelExtension.
+        if (strings[1] == "1")
+            return false; // ICStreamingExtension.
+        return false;
     }
 
     // Otherwise return false.
@@ -1442,7 +1522,7 @@ FILE *__mhlogStream = NULL;
 void __mhlog(QString logtext)
 {
     QByteArray tmp = logtext.toAscii();
-    fprintf(__mhlogStream, "%s\n", tmp.constData());
+    fprintf(__mhlogStream, "[freemheg] %s\n", tmp.constData());
 }
 
 // Called from the user of the library to set the logging.

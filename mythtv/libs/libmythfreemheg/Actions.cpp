@@ -44,9 +44,9 @@
 class MHUnimplementedAction: public MHElemAction
 {
   public:
-    MHUnimplementedAction(int nTag): MHElemAction("")
+    MHUnimplementedAction(int nTag): MHElemAction(""), m_nTag(nTag)
     {
-        m_nTag = nTag;
+        MHLOG(MHLogWarning, QString("WARN Unimplemented action %1").arg(m_nTag) );
     }
     virtual void Initialise(MHParseNode *, MHEngine *) {}
     virtual void PrintMe(FILE *fd, int /*nTabs*/) const
@@ -297,7 +297,7 @@ void MHActionSequence::Initialise(MHParseNode *p, MHEngine *engine)
                 pAction = new MHUnimplementedAction(pElemAction->GetTagNo());
                 break; // Stream
             case C_SET_COUNTER_POSITION:
-                pAction = new MHUnimplementedAction(pElemAction->GetTagNo());
+                pAction = new MHSetCounterPosition;
                 break; // Stream
             case C_SET_COUNTER_TRIGGER:
                 pAction = new MHUnimplementedAction(pElemAction->GetTagNo());
@@ -357,7 +357,7 @@ void MHActionSequence::Initialise(MHParseNode *p, MHEngine *engine)
                 pAction = new MHSetSliderValue;
                 break;
             case C_SET_SPEED:
-                pAction = new MHUnimplementedAction(pElemAction->GetTagNo());
+                pAction = new MHSetSpeed;
                 break; // ?
             case C_SET_TIMER:
                 pAction = new MHSetTimer;
@@ -442,8 +442,16 @@ void MHActionSequence::Initialise(MHParseNode *p, MHEngine *engine)
                 pAction = new MHSetSliderParameters;
                 break;
 
+            // Added in ETSI ES 202 184 V2.1.1 (2010-01)
+            case C_GET_COUNTER_POSITION: // Stream position
+                pAction = new MHGetCounterPosition;
+                break;
+            case C_GET_COUNTER_MAX_POSITION: // Stream total size
+                pAction = new MHGetCounterMaxPosition;
+                break;
+
             default:
-                MHLOG(MHLogWarning, QString("Unknown action %1").arg(pElemAction->GetTagNo()));
+                MHLOG(MHLogWarning, QString("WARN Unknown action %1").arg(pElemAction->GetTagNo()));
                 // Future proofing: ignore any actions that we don't know about.
                 // Obviously these can only arise in the binary coding.
                 pAction = NULL;

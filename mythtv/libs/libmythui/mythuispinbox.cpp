@@ -83,6 +83,43 @@ void MythUISpinBox::SetRange(int low, int high, int step, uint pageMultiple)
     CalculateArrowStates();
 }
 
+
+/**
+ * \brief Add a special label for a value of the spinbox, it does not need to be in the range
+ *
+ * \param label The text displayed
+ * \param value The value associated to this label
+ */
+void MythUISpinBox::AddSelection(int value, const QString &label)
+{
+    MythUIButtonListItem *item;
+    if (!label.isEmpty())
+    {
+        item = GetItemByData(value);
+        if (item)
+        {
+            item->SetText(label);
+            return;
+        }
+    }
+    
+    int insertPos=-1;
+
+    for (int pos = 0; pos < m_itemList.size(); pos++)
+    {
+        item = m_itemList.at(pos);
+        if (item->GetData().toInt() > value)
+        {
+            insertPos = pos;
+            break;
+        }
+    }
+
+    item = new MythUIButtonListItem(this,
+                                    label.isEmpty() ? QString(value) : label,
+                                    qVariantFromValue(value), insertPos);
+}
+
 /**
  *  \copydoc MythUIType::ParseElement()
  */
