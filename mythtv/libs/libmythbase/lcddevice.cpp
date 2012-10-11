@@ -19,6 +19,7 @@
 #include <QTextStream>
 #include <QTextCodec>
 #include <QByteArray>
+#include <QTcpSocket>
 
 // MythTV headers
 #include "lcddevice.h"
@@ -167,23 +168,27 @@ bool LCD::connectToHost(const QString &lhostname, unsigned int lport)
                                            .arg(count));
 
             if (socket)
-                socket->DecrRef();
+                delete socket;
 
-            socket = new MythSocket(-1, this);
-            if (socket->connect(hostname, port))
+            socket = new QTcpSocket();
+
+            QObject::connect(socket, SIGNAL(readyRead()),
+                             this, SLOT(ReadyRead()));
+            QObject::connect(socket, SIGNAL(disconnected()),
+                             this, SLOT(Disconnected()));
+
+            socket->connectToHost(hostname, port);
+            if (socket->waitForConnected())
             {
                 lcd_ready = false;
                 bConnected = true;
                 QTextStream os(socket);
                 os << "HELLO\n";
-
-                // HACK make sure the ready read thread is awake
-                usleep(1000);
-                socket->Lock();
-                socket->Unlock();
+                os.flush();
 
                 break;
             }
+            socket->close();
 
             usleep(500000);
         }
@@ -204,7 +209,7 @@ void LCD::sendToServer(const QString &someText)
         return;
 
     // Check the socket, make sure the connection is still up
-    if (socket->state() == MythSocket::Idle)
+    if (QAbstractSocket::ConnectedState != socket->state())
     {
         lcd_ready = false;
 
@@ -253,11 +258,12 @@ void LCD::restartConnection()
     connectToHost(hostname, port);
 }
 
-void LCD::readyRead(MythSocket *sock)
+void LCD::ReadyRead(void)
 {
-    (void) sock;
-
     QMutexLocker locker(&socketLock);
+
+    if (!socket)
+        return;
 
     QString lineFromServer, tempString;
     QStringList aList;
@@ -272,7 +278,7 @@ void LCD::readyRead(MythSocket *sock)
     int dataSize = socket->bytesAvailable() + 1;
     QByteArray data(dataSize + 1, 0);
 
-    socket->readBlock(data.data(), dataSize);
+    socket->read(data.data(), dataSize);
 
     lineFromServer = data;
     lineFromServer = lineFromServer.replace( QRegExp("\n"), " " );
@@ -372,18 +378,9 @@ void LCD::init()
     }
 }
 
-void LCD::connectionClosed(MythSocket *sock)
+void LCD::Disconnected(void)
 {
-    (void) sock;
     bConnected = false;
-}
-
-void LCD::connectionFailed(MythSocket *sock)
-{
-    QMutexLocker locker(&socketLock);
-    QString err = sock->errorToString();
-    LOG(VB_GENERAL, LOG_ERR, QString("Could not connect to LCDServer: %1")
-                                 .arg(err));
 }
 
 void LCD::stopAll()
@@ -736,7 +733,7 @@ LCD::~LCD()
 
     if (socket)
     {
-        socket->DecrRef();
+        delete socket;
         socket = NULL;
         lcd_ready = false;
     }
