@@ -37,6 +37,7 @@ using namespace std;
 #include <QReadWriteLock>
 #include <QNetworkProxy>
 #include <QStringList>
+#include <QUdpSocket>
 #include <QFileInfo>
 #include <QFile>
 #include <QDir>
@@ -46,7 +47,6 @@ using namespace std;
 #include "mythcorecontext.h"
 #include "exitcodes.h"
 #include "mythlogging.h"
-#include "msocketdevice.h"
 #include "mythsocket.h"
 #include "mythcoreutil.h"
 #include "mythsystem.h"
@@ -670,11 +670,9 @@ bool WakeOnLAN(QString MAC)
     LOG(VB_NETWORK, LOG_INFO,
             QString("WakeOnLan(): Sending WOL packet to %1").arg(MAC));
 
-    MSocketDevice socket(MSocketDevice::Datagram);
-    socket.setBroadcast(true);
-    socket.writeBlock(msg, msglen, QHostAddress("255.255.255.255"), 32767);
-
-    return true;
+    QUdpSocket udp_socket;
+    return udp_socket.writeDatagram(
+        msg, msglen, QHostAddress::Broadcast, 32767) == msglen;
 }
 
 bool IsPulseAudioRunning(void)
