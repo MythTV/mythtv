@@ -10,7 +10,7 @@ class MythServer : public ServerPool
     Q_OBJECT
 
   signals:
-    void newConnect(MythSocket*);
+    void NewConnection(int socketDescriptor);
 
   protected:
     virtual void newTcpConnection(int socket);

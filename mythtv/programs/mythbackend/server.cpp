@@ -1,9 +1,8 @@
 #include "server.h"
-#include "mythsocket.h"
+#include "mythlogging.h"
 
 void MythServer::newTcpConnection(int socket)
 {
-    MythSocket *s = new MythSocket(socket);
-    emit newConnect(s);
+    emit NewConnection(socket);
 }
 

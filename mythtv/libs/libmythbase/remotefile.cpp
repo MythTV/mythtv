@@ -85,7 +85,7 @@ MythSocket *RemoteFile::openSocket(bool control)
             port = 6543;
     }
 
-    if (!lsock->connect(host, port))
+    if (!lsock->ConnectToHost(host, port))
     {
         LOG(VB_GENERAL, LOG_ERR, loc +
             QString("Could not connect to server %1:%2") .arg(host).arg(port));
@@ -110,8 +110,7 @@ MythSocket *RemoteFile::openSocket(bool control)
     if (control)
     {
         strlist.append(QString("ANN Playback %1 %2").arg(hostname).arg(false));
-        lsock->writeStringList(strlist);
-        if (!lsock->readStringList(strlist, true))
+        if (!lsock->SendReceiveStringList(strlist))
         {
             LOG(VB_GENERAL, LOG_ERR, loc +
                 QString("Could not read string list from server %1:%2")
@@ -132,8 +131,7 @@ MythSocket *RemoteFile::openSocket(bool control)
         for (; it != possibleauxfiles.end(); ++it)
             strlist << *it;
 
-        if (!lsock->writeStringList(strlist) ||
-            !lsock->readStringList(strlist, true))
+        if (!lsock->SendReceiveStringList(strlist))
         {
             LOG(VB_GENERAL, LOG_ERR, loc +
                 QString("Did not get proper response from %1:%2")
@@ -211,18 +209,14 @@ bool RemoteFile::ReOpen(QString newFilename)
         return false;
     }
 
-    if (!sock->isOpen() || sock->error())
-        return false;
-
-    if (!controlSock->isOpen() || controlSock->error())
-        return false;
+    if (!sock->IsConnected() || !controlSock->IsConnected())
+        return -1;
 
     QStringList strlist( QString(query).arg(recordernum) );
     strlist << "REOPEN";
     strlist << newFilename;
 
-    controlSock->writeStringList(strlist);
-    controlSock->readStringList(strlist);
+    controlSock->SendReceiveStringList(strlist);
 
     lock.unlock();
 
@@ -242,8 +236,8 @@ void RemoteFile::Close(void)
     strlist << "DONE";
 
     lock.lock();
-    controlSock->writeStringList(strlist);
-    if (!controlSock->readStringList(strlist, true))
+    if (!controlSock->SendReceiveStringList(
+            strlist, 0, MythSocket::kShortTimeout))
     {
         LOG(VB_GENERAL, LOG_ERR, "Remote file timeout.");
     }
@@ -385,39 +379,23 @@ void RemoteFile::Reset(void)
         LOG(VB_NETWORK, LOG_ERR, "RemoteFile::Reset(): Called with no socket");
         return;
     }
-
-    while (sock && (sock->bytesAvailable() > 0))
-    {
-        int avail;
-        char *trash;
-
-        avail = sock->bytesAvailable();
-        trash = new char[avail + 1];
-        sock->readBlock(trash, avail);
-        delete [] trash;
-
-        LOG(VB_NETWORK, LOG_INFO,
-            QString ("%1 bytes available during reset.") .arg(avail));
-        locker.unlock();
-        usleep(30000);
-        locker.relock();
-    }
+    sock->Reset();
 }
 
 long long RemoteFile::Seek(long long pos, int whence, long long curpos)
 {
-    lock.lock();
+    QMutexLocker locker(&lock);
+
     if (!sock)
     {
         LOG(VB_NETWORK, LOG_ERR, "RemoteFile::Seek(): Called with no socket");
-        return 0;
+        return -1;
     }
 
-    if (!sock->isOpen() || sock->error())
-        return 0;
-
-    if (!controlSock->isOpen() || controlSock->error())
-        return 0;
+    if (!sock->IsConnected() || !controlSock->IsConnected())
+    {
+        return -1;
+    }
 
     QStringList strlist( QString(query).arg(recordernum) );
     strlist << "SEEK";
@@ -428,20 +406,16 @@ long long RemoteFile::Seek(long long pos, int whence, long long curpos)
     else
         strlist << QString::number(readposition);
 
-    controlSock->writeStringList(strlist);
-    controlSock->readStringList(strlist);
-    lock.unlock();
+    bool ok = controlSock->SendReceiveStringList(strlist);
 
-    long long retval = -1;
-    if (!strlist.empty())
+    if (ok && !strlist.empty())
     {
-        retval = strlist[0].toLongLong();
-        readposition = retval;
+        readposition = strlist[0].toLongLong();
+        sock->Reset();
+        return strlist[0].toLongLong();
     }
 
-    Reset();
-
-    return retval;
+    return -1;
 }
 
 int RemoteFile::Write(const void *data, int size)
@@ -466,21 +440,26 @@ int RemoteFile::Write(const void *data, int size)
         return -1;
     }
 
-    if (!sock->isOpen() || sock->error())
+    if (!sock->IsConnected() || !controlSock->IsConnected())
+    {
         return -1;
-
-    if (!controlSock->isOpen() || controlSock->error())
-        return -1;
+    }
 
     QStringList strlist( QString(query).arg(recordernum) );
     strlist << "WRITE_BLOCK";
     strlist << QString::number(size);
-    controlSock->writeStringList(strlist);
+    bool ok = controlSock->WriteStringList(strlist);
+    if (!ok)
+    {
+        LOG(VB_NETWORK, LOG_ERR,
+            "RemoteFile::Write(): Block notification failed");
+        return -1;
+    }
 
     recv = size;
     while (sent < recv && !error && zerocnt++ < 50)
     {
-        int ret = sock->writeBlock((char *)data + sent, recv - sent);
+        int ret = sock->Write((char*)data + sent, recv - sent);
         if (ret > 0)
         {
             sent += ret;
@@ -492,19 +471,19 @@ int RemoteFile::Write(const void *data, int size)
             break;
         }
 
-        if (controlSock->bytesAvailable() > 0)
+        if (controlSock->IsDataAvailable() &&
+            controlSock->ReadStringList(strlist, MythSocket::kShortTimeout) &&
+            !strlist.empty())
         {
-            if (controlSock->readStringList(strlist, true))
-            {
-                recv = strlist[0].toInt(); // -1 on backend error
-                response = true;
-            }
+            recv = strlist[0].toInt(); // -1 on backend error
+            response = true;
         }
     }
 
     if (!error && !response)
     {
-        if (controlSock->readStringList(strlist, true))
+        if (controlSock->ReadStringList(strlist, MythSocket::kShortTimeout) &&
+            !strlist.empty())
         {
             recv = strlist[0].toInt(); // -1 on backend error
         }
@@ -517,8 +496,8 @@ int RemoteFile::Write(const void *data, int size)
     }
 
     LOG(VB_NETWORK, LOG_DEBUG,
-            QString("RemoteFile::Write(): reqd=%1, sent=%2, rept=%3, error=%4")
-                    .arg(size).arg(sent).arg(recv).arg(error));
+        QString("RemoteFile::Write(): reqd=%1, sent=%2, rept=%3, error=%4")
+        .arg(size).arg(sent).arg(recv).arg(error));
 
     if (recv < 0)
         return recv;
@@ -543,37 +522,32 @@ int RemoteFile::Read(void *data, int size)
         return -1;
     }
 
-    if (!sock->isOpen() || sock->error())
+    if (!sock->IsConnected() || !controlSock->IsConnected())
         return -1;
 
-    if (!controlSock->isOpen() || controlSock->error())
-        return -1;
-
-    if (sock->bytesAvailable() > 0)
+    if (sock->IsDataAvailable())
     {
         LOG(VB_NETWORK, LOG_ERR,
                 "RemoteFile::Read(): Read socket not empty to start!");
-        while (sock->waitForMore(5) > 0)
-        {
-            int avail = sock->bytesAvailable();
-            char *trash = new char[avail + 1];
-            sock->readBlock(trash, avail);
-            delete [] trash;
-        }
+        sock->Reset();
     }
 
-    if (controlSock->bytesAvailable() > 0)
+    while (controlSock->IsDataAvailable())
     {
         LOG(VB_NETWORK, LOG_ERR,
                 "RemoteFile::Read(): Control socket not empty to start!");
-        QStringList tempstrlist;
-        controlSock->readStringList(tempstrlist);
+        controlSock->Reset();
     }
 
     QStringList strlist( QString(query).arg(recordernum) );
     strlist << "REQUEST_BLOCK";
     strlist << QString::number(size);
-    controlSock->writeStringList(strlist);
+    bool ok = controlSock->WriteStringList(strlist);
+    if (!ok)
+    {
+        LOG(VB_NETWORK, LOG_ERR, "RemoteFile::Read(): Block request failed");
+        return -1;
+    }
 
     sent = size;
 
@@ -583,27 +557,28 @@ int RemoteFile::Read(void *data, int size)
 
     while (recv < sent && !error && mtimer.elapsed() < 10000)
     {
-        while (recv < sent && sock->waitForMore(waitms) > 0)
+        MythTimer ctt; // check control socket timer
+        ctt.start();
+        while ((recv < sent) && (ctt.elapsed() < 500))
         {
-            int ret = sock->readBlock(((char *)data) + recv, sent - recv);
+            int ret = sock->Read(
+                ((char *)data) + recv, sent - recv, 500);
             if (ret > 0)
             {
                 recv += ret;
             }
-            else if (sock->error() != MythSocket::NoError)
+            else if (ret < 0)
             {
-                LOG(VB_GENERAL, LOG_ERR, "RemoteFile::Read(): socket error");
                 error = true;
-                break;
             }
-
             if (waitms < 200)
                 waitms += 20;
         }
 
-        if (controlSock->bytesAvailable() > 0)
+        if (controlSock->IsDataAvailable() &&
+            controlSock->ReadStringList(strlist, MythSocket::kShortTimeout) &&
+            !strlist.empty())
         {
-            controlSock->readStringList(strlist, true);
             sent = strlist[0].toInt(); // -1 on backend error
             response = true;
         }
@@ -611,7 +586,8 @@ int RemoteFile::Read(void *data, int size)
 
     if (!error && !response)
     {
-        if (controlSock->readStringList(strlist, true))
+        if (controlSock->ReadStringList(strlist, MythSocket::kShortTimeout) &&
+            !strlist.empty())
         {
             sent = strlist[0].toInt(); // -1 on backend error
         }
@@ -660,18 +636,14 @@ void RemoteFile::SetTimeout(bool fast)
         return;
     }
 
-    if (!sock->isOpen() || sock->error())
-        return;
-
-    if (!controlSock->isOpen() || controlSock->error())
+    if (!sock->IsConnected() || !controlSock->IsConnected())
         return;
 
     QStringList strlist( QString(query).arg(recordernum) );
     strlist << "SET_TIMEOUT";
     strlist << QString::number((int)fast);
 
-    controlSock->writeStringList(strlist);
-    controlSock->readStringList(strlist);
+    controlSock->SendReceiveStringList(strlist);
 
     timeoutisfast = fast;
 }

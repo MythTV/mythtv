@@ -1,117 +1,122 @@
 /** -*- Mode: c++ -*- */
-#ifndef MYTHSOCKET_H
-#define MYTHSOCKET_H
+#ifndef MYTH_SOCKET_H
+#define MYTH_SOCKET_H
 
+#include <QHostAddress>
 #include <QStringList>
 #include <QMutex>
+#include <QHash>
 
 #include "referencecounter.h"
-#include "msocketdevice.h"
 #include "mythsocket_cb.h"
 #include "mythbaseexp.h"
+#include "mthread.h"
 
-template<class T >
-class QList;
-class QString;
-class QHostAddress;
-class MythSocketThread;
+class QTcpSocket;
 
-class MBASE_PUBLIC MythSocket :
-    public MSocketDevice, public ReferenceCounter
+/** \brief Class for communcating between myth backends and frontends
+ *
+ *  \note Access to the methods of MythSocket must be externally
+ *  serialized (i.e. the MythSocket must only be available to one
+ *  thread at a time).
+ *
+ */
+class MBASE_PUBLIC MythSocket : public QObject, public ReferenceCounter
 {
-    friend class MythSocketThread;
-    friend class QList<MythSocket*>;
-    friend void ShutdownRRT(void);
+    Q_OBJECT
+
+    friend class MythSocketManager;
 
   public:
-    MythSocket(int socket = -1, MythSocketCBs *cb = NULL);
+    MythSocket(int socket = -1, MythSocketCBs *cb = NULL,
+               bool use_shared_thread = false);
 
-    enum State {
-        Connected,
-        Connecting,
-        HostLookup,
-        Idle
-    };
+    bool ConnectToHost(const QString &hostname, quint16 port);
+    bool ConnectToHost(const QHostAddress &address, quint16 port);
+    void DisconnectFromHost(void);
 
-    void close(void);
-    bool closedByRemote(void);
-    void deleteLater(void);
+    bool Validate(uint timeout_ms = kMythSocketLongTimeout,
+                  bool error_dialog_desired = false);
+    bool IsValidated(void) const { return m_isValidated; }
 
-    virtual int DecrRef(void); // ReferenceCounter
+    bool Announce(const QStringList &strlist);
+    QStringList GetAnnounce(void) const { return m_announce; }
+    void SetAnnounce(const QStringList &strlist);
+    bool IsAnnounced(void) const { return m_isAnnounced; }
 
-    State   state(void) const;
-    QString stateToString(void) const { return stateToString(state()); }
-    QString stateToString(const State state) const;
+    void SetReadyReadCallbackEnabled(bool useReadyReadCallback)
+        { m_disableReadyReadCallback = !useReadyReadCallback; }
 
-    QString errorToString(void) const { return errorToString(error()); }
-    QString errorToString(const Error error) const;
+    bool SendReceiveStringList(
+        QStringList &list, uint min_reply_length = 0,
+        uint timeoutMS = kLongTimeout);
 
-    bool    Validate(uint timeout_ms = kMythSocketLongTimeout,
-                     bool error_dialog_desired = false);
-    void setValidated(bool isValidated=true)    { m_isValidated = isValidated; }
-    bool  isValidated(void)                     { return m_isValidated; }
+    bool ReadStringList(QStringList &list, uint timeoutMS = kShortTimeout);
+    bool WriteStringList(const QStringList &list);
 
-    bool           Announce(QStringList &strlist);
-    QStringList getAnnounce(void)               { return m_announce; }
-    void        setAnnounce(QStringList &strlist);
-    bool         isAnnounced(void)              { return m_isAnnounced; }
+    bool IsConnected(void) const;
+    bool IsDataAvailable(void) const;
 
-    bool isExpectingReply(void)                 { return m_expectingreply; }
+    QHostAddress GetPeerAddress(void) const;
+    int GetPeerPort(void) const;
+    int GetSocketDescriptor(void) const;
 
-    void setSocket(int socket, Type type = MSocketDevice::Stream);
-    void setCallbacks(MythSocketCBs *cb);
-    void useReadyReadCallback(bool useReadyReadCallback = true)
-        { m_useReadyReadCallback = useReadyReadCallback; }
-
-    qint64 readBlock(char *data, quint64 len);
-    qint64 writeBlock(const char *data, quint64 len);
-
-    bool readStringList(QStringList &list, uint timeoutMS = kLongTimeout);
-    bool readStringList(QStringList &list, bool quicTimeout)
-    {
-        return readStringList(
-            list, quicTimeout ? kShortTimeout : kLongTimeout);
-    }
-    bool writeStringList(QStringList &list);
-    bool SendReceiveStringList(QStringList &list, uint min_reply_length = 0);
-    bool readData(char *data, quint64 len);
-    bool writeData(const char *data, quint64 len);
-
-    bool connect(const QHostAddress &hadr, quint16 port);
-    bool connect(const QString &host, quint16 port);
-
-    void Lock(void) const;
-    bool TryLock(bool wakereadyread) const;
-    void Unlock(bool wakereadyread = true) const;
+    // RemoteFile stuff
+    int Write(const char*, int size);
+    int Read(char*, int size, int max_wait_ms);
+    void Reset(void);
 
     static const uint kShortTimeout;
     static const uint kLongTimeout;
 
+  signals:
+    void CallReadyRead(void);
+
+  protected slots:
+    void ConnectHandler(void);
+    void ErrorHandler(QAbstractSocket::SocketError);
+    void AboutToCloseHandler(void);
+    void DisconnectHandler(void);
+    void ReadyReadHandler(void);
+    void CallReadyReadHandler(void);
+
+    void ReadStringListReal(QStringList *list, uint timeoutMS, bool *ret);
+    void WriteStringListReal(const QStringList *list, bool *ret);
+    void ConnectToHostReal(QHostAddress address, quint16 port, bool *ret);
+    void DisconnectFromHostReal(void);
+
+    void WriteReal(const char*, int size, int *ret);
+    void ReadReal(char*, int size, int max_wait_ms, int *ret);
+    void ResetReal(void);
+
+    void IsDataAvailableReal(bool *ret) const;
+
   protected:
-   ~MythSocket();  // force refcounting
+    ~MythSocket(); // force reference counting
 
-    void  setState(const State state);
-
-    MythSocketCBs  *m_cb;
-    bool            m_useReadyReadCallback;
-    State           m_state;
-    QHostAddress    m_addr;
-    quint16         m_port;
-
-    bool            m_notifyread;
-    mutable QMutex  m_lock; // externally accessible lock
-
-    bool            m_expectingreply;
-    bool            m_isValidated;
-    bool            m_isAnnounced;
-    QStringList     m_announce;
+    QTcpSocket     *m_tcpSocket; // only set in ctor
+    MThread        *m_thread; // only set in ctor
+    mutable QMutex  m_lock;
+    int             m_socketDescriptor; // protected by m_lock
+    QHostAddress    m_peerAddress; // protected by m_lock
+    int             m_peerPort; // protected by m_lock
+    MythSocketCBs  *m_callback; // only set in ctor
+    bool            m_useSharedThread; // only set in ctor
+    volatile bool   m_disableReadyReadCallback;
+    bool            m_connected; // protected by m_lock
+    volatile bool   m_dataAvailable;
+    bool            m_isValidated; // only set in thread using MythSocket
+    bool            m_isAnnounced; // only set in thread using MythSocket
+    QStringList     m_announce; // only set in thread using MythSocket
 
     static const uint kSocketBufferSize;
-    static QMutex s_readyread_thread_lock;
-    static MythSocketThread *s_readyread_thread;
-    
-    static QMap<QString, QHostAddress::SpecialAddress> s_loopback_cache;
+
+    static QMutex s_loopbackCacheLock;
+    static QHash<QString, QHostAddress::SpecialAddress> s_loopbackCache;
+
+    static QMutex s_thread_lock;
+    static MThread *s_thread; // protected by s_thread_lock
+    static int s_thread_cnt; // protected by s_thread_lock
 };
 
-#endif
-
+#endif /* MYTH_SOCKET_H */

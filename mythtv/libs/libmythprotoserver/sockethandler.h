@@ -29,7 +29,7 @@ class PROTOSERVER_PUBLIC SocketHandler : public ReferenceCounter
     MythSocket *GetSocket(void)         { return m_socket; }
     MythSocketManager *GetParent(void)  { return m_parent; }
 
-    bool SendStringList(QStringList &strlist, bool lock=false);
+    bool WriteStringList(const QStringList &strlist);
     bool SendReceiveStringList(QStringList &strlist, uint min_reply_length=0);
 
     void BlockShutdown(bool block)      { m_blockShutdown = block; }

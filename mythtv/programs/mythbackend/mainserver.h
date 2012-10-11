@@ -133,7 +133,7 @@ class MainServer : public QObject, public MythSocketCBs
     void autoexpireUpdate(void);
 
   private slots:
-    void newConnection(MythSocket *);
+    void NewConnection(int socketDescriptor);
 
   private:
 
@@ -274,6 +274,8 @@ class MainServer : public QObject, public MythSocketCBs
     QReadWriteLock sockListLock;
     vector<PlaybackSock *> playbackList;
     vector<FileTransfer *> fileTransferList;
+    QSet<MythSocket*> controlSocketList;
+    vector<MythSocket*> decrRefSocketList;
 
     QMutex masterFreeSpaceListLock;
     FreeSpaceUpdater * volatile masterFreeSpaceListUpdater;

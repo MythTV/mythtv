@@ -4,10 +4,12 @@
 using namespace std;
 
 // Qt
-#include <QReadWriteLock>
 #include <QMap>
+#include <QSet>
 #include <QList>
+#include <QMutex>
 #include <QTimer>
+#include <QReadWriteLock>
 #include <QWaitCondition>
 
 // MythTV
@@ -24,7 +26,7 @@ class MythServer : public ServerPool
     MythServer(QObject *parent=0);
 
   signals:
-    void newConnection(MythSocket *);
+    void newConnection(int socketDescriptor);
 
   protected slots:
     virtual void newTcpConnection(int socket);
@@ -53,7 +55,7 @@ class PROTOSERVER_PUBLIC MythSocketManager : public QObject, public MythSocketCB
     bool Listen(int port);
 
   public slots:
-    void newConnection(MythSocket *socket) { socket->setCallbacks(this); }
+    void newConnection(int sd);
 
   private:
     void ProcessRequestWork(MythSocket *socket);
@@ -69,5 +71,7 @@ class PROTOSERVER_PUBLIC MythSocketManager : public QObject, public MythSocketCB
     MythServer     *m_server;
     MThreadPool     m_threadPool;
 
+    QMutex m_socketListLock;
+    QSet<MythSocket*> m_socketList;
 };
 #endif

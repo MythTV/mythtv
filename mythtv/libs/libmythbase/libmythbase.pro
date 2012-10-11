@@ -11,7 +11,7 @@ QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 
 # Input
 HEADERS += mthread.h mthreadpool.h
-HEADERS += mythsocket.h mythsocket_cb.h mythsocketthread.h msocketdevice.h
+HEADERS += mythsocket.h mythsocket_cb.h
 HEADERS += mythbaseexp.h mythdbcon.h mythdb.h mythdbparams.h oldsettings.h
 HEADERS += verbosedefs.h mythversion.h compat.h mythconfig.h
 HEADERS += mythobservable.h mythevent.h httpcomms.h mcodecs.h
@@ -28,7 +28,7 @@ HEADERS += plist.h bswap.h signalhandling.h mythtimezone.h mythdate.h
 HEADERS += ffmpeg-mmx.h
 
 SOURCES += mthread.cpp mthreadpool.cpp
-SOURCES += mythsocket.cpp mythsocketthread.cpp msocketdevice.cpp
+SOURCES += mythsocket.cpp
 SOURCES += mythdbcon.cpp mythdb.cpp mythdbparams.cpp oldsettings.cpp
 SOURCES += mythobservable.cpp mythevent.cpp httpcomms.cpp mcodecs.cpp
 SOURCES += mythdirs.cpp mythsignalingtimer.cpp
@@ -42,9 +42,8 @@ SOURCES += referencecounter.cpp mythcommandlineparser.cpp
 SOURCES += filesysteminfo.cpp hardwareprofile.cpp serverpool.cpp
 SOURCES += plist.cpp signalhandling.cpp mythtimezone.cpp mythdate.cpp
 
-win32:SOURCES += msocketdevice_win.cpp
 unix {
-    SOURCES += msocketdevice_unix.cpp system-unix.cpp
+    SOURCES += system-unix.cpp
     HEADERS += system-unix.h
     QMAKE_CXXFLAGS += -fno-strict-aliasing
 }
@@ -60,7 +59,7 @@ inc.files  = mythdbcon.h mythdbparams.h mythbaseexp.h mythdb.h
 inc.files += compat.h mythversion.h mythconfig.h mythconfig.mak version.h
 inc.files += mythobservable.h mythevent.h httpcomms.h mcodecs.h verbosedefs.h
 inc.files += mythtimer.h lcddevice.h exitcodes.h mythdirs.h mythstorage.h
-inc.files += mythsocket.h mythsocket_cb.h msocketdevice.h mythlogging.h
+inc.files += mythsocket.h mythsocket_cb.h mythlogging.h
 inc.files += mythcorecontext.h mythsystem.h storagegroup.h loggingserver.h
 inc.files += mythcoreutil.h mythlocale.h mythdownloadmanager.h
 inc.files += mythtranslation.h iso639.h iso3166.h mythmedia.h mythmiscutil.h

@@ -81,6 +81,7 @@ EncoderLink::~EncoderLink(void)
         delete tv;
         tv = NULL;
     }
+    SetSocket(NULL);
 }
 
 /** \fn EncoderLink::SetSocket(PlaybackSock *lsock)

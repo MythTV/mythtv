@@ -144,6 +144,8 @@ class ProcessRequestRunnable : public QRunnable
 
     virtual void run(void)
     {
+        LOG(VB_GENERAL, LOG_INFO, QString("Processing request for sock %1")
+            .arg(m_sock->GetSocketDescriptor()));
         m_parent.ProcessRequest(m_sock);
         m_sock->DecrRef();
         m_sock = NULL;
@@ -282,8 +284,8 @@ MainServer::MainServer(bool master, int port,
         SetExitCode(GENERIC_EXIT_SOCKET_ERROR, false);
         return;
     }
-    connect(mythserver, SIGNAL(newConnect(MythSocket *)),
-            this,        SLOT(newConnection(MythSocket *)));
+    connect(mythserver, SIGNAL(NewConnection(int)),
+            this,       SLOT(NewConnection(int)));
 
     gCoreContext->addListener(this);
 
@@ -385,6 +387,30 @@ void MainServer::Stop()
             masterFreeSpaceListWait.wait(locker.mutex());
         }
     }
+
+    // Close all open sockets
+    QWriteLocker locker(&sockListLock);
+
+    vector<PlaybackSock *>::iterator it = playbackList.begin();
+    for (; it != playbackList.end(); ++it)
+        (*it)->DecrRef();
+    playbackList.clear();
+
+    vector<FileTransfer *>::iterator ft = fileTransferList.begin();
+    for (; ft != fileTransferList.end(); ++ft)
+        (*ft)->DecrRef();
+    fileTransferList.clear();
+
+    QSet<MythSocket*>::iterator cs = controlSocketList.begin();
+    for (; cs != controlSocketList.end(); ++cs)
+        (*cs)->DecrRef();
+    controlSocketList.clear();
+
+    while (!decrRefSocketList.empty())
+    {
+        (*decrRefSocketList.begin())->DecrRef();
+        decrRefSocketList.erase(decrRefSocketList.begin());
+    }
 }
 
 void MainServer::autoexpireUpdate(void)
@@ -392,9 +418,10 @@ void MainServer::autoexpireUpdate(void)
     AutoExpire::Update(false);
 }
 
-void MainServer::newConnection(MythSocket *socket)
+void MainServer::NewConnection(int socketDescriptor)
 {
-    socket->setCallbacks(this);
+    QWriteLocker locker(&sockListLock);
+    controlSocketList.insert(new MythSocket(socketDescriptor, this));
 }
 
 void MainServer::readyRead(MythSocket *sock)
@@ -404,38 +431,44 @@ void MainServer::readyRead(MythSocket *sock)
     bool expecting_reply = testsock && testsock->isExpectingReply();
     sockListLock.unlock();
     if (expecting_reply)
+    {
+        LOG(VB_GENERAL, LOG_INFO, "readyRead ignoring, expecting reply");
         return;
+    }
 
     threadPool.startReserved(
         new ProcessRequestRunnable(*this, sock),
         "ProcessRequest", PRT_TIMEOUT);
+
+    QCoreApplication::processEvents();
 }
 
 void MainServer::ProcessRequest(MythSocket *sock)
 {
-    sock->Lock();
-
-    if (sock->bytesAvailable() > 0)
-    {
+    if (sock->IsDataAvailable())
         ProcessRequestWork(sock);
-    }
-
-    sock->Unlock();
+    else
+        LOG(VB_GENERAL, LOG_INFO, QString("No data on sock %1")
+            .arg(sock->GetSocketDescriptor()));
 }
 
 void MainServer::ProcessRequestWork(MythSocket *sock)
 {
     QStringList listline;
-    if (!sock->readStringList(listline))
+    LOG(VB_GENERAL, LOG_INFO, "PRW: Calling ReadStringList()");
+    if (!sock->ReadStringList(listline) || listline.empty())
+    {
+        LOG(VB_GENERAL, LOG_INFO, "No data in ProcessRequestWork()");
         return;
+    }
 
     QString line = listline[0];
 
     line = line.simplified();
     QStringList tokens = line.split(' ', QString::SkipEmptyParts);
     QString command = tokens[0];
-#if 0
-    LOG(VB_GENERAL, LOG_DEBUG, "command='" + command + "'");
+#if 1
+    LOG(VB_GENERAL, LOG_INFO, "PRW: command='" + command + "'");
 #endif
     if (command == "MYTH_PROTO_VERSION")
     {
@@ -860,6 +893,20 @@ void MainServer::customEvent(QEvent *e)
     QStringList broadcast;
     QSet<QString> receivers;
 
+    // delete stale sockets in the UI thread
+    sockListLock.lockForRead();
+    bool decrRefEmpty = decrRefSocketList.empty();
+    sockListLock.unlock();
+    if (!decrRefEmpty)
+    {
+        QWriteLocker locker(&sockListLock);
+        while (!decrRefSocketList.empty())
+        {
+            (*decrRefSocketList.begin())->DecrRef();
+            decrRefSocketList.erase(decrRefSocketList.begin());
+        }
+    }
+
     if ((MythEvent::Type)(e->type()) == MythEvent::MythEventMessage)
     {
         MythEvent *me = (MythEvent *)e;
@@ -1255,15 +1302,8 @@ void MainServer::customEvent(QEvent *e)
             }
 
             MythSocket *sock = pbs->getSocket();
-            if (reallysendit && sock->socket() >= 0)
-            {
-                sock->Lock();
-
-                if (sock->socket() >= 0)
-                    sock->writeStringList(broadcast);
-
-                sock->Unlock();
-            }
+            if (reallysendit && sock->IsConnected())
+                sock->WriteStringList(broadcast);
         }
 
         // Done with the pbs list, so decrement all the instances..
@@ -1293,7 +1333,7 @@ void MainServer::HandleVersion(MythSocket *socket, const QStringList &slist)
             "MainServer::HandleVersion - Client speaks protocol version " +
             version + " but we speak " + MYTH_PROTO_VERSION + '!');
         retlist << "REJECT" << MYTH_PROTO_VERSION;
-        socket->writeStringList(retlist);
+        socket->WriteStringList(retlist);
         HandleDone(socket);
         return;
     }
@@ -1304,7 +1344,7 @@ void MainServer::HandleVersion(MythSocket *socket, const QStringList &slist)
             "MainServer::HandleVersion - Client did not pass protocol "
             "token. Refusing connection!");
         retlist << "REJECT" << MYTH_PROTO_VERSION;
-        socket->writeStringList(retlist);
+        socket->WriteStringList(retlist);
         HandleDone(socket);
         return;
     }
@@ -1316,13 +1356,13 @@ void MainServer::HandleVersion(MythSocket *socket, const QStringList &slist)
             "MainServer::HandleVersion - Client sent incorrect protocol"
             " token for protocol version. Refusing connection!");
         retlist << "REJECT" << MYTH_PROTO_VERSION;
-        socket->writeStringList(retlist);
+        socket->WriteStringList(retlist);
         HandleDone(socket);
         return;
     }
 
     retlist << "ACCEPT" << MYTH_PROTO_VERSION;
-    socket->writeStringList(retlist);
+    socket->WriteStringList(retlist);
 }
 
 /**
@@ -1353,7 +1393,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
                 .arg(info));
 
         errlist << "malformed_ann_query";
-        socket->writeStringList(errlist);
+        socket->WriteStringList(errlist);
         return;
     }
 
@@ -1368,7 +1408,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
                 QString("Client %1 is trying to announce a socket "
                         "multiple times.")
                     .arg(commands[2]));
-            socket->writeStringList(retlist);
+            socket->WriteStringList(retlist);
             sockListLock.unlock();
             return;
         }
@@ -1383,7 +1423,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
                     .arg(commands[1]));
 
             errlist << "malformed_ann_query";
-            socket->writeStringList(errlist);
+            socket->WriteStringList(errlist);
             return;
         }
         // Monitor connections are same as Playback but they don't
@@ -1400,6 +1440,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
         pbs->setBlockShutdown(commands[1] == "Playback");
 
         sockListLock.lockForWrite();
+        controlSocketList.remove(socket);
         playbackList.push_back(pbs);
         sockListLock.unlock();
 
@@ -1414,7 +1455,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
             LOG(VB_GENERAL, LOG_ERR,
                 "Received malformed ANN MediaServer query");
             errlist << "malformed_ann_query";
-            socket->writeStringList(errlist);
+            socket->WriteStringList(errlist);
             return;
         }
 
@@ -1423,6 +1464,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
         pbs->setAsMediaServer();
         pbs->setBlockShutdown(false);
         sockListLock.lockForWrite();
+        controlSocketList.remove(socket);
         playbackList.push_back(pbs);
         sockListLock.unlock();
 
@@ -1436,7 +1478,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
             LOG(VB_GENERAL, LOG_ERR, QString("Received malformed ANN %1 query")
                     .arg(commands[1]));
             errlist << "malformed_ann_query";
-            socket->writeStringList(errlist);
+            socket->WriteStringList(errlist);
             return;
         }
 
@@ -1489,6 +1531,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
         pbs->setBlockShutdown(false);
 
         sockListLock.lockForWrite();
+        controlSocketList.remove(socket);
         playbackList.push_back(pbs);
         sockListLock.unlock();
 
@@ -1503,7 +1546,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
         {
             LOG(VB_GENERAL, LOG_ERR, "Received malformed FileTransfer command");
             errlist << "malformed_filetransfer_command";
-            socket->writeStringList(errlist);
+            socket->WriteStringList(errlist);
             return;
         }
 
@@ -1543,7 +1586,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
                 LOG(VB_GENERAL, LOG_ERR, "Unable to determine directory "
                         "to write to in FileTransfer write command");
                 errlist << "filetransfer_directory_not_found";
-                socket->writeStringList(errlist);
+                socket->WriteStringList(errlist);
                 return;
             }
 
@@ -1557,7 +1600,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
                     QString("FileTransfer write filename is empty in url '%1'.")
                         .arg(qurl.toString()));
                 errlist << "filetransfer_filename_empty";
-                socket->writeStringList(errlist);
+                socket->WriteStringList(errlist);
                 return;
             }
 
@@ -1568,7 +1611,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
                     QString("FileTransfer write filename '%1' does not pass "
                             "sanity checks.") .arg(basename));
                 errlist << "filetransfer_filename_dangerous";
-                socket->writeStringList(errlist);
+                socket->WriteStringList(errlist);
                 return;
             }
 
@@ -1581,7 +1624,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
         {
             LOG(VB_GENERAL, LOG_ERR, "Empty filename, cowardly aborting!");
             errlist << "filetransfer_filename_empty";
-            socket->writeStringList(errlist);
+            socket->WriteStringList(errlist);
             return;
         }
             
@@ -1593,7 +1636,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
                 QString("FileTransfer filename '%1' is actually a directory, "
                         "cannot transfer.") .arg(filename));
             errlist << "filetransfer_filename_is_a_directory";
-            socket->writeStringList(errlist);
+            socket->WriteStringList(errlist);
             return;
         }
 
@@ -1610,7 +1653,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
                                 "subdirectory which does not exist, and can "
                                 "not be created.") .arg(filename));
                     errlist << "filetransfer_unable_to_create_subdirectory";
-                    socket->writeStringList(errlist);
+                    socket->WriteStringList(errlist);
                     return;
                 }
             }
@@ -1624,10 +1667,11 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
         ft->IncrRef();
 
         sockListLock.lockForWrite();
+        controlSocketList.remove(socket);
         fileTransferList.push_back(ft);
         sockListLock.unlock();
 
-        retlist << QString::number(socket->socket());
+        retlist << QString::number(socket->GetSocketDescriptor());
         retlist << QString::number(ft->GetFileSize());
 
         ft->DecrRef();
@@ -1647,7 +1691,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
         }
     }
 
-    socket->writeStringList(retlist);
+    socket->WriteStringList(retlist);
 }
 
 /**
@@ -1657,7 +1701,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
  */
 void MainServer::HandleDone(MythSocket *socket)
 {
-    socket->close();
+    socket->DisconnectFromHost();
 }
 
 void MainServer::SendResponse(MythSocket *socket, QStringList &commands)
@@ -1680,7 +1724,7 @@ void MainServer::SendResponse(MythSocket *socket, QStringList &commands)
 
     if (do_write)
     {
-        socket->writeStringList(commands);
+        socket->WriteStringList(commands);
     }
     else
     {
@@ -5707,9 +5751,15 @@ void MainServer::DeletePBS(PlaybackSock *sock)
     deferredDeleteList.push_back(dds);
 }
 
+#undef QT_NO_DEBUG
+
 void MainServer::connectionClosed(MythSocket *socket)
 {
     sockListLock.lockForWrite();
+
+    // make sure these are not actually deleted in the callback
+    socket->IncrRef();
+    decrRefSocketList.push_back(socket);
 
     vector<PlaybackSock *>::iterator it = playbackList.begin();
     for (; it != playbackList.end(); ++it)
@@ -5808,13 +5858,14 @@ void MainServer::connectionClosed(MythSocket *socket)
             if (testsock)
                 LOG(VB_GENERAL, LOG_ERR, "Playback sock still exists?");
 
+            pbs->DecrRef();
+
             sockListLock.unlock();
 
             // Since we may already be holding the scheduler lock
             // delay handling the disconnect until a little later. #9885
             SendSlaveDisconnectedEvent(disconnectedSlaves, needsReschedule);
 
-            pbs->DecrRef();
             return;
         }
     }
@@ -5832,11 +5883,20 @@ void MainServer::connectionClosed(MythSocket *socket)
         }
     }
 
+    QSet<MythSocket*>::iterator cs = controlSocketList.find(socket);
+    if (cs != controlSocketList.end())
+    {
+        (*cs)->DecrRef();
+        controlSocketList.erase(cs);
+        sockListLock.unlock();
+        return;
+    }
+
     sockListLock.unlock();
 
     LOG(VB_GENERAL, LOG_WARNING, LOC +
         QString("Unknown socket closing MythSocket(0x%1)")
-            .arg((uint64_t)socket,0,16));
+            .arg((intptr_t)socket,0,16));
 }
 
 PlaybackSock *MainServer::GetSlaveByHostname(const QString &hostname)
@@ -5914,7 +5974,7 @@ FileTransfer *MainServer::GetFileTransferByID(int id)
     vector<FileTransfer *>::iterator it = fileTransferList.begin();
     for (; it != fileTransferList.end(); ++it)
     {
-        if (id == (*it)->getSocket()->socket())
+        if (id == (*it)->getSocket()->GetSocketDescriptor())
         {
             retval = (*it);
             break;
@@ -6118,7 +6178,7 @@ QString MainServer::LocalFilePath(const QUrl &url, const QString &wantgroup)
 
 void MainServer::reconnectTimeout(void)
 {
-    MythSocket *masterServerSock = new MythSocket();
+    MythSocket *masterServerSock = new MythSocket(-1, this);
 
     QString server = gCoreContext->GetSetting("MasterServerIP", "127.0.0.1");
     int port = gCoreContext->GetNumSetting("MasterServerPort", 6543);
@@ -6126,17 +6186,9 @@ void MainServer::reconnectTimeout(void)
     LOG(VB_GENERAL, LOG_NOTICE, QString("Connecting to master server: %1:%2")
                            .arg(server).arg(port));
 
-    if (!masterServerSock->connect(server, port))
+    if (!masterServerSock->ConnectToHost(server, port))
     {
         LOG(VB_GENERAL, LOG_NOTICE, "Connection to master server timed out.");
-        masterServerReconnect->start(kMasterServerReconnectTimeout);
-        masterServerSock->DecrRef();
-        return;
-    }
-
-    if (masterServerSock->state() != MythSocket::Connected)
-    {
-        LOG(VB_GENERAL, LOG_ERR, "Could not connect to master server.");
         masterServerReconnect->start(kMasterServerReconnectTimeout);
         masterServerSock->DecrRef();
         return;
@@ -6147,8 +6199,6 @@ void MainServer::reconnectTimeout(void)
     QString str = QString("ANN SlaveBackend %1 %2")
                           .arg(gCoreContext->GetHostName())
                           .arg(gCoreContext->GetBackendServerIP());
-
-    masterServerSock->Lock();
 
     QStringList strlist( str );
 
@@ -6170,12 +6220,11 @@ void MainServer::reconnectTimeout(void)
         }
     }
 
-    if (!masterServerSock->writeStringList(strlist) ||
-        !masterServerSock->readStringList(strlist) ||
-        strlist.empty() || strlist[0] == "ERROR")
+    if (!masterServerSock->SendReceiveStringList(strlist, 1) ||
+        (strlist[0] == "ERROR"))
     {
-        masterServerSock->Unlock(); // DownRef will delete socket...
-        masterServerSock->DecrRef(); masterServerSock = NULL;
+        masterServerSock->DecrRef();
+        masterServerSock = NULL;
         if (strlist.empty())
         {
             LOG(VB_GENERAL, LOG_ERR, LOC +
@@ -6193,15 +6242,11 @@ void MainServer::reconnectTimeout(void)
         return;
     }
 
-    masterServerSock->setCallbacks(this);
-
     masterServer = new PlaybackSock(this, masterServerSock, server,
                                     kPBSEvents_Normal);
     sockListLock.lockForWrite();
     playbackList.push_back(masterServer);
     sockListLock.unlock();
-
-    masterServerSock->Unlock();
 
     autoexpireUpdateTimer->start(1000);
 }
@@ -6245,7 +6290,7 @@ void MainServer::ShutSlaveBackendsDown(QString &haltcmd)
     for (; it != playbackList.end(); ++it)
     {
         if ((*it)->isSlaveBackend())
-            (*it)->getSocket()->writeStringList(bcast);
+            (*it)->getSocket()->WriteStringList(bcast);
     }
 
     sockListLock.unlock();

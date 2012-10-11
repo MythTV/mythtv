@@ -33,7 +33,7 @@ FileTransfer::FileTransfer(QString &filename, MythSocket *remote, bool write) :
     pginfo->MarkAsInUse(true, kFileTransferInUseID);
 
     if (write)
-        remote->useReadyReadCallback(false);
+        remote->SetReadyReadCallbackEnabled(false);
     rbuffer->Start();
 }
 
@@ -138,7 +138,7 @@ int FileTransfer::RequestBlock(int size)
         if (rbuffer->GetStopReads() || ret <= 0)
             break;
 
-        if (!sock->writeData(buf, (uint)ret))
+        if (sock->Write(buf, (uint)ret) != ret)
         {
             tot = -1;
             break;
@@ -171,7 +171,7 @@ int FileTransfer::WriteBlock(int size)
     {
         int request = size - tot;
 
-        if (!sock->readData(buf, (uint)request))
+        if (sock->Read(buf, (uint)request, 25 /*ms */) != request)
             break;
 
         ret = rbuffer->Write(buf, request);

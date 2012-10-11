@@ -88,7 +88,7 @@ bool RemoteEncoder::SendReceiveStringList(
         return false;
     }
 
-    if (!controlSock->writeStringList(strlist))
+    if (!controlSock->WriteStringList(strlist))
     {
         LOG(VB_GENERAL, LOG_ERR, "RemoteEncoder::SendReceiveStringList(): "
                                  "Failed to write data.");
@@ -96,7 +96,7 @@ bool RemoteEncoder::SendReceiveStringList(
     }
 
     if (!backendError &&
-        !controlSock->readStringList(strlist, MythSocket::kShortTimeout))
+        !controlSock->ReadStringList(strlist, MythSocket::kShortTimeout))
     {
         LOG(VB_GENERAL, LOG_ERR,
             "RemoteEncoder::SendReceiveStringList(): No response.");

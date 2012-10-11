@@ -265,7 +265,7 @@ bool telnet(const QString &host, int port)
 {
     MythSocket *s = new MythSocket();
 
-    bool connected = s->connect(host, port);
+    bool connected = s->ConnectToHost(host, port);
     s->DecrRef();
 
     return connected;

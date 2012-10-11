@@ -18,6 +18,7 @@ QMAKE_CLEAN += version.cpp
 # Input
 
 HEADERS += mmulticastsocketdevice.h     mbroadcastsocketdevice.h
+HEADERS += msocketdevice.h
 HEADERS += httprequest.h upnp.h ssdp.h taskqueue.h upnpsubscription.h
 HEADERS += upnpdevice.h upnptasknotify.h upnptasksearch.h upnputil.h
 HEADERS += httpserver.h upnpcds.h upnpcdsobjects.h bufferedsocketdevice.h upnpmsrr.h
@@ -32,6 +33,9 @@ HEADERS += serializers/jsonSerializer.h serializers/soapSerializer.h
 HEADERS += serializers/xmlplistSerializer.h
 
 SOURCES += mmulticastsocketdevice.cpp
+SOURCES += msocketdevice.cpp
+unix:SOURCES += msocketdevice_unix.cpp
+mingw:SOURCES += msocketdevice_win.cpp
 SOURCES += httprequest.cpp upnp.cpp ssdp.cpp taskqueue.cpp upnputil.cpp
 SOURCES += upnpdevice.cpp upnptasknotify.cpp upnptasksearch.cpp
 SOURCES += httpserver.cpp upnpcds.cpp upnpcdsobjects.cpp bufferedsocketdevice.cpp

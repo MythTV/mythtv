@@ -25,7 +25,6 @@
 
 #include "tv_rec.h"
 #include "scheduledrecording.h"
-#include "mythsocketthread.h"
 #include "autoexpire.h"
 #include "scheduler.h"
 #include "mainserver.h"
@@ -424,7 +423,7 @@ using namespace MythTZ;
 int connect_to_master(void)
 {
     MythSocket *tempMonitorConnection = new MythSocket();
-    if (tempMonitorConnection->connect(
+    if (tempMonitorConnection->ConnectToHost(
             gCoreContext->GetSetting("MasterServerIP", "127.0.0.1"),
             gCoreContext->GetNumSetting("MasterServerPort", 6543)))
     {
@@ -438,8 +437,7 @@ int connect_to_master(void)
         QStringList tempMonitorDone("DONE");
 
         QStringList tempMonitorAnnounce("ANN Monitor tzcheck 0");
-        tempMonitorConnection->writeStringList(tempMonitorAnnounce);
-        tempMonitorConnection->readStringList(tempMonitorAnnounce);
+        tempMonitorConnection->SendReceiveStringList(tempMonitorAnnounce);
         if (tempMonitorAnnounce.empty() ||
             tempMonitorAnnounce[0] == "ERROR")
         {
@@ -464,14 +462,13 @@ int connect_to_master(void)
         if (tempMonitorConnection)
         {
             timeCheck.push_back("QUERY_TIME_ZONE");
-            tempMonitorConnection->writeStringList(timeCheck);
-            tempMonitorConnection->readStringList(timeCheck);
+            tempMonitorConnection->SendReceiveStringList(timeCheck);
         }
         if (timeCheck.size() < 3)
         {
             return GENERIC_EXIT_SOCKET_ERROR;
         }
-        tempMonitorConnection->writeStringList(tempMonitorDone);
+        tempMonitorConnection->WriteStringList(tempMonitorDone);
 
         QDateTime our_time = MythDate::current();
         QDateTime master_time = MythDate::fromString(timeCheck[2]);

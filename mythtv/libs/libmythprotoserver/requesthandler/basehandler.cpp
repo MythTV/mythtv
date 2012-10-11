@@ -37,7 +37,7 @@ bool BaseRequestHandler::HandleAnnounce(MythSocket *socket,
     bool normalevents = ( (eventlevel == 1) || (eventlevel == 2));
 
     SocketHandler *handler = new SocketHandler(socket, m_parent, hostname);
-    socket->setAnnounce(slist);
+    socket->SetAnnounce(slist);
 
     handler->BlockShutdown(blockShutdown);
     handler->AllowStandardEvents(normalevents);
@@ -45,8 +45,7 @@ bool BaseRequestHandler::HandleAnnounce(MythSocket *socket,
 
     m_parent->AddSocketHandler(handler);
 
-    QStringList sl; sl << "OK";
-    handler->SendStringList(sl);
+    handler->WriteStringList(QStringList("OK"));
     handler->DecrRef();
     handler = NULL;
 
@@ -101,7 +100,7 @@ bool BaseRequestHandler::HandleQueryLoad(SocketHandler *sock)
                 << QString::number(loads[1])
                 << QString::number(loads[2]);
 
-    sock->SendStringList(strlist);
+    sock->WriteStringList(strlist);
     return true;
 }
 
@@ -123,7 +122,7 @@ bool BaseRequestHandler::HandleQueryUptime(SocketHandler *sock)
         strlist << "Could not determine uptime.";
     }
 
-    sock->SendStringList(strlist);
+    sock->WriteStringList(strlist);
     return true;
 }
 
@@ -138,7 +137,7 @@ bool BaseRequestHandler::HandleQueryHostname(SocketHandler *sock)
 
     strlist << gCoreContext->GetHostName();
 
-    sock->SendStringList(strlist);
+    sock->WriteStringList(strlist);
     return true;
 }
 
@@ -163,7 +162,7 @@ bool BaseRequestHandler::HandleQueryMemStats(SocketHandler *sock)
                 << "Could not determine memory stats.";
     }
 
-    sock->SendStringList(strlist);
+    sock->WriteStringList(strlist);
     return true;
 }
 
@@ -179,7 +178,7 @@ bool BaseRequestHandler::HandleQueryTimeZone(SocketHandler *sock)
             << QString::number(MythTZ::calc_utc_offset())
             << MythDate::current_iso_string(true);
 
-    sock->SendStringList(strlist);
+    sock->WriteStringList(strlist);
     return true;
 }
 

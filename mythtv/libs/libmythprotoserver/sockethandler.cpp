@@ -26,18 +26,12 @@ SocketHandler::~SocketHandler()
     }
 }
 
-bool SocketHandler::SendStringList(QStringList &strlist, bool lock)
+bool SocketHandler::WriteStringList(const QStringList &strlist)
 {
     if (!m_socket)
         return false;
 
-    LOG(VB_GENERAL, LOG_DEBUG, "Locking Socket for write");
-    if (lock) m_socket->Lock();
-    bool res = m_socket->writeStringList(strlist);
-    if (lock) m_socket->Unlock();
-    LOG(VB_GENERAL, LOG_DEBUG, "UnLocking Socket from write");
-
-    return res;
+    return m_socket->WriteStringList(strlist);
 }
 
 bool SocketHandler::SendReceiveStringList(QStringList &strlist,

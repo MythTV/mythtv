@@ -78,34 +78,14 @@ bool PlaybackSock::SendReceiveStringList(
     bool ok = false;
 
     sock->IncrRef();
-    sock->Lock();
 
     {
         QMutexLocker locker(&sockLock);
         expectingreply = true;
-
-        sock->writeStringList(strlist);
-        ok = sock->readStringList(strlist);
-
-        while (ok && strlist[0] == "BACKEND_MESSAGE")
-        {
-            // oops, not for us
-            if (strlist.size() >= 2)
-            {
-                QString message = strlist[1];
-                strlist.pop_front();
-                strlist.pop_front();
-                MythEvent me(message, strlist);
-                gCoreContext->dispatch(me);
-            }
-
-            ok = sock->readStringList(strlist);
-        }
-
+        ok = sock->SendReceiveStringList(strlist);
         expectingreply = false;
     }
 
-    sock->Unlock();
     sock->DecrRef();
 
     if (!ok)
