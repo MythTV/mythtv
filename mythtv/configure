@@ -5511,5 +5511,17 @@ cp_if_changed $TMPH external/FFmpeg/libavutil/avconfig.h
 echo "config:$arch:$subarch:$cpu:$target_os:$cc_ident:$FFMPEG_CONFIGURATION" >config.fate
 BLOCKQUOTE
 
+# configure zeromq
+echo "Configuring zeromq..."
+(cd external/zeromq ; \
+         ./configure --quiet --without-documentation --prefix=${prefix} \
+                     --includedir=${prefix}/include/mythtv/zeromq)
+echo "Configuring nzmqt..."
+(cd external/nzmqt/src ; \
+       ${qmake} -o Makefile)
+echo "Configuring qjson..."
+(cd external/qjson ; \
+       ${qmake} -o Makefile)
+
 test -n "$WARNINGS" && printf "\n$WARNINGS" || exit 0
 
