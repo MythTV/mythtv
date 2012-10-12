@@ -121,6 +121,51 @@ class Content : public ContentServices
         bool                     RemoveLiveStream       ( int Id );
 };
 
+// --------------------------------------------------------------------------
+// The following class wrapper is due to a limitation in Qt Script Engine.  It
+// requires all methods that return pointers to user classes that are derived from
+// QObject actually return QObject* (not the user class *).  If the user class pointer
+// is returned, the script engine treats it as a QVariant and doesn't create a
+// javascript prototype wrapper for it.
+//
+// This class allows us to keep the rich return types in the main API class while
+// offering the script engine a class it can work with.
+//
+// Only API Classes that return custom classes needs to implement these wrappers.
+//
+// We should continue to look for a cleaning solution to this problem.
+// --------------------------------------------------------------------------
+
+class ScriptableContent : public QObject
+{
+    Q_OBJECT
+
+    private:
+
+        Content  m_obj;
+
+    public:
+
+        Q_INVOKABLE ScriptableContent( QObject *parent = 0 ) : QObject( parent ) {}
+
+    public slots:
+
+        QObject* GetLiveStream(      int              Id )
+        {
+            return m_obj.GetLiveStream( Id );
+        }
+
+        QObject* GetLiveStreamList(  void )
+        {
+            return m_obj.GetLiveStreamList();
+        }
+
+        QObject* GetFilteredLiveStreamList(  const QString &FileName )
+        {
+            return m_obj.GetFilteredLiveStreamList( FileName );
+        }
+};
+
 Q_SCRIPT_DECLARE_QMETAOBJECT( Content, QObject*);
 
 #endif
