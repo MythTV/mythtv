@@ -483,7 +483,7 @@ void ThreadedFileWriter::DiskLoop(void)
 
             locker.relock();
 
-            if (!in_dtor)
+            if ((tot < sz) && !in_dtor)
                 bufferHasData.wait(locker.mutex(), 50);
         }
 
