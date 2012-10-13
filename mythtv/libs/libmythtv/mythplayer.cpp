@@ -2373,7 +2373,7 @@ bool MythPlayer::FastForward(float seconds)
         return false;
 
     if (fftime <= 0)
-        fftime = (long long)(seconds * video_frame_rate);
+        fftime = (long long)(seconds * video_frame_rate + 0.5);
     return fftime > CalcMaxFFTime(fftime, false);
 }
 
@@ -2383,7 +2383,7 @@ bool MythPlayer::Rewind(float seconds)
         return false;
 
     if (rewindtime <= 0)
-        rewindtime = (long long)(seconds * video_frame_rate);
+        rewindtime = (long long)(seconds * video_frame_rate + 0.5);
     return (uint64_t)rewindtime >= framesPlayed;
 }
 
