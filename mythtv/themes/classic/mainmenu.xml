@@ -4,6 +4,7 @@
     <button>
         <type>TV</type>
         <text>TV</text>
+        <description>View and schedule recordings</description>
         <action>MENU tvmenu.xml</action>
     </button>
 
@@ -11,6 +12,7 @@
         <type>NET_VIDEO</type>
         <text>Internet Video</text>
         <action>MENU netvisionmenu.xml</action>
+        <description>Search and browse internet video sites</description>
         <depends>mythnetvision</depends>
     </button>
 
@@ -24,12 +26,13 @@
     <button>
         <type>VIDEO</type>
         <text>Videos</text>
+        <description>Browse the video library</description>
         <action>MENU videomenu.xml</action>
     </button>
 
     <button>
         <type>STREAM</type>
-        <text>Play Online Streams</text>
+        <text>Play online streams</text>
         <action>PLUGIN mythstream</action>
         <depends>mythstream</depends>
     </button>
@@ -38,6 +41,7 @@
         <type>IMAGES</type>
         <text>Images</text>
         <action>PLUGIN mythgallery</action>
+        <description>Look at pictures</description>
         <depends>mythgallery</depends>
     </button>
 
@@ -45,12 +49,14 @@
         <type>GAME</type>
         <text>Games</text>
         <action>PLUGIN mythgame</action>
+        <description>Play games</description>
         <depends>mythgame</depends>
     </button>
 
     <button>
         <type>WEATHER</type>
         <text>Weather</text>
+        <description>View the weather forcast</description>
         <action>PLUGIN mythweather</action>
         <depends>mythweather</depends>
     </button>
@@ -58,6 +64,7 @@
     <button>
         <type>WEATHER</type>
         <text>Weather Station</text>
+        <description>View weather statistics</description>
         <action>PLUGIN mythwstation</action>
         <depends>mythwstation</depends>
     </button>
@@ -65,6 +72,7 @@
     <button>
         <type>NEWS</type>
         <text>News Feeds</text>
+        <description>Keep up with the news</description>
         <action>PLUGIN mythnews</action>
         <depends>mythnews</depends>
     </button>
@@ -72,8 +80,16 @@
     <button>
         <type>WEBPAGE</type>
         <text>Web</text>
+        <description>Browse the web</description>
         <action>PLUGIN mythbrowser</action>
         <depends>mythbrowser</depends>
+    </button>
+
+    <button>
+        <type>WEBPAGE</type>
+        <text>Email</text>
+        <description>View email</description>
+        <action>MEDIA WebBrowser https://skyid.sky.com/signin/email/</action>
     </button>
 
     <button>
@@ -86,6 +102,7 @@
     <button>
         <type>ARCHIVE</type>
         <text>Archive Files</text>
+        <description>Backup a program to DVD</description>
         <action>PLUGIN mytharchive</action>
         <depends>mytharchive</depends>
     </button>
@@ -93,6 +110,7 @@
     <button>
         <type>ZONEMINDER</type>
         <text>ZoneMinder</text>
+        <description>View live and recorded home surveillance camera images</description>
         <action>PLUGIN mythzoneminder</action>
         <depends>mythzoneminder</depends>
     </button>
