@@ -4,6 +4,7 @@
 
 #include <QHostAddress>
 #include <QStringList>
+#include <QAtomicInt>
 #include <QMutex>
 #include <QHash>
 
@@ -44,8 +45,8 @@ class MBASE_PUBLIC MythSocket : public QObject, public ReferenceCounter
     void SetAnnounce(const QStringList &strlist);
     bool IsAnnounced(void) const { return m_isAnnounced; }
 
-    void SetReadyReadCallbackEnabled(bool useReadyReadCallback)
-        { m_disableReadyReadCallback = !useReadyReadCallback; }
+    void SetReadyReadCallbackEnabled(bool enabled)
+        { m_disableReadyReadCallback.fetchAndStoreOrdered((enabled) ? 0 : 1); }
 
     bool SendReceiveStringList(
         QStringList &list, uint min_reply_length = 0,
@@ -102,9 +103,11 @@ class MBASE_PUBLIC MythSocket : public QObject, public ReferenceCounter
     int             m_peerPort; // protected by m_lock
     MythSocketCBs  *m_callback; // only set in ctor
     bool            m_useSharedThread; // only set in ctor
-    volatile bool   m_disableReadyReadCallback;
+    QAtomicInt      m_disableReadyReadCallback;
     bool            m_connected; // protected by m_lock
-    volatile bool   m_dataAvailable;
+    /// This is used internally as a hint that there might be
+    /// data available for reading.
+    mutable QAtomicInt m_dataAvailable;
     bool            m_isValidated; // only set in thread using MythSocket
     bool            m_isAnnounced; // only set in thread using MythSocket
     QStringList     m_announce; // only set in thread using MythSocket

@@ -65,7 +65,7 @@ MythSocket::MythSocket(int socket, MythSocketCBs *cb, bool use_shared_thread) :
     m_useSharedThread(use_shared_thread),
     m_disableReadyReadCallback(false),
     m_connected(false),
-    m_dataAvailable(false),
+    m_dataAvailable(0),
     m_isValidated(false),
     m_isAnnounced(false)
 {
@@ -218,8 +218,8 @@ void MythSocket::AboutToCloseHandler(void)
 
 void MythSocket::ReadyReadHandler(void)
 {
-    m_dataAvailable = true;
-    if (m_callback && !m_disableReadyReadCallback)
+    m_dataAvailable.fetchAndStoreOrdered(1);
+    if (m_callback && m_disableReadyReadCallback.testAndSetOrdered(0,0))
     {
         emit CallReadyRead();
     }
@@ -482,7 +482,7 @@ bool MythSocket::IsDataAvailable(void) const
     if (QThread::currentThread() == m_thread->qthread())
         return m_tcpSocket->bytesAvailable() > 0;
 
-    if (!m_dataAvailable)
+    if (m_dataAvailable.testAndSetOrdered(0,0))
         return false;
 
     bool ret = false;
@@ -518,6 +518,7 @@ int MythSocket::GetPeerPort(void) const
 void MythSocket::IsDataAvailableReal(bool *ret) const
 {
     *ret = (m_tcpSocket->bytesAvailable() > 0);
+    m_dataAvailable.fetchAndStoreOrdered((*ret) ? 1 : 0);
 }
 
 void MythSocket::ConnectToHostReal(QHostAddress addr, quint16 port, bool *ret)
@@ -713,14 +714,14 @@ void MythSocket::ReadStringListReal(
             LOG(VB_GENERAL, LOG_ERR, LOC + "ReadStringList: " +
                 QString("Error, timed out after %1 ms.").arg(timeoutMS));
             m_tcpSocket->close();
-            m_dataAvailable = false;
+            m_dataAvailable.fetchAndStoreOrdered(0);
             return;
         }
 
         if (m_tcpSocket->state() != QAbstractSocket::ConnectedState)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + "ReadStringList: Connection died.");
-            m_dataAvailable = false;
+            m_dataAvailable.fetchAndStoreOrdered(0);
             return;
         }
 
@@ -734,7 +735,7 @@ void MythSocket::ReadStringListReal(
             QString("ReadStringList: Error, read return error (%1)")
                 .arg(m_tcpSocket->errorString()));
         m_tcpSocket->close();
-        m_dataAvailable = false;
+        m_dataAvailable.fetchAndStoreOrdered(0);
         return;
     }
 
@@ -770,7 +771,7 @@ void MythSocket::ReadStringListReal(
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC +
                     "ReadStringList: Connection died.");
-                m_dataAvailable = false;
+                m_dataAvailable.fetchAndStoreOrdered(0);
                 return;
             }
         }
@@ -789,7 +790,7 @@ void MythSocket::ReadStringListReal(
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + "ReadStringList: Error, read");
             m_tcpSocket->close();
-            m_dataAvailable = false;
+            m_dataAvailable.fetchAndStoreOrdered(0);
             return;
         }
         else if (!m_tcpSocket->isValid())
@@ -797,7 +798,7 @@ void MythSocket::ReadStringListReal(
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 "ReadStringList: Error, socket went unconnected");
             m_tcpSocket->close();
-            m_dataAvailable = false;
+            m_dataAvailable.fetchAndStoreOrdered(0);
             return;
         }
         else
@@ -818,7 +819,7 @@ void MythSocket::ReadStringListReal(
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC +
                     "Error, ReadStringList timeout (readBlock)");
-                m_dataAvailable = false;
+                m_dataAvailable.fetchAndStoreOrdered(0);
                 return;
             }
         }
@@ -848,7 +849,8 @@ void MythSocket::ReadStringListReal(
 
     *list = str.split("[]:[]");
 
-    m_dataAvailable = (m_tcpSocket->bytesAvailable() > 0);
+    m_dataAvailable.fetchAndStoreOrdered(
+        (m_tcpSocket->bytesAvailable() > 0) ? 1 : 0);
 
     *ret = true;
 }
@@ -877,7 +879,8 @@ void MythSocket::ReadReal(char *data, int size, int max_wait_ms, int *ret)
             .arg(t.elapsed()));
     }
 
-    m_dataAvailable = (m_tcpSocket->bytesAvailable() > 0);
+    m_dataAvailable.fetchAndStoreOrdered(
+        (m_tcpSocket->bytesAvailable() > 0) ? 1 : 0);
 }
 
 void MythSocket::ResetReal(void)
@@ -898,6 +901,6 @@ void MythSocket::ResetReal(void)
     }
     while (m_tcpSocket->bytesAvailable() > 0);
 
-    m_dataAvailable = false;
+    m_dataAvailable.fetchAndStoreOrdered(0);
 }
 
