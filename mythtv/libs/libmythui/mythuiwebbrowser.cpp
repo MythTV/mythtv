@@ -78,7 +78,18 @@ static MimeType SupportedMimeTypes[] =
 static int SupportedMimeTypesCount = sizeof(SupportedMimeTypes) /
                                         sizeof(SupportedMimeTypes[0]);
 
-static QNetworkAccessManager *networkManager = NULL;
+MythNetworkAccessManager::MythNetworkAccessManager()
+{
+}
+
+QNetworkReply* MythNetworkAccessManager::createRequest(Operation op, const QNetworkRequest& req, QIODevice* outgoingData)
+{
+    QNetworkReply* reply = QNetworkAccessManager::createRequest(op, req, outgoingData);
+    reply->ignoreSslErrors();
+    return reply;
+}
+
+static MythNetworkAccessManager *networkManager = NULL;
 
 static void DestroyNetworkAccessManager(void)
 {
@@ -94,7 +105,7 @@ static QNetworkAccessManager *GetNetworkAccessManager(void)
     if (networkManager)
         return networkManager;
 
-    networkManager = new QNetworkAccessManager();
+    networkManager = new MythNetworkAccessManager();
     LOG(VB_GENERAL, LOG_DEBUG, "Copying DLManager's Cookie Jar");
     networkManager->setCookieJar(GetMythDownloadManager()->copyCookieJar());
 

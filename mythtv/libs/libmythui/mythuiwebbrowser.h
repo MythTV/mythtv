@@ -73,6 +73,16 @@ class BrowserApi : public QObject
     QString    m_answer;
 };
 
+class MythNetworkAccessManager : public QNetworkAccessManager
+{
+  Q_OBJECT
+  public:
+    MythNetworkAccessManager();
+
+  protected:
+    QNetworkReply* createRequest(Operation op, const QNetworkRequest & req, QIODevice * outgoingData = 0);
+};
+
 class MythWebPage : public QWebPage
 {
   Q_OBJECT
