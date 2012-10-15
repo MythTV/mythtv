@@ -19,6 +19,7 @@
     <button>
         <type>MUSIC</type>
         <text>Music</text>
+        <description>Play music files and internet radio streams</description>
         <action>PLUGIN mythmusic</action>
         <depends>mythmusic</depends>
     </button>
