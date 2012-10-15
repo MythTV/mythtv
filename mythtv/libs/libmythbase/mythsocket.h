@@ -112,7 +112,7 @@ class MBASE_PUBLIC MythSocket : public QObject, public ReferenceCounter
     bool            m_isAnnounced; // only set in thread using MythSocket
     QStringList     m_announce; // only set in thread using MythSocket
 
-    static const uint kSocketBufferSize;
+    static const int kSocketReceiveBufferSize;
 
     static QMutex s_loopbackCacheLock;
     static QHash<QString, QHostAddress::SpecialAddress> s_loopbackCache;

@@ -1,3 +1,12 @@
+// setsockopt
+#ifdef Q_OS_WIN32
+#include <winsock2.h>
+#include <Ws2tcpip.h>
+#include <stdio.h>
+#else
+#include <sys/socket.h>
+#endif
+
 // Qt
 #include <QNetworkInterface> // for QNetworkInterface::allAddresses ()
 #include <QCoreApplication>
@@ -22,9 +31,10 @@
     .arg(a->GetSocketDescriptor())
 #define LOC SLOC(this)
 
-const uint MythSocket::kSocketBufferSize = 128 * 1024;
 const uint MythSocket::kShortTimeout = kMythSocketShortTimeout;
 const uint MythSocket::kLongTimeout  = kMythSocketLongTimeout;
+
+const int MythSocket::kSocketReceiveBufferSize = 128 * 1024;
 
 QMutex MythSocket::s_loopbackCacheLock;
 QHash<QString, QHostAddress::SpecialAddress> MythSocket::s_loopbackCache;
@@ -170,6 +180,28 @@ void MythSocket::ConnectHandler(void)
     m_tcpSocket->setSocketOption(QAbstractSocket::LowDelayOption, QVariant(1));
     m_tcpSocket->setSocketOption(QAbstractSocket::KeepAliveOption, QVariant(1));
 
+#if defined(Q_OS_WIN32)
+    BOOL reuse_addr_val = TRUE;
+#else
+    int reuse_addr_val = 1;
+#endif
+    int ret = setsockopt(m_tcpSocket->socketDescriptor(), SOL_SOCKET,
+                         SO_REUSEADDR, &reuse_addr_val,
+                         sizeof(reuse_addr_val));
+    if (ret < 0)
+    {
+        LOG(VB_SOCKET, LOG_INFO, LOC + "Failed to set SO_REUSEADDR" + ENO);
+    }
+
+    int rcv_buf_val = kSocketReceiveBufferSize;
+    ret = setsockopt(m_tcpSocket->socketDescriptor(), SOL_SOCKET,
+                     SO_RCVBUF, &rcv_buf_val,
+                     sizeof(rcv_buf_val));
+    if (ret < 0)
+    {
+        LOG(VB_SOCKET, LOG_INFO, LOC + "Failed to set SO_RCVBUF" + ENO);
+    }
+    
     if (m_callback)
     {
         LOG(VB_SOCKET, LOG_DEBUG, LOC +
@@ -567,9 +599,6 @@ void MythSocket::ConnectToHostReal(QHostAddress addr, quint16 port, bool *ret)
         .arg(addr.toString()).arg(port));
 
     m_tcpSocket->connectToHost(addr, port, QAbstractSocket::ReadWrite);
-
-    //setReceiveBufferSize(kSocketBufferSize);
-    //setAddressReusable(true);
 
     bool ok = m_tcpSocket->waitForConnected();
 
