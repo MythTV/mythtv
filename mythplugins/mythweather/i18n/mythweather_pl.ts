@@ -1198,7 +1198,8 @@ When you have completed your changes, click &quot;Finish&quot; to continue.</sou
     </message>
     <message>
         <location filename="themestrings.h" line="50"/>
-        <source>Wind(Gust):</source>
+        <source>Wind (Gust):</source>
+        <oldsource>Wind(Gust):</oldsource>
         <translation>Wiatr:</translation>
     </message>
     <message>
