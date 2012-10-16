@@ -1142,7 +1142,8 @@ Cuando termine los cambios, pulse &quot;Finalizar&quot; para continuar.</transla
     </message>
     <message>
         <location filename="themestrings.h" line="50"/>
-        <source>Wind(Gust):</source>
+        <source>Wind (Gust):</source>
+        <oldsource>Wind(Gust):</oldsource>
         <translation>Viento (Rachas):</translation>
     </message>
     <message>
