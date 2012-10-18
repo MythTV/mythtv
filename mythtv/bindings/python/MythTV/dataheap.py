@@ -17,20 +17,43 @@ import locale
 import xml.etree.cElementTree as etree
 from datetime import date, time
 
-class Artwork( unicode ):
+from UserString import MutableString
+class Artwork( MutableString ):
     _types = {'coverart':   'Coverart',
               'coverfile':  'Coverart',
               'fanart':     'Fanart',
               'banner':     'Banners',
               'screenshot': 'ScreenShots',
               'trailer':    'Trailers'}
-    def __new__(self, attr, parent=None, imagetype=None):
-        s = u''
-        if parent and (parent[attr] is not None):
-            s = parent[attr]
-        return super(Artwork, self).__new__(self, s)
+
+    @property
+    def data(self):
+        try:
+            return self.parent[self.attr]
+        except:
+            raise RuntimeError("Artwork property must be used through an " +\
+                               "object, not independently.")
+    @data.setter
+    def data(self, value):
+        try:
+            self.parent[self.attr] = value
+        except:
+            raise RuntimeError("Artwork property must be used through an " +\
+                               "object, not independently.")
+    @data.deleter
+    def data(self):
+        try:
+            self.parent[self.attr] = self.parent._defaults.get(self.attr, "")
+        except:
+            raise RuntimeError("Artwork property must be used through an " +\
+                               "object, not independently.")
 
     def __init__(self, attr, parent=None, imagetype=None):
+        # replace standard MutableString init to not overwrite self.data
+        from warnings import warnpy3k
+        warnpy3k('the class UserString.MutableString has been removed in '
+                    'Python 3.0', stacklevel=2)
+
         self.attr = attr
         if imagetype is None:
             imagetype = self._types[attr]
@@ -39,10 +62,9 @@ class Artwork( unicode ):
 
         if parent:
             self.hostname = parent.get('hostname', parent.get('host', None))
-        super(Artwork, self).__init__()
 
     def __repr__(self):
-        return u"<{0.imagetype} '{0}'>".format(self)
+        return u"<{0.imagetype} '{0.data}'>".format(self)
 
     def __get__(self, inst, owner):
         if inst is None:
@@ -50,13 +72,15 @@ class Artwork( unicode ):
         return Artwork(self.attr, inst, self.imagetype)
 
     def __set__(self, inst, value):
-        super(Artwork, self).__set__(inst, value)
-        self.parent[self.attr] = value
+        inst[self.attr] = value
+
+    def __delete__(self, inst):
+        inst[self.attr] = inst._defaults.get(self.attr, "")
 
     @property
     def exists(self):
         be = FileOps(self.hostname, db = self.parent._db)
-        return be.fileExists(self, self.imagetype)
+        return be.fileExists(unicode(self), self.imagetype)
 
     def downloadFrom(self, url):
         if self.parent is None:
