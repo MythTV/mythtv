@@ -16,14 +16,13 @@ __version__ = "0.3.0"
 # 0.2.0 Add language support, move cache to home directory
 # 0.3.0 Enable version detection to allow use in MythTV
 
-from MythTV.tmdb3 import searchMovie, Movie, Collection, set_key, set_cache, set_locale
-from MythTV import VideoMetadata
-
 from optparse import OptionParser
-from lxml import etree
 import sys
 
 def buildSingle(inetref):
+    from MythTV.tmdb3 import Movie
+    from MythTV import VideoMetadata
+    from lxml import etree
     movie = Movie(inetref)
     tree = etree.XML(u'<metadata></metadata>')
     mapping = [['runtime',      'runtime'],     ['title',       'originaltitle'],
@@ -75,6 +74,10 @@ def buildList(query):
     # replace all dashes from queries to work around search behavior
     # as negative to all text that comes afterwards
     query = query.replace('-',' ')
+
+    from MythTV.tmdb3 import searchMovie
+    from MythTV import VideoMetadata
+    from lxml import etree
     results = searchMovie(query)
     tree = etree.XML(u'<metadata></metadata>')
     mapping = [['runtime',      'runtime'],     ['title',       'originaltitle'],
@@ -110,6 +113,9 @@ def buildList(query):
     sys.exit(0)
 
 def buildCollection(inetref):
+    from MythTV.tmdb3 import Collection
+    from MythTV import VideoMetadata
+    from lxml import etree
     collection = Collection(inetref)
     tree = etree.XML(u'<metadata></metadata>')
     m = VideoMetadata()
@@ -129,6 +135,7 @@ def buildCollection(inetref):
     sys.exit()
 
 def buildVersion():
+    from lxml import etree
     version = etree.XML(u'<grabber></grabber>')
     etree.SubElement(version, "name").text = __title__
     etree.SubElement(version, "author").text = __author__
@@ -142,14 +149,38 @@ def buildVersion():
                                     xml_declaration=True))
     sys.exit(0)
 
-def main():
-    set_key('c27cb71cff5bd76e1a7a009380562c62')
-    set_cache(engine='file', filename='~/.mythtv/pytmdb3.cache')
+def performSelfTest():
+    err = 0
+    try:
+        import MythTV
+    except:
+        err = 1
+        print ("Failed to import MythTV bindings. Check your `configure` output "
+               "to make sure installation was not disabled due to external "
+               "dependencies")
+    try:
+        import MythTV.tmdb3
+    except:
+        err = 1
+        print ("Failed to import PyTMDB3 library. This should have been included "
+               "with the python MythTV bindings.")
+    try:
+        import lxml
+    except:
+        err = 1
+        print "Failed to import python lxml library."
 
+    if not err:
+        print "Everything appears in order."
+    sys.exit(err)
+
+def main():
     parser = OptionParser()
 
     parser.add_option('-v', "--version", action="store_true", default=False,
                       dest="version", help="Display version and author")
+    parser.add_option('-t', "--test", action="store_true", default=False,
+                      dest="test", help="Perform self-test for dependencies.")
     parser.add_option('-M', "--movielist", action="store_true", default=False,
                       dest="movielist", help="Get Movies matching search.")
     parser.add_option('-D', "--moviedata", action="store_true", default=False,
@@ -164,6 +195,12 @@ def main():
     if opts.version:
         buildVersion()
 
+    if opts.test:
+        performSelfTest()
+
+    from MythTV.tmdb3 import set_key, set_cache, set_locale
+    set_key('c27cb71cff5bd76e1a7a009380562c62')
+    set_cache(engine='file', filename='~/.mythtv/pytmdb3.cache')
     if opts.language:
         set_locale(language=opts.language, fallthrough=True)
 
