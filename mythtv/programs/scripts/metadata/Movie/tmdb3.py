@@ -11,15 +11,18 @@
 #-----------------------
 __title__ = "TheMovieDB.org V3"
 __author__ = "Raymond Wagner"
-__version__ = "0.3.0"
+__version__ = "0.3.2"
 # 0.1.0 Initial version
 # 0.2.0 Add language support, move cache to home directory
 # 0.3.0 Enable version detection to allow use in MythTV
+# 0.3.1 Add --test parameter for proper compatibility with mythmetadatalookup
+# 0.3.2 Add --area parameter to allow country selection for release date and
+#       parental ratings
 
 from optparse import OptionParser
 import sys
 
-def buildSingle(inetref):
+def buildSingle(inetref, opts):
     from MythTV.tmdb3 import Movie
     from MythTV import VideoMetadata
     from lxml import etree
@@ -34,12 +37,30 @@ def buildSingle(inetref):
     for i,j in mapping:
         if getattr(movie, j):
             setattr(m, i, getattr(movie, j))
+
+    releases = movie.releases.items()
+
+    if opts.country:
+        for alt in movie.alternate_titles:
+            if alt.country == opts.country:
+                m.title = alt.title
+                break
+        try:
+            # resort releases with selected country at top to ensure it
+            # is selected by the metadata libraries
+            index = zip(*releases)[0].index(opts.country)
+            releases.insert(0, releases.pop(index))
+        except ValueError:
+            pass
+        else:
+            m.releasedate = releases[0][1].releasedate
+
     m.inetref = str(movie.id)
-    if movie.releasedate:
-        m.year = movie.releasedate.year
     if movie.collection:
         m.collectionref = str(movie.collection.id)
-    for country, release in movie.releases.items():
+    if movie.releasedate:
+        m.year = movie.releasedate.year
+    for country, release in releases:
         if release.certification:
             m.certifications[country] = release.certification
     for genre in movie.genres:
@@ -69,7 +90,7 @@ def buildSingle(inetref):
                                     xml_declaration=True))
     sys.exit()
 
-def buildList(query):
+def buildList(query, opts):
     # TEMPORARY FIX:
     # replace all dashes from queries to work around search behavior
     # as negative to all text that comes afterwards
@@ -92,6 +113,10 @@ def buildList(query):
             if getattr(res, j):
                 setattr(m, i, getattr(res, j))
         m.inetref = str(res.id)
+        #TODO:
+        # should releasedate and year be pulled from the country-specific data
+        # or should it be left to the default information to cut down on
+        # traffic from searches
         if res.releasedate:
             m.year = res.releasedate.year
         if res.backdrop:
@@ -112,7 +137,7 @@ def buildList(query):
                                     xml_declaration=True))
     sys.exit(0)
 
-def buildCollection(inetref):
+def buildCollection(inetref, opts):
     from MythTV.tmdb3 import Collection
     from MythTV import VideoMetadata
     from lxml import etree
@@ -187,8 +212,10 @@ def main():
                       dest="moviedata", help="Get Movie data.")
     parser.add_option('-C', "--collection", action="store_true", default=False,
                       dest="collectiondata", help="Get Collection data.")
-    parser.add_option( "-l", "--language", metavar="LANGUAGE", default=u'en',
+    parser.add_option('-l', "--language", metavar="LANGUAGE", default=u'en',
                       dest="language", help="Specify language for filtering.")
+    parser.add_option('-a', "--area", metavar="COUNTRY", default=None,
+                      dest="country", help="Specify country for custom data.")
 
     opts, args = parser.parse_args()
 
@@ -201,21 +228,24 @@ def main():
     from MythTV.tmdb3 import set_key, set_cache, set_locale
     set_key('c27cb71cff5bd76e1a7a009380562c62')
     set_cache(engine='file', filename='~/.mythtv/pytmdb3.cache')
+
     if opts.language:
         set_locale(language=opts.language, fallthrough=True)
+    if opts.country:
+        set_locale(country=opts.country, fallthrough=True)
 
     if (len(args) != 1) or (args[0] == ''):
         sys.stdout.write('ERROR: tmdb3.py requires exactly one non-empty argument')
         sys.exit(1)
 
     if opts.movielist:
-        buildList(args[0])
+        buildList(args[0], opts)
 
     if opts.moviedata:
-        buildSingle(args[0])
+        buildSingle(args[0], opts)
 
     if opts.collectiondata:
-        buildCollection(args[0])
+        buildCollection(args[0], opts)
 
 if __name__ == '__main__':
     main()
