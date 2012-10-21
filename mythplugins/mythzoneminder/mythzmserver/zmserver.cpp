@@ -1385,7 +1385,7 @@ void ZMServer::initMonitor(MONITOR *monitor)
 
         shm_ptr = mmap(NULL, shared_data_size, PROT_READ,
                                             MAP_SHARED, mapFile, 0x0);
-        if (shm_ptr == NULL)
+        if (shm_ptr == MAP_FAILED)
         {
             cout << "Failed to map shared memory from file [" << 
                 mmap_filename << "] " <<
@@ -1394,6 +1394,21 @@ void ZMServer::initMonitor(MONITOR *monitor)
                 endl;
             monitor->status = "Error";
             return;
+        }
+    }
+    else
+    {
+        // this is not necessarily a problem, maybe the user is still
+        // using the legacy shared memory support
+        if (m_debug)
+        {
+            cout << "Failed to open mmap file [" <<
+                mmap_filename << "] " <<
+                "for monitor: " <<
+                monitor->mon_id <<
+                " : " << strerror(errno) <<
+                endl;
+            cout << "Falling back to the legacy shared memory method" << endl;
         }
     }
 #endif
