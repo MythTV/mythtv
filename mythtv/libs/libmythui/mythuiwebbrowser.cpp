@@ -84,13 +84,6 @@ static void DestroyNetworkAccessManager(void)
 {
     if (networkManager)
     {
-        MythDownloadManager *dlmgr = GetMythDownloadManager();
-        if (dlmgr)
-        {
-            LOG(VB_GENERAL, LOG_DEBUG, "Refreshing DLManager's Cookie Jar");
-            dlmgr->refreshCookieJar(networkManager->cookieJar());
-        }
-
         delete networkManager;
         networkManager = NULL;
     }
@@ -265,7 +258,8 @@ MythWebPage::MythWebPage(QObject *parent)
 
 MythWebPage::~MythWebPage()
 {
-    DestroyNetworkAccessManager();
+    LOG(VB_GENERAL, LOG_DEBUG, "Refreshing DLManager's Cookie Jar");
+    GetMythDownloadManager()->refreshCookieJar(networkManager->cookieJar());
 }
 
 bool MythWebPage::supportsExtension(Extension extension) const
