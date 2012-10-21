@@ -145,7 +145,7 @@ void MythScreenStack::PopScreen(MythScreenType *screen, bool allowFade,
     RecalculateDrawOrder();
 
     // If we're fading it, we still want to draw it.
-    if (screen)
+    if (screen && !m_DrawOrder.contains(screen))
         m_DrawOrder.push_back(screen);
 
     if (!m_Children.isEmpty())
