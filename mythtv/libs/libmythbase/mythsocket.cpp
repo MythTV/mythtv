@@ -1,12 +1,3 @@
-// setsockopt
-#ifdef Q_OS_WIN32
-#include <winsock2.h>
-#include <Ws2tcpip.h>
-#include <stdio.h>
-#else
-#include <sys/socket.h>
-#endif
-
 // Qt
 #include <QNetworkInterface> // for QNetworkInterface::allAddresses ()
 #include <QCoreApplication>
@@ -17,6 +8,15 @@
 #include <QHostInfo>
 #include <QThread>
 #include <QMetaType>
+
+// setsockopt -- has to be after Qt includes for Q_OS_WIN definition
+#if defined(Q_OS_WIN)
+#include <winsock2.h>
+#include <Ws2tcpip.h>
+#include <stdio.h>
+#else
+#include <sys/socket.h>
+#endif
 
 // MythTV
 #include "mythsocket.h"
@@ -180,7 +180,7 @@ void MythSocket::ConnectHandler(void)
     m_tcpSocket->setSocketOption(QAbstractSocket::LowDelayOption, QVariant(1));
     m_tcpSocket->setSocketOption(QAbstractSocket::KeepAliveOption, QVariant(1));
 
-#if defined(Q_OS_WIN32)
+#if defined(Q_OS_WIN)
     BOOL reuse_addr_val = TRUE;
 #else
     int reuse_addr_val = 1;
