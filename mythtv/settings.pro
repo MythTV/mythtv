@@ -38,8 +38,8 @@ isEmpty( LIBDIR ) {
     LIBDIR = $${RUNPREFIX}/$${LIBDIRNAME}
 }
 
-LIBVERSION = 0.26
-VERSION = 0.26.0
+LIBVERSION = 0.27
+VERSION = 0.27.0
 
 isEmpty(TARGET_OS) : win32 {
     CONFIG += mingw
