@@ -48,6 +48,14 @@ class Artwork( MutableString ):
             raise RuntimeError("Artwork property must be used through an " +\
                                "object, not independently.")
 
+    def __new__(cls, attr, parent=None, imagetype=None):
+        if (imagetype is None) and (attr not in cls._types):
+            # usage appears to be export from immutable UserString methods
+            # return a dumb string
+            return str.__new__(str, attr)
+        else:
+            return super(Artwork, cls).__new__(cls, attr, parent, imagetype)
+
     def __init__(self, attr, parent=None, imagetype=None):
         # replace standard MutableString init to not overwrite self.data
         from warnings import warnpy3k
