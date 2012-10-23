@@ -52,7 +52,7 @@ class Artwork( MutableString ):
         if (imagetype is None) and (attr not in cls._types):
             # usage appears to be export from immutable UserString methods
             # return a dumb string
-            return str.__new__(str, attr)
+            return unicode.__new__(unicode, attr)
         else:
             return super(Artwork, cls).__new__(cls, attr, parent, imagetype)
 
