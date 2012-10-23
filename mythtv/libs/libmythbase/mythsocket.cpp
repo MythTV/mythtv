@@ -14,6 +14,7 @@
 #include <winsock2.h>
 #include <Ws2tcpip.h>
 #include <stdio.h>
+#include <unistd.h>
 #else
 #include <sys/socket.h>
 #endif
@@ -180,23 +181,31 @@ void MythSocket::ConnectHandler(void)
     m_tcpSocket->setSocketOption(QAbstractSocket::LowDelayOption, QVariant(1));
     m_tcpSocket->setSocketOption(QAbstractSocket::KeepAliveOption, QVariant(1));
 
-#if defined(Q_OS_WIN)
-    BOOL reuse_addr_val = TRUE;
-#else
     int reuse_addr_val = 1;
-#endif
+#if defined(Q_OS_WIN)
+    int ret = setsockopt(m_tcpSocket->socketDescriptor(), SOL_SOCKET,
+                         SO_REUSEADDR, (char*) &reuse_addr_val,
+                         sizeof(reuse_addr_val));
+#else
     int ret = setsockopt(m_tcpSocket->socketDescriptor(), SOL_SOCKET,
                          SO_REUSEADDR, &reuse_addr_val,
                          sizeof(reuse_addr_val));
+#endif
     if (ret < 0)
     {
         LOG(VB_SOCKET, LOG_INFO, LOC + "Failed to set SO_REUSEADDR" + ENO);
     }
 
     int rcv_buf_val = kSocketReceiveBufferSize;
+#if defined(Q_OS_WIN)
+    ret = setsockopt(m_tcpSocket->socketDescriptor(), SOL_SOCKET,
+                     SO_RCVBUF, (char*) &rcv_buf_val,
+                     sizeof(rcv_buf_val));
+#else
     ret = setsockopt(m_tcpSocket->socketDescriptor(), SOL_SOCKET,
                      SO_RCVBUF, &rcv_buf_val,
                      sizeof(rcv_buf_val));
+#endif
     if (ret < 0)
     {
         LOG(VB_SOCKET, LOG_INFO, LOC + "Failed to set SO_RCVBUF" + ENO);
