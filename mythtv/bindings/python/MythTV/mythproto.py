@@ -608,6 +608,8 @@ class FileOps( BECache ):
         getRecording()      - return a Program object for a recording
         deleteRecording()   - notify the backend to delete a recording
         forgetRecording()   - allow a recording to re-record
+        stopRecording()     - stop an in-progress recording without deleting
+                              the file
         deleteFile()        - notify the backend to delete a file
                               in a storage group
         getHash()           - return the hash of a file in a storage group
@@ -649,6 +651,11 @@ class FileOps( BECache ):
         """FileOps.forgetRecording(program) -> None"""
         self.backendCommand(BACKEND_SEP.join(['FORGET_RECORDING',
                     program.toString()]))
+
+    def stopRecording(self, program):
+        """FileOps.stopRecording(program) -> None"""
+        self.backendCommand(BACKEND_SEP.join(['STOP_RECORDING',
+                    program.toString()])
 
     def deleteFile(self, file, sgroup):
         """FileOps.deleteFile(file, storagegroup) -> retcode"""
