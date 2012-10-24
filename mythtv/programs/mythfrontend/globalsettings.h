@@ -69,6 +69,7 @@ class PlaybackProfileItemConfig : public QObject, public ConfigurationWizard
 
     virtual void Load(void);
     virtual void Save(void);
+    virtual void Save(QString /*destination*/) { Save(); }
 
   private slots:
     void decoderChanged(const QString &dec);
@@ -103,6 +104,7 @@ class PlaybackProfileConfig : public VerticalConfigurationGroup
 
     virtual void Load(void);
     virtual void Save(void);
+    virtual void Save(QString /*destination*/) { Save(); }
 
     void swap(int indexA, int intexB);
 

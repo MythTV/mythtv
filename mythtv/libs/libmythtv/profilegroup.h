@@ -125,9 +125,12 @@ class MTV_PUBLIC ProfileGroupEditor :
         { addChild(listbox); }
 
     virtual DialogCode exec(void);
+    virtual DialogCode exec(bool /*saveOnExec*/, bool /*doLoad*/)
+        { return exec(); }
 
     virtual void Load(void);
     virtual void Save(void) {}
+    virtual void Save(QString /*destination*/) {}
 
   protected slots:
     void open(int id);

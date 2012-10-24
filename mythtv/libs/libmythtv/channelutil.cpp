@@ -1726,6 +1726,64 @@ void ChannelUtil::UpdateInsertInfoFromDB(ChannelInsertInfo &chan)
     }
 }
 
+bool ChannelUtil::UpdateIPTVTuningData(
+    uint channel_id, const IPTVTuningData &tuning)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare(
+        "DELETE FROM iptv_channel "
+        "WHERE chanid=:CHANID");
+    query.bindValue(":CHANID", channel_id);
+
+    if (!query.exec())
+    {
+        MythDB::DBError("UpdateIPTVTuningData -- delete", query);
+        return false;
+    }
+
+    query.prepare(
+        "INSERT INTO iptv_channel (chanid, url, type, bitrate) "
+        "VALUES (:CHANID, :URL, :TYPE, :BITRATE)");
+    query.bindValue(":CHANID", channel_id);
+
+    query.bindValue(":URL", tuning.GetDataURL().toString());
+    query.bindValue(":TYPE", tuning.GetFECTypeString(0));
+    query.bindValue(":BITRATE", tuning.GetBitrate(0));
+
+    if (!query.exec())
+    {
+        MythDB::DBError("UpdateIPTVTuningData -- data", query);
+        return false;
+    }
+
+    if (tuning.GetFECURL0().port() >= 0)
+    {
+        query.bindValue(":URL", tuning.GetFECURL0().toString());
+        query.bindValue(":TYPE", tuning.GetFECTypeString(1));
+        query.bindValue(":BITRATE", tuning.GetBitrate(1));
+        if (!query.exec())
+        {
+            MythDB::DBError("UpdateIPTVTuningData -- fec 0", query);
+            return false;
+        }
+    }
+
+    if (tuning.GetFECURL1().port() >= 0)
+    {
+        query.bindValue(":URL", tuning.GetFECURL1().toString());
+        query.bindValue(":TYPE", tuning.GetFECTypeString(2));
+        query.bindValue(":BITRATE", tuning.GetBitrate(2));
+        if (!query.exec())
+        {
+            MythDB::DBError("UpdateIPTVTuningData -- fec 1", query);
+            return false;
+        }
+    }
+
+    return true;
+}
+
 bool ChannelUtil::DeleteChannel(uint channel_id)
 {
     MSqlQuery query(MSqlQuery::InitCon());
@@ -1737,6 +1795,17 @@ bool ChannelUtil::DeleteChannel(uint channel_id)
     if (!query.exec())
     {
         MythDB::DBError("Delete Channel", query);
+        return false;
+    }
+
+    query.prepare(
+        "DELETE FROM iptv_channel "
+        "WHERE chanid = :ID");
+    query.bindValue(":ID", channel_id);
+
+    if (!query.exec())
+    {
+        MythDB::DBError("Delete Channel 2", query);
         return false;
     }
 
@@ -1961,6 +2030,71 @@ bool ChannelUtil::GetExtendedChannelData(
 
     return GetTuningParams(mplexid, modulation, frequency,
                            dvb_transportid, dvb_networkid, dtv_si_std);
+}
+
+IPTVTuningData ChannelUtil::GetIPTVTuningData(uint chanid)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "SELECT type+0, url, bitrate "
+        "FROM iptv_channel "
+        "WHERE chanid = :CHANID "
+        "ORDER BY type+0");
+    query.bindValue(":CHANID", chanid);
+
+    if (!query.exec())
+    {
+        MythDB::DBError("GetChannelData -- iptv", query);
+        return IPTVTuningData();
+    }
+
+    QString data_url, fec_url0, fec_url1;
+    IPTVTuningData::FECType fec_type = IPTVTuningData::kNone;
+    uint bitrate[3] = { 0, 0, 0, };
+    while (query.next())
+    {
+        IPTVTuningData::IPTVType type = (IPTVTuningData::IPTVType)
+            query.value(0).toUInt();
+        switch (type)
+        {
+            case IPTVTuningData::kData:
+                data_url = query.value(1).toString();
+                bitrate[0] = query.value(2).toUInt();
+                break;
+            case IPTVTuningData::kRFC2733_1:
+            case IPTVTuningData::kRFC5109_1:
+            case IPTVTuningData::kSMPTE2022_1:
+                fec_url0 = query.value(1).toString();
+                bitrate[1] = query.value(2).toUInt();
+                break;
+            case IPTVTuningData::kRFC2733_2:
+            case IPTVTuningData::kRFC5109_2:
+            case IPTVTuningData::kSMPTE2022_2:
+                fec_url1 = query.value(1).toString();
+                bitrate[2] = query.value(2).toUInt();
+                break;
+        }
+        switch (type)
+        {
+            case IPTVTuningData::kData:
+                break;
+            case IPTVTuningData::kRFC2733_1:
+                fec_type = IPTVTuningData::kRFC2733;
+                break;
+            case IPTVTuningData::kRFC5109_1:
+                fec_type = IPTVTuningData::kRFC5109;
+                break;
+            case IPTVTuningData::kSMPTE2022_1:
+                fec_type = IPTVTuningData::kSMPTE2022;
+                break;
+        }
+    }
+
+    IPTVTuningData tuning(data_url, bitrate[0], fec_type,
+                          fec_url0, bitrate[1], fec_url1, bitrate[2]);
+    LOG(VB_GENERAL, LOG_INFO, QString("Loaded %1 for %2")
+        .arg(tuning.GetDeviceName()).arg(chanid));
+    return tuning;
 }
 
 DBChanList ChannelUtil::GetChannelsInternal(

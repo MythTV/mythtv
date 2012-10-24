@@ -103,7 +103,7 @@ class MTV_PUBLIC ChannelScanner
 
     // Low level channel scanners
     ChannelScanSM      *sigmonScanner;
-    IPTVChannelFetcher *freeboxScanner;
+    IPTVChannelFetcher *iptvScanner;
 
     /// imported channels
     DTVChannelList      channels;

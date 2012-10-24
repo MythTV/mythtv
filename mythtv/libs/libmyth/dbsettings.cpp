@@ -12,6 +12,7 @@ public:
 
     void Load(void);
     void Save(void);
+    void Save(QString /*destination*/) { Save(); }
 
 protected:
     TransLabelSetting    *info;
@@ -32,6 +33,7 @@ public:
 
     void Load(void);
     void Save(void);
+    void Save(QString /*destination*/) { Save(); }
 
 protected:
     TransCheckBoxSetting *localEnabled;

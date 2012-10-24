@@ -26,14 +26,16 @@ HEADERS += audioreencodebuffer.h cutter.h videodecodebuffer.h
 HEADERS += replex/element.h replex/mpg_common.h replex/multiplex.h \
            replex/pes.h     replex/ringbuffer.h replex/ts.h
 
-INCLUDEPATH += replex
-INCLUDEPATH += ../../libs/libavcodec
-INCLUDEPATH += ../../libs/libavformat
-INCLUDEPATH += ../../libs/libavutil
+DEPENDPATH += replex
+DEPENDPATH += ../../libs/libavcodec
+DEPENDPATH += ../../libs/libavformat
+DEPENDPATH += ../../libs/libavutil
+DEPENDPATH += ../../libs/libmythtv/recorders
 
 !contains( CONFIG_LIBMPEG2EXTERNAL, yes) {
-        DEPENDPATH  += ../../libs/libmythmpeg2
-        INCLUDEPATH += ../../libs/libmythmpeg2
+        DEPENDPATH += ../../libs/libmythmpeg2
         LIBS += -L../../libs/libmythmpeg2 -lmythmpeg2-$$LIBVERSION
         POST_TARGETDEPS += ../../libs/libmythmpeg2/libmythmpeg2-$${MYTH_LIB_EXT}
 }
+
+INCLUDEPATH += $$DEPENDPATH

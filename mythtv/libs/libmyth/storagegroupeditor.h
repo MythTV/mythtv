@@ -13,6 +13,8 @@ class MPUBLIC StorageGroupEditor :
   public:
     StorageGroupEditor(QString group);
     virtual DialogCode exec(void);
+    virtual DialogCode exec(bool /*saveOnExec*/, bool /*doLoad*/)
+        { return exec(); }
     virtual void Load(void);
     virtual void Save(void) { }
     virtual void Save(QString) { }
@@ -36,6 +38,8 @@ class MPUBLIC StorageGroupListEditor :
   public:
     StorageGroupListEditor(void);
     virtual DialogCode exec(void);
+    virtual DialogCode exec(bool /*saveOnExec*/, bool /*doLoad*/)
+        { return exec(); }
     virtual void Load(void);
     virtual void Save(void) { }
     virtual void Save(QString) { }

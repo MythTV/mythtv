@@ -68,7 +68,7 @@ void ChannelScannerCLI::HandleEvent(const ScannerEvent *scanEvent)
 
         Teardown();
 
-        if (!transports.empty())
+        if (sigmonScanner && !transports.empty())
             Process(transports);
 
         done = true;

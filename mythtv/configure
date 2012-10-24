@@ -110,9 +110,8 @@ Advanced options (experts only):
   --libcec-path=HDRLOC     location of directory containing
                            'libcec/cec.h', not the directory
                            with 'cec.h' [$libcec_path_default]
-  --disable-firewire       disable support for FireWire cable boxes
   --firewire-sdk           specify location for mac FireWire SDK [mac only]
-  --disable-iptv           disable support for recording RTSP/UDP/RTP streams
+  --disable-firewire       disable support for FireWire cable boxes
   --disable-hdhomerun      disable support for HDHomeRun boxes
   --disable-ceton          disable support for Ceton cards
   --disable-v4l2           disable Video4Linux support
@@ -1512,7 +1511,6 @@ MYTHTV_CONFIG_LIST='
     hdhomerun
     ceton
     hdpvr
-    iptv
     ivtv
     asi
     joystick_menu
@@ -2033,7 +2031,6 @@ doc_deps="texi2html"
 audio_oss_deps_any="soundcard_h sys_soundcard_h"
 dvb_deps="backend"
 firewire_deps="backend"
-iptv_deps="backend"
 ivtv_deps="backend v4l2"
 hdpvr_deps="backend v4l2"
 hdhomerun_deps="backend"
@@ -2237,7 +2234,6 @@ enable frontend
 enable hdhomerun
 enable ceton
 enable hdpvr
-enable iptv
 enable ivtv
 enable asi
 enable lamemp3
@@ -5014,7 +5010,6 @@ if enabled backend; then
   echo "DVB-S2 support            ${fe_can_2g_modulation-no}"
   echo "HDHomeRun support         ${hdhomerun-no}"
   echo "Ceton support             ${ceton-no}"
-  echo "IPTV support              ${iptv-no}"
   echo "ASI support               ${asi-no}"
 fi
 
@@ -5351,10 +5346,6 @@ if enabled firewire; then
   else
       echo "CONFIG_FIREWIRE_LIBS=-lraw1394 -liec61883 -lavc1394 -lrom1394" >> $TMPMAK
   fi
-fi
-
-if enabled iptv; then
-    append CCONFIG "using_live"
 fi
 
 if enabled mheg; then

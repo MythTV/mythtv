@@ -22,7 +22,14 @@ contains(INCLUDEPATH, /usr/local/include) {
 DEPENDPATH  += .
 DEPENDPATH  += ../libmyth ../libmyth/audio
 DEPENDPATH  += ../libmythbase ../libmythhdhomerun
-DEPENDPATH  += ./dvbdev ./mpeg ./iptv ./channelscan ./visualisations
+DEPENDPATH  += ../libmythdvdnav/
+DEPENDPATH  += ../libmythbluray/
+DEPENDPATH  += ./mpeg ./channelscan ./visualisations
+DEPENDPATH  += ./recorders
+DEPENDPATH  += ./recorders/dvbdev
+DEPENDPATH  += ./recorders/HLS
+DEPENDPATH  += ./recorders/rtp
+DEPENDPATH  += ./recorders/vbitext
 DEPENDPATH  += ../libmythlivemedia/BasicUsageEnvironment/include
 DEPENDPATH  += ../libmythlivemedia/BasicUsageEnvironment
 DEPENDPATH  += ../libmythlivemedia/groupsock/include
@@ -71,9 +78,16 @@ using_valgrind:DEFINES += USING_VALGRIND
 # old libvbitext (Caption decoder)
 #using_v4l2 {
 !mingw {
-    HEADERS += vbitext/cc.h vbitext/dllist.h vbitext/hamm.h vbitext/lang.h
-    HEADERS += vbitext/vbi.h vbitext/vt.h
-    SOURCES += vbitext/cc.cpp vbitext/vbi.c vbitext/hamm.c vbitext/lang.c
+    HEADERS += recorders/vbitext/cc.h
+    HEADERS += recorders/vbitext/dllist.h
+    HEADERS += recorders/vbitext/hamm.h
+    HEADERS += recorders/vbitext/lang.h
+    HEADERS += recorders/vbitext/vbi.h
+    HEADERS += recorders/vbitext/vt.h
+    SOURCES += recorders/vbitext/cc.cpp
+    SOURCES += recorders/vbitext/vbi.c
+    SOURCES += recorders/vbitext/hamm.c
+    SOURCES += recorders/vbitext/lang.c
 }
 
 # mmx macros from avlib
@@ -90,10 +104,10 @@ QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 HEADERS += filter.h                 format.h
 HEADERS += frame.h                  compat.h
 
-# LZO / RTjpegN, used by NuppelDecoder & NuppelVideoRecorder
+# LZO used by NuppelDecoder & NuppelVideoRecorder
 HEADERS += lzoconf.h
-HEADERS += minilzo.h                RTjpegN.h
-SOURCES += minilzo.cpp              RTjpegN.cpp
+HEADERS += minilzo.h
+SOURCES += minilzo.cpp
 
 # Misc. needed by backend/frontend
 HEADERS += mythtvexp.h
@@ -161,9 +175,11 @@ SOURCES += diseqc.cpp               diseqcsettings.cpp
 HEADERS += datadirect.h
 SOURCES += datadirect.cpp
 
-# File Writer classes
+# File/FIFO Writer classes
 HEADERS += filewriterbase.h         avformatwriter.h
+HEADERS += fifowriter.h
 SOURCES += filewriterbase.cpp       avformatwriter.cpp
+SOURCES += fifowriter.cpp
 
 # Teletext stuff
 HEADERS += teletextdecoder.h        teletextreader.h   vbilut.h
@@ -206,6 +222,7 @@ HEADERS += frequencies.h            frequencytables.h
 SOURCES += frequencies.cpp          frequencytables.cpp
 
 HEADERS += channelutil.h            dbchannelinfo.h
+HEADERS += iptvtuningdata.h
 SOURCES += channelutil.cpp          dbchannelinfo.cpp
 
 HEADERS += dtvmultiplex.h
@@ -214,7 +231,9 @@ SOURCES += dtvmultiplex.cpp
 SOURCES += dtvconfparser.cpp        dtvconfparserhelpers.cpp
 
 HEADERS += channelscan/scaninfo.h   channelscan/channelimporter.h
+HEADERS += channelscan/iptvchannelfetcher.h
 SOURCES += channelscan/scaninfo.cpp channelscan/channelimporter.cpp
+SOURCES += channelscan/iptvchannelfetcher.cpp
 
 # subtitles: srt
 HEADERS += srtwriter.h
@@ -443,12 +462,17 @@ using_frontend {
 
 using_backend {
     # Channel stuff
-    HEADERS += channelbase.h               dtvchannel.h
-    HEADERS += signalmonitor.h             dtvsignalmonitor.h
-    HEADERS += scriptsignalmonitor.h
+    HEADERS += recorders/channelbase.h
+    HEADERS += recorders/dtvchannel.h
+    HEADERS += recorders/signalmonitor.h
+    HEADERS += recorders/dtvsignalmonitor.h
+    HEADERS += recorders/scriptsignalmonitor.h
+    SOURCES += recorders/channelbase.cpp
+    SOURCES += recorders/dtvchannel.cpp
+    SOURCES += recorders/signalmonitor.cpp
+    SOURCES += recorders/dtvsignalmonitor.cpp
+
     HEADERS += inputinfo.h                 inputgroupmap.h
-    SOURCES += channelbase.cpp             dtvchannel.cpp
-    SOURCES += signalmonitor.cpp           dtvsignalmonitor.cpp
     SOURCES += inputinfo.cpp               inputgroupmap.cpp
 
     # Channel scanner stuff
@@ -500,41 +524,53 @@ using_backend {
     HEADERS += programdata.h
     SOURCES += programdata.cpp
 
-    # TVRec & Recorder base classes
-    HEADERS += tv_rec.h
-    HEADERS += recorderbase.h              DeviceReadBuffer.h
-    HEADERS += dtvrecorder.h               recordingquality.h
-    SOURCES += tv_rec.cpp
-    SOURCES += recorderbase.cpp            DeviceReadBuffer.cpp
-    SOURCES += dtvrecorder.cpp             recordingquality.cpp
+    # TVRec stuff
+    HEADERS += tv_rec.h                    recordingquality.h
+    SOURCES += tv_rec.cpp                  recordingquality.cpp
+
+    # Recorder base and util classes
+    HEADERS += recorders/recorderbase.h
+    HEADERS += recorders/DeviceReadBuffer.h
+    HEADERS += recorders/dtvrecorder.h
+    SOURCES += recorders/recorderbase.cpp
+    SOURCES += recorders/DeviceReadBuffer.cpp
+    SOURCES += recorders/dtvrecorder.cpp
 
     # Import recorder
-    HEADERS += importrecorder.h
-    SOURCES += importrecorder.cpp
+    HEADERS += recorders/importrecorder.h
+    SOURCES += recorders/importrecorder.cpp
 
     # Simple NuppelVideo Recorder
     using_ffmpeg_threads:DEFINES += USING_FFMPEG_THREADS
-    HEADERS += NuppelVideoRecorder.h       fifowriter.h        audioinput.h
-    SOURCES += NuppelVideoRecorder.cpp     fifowriter.cpp      audioinput.cpp
+    !mingw:HEADERS += recorders/NuppelVideoRecorder.h
+    HEADERS += recorders/RTjpegN.h
+    HEADERS += recorders/audioinput.h
+    HEADERS += recorders/go7007_myth.h
+
+    !mingw:SOURCES += recorders/NuppelVideoRecorder.cpp
+    SOURCES += recorders/RTjpegN.cpp
+    SOURCES += recorders/audioinput.cpp
     using_alsa {
-        HEADERS += audioinputalsa.h
-        SOURCES += audioinputalsa.cpp
+        HEADERS += recorders/audioinputalsa.h
+        SOURCES += recorders/audioinputalsa.cpp
         DEFINES += USING_ALSA
     }
     using_oss {
-        HEADERS += audioinputoss.h
-        SOURCES += audioinputoss.cpp
+        HEADERS += recorders/audioinputoss.h
+        SOURCES += recorders/audioinputoss.cpp
         DEFINES += USING_OSS
     }
 
     # Support for Video4Linux devices
     !mingw {
-        HEADERS += v4lrecorder.h
-        SOURCES += v4lrecorder.cpp
+        HEADERS += recorders/v4lrecorder.h
+        SOURCES += recorders/v4lrecorder.cpp
     }
     using_v4l2 {
-        HEADERS += v4lchannel.h                analogsignalmonitor.h
-        SOURCES += v4lchannel.cpp              analogsignalmonitor.cpp
+        HEADERS += recorders/v4lchannel.h
+        HEADERS += recorders/analogsignalmonitor.h
+        SOURCES += recorders/v4lchannel.cpp
+        SOURCES += recorders/analogsignalmonitor.cpp
 
         DEFINES += USING_V4L2
         using_v4l1:DEFINES += USING_V4L1
@@ -542,64 +578,76 @@ using_backend {
 
     # Support for cable boxes that provide Firewire out
     using_firewire {
-        HEADERS += firewirechannel.h           firewirerecorder.h
-        HEADERS += firewiresignalmonitor.h     firewiredevice.h
-        HEADERS += avcinfo.h
-        SOURCES += firewirechannel.cpp         firewirerecorder.cpp
-        SOURCES += firewiresignalmonitor.cpp   firewiredevice.cpp
-        SOURCES += avcinfo.cpp
+        HEADERS += recorders/firewirechannel.h
+        HEADERS += recorders/firewirerecorder.h
+        HEADERS += recorders/firewiresignalmonitor.h
+        HEADERS += recorders/firewiredevice.h
+        HEADERS += recorders/avcinfo.h
+        SOURCES += recorders/firewirechannel.cpp
+        SOURCES += recorders/firewirerecorder.cpp
+        SOURCES += recorders/firewiresignalmonitor.cpp
+        SOURCES += recorders/firewiredevice.cpp
+        SOURCES += recorders/avcinfo.cpp
 
         macx {
-            HEADERS += darwinfirewiredevice.h   darwinavcinfo.h
-            SOURCES += darwinfirewiredevice.cpp darwinavcinfo.cpp
+            HEADERS += recorders/darwinfirewiredevice.h
+            HEADERS += recorders/darwinavcinfo.h
+            SOURCES += recorders/darwinfirewiredevice.cpp
+            SOURCES += recorders/darwinavcinfo.cpp
             DEFINES += USING_OSX_FIREWIRE
         }
 
         !macx {
-            HEADERS += linuxfirewiredevice.h   linuxavcinfo.h
-            SOURCES += linuxfirewiredevice.cpp linuxavcinfo.cpp
+            HEADERS += recorders/linuxfirewiredevice.h
+            HEADERS += recorders/linuxavcinfo.h
+            SOURCES += recorders/linuxfirewiredevice.cpp
+            SOURCES += recorders/linuxavcinfo.cpp
             DEFINES += USING_LINUX_FIREWIRE
         }
 
         DEFINES += USING_FIREWIRE
     }
 
-    # Support for MPEG2 TS streams (including FreeBox http://adsl.free.fr/)
-    using_iptv {
-        HEADERS += iptvchannel.h              iptvrecorder.h
-        HEADERS += iptvsignalmonitor.h
-        HEADERS += iptv/iptvchannelfetcher.h  iptv/iptvchannelinfo.h
-        HEADERS += iptv/iptvmediasink.h
-        HEADERS += iptv/iptvfeeder.h          iptv/iptvfeederwrapper.h
-        HEADERS += iptv/iptvfeederrtsp.h      iptv/iptvfeederudp.h
-        HEADERS += iptv/iptvfeederfile.h      iptv/iptvfeederlive.h
-        HEADERS += iptv/iptvfeederrtp.h       iptv/timeoutedtaskscheduler.h
-        HEADERS += iptv/iptvfeederhls.h
+    # Support for RTP/UDP streams
+    HEADERS += recorders/iptvchannel.h
+    HEADERS += recorders/iptvrecorder.h
+    HEADERS += recorders/iptvsignalmonitor.h
+    HEADERS += recorders/iptvstreamhandler.h
+    HEADERS *= recorders/streamhandler.h
 
-        SOURCES += iptvchannel.cpp            iptvrecorder.cpp
-        SOURCES += iptvsignalmonitor.cpp
-        SOURCES += iptv/iptvchannelfetcher.cpp
-        SOURCES += iptv/iptvmediasink.cpp
-        SOURCES += iptv/iptvfeeder.cpp        iptv/iptvfeederwrapper.cpp
-        SOURCES += iptv/iptvfeederrtsp.cpp    iptv/iptvfeederudp.cpp
-        SOURCES += iptv/iptvfeederfile.cpp    iptv/iptvfeederlive.cpp
-        SOURCES += iptv/iptvfeederrtp.cpp     iptv/timeoutedtaskscheduler.cpp
-        SOURCES += iptv/iptvfeederhls.cpp
+    HEADERS += recorders/rtp/udppacket.h
+    HEADERS += recorders/rtp/udppacketbuffer.h
+    HEADERS += recorders/rtp/packetbuffer.h
+    HEADERS += recorders/rtp/rtppacketbuffer.h
+    HEADERS += recorders/rtp/rtpdatapacket.h
+    HEADERS += recorders/rtp/rtpfecpacket.h
 
-        DEFINES += USING_IPTV
-    }
+    SOURCES += recorders/iptvchannel.cpp
+    SOURCES += recorders/iptvrecorder.cpp
+    SOURCES += recorders/iptvsignalmonitor.cpp
+    SOURCES += recorders/iptvstreamhandler.cpp
+    SOURCES *= recorders/streamhandler.cpp
+
+    SOURCES += recorders/rtp/packetbuffer.cpp
+    SOURCES += recorders/rtp/rtppacketbuffer.cpp
+
+    DEFINES += USING_IPTV
 
     # Support for HDHomeRun box
     using_hdhomerun {
         # MythTV HDHomeRun glue
-        HEADERS += hdhrsignalmonitor.h   hdhrchannel.h
-        HEADERS += hdhrrecorder.h        hdhrstreamhandler.h
+        HEADERS += recorders/hdhrsignalmonitor.h
+        HEADERS += recorders/hdhrchannel.h
+        HEADERS += recorders/hdhrrecorder.h
+        HEADERS += recorders/hdhrstreamhandler.h
 
-        SOURCES += hdhrsignalmonitor.cpp hdhrchannel.cpp
-        SOURCES += hdhrrecorder.cpp      hdhrstreamhandler.cpp
+        SOURCES += recorders/hdhrsignalmonitor.cpp
+        SOURCES += recorders/hdhrchannel.cpp
+        SOURCES += recorders/hdhrrecorder.cpp
+        SOURCES += recorders/hdhrstreamhandler.cpp
 
-        HEADERS *= streamhandler.h
-        SOURCES *= streamhandler.cpp
+        HEADERS *= recorders/streamhandler.h
+        SOURCES *= recorders/streamhandler.cpp
 
         DEFINES += USING_HDHOMERUN
     }
@@ -607,67 +655,79 @@ using_backend {
     # Support for Ceton
     using_ceton {
         # MythTV Ceton glue
-        HEADERS += cetonsignalmonitor.h   cetonchannel.h
-        HEADERS += cetonrecorder.h        cetonstreamhandler.h
-        HEADERS += cetonrtp.h             cetonrtsp.h
+        HEADERS += recorders/cetonsignalmonitor.h
+        HEADERS += recorders/cetonchannel.h
+        HEADERS += recorders/cetonrecorder.h
+        HEADERS += recorders/cetonstreamhandler.h
+        HEADERS += recorders/cetonrtsp.h
 
-        SOURCES += cetonsignalmonitor.cpp cetonchannel.cpp
-        SOURCES += cetonrecorder.cpp      cetonstreamhandler.cpp
-        SOURCES += cetonrtp.cpp           cetonrtsp.cpp
+        SOURCES += recorders/cetonsignalmonitor.cpp
+        SOURCES += recorders/cetonchannel.cpp
+        SOURCES += recorders/cetonrecorder.cpp
+        SOURCES += recorders/cetonstreamhandler.cpp
+        SOURCES += recorders/cetonrtsp.cpp
 
-        HEADERS *= streamhandler.h
-        SOURCES *= streamhandler.cpp
+        HEADERS *= recorders/streamhandler.h
+        SOURCES *= recorders/streamhandler.cpp
 
         DEFINES += USING_CETON
     }
 
     # Support for PVR-150/250/350/500, etc. on Linux
-    using_ivtv:HEADERS += mpegrecorder.h
-    using_ivtv:SOURCES += mpegrecorder.cpp
+    using_ivtv:HEADERS *= recorders/mpegrecorder.h
+    using_ivtv:SOURCES *= recorders/mpegrecorder.cpp
     using_ivtv:DEFINES += USING_IVTV
 
     # Support for HD-PVR on Linux
-    using_hdpvr:HEADERS *= mpegrecorder.h
-    using_hdpvr:SOURCES *= mpegrecorder.cpp
+    using_hdpvr:HEADERS *= recorders/mpegrecorder.h
+    using_hdpvr:SOURCES *= recorders/mpegrecorder.cpp
     using_hdpvr:DEFINES += USING_HDPVR
 
     # Support for Linux DVB drivers
     using_dvb {
         # Basic DVB types
-        HEADERS += dvbtypes.h
-        SOURCES += dvbtypes.cpp
+        HEADERS += recorders/dvbtypes.h
+        SOURCES += recorders/dvbtypes.cpp
 
         # Channel stuff
-        HEADERS += dvbchannel.h           dvbsignalmonitor.h
-        HEADERS += dvbcam.h
-        SOURCES += dvbchannel.cpp         dvbsignalmonitor.cpp
-        SOURCES += dvbcam.cpp
+        HEADERS += recorders/dvbchannel.h
+        HEADERS += recorders/dvbsignalmonitor.h
+        HEADERS += recorders/dvbcam.h
+        SOURCES += recorders/dvbchannel.cpp
+        SOURCES += recorders/dvbsignalmonitor.cpp
+        SOURCES += recorders/dvbcam.cpp
 
         # DVB Recorder
-        HEADERS += dvbrecorder.h          dvbstreamhandler.h
-        SOURCES += dvbrecorder.cpp        dvbstreamhandler.cpp
+        HEADERS += recorders/dvbrecorder.h
+        HEADERS += recorders/dvbstreamhandler.h
+        SOURCES += recorders/dvbrecorder.cpp
+        SOURCES += recorders/dvbstreamhandler.cpp
 
-        HEADERS *= streamhandler.h
-        SOURCES *= streamhandler.cpp
+        HEADERS *= recorders/streamhandler.h
+        SOURCES *= recorders/streamhandler.cpp
 
         # Misc
-        HEADERS += dvbdev/dvbci.h
-        SOURCES += dvbdev/dvbci.cpp
+        HEADERS += recorders/dvbdev/dvbci.h
+        SOURCES += recorders/dvbdev/dvbci.cpp
 
         DEFINES += USING_DVB
     }
 
     using_asi {
         # Channel stuff
-        HEADERS += asichannel.h           asisignalmonitor.h
-        SOURCES += asichannel.cpp         asisignalmonitor.cpp
+        HEADERS += recorders/asichannel.h
+        HEADERS += recorders/asisignalmonitor.h
+        SOURCES += recorders/asichannel.cpp
+        SOURCES += recorders/asisignalmonitor.cpp
 
         # ASI Recorder
-        HEADERS += asirecorder.h          asistreamhandler.h
-        SOURCES += asirecorder.cpp        asistreamhandler.cpp
+        HEADERS += recorders/asirecorder.h
+        HEADERS += recorders/asistreamhandler.h
+        SOURCES += recorders/asirecorder.cpp
+        SOURCES += recorders/asistreamhandler.cpp
 
-        HEADERS *= streamhandler.h
-        SOURCES *= streamhandler.cpp
+        HEADERS *= recorders/streamhandler.h
+        SOURCES *= recorders/streamhandler.cpp
 
         DEFINES += USING_ASI
     }
@@ -683,8 +743,6 @@ mingw {
     DEFINES += USING_MINGW
 
     HEADERS += videoout_d3d.h
-    HEADERS -= NuppelVideoRecorder.h
-    SOURCES -= NuppelVideoRecorder.cpp
     SOURCES += videoout_d3d.cpp
 
     using_dxva2: DEFINES += USING_DXVA2
