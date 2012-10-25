@@ -117,7 +117,7 @@ class DictData( OrdDict ):
         if name in self._localvars:
             self.__dict__[name] = value
         elif name not in self._field_order:
-            self.__dict__[name] = value
+            object.__setattr__(self, name, value)
         else:
             try:
                 self[name] = value
