@@ -655,7 +655,7 @@ class FileOps( BECache ):
     def stopRecording(self, program):
         """FileOps.stopRecording(program) -> None"""
         self.backendCommand(BACKEND_SEP.join(['STOP_RECORDING',
-                    program.toString()])
+                    program.toString()]))
 
     def deleteFile(self, file, sgroup):
         """FileOps.deleteFile(file, storagegroup) -> retcode"""
