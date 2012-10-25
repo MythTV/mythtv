@@ -29,10 +29,14 @@ class Artwork( MutableString ):
     @property
     def data(self):
         try:
-            return self.parent[self.attr]
+            val = self.parent[self.attr]
         except:
             raise RuntimeError("Artwork property must be used through an " +\
                                "object, not independently.")
+        else:
+            if val is None:
+                return ''
+            return val
     @data.setter
     def data(self, value):
         try:
