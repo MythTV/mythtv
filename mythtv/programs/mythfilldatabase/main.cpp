@@ -181,7 +181,7 @@ int main(int argc, char *argv[])
 
         fromfile_id         = cmdline.toInt("sourceid");
         fromfile_offset     = cmdline.toInt("offset");
-        fromddfile_lineupid = cmdline.toInt("lineupid");
+        fromddfile_lineupid = cmdline.toString("lineupid");
         fromfile_name       = cmdline.toString("xmlfile");
 
         LOG(VB_GENERAL, LOG_INFO,
