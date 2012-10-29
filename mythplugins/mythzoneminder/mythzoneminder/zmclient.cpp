@@ -332,8 +332,7 @@ void ZMClient::getEventList(const QString &monitorName, bool oldestFirst,
         item->eventName = *it++;
         item->monitorID = (*it++).toInt();
         item->monitorName = *it++;
-        QString sDate = *it++;
-        item->startTime = MythDate::fromString(sDate);
+        item->startTime = QDateTime::fromString(*it++, Qt::ISODate).toUTC();
         item->length = *it++;
         eventList->push_back(item);
     }
