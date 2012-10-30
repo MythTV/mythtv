@@ -53,6 +53,8 @@ bool SearchView::Create(void)
 
     BuildFocusList();
 
+    SetFocusWidget(m_criteriaEdit);
+
     new MythUIButtonListItem(m_fieldList, tr("All Fields"),
                                 qVariantFromValue(0));
     new MythUIButtonListItem(m_fieldList, tr("Artist"),
