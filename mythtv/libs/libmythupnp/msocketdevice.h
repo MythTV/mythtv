@@ -47,11 +47,11 @@
 #include <QIODevice>
 #include <QHostAddress> // int->QHostAddress conversion
 
-#include "mythbaseexp.h"
+#include "upnpexp.h"
 
 class MSocketDevicePrivate;
 
-class MBASE_PUBLIC MSocketDevice: public QIODevice
+class UPNP_PUBLIC MSocketDevice: public QIODevice
 {
 
 public:
