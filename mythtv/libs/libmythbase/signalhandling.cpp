@@ -83,7 +83,10 @@ SignalHandler::SignalHandler(QList<int> &signallist, QObject *parent) :
         s_defaultHandlerList << SIGINT << SIGTERM << SIGSEGV << SIGABRT
                              << SIGFPE << SIGILL;
 #ifndef _WIN32
-        s_defaultHandlerList << SIGBUS << SIGRTMIN;
+    s_defaultHandlerList << SIGBUS;
+#if ! CONFIG_DARWIN
+    s_defaultHandlerList << SIGRTMIN;
+#endif
 
     if (::socketpair(AF_UNIX, SOCK_STREAM, 0, sigFd))
     {
@@ -305,6 +308,8 @@ void SignalHandler::handleSignal(void)
 
     SigHandlerFunc handler = NULL;
     bool allowNullHandler = false;
+
+#if ! CONFIG_DARWIN
     if (signum == SIGRTMIN)
     {
         // glibc idiots seem to have made SIGRTMIN a macro that expands to a
@@ -312,6 +317,7 @@ void SignalHandler::handleSignal(void)
         // This uses the default handler to just get us here and to ignore it.
         allowNullHandler = true;
     }
+#endif
 
     switch (signum)
     {

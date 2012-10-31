@@ -2320,10 +2320,12 @@ void MythMainWindow::customEvent(QEvent *ce)
     else if (ce->type() == MythEvent::kLockInputDevicesEventType)
     {
         LockInputDevices(true);
+        PauseIdleTimer(true);
     }
     else if (ce->type() == MythEvent::kUnlockInputDevicesEventType)
     {
         LockInputDevices(false);
+        PauseIdleTimer(false);
     }
     else if (ce->type() == MythEvent::kDisableUDPListenerEventType)
     {

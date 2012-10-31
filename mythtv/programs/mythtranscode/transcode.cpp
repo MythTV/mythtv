@@ -29,6 +29,9 @@
 #include "avformatwriter.h"
 #include "HLS/httplivestream.h"
 
+#include "videodecodebuffer.h"
+#include "cutter.h"
+#include "audioreencodebuffer.h"
 
 extern "C" {
 #include "libavcodec/avcodec.h"
@@ -38,676 +41,6 @@ extern "C" {
 using namespace std;
 
 #define LOC QString("Transcode: ")
-
-#define ABLOCK_SIZE   8192
-
-class AudioBuffer
-{
-  public:
-    AudioBuffer() : m_frames(0), m_time(-1)
-    {
-        m_size      = 0;
-        m_buffer    = (uint8_t *)av_malloc(ABLOCK_SIZE);
-        if (m_buffer == NULL)
-        {
-            throw std::bad_alloc();
-        }
-        m_realsize  = ABLOCK_SIZE;
-    }
-
-    AudioBuffer(const AudioBuffer &old) : m_size(old.m_size),
-        m_realsize(old.m_realsize), m_frames(old.m_frames), m_time(old.m_time)
-    {
-        m_buffer = (uint8_t *)av_malloc(m_realsize);
-        if (m_buffer == NULL)
-        {
-            throw std::bad_alloc();
-        }
-        memcpy(m_buffer, old.m_buffer, m_size);
-    }
-
-    ~AudioBuffer()
-    {
-        av_free(m_buffer);
-    }
-
-    void appendData(unsigned char *buffer, int len, int frames, long long time)
-    {
-        if ((m_size + len) > m_realsize)
-        {
-            // buffer is too small to fit all
-            // can't use av_realloc as it doesn't guarantee reallocated memory
-            // to be 16 bytes aligned
-            m_realsize = ((m_size + len) / ABLOCK_SIZE + 1 ) * ABLOCK_SIZE;
-            uint8_t *tmp = (uint8_t *)av_malloc(m_realsize);
-            if (tmp == NULL)
-            {
-                throw std::bad_alloc();
-            }
-            memcpy(tmp, m_buffer, m_size);
-            av_free(m_buffer);
-            m_buffer = tmp;
-        }
-        memcpy(m_buffer + m_size, buffer, len);
-        m_size   += len;
-        m_frames += frames;
-        m_time    = time;
-    }
-
-    char *data(void) { return (char *)m_buffer; }
-    int   size(void) { return m_size; }
-
-    uint8_t    *m_buffer;
-    int         m_size;
-    int         m_realsize;
-    int         m_frames;
-    long long   m_time;
-};
-
-// This class is to act as a fake audio output device to store the data
-// for reencoding.
-class AudioReencodeBuffer : public AudioOutput
-{
-  public:
-    AudioReencodeBuffer(AudioFormat audio_format, int audio_channels,
-                        bool passthru) :
-        m_saveBuffer(NULL)
-    {
-        Reset();
-        const AudioSettings settings(audio_format, audio_channels, 0, 0, false);
-        Reconfigure(settings);
-        m_initpassthru = passthru;
-        m_audioFrameSize = 0;
-    }
-
-    ~AudioReencodeBuffer()
-    {
-        Reset();
-        if (m_saveBuffer)
-            delete m_saveBuffer;
-    }
-
-    // reconfigure sound out for new params
-    virtual void Reconfigure(const AudioSettings &settings)
-    {
-        ClearError();
-
-        m_passthru        = settings.use_passthru;
-        m_channels        = settings.channels;
-        m_bytes_per_frame = m_channels *
-            AudioOutputSettings::SampleSize(settings.format);
-        m_eff_audiorate   = settings.samplerate;
-    }
-
-    // dsprate is in 100 * frames/second
-    virtual void SetEffDsp(int dsprate)
-    {
-        m_eff_audiorate = (dsprate / 100);
-    }
-
-    virtual void Reset(void)
-    {
-        QMutexLocker locker(&m_bufferMutex);
-        foreach (AudioBuffer *ab, m_bufferList)
-        {
-            delete ab;
-        }
-        m_bufferList.clear();
-    }
-
-    // timecode is in milliseconds.
-    virtual bool AddFrames(void *buffer, int frames, int64_t timecode)
-    {
-        return AddData(buffer, frames * m_bytes_per_frame, timecode, frames);
-    }
-
-    // timecode is in milliseconds.
-    virtual bool AddData(void *buffer, int len, int64_t timecode, int frames)
-    {
-        unsigned char *buf = (unsigned char *)buffer;
-
-        // Test if target is using a fixed buffer size.
-        if (m_audioFrameSize)
-        {
-            int index = 0;
-
-            // Target has a fixed buffer size, which may not match len.
-            // Redistribute the bytes into appropriately sized buffers.
-            while (index < len)
-            {
-                // See if we have some saved from last iteration in
-                // m_saveBuffer. If not create a new empty buffer.
-                if (!m_saveBuffer)
-                    m_saveBuffer = new AudioBuffer();
-
-                // Use as many of the remaining frames as will fit in the space
-                // left in the buffer.
-                int bufsize = m_saveBuffer->size();
-                int part = min(len - index, m_audioFrameSize - bufsize);
-                int out_frames = part / m_bytes_per_frame;
-                timecode += out_frames * 1000 / m_eff_audiorate;
-
-                // Store frames in buffer, basing frame count on number of
-                // bytes, which works only for uncompressed data.
-                m_saveBuffer->appendData(&buf[index], part,
-                                         out_frames, timecode);
-
-                // If we have filled the buffer...
-                if (m_saveBuffer->size() == m_audioFrameSize)
-                {
-                    QMutexLocker locker(&m_bufferMutex);
-
-                    // store the buffer
-                    m_bufferList.append(m_saveBuffer);
-                    // mark m_saveBuffer as emtpy.
-                    m_saveBuffer = NULL;
-                    // m_last_audiotime is updated iff we store a buffer.
-                    m_last_audiotime = timecode;
-                }
-
-                index += part;
-            }
-        }
-        else
-        {
-            // Target has no fixed buffer size. We can use a simpler algorithm
-            // and use 'frames' directly rather than 'len / m_bytes_per_frame',
-            // thus also covering the passthrough case.
-            m_saveBuffer = new AudioBuffer();
-            timecode += frames * 1000 / m_eff_audiorate;
-            m_saveBuffer->appendData(buf, len, frames, timecode);
-
-            QMutexLocker locker(&m_bufferMutex);
-            m_bufferList.append(m_saveBuffer);
-            m_saveBuffer = NULL;
-            m_last_audiotime = timecode;
-        }
-
-        return true;
-    }
-
-    AudioBuffer *GetData(long long time)
-    {
-        QMutexLocker locker(&m_bufferMutex);
-
-        if (m_bufferList.isEmpty())
-            return NULL;
-
-        AudioBuffer *ab = m_bufferList.front();
-
-        if (ab->m_time <= time)
-        {
-            m_bufferList.pop_front();
-            return ab;
-        }
-
-        return NULL;
-    }
-
-    long long GetSamples(long long time)
-    {
-        QMutexLocker locker(&m_bufferMutex);
-
-        if (m_bufferList.isEmpty())
-            return 0;
-
-        long long samples = 0;
-        for (QList<AudioBuffer *>::iterator it = m_bufferList.begin();
-             it != m_bufferList.end(); ++it)
-        {
-            AudioBuffer *ab = *it;
-
-            if (ab->m_time <= time)
-                samples += ab->m_frames;
-            else
-                break;
-        }
-        return samples;
-    }
-
-    virtual void SetTimecode(int64_t timecode)
-    {
-        m_last_audiotime = timecode;
-    }
-    virtual bool IsPaused(void) const
-    {
-        return false;
-    }
-    virtual void Pause(bool paused)
-    {
-        (void)paused;
-    }
-    virtual void PauseUntilBuffered(void)
-    {
-        // Do nothing
-    }
-    virtual void Drain(void)
-    {
-        // Do nothing
-    }
-
-    virtual int64_t GetAudiotime(void)
-    {
-        return m_last_audiotime;
-    }
-
-    virtual int GetVolumeChannel(int) const
-    {
-        // Do nothing
-        return 100;
-    }
-    virtual void SetVolumeChannel(int, int)
-    {
-        // Do nothing
-    }
-    virtual void SetVolumeAll(int)
-    {
-        // Do nothing
-    }
-    virtual uint GetCurrentVolume(void) const
-    {
-        // Do nothing
-        return 100;
-    }
-    virtual void SetCurrentVolume(int)
-    {
-        // Do nothing
-    }
-    virtual void AdjustCurrentVolume(int)
-    {
-        // Do nothing
-    }
-    virtual void SetMute(bool)
-    {
-        // Do nothing
-    }
-    virtual void ToggleMute(void)
-    {
-        // Do nothing
-    }
-    virtual MuteState GetMuteState(void) const
-    {
-        // Do nothing
-        return kMuteOff;
-    }
-    virtual MuteState IterateMutedChannels(void)
-    {
-        // Do nothing
-        return kMuteOff;
-    }
-
-    virtual bool IsUpmixing(void)
-    {
-        // Do nothing
-        return false;
-    }
-
-    virtual bool ToggleUpmix(void)
-    {
-        // Do nothing
-        return false;
-    }
-
-    virtual bool CanUpmix(void)
-    {
-        // Do nothing
-        return false;
-    }
-
-    virtual void SetSWVolume(int new_volume, bool save)
-    {
-        // Do nothing
-        return;
-    }
-    virtual int GetSWVolume(void)
-    {
-        // Do nothing
-        return 100;
-    }
-
-    //  These are pure virtual in AudioOutput, but we don't need them here
-    virtual void bufferOutputData(bool){ return; }
-    virtual int readOutputData(unsigned char*, int ){ return 0; }
-
-    /**
-     * Test if we can output digital audio
-     */
-    virtual bool CanPassthrough(int, int, int, int) const
-        { return m_initpassthru; }
-
-    int                 m_channels;
-    int                 m_bits;
-    int                 m_bytes_per_frame;
-    int                 m_eff_audiorate;
-    long long           m_last_audiotime;
-    bool                m_passthru;
-    int                 m_audioFrameSize;
-  private:
-    bool                m_initpassthru;
-    QMutex              m_bufferMutex;
-    QList<AudioBuffer *> m_bufferList;
-    AudioBuffer         *m_saveBuffer;
-};
-
-// Cutter object is used in performing clean cutting. The
-// act of cutting is shared between the player and the
-// transcode loop. The player performs the initial part
-// of the cut by seeking, and the transcode loop handles
-// the remaining part by discarding data.
-class Cutter
-{
-  private:
-    bool          active;
-    frm_dir_map_t foreshortenedCutList;
-    DeleteMap     tracker;
-    int64_t       totalFrames;
-    int64_t       videoFramesToCut;
-    int64_t       audioFramesToCut;
-    float         audioFramesPerVideoFrame;
-    enum
-    {
-        MAXLEADIN  = 200,
-        MINCUT     = 20
-    };
-
-  public:
-    Cutter() : active(false), videoFramesToCut(0), audioFramesToCut(0),
-        audioFramesPerVideoFrame(0.0) {};
-
-    void SetCutList(frm_dir_map_t &deleteMap)
-    {
-        // Break each cut into two parts, the first for
-        // the player and the second for the transcode loop.
-        frm_dir_map_t           remainingCutList;
-        frm_dir_map_t::Iterator it;
-        int64_t                 start = 0;
-        int64_t                 leadinLength;
-
-        foreshortenedCutList.clear();
-
-        for (it = deleteMap.begin(); it != deleteMap.end(); ++it)
-        {
-            switch(it.value())
-            {
-                case MARK_CUT_START:
-                    foreshortenedCutList[it.key()] = MARK_CUT_START;
-                    start = it.key();
-                    break;
-
-                case MARK_CUT_END:
-                    leadinLength = min((int64_t)(it.key() - start),
-                                       (int64_t)MAXLEADIN);
-                    if (leadinLength >= MINCUT)
-                    {
-                        foreshortenedCutList[it.key() - leadinLength + 2] =
-                            MARK_CUT_END;
-                        remainingCutList[it.key() - leadinLength + 1] =
-                            MARK_CUT_START;
-                        remainingCutList[it.key()] = MARK_CUT_END;
-                    }
-                    else
-                    {
-                        // Cut too short to use new method.
-                        foreshortenedCutList[it.key()] = MARK_CUT_END;
-                    }
-                    break;
-            }
-        }
-
-        tracker.SetMap(remainingCutList);
-    }
-
-    frm_dir_map_t AdjustedCutList() const
-    {
-        return foreshortenedCutList;
-    }
-
-    void Activate(float v2a, int64_t total)
-    {
-        active = true;
-        audioFramesPerVideoFrame = v2a;
-        totalFrames = total;
-        videoFramesToCut = 0;
-        audioFramesToCut = 0;
-        tracker.TrackerReset(0, totalFrames);
-    }
-
-    void NewFrame(int64_t currentFrame)
-    {
-        if (active)
-        {
-            if (videoFramesToCut == 0)
-            {
-                uint64_t jumpTo = 0;
-
-                if (tracker.TrackerWantsToJump(currentFrame, totalFrames,
-                                               jumpTo))
-                {
-                    // Reset the tracker and work out how much video and audio
-                    // to drop
-                    tracker.TrackerReset(jumpTo, totalFrames);
-                    videoFramesToCut = jumpTo - currentFrame;
-                    audioFramesToCut += (int64_t)(videoFramesToCut *
-                                        audioFramesPerVideoFrame + 0.5);
-                    LOG(VB_GENERAL, LOG_INFO,
-                        QString("Clean cut: discarding frame from %1 to %2: "
-                                "vid %3 aud %4")
-                        .arg((long)currentFrame).arg((long)jumpTo)
-                        .arg((long)videoFramesToCut)
-                        .arg((long)audioFramesToCut));
-                }
-            }
-        }
-    }
-
-    bool InhibitUseVideoFrame()
-    {
-        if (videoFramesToCut == 0)
-        {
-            return false;
-        }
-        else
-        {
-            // We are inside a cut. Inhibit use of this frame
-            videoFramesToCut--;
-
-            if(videoFramesToCut == 0)
-                LOG(VB_GENERAL, LOG_INFO,
-                    QString("Clean cut: end of video cut; audio frames left "
-                            "to cut %1") .arg((long)audioFramesToCut));
-
-            return true;
-        }
-    }
-
-    bool InhibitUseAudioFrames(int64_t frames, long *totalAudio)
-    {
-        int64_t delta = audioFramesToCut - frames;
-        if (delta < 0)
-            delta = -delta;
-
-        if (audioFramesToCut == 0)
-        {
-            return false;
-        }
-        else if (delta < audioFramesToCut)
-        {
-            // Drop the packet containing these frames if doing
-            // so gets us closer to zero left to drop
-            audioFramesToCut -= frames;
-            if(audioFramesToCut == 0)
-                LOG(VB_GENERAL, LOG_INFO,
-                    QString("Clean cut: end of audio cut; vidio frames left "
-                            "to cut %1") .arg((long)videoFramesToCut));
-            return true;
-        }
-        else
-        {
-            // Don't drop this packet even though we still have frames to cut,
-            // because doing so would put us further out. Instead, inflate the
-            // callers record of how many audio frames have been output.
-            *totalAudio += audioFramesToCut;
-            audioFramesToCut = 0;
-            LOG(VB_GENERAL, LOG_INFO,
-                QString("Clean cut: end of audio cut; vidio frames left to "
-                        "cut %1") .arg((long)videoFramesToCut));
-            return false;
-        }
-    }
-
-    bool InhibitDummyFrame()
-    {
-        if (audioFramesToCut > 0)
-        {
-            // If the cutter is in the process of dropping audio then
-            // it is better to drop more audio rather than insert a dummy frame
-            audioFramesToCut += (int64_t)(audioFramesPerVideoFrame + 0.5);
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
-
-    bool InhibitDropFrame()
-    {
-        if (audioFramesToCut > (int64_t)(audioFramesPerVideoFrame + 0.5))
-        {
-            // If the cutter is in the process of dropping audio and the
-            // amount to drop is sufficient then we can drop less
-            // audio rather than drop a frame
-            audioFramesToCut -= (int64_t)(audioFramesPerVideoFrame + 0.5);
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
-};
-
-typedef struct transcodeFrameInfo
-{
-    VideoFrame *frame;
-    int         didFF;
-    bool        isKey;
-} TranscodeFrameInfo;
-
-class TranscodeFrameQueue : public QRunnable
-{
-  public:
-    TranscodeFrameQueue(MythPlayer *player, VideoOutput *videoout,
-        bool cutlist, int size = 5)
-      : m_player(player),         m_videoOutput(videoout),
-        m_honorCutlist(cutlist),
-        m_eof(false),             m_maxFrames(size),
-        m_runThread(true),        m_isRunning(false)
-    {
-
-    }
-
-    ~TranscodeFrameQueue()
-    {
-        m_runThread = false;
-        m_frameWaitCond.wakeAll();
-
-        while (m_isRunning)
-            usleep(50000);
-    }
-
-    void stop(void)
-    {
-        m_runThread = false;
-        m_frameWaitCond.wakeAll();
-
-        while (m_isRunning)
-            usleep(50000);
-    }
-
-    void run()
-    {
-        frm_dir_map_t::iterator dm_iter;
-
-        m_isRunning = true;
-        while (m_runThread)
-        {
-            if (m_frameList.size() < m_maxFrames && !m_eof)
-            {
-                TranscodeFrameInfo tfInfo;
-                tfInfo.frame = NULL;
-                tfInfo.didFF = 0;
-                tfInfo.isKey = false;
-
-                if (m_player->TranscodeGetNextFrame(dm_iter, tfInfo.didFF,
-                    tfInfo.isKey, m_honorCutlist))
-                {
-                    tfInfo.frame = m_videoOutput->GetLastDecodedFrame();
-
-                    QMutexLocker locker(&m_queueLock);
-                    m_frameList.append(tfInfo);
-                }
-                else
-                {
-                    m_eof = true;
-                }
-
-                m_frameWaitCond.wakeAll();
-            }
-            else
-            {
-                m_frameWaitLock.lock();
-                m_frameWaitCond.wait(&m_frameWaitLock);
-                m_frameWaitLock.unlock();
-            }
-        }
-        m_isRunning = false;
-    }
-
-    VideoFrame *GetFrame(int &didFF, bool &isKey)
-    {
-        m_queueLock.lock();
-
-        if (m_frameList.isEmpty())
-        {
-            m_queueLock.unlock();
-
-            if (m_eof)
-                return NULL;
-
-            m_frameWaitLock.lock();
-            m_frameWaitCond.wait(&m_frameWaitLock);
-            m_frameWaitLock.unlock();
-
-            if (m_frameList.isEmpty())
-                return NULL;
-
-            m_queueLock.lock();
-        }
-
-        TranscodeFrameInfo tfInfo = m_frameList.takeFirst();
-        m_queueLock.unlock();
-        m_frameWaitCond.wakeAll();
-
-        didFF = tfInfo.didFF;
-        isKey = tfInfo.isKey;
-
-        return tfInfo.frame;
-    }
-
-  private:
-    MythPlayer               *m_player;
-    VideoOutput              *m_videoOutput;
-    bool                      m_honorCutlist;
-    bool                      m_eof;
-    int                       m_maxFrames;
-    bool                      m_runThread;
-    bool                      m_isRunning;
-    QMutex                    m_queueLock;
-    QList<TranscodeFrameInfo> m_frameList;
-    QWaitCondition            m_frameWaitCond;
-    QMutex                    m_frameWaitLock;
-};
 
 Transcode::Transcode(ProgramInfo *pginfo) :
     m_proginfo(pginfo),
@@ -1639,9 +972,9 @@ int Transcode::TranscodeFile(const QString &inputname,
     else
         LOG(VB_GENERAL, LOG_INFO, "Transcoding Video and Audio");
 
-    TranscodeFrameQueue *frameQueue =
-        new TranscodeFrameQueue(GetPlayer(), videoOutput, honorCutList);
-    MThreadPool::globalInstance()->start(frameQueue, "TranscodeFrameQueue");
+    VideoDecodeBuffer *videoBuffer =
+        new VideoDecodeBuffer(GetPlayer(), videoOutput, honorCutList);
+    MThreadPool::globalInstance()->start(videoBuffer, "VideoDecodeBuffer");
 
     QTime flagTime;
     flagTime.start();
@@ -1659,7 +992,7 @@ int Transcode::TranscodeFile(const QString &inputname,
     }
 
     while ((!stopSignalled) &&
-           (lastDecode = frameQueue->GetFrame(did_ff, is_key)))
+           (lastDecode = videoBuffer->GetFrame(did_ff, is_key)))
     {
         if (first_loop)
         {
@@ -1794,8 +1127,8 @@ int Transcode::TranscodeFile(const QString &inputname,
                 unlink(outputname.toLocal8Bit().constData());
                 av_free(newFrame);
                 SetPlayerContext(NULL);
-                if (frameQueue)
-                    frameQueue->stop();
+                if (videoBuffer)
+                    videoBuffer->stop();
                 return REENCODE_ERROR;
             }
 
@@ -1987,8 +1320,8 @@ int Transcode::TranscodeFile(const QString &inputname,
 
                         av_free(newFrame);
                         SetPlayerContext(NULL);
-                        if (frameQueue)
-                            frameQueue->stop();
+                        if (videoBuffer)
+                            videoBuffer->stop();
                         delete ab;
                         return REENCODE_ERROR;
                     }
@@ -2076,8 +1409,8 @@ int Transcode::TranscodeFile(const QString &inputname,
                 unlink(outputname.toLocal8Bit().constData());
                 av_free(newFrame);
                 SetPlayerContext(NULL);
-                if (frameQueue)
-                    frameQueue->stop();
+                if (videoBuffer)
+                    videoBuffer->stop();
                 return REENCODE_CUTLIST_CHANGE;
             }
 
@@ -2091,8 +1424,8 @@ int Transcode::TranscodeFile(const QString &inputname,
                     unlink(outputname.toLocal8Bit().constData());
                     av_free(newFrame);
                     SetPlayerContext(NULL);
-                    if (frameQueue)
-                        frameQueue->stop();
+                    if (videoBuffer)
+                        videoBuffer->stop();
                     return REENCODE_STOPPED;
                 }
 
@@ -2177,8 +1510,11 @@ int Transcode::TranscodeFile(const QString &inputname,
         delete hls;
     }
 
-    if (frameQueue)
-        frameQueue->stop();
+    if (videoBuffer)
+    {
+        videoBuffer->stop();
+        delete videoBuffer;
+    }
 
     av_free(newFrame);
     SetPlayerContext(NULL);

@@ -115,8 +115,7 @@ void ChannelScannerGUI::HandleEvent(const ScannerEvent *scanEvent)
         Teardown();
 
         int ret = scanEvent->intValue();
-        if (sigmonScanner &&
-            (!transports.empty() || (MythDialog::Rejected != ret)))
+        if (!transports.empty() || (MythDialog::Rejected != ret))
         {
             Process(transports);
         }

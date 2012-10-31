@@ -181,7 +181,7 @@ int main(int argc, char *argv[])
 
         fromfile_id         = cmdline.toInt("sourceid");
         fromfile_offset     = cmdline.toInt("offset");
-        fromddfile_lineupid = cmdline.toInt("lineupid");
+        fromddfile_lineupid = cmdline.toString("lineupid");
         fromfile_name       = cmdline.toString("xmlfile");
 
         LOG(VB_GENERAL, LOG_INFO,
@@ -348,7 +348,10 @@ int main(int argc, char *argv[])
 #ifndef _WIN32
     QList<int> signallist;
     signallist << SIGINT << SIGTERM << SIGSEGV << SIGABRT << SIGBUS << SIGFPE
-               << SIGILL << SIGRTMIN;
+               << SIGILL;
+#if ! CONFIG_DARWIN
+    signallist << SIGRTMIN;
+#endif
     SignalHandler::Init(signallist);
     signal(SIGHUP, SIG_IGN);
 #endif
@@ -633,7 +636,28 @@ int main(int argc, char *argv[])
 
         if (query.exec())
             LOG(VB_GENERAL, LOG_INFO,
-                QString("    Found %1").arg(query.numRowsAffected()));
+                QString("    Found %1 with programids")
+                .arg(query.numRowsAffected()));
+
+        query.prepare("UPDATE program p "
+                      "JOIN ( "
+                      "  SELECT title, subtitle, description, "
+                      "         MAX(originalairdate) maxoad "
+                      "  FROM program "
+                      "  WHERE programid = '' AND "
+                      "        originalairdate IS NOT NULL "
+                      "  GROUP BY title, subtitle, description ) oad "
+                      "  ON p.programid = '' AND "
+                      "     p.title = oad.title AND "
+                      "     p.subtitle = oad.subtitle AND "
+                      "     p.description = oad.description "
+                      "SET p.originalairdate = oad.maxoad "
+                      "WHERE p.originalairdate IS NULL");
+
+        if (query.exec())
+            LOG(VB_GENERAL, LOG_INFO,
+                QString("    Found %1 without programids")
+                .arg(query.numRowsAffected()));
     }
 
     if (mark_repeats)
