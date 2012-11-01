@@ -1035,18 +1035,40 @@ bool MythCoreContext::SendReceiveStringList(
     return ok;
 }
 
+class SendAsyncMessage : public QRunnable
+{
+  public:
+    SendAsyncMessage(const QString &msg, const QStringList &extra) :
+        m_message(msg), m_extraData(extra)
+    {
+    }
+
+    SendAsyncMessage(const QString &msg) : m_message(msg) { }
+
+    void run(void)
+    {
+        QStringList strlist("MESSAGE");
+        strlist << m_message;
+        strlist << m_extraData;
+        gCoreContext->SendReceiveStringList(strlist);
+    }
+
+  private:
+    QString m_message;
+    QStringList m_extraData;
+};
+
 void MythCoreContext::SendMessage(const QString &message)
 {
     if (IsBackend())
     {
         dispatch(MythEvent(message));
-        return;
     }
-
-    QStringList strlist( "MESSAGE" );
-    strlist << message;
-
-    SendReceiveStringList(strlist);
+    else
+    {
+        MThreadPool::globalInstance()->start(
+            new SendAsyncMessage(message), "SendMessage");
+    }
 }
 
 void MythCoreContext::SendEvent(const MythEvent &event)
@@ -1054,14 +1076,13 @@ void MythCoreContext::SendEvent(const MythEvent &event)
     if (IsBackend())
     {
         dispatch(event);
-        return;
     }
-
-    QStringList strlist( "MESSAGE" );
-    strlist << event.Message();
-    strlist << event.ExtraDataList();
-
-    SendReceiveStringList(strlist);
+    else
+    {
+        MThreadPool::globalInstance()->start(
+            new SendAsyncMessage(event.Message(), event.ExtraDataList()),
+            "SendEvent");
+    }
 }
 
 void MythCoreContext::SendSystemEvent(const QString &msg)
