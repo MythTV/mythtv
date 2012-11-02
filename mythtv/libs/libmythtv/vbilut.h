@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-extern "C" const unsigned char  lang_chars[][16];
+extern "C" const char  lang_chars[][16];
 extern const char           chartab_original[];
 extern const char           chartab_swedish[];
 extern const unsigned short hammtab[];
