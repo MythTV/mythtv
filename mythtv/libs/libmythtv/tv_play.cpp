@@ -4868,14 +4868,6 @@ void TV::ProcessNetworkControlCommand(PlayerContext *ctx,
         if (ctx->buffer && ctx->buffer->IsInDiscMenuOrStillFrame())
             return;
 
-        ctx->LockDeletePlayer(__FILE__, __LINE__);
-        long long fplay = 0;
-        if (ctx->player && (tokens[2] == "BEGINNING" || tokens[2] == "POSITION"))
-        {
-            fplay = ctx->player->GetFramesPlayed();
-        }
-        ctx->UnlockDeletePlayer(__FILE__, __LINE__);
-
         if (tokens[2] == "BEGINNING")
             DoSeek(ctx, 0, tr("Jump to Beginning"),
                    /*timeIsOffset*/false,
@@ -4900,7 +4892,7 @@ void TV::ProcessNetworkControlCommand(PlayerContext *ctx,
     else if (tokens.size() >= 3 && tokens[1] == "SUBTITLES")
     {
         bool ok = false;
-        int track = tokens[2].toInt(&ok);
+        uint track = tokens[2].toUInt(&ok);
 
         if (!ok)
             return;
