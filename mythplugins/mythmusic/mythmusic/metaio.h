@@ -95,7 +95,7 @@ class MetaIO
     {
         (void)filename;
         (void)type;
-        return false;
+        return NULL;
     }
 
     void readFromFilename(const QString &filename, QString &artist,
