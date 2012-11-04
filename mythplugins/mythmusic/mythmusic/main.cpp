@@ -197,7 +197,6 @@ static void loadMusic()
         qApp->processEvents();
         usleep(50000);
     }
-    gMusicData->all_playlists->postLoad();
 
     gMusicData->all_streams->createPlaylist();
 
@@ -312,8 +311,6 @@ static void runScan(void)
     if (gMusicData->all_playlists && gMusicData->all_playlists->cleanOutThreads())
     {
         gMusicData->all_playlists->save();
-        int x = gMusicData->all_playlists->getPending();
-        SavePending(x);
     }
 
     // force a complete reload of the tracks and playlists
@@ -708,8 +705,6 @@ void mythplugin_destroy(void)
     if (gMusicData->all_playlists && gMusicData->all_playlists->cleanOutThreads())
     {
         gMusicData->all_playlists->save();
-        int x = gMusicData->all_playlists->getPending();
-        SavePending(x);
     }
 
     delete gPlayer;

@@ -1834,7 +1834,6 @@ void MusicData::reloadMusic(void)
         qApp->processEvents();
         usleep(50000);
     }
-    all_playlists->postLoad();
 
     if (busy)
         busy->Close();

@@ -43,15 +43,8 @@ class PlaylistContainer
 
     QString         getPlaylistName(int index, bool &reference);
 
-    void            postLoad();
-
     void            deletePlaylist(int index);
     void            renamePlaylist(int index, QString new_name);
-
-    void            popBackPlaylist();
-    bool            pendingWriteback();
-    void            setPending(int x) {m_pendingWritebackIndex = x;}
-    int             getPending() {return m_pendingWritebackIndex;}
 
     bool            nameIsUnique(QString a_name, int which_id);
 
@@ -68,14 +61,11 @@ class PlaylistContainer
 
   private:  
     Playlist            *m_activePlaylist;
-    Playlist            *m_backupPlaylist;
     Playlist            *m_streamPlaylist;
     QList<int>           m_cdPlaylist;
     QList<Playlist*>    *m_allPlaylists;
     AllMusic            *m_allMusic;
 
-    int                  m_pendingWritebackIndex;
-    
     PlaylistLoadingThread  *m_playlistsLoader;
     bool                    m_doneLoading;
     QString                 m_myHost;
