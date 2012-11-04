@@ -112,10 +112,12 @@ void PlaylistContainer::load()
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT playlist_id FROM music_playlists "
                   "WHERE playlist_name != :DEFAULT"
+                  " AND playlist_name != :BACKUP "
                   " AND playlist_name != :STREAM "
                   " AND (hostname = '' OR hostname = :HOST) "
                   "ORDER BY playlist_name;");
     query.bindValue(":DEFAULT", "default_playlist_storage");
+    query.bindValue(":BACKUP", "backup_playlist_storage");
     query.bindValue(":STREAM", "stream_playlist");
     query.bindValue(":HOST", m_myHost);
 
@@ -298,9 +300,6 @@ QString PlaylistContainer::getPlaylistName(int index, bool &reference)
 bool PlaylistContainer::nameIsUnique(QString a_name, int which_id)
 {
     if (a_name == "default_playlist_storage")
-        return false;
-
-    if (a_name == "backup_playlist_storage")
         return false;
 
     QList<Playlist*>::iterator it = m_allPlaylists->begin();

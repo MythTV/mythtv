@@ -536,7 +536,6 @@ void Playlist::loadPlaylist(QString a_name, QString a_host)
     MSqlQuery query(MSqlQuery::InitCon());
 
     if (m_name == "default_playlist_storage" ||
-        m_name == "backup_playlist_storage"  || 
         m_name == "stream_playlist")
     {
         query.prepare("SELECT playlist_id, playlist_name, playlist_songs "
@@ -547,7 +546,7 @@ void Playlist::loadPlaylist(QString a_name, QString a_host)
     else
     {
         // Technically this is never called as this function
-        // is only used to load the default/backup playlists.
+        // is only used to load the default playlist.
         query.prepare("SELECT playlist_id, playlist_name, playlist_songs "
                       "FROM music_playlists "
                       "WHERE playlist_name = :NAME"
@@ -566,8 +565,6 @@ void Playlist::loadPlaylist(QString a_name, QString a_host)
         }
         if (m_name == "default_playlist_storage")
             m_name = QObject::tr("Default Playlist");
-        if (m_name == "backup_playlist_storage")
-            m_name = "and they should **REALLY** never see this";
     }
     else
     {
@@ -607,8 +604,6 @@ void Playlist::loadPlaylistByID(int id, QString a_host)
 
     if (m_name == "default_playlist_storage")
         m_name = QObject::tr("Default Playlist");
-    if (m_name == "backup_playlist_storage")
-        m_name = "and they should **REALLY** never see this";
 
     fillSongsFromSonglist(rawSonglist);
 }
@@ -970,8 +965,7 @@ void Playlist::savePlaylist(QString a_name, QString a_host)
 
     getStats(&songcount, &playtime);
 
-    bool save_host = ("default_playlist_storage" == a_name
-        || "backup_playlist_storage" == a_name);
+    bool save_host = ("default_playlist_storage" == a_name);
     if (m_playlistid > 0)
     {
         QString str_query = "UPDATE music_playlists SET "
