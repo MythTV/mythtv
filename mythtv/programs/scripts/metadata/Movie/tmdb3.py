@@ -11,13 +11,14 @@
 #-----------------------
 __title__ = "TheMovieDB.org V3"
 __author__ = "Raymond Wagner"
-__version__ = "0.3.2"
+__version__ = "0.3.3"
 # 0.1.0 Initial version
 # 0.2.0 Add language support, move cache to home directory
 # 0.3.0 Enable version detection to allow use in MythTV
 # 0.3.1 Add --test parameter for proper compatibility with mythmetadatalookup
 # 0.3.2 Add --area parameter to allow country selection for release date and
 #       parental ratings
+# 0.3.3 Use translated title if available
 
 from optparse import OptionParser
 import sys
@@ -38,13 +39,12 @@ def buildSingle(inetref, opts):
         if getattr(movie, j):
             setattr(m, i, getattr(movie, j))
 
+    if movie.title:
+        m.title = movie.title
+
     releases = movie.releases.items()
 
     if opts.country:
-        for alt in movie.alternate_titles:
-            if alt.country == opts.country:
-                m.title = alt.title
-                break
         try:
             # resort releases with selected country at top to ensure it
             # is selected by the metadata libraries
@@ -113,6 +113,10 @@ def buildList(query, opts):
             if getattr(res, j):
                 setattr(m, i, getattr(res, j))
         m.inetref = str(res.id)
+
+        if res.title:
+            m.title = res.title
+
         #TODO:
         # should releasedate and year be pulled from the country-specific data
         # or should it be left to the default information to cut down on
