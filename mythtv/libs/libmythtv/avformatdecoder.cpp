@@ -682,6 +682,9 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame, bool discardFrames)
 void AvFormatDecoder::SeekReset(long long newKey, uint skipFrames,
                                 bool doflush, bool discardFrames)
 {
+    if (!ringBuffer)
+        return; // nothing to reset...
+
     if (ringBuffer->IsInDiscMenuOrStillFrame() || newKey == 0)
         return;
 
