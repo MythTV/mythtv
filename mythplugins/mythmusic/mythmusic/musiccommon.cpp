@@ -511,6 +511,7 @@ bool MusicCommon::keyPressEvent(QKeyEvent *e)
             {
                 m_movingTrack = false;
                 item->DisplayState("off", "movestate");
+                storePlaylists();
             }
             else if (action == "UP")
             {
@@ -1309,13 +1310,17 @@ void MusicCommon::customEvent(QEvent *event)
                 {
                     Metadata *mdata = qVariantValue<Metadata*> (item->GetData());
                     if (mdata)
+                    {
                         gPlayer->removeTrack(mdata->ID());
+                        storePlaylists();
+                    }
                 }
             }
             else if (resulttext == tr("Remove All Tracks"))
             {
                 gPlayer->getPlaylist()->removeAllTracks();
                 gPlayer->activePlaylistChanged(-1, true);
+                storePlaylists();
             }
             else if (resulttext == tr("Save To New Playlist"))
             {
@@ -1384,6 +1389,7 @@ void MusicCommon::customEvent(QEvent *event)
             int mode = dce->GetData().toInt();
             gPlayer->setShuffleMode((MusicPlayer::ShuffleMode) mode);
             updateShuffleMode(true);
+            storePlaylists();
         }
         else if (resultid == "exitmenu")
         {
@@ -1435,6 +1441,7 @@ void MusicCommon::customEvent(QEvent *event)
                 byYear();
             else if (resulttext == tr("Tracks With Same Title"))
                 byTitle();
+
         }
         else if (resultid == "playlistoptionsmenu")
         {
@@ -1442,11 +1449,13 @@ void MusicCommon::customEvent(QEvent *event)
             {
                 m_playlistOptions.insertPLOption = PL_REPLACE;
                 doUpdatePlaylist();
+                storePlaylists();
             }
             else if (resulttext == tr("Add Tracks"))
             {
                 m_playlistOptions.insertPLOption = PL_INSERTATEND;
                 doUpdatePlaylist();
+                storePlaylists();
             }
         }
         else if (resultid == "visualizermenu")
@@ -1464,7 +1473,7 @@ void MusicCommon::customEvent(QEvent *event)
             gMusicData->all_playlists->copyNewPlaylist(resulttext);
             Playlist *playlist = gMusicData->all_playlists->getPlaylist(resulttext);
             gPlayer->playlistChanged(playlist->getID());
-            gMusicData->all_playlists->save();
+            storePlaylists();
         }
         else if (resultid == "updateplaylist")
         {
@@ -1473,7 +1482,7 @@ void MusicCommon::customEvent(QEvent *event)
             playlist->removeAllTracks();
             playlist->fillSongsFromSonglist(songList);
             gPlayer->playlistChanged(playlist->getID());
-            gMusicData->all_playlists->save();
+            storePlaylists();
         }
     }
     else if (event->type() == MusicPlayerEvent::TrackChangeEvent)
@@ -2408,6 +2417,7 @@ void MusicCommon::doUpdatePlaylist(void)
                     m_whereClause, true,
                     m_playlistOptions.insertPLOption, curTrackID);
         m_whereClause.clear();
+
     }
     else if (!m_songList.isEmpty())
     {
@@ -2505,6 +2515,15 @@ bool MusicCommon::restorePosition(int trackID)
 void MusicCommon::playFirstTrack()
 {
     gPlayer->setCurrentTrackPos(0);
+}
+
+void MusicCommon::storePlaylists(void)
+{
+    if (gMusicData->all_playlists->cleanOutThreads())
+    {
+        gMusicData->all_playlists->save();
+        LOG(VB_GENERAL, LOG_INFO, "Playlists saved.");
+    }
 }
 
 //---------------------------------------------------------
