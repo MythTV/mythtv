@@ -1464,6 +1464,7 @@ void MusicCommon::customEvent(QEvent *event)
             gMusicData->all_playlists->copyNewPlaylist(resulttext);
             Playlist *playlist = gMusicData->all_playlists->getPlaylist(resulttext);
             gPlayer->playlistChanged(playlist->getID());
+            gMusicData->all_playlists->save();
         }
         else if (resultid == "updateplaylist")
         {
@@ -1472,6 +1473,7 @@ void MusicCommon::customEvent(QEvent *event)
             playlist->removeAllTracks();
             playlist->fillSongsFromSonglist(songList);
             gPlayer->playlistChanged(playlist->getID());
+            gMusicData->all_playlists->save();
         }
     }
     else if (event->type() == MusicPlayerEvent::TrackChangeEvent)
