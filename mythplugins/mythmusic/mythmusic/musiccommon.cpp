@@ -692,7 +692,10 @@ bool MusicCommon::keyPressEvent(QKeyEvent *e)
             {
                 Metadata *mdata = qVariantValue<Metadata*> (item->GetData());
                 if (mdata)
+                {
                     gPlayer->removeTrack(mdata->ID());
+                    storePlaylists();
+                }
             }
         }
         else if (action == "MENU")
