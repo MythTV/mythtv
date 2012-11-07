@@ -46,13 +46,12 @@ bool PlaylistContainer::checkCDTrack(int track)
     return m_cdPlaylist.contains(track);
 }
 
-PlaylistContainer::PlaylistContainer(
-    AllMusic *all_music, const QString &host_name) :
+PlaylistContainer::PlaylistContainer(AllMusic *all_music) :
     m_activePlaylist(NULL), m_streamPlaylist(NULL),
     m_allPlaylists(NULL),   m_allMusic(all_music),
 
     m_playlistsLoader(new PlaylistLoadingThread(this, all_music)),
-    m_doneLoading(false),        m_myHost(host_name),
+    m_doneLoading(false), m_myHost(gCoreContext->GetHostName()),
 
     m_ratingWeight(   gCoreContext->GetNumSetting("IntelliRatingWeight",    2)),
     m_playCountWeight(gCoreContext->GetNumSetting("IntelliPlayCountWeight", 2)),
@@ -208,7 +207,7 @@ void PlaylistContainer::createNewPlaylist(QString name)
 
     //  Need to touch the database to get persistent ID
     new_list->savePlaylist(name, m_myHost);
-    new_list->Changed();
+
     m_allPlaylists->push_back(new_list);
 }
 
@@ -219,7 +218,7 @@ void PlaylistContainer::copyNewPlaylist(QString name)
 
     //  Need to touch the database to get persistent ID
     new_list->savePlaylist(name, m_myHost);
-    new_list->Changed();
+
     m_allPlaylists->push_back(new_list);
     m_activePlaylist->copyTracks(new_list, false);
 }
@@ -235,10 +234,7 @@ void PlaylistContainer::copyToActive(int index)
         return;
     }
     copy_from->copyTracks(m_activePlaylist, true);
-
-    m_activePlaylist->Changed();
 }
-
 
 void PlaylistContainer::renamePlaylist(int index, QString new_name)
 {
@@ -246,7 +242,7 @@ void PlaylistContainer::renamePlaylist(int index, QString new_name)
     if (list_to_rename)
     {
         list_to_rename->setName(new_name);
-        list_to_rename->Changed();
+        list_to_rename->changed();
     }
 }
 
@@ -260,6 +256,9 @@ void PlaylistContainer::deletePlaylist(int kill_me)
         return;
     }
 
+    list_to_kill->removeAllTracks();
+    m_allPlaylists->removeAll(list_to_kill);
+
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("DELETE FROM music_playlists WHERE playlist_id = :ID ;");
     query.bindValue(":ID", kill_me);
@@ -268,8 +267,6 @@ void PlaylistContainer::deletePlaylist(int kill_me)
     {
         MythDB::DBError("playlist delete", query);
     }
-    list_to_kill->removeAllTracks();
-    m_allPlaylists->removeAll(list_to_kill);
 }
 
 
@@ -338,5 +335,4 @@ bool PlaylistContainer::cleanOutThreads()
 void PlaylistContainer::clearActive()
 {
     m_activePlaylist->removeAllTracks();
-    m_activePlaylist->Changed();
 }

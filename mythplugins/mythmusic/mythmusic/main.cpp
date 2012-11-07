@@ -183,8 +183,7 @@ static void loadMusic()
     AllMusic *all_music = new AllMusic();
 
     //  Load all playlists into RAM (once!)
-    PlaylistContainer *all_playlists = new PlaylistContainer(
-            all_music, gCoreContext->GetHostName());
+    PlaylistContainer *all_playlists = new PlaylistContainer(all_music);
 
     gMusicData->all_music = all_music;
     gMusicData->all_streams = new AllStream();

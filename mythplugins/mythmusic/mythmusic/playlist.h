@@ -53,7 +53,6 @@ class Playlist : public QObject
 
     void describeYourself(void) const; //  debugging
 
-    void fillSongsFromCD();
     void fillSongsFromSonglist(QString songList);
     void fillSonglistFromQuery(QString whereClause, 
                                bool removeDuplicates = false,
@@ -85,10 +84,15 @@ class Playlist : public QObject
     void removeTrack(int the_track_id);
     void removeAllTracks(void);
 
-    void copyTracks(Playlist *to_ptr, bool update_display) const;
+    void copyTracks(Playlist *to_ptr, bool update_display);
 
     bool hasChanged(void) { return m_changed; }
-    void Changed(void) { m_changed = true; }
+    void changed(void);
+
+    /// whether any changes should be saved to the DB
+    void disableSaves(void) { m_doSave = false; }
+    void enableSaves(void) { m_doSave = true; }
+    bool doSaves(void) { return m_doSave; }
 
     QString getName(void) { return m_name; } 
     void    setName(QString a_name) { m_name = a_name; }
@@ -118,6 +122,7 @@ class Playlist : public QObject
     QMap<int, Metadata*>  m_songMap;
     PlaylistContainer    *m_parent;
     bool                  m_changed;
+    bool                  m_doSave;
     MythProgressDialog   *m_progress;
     MythSystem           *m_proc;
     uint                  m_procExitVal;

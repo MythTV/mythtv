@@ -20,7 +20,7 @@ class PlaylistLoadingThread : public MThread
 class PlaylistContainer
 {
   public:
-    PlaylistContainer(AllMusic *all_music, const QString &host_name);
+    PlaylistContainer(AllMusic *all_music);
    ~PlaylistContainer();
 
     void            load();
