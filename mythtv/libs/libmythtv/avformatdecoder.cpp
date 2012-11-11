@@ -4334,7 +4334,7 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
         LOG(VB_TIMESTAMP, LOG_INFO, LOC + QString("audio timecode %1 %2 %3 %4")
                 .arg(pkt->pts).arg(pkt->dts).arg(temppts).arg(lastapts));
 
-        allowedquit |= ringBuffer->IsInDiscMenuOrStillFrame() ||
+        allowedquit |= ringBuffer->IsInStillFrame() ||
                        m_audio->IsBufferAlmostFull();
 
         tmp_pkt.data += ret;
@@ -4451,9 +4451,9 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
                 continue;
             }
             else if (lowbuffers && ((decodetype & kDecodeAV) == kDecodeAV) &&
-                     storedPackets.count() < max_video_queue_size &&
-                     lastapts < lastvpts + 100 &&
-                     !ringBuffer->IsInDiscMenuOrStillFrame())
+                     (storedPackets.count() < max_video_queue_size) &&
+                     (lastapts < lastvpts + 100) &&
+                     !ringBuffer->IsInStillFrame())
             {
                 storevideoframes = true;
             }
