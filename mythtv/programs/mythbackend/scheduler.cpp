@@ -2041,16 +2041,18 @@ void Scheduler::ResetDuplicates(uint recordid, uint findid,
         if (!subtitle.isEmpty())
         {
             // Need to check both for kDupCheckSubThenDesc
-            filterClause += "OR p.subtitle = :SUBTITLE "
-                            "OR p.description = :SUBTITLE ";
-            bindings[":SUBTITLE"] = subtitle;
+            filterClause += "OR p.subtitle = :SUBTITLE1 "
+                            "OR p.description = :SUBTITLE2 ";
+            bindings[":SUBTITLE1"] = subtitle;
+            bindings[":SUBTITLE2"] = subtitle;
         }
         if (!descrip.isEmpty())
         {
             // Need to check both for kDupCheckSubThenDesc
-            filterClause += "OR p.description = :DESCRIP "
-                            "OR p.subtitle = :DESCRIP ";
-            bindings[":DESCRIP"] = descrip;
+            filterClause += "OR p.description = :DESCRIP1 "
+                            "OR p.subtitle = :DESCRIP2 ";
+            bindings[":DESCRIP1"] = descrip;
+            bindings[":DESCRIP2"] = descrip;
         }
         if (!programid.isEmpty())
         {
