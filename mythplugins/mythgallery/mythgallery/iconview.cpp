@@ -455,6 +455,8 @@ bool IconView::keyPressEvent(QKeyEvent *event)
                 HandleRotateCCW();
             else if (action == "DELETE")
                 HandleDelete();
+            else if (action == "EDIT")
+                HandleRename();
             else if (action == "MARK")
             {
                 ThumbItem *thumbitem = GetCurrentThumb();
@@ -1358,6 +1360,16 @@ void IconView::DoRename(QString folderName)
 
     ThumbItem *thumbitem = GetCurrentThumb();
 
+    int currPos = 0;
+    MythUIButtonListItem *item = m_imageList->GetItemCurrent();
+    if (item)
+    {
+        currPos = m_imageList->GetCurrentPos() + 1;
+
+        if (currPos >= m_imageList->GetCount())
+            currPos = m_imageList->GetCount() - 1;
+    }
+
     if (!thumbitem)
         return;
 
@@ -1375,6 +1387,8 @@ void IconView::DoRename(QString folderName)
     }
 
     LoadDirectory(m_currDir);
+
+    m_imageList->SetItemCurrent(currPos);
 }
 
 void IconView::ImportFromDir(const QString &fromDir, const QString &toDir)
