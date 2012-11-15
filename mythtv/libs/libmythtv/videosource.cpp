@@ -2049,8 +2049,6 @@ CetonConfigurationGroup::CetonConfigurationGroup
 
     connect(deviceid, SIGNAL(LoadedIP(const QString&)),
             ip,       SLOT(  LoadValue(const QString&)));
-    connect(deviceid, SIGNAL(LoadedCard(const QString&)),
-            card,     SLOT(  LoadValue(const QString&)));
     connect(deviceid, SIGNAL(LoadedTuner(const QString&)),
             tuner,    SLOT(  LoadValue(const QString&)));
 
