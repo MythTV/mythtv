@@ -130,7 +130,7 @@ static int toTrackType(int type)
     if (kDisplayTeletextCaptions == type) return kTrackTypeTeletextCaptions;
     if (kDisplayTextSubtitle == type)     return kTrackTypeTextSubtitle;
     if (kDisplayRawTextSubtitle == type)  return kTrackTypeRawText;
-    return 0;
+    return kTrackTypeUnknown;
 }
 
 MythPlayer::MythPlayer(PlayerFlags flags)
