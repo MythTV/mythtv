@@ -160,6 +160,13 @@ bool ZMClient::sendReceiveStringList(QStringList &strList)
         }
     }
 
+    // sanity check
+    if (strList.size() < 1)
+    {
+        LOG(VB_GENERAL, LOG_ERR, "ZMClient response too short");
+        return false;
+    }
+
     // the server sends "UNKNOWN_COMMAND" if it did not recognise the command
     if (strList[0] == "UNKNOWN_COMMAND")
     {
@@ -193,6 +200,13 @@ bool ZMClient::checkProtoVersion(void)
 
         ShowOkPopup(tr("The mythzmserver didn't respond to our request "
                        "to get the protocol version!!"));
+        return false;
+    }
+
+    // sanity check
+    if (strList.size() < 2)
+    {
+        LOG(VB_GENERAL, LOG_ERR, "ZMClient response too short");
         return false;
     }
 
@@ -258,6 +272,13 @@ void ZMClient::getServerStatus(QString &status, QString &cpuStat, QString &diskS
     if (!sendReceiveStringList(strList))
         return;
 
+    // sanity check
+    if (strList.size() < 4)
+    {
+        LOG(VB_GENERAL, LOG_ERR, "ZMClient response too short");
+        return;
+    }
+
     status = strList[1];
     cpuStat = strList[2];
     diskStat = strList[3];
@@ -270,6 +291,13 @@ void ZMClient::getMonitorStatus(vector<Monitor*> *monitorList)
     QStringList strList("GET_MONITOR_STATUS");
     if (!sendReceiveStringList(strList))
         return;
+
+    // sanity check
+    if (strList.size() < 2)
+    {
+        LOG(VB_GENERAL, LOG_ERR, "ZMClient response too short");
+        return;
+    }
 
     bool bOK;
     int monitorCount = strList[1].toInt(&bOK);
@@ -306,6 +334,13 @@ void ZMClient::getEventList(const QString &monitorName, bool oldestFirst,
     if (!sendReceiveStringList(strList))
         return;
 
+    // sanity check
+    if (strList.size() < 2)
+    {
+        LOG(VB_GENERAL, LOG_ERR, "ZMClient response too short");
+        return;
+    }
+
     bool bOK;
     int eventCount = strList[1].toInt(&bOK);
     if (!bOK)
@@ -314,7 +349,7 @@ void ZMClient::getEventList(const QString &monitorName, bool oldestFirst,
         return;
     }
 
-    // sanity check 
+    // sanity check
     if ((int)(strList.size() - 2) / 6 != eventCount)
     {
         LOG(VB_GENERAL, LOG_ERR,
@@ -350,6 +385,13 @@ void ZMClient::getEventDates(const QString &monitorName, bool oldestFirst,
     if (!sendReceiveStringList(strList))
         return;
 
+    // sanity check
+    if (strList.size() < 2)
+    {
+        LOG(VB_GENERAL, LOG_ERR, "ZMClient response too short");
+        return;
+    }
+
     bool bOK;
     int dateCount = strList[1].toInt(&bOK);
     if (!bOK)
@@ -359,7 +401,7 @@ void ZMClient::getEventDates(const QString &monitorName, bool oldestFirst,
         return;
     }
 
-    // sanity check 
+    // sanity check
     if ((int)(strList.size() - 3) != dateCount)
     {
         LOG(VB_GENERAL, LOG_ERR,
@@ -384,6 +426,13 @@ void ZMClient::getFrameList(int eventID, vector<Frame*> *frameList)
     strList << QString::number(eventID);
     if (!sendReceiveStringList(strList))
         return;
+
+    // sanity check
+    if (strList.size() < 2)
+    {
+        LOG(VB_GENERAL, LOG_ERR, "ZMClient response too short");
+        return;
+    }
 
     bool bOK;
     int frameCount = strList[1].toInt(&bOK);
@@ -523,6 +572,13 @@ void ZMClient::getEventFrame(Event *event, int frameNo, MythImage **image)
     if (!sendReceiveStringList(strList))
         return;
 
+    // sanity check
+    if (strList.size() < 2)
+    {
+        LOG(VB_GENERAL, LOG_ERR, "ZMClient response too short");
+        return;
+    }
+
     // get frame length from data
     int imageSize = strList[1].toInt();
 
@@ -562,6 +618,13 @@ void ZMClient::getAnalyseFrame(Event *event, int frameNo, QImage &image)
         return;
     }
 
+    // sanity check
+    if (strList.size() < 2)
+    {
+        LOG(VB_GENERAL, LOG_ERR, "ZMClient response too short");
+        return;
+    }
+
     // get frame length from data
     int imageSize = strList[1].toInt();
 
@@ -593,15 +656,30 @@ int ZMClient::getLiveFrame(int monitorID, QString &status, unsigned char* buffer
     strList << QString::number(monitorID);
     if (!sendReceiveStringList(strList))
     {
-        // the server sends a "WARNING" message if there is no new frame available
-        // we can safely ignore it
-        if (strList[0].startsWith("WARNING"))
+        if (strList.size() < 1)
+        {
+            LOG(VB_GENERAL, LOG_ERR, "ZMClient response too short");
             return 0;
+        }
+
+        // the server sends a "WARNING" message if there is no new
+        // frame available we can safely ignore it
+        if (strList[0].startsWith("WARNING"))
+        {
+            return 0;
+        }
         else
         {
             status = strList[0];
             return 0;
         }
+    }
+
+    // sanity check
+    if (strList.size() < 4)
+    {
+        LOG(VB_GENERAL, LOG_ERR, "ZMClient response too short");
+        return 0;
     }
 
     // get status
@@ -639,12 +717,28 @@ void ZMClient::getCameraList(QStringList &cameraList)
     if (!sendReceiveStringList(strList))
         return;
 
+    // sanity check
+    if (strList.size() < 2)
+    {
+        LOG(VB_GENERAL, LOG_ERR, "ZMClient response too short");
+        return;
+    }
+
     bool bOK;
     int cameraCount = strList[1].toInt(&bOK);
     if (!bOK)
     {
         LOG(VB_GENERAL, LOG_ERR,
             "ZMClient received bad int in getCameraList()");
+        return;
+    }
+
+    // sanity check
+    if (strList.size() < cameraCount + 2)
+    {
+        LOG(VB_GENERAL, LOG_ERR,
+            "ZMClient got a mismatch between the number of cameras and "
+            "the expected number of stringlist items in getCameraList()");
         return;
     }
 
@@ -662,12 +756,28 @@ void ZMClient::getMonitorList(vector<Monitor*> *monitorList)
     if (!sendReceiveStringList(strList))
         return;
 
+    // sanity check
+    if (strList.size() < 2)
+    {
+        LOG(VB_GENERAL, LOG_ERR, "ZMClient response too short");
+        return;
+    }
+
     bool bOK;
     int monitorCount = strList[1].toInt(&bOK);
     if (!bOK)
     {
         LOG(VB_GENERAL, LOG_ERR,
             "ZMClient received bad int in getMonitorList()");
+        return;
+    }
+
+    // sanity check
+    if ((int)(strList.size() - 2) / 5 != monitorCount)
+    {
+        LOG(VB_GENERAL, LOG_ERR,
+            "ZMClient got a mismatch between the number of monitors and "
+            "the expected number of stringlist items in getMonitorList()");
         return;
     }
 
