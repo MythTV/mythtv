@@ -11432,7 +11432,7 @@ void TV::FillOSDMenuNavigate(const PlayerContext *ctx, OSD *osd,
         currenttext = tr("Angle");
         int current_angle = GetCurrentAngle(ctx);
 
-        for (int i = 0; i < num_angles; i++)
+        for (int i = 1; i <= num_angles; i++)
         {
             QString angleIdx = QString("%1").arg(i, 3, 10, QChar(48));
             QString desc = GetAngleName(ctx, i);
