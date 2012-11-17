@@ -263,11 +263,11 @@ void MpegRecorder::SetOption(const QString &opt, const QString &value)
     else if (opt == "mpeg2audtype")
     {
         if (value == "Layer I")
-            audtype = 1;
+            audtype = V4L2_MPEG_AUDIO_ENCODING_LAYER_1 + 1;
         else if (value == "Layer II")
-            audtype = 2;
+            audtype = V4L2_MPEG_AUDIO_ENCODING_LAYER_2 + 1;
         else if (value == "Layer III")
-            audtype = 3;
+            audtype = V4L2_MPEG_AUDIO_ENCODING_LAYER_3 + 1;
         else
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + "MPEG2 audio layer: " +
@@ -277,9 +277,9 @@ void MpegRecorder::SetOption(const QString &opt, const QString &value)
     else if (opt == "audiocodec")
     {
         if (value == "AAC Hardware Encoder")
-            audtype = 4;
+            audtype = V4L2_MPEG_AUDIO_ENCODING_AAC + 1;
         else if (value == "AC3 Hardware Encoder")
-            audtype = 5;
+            audtype = V4L2_MPEG_AUDIO_ENCODING_AC3 + 1;
     }
     else
     {
