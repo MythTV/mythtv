@@ -362,15 +362,14 @@ void ZMClient::getEventList(const QString &monitorName, bool oldestFirst,
     it++; it++;
     for (int x = 0; x < eventCount; x++)
     {
-        Event *item = new Event;
-        item->eventID = (*it++).toInt();
-        item->eventName = *it++;
-        item->monitorID = (*it++).toInt();
-        item->monitorName = *it++;
-        QString sDate = *it++;
-        item->startTime = MythDate::fromString(sDate);
-        item->length = *it++;
-        eventList->push_back(item);
+        eventList->push_back(
+            new Event(
+                (*it++).toInt(), /* eventID */
+                *it++, /* eventName */
+                (*it++).toInt(), /* monitorID */
+                *it++, /* monitorName */
+                QDateTime::fromString(*it++, Qt::ISODate), /* startTime */
+                *it++ /* length */));
     }
 }
 
@@ -477,7 +476,7 @@ void ZMClient::deleteEventList(vector<Event*> *eventList)
     vector<Event*>::iterator it;
     for (it = eventList->begin(); it != eventList->end(); ++it)
     {
-        strList << QString::number((*it)->eventID);
+        strList << QString::number((*it)->eventID());
 
         if (++count == 100)
         {
@@ -565,10 +564,10 @@ void ZMClient::getEventFrame(Event *event, int frameNo, MythImage **image)
     }
 
     QStringList strList("GET_EVENT_FRAME");
-    strList << QString::number(event->monitorID);
-    strList << QString::number(event->eventID);
+    strList << QString::number(event->monitorID());
+    strList << QString::number(event->eventID());
     strList << QString::number(frameNo);
-    strList << event->startTime.toString("yy/MM/dd/hh/mm/ss");
+    strList << event->startTime(Qt::LocalTime).toString("yy/MM/dd/hh/mm/ss");
     if (!sendReceiveStringList(strList))
         return;
 
@@ -608,10 +607,10 @@ void ZMClient::getEventFrame(Event *event, int frameNo, MythImage **image)
 void ZMClient::getAnalyseFrame(Event *event, int frameNo, QImage &image)
 {
     QStringList strList("GET_ANALYSE_FRAME");
-    strList << QString::number(event->monitorID);
-    strList << QString::number(event->eventID);
+    strList << QString::number(event->monitorID());
+    strList << QString::number(event->eventID());
     strList << QString::number(frameNo);
-    strList << event->startTime.toString("yy/MM/dd/hh/mm/ss");
+    strList << event->startTime(Qt::LocalTime).toString("yy/MM/dd/hh/mm/ss");
     if (!sendReceiveStringList(strList))
     {
         image = QImage();
