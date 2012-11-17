@@ -46,12 +46,12 @@ class ZMClient *ZMClient::get(void)
     return m_zmclient;
 }
 
-bool ZMClient::setupZMClient(void) 
+bool ZMClient::setupZMClient(void)
 {
     QString zmserver_host;
     int zmserver_port;
 
-    if (m_zmclient) 
+    if (m_zmclient)
     {
         delete m_zmclient;
         m_zmclient = NULL;
@@ -62,7 +62,7 @@ bool ZMClient::setupZMClient(void)
     zmserver_port = gCoreContext->GetNumSetting("ZoneMinderServerPort", 6548);
 
     class ZMClient *zmclient = ZMClient::get();
-    if (zmclient->connectToHost(zmserver_host, zmserver_port) == false) 
+    if (zmclient->connectToHost(zmserver_host, zmserver_port) == false)
     {
         delete m_zmclient;
         m_zmclient = NULL;
@@ -114,7 +114,7 @@ bool ZMClient::connectToHost(const QString &lhostname, unsigned int lport)
 
     if (!m_bConnected)
     {
-        ShowOkPopup(tr("Cannot connect to the mythzmserver - Is it running? " 
+        ShowOkPopup(tr("Cannot connect to the mythzmserver - Is it running? "
                        "Have you set the correct IP and port in the settings?"));
     }
 
@@ -150,7 +150,7 @@ bool ZMClient::sendReceiveStringList(QStringList &strList)
             return false;
         }
 
-        // try to resend 
+        // try to resend
         m_socket->writeStringList(strList);
         ok = m_socket->readStringList(strList, false);
         if (!ok)
@@ -322,7 +322,7 @@ void ZMClient::getMonitorStatus(vector<Monitor*> *monitorList)
     }
 }
 
-void ZMClient::getEventList(const QString &monitorName, bool oldestFirst, 
+void ZMClient::getEventList(const QString &monitorName, bool oldestFirst,
                             QString date, vector<Event*> *eventList)
 {
     eventList->clear();
