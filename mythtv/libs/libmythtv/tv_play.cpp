@@ -9019,9 +9019,8 @@ void TV::customEvent(QEvent *e)
         MythMediaDevice *device = me->getDevice();
         
         QString filename = mctx->buffer->GetFilename();
-        QString devicePath = device->getDevicePath();
-        
-        if (device && filename.endsWith(devicePath) &&
+
+        if (device && filename.endsWith(device->getDevicePath()) &&
             (device->getStatus() == MEDIASTAT_OPEN))
         {
             LOG(VB_GENERAL, LOG_NOTICE, "DVD has been ejected, exiting playback");
