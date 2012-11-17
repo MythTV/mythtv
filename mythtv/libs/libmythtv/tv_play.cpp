@@ -9014,16 +9014,18 @@ void TV::customEvent(QEvent *e)
             ReturnPlayerLock(mctx);
             return;
         }
-        
+
         MythMediaEvent *me = static_cast<MythMediaEvent*>(e);
         MythMediaDevice *device = me->getDevice();
-        
+
         QString filename = mctx->buffer->GetFilename();
 
         if (device && filename.endsWith(device->getDevicePath()) &&
             (device->getStatus() == MEDIASTAT_OPEN))
         {
-            LOG(VB_GENERAL, LOG_NOTICE, "DVD has been ejected, exiting playback");
+            LOG(VB_GENERAL, LOG_NOTICE,
+                "DVD has been ejected, exiting playback");
+
             for (uint i = 0; mctx && (i < player.size()); i++)
             {
                 PlayerContext *ctx = GetPlayer(mctx, i);
@@ -9035,7 +9037,7 @@ void TV::customEvent(QEvent *e)
         ReturnPlayerLock(mctx);
         return;
     }
-    
+
     if (e->type() != MythEvent::MythEventMessage)
         return;
 
