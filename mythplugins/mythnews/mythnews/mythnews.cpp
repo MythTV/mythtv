@@ -254,10 +254,15 @@ void MythNews::updateInfoView(MythUIButtonListItem *selected)
             {
                 QString artText = article.description();
                 // replace a few HTML characters
-                artText.replace("&#8232;", ""); // LSEP
-                artText.replace("&#8233;", ""); // PSEP
-                artText.replace("&#163;",  "£"); // POUND
-                artText.replace("&#8211;", "-"); // EN-DASH
+                artText.replace("&#8232;", "");   // LSEP
+                artText.replace("&#8233;", "");   // PSEP
+                artText.replace("&#163;",  "£");  // POUND
+                artText.replace("&#173;",  "");   // ?
+                artText.replace("&#8211;", "-");  // EN-DASH
+                artText.replace("&#8220;", """"); // LEFT-DOUBLE-QUOTE
+                artText.replace("&#8221;", """"); // RIGHT-DOUBLE-QUOTE
+                artText.replace("&#8216;", "'");  // LEFT-SINGLE-QUOTE
+                artText.replace("&#8217;", "'");  // RIGHT-SINGLE-QUOTE
                 // Replace paragraph and break HTML with newlines
                 if( artText.indexOf(QRegExp("</(p|P)>")) )
                 {
