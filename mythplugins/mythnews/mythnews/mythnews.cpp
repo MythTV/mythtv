@@ -1,5 +1,6 @@
 // POSIX headers
 #include <unistd.h>
+#include <iostream>
 
 // C headers
 #include <cmath>
@@ -252,6 +253,11 @@ void MythNews::updateInfoView(MythUIButtonListItem *selected)
             if (m_descText)
             {
                 QString artText = article.description();
+                // replace a few HTML characters
+                artText.replace("&#8232;", ""); // LSEP
+                artText.replace("&#8233;", ""); // PSEP
+                artText.replace("&#163;",  "£"); // POUND
+                artText.replace("&#8211;", "-"); // EN-DASH
                 // Replace paragraph and break HTML with newlines
                 if( artText.indexOf(QRegExp("</(p|P)>")) )
                 {
