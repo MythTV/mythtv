@@ -8,7 +8,7 @@
 #include <vector>
 using namespace std;
 
-#include "mythexp.h"
+#include "mythbaseexp.h"
 
 class QSqlDatabase;
 class MythContext;
@@ -57,7 +57,7 @@ class MythPlugin : public QLibrary
 };
 
 // this should only be instantiated through MythContext.
-class MPUBLIC MythPluginManager
+class MBASE_PUBLIC MythPluginManager
 {
   public:   
     MythPluginManager();

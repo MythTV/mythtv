@@ -62,7 +62,7 @@ static void setupKeys()
 
 int mythplugin_init(const char *libversion)
 {
-    if (!gContext->TestPopupVersion("mythweather", libversion,
+    if (!gCoreContext->TestPluginVersion("mythweather", libversion,
                                     MYTH_BINARY_VERSION))
         return -1;
 

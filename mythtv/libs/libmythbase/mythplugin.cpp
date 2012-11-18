@@ -9,10 +9,11 @@
 #include <QDir>
 
 // MythTV includes
-#include "mythplugin.h"
-#include "mythcontext.h"
-#include "mythtranslation.h"
 
+// libmythbase
+#include "mythplugin.h"
+#include "mythcorecontext.h"
+#include "mythtranslation.h"
 #include "mythdirs.h"
 #include "mythversion.h"
 #include "mythlogging.h"
@@ -115,8 +116,6 @@ MythPluginManager::MythPluginManager()
     QString filter = GetPluginsNameFilter();
     filterDir.setNameFilters(QStringList(filter));
 
-    gContext->SetDisableLibraryPopup(true);
-
     if (filterDir.exists())
     {
         int prefixLength = filter.indexOf("*");
@@ -142,8 +141,6 @@ MythPluginManager::MythPluginManager()
     else
         LOG(VB_GENERAL, LOG_WARNING,
                  "No plugins directory " + filterDir.path());
-
-    gContext->SetDisableLibraryPopup(false);
 }
 
 MythPluginManager::~MythPluginManager()

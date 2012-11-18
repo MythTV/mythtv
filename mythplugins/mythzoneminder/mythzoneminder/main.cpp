@@ -137,7 +137,7 @@ static void setupKeys(void)
 
 int mythplugin_init(const char *libversion)
 {
-    if (!gContext->TestPopupVersion("mythzoneminder",
+    if (!gCoreContext->TestPluginVersion("mythzoneminder",
                                     libversion,
                                     MYTH_BINARY_VERSION))
         return -1;
