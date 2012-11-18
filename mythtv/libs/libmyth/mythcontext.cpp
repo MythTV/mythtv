@@ -181,7 +181,7 @@ static void exec_program_tv_cb(const QString &cmd)
 
 static void configplugin_cb(const QString &cmd)
 {
-    MythPluginManager *pmanager = gContext->getPluginManager();
+    MythPluginManager *pmanager = gContext->GetPluginManager();
     if (pmanager)
         if (pmanager->config_plugin(cmd.trimmed()))
             ShowOkPopup(QObject::tr("Failed to configure plugin %1").arg(cmd));
@@ -189,7 +189,7 @@ static void configplugin_cb(const QString &cmd)
 
 static void plugin_cb(const QString &cmd)
 {
-    MythPluginManager *pmanager = gContext->getPluginManager();
+    MythPluginManager *pmanager = gContext->GetPluginManager();
     if (pmanager)
         if (pmanager->run_plugin(cmd.trimmed()))
             ShowOkPopup(QObject::tr("The plugin %1 has failed "
@@ -1218,7 +1218,7 @@ void MythContext::SetPluginManager(MythPluginManager *pmanager)
     d->pluginmanager = pmanager;
 }
 
-MythPluginManager *MythContext::getPluginManager(void)
+MythPluginManager *MythContext::GetPluginManager(void)
 {
     return d->pluginmanager;
 }

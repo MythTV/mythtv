@@ -60,7 +60,7 @@ class MPUBLIC MythContext
     void SetDisableLibraryPopup(bool check);
 
     void SetPluginManager(MythPluginManager *pmanager);
-    MythPluginManager *getPluginManager(void);
+    MythPluginManager *GetPluginManager(void);
 
   private:
     MythContextPrivate *d;
