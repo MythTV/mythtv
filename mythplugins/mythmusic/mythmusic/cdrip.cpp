@@ -635,7 +635,7 @@ bool Ripper::keyPressEvent(QKeyEvent *event)
         QString action = actions[i];
         handled = true;
 
-        if (action == "INFO")
+        if (action == "EDIT" || action == "INFO") // INFO purely for historical reasons
         {
             showEditMetadataDialog(m_trackList->GetItemCurrent());
         }
