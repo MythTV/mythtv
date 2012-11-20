@@ -268,9 +268,16 @@ void MythSocket::ReadyReadHandler(void)
 
 void MythSocket::CallReadyReadHandler(void)
 {
-    LOG(VB_SOCKET, LOG_DEBUG, LOC +
-        "calling m_callback->readyRead()");
-    m_callback->readyRead(this);
+    // Because the connection to this is a queued connection the
+    // data may have already been read by the time this is called
+    // so we check that there is still data to read before calling
+    // the callback.
+    if (IsDataAvailable())
+    {
+        LOG(VB_SOCKET, LOG_DEBUG, LOC +
+            "calling m_callback->readyRead()");
+        m_callback->readyRead(this);
+    }
 }
     
 bool MythSocket::ConnectToHost(
