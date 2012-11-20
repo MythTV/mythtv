@@ -2165,10 +2165,10 @@ int AvFormatDecoder::ScanStreams(bool novideo)
         if (enc->codec_type == AVMEDIA_TYPE_AUDIO)
         {
             int lang = GetAudioLanguage(audioStreamCount, i);
+            AudioTrackType type = GetAudioTrackType(i);
             int channels  = ic->streams[i]->codec->channels;
             int lang_indx = lang_aud_cnt[lang]++;
             audioStreamCount++;
-            AudioTrackType type = kAudioTypeNormal;
 
             if (ic->streams[i]->codec->avcodec_dual_language)
             {
@@ -2336,6 +2336,38 @@ int AvFormatDecoder::GetCaptionLanguage(TrackTypes trackType, int service_num)
 int AvFormatDecoder::GetAudioLanguage(uint audio_index, uint stream_index)
 {
     return GetSubtitleLanguage(audio_index, stream_index);
+}
+
+AudioTrackType AvFormatDecoder::GetAudioTrackType(uint stream_index)
+{
+    AudioTrackType type = kAudioTypeNormal;
+
+    // mpeg-ts
+    if (ic->cur_pmt_sect)
+    {
+        const PESPacket pes = PESPacket::ViewData(ic->cur_pmt_sect);
+        const PSIPTable psip(pes);
+        const ProgramMapTable pmt(psip);
+        switch (pmt.GetAudioType(stream_index))
+        {
+            case 0x03 :
+                type = kAudioTypeAudioDescription;
+                break;
+            case 0x00 :
+            default:
+                type = kAudioTypeNormal;
+        }
+    }
+    else // all other containers
+    {
+        // We only support labelling/filtering of these two types for now
+        if (ic->streams[stream_index]->disposition & AV_DISPOSITION_VISUAL_IMPAIRED)
+            type = kAudioTypeAudioDescription;
+        else if (ic->streams[stream_index]->disposition & AV_DISPOSITION_COMMENT)
+            type = kAudioTypeCommentary;
+    }
+
+    return type;
 }
 
 /**

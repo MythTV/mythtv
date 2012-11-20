@@ -1084,6 +1084,20 @@ QString ProgramMapTable::GetLanguage(uint i) const
     return iso_lang.CanonicalLanguageString();
 }
 
+uint ProgramMapTable::GetAudioType(uint i) const
+{
+    const desc_list_t list = MPEGDescriptor::Parse(
+        StreamInfo(i), StreamInfoLength(i));
+    const unsigned char *lang_desc = MPEGDescriptor::Find(
+        list, DescriptorID::iso_639_language);
+
+    if (!lang_desc)
+        return 0;
+
+    ISO639LanguageDescriptor iso_lang(lang_desc);
+    return iso_lang.AudioType();
+}
+
 QString ProgramMapTable::StreamDescription(uint i, QString sistandard) const
 {
     desc_list_t list;
