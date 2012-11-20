@@ -20,4 +20,5 @@ class BackendConnectionManager : public QObject
   protected:
     Reconnect *m_reconnecting;
     QTimer    *m_reconnect_timer;
+    bool       m_reconnect_again;
 };

@@ -25,6 +25,7 @@ class Reconnect : public QRunnable
 
     virtual void run(void)
     {
+        // Note: GetMasterHostPrefix() implicitly reconnects the sockets
         if (gCoreContext->GetMasterHostPrefix().isEmpty())
             gCoreContext->dispatch(MythEvent(QString("RECONNECT_FAILURE")));
         else
@@ -33,8 +34,10 @@ class Reconnect : public QRunnable
 };
 
 BackendConnectionManager::BackendConnectionManager() :
-    QObject(), m_reconnecting(NULL), m_reconnect_timer(NULL)
+    QObject(), m_reconnecting(NULL), m_reconnect_timer(NULL),
+    m_reconnect_again(false)
 {
+    setObjectName("BackendConnectionManager");
     gCoreContext->addListener(this);
 
     uint reconnect_timeout = 1;
@@ -64,22 +67,31 @@ void BackendConnectionManager::customEvent(QEvent *event)
 
         if (message == "BACKEND_SOCKETS_CLOSED")
         {
+            LOG(VB_SOCKET, LOG_INFO, "Got BACKEND_SOCKETS_CLOSED message");
+
             if (!m_reconnecting)
             {
+                LOG(VB_SOCKET, LOG_INFO, "Will reconnect");
                 reconnect = true;
                 reconnect_timeout = 500;
             }
+            else
+            {
+                LOG(VB_SOCKET, LOG_INFO, "Already reconnecting");
+                m_reconnect_again = true;
+            }
         }
-        else if (message == "RECONNECT_SUCCESS")
+        else if ((message == "RECONNECT_SUCCESS") ||
+                 (message == "RECONNECT_FAILURE"))
         {
+            LOG(VB_SOCKET, LOG_INFO, QString("Got %1 message")
+                .arg(message));
+
             delete m_reconnecting;
             m_reconnecting = NULL;
-        }
-        else if (message == "RECONNECT_FAILURE")
-        {
-            delete m_reconnecting;
-            m_reconnecting = NULL;
-            reconnect = true;
+
+            reconnect = m_reconnect_again;
+            m_reconnect_again = false;
         }
     }
 
@@ -98,6 +110,7 @@ void BackendConnectionManager::customEvent(QEvent *event)
 
 void BackendConnectionManager::ReconnectToBackend(void)
 {
+    LOG(VB_SOCKET, LOG_INFO, "Reconnecting");
     m_reconnecting = new Reconnect();
     MThreadPool::globalInstance()->start(m_reconnecting, "Reconnect");
 }
