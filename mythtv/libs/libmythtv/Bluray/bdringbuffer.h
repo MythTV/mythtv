@@ -85,10 +85,8 @@ class MTV_PUBLIC BDRingBuffer : public RingBuffer
     uint64_t GetChapterStartFrame(uint32_t chapter);
     bool IsOpen(void)        const { return bdnav; }
     bool IsHDMVNavigation(void) const { return m_isHDMVNavigation; }
-    bool IsInMenu(void) const { return m_inMenu; }
-    bool IsInStillFrame(void) const;
-    virtual bool IsInDiscMenuOrStillFrame(void) const
-        { return IsInMenu() || IsInStillFrame(); } // RingBuffer
+    virtual bool IsInMenu(void) const { return m_inMenu; }
+    virtual bool IsInStillFrame(void) const;
     bool TitleChanged(void);
 
     void GetDescForPos(QString &desc);

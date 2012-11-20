@@ -40,6 +40,7 @@ using namespace std;
 #include "mthread.h"
 #include "serverpool.h"
 #include "mythdate.h"
+#include "mythplugin.h"
 
 #define LOC      QString("MythCoreContext: ")
 
@@ -89,6 +90,8 @@ class MythCoreContextPrivate : public QObject
 
     QMap<QObject *, QByteArray> m_playbackClients;
     QMutex m_playbackLock;
+    
+    MythPluginManager *pluginmanager;
 };
 
 MythCoreContextPrivate::MythCoreContextPrivate(MythCoreContext *lparent,
@@ -1435,6 +1438,30 @@ void MythCoreContext::WantingPlayback(QObject *sender)
                 sender, method,
                 Qt::BlockingQueuedConnection);
     }
+}
+
+bool MythCoreContext::TestPluginVersion(const QString &name,
+                                   const QString &libversion,
+                                   const QString &pluginversion)
+{
+    if (libversion == pluginversion)
+        return true;
+
+    LOG(VB_GENERAL, LOG_EMERG,
+             QString("Plugin %1 (%2) binary version does not "
+                     "match libraries (%3)")
+                 .arg(name).arg(pluginversion).arg(libversion));
+    return false;
+}
+
+void MythCoreContext::SetPluginManager(MythPluginManager *pmanager)
+{
+    d->pluginmanager = pmanager;
+}
+
+MythPluginManager *MythCoreContext::GetPluginManager(void)
+{
+    return d->pluginmanager;
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

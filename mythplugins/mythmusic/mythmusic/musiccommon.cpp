@@ -1471,6 +1471,7 @@ void MusicCommon::customEvent(QEvent *event)
             QString songList = gPlayer->getPlaylist()->toRawSonglist();
             playlist->removeAllTracks();
             playlist->fillSongsFromSonglist(songList);
+            playlist->changed();
             gPlayer->playlistChanged(playlist->getID());
         }
     }

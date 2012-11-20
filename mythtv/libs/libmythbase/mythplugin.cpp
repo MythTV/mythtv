@@ -9,10 +9,11 @@
 #include <QDir>
 
 // MythTV includes
-#include "mythplugin.h"
-#include "mythcontext.h"
-#include "mythtranslation.h"
 
+// libmythbase
+#include "mythplugin.h"
+#include "mythcorecontext.h"
+#include "mythtranslation.h"
 #include "mythdirs.h"
 #include "mythversion.h"
 #include "mythlogging.h"
@@ -105,26 +106,6 @@ void MythPlugin::destroy(void)
         rfunc();
 }
 
-int MythPlugin::setupMenuPlugin(void)
-{
-    typedef int (*PluginSetup)();
-    PluginSetup rfunc = (PluginSetup)QLibrary::resolve("mythplugin_setupMenu");
-
-    if (rfunc)
-        return rfunc();
-
-    return -1;
-}
-
-void MythPlugin::drawMenuPlugin(QPainter *painter, int x, int y, int w, int h)
-{
-    typedef void (*PluginDrawMenu)(QPainter *, int, int, int, int);
-    PluginDrawMenu rfunc = (PluginDrawMenu)QLibrary::resolve("mythplugin_drawMenu");
-
-    if (rfunc)
-        rfunc(painter, x, y, w, h);
-}
-
 MythPluginManager::MythPluginManager()
 {
     QString pluginprefix = GetPluginsDir();
@@ -134,8 +115,6 @@ MythPluginManager::MythPluginManager()
     filterDir.setFilter(QDir::Files | QDir::Readable);
     QString filter = GetPluginsNameFilter();
     filterDir.setNameFilters(QStringList(filter));
-
-    gContext->SetDisableLibraryPopup(true);
 
     if (filterDir.exists())
     {
@@ -162,10 +141,6 @@ MythPluginManager::MythPluginManager()
     else
         LOG(VB_GENERAL, LOG_WARNING,
                  "No plugins directory " + filterDir.path());
-
-    gContext->SetDisableLibraryPopup(false);
-
-    orderMenuPlugins();
 }
 
 MythPluginManager::~MythPluginManager()
@@ -196,9 +171,6 @@ bool MythPluginManager::init_plugin(const QString &plugname)
 
     switch (m_dict[newname]->type())
     {
-        case kPluginType_MenuPlugin:
-            menuPluginMap[newname] = m_dict[newname];
-            break;
         case kPluginType_Module:
         default:
             moduleMap[newname] = m_dict[newname];
@@ -270,39 +242,6 @@ MythPlugin *MythPluginManager::GetPlugin(const QString &plugname)
     return moduleMap[newname];
 }
 
-MythPlugin *MythPluginManager::GetMenuPlugin(const QString &plugname)
-{
-    QString newname = FindPluginName(plugname);
-
-    if (menuPluginMap.find(newname) == menuPluginMap.end())
-        return NULL;
-
-    return menuPluginMap[newname];
-}
-
-MythPlugin *MythPluginManager::GetMenuPluginAt(int pos)
-{
-    if ((uint)pos >= menuPluginList.size())
-        return NULL;
-
-    return menuPluginList[pos];
-}
-
-void MythPluginManager::orderMenuPlugins(void)
-{
-    // This needs to hit a db table for persistant ordering
-    // For now, just use whatever order the map iterator returns
-
-    menuPluginList.clear();
-
-    QMap<QString, MythPlugin *>::iterator iter = menuPluginMap.begin();
-    for (; iter != menuPluginMap.end(); ++iter)
-    {
-        if ((*iter)->isEnabled())
-            menuPluginList.push_back(*iter);
-    }
-}
-
 void MythPluginManager::DestroyAllPlugins(void)
 {
     QHash<QString, MythPlugin*>::iterator it = m_dict.begin();
@@ -314,8 +253,6 @@ void MythPluginManager::DestroyAllPlugins(void)
 
     m_dict.clear();
     moduleMap.clear();
-    menuPluginMap.clear();
-    menuPluginList.clear();
 }
 
 QStringList MythPluginManager::EnumeratePlugins(void)

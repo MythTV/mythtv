@@ -1451,6 +1451,8 @@ void AllStream::updateStream(Metadata* mdata)
 
 void AllStream::createPlaylist(void)
 {
+    gMusicData->all_playlists->getStreamPlaylist()->disableSaves();
+
     gMusicData->all_playlists->getStreamPlaylist()->removeAllTracks();
 
     for (int x = 0; x < m_streamList.count(); x++)
@@ -1458,6 +1460,8 @@ void AllStream::createPlaylist(void)
         Metadata *mdata = m_streamList.at(x);
         gMusicData->all_playlists->getStreamPlaylist()->addTrack(mdata->ID(), false);
     }
+
+    gMusicData->all_playlists->getStreamPlaylist()->enableSaves();
 }
 
 /**************************************************************************/
@@ -1834,7 +1838,6 @@ void MusicData::reloadMusic(void)
         qApp->processEvents();
         usleep(50000);
     }
-    all_playlists->postLoad();
 
     if (busy)
         busy->Close();

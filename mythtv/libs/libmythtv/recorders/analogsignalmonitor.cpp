@@ -51,7 +51,6 @@ bool AnalogSignalMonitor::VerifyHDPVRaudio(int videofd)
     }
 
     int  current_audio;
-    uint audio_enc = max(min(audtype, qctrl.maximum), qctrl.minimum);
 
     struct v4l2_ext_control  ext_ctrl;
     struct v4l2_ext_controls ext_ctrls;
@@ -116,9 +115,6 @@ bool AnalogSignalMonitor::VerifyHDPVRaudio(int videofd)
  */
 bool AnalogSignalMonitor::handleHDPVR(int videofd)
 {
-    struct v4l2_encoder_cmd command;
-    struct pollfd polls;
-
     struct v4l2_format vfmt;
     memset(&vfmt, 0, sizeof(vfmt));
     vfmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
@@ -224,4 +220,3 @@ void AnalogSignalMonitor::UpdateValues(void)
     if (IsAllGood())
         SendMessageAllGood();
 }
-

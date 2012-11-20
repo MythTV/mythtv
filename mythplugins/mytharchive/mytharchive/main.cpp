@@ -315,7 +315,7 @@ static void initKeys(void)
 
 int mythplugin_init(const char *libversion)
 {
-    if (!gContext->TestPopupVersion("mytharchive", libversion,
+    if (!gCoreContext->TestPluginVersion("mytharchive", libversion,
                                     MYTH_BINARY_VERSION))
     {
         LOG(VB_GENERAL, LOG_ERR, "Test Popup Version Failed");

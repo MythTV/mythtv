@@ -30,7 +30,7 @@ The source of all cover art and screen shots are from those downloaded and maint
 Miro v2.0.3 or later must already be installed and configured and capable of downloading videos.
 '''
 
-__version__=u"v0.6.9"
+__version__=u"v0.7.0"
 # 0.1.0 Initial development
 # 0.2.0 Initial Alpha release for internal testing only
 # 0.2.1 Fixes from initial alpha test
@@ -210,6 +210,7 @@ __version__=u"v0.6.9"
 #       Fixed the options "-h, --help" command line display
 # 0.6.8 Sometimes Miro metadata has no video filename. Skip these invalid videos.
 # 0.6.9 Adjust to datetime issues with MythTV v0.26's move to UTC datatimes in DB
+# 0.7.0 Fix bug introduced with v0.6.9, ticket reported as #11219 and #11220
 
 examples_txt=u'''
 For examples, please see the Mirobridge's wiki page at http://www.mythtv.org/wiki/MiroBridge
@@ -219,7 +220,6 @@ For examples, please see the Mirobridge's wiki page at http://www.mythtv.org/wik
 import sys, os, re, locale, subprocess, locale, ConfigParser, codecs, shutil, struct
 import fnmatch, string, time, logging, traceback, platform, fnmatch, ConfigParser
 from datetime import timedelta
-from dateutil.tz import tzutc, tzlocal
 from optparse import OptionParser
 from socket import gethostbyname
 import formatter
@@ -682,37 +682,40 @@ def is_not_punct_char(char):
 def delOldRecorded(chanid, starttime, endtime, title, \
                    subtitle, description):
     '''
-    This routine is not supported in the native python bindings as MiroBridge uses the
-    oldrecorded table outside of its original intent.
+    This routine is not supported in the native python bindings as MiroBridge
+    uses the oldrecorded table outside of its original intent.
     return nothing
     '''
     sql_cmd = u"""DELETE FROM `mythconverg`.`oldrecorded`
                         WHERE `oldrecorded`.`chanid` = '%s'
                           AND `oldrecorded`.`starttime` = '%s'
                           AND `oldrecorded`.`endtime` = '%s';"""
-    sql_del_a_record(sql_cmd, (chanid, set_del_datatime(starttime), set_del_datatime(endtime)))
+    sql_del_a_record(sql_cmd % (chanid, set_del_datatime(starttime),
+                     set_del_datatime(endtime)))
 # end delOldRecorded()
 
 
 def delRecorded(chanid, starttime):
-    '''Just delete a recorded record. Never abort as sometimes a record may not exist.
+    '''Just delete a recorded record. Never abort as sometimes a record
+    may not exist.
     return nothing
     '''
     sql_cmd = u"""DELETE FROM `mythconverg`.`recorded`
                         WHERE `recorded`.`chanid` = %s
                           AND `recorded`.`starttime` = '%s';"""
-    sql_del_a_record(sql_cmd, (chanid, set_del_datatime(starttime)))
+    sql_del_a_record(sql_cmd % (chanid, set_del_datatime(starttime)))
 # end delRecorded()
 
 
 def set_del_datatime(rec_time):
     ''' Set the SQL datetime so that the delRecorded and delOldrecorded
     methods use UTC datetime values.
-    return rec_time
+    return rec_time datetime string
     '''
     #
-    return rec_time.replace(tzinfo=tzlocal()).astimezone(
-                    tzutc()).strftime("%Y-%m-%d %H:%M:%S")
+    return rec_time.astimezone(
+                        rec_time.UTCTZ()).strftime("%Y-%m-%d %H:%M:%S")
+# end set_del_datetime()
 
 def sql_del_a_record(sql_cmd):
     ## Get a MythTV data base cursor

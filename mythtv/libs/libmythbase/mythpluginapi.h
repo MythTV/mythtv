@@ -10,9 +10,6 @@ extern "C" {
     MPUBLIC int mythplugin_config();
     MPUBLIC MythPluginType mythplugin_type();
     MPUBLIC void mythplugin_destroy();
-    MPUBLIC int mythplugin_setupMenu();
-    MPUBLIC void mythplugin_drawMenu(QPainter *painter, int x, int y,
-                                     int w, int h);
 }
 
 #endif // MYTHPLUGINAPI_H_

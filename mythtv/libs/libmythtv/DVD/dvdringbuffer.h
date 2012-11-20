@@ -71,22 +71,20 @@ class MTV_PUBLIC DVDRingBuffer : public RingBuffer
     uint GetCellStart(void);
     bool PGCLengthChanged(void);
     bool CellChanged(void);
-    bool IsInStillFrame(void)   const { return m_still > 0;             }
+    virtual bool IsInStillFrame(void)   const { return m_still > 0;             }
     bool NeedsStillFrame(void) { return IsInStillFrame() || NewSequence(); }
     bool NewSequence(bool new_sequence = false);
     bool AudioStreamsChanged(void) const { return m_audioStreamsChanged; }
     bool IsWaiting(void) const           { return m_dvdWaiting;          }
     int  NumPartsInTitle(void)     const { return m_titleParts;          }
     void GetMenuSPUPkt(uint8_t *buf, int len, int stream_id);
-    virtual bool IsInDiscMenuOrStillFrame(void) const
-        { return IsInMenu() || IsInStillFrame(); }
 
     // Public menu/button stuff
     AVSubtitle *GetMenuSubtitle(uint &version);
     int         NumMenuButtons(void) const;
     QRect       GetButtonCoords(void);
     void        ReleaseMenuButton(void);
-    bool        IsInMenu(void) const { return m_inMenu; }
+    virtual bool IsInMenu(void) const { return m_inMenu; }
     virtual bool HandleAction(const QStringList &actions, int64_t pts);
 
     // Subtitles

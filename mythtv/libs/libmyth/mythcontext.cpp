@@ -16,7 +16,6 @@ using namespace std;
 #include "exitcodes.h"
 #include "mythdate.h"
 #include "remotefile.h"
-#include "mythplugin.h"
 #include "backendselect.h"
 #include "dbsettings.h"
 #include "langsettings.h"
@@ -39,6 +38,8 @@ using namespace std;
 #include "mythlogging.h"
 #include "mythsystem.h"
 #include "mythmiscutil.h"
+
+#include "mythplugin.h"
 
 #ifdef USING_MINGW
 #include <unistd.h>
@@ -102,9 +103,6 @@ class MythContextPrivate : public QObject
     Configuration    *m_pConfig;
 
     bool disableeventpopup;
-    bool disablelibrarypopup;
-
-    MythPluginManager *pluginmanager;
 
     MythUIHelper *m_ui;
     MythContextSlotHandler *m_sh;
@@ -180,7 +178,7 @@ static void exec_program_tv_cb(const QString &cmd)
 
 static void configplugin_cb(const QString &cmd)
 {
-    MythPluginManager *pmanager = gContext->getPluginManager();
+    MythPluginManager *pmanager = gCoreContext->GetPluginManager();
     if (pmanager)
         if (pmanager->config_plugin(cmd.trimmed()))
             ShowOkPopup(QObject::tr("Failed to configure plugin %1").arg(cmd));
@@ -188,7 +186,7 @@ static void configplugin_cb(const QString &cmd)
 
 static void plugin_cb(const QString &cmd)
 {
-    MythPluginManager *pmanager = gContext->getPluginManager();
+    MythPluginManager *pmanager = gCoreContext->GetPluginManager();
     if (pmanager)
         if (pmanager->run_plugin(cmd.trimmed()))
             ShowOkPopup(QObject::tr("The plugin %1 has failed "
@@ -205,8 +203,6 @@ MythContextPrivate::MythContextPrivate(MythContext *lparent)
       m_gui(false),
       m_pConfig(NULL), 
       disableeventpopup(false),
-      disablelibrarypopup(false),
-      pluginmanager(NULL),
       m_ui(NULL),
       m_sh(new MythContextSlotHandler(this)),
       MBEconnectPopup(NULL),
@@ -1179,46 +1175,9 @@ MythContext::~MythContext()
     delete d;
 }
 
-bool MythContext::TestPopupVersion(const QString &name,
-                                   const QString &libversion,
-                                   const QString &pluginversion)
-{
-    if (libversion == pluginversion)
-        return true;
-
-    QString err = QObject::tr(
-        "Plugin %1 is not compatible with the installed MythTV "
-        "libraries.");
-
-    LOG(VB_GENERAL, LOG_EMERG, 
-             QString("Plugin %1 (%2) binary version does not "
-                     "match libraries (%3)")
-                 .arg(name).arg(pluginversion).arg(libversion));
-
-    if (GetMythMainWindow() && !d->disablelibrarypopup)
-        ShowOkPopup(err.arg(name));
-
-    return false;
-}
-
 void MythContext::SetDisableEventPopup(bool check)
 {
     d->disableeventpopup = check;
-}
-
-void MythContext::SetDisableLibraryPopup(bool check)
-{
-    d->disablelibrarypopup = check;
-}
-
-void MythContext::SetPluginManager(MythPluginManager *pmanager)
-{
-    d->pluginmanager = pmanager;
-}
-
-MythPluginManager *MythContext::getPluginManager(void)
-{
-    return d->pluginmanager;
 }
 
 DatabaseParams MythContext::GetDatabaseParams(void)

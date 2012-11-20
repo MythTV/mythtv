@@ -43,13 +43,19 @@ bool Playlist::checkTrack(int a_track_id) const
     return false;
 }
 
-void Playlist::copyTracks(Playlist *to_ptr, bool update_display) const
+void Playlist::copyTracks(Playlist *to_ptr, bool update_display)
 {
+    disableSaves();
+
     SongList::const_iterator it = m_songs.begin();
     for (; it != m_songs.end(); ++it)
     {
         to_ptr->addTrack(*it, update_display);
     }
+
+    enableSaves();
+
+    changed();
 }
 
 /// Given a tracks ID, add that track to this playlist
@@ -76,7 +82,7 @@ void Playlist::addTrack(Metadata *mdata, bool update_display)
     m_shuffledSongs.push_back(mdata);
     m_songMap.insert(mdata->ID(), mdata);
 
-    m_changed = true;
+    changed();
 
     if (update_display)
         gPlayer->activePlaylistChanged(mdata->ID(), false);
@@ -88,7 +94,7 @@ void Playlist::removeAllTracks(void)
     m_songMap.clear();
     m_shuffledSongs.clear();
 
-    m_changed = true;
+    changed();
 }
 
 void Playlist::removeTrack(int the_track)
@@ -100,6 +106,8 @@ void Playlist::removeTrack(int the_track)
         m_songs.removeAll(*it);
         m_shuffledSongs.removeAll(*it);
     }
+
+    changed();
 
     gPlayer->activePlaylistChanged(the_track, true);
 }
@@ -137,7 +145,7 @@ void Playlist::moveTrackUpDown(bool flag, Metadata* mdata)
     m_shuffledSongs.removeAt(where_its_at);
     m_shuffledSongs.insert(insertion_point, mdata);
 
-    m_changed = true;
+    changed();
 }
 
 Playlist::Playlist(void) :
@@ -145,6 +153,7 @@ Playlist::Playlist(void) :
     m_name(QObject::tr("oops")),
     m_parent(NULL),
     m_changed(false),
+    m_doSave(true),
     m_progress(NULL),
     m_proc(NULL),
     m_procExitVal(0)
@@ -536,7 +545,6 @@ void Playlist::loadPlaylist(QString a_name, QString a_host)
     MSqlQuery query(MSqlQuery::InitCon());
 
     if (m_name == "default_playlist_storage" ||
-        m_name == "backup_playlist_storage"  || 
         m_name == "stream_playlist")
     {
         query.prepare("SELECT playlist_id, playlist_name, playlist_songs "
@@ -547,7 +555,7 @@ void Playlist::loadPlaylist(QString a_name, QString a_host)
     else
     {
         // Technically this is never called as this function
-        // is only used to load the default/backup playlists.
+        // is only used to load the default playlist.
         query.prepare("SELECT playlist_id, playlist_name, playlist_songs "
                       "FROM music_playlists "
                       "WHERE playlist_name = :NAME"
@@ -566,8 +574,6 @@ void Playlist::loadPlaylist(QString a_name, QString a_host)
         }
         if (m_name == "default_playlist_storage")
             m_name = QObject::tr("Default Playlist");
-        if (m_name == "backup_playlist_storage")
-            m_name = "and they should **REALLY** never see this";
     }
     else
     {
@@ -576,7 +582,6 @@ void Playlist::loadPlaylist(QString a_name, QString a_host)
                           // of an existing playlist
         rawSonglist.clear();
         savePlaylist(a_name, a_host);
-        m_changed = true;
     }
 
     fillSongsFromSonglist(rawSonglist);
@@ -607,8 +612,6 @@ void Playlist::loadPlaylistByID(int id, QString a_host)
 
     if (m_name == "default_playlist_storage")
         m_name = QObject::tr("Default Playlist");
-    if (m_name == "backup_playlist_storage")
-        m_name = "and they should **REALLY** never see this";
 
     fillSongsFromSonglist(rawSonglist);
 }
@@ -616,6 +619,7 @@ void Playlist::loadPlaylistByID(int id, QString a_host)
 void Playlist::fillSongsFromSonglist(QString songList)
 {
     Metadata::IdType id;
+    bool badTrack = false;
 
     QStringList list = songList.split(",", QString::SkipEmptyParts);
     QStringList::iterator it = list.begin();
@@ -634,8 +638,7 @@ void Playlist::fillSongsFromSonglist(QString songList)
             }
             else
             {
-                m_changed = true;
-
+                badTrack = true;
                 LOG(VB_GENERAL, LOG_ERR, LOC + QString("Got a bad track %1").arg(id));
             }
         }
@@ -650,8 +653,7 @@ void Playlist::fillSongsFromSonglist(QString songList)
             }
             else
             {
-                m_changed = true;
-
+                badTrack = true;
                 LOG(VB_GENERAL, LOG_ERR, LOC + QString("Got a bad track %1").arg(id));
             }
         }
@@ -662,10 +664,12 @@ void Playlist::fillSongsFromSonglist(QString songList)
     else
         shuffleTracks(MusicPlayer::SHUFFLE_OFF);
 
+    if (badTrack)
+        changed();
+
     gPlayer->activePlaylistChanged(-1, false);
 }
 
-//FIXME:: this needs checking
 void Playlist::fillSonglistFromQuery(QString whereClause,
                                      bool removeDuplicates,
                                      InsertPLOption insertOption,
@@ -674,6 +678,7 @@ void Playlist::fillSonglistFromQuery(QString whereClause,
     QString orig_songlist = toRawSonglist();
     QString new_songlist;
 
+    disableSaves();
     removeAllTracks();
 
     MSqlQuery query(MSqlQuery::InitCon());
@@ -699,6 +704,8 @@ void Playlist::fillSonglistFromQuery(QString whereClause,
         MythDB::DBError("Load songlist from query", query);
         new_songlist.clear();
         fillSongsFromSonglist(new_songlist);
+        enableSaves();
+        changed();
         return;
     }
 
@@ -754,6 +761,9 @@ void Playlist::fillSonglistFromQuery(QString whereClause,
     }
 
     fillSongsFromSonglist(new_songlist);
+
+    enableSaves();
+    changed();
 }
 
 // songList is a list of trackIDs to add
@@ -764,6 +774,8 @@ void Playlist::fillSonglistFromList(const QList<int> &songList,
 {
     QString orig_songlist = toRawSonglist();
     QString new_songlist;
+
+    disableSaves();
 
     removeAllTracks();
 
@@ -819,11 +831,10 @@ void Playlist::fillSonglistFromList(const QList<int> &songList,
     }
 
     fillSongsFromSonglist(new_songlist);
-}
 
-void Playlist::fillSongsFromCD()
-{
-    //FIXME: is this still needed?
+    enableSaves();
+
+    changed();
 }
 
 QString Playlist::toRawSonglist(bool shuffled)
@@ -939,29 +950,35 @@ void Playlist::fillSonglistFromSmartPlaylist(QString category, QString name,
     if (limitTo > 0)
         whereClause +=  " LIMIT " + QString::number(limitTo);
 
-    //m_name = name; // Set Playlist name to match smart playlist name
-
     fillSonglistFromQuery(whereClause, removeDuplicates,
                           insertOption, currentTrackID);
 }
 
+void Playlist::changed(void)
+{
+    m_changed = true;
+
+    if (m_doSave)
+        savePlaylist(m_name, gCoreContext->GetHostName());
+}
+
 void Playlist::savePlaylist(QString a_name, QString a_host)
 {
+    LOG(VB_GENERAL, LOG_DEBUG, LOC + "Saving playlist: " + a_name);
+
     m_name = a_name.simplified();
-    if (m_name.length() < 1)
+    if (m_name.isEmpty())
     {
         LOG(VB_GENERAL, LOG_WARNING, LOC + "Not saving unnamed playlist");
         return;
     }
 
-    if (a_host.length() < 1)
+    if (a_host.isEmpty())
     {
         LOG(VB_GENERAL, LOG_WARNING, LOC +
             "Not saving playlist without a host name");
         return;
     }
-    if (m_name.length() < 1)
-        return;
 
     QString rawSonglist = toRawSonglist(true);
 
@@ -970,8 +987,7 @@ void Playlist::savePlaylist(QString a_name, QString a_host)
 
     getStats(&songcount, &playtime);
 
-    bool save_host = ("default_playlist_storage" == a_name
-        || "backup_playlist_storage" == a_name);
+    bool save_host = ("default_playlist_storage" == a_name);
     if (m_playlistid > 0)
     {
         QString str_query = "UPDATE music_playlists SET "
@@ -1014,6 +1030,8 @@ void Playlist::savePlaylist(QString a_name, QString a_host)
 
     if (m_playlistid < 1)
         m_playlistid = query.lastInsertId().toInt();
+
+    m_changed = false;
 }
 
 QString Playlist::removeDuplicateTracks(const QString &orig_songlist, const QString &new_songlist)

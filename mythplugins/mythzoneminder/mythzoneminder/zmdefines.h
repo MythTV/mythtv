@@ -21,16 +21,63 @@
 #include <QString>
 #include <QDateTime>
 
-// event details
-typedef struct
+/// Event details
+class Event
 {
-    int monitorID;
-    int eventID;
-    QString eventName;
-    QString monitorName;
-    QDateTime startTime;
-    QString length;
-} Event;
+  public:
+    Event(int eventID,
+          const QString &eventName,
+          int monitorID,
+          const QString &monitorName,
+          const QDateTime &startTime,
+          const QString &length) :
+        m_monitorID(monitorID),
+        m_eventID(eventID),
+        m_eventName(eventName),
+        m_monitorName(monitorName),
+        m_length(length),
+        m_startTime(startTime.toLocalTime())
+    {
+    }
+
+    Event() : m_monitorID(-1), m_eventID(-1) {}
+
+    int monitorID(void) const { return m_monitorID; }
+
+    int eventID(void) const { return m_eventID; }
+
+    QString eventName(void) const { return m_eventName; }
+
+    QString monitorName(void) const { return m_monitorName; }
+
+    /// Returns time using specified Qt::TimeSpec.
+    QDateTime startTime(Qt::TimeSpec spec) const
+    {
+        /// Since the spec will always be a constant Qt::LocalTime,
+        /// this just optimizes away to "return m_startTime", but
+        /// it remains self documenting and the fact that we keep
+        /// the time in this class in local time is encapsulated.
+        return (Qt::LocalTime == spec) ?
+            m_startTime : m_startTime.toTimeSpec(spec);
+    }
+
+    /// Returns time with native Qt::TimeSpec (subject to revision).
+    /// Use only if the code using this functions properly with any timeSpec.
+    QDateTime startTime(void) const { return m_startTime; }
+
+    QString length(void) const { return m_length; }
+
+  private:
+    int m_monitorID;
+    int m_eventID;
+    QString m_eventName;
+    QString m_monitorName;
+    QString m_length;
+    /// The start time is stored in local time interally since
+    /// all uses are currently using local time and conversion
+    /// to/from UTC would consume significant CPU cycles.
+    QDateTime m_startTime;
+};
 
 // event frame details
 typedef struct

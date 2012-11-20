@@ -27,7 +27,7 @@ class AnalogSignalMonitor : public SignalMonitor
     QString  m_driver;
     uint32_t m_version;
     uint     m_width;
-    uint     m_stable_time;
+    int      m_stable_time;
     uint     m_lock_cnt;
     MythTimer m_timer;
 };

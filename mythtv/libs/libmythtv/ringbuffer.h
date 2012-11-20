@@ -100,7 +100,9 @@ class MTV_PUBLIC RingBuffer : protected MThread
     BDRingBuffer  *BD(void);
     virtual bool StartFromBeginning(void)                   { return true;  }
     virtual void IgnoreWaitStates(bool ignore)              { }
-    virtual bool IsInDiscMenuOrStillFrame(void) const       { return false; }
+    virtual bool IsInMenu(void) const                       { return false; }
+    virtual bool IsInStillFrame(void) const                 { return false; }
+    virtual bool IsInDiscMenuOrStillFrame(void) const       { return IsInMenu() || IsInStillFrame(); }
     virtual bool HandleAction(const QStringList &, int64_t) { return false; }
 
     // General Commands

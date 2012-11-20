@@ -183,8 +183,7 @@ static void loadMusic()
     AllMusic *all_music = new AllMusic();
 
     //  Load all playlists into RAM (once!)
-    PlaylistContainer *all_playlists = new PlaylistContainer(
-            all_music, gCoreContext->GetHostName());
+    PlaylistContainer *all_playlists = new PlaylistContainer(all_music);
 
     gMusicData->all_music = all_music;
     gMusicData->all_streams = new AllStream();
@@ -197,7 +196,6 @@ static void loadMusic()
         qApp->processEvents();
         usleep(50000);
     }
-    gMusicData->all_playlists->postLoad();
 
     gMusicData->all_streams->createPlaylist();
 
@@ -312,8 +310,6 @@ static void runScan(void)
     if (gMusicData->all_playlists && gMusicData->all_playlists->cleanOutThreads())
     {
         gMusicData->all_playlists->save();
-        int x = gMusicData->all_playlists->getPending();
-        SavePending(x);
     }
 
     // force a complete reload of the tracks and playlists
@@ -656,7 +652,7 @@ static void setupKeys(void)
 
 int mythplugin_init(const char *libversion)
 {
-    if (!gContext->TestPopupVersion("mythmusic", libversion,
+    if (!gCoreContext->TestPluginVersion("mythmusic", libversion,
                                     MYTH_BINARY_VERSION))
         return -1;
 
@@ -708,8 +704,6 @@ void mythplugin_destroy(void)
     if (gMusicData->all_playlists && gMusicData->all_playlists->cleanOutThreads())
     {
         gMusicData->all_playlists->save();
-        int x = gMusicData->all_playlists->getPending();
-        SavePending(x);
     }
 
     delete gPlayer;
