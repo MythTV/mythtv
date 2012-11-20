@@ -48,12 +48,14 @@ void MythSystem::initializePrivate(void)
 
 MythSystem::MythSystem()
 {
+    setObjectName("MythSystem()");
     m_semReady.release(1);  // initialize
     initializePrivate();
 }
 
 MythSystem::MythSystem(const QString &command, uint flags)
 {
+    setObjectName(QString("MythSystem(%1)").arg(command));
     m_semReady.release(1);  // initialize
     initializePrivate();
     SetCommand(command, flags);

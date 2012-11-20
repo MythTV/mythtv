@@ -76,6 +76,7 @@ class SystemEventThread : public QRunnable
  */
 MythSystemEventHandler::MythSystemEventHandler(void)
 {
+    setObjectName("MythSystemEventHandler");
     gCoreContext->addListener(this);
 }
 
