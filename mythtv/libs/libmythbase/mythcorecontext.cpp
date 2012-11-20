@@ -704,7 +704,8 @@ QString MythCoreContext::GetMasterHostPrefix(const QString &storageGroup,
     }
 
     QMutexLocker locker(&d->m_sockLock);
-    if (!d->m_serverSock)
+    if (!d->m_serverSock || !d->m_serverSock->IsConnected() ||
+        !d->m_eventSock || !d->m_eventSock->IsConnected())
     {
         bool blockingClient = GetNumSetting("idleTimeoutSecs",0) > 0;
         ConnectToMasterServer(blockingClient);
