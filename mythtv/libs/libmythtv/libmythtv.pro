@@ -609,6 +609,7 @@ using_backend {
     }
 
     # Support for RTP/UDP streams
+    HEADERS += recorders/cetonrtsp.h
     HEADERS += recorders/iptvchannel.h
     HEADERS += recorders/iptvrecorder.h
     HEADERS += recorders/iptvsignalmonitor.h
@@ -622,6 +623,7 @@ using_backend {
     HEADERS += recorders/rtp/rtpdatapacket.h
     HEADERS += recorders/rtp/rtpfecpacket.h
 
+    SOURCES += recorders/cetonrtsp.cpp
     SOURCES += recorders/iptvchannel.cpp
     SOURCES += recorders/iptvrecorder.cpp
     SOURCES += recorders/iptvsignalmonitor.cpp
@@ -659,13 +661,11 @@ using_backend {
         HEADERS += recorders/cetonchannel.h
         HEADERS += recorders/cetonrecorder.h
         HEADERS += recorders/cetonstreamhandler.h
-        HEADERS += recorders/cetonrtsp.h
 
         SOURCES += recorders/cetonsignalmonitor.cpp
         SOURCES += recorders/cetonchannel.cpp
         SOURCES += recorders/cetonrecorder.cpp
         SOURCES += recorders/cetonstreamhandler.cpp
-        SOURCES += recorders/cetonrtsp.cpp
 
         HEADERS *= recorders/streamhandler.h
         SOURCES *= recorders/streamhandler.cpp
