@@ -2197,10 +2197,10 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             }
 
             LOG(VB_AUDIO, LOG_INFO, LOC +
-                QString("Audio Track #%1, with type %2 is A/V stream #%3 "
+                QString("Audio Track #%1, of type (%2) is A/V stream #%3 "
                         "and has %4 channels in the %5 language(%6).")
-                    .arg(tracks[kTrackTypeAudio].size()).arg((int)type).arg(i)
-                    .arg(enc->channels)
+                    .arg(tracks[kTrackTypeAudio].size()).arg(toString(type))
+                    .arg(i).arg(enc->channels)
                     .arg(iso639_key_toName(lang)).arg(lang));
         }
     }
