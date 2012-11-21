@@ -375,31 +375,16 @@ static int checkOKShutdown(bool bWantRecStatus)
     return res;
 }
 
-static int setWakeupTime(QString sWakeupTime)
+static void setWakeupTime(const QDateTime &wakeupTime)
 {
     LOG(VB_GENERAL, LOG_INFO, "Mythshutdown: --setwakeup");
 
     LOG(VB_GENERAL, LOG_NOTICE,
-        QString("Mythshutdown: wakeup time given is: %1").arg(sWakeupTime));
-
-    // check time given is valid
-    QDateTime dtWakeupTime;
-    dtWakeupTime = MythDate::fromString(sWakeupTime);
-
-    if (!dtWakeupTime.isValid())
-    {
-        LOG(VB_GENERAL, LOG_ERR,
-            QString("Mythshutdown: --setwakeup invalid date "
-                                      "format (%1)\n\t\t\t"
-                                      "must be yyyy-MM-ddThh:mm:ss")
-                                      .arg(sWakeupTime));
-        return 1;
-    }
+        QString("Mythshutdown: wakeup time given is: %1 (local time)")
+        .arg(MythDate::toString(wakeupTime)));
 
     setGlobalSetting("MythShutdownNextScheduled",
-                     MythDate::toString(dtWakeupTime, MythDate::kDatabase));
-
-    return 0;
+                     MythDate::toString(wakeupTime, MythDate::kDatabase));
 }
 
 static int setScheduledWakeupTime()
@@ -432,7 +417,7 @@ static int setScheduledWakeupTime()
         if (add)
             restarttime = restarttime.addSecs((-1) * add);
 
-        setWakeupTime(restarttime.toString(Qt::ISODate));
+        setWakeupTime(restarttime);
 
         return 0;
     }
@@ -821,7 +806,30 @@ int main(int argc, char **argv)
     else if (cmdline.toBool("status"))
         res = getStatus((bool)(cmdline.toInt("status") == 1));
     else if (cmdline.toBool("setwakeup"))
-        res = setWakeupTime(cmdline.toString("setwakeup"));
+    {
+        // only one of --utc or --localtime can be passed per
+        // CommandLineArg::AllowOneOf() in commandlineparser.cpp
+        bool utc = cmdline.toBool("utc");
+        QString tmp = cmdline.toString("setwakeup");
+
+        QDateTime wakeuptime = (utc) ?
+            MythDate::fromString(tmp) :
+            QDateTime::fromString(tmp, Qt::ISODate).toUTC();
+
+        if (!wakeuptime.isValid())
+        {
+            cerr << qPrintable(
+                QObject::tr("mythshutdown: --setwakeup invalid date "
+                            "format (%1)\n\t\t\t"
+                            "must be yyyy-MM-ddThh:mm:ss")
+                .arg(tmp)) << endl;
+            res = 1;
+        }
+        else
+        {
+            setWakeupTime(wakeuptime);
+        }
+    }
     else if (cmdline.toBool("safeshutdown"))
     { 
         res = checkOKShutdown(true);
