@@ -2187,7 +2187,6 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 {
                     logical_stream_id =
                         ringBuffer->DVD()->GetAudioTrackNum(ic->streams[i]->id);
-                    type = (AudioTrackType)(ringBuffer->DVD()->GetAudioTrackType(ic->streams[i]->id));
                 }
                 else
                     logical_stream_id = ic->streams[i]->id;
@@ -2341,9 +2340,13 @@ int AvFormatDecoder::GetAudioLanguage(uint audio_index, uint stream_index)
 AudioTrackType AvFormatDecoder::GetAudioTrackType(uint stream_index)
 {
     AudioTrackType type = kAudioTypeNormal;
+    AVStream *stream = ic->streams[stream_index];
 
-    // mpeg-ts
-    if (ic->cur_pmt_sect)
+    if (ringBuffer && ringBuffer->IsDVD()) // DVD
+    {
+        type = (AudioTrackType)(ringBuffer->DVD()->GetAudioTrackType(stream->id));
+    }
+    else if (ic->cur_pmt_sect) // mpeg-ts
     {
         const PESPacket pes = PESPacket::ViewData(ic->cur_pmt_sect);
         const PSIPTable psip(pes);
@@ -2361,9 +2364,9 @@ AudioTrackType AvFormatDecoder::GetAudioTrackType(uint stream_index)
     else // all other containers
     {
         // We only support labelling/filtering of these two types for now
-        if (ic->streams[stream_index]->disposition & AV_DISPOSITION_VISUAL_IMPAIRED)
+        if (stream->disposition & AV_DISPOSITION_VISUAL_IMPAIRED)
             type = kAudioTypeAudioDescription;
-        else if (ic->streams[stream_index]->disposition & AV_DISPOSITION_COMMENT)
+        else if (stream->disposition & AV_DISPOSITION_COMMENT)
             type = kAudioTypeCommentary;
     }
 
@@ -3701,11 +3704,9 @@ QString AvFormatDecoder::GetTrackDesc(uint type, uint trackNo) const
         switch (tracks[type][trackNo].audio_type)
         {
             case kAudioTypeAudioDescription :
-                msg += QObject::tr(" (Audio Description)",
-                                   "Audio described for the visually impaired");
-                break;
             case kAudioTypeCommentary :
-                msg += QObject::tr(" (Commentary)", "Audio commentary track");
+                msg += QString(" (%1)")
+                            .arg(toString(tracks[type][trackNo].audio_type));
                 break;
             case kAudioTypeNormal : default :
                 int av_index = tracks[kTrackTypeAudio][trackNo].av_stream_index;
