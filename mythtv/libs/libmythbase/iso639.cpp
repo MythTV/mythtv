@@ -463,6 +463,7 @@ static int createCodeToEnglishNamesMap(QMap<int, QString>& names)
   names[iso639_str3_to_key("mwr")] = QString("Marwari");
   names[iso639_str3_to_key("myn")] = QString("Mayan languages");
   names[iso639_str3_to_key("myv")] = QString("Erzya");
+  names[iso639_str3_to_key("nar")] = QString("Narrative"); // UK & Irish DTV Spec
   names[iso639_str3_to_key("nah")] = QString("Nahuatl");
   names[iso639_str3_to_key("nai")] = QString("North American Indian");
   names[iso639_str3_to_key("nap")] = QString("Neapolitan");
