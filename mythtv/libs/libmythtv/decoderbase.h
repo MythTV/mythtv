@@ -51,8 +51,11 @@ typedef enum DecodeTypes
 typedef enum AudioTrackType
 {
     kAudioTypeNormal = 0,
-    kAudioTypeAudioDescription,
-    kAudioTypeCommentary
+    kAudioTypeAudioDescription, // Audio Description for the visually impaired
+    kAudioTypeCleanEffects, // No dialog, soundtrack or effects only e.g. Karaoke
+    kAudioTypeHearingImpaired, // Greater contrast between dialog and background audio
+    kAudioTypeSpokenSubs, // Spoken subtitles for the visually impaired
+    kAudioTypeCommentary // Director/actor/etc Commentary
 } AudioTrackType;
 QString toString(AudioTrackType type);
 

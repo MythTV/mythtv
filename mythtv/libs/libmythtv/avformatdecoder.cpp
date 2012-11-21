@@ -2353,6 +2353,12 @@ AudioTrackType AvFormatDecoder::GetAudioTrackType(uint stream_index)
         const ProgramMapTable pmt(psip);
         switch (pmt.GetAudioType(stream_index))
         {
+            case 0x01 :
+                type = kAudioTypeCleanEffects;
+                break;
+            case 0x02 :
+                type = kAudioTypeHearingImpaired;
+                break;
             case 0x03 :
                 type = kAudioTypeAudioDescription;
                 break;
@@ -2368,6 +2374,10 @@ AudioTrackType AvFormatDecoder::GetAudioTrackType(uint stream_index)
             type = kAudioTypeAudioDescription;
         else if (stream->disposition & AV_DISPOSITION_COMMENT)
             type = kAudioTypeCommentary;
+        else if (stream->disposition & AV_DISPOSITION_HEARING_IMPAIRED)
+            type = kAudioTypeHearingImpaired;
+        else if (stream->disposition & AV_DISPOSITION_CLEAN_EFFECTS)
+            type = kAudioTypeCleanEffects;
     }
 
     return type;
@@ -3703,12 +3713,8 @@ QString AvFormatDecoder::GetTrackDesc(uint type, uint trackNo) const
 
         switch (tracks[type][trackNo].audio_type)
         {
-            case kAudioTypeAudioDescription :
-            case kAudioTypeCommentary :
-                msg += QString(" (%1)")
-                            .arg(toString(tracks[type][trackNo].audio_type));
-                break;
-            case kAudioTypeNormal : default :
+            case kAudioTypeNormal :
+            {
                 int av_index = tracks[kTrackTypeAudio][trackNo].av_stream_index;
                 AVStream *s = ic->streams[av_index];
 
@@ -3733,6 +3739,16 @@ QString AvFormatDecoder::GetTrackDesc(uint type, uint trackNo) const
                         msg += QString(" %1ch").arg(channels);
                 }
 
+                break;
+            }
+            case kAudioTypeAudioDescription :
+            case kAudioTypeCommentary :
+            case kAudioTypeHearingImpaired :
+            case kAudioTypeCleanEffects :
+            case kAudioTypeSpokenSubs :
+            default :
+                msg += QString(" (%1)")
+                            .arg(toString(tracks[type][trackNo].audio_type));
                 break;
         }
 

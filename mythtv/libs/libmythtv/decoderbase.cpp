@@ -1112,10 +1112,22 @@ QString toString(AudioTrackType type)
     {
         case kAudioTypeAudioDescription :
             str = QObject::tr("Audio Description",
-                              "Audio described for the visually impaired");
+                              "On-screen events described for the visually impaired");
+            break;
+        case kAudioTypeCleanEffects :
+            str = QObject::tr("Clean Effects",
+                              "No dialog, background audio only");
+            break;
+        case kAudioTypeHearingImpaired :
+            str = QObject::tr("Hearing Impaired",
+                              "Clear dialog for the hearing impaired");
+            break;
+        case kAudioTypeSpokenSubs :
+            str = QObject::tr("Spoken Subtitles",
+                              "Subtitles are read out for the visually impaired");
             break;
         case kAudioTypeCommentary :
-            str = QObject::tr("Commentary", "Audio commentary track");
+            str = QObject::tr("Commentary", "Director/Cast commentary track");
             break;
         case kAudioTypeNormal :
         default:
