@@ -1098,7 +1098,8 @@ uint ProgramMapTable::GetAudioType(uint i) const
 
     // Hack for non-standard AD labelling on UK Satellite and Irish DTTV
     // Language string of 'nar' for narrative indicates an AD track
-    if (iso_lang.LanguageString() == "nar")
+    if (iso_lang.AudioType() == 0x0 &&
+        iso_lang.LanguageString() == "nar")
         return 0x03;
     
     return iso_lang.AudioType();
