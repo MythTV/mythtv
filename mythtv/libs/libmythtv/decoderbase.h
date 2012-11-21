@@ -54,6 +54,7 @@ typedef enum AudioTrackType
     kAudioTypeAudioDescription,
     kAudioTypeCommentary
 } AudioTrackType;
+QString toString(AudioTrackType type);
 
 class StreamInfo
 {

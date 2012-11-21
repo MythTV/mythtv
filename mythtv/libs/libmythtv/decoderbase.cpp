@@ -1104,6 +1104,28 @@ int to_track_type(const QString &str)
     return ret;
 }
 
+QString toString(AudioTrackType type)
+{
+    QString str;
+
+    switch (type)
+    {
+        case kAudioTypeAudioDescription :
+            str = QObject::tr("Audio Description",
+                              "Audio described for the visually impaired");
+            break;
+        case kAudioTypeCommentary :
+            str = QObject::tr("Commentary", "Audio commentary track");
+            break;
+        case kAudioTypeNormal :
+        default:
+            str = QObject::tr("Normal", "Ordinary audio track");
+            break;
+    }
+    
+    return str;
+}
+
 void DecoderBase::SaveTotalDuration(void)
 {
     if (!m_playbackinfo || !totalDuration)
