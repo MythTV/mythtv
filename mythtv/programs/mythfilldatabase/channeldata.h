@@ -3,33 +3,9 @@
 
 // Qt headers
 #include <QString>
-#include <QList>
 
-class ChanInfo
-{
-  public:
-    ChanInfo() { }
-    ChanInfo(const ChanInfo &other) { callsign = other.callsign; 
-                                      iconpath = other.iconpath;
-                                      chanstr = other.chanstr;
-                                      xmltvid = other.xmltvid;
-                                      old_xmltvid = other.old_xmltvid;
-                                      name = other.name;
-                                      freqid = other.freqid;
-                                      finetune = other.finetune;
-                                      tvformat = other.tvformat;
-                                    }
-
-    QString callsign;
-    QString iconpath;
-    QString chanstr;
-    QString xmltvid;
-    QString old_xmltvid;
-    QString name;
-    QString freqid;
-    QString finetune;
-    QString tvformat;
-};
+// libmythtv
+#include "channelinfo.h"
 
 class ChannelData
 {
@@ -40,9 +16,9 @@ class ChannelData
         remove_new_channels(false), filter_new_channels(true) {}
 
     bool insert_chan(uint sourceid);
-    void handleChannels(int id, QList<ChanInfo> *chanlist);
+    void handleChannels(int id, ChannelInfoList *chanlist);
     unsigned int promptForChannelUpdates(
-        QList<ChanInfo>::iterator chaninfo, unsigned int chanid);
+        ChannelInfoList::iterator chaninfo, unsigned int chanid);
 
   public:
     bool    interactive;

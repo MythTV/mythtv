@@ -89,8 +89,8 @@ ChannelInfo &ChannelInfo::operator=(const ChannelInfo &other)
 void ChannelInfo::Init()
 {
     chanid = 0;
-    // channum = QString();
-    freqid = 0;
+//  channum = QString();
+//  freqid = QString(); May be overloaded to a non-frequency identifier
     sourceid = 0;
 
 //  callsign = QString();

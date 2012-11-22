@@ -50,7 +50,7 @@ class MTV_PUBLIC ChannelInfo
     // Ordered to match channel table
     uint    chanid;
     QString channum;
-    uint    freqid;
+    QString freqid;
     uint    sourceid;
     
     QString callsign;
@@ -87,6 +87,8 @@ class MTV_PUBLIC ChannelInfo
     // Following not in database
     int     groupid;
     int     cardid;
+
+    QString old_xmltvid; // Used by mythfilldatabase when updating the xmltvid
 
   private:
     QString m_sourcename; // Cache here rather than looking up each time

@@ -325,7 +325,7 @@ bool FillData::GrabDDData(Source source, int poffset,
 // XMLTV stuff
 bool FillData::GrabDataFromFile(int id, QString &filename)
 {
-    QList<ChanInfo> chanlist;
+    ChannelInfoList chanlist;
     QMap<QString, QList<ProgInfo> > proglist;
 
     if (!xmltv_parser.parseFile(filename, &chanlist, &proglist))
@@ -1003,17 +1003,17 @@ bool FillData::Run(SourceList &sourcelist)
     return (failures == 0);
 }
 
-ChanInfo *FillData::xawtvChannel(QString &id, QString &channel, QString &fine)
+ChannelInfo *FillData::xawtvChannel(QString &id, QString &channel, QString &fine)
 {
-    ChanInfo *chaninfo = new ChanInfo;
+    ChannelInfo *chaninfo = new ChannelInfo;
     chaninfo->xmltvid = id;
     chaninfo->name = id;
     chaninfo->callsign = id;
     if (chan_data.channel_preset)
-        chaninfo->chanstr = id;
+        chaninfo->channum = id;
     else
-        chaninfo->chanstr = channel;
-    chaninfo->finetune = fine;
+        chaninfo->channum = channel;
+    chaninfo->finetune = fine.toInt();
     chaninfo->freqid = channel;
     chaninfo->tvformat = "Default";
 
@@ -1028,7 +1028,7 @@ void FillData::readXawtvChannels(int id, QString xawrcfile)
     if (!fin.is_open())
         return;
 
-    QList<ChanInfo> chanlist;
+    ChannelInfoList chanlist;
 
     QString xawid;
     QString channel;
@@ -1049,7 +1049,7 @@ void FillData::readXawtvChannels(int id, QString xawrcfile)
                 {
                     if (!xawid.isEmpty() && !channel.isEmpty())
                     {
-                        ChanInfo *chinfo = xawtvChannel(xawid, channel, fine);
+                        ChannelInfo *chinfo = xawtvChannel(xawid, channel, fine);
                         chanlist.push_back(*chinfo);
                         delete chinfo;
                     }
@@ -1078,7 +1078,7 @@ void FillData::readXawtvChannels(int id, QString xawrcfile)
 
     if (!xawid.isEmpty() && !channel.isEmpty())
     {
-        ChanInfo *chinfo = xawtvChannel(xawid, channel, fine);
+        ChannelInfo *chinfo = xawtvChannel(xawid, channel, fine);
         chanlist.push_back(*chinfo);
         delete chinfo;
     }

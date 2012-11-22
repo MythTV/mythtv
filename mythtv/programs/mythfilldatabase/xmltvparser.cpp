@@ -20,6 +20,7 @@
 #include "programinfo.h"
 #include "programdata.h"
 #include "dvbdescriptors.h"
+#include "channelinfo.h"
 
 // filldata headers
 #include "channeldata.h"
@@ -62,9 +63,9 @@ static QString getFirstText(QDomElement element)
     return QString();
 }
 
-ChanInfo *XMLTVParser::parseChannel(QDomElement &element, QUrl &baseUrl)
+ChannelInfo *XMLTVParser::parseChannel(QDomElement &element, QUrl &baseUrl)
 {
-    ChanInfo *chaninfo = new ChanInfo;
+    ChannelInfo *chaninfo = new ChannelInfo;
 
     QString xmltvid = element.attribute("id", "");
     QStringList split = xmltvid.simplified().split(" ");
@@ -84,14 +85,14 @@ ChanInfo *XMLTVParser::parseChannel(QDomElement &element, QUrl &baseUrl)
                 if (!path.isEmpty() && !path.contains("://"))
                 {
                     QString base = baseUrl.toString(QUrl::StripTrailingSlash);
-                    chaninfo->iconpath = base +
+                    chaninfo->icon = base +
                         ((path.left(1) == "/") ? path : QString("/") + path);
                 }
                 else if (!path.isEmpty())
                 {
                     QUrl url(path);
                     if (url.isValid())
-                        chaninfo->iconpath = url.toString();
+                        chaninfo->icon = url.toString();
                 }
             }
             else if (info.tagName() == "display-name")
@@ -104,15 +105,15 @@ ChanInfo *XMLTVParser::parseChannel(QDomElement &element, QUrl &baseUrl)
                 {
                     chaninfo->callsign = info.text();
                 }
-                else if (chaninfo->chanstr.isEmpty())
+                else if (chaninfo->channum.isEmpty())
                 {
-                    chaninfo->chanstr = info.text();
+                    chaninfo->channum = info.text();
                 }
             }
         }
     }
 
-    chaninfo->freqid = chaninfo->chanstr;
+    chaninfo->freqid = chaninfo->channum;
     return chaninfo;
 }
 
@@ -582,7 +583,7 @@ ProgInfo *XMLTVParser::parseProgram(
 }
 
 bool XMLTVParser::parseFile(
-    QString filename, QList<ChanInfo> *chanlist,
+    QString filename, ChannelInfoList *chanlist,
     QMap<QString, QList<ProgInfo> > *proglist)
 {
     QDomDocument doc;
@@ -657,7 +658,7 @@ bool XMLTVParser::parseFile(
         {
             if (e.tagName() == "channel")
             {
-                ChanInfo *chinfo = parseChannel(e, baseUrl);
+                ChannelInfo *chinfo = parseChannel(e, baseUrl);
                 chanlist->push_back(*chinfo);
                 delete chinfo;
             }
