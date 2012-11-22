@@ -15,7 +15,7 @@
 
 // MythTV headers
 #include "dtvconfparserhelpers.h"
-#include "dbchannelinfo.h"
+#include "channelinfo.h"
 
 class MPEGDescriptor;
 

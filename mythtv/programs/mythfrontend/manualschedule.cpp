@@ -16,6 +16,7 @@
 // libmythtv
 #include "recordingrule.h"
 #include "recordingtypes.h"
+#include "channelinfo.h"
 #include "channelutil.h"
 
 // libmythui
@@ -68,12 +69,12 @@ bool ManualSchedule::Create(void)
     }
 
     QString chanorder = gCoreContext->GetSetting("ChannelOrdering", "channum");
-    DBChanList channels = ChannelUtil::GetChannels(0, false, "channum,callsign");
+    ChannelInfoList channels = ChannelUtil::GetChannels(0, false, "channum,callsign");
     ChannelUtil::SortChannels(channels, chanorder);
 
     for (uint i = 0; i < channels.size(); i++)
     {
-        QString chantext = channels[i].GetFormatted(DBChannel::kChannelLong);
+        QString chantext = channels[i].GetFormatted(ChannelInfo::kChannelLong);
 
         MythUIButtonListItem *item =
                             new MythUIButtonListItem(m_channelList, chantext);

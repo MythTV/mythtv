@@ -2097,11 +2097,11 @@ IPTVTuningData ChannelUtil::GetIPTVTuningData(uint chanid)
     return tuning;
 }
 
-DBChanList ChannelUtil::GetChannelsInternal(
+ChannelInfoList ChannelUtil::GetChannelsInternal(
     uint sourceid, bool vis_only, bool include_disconnected,
     const QString &grp, uint changrpid)
 {
-    DBChanList list;
+    ChannelInfoList list;
 
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -2154,7 +2154,7 @@ DBChanList ChannelUtil::GetChannelsInternal(
         if (query.value(0).toString().isEmpty() || !query.value(2).toUInt())
             continue; // skip if channum blank, or chanid empty
 
-        DBChannel chan(
+        ChannelInfo chan(
             query.value(0).toString(),                    /* channum    */
             query.value(1).toString(),                    /* callsign   */
             query.value(2).toUInt(),                      /* chanid     */
@@ -2195,12 +2195,12 @@ vector<uint> ChannelUtil::GetChanIDs(int sourceid)
     return list;
 }
 
-inline bool lt_callsign(const DBChannel &a, const DBChannel &b)
+inline bool lt_callsign(const ChannelInfo &a, const ChannelInfo &b)
 {
     return QString::localeAwareCompare(a.callsign, b.callsign) < 0;
 }
 
-inline bool lt_smart(const DBChannel &a, const DBChannel &b)
+inline bool lt_smart(const ChannelInfo &a, const ChannelInfo &b)
 {
     static QMutex sepExprLock;
     static const QRegExp sepExpr(ChannelUtil::kATSCSeparators);
@@ -2210,10 +2210,10 @@ inline bool lt_smart(const DBChannel &a, const DBChannel &b)
     bool isIntA, isIntB;
     int a_int = a.channum.toUInt(&isIntA);
     int b_int = b.channum.toUInt(&isIntB);
-    int a_major = a.major_chan;
-    int b_major = b.major_chan;
-    int a_minor = a.minor_chan;
-    int b_minor = b.minor_chan;
+    int a_major = a.atsc_major_chan;
+    int b_major = b.atsc_major_chan;
+    int a_minor = a.atsc_minor_chan;
+    int b_minor = b.atsc_minor_chan;
 
     // Extract minor and major numbers from channum..
     bool tmp1, tmp2;
@@ -2308,7 +2308,7 @@ uint ChannelUtil::GetChannelCount(int sourceid)
     return query.size();
 }
 
-void ChannelUtil::SortChannels(DBChanList &list, const QString &order,
+void ChannelUtil::SortChannels(ChannelInfoList &list, const QString &order,
                                bool eliminate_duplicates)
 {
     bool cs = order.toLower() == "callsign";
@@ -2319,7 +2319,7 @@ void ChannelUtil::SortChannels(DBChanList &list, const QString &order,
 
     if (eliminate_duplicates && !list.empty())
     {
-        DBChanList tmp;
+        ChannelInfoList tmp;
         tmp.push_back(list[0]);
         for (uint i = 1; i < list.size(); i++)
         {
@@ -2335,14 +2335,14 @@ void ChannelUtil::SortChannels(DBChanList &list, const QString &order,
 }
 
 uint ChannelUtil::GetNextChannel(
-    const DBChanList &sorted,
+    const ChannelInfoList &sorted,
     uint              old_chanid,
     uint              mplexid_restriction,
     int               direction,
     bool              skip_non_visible,
     bool              skip_same_channum_and_callsign)
 {
-    DBChanList::const_iterator it =
+    ChannelInfoList::const_iterator it =
         find(sorted.begin(), sorted.end(), old_chanid);
 
     if (it == sorted.end())
@@ -2351,7 +2351,7 @@ uint ChannelUtil::GetNextChannel(
     if (it == sorted.end())
         return 0; // no channels..
 
-    DBChanList::const_iterator start = it;
+    ChannelInfoList::const_iterator start = it;
 
     if (CHANNEL_DIRECTION_DOWN == direction)
     {

@@ -8,7 +8,7 @@
 #include <QUrl>
 
 // MythTV headers
-#include "dbchannelinfo.h"
+#include "channelinfo.h"
 #include "mythcorecontext.h"
 #include "mythdb.h"
 #include "mythdirs.h"
@@ -17,69 +17,119 @@
 #include "channelgroup.h"
 #include "sourceutil.h"
 
-DBChannel::DBChannel(const DBChannel &other) :
-    channum(other.channum),       callsign(other.callsign),
-    name(other.name),             icon(other.icon),
-    chanid(other.chanid),
-    major_chan(other.major_chan), minor_chan(other.minor_chan),
-    mplexid((other.mplexid == 32767) ? 0 : other.mplexid),
-    sourceid(other.sourceid),     cardid (other.cardid),
-    grpid(other.grpid),           visible(other.visible)
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+
+ChannelInfo::ChannelInfo()
 {
+    Init();
 }
 
-DBChannel::DBChannel(
+ChannelInfo::ChannelInfo(const ChannelInfo &other)
+{
+    Init();
+
+    channum = other.channum;
+    callsign = other.callsign;
+    name = other.name;
+    icon = other.icon;
+    chanid = other.chanid;
+    atsc_major_chan = other.atsc_major_chan;
+    atsc_minor_chan = other.atsc_major_chan;
+    mplexid = other.mplexid == 32767 ? 0 : other.mplexid;
+    sourceid = other.sourceid;
+    cardid  = other.cardid;
+    groupid = other.groupid;
+    visible = other.visible;
+}
+
+ChannelInfo::ChannelInfo(
     const QString &_channum, const QString &_callsign,
     uint _chanid, uint _major_chan, uint _minor_chan,
     uint _mplexid, bool _visible,
     const QString &_name, const QString &_icon,
-    uint _sourceid, uint _cardid, uint _grpid) :
-    channum(_channum),
-    callsign(_callsign),
-    name(_name), icon(_icon),
-    chanid(_chanid),
-    major_chan(_major_chan), minor_chan(_minor_chan),
-    mplexid((_mplexid == 32767) ? 0 : _mplexid),
-    sourceid(_sourceid), cardid(_cardid), grpid(_grpid),
-    visible(_visible)
+    uint _sourceid, uint _cardid, uint _grpid)
 {
+    Init();
+
+    channum = _channum;
+    callsign = _callsign;
+    name = _name;
+    icon = _icon;
+    chanid = _chanid;
+    atsc_major_chan = _major_chan;
+    atsc_minor_chan = _minor_chan;
+    mplexid = (_mplexid == 32767) ? 0 : _mplexid;
+    sourceid = _sourceid;
+    cardid = _cardid;
+    groupid = _grpid;
+    visible = _visible;
 }
 
-DBChannel &DBChannel::operator=(const DBChannel &other)
+ChannelInfo &ChannelInfo::operator=(const ChannelInfo &other)
 {
+    Init();
+    
     channum    = other.channum;
     callsign   = other.callsign;
     name       = other.name;
     icon       = other.icon;
     chanid     = other.chanid;
-    major_chan = other.major_chan;
-    minor_chan = other.minor_chan;
+    atsc_major_chan = other.atsc_major_chan;
+    atsc_minor_chan = other.atsc_minor_chan;
     mplexid    = (other.mplexid == 32767) ? 0 : other.mplexid;
     sourceid   = other.sourceid;
     cardid     = other.cardid;
-    grpid      = other.grpid;
+    groupid      = other.groupid;
     visible    = other.visible;
 
     return *this;
 }
 
-void DBChannel::ToMap(InfoMap& infoMap) const
+void ChannelInfo::Init()
 {
-    infoMap["channelnumber"] = channum;
-    infoMap["callsign"] = callsign;
-    infoMap["channelname"] = name;
-    infoMap["channeliconpath"] = icon;
-    infoMap["channelid"] = QString().setNum(chanid);
-    infoMap["majorchan"] = QString().setNum(major_chan);
-    infoMap["minorchan"] = QString().setNum(minor_chan);
-    infoMap["mplexid"] = QString().setNum(mplexid);
-    infoMap["channelvisible"] = visible ? QObject::tr("Yes") : QObject::tr("No");
+    chanid = 0;
+    // channum = QString();
+    freqid = 0;
+    sourceid = 0;
 
-    infoMap["channelgroupname"] = ChannelGroup::GetChannelGroupName(grpid);
-    infoMap["channelsourcename"] = SourceUtil::GetSourceName(sourceid);
+//  callsign = QString();
+//  name = QString();
+//  icon = QString();
+
+    finetune = 0;
+//  videofilters = QString();
+//  xmltvid = QString();
+    recpriority = 0;
+
+    contrast = 32768;
+    brightness = 32768;
+    colour = 32768;
+    hue = 32768;
+
+//  tvformat = QString();
+    visible = true;
+//  outputfilters = QString();
+    useonairguide = false;
+
+    mplexid = 0;
+    serviceid = 0;
+    atsc_major_chan = 0;
+    atsc_minor_chan = 0;
+
+    QDateTime last_record;
+
+//  default_authority = QString();
+    commmethod = -1;
+    tmoffset = 0;
+    iptvid = 0;
+
+    // Following not in database
+    groupid = -1;
+    cardid = -1;
 }
 
-QString DBChannel::GetFormatted(const ChannelFormat &format) const
+QString ChannelInfo::GetFormatted(const ChannelFormat &format) const
 {
     QString tmp;
 
@@ -99,38 +149,32 @@ QString DBChannel::GetFormatted(const ChannelFormat &format) const
     return tmp;
 }
 
-////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////
-
-QString ChannelInfo::GetFormatted(const ChannelFormat &format) const
+QString ChannelInfo::GetSourceName()
 {
-    QString tmp;
-
-    if (format & kChannelLong)
-        tmp = gCoreContext->GetSetting("LongChannelFormat", "<num> <name>");
-    else // kChannelShort
-        tmp = gCoreContext->GetSetting("ChannelFormat", "<num> <sign>");
-
-
-    if (tmp.isEmpty())
-        return QString();
-
-    tmp.replace("<num>",  chanstr);
-    tmp.replace("<sign>", callsign);
-    tmp.replace("<name>", channame);
-
-    return tmp;
+    if (sourceid > 0 && m_sourcename.isNull())
+        m_sourcename = SourceUtil::GetSourceName(sourceid);
+    
+    return m_sourcename;
 }
 
-void ChannelInfo::ToMap(InfoMap& infoMap) const
+void ChannelInfo::ToMap(InfoMap& infoMap)
 {
     infoMap["callsign"] = callsign;
-    infoMap["channeliconpath"] = iconpath;
-    infoMap["chanstr"] = chanstr;
-    infoMap["channelname"] = channame;
+    infoMap["channeliconpath"] = icon;
+    //infoMap["chanstr"] = chanstr;
+    infoMap["channelname"] = name;
     infoMap["channelid"] = QString().setNum(chanid);
-    infoMap["channelsourcename"] = sourcename;
+    infoMap["channelsourcename"] = GetSourceName();
     infoMap["channelrecpriority"] = recpriority;
+    
+    infoMap["channelnumber"] = channum;
+    
+    infoMap["majorchan"] = QString().setNum(atsc_major_chan);
+    infoMap["minorchan"] = QString().setNum(atsc_minor_chan);
+    infoMap["mplexid"] = QString().setNum(mplexid);
+    infoMap["channelvisible"] = visible ? QObject::tr("Yes") : QObject::tr("No");
+
+    infoMap["channelgroupname"] = ChannelGroup::GetChannelGroupName(groupid);
 }
 
 ////////////////////////////////////////////////////////////////////////////

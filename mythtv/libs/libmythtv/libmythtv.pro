@@ -221,9 +221,9 @@ SOURCES += mpeg/H264Parser.cpp
 HEADERS += frequencies.h            frequencytables.h
 SOURCES += frequencies.cpp          frequencytables.cpp
 
-HEADERS += channelutil.h            dbchannelinfo.h
+HEADERS += channelutil.h            channelinfo.h
 HEADERS += iptvtuningdata.h
-SOURCES += channelutil.cpp          dbchannelinfo.cpp
+SOURCES += channelutil.cpp          channelinfo.cpp
 
 HEADERS += dtvmultiplex.h
 HEADERS += dtvconfparser.h          dtvconfparserhelpers.h

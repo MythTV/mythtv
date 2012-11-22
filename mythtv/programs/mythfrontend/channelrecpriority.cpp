@@ -12,7 +12,7 @@ using namespace std;
 #include "mythlogging.h"
 #include "scheduledrecording.h"
 #include "proglist.h"
-#include "dbchannelinfo.h"
+#include "channelinfo.h"
 
 #include "mythuihelper.h"
 #include "mythuitext.h"
@@ -32,9 +32,9 @@ class channelSort
     public:
         bool operator()(const RecPriorityInfo &a, const RecPriorityInfo &b)
         {
-            if (a.chan->chanstr.toInt() == b.chan->chanstr.toInt())
+            if (a.chan->channum.toInt() == b.chan->channum.toInt())
                 return(a.chan->sourceid > b.chan->sourceid);
-            return(a.chan->chanstr.toInt() > b.chan->chanstr.toInt());
+            return(a.chan->channum.toInt() > b.chan->channum.toInt());
         }
 };
 
@@ -43,9 +43,9 @@ class channelRecPrioritySort
     public:
         bool operator()(const RecPriorityInfo &a, const RecPriorityInfo &b)
         {
-            if (a.chan->recpriority.toInt() == b.chan->recpriority.toInt())
-                return (a.chan->chanstr.toInt() > b.chan->chanstr.toInt());
-            return (a.chan->recpriority.toInt() < b.chan->recpriority.toInt());
+            if (a.chan->recpriority == b.chan->recpriority)
+                return (a.chan->channum.toInt() > b.chan->channum.toInt());
+            return (a.chan->recpriority < b.chan->recpriority);
         }
 };
 
@@ -194,17 +194,17 @@ void ChannelRecPriority::changeRecPriority(int howMuch)
     ChannelInfo *chanInfo = qVariantValue<ChannelInfo *>(item->GetData());
 
     // inc/dec recording priority
-    int tempRecPriority = chanInfo->recpriority.toInt() + howMuch;
+    int tempRecPriority = chanInfo->recpriority + howMuch;
     if (tempRecPriority > -100 && tempRecPriority < 100)
     {
-        chanInfo->recpriority = QString::number(tempRecPriority);
+        chanInfo->recpriority = tempRecPriority;
 
         // order may change if sorting by recoring priority, so resort
         if (m_sortType == byRecPriority)
             SortList();
         else
         {
-            item->SetText(chanInfo->recpriority, "priority");
+            item->SetText(QString::number(chanInfo->recpriority), "priority");
             updateInfo(item);
         }
     }
@@ -234,9 +234,9 @@ void ChannelRecPriority::saveRecPriority(void)
 
         // if this channel's recording priority changed from when we entered
         // save new value out to db
-        if (chanInfo->recpriority != m_origRecPriorityData[key])
+        if (QString::number(chanInfo->recpriority) != m_origRecPriorityData[key])
             applyChannelRecPriorityChange(QString::number(chanInfo->chanid),
-                                          chanInfo->recpriority);
+                                          QString::number(chanInfo->recpriority));
     }
     ScheduledRecording::ReschedulePlace("SaveChannelPriority");
 }
@@ -269,15 +269,15 @@ void ChannelRecPriority::FillList(void)
         {
             ChannelInfo *chaninfo = new ChannelInfo;
             chaninfo->chanid = result.value(0).toInt();
-            chaninfo->chanstr = result.value(1).toString();
+            chaninfo->channum = result.value(1).toString();
             chaninfo->sourceid = result.value(2).toInt();
             chaninfo->callsign = result.value(3).toString();
-            chaninfo->iconpath = result.value(4).toString();
-            chaninfo->recpriority = result.value(5).toString();
-            chaninfo->channame = result.value(6).toString();
+            chaninfo->icon = result.value(4).toString();
+            chaninfo->recpriority = result.value(5).toInt();
+            chaninfo->name = result.value(6).toString();
             if (result.value(7).toInt() > 0)
                 m_visMap[chaninfo->chanid] = true;
-            chaninfo->sourcename = srcMap[chaninfo->sourceid];
+            chaninfo->SetSourceName(srcMap[chaninfo->sourceid]);
 
             m_channelData[QString::number(cnt)] = *chaninfo;
 
@@ -324,10 +324,10 @@ void ChannelRecPriority::updateList()
         else
             item->DisplayState("disabled", "status");
 
-        item->SetImage(chanInfo->iconpath, "icon");
-        item->SetImage(chanInfo->iconpath);
+        item->SetImage(chanInfo->icon, "icon");
+        item->SetImage(chanInfo->icon);
 
-        item->SetText(chanInfo->recpriority, "priority", fontState);
+        item->SetText(QString::number(chanInfo->recpriority), "priority", fontState);
 
         if (m_currentItem == chanInfo)
             m_channelList->SetItemCurrent(item);
@@ -407,7 +407,7 @@ void ChannelRecPriority::updateInfo(MythUIButtonListItem *item)
         QString rectype;
         if (m_iconImage)
         {
-            m_iconImage->SetFilename(channelItem->iconpath);
+            m_iconImage->SetFilename(channelItem->icon);
             m_iconImage->Load();
         }
 

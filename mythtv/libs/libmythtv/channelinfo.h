@@ -6,71 +6,92 @@
 
 // C++ headers
 #include <vector>
+
 using namespace std;
 
 // Qt headers
 #include <QString>
 #include <QImage>
 #include <QVariant>
+#include <QDateTime>
 
 // MythTV headers
 #include "mythtvexp.h"
 #include "programtypes.h"
 
-// TODO: Refactor DBChannel and ChannelInfo into a single class
-
-class MTV_PUBLIC DBChannel
+class MTV_PUBLIC ChannelInfo
 {
-  public:
-    DBChannel(const DBChannel&);
-    DBChannel(const QString &_channum, const QString &_callsign,
+ public:
+    ChannelInfo();
+    ChannelInfo(const ChannelInfo&);
+    ChannelInfo(const QString &_channum, const QString &_callsign,
               uint _chanid, uint _major_chan, uint _minor_chan,
               uint _mplexid, bool _visible,
               const QString &_name, const QString &_icon,
               uint _sourceid, uint _cardid, uint _grpid);
-    DBChannel& operator=(const DBChannel&);
+    
+    ChannelInfo& operator=(const ChannelInfo&);
 
     bool operator == (uint _chanid) const
         { return chanid == _chanid; }
-
+        
     enum ChannelFormat { kChannelShort, kChannelLong };
     QString GetFormatted(const ChannelFormat &format) const;
-    void ToMap(InfoMap &infoMap) const;
+    void ToMap(InfoMap &infoMap);
+
+    QString GetSourceName();
+    void SetSourceName(const QString lname) { m_sourcename = lname; }
+    
+  private:
+    void Init();
 
   public:
+      
+    // Ordered to match channel table
+    uint    chanid;
     QString channum;
+    uint    freqid;
+    uint    sourceid;
+    
     QString callsign;
     QString name;
     QString icon;
-    uint    chanid;
-    uint    major_chan;
-    uint    minor_chan;
-    uint    mplexid;
-    uint    sourceid;
-    uint    cardid;
-    uint    grpid;
+    
+    int     finetune;
+    QString videofilters;
+    QString xmltvid;
+    int     recpriority;
+
+    uint    contrast;
+    uint    brightness;
+    uint    colour;
+    uint    hue;
+
+    QString tvformat;
     bool    visible;
-};
-typedef vector<DBChannel> DBChanList;
+    QString outputfilters;
+    bool    useonairguide;
+    
+    uint    mplexid;
+    uint    serviceid;
+    uint    atsc_major_chan;
+    uint    atsc_minor_chan;
 
-class MTV_PUBLIC ChannelInfo
-{
- public:
-    ChannelInfo() : chanid(-1), sourceid(-1), favid(-1) {}
-    enum ChannelFormat { kChannelShort, kChannelLong };
-    QString GetFormatted(const ChannelFormat &format) const;
-    void ToMap(InfoMap &infoMap) const;
+    QDateTime last_record;
 
-    QString callsign;
-    QString iconpath;
-    QString chanstr;
-    QString channame;
-    int chanid;
-    int sourceid;
-    QString sourcename;
-    int favid;
-    QString recpriority;
+    QString default_authority;
+    int     commmethod;
+    int     tmoffset;
+    uint    iptvid;
+
+    // Following not in database
+    int     groupid;
+    int     cardid;
+
+  private:
+    QString m_sourcename; // Cache here rather than looking up each time
 };
+typedef vector<ChannelInfo> ChannelInfoList;
 
 class MTV_PUBLIC ChannelInsertInfo
 {
