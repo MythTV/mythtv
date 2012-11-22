@@ -66,9 +66,6 @@ int main(int argc, char *argv[])
     int fromfile_id = 1;
     int fromfile_offset = 0;
     QString fromfile_name;
-    bool from_xawfile = false;
-    int fromxawfile_id = 1;
-    QString fromxawfile_name;
     bool from_file = false;
     bool mark_repeats = true;
 
@@ -187,24 +184,6 @@ int main(int argc, char *argv[])
         LOG(VB_GENERAL, LOG_INFO,
             "Bypassing grabbers, reading directly from file");
         from_dd_file = true;
-    }
-
-    if (cmdline.toBool("xawchannels"))
-    {
-        // xaw channel import mode
-        if (!cmdline.toBool("sourceid") ||
-            !cmdline.toBool("xawtvrcfile"))
-        {
-            cerr << "The --xawchannels option must be used in combination"
-                 <<  endl
-                 << "with both --sourceid and --xawtvrcfile" << endl;
-        }
-
-        fromxawfile_id = cmdline.toInt("sourceid");
-        fromxawfile_name = cmdline.toString("xawtvrcfile");
-
-        LOG(VB_GENERAL, LOG_INFO, "Reading channels from xawtv configfile");
-        from_xawfile = true;
     }
 
     if (cmdline.toBool("dochannelupdates"))
@@ -375,10 +354,6 @@ int main(int argc, char *argv[])
 
     if (!grab_data)
     {
-    }
-    else if (from_xawfile)
-    {
-        fill_data.readXawtvChannels(fromxawfile_id, fromxawfile_name);
     }
     else if (from_file)
     {
