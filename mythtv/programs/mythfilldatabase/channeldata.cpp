@@ -89,7 +89,7 @@ unsigned int ChannelData::promptForChannelUpdates(
         // Default is 0 to allow rapid skipping of many channels,
         // in some xmltv outputs there may be over 100 channel, but
         // only 10 or so that are available in each area.
-        chanid = getResponse("Choose a channel ID (positive integer) ", "0")
+        chanid = getResponse(QObject::tr("Choose a channel ID (positive integer) "), "0")
             .toUInt();
 
         // If we wish to skip this channel, use the default 0 and return.
@@ -97,35 +97,35 @@ unsigned int ChannelData::promptForChannelUpdates(
             return(0);
     }
 
-    (*chaninfo).name = getResponse("Choose a channel name (any string, "
-                                   "long version) ",(*chaninfo).name);
-    (*chaninfo).callsign = getResponse("Choose a channel callsign (any string, "
-                                       "short version) ",(*chaninfo).callsign);
+    (*chaninfo).name = getResponse(QObject::tr("Choose a channel name (any string, "
+                                   "long version) "),(*chaninfo).name);
+    (*chaninfo).callsign = getResponse(QObject::tr("Choose a channel callsign (any string, "
+                                       "short version) "),(*chaninfo).callsign);
 
     if (channel_preset)
     {
-        (*chaninfo).channum = getResponse("Choose a channel preset (0..999) ",
+        (*chaninfo).channum = getResponse(QObject::tr("Choose a channel preset (0..999) "),
                                          (*chaninfo).channum);
-        (*chaninfo).freqid  = getResponse("Choose a frequency id (just like "
-                                          "xawtv) ",(*chaninfo).freqid);
+        (*chaninfo).freqid  = getResponse(QObject::tr("Choose a frequency id "),
+                                          (*chaninfo).freqid);
     }
     else
     {
-        (*chaninfo).channum  = getResponse("Choose a channel number (just like "
-                                           "xawtv) ",(*chaninfo).channum);
+        (*chaninfo).channum  = getResponse(QObject::tr("Choose a channel number "),
+                                           (*chaninfo).channum);
         (*chaninfo).freqid = (*chaninfo).channum;
     }
 
-    (*chaninfo).finetune = getResponse("Choose a channel fine tune offset (just"
-                                       " like xawtv) ",
+    (*chaninfo).finetune = getResponse(QObject::tr("Choose a channel fine tune offset "),
                                        QString::number((*chaninfo).finetune)).toInt();
 
-    (*chaninfo).tvformat = getResponse("Choose a TV format "
-                                       "(PAL/SECAM/NTSC/ATSC/Default) ",
+    (*chaninfo).tvformat = getResponse(QObject::tr("Choose a TV format "
+                                       "(PAL/SECAM/NTSC/ATSC/Default) "),
                                        (*chaninfo).tvformat);
 
-    (*chaninfo).icon = getResponse("Choose a channel icon image (any path "
-                                       "name) ",(*chaninfo).icon);
+    (*chaninfo).icon = getResponse(QObject::tr("Choose a channel icon image "
+                                   "(relative path to icon storage group) "),
+                                   (*chaninfo).icon);
 
     return(chanid);
 }
