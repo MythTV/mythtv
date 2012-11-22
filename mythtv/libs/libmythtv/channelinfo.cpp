@@ -29,18 +29,41 @@ ChannelInfo::ChannelInfo(const ChannelInfo &other)
 {
     Init();
 
-    channum = other.channum;
-    callsign = other.callsign;
-    name = other.name;
-    icon = other.icon;
-    chanid = other.chanid;
+    // Channel table
+    chanid        = other.chanid;
+    channum       = other.channum;
+    freqid        = other.freqid;
+    sourceid      = other.sourceid;
+    callsign      = other.callsign;
+    name          = other.name;
+    icon          = other.icon;
+    finetune      = other.finetune;
+    videofilters  = other.videofilters;
+    xmltvid       = other.xmltvid;
+    recpriority   = other.recpriority;
+    contrast      = other.contrast;
+    brightness    = other.brightness;
+    colour        = other.colour;
+    hue           = other.hue;
+    tvformat      = other.tvformat;
+    visible       = other.visible;
+    outputfilters = other.outputfilters;
+    useonairguide = other.useonairguide;
+    mplexid       = (other.mplexid == 32767) ? 0 : other.mplexid;
+    serviceid     = other.serviceid;
     atsc_major_chan = other.atsc_major_chan;
-    atsc_minor_chan = other.atsc_major_chan;
-    mplexid = other.mplexid == 32767 ? 0 : other.mplexid;
-    sourceid = other.sourceid;
-    cardid  = other.cardid;
-    groupid = other.groupid;
-    visible = other.visible;
+    atsc_minor_chan = other.atsc_minor_chan;
+    last_record   = other.last_record;
+    default_authority = other.default_authority;
+    commmethod    = other.commmethod;
+    tmoffset      = other.tmoffset;
+    iptvid        = other.iptvid;
+
+    // Not in channel table
+    groupid       = other.groupid;
+    cardid        = other.cardid;
+    old_xmltvid   = other.old_xmltvid;
+    m_sourcename  = other.m_sourcename;
 }
 
 ChannelInfo::ChannelInfo(
@@ -69,19 +92,42 @@ ChannelInfo::ChannelInfo(
 ChannelInfo &ChannelInfo::operator=(const ChannelInfo &other)
 {
     Init();
-    
-    channum    = other.channum;
-    callsign   = other.callsign;
-    name       = other.name;
-    icon       = other.icon;
-    chanid     = other.chanid;
+
+    // Channel table
+    chanid        = other.chanid;
+    channum       = other.channum;
+    freqid        = other.freqid;
+    sourceid      = other.sourceid;
+    callsign      = other.callsign;
+    name          = other.name;
+    icon          = other.icon;
+    finetune      = other.finetune;
+    videofilters  = other.videofilters;
+    xmltvid       = other.xmltvid;
+    recpriority   = other.recpriority;
+    contrast      = other.contrast;
+    brightness    = other.brightness;
+    colour        = other.colour;
+    hue           = other.hue;
+    tvformat      = other.tvformat;
+    visible       = other.visible;
+    outputfilters = other.outputfilters;
+    useonairguide = other.useonairguide;
+    mplexid       = (other.mplexid == 32767) ? 0 : other.mplexid;
+    serviceid     = other.serviceid;
     atsc_major_chan = other.atsc_major_chan;
     atsc_minor_chan = other.atsc_minor_chan;
-    mplexid    = (other.mplexid == 32767) ? 0 : other.mplexid;
-    sourceid   = other.sourceid;
-    cardid     = other.cardid;
-    groupid      = other.groupid;
-    visible    = other.visible;
+    last_record   = other.last_record;
+    default_authority = other.default_authority;
+    commmethod    = other.commmethod;
+    tmoffset      = other.tmoffset;
+    iptvid        = other.iptvid;
+
+    // Not in channel table
+    groupid       = other.groupid;
+    cardid        = other.cardid;
+    old_xmltvid   = other.old_xmltvid;
+    m_sourcename  = other.m_sourcename;
 
     return *this;
 }
@@ -117,7 +163,7 @@ void ChannelInfo::Init()
     atsc_major_chan = 0;
     atsc_minor_chan = 0;
 
-    QDateTime last_record;
+    last_record = QDateTime();
 
 //  default_authority = QString();
     commmethod = -1;
