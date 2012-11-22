@@ -68,7 +68,6 @@ ChannelInfo *XMLTVParser::parseChannel(QDomElement &element, QUrl &baseUrl)
     ChannelInfo *chaninfo = new ChannelInfo;
 
     QString xmltvid = element.attribute("id", "");
-    QStringList split = xmltvid.simplified().split(" ");
 
     chaninfo->xmltvid = xmltvid;
     chaninfo->tvformat = "Default";
@@ -659,7 +658,8 @@ bool XMLTVParser::parseFile(
             if (e.tagName() == "channel")
             {
                 ChannelInfo *chinfo = parseChannel(e, baseUrl);
-                chanlist->push_back(*chinfo);
+                if (!chinfo->xmltvid.isEmpty())
+                    chanlist->push_back(*chinfo);
                 delete chinfo;
             }
             else if (e.tagName() == "programme")

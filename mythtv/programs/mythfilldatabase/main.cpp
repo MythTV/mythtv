@@ -119,7 +119,7 @@ int main(int argc, char *argv[])
         cout << "### Running in manual channel configuration mode.\n";
         cout << "### This will ask you questions about every channel.\n";
         cout << "###\n";
-        fill_data.chan_data.interactive = true;
+        fill_data.chan_data.m_interactive = true;
     }
 
     if (cmdline.toBool("update"))
@@ -130,7 +130,7 @@ int main(int argc, char *argv[])
                  << endl;
             return GENERIC_EXIT_INVALID_CMDLINE;
         }
-        fill_data.chan_data.non_us_updating = true;
+        fill_data.chan_data.m_nonUSUpdating = true;
     }
 
     if (cmdline.toBool("preset"))
@@ -140,7 +140,7 @@ int main(int argc, char *argv[])
         cout << "### This will assign channel ";
         cout << "preset numbers to every channel.\n";
         cout << "###\n";
-        fill_data.chan_data.channel_preset = true;
+        fill_data.chan_data.m_channelPreset = true;
     }
 
     if (cmdline.toBool("file"))
@@ -187,11 +187,11 @@ int main(int argc, char *argv[])
     }
 
     if (cmdline.toBool("dochannelupdates"))
-        fill_data.chan_data.channel_updates = true;
+        fill_data.chan_data.m_channelUpdates = true;
     if (cmdline.toBool("removechannels"))
-        fill_data.chan_data.remove_new_channels = true;
+        fill_data.chan_data.m_removeNewChannels = true;
     if (cmdline.toBool("nofilterchannels"))
-        fill_data.chan_data.filter_new_channels = false;
+        fill_data.chan_data.m_filterNewChannels = false;
     if (!cmdline.GetPassthrough().isEmpty())
         fill_data.graboptions = " " + cmdline.GetPassthrough();
     if (cmdline.toBool("sourceid"))
@@ -205,7 +205,7 @@ int main(int argc, char *argv[])
             return GENERIC_EXIT_INVALID_CMDLINE;
         }
 
-        fill_data.chan_data.cardtype = cmdline.toString("cardtype")
+        fill_data.chan_data.m_cardType = cmdline.toString("cardtype")
                                                 .trimmed().toUpper();
     }
     if (cmdline.toBool("maxdays") && cmdline.toInt("maxdays") > 0)

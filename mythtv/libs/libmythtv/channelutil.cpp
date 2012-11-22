@@ -2097,6 +2097,8 @@ IPTVTuningData ChannelUtil::GetIPTVTuningData(uint chanid)
     return tuning;
 }
 
+// TODO This should be modified to load a complete channelinfo object including
+//      all fields from the database
 ChannelInfoList ChannelUtil::GetChannelsInternal(
     uint sourceid, bool vis_only, bool include_disconnected,
     const QString &grp, uint changrpid)
@@ -2109,7 +2111,8 @@ ChannelInfoList ChannelUtil::GetChannelsInternal(
         "SELECT channum, callsign, channel.chanid, "
         "       atsc_major_chan, atsc_minor_chan, "
         "       name, icon, mplexid, visible, "
-        "       channel.sourceid, cardinput.cardid, channelgroup.grpid "
+        "       channel.sourceid, cardinput.cardid, channelgroup.grpid, "
+        "       xmltvid "
         "FROM channel "
         "LEFT JOIN channelgroup ON channel.chanid     = channelgroup.chanid "
         " %1  JOIN cardinput    ON cardinput.sourceid = channel.sourceid "
@@ -2167,6 +2170,8 @@ ChannelInfoList ChannelUtil::GetChannelsInternal(
             query.value(9).toUInt(),                      /* sourceid   */
             query.value(11).toUInt(),                     /* cardid     */
             query.value(10).toUInt());                    /* grpid      */
+
+        chan.xmltvid = query.value(12).toString();        /* xmltvid    */
 
         list.push_back(chan);
     }
