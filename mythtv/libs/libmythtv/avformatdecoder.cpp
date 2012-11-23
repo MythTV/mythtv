@@ -1690,14 +1690,16 @@ void AvFormatDecoder::ScanRawTextCaptions(int av_stream_index)
     AVDictionaryEntry *metatag =
         av_dict_get(ic->streams[av_stream_index]->metadata, "language", NULL,
                     0);
+    bool forced =
+      ic->streams[av_stream_index]->disposition & AV_DISPOSITION_FORCED;
     int lang = metatag ? get_canonical_lang(metatag->value) :
                          iso639_str3_to_key("und");
     LOG(VB_PLAYBACK, LOG_INFO, LOC +
         QString("Text Subtitle track #%1 is A/V stream #%2 "
-                "and is in the %3 language(%4).")
+                "and is in the %3 language(%4), forced=%5.")
                     .arg(tracks[kTrackTypeRawText].size()).arg(av_stream_index)
-                    .arg(iso639_key_toName(lang)).arg(lang));
-    StreamInfo si(av_stream_index, lang, 0, 0, 0);
+                    .arg(iso639_key_toName(lang)).arg(lang).arg(forced));
+    StreamInfo si(av_stream_index, lang, 0, 0, 0, false, false, forced);
     tracks[kTrackTypeRawText].push_back(si);
 }
 
@@ -3704,6 +3706,7 @@ QString AvFormatDecoder::GetTrackDesc(uint type, uint trackNo) const
 
     bool forced = tracks[type][trackNo].forced;
     int lang_key = tracks[type][trackNo].language;
+    QString forcedString = forced ? QObject::tr(" (forced)") : "";
     if (kTrackTypeAudio == type)
     {
         if (ringBuffer->IsDVD())
@@ -3761,7 +3764,11 @@ QString AvFormatDecoder::GetTrackDesc(uint type, uint trackNo) const
 
         return QObject::tr("Subtitle") + QString(" %1: %2%3")
             .arg(trackNo + 1).arg(iso639_key_toName(lang_key))
-            .arg(forced ? QObject::tr(" (forced)") : "");
+            .arg(forcedString);
+    }
+    else if (forced && kTrackTypeRawText == type)
+    {
+        return DecoderBase::GetTrackDesc(type, trackNo) + forcedString;
     }
     else
     {
