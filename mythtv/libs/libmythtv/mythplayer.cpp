@@ -2266,7 +2266,32 @@ void MythPlayer::VideoStart(void)
         }
 #endif // USING_MHEG
 
-        SetCaptionsEnabled(captionsEnabledbyDefault, false);
+        // If there is a forced text subtitle track (which is possible
+        // in e.g. a .mkv container), and forced subtitles are
+        // allowed, then start playback with that subtitle track
+        // selected.  Otherwise, use the frontend settings to decide
+        // which captions/subtitles (if any) to enable at startup.
+        // TODO: modify the fix to #10735 to use this approach
+        // instead.
+        bool hasForcedTextTrack = false;
+        uint forcedTrackNumber = 0;
+        if (GetAllowForcedSubtitles())
+        {
+            uint numTextTracks = decoder->GetTrackCount(kTrackTypeRawText);
+            for (uint i = 0; !hasForcedTextTrack && i < numTextTracks; ++i)
+            {
+                if (decoder->GetTrackInfo(kTrackTypeRawText, i).forced)
+                {
+                    hasForcedTextTrack = true;
+                    forcedTrackNumber = i;
+                }
+            }
+        }
+        if (hasForcedTextTrack)
+            SetTrack(kTrackTypeRawText, forcedTrackNumber);
+        else
+            SetCaptionsEnabled(captionsEnabledbyDefault, false);
+
         osdLock.unlock();
     }
 
