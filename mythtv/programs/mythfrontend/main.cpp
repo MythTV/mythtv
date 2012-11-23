@@ -1656,7 +1656,7 @@ int main(int argc, char **argv)
     setHttpProxy();
 
     pmanager = new MythPluginManager();
-    gContext->SetPluginManager(pmanager);
+    gCoreContext->SetPluginManager(pmanager);
 
     MediaMonitor *mon = MediaMonitor::GetMediaMonitor();
     if (mon)

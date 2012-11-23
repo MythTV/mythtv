@@ -8,15 +8,14 @@
 #include <vector>
 using namespace std;
 
-#include "mythexp.h"
+#include "mythbaseexp.h"
 
 class QSqlDatabase;
 class MythContext;
 class QPainter;
 
 typedef enum {
-    kPluginType_Module = 0,
-    kPluginType_MenuPlugin
+    kPluginType_Module = 0
 } MythPluginType;
 
 class MythPlugin : public QLibrary
@@ -50,22 +49,15 @@ class MythPlugin : public QLibrary
 
     QString getName(void) { return m_plugName; }
 
-    // mainmenu plugins, probably should separate out
-
-    // setup the plugin -- returns how often (in ms) the plugin wants updated
-    int setupMenuPlugin(void);
-
-    // draw the plugin
-    void drawMenuPlugin(QPainter *painter, int x, int y, int w, int h);
-
   private:
     bool enabled;
     int position;
     QString m_plugName;
+    QStringList m_features;
 };
 
 // this should only be instantiated through MythContext.
-class MPUBLIC MythPluginManager
+class MBASE_PUBLIC MythPluginManager
 {
   public:   
     MythPluginManager();
@@ -77,8 +69,6 @@ class MPUBLIC MythPluginManager
     bool destroy_plugin(const QString &plugname);
 
     MythPlugin *GetPlugin(const QString &plugname);
-    MythPlugin *GetMenuPlugin(const QString &plugname);
-    MythPlugin *GetMenuPluginAt(int pos);
 
     QStringList EnumeratePlugins(void);
     void DestroyAllPlugins();
@@ -87,10 +77,6 @@ class MPUBLIC MythPluginManager
     QHash<QString,MythPlugin*> m_dict;
    
     QMap<QString, MythPlugin *> moduleMap;
-    QMap<QString, MythPlugin *> menuPluginMap;
-    vector<MythPlugin*> menuPluginList;
-
-    void orderMenuPlugins();
 };
 
 #endif

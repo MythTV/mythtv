@@ -652,7 +652,7 @@ static void setupKeys(void)
 
 int mythplugin_init(const char *libversion)
 {
-    if (!gContext->TestPopupVersion("mythmusic", libversion,
+    if (!gCoreContext->TestPluginVersion("mythmusic", libversion,
                                     MYTH_BINARY_VERSION))
         return -1;
 

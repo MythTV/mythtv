@@ -654,6 +654,8 @@ class MTV_PUBLIC ProgramMapTable : public PSIPTable
     QString StreamDescription(uint i, QString sistandard) const;
     /// Returns the cannonical language if we find the iso639 descriptor
     QString GetLanguage(uint i) const;
+    /// Returns the audio type from the iso 639 descriptor
+    uint GetAudioType(uint i) const;
 
     uint FindPIDs(uint type, vector<uint> &pids,
                   const QString &sistandard) const;

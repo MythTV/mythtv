@@ -9,7 +9,7 @@
 #include <QMutex>
 
 // MythTV headers
-#include "channelutil.h"
+#include "channelinfo.h"
 #include "inputinfo.h"
 #include "mythsystem.h"
 #include "tv.h"
@@ -80,8 +80,8 @@ class ChannelBase
     virtual uint GetSourceID(int inputID) const
         { return m_inputs[inputID]->sourceid; }
     virtual uint GetInputCardID(int inputNum) const;
-    virtual DBChanList GetChannels(int inputNum) const;
-    virtual DBChanList GetChannels(const QString &inputname) const;
+    virtual ChannelInfoList GetChannels(int inputNum) const;
+    virtual ChannelInfoList GetChannels(const QString &inputname) const;
     virtual vector<InputInfo> GetFreeInputs(
         const vector<uint> &excluded_cards) const;
     virtual QStringList GetConnectedInputs(void) const;
@@ -160,7 +160,7 @@ class ChannelBase
     bool     m_commfree;
     uint     m_cardid;
     InputMap m_inputs;
-    DBChanList m_allchannels; ///< channels across all inputs
+    ChannelInfoList m_allchannels; ///< channels across all inputs
 
     QMutex         m_system_lock;
     MythSystem    *m_system;

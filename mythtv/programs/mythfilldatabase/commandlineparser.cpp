@@ -39,17 +39,11 @@ void MythFillDatabaseCommandLineParser::LoadArguments(void)
             "Directly define the sourceid and XMLTV file to "
             "import.")
         ->SetBlocks("ddfile")
-        ->SetBlocks("xawchannels")
         ->SetRequires("sourceid");
     add("--dd-file", "ddfile", false,
             "Bypass grabber, and read SD data from file",
             "Directly define the data needed to import a local "
             "DataDirect download.")
-        ->SetBlocks("xawchannels")
-        ->SetRequires("sourceid");
-    add("--xawchannels", "xawchannels", false,
-            "Read channels from xawtvrc file",
-            "Import channels from an xawtvrc file.")
         ->SetRequires("sourceid");
 
     add("--sourceid", "sourceid", 0, "Operate on single source",
@@ -71,11 +65,6 @@ void MythFillDatabaseCommandLineParser::LoadArguments(void)
             "rather than pull data through the specified grabber.")
         ->SetRequiredChildOf("ddfile")
         ->SetRequiredChildOf("file");
-
-    add("--xawtvrcfile", "xawtvrcfile", "",
-            "xawtvrc file to import channels from",
-            "Xawtvrc file containing channels to be imported.")
-        ->SetRequiredChildOf("xawchannels");
 
     add("--do-channel-updates", "dochannelupdates", false,
             "update channels using datadirect",

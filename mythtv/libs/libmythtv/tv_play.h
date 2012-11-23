@@ -31,6 +31,7 @@ using namespace std;
 #include "tv.h"
 #include "mythdate.h"
 #include "programinfo.h"
+#include "channelinfo.h"
 #include "channelutil.h"
 #include "videoouttypes.h"
 #include "volumebase.h"
@@ -287,7 +288,7 @@ class MTV_PUBLIC TV : public QObject
     QSet<uint> IsTunableOn(const PlayerContext*, uint chanid,
                            bool use_cache, bool early_exit);
     void ClearTunableCache(void);
-    void ChangeChannel(const PlayerContext*, const DBChanList &options);
+    void ChangeChannel(const PlayerContext*, const ChannelInfoList &options);
     void DrawUnusedRects(void);
     void DoEditSchedule(int editType = kScheduleProgramGuide);
     QString GetRecordingGroup(int player_idx) const;
@@ -818,7 +819,7 @@ class MTV_PUBLIC TV : public QObject
     /// to read this value in the UI thread.
     mutable QMutex channelGroupLock;
     volatile int   channelGroupId;
-    DBChanList     channelGroupChannelList;
+    ChannelInfoList     channelGroupChannelList;
 
     // Network Control stuff
     MythDeque<QString> networkControlCommands;

@@ -3,55 +3,36 @@
 
 // Qt headers
 #include <QString>
-#include <QList>
 
-class ChanInfo
-{
-  public:
-    ChanInfo() { }
-    ChanInfo(const ChanInfo &other) { callsign = other.callsign; 
-                                      iconpath = other.iconpath;
-                                      chanstr = other.chanstr;
-                                      xmltvid = other.xmltvid;
-                                      old_xmltvid = other.old_xmltvid;
-                                      name = other.name;
-                                      freqid = other.freqid;
-                                      finetune = other.finetune;
-                                      tvformat = other.tvformat;
-                                    }
-
-    QString callsign;
-    QString iconpath;
-    QString chanstr;
-    QString xmltvid;
-    QString old_xmltvid;
-    QString name;
-    QString freqid;
-    QString finetune;
-    QString tvformat;
-};
+// libmythtv
+#include "channelinfo.h"
 
 class ChannelData
 {
   public:
     ChannelData() :
-        interactive(false),         non_us_updating(false),
-        channel_preset(false),      channel_updates(false),
-        remove_new_channels(false), filter_new_channels(true) {}
+        m_interactive(false),         m_nonUSUpdating(false),
+        m_channelPreset(false),       m_channelUpdates(false),
+        m_removeNewChannels(false),   m_filterNewChannels(true) {}
 
     bool insert_chan(uint sourceid);
-    void handleChannels(int id, QList<ChanInfo> *chanlist);
-    unsigned int promptForChannelUpdates(
-        QList<ChanInfo>::iterator chaninfo, unsigned int chanid);
+    void handleChannels(int id, ChannelInfoList *chanlist);
+    unsigned int promptForChannelUpdates(ChannelInfoList::iterator chaninfo,
+                                         unsigned int chanid);
+
+    ChannelInfo FindMatchingChannel(const ChannelInfo &chanInfo,
+                            QHash<QString, ChannelInfo> existingChannels) const;
+    QHash<QString, ChannelInfo> channelList(int sourceId);
+    QString normalizeChannelKey(const QString &chanName) const;
 
   public:
-    bool    interactive;
-    bool    non_us_updating;
-    bool    channel_preset;
-    bool    channel_updates;
-    bool    remove_new_channels;
-    bool    filter_new_channels;
-    QString cardtype;
+    bool    m_interactive;
+    bool    m_nonUSUpdating;
+    bool    m_channelPreset;
+    bool    m_channelUpdates;
+    bool    m_removeNewChannels;
+    bool    m_filterNewChannels;
+    QString m_cardType;
 };
 
 #endif // _CHANNELDATA_H_

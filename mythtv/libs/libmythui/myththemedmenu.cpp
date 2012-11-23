@@ -29,6 +29,9 @@
 #include "mythversion.h"
 #include "mythdate.h"
 
+// libmythbase headers
+#include "mythplugin.h"
+
 MythThemedMenuState::MythThemedMenuState(MythScreenStack *parent,
                                          const QString &name)
     : MythScreenType(parent, name),
@@ -842,6 +845,7 @@ bool MythThemedMenu::findDepends(const QString &fileList)
 {
     QStringList files = fileList.split(" ");
     QString filename;
+    MythPluginManager *pluginManager = gCoreContext->GetPluginManager();
 
     for (QStringList::Iterator it = files.begin(); it != files.end(); ++it )
     {
@@ -849,10 +853,9 @@ bool MythThemedMenu::findDepends(const QString &fileList)
         if (!filename.isEmpty() && filename.endsWith(".xml"))
             return true;
 
-        QString newname = FindPluginName(*it);
-
-        QFile checkFile(newname);
-        if (checkFile.exists())
+        // Has plugin by this name been successfully loaded
+        MythPlugin *plugin = pluginManager->GetPlugin(*it);
+        if (plugin)
             return true;
     }
 

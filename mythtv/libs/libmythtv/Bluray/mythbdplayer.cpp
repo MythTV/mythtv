@@ -239,9 +239,9 @@ QString MythBDPlayer::GetTitleName(int title) const
 
 QString MythBDPlayer::GetAngleName(int angle) const
 {
-    if (angle >= 0 && angle < GetNumAngles())
+    if (angle >= 1 && angle <= GetNumAngles())
     {
-        QString name = QObject::tr("Angle %1").arg(angle+1);
+        QString name = QObject::tr("Angle %1").arg(angle);
         return name;
     }
     return QString();

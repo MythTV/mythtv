@@ -23,8 +23,10 @@ using namespace std;
 #include "programinfo.h"
 #include "signalhandling.h"
 
-static void setGlobalSetting(const QString &key, const QString &value)
+static void setGlobalSetting(const QString &key, const QString &v)
 {
+    QString value = (v.isNull()) ? QString("") : v;
+
     MSqlQuery query(MSqlQuery::InitCon());
     if (query.isConnected())
     {
@@ -44,9 +46,9 @@ static void setGlobalSetting(const QString &key, const QString &value)
     }
     else
     {
-        LOG(VB_GENERAL, LOG_ERR,
-            QString("Database not open while trying to save setting: %1")
-                .arg(key));
+        LOG(VB_STDIO|VB_FLUSH, LOG_ERR,
+            QString("Error: Database not open while trying "
+                    "to save setting: %1\n").arg(key));
     }
 }
 
@@ -65,9 +67,9 @@ static QString getGlobalSetting(const QString &key, const QString &defaultval)
     }
     else
     {
-        LOG(VB_GENERAL, LOG_ERR,
-            QString("Database not open while trying to load setting: %1")
-                .arg(key));
+        LOG(VB_STDIO|VB_FLUSH, LOG_ERR, 
+            QObject::tr("Error: Database not open while trying to "
+                        "load setting: %1", "mythshutdown").arg(key) + "\n");
     }
 
     return value;
@@ -90,8 +92,9 @@ static int lockShutdown()
 
     if (tries >= 5)
     {
-        LOG(VB_GENERAL, LOG_ERR,
-            "Waited too long to obtain lock on setting table");
+        LOG(VB_STDIO|VB_FLUSH, LOG_ERR,
+            QObject::tr("Error: Waited too long to obtain "
+                        "lock on setting table", "mythshutdown") + "\n");
         return 1;
     }
 
@@ -143,8 +146,9 @@ static int unlockShutdown()
 
     if (tries >= 5)
     {
-        LOG(VB_GENERAL, LOG_ERR,
-            "Waited too long to obtain lock on setting table");
+        LOG(VB_STDIO|VB_FLUSH, LOG_ERR,
+            QObject::tr("Error: Waited too long to obtain "
+                        "lock on setting table", "mythshutdown") + "\n");
         return 1;
     }
 
@@ -216,12 +220,13 @@ static bool isRecording()
 {
     if (!gCoreContext->IsConnectedToMaster())
     {
-        LOG(VB_GENERAL, LOG_NOTICE,
+        LOG(VB_GENERAL, LOG_INFO,
                 "isRecording: Attempting to connect to master server...");
         if (!gCoreContext->ConnectToMasterServer(false))
         {
-            LOG(VB_GENERAL, LOG_ERR,
-                    "isRecording: Could not connect to master server!");
+            LOG(VB_STDIO|VB_FLUSH, LOG_ERR,
+                QObject::tr("Error: Could not connect to master server",
+                            "mythshutdown") + "\n");
             return false;
         }
     }
@@ -237,37 +242,45 @@ static int getStatus(bool bWantRecStatus)
 
     if (isRunning("mythtranscode"))
     {
-        LOG(VB_GENERAL, LOG_NOTICE, "Transcoding in progress...");
+        LOG(VB_STDIO|VB_FLUSH, LOG_ERR,
+            QObject::tr("Transcoding in progress...", "mythshutdown") + "\n");
         res |= 1;
     }
 
     if (isRunning("mythcommflag"))
     {
-        LOG(VB_GENERAL, LOG_NOTICE, "Commercial Detection in progress...");
+        LOG(VB_STDIO|VB_FLUSH, LOG_ERR,
+            QObject::tr("Commercial Detection in progress...",
+                        "mythshutdown") + "\n");
         res |= 2;
     }
 
     if (isRunning("mythfilldatabase"))
     {
-        LOG(VB_GENERAL, LOG_NOTICE, "Grabbing EPG data in progress...");
+        LOG(VB_STDIO|VB_FLUSH, LOG_ERR,
+            QObject::tr("Grabbing EPG data in progress...", "mythshutdown") +
+            "\n");
         res |= 4;
     }
 
     if (bWantRecStatus && isRecording())
     {
-        LOG(VB_GENERAL, LOG_NOTICE, "Recording in progress...");
+        LOG(VB_STDIO|VB_FLUSH, LOG_ERR,
+            QObject::tr("Recording in progress...", "mythshutdown") + "\n");
         res |= 8;
     }
 
     if (getGlobalSetting("MythShutdownLock", "0") != "0")
     {
-        LOG(VB_GENERAL, LOG_NOTICE, "Shutdown is locked");
+        LOG(VB_STDIO|VB_FLUSH, LOG_ERR,
+            QObject::tr("Shutdown is locked", "mythshutdown") + "\n");
         res |= 16;
     }
 
     if (JobQueue::HasRunningOrPendingJobs(15))
     {
-        LOG(VB_GENERAL, LOG_NOTICE, "Has queued or pending jobs");
+        LOG(VB_STDIO|VB_FLUSH, LOG_ERR,
+            QObject::tr("Has queued or pending jobs", "mythshutdown") + "\n");
         res |= 32;
     }
 
@@ -299,7 +312,9 @@ static int getStatus(bool bWantRecStatus)
     {
         if (dtCurrent >= dtPeriod1Start && dtCurrent <= dtPeriod1End)
         {
-            LOG(VB_GENERAL, LOG_NOTICE, "In a daily wakeup period (1).");
+            LOG(VB_STDIO|VB_FLUSH, LOG_ERR,
+                QObject::tr("In a daily wakeup period (1).", "mythshutdown") +
+                "\n");
             res |= 64;
         }
     }
@@ -308,7 +323,9 @@ static int getStatus(bool bWantRecStatus)
     {
         if (dtCurrent >= dtPeriod2Start && dtCurrent <= dtPeriod2End)
         {
-            LOG(VB_GENERAL, LOG_NOTICE, "In a daily wakeup period (2).");
+            LOG(VB_STDIO|VB_FLUSH, LOG_ERR,
+                QObject::tr("In a daily wakeup period (2).", "mythshutdown") +
+                "\n");
             res |= 64;
         }
     }
@@ -320,8 +337,9 @@ static int getStatus(bool bWantRecStatus)
         int delta = dtCurrent.secsTo(dtPeriod1Start);
         if (delta >= 0 && delta <= 15 * 60)
         {
-            LOG(VB_GENERAL, LOG_NOTICE,
-                "About to start daily wakeup period (1)");
+            LOG(VB_STDIO|VB_FLUSH, LOG_ERR,
+                QObject::tr("About to start daily wakeup period (1)",
+                            "mythshutdown") + "\n");
             res |= 128;
         }
     }
@@ -331,20 +349,23 @@ static int getStatus(bool bWantRecStatus)
         int delta = dtCurrent.secsTo(dtPeriod2Start);
         if (delta >= 0 && delta <= 15 * 60)
         {
-            LOG(VB_GENERAL, LOG_NOTICE,
-                "About to start daily wakeup period (2)");
+            LOG(VB_STDIO|VB_FLUSH, LOG_ERR,
+                QObject::tr("About to start daily wakeup period (2)",
+                            "mythshutdown") + "\n");
             res |= 128;
         }
     }
 
     if (isRunning("mythtv-setup"))
     {
-        LOG(VB_GENERAL, LOG_NOTICE, "Setup is running...");
+        LOG(VB_STDIO|VB_FLUSH, LOG_ERR,
+            QObject::tr("Setup is running...", "mythshutdown") + "\n");
         res = 255;
     }
 
     LOG(VB_GENERAL, LOG_INFO,
-        QString("Mythshutdown: --status returned: %1").arg(res));
+        QObject::tr("Mythshutdown: --status returned: %1",
+                    "mythshutdown").arg(res) + "\n");
 
     return res;
 }
@@ -360,12 +381,14 @@ static int checkOKShutdown(bool bWantRecStatus)
 
     if (res > 0)
     {
-        LOG(VB_GENERAL, LOG_NOTICE, "Not OK to shutdown");
+        LOG(VB_STDIO|VB_FLUSH, LOG_ERR,
+            QObject::tr("Not OK to shutdown", "mythshutdown") + "\n");
         res = 1;
     }
     else
     {
-        LOG(VB_GENERAL, LOG_NOTICE, "OK to shutdown");
+        LOG(VB_STDIO|VB_FLUSH, LOG_ERR,
+            QObject::tr("OK to shutdown", "mythshutdown") + "\n");
         res = 0;
     }
 
@@ -375,45 +398,32 @@ static int checkOKShutdown(bool bWantRecStatus)
     return res;
 }
 
-static int setWakeupTime(QString sWakeupTime)
+static void setWakeupTime(const QDateTime &wakeupTime)
 {
     LOG(VB_GENERAL, LOG_INFO, "Mythshutdown: --setwakeup");
 
-    LOG(VB_GENERAL, LOG_NOTICE,
-        QString("Mythshutdown: wakeup time given is: %1").arg(sWakeupTime));
-
-    // check time given is valid
-    QDateTime dtWakeupTime;
-    dtWakeupTime = MythDate::fromString(sWakeupTime);
-
-    if (!dtWakeupTime.isValid())
-    {
-        LOG(VB_GENERAL, LOG_ERR,
-            QString("Mythshutdown: --setwakeup invalid date "
-                                      "format (%1)\n\t\t\t"
-                                      "must be yyyy-MM-ddThh:mm:ss")
-                                      .arg(sWakeupTime));
-        return 1;
-    }
+    LOG(VB_STDIO|VB_FLUSH, LOG_ERR,
+        QObject::tr("Wakeup time given is: %1 (local time)", "mythshutdown")
+        .arg(MythDate::toString(wakeupTime, MythDate::kDateTimeShort)) + "\n");
 
     setGlobalSetting("MythShutdownNextScheduled",
-                     MythDate::toString(dtWakeupTime, MythDate::kDatabase));
-
-    return 0;
+                     MythDate::toString(wakeupTime, MythDate::kDatabase));
 }
 
 static int setScheduledWakeupTime()
 {
     if (!gCoreContext->IsConnectedToMaster())
     {
-        LOG(VB_GENERAL, LOG_NOTICE,
-            "setScheduledWakeupTime: "
-            "Attempting to connect to master server...");
+        LOG(VB_STDIO|VB_FLUSH, LOG_ERR,
+            QObject::tr("Setting scheduled wakeup time: "
+                        "Attempting to connect to master server...",
+                        "mythshutdown") + "\n");
         if (!gCoreContext->ConnectToMasterServer(false))
         {
-            LOG(VB_GENERAL, LOG_NOTICE,
-                "setScheduledWakeupTime: "
-                "Could not connect to master server!");
+            LOG(VB_STDIO|VB_FLUSH, LOG_ERR,
+                QObject::tr("Setting scheduled wakeup time: "
+                            "Could not connect to master server!",
+                            "mythshutdown") + "\n");
             return 1;
         }
     }
@@ -428,11 +438,13 @@ static int setScheduledWakeupTime()
         QDateTime restarttime = nextRecordingStart
             .addSecs((-1) * m_preRollSeconds);
 
-        int add = gCoreContext->GetNumSetting("StartupSecsBeforeRecording", 240);
+        int add = gCoreContext->GetNumSetting(
+            "StartupSecsBeforeRecording", 240);
+
         if (add)
             restarttime = restarttime.addSecs((-1) * add);
 
-        setWakeupTime(restarttime.toString(Qt::ISODate));
+        setWakeupTime(restarttime);
 
         return 0;
     }
@@ -484,9 +496,10 @@ static int shutdown()
     {
         if (dtCurrent < dtPeriod1Start)
         {
-            LOG(VB_GENERAL, LOG_NOTICE,
-                "daily wakeup today at " +
-                dtPeriod1Start.toLocalTime().toString("hh:mm:ss"));
+            LOG(VB_STDIO|VB_FLUSH, LOG_ERR,
+                QObject::tr("Daily wakeup today at %1", "mythshutdown")
+                .arg(MythDate::toString(dtPeriod1Start, MythDate::kTime)) +
+                "\n");
             dtNextDailyWakeup = dtPeriod1Start;
         }
     }
@@ -496,9 +509,10 @@ static int shutdown()
     {
         if (dtCurrent < dtPeriod2Start)
         {
-            LOG(VB_GENERAL, LOG_NOTICE,
-                "daily wakeup today at " +
-                dtPeriod2Start.toLocalTime().toString("hh:mm:ss"));
+            LOG(VB_STDIO|VB_FLUSH, LOG_ERR,
+                QObject::tr("Daily wakeup today at %1", "mythshutdown")
+                .arg(MythDate::toString(dtPeriod2Start, MythDate::kTime)) +
+                "\n");
             dtNextDailyWakeup = dtPeriod2Start;
         }
     }
@@ -517,14 +531,21 @@ static int shutdown()
         {
             dtNextDailyWakeup = dtNextDailyWakeup.addDays(1);
 
-            LOG(VB_GENERAL, LOG_NOTICE, "next daily wakeup is tomorrow at " +
-                dtNextDailyWakeup.toLocalTime().toString("hh:mm:ss"));
+            LOG(VB_STDIO|VB_FLUSH, LOG_ERR,
+                QObject::tr("Next daily wakeup is tomorrow at %1",
+                            "mythshutdown")
+                .arg(MythDate::toString(dtNextDailyWakeup, MythDate::kTime)) +
+                "\n");
         }
     }
 
     // if dtNextDailyWakeup is still not valid then no daily wakeups are set
     if (!dtNextDailyWakeup.isValid())
-        LOG(VB_GENERAL, LOG_ERR, "no daily wakeup times are set");
+    {
+        LOG(VB_STDIO|VB_FLUSH, LOG_ERR,
+            QObject::tr("Error: no daily wakeup times are set",
+                        "mythshutdown") + "\n");
+    }
 
     // get next scheduled wake up for a recording if any
     QDateTime dtNextRecordingStart = QDateTime();
@@ -533,10 +554,18 @@ static int shutdown()
         dtNextRecordingStart = MythDate::fromString(s);
 
     if (!dtNextRecordingStart.isValid())
-        LOG(VB_GENERAL, LOG_ERR, "no recording time is set");
-    else 
-        LOG(VB_GENERAL, LOG_NOTICE, "recording scheduled at: " +
-                    dtNextRecordingStart.toString(Qt::ISODate));
+    {
+        LOG(VB_STDIO|VB_FLUSH, LOG_ERR,
+            QObject::tr("Error: no recording time is set", "mythshutdown") +
+            "\n");
+    }
+    else
+    {
+        LOG(VB_STDIO|VB_FLUSH, LOG_ERR,
+            QObject::tr("Recording scheduled at: %1", "mythshutdown")
+            .arg(MythDate::toString(dtNextRecordingStart, MythDate::kTime)) +
+            "\n");
+    }
 
     // check if scheduled recording time has already passed
     if (dtNextRecordingStart.isValid())
@@ -545,9 +574,9 @@ static int shutdown()
 
         if (delta < 0)
         {
-            LOG(VB_GENERAL, LOG_NOTICE,
-                "Scheduled recording time has already passed. "
-                "Schedule deleted");
+            LOG(VB_STDIO|VB_FLUSH, LOG_ERR,
+                QObject::tr("Scheduled recording time has already passed. "
+                            "Schedule deleted", "mythshutdown") + "\n");
 
             dtNextRecordingStart = QDateTime();
             setGlobalSetting("MythShutdownNextScheduled", "");
@@ -563,8 +592,9 @@ static int shutdown()
     if (!dtNextRecordingStart.isValid() && !dtNextDailyWakeup.isValid())
     {
         dtWakeupTime = QDateTime();
-        LOG(VB_GENERAL, LOG_ERR,
-            "no wake up time set and no scheduled program");
+        LOG(VB_STDIO|VB_FLUSH, LOG_ERR,
+            QObject::tr("Error: no wake up time set and no scheduled program",
+                        "mythshutdown") + "\n");
     }
 
     // no daily wakeup set
@@ -572,7 +602,9 @@ static int shutdown()
     if (dtNextRecordingStart.isValid() && !dtNextDailyWakeup.isValid())
     {
         dtWakeupTime = dtNextRecordingStart;
-        LOG(VB_GENERAL, LOG_NOTICE, "will wake up at next scheduled program");
+        LOG(VB_STDIO|VB_FLUSH, LOG_ERR,
+            QObject::tr("Will wake up at next scheduled program",
+                        "mythshutdown") + "\n");
     }
 
     // daily wakeup is set
@@ -580,7 +612,9 @@ static int shutdown()
     if (!dtNextRecordingStart.isValid() && dtNextDailyWakeup.isValid())
     {
         dtWakeupTime = dtNextDailyWakeup;
-        LOG(VB_GENERAL, LOG_NOTICE, "will wake up at next daily wakeup");
+        LOG(VB_STDIO|VB_FLUSH, LOG_ERR,
+            QObject::tr("Will wake up at next daily wakeup",
+                        "mythshutdown") + "\n");
     }
 
     // daily wakeup is set
@@ -590,14 +624,18 @@ static int shutdown()
     {
         if (dtNextDailyWakeup < dtNextRecordingStart)
         {
-            LOG(VB_GENERAL, LOG_NOTICE,
-                "program is scheduled but will wake up at next daily wakeup");
+            LOG(VB_STDIO|VB_FLUSH, LOG_ERR,
+                QObject::tr("Program is scheduled but will "
+                            "wake up at next daily wakeup",
+                            "mythshutdown") + "\n");
             dtWakeupTime = dtNextDailyWakeup;
         }
         else
         {
-            LOG(VB_GENERAL, LOG_NOTICE, "daily wakeup is set but will wake up "
-                                        "at next scheduled program");
+            LOG(VB_STDIO|VB_FLUSH, LOG_ERR,
+                QObject::tr("Daily wakeup is set but will wake up "
+                            "at next scheduled program",
+                            "mythshutdown") + "\n");
             dtWakeupTime = dtNextRecordingStart;
         }
     }
@@ -619,8 +657,9 @@ static int shutdown()
         if (dtCurrent.secsTo(dtWakeupTime) > 15 * 60)
         {
             QString nvramCommand =
-                gCoreContext->GetSetting("MythShutdownNvramCmd",
-                     "/usr/bin/nvram-wakeup --settime $time");
+                gCoreContext->GetSetting(
+                    "MythShutdownNvramCmd",
+                    "/usr/bin/nvram-wakeup --settime $time");
 
             QString wakeup_timeformat = gCoreContext->GetSetting(
                 "MythShutdownWakeupTimeFmt", "time_t");
@@ -636,18 +675,22 @@ static int shutdown()
                     "$time", dtWakeupTime.toLocalTime()
                     .toString(wakeup_timeformat));
 
-            LOG(VB_GENERAL, LOG_NOTICE, "sending command to set time in bios" +
-                nvramCommand);
+            LOG(VB_STDIO|VB_FLUSH, LOG_ERR,
+                QObject::tr("Sending command to set time in BIOS %1",
+                            "mythshutdown")
+                .arg(nvramCommand) + "\n");
 
             shutdownmode = myth_system(nvramCommand);
 
-            LOG(VB_GENERAL, LOG_NOTICE, (nvramCommand + " exited with code %2")
-                    .arg(shutdownmode));
+            LOG(VB_STDIO|VB_FLUSH, LOG_ERR,
+                QObject::tr("Program %1 exited with code %2", "mythshutdown")
+                .arg(nvramCommand).arg(shutdownmode) + "\n");
 
             if (shutdownmode == 2)
             {
-                LOG(VB_GENERAL, LOG_ERR,
-                    "nvram-wakeup failed to set time in bios");
+                LOG(VB_STDIO|VB_FLUSH, LOG_ERR,
+                    QObject::tr("Error: nvram-wakeup failed to "
+                                "set time in BIOS", "mythshutdown") + "\n");
                 return 1;
             }
 
@@ -660,8 +703,10 @@ static int shutdown()
         }
         else
         {
-            LOG(VB_GENERAL, LOG_NOTICE, "The next wakeup time is less than "
-                                        "15 mins away, not shutting down");
+            LOG(VB_STDIO|VB_FLUSH, LOG_ERR,
+                QObject::tr("The next wakeup time is less than "
+                            "15 mins away, not shutting down.",
+                            "mythshutdown") + "\n");
             return 0;
         }
     }
@@ -672,13 +717,14 @@ static int shutdown()
     {
         case 0:
         {
-            LOG(VB_GENERAL, LOG_NOTICE,
-                "everything looks fine, shutting down ...");
+            LOG(VB_STDIO|VB_FLUSH, LOG_ERR,
+                QObject::tr("everything looks fine, shutting down ...",
+                            "mythshutdown") + "\n");
             QString poweroffCmd = gCoreContext->GetSetting(
                 "MythShutdownPoweroff", "/sbin/poweroff");
-            LOG(VB_GENERAL, LOG_NOTICE, "..");
-            LOG(VB_GENERAL, LOG_NOTICE, ".");
-            LOG(VB_GENERAL, LOG_NOTICE, "shutting down ...");
+            LOG(VB_STDIO|VB_FLUSH, LOG_ERR,
+                "..\n.\n" + QObject::tr("shutting down", "mythshutdown") +
+                " ...\n");
 
             myth_system(poweroffCmd);
             res = 0;
@@ -686,16 +732,19 @@ static int shutdown()
         }
         case 1:
         {
-            LOG(VB_GENERAL, LOG_NOTICE,
-                "everything looks fine, but reboot is needed");
-            LOG(VB_GENERAL, LOG_NOTICE, "sending command to bootloader ...");
-            LOG(VB_GENERAL, LOG_NOTICE, nvramRestartCmd);
+            LOG(VB_STDIO|VB_FLUSH, LOG_ERR,
+                QObject::tr("Everything looks fine, but reboot is needed",
+                            "mythshutdown") + "\n");
+            LOG(VB_STDIO|VB_FLUSH, LOG_ERR,
+                QObject::tr("Sending command to bootloader", "mythshutdown") +
+                " ...\n");
+            LOG(VB_STDIO|VB_FLUSH, LOG_ERR, nvramRestartCmd);
 
             myth_system(nvramRestartCmd);
 
-            LOG(VB_GENERAL, LOG_NOTICE, "..");
-            LOG(VB_GENERAL, LOG_NOTICE, ".");
-            LOG(VB_GENERAL, LOG_NOTICE, "rebooting ...");
+            LOG(VB_STDIO|VB_FLUSH, LOG_ERR,
+                "..\n.\n" + QObject::tr("rebooting", "mythshutdown") +
+                " ...\n");
 
             QString rebootCmd =
                 gCoreContext->GetSetting("MythShutdownReboot", "/sbin/reboot");
@@ -704,8 +753,9 @@ static int shutdown()
             break;
         }
         default:
-            LOG(VB_GENERAL, LOG_ERR,
-                "panic. invalid shutdown mode, do nothing");
+            LOG(VB_STDIO|VB_FLUSH, LOG_ERR,
+                QObject::tr("Error: Invalid shutdown mode, doing nothing.",
+                            "mythshutdown") + "\n");
             res = 1;
             break;
     }
@@ -742,11 +792,15 @@ static int startup()
     }
 
     if (res)
+    {
         LOG(VB_GENERAL, LOG_INFO,
             QString("looks like we were started manually: %1").arg(res));
+    }
     else
+    {
         LOG(VB_GENERAL, LOG_INFO,
             QString("looks like we were started automatically: %1").arg(res));
+    }
 
 
     LOG(VB_GENERAL, LOG_INFO,
@@ -779,9 +833,8 @@ int main(int argc, char **argv)
     QCoreApplication a(argc, argv);
     QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHSHUTDOWN);
 
-    int retval;
-    QString mask("none");
-    if ((retval = cmdline.ConfigureLogging(mask)) != GENERIC_EXIT_OK)
+    int retval = cmdline.ConfigureLogging("none");
+    if (retval != GENERIC_EXIT_OK)
         return retval;
 
 #ifndef _WIN32
@@ -798,8 +851,8 @@ int main(int argc, char **argv)
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init(false))
     {
-        LOG(VB_GENERAL, LOG_ERR,
-            "mythshutdown: Could not initialize MythContext. Exiting.");
+        LOG(VB_STDIO|VB_FLUSH, LOG_ERR, "Error: "
+            "Could not initialize MythContext. Exiting.\n");
         SignalHandler::Done();
         return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
@@ -821,7 +874,30 @@ int main(int argc, char **argv)
     else if (cmdline.toBool("status"))
         res = getStatus((bool)(cmdline.toInt("status") == 1));
     else if (cmdline.toBool("setwakeup"))
-        res = setWakeupTime(cmdline.toString("setwakeup"));
+    {
+        // only one of --utc or --localtime can be passed per
+        // CommandLineArg::AllowOneOf() in commandlineparser.cpp
+        bool utc = cmdline.toBool("utc");
+        QString tmp = cmdline.toString("setwakeup");
+
+        QDateTime wakeuptime = (utc) ?
+            MythDate::fromString(tmp) :
+            QDateTime::fromString(tmp, Qt::ISODate).toUTC();
+
+        if (!wakeuptime.isValid())
+        {
+            LOG(VB_STDIO|VB_FLUSH, LOG_ERR,
+                QObject::tr("Error: "
+                            "--setwakeup invalid date format (%1)\n\t\t\t"
+                            "must be yyyy-MM-ddThh:mm:ss", "mythshutdown")
+                .arg(tmp) + "\n");
+            res = 1;
+        }
+        else
+        {
+            setWakeupTime(wakeuptime);
+        }
+    }
     else if (cmdline.toBool("safeshutdown"))
     { 
         res = checkOKShutdown(true);
@@ -842,4 +918,3 @@ int main(int argc, char **argv)
 
     return res;
 }
-

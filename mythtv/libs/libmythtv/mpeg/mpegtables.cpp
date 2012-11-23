@@ -1084,6 +1084,27 @@ QString ProgramMapTable::GetLanguage(uint i) const
     return iso_lang.CanonicalLanguageString();
 }
 
+uint ProgramMapTable::GetAudioType(uint i) const
+{
+    const desc_list_t list = MPEGDescriptor::Parse(
+        StreamInfo(i), StreamInfoLength(i));
+    const unsigned char *lang_desc = MPEGDescriptor::Find(
+        list, DescriptorID::iso_639_language);
+
+    if (!lang_desc)
+        return 0;
+
+    ISO639LanguageDescriptor iso_lang(lang_desc);
+
+    // Hack for non-standard AD labelling on UK Satellite and Irish DTTV
+    // Language string of 'nar' for narrative indicates an AD track
+    if (iso_lang.AudioType() == 0x0 &&
+        iso_lang.LanguageString() == "nar")
+        return 0x03;
+    
+    return iso_lang.AudioType();
+}
+
 QString ProgramMapTable::StreamDescription(uint i, QString sistandard) const
 {
     desc_list_t list;

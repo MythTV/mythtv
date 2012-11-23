@@ -307,6 +307,7 @@ class ISO639LanguageDescriptor : public MPEGDescriptor
         MPEGDescriptor(data, len, DescriptorID::iso_639_language) { }
 
     const unsigned char* CodeRaw() const { return &_data[2]; }
+    uint AudioType() const { return _data[5]; }
 
     int LanguageKey(void) const
         { return iso639_str3_to_key(&_data[2]); }
@@ -316,6 +317,7 @@ class ISO639LanguageDescriptor : public MPEGDescriptor
         { return iso639_key_to_canonical_key(LanguageKey()); }
     QString CanonicalLanguageString(void) const
         { return iso639_key_to_str3(CanonicalLanguageKey()); }
+    
     QString toString() const;
 };
 

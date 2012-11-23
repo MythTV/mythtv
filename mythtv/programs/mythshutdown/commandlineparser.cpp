@@ -17,12 +17,13 @@ void MythShutdownCommandLineParser::LoadArguments(void)
 
     addHelp();
     addVersion();
-    addLogging();
+    addLogging("none", LOG_ERR);
 
     CommandLineArg::AllowOneOf( QList<CommandLineArg*>()
          << add(QStringList( QStringList() << "-w" << "--setwakeup" ),
                 "setwakeup", "",
-                "Set the wakeup time (yyyy-MM-ddThh:mm:ss)", "")
+                "Set the wakeup time (yyyy-MM-ddThh:mm:ss) "
+                "default is in local time", "")
          << add(QStringList( QStringList() << "-t" << "--setscheduledwakeup" ),
                 "setschedwakeup", false,
                 "Set wakeup time to the next scheduled recording", "")
@@ -66,5 +67,16 @@ void MythShutdownCommandLineParser::LoadArguments(void)
                 "        64 - In daily wakeup/shutdown period\n"
                 "       128 - Less than 15 minutes to next wakeup period\n"
                 "       255 - Setup is running") );
+
+    // The localtime command line parameter exists solely to make scripts
+    // using this executable self documenting.
+
+    CommandLineArg::AllowOneOf( QList<CommandLineArg*>()
+         << add("--utc",
+                "utc", false,
+                "Specify that the wakeup time is in utc", "")
+         << add("--localtime",
+                "localtime", false,
+                "Specify that the wakeup time is in local time", "") );
 }
 
