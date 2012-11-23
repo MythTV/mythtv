@@ -10,6 +10,7 @@ class MythTVProgram {
     public $description    = 'No Description';
     public $season;
     public $episode;
+    public $syndicatedepisodenumber;
     public $category;
     public $chanid;
     public $channum;
@@ -49,6 +50,8 @@ class MythTVProgram {
     public $videoprop;
     public $subtitletype;
     public $year;
+    public $partnumber;
+    public $parttotal;
 
     // Additional program table fields
     public $category_type;
@@ -58,12 +61,9 @@ class MythTVProgram {
     public $subtitled;
     public $hdtv;
     public $closecaptioned;
-    public $partnumber;
-    public $parttotal;
     public $originalairdate;
     public $showtype;
     public $colorcode;
-    public $syndicatedepisodenumber;
     public $manualid;
     public $generic;
     public $listingsource;

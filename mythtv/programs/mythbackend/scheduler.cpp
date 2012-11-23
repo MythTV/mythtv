@@ -4010,7 +4010,8 @@ void Scheduler::AddNewRecords(void)
         "    p.subtitletypes+0, p.audioprop+0,   RECTABLE.storagegroup, "//40-42
         "    capturecard.hostname, recordmatch.oldrecstatus, "
         "                                           RECTABLE.avg_delay, "//43-45
-        "    oldrecstatus.future, cardinput.schedorder, ") +             //46-47
+        "    oldrecstatus.future, cardinput.schedorder, " //46-47
+        "    p.syndicatedepisodenumber, p.partnumber, p.parttotal, ") + //48-50
         pwrpri + QString(
         "FROM recordmatch "
         "INNER JOIN RECTABLE ON (recordmatch.recordid = RECTABLE.recordid) "
@@ -4075,6 +4076,7 @@ void Scheduler::AddNewRecords(void)
             result.value(6).toString(),//description
             0, // season
             0, // episode
+            result.value(48).toString(),//synidcatedepisode
             result.value(11).toString(),//category
 
             result.value(0).toUInt(),//chanid
@@ -4089,6 +4091,8 @@ void Scheduler::AddNewRecords(void)
             result.value(42).toString(),//storagegroup
 
             result.value(30).toUInt(),//year
+            result.value(49).toUInt(),//partnumber
+            result.value(50).toUInt(),//parttotal
 
             result.value(26).toString(),//seriesid
             result.value(27).toString(),//programid
@@ -4146,7 +4150,7 @@ void Scheduler::AddNewRecords(void)
 
         p->SetRecordingPriority(
             p->GetRecordingPriority() + recTypeRecPriorityMap[p->GetRecordingRuleType()] +
-            result.value(48).toInt() +
+            result.value(51).toInt() +
             ((autopriority) ?
              autopriority - (result.value(45).toInt() * autostrata / 200) : 0));
 

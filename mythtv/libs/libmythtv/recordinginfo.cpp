@@ -49,6 +49,7 @@ RecordingInfo::RecordingInfo(
     const QString &_description,
     uint _season,
     uint _episode,
+    const QString &_syndicatedepisode,
     const QString &_category,
 
     uint _chanid,
@@ -63,6 +64,8 @@ RecordingInfo::RecordingInfo(
     const QString &_storagegroup,
 
     uint _year,
+    uint _partnumber,
+    uint _parttotal,
 
     const QString &_seriesid,
     const QString &_programid,
@@ -117,8 +120,11 @@ RecordingInfo::RecordingInfo(
     hostname = _hostname;
     storagegroup = _storagegroup;
 
-    year = _year;
+    syndicatedepisode = _syndicatedepisode;
 
+    year = _year;
+    partnumber = _partnumber;
+    parttotal = _parttotal;
     catType = _catType;
 
     recpriority = _recpriority;
