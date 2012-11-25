@@ -133,8 +133,7 @@ QHash<QString, ChannelInfo> ChannelData::channelList(int sourceId)
 {
     QHash<QString, ChannelInfo> retList;
 
-    ChannelInfoList channelList = ChannelUtil::GetChannels(sourceId, true,
-                                                           "chanid");
+    ChannelInfoList channelList = ChannelUtil::GetChannels(sourceId, true);
     
     ChannelInfoList::iterator it = channelList.begin();
     for ( ; it != channelList.end(); ++it)

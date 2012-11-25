@@ -28,7 +28,7 @@ class MTV_PUBLIC ChannelInfo
               uint _chanid, uint _major_chan, uint _minor_chan,
               uint _mplexid, bool _visible,
               const QString &_name, const QString &_icon,
-              uint _sourceid, uint _cardid, uint _grpid);
+              uint _sourceid);
     
     ChannelInfo& operator=(const ChannelInfo&);
 
@@ -41,6 +41,29 @@ class MTV_PUBLIC ChannelInfo
 
     QString GetSourceName();
     void SetSourceName(const QString lname) { m_sourcename = lname; }
+
+    
+    const QList<uint> GetGroupIds() const { return m_groupIdList; }
+    void LoadGroupIds();
+    void AddGroupId(uint lgroupid)
+    {
+        if (m_groupIdList.contains(lgroupid))
+            m_groupIdList.push_back(lgroupid);
+    }
+    void RemoveGroupId(uint lgroupid) { m_groupIdList.removeOne(lgroupid); }
+
+    
+    const QList<uint> GetCardIds() const { return m_cardIdList; }
+    void LoadCardIds();
+    // Since cardids must only appear once in a list, protect access
+    // to it
+    void AddCardId(uint lcardid)
+    {
+        if (m_cardIdList.contains(lcardid))
+            m_cardIdList.push_back(lcardid);
+    }
+    void RemoveCardId(uint lcardid) { m_cardIdList.removeOne(lcardid); }
+    
     
   private:
     void Init();
@@ -84,14 +107,13 @@ class MTV_PUBLIC ChannelInfo
     int     tmoffset;
     uint    iptvid;
 
-    // Following not in database
-    int     groupid;
-    int     cardid;
-
     QString old_xmltvid; // Used by mythfilldatabase when updating the xmltvid
 
   private:
     QString m_sourcename; // Cache here rather than looking up each time
+    // Following not in database - Cached
+    QList<uint>  m_groupIdList;
+    QList<uint>  m_cardIdList;
 };
 typedef vector<ChannelInfo> ChannelInfoList;
 

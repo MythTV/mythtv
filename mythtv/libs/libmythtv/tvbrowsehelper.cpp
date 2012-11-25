@@ -245,7 +245,8 @@ uint TVBrowseHelper::GetChanId(
         ChannelInfoList::const_iterator it = db_all_channels.begin();
         for (; it != db_all_channels.end(); ++it)
         {
-            if ((*it).cardid == pref_cardid && (*it).channum == channum)
+            if ((*it).GetCardIds().contains(pref_cardid) &&
+                (*it).channum == channum)
                 return (*it).chanid;
         }
     }
