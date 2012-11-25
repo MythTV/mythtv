@@ -14,10 +14,10 @@
 #include <winsock2.h>
 #include <Ws2tcpip.h>
 #include <stdio.h>
-#include <unistd.h>
 #else
 #include <sys/socket.h>
 #endif
+#include <unistd.h> // for usleep (and socket code on Q_OS_WIN)
 
 // MythTV
 #include "mythsocket.h"
