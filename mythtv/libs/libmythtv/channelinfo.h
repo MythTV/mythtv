@@ -47,7 +47,7 @@ class MTV_PUBLIC ChannelInfo
     void LoadGroupIds();
     void AddGroupId(uint lgroupid)
     {
-        if (m_groupIdList.contains(lgroupid))
+        if (!m_groupIdList.contains(lgroupid))
             m_groupIdList.push_back(lgroupid);
     }
     void RemoveGroupId(uint lgroupid) { m_groupIdList.removeOne(lgroupid); }
@@ -59,7 +59,7 @@ class MTV_PUBLIC ChannelInfo
     // to it
     void AddCardId(uint lcardid)
     {
-        if (m_cardIdList.contains(lcardid))
+        if (!m_cardIdList.contains(lcardid))
             m_cardIdList.push_back(lcardid);
     }
     void RemoveCardId(uint lcardid) { m_cardIdList.removeOne(lcardid); }
