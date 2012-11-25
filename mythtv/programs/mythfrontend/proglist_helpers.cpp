@@ -6,6 +6,7 @@
 #include "scheduleeditor.h"
 #include "recordingrule.h"
 #include "mythuibutton.h"
+#include "channelinfo.h"
 #include "channelutil.h"
 #include "proglist.h"
 #include "mythdate.h"
@@ -564,13 +565,13 @@ void EditPowerSearchPopup::initLists(void)
     new MythUIButtonListItem(m_channelList, tr("(Any Channel)"), NULL, false);
     m_channels << "";
 
-    DBChanList channels = ChannelUtil::GetChannels(0, true, "callsign");
+    ChannelInfoList channels = ChannelUtil::GetChannels(0, true, "callsign");
     ChannelUtil::SortChannels(channels, channelOrdering, true);
 
     MythUIButtonListItem *item;
     for (uint i = 0; i < channels.size(); ++i)
     {
-        QString chantext = channels[i].GetFormatted(DBChannel::kChannelShort);
+        QString chantext = channels[i].GetFormatted(ChannelInfo::kChannelShort);
 
         m_parent->m_viewList << QString::number(channels[i].chanid);
         m_parent->m_viewTextList << chantext;

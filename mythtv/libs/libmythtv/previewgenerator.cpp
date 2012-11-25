@@ -129,7 +129,7 @@ bool PreviewGenerator::RunReal(void)
                     "because mode was invalid 0x%2")
             .arg(pathname).arg((int)mode,0,16));
     }
-    else if (is_local && !!(mode & kLocal) && LocalPreviewRun())
+    else if (!!(mode & kLocal) && LocalPreviewRun())
     {
         ok = true;
         msg = QString("Generated on %1 in %2 seconds, starting at %3")

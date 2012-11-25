@@ -286,7 +286,7 @@ static bool comp_redundant(RecordingInfo *a, RecordingInfo *b)
         return cmp < 0;
     if (a->GetRecordingRuleID() != b->GetRecordingRuleID())
         return a->GetRecordingRuleID() < b->GetRecordingRuleID();
-    cmp = a->GetChannelSchedulingID().compare(b->GetChannelSchedulingID(), 
+    cmp = a->GetChannelSchedulingID().compare(b->GetChannelSchedulingID(),
                                               Qt::CaseInsensitive);
     if (cmp != 0)
         return cmp < 0;
@@ -302,7 +302,7 @@ static bool comp_recstart(RecordingInfo *a, RecordingInfo *b)
         return a->GetRecordingStartTime() < b->GetRecordingStartTime();
     if (a->GetRecordingEndTime() != b->GetRecordingEndTime())
         return a->GetRecordingEndTime() < b->GetRecordingEndTime();
-    int cmp = a->GetChannelSchedulingID().compare(b->GetChannelSchedulingID(), 
+    int cmp = a->GetChannelSchedulingID().compare(b->GetChannelSchedulingID(),
                                                   Qt::CaseInsensitive);
     if (cmp != 0)
         return cmp < 0;
@@ -489,9 +489,9 @@ void Scheduler::FillRecordListFromDB(uint recordid)
 
     QString msg;
     msg.sprintf("Speculative scheduled %d items in %.1f "
-                "= %.2f match + %.2f check + %.2f place", 
+                "= %.2f match + %.2f check + %.2f place",
                 (int)reclist.size(),
-                matchTime + checkTime + placeTime, 
+                matchTime + checkTime + placeTime,
                 matchTime, checkTime, placeTime);
     LOG(VB_GENERAL, LOG_INFO, msg);
 }
@@ -756,7 +756,7 @@ void Scheduler::SlaveConnected(RecordingList &slavelist)
                 sp->GetScheduledStartTime() == rp->GetScheduledStartTime() &&
                 sp->GetChannelSchedulingID().compare(
                     rp->GetChannelSchedulingID(), Qt::CaseInsensitive) == 0 &&
-                sp->GetTitle().compare(rp->GetTitle(), 
+                sp->GetTitle().compare(rp->GetTitle(),
                                        Qt::CaseInsensitive) == 0)
             {
                 if (sp->GetCardID() == rp->GetCardID())
@@ -789,7 +789,7 @@ void Scheduler::SlaveConnected(RecordingList &slavelist)
                 rp->SetRecordingStatus(rsAborted);
                 reclist_changed = true;
                 rp->AddHistory(false);
-                LOG(VB_GENERAL, LOG_INFO, 
+                LOG(VB_GENERAL, LOG_INFO,
                     QString("setting %1/%2/\"%3\" as aborted")
                         .arg(rp->GetCardID())
                         .arg(rp->GetChannelSchedulingID())
@@ -1012,7 +1012,7 @@ bool Scheduler::FindNextConflict(
         if (debugConflicts)
         {
             LOG(VB_SCHEDULE, LOG_INFO, msg);
-            LOG(VB_SCHEDULE, LOG_INFO, 
+            LOG(VB_SCHEDULE, LOG_INFO,
                 QString("  cardid's: %1, %2 Shared input group: %3 "
                         "mplexid's: %4, %5")
                      .arg(p->GetCardID()).arg(q->GetCardID())
@@ -1837,7 +1837,7 @@ void Scheduler::run(void)
                 if (!doRun)
                     break;
             }
-            
+
             QTime t; t.start();
             if (HaveQueuedRequests() && HandleReschedule())
             {
@@ -1857,7 +1857,7 @@ void Scheduler::run(void)
                 tuningTimeout =
                     gCoreContext->GetNumSetting("tuningTimeout", 180);
             }
-            
+
             int e = t.elapsed();
             if (e > 0)
             {
@@ -2019,9 +2019,9 @@ int Scheduler::CalcTimeToNextHandleRecordingEvent(
     return min(msecs, max_sleep);
 }
 
-void Scheduler::ResetDuplicates(uint recordid, uint findid, 
+void Scheduler::ResetDuplicates(uint recordid, uint findid,
                                 const QString &title, const QString &subtitle,
-                                const QString &descrip, 
+                                const QString &descrip,
                                 const QString &programid)
 {
     MSqlQuery query(dbConn);
@@ -2109,7 +2109,7 @@ bool Scheduler::HandleReschedule(void)
     QString msg;
     bool deleteFuture = false;
     bool runCheck = false;
-    
+
     while (HaveQueuedRequests())
     {
         m_queueLock.lock();
@@ -2132,7 +2132,7 @@ bool Scheduler::HandleReschedule(void)
         {
             if (tokens.size() < 5)
             {
-                LOG(VB_GENERAL, LOG_ERR, 
+                LOG(VB_GENERAL, LOG_ERR,
                     QString("Invalid RescheduleMatch request received (%1)")
                     .arg(request[0]));
                 continue;
@@ -2154,7 +2154,7 @@ bool Scheduler::HandleReschedule(void)
         {
             if (tokens.size() < 4 || request.size() < 5)
             {
-                LOG(VB_GENERAL, LOG_ERR, 
+                LOG(VB_GENERAL, LOG_ERR,
                     QString("Invalid RescheduleCheck request received (%1)")
                     .arg(request[0]));
                 continue;
@@ -2169,14 +2169,14 @@ bool Scheduler::HandleReschedule(void)
             runCheck = true;
             schedLock.unlock();
             recordmatchLock.lock();
-            ResetDuplicates(recordid, findid, title, subtitle, descrip, 
+            ResetDuplicates(recordid, findid, title, subtitle, descrip,
                             programid);
             recordmatchLock.unlock();
             schedLock.lock();
         }
         else if (tokens[0] != "PLACE")
         {
-            LOG(VB_GENERAL, LOG_ERR, 
+            LOG(VB_GENERAL, LOG_ERR,
                 QString("Unknown Reschedule request received (%1)")
                 .arg(request[0]));
         }
@@ -2237,7 +2237,7 @@ bool Scheduler::HandleReschedule(void)
 
     msg.sprintf("Scheduled %d items in %.1f "
                 "= %.2f match + %.2f check + %.2f place",
-                (int)reclist.size(), matchTime + checkTime + placeTime, 
+                (int)reclist.size(), matchTime + checkTime + placeTime,
                 matchTime, checkTime, placeTime);
     LOG(VB_GENERAL, LOG_INFO, msg);
 
@@ -2752,9 +2752,9 @@ void Scheduler::HandleIdleShutdown(
 
             if (statuschanged || !idleSince.isValid())
             {
-                if (!idleSince.isValid()) 
+                if (!idleSince.isValid())
                     idleSince = curtime;
-    
+
                 RecIter idleIter = reclist.begin();
                 for ( ; idleIter != reclist.end(); ++idleIter)
                     if ((*idleIter)->GetRecordingStatus() ==
@@ -2773,7 +2773,7 @@ void Scheduler::HandleIdleShutdown(
                     }
                 }
             }
-            
+
             if (idleSince.isValid())
             {
                 // is the machine already idling the timeout time?
@@ -4010,7 +4010,8 @@ void Scheduler::AddNewRecords(void)
         "    p.subtitletypes+0, p.audioprop+0,   RECTABLE.storagegroup, "//40-42
         "    capturecard.hostname, recordmatch.oldrecstatus, "
         "                                           RECTABLE.avg_delay, "//43-45
-        "    oldrecstatus.future, cardinput.schedorder, ") +             //46-47
+        "    oldrecstatus.future, cardinput.schedorder, " //46-47
+        "    p.syndicatedepisodenumber, p.partnumber, p.parttotal, ") + //48-50
         pwrpri + QString(
         "FROM recordmatch "
         "INNER JOIN RECTABLE ON (recordmatch.recordid = RECTABLE.recordid) "
@@ -4075,6 +4076,7 @@ void Scheduler::AddNewRecords(void)
             result.value(6).toString(),//description
             0, // season
             0, // episode
+            result.value(48).toString(),//synidcatedepisode
             result.value(11).toString(),//category
 
             result.value(0).toUInt(),//chanid
@@ -4089,6 +4091,8 @@ void Scheduler::AddNewRecords(void)
             result.value(42).toString(),//storagegroup
 
             result.value(30).toUInt(),//year
+            result.value(49).toUInt(),//partnumber
+            result.value(50).toUInt(),//parttotal
 
             result.value(26).toString(),//seriesid
             result.value(27).toString(),//programid
@@ -4146,7 +4150,7 @@ void Scheduler::AddNewRecords(void)
 
         p->SetRecordingPriority(
             p->GetRecordingPriority() + recTypeRecPriorityMap[p->GetRecordingRuleType()] +
-            result.value(48).toInt() +
+            result.value(51).toInt() +
             ((autopriority) ?
              autopriority - (result.value(45).toInt() * autostrata / 200) : 0));
 
@@ -4184,7 +4188,7 @@ void Scheduler::AddNewRecords(void)
 
         RecStatusType newrecstatus = rsUnknown;
         // Check for rsOffLine
-        if ((doRun || specsched) && 
+        if ((doRun || specsched) &&
             (!cardMap.contains(p->GetCardID()) || !p->GetRecordingPriority2()))
             newrecstatus = rsOffLine;
 

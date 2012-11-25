@@ -28,7 +28,6 @@ using namespace std;
 #include "cetonchannel.h"
 #include "dummychannel.h"
 #include "tvremoteutil.h"
-#include "channelutil.h"
 #include "channelbase.h"
 #include "channelutil.h"
 #include "frequencies.h"
@@ -99,9 +98,9 @@ bool ChannelBase::Init(QString &inputname, QString &startchannel, bool setchan)
     QStringList::const_iterator it = start;
     while (it != inputs.end())
     {
-        DBChanList channels = GetChannels(*it);
+        ChannelInfoList channels = GetChannels(*it);
 
-        DBChanList::const_iterator cit = channels.begin();
+        ChannelInfoList::const_iterator cit = channels.begin();
         for (; cit != channels.end(); ++cit)
         {
             if ((*cit).channum == startchannel &&
@@ -126,7 +125,7 @@ bool ChannelBase::Init(QString &inputname, QString &startchannel, bool setchan)
     {
         uint mplexid_restriction = 0;
 
-        DBChanList channels = GetChannels(*it);
+        ChannelInfoList channels = GetChannels(*it);
         if (channels.size() &&
             IsInputAvailable(GetInputByName(*it), mplexid_restriction))
         {
@@ -134,7 +133,7 @@ bool ChannelBase::Init(QString &inputname, QString &startchannel, bool setchan)
                 channels, channels[0].chanid,
                 mplexid_restriction, CHANNEL_DIRECTION_UP);
 
-            DBChanList::const_iterator cit =
+            ChannelInfoList::const_iterator cit =
                 find(channels.begin(), channels.end(), chanid);
 
             if (chanid && cit != channels.end())
@@ -607,11 +606,11 @@ uint ChannelBase::GetInputCardID(int inputNum) const
     return 0;
 }
 
-DBChanList ChannelBase::GetChannels(int inputNum) const
+ChannelInfoList ChannelBase::GetChannels(int inputNum) const
 {
     int inputid = (inputNum > 0) ? inputNum : m_currentInputID;
 
-    DBChanList ret;
+    ChannelInfoList ret;
     InputMap::const_iterator it = m_inputs.find(inputid);
     if (it != m_inputs.end())
         ret = (*it)->channels;
@@ -619,7 +618,7 @@ DBChanList ChannelBase::GetChannels(int inputNum) const
     return ret;
 }
 
-DBChanList ChannelBase::GetChannels(const QString &inputname) const
+ChannelInfoList ChannelBase::GetChannels(const QString &inputname) const
 {
     int inputid = m_currentInputID;
     if (!inputname.isEmpty())
@@ -945,7 +944,7 @@ bool ChannelBase::InitializeInputs(void)
     while (query.next())
     {
         uint sourceid = query.value(5).toUInt();
-        DBChanList channels = ChannelUtil::GetChannels(sourceid, false);
+        ChannelInfoList channels = ChannelUtil::GetChannels(sourceid, false);
 
         ChannelUtil::SortChannels(channels, order);
 

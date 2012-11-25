@@ -77,11 +77,19 @@ class ShoutCastRequest
                       "Accept: */*\r\n");
 
         QString path = url.path();
+        QString host = url.host();
+
+        if (path.isEmpty())
+            path = "/";
+
         if (url.hasQuery())
             path += '?' + url.encodedQuery();
 
+        if (url.port() != -1)
+            host += QString(":%1").arg(url.port());
+
         hdr.replace("%PATH%", path);
-        hdr.replace("%HOST%", url.host());
+        hdr.replace("%HOST%", host);
         hdr.replace("%VERSION%", MYTH_BINARY_VERSION);
 
         if (!url.userName().isEmpty() && !url.password().isEmpty()) 
@@ -123,11 +131,19 @@ class IceCastRequest
                       "Accept: */*\r\n");
 
         QString path = url.path();
+        QString host = url.host();
+
+        if (path.isEmpty())
+            path = "/";
+
         if (url.hasQuery())
             path += '?' + url.encodedQuery();
 
+        if (url.port() != -1)
+            host += QString(":%1").arg(url.port());
+
         hdr.replace("%PATH%", path);
-        hdr.replace("%HOST%", url.host());
+        hdr.replace("%HOST%", host);
         hdr.replace("%VERSION%", MYTH_BINARY_VERSION);
 
         if (!url.userName().isEmpty() && !url.password().isEmpty()) 

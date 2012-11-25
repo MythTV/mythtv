@@ -68,8 +68,6 @@ class FillData
     bool GrabDataFromDDFile(int id, int offset, const QString &filename,
                             const QString &lineupid, QDate *qCurrentDate = 0);
     bool Run(SourceList &sourcelist);
-    ChanInfo *xawtvChannel(QString &id, QString &channel, QString &fine);
-    void readXawtvChannels(int id, QString xawrcfile);
 
     enum
     {

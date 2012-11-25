@@ -80,6 +80,7 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
         const QString &description,
         uint season,
         uint episode,
+        const QString &syndicatedepisode,
         const QString &category,
 
         uint chanid,
@@ -94,6 +95,8 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
         const QString &storagegroup,
 
         uint year,
+	uint partnumber,
+	uint parttotal,
 
         const QString &seriesid,
         const QString &programid,

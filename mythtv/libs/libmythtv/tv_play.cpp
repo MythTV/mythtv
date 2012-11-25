@@ -1414,7 +1414,7 @@ void TV::UpdateChannelList(int groupID)
     if (groupID == channelGroupId)
         return;
 
-    DBChanList list;
+    ChannelInfoList list;
     if (groupID != -1)
     {
         list = ChannelUtil::GetChannels(
@@ -7514,7 +7514,7 @@ void TV::ChangeChannel(PlayerContext *ctx, uint chanid, const QString &chan)
         UpdateOSDInput(ctx);
 }
 
-void TV::ChangeChannel(const PlayerContext *ctx, const DBChanList &options)
+void TV::ChangeChannel(const PlayerContext *ctx, const ChannelInfoList &options)
 {
     for (uint i = 0; i < options.size(); i++)
     {
@@ -10573,11 +10573,11 @@ void TV::OSDDialogEvent(int result, QString text, QString action)
             if (actx->tvchain)
             {
                 QMutexLocker locker(&channelGroupLock);
-                const DBChanList &list = channelGroupChannelList;
+                const ChannelInfoList &list = channelGroupChannelList;
                 cur_channum = actx->tvchain->GetChannelName(-1);
                 new_channum = cur_channum;
 
-                DBChanList::const_iterator it = list.begin();
+                ChannelInfoList::const_iterator it = list.begin();
                 for (; it != list.end(); ++it)
                 {
                     if ((*it).channum == cur_channum)
@@ -11181,7 +11181,7 @@ void TV::FillOSDMenuSubtitles(const PlayerContext *ctx, OSD *osd,
             osd->DialogAddButton(tr("Disable Subtitles"), ACTION_DISABLESUBS);
         else if (have_subs && !enabled)
             osd->DialogAddButton(tr("Enable Subtitles"), ACTION_ENABLESUBS);
-        if (!av_tracks.empty())
+        if (!av_tracks.empty() || !text_tracks.empty())
         {
             if (forcedon)
             {
@@ -11193,9 +11193,10 @@ void TV::FillOSDMenuSubtitles(const PlayerContext *ctx, OSD *osd,
                 osd->DialogAddButton(tr("Enable Forced Subtitles"),
                                      ACTION_ENABLEFORCEDSUBS);
             }
-            osd->DialogAddButton(tr("Select Subtitle"),
-                                 "DIALOG_MENU_AVSUBTITLES_0",
-                                 true, selected == "AVSUBTITLES");
+            if (!av_tracks.empty())
+                osd->DialogAddButton(tr("Select Subtitle"),
+                                     "DIALOG_MENU_AVSUBTITLES_0",
+                                     true, selected == "AVSUBTITLES");
         }
         if (havetext || !text_tracks.empty())
         {

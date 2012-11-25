@@ -2268,7 +2268,32 @@ void MythPlayer::VideoStart(void)
         }
 #endif // USING_MHEG
 
-        SetCaptionsEnabled(captionsEnabledbyDefault, false);
+        // If there is a forced text subtitle track (which is possible
+        // in e.g. a .mkv container), and forced subtitles are
+        // allowed, then start playback with that subtitle track
+        // selected.  Otherwise, use the frontend settings to decide
+        // which captions/subtitles (if any) to enable at startup.
+        // TODO: modify the fix to #10735 to use this approach
+        // instead.
+        bool hasForcedTextTrack = false;
+        uint forcedTrackNumber = 0;
+        if (GetAllowForcedSubtitles())
+        {
+            uint numTextTracks = decoder->GetTrackCount(kTrackTypeRawText);
+            for (uint i = 0; !hasForcedTextTrack && i < numTextTracks; ++i)
+            {
+                if (decoder->GetTrackInfo(kTrackTypeRawText, i).forced)
+                {
+                    hasForcedTextTrack = true;
+                    forcedTrackNumber = i;
+                }
+            }
+        }
+        if (hasForcedTextTrack)
+            SetTrack(kTrackTypeRawText, forcedTrackNumber);
+        else
+            SetCaptionsEnabled(captionsEnabledbyDefault, false);
+
         osdLock.unlock();
     }
 
@@ -4264,29 +4289,6 @@ char *MythPlayer::GetScreenGrabAtFrame(uint64_t frameNum, bool absolute,
 void MythPlayer::SeekForScreenGrab(uint64_t &number, uint64_t frameNum,
                                    bool absolute)
 {
-    if (!hasFullPositionMap)
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC +
-            "GetScreenGrabAtFrame: Recording does not "
-            "have position map so we will be unable to grab the desired "
-            "frame.");
-        player_ctx->LockPlayingInfo(__FILE__, __LINE__);
-        if (player_ctx->playingInfo)
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC +
-                QString("Run 'mythcommflag --file %1 --rebuild' to fix.")
-                    .arg(player_ctx->playingInfo->GetBasename()));
-            LOG(VB_GENERAL, LOG_ERR, LOC +
-                QString("If that does not work and this is a .mpg file, "
-                        "try 'mythtranscode --mpeg2 --buildindex "
-                        "--allkeys -c %1 -s %2'.")
-                .arg(player_ctx->playingInfo->GetChanID())
-                .arg(player_ctx->playingInfo->
-                     GetRecordingStartTime(MythDate::kFilename)));
-        }
-        player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
-    }
-
     number = frameNum;
     if (number >= totalFrames)
     {
