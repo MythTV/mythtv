@@ -23,7 +23,7 @@ package MythTV;
     use DBI;
     use HTTP::Request;
     use LWP::UserAgent;
-    use Time::Local;
+    use POSIX;
 
 # Load the UPNP libraries if we have them, but die nicely if we don't.
     BEGIN {
@@ -372,6 +372,8 @@ EOF
                                       $self->{'db_user'},
                                       $self->{'db_pass'})
             or die "Cannot connect to database: $!\n\n";
+        $self->{'dbh'}->do("SET time_zone = 'UTC'")
+            or die "Can't set timezone: $!\n\n";
 
     # Check for supported schema version
         $self->{'schema_version'} = $self->backend_setting('DBSchemaVer');
@@ -798,26 +800,20 @@ EOF
         if ($time =~ /^(\d{4})(\d\d)(\d\d)(\d\d)(\d\d)(\d\d)$/) {
             return "$1-$2-${3}T$4:$5:$6";
         }
-    # Otherwise, format it as necessary.  We have to use MySQL here because
-    # Date::Manip is not aware of DST differences.  Yay.  Blech.
-        my $sh = $self->{'dbh'}->prepare('SELECT FROM_UNIXTIME(?)');
-        $sh->execute($time);    # Assumed to be a correct epoch time (in GMT)
-        ($time) = $sh->fetchrow_array();
-        $time =~ s/\s/T/;
-        return $time;
+    # Otherwise, format it as necessary.
+        return POSIX::strftime("%Y-%m-%dT%H:%M:%S", gmtime($time));
     }
 
 # Format a MythTV timestamp into a unix timestamp.  This function is exported.
-# We have to use MySQL here because Date::Manip is not aware of DST.
+# We have to use MySQL here because it was used historically, and so the
+# formats that MySQL supports is effectively the API...
     sub myth_to_unix_time {
         my $self = (ref $_[0] ? shift : $MythTV::last);
         my $time = shift;
         my $sh = $self->{'dbh'}->prepare('SELECT UNIX_TIMESTAMP(?)');
         $sh->execute($time);
         ($time) = $sh->fetchrow_array();
-        my @t = localtime(time);
-        my $offset = timegm(@t) - timelocal(@t);
-        return $time - $offset;
+        return $time;
     }
 
 # Create a new MythTV::Program object
