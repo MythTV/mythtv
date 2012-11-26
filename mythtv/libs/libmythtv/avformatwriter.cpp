@@ -246,9 +246,7 @@ bool AVFormatWriter::NextFrameIsKeyFrame(void)
 
 int AVFormatWriter::WriteVideoFrame(VideoFrame *frame)
 {
-    AVCodecContext *c;
-
-    c = m_videoStream->codec;
+    //AVCodecContext *c = m_videoStream->codec;
 
     uint8_t *planes[3];
     int len = frame->size;
@@ -461,7 +459,7 @@ AVStream* AVFormatWriter::AddVideoStream(void)
     {
         LOG(VB_RECORD, LOG_ERR,
             LOC + "AddVideoStream(): avcodec_find_encoder() failed");
-        return false;
+        return NULL;
     }
 
     avcodec_get_context_defaults3(c, codec);
