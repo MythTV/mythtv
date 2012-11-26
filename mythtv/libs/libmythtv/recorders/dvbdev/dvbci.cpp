@@ -847,12 +847,14 @@ bool cCiResourceManager::Process(int Length, const uint8_t *Data)
      switch (Tag) {
        case AOT_PROFILE_ENQ: {
             dbgprotocol("%d: <== Profile Enquiry\n", SessionId());
-            int resources[] = { htonl(RI_RESOURCE_MANAGER),
-                                htonl(RI_APPLICATION_INFORMATION),
-                                htonl(RI_CONDITIONAL_ACCESS_SUPPORT),
-                                htonl(RI_DATE_TIME),
-                                htonl(RI_MMI)
-                              };
+            uint32_t resources[] =
+            {
+                htonl(RI_RESOURCE_MANAGER),
+                htonl(RI_APPLICATION_INFORMATION),
+                htonl(RI_CONDITIONAL_ACCESS_SUPPORT),
+                htonl(RI_DATE_TIME),
+                htonl(RI_MMI)
+            };
             dbgprotocol("%d: ==> Profile\n", SessionId());
             SendData(AOT_PROFILE, sizeof(resources), (uint8_t*)resources);
             state = 3;
