@@ -104,7 +104,7 @@ void BackendSelection::Accept(MythUIButtonListItem *item)
             m_pConfig->SetValue(kDefaultUSN, m_USN);
             m_pConfig->Save();
         }
-        Close(kAcceptConfigure);
+        CloseWithDecision(kAcceptConfigure);
     }
 }
 
@@ -227,7 +227,7 @@ bool BackendSelection::ConnectBackend(DeviceLocation *dev)
 
 void BackendSelection::Cancel(void)
 {
-    Close(kCancelConfigure);
+    CloseWithDecision(kCancelConfigure);
 }
 
 void BackendSelection::Load(void)
@@ -256,7 +256,7 @@ void BackendSelection::Init(void)
 
 void BackendSelection::Manual(void)
 {
-    Close(kManualConfigure);
+    CloseWithDecision(kManualConfigure);
 }
 
 void BackendSelection::RemoveItem(QString USN)
@@ -358,7 +358,12 @@ void BackendSelection::PromptForPassword(void)
         delete pwDialog;
 }
 
-void BackendSelection::Close(Decision d)
+void BackendSelection::Close(void)
+{
+    CloseWithDecision(kCancelConfigure);
+}
+
+void BackendSelection::CloseWithDecision(Decision d)
 {
     m_backendDecision = d;
 
