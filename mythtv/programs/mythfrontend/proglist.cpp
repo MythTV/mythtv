@@ -1037,9 +1037,9 @@ void ProgLister::FillViewList(const QString &view)
 
 class plCompare : binary_function<const ProgramInfo*, const ProgramInfo*, bool>
 {
-    public:
-        virtual bool operator()(const ProgramInfo *a, const ProgramInfo *b)
-            = 0;
+  public:
+    virtual bool operator()(const ProgramInfo*, const ProgramInfo*) = 0;
+    virtual ~plCompare() {}
 };
 
 class plTitleSort : public plCompare
