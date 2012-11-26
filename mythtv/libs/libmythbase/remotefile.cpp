@@ -557,23 +557,14 @@ int RemoteFile::Read(void *data, int size)
 
     while (recv < sent && !error && mtimer.elapsed() < 10000)
     {
-        MythTimer ctt; // check control socket timer
-        ctt.start();
-        while ((recv < sent) && (ctt.elapsed() < 500))
-        {
-            int ret = sock->Read(
-                ((char *)data) + recv, sent - recv, 500);
-            if (ret > 0)
-            {
-                recv += ret;
-            }
-            else if (ret < 0)
-            {
-                error = true;
-            }
-            if (waitms < 200)
-                waitms += 20;
-        }
+        int ret = sock->Read(((char *)data) + recv, sent - recv, waitms);
+
+        if (ret > 0)
+            recv += ret;
+        else if (ret < 0)
+            error = true;
+
+        waitms += (waitms < 200) ? 20 : 0;
 
         if (controlSock->IsDataAvailable() &&
             controlSock->ReadStringList(strlist, MythSocket::kShortTimeout) &&
