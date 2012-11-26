@@ -928,8 +928,8 @@ bool SchedEditChild::keyPressEvent(QKeyEvent *event)
     return handled;
 }
 
-bool SchedEditChild::Create(const QString xmlfile, const QString winname,
-                            bool isTemplate)
+bool SchedEditChild::CreateEditChild(
+    const QString xmlfile, const QString winname, bool isTemplate)
 {
     if (!LoadWindowFromXML(xmlfile, winname, this))
         return false;
@@ -996,9 +996,12 @@ SchedOptEditor::~SchedOptEditor(void)
 
 bool SchedOptEditor::Create()
 {
-    if (!SchedEditChild::Create("schedule-ui.xml", "scheduleoptionseditor",
-                                m_recordingRule->m_isTemplate))
+    if (!SchedEditChild::CreateEditChild(
+            "schedule-ui.xml", "scheduleoptionseditor",
+            m_recordingRule->m_isTemplate))
+    {
         return false;
+    }
 
     bool err = false;
 
@@ -1064,9 +1067,12 @@ SchedFilterEditor::~SchedFilterEditor(void)
 
 bool SchedFilterEditor::Create()
 {
-    if (!SchedEditChild::Create("schedule-ui.xml", "schedulefiltereditor",
-                                m_recordingRule->m_isTemplate))
+    if (!SchedEditChild::CreateEditChild(
+            "schedule-ui.xml", "schedulefiltereditor",
+            m_recordingRule->m_isTemplate))
+    {
         return false;
+    }
 
     bool err = false;
 
@@ -1175,9 +1181,12 @@ StoreOptEditor::~StoreOptEditor(void)
 
 bool StoreOptEditor::Create()
 {
-    if (!SchedEditChild::Create("schedule-ui.xml", "storageoptionseditor",
-                                m_recordingRule->m_isTemplate))
+    if (!SchedEditChild::CreateEditChild(
+            "schedule-ui.xml", "storageoptionseditor",
+            m_recordingRule->m_isTemplate))
+    {
         return false;
+    }
 
     bool err = false;
 
@@ -1261,9 +1270,12 @@ PostProcEditor::~PostProcEditor(void)
 
 bool PostProcEditor::Create()
 {
-    if (!SchedEditChild::Create("schedule-ui.xml", "postproceditor",
-                                m_recordingRule->m_isTemplate))
+    if (!SchedEditChild::CreateEditChild(
+            "schedule-ui.xml", "postproceditor",
+            m_recordingRule->m_isTemplate))
+    {
         return false;
+    }
 
     bool err = false;
 
@@ -1350,9 +1362,12 @@ MetadataOptions::~MetadataOptions(void)
 
 bool MetadataOptions::Create()
 {
-    if (!SchedEditChild::Create("schedule-ui.xml", "metadataoptions",
-                                m_recordingRule->m_isTemplate))
+    if (!SchedEditChild::CreateEditChild(
+            "schedule-ui.xml", "metadataoptions",
+            m_recordingRule->m_isTemplate))
+    {
         return false;
+    }
 
     bool err = false;
 

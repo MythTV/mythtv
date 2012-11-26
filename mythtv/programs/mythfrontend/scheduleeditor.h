@@ -219,8 +219,8 @@ class SchedEditChild : public MythScreenType
    ~SchedEditChild();
 
     virtual bool keyPressEvent(QKeyEvent *event);
-    virtual bool Create(const QString xmlfile, const QString winname,
-                        bool isTemplate);
+    virtual bool CreateEditChild(
+        QString xmlfile, QString winname, bool isTemplate);
 
   signals:
     void Closing(void);
