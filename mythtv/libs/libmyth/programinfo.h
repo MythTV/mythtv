@@ -291,7 +291,6 @@ class MPUBLIC ProgramInfo
     bool IsSameProgram(const ProgramInfo &other) const;
     bool IsSameTimeslot(const ProgramInfo &other) const;
     bool IsSameProgramTimeslot(const ProgramInfo &other) const;//sched only
-    static int GetRecordingTypeRecPriority(RecordingType type);//sched only
     static bool UsingProgramIDAuthority(void)
     {
         return usingProgIDAuth;

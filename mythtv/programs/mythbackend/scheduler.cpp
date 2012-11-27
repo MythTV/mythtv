@@ -3852,7 +3852,6 @@ void Scheduler::AddNewRecords(void)
 
     struct timeval dbstart, dbend;
 
-    QMap<RecordingType, int> recTypeRecPriorityMap;
     RecList tmpList;
 
     QMap<int, bool> cardMap;
@@ -4142,14 +4141,8 @@ void Scheduler::AddNewRecords(void)
             p->SetRecordingStatus(p->oldrecstatus);
         }
 
-        if (!recTypeRecPriorityMap.contains(p->GetRecordingRuleType()))
-        {
-            recTypeRecPriorityMap[p->GetRecordingRuleType()] =
-                p->GetRecordingTypeRecPriority(p->GetRecordingRuleType());
-        }
-
         p->SetRecordingPriority(
-            p->GetRecordingPriority() + recTypeRecPriorityMap[p->GetRecordingRuleType()] +
+            p->GetRecordingPriority() +
             result.value(51).toInt() +
             ((autopriority) ?
              autopriority - (result.value(45).toInt() * autostrata / 200) : 0));

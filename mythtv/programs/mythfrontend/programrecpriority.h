@@ -38,7 +38,6 @@ class ProgramRecPriorityInfo : public RecordingInfo
                        bool showrerecord = false,
                        uint star_range = 10) const;
 
-    int recTypeRecPriority;
     RecordingType recType;
     int matchCount;
     int recCount;
@@ -109,7 +108,6 @@ class ProgramRecPriority : public ScheduleCommon
     MythUIButtonList *m_programList;
 
     MythUIText *m_schedInfoText;
-    MythUIText *m_rectypePriorityText;
     MythUIText *m_recPriorityText;
     MythUIText *m_recPriorityBText;
     MythUIText *m_finalPriorityText;

@@ -36,7 +36,7 @@ using namespace std;
 // have to hit the db mulitiple times
 ProgramRecPriorityInfo::ProgramRecPriorityInfo(void) :
     RecordingInfo(),
-    recTypeRecPriority(0), recType(kNotRecording),
+    recType(kNotRecording),
     matchCount(0),         recCount(0),
     last_record(QDateTime()),
     avg_delay(0),          autoRecPriority(0),
@@ -47,7 +47,6 @@ ProgramRecPriorityInfo::ProgramRecPriorityInfo(void) :
 ProgramRecPriorityInfo::ProgramRecPriorityInfo(
     const ProgramRecPriorityInfo &other) :
     RecordingInfo(other),
-    recTypeRecPriority(other.recTypeRecPriority),
     recType(other.recType),
     matchCount(other.matchCount),
     recCount(other.recCount),
@@ -81,7 +80,6 @@ ProgramRecPriorityInfo &ProgramRecPriorityInfo::clone(
 {
     RecordingInfo::clone(other);
 
-    recTypeRecPriority = other.recTypeRecPriority;
     recType            = other.recType;
     matchCount         = other.matchCount;
     recCount           = other.recCount;
@@ -97,7 +95,6 @@ ProgramRecPriorityInfo &ProgramRecPriorityInfo::clone(const ProgramInfo &other)
 {
     RecordingInfo::clone(other);
 
-    recTypeRecPriority = 0;
     recType            = kNotRecording;
     matchCount         = 0;
     recCount           = 0;
@@ -113,7 +110,6 @@ void ProgramRecPriorityInfo::clear(void)
 {
     RecordingInfo::clear();
 
-    recTypeRecPriority = 0;
     recType            = kNotRecording;
     matchCount         = 0;
     recCount           = 0;
@@ -149,10 +145,9 @@ class TitleSort
                 return (a->sortTitle < b->sortTitle);
         }
 
-        int finalA = a->GetRecordingPriority() +
-            a->recTypeRecPriority;
-        int finalB = b->GetRecordingPriority() +
-            b->recTypeRecPriority;
+        int finalA = a->GetRecordingPriority();
+        int finalB = b->GetRecordingPriority();
+
         if (finalA != finalB)
         {
             if (m_reverse)
@@ -192,12 +187,10 @@ class ProgramRecPrioritySort
     bool operator()(const ProgramRecPriorityInfo *a, 
                     const ProgramRecPriorityInfo *b) const
     {
-        int finalA = (a->GetRecordingPriority() +
-                      a->autoRecPriority +
-                      a->recTypeRecPriority);
-        int finalB = (b->GetRecordingPriority() +
-                      b->autoRecPriority +
-                      b->recTypeRecPriority);
+        int finalA = a->GetRecordingPriority() +
+                     a->autoRecPriority;
+        int finalB = b->GetRecordingPriority() +
+                     b->autoRecPriority;
 
         if (finalA != finalB)
         {
@@ -249,10 +242,8 @@ class ProgramRecTypeSort
                 return (typeA < typeB);
         }
 
-        int finalA = (a->GetRecordingPriority() +
-                      a->recTypeRecPriority);
-        int finalB = (b->GetRecordingPriority() +
-                      b->recTypeRecPriority);
+        int finalA = a->GetRecordingPriority();
+        int finalB = b->GetRecordingPriority();
 
         if (finalA != finalB)
         {
@@ -416,7 +407,7 @@ ProgramRecPriority::ProgramRecPriority(MythScreenStack *parent,
                                        const QString &name)
                    : ScheduleCommon(parent, name),
                      m_programList(NULL), m_schedInfoText(NULL),
-                     m_rectypePriorityText(NULL), m_recPriorityText(NULL),
+                     m_recPriorityText(NULL),
                      m_recPriorityBText(NULL), m_finalPriorityText(NULL),
                      m_lastRecordedText(NULL), m_lastRecordedDateText(NULL),
                      m_lastRecordedTimeText(NULL), m_channameText(NULL),
@@ -444,8 +435,6 @@ bool ProgramRecPriority::Create()
     m_programList = dynamic_cast<MythUIButtonList *> (GetChild("programs"));
 
     m_schedInfoText = dynamic_cast<MythUIText *> (GetChild("scheduleinfo"));
-    m_rectypePriorityText = dynamic_cast<MythUIText *>
-                                                 (GetChild("rectypepriority"));
     m_recPriorityText = dynamic_cast<MythUIText *> (GetChild("recpriority"));
     m_recPriorityBText = dynamic_cast<MythUIText *> (GetChild("recpriorityB"));
     m_finalPriorityText = dynamic_cast<MythUIText *> (GetChild("finalpriority"));
@@ -938,30 +927,6 @@ void ProgramRecPriority::newTemplate(QString category)
 
 void ProgramRecPriority::scheduleChanged(int recid)
 {
-    int rtRecPriors[12];
-    rtRecPriors[kNotRecording] = 0;
-    rtRecPriors[kSingleRecord] =
-        gCoreContext->GetNumSetting("SingleRecordRecPriority", 1);
-    rtRecPriors[kTimeslotRecord] =
-        gCoreContext->GetNumSetting("TimeslotRecordRecPriority", 0);
-    rtRecPriors[kChannelRecord] =
-        gCoreContext->GetNumSetting("ChannelRecordRecPriority", 0);
-    rtRecPriors[kAllRecord] =
-        gCoreContext->GetNumSetting("AllRecordRecPriority", 0);
-    rtRecPriors[kWeekslotRecord] =
-        gCoreContext->GetNumSetting("WeekslotRecordRecPriority", 0);
-    rtRecPriors[kFindOneRecord] =
-        gCoreContext->GetNumSetting("FindOneRecordRecPriority", -1);
-    rtRecPriors[kOverrideRecord] =
-        gCoreContext->GetNumSetting("OverrideRecordRecPriority", 0);
-    rtRecPriors[kDontRecord] =
-        gCoreContext->GetNumSetting("OverrideRecordRecPriority", 0);
-    rtRecPriors[kFindDailyRecord] =
-        gCoreContext->GetNumSetting("FindOneRecordRecPriority", -1);
-    rtRecPriors[kFindWeeklyRecord] =
-        gCoreContext->GetNumSetting("FindOneRecordRecPriority", -1);
-    rtRecPriors[kTemplateRecord] = 0;
-
     // Assumes that the current item didn't change, which isn't guaranteed
     MythUIButtonListItem *item = m_programList->GetItemCurrent();
     ProgramRecPriorityInfo *pgRecInfo = NULL;
@@ -985,7 +950,6 @@ void ProgramRecPriority::scheduleChanged(int recid)
         progInfo.SetRecordingPriority(record.m_recPriority);
         progInfo.recType = record.m_type;
         progInfo.sortTitle = record.m_title;
-        progInfo.recTypeRecPriority = rtRecPriors[progInfo.recType];
         progInfo.recstatus = record.m_isInactive ? 
             rsInactive : rsUnknown;
         progInfo.profile = record.m_recProfile;
@@ -1020,7 +984,6 @@ void ProgramRecPriority::scheduleChanged(int recid)
         // set the recording priorities of that program
         pgRecInfo->SetRecordingPriority(recPriority);
         pgRecInfo->recType = (RecordingType)rectype;
-        pgRecInfo->recTypeRecPriority = rtRecPriors[pgRecInfo->recType];
         // also set the m_origRecPriorityData with new recording
         // priority so we don't save to db again when we exit
         m_origRecPriorityData[pgRecInfo->GetRecordingRuleID()] =
@@ -1226,8 +1189,7 @@ void ProgramRecPriority::changeRecPriority(int howMuch)
             int progRecPriority = pgRecInfo->GetRecordingPriority();
             int autorecpri = pgRecInfo->autoRecPriority;
             int finalRecPriority = progRecPriority +
-                                   autorecpri +
-                                   pgRecInfo->recTypeRecPriority;
+                                   autorecpri;
 
             item->SetText(QString::number(progRecPriority), "progpriority");
 
@@ -1271,7 +1233,6 @@ void ProgramRecPriority::saveRecPriority(void)
 
 void ProgramRecPriority::FillList(void)
 {
-    int rtRecPriors[12];
     vector<ProgramInfo *> recordinglist;
 
     int autopriority = gCoreContext->GetNumSetting("AutoRecPriority", 0);
@@ -1296,30 +1257,6 @@ void ProgramRecPriority::FillList(void)
         delete (*pgiter);
     }
 
-    // get all the recording type recording priority values
-    rtRecPriors[kNotRecording] = 0;
-    rtRecPriors[kSingleRecord] =
-        gCoreContext->GetNumSetting("SingleRecordRecPriority", 1);
-    rtRecPriors[kTimeslotRecord] =
-        gCoreContext->GetNumSetting("TimeslotRecordRecPriority", 0);
-    rtRecPriors[kChannelRecord] =
-        gCoreContext->GetNumSetting("ChannelRecordRecPriority", 0);
-    rtRecPriors[kAllRecord] =
-        gCoreContext->GetNumSetting("AllRecordRecPriority", 0);
-    rtRecPriors[kWeekslotRecord] =
-        gCoreContext->GetNumSetting("WeekslotRecordRecPriority", 0);
-    rtRecPriors[kFindOneRecord] =
-        gCoreContext->GetNumSetting("FindOneRecordRecPriority", -1);
-    rtRecPriors[kOverrideRecord] =
-        gCoreContext->GetNumSetting("OverrideRecordRecPriority", 0);
-    rtRecPriors[kDontRecord] =
-        gCoreContext->GetNumSetting("OverrideRecordRecPriority", 0);
-    rtRecPriors[kFindDailyRecord] =
-        gCoreContext->GetNumSetting("FindOneRecordRecPriority", -1);
-    rtRecPriors[kFindWeeklyRecord] =
-        gCoreContext->GetNumSetting("FindOneRecordRecPriority", -1);
-    rtRecPriors[kTemplateRecord] = 0;
-
     // get recording types associated with each program from db
     // (hope this is ok to do here, it's so much lighter doing
     // it all at once than once per program)
@@ -1343,14 +1280,13 @@ void ProgramRecPriority::FillList(void)
             QString tempTime = result.value(3).toString();
             QString tempDate = result.value(4).toString();
             RecordingType recType = (RecordingType)result.value(5).toInt();
-            int recTypeRecPriority = rtRecPriors[recType];
             int inactive = result.value(6).toInt();
             QDateTime lastrec = MythDate::as_utc(result.value(7).toDateTime());
             int avgd = result.value(8).toInt();
             QString profile = result.value(9).toString();
 
             // find matching program in m_programData and set
-            // recTypeRecPriority and recType
+            // recType
             QMap<int, ProgramRecPriorityInfo>::Iterator it;
             it = m_programData.find(recordid);
             if (it != m_programData.end())
@@ -1360,7 +1296,6 @@ void ProgramRecPriority::FillList(void)
                 progInfo->sortTitle = progInfo->title;
                 progInfo->sortTitle.remove(QRegExp(tr("^(The |A |An )")));
 
-                progInfo->recTypeRecPriority = recTypeRecPriority;
                 progInfo->recType = recType;
                 progInfo->matchCount =
                     m_listMatch[progInfo->GetRecordingRuleID()];
@@ -1502,8 +1437,7 @@ void ProgramRecPriority::UpdateList()
         int progRecPriority = progInfo->GetRecordingPriority();
         int autorecpri = progInfo->autoRecPriority;
         int finalRecPriority = progRecPriority +
-                               autorecpri +
-                               progInfo->recTypeRecPriority;
+                               autorecpri;
 
         if ((progInfo->rectype == kSingleRecord ||
                 progInfo->rectype == kOverrideRecord ||
@@ -1572,8 +1506,6 @@ void ProgramRecPriority::UpdateList()
         item->SetText(msg, "recpriority", state);
         item->SetText(QString::number(progRecPriority + autorecpri),
                       "recpriorityB", state);
-        item->SetText(QString::number(progInfo->recTypeRecPriority),
-                      "rectypepriority", state);
 
         QString tempDateTime = MythDate::toString(progInfo->last_record,
                                                     MythDate::kDateTimeFull | MythDate::kSimplify |
@@ -1640,12 +1572,11 @@ void ProgramRecPriority::updateInfo(MythUIButtonListItem *item)
     if (!pgRecInfo)
         return;
 
-    int progRecPriority, autorecpri, rectyperecpriority, finalRecPriority;
+    int progRecPriority, autorecpri, finalRecPriority;
 
     progRecPriority = pgRecInfo->GetRecordingPriority();
     autorecpri = pgRecInfo->autoRecPriority;
-    rectyperecpriority = pgRecInfo->recTypeRecPriority;
-    finalRecPriority = progRecPriority + autorecpri + rectyperecpriority;
+    finalRecPriority = progRecPriority + autorecpri;
 
     QString subtitle;
     if (pgRecInfo->subtitle != "(null)" &&
@@ -1677,9 +1608,6 @@ void ProgramRecPriority::updateInfo(MythUIButtonListItem *item)
 
     if (m_schedInfoText)
         m_schedInfoText->SetText(subtitle);
-
-    if (m_rectypePriorityText)
-        m_rectypePriorityText->SetText(QString::number(rectyperecpriority));
 
     if (m_recPriorityText)
     {

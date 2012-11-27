@@ -758,15 +758,6 @@
             <position>770,440</position>
         </textarea>
 
-        <textarea name="rectypeprioritylabel" from="recprioritylabel">
-            <position>500,470</position>
-            <value>Type Priority:</value>
-        </textarea>
-
-        <textarea name="rectypepriority" from="recpriority">
-            <position>670,470</position>
-        </textarea>
-
         <textarea name="finalprioritylabel" from="recprioritylabel">
             <position>500,500</position>
             <value>Final Priority:</value>
