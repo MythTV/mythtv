@@ -74,7 +74,6 @@ NetworkControl::NetworkControl() :
     jumpMap["playmusic"]             = "Play music";
     jumpMap["programfinder"]         = "Program Finder";
     jumpMap["programguide"]          = "Program Guide";
-    jumpMap["recordingpriorities"]   = "Program Recording Priorities";
     jumpMap["ripcd"]                 = "Rip CD";
     jumpMap["musicplaylists"]        = "Select music playlists";
     jumpMap["deleterecordings"]      = "TV Recording Deletion";
@@ -92,7 +91,7 @@ NetworkControl::NetworkControl() :
     jumpMap["previousbox"]           = "Previously Recorded";
     jumpMap["progfinder"]            = "Program Finder";
     jumpMap["guidegrid"]             = "Program Guide";
-    jumpMap["programrecpriority"]    = "Program Recording Priorities";
+    jumpMap["managerecrules"]        = "Manage Recording Rules";
     jumpMap["statusbox"]             = "Status Screen";
     jumpMap["deletebox"]             = "TV Recording Deletion";
     jumpMap["playbackbox"]           = "TV Recording Playback";

@@ -23,10 +23,10 @@
     </button>
 
     <button>
-        <type>TV_RECPRIORITIES</type>
-        <text>Recording Priorities</text>
-        <description>Prioritize some shows over others</description>
-        <action>TV_SET_RECPRIORITIES</action>
+        <type>TV_RECORDING_RULES</type>
+        <text>Recording Rules</text>
+        <description>Edit or delete any recording rule</description>
+        <action>TV_MANAGE_RECORDING_RULES</action>
     </button>
 
     <button>

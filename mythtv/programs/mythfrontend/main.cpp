@@ -441,19 +441,6 @@ static void startManaged(void)
         delete viewsched;
 }
 
-static void startProgramRecPriorities(void)
-{
-    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-
-    ProgramRecPriority *progRecPrior = new ProgramRecPriority(mainStack,
-                                                        "ProgramRecPriority");
-
-    if (progRecPrior->Create())
-        mainStack->AddScreen(progRecPrior);
-    else
-        delete progRecPrior;
-}
-
 static void startManageRecordingRules(void)
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
@@ -807,8 +794,6 @@ static void TVMenuCallback(void *data, QString &selection)
         startCustomEdit();
     else if (sel == "tv_fix_conflicts")
         startManaged();
-    else if (sel == "tv_set_recpriorities")
-        startProgramRecPriorities();
     else if (sel == "tv_manage_recording_rules")
         startManageRecordingRules();
     else if (sel == "tv_progfind")
@@ -1293,8 +1278,6 @@ static void InitJumpPoints(void)
      //    "", "", startSearch);
      REG_JUMPLOC(QT_TRANSLATE_NOOP("MythControls", "Manage Recordings / "
          "Fix Conflicts"), "", "", startManaged, "VIEWSCHEDULED");
-     REG_JUMP(QT_TRANSLATE_NOOP("MythControls", "Program Recording "
-         "Priorities"), "", "", startProgramRecPriorities);
      REG_JUMP(QT_TRANSLATE_NOOP("MythControls", "Manage Recording Rules"),
          "", "", startManageRecordingRules);
      REG_JUMP(QT_TRANSLATE_NOOP("MythControls", "Channel Recording "

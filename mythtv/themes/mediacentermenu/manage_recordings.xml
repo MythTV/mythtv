@@ -38,11 +38,4 @@
         <action>TV_PREVIOUS</action>
     </button>
 
-    <button>
-        <type>TV_RECPRIORITIES</type>
-        <text>Set Priorities</text>
-        <description>Prioritize some shows over others</description>
-        <action>TV_SET_RECPRIORITIES</action>
-    </button>
-
 </mythmenu>

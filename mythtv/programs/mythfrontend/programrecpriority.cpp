@@ -425,11 +425,7 @@ ProgramRecPriority::~ProgramRecPriority()
 
 bool ProgramRecPriority::Create()
 {
-    QString window_name = "programrecpriority";
-    if (objectName() == "ManageRecRules")
-        window_name = "managerecrules";
-
-    if (!LoadWindowFromXML("schedule-ui.xml", window_name, this))
+    if (!LoadWindowFromXML("schedule-ui.xml", "managerecrules", this))
         return false;
 
     m_programList = dynamic_cast<MythUIButtonList *> (GetChild("programs"));
