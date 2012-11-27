@@ -324,9 +324,7 @@ bool MythMediaDevice::isSameDevice(const QString &path)
 
 void MythMediaDevice::setSpeed(int speed)
 {
-    LOG(VB_MEDIA, LOG_ERR,
-            QString("Cannot setSpeed(%1) for device %2 - not implemented.")
-            .arg(speed).arg(m_DevicePath));
+    setDeviceSpeed(m_DevicePath.toLocal8Bit().constData(), speed);
 }
 
 MythMediaError MythMediaDevice::lock()

@@ -138,8 +138,7 @@ public:
     virtual bool checkOK(void);
     virtual MythMediaStatus checkMedia(void);
     virtual MythMediaError eject(bool open_close = true);
-    virtual void setSpeed(int speed);
-    virtual void setSpeed(const char *device, int speed);
+    virtual void setDeviceSpeed(const char *device, int speed);
     virtual bool isSameDevice(const QString &path);
     virtual MythMediaError lock(void);
     virtual MythMediaError unlock(void);
@@ -665,12 +664,7 @@ bool MythCDROMLinux::isSameDevice(const QString &path)
 /*
  * \brief obtained from the mplayer project
  */
-void MythCDROMLinux::setSpeed(int speed)
-{
-    MythCDROMLinux::setSpeed(m_DevicePath.toLocal8Bit().constData(), speed);
-}
-
-void MythCDROMLinux::setSpeed(const char *device, int speed)
+void MythCDROMLinux::setDeviceSpeed(const char *device, int speed)
 {
     int fd;
     unsigned char buffer[28];
@@ -697,14 +691,16 @@ void MythCDROMLinux::setSpeed(const char *device, int speed)
     {
         close(fd);
         LOG(VB_MEDIA, LOG_ERR, LOC +
-            QString(":setSpeed() Failed. device %1 not found") .arg(device));
+            QString(":setDeviceSpeed() Failed. device %1 not found")
+            .arg(device));
         return;
     }
 
     if (!S_ISBLK(st.st_mode))
     {
         close(fd);
-        LOG(VB_MEDIA, LOG_ERR, LOC + ":setSpeed() Failed. Not a block device");
+        LOG(VB_MEDIA, LOG_ERR, LOC +
+            ":setDeviceSpeed() Failed. Not a block device");
         return;
     }
 
@@ -721,7 +717,7 @@ void MythCDROMLinux::setSpeed(const char *device, int speed)
             rate = 0;
             buffer[0] = 4;
             LOG(VB_MEDIA, LOG_INFO, LOC + 
-                ":setSpeed() - Restored CD/DVD Speed");
+                ":setDeviceSpeed() - Restored CD/DVD Speed");
             break;
         }
         default:
@@ -732,7 +728,7 @@ void MythCDROMLinux::setSpeed(const char *device, int speed)
             rate = (speed > 0 && speed < 100) ? speed * 177 : speed;
 
             LOG(VB_MEDIA, LOG_INFO, LOC +
-                QString(":setSpeed() - Limiting CD/DVD Speed to %1KB/s")
+                QString(":setDeviceSpeed() - Limiting CD/DVD Speed to %1KB/s")
                     .arg(rate));
             break;
         }
@@ -779,7 +775,7 @@ void MythCDROMLinux::setSpeed(const char *device, int speed)
                 " Limit CD/DVD CDROM_SELECT_SPEED Failed");
         }
         LOG(VB_MEDIA, LOG_INFO, LOC +
-            ":setSpeed() - CD/DVD Speed Set Successful");
+            ":setDeviceSpeed() - CD/DVD Speed Set Successful");
     }
 
     close(fd);

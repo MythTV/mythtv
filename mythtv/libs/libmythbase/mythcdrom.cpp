@@ -125,9 +125,9 @@ void MythCDROM::onDeviceMounted()
     }
 }
 
-void MythCDROM::setSpeed(const char *devicePath, int speed)
+void MythCDROM::setDeviceSpeed(const char *devicePath, int speed)
 {
     LOG(VB_MEDIA, LOG_INFO, 
-        QString("SetSpeed(%1,%2) - not implemented on this OS.")
-                      .arg(devicePath).arg(speed));
+        QString("SetDeviceSpeed(%1,%2) - not implemented on this OS.")
+        .arg(devicePath).arg(speed));
 }
