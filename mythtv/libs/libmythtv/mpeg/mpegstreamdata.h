@@ -100,8 +100,8 @@ class MTV_PUBLIC MPEGStreamData : public EITSource
     void SetCaching(bool cacheTables) { _cache_tables = cacheTables; }
     void SetListeningDisabled(bool lt) { _listening_disabled = lt; }
 
-    virtual void Reset(void) { Reset(-1); }
-    virtual void Reset(int desiredProgram);
+    virtual void Reset(void) { MPEGStreamData::ResetMPEG(-1); }
+    virtual void ResetMPEG(int desiredProgram);
 
     /// \brief Current Offset from computer time to DVB time in seconds
     double TimeOffset(void) const;

@@ -91,7 +91,7 @@ MPEGStreamData::MPEGStreamData(int desiredProgram, bool cacheTables)
 
 MPEGStreamData::~MPEGStreamData()
 {
-    Reset(-1);
+    ResetMPEG(-1);
     SetPATSingleProgram(NULL);
     SetPMTSingleProgram(NULL);
 
@@ -135,7 +135,7 @@ void MPEGStreamData::SetDesiredProgram(int p)
     ReturnCachedPATTables(pats);
 
     if (reset)
-        Reset(p);
+        ResetMPEG(p);
 }
 
 void MPEGStreamData::SetRecordingType(const QString &recording_type)
@@ -167,7 +167,7 @@ void MPEGStreamData::SetEITRate(float rate)
     _eit_rate = rate;
 }
 
-void MPEGStreamData::Reset(int desiredProgram)
+void MPEGStreamData::ResetMPEG(int desiredProgram)
 {
     _desired_program       = desiredProgram;
     _recording_type        = "all";

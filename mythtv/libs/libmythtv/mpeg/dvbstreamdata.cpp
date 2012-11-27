@@ -31,7 +31,7 @@ DVBStreamData::DVBStreamData(uint desired_netid,  uint desired_tsid,
 
 DVBStreamData::~DVBStreamData()
 {
-    Reset(_desired_netid, _desired_tsid, _desired_program);
+    Reset();
 
     QMutexLocker locker(&_listener_lock);
     _dvb_main_listeners.clear();
@@ -67,7 +67,7 @@ void DVBStreamData::SetDesiredService(uint netid, uint tsid, int serviceid)
     }
 
     if (reset)
-        Reset(netid, tsid, serviceid);
+        ResetDVB(netid, tsid, serviceid);
 }
 
 
@@ -176,10 +176,15 @@ bool DVBStreamData::IsRedundant(uint pid, const PSIPTable &psip) const
     return false;
 }
 
-void DVBStreamData::Reset(uint desired_netid, uint desired_tsid,
-                          int desired_serviceid)
+void DVBStreamData::ResetMPEG(int desiredProgram)
 {
-    MPEGStreamData::Reset(desired_serviceid);
+    ResetDVB(0, 0, desiredProgram);
+}
+
+void DVBStreamData::ResetDVB(uint desired_netid, uint desired_tsid,
+                             int desired_serviceid)
+{
+    MPEGStreamData::ResetMPEG(desired_serviceid);
 
     _desired_netid = desired_netid;
     _desired_tsid  = desired_tsid;

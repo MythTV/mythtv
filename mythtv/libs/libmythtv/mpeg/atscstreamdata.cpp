@@ -46,7 +46,7 @@ ATSCStreamData::ATSCStreamData(int desiredMajorChannel,
 
 ATSCStreamData::~ATSCStreamData()
 {
-    Reset(-1,-1);
+    Reset();
 
     QMutexLocker locker(&_listener_lock);
     _atsc_main_listeners.clear();
@@ -107,21 +107,22 @@ void ATSCStreamData::SetDesiredChannel(int major, int minor)
     ReturnCachedCVCTTables(cvcts);
 
     if (reset)
-        Reset(major, minor);
+        ResetATSC(major, minor);
 }
 
-void ATSCStreamData::Reset(int desiredProgram)
+void ATSCStreamData::ResetMPEG(int desiredProgram)
 {
-    MPEGStreamData::Reset(desiredProgram);
+    Reset();
+    MPEGStreamData::ResetMPEG(desiredProgram);
     AddListeningPID(ATSC_PSIP_PID);
 }
 
-void ATSCStreamData::Reset(int major, int minor)
+void ATSCStreamData::ResetATSC(int major, int minor)
 {
+    MPEGStreamData::ResetMPEG(-1);
     _desired_major_channel = major;
     _desired_minor_channel = minor;
 
-    MPEGStreamData::Reset(-1);
     _mgt_version = -1;
     _tvct_version.clear();
     _cvct_version.clear();

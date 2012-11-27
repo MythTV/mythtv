@@ -1180,7 +1180,7 @@ void MpegRecorder::Reset(void)
         curRecording->ClearPositionMap(MARK_GOP_BYFRAME);
     }
     if (_stream_data)
-        _stream_data->Reset(_stream_data->DesiredProgram());
+        _stream_data->ResetMPEG(_stream_data->DesiredProgram());
 }
 
 void MpegRecorder::Pause(bool clear)
@@ -1228,7 +1228,7 @@ bool MpegRecorder::PauseAndWait(int timeout)
         StartEncoding();
 
         if (_stream_data)
-            _stream_data->Reset(_stream_data->DesiredProgram());
+            _stream_data->ResetMPEG(_stream_data->DesiredProgram());
 
         paused = false;
     }

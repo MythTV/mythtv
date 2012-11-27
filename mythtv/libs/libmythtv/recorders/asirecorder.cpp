@@ -90,7 +90,7 @@ void ASIRecorder::run(void)
     {
         const ProgramAssociationTable *pat = m_channel->GetGeneratedPAT();
         const ProgramMapTable         *pmt = m_channel->GetGeneratedPMT();
-        _stream_data->Reset(pat->ProgramNumber(0));
+        _stream_data->ResetMPEG(pat->ProgramNumber(0));
         _stream_data->HandleTables(MPEG_PAT_PID, *pat);
         _stream_data->HandleTables(pat->ProgramPID(0), *pmt);
     }
