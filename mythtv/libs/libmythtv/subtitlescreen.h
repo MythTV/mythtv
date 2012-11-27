@@ -44,10 +44,8 @@ class SubtitleScreen : public MythScreenType
 
     QSize CalcTextSize(const QString &text,
                        const CC708CharacterAttribute &format,
-                       bool teletext,
                        float layoutSpacing) const;
-    int CalcPadding(const CC708CharacterAttribute &format,
-                    bool teletext, bool isLeft) const;
+    int CalcPadding(const CC708CharacterAttribute &format, bool isLeft) const;
 
     void RegisterExpiration(MythUIType *shape, long long endTime)
     {
@@ -78,8 +76,7 @@ class SubtitleScreen : public MythScreenType
     void AddScaledImage(QImage &img, QRect &pos);
     void Clear708Cache(int num);
     void InitializeFonts(bool wasResized);
-    MythFontProperties* GetFont(CC708CharacterAttribute attr,
-                                bool teletext) const;
+    MythFontProperties* GetFont(CC708CharacterAttribute attr) const;
     void SetFontSize(int pixelSize) { m_fontSize = pixelSize; }
 
     MythPlayer        *m_player;
@@ -122,19 +119,19 @@ class FormattedTextChunk
 {
   public:
     FormattedTextChunk(const QString &t, CC708CharacterAttribute formatting,
-                       SubtitleScreen *p, bool teletext = false)
-        : text(t), format(formatting), parent(p), isTeletext(teletext)
+                       SubtitleScreen *p)
+        : text(t), format(formatting), parent(p)
     {
     }
-    FormattedTextChunk(void) : parent(NULL), isTeletext(false) {}
+    FormattedTextChunk(void) : parent(NULL) {}
 
     QSize CalcSize(float layoutSpacing = 0.0f) const
     {
-        return parent->CalcTextSize(text, format, isTeletext, layoutSpacing);
+        return parent->CalcTextSize(text, format, layoutSpacing);
     }
     int CalcPadding(bool isLeft) const
     {
-        return parent->CalcPadding(format, isTeletext, isLeft);
+        return parent->CalcPadding(format, isLeft);
     }
     bool Split(FormattedTextChunk &newChunk);
     QString ToLogString(void) const;
@@ -142,7 +139,6 @@ class FormattedTextChunk
     QString text;
     CC708CharacterAttribute format;
     SubtitleScreen *parent; // where fonts and sizes are kept
-    bool isTeletext;
 };
 
 class FormattedTextLine

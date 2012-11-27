@@ -70,8 +70,7 @@ public:
     ~SubtitleFormat(void);
     MythFontProperties *GetFont(const QString &family,
                                 const CC708CharacterAttribute &attr,
-                                int pixelSize, bool isTeletext,
-                                int zoom, int stretch);
+                                int pixelSize, int zoom, int stretch);
     MythUIShape *GetBackground(MythUIType *parent, const QString &name,
                                const QString &family,
                                const CC708CharacterAttribute &attr);
@@ -392,13 +391,10 @@ QSet<QString> SubtitleFormat::Diff(const QString &family,
 MythFontProperties *
 SubtitleFormat::GetFont(const QString &family,
                         const CC708CharacterAttribute &attr,
-                        int pixelSize, bool isTeletext,
-                        int zoom, int stretch)
+                        int pixelSize, int zoom, int stretch)
 {
     int origPixelSize = pixelSize;
     float scale = zoom / 100.0;
-    if (isTeletext)
-        scale = scale * 17 / 25;
     if ((attr.pen_size & 0x3) == k708AttrSizeSmall)
         scale = scale * 32 / 42;
     else if ((attr.pen_size & 0x3) == k708AttrSizeLarge)
@@ -1204,19 +1200,11 @@ void SubtitleScreen::DisplayDVDButton(AVSubtitle* dvdButton, QRect &buttonPos)
 /// input string.  Bogus control characters are left unchanged.  If the
 /// buffer starts with a valid control character, the output parameters
 /// are corresondingly updated (and the control character is stripped).
-static QString extract_cc608(
-    QString &text, bool teletextmode, int &color,
-    bool &isItalic, bool &isUnderline)
+static QString extract_cc608(QString &text, int &color,
+                             bool &isItalic, bool &isUnderline)
 {
     QString result;
     QString orig(text);
-
-    if (teletextmode)
-    {
-        result = text;
-        text = QString::null;
-        return result;
-    }
 
     // Handle an initial control sequence.
     if (text.length() >= 1 && text[0] >= 0x7000)
@@ -1413,11 +1401,10 @@ void SubtitleScreen::AddScaledImage(QImage &img, QRect &pos)
     }
 }
 
-MythFontProperties* SubtitleScreen::GetFont(CC708CharacterAttribute attr,
-                                            bool teletext) const
+MythFontProperties* SubtitleScreen::GetFont(CC708CharacterAttribute attr) const
 {
     return m_format->GetFont(m_family, attr, m_fontSize,
-                             teletext, m_textFontZoom, m_fontStretch);
+                             m_textFontZoom, m_fontStretch);
 }
 
 void SubtitleScreen::SetZoom(int percent)
@@ -1454,22 +1441,16 @@ void FormattedTextSubtitle::InitFromCC608(vector<CC608Text*> &buffers,
     if (buffers.empty())
         return;
     vector<CC608Text*>::iterator i = buffers.begin();
-    bool teletextmode = (*i)->teletextmode;
-
-    int xscale = teletextmode ? 40 : 36;
-    int yscale = teletextmode ? 25 : 17;
-    // For the purpose of pixel size calculation, use a normalized
-    // size based on 17 non-teletext rows rather than 25.  The
-    // shrinking is done in GetFont so that the theme can supply a
-    // uniform normalized pixelsize value.
-    int pixelSize = m_safeArea.height() / (/*yscale*/17 * LINE_SPACING);
+    int xscale = 36;
+    int yscale = 17;
+    int pixelSize = m_safeArea.height() / (yscale * LINE_SPACING);
     int fontwidth = 0;
     int xmid = 0;
     if (parent)
     {
         parent->SetFontSize(pixelSize);
         CC708CharacterAttribute def_attr(false, false, false, clr[0]);
-        QFont *font = parent->GetFont(def_attr, teletextmode)->GetFace();
+        QFont *font = parent->GetFont(def_attr)->GetFace();
         QFontMetrics fm(*font);
         fontwidth = fm.averageCharWidth();
         xmid = m_safeArea.width() / 2;
@@ -1486,7 +1467,7 @@ void FormattedTextSubtitle::InitFromCC608(vector<CC608Text*> &buffers,
         const bool isBold = false;
         QString text(cc->text);
 
-        int orig_x = teletextmode ? cc->y : cc->x;
+        int orig_x = cc->x;
         // position as if we use a fixed size font
         // - font size already has zoom factor applied
 
@@ -1498,7 +1479,7 @@ void FormattedTextSubtitle::InitFromCC608(vector<CC608Text*> &buffers,
             // fallback
             x = (orig_x + 3) * m_safeArea.width() / xscale;
 
-        int orig_y = teletextmode ? cc->x : cc->y;
+        int orig_y = cc->y;
         int y;
         if (orig_y < yscale / 2)
             // top half -- anchor up
@@ -1513,12 +1494,10 @@ void FormattedTextSubtitle::InitFromCC608(vector<CC608Text*> &buffers,
         while (!text.isNull())
         {
             QString captionText =
-                extract_cc608(text, cc->teletextmode,
-                              color, isItalic, isUnderline);
+                extract_cc608(text, color, isItalic, isUnderline);
             CC708CharacterAttribute attr(isItalic, isBold, isUnderline,
                                          clr[min(max(0, color), 7)]);
-            FormattedTextChunk chunk(captionText, attr, parent,
-                                     cc->teletextmode);
+            FormattedTextChunk chunk(captionText, attr, parent);
             line.chunks += chunk;
             LOG(VB_VBI, LOG_INFO,
                 QString("Adding cc608 chunk (%1,%2): %3")
@@ -1680,7 +1659,6 @@ bool FormattedTextChunk::Split(FormattedTextChunk &newChunk)
             QString("Failed to split chunk '%1'").arg(text));
         return false;
     }
-    newChunk.isTeletext = isTeletext;
     newChunk.parent = parent;
     newChunk.format = format;
     newChunk.text = text.mid(lastSpace + 1).trimmed() + ' ';
@@ -1895,8 +1873,7 @@ bool FormattedTextSubtitle::Draw(const QString &base,
              chunk != m_lines[i].chunks.constEnd();
              ++chunk)
         {
-            MythFontProperties *mythfont =
-                parent->GetFont((*chunk).format, (*chunk).isTeletext);
+            MythFontProperties *mythfont = parent->GetFont((*chunk).format);
             if (!mythfont)
                 continue;
             QFontMetrics font(*(mythfont->GetFace()));
@@ -1960,8 +1937,6 @@ bool FormattedTextSubtitle::Draw(const QString &base,
             LOG(VB_VBI, LOG_INFO,
                 QString("Drawing chunk at (%1,%2): %3")
                 .arg(x).arg(y).arg((*chunk).ToLogString()));
-            if ((*chunk).isTeletext)
-                LOG(VB_GENERAL, LOG_INFO, "DEPRECATED_608_TELETEXT");
 
             x += chunk_sz.width();
             first = false;
@@ -2050,10 +2025,9 @@ static QSize CalcShadowOffsetPadding(MythFontProperties *mythfont)
 
 QSize SubtitleScreen::CalcTextSize(const QString &text,
                                    const CC708CharacterAttribute &format,
-                                   bool teletext,
                                    float layoutSpacing) const
 {
-    MythFontProperties *mythfont = GetFont(format, teletext);
+    MythFontProperties *mythfont = GetFont(format);
     QFont *font = mythfont->GetFace();
     QFontMetrics fm(*font);
     int width = fm.width(text);
@@ -2068,9 +2042,9 @@ QSize SubtitleScreen::CalcTextSize(const QString &text,
 // is on the left side or the right side of the text.  Padding on the
 // right needs to add the shadow and offset padding.
 int SubtitleScreen::CalcPadding(const CC708CharacterAttribute &format,
-                                bool teletext, bool isLeft) const
+                                bool isLeft) const
 {
-    MythFontProperties *mythfont = GetFont(format, teletext);
+    MythFontProperties *mythfont = GetFont(format);
     QFont *font = mythfont->GetFace();
     QFontMetrics fm(*font);
     int result = fm.maxWidth() * PAD_WIDTH;
@@ -2084,7 +2058,8 @@ QString SubtitleScreen::GetTeletextFontName(void)
     SubtitleFormat format;
     CC708CharacterAttribute attr(false, false, false, Qt::white);
     MythFontProperties *mythfont =
-        format.GetFont(kSubFamilyTeletext, attr, 20, false, 100, 100);
+        format.GetFont(kSubFamilyTeletext, attr,
+                       /*pixelsize*/20, /*zoom*/100, /*stretch*/100);
     return mythfont->face().family();
 }
 

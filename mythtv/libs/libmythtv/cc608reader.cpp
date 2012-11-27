@@ -118,16 +118,21 @@ CC608Buffer *CC608Reader::GetOutputText(bool &changed, int &streamIdx)
                     memcpy(&st, inpos, sizeof(st));
                     inpos += sizeof(st);
 
+#if 0
+                    // With the removal of support for cc608 teletext,
+                    // we still want to skip over any teletext packets
+                    // that might inadvertently be present.
                     CC608Text *cc = new CC608Text(
-                        QString((const char*) inpos), st.row, st.col, true);
+                        QString((const char*) inpos), st.row, st.col);
 
                     m_state[streamIdx].m_output.lock.lock();
                     m_state[streamIdx].m_output.buffers.push_back(cc);
                     m_state[streamIdx].m_output.lock.unlock();
+#endif // 0
 
                     inpos += st.len;
                 }
-                changed = true;
+                //changed = true;
             }
         }
         else if (m_inputBuffers[m_writePosition].type == 'C')
@@ -255,7 +260,7 @@ int CC608Reader::Update(unsigned char *inpos)
                 tmpcc = new CC608Text(
                     m_state[streamIdx].m_outputText,
                     m_state[streamIdx].m_outputCol,
-                    m_state[streamIdx].m_outputRow, false);
+                    m_state[streamIdx].m_outputRow);
                 ccbuf->push_back(tmpcc);
 #if 0
                 if (ccbuf->size() > 4)

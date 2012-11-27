@@ -15,12 +15,11 @@
 class CC608Text
 {
   public:
-    CC608Text(QString T, int X, int Y, int TT) :
-        text(T), x(X), y(Y), teletextmode(TT) {}
+    CC608Text(QString T, int X, int Y) :
+        text(T), x(X), y(Y) {}
     QString text;
     int x;
     int y;
-    bool teletextmode;
 };
 
 struct TextContainer
