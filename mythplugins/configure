@@ -521,7 +521,7 @@ EOF
 fi
 
 is_qmake4(){
-    $1 --version 2>&1 | egrep -q -e "Qt version 4\.[5-9]\.[0-9]"
+    $1 --version 2>&1 | egrep -q -e "Qt version 4\.[8-9]\.[0-9]"
 }
 
 # bring in mythtv config
@@ -559,11 +559,11 @@ EXTRALIBS=$(cat mythconfig.mak | grep -e "^EXTRALIBS=")
 EXTRALIBS=${EXTRALIBS#EXTRALIBS=}
 
 if ! is_qmake4 $qmake; then
-    is_qmake4 qmake-qt4 && qmake=qmake-qt4 || die "qmake for Qt4.6 or newer not found.\nPlease specify the correct qmake with --qmake="
+    is_qmake4 qmake-qt4 && qmake=qmake-qt4 || die "qmake for Qt4.8 or newer not found.\nPlease specify the correct qmake with --qmake="
 fi
 
-if ! expr $($qmake -query QT_VERSION) : "4\.[6-9]\.[0-9]" >/dev/null; then
-    die "Qt4.6 or newer is required to build MythTV."
+if ! expr $($qmake -query QT_VERSION) : "4\.[8-9]\.[0-9]" >/dev/null; then
+    die "Qt4.8 or newer is required to build MythTV."
 fi
 
 # rely on what was discover during MythTV configure
