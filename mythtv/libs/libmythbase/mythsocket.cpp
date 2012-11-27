@@ -48,14 +48,18 @@ Q_DECLARE_METATYPE ( const QStringList * );
 Q_DECLARE_METATYPE ( QStringList * );
 Q_DECLARE_METATYPE ( const char * );
 Q_DECLARE_METATYPE ( char * );
+Q_DECLARE_METATYPE ( bool * );
 Q_DECLARE_METATYPE ( int * );
 Q_DECLARE_METATYPE ( QHostAddress );
 static int x0 = qRegisterMetaType< const QStringList * >();
 static int x1 = qRegisterMetaType< QStringList * >();
 static int x2 = qRegisterMetaType< const char * >();
 static int x3 = qRegisterMetaType< char * >();
-static int x4 = qRegisterMetaType< int * >();
-static int x5 = qRegisterMetaType< QHostAddress >();
+static int x4 = qRegisterMetaType< bool * >();
+static int x5 = qRegisterMetaType< int * >();
+static int x6 = qRegisterMetaType< QHostAddress >();
+int s_dummy_meta_variable_to_suppress_gcc_warning =
+    x0 + x1 + x2 + x3 + x4 + x5 + x6;
 
 static QString to_sample(const QByteArray &payload)
 {
