@@ -2207,7 +2207,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
         }
     }
 
-    if ((uint)ic->bit_rate > bitrate)
+    if (ic && ((uint)ic->bit_rate > bitrate))
         bitrate = (uint)ic->bit_rate;
 
     if (bitrate > 0)
