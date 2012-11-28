@@ -253,20 +253,20 @@ static bool comp_overlap(RecordingInfo *a, RecordingInfo *b)
     // won't record except for those from kDontRecord rules.  This
     // will force them to yield to a rule that might record.
     // Otherwise, more specific record type beats less specific.
-    int apri = RecTypePriority(a->GetRecordingRuleType());
+    int aprec = RecTypePrecedence(a->GetRecordingRuleType());
     if (a->GetRecordingStatus() != rsUnknown &&
         a->GetRecordingStatus() != rsDontRecord)
     {
-        apri += 100;
+        aprec += 100;
     }
-    int bpri = RecTypePriority(b->GetRecordingRuleType());
+    int bprec = RecTypePrecedence(b->GetRecordingRuleType());
     if (b->GetRecordingStatus() != rsUnknown &&
         b->GetRecordingStatus() != rsDontRecord)
     {
-        bpri += 100;
+        bprec += 100;
     }
-    if (apri != bpri)
-        return apri < bpri;
+    if (aprec != bprec)
+        return aprec < bprec;
 
     if (a->GetFindID() != b->GetFindID())
         return a->GetFindID() > b->GetFindID();
@@ -335,11 +335,11 @@ static bool comp_priority(RecordingInfo *a, RecordingInfo *b)
     if (apast != bpast)
         return apast < bpast;
 
-    int apri = RecTypePriority(a->GetRecordingRuleType());
-    int bpri = RecTypePriority(b->GetRecordingRuleType());
+    int aprec = RecTypePrecedence(a->GetRecordingRuleType());
+    int bprec = RecTypePrecedence(b->GetRecordingRuleType());
 
-    if (apri != bpri)
-        return apri < bpri;
+    if (aprec != bprec)
+        return aprec < bprec;
 
     if (a->GetRecordingStartTime() != b->GetRecordingStartTime())
     {

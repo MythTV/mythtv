@@ -4,7 +4,7 @@
 
 /// Converts a RecordingType to a simple integer so it's specificity can
 /// be compared to another.  Lower number means more specific.
-int RecTypePriority(RecordingType rectype)
+int RecTypePrecedence(RecordingType rectype)
 {
     switch (rectype)
     {

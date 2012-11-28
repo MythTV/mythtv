@@ -36,7 +36,7 @@ MPUBLIC QString toRawString(RecordingType);
 MPUBLIC QChar   toQChar( RecordingType);
 MPUBLIC RecordingType recTypeFromString(QString);
 
-MPUBLIC int RecTypePriority(RecordingType rectype);
+MPUBLIC int RecTypePrecedence(RecordingType rectype);
 
 typedef enum RecordingDupInTypes
 {

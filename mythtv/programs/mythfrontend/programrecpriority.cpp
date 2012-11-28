@@ -156,8 +156,8 @@ class TitleSort
                 return finalA > finalB;
         }
 
-        int typeA = RecTypePriority(a->recType);
-        int typeB = RecTypePriority(b->recType);
+        int typeA = RecTypePrecedence(a->recType);
+        int typeB = RecTypePrecedence(b->recType);
 
         if (typeA != typeB)
         {
@@ -200,8 +200,8 @@ class ProgramRecPrioritySort
                 return finalA > finalB;
         }
 
-        int typeA = RecTypePriority(a->recType);
-        int typeB = RecTypePriority(b->recType);
+        int typeA = RecTypePrecedence(a->recType);
+        int typeB = RecTypePrecedence(b->recType);
 
         if (typeA != typeB)
         {
@@ -231,8 +231,8 @@ class ProgramRecTypeSort
     bool operator()(const ProgramRecPriorityInfo *a, 
                     const ProgramRecPriorityInfo *b) const
     {
-        int typeA = RecTypePriority(a->recType);
-        int typeB = RecTypePriority(b->recType);
+        int typeA = RecTypePrecedence(a->recType);
+        int typeB = RecTypePrecedence(b->recType);
 
         if (typeA != typeB)
         {
