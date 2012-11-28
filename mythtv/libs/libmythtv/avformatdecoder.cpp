@@ -1049,13 +1049,12 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
     // If watching pre-recorded television or video use the marked duration
     // from the db if it exists, else ffmpeg duration
-    int64_t dur = 0, frames = 0;
+    int64_t dur = 0;
 
     if (m_playbackinfo)
     {
         dur = m_playbackinfo->QueryTotalDuration();
         dur /= 1000000;
-        frames = m_playbackinfo->QueryTotalFrames();
     }
 
     if (dur == 0)
