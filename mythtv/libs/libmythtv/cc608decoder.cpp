@@ -1265,16 +1265,15 @@ void CC608Decoder::XDSPacketParse(const vector<unsigned char> &xds_buf)
         ; // reserved
     else if (xds_class == 0x0d) // cont code: 0x0e
         handled = true; // undefined
-#if DEBUG_XDS
-    if (!handled)
+
+    if (DEBUG_XDS && !handled)
     {
         LOG(VB_VBI, LOG_INFO, QString("XDS: ") +
-                QString("Unhandled packet (0x%1 0x%2) sz(%3) '%4'")
-                .arg(xds_buf[0],0,16).arg(xds_buf[1],0,16)
-                .arg(xds_buf.size())
-                .arg(XDSDecodeString(xds_buf, 2, xds_buf.size() - 2)));
+            QString("Unhandled packet (0x%1 0x%2) sz(%3) '%4'")
+            .arg(xds_buf[0],0,16).arg(xds_buf[1],0,16)
+            .arg(xds_buf.size())
+            .arg(XDSDecodeString(xds_buf, 2, xds_buf.size() - 2)));
     }
-#endif // DEBUG_XDS
 }
 
 bool CC608Decoder::XDSPacketCRC(const vector<unsigned char> &xds_buf)
