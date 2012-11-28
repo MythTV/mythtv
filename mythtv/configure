@@ -4729,7 +4729,6 @@ if enabled gxx; then
         check_cxxflags -Wmissing-declarations
     fi
     check_cxxflags -Wno-switch
-    check_cxxflags -Wredundant-decls
     check_cxxflags -Woverloaded-virtual
     check_cxxflags -funit-at-a-time
 elif enabled icpc; then
