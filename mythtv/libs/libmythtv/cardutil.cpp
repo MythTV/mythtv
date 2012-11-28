@@ -2380,7 +2380,7 @@ QString CardUtil::GetHDHRdesc(const QString &device)
         if (!validID || !hdhomerun_discover_validate_device_id(dev))
             return QObject::tr("Invalid Device ID");
     }
-
+    (void) deviceIsIP;
 
     LOG(VB_GENERAL, LOG_INFO, "CardUtil::GetHDHRdescription(" + device +
                               ") - trying to locate device");

@@ -574,8 +574,6 @@ void H264Parser::processRBSP(bool rbsp_complete)
 */
 bool H264Parser::decode_Header(GetBitContext *gb)
 {
-    uint first_mb_in_slice;
-
     is_keyframe = false;
 
     if (log2_max_frame_num == 0 || pic_order_present_flag == -1)
@@ -601,7 +599,7 @@ bool H264Parser::decode_Header(GetBitContext *gb)
       that precedes the current slice in decoding order and has the
       same value of colour_plane_id.
      */
-    first_mb_in_slice = get_ue_golomb(gb);
+    //uint first_mb_in_slice = get_ue_golomb(gb);
 
     /*
       slice_type specifies the coding type of the slice according to
@@ -808,7 +806,6 @@ void H264Parser::decode_SPS(GetBitContext * gb)
     int  offset_for_non_ref_pic;
     int  offset_for_top_to_bottom_field;
     uint tmp;
-    bool gaps_in_frame_num_allowed_flag;
 
     /*
       pic_order_cnt_type specifies the method to decode picture order
@@ -866,6 +863,8 @@ void H264Parser::decode_SPS(GetBitContext * gb)
         for (uint idx = 0; idx < tmp; ++idx)
             get_se_golomb(gb);  // offset_for_ref_frame[i]
     }
+    (void) offset_for_non_ref_pic; // suppress unused var warning
+    (void) offset_for_top_to_bottom_field; // suppress unused var warning
 
     /*
       num_ref_frames specifies the maximum number of short-term and
@@ -884,7 +883,7 @@ void H264Parser::decode_SPS(GetBitContext * gb)
       decoding process in case of an inferred gap between values of
       frame_num as specified in subclause 8.2.5.2.
      */
-    gaps_in_frame_num_allowed_flag = get_bits1(gb);
+    //bool gaps_in_frame_num_allowed_flag = get_bits1(gb);
 
     /*
       pic_width_in_mbs_minus1 plus 1 specifies the width of each
@@ -1067,6 +1066,10 @@ void H264Parser::decode_SEI(GetBitContext *gb)
                 break;
         }
     }
+
+    (void) exact_match_flag; // suppress unused var warning
+    (void) broken_link_flag; // suppress unused var warning
+    (void) changing_group_slice_idc; // suppress unused var warning
 }
 
 void H264Parser::vui_parameters(GetBitContext * gb)
