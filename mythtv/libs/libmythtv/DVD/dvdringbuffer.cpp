@@ -365,7 +365,7 @@ bool DVDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
     }
 
     int startTitle = 1;
-    dvdnav_status_t result;
+    dvdnav_status_t result = DVDNAV_STATUS_ERR;
     while (startTitle <= num_titles)
     {
         result = dvdnav_title_play(m_dvdnav, startTitle);
