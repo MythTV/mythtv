@@ -2,6 +2,10 @@ include ../config.mak
 
 SUBDIRS = FFmpeg zeromq nzmqt qjson
 
+ifdef CONFIG_HDHOMERUN
+    SUBDIRS += libhdhomerun
+endif
+
 SUBDIRS_ALL = $(addsuffix -all, ${SUBDIRS})
 SUBDIRS_INSTALL = $(addsuffix -install, ${SUBDIRS})
 SUBDIRS_UNINSTALL = $(addsuffix -uninstall, ${SUBDIRS})
@@ -45,4 +49,7 @@ qjson-all:
 
 qjson-install qjson-uninstall qjson-clean qjson-distclean:
 	${MAKE} -C qjson ${@:qjson-%=%} 
+
+libhdhomerun-all libhdhomerun-clean libhdhomerun-distclean libhdhomerun-install libhdhomerun-uninstall:
+	${MAKE} -C libhdhomerun ${@:libhdhomerun-%=%}
 

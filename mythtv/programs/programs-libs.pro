@@ -1,7 +1,7 @@
 INCLUDEPATH += ../.. ../../libs/ ../../libs/libmyth ../../libs/libmyth/audio
 INCLUDEPATH +=  ../../libs/libmythtv ../../external/FFmpeg
 INCLUDEPATH += ../../libs/libmythupnp ../../libs/libmythui ../../libs/libmythmetadata
-INCLUDEPATH += ../../libs/libmythlivemedia ../../libs/libmythbase ../../libs/libmythhdhomerun
+INCLUDEPATH += ../../libs/libmythlivemedia ../../libs/libmythbase
 INCLUDEPATH += ../../libs/libmythdvdnav ../../libs/libmythbluray ../../libs/libmythsamplerate
 INCLUDEPATH += ../../libs/libmythtv/mpeg
 INCLUDEPATH += ../../libs/libmythtv/vbitext
@@ -35,7 +35,7 @@ LIBS += -lmythprotoserver-$$LIBVERSION
 
 using_live:LIBS += -L../../libs/libmythlivemedia -lmythlivemedia-$$LIBVERSION
 using_mheg:LIBS += -L../../libs/libmythfreemheg -lmythfreemheg-$$LIBVERSION
-using_hdhomerun:LIBS += -L../../libs/libmythhdhomerun -lmythhdhomerun-$$LIBVERSION
+using_hdhomerun:LIBS += -L../../external/libhdhomerun -lmythhdhomerun
 
 mingw {
     CONFIG += console
@@ -53,14 +53,14 @@ POST_TARGETDEPS += ../../libs/libmythbase/libmythbase-$${MYTH_SHLIB_EXT}
 POST_TARGETDEPS += ../../libs/libmythservicecontracts/libmythservicecontracts-$${MYTH_SHLIB_EXT}
 POST_TARGETDEPS += ../../libs/libmythprotoserver/libmythprotoserver-$${MYTH_SHLIB_EXT}
 using_live: POST_TARGETDEPS += ../../libs/libmythlivemedia/libmythlivemedia-$${MYTH_SHLIB_EXT}
-using_hdhomerun: POST_TARGETDEPS += ../../libs/libmythhdhomerun/libmythhdhomerun-$${MYTH_SHLIB_EXT}
+using_hdhomerun: POST_TARGETDEPS += ../../external/libhdhomerun/libmythhdhomerun.$${QMAKE_EXTENSION_SHLIB}
 
 DEPENDPATH += ../.. ../../libs ../../libs/libmyth ../../libs/libmyth/audio
 DEPENDPATH += ../../libs/libmythtv
 DEPENDPATH += ../../libs/libmythtv/mpeg ../../libs/libmythtv/vbitext
 DEPENDPATH += ../../external/FFmpeg
 DEPENDPATH += ../../libs/libmythupnp ../../libs/libmythui
-DEPENDPATH += ../../libs/libmythlivemedia ../../libmythbase ../../libmythhdhomerun
+DEPENDPATH += ../../libs/libmythlivemedia ../../libmythbase
 DEPENDPATH +=../../libs/libmythservicecontracts ../../libs/libmythprotoserver
 
 using_opengl:CONFIG += opengl

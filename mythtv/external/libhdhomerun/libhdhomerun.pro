@@ -1,10 +1,8 @@
 include ( ../../settings.pro )
 
-INCLUDEPATH += ../libmythtv
-
 TEMPLATE = lib
-TARGET = mythhdhomerun-$$LIBVERSION
-CONFIG += thread dll
+TARGET = mythhdhomerun
+CONFIG += thread dll plugin
 CONFIG -= qt
 target.path = $${LIBDIR}
 INSTALLS = target
@@ -31,8 +29,20 @@ mingw {
     SOURCES += hdhomerun_os_windows.c hdhomerun_sock_windows.c
     SOURCES -= hdhomerun_os_posix.c
     LIBS += -lws2_32 -liphlpapi
+
+    # Qt under Linux/UnixMac OS X builds libBlah.a and libBlah.so,
+    # but is using the Windows defaults  libBlah.a and    Blah.dll.
+    #
+    # So that our dependency targets work between SUBDIRS, override:
+    #
+    TARGET = lib$${TARGET}
+
+    # Windows doesnt have a nice variable like LD_LIBRARY_PATH,
+    # which means make install would be broken without extra steps.
+    # As a workaround, we store dlls with exes. Also improves debugging!
+    #
+    target.path = $${PREFIX}/bin
+
 }
 
-LIBS += $$EXTRALIBS 
 
-include ( ../libs-targetfix.pro )

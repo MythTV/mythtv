@@ -44,7 +44,6 @@ LIBS += -lmythavutil -lmythavcodec -lmythavformat -lmythswscale
 LIBS += $$EXTRA_LIBS $$LATE_LIBS $$QMAKE_LIBS_DYNLOAD
 using_mheg:LIBS += -L../libmythfreemheg -lmythfreemheg-$$LIBVERSION
 using_live:LIBS += -L../libmythlivemedia -lmythlivemedia-$$LIBVERSION
-using_hdhomerun:LIBS += -L../libmythhdhomerun -lmythhdhomerun-$$LIBVERSION
 
 inc.path = $${PREFIX}/include/mythtv/protoserver
 
