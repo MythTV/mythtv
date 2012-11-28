@@ -62,7 +62,6 @@ Scheduler::Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList,
     m_queueLock(),
     reclist_changed(false),
     specsched(master_sched),
-    schedMoveHigher(false),
     schedulingEnabled(true),
     m_tvList(tvList),
     m_expirer(NULL),
@@ -360,7 +359,6 @@ static bool comp_priority(RecordingInfo *a, RecordingInfo *b)
 
 bool Scheduler::FillRecordList(void)
 {
-    schedMoveHigher = (bool)gCoreContext->GetNumSetting("SchedMoveHigher");
     schedTime = MythDate::current();
 
     LOG(VB_SCHEDULE, LOG_INFO, "BuildWorkList...");
@@ -1365,9 +1363,7 @@ void Scheduler::MoveHigherRecords(bool move_this)
         RecConstIter k = conflictlist.begin();
         for ( ; FindNextConflict(conflictlist, p, k); ++k)
         {
-            if ((p->GetRecordingPriority() < (*k)->GetRecordingPriority() &&
-                 !schedMoveHigher && move_this) ||
-                !TryAnotherShowing(*k, false, !move_this))
+            if (!TryAnotherShowing(*k, false, !move_this))
             {
                 RestoreRecStatus();
                 break;

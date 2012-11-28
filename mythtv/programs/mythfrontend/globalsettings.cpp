@@ -2272,19 +2272,6 @@ class ChannelGroupSettings : public TriggeredConfigurationGroup
 
 // General RecPriorities settings
 
-static GlobalCheckBox *GRSchedMoveHigher()
-{
-    GlobalCheckBox *bc = new GlobalCheckBox("SchedMoveHigher");
-    bc->setLabel(QObject::tr("Reschedule higher priorities"));
-    bc->setHelpText(QObject::tr("Move higher priority programs to other "
-                    "cards and showings when resolving conflicts. This "
-                    "can be used to record lower priority programs that "
-                    "would otherwise not be recorded, but risks missing "
-                    "a higher priority program if the schedule changes."));
-    bc->setValue(true);
-    return bc;
-}
-
 static GlobalComboBox *GRSchedOpenEnd()
 {
     GlobalComboBox *bc = new GlobalComboBox("SchedOpenEnd");
@@ -3462,7 +3449,6 @@ GeneralRecPrioritiesSettings::GeneralRecPrioritiesSettings()
     VerticalConfigurationGroup* sched = new VerticalConfigurationGroup(false);
     sched->setLabel(QObject::tr("Scheduler Options"));
 
-    sched->addChild(GRSchedMoveHigher());
     sched->addChild(GRSchedOpenEnd());
     sched->addChild(GRPrefInputRecPriority());
     sched->addChild(GRHDTVRecPriority());

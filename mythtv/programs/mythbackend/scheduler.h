@@ -220,7 +220,6 @@ class Scheduler : public MThread, public MythScheduler
     bool reclist_changed;
 
     bool specsched;
-    bool schedMoveHigher;
     bool schedulingEnabled;
     QMap<int, bool> schedAfterStartMap;
 
