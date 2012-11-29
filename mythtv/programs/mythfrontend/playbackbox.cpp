@@ -1333,7 +1333,7 @@ void PlaybackBox::UpdateUIGroupList(const QStringList &groupPreferences)
         QStringList::iterator it;
         for (it = m_titleList.begin(); it != m_titleList.end(); ++it)
         {
-            QString groupname = (*it).simplified();
+            QString groupname = (*it);
 
             MythUIButtonListItem *item =
                 new MythUIButtonListItem(
@@ -1690,7 +1690,7 @@ bool PlaybackBox::UpdateUILists(void)
                     sTitle = construct_sort_title(
                         p->GetTitle(), m_viewMask, titleSort,
                         p->GetRecordingPriority(), m_prefixes);
-                    sTitle = sTitle.toLower().simplified();
+                    sTitle = sTitle.toLower();
 
                     if (!sortedList.contains(sTitle))
                         sortedList[sTitle] = p->GetTitle();
