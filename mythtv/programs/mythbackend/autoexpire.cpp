@@ -645,8 +645,6 @@ void AutoExpire::SendDeleteMessages(pginfolist_t &deleteList)
                      .arg((*it)->GetRecordingStartTime(MythDate::ISODate)));
         gCoreContext->dispatch(me);
 
-        deleted_set.insert((*it)->MakeUniqueKey());
-
         ++it; // move on to next program
     }
 }
@@ -1104,7 +1102,7 @@ void AutoExpire::Update(int encoder, int fsID, bool immediately)
 
 void AutoExpire::UpdateDontExpireSet(void)
 {
-    dont_expire_set = deleted_set;
+    dont_expire_set.clear();
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
