@@ -455,7 +455,12 @@ bool DeviceReadBuffer::Poll(void) const
 
         int ret = poll(polls, poll_cnt, timeout);
 
-        if (polls[0].revents & (POLLHUP | POLLNVAL))
+        if (polls[0].revents & POLLHUP)
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC + "poll eof (POLLHUP)");
+            break;
+        }
+        else if (polls[0].revents & POLLNVAL)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + "poll error");
             error = true;
