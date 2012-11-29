@@ -1458,6 +1458,14 @@ bool DVDRingBuffer::DVDButtonUpdate(bool b_mode)
         m_button_color[i] = 0xf & (hl.palette >> (16+4 *i ));
     }
 
+    // If the button overlay has already been decoded, make sure
+    // the correct palette for the current highlight is set
+    if (m_dvdMenuButton.rects && (m_dvdMenuButton.num_rects > 1))
+    {
+        guess_palette((uint32_t*)m_dvdMenuButton.rects[1]->pict.data[1],
+                        m_button_color, m_button_alpha);
+    }
+    
     m_hl_button.setCoords(hl.sx, hl.sy, hl.ex, hl.ey);
 
     if (((hl.sx + hl.sy) > 0) &&
