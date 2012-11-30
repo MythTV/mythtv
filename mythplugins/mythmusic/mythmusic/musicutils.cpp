@@ -52,7 +52,7 @@ QString findIcon(const QString &type, const QString &name)
 //TODO this needs updating to also use storage groups
 uint calcTrackLength(const QString &musicFile)
 {
-    const char *type = NULL;
+//    const char *type = NULL;
 
     AVFormatContext *inputFC = NULL;
     AVInputFormat *fmt = NULL;
