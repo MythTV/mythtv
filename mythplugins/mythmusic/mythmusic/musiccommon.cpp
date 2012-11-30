@@ -1138,7 +1138,7 @@ void MusicCommon::customEvent(QEvent *event)
         if (!oe)
             return;
 
-        int rs;
+        int rs = 0;
         Metadata *curMeta = gPlayer->getCurrentMetadata();
 
         if (gPlayer->getPlayMode() == MusicPlayer::PLAYMODE_RADIO)
