@@ -262,8 +262,8 @@ class MusicIODevice : public QIODevice
     MusicIODevice(void);
     ~MusicIODevice(void);
 
-    bool open(int);
-    void close(void) { };
+    virtual bool open(OpenMode mode);
+    virtual void close(void) { };
     bool flush(void);
 
     qint64 size(void) const;
@@ -293,8 +293,8 @@ class MusicSGIODevice : public QIODevice
     MusicSGIODevice(const QString &url);
     ~MusicSGIODevice(void);
 
-    bool open(int);
-    void close(void) { };
+    virtual bool open(OpenMode mode);
+    virtual void close(void) { };
     bool flush(void);
 
     qint64 size(void) const;

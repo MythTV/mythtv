@@ -712,7 +712,7 @@ MusicIODevice::~MusicIODevice(void)
     delete m_buffer;
 }
 
-bool MusicIODevice::open(int)
+bool MusicIODevice::open(OpenMode)
 {
     return true;
 }
@@ -774,7 +774,7 @@ MusicSGIODevice::~MusicSGIODevice(void)
     delete m_remotefile;
 }
 
-bool MusicSGIODevice::open(int)
+bool MusicSGIODevice::open(OpenMode)
 {
     return m_remotefile->isOpen();
 }
