@@ -600,6 +600,7 @@ bool H264Parser::decode_Header(GetBitContext *gb)
       same value of colour_plane_id.
      */
     //uint first_mb_in_slice = get_ue_golomb(gb);
+    get_ue_golomb(gb); // Replaced above line
 
     /*
       slice_type specifies the coding type of the slice according to
@@ -884,6 +885,7 @@ void H264Parser::decode_SPS(GetBitContext * gb)
       frame_num as specified in subclause 8.2.5.2.
      */
     //bool gaps_in_frame_num_allowed_flag = get_bits1(gb);
+    get_bits1(gb); // Replaced above line
 
     /*
       pic_width_in_mbs_minus1 plus 1 specifies the width of each
