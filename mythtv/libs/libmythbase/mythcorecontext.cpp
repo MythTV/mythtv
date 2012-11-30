@@ -83,6 +83,8 @@ class MythCoreContextPrivate : public QObject
 
     MythLocale *m_locale;
     QString language;
+    QString metadataLanguageGames;
+    QString metadataLanguageVideos;
 
     MythScheduler *m_scheduler;
 
@@ -1261,6 +1263,11 @@ QString MythCoreContext::GetLanguage(void)
     return GetLanguageAndVariant().left(2);
 }
 
+QString MythCoreContext::GetLanguage(QString languageType)
+{
+    return GetLanguageAndVariant(languageType).left(2);
+}
+
 /**
  *  \brief Returns the user-set language and variant.
  *
@@ -1276,9 +1283,29 @@ QString MythCoreContext::GetLanguageAndVariant(void)
     return d->language;
 }
 
+QString MythCoreContext::GetLanguageAndVariant(QString languageType)
+{
+    if (languageType.compare("MetadataLanguageGames") == 0)
+    {
+        if (d->metadataLanguageGames.isEmpty())
+            d->metadataLanguageGames = GetSetting(languageType, "en_US").toLower();
+        return d->metadataLanguageGames;
+    }
+
+    if (languageType.compare("MetadataLanguageVideos") == 0)
+    {
+        if (d->metadataLanguageVideos.isEmpty())
+            d->metadataLanguageVideos = GetSetting(languageType, "en_US").toLower();
+        return d->metadataLanguageVideos;
+    }
+    return d->language;
+}
+
 void MythCoreContext::ResetLanguage(void)
 {
     d->language.clear();
+    d->metadataLanguageGames.clear();
+    d->metadataLanguageVideos.clear();
 }
 
 void MythCoreContext::InitLocale(void )
