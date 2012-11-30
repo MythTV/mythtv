@@ -70,7 +70,7 @@ class VideoOutputOpenGL : public VideoOutput
     bool CreatePauseFrame(void);
     bool SetupContext(void);
     bool SetupOpenGL(void);
-    void InitOSD(void);
+    void CreatePainter(void);
 
     QMutex            gl_context_lock;
     MythRenderOpenGL *gl_context;

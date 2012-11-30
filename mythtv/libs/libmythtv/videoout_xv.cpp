@@ -293,7 +293,7 @@ bool VideoOutputXv::InputChanged(const QSize &input_size,
     }
 
     InitColorKey(true);
-    InitOSD();
+    CreateOSD();
 
     MoveResize();
 
@@ -756,7 +756,7 @@ MythCodecID VideoOutputXv::GetBestSupportedCodec(uint stream_type)
     return (MythCodecID)(kCodec_MPEG1 + (stream_type-1));
 }
 
-bool VideoOutputXv::InitOSD(void)
+bool VideoOutputXv::CreateOSD(void)
 {
     QString osdrenderer = db_vdisp_profile->GetOSDRenderer();
 
@@ -909,7 +909,7 @@ bool VideoOutputXv::Init(int width, int height, float aspect,
         return false;
 
     InitColorKey(true);
-    InitOSD();
+    CreateOSD();
 
     MoveResize();
 
