@@ -2609,6 +2609,9 @@ void NuppelVideoRecorder::FormatTT(struct VBIData *vbidata)
                 *linebufpos = 0;
                 visible = 1;
             }
+
+            (void) box;
+            (void) sep;
         }
         if (visible)
         {
