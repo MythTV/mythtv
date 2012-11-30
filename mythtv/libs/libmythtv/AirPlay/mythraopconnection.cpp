@@ -931,90 +931,91 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
     }
     *m_textStream << "RTSP/1.0 200 OK\r\n";
 
-    if (option == "OPTIONS")
+    if (tags.contains("Apple-Challenge"))
     {
-        if (tags.contains("Apple-Challenge"))
+        LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("Received Apple-Challenge"));
+        
+        *m_textStream << "Apple-Response: ";
+        if (!LoadKey())
+            return;
+        int tosize = RSA_size(LoadKey());
+        uint8_t *to = new uint8_t[tosize];
+        
+        QByteArray challenge =
+        QByteArray::fromBase64(tags["Apple-Challenge"].toAscii());
+        int challenge_size = challenge.size();
+        if (challenge_size != 16)
         {
-            LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("Received Apple-Challenge"));
-
-            *m_textStream << "Apple-Response: ";
-            if (!LoadKey())
-                return;
-            int tosize = RSA_size(LoadKey());
-            uint8_t *to = new uint8_t[tosize];
-
-            QByteArray challenge =
-                QByteArray::fromBase64(tags["Apple-Challenge"].toAscii());
-            int challenge_size = challenge.size();
-            if (challenge_size != 16)
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                QString("Decoded challenge size %1, expected 16")
+                .arg(challenge_size));
+            if (challenge_size > 16)
+                challenge_size = 16;
+        }
+        
+        int i = 0;
+        unsigned char from[38];
+        memcpy(from, challenge.constData(), challenge_size);
+        i += challenge_size;
+        if (m_socket->localAddress().protocol() ==
+            QAbstractSocket::IPv4Protocol)
+        {
+            uint32_t ip = m_socket->localAddress().toIPv4Address();
+            ip = qToBigEndian(ip);
+            memcpy(from + i, &ip, 4);
+            i += 4;
+        }
+        else if (m_socket->localAddress().protocol() ==
+                 QAbstractSocket::IPv6Protocol)
+        {
+            Q_IPV6ADDR ip = m_socket->localAddress().toIPv6Address();
+            if(memcmp(&ip,
+                      "\x00\x00\x00\x00" "\x00\x00\x00\x00" "\x00\x00\xff\xff",
+                      12) == 0)
             {
-                LOG(VB_GENERAL, LOG_ERR, LOC +
-                    QString("Decoded challenge size %1, expected 16")
-                    .arg(challenge_size));
-                if (challenge_size > 16)
-                    challenge_size = 16;
-            }
-
-            int i = 0;
-            unsigned char from[38];
-            memcpy(from, challenge.constData(), challenge_size);
-            i += challenge_size;
-            if (m_socket->localAddress().protocol() ==
-                QAbstractSocket::IPv4Protocol)
-            {
-                uint32_t ip = m_socket->localAddress().toIPv4Address();
-                ip = qToBigEndian(ip);
-                memcpy(from + i, &ip, 4);
+                memcpy(from + i, &ip[12], 4);
                 i += 4;
             }
-            else if (m_socket->localAddress().protocol() ==
-                     QAbstractSocket::IPv6Protocol)
+            else
             {
-                Q_IPV6ADDR ip = m_socket->localAddress().toIPv6Address();
-                if(memcmp(&ip,
-                          "\x00\x00\x00\x00" "\x00\x00\x00\x00" "\x00\x00\xff\xff",
-                          12) == 0)
-                {
-                    memcpy(from + i, &ip[12], 4);
-                    i += 4;
-                }
-                else
-                {
-                    memcpy(from + i, &ip, 16);
-                    i += 16;
-                }
+                memcpy(from + i, &ip, 16);
+                i += 16;
             }
-            memcpy(from + i, m_hardwareId.constData(), AIRPLAY_HARDWARE_ID_SIZE);
-            i += AIRPLAY_HARDWARE_ID_SIZE;
-
-            int pad = 32 - i;
-            if (pad > 0)
-            {
-                memset(from + i, 0, pad);
-                i += pad;
-            }
-
-            LOG(VB_GENERAL, LOG_DEBUG, LOC +
-                QString("Full base64 response: '%1' size %2")
-                .arg(QByteArray((const char *)from, i).toBase64().constData())
-                .arg(i));
-
-            RSA_private_encrypt(i, from, to, LoadKey(), RSA_PKCS1_PADDING);
-
-            QByteArray base64 = QByteArray((const char *)to, tosize).toBase64();
-            delete[] to;
-
-            for (int pos = base64.size() - 1; pos > 0; pos--)
-            {
-                if (base64[pos] == '=')
-                    base64[pos] = ' ';
-                else
-                    break;
-            }
-            LOG(VB_GENERAL, LOG_DEBUG, QString("tSize=%1 tLen=%2 tResponse=%3")
-                .arg(tosize).arg(base64.size()).arg(base64.constData()));
-            *m_textStream << base64.trimmed() << "\r\n";
         }
+        memcpy(from + i, m_hardwareId.constData(), AIRPLAY_HARDWARE_ID_SIZE);
+        i += AIRPLAY_HARDWARE_ID_SIZE;
+        
+        int pad = 32 - i;
+        if (pad > 0)
+        {
+            memset(from + i, 0, pad);
+            i += pad;
+        }
+        
+        LOG(VB_GENERAL, LOG_DEBUG, LOC +
+            QString("Full base64 response: '%1' size %2")
+            .arg(QByteArray((const char *)from, i).toBase64().constData())
+            .arg(i));
+        
+        RSA_private_encrypt(i, from, to, LoadKey(), RSA_PKCS1_PADDING);
+        
+        QByteArray base64 = QByteArray((const char *)to, tosize).toBase64();
+        delete[] to;
+        
+        for (int pos = base64.size() - 1; pos > 0; pos--)
+        {
+            if (base64[pos] == '=')
+                base64[pos] = ' ';
+            else
+                break;
+        }
+        LOG(VB_GENERAL, LOG_DEBUG, QString("tSize=%1 tLen=%2 tResponse=%3")
+            .arg(tosize).arg(base64.size()).arg(base64.constData()));
+        *m_textStream << base64.trimmed() << "\r\n";
+    }
+
+    if (option == "OPTIONS")
+    {
         *m_textStream << "Public: ANNOUNCE, SETUP, RECORD, PAUSE, FLUSH, "
             "TEARDOWN, OPTIONS, GET_PARAMETER, SET_PARAMETER, POST, GET\r\n";
     }
