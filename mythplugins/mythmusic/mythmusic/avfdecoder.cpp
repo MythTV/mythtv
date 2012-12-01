@@ -498,32 +498,6 @@ void avfDecoder::run()
     RunEpilog();
 }
 
-MetaIO* avfDecoder::doCreateTagger(void)
-{
-    QString extension = filename.section('.', -1);
-
-    if (extension == "mp3")
-        return new MetaIOID3();
-    else if (extension == "ogg" || extension == "oga")
-        return new MetaIOOggVorbis();
-    else if (extension == "flac")
-    {
-        MetaIOID3 *file = new MetaIOID3();
-        if (file->TagExists(filename))
-            return file;
-        else
-            delete file;
-
-        return new MetaIOFLACVorbis();
-    }
-    else if (extension == "m4a")
-        return new MetaIOMP4();
-    else if (extension == "wv")
-        return new MetaIOWavPack();
-    else
-        return new MetaIOAVFComment();
-}
-
 bool avfDecoderFactory::supports(const QString &source) const
 {
     QStringList list = extension().split("|", QString::SkipEmptyParts);

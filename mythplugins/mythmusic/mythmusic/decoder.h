@@ -89,19 +89,12 @@ class Decoder : public MThread, public MythObservable
 
     QString getFilename(void) const { return filename; }
 
-    virtual Metadata *readMetadata(void);
-    virtual Metadata *getMetadata(void);
-    virtual MetaIO *doCreateTagger (void);
-    virtual void commitMetadata(Metadata *mdata);
-    virtual void commitVolatileMetadata(const Metadata *mdata);
-
     // static methods
     static QStringList all();
     static bool supports(const QString &);
     static void registerFactory(DecoderFactory *);
     static Decoder *create(const QString &, QIODevice *, AudioOutput *,
                            bool = false);
-    static void SetLocationFormatUseTags(void);
 
   protected:
     Decoder(DecoderFactory *, QIODevice *, AudioOutput *);
@@ -109,10 +102,6 @@ class Decoder : public MThread, public MythObservable
     void error(const QString &);
 
     QString filename;
-
-    static QString filename_format;
-    static int ignore_id3;
-    static QString musiclocation;
 
   private:
     DecoderFactory *fctry;

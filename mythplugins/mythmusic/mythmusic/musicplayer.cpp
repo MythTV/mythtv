@@ -19,6 +19,7 @@
 #include "musicplayer.h"
 #include "decoder.h"
 #include "decoderhandler.h"
+#include "metaio.h"
 #ifdef HAVE_CDIO
 #include "cddecoder.h"
 #endif
@@ -1161,8 +1162,18 @@ void MusicPlayer::updateVolatileMetadata(void)
         if (m_currentMetadata->hasChanged())
         {
             m_currentMetadata->persist();
-            if (getDecoder())
-                getDecoder()->commitVolatileMetadata(m_currentMetadata);
+
+            // only write the playcount & rating to the tag if it's enabled by the user
+            if (GetMythDB()->GetNumSetting("AllowTagWriting", 0) == 1)
+            {
+                MetaIO *tagger = MetaIO::createTagger(m_currentMetadata->Filename(true));
+
+                if (tagger)
+                {
+                    tagger->writeVolatileMetadata(m_currentMetadata);
+                    delete tagger;
+                }
+            }
 
             sendTrackStatsChangedEvent(m_currentMetadata->ID());
         }

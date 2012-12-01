@@ -98,10 +98,22 @@ class MetaIO
         return NULL;
     }
 
+    /*!
+    * \brief Reads Metadata based on the folder/filename.
+    *
+    * \param filename The filename to try and determine metadata for.
+    * \returns artist, album, title, genre & tracknum in parameters.
+    */
     void readFromFilename(const QString &filename, QString &artist,
                           QString &album, QString &title, QString &genre,
                           int &tracknum);
 
+    /*!
+    * \brief Reads Metadata based on the folder/filename.
+    *
+    * \param filename The filename to try and determine metadata for.
+    * \returns Metadata Pointer, or NULL on error.
+    */
     Metadata* readFromFilename(const QString &filename, bool blnLength = false);
 
     void readFromFilename(Metadata *metadata);
@@ -111,7 +123,39 @@ class MetaIO
         (void)filename;
         return false;
     }
-    
+
+    /*!
+    * \brief Finds an appropriate tagger for the given file
+    *
+    * \param filename The filename to find a tagger for.
+    * \returns MetaIO Pointer, or NULL if non found.
+    *
+    * \Note The caller is responsible for freeing it when no longer required
+    */
+
+    static MetaIO *createTagger(const QString &filename);
+
+    /*!
+    * \brief Read the metadata from \p filename directly.
+    *
+    * Creates a \p MetaIO object using \p MetaIO::createTagger and uses
+    * the MetaIO object to read the metadata.
+    * \param filename The filename to read metadata from.
+    * \returns an instance of \p Metadata owned by the caller
+    */
+    static Metadata *readMetadata(const QString &filename);
+
+    /*!
+    * \brief Get the metadata for \p filename
+    *
+    * First tries to read the metadata from the database. If there
+    * is no database entry, it'll call \p MetaIO::readMetadata.
+    *
+    * \param filename The filename to get metadata for.
+    * \returns an instance of \p Metadata owned by the caller
+    */
+    static Metadata *getMetadata(const QString &filename);
+
   protected:
 
   private:

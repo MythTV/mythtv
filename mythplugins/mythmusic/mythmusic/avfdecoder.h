@@ -25,8 +25,6 @@ class avfDecoder : public Decoder
     void seek(double);
     void stop();
 
-    MetaIO *doCreateTagger(void);
-
   private:
     void run();
 

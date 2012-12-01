@@ -422,26 +422,27 @@ void ImportMusicDialog::addPressed()
         // do we need to update the tags?
         if (m_tracks->at(m_currentTrack)->metadataHasChanged)
         {
-            Decoder *decoder = Decoder::create(gMusicData->musicDir + saveFilename, NULL, NULL, true);
-            if (decoder)
+            MetaIO *tagger = MetaIO::createTagger(gMusicData->musicDir + saveFilename);
+            if (tagger)
             {
-                decoder->commitMetadata(meta);
-                delete decoder;
+                tagger->write(meta);
+                delete tagger;
             }
         }
 
         meta->setFileSize((quint64)QFileInfo(saveFilename).size());
-        
+
         // update the database
         meta->dumpToDatabase();
 
         // read any embedded images from the tag
-        MetaIO *tagger = meta->getTagger();
+        MetaIO *tagger = MetaIO::createTagger(meta->Filename(true));
         if (tagger && tagger->supportsEmbeddedImages())
         {
-            AlbumArtList artList = tagger->getAlbumArtList(meta->Filename());
+            AlbumArtList artList = tagger->getAlbumArtList(meta->Filename(true));
             meta->setEmbeddedAlbumArt(artList);
             meta->getAlbumArtImages()->dumpToDatabase();
+            delete tagger;
         }
 
         m_somethingWasImported = true;
@@ -571,10 +572,10 @@ void ImportMusicDialog::scanDirectory(QString &directory, vector<TrackInfo*> *tr
             scanDirectory(filename, tracks);
         else
         {
-            Decoder *decoder = Decoder::create(filename, NULL, NULL, true);
-            if (decoder)
+            MetaIO *tagger = MetaIO::createTagger(filename);
+            if (tagger)
             {
-                Metadata *metadata = decoder->getMetadata();
+                Metadata *metadata = tagger->read(filename);
                 if (metadata)
                 {
                     TrackInfo * track = new TrackInfo;
@@ -586,7 +587,7 @@ void ImportMusicDialog::scanDirectory(QString &directory, vector<TrackInfo*> *tr
                     m_sourceFiles.append(filename);
                 }
 
-                delete decoder;
+                delete tagger;
             }
         }
     }
