@@ -133,7 +133,7 @@ bool Frontend::PlayRecording(int ChanID, const QDateTime &StartTime)
 
         QString message = QString("NETWORK_CONTROL PLAY PROGRAM %1 %2 %3")
             .arg(ChanID)
-            .arg(starttime.toLocalTime().toString("yyyyMMddhhmmss"))
+            .arg(starttime.toString("yyyyMMddhhmmss"))
             .arg("12345");
 
         MythEvent me(message);
