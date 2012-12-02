@@ -1215,7 +1215,7 @@
         </shape>
 
         <webbrowser name="browser">
-            <area>40,65,710,490</area>
+            <area>50,70,700,480</area>
             <zoom>1.0</zoom>
             <background color="#131564"/>
         </webbrowser>
