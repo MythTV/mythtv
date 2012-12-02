@@ -630,10 +630,10 @@
                         <area>220,2,250,24</area>
                     </textarea>
                     <textarea name="channelname" from="chanstr">
-                        <area>570,2,500,24</area>
+                        <area>570,2,550,24</area>
                     </textarea>
                     <textarea name="priority" from="chanstr">
-                        <area>1140,2,30,24</area>
+                        <area>1130,2,40,24</area>
                         <align>right</align>
                     </textarea>
                 </state>
