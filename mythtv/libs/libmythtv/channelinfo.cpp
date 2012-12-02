@@ -209,7 +209,7 @@ void ChannelInfo::ToMap(InfoMap& infoMap)
     infoMap["channelname"] = name;
     infoMap["channelid"] = QString().setNum(chanid);
     infoMap["channelsourcename"] = GetSourceName();
-    infoMap["channelrecpriority"] = recpriority;
+    infoMap["channelrecpriority"] = QString().setNum(recpriority);
     
     infoMap["channelnumber"] = channum;
     
