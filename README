@@ -80,9 +80,9 @@ This is not yet supported.
 ## Searching
 
 There are currently three search methods available for use: movies, people, 
-and studios. Search results from TheMovieDb are sent iteratively, twenty
-results per page. The search methods provided by the PyTMDB3 module return
-list-like structures that will automatically grab new pages as needed.
+studios, and lists. Search results from TheMovieDb are sent iteratively,
+twenty results per page. The search methods provided by the PyTMDB3 module
+return list-like structures that will automatically grab new pages as needed.
 
   >>> from tmdb3 import searchMovie
   >>> res = searchMovie('A New Hope')
@@ -234,6 +234,8 @@ Movie:
   list(Keyword)         keywords
   dict(Release)         releases            (indexed by country)
   list(Translation)     translations
+  list(Movie)           similar
+  list(List)            lists
   list(Movie)           getSimilar()
   None                  setFavorite(bool)   mark favorite status for current user
   None                  setRating(int)      rate movie by current user
@@ -249,6 +251,17 @@ Movie classmethods:
   list(Movie)           favorites()         current user's favorite movies
   list(Movie)           ratedmovies()       movies rated by current user
   list(Movie)           watchlist()         movies marked to watch by current user
+
+List:
+  hex string            id
+  string                name
+  string                author
+  string                description
+  integer               favorites           number of users that have marked list
+  string                language
+  integer               count
+  Poster                poster
+  list(Movie)           members
 
 Person:
   integer               id

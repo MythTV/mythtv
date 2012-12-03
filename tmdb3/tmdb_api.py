@@ -22,7 +22,7 @@ for search and retrieval of text metadata and image URLs from TMDB.
 Preliminary API specifications can be found at
 http://help.themoviedb.org/kb/api/about-3"""
 
-__version__="v0.6.13"
+__version__="v0.6.14"
 # 0.1.0  Initial development
 # 0.2.0  Add caching mechanism for API queries
 # 0.2.1  Temporary work around for broken search paging
@@ -56,6 +56,7 @@ __version__="v0.6.13"
 # 0.6.11 Fix URL for top rated Movie query
 # 0.6.12 Add support for Movie watchlist query and editing
 # 0.6.13 Fix URL for rating Movies
+# 0.6.14 Add support for Lists
 
 from request import set_key, Request
 from util import Datapoint, Datalist, Datadict, Element, NameRepr, SearchRepr
@@ -162,6 +163,16 @@ class StudioSearchResult( SearchRepr, PagedRequest ):
     def __init__(self, request):
         super(StudioSearchResult, self).__init__(request,
                                 lambda x: Studio(raw=x))
+
+def searchList(query):
+    ListSearchResult(Request('search/list', query=query))
+
+class ListSearchResult( SearchRepr, PagedRequest ):
+    """Stores a list of search matches."""
+    _name = None
+    def __init__(self, request):
+        super(ListSearchResult, self).__init__(request,
+                                lambda x: List(raw=x))
 
 class Image( Element ):
     filename        = Datapoint('file_path', initarg=1,
@@ -563,10 +574,20 @@ class Movie( Element ):
         req.readJSON()
 
     def getSimilar(self):
+        return self.similar
+
+    @property
+    def similar(self):
         res = MovieSearchResult(Request('movie/{0}/similar_movies'\
                                                             .format(self.id)),
                                         locale=self._locale)
         res._name = 'Similar to {0}'.format(self._printable_name())
+        return res
+
+    @property
+    def lists(self):
+        res = ListSearchResult(Request('movie/{0}/lists'.format(self.id)))
+        res._name = "Lists containing {0}".format(self._printable_name())
         return res
 
     def _printable_name(self):
@@ -619,4 +640,19 @@ class Collection( NameRepr, Element ):
                                     poller=_populate_images, sort=True)
     posters          = Datalist('posters', handler=Poster, \
                                     poller=_populate_images, sort=True)
+
+class List( NameRepr, Element ):
+    id          = Datapoint('id', initarg=1)
+    name        = Datapoint('name')
+    author      = Datapoint('created_by')
+    description = Datapoint('description')
+    favorites   = Datapoint('favorite_count')
+    language    = Datapoint('iso_639_1')
+    count       = Datapoint('item_count')
+    poster      = Datapoint('poster_path', handler=Poster, raw=False)
+
+    members     = Datalist('items', handler=Movie)
+
+    def _populate(self):
+        return Request('list/{0}'.format(self.id))
 
