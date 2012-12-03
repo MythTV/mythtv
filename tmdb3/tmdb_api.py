@@ -22,7 +22,7 @@ for search and retrieval of text metadata and image URLs from TMDB.
 Preliminary API specifications can be found at
 http://help.themoviedb.org/kb/api/about-3"""
 
-__version__="v0.6.14"
+__version__="v0.6.15"
 # 0.1.0  Initial development
 # 0.2.0  Add caching mechanism for API queries
 # 0.2.1  Temporary work around for broken search paging
@@ -57,6 +57,7 @@ __version__="v0.6.14"
 # 0.6.12 Add support for Movie watchlist query and editing
 # 0.6.13 Fix URL for rating Movies
 # 0.6.14 Add support for Lists
+# 0.6.15 Add ability to search Collections
 
 from request import set_key, Request
 from util import Datapoint, Datalist, Datadict, Element, NameRepr, SearchRepr
@@ -164,8 +165,8 @@ class StudioSearchResult( SearchRepr, PagedRequest ):
         super(StudioSearchResult, self).__init__(request,
                                 lambda x: Studio(raw=x))
 
-def searchList(query):
-    ListSearchResult(Request('search/list', query=query))
+def searchList(query, adult=False):
+    ListSearchResult(Request('search/list', query=query, include_adult=adult))
 
 class ListSearchResult( SearchRepr, PagedRequest ):
     """Stores a list of search matches."""
@@ -173,6 +174,20 @@ class ListSearchResult( SearchRepr, PagedRequest ):
     def __init__(self, request):
         super(ListSearchResult, self).__init__(request,
                                 lambda x: List(raw=x))
+
+def searchCollection(query, locale=None):
+    return CollectionSearchResult(Request('search/collection', query=query),
+                           locale=locale)
+
+class CollectionSearchResult( SearchRepr, PagedRequest ):
+    """Stores a list of search matches."""
+    _name=None
+    def __init__(self, request, locale=None):
+        if locale is None:
+            locale = get_locale()
+        super(CollectionSearchResult, self).__init__(
+                                request.new(language=locale.language),
+                                lambda x: Collection(raw=x, locale=locale))
 
 class Image( Element ):
     filename        = Datapoint('file_path', initarg=1,

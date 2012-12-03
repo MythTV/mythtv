@@ -80,9 +80,10 @@ This is not yet supported.
 ## Searching
 
 There are currently three search methods available for use: movies, people, 
-studios, and lists. Search results from TheMovieDb are sent iteratively,
-twenty results per page. The search methods provided by the PyTMDB3 module
-return list-like structures that will automatically grab new pages as needed.
+studios, lists, and collections. Search results from TheMovieDb are sent
+iteratively, twenty results per page. The search methods provided by the
+PyTMDB3 module return list-like structures that will automatically grab new
+pages as needed.
 
   >>> from tmdb3 import searchMovie
   >>> res = searchMovie('A New Hope')
