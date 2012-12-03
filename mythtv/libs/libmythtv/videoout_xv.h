@@ -111,7 +111,7 @@ class VideoOutputXv : public VideoOutput
     bool InitXVideo(void);
     bool InitXShm(void);
     bool InitXlib(void);
-    bool InitOSD(void);
+    bool CreateOSD(void);
 
     bool CreateBuffers(VOSType subtype);
     vector<unsigned char*> CreateShmImages(uint num, bool use_xv);

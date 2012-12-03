@@ -934,24 +934,29 @@ QString Metadata::getAlbumArtFile(void)
         {
             if (!QFile::exists(res))
             {
-                if (albumart_image->embedded && getTagger()->supportsEmbeddedImages())
+                if (albumart_image->embedded)
                 {
                     // image is embedded try to extract it from the tag and cache it for latter
-                    QImage *image = getTagger()->getAlbumArt(Filename(),
-                                                             albumart_image->imageType);
-                    if (image)
+                    MetaIO *tagger = getTagger();
+                    if (tagger && tagger->supportsEmbeddedImages())
                     {
-                        image->save(res);
-                        delete image;
-                        return res;
+                        QImage *image = tagger->getAlbumArt(Filename(), albumart_image->imageType);
+                        if (image)
+                        {
+                            image->save(res);
+                            delete image;
+                            delete tagger;
+                            return res;
+                        }
                     }
+
+                    if (tagger)
+                        delete tagger;
                 }
-                else
-                {
-                    // image is in a file but couldn't be found!
-                    m_albumArt->getImageList()->removeAll(albumart_image);
-                    return QString("");
-                }
+
+                // image couldn't be found!
+                m_albumArt->getImageList()->removeAll(albumart_image);
+                return QString("");
             }
         }
 
@@ -988,36 +993,11 @@ void Metadata::reloadAlbumArtImages(void)
 }
 
 
-/// create a MetaIO for the file to read/write any tags etc
+// create a MetaIO for the file to read/write any tags etc
+// NOTE the caller is responsible for deleting it
 MetaIO* Metadata::getTagger(void)
 {
-    static MetaIOID3 metaIOID3;
-    static MetaIOOggVorbis metaIOOggVorbis;
-    static MetaIOFLACVorbis metaIOFLACVorbis;
-    static MetaIOMP4 metaIOMP4;
-    static MetaIOWavPack metaIOWavPack;
-    static MetaIOAVFComment metaIOAVFComment;
-
-    QFileInfo fi(m_filename);
-    QString extension = fi.suffix();
-
-    if (extension == "mp3" || extension == "mp2")
-        return &metaIOID3;
-    else if (extension == "ogg" || extension == "oga")
-        return &metaIOOggVorbis;
-    else if (extension == "flac")
-    {
-        if (metaIOID3.TagExists(Filename(true)))
-            return &metaIOID3;
-        else
-            return &metaIOFLACVorbis;
-    }
-    else if (extension == "m4a")
-        return &metaIOMP4;
-    else if (extension == "wv")
-        return &metaIOWavPack;
-    else
-        return &metaIOAVFComment;
+    return MetaIO::createTagger(Filename(true));
 }
 
 //--------------------------------------------------------------------------
@@ -1691,26 +1671,33 @@ void AlbumArtImages::addImage(const AlbumArtImage &newImage)
     }
 
     // if this is an embedded image copy it to disc to speed up its display
-    if (image->embedded && m_parent->getTagger()->supportsEmbeddedImages())
+    MetaIO *tagger = m_parent->getTagger();
+
+    if (tagger)
     {
-        QString path = GetConfDir() + "/MythMusic/AlbumArt/";
-        QDir dir(path);
-
-        QString filename = QString("%1-%2.jpg").arg(m_parent->ID()).arg(AlbumArtImages::getTypeFilename(image->imageType));
-        if (!QFile::exists(path + filename))
+        if (image->embedded && tagger->supportsEmbeddedImages())
         {
-            if (!dir.exists())
-                dir.mkpath(path);
+            QString path = GetConfDir() + "/MythMusic/AlbumArt/";
+            QDir dir(path);
 
-            QImage *saveImage = m_parent->getTagger()->getAlbumArt(m_parent->Filename(), image->imageType);
-            if (saveImage)
+            QString filename = QString("%1-%2.jpg").arg(m_parent->ID()).arg(AlbumArtImages::getTypeFilename(image->imageType));
+            if (!QFile::exists(path + filename))
             {
-                saveImage->save(path + filename, "JPEG");
-                delete saveImage;
+                if (!dir.exists())
+                    dir.mkpath(path);
+
+                QImage *saveImage = tagger->getAlbumArt(m_parent->Filename(), image->imageType);
+                if (saveImage)
+                {
+                    saveImage->save(path + filename, "JPEG");
+                    delete saveImage;
+                }
             }
+
+            image->filename = path + filename;
         }
 
-        image->filename = path + filename;
+        delete tagger;
     }
 }
 

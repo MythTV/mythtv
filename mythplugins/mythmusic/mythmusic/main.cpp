@@ -155,8 +155,6 @@ static void loadMusic()
 
     gMusicData->musicDir = startdir;
 
-    Decoder::SetLocationFormatUseTags();
-
     // Only search music files if a directory was specified & there
     // is no data in the database yet (first run).  Otherwise, user
     // can choose "Setup" option from the menu to force it.
@@ -669,8 +667,6 @@ int mythplugin_init(const char *libversion)
 
     setupKeys();
 
-    Decoder::SetLocationFormatUseTags();
-
     gPlayer = new MusicPlayer(NULL, chooseCD());
     gMusicData = new MusicData();
 
@@ -685,8 +681,6 @@ int mythplugin_run(void)
 
 int mythplugin_config(void)
 {
-    Decoder::SetLocationFormatUseTags();
-
     return runMenu("music_settings.xml");
 }
 

@@ -2072,8 +2072,8 @@ static HostComboBox *MythDateFormatCB()
         QString::fromUtf8("dddd yyyy\u5E74M\u6708d\u65E5")),
         QString::fromUtf8("dddd yyyy\u5E74M\u6708d\u65E5"));
     gc->addSelection(locale.toString(sampdate,
-        QString::fromUtf8("ddd M\u6708d\u65E5")),
-        QString::fromUtf8("ddd M\u6708d\u65E5"));
+        QString::fromUtf8("dddd M\u6708d\u65E5")),
+        QString::fromUtf8("dddd M\u6708d\u65E5"));
     gc->setHelpText(QObject::tr("Your preferred date format.") + ' ' +
                     sampleStr);
     return gc;

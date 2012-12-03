@@ -100,7 +100,7 @@ bool VideoOutputOpenGL::CreateGPUResources(void)
     bool result = SetupContext();
     QSize size = window.GetActualVideoDim();
     InitDisplayMeasurements(size.width(), size.height(), false);
-    InitOSD();
+    CreatePainter();
     return result;
 }
 
@@ -378,7 +378,7 @@ bool VideoOutputOpenGL::SetupOpenGL(void)
     return success;
 }
 
-void VideoOutputOpenGL::InitOSD(void)
+void VideoOutputOpenGL::CreatePainter(void)
 {
     QMutexLocker locker(&gl_context_lock);
 

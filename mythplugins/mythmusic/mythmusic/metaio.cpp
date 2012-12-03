@@ -1,7 +1,15 @@
+// Qt
+#include <QFileInfo>
 
 // Mythmusic
 #include "metaio.h"
 #include "metadata.h"
+#include "metaioid3.h"
+#include "metaiooggvorbis.h"
+#include "metaioflacvorbis.h"
+#include "metaiomp4.h"
+#include "metaiowavpack.h"
+#include "metaioavfcomment.h"
 
 // Libmyth
 #include <mythcontext.h>
@@ -21,12 +29,76 @@ MetaIO::~MetaIO()
 {
 }
 
-/*!
- * \brief Reads Metadata based on the folder/filename.
- *
- * \param filename The filename to try and determine metadata for.
- * \returns Metadata Pointer, or NULL on error.
- */
+// static
+MetaIO* MetaIO::createTagger(const QString& filename)
+{
+    QFileInfo fi(filename);
+    QString extension = fi.suffix().toLower();
+
+    if (extension == "mp3" || extension == "mp2")
+        return new MetaIOID3;
+    else if (extension == "ogg" || extension == "oga")
+        return new MetaIOOggVorbis;
+    else if (extension == "flac")
+    {
+        MetaIOID3 *tagger = new MetaIOID3;
+        if (tagger->TagExists(filename))
+            return tagger;
+        else
+        {
+            delete tagger;
+            return new MetaIOFLACVorbis;
+        }
+    }
+    else if (extension == "m4a")
+        return new MetaIOMP4;
+    else if (extension == "wv")
+        return new MetaIOWavPack;
+    else
+        return new MetaIOAVFComment;
+}
+
+// static
+Metadata* MetaIO::readMetadata(const QString &filename)
+{
+    Metadata *mdata = NULL;
+    MetaIO *tagger = MetaIO::createTagger(filename);
+    bool ignoreID3 = (gCoreContext->GetNumSetting("Ignore_ID3", 0) == 1);
+
+    if (tagger)
+    {
+        if (!ignoreID3)
+            mdata = tagger->read(filename);
+
+        if (ignoreID3 || !mdata)
+            mdata = tagger->readFromFilename(filename);
+
+        delete tagger;
+    }
+
+    if (!mdata)
+    {
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("MetaIO::readMetadata(): Could not read '%1'")
+                .arg(filename));
+    }
+
+    return mdata;
+}
+
+// static
+Metadata* MetaIO::getMetadata(const QString &filename)
+{
+
+    Metadata *mdata = new Metadata(filename);
+    if (mdata->isInDatabase())
+        return mdata;
+
+    delete mdata;
+
+    return readMetadata(filename);
+}
+
 void MetaIO::readFromFilename(const QString &filename,
                               QString &artist, QString &album, QString &title,
                               QString &genre, int &tracknum)
@@ -93,14 +165,6 @@ void MetaIO::readFromFilename(const QString &filename,
     }
 }
 
-/*!
- * \brief Reads Metadata based on the folder/filename.
- *
- * \note Just an overloaded wrapper around the other method above.
- *
- * \param filename The filename to try and determine metadata for.
- * \returns Metadata Pointer, or NULL on error.
- */
 Metadata* MetaIO::readFromFilename(const QString &filename, bool blnLength)
 {
     QString artist, album, title, genre;

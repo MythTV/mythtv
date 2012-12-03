@@ -1131,22 +1131,25 @@ void VideoOutput::ShowPIP(VideoFrame  *frame,
         }
     }
 
-    int xoff = position.left();
-    int yoff = position.top();
-    uint xoff2[3]  = { xoff, xoff>>1, xoff>>1 };
-    uint yoff2[3]  = { yoff, yoff>>1, yoff>>1 };
-
-    uint pip_height = pip_tmp_image.height;
-    uint height[3] = { pip_height, pip_height>>1, pip_height>>1 };
-
-    for (int p = 0; p < 3; p++)
+    if ((position.left() >= 0) && (position.top() >= 0))
     {
-        for (uint h = 2; h < height[p]; h++)
+        int xoff = position.left();
+        int yoff = position.top();
+        int xoff2[3] = { xoff, xoff>>1, xoff>>1 };
+        int yoff2[3] = { yoff, yoff>>1, yoff>>1 };
+
+        int pip_height = pip_tmp_image.height;
+        int height[3] = { pip_height, pip_height>>1, pip_height>>1 };
+
+        for (int p = 0; p < 3; p++)
         {
-            memcpy((frame->buf + frame->offsets[p]) + (h + yoff2[p]) *
-                   frame->pitches[p] + xoff2[p],
-                   (pip_tmp_image.buf + pip_tmp_image.offsets[p]) + h *
-                   pip_tmp_image.pitches[p], pip_tmp_image.pitches[p]);
+            for (int h = 2; h < height[p]; h++)
+            {
+                memcpy((frame->buf + frame->offsets[p]) + (h + yoff2[p]) *
+                       frame->pitches[p] + xoff2[p],
+                       (pip_tmp_image.buf + pip_tmp_image.offsets[p]) + h *
+                       pip_tmp_image.pitches[p], pip_tmp_image.pitches[p]);
+            }
         }
     }
 
@@ -1503,14 +1506,14 @@ void VideoOutput::CopyFrame(VideoFrame *to, const VideoFrame *from)
         memcpy(to->buf + to->offsets[2], from->buf + from->offsets[2],
                from->pitches[2] * (from->height>>1));
     }
-    else
+    else if ((from->height >= 0) && (to->height >= 0))
     {
-        uint f[3] = { from->height,   from->height>>1, from->height>>1, };
-        uint t[3] = { to->height,     to->height>>1,   to->height>>1,   };
-        uint h[3] = { min(f[0],t[0]), min(f[1],t[1]),  min(f[2],t[2]),  };
+        int f[3] = { from->height,   from->height>>1, from->height>>1, };
+        int t[3] = { to->height,     to->height>>1,   to->height>>1,   };
+        int h[3] = { min(f[0],t[0]), min(f[1],t[1]),  min(f[2],t[2]),  };
         for (uint i = 0; i < 3; i++)
         {
-            for (uint j = 0; j < h[i]; j++)
+            for (int j = 0; j < h[i]; j++)
             {
                 memcpy(to->buf   + to->offsets[i]   + (j * to->pitches[i]),
                        from->buf + from->offsets[i] + (j * from->pitches[i]),
