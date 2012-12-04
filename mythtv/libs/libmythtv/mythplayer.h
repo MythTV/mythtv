@@ -31,9 +31,8 @@
 
 #include "mythtvexp.h"
 
-extern "C" {
 #include "filter.h"
-}
+
 using namespace std;
 
 class VideoOutput;

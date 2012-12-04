@@ -5,11 +5,11 @@
 #ifndef _FILTER_H
 #define _FILTER_H
 
+#include "frame.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include "frame.h"
 
 typedef struct FmtConv_
 {
