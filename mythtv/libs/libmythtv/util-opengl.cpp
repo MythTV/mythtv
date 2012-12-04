@@ -10,7 +10,7 @@ extern "C" {
 #include "ffmpeg-mmx.h"
 }
 
-static mmx_t mmx_1s = {0xffffffffffffffffLL};
+static mmx_t mmx_1s = {0xffffffffffffffffULL};
 
 static inline void mmx_pack_alpha1s_high(uint8_t *y1, uint8_t *y2)
 {

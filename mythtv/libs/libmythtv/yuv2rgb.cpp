@@ -87,14 +87,14 @@ do {                            \
 #if HAVE_MMX
 static inline void mmx_yuv2rgb (uint8_t * py, uint8_t * pu, uint8_t * pv)
 {
-    static mmx_t mmx_80w = {0x0080008000800080LL};
-    static mmx_t mmx_U_green = {0xf37df37df37df37dLL};
-    static mmx_t mmx_U_blue = {0x4093409340934093LL};
-    static mmx_t mmx_V_red = {0x3312331233123312LL};
-    static mmx_t mmx_V_green = {0xe5fce5fce5fce5fcLL};
-    static mmx_t mmx_10w = {0x1010101010101010LL};
-    static mmx_t mmx_00ffw = {0x00ff00ff00ff00ffLL};
-    static mmx_t mmx_Y_coeff = {0x253f253f253f253fLL};
+    static mmx_t mmx_80w = {0x0080008000800080ULL};
+    static mmx_t mmx_U_green = {0xf37df37df37df37dULL};
+    static mmx_t mmx_U_blue = {0x4093409340934093ULL};
+    static mmx_t mmx_V_red = {0x3312331233123312ULL};
+    static mmx_t mmx_V_green = {0xe5fce5fce5fce5fcULL};
+    static mmx_t mmx_10w = {0x1010101010101010ULL};
+    static mmx_t mmx_00ffw = {0x00ff00ff00ff00ffULL};
+    static mmx_t mmx_Y_coeff = {0x253f253f253f253fULL};
 
     movd_m2r (*pu, mm0);                // mm0 = 00 00 00 00 u3 u2 u1 u0
     movd_m2r (*pv, mm1);                // mm1 = 00 00 00 00 v3 v2 v1 v0
