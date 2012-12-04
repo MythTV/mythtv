@@ -57,53 +57,55 @@ ProgramRecPriorityInfo::ProgramRecPriorityInfo(
 {
 }
 
-ProgramRecPriorityInfo &ProgramRecPriorityInfo::operator=(
-    const ProgramInfo &other)
+void ProgramRecPriorityInfo::clone(
+    const ProgramRecPriorityInfo &other, bool ignore_non_serialized_data)
 {
-    return clone(other);
+    RecordingInfo::clone(other, ignore_non_serialized_data);
+
+    if (!ignore_non_serialized_data)
+    {
+        recType            = other.recType;
+        matchCount         = other.matchCount;
+        recCount           = other.recCount;
+        last_record        = other.last_record;
+        avg_delay          = other.avg_delay;
+        autoRecPriority    = other.autoRecPriority;
+        profile            = other.profile;
+    }
 }
 
-ProgramRecPriorityInfo &ProgramRecPriorityInfo::operator=(
-    const ProgramRecPriorityInfo &other)
+void ProgramRecPriorityInfo::clone(
+    const RecordingInfo &other, bool ignore_non_serialized_data)
 {
-    return clone(other);
+    RecordingInfo::clone(other, ignore_non_serialized_data);
+
+    if (!ignore_non_serialized_data)
+    {
+        recType            = kNotRecording;
+        matchCount         = 0;
+        recCount           = 0;
+        last_record        = QDateTime();
+        avg_delay          = 0;
+        autoRecPriority    = 0;
+        profile.clear();
+    }
 }
 
-ProgramRecPriorityInfo &ProgramRecPriorityInfo::operator=(
-    const RecordingInfo &other)
+void ProgramRecPriorityInfo::clone(
+    const ProgramInfo &other, bool ignore_non_serialized_data)
 {
-    return clone((ProgramInfo&)other);
-}
+    RecordingInfo::clone(other, ignore_non_serialized_data);
 
-ProgramRecPriorityInfo &ProgramRecPriorityInfo::clone(
-    const ProgramRecPriorityInfo &other)
-{
-    RecordingInfo::clone(other);
-
-    recType            = other.recType;
-    matchCount         = other.matchCount;
-    recCount           = other.recCount;
-    last_record        = other.last_record;
-    avg_delay          = other.avg_delay;
-    autoRecPriority    = other.autoRecPriority;
-    profile            = other.profile;
-
-    return *this;
-}
-
-ProgramRecPriorityInfo &ProgramRecPriorityInfo::clone(const ProgramInfo &other)
-{
-    RecordingInfo::clone(other);
-
-    recType            = kNotRecording;
-    matchCount         = 0;
-    recCount           = 0;
-    last_record        = QDateTime();
-    avg_delay          = 0;
-    autoRecPriority    = 0;
-    profile.clear();
-
-    return *this;
+    if (!ignore_non_serialized_data)
+    {
+        recType            = kNotRecording;
+        matchCount         = 0;
+        recCount           = 0;
+        last_record        = QDateTime();
+        avg_delay          = 0;
+        autoRecPriority    = 0;
+        profile.clear();
+    }
 }
 
 void ProgramRecPriorityInfo::clear(void)

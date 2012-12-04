@@ -26,12 +26,19 @@ class ProgramRecPriorityInfo : public RecordingInfo
   public:
     ProgramRecPriorityInfo();
     ProgramRecPriorityInfo(const ProgramRecPriorityInfo &other);
-    ProgramRecPriorityInfo &operator=(const ProgramRecPriorityInfo&);
-    ProgramRecPriorityInfo &operator=(const RecordingInfo&);
-    ProgramRecPriorityInfo &operator=(const ProgramInfo&);
+    ProgramRecPriorityInfo &operator=(const ProgramRecPriorityInfo &other)
+        { clone(other); return *this; }
+    ProgramRecPriorityInfo &operator=(const RecordingInfo &other)
+        { clone(other); return *this; }
+    ProgramRecPriorityInfo &operator=(const ProgramInfo &other)
+        { clone(other); return *this; }
+    virtual void clone(const ProgramRecPriorityInfo &other,
+                       bool ignore_non_serialized_data = false);
+    virtual void clone(const RecordingInfo &other,
+                       bool ignore_non_serialized_data = false);
+    virtual void clone(const ProgramInfo &other,
+                       bool ignore_non_serialized_data = false);
 
-    virtual ProgramRecPriorityInfo &clone(const ProgramRecPriorityInfo &other);
-    virtual ProgramRecPriorityInfo &clone(const ProgramInfo &other);
     virtual void clear(void);
 
     virtual void ToMap(QHash<QString, QString> &progMap,
