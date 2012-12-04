@@ -38,14 +38,14 @@ void c_zoom (unsigned int *expix1, unsigned int *expix2, unsigned int prevX, uns
 #ifdef MMX
 
 void    zoom_filter_xmmx (int prevX, int prevY, unsigned int *expix1, unsigned int *expix2, int *brutS, int *brutD, int buffratio, int precalCoef[16][16]);
-int 	zoom_filter_xmmx_supported ();
+int 	zoom_filter_xmmx_supported (void);
 void    zoom_filter_mmx (int prevX, int prevY, unsigned int *expix1, unsigned int *expix2, int *brutS, int *brutD, int buffratio, int precalCoef[16][16]);
-int 	zoom_filter_mmx_supported ();
+int 	zoom_filter_mmx_supported (void);
 
 static int zf_use_xmmx = 0;
 static int zf_use_mmx = 0;
 
-static void select_zoom_filter () {
+static void select_zoom_filter (void) {
 	static int firsttime = 1;
 	if (firsttime){
 		if (zoom_filter_xmmx_supported()) {
