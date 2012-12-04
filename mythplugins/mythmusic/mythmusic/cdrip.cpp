@@ -49,7 +49,7 @@ using namespace std;
 #include "cdrip.h"
 #ifdef HAVE_CDIO
 #include "cddecoder.h"
-#endif
+#endif // HAVE_CDIO
 #include "encoder.h"
 #include "vorbisencoder.h"
 #include "lameencoder.h"
@@ -63,12 +63,12 @@ using namespace std;
 // libparanoia compatibility
 #ifndef cdrom_paranoia
 #define cdrom_paranoia cdrom_paranoia_t
-#endif
+#endif // cdrom_paranoia
 
 #ifndef CD_FRAMESIZE_RAW
 # define CD_FRAMESIZE_RAW CDIO_CD_FRAMESIZE_RAW
-#endif
-#endif
+#endif // CD_FRAMESIZE_RAW
+#endif // HAVE_CDIO
 
 QEvent::Type RipStatusEvent::kTrackTextEvent =
     (QEvent::Type) QEvent::registerEventType();
@@ -159,7 +159,7 @@ static long int getSectorCount (QString &cddevice, int tracknum)
     cdda_close(device);
 #else
     (void)cddevice; (void)tracknum;
-#endif
+#endif // HAVE_CDIO
     return 0;
 }
 
@@ -167,7 +167,7 @@ static long int getSectorCount (QString &cddevice, int tracknum)
 static void paranoia_cb(long, paranoia_cb_mode_t)
 {
 }
-#endif
+#endif // HAVE_CDIO
 
 CDRipperThread::CDRipperThread(RipStatus *parent,  QString device,
                                QVector<RipTrack*> *tracks, int quality) :
@@ -181,7 +181,7 @@ CDRipperThread::CDRipperThread(RipStatus *parent,  QString device,
 #ifdef WIN32 // libcdio needs the drive letter with no path
     if (m_CDdevice.endsWith('\\'))
         m_CDdevice.chop(1);
-#endif
+#endif // WIN32
 }
 
 CDRipperThread::~CDRipperThread(void)
@@ -493,7 +493,7 @@ int CDRipperThread::ripTrack(QString &cddevice, Encoder *encoder, int tracknum)
 #else
     (void)cddevice; (void)encoder; (void)tracknum;
     return 0;
-#endif
+#endif // HAVE_CDIO
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -537,7 +537,7 @@ Ripper::Ripper(MythScreenStack *parent, QString device) :
         m_mediaMonitorActive = true;
         mon->StopMonitoring();
     }
-#endif
+#endif // _WIN32
 }
 
 Ripper::~Ripper(void)
@@ -553,7 +553,7 @@ Ripper::~Ripper(void)
         if (mon)
             mon->StartMonitoring();
     }
-#endif
+#endif // _WIN32
 
     if (m_somethingwasripped)
         emit ripFinished();
@@ -747,7 +747,7 @@ void Ripper::scanCD(void)
         arg(__func__).arg(m_CDdevice));
     (void)cdio_close_tray(m_CDdevice.toAscii().constData(), NULL);
     }
-#endif
+#endif // HAVE_CDIO
 
     if (m_decoder)
         delete m_decoder;
@@ -1107,7 +1107,7 @@ void Ripper::ejectCD()
                 mon->Unlock(pMedia);
             }
         }
-#endif
+#endif // HAVE_CDIO
     }
 }
 
