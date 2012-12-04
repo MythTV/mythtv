@@ -96,7 +96,7 @@ lang_init(void)
 
     memset(lang_char, 0, sizeof(lang_char));
     for (i = 1; i <= 13; i++)
-       lang_char[lang_chars[0][i]] = i;
+        lang_char[(unsigned char)(lang_chars[0][i])] = i;
 }
 
 
