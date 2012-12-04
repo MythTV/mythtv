@@ -4846,11 +4846,13 @@ bool MythPlayer::ITVHandleAction(const QString &action)
 {
     bool result = false;
 
+#ifdef USING_MHEG
     if (!GetInteractiveTV())
         return result;
 
     QMutexLocker locker(&itvLock);
     result = interactiveTV->OfferKey(action);
+#endif // USING_MHEG
 
     return result;
 }
