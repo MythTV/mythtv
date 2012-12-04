@@ -18,7 +18,7 @@ static unsigned short rand_pos;
 	while (rand_pos != 0) rand_tab [rand_pos++] = rand () ;
 
 
-static inline int RAND() {
+static inline int RAND(void) {
 	++rand_pos;
 	return rand_tab[rand_pos];
 }

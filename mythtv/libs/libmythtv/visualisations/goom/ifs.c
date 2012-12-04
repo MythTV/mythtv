@@ -147,7 +147,6 @@ static FRACTAL *Root = (FRACTAL *) NULL, *Cur_F;
 IFSPoint *Buf;
 static int Cur_Pt;
 
-
 /*****************************************************/
 
 static  DBL
@@ -385,7 +384,7 @@ Trace (FRACTAL * F, F_PT xo, F_PT yo)
 }
 
 static void
-Draw_Fractal ( /* ModeInfo * mi */ )
+Draw_Fractal ( void /* ModeInfo * mi */ )
 {
 	FRACTAL *F = Root;
 	int     i, j;
