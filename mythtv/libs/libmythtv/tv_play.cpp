@@ -568,7 +568,7 @@ void TV::InitKeys(void)
             "Change Group View"), "");
 
     REG_KEY("TV Playback", "BACK", QT_TRANSLATE_NOOP("MythControls",
-            "Exit or return to DVD menu"), "");
+            "Exit or return to DVD menu"), "Esc");
     REG_KEY("TV Playback", ACTION_CLEAROSD, QT_TRANSLATE_NOOP("MythControls",
             "Clear OSD"), "Backspace");
     REG_KEY("TV Playback", ACTION_PAUSE, QT_TRANSLATE_NOOP("MythControls",
