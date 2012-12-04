@@ -107,7 +107,7 @@ MythThemedMenu::MythThemedMenu(const QString &cdir, const QString &menufile,
         m_allocedstate = true;
     }
 
-    Init(menufile);
+    SetMenuTheme(menufile);
 }
 
 /** \brief Loads the main UI theme, and a menu theme.
@@ -117,7 +117,7 @@ MythThemedMenu::MythThemedMenu(const QString &cdir, const QString &menufile,
  *
  *  \param menufile name of menu item xml file
  */
-void MythThemedMenu::Init(const QString &menufile)
+void MythThemedMenu::SetMenuTheme(const QString &menufile)
 {
     if (!m_state->m_loaded)
     {
@@ -147,7 +147,8 @@ MythThemedMenu::~MythThemedMenu(void)
         delete m_state;
 }
 
-/// \brief Returns true iff a theme has been found by a previous call to Init()
+/// \brief Returns true iff a theme has been
+///        found by a previous call to SetMenuTheme().
 bool MythThemedMenu::foundTheme(void)
 {
     return m_foundtheme;
