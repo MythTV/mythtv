@@ -451,8 +451,8 @@ void CustomEdit::loadClauses()
     new MythUIButtonListItem(m_clauseList, rule.title,
                              qVariantFromValue(rule));
 
-    rule.title = QString(tr("Category type") +
-                   " ('movie', 'series', 'sports' " + tr("or") + " 'tvshow')");
+    rule.title = tr("Category type (%1)", "List of hardcoded category types")
+                    .arg("'movie', 'series', 'sports', 'tvshow'");
     rule.subtitle.clear();
     rule.description = "program.category_type = 'sports' ";
     new MythUIButtonListItem(m_clauseList, rule.title,
