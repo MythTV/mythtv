@@ -28,6 +28,7 @@ class PIDInfo
     PIDInfo(uint pid, uint stream_type, int pes_type) :
         _pid(pid),                       filter_fd(-1),
         streamType(stream_type),         pesType(pes_type) {;}
+    virtual ~PIDInfo() {;}
 
     virtual bool Open(const QString &dev, bool use_section_reader)
         { return false; }
