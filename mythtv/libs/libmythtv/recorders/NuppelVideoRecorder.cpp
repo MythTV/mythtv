@@ -2215,10 +2215,10 @@ void NuppelVideoRecorder::WriteSeekTable(void)
     char *seekbuf = new char[frameheader.packetlength];
     int offset = 0;
 
-    vector<struct seektable_entry>::iterator i = seektable->begin();
-    for (; i != seektable->end(); i++)
+    vector<struct seektable_entry>::iterator it = seektable->begin();
+    for (; it != seektable->end(); ++it)
     {
-        memcpy(seekbuf + offset, (const void *)&(*i),
+        memcpy(seekbuf + offset, (const void *)&(*it),
                sizeof(struct seektable_entry));
         offset += sizeof(struct seektable_entry);
     }
