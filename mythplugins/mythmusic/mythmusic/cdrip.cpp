@@ -123,7 +123,7 @@ void CDEjectorThread::run()
 
 static long int getSectorCount (QString &cddevice, int tracknum)
 {
-#if defined HAVE_CDIO
+#ifdef HAVE_CDIO
     QByteArray devname = cddevice.toAscii();
     cdrom_drive *device = cdda_identify(devname.constData(), 0, NULL);
 
@@ -377,7 +377,7 @@ void CDRipperThread::run(void)
 
 int CDRipperThread::ripTrack(QString &cddevice, Encoder *encoder, int tracknum)
 {
-#if defined HAVE_CDIO
+#ifdef HAVE_CDIO
     QByteArray devname = cddevice.toAscii();
     cdrom_drive *device = cdda_identify(devname.constData(), 0, NULL);
 
