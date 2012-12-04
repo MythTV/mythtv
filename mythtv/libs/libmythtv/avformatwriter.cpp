@@ -46,6 +46,8 @@ AVFormatWriter::AVFormatWriter()
       m_videoStream(NULL),   m_avVideoCodec(NULL),
       m_audioStream(NULL),   m_avAudioCodec(NULL),
       m_picture(NULL),       m_tmpPicture(NULL),
+      m_pkt(NULL),           m_audPicture(NULL),
+      m_audPkt(NULL),
       m_videoOutBuf(NULL),
       m_audioOutBuf(NULL),   m_audioOutBufSize(0),
       m_audioFltBuf(NULL)
