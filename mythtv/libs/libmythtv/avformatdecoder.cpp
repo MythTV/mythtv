@@ -4052,7 +4052,7 @@ int AvFormatDecoder::AutoSelectAudioTrack(void)
         {
             LOG(VB_AUDIO, LOG_WARNING, "No audio tracks matched the type filter, "
                                        "so trying all tracks.");
-            for (int i = 0; i < atracks.size(); i++)
+            for (int i = 0; i < static_cast<int>(atracks.size()); i++)
                 ftype.push_back(i);
         }
 
