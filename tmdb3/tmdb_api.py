@@ -22,7 +22,7 @@ for search and retrieval of text metadata and image URLs from TMDB.
 Preliminary API specifications can be found at
 http://help.themoviedb.org/kb/api/about-3"""
 
-__version__="v0.6.15"
+__version__="v0.6.16"
 # 0.1.0  Initial development
 # 0.2.0  Add caching mechanism for API queries
 # 0.2.1  Temporary work around for broken search paging
@@ -58,6 +58,7 @@ __version__="v0.6.15"
 # 0.6.13 Fix URL for rating Movies
 # 0.6.14 Add support for Lists
 # 0.6.15 Add ability to search Collections
+# 0.6.16 Make absent primary images return None (previously u'')
 
 from request import set_key, Request
 from util import Datapoint, Datalist, Datadict, Element, NameRepr, SearchRepr
@@ -213,8 +214,14 @@ class Image( Element ):
     def __gt__(self, other):
         return (self.language != other.language) \
                 and (other.language == self._locale.language)
+    # direct match for comparison
     def __eq__(self, other):
-        return self.language == other.language
+        return self.filename == other.filename
+    # special handling for boolean to see if exists
+    def __nonzero__(self):
+        if len(self.filename) == 0:
+            return False
+        return True
 
     def __repr__(self):
         # BASE62 encoded filename, no need to worry about unicode
@@ -259,7 +266,8 @@ class Person( Element ):
     dayofdeath  = Datapoint('deathday', default=None, handler=process_date)
     homepage    = Datapoint('homepage')
     birthplace  = Datapoint('place_of_birth')
-    profile     = Datapoint('profile_path', handler=Profile, raw=False)
+    profile     = Datapoint('profile_path', handler=Profile, \
+                                raw=False, default=None)
     adult       = Datapoint('adult')
     aliases     = Datalist('also_known_as')
 
@@ -381,7 +389,8 @@ class Studio( NameRepr, Element ):
     name            = Datapoint('name')
     description     = Datapoint('description')
     headquarters    = Datapoint('headquarters')
-    logo            = Datapoint('logo_path', handler=Logo, raw=False)
+    logo            = Datapoint('logo_path', handler=Logo, \
+                                    raw=False, default=None)
     # FIXME: manage not-yet-defined handlers in a way that will propogate
     #        locale information properly
     parent          = Datapoint('parent_company', \
@@ -502,8 +511,10 @@ class Movie( Element ):
     homepage        = Datapoint('homepage')
     imdb            = Datapoint('imdb_id')
 
-    backdrop        = Datapoint('backdrop_path', handler=Backdrop, raw=False)
-    poster          = Datapoint('poster_path', handler=Poster, raw=False)
+    backdrop        = Datapoint('backdrop_path', handler=Backdrop, \
+                                    raw=False, default=None)
+    poster          = Datapoint('poster_path', handler=Poster, \
+                                    raw=False, default=None)
 
     popularity      = Datapoint('popularity')
     userrating      = Datapoint('vote_average')
@@ -638,8 +649,10 @@ class ReverseCrew( Movie ):
 class Collection( NameRepr, Element ):
     id       = Datapoint('id', initarg=1)
     name     = Datapoint('name')
-    backdrop = Datapoint('backdrop_path', handler=Backdrop, raw=False)
-    poster   = Datapoint('poster_path', handler=Poster, raw=False)
+    backdrop = Datapoint('backdrop_path', handler=Backdrop, \
+                            raw=False, default=None)
+    poster   = Datapoint('poster_path', handler=Poster, \
+                            raw=False, default=None)
     members  = Datalist('parts', handler=Movie, sort='releasedate')
 
     def _populate(self):
@@ -664,7 +677,8 @@ class List( NameRepr, Element ):
     favorites   = Datapoint('favorite_count')
     language    = Datapoint('iso_639_1')
     count       = Datapoint('item_count')
-    poster      = Datapoint('poster_path', handler=Poster, raw=False)
+    poster      = Datapoint('poster_path', handler=Poster, \
+                                raw=False, default=None)
 
     members     = Datalist('items', handler=Movie)
 
