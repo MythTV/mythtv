@@ -4,9 +4,7 @@
 #define VIDEOOUTBASE_H_
 
 #include "frame.h"
-extern "C" {
 #include "filter.h"
-}
 
 #include <QSize>
 #include <QRect>

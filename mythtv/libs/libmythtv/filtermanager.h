@@ -1,10 +1,8 @@
 #ifndef FILTERMANAGER
 #define FILTERMANAGER
 
-extern "C" {
 #include "filter.h"
 #include "frame.h"
-}
 
 // C++ headers
 #include <vector>
