@@ -1521,11 +1521,11 @@ bool MythUIWebBrowser::keyPressEvent(QKeyEvent *event)
         }
         else if (action == "PAGEUP")
         {
-            Scroll(0, -m_browserArea.height());
+            Scroll(0, -m_browserArea.height() * 19 / 20);
         }
         else if (action == "PAGEDOWN")
         {
-            Scroll(0, m_browserArea.height());
+            Scroll(0, m_browserArea.height() * 19 / 20);
         }
         else if (action == "ZOOMIN")
         {
