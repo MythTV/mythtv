@@ -51,5 +51,6 @@ qjson-install qjson-uninstall qjson-clean qjson-distclean:
 	${MAKE} -C qjson ${@:qjson-%=%} 
 
 libhdhomerun-all libhdhomerun-clean libhdhomerun-distclean libhdhomerun-install libhdhomerun-uninstall:
-	${MAKE} -C libhdhomerun ${@:libhdhomerun-%=%}
+	${MAKE} -C libhdhomerun -f Makefile.lib ${@:libhdhomerun-%=%}
+	${MAKE} -C libhdhomerun -f Makefile.app ${@:libhdhomerun-%=%}
 
