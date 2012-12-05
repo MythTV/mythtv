@@ -214,8 +214,8 @@ class Record( CMPRecord, DBDataWrite, RECTYPE ):
                            join='', db=None, type=RECTYPE.kAllRecord, 
                            searchtype=RECSEARCHTYPE.kPowerSearch, wait=False):
 
-        if type not in (RECTYPE.kAllRecord,           RECTYPE.kFindDailyRecord,
-                        RECTYPE.kFindWeeklyRecord,    RECTYPE.kFindOneRecord):
+        if type not in (RECTYPE.kAllRecord,           RECTYPE.kDailyRecord,
+                        RECTYPE.kWeeklyRecord,        RECTYPE.kOneRecord):
             raise MythDBError("Invalid 'type' set for power recording rule.")
 
         rec = cls(None, db=db)

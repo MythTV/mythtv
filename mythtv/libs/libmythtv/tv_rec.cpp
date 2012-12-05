@@ -806,7 +806,7 @@ void TVRec::StartedRecording(RecordingInfo *curRec)
 }
 
 /** \brief If not a premature stop, adds program to history of recorded
- *         programs. If the recording type is kFindOneRecord this find
+ *         programs. If the recording type is kOneRecord this find
  *         is removed.
  *  \sa ProgramInfo::FinishedRecording(bool prematurestop)
  *  \param curRec RecordingInfo or recording to mark as done

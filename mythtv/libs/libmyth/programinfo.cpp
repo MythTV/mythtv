@@ -1977,7 +1977,7 @@ bool ProgramInfo::IsSameProgramWeakCheck(const ProgramInfo &other) const
  */
 bool ProgramInfo::IsSameProgram(const ProgramInfo& other) const
 {
-    if (GetRecordingRuleType() == kFindOneRecord)
+    if (GetRecordingRuleType() == kOneRecord)
         return recordid == other.recordid;
 
     if (findid && findid == other.findid &&

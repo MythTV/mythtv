@@ -244,7 +244,7 @@ void ScheduleCommon::ShowRecordingDialog(const RecordingInfo& recinfo)
                     recinfo.GetRecordingStatus() != rsTuning &&
                     recinfo.GetRecordingStatus() != rsOtherRecording &&
                     recinfo.GetRecordingStatus() != rsOtherTuning &&
-                    recinfo.GetRecordingRuleType() != kFindOneRecord &&
+                    recinfo.GetRecordingRuleType() != kOneRecord &&
                     !((recinfo.GetFindID() == 0 ||
                        !IsFindApplicable(recinfo)) &&
                       recinfo.GetCategoryType() == "series" &&
@@ -283,7 +283,7 @@ void ScheduleCommon::ShowRecordingDialog(const RecordingInfo& recinfo)
                                          qVariantFromValue(recinfo));
 
                     if (recinfo.GetRecordingRuleType() != kSingleRecord &&
-                        recinfo.GetRecordingRuleType() != kFindOneRecord)
+                        recinfo.GetRecordingRuleType() != kOneRecord)
                     {
                         menuPopup->AddButton(tr("Add Override"),
                                              qVariantFromValue(recinfo));
@@ -427,7 +427,7 @@ void ScheduleCommon::ShowNotRecordingDialog(const RecordingInfo& recinfo)
                     const RecordingDupMethodType dupmethod =
                         recinfo.GetDuplicateCheckMethod();
 
-                    if (recinfo.GetRecordingRuleType() != kFindOneRecord &&
+                    if (recinfo.GetRecordingRuleType() != kOneRecord &&
                         !((recinfo.GetFindID() == 0 ||
                            !IsFindApplicable(recinfo)) &&
                           recinfo.GetCategoryType() == "series" &&
@@ -453,7 +453,7 @@ void ScheduleCommon::ShowNotRecordingDialog(const RecordingInfo& recinfo)
                                      qVariantFromValue(recinfo));
 
                 if (recinfo.GetRecordingRuleType() != kSingleRecord &&
-                    recinfo.GetRecordingRuleType() != kFindOneRecord &&
+                    recinfo.GetRecordingRuleType() != kOneRecord &&
                     recinfo.GetRecordingStatus() != rsNotListed)
                 {
                     menuPopup->AddButton(tr("Add Override"),
@@ -557,7 +557,7 @@ void ScheduleCommon::customEvent(QEvent *event)
             {
                 if (recInfo.GetRecordingRuleType() == kSingleRecord ||
                     recInfo.GetRecordingRuleType() == kOverrideRecord ||
-                    recInfo.GetRecordingRuleType() == kFindOneRecord)
+                    recInfo.GetRecordingRuleType() == kOneRecord)
                     EditScheduled(&recInfo);
                 else
                     MakeOverride(&recInfo, true);
@@ -581,6 +581,6 @@ void ScheduleCommon::customEvent(QEvent *event)
 */
 bool ScheduleCommon::IsFindApplicable(const RecordingInfo& recInfo) const
 {
-    return recInfo.GetRecordingRuleType() == kFindDailyRecord ||
-           recInfo.GetRecordingRuleType() == kFindWeeklyRecord;
+    return recInfo.GetRecordingRuleType() == kDailyRecord ||
+           recInfo.GetRecordingRuleType() == kWeeklyRecord;
 }

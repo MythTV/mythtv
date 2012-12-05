@@ -12,11 +12,9 @@ int RecTypePrecedence(RecordingType rectype)
         case kDontRecord:     return 1; break;
         case kOverrideRecord: return 2; break;
         case kSingleRecord:   return 3; break;
-        case kFindOneRecord:  return 4; break;
-        case kWeekslotRecord: return 5; break;
-        case kFindWeeklyRecord: return 6; break;
-        case kTimeslotRecord: return 7; break;
-        case kFindDailyRecord: return 8; break;
+        case kOneRecord:      return 4; break;
+        case kWeeklyRecord:   return 6; break;
+        case kDailyRecord:    return 8; break;
         case kChannelRecord:  return 9; break;
         case kAllRecord:      return 10; break;
         case kTemplateRecord: return 0; break;
@@ -31,20 +29,16 @@ QString toString(RecordingType rectype)
     {
         case kSingleRecord:
             return QObject::tr("Single Record");
-        case kTimeslotRecord:
-            return QObject::tr("Record Daily");
-        case kWeekslotRecord:
-            return QObject::tr("Record Weekly");
         case kChannelRecord:
             return QObject::tr("Channel Record");
         case kAllRecord:
             return QObject::tr("Record All");
-        case kFindOneRecord:
-            return QObject::tr("Find One");
-        case kFindDailyRecord:
-            return QObject::tr("Find Daily");
-        case kFindWeeklyRecord:
-            return QObject::tr("Find Weekly");
+        case kOneRecord:
+            return QObject::tr("Record One");
+        case kDailyRecord:
+            return QObject::tr("Record Daily");
+        case kWeeklyRecord:
+            return QObject::tr("Record Weekly");
         case kOverrideRecord:
         case kDontRecord:
             return QObject::tr("Override Recording");
@@ -62,20 +56,16 @@ QString toRawString(RecordingType rectype)
     {
         case kSingleRecord:
             return QString("Single Record");
-        case kTimeslotRecord:
-            return QString("Record Daily");
-        case kWeekslotRecord:
-            return QString("Record Weekly");
         case kChannelRecord:
             return QString("Channel Record");
         case kAllRecord:
             return QString("Record All");
-        case kFindOneRecord:
-            return QString("Find One");
-        case kFindDailyRecord:
-            return QString("Find Daily");
-        case kFindWeeklyRecord:
-            return QString("Find Weekly");
+        case kOneRecord:
+            return QString("Record One");
+        case kDailyRecord:
+            return QString("Record Daily");
+        case kWeeklyRecord:
+            return QString("Record Weekly");
         case kOverrideRecord:
         case kDontRecord:
             return QString("Override Recording");
@@ -90,20 +80,19 @@ RecordingType recTypeFromString(QString type)
         return kNotRecording;
     if (type.toLower() == "single record" || type.toLower() == "single")
         return kSingleRecord;
-    else if (type.toLower() == "record daily" || type.toLower() == "daily")
-        return kTimeslotRecord;
-    else if (type.toLower() == "record weekly" || type.toLower() == "weekly")
-        return kWeekslotRecord;
     else if (type.toLower() == "channel record" || type.toLower() == "channel")
         return kChannelRecord;
     else if (type.toLower() == "record all" || type.toLower() == "all")
         return kAllRecord;
-    else if (type.toLower() == "find one" || type.toLower() == "findone")
-        return kFindOneRecord;
-    else if (type.toLower() == "find daily" || type.toLower() == "finddaily")
-        return kFindDailyRecord;
-    else if (type.toLower() == "find weekly" || type.toLower() == "findweekly")
-        return kFindWeeklyRecord;
+    else if (type.toLower() == "record one" || type.toLower() == "one" ||
+             type.toLower() == "find one" || type.toLower() == "findone")
+        return kOneRecord;
+    else if (type.toLower() == "record daily" || type.toLower() == "daily" ||
+             type.toLower() == "find daily" || type.toLower() == "finddaily")
+        return kDailyRecord;
+    else if (type.toLower() == "record weekly" || type.toLower() == "weekly" ||
+             type.toLower() == "find weekly" || type.toLower() == "findweekly")
+        return kWeeklyRecord;
     else if (type.toLower() == "template" || type.toLower() == "template")
         return kTemplateRecord;
     else if (type.toLower() == "override recording" || type.toLower() == "override")
@@ -120,26 +109,22 @@ QChar toQChar(RecordingType rectype)
     {
         case kSingleRecord:
             ret = QObject::tr("S", "RecTypeChar kSingleRecord");     break;
-        case kTimeslotRecord:
-            ret = QObject::tr("T", "RecTypeChar kTimeslotRecord");   break;
-        case kWeekslotRecord:
-            ret = QObject::tr("W", "RecTypeChar kWeekslotRecord");   break;
         case kChannelRecord:
             ret = QObject::tr("C", "RecTypeChar kChannelRecord");    break;
         case kAllRecord:
             ret = QObject::tr("A", "RecTypeChar kAllRecord");        break;
-        case kFindOneRecord:
-            ret = QObject::tr("F", "RecTypeChar kFindOneRecord");    break;
-        case kFindDailyRecord:
-            ret = QObject::tr("d", "RecTypeChar kFindDailyRecord");  break;
-        case kFindWeeklyRecord:
-            ret = QObject::tr("w", "RecTypeChar kFindWeeklyRecord"); break;
+        case kOneRecord:
+            ret = QObject::tr("1", "RecTypeChar kOneRecord");    break;
+        case kDailyRecord:
+            ret = QObject::tr("D", "RecTypeChar kDailyRecord");  break;
+        case kWeeklyRecord:
+            ret = QObject::tr("W", "RecTypeChar kWeeklyRecord"); break;
         case kOverrideRecord:
         case kDontRecord:
             ret = QObject::tr("O", "RecTypeChar kOverrideRecord/kDontRecord");
             break;
         case kTemplateRecord:
-            ret = QObject::tr("t", "RecTypeChar kTemplateRecord");   break;
+            ret = QObject::tr("T", "RecTypeChar kTemplateRecord");   break;
         case kNotRecording:
         default:
             ret = " ";

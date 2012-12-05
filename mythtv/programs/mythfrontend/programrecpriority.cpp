@@ -1519,23 +1519,23 @@ void ProgramRecPriority::UpdateList()
 
         QString channame = progInfo->channame;
         if ((progInfo->recType == kAllRecord) ||
-            (progInfo->recType == kFindOneRecord) ||
-            (progInfo->recType == kFindDailyRecord) ||
-            (progInfo->recType == kFindWeeklyRecord))
+            (progInfo->recType == kOneRecord) ||
+            (progInfo->recType == kDailyRecord) ||
+            (progInfo->recType == kWeeklyRecord))
             channame = tr("Any");
         item->SetText(channame, "channel", state);
         QString channum = progInfo->chanstr;
         if ((progInfo->recType == kAllRecord) ||
-            (progInfo->recType == kFindOneRecord) ||
-            (progInfo->recType == kFindDailyRecord) ||
-            (progInfo->recType == kFindWeeklyRecord))
+            (progInfo->recType == kOneRecord) ||
+            (progInfo->recType == kDailyRecord) ||
+            (progInfo->recType == kWeeklyRecord))
             channum = tr("Any");
         item->SetText(channum, "channum", state);
         QString callsign = progInfo->chansign;
         if ((progInfo->recType == kAllRecord) ||
-            (progInfo->recType == kFindOneRecord) ||
-            (progInfo->recType == kFindDailyRecord) ||
-            (progInfo->recType == kFindWeeklyRecord))
+            (progInfo->recType == kOneRecord) ||
+            (progInfo->recType == kDailyRecord) ||
+            (progInfo->recType == kWeeklyRecord))
             callsign = tr("Any");
         item->SetText(callsign, "callsign", state);
 
@@ -1651,9 +1651,9 @@ void ProgramRecPriority::updateInfo(MythUIButtonListItem *item)
     {
         QString channame = pgRecInfo->channame;
         if ((pgRecInfo->rectype == kAllRecord) ||
-            (pgRecInfo->rectype == kFindOneRecord) ||
-            (pgRecInfo->rectype == kFindDailyRecord) ||
-            (pgRecInfo->rectype == kFindWeeklyRecord))
+            (pgRecInfo->rectype == kOneRecord) ||
+            (pgRecInfo->rectype == kDailyRecord) ||
+            (pgRecInfo->rectype == kWeeklyRecord))
             channame = tr("Any");
         m_channameText->SetText(channame);
     }
@@ -1662,9 +1662,9 @@ void ProgramRecPriority::updateInfo(MythUIButtonListItem *item)
     {
         QString channum = pgRecInfo->chanstr;
         if ((pgRecInfo->rectype == kAllRecord) ||
-            (pgRecInfo->rectype == kFindOneRecord) ||
-            (pgRecInfo->rectype == kFindDailyRecord) ||
-            (pgRecInfo->rectype == kFindWeeklyRecord))
+            (pgRecInfo->rectype == kOneRecord) ||
+            (pgRecInfo->rectype == kDailyRecord) ||
+            (pgRecInfo->rectype == kWeeklyRecord))
             channum = tr("Any");
         m_channumText->SetText(channum);
     }
@@ -1673,9 +1673,9 @@ void ProgramRecPriority::updateInfo(MythUIButtonListItem *item)
     {
         QString callsign = pgRecInfo->chansign;
         if ((pgRecInfo->rectype == kAllRecord) ||
-            (pgRecInfo->rectype == kFindOneRecord) ||
-            (pgRecInfo->rectype == kFindDailyRecord) ||
-            (pgRecInfo->rectype == kFindWeeklyRecord))
+            (pgRecInfo->rectype == kOneRecord) ||
+            (pgRecInfo->rectype == kDailyRecord) ||
+            (pgRecInfo->rectype == kWeeklyRecord))
             callsign = tr("Any");
         m_callsignText->SetText(callsign);
     }

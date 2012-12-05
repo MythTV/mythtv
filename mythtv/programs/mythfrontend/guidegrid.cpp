@@ -1300,7 +1300,7 @@ void GuideGrid::fillProgramRowInfos(unsigned int row, bool useExistingData)
             case kSingleRecord:
                 recFlag = 1;
                 break;
-            case kTimeslotRecord:
+            case kDailyRecord:
                 recFlag = 2;
                 break;
             case kChannelRecord:
@@ -1309,12 +1309,10 @@ void GuideGrid::fillProgramRowInfos(unsigned int row, bool useExistingData)
             case kAllRecord:
                 recFlag = 4;
                 break;
-            case kWeekslotRecord:
+            case kWeeklyRecord:
                 recFlag = 5;
                 break;
-            case kFindOneRecord:
-            case kFindDailyRecord:
-            case kFindWeeklyRecord:
+            case kOneRecord:
                 recFlag = 6;
                 break;
             case kOverrideRecord:

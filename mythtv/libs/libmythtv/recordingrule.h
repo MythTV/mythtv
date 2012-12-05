@@ -39,7 +39,7 @@ class MTV_PUBLIC RecordingRule
     bool Load(bool asTemplate = false);
     bool LoadByProgram(const ProgramInfo* proginfo);
     bool LoadBySearch(RecSearchType lsearch, QString textname, QString forwhat,
-                      QString from = "");
+                      QString from = "", ProgramInfo *pginfo = NULL);
     bool LoadTemplate(QString category, QString categoryType = "Default");
 
     bool ModifyPowerSearchByID(int rid, QString textname, QString forwhat,

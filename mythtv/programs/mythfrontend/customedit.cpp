@@ -678,7 +678,8 @@ void CustomEdit::recordClicked(void)
     {
         record->LoadBySearch(kPowerSearch, m_titleEdit->GetText(),
                              evaluate(m_descriptionEdit->GetText()),
-                             m_subtitleEdit->GetText());
+                             m_subtitleEdit->GetText(),
+                             m_pginfo->GetTitle().isEmpty() ? NULL : m_pginfo);
     }
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();

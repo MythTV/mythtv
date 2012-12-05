@@ -20,16 +20,16 @@ typedef enum RecordingTypes
 {
     kNotRecording = 0,
     kSingleRecord = 1,
-    kTimeslotRecord,
-    kChannelRecord,
-    kAllRecord,
-    kWeekslotRecord,
-    kFindOneRecord,
-    kOverrideRecord,
-    kDontRecord,
-    kFindDailyRecord,
-    kFindWeeklyRecord,
-    kTemplateRecord
+    kDailyRecord = 2,
+    kChannelRecord = 3,
+    kAllRecord = 4,
+    kWeeklyRecord = 5,
+    kOneRecord = 6,
+    kOverrideRecord = 7,
+    kDontRecord = 8,
+    //kFindDailyRecord = 9, (Obsolete)
+    //kFindWeeklyRecord = 10, (Obsolete)
+    kTemplateRecord = 11
 } RecordingType; // note stored in uint8_t in ProgramInfo
 MPUBLIC QString toString(RecordingType);
 MPUBLIC QString toRawString(RecordingType);

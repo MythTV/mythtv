@@ -2279,7 +2279,6 @@ NULL
 
     if (dbver == "1307")
     {
-        
         const char *updates[] = {
 "ALTER TABLE channel MODIFY COLUMN icon varchar(255) NOT NULL DEFAULT '';",
 "UPDATE channel SET icon='' WHERE icon='none';",
@@ -2289,6 +2288,45 @@ NULL
             return false;
     }
     
+    if (dbver == "1308")
+    {
+        const char *updates[] = {
+// Add this time filter
+"REPLACE INTO recordfilter (filterid, description, clause, newruledefault) "
+"  VALUES (8, 'This time', 'ABS(TIMESTAMPDIFF(MINUTE, CONVERT_TZ("
+"  ADDTIME(RECTABLE.startdate, RECTABLE.starttime), ''UTC'', ''SYSTEM''), "
+"  CONVERT_TZ(program.starttime, ''UTC'', ''SYSTEM''))) MOD 1440 <= 10', 0)",
+// Add this day and time filter
+"REPLACE INTO recordfilter (filterid, description, clause, newruledefault) "
+"  VALUES (9, 'This day and time', 'ABS(TIMESTAMPDIFF(MINUTE, CONVERT_TZ("
+"  ADDTIME(RECTABLE.startdate, RECTABLE.starttime), ''UTC'', ''SYSTEM''), "
+"  CONVERT_TZ(program.starttime, ''UTC'', ''SYSTEM''))) MOD 10080 <= 10', 0)",
+// Convert old, normal Timeslot rules to Channel with time filter
+"UPDATE record SET type = 3, filter = filter|256 "
+"  WHERE type = 2 AND search = 0",
+// Convert old, normal Weekslot rules to Channel with day and time filter
+"UPDATE record SET type = 3, filter = filter|512 "
+"  WHERE type = 5 AND search = 0",
+// Convert old, normal find daily to new, power search, find daily
+"UPDATE record SET type = 2, search = 1, chanid = 0, station = '', "
+"  subtitle = '', description = CONCAT('program.title = ''', "
+"  REPLACE(title, '''', ''''''), ''''), "
+"  title = CONCAT(title, ' (Power Search)') WHERE type = 9 AND search = 0",
+// Convert old, normal find weekly to new, power search, find weekly
+"UPDATE record SET type = 5, search = 1, chanid = 0, station = '', "
+"  subtitle = '', description = CONCAT('program.title = ''', "
+"  REPLACE(title, '''', ''''''), ''''), "
+"  title = CONCAT(title, ' (Power Search)') WHERE type = 10 AND search = 0",
+// Convert old, find daily to new, find daily
+"UPDATE record SET type = 2 WHERE type = 9",
+// Convert old, find weekly to new, find weekly
+"UPDATE record SET type = 5 WHERE type = 10",
+NULL
+};
+        if (!performActualUpdate(&updates[0], "1309", dbver))
+            return false;
+    }
+
     return true;
 }
 

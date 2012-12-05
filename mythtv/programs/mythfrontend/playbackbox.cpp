@@ -1940,8 +1940,7 @@ bool PlaybackBox::UpdateUILists(void)
 
             // Daily
             if (spanHours[recid] < 50 ||
-                recType[recid] == kTimeslotRecord ||
-                recType[recid] == kFindDailyRecord)
+                recType[recid] == kDailyRecord)
             {
                 if (delHours[recid] < m_watchListBlackOut * 4)
                 {
@@ -1973,8 +1972,7 @@ bool PlaybackBox::UpdateUILists(void)
             }
             // Weekly
             else if (nextHours[recid] ||
-                     recType[recid] == kWeekslotRecord ||
-                     recType[recid] == kFindWeeklyRecord)
+                     recType[recid] == kWeeklyRecord)
 
             {
                 if (delHours[recid] < (m_watchListBlackOut * 24) - 4)

@@ -728,7 +728,7 @@ void HouseKeeper::CleanupProgramListings(void)
     findq.prepare("SELECT record.recordid FROM record "
                   "LEFT JOIN oldfind ON oldfind.recordid = record.recordid "
                   "WHERE type = :FINDONE AND oldfind.findid IS NOT NULL;");
-    findq.bindValue(":FINDONE", kFindOneRecord);
+    findq.bindValue(":FINDONE", kOneRecord);
 
     if (findq.exec())
     {

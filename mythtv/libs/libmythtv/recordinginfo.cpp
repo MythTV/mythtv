@@ -772,12 +772,11 @@ void RecordingInfo::ApplyTranscoderProfileChange(const QString &profile) const
  *   If the program recording status is kNotRecording,
  *   ApplyRecordStateChange(kSingleRecord) is called.
  *   If the program recording status is kSingleRecording,
- *   ApplyRecordStateChange(kFindOneRecord) is called.
+ *   ApplyRecordStateChange(kOneRecord) is called.
  *   <br>etc...
  *
- *   The states in order are: kNotRecording, kSingleRecord, kFindOneRecord,
- *     kWeekslotRecord, kFindWeeklyRecord, kTimeslotRecord, kFindDailyRecord,
- *     kChannelRecord, kAllRecord.<br>
+ *   The states in order are: kNotRecording, kSingleRecord, kOneRecord,
+ *     kWeeklyRecord, kDailyRecord, kChannelRecord, kAllRecord.<br>
  *   And: kOverrideRecord, kDontRecord.
  *
  *   That is if you the recording is in any of the first set of states,
@@ -794,9 +793,9 @@ void RecordingInfo::ToggleRecord(void)
             ApplyRecordStateChange(kSingleRecord);
             break;
         case kSingleRecord:
-            ApplyRecordStateChange(kFindOneRecord);
+            ApplyRecordStateChange(kOneRecord);
             break;
-        case kFindOneRecord:
+        case kOneRecord:
             ApplyRecordStateChange(kAllRecord);
             break;
         case kAllRecord:
@@ -813,42 +812,6 @@ void RecordingInfo::ToggleRecord(void)
         default:
             ApplyRecordStateChange(kAllRecord);
             break;
-/*
-        case kNotRecording:
-            ApplyRecordStateChange(kSingleRecord);
-            break;
-        case kSingleRecord:
-            ApplyRecordStateChange(kFindOneRecord);
-            break;
-        case kFindOneRecord:
-            ApplyRecordStateChange(kWeekslotRecord);
-            break;
-        case kWeekslotRecord:
-            ApplyRecordStateChange(kFindWeeklyRecord);
-            break;
-        case kFindWeeklyRecord:
-            ApplyRecordStateChange(kTimeslotRecord);
-            break;
-        case kTimeslotRecord:
-            ApplyRecordStateChange(kFindDailyRecord);
-            break;
-        case kFindDailyRecord:
-            ApplyRecordStateChange(kChannelRecord);
-            break;
-        case kChannelRecord:
-            ApplyRecordStateChange(kAllRecord);
-            break;
-        case kAllRecord:
-        default:
-            ApplyRecordStateChange(kNotRecording);
-            break;
-        case kOverrideRecord:
-            ApplyRecordStateChange(kDontRecord);
-            break;
-        case kDontRecord:
-            ApplyRecordStateChange(kOverrideRecord);
-            break;
-*/
     }
 }
 
