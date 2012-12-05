@@ -25,10 +25,6 @@
 
 #include <stdint.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 struct bd_mobj_cmd_s;
 
 /*
@@ -145,9 +141,5 @@ typedef struct bd_pg_interactive_s {
     BD_PG_COMPOSITION_DESCRIPTOR  composition_descriptor;
     BD_IG_INTERACTIVE_COMPOSITION interactive_composition;
 } BD_IG_INTERACTIVE;
-
-#ifdef __cplusplus
-};
-#endif
 
 #endif // _BD_IG_H_

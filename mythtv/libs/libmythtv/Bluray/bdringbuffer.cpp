@@ -315,18 +315,18 @@ bool BDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
         return false;
     }
 
-    m_metaDiscLibrary = bd_get_meta(bdnav);
+    const meta_dl *metaDiscLibrary = bd_get_meta(bdnav);
 
-    if (m_metaDiscLibrary)
+    if (metaDiscLibrary)
     {
         LOG(VB_GENERAL, LOG_INFO, LOC + QString("Disc Title: %1 (%2)")
-                    .arg(m_metaDiscLibrary->di_name)
-                    .arg(m_metaDiscLibrary->language_code));
+                    .arg(metaDiscLibrary->di_name)
+                    .arg(metaDiscLibrary->language_code));
         LOG(VB_GENERAL, LOG_INFO, LOC + QString("Alternative Title: %1")
-                    .arg(m_metaDiscLibrary->di_alternative));
+                    .arg(metaDiscLibrary->di_alternative));
         LOG(VB_GENERAL, LOG_INFO, LOC + QString("Disc Number: %1 of %2")
-                    .arg(m_metaDiscLibrary->di_set_number)
-                    .arg(m_metaDiscLibrary->di_num_sets));
+                    .arg(metaDiscLibrary->di_set_number)
+                    .arg(metaDiscLibrary->di_num_sets));
     }
 
     // Check disc to see encryption status, menu and navigation types.
@@ -1067,11 +1067,16 @@ bool BDRingBuffer::StartFromBeginning(void)
 
 bool BDRingBuffer::GetNameAndSerialNum(QString &name, QString &serial)
 {
-    if (!m_metaDiscLibrary)
+    if (!bdnav)
+        return false;
+        
+    const meta_dl *metaDiscLibrary = bd_get_meta(bdnav);
+    
+    if (!metaDiscLibrary)
         return false;
 
-    name   = QString(m_metaDiscLibrary->di_name);
-    serial = QString::number(m_metaDiscLibrary->di_set_number);
+    name   = QString(metaDiscLibrary->di_name);
+    serial = QString::number(metaDiscLibrary->di_set_number);
 
     if (name.isEmpty() && serial.isEmpty())
         return false;

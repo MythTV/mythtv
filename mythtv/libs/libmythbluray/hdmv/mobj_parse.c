@@ -1,6 +1,6 @@
 /*
  * This file is part of libbluray
- * Copyright (C) 2010  hpi1
+ * Copyright (C) 2010  Petri Hintukainen <phintuka@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -24,6 +24,7 @@
 #include "mobj_parse.h"
 
 #include <stdlib.h>
+#include <string.h>
 
 #define MOBJ_SIG1  ('M' << 24 | 'O' << 16 | 'B' << 8 | 'J')
 #define MOBJ_SIG2A ('0' << 24 | '2' << 16 | '0' << 8 | '0')
@@ -105,11 +106,13 @@ void mobj_free(MOBJ_OBJECTS **p)
             X_FREE((*p)->objects[i].cmds);
         }
 
+        X_FREE((*p)->objects);
+
         X_FREE(*p);
     }
 }
 
-MOBJ_OBJECTS *mobj_parse(const char *file_name)
+static MOBJ_OBJECTS *_mobj_parse(const char *file_name)
 {
     BITSTREAM     bs;
     BD_FILE_H    *fp;
@@ -134,11 +137,18 @@ MOBJ_OBJECTS *mobj_parse(const char *file_name)
     bs_seek_byte(&bs, 40);
 
     data_len = bs_read(&bs, 32);
+
+    if ((bs_end(&bs) - bs_pos(&bs))/8 < (off_t)data_len) {
+        BD_DEBUG(DBG_NAV | DBG_CRIT, "%s: invalid data_len %d !\n", file_name, data_len);
+        goto error;
+    }
+
     bs_skip(&bs, 32); /* reserved */
     num_objects = bs_read(&bs, 16);
 
-    objects = calloc(1, sizeof(MOBJ_OBJECTS) + num_objects * sizeof(MOBJ_OBJECT));
+    objects = calloc(1, sizeof(MOBJ_OBJECTS));
     objects->num_objects = num_objects;
+    objects->objects = calloc(num_objects, sizeof(MOBJ_OBJECT));
 
     for (i = 0; i < objects->num_objects; i++) {
         if (!_mobj_parse_object(&bs, &objects->objects[i])) {
@@ -155,4 +165,24 @@ MOBJ_OBJECTS *mobj_parse(const char *file_name)
     mobj_free(&objects);
     file_close(fp);
     return NULL;
+}
+
+MOBJ_OBJECTS *mobj_parse(const char *file_name)
+{
+    MOBJ_OBJECTS *objects = _mobj_parse(file_name);
+
+    /* if failed, try backup file */
+    if (!objects) {
+        int   len    = strlen(file_name);
+        char *backup = malloc(len + 8);
+
+        strcpy(backup, file_name);
+        strcpy(backup + len - 16, "BACKUP/MovieObject.bdmv");
+
+        objects = _mobj_parse(backup);
+
+        X_FREE(backup);
+    }
+
+    return objects;
 }

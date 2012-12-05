@@ -26,10 +26,6 @@
 
 #include <stdint.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #define BD_MARK_ENTRY   0x01
 #define BD_MARK_LINK    0x02
 
@@ -149,16 +145,16 @@ typedef struct
     MPLS_PI        *play_item;
     MPLS_SUB       *sub_path;
     MPLS_PLM       *play_mark;
+
+    // extension data (profile 5, version 2.4)
+    uint16_t        ext_sub_count;
+    MPLS_SUB       *ext_sub_path;  // sub path entries extension
 } MPLS_PL;
 
 
-BD_PRIVATE MPLS_PL* mpls_parse(char *path, int verbose);
+BD_PRIVATE MPLS_PL* mpls_parse(const char *path, int verbose);
 BD_PRIVATE void mpls_free(MPLS_PL *pl);
 
 BD_PRIVATE int  mpls_parse_uo(uint8_t *buf, BD_UO_MASK *uo);
-
-#ifdef __cplusplus
-};
-#endif
 
 #endif // _MPLS_PARSE_H_

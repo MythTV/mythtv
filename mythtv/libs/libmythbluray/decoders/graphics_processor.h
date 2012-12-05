@@ -26,10 +26,6 @@
 
 #include <stdint.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 typedef struct graphics_processor_s GRAPHICS_PROCESSOR;
 struct pes_buffer_s;
 
@@ -104,9 +100,5 @@ graphics_processor_decode_ts(GRAPHICS_PROCESSOR *p,
                              PG_DISPLAY_SET **s,
                              uint16_t pid, uint8_t *unit, unsigned num_units,
                              int64_t stc);
-
-#ifdef __cplusplus
-};
-#endif
 
 #endif // _GRAPHICS_PROCESSOR_H_

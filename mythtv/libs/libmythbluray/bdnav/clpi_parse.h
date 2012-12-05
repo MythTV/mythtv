@@ -25,18 +25,10 @@
 
 #include <stdint.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-BD_PRIVATE uint32_t clpi_lookup_spn(CLPI_CL *cl, uint32_t timestamp, int before, uint8_t stc_id);
-BD_PRIVATE uint32_t clpi_access_point(CLPI_CL *cl, uint32_t pkt, int next, int angle_change, uint32_t *time);
-BD_PRIVATE CLPI_CL* clpi_parse(char *path, int verbose);
-BD_PRIVATE CLPI_CL* clpi_copy(CLPI_CL* dest_cl, CLPI_CL* src_cl);
+BD_PRIVATE uint32_t clpi_lookup_spn(const CLPI_CL *cl, uint32_t timestamp, int before, uint8_t stc_id);
+BD_PRIVATE uint32_t clpi_access_point(const CLPI_CL *cl, uint32_t pkt, int next, int angle_change, uint32_t *time);
+BD_PRIVATE CLPI_CL* clpi_parse(const char *path, int verbose);
+BD_PRIVATE CLPI_CL* clpi_copy(const CLPI_CL* src_cl);
 BD_PRIVATE void clpi_free(CLPI_CL *cl);
-
-#ifdef __cplusplus
-};
-#endif
 
 #endif // _CLPI_PARSE_H_

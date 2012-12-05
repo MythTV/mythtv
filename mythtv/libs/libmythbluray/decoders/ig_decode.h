@@ -27,10 +27,6 @@
 
 #include <stdint.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /*
  * segment
  */
@@ -40,8 +36,5 @@ BD_PRIVATE int  ig_decode_interactive(BITBUFFER *bb, BD_IG_INTERACTIVE *p);
 BD_PRIVATE void ig_clean_interactive(BD_IG_INTERACTIVE *p);
 BD_PRIVATE void ig_free_interactive(BD_IG_INTERACTIVE **p);
 
-#ifdef __cplusplus
-};
-#endif
 
 #endif // _IG_DECODE_H_

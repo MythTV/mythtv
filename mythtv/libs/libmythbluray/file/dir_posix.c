@@ -22,7 +22,6 @@
 #endif
 
 #include "file.h"
-#include "file_mythiowrapper.h"
 #include "util/macro.h"
 #include "util/logging.h"
 #include "util/strutl.h"
@@ -34,12 +33,13 @@
 #endif
 #if defined(_WIN32)
 #   include <io.h>
+#   include <windows.h>
 #endif
 
 #if defined(_WIN32)
 typedef struct {
-    long               handle;
-    struct _finddata_t info;
+    long                handle;
+    struct _wfinddata_t info;
 } dir_data_t;
 #endif
 
@@ -47,7 +47,7 @@ static void dir_close_posix(BD_DIR_H *dir)
 {
     if (dir) {
 #if defined(_WIN32)
-        dir_data_t *priv = dir->internal;
+        dir_data_t *priv = (dir_data_t*)dir->internal;
         _findclose(priv->handle);
         X_FREE(dir->internal);
 #else
@@ -63,15 +63,15 @@ static void dir_close_posix(BD_DIR_H *dir)
 static int dir_read_posix(BD_DIR_H *dir, BD_DIRENT *entry)
 {
 #if defined(_WIN32)
-    dir_data_t *priv = dir->internal;
+    dir_data_t *priv = (dir_data_t*)dir->internal;
 
     if (!priv->info.name[0]) {
         return 1;
     }
-    strncpy(entry->d_name, priv->info.name, sizeof(entry->d_name));
+    WideCharToMultiByte(CP_UTF8, 0, priv->info.name, -1, entry->d_name, sizeof(entry->d_name), NULL, NULL);
 
     priv->info.name[0] = 0;
-    _findnext(priv->handle, &priv->info);
+    _wfindnext(priv->handle, &priv->info);
 
 #else
     struct dirent e, *p_e;
@@ -91,9 +91,6 @@ static int dir_read_posix(BD_DIR_H *dir, BD_DIRENT *entry)
 
 static BD_DIR_H *dir_open_posix(const char* dirname)
 {
-    if (strncmp(dirname, "myth://", 7) == 0)
-        return dir_open_mythiowrapper(dirname);
-
     BD_DIR_H *dir = malloc(sizeof(BD_DIR_H));
 
     BD_DEBUG(DBG_DIR, "Opening POSIX dir %s... (%p)\n", dirname, dir);
@@ -106,7 +103,11 @@ static BD_DIR_H *dir_open_posix(const char* dirname)
 
     dir->internal = priv;
 
-    priv->handle = _findfirst(filespec, &priv->info);
+    wchar_t wfilespec[MAX_PATH];
+    if (MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, filespec, -1, wfilespec, MAX_PATH))
+        priv->handle = _wfindfirst(wfilespec, &priv->info);
+    else
+        priv->handle = -1;
 
     X_FREE(filespec);
 

@@ -130,6 +130,7 @@ typedef struct bd_stream_info {
     uint8_t     lang[4];
     uint16_t    pid;
     uint8_t     aspect;
+    uint8_t     subpath_id;
 } BLURAY_STREAM_INFO;
 
 typedef struct bd_clip {
@@ -148,6 +149,10 @@ typedef struct bd_clip {
     BLURAY_STREAM_INFO *ig_streams;
     BLURAY_STREAM_INFO *sec_audio_streams;
     BLURAY_STREAM_INFO *sec_video_streams;
+
+    uint64_t           start_time;
+    uint64_t           in_time;
+    uint64_t           out_time;
 } BLURAY_CLIP_INFO;
 
 typedef struct bd_chapter {
@@ -155,7 +160,17 @@ typedef struct bd_chapter {
     uint64_t    start;
     uint64_t    duration;
     uint64_t    offset;
+    unsigned    clip_ref;
 } BLURAY_TITLE_CHAPTER;
+
+typedef struct bd_mark {
+    uint32_t    idx;
+    int         type;
+    uint64_t    start;
+    uint64_t    duration;
+    uint64_t    offset;
+    unsigned    clip_ref;
+} BLURAY_TITLE_MARK;
 
 typedef struct bd_title_info {
     uint32_t             idx;
@@ -166,7 +181,22 @@ typedef struct bd_title_info {
     uint32_t             chapter_count;
     BLURAY_CLIP_INFO     *clips;
     BLURAY_TITLE_CHAPTER *chapters;
+
+    uint32_t             mark_count;
+    BLURAY_TITLE_MARK    *marks;
 } BLURAY_TITLE_INFO;
+
+typedef struct bd_sound_effect {
+    uint8_t         num_channels; /* 1 - mono, 2 - stereo */
+    uint32_t        num_frames;
+    const int16_t  *samples;      /* 48000 Hz, 16 bit LPCM. interleaved if stereo */
+} BLURAY_SOUND_EFFECT;
+
+/**
+ *  Get library version
+ *
+ */
+void bd_get_version(int *major, int *minor, int *micro);
 
 /**
  *
@@ -214,7 +244,7 @@ void bd_free_title_info(BLURAY_TITLE_INFO *title_info);
 /**
  *  Initializes libbluray objects
  *
- * @param device_path   path to mounted Blu-ray disc
+ * @param device_path   path to mounted Blu-ray disc or device
  * @param keyfile_path  path to KEYDB.cfg (may be NULL)
  * @return allocated BLURAY object, NULL if error
  */
@@ -228,7 +258,7 @@ BLURAY *bd_open(const char* device_path, const char* keyfile_path);
 void bd_close(BLURAY *bd);
 
 /**
- *  Seek to pos in corrently selected title
+ *  Seek to pos in currently selected title
  *
  * @param bd  BLURAY object
  * @param pos position to seek to
@@ -304,6 +334,16 @@ uint32_t bd_get_current_chapter(BLURAY *bd);
  * @return current seek position
  */
 int64_t bd_seek_mark(BLURAY *bd, unsigned mark);
+
+/**
+ *
+ *  Seek to a playitem.
+ *
+ * @param bd  BLURAY object
+ * @param playitem to seek to
+ * @return current seek position
+ */
+int64_t bd_seek_playitem(BLURAY *bd, unsigned clip_ref);
 
 /**
  *
@@ -395,6 +435,14 @@ uint64_t bd_tell_time(BLURAY *bd);
  * Disc info
  */
 
+/* AACS error codes */
+#define BD_AACS_CORRUPTED_DISC  -1
+#define BD_AACS_NO_CONFIG       -2
+#define BD_AACS_NO_PK           -3
+#define BD_AACS_NO_CERT         -4
+#define BD_AACS_CERT_REVOKED    -5
+#define BD_AACS_MMC_FAILED      -6
+
 typedef struct {
     uint8_t  bluray_detected;
 
@@ -412,6 +460,14 @@ typedef struct {
     uint8_t  bdplus_detected;
     uint8_t  libbdplus_detected;
     uint8_t  bdplus_handled;
+
+    /* aacs error code */
+    int      aacs_error_code;
+    /* aacs MKB version */
+    int      aacs_mkbv;
+
+    /* Disc ID */
+    uint8_t  disc_id[20];
 
 } BLURAY_DISC_INFO;
 
@@ -436,6 +492,9 @@ typedef enum {
     BLURAY_PLAYER_SETTING_MENU_LANG      = 18,  /* Initial menu language: ISO 639-2 string, ex. "eng" */
     BLURAY_PLAYER_SETTING_COUNTRY_CODE   = 19,  /* Player country code: ISO 3166-1 string, ex. "de" */
     BLURAY_PLAYER_SETTING_REGION_CODE    = 20,  /* Player region code: 1 - region A, 2 - B, 4 - C */
+    BLURAY_PLAYER_SETTING_OUTPUT_PREFER  = 21,  /* output mode preference: 0 - 2D, 1 - 3D */
+    BLURAY_PLAYER_SETTING_DISPLAY_CAP    = 23,  /* Display capability (bit mask) */
+    BLURAY_PLAYER_SETTING_3D_CAP         = 24,  /* 3D capability (bit mask) */
     BLURAY_PLAYER_SETTING_VIDEO_CAP      = 29,  /* Player capability for video (bit mask) */
     BLURAY_PLAYER_SETTING_TEXT_CAP       = 30,  /* Player capability for text subtitle (bit mask) */
     BLURAY_PLAYER_SETTING_PLAYER_PROFILE = 31,  /* Profile1: 0, Profile1+: 1, Profile2: 3, Profile3: 8 */
@@ -466,14 +525,15 @@ void bd_stop_bdj(BLURAY *bd); // shutdown BD-J and clean up resources
 
 typedef enum {
     BD_EVENT_NONE = 0,
-    BD_EVENT_ERROR,
-    BD_EVENT_ENCRYPTED,
+    BD_EVENT_ERROR,       /* Fatal error. Playback can't be continued. */
+    BD_EVENT_READ_ERROR,  /* Reading of .m2ts aligned unit failed. Next call to read will try next block. */
+    BD_EVENT_ENCRYPTED,   /* .m2ts file is encrypted and can't be played */
 
     /* current playback position */
     BD_EVENT_ANGLE,     /* current angle, 1...N */
     BD_EVENT_TITLE,     /* current title, 1...N (0 = top menu) */
     BD_EVENT_PLAYLIST,  /* current playlist (xxxxx.mpls) */
-    BD_EVENT_PLAYITEM,  /* current play item */
+    BD_EVENT_PLAYITEM,  /* current play item, 0...N-1  */
     BD_EVENT_CHAPTER,   /* current chapter, 1...N */
     BD_EVENT_END_OF_TITLE,
 
@@ -499,6 +559,18 @@ typedef enum {
 
     /* Still playback for n seconds (reached end of still mode play item) */
     BD_EVENT_STILL_TIME,             /* 0 = infinite ; 1...300 = seconds */
+
+    /* Play sound effect */
+    BD_EVENT_SOUND_EFFECT,           /* effect ID */
+
+    /* Pop-Up menu available */
+    BD_EVENT_POPUP,                  /* 0 - no, 1 - yes */
+
+    /* Interactive menu visible */
+    BD_EVENT_MENU,                   /* 0 - no, 1 - yes */
+
+    /* 3D */
+    BD_EVENT_STEREOSCOPIC_STATUS,    /* 0 - 2D, 1 - 3D */
 
 } bd_event_e;
 
@@ -594,6 +666,15 @@ void bd_register_overlay_proc(BLURAY *bd, void *handle, bd_overlay_proc_f func);
 
 /**
  *
+ *  Update current pts.
+ *
+ * @param bd  BLURAY object
+ * @param pts current playback position (1/90000s) or -1
+ */
+void bd_set_scr(BLURAY *bd, int64_t pts);
+
+/**
+ *
  *  Pass user input to graphics controller.
  *  Keys are defined in libbluray/keys.h.
  *  Current pts can be updated by using BD_VK_NONE key. This is required for animated menus.
@@ -617,6 +698,17 @@ int bd_user_input(BLURAY *bd, int64_t pts, uint32_t key);
  */
 int bd_mouse_select(BLURAY *bd, int64_t pts, uint16_t x, uint16_t y);
 
+/**
+ *
+ *  Get sound effect
+ *
+ * @param bd  BLURAY object
+ * @param effect_id  sound effect id (0...N)
+ * @param effect     sound effect data
+ * @return <0 when no effects, 0 when id out of range, 1 on success
+ */
+int bd_get_sound_effect(BLURAY *bd, unsigned sound_id, struct bd_sound_effect *effect);
+
 /*
  *
  */
@@ -627,9 +719,9 @@ struct meta_dl;
  *  Get meta information about the bluray disc.
  *
  * @param bd  BLURAY object
- * @return allocated META_DL (disclib) object, NULL on error
+ * @return META_DL (disclib) object, NULL on error
  */
-struct meta_dl *bd_get_meta(BLURAY *bd);
+const struct meta_dl *bd_get_meta(BLURAY *bd);
 
 
 struct clpi_cl;

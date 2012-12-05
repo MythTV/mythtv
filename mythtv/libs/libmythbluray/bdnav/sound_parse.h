@@ -24,13 +24,9 @@
 
 #include <stdint.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 typedef struct {
-  uint8_t    num_channels;
   uint32_t   sample_rate;
+  uint8_t    num_channels;
   uint8_t    bits_per_sample;
 
   uint32_t   num_frames;
@@ -39,15 +35,11 @@ typedef struct {
 
 typedef struct {
     uint16_t     num_sounds;
-    SOUND_OBJECT sounds[];
+    SOUND_OBJECT *sounds;
 } SOUND_DATA;
 
 
 BD_PRIVATE SOUND_DATA* sound_parse(const char *path); /* parse sound.bdmv */
 BD_PRIVATE void        sound_free(SOUND_DATA **sound);
 
-#ifdef __cplusplus
-};
-#endif
-
-#endif // _MOBJ_PARSE_H_
+#endif // _SOUND_PARSE_H_

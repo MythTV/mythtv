@@ -32,9 +32,6 @@
 #   error no mutex support found
 #endif
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #if defined(_WIN32)
 
@@ -102,7 +99,7 @@ static int bd_mutex_lock(BD_MUTEX *p)
     }
 
     if (pthread_mutex_lock(&p->mutex)) {
-        BD_DEBUG(DBG_BLURAY|DBG_CRIT, "bd_mutex_lock() failed !");
+        BD_DEBUG(DBG_BLURAY|DBG_CRIT, "bd_mutex_lock() failed !\n");
         return -1;
     }
 
@@ -115,7 +112,7 @@ static int bd_mutex_lock(BD_MUTEX *p)
 static int bd_mutex_unlock(BD_MUTEX *p)
 {
     if (!pthread_equal(p->owner, pthread_self())) {
-        BD_DEBUG(DBG_BLURAY|DBG_CRIT, "bd_mutex_unlock(): not owner !");
+        BD_DEBUG(DBG_BLURAY|DBG_CRIT, "bd_mutex_unlock(): not owner !\n");
         return -1;
     }
 
@@ -129,7 +126,7 @@ static int bd_mutex_unlock(BD_MUTEX *p)
     p->owner = (pthread_t)-1;
 
     if (pthread_mutex_unlock(&p->mutex)) {
-        BD_DEBUG(DBG_BLURAY|DBG_CRIT, "bd_mutex_unlock() failed !");
+        BD_DEBUG(DBG_BLURAY|DBG_CRIT, "bd_mutex_unlock() failed !\n");
         return -1;
     }
 
@@ -138,8 +135,5 @@ static int bd_mutex_unlock(BD_MUTEX *p)
 
 #endif // HAVE_PTHREAD_H
 
-#ifdef __cplusplus
-};
-#endif
 
 #endif // LIBBLURAY_MUTEX_H_

@@ -66,7 +66,12 @@ static int _parse_index(BITSTREAM *bs, INDX_ROOT *index)
 
     index_len = bs_read(bs, 32);
 
-    /* TODO: check if goes to extension data area or EOF */
+    /* TODO: check if goes to extension data area */
+
+    if ((bs_end(bs) - bs_pos(bs))/8 < (off_t)index_len) {
+        BD_DEBUG(DBG_NAV | DBG_CRIT, "index.bdmv: invalid index_len %d !\n", index_len);
+        return 0;
+    }
 
     if (!_parse_playback_obj(bs, &index->first_play) ||
         !_parse_playback_obj(bs, &index->top_menu)) {
@@ -144,7 +149,7 @@ static int _parse_header(BITSTREAM *bs, int *index_start, int *extension_data_st
     return 1;
 }
 
-INDX_ROOT *indx_parse(const char *file_name)
+static INDX_ROOT *_indx_parse(const char *file_name)
 {
     BITSTREAM  bs;
     BD_FILE_H *fp;
@@ -186,6 +191,26 @@ INDX_ROOT *indx_parse(const char *file_name)
     X_FREE(index);
     file_close(fp);
     return NULL;
+}
+
+INDX_ROOT *indx_parse(const char *file_name)
+{
+    INDX_ROOT *indx = _indx_parse(file_name);
+
+    /* if failed, try backup file */
+    if (!indx) {
+        size_t len   = strlen(file_name);
+        char *backup = malloc(len + 8);
+
+        strcpy(backup, file_name);
+        strcpy(backup + len - 10, "BACKUP/index.bdmv");
+
+        indx = _indx_parse(backup);
+
+        X_FREE(backup);
+    }
+
+    return indx;
 }
 
 void indx_free(INDX_ROOT **p)

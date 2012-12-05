@@ -180,7 +180,7 @@ static int _decode_ods(PG_DISPLAY_SET *s, BITBUFFER *bb, PES_BUFFER *p)
 
     if (s->object) {
         BITBUFFER bb_tmp = *bb;
-        uint16_t   id     = bb_read(&bb_tmp, 16);
+        uint16_t  id     = bb_read(&bb_tmp, 16);
         unsigned  ii;
 
         for (ii = 0; ii < s->num_object; ii++) {

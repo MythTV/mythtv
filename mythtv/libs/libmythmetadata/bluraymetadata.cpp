@@ -5,7 +5,7 @@
 #include "mythdirs.h"
 
 BlurayMetadata::BlurayMetadata(const QString path) :
-    m_bdnav(NULL),               m_metadata(NULL),
+    m_bdnav(NULL),
     m_title(QString()),          m_alttitle(QString()),
     m_language(QString()),       m_discnumber(0),
     m_disctotal(0),              m_path(path),
@@ -46,29 +46,29 @@ bool BlurayMetadata::ParseDisc(void)
     if (!OpenDisc() && !m_bdnav)
         return false;
 
-    m_metadata = bd_get_meta(m_bdnav);
+    const meta_dl *metadata = bd_get_meta(m_bdnav);
 
-    if (m_metadata)
+    if (metadata)
     {
-        m_title = QString(m_metadata->di_name);
-        m_alttitle = QString(m_metadata->di_alternative);
-        m_language = QString(m_metadata->language_code);
-        m_discnumber = m_metadata->di_set_number;
-        m_disctotal = m_metadata->di_num_sets;
+        m_title = QString(metadata->di_name);
+        m_alttitle = QString(metadata->di_alternative);
+        m_language = QString(metadata->language_code);
+        m_discnumber = metadata->di_set_number;
+        m_disctotal = metadata->di_num_sets;
 
-        for (unsigned i = 0; i < m_metadata->toc_count; i++)
+        for (unsigned i = 0; i < metadata->toc_count; i++)
         {
-            uint num = m_metadata->toc_entries[i].title_number;
-            QString title = QString(m_metadata->toc_entries[i].title_name);
+            uint num = metadata->toc_entries[i].title_number;
+            QString title = QString(metadata->toc_entries[i].title_name);
             QPair<uint,QString> ret(num,title); 
             m_titles.append(ret);
         }
 
-        for (unsigned i = 0; i < m_metadata->thumb_count; i++)
+        for (unsigned i = 0; i < metadata->thumb_count; i++)
         {
             QString filepath = QString("%1/BDMV/META/DL/%2")
                                    .arg(m_path)
-                                   .arg(m_metadata->thumbnails[i].path);
+                                   .arg(metadata->thumbnails[i].path);
             m_images.append(filepath);
         }
     }

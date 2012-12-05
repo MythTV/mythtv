@@ -27,10 +27,6 @@
 
 #include <stdint.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 //#ifdef __LINUX__
 #define DIR_SEP "/"
 //#endif
@@ -49,6 +45,8 @@ extern "C" {
 
 BD_PRIVATE extern BD_FILE_H* (*file_open)(const char* filename, const char *mode);
 
+BD_PRIVATE BD_FILE_OPEN file_open_default(void);
+
 /*
  * directory access
  */
@@ -57,9 +55,5 @@ BD_PRIVATE extern BD_FILE_H* (*file_open)(const char* filename, const char *mode
 #define dir_read(X,Y) X->read(X,Y)
 
 BD_PRIVATE extern BD_DIR_H* (*dir_open)(const char* dirname);
-
-#ifdef __cplusplus
-};
-#endif
 
 #endif /* FILE_H_ */

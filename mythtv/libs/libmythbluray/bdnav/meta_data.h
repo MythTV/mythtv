@@ -22,10 +22,6 @@
 
 #include <stdint.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 typedef struct meta_thumbnail {
     char *               path;
     uint32_t             xres;
@@ -54,10 +50,6 @@ typedef struct meta_root {
     uint8_t              dl_count;
     META_DL *            dl_entries;
 } META_ROOT;
-
-#ifdef __cplusplus
-};
-#endif
 
 #endif // _META_DATA_H_
 

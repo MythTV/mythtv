@@ -24,9 +24,6 @@
 
 #include <stdint.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 typedef struct pes_buffer_s PES_BUFFER;
 struct pes_buffer_s {
@@ -46,9 +43,5 @@ BD_PRIVATE void        pes_buffer_free(PES_BUFFER **); // free list of buffers
 
 BD_PRIVATE void        pes_buffer_append(PES_BUFFER **head, PES_BUFFER *buf); // append buf to list
 BD_PRIVATE void        pes_buffer_remove(PES_BUFFER **head, PES_BUFFER *buf); // remove buf from list and free it
-
-#ifdef __cplusplus
-};
-#endif
 
 #endif // _PES_BUFFER_H_

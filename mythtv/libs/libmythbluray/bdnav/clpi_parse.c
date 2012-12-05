@@ -20,6 +20,7 @@
 #include "util/macro.h"
 #include "file/file.h"
 #include "util/bits.h"
+#include "extdata_parse.h"
 #include "clpi_parse.h"
 
 #include <stdlib.h>
@@ -64,6 +65,7 @@ _parse_stream_attr(BITSTREAM *bits, CLPI_PROG_STREAM *ss)
         case 0x02:
         case 0xea:
         case 0x1b:
+        case 0x20:
             ss->format = bs_read(bits, 4);
             ss->rate   = bs_read(bits, 4);
             ss->aspect = bs_read(bits, 4);
@@ -221,20 +223,19 @@ _parse_sequence(BITSTREAM *bits, CLPI_CL *cl)
 }
 
 static int
-_parse_program(BITSTREAM *bits, CLPI_CL *cl)
+_parse_program(BITSTREAM *bits, CLPI_PROG_INFO *program)
 {
     int ii, jj;
 
-    bs_seek_byte(bits, cl->program_info_start_addr);
     // Skip the length field, and a reserved byte
     bs_skip(bits, 5 * 8);
     // Then get the number of sequences
-    cl->program.num_prog = bs_read(bits, 8);
+    program->num_prog = bs_read(bits, 8);
 
     CLPI_PROG *progs;
-    progs = malloc(cl->program.num_prog * sizeof(CLPI_PROG));
-    cl->program.progs = progs;
-    for (ii = 0; ii < cl->program.num_prog; ii++) {
+    progs = malloc(program->num_prog * sizeof(CLPI_PROG));
+    program->progs = progs;
+    for (ii = 0; ii < program->num_prog; ii++) {
         progs[ii].spn_program_sequence_start = bs_read(bits, 32);
         progs[ii].program_map_pid            = bs_read(bits, 16);
         progs[ii].num_streams                = bs_read(bits, 8);
@@ -251,6 +252,14 @@ _parse_program(BITSTREAM *bits, CLPI_CL *cl)
         }
     }
     return 1;
+}
+
+static int
+_parse_program_info(BITSTREAM *bits, CLPI_CL *cl)
+{
+    bs_seek_byte(bits, cl->program_info_start_addr);
+
+    return _parse_program(bits, &cl->program);
 }
 
 static int
@@ -286,29 +295,28 @@ _parse_ep_map_stream(BITSTREAM *bits, CLPI_EP_MAP_ENTRY *ee)
 }
 
 static int
-_parse_cpi(BITSTREAM *bits, CLPI_CL *cl)
+_parse_cpi(BITSTREAM *bits, CLPI_CPI *cpi)
 {
     int ii;
     uint32_t ep_map_pos, len;
 
-    bs_seek_byte(bits, cl->cpi_start_addr);
     len = bs_read(bits, 32);
     if (len == 0) {
         return 1;
     }
 
     bs_skip(bits, 12);
-    cl->cpi.type = bs_read(bits, 4);
+    cpi->type = bs_read(bits, 4);
     ep_map_pos = bs_pos(bits) >> 3;
 
     // EP Map starts here
     bs_skip(bits, 8);
-    cl->cpi.num_stream_pid = bs_read(bits, 8);
+    cpi->num_stream_pid = bs_read(bits, 8);
 
     CLPI_EP_MAP_ENTRY *entry;
-    entry = malloc(cl->cpi.num_stream_pid * sizeof(CLPI_EP_MAP_ENTRY));
-    cl->cpi.entry = entry;
-    for (ii = 0; ii < cl->cpi.num_stream_pid; ii++) {
+    entry = malloc(cpi->num_stream_pid * sizeof(CLPI_EP_MAP_ENTRY));
+    cpi->entry = entry;
+    for (ii = 0; ii < cpi->num_stream_pid; ii++) {
         entry[ii].pid                      = bs_read(bits, 16);
         bs_skip(bits, 10);
         entry[ii].ep_stream_type           = bs_read(bits, 4);
@@ -316,14 +324,22 @@ _parse_cpi(BITSTREAM *bits, CLPI_CL *cl)
         entry[ii].num_ep_fine              = bs_read(bits, 18);
         entry[ii].ep_map_stream_start_addr = bs_read(bits, 32) + ep_map_pos;
     }
-    for (ii = 0; ii < cl->cpi.num_stream_pid; ii++) {
-        _parse_ep_map_stream(bits, &cl->cpi.entry[ii]);
+    for (ii = 0; ii < cpi->num_stream_pid; ii++) {
+        _parse_ep_map_stream(bits, &cpi->entry[ii]);
     }
     return 1;
 }
 
+static int
+_parse_cpi_info(BITSTREAM *bits, CLPI_CL *cl)
+{
+    bs_seek_byte(bits, cl->cpi_start_addr);
+
+    return _parse_cpi(bits, &cl->cpi);
+}
+
 static uint32_t
-_find_stc_spn(CLPI_CL *cl, uint8_t stc_id)
+_find_stc_spn(const CLPI_CL *cl, uint8_t stc_id)
 {
     int ii;
     CLPI_ATC_SEQ *atc;
@@ -341,10 +357,10 @@ _find_stc_spn(CLPI_CL *cl, uint8_t stc_id)
 // Returns the spn for the entry that is closest to but
 // before the given timestamp
 uint32_t
-clpi_lookup_spn(CLPI_CL *cl, uint32_t timestamp, int before, uint8_t stc_id)
+clpi_lookup_spn(const CLPI_CL *cl, uint32_t timestamp, int before, uint8_t stc_id)
 {
-    CLPI_EP_MAP_ENTRY *entry;
-    CLPI_CPI *cpi = &cl->cpi;
+    const CLPI_EP_MAP_ENTRY *entry;
+    const CLPI_CPI *cpi = &cl->cpi;
     int ii, jj;
     uint32_t coarse_pts, pts; // 45khz timestamps
     uint32_t spn, coarse_spn, stc_spn;
@@ -447,10 +463,10 @@ done:
 // Returns the spn for the entry that is closest to but
 // before the given packet
 uint32_t
-clpi_access_point(CLPI_CL *cl, uint32_t pkt, int next, int angle_change, uint32_t *time)
+clpi_access_point(const CLPI_CL *cl, uint32_t pkt, int next, int angle_change, uint32_t *time)
 {
-    CLPI_EP_MAP_ENTRY *entry;
-    CLPI_CPI *cpi = &cl->cpi;
+    const CLPI_EP_MAP_ENTRY *entry;
+    const CLPI_CPI *cpi = &cl->cpi;
     int ii, jj;
     uint32_t coarse_spn, spn;
     int start, end;
@@ -532,6 +548,74 @@ clpi_access_point(CLPI_CL *cl, uint32_t pkt, int next, int angle_change, uint32_
     return coarse_spn + entry->fine[jj].spn_ep;
 }
 
+static int
+_parse_extent_start_points(BITSTREAM *bits, CLPI_EXTENT_START *es)
+{
+    unsigned int ii;
+
+    bs_skip(bits, 32); // length
+    es->num_point = bs_read(bits, 32);
+
+    es->point = malloc(es->num_point * sizeof(uint32_t));
+
+    for (ii = 0; ii < es->num_point; ii++) {
+        es->point[ii] = bs_read(bits, 32);
+    }
+
+    return 1;
+}
+
+static int _parse_clpi_extension(BITSTREAM *bits, int id1, int id2, void *handle)
+{
+    CLPI_CL *cl = (CLPI_CL*)handle;
+
+    if (id1 == 2) {
+        if (id2 == 4) {
+            // Extent start point
+            return _parse_extent_start_points(bits, &cl->extent_start);
+        }
+        if (id2 == 5) {
+            // ProgramInfo SS
+            return _parse_program(bits, &cl->program_ss);
+        }
+        if (id2 == 6) {
+            // CPI SS
+            return _parse_cpi(bits, &cl->cpi_ss);
+        }
+    }
+
+    return 0;
+}
+
+static void
+_clean_program(CLPI_PROG_INFO *p)
+{
+    int ii;
+
+    for (ii = 0; ii < p->num_prog; ii++) {
+        if (p->progs[ii].streams != NULL) {
+            X_FREE(p->progs[ii].streams);
+        }
+    }
+    X_FREE(p->progs);
+}
+
+static void
+_clean_cpi(CLPI_CPI *cpi)
+{
+    int ii;
+
+    for (ii = 0; ii < cpi->num_stream_pid; ii++) {
+        if (cpi->entry[ii].coarse != NULL) {
+            X_FREE(cpi->entry[ii].coarse);
+        }
+        if (cpi->entry[ii].fine != NULL) {
+            X_FREE(cpi->entry[ii].fine);
+        }
+    }
+    X_FREE(cpi->entry);
+}
+
 void
 clpi_free(CLPI_CL *cl)
 {
@@ -552,31 +636,19 @@ clpi_free(CLPI_CL *cl)
         X_FREE(cl->sequence.atc_seq);
     }
 
-    for (ii = 0; ii < cl->program.num_prog; ii++) {
-        if (cl->program.progs[ii].streams != NULL) {
-            X_FREE(cl->program.progs[ii].streams);
-        }
-    }
-    if (cl->program.progs != NULL) {
-        X_FREE(cl->program.progs);
-    }
+    _clean_program(&cl->program);
+    _clean_cpi(&cl->cpi);
 
-    for (ii = 0; ii < cl->cpi.num_stream_pid; ii++) {
-        if (cl->cpi.entry[ii].coarse != NULL) {
-            X_FREE(cl->cpi.entry[ii].coarse);
-        }
-        if (cl->cpi.entry[ii].fine != NULL) {
-            X_FREE(cl->cpi.entry[ii].fine);
-        }
-    }
-    if (cl->cpi.entry != NULL) {
-        X_FREE(cl->cpi.entry);
-    }
+    X_FREE(cl->extent_start.point);
+
+    _clean_program(&cl->program_ss);
+    _clean_cpi(&cl->cpi_ss);
+
     X_FREE(cl);
 }
 
-CLPI_CL*
-clpi_parse(char *path, int verbose)
+static CLPI_CL*
+_clpi_parse(const char *path, int verbose)
 {
     BITSTREAM  bits;
     BD_FILE_H *fp;
@@ -602,6 +674,14 @@ clpi_parse(char *path, int verbose)
         clpi_free(cl);
         return NULL;
     }
+
+    if (cl->ext_data_start_addr > 0) {
+        bdmv_parse_extension_data(&bits,
+                                   cl->ext_data_start_addr,
+                                   _parse_clpi_extension,
+                                   cl);
+    }
+
     if (!_parse_clipinfo(&bits, cl)) {
         file_close(fp);
         clpi_free(cl);
@@ -612,12 +692,12 @@ clpi_parse(char *path, int verbose)
         clpi_free(cl);
         return NULL;
     }
-    if (!_parse_program(&bits, cl)) {
+    if (!_parse_program_info(&bits, cl)) {
         file_close(fp);
         clpi_free(cl);
         return NULL;
     }
-    if (!_parse_cpi(&bits, cl)) {
+    if (!_parse_cpi_info(&bits, cl)) {
         file_close(fp);
         clpi_free(cl);
         return NULL;
@@ -627,84 +707,109 @@ clpi_parse(char *path, int verbose)
 }
 
 CLPI_CL*
-clpi_copy(CLPI_CL* dest_cl, CLPI_CL* src_cl)
+clpi_parse(const char *path, int verbose)
 {
-    int ii, jj;
-    if (dest_cl && src_cl) {
-      dest_cl->clip.clip_stream_type = src_cl->clip.clip_stream_type;
-      dest_cl->clip.application_type = src_cl->clip.application_type;
-      dest_cl->clip.is_atc_delta = src_cl->clip.is_atc_delta;
-      dest_cl->clip.atc_delta_count = src_cl->clip.atc_delta_count;
-      dest_cl->clip.ts_recording_rate = src_cl->clip.ts_recording_rate;
-      dest_cl->clip.num_source_packets = src_cl->clip.num_source_packets;
-      dest_cl->clip.ts_type_info.validity = src_cl->clip.ts_type_info.validity;
-      memcpy(dest_cl->clip.ts_type_info.format_id, src_cl->clip.ts_type_info.format_id, 5);
-      dest_cl->clip.atc_delta = malloc(src_cl->clip.atc_delta_count * sizeof(CLPI_ATC_DELTA));
-      for (ii = 0; ii < src_cl->clip.atc_delta_count; ii++) {
-        dest_cl->clip.atc_delta[ii].delta =  src_cl->clip.atc_delta[ii].delta;
-	memcpy(dest_cl->clip.atc_delta[ii].file_id, src_cl->clip.atc_delta[ii].file_id, 6);
-	memcpy(dest_cl->clip.atc_delta[ii].file_code, src_cl->clip.atc_delta[ii].file_code, 5);
-      }
+    CLPI_CL *cl = _clpi_parse(path, verbose);
 
-      dest_cl->sequence.num_atc_seq = src_cl->sequence.num_atc_seq;
-      dest_cl->sequence.atc_seq = malloc(src_cl->sequence.num_atc_seq * sizeof(CLPI_ATC_SEQ));
-      for (ii = 0; ii < src_cl->sequence.num_atc_seq; ii++) {
-	dest_cl->sequence.atc_seq[ii].spn_atc_start = src_cl->sequence.atc_seq[ii].spn_atc_start;
-	dest_cl->sequence.atc_seq[ii].offset_stc_id = src_cl->sequence.atc_seq[ii].offset_stc_id;
-	dest_cl->sequence.atc_seq[ii].num_stc_seq = src_cl->sequence.atc_seq[ii].num_stc_seq;
-	dest_cl->sequence.atc_seq[ii].stc_seq = malloc(src_cl->sequence.atc_seq[ii].num_stc_seq * sizeof(CLPI_STC_SEQ));
-        for (jj = 0; jj < src_cl->sequence.atc_seq[ii].num_stc_seq; jj++) {
-	    dest_cl->sequence.atc_seq[ii].stc_seq[jj].spn_stc_start = src_cl->sequence.atc_seq[ii].stc_seq[jj].spn_stc_start;
-	    dest_cl->sequence.atc_seq[ii].stc_seq[jj].pcr_pid = src_cl->sequence.atc_seq[ii].stc_seq[jj].pcr_pid;
-	    dest_cl->sequence.atc_seq[ii].stc_seq[jj].presentation_start_time = src_cl->sequence.atc_seq[ii].stc_seq[jj].presentation_start_time;
-	    dest_cl->sequence.atc_seq[ii].stc_seq[jj].presentation_end_time = src_cl->sequence.atc_seq[ii].stc_seq[jj].presentation_end_time;
-        }
-      }
+    /* if failed, try backup file */
+    if (!cl) {
+        size_t len   = strlen(path);
+        char *backup = malloc(len + 8);
 
-      dest_cl->program.num_prog = src_cl->program.num_prog;
-      dest_cl->program.progs = malloc(src_cl->program.num_prog * sizeof(CLPI_PROG));
-      for (ii = 0; ii < src_cl->program.num_prog; ii++) {
-	dest_cl->program.progs[ii].spn_program_sequence_start = src_cl->program.progs[ii].spn_program_sequence_start;
-	dest_cl->program.progs[ii].program_map_pid = src_cl->program.progs[ii].program_map_pid;
-	dest_cl->program.progs[ii].num_streams = src_cl->program.progs[ii].num_streams;
-	dest_cl->program.progs[ii].num_groups = src_cl->program.progs[ii].num_groups;
-	dest_cl->program.progs[ii].streams = malloc(src_cl->program.progs[ii].num_streams * sizeof(CLPI_PROG_STREAM));
-	for (jj = 0; jj < src_cl->program.progs[ii].num_streams; jj++) {
-	  dest_cl->program.progs[ii].streams[jj].coding_type = src_cl->program.progs[ii].streams[jj].coding_type;
-	  dest_cl->program.progs[ii].streams[jj].pid = src_cl->program.progs[ii].streams[jj].pid;
-	  dest_cl->program.progs[ii].streams[jj].format = src_cl->program.progs[ii].streams[jj].format;
-	  dest_cl->program.progs[ii].streams[jj].rate = src_cl->program.progs[ii].streams[jj].rate;
-	  dest_cl->program.progs[ii].streams[jj].aspect = src_cl->program.progs[ii].streams[jj].aspect;
-	  dest_cl->program.progs[ii].streams[jj].oc_flag = src_cl->program.progs[ii].streams[jj].oc_flag;
-	  dest_cl->program.progs[ii].streams[jj].char_code = src_cl->program.progs[ii].streams[jj].char_code;
-	  memcpy(dest_cl->program.progs[ii].streams[jj].lang,src_cl->program.progs[ii].streams[jj].lang,4);
-	}
-      }
+        strncpy(backup, path, len - 18);
+        strcpy(backup + len - 18, "BACKUP/");
+        strcpy(backup + len - 18 + 7, path + len - 18);
 
-      dest_cl->cpi.num_stream_pid = src_cl->cpi.num_stream_pid;
-      dest_cl->cpi.entry = malloc(src_cl->cpi.num_stream_pid * sizeof(CLPI_EP_MAP_ENTRY));
-      for (ii = 0; ii < dest_cl->cpi.num_stream_pid; ii++) {
-	dest_cl->cpi.entry[ii].pid = src_cl->cpi.entry[ii].pid;
-	dest_cl->cpi.entry[ii].ep_stream_type = src_cl->cpi.entry[ii].ep_stream_type;
-	dest_cl->cpi.entry[ii].num_ep_coarse = src_cl->cpi.entry[ii].num_ep_coarse;
-	dest_cl->cpi.entry[ii].num_ep_fine = src_cl->cpi.entry[ii].num_ep_fine;
-	dest_cl->cpi.entry[ii].ep_map_stream_start_addr = src_cl->cpi.entry[ii].ep_map_stream_start_addr;
-	dest_cl->cpi.entry[ii].coarse = malloc(src_cl->cpi.entry[ii].num_ep_coarse * sizeof(CLPI_EP_COARSE));
-	for (jj = 0; jj < src_cl->cpi.entry[ii].num_ep_coarse; jj++) {
-	  dest_cl->cpi.entry[ii].coarse[jj].ref_ep_fine_id = src_cl->cpi.entry[ii].coarse[jj].ref_ep_fine_id;
-	  dest_cl->cpi.entry[ii].coarse[jj].pts_ep = src_cl->cpi.entry[ii].coarse[jj].pts_ep;
-	  dest_cl->cpi.entry[ii].coarse[jj].spn_ep = src_cl->cpi.entry[ii].coarse[jj].spn_ep;
-	}
-	dest_cl->cpi.entry[ii].fine = malloc(src_cl->cpi.entry[ii].num_ep_fine * sizeof(CLPI_EP_FINE));
-	for (jj = 0; jj < src_cl->cpi.entry[ii].num_ep_fine; jj++) {
-	  dest_cl->cpi.entry[ii].fine[jj].is_angle_change_point = src_cl->cpi.entry[ii].fine[jj].is_angle_change_point;
-	  dest_cl->cpi.entry[ii].fine[jj].i_end_position_offset = src_cl->cpi.entry[ii].fine[jj].i_end_position_offset;
-	  dest_cl->cpi.entry[ii].fine[jj].pts_ep = src_cl->cpi.entry[ii].fine[jj].pts_ep;
-	  dest_cl->cpi.entry[ii].fine[jj].spn_ep = src_cl->cpi.entry[ii].fine[jj].spn_ep;
-	}
-      }
-      return dest_cl;
+        cl = _clpi_parse(backup, verbose);
+
+        X_FREE(backup);
     }
-    clpi_free(dest_cl);
-    return NULL;
+
+    return cl;
+}
+
+CLPI_CL*
+clpi_copy(const CLPI_CL* src_cl)
+{
+    CLPI_CL* dest_cl = NULL;
+    int ii, jj;
+
+    if (src_cl) {
+        dest_cl = (CLPI_CL*) calloc(1, sizeof(CLPI_CL));
+
+        dest_cl->clip.clip_stream_type = src_cl->clip.clip_stream_type;
+        dest_cl->clip.application_type = src_cl->clip.application_type;
+        dest_cl->clip.is_atc_delta = src_cl->clip.is_atc_delta;
+        dest_cl->clip.atc_delta_count = src_cl->clip.atc_delta_count;
+        dest_cl->clip.ts_recording_rate = src_cl->clip.ts_recording_rate;
+        dest_cl->clip.num_source_packets = src_cl->clip.num_source_packets;
+        dest_cl->clip.ts_type_info.validity = src_cl->clip.ts_type_info.validity;
+        memcpy(dest_cl->clip.ts_type_info.format_id, src_cl->clip.ts_type_info.format_id, 5);
+        dest_cl->clip.atc_delta = malloc(src_cl->clip.atc_delta_count * sizeof(CLPI_ATC_DELTA));
+        for (ii = 0; ii < src_cl->clip.atc_delta_count; ii++) {
+            dest_cl->clip.atc_delta[ii].delta =  src_cl->clip.atc_delta[ii].delta;
+            memcpy(dest_cl->clip.atc_delta[ii].file_id, src_cl->clip.atc_delta[ii].file_id, 6);
+            memcpy(dest_cl->clip.atc_delta[ii].file_code, src_cl->clip.atc_delta[ii].file_code, 5);
+        }
+
+        dest_cl->sequence.num_atc_seq = src_cl->sequence.num_atc_seq;
+        dest_cl->sequence.atc_seq = malloc(src_cl->sequence.num_atc_seq * sizeof(CLPI_ATC_SEQ));
+        for (ii = 0; ii < src_cl->sequence.num_atc_seq; ii++) {
+            dest_cl->sequence.atc_seq[ii].spn_atc_start = src_cl->sequence.atc_seq[ii].spn_atc_start;
+            dest_cl->sequence.atc_seq[ii].offset_stc_id = src_cl->sequence.atc_seq[ii].offset_stc_id;
+            dest_cl->sequence.atc_seq[ii].num_stc_seq = src_cl->sequence.atc_seq[ii].num_stc_seq;
+            dest_cl->sequence.atc_seq[ii].stc_seq = malloc(src_cl->sequence.atc_seq[ii].num_stc_seq * sizeof(CLPI_STC_SEQ));
+            for (jj = 0; jj < src_cl->sequence.atc_seq[ii].num_stc_seq; jj++) {
+                dest_cl->sequence.atc_seq[ii].stc_seq[jj].spn_stc_start = src_cl->sequence.atc_seq[ii].stc_seq[jj].spn_stc_start;
+                dest_cl->sequence.atc_seq[ii].stc_seq[jj].pcr_pid = src_cl->sequence.atc_seq[ii].stc_seq[jj].pcr_pid;
+                dest_cl->sequence.atc_seq[ii].stc_seq[jj].presentation_start_time = src_cl->sequence.atc_seq[ii].stc_seq[jj].presentation_start_time;
+                dest_cl->sequence.atc_seq[ii].stc_seq[jj].presentation_end_time = src_cl->sequence.atc_seq[ii].stc_seq[jj].presentation_end_time;
+            }
+        }
+
+        dest_cl->program.num_prog = src_cl->program.num_prog;
+        dest_cl->program.progs = malloc(src_cl->program.num_prog * sizeof(CLPI_PROG));
+        for (ii = 0; ii < src_cl->program.num_prog; ii++) {
+            dest_cl->program.progs[ii].spn_program_sequence_start = src_cl->program.progs[ii].spn_program_sequence_start;
+            dest_cl->program.progs[ii].program_map_pid = src_cl->program.progs[ii].program_map_pid;
+            dest_cl->program.progs[ii].num_streams = src_cl->program.progs[ii].num_streams;
+            dest_cl->program.progs[ii].num_groups = src_cl->program.progs[ii].num_groups;
+            dest_cl->program.progs[ii].streams = malloc(src_cl->program.progs[ii].num_streams * sizeof(CLPI_PROG_STREAM));
+            for (jj = 0; jj < src_cl->program.progs[ii].num_streams; jj++) {
+                dest_cl->program.progs[ii].streams[jj].coding_type = src_cl->program.progs[ii].streams[jj].coding_type;
+                dest_cl->program.progs[ii].streams[jj].pid = src_cl->program.progs[ii].streams[jj].pid;
+                dest_cl->program.progs[ii].streams[jj].format = src_cl->program.progs[ii].streams[jj].format;
+                dest_cl->program.progs[ii].streams[jj].rate = src_cl->program.progs[ii].streams[jj].rate;
+                dest_cl->program.progs[ii].streams[jj].aspect = src_cl->program.progs[ii].streams[jj].aspect;
+                dest_cl->program.progs[ii].streams[jj].oc_flag = src_cl->program.progs[ii].streams[jj].oc_flag;
+                dest_cl->program.progs[ii].streams[jj].char_code = src_cl->program.progs[ii].streams[jj].char_code;
+                memcpy(dest_cl->program.progs[ii].streams[jj].lang,src_cl->program.progs[ii].streams[jj].lang,4);
+            }
+        }
+
+        dest_cl->cpi.num_stream_pid = src_cl->cpi.num_stream_pid;
+        dest_cl->cpi.entry = malloc(src_cl->cpi.num_stream_pid * sizeof(CLPI_EP_MAP_ENTRY));
+        for (ii = 0; ii < dest_cl->cpi.num_stream_pid; ii++) {
+            dest_cl->cpi.entry[ii].pid = src_cl->cpi.entry[ii].pid;
+            dest_cl->cpi.entry[ii].ep_stream_type = src_cl->cpi.entry[ii].ep_stream_type;
+            dest_cl->cpi.entry[ii].num_ep_coarse = src_cl->cpi.entry[ii].num_ep_coarse;
+            dest_cl->cpi.entry[ii].num_ep_fine = src_cl->cpi.entry[ii].num_ep_fine;
+            dest_cl->cpi.entry[ii].ep_map_stream_start_addr = src_cl->cpi.entry[ii].ep_map_stream_start_addr;
+            dest_cl->cpi.entry[ii].coarse = malloc(src_cl->cpi.entry[ii].num_ep_coarse * sizeof(CLPI_EP_COARSE));
+            for (jj = 0; jj < src_cl->cpi.entry[ii].num_ep_coarse; jj++) {
+                dest_cl->cpi.entry[ii].coarse[jj].ref_ep_fine_id = src_cl->cpi.entry[ii].coarse[jj].ref_ep_fine_id;
+                dest_cl->cpi.entry[ii].coarse[jj].pts_ep = src_cl->cpi.entry[ii].coarse[jj].pts_ep;
+                dest_cl->cpi.entry[ii].coarse[jj].spn_ep = src_cl->cpi.entry[ii].coarse[jj].spn_ep;
+            }
+            dest_cl->cpi.entry[ii].fine = malloc(src_cl->cpi.entry[ii].num_ep_fine * sizeof(CLPI_EP_FINE));
+            for (jj = 0; jj < src_cl->cpi.entry[ii].num_ep_fine; jj++) {
+                dest_cl->cpi.entry[ii].fine[jj].is_angle_change_point = src_cl->cpi.entry[ii].fine[jj].is_angle_change_point;
+                dest_cl->cpi.entry[ii].fine[jj].i_end_position_offset = src_cl->cpi.entry[ii].fine[jj].i_end_position_offset;
+                dest_cl->cpi.entry[ii].fine[jj].pts_ep = src_cl->cpi.entry[ii].fine[jj].pts_ep;
+                dest_cl->cpi.entry[ii].fine[jj].spn_ep = src_cl->cpi.entry[ii].fine[jj].spn_ep;
+            }
+        }
+    }
+
+    return dest_cl;
 }

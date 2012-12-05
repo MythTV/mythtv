@@ -114,6 +114,8 @@ void sound_free(SOUND_DATA **p)
             X_FREE((*p)->sounds[i].samples);
         }
 
+        X_FREE((*p)->sounds);
+
         X_FREE(*p);
     }
 }
@@ -154,8 +156,9 @@ SOUND_DATA *sound_parse(const char *file_name)
     }
 
     data_offsets = calloc(num_sounds, sizeof(uint32_t));
-    data = calloc(1, sizeof(SOUND_DATA) + num_sounds * sizeof(SOUND_OBJECT));
+    data = calloc(1, sizeof(SOUND_DATA));
     data->num_sounds = num_sounds;
+    data->sounds = calloc(num_sounds, sizeof(SOUND_OBJECT));
 
     /* parse headers */
 

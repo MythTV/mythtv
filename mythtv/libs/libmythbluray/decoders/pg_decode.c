@@ -112,7 +112,15 @@ static int _decode_rle(BITBUFFER *bb, BD_PG_OBJECT *p)
     int num_rle     = 0;
     int rle_size    = p->width * p->height / 4;
 
+    if (rle_size < 1)
+        rle_size = 1;
+
     p->img = realloc(p->img, rle_size * sizeof(BD_PG_RLE_ELEM));
+    if (!p->img) {
+        BD_DEBUG(DBG_DECODE | DBG_CRIT, "pg_decode_object(): relloc(%zu) failed\n",
+                 rle_size * sizeof(BD_PG_RLE_ELEM));
+        return 0;
+    }
 
     while (!bb_eof(bb)) {
         uint32_t len   = 1;
@@ -140,19 +148,27 @@ static int _decode_rle(BITBUFFER *bb, BD_PG_OBJECT *p)
 
         pixels_left -= len;
 
+        if (pixels_left < 0) {
+            BD_DEBUG(DBG_DECODE, "pg_decode_object(): too many pixels (%d)\n", -pixels_left);
+            return 0;
+        }
+
         num_rle++;
         if (num_rle >= rle_size) {
+            void *tmp = p->img;
             rle_size *= 2;
             p->img = realloc(p->img, rle_size * sizeof(BD_PG_RLE_ELEM));
+            if (!p->img) {
+                BD_DEBUG(DBG_DECODE | DBG_CRIT, "pg_decode_object(): relloc(%zu) failed\n",
+                         rle_size * sizeof(BD_PG_RLE_ELEM));
+                X_FREE(tmp);
+                return 0;
+            }
         }
     }
 
     if (pixels_left > 0) {
         BD_DEBUG(DBG_DECODE, "pg_decode_object(): missing %d pixels\n", pixels_left);
-        return 0;
-    }
-    if (pixels_left < 0) {
-        BD_DEBUG(DBG_DECODE, "pg_decode_object(): too many pixels (%d)\n", -pixels_left);
         return 0;
     }
 

@@ -27,17 +27,11 @@
 
 #include <stdint.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #define BD_DEBUG(MASK,...) bd_debug(__FILE__,__LINE__,MASK,__VA_ARGS__)
+
 
 BD_PRIVATE char *print_hex(char *out, const uint8_t *str, int count);
 BD_PRIVATE void bd_debug(const char *file, int line, uint32_t mask, const char *format, ...) BD_ATTR_FORMAT_PRINTF(4,5);
 
-#ifdef __cplusplus
-};
-#endif
 
 #endif /* LOGGING_H_ */

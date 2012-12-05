@@ -130,6 +130,12 @@ typedef struct
     CLPI_EP_MAP_ENTRY *entry;
 } CLPI_CPI;
 
+/* Extent start points (profile 5 / version 2.4) */
+typedef struct {
+    uint32_t          num_point;
+    uint32_t         *point;
+} CLPI_EXTENT_START;
+
 typedef struct clpi_cl {
     uint32_t          type_indicator;
     uint32_t          type_indicator2;
@@ -143,6 +149,13 @@ typedef struct clpi_cl {
     CLPI_PROG_INFO    program;
     CLPI_CPI          cpi;
     // skip clip mark & extension data
+
+    // extensions for 3D
+
+    CLPI_EXTENT_START extent_start; /* extent start points (.ssif interleaving) */
+    CLPI_PROG_INFO    program_ss;
+    CLPI_CPI          cpi_ss;
+
 } CLPI_CL;
 
 #endif // _CLPI_DATA_H_

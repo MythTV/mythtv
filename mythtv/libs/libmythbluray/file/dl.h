@@ -23,10 +23,6 @@
 
 #include <util/attributes.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 // We don't bother aliasing dlopen to dlopen_posix, since only one
 // of the .C files will be compiled and linked, the right one for the
 // platform.
@@ -36,9 +32,5 @@ extern "C" {
 BD_PRIVATE void   *dl_dlopen  ( const char* path, const char *version );
 BD_PRIVATE void   *dl_dlsym   ( void* handle, const char* symbol );
 BD_PRIVATE int     dl_dlclose ( void* handle );
-
-#ifdef __cplusplus
-};
-#endif
 
 #endif /* DL_H_ */

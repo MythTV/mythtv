@@ -24,10 +24,6 @@
 
 #include <stdint.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 typedef struct {
     uint16_t video_width;
     uint16_t video_height;
@@ -102,10 +98,6 @@ typedef struct {
     BD_PG_COMPOSITION_OBJECT *composition_object;
 
 } BD_PG_COMPOSITION;
-
-#ifdef __cplusplus
-};
-#endif
 
 typedef struct {
     int64_t       pts;

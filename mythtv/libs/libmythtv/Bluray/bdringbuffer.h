@@ -129,7 +129,6 @@ class MTV_PUBLIC BDRingBuffer : public RingBuffer
     void HandleBDEvent(BD_EVENT &event);
 
     BLURAY            *bdnav;
-    meta_dl           *m_metaDiscLibrary;
     bool               m_isHDMVNavigation;
     bool               m_tryHDMVNavigation;
     bool               m_topMenuSupported;

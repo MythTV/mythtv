@@ -25,10 +25,6 @@
 #include "mpls_parse.h"
 #include "clpi_parse.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #define CONNECT_NON_SEAMLESS 0
 #define CONNECT_SEAMLESS 1
 
@@ -156,9 +152,5 @@ BD_PRIVATE NAV_CLIP* nav_set_angle(NAV_TITLE *title, NAV_CLIP *clip, unsigned an
 
 BD_PRIVATE NAV_TITLE_LIST* nav_get_title_list(const char *root, uint32_t flags, uint32_t min_title_length);
 BD_PRIVATE void nav_free_title_list(NAV_TITLE_LIST *title_list);
-
-#ifdef __cplusplus
-};
-#endif
 
 #endif // _NAVIGATION_H_

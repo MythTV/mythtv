@@ -1,6 +1,6 @@
 /*
  * This file is part of libbluray
- * Copyright (C) 2009-2010  hpi1
+ * Copyright (C) 2009-2012  Petri Hintukainen <phintuka@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -46,10 +46,10 @@ static const char * const psr_info[128] = {
     "/* RO: PSR18: Menu description language code */",
     "/* RO: PSR19: Country code */",
     "/* RO: PSR20: Region code */ /* 1 - A, 2 - B, 4 - C */",
-    "/*     PSR21 */",
-    "/*     PSR22 */",
-    "/*     PSR23 */",
-    "/*     PSR24 */",
+    "/* RO: PSR21: Output Mode Preference */ /* 0 - 2D, 1 - 3D */",
+    "/*     PSR22: Stereoscopic status */ /* 2D / 3D */ ",
+    "/* RO: PSR23: display capablity */",
+    "/* RO: PSR24: 3D capability */",
     "/*     PSR25 */",
     "/*     PSR26 */",
     "/*     PSR27 */",
@@ -136,6 +136,8 @@ static const char * const insn_opt_setsys[32] = {
     "POPUP_OFF",
     "STILL_ON",
     "STILL_OFF",
+    "SET_OUTPUT_MODE",
+    "SET_STREAM_SS",
 };
 
 static const char * const insn_opt_cmp[16] = {

@@ -24,10 +24,6 @@
 #include "clpi_parse.h"
 #include "navigation.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #define BD_STREAM_TYPE_VIDEO_MPEG1          0x01
 #define BD_STREAM_TYPE_VIDEO_MPEG2          0x02
 #define BD_STREAM_TYPE_AUDIO_MPEG1          0x03
@@ -84,9 +80,5 @@ extern "C" {
 #define BD_TEXT_CHAR_CODE_GB18030_20001     0x05
 #define BD_TEXT_CHAR_CODE_CN_GB             0x06
 #define BD_TEXT_CHAR_CODE_BIG5              0x07
-
-#ifdef __cplusplus
-};
-#endif
 
 #endif // _BDPARSE_H_

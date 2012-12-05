@@ -25,7 +25,7 @@
 #include "util/logging.h"
 #include "util/strutl.h"
 #include "file/file.h"
-#include "../bluray.h"
+#include "bluray.h"
 #include "mpls_parse.h"
 #include "navigation.h"
 
@@ -202,6 +202,7 @@ NAV_TITLE_LIST* nav_get_title_list(const char *root, uint32_t flags, uint32_t mi
     for (ii = 0; ii < title_list->count; ii++) {
         mpls_free(pl_list[ii]);
     }
+    X_FREE(pl_list);
     return title_list;
 }
 
@@ -276,9 +277,7 @@ char* nav_find_main_title(const char *root)
         mpls_free(pl_list[ii]);
     }
     if (count > 0) {
-        char *str = (char*)malloc(strlen(longest) + 1);
-        strcpy(str, longest);
-        return str;
+        return str_dup(longest);
     } else {
         return NULL;
     }
@@ -340,8 +339,8 @@ _fill_mark(NAV_TITLE *title, NAV_MARK *mark, int entry)
 static void
 _extrapolate_title(NAV_TITLE *title)
 {
-    uint64_t duration = 0;
-    uint64_t pkt = 0;
+    uint32_t duration = 0;
+    uint32_t pkt = 0;
     unsigned ii, jj;
     MPLS_PL *pl = title->pl;
     MPLS_PI *pi;
@@ -465,8 +464,7 @@ NAV_TITLE* nav_title_open(const char *root, const char *playlist, unsigned angle
     if (title == NULL) {
         return NULL;
     }
-    title->root = (char*)malloc(strlen(root) + 1);
-    strcpy(title->root, root);
+    title->root = str_dup(root);
     strncpy(title->name, playlist, 11);
     title->name[10] = '\0';
     path = str_printf("%s" DIR_SEP "BDMV" DIR_SEP "PLAYLIST" DIR_SEP "%s",
@@ -793,13 +791,13 @@ NAV_CLIP* nav_set_angle(NAV_TITLE *title, NAV_CLIP *clip, unsigned angle)
     title->packets = 0;
     for (ii = 0; ii < title->pl->list_count; ii++) {
         MPLS_PI *pi;
-        NAV_CLIP *clip;
+        NAV_CLIP *cl;
 
         pi = &title->pl->play_item[ii];
-        clip = &title->clip_list.clip[ii];
+        cl = &title->clip_list.clip[ii];
 
         _fill_clip(title, pi->clip, pi->connection_condition, pi->in_time, pi->out_time, pi->angle_count,
-                   clip, ii, &pos, &time);
+                   cl, ii, &pos, &time);
     }
     _extrapolate_title(title);
     return clip;

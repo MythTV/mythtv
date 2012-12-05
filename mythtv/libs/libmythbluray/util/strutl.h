@@ -24,17 +24,10 @@
 
 #include <stdint.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
+BD_PRIVATE char * str_dup(const char *str) BD_ATTR_MALLOC;
 BD_PRIVATE char * str_printf(const char *fmt, ...) BD_ATTR_FORMAT_PRINTF(1,2) BD_ATTR_MALLOC;
 
 BD_PRIVATE uint32_t str_to_uint32(const char *s, int n);
 BD_PRIVATE void     str_tolower(char *s);
-
-#ifdef __cplusplus
-};
-#endif
 
 #endif // STRUTL_H_

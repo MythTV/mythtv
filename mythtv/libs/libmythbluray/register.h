@@ -20,10 +20,6 @@
 #if !defined(_BD_REGISTER_H_)
 #define _BD_REGISTER_H_
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include <util/attributes.h>
 
 #include <stdint.h>
@@ -54,6 +50,10 @@ typedef enum {
     PSR_MENU_LANG        = 18,
     PSR_COUNTRY          = 19,
     PSR_REGION           = 20,
+    PSR_OUTPUT_PREFER    = 21,
+    PSR_3D_STATUS        = 22,
+    PSR_DISPLAY_CAP      = 23,
+    PSR_3D_CAP           = 24,
     PSR_VIDEO_CAP        = 29,
     PSR_TEXT_CAP         = 30, /* text subtitles */
     PSR_PROFILE_VERSION  = 31, /* player profile and version */
@@ -245,8 +245,5 @@ void bd_psr_register_cb(BD_REGISTERS *, void (*callback)(void*,BD_PSR_EVENT*), v
  */
 void bd_psr_unregister_cb(BD_REGISTERS *, void (*callback)(void*,BD_PSR_EVENT*), void *cb_handle);
 
-#ifdef __cplusplus
-};
-#endif
 
 #endif /* _BD_REGISTER_H_ */

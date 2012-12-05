@@ -19,20 +19,12 @@
 
 #include "meta_data.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #if !defined(_META_PARSE_H_)
 #define _META_PARSE_H_
 
 BD_PRIVATE META_ROOT* meta_parse(const char *device_path);
 BD_PRIVATE void       meta_free(META_ROOT **index);
-BD_PRIVATE META_DL*   meta_get(META_ROOT *meta_root, const char *language_code);
-
-#ifdef __cplusplus
-};
-#endif
+BD_PRIVATE const META_DL* meta_get(const META_ROOT *meta_root, const char *language_code);
 
 #endif // _META_PARSE_H_
 

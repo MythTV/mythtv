@@ -40,69 +40,101 @@ static const char *dlerror(char *buf, int buf_size)
 {
     DWORD error_code = GetLastError();
     wchar_t wbuf[256];
-  
+
     if (FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS |
                        FORMAT_MESSAGE_MAX_WIDTH_MASK,
                        NULL, error_code, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
                        wbuf, sizeof(wbuf)/sizeof(wbuf[0]), NULL)) {
         WideCharToMultiByte(CP_UTF8, 0, wbuf, -1, buf, buf_size, NULL, NULL);
     } else {
+#ifdef _MSC_VER
+        _snprintf(buf, buf_size, "error %d", (int)error_code);
+#else
         snprintf(buf, buf_size, "error %d", (int)error_code);
+#endif
     }
-    
+
     return buf;
 }
-#endif
+#endif /* _WIN32 */
 
-void   *dl_dlopen  ( const char* path, const char *version )
+static void   *_dl_dlopen  ( const char* path )
 {
-    char *name;
     void *result;
 
-#if defined(__APPLE__)
-    static const char ext[] = ".dylib";
-    version = NULL;
-#elif defined(_WIN32)
-    static const char ext[] = ".dll";
-    version = NULL;
-#else
-    static const char ext[] = ".so";
-#endif
-
-    if (version) {
-        name = str_printf("%s%s.%s", path, ext, version);
-    } else {
-        name = str_printf("%s%s", path, ext);
-    }
-
-    BD_DEBUG(DBG_FILE, "searching for library '%s' ...\n", name);
+    BD_DEBUG(DBG_FILE, "searching for library '%s' ...\n", path);
 
 #if defined(_WIN32)
     wchar_t wname[MAX_PATH];
-    MultiByteToWideChar(CP_UTF8, 0, name, -1, wname, MAX_PATH);
+    MultiByteToWideChar(CP_UTF8, 0, path, -1, wname, MAX_PATH);
     result = LoadLibraryW(wname);
 
     if (!result) {
         char buf[128];
-        BD_DEBUG(DBG_FILE, "can't open library '%s': %s\n", name, dlerror(buf, sizeof(buf)));
+        BD_DEBUG(DBG_FILE, "can't open library '%s': %s\n", path, dlerror(buf, sizeof(buf)));
     }
 #else
-    result = dlopen(name, RTLD_LAZY);
+    result = dlopen(path, RTLD_LAZY);
 
     if (!result) {
-        BD_DEBUG(DBG_FILE, "can't open library '%s': %s\n", name, dlerror());
+        BD_DEBUG(DBG_FILE, "can't open library '%s': %s\n", path, dlerror());
     }
 #endif
 
-    X_FREE(name);
-
     return result;
+}
+
+void   *dl_dlopen  ( const char* path, const char *version )
+{
+    char *name;
+    void *dll;
+    int i;
+
+#if defined(__APPLE__)
+    static const char ext[] = ".dylib";
+    /*
+      Search for the library in several locations:
+       ""               - default search path (including DYLD_LIBRARY_PATH)
+       @loader_path     - location of current library/binary (ex. libbluray.dylib)
+       @executable_path - location of running binary (ex. /Applications/Some.app/Contents/MacOS)
+       @rpath           - search rpaths of running binary (man install_name_path)
+    */
+    static const char *search_paths[] = {"", "@loader_path/lib/", "@loader_path/", "@executable_path/",
+                                         "@executable_path/lib/", "@executable_path/../lib/",
+                                         "@executable_path/../Resources/", "@rpath/", NULL};
+    version = NULL;
+#elif defined(_WIN32)
+    static const char ext[] = ".dll";
+    static const char *search_paths[] = {"", NULL};
+    version = NULL;
+#else
+    static const char ext[] = ".so";
+    static const char *search_paths[] = {"", NULL};
+#endif
+
+    for (i = 0 ; search_paths[i] ; ++i) {
+        if (version) {
+            name = str_printf("%s%s%s.%s", search_paths[i], path, ext, version);
+        } else {
+            name = str_printf("%s%s%s", search_paths[i], path, ext);
+        }
+
+        fprintf (stderr, "Attempting to open %s\n", name);
+
+        dll = _dl_dlopen (name);
+        X_FREE(name);
+        if (dll) {
+            return dll;
+        }
+    }
+
+    return NULL;
 }
 
 void   *dl_dlsym   ( void* handle, const char* symbol )
 {
 #if defined(_WIN32)
-    void *result = (void *)GetProcAddress(handle, symbol);
+    void *result = (void *)GetProcAddress((HMODULE)handle, symbol);
 
     if (!result) {
         char buf[128];
@@ -122,7 +154,7 @@ void   *dl_dlsym   ( void* handle, const char* symbol )
 int     dl_dlclose ( void* handle )
 {
 #if defined(_WIN32)
-    FreeLibrary(handle);
+    FreeLibrary((HMODULE)handle);
     return 0;
 #else
     return dlclose(handle);

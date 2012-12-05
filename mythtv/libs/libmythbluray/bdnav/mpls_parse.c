@@ -20,6 +20,7 @@
 #include "util/macro.h"
 #include "file/file.h"
 #include "util/bits.h"
+#include "extdata_parse.h"
 #include "mpls_parse.h"
 
 #include <stdlib.h>
@@ -401,6 +402,14 @@ _parse_stn(BITSTREAM *bits, MPLS_STN *stn)
 static void
 _clean_stn(MPLS_STN *stn)
 {
+    if(stn->secondary_audio) {
+        X_FREE(stn->secondary_audio->sa_primary_audio_ref);
+    }
+    if(stn->secondary_video) {
+        X_FREE(stn->secondary_video->sv_secondary_audio_ref);
+        X_FREE(stn->secondary_video->sv_pip_pg_ref);
+    }
+
     X_FREE(stn->video);
     X_FREE(stn->audio);
     X_FREE(stn->pg);
@@ -716,6 +725,12 @@ _clean_playlist(MPLS_PL *pl)
         }
         X_FREE(pl->sub_path);
     }
+    if (pl->ext_sub_path != NULL) {
+        for (ii = 0; ii < pl->ext_sub_count; ii++) {
+            _clean_subpath(&pl->ext_sub_path[ii]);
+        }
+        X_FREE(pl->ext_sub_path);
+    }
     X_FREE(pl->play_mark);
     X_FREE(pl);
 }
@@ -726,8 +741,50 @@ mpls_free(MPLS_PL *pl)
     _clean_playlist(pl);
 }
 
-MPLS_PL*
-mpls_parse(char *path, int verbose)
+static int
+_parse_subpath_extension(BITSTREAM *bits, MPLS_PL *pl)
+{
+    MPLS_SUB *sub_path;
+    int ii;
+
+    uint32_t len       = bs_read(bits, 32);
+    int      sub_count = bs_read(bits, 16);
+
+    if (len < 1 || sub_count < 1) {
+        return 0;
+    }
+
+    sub_path = calloc(sub_count,  sizeof(MPLS_SUB));
+    for (ii = 0; ii < sub_count; ii++) {
+        if (!_parse_subpath(bits, &sub_path[ii])) {
+            X_FREE(sub_path);
+            fprintf(stderr, "error parsing extension subpath\n");
+            return 0;
+        }
+    }
+    pl->ext_sub_path  = sub_path;
+    pl->ext_sub_count = sub_count;
+
+    return 1;
+}
+
+static int
+_parse_mpls_extension(BITSTREAM *bits, int id1, int id2, void *handle)
+{
+    MPLS_PL *pl = (MPLS_PL*)handle;
+
+    if (id1 == 2) {
+        if (id2 == 2) {
+            // SubPath entries extension
+            return _parse_subpath_extension(bits, pl);
+        }
+    }
+
+    return 0;
+}
+
+static MPLS_PL*
+_mpls_parse(const char *path, int verbose)
 {
     BITSTREAM  bits;
     BD_FILE_H *fp;
@@ -763,7 +820,35 @@ mpls_parse(char *path, int verbose)
         _clean_playlist(pl);
         return NULL;
     }
+    if (pl->ext_pos > 0) {
+        bdmv_parse_extension_data(&bits,
+                                  pl->ext_pos,
+                                  _parse_mpls_extension,
+                                  pl);
+    }
+
     file_close(fp);
     return pl;
 }
 
+MPLS_PL*
+mpls_parse(const char *path, int verbose)
+{
+    MPLS_PL *pl = _mpls_parse(path, verbose);
+
+    /* if failed, try backup file */
+    if (!pl) {
+        size_t len   = strlen(path);
+        char *backup = malloc(len + 8);
+
+        strncpy(backup, path, len - 19);
+        strcpy(backup + len - 19, "BACKUP/");
+        strcpy(backup + len - 19 + 7, path + len - 19);
+
+        pl = _mpls_parse(backup, verbose);
+
+        X_FREE(backup);
+    }
+
+    return pl;
+}

@@ -17,10 +17,6 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #if !defined(_BD_KEYS_H_)
 #define _BD_KEYS_H_
 
@@ -59,9 +55,5 @@ typedef enum {
     BD_VK_MOUSE_ACTIVATE = 17,
 
 } bd_vk_key_e;
-
-#ifdef __cplusplus
-};
-#endif
 
 #endif // _BD_KEYS_H_

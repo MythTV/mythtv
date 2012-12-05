@@ -1,6 +1,6 @@
 /*
  * This file is part of libbluray
- * Copyright (C) 2010  hpi1
+ * Copyright (C) 2010  Petri Hintukainen <phintuka@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -25,20 +25,20 @@
 #include <stdint.h>
 
 typedef struct {
+  uint8_t sub_grp    : 3;  /* command sub-group */
   uint8_t op_cnt     : 3;  /* operand count */
   uint8_t grp        : 2;  /* command group */
-  uint8_t sub_grp    : 3;  /* command sub-group */
 
-  uint8_t imm_op1    : 1;  /* I-flag for operand 1 */
-  uint8_t imm_op2    : 1;  /* I-flag for operand 2 */
-  uint8_t reserved1  : 2;
   uint8_t branch_opt : 4;  /* branch option */
+  uint8_t reserved1  : 2;
+  uint8_t imm_op2    : 1;  /* I-flag for operand 2 */
+  uint8_t imm_op1    : 1;  /* I-flag for operand 1 */
 
-  uint8_t reserved2  : 4;
   uint8_t cmp_opt    : 4;  /* compare option */
+  uint8_t reserved2  : 4;
 
-  uint8_t reserved3  : 3;
   uint8_t set_opt    : 5;  /* set option */
+  uint8_t reserved3  : 3;
 } HDMV_INSN;
 
 typedef struct bd_mobj_cmd_s {
@@ -58,11 +58,11 @@ typedef struct {
 
 typedef struct {
     uint16_t    num_objects;
-    MOBJ_OBJECT objects[];
+    MOBJ_OBJECT *objects;
 } MOBJ_OBJECTS;
 
 
-BD_PRIVATE MOBJ_OBJECTS* mobj_parse(const char *path); /* parse MovieObject.bdmv */
+BD_PRIVATE MOBJ_OBJECTS* mobj_parse(const char *path) BD_ATTR_MALLOC; /* parse MovieObject.bdmv */
 BD_PRIVATE void          mobj_parse_cmd(uint8_t *buf, MOBJ_CMD *cmd);
 BD_PRIVATE void          mobj_free(MOBJ_OBJECTS **index);
 

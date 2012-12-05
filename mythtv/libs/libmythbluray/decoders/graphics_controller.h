@@ -41,6 +41,7 @@ typedef void (*gc_overlay_proc_f)(void *, const struct bd_overlay_s * const);
 
 typedef enum {
     /* */
+    GC_CTRL_INIT_MENU,       /* */
     GC_CTRL_NOP,             /* No input. Render page / run timers / run animations */
     GC_CTRL_RESET,           /* reset graphics controller */
 
@@ -57,6 +58,11 @@ typedef enum {
 
 } gc_ctrl_e;
 
+
+#define GC_STATUS_NONE      0
+#define GC_STATUS_POPUP     1  /* popup menu loaded */
+#define GC_STATUS_MENU_OPEN 2  /* menu open */
+
 typedef struct {
     /* HDMV navigation command sequence */
     int   num_nav_cmds;
@@ -64,6 +70,9 @@ typedef struct {
 
     /* Sound idx */
     int   sound_id_ref;
+
+    /* graphics status (none, menu, popup) */
+    uint32_t status; /* bit mask */
 } GC_NAV_CMDS;
 
 /*

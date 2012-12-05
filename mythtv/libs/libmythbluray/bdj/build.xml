@@ -1,0 +1,31 @@
+<project name="BDJ" default="dist" basedir=".">
+    <description>
+        Build file for the java portion of libBDJ
+    </description>
+
+    <property name="src" location="java"/>
+    <property name="build" location="build"/>
+    <property name="dist"  location="../../.libs"/>
+
+    <target name="init">
+        <tstamp/>
+        <mkdir dir="${build}"/>
+        <mkdir dir="${dist}"/>
+    </target>
+
+    <target name="compile" depends="init"
+            description="compile the source " >
+        <javac srcdir="${src}" destdir="${build}" debug="yes" />
+    </target>
+
+    <target name="dist" depends="compile"
+            description="generate the distribution" >
+        <jar jarfile="${dist}/libbluray.jar" basedir="${build}" />
+    </target>
+
+    <target name="clean"
+            description="clean up" >
+        <delete dir="${build}"/>
+        <delete dir="${dist}/libbluray.jar"/>
+    </target>
+</project>
