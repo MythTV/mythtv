@@ -505,7 +505,10 @@ bool parse_dom(MythSettingList &settings, const QDomElement &element,
             if ((e.hasChildNodes()) &&
                 (!parse_dom(g->settings, e, filename, group, tmpIncludeAllChildren,
                             tmpFoundGroup)))
+            {
+                delete g;
                 return false;
+            }
 
             if (tmpFoundGroup || tmpIncludeAllChildren)
             {
