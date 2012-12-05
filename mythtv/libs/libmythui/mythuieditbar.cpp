@@ -296,6 +296,7 @@ void MythUIEditBar::ClearImages(void)
 {
     while (m_images.size())
         DeleteChild(m_images.takeFirst());
+    SetRedraw();
 }
 
 /**
