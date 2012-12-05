@@ -310,10 +310,10 @@ Cddb::Album& Cddb::Album::operator =(const QString& rhs)
     submitter = "MythTV " MYTH_BINARY_VERSION;
     rev = 1;
     isCompilation = false;
-    tracks.empty();
-    toc.empty();
+    tracks.clear();
+    toc.clear();
     extd.clear();
-    ext.empty();
+    ext.clear();
 
     enum { kNorm, kToc } eState = kNorm;
 
