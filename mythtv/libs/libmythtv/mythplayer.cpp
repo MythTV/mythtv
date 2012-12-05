@@ -813,6 +813,8 @@ void MythPlayer::SetVideoParams(int width, int height, double fps,
 
     video_dim      = QSize((width + 15) & ~0xf, (height + 15) & ~0xf);
     video_disp_dim = QSize(width, height);
+    if (height)
+        video_aspect = (float)width / height;
 
     if (fps > 0.0f && fps < 121.0f)
     {
