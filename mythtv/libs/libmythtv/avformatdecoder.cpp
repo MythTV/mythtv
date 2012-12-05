@@ -4445,6 +4445,8 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
     AVPacket *pkt = NULL;
     bool have_err = false;
 
+    const DecodeType origDecodetype = decodetype;
+
     gotVideoFrame = false;
 
     frame_decoded = 0;
@@ -4488,16 +4490,28 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
 
     while (!allowedquit)
     {
-        if ((decodetype & kDecodeAudio) &&
-            ((currentTrack[kTrackTypeAudio] < 0) ||
-             (selectedTrack[kTrackTypeAudio].av_stream_index < 0)))
+        if (decodetype & kDecodeAudio)
         {
-            // disable audio request if there are no audio streams anymore
-            // and we have video, otherwise allow decoding to stop
-            if (hasVideo)
-                decodetype = (DecodeType)((int)decodetype & ~kDecodeAudio);
-            else
-                allowedquit = true;
+            if (((currentTrack[kTrackTypeAudio] < 0) ||
+                 (selectedTrack[kTrackTypeAudio].av_stream_index < 0)))
+            {
+                // disable audio request if there are no audio streams anymore
+                // and we have video, otherwise allow decoding to stop
+                if (hasVideo)
+                    decodetype = (DecodeType)((int)decodetype & ~kDecodeAudio);
+                else
+                    allowedquit = true;
+            }
+        }
+        else
+        if ((origDecodetype & kDecodeAudio) &&
+            (currentTrack[kTrackTypeAudio] >= 0) &&
+            (selectedTrack[kTrackTypeAudio].av_stream_index >= 0))
+        {
+            // Turn on audio decoding again if it was on originally
+            // and an audio stream has now appeared.  This can happen
+            // in still DVD menus with audio
+            decodetype = (DecodeType)((int)decodetype | kDecodeAudio);
         }
 
         StreamChangeCheck();
