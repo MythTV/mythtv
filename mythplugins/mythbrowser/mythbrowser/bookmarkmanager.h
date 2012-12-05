@@ -15,12 +15,14 @@ class Bookmark
         category = "";
         name = "";
         url = "";
+		isHomepage = false;
         selected = false;
     }
 
     QString category;
     QString name;
     QString url;
+	bool    isHomepage;
     bool    selected;
 
     inline bool operator == (const Bookmark &b) const
@@ -76,6 +78,8 @@ class BookmarkManager : public MythScreenType
     void slotDoDeleteMarked(bool doDelete);
     void slotBrowserClosed(void);
 
+    void slotSettings(void);
+    void slotSetHomepage(void);
     void slotAddBookmark(void);
     void slotEditBookmark(void);
     void slotDeleteCurrent(void);
