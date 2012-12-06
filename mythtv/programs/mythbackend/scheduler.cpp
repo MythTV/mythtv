@@ -3901,14 +3901,11 @@ void Scheduler::AddNewRecords(void)
     prefinputpri        = gCoreContext->GetNumSetting("PrefInputPriority", 2);
     int hdtvpriority    = gCoreContext->GetNumSetting("HDTVRecPriority", 0);
     int wspriority      = gCoreContext->GetNumSetting("WSRecPriority", 0);
-    int autopriority    = gCoreContext->GetNumSetting("AutoRecPriority", 0);
     int slpriority      = gCoreContext->GetNumSetting("SignLangRecPriority", 0);
     int onscrpriority   = gCoreContext->GetNumSetting("OnScrSubRecPriority", 0);
     int ccpriority      = gCoreContext->GetNumSetting("CCRecPriority", 0);
     int hhpriority      = gCoreContext->GetNumSetting("HardHearRecPriority", 0);
     int adpriority      = gCoreContext->GetNumSetting("AudioDescRecPriority", 0);
-
-    int autostrata = autopriority * 2 + 1;
 
     QString pwrpri = "channel.recpriority + cardinput.recpriority";
 
@@ -3993,8 +3990,7 @@ void Scheduler::AddNewRecords(void)
         "    RECTABLE.playgroup, oldrecstatus.recstatus, "//36-37
         "    oldrecstatus.reactivate, p.videoprop+0,     "//38-39
         "    p.subtitletypes+0, p.audioprop+0,   RECTABLE.storagegroup, "//40-42
-        "    capturecard.hostname, recordmatch.oldrecstatus, "
-        "                                           RECTABLE.avg_delay, "//43-45
+        "    capturecard.hostname, recordmatch.oldrecstatus, NULL, "//43-45
         "    oldrecstatus.future, cardinput.schedorder, " //46-47
         "    p.syndicatedepisodenumber, p.partnumber, p.parttotal, ") + //48-50
         pwrpri + QString(
@@ -4127,11 +4123,8 @@ void Scheduler::AddNewRecords(void)
             p->SetRecordingStatus(p->oldrecstatus);
         }
 
-        p->SetRecordingPriority(
-            p->GetRecordingPriority() +
-            result.value(51).toInt() +
-            ((autopriority) ?
-             autopriority - (result.value(45).toInt() * autostrata / 200) : 0));
+        p->SetRecordingPriority(p->GetRecordingPriority() +
+                                result.value(51).toInt());
 
         // Check to see if the program is currently recording and if
         // the end time was changed.  Ideally, checking for a new end

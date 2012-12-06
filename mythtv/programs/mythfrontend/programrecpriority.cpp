@@ -39,7 +39,7 @@ ProgramRecPriorityInfo::ProgramRecPriorityInfo(void) :
     recType(kNotRecording),
     matchCount(0),         recCount(0),
     last_record(QDateTime()),
-    avg_delay(0),          autoRecPriority(0),
+    avg_delay(0),
     profile("")
 {
 }
@@ -52,7 +52,6 @@ ProgramRecPriorityInfo::ProgramRecPriorityInfo(
     recCount(other.recCount),
     last_record(other.last_record),
     avg_delay(other.avg_delay),
-    autoRecPriority(other.autoRecPriority),
     profile(other.profile)
 {
 }
@@ -69,7 +68,6 @@ void ProgramRecPriorityInfo::clone(
         recCount           = other.recCount;
         last_record        = other.last_record;
         avg_delay          = other.avg_delay;
-        autoRecPriority    = other.autoRecPriority;
         profile            = other.profile;
     }
 }
@@ -86,7 +84,6 @@ void ProgramRecPriorityInfo::clone(
         recCount           = 0;
         last_record        = QDateTime();
         avg_delay          = 0;
-        autoRecPriority    = 0;
         profile.clear();
     }
 }
@@ -103,7 +100,6 @@ void ProgramRecPriorityInfo::clone(
         recCount           = 0;
         last_record        = QDateTime();
         avg_delay          = 0;
-        autoRecPriority    = 0;
         profile.clear();
     }
 }
@@ -117,7 +113,6 @@ void ProgramRecPriorityInfo::clear(void)
     recCount           = 0;
     last_record        = QDateTime();
     avg_delay          = 0;
-    autoRecPriority    = 0;
     profile.clear();
 }
 
@@ -189,10 +184,8 @@ class ProgramRecPrioritySort
     bool operator()(const ProgramRecPriorityInfo *a, 
                     const ProgramRecPriorityInfo *b) const
     {
-        int finalA = a->GetRecordingPriority() +
-                     a->autoRecPriority;
-        int finalB = b->GetRecordingPriority() +
-                     b->autoRecPriority;
+        int finalA = a->GetRecordingPriority();
+        int finalB = b->GetRecordingPriority();
 
         if (finalA != finalB)
         {
@@ -456,7 +449,7 @@ bool ProgramRecPriority::Create()
             SLOT(edit(MythUIButtonListItem*)));
 
     m_programList->SetLCDTitles(tr("Schedule Priorities"),
-                          "rec_type|titlesubtitle|progpriority|finalpriority");
+                          "rec_type|titlesubtitle|progpriority");
     m_programList->SetSearchFields("titlesubtitle");
 
     BuildFocusList();
@@ -1185,29 +1178,19 @@ void ProgramRecPriority::changeRecPriority(int howMuch)
         {
             // No need to re-fill the entire list, just update this entry
             int progRecPriority = pgRecInfo->GetRecordingPriority();
-            int autorecpri = pgRecInfo->autoRecPriority;
-            int finalRecPriority = progRecPriority +
-                                   autorecpri;
 
             item->SetText(QString::number(progRecPriority), "progpriority");
-
-            QString msg = QString::number(progRecPriority);
-            if(autorecpri != 0)
-                msg += tr(" + %1 automatic priority (%2hr)")
-                                .arg(autorecpri).arg(pgRecInfo->avg_delay);
-            item->SetText(msg, "recpriority");
+            item->SetText(QString::number(progRecPriority), "recpriority");
             if (m_recPriorityText)
-                m_recPriorityText->SetText(msg);
+                m_recPriorityText->SetText(QString::number(progRecPriority));
 
-            item->SetText(QString::number(progRecPriority +
-                                          autorecpri), "recpriorityB");
+            item->SetText(QString::number(progRecPriority), "recpriorityB");
             if (m_recPriorityBText)
-                m_recPriorityBText->SetText(QString::number(progRecPriority +
-                                                            autorecpri));
+                m_recPriorityBText->SetText(QString::number(progRecPriority));
 
-            item->SetText(QString::number(finalRecPriority), "finalpriority");
+            item->SetText(QString::number(progRecPriority), "finalpriority");
             if (m_finalPriorityText)
-                m_finalPriorityText->SetText(QString::number(finalRecPriority));
+                m_finalPriorityText->SetText(QString::number(progRecPriority));
         }
     }
 }
@@ -1232,8 +1215,6 @@ void ProgramRecPriority::saveRecPriority(void)
 void ProgramRecPriority::FillList(void)
 {
     vector<ProgramInfo *> recordinglist;
-
-    int autopriority = gCoreContext->GetNumSetting("AutoRecPriority", 0);
 
     m_programData.clear();
 
@@ -1302,13 +1283,6 @@ void ProgramRecPriority::FillList(void)
                 progInfo->last_record = lastrec;
                 progInfo->avg_delay = avgd;
                 progInfo->profile = profile;
-
-                if (autopriority)
-                    progInfo->autoRecPriority =
-                        autopriority - (progInfo->avg_delay *
-                                        (autopriority * 2 + 1) / 200);
-                else
-                    progInfo->autoRecPriority = 0;
 
                 if (inactive)
                     progInfo->recstatus = rsInactive;
@@ -1433,9 +1407,6 @@ void ProgramRecPriority::UpdateList()
                                                 qVariantFromValue(progInfo));
 
         int progRecPriority = progInfo->GetRecordingPriority();
-        int autorecpri = progInfo->autoRecPriority;
-        int finalRecPriority = progRecPriority +
-                               autorecpri;
 
         if ((progInfo->rectype == kSingleRecord ||
                 progInfo->rectype == kOverrideRecord ||
@@ -1494,16 +1465,10 @@ void ProgramRecPriority::UpdateList()
         item->SetText(subtitle, "scheduleinfo", state);
 
         item->SetText(QString::number(progRecPriority), "progpriority", state);
-        item->SetText(QString::number(finalRecPriority),
-                      "finalpriority", state);
+        item->SetText(QString::number(progRecPriority), "finalpriority", state);
 
-        QString msg = QString::number(progRecPriority);
-        if(autorecpri != 0)
-            msg += tr(" + %1 automatic priority (%2hr)")
-                   .arg(autorecpri).arg(progInfo->avg_delay);
-        item->SetText(msg, "recpriority", state);
-        item->SetText(QString::number(progRecPriority + autorecpri),
-                      "recpriorityB", state);
+        item->SetText(QString::number(progRecPriority), "recpriority", state);
+        item->SetText(QString::number(progRecPriority), "recpriorityB", state);
 
         QString tempDateTime = MythDate::toString(progInfo->last_record,
                                                     MythDate::kDateTimeFull | MythDate::kSimplify |
@@ -1570,11 +1535,7 @@ void ProgramRecPriority::updateInfo(MythUIButtonListItem *item)
     if (!pgRecInfo)
         return;
 
-    int progRecPriority, autorecpri, finalRecPriority;
-
-    progRecPriority = pgRecInfo->GetRecordingPriority();
-    autorecpri = pgRecInfo->autoRecPriority;
-    finalRecPriority = progRecPriority + autorecpri;
+    int progRecPriority = pgRecInfo->GetRecordingPriority();
 
     QString subtitle;
     if (pgRecInfo->subtitle != "(null)" &&
@@ -1608,21 +1569,13 @@ void ProgramRecPriority::updateInfo(MythUIButtonListItem *item)
         m_schedInfoText->SetText(subtitle);
 
     if (m_recPriorityText)
-    {
-        QString msg = QString::number(pgRecInfo->GetRecordingPriority());
-
-        if(autorecpri != 0)
-            msg += tr(" + %1 automatic priority (%2hr)")
-                        .arg(autorecpri).arg(pgRecInfo->avg_delay);
-        m_recPriorityText->SetText(msg);
-    }
+        m_recPriorityText->SetText(QString::number(progRecPriority));
 
     if (m_recPriorityBText)
-        m_recPriorityBText->SetText(QString::number(progRecPriority +
-                                                    autorecpri));
+        m_recPriorityBText->SetText(QString::number(progRecPriority));
 
     if (m_finalPriorityText)
-        m_finalPriorityText->SetText(QString::number(finalRecPriority));
+        m_finalPriorityText->SetText(QString::number(progRecPriority));
 
     if (m_lastRecordedText)
     {

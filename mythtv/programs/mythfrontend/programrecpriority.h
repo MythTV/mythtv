@@ -50,7 +50,6 @@ class ProgramRecPriorityInfo : public RecordingInfo
     int recCount;
     QDateTime last_record;
     int avg_delay;
-    int autoRecPriority;
     QString profile;
 };
 
