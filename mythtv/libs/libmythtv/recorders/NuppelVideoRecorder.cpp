@@ -2809,23 +2809,6 @@ void NuppelVideoRecorder::doWriteThread(void)
     }
 }
 
-void NuppelVideoRecorder::SetNextRecording(
-    const RecordingInfo *progInf, RingBuffer *rb)
-{
-    // First we do some of the time consuming stuff we can do now
-    SavePositionMap(true);
-    ringBuffer->WriterFlush();
-    if (curRecording)
-        curRecording->SaveFilesize(ringBuffer->GetRealFileSize());
-
-    // Then we set the next info
-    QMutexLocker locker(&nextRingBufferLock);
-    nextRecording = NULL;
-    if (progInf)
-        nextRecording = new RecordingInfo(*progInf);
-    nextRingBuffer = rb;
-}
-
 void NuppelVideoRecorder::ResetForNewFile(void)
 {
     framesWritten = 0;

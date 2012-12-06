@@ -116,7 +116,7 @@ class MTV_PUBLIC RecorderBase : public QRunnable
      *
      *   This calls TVRec::RingBufferChanged() when the switch happens.
      */
-    virtual void SetNextRecording(const RecordingInfo*, RingBuffer*) = 0;
+    void SetNextRecording(const RecordingInfo*, RingBuffer*);
 
     /** \brief This is called between SetOptionsFromProfile() and
      *         run() to initialize any devices, etc.

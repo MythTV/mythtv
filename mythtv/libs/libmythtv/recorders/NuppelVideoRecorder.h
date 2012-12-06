@@ -101,7 +101,6 @@ class MTV_PUBLIC NuppelVideoRecorder : public V4LRecorder, public CC608Input
     void SetVideoFilters(QString &filters);
     void SetTranscoding(bool value) { transcoding = value; };
 
-    void SetNextRecording(const RecordingInfo*, RingBuffer*);
     void ResetForNewFile(void);
     void FinishRecording(void);
     void StartNewFile(void);

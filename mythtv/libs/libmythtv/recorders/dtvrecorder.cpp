@@ -686,31 +686,6 @@ bool DTVRecorder::FindOtherKeyframes(const TSPacket *tspacket)
     return true;
 }
 
-// documented in recorderbase.h
-void DTVRecorder::SetNextRecording(const RecordingInfo *progInf, RingBuffer *rb)
-{
-    LOG(VB_RECORD, LOG_INFO, LOC + QString("SetNextRecord(0x%1, 0x%2)")
-            .arg((uint64_t)progInf,0,16).arg((uint64_t)rb,0,16));
-    // First we do some of the time consuming stuff we can do now
-    SavePositionMap(true);
-    if (ringBuffer)
-    {
-        ringBuffer->WriterFlush();
-        if (curRecording)
-            curRecording->SaveFilesize(ringBuffer->GetRealFileSize());
-    }
-
-    // Then we set the next info
-    nextRingBufferLock.lock();
-
-    nextRecording = NULL;
-    if (progInf)
-        nextRecording = new RecordingInfo(*progInf);
-
-    nextRingBuffer = rb;
-    nextRingBufferLock.unlock();
-}
-
 /** \fn DTVRecorder::HandleKeyframe(uint64_t)
  *  \brief This save the current frame to the position maps
  *         and handles ringbuffer switching.
