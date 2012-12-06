@@ -15,7 +15,6 @@ using namespace std;
 // filldata headers
 #include "channeldata.h"
 #include "xmltvparser.h"
-#include "icondata.h"
 
 #define REFRESH_MAX 21
 
@@ -59,7 +58,7 @@ class FillData
 
     void SetRefresh(int day, bool set);
 
-    void DataDirectStationUpdate(Source source, bool update_icons = true);
+    void DataDirectStationUpdate(Source source);
     bool DataDirectUpdateChannels(Source source);
     bool GrabDDData(Source source, int poffset,
                     QDate pdate, int ddSource);
@@ -79,7 +78,6 @@ class FillData
     ProgramData         prog_data;
     ChannelData         chan_data;
     XMLTVParser         xmltv_parser;
-    IconData            icon_data;
     DataDirectProcessor ddprocessor;
 
     QString logged_in;

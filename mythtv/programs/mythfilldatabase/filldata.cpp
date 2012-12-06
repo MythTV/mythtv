@@ -101,7 +101,7 @@ void FillData::SetRefresh(int day, bool set)
 }
 
 // DataDirect stuff
-void FillData::DataDirectStationUpdate(Source source, bool update_icons)
+void FillData::DataDirectStationUpdate(Source source)
 {
     DataDirectProcessor::UpdateStationViewTable(source.lineupid);
 
@@ -116,9 +116,6 @@ void FillData::DataDirectStationUpdate(Source source, bool update_icons)
             source.id, chan_data.m_filterNewChannels);
     }
     // TODO delete any channels which no longer exist in listings source
-
-    if (update_icons)
-        icon_data.UpdateSourceIcons(source.id);
 
     // Unselect channels not in users lineup for DVB, HDTV
     if (!insert_channels && (new_channels > 0) &&
@@ -179,7 +176,7 @@ bool FillData::DataDirectUpdateChannels(Source source)
     }
 
     if (ok)
-        DataDirectStationUpdate(source, false);
+        DataDirectStationUpdate(source);
 
     return ok;
 }
@@ -332,7 +329,6 @@ bool FillData::GrabDataFromFile(int id, QString &filename)
         return false;
 
     chan_data.handleChannels(id, &chanlist);
-    icon_data.UpdateSourceIcons(id);
     if (proglist.count() == 0)
     {
         LOG(VB_GENERAL, LOG_INFO, "No programs found in data.");

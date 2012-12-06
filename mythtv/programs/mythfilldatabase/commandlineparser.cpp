@@ -190,19 +190,6 @@ void MythFillDatabaseCommandLineParser::LoadArguments(void)
             "channel lineup.")
         ->SetGroup("Channel List Handling");
     add("--no-mark-repeats", "markrepeats", true, "do not mark repeats", "");
-    add("--export-icon-map", "exporticonmap", "iconmap.xml",
-            "export icon map to file", "")
-        ->SetGroup("Channel Icon Handling");
-    add("--import-icon-map", "importiconmap", "iconmap.xml",
-            "import icon map to file", "")
-        ->SetGroup("Channel Icon Handling");
-    add("--update-icon-map", "updateiconmap", false,
-            "updates icon map icons", "")
-        ->SetGroup("Channel Icon Handling");
-    add("--reset-icon-map", "reseticonmap", "", "resets icon maps",
-            "Reset all icon maps. If given 'all' as an optional value, reset "
-            "channel icons as well.")
-        ->SetGroup("Channel Icon Handling");
 
     add("--graboptions", "graboptions", "", "", "")
         ->SetRemoved("mythfilldatabase now passes any text after an\n"

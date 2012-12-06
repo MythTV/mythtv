@@ -18,9 +18,8 @@ DEPENDPATH  += ../../libs/libmythtv/mpeg
 
 # Input
 HEADERS += filldata.h   channeldata.h
-HEADERS += icondata.h   xmltvparser.h
+HEADERS += xmltvparser.h
 HEADERS += fillutil.h   commandlineparser.h
 SOURCES += filldata.cpp channeldata.cpp
-SOURCES += icondata.cpp xmltvparser.cpp
-SOURCES += fillutil.cpp
+SOURCES += xmltvparser.cpp fillutil.cpp
 SOURCES += main.cpp     commandlineparser.cpp

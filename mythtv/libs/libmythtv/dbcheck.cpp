@@ -38,7 +38,6 @@ The schema contains the following tables:
 
 \htmlonly
 <table>
-<tr><td>callsignnetworkmap         <td>pk(id)
 <tr><td>capturecard                <td>pk(cardid)
 <tr><td>cardinput                  <td>pk(cardinputid)
 <tr><td>channel                    <td>pk(chanid) k(channum,sourceid)
@@ -58,7 +57,6 @@ The schema contains the following tables:
 <tr><td>keybindings                <td>pk(context,action,hostname)
 <tr><td>keyword                    <td>uk(phrase,searchtype)
 <tr><td>mythlog                    <td>pk(logid)
-<tr><td>networkiconmap             <td>pk(id) uk(network)
 <tr><td>oldprogram                 <td>pk(oldtitle)
 <tr><td>oldrecorded                <td>k(endtime) k(title) k(seriesid) k(programid)
                                        pk(station,starttime,title)
@@ -2370,13 +2368,6 @@ bool InitializeMythSchema(void)
         "Inserting MythTV initial database information.");
 
     const char *updates[] = {
-"CREATE TABLE callsignnetworkmap ("
-"  id int(11) NOT NULL AUTO_INCREMENT,"
-"  callsign varchar(20) NOT NULL DEFAULT '',"
-"  network varchar(20) NOT NULL DEFAULT '',"
-"  PRIMARY KEY (id),"
-"  UNIQUE KEY callsign (callsign)"
-") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
 "CREATE TABLE capturecard ("
 "  cardid int(10) unsigned NOT NULL AUTO_INCREMENT,"
 "  videodevice varchar(128) DEFAULT NULL,"
@@ -2870,13 +2861,6 @@ bool InitializeMythSchema(void)
 "  details varchar(16000) NOT NULL DEFAULT '',"
 "  PRIMARY KEY (logid),"
 "  KEY module (module)"
-") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
-"CREATE TABLE networkiconmap ("
-"  id int(11) NOT NULL AUTO_INCREMENT,"
-"  network varchar(20) NOT NULL DEFAULT '',"
-"  url varchar(255) NOT NULL DEFAULT '',"
-"  PRIMARY KEY (id),"
-"  UNIQUE KEY network (network)"
 ") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
 "CREATE TABLE oldfind ("
 "  recordid int(11) NOT NULL DEFAULT '0',"

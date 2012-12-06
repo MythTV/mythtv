@@ -72,15 +72,6 @@ int main(int argc, char *argv[])
     bool usingDataDirect = false;
     bool grab_data = true;
 
-    bool export_iconmap = false;
-    bool import_iconmap = false;
-    bool reset_iconmap = false;
-    bool reset_iconmap_icons = false;
-    QString import_icon_data_filename("iconmap.xml");
-    QString export_icon_data_filename("iconmap.xml");
-
-    bool update_icon_data = false;
-
     bool from_dd_file = false;
     int sourceid = -1;
     QString fromddfile_lineupid;
@@ -305,22 +296,6 @@ int main(int argc, char *argv[])
         fill_data.only_update_channels = true;
 
     mark_repeats = cmdline.toBool("markrepeats");
-    if (cmdline.toBool("exporticonmap"))
-        export_icon_data_filename = cmdline.toString("exporticonmap");
-    if (cmdline.toBool("importiconmap"))
-        import_icon_data_filename = cmdline.toString("importiconmap");
-    if (cmdline.toBool("updateiconmap"))
-    {
-        update_icon_data = true;
-        grab_data = false;
-    }
-    if (cmdline.toBool("reseticonmap"))
-    {
-        reset_iconmap = true;
-        grab_data = false;
-        if (cmdline.toString("reseticonmap") == "all")
-            reset_iconmap_icons = true;
-    }
 
     CleanupGuard callCleanup(cleanup);
 
@@ -477,35 +452,6 @@ int main(int argc, char *argv[])
     if (fill_data.only_update_channels && !fill_data.need_post_grab_proc)
     {
         return GENERIC_EXIT_OK;
-    }
-
-    if (reset_iconmap)
-    {
-        fill_data.icon_data.ResetIconMap(reset_iconmap_icons);
-    }
-
-    if (import_iconmap)
-    {
-        fill_data.icon_data.ImportIconMap(import_icon_data_filename);
-    }
-
-    if (export_iconmap)
-    {
-        fill_data.icon_data.ExportIconMap(export_icon_data_filename);
-    }
-
-    if (update_icon_data)
-    {
-        MSqlQuery query(MSqlQuery::InitCon());
-        query.prepare("SELECT sourceid FROM videosource ORDER BY sourceid");
-        if (!query.exec())
-        {
-            MythDB::DBError("Querying sources", query);
-            return GENERIC_EXIT_DB_ERROR;
-        }
-
-        while (query.next())
-            fill_data.icon_data.UpdateSourceIcons(query.value(0).toInt());
     }
 
     if (grab_data)
