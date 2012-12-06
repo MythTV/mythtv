@@ -1742,7 +1742,8 @@ int MythUIButtonList::PageUp(void)
             buttonItem->SetToRealButton(realButton, false);
             buttonstate = dynamic_cast<MythUIGroup *>
                           (realButton->GetCurrentState());
-            total += m_itemHorizSpacing + buttonstate->GetArea().width();
+            if (buttonstate)
+                total += m_itemHorizSpacing + buttonstate->GetArea().width();
         }
 
         return 0;
@@ -1792,7 +1793,8 @@ int MythUIButtonList::PageUp(void)
         buttonItem->SetToRealButton(realButton, false);
         buttonstate = dynamic_cast<MythUIGroup *>
                       (realButton->GetCurrentState());
-        total += m_itemHorizSpacing + buttonstate->GetArea().height();
+        if (buttonstate)
+            total += m_itemHorizSpacing + buttonstate->GetArea().height();
     }
 
     return 0;
@@ -1845,7 +1847,8 @@ int MythUIButtonList::PageDown(void)
             buttonItem->SetToRealButton(realButton, false);
             buttonstate = dynamic_cast<MythUIGroup *>
                           (realButton->GetCurrentState());
-            total += m_itemHorizSpacing + buttonstate->GetArea().width();
+            if (buttonstate)
+                total += m_itemHorizSpacing + buttonstate->GetArea().width();
         }
 
         return num_items - 1;
