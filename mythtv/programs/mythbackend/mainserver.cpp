@@ -455,7 +455,6 @@ void MainServer::ProcessRequest(MythSocket *sock)
 void MainServer::ProcessRequestWork(MythSocket *sock)
 {
     QStringList listline;
-    LOG(VB_GENERAL, LOG_INFO, "PRW: Calling ReadStringList()");
     if (!sock->ReadStringList(listline) || listline.empty())
     {
         LOG(VB_GENERAL, LOG_INFO, "No data in ProcessRequestWork()");
