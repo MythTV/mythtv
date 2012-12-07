@@ -760,9 +760,14 @@ void ProgFinder::restoreSelectedData(QString &data)
 // Japanese specific program finder
 
 // japanese HIRAGANA list and more
-const char* JaProgFinder::searchChars[] = {
-    "あ", "か", "さ", "た", "な", "は", "ま", "や", "ら", "わ",
-    "英", "数",
+const QChar JaProgFinder::searchChars[] =
+{
+    // "あ", "か", "さ", "た",
+    QChar(0x3042), QChar(0x304b), QChar(0x3055), QChar(0x305f),
+    // "な", "は", "ま", "や",
+    QChar(0x306a), QChar(0x306f), QChar(0x307e), QChar(0x3084),
+    // "ら", "わ", "英", "数",
+    QChar(0x3089), QChar(0x308f), QChar(0x82f1), QChar(0x6570),
     0,
 };
 
@@ -770,7 +775,7 @@ JaProgFinder::JaProgFinder(MythScreenStack *parentStack, bool gg,
                            TV *player, bool embedVideo)
             : ProgFinder(parentStack, gg, player, embedVideo)
 {
-    for (numberOfSearchChars = 0; searchChars[numberOfSearchChars];
+    for (numberOfSearchChars = 0; !searchChars[numberOfSearchChars].isNull();
          ++numberOfSearchChars)
          ;
 }
@@ -870,16 +875,28 @@ void JaProgFinder::restoreSelectedData(QString& data)
 // Hebrew specific program finder
 
 // Hebrew alphabet list and more
-const char* HeProgFinder::searchChars[] = {
-    "\u05d0", "\u05d1", "\u05d2", "\u05d3", "\u05d4", "\u05d5", "\u05d6", "\u05d7", "\u05d8",
-    "\u05d9", "\u05db", "\u05dc", "\u05de", "\u05e0", "\u05e1", "\u05e2", "\u05e4", "\u05e6",
-    "\u05e7", "\u05e8", "\u05e9", "\u05ea", "E", "#", 0 };
+const QChar HeProgFinder::searchChars[] =
+{
+    // "א", "ב", "ג", "ד",
+    QChar(0x5d0), QChar(0x5d1), QChar(0x5d2), QChar(0x5d3),
+    // "ה", "ו", "ז", "ח",
+    QChar(0x5d4), QChar(0x5d5), QChar(0x5d6), QChar(0x5d7),
+    // "ט", "י", "כ", "ל",
+    QChar(0x5d8), QChar(0x5d9), QChar(0x5db), QChar(0x5dc),
+    // "מ", "נ", "ס", "ע",
+    QChar(0x5de), QChar(0x5e0), QChar(0x5e1), QChar(0x5e2),
+    // "פ", "צ", "ק", "ר",
+    QChar(0x5e4), QChar(0x5e6), QChar(0x5e7), QChar(0x5e8),
+    // "ש", "ת", "E", "#",
+    QChar(0x5e9), QChar(0x5ea), QChar('E'), QChar('#'),
+    QChar(0),
+};
 
 HeProgFinder::HeProgFinder(MythScreenStack *parentStack, bool gg,
                            TV *player, bool embedVideo)
             : ProgFinder(parentStack, gg, player, embedVideo)
 {
-    for (numberOfSearchChars = 0; searchChars[numberOfSearchChars];
+    for (numberOfSearchChars = 0; !searchChars[numberOfSearchChars].isNull();
          ++numberOfSearchChars)
         ;
 }
@@ -888,7 +905,7 @@ void HeProgFinder::initAlphabetList()
 {
     for (int charNum = 0; charNum < numberOfSearchChars; ++charNum)
     {
-        new MythUIButtonListItem(m_alphabetList, QString::fromUtf8(searchChars[charNum]));
+        new MythUIButtonListItem(m_alphabetList, QString(searchChars[charNum]));
     }
 }
 
@@ -956,20 +973,42 @@ void HeProgFinder::restoreSelectedData(QString& data)
 
 // Cyrrilic specific program finder
 // Cyrrilic alphabet list and more
-const char* RuProgFinder::searchChars[] = {
-    "А", "Б", "В", "Г", "Д", "Е", "Ё", "Ж", "З", "И",
-    "Й", "К", "Л", "М", "Н", "О", "П", "Р", "С", "Т",
-    "У", "Ф", "Х", "Ц", "Ч", "Ш", "Щ", "Ъ", "Ы", "ь",
-    "Э", "Ю", "Я", "0", "1", "2", "3", "4", "5", "6",
-    "7", "8", "9", "@", "A", "B", "C", "D", "E", "F",
-    "G", "H", "I", "J", "K", "L", "M", "N", "O", "P",
-    "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", 0 };
+const QChar RuProgFinder::searchChars[] =
+{
+    // "А", "Б", "В", "Г",
+    QChar(0x410), QChar(0x411), QChar(0x412), QChar(0x413),
+    // "Д", "Е", "Ё", "Ж",
+    QChar(0x414), QChar(0x415), QChar(0x401), QChar(0x416),
+    // "З", "И", "Й", "К",
+    QChar(0x417), QChar(0x418), QChar(0x419), QChar(0x41a),
+    // "Л", "М", "Н", "О",
+    QChar(0x41b), QChar(0x41c), QChar(0x41d), QChar(0x41e),
+    // "П", "Р", "С", "Т",
+    QChar(0x41f), QChar(0x420), QChar(0x421), QChar(0x422),
+    // "У", "Ф", "Х", "Ц",
+    QChar(0x423), QChar(0x424), QChar(0x425), QChar(0x426),
+    // "Ч", "Ш", "Щ", "Ъ",
+    QChar(0x427), QChar(0x428), QChar(0x429), QChar(0x42a),
+    // "Ы", "ь", "Э", "Ю",
+    QChar(0x42b), QChar(0x44c), QChar(0x42d), QChar(0x42e),
+    // "Я", "0", "1", "2",
+    QChar(0x42f), QChar('0'),   QChar('1'),   QChar('2'),
+    QChar('3'),   QChar('4'),   QChar('5'),   QChar('6'),
+    QChar('7'),   QChar('8'),   QChar('9'),   QChar('@'),
+    QChar('A'),   QChar('B'),   QChar('C'),   QChar('D'),
+    QChar('E'),   QChar('F'),   QChar('G'),   QChar('H'),
+    QChar('I'),   QChar('J'),   QChar('K'),   QChar('L'),
+    QChar('M'),   QChar('N'),   QChar('O'),   QChar('P'),
+    QChar('Q'),   QChar('R'),   QChar('S'),   QChar('T'),
+    QChar('U'),   QChar('V'),   QChar('W'),   QChar('X'),
+    QChar('Y'),   QChar('Z'), 0
+};
 
 RuProgFinder::RuProgFinder(MythScreenStack *parentStack, bool gg,
                            TV *player, bool embedVideo)
             : ProgFinder(parentStack, gg, player, embedVideo)
 {
-    for (numberOfSearchChars = 0; searchChars[numberOfSearchChars];
+    for (numberOfSearchChars = 0; !searchChars[numberOfSearchChars].isNull();
          ++numberOfSearchChars)
         ;
 }
@@ -978,7 +1017,7 @@ void RuProgFinder::initAlphabetList()
 {
     for (int charNum = 0; charNum < numberOfSearchChars; ++charNum)
     {
-        new MythUIButtonListItem(m_alphabetList, QString::fromUtf8(searchChars[charNum]));
+        new MythUIButtonListItem(m_alphabetList, searchChars[charNum]);
     }
 }
 

@@ -2068,12 +2068,12 @@ static HostComboBox *MythDateFormatCB()
     gc->addSelection(locale.toString(sampdate, "ddd MMM d yyyy"), "ddd MMM d yyyy");
     gc->addSelection(locale.toString(sampdate, "ddd d MMM yyyy"), "ddd d MMM yyyy");
     gc->addSelection(locale.toString(sampdate, "ddd yyyy-MM-dd"), "ddd yyyy-MM-dd");
-    gc->addSelection(locale.toString(sampdate,
-        QString::fromUtf8("dddd yyyy\u5E74M\u6708d\u65E5")),
-        QString::fromUtf8("dddd yyyy\u5E74M\u6708d\u65E5"));
-    gc->addSelection(locale.toString(sampdate,
-        QString::fromUtf8("dddd M\u6708d\u65E5")),
-        QString::fromUtf8("dddd M\u6708d\u65E5"));
+    QString jp_long = QString("dddd yyyy") + QChar(0x5E74) +
+        "M" + QChar(0x6708) + "d"+ QChar(0x65E5); // dddd yyyy年M月d日
+    gc->addSelection(locale.toString(sampdate, jp_long), jp_long);
+    QString jp_med = QString("dddd ") +
+        "M" + QChar(0x6708) + "d"+ QChar(0x65E5); // dddd M月d日
+    gc->addSelection(locale.toString(sampdate, jp_med), jp_med);
     gc->setHelpText(QObject::tr("Your preferred date format.") + ' ' +
                     sampleStr);
     return gc;
@@ -2114,9 +2114,8 @@ static HostComboBox *MythShortDateFormat()
     gc->addSelection(locale.toString(sampdate, "ddd d/M"), "ddd d/M");
     gc->addSelection(locale.toString(sampdate, "M/d ddd"), "M/d ddd");
     gc->addSelection(locale.toString(sampdate, "d/M ddd"), "d/M ddd");
-    gc->addSelection(locale.toString(sampdate,
-        QString::fromUtf8("M\u6708d\u65E5")),
-        QString::fromUtf8("M\u6708d\u65E5"));
+    QString jp = QString("M") + QChar(0x6708) + "d" + QChar(0x65E5); // M月d日
+    gc->addSelection(locale.toString(sampdate, jp), jp);
     gc->setHelpText(QObject::tr("Your preferred short date format.") + ' ' +
                     sampleStr);
     return gc;
