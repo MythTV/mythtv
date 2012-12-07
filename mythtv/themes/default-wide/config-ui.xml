@@ -386,32 +386,47 @@
         </textarea>
 
         <textarea name="helptext" from="basetextarea">
-            <area>270,350,740,280</area>
+            <area>270,520,740,100</area>
             <multiline>yes</multiline>
             <font>basesmall</font>
             <align>allcenter</align>
         </textarea>
 
         <textarea name="moviegrabber_text" from="basetextarea">
-            <area>75,173,350,30</area>
+            <area>75,173,450,30</area>
             <font>basesmall</font>
             <value>Movie Metadata Source:</value>
         </textarea>
+        <textarea name="moviegrabberlanguage_text" from="basetextarea">
+            <area>75,223,450,30</area>
+            <font>basesmall</font>
+            <value>Use this language for Movie Metadata:</value>
+        </textarea>
 
         <textarea name="tvgrabber_text" from="basetextarea">
-            <area>75,238,350,30</area>
+            <area>75,273,450,30</area>
             <font>basesmall</font>
             <value>Television Metadata Source:</value>
         </textarea>
+        <textarea name="tvgrabberlanguage_text" from="basetextarea">
+            <area>75,323,450,30</area>
+            <font>basesmall</font>
+            <value>Use this language for Television Metadata:</value>
+        </textarea>
 
         <textarea name="gamegrabber_text" from="basetextarea">
-            <area>75,303,350,30</area>
+            <area>75,373,450,30</area>
             <font>basesmall</font>
             <value>Game Metadata Source:</value>
         </textarea>
+        <textarea name="gamegrabberlanguage_text" from="basetextarea">
+            <area>75,423,450,30</area>
+            <font>basesmall</font>
+            <value>Use this language for Game Metadata:</value>
+        </textarea>
 
         <textarea name="dailyupdates_text" from="basetextarea">
-            <area>430,365,600,40</area>
+            <area>430,475,600,40</area>
             <value>Perform daily updates of recording artwork</value>
             <align>left,vcenter</align>
         </textarea>
@@ -419,19 +434,28 @@
     <!--Widgets-->
 
         <buttonlist name="moviegrabber" from="basewideselector">
-            <position>465,167</position>
+            <position>565,167</position>
+        </buttonlist>
+        <buttonlist name="moviegrabberlanguage" from="basewideselector">
+            <position>565,217</position>
         </buttonlist>
 
         <buttonlist name="tvgrabber" from="basewideselector">
-            <position>465,232</position>
+            <position>565,267</position>
+        </buttonlist>
+        <buttonlist name="tvgrabberlanguage" from="basewideselector">
+            <position>565,317</position>
         </buttonlist>
 
         <buttonlist name="gamegrabber" from="basewideselector">
-            <position>465,297</position>
+            <position>565,367</position>
+        </buttonlist>
+        <buttonlist name="gamegrabberlanguage" from="basewideselector">
+            <position>565,417</position>
         </buttonlist>
 
         <checkbox name="dailyupdates" from="basecheckbox">
-            <position>390,370</position>
+            <position>390,480</position>
         </checkbox>
 
         <button name="cancel" from="basebutton">
