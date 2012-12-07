@@ -937,8 +937,6 @@ bool DVBChannel::ProbeTuningParams(DTVMultiplex &tuning) const
  */
 int DVBChannel::GetChanID() const
 {
-    int cardid = GetCardID();
-
     MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare("SELECT chanid "
@@ -948,7 +946,7 @@ int DVBChannel::GetChanID() const
                   "      cardinput.cardid = :CARDID");
 
     query.bindValue(":CHANNUM", m_curchannelname);
-    query.bindValue(":CARDID",  cardid);
+    query.bindValue(":CARDID", GetCardID());
 
     if (!query.exec() || !query.isActive())
     {

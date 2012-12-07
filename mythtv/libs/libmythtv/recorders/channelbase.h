@@ -120,7 +120,7 @@ class ChannelBase
     // \brief Set cardid for scanning
     void SetCardID(uint _cardid) { m_cardid = _cardid; }
 
-    virtual int GetCardID(void) const;
+    virtual uint GetCardID(void) const;
 
     static ChannelBase *CreateChannel(
         TVRec                    *tv_rec,

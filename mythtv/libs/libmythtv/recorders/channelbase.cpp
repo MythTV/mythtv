@@ -859,7 +859,7 @@ void ChannelBase::HandleScriptEnd(bool ok)
 /** \fn ChannelBase::GetCardID(void) const
  *  \brief Returns card id.
  */
-int ChannelBase::GetCardID(void) const
+uint ChannelBase::GetCardID(void) const
 {
     if (m_cardid > 0)
         return m_cardid;
@@ -868,10 +868,9 @@ int ChannelBase::GetCardID(void) const
         return m_pParent->GetCaptureCardNum();
 
     if (GetDevice().isEmpty())
-        return -1;
+        return 0;
 
-    uint tmpcardid = CardUtil::GetFirstCardID(GetDevice());
-    return (tmpcardid <= 0) ? -1 : tmpcardid;
+    return CardUtil::GetFirstCardID(GetDevice());
 }
 
 int ChannelBase::GetChanID() const
@@ -907,7 +906,7 @@ bool ChannelBase::InitializeInputs(void)
 {
     ClearInputMap();
 
-    uint cardid = max(GetCardID(), 0);
+    uint cardid = GetCardID();
     if (!cardid)
     {
         LOG(VB_GENERAL, LOG_ERR,
