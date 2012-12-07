@@ -447,11 +447,22 @@ MetadataLookupList MetadataDownload::handleGame(MetadataLookup* lookup)
 
     QString cmd = GetGameGrabber();
 
+    // The language value saved in the database is actually the combined language
+    // and country code (like en_US), so we can use this value to get both information.
+    QString countryCode = gCoreContext->GetSetting("GameMetadataLanguage");
+    QString language = countryCode.left(2);
+
+    // Revert to defaults if no language was specified
+    if (countryCode.isEmpty())
+    {
+        language = gCoreContext->GetLanguage();
+        countryCode = gCoreContext->GetLocale()->GetCountryCode();
+    }
     QStringList args;
     args.append(QString("-l")); // Language Flag
-    args.append(gCoreContext->GetLanguage()); // UI Language
+    args.append(language); // UI Language
     args.append(QString("-a"));
-    args.append(gCoreContext->GetLocale()->GetCountryCode());
+    args.append(countryCode);
 
     // If the inetref is populated, even in kLookupSearch mode,
     // become a kLookupData grab and use that.
@@ -493,12 +504,24 @@ MetadataLookupList MetadataDownload::handleMovie(MetadataLookup* lookup)
     {
         QString cmd = GetMovieGrabber();
 
+        // The language value saved in the database is actually the combined language
+        // and country code (like en_US), so we can use this value to get both information.
+        QString countryCode = gCoreContext->GetSetting("MovieMetadataLanguage");
+        QString language = countryCode.left(2);
+
+        // Revert to defaults if no language was specified
+        if (countryCode.isEmpty())
+        {
+            language = gCoreContext->GetLanguage();
+            countryCode = gCoreContext->GetLocale()->GetCountryCode();
+        }
+
         QStringList args;
         args.append(QString("-l")); // Language Flag
-        args.append(gCoreContext->GetLanguage()); // UI Language
+        args.append(language); // UI Language
 
         args.append(QString("-a"));
-        args.append(gCoreContext->GetLocale()->GetCountryCode());
+        args.append(countryCode);
 
         // If the inetref is populated, even in kLookupSearch mode,
         // become a kLookupData grab and use that.
@@ -534,12 +557,23 @@ MetadataLookupList MetadataDownload::handleTelevision(MetadataLookup* lookup)
 
     QString cmd = GetTelevisionGrabber();
 
+    // The language value saved in the database is actually the combined language
+    // and country code (like en_US), so we can use this value to get both information.
+    QString countryCode = gCoreContext->GetSetting("TvMetadataLanguage");
+    QString language = countryCode.left(2);
+
+    // Revert to defaults if no language was specified
+    if (countryCode.isEmpty())
+    {
+        language = gCoreContext->GetLanguage();
+        countryCode = gCoreContext->GetLocale()->GetCountryCode();
+    }
+
     QStringList args;
     args.append(QString("-l")); // Language Flag
-    args.append(gCoreContext->GetLanguage()); // UI Language
-    
+    args.append(language); // UI Language
     args.append(QString("-a"));
-    args.append(gCoreContext->GetLocale()->GetCountryCode());
+    args.append(countryCode);
 
     // If the inetref is populated, even in kLookupSearch mode,
     // become a kLookupData grab and use that.
@@ -598,14 +632,26 @@ MetadataLookupList MetadataDownload::handleVideoUndetermined(
 
     QString cmd = GetTelevisionGrabber();
 
+    // The language value saved in the database is actually the combined language
+    // and country code (like en_US), so we can use this value to get both information.
+    QString countryCode = gCoreContext->GetSetting("TvMetadataLanguage");
+    QString language = countryCode.left(2);
+
+    // Revert to defaults if no language was specified
+    if (countryCode.isEmpty())
+    {
+        language = gCoreContext->GetLanguage();
+        countryCode = gCoreContext->GetLocale()->GetCountryCode();
+    }
+
     // Can't trust the inetref with so little information.
 
     QStringList args;
     args.append(QString("-l")); // Language Flag
-    args.append(gCoreContext->GetLanguage()); // UI Language
+    args.append(language); // UI Language
 
     args.append(QString("-a"));
-    args.append(gCoreContext->GetLocale()->GetCountryCode());
+    args.append(countryCode);
 
     args.append(QString("-N"));
     if (!lookup->GetInetref().isEmpty())
@@ -642,13 +688,25 @@ MetadataLookupList MetadataDownload::handleRecordingGeneric(
 
     QString cmd = GetTelevisionGrabber();
 
+    // The language value saved in the database is actually the combined language
+    // and country code (like en_US), so we can use this value to get both information.
+    QString countryCode = gCoreContext->GetSetting("TvMetadataLanguage");
+    QString language = countryCode.left(2);
+
+    // Revert to defaults if no language was specified
+    if (countryCode.isEmpty())
+    {
+        language = gCoreContext->GetLanguage();
+        countryCode = gCoreContext->GetLocale()->GetCountryCode();
+    }
+
     QStringList args;
 
     args.append(QString("-l")); // Language Flag
-    args.append(gCoreContext->GetLanguage()); // UI Language
+    args.append(language); // UI Language
 
     args.append(QString("-a"));
-    args.append(gCoreContext->GetLocale()->GetCountryCode());
+    args.append(countryCode);
 
 
     args.append("-M");
