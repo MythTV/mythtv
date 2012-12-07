@@ -2432,58 +2432,6 @@ static HostComboBox *MythLanguage()
     return gc;
 }
 
-static HostComboBox *MetadataLanguageVideos()
-{
-    HostComboBox *gc = new HostComboBox("MetadataLanguageVideos");
-    gc->setLabel(QObject::tr("Metadata language for videos and series"));
-
-    QMap<QString, QString> langMap = MythTranslation::getLanguages();
-    QStringList langs = langMap.values();
-    langs.sort();
-
-    QString langCode = gCoreContext->GetSetting("MetadataLanguageVideos");
-    if (langCode.isEmpty())
-        langCode = "en_us";
-
-    gc->clearSelections();
-
-    for (QStringList::Iterator it = langs.begin(); it != langs.end(); ++it)
-    {
-        QString label = *it;
-        QString value = langMap.key(label);
-        gc->addSelection(label, value, (value == langCode));
-    }
-
-    gc->setHelpText(QObject::tr("Your preferred language for the video and series metadata grabbers."));
-    return gc;
-}
-
-static HostComboBox *MetadataLanguageGames()
-{
-    HostComboBox *gc = new HostComboBox("MetadataLanguageGames");
-    gc->setLabel(QObject::tr("Metadata language for games"));
-
-    QMap<QString, QString> langMap = MythTranslation::getLanguages();
-    QStringList langs = langMap.values();
-    langs.sort();
-
-    QString langCode = gCoreContext->GetSetting("MetadataLanguageGames");
-    if (langCode.isEmpty())
-        langCode = "en_us";
-
-    gc->clearSelections();
-
-    for (QStringList::Iterator it = langs.begin(); it != langs.end(); ++it)
-    {
-        QString label = *it;
-        QString value = langMap.key(label);
-        gc->addSelection(label, value, (value == langCode));
-    }
-
-    gc->setHelpText(QObject::tr("Your preferred language for the game metadata grabbers."));
-    return gc;
-}
-
 static void ISO639_fill_selections(SelectSetting *widget, uint i)
 {
     widget->clearSelections();
@@ -3574,8 +3522,6 @@ AppearanceSettings::AppearanceSettings()
     dates->addChild(MythLanguage());
     dates->addChild(ISO639PreferredLanguage(0));
     dates->addChild(ISO639PreferredLanguage(1));
-    dates->addChild(MetadataLanguageVideos());
-    dates->addChild(MetadataLanguageGames());
     dates->addChild(MythDateFormatCB());
     dates->addChild(MythShortDateFormat());
     dates->addChild(MythTimeFormat());

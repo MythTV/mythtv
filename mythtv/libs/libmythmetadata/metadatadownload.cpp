@@ -449,7 +449,7 @@ MetadataLookupList MetadataDownload::handleGame(MetadataLookup* lookup)
 
     QStringList args;
     args.append(QString("-l")); // Language Flag
-    args.append(gCoreContext->GetLanguage("MetadataLanguageGames")); // UI Language
+    args.append(gCoreContext->GetLanguage()); // UI Language
     args.append(QString("-a"));
     args.append(gCoreContext->GetLocale()->GetCountryCode());
 
@@ -495,7 +495,7 @@ MetadataLookupList MetadataDownload::handleMovie(MetadataLookup* lookup)
 
         QStringList args;
         args.append(QString("-l")); // Language Flag
-        args.append(gCoreContext->GetLanguage("MetadataLanguageVideos")); // UI Language
+        args.append(gCoreContext->GetLanguage()); // UI Language
 
         args.append(QString("-a"));
         args.append(gCoreContext->GetLocale()->GetCountryCode());
@@ -536,7 +536,7 @@ MetadataLookupList MetadataDownload::handleTelevision(MetadataLookup* lookup)
 
     QStringList args;
     args.append(QString("-l")); // Language Flag
-    args.append(gCoreContext->GetLanguage("MetadataLanguageVideos")); // UI Language
+    args.append(gCoreContext->GetLanguage()); // UI Language
     
     args.append(QString("-a"));
     args.append(gCoreContext->GetLocale()->GetCountryCode());
@@ -602,7 +602,7 @@ MetadataLookupList MetadataDownload::handleVideoUndetermined(
 
     QStringList args;
     args.append(QString("-l")); // Language Flag
-    args.append(gCoreContext->GetLanguage("MetadataLanguageVideos")); // UI Language
+    args.append(gCoreContext->GetLanguage()); // UI Language
 
     args.append(QString("-a"));
     args.append(gCoreContext->GetLocale()->GetCountryCode());
@@ -645,7 +645,7 @@ MetadataLookupList MetadataDownload::handleRecordingGeneric(
     QStringList args;
 
     args.append(QString("-l")); // Language Flag
-    args.append(gCoreContext->GetLanguage("MetadataLanguageVideos")); // UI Language
+    args.append(gCoreContext->GetLanguage()); // UI Language
 
     args.append(QString("-a"));
     args.append(gCoreContext->GetLocale()->GetCountryCode());

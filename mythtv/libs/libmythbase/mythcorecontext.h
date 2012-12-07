@@ -168,8 +168,6 @@ class MBASE_PUBLIC MythCoreContext : public QObject, public MythObservable, publ
     void SaveLocaleDefaults(void);
     QString GetLanguage(void);
     QString GetLanguageAndVariant(void);
-    QString GetLanguage(QString languageType);
-    QString GetLanguageAndVariant(QString languageType);
     void ResetLanguage(void);
 
     void RegisterForPlayback(QObject *sender, const char *method);
