@@ -66,6 +66,16 @@ RecorderBase::~RecorderBase(void)
         ringBuffer = NULL;
     }
     SetRecording(NULL);
+    if (nextRingBuffer)
+    {
+        delete nextRingBuffer;
+        nextRingBuffer = NULL;
+    }
+    if (nextRecording)
+    {
+        delete nextRecording;
+        nextRecording = NULL;
+    }
 }
 
 void RecorderBase::SetRingBuffer(RingBuffer *rbuf)
@@ -117,10 +127,16 @@ void RecorderBase::SetNextRecording(const RecordingInfo *ri, RingBuffer *rb)
 
     // Then we set the next info
     QMutexLocker locker(&nextRingBufferLock);
-    nextRecording = NULL;
+    if (nextRecording)
+    {
+        delete nextRecording;
+        nextRecording = NULL;
+    }
     if (ri)
         nextRecording = new RecordingInfo(*ri);
 
+    if (nextRingBuffer)
+        delete nextRingBuffer;
     nextRingBuffer = rb;
 }
 
