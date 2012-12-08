@@ -67,7 +67,7 @@ static int channelscan_find_lock(struct hdhomerun_channelscan_t *scan, uint32_t 
 {
 	/* Set channel. */
 	char channel_str[64];
-	sprintf(channel_str, "auto:%ld", (unsigned long)frequency);
+	hdhomerun_sprintf(channel_str, channel_str + sizeof(channel_str), "auto:%u", (unsigned int)frequency);
 
 	int ret = hdhomerun_device_set_tuner_channel(scan->hd, channel_str);
 	if (ret <= 0) {
@@ -175,8 +175,7 @@ static int channelscan_detect_programs(struct hdhomerun_channelscan_t *scan, str
 		struct hdhomerun_channelscan_program_t program;
 		memset(&program, 0, sizeof(program));
 
-		strncpy(program.program_str, line, sizeof(program.program_str));
-		program.program_str[sizeof(program.program_str) - 1] = 0;
+		hdhomerun_sprintf(program.program_str, program.program_str + sizeof(program.program_str), "%s", line);
 
 		unsigned int program_number;
 		unsigned int virtual_major, virtual_minor;
@@ -237,8 +236,10 @@ int channelscan_advance(struct hdhomerun_channelscan_t *scan, struct hdhomerun_c
 
 	/* Combine channels with same frequency. */
 	result->frequency = hdhomerun_channel_entry_frequency(entry);
-	strncpy(result->channel_str, hdhomerun_channel_entry_name(entry), sizeof(result->channel_str) - 1);
-	result->channel_str[sizeof(result->channel_str) - 1] = 0;
+
+	char *ptr = result->channel_str;
+	char *end = result->channel_str + sizeof(result->channel_str);
+	hdhomerun_sprintf(ptr, end, hdhomerun_channel_entry_name(entry));
 
 	while (1) {
 		entry = hdhomerun_channel_list_prev(scan->channel_list, entry);
@@ -252,8 +253,8 @@ int channelscan_advance(struct hdhomerun_channelscan_t *scan, struct hdhomerun_c
 			break;
 		}
 
-		char *ptr = strchr(result->channel_str, 0);
-		sprintf(ptr, ", %s", hdhomerun_channel_entry_name(entry));
+		ptr = strchr(ptr, 0);
+		hdhomerun_sprintf(ptr, end, ", %s", hdhomerun_channel_entry_name(entry));
 	}
 
 	return 1;

@@ -300,12 +300,8 @@ void hdhomerun_debug_vprintf(struct hdhomerun_debug_t *dbg, const char *fmt, va_
 	pthread_mutex_lock(&dbg->print_lock);
 
 	if (dbg->prefix) {
-		int len = snprintf(ptr, end - ptr, "%s ", dbg->prefix);
-		len = (len <= 0) ? 0 : len;
-		ptr += len;
-		if (ptr > end) {
-			ptr = end;
-		}
+		hdhomerun_sprintf(ptr, end, "%s ", dbg->prefix);
+		ptr = strchr(ptr, 0);
 	}
 
 	pthread_mutex_unlock(&dbg->print_lock);
@@ -313,27 +309,15 @@ void hdhomerun_debug_vprintf(struct hdhomerun_debug_t *dbg, const char *fmt, va_
 	/*
 	 * Message text.
 	 */
-	int len = vsnprintf(ptr, end - ptr, fmt, args);
-	len = (len < 0) ? 0 : len; /* len does not include null */
-	ptr += len;
-	if (ptr > end) {
-		ptr = end;
-	}
+	hdhomerun_vsprintf(ptr, end, fmt, args);
+	ptr = strchr(ptr, 0);
 
 	/*
 	 * Force newline.
 	 */
-	if ((ptr[-1] != '\n') && (ptr + 1 <= end)) {
-		*ptr++ = '\n';
+	if (ptr[-1] != '\n') {
+		hdhomerun_sprintf(ptr, end, "\n");
 	}
-
-	/*
-	 * Force NULL.
-	 */
-	if (ptr + 1 > end) {
-		ptr = end - 1;
-	}
-	*ptr++ = 0;
 
 	/*
 	 * Enqueue.

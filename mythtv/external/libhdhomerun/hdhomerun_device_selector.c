@@ -201,7 +201,7 @@ int hdhomerun_device_selector_load_from_windows_registry(struct hdhomerun_device
 
 		/* Create and add device. */
 		char device_name[32];
-		sprintf(device_name, "%S", wdevice_name);
+		hdhomerun_sprintf(device_name, device_name + sizeof(device_name), "%S", wdevice_name);
 
 		struct hdhomerun_device_t *hd = hdhomerun_device_create_from_str(device_name, hds->dbg);
 		if (!hd) {
@@ -258,9 +258,9 @@ static bool_t hdhomerun_device_selector_choose_test(struct hdhomerun_device_sele
 		*ptr = 0;
 	}
 
-	unsigned long a[4];
-	unsigned long target_port;
-	if (sscanf(target, "%lu.%lu.%lu.%lu:%lu", &a[0], &a[1], &a[2], &a[3], &target_port) != 5) {
+	unsigned int a[4];
+	unsigned int target_port;
+	if (sscanf(target, "%u.%u.%u.%u:%u", &a[0], &a[1], &a[2], &a[3], &target_port) != 5) {
 		hdhomerun_debug_printf(hds->dbg, "hdhomerun_device_selector_choose_test: device %s in use, no target set (%s)\n", name, target);
 		return FALSE;
 	}

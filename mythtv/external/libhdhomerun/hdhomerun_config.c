@@ -93,8 +93,8 @@ static bool_t contains(const char *arg, const char *cmpstr)
 
 static uint32_t parse_ip_addr(const char *str)
 {
-	unsigned long a[4];
-	if (sscanf(str, "%lu.%lu.%lu.%lu", &a[0], &a[1], &a[2], &a[3]) != 4) {
+	unsigned int a[4];
+	if (sscanf(str, "%u.%u.%u.%u", &a[0], &a[1], &a[2], &a[3]) != 4) {
 		return 0;
 	}
 
@@ -126,8 +126,8 @@ static int discover_print(char *target_ip_str)
 	int index;
 	for (index = 0; index < count; index++) {
 		struct hdhomerun_discover_device_t *result = &result_list[index];
-		printf("hdhomerun device %08lX found at %u.%u.%u.%u\n",
-			(unsigned long)result->device_id,
+		printf("hdhomerun device %08X found at %u.%u.%u.%u\n",
+			(unsigned int)result->device_id,
 			(unsigned int)(result->ip_addr >> 24) & 0x0FF, (unsigned int)(result->ip_addr >> 16) & 0x0FF,
 			(unsigned int)(result->ip_addr >> 8) & 0x0FF, (unsigned int)(result->ip_addr >> 0) & 0x0FF
 		);
@@ -303,8 +303,8 @@ static int cmd_scan(const char *tuner_str, const char *filename)
 			break;
 		}
 
-		cmd_scan_printf(fp, "SCANNING: %lu (%s)\n",
-			(unsigned long)result.frequency, result.channel_str
+		cmd_scan_printf(fp, "SCANNING: %u (%s)\n",
+			(unsigned int)result.frequency, result.channel_str
 		);
 
 		ret = hdhomerun_device_channelscan_detect(hd, &result);
@@ -671,7 +671,7 @@ static int main_internal(int argc, char *argv[])
 	/* Device ID check. */
 	uint32_t device_id_requested = hdhomerun_device_get_device_id_requested(hd);
 	if (!hdhomerun_discover_validate_device_id(device_id_requested)) {
-		fprintf(stderr, "invalid device id: %08lX\n", (unsigned long)device_id_requested);
+		fprintf(stderr, "invalid device id: %08X\n", (unsigned int)device_id_requested);
 	}
 
 	/* Connect to device and check model. */

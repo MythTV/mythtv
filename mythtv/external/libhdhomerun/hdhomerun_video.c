@@ -35,9 +35,7 @@
 struct hdhomerun_video_sock_t {
 	pthread_mutex_t lock;
 	struct hdhomerun_debug_t *dbg;
-
 	hdhomerun_sock_t sock;
-	uint32_t multicast_ip;
 
 	volatile size_t head;
 	volatile size_t tail;
@@ -157,41 +155,19 @@ uint16_t hdhomerun_video_get_local_port(struct hdhomerun_video_sock_t *vs)
 
 int hdhomerun_video_join_multicast_group(struct hdhomerun_video_sock_t *vs, uint32_t multicast_ip, uint32_t local_ip)
 {
-	if (vs->multicast_ip != 0) {
-		hdhomerun_video_leave_multicast_group(vs);
-	}
-
-	struct ip_mreq imr;
-	memset(&imr, 0, sizeof(imr));
-	imr.imr_multiaddr.s_addr  = htonl(multicast_ip);
-	imr.imr_interface.s_addr  = htonl(local_ip);
-
-	if (setsockopt(vs->sock, IPPROTO_IP, IP_ADD_MEMBERSHIP, (const char *)&imr, sizeof(imr)) != 0) {
+	if (!hdhomerun_sock_join_multicast_group(vs->sock, multicast_ip, local_ip)) {
 		hdhomerun_debug_printf(vs->dbg, "hdhomerun_video_join_multicast_group: setsockopt failed (%d)\n", hdhomerun_sock_getlasterror());
 		return -1;
 	}
 
-	vs->multicast_ip = multicast_ip;
 	return 1;
 }
 
-int hdhomerun_video_leave_multicast_group(struct hdhomerun_video_sock_t *vs)
+void hdhomerun_video_leave_multicast_group(struct hdhomerun_video_sock_t *vs, uint32_t multicast_ip, uint32_t local_ip)
 {
-	if (vs->multicast_ip == 0) {
-		return 1;
-	}
-
-	struct ip_mreq imr;
-	memset(&imr, 0, sizeof(imr));
-	imr.imr_multiaddr.s_addr  = htonl(vs->multicast_ip);
-	imr.imr_interface.s_addr  = htonl(INADDR_ANY);
-
-	if (setsockopt(vs->sock, IPPROTO_IP, IP_DROP_MEMBERSHIP, (const char *)&imr, sizeof(imr)) != 0) {
+	if (!hdhomerun_sock_leave_multicast_group(vs->sock, multicast_ip, local_ip)) {
 		hdhomerun_debug_printf(vs->dbg, "hdhomerun_video_leave_multicast_group: setsockopt failed (%d)\n", hdhomerun_sock_getlasterror());
 	}
-
-	vs->multicast_ip = 0;
-	return 1;
 }
 
 static void hdhomerun_video_stats_ts_pkt(struct hdhomerun_video_sock_t *vs, uint8_t *ptr)
@@ -396,10 +372,10 @@ void hdhomerun_video_debug_print_stats(struct hdhomerun_video_sock_t *vs)
 	struct hdhomerun_video_stats_t stats;
 	hdhomerun_video_get_stats(vs, &stats);
 
-	hdhomerun_debug_printf(vs->dbg, "video sock: pkt=%lu net=%lu te=%lu miss=%lu drop=%lu\n",
-		(unsigned long)stats.packet_count, (unsigned long)stats.network_error_count,
-		(unsigned long)stats.transport_error_count, (unsigned long)stats.sequence_error_count,
-		(unsigned long)stats.overflow_error_count
+	hdhomerun_debug_printf(vs->dbg, "video sock: pkt=%u net=%u te=%u miss=%u drop=%u\n",
+		(unsigned int)stats.packet_count, (unsigned int)stats.network_error_count,
+		(unsigned int)stats.transport_error_count, (unsigned int)stats.sequence_error_count,
+		(unsigned int)stats.overflow_error_count
 	);
 }
 

@@ -81,7 +81,6 @@ typedef HANDLE pthread_mutex_t;
 #define atoll _atoi64
 #define strdup _strdup
 #define strcasecmp _stricmp
-#define snprintf _snprintf
 #define fseeko _fseeki64
 #define ftello _ftelli64
 #define THREAD_FUNC_PREFIX DWORD WINAPI
@@ -102,6 +101,9 @@ extern LIBTYPE void pthread_mutex_init(pthread_mutex_t *mutex, void *attr);
 extern LIBTYPE void pthread_mutex_lock(pthread_mutex_t *mutex);
 extern LIBTYPE void pthread_mutex_unlock(pthread_mutex_t *mutex);
 #endif
+
+extern LIBTYPE bool_t hdhomerun_vsprintf(char *buffer, char *end, const char *fmt, va_list ap);
+extern LIBTYPE bool_t hdhomerun_sprintf(char *buffer, char *end, const char *fmt, ...);
 
 /*
  * The console output format should be set to UTF-8, however in XP and Vista this breaks batch file processing.

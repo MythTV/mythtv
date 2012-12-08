@@ -91,14 +91,13 @@ int hdhomerun_local_ip_info(struct hdhomerun_local_ip_info_t ip_info_list[], int
 				continue;
 			}
 
-			struct hdhomerun_local_ip_info_t *ip_info = &ip_info_list[count++];
-			ip_info->ip_addr = ip_addr;
-			ip_info->subnet_mask = subnet_mask;
-
-			if (count >= max_count) {
-				break;
+			if (count < max_count) {
+				struct hdhomerun_local_ip_info_t *ip_info = &ip_info_list[count];
+				ip_info->ip_addr = ip_addr;
+				ip_info->subnet_mask = subnet_mask;
 			}
 
+			count++;
 			IPAddr = IPAddr->Next;
 		}
 
@@ -221,6 +220,34 @@ uint32_t hdhomerun_sock_getaddrinfo_addr(hdhomerun_sock_t sock, const char *name
 	return addr;
 }
 
+bool_t hdhomerun_sock_join_multicast_group(hdhomerun_sock_t sock, uint32_t multicast_ip, uint32_t local_ip)
+{
+	struct ip_mreq imr;
+	memset(&imr, 0, sizeof(imr));
+	imr.imr_multiaddr.s_addr  = htonl(multicast_ip);
+	imr.imr_interface.s_addr  = htonl(local_ip);
+
+	if (setsockopt(sock, IPPROTO_IP, IP_ADD_MEMBERSHIP, (const char *)&imr, sizeof(imr)) != 0) {
+		return FALSE;
+	}
+
+	return TRUE;
+}
+
+bool_t hdhomerun_sock_leave_multicast_group(hdhomerun_sock_t sock, uint32_t multicast_ip, uint32_t local_ip)
+{
+	struct ip_mreq imr;
+	memset(&imr, 0, sizeof(imr));
+	imr.imr_multiaddr.s_addr  = htonl(multicast_ip);
+	imr.imr_interface.s_addr  = htonl(local_ip);
+
+	if (setsockopt(sock, IPPROTO_IP, IP_DROP_MEMBERSHIP, (const char *)&imr, sizeof(imr)) != 0) {
+		return FALSE;
+	}
+
+	return TRUE;
+}
+
 bool_t hdhomerun_sock_bind(hdhomerun_sock_t sock, uint32_t local_addr, uint16_t local_port, bool_t allow_reuse)
 {
 	int sock_opt = allow_reuse;
@@ -241,16 +268,6 @@ bool_t hdhomerun_sock_bind(hdhomerun_sock_t sock, uint32_t local_addr, uint16_t 
 
 bool_t hdhomerun_sock_connect(hdhomerun_sock_t sock, uint32_t remote_addr, uint16_t remote_port, uint64_t timeout)
 {
-	WSAEVENT wsa_event = WSACreateEvent();
-	if (wsa_event == WSA_INVALID_EVENT) {
-		return FALSE;
-	}
-
-	if (WSAEventSelect(sock, wsa_event, FD_CONNECT) == SOCKET_ERROR) {
-		WSACloseEvent(wsa_event);
-		return FALSE;
-	}
-
 	/* Connect (non-blocking). */
 	struct sockaddr_in sock_addr;
 	memset(&sock_addr, 0, sizeof(sock_addr));
@@ -260,22 +277,41 @@ bool_t hdhomerun_sock_connect(hdhomerun_sock_t sock, uint32_t remote_addr, uint1
 
 	if (connect(sock, (struct sockaddr *)&sock_addr, sizeof(sock_addr)) != 0) {
 		if (WSAGetLastError() != WSAEWOULDBLOCK) {
-			WSACloseEvent(wsa_event);
 			return FALSE;
 		}
 	}
 
 	/* Wait for connect to complete (both success and failure will signal). */
+	WSAEVENT wsa_event = WSACreateEvent();
+	if (wsa_event == WSA_INVALID_EVENT) {
+		return FALSE;
+	}
+
+	if (WSAEventSelect(sock, wsa_event, FD_WRITE | FD_CLOSE) == SOCKET_ERROR) {
+		WSACloseEvent(wsa_event);
+		return FALSE;
+	}
+
 	DWORD ret = WaitForSingleObjectEx(wsa_event, (DWORD)timeout, FALSE);
 	WSACloseEvent(wsa_event);
-
 	if (ret != WAIT_OBJECT_0) {
 		return FALSE;
 	}
 
 	/* Detect success/failure. */
-	int sockaddr_size = sizeof(sock_addr);
-	if (getpeername(sock, (struct sockaddr *)&sock_addr, &sockaddr_size) != 0) {
+	wsa_event = WSACreateEvent();
+	if (wsa_event == WSA_INVALID_EVENT) {
+		return FALSE;
+	}
+
+	if (WSAEventSelect(sock, wsa_event, FD_CLOSE) == SOCKET_ERROR) {
+		WSACloseEvent(wsa_event);
+		return FALSE;
+	}
+
+	ret = WaitForSingleObjectEx(wsa_event, 0, FALSE);
+	WSACloseEvent(wsa_event);
+	if (ret == WAIT_OBJECT_0) {
 		return FALSE;
 	}
 
@@ -316,22 +352,23 @@ bool_t hdhomerun_sock_send(hdhomerun_sock_t sock, const void *data, size_t lengt
 
 	while (1) {
 		int ret = send(sock, (char *)ptr, (int)length, 0);
-		if (ret >= (int)length) {
-			return TRUE;
+		if (ret <= 0) {
+			if (WSAGetLastError() != WSAEWOULDBLOCK) {
+				return FALSE;
+			}
+			if (!hdhomerun_sock_wait_for_event(sock, FD_WRITE | FD_CLOSE, stop_time)) {
+				return FALSE;
+			}
+			continue;
 		}
 
-		if (ret > 0) {
+		if (ret < (int)length) {
 			ptr += ret;
 			length -= ret;
+			continue;
 		}
 
-		if (WSAGetLastError() != WSAEWOULDBLOCK) {
-			return FALSE;
-		}
-
-		if (!hdhomerun_sock_wait_for_event(sock, FD_WRITE | FD_CLOSE, stop_time)) {
-			return FALSE;
-		}
+		return TRUE;
 	}
 }
 
@@ -348,22 +385,23 @@ bool_t hdhomerun_sock_sendto(hdhomerun_sock_t sock, uint32_t remote_addr, uint16
 		sock_addr.sin_port = htons(remote_port);
 
 		int ret = sendto(sock, (char *)ptr, (int)length, 0, (struct sockaddr *)&sock_addr, sizeof(sock_addr));
-		if (ret >= (int)length) {
-			return TRUE;
+		if (ret <= 0) {
+			if (WSAGetLastError() != WSAEWOULDBLOCK) {
+				return FALSE;
+			}
+			if (!hdhomerun_sock_wait_for_event(sock, FD_WRITE | FD_CLOSE, stop_time)) {
+				return FALSE;
+			}
+			continue;
 		}
 
-		if (ret > 0) {
+		if (ret < (int)length) {
 			ptr += ret;
 			length -= ret;
+			continue;
 		}
 
-		if (WSAGetLastError() != WSAEWOULDBLOCK) {
-			return FALSE;
-		}
-
-		if (!hdhomerun_sock_wait_for_event(sock, FD_WRITE | FD_CLOSE, stop_time)) {
-			return FALSE;
-		}
+		return TRUE;
 	}
 }
 
@@ -373,18 +411,22 @@ bool_t hdhomerun_sock_recv(hdhomerun_sock_t sock, void *data, size_t *length, ui
 
 	while (1) {
 		int ret = recv(sock, (char *)data, (int)(*length), 0);
-		if (ret > 0) {
-			*length = ret;
-			return TRUE;
+		if (ret < 0) {
+			if (WSAGetLastError() != WSAEWOULDBLOCK) {
+				return FALSE;
+			}
+			if (!hdhomerun_sock_wait_for_event(sock, FD_READ | FD_CLOSE, stop_time)) {
+				return FALSE;
+			}
+			continue;
 		}
 
-		if (WSAGetLastError() != WSAEWOULDBLOCK) {
+		if (ret == 0) {
 			return FALSE;
 		}
 
-		if (!hdhomerun_sock_wait_for_event(sock, FD_READ | FD_CLOSE, stop_time)) {
-			return FALSE;
-		}
+		*length = ret;
+		return TRUE;
 	}
 }
 
@@ -398,19 +440,23 @@ bool_t hdhomerun_sock_recvfrom(hdhomerun_sock_t sock, uint32_t *remote_addr, uin
 		int sockaddr_size = sizeof(sock_addr);
 
 		int ret = recvfrom(sock, (char *)data, (int)(*length), 0, (struct sockaddr *)&sock_addr, &sockaddr_size);
-		if (ret > 0) {
-			*remote_addr = ntohl(sock_addr.sin_addr.s_addr);
-			*remote_port = ntohs(sock_addr.sin_port);
-			*length = ret;
-			return TRUE;
+		if (ret < 0) {
+			if (WSAGetLastError() != WSAEWOULDBLOCK) {
+				return FALSE;
+			}
+			if (!hdhomerun_sock_wait_for_event(sock, FD_READ | FD_CLOSE, stop_time)) {
+				return FALSE;
+			}
+			continue;
 		}
 
-		if (WSAGetLastError() != WSAEWOULDBLOCK) {
+		if (ret == 0) {
 			return FALSE;
 		}
 
-		if (!hdhomerun_sock_wait_for_event(sock, FD_READ | FD_CLOSE, stop_time)) {
-			return FALSE;
-		}
+		*remote_addr = ntohl(sock_addr.sin_addr.s_addr);
+		*remote_port = ntohs(sock_addr.sin_port);
+		*length = ret;
+		return TRUE;
 	}
 }

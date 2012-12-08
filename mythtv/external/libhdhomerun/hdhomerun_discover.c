@@ -46,6 +46,7 @@ struct hdhomerun_discover_t {
 	unsigned int sock_count;
 	struct hdhomerun_pkt_t tx_pkt;
 	struct hdhomerun_pkt_t rx_pkt;
+	struct hdhomerun_debug_t *dbg;
 };
 
 static bool_t hdhomerun_discover_sock_add(struct hdhomerun_discover_t *ds, uint32_t local_ip, uint32_t subnet_mask)
@@ -72,6 +73,7 @@ static bool_t hdhomerun_discover_sock_add(struct hdhomerun_discover_t *ds, uint3
 
 	/* Bind socket. */
 	if (!hdhomerun_sock_bind(sock, local_ip, 0, FALSE)) {
+		hdhomerun_debug_printf(ds->dbg, "discover: failed to bind to %u.%u.%u.%u:0\n", (unsigned int)(local_ip >> 24) & 0xFF, (unsigned int)(local_ip >> 16) & 0xFF, (unsigned int)(local_ip >> 8) & 0xFF, (unsigned int)(local_ip >> 0) & 0xFF);
 		hdhomerun_sock_destroy(sock);
 		return FALSE;
 	}
@@ -86,12 +88,14 @@ static bool_t hdhomerun_discover_sock_add(struct hdhomerun_discover_t *ds, uint3
 	return TRUE;
 }
 
-struct hdhomerun_discover_t *hdhomerun_discover_create(void)
+struct hdhomerun_discover_t *hdhomerun_discover_create(struct hdhomerun_debug_t *dbg)
 {
 	struct hdhomerun_discover_t *ds = (struct hdhomerun_discover_t *)calloc(1, sizeof(struct hdhomerun_discover_t));
 	if (!ds) {
 		return NULL;
 	}
+
+	ds->dbg = dbg;
 
 	/* Create a routable socket (always first entry). */
 	if (!hdhomerun_discover_sock_add(ds, 0, 0)) {
@@ -125,7 +129,12 @@ static void hdhomerun_discover_sock_detect(struct hdhomerun_discover_t *ds)
 	struct hdhomerun_local_ip_info_t ip_info_list[HDHOMERUN_DISOCVER_MAX_SOCK_COUNT];
 	int count = hdhomerun_local_ip_info(ip_info_list, HDHOMERUN_DISOCVER_MAX_SOCK_COUNT);
 	if (count < 0) {
+		hdhomerun_debug_printf(ds->dbg, "discover: hdhomerun_local_ip_info returned error\n");
 		count = 0;
+	}
+	if (count > HDHOMERUN_DISOCVER_MAX_SOCK_COUNT) {
+		hdhomerun_debug_printf(ds->dbg, "discover: too many local IP addresses\n");
+		count = HDHOMERUN_DISOCVER_MAX_SOCK_COUNT;
 	}
 
 	int index;
@@ -404,7 +413,7 @@ int hdhomerun_discover_find_devices_custom(uint32_t target_ip, uint32_t device_t
 		return 0;
 	}
 
-	struct hdhomerun_discover_t *ds = hdhomerun_discover_create();
+	struct hdhomerun_discover_t *ds = hdhomerun_discover_create(NULL);
 	if (!ds) {
 		return -1;
 	}

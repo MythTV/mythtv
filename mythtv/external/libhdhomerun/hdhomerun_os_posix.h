@@ -69,6 +69,9 @@ extern LIBTYPE uint64_t getcurrenttime(void);
 extern LIBTYPE void msleep_approx(uint64_t ms);
 extern LIBTYPE void msleep_minimum(uint64_t ms);
 
+extern LIBTYPE bool_t hdhomerun_vsprintf(char *buffer, char *end, const char *fmt, va_list ap);
+extern LIBTYPE bool_t hdhomerun_sprintf(char *buffer, char *end, const char *fmt, ...);
+
 #ifdef __cplusplus
 }
 #endif

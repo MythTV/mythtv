@@ -368,7 +368,15 @@ int hdhomerun_control_upgrade(struct hdhomerun_control_sock_t *cs, FILE *upgrade
 {
 	struct hdhomerun_pkt_t *tx_pkt = &cs->tx_pkt;
 	struct hdhomerun_pkt_t *rx_pkt = &cs->rx_pkt;
+	bool_t upload_delay = FALSE;
 	uint32_t sequence = 0;
+
+	/* Special case detection. */
+	char *version_str;
+	int ret = hdhomerun_control_get(cs, "/sys/version", &version_str, NULL);
+	if (ret > 0) {
+		upload_delay = strcmp(version_str, "20120704beta1") == 0;
+	}
 
 	/* Upload. */
 	while (1) {
@@ -388,6 +396,10 @@ int hdhomerun_control_upgrade(struct hdhomerun_control_sock_t *cs, FILE *upgrade
 		}
 
 		sequence += (uint32_t)length;
+
+		if (upload_delay) {
+			msleep_approx(25);
+		}
 	}
 
 	if (sequence == 0) {

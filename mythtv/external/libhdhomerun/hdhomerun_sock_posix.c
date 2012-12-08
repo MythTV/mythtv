@@ -50,11 +50,17 @@
 
 #include <net/if.h>
 #include <sys/ioctl.h>
+
 #ifndef SIOCGIFCONF
 #include <sys/sockio.h>
 #endif
+
 #ifndef _SIZEOF_ADDR_IFREQ
 #define _SIZEOF_ADDR_IFREQ(x) sizeof(x)
+#endif
+
+#ifndef MSG_NOSIGNAL
+#define MSG_NOSIGNAL 0
 #endif
 
 int hdhomerun_local_ip_info(struct hdhomerun_local_ip_info_t ip_info_list[], int max_count)
@@ -99,6 +105,19 @@ int hdhomerun_local_ip_info(struct hdhomerun_local_ip_info_t ip_info_list[], int
 		struct ifreq *ifr = (struct ifreq *)ptr;
 		ptr += _SIZEOF_ADDR_IFREQ(*ifr);
 
+		/* Flags. */
+		if (ioctl(sock, SIOCGIFFLAGS, ifr) != 0) {
+			continue;
+		}
+
+		if ((ifr->ifr_flags & IFF_UP) == 0) {
+			continue;
+		}
+		if ((ifr->ifr_flags & IFF_RUNNING) == 0) {
+			continue;
+		}
+
+		/* Local IP address. */
 		if (ioctl(sock, SIOCGIFADDR, ifr) != 0) {
 			continue;
 		}
@@ -109,6 +128,7 @@ int hdhomerun_local_ip_info(struct hdhomerun_local_ip_info_t ip_info_list[], int
 			continue;
 		}
 
+		/* Subnet mask. */
 		if (ioctl(sock, SIOCGIFNETMASK, ifr) != 0) {
 			continue;
 		}
@@ -116,13 +136,14 @@ int hdhomerun_local_ip_info(struct hdhomerun_local_ip_info_t ip_info_list[], int
 		struct sockaddr_in *subnet_mask_in = (struct sockaddr_in *)&(ifr->ifr_addr);
 		uint32_t subnet_mask = ntohl(subnet_mask_in->sin_addr.s_addr);
 
-		struct hdhomerun_local_ip_info_t *ip_info = &ip_info_list[count++];
-		ip_info->ip_addr = ip_addr;
-		ip_info->subnet_mask = subnet_mask;
-
-		if (count >= max_count) {
-			break;
+		/* Report. */
+		if (count < max_count) {
+			struct hdhomerun_local_ip_info_t *ip_info = &ip_info_list[count];
+			ip_info->ip_addr = ip_addr;
+			ip_info->subnet_mask = subnet_mask;
 		}
+
+		count++;
 	}
 
 	free(ifc.ifc_buf);
@@ -236,6 +257,34 @@ uint32_t hdhomerun_sock_getaddrinfo_addr(hdhomerun_sock_t sock, const char *name
 	return addr;
 }
 
+bool_t hdhomerun_sock_join_multicast_group(hdhomerun_sock_t sock, uint32_t multicast_ip, uint32_t local_ip)
+{
+	struct ip_mreq imr;
+	memset(&imr, 0, sizeof(imr));
+	imr.imr_multiaddr.s_addr  = htonl(multicast_ip);
+	imr.imr_interface.s_addr  = htonl(local_ip);
+
+	if (setsockopt(sock, IPPROTO_IP, IP_ADD_MEMBERSHIP, (const char *)&imr, sizeof(imr)) != 0) {
+		return FALSE;
+	}
+
+	return TRUE;
+}
+
+bool_t hdhomerun_sock_leave_multicast_group(hdhomerun_sock_t sock, uint32_t multicast_ip, uint32_t local_ip)
+{
+	struct ip_mreq imr;
+	memset(&imr, 0, sizeof(imr));
+	imr.imr_multiaddr.s_addr  = htonl(multicast_ip);
+	imr.imr_interface.s_addr  = htonl(local_ip);
+
+	if (setsockopt(sock, IPPROTO_IP, IP_DROP_MEMBERSHIP, (const char *)&imr, sizeof(imr)) != 0) {
+		return FALSE;
+	}
+
+	return TRUE;
+}
+
 bool_t hdhomerun_sock_bind(hdhomerun_sock_t sock, uint32_t local_addr, uint16_t local_port, bool_t allow_reuse)
 {
 	int sock_opt = allow_reuse;
@@ -340,30 +389,20 @@ bool_t hdhomerun_sock_connect(hdhomerun_sock_t sock, uint32_t remote_addr, uint1
 	sock_addr.sin_addr.s_addr = htonl(remote_addr);
 	sock_addr.sin_port = htons(remote_port);
 
-	if (connect(sock, (struct sockaddr *)&sock_addr, sizeof(sock_addr)) == 0) {
-		return TRUE;
+	if (connect(sock, (struct sockaddr *)&sock_addr, sizeof(sock_addr)) != 0) {
+		if ((errno != EAGAIN) && (errno != EWOULDBLOCK) && (errno != EINPROGRESS)) {
+			return FALSE;
+		}
 	}
 
 	uint64_t stop_time = getcurrenttime() + timeout;
 
-	/*
-	 * getpeername() is used to detect if connect succeeded. Bug - cygwin
-	 * will return getpeername success even if the connect process hasn't
-	 * completed. This first call to select is used to work around the
-	 * problem (at least for low numbered sockets where select is used).
-	 */
-	if (!hdhomerun_sock_wait_for_write_event(sock, stop_time)) {
-		return FALSE;
-	}
-
 	while (1) {
-		struct sockaddr_in sock_addr;
-		socklen_t sockaddr_size = sizeof(sock_addr);
-		if (getpeername(sock, (struct sockaddr *)&sock_addr, &sockaddr_size) == 0) {
+		if (send(sock, NULL, 0, MSG_NOSIGNAL) == 0) {
 			return TRUE;
 		}
 
-		if (errno != ENOTCONN) {
+		if ((errno != EAGAIN) && (errno != EWOULDBLOCK) && (errno != EINPROGRESS) && (errno != ENOTCONN)) {
 			return FALSE;
 		}
 
@@ -379,26 +418,24 @@ bool_t hdhomerun_sock_send(hdhomerun_sock_t sock, const void *data, size_t lengt
 	const uint8_t *ptr = (const uint8_t *)data;
 
 	while (1) {
-		int ret = send(sock, ptr, length, 0);
-		if (ret >= (int)length) {
-			return TRUE;
+		int ret = send(sock, ptr, length, MSG_NOSIGNAL);
+		if (ret <= 0) {
+			if ((errno != EAGAIN) && (errno != EWOULDBLOCK) && (errno != EINPROGRESS)) {
+				return FALSE;
+			}
+			if (!hdhomerun_sock_wait_for_write_event(sock, stop_time)) {
+				return FALSE;
+			}
+			continue;
 		}
 
-		if (ret > 0) {
+		if (ret < (int)length) {
 			ptr += ret;
 			length -= ret;
+			continue;
 		}
 
-		if (errno == EINPROGRESS) {
-			errno = EWOULDBLOCK;
-		}
-		if (errno != EWOULDBLOCK) {
-			return FALSE;
-		}
-
-		if (!hdhomerun_sock_wait_for_write_event(sock, stop_time)) {
-			return FALSE;
-		}
+		return TRUE;
 	}
 }
 
@@ -415,25 +452,23 @@ bool_t hdhomerun_sock_sendto(hdhomerun_sock_t sock, uint32_t remote_addr, uint16
 		sock_addr.sin_port = htons(remote_port);
 
 		int ret = sendto(sock, ptr, length, 0, (struct sockaddr *)&sock_addr, sizeof(sock_addr));
-		if (ret >= (int)length) {
-			return TRUE;
+		if (ret <= 0) {
+			if ((errno != EAGAIN) && (errno != EWOULDBLOCK) && (errno != EINPROGRESS)) {
+				return FALSE;
+			}
+			if (!hdhomerun_sock_wait_for_write_event(sock, stop_time)) {
+				return FALSE;
+			}
+			continue;
 		}
 
-		if (ret > 0) {
+		if (ret < (int)length) {
 			ptr += ret;
 			length -= ret;
+			continue;
 		}
 
-		if (errno == EINPROGRESS) {
-			errno = EWOULDBLOCK;
-		}
-		if (errno != EWOULDBLOCK) {
-			return FALSE;
-		}
-
-		if (!hdhomerun_sock_wait_for_write_event(sock, stop_time)) {
-			return FALSE;
-		}
+		return TRUE;
 	}
 }
 
@@ -443,21 +478,22 @@ bool_t hdhomerun_sock_recv(hdhomerun_sock_t sock, void *data, size_t *length, ui
 
 	while (1) {
 		int ret = recv(sock, data, *length, 0);
-		if (ret > 0) {
-			*length = ret;
-			return TRUE;
+		if (ret < 0) {
+			if ((errno != EAGAIN) && (errno != EWOULDBLOCK) && (errno != EINPROGRESS)) {
+				return FALSE;
+			}
+			if (!hdhomerun_sock_wait_for_read_event(sock, stop_time)) {
+				return FALSE;
+			}
+			continue;
 		}
 
-		if (errno == EINPROGRESS) {
-			errno = EWOULDBLOCK;
-		}
-		if (errno != EWOULDBLOCK) {
+		if (ret == 0) {
 			return FALSE;
 		}
 
-		if (!hdhomerun_sock_wait_for_read_event(sock, stop_time)) {
-			return FALSE;
-		}
+		*length = ret;
+		return TRUE;
 	}
 }
 
@@ -471,22 +507,23 @@ bool_t hdhomerun_sock_recvfrom(hdhomerun_sock_t sock, uint32_t *remote_addr, uin
 		socklen_t sockaddr_size = sizeof(sock_addr);
 
 		int ret = recvfrom(sock, data, *length, 0, (struct sockaddr *)&sock_addr, &sockaddr_size);
-		if (ret > 0) {
-			*remote_addr = ntohl(sock_addr.sin_addr.s_addr);
-			*remote_port = ntohs(sock_addr.sin_port);
-			*length = ret;
-			return TRUE;
+		if (ret < 0) {
+			if ((errno != EAGAIN) && (errno != EWOULDBLOCK) && (errno != EINPROGRESS)) {
+				return FALSE;
+			}
+			if (!hdhomerun_sock_wait_for_read_event(sock, stop_time)) {
+				return FALSE;
+			}
+			continue;
 		}
 
-		if (errno == EINPROGRESS) {
-			errno = EWOULDBLOCK;
-		}
-		if (errno != EWOULDBLOCK) {
+		if (ret == 0) {
 			return FALSE;
 		}
 
-		if (!hdhomerun_sock_wait_for_read_event(sock, stop_time)) {
-			return FALSE;
-		}
+		*remote_addr = ntohl(sock_addr.sin_addr.s_addr);
+		*remote_port = ntohs(sock_addr.sin_port);
+		*length = ret;
+		return TRUE;
 	}
 }

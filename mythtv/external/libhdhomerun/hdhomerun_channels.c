@@ -79,6 +79,16 @@ static const struct hdhomerun_channelmap_range_t hdhomerun_channelmap_range_eu_c
 	{  0,   0,         0,       0}
 };
 
+/* KR cable channels. */
+static const struct hdhomerun_channelmap_range_t hdhomerun_channelmap_range_kr_cable[] = {
+	{  2,   4,  57000000, 6000000},
+	{  5,   6,  79000000, 6000000},
+	{  7,  13, 177000000, 6000000},
+	{ 14,  22, 123000000, 6000000},
+	{ 23, 153, 219000000, 6000000},
+	{  0,   0,         0,       0}
+};
+
 /* US antenna channels. */
 static const struct hdhomerun_channelmap_range_t hdhomerun_channelmap_range_us_bcast[] = {
 	{  2,   4,  57000000, 6000000},
@@ -135,6 +145,8 @@ static const struct hdhomerun_channelmap_record_t hdhomerun_channelmap_table[] =
 	{"tw-bcast", hdhomerun_channelmap_range_us_bcast, "tw-bcast",               "TW"},
 	{"tw-cable", hdhomerun_channelmap_range_us_cable, "tw-cable",               "TW"},
 
+	{"kr-bcast", hdhomerun_channelmap_range_us_bcast, "kr-bcast",               "KR"},
+	{"kr-cable", hdhomerun_channelmap_range_kr_cable, "kr-cable",               "KR"},
 	{"us-bcast", hdhomerun_channelmap_range_us_bcast, "us-bcast",               "CA US"},
 	{"us-cable", hdhomerun_channelmap_range_us_cable, "us-cable us-hrc us-irc", "CA PA US"},
 	{"us-hrc",   hdhomerun_channelmap_range_us_hrc  , "us-cable us-hrc us-irc", "CA PA US"},
@@ -334,7 +346,7 @@ static void hdhomerun_channel_list_build_range(struct hdhomerun_channel_list_t *
 		entry->channel_number = channel_number;
 		entry->frequency = range->frequency + ((uint32_t)(channel_number - range->channel_range_start) * range->spacing);
 		entry->frequency = hdhomerun_channel_frequency_round_normal(entry->frequency);
-		sprintf(entry->name, "%s:%u", channelmap, entry->channel_number);
+		hdhomerun_sprintf(entry->name, entry->name + sizeof(entry->name), "%s:%u", channelmap, entry->channel_number);
 
 		hdhomerun_channel_list_build_insert(channel_list, entry);
 	}

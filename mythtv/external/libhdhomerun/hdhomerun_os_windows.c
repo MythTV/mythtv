@@ -36,7 +36,7 @@ uint32_t random_get32(void)
 {
 	HCRYPTPROV hProv;
 	if (!CryptAcquireContext(&hProv, 0, 0, PROV_RSA_FULL, CRYPT_VERIFYCONTEXT)) {
-		return (uint32_t)rand();
+		return (uint32_t)getcurrenttime();
 	}
 
 	uint32_t Result;
@@ -128,6 +128,36 @@ void pthread_mutex_unlock(pthread_mutex_t *mutex)
 	ReleaseMutex(*mutex);
 }
 #endif
+
+bool_t hdhomerun_vsprintf(char *buffer, char *end, const char *fmt, va_list ap)
+{
+	if (buffer >= end) {
+		return FALSE;
+	}
+
+	int length = _vsnprintf(buffer, end - buffer - 1, fmt, ap);
+	if (length < 0) {
+		*buffer = 0;
+		return FALSE;
+	}
+
+	if (buffer + length + 1 > end) {
+		*(end - 1) = 0;
+		return FALSE;
+
+	}
+
+	return TRUE;
+}
+
+bool_t hdhomerun_sprintf(char *buffer, char *end, const char *fmt, ...)
+{
+	va_list ap;
+	va_start(ap, fmt);
+	bool_t result = hdhomerun_vsprintf(buffer, end, fmt, ap);
+	va_end(ap);
+	return result;
+}
 
 /*
  * The console output format should be set to UTF-8, however in XP and Vista this breaks batch file processing.

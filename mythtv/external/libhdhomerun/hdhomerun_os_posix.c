@@ -36,12 +36,12 @@ uint32_t random_get32(void)
 {
 	FILE *fp = fopen("/dev/urandom", "rb");
 	if (!fp) {
-		return (uint32_t)rand();
+		return (uint32_t)getcurrenttime();
 	}
 
 	uint32_t Result;
 	if (fread(&Result, 4, 1, fp) != 1) {
-		Result = (uint32_t)rand();
+		Result = (uint32_t)getcurrenttime();
 	}
 
 	fclose(fp);
@@ -102,4 +102,34 @@ void msleep_minimum(uint64_t ms)
 
 		msleep_approx(stop_time - current_time);
 	}
+}
+
+bool_t hdhomerun_vsprintf(char *buffer, char *end, const char *fmt, va_list ap)
+{
+	if (buffer >= end) {
+		return FALSE;
+	}
+
+	int length = vsnprintf(buffer, end - buffer - 1, fmt, ap);
+	if (length < 0) {
+		*buffer = 0;
+		return FALSE;
+	}
+
+	if (buffer + length + 1 > end) {
+		*(end - 1) = 0;
+		return FALSE;
+
+	}
+
+	return TRUE;
+}
+
+bool_t hdhomerun_sprintf(char *buffer, char *end, const char *fmt, ...)
+{
+	va_list ap;
+	va_start(ap, fmt);
+	bool_t result = hdhomerun_vsprintf(buffer, end, fmt, ap);
+	va_end(ap);
+	return result;
 }

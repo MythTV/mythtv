@@ -54,6 +54,9 @@ extern LIBTYPE uint16_t hdhomerun_sock_getsockname_port(hdhomerun_sock_t sock);
 extern LIBTYPE uint32_t hdhomerun_sock_getpeername_addr(hdhomerun_sock_t sock);
 extern LIBTYPE uint32_t hdhomerun_sock_getaddrinfo_addr(hdhomerun_sock_t sock, const char *name);
 
+extern LIBTYPE bool_t hdhomerun_sock_join_multicast_group(hdhomerun_sock_t sock, uint32_t multicast_ip, uint32_t local_ip);
+extern LIBTYPE bool_t hdhomerun_sock_leave_multicast_group(hdhomerun_sock_t sock, uint32_t multicast_ip, uint32_t local_ip);
+
 extern LIBTYPE bool_t hdhomerun_sock_bind(hdhomerun_sock_t sock, uint32_t local_addr, uint16_t local_port, bool_t allow_reuse);
 extern LIBTYPE bool_t hdhomerun_sock_connect(hdhomerun_sock_t sock, uint32_t remote_addr, uint16_t remote_port, uint64_t timeout);
 
