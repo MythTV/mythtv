@@ -1238,7 +1238,7 @@ static HostComboBox *PlayBoxEpisodeSort()
     gc->addSelection(QObject::tr("Season/Episode"), "Season");
     gc->addSelection(QObject::tr("Original air date"), "OrigAirDate");
     gc->addSelection(QObject::tr("Program ID"), "Id");
-    gc->setHelpText(QObject::tr("Selects how to sort a shows episodes"));
+    gc->setHelpText(QObject::tr("Selects how to sort a show's episodes"));
     return gc;
 }
 
@@ -1411,7 +1411,7 @@ static HostCheckBox *BrowseAllTuners()
     gc->setValue(false);
     gc->setHelpText(
         QObject::tr(
-            "If enabled, browse mode will shows channels on all "
+            "If enabled, browse mode will show channels on all "
             "available recording devices, instead of showing "
             "channels on just the current recorder."));
     return gc;
