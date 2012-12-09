@@ -833,13 +833,13 @@ static void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist,
         return;
     }
 
-    WaitToDelete(pginfo);
-
     const QString filename = pginfo->GetPlaybackURL(false, true);
     const QByteArray fname = filename.toLocal8Bit();
 
     if (status == JOB_STOPPING)
     {
+        WaitToDelete(pginfo);
+
         // Transcoding may take several minutes.  Reload the bookmark
         // in case it changed, then save its translated value back.
         uint64_t previousBookmark =
