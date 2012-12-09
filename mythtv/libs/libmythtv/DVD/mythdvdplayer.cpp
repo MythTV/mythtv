@@ -657,7 +657,13 @@ void MythDVDPlayer::ResetStillFrameTimer(void)
 
 void MythDVDPlayer::SetStillFrameTimeout(int length)
 {
-    m_stillFrameLength = length;
+    if (length != m_stillFrameLength)
+    {
+        m_stillFrameTimerLock.lock();
+        m_stillFrameLength = length;
+        m_stillFrameTimer.restart();
+        m_stillFrameTimerLock.unlock();
+    }
 }
 
 void MythDVDPlayer::StillFrameCheck(void)
