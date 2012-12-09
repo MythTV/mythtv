@@ -513,8 +513,8 @@ void Scheduler::PrintList(RecList &list, bool onlyFutureRecordings)
     QDateTime now = MythDate::current();
 
     LOG(VB_SCHEDULE, LOG_INFO, "--- print list start ---");
-    LOG(VB_SCHEDULE, LOG_INFO, "Title - Subtitle                    Ch Station "
-                               "Day Start  End   S C I  T N Pri");
+    LOG(VB_SCHEDULE, LOG_INFO, "Title - Subtitle                     Ch Station "
+                               "Day Start  End   S  C  I  T  N Pri");
 
     RecIter i = list.begin();
     for ( ; i != list.end(); ++i)
@@ -549,16 +549,16 @@ void Scheduler::PrintRec(const RecordingInfo *p, const char *prefix)
 
     outstr += QString("%1 %2 %3 %4-%5  %6 %7 %8  ")
         .arg(episode)
-        .arg(p->GetChanNum().rightJustified(4, ' '))
+        .arg(p->GetChanNum().rightJustified(5, ' '))
         .arg(p->GetChannelSchedulingID().leftJustified(7, ' ', true))
         .arg(p->GetRecordingStartTime().toLocalTime().toString("dd hh:mm"))
         .arg(p->GetRecordingEndTime().toLocalTime().toString("hh:mm"))
         .arg(p->GetSourceID())
-        .arg(p->GetCardID())
-        .arg(p->GetInputID());
+        .arg(QString::number(p->GetCardID()).rightJustified(2, ' '))
+        .arg(QString::number(p->GetInputID()).rightJustified(2, ' '));
     outstr += QString("%1 %2 %3")
         .arg(toQChar(p->GetRecordingRuleType()))
-        .arg(toString(p->GetRecordingStatus(), p->GetCardID()))
+        .arg(toString(p->GetRecordingStatus(), p->GetCardID()).rightJustified(2, ' '))
         .arg(p->GetRecordingPriority());
     if (p->GetRecordingPriority2())
         outstr += QString("/%1").arg(p->GetRecordingPriority2());
