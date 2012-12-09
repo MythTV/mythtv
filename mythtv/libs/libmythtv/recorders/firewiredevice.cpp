@@ -19,7 +19,7 @@
 #include "darwinfirewiredevice.h"
 #endif
 #include "mythlogging.h"
-#include "pespacket.h"
+#include "mpegtables.h"
 
 #define LOC      QString("FireDev(%1): ").arg(guid_to_string(m_guid))
 
@@ -337,9 +337,9 @@ void FirewireDevice::SetLastChannel(const uint channel)
 void FirewireDevice::ProcessPATPacket(const TSPacket &tspacket)
 {
     if (!tspacket.TransportError() && !tspacket.Scrambled() &&
-        tspacket.HasPayload() && tspacket.PayloadStart() && !tspacket.PID())
+        tspacket.HasPayload() && tspacket.PayloadStart() && (tspacket.PID() == 0))
     {
-        PESPacket pes = PESPacket::View(tspacket);
+        PSIPTable pes(tspacket);
         uint crc = pes.CalcCRC();
         m_buffer_cleared |= (crc != m_last_crc);
         m_last_crc = crc;
