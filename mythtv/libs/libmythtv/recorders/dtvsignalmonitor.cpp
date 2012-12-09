@@ -484,6 +484,16 @@ void DTVSignalMonitor::HandleSDT(uint, const ServiceDescriptionTable *sdt)
     detectedNetworkID = sdt->OriginalNetworkID();
     detectedTransportID = sdt->TSID();
 
+    // if the multiplex is not properly configured with ONID and TSID then take
+    // whatever SDT we see first
+    if ((networkID == 0) && (transportID == 0))
+    {
+        networkID = detectedNetworkID;
+        transportID = detectedTransportID;
+
+        // FIXME assert if TableID == SDTo
+    }
+
     if (sdt->OriginalNetworkID() != networkID || sdt->TSID() != transportID)
     {
         GetDVBStreamData()->SetVersionSDT(sdt->TSID(), -1, 0);

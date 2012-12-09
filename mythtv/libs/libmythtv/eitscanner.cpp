@@ -8,6 +8,7 @@
 
 #include "scheduledrecording.h"
 #include "channelbase.h"
+#include "channelutil.h"
 #include "mythlogging.h"
 #include "eitscanner.h"
 #include "eithelper.h"
@@ -135,6 +136,8 @@ void EITScanner::run(void)
                 eitHelper->WriteEITCache();
                 if (rec->QueueEITChannelChange(*activeScanNextChan))
                 {
+                    eitHelper->SetChannelID(ChannelUtil::GetChanID(
+                        rec->GetSourceID(), *activeScanNextChan));
                     LOG(VB_EIT, LOG_INFO,
                         LOC_ID + QString("Now looking for EIT data on "
                                          "multiplex of channel %1")
@@ -206,6 +209,7 @@ void EITScanner::StartPassiveScan(ChannelBase *_channel,
     eitHelper->SetSourceID(sourceid);
     eitSource->SetEITHelper(eitHelper);
     eitSource->SetEITRate(1.0f);
+    eitHelper->SetChannelID(_channel->GetChanID());
 
     LOG(VB_EIT, LOG_INFO, LOC_ID + "Started passive scan.");
 }

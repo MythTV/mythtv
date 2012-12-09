@@ -25,10 +25,12 @@ using namespace std;
 const uint EITHelper::kChunkSize = 20;
 EITCache *EITHelper::eitcache = new EITCache();
 
-static uint get_chan_id_from_db(uint sourceid,
-                                uint atscmajor, uint atscminor);
-static uint get_chan_id_from_db(uint sourceid,  uint serviceid,
-                                uint networkid, uint transportid);
+static uint get_chan_id_from_db_atsc(uint sourceid,
+                                     uint atscmajor, uint atscminor);
+static uint get_chan_id_from_db_dvb(uint sourceid,  uint serviceid,
+                                    uint networkid, uint transportid);
+static uint get_chan_id_from_db_dtv(uint sourceid,
+                                    uint programnumber, uint tunedchanid);
 static void init_fixup(QMap<uint64_t,uint> &fix);
 
 #define LOC QString("EITHelper: ")
@@ -36,7 +38,7 @@ static void init_fixup(QMap<uint64_t,uint> &fix);
 EITHelper::EITHelper() :
     eitfixup(new EITFixUp()),
     gps_offset(-1 * GPS_LEAP_SECONDS),
-    sourceid(0)
+    sourceid(0), channelid(0)
 {
     init_fixup(fixup);
 }
@@ -131,6 +133,12 @@ void EITHelper::SetSourceID(uint _sourceid)
 {
     QMutexLocker locker(&eitList_lock);
     sourceid = _sourceid;
+}
+
+void EITHelper::SetChannelID(uint _channelid)
+{
+    QMutexLocker locker(&eitList_lock);
+    channelid = _channelid;
 }
 
 void EITHelper::AddEIT(uint atsc_major, uint atsc_minor,
@@ -285,8 +293,18 @@ static inline void parse_dvb_component_descriptors(desc_list_t list,
 
 void EITHelper::AddEIT(const DVBEventInformationTable *eit)
 {
-    uint chanid = GetChanID(eit->ServiceID(), eit->OriginalNetworkID(),
-                            eit->TSID());
+    uint chanid = 0;
+    if ((eit->TableID() == TableID::PF_EIT) ||
+        ((eit->TableID() >= TableID::SC_EITbeg) && (eit->TableID() <= TableID::SC_EITend)))
+    {
+        // EITa(ctive)
+        chanid = GetChanID(eit->ServiceID());
+    }
+    else
+    {
+        // EITo(ther)
+        chanid = GetChanID(eit->ServiceID(), eit->OriginalNetworkID(), eit->TSID());
+    }
     if (!chanid)
         return;
 
@@ -647,7 +665,7 @@ uint EITHelper::GetChanID(uint atsc_major, uint atsc_minor)
     if (it != srv_to_chanid.end())
         return max(*it, 0);
 
-    uint chanid = get_chan_id_from_db(sourceid, atsc_major, atsc_minor);
+    uint chanid = get_chan_id_from_db_atsc(sourceid, atsc_major, atsc_minor);
     srv_to_chanid[key] = chanid;
 
     return chanid;
@@ -665,13 +683,30 @@ uint EITHelper::GetChanID(uint serviceid, uint networkid, uint tsid)
     if (it != srv_to_chanid.end())
         return max(*it, 0);
 
-    uint chanid = get_chan_id_from_db(sourceid, serviceid, networkid, tsid);
+    uint chanid = get_chan_id_from_db_dvb(sourceid, serviceid, networkid, tsid);
     srv_to_chanid[key] = chanid;
 
     return chanid;
 }
 
-static uint get_chan_id_from_db(uint sourceid,
+uint EITHelper::GetChanID(uint program_number)
+{
+    uint64_t key;
+    key  = ((uint64_t) sourceid);
+    key |= ((uint64_t) program_number) << 16;
+    key |= ((uint64_t) channelid)      << 32;
+
+    ServiceToChanID::const_iterator it = srv_to_chanid.find(key);
+    if (it != srv_to_chanid.end())
+        return max(*it, 0);
+
+    uint chanid = get_chan_id_from_db_dtv(sourceid, program_number, channelid);
+    srv_to_chanid[key] = chanid;
+
+    return chanid;
+}
+
+static uint get_chan_id_from_db_atsc(uint sourceid,
                                 uint atsc_major, uint atsc_minor)
 {
     MSqlQuery query(MSqlQuery::InitCon());
@@ -697,7 +732,7 @@ static uint get_chan_id_from_db(uint sourceid,
 }
 
 // Figure out the chanid for this channel
-static uint get_chan_id_from_db(uint sourceid, uint serviceid,
+static uint get_chan_id_from_db_dvb(uint sourceid, uint serviceid,
                                 uint networkid, uint transportid)
 {
     uint chanid = 0;
@@ -747,12 +782,64 @@ static uint get_chan_id_from_db(uint sourceid, uint serviceid,
             return useOnAirGuide ? chanid : 0;
     }
 
-    if (query.size() > 1) {
+    if (query.size() > 1)
+    {
         LOG(VB_EIT, LOG_INFO,
             LOC + QString("found %1 channels for networdid %2, "
                           "transportid %3, serviceid %4 but none "
                           "for current sourceid %5.")
                 .arg(query.size()).arg(networkid).arg(transportid)
+                .arg(serviceid).arg(sourceid));
+    }
+
+    return useOnAirGuide ? chanid : 0;
+}
+
+/* Figure out the chanid for this channel from the sourceid,
+ * program_number/service_id and the chanid of the channel we are tuned to
+ *
+ * TODO for SPTS (e.g. HLS / IPTV) it would be useful to match without an entry
+ * in dtv_multiplex
+ */
+static uint get_chan_id_from_db_dtv(uint sourceid, uint serviceid,
+                                uint tunedchanid)
+{
+    uint chanid = 0;
+    bool useOnAirGuide = false;
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    // DVB Link to chanid
+    QString qstr =
+        "SELECT c1.chanid, c1.useonairguide, c1.sourceid "
+        "FROM channel c1, dtv_multiplex m, channel c2 "
+        "WHERE c1.serviceid        = :SERVICEID   AND "
+        "      c1.mplexid  = m.mplexid AND "
+        "      m.mplexid = c2.mplexid AND "
+        "      c2.chanid = :CHANID";
+
+    query.prepare(qstr);
+    query.bindValue(":SERVICEID",   serviceid);
+    query.bindValue(":CHANID", tunedchanid);
+
+    if (!query.exec() || !query.isActive())
+        MythDB::DBError("Looking up chanID", query);
+
+    while (query.next())
+    {
+        // Check to see if we are interested in this channel
+        chanid        = query.value(0).toUInt();
+        useOnAirGuide = query.value(1).toBool();
+        if (sourceid == query.value(2).toUInt())
+            return useOnAirGuide ? chanid : 0;
+    }
+
+    if (query.size() > 1)
+    {
+        LOG(VB_EIT, LOG_INFO,
+            LOC + QString("found %1 channels for multiplex of chanid %2, "
+                          "serviceid %3 but none "
+                          "for current sourceid %4.")
+                .arg(query.size()).arg(tunedchanid)
                 .arg(serviceid).arg(sourceid));
     }
 

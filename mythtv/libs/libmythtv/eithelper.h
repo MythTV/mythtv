@@ -66,6 +66,7 @@ class EITHelper
 
     uint GetGPSOffset(void) const { return (uint) (0 - gps_offset); }
 
+    void SetChannelID(uint _channelid);
     void SetGPSOffset(uint _gps_offset) { gps_offset = 0 - _gps_offset; }
     void SetFixup(uint atsc_major, uint atsc_minor, uint eitfixup);
     void SetLanguagePreferences(const QStringList &langPref);
@@ -90,8 +91,12 @@ class EITHelper
     void WriteEITCache(void);
 
   private:
+    // only ATSC
     uint GetChanID(uint atsc_major, uint atsc_minor);
+    // only DVB
     uint GetChanID(uint serviceid, uint networkid, uint transportid);
+    // any DTV
+    uint GetChanID(uint program_number);
 
     void CompleteEvent(uint atsc_major, uint atsc_minor,
                        const ATSCEvent &event,
@@ -106,6 +111,7 @@ class EITHelper
 
     int                     gps_offset;
     uint                    sourceid;
+    uint                    channelid;
     QMap<uint64_t,uint>     fixup;
     ATSCSRCToEvents         incomplete_events;
     ATSCSRCToETTs           unmatched_etts;

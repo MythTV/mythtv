@@ -2991,6 +2991,16 @@ QString TVRec::GetInput(void) const
     return QString::null;
 }
 
+/** \fn TVRec::GetSourceID(void) const
+ *  \brief Returns current source id.
+ */
+uint TVRec::GetSourceID(void) const
+{
+    if (channel)
+        return channel->GetCurrentSourceID();
+    return 0;
+}
+
 /** \fn TVRec::SetInput(QString, uint)
  *  \brief Changes to the specified input.
  *

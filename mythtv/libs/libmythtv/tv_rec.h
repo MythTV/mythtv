@@ -192,6 +192,7 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
 
     vector<InputInfo> GetFreeInputs(const vector<uint> &excluded_cards) const;
     QString     GetInput(void) const;
+    uint        GetSourceID(void) const;
     QString     SetInput(QString input, uint requestType = kFlagDetect);
 
     /// Changes to a channel in the 'dir' channel change direction.
