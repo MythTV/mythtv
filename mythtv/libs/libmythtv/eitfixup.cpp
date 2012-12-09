@@ -1300,7 +1300,6 @@ void EITFixUp::FixRTL(DBEventEIT &event) const
         // remove '.' if it matches at the beginning of the description
         int length = tmpExpRepeat.cap(0).length() + (pos ? 0 : 1);
         event.description = event.description.remove(pos, length).trimmed();
-        event.originalairdate = event.starttime.addDays(-1).date();
     }
 
     QRegExp tmpExp1 = m_RTLSubtitle;
