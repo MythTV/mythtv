@@ -19,45 +19,19 @@ MTV_PUBLIC void pes_free(unsigned char *ptr);
 
 /** \class PESPacket
  *  \brief Allows us to transform TS packets to PES packets, which
- *         are used to hold PSIP tables as well as multimedia streams.
+ *         are used to hold multimedia streams and very similar to PSIP tables.
  *  \sa PSIPTable, TSPacket
  */
 class MTV_PUBLIC PESPacket
 {
-    /// Only handles single TS packet PES packets, for PMT/PAT tables basically
-    void InitPESPacket(TSPacket& tspacket)
-    {
-        if (tspacket.PayloadStart())
-            _psiOffset = tspacket.AFCOffset() + tspacket.StartOfFieldPointer();
-        else
-        {
-            LOG(VB_GENERAL, LOG_ERR, "Started PESPacket, but !payloadStart()");
-            _psiOffset = tspacket.AFCOffset();
-        }
-        _pesdata = tspacket.data() + _psiOffset + 1;
-
-        _badPacket = true;
-        // first check if Length() will return something useful and
-        // than check if the packet ends in the first TSPacket
-        if ((_pesdata - tspacket.data()) <= (188-3) &&
-            (_pesdata + Length() - tspacket.data()) <= (188-3))
-        {
-            _badPacket = !VerifyCRC();
-        }
-    }
-
   protected:
+    /** noop constructor, only for use by derived classes */
+    PESPacket()
+    { ; }
+
+  public:
     // does not create it's own data
-    PESPacket(const TSPacket* tspacket, bool)
-        : _pesdata(NULL),    _fullbuffer(NULL),
-          _ccLast(tspacket->ContinuityCounter()), _allocSize(0)
-    {
-        InitPESPacket(const_cast<TSPacket&>(*tspacket));
-        _fullbuffer = const_cast<unsigned char*>(tspacket->data());
-        _pesdataSize = TSPacket::kSize - (_pesdata - _fullbuffer);
-    }
-    // does not create it's own data
-    PESPacket(const unsigned char *pesdata, bool)
+    PESPacket(const unsigned char *pesdata)
         : _pesdata(const_cast<unsigned char*>(pesdata)),
           _fullbuffer(const_cast<unsigned char*>(pesdata)),
           _psiOffset(0), _ccLast(255), _allocSize(0)
@@ -88,39 +62,11 @@ class MTV_PUBLIC PESPacket
         _pesdata = _fullbuffer + (pkt._pesdata - pkt._fullbuffer);
     }
 
-    // may be modified
-    PESPacket(const TSPacket& tspacket)
-        : _ccLast(tspacket.ContinuityCounter()), _pesdataSize(188)
-    { // clone
-        InitPESPacket(const_cast<TSPacket&>(tspacket)); // sets _psiOffset
-
-        int len     = (4*1024) - 256; /* ~4KB */
-        _allocSize  = len + _psiOffset;
-        _fullbuffer = pes_alloc(_allocSize);
-        _pesdata    = _fullbuffer + _psiOffset + 1;
-        memcpy(_fullbuffer, tspacket.data(), TSPacket::kSize);
-    }
-
     // At this point we should have the entire VCT table in buffer
     // at (buffer - 8), and without the tspacket 4 byte header
 
         //if (TableID::TVCT == table_id)
         //VirtualChannelTable vct;
-
-    // may be modified
-    PESPacket(const TSPacket &tspacket,
-              const unsigned char *pesdata, uint pes_size)
-        : _ccLast(tspacket.ContinuityCounter()), _pesdataSize(pes_size)
-    { // clone
-        InitPESPacket(const_cast<TSPacket&>(tspacket)); // sets _psiOffset
-        int len     = pes_size+4;
-        /* make alloc size multiple of 188 */
-        _allocSize  = ((len+_psiOffset+187)/188)*188;
-        _fullbuffer = pes_alloc(_allocSize);
-        _pesdata    = _fullbuffer + _psiOffset + 1;
-        memcpy(_fullbuffer, tspacket.data(), 188);
-        memcpy(_pesdata, pesdata, pes_size-1);
-    }
 
     virtual ~PESPacket()
     {
@@ -130,12 +76,6 @@ class MTV_PUBLIC PESPacket
         _fullbuffer = NULL;
         _pesdata    = NULL;
     }
-
-    static const PESPacket View(const TSPacket& tspacket)
-        { return PESPacket(&tspacket, false); }
-
-    static PESPacket View(TSPacket& tspacket)
-        { return PESPacket(&tspacket, false); }
 
     bool IsClone() const { return bool(_allocSize); }
 
