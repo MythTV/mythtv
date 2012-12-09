@@ -609,13 +609,11 @@ int DVDRingBuffer::safe_read(void *data, uint sz)
                     WaitForPlayer();
                 }
 
-                // if the new cell is a still frame, reset the timer
+                // Make sure the still frame timer is updated (if this isn't
+                // a still frame, this will ensure the timer knows about it).
                 if (m_parent)
                 {
-                    if (m_still && (m_still < 0xff))
-                        m_parent->ResetStillFrameTimer();
-                    else
-                        m_parent->SetStillFrameTimeout(0);
+                    m_parent->SetStillFrameTimeout(m_still);
                 }
 
                 // clear menus/still frame selections
@@ -1021,6 +1019,12 @@ void DVDRingBuffer::SkipStillFrame(void)
     QMutexLocker locker(&m_seekLock);
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "Skipping still frame.");
     dvdnav_still_skip(m_dvdnav);
+
+    // Make sure the still frame timer is disabled.
+    if (m_parent)
+    {
+        m_parent->SetStillFrameTimeout(0);
+    }
 }
 
 void DVDRingBuffer::WaitSkip(void)
