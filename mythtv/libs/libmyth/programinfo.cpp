@@ -4577,8 +4577,9 @@ static bool FromProgramQuery(
     const QString &sql, const MSqlBindings &bindings, MSqlQuery &query)
 {
     QString querystr = QString(
+        "SELECT program.description, sub.* FROM program, ("
         "SELECT DISTINCT program.chanid, program.starttime, program.endtime, "
-        "    program.title, program.subtitle, program.description, "
+        "    program.title, program.subtitle, "
         "    program.category, channel.channum, channel.callsign, "
         "    channel.name, program.previouslyshown, channel.commmethod, "
         "    channel.outputfilters, program.seriesid, program.programid, "
@@ -4613,6 +4614,7 @@ static bool FromProgramQuery(
     if (!sql.contains(" LIMIT "))
         querystr += " LIMIT 20000 ";
 
+    querystr += " ) AS sub WHERE program.chanid=sub.chanid AND program.starttime=sub.starttime";
     query.prepare(querystr);
     MSqlBindings::const_iterator it;
     for (it = bindings.begin(); it != bindings.end(); ++it)
@@ -4645,22 +4647,22 @@ bool LoadFromProgram(
     {
         destination.push_back(
             new ProgramInfo(
-                query.value(3).toString(), // title
-                query.value(4).toString(), // subtitle
-                query.value(5).toString(), // description
+                query.value(4).toString(), // title
+                query.value(5).toString(), // subtitle
+                query.value(0).toString(), // description
                 query.value(26).toString(), // syndicatedepisodenumber
                 query.value(6).toString(), // category
 
-                query.value(0).toUInt(), // chanid
+                query.value(1).toUInt(), // chanid
                 query.value(7).toString(), // channum
                 query.value(8).toString(), // chansign
                 query.value(9).toString(), // channame
                 query.value(12).toString(), // chanplaybackfilters
 
-                MythDate::as_utc(query.value(1).toDateTime()), // startts
-                MythDate::as_utc(query.value(2).toDateTime()), // endts
-                MythDate::as_utc(query.value(1).toDateTime()), // recstartts
-                MythDate::as_utc(query.value(2).toDateTime()), // recendts
+                MythDate::as_utc(query.value(2).toDateTime()), // startts
+                MythDate::as_utc(query.value(3).toDateTime()), // endts
+                MythDate::as_utc(query.value(2).toDateTime()), // recstartts
+                MythDate::as_utc(query.value(3).toDateTime()), // recendts
 
                 query.value(13).toString(), // seriesid
                 query.value(14).toString(), // programid
