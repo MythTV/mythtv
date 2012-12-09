@@ -1755,7 +1755,7 @@
     <message>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="151"/>
         <source>Allows you to edit the transports directly. This is rarely required unless you are using a satellite dish and must enter an initial frequency to for the channel scanner to try.</source>
-        <translation>直接編輯傳遞單元。除非使用衛星天線，否則不太要用到；須輸入掃描頻道之初始頻率。</translation>
+        <translation>讓閣下直接編輯傳遞單元。除非使用衛星天線，否則不太要用到；須輸入掃描頻道之初始頻率。</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="242"/>
@@ -3102,7 +3102,7 @@ Delete the current cut or preserved region</extracomment>
     <message>
         <location filename="../programs/mythfrontend/exitprompt.cpp" line="196"/>
         <source>Do you really want to exit MythTV?</source>
-        <translation>真要離開 MythTV？</translation>
+        <translation>真要結束 MythTV？</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/exitprompt.cpp" line="205"/>
@@ -3313,8 +3313,9 @@ Delete the current cut or preserved region</extracomment>
         <location filename="../programs/mythfrontend/guidegrid.cpp" line="182"/>
         <source>You don&apos;t have any channels defined in the database.
 			The program guide will have nothing to show you.</source>
+        <translatorcomment>用兩個 Tab 會令第二行在 Terra 佈景主題換行得不漂亮 --Walter Cheuk</translatorcomment>
         <translation>資料庫未有頻道。
-			節目表無東西可看。</translation>
+		節目表無東西可看。</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/guidegrid.cpp" line="187"/>
@@ -7151,8 +7152,6 @@ Returning to the previous menu.</source>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="1679"/>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2089"/>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2090"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3489"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3491"/>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="4387"/>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="4586"/>
         <source>Live TV</source>
@@ -7792,7 +7791,7 @@ Are you sure you want to delete:</source>
     <message>
         <location filename="../programs/mythfrontend/videoplayersettings.cpp" line="96"/>
         <source>This device must exist, and the user playing the DVD needs to have read permission on the device.  &apos;default&apos; will let the MediaMonitor choose a device.</source>
-        <translation>必須真的有此裝置，而且播放 DVD 之用戶要有能讀取此裝置之權限。設為「預設」讓 MediaMonitor 自動選擇裝置。</translation>
+        <translation>必須真的有此裝置，而且播放 DVD 之用戶要有能讀取此裝置之權限。設為「default」讓 MediaMonitor 自動選擇裝置。</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/videoplayersettings.cpp" line="101"/>
@@ -13099,7 +13098,7 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="983"/>
         <source>When you change this setting, the text below should change to the name and type of your card. If the card cannot be opened, an error message will be displayed.</source>
-        <translation>當變更此設定，以下文字會改為閣下擷取卡之名稱及型號。如擷取卡無法開啟，會顯示錯誤訊息。</translation>
+        <translation>當變更此設定，以下文字會改為閣下擷取卡之名稱及類型。如擷取卡無法開啟，會顯示錯誤訊息。</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="1023"/>
@@ -13264,12 +13263,12 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="1541"/>
         <source>M3U URL</source>
-        <translation>M3U URL</translation>
+        <translation>M3U 網址</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="1542"/>
         <source>URL of M3U containing IPTV channel URLs.</source>
-        <translation>包含 IPTV 頻道 URL 之 M3U 之 URL。</translation>
+        <translation>包含 IPTV 頻道網址 之 M3U 之網址。</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="1571"/>
@@ -14115,17 +14114,17 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     <message>
         <location filename="../programs/mythfrontend/exitprompt.cpp" line="207"/>
         <source>Yes, Exit now</source>
-        <translation>是，立即離開</translation>
+        <translation>是，立即結束</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/exitprompt.cpp" line="209"/>
         <source>Yes, Exit and Reboot</source>
-        <translation>是，立即離開並重新開機</translation>
+        <translation>是，立即結束並重新開機</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/exitprompt.cpp" line="211"/>
         <source>Yes, Exit and Shutdown</source>
-        <translation>是，立即離開並關機</translation>
+        <translation>是，立即結束並關機</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="51"/>
@@ -14651,7 +14650,7 @@ name cannot be blank.</source>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1310"/>
         <source>Subtitle Codec</source>
-        <translation>字幕解碼</translation>
+        <translation>字幕編碼</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1324"/>
@@ -21851,7 +21850,7 @@ Finally, you can test, immediately activate, store, or cancel your rule.</source
     <message>
         <location filename="../themes/themestrings.h" line="199"/>
         <source>Showing:</source>
-        <translation>放映次數：</translation>
+        <translation>放映：</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="806"/>
@@ -21865,7 +21864,7 @@ Finally, you can test, immediately activate, store, or cancel your rule.</source
         <source>You Haven&apos;t Scheduled Any Programs To Be Recorded
  To schedule a recording, exit this screen and select &apos;Program Guide&apos; or &apos;Program Finder&apos;</source>
         <translation>未設定電視預錄
- 要進行預錄，離開此畫面然後選擇「節目表」或「找節目」</translation>
+ 要進行預錄，離開此畫面然後選「節目表」或「找節目」</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="807"/>
@@ -22156,7 +22155,7 @@ Finally, you can test, immediately activate, store, or cancel your rule.</source
         <source>You Haven&apos;t Scheduled Any Programs To Be Recorded
  To schedule a recording, exit this screen and Select &apos;Program Guide&apos; or &apos;Program Finder&apos; </source>
         <translation>未設定電視預錄
- 要進行預錄，離開此畫面並選「節目表」或「找節目」。</translation>
+ 要進行預錄，離開此畫面然後選「節目表」或「找節目」。</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="829"/>
@@ -23052,7 +23051,7 @@ If you select &quot;Use Default Player,&quot; the player command set for the ext
     <message>
         <location filename="../themes/themestrings.h" line="70"/>
         <source>Pick a program to record for a list of new titles</source>
-        <translation>為一整列之新節目揀選錄影程式</translation>
+        <translation>為一整列之新節目揀選要錄影的節目</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="71"/>
@@ -23082,7 +23081,7 @@ If you select &quot;Use Default Player,&quot; the player command set for the ext
     <message>
         <location filename="../themes/themestrings.h" line="76"/>
         <source>Pick a program on a given channel</source>
-        <translation>根據給定頻道揀選節目</translation>
+        <translation>根據頻道揀選節目</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="77"/>
@@ -23142,7 +23141,7 @@ If you select &quot;Use Default Player,&quot; the player command set for the ext
     <message>
         <location filename="../themes/themestrings.h" line="92"/>
         <source>Find a program based on title</source>
-        <translation>根據節目名找尋節目</translation>
+        <translation>根據節目名找節目</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="93"/>
@@ -23152,7 +23151,7 @@ If you select &quot;Use Default Player,&quot; the player command set for the ext
     <message>
         <location filename="../themes/themestrings.h" line="94"/>
         <source>Find a program matching a keyword</source>
-        <translation>以關鍵字找節目</translation>
+        <translation>根據關鍵字找節目</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="95"/>
@@ -23162,7 +23161,7 @@ If you select &quot;Use Default Player,&quot; the player command set for the ext
     <message>
         <location filename="../themes/themestrings.h" line="96"/>
         <source>Find a program including a given person</source>
-        <translation>以給定人物找節目</translation>
+        <translation>根據人物找節目</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="97"/>
@@ -23561,7 +23560,7 @@ If you select &quot;Use Default Player,&quot; the player command set for the ext
     <message>
         <location filename="../themes/themestrings.h" line="183"/>
         <source>Inetref:</source>
-        <translation>Inetref：</translation>
+        <translation>互聯網參考：</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="254"/>
@@ -24084,7 +24083,7 @@ Once you have completed your modifications, click the &quot;Save&quot; button.</
     <message>
         <location filename="../themes/themestrings.h" line="897"/>
         <source>You Haven&apos;t Scheduled Any Programs To Be Recorded. To schedule a recording, exit this screen and select &apos;Program Guide&apos; or &apos;Program Finder&apos;</source>
-        <translation>未設定電視預錄。要進行預錄，離開此畫面然後選擇「節目表」或「找節目」</translation>
+        <translation>未設定電視預錄。要進行預錄，離開此畫面然後選「節目表」或「找節目」</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="898"/>
@@ -24568,7 +24567,7 @@ yyyy年M月d日</translation>
     <message>
         <location filename="../themes/themestrings.h" line="474"/>
         <source>InetRef</source>
-        <translation>互聯聯參考</translation>
+        <translation>互聯網參考</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="475"/>
@@ -24578,7 +24577,7 @@ yyyy年M月d日</translation>
     <message>
         <location filename="../themes/themestrings.h" line="476"/>
         <source>Sort by</source>
-        <translation>排列準則：</translation>
+        <translation>排列準則</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="477"/>
@@ -25403,7 +25402,7 @@ yyyy年M月d日</translation>
     <message>
         <location filename="../programs/mythfrontend/videodlg.cpp" line="2560"/>
         <source>Studio</source>
-        <translation>製片室</translation>
+        <translation>公司</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/videodlg.cpp" line="2563"/>
