@@ -218,8 +218,10 @@ static void parse_dvb_event_descriptors(desc_list_t list, uint fix,
         MPEGDescriptor::FindBestMatch(
             list, DescriptorID::short_event, languagePreferences);
 
+    // from EN 300 468, Appendix A.2 - Selection of character table
     unsigned char enc_1[3]  = { 0x10, 0x00, 0x01 };
-    unsigned char enc_15[3] = { 0x10, 0x00, 0x0f };
+    unsigned char enc_9[3]  = { 0x10, 0x00, 0x09 }; // could use { 0x05 } instead
+    unsigned char enc_15[3] = { 0x10, 0x00, 0x0f }; // could use { 0x0B } instead
     int enc_len = 0;
     const unsigned char *enc = NULL;
 
@@ -229,6 +231,14 @@ static void parse_dvb_event_descriptors(desc_list_t list, uint fix,
     {
         enc = enc_1;
         enc_len = sizeof(enc_1);
+    }
+
+    // Is this broken DVB provider in Western Europe?
+    // Use an encoding override of ISO 8859-9 (Latin5)
+    if (fix & EITFixUp::kEFixForceISO8859_9)
+    {
+        enc = enc_9;
+        enc_len = sizeof(enc_9);
     }
 
     // Is this broken DVB provider in Western Europe?
@@ -999,7 +1009,10 @@ static void init_fixup(QMap<uint64_t,uint> &fix)
     //DVB-T Germany Berlin HSE/MonA TV
     fix[  772LL << 32 | 8468 << 16 | 16387] = EITFixUp::kEFixForceISO8859_15;
     //DVB-T Germany Ruhrgebiet Tele 5
-    fix[ 8707LL << 32 | 8468 << 16 | 16413] = EITFixUp::kEFixForceISO8859_15;
+    //fix[ 8707LL << 32 | 8468 << 16 | 16413] = EITFixUp::kEFixForceISO8859_15; // they are sending the ISO 8859-9 signalling now
+    // ANIXE
+    fix[ 8707LL << 32 | 8468U << 16 | 16426 ] = // DVB-T Rhein-Main
+        EITFixUp::kEFixForceISO8859_9;
 
     // DVB-C Kabel Deutschland encoding fixes Germany
     fix[   112LL << 32 | 61441U << 16] = EITFixUp::kEFixForceISO8859_15;
