@@ -93,6 +93,7 @@ uint StreamID::Normalize(uint stream_id, const desc_list_t &desc,
 
 bool PSIPTable::HasCRC(void) const
 {
+    // default is false, but gets set to true for 0x80-0xfe at the end!
     bool has_crc = false;
 
     switch (TableID())
@@ -185,11 +186,19 @@ bool PSIPTable::HasCRC(void) const
                 has_crc = true;
             }
 
-            // Dishnet Longterm EIT data
+            // FIXME Dishnet Longterm EIT data, only on PID 0x300! Forces
+            // table_id 0x80-0xfe to true, unless handled before or after!
             if (TableID::DN_EITbego <= TableID() &&
                 TableID() <= TableID::DN_EITendo)
             {
                 has_crc = true;
+            }
+
+            // ATSC/DVB conditional access ECM/EMM, reset to false after Dishnet
+            if (TableID::ECM0 <= TableID() &&
+                TableID() <= TableID::ECMend)
+            {
+                has_crc = false;
             }
         }
         break;
