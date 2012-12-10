@@ -4750,6 +4750,10 @@ elif enabled clangxx; then
     # The self assign warning triggers on headers that use x=x;
     # to suppress warnings about unused parameters.
     check_cxxflags -Wno-self-assign
+    # The constant-logical-operand only gives use false positives
+    # for constant logical operands meant to be optimized away.
+    check_cxxflags -Wno-constant-logical-operand
+    # clang complains about every unused -I unless you pass it this.
     check_cxxflags -Qunused-arguments
 fi
 
