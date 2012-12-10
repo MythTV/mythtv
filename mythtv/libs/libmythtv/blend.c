@@ -21,7 +21,7 @@ void blendregion_mmx (uint8_t * ysrc, uint8_t * usrc, uint8_t * vsrc,
                       int16_t rec_lut[256], uint8_t pow_lut[256][256])
 {
     int x, y, i, alpha, newalpha;
-    mmx_t amod = { uw: {alphamod, alphamod, alphamod, alphamod} };
+    mmx_t amod = { .uw = {alphamod, alphamod, alphamod, alphamod} };
     int16_t wbuf[8];
 
     (void) pow_lut;
