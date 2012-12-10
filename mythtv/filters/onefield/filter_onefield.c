@@ -97,13 +97,13 @@ static FmtConv FmtList[] =
 const FilterInfo filter_table[] =
 {
     {
-        filter_init: &new_filter,
-        name:       (char*)"onefield",
-        descript:   (char*)
+        .filter_init= &new_filter,
+        .name=       (char*)"onefield",
+        .descript=   (char*)
         "one-field-only deinterlace filter; "
         "parameter \"bottom\" for bottom field, otherwise top",
-        formats:    FmtList,
-        libname:    NULL,
+        .formats=    FmtList,
+        .libname=    NULL,
     },
     FILT_NULL
 };

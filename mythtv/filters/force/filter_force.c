@@ -98,32 +98,32 @@ static FmtConv Fmt_List_ARGB32[] =
 const FilterInfo filter_table[] =
 {
     {
-        filter_init: &new_force_yv12,
-        name:       (char*)"forceyv12",
-        descript:   (char*)"forces use of YV12 video format",
-        formats:    Fmt_List_YV12,
-        libname:    NULL
+        .filter_init= &new_force_yv12,
+        .name=       (char*)"forceyv12",
+        .descript=   (char*)"forces use of YV12 video format",
+        .formats=    Fmt_List_YV12,
+        .libname=    NULL
     },
     {
-        filter_init: &new_force_yuv422p,
-        name:       (char*)"forceyuv422p",
-        descript:   (char*)"forces use of YUV422P video format",
-        formats:    Fmt_List_YUV422P,
-        libname:    NULL
+        .filter_init= &new_force_yuv422p,
+        .name=       (char*)"forceyuv422p",
+        .descript=   (char*)"forces use of YUV422P video format",
+        .formats=    Fmt_List_YUV422P,
+        .libname=    NULL
     },
     {
-        filter_init: &new_force_rgb24,
-        name:       (char*)"forcergb24",
-        descript:   (char*)"forces use of RGB24 video format",
-        formats:    Fmt_List_RGB24,
-        libname:    NULL
+        .filter_init= &new_force_rgb24,
+        .name=       (char*)"forcergb24",
+        .descript=   (char*)"forces use of RGB24 video format",
+        .formats=    Fmt_List_RGB24,
+        .libname=    NULL
     },
     {
-        filter_init: &new_force_argb32,
-        name:       (char*)"forceargb32",
-        descript:   (char*)"forces use of ARGB32 video format",
-        formats:    Fmt_List_ARGB32,
-        libname:    NULL
+        .filter_init= &new_force_argb32,
+        .name=       (char*)"forceargb32",
+        .descript=   (char*)"forces use of ARGB32 video format",
+        .formats=    Fmt_List_ARGB32,
+        .libname=    NULL
     },
     FILT_NULL
 };

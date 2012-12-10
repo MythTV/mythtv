@@ -229,12 +229,12 @@ static FmtConv FmtList[] =
 const FilterInfo filter_table[] =
 {
     {
-        filter_init: &FieldorderDeintFilter,
-        name:       (char*)"fieldorderdoubleprocessdeint",
-        descript:   (char*)"avoids synchronisation problems when matching an "
+        .filter_init= &FieldorderDeintFilter,
+        .name=       (char*)"fieldorderdoubleprocessdeint",
+        .descript=   (char*)"avoids synchronisation problems when matching an "
                     "interlaced video mode to an interlaced source",
-        formats:    FmtList,
-        libname:    NULL
+        .formats=    FmtList,
+        .libname=    NULL
     }, FILT_NULL
 };
 

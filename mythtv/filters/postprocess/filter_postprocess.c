@@ -136,11 +136,11 @@ FmtConv FmtList[] =
 const FilterInfo filter_table[] =
 {
     {
-        filter_init: &new_filter,
-        name:       (char*)"postprocess",
-        descript:   (char*)"FFMPEG's postprocessing filters",
-        formats:    FmtList,
-        libname:    NULL
+        .filter_init= &new_filter,
+        .name=       (char*)"postprocess",
+        .descript=   (char*)"FFMPEG's postprocessing filters",
+        .formats=    FmtList,
+        .libname=    NULL
     },
     FILT_NULL
 };

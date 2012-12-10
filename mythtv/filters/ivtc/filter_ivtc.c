@@ -252,11 +252,11 @@ static FmtConv FmtList[] =
 const FilterInfo filter_table[] =
 {
     {
-        filter_init: &NewIvtcFilter,
-        name:       (char*)"ivtc",
-        descript:   (char*)"inverse telecine filter",
-        formats:    FmtList,
-        libname:    NULL
+        .filter_init= &NewIvtcFilter,
+        .name=       (char*)"ivtc",
+        .descript=   (char*)"inverse telecine filter",
+        .formats=    FmtList,
+        .libname=    NULL
     },
     FILT_NULL
 };

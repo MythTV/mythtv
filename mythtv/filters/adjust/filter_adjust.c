@@ -22,11 +22,11 @@
 #include "ffmpeg-mmx.h"
 
 static const mmx_t mm_cpool[] = {
-    { w: {1, 1, 1, 1} },
-    { ub: {36, 36, 36, 36, 36, 36, 36, 36} },
-    { ub: {20, 20, 20, 20, 20, 20, 20, 20} },
-    { ub: {31, 31, 31, 31, 31, 31, 31, 31} },
-    { ub: {15, 15, 15, 15, 15, 15, 15, 15} }
+    { .w = {1, 1, 1, 1} },
+    { .ub= {36, 36, 36, 36, 36, 36, 36, 36} },
+    { .ub= {20, 20, 20, 20, 20, 20, 20, 20} },
+    { .ub= {31, 31, 31, 31, 31, 31, 31, 31} },
+    { .ub= {15, 15, 15, 15, 15, 15, 15, 15} }
 };
     
 #endif /* HAVE_MMX */
@@ -315,11 +315,11 @@ static FmtConv FmtList[] =
 const FilterInfo filter_table[] =
 {
     {
-        filter_init: &newAdjustFilter,
-        name:       (char*)"adjust",
-        descript:   (char*)"adjust range and gamma of video",
-        formats:    FmtList,
-        libname:    NULL
+        .filter_init= &newAdjustFilter,
+        .name=       (char*)"adjust",
+        .descript=   (char*)"adjust range and gamma of video",
+        .formats=    FmtList,
+        .libname=    NULL
     },
     FILT_NULL
 };

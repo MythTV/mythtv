@@ -143,11 +143,11 @@ static FmtConv FmtList[] =
 const FilterInfo filter_table[] =
 {
     {
-        filter_init: &new_filter,
-        name:       (char*)"vflip",
-        descript:   (char*)"flips the video image vertically",
-        formats:    FmtList,
-        libname:    NULL
+        .filter_init= &new_filter,
+        .name=       (char*)"vflip",
+        .descript=   (char*)"flips the video image vertically",
+        .formats=    FmtList,
+        .libname=    NULL
     },
     FILT_NULL
 };

@@ -276,18 +276,18 @@ static FmtConv FmtList[] =
 const FilterInfo filter_table[] =
 {
     {
-            filter_init: &GreedyHDeintFilter,
-            name:       (char*)"greedyhdeint",
-            descript:   (char*)"combines data from several fields to deinterlace with less motion blur",
-            formats:    FmtList,
-            libname:    NULL
+            .filter_init= &GreedyHDeintFilter,
+            .name=       (char*)"greedyhdeint",
+            .descript=   (char*)"combines data from several fields to deinterlace with less motion blur",
+            .formats=    FmtList,
+            .libname=    NULL
     },
     {
-            filter_init: &GreedyHDeintFilter,
-            name:       (char*)"greedyhdoubleprocessdeint",
-            descript:   (char*)"combines data from several fields to deinterlace with less motion blur",
-            formats:    FmtList,
-            libname:    NULL
+            .filter_init= &GreedyHDeintFilter,
+            .name=       (char*)"greedyhdoubleprocessdeint",
+            .descript=   (char*)"combines data from several fields to deinterlace with less motion blur",
+            .formats=    FmtList,
+            .libname=    NULL
     },FILT_NULL
 };
 

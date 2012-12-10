@@ -723,22 +723,22 @@ static FmtConv FmtList[] =
 const FilterInfo filter_table[] =
 {
     {
-            filter_init: &YadifDeintFilter,
-            name:       (char*)"yadifdeint",
-            descript:   (char*)
+            .filter_init= &YadifDeintFilter,
+            .name=       (char*)"yadifdeint",
+            .descript=   (char*)
             "combines data from several fields to "
             "deinterlace with less motion blur",
-            formats:    FmtList,
-            libname:    NULL
+            .formats=    FmtList,
+            .libname=    NULL
     },
     {
-            filter_init: &YadifDeintFilter,
-            name:       (char*)"yadifdoubleprocessdeint",
-            descript:   (char*)
+            .filter_init= &YadifDeintFilter,
+            .name=       (char*)"yadifdoubleprocessdeint",
+            .descript=   (char*)
             "combines data from several fields to "
             "deinterlace with less motion blur",
-            formats:    FmtList,
-            libname:    NULL
+            .formats=    FmtList,
+            .libname=    NULL
     },
     FILT_NULL
 };

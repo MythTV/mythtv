@@ -27,9 +27,9 @@
 #if HAVE_MMX
 #include "ffmpeg-mmx.h"
 #define THRESHOLD 12
-static const mmx_t mm_lthr = { w:{ -THRESHOLD, -THRESHOLD,
+static const mmx_t mm_lthr = { .w={ -THRESHOLD, -THRESHOLD,
                                    -THRESHOLD, -THRESHOLD} };
-static const mmx_t mm_hthr = { w:{ THRESHOLD - 1, THRESHOLD - 1,
+static const mmx_t mm_hthr = { .w={ THRESHOLD - 1, THRESHOLD - 1,
                                    THRESHOLD - 1, THRESHOLD - 1} };
 static const mmx_t mm_cpool[] = { { 0x0000000000000000LL }, };
 #else
@@ -664,20 +664,20 @@ static FmtConv FmtList[] =
 const FilterInfo filter_table[] =
 {
     {
-        filter_init: &NewKernelDeintFilter,
-        name:       (char*)"kerneldeint",
-        descript:   (char*)"combines data from several fields to deinterlace "
+        .filter_init= &NewKernelDeintFilter,
+        .name=       (char*)"kerneldeint",
+        .descript=   (char*)"combines data from several fields to deinterlace "
                     "with less motion blur",
-        formats:    FmtList,
-        libname:    NULL
+        .formats=    FmtList,
+        .libname=    NULL
     },
     {
-        filter_init: &NewKernelDeintFilter,
-        name:       (char*)"kerneldoubleprocessdeint",
-        descript:   (char*)"combines data from several fields to deinterlace "
+        .filter_init= &NewKernelDeintFilter,
+        .name=       (char*)"kerneldoubleprocessdeint",
+        .descript=   (char*)"combines data from several fields to deinterlace "
                     "with less motion blur",
-        formats:    FmtList,
-        libname:    NULL
+        .formats=    FmtList,
+        .libname=    NULL
     },
     FILT_NULL
 };

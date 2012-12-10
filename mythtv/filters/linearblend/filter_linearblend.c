@@ -378,11 +378,11 @@ static FmtConv FmtList[] =
 const FilterInfo filter_table[] =
 {
     {
-        filter_init: &new_filter,
-        name:       (char*)"linearblend",
-        descript:   (char*)"fast blending deinterlace filter",
-        formats:    FmtList,
-        libname:    NULL
+        .filter_init= &new_filter,
+        .name=       (char*)"linearblend",
+        .descript=   (char*)"fast blending deinterlace filter",
+        .formats=    FmtList,
+        .libname=    NULL
     },
     FILT_NULL
 };

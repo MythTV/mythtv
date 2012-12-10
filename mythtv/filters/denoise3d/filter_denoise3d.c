@@ -474,12 +474,12 @@ static FmtConv FmtList[] =
 const FilterInfo filter_table[] =
 {
     {
-        filter_init: &NewDenoise3DFilter,
-        name:       (char*)"denoise3d",
-        descript:   (char*)
+        .filter_init= &NewDenoise3DFilter,
+        .name=       (char*)"denoise3d",
+        .descript=   (char*)
         "removes noise with a spatial and temporal low-pass filter",
-        formats:    FmtList,
-        libname:    NULL
+        .formats=    FmtList,
+        .libname=    NULL
     },
     FILT_NULL
 };

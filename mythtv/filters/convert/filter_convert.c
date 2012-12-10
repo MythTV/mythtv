@@ -159,11 +159,11 @@ static FmtConv FmtList[] =
 FilterInfo filter_table[] = 
 {
     {
-        filter_init: &newConvertFilter,
-        name:       "convert",
-        descript:   "converts between various video types",
-        formats:    FmtList,
-        libname:    NULL
+        .filter_init= &newConvertFilter,
+        .name=       "convert",
+        .descript=   "converts between various video types",
+        .formats=    FmtList,
+        .libname=    NULL
     },
     FILT_NULL
 };

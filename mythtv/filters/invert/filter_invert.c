@@ -79,11 +79,11 @@ static FmtConv FmtList[] =
 const FilterInfo filter_table[] =
 {
     {
-        filter_init: &new_filter,
-        name:       (char*)"invert",
-        descript:   (char*)"inverts the colors of the input video",
-        formats:    FmtList,
-        libname:    NULL
+        .filter_init= &new_filter,
+        .name=       (char*)"invert",
+        .descript=   (char*)"inverts the colors of the input video",
+        .formats=    FmtList,
+        .libname=    NULL
     },
     FILT_NULL
 };
