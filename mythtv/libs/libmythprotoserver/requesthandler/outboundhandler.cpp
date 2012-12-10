@@ -1,6 +1,3 @@
-
-using namespace std;
-
 #include <QTimer>
 #include <QString>
 #include <QStringList>

@@ -1,6 +1,3 @@
-
-using namespace std;
-
 #include <QFileInfo>
 #include <QMutexLocker>
 

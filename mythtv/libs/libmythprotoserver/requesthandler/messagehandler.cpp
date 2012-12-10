@@ -1,6 +1,3 @@
-
-using namespace std;
-
 #include "mythcorecontext.h"
 #include "mythevent.h"
 

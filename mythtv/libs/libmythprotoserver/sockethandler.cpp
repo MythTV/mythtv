@@ -1,6 +1,3 @@
-
-using namespace std;
-
 #include <QStringList>
 
 #include "sockethandler.h"

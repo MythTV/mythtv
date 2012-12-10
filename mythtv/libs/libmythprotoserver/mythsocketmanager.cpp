@@ -1,5 +1,3 @@
-using namespace std;
-
 // Qt
 #include <QMutex>
 #include <QReadWriteLock>

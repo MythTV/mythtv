@@ -1,8 +1,6 @@
 #ifndef _MYTHSOCKETMANAGER_H_
 #define _MYTHSOCKETMANAGER_H_
 
-using namespace std;
-
 // Qt
 #include <QMap>
 #include <QSet>
