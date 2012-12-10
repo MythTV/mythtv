@@ -4753,6 +4753,10 @@ elif enabled clangxx; then
     # The constant-logical-operand only gives use false positives
     # for constant logical operands meant to be optimized away.
     check_cxxflags -Wno-constant-logical-operand
+    # Unfortunately clang's unused-value warning is smart enough to notice
+    # that ZMQ_ASSERT expressions don't use the values unless it is a debug
+    # build. So lets rely on other compilers to report on unused values.
+    check_cxxflags -Wno-unused-value
     # clang complains about every unused -I unless you pass it this.
     check_cxxflags -Qunused-arguments
 fi
