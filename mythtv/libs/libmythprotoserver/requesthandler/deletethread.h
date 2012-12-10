@@ -5,9 +5,6 @@
 #include <stdint.h>
 #include <unistd.h>
 
-// C++ headers
-using namespace std;
-
 // Qt headers
 #include <QMutex>
 #include <QTimer>

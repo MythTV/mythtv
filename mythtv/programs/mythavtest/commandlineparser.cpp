@@ -1,6 +1,3 @@
-
-using namespace std;
-
 #include <QString>
 
 #include "mythcorecontext.h"
