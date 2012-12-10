@@ -2834,6 +2834,14 @@ elif $cxx --version 2>/dev/null | grep -q Intel; then
     speed_cxxflags='-O3'
     size_cxxflags='-Os'
     noopt_cxxflags='-O1'
+elif $cxx --version 2>/dev/null | grep -q clang; then
+    cxx_type=clangxx
+    gxx_version="AV_STRINGIFY(__CLANG_COMPILER)"
+    cxx_ident=$($cxx --version | head -n1)
+    clangxx_version=$($cxx -dumpversion)
+    speed_cxxflags='-O3'
+    size_cxxflags='-Os'
+    noopt_cxxflags='-O1'
 fi
 
 test -n "$cxx_type" && enable $cxx_type ||
@@ -4738,6 +4746,11 @@ elif enabled icpc; then
     # 913: ignoring invalid multibyte character sequence,
     #      icpc and g++ do the right thing for char 0x80-0xFF
     check_cxxflags -wd177,192,592,913
+elif enabled clangxx; then
+    # The self assign warning triggers on headers that use x=x;
+    # to suppress warnings about unused parameters.
+    check_cxxflags -Wno-self-assign
+    check_cxxflags -Qunused-arguments
 fi
 
 # Check for python dependencies
