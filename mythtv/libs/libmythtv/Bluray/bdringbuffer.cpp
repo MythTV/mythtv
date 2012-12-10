@@ -499,7 +499,7 @@ uint32_t BDRingBuffer::GetCurrentChapter(void)
 
 uint64_t BDRingBuffer::GetChapterStartTime(uint32_t chapter)
 {
-    if (chapter < 0 || chapter >= GetNumChapters())
+    if (chapter >= GetNumChapters())
         return 0;
     QMutexLocker locker(&m_infoLock);
     return (uint64_t)((long double)m_currentTitleInfo->chapters[chapter].start /
@@ -508,7 +508,7 @@ uint64_t BDRingBuffer::GetChapterStartTime(uint32_t chapter)
 
 uint64_t BDRingBuffer::GetChapterStartFrame(uint32_t chapter)
 {
-    if (chapter < 0 || chapter >= GetNumChapters())
+    if (chapter >= GetNumChapters())
         return 0;
     QMutexLocker locker(&m_infoLock);
     return (uint64_t)((long double)(m_currentTitleInfo->chapters[chapter].start *

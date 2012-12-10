@@ -70,7 +70,7 @@ DVBChannel::DVBChannel(const QString &aDevice, TVRec *parent)
       frontend_name(QString::null),
       // Tuning
       tune_lock(),                  hw_lock(QMutex::Recursive),
-      last_lnb_dev_id(-1),
+      last_lnb_dev_id(~0x0),
       tuning_delay(0),              sigmon_delay(25),
       first_tune(true),
       // Misc
