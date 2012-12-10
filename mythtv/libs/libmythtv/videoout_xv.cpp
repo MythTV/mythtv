@@ -576,7 +576,7 @@ static bool has_format(XvImageFormatValues *formats, int format_cnt, int id)
 {
     for (int i = 0; i < format_cnt; i++)
     {
-        if ((formats[i].id == id))
+        if (formats[i].id == id)
             return true;
     }
 
