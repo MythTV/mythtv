@@ -13,7 +13,7 @@
 class MythUIButtonList;
 class MythUIButton;
 
-struct DatabaseParams;
+class DatabaseParams;
 
 // TODO: The following do not belong here, but I cannot think of a better
 //       location at this moment in time
