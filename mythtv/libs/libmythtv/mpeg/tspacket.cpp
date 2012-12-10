@@ -37,17 +37,20 @@ const TSPacket *TSPacket::kNullPacket =
 QString TSPacket::toString() const
 {
     QString str;
-    str.append("TSPacket @0x%1  ").arg((intptr_t)(&data()[0]),0,16);
-    str.append("raw: 0x%1 0x%2 0x%3 0x%4\n")
-        .arg(int(data()[0]),0,16).arg(int(data()[1]),0,16)
-        .arg(int(data()[2]),0,16).arg(int(data()[3]),0,16);
-    str.append("                 inSync: %1\n").arg(HasSync());
-    str.append("         transportError: %1\n").arg(TransportError());
-    str.append("           payloadStart: %1\n").arg(PayloadStart());
-    str.append("               priority: %1\n").arg(Priority());
-    str.append("                    pid: %1\n").arg(PID());
-    str.append("       scrambled (if>1): %1\n").arg(ScramblingControl());
-    str.append(" adaptationFieldControl: %1\n").arg(AdaptationFieldControl());
-    str.append("      continuityCounter: %1\n").arg(ContinuityCounter());
+    str.append(QString("TSPacket @0x%1  ").arg((intptr_t)(&data()[0]),0,16));
+    str.append(QString("raw: 0x%1 0x%2 0x%3 0x%4\n")
+               .arg(int(data()[0]),0,16).arg(int(data()[1]),0,16)
+               .arg(int(data()[2]),0,16).arg(int(data()[3]),0,16));
+    str.append(QString("                 inSync: %1\n").arg(HasSync()));
+    str.append(QString("         transportError: %1\n").arg(TransportError()));
+    str.append(QString("           payloadStart: %1\n").arg(PayloadStart()));
+    str.append(QString("               priority: %1\n").arg(Priority()));
+    str.append(QString("                    pid: %1\n").arg(PID()));
+    str.append(QString("       scrambled (if>1): %1\n")
+               .arg(ScramblingControl()));
+    str.append(QString(" adaptationFieldControl: %1\n")
+               .arg(AdaptationFieldControl()));
+    str.append(QString("      continuityCounter: %1\n")
+               .arg(ContinuityCounter()));
     return str;
 }

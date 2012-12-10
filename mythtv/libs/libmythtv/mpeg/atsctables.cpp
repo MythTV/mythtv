@@ -205,7 +205,7 @@ QString VirtualChannelTable::toString(void) const
     if (TableID::CVCT == TableID())
     {
         uint sctemapid = (pesdata()[3]<<8) | pesdata()[4];
-        str.append(" mapid(0x%1)").arg(sctemapid,0,16);
+        str.append(QString(" mapid(0x%1)").arg(sctemapid,0,16));
     }
 
     str.append("\n");
