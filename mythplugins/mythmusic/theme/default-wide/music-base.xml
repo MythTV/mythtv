@@ -830,6 +830,13 @@
             <fill color="#000000" alpha="50" />
         </shape>
 
+        <textarea name="notracks" from="basetextarea">
+            <area>40,25,1200,190</area>
+            <multiline>yes</multiline>
+            <align>allcenter</align>
+            <value>You haven't selected any tracks to play</value>
+        </textarea>
+
         <buttonlist name="currentplaylist" from="basebuttonlist2">
             <area>30,15,1220,210</area>
             <spacing>0</spacing>
