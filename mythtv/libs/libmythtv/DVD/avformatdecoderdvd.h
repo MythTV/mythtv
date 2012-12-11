@@ -17,6 +17,7 @@ class AvFormatDecoderDVD : public AvFormatDecoder
     virtual void StreamChangeCheck(void);
     virtual void PostProcessTracks(void);
     virtual int GetAudioLanguage(uint audio_index, uint stream_index);
+    virtual AudioTrackType GetAudioTrackType(uint stream_index);
 
     long long DVDFindPosition(long long desiredFrame);
 };

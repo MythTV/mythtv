@@ -2343,11 +2343,7 @@ AudioTrackType AvFormatDecoder::GetAudioTrackType(uint stream_index)
     AudioTrackType type = kAudioTypeNormal;
     AVStream *stream = ic->streams[stream_index];
 
-    if (ringBuffer && ringBuffer->IsDVD()) // DVD
-    {
-        type = (AudioTrackType)(ringBuffer->DVD()->GetAudioTrackType(stream->id));
-    }
-    else if (ic->cur_pmt_sect) // mpeg-ts
+    if (ic->cur_pmt_sect) // mpeg-ts
     {
         const PESPacket pes = PESPacket::ViewData(ic->cur_pmt_sect);
         const PSIPTable psip(pes);
