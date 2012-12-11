@@ -371,8 +371,6 @@ class PlaybackBox : public ScheduleCommon
     int                 m_watchListMaxAge;
     /// adjust exclusion of a title from the Watch List after a delete
     int                 m_watchListBlackOut;
-    /// contains "DispRecGroupAsAllProg" setting
-    bool                m_groupnameAsAllProg;
     /// allOrder controls the ordering of the "All Programs" list
     int                 m_allOrder;
     /// listOrder controls the ordering of the recordings in the list

@@ -385,7 +385,6 @@ PlaybackBox::PlaybackBox(MythScreenStack *parent, QString name, BoxType ltype,
       m_type(ltype),
       m_watchListAutoExpire(false),
       m_watchListMaxAge(60),              m_watchListBlackOut(2),
-      m_groupnameAsAllProg(false),
       m_listOrder(1),
       // Recording Group settings
       m_groupDisplayName(ProgramInfo::i18n("All Programs")),
@@ -426,7 +425,6 @@ PlaybackBox::PlaybackBox(MythScreenStack *parent, QString name, BoxType ltype,
     m_watchListAutoExpire= gCoreContext->GetNumSetting("PlaybackWLAutoExpire", 0);
     m_watchListMaxAge    = gCoreContext->GetNumSetting("PlaybackWLMaxAge", 60);
     m_watchListBlackOut  = gCoreContext->GetNumSetting("PlaybackWLBlackOut", 2);
-    m_groupnameAsAllProg = gCoreContext->GetNumSetting("DispRecGroupAsAllProg", 0);
 
     bool displayCat  = gCoreContext->GetNumSetting("DisplayRecGroupIsCategory", 0);
 
@@ -472,8 +470,7 @@ PlaybackBox::PlaybackBox(MythScreenStack *parent, QString name, BoxType ltype,
     m_recGroupIdx = -1;
     m_recGroupType.clear();
     m_recGroupType[m_recGroup] = (displayCat) ? "category" : "recgroup";
-    if (m_groupnameAsAllProg)
-        m_groupDisplayName = ProgramInfo::i18n(m_recGroup);
+    m_groupDisplayName = ProgramInfo::i18n(m_recGroup);
 
     fillRecGroupPasswordCache();
 
@@ -639,21 +636,11 @@ void PlaybackBox::updateGroupInfo(const QString &groupname,
     InfoMap infoMap;
     int countInGroup;
 
-    if (groupname.isEmpty())
-    {
-        countInGroup = m_progLists[""].size();
-        infoMap["title"] = m_groupDisplayName;
-        infoMap["group"] = m_groupDisplayName;
-        infoMap["show"]  = ProgramInfo::i18n("All Programs");
-    }
-    else
-    {
-        countInGroup = m_progLists[groupname].size();
-        infoMap["title"] = QString("%1 - %2").arg(m_groupDisplayName)
-                                             .arg(grouplabel);
-        infoMap["group"] = m_groupDisplayName;
-        infoMap["show"]  = grouplabel;
-    }
+    infoMap["group"] = m_groupDisplayName;
+    infoMap["title"] = grouplabel;
+    infoMap["show"] =
+        groupname.isEmpty() ? ProgramInfo::i18n("All Programs") : grouplabel;
+    countInGroup = m_progLists[groupname].size();
 
     if (m_artImage[kArtworkFanart])
     {
@@ -841,6 +828,7 @@ void PlaybackBox::UpdateUIListItem(MythUIButtonListItem *item,
         InfoMap infoMap;
 
         pginfo->ToMap(infoMap);
+        infoMap["group"] = m_groupDisplayName;
         ResetMap(m_currentMap);
         SetTextFromMap(infoMap);
         m_currentMap = infoMap;
@@ -1349,7 +1337,7 @@ void PlaybackBox::UpdateUIGroupList(const QStringList &groupPreferences)
 
             QString displayName = groupname;
             if (displayName.isEmpty())
-                displayName = m_groupDisplayName;
+                displayName = ProgramInfo::i18n("All Programs");
 
             item->SetText(displayName, "name");
             item->SetText(displayName);
@@ -4493,8 +4481,7 @@ void PlaybackBox::setGroupFilter(const QString &recGroup)
 
     m_recGroup = newRecGroup;
 
-    if (m_groupnameAsAllProg)
-        m_groupDisplayName = ProgramInfo::i18n(m_recGroup);
+    m_groupDisplayName = ProgramInfo::i18n(m_recGroup);
 
     // Since the group filter is changing, the current position in the lists
     // is meaningless -- so reset the lists so the position won't be saved.

@@ -130,17 +130,6 @@ static HostCheckBox *RememberRecGroup()
     return gc;
 }
 
-static HostCheckBox *UseGroupNameAsAllPrograms()
-{
-    HostCheckBox *gc = new HostCheckBox("DispRecGroupAsAllProg");
-    gc->setLabel(QObject::tr("Show filter name instead of \"All Programs\""));
-    gc->setValue(false);
-    gc->setHelpText(QObject::tr("If enabled, use the name of the display "
-                    "filter currently applied in place of the term \"All "
-                    "Programs\" in the playback screen."));
-    return gc;
-}
-
 static HostCheckBox *PBBStartInTitle()
 {
     HostCheckBox *gc = new HostCheckBox("PlaybackBoxStartInTitle");
@@ -3285,7 +3274,6 @@ PlaybackSettings::PlaybackSettings()
     pbox2->addChild(DisplayRecGroup());
     pbox2->addChild(QueryInitialFilter());
     pbox2->addChild(RememberRecGroup());
-    pbox2->addChild(UseGroupNameAsAllPrograms());
     addChild(pbox2);
 
     VerticalConfigurationGroup* pbox3 = new VerticalConfigurationGroup(false);
