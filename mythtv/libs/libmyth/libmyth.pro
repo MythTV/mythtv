@@ -87,12 +87,14 @@ LIBS += -L../libmythservicecontracts -lmythservicecontracts-$${LIBVERSION}
 LIBS += -L../../external/FFmpeg/libavcodec -lmythavcodec
 LIBS += -L../../external/FFmpeg/libavutil  -lmythavutil
 LIBS += -L../../external/FFmpeg/libavformat  -lmythavformat
+LIBS += -L../../external/FFmpeg/libswresample -lmythswresample
 
 POST_TARGETDEPS += ../libmythsamplerate/libmythsamplerate-$${MYTH_LIB_EXT}
 POST_TARGETDEPS += ../libmythsoundtouch/libmythsoundtouch-$${MYTH_LIB_EXT}
 POST_TARGETDEPS += ../libmythfreesurround/libmythfreesurround-$${MYTH_LIB_EXT}
 POST_TARGETDEPS += ../../external/FFmpeg/libavcodec/$$avLibName(avcodec)
 POST_TARGETDEPS += ../../external/FFmpeg/libavutil/$$avLibName(avutil)
+POST_TARGETDEPS += ../../external/FFmpeg/libswresample/$$avLibName(swresample)
 
 # Install headers so that plugins can compile independently
 inc.path = $${PREFIX}/include/mythtv/
@@ -100,7 +102,7 @@ inc.files  = dialogbox.h mythcontext.h
 inc.files += mythwidgets.h remotefile.h oldsettings.h volumecontrol.h
 inc.files += settings.h uitypes.h mythdialogs.h
 inc.files += audio/audiooutput.h audio/audiosettings.h
-inc.files += audio/audiooutputsettings.h
+inc.files += audio/audiooutputsettings.h audio/audiooutpututil.h
 inc.files += audio/volumebase.h audio/eldutils.h
 inc.files += inetcomms.h mythwizard.h schemawizard.h
 inc.files += mythmediamonitor.h

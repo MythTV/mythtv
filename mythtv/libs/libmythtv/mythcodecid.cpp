@@ -96,47 +96,47 @@ QString toString(MythCodecID codecid)
 int myth2av_codecid(MythCodecID codec_id, bool &vdpau)
 {
     vdpau = false;
-    CodecID ret = CODEC_ID_NONE;
+    CodecID ret = AV_CODEC_ID_NONE;
     switch (codec_id)
     {
         case kCodec_NONE:
         case kCodec_NUV_MPEG4:
         case kCodec_NUV_RTjpeg:
-            ret = CODEC_ID_NONE;
+            ret = AV_CODEC_ID_NONE;
             break;
 
         case kCodec_MPEG1:
-            ret = CODEC_ID_MPEG1VIDEO;
+            ret = AV_CODEC_ID_MPEG1VIDEO;
             break;
         case kCodec_MPEG2:
-            ret = CODEC_ID_MPEG2VIDEO;
+            ret = AV_CODEC_ID_MPEG2VIDEO;
             break;
         case kCodec_H263:
-            ret = CODEC_ID_H263;
+            ret = AV_CODEC_ID_H263;
             break;
         case kCodec_MPEG4:
-            ret = CODEC_ID_MPEG4;
+            ret = AV_CODEC_ID_MPEG4;
             break;
         case kCodec_H264:
-            ret = CODEC_ID_H264;
+            ret = AV_CODEC_ID_H264;
             break;
         case kCodec_VP8:
-            ret = CODEC_ID_VP8;
+            ret = AV_CODEC_ID_VP8;
             break;
 
         case kCodec_VC1:
-            ret = CODEC_ID_VC1;
+            ret = AV_CODEC_ID_VC1;
             break;
         case kCodec_WMV3:
-            ret = CODEC_ID_WMV3;
+            ret = AV_CODEC_ID_WMV3;
             break;
 
         case kCodec_MPEG1_VDPAU:
-            ret = CODEC_ID_MPEG1VIDEO;
+            ret = AV_CODEC_ID_MPEG1VIDEO;
             vdpau = true;
             break;
         case kCodec_MPEG2_VDPAU:
-            ret = CODEC_ID_MPEG2VIDEO;
+            ret = AV_CODEC_ID_MPEG2VIDEO;
             vdpau = true;
             break;
         case kCodec_H263_VDPAU:
@@ -144,73 +144,73 @@ int myth2av_codecid(MythCodecID codec_id, bool &vdpau)
                 "Error: VDPAU H.263 not supported by ffmpeg");
             break;
         case kCodec_MPEG4_VDPAU:
-            ret = CODEC_ID_MPEG4;
+            ret = AV_CODEC_ID_MPEG4;
             break;
 
         case kCodec_H264_VDPAU:
-            ret = CODEC_ID_H264;
+            ret = AV_CODEC_ID_H264;
             vdpau = true;
             break;
         case kCodec_VC1_VDPAU:
-            ret = CODEC_ID_VC1;
+            ret = AV_CODEC_ID_VC1;
             vdpau = true;
             break;
         case kCodec_WMV3_VDPAU:
-            ret = CODEC_ID_WMV3;
+            ret = AV_CODEC_ID_WMV3;
             vdpau = true;
             break;
         case kCodec_VP8_VDPAU:
-            ret = CODEC_ID_VP8;
+            ret = AV_CODEC_ID_VP8;
             break;
 
         case kCodec_MPEG1_VAAPI:
-            ret = CODEC_ID_MPEG1VIDEO;
+            ret = AV_CODEC_ID_MPEG1VIDEO;
             break;
         case kCodec_MPEG2_VAAPI:
-            ret = CODEC_ID_MPEG2VIDEO;
+            ret = AV_CODEC_ID_MPEG2VIDEO;
             break;
         case kCodec_H263_VAAPI:
-            ret = CODEC_ID_H263;
+            ret = AV_CODEC_ID_H263;
             break;
         case kCodec_MPEG4_VAAPI:
-            ret = CODEC_ID_MPEG4;
+            ret = AV_CODEC_ID_MPEG4;
             break;
         case kCodec_H264_VAAPI:
-            ret = CODEC_ID_H264;
+            ret = AV_CODEC_ID_H264;
             break;
         case kCodec_VC1_VAAPI:
-            ret = CODEC_ID_VC1;
+            ret = AV_CODEC_ID_VC1;
             break;
         case kCodec_WMV3_VAAPI:
-            ret = CODEC_ID_WMV3;
+            ret = AV_CODEC_ID_WMV3;
             break;
         case kCodec_VP8_VAAPI:
-            ret = CODEC_ID_VP8;
+            ret = AV_CODEC_ID_VP8;
             break;
 
         case kCodec_MPEG1_DXVA2:
-            ret = CODEC_ID_MPEG1VIDEO;
+            ret = AV_CODEC_ID_MPEG1VIDEO;
             break;
         case kCodec_MPEG2_DXVA2:
-            ret = CODEC_ID_MPEG2VIDEO;
+            ret = AV_CODEC_ID_MPEG2VIDEO;
             break;
         case kCodec_H263_DXVA2:
-            ret = CODEC_ID_H263;
+            ret = AV_CODEC_ID_H263;
             break;
         case kCodec_MPEG4_DXVA2:
-            ret = CODEC_ID_MPEG4;
+            ret = AV_CODEC_ID_MPEG4;
             break;
         case kCodec_H264_DXVA2:
-            ret = CODEC_ID_H264;
+            ret = AV_CODEC_ID_H264;
             break;
         case kCodec_VC1_DXVA2:
-            ret = CODEC_ID_VC1;
+            ret = AV_CODEC_ID_VC1;
             break;
         case kCodec_WMV3_DXVA2:
-            ret = CODEC_ID_WMV3;
+            ret = AV_CODEC_ID_WMV3;
             break;
         case kCodec_VP8_DXVA2:
-            ret = CODEC_ID_VP8;
+            ret = AV_CODEC_ID_VP8;
             break;
 
         default:
@@ -226,21 +226,21 @@ int mpeg_version(int codec_id)
 {
     switch (codec_id)
     {
-        case CODEC_ID_MPEG1VIDEO:
+        case AV_CODEC_ID_MPEG1VIDEO:
             return 1;
-        case CODEC_ID_MPEG2VIDEO:
+        case AV_CODEC_ID_MPEG2VIDEO:
             return 2;
-        case CODEC_ID_H263:
+        case AV_CODEC_ID_H263:
             return 3;
-        case CODEC_ID_MPEG4:
+        case AV_CODEC_ID_MPEG4:
             return 4;
-        case CODEC_ID_H264:
+        case AV_CODEC_ID_H264:
             return 5;
-        case CODEC_ID_VC1:
+        case AV_CODEC_ID_VC1:
             return 6;
-        case CODEC_ID_WMV3:
+        case AV_CODEC_ID_WMV3:
             return 7;
-        case CODEC_ID_VP8:
+        case AV_CODEC_ID_VP8:
             return 8;
         default:
             break;

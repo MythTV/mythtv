@@ -9,6 +9,7 @@
 #include "serverpool.h"
 
 #include "audiooutput.h"
+#include "audiooutpututil.h"
 
 #include "mythraopdevice.h"
 #include "mythraopconnection.h"
@@ -615,33 +616,28 @@ uint32_t MythRAOPConnection::decodeAudioPacket(uint8_t type,
     tmp_pkt.size = len;
 
     uint32_t frames_added = 0;
+    uint8_t *samples = (uint8_t *)av_mallocz(AVCODEC_MAX_AUDIO_FRAME_SIZE);
     while (tmp_pkt.size > 0)
     {
-        uint8_t *samples = (uint8_t *)av_mallocz(AVCODEC_MAX_AUDIO_FRAME_SIZE);
-        AVFrame frame;
-        int got_frame = 0;
-
-        int ret = avcodec_decode_audio4(ctx, &frame, &got_frame, &tmp_pkt);
-
+        int data_size;
+        int ret = AudioOutputUtil::DecodeAudio(ctx, samples,
+                                               data_size, &tmp_pkt);
         if (ret < 0)
         {
             av_free(samples);
             return -1;
         }
 
-        if (got_frame)
+        if (data_size)
         {
-            // ALAC codec isn't planar
-            int data_size = av_samples_get_buffer_size(NULL, ctx->channels,
-                                                       frame.nb_samples,
-                                                       ctx->sample_fmt, 1);
-            memcpy(samples, frame.extended_data[0], data_size);
+            int num_samples = data_size /
+	      (ctx->channels * av_get_bytes_per_sample(ctx->sample_fmt));
 
-            frames_added += frame.nb_samples;
+            frames_added += num_samples;
             AudioData block;
             block.data    = samples;
             block.length  = data_size;
-            block.frames  = frame.nb_samples;
+            block.frames  = num_samples;
             dest->append(block);
         }
         tmp_pkt.data += ret;

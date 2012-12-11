@@ -585,12 +585,12 @@ void MPEG2fixup::InitReplex()
         strncpy(rx.extframe[i].language, lang, 4);
         switch(GetStreamType(it.key()))
         {
-            case CODEC_ID_MP2:
-            case CODEC_ID_MP3:
+            case AV_CODEC_ID_MP2:
+            case AV_CODEC_ID_MP3:
                 rx.exttype[i] = 2;
                 rx.exttypcnt[i] = mp2_count++;
                 break;
-            case CODEC_ID_AC3:
+            case AV_CODEC_ID_AC3:
                 rx.exttype[i] = 1;
                 rx.exttypcnt[i] = ac3_count++;
                 break;
@@ -642,9 +642,9 @@ int MPEG2fixup::AddFrame(MPEG2frame *f)
         iu.frame_off = f->framePos - f->pkt.data;
         iu.dts = f->pkt.dts * 300;
     }
-    else if (GetStreamType(id) == CODEC_ID_MP2 ||
-             GetStreamType(id) == CODEC_ID_MP3 ||
-             GetStreamType(id) == CODEC_ID_AC3)
+    else if (GetStreamType(id) == AV_CODEC_ID_MP2 ||
+             GetStreamType(id) == AV_CODEC_ID_MP3 ||
+             GetStreamType(id) == AV_CODEC_ID_AC3)
     {
         rb = &rx.extrbuf[aud_map[id]];
         rbi = &rx.index_extrbuf[aud_map[id]];
@@ -783,9 +783,9 @@ bool MPEG2fixup::InitAV(QString inputfile, const char *type, int64_t offset)
                         QString("Skipping invalid audio stream: %1").arg(i));
                     break;
                 }
-                if (inputFC->streams[i]->codec->codec_id == CODEC_ID_AC3 ||
-                    inputFC->streams[i]->codec->codec_id == CODEC_ID_MP3 ||
-                    inputFC->streams[i]->codec->codec_id == CODEC_ID_MP2)
+                if (inputFC->streams[i]->codec->codec_id == AV_CODEC_ID_AC3 ||
+                    inputFC->streams[i]->codec->codec_id == AV_CODEC_ID_MP3 ||
+                    inputFC->streams[i]->codec->codec_id == AV_CODEC_ID_MP2)
                 {
                     aud_map[i] = ext_count++;
                     aFrame[i] = new FrameList();
@@ -1110,7 +1110,7 @@ bool MPEG2fixup::BuildFrame(AVPacket *pkt, QString fname)
     picture->interlaced_frame = !(info->display_picture->flags &
                                   PIC_FLAG_PROGRESSIVE_FRAME);
 
-    out_codec = avcodec_find_encoder(CODEC_ID_MPEG2VIDEO);
+    out_codec = avcodec_find_encoder(AV_CODEC_ID_MPEG2VIDEO);
 
     if (!out_codec)
     {

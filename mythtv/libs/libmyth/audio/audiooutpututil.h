@@ -2,9 +2,6 @@
 #define AUDIOOUTPUTUTIL_H_
 
 #include "audiooutputsettings.h"
-extern "C" {
-#include "pink.h"
-}
 
 class MPUBLIC AudioOutputUtil
 {
@@ -19,6 +16,9 @@ class MPUBLIC AudioOutputUtil
                             void *buffer, int bytes);
     static char *GeneratePinkFrames(char *frames, int channels,
                                     int channel, int count, int bits = 16);
+    static int DecodeAudio(AVCodecContext *ctx,
+                           uint8_t *buffer, int &data_size,
+                           AVPacket *pkt);
 };
 
 #endif
