@@ -4746,6 +4746,8 @@ elif enabled icpc; then
     # 913: ignoring invalid multibyte character sequence,
     #      icpc and g++ do the right thing for char 0x80-0xFF
     check_cxxflags -wd177,192,592,913
+    # 13200: ignore EMMS instruction required, RTjpegN.cpp does the right thing
+    check_cxxflags -wd177,192,592,913,13200
 elif enabled clangxx; then
     # The self assign warning triggers on headers that use x=x;
     # to suppress warnings about unused parameters.
