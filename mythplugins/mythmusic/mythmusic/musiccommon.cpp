@@ -1544,7 +1544,11 @@ void MusicCommon::customEvent(QEvent *event)
                 Metadata *mdata = qVariantValue<Metadata*> (item->GetData());
                 if (mdata && mdata->ID() == (Metadata::IdType) trackID)
                 {
-                    m_currentPlaylist->RemoveItem(item);
+                    // work around a bug in MythUIButtonlist not updating properly after removing the last item
+                    if (m_currentPlaylist->GetCount() == 1)
+                        m_currentPlaylist->Reset();
+                    else
+                        m_currentPlaylist->RemoveItem(item);
                     break;
                 }
             }
@@ -1564,6 +1568,9 @@ void MusicCommon::customEvent(QEvent *event)
                                           m_currentTrack, &m_playlistPlayedTime);
         updatePlaylistStats();
         updateTrackInfo(gPlayer->getCurrentMetadata());
+
+        if (m_noTracksText)
+            m_noTracksText->SetVisible((gPlayer->getPlaylist()->getSongs().count() == 0));
     }
     else if (event->type() == MusicPlayerEvent::TrackAddedEvent)
     {
@@ -1608,6 +1615,9 @@ void MusicCommon::customEvent(QEvent *event)
                         item->DisplayState("default", "playstate");
                     }
                 }
+
+                if (m_noTracksText)
+                    m_noTracksText->SetVisible((gPlayer->getPlaylist()->getSongs().count() == 0));
             }
         }
 
