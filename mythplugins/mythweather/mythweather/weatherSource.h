@@ -42,7 +42,7 @@ class WeatherSource : public QObject
                               QString        program,
                               uint          &updateTimeout,
                               uint          &scriptTimeout);
-    static bool ProbeInfo(struct ScriptInfo &scriptInfo);
+    static bool ProbeInfo(ScriptInfo &scriptInfo);
 
     WeatherSource(ScriptInfo *info);
     ~WeatherSource();

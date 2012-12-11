@@ -12,7 +12,7 @@
 #include "weatherSource.h"
 
 class WeatherScreen;
-struct ScriptInfo;
+class ScriptInfo;
 typedef QMultiMap<long, const WeatherSource*> SourceMap;
 
 class SourceManager : public QObject
