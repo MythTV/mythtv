@@ -47,7 +47,7 @@
 #include "rtpenc_chain.h"
 #include "url.h"
 #include "rtpenc.h"
-#include "mpegts.h"
+#include "mpegts-mythtv.h"
 
 //#define DEBUG
 

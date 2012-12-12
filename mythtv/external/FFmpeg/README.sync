@@ -45,7 +45,9 @@ libavformat/mpegts.h
 libavformat/nuv.c  <- could be ignored, whitespace only
 libavformat/utils-mythtv.c  <- new file
 libavformat/utils.c
-libavresample/libavresample.v
+libavformat/rtpdec.c <- header change
+libavformat/rtsp.c <- header change
+libavformat/wtvdec.c <- header change
 libavutil/bswap.h
 libpostproc/Makefile
 libpostproc/postprocess.c

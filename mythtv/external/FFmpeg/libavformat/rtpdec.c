@@ -24,7 +24,7 @@
 #include "libavutil/time.h"
 #include "libavcodec/get_bits.h"
 #include "avformat.h"
-#include "mpegts.h"
+#include "mpegts-mythtv.h"
 #include "url.h"
 
 #include "network.h"
