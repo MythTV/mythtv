@@ -1818,8 +1818,6 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                     continue;
                 }
 
-                codec_is_mpeg = CODEC_IS_FFMPEG_MPEG(enc->codec_id);
-
                 // ffmpeg does not return a bitrate for several codecs and
                 // formats. Forcing it to 500000 ensures the ringbuffer does not
                 // use optimisations for low bitrate (audio and data) streams.
@@ -1835,6 +1833,15 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 if (novideo)
                     break;
 
+                // Set the default stream to the stream
+                // that is found first in the PMT
+                if (selectedTrack[kTrackTypeVideo].av_stream_index < 0)
+                    selectedTrack[kTrackTypeVideo] = si;
+                else
+                    break;
+
+                codec_is_mpeg = CODEC_IS_FFMPEG_MPEG(enc->codec_id);
+                
                 delete private_dec;
                 private_dec = NULL;
                 m_h264_parser->Reset();
@@ -1944,11 +1951,6 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                             .arg(ff_codec_type_string(enc->codec_type)));
                 }
 
-                // Set the default stream to the stream
-                // that is found first in the PMT
-                if (selectedTrack[kTrackTypeVideo].av_stream_index < 0)
-                    selectedTrack[kTrackTypeVideo] = si;
-
                 // Use a PrivateDecoder if allowed in playerFlags AND matched
                 // via the decoder name
                 if (selectedTrack[kTrackTypeVideo].av_stream_index == (int) i)
@@ -1972,7 +1974,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                     enc->thread_count = thread_count;
 
                 InitVideoCodec(ic->streams[i], enc,
-                    selectedTrack[kTrackTypeVideo].av_stream_index == (int) i);
+                    (selectedTrack[kTrackTypeVideo].av_stream_index == (int) i));
 
                 ScanATSCCaptionStreams(i);
                 UpdateATSCCaptionTracks();
