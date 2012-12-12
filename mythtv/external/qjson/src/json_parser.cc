@@ -60,7 +60,7 @@
 #line 61 "json_parser.tab.cc"
 
 
-#include "json_parser.tab.hh"
+#include "json_parser.hh"
 
 /* User implementation prologue.  */
 
