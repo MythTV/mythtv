@@ -126,7 +126,6 @@ bool VideoOutputVDPAU::InitRender(void)
     QMutexLocker locker(&m_lock);
 
     const QSize size = window.GetDisplayVisibleRect().size();
-    const QRect rect = QRect(QPoint(0,0), size);
     m_render = new MythRenderVDPAU();
 
     if (m_render && m_render->Create(size, m_win))

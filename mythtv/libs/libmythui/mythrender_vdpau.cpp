@@ -1509,14 +1509,12 @@ void MythRenderVDPAU::ChangeVideoSurfaceOwner(uint id)
 void MythRenderVDPAU::Decode(uint id, struct vdpau_render_state *render)
 {
     CHECK_VIDEO_SURFACES()
-    VdpDecoder decoder = 0;
 
     {
         CHECK_STATUS()
         LOCK_DECODE
         if (!m_decoders.contains(id))
             return;
-        decoder = m_decoders[id].m_id;
     }
 
     INIT_ST
