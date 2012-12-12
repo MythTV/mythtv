@@ -20,6 +20,8 @@
 
 #include "avcodec.h"
 #include "libavutil/bswap.h"
+#include "libavutil/internal.h"
+#include "libavutil/mem.h"
 
 static av_cold int decode_init(AVCodecContext *avctx)
 {
@@ -137,7 +139,7 @@ static av_cold int decode_close(AVCodecContext *avctx)
 AVCodec ff_v210x_decoder = {
     .name           = "v210x",
     .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = CODEC_ID_V210X,
+    .id             = AV_CODEC_ID_V210X,
     .init           = decode_init,
     .close          = decode_close,
     .decode         = decode_frame,

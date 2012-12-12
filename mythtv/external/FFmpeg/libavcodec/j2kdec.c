@@ -217,6 +217,10 @@ static int get_siz(J2kDecoderContext *s)
      s->tile_offset_y = bytestream2_get_be32u(&s->g); // YT0Siz
        s->ncomponents = bytestream2_get_be16u(&s->g); // CSiz
 
+    if(s->ncomponents <= 0 || s->ncomponents > 4) {
+        av_log(s->avctx, AV_LOG_ERROR, "unsupported/invalid ncomponents: %d\n", s->ncomponents);
+        return AVERROR(EINVAL);
+    }
     if(s->tile_width<=0 || s->tile_height<=0)
         return AVERROR(EINVAL);
 
@@ -1017,7 +1021,6 @@ static int decode_frame(AVCodecContext *avctx,
     AVFrame *picture = data;
     int tileno, ret;
 
-    s->avctx = avctx;
     bytestream2_init(&s->g, avpkt->data, avpkt->size);
     s->curtileno = -1;
 
@@ -1068,6 +1071,7 @@ static av_cold int j2kdec_init(AVCodecContext *avctx)
 {
     J2kDecoderContext *s = avctx->priv_data;
 
+    s->avctx = avctx;
     avcodec_get_frame_defaults((AVFrame*)&s->picture);
     avctx->coded_frame = (AVFrame*)&s->picture;
 
@@ -1089,7 +1093,7 @@ static av_cold int decode_end(AVCodecContext *avctx)
 AVCodec ff_jpeg2000_decoder = {
     .name           = "j2k",
     .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = CODEC_ID_JPEG2000,
+    .id             = AV_CODEC_ID_JPEG2000,
     .priv_data_size = sizeof(J2kDecoderContext),
     .init           = j2kdec_init,
     .close          = decode_end,

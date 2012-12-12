@@ -71,6 +71,8 @@
 
 #include "libavutil/imgutils.h"
 #include "avfilter.h"
+#include "formats.h"
+#include "video.h"
 #include "bbox.h"
 #include "lavfutils.h"
 #include "lswsutils.h"
@@ -190,7 +192,7 @@ static void convert_mask_to_strength_mask(uint8_t *data, int linesize,
 static int query_formats(AVFilterContext *ctx)
 {
     enum PixelFormat pix_fmts[] = { PIX_FMT_YUV420P, PIX_FMT_NONE };
-    avfilter_set_common_pixel_formats(ctx, avfilter_make_format_list(pix_fmts));
+    ff_set_common_formats(ctx, ff_make_format_list(pix_fmts));
     return 0;
 }
 
@@ -261,7 +263,7 @@ static void generate_half_size_image(const uint8_t *src_data, int src_linesize,
                                   src_w/2, src_h/2, 0, max_mask_size);
 }
 
-static av_cold int init(AVFilterContext *ctx, const char *args, void *opaque)
+static av_cold int init(AVFilterContext *ctx, const char *args)
 {
     RemovelogoContext *removelogo = ctx->priv;
     int ***mask;
@@ -324,7 +326,7 @@ static av_cold int init(AVFilterContext *ctx, const char *args, void *opaque)
     ff_calculate_bounding_box(&removelogo->half_mask_bbox, removelogo->half_mask_data, w/2, w/2, h/2, 0);
 
 #define SHOW_LOGO_INFO(mask_type)                                       \
-    av_log(ctx, AV_LOG_INFO, #mask_type " x1:%d x2:%d y1:%d y2:%d max_mask_size:%d\n", \
+    av_log(ctx, AV_LOG_VERBOSE, #mask_type " x1:%d x2:%d y1:%d y2:%d max_mask_size:%d\n", \
            removelogo->mask_type##_mask_bbox.x1, removelogo->mask_type##_mask_bbox.x2, \
            removelogo->mask_type##_mask_bbox.y1, removelogo->mask_type##_mask_bbox.y2, \
            mask_type##_max_mask_size);
@@ -470,25 +472,18 @@ static void blur_image(int ***mask,
     }
 }
 
-static void start_frame(AVFilterLink *inlink, AVFilterBufferRef *inpicref)
+static int start_frame(AVFilterLink *inlink, AVFilterBufferRef *inpicref)
 {
     AVFilterLink *outlink = inlink->dst->outputs[0];
     AVFilterBufferRef *outpicref;
 
-    if (inpicref->perms & AV_PERM_PRESERVE) {
-        outpicref = avfilter_get_video_buffer(outlink, AV_PERM_WRITE,
-                                              outlink->w, outlink->h);
-        avfilter_copy_buffer_ref_props(outpicref, inpicref);
-        outpicref->video->w = outlink->w;
-        outpicref->video->h = outlink->h;
-    } else
-        outpicref = inpicref;
+    outpicref = inpicref;
 
     outlink->out_buf = outpicref;
-    avfilter_start_frame(outlink, avfilter_ref_buffer(outpicref, ~0));
+    return ff_start_frame(outlink, avfilter_ref_buffer(outpicref, ~0));
 }
 
-static void end_frame(AVFilterLink *inlink)
+static int end_frame(AVFilterLink *inlink)
 {
     RemovelogoContext *removelogo = inlink->dst->priv;
     AVFilterLink *outlink = inlink->dst->outputs[0];
@@ -512,11 +507,8 @@ static void end_frame(AVFilterLink *inlink)
                removelogo->half_mask_data, inlink->w/2,
                inlink->w/2, inlink->h/2, direct, &removelogo->half_mask_bbox);
 
-    avfilter_draw_slice(outlink, 0, inlink->h, 1);
-    avfilter_end_frame(outlink);
-    avfilter_unref_buffer(inpicref);
-    if (!direct)
-        avfilter_unref_buffer(outpicref);
+    ff_draw_slice(outlink, 0, inlink->h, 1);
+    return ff_end_frame(outlink);
 }
 
 static void uninit(AVFilterContext *ctx)
@@ -541,7 +533,7 @@ static void uninit(AVFilterContext *ctx)
     }
 }
 
-static void null_draw_slice(AVFilterLink *link, int y, int h, int slice_dir) { }
+static int null_draw_slice(AVFilterLink *link, int y, int h, int slice_dir) { return 0; }
 
 AVFilter avfilter_vf_removelogo = {
     .name          = "removelogo",
@@ -554,13 +546,12 @@ AVFilter avfilter_vf_removelogo = {
     .inputs = (const AVFilterPad[]) {
         { .name             = "default",
           .type             = AVMEDIA_TYPE_VIDEO,
-          .get_video_buffer = avfilter_null_get_video_buffer,
+          .get_video_buffer = ff_null_get_video_buffer,
           .config_props     = config_props_input,
           .draw_slice       = null_draw_slice,
           .start_frame      = start_frame,
           .end_frame        = end_frame,
-          .min_perms        = AV_PERM_WRITE | AV_PERM_READ,
-          .rej_perms        = AV_PERM_PRESERVE },
+          .min_perms        = AV_PERM_WRITE | AV_PERM_READ },
         { .name = NULL }
     },
     .outputs = (const AVFilterPad[]) {

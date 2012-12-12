@@ -347,7 +347,8 @@ static void ra144_encode_subblock(RA144Context *ractx,
     float zero[BLOCKSIZE], cba[BLOCKSIZE], cb1[BLOCKSIZE], cb2[BLOCKSIZE];
     int16_t cba_vect[BLOCKSIZE];
     int cba_idx, cb1_idx, cb2_idx, gain;
-    int i, n, m[3];
+    int i, n;
+    unsigned m[3];
     float g[3];
     float error, best_error;
 
@@ -555,7 +556,7 @@ static int ra144_encode_frame(AVCodecContext *avctx, AVPacket *avpkt,
 AVCodec ff_ra_144_encoder = {
     .name           = "real_144",
     .type           = AVMEDIA_TYPE_AUDIO,
-    .id             = CODEC_ID_RA_144,
+    .id             = AV_CODEC_ID_RA_144,
     .priv_data_size = sizeof(RA144Context),
     .init           = ra144_encode_init,
     .encode2        = ra144_encode_frame,

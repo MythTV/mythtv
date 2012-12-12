@@ -621,34 +621,6 @@ static inline void do_imdct(AC3DecodeContext *s, int channels)
 }
 
 /**
- * Downmix the output to mono or stereo.
- */
-void ff_ac3_downmix_c(float (*samples)[256], float (*matrix)[2],
-                      int out_ch, int in_ch, int len)
-{
-    int i, j;
-    float v0, v1;
-    if (out_ch == 2) {
-        for (i = 0; i < len; i++) {
-            v0 = v1 = 0.0f;
-            for (j = 0; j < in_ch; j++) {
-                v0 += samples[j][i] * matrix[j][0];
-                v1 += samples[j][i] * matrix[j][1];
-            }
-            samples[0][i] = v0;
-            samples[1][i] = v1;
-        }
-    } else if (out_ch == 1) {
-        for (i = 0; i < len; i++) {
-            v0 = 0.0f;
-            for (j = 0; j < in_ch; j++)
-                v0 += samples[j][i] * matrix[j][0];
-            samples[0][i] = v0;
-        }
-    }
-}
-
-/**
  * Upmix delay samples from stereo to original channel layout.
  */
 static void ac3_upmix_delay(AC3DecodeContext *s)
@@ -1266,19 +1238,19 @@ static int decode_audio_block(AC3DecodeContext *s, int blk)
         do_imdct(s, s->channels);
 
         if (downmix_output) {
-            s->dsp.ac3_downmix(s->output, s->downmix_coeffs,
-                               s->out_channels, s->fbw_channels, 256);
+            s->ac3dsp.downmix(s->output, s->downmix_coeffs,
+                              s->out_channels, s->fbw_channels, 256);
         }
     } else {
         if (downmix_output) {
-            s->dsp.ac3_downmix(s->transform_coeffs + 1, s->downmix_coeffs,
-                               s->out_channels, s->fbw_channels, 256);
+            s->ac3dsp.downmix(s->transform_coeffs + 1, s->downmix_coeffs,
+                              s->out_channels, s->fbw_channels, 256);
         }
 
         if (downmix_output && !s->downmixed) {
             s->downmixed = 1;
-            s->dsp.ac3_downmix(s->delay, s->downmix_coeffs, s->out_channels,
-                               s->fbw_channels, 128);
+            s->ac3dsp.downmix(s->delay, s->downmix_coeffs, s->out_channels,
+                              s->fbw_channels, 128);
         }
 
         do_imdct(s, s->out_channels);
@@ -1433,6 +1405,8 @@ static int ac3_decode_frame(AVCodecContext * avctx, void *data,
         }
     }
 
+    s->frame.decode_error_flags = err ? FF_DECODE_ERROR_INVALID_BITSTREAM : 0;
+
     *got_frame_ptr   = 1;
     *(AVFrame *)data = s->frame;
 
@@ -1454,9 +1428,9 @@ static av_cold int ac3_decode_end(AVCodecContext *avctx)
 #define OFFSET(x) offsetof(AC3DecodeContext, x)
 #define PAR (AV_OPT_FLAG_DECODING_PARAM | AV_OPT_FLAG_AUDIO_PARAM)
 static const AVOption options[] = {
-    { "drc_scale", "percentage of dynamic range compression to apply", OFFSET(drc_scale), AV_OPT_TYPE_FLOAT, {1.0}, 0.0, 1.0, PAR },
+    { "drc_scale", "percentage of dynamic range compression to apply", OFFSET(drc_scale), AV_OPT_TYPE_FLOAT, {.dbl = 1.0}, 0.0, 1.0, PAR },
 
-{"dmix_mode", "Preferred Stereo Downmix Mode", OFFSET(preferred_stereo_downmix), AV_OPT_TYPE_INT, {.dbl = -1 }, -1, 2, 0, "dmix_mode"},
+{"dmix_mode", "Preferred Stereo Downmix Mode", OFFSET(preferred_stereo_downmix), AV_OPT_TYPE_INT, {.i64 = -1 }, -1, 2, 0, "dmix_mode"},
 {"ltrt_cmixlev",   "Lt/Rt Center Mix Level",   OFFSET(ltrt_center_mix_level),    AV_OPT_TYPE_FLOAT, {.dbl = -1.0 }, -1.0, 2.0, 0},
 {"ltrt_surmixlev", "Lt/Rt Surround Mix Level", OFFSET(ltrt_surround_mix_level),  AV_OPT_TYPE_FLOAT, {.dbl = -1.0 }, -1.0, 2.0, 0},
 {"loro_cmixlev",   "Lo/Ro Center Mix Level",   OFFSET(loro_center_mix_level),    AV_OPT_TYPE_FLOAT, {.dbl = -1.0 }, -1.0, 2.0, 0},
@@ -1475,7 +1449,7 @@ static const AVClass ac3_decoder_class = {
 AVCodec ff_ac3_decoder = {
     .name           = "ac3",
     .type           = AVMEDIA_TYPE_AUDIO,
-    .id             = CODEC_ID_AC3,
+    .id             = AV_CODEC_ID_AC3,
     .priv_data_size = sizeof (AC3DecodeContext),
     .init           = ac3_decode_init,
     .close          = ac3_decode_end,
@@ -1499,7 +1473,7 @@ static const AVClass eac3_decoder_class = {
 AVCodec ff_eac3_decoder = {
     .name           = "eac3",
     .type           = AVMEDIA_TYPE_AUDIO,
-    .id             = CODEC_ID_EAC3,
+    .id             = AV_CODEC_ID_EAC3,
     .priv_data_size = sizeof (AC3DecodeContext),
     .init           = ac3_decode_init,
     .close          = ac3_decode_end,

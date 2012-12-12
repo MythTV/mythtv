@@ -112,6 +112,19 @@ defaults to 0).
 Set audio device number for devices with same name (starts at 0,
 defaults to 0).
 
+@item pixel_format
+Select pixel format to be used by DirectShow. This may only be set when
+the video codec is not set or set to rawvideo.
+
+@item audio_buffer_size
+Set audio device buffer size in milliseconds (which can directly
+impact latency, depending on the device).
+Defaults to using the audio device's
+default buffer size (typically some multiple of 500ms).
+Setting this value too low can degrade performance.
+See also
+@url{http://msdn.microsoft.com/en-us/library/windows/desktop/dd377582(v=vs.85).aspx}
+
 @end table
 
 @subsection Examples
@@ -178,6 +191,59 @@ ffmpeg -f fbdev -frames:v 1 -r 1 -i /dev/fb0 screenshot.jpeg
 @end example
 
 See also @url{http://linux-fbdev.sourceforge.net/}, and fbset(1).
+
+@section iec61883
+
+FireWire DV/HDV input device using libiec61883.
+
+To enable this input device, you need libiec61883, libraw1394 and
+libavc1394 installed on your system. Use the configure option
+@code{--enable-libiec61883} to compile with the device enabled.
+
+The iec61883 capture device supports capturing from a video device
+connected via IEEE1394 (FireWire), using libiec61883 and the new Linux
+FireWire stack (juju). This is the default DV/HDV input method in Linux
+Kernel 2.6.37 and later, since the old FireWire stack was removed.
+
+Specify the FireWire port to be used as input file, or "auto"
+to choose the first port connected.
+
+@subsection Options
+
+@table @option
+
+@item dvtype
+Override autodetection of DV/HDV. This should only be used if auto
+detection does not work, or if usage of a different device type
+should be prohibited. Treating a DV device as HDV (or vice versa) will
+not work and result in undefined behavior.
+The values @option{auto}, @option{dv} and @option{hdv} are supported.
+
+@item dvbuffer
+Set maxiumum size of buffer for incoming data, in frames. For DV, this
+is an exact value. For HDV, it is not frame exact, since HDV does
+not have a fixed frame size.
+
+@end table
+
+@subsection Examples
+
+@itemize
+
+@item
+Grab and show the input of a FireWire DV/HDV device.
+@example
+ffplay -f iec61883 -i auto
+@end example
+
+@item
+Grab and record the input of a FireWire DV/HDV device,
+using a packet buffer of 100000 packets if the source is HDV.
+@example
+ffmpeg -f iec61883 -i auto -hdvbuffer 100000 out.mpg
+@end example
+
+@end itemize
 
 @section jack
 
@@ -577,17 +643,23 @@ properties of your X11 display (e.g. grep for "name" or "dimensions").
 For example to grab from @file{:0.0} using @command{ffmpeg}:
 @example
 ffmpeg -f x11grab -r 25 -s cif -i :0.0 out.mpg
+@end example
 
-# Grab at position 10,20.
+Grab at position @code{10,20}:
+@example
 ffmpeg -f x11grab -r 25 -s cif -i :0.0+10,20 out.mpg
 @end example
 
-@subsection @var{follow_mouse} AVOption
+@subsection Options
 
-The syntax is:
-@example
--follow_mouse centered|@var{PIXELS}
-@end example
+@table @option
+@item draw_mouse
+Specify whether to draw the mouse pointer. A value of @code{0} specify
+not to draw the pointer. Default value is @code{1}.
+
+@item follow_mouse
+Make the grabbed area follow the mouse. The argument can be
+@code{centered} or a number of pixels @var{PIXELS}.
 
 When it is specified with "centered", the grabbing region follows the mouse
 pointer and keeps the pointer at the center of region; otherwise, the region
@@ -597,28 +669,36 @@ zero) to the edge of region.
 For example:
 @example
 ffmpeg -f x11grab -follow_mouse centered -r 25 -s cif -i :0.0 out.mpg
+@end example
 
-# Follows only when the mouse pointer reaches within 100 pixels to edge
+To follow only when the mouse pointer reaches within 100 pixels to edge:
+@example
 ffmpeg -f x11grab -follow_mouse 100 -r 25 -s cif -i :0.0 out.mpg
 @end example
 
-@subsection @var{show_region} AVOption
+@item framerate
+Set the grabbing frame rate. Default value is @code{ntsc},
+corresponding to a framerate of @code{30000/1001}.
 
-The syntax is:
-@example
--show_region 1
-@end example
+@item show_region
+Show grabbed region on screen.
 
-If @var{show_region} AVOption is specified with @var{1}, then the grabbing
-region will be indicated on screen. With this option, it's easy to know what is
-being grabbed if only a portion of the screen is grabbed.
+If @var{show_region} is specified with @code{1}, then the grabbing
+region will be indicated on screen. With this option, it is easy to
+know what is being grabbed if only a portion of the screen is grabbed.
 
 For example:
 @example
 ffmpeg -f x11grab -show_region 1 -r 25 -s cif -i :0.0+10,20 out.mpg
-
-# With follow_mouse
-ffmpeg -f x11grab -follow_mouse centered -show_region 1  -r 25 -s cif -i :0.0 out.mpg
 @end example
+
+With @var{follow_mouse}:
+@example
+ffmpeg -f x11grab -follow_mouse centered -show_region 1 -r 25 -s cif -i :0.0 out.mpg
+@end example
+
+@item video_size
+Set the video frame size. Default value is @code{vga}.
+@end table
 
 @c man end INPUT DEVICES

@@ -4,6 +4,7 @@ git://source.ffmpeg.org/ffmpeg.git at SHA1 d3db8988d on March 31, 2012 (Beirdo)
 git://source.ffmpeg.org/ffmpeg.git at SHA1 ea5dab58e on May 23, 2012 (jya)
 git://source.ffmpeg.org/ffmpeg.git at SHA1 cc4d80c on June 1st, 2012 (jya)
 git://source.ffmpeg.org/ffmpeg.git at SHA1 f218121 on June 1st, 2012 (jya)
+git://source.ffmpeg.org/ffmpeg.git at SHA1 59d765e30 on December 12th, 2012 (jya) (release/1.0 branch)
 
 List of files modified from original FFmpeg:
 Makefile
@@ -12,6 +13,7 @@ common.mak
 configure
 libavcodec/Makefile
 libavcodec/avcodec.h
+libavcodec/old_codec_ids.h
 libavcodec/dsputil.h
 libavcodec/dvbsub_parser.c
 libavcodec/dvbsubdec.c

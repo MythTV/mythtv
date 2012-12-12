@@ -26,6 +26,7 @@
 
 #include "avcodec.h"
 #include "dsputil.h"
+#include "libavutil/internal.h"
 
 typedef struct VCR1Context {
     AVFrame picture;
@@ -145,7 +146,7 @@ static int vcr1_decode_frame(AVCodecContext *avctx, void *data,
 AVCodec ff_vcr1_decoder = {
     .name           = "vcr1",
     .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = CODEC_ID_VCR1,
+    .id             = AV_CODEC_ID_VCR1,
     .priv_data_size = sizeof(VCR1Context),
     .init           = vcr1_decode_init,
     .close          = vcr1_decode_end,
@@ -185,7 +186,7 @@ static int vcr1_encode_frame(AVCodecContext *avctx, unsigned char *buf,
 AVCodec ff_vcr1_encoder = {
     .name           = "vcr1",
     .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = CODEC_ID_VCR1,
+    .id             = AV_CODEC_ID_VCR1,
     .priv_data_size = sizeof(VCR1Context),
     .init           = vcr1_common_init,
     .encode         = vcr1_encode_frame,

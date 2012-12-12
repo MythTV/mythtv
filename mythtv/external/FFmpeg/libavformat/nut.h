@@ -79,6 +79,7 @@ typedef struct {
     int msb_pts_shift;
     int max_pts_distance;
     int decode_delay; //FIXME duplicate of has_b_frames
+    int64_t *keyframe_pts;
 } StreamContext;
 
 typedef struct {
@@ -101,6 +102,9 @@ typedef struct {
     int header_count;
     AVRational *time_base;
     struct AVTreeNode *syncpoints;
+    int sp_count;
+    int64_t max_pts;
+    AVRational *max_pts_tb;
 } NUTContext;
 
 extern const AVCodecTag ff_nut_subtitle_tags[];

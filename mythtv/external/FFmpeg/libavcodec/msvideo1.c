@@ -31,6 +31,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "libavutil/internal.h"
 #include "libavutil/intreadwrite.h"
 #include "avcodec.h"
 
@@ -337,7 +338,7 @@ static av_cold int msvideo1_decode_end(AVCodecContext *avctx)
 AVCodec ff_msvideo1_decoder = {
     .name           = "msvideo1",
     .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = CODEC_ID_MSVIDEO1,
+    .id             = AV_CODEC_ID_MSVIDEO1,
     .priv_data_size = sizeof(Msvideo1Context),
     .init           = msvideo1_decode_init,
     .close          = msvideo1_decode_end,

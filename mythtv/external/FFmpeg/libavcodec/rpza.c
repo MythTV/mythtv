@@ -38,6 +38,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "libavutil/internal.h"
 #include "libavutil/intreadwrite.h"
 #include "avcodec.h"
 
@@ -283,7 +284,7 @@ static av_cold int rpza_decode_end(AVCodecContext *avctx)
 AVCodec ff_rpza_decoder = {
     .name           = "rpza",
     .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = CODEC_ID_RPZA,
+    .id             = AV_CODEC_ID_RPZA,
     .priv_data_size = sizeof(RpzaContext),
     .init           = rpza_decode_init,
     .close          = rpza_decode_end,

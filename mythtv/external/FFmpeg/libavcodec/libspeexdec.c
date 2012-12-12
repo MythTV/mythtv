@@ -23,6 +23,7 @@
 #include <speex/speex_stereo.h>
 #include <speex/speex_callbacks.h>
 #include "avcodec.h"
+#include "libavutil/common.h"
 
 typedef struct {
     AVFrame frame;
@@ -58,7 +59,7 @@ static av_cold int libspeex_decode_init(AVCodecContext *avctx)
 
         mode = speex_lib_get_mode(s->header->mode);
         if (!mode) {
-            av_log(avctx, AV_LOG_ERROR, "Unknown Speex mode %d", s->header->mode);
+            av_log(avctx, AV_LOG_ERROR, "Unknown Speex mode %d\n", s->header->mode);
             return AVERROR_INVALIDDATA;
         }
     } else
@@ -161,7 +162,7 @@ static av_cold void libspeex_decode_flush(AVCodecContext *avctx)
 AVCodec ff_libspeex_decoder = {
     .name           = "libspeex",
     .type           = AVMEDIA_TYPE_AUDIO,
-    .id             = CODEC_ID_SPEEX,
+    .id             = AV_CODEC_ID_SPEEX,
     .priv_data_size = sizeof(LibSpeexContext),
     .init           = libspeex_decode_init,
     .close          = libspeex_decode_close,

@@ -32,7 +32,6 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/ioctl.h>
-#include <sys/time.h>
 #include <sys/mman.h>
 #include <time.h>
 #include <linux/fb.h>
@@ -40,6 +39,7 @@
 #include "libavutil/log.h"
 #include "libavutil/mem.h"
 #include "libavutil/opt.h"
+#include "libavutil/time.h"
 #include "libavutil/parseutils.h"
 #include "libavutil/pixdesc.h"
 #include "avdevice.h"
@@ -160,11 +160,11 @@ static av_cold int fbdev_read_header(AVFormatContext *avctx)
     }
 
     st->codec->codec_type = AVMEDIA_TYPE_VIDEO;
-    st->codec->codec_id   = CODEC_ID_RAWVIDEO;
+    st->codec->codec_id   = AV_CODEC_ID_RAWVIDEO;
     st->codec->width      = fbdev->width;
     st->codec->height     = fbdev->height;
     st->codec->pix_fmt    = pix_fmt;
-    st->codec->time_base  = (AVRational){fbdev->framerate_q.den, fbdev->framerate_q.num};
+    st->codec->time_base  = av_inv_q(fbdev->framerate_q);
     st->codec->bit_rate   =
         fbdev->width * fbdev->height * fbdev->bytes_per_pixel * av_q2d(fbdev->framerate_q) * 8;
 

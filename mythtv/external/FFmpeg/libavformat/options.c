@@ -76,6 +76,13 @@ static const AVClass *format_child_class_next(const AVClass *prev)
     return NULL;
 }
 
+static AVClassCategory get_category(void *ptr)
+{
+    AVFormatContext* s = ptr;
+    if(s->iformat) return AV_CLASS_CATEGORY_DEMUXER;
+    else           return AV_CLASS_CATEGORY_MUXER;
+}
+
 static const AVClass av_format_context_class = {
     .class_name     = "AVFormatContext",
     .item_name      = format_to_name,
@@ -83,6 +90,8 @@ static const AVClass av_format_context_class = {
     .version        = LIBAVUTIL_VERSION_INT,
     .child_next     = format_child_next,
     .child_class_next = format_child_class_next,
+    .category       = AV_CLASS_CATEGORY_MUXER,
+    .get_category   = get_category,
 };
 
 static void avformat_get_context_defaults(AVFormatContext *s)
@@ -101,6 +110,11 @@ AVFormatContext *avformat_alloc_context(void)
     if (!ic) return ic;
     avformat_get_context_defaults(ic);
     return ic;
+}
+
+enum AVDurationEstimationMethod av_fmt_ctx_get_duration_estimation_method(const AVFormatContext* ctx)
+{
+    return ctx->duration_estimation_method;
 }
 
 const AVClass *avformat_get_class(void)

@@ -31,6 +31,7 @@
  */
 
 /* FFmpeg includes */
+#include "libavutil/common.h"
 #include "libavutil/intreadwrite.h"
 #include "libavutil/log.h"
 #include "libavutil/base64.h"
@@ -361,7 +362,7 @@ static av_cold int encode_close(AVCodecContext* avc_context)
 AVCodec ff_libtheora_encoder = {
     .name           = "libtheora",
     .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = CODEC_ID_THEORA,
+    .id             = AV_CODEC_ID_THEORA,
     .priv_data_size = sizeof(TheoraContext),
     .init           = encode_init,
     .close          = encode_close,

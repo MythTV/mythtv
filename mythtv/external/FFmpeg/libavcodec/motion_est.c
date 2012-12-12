@@ -39,15 +39,13 @@
 #undef NDEBUG
 #include <assert.h>
 
-#define SQ(a) ((a)*(a))
-
 #define P_LEFT P[1]
 #define P_TOP P[2]
 #define P_TOPRIGHT P[3]
 #define P_MEDIAN P[4]
 #define P_MV1 P[9]
 
-static inline int sad_hpel_motion_search(MpegEncContext * s,
+static int sad_hpel_motion_search(MpegEncContext * s,
                                   int *mx_ptr, int *my_ptr, int dmin,
                                   int src_index, int ref_index,
                                   int size, int h);
@@ -305,7 +303,7 @@ int ff_init_me(MpegEncContext *s){
         return -1;
     }
     //special case of snow is needed because snow uses its own iterative ME code
-    if(s->me_method!=ME_ZERO && s->me_method!=ME_EPZS && s->me_method!=ME_X1 && s->avctx->codec_id != CODEC_ID_SNOW){
+    if(s->me_method!=ME_ZERO && s->me_method!=ME_EPZS && s->me_method!=ME_X1 && s->avctx->codec_id != AV_CODEC_ID_SNOW){
         av_log(s->avctx, AV_LOG_ERROR, "me_method is only allowed to be set to zero and epzs; for hex,umh,full and others see dia_size\n");
         return -1;
     }
@@ -356,7 +354,7 @@ int ff_init_me(MpegEncContext *s){
     /* 8x8 fullpel search would need a 4x4 chroma compare, which we do
      * not have yet, and even if we had, the motion estimation code
      * does not expect it. */
-    if(s->codec_id != CODEC_ID_SNOW){
+    if(s->codec_id != AV_CODEC_ID_SNOW){
         if((c->avctx->me_cmp&FF_CMP_CHROMA)/* && !s->dsp.me_cmp[2]*/){
             s->dsp.me_cmp[2]= zero_cmp;
         }
@@ -367,21 +365,12 @@ int ff_init_me(MpegEncContext *s){
         c->hpel_put[2][2]= c->hpel_put[2][3]= zero_hpel;
     }
 
-    if(s->codec_id == CODEC_ID_H261){
+    if(s->codec_id == AV_CODEC_ID_H261){
         c->sub_motion_search= no_sub_motion_search;
     }
 
     return 0;
 }
-
-static inline void no_motion_search(MpegEncContext * s,
-                                    int *mx_ptr, int *my_ptr)
-{
-    *mx_ptr = 16 * s->mb_x;
-    *my_ptr = 16 * s->mb_y;
-}
-
-#define Z_THRESHOLD 256
 
 #define CHECK_SAD_HALF_MV(suffix, x, y) \
 {\
@@ -390,7 +379,7 @@ static inline void no_motion_search(MpegEncContext * s,
     COPY3_IF_LT(dminh, d, dx, x, dy, y)\
 }
 
-static inline int sad_hpel_motion_search(MpegEncContext * s,
+static int sad_hpel_motion_search(MpegEncContext * s,
                                   int *mx_ptr, int *my_ptr, int dmin,
                                   int src_index, int ref_index,
                                   int size, int h)
@@ -1051,9 +1040,8 @@ void ff_estimate_p_frame_motion(MpegEncContext * s,
     switch(s->me_method) {
     case ME_ZERO:
     default:
-        no_motion_search(s, &mx, &my);
-        mx-= mb_x*16;
-        my-= mb_y*16;
+        mx   = 0;
+        my   = 0;
         dmin = 0;
         break;
     case ME_X1:
@@ -1163,7 +1151,7 @@ void ff_estimate_p_frame_motion(MpegEncContext * s,
 
         dmin= c->sub_motion_search(s, &mx, &my, dmin, 0, 0, 0, 16);
         if(c->avctx->me_sub_cmp != c->avctx->mb_cmp && !c->skip)
-            dmin= ff_get_mb_score(s, mx, my, 0, 0, 0, 16, 1);
+            dmin= get_mb_score(s, mx, my, 0, 0, 0, 16, 1);
 
         if((s->flags&CODEC_FLAG_4MV)
            && !c->skip && varc>50<<8 && vard>10<<8){
@@ -1294,10 +1282,9 @@ static int ff_estimate_motion_b(MpegEncContext * s,
     switch(s->me_method) {
     case ME_ZERO:
     default:
-        no_motion_search(s, &mx, &my);
+        mx   = 0;
+        my   = 0;
         dmin = 0;
-        mx-= mb_x*16;
-        my-= mb_y*16;
         break;
     case ME_X1:
     case ME_EPZS:
@@ -1336,7 +1323,7 @@ static int ff_estimate_motion_b(MpegEncContext * s,
     dmin= c->sub_motion_search(s, &mx, &my, dmin, 0, ref_index, 0, 16);
 
     if(c->avctx->me_sub_cmp != c->avctx->mb_cmp && !c->skip)
-        dmin= ff_get_mb_score(s, mx, my, 0, ref_index, 0, 16, 1);
+        dmin= get_mb_score(s, mx, my, 0, ref_index, 0, 16, 1);
 
 //printf("%d %d %d %d//", s->mb_x, s->mb_y, mx, my);
 //    s->mb_type[mb_y*s->mb_width + mb_x]= mb_type;
@@ -1648,7 +1635,7 @@ static inline int direct_search(MpegEncContext * s, int mb_x, int mb_y)
         dmin = hpel_motion_search(s, &mx, &my, dmin, 0, 0, 0, 16);
 
     if(c->avctx->me_sub_cmp != c->avctx->mb_cmp && !c->skip)
-        dmin= ff_get_mb_score(s, mx, my, 0, 0, 0, 16, 1);
+        dmin= get_mb_score(s, mx, my, 0, 0, 0, 16, 1);
 
     get_limits(s, 16*mb_x, 16*mb_y); //restore c->?min/max, maybe not needed
 
@@ -1675,7 +1662,7 @@ void ff_estimate_b_frame_motion(MpegEncContext * s,
 
     c->skip=0;
 
-    if (s->codec_id == CODEC_ID_MPEG4 && s->next_picture.f.mbskip_table[xy]) {
+    if (s->codec_id == AV_CODEC_ID_MPEG4 && s->next_picture.f.mbskip_table[xy]) {
         int score= direct_search(s, mb_x, mb_y); //FIXME just check 0,0
 
         score= ((unsigned)(score*score + 128*256))>>16;
@@ -1737,7 +1724,7 @@ void ff_estimate_b_frame_motion(MpegEncContext * s,
         }
     }
 
-    if (s->codec_id == CODEC_ID_MPEG4)
+    if (s->codec_id == AV_CODEC_ID_MPEG4)
         dmin= direct_search(s, mb_x, mb_y);
     else
         dmin= INT_MAX;
@@ -1808,7 +1795,7 @@ void ff_estimate_b_frame_motion(MpegEncContext * s,
         }
          //FIXME something smarter
         if(dmin>256*256*16) type&= ~CANDIDATE_MB_TYPE_DIRECT; //do not try direct mode if it is invalid for this MB
-        if(s->codec_id == CODEC_ID_MPEG4 && type&CANDIDATE_MB_TYPE_DIRECT && s->flags&CODEC_FLAG_MV0 && *(uint32_t*)s->b_direct_mv_table[xy])
+        if(s->codec_id == AV_CODEC_ID_MPEG4 && type&CANDIDATE_MB_TYPE_DIRECT && s->flags&CODEC_FLAG_MV0 && *(uint32_t*)s->b_direct_mv_table[xy])
             type |= CANDIDATE_MB_TYPE_DIRECT0;
     }
 
@@ -1827,7 +1814,7 @@ int ff_get_best_fcode(MpegEncContext * s, int16_t (*mv_table)[2], int type)
 
         if(s->msmpeg4_version)
             range= FFMIN(range, 16);
-        else if(s->codec_id == CODEC_ID_MPEG2VIDEO && s->avctx->strict_std_compliance >= FF_COMPLIANCE_NORMAL)
+        else if(s->codec_id == AV_CODEC_ID_MPEG2VIDEO && s->avctx->strict_std_compliance >= FF_COMPLIANCE_NORMAL)
             range= FFMIN(range, 256);
 
         for(i=0; i<8; i++) score[i]= s->mb_num*(8-i);
@@ -1880,12 +1867,12 @@ void ff_fix_long_p_mvs(MpegEncContext * s)
     MotionEstContext * const c= &s->me;
     const int f_code= s->f_code;
     int y, range;
-    assert(s->pict_type==AV_PICTURE_TYPE_P);
+    av_assert0(s->pict_type==AV_PICTURE_TYPE_P);
 
     range = (((s->out_format == FMT_MPEG1 || s->msmpeg4_version) ? 8 : 16) << f_code);
 
-    assert(range <= 16 || !s->msmpeg4_version);
-    assert(range <=256 || !(s->codec_id == CODEC_ID_MPEG2VIDEO && s->avctx->strict_std_compliance >= FF_COMPLIANCE_NORMAL));
+    av_assert0(range <= 16 || !s->msmpeg4_version);
+    av_assert0(range <=256 || !(s->codec_id == AV_CODEC_ID_MPEG2VIDEO && s->avctx->strict_std_compliance >= FF_COMPLIANCE_NORMAL));
 
     if(c->avctx->me_range && range > c->avctx->me_range) range= c->avctx->me_range;
 

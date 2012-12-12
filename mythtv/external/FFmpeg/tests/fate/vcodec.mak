@@ -17,22 +17,22 @@ FATE_VCODEC += cljr
 
 FATE_VCODEC += dnxhd-720p
 fate-vsynth%-dnxhd-720p:         ENCOPTS = -s hd720 -b 90M              \
-                                           -pix_fmt yuv422p -frames 5
+                                           -pix_fmt yuv422p -frames 5 -qmax 8
 fate-vsynth%-dnxhd-720p:         FMT     = dnxhd
 
 FATE_VCODEC += dnxhd-720p-rd
 fate-vsynth%-dnxhd-720p-rd:      ENCOPTS = -s hd720 -b 90M -threads 4 -mbd rd \
-                                           -pix_fmt yuv422p -frames 5
+                                           -pix_fmt yuv422p -frames 5 -qmax 8
 fate-vsynth%-dnxhd-720p-rd:      FMT     = dnxhd
 
 FATE_VCODEC += dnxhd-720p-10bit
 fate-vsynth%-dnxhd-720p-10bit:   ENCOPTS = -s hd720 -b 90M              \
-                                           -pix_fmt yuv422p10 -frames 5
+                                           -pix_fmt yuv422p10 -frames 5 -qmax 8
 fate-vsynth%-dnxhd-720p-10bit:   FMT     = dnxhd
 
 FATE_VCODEC += dnxhd-1080i
 fate-vsynth%-dnxhd-1080i:        ENCOPTS = -s hd1080 -b 120M -flags +ildct \
-                                           -pix_fmt yuv422p -frames 5
+                                           -pix_fmt yuv422p -frames 5 -qmax 8
 fate-vsynth%-dnxhd-1080i:        FMT     = mov
 
 FATE_VCODEC += dv
@@ -59,12 +59,12 @@ fate-vsynth%-ffv1:               ENCOPTS = -strict -2
 
 FATE_VCODEC += ffvhuff
 
-FATE_VCODEC += flashsv
+FATE_VCODEC-$(CONFIG_ZLIB) += flashsv
 fate-vsynth%-flashsv:            ENCOPTS = -sws_flags neighbor+full_chroma_int
 fate-vsynth%-flashsv:            DECOPTS = -sws_flags area
 fate-vsynth%-flashsv:            FMT     = flv
 
-FATE_VCODEC += flashsv2
+FATE_VCODEC-$(CONFIG_ZLIB) += flashsv2
 fate-vsynth%-flashsv2:           ENCOPTS = -sws_flags neighbor+full_chroma_int -strict experimental -compression_level 0
 fate-vsynth%-flashsv2:           DECOPTS = -sws_flags area
 fate-vsynth%-flashsv2:           FMT     = flv
@@ -193,7 +193,7 @@ fate-vsynth%-msmpeg4:            ENCOPTS = -qscale 10
 FATE_VCODEC += msmpeg4v2
 fate-vsynth%-msmpeg4v2:          ENCOPTS = -qscale 10
 
-FATE_VCODEC += mpng
+FATE_VCODEC-$(CONFIG_ZLIB) += mpng
 fate-vsynth%-mpng:               CODEC   = png
 
 FATE_VCODEC += msvideo1
@@ -236,6 +236,11 @@ fate-vsynth%-snow:               ENCOPTS = -strict -2 -qscale 2 -flags +qpel \
                                            -me_method iter -dia_size 2       \
                                            -cmp 12 -subcmp 12 -s 128x64
 
+FATE_VCODEC += snow-hpel
+fate-vsynth%-snow-hpel:          ENCOPTS = -strict -2 -qscale 2              \
+                                           -me_method iter -dia_size 2       \
+                                           -cmp 12 -subcmp 12 -s 128x64
+
 FATE_VCODEC += snow-ll
 fate-vsynth%-snow-ll:            ENCOPTS = -strict -2 -qscale .001 -pred 1 \
                                            -flags +mv4+qpel
@@ -272,8 +277,9 @@ FATE_VCODEC += yuv4
 
 FATE_VCODEC += y41p
 
-FATE_VCODEC += zlib
+FATE_VCODEC-$(CONFIG_ZLIB) += zlib
 
+FATE_VCODEC += $(FATE_VCODEC-yes)
 
 FATE_VSYNTH1 = $(FATE_VCODEC:%=fate-vsynth1-%)
 FATE_VSYNTH2 = $(FATE_VCODEC:%=fate-vsynth2-%)

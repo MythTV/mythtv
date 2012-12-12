@@ -98,6 +98,12 @@ static int aiff_write_header(AVFormatContext *s)
         avio_wb16(pb, 0);
     }
 
+    if (enc->codec_tag == MKTAG('Q','D','M','2') && enc->extradata_size) {
+        ffio_wfourcc(pb, "wave");
+        avio_wb32(pb, enc->extradata_size);
+        avio_write(pb, enc->extradata, enc->extradata_size);
+    }
+
     /* Sound data chunk */
     ffio_wfourcc(pb, "SSND");
     aiff->ssnd = avio_tell(pb);         /* Sound chunk size */
@@ -162,8 +168,8 @@ AVOutputFormat ff_aiff_muxer = {
     .mime_type         = "audio/aiff",
     .extensions        = "aif,aiff,afc,aifc",
     .priv_data_size    = sizeof(AIFFOutputContext),
-    .audio_codec       = CODEC_ID_PCM_S16BE,
-    .video_codec       = CODEC_ID_NONE,
+    .audio_codec       = AV_CODEC_ID_PCM_S16BE,
+    .video_codec       = AV_CODEC_ID_NONE,
     .write_header      = aiff_write_header,
     .write_packet      = aiff_write_packet,
     .write_trailer     = aiff_write_trailer,

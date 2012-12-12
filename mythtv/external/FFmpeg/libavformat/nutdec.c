@@ -31,6 +31,9 @@
 
 #define NUT_MAX_STREAMS 256    /* arbitrary sanity check value */
 
+static int64_t nut_read_timestamp(AVFormatContext *s, int stream_index,
+                                  int64_t *pos_arg, int64_t pos_limit);
+
 static int get_str(AVIOContext *bc, char *string, unsigned int maxlen)
 {
     unsigned int len = ffio_read_varlen(bc);
@@ -74,8 +77,8 @@ static uint64_t get_fourcc(AVIOContext *bc)
 }
 
 #ifdef TRACE
-static inline uint64_t get_v_trace(AVIOContext *bc, char *file,
-                                   char *func, int line)
+static inline uint64_t get_v_trace(AVIOContext *bc, const char *file,
+                                   const char *func, int line)
 {
     uint64_t v = ffio_read_varlen(bc);
 
@@ -84,8 +87,8 @@ static inline uint64_t get_v_trace(AVIOContext *bc, char *file,
     return v;
 }
 
-static inline int64_t get_s_trace(AVIOContext *bc, char *file,
-                                  char *func, int line)
+static inline int64_t get_s_trace(AVIOContext *bc, const char *file,
+                                  const char *func, int line)
 {
     int64_t v = get_s(bc);
 
@@ -377,7 +380,7 @@ static int decode_stream_header(NUTContext *nut)
         av_log(s, AV_LOG_ERROR, "unknown stream class (%d)\n", class);
         return -1;
     }
-    if (class < 3 && st->codec->codec_id == CODEC_ID_NONE)
+    if (class < 3 && st->codec->codec_id == AV_CODEC_ID_NONE)
         av_log(s, AV_LOG_ERROR,
                "Unknown codec tag '0x%04x' for stream number %d\n",
                (unsigned int) tmp, stream_id);
@@ -524,7 +527,8 @@ static int decode_syncpoint(NUTContext *nut, int64_t *ts, int64_t *back_ptr)
 {
     AVFormatContext *s = nut->avf;
     AVIOContext *bc    = s->pb;
-    int64_t end, tmp;
+    int64_t end;
+    uint64_t tmp;
 
     nut->last_syncpoint_pos = avio_tell(bc) - 8;
 
@@ -544,11 +548,30 @@ static int decode_syncpoint(NUTContext *nut, int64_t *ts, int64_t *back_ptr)
         return -1;
     }
 
-    *ts = tmp / s->nb_streams *
-          av_q2d(nut->time_base[tmp % s->nb_streams]) * AV_TIME_BASE;
+    *ts = tmp / nut->time_base_count *
+          av_q2d(nut->time_base[tmp % nut->time_base_count]) * AV_TIME_BASE;
     ff_nut_add_sp(nut, nut->last_syncpoint_pos, *back_ptr, *ts);
 
     return 0;
+}
+
+//FIXME calculate exactly, this is just a good approximation.
+static int64_t find_duration(NUTContext *nut, int64_t filesize)
+{
+    AVFormatContext *s = nut->avf;
+    int64_t duration = 0;
+
+    int64_t pos = FFMAX(0, filesize - 2*nut->max_distance);
+    for(;;){
+        int64_t ts = nut_read_timestamp(s, -1, &pos, INT64_MAX);
+        if(ts < 0)
+            break;
+        duration = FFMAX(duration, ts);
+        pos++;
+    }
+    if(duration > 0)
+        s->duration_estimation_method = AVFMT_DURATION_FROM_PTS;
+    return duration;
 }
 
 static int find_and_decode_index(NUTContext *nut)
@@ -562,10 +585,16 @@ static int find_and_decode_index(NUTContext *nut)
     int8_t *has_keyframe;
     int ret = -1;
 
+    if(filesize <= 0)
+        return -1;
+
     avio_seek(bc, filesize - 12, SEEK_SET);
     avio_seek(bc, filesize - avio_rb64(bc), SEEK_SET);
     if (avio_rb64(bc) != INDEX_STARTCODE) {
         av_log(s, AV_LOG_ERROR, "no index at the end\n");
+
+        if(s->duration<=0)
+            s->duration = find_duration(nut, filesize);
         return -1;
     }
 
@@ -595,7 +624,7 @@ static int find_and_decode_index(NUTContext *nut)
                 int flag = x & 1;
                 x >>= 1;
                 if (n + x >= syncpoint_count + 1) {
-                    av_log(s, AV_LOG_ERROR, "index overflow A\n");
+                    av_log(s, AV_LOG_ERROR, "index overflow A %d + %"PRIu64" >= %d\n", n, x, syncpoint_count + 1);
                     goto fail;
                 }
                 while (x--)
@@ -895,7 +924,6 @@ static int64_t nut_read_timestamp(AVFormatContext *s, int stream_index,
     do {
         pos = find_startcode(bc, SYNCPOINT_STARTCODE, pos) + 1;
         if (pos < 1) {
-            av_assert0(nut->next_startcode == 0);
             av_log(s, AV_LOG_ERROR, "read_timestamp failed.\n");
             return AV_NOPTS_VALUE;
         }
@@ -923,6 +951,8 @@ static int read_seek(AVFormatContext *s, int stream_index,
 
     if (st->index_entries) {
         int index = av_index_search_timestamp(st, pts, flags);
+        if (index < 0)
+            index = av_index_search_timestamp(st, pts, flags ^ AVSEEK_FLAG_BACKWARD);
         if (index < 0)
             return -1;
 
@@ -987,7 +1017,7 @@ static int nut_read_close(AVFormatContext *s)
 
 AVInputFormat ff_nut_demuxer = {
     .name           = "nut",
-    .long_name      = NULL_IF_CONFIG_SMALL("NUT format"),
+    .long_name      = NULL_IF_CONFIG_SMALL("NUT"),
     .flags          = AVFMT_SEEK_TO_PTS,
     .priv_data_size = sizeof(NUTContext),
     .read_probe     = nut_probe,

@@ -21,11 +21,11 @@
  * misc parsing utilities
  */
 
-#include <sys/time.h>
 #include <time.h>
 
 #include "avstring.h"
 #include "avutil.h"
+#include "common.h"
 #include "eval.h"
 #include "log.h"
 #include "random_seed.h"
@@ -250,8 +250,8 @@ static const ColorEntry color_table[] = {
     { "LightCoral",           { 0xF0, 0x80, 0x80 } },
     { "LightCyan",            { 0xE0, 0xFF, 0xFF } },
     { "LightGoldenRodYellow", { 0xFA, 0xFA, 0xD2 } },
-    { "LightGrey",            { 0xD3, 0xD3, 0xD3 } },
     { "LightGreen",           { 0x90, 0xEE, 0x90 } },
+    { "LightGrey",            { 0xD3, 0xD3, 0xD3 } },
     { "LightPink",            { 0xFF, 0xB6, 0xC1 } },
     { "LightSalmon",          { 0xFF, 0xA0, 0x7A } },
     { "LightSeaGreen",        { 0x20, 0xB2, 0xAA } },
@@ -438,24 +438,20 @@ static int date_get_num(const char **pp,
     return val;
 }
 
-/**
- * Parse the input string p according to the format string fmt and
- * store its results in the structure dt.
- * This implementation supports only a subset of the formats supported
- * by the standard strptime().
- *
- * @return a pointer to the first character not processed in this
- * function call, or NULL in case the function fails to match all of
- * the fmt string and therefore an error occurred
- */
-static const char *small_strptime(const char *p, const char *fmt, struct tm *dt)
+char *av_small_strptime(const char *p, const char *fmt, struct tm *dt)
 {
     int c, val;
 
     for(;;) {
+        /* consume time string until a non whitespace char is found */
+        while (isspace(*fmt)) {
+            while (isspace(*p))
+                p++;
+            fmt++;
+        }
         c = *fmt++;
         if (c == '\0') {
-            return p;
+            return (char *)p;
         } else if (c == '%') {
             c = *fmt++;
             switch(c) {
@@ -558,7 +554,7 @@ int av_parse_time(int64_t *timeval, const char *timestr, int duration)
 
         /* parse the year-month-day part */
         for (i = 0; i < FF_ARRAY_ELEMS(date_fmt); i++) {
-            q = small_strptime(p, date_fmt[i], &dt);
+            q = av_small_strptime(p, date_fmt[i], &dt);
             if (q)
                 break;
         }
@@ -576,7 +572,7 @@ int av_parse_time(int64_t *timeval, const char *timestr, int duration)
 
         /* parse the hour-minute-second part */
         for (i = 0; i < FF_ARRAY_ELEMS(time_fmt); i++) {
-            q = small_strptime(p, time_fmt[i], &dt);
+            q = av_small_strptime(p, time_fmt[i], &dt);
             if (q)
                 break;
         }
@@ -587,7 +583,7 @@ int av_parse_time(int64_t *timeval, const char *timestr, int duration)
             ++p;
         }
         /* parse timestr as HH:MM:SS */
-        q = small_strptime(p, time_fmt[0], &dt);
+        q = av_small_strptime(p, time_fmt[0], &dt);
         if (!q) {
             /* parse timestr as S+ */
             dt.tm_sec = strtol(p, (void *)&q, 10);
@@ -611,6 +607,8 @@ int av_parse_time(int64_t *timeval, const char *timestr, int duration)
                 break;
             microseconds += n * (*q - '0');
         }
+        while (isdigit(*q))
+            q++;
     }
 
     if (duration) {
@@ -723,12 +721,10 @@ int main(void)
 
         for (i = 0; i < FF_ARRAY_ELEMS(rates); i++) {
             int ret;
-            char err[1024];
             AVRational q = (AVRational){0, 0};
             ret = av_parse_video_rate(&q, rates[i]);
-            av_strerror(ret, err, sizeof(err));
-            printf("'%s' -> %d/%d ret:%s\n",
-                   rates[i], q.num, q.den, err);
+            printf("'%s' -> %d/%d%s\n",
+                   rates[i], q.num, q.den, ret ? " error" : "");
         }
     }
 
@@ -782,6 +778,35 @@ int main(void)
                 printf("%s -> R(%d) G(%d) B(%d) A(%d)\n", color_names[i], rgba[0], rgba[1], rgba[2], rgba[3]);
             else
                 printf("%s -> error\n", color_names[i]);
+        }
+    }
+
+    printf("\nTesting av_small_strptime()\n");
+    {
+        int i;
+        struct tm tm = { 0 };
+        struct fmt_timespec_entry {
+            const char *fmt, *timespec;
+        } fmt_timespec_entries[] = {
+            { "%Y-%m-%d",                    "2012-12-21" },
+            { "%Y - %m - %d",                "2012-12-21" },
+            { "%Y-%m-%d %H:%M:%S",           "2012-12-21 20:12:21" },
+            { "  %Y - %m - %d %H : %M : %S", "   2012 - 12 -  21   20 : 12 : 21" },
+        };
+
+        av_log_set_level(AV_LOG_DEBUG);
+        for (i = 0;  i < FF_ARRAY_ELEMS(fmt_timespec_entries); i++) {
+            char *p;
+            struct fmt_timespec_entry *e = &fmt_timespec_entries[i];
+            printf("fmt:'%s' spec:'%s' -> ", e->fmt, e->timespec);
+            p = av_small_strptime(e->timespec, e->fmt, &tm);
+            if (p) {
+                printf("%04d-%02d-%2d %02d:%02d:%02d\n",
+                       1900+tm.tm_year, tm.tm_mon+1, tm.tm_mday,
+                       tm.tm_hour, tm.tm_min, tm.tm_sec);
+            } else {
+                printf("error\n");
+            }
         }
     }
 

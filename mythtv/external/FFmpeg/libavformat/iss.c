@@ -98,7 +98,7 @@ static av_cold int iss_read_header(AVFormatContext *s)
     if (!st)
         return AVERROR(ENOMEM);
     st->codec->codec_type = AVMEDIA_TYPE_AUDIO;
-    st->codec->codec_id = CODEC_ID_ADPCM_IMA_ISS;
+    st->codec->codec_id = AV_CODEC_ID_ADPCM_IMA_ISS;
     st->codec->channels = stereo ? 2 : 1;
     st->codec->sample_rate = 44100;
     if(rate_divisor > 0)
@@ -129,7 +129,7 @@ static int iss_read_packet(AVFormatContext *s, AVPacket *pkt)
 
 AVInputFormat ff_iss_demuxer = {
     .name           = "iss",
-    .long_name      = NULL_IF_CONFIG_SMALL("Funcom ISS format"),
+    .long_name      = NULL_IF_CONFIG_SMALL("Funcom ISS"),
     .priv_data_size = sizeof(IssDemuxContext),
     .read_probe     = iss_probe,
     .read_header    = iss_read_header,

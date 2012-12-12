@@ -19,6 +19,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include <string.h>
+
+#include "libavutil/internal.h"
 #include "libavutil/intreadwrite.h"
 #include "libavutil/pixdesc.h"
 #include "avcodec.h"
@@ -116,7 +119,7 @@ static int targa_encode_frame(AVCodecContext *avctx, AVPacket *pkt,
         pkt->data[16] = 8;          /* bpp */
         break;
     case PIX_FMT_RGB555LE:
-        pkt->data[2]  = TGA_RGB;    /* uncompresses true-color image */
+        pkt->data[2]  = TGA_RGB;    /* uncompressed true-color image */
         avctx->bits_per_coded_sample =
         pkt->data[16] = 16;         /* bpp */
         break;
@@ -141,7 +144,7 @@ static int targa_encode_frame(AVCodecContext *avctx, AVPacket *pkt,
 
     /* if that worked well, mark the picture as RLE compressed */
     if(datasize >= 0)
-        pkt->data[2] |= 8;
+        pkt->data[2] |= TGA_RLE;
 
     /* if RLE didn't make it smaller, go back to no compression */
     else datasize = targa_encode_normal(out, p, bpp, avctx->width, avctx->height);
@@ -175,7 +178,7 @@ static av_cold int targa_encode_init(AVCodecContext *avctx)
 AVCodec ff_targa_encoder = {
     .name           = "targa",
     .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = CODEC_ID_TARGA,
+    .id             = AV_CODEC_ID_TARGA,
     .priv_data_size = sizeof(TargaContext),
     .init           = targa_encode_init,
     .encode2        = targa_encode_frame,

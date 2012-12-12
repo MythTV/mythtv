@@ -30,6 +30,7 @@
 #ifndef AVCODEC_AAC_H
 #define AVCODEC_AAC_H
 
+#include "libavutil/float_dsp.h"
 #include "avcodec.h"
 #include "dsputil.h"
 #include "fft.h"
@@ -292,6 +293,7 @@ typedef struct {
     FFTContext mdct_ltp;
     DSPContext dsp;
     FmtConvertContext fmt_conv;
+    AVFloatDSPContext fdsp;
     int random_state;
     /** @} */
 
@@ -300,6 +302,15 @@ typedef struct {
      * @{
      */
     float *output_data[MAX_CHANNELS];                 ///< Points to each element's 'ret' buffer (PCM output).
+    /** @} */
+
+
+    /**
+     * @name Japanese DTV specific extension
+     * @{
+     */
+    int enable_jp_dmono; ///< enable japanese DTV specific 'dual mono'
+    int dmono_mode;      ///< select the channel to decode in dual mono.
     /** @} */
 
     DECLARE_ALIGNED(32, float, temp)[128];

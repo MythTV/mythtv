@@ -242,7 +242,7 @@ static int dv_extract_audio_info(DVDemuxContext* c, uint8_t* frame)
                break;
            avpriv_set_pts_info(c->ast[i], 64, 1, 30000);
            c->ast[i]->codec->codec_type = AVMEDIA_TYPE_AUDIO;
-           c->ast[i]->codec->codec_id   = CODEC_ID_PCM_S16LE;
+           c->ast[i]->codec->codec_id   = AV_CODEC_ID_PCM_S16LE;
 
            av_init_packet(&c->audio_pkt[i]);
            c->audio_pkt[i].size         = 0;
@@ -323,7 +323,7 @@ DVDemuxContext* avpriv_dv_init_demux(AVFormatContext *s)
 
     c->fctx                   = s;
     c->vst->codec->codec_type = AVMEDIA_TYPE_VIDEO;
-    c->vst->codec->codec_id   = CODEC_ID_DVVIDEO;
+    c->vst->codec->codec_id   = AV_CODEC_ID_DVVIDEO;
     c->vst->codec->bit_rate   = 25000000;
     c->vst->start_time        = 0;
 
@@ -419,9 +419,13 @@ static int64_t dv_frame_offset(AVFormatContext *s, DVDemuxContext *c,
 void ff_dv_offset_reset(DVDemuxContext *c, int64_t frame_offset)
 {
     c->frames= frame_offset;
-    if (c->ach)
+    if (c->ach) {
+        if (c->sys) {
         c->abytes= av_rescale_q(c->frames, c->sys->time_base,
                                 (AVRational){8, c->ast[0]->codec->bit_rate});
+        }else
+            av_log(c->fctx, AV_LOG_ERROR, "cannot adjust audio bytes\n");
+    }
     c->audio_pkt[0].size = c->audio_pkt[1].size = 0;
     c->audio_pkt[2].size = c->audio_pkt[3].size = 0;
 }
@@ -459,7 +463,7 @@ static int dv_read_timecode(AVFormatContext *s) {
     if (ret)
         av_dict_set(&s->metadata, "timecode", timecode, 0);
     else if (ret < 0)
-        av_log(s, AV_LOG_ERROR, "Detected timecode is invalid");
+        av_log(s, AV_LOG_ERROR, "Detected timecode is invalid\n");
 
 finish:
     av_free(partial_frame);
@@ -591,7 +595,7 @@ static int dv_probe(AVProbeData *p)
 #if CONFIG_DV_DEMUXER
 AVInputFormat ff_dv_demuxer = {
     .name           = "dv",
-    .long_name      = NULL_IF_CONFIG_SMALL("DV video format"),
+    .long_name      = NULL_IF_CONFIG_SMALL("DV (Digital Video)"),
     .priv_data_size = sizeof(RawDVContext),
     .read_probe     = dv_probe,
     .read_header    = dv_read_header,

@@ -19,6 +19,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include "libavutil/common.h"
 #include "libavutil/intreadwrite.h"
 #include "libavutil/imgutils.h"
 #include "avcodec.h"
@@ -58,7 +59,7 @@ static int ptx_decode_frame(AVCodecContext *avctx, void *data, int *data_size,
         return -1;
     }
 
-    avctx->pix_fmt = PIX_FMT_RGB555;
+    avctx->pix_fmt = PIX_FMT_BGR555LE;
 
     if (buf_end - buf < offset)
         return AVERROR_INVALIDDATA;
@@ -85,13 +86,7 @@ static int ptx_decode_frame(AVCodecContext *avctx, void *data, int *data_size,
     stride = p->linesize[0];
 
     for (y = 0; y < h && buf_end - buf >= w * bytes_per_pixel; y++) {
-#if HAVE_BIGENDIAN
-        unsigned int x;
-        for (x=0; x<w*bytes_per_pixel; x+=bytes_per_pixel)
-            AV_WN16(ptr+x, AV_RL16(buf+x));
-#else
         memcpy(ptr, buf, w*bytes_per_pixel);
-#endif
         ptr += stride;
         buf += w*bytes_per_pixel;
     }
@@ -119,7 +114,7 @@ static av_cold int ptx_end(AVCodecContext *avctx) {
 AVCodec ff_ptx_decoder = {
     .name           = "ptx",
     .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = CODEC_ID_PTX,
+    .id             = AV_CODEC_ID_PTX,
     .priv_data_size = sizeof(PTXContext),
     .init           = ptx_init,
     .close          = ptx_end,

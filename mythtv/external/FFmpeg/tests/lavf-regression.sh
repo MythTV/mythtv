@@ -107,8 +107,9 @@ do_lavf flv "" "-an"
 fi
 
 if [ -n "$do_mov" ] ; then
-do_lavf mov "" "-movflags +rtphint -acodec pcm_alaw -vcodec mpeg4"
-do_lavf_timecode mov "-acodec pcm_alaw -vcodec mpeg4"
+mov_common_opt="-acodec pcm_alaw -vcodec mpeg4"
+do_lavf mov "" "-movflags +rtphint $mov_common_opt"
+do_lavf_timecode mov "-movflags +faststart $mov_common_opt"
 fi
 
 if [ -n "$do_ismv" ] ; then
@@ -282,7 +283,7 @@ do_audio_only aif
 fi
 
 if [ -n "$do_voc" ] ; then
-do_audio_only voc
+do_audio_only voc "" "-acodec pcm_u8"
 fi
 
 if [ -n "$do_voc_s16" ] ; then

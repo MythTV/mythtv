@@ -30,6 +30,8 @@
 #include <math.h>
 
 #define BITSTREAM_READER_LE
+#include "libavutil/float_dsp.h"
+#include "libavutil/avassert.h"
 #include "avcodec.h"
 #include "get_bits.h"
 #include "dsputil.h"
@@ -43,9 +45,6 @@
 #define V_NB_BITS2 11
 #define V_MAX_VLCS (1 << 16)
 #define V_MAX_PARTITIONS (1 << 20)
-
-#undef NDEBUG
-#include <assert.h>
 
 typedef struct {
     uint8_t      dimensions;
@@ -128,6 +127,7 @@ typedef struct vorbis_context_s {
     AVFrame frame;
     GetBitContext gb;
     DSPContext dsp;
+    AVFloatDSPContext fdsp;
     FmtConvertContext fmt_conv;
 
     FFTContext mdct[2];
@@ -578,14 +578,10 @@ static int vorbis_parse_setup_hdr_floors(vorbis_context *vc)
             }
 
 // Precalculate order of x coordinates - needed for decode
-            ff_vorbis_ready_floor1_list(floor_setup->data.t1.list, floor_setup->data.t1.x_list_dim);
-
-            for (j=1; j<floor_setup->data.t1.x_list_dim; j++) {
-                if (   floor_setup->data.t1.list[ floor_setup->data.t1.list[j-1].sort ].x
-                    == floor_setup->data.t1.list[ floor_setup->data.t1.list[j  ].sort ].x) {
-                    av_log(vc->avccontext, AV_LOG_ERROR, "Non unique x values in floor type 1\n");
-                    return AVERROR_INVALIDDATA;
-                }
+            if (ff_vorbis_ready_floor1_list(vc->avccontext,
+                                            floor_setup->data.t1.list,
+                                            floor_setup->data.t1.x_list_dim)) {
+                return AVERROR_INVALIDDATA;
             }
         } else if (floor_setup->floor_type == 0) {
             unsigned max_codebook_dim = 0;
@@ -991,6 +987,7 @@ static av_cold int vorbis_decode_init(AVCodecContext *avccontext)
 
     vc->avccontext = avccontext;
     ff_dsputil_init(&vc->dsp, avccontext);
+    avpriv_float_dsp_init(&vc->fdsp, avccontext->flags & CODEC_FLAG_BITEXACT);
     ff_fmt_convert_init(&vc->fmt_conv, avccontext);
 
     if (avccontext->request_sample_fmt == AV_SAMPLE_FMT_FLT) {
@@ -1335,7 +1332,7 @@ static av_always_inline int vorbis_residue_decode_internal(vorbis_context *vc,
 
                         av_dlog(NULL, "Classword: %u\n", temp);
 
-                        assert(vr->classifications > 1 && temp <= 65536); //needed for inverse[]
+                        av_assert0(vr->classifications > 1 && temp <= 65536); //needed for inverse[]
                         for (i = 0; i < c_p_c; ++i) {
                             unsigned temp2;
 
@@ -1359,8 +1356,7 @@ static av_always_inline int vorbis_residue_decode_internal(vorbis_context *vc,
                         if (vqbook >= 0 && vc->codebooks[vqbook].codevectors) {
                             unsigned coffs;
                             unsigned dim  = vc->codebooks[vqbook].dimensions;
-                            unsigned step = dim == 1 ? vr->partition_size
-                                                     : FASTDIV(vr->partition_size, dim);
+                            unsigned step = FASTDIV(vr->partition_size << 1, dim << 1);
                             vorbis_codebook codebook = vc->codebooks[vqbook];
 
                             if (vr_type == 0) {
@@ -1369,14 +1365,14 @@ static av_always_inline int vorbis_residue_decode_internal(vorbis_context *vc,
                                 for (k = 0; k < step; ++k) {
                                     coffs = get_vlc2(gb, codebook.vlc.table, codebook.nb_bits, 3) * dim;
                                     for (l = 0; l < dim; ++l)
-                                        vec[voffs + k + l * step] += codebook.codevectors[coffs + l];  // FPMATH
+                                        vec[voffs + k + l * step] += codebook.codevectors[coffs + l];
                                 }
                             } else if (vr_type == 1) {
                                 voffs = voffset + j * vlen;
                                 for (k = 0; k < step; ++k) {
                                     coffs = get_vlc2(gb, codebook.vlc.table, codebook.nb_bits, 3) * dim;
                                     for (l = 0; l < dim; ++l, ++voffs) {
-                                        vec[voffs]+=codebook.codevectors[coffs+l];  // FPMATH
+                                        vec[voffs]+=codebook.codevectors[coffs+l];
 
                                         av_dlog(NULL, " pass %d offs: %d curr: %f change: %f cv offs.: %d  \n",
                                                 pass, voffs, vec[voffs], codebook.codevectors[coffs+l], coffs);
@@ -1388,23 +1384,23 @@ static av_always_inline int vorbis_residue_decode_internal(vorbis_context *vc,
                                 if (dim == 2) {
                                     for (k = 0; k < step; ++k) {
                                         coffs = get_vlc2(gb, codebook.vlc.table, codebook.nb_bits, 3) * 2;
-                                        vec[voffs + k       ] += codebook.codevectors[coffs    ];  // FPMATH
-                                        vec[voffs + k + vlen] += codebook.codevectors[coffs + 1];  // FPMATH
+                                        vec[voffs + k       ] += codebook.codevectors[coffs    ];
+                                        vec[voffs + k + vlen] += codebook.codevectors[coffs + 1];
                                     }
                                 } else if (dim == 4) {
                                     for (k = 0; k < step; ++k, voffs += 2) {
                                         coffs = get_vlc2(gb, codebook.vlc.table, codebook.nb_bits, 3) * 4;
-                                        vec[voffs           ] += codebook.codevectors[coffs    ];  // FPMATH
-                                        vec[voffs + 1       ] += codebook.codevectors[coffs + 2];  // FPMATH
-                                        vec[voffs + vlen    ] += codebook.codevectors[coffs + 1];  // FPMATH
-                                        vec[voffs + vlen + 1] += codebook.codevectors[coffs + 3];  // FPMATH
+                                        vec[voffs           ] += codebook.codevectors[coffs    ];
+                                        vec[voffs + 1       ] += codebook.codevectors[coffs + 2];
+                                        vec[voffs + vlen    ] += codebook.codevectors[coffs + 1];
+                                        vec[voffs + vlen + 1] += codebook.codevectors[coffs + 3];
                                     }
                                 } else
                                 for (k = 0; k < step; ++k) {
                                     coffs = get_vlc2(gb, codebook.vlc.table, codebook.nb_bits, 3) * dim;
                                     for (l = 0; l < dim; l += 2, voffs++) {
-                                        vec[voffs       ] += codebook.codevectors[coffs + l    ];  // FPMATH
-                                        vec[voffs + vlen] += codebook.codevectors[coffs + l + 1];  // FPMATH
+                                        vec[voffs       ] += codebook.codevectors[coffs + l    ];
+                                        vec[voffs + vlen] += codebook.codevectors[coffs + l + 1];
 
                                         av_dlog(NULL, " pass %d offs: %d curr: %f change: %f cv offs.: %d+%d  \n",
                                                 pass, voffset / ch + (voffs % ch) * vlen,
@@ -1414,17 +1410,24 @@ static av_always_inline int vorbis_residue_decode_internal(vorbis_context *vc,
                                 }
 
                             } else if (vr_type == 2) {
-                                voffs = voffset;
+                                unsigned voffs_div = FASTDIV(voffset << 1, ch <<1);
+                                unsigned voffs_mod = voffset - voffs_div * ch;
 
                                 for (k = 0; k < step; ++k) {
                                     coffs = get_vlc2(gb, codebook.vlc.table, codebook.nb_bits, 3) * dim;
-                                    for (l = 0; l < dim; ++l, ++voffs) {
-                                        vec[voffs / ch + (voffs % ch) * vlen] += codebook.codevectors[coffs + l];  // FPMATH FIXME use if and counter instead of / and %
+                                    for (l = 0; l < dim; ++l) {
+                                        vec[voffs_div + voffs_mod * vlen] +=
+                                            codebook.codevectors[coffs + l];
 
                                         av_dlog(NULL, " pass %d offs: %d curr: %f change: %f cv offs.: %d+%d  \n",
-                                                pass, voffset / ch + (voffs % ch) * vlen,
-                                                vec[voffset / ch + (voffs % ch) * vlen],
+                                                pass, voffs_div + voffs_mod * vlen,
+                                                vec[voffs_div + voffs_mod * vlen],
                                                 codebook.codevectors[coffs + l], coffs, l);
+
+                                        if (++voffs_mod == ch) {
+                                            voffs_div++;
+                                            voffs_mod = 0;
+                                        }
                                     }
                                 }
                             }
@@ -1613,11 +1616,11 @@ static int vorbis_parse_audio_packet(vorbis_context *vc)
     for (j = vc->audio_channels-1;j >= 0; j--) {
         ch_floor_ptr = vc->channel_floors   + j           * blocksize / 2;
         ch_res_ptr   = vc->channel_residues + res_chan[j] * blocksize / 2;
-        vc->dsp.vector_fmul(ch_floor_ptr, ch_floor_ptr, ch_res_ptr, blocksize / 2);
+        vc->fdsp.vector_fmul(ch_floor_ptr, ch_floor_ptr, ch_res_ptr, blocksize / 2);
         mdct->imdct_half(mdct, ch_res_ptr, ch_floor_ptr);
     }
 
-// Overlap/add, save data for next overlapping  FPMATH
+// Overlap/add, save data for next overlapping
 
     retlen = (blocksize + vc->blocksize[previous_window]) / 4;
     for (j = 0; j < vc->audio_channels; j++) {
@@ -1728,7 +1731,7 @@ static av_cold void vorbis_decode_flush(AVCodecContext *avccontext)
 AVCodec ff_vorbis_decoder = {
     .name            = "vorbis",
     .type            = AVMEDIA_TYPE_AUDIO,
-    .id              = CODEC_ID_VORBIS,
+    .id              = AV_CODEC_ID_VORBIS,
     .priv_data_size  = sizeof(vorbis_context),
     .init            = vorbis_decode_init,
     .close           = vorbis_decode_close,

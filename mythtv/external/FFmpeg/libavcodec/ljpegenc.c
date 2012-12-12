@@ -196,7 +196,8 @@ static int encode_picture_lossless(AVCodecContext *avctx, AVPacket *pkt,
     }
 
     emms_c();
-
+    av_assert0(s->esc_pos == s->header_bits >> 3);
+    ff_mjpeg_encode_stuffing(s);
     ff_mjpeg_encode_picture_trailer(s);
     s->picture_number++;
 
@@ -213,10 +214,15 @@ static int encode_picture_lossless(AVCodecContext *avctx, AVPacket *pkt,
 AVCodec ff_ljpeg_encoder = { //FIXME avoid MPV_* lossless JPEG should not need them
     .name           = "ljpeg",
     .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = CODEC_ID_LJPEG,
+    .id             = AV_CODEC_ID_LJPEG,
     .priv_data_size = sizeof(MpegEncContext),
     .init           = ff_MPV_encode_init,
     .encode2        = encode_picture_lossless,
     .close          = ff_MPV_encode_end,
+    .pix_fmts       = (const enum PixelFormat[]){
+        PIX_FMT_BGR24, PIX_FMT_BGRA, PIX_FMT_BGR0,
+        PIX_FMT_YUVJ420P, PIX_FMT_YUVJ444P, PIX_FMT_YUVJ422P,
+        PIX_FMT_YUV420P, PIX_FMT_YUV444P, PIX_FMT_YUV422P,
+        PIX_FMT_NONE},
     .long_name      = NULL_IF_CONFIG_SMALL("Lossless JPEG"),
 };

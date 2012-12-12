@@ -188,13 +188,13 @@ static int mm_decode_frame(AVCodecContext *avctx,
     buf_size -= MM_PREAMBLE_SIZE;
     bytestream2_init(&s->gb, buf, buf_size);
 
-    if (avctx->reget_buffer(avctx, &s->frame) < 0) {
+    if ((res = avctx->reget_buffer(avctx, &s->frame)) < 0) {
         av_log(avctx, AV_LOG_ERROR, "reget_buffer() failed\n");
-        return -1;
+        return res;
     }
 
     switch(type) {
-    case MM_TYPE_PALETTE   : res = mm_decode_pal(s); return buf_size;
+    case MM_TYPE_PALETTE   : res = mm_decode_pal(s); return avpkt->size;
     case MM_TYPE_INTRA     : res = mm_decode_intra(s, 0, 0); break;
     case MM_TYPE_INTRA_HH  : res = mm_decode_intra(s, 1, 0); break;
     case MM_TYPE_INTRA_HHV : res = mm_decode_intra(s, 1, 1); break;
@@ -213,7 +213,7 @@ static int mm_decode_frame(AVCodecContext *avctx,
     *data_size = sizeof(AVFrame);
     *(AVFrame*)data = s->frame;
 
-    return buf_size;
+    return avpkt->size;
 }
 
 static av_cold int mm_decode_end(AVCodecContext *avctx)
@@ -229,7 +229,7 @@ static av_cold int mm_decode_end(AVCodecContext *avctx)
 AVCodec ff_mmvideo_decoder = {
     .name           = "mmvideo",
     .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = CODEC_ID_MMVIDEO,
+    .id             = AV_CODEC_ID_MMVIDEO,
     .priv_data_size = sizeof(MmContext),
     .init           = mm_decode_init,
     .close          = mm_decode_end,

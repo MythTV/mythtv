@@ -24,6 +24,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "libavutil/attributes.h"
 #include "libavutil/avutil.h"
 #include "libavutil/avassert.h"
 #include "libavutil/bswap.h"
@@ -36,24 +37,27 @@
 #include "swscale.h"
 #include "swscale_internal.h"
 
-DECLARE_ALIGNED(8, static const uint8_t, dither_2x2_4)[2][8]={
+DECLARE_ALIGNED(8, const uint8_t, dither_2x2_4)[][8]={
 {  1,   3,   1,   3,   1,   3,   1,   3, },
 {  2,   0,   2,   0,   2,   0,   2,   0, },
+{  1,   3,   1,   3,   1,   3,   1,   3, },
 };
 
-DECLARE_ALIGNED(8, static const uint8_t, dither_2x2_8)[2][8]={
+DECLARE_ALIGNED(8, const uint8_t, dither_2x2_8)[][8]={
 {  6,   2,   6,   2,   6,   2,   6,   2, },
 {  0,   4,   0,   4,   0,   4,   0,   4, },
+{  6,   2,   6,   2,   6,   2,   6,   2, },
 };
 
-DECLARE_ALIGNED(8, const uint8_t, dither_4x4_16)[4][8]={
+DECLARE_ALIGNED(8, const uint8_t, dither_4x4_16)[][8]={
 {  8,   4,  11,   7,   8,   4,  11,   7, },
 {  2,  14,   1,  13,   2,  14,   1,  13, },
 { 10,   6,   9,   5,  10,   6,   9,   5, },
 {  0,  12,   3,  15,   0,  12,   3,  15, },
+{  8,   4,  11,   7,   8,   4,  11,   7, },
 };
 
-DECLARE_ALIGNED(8, const uint8_t, dither_8x8_32)[8][8]={
+DECLARE_ALIGNED(8, const uint8_t, dither_8x8_32)[][8]={
 { 17,   9,  23,  15,  16,   8,  22,  14, },
 {  5,  29,   3,  27,   4,  28,   2,  26, },
 { 21,  13,  19,  11,  20,  12,  18,  10, },
@@ -62,9 +66,10 @@ DECLARE_ALIGNED(8, const uint8_t, dither_8x8_32)[8][8]={
 {  4,  28,   2,  26,   5,  29,   3,  27, },
 { 20,  12,  18,  10,  21,  13,  19,  11, },
 {  1,  25,   7,  31,   0,  24,   6,  30, },
+{ 17,   9,  23,  15,  16,   8,  22,  14, },
 };
 
-DECLARE_ALIGNED(8, const uint8_t, dither_8x8_73)[8][8]={
+DECLARE_ALIGNED(8, const uint8_t, dither_8x8_73)[][8]={
 {  0,  55,  14,  68,   3,  58,  17,  72, },
 { 37,  18,  50,  32,  40,  22,  54,  35, },
 {  9,  64,   5,  59,  13,  67,   8,  63, },
@@ -73,10 +78,11 @@ DECLARE_ALIGNED(8, const uint8_t, dither_8x8_73)[8][8]={
 { 39,  21,  52,  34,  38,  19,  51,  33, },
 { 11,  66,   7,  62,  10,  65,   6,  60, },
 { 48,  30,  43,  25,  47,  29,  42,  24, },
+{  0,  55,  14,  68,   3,  58,  17,  72, },
 };
 
 #if 1
-DECLARE_ALIGNED(8, const uint8_t, dither_8x8_220)[8][8]={
+DECLARE_ALIGNED(8, const uint8_t, dither_8x8_220)[][8]={
 {117,  62, 158, 103, 113,  58, 155, 100, },
 { 34, 199,  21, 186,  31, 196,  17, 182, },
 {144,  89, 131,  76, 141,  86, 127,  72, },
@@ -85,10 +91,11 @@ DECLARE_ALIGNED(8, const uint8_t, dither_8x8_220)[8][8]={
 { 28, 193,  14, 179,  38, 203,  24, 189, },
 {138,  83, 124,  69, 148,  93, 134,  79, },
 {  7, 172,  48, 213,   3, 168,  45, 210, },
+{117,  62, 158, 103, 113,  58, 155, 100, },
 };
 #elif 1
 // tries to correct a gamma of 1.5
-DECLARE_ALIGNED(8, const uint8_t, dither_8x8_220)[8][8]={
+DECLARE_ALIGNED(8, const uint8_t, dither_8x8_220)[][8]={
 {  0, 143,  18, 200,   2, 156,  25, 215, },
 { 78,  28, 125,  64,  89,  36, 138,  74, },
 { 10, 180,   3, 161,  16, 195,   8, 175, },
@@ -97,10 +104,11 @@ DECLARE_ALIGNED(8, const uint8_t, dither_8x8_220)[8][8]={
 { 85,  33, 134,  71,  81,  30, 130,  67, },
 { 14, 190,   6, 171,  12, 185,   5, 166, },
 {117,  57, 101,  44, 113,  54,  97,  41, },
+{  0, 143,  18, 200,   2, 156,  25, 215, },
 };
 #elif 1
 // tries to correct a gamma of 2.0
-DECLARE_ALIGNED(8, const uint8_t, dither_8x8_220)[8][8]={
+DECLARE_ALIGNED(8, const uint8_t, dither_8x8_220)[][8]={
 {  0, 124,   8, 193,   0, 140,  12, 213, },
 { 55,  14, 104,  42,  66,  19, 119,  52, },
 {  3, 168,   1, 145,   6, 187,   3, 162, },
@@ -109,10 +117,11 @@ DECLARE_ALIGNED(8, const uint8_t, dither_8x8_220)[8][8]={
 { 62,  17, 114,  48,  58,  16, 109,  45, },
 {  5, 181,   2, 157,   4, 175,   1, 151, },
 { 95,  36,  78,  26,  90,  34,  74,  24, },
+{  0, 124,   8, 193,   0, 140,  12, 213, },
 };
 #else
 // tries to correct a gamma of 2.5
-DECLARE_ALIGNED(8, const uint8_t, dither_8x8_220)[8][8]={
+DECLARE_ALIGNED(8, const uint8_t, dither_8x8_220)[][8]={
 {  0, 107,   3, 187,   0, 125,   6, 212, },
 { 39,   7,  86,  28,  49,  11, 102,  36, },
 {  1, 158,   0, 131,   3, 180,   1, 151, },
@@ -121,6 +130,7 @@ DECLARE_ALIGNED(8, const uint8_t, dither_8x8_220)[8][8]={
 { 45,   9,  96,  33,  42,   8,  91,  30, },
 {  2, 172,   1, 144,   2, 165,   0, 137, },
 { 77,  23,  60,  15,  72,  21,  56,  14, },
+{  0, 107,   3, 187,   0, 125,   6, 212, },
 };
 #endif
 
@@ -165,7 +175,7 @@ yuv2planeX_16_c_template(const int16_t *filter, int filterSize,
          * reasonable filterSize), and re-add that at the end. */
         val -= 0x40000000;
         for (j = 0; j < filterSize; j++)
-            val += src[j][i] * filter[j];
+            val += src[j][i] * (unsigned)filter[j];
 
         output_pixel(&dest[i], val, 0x8000, int);
     }
@@ -617,12 +627,12 @@ yuv2rgb48_X_c_template(SwsContext *c, const int16_t *lumFilter,
         int R, G, B;
 
         for (j = 0; j < lumFilterSize; j++) {
-            Y1 += lumSrc[j][i * 2]     * lumFilter[j];
-            Y2 += lumSrc[j][i * 2 + 1] * lumFilter[j];
+            Y1 += lumSrc[j][i * 2]     * (unsigned)lumFilter[j];
+            Y2 += lumSrc[j][i * 2 + 1] * (unsigned)lumFilter[j];
         }
-        for (j = 0; j < chrFilterSize; j++) {
-            U += chrUSrc[j][i] * chrFilter[j];
-            V += chrVSrc[j][i] * chrFilter[j];
+        for (j = 0; j < chrFilterSize; j++) {;
+            U += chrUSrc[j][i] * (unsigned)chrFilter[j];
+            V += chrVSrc[j][i] * (unsigned)chrFilter[j];
         }
 
         // 8bit: 12+15=27; 16-bit: 12+19=31
@@ -1251,13 +1261,13 @@ YUV2RGBWRAPPERX(yuv2, rgb_full, xrgb32_full, PIX_FMT_ARGB,  0)
 YUV2RGBWRAPPERX(yuv2, rgb_full, bgr24_full,  PIX_FMT_BGR24, 0)
 YUV2RGBWRAPPERX(yuv2, rgb_full, rgb24_full,  PIX_FMT_RGB24, 0)
 
-void ff_sws_init_output_funcs(SwsContext *c,
-                              yuv2planar1_fn *yuv2plane1,
-                              yuv2planarX_fn *yuv2planeX,
-                              yuv2interleavedX_fn *yuv2nv12cX,
-                              yuv2packed1_fn *yuv2packed1,
-                              yuv2packed2_fn *yuv2packed2,
-                              yuv2packedX_fn *yuv2packedX)
+av_cold void ff_sws_init_output_funcs(SwsContext *c,
+                                      yuv2planar1_fn *yuv2plane1,
+                                      yuv2planarX_fn *yuv2planeX,
+                                      yuv2interleavedX_fn *yuv2nv12cX,
+                                      yuv2packed1_fn *yuv2packed1,
+                                      yuv2packed2_fn *yuv2packed2,
+                                      yuv2packedX_fn *yuv2packedX)
 {
     enum PixelFormat dstFormat = c->dstFormat;
 

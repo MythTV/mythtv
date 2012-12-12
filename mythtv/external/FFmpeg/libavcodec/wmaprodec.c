@@ -341,6 +341,11 @@ static av_cold int decode_init(AVCodecContext *avctx)
         return AVERROR_INVALIDDATA;
     }
 
+    if (s->avctx->sample_rate <= 0) {
+        av_log(avctx, AV_LOG_ERROR, "invalid sample rate\n");
+        return AVERROR_INVALIDDATA;
+    }
+
     s->num_channels = avctx->channels;
 
     if (s->num_channels < 0) {
@@ -535,7 +540,7 @@ static int decode_tilehdr(WMAProDecodeCtx *s)
     int c;
 
     /* Should never consume more than 3073 bits (256 iterations for the
-     * while loop when always the minimum amount of 128 samples is substracted
+     * while loop when always the minimum amount of 128 samples is subtracted
      * from missing samples in the 8 channel case).
      * 1 + BLOCK_MAX_SIZE * MAX_CHANNELS / BLOCK_MIN_SIZE * (MAX_CHANNELS  + 4)
      */
@@ -1449,7 +1454,7 @@ static void save_bits(WMAProDecodeCtx *s, GetBitContext* gb, int len,
     int buflen;
 
     /** when the frame data does not need to be concatenated, the input buffer
-        is resetted and additional bits from the previous frame are copyed
+        is reset and additional bits from the previous frame are copied
         and skipped later so that a fast byte copy is possible */
 
     if (!append) {
@@ -1630,7 +1635,7 @@ static void flush(AVCodecContext *avctx)
 AVCodec ff_wmapro_decoder = {
     .name           = "wmapro",
     .type           = AVMEDIA_TYPE_AUDIO,
-    .id             = CODEC_ID_WMAPRO,
+    .id             = AV_CODEC_ID_WMAPRO,
     .priv_data_size = sizeof(WMAProDecodeCtx),
     .init           = decode_init,
     .close          = decode_end,

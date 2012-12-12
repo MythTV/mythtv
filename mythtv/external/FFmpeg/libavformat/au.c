@@ -38,15 +38,15 @@
 
 /* The libavcodec codecs we support, and the IDs they have in the file */
 static const AVCodecTag codec_au_tags[] = {
-    { CODEC_ID_PCM_MULAW, 1 },
-    { CODEC_ID_PCM_S8, 2 },
-    { CODEC_ID_PCM_S16BE, 3 },
-    { CODEC_ID_PCM_S24BE, 4 },
-    { CODEC_ID_PCM_S32BE, 5 },
-    { CODEC_ID_PCM_F32BE, 6 },
-    { CODEC_ID_PCM_F64BE, 7 },
-    { CODEC_ID_PCM_ALAW, 27 },
-    { CODEC_ID_NONE, 0 },
+    { AV_CODEC_ID_PCM_MULAW, 1 },
+    { AV_CODEC_ID_PCM_S8, 2 },
+    { AV_CODEC_ID_PCM_S16BE, 3 },
+    { AV_CODEC_ID_PCM_S24BE, 4 },
+    { AV_CODEC_ID_PCM_S32BE, 5 },
+    { AV_CODEC_ID_PCM_F32BE, 6 },
+    { AV_CODEC_ID_PCM_F64BE, 7 },
+    { AV_CODEC_ID_PCM_ALAW, 27 },
+    { AV_CODEC_ID_NONE, 0 },
 };
 
 #if CONFIG_AU_MUXER
@@ -124,7 +124,7 @@ static int au_read_header(AVFormatContext *s)
     unsigned int tag;
     AVIOContext *pb = s->pb;
     unsigned int id, channels, rate;
-    enum CodecID codec;
+    enum AVCodecID codec;
     AVStream *st;
 
     /* check ".snd" header */
@@ -181,10 +181,13 @@ static int au_read_packet(AVFormatContext *s,
                           AVPacket *pkt)
 {
     int ret;
+    int bpcs = av_get_bits_per_sample(s->streams[0]->codec->codec_id);
 
+    if (!bpcs)
+        return AVERROR(EINVAL);
     ret= av_get_packet(s->pb, pkt, BLOCK_SIZE *
                        s->streams[0]->codec->channels *
-                       av_get_bits_per_sample(s->streams[0]->codec->codec_id) >> 3);
+                       bpcs >> 3);
     if (ret < 0)
         return ret;
     pkt->flags &= ~AV_PKT_FLAG_CORRUPT;
@@ -195,7 +198,7 @@ static int au_read_packet(AVFormatContext *s,
 #if CONFIG_AU_DEMUXER
 AVInputFormat ff_au_demuxer = {
     .name           = "au",
-    .long_name      = NULL_IF_CONFIG_SMALL("SUN AU format"),
+    .long_name      = NULL_IF_CONFIG_SMALL("Sun AU"),
     .read_probe     = au_probe,
     .read_header    = au_read_header,
     .read_packet    = au_read_packet,
@@ -207,11 +210,11 @@ AVInputFormat ff_au_demuxer = {
 #if CONFIG_AU_MUXER
 AVOutputFormat ff_au_muxer = {
     .name              = "au",
-    .long_name         = NULL_IF_CONFIG_SMALL("SUN AU format"),
+    .long_name         = NULL_IF_CONFIG_SMALL("Sun AU"),
     .mime_type         = "audio/basic",
     .extensions        = "au",
-    .audio_codec       = CODEC_ID_PCM_S16BE,
-    .video_codec       = CODEC_ID_NONE,
+    .audio_codec       = AV_CODEC_ID_PCM_S16BE,
+    .video_codec       = AV_CODEC_ID_NONE,
     .write_header      = au_write_header,
     .write_packet      = au_write_packet,
     .write_trailer     = au_write_trailer,

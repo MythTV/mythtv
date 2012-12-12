@@ -1202,14 +1202,16 @@ static int wavpack_decode_frame(AVCodecContext *avctx, void *data,
         avctx->sample_fmt = AV_SAMPLE_FMT_S16;
     } else {
         avctx->sample_fmt = AV_SAMPLE_FMT_S32;
+        avctx->bits_per_raw_sample = ((frame_flags & 0x03) + 1) << 3;
     }
 
     /* get output buffer */
-    s->frame.nb_samples = s->samples;
+    s->frame.nb_samples = s->samples + 1;
     if ((ret = avctx->get_buffer(avctx, &s->frame)) < 0) {
         av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
         return ret;
     }
+    s->frame.nb_samples = s->samples;
 
     while (buf_size > 0) {
         if (!s->multichannel) {
@@ -1248,7 +1250,7 @@ static int wavpack_decode_frame(AVCodecContext *avctx, void *data,
 AVCodec ff_wavpack_decoder = {
     .name           = "wavpack",
     .type           = AVMEDIA_TYPE_AUDIO,
-    .id             = CODEC_ID_WAVPACK,
+    .id             = AV_CODEC_ID_WAVPACK,
     .priv_data_size = sizeof(WavpackContext),
     .init           = wavpack_decode_init,
     .close          = wavpack_decode_end,

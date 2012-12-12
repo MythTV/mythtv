@@ -25,6 +25,9 @@
  */
 
 #include "avfilter.h"
+#include "video.h"
+#include "formats.h"
+#include "internal.h"
 #include "libavutil/avassert.h"
 #include "libavutil/pixdesc.h"
 #include "libavutil/intreadwrite.h"
@@ -124,7 +127,6 @@ extern const vf_info_t vf_info_1bpp;
 extern const vf_info_t vf_info_ass;
 extern const vf_info_t vf_info_bmovl;
 extern const vf_info_t vf_info_crop;
-extern const vf_info_t vf_info_decimate;
 extern const vf_info_t vf_info_denoise3d;
 extern const vf_info_t vf_info_detc;
 extern const vf_info_t vf_info_dint;
@@ -141,13 +143,11 @@ extern const vf_info_t vf_info_filmdint;
 extern const vf_info_t vf_info_fixpts;
 extern const vf_info_t vf_info_flip;
 extern const vf_info_t vf_info_format;
-extern const vf_info_t vf_info_framestep;
 extern const vf_info_t vf_info_fspp;
 extern const vf_info_t vf_info_geq;
 extern const vf_info_t vf_info_halfpack;
 extern const vf_info_t vf_info_harddup;
 extern const vf_info_t vf_info_hqdn3d;
-extern const vf_info_t vf_info_hue;
 extern const vf_info_t vf_info_il;
 extern const vf_info_t vf_info_ilpack;
 extern const vf_info_t vf_info_ivtc;
@@ -166,10 +166,8 @@ extern const vf_info_t vf_info_pp;
 extern const vf_info_t vf_info_pullup;
 extern const vf_info_t vf_info_qp;
 extern const vf_info_t vf_info_rectangle;
-extern const vf_info_t vf_info_rotate;
 extern const vf_info_t vf_info_sab;
 extern const vf_info_t vf_info_scale;
-extern const vf_info_t vf_info_smartblur;
 extern const vf_info_t vf_info_softpulldown;
 extern const vf_info_t vf_info_softskip;
 extern const vf_info_t vf_info_spp;
@@ -189,7 +187,6 @@ extern const vf_info_t vf_info_zrmjpeg;
 
 
 static const vf_info_t* const filters[]={
-    &vf_info_decimate,
     &vf_info_denoise3d,
     &vf_info_detc,
     &vf_info_dint,
@@ -202,12 +199,10 @@ static const vf_info_t* const filters[]={
     &vf_info_fil,
 //    &vf_info_filmdint, cmmx.h vd.h ‘opt_screen_size_x’
     &vf_info_fixpts,
-    &vf_info_framestep,
     &vf_info_fspp,
     &vf_info_geq,
     &vf_info_harddup,
     &vf_info_hqdn3d,
-    &vf_info_hue,
     &vf_info_il,
     &vf_info_ilpack,
     &vf_info_ivtc,
@@ -223,9 +218,7 @@ static const vf_info_t* const filters[]={
     &vf_info_pullup,
     &vf_info_qp,
     &vf_info_rectangle,
-    &vf_info_rotate,
     &vf_info_sab,
-    &vf_info_smartblur,
     &vf_info_softpulldown,
     &vf_info_softskip,
     &vf_info_spp,
@@ -633,9 +626,9 @@ int vf_next_put_image(struct vf_instance *vf,mp_image_t *mpi, double pts){
     if(pts != MP_NOPTS_VALUE)
         picref->pts= pts * av_q2d(outlink->time_base);
 
-    avfilter_start_frame(outlink, avfilter_ref_buffer(picref, ~0));
-    avfilter_draw_slice(outlink, 0, picref->video->h, 1);
-    avfilter_end_frame(outlink);
+    ff_start_frame(outlink, avfilter_ref_buffer(picref, ~0));
+    ff_draw_slice(outlink, 0, picref->video->h, 1);
+    ff_end_frame(outlink);
     avfilter_unref_buffer(picref);
     m->frame_returned++;
 
@@ -673,8 +666,8 @@ int vf_next_config(struct vf_instance *vf,
         vf->next=vf2;
     }
     vf->next->w = width; vf->next->h = height;
-#endif
     return 1;
+#endif
 }
 
 int vf_next_control(struct vf_instance *vf, int request, void* data){
@@ -696,7 +689,7 @@ static int vf_default_query_format(struct vf_instance *vf, unsigned int fmt){
 }
 
 
-static av_cold int init(AVFilterContext *ctx, const char *args, void *opaque)
+static av_cold int init(AVFilterContext *ctx, const char *args)
 {
     MPContext *m = ctx->priv;
     char name[256];
@@ -788,14 +781,14 @@ static int query_formats(AVFilterContext *ctx)
         if(m->vf.query_format(&m->vf, conversion_map[i].fmt)){
             av_log(ctx, AV_LOG_DEBUG, "supported,adding\n");
             if (conversion_map[i].pix_fmt != lastpixfmt) {
-                avfilter_add_format(&avfmts, conversion_map[i].pix_fmt);
+                ff_add_format(&avfmts, conversion_map[i].pix_fmt);
                 lastpixfmt = conversion_map[i].pix_fmt;
             }
         }
     }
 
     //We assume all allowed input formats are also allowed output formats
-    avfilter_set_common_pixel_formats(ctx, avfmts);
+    ff_set_common_formats(ctx, avfmts);
     return 0;
 }
 
@@ -836,7 +829,7 @@ static int request_frame(AVFilterLink *outlink)
     av_log(m->avfctx, AV_LOG_DEBUG, "mp request_frame\n");
 
     for(m->frame_returned=0; !m->frame_returned;){
-        ret=avfilter_request_frame(outlink->src->inputs[0]);
+        ret=ff_request_frame(outlink->src->inputs[0]);
         if(ret<0)
             break;
     }
@@ -845,15 +838,17 @@ static int request_frame(AVFilterLink *outlink)
     return ret;
 }
 
-static void start_frame(AVFilterLink *inlink, AVFilterBufferRef *picref)
+static int start_frame(AVFilterLink *inlink, AVFilterBufferRef *picref)
 {
+    return 0;
 }
 
-static void null_draw_slice(AVFilterLink *link, int y, int h, int slice_dir)
+static int null_draw_slice(AVFilterLink *link, int y, int h, int slice_dir)
 {
+    return 0;
 }
 
-static void end_frame(AVFilterLink *inlink)
+static int end_frame(AVFilterLink *inlink)
 {
     MPContext *m = inlink->dst->priv;
     AVFilterBufferRef *inpic  = inlink->cur_buf;
@@ -880,8 +875,7 @@ static void end_frame(AVFilterLink *inlink)
         av_log(m->avfctx, AV_LOG_DEBUG, "put_image() says skip\n");
     }
     free_mp_image(mpi);
-
-    avfilter_unref_buffer(inpic);
+    return 0;
 }
 
 AVFilter avfilter_vf_mp = {

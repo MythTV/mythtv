@@ -25,10 +25,6 @@
  *   http://www.csse.monash.edu.au/~timf/
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 #include "avcodec.h"
 #include "bytestream.h"
 #include "roqvideo.h"
@@ -173,6 +169,12 @@ static av_cold int roq_decode_init(AVCodecContext *avctx)
     RoqContext *s = avctx->priv_data;
 
     s->avctx = avctx;
+
+    if (avctx->width%16 || avctx->height%16) {
+         av_log_ask_for_sample(avctx, "dimensions not being a multiple of 16 are unsupported\n");
+         return AVERROR_PATCHWELCOME;
+    }
+
     s->width = avctx->width;
     s->height = avctx->height;
     avcodec_get_frame_defaults(&s->frames[0]);
@@ -192,11 +194,12 @@ static int roq_decode_frame(AVCodecContext *avctx,
     int buf_size = avpkt->size;
     RoqContext *s = avctx->priv_data;
     int copy= !s->current_frame->data[0];
+    int ret;
 
     s->current_frame->reference = 3;
-    if (avctx->reget_buffer(avctx, s->current_frame)) {
-        av_log(avctx, AV_LOG_ERROR, "  RoQ: get_buffer() failed\n");
-        return -1;
+    if ((ret = avctx->reget_buffer(avctx, s->current_frame)) < 0) {
+        av_log(avctx, AV_LOG_ERROR, "reget_buffer() failed\n");
+        return ret;
     }
 
     if(copy)
@@ -231,7 +234,7 @@ static av_cold int roq_decode_end(AVCodecContext *avctx)
 AVCodec ff_roq_decoder = {
     .name           = "roqvideo",
     .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = CODEC_ID_ROQ,
+    .id             = AV_CODEC_ID_ROQ,
     .priv_data_size = sizeof(RoqContext),
     .init           = roq_decode_init,
     .close          = roq_decode_end,

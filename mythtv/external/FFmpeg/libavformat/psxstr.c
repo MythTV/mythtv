@@ -64,7 +64,7 @@ typedef struct StrDemuxContext {
     StrChannel channels[32];
 } StrDemuxContext;
 
-static const char sync_header[12] = {0x00,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0x00};
+static const uint8_t sync_header[12] = {0x00,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0x00};
 
 static int str_probe(AVProbeData *p)
 {
@@ -204,7 +204,7 @@ static int str_read_packet(AVFormatContext *s,
                     str->channels[channel].video_stream_index = st->index;
 
                     st->codec->codec_type = AVMEDIA_TYPE_VIDEO;
-                    st->codec->codec_id   = CODEC_ID_MDEC;
+                    st->codec->codec_id   = AV_CODEC_ID_MDEC;
                     st->codec->codec_tag  = 0;  /* no fourcc */
                     st->codec->width      = AV_RL16(&sector[0x28]);
                     st->codec->height     = AV_RL16(&sector[0x2A]);
@@ -251,7 +251,7 @@ static int str_read_packet(AVFormatContext *s,
                 str->channels[channel].audio_stream_index = st->index;
 
                 st->codec->codec_type  = AVMEDIA_TYPE_AUDIO;
-                st->codec->codec_id    = CODEC_ID_ADPCM_XA;
+                st->codec->codec_id    = AV_CODEC_ID_ADPCM_XA;
                 st->codec->codec_tag   = 0;  /* no fourcc */
                 st->codec->channels    = (fmt&1)?2:1;
                 st->codec->sample_rate = (fmt&4)?18900:37800;
@@ -296,7 +296,7 @@ static int str_read_close(AVFormatContext *s)
 
 AVInputFormat ff_str_demuxer = {
     .name           = "psxstr",
-    .long_name      = NULL_IF_CONFIG_SMALL("Sony Playstation STR format"),
+    .long_name      = NULL_IF_CONFIG_SMALL("Sony Playstation STR"),
     .priv_data_size = sizeof(StrDemuxContext),
     .read_probe     = str_probe,
     .read_header    = str_read_header,

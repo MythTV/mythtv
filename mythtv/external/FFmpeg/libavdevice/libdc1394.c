@@ -101,7 +101,7 @@ struct dc1394_frame_rate {
 #define DEC AV_OPT_FLAG_DECODING_PARAM
 static const AVOption options[] = {
 #if HAVE_LIBDC1394_1
-    { "channel", "", offsetof(dc1394_data, channel), AV_OPT_TYPE_INT, {.dbl = 0}, 0, INT_MAX, AV_OPT_FLAG_DECODING_PARAM },
+    { "channel", "", offsetof(dc1394_data, channel), AV_OPT_TYPE_INT, {.i64 = 0}, 0, INT_MAX, AV_OPT_FLAG_DECODING_PARAM },
 #endif
     { "video_size", "A string describing frame size, such as 640x480 or hd720.", OFFSET(video_size), AV_OPT_TYPE_STRING, {.str = "qvga"}, 0, 0, DEC },
     { "pixel_format", "", OFFSET(pixel_format), AV_OPT_TYPE_STRING, {.str = "uyvy422"}, 0, 0, DEC },
@@ -168,7 +168,7 @@ static inline int dc1394_read_common(AVFormatContext *c,
     }
     avpriv_set_pts_info(vst, 64, 1, 1000);
     vst->codec->codec_type = AVMEDIA_TYPE_VIDEO;
-    vst->codec->codec_id = CODEC_ID_RAWVIDEO;
+    vst->codec->codec_id = AV_CODEC_ID_RAWVIDEO;
     vst->codec->time_base.den = framerate.num;
     vst->codec->time_base.num = framerate.den;
     vst->codec->width = fmt->width;

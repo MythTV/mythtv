@@ -174,7 +174,7 @@ static av_cold int decode_init(AVCodecContext *avctx)
     WmallDecodeCtx *s  = avctx->priv_data;
     uint8_t *edata_ptr = avctx->extradata;
     unsigned int channel_mask;
-    int i, bits, log2_max_num_subframes, num_possible_block_sizes;
+    int i, bits, log2_max_num_subframes;
 
     s->avctx = avctx;
     init_put_bits(&s->pb, s->frame_data, MAX_FRAMESIZE);
@@ -1289,7 +1289,7 @@ static void flush(AVCodecContext *avctx)
 AVCodec ff_wmalossless_decoder = {
     .name           = "wmalossless",
     .type           = AVMEDIA_TYPE_AUDIO,
-    .id             = CODEC_ID_WMALOSSLESS,
+    .id             = AV_CODEC_ID_WMALOSSLESS,
     .priv_data_size = sizeof(WmallDecodeCtx),
     .init           = decode_init,
     .decode         = decode_packet,

@@ -31,6 +31,9 @@
 #include "libavutil/parseutils.h"
 #include "libavutil/random_seed.h"
 #include "avfilter.h"
+#include "internal.h"
+#include "formats.h"
+#include "video.h"
 
 typedef struct {
     const AVClass *class;
@@ -54,38 +57,30 @@ typedef struct {
 } CellAutoContext;
 
 #define OFFSET(x) offsetof(CellAutoContext, x)
+#define FLAGS AV_OPT_FLAG_FILTERING_PARAM|AV_OPT_FLAG_VIDEO_PARAM
 
 static const AVOption cellauto_options[] = {
-    { "filename", "read initial pattern from file", OFFSET(filename), AV_OPT_TYPE_STRING, {.str = NULL}, 0, 0 },
-    { "f",        "read initial pattern from file", OFFSET(filename), AV_OPT_TYPE_STRING, {.str = NULL}, 0, 0 },
-    { "pattern",  "set initial pattern", OFFSET(pattern), AV_OPT_TYPE_STRING, {.str = NULL}, 0, 0 },
-    { "p",        "set initial pattern", OFFSET(pattern), AV_OPT_TYPE_STRING, {.str = NULL}, 0, 0 },
-    { "rate",     "set video rate", OFFSET(rate), AV_OPT_TYPE_STRING, {.str = "25"}, 0, 0 },
-    { "r",        "set video rate", OFFSET(rate), AV_OPT_TYPE_STRING, {.str = "25"}, 0, 0 },
-    { "size",     "set video size", OFFSET(w),    AV_OPT_TYPE_IMAGE_SIZE, {.str = NULL}, 0, 0 },
-    { "s",        "set video size", OFFSET(w),    AV_OPT_TYPE_IMAGE_SIZE, {.str = NULL}, 0, 0 },
-    { "rule",     "set rule",       OFFSET(rule), AV_OPT_TYPE_INT,    {.dbl = 110},  0, 255 },
-    { "random_fill_ratio", "set fill ratio for filling initial grid randomly", OFFSET(random_fill_ratio), AV_OPT_TYPE_DOUBLE, {.dbl = 1/M_PHI}, 0, 1 },
-    { "ratio",             "set fill ratio for filling initial grid randomly", OFFSET(random_fill_ratio), AV_OPT_TYPE_DOUBLE, {.dbl = 1/M_PHI}, 0, 1 },
-    { "random_seed", "set the seed for filling the initial grid randomly", OFFSET(random_seed), AV_OPT_TYPE_INT, {.dbl = -1}, -1, UINT32_MAX },
-    { "seed",        "set the seed for filling the initial grid randomly", OFFSET(random_seed), AV_OPT_TYPE_INT, {.dbl = -1}, -1, UINT32_MAX },
-    { "scroll",      "scroll pattern downward", OFFSET(scroll), AV_OPT_TYPE_INT, {.dbl = 1}, 0, 1 },
-    { "start_full",  "start filling the whole video", OFFSET(start_full), AV_OPT_TYPE_INT, {.dbl = 0}, 0, 1 },
-    { "full",        "start filling the whole video", OFFSET(start_full), AV_OPT_TYPE_INT, {.dbl = 1}, 0, 1 },
-    { "stitch",      "stitch boundaries", OFFSET(stitch), AV_OPT_TYPE_INT,    {.dbl = 1},   0, 1 },
+    { "filename", "read initial pattern from file", OFFSET(filename), AV_OPT_TYPE_STRING, {.str = NULL}, 0, 0, FLAGS },
+    { "f",        "read initial pattern from file", OFFSET(filename), AV_OPT_TYPE_STRING, {.str = NULL}, 0, 0, FLAGS },
+    { "pattern",  "set initial pattern", OFFSET(pattern), AV_OPT_TYPE_STRING, {.str = NULL}, 0, 0, FLAGS },
+    { "p",        "set initial pattern", OFFSET(pattern), AV_OPT_TYPE_STRING, {.str = NULL}, 0, 0, FLAGS },
+    { "rate",     "set video rate", OFFSET(rate), AV_OPT_TYPE_STRING, {.str = "25"}, 0, 0, FLAGS },
+    { "r",        "set video rate", OFFSET(rate), AV_OPT_TYPE_STRING, {.str = "25"}, 0, 0, FLAGS },
+    { "size",     "set video size", OFFSET(w),    AV_OPT_TYPE_IMAGE_SIZE, {.str = NULL}, 0, 0, FLAGS },
+    { "s",        "set video size", OFFSET(w),    AV_OPT_TYPE_IMAGE_SIZE, {.str = NULL}, 0, 0, FLAGS },
+    { "rule",     "set rule",       OFFSET(rule), AV_OPT_TYPE_INT,    {.i64 = 110},  0, 255, FLAGS },
+    { "random_fill_ratio", "set fill ratio for filling initial grid randomly", OFFSET(random_fill_ratio), AV_OPT_TYPE_DOUBLE, {.dbl = 1/M_PHI}, 0, 1, FLAGS },
+    { "ratio",             "set fill ratio for filling initial grid randomly", OFFSET(random_fill_ratio), AV_OPT_TYPE_DOUBLE, {.dbl = 1/M_PHI}, 0, 1, FLAGS },
+    { "random_seed", "set the seed for filling the initial grid randomly", OFFSET(random_seed), AV_OPT_TYPE_INT, {.i64 = -1}, -1, UINT32_MAX, FLAGS },
+    { "seed",        "set the seed for filling the initial grid randomly", OFFSET(random_seed), AV_OPT_TYPE_INT, {.i64 = -1}, -1, UINT32_MAX, FLAGS },
+    { "scroll",      "scroll pattern downward", OFFSET(scroll), AV_OPT_TYPE_INT, {.i64 = 1}, 0, 1, FLAGS },
+    { "start_full",  "start filling the whole video", OFFSET(start_full), AV_OPT_TYPE_INT, {.i64 = 0}, 0, 1, FLAGS },
+    { "full",        "start filling the whole video", OFFSET(start_full), AV_OPT_TYPE_INT, {.i64 = 1}, 0, 1, FLAGS },
+    { "stitch",      "stitch boundaries", OFFSET(stitch), AV_OPT_TYPE_INT,    {.i64 = 1},   0, 1, FLAGS },
     { NULL },
 };
 
-static const char *cellauto_get_name(void *ctx)
-{
-    return "cellauto";
-}
-
-static const AVClass cellauto_class = {
-    "CellAutoContext",
-    cellauto_get_name,
-    cellauto_options
-};
+AVFILTER_DEFINE_CLASS(cellauto);
 
 #ifdef DEBUG
 static void show_cellauto_row(AVFilterContext *ctx)
@@ -164,7 +159,7 @@ static int init_pattern_from_file(AVFilterContext *ctx)
     return init_pattern_from_string(ctx);
 }
 
-static int init(AVFilterContext *ctx, const char *args, void *opaque)
+static int init(AVFilterContext *ctx, const char *args)
 {
     CellAutoContext *cellauto = ctx->priv;
     AVRational frame_rate;
@@ -173,10 +168,8 @@ static int init(AVFilterContext *ctx, const char *args, void *opaque)
     cellauto->class = &cellauto_class;
     av_opt_set_defaults(cellauto);
 
-    if ((ret = av_set_options_string(cellauto, args, "=", ":")) < 0) {
-        av_log(ctx, AV_LOG_ERROR, "Error parsing options string: '%s'\n", args);
+    if ((ret = av_set_options_string(cellauto, args, "=", ":")) < 0)
         return ret;
-    }
 
     if ((ret = av_parse_video_rate(&frame_rate, cellauto->rate)) < 0) {
         av_log(ctx, AV_LOG_ERROR, "Invalid frame rate: %s\n", cellauto->rate);
@@ -219,7 +212,7 @@ static int init(AVFilterContext *ctx, const char *args, void *opaque)
         }
     }
 
-    av_log(ctx, AV_LOG_INFO,
+    av_log(ctx, AV_LOG_VERBOSE,
            "s:%dx%d r:%d/%d rule:%d stitch:%d scroll:%d full:%d seed:%u\n",
            cellauto->w, cellauto->h, frame_rate.num, frame_rate.den,
            cellauto->rule, cellauto->stitch, cellauto->scroll, cellauto->start_full,
@@ -310,7 +303,7 @@ static int request_frame(AVFilterLink *outlink)
 {
     CellAutoContext *cellauto = outlink->src->priv;
     AVFilterBufferRef *picref =
-        avfilter_get_video_buffer(outlink, AV_PERM_WRITE, cellauto->w, cellauto->h);
+        ff_get_video_buffer(outlink, AV_PERM_WRITE, cellauto->w, cellauto->h);
     picref->video->sample_aspect_ratio = (AVRational) {1, 1};
     if (cellauto->generation == 0 && cellauto->start_full) {
         int i;
@@ -327,9 +320,9 @@ static int request_frame(AVFilterLink *outlink)
     show_cellauto_row(outlink->src);
 #endif
 
-    avfilter_start_frame(outlink, avfilter_ref_buffer(picref, ~0));
-    avfilter_draw_slice(outlink, 0, cellauto->h, 1);
-    avfilter_end_frame(outlink);
+    ff_start_frame(outlink, avfilter_ref_buffer(picref, ~0));
+    ff_draw_slice(outlink, 0, cellauto->h, 1);
+    ff_end_frame(outlink);
     avfilter_unref_buffer(picref);
 
     return 0;
@@ -338,7 +331,7 @@ static int request_frame(AVFilterLink *outlink)
 static int query_formats(AVFilterContext *ctx)
 {
     static const enum PixelFormat pix_fmts[] = { PIX_FMT_MONOBLACK, PIX_FMT_NONE };
-    avfilter_set_common_pixel_formats(ctx, avfilter_make_format_list(pix_fmts));
+    ff_set_common_formats(ctx, ff_make_format_list(pix_fmts));
     return 0;
 }
 
@@ -360,4 +353,5 @@ AVFilter avfilter_vsrc_cellauto = {
           .config_props    = config_props },
         { .name = NULL}
     },
+    .priv_class = &cellauto_class,
 };

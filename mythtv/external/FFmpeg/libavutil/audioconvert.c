@@ -26,39 +26,47 @@
 #include "avstring.h"
 #include "avutil.h"
 #include "audioconvert.h"
+#include "bprint.h"
+#include "common.h"
 
-static const char * const channel_names[] = {
-    [0]  = "FL",        /* front left */
-    [1]  = "FR",        /* front right */
-    [2]  = "FC",        /* front center */
-    [3]  = "LFE",       /* low frequency */
-    [4]  = "BL",        /* back left */
-    [5]  = "BR",        /* back right */
-    [6]  = "FLC",       /* front left-of-center  */
-    [7]  = "FRC",       /* front right-of-center */
-    [8]  = "BC",        /* back-center */
-    [9]  = "SL",        /* side left */
-    [10] = "SR",        /* side right */
-    [11] = "TC",        /* top center */
-    [12] = "TFL",       /* top front left */
-    [13] = "TFC",       /* top front center */
-    [14] = "TFR",       /* top front right */
-    [15] = "TBL",       /* top back left */
-    [16] = "TBC",       /* top back center */
-    [17] = "TBR",       /* top back right */
-    [29] = "DL",        /* downmix left */
-    [30] = "DR",        /* downmix right */
-    [31] = "WL",        /* wide left */
-    [32] = "WR",        /* wide right */
-    [33] = "SDL",       /* surround direct left */
-    [34] = "SDR",       /* surround direct right */
+struct channel_name {
+    const char *name;
+    const char *description;
+};
+
+static const struct channel_name channel_names[] = {
+     [0] = { "FL",        "front left"            },
+     [1] = { "FR",        "front right"           },
+     [2] = { "FC",        "front center"          },
+     [3] = { "LFE",       "low frequency"         },
+     [4] = { "BL",        "back left"             },
+     [5] = { "BR",        "back right"            },
+     [6] = { "FLC",       "front left-of-center"  },
+     [7] = { "FRC",       "front right-of-center" },
+     [8] = { "BC",        "back center"           },
+     [9] = { "SL",        "side left"             },
+    [10] = { "SR",        "side right"            },
+    [11] = { "TC",        "top center"            },
+    [12] = { "TFL",       "top front left"        },
+    [13] = { "TFC",       "top front center"      },
+    [14] = { "TFR",       "top front right"       },
+    [15] = { "TBL",       "top back left"         },
+    [16] = { "TBC",       "top back center"       },
+    [17] = { "TBR",       "top back right"        },
+    [29] = { "DL",        "downmix left"          },
+    [30] = { "DR",        "downmix right"         },
+    [31] = { "WL",        "wide left"             },
+    [32] = { "WR",        "wide right"            },
+    [33] = { "SDL",       "surround direct left"  },
+    [34] = { "SDR",       "surround direct right" },
+    [35] = { "LFE2",      "low frequency 2"       },
 };
 
 static const char *get_channel_name(int channel_id)
 {
     if (channel_id < 0 || channel_id >= FF_ARRAY_ELEMS(channel_names))
         return NULL;
-    return channel_names[channel_id];
+    return channel_names[channel_id].name;
 }
 
 static const struct {
@@ -106,9 +114,9 @@ static uint64_t get_channel_layout_single(const char *name, int name_len)
             return channel_layout_map[i].layout;
     }
     for (i = 0; i < FF_ARRAY_ELEMS(channel_names); i++)
-        if (channel_names[i] &&
-            strlen(channel_names[i]) == name_len &&
-            !memcmp(channel_names[i], name, name_len))
+        if (channel_names[i].name &&
+            strlen(channel_names[i].name) == name_len &&
+            !memcmp(channel_names[i].name, name, name_len))
             return (int64_t)1 << i;
     i = strtol(name, &end, 10);
     if (end - name == name_len ||
@@ -136,8 +144,8 @@ uint64_t av_get_channel_layout(const char *name)
     return layout;
 }
 
-void av_get_channel_layout_string(char *buf, int buf_size,
-                                  int nb_channels, uint64_t channel_layout)
+void av_bprint_channel_layout(struct AVBPrint *bp,
+                              int nb_channels, uint64_t channel_layout)
 {
     int i;
 
@@ -147,36 +155,41 @@ void av_get_channel_layout_string(char *buf, int buf_size,
     for (i = 0; i < FF_ARRAY_ELEMS(channel_layout_map); i++)
         if (nb_channels    == channel_layout_map[i].nb_channels &&
             channel_layout == channel_layout_map[i].layout) {
-            av_strlcpy(buf, channel_layout_map[i].name, buf_size);
+            av_bprintf(bp, "%s", channel_layout_map[i].name);
             return;
         }
 
-    snprintf(buf, buf_size, "%d channels", nb_channels);
+    av_bprintf(bp, "%d channels", nb_channels);
     if (channel_layout) {
         int i, ch;
-        av_strlcat(buf, " (", buf_size);
+        av_bprintf(bp, " (");
         for (i = 0, ch = 0; i < 64; i++) {
             if ((channel_layout & (UINT64_C(1) << i))) {
                 const char *name = get_channel_name(i);
                 if (name) {
                     if (ch > 0)
-                        av_strlcat(buf, "+", buf_size);
-                    av_strlcat(buf, name, buf_size);
+                        av_bprintf(bp, "+");
+                    av_bprintf(bp, "%s", name);
                 }
                 ch++;
             }
         }
-        av_strlcat(buf, ")", buf_size);
+        av_bprintf(bp, ")");
     }
+}
+
+void av_get_channel_layout_string(char *buf, int buf_size,
+                                  int nb_channels, uint64_t channel_layout)
+{
+    AVBPrint bp;
+
+    av_bprint_init_for_buffer(&bp, buf, buf_size);
+    av_bprint_channel_layout(&bp, nb_channels, channel_layout);
 }
 
 int av_get_channel_layout_nb_channels(uint64_t channel_layout)
 {
-    int count;
-    uint64_t x = channel_layout;
-    for (count = 0; x; count++)
-        x &= x-1; // unset lowest set bit
-    return count;
+    return av_popcount64(channel_layout);
 }
 
 int64_t av_get_default_channel_layout(int nb_channels) {
@@ -184,5 +197,61 @@ int64_t av_get_default_channel_layout(int nb_channels) {
     for (i = 0; i < FF_ARRAY_ELEMS(channel_layout_map); i++)
         if (nb_channels == channel_layout_map[i].nb_channels)
             return channel_layout_map[i].layout;
+    return 0;
+}
+
+int av_get_channel_layout_channel_index(uint64_t channel_layout,
+                                        uint64_t channel)
+{
+    if (!(channel_layout & channel) ||
+        av_get_channel_layout_nb_channels(channel) != 1)
+        return AVERROR(EINVAL);
+    channel_layout &= channel - 1;
+    return av_get_channel_layout_nb_channels(channel_layout);
+}
+
+const char *av_get_channel_name(uint64_t channel)
+{
+    int i;
+    if (av_get_channel_layout_nb_channels(channel) != 1)
+        return NULL;
+    for (i = 0; i < 64; i++)
+        if ((1ULL<<i) & channel)
+            return get_channel_name(i);
+    return NULL;
+}
+
+const char *av_get_channel_description(uint64_t channel)
+{
+    int i;
+    if (av_get_channel_layout_nb_channels(channel) != 1)
+        return NULL;
+    for (i = 0; i < FF_ARRAY_ELEMS(channel_names); i++)
+        if ((1ULL<<i) & channel)
+            return channel_names[i].description;
+    return NULL;
+}
+
+uint64_t av_channel_layout_extract_channel(uint64_t channel_layout, int index)
+{
+    int i;
+
+    if (av_get_channel_layout_nb_channels(channel_layout) <= index)
+        return 0;
+
+    for (i = 0; i < 64; i++) {
+        if ((1ULL << i) & channel_layout && !index--)
+            return 1ULL << i;
+    }
+    return 0;
+}
+
+int av_get_standard_channel_layout(unsigned index, uint64_t *layout,
+                                   const char **name)
+{
+    if (index >= FF_ARRAY_ELEMS(channel_layout_map))
+        return AVERROR_EOF;
+    if (layout) *layout = channel_layout_map[index].layout;
+    if (name)   *name   = channel_layout_map[index].name;
     return 0;
 }

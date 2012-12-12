@@ -125,12 +125,15 @@ const char *ff_id3v2_picture_types[21] = {
 };
 
 const CodecMime ff_id3v2_mime_tags[] = {
-    {"image/gif" , CODEC_ID_GIF},
-    {"image/jpeg", CODEC_ID_MJPEG},
-    {"image/jpg",  CODEC_ID_MJPEG},
-    {"image/png" , CODEC_ID_PNG},
-    {"image/tiff", CODEC_ID_TIFF},
-    {"",           CODEC_ID_NONE},
+    {"image/gif" , AV_CODEC_ID_GIF},
+    {"image/jpeg", AV_CODEC_ID_MJPEG},
+    {"image/jpg",  AV_CODEC_ID_MJPEG},
+    {"image/png" , AV_CODEC_ID_PNG},
+    {"image/tiff", AV_CODEC_ID_TIFF},
+    {"image/bmp",  AV_CODEC_ID_BMP},
+    {"JPG",        AV_CODEC_ID_MJPEG}, /* ID3v2.2  */
+    {"PNG" ,       AV_CODEC_ID_PNG},   /* ID3v2.2  */
+    {"",           AV_CODEC_ID_NONE},
 };
 
 int ff_id3v2_match(const uint8_t *buf, const char * magic)
@@ -440,7 +443,7 @@ static void read_apic(AVFormatContext *s, AVIOContext *pb, int taglen, char *tag
     int enc, pic_type;
     char             mimetype[64];
     const CodecMime     *mime = ff_id3v2_mime_tags;
-    enum CodecID           id = CODEC_ID_NONE;
+    enum AVCodecID           id = AV_CODEC_ID_NONE;
     ID3v2ExtraMetaAPIC  *apic = NULL;
     ID3v2ExtraMeta *new_extra = NULL;
     int64_t               end = avio_tell(pb) + taglen;
@@ -458,14 +461,14 @@ static void read_apic(AVFormatContext *s, AVIOContext *pb, int taglen, char *tag
 
     /* mimetype */
     taglen -= avio_get_str(pb, taglen, mimetype, sizeof(mimetype));
-    while (mime->id != CODEC_ID_NONE) {
-        if (!strncmp(mime->str, mimetype, sizeof(mimetype))) {
+    while (mime->id != AV_CODEC_ID_NONE) {
+        if (!av_strncasecmp(mime->str, mimetype, sizeof(mimetype))) {
             id = mime->id;
             break;
         }
         mime++;
     }
-    if (id == CODEC_ID_NONE) {
+    if (id == AV_CODEC_ID_NONE) {
         av_log(s, AV_LOG_WARNING, "Unknown attached picture mimetype: %s, skipping.\n", mimetype);
         goto fail;
     }
@@ -711,7 +714,7 @@ static void ff_id3v2_parse(AVFormatContext *s, int len, uint8_t version, uint8_t
         }
         else if (!tag[0]) {
             if (tag[1])
-                av_log(s, AV_LOG_WARNING, "invalid frame id, assuming padding");
+                av_log(s, AV_LOG_WARNING, "invalid frame id, assuming padding\n");
             avio_skip(s->pb, tlen);
             break;
         }

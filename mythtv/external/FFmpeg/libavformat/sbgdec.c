@@ -1414,7 +1414,7 @@ static av_cold int sbg_read_header(AVFormatContext *avf)
     if (!st)
         return AVERROR(ENOMEM);
     st->codec->codec_type     = AVMEDIA_TYPE_AUDIO;
-    st->codec->codec_id       = CODEC_ID_FFWAVESYNTH;
+    st->codec->codec_id       = AV_CODEC_ID_FFWAVESYNTH;
     st->codec->channels       = 2;
     st->codec->channel_layout = AV_CH_LAYOUT_STEREO;
     st->codec->sample_rate    = sbg->sample_rate;
@@ -1481,13 +1481,13 @@ static int sbg_read_seek(AVFormatContext *avf, int stream_index,
 
 static const AVOption sbg_options[] = {
     { "sample_rate", "", offsetof(struct sbg_demuxer, sample_rate),
-      AV_OPT_TYPE_INT, { .dbl = 0 }, 0, INT_MAX,
+      AV_OPT_TYPE_INT, { .i64 = 0 }, 0, INT_MAX,
       AV_OPT_FLAG_DECODING_PARAM },
     { "frame_size", "", offsetof(struct sbg_demuxer, frame_size),
-      AV_OPT_TYPE_INT, { .dbl = 0 }, 0, INT_MAX,
+      AV_OPT_TYPE_INT, { .i64 = 0 }, 0, INT_MAX,
       AV_OPT_FLAG_DECODING_PARAM },
     { "max_file_size", "", offsetof(struct sbg_demuxer, max_file_size),
-      AV_OPT_TYPE_INT, { .dbl = 5000000 }, 0, INT_MAX,
+      AV_OPT_TYPE_INT, { .i64 = 5000000 }, 0, INT_MAX,
       AV_OPT_FLAG_DECODING_PARAM },
     { NULL },
 };

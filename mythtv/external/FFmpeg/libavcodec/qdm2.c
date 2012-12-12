@@ -1105,7 +1105,6 @@ static int process_subpacket_9 (QDM2Context *q, QDM2SubPNode *node)
  *
  * @param q         context
  * @param node      pointer to node with packet
- * @param length    packet length in bits
  */
 static void process_subpacket_10 (QDM2Context *q, QDM2SubPNode *node)
 {
@@ -1154,7 +1153,6 @@ static void process_subpacket_11 (QDM2Context *q, QDM2SubPNode *node)
  *
  * @param q         context
  * @param node      pointer to node with packet
- * @param length    packet length in bits
  */
 static void process_subpacket_12 (QDM2Context *q, QDM2SubPNode *node)
 {
@@ -1260,6 +1258,11 @@ static void qdm2_decode_super_block (QDM2Context *q)
 
     for (i = 0; packet_bytes > 0; i++) {
         int j;
+
+        if (i>=FF_ARRAY_ELEMS(q->sub_packet_list_A)) {
+            SAMPLES_NEEDED_2("too many packet bytes");
+            return;
+        }
 
         q->sub_packet_list_A[i].next = NULL;
 
@@ -1696,51 +1699,6 @@ static av_cold void qdm2_init(QDM2Context *q) {
 }
 
 
-#if 0
-static void dump_context(QDM2Context *q)
-{
-    int i;
-#define PRINT(a,b) av_log(NULL,AV_LOG_DEBUG," %s = %d\n", a, b);
-    PRINT("compressed_data",q->compressed_data);
-    PRINT("compressed_size",q->compressed_size);
-    PRINT("frame_size",q->frame_size);
-    PRINT("checksum_size",q->checksum_size);
-    PRINT("channels",q->channels);
-    PRINT("nb_channels",q->nb_channels);
-    PRINT("fft_size",q->fft_size);
-    PRINT("sub_sampling",q->sub_sampling);
-    PRINT("fft_order",q->fft_order);
-    PRINT("group_order",q->group_order);
-    PRINT("group_size",q->group_size);
-    PRINT("sub_packet",q->sub_packet);
-    PRINT("frequency_range",q->frequency_range);
-    PRINT("has_errors",q->has_errors);
-    PRINT("fft_tone_end",q->fft_tone_end);
-    PRINT("fft_tone_start",q->fft_tone_start);
-    PRINT("fft_coefs_index",q->fft_coefs_index);
-    PRINT("coeff_per_sb_select",q->coeff_per_sb_select);
-    PRINT("cm_table_select",q->cm_table_select);
-    PRINT("noise_idx",q->noise_idx);
-
-    for (i = q->fft_tone_start; i < q->fft_tone_end; i++)
-    {
-    FFTTone *t = &q->fft_tones[i];
-
-    av_log(NULL,AV_LOG_DEBUG,"Tone (%d) dump:\n", i);
-    av_log(NULL,AV_LOG_DEBUG,"  level = %f\n", t->level);
-//  PRINT(" level", t->level);
-    PRINT(" phase", t->phase);
-    PRINT(" phase_shift", t->phase_shift);
-    PRINT(" duration", t->duration);
-    PRINT(" samples_im", t->samples_im);
-    PRINT(" samples_re", t->samples_re);
-    PRINT(" table", t->table);
-    }
-
-}
-#endif
-
-
 /**
  * Init parameters from codec extradata
  */
@@ -1922,7 +1880,6 @@ static av_cold int qdm2_decode_init(AVCodecContext *avctx)
     avcodec_get_frame_defaults(&s->frame);
     avctx->coded_frame = &s->frame;
 
-//    dump_context(s);
     return 0;
 }
 
@@ -1948,8 +1905,6 @@ static int qdm2_decode (QDM2Context *q, const uint8_t *in, int16_t *out)
     /* select input buffer */
     q->compressed_data = in;
     q->compressed_size = q->checksum_size;
-
-//  dump_context(q);
 
     /* copy old block, clear new block of output samples */
     memmove(q->output_buffer, &q->output_buffer[frame_size], frame_size * sizeof(float));
@@ -2040,7 +1995,7 @@ AVCodec ff_qdm2_decoder =
 {
     .name           = "qdm2",
     .type           = AVMEDIA_TYPE_AUDIO,
-    .id             = CODEC_ID_QDM2,
+    .id             = AV_CODEC_ID_QDM2,
     .priv_data_size = sizeof(QDM2Context),
     .init           = qdm2_decode_init,
     .close          = qdm2_decode_close,

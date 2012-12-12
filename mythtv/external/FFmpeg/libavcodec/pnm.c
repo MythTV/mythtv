@@ -19,6 +19,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include <stdlib.h>
+#include <string.h>
+
 #include "libavutil/imgutils.h"
 #include "avcodec.h"
 #include "pnm.h"
@@ -34,12 +37,12 @@ static void pnm_get(PNMContext *sc, char *str, int buf_size)
     int c;
 
     /* skip spaces and comments */
-    for (;;) {
+    while (sc->bytestream < sc->bytestream_end) {
         c = *sc->bytestream++;
         if (c == '#')  {
-            do {
+            while (c != '\n' && sc->bytestream < sc->bytestream_end) {
                 c = *sc->bytestream++;
-            } while (c != '\n' && sc->bytestream < sc->bytestream_end);
+            }
         } else if (!pnm_space(c)) {
             break;
         }
@@ -67,7 +70,7 @@ int ff_pnm_decode_header(AVCodecContext *avctx, PNMContext * const s)
     if (s->type==1 || s->type==4) {
         avctx->pix_fmt = PIX_FMT_MONOWHITE;
     } else if (s->type==2 || s->type==5) {
-        if (avctx->codec_id == CODEC_ID_PGMYUV)
+        if (avctx->codec_id == AV_CODEC_ID_PGMYUV)
             avctx->pix_fmt = PIX_FMT_YUV420P;
         else
             avctx->pix_fmt = PIX_FMT_GRAY8;
@@ -104,7 +107,7 @@ int ff_pnm_decode_header(AVCodecContext *avctx, PNMContext * const s)
             }
         }
         /* check that all tags are present */
-        if (w <= 0 || h <= 0 || maxval <= 0 || depth <= 0 || tuple_type[0] == '\0' || av_image_check_size(w, h, 0, avctx))
+        if (w <= 0 || h <= 0 || maxval <= 0 || depth <= 0 || tuple_type[0] == '\0' || av_image_check_size(w, h, 0, avctx) || s->bytestream >= s->bytestream_end)
             return -1;
 
         avctx->width  = w;
@@ -141,13 +144,15 @@ int ff_pnm_decode_header(AVCodecContext *avctx, PNMContext * const s)
         return -1;
     }
     pnm_get(s, buf1, sizeof(buf1));
-    avctx->width = atoi(buf1);
-    if (avctx->width <= 0)
-        return -1;
+    w = atoi(buf1);
     pnm_get(s, buf1, sizeof(buf1));
-    avctx->height = atoi(buf1);
-    if(avctx->height <= 0 || av_image_check_size(avctx->width, avctx->height, 0, avctx))
+    h = atoi(buf1);
+    if(w <= 0 || h <= 0 || av_image_check_size(w, h, 0, avctx) || s->bytestream >= s->bytestream_end)
         return -1;
+
+    avctx->width  = w;
+    avctx->height = h;
+
     if (avctx->pix_fmt != PIX_FMT_MONOWHITE && avctx->pix_fmt != PIX_FMT_MONOBLACK) {
         pnm_get(s, buf1, sizeof(buf1));
         s->maxval = atoi(buf1);

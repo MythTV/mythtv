@@ -31,7 +31,7 @@
 #include "dsputil.h"
 #include "mpegvideo.h"
 #include "msmpeg4.h"
-#include "libavutil/x86_cpu.h"
+#include "libavutil/x86/asm.h"
 #include "h263.h"
 #include "mpeg4video.h"
 #include "msmpeg4data.h"
@@ -409,6 +409,7 @@ static int msmpeg4v2_decode_motion(MpegEncContext * s, int pred, int f_code)
 static int msmpeg4v12_decode_mb(MpegEncContext *s, DCTELEM block[6][64])
 {
     int cbp, code, i;
+    uint32_t * const mb_type_ptr = &s->current_picture.f.mb_type[s->mb_x + s->mb_y*s->mb_stride];
 
     if (s->pict_type == AV_PICTURE_TYPE_P) {
         if (s->use_skip_mb_code) {
@@ -422,6 +423,7 @@ static int msmpeg4v12_decode_mb(MpegEncContext *s, DCTELEM block[6][64])
                 s->mv[0][0][0] = 0;
                 s->mv[0][0][1] = 0;
                 s->mb_skipped = 1;
+                *mb_type_ptr = MB_TYPE_SKIP | MB_TYPE_L0 | MB_TYPE_16x16;
                 return 0;
             }
         }
@@ -470,6 +472,7 @@ static int msmpeg4v12_decode_mb(MpegEncContext *s, DCTELEM block[6][64])
         s->mv_type = MV_TYPE_16X16;
         s->mv[0][0][0] = mx;
         s->mv[0][0][1] = my;
+        *mb_type_ptr = MB_TYPE_L0 | MB_TYPE_16x16;
     } else {
         if(s->msmpeg4_version==2){
             s->ac_pred = get_bits1(&s->gb);
@@ -479,6 +482,7 @@ static int msmpeg4v12_decode_mb(MpegEncContext *s, DCTELEM block[6][64])
             cbp|= get_vlc2(&s->gb, ff_h263_cbpy_vlc.table, CBPY_VLC_BITS, 1)<<2; //FIXME check errors
             if(s->pict_type==AV_PICTURE_TYPE_P) cbp^=0x3C;
         }
+        *mb_type_ptr = MB_TYPE_INTRA;
     }
 
     s->dsp.clear_blocks(s->block[0]);
@@ -1210,7 +1214,7 @@ int ff_msmpeg4_decode_motion(MpegEncContext * s,
 AVCodec ff_msmpeg4v1_decoder = {
     .name           = "msmpeg4v1",
     .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = CODEC_ID_MSMPEG4V1,
+    .id             = AV_CODEC_ID_MSMPEG4V1,
     .priv_data_size = sizeof(MpegEncContext),
     .init           = ff_msmpeg4_decode_init,
     .close          = ff_h263_decode_end,
@@ -1224,7 +1228,7 @@ AVCodec ff_msmpeg4v1_decoder = {
 AVCodec ff_msmpeg4v2_decoder = {
     .name           = "msmpeg4v2",
     .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = CODEC_ID_MSMPEG4V2,
+    .id             = AV_CODEC_ID_MSMPEG4V2,
     .priv_data_size = sizeof(MpegEncContext),
     .init           = ff_msmpeg4_decode_init,
     .close          = ff_h263_decode_end,
@@ -1238,7 +1242,7 @@ AVCodec ff_msmpeg4v2_decoder = {
 AVCodec ff_msmpeg4v3_decoder = {
     .name           = "msmpeg4",
     .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = CODEC_ID_MSMPEG4V3,
+    .id             = AV_CODEC_ID_MSMPEG4V3,
     .priv_data_size = sizeof(MpegEncContext),
     .init           = ff_msmpeg4_decode_init,
     .close          = ff_h263_decode_end,
@@ -1252,7 +1256,7 @@ AVCodec ff_msmpeg4v3_decoder = {
 AVCodec ff_wmv1_decoder = {
     .name           = "wmv1",
     .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = CODEC_ID_WMV1,
+    .id             = AV_CODEC_ID_WMV1,
     .priv_data_size = sizeof(MpegEncContext),
     .init           = ff_msmpeg4_decode_init,
     .close          = ff_h263_decode_end,

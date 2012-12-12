@@ -54,10 +54,13 @@ typedef struct {
     char *video_size;       /**< Set by a private option. */
     char *framerate;        /**< Set by a private option. */
     int loop;
+    enum { PT_GLOB_SEQUENCE, PT_GLOB, PT_SEQUENCE } pattern_type;
     int use_glob;
 #if HAVE_GLOB
     glob_t globstate;
 #endif
+    int start_number;
+    int start_number_range;
 } VideoDemuxData;
 
 static const int sizes[][2] = {
@@ -107,15 +110,23 @@ static int is_glob(const char *path)
 #endif
 }
 
-/* return -1 if no image found */
+/**
+ * Get index range of image files matched by path.
+ *
+ * @param pfirst_index pointer to index updated with the first number in the range
+ * @param plast_index  pointer to index updated with the last number in the range
+ * @param path         path which has to be matched by the image files in the range
+ * @param start_index  minimum accepted value for the first index in the range
+ * @return -1 if no image file could be found
+ */
 static int find_image_range(int *pfirst_index, int *plast_index,
-                            const char *path)
+                            const char *path, int start_index, int start_index_range)
 {
     char buf[1024];
     int range, last_index, range1, first_index;
 
     /* find the first image */
-    for(first_index = 0; first_index < 5; first_index++) {
+    for (first_index = start_index; first_index < start_index + start_index_range; first_index++) {
         if (av_get_frame_filename(buf, sizeof(buf), path, first_index) < 0){
             *pfirst_index =
             *plast_index = 1;
@@ -126,7 +137,7 @@ static int find_image_range(int *pfirst_index, int *plast_index,
         if (avio_check(buf, AVIO_FLAG_READ) > 0)
             break;
     }
-    if (first_index == 5)
+    if (first_index == start_index + start_index_range)
         goto fail;
 
     /* find the last image */
@@ -223,12 +234,15 @@ static int read_header(AVFormatContext *s1)
     }
 
     if (!s->is_pipe) {
+        if (s->pattern_type == PT_GLOB_SEQUENCE) {
         s->use_glob = is_glob(s->path);
         if (s->use_glob) {
-#if HAVE_GLOB
             char *p = s->path, *q, *dup;
             int gerr;
 
+            av_log(s1, AV_LOG_WARNING, "Pattern type 'glob_sequence' is deprecated: "
+                   "use pattern_type 'glob' instead\n");
+#if HAVE_GLOB
             dup = q = av_strdup(p);
             while (*q) {
                 /* Do we have room for the next char and a \ insertion? */
@@ -250,9 +264,36 @@ static int read_header(AVFormatContext *s1)
             first_index = 0;
             last_index = s->globstate.gl_pathc - 1;
 #endif
-        } else {
-        if (find_image_range(&first_index, &last_index, s->path) < 0)
-            return AVERROR(ENOENT);
+        }
+        }
+        if ((s->pattern_type == PT_GLOB_SEQUENCE && !s->use_glob) || s->pattern_type == PT_SEQUENCE) {
+            if (find_image_range(&first_index, &last_index, s->path,
+                                 s->start_number, s->start_number_range) < 0) {
+                av_log(s1, AV_LOG_ERROR,
+                       "Could find no file with with path '%s' and index in the range %d-%d\n",
+                       s->path, s->start_number, s->start_number + s->start_number_range - 1);
+                return AVERROR(ENOENT);
+            }
+        } else if (s->pattern_type == PT_GLOB) {
+#if HAVE_GLOB
+            int gerr;
+            gerr = glob(s->path, GLOB_NOCHECK|GLOB_BRACE|GLOB_NOMAGIC, NULL, &s->globstate);
+            if (gerr != 0) {
+                return AVERROR(ENOENT);
+            }
+            first_index = 0;
+            last_index = s->globstate.gl_pathc - 1;
+            s->use_glob = 1;
+#else
+            av_log(s1, AV_LOG_ERROR,
+                   "Pattern type 'glob' was selected but globbing "
+                   "is not supported by this libavformat build\n");
+            return AVERROR(ENOSYS);
+#endif
+        } else if (s->pattern_type != PT_GLOB_SEQUENCE) {
+            av_log(s1, AV_LOG_ERROR,
+                   "Unknown value '%d' for pattern_type option\n", s->pattern_type);
+            return AVERROR(EINVAL);
         }
         s->img_first = first_index;
         s->img_last = last_index;
@@ -273,8 +314,8 @@ static int read_header(AVFormatContext *s1)
         s->split_planes = str && !av_strcasecmp(str + 1, "y");
         st->codec->codec_type = AVMEDIA_TYPE_VIDEO;
         st->codec->codec_id = ff_guess_image2_codec(s->path);
-        if (st->codec->codec_id == CODEC_ID_LJPEG)
-            st->codec->codec_id = CODEC_ID_MJPEG;
+        if (st->codec->codec_id == AV_CODEC_ID_LJPEG)
+            st->codec->codec_id = AV_CODEC_ID_MJPEG;
     }
     if(st->codec->codec_type == AVMEDIA_TYPE_VIDEO && pix_fmt != PIX_FMT_NONE)
         st->codec->pix_fmt = pix_fmt;
@@ -289,7 +330,7 @@ static int read_packet(AVFormatContext *s1, AVPacket *pkt)
     char *filename = filename_bytes;
     int i;
     int size[3]={0}, ret[3]={0};
-    AVIOContext *f[3];
+    AVIOContext *f[3] = {NULL};
     AVCodecContext *codec= s1->streams[0]->codec;
 
     if (!s->is_pipe) {
@@ -311,7 +352,7 @@ static int read_packet(AVFormatContext *s1, AVPacket *pkt)
         for(i=0; i<3; i++){
             if (avio_open2(&f[i], filename, AVIO_FLAG_READ,
                            &s1->interrupt_callback, NULL) < 0) {
-                if(i==1)
+                if(i>=1)
                     break;
                 av_log(s1, AV_LOG_ERROR, "Could not open file : %s\n",filename);
                 return AVERROR(EIO);
@@ -323,7 +364,7 @@ static int read_packet(AVFormatContext *s1, AVPacket *pkt)
             filename[ strlen(filename) - 1 ]= 'U' + i;
         }
 
-        if(codec->codec_id == CODEC_ID_RAWVIDEO && !codec->width)
+        if(codec->codec_id == AV_CODEC_ID_RAWVIDEO && !codec->width)
             infer_size(&codec->width, &codec->height, size[0]);
     } else {
         f[0] = s1->pb;
@@ -338,7 +379,7 @@ static int read_packet(AVFormatContext *s1, AVPacket *pkt)
 
     pkt->size= 0;
     for(i=0; i<3; i++){
-        if(size[i]){
+        if(f[i]){
             ret[i]= avio_read(f[i], pkt->data + pkt->size, size[i]);
             if (!s->is_pipe)
                 avio_close(f[i]);
@@ -371,10 +412,18 @@ static int read_close(struct AVFormatContext* s1)
 #define OFFSET(x) offsetof(VideoDemuxData, x)
 #define DEC AV_OPT_FLAG_DECODING_PARAM
 static const AVOption options[] = {
-    { "pixel_format", "", OFFSET(pixel_format), AV_OPT_TYPE_STRING, {.str = NULL}, 0, 0, DEC },
-    { "video_size",   "", OFFSET(video_size),   AV_OPT_TYPE_STRING, {.str = NULL}, 0, 0, DEC },
-    { "framerate",    "", OFFSET(framerate),    AV_OPT_TYPE_STRING, {.str = "25"}, 0, 0, DEC },
-    { "loop",         "", OFFSET(loop),         AV_OPT_TYPE_INT,    {.dbl = 0},    0, 1, DEC },
+    { "framerate",    "set the video framerate",             OFFSET(framerate),    AV_OPT_TYPE_STRING, {.str = "25"}, 0, 0, DEC },
+    { "loop",         "force loop over input file sequence", OFFSET(loop),         AV_OPT_TYPE_INT,    {.i64 = 0},    0, 1, DEC },
+
+    { "pattern_type", "set pattern type",                    OFFSET(pattern_type), AV_OPT_TYPE_INT, {.i64=PT_GLOB_SEQUENCE}, 0, INT_MAX, DEC, "pattern_type"},
+    { "glob_sequence","glob/sequence pattern type",          0, AV_OPT_TYPE_CONST, {.i64=PT_GLOB_SEQUENCE}, INT_MIN, INT_MAX, DEC, "pattern_type" },
+    { "glob",         "glob pattern type",                   0, AV_OPT_TYPE_CONST, {.i64=PT_GLOB},          INT_MIN, INT_MAX, DEC, "pattern_type" },
+    { "sequence",     "glob pattern type",                   0, AV_OPT_TYPE_CONST, {.i64=PT_SEQUENCE},      INT_MIN, INT_MAX, DEC, "pattern_type" },
+
+    { "pixel_format", "set video pixel format",              OFFSET(pixel_format), AV_OPT_TYPE_STRING, {.str = NULL}, 0, 0, DEC },
+    { "start_number", "set first number in the sequence",    OFFSET(start_number), AV_OPT_TYPE_INT,    {.i64 = 0},    0, INT_MAX, DEC },
+    { "start_number_range", "set range for looking at the first sequence number", OFFSET(start_number_range), AV_OPT_TYPE_INT, {.i64 = 5}, 1, INT_MAX, DEC },
+    { "video_size",   "set video size",                      OFFSET(video_size),   AV_OPT_TYPE_STRING, {.str = NULL}, 0, 0, DEC },
     { NULL },
 };
 

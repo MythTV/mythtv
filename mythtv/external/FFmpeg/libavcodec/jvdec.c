@@ -133,17 +133,19 @@ static int decode_frame(AVCodecContext *avctx,
                         AVPacket *avpkt)
 {
     JvContext *s           = avctx->priv_data;
-    int buf_size           = avpkt->size;
     const uint8_t *buf     = avpkt->data;
-    const uint8_t *buf_end = buf + buf_size;
+    const uint8_t *buf_end = buf + avpkt->size;
     int video_size, video_type, i, j;
+
+    if (avpkt->size < 6)
+        return AVERROR_INVALIDDATA;
 
     video_size = AV_RL32(buf);
     video_type = buf[4];
     buf += 5;
 
     if (video_size) {
-        if(video_size < 0) {
+        if (video_size < 0 || video_size > avpkt->size - 5) {
             av_log(avctx, AV_LOG_ERROR, "video size %d invalid\n", video_size);
             return AVERROR_INVALIDDATA;
         }
@@ -154,7 +156,7 @@ static int decode_frame(AVCodecContext *avctx,
 
         if (video_type == 0 || video_type == 1) {
             GetBitContext gb;
-            init_get_bits(&gb, buf, 8 * FFMIN(video_size, buf_end - buf));
+            init_get_bits(&gb, buf, 8 * video_size);
 
             for (j = 0; j < avctx->height; j += 8)
                 for (i = 0; i < avctx->width; i += 8)
@@ -163,19 +165,17 @@ static int decode_frame(AVCodecContext *avctx,
 
             buf += video_size;
         } else if (video_type == 2) {
-            if (buf + 1 <= buf_end) {
-                int v = *buf++;
-                for (j = 0; j < avctx->height; j++)
-                    memset(s->frame.data[0] + j*s->frame.linesize[0], v, avctx->width);
-            }
+            int v = *buf++;
+            for (j = 0; j < avctx->height; j++)
+                memset(s->frame.data[0] + j*s->frame.linesize[0], v, avctx->width);
         } else {
             av_log(avctx, AV_LOG_WARNING, "unsupported frame type %i\n", video_type);
             return AVERROR_INVALIDDATA;
         }
     }
 
-    if (buf < buf_end) {
-        for (i = 0; i < AVPALETTE_COUNT && buf + 3 <= buf_end; i++) {
+    if (buf_end - buf >= AVPALETTE_COUNT * 3) {
+        for (i = 0; i < AVPALETTE_COUNT; i++) {
             uint32_t pal = AV_RB24(buf);
             s->palette[i] = 0xFF << 24 | pal << 2 | ((pal >> 4) & 0x30303);
             buf += 3;
@@ -194,7 +194,7 @@ static int decode_frame(AVCodecContext *avctx,
         *(AVFrame*)data = s->frame;
     }
 
-    return buf_size;
+    return avpkt->size;
 }
 
 static av_cold int decode_close(AVCodecContext *avctx)
@@ -211,7 +211,7 @@ AVCodec ff_jv_decoder = {
     .name           = "jv",
     .long_name      = NULL_IF_CONFIG_SMALL("Bitmap Brothers JV video"),
     .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = CODEC_ID_JV,
+    .id             = AV_CODEC_ID_JV,
     .priv_data_size = sizeof(JvContext),
     .init           = decode_init,
     .close          = decode_close,

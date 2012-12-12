@@ -24,9 +24,9 @@
 #if HAVE_ALTIVEC_H
 #include <altivec.h>
 #endif
+#include "libavutil/ppc/types_altivec.h"
+#include "libavutil/ppc/util_altivec.h"
 #include "libavcodec/dsputil.h"
-#include "util_altivec.h"
-#include "types_altivec.h"
 #include "dsputil_altivec.h"
 
 static int sad16_x2_altivec(void *v, uint8_t *pix1, uint8_t *pix2, int line_size, int h)
@@ -476,7 +476,7 @@ static int pix_sum_altivec(uint8_t * pix, int line_size)
     return s;
 }
 
-static void get_pixels_altivec(DCTELEM *restrict block, const uint8_t *pixels, int line_size)
+static void get_pixels_altivec(DCTELEM *av_restrict block, const uint8_t *pixels, int line_size)
 {
     int i;
     vector unsigned char perm = vec_lvsl(0, pixels);
@@ -502,7 +502,7 @@ static void get_pixels_altivec(DCTELEM *restrict block, const uint8_t *pixels, i
     }
 }
 
-static void diff_pixels_altivec(DCTELEM *restrict block, const uint8_t *s1,
+static void diff_pixels_altivec(DCTELEM *av_restrict block, const uint8_t *s1,
         const uint8_t *s2, int stride)
 {
     int i;

@@ -27,7 +27,10 @@
  * @author Marco Gerards <marco@gnu.org>
  */
 
+#include <string.h>
+
 #include "libavutil/intreadwrite.h"
+#include "libavutil/mem.h"
 #include "parser.h"
 
 #define DIRAC_PARSE_INFO_PREFIX 0x42424344
@@ -248,7 +251,7 @@ static void dirac_parse_close(AVCodecParserContext *s)
 }
 
 AVCodecParser ff_dirac_parser = {
-    .codec_ids      = { CODEC_ID_DIRAC },
+    .codec_ids      = { AV_CODEC_ID_DIRAC },
     .priv_data_size = sizeof(DiracParseContext),
     .parser_parse   = dirac_parse,
     .parser_close   = dirac_parse_close,

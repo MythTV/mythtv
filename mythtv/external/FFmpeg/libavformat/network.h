@@ -27,26 +27,29 @@
 #include "libavutil/error.h"
 #include "os_support.h"
 
+#if HAVE_UNISTD_H
+#include <unistd.h>
+#endif
+
 #if HAVE_WINSOCK2_H
 #include <winsock2.h>
 #include <ws2tcpip.h>
 
-#ifdef EPROTONOSUPPORT
-# undef EPROTONOSUPPORT
-#endif
+#ifndef EPROTONOSUPPORT
 #define EPROTONOSUPPORT WSAEPROTONOSUPPORT
-#ifdef ETIMEDOUT
-# undef ETIMEDOUT
 #endif
+#ifndef ETIMEDOUT
 #define ETIMEDOUT       WSAETIMEDOUT
-#ifdef ECONNREFUSED
-# undef ECONNREFUSED
 #endif
+#ifndef ECONNREFUSED
 #define ECONNREFUSED    WSAECONNREFUSED
-#ifdef EINPROGRESS
-# undef EINPROGRESS
 #endif
+#ifndef EINPROGRESS
 #define EINPROGRESS     WSAEINPROGRESS
+#endif
+
+#define getsockopt(a, b, c, d, e) getsockopt(a, b, c, (char*) d, e)
+#define setsockopt(a, b, c, d, e) setsockopt(a, b, c, (const char*) d, e)
 
 int ff_neterrno(void);
 #else
@@ -107,16 +110,32 @@ struct addrinfo {
 #endif
 
 /* getaddrinfo constants */
+#ifndef EAI_AGAIN
+#define EAI_AGAIN 2
+#endif
+#ifndef EAI_BADFLAGS
+#define EAI_BADFLAGS 3
+#endif
 #ifndef EAI_FAIL
 #define EAI_FAIL 4
 #endif
-
 #ifndef EAI_FAMILY
 #define EAI_FAMILY 5
 #endif
-
+#ifndef EAI_MEMORY
+#define EAI_MEMORY 6
+#endif
+#ifndef EAI_NODATA
+#define EAI_NODATA 7
+#endif
 #ifndef EAI_NONAME
 #define EAI_NONAME 8
+#endif
+#ifndef EAI_SERVICE
+#define EAI_SERVICE 9
+#endif
+#ifndef EAI_SOCKTYPE
+#define EAI_SOCKTYPE 10
 #endif
 
 #ifndef AI_PASSIVE
@@ -158,10 +177,13 @@ void ff_freeaddrinfo(struct addrinfo *res);
 int ff_getnameinfo(const struct sockaddr *sa, int salen,
                    char *host, int hostlen,
                    char *serv, int servlen, int flags);
-const char *ff_gai_strerror(int ecode);
 #define getaddrinfo ff_getaddrinfo
 #define freeaddrinfo ff_freeaddrinfo
 #define getnameinfo ff_getnameinfo
+#endif
+#if !HAVE_GETADDRINFO || HAVE_WINSOCK2_H
+const char *ff_gai_strerror(int ecode);
+#undef gai_strerror
 #define gai_strerror ff_gai_strerror
 #endif
 

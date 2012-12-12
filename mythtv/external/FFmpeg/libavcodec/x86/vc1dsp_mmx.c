@@ -25,10 +25,13 @@
  */
 
 #include "libavutil/cpu.h"
-#include "libavutil/x86_cpu.h"
+#include "libavutil/mem.h"
+#include "libavutil/x86/asm.h"
 #include "libavcodec/dsputil.h"
 #include "dsputil_mmx.h"
 #include "libavcodec/vc1dsp.h"
+
+#if HAVE_INLINE_ASM
 
 #define OP_PUT(S,D)
 #define OP_AVG(S,D) "pavgb " #S ", " #D " \n\t"
@@ -682,6 +685,8 @@ static void vc1_inv_trans_8x8_dc_mmx2(uint8_t *dest, int linesize, DCTELEM *bloc
     );
 }
 
+#endif /* HAVE_INLINE_ASM */
+
 #define LOOP_FILTER(EXT) \
 void ff_vc1_v_loop_filter4_ ## EXT(uint8_t *src, int stride, int pq); \
 void ff_vc1_h_loop_filter4_ ## EXT(uint8_t *src, int stride, int pq); \
@@ -712,8 +717,7 @@ static void vc1_h_loop_filter16_sse4(uint8_t *src, int stride, int pq)
     ff_vc1_h_loop_filter8_sse4(src,          stride, pq);
     ff_vc1_h_loop_filter8_sse4(src+8*stride, stride, pq);
 }
-
-#endif
+#endif /* HAVE_YASM */
 
 void ff_put_vc1_chroma_mc8_mmx_nornd  (uint8_t *dst, uint8_t *src,
                                        int stride, int h, int x, int y);
@@ -730,6 +734,7 @@ void ff_vc1dsp_init_mmx(VC1DSPContext *dsp)
 {
     int mm_flags = av_get_cpu_flags();
 
+#if HAVE_INLINE_ASM
     if (mm_flags & AV_CPU_FLAG_MMX) {
         dsp->put_vc1_mspel_pixels_tab[ 0] = ff_put_vc1_mspel_mc00_mmx;
         dsp->put_vc1_mspel_pixels_tab[ 4] = put_vc1_mspel_mc01_mmx;
@@ -755,7 +760,7 @@ void ff_vc1dsp_init_mmx(VC1DSPContext *dsp)
             dsp->put_no_rnd_vc1_chroma_pixels_tab[0]= ff_put_vc1_chroma_mc8_mmx_nornd;
     }
 
-    if (mm_flags & AV_CPU_FLAG_MMX2){
+    if (mm_flags & AV_CPU_FLAG_MMXEXT) {
         dsp->avg_vc1_mspel_pixels_tab[ 0] = ff_avg_vc1_mspel_mc00_mmx2;
         dsp->avg_vc1_mspel_pixels_tab[ 4] = avg_vc1_mspel_mc01_mmx2;
         dsp->avg_vc1_mspel_pixels_tab[ 8] = avg_vc1_mspel_mc02_mmx2;
@@ -791,6 +796,7 @@ void ff_vc1dsp_init_mmx(VC1DSPContext *dsp)
         dsp->put_no_rnd_vc1_chroma_pixels_tab[0]= ff_put_vc1_chroma_mc8_ssse3_nornd;
         dsp->avg_no_rnd_vc1_chroma_pixels_tab[0]= ff_avg_vc1_chroma_mc8_ssse3_nornd;
     }
+#endif /* HAVE_INLINE_ASM */
 
 #define ASSIGN_LF(EXT) \
         dsp->vc1_v_loop_filter4  = ff_vc1_v_loop_filter4_ ## EXT; \
@@ -803,8 +809,8 @@ void ff_vc1dsp_init_mmx(VC1DSPContext *dsp)
 #if HAVE_YASM
     if (mm_flags & AV_CPU_FLAG_MMX) {
     }
-    return;
-    if (mm_flags & AV_CPU_FLAG_MMX2) {
+
+    if (mm_flags & AV_CPU_FLAG_MMXEXT) {
         ASSIGN_LF(mmx2);
     }
 
@@ -821,5 +827,5 @@ void ff_vc1dsp_init_mmx(VC1DSPContext *dsp)
         dsp->vc1_h_loop_filter8  = ff_vc1_h_loop_filter8_sse4;
         dsp->vc1_h_loop_filter16 = vc1_h_loop_filter16_sse4;
     }
-#endif
+#endif /* HAVE_YASM */
 }

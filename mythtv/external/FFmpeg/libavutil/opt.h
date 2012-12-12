@@ -64,7 +64,7 @@
  *
  * static const AVOption options[] = {
  *   { "test_int", "This is a test option of int type.", offsetof(test_struct, int_opt),
- *     AV_OPT_TYPE_INT, { -1 }, INT_MIN, INT_MAX },
+ *     AV_OPT_TYPE_INT, { .i64 = -1 }, INT_MIN, INT_MAX },
  *   { "test_str", "This is a test option of string type.", offsetof(test_struct, str_opt),
  *     AV_OPT_TYPE_STRING },
  *   { "test_bin", "This is a test option of binary type.", offsetof(test_struct, bin_opt),
@@ -123,7 +123,7 @@
  *      } child_struct;
  *      static const AVOption child_opts[] = {
  *          { "test_flags", "This is a test option of flags type.",
- *            offsetof(child_struct, flags_opt), AV_OPT_TYPE_FLAGS, { 0 }, INT_MIN, INT_MAX },
+ *            offsetof(child_struct, flags_opt), AV_OPT_TYPE_FLAGS, { .i64 = 0 }, INT_MIN, INT_MAX },
  *          { NULL },
  *      };
  *      static const AVClass child_class = {
@@ -170,8 +170,8 @@
  *      above, put the following into the child_opts array:
  *      @code
  *      { "test_flags", "This is a test option of flags type.",
- *        offsetof(child_struct, flags_opt), AV_OPT_TYPE_FLAGS, { 0 }, INT_MIN, INT_MAX, "test_unit" },
- *      { "flag1", "This is a flag with value 16", 0, AV_OPT_TYPE_CONST, { 16 }, 0, 0, "test_unit" },
+ *        offsetof(child_struct, flags_opt), AV_OPT_TYPE_FLAGS, { .i64 = 0 }, INT_MIN, INT_MAX, "test_unit" },
+ *      { "flag1", "This is a flag with value 16", 0, AV_OPT_TYPE_CONST, { .i64 = 16 }, 0, 0, "test_unit" },
  *      @endcode
  *
  * @section avoptions_use Using AVOptions
@@ -226,6 +226,7 @@ enum AVOptionType{
     AV_OPT_TYPE_BINARY,  ///< offset must point to a pointer immediately followed by an int for the length
     AV_OPT_TYPE_CONST = 128,
     AV_OPT_TYPE_IMAGE_SIZE = MKBETAG('S','I','Z','E'), ///< offset must point to two consecutive integers
+    AV_OPT_TYPE_PIXEL_FMT  = MKBETAG('P','F','M','T'),
 #if FF_API_OLD_AVOPTIONS
     FF_OPT_TYPE_FLAGS = 0,
     FF_OPT_TYPE_INT,
@@ -262,10 +263,10 @@ typedef struct AVOption {
      * the default value for scalar options
      */
     union {
+        int64_t i64;
         double dbl;
         const char *str;
         /* TODO those are unused now */
-        int64_t i64;
         AVRational q;
     } default_val;
     double min;                 ///< minimum valid value for the option
@@ -278,6 +279,7 @@ typedef struct AVOption {
 #define AV_OPT_FLAG_AUDIO_PARAM     8
 #define AV_OPT_FLAG_VIDEO_PARAM     16
 #define AV_OPT_FLAG_SUBTITLE_PARAM  32
+#define AV_OPT_FLAG_FILTERING_PARAM (1<<16) ///< a generic parameter which can be set by the user for filtering
 //FIXME think about enc-audio, ... style flags
 
     /**

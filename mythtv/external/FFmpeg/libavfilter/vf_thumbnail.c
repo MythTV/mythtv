@@ -28,6 +28,7 @@
  */
 
 #include "avfilter.h"
+#include "internal.h"
 
 #define HIST_SIZE (3*256)
 
@@ -42,7 +43,7 @@ typedef struct {
     struct thumb_frame *frames; ///< the n_frames frames
 } ThumbContext;
 
-static av_cold int init(AVFilterContext *ctx, const char *args, void *opaque)
+static av_cold int init(AVFilterContext *ctx, const char *args)
 {
     ThumbContext *thumb = ctx->priv;
 
@@ -63,11 +64,11 @@ static av_cold int init(AVFilterContext *ctx, const char *args, void *opaque)
                "Allocation failure, try to lower the number of frames\n");
         return AVERROR(ENOMEM);
     }
-    av_log(ctx, AV_LOG_INFO, "batch size: %d frames\n", thumb->n_frames);
+    av_log(ctx, AV_LOG_VERBOSE, "batch size: %d frames\n", thumb->n_frames);
     return 0;
 }
 
-static void draw_slice(AVFilterLink *inlink, int y, int h, int slice_dir)
+static int draw_slice(AVFilterLink *inlink, int y, int h, int slice_dir)
 {
     int i, j;
     AVFilterContext *ctx = inlink->dst;
@@ -85,6 +86,7 @@ static void draw_slice(AVFilterLink *inlink, int y, int h, int slice_dir)
         }
         p += picref->linesize[0];
     }
+    return 0;
 }
 
 /**
@@ -105,7 +107,7 @@ static double frame_sum_square_err(const int *hist, const double *median)
     return sum_sq_err;
 }
 
-static void end_frame(AVFilterLink *inlink)
+static int  end_frame(AVFilterLink *inlink)
 {
     int i, j, best_frame_idx = 0;
     double avg_hist[HIST_SIZE] = {0}, sq_err, min_sq_err = -1;
@@ -116,11 +118,12 @@ static void end_frame(AVFilterLink *inlink)
 
     // keep a reference of each frame
     thumb->frames[thumb->n].buf = inlink->cur_buf;
+    inlink->cur_buf = NULL;
 
     // no selection until the buffer of N frames is filled up
     if (thumb->n < thumb->n_frames - 1) {
         thumb->n++;
-        return;
+        return 0;
     }
 
     // average histogram of the N frames
@@ -151,10 +154,10 @@ static void end_frame(AVFilterLink *inlink)
     picref = thumb->frames[best_frame_idx].buf;
     av_log(ctx, AV_LOG_INFO, "frame id #%d (pts_time=%f) selected\n",
            best_frame_idx, picref->pts * av_q2d(inlink->time_base));
-    avfilter_start_frame(outlink, picref);
+    ff_start_frame(outlink, picref);
     thumb->frames[best_frame_idx].buf = NULL;
-    avfilter_draw_slice(outlink, 0, inlink->h, 1);
-    avfilter_end_frame(outlink);
+    ff_draw_slice(outlink, 0, inlink->h, 1);
+    return ff_end_frame(outlink);
 }
 
 static av_cold void uninit(AVFilterContext *ctx)
@@ -168,7 +171,7 @@ static av_cold void uninit(AVFilterContext *ctx)
     av_freep(&thumb->frames);
 }
 
-static void null_start_frame(AVFilterLink *link, AVFilterBufferRef *picref) { }
+static int null_start_frame(AVFilterLink *link, AVFilterBufferRef *picref) { return 0; }
 
 static int request_frame(AVFilterLink *link)
 {
@@ -177,7 +180,7 @@ static int request_frame(AVFilterLink *link)
     /* loop until a frame thumbnail is available (when a frame is queued,
      * thumb->n is reset to zero) */
     do {
-        int ret = avfilter_request_frame(link->src->inputs[0]);
+        int ret = ff_request_frame(link->src->inputs[0]);
         if (ret < 0)
             return ret;
     } while (thumb->n);
@@ -188,7 +191,7 @@ static int poll_frame(AVFilterLink *link)
 {
     ThumbContext *thumb  = link->src->priv;
     AVFilterLink *inlink = link->src->inputs[0];
-    int ret, available_frames = avfilter_poll_frame(inlink);
+    int ret, available_frames = ff_poll_frame(inlink);
 
     /* If the input link is not able to provide any frame, we can't do anything
      * at the moment and thus have zero thumbnail available. */
@@ -202,7 +205,7 @@ static int poll_frame(AVFilterLink *link)
 
     /* we have some frame(s) available in the input link, but not yet enough to
      * output a thumbnail, so we request more */
-    ret = avfilter_request_frame(inlink);
+    ret = ff_request_frame(inlink);
     return ret < 0 ? ret : 0;
 }
 
@@ -212,7 +215,7 @@ static int query_formats(AVFilterContext *ctx)
         PIX_FMT_RGB24, PIX_FMT_BGR24,
         PIX_FMT_NONE
     };
-    avfilter_set_common_pixel_formats(ctx, avfilter_make_format_list(pix_fmts));
+    ff_set_common_formats(ctx, ff_make_format_list(pix_fmts));
     return 0;
 }
 
@@ -226,7 +229,8 @@ AVFilter avfilter_vf_thumbnail = {
     .inputs        = (const AVFilterPad[]) {
         {   .name             = "default",
             .type             = AVMEDIA_TYPE_VIDEO,
-            .get_video_buffer = avfilter_null_get_video_buffer,
+            .get_video_buffer = ff_null_get_video_buffer,
+            .min_perms        = AV_PERM_PRESERVE,
             .start_frame      = null_start_frame,
             .draw_slice       = draw_slice,
             .end_frame        = end_frame,
@@ -237,7 +241,6 @@ AVFilter avfilter_vf_thumbnail = {
             .type             = AVMEDIA_TYPE_VIDEO,
             .request_frame    = request_frame,
             .poll_frame       = poll_frame,
-            .rej_perms        = AV_PERM_REUSE2,
         },{ .name = NULL }
     },
 };

@@ -26,6 +26,7 @@
 
 #include "avcodec.h"
 #include "raw.h"
+#include "libavutil/common.h"
 
 const PixelFormatTag ff_raw_pix_fmt_tags[] = {
     { PIX_FMT_YUV420P, MKTAG('I', '4', '2', '0') }, /* Planar formats */
@@ -123,6 +124,18 @@ const PixelFormatTag ff_raw_pix_fmt_tags[] = {
     { PIX_FMT_YUV422P10BE, MKTAG(10 , 10 , '3', 'Y') },
     { PIX_FMT_YUV444P10LE, MKTAG('Y', '3',  0 , 10 ) },
     { PIX_FMT_YUV444P10BE, MKTAG(10 ,  0 , '3', 'Y') },
+    { PIX_FMT_YUV420P12LE, MKTAG('Y', '3', 11 , 12 ) },
+    { PIX_FMT_YUV420P12BE, MKTAG(12 , 11 , '3', 'Y') },
+    { PIX_FMT_YUV422P12LE, MKTAG('Y', '3', 10 , 12 ) },
+    { PIX_FMT_YUV422P12BE, MKTAG(12 , 10 , '3', 'Y') },
+    { PIX_FMT_YUV444P12LE, MKTAG('Y', '3',  0 , 12 ) },
+    { PIX_FMT_YUV444P12BE, MKTAG(12 ,  0 , '3', 'Y') },
+    { PIX_FMT_YUV420P14LE, MKTAG('Y', '3', 11 , 14 ) },
+    { PIX_FMT_YUV420P14BE, MKTAG(14 , 11 , '3', 'Y') },
+    { PIX_FMT_YUV422P14LE, MKTAG('Y', '3', 10 , 14 ) },
+    { PIX_FMT_YUV422P14BE, MKTAG(14 , 10 , '3', 'Y') },
+    { PIX_FMT_YUV444P14LE, MKTAG('Y', '3',  0 , 14 ) },
+    { PIX_FMT_YUV444P14BE, MKTAG(14 ,  0 , '3', 'Y') },
     { PIX_FMT_YUV420P16LE, MKTAG('Y', '3', 11 , 16 ) },
     { PIX_FMT_YUV420P16BE, MKTAG(16 , 11 , '3', 'Y') },
     { PIX_FMT_YUV422P16LE, MKTAG('Y', '3', 10 , 16 ) },
@@ -135,6 +148,8 @@ const PixelFormatTag ff_raw_pix_fmt_tags[] = {
     { PIX_FMT_GRAY8A,      MKTAG('Y', '2',  0 ,  8 ) },
 
     /* quicktime */
+    { PIX_FMT_YUV420P, MKTAG('R', '4', '2', '0') }, /* Radius DV YUV PAL */
+    { PIX_FMT_YUV411P, MKTAG('R', '4', '1', '1') }, /* Radius DV YUV NTSC */
     { PIX_FMT_UYVY422, MKTAG('2', 'v', 'u', 'y') },
     { PIX_FMT_UYVY422, MKTAG('2', 'V', 'u', 'y') },
     { PIX_FMT_UYVY422, MKTAG('A', 'V', 'U', 'I') }, /* FIXME merge both fields */

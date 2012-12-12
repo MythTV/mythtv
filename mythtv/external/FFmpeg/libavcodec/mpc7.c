@@ -35,10 +35,6 @@
 #include "mpc.h"
 #include "mpc7data.h"
 
-#define BANDS            32
-#define SAMPLES_PER_BAND 36
-#define MPC_FRAME_SIZE   (BANDS * SAMPLES_PER_BAND)
-
 static VLC scfi_vlc, dscf_vlc, hdr_vlc, quant_vlc[MPC7_QUANT_VLC_TABLES][2];
 
 static const uint16_t quant_offsets[MPC7_QUANT_VLC_TABLES*2 + 1] =
@@ -97,6 +93,9 @@ static av_cold int mpc7_decode_init(AVCodecContext * avctx)
     avctx->sample_fmt = AV_SAMPLE_FMT_S16;
     avctx->channel_layout = AV_CH_LAYOUT_STEREO;
 
+    avcodec_get_frame_defaults(&c->frame);
+    avctx->coded_frame = &c->frame;
+
     if(vlc_initialized) return 0;
     av_log(avctx, AV_LOG_DEBUG, "Initing VLC\n");
     scfi_vlc.table = scfi_table;
@@ -136,9 +135,6 @@ static av_cold int mpc7_decode_init(AVCodecContext * avctx)
         }
     }
     vlc_initialized = 1;
-
-    avcodec_get_frame_defaults(&c->frame);
-    avctx->coded_frame = &c->frame;
 
     return 0;
 }
@@ -228,7 +224,7 @@ static int mpc7_decode_frame(AVCodecContext * avctx, void *data,
     buf_size  -= 4;
 
     /* get output buffer */
-    c->frame.nb_samples = last_frame ? c->lastframelen : MPC_FRAME_SIZE;
+    c->frame.nb_samples = MPC_FRAME_SIZE;
     if ((ret = avctx->get_buffer(avctx, &c->frame)) < 0) {
         av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
         return ret;
@@ -298,6 +294,8 @@ static int mpc7_decode_frame(AVCodecContext * avctx, void *data,
             idx_to_quant(c, &gb, bands[i].res[ch], c->Q[ch] + off);
 
     ff_mpc_dequantize_and_synth(c, mb, c->frame.data[0], 2);
+    if(last_frame)
+        c->frame.nb_samples = c->lastframelen;
 
     bits_used = get_bits_count(&gb);
     bits_avail = buf_size * 8;
@@ -336,7 +334,7 @@ static av_cold int mpc7_decode_close(AVCodecContext *avctx)
 AVCodec ff_mpc7_decoder = {
     .name           = "mpc7",
     .type           = AVMEDIA_TYPE_AUDIO,
-    .id             = CODEC_ID_MUSEPACK7,
+    .id             = AV_CODEC_ID_MUSEPACK7,
     .priv_data_size = sizeof(MPCContext),
     .init           = mpc7_decode_init,
     .close          = mpc7_decode_close,

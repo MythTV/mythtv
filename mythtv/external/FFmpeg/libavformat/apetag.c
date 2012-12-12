@@ -24,9 +24,8 @@
 #include "libavutil/dict.h"
 #include "avformat.h"
 #include "apetag.h"
+#include "internal.h"
 
-#define APE_TAG_VERSION               2000
-#define APE_TAG_FOOTER_BYTES          32
 #define APE_TAG_FLAG_CONTAINS_HEADER  (1 << 31)
 #define APE_TAG_FLAG_IS_HEADER        (1 << 29)
 #define APE_TAG_FLAG_IS_BINARY        (1 << 1)
@@ -56,20 +55,47 @@ static int ape_tag_read_field(AVFormatContext *s)
         return -1;
     if (flags & APE_TAG_FLAG_IS_BINARY) {
         uint8_t filename[1024];
+        enum AVCodecID id;
         AVStream *st = avformat_new_stream(s, NULL);
         if (!st)
             return AVERROR(ENOMEM);
-        avio_get_str(pb, INT_MAX, filename, sizeof(filename));
-        st->codec->extradata = av_malloc(size + FF_INPUT_BUFFER_PADDING_SIZE);
-        if (!st->codec->extradata)
-            return AVERROR(ENOMEM);
-        if (avio_read(pb, st->codec->extradata, size) != size) {
-            av_freep(&st->codec->extradata);
-            return AVERROR(EIO);
+
+        size -= avio_get_str(pb, size, filename, sizeof(filename));
+        if (size <= 0) {
+            av_log(s, AV_LOG_WARNING, "Skipping binary tag '%s'.\n", key);
+            return 0;
         }
-        st->codec->extradata_size = size;
+
         av_dict_set(&st->metadata, key, filename, 0);
-        st->codec->codec_type = AVMEDIA_TYPE_ATTACHMENT;
+
+        if ((id = ff_guess_image2_codec(filename)) != AV_CODEC_ID_NONE) {
+            AVPacket pkt;
+            int ret;
+
+            ret = av_get_packet(s->pb, &pkt, size);
+            if (ret < 0) {
+                av_log(s, AV_LOG_ERROR, "Error reading cover art.\n");
+                return ret;
+            }
+
+            st->disposition      |= AV_DISPOSITION_ATTACHED_PIC;
+            st->codec->codec_type = AVMEDIA_TYPE_VIDEO;
+            st->codec->codec_id   = id;
+
+            st->attached_pic              = pkt;
+            st->attached_pic.stream_index = st->index;
+            st->attached_pic.flags       |= AV_PKT_FLAG_KEY;
+        } else {
+            st->codec->extradata = av_malloc(size + FF_INPUT_BUFFER_PADDING_SIZE);
+            if (!st->codec->extradata)
+                return AVERROR(ENOMEM);
+            if (avio_read(pb, st->codec->extradata, size) != size) {
+                av_freep(&st->codec->extradata);
+                return AVERROR(EIO);
+            }
+            st->codec->extradata_size = size;
+            st->codec->codec_type = AVMEDIA_TYPE_ATTACHMENT;
+        }
     } else {
         value = av_malloc(size+1);
         if (!value)
@@ -85,50 +111,59 @@ static int ape_tag_read_field(AVFormatContext *s)
     return 0;
 }
 
-void ff_ape_parse_tag(AVFormatContext *s)
+int64_t ff_ape_parse_tag(AVFormatContext *s)
 {
     AVIOContext *pb = s->pb;
     int file_size = avio_size(pb);
     uint32_t val, fields, tag_bytes;
     uint8_t buf[8];
+    int64_t tag_start;
     int i;
 
     if (file_size < APE_TAG_FOOTER_BYTES)
-        return;
+        return 0;
 
     avio_seek(pb, file_size - APE_TAG_FOOTER_BYTES, SEEK_SET);
 
     avio_read(pb, buf, 8);     /* APETAGEX */
-    if (strncmp(buf, "APETAGEX", 8)) {
-        return;
+    if (strncmp(buf, APE_TAG_PREAMBLE, 8)) {
+        return 0;
     }
 
     val = avio_rl32(pb);       /* APE tag version */
     if (val > APE_TAG_VERSION) {
         av_log(s, AV_LOG_ERROR, "Unsupported tag version. (>=%d)\n", APE_TAG_VERSION);
-        return;
+        return 0;
     }
 
     tag_bytes = avio_rl32(pb); /* tag size */
     if (tag_bytes - APE_TAG_FOOTER_BYTES > (1024 * 1024 * 16)) {
         av_log(s, AV_LOG_ERROR, "Tag size is way too big\n");
-        return;
+        return 0;
+    }
+
+    tag_start = file_size - tag_bytes - APE_TAG_FOOTER_BYTES;
+    if (tag_start < 0) {
+        av_log(s, AV_LOG_ERROR, "Invalid tag size %u.\n", tag_bytes);
+        return 0;
     }
 
     fields = avio_rl32(pb);    /* number of fields */
     if (fields > 65536) {
         av_log(s, AV_LOG_ERROR, "Too many tag fields (%d)\n", fields);
-        return;
+        return 0;
     }
 
     val = avio_rl32(pb);       /* flags */
     if (val & APE_TAG_FLAG_IS_HEADER) {
         av_log(s, AV_LOG_ERROR, "APE Tag is a header\n");
-        return;
+        return 0;
     }
 
     avio_seek(pb, file_size - tag_bytes, SEEK_SET);
 
     for (i=0; i<fields; i++)
         if (ape_tag_read_field(s) < 0) break;
+
+    return tag_start;
 }

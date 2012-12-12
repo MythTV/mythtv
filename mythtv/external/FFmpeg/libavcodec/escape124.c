@@ -48,7 +48,7 @@ typedef struct Escape124Context {
     CodeBook codebooks[3];
 } Escape124Context;
 
-static int can_safely_read(GetBitContext* gb, int bits) {
+static int can_safely_read(GetBitContext* gb, uint64_t bits) {
     return get_bits_left(gb) >= bits;
 }
 
@@ -90,7 +90,7 @@ static CodeBook unpack_codebook(GetBitContext* gb, unsigned depth,
     unsigned i, j;
     CodeBook cb = { 0 };
 
-    if (!can_safely_read(gb, size * 34))
+    if (!can_safely_read(gb, (uint64_t)size * 34))
         return cb;
 
     if (size >= INT_MAX / sizeof(MacroBlock))
@@ -368,7 +368,7 @@ static int escape124_decode_frame(AVCodecContext *avctx,
 AVCodec ff_escape124_decoder = {
     .name           = "escape124",
     .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = CODEC_ID_ESCAPE124,
+    .id             = AV_CODEC_ID_ESCAPE124,
     .priv_data_size = sizeof(Escape124Context),
     .init           = escape124_decode_init,
     .close          = escape124_decode_close,

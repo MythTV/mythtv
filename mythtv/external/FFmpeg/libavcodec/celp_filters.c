@@ -24,6 +24,7 @@
 
 #include "avcodec.h"
 #include "celp_filters.h"
+#include "libavutil/common.h"
 
 void ff_celp_convolve_circ(int16_t* fc_out, const int16_t* fc_in,
                            const int16_t* filter, int len)
@@ -63,17 +64,16 @@ int ff_celp_lp_synthesis_filter(int16_t *out, const int16_t *filter_coeffs,
     int i,n;
 
     for (n = 0; n < buffer_length; n++) {
-        int sum = rounder;
+        int sum = -rounder, sum1;
         for (i = 1; i <= filter_length; i++)
-            sum -= filter_coeffs[i-1] * out[n-i];
+            sum += filter_coeffs[i-1] * out[n-i];
 
-        sum = ((sum >> 12) + in[n]) >> shift;
+        sum1 = ((-sum >> 12) + in[n]) >> shift;
+        sum  = av_clip_int16(sum1);
 
-        if (sum + 0x8000 > 0xFFFFU) {
-            if (stop_on_overflow)
-                return 1;
-            sum = (sum >> 31) ^ 32767;
-        }
+        if (stop_on_overflow && sum != sum1)
+            return 1;
+
         out[n] = sum;
     }
 
@@ -204,4 +204,13 @@ void ff_celp_lp_zero_synthesis_filterf(float *out, const float *filter_coeffs,
         for (i = 1; i <= filter_length; i++)
             out[n] += filter_coeffs[i-1] * in[n-i];
     }
+}
+
+void ff_celp_filter_init(CELPFContext *c)
+{
+    c->celp_lp_synthesis_filterf        = ff_celp_lp_synthesis_filterf;
+    c->celp_lp_zero_synthesis_filterf   = ff_celp_lp_zero_synthesis_filterf;
+
+    if(HAVE_MIPSFPU)
+        ff_celp_filter_init_mips(c);
 }

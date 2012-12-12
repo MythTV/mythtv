@@ -22,10 +22,13 @@
 
 #include "libavutil/audioconvert.h"
 #include "libavutil/avassert.h"
+#include "libavutil/common.h"
+#include "libavutil/imgutils.h"
 #include "libavcodec/avcodec.h"
 
 #include "avfilter.h"
 #include "internal.h"
+#include "audio.h"
 #include "avcodec.h"
 
 void ff_avfilter_default_free_buffer(AVFilterBuffer *ptr)
@@ -34,6 +37,15 @@ void ff_avfilter_default_free_buffer(AVFilterBuffer *ptr)
         av_freep(&ptr->extended_data);
     av_free(ptr->data[0]);
     av_free(ptr);
+}
+
+static void copy_video_props(AVFilterBufferRefVideoProps *dst, AVFilterBufferRefVideoProps *src) {
+    *dst = *src;
+    if (src->qp_table) {
+        int qsize = src->qp_table_size;
+        dst->qp_table = av_malloc(qsize);
+        memcpy(dst->qp_table, src->qp_table, qsize);
+    }
 }
 
 AVFilterBufferRef *avfilter_ref_buffer(AVFilterBufferRef *ref, int pmask)
@@ -48,7 +60,7 @@ AVFilterBufferRef *avfilter_ref_buffer(AVFilterBufferRef *ref, int pmask)
             av_free(ret);
             return NULL;
         }
-        *ret->video = *ref->video;
+        copy_video_props(ret->video, ref->video);
         ret->extended_data = ret->data;
     } else if (ref->type == AVMEDIA_TYPE_AUDIO) {
         ret->audio = av_malloc(sizeof(AVFilterBufferRefAudioProps));
@@ -92,6 +104,7 @@ void ff_free_pool(AVFilterPool *pool)
             av_freep(&picref->buf);
 
             av_freep(&picref->audio);
+            av_assert0(!picref->video || !picref->video->qp_table);
             av_freep(&picref->video);
             av_freep(&pool->pic[i]);
             pool->count--;
@@ -112,6 +125,9 @@ static void store_in_pool(AVFilterBufferRef *ref)
 
     av_assert0(ref->buf->data[0]);
     av_assert0(pool->refcount>0);
+
+    if (ref->video)
+        av_freep(&ref->video->qp_table);
 
     if (pool->count == POOL_SIZE) {
         AVFilterBufferRef *ref1 = pool->pic[0];
@@ -152,6 +168,8 @@ void avfilter_unref_buffer(AVFilterBufferRef *ref)
     }
     if (ref->extended_data != ref->data)
         av_freep(&ref->extended_data);
+    if (ref->video)
+        av_freep(&ref->video->qp_table);
     av_freep(&ref->video);
     av_freep(&ref->audio);
     av_free(ref);
@@ -163,77 +181,6 @@ void avfilter_unref_bufferp(AVFilterBufferRef **ref)
     *ref = NULL;
 }
 
-int avfilter_copy_frame_props(AVFilterBufferRef *dst, const AVFrame *src)
-{
-    dst->pts    = src->pts;
-    dst->pos    = av_frame_get_pkt_pos(src);
-    dst->format = src->format;
-
-    switch (dst->type) {
-    case AVMEDIA_TYPE_VIDEO:
-        dst->video->w                   = src->width;
-        dst->video->h                   = src->height;
-        dst->video->sample_aspect_ratio = src->sample_aspect_ratio;
-        dst->video->interlaced          = src->interlaced_frame;
-        dst->video->top_field_first     = src->top_field_first;
-        dst->video->key_frame           = src->key_frame;
-        dst->video->pict_type           = src->pict_type;
-        break;
-    case AVMEDIA_TYPE_AUDIO:
-        dst->audio->sample_rate         = src->sample_rate;
-        dst->audio->channel_layout      = src->channel_layout;
-        break;
-    default:
-        return AVERROR(EINVAL);
-    }
-
-    return 0;
-}
-
-int avfilter_copy_buf_props(AVFrame *dst, const AVFilterBufferRef *src)
-{
-    int planes, nb_channels;
-
-    memcpy(dst->data, src->data, sizeof(dst->data));
-    memcpy(dst->linesize, src->linesize, sizeof(dst->linesize));
-
-    dst->pts     = src->pts;
-    dst->format  = src->format;
-
-    switch (src->type) {
-    case AVMEDIA_TYPE_VIDEO:
-        dst->width               = src->video->w;
-        dst->height              = src->video->h;
-        dst->sample_aspect_ratio = src->video->sample_aspect_ratio;
-        dst->interlaced_frame    = src->video->interlaced;
-        dst->top_field_first     = src->video->top_field_first;
-        dst->key_frame           = src->video->key_frame;
-        dst->pict_type           = src->video->pict_type;
-        break;
-    case AVMEDIA_TYPE_AUDIO:
-        nb_channels = av_get_channel_layout_nb_channels(src->audio->channel_layout);
-        planes      = av_sample_fmt_is_planar(src->format) ? nb_channels : 1;
-
-        if (planes > FF_ARRAY_ELEMS(dst->data)) {
-            dst->extended_data = av_mallocz(planes * sizeof(*dst->extended_data));
-            if (!dst->extended_data)
-                return AVERROR(ENOMEM);
-            memcpy(dst->extended_data, src->extended_data,
-                   planes * sizeof(dst->extended_data));
-        } else
-            dst->extended_data = dst->data;
-
-        dst->sample_rate         = src->audio->sample_rate;
-        dst->channel_layout      = src->audio->channel_layout;
-        dst->nb_samples          = src->audio->nb_samples;
-        break;
-    default:
-        return AVERROR(EINVAL);
-    }
-
-    return 0;
-}
-
 void avfilter_copy_buffer_ref_props(AVFilterBufferRef *dst, AVFilterBufferRef *src)
 {
     // copy common properties
@@ -241,8 +188,50 @@ void avfilter_copy_buffer_ref_props(AVFilterBufferRef *dst, AVFilterBufferRef *s
     dst->pos             = src->pos;
 
     switch (src->type) {
-    case AVMEDIA_TYPE_VIDEO: *dst->video = *src->video; break;
+    case AVMEDIA_TYPE_VIDEO: {
+        if (dst->video->qp_table)
+            av_freep(&dst->video->qp_table);
+        copy_video_props(dst->video, src->video);
+        break;
+    }
     case AVMEDIA_TYPE_AUDIO: *dst->audio = *src->audio; break;
     default: break;
     }
+}
+
+AVFilterBufferRef *ff_copy_buffer_ref(AVFilterLink *outlink,
+                                      AVFilterBufferRef *ref)
+{
+    AVFilterBufferRef *buf;
+    int channels;
+
+    switch (outlink->type) {
+
+    case AVMEDIA_TYPE_VIDEO:
+        buf = ff_get_video_buffer(outlink, AV_PERM_WRITE,
+                                  ref->video->w, ref->video->h);
+        if(!buf)
+            return NULL;
+        av_image_copy(buf->data, buf->linesize,
+                      (void*)ref->data, ref->linesize,
+                      ref->format, ref->video->w, ref->video->h);
+        break;
+
+    case AVMEDIA_TYPE_AUDIO:
+        buf = ff_get_audio_buffer(outlink, AV_PERM_WRITE,
+                                        ref->audio->nb_samples);
+        if(!buf)
+            return NULL;
+        channels = av_get_channel_layout_nb_channels(ref->audio->channel_layout);
+        av_samples_copy(buf->extended_data, ref->buf->extended_data,
+                        0, 0, ref->audio->nb_samples,
+                        channels,
+                        ref->format);
+        break;
+
+    default:
+        return NULL;
+    }
+    avfilter_copy_buffer_ref_props(buf, ref);
+    return buf;
 }

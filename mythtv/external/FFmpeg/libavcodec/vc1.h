@@ -210,9 +210,6 @@ typedef struct VC1Context{
     int panscanflag;      ///< NUMPANSCANWIN, TOPLEFT{X,Y}, BOTRIGHT{X,Y} present
     int refdist_flag;     ///< REFDIST syntax element present in II, IP, PI or PP field picture headers
     int extended_dmv;     ///< Additional extended dmv range at P/B frame-level
-    int color_prim;       ///< 8bits, chroma coordinates of the color primaries
-    int transfer_char;    ///< 8bits, Opto-electronic transfer characteristics
-    int matrix_coef;      ///< 8bits, Color primaries->YCbCr transform matrix
     int hrd_param_flag;   ///< Presence of Hypothetical Reference
                           ///< Decoder parameters
     int psf;              ///< Progressive Segmented Frame
@@ -225,6 +222,7 @@ typedef struct VC1Context{
     int profile;          ///< 2bits, Profile
     int frmrtq_postproc;  ///< 3bits,
     int bitrtq_postproc;  ///< 5bits, quantized framerate-based postprocessing strength
+    int max_coded_width, max_coded_height;
     int fastuvmc;         ///< Rounding of qpel vector to hpel ? (not in Simple)
     int extended_mv;      ///< Ext MV in P/B (not in Simple)
     int dquant;           ///< How qscale varies with MBs, 2bits (not in Simple)
@@ -394,6 +392,8 @@ typedef struct VC1Context{
     uint8_t broken_link;         ///< Broken link flag (BROKEN_LINK syntax element)
     uint8_t closed_entry;        ///< Closed entry point flag (CLOSED_ENTRY syntax element)
 
+    int end_mb_x;                ///< Horizontal macroblock limit (used only by mss2)
+
     int parse_only;              ///< Context is used within parser
 
     int warn_interlaced;
@@ -450,5 +450,10 @@ int ff_vc1_decode_entry_point(AVCodecContext *avctx, VC1Context *v, GetBitContex
 int ff_vc1_parse_frame_header    (VC1Context *v, GetBitContext *gb);
 int ff_vc1_parse_frame_header_adv(VC1Context *v, GetBitContext *gb);
 int ff_vc1_init_common(VC1Context *v);
+
+av_cold int  ff_vc1_decode_init_alloc_tables(VC1Context *v);
+av_cold void ff_vc1_init_transposed_scantables(VC1Context *v);
+av_cold int  ff_vc1_decode_end(AVCodecContext *avctx);
+void ff_vc1_decode_blocks(VC1Context *v);
 
 #endif /* AVCODEC_VC1_H */

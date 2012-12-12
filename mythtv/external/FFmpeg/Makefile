@@ -17,9 +17,10 @@ PROGS-$(CONFIG_FFPLAY)   += ffplay
 PROGS-$(CONFIG_FFPROBE)  += ffprobe
 PROGS-$(CONFIG_FFSERVER) += ffserver
 
-PROGS      := $(PROGS-yes:%=%$(EXESUF))
+PROGS      := $(PROGS-yes:%=%$(PROGSSUF)$(EXESUF))
 INSTPROGS   = $(PROGS-yes:%=%$(PROGSSUF)$(EXESUF))
-OBJS        = $(PROGS-yes:%=%.o) cmdutils.o
+OBJS        = cmdutils.o
+OBJS-ffmpeg = ffmpeg_opt.o ffmpeg_filter.o
 TESTTOOLS   = audiogen videogen rotozoom tiny_psnr base64
 HOSTPROGS  := $(TESTTOOLS:%=tests/%) doc/print_options
 TOOLS       = qt-faststart trasher
@@ -54,14 +55,14 @@ FF_DEP_LIBS  := $(DEP_LIBS)
 
 all: $(PROGS)
 
-$(PROGS): %$(EXESUF): %$(PROGSSUF)_g$(EXESUF)
-	$(CP) $< $@$(PROGSSUF)
-	$(STRIP) $@$(PROGSSUF)
+$(PROGS): %$(EXESUF): %_g$(EXESUF)
+	$(CP) $< $@
+	$(STRIP) $@
 
 $(TOOLS): %$(EXESUF): %.o
-	$(LD) $(LDFLAGS) -o $@ $< $(ELIBS)
+	$(LD) $(LDFLAGS) $(LD_O) $< $(ELIBS)
 
-tools/cws2fws$(EXESUF): ELIBS = -lz
+tools/cws2fws$(EXESUF): ELIBS = $(ZLIB)
 
 ${MYTHPROGS}: myth%: %
 	$(CP) $< $@
@@ -74,9 +75,11 @@ config.h: .config
 
 SUBDIR_VARS := CLEANFILES EXAMPLES FFLIBS HOSTPROGS TESTPROGS TOOLS      \
                ARCH_HEADERS BUILT_HEADERS SKIPHEADERS                    \
-               ALTIVEC-OBJS ARMV5TE-OBJS ARMV6-OBJS ARMVFP-OBJS MMI-OBJS \
-               MMX-OBJS NEON-OBJS VIS-OBJS YASM-OBJS                     \
-               OBJS TESTOBJS
+               ARMV5TE-OBJS ARMV6-OBJS ARMVFP-OBJS NEON-OBJS             \
+               MMI-OBJS ALTIVEC-OBJS VIS-OBJS                            \
+               MMX-OBJS YASM-OBJS                                        \
+               MIPSFPU-OBJS MIPSDSPR2-OBJS MIPSDSPR1-OBJS MIPS32R2-OBJS  \
+               OBJS HOSTOBJS TESTOBJS
 
 define RESET
 $(1) :=
@@ -93,12 +96,19 @@ endef
 
 $(foreach D,$(FFLIBS),$(eval $(call DOSUBDIR,lib$(D))))
 
-ffplay.o: CFLAGS += $(SDL_CFLAGS)
-ffplay_g$(EXESUF): FF_EXTRALIBS += $(SDL_LIBS)
-ffserver_g$(EXESUF): LDFLAGS += $(FFSERVERLDFLAGS)
+define DOPROG
+OBJS-$(1) += $(1).o
+$(1)$(PROGSSUF)_g$(EXESUF): $(OBJS-$(1))
+$$(OBJS-$(1)): CFLAGS  += $(CFLAGS-$(1))
+$(1)$(PROGSSUF)_g$(EXESUF): LDFLAGS += $(LDFLAGS-$(1))
+$(1)$(PROGSSUF)_g$(EXESUF): FF_EXTRALIBS += $(LIBS-$(1))
+-include $$(OBJS-$(1):.o=.d)
+endef
+
+$(foreach P,$(PROGS-yes),$(eval $(call DOPROG,$(P))))
 
 %$(PROGSSUF)_g$(EXESUF): %.o cmdutils.o $(FF_DEP_LIBS)
-	$(LD) $(LDFLAGS) -o $@ $< cmdutils.o $(FF_EXTRALIBS)
+	$(LD) $(LDFLAGS) $(LD_O) $(OBJS-$*) cmdutils.o $(FF_EXTRALIBS)
 
 OBJDIRS += tools
 
@@ -159,7 +169,7 @@ clean::
 
 distclean::
 	$(RM) $(DISTCLEANSUFFIXES)
-	$(RM) config.* .version version.h libavutil/avconfig.h
+	$(RM) config.* .version version.h libavutil/avconfig.h libavcodec/codec_names.h
 
 config:
 	$(SRC_PATH)/configure $(value FFMPEG_CONFIGURATION)
@@ -172,6 +182,8 @@ coverage-html: coverage.info
 	$(Q)mkdir -p $@
 	$(Q)genhtml -o $@ $<
 	$(Q)touch $@
+
+#check: all alltools examples testprogs fate
 
 #include $(SRC_PATH)/doc/Makefile
 #include $(SRC_PATH)/tests/Makefile

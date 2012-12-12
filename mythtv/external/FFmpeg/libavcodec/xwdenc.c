@@ -3,20 +3,20 @@
  *
  * Copyright (c) 2012 Paul B Mahol
  *
- * This file is part of Libav.
+ * This file is part of FFmpeg.
  *
- * Libav is free software; you can redistribute it and/or
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
  *
- * Libav is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with Libav; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
@@ -132,6 +132,11 @@ static int xwd_encode_frame(AVCodecContext *avctx, AVPacket *pkt,
         bpad     = 8;
         ncolors  = 256;
         break;
+    case PIX_FMT_GRAY8:
+        bpp      = 8;
+        bpad     = 8;
+        vclass   = XWD_STATIC_GRAY;
+        break;
     case PIX_FMT_MONOWHITE:
         be       = 1;
         bitorder = 1;
@@ -220,7 +225,7 @@ static av_cold int xwd_encode_close(AVCodecContext *avctx)
 AVCodec ff_xwd_encoder = {
     .name         = "xwd",
     .type         = AVMEDIA_TYPE_VIDEO,
-    .id           = CODEC_ID_XWD,
+    .id           = AV_CODEC_ID_XWD,
     .init         = xwd_encode_init,
     .encode2      = xwd_encode_frame,
     .close        = xwd_encode_close,
@@ -243,6 +248,7 @@ AVCodec ff_xwd_encoder = {
                                                  PIX_FMT_RGB4_BYTE,
                                                  PIX_FMT_BGR4_BYTE,
                                                  PIX_FMT_PAL8,
+                                                 PIX_FMT_GRAY8,
                                                  PIX_FMT_MONOWHITE,
                                                  PIX_FMT_NONE },
     .long_name    = NULL_IF_CONFIG_SMALL("XWD (X Window Dump) image"),

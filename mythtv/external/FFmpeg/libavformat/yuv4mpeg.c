@@ -121,7 +121,7 @@ static int yuv4_write_packet(AVFormatContext *s, AVPacket *pkt)
 {
     AVStream *st = s->streams[pkt->stream_index];
     AVIOContext *pb = s->pb;
-    AVPicture *picture;
+    AVPicture *picture, picture_tmp;
     int* first_pkt = s->priv_data;
     int width, height, h_chroma_shift, v_chroma_shift;
     int i;
@@ -129,7 +129,8 @@ static int yuv4_write_packet(AVFormatContext *s, AVPacket *pkt)
     char buf1[20];
     uint8_t *ptr, *ptr1, *ptr2;
 
-    picture = (AVPicture *)pkt->data;
+    memcpy(&picture_tmp, pkt->data, sizeof(AVPicture));
+    picture = &picture_tmp;
 
     /* for the first packet we have to output the header as well */
     if (*first_pkt) {
@@ -214,7 +215,7 @@ static int yuv4_write_header(AVFormatContext *s)
     if (s->nb_streams != 1)
         return AVERROR(EIO);
 
-    if (s->streams[0]->codec->codec_id != CODEC_ID_RAWVIDEO) {
+    if (s->streams[0]->codec->codec_id != AV_CODEC_ID_RAWVIDEO) {
         av_log(s, AV_LOG_ERROR,
                "A non-rawvideo stream was selected, but yuv4mpeg only handles rawvideo streams\n");
         return AVERROR(EINVAL);
@@ -266,11 +267,11 @@ static int yuv4_write_header(AVFormatContext *s)
 
 AVOutputFormat ff_yuv4mpegpipe_muxer = {
     .name              = "yuv4mpegpipe",
-    .long_name         = NULL_IF_CONFIG_SMALL("YUV4MPEG pipe format"),
+    .long_name         = NULL_IF_CONFIG_SMALL("YUV4MPEG pipe"),
     .extensions        = "y4m",
     .priv_data_size    = sizeof(int),
-    .audio_codec       = CODEC_ID_NONE,
-    .video_codec       = CODEC_ID_RAWVIDEO,
+    .audio_codec       = AV_CODEC_ID_NONE,
+    .video_codec       = AV_CODEC_ID_RAWVIDEO,
     .write_header      = yuv4_write_header,
     .write_packet      = yuv4_write_packet,
     .flags             = AVFMT_RAWPICTURE,
@@ -366,10 +367,10 @@ static int yuv4_read_header(AVFormatContext *s)
                 return -1;
             } else if (strncmp("444", tokstart, 3) == 0) {
                 pix_fmt = PIX_FMT_YUV444P;
-            } else if (strncmp("mono", tokstart, 4) == 0) {
-                pix_fmt = PIX_FMT_GRAY8;
             } else if (strncmp("mono16", tokstart, 6) == 0) {
                 pix_fmt = PIX_FMT_GRAY16;
+            } else if (strncmp("mono", tokstart, 4) == 0) {
+                pix_fmt = PIX_FMT_GRAY8;
             } else {
                 av_log(s, AV_LOG_ERROR, "YUV4MPEG stream contains an unknown "
                        "pixel format.\n");
@@ -485,7 +486,7 @@ static int yuv4_read_header(AVFormatContext *s)
     avpriv_set_pts_info(st, 64, rated, raten);
     st->codec->pix_fmt                = pix_fmt;
     st->codec->codec_type             = AVMEDIA_TYPE_VIDEO;
-    st->codec->codec_id               = CODEC_ID_RAWVIDEO;
+    st->codec->codec_id               = AV_CODEC_ID_RAWVIDEO;
     st->sample_aspect_ratio           = (AVRational){ aspectn, aspectd };
     st->codec->chroma_sample_location = chroma_sample_location;
 
@@ -543,7 +544,7 @@ static int yuv4_probe(AVProbeData *pd)
 #if CONFIG_YUV4MPEGPIPE_DEMUXER
 AVInputFormat ff_yuv4mpegpipe_demuxer = {
     .name           = "yuv4mpegpipe",
-    .long_name      = NULL_IF_CONFIG_SMALL("YUV4MPEG pipe format"),
+    .long_name      = NULL_IF_CONFIG_SMALL("YUV4MPEG pipe"),
     .priv_data_size = sizeof(struct frame_attributes),
     .read_probe     = yuv4_probe,
     .read_header    = yuv4_read_header,

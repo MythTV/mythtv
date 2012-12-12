@@ -24,7 +24,7 @@
 
 #include "avfilter.h"
 
-static const enum AVSampleFormat ff_packed_sample_fmts[] = {
+static const enum AVSampleFormat ff_packed_sample_fmts_array[] = {
     AV_SAMPLE_FMT_U8,
     AV_SAMPLE_FMT_S16,
     AV_SAMPLE_FMT_S32,
@@ -33,7 +33,7 @@ static const enum AVSampleFormat ff_packed_sample_fmts[] = {
     AV_SAMPLE_FMT_NONE
 };
 
-static const enum AVSampleFormat ff_planar_sample_fmts[] = {
+static const enum AVSampleFormat ff_planar_sample_fmts_array[] = {
     AV_SAMPLE_FMT_U8P,
     AV_SAMPLE_FMT_S16P,
     AV_SAMPLE_FMT_S32P,
@@ -63,12 +63,6 @@ AVFilterBufferRef *ff_null_get_audio_buffer(AVFilterLink *link, int perms,
 AVFilterBufferRef *ff_get_audio_buffer(AVFilterLink *link, int perms,
                                              int nb_samples);
 
-/** default handler for filter_samples() for audio inputs */
-void ff_default_filter_samples(AVFilterLink *link, AVFilterBufferRef *samplesref);
-
-/** filter_samples() handler for filters which simply pass audio along */
-void ff_null_filter_samples(AVFilterLink *link, AVFilterBufferRef *samplesref);
-
 /**
  * Send a buffer of audio samples to the next filter.
  *
@@ -76,7 +70,17 @@ void ff_null_filter_samples(AVFilterLink *link, AVFilterBufferRef *samplesref);
  * @param samplesref a reference to the buffer of audio samples being sent. The
  *                   receiving filter will free this reference when it no longer
  *                   needs it or pass it on to the next filter.
+ *
+ * @return >= 0 on success, a negative AVERROR on error. The receiving filter
+ * is responsible for unreferencing samplesref in case of error.
  */
-void ff_filter_samples(AVFilterLink *link, AVFilterBufferRef *samplesref);
+int ff_filter_samples(AVFilterLink *link, AVFilterBufferRef *samplesref);
+
+/**
+ * Send a buffer of audio samples to the next link, without checking
+ * min_samples.
+ */
+int ff_filter_samples_framed(AVFilterLink *link,
+                              AVFilterBufferRef *samplesref);
 
 #endif /* AVFILTER_AUDIO_H */

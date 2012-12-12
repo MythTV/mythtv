@@ -19,10 +19,12 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include "libavutil/common.h"
 #include "libavutil/lls.h"
 
 #define LPC_USE_DOUBLE
 #include "lpc.h"
+#include "libavutil/avassert.h"
 
 
 /**
@@ -37,7 +39,7 @@ static void lpc_apply_welch_window_c(const int32_t *data, int len,
 
     /* The optimization in commit fa4ed8c does not support odd len.
      * If someone wants odd len extend that change. */
-    assert(!(len & 1));
+    av_assert2(!(len & 1));
 
     n2 = (len >> 1);
     c = 2.0 / (len - 1.0);
@@ -166,7 +168,7 @@ int ff_lpc_calc_coefs(LPCContext *s,
     int i, j, pass;
     int opt_order;
 
-    assert(max_order >= MIN_LPC_ORDER && max_order <= MAX_LPC_ORDER &&
+    av_assert2(max_order >= MIN_LPC_ORDER && max_order <= MAX_LPC_ORDER &&
            lpc_type > FF_LPC_TYPE_FIXED);
 
     /* reinit LPC context if parameters have changed */
@@ -177,11 +179,9 @@ int ff_lpc_calc_coefs(LPCContext *s,
     }
 
     if (lpc_type == FF_LPC_TYPE_LEVINSON) {
-        double *windowed_samples = s->windowed_samples + max_order;
+        s->lpc_apply_welch_window(samples, blocksize, s->windowed_samples);
 
-        s->lpc_apply_welch_window(samples, blocksize, windowed_samples);
-
-        s->lpc_compute_autocorr(windowed_samples, blocksize, max_order, autoc);
+        s->lpc_compute_autocorr(s->windowed_samples, blocksize, max_order, autoc);
 
         compute_lpc_coefs(autoc, max_order, &lpc[0][0], MAX_LPC_ORDER, 0, 1);
 
@@ -190,6 +190,9 @@ int ff_lpc_calc_coefs(LPCContext *s,
     } else if (lpc_type == FF_LPC_TYPE_CHOLESKY) {
         LLSModel m[2];
         double var[MAX_LPC_ORDER+1], av_uninit(weight);
+
+        if(lpc_passes <= 0)
+            lpc_passes = 2;
 
         for(pass=0; pass<lpc_passes; pass++){
             av_init_lls(&m[pass&1], max_order);
@@ -247,10 +250,11 @@ av_cold int ff_lpc_init(LPCContext *s, int blocksize, int max_order,
     s->lpc_type  = lpc_type;
 
     if (lpc_type == FF_LPC_TYPE_LEVINSON) {
-        s->windowed_samples = av_mallocz((blocksize + max_order + 2) *
-                                         sizeof(*s->windowed_samples));
-        if (!s->windowed_samples)
+        s->windowed_buffer = av_mallocz((blocksize + 2 + FFALIGN(max_order, 4)) *
+                                        sizeof(*s->windowed_samples));
+        if (!s->windowed_buffer)
             return AVERROR(ENOMEM);
+        s->windowed_samples = s->windowed_buffer + FFALIGN(max_order, 4);
     } else {
         s->windowed_samples = NULL;
     }
@@ -266,5 +270,5 @@ av_cold int ff_lpc_init(LPCContext *s, int blocksize, int max_order,
 
 av_cold void ff_lpc_end(LPCContext *s)
 {
-    av_freep(&s->windowed_samples);
+    av_freep(&s->windowed_buffer);
 }

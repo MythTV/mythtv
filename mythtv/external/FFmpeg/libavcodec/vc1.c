@@ -418,7 +418,6 @@ int ff_vc1_decode_sequence_header(AVCodecContext *avctx, VC1Context *v, GetBitCo
 
 static int decode_sequence_header_adv(VC1Context *v, GetBitContext *gb)
 {
-    int w, h;
     v->res_rtm_flag = 1;
     v->level = get_bits(gb, 3);
     if (v->level >= 5) {
@@ -437,9 +436,8 @@ static int decode_sequence_header_adv(VC1Context *v, GetBitContext *gb)
     v->bitrtq_postproc       = get_bits(gb, 5); //common
     v->postprocflag          = get_bits1(gb);   //common
 
-    w = (get_bits(gb, 12) + 1) << 1;
-    h = (get_bits(gb, 12) + 1) << 1;
-    avcodec_set_dimensions(v->s.avctx, w, h);
+    v->max_coded_width       = (get_bits(gb, 12) + 1) << 1;
+    v->max_coded_height      = (get_bits(gb, 12) + 1) << 1;
     v->broadcast             = get_bits1(gb);
     v->interlace             = get_bits1(gb);
     v->tfcntrflag            = get_bits1(gb);
@@ -505,9 +503,10 @@ static int decode_sequence_header_adv(VC1Context *v, GetBitContext *gb)
         }
 
         if (get_bits1(gb)) {
-            v->color_prim    = get_bits(gb, 8);
-            v->transfer_char = get_bits(gb, 8);
-            v->matrix_coef   = get_bits(gb, 8);
+            v->s.avctx->color_primaries = get_bits(gb, 8);
+            v->s.avctx->color_trc       = get_bits(gb, 8);
+            v->s.avctx->colorspace      = get_bits(gb, 8);
+            v->s.avctx->color_range     = AVCOL_RANGE_MPEG;
         }
     }
 
@@ -528,6 +527,7 @@ static int decode_sequence_header_adv(VC1Context *v, GetBitContext *gb)
 int ff_vc1_decode_entry_point(AVCodecContext *avctx, VC1Context *v, GetBitContext *gb)
 {
     int i;
+    int w,h;
 
     av_log(avctx, AV_LOG_DEBUG, "Entry point: %08X\n", show_bits_long(gb, 32));
     v->broken_link    = get_bits1(gb);
@@ -551,10 +551,13 @@ int ff_vc1_decode_entry_point(AVCodecContext *avctx, VC1Context *v, GetBitContex
     }
 
     if(get_bits1(gb)){
-        int w = (get_bits(gb, 12)+1)<<1;
-        int h = (get_bits(gb, 12)+1)<<1;
-        avcodec_set_dimensions(avctx, w, h);
+        w = (get_bits(gb, 12)+1)<<1;
+        h = (get_bits(gb, 12)+1)<<1;
+    } else {
+        w = v->max_coded_width;
+        h = v->max_coded_height;
     }
+    avcodec_set_dimensions(avctx, w, h);
     if (v->extended_mv)
         v->extended_dmv = get_bits1(gb);
     if ((v->range_mapy_flag = get_bits1(gb))) {
@@ -582,7 +585,14 @@ int ff_vc1_parse_frame_header(VC1Context *v, GetBitContext* gb)
 
     if (v->finterpflag)
         v->interpfrm = get_bits1(gb);
-    skip_bits(gb, 2); //framecnt unused
+    if (!v->s.avctx->codec)
+        return -1;
+    if (v->s.avctx->codec->id == AV_CODEC_ID_MSS2)
+        v->respic   =
+        v->rangered =
+        v->multires = get_bits(gb, 2) == 1;
+    else
+        skip_bits(gb, 2); //framecnt unused
     v->rangeredfrm = 0;
     if (v->rangered)
         v->rangeredfrm = get_bits1(gb);
@@ -1143,9 +1153,14 @@ int ff_vc1_parse_frame_header_adv(VC1Context *v, GetBitContext* gb)
         }
         break;
     case AV_PICTURE_TYPE_B:
-        // TODO: implement interlaced frame B picture decoding
-        if (v->fcm == ILACE_FRAME)
-            return -1;
+        if (v->fcm == ILACE_FRAME) {
+            v->bfraction_lut_index = get_vlc2(gb, ff_vc1_bfraction_vlc.table, VC1_BFRACTION_VLC_BITS, 1);
+            v->bfraction           = ff_vc1_bfraction_lut[v->bfraction_lut_index];
+            if (v->bfraction == 0) {
+                return -1;
+            }
+            return -1; // This codepath is still incomplete thus it is disabled
+        }
         if (v->extended_mv)
             v->mvrange = get_unary(gb, 0, 3);
         else
@@ -1164,8 +1179,7 @@ int ff_vc1_parse_frame_header_adv(VC1Context *v, GetBitContext* gb)
 
         if (v->field_mode) {
             int mvmode;
-            av_log(v->s.avctx, AV_LOG_ERROR, "B Fields do not work currently\n");
-            return -1;
+            av_log(v->s.avctx, AV_LOG_DEBUG, "B Fields\n");
             if (v->extended_dmv)
                 v->dmvrange = get_unary(gb, 0, 3);
             mvmode = get_unary(gb, 1, 3);
@@ -1193,6 +1207,37 @@ int ff_vc1_parse_frame_header_adv(VC1Context *v, GetBitContext* gb)
                 v->fourmvbp_vlc = &ff_vc1_4mv_block_pattern_vlc[fourmvbptab];
             }
             v->numref = 1; // interlaced field B pictures are always 2-ref
+        } else if (v->fcm == ILACE_FRAME) {
+            if (v->extended_dmv)
+                v->dmvrange = get_unary(gb, 0, 3);
+            get_bits1(gb); /* intcomp - present but shall always be 0 */
+            v->intcomp          = 0;
+            v->mv_mode          = MV_PMODE_1MV;
+            v->fourmvswitch     = 0;
+            v->qs_last          = v->s.quarter_sample;
+            v->s.quarter_sample = 1;
+            v->s.mspel          = 1;
+            status              = bitplane_decoding(v->direct_mb_plane, &v->dmb_is_raw, v);
+            if (status < 0)
+                return -1;
+            av_log(v->s.avctx, AV_LOG_DEBUG, "MB Direct Type plane encoding: "
+                   "Imode: %i, Invert: %i\n", status>>1, status&1);
+            status = bitplane_decoding(v->s.mbskip_table, &v->skip_is_raw, v);
+            if (status < 0)
+                return -1;
+            av_log(v->s.avctx, AV_LOG_DEBUG, "MB Skip plane encoding: "
+                   "Imode: %i, Invert: %i\n", status>>1, status&1);
+            mbmodetab       = get_bits(gb, 2);
+            v->mbmode_vlc   = &ff_vc1_intfr_non4mv_mbmode_vlc[mbmodetab];
+            imvtab          = get_bits(gb, 2);
+            v->imv_vlc      = &ff_vc1_1ref_mvdata_vlc[imvtab];
+            // interlaced p/b-picture cbpcy range is [1, 63]
+            icbptab         = get_bits(gb, 3);
+            v->cbpcy_vlc    = &ff_vc1_icbpcy_vlc[icbptab];
+            twomvbptab      = get_bits(gb, 2);
+            v->twomvbp_vlc  = &ff_vc1_2mv_block_pattern_vlc[twomvbptab];
+            fourmvbptab     = get_bits(gb, 2);
+            v->fourmvbp_vlc = &ff_vc1_4mv_block_pattern_vlc[fourmvbptab];
         } else {
             v->mv_mode          = get_bits1(gb) ? MV_PMODE_1MV : MV_PMODE_1MV_HPEL_BILIN;
             v->qs_last          = v->s.quarter_sample;

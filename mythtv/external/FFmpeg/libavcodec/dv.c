@@ -335,6 +335,10 @@ static av_cold int dvvideo_init_encoder(AVCodecContext *avctx)
         ff_dv_print_profiles(avctx, AV_LOG_ERROR);
         return AVERROR(EINVAL);
     }
+    if (avctx->height > 576) {
+        av_log(avctx, AV_LOG_ERROR, "DVCPRO HD encoding is not supported.\n");
+        return AVERROR_PATCHWELCOME;
+    }
 
     dv_vlc_map_tableinit();
 
@@ -983,7 +987,7 @@ static int dvvideo_encode_frame(AVCodecContext *c, AVPacket *pkt,
 AVCodec ff_dvvideo_encoder = {
     .name           = "dvvideo",
     .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = CODEC_ID_DVVIDEO,
+    .id             = AV_CODEC_ID_DVVIDEO,
     .priv_data_size = sizeof(DVVideoContext),
     .init           = dvvideo_init_encoder,
     .encode2        = dvvideo_encode_frame,

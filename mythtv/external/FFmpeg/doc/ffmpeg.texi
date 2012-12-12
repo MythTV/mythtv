@@ -79,6 +79,126 @@ The format option may be needed for raw input files.
 
 @c man end DESCRIPTION
 
+@chapter Detailed description
+@c man begin DETAILED DESCRIPTION
+
+The transcoding process in @command{ffmpeg} for each output can be described by
+the following diagram:
+
+@example
+ _______              ______________               _________              ______________            ________
+|       |            |              |             |         |            |              |          |        |
+| input |  demuxer   | encoded data |   decoder   | decoded |  encoder   | encoded data |  muxer   | output |
+| file  | ---------> | packets      |  ---------> | frames  | ---------> | packets      | -------> | file   |
+|_______|            |______________|             |_________|            |______________|          |________|
+
+@end example
+
+@command{ffmpeg} calls the libavformat library (containing demuxers) to read
+input files and get packets containing encoded data from them. When there are
+multiple input files, @command{ffmpeg} tries to keep them synchronized by
+tracking lowest timestamp on any active input stream.
+
+Encoded packets are then passed to the decoder (unless streamcopy is selected
+for the stream, see further for a description). The decoder produces
+uncompressed frames (raw video/PCM audio/...) which can be processed further by
+filtering (see next section). After filtering the frames are passed to the
+encoder, which encodes them and outputs encoded packets again. Finally those are
+passed to the muxer, which writes the encoded packets to the output file.
+
+@section Filtering
+Before encoding, @command{ffmpeg} can process raw audio and video frames using
+filters from the libavfilter library. Several chained filters form a filter
+graph.  @command{ffmpeg} distinguishes between two types of filtergraphs -
+simple and complex.
+
+@subsection Simple filtergraphs
+Simple filtergraphs are those that have exactly one input and output, both of
+the same type. In the above diagram they can be represented by simply inserting
+an additional step between decoding and encoding:
+
+@example
+ _________                        __________              ______________
+|         |                      |          |            |              |
+| decoded |  simple filtergraph  | filtered |  encoder   | encoded data |
+| frames  | -------------------> | frames   | ---------> | packets      |
+|_________|                      |__________|            |______________|
+
+@end example
+
+Simple filtergraphs are configured with the per-stream @option{-filter} option
+(with @option{-vf} and @option{-af} aliases for video and audio respectively).
+A simple filtergraph for video can look for example like this:
+
+@example
+ _______        _____________        _______        _____        ________
+|       |      |             |      |       |      |     |      |        |
+| input | ---> | deinterlace | ---> | scale | ---> | fps | ---> | output |
+|_______|      |_____________|      |_______|      |_____|      |________|
+
+@end example
+
+Note that some filters change frame properties but not frame contents. E.g. the
+@code{fps} filter in the example above changes number of frames, but does not
+touch the frame contents. Another example is the @code{setpts} filter, which
+only sets timestamps and otherwise passes the frames unchanged.
+
+@subsection Complex filtergraphs
+Complex filtergraphs are those which cannot be described as simply a linear
+processing chain applied to one stream. This is the case e.g. when the graph has
+more than one input and/or output, or when output stream type is different from
+input. They can be represented with the following diagram:
+
+@example
+ _________
+|         |
+| input 0 |\                    __________
+|_________| \                  |          |
+             \   _________    /| output 0 |
+              \ |         |  / |__________|
+ _________     \| complex | /
+|         |     |         |/
+| input 1 |---->| filter  |\
+|_________|     |         | \   __________
+               /| graph   |  \ |          |
+              / |         |   \| output 1 |
+ _________   /  |_________|    |__________|
+|         | /
+| input 2 |/
+|_________|
+
+@end example
+
+Complex filtergraphs are configured with the @option{-filter_complex} option.
+Note that this option is global, since a complex filtergraph by its nature
+cannot be unambiguously associated with a single stream or file.
+
+A trivial example of a complex filtergraph is the @code{overlay} filter, which
+has two video inputs and one video output, containing one video overlaid on top
+of the other. Its audio counterpart is the @code{amix} filter.
+
+@section Stream copy
+Stream copy is a mode selected by supplying the @code{copy} parameter to the
+@option{-codec} option. It makes @command{ffmpeg} omit the decoding and encoding
+step for the specified stream, so it does only demuxing and muxing. It is useful
+for changing the container format or modifying container-level metadata. The
+diagram above will in this case simplify to this:
+
+@example
+ _______              ______________            ________
+|       |            |              |          |        |
+| input |  demuxer   | encoded data |  muxer   | output |
+| file  | ---------> | packets      | -------> | file   |
+|_______|            |______________|          |________|
+
+@end example
+
+Since there is no decoding or encoding, it is very fast and there is no quality
+loss. However it might not work in some cases because of many factors. Applying
+filters is obviously also impossible, since filters work on uncompressed data.
+
+@c man end DETAILED DESCRIPTION
+
 @chapter Stream selection
 @c man begin STREAM SELECTION
 
@@ -233,6 +353,24 @@ Specify the preset for matching stream(s).
 @item -stats (@emph{global})
 Print encoding progress/statistics. On by default.
 
+@item -progress @var{url} (@emph{global})
+Send program-friendly progress information to @var{url}.
+
+Progress information is written approximately every second and at the end of
+the encoding process. It is made of "@var{key}=@var{value}" lines. @var{key}
+consists of only alphanumeric characters. The last key of a sequence of
+progress information is always "progress".
+
+@item -stdin
+Enable interaction on standard input. On by default unless standard input is
+used as an input. To explicitly disable interaction you need to specify
+@code{-nostdin}.
+
+Disabling interaction on standard input is useful, for example, if
+ffmpeg is in the background process group. Roughly the same result can
+be achieved with @code{ffmpeg ... < /dev/null} but it requires a
+shell.
+
 @item -debug_ts (@emph{global})
 Print timestamp information. It is off by default. This option is
 mostly useful for testing and debugging purposes, and the output
@@ -338,7 +476,7 @@ Use same quantizer as source (implies VBR).
 Note that this is NOT SAME QUALITY. Do not use this option unless you know you
 need it.
 
-@item -pass @var{n}
+@item -pass[:@var{stream_specifier}] @var{n} (@emph{output,per-stream})
 Select the pass number (1 or 2). It is used to do two-pass
 video encoding. The statistics of the video are recorded in the first
 pass into a log file (see also the option -passlogfile),
@@ -351,7 +489,7 @@ ffmpeg -i foo.mov -c:v libxvid -pass 1 -an -f rawvideo -y NUL
 ffmpeg -i foo.mov -c:v libxvid -pass 1 -an -f rawvideo -y /dev/null
 @end example
 
-@item -passlogfile @var{prefix} (@emph{global})
+@item -passlogfile[:@var{stream_specifier}] @var{prefix} (@emph{output,per-stream})
 Set two-pass log file name prefix to @var{prefix}, the default file name
 prefix is ``ffmpeg2pass''. The complete file name will be
 @file{PREFIX-N.log}, where N is a number specific to the output
@@ -484,11 +622,23 @@ Disable subtitle recording.
 Deprecated, see -bsf
 @end table
 
-@section Audio/Video grab options
+@section Advanced Subtitle options:
 
 @table @option
-@item -isync (@emph{global})
-Synchronize read on input.
+
+@item -fix_sub_duration
+Fix subtitles durations. For each subtitle, wait for the next packet in the
+same stream and adjust the duration of the first to avoid overlap. This is
+necessary with some subtitles codecs, especially DVB subtitles, because the
+duration in the original packet is only a rough estimate and the end is
+actually marked by an empty subtitle frame. Failing to use this option when
+necessary can result in exaggerated durations or muxing failures due to
+non-monotonic timestamps.
+
+Note that this option will delay the output of all data until the next
+subtitle packet is decoded: it may increase memory consumption and latency a
+lot.
+
 @end table
 
 @section Advanced options
@@ -602,10 +752,7 @@ filter. For example, if you need to merge a media (here @file{input.mkv}) with 2
 mono audio streams into one single stereo channel audio stream (and keep the
 video stream), you can use the following command:
 @example
-ffmpeg -i input.mkv -f lavfi -i "
-amovie=input.mkv:si=1 [a1];
-amovie=input.mkv:si=2 [a2];
-[a1][a2] amerge" -c:a pcm_s16le -c:v copy output.mkv
+ffmpeg -i input.mkv -filter_complex "[0:1] [0:2] amerge" -c:a pcm_s16le -c:v copy output.mkv
 @end example
 
 @item -map_metadata[:@var{metadata_spec_out}] @var{infile}[:@var{metadata_spec_in}] (@emph{output,per-metadata})
@@ -703,6 +850,13 @@ Dump each input packet to stderr.
 When dumping packets, also dump the payload.
 @item -re (@emph{input})
 Read input at native frame rate. Mainly used to simulate a grab device.
+By default @command{ffmpeg} attempts to read the input(s) as fast as possible.
+This option will slow down the reading of the input(s) to the native frame rate
+of the input(s). It is useful for real-time output (e.g. live streaming). If
+your input(s) is coming from some other live streaming source (through HTTP or
+UDP for example) the server might already be in real-time, thus the option will
+likely not be required. On the other hand, this is meaningful if your input(s)
+is a file you are trying to push in real-time.
 @item -loop_input
 Loop over the input stream. Currently it works only for image
 streams. This option is used for automatic FFserver testing.
@@ -769,7 +923,7 @@ Try to make the choice automatically, in order to generate a sane output.
 
 Default value is -1.
 
-@item -shortest
+@item -shortest (@emph{output})
 Finish encoding when the shortest input stream ends.
 @item -dts_delta_threshold
 Timestamp discontinuity delta threshold.
@@ -825,6 +979,9 @@ the matching type.
 Output link labels are referred to with @option{-map}. Unlabeled outputs are
 added to the first output file.
 
+Note that with this option it is possible to use only lavfi sources without
+normal input files.
+
 For example, to overlay an image over video
 @example
 ffmpeg -i video.mkv -i image.png -filter_complex '[0:v][1:v]overlay[out]' -map
@@ -847,7 +1004,28 @@ graph will be added to the output file automatically, so we can simply write
 @example
 ffmpeg -i video.mkv -i image.png -filter_complex 'overlay' out.mkv
 @end example
+
+To generate 5 seconds of pure red video using lavfi @code{color} source:
+@example
+ffmpeg -filter_complex 'color=red' -t 5 out.mkv
+@end example
 @end table
+
+As a special exception, you can use a bitmap subtitle stream as input: it
+will be converted into a video with the same size as the largest video in
+the file, or 720×576 if no video is present. Note that this is an
+experimental and temporary solution. It will be removed once libavfilter has
+proper support for subtitles.
+
+For example, to hardcode subtitles on top of a DVB-T recording stored in
+MPEG-TS format, delaying the subtitles by 1 second:
+@example
+ffmpeg -i input.ts -filter_complex \
+  '[#0x2ef] setpts=PTS+1/TB [sub] ; [#0x2d0] [sub] overlay' \
+  -sn -map '#0x2dc' output.mkv
+@end example
+(0x2d0, 0x2dc and 0x2ef are the MPEG-TS PIDs of respectively the video,
+audio and subtitles streams; 0:0, 0:3 and 0:7 would have worked too)
 
 @section Preset files
 A preset file contains a sequence of @var{option}=@var{value} pairs,
@@ -872,15 +1050,15 @@ First ffmpeg searches for a file named @var{arg}.ffpreset in the
 directories @file{$FFMPEG_DATADIR} (if set), and @file{$HOME/.ffmpeg}, and in
 the datadir defined at configuration time (usually @file{PREFIX/share/ffmpeg})
 or in a @file{ffpresets} folder along the executable on win32,
-in that order. For example, if the argument is @code{libx264-max}, it will
-search for the file @file{libx264-max.ffpreset}.
+in that order. For example, if the argument is @code{libvpx-1080p}, it will
+search for the file @file{libvpx-1080p.ffpreset}.
 
 If no such file is found, then ffmpeg will search for a file named
 @var{codec_name}-@var{arg}.ffpreset in the above-mentioned
 directories, where @var{codec_name} is the name of the codec to which
 the preset file options will be applied. For example, if you select
-the video codec with @code{-vcodec libx264} and use @code{-vpre max},
-then it will search for the file @file{libx264-max.ffpreset}.
+the video codec with @code{-vcodec libvpx} and use @code{-vpre 1080p},
+then it will search for the file @file{libvpx-1080p.ffpreset}.
 @c man end OPTIONS
 
 @chapter Tips
@@ -1097,17 +1275,15 @@ composed of three digits padded with zeroes to express the sequence
 number. It is the same syntax supported by the C printf function, but
 only formats accepting a normal integer are suitable.
 
-When importing an image sequence, -i also supports expanding shell-like
-wildcard patterns (globbing) internally. To lower the chance of interfering
-with your actual file names and the shell's glob expansion, you are required
-to activate glob meta characters by prefixing them with a single @code{%}
-character, like in @code{foo-%*.jpeg}, @code{foo-%?%?%?.jpeg} or
-@code{foo-00%[234%]%*.jpeg}.
-If your filename actually contains a character sequence of a @code{%} character
-followed by a glob character, you must double the @code{%} character to escape
-it. Imagine your files begin with @code{%?-foo-}, then you could use a glob
-pattern like @code{%%?-foo-%*.jpeg}. For input patterns that could be both a
-printf or a glob pattern, ffmpeg will assume it is a glob pattern.
+When importing an image sequence, -i also supports expanding
+shell-like wildcard patterns (globbing) internally, by selecting the
+image2-specific @code{-pattern_type glob} option.
+
+For example, for creating a video from filenames matching the glob pattern
+@code{foo-*.jpeg}:
+@example
+ffmpeg -f image2 -pattern_type glob -i 'foo-*.jpeg' -r 12 -s WxH foo.avi
+@end example
 
 @item
 You can put many streams of the same type in the output:

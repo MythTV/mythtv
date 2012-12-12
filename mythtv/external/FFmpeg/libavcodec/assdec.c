@@ -19,9 +19,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include <string.h>
+
 #include "avcodec.h"
 #include "ass.h"
 #include "ass_split.h"
+#include "libavutil/internal.h"
+#include "libavutil/mem.h"
 
 static av_cold int ass_decode_init(AVCodecContext *avctx)
 {
@@ -68,9 +72,9 @@ static int ass_decode_close(AVCodecContext *avctx)
 
 AVCodec ff_ass_decoder = {
     .name         = "ass",
-    .long_name    = NULL_IF_CONFIG_SMALL("Advanced SubStation Alpha subtitle"),
+    .long_name    = NULL_IF_CONFIG_SMALL("SSA (SubStation Alpha) subtitle"),
     .type         = AVMEDIA_TYPE_SUBTITLE,
-    .id           = CODEC_ID_SSA,
+    .id           = AV_CODEC_ID_SSA,
     .init         = ass_decode_init,
     .decode       = ass_decode_frame,
     .close        = ass_decode_close,

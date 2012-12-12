@@ -11,7 +11,7 @@
  * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with FFmpeg; if not, write to the Free Software
@@ -60,7 +60,7 @@ typedef struct {
 
 static const char *default_expr = "t1-t2";
 
-static av_cold int init(AVFilterContext *ctx, const char *args0, void *opaque)
+static av_cold int init(AVFilterContext *ctx, const char *args0)
 {
     AStreamSyncContext *as = ctx->priv;
     const char *expr = args0 ? args0 : default_expr;
@@ -80,13 +80,16 @@ static av_cold int init(AVFilterContext *ctx, const char *args0, void *opaque)
 static int query_formats(AVFilterContext *ctx)
 {
     int i;
-    AVFilterFormats *formats;
+    AVFilterFormats *formats, *rates;
     AVFilterChannelLayouts *layouts;
 
     for (i = 0; i < 2; i++) {
         formats = ctx->inputs[i]->in_formats;
-        avfilter_formats_ref(formats, &ctx->inputs[i]->out_formats);
-        avfilter_formats_ref(formats, &ctx->outputs[i]->in_formats);
+        ff_formats_ref(formats, &ctx->inputs[i]->out_formats);
+        ff_formats_ref(formats, &ctx->outputs[i]->in_formats);
+        rates = ff_all_samplerates();
+        ff_formats_ref(rates, &ctx->inputs[i]->out_samplerates);
+        ff_formats_ref(rates, &ctx->outputs[i]->in_samplerates);
         layouts = ctx->inputs[i]->in_channel_layouts;
         ff_channel_layouts_ref(layouts, &ctx->inputs[i]->out_channel_layouts);
         ff_channel_layouts_ref(layouts, &ctx->outputs[i]->in_channel_layouts);
@@ -104,11 +107,12 @@ static int config_output(AVFilterLink *outlink)
     return 0;
 }
 
-static void send_out(AVFilterContext *ctx, int out_id)
+static int send_out(AVFilterContext *ctx, int out_id)
 {
     AStreamSyncContext *as = ctx->priv;
     struct buf_queue *queue = &as->queue[out_id];
     AVFilterBufferRef *buf = queue->buf[queue->tail];
+    int ret;
 
     queue->buf[queue->tail] = NULL;
     as->var_values[VAR_B1 + out_id]++;
@@ -118,11 +122,12 @@ static void send_out(AVFilterContext *ctx, int out_id)
             av_q2d(ctx->outputs[out_id]->time_base) * buf->pts;
     as->var_values[VAR_T1 + out_id] += buf->audio->nb_samples /
                                    (double)ctx->inputs[out_id]->sample_rate;
-    ff_filter_samples(ctx->outputs[out_id], buf);
+    ret = ff_filter_samples(ctx->outputs[out_id], buf);
     queue->nb--;
     queue->tail = (queue->tail + 1) % QUEUE_SIZE;
     if (as->req[out_id])
         as->req[out_id]--;
+    return ret;
 }
 
 static void send_next(AVFilterContext *ctx)
@@ -154,7 +159,7 @@ static int request_frame(AVFilterLink *outlink)
             send_next(ctx);
         } else {
             as->eof |= 1 << as->next_out;
-            avfilter_request_frame(ctx->inputs[as->next_out]);
+            ff_request_frame(ctx->inputs[as->next_out]);
             if (as->eof & (1 << as->next_out))
                 as->next_out = !as->next_out;
         }
@@ -162,7 +167,7 @@ static int request_frame(AVFilterLink *outlink)
     return 0;
 }
 
-static void filter_samples(AVFilterLink *inlink, AVFilterBufferRef *insamples)
+static int filter_samples(AVFilterLink *inlink, AVFilterBufferRef *insamples)
 {
     AVFilterContext *ctx = inlink->dst;
     AStreamSyncContext *as = ctx->priv;
@@ -172,6 +177,7 @@ static void filter_samples(AVFilterLink *inlink, AVFilterBufferRef *insamples)
         insamples;
     as->eof &= ~(1 << id);
     send_next(ctx);
+    return 0;
 }
 
 AVFilter avfilter_af_astreamsync = {
@@ -186,11 +192,11 @@ AVFilter avfilter_af_astreamsync = {
         { .name             = "in1",
           .type             = AVMEDIA_TYPE_AUDIO,
           .filter_samples   = filter_samples,
-          .min_perms        = AV_PERM_READ, },
+          .min_perms        = AV_PERM_READ | AV_PERM_PRESERVE, },
         { .name             = "in2",
           .type             = AVMEDIA_TYPE_AUDIO,
           .filter_samples   = filter_samples,
-          .min_perms        = AV_PERM_READ, },
+          .min_perms        = AV_PERM_READ | AV_PERM_PRESERVE, },
         { .name = NULL }
     },
     .outputs   = (const AVFilterPad[]) {

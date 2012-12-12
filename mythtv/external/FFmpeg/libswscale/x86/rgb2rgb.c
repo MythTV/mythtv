@@ -26,12 +26,16 @@
 #include <stdint.h>
 
 #include "config.h"
-#include "libavutil/x86_cpu.h"
+#include "libavutil/attributes.h"
+#include "libavutil/x86/asm.h"
+#include "libavutil/x86/cpu.h"
 #include "libavutil/cpu.h"
 #include "libavutil/bswap.h"
 #include "libswscale/rgb2rgb.h"
 #include "libswscale/swscale.h"
 #include "libswscale/swscale_internal.h"
+
+#if HAVE_INLINE_ASM
 
 DECLARE_ASM_CONST(8, uint64_t, mmx_ff)       = 0x00000000000000FFULL;
 DECLARE_ASM_CONST(8, uint64_t, mmx_null)     = 0x0000000000000000ULL;
@@ -85,7 +89,7 @@ DECLARE_ASM_CONST(8, uint64_t, mul16_mid)    = 0x2080208020802080ULL;
 
 //Note: We have C, MMX, MMX2, 3DNOW versions, there is no 3DNOW + MMX2 one.
 
-#define COMPILE_TEMPLATE_MMX2 0
+#define COMPILE_TEMPLATE_MMXEXT 0
 #define COMPILE_TEMPLATE_AMD3DNOW 0
 #define COMPILE_TEMPLATE_SSE2 0
 
@@ -96,8 +100,8 @@ DECLARE_ASM_CONST(8, uint64_t, mul16_mid)    = 0x2080208020802080ULL;
 
 //MMX2 versions
 #undef RENAME
-#undef COMPILE_TEMPLATE_MMX2
-#define COMPILE_TEMPLATE_MMX2 1
+#undef COMPILE_TEMPLATE_MMXEXT
+#define COMPILE_TEMPLATE_MMXEXT 1
 #define RENAME(a) a ## _MMX2
 #include "rgb2rgb_template.c"
 
@@ -110,10 +114,10 @@ DECLARE_ASM_CONST(8, uint64_t, mul16_mid)    = 0x2080208020802080ULL;
 
 //3DNOW versions
 #undef RENAME
-#undef COMPILE_TEMPLATE_MMX2
+#undef COMPILE_TEMPLATE_MMXEXT
 #undef COMPILE_TEMPLATE_SSE2
 #undef COMPILE_TEMPLATE_AMD3DNOW
-#define COMPILE_TEMPLATE_MMX2 0
+#define COMPILE_TEMPLATE_MMXEXT 0
 #define COMPILE_TEMPLATE_SSE2 0
 #define COMPILE_TEMPLATE_AMD3DNOW 1
 #define RENAME(a) a ## _3DNOW
@@ -126,16 +130,20 @@ DECLARE_ASM_CONST(8, uint64_t, mul16_mid)    = 0x2080208020802080ULL;
  32-bit C version, and and&add trick by Michael Niedermayer
 */
 
-void rgb2rgb_init_x86(void)
+#endif /* HAVE_INLINE_ASM */
+
+av_cold void rgb2rgb_init_x86(void)
 {
+#if HAVE_INLINE_ASM
     int cpu_flags = av_get_cpu_flags();
 
-    if (cpu_flags & AV_CPU_FLAG_MMX)
+    if (INLINE_MMX(cpu_flags))
         rgb2rgb_init_MMX();
-    if (HAVE_AMD3DNOW && cpu_flags & AV_CPU_FLAG_3DNOW)
+    if (INLINE_AMD3DNOW(cpu_flags))
         rgb2rgb_init_3DNOW();
-    if (HAVE_MMX2     && cpu_flags & AV_CPU_FLAG_MMX2)
+    if (INLINE_MMXEXT(cpu_flags))
         rgb2rgb_init_MMX2();
-    if (HAVE_SSE      && cpu_flags & AV_CPU_FLAG_SSE2)
+    if (INLINE_SSE2(cpu_flags))
         rgb2rgb_init_SSE2();
+#endif /* HAVE_INLINE_ASM */
 }

@@ -27,6 +27,7 @@
 #include <vpx/vpx_decoder.h>
 #include <vpx/vp8dx.h>
 
+#include "libavutil/common.h"
 #include "libavutil/imgutils.h"
 #include "avcodec.h"
 
@@ -114,7 +115,7 @@ static av_cold int vp8_free(AVCodecContext *avctx)
 AVCodec ff_libvpx_decoder = {
     .name           = "libvpx",
     .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = CODEC_ID_VP8,
+    .id             = AV_CODEC_ID_VP8,
     .priv_data_size = sizeof(VP8Context),
     .init           = vp8_init,
     .close          = vp8_free,

@@ -34,7 +34,7 @@ typedef struct {
     int vsub, hsub;
 } BBoxContext;
 
-static av_cold int init(AVFilterContext *ctx, const char *args, void *opaque)
+static av_cold int init(AVFilterContext *ctx, const char *args)
 {
     BBoxContext *bbox = ctx->priv;
     bbox->frame = 0;
@@ -52,11 +52,11 @@ static int query_formats(AVFilterContext *ctx)
         PIX_FMT_NONE,
     };
 
-    avfilter_set_common_pixel_formats(ctx, avfilter_make_format_list(pix_fmts));
+    ff_set_common_formats(ctx, ff_make_format_list(pix_fmts));
     return 0;
 }
 
-static void end_frame(AVFilterLink *inlink)
+static int end_frame(AVFilterLink *inlink)
 {
     AVFilterContext *ctx = inlink->dst;
     BBoxContext *bbox = ctx->priv;
@@ -86,8 +86,7 @@ static void end_frame(AVFilterLink *inlink)
     av_log(ctx, AV_LOG_INFO, "\n");
 
     bbox->frame++;
-    avfilter_unref_buffer(picref);
-    avfilter_end_frame(inlink->dst->outputs[0]);
+    return ff_end_frame(inlink->dst->outputs[0]);
 }
 
 AVFilter avfilter_vf_bbox = {
@@ -100,8 +99,8 @@ AVFilter avfilter_vf_bbox = {
     .inputs = (const AVFilterPad[]) {
         { .name             = "default",
           .type             = AVMEDIA_TYPE_VIDEO,
-          .get_video_buffer = avfilter_null_get_video_buffer,
-          .start_frame      = ff_null_start_frame_keep_ref,
+          .get_video_buffer = ff_null_get_video_buffer,
+          .start_frame      = ff_null_start_frame,
           .end_frame        = end_frame,
           .min_perms        = AV_PERM_READ, },
         { .name = NULL }

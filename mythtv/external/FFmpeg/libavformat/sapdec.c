@@ -30,7 +30,6 @@
 #if HAVE_POLL_H
 #include <poll.h>
 #endif
-#include <sys/time.h>
 
 struct SAPState {
     URLContext *ann_fd;
@@ -228,7 +227,7 @@ static int sap_fetch_packet(AVFormatContext *s, AVPacket *pkt)
 
 AVInputFormat ff_sap_demuxer = {
     .name           = "sap",
-    .long_name      = NULL_IF_CONFIG_SMALL("SAP input format"),
+    .long_name      = NULL_IF_CONFIG_SMALL("SAP input"),
     .priv_data_size = sizeof(struct SAPState),
     .read_probe     = sap_probe,
     .read_header    = sap_read_header,

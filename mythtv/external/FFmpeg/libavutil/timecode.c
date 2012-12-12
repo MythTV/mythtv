@@ -31,6 +31,7 @@
 #include "log.h"
 #include "error.h"
 
+#ifdef FF_API_OLD_TC_ADJUST_FRAMENUM
 int av_timecode_adjust_ntsc_framenum(int framenum)
 {
     /* only works for NTSC 29.97 */
@@ -38,6 +39,25 @@ int av_timecode_adjust_ntsc_framenum(int framenum)
     int m = framenum % 17982;
     //if (m < 2) m += 2; /* not needed since -2,-1 / 1798 in C returns 0 */
     return framenum + 18 * d + 2 * ((m - 2) / 1798);
+}
+#endif
+
+int av_timecode_adjust_ntsc_framenum2(int framenum, int fps)
+{
+    /* only works for NTSC 29.97 and 59.94 */
+    int drop_frames = 0;
+    int d = framenum / 17982;
+    int m = framenum % 17982;
+
+    if (fps == 30)
+        drop_frames = 2;
+    else if (fps == 60)
+        drop_frames = 4;
+    else
+        return framenum;
+
+    //if (m < 2) m += 2; /* not needed since -2,-1 / 1798 in C returns 0 */
+    return framenum + 9 * drop_frames * d + drop_frames * ((m - 2) / 1798);
 }
 
 uint32_t av_timecode_get_smpte_from_framenum(const AVTimecode *tc, int framenum)
@@ -48,7 +68,7 @@ uint32_t av_timecode_get_smpte_from_framenum(const AVTimecode *tc, int framenum)
 
     framenum += tc->start;
     if (drop)
-        framenum = av_timecode_adjust_ntsc_framenum(framenum);
+        framenum = av_timecode_adjust_ntsc_framenum2(framenum, tc->fps);
     ff = framenum % fps;
     ss = framenum / fps      % 60;
     mm = framenum / (fps*60) % 60;
@@ -77,7 +97,7 @@ char *av_timecode_make_string(const AVTimecode *tc, char *buf, int framenum)
 
     framenum += tc->start;
     if (drop)
-        framenum = av_timecode_adjust_ntsc_framenum(framenum);
+        framenum = av_timecode_adjust_ntsc_framenum2(framenum, fps);
     if (framenum < 0) {
         framenum = -framenum;
         neg = tc->flags & AV_TIMECODE_FLAG_ALLOWNEGATIVE;
@@ -126,6 +146,17 @@ char *av_timecode_make_mpeg_tc_string(char *buf, uint32_t tc25bit)
     return buf;
 }
 
+static int check_fps(int fps)
+{
+    int i;
+    static const int supported_fps[] = {24, 25, 30, 50, 60};
+
+    for (i = 0; i < FF_ARRAY_ELEMS(supported_fps); i++)
+        if (fps == supported_fps[i])
+            return 0;
+    return -1;
+}
+
 static int check_timecode(void *log_ctx, AVTimecode *tc)
 {
     if (tc->fps <= 0) {
@@ -136,15 +167,12 @@ static int check_timecode(void *log_ctx, AVTimecode *tc)
         av_log(log_ctx, AV_LOG_ERROR, "Drop frame is only allowed with 30000/1001 FPS\n");
         return AVERROR(EINVAL);
     }
-    switch (tc->fps) {
-    case 24:
-    case 25:
-    case 30: return  0;
-
-    default:
-        av_log(log_ctx, AV_LOG_ERROR, "Timecode frame rate not supported\n");
+    if (check_fps(tc->fps) < 0) {
+        av_log(log_ctx, AV_LOG_ERROR, "Timecode frame rate %d/%d not supported\n",
+               tc->rate.num, tc->rate.den);
         return AVERROR_PATCHWELCOME;
     }
+    return 0;
 }
 
 static int fps_from_frame_rate(AVRational rate)
@@ -152,6 +180,11 @@ static int fps_from_frame_rate(AVRational rate)
     if (!rate.den || !rate.num)
         return -1;
     return (rate.num + rate.den/2) / rate.den;
+}
+
+int av_timecode_check_frame_rate(AVRational rate)
+{
+    return check_fps(fps_from_frame_rate(rate));
 }
 
 int av_timecode_init(AVTimecode *tc, AVRational rate, int flags, int frame_start, void *log_ctx)

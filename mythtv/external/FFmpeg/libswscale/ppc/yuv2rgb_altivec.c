@@ -95,6 +95,7 @@
 #include "libswscale/rgb2rgb.h"
 #include "libswscale/swscale.h"
 #include "libswscale/swscale_internal.h"
+#include "libavutil/attributes.h"
 #include "libavutil/cpu.h"
 #include "libavutil/pixdesc.h"
 #include "yuv2rgb_altivec.h"
@@ -317,12 +318,7 @@ static int altivec_ ## name(SwsContext *c, const unsigned char **in,          \
     const ubyte *ui  = in[1];                                                 \
     const ubyte *vi  = in[2];                                                 \
                                                                               \
-    vector unsigned char *oute =                                              \
-        (vector unsigned char *)                                              \
-            (oplanes[0] + srcSliceY * outstrides[0]);                         \
-    vector unsigned char *outo =                                              \
-        (vector unsigned char *)                                              \
-            (oplanes[0] + srcSliceY * outstrides[0] + outstrides[0]);         \
+    vector unsigned char *oute, *outo;                                        \
                                                                               \
     /* loop moves y{1, 2}i by w */                                            \
     instrides_scl[0] = instrides[0] * 2 - w;                                  \
@@ -332,6 +328,9 @@ static int altivec_ ## name(SwsContext *c, const unsigned char **in,          \
     instrides_scl[2] = instrides[2] - w / 2;                                  \
                                                                               \
     for (i = 0; i < h / 2; i++) {                                             \
+        oute = (vector unsigned char *)(oplanes[0] + outstrides[0] *          \
+                                        (srcSliceY + i * 2));                 \
+        outo = oute + (outstrides[0] >> 4);                                   \
         vec_dstst(outo, (0x02000002 | (((w * 3 + 32) / 32) << 16)), 0);       \
         vec_dstst(oute, (0x02000002 | (((w * 3 + 32) / 32) << 16)), 1);       \
                                                                               \
@@ -428,9 +427,6 @@ static int altivec_ ## name(SwsContext *c, const unsigned char **in,          \
             ui  += 8;                                                         \
             vi  += 8;                                                         \
         }                                                                     \
-                                                                              \
-        outo += (outstrides[0]) >> 4;                                         \
-        oute += (outstrides[0]) >> 4;                                         \
                                                                               \
         ui  += instrides_scl[1];                                              \
         vi  += instrides_scl[2];                                              \
@@ -536,7 +532,7 @@ static int altivec_uyvy_rgb32(SwsContext *c, const unsigned char **in,
  *
  * So we just fall back to the C codes for this.
  */
-SwsFunc ff_yuv2rgb_init_altivec(SwsContext *c)
+av_cold SwsFunc ff_yuv2rgb_init_altivec(SwsContext *c)
 {
     if (!(av_get_cpu_flags() & AV_CPU_FLAG_ALTIVEC))
         return NULL;
@@ -596,9 +592,11 @@ SwsFunc ff_yuv2rgb_init_altivec(SwsContext *c)
     return NULL;
 }
 
-void ff_yuv2rgb_init_tables_altivec(SwsContext *c, const int inv_table[4],
-                                    int brightness, int contrast,
-                                    int saturation)
+av_cold void ff_yuv2rgb_init_tables_altivec(SwsContext *c,
+                                            const int inv_table[4],
+                                            int brightness,
+                                            int contrast,
+                                            int saturation)
 {
     union {
         DECLARE_ALIGNED(16, signed short, tmp)[8];

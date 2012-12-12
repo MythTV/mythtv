@@ -160,7 +160,7 @@ static int commit_bitstream_and_slice_buffer(AVCodecContext *avctx,
 
     if (FAILED(IDirectXVideoDecoder_GetBuffer(ctx->decoder,
                                               DXVA2_BitStreamDateBufferType,
-                                              &dxva_data, &dxva_size)))
+                                              (void **)&dxva_data, &dxva_size)))
         return -1;
     current = dxva_data;
     end = dxva_data + dxva_size;
@@ -263,7 +263,7 @@ static int end_frame(AVCodecContext *avctx)
 AVHWAccel ff_mpeg2_dxva2_hwaccel = {
     .name           = "mpeg2_dxva2",
     .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = CODEC_ID_MPEG2VIDEO,
+    .id             = AV_CODEC_ID_MPEG2VIDEO,
     .pix_fmt        = PIX_FMT_DXVA2_VLD,
     .start_frame    = start_frame,
     .decode_slice   = decode_slice,

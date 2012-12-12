@@ -204,8 +204,8 @@ For Emacs, add these roughly equivalent lines to your @file{.emacs.d/init.el}:
 (c-add-style "ffmpeg"
              '("k&r"
                (c-basic-offset . 4)
-               (indent-tabs-mode nil)
-               (show-trailing-whitespace t)
+               (indent-tabs-mode . nil)
+               (show-trailing-whitespace . t)
                (c-offsets-alist
                 (statement-cont . (c-lineup-assignments +)))
                )
@@ -393,7 +393,9 @@ send a reminder by email. Your patch should eventually be dealt with.
 @item
     Did you register it in @file{allcodecs.c} or @file{allformats.c}?
 @item
-    Did you add the CodecID to @file{avcodec.h}?
+    Did you add the AVCodecID to @file{avcodec.h}?
+    When adding new codec IDs, also add an entry to the codec descriptor
+    list in @file{libavcodec/codec_desc.c}.
 @item
     If it has a fourCC, did you add it to @file{libavformat/riff.c},
     even if it is only a decoder?
@@ -489,6 +491,10 @@ send a reminder by email. Your patch should eventually be dealt with.
     Consider to add a regression test for your code.
 @item
     If you added YASM code please check that things still work with --disable-yasm
+@item
+    Make sure you check the return values of function and return appropriate
+    error codes. Especially memory allocation functions like @code{av_malloc()}
+    are notoriously left unchecked, which is a serious problem.
 @end enumerate
 
 @section Patch review process
@@ -528,5 +534,17 @@ Running 'make fate' accomplishes this, please see @url{fate.html} for details.
 [Of course, some patches may change the results of the regression tests. In
 this case, the reference results of the regression tests shall be modified
 accordingly].
+
+@subsection Adding files to the fate-suite dataset
+
+When there is no muxer or encoder available to generate test media for a
+specific test then the media has to be inlcuded in the fate-suite.
+First please make sure that the sample file is as small as possible to test the
+respective decoder or demuxer sufficiently. Large files increase network
+bandwidth and disk space requirements.
+Once you have a working fate test and fate sample, provide in the commit
+message or introductionary message for the patch series that you post to
+the ffmpeg-devel mailing list, a direct link to download the sample media.
+
 
 @bye
