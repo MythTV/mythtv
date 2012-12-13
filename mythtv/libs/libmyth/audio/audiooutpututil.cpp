@@ -697,6 +697,7 @@ int AudioOutputUtil::DecodeAudio(AVCodecContext *ctx,
     AVFrame frame;
     int got_frame = 0;
     int ret, ret2;
+    char error[AV_ERROR_MAX_STRING_SIZE];
 
     data_size = 0;
     avcodec_get_frame_defaults(&frame);
@@ -705,7 +706,8 @@ int AudioOutputUtil::DecodeAudio(AVCodecContext *ctx,
     {
         LOG(VB_AUDIO, LOG_ERR, LOC +
             QString("audio decode error: %1 (%2)")
-            .arg(av_err2str(ret)).arg(got_frame));
+            .arg(av_make_error_string(error, sizeof(error), ret))
+            .arg(got_frame));
         return ret;
     }
 
@@ -743,7 +745,7 @@ int AudioOutputUtil::DecodeAudio(AVCodecContext *ctx,
     {
         LOG(VB_AUDIO, LOG_ERR, LOC +
             QString("error initializing resampler context (%1)")
-            .arg(av_err2str(ret2)));
+            .arg(av_make_error_string(error, sizeof(error), ret2)));
         swr_free(&swr);
         return ret2;
     }
@@ -756,7 +758,7 @@ int AudioOutputUtil::DecodeAudio(AVCodecContext *ctx,
     {
         LOG(VB_AUDIO, LOG_ERR, LOC +
             QString("error converting audio from planar format (%1)")
-            .arg(av_err2str(ret2)));
+            .arg(av_make_error_string(error, sizeof(error), ret2)));
         return ret2;
     }
     data_size = ret2 * frame.channels * av_get_bytes_per_sample(format);
