@@ -133,10 +133,10 @@ class Scheduler : public MThread, public MythScheduler
     void BackupRecStatus(void);
     void RestoreRecStatus(void);
     bool TryAnotherShowing(RecordingInfo *p,  bool samePriority,
-                           bool preserveLive = false);
+                           bool livetv = false);
     void SchedNewRecords(void);
-    void MoveHigherRecords(bool move_this = true);
-    void SchedPreserveLiveTV(void);
+    void MoveHigherRecords(bool livetv = false);
+    void SchedLiveTV(void);
     void PruneRedundants(void);
     void UpdateNextRecord(void);
 
@@ -247,9 +247,6 @@ class Scheduler : public MThread, public MythScheduler
 
     // Try to avoid LiveTV sessions until this time
     QDateTime livetvTime;
-    int livetvpriority;
-    int prefinputpri;
-    QMap<QString, bool> hasLaterList;
 
     // cache IsSameProgram()
     typedef pair<const RecordingInfo*,const RecordingInfo*> IsSameKey;

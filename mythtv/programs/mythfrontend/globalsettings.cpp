@@ -2180,17 +2180,6 @@ static HostComboBox *LongChannelFormat()
     return gc;
 }
 
-static GlobalCheckBox *LiveTVPriority()
-{
-    GlobalCheckBox *bc = new GlobalCheckBox("LiveTVPriority");
-    bc->setLabel(QObject::tr("Allow Live TV to move scheduled shows"));
-    bc->setValue(false);
-    bc->setHelpText(QObject::tr("If enabled, scheduled recordings will "
-                    "be moved to other cards (where possible), so that "
-                    "Live TV will not be interrupted."));
-    return bc;
-}
-
 static HostCheckBox *ChannelGroupRememberLast()
 {
     HostCheckBox *gc = new HostCheckBox("ChannelGroupRememberLast");
@@ -3356,7 +3345,6 @@ GeneralSettings::GeneralSettings()
     general->addChild(ChannelOrdering());
     general->addChild(ChannelFormat());
     general->addChild(LongChannelFormat());
-    general->addChild(LiveTVPriority());
     addChild(general);
 
     VerticalConfigurationGroup* autoexp = new VerticalConfigurationGroup(false);
