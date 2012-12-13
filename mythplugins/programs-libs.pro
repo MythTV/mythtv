@@ -10,6 +10,7 @@ LIBS += -lmythservicecontracts-$$LIBVERSION
 LIBS += -lmythavcodec
 LIBS += -lmythavutil
 LIBS += -lmythavformat
+LIBS += -lmythswresample
 
 # On Windows, libs are stored with the binaries:
 mingw:LIBS += -L$${SYSROOT}$${PREFIX}/bin

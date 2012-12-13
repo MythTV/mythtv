@@ -257,7 +257,7 @@ bool CdDecoder::initialize()
     if (output())
     {
         const AudioSettings settings(FORMAT_S16, m_chan,
-            CODEC_ID_PCM_S16LE, m_freq, false /* AC3/DTS passthru */);
+            AV_CODEC_ID_PCM_S16LE, m_freq, false /* AC3/DTS passthru */);
         output()->Reconfigure(settings);
         output()->SetSourceBitrate(m_freq * m_chan * 16);
     }
