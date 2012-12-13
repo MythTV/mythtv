@@ -31,9 +31,14 @@
  * values by ULL, lest they be truncated by the compiler)
  */
 
+/* Note: moved uq to be first so we can initialize with ULL
+ * in C++11 code without narrowing complaints or use of gcc
+ * extensions. -- Daniel Kristjansson 2012-12-13
+ */
+
 typedef        union {
-        long long               q;      /* Quadword (64-bit) value */
         unsigned long long      uq;     /* Unsigned Quadword */
+        long long               q;      /* Quadword (64-bit) value */
         int                     d[2];   /* 2 Doubleword (32-bit) values */
         unsigned int            ud[2];  /* 2 Unsigned Doubleword */
         short                   w[4];   /* 4 Word (16-bit) values */
