@@ -212,7 +212,12 @@ ZMServer::ZMServer(int sock, bool debug)
     string setting = getZMSetting("ZM_SHM_KEY");
 
     if (setting != "")
-        sscanf(setting.c_str(), "%20x", (unsigned int *)&m_shmKey);
+    {
+        unsigned long long tmp = m_shmKey;
+        sscanf(setting.c_str(), "%20llx", &tmp);
+        m_shmKey = tmp;
+    }
+
     if (m_debug)
     {
         snprintf(buf, sizeof(buf), "0x%x", (unsigned int)m_shmKey);
