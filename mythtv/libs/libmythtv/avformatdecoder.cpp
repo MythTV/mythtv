@@ -1819,8 +1819,6 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                     continue;
                 }
 
-                codec_is_mpeg = CODEC_IS_FFMPEG_MPEG(enc->codec_id);
-
                 // ffmpeg does not return a bitrate for several codecs and
                 // formats. Forcing it to 500000 ensures the ringbuffer does not
                 // use optimisations for low bitrate (audio and data) streams.
@@ -1829,158 +1827,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                     enc->bit_rate = 500000;
                     unknownbitrate = true;
                 }
-
-                StreamInfo si(i, 0, 0, 0, 0);
-                tracks[kTrackTypeVideo].push_back(si);
                 bitrate += enc->bit_rate;
-                if (novideo)
-                    break;
-
-                delete private_dec;
-                private_dec = NULL;
-                m_h264_parser->Reset();
-
-                QSize dim = get_video_dim(*enc);
-                uint width  = max(dim.width(),  16);
-                uint height = max(dim.height(), 16);
-                QString dec = "ffmpeg";
-                uint thread_count = 1;
-
-                if (!is_db_ignored)
-                {
-                    VideoDisplayProfile vdp;
-                    vdp.SetInput(QSize(width, height));
-                    dec = vdp.GetDecoder();
-                    thread_count = vdp.GetMaxCPUs();
-                    bool skip_loop_filter = vdp.IsSkipLoopEnabled();
-                    if  (!skip_loop_filter)
-                    {
-                        enc->skip_loop_filter = AVDISCARD_NONKEY;
-                    }
-                }
-
-                video_codec_id = kCodec_NONE;
-                int version = mpeg_version(enc->codec_id);
-                if (version)
-                    video_codec_id = (MythCodecID)(kCodec_MPEG1 + version - 1);
-
-                if (version)
-                {
-#if defined(USING_VDPAU)
-                    // HACK -- begin
-                    // Force MPEG2 decoder on MPEG1 streams.
-                    // Needed for broken transmitters which mark
-                    // MPEG2 streams as MPEG1 streams, and should
-                    // be harmless for unbroken ones.
-                    if (enc->codec_id == AV_CODEC_ID_MPEG1VIDEO)
-                        enc->codec_id = AV_CODEC_ID_MPEG2VIDEO;
-                    // HACK -- end
-#endif // USING_VDPAU
-#ifdef USING_VDPAU
-                    MythCodecID vdpau_mcid;
-                    vdpau_mcid = VideoOutputVDPAU::GetBestSupportedCodec(
-                        width, height, dec,
-                        mpeg_version(enc->codec_id),
-                        !FlagIsSet(kDecodeAllowGPU));
-
-                    if (vdpau_mcid >= video_codec_id)
-                    {
-                        enc->codec_id = (CodecID) myth2av_codecid(vdpau_mcid);
-                        video_codec_id = vdpau_mcid;
-                    }
-#endif // USING_VDPAU
-#ifdef USING_GLVAAPI
-                    MythCodecID vaapi_mcid;
-                    PixelFormat pix_fmt = PIX_FMT_YUV420P;
-                    vaapi_mcid = VideoOutputOpenGLVAAPI::GetBestSupportedCodec(
-                            width, height, dec, mpeg_version(enc->codec_id),
-                            !FlagIsSet(kDecodeAllowGPU), pix_fmt);
-
-                    if (vaapi_mcid >= video_codec_id)
-                    {
-                        enc->codec_id = (CodecID)myth2av_codecid(vaapi_mcid);
-                        video_codec_id = vaapi_mcid;
-                        if (FlagIsSet(kDecodeAllowGPU) &&
-                            codec_is_vaapi(video_codec_id))
-                        {
-                            enc->pix_fmt = pix_fmt;
-                        }
-                    }
-#endif // USING_GLVAAPI
-#ifdef USING_DXVA2
-                    MythCodecID dxva2_mcid;
-                    PixelFormat pix_fmt = PIX_FMT_YUV420P;
-                    dxva2_mcid = VideoOutputD3D::GetBestSupportedCodec(
-                        width, height, dec, mpeg_version(enc->codec_id),
-                        !FlagIsSet(kDecodeAllowGPU), pix_fmt);
-
-                    if (dxva2_mcid >= video_codec_id)
-                    {
-                        enc->codec_id = (CodecID)myth2av_codecid(dxva2_mcid);
-                        video_codec_id = dxva2_mcid;
-                        if (FlagIsSet(kDecodeAllowGPU) &&
-                            codec_is_dxva2(video_codec_id))
-                        {
-                            enc->pix_fmt = pix_fmt;
-                        }
-                    }
-#endif // USING_DXVA2
-                }
-
-                // default to mpeg2
-                if (video_codec_id == kCodec_NONE)
-                {
-                    LOG(VB_GENERAL, LOG_ERR, LOC +
-                        "Unknown video codec - defaulting to MPEG2");
-                    video_codec_id = kCodec_MPEG2;
-                }
-
-                if (enc->codec)
-                {
-                    LOG(VB_GENERAL, LOG_WARNING, LOC +
-                        QString("Warning, video codec 0x%1 id(%2) type (%3) "
-                                "already open.")
-                            .arg((uint64_t)enc,0,16)
-                            .arg(ff_codec_id_string(enc->codec_id))
-                            .arg(ff_codec_type_string(enc->codec_type)));
-                }
-
-                // Set the default stream to the stream
-                // that is found first in the PMT
-                if (selectedTrack[kTrackTypeVideo].av_stream_index < 0)
-                    selectedTrack[kTrackTypeVideo] = si;
-
-                // Use a PrivateDecoder if allowed in playerFlags AND matched
-                // via the decoder name
-                if (selectedTrack[kTrackTypeVideo].av_stream_index == (int) i)
-                {
-                    private_dec = PrivateDecoder::Create(dec, playerFlags, enc);
-                    if (private_dec)
-                        thread_count = 1;
-                }
-
-                if (!codec_is_std(video_codec_id))
-                    thread_count = 1;
-
-                if (FlagIsSet(kDecodeSingleThreaded))
-                    thread_count = 1;
-
-                LOG(VB_PLAYBACK, LOG_INFO, LOC +
-                    QString("Using %1 CPUs for decoding")
-                        .arg(HAVE_THREADS ? thread_count : 1));
-
-                if (HAVE_THREADS)
-                    enc->thread_count = thread_count;
-
-                InitVideoCodec(ic->streams[i], enc,
-                    selectedTrack[kTrackTypeVideo].av_stream_index == (int) i);
-
-                ScanATSCCaptionStreams(i);
-                UpdateATSCCaptionTracks();
-
-                LOG(VB_PLAYBACK, LOG_INFO, LOC +
-                    QString("Using %1 for video decoding")
-                        .arg(GetCodecDecoderName()));
 
                 break;
             }
@@ -2046,7 +1893,6 @@ int AvFormatDecoder::ScanStreams(bool novideo)
         }
 
         if (enc->codec_type != AVMEDIA_TYPE_AUDIO &&
-            enc->codec_type != AVMEDIA_TYPE_VIDEO &&
             enc->codec_type != AVMEDIA_TYPE_SUBTITLE)
             continue;
 
@@ -2110,39 +1956,11 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             if (!codec)
                 continue;
         }
-        // select vdpau capable decoder if needed
-        else if (enc->codec_type == AVMEDIA_TYPE_VIDEO &&
-                 codec_is_vdpau(video_codec_id) && !CODEC_IS_VDPAU(codec))
-        {
-            codec = find_vdpau_decoder(codec, enc->codec_id);
-        }
 
         if (!enc->codec)
         {
-            QMutexLocker locker(avcodeclock);
-
-            int open_val = avcodec_open2(enc, codec, NULL);
-            if (open_val < 0)
-            {
-                LOG(VB_GENERAL, LOG_ERR, LOC +
-                    QString("Could not open codec 0x%1, id(%2) type(%3) "
-                            "aborting. reason %4").arg((uint64_t)enc,0,16)
-                        .arg(ff_codec_id_string(enc->codec_id))
-                        .arg(ff_codec_type_string(enc->codec_type))
-                        .arg(open_val));
-                //av_close_input_file(ic); // causes segfault
-                ic = NULL;
-                scanerror = -1;
-                break;
-            }
-            else
-            {
-                LOG(VB_GENERAL, LOG_INFO, LOC +
-                    QString("Opened codec 0x%1, id(%2) type(%3)")
-                        .arg((uint64_t)enc,0,16)
-                        .arg(ff_codec_id_string(enc->codec_id))
-                        .arg(ff_codec_type_string(enc->codec_type)));
-            }
+            if (OpenAVCodec(enc, codec) < 0)
+                continue;
         }
 
         if (enc->codec_type == AVMEDIA_TYPE_SUBTITLE)
@@ -2205,6 +2023,213 @@ int AvFormatDecoder::ScanStreams(bool novideo)
         }
     }
 
+    // Now find best video track to play
+    if (!novideo && ic)
+    {
+        for(;;)
+        {
+            AVCodec *codec = NULL;
+            selectedTrack[kTrackTypeVideo].av_stream_index == -1;
+            LOG(VB_PLAYBACK, LOG_INFO, LOC +
+                "Trying to select best video track");
+
+            /*
+             *  Find the "best" stream in the file.
+             *
+             * The best stream is determined according to various heuristics as
+             * the most likely to be what the user expects. If the decoder parameter
+             * is non-NULL, av_find_best_stream will find the default decoder
+             * for the stream's codec; streams for which no decoder can be found
+             * are ignored.
+             *
+             * If av_find_best_stream returns successfully and decoder_ret is not NULL,
+             * then *decoder_ret is guaranteed to be set to a valid AVCodec.
+             */
+            int selTrack = av_find_best_stream(ic, AVMEDIA_TYPE_VIDEO,
+                                               -1, -1, &codec, 0);
+
+            if (selTrack < 0)
+            {
+                LOG(VB_PLAYBACK, LOG_INFO, LOC +
+                    "No video track found/selected.");
+                break;
+            }
+
+            AVCodecContext *enc = ic->streams[selTrack]->codec;
+            StreamInfo si(selTrack, 0, 0, 0, 0);
+
+            tracks[kTrackTypeVideo].push_back(si);
+            selectedTrack[kTrackTypeVideo] = si;
+
+            LOG(VB_PLAYBACK, LOG_INFO, LOC +
+                QString("Selected track #%1 (id 0x%2 codec id %3, "
+                        "type %4, bitrate %5 at 0x%6)")
+                .arg(selTrack).arg((uint64_t)ic->streams[selTrack]->id,0,16)
+                .arg(ff_codec_id_string(enc->codec_id))
+                .arg(ff_codec_type_string(enc->codec_type))
+                .arg(enc->bit_rate).arg((uint64_t)ic->streams[selTrack],0,16));
+
+            codec_is_mpeg = CODEC_IS_FFMPEG_MPEG(enc->codec_id);
+
+            delete private_dec;
+            private_dec = NULL;
+            m_h264_parser->Reset();
+
+            QSize dim = get_video_dim(*enc);
+            uint width  = max(dim.width(),  16);
+            uint height = max(dim.height(), 16);
+            QString dec = "ffmpeg";
+            uint thread_count = 1;
+
+            if (!is_db_ignored)
+            {
+                VideoDisplayProfile vdp;
+                vdp.SetInput(QSize(width, height));
+                dec = vdp.GetDecoder();
+                thread_count = vdp.GetMaxCPUs();
+                bool skip_loop_filter = vdp.IsSkipLoopEnabled();
+                if  (!skip_loop_filter)
+                {
+                    enc->skip_loop_filter = AVDISCARD_NONKEY;
+                }
+            }
+
+            video_codec_id = kCodec_NONE;
+            int version = mpeg_version(enc->codec_id);
+            if (version)
+                video_codec_id = (MythCodecID)(kCodec_MPEG1 + version - 1);
+
+            if (version)
+            {
+#if defined(USING_VDPAU)
+                // HACK -- begin
+                // Force MPEG2 decoder on MPEG1 streams.
+                // Needed for broken transmitters which mark
+                // MPEG2 streams as MPEG1 streams, and should
+                // be harmless for unbroken ones.
+                if (enc->codec_id == AV_CODEC_ID_MPEG1VIDEO)
+                    enc->codec_id = AV_CODEC_ID_MPEG2VIDEO;
+                // HACK -- end
+#endif // USING_VDPAU
+#ifdef USING_VDPAU
+                MythCodecID vdpau_mcid;
+                vdpau_mcid =
+                    VideoOutputVDPAU::GetBestSupportedCodec(width, height, dec,
+                                                            mpeg_version(enc->codec_id),
+                                                            !FlagIsSet(kDecodeAllowGPU));
+
+                if (vdpau_mcid >= video_codec_id)
+                {
+                    enc->codec_id = (CodecID) myth2av_codecid(vdpau_mcid);
+                    video_codec_id = vdpau_mcid;
+                }
+#endif // USING_VDPAU
+#ifdef USING_GLVAAPI
+                MythCodecID vaapi_mcid;
+                PixelFormat pix_fmt = PIX_FMT_YUV420P;
+                vaapi_mcid =
+                    VideoOutputOpenGLVAAPI::GetBestSupportedCodec(width, height, dec,
+                                                                  mpeg_version(enc->codec_id),
+                                                                  !FlagIsSet(kDecodeAllowGPU),
+                                                                  pix_fmt);
+
+                if (vaapi_mcid >= video_codec_id)
+                {
+                    enc->codec_id = (CodecID)myth2av_codecid(vaapi_mcid);
+                    video_codec_id = vaapi_mcid;
+                    if (FlagIsSet(kDecodeAllowGPU) &&
+                        codec_is_vaapi(video_codec_id))
+                    {
+                        enc->pix_fmt = pix_fmt;
+                    }
+                }
+#endif // USING_GLVAAPI
+#ifdef USING_DXVA2
+                MythCodecID dxva2_mcid;
+                PixelFormat pix_fmt = PIX_FMT_YUV420P;
+                dxva2_mcid = VideoOutputD3D::GetBestSupportedCodec(
+                                                                   width, height, dec, mpeg_version(enc->codec_id),
+                                                                   !FlagIsSet(kDecodeAllowGPU), pix_fmt);
+
+                if (dxva2_mcid >= video_codec_id)
+                {
+                    enc->codec_id = (CodecID)myth2av_codecid(dxva2_mcid);
+                    video_codec_id = dxva2_mcid;
+                    if (FlagIsSet(kDecodeAllowGPU) &&
+                        codec_is_dxva2(video_codec_id))
+                    {
+                        enc->pix_fmt = pix_fmt;
+                    }
+                }
+#endif // USING_DXVA2
+            }
+
+            // default to mpeg2
+            if (video_codec_id == kCodec_NONE)
+            {
+                LOG(VB_GENERAL, LOG_ERR, LOC +
+                    "Unknown video codec - defaulting to MPEG2");
+                video_codec_id = kCodec_MPEG2;
+            }
+
+            if (enc->codec)
+            {
+                LOG(VB_GENERAL, LOG_WARNING, LOC +
+                    QString("Warning, video codec 0x%1 id(%2) type (%3) "
+                            "already open.")
+                    .arg((uint64_t)enc,0,16)
+                    .arg(ff_codec_id_string(enc->codec_id))
+                    .arg(ff_codec_type_string(enc->codec_type)));
+            }
+
+            // Use a PrivateDecoder if allowed in playerFlags AND matched
+            // via the decoder name
+            private_dec = PrivateDecoder::Create(dec, playerFlags, enc);
+            if (private_dec)
+                thread_count = 1;
+
+            if (!codec_is_std(video_codec_id))
+                thread_count = 1;
+
+            if (FlagIsSet(kDecodeSingleThreaded))
+                thread_count = 1;
+
+            LOG(VB_PLAYBACK, LOG_INFO, LOC +
+                QString("Using %1 CPUs for decoding")
+                .arg(HAVE_THREADS ? thread_count : 1));
+
+            if (HAVE_THREADS)
+                enc->thread_count = thread_count;
+
+            InitVideoCodec(ic->streams[selTrack], enc, true);
+
+            ScanATSCCaptionStreams(selTrack);
+            UpdateATSCCaptionTracks();
+
+            LOG(VB_PLAYBACK, LOG_INFO, LOC +
+                QString("Using %1 for video decoding")
+                .arg(GetCodecDecoderName()));
+
+            if (codec_is_vdpau(video_codec_id) && !CODEC_IS_VDPAU(codec))
+            {
+                codec = find_vdpau_decoder(codec, enc->codec_id);
+            }
+
+            if (!enc->codec)
+            {
+                QMutexLocker locker(avcodeclock);
+
+                if (OpenAVCodec(enc, codec) < 0)
+                {
+                    scanerror = -1;
+                    break;
+                }
+            }
+
+            break;
+        }
+    }
+
     if (ic && ((uint)ic->bit_rate > bitrate))
         bitrate = (uint)ic->bit_rate;
 
@@ -2241,8 +2266,6 @@ int AvFormatDecoder::ScanStreams(bool novideo)
     // video params are set properly
     if (selectedTrack[kTrackTypeVideo].av_stream_index == -1)
     {
-        LOG(VB_PLAYBACK, LOG_INFO, LOC +
-            QString("No video track found/selected."));
         QString tvformat = gCoreContext->GetSetting("TVFormat").toLower();
         if (tvformat == "ntsc" || tvformat == "ntsc-jp" ||
             tvformat == "pal-m" || tvformat == "atsc")
@@ -2263,6 +2286,35 @@ int AvFormatDecoder::ScanStreams(bool novideo)
     ScanDSMCCStreams();
 
     return scanerror;
+}
+
+bool AvFormatDecoder::OpenAVCodec(AVCodecContext *avctx, const AVCodec *codec)
+{
+    QMutexLocker locker(avcodeclock);
+
+    int ret = avcodec_open2(avctx, codec, NULL);
+    if (ret < 0)
+    {
+        char error[AV_ERROR_MAX_STRING_SIZE];
+
+        av_make_error_string(error, sizeof(error), ret);
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("Could not open codec 0x%1, id(%2) type(%3) "
+                    "ignoring. reason %4").arg((uint64_t)avctx,0,16)
+            .arg(ff_codec_id_string(avctx->codec_id))
+            .arg(ff_codec_type_string(avctx->codec_type))
+            .arg(error));
+        return false;
+    }
+    else
+    {
+        LOG(VB_GENERAL, LOG_INFO, LOC +
+            QString("Opened codec 0x%1, id(%2) type(%3)")
+            .arg((uint64_t)avctx,0,16)
+            .arg(ff_codec_id_string(avctx->codec_id))
+            .arg(ff_codec_type_string(avctx->codec_type)));
+        return true;
+    }
 }
 
 void AvFormatDecoder::UpdateFramesPlayed(void)
@@ -4620,12 +4672,15 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
 
         if (!curstream->codec->codec)
         {
-            LOG(VB_PLAYBACK, LOG_ERR, LOC +
-                QString("No codec for stream index %1, type(%2) id(%3:%4)")
-                    .arg(pkt->stream_index)
-                    .arg(ff_codec_type_string(codec_type))
-                    .arg(ff_codec_id_string(curstream->codec->codec_id))
-                    .arg(curstream->codec->codec_id));
+            if (codec_type != AVMEDIA_TYPE_VIDEO)
+            {
+                LOG(VB_PLAYBACK, LOG_ERR, LOC +
+                    QString("No codec for stream index %1, type(%2) id(%3:%4)")
+                        .arg(pkt->stream_index)
+                        .arg(ff_codec_type_string(codec_type))
+                        .arg(ff_codec_id_string(curstream->codec->codec_id))
+                        .arg(curstream->codec->codec_id));
+            }
             av_free_packet(pkt);
             continue;
         }
