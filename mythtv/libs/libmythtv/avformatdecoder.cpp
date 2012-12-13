@@ -3676,6 +3676,8 @@ bool AvFormatDecoder::ProcessDataPacket(AVStream *curstream, AVPacket *pkt,
 #endif // USING_MHEG:
             break;
         }
+        default:
+            break;
     }
     return true;
 }
