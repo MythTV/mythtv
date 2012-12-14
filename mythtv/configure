@@ -8919,6 +8919,11 @@ echo "Configuring minilzo..."
 echo "Configuring libmythsoundtouch..."
 (cd external/libmythsoundtouch ; \
        ${qmakeconf} -o Makefile)
+if ! disabled x11 ; then
+    echo "Configuring libXNVCtrl..."
+    (cd external/libXNVCtrl; \
+           ${qmakeconf} -o Makefile.lib)
+fi
 
 # generate the lists of enabled components
 print_enabled_components(){

@@ -8,7 +8,6 @@ SUBDIRS += libmythservicecontracts
 libmythservicecontracts.depends = libmythbase
 
 using_mheg:SUBDIRS += libmythfreemheg
-using_x11:SUBDIRS += libmythnvctrl
 !contains( CONFIG_LIBMPEG2EXTERNAL, yes):SUBDIRS += libmythmpeg2
 
 # Libraries with dependencies
