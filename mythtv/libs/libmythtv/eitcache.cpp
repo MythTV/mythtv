@@ -84,7 +84,7 @@ static inline bool modified(uint64_t sig)
     return sig >> 63;
 }
 
-static void replace_in_db(int chanid, uint eventid, uint64_t sig)
+static void replace_in_db(uint chanid, uint eventid, uint64_t sig)
 {
 
     MSqlQuery query(MSqlQuery::InitCon());
@@ -129,7 +129,7 @@ static void delete_in_db(uint endtime)
 #define CHANNEL_LOCK 1
 #define STATISTIC    2
 
-static bool lock_channel(int chanid, uint lastPruneTime)
+static bool lock_channel(uint chanid, uint lastPruneTime)
 {
     int lock = 1;
     MSqlQuery query(MSqlQuery::InitCon());
@@ -183,7 +183,7 @@ static bool lock_channel(int chanid, uint lastPruneTime)
     return true;
 }
 
-static void unlock_channel(int chanid, uint updated)
+static void unlock_channel(uint chanid, uint updated)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 

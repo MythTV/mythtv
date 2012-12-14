@@ -44,7 +44,7 @@ typedef QMap<uint,ATSCEvent>               EventIDToATSCEvent;
 typedef QMap<uint,QString>                 EventIDToETT;
 typedef QMap<uint,EventIDToATSCEvent>      ATSCSRCToEvents;
 typedef QMap<uint,EventIDToETT>            ATSCSRCToETTs;
-typedef QMap<unsigned long long,int>       ServiceToChanID;
+typedef QMap<unsigned long long,uint>      ServiceToChanID;
 
 class DBEventEIT;
 class EITFixUp;
