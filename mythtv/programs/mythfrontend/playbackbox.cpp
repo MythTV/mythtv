@@ -1337,7 +1337,13 @@ void PlaybackBox::UpdateUIGroupList(const QStringList &groupPreferences)
 
             QString displayName = groupname;
             if (displayName.isEmpty())
-                displayName = ProgramInfo::i18n("All Programs");
+            {
+                if (m_recGroup == "All Programs")
+                    displayName = ProgramInfo::i18n("All Programs");
+                else
+                    displayName = ProgramInfo::i18n("All Programs - %1")
+                        .arg(m_groupDisplayName);
+            }
 
             item->SetText(displayName, "name");
             item->SetText(displayName);

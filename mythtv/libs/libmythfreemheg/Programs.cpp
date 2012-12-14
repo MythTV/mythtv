@@ -30,7 +30,9 @@
 #include "freemheg.h"
 
 #include <QStringList>
+#if HAVE_GETTIMEOFDAY == 0
 #include <sys/timeb.h>
+#endif
 #ifdef __FreeBSD__
 #include <sys/time.h>
 #else
@@ -175,10 +177,9 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
         {
             if (args.Size() == 2)
             {
-                struct timeb timebuffer;
-#if HAVE_FTIME
-                ftime(&timebuffer);
-#elif HAVE_GETTIMEOFDAY
+                time_t epochSeconds = 0;
+                short int timeZone = 0;
+#if HAVE_GETTIMEOFDAY
                 struct timeval   time;
                 struct timezone  zone;
 
@@ -187,19 +188,26 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
                     MHLOG(MHLogDetail, QString("gettimeofday() failed"));
                 }
 
-                timebuffer.time     = time.tv_sec;
-                timebuffer.timezone = zone.tz_minuteswest;
-                timebuffer.dstflag  = zone.tz_dsttime;
+                epochSeconds     = time.tv_sec;
+                timeZone = zone.tz_minuteswest;
+#elif HAVE_FTIME
+                struct timeb timebuffer;
+                if (ftime(&timebuffer) == -1)
+                {
+                    MHLOG(MHLogDetail, QString("ftime() failed"));
+                }
+                epochSeconds = timebuffer.time;
+                timeZone = timebuffer.timezone;
 #else
 #error Configuration error? No ftime() or gettimeofday()?
 #endif
                 // Adjust the time to local.  TODO: Check this.
-                timebuffer.time -= timebuffer.timezone * 60;
+                epochSeconds -= timeZone * 60;
                 // Time as seconds since midnight.
-                int nTimeAsSecs = timebuffer.time % (24 * 60 * 60);
+                int nTimeAsSecs = epochSeconds % (24 * 60 * 60);
                 // Modified Julian date as number of days since 17th November 1858.
                 // 1st Jan 1970 was date 40587.
-                int nModJulianDate = 40587 + timebuffer.time / (24 * 60 * 60);
+                int nModJulianDate = 40587 + epochSeconds / (24 * 60 * 60);
 
                 engine->FindObject(*(args.GetAt(0)->GetReference()))->SetVariableValue(nModJulianDate);
                 engine->FindObject(*(args.GetAt(1)->GetReference()))->SetVariableValue(nTimeAsSecs);

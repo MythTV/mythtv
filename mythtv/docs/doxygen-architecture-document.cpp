@@ -161,10 +161,6 @@ There are also a few simple \ref testing "testing shortcuts".
 
       This library does not depend on any of our libraries.
 
-  <dt>libmythhdhomerun       <dd>Support for the HDHomeRun recorder device.
-
-      This library does not depend on any of our libraries.
-
 </dl>
 Two libraries libmythmpeg2 and libmythsamplerate appear redundant, but
 libmpeg2 decodes MPEG-2 more quickly than ffmpeg on some systems, and

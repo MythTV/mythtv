@@ -313,15 +313,42 @@ void SSDP::run()
 
 void SSDP::ProcessData( MSocketDevice *pSocket )
 {
+    QByteArray buffer;
     long nBytes = 0;
-    long nRead  = 0;
 
     while ((nBytes = pSocket->bytesAvailable()) > 0)
     {
-        QByteArray buffer;
         buffer.resize(nBytes);
 
-        nRead = pSocket->readBlock( buffer.data(), nBytes );
+        long nRead = 0;
+        do
+        {
+            long ret = pSocket->readBlock( buffer.data() + nRead, nBytes );
+            if (ret < 0)
+            {
+                LOG(VB_GENERAL, LOG_ERR, QString("Socket readBlock error %1")
+                    .arg(pSocket->error()));
+                buffer.clear();
+                break;
+            }
+
+            nRead += ret;
+
+            if (0 == ret)
+            {
+                LOG(VB_SOCKET, LOG_WARNING,
+                    QString("%1 bytes reported available, "
+                            "but only %2 bytes read.")
+                    .arg(nBytes).arg(nRead));
+                nBytes = nRead;
+                buffer.resize(nBytes);
+                break;
+            }
+        }
+        while (nRead < nBytes);
+
+        if (buffer.isEmpty())
+            continue;
 
         QHostAddress  peerAddress = pSocket->peerAddress();
         quint16       peerPort    = pSocket->peerPort   ();

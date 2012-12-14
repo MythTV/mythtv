@@ -498,7 +498,7 @@ ProgInfo *XMLTVParser::parseProgram(
                     if (!parttotal.isEmpty() && partno > 0)
                     {
                         bool ok;
-                        uint partto = parttotal.toUInt(&ok) + 1;
+                        uint partto = parttotal.toUInt(&ok);
                         if (ok && partnumber <= parttotal)
                         {
                             pginfo->parttotal  = partto;

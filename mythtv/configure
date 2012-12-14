@@ -6215,5 +6215,11 @@ echo "Configuring nzmqt..."
 echo "Configuring qjson..."
 (cd external/qjson ; \
        ${qmake} -o Makefile)
+if ! disabled hdhomerun ; then
+    echo "Configuring libhdhomerun..."
+    (cd external/libhdhomerun; \
+           ${qmake} -o Makefile.lib CONFIG+=Makefile.lib; \
+           ${qmake} -o Makefile.app CONFIG+=Makefile.app)
+fi
 
 test -n "$WARNINGS" && printf "\n$WARNINGS" || exit 0

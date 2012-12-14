@@ -50,7 +50,6 @@ LIBS += -L../libmythbluray        -lmythbluray-$${LIBVERSION}
 LIBS += -L../../external/FFmpeg/libswscale -lmythswscale
 using_mheg:LIBS += -L../libmythfreemheg        -lmythfreemheg-$${LIBVERSION}
 using_live:LIBS += -L../libmythlivemedia        -lmythlivemedia-$${LIBVERSION}
-using_hdhomerun:LIBS += -L../libmythhdhomerun        -lmythhdhomerun-$${LIBVERSION}
 
 mingw {
 

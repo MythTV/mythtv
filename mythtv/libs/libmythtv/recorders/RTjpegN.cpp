@@ -520,15 +520,16 @@ int RTjpeg::s2b(int16_t *data, int8_t *strm, uint8_t bt8, uint32_t *qtbla)
 void RTjpeg::QuantInit(void)
 {
  int i;
- int16_t *qtbl;
+ typedef union { int16_t *int16; int32_t *int32; } P16_32;
+ P16_32 qtbl;
 
- qtbl = (int16_t *)lqt;
+ qtbl.int32 = lqt;
  for (i = 0; i < 64; i++)
-     qtbl[i] = (int16_t)lqt[i];
+     qtbl.int16[i] = static_cast<int16_t>(lqt[i]);
 
- qtbl = (int16_t *)cqt;
+ qtbl.int32 = cqt;
  for (i = 0; i < 64; i++)
-    qtbl[i] = (int16_t)cqt[i];
+    qtbl.int16[i] = static_cast<int16_t>(cqt[i]);
 }
 
 void RTjpeg::Quant(int16_t *block, int32_t *qtbl)
