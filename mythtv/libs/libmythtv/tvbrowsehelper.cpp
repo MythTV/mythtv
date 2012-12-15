@@ -349,6 +349,7 @@ void TVBrowseHelper::GetNextProgramDB(
         case BROWSE_UP:       chandir = CHANNEL_DIRECTION_UP;       break;
         case BROWSE_DOWN:     chandir = CHANNEL_DIRECTION_DOWN;     break;
         case BROWSE_FAVORITE: chandir = CHANNEL_DIRECTION_FAVORITE; break;
+        default: break; // quiet -Wswitch-enum
     }
     if (chandir != -1)
     {
