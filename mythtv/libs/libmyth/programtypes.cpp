@@ -232,6 +232,8 @@ QString toString(RecStatusType recstatus, RecordingType rectype)
             return QObject::tr("Other Recording");
         case rsOtherTuning:
             return QObject::tr("Other Tuning");
+        case rsUnknown:
+            break;
     }
 
     return QObject::tr("Unknown");
