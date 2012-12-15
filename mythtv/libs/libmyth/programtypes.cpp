@@ -165,6 +165,8 @@ QString toString(RecStatusType recstatus, uint id)
         case rsOtherTuning:
             ret = QString::number(id);
             break;
+        case rsUnknown:
+            break;
     }
 
     return (ret.isEmpty()) ? QString("-") : ret;
