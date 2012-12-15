@@ -23,6 +23,7 @@ QString toString(MarkTypes type)
 {
     switch (type)
     {
+        case MARK_ALL:          return "ALL";
         case MARK_UNSET:        return "UNSET";
         case MARK_TMP_CUT_END:  return "TMP_CUT_END";
         case MARK_TMP_CUT_START:return "TMP_CUT_START";
@@ -38,6 +39,16 @@ QString toString(MarkTypes type)
         case MARK_KEYFRAME:     return "KEYFRAME";
         case MARK_SCENE_CHANGE: return "SCENE_CHANGE";
         case MARK_GOP_BYFRAME:  return "GOP_BYFRAME";
+        case MARK_ASPECT_1_1:   return "ASPECT_1_1 (depreciated)";
+        case MARK_ASPECT_4_3:   return "ASPECT_4_3";
+        case MARK_ASPECT_16_9:  return "ASPECT_16_9";
+        case MARK_ASPECT_2_21_1:return "ASPECT_2_21_1";
+        case MARK_ASPECT_CUSTOM:return "ASPECT_CUSTOM";
+        case MARK_VIDEO_WIDTH:  return "VIDEO_WIDTH";
+        case MARK_VIDEO_HEIGHT: return "VIDEO_HEIGHT";
+        case MARK_VIDEO_RATE:   return "VIDEO_RATE";
+        case MARK_DURATION_MS:  return "DURATION_MS";
+        case MARK_TOTAL_FRAMES: return "TOTAL_FRAMES";
     }
 
     return "unknown";
