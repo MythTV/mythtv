@@ -551,7 +551,9 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
             {
                 ContentDescriptor content(content_data);
                 category      = content.GetDescription(0);
+#if 0 /* there is no category_type in DVB EIT */
                 category_type = content.GetMythCategory(0);
+#endif
             }
         }
 
@@ -1100,7 +1102,7 @@ static void init_fixup(QMap<uint64_t,uint> &fix)
         fix[  2819LL << 32 |  8468U << 16] = // DVB-T Niedersachsen + Bremen
         fix[  8706LL << 32 |  8468U << 16] = // DVB-T NRW
         fix[ 12801LL << 32 |  8468U << 16] = // DVB-T Bayern
-        EITFixUp::kFixRTL | EITFixUp::kFixCategory;
+        EITFixUp::kFixRTL;
 
     // Premiere EIT processing
     fix[   1LL << 32 |  133 << 16] = EITFixUp::kFixPremiere;
@@ -1129,7 +1131,7 @@ static void init_fixup(QMap<uint64_t,uint> &fix)
     fix[      8438U << 16] = // DVB-T Espoo
         fix[ 42249U << 16] = // DVB-C Welho
         fix[    15U << 16] = // DVB-C Welho
-        EITFixUp::kFixFI | EITFixUp::kFixCategory;
+        EITFixUp::kFixFI;
 
     // DVB-C YouSee (Denmark)
     fix[65024U << 16] = EITFixUp::kFixDK;
