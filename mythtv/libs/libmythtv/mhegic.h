@@ -15,7 +15,6 @@ class NetStream;
 class MHInteractionChannel : public QObject
 {
     Q_OBJECT
-    Q_DISABLE_COPY(MHInteractionChannel)
 
 public:
     MHInteractionChannel(QObject* parent = 0);
@@ -41,6 +40,7 @@ private slots:
     void slotFinished(QObject*);
 
 private:
+    Q_DISABLE_COPY(MHInteractionChannel)
     mutable QMutex m_mutex;
     typedef QHash< QString, NetStream* > map_t;
     map_t m_pending; // Pending requests

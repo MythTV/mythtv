@@ -30,7 +30,6 @@ class NetStreamAbort;
 class NetStream : public QObject
 {
     Q_OBJECT
-    Q_DISABLE_COPY(NetStream)
 
 public:
     enum EMode { kNeverCache, kPreferCache, kAlwaysCache };
@@ -86,6 +85,8 @@ private slots:
     void slotReadyRead();
 
 private:
+    Q_DISABLE_COPY(NetStream)
+
     bool Request(const QUrl &);
 
     const int m_id; // Unique request ID
@@ -109,7 +110,6 @@ private:
 class NAMThread : public QThread
 {
     Q_OBJECT
-    Q_DISABLE_COPY(NAMThread)
 
     // Use manager() to create
     NAMThread();
@@ -137,6 +137,8 @@ private slots:
     void quit();
 
 private:
+    Q_DISABLE_COPY(NAMThread)
+
     volatile bool m_bQuit;
     QSemaphore m_running;
     mutable QMutex m_mutex; // Protects r/w access to the following data
