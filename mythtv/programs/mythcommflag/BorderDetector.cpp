@@ -1,5 +1,7 @@
 #include <sys/time.h>
 
+#include "mythconfig.h"
+
 extern "C" {
 #include "libavcodec/avcodec.h"        /* AVPicture */
 }

@@ -25,7 +25,7 @@ class MTV_PUBLIC HTTPLiveStream
     HTTPLiveStream(QString srcFile, uint16_t width = 640, uint16_t height = 480,
                    uint32_t bitrate = 800000, uint32_t abitrate = 64000,
                    uint16_t maxSegments = 0, uint16_t segmentSize = 10,
-                   uint32_t aobitrate = 32000, uint16_t srate = -1);
+                   uint32_t aobitrate = 32000, int32_t srate = -1);
     HTTPLiveStream(int streamid);
    ~HTTPLiveStream();
 
@@ -106,7 +106,7 @@ class MTV_PUBLIC HTTPLiveStream
     uint32_t    m_bitrate;
     uint32_t    m_audioBitrate;
     uint32_t    m_audioOnlyBitrate;
-    uint16_t    m_sampleRate;
+    int32_t     m_sampleRate;
 
     QDateTime   m_created;
     QDateTime   m_lastModified;

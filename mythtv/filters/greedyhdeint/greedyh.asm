@@ -43,7 +43,7 @@ static void FUNCT_NAME(uint8_t *output, int outstride,
 
     int Line;
     long LoopCtr;
-    long oldbx;
+    long oldbx = 0;
     unsigned int Pitch = stride*2;
     int FieldHeight = height / 2;
 

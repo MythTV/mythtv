@@ -1541,11 +1541,11 @@ void RTjpeg::Idct(uint8_t *odata, int16_t *data, int rskip)
 {
 #ifdef MMX
 
-static mmx_t fix_141            = { q: (long long)0x5a825a825a825a82LL };
-static mmx_t fix_184n261        = { q: (long long)0xcf04cf04cf04cf04LL };
-static mmx_t fix_184            = { q: (long long)0x7641764176417641LL };
-static mmx_t fix_n184           = { q: (long long)0x896f896f896f896fLL };
-static mmx_t fix_108n184        = { q: (long long)0xcf04cf04cf04cf04LL };
+static mmx_t fix_141;         fix_141.q = (long long)0x5a825a825a825a82LL;
+static mmx_t fix_184n261; fix_184n261.q = (long long)0xcf04cf04cf04cf04LL;
+static mmx_t fix_184;         fix_184.q = (long long)0x7641764176417641LL;
+static mmx_t fix_n184;       fix_n184.q = (long long)0x896f896f896f896fLL;
+static mmx_t fix_108n184; fix_108n184.q = (long long)0xcf04cf04cf04cf04LL;
 
   mmx_t *wsptr = (mmx_t *)ws;
   register mmx_t *dataptr = (mmx_t *)odata;
@@ -3096,7 +3096,7 @@ int RTjpeg::bcomp(int16_t *rblock, int16_t *old, mmx_t *mask)
  mmx_t *mold=(mmx_t *)old;
  mmx_t *mblock=(mmx_t *)rblock;
  volatile mmx_t result;
- static mmx_t neg= { uq: (unsigned long long)0xffffffffffffffffULL };
+ static mmx_t neg= { (unsigned long long)0xffffffffffffffffULL };
 
  movq_m2r(*mask, mm7);
  movq_m2r(neg, mm6);

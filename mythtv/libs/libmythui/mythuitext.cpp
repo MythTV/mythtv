@@ -594,7 +594,6 @@ bool MythUIText::LayoutParagraphs(const QStringList & paragraphs,
 bool MythUIText::GetNarrowWidth(const QStringList & paragraphs,
                                 const QTextOption & textoption, qreal & width)
 {
-    MythRect textrect(m_Area);
     qreal    height, last_line_width, lines;
     int      best_width, too_narrow, last_width = -1;
     int      num_lines, line_height = 0;
@@ -777,6 +776,8 @@ void MythUIText::FillCutMessage(void)
 
             m_CutMessage = templist.join(" ");
             break;
+            case CaseNormal:
+                break;
         }
 
         QTextOption textoption(static_cast<Qt::Alignment>(m_Justification));
@@ -1130,6 +1131,8 @@ void MythUIText::Pulse(void)
                     ShiftCanvas(0, -1);
             }
             break;
+            case ScrollNone:
+                break;
         }
     }
 }

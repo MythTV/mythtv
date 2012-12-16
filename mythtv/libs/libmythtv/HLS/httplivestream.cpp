@@ -91,7 +91,7 @@ class HTTPLiveStreamThread : public QRunnable
 HTTPLiveStream::HTTPLiveStream(QString srcFile, uint16_t width, uint16_t height,
                                uint32_t bitrate, uint32_t abitrate,
                                uint16_t maxSegments, uint16_t segmentSize,
-                               uint32_t aobitrate, uint16_t srate)
+                               uint32_t aobitrate, int32_t srate)
   : m_writing(false),
     m_streamid(-1),              m_sourceFile(srcFile),
     m_sourceWidth(0),            m_sourceHeight(0),

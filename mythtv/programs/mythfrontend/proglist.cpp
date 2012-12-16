@@ -455,6 +455,8 @@ void ProgLister::ShowChooseViewMenu(void)
                 case plStoredSearch: msg = QString("%1\n%2")
                     .arg(tr("Select a search stored from"))
                     .arg(tr("Custom Record")); break;
+                default: // silence warning
+                    break;
             }
 
             screen = new MythUISearchDialog(
@@ -475,12 +477,20 @@ void ProgLister::ShowChooseViewMenu(void)
                 (m_curView >= 0) ? m_viewList[m_curView] : QString());
             break;
         case plTime:
+        {
             QString message =  tr("Start search from date and time");
             int flags = (MythTimeInputDialog::kDay |
                          MythTimeInputDialog::kHours |
                          MythTimeInputDialog::kFutureDates);
             screen = new MythTimeInputDialog(popupStack, message, flags);
             connect_string = false;
+            break;
+        }
+        case plRecordid:
+        case plPreviouslyRecorded:
+        case plUnknown:
+        case plTitle:
+        case plSQLSearch:
             break;
     }
 

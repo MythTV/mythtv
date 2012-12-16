@@ -2085,7 +2085,9 @@ bool MythUIButtonList::MoveDown(MovementUnit unit, uint amount)
                 else if (m_wrapStyle > WrapNone)
                     m_selPosition = 0;
             }
+            break;
 
+        case MoveMid:
             break;
     }
 

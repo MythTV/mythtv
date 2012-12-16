@@ -181,6 +181,15 @@ QString MythSetting::ToHTML(uint level) const
         case kIPAddress:
             size = 20;
             break;
+        case kCheckBox:
+        case kSelect:
+        case kComboBox:
+        case kTVFormat:
+        case kFrequencyTable:
+        case kLocalIPAddress:
+        case kOther:
+        case kInvalidDataType:
+            break;
     }
 
     switch (dtype)
@@ -294,6 +303,8 @@ QString MythSetting::ToHTML(uint level) const
                         "position:absolute;left:-4000px\" "
                         "id=\"%2_default\">%3</div>\r\n")
                 .arg(value).arg(value).arg(default_data);
+            break;
+        case kInvalidDataType:
             break;
     }
 

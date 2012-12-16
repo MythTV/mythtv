@@ -355,6 +355,14 @@ bool ServiceHost::ProcessRequest( HTTPRequest *pRequest )
                     case RequestTypePost:
                         sMethodName = "Put" + sMethodName;
                         break;
+                    case RequestTypeUnknown:
+                    case RequestTypeMSearch:
+                    case RequestTypeSubscribe:
+                    case RequestTypeUnsubscribe:
+                    case RequestTypeNotify:
+                    case RequestTypeResponse:
+                        // silence compiler
+                        break;
                 }
 
                 if (m_Methods.contains(sMethodName))

@@ -91,6 +91,9 @@ class SortableMythGenericTreeList : public QList<MythGenericTree*>
 //             case SORT_ATT_THEN_STRING:
 //                 std::sort(begin(), end(), sortByAttributeThenString);
 //                 break;
+            case SORT_ATTRIBUTE:
+            case SORT_ATT_THEN_STRING:
+                break;
         }
     }
 
