@@ -3987,18 +3987,6 @@ int AvFormatDecoder::AutoSelectAudioTrack(void)
     int selTrack = (1 == numStreams) ? 0 : -1;
     int wlang    = wtrack.language;
 
-    if (selTrack < 0 && numStreams)
-    {
-        LOG(VB_AUDIO, LOG_INFO, LOC + "Trying to select default track");
-        for (uint i = 0; i < atracks.size(); i++) {
-            int idx = atracks[i].av_stream_index;
-            if (ic->streams[idx]->disposition & AV_DISPOSITION_DEFAULT)
-            {
-                selTrack = i;
-                break;
-            }
-        }
-    }
 
     if ((selTrack < 0) && (wtrack.av_substream_index >= 0))
     {
@@ -4114,6 +4102,22 @@ int AvFormatDecoder::AutoSelectAudioTrack(void)
                     selTrack = filter_max_ch(ic, atracks, flang);
             }
         }
+
+        // could not select track based on user preferences (language)
+        // try to select the default track
+        if (selTrack < 0 && numStreams)
+        {
+            LOG(VB_AUDIO, LOG_INFO, LOC + "Trying to select default track");
+            for (uint i = 0; i < atracks.size(); i++) {
+                int idx = atracks[i].av_stream_index;
+                if (ic->streams[idx]->disposition & AV_DISPOSITION_DEFAULT)
+                {
+                    selTrack = i;
+                    break;
+                }
+            }
+        }
+
         // try to get best track for any language
         if (selTrack < 0)
         {
