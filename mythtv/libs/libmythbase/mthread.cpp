@@ -81,7 +81,7 @@ class MThreadInternal : public QThread
     void QThreadRun(void) { QThread::run(); }
     int exec(void)
     {
-        DBPurgeHandler ph();
+        DBPurgeHandler ph;
         return QThread::exec();
     }
 

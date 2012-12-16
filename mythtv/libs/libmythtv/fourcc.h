@@ -13,6 +13,8 @@
  * $Id$
  *****************************************************************************/
 
+#include "mythconfig.h"
+
 #ifdef __cplusplus
 extern "C" {
 #include "libavutil/common.h" // for MKTAG

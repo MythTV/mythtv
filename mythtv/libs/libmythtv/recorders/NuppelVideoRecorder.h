@@ -15,6 +15,8 @@
 #define MMX
 #endif
 
+#include "mythconfig.h"
+
 #undef HAVE_AV_CONFIG_H
 extern "C" {
 #include "libavcodec/avcodec.h"

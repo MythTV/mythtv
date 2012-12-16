@@ -20,6 +20,7 @@ using namespace std;
 #include <QRect>
 
 // MythTV headers
+#include "mythconfig.h"
 #include "../libmythfreemheg/freemheg.h"
 #include "interactivetv.h"
 #include "dsmcc.h"

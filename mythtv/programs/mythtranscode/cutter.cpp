@@ -39,6 +39,31 @@ void Cutter::SetCutList(frm_dir_map_t &deleteMap)
                     foreshortenedCutList[it.key()] = MARK_CUT_END;
                 }
                 break;
+            case MARK_ALL:
+            case MARK_UNSET:
+            case MARK_TMP_CUT_END:
+            case MARK_TMP_CUT_START:
+            case MARK_UPDATED_CUT:
+            case MARK_PLACEHOLDER:
+            case MARK_BOOKMARK:
+            case MARK_BLANK_FRAME:
+            case MARK_COMM_START:
+            case MARK_COMM_END:
+            case MARK_GOP_START:
+            case MARK_KEYFRAME:
+            case MARK_SCENE_CHANGE:
+            case MARK_GOP_BYFRAME:
+            case MARK_ASPECT_1_1:
+            case MARK_ASPECT_4_3:
+            case MARK_ASPECT_16_9:
+            case MARK_ASPECT_2_21_1:
+            case MARK_ASPECT_CUSTOM:
+            case MARK_VIDEO_WIDTH:
+            case MARK_VIDEO_HEIGHT:
+            case MARK_VIDEO_RATE:
+            case MARK_DURATION_MS:
+            case MARK_TOTAL_FRAMES:
+                break;
         }
     }
 

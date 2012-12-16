@@ -4,6 +4,8 @@
 // C
 #include <cstdlib>
 
+#include "mythconfig.h"
+
 extern "C"
 {
 //AVFormat/AVCodec

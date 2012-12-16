@@ -88,7 +88,8 @@ EITFixUp::EITFixUp()
       m_mcaDD(",?\\sDD\\.?"),
       m_RTLrepeat("(\\(|\\s)?Wiederholung.+vo[m|n].+((?:\\d{2}\\.\\d{2}\\.\\d{4})|(?:\\d{2}[:\\.]\\d{2}\\sUhr))\\)?"),
       m_RTLSubtitle("^([^\\.]{3,})\\.\\s+(.+)"),
-      m_RTLSubtitle1("^Folge\\s(\\d{1,4})\\s*:\\s+'(.*)'(?:\\.\\s*|$)"),
+      /* should be (?:\x{8a}|\\.\\s*|$) but 0x8A gets replaced with 0x20 */
+      m_RTLSubtitle1("^Folge\\s(\\d{1,4})\\s*:\\s+'(.*)'(?:\\s|\\.\\s*|$)"),
       m_RTLSubtitle2("^Folge\\s(\\d{1,4})\\s+(.{,5}[^\\.]{,120})[\\?!\\.]\\s*"),
       m_RTLSubtitle3("^(?:Folge\\s)?(\\d{1,4}(?:\\/[IVX]+)?)\\s+(.{,5}[^\\.]{,120})[\\?!\\.]\\s*"),
       m_RTLSubtitle4("^Thema.{0,5}:\\s([^\\.]+)\\.\\s*"),
@@ -1288,7 +1289,7 @@ void EITFixUp::FixRTL(DBEventEIT &event) const
 {
     int        pos;
 
-    // No need to continue without a description and with an subtitle.
+    // No need to continue without a description or with an subtitle.
     if (event.description.length() <= 0 || event.subtitle.length() > 0)
         return;
 
@@ -1368,20 +1369,30 @@ void EITFixUp::FixRTL(DBEventEIT &event) const
             event.description.remove(0, tmpExpEpisodeNo2.matchedLength());
     }
 
-    int position;
-    const uint SUBTITLE_PCT = 35; // % of description to allow subtitle up to
-    const uint SUBTITLE_MAX_LEN = 50; // max length of subtitle field in db
-
-    if ((position = tmpExp1.indexIn(event.description)) != -1)
+    /* got an episode title now? (we did not have one at the start of this function) */
+    if (!event.subtitle.isEmpty())
     {
-        uint tmpExp1Len = tmpExp1.cap(1).length();
-        uint evDescLen = max(event.description.length(), 1);
+        event.categoryType = kCategorySeries;
+    }
 
-        if ((tmpExp1Len < SUBTITLE_MAX_LEN) &&
-            (tmpExp1Len * 100 / evDescLen < SUBTITLE_PCT))
+    /* if we do not have an episode title by now try some guessing as last resort */
+    if (event.subtitle.length() == 0)
+    {
+        int position;
+        const uint SUBTITLE_PCT = 35; // % of description to allow subtitle up to
+        const uint SUBTITLE_MAX_LEN = 50; // max length of subtitle field in db
+
+        if ((position = tmpExp1.indexIn(event.description)) != -1)
         {
-            event.subtitle    = tmpExp1.cap(1);
-            event.description = tmpExp1.cap(2);
+            uint tmpExp1Len = tmpExp1.cap(1).length();
+            uint evDescLen = max(event.description.length(), 1);
+
+            if ((tmpExp1Len < SUBTITLE_MAX_LEN) &&
+                (tmpExp1Len * 100 / evDescLen < SUBTITLE_PCT))
+            {
+                event.subtitle    = tmpExp1.cap(1);
+                event.description = tmpExp1.cap(2);
+            }
         }
     }
 }

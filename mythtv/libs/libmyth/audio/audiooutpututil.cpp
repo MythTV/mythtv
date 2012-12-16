@@ -495,9 +495,10 @@ int AudioOutputUtil::toFloat(AudioFormat format, void *out, void *in,
         case FORMAT_FLT:
             memcpy(out, in, bytes);
             return bytes;
+        case FORMAT_NONE:
+        default:
+            return 0;
     }
-
-    return 0;
 }
 
 /**
@@ -523,9 +524,10 @@ int AudioOutputUtil::fromFloat(AudioFormat format, void *out, void *in,
             return fromFloat32(format, (int *)out, (float *)in, bytes >> 2);
         case FORMAT_FLT:
             return fromFloatFLT((float *)out, (float *)in, bytes >> 2);
+        case FORMAT_NONE:
+        default:
+            return 0;
     }
-
-    return 0;
 }
 
 /**

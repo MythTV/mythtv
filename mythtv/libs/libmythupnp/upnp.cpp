@@ -226,7 +226,7 @@ QString UPnp::GetResultDesc( UPnPResultCode eCode )
         //case UPnPResult_CMGR_AccessDenied             = 705,
         //case UPnPResult_CMGR_InvalidConnectionRef     = 706,
         case UPnPResult_CMGR_NotInNetwork           : return "Not In Network";
-
+        case UPnPResult_MythTV_NoNamespaceGiven:      return "Unknown";
     }
 
     return "Unknown";

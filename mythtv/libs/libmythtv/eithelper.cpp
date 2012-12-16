@@ -285,6 +285,11 @@ static inline void parse_dvb_component_descriptors(desc_list_t list,
 
 void EITHelper::AddEIT(const DVBEventInformationTable *eit)
 {
+    uint chanid = GetChanID(eit->ServiceID(), eit->OriginalNetworkID(),
+                            eit->TSID());
+    if (!chanid)
+        return;
+
     uint descCompression = (eit->TableID() > 0x80) ? 2 : 1;
     uint fix = fixup.value(eit->OriginalNetworkID() << 16);
     fix |= fixup.value((((uint64_t)eit->TSID()) << 32) |
@@ -294,11 +299,6 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
                  (uint64_t)(eit->OriginalNetworkID() << 16) |
                   (uint64_t)eit->ServiceID());
     fix |= EITFixUp::kFixGenericDVB;
-
-    uint chanid = GetChanID(eit->ServiceID(), eit->OriginalNetworkID(),
-                            eit->TSID());
-    if (!chanid)
-        return;
 
     uint tableid   = eit->TableID();
     uint version   = eit->Version();
@@ -648,8 +648,7 @@ uint EITHelper::GetChanID(uint atsc_major, uint atsc_minor)
         return max(*it, 0);
 
     uint chanid = get_chan_id_from_db(sourceid, atsc_major, atsc_minor);
-    if (chanid)
-        srv_to_chanid[key] = chanid;
+    srv_to_chanid[key] = chanid;
 
     return chanid;
 }
@@ -667,8 +666,7 @@ uint EITHelper::GetChanID(uint serviceid, uint networkid, uint tsid)
         return max(*it, 0);
 
     uint chanid = get_chan_id_from_db(sourceid, serviceid, networkid, tsid);
-    if (chanid)
-        srv_to_chanid[key] = chanid;
+    srv_to_chanid[key] = chanid;
 
     return chanid;
 }

@@ -2087,6 +2087,10 @@ IPTVTuningData ChannelUtil::GetIPTVTuningData(uint chanid)
             case IPTVTuningData::kSMPTE2022_1:
                 fec_type = IPTVTuningData::kSMPTE2022;
                 break;
+            case IPTVTuningData::kRFC2733_2:
+            case IPTVTuningData::kRFC5109_2:
+            case IPTVTuningData::kSMPTE2022_2:
+                break; // will be handled by type of first FEC stream
         }
     }
 

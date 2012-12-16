@@ -921,8 +921,9 @@ QString MythAirplayServer::eventToString(AirplayEvent event)
         case AP_EVENT_PAUSED:  return "paused";
         case AP_EVENT_LOADING: return "loading";
         case AP_EVENT_STOPPED: return "stopped";
+        case AP_EVENT_NONE:    return "none";
+        default:               return "";
     }
-    return "";
 }
 
 void MythAirplayServer::GetPlayerStatus(bool &playing, float &speed,

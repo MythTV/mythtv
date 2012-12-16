@@ -479,6 +479,7 @@ MythMediaStatus MythMediaDevice::setStatus( MythMediaStatus NewStatus,
             case MEDIASTAT_USEABLE:
             case MEDIASTAT_MOUNTED:
             case MEDIASTAT_UNPLUGGED:
+            case MEDIASTAT_UNFORMATTED:
                 // get rid of the compiler warning...
                 break;
         }

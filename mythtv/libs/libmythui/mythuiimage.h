@@ -177,6 +177,7 @@ class MUI_PUBLIC MythUIImage : public MythUIType
     friend class MythUITextEdit;
     friend class ImageLoadThread;
 
+  private:
     Q_DISABLE_COPY(MythUIImage)
 };
 

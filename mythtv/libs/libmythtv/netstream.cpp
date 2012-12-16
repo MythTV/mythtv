@@ -119,6 +119,8 @@ NetStream::~NetStream()
 {
     Abort();
 
+    (NAMThread::manager()).disconnect(this);
+    
     QMutexLocker locker(&m_mutex);
 
     if (m_reply)
