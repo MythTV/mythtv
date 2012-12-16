@@ -1334,6 +1334,12 @@ static int guess_ni_flag(AVFormatContext *s){
             first_end= st->index_entries[n-1].pos;
     }
     avio_seek(s->pb, oldpos, SEEK_SET);
+
+    return (last_start > first_end);
+
+/* myth
+    
+    
     if (last_start > first_end)
         return 1;
     idx= av_mallocz(sizeof(*idx) * s->nb_streams);
@@ -1360,6 +1366,9 @@ static int guess_ni_flag(AVFormatContext *s){
     }
     av_free(idx);
     return 0;
+
+ 
+*/
 }
 
 static int avi_load_index(AVFormatContext *s)
