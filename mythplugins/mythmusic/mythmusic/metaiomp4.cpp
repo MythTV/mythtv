@@ -32,8 +32,6 @@ bool MetaIOMP4::write(const Metadata* mdata)
     if (!mdata)
         return false;
 
-    mdata = mdata;
-
 // Disabled because it doesn't actually work. Better implemented with Taglib
 // when we formally move to 1.6
 

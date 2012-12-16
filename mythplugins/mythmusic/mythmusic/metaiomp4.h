@@ -4,7 +4,7 @@
 // Mythmusic
 #include "metaio.h"
 
-class AVFormatContext;
+struct AVFormatContext;
 
 /*!
 * \class MetaIOMP4

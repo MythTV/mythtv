@@ -369,7 +369,7 @@ void avfDecoder::run()
     }
 
     AVPacket pkt, tmp_pkt;
-    int data_size, dec_len;
+    int data_size;
     uint fill, total;
     // account for possible frame expansion in aobase (upmix, float conv)
     uint thresh = bks * 12 / AudioOutputSettings::SampleSize(m_sampleFmt);
