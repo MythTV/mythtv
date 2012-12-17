@@ -4982,7 +4982,6 @@ enabled extra_warnings && check_cflags -Winline
 # C++ Flags
 check_cxxflags -Wall
 check_cxxflags -Wpointer-arith
-check_cxxflags -Wno-non-virtual-dtor
 #needed for INT64_C in libs/libavformat under g++
 check_cxxflags -D__STDC_CONSTANT_MACROS
 check_cxxflags -D__STDC_LIMIT_MACROS
