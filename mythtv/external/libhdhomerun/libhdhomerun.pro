@@ -35,7 +35,7 @@ mingw {
 Makefile.lib {
 
     TEMPLATE = lib
-    TARGET = mythhdhomerun
+    TARGET = mythhdhomerun-$$LIBVERSION
     CONFIG += thread dll plugin
     CONFIG -= qt
     target.path = $${LIBDIR}
