@@ -23,7 +23,6 @@ DEPENDPATH  += .
 DEPENDPATH  += ../libmyth ../libmyth/audio
 DEPENDPATH  += ../libmythbase
 DEPENDPATH  += ../libmythdvdnav/
-DEPENDPATH  += ../libmythbluray/
 DEPENDPATH  += ./mpeg ./channelscan ./visualisations
 DEPENDPATH  += ./recorders
 DEPENDPATH  += ./recorders/dvbdev
@@ -261,9 +260,9 @@ LIBS += -L../libmythdvdnav
 LIBS += -lmythdvdnav-$$LIBVERSION
 
 #Bluray stuff
-DEPENDPATH   += ../libmythbluray/
-INCLUDEPATH  += ../libmythbluray/
-POST_TARGETDEPS += ../libmythbluray/libmythbluray-$${MYTH_LIB_EXT}
+DEPENDPATH   += ../../external/libmythbluray/
+INCLUDEPATH  += ../../external/libmythbluray/
+POST_TARGETDEPS += ../../external/libmythbluray/libmythbluray-$${MYTH_LIB_EXT}
 HEADERS += Bluray/bdringbuffer.h
 SOURCES += Bluray/bdringbuffer.cpp
 using_frontend {
@@ -274,7 +273,7 @@ using_frontend {
     HEADERS += Bluray/bdoverlayscreen.h
     SOURCES += Bluray/bdoverlayscreen.cpp
 }
-LIBS += -L../libmythbluray
+LIBS += -L../../external/libmythbluray
 LIBS += -lmythbluray-$$LIBVERSION
 
 #HLS stuff

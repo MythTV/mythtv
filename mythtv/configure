@@ -6231,5 +6231,8 @@ if ! disabled hdhomerun ; then
            ${qmakeconf} -o Makefile.lib CONFIG+=Makefile.lib; \
            ${qmakeconf} -o Makefile.app CONFIG+=Makefile.app)
 fi
+echo "Configuring libmythbluray..."
+(cd external/libmythbluray ; \
+       ${qmakeconf} -o Makefile)
 
 test -n "$WARNINGS" && printf "\n$WARNINGS" || exit 0

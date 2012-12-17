@@ -7,8 +7,9 @@
 #include <QRect>
 #include <QHash>
 
-#include "libmythbluray/bluray.h"
-#include "libmythbluray/keys.h"
+// external/libmythbluray
+#include "bluray.h"
+#include "keys.h" // Likely to cause collisions?
 
 #include "ringbuffer.h"
 #include "mythdate.h"

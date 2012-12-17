@@ -27,12 +27,12 @@ SOURCES += mythuiimageresults.cpp
 
 INCLUDEPATH += ../libmythbase ../libmythtv
 INCLUDEPATH += ../.. ../ ./ ../libmythupnp ../libmythui
-INCLUDEPATH += ../../external/FFmpeg ../libmyth ../libmythbluray
+INCLUDEPATH += ../../external/FFmpeg ../libmyth  ../../external/libmythbluray
 DEPENDPATH += ../libmythsamplerate ../libmythsoundtouch
 DEPENDPATH += ../libmythfreesurround
 DEPENDPATH += ../ ../libmythui ../libmythbase
 DEPENDPATH += ../libmythupnp ../libmythtv ../libmyth
-DEPENDPATH += ../libmythbluray
+DEPENDPATH += ../../external/libmythbluray
 
 LIBS += -L../libmythsamplerate   -lmythsamplerate-$${LIBVERSION}
 LIBS += -L../libmythsoundtouch   -lmythsoundtouch-$${LIBVERSION}
@@ -46,7 +46,7 @@ LIBS += -L../../external/FFmpeg/libavutil  -lmythavutil
 LIBS += -L../../external/FFmpeg/libavformat -lmythavformat
 LIBS += -L../libmyth              -lmyth-$${LIBVERSION}
 LIBS += -L../libmythtv              -lmythtv-$${LIBVERSION}
-LIBS += -L../libmythbluray        -lmythbluray-$${LIBVERSION}
+LIBS += -L../../external/libmythbluray     -lmythbluray-$${LIBVERSION}
 LIBS += -L../../external/FFmpeg/libswscale -lmythswscale
 using_mheg:LIBS += -L../libmythfreemheg        -lmythfreemheg-$${LIBVERSION}
 using_live:LIBS += -L../libmythlivemedia        -lmythlivemedia-$${LIBVERSION}
