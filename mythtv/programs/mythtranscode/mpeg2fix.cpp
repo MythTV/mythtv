@@ -1918,7 +1918,7 @@ int MPEG2fixup::Start()
 {
     // NOTE: expectedvPTS/DTS are in units of SCR (300*PTS) to allow for better
     // accounting of rounding errors (still won't be right, but better)
-    int64_t expectedvPTS, expectedPTS[N_AUDIO];
+    int64_t expectedvPTS; // , expectedPTS[N_AUDIO];
     int64_t expectedDTS = 0, lastPTS = 0, initPTS = 0, deltaPTS = 0;
     int64_t origvPTS = 0, origaPTS[N_AUDIO];
     int64_t cutStartPTS = 0, cutEndPTS = 0;
@@ -1983,7 +1983,7 @@ int MPEG2fixup::Start()
     {
         FrameList *af = (*it);
         origaPTS[it.key()] = af->first()->pkt.pts * 300;
-        expectedPTS[it.key()] = udiff2x33(af->first()->pkt.pts, initPTS);
+        //expectedPTS[it.key()] = udiff2x33(af->first()->pkt.pts, initPTS);
         af_dlta_cnt[it.key()] = 0;
         cutState[it.key()] = !!(discard);
     }
