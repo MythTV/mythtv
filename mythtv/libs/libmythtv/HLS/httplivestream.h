@@ -94,7 +94,6 @@ class MTV_PUBLIC HTTPLiveStream
     QString     m_audioOutFile;
     QString     m_audioOutFileEncoded;
     uint16_t    m_segmentSize;
-    uint16_t    m_segmentFrames;
     uint16_t    m_maxSegments;
     uint16_t    m_segmentCount;
     uint16_t    m_startSegment;
