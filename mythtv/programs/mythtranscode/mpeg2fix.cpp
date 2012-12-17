@@ -1628,7 +1628,10 @@ MPEG2frame *MPEG2fixup::DecodeToFrame(int frameNum, int skip_reset)
         {
             SetFrameNum(tmpFrame->framePos, ++tmpFrameNum);
             if (ProcessVideo(tmpFrame, img_decoder) < 0)
+            {
+                delete tmpFrame;
                 return NULL;
+            }
         }
 
         framePool.enqueue(tmpFrame);
