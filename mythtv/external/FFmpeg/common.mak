@@ -10,8 +10,9 @@ ifndef SUBDIR
 ifndef V
 Q      = @
 ECHO   = printf "$(1)\t%s\n" $(2)
-BRIEF  = CC CXX AS YASM AR LD HOSTCC STRIP CP
-SILENT = DEPCC YASMDEP RM RANLIB
+BRIEF  = CC CXX HOSTCC HOSTLD AS YASM AR LD STRIP CP
+SILENT = DEPCC DEPHOSTCC DEPAS DEPYASM RANLIB RM
+
 MSG    = $@
 M      = @$(call ECHO,$(TAG),$@);
 $(foreach VAR,$(BRIEF), \
@@ -26,15 +27,17 @@ ALLFFLIBS = avcodec avdevice avfilter avformat avresample avutil postproc swscal
 IFLAGS     := -I. -I$(SRC_PATH)/
 CPPFLAGS   := $(IFLAGS) $(CPPFLAGS)
 CFLAGS     += $(ECFLAGS)
-CCFLAGS     = $(CFLAGS)
-CXXFLAGS   := $(CFLAGS) $(CXXFLAGS)
-YASMFLAGS  += $(IFLAGS) -I$(SRC_PATH)/libavutil/x86/ -Pconfig.asm
-HOSTCFLAGS += $(IFLAGS)
-LDFLAGS    := $(ALLFFLIBS:%=-Llib%) $(LDFLAGS)
+CCFLAGS     = $(CPPFLAGS) $(CFLAGS)
+ASFLAGS    := $(CPPFLAGS) $(ASFLAGS)
+CXXFLAGS   += $(CPPFLAGS) $(CFLAGS)
+YASMFLAGS  += $(IFLAGS:%=%/) -I$(SRC_PATH)/libavutil/x86/ -Pconfig.asm
+
+HOSTCCFLAGS = $(IFLAGS) $(HOSTCFLAGS)
+LDFLAGS    := $(ALLFFLIBS:%=$(LD_PATH)lib%) $(LDFLAGS)
 
 define COMPILE
-       $($(1)DEP)
-       $($(1)) $(CPPFLAGS) $($(1)FLAGS) $($(1)_DEPFLAGS) -c $($(1)_O) $<
+       $(call $(1)DEP,$(1))
+       $($(1)) $($(1)FLAGS) $($(1)_DEPFLAGS) $($(1)_C) $($(1)_O) $<
 endef
 
 COMPILE_C = $(call COMPILE,CC)
@@ -53,8 +56,8 @@ COMPILE_S = $(call COMPILE,AS)
 %.o: %.S
 	$(COMPILE_S)
 
-%.ho: %.h
-	$(CC) $(CPPFLAGS) $(CFLAGS) -Wno-unused -c -o $@ -x c $<
+%.h.c:
+	$(Q)echo '#include "$*.h"' >$@
 
 %.ver: %.v
 	$(Q)sed 's/$$MAJOR/$($(basename $(@F))_VERSION_MAJOR)/' $^ > $@
@@ -79,6 +82,7 @@ OBJS      += $(OBJS-yes)
 FFLIBS    := $(FFLIBS-yes) $(FFLIBS)
 TESTPROGS += $(TESTPROGS-yes)
 
+LDLIBS       = $(FFLIBS:%=%$(BUILDSUF))
 FFEXTRALIBS := $(addprefix -lmyth,$(addsuffix $(BUILDSUF),$(FFLIBS))) $(EXTRALIBS)
 
 EXAMPLES  := $(EXAMPLES:%=$(SUBDIR)%-example$(EXESUF))
@@ -96,25 +100,31 @@ DEP_LIBS := $(foreach NAME,$(FFLIBS),lib$(NAME)/$($(CONFIG_SHARED:yes=S)LIBNAME)
 ALLHEADERS := $(subst $(SRC_DIR)/,$(SUBDIR),$(wildcard $(SRC_DIR)/*.h $(SRC_DIR)/$(ARCH)/*.h))
 SKIPHEADERS += $(ARCH_HEADERS:%=$(ARCH)/%) $(SKIPHEADERS-)
 SKIPHEADERS := $(SKIPHEADERS:%=$(SUBDIR)%)
-checkheaders: $(filter-out $(SKIPHEADERS:.h=.ho),$(ALLHEADERS:.h=.ho))
+HOBJS        = $(filter-out $(SKIPHEADERS:.h=.h.o),$(ALLHEADERS:.h=.h.o))
+checkheaders: $(HOBJS)
+.SECONDARY:   $(HOBJS:.o=.c)
 
 alltools: $(TOOLS)
 
 $(HOSTOBJS): %.o: %.c
-	$(HOSTCC) $(HOSTCFLAGS) -c -o $@ $<
+	$(call COMPILE,HOSTCC)
 
 $(HOSTPROGS): %$(HOSTEXESUF): %.o
-	$(HOSTCC) $(HOSTLDFLAGS) -o $@ $< $(HOSTLIBS)
+	$(HOSTLD) $(HOSTLDFLAGS) $(HOSTLD_O) $< $(HOSTLIBS)
 
 $(OBJS):     | $(sort $(dir $(OBJS)))
 $(HOSTOBJS): | $(sort $(dir $(HOSTOBJS)))
 $(TESTOBJS): | $(sort $(dir $(TESTOBJS)))
+$(HOBJS):    | $(sort $(dir $(HOBJS)))
 $(TOOLOBJS): | tools
 
-OBJDIRS := $(OBJDIRS) $(dir $(OBJS) $(HOSTOBJS) $(TESTOBJS))
+OBJDIRS := $(OBJDIRS) $(dir $(OBJS) $(HOSTOBJS) $(TESTOBJS) $(HOBJS))
 
-CLEANSUFFIXES     = *.d *.o *~ *.ho *.map *.ver *.gcno *.gcda
+CLEANSUFFIXES     = *.d *.o *~ *.h.c *.map *.ver *.ho *.gcno *.gcda
 DISTCLEANSUFFIXES = *.pc
 LIBSUFFIXES       = *.a *.lib *.so *.so.* *.dylib *.dll *.def *.dll.a
 
--include $(wildcard $(OBJS:.o=.d) $(TESTOBJS:.o=.d))
+clean::
+	$(RM) $(OBJS) $(OBJS:.o=.d)
+
+-include $(wildcard $(OBJS:.o=.d) $(HOSTOBJS:.o=.d) $(TESTOBJS:.o=.d) $(HOBJS:.o=.d))

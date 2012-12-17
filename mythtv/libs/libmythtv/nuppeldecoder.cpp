@@ -526,7 +526,7 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
         m_audio->SetAudioParams(format, extradata.audio_channels,
                                 extradata.audio_channels,
-                                CODEC_ID_NONE, extradata.audio_sample_rate,
+                                AV_CODEC_ID_NONE, extradata.audio_sample_rate,
                                 false /* AC3/DTS pass through */);
         m_audio->ReinitAudio();
         foundit = 1;
@@ -665,18 +665,18 @@ bool NuppelDecoder::InitAVCodecVideo(int codec)
     {
         switch(extradata.video_fourcc)
         {
-            case FOURCC_DIVX: codec = CODEC_ID_MPEG4;      break;
-            case FOURCC_WMV1: codec = CODEC_ID_WMV1;       break;
-            case FOURCC_DIV3: codec = CODEC_ID_MSMPEG4V3;  break;
-            case FOURCC_MP42: codec = CODEC_ID_MSMPEG4V2;  break;
-            case FOURCC_MPG4: codec = CODEC_ID_MSMPEG4V1;  break;
-            case FOURCC_MJPG: codec = CODEC_ID_MJPEG;      break;
-            case FOURCC_H263: codec = CODEC_ID_H263;       break;
-            case FOURCC_H264: codec = CODEC_ID_H264;       break;
-            case FOURCC_I263: codec = CODEC_ID_H263I;      break;
-            case FOURCC_MPEG: codec = CODEC_ID_MPEG1VIDEO; break;
-            case FOURCC_MPG2: codec = CODEC_ID_MPEG2VIDEO; break;
-            case FOURCC_HFYU: codec = CODEC_ID_HUFFYUV;    break;
+            case FOURCC_DIVX: codec = AV_CODEC_ID_MPEG4;      break;
+            case FOURCC_WMV1: codec = AV_CODEC_ID_WMV1;       break;
+            case FOURCC_DIV3: codec = AV_CODEC_ID_MSMPEG4V3;  break;
+            case FOURCC_MP42: codec = AV_CODEC_ID_MSMPEG4V2;  break;
+            case FOURCC_MPG4: codec = AV_CODEC_ID_MSMPEG4V1;  break;
+            case FOURCC_MJPG: codec = AV_CODEC_ID_MJPEG;      break;
+            case FOURCC_H263: codec = AV_CODEC_ID_H263;       break;
+            case FOURCC_H264: codec = AV_CODEC_ID_H264;       break;
+            case FOURCC_I263: codec = AV_CODEC_ID_H263I;      break;
+            case FOURCC_MPEG: codec = AV_CODEC_ID_MPEG1VIDEO; break;
+            case FOURCC_MPG2: codec = AV_CODEC_ID_MPEG2VIDEO; break;
+            case FOURCC_HFYU: codec = AV_CODEC_ID_HUFFYUV;    break;
             default: codec = -1;
         }
     }
@@ -693,7 +693,7 @@ bool NuppelDecoder::InitAVCodecVideo(int codec)
         return false;
     }
 
-    if (mpa_vidcodec->capabilities & CODEC_CAP_DR1 && codec != CODEC_ID_MJPEG)
+    if (mpa_vidcodec->capabilities & CODEC_CAP_DR1 && codec != AV_CODEC_ID_MJPEG)
         directrendering = true;
 
     if (mpa_vidctx)
@@ -759,8 +759,8 @@ bool NuppelDecoder::InitAVCodecAudio(int codec)
     {
         switch(extradata.audio_fourcc)
         {
-            case FOURCC_LAME: codec = CODEC_ID_MP3;        break;
-            case FOURCC_AC3 : codec = CODEC_ID_AC3;        break;
+            case FOURCC_LAME: codec = AV_CODEC_ID_MP3;        break;
+            case FOURCC_AC3 : codec = AV_CODEC_ID_AC3;        break;
             default: codec = -1;
         }
     }
@@ -1245,9 +1245,9 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype)
                 if (!mpa_audcodec)
                 {
                     if (frameheader.comptype == '3')
-                        InitAVCodecAudio(CODEC_ID_MP3);
+                        InitAVCodecAudio(AV_CODEC_ID_MP3);
                     else if (frameheader.comptype == 'A')
-                        InitAVCodecAudio(CODEC_ID_AC3);
+                        InitAVCodecAudio(AV_CODEC_ID_AC3);
                     else
                     {
                         LOG(VB_GENERAL, LOG_ERR, LOC + QString("GetFrame: "

@@ -96,6 +96,10 @@ enum SmkBlockTypes {
  */
 static int smacker_decode_tree(GetBitContext *gb, HuffContext *hc, uint32_t prefix, int length)
 {
+    if(length > 32) {
+        av_log(NULL, AV_LOG_ERROR, "length too long\n");
+        return -1;
+    }
     if(!get_bits1(gb)){ //Leaf
         if(hc->current >= 256){
             av_log(NULL, AV_LOG_ERROR, "Tree size exceeded!\n");
@@ -133,13 +137,9 @@ static int smacker_decode_bigtree(GetBitContext *gb, HuffContext *hc, DBCtx *ctx
         return -1;
     }
     if(!get_bits1(gb)){ //Leaf
-        int val, i1, i2, b1, b2;
-        b1 = get_bits_count(gb);
+        int val, i1, i2;
         i1 = ctx->v1->table ? get_vlc2(gb, ctx->v1->table, SMKTREE_BITS, 3) : 0;
-        b1 = get_bits_count(gb) - b1;
-        b2 = get_bits_count(gb);
         i2 = ctx->v2->table ? get_vlc2(gb, ctx->v2->table, SMKTREE_BITS, 3) : 0;
-        b2 = get_bits_count(gb) - b2;
         if (i1 < 0 || i2 < 0)
             return -1;
         val = ctx->recode1[i1] | (ctx->recode2[i2] << 8);
@@ -762,7 +762,7 @@ static int smka_decode_frame(AVCodecContext *avctx, void *data,
 AVCodec ff_smacker_decoder = {
     .name           = "smackvid",
     .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = CODEC_ID_SMACKVIDEO,
+    .id             = AV_CODEC_ID_SMACKVIDEO,
     .priv_data_size = sizeof(SmackVContext),
     .init           = decode_init,
     .close          = decode_end,
@@ -774,7 +774,7 @@ AVCodec ff_smacker_decoder = {
 AVCodec ff_smackaud_decoder = {
     .name           = "smackaud",
     .type           = AVMEDIA_TYPE_AUDIO,
-    .id             = CODEC_ID_SMACKAUDIO,
+    .id             = AV_CODEC_ID_SMACKAUDIO,
     .priv_data_size = sizeof(SmackerAudioContext),
     .init           = smka_decode_init,
     .decode         = smka_decode_frame,

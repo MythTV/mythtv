@@ -27,7 +27,7 @@
  */
 
 #define LIBAVCODEC_VERSION_MAJOR 54
-#define LIBAVCODEC_VERSION_MINOR  23
+#define LIBAVCODEC_VERSION_MINOR 59
 #define LIBAVCODEC_VERSION_MICRO 100
 
 #define LIBAVCODEC_VERSION_INT  AV_VERSION_INT(LIBAVCODEC_VERSION_MAJOR, \
@@ -41,9 +41,11 @@
 #define LIBAVCODEC_IDENT        "Lavc" AV_STRINGIFY(LIBAVCODEC_VERSION)
 
 /**
- * Those FF_API_* defines are not part of public API.
- * They may change, break or disappear at any time.
+ * FF_API_* defines may be placed below to indicate public API that will be
+ * dropped at a future version bump. The defines themselves are not part of
+ * the public API and may change, break or disappear at any time.
  */
+
 #ifndef FF_API_REQUEST_CHANNELS
 #define FF_API_REQUEST_CHANNELS (LIBAVCODEC_VERSION_MAJOR < 55)
 #endif
@@ -80,6 +82,15 @@
 #endif
 #ifndef FF_API_DSP_MASK
 #define FF_API_DSP_MASK         (LIBAVCODEC_VERSION_MAJOR < 55)
+#endif
+#ifndef FF_API_FIND_BEST_PIX_FMT
+#define FF_API_FIND_BEST_PIX_FMT (LIBAVCODEC_VERSION_MAJOR < 55)
+#endif
+#ifndef FF_API_CODEC_ID
+#define FF_API_CODEC_ID          (LIBAVCODEC_VERSION_MAJOR < 55)
+#endif
+#ifndef FF_API_VDA_ASYNC
+#define FF_API_VDA_ASYNC         (LIBAVCODEC_VERSION_MAJOR < 55)
 #endif
 
 #endif /* AVCODEC_VERSION_H */

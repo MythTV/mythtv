@@ -33,7 +33,7 @@ class avfDecoder : public Decoder
 
     bool inited, user_stop;
     int stat;
-    char *output_buf;
+    uint8_t *output_buf;
     ulong output_at;
 
     unsigned int bks, bksFrames, decodeBytes;

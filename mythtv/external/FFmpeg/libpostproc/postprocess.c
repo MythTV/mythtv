@@ -80,9 +80,9 @@ try to unroll inner for(x=0 ... loop to avoid these damn if(x ... checks
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-//#undef HAVE_MMX2
-//#define HAVE_AMD3DNOW
-//#undef HAVE_MMX
+//#undef HAVE_MMXEXT_INLINE
+//#define HAVE_AMD3DNOW_INLINE
+//#undef HAVE_MMX_INLINE
 //#undef ARCH_X86
 //#define DEBUG_BRIGHTNESS
 #include "postprocess.h"
@@ -118,7 +118,7 @@ const char *postproc_license(void)
 #define TEMP_STRIDE 8
 //#define NUM_BLOCKS_AT_ONCE 16 //not used yet
 
-#if ARCH_X86
+#if ARCH_X86 && HAVE_INLINE_ASM
 DECLARE_ASM_CONST(8, uint64_t, w05)= 0x0005000500050005LL;
 DECLARE_ASM_CONST(8, uint64_t, w04)= 0x0004000400040004LL;
 DECLARE_ASM_CONST(8, uint64_t, w20)= 0x0020002000200020LL;
@@ -167,7 +167,7 @@ static const char *replaceTable[]=
 };
 
 
-#if ARCH_X86
+#if ARCH_X86 && HAVE_INLINE_ASM
 static inline void prefetchnta(void *p)
 {
     __asm__ volatile(   "prefetchnta (%0)\n\t"
@@ -546,27 +546,27 @@ static av_always_inline void do_a_deblock_C(uint8_t *src, int step, int stride, 
 #define COMPILE_ALTIVEC
 #endif //HAVE_ALTIVEC
 
-#if ARCH_X86
+#if ARCH_X86 && HAVE_INLINE_ASM
 
-#if (HAVE_MMX && !HAVE_AMD3DNOW && !HAVE_MMX2) || CONFIG_RUNTIME_CPUDETECT
+#if (HAVE_MMX_INLINE && !HAVE_AMD3DNOW_INLINE && !HAVE_MMXEXT_INLINE) || CONFIG_RUNTIME_CPUDETECT
 #define COMPILE_MMX
 #endif
 
-#if HAVE_MMX2 || CONFIG_RUNTIME_CPUDETECT
+#if HAVE_MMXEXT_INLINE || CONFIG_RUNTIME_CPUDETECT
 #define COMPILE_MMX2
 #endif
 
-#if (HAVE_AMD3DNOW && !HAVE_MMX2) || CONFIG_RUNTIME_CPUDETECT
+#if (HAVE_AMD3DNOW_INLINE && !HAVE_MMXEXT_INLINE) || CONFIG_RUNTIME_CPUDETECT
 #define COMPILE_3DNOW
 #endif
 #endif /* ARCH_X86 */
 
-#undef HAVE_MMX
-#define HAVE_MMX 0
-#undef HAVE_MMX2
-#define HAVE_MMX2 0
-#undef HAVE_AMD3DNOW
-#define HAVE_AMD3DNOW 0
+#undef HAVE_MMX_INLINE
+#define HAVE_MMX_INLINE 0
+#undef HAVE_MMXEXT_INLINE
+#define HAVE_MMXEXT_INLINE 0
+#undef HAVE_AMD3DNOW_INLINE
+#define HAVE_AMD3DNOW_INLINE 0
 #undef HAVE_ALTIVEC
 #define HAVE_ALTIVEC 0
 
@@ -587,8 +587,8 @@ static av_always_inline void do_a_deblock_C(uint8_t *src, int step, int stride, 
 //MMX versions
 #ifdef COMPILE_MMX
 #undef RENAME
-#undef HAVE_MMX
-#define HAVE_MMX 1
+#undef HAVE_MMX_INLINE
+#define HAVE_MMX_INLINE 1
 #define RENAME(a) a ## _MMX
 #include "postprocess_template.c"
 #endif
@@ -596,10 +596,10 @@ static av_always_inline void do_a_deblock_C(uint8_t *src, int step, int stride, 
 //MMX2 versions
 #ifdef COMPILE_MMX2
 #undef RENAME
-#undef HAVE_MMX
-#undef HAVE_MMX2
-#define HAVE_MMX 1
-#define HAVE_MMX2 1
+#undef HAVE_MMX_INLINE
+#undef HAVE_MMXEXT_INLINE
+#define HAVE_MMX_INLINE 1
+#define HAVE_MMXEXT_INLINE 1
 #define RENAME(a) a ## _MMX2
 #include "postprocess_template.c"
 #endif
@@ -607,12 +607,12 @@ static av_always_inline void do_a_deblock_C(uint8_t *src, int step, int stride, 
 //3DNOW versions
 #ifdef COMPILE_3DNOW
 #undef RENAME
-#undef HAVE_MMX
-#undef HAVE_MMX2
-#undef HAVE_AMD3DNOW
-#define HAVE_MMX 1
-#define HAVE_MMX2 0
-#define HAVE_AMD3DNOW 1
+#undef HAVE_MMX_INLINE
+#undef HAVE_MMXEXT_INLINE
+#undef HAVE_AMD3DNOW_INLINE
+#define HAVE_MMX_INLINE 1
+#define HAVE_MMXEXT_INLINE 0
+#define HAVE_AMD3DNOW_INLINE 1
 #define RENAME(a) a ## _3DNow
 #include "postprocess_template.c"
 #endif
@@ -626,14 +626,16 @@ static inline void postProcess(const uint8_t src[], int srcStride, uint8_t dst[]
     PPMode *ppMode= (PPMode *)vm;
     c->ppMode= *ppMode; //FIXME
 
-    if(ppMode->lumMode & BITEXACT)
-        return postProcess_C(src, srcStride, dst, dstStride, width, height, QPs, QPStride, isColor, c);
+    if(ppMode->lumMode & BITEXACT) {
+        postProcess_C(src, srcStride, dst, dstStride, width, height, QPs, QPStride, isColor, c);
+        return;
+    }
 
     // Using ifs here as they are faster than function pointers although the
     // difference would not be measurable here but it is much better because
     // someone might exchange the CPU whithout restarting MPlayer ;)
 #if CONFIG_RUNTIME_CPUDETECT
-#if ARCH_X86
+#if ARCH_X86 && HAVE_INLINE_ASM
     // ordered per speed fastest first
     if(c->cpuCaps & PP_CPU_CAPS_MMX2)
         postProcess_MMX2(src, srcStride, dst, dstStride, width, height, QPs, QPStride, isColor, c);
@@ -652,11 +654,11 @@ static inline void postProcess(const uint8_t src[], int srcStride, uint8_t dst[]
             postProcess_C(src, srcStride, dst, dstStride, width, height, QPs, QPStride, isColor, c);
 #endif
 #else /* CONFIG_RUNTIME_CPUDETECT */
-#if   HAVE_MMX2
+#if   HAVE_MMXEXT_INLINE
             postProcess_MMX2(src, srcStride, dst, dstStride, width, height, QPs, QPStride, isColor, c);
-#elif HAVE_AMD3DNOW
+#elif HAVE_AMD3DNOW_INLINE
             postProcess_3DNow(src, srcStride, dst, dstStride, width, height, QPs, QPStride, isColor, c);
-#elif HAVE_MMX
+#elif HAVE_MMX_INLINE
             postProcess_MMX(src, srcStride, dst, dstStride, width, height, QPs, QPStride, isColor, c);
 #elif HAVE_ALTIVEC
             postProcess_altivec(src, srcStride, dst, dstStride, width, height, QPs, QPStride, isColor, c);
@@ -727,6 +729,11 @@ pp_mode *pp_get_mode_by_name_and_quality(const char *name, int quality)
     static const char optionDelimiters[] = ":";
     struct PPMode *ppMode;
     char *filterToken;
+
+    if (!name)  {
+        av_log(NULL, AV_LOG_ERROR, "pp: Missing argument\n");
+        return NULL;
+    }
 
     if (!strcmp(name, "help")) {
         const char *p;

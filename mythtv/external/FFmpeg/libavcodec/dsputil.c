@@ -36,13 +36,13 @@
 #include "mathops.h"
 #include "mpegvideo.h"
 #include "config.h"
-#include "ac3dec.h"
 #include "vorbis.h"
 #include "diracdsp.h"
 
 uint8_t ff_cropTbl[256 + 2 * MAX_NEG_CROP] = {0, };
 uint32_t ff_squareTbl[512] = {0, };
 
+#define pixeltmp int16_t
 #define BIT_DEPTH 9
 #include "dsputil_template.c"
 #undef BIT_DEPTH
@@ -51,8 +51,21 @@ uint32_t ff_squareTbl[512] = {0, };
 #include "dsputil_template.c"
 #undef BIT_DEPTH
 
+#undef pixeltmp
+#define pixeltmp int32_t
+#define BIT_DEPTH 12
+#include "dsputil_template.c"
+#undef BIT_DEPTH
+
+#define BIT_DEPTH 14
+#include "dsputil_template.c"
+#undef BIT_DEPTH
+
+#undef pixeltmp
+#define pixeltmp int16_t
 #define BIT_DEPTH 8
 #include "dsputil_template.c"
+#undef pixeltmp
 
 // 0x7f7f7f7f or 0x7f7f7f7f7f7f7f7f or whatever, depending on the cpu's native arithmetic size
 #define pb_7f (~0UL/255 * 0x7f)
@@ -339,7 +352,7 @@ static int sse16_c(void *v, uint8_t *pix1, uint8_t *pix2, int line_size, int h)
     return s;
 }
 
-static void diff_pixels_c(DCTELEM *restrict block, const uint8_t *s1,
+static void diff_pixels_c(DCTELEM *av_restrict block, const uint8_t *s1,
                           const uint8_t *s2, int stride){
     int i;
 
@@ -360,8 +373,8 @@ static void diff_pixels_c(DCTELEM *restrict block, const uint8_t *s1,
 }
 
 
-void ff_put_pixels_clamped_c(const DCTELEM *block, uint8_t *restrict pixels,
-                             int line_size)
+static void put_pixels_clamped_c(const DCTELEM *block, uint8_t *av_restrict pixels,
+                                 int line_size)
 {
     int i;
 
@@ -381,7 +394,7 @@ void ff_put_pixels_clamped_c(const DCTELEM *block, uint8_t *restrict pixels,
     }
 }
 
-static void put_pixels_clamped4_c(const DCTELEM *block, uint8_t *restrict pixels,
+static void put_pixels_clamped4_c(const DCTELEM *block, uint8_t *av_restrict pixels,
                                  int line_size)
 {
     int i;
@@ -398,7 +411,7 @@ static void put_pixels_clamped4_c(const DCTELEM *block, uint8_t *restrict pixels
     }
 }
 
-static void put_pixels_clamped2_c(const DCTELEM *block, uint8_t *restrict pixels,
+static void put_pixels_clamped2_c(const DCTELEM *block, uint8_t *av_restrict pixels,
                                  int line_size)
 {
     int i;
@@ -413,9 +426,9 @@ static void put_pixels_clamped2_c(const DCTELEM *block, uint8_t *restrict pixels
     }
 }
 
-void ff_put_signed_pixels_clamped_c(const DCTELEM *block,
-                                    uint8_t *restrict pixels,
-                                    int line_size)
+static void put_signed_pixels_clamped_c(const DCTELEM *block,
+                                        uint8_t *av_restrict pixels,
+                                        int line_size)
 {
     int i, j;
 
@@ -434,8 +447,8 @@ void ff_put_signed_pixels_clamped_c(const DCTELEM *block,
     }
 }
 
-void ff_add_pixels_clamped_c(const DCTELEM *block, uint8_t *restrict pixels,
-                             int line_size)
+static void add_pixels_clamped_c(const DCTELEM *block, uint8_t *av_restrict pixels,
+                                 int line_size)
 {
     int i;
 
@@ -454,7 +467,7 @@ void ff_add_pixels_clamped_c(const DCTELEM *block, uint8_t *restrict pixels,
     }
 }
 
-static void add_pixels_clamped4_c(const DCTELEM *block, uint8_t *restrict pixels,
+static void add_pixels_clamped4_c(const DCTELEM *block, uint8_t *av_restrict pixels,
                           int line_size)
 {
     int i;
@@ -470,7 +483,7 @@ static void add_pixels_clamped4_c(const DCTELEM *block, uint8_t *restrict pixels
     }
 }
 
-static void add_pixels_clamped2_c(const DCTELEM *block, uint8_t *restrict pixels,
+static void add_pixels_clamped2_c(const DCTELEM *block, uint8_t *av_restrict pixels,
                           int line_size)
 {
     int i;
@@ -2058,7 +2071,7 @@ static int hadamard8_diff8x8_c(/*MpegEncContext*/ void *s, uint8_t *dst, uint8_t
     int temp[64];
     int sum=0;
 
-    assert(h==8);
+    av_assert2(h==8);
 
     for(i=0; i<8; i++){
         //FIXME try pointer walks
@@ -2103,7 +2116,7 @@ static int hadamard8_intra8x8_c(/*MpegEncContext*/ void *s, uint8_t *src, uint8_
     int temp[64];
     int sum=0;
 
-    assert(h==8);
+    av_assert2(h==8);
 
     for(i=0; i<8; i++){
         //FIXME try pointer walks
@@ -2150,7 +2163,7 @@ static int dct_sad8x8_c(/*MpegEncContext*/ void *c, uint8_t *src1, uint8_t *src2
     MpegEncContext * const s= (MpegEncContext *)c;
     LOCAL_ALIGNED_16(DCTELEM, temp, [64]);
 
-    assert(h==8);
+    av_assert2(h==8);
 
     s->dsp.diff_pixels(temp, src1, src2, stride);
     s->dsp.fdct(temp);
@@ -2215,7 +2228,7 @@ static int dct_max8x8_c(/*MpegEncContext*/ void *c, uint8_t *src1, uint8_t *src2
     LOCAL_ALIGNED_16(DCTELEM, temp, [64]);
     int sum=0, i;
 
-    assert(h==8);
+    av_assert2(h==8);
 
     s->dsp.diff_pixels(temp, src1, src2, stride);
     s->dsp.fdct(temp);
@@ -2232,7 +2245,7 @@ static int quant_psnr8x8_c(/*MpegEncContext*/ void *c, uint8_t *src1, uint8_t *s
     DCTELEM * const bak = temp+64;
     int sum=0, i;
 
-    assert(h==8);
+    av_assert2(h==8);
     s->mb_intra=0;
 
     s->dsp.diff_pixels(temp, src1, src2, stride);
@@ -2260,7 +2273,7 @@ static int rd8x8_c(/*MpegEncContext*/ void *c, uint8_t *src1, uint8_t *src2, int
     uint8_t * length;
     uint8_t * last_length;
 
-    assert(h==8);
+    av_assert2(h==8);
 
     copy_block8(lsrc1, src1, 8, stride, 8);
     copy_block8(lsrc2, src2, 8, stride, 8);
@@ -2334,7 +2347,7 @@ static int bit8x8_c(/*MpegEncContext*/ void *c, uint8_t *src1, uint8_t *src2, in
     uint8_t * length;
     uint8_t * last_length;
 
-    assert(h==8);
+    av_assert2(h==8);
 
     s->dsp.diff_pixels(temp, src1, src2, stride);
 
@@ -2471,12 +2484,6 @@ WRAPPER8_16_SQ(quant_psnr8x8_c, quant_psnr16_c)
 WRAPPER8_16_SQ(rd8x8_c, rd16_c)
 WRAPPER8_16_SQ(bit8x8_c, bit16_c)
 
-static void vector_fmul_c(float *dst, const float *src0, const float *src1, int len){
-    int i;
-    for(i=0; i<len; i++)
-        dst[i] = src0[i] * src1[i];
-}
-
 static void vector_fmul_reverse_c(float *dst, const float *src0, const float *src1, int len){
     int i;
     src1 += len-1;
@@ -2515,15 +2522,7 @@ static void vector_fmul_scalar_c(float *dst, const float *src, float mul,
         dst[i] = src[i] * mul;
 }
 
-static void vector_fmac_scalar_c(float *dst, const float *src, float mul,
-                                 int len)
-{
-    int i;
-    for (i = 0; i < len; i++)
-        dst[i] += src[i] * mul;
-}
-
-static void butterflies_float_c(float *restrict v1, float *restrict v2,
+static void butterflies_float_c(float *av_restrict v1, float *av_restrict v2,
                                 int len)
 {
     int i;
@@ -2546,7 +2545,7 @@ static void butterflies_float_interleave_c(float *dst, const float *src0,
     }
 }
 
-static float scalarproduct_float_c(const float *v1, const float *v2, int len)
+float ff_scalarproduct_float_c(const float *v1, const float *v2, int len)
 {
     float p = 0.0;
     int i;
@@ -2728,22 +2727,22 @@ void ff_wmv2_idct_c(short * block){
 static void ff_wmv2_idct_put_c(uint8_t *dest, int line_size, DCTELEM *block)
 {
     ff_wmv2_idct_c(block);
-    ff_put_pixels_clamped_c(block, dest, line_size);
+    put_pixels_clamped_c(block, dest, line_size);
 }
 static void ff_wmv2_idct_add_c(uint8_t *dest, int line_size, DCTELEM *block)
 {
     ff_wmv2_idct_c(block);
-    ff_add_pixels_clamped_c(block, dest, line_size);
+    add_pixels_clamped_c(block, dest, line_size);
 }
 static void ff_jref_idct_put(uint8_t *dest, int line_size, DCTELEM *block)
 {
     ff_j_rev_dct (block);
-    ff_put_pixels_clamped_c(block, dest, line_size);
+    put_pixels_clamped_c(block, dest, line_size);
 }
 static void ff_jref_idct_add(uint8_t *dest, int line_size, DCTELEM *block)
 {
     ff_j_rev_dct (block);
-    ff_add_pixels_clamped_c(block, dest, line_size);
+    add_pixels_clamped_c(block, dest, line_size);
 }
 
 static void ff_jref_idct4_put(uint8_t *dest, int line_size, DCTELEM *block)
@@ -2870,12 +2869,6 @@ av_cold void ff_dsputil_init(DSPContext* c, AVCodecContext *avctx)
             c->idct_add= ff_jref_idct_add;
             c->idct    = ff_j_rev_dct;
             c->idct_permutation_type= FF_LIBMPEG2_IDCT_PERM;
-        }else if((CONFIG_VP3_DECODER || CONFIG_VP5_DECODER || CONFIG_VP6_DECODER ) &&
-                avctx->idct_algo==FF_IDCT_VP3){
-            c->idct_put= ff_vp3_idct_put_c;
-            c->idct_add= ff_vp3_idct_add_c;
-            c->idct    = ff_vp3_idct_c;
-            c->idct_permutation_type= FF_NO_IDCT_PERM;
         }else if(avctx->idct_algo==FF_IDCT_WMV2){
             c->idct_put= ff_wmv2_idct_put_c;
             c->idct_add= ff_wmv2_idct_add_c;
@@ -2885,9 +2878,6 @@ av_cold void ff_dsputil_init(DSPContext* c, AVCodecContext *avctx)
             c->idct_put= ff_faanidct_put;
             c->idct_add= ff_faanidct_add;
             c->idct    = ff_faanidct;
-            c->idct_permutation_type= FF_NO_IDCT_PERM;
-        }else if(CONFIG_EATGQ_DECODER && avctx->idct_algo==FF_IDCT_EA) {
-            c->idct_put= ff_ea_idct_put_c;
             c->idct_permutation_type= FF_NO_IDCT_PERM;
         }else{ //accurate/default
             c->idct_put = ff_simple_idct_put_8;
@@ -2899,9 +2889,9 @@ av_cold void ff_dsputil_init(DSPContext* c, AVCodecContext *avctx)
     }
 
     c->diff_pixels = diff_pixels_c;
-    c->put_pixels_clamped = ff_put_pixels_clamped_c;
-    c->put_signed_pixels_clamped = ff_put_signed_pixels_clamped_c;
-    c->add_pixels_clamped = ff_add_pixels_clamped_c;
+    c->put_pixels_clamped = put_pixels_clamped_c;
+    c->put_signed_pixels_clamped = put_signed_pixels_clamped_c;
+    c->add_pixels_clamped = add_pixels_clamped_c;
     c->sum_abs_dctelem = sum_abs_dctelem_c;
     c->gmc1 = gmc1_c;
     c->gmc = ff_gmc_c;
@@ -2976,9 +2966,6 @@ av_cold void ff_dsputil_init(DSPContext* c, AVCodecContext *avctx)
 #if CONFIG_MLP_DECODER || CONFIG_TRUEHD_DECODER
     ff_mlp_init(c, avctx);
 #endif
-#if CONFIG_WMV2_DECODER || CONFIG_VC1_DECODER
-    ff_intrax8dsp_init(c,avctx);
-#endif
 
     c->put_mspel_pixels_tab[0]= ff_put_pixels8x8_c;
     c->put_mspel_pixels_tab[1]= put_mspel8_mc10_c;
@@ -3037,12 +3024,6 @@ av_cold void ff_dsputil_init(DSPContext* c, AVCodecContext *avctx)
         c->h263_v_loop_filter= h263_v_loop_filter_c;
     }
 
-    if (CONFIG_VP3_DECODER) {
-        c->vp3_h_loop_filter= ff_vp3_h_loop_filter_c;
-        c->vp3_v_loop_filter= ff_vp3_v_loop_filter_c;
-        c->vp3_idct_dc_add= ff_vp3_idct_dc_add_c;
-    }
-
     c->h261_loop_filter= h261_loop_filter_c;
 
     c->try_8x8basis= try_8x8basis_c;
@@ -3051,10 +3032,6 @@ av_cold void ff_dsputil_init(DSPContext* c, AVCodecContext *avctx)
 #if CONFIG_VORBIS_DECODER
     c->vorbis_inverse_coupling = ff_vorbis_inverse_coupling;
 #endif
-#if CONFIG_AC3_DECODER
-    c->ac3_downmix = ff_ac3_downmix_c;
-#endif
-    c->vector_fmul = vector_fmul_c;
     c->vector_fmul_reverse = vector_fmul_reverse_c;
     c->vector_fmul_add = vector_fmul_add_c;
     c->vector_fmul_window = vector_fmul_window_c;
@@ -3063,11 +3040,10 @@ av_cold void ff_dsputil_init(DSPContext* c, AVCodecContext *avctx)
     c->scalarproduct_and_madd_int16 = scalarproduct_and_madd_int16_c;
     c->apply_window_int16 = apply_window_int16_c;
     c->vector_clip_int32 = vector_clip_int32_c;
-    c->scalarproduct_float = scalarproduct_float_c;
+    c->scalarproduct_float = ff_scalarproduct_float_c;
     c->butterflies_float = butterflies_float_c;
     c->butterflies_float_interleave = butterflies_float_interleave_c;
     c->vector_fmul_scalar = vector_fmul_scalar_c;
-    c->vector_fmac_scalar = vector_fmac_scalar_c;
 
     c->shrink[0]= av_image_copy_plane;
     c->shrink[1]= ff_shrink22;
@@ -3163,8 +3139,24 @@ av_cold void ff_dsputil_init(DSPContext* c, AVCodecContext *avctx)
             BIT_DEPTH_FUNCS(10, _16);
         }
         break;
+    case 12:
+        if (c->dct_bits == 32) {
+            BIT_DEPTH_FUNCS(12, _32);
+        } else {
+            BIT_DEPTH_FUNCS(12, _16);
+        }
+        break;
+    case 14:
+        if (c->dct_bits == 32) {
+            BIT_DEPTH_FUNCS(14, _32);
+        } else {
+            BIT_DEPTH_FUNCS(14, _16);
+        }
+        break;
     default:
-        BIT_DEPTH_FUNCS(8, _16);
+        if(avctx->bits_per_raw_sample<=8 || avctx->codec_type != AVMEDIA_TYPE_VIDEO) {
+            BIT_DEPTH_FUNCS(8, _16);
+        }
         break;
     }
 
@@ -3177,6 +3169,7 @@ av_cold void ff_dsputil_init(DSPContext* c, AVCodecContext *avctx)
     if (HAVE_MMI)        ff_dsputil_init_mmi   (c, avctx);
     if (ARCH_SH4)        ff_dsputil_init_sh4   (c, avctx);
     if (ARCH_BFIN)       ff_dsputil_init_bfin  (c, avctx);
+    if (HAVE_MIPSFPU)    ff_dsputil_init_mips  (c, avctx);
 
     for (i = 0; i < 4; i++) {
         for (j = 0; j < 16; j++) {

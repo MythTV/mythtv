@@ -27,19 +27,20 @@
 #include "libavutil/opt.h"
 #include "libavutil/parseutils.h"
 #include "libavutil/pixdesc.h"
+#include "libavutil/avassert.h"
 
 /* raw input */
 int ff_raw_read_header(AVFormatContext *s)
 {
     AVStream *st;
-    enum CodecID id;
+    enum AVCodecID id;
 
     st = avformat_new_stream(s, NULL);
     if (!st)
         return AVERROR(ENOMEM);
 
         id = s->iformat->raw_codec_id;
-        if (id == CODEC_ID_RAWVIDEO) {
+        if (id == AV_CODEC_ID_RAWVIDEO) {
             st->codec->codec_type = AVMEDIA_TYPE_VIDEO;
         } else {
             st->codec->codec_type = AVMEDIA_TYPE_AUDIO;
@@ -52,7 +53,7 @@ int ff_raw_read_header(AVFormatContext *s)
 
             st->codec->channels = 1;
 
-            if (id == CODEC_ID_ADPCM_G722)
+            if (id == AV_CODEC_ID_ADPCM_G722)
                 st->codec->sample_rate = 16000;
 
             if (s1 && s1->sample_rate)
@@ -67,7 +68,7 @@ int ff_raw_read_header(AVFormatContext *s)
                 st->codec->channels    = s1->channels;
 
             st->codec->bits_per_coded_sample = av_get_bits_per_sample(st->codec->codec_id);
-            assert(st->codec->bits_per_coded_sample > 0);
+            av_assert0(st->codec->bits_per_coded_sample > 0);
             st->codec->block_align = st->codec->bits_per_coded_sample*st->codec->channels/8;
             avpriv_set_pts_info(st, 64, 1, st->codec->sample_rate);
             break;
@@ -133,7 +134,7 @@ int ff_raw_audio_read_header(AVFormatContext *s)
         return AVERROR(ENOMEM);
     st->codec->codec_type = AVMEDIA_TYPE_AUDIO;
     st->codec->codec_id = s->iformat->raw_codec_id;
-    st->need_parsing = AVSTREAM_PARSE_FULL;
+    st->need_parsing = AVSTREAM_PARSE_FULL_RAW;
     st->start_time = 0;
     /* the parameters will be extracted from the compressed bitstream */
 
@@ -164,7 +165,7 @@ int ff_raw_video_read_header(AVFormatContext *s)
         goto fail;
     }
 
-    st->codec->time_base = (AVRational){framerate.den, framerate.num};
+    st->codec->time_base = av_inv_q(framerate);
     avpriv_set_pts_info(st, 64, 1, 1200000);
 
 fail:
@@ -188,7 +189,7 @@ AVInputFormat ff_g722_demuxer = {
     .read_packet    = ff_raw_read_partial_packet,
     .flags          = AVFMT_GENERIC_INDEX,
     .extensions     = "g722,722",
-    .raw_codec_id   = CODEC_ID_ADPCM_G722,
+    .raw_codec_id   = AV_CODEC_ID_ADPCM_G722,
 };
 #endif
 
@@ -200,12 +201,12 @@ AVInputFormat ff_latm_demuxer = {
     .read_packet    = ff_raw_read_partial_packet,
     .flags          = AVFMT_GENERIC_INDEX,
     .extensions     = "latm",
-    .raw_codec_id   = CODEC_ID_AAC_LATM,
+    .raw_codec_id   = AV_CODEC_ID_AAC_LATM,
 };
 #endif
 
 #if CONFIG_MJPEG_DEMUXER
-FF_DEF_RAWVIDEO_DEMUXER(mjpeg, "raw MJPEG video", NULL, "mjpg,mjpeg,mpo", CODEC_ID_MJPEG)
+FF_DEF_RAWVIDEO_DEMUXER(mjpeg, "raw MJPEG video", NULL, "mjpg,mjpeg,mpo", AV_CODEC_ID_MJPEG)
 #endif
 
 #if CONFIG_MLP_DEMUXER
@@ -216,7 +217,7 @@ AVInputFormat ff_mlp_demuxer = {
     .read_packet    = ff_raw_read_partial_packet,
     .flags          = AVFMT_GENERIC_INDEX,
     .extensions     = "mlp",
-    .raw_codec_id   = CODEC_ID_MLP,
+    .raw_codec_id   = AV_CODEC_ID_MLP,
 };
 #endif
 
@@ -228,7 +229,7 @@ AVInputFormat ff_truehd_demuxer = {
     .read_packet    = ff_raw_read_partial_packet,
     .flags          = AVFMT_GENERIC_INDEX,
     .extensions     = "thd",
-    .raw_codec_id   = CODEC_ID_TRUEHD,
+    .raw_codec_id   = AV_CODEC_ID_TRUEHD,
 };
 #endif
 
@@ -240,10 +241,10 @@ AVInputFormat ff_shorten_demuxer = {
     .read_packet    = ff_raw_read_partial_packet,
     .flags          = AVFMT_NOBINSEARCH | AVFMT_NOGENSEARCH | AVFMT_NO_BYTE_SEEK,
     .extensions     = "shn",
-    .raw_codec_id   = CODEC_ID_SHORTEN,
+    .raw_codec_id   = AV_CODEC_ID_SHORTEN,
 };
 #endif
 
 #if CONFIG_VC1_DEMUXER
-FF_DEF_RAWVIDEO_DEMUXER(vc1, "raw VC-1", NULL, "vc1", CODEC_ID_VC1)
+FF_DEF_RAWVIDEO_DEMUXER(vc1, "raw VC-1", NULL, "vc1", AV_CODEC_ID_VC1)
 #endif

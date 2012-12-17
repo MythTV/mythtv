@@ -28,6 +28,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "libavutil/common.h"
 #include "libavutil/intreadwrite.h"
 #include "avcodec.h"
 
@@ -513,7 +514,7 @@ static av_cold int decode_end(AVCodecContext *avctx)
 AVCodec ff_vmnc_decoder = {
     .name           = "vmnc",
     .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = CODEC_ID_VMNC,
+    .id             = AV_CODEC_ID_VMNC,
     .priv_data_size = sizeof(VmncContext),
     .init           = decode_init,
     .close          = decode_end,

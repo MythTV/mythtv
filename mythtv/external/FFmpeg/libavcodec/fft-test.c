@@ -27,14 +27,16 @@
 #include "libavutil/mathematics.h"
 #include "libavutil/lfg.h"
 #include "libavutil/log.h"
+#include "libavutil/time.h"
 #include "fft.h"
 #if CONFIG_FFT_FLOAT
 #include "dct.h"
 #include "rdft.h"
 #endif
 #include <math.h>
+#if HAVE_UNISTD_H
 #include <unistd.h>
-#include <sys/time.h>
+#endif
 #include <stdlib.h>
 #include <string.h>
 
@@ -186,13 +188,6 @@ static FFTSample frandom(AVLFG *prng)
     return (int16_t)av_lfg_get(prng) / 32768.0 * RANGE;
 }
 
-static int64_t gettime(void)
-{
-    struct timeval tv;
-    gettimeofday(&tv,NULL);
-    return (int64_t)tv.tv_sec * 1000000 + tv.tv_usec;
-}
-
 static int check_diff(FFTSample *tab1, FFTSample *tab2, int n, double scale)
 {
     int i;
@@ -235,6 +230,10 @@ enum tf_transform {
     TRANSFORM_RDFT,
     TRANSFORM_DCT,
 };
+
+#if !HAVE_GETOPT
+#include "compat/getopt.c"
+#endif
 
 int main(int argc, char **argv)
 {
@@ -289,10 +288,12 @@ int main(int argc, char **argv)
             scale = atof(optarg);
             break;
         case 'c':
-            cpuflags = av_parse_cpu_flags(optarg);
-            if (cpuflags < 0)
+            cpuflags = av_get_cpu_flags();
+
+            if (av_parse_cpu_caps(&cpuflags, optarg) < 0)
                 return 1;
-            av_set_cpu_flags_mask(cpuflags);
+
+            av_force_cpu_flags(cpuflags);
             break;
         }
     }
@@ -430,7 +431,7 @@ int main(int argc, char **argv)
         /* we measure during about 1 seconds */
         nb_its = 1;
         for(;;) {
-            time_start = gettime();
+            time_start = av_gettime();
             for (it = 0; it < nb_its; it++) {
                 switch (transform) {
                 case TRANSFORM_MDCT:
@@ -456,7 +457,7 @@ int main(int argc, char **argv)
 #endif
                 }
             }
-            duration = gettime() - time_start;
+            duration = av_gettime() - time_start;
             if (duration >= 1000000)
                 break;
             nb_its *= 2;

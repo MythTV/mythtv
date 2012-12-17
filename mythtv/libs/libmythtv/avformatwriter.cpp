@@ -124,7 +124,7 @@ bool AVFormatWriter::Init(void)
         m_fmt.video_codec = m_avVideoCodec->id;
     }
     else
-        m_fmt.video_codec = CODEC_ID_NONE;
+        m_fmt.video_codec = AV_CODEC_ID_NONE;
 
     m_avAudioCodec = avcodec_find_encoder_by_name(
         m_audioCodec.toAscii().constData());
@@ -153,9 +153,9 @@ bool AVFormatWriter::Init(void)
     snprintf(m_ctx->filename, sizeof(m_ctx->filename), "%s",
              m_filename.toAscii().constData());
 
-    if (m_fmt.video_codec != CODEC_ID_NONE)
+    if (m_fmt.video_codec != AV_CODEC_ID_NONE)
         m_videoStream = AddVideoStream();
-    if (m_fmt.audio_codec != CODEC_ID_NONE)
+    if (m_fmt.audio_codec != AV_CODEC_ID_NONE)
         m_audioStream = AddAudioStream();
 
     m_pkt = new AVPacket;
@@ -489,14 +489,14 @@ AVStream* AVFormatWriter::AddVideoStream(void)
     c->thread_count               = m_encodingThreadCount;
     c->thread_type                = FF_THREAD_SLICE;
 
-    if (c->codec_id == CODEC_ID_MPEG2VIDEO) {
+    if (c->codec_id == AV_CODEC_ID_MPEG2VIDEO) {
         c->max_b_frames          = 2;
     }
-    else if (c->codec_id == CODEC_ID_MPEG1VIDEO)
+    else if (c->codec_id == AV_CODEC_ID_MPEG1VIDEO)
     {
         c->mb_decision           = 2;
     }
-    else if (c->codec_id == CODEC_ID_H264)
+    else if (c->codec_id == AV_CODEC_ID_H264)
     {
 
         if ((c->width > 480) ||

@@ -4,6 +4,7 @@
 #include "metadata.h"
 
 // libmyth
+#include <mythconfig.h>
 #include <mythcontext.h>
 
 extern "C" {

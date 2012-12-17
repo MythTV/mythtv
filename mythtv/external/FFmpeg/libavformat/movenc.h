@@ -39,6 +39,7 @@
 #define MODE_3G2  0x10
 #define MODE_IPOD 0x20
 #define MODE_ISM  0x40
+#define MODE_F4V  0x80
 
 typedef struct MOVIentry {
     uint64_t     pos;
@@ -80,6 +81,7 @@ typedef struct MOVIndex {
     unsigned    timescale;
     uint64_t    time;
     int64_t     track_duration;
+    int         last_sample_is_subtitle_end;
     long        sample_count;
     long        sample_size;
     long        chunkCount;
@@ -87,6 +89,10 @@ typedef struct MOVIndex {
 #define MOV_TRACK_CTTS         0x0001
 #define MOV_TRACK_STPS         0x0002
     uint32_t    flags;
+#define MOV_TIMECODE_FLAG_DROPFRAME     0x0001
+#define MOV_TIMECODE_FLAG_24HOURSMAX    0x0002
+#define MOV_TIMECODE_FLAG_ALLOWNEGATIVE 0x0004
+    uint32_t    timecode_flags;
     int         language;
     int         track_id;
     int         tag; ///< stsd fourcc
@@ -102,7 +108,7 @@ typedef struct MOVIndex {
     int64_t     start_dts;
 
     int         hint_track;   ///< the track that hints this track, -1 if no hint track is set
-    int         src_track;    ///< the track that this hint track describes
+    int         src_track;    ///< the track that this hint (or tmcd) track describes
     AVFormatContext *rtp_ctx; ///< the format context for the hinting rtp muxer
     uint32_t    prev_rtp_ts;
     int64_t     cur_rtp_ts_unwrapped;
@@ -138,6 +144,7 @@ typedef struct MOVMuxContext {
     int     mode;
     int64_t time;
     int     nb_streams;
+    int     nb_meta_tmcd;  ///< number of new created tmcd track based on metadata (aka not data copy)
     int     chapter_track; ///< qt chapter track number
     int64_t mdat_pos;
     uint64_t mdat_size;
@@ -145,7 +152,7 @@ typedef struct MOVMuxContext {
 
     int flags;
     int rtp_flags;
-    int reserved_moov_size;
+    int reserved_moov_size; ///< 0 for disabled, -1 for automatic, size otherwise
     int64_t reserved_moov_pos;
 
     int iods_skip;
@@ -167,6 +174,7 @@ typedef struct MOVMuxContext {
 #define FF_MOV_FLAG_SEPARATE_MOOF 16
 #define FF_MOV_FLAG_FRAG_CUSTOM 32
 #define FF_MOV_FLAG_ISML 64
+#define FF_MOV_FLAG_FASTSTART 128
 
 int ff_mov_write_packet(AVFormatContext *s, AVPacket *pkt);
 

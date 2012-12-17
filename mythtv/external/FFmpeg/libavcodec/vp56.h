@@ -30,14 +30,15 @@
 #include "dsputil.h"
 #include "get_bits.h"
 #include "bytestream.h"
+#include "vp3dsp.h"
 #include "vp56dsp.h"
 
 typedef struct vp56_context VP56Context;
 
 typedef struct {
-    int16_t x;
+    DECLARE_ALIGNED(4, int16_t, x);
     int16_t y;
-} DECLARE_ALIGNED(4, , VP56mv);
+} VP56mv;
 
 typedef void (*VP56ParseVectorAdjustment)(VP56Context *s,
                                           VP56mv *vect);
@@ -49,7 +50,7 @@ typedef void (*VP56DefaultModelsInit)(VP56Context *s);
 typedef void (*VP56ParseVectorModels)(VP56Context *s);
 typedef int  (*VP56ParseCoeffModels)(VP56Context *s);
 typedef int  (*VP56ParseHeader)(VP56Context *s, const uint8_t *buf,
-                                int buf_size, int *golden_frame);
+                                int buf_size);
 
 typedef struct {
     int high;
@@ -91,6 +92,7 @@ typedef struct {
 struct vp56_context {
     AVCodecContext *avctx;
     DSPContext dsp;
+    VP3DSPContext vp3dsp;
     VP56DSPContext vp56dsp;
     ScanTable scantable;
     AVFrame frames[4];
@@ -103,6 +105,7 @@ struct vp56_context {
     int sub_version;
 
     /* frame info */
+    int golden_frame;
     int plane_width[4];
     int plane_height[4];
     int mb_width;   /* number of horizontal MB */
@@ -158,8 +161,11 @@ struct vp56_context {
     VP56ParseCoeffModels parse_coeff_models;
     VP56ParseHeader parse_header;
 
+    /* for "slice" parallelism between YUV and A */
+    VP56Context *alpha_context;
+
     VP56Model *modelp;
-    VP56Model models[2];
+    VP56Model model;
 
     /* huffman decoding */
     int use_huffman;
@@ -172,7 +178,10 @@ struct vp56_context {
 
 
 void ff_vp56_init(AVCodecContext *avctx, int flip, int has_alpha);
+void ff_vp56_init_context(AVCodecContext *avctx, VP56Context *s,
+                          int flip, int has_alpha);
 int ff_vp56_free(AVCodecContext *avctx);
+int ff_vp56_free_context(VP56Context *s);
 void ff_vp56_init_dequant(VP56Context *s, int quantizer);
 int ff_vp56_decode_frame(AVCodecContext *avctx, void *data, int *data_size,
                          AVPacket *avpkt);

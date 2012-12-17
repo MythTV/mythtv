@@ -39,6 +39,10 @@
 #include <windows.h>
 #include <process.h>
 
+#include "libavutil/common.h"
+#include "libavutil/internal.h"
+#include "libavutil/mem.h"
+
 typedef struct {
     void *handle;
     void *(*func)(void* arg);

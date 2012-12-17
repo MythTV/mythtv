@@ -24,6 +24,7 @@
  * ASCII/ANSI art decoder
  */
 
+#include "libavutil/common.h"
 #include "libavutil/lfg.h"
 #include "avcodec.h"
 #include "cga_data.h"
@@ -57,6 +58,7 @@ typedef struct {
     int attributes;       /**< attribute flags */
     int fg;               /**< foreground color */
     int bg;               /**< background color */
+    int first_frame;
 
     /* ansi parser state machine */
     enum {
@@ -86,6 +88,21 @@ static av_cold int decode_init(AVCodecContext *avctx)
         avcodec_set_dimensions(avctx, 80<<3, 25<<4);
 
     return 0;
+}
+
+static void set_palette(uint32_t *pal)
+{
+    int r, g, b;
+    memcpy(pal, ff_cga_palette, 16 * 4);
+    pal += 16;
+#define COLOR(x) ((x) * 40 + 55)
+    for (r = 0; r < 6; r++)
+        for (g = 0; g < 6; g++)
+            for (b = 0; b < 6; b++)
+                *pal++ = 0xFF000000 | (COLOR(r) << 16) | (COLOR(g) << 8) | COLOR(b);
+#define GRAY(x) ((x) * 10 + 8)
+    for (g = 0; g < 24; g++)
+        *pal++ = 0xFF000000 | (GRAY(g) << 16) | (GRAY(g) << 8) | GRAY(g);
 }
 
 static void hscroll(AVCodecContext *avctx)
@@ -231,7 +248,7 @@ static int execute_code(AVCodecContext * avctx, int c)
             }
             s->frame.pict_type           = AV_PICTURE_TYPE_I;
             s->frame.palette_has_changed = 1;
-            memcpy(s->frame.data[1], ff_cga_palette, 16 * 4);
+            set_palette((uint32_t *)s->frame.data[1]);
             erase_screen(avctx);
         } else if (c == 'l') {
             erase_screen(avctx);
@@ -279,12 +296,20 @@ static int execute_code(AVCodecContext * avctx, int c)
                 s->bg = DEFAULT_BG_COLOR;
             } else if (m == 1 || m == 2 || m == 4 || m == 5 || m == 7 || m == 8) {
                 s->attributes |= 1 << (m - 1);
-            } else if (m >= 30 && m <= 38) {
+            } else if (m >= 30 && m <= 37) {
                 s->fg = ansi_to_cga[m - 30];
+            } else if (m == 38 && i + 2 < s->nb_args && s->args[i + 1] == 5 && s->args[i + 2] < 256) {
+                int index = s->args[i + 2];
+                s->fg = index < 16 ? ansi_to_cga[index] : index;
+                i += 2;
             } else if (m == 39) {
                 s->fg = ansi_to_cga[DEFAULT_FG_COLOR];
             } else if (m >= 40 && m <= 47) {
                 s->bg = ansi_to_cga[m - 40];
+            } else if (m == 48 && i + 2 < s->nb_args && s->args[i + 1] == 5 && s->args[i + 2] < 256) {
+                int index = s->args[i + 2];
+                s->bg = index < 16 ? ansi_to_cga[index] : index;
+                i += 2;
             } else if (m == 49) {
                 s->fg = ansi_to_cga[DEFAULT_BG_COLOR];
             } else {
@@ -328,7 +353,11 @@ static int decode_frame(AVCodecContext *avctx,
     }
     s->frame.pict_type           = AV_PICTURE_TYPE_I;
     s->frame.palette_has_changed = 1;
-    memcpy(s->frame.data[1], ff_cga_palette, 16 * 4);
+    set_palette((uint32_t *)s->frame.data[1]);
+    if (!s->first_frame) {
+        erase_screen(avctx);
+        s->first_frame = 1;
+    }
 
     while(buf < buf_end) {
         switch(s->state) {
@@ -367,11 +396,10 @@ static int decode_frame(AVCodecContext *avctx,
             if (buf[0] == '[') {
                 s->state   = STATE_CODE;
                 s->nb_args = 0;
-                s->args[0] = 0;
+                s->args[0] = -1;
             } else {
                 s->state = STATE_NORMAL;
                 draw_char(avctx, 0x1B);
-                    return -1;
                 continue;
             }
             break;
@@ -380,7 +408,7 @@ static int decode_frame(AVCodecContext *avctx,
             case '0': case '1': case '2': case '3': case '4':
             case '5': case '6': case '7': case '8': case '9':
                 if (s->nb_args < MAX_NB_ARGS)
-                    s->args[s->nb_args] = s->args[s->nb_args] * 10 + buf[0] - '0';
+                    s->args[s->nb_args] = FFMAX(s->args[s->nb_args], 0) * 10 + buf[0] - '0';
                 break;
             case ';':
                 s->nb_args++;
@@ -396,7 +424,7 @@ static int decode_frame(AVCodecContext *avctx,
             default:
                 if (s->nb_args > MAX_NB_ARGS)
                     av_log(avctx, AV_LOG_WARNING, "args overflow (%i)\n", s->nb_args);
-                if (s->nb_args < MAX_NB_ARGS && s->args[s->nb_args])
+                if (s->nb_args < MAX_NB_ARGS && s->args[s->nb_args] >= 0)
                     s->nb_args++;
                 if (execute_code(avctx, buf[0]) < 0)
                     return -1;
@@ -428,7 +456,7 @@ static av_cold int decode_close(AVCodecContext *avctx)
 AVCodec ff_ansi_decoder = {
     .name           = "ansi",
     .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = CODEC_ID_ANSI,
+    .id             = AV_CODEC_ID_ANSI,
     .priv_data_size = sizeof(AnsiContext),
     .init           = decode_init,
     .close          = decode_close,

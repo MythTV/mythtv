@@ -1313,11 +1313,11 @@ static av_cold int cook_decode_init(AVCodecContext *avctx)
 AVCodec ff_cook_decoder = {
     .name           = "cook",
     .type           = AVMEDIA_TYPE_AUDIO,
-    .id             = CODEC_ID_COOK,
+    .id             = AV_CODEC_ID_COOK,
     .priv_data_size = sizeof(COOKContext),
     .init           = cook_decode_init,
     .close          = cook_decode_close,
     .decode         = cook_decode_frame,
     .capabilities   = CODEC_CAP_DR1,
-    .long_name      = NULL_IF_CONFIG_SMALL("COOK"),
+    .long_name      = NULL_IF_CONFIG_SMALL("Cook / Cooker / Gecko (RealAudio G2)"),
 };

@@ -21,10 +21,10 @@
  */
 
 #include "libavutil/imgutils.h"
+#include "libavutil/avassert.h"
 #include "avcodec.h"
 #include "bytestream.h"
 #include "bmp.h"
-#include <assert.h>
 #include "internal.h"
 
 static const uint32_t monoblack_pal[] = { 0x000000, 0xFFFFFF };
@@ -98,7 +98,7 @@ static int bmp_encode_frame(AVCodecContext *avctx, AVPacket *pkt,
     case PIX_FMT_RGB4_BYTE:
     case PIX_FMT_BGR4_BYTE:
     case PIX_FMT_GRAY8:
-        assert(bit_count == 8);
+        av_assert1(bit_count == 8);
         ff_set_systematic_pal2(palette256, avctx->pix_fmt);
         pal = palette256;
         break;
@@ -168,7 +168,7 @@ static int bmp_encode_frame(AVCodecContext *avctx, AVPacket *pkt,
 AVCodec ff_bmp_encoder = {
     .name           = "bmp",
     .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = CODEC_ID_BMP,
+    .id             = AV_CODEC_ID_BMP,
     .priv_data_size = sizeof(BMPContext),
     .init           = bmp_encode_init,
     .encode2        = bmp_encode_frame,
@@ -179,5 +179,5 @@ AVCodec ff_bmp_encoder = {
         PIX_FMT_MONOBLACK,
         PIX_FMT_NONE
     },
-    .long_name      = NULL_IF_CONFIG_SMALL("BMP image"),
+    .long_name      = NULL_IF_CONFIG_SMALL("BMP (Windows and OS/2 bitmap)"),
 };

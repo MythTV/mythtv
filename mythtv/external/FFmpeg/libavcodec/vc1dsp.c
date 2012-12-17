@@ -26,6 +26,8 @@
  */
 
 #include "vc1dsp.h"
+#include "libavutil/avassert.h"
+#include "libavutil/common.h"
 
 
 /** Apply overlap transform to horizontal edge
@@ -561,7 +563,7 @@ static av_always_inline int vc1_mspel_filter(const uint8_t *src, int stride, int
 /** Function used to do motion compensation with bicubic interpolation
  */
 #define VC1_MSPEL_MC(OP, OPNAME)\
-static void OPNAME ## vc1_mspel_mc(uint8_t *dst, const uint8_t *src, int stride, int hmode, int vmode, int rnd)\
+static av_always_inline void OPNAME ## vc1_mspel_mc(uint8_t *dst, const uint8_t *src, int stride, int hmode, int vmode, int rnd)\
 {\
     int     i, j;\
 \
@@ -658,7 +660,7 @@ static void put_no_rnd_vc1_chroma_mc8_c(uint8_t *dst/*align 8*/, uint8_t *src/*a
     const int D=(  x)*(  y);
     int i;
 
-    assert(x<8 && y<8 && x>=0 && y>=0);
+    av_assert2(x<8 && y<8 && x>=0 && y>=0);
 
     for(i=0; i<h; i++)
     {
@@ -682,7 +684,7 @@ static void put_no_rnd_vc1_chroma_mc4_c(uint8_t *dst, uint8_t *src, int stride, 
     const int D=(  x)*(  y);
     int i;
 
-    assert(x<8 && y<8 && x>=0 && y>=0);
+    av_assert2(x<8 && y<8 && x>=0 && y>=0);
 
     for(i=0; i<h; i++)
     {
@@ -703,7 +705,7 @@ static void avg_no_rnd_vc1_chroma_mc8_c(uint8_t *dst/*align 8*/, uint8_t *src/*a
     const int D=(  x)*(  y);
     int i;
 
-    assert(x<8 && y<8 && x>=0 && y>=0);
+    av_assert2(x<8 && y<8 && x>=0 && y>=0);
 
     for(i=0; i<h; i++)
     {

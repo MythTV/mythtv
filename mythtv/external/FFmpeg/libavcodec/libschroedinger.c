@@ -24,6 +24,7 @@
 */
 
 #include "libschroedinger.h"
+#include "libavutil/mem.h"
 
 static const SchroVideoFormatInfo ff_schro_video_format_info[] = {
     { 640,  480,  24000, 1001},
@@ -189,7 +190,10 @@ SchroFrame *ff_create_schro_frame(AVCodecContext *avccontext,
     uv_height = y_height >> (SCHRO_FRAME_FORMAT_V_SHIFT(schro_frame_fmt));
 
     p_pic = av_mallocz(sizeof(AVPicture));
-    avpicture_alloc(p_pic, avccontext->pix_fmt, y_width, y_height);
+    if (!p_pic || avpicture_alloc(p_pic, avccontext->pix_fmt, y_width, y_height) < 0) {
+        av_free(p_pic);
+        return NULL;
+    }
 
     p_frame         = schro_frame_new();
     p_frame->format = schro_frame_fmt;

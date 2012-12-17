@@ -20,7 +20,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include <string.h>
+
 #include "parser.h"
+#include "libavutil/mem.h"
 
 static AVCodecParser *av_first_parser = NULL;
 
@@ -41,7 +44,7 @@ AVCodecParserContext *av_parser_init(int codec_id)
     AVCodecParser *parser;
     int ret;
 
-    if(codec_id == CODEC_ID_NONE)
+    if(codec_id == AV_CODEC_ID_NONE)
         return NULL;
 
     for(parser = av_first_parser; parser != NULL; parser = parser->next) {
@@ -91,7 +94,7 @@ void ff_fetch_timestamp(AVCodecParserContext *s, int off, int remove){
         if (   s->cur_offset + off >= s->cur_frame_offset[i]
             && (s->frame_offset < s->cur_frame_offset[i] ||
               (!s->frame_offset && !s->next_frame_offset)) // first field/frame
-            //check is disabled  because mpeg-ts doesnt send complete PES packets
+            //check is disabled because mpeg-ts doesn't send complete PES packets
             && /*s->next_frame_offset + off <*/  s->cur_frame_end[i]){
             s->dts= s->cur_frame_dts[i];
             s->pts= s->cur_frame_pts[i];

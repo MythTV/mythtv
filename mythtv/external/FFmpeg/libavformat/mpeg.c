@@ -87,14 +87,15 @@ static int mpegps_probe(AVProbeData *p)
 
 //av_log(NULL, AV_LOG_ERROR, "%d %d %d %d %d %d len:%d\n", sys, priv1, pspack,vid, audio, invalid, p->buf_size);
     if(sys>invalid && sys*9 <= pspack*10)
-        return pspack > 2 ? AVPROBE_SCORE_MAX/2+2 : AVPROBE_SCORE_MAX/4; // +1 for .mpg
+        return (audio > 12 || vid > 3 || pspack > 2) ? AVPROBE_SCORE_MAX/2+2 : AVPROBE_SCORE_MAX/4; // +1 for .mpg
     if(pspack > invalid && (priv1+vid+audio)*10 >= pspack*9)
         return pspack > 2 ? AVPROBE_SCORE_MAX/2+2 : AVPROBE_SCORE_MAX/4; // +1 for .mpg
     if((!!vid ^ !!audio) && (audio > 4 || vid > 1) && !sys && !pspack && p->buf_size>2048 && vid + audio > invalid) /* PES stream */
-        return (audio > 12 || vid > 3) ? AVPROBE_SCORE_MAX/2+2 : AVPROBE_SCORE_MAX/4;
+        return (audio > 12 || vid > 3 + 2*invalid) ? AVPROBE_SCORE_MAX/2+2 : AVPROBE_SCORE_MAX/4;
 
     //02-Penguin.flac has sys:0 priv1:0 pspack:0 vid:0 audio:1
     //mp3_misidentified_2.mp3 has sys:0 priv1:0 pspack:0 vid:0 audio:6
+    //Have\ Yourself\ a\ Merry\ Little\ Christmas.mp3 0 0 0 5 0 1 len:21618
     return score;
 }
 
@@ -166,41 +167,6 @@ static int find_next_start_code(AVIOContext *pb, int *size_ptr,
     *size_ptr = n;
     return val;
 }
-
-#if 0 /* unused, remove? */
-/* XXX: optimize */
-static int find_prev_start_code(AVIOContext *pb, int *size_ptr)
-{
-    int64_t pos, pos_start;
-    int max_size, start_code;
-
-    max_size = *size_ptr;
-    pos_start = avio_tell(pb);
-
-    /* in order to go faster, we fill the buffer */
-    pos = pos_start - 16386;
-    if (pos < 0)
-        pos = 0;
-    avio_seek(pb, pos, SEEK_SET);
-    avio_r8(pb);
-
-    pos = pos_start;
-    for(;;) {
-        pos--;
-        if (pos < 0 || (pos_start - pos) >= max_size) {
-            start_code = -1;
-            goto the_end;
-        }
-        avio_seek(pb, pos, SEEK_SET);
-        start_code = avio_rb32(pb);
-        if ((start_code & 0xffffff00) == 0x100)
-            break;
-    }
- the_end:
-    *size_ptr = pos_start - pos;
-    return start_code;
-}
-#endif
 
 /**
  * Extract stream types from a program stream map
@@ -331,12 +297,6 @@ static int mpegps_read_pes_header(AVFormatContext *s,
         }
     } else if ((c & 0xc0) == 0x80) {
         /* mpeg 2 PES */
-#if 0 /* some streams have this field set for no apparent reason */
-        if ((c & 0x30) != 0) {
-            /* Encrypted multiplex not handled */
-            goto redo;
-        }
-#endif
         flags = avio_r8(s->pb);
         header_len = avio_r8(s->pb);
         len -= 2;
@@ -386,21 +346,9 @@ static int mpegps_read_pes_header(AVFormatContext *s,
     else if( c!= 0xf )
         goto redo;
 
-    if (startcode == PRIVATE_STREAM_1 && !m->psm_es_type[startcode & 0xff]) {
+    if (startcode == PRIVATE_STREAM_1) {
         startcode = avio_r8(s->pb);
         len--;
-        if (startcode >= 0x80 && startcode <= 0xcf) {
-            /* audio: skip header */
-            avio_r8(s->pb);
-            avio_r8(s->pb);
-            avio_r8(s->pb);
-            len -= 3;
-            if (startcode >= 0xb0 && startcode <= 0xbf) {
-                /* MLP/TrueHD audio has a 4-byte header */
-                avio_r8(s->pb);
-                len--;
-            }
-        }
     }
     if(len<0)
         goto error_redo;
@@ -427,21 +375,30 @@ static int mpegps_read_packet(AVFormatContext *s,
     MpegDemuxContext *m = s->priv_data;
     AVStream *st;
     int len, startcode, i, es_type, ret;
+    int lpcm_header_len;
     int request_probe= 0;
-    enum CodecID codec_id = CODEC_ID_NONE;
+    enum AVCodecID codec_id = AV_CODEC_ID_NONE;
     enum AVMediaType type;
     int64_t pts, dts, dummy_pos; //dummy_pos is needed for the index building to work
-    uint8_t av_uninit(dvdaudio_substream_type);
 
  redo:
     len = mpegps_read_pes_header(s, &dummy_pos, &startcode, &pts, &dts);
     if (len < 0)
         return len;
 
-    if(startcode == 0x1bd) {
-        dvdaudio_substream_type = avio_r8(s->pb);
-        avio_skip(s->pb, 3);
-        len -= 4;
+    if (startcode >= 0x80 && startcode <= 0xcf) {
+        if(len < 4)
+            goto skip;
+
+        /* audio: skip header */
+        avio_r8(s->pb);
+        lpcm_header_len = avio_rb16(s->pb);
+        len -= 3;
+        if (startcode >= 0xb0 && startcode <= 0xbf) {
+            /* MLP/TrueHD audio has a 4-byte header */
+            avio_r8(s->pb);
+            len--;
+        }
     }
 
     /* now find stream */
@@ -454,29 +411,29 @@ static int mpegps_read_packet(AVFormatContext *s,
     es_type = m->psm_es_type[startcode & 0xff];
     if(es_type > 0 && es_type != STREAM_TYPE_PRIVATE_DATA){
         if(es_type == STREAM_TYPE_VIDEO_MPEG1){
-            codec_id = CODEC_ID_MPEG2VIDEO;
+            codec_id = AV_CODEC_ID_MPEG2VIDEO;
             type = AVMEDIA_TYPE_VIDEO;
         } else if(es_type == STREAM_TYPE_VIDEO_MPEG2){
-            codec_id = CODEC_ID_MPEG2VIDEO;
+            codec_id = AV_CODEC_ID_MPEG2VIDEO;
             type = AVMEDIA_TYPE_VIDEO;
         } else if(es_type == STREAM_TYPE_AUDIO_MPEG1 ||
                   es_type == STREAM_TYPE_AUDIO_MPEG2){
-            codec_id = CODEC_ID_MP3;
+            codec_id = AV_CODEC_ID_MP3;
             type = AVMEDIA_TYPE_AUDIO;
         } else if(es_type == STREAM_TYPE_AUDIO_AAC){
-            codec_id = CODEC_ID_AAC;
+            codec_id = AV_CODEC_ID_AAC;
             type = AVMEDIA_TYPE_AUDIO;
         } else if(es_type == STREAM_TYPE_AUDIO_AAC_LATM){
-            codec_id = CODEC_ID_AAC_LATM;
+            codec_id = AV_CODEC_ID_AAC_LATM;
             type = AVMEDIA_TYPE_AUDIO;
         } else if(es_type == STREAM_TYPE_VIDEO_MPEG4){
-            codec_id = CODEC_ID_MPEG4;
+            codec_id = AV_CODEC_ID_MPEG4;
             type = AVMEDIA_TYPE_VIDEO;
         } else if(es_type == STREAM_TYPE_VIDEO_H264){
-            codec_id = CODEC_ID_H264;
+            codec_id = AV_CODEC_ID_H264;
             type = AVMEDIA_TYPE_VIDEO;
         } else if(es_type == STREAM_TYPE_AUDIO_AC3){
-            codec_id = CODEC_ID_AC3;
+            codec_id = AV_CODEC_ID_AC3;
             type = AVMEDIA_TYPE_AUDIO;
         } else {
             goto skip;
@@ -487,54 +444,45 @@ static int mpegps_read_packet(AVFormatContext *s,
         avio_read(s->pb, buf, 8);
         avio_seek(s->pb, -8, SEEK_CUR);
         if(!memcmp(buf, avs_seqh, 4) && (buf[6] != 0 || buf[7] != 1))
-            codec_id = CODEC_ID_CAVS;
+            codec_id = AV_CODEC_ID_CAVS;
         else
             request_probe= 1;
         type = AVMEDIA_TYPE_VIDEO;
     } else if (startcode >= 0x1c0 && startcode <= 0x1df) {
         type = AVMEDIA_TYPE_AUDIO;
-        codec_id = m->sofdec > 0 ? CODEC_ID_ADPCM_ADX : CODEC_ID_MP2;
+        codec_id = m->sofdec > 0 ? AV_CODEC_ID_ADPCM_ADX : AV_CODEC_ID_MP2;
     } else if (startcode >= 0x80 && startcode <= 0x87) {
         type = AVMEDIA_TYPE_AUDIO;
-        codec_id = CODEC_ID_AC3;
+        codec_id = AV_CODEC_ID_AC3;
     } else if (  ( startcode >= 0x88 && startcode <= 0x8f)
                ||( startcode >= 0x98 && startcode <= 0x9f)) {
         /* 0x90 - 0x97 is reserved for SDDS in DVD specs */
         type = AVMEDIA_TYPE_AUDIO;
-        codec_id = CODEC_ID_DTS;
+        codec_id = AV_CODEC_ID_DTS;
     } else if (startcode >= 0xa0 && startcode <= 0xaf) {
         type = AVMEDIA_TYPE_AUDIO;
-        /* 16 bit form will be handled as CODEC_ID_PCM_S16BE */
-        codec_id = CODEC_ID_PCM_DVD;
+        if(lpcm_header_len == 6) {
+            codec_id = AV_CODEC_ID_MLP;
+        } else {
+            /* 16 bit form will be handled as AV_CODEC_ID_PCM_S16BE */
+            codec_id = AV_CODEC_ID_PCM_DVD;
+        }
     } else if (startcode >= 0xb0 && startcode <= 0xbf) {
         type = AVMEDIA_TYPE_AUDIO;
-        codec_id = CODEC_ID_TRUEHD;
+        codec_id = AV_CODEC_ID_TRUEHD;
     } else if (startcode >= 0xc0 && startcode <= 0xcf) {
         /* Used for both AC-3 and E-AC-3 in EVOB files */
         type = AVMEDIA_TYPE_AUDIO;
-        codec_id = CODEC_ID_AC3;
+        codec_id = AV_CODEC_ID_AC3;
     } else if (startcode >= 0x20 && startcode <= 0x3f) {
         type = AVMEDIA_TYPE_SUBTITLE;
-        codec_id = CODEC_ID_DVD_SUBTITLE;
+        codec_id = AV_CODEC_ID_DVD_SUBTITLE;
     } else if (startcode == 0x69 || startcode == 0x49) {
         type = AVMEDIA_TYPE_DATA;
-        codec_id = CODEC_ID_MPEG2VBI;
+        codec_id = AV_CODEC_ID_MPEG2VBI;
     } else if (startcode >= 0xfd55 && startcode <= 0xfd5f) {
         type = AVMEDIA_TYPE_VIDEO;
-        codec_id = CODEC_ID_VC1;
-    } else if (startcode == 0x1bd) {
-        // check dvd audio substream type
-        type = AVMEDIA_TYPE_AUDIO;
-        switch(dvdaudio_substream_type & 0xe0) {
-        case 0xa0:  codec_id = CODEC_ID_PCM_DVD;
-                    break;
-        case 0x80:  if((dvdaudio_substream_type & 0xf8) == 0x88)
-                         codec_id = CODEC_ID_DTS;
-                    else codec_id = CODEC_ID_AC3;
-                    break;
-        default:    av_log(s, AV_LOG_ERROR, "Unknown 0x1bd sub-stream\n");
-                    goto skip;
-        }
+        codec_id = AV_CODEC_ID_VC1;
     } else {
     skip:
         /* skip packet */
@@ -549,7 +497,7 @@ static int mpegps_read_packet(AVFormatContext *s,
     st->codec->codec_type = type;
     st->codec->codec_id = codec_id;
     st->request_probe     = request_probe;
-    if (codec_id != CODEC_ID_PCM_S16BE)
+    if (codec_id != AV_CODEC_ID_PCM_S16BE)
         st->need_parsing = AVSTREAM_PARSE_FULL;
 
     /* notify the callback of the change in streams */
@@ -560,8 +508,13 @@ static int mpegps_read_packet(AVFormatContext *s,
  found:
     if(st->discard >= AVDISCARD_ALL)
         goto skip;
-    if ((startcode >= 0xa0 && startcode <= 0xaf) ||
-        (startcode == 0x1bd && ((dvdaudio_substream_type & 0xe0) == 0xa0))) {
+    if (startcode >= 0xa0 && startcode <= 0xaf) {
+      if (lpcm_header_len == 6) {
+            if (len < 6)
+                goto skip;
+            avio_skip(s->pb, 6);
+            len -=6;
+      } else {
         int b1, freq;
 
         /* for LPCM, we just skip the header and consider it is raw
@@ -580,9 +533,10 @@ static int mpegps_read_packet(AVFormatContext *s,
                               st->codec->sample_rate *
                               st->codec->bits_per_coded_sample;
         if (st->codec->bits_per_coded_sample == 16)
-            st->codec->codec_id = CODEC_ID_PCM_S16BE;
+            st->codec->codec_id = AV_CODEC_ID_PCM_S16BE;
         else if (st->codec->bits_per_coded_sample == 28)
             return AVERROR(EINVAL);
+      }
     }
     ret = av_get_packet(s->pb, pkt, len);
     pkt->pts = pts;
@@ -626,7 +580,7 @@ static int64_t mpegps_read_dts(AVFormatContext *s, int stream_index,
 
 AVInputFormat ff_mpegps_demuxer = {
     .name           = "mpeg",
-    .long_name      = NULL_IF_CONFIG_SMALL("MPEG-PS format"),
+    .long_name      = NULL_IF_CONFIG_SMALL("MPEG-PS (MPEG-2 Program Stream)"),
     .priv_data_size = sizeof(MpegDemuxContext),
     .read_probe     = mpegps_probe,
     .read_header    = mpegps_read_header,

@@ -47,7 +47,7 @@ const char *AudioOutputBase::quality_string(int q)
 AudioOutputBase::AudioOutputBase(const AudioSettings &settings) :
     MThread("AudioOutputBase"),
     // protected
-    channels(-1),               codec(CODEC_ID_NONE),
+    channels(-1),               codec(AV_CODEC_ID_NONE),
     bytes_per_frame(0),         output_bytes_per_frame(0),
     format(FORMAT_NONE),        output_format(FORMAT_NONE),
     samplerate(-1),             effdsp(0),
@@ -251,10 +251,10 @@ bool AudioOutputBase::CanPassthrough(int samplerate, int channels,
 
     switch(codec)
     {
-        case CODEC_ID_AC3:
+        case AV_CODEC_ID_AC3:
             arg = FEATURE_AC3;
             break;
-        case CODEC_ID_DTS:
+        case AV_CODEC_ID_DTS:
             switch(profile)
             {
                 case FF_PROFILE_DTS:
@@ -270,10 +270,10 @@ bool AudioOutputBase::CanPassthrough(int samplerate, int channels,
                     break;
             }
             break;
-        case CODEC_ID_EAC3:
+        case AV_CODEC_ID_EAC3:
             arg = FEATURE_EAC3;
             break;
-        case CODEC_ID_TRUEHD:
+        case AV_CODEC_ID_TRUEHD:
             arg = FEATURE_TRUEHD;
             break;
     }
@@ -429,7 +429,7 @@ bool AudioOutputBase::CanUpmix(void)
 bool AudioOutputBase::SetupPassthrough(int codec, int codec_profile,
                                        int &samplerate_tmp, int &channels_tmp)
 {
-    if (codec == CODEC_ID_DTS &&
+    if (codec == AV_CODEC_ID_DTS &&
         !output_settingsdigital->canFeature(FEATURE_DTSHD))
     {
         // We do not support DTS-HD bitstream so force extraction of the
@@ -448,7 +448,7 @@ bool AudioOutputBase::SetupPassthrough(int codec, int codec_profile,
     }
 
     m_spdifenc = new SPDIFEncoder("spdif", codec);
-    if (m_spdifenc->Succeeded() && codec == CODEC_ID_DTS)
+    if (m_spdifenc->Succeeded() && codec == AV_CODEC_ID_DTS)
     {
         switch(codec_profile)
         {
@@ -553,7 +553,7 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
         /* Might we reencode a bitstream that's been decoded for timestretch?
            If the device doesn't support the number of channels - see below */
         if (output_settingsdigital->canFeature(FEATURE_AC3) &&
-            (settings.codec == CODEC_ID_AC3 || settings.codec == CODEC_ID_DTS))
+            (settings.codec == AV_CODEC_ID_AC3 || settings.codec == AV_CODEC_ID_DTS))
         {
             lreenc = true;
         }
@@ -734,7 +734,7 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
                 .arg(samplerate).arg(configured_channels));
 
         encoder = new AudioOutputDigitalEncoder();
-        if (!encoder->Init(CODEC_ID_AC3, 448000, samplerate,
+        if (!encoder->Init(AV_CODEC_ID_AC3, 448000, samplerate,
                            configured_channels))
         {
             Error("AC-3 encoder initialization failed");

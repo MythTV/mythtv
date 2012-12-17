@@ -32,12 +32,11 @@
 #include "mpegvideo.h"
 #include "h263.h"
 #include "internal.h"
+#include "libavutil/avassert.h"
 
 #include "svq1.h"
 #include "svq1enc_cb.h"
 
-#undef NDEBUG
-#include <assert.h>
 
 
 typedef struct SVQ1Context {
@@ -176,7 +175,7 @@ static int encode_block(SVQ1Context *s, uint8_t *src, uint8_t *ref, uint8_t *dec
                 score= sqr - ((diff*(int64_t)diff)>>(level+3)); //FIXME 64bit slooow
                 if(score < best_vector_score){
                     int mean= (diff + (size>>1)) >> (level+3);
-                    assert(mean >-300 && mean<300);
+                    av_assert2(mean >-300 && mean<300);
                     mean= av_clip(mean, intra?0:-256, 255);
                     best_vector_score= score;
                     best_vector[stage]= i;
@@ -184,7 +183,7 @@ static int encode_block(SVQ1Context *s, uint8_t *src, uint8_t *ref, uint8_t *dec
                     best_vector_mean= mean;
                 }
             }
-            assert(best_vector_mean != -999);
+            av_assert0(best_vector_mean != -999);
             vector= codebook + stage*size*16 + best_vector[stage]*size;
             for(j=0; j<size; j++){
                 block[stage+1][j] = block[stage][j] - vector[j];
@@ -229,10 +228,10 @@ static int encode_block(SVQ1Context *s, uint8_t *src, uint8_t *ref, uint8_t *dec
         put_bits(&s->reorder_pb[level], 1, split);
 
     if(!split){
-        assert((best_mean >= 0 && best_mean<256) || !intra);
-        assert(best_mean >= -256 && best_mean<256);
-        assert(best_count >=0 && best_count<7);
-        assert(level<4 || best_count==0);
+        av_assert1((best_mean >= 0 && best_mean<256) || !intra);
+        av_assert1(best_mean >= -256 && best_mean<256);
+        av_assert1(best_count >=0 && best_count<7);
+        av_assert1(level<4 || best_count==0);
 
         /* output the encoding */
         put_bits(&s->reorder_pb[level],
@@ -242,7 +241,7 @@ static int encode_block(SVQ1Context *s, uint8_t *src, uint8_t *ref, uint8_t *dec
             mean_vlc[best_mean][0]);
 
         for (i = 0; i < best_count; i++){
-            assert(best_vector[i]>=0 && best_vector[i]<16);
+            av_assert2(best_vector[i]>=0 && best_vector[i]<16);
             put_bits(&s->reorder_pb[level], 4, best_vector[i]);
         }
 
@@ -412,10 +411,10 @@ static int svq1_encode_plane(SVQ1Context *s, int plane, unsigned char *src_plane
                     s->m.pb= s->reorder_pb[5];
                     mx= motion_ptr[0];
                     my= motion_ptr[1];
-                    assert(mx>=-32 && mx<=31);
-                    assert(my>=-32 && my<=31);
-                    assert(pred_x>=-32 && pred_x<=31);
-                    assert(pred_y>=-32 && pred_y<=31);
+                    av_assert1(mx>=-32 && mx<=31);
+                    av_assert1(my>=-32 && my<=31);
+                    av_assert1(pred_x>=-32 && pred_x<=31);
+                    av_assert1(pred_y>=-32 && pred_y<=31);
                     ff_h263_encode_motion(&s->m, mx - pred_x, 1);
                     ff_h263_encode_motion(&s->m, my - pred_y, 1);
                     s->reorder_pb[5]= s->m.pb;
@@ -486,6 +485,7 @@ static av_cold int svq1_encode_init(AVCodecContext *avctx)
 
     s->avctx= avctx;
     s->m.avctx= avctx;
+    s->m.picture_structure = PICT_FRAME;
     s->m.me.temp      =
     s->m.me.scratchpad= av_mallocz((avctx->width+64)*2*16*2*sizeof(uint8_t));
     s->m.me.map       = av_mallocz(ME_MAP_SIZE*sizeof(uint32_t));
@@ -582,7 +582,7 @@ static av_cold int svq1_encode_end(AVCodecContext *avctx)
 AVCodec ff_svq1_encoder = {
     .name           = "svq1",
     .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = CODEC_ID_SVQ1,
+    .id             = AV_CODEC_ID_SVQ1,
     .priv_data_size = sizeof(SVQ1Context),
     .init           = svq1_encode_init,
     .encode2        = svq1_encode_frame,

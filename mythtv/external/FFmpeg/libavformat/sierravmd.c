@@ -111,7 +111,7 @@ static int vmd_read_header(AVFormatContext *s)
     avpriv_set_pts_info(vst, 33, 1, 10);
     vmd->video_stream_index = vst->index;
     vst->codec->codec_type = AVMEDIA_TYPE_VIDEO;
-    vst->codec->codec_id = vmd->is_indeo3 ? CODEC_ID_INDEO3 : CODEC_ID_VMDVIDEO;
+    vst->codec->codec_id = vmd->is_indeo3 ? AV_CODEC_ID_INDEO3 : AV_CODEC_ID_VMDVIDEO;
     vst->codec->codec_tag = 0;  /* no fourcc */
     vst->codec->width = AV_RL16(&vmd->vmd_header[12]);
     vst->codec->height = AV_RL16(&vmd->vmd_header[14]);
@@ -131,7 +131,7 @@ static int vmd_read_header(AVFormatContext *s)
             return AVERROR(ENOMEM);
         vmd->audio_stream_index = st->index;
         st->codec->codec_type = AVMEDIA_TYPE_AUDIO;
-        st->codec->codec_id = CODEC_ID_VMDAUDIO;
+        st->codec->codec_id = AV_CODEC_ID_VMDAUDIO;
         st->codec->codec_tag = 0;  /* no fourcc */
         st->codec->channels = (vmd->vmd_header[811] & 0x80) ? 2 : 1;
         st->codec->sample_rate = vmd->sample_rate;
@@ -285,7 +285,7 @@ static int vmd_read_close(AVFormatContext *s)
 
 AVInputFormat ff_vmd_demuxer = {
     .name           = "vmd",
-    .long_name      = NULL_IF_CONFIG_SMALL("Sierra VMD format"),
+    .long_name      = NULL_IF_CONFIG_SMALL("Sierra VMD"),
     .priv_data_size = sizeof(VmdDemuxContext),
     .read_probe     = vmd_probe,
     .read_header    = vmd_read_header,

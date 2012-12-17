@@ -24,6 +24,7 @@
  * Kega Game Video decoder
  */
 
+#include "libavutil/common.h"
 #include "libavutil/intreadwrite.h"
 #include "libavutil/imgutils.h"
 #include "avcodec.h"
@@ -183,7 +184,7 @@ static av_cold int decode_end(AVCodecContext *avctx)
 AVCodec ff_kgv1_decoder = {
     .name           = "kgv1",
     .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = CODEC_ID_KGV1,
+    .id             = AV_CODEC_ID_KGV1,
     .priv_data_size = sizeof(KgvContext),
     .init           = decode_init,
     .close          = decode_end,

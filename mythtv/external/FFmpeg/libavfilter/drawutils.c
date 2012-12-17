@@ -19,10 +19,14 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include <string.h>
+
 #include "libavutil/avutil.h"
 #include "libavutil/colorspace.h"
+#include "libavutil/mem.h"
 #include "libavutil/pixdesc.h"
 #include "drawutils.h"
+#include "formats.h"
 
 enum { RED = 0, GREEN, BLUE, ALPHA };
 
@@ -172,7 +176,7 @@ int ff_draw_init(FFDrawContext *draw, enum PixelFormat format, unsigned flags)
     return 0;
 }
 
-void ff_draw_color(FFDrawContext *draw, FFDrawColor *color, uint8_t rgba[4])
+void ff_draw_color(FFDrawContext *draw, FFDrawColor *color, const uint8_t rgba[4])
 {
     unsigned i;
     uint8_t rgba_map[4];
@@ -505,7 +509,7 @@ AVFilterFormats *ff_draw_supported_pixel_formats(unsigned flags)
         if (ff_draw_init(&draw, i, flags) >= 0)
             pix_fmts[n++] = i;
     pix_fmts[n++] = PIX_FMT_NONE;
-    return avfilter_make_format_list(pix_fmts);
+    return ff_make_format_list(pix_fmts);
 }
 
 #ifdef TEST

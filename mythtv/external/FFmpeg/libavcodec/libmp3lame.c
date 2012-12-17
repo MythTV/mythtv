@@ -27,6 +27,7 @@
 #include <lame/lame.h>
 
 #include "libavutil/audioconvert.h"
+#include "libavutil/common.h"
 #include "libavutil/intreadwrite.h"
 #include "libavutil/log.h"
 #include "libavutil/opt.h"
@@ -269,7 +270,7 @@ static int mp3lame_encode_frame(AVCodecContext *avctx, AVPacket *avpkt,
 #define OFFSET(x) offsetof(LAMEContext, x)
 #define AE AV_OPT_FLAG_AUDIO_PARAM | AV_OPT_FLAG_ENCODING_PARAM
 static const AVOption options[] = {
-    { "reservoir", "Use bit reservoir.", OFFSET(reservoir), AV_OPT_TYPE_INT, { 1 }, 0, 1, AE },
+    { "reservoir", "Use bit reservoir.", OFFSET(reservoir), AV_OPT_TYPE_INT, { .i64 = 1 }, 0, 1, AE },
     { NULL },
 };
 
@@ -292,7 +293,7 @@ static const int libmp3lame_sample_rates[] = {
 AVCodec ff_libmp3lame_encoder = {
     .name                  = "libmp3lame",
     .type                  = AVMEDIA_TYPE_AUDIO,
-    .id                    = CODEC_ID_MP3,
+    .id                    = AV_CODEC_ID_MP3,
     .priv_data_size        = sizeof(LAMEContext),
     .init                  = mp3lame_encode_init,
     .encode2               = mp3lame_encode_frame,
@@ -305,7 +306,7 @@ AVCodec ff_libmp3lame_encoder = {
     .supported_samplerates = libmp3lame_sample_rates,
     .channel_layouts       = (const uint64_t[]) { AV_CH_LAYOUT_MONO,
                                                   AV_CH_LAYOUT_STEREO,
-                                                  0},
+                                                  0 },
     .long_name             = NULL_IF_CONFIG_SMALL("libmp3lame MP3 (MPEG audio layer 3)"),
     .priv_class            = &libmp3lame_class,
     .defaults              = libmp3lame_defaults,

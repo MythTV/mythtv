@@ -20,8 +20,12 @@
  */
 
 #include <vo-amrwbenc/enc_if.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 #include "libavutil/avstring.h"
+#include "libavutil/internal.h"
+#include "libavutil/mem.h"
 #include "libavutil/opt.h"
 #include "avcodec.h"
 #include "internal.h"
@@ -37,7 +41,7 @@ typedef struct AMRWBContext {
 } AMRWBContext;
 
 static const AVOption options[] = {
-    { "dtx", "Allow DTX (generate comfort noise)", offsetof(AMRWBContext, allow_dtx), AV_OPT_TYPE_INT, { 0 }, 0, 1, AV_OPT_FLAG_AUDIO_PARAM | AV_OPT_FLAG_ENCODING_PARAM },
+    { "dtx", "Allow DTX (generate comfort noise)", offsetof(AMRWBContext, allow_dtx), AV_OPT_TYPE_INT, { .i64 = 0 }, 0, 1, AV_OPT_FLAG_AUDIO_PARAM | AV_OPT_FLAG_ENCODING_PARAM },
     { NULL }
 };
 
@@ -141,14 +145,14 @@ static int amr_wb_encode_frame(AVCodecContext *avctx, AVPacket *avpkt,
 AVCodec ff_libvo_amrwbenc_encoder = {
     .name           = "libvo_amrwbenc",
     .type           = AVMEDIA_TYPE_AUDIO,
-    .id             = CODEC_ID_AMR_WB,
+    .id             = AV_CODEC_ID_AMR_WB,
     .priv_data_size = sizeof(AMRWBContext),
     .init           = amr_wb_encode_init,
     .encode2        = amr_wb_encode_frame,
     .close          = amr_wb_encode_close,
     .sample_fmts    = (const enum AVSampleFormat[]){ AV_SAMPLE_FMT_S16,
                                                      AV_SAMPLE_FMT_NONE },
-    .long_name      = NULL_IF_CONFIG_SMALL("Android VisualOn Adaptive "
-                                           "Multi-Rate (AMR) Wide-Band"),
+    .long_name      = NULL_IF_CONFIG_SMALL("Android VisualOn AMR-WB "
+                                           "(Adaptive Multi-Rate Wide-Band)"),
     .priv_class     = &class,
 };

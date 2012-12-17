@@ -49,16 +49,16 @@ static int expand_rle_row(SgiState *s, uint8_t *out_buf,
     unsigned char pixel, count;
     unsigned char *orig = out_buf;
 
-    while (1) {
+    while (out_buf < out_end) {
         if (bytestream2_get_bytes_left(&s->g) < 1)
             return AVERROR_INVALIDDATA;
         pixel = bytestream2_get_byteu(&s->g);
         if (!(count = (pixel & 0x7f))) {
-            return (out_buf - orig) / pixelstride;
+            break;
         }
 
         /* Check for buffer overflow. */
-        if(out_buf + pixelstride * count >= out_end) return -1;
+        if(out_buf + pixelstride * (count-1) >= out_end) return -1;
 
         if (pixel & 0x80) {
             while (count--) {
@@ -74,6 +74,7 @@ static int expand_rle_row(SgiState *s, uint8_t *out_buf,
             }
         }
     }
+    return (out_buf - orig) / pixelstride;
 }
 
 /**
@@ -101,7 +102,7 @@ static int read_rle_sgi(uint8_t *out_buf, SgiState *s)
             dest_row -= s->linesize;
             start_offset = bytestream2_get_be32(&g_table);
             bytestream2_seek(&s->g, start_offset, SEEK_SET);
-            if (expand_rle_row(s, dest_row + z, dest_row + FFABS(s->linesize),
+            if (expand_rle_row(s, dest_row + z, dest_row + s->width*s->depth,
                                s->depth) != s->width) {
                 return AVERROR_INVALIDDATA;
             }
@@ -113,16 +114,15 @@ static int read_rle_sgi(uint8_t *out_buf, SgiState *s)
 /**
  * Read an uncompressed SGI image.
  * @param out_buf output buffer
- * @param out_end end ofoutput buffer
  * @param s the current image state
  * @return 0 if read success, otherwise return -1.
  */
-static int read_uncompressed_sgi(unsigned char* out_buf, uint8_t* out_end,
-                                 SgiState *s)
+static int read_uncompressed_sgi(unsigned char* out_buf, SgiState *s)
 {
     int x, y, z;
     unsigned int offset = s->height * s->width * s->bytes_per_channel;
     GetByteContext gp[4];
+    uint8_t *out_end;
 
     /* Test buffer size. */
     if (offset * s->depth > bytestream2_get_bytes_left(&s->g))
@@ -228,7 +228,7 @@ static int decode_frame(AVCodecContext *avctx,
     if (rle) {
         ret = read_rle_sgi(out_end, s);
     } else {
-        ret = read_uncompressed_sgi(out_buf, out_end, s);
+        ret = read_uncompressed_sgi(out_buf, s);
     }
 
     if (ret == 0) {
@@ -262,10 +262,11 @@ static av_cold int sgi_end(AVCodecContext *avctx)
 AVCodec ff_sgi_decoder = {
     .name           = "sgi",
     .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = CODEC_ID_SGI,
+    .id             = AV_CODEC_ID_SGI,
     .priv_data_size = sizeof(SgiState),
     .init           = sgi_init,
     .close          = sgi_end,
     .decode         = decode_frame,
+    .capabilities   = CODEC_CAP_DR1,
     .long_name      = NULL_IF_CONFIG_SMALL("SGI image"),
 };

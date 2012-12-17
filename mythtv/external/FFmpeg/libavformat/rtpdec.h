@@ -71,11 +71,6 @@ void ff_rtp_send_punch_packets(URLContext* rtp_handle);
  */
 int ff_rtp_check_and_send_back_rr(RTPDemuxContext *s, int count);
 
-/**
- * Get the file handle for the RTCP socket.
- */
-int ff_rtp_get_rtcp_file_handle(URLContext *h);
-
 // these statistics are used for rtcp receiver reports...
 typedef struct {
     uint16_t max_seq;           ///< highest sequence number seen
@@ -116,7 +111,7 @@ struct RTPDynamicProtocolHandler_s {
     // fields from AVRtpDynamicPayloadType_s
     const char enc_name[50];    /* XXX: still why 50 ? ;-) */
     enum AVMediaType codec_type;
-    enum CodecID codec_id;
+    enum AVCodecID codec_id;
     int static_payload_id; /* 0 means no payload id is set. 0 is a valid
                             * payload ID (PCMU), too, but that format doesn't
                             * require any custom depacketization code. */

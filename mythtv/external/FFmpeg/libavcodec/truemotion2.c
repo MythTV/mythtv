@@ -214,7 +214,7 @@ static inline int tm2_read_header(TM2Context *ctx, const uint8_t *buf)
     buf += 4;
 
     if(magic == 0x00000100) { /* old header */
-/*      av_log (ctx->avctx, AV_LOG_ERROR, "TM2 old header: not implemented (yet)\n"); */
+        av_log_missing_feature(ctx->avctx, "TM2 old header", 1);
         return 40;
     } else if(magic == 0x00000101) { /* new header */
         return 40;
@@ -971,7 +971,7 @@ static av_cold int decode_end(AVCodecContext *avctx){
 AVCodec ff_truemotion2_decoder = {
     .name           = "truemotion2",
     .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = CODEC_ID_TRUEMOTION2,
+    .id             = AV_CODEC_ID_TRUEMOTION2,
     .priv_data_size = sizeof(TM2Context),
     .init           = decode_init,
     .close          = decode_end,

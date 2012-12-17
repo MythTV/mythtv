@@ -29,6 +29,7 @@
 #include "internal.h"
 #include "libavutil/pixdesc.h"
 #include "libavutil/intreadwrite.h"
+#include "libavutil/internal.h"
 
 static av_cold int raw_init_encoder(AVCodecContext *avctx)
 {
@@ -69,7 +70,7 @@ static int raw_encode(AVCodecContext *avctx, AVPacket *pkt,
 AVCodec ff_rawvideo_encoder = {
     .name           = "rawvideo",
     .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = CODEC_ID_RAWVIDEO,
+    .id             = AV_CODEC_ID_RAWVIDEO,
     .priv_data_size = sizeof(AVFrame),
     .init           = raw_init_encoder,
     .encode2        = raw_encode,

@@ -42,7 +42,7 @@ typedef struct AudioConvert AudioConvert;
  * @param in_fmt         input sample format
  * @param channels       number of channels, or 0 for any number of channels
  * @param ptr_align      buffer pointer alignment, in bytes
- * @param sample_align   buffer size alignment, in samples
+ * @param samples_align  buffer size alignment, in samples
  * @param descr          function type description (e.g. "C" or "SSE")
  * @param conv           conversion function pointer
  */
@@ -82,6 +82,7 @@ int ff_audio_convert(AudioConvert *ac, AudioData *out, AudioData *in, int len);
 
 /* arch-specific initialization functions */
 
+void ff_audio_convert_init_arm(AudioConvert *ac);
 void ff_audio_convert_init_x86(AudioConvert *ac);
 
 #endif /* AVRESAMPLE_AUDIO_CONVERT_H */

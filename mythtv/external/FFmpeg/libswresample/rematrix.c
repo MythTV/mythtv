@@ -26,6 +26,7 @@
 #define R(x) x
 #define SAMPLE float
 #define COEFF float
+#define INTER float
 #define RENAME(x) x ## _float
 #include "rematrix_template.c"
 #undef SAMPLE
@@ -33,11 +34,13 @@
 #undef R
 #undef ONE
 #undef COEFF
+#undef INTER
 
 #define ONE (1.0)
 #define R(x) x
 #define SAMPLE double
 #define COEFF double
+#define INTER double
 #define RENAME(x) x ## _double
 #include "rematrix_template.c"
 #undef SAMPLE
@@ -45,11 +48,13 @@
 #undef R
 #undef ONE
 #undef COEFF
+#undef INTER
 
 #define ONE (-32768)
 #define R(x) (((x) + 16384)>>15)
 #define SAMPLE int16_t
 #define COEFF int
+#define INTER int
 #define RENAME(x) x ## _s16
 #include "rematrix_template.c"
 
@@ -97,6 +102,20 @@ static int even(int64_t layout){
     return 0;
 }
 
+static int clean_layout(SwrContext *s, int64_t layout){
+    if((layout & AV_CH_LAYOUT_STEREO_DOWNMIX) == AV_CH_LAYOUT_STEREO_DOWNMIX)
+        return AV_CH_LAYOUT_STEREO;
+
+    if(layout && layout != AV_CH_FRONT_CENTER && !(layout&(layout-1))) {
+        char buf[128];
+        av_get_channel_layout_string(buf, sizeof(buf), -1, layout);
+        av_log(s, AV_LOG_VERBOSE, "Treating %s as mono\n", buf);
+        return AV_CH_FRONT_CENTER;
+    }
+
+    return layout;
+}
+
 static int sane_layout(int64_t layout){
     if(!(layout & AV_CH_LAYOUT_SURROUND)) // at least 1 front speaker
         return 0;
@@ -114,80 +133,117 @@ static int sane_layout(int64_t layout){
     return 1;
 }
 
-static int auto_matrix(SwrContext *s)
+av_cold static int auto_matrix(SwrContext *s)
 {
     int i, j, out_i;
     double matrix[64][64]={{0}};
-    int64_t unaccounted= s->in_ch_layout & ~s->out_ch_layout;
+    int64_t unaccounted, in_ch_layout, out_ch_layout;
     double maxcoef=0;
+    char buf[128];
+    const int matrix_encoding = s->matrix_encoding;
+
+    in_ch_layout = clean_layout(s, s->in_ch_layout);
+    if(!sane_layout(in_ch_layout)){
+        av_get_channel_layout_string(buf, sizeof(buf), -1, s->in_ch_layout);
+        av_log(s, AV_LOG_ERROR, "Input channel layout '%s' is not supported\n", buf);
+        return AVERROR(EINVAL);
+    }
+
+    out_ch_layout = clean_layout(s, s->out_ch_layout);
+    if(!sane_layout(out_ch_layout)){
+        av_get_channel_layout_string(buf, sizeof(buf), -1, s->out_ch_layout);
+        av_log(s, AV_LOG_ERROR, "Output channel layout '%s' is not supported\n", buf);
+        return AVERROR(EINVAL);
+    }
 
     memset(s->matrix, 0, sizeof(s->matrix));
     for(i=0; i<64; i++){
-        if(s->in_ch_layout & s->out_ch_layout & (1LL<<i))
+        if(in_ch_layout & out_ch_layout & (1LL<<i))
             matrix[i][i]= 1.0;
     }
 
-    if(!sane_layout(s->in_ch_layout)){
-        av_log(s, AV_LOG_ERROR, "Input channel layout isnt supported\n");
-        return AVERROR(EINVAL);
-    }
-    if(!sane_layout(s->out_ch_layout)){
-        av_log(s, AV_LOG_ERROR, "Output channel layout isnt supported\n");
-        return AVERROR(EINVAL);
-    }
+    unaccounted= in_ch_layout & ~out_ch_layout;
 
 //FIXME implement dolby surround
 //FIXME implement full ac3
 
 
     if(unaccounted & AV_CH_FRONT_CENTER){
-        if((s->out_ch_layout & AV_CH_LAYOUT_STEREO) == AV_CH_LAYOUT_STEREO){
-            matrix[ FRONT_LEFT][FRONT_CENTER]+= M_SQRT1_2;
-            matrix[FRONT_RIGHT][FRONT_CENTER]+= M_SQRT1_2;
+        if((out_ch_layout & AV_CH_LAYOUT_STEREO) == AV_CH_LAYOUT_STEREO){
+            if(in_ch_layout & AV_CH_LAYOUT_STEREO) {
+                matrix[ FRONT_LEFT][FRONT_CENTER]+= s->clev;
+                matrix[FRONT_RIGHT][FRONT_CENTER]+= s->clev;
+            } else {
+                matrix[ FRONT_LEFT][FRONT_CENTER]+= M_SQRT1_2;
+                matrix[FRONT_RIGHT][FRONT_CENTER]+= M_SQRT1_2;
+            }
         }else
             av_assert0(0);
     }
     if(unaccounted & AV_CH_LAYOUT_STEREO){
-        if(s->out_ch_layout & AV_CH_FRONT_CENTER){
+        if(out_ch_layout & AV_CH_FRONT_CENTER){
             matrix[FRONT_CENTER][ FRONT_LEFT]+= M_SQRT1_2;
             matrix[FRONT_CENTER][FRONT_RIGHT]+= M_SQRT1_2;
-            if(s->in_ch_layout & AV_CH_FRONT_CENTER)
+            if(in_ch_layout & AV_CH_FRONT_CENTER)
                 matrix[FRONT_CENTER][ FRONT_CENTER] = s->clev*sqrt(2);
         }else
             av_assert0(0);
     }
 
     if(unaccounted & AV_CH_BACK_CENTER){
-        if(s->out_ch_layout & AV_CH_BACK_LEFT){
+        if(out_ch_layout & AV_CH_BACK_LEFT){
             matrix[ BACK_LEFT][BACK_CENTER]+= M_SQRT1_2;
             matrix[BACK_RIGHT][BACK_CENTER]+= M_SQRT1_2;
-        }else if(s->out_ch_layout & AV_CH_SIDE_LEFT){
+        }else if(out_ch_layout & AV_CH_SIDE_LEFT){
             matrix[ SIDE_LEFT][BACK_CENTER]+= M_SQRT1_2;
             matrix[SIDE_RIGHT][BACK_CENTER]+= M_SQRT1_2;
-        }else if(s->out_ch_layout & AV_CH_FRONT_LEFT){
-            matrix[ FRONT_LEFT][BACK_CENTER]+= s->slev*M_SQRT1_2;
-            matrix[FRONT_RIGHT][BACK_CENTER]+= s->slev*M_SQRT1_2;
-        }else if(s->out_ch_layout & AV_CH_FRONT_CENTER){
+        }else if(out_ch_layout & AV_CH_FRONT_LEFT){
+            if (matrix_encoding == AV_MATRIX_ENCODING_DOLBY ||
+                matrix_encoding == AV_MATRIX_ENCODING_DPLII) {
+                if (unaccounted & (AV_CH_BACK_LEFT | AV_CH_SIDE_LEFT)) {
+                    matrix[FRONT_LEFT ][BACK_CENTER] -= s->slev * M_SQRT1_2;
+                    matrix[FRONT_RIGHT][BACK_CENTER] += s->slev * M_SQRT1_2;
+                } else {
+                    matrix[FRONT_LEFT ][BACK_CENTER] -= s->slev;
+                    matrix[FRONT_RIGHT][BACK_CENTER] += s->slev;
+                }
+            } else {
+                matrix[ FRONT_LEFT][BACK_CENTER]+= s->slev*M_SQRT1_2;
+                matrix[FRONT_RIGHT][BACK_CENTER]+= s->slev*M_SQRT1_2;
+            }
+        }else if(out_ch_layout & AV_CH_FRONT_CENTER){
             matrix[ FRONT_CENTER][BACK_CENTER]+= s->slev*M_SQRT1_2;
         }else
             av_assert0(0);
     }
     if(unaccounted & AV_CH_BACK_LEFT){
-        if(s->out_ch_layout & AV_CH_BACK_CENTER){
+        if(out_ch_layout & AV_CH_BACK_CENTER){
             matrix[BACK_CENTER][ BACK_LEFT]+= M_SQRT1_2;
             matrix[BACK_CENTER][BACK_RIGHT]+= M_SQRT1_2;
-        }else if(s->out_ch_layout & AV_CH_SIDE_LEFT){
-            if(s->in_ch_layout & AV_CH_SIDE_LEFT){
+        }else if(out_ch_layout & AV_CH_SIDE_LEFT){
+            if(in_ch_layout & AV_CH_SIDE_LEFT){
                 matrix[ SIDE_LEFT][ BACK_LEFT]+= M_SQRT1_2;
                 matrix[SIDE_RIGHT][BACK_RIGHT]+= M_SQRT1_2;
             }else{
             matrix[ SIDE_LEFT][ BACK_LEFT]+= 1.0;
             matrix[SIDE_RIGHT][BACK_RIGHT]+= 1.0;
             }
-        }else if(s->out_ch_layout & AV_CH_FRONT_LEFT){
-            matrix[ FRONT_LEFT][ BACK_LEFT]+= s->slev;
-            matrix[FRONT_RIGHT][BACK_RIGHT]+= s->slev;
-        }else if(s->out_ch_layout & AV_CH_FRONT_CENTER){
+        }else if(out_ch_layout & AV_CH_FRONT_LEFT){
+            if (matrix_encoding == AV_MATRIX_ENCODING_DOLBY) {
+                matrix[FRONT_LEFT ][BACK_LEFT ] -= s->slev * M_SQRT1_2;
+                matrix[FRONT_LEFT ][BACK_RIGHT] -= s->slev * M_SQRT1_2;
+                matrix[FRONT_RIGHT][BACK_LEFT ] += s->slev * M_SQRT1_2;
+                matrix[FRONT_RIGHT][BACK_RIGHT] += s->slev * M_SQRT1_2;
+            } else if (matrix_encoding == AV_MATRIX_ENCODING_DPLII) {
+                matrix[FRONT_LEFT ][BACK_LEFT ] -= s->slev * SQRT3_2;
+                matrix[FRONT_LEFT ][BACK_RIGHT] -= s->slev * M_SQRT1_2;
+                matrix[FRONT_RIGHT][BACK_LEFT ] += s->slev * M_SQRT1_2;
+                matrix[FRONT_RIGHT][BACK_RIGHT] += s->slev * SQRT3_2;
+            } else {
+                matrix[ FRONT_LEFT][ BACK_LEFT] += s->slev;
+                matrix[FRONT_RIGHT][BACK_RIGHT] += s->slev;
+            }
+        }else if(out_ch_layout & AV_CH_FRONT_CENTER){
             matrix[ FRONT_CENTER][BACK_LEFT ]+= s->slev*M_SQRT1_2;
             matrix[ FRONT_CENTER][BACK_RIGHT]+= s->slev*M_SQRT1_2;
         }else
@@ -195,23 +251,35 @@ static int auto_matrix(SwrContext *s)
     }
 
     if(unaccounted & AV_CH_SIDE_LEFT){
-        if(s->out_ch_layout & AV_CH_BACK_LEFT){
+        if(out_ch_layout & AV_CH_BACK_LEFT){
             /* if back channels do not exist in the input, just copy side
                channels to back channels, otherwise mix side into back */
-            if (s->in_ch_layout & AV_CH_BACK_LEFT) {
+            if (in_ch_layout & AV_CH_BACK_LEFT) {
                 matrix[BACK_LEFT ][SIDE_LEFT ] += M_SQRT1_2;
                 matrix[BACK_RIGHT][SIDE_RIGHT] += M_SQRT1_2;
             } else {
                 matrix[BACK_LEFT ][SIDE_LEFT ] += 1.0;
                 matrix[BACK_RIGHT][SIDE_RIGHT] += 1.0;
             }
-        }else if(s->out_ch_layout & AV_CH_BACK_CENTER){
+        }else if(out_ch_layout & AV_CH_BACK_CENTER){
             matrix[BACK_CENTER][ SIDE_LEFT]+= M_SQRT1_2;
             matrix[BACK_CENTER][SIDE_RIGHT]+= M_SQRT1_2;
-        }else if(s->out_ch_layout & AV_CH_FRONT_LEFT){
-            matrix[ FRONT_LEFT][ SIDE_LEFT]+= s->slev;
-            matrix[FRONT_RIGHT][SIDE_RIGHT]+= s->slev;
-        }else if(s->out_ch_layout & AV_CH_FRONT_CENTER){
+        }else if(out_ch_layout & AV_CH_FRONT_LEFT){
+            if (matrix_encoding == AV_MATRIX_ENCODING_DOLBY) {
+                matrix[FRONT_LEFT ][SIDE_LEFT ] -= s->slev * M_SQRT1_2;
+                matrix[FRONT_LEFT ][SIDE_RIGHT] -= s->slev * M_SQRT1_2;
+                matrix[FRONT_RIGHT][SIDE_LEFT ] += s->slev * M_SQRT1_2;
+                matrix[FRONT_RIGHT][SIDE_RIGHT] += s->slev * M_SQRT1_2;
+            } else if (matrix_encoding == AV_MATRIX_ENCODING_DPLII) {
+                matrix[FRONT_LEFT ][SIDE_LEFT ] -= s->slev * SQRT3_2;
+                matrix[FRONT_LEFT ][SIDE_RIGHT] -= s->slev * M_SQRT1_2;
+                matrix[FRONT_RIGHT][SIDE_LEFT ] += s->slev * M_SQRT1_2;
+                matrix[FRONT_RIGHT][SIDE_RIGHT] += s->slev * SQRT3_2;
+            } else {
+                matrix[ FRONT_LEFT][ SIDE_LEFT] += s->slev;
+                matrix[FRONT_RIGHT][SIDE_RIGHT] += s->slev;
+            }
+        }else if(out_ch_layout & AV_CH_FRONT_CENTER){
             matrix[ FRONT_CENTER][SIDE_LEFT ]+= s->slev*M_SQRT1_2;
             matrix[ FRONT_CENTER][SIDE_RIGHT]+= s->slev*M_SQRT1_2;
         }else
@@ -219,10 +287,10 @@ static int auto_matrix(SwrContext *s)
     }
 
     if(unaccounted & AV_CH_FRONT_LEFT_OF_CENTER){
-        if(s->out_ch_layout & AV_CH_FRONT_LEFT){
+        if(out_ch_layout & AV_CH_FRONT_LEFT){
             matrix[ FRONT_LEFT][ FRONT_LEFT_OF_CENTER]+= 1.0;
             matrix[FRONT_RIGHT][FRONT_RIGHT_OF_CENTER]+= 1.0;
-        }else if(s->out_ch_layout & AV_CH_FRONT_CENTER){
+        }else if(out_ch_layout & AV_CH_FRONT_CENTER){
             matrix[ FRONT_CENTER][ FRONT_LEFT_OF_CENTER]+= M_SQRT1_2;
             matrix[ FRONT_CENTER][FRONT_RIGHT_OF_CENTER]+= M_SQRT1_2;
         }else
@@ -230,9 +298,9 @@ static int auto_matrix(SwrContext *s)
     }
     /* mix LFE into front left/right or center */
     if (unaccounted & AV_CH_LOW_FREQUENCY) {
-        if (s->out_ch_layout & AV_CH_FRONT_CENTER) {
+        if (out_ch_layout & AV_CH_FRONT_CENTER) {
             matrix[FRONT_CENTER][LOW_FREQUENCY] += s->lfe_mix_level;
-        } else if (s->out_ch_layout & AV_CH_FRONT_LEFT) {
+        } else if (out_ch_layout & AV_CH_FRONT_LEFT) {
             matrix[FRONT_LEFT ][LOW_FREQUENCY] += s->lfe_mix_level * M_SQRT1_2;
             matrix[FRONT_RIGHT][LOW_FREQUENCY] += s->lfe_mix_level * M_SQRT1_2;
         } else
@@ -247,11 +315,11 @@ static int auto_matrix(SwrContext *s)
             if(matrix[i][j]){
                 sum += fabs(matrix[i][j]);
             }
-            if(s->in_ch_layout & (1ULL<<j))
+            if(in_ch_layout & (1ULL<<j))
                 in_i++;
         }
         maxcoef= FFMAX(maxcoef, sum);
-        if(s->out_ch_layout & (1ULL<<i))
+        if(out_ch_layout & (1ULL<<i))
             out_i++;
     }
     if(s->rematrix_volume  < 0)
@@ -272,8 +340,8 @@ static int auto_matrix(SwrContext *s)
             }
     }
 
-    for(i=0; i<av_get_channel_layout_nb_channels(s->out_ch_layout); i++){
-        for(j=0; j<av_get_channel_layout_nb_channels(s->in_ch_layout); j++){
+    for(i=0; i<av_get_channel_layout_nb_channels(out_ch_layout); i++){
+        for(j=0; j<av_get_channel_layout_nb_channels(in_ch_layout); j++){
             av_log(NULL, AV_LOG_DEBUG, "%f ", s->matrix[i][j]);
         }
         av_log(NULL, AV_LOG_DEBUG, "\n");
@@ -281,10 +349,12 @@ static int auto_matrix(SwrContext *s)
     return 0;
 }
 
-int swri_rematrix_init(SwrContext *s){
+av_cold int swri_rematrix_init(SwrContext *s){
     int i, j;
     int nb_in  = av_get_channel_layout_nb_channels(s->in_ch_layout);
     int nb_out = av_get_channel_layout_nb_channels(s->out_ch_layout);
+
+    s->mix_any_f = NULL;
 
     if (!s->rematrix_custom) {
         int r = auto_matrix(s);
@@ -298,8 +368,9 @@ int swri_rematrix_init(SwrContext *s){
             for (j = 0; j < nb_in; j++)
                 ((int*)s->native_matrix)[i * nb_in + j] = lrintf(s->matrix[i][j] * 32768);
         *((int*)s->native_one) = 32768;
-        s->mix_1_1_f = copy_s16;
-        s->mix_2_1_f = sum2_s16;
+        s->mix_1_1_f = (mix_1_1_func_type*)copy_s16;
+        s->mix_2_1_f = (mix_2_1_func_type*)sum2_s16;
+        s->mix_any_f = (mix_any_func_type*)get_mix_any_func_s16(s);
     }else if(s->midbuf.fmt == AV_SAMPLE_FMT_FLTP){
         s->native_matrix = av_mallocz(nb_in * nb_out * sizeof(float));
         s->native_one    = av_mallocz(sizeof(float));
@@ -307,8 +378,9 @@ int swri_rematrix_init(SwrContext *s){
             for (j = 0; j < nb_in; j++)
                 ((float*)s->native_matrix)[i * nb_in + j] = s->matrix[i][j];
         *((float*)s->native_one) = 1.0;
-        s->mix_1_1_f = copy_float;
-        s->mix_2_1_f = sum2_float;
+        s->mix_1_1_f = (mix_1_1_func_type*)copy_float;
+        s->mix_2_1_f = (mix_2_1_func_type*)sum2_float;
+        s->mix_any_f = (mix_any_func_type*)get_mix_any_func_float(s);
     }else if(s->midbuf.fmt == AV_SAMPLE_FMT_DBLP){
         s->native_matrix = av_mallocz(nb_in * nb_out * sizeof(double));
         s->native_one    = av_mallocz(sizeof(double));
@@ -316,8 +388,9 @@ int swri_rematrix_init(SwrContext *s){
             for (j = 0; j < nb_in; j++)
                 ((double*)s->native_matrix)[i * nb_in + j] = s->matrix[i][j];
         *((double*)s->native_one) = 1.0;
-        s->mix_1_1_f = copy_double;
-        s->mix_2_1_f = sum2_double;
+        s->mix_1_1_f = (mix_1_1_func_type*)copy_double;
+        s->mix_2_1_f = (mix_2_1_func_type*)sum2_double;
+        s->mix_any_f = (mix_any_func_type*)get_mix_any_func_double(s);
     }else
         av_assert0(0);
     //FIXME quantize for integeres
@@ -330,16 +403,32 @@ int swri_rematrix_init(SwrContext *s){
         }
         s->matrix_ch[i][0]= ch_in;
     }
+
+    if(HAVE_YASM && HAVE_MMX) swri_rematrix_init_x86(s);
+
     return 0;
 }
 
-void swri_rematrix_free(SwrContext *s){
+av_cold void swri_rematrix_free(SwrContext *s){
     av_freep(&s->native_matrix);
     av_freep(&s->native_one);
+    av_freep(&s->native_simd_matrix);
 }
 
 int swri_rematrix(SwrContext *s, AudioData *out, AudioData *in, int len, int mustcopy){
     int out_i, in_i, i, j;
+    int len1 = 0;
+    int off = 0;
+
+    if(s->mix_any_f) {
+        s->mix_any_f(out->ch, (const uint8_t **)in->ch, s->native_matrix, len);
+        return 0;
+    }
+
+    if(s->mix_2_1_simd || s->mix_1_1_simd){
+        len1= len&~15;
+        off = len1 * out->bps;
+    }
 
     av_assert0(out->ch_count == av_get_channel_layout_nb_channels(s->out_ch_layout));
     av_assert0(in ->ch_count == av_get_channel_layout_nb_channels(s-> in_ch_layout));
@@ -347,12 +436,16 @@ int swri_rematrix(SwrContext *s, AudioData *out, AudioData *in, int len, int mus
     for(out_i=0; out_i<out->ch_count; out_i++){
         switch(s->matrix_ch[out_i][0]){
         case 0:
-            memset(out->ch[out_i], 0, len * av_get_bytes_per_sample(s->int_sample_fmt));
+            if(mustcopy)
+                memset(out->ch[out_i], 0, len * av_get_bytes_per_sample(s->int_sample_fmt));
             break;
         case 1:
             in_i= s->matrix_ch[out_i][1];
             if(s->matrix[out_i][in_i]!=1.0){
-                s->mix_1_1_f(out->ch[out_i], in->ch[in_i], s->native_matrix, in->ch_count*out_i + in_i, len);
+                if(s->mix_1_1_simd && len1)
+                    s->mix_1_1_simd(out->ch[out_i]    , in->ch[in_i]    , s->native_simd_matrix, in->ch_count*out_i + in_i, len1);
+                if(len != len1)
+                    s->mix_1_1_f   (out->ch[out_i]+off, in->ch[in_i]+off, s->native_matrix, in->ch_count*out_i + in_i, len-len1);
             }else if(mustcopy){
                 memcpy(out->ch[out_i], in->ch[in_i], len*out->bps);
             }else{
@@ -362,7 +455,12 @@ int swri_rematrix(SwrContext *s, AudioData *out, AudioData *in, int len, int mus
         case 2: {
             int in_i1 = s->matrix_ch[out_i][1];
             int in_i2 = s->matrix_ch[out_i][2];
-            s->mix_2_1_f(out->ch[out_i], in->ch[in_i1], in->ch[in_i2], s->native_matrix, in->ch_count*out_i + in_i1, in->ch_count*out_i + in_i2, len);
+            if(s->mix_2_1_simd && len1)
+                s->mix_2_1_simd(out->ch[out_i]    , in->ch[in_i1]    , in->ch[in_i2]    , s->native_simd_matrix, in->ch_count*out_i + in_i1, in->ch_count*out_i + in_i2, len1);
+            else
+                s->mix_2_1_f   (out->ch[out_i]    , in->ch[in_i1]    , in->ch[in_i2]    , s->native_matrix, in->ch_count*out_i + in_i1, in->ch_count*out_i + in_i2, len1);
+            if(len != len1)
+                s->mix_2_1_f   (out->ch[out_i]+off, in->ch[in_i1]+off, in->ch[in_i2]+off, s->native_matrix, in->ch_count*out_i + in_i1, in->ch_count*out_i + in_i2, len-len1);
             break;}
         default:
             if(s->int_sample_fmt == AV_SAMPLE_FMT_FLTP){

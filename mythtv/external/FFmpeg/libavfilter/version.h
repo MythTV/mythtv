@@ -28,8 +28,8 @@
 
 #include "libavutil/avutil.h"
 
-#define LIBAVFILTER_VERSION_MAJOR  2
-#define LIBAVFILTER_VERSION_MINOR 77
+#define LIBAVFILTER_VERSION_MAJOR  3
+#define LIBAVFILTER_VERSION_MINOR  17
 #define LIBAVFILTER_VERSION_MICRO 100
 
 #define LIBAVFILTER_VERSION_INT AV_VERSION_INT(LIBAVFILTER_VERSION_MAJOR, \
@@ -41,26 +41,25 @@
 #define LIBAVFILTER_BUILD       LIBAVFILTER_VERSION_INT
 
 /**
- * Those FF_API_* defines are not part of public API.
- * They may change, break or disappear at any time.
+ * FF_API_* defines may be placed below to indicate public API that will be
+ * dropped at a future version bump. The defines themselves are not part of
+ * the public API and may change, break or disappear at any time.
  */
-#ifndef FF_API_GRAPH_AVCLASS
-#define FF_API_GRAPH_AVCLASS            (LIBAVFILTER_VERSION_MAJOR > 2)
+
+#ifndef FF_API_OLD_ALL_FORMATS_API
+#define FF_API_OLD_ALL_FORMATS_API (LIBAVFILTER_VERSION_MAJOR < 3)
 #endif
-#ifndef FF_API_SAMPLERATE64
-#define FF_API_SAMPLERATE64             (LIBAVFILTER_VERSION_MAJOR < 3)
+#ifndef FF_API_AVFILTERPAD_PUBLIC
+#define FF_API_AVFILTERPAD_PUBLIC           (LIBAVFILTER_VERSION_MAJOR < 4)
 #endif
-#ifndef FF_API_VSRC_BUFFER_ADD_FRAME
-#define FF_API_VSRC_BUFFER_ADD_FRAME        (LIBAVFILTER_VERSION_MAJOR < 3)
+#ifndef FF_API_FOO_COUNT
+#define FF_API_FOO_COUNT                    (LIBAVFILTER_VERSION_MAJOR < 4)
 #endif
-#ifndef FF_API_PACKING
-#define FF_API_PACKING                  (LIBAVFILTER_VERSION_MAJOR < 3)
+#ifndef FF_API_FILL_FRAME
+#define FF_API_FILL_FRAME                   (LIBAVFILTER_VERSION_MAJOR < 4)
 #endif
-#ifndef FF_API_DEFAULT_CONFIG_OUTPUT_LINK
-#define FF_API_DEFAULT_CONFIG_OUTPUT_LINK   (LIBAVFILTER_VERSION_MAJOR < 3)
-#endif
-#ifndef FF_API_FILTERS_PUBLIC
-#define FF_API_FILTERS_PUBLIC               (LIBAVFILTER_VERSION_MAJOR < 3)
+#ifndef FF_API_BUFFERSRC_BUFFER
+#define FF_API_BUFFERSRC_BUFFER             (LIBAVFILTER_VERSION_MAJOR < 4)
 #endif
 
-#endif // AVFILTER_VERSION_H
+#endif /* AVFILTER_VERSION_H */

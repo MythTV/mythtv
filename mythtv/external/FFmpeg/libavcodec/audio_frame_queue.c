@@ -19,6 +19,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include "libavutil/common.h"
 #include "audio_frame_queue.h"
 #include "internal.h"
 #include "libavutil/avassert.h"
@@ -107,4 +108,3 @@ void ff_af_queue_remove(AudioFrameQueue *afq, int nb_samples, int64_t *pts,
     if (duration)
         *duration = ff_samples_to_time_base(afq->avctx, removed_samples);
 }
-

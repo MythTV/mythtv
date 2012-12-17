@@ -450,14 +450,14 @@ QString AudioOutputSettings::GetPassthroughParams(int codec, int codec_profile,
 
     switch (codec)
     {
-        case CODEC_ID_AC3:
+        case AV_CODEC_ID_AC3:
             log = "AC3";
             break;
-        case CODEC_ID_EAC3:
+        case AV_CODEC_ID_EAC3:
             samplerate = samplerate * 4;
             log = "Dolby Digital Plus (E-AC3)";
             break;
-        case CODEC_ID_DTS:
+        case AV_CODEC_ID_DTS:
             switch(codec_profile)
             {
                 case FF_PROFILE_DTS_ES:
@@ -488,7 +488,7 @@ QString AudioOutputSettings::GetPassthroughParams(int codec, int codec_profile,
                     break;
             }
             break;
-        case CODEC_ID_TRUEHD:
+        case AV_CODEC_ID_TRUEHD:
             channels = 8;
             log = "TrueHD";
             switch(samplerate)

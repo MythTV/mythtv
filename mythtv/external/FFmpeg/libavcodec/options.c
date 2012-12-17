@@ -27,8 +27,10 @@
 #include "avcodec.h"
 #include "internal.h"
 #include "libavutil/avassert.h"
+#include "libavutil/mem.h"
 #include "libavutil/opt.h"
 #include <float.h>              /* FLT_MIN, FLT_MAX */
+#include <string.h>
 
 #include "options_table.h"
 
@@ -65,6 +67,13 @@ static const AVClass *codec_child_class_next(const AVClass *prev)
     return NULL;
 }
 
+static AVClassCategory get_category(void *ptr)
+{
+    AVCodecContext* avctx = ptr;
+    if(avctx->codec && avctx->codec->decode) return AV_CLASS_CATEGORY_DECODER;
+    else                                     return AV_CLASS_CATEGORY_ENCODER;
+}
+
 static const AVClass av_codec_context_class = {
     .class_name              = "AVCodecContext",
     .item_name               = context_to_name,
@@ -73,6 +82,8 @@ static const AVClass av_codec_context_class = {
     .log_level_offset_offset = offsetof(AVCodecContext, log_level_offset),
     .child_next              = codec_child_next,
     .child_class_next        = codec_child_class_next,
+    .category                = AV_CLASS_CATEGORY_ENCODER,
+    .get_category            = get_category,
 };
 
 #if FF_API_ALLOC_CONTEXT
@@ -83,7 +94,8 @@ void avcodec_get_context_defaults2(AVCodecContext *s, enum AVMediaType codec_typ
 }
 #endif
 
-int avcodec_get_context_defaults3(AVCodecContext *s, AVCodec *codec){
+int avcodec_get_context_defaults3(AVCodecContext *s, const AVCodec *codec)
+{
     int flags=0;
     memset(s, 0, sizeof(AVCodecContext));
 
@@ -135,7 +147,8 @@ int avcodec_get_context_defaults3(AVCodecContext *s, AVCodec *codec){
     return 0;
 }
 
-AVCodecContext *avcodec_alloc_context3(AVCodec *codec){
+AVCodecContext *avcodec_alloc_context3(const AVCodec *codec)
+{
     AVCodecContext *avctx= av_malloc(sizeof(AVCodecContext));
 
     if(avctx==NULL) return NULL;
@@ -233,14 +246,14 @@ const AVClass *avcodec_get_class(void)
 #define FOFFSET(x) offsetof(AVFrame,x)
 
 static const AVOption frame_options[]={
-{"best_effort_timestamp", "", FOFFSET(best_effort_timestamp), AV_OPT_TYPE_INT64, {.dbl = AV_NOPTS_VALUE }, INT64_MIN, INT64_MAX, 0},
-{"pkt_pos", "", FOFFSET(pkt_pos), AV_OPT_TYPE_INT64, {.dbl = -1 }, INT64_MIN, INT64_MAX, 0},
+{"best_effort_timestamp", "", FOFFSET(best_effort_timestamp), AV_OPT_TYPE_INT64, {.i64 = AV_NOPTS_VALUE }, INT64_MIN, INT64_MAX, 0},
+{"pkt_pos", "", FOFFSET(pkt_pos), AV_OPT_TYPE_INT64, {.i64 = -1 }, INT64_MIN, INT64_MAX, 0},
 {"sample_aspect_ratio", "", FOFFSET(sample_aspect_ratio), AV_OPT_TYPE_RATIONAL, {.dbl = 0 }, 0, INT_MAX, 0},
-{"width", "", FOFFSET(width), AV_OPT_TYPE_INT, {.dbl = 0 }, 0, INT_MAX, 0},
-{"height", "", FOFFSET(height), AV_OPT_TYPE_INT, {.dbl = 0 }, 0, INT_MAX, 0},
-{"format", "", FOFFSET(format), AV_OPT_TYPE_INT, {.dbl = -1 }, 0, INT_MAX, 0},
-{"channel_layout", "", FOFFSET(channel_layout), AV_OPT_TYPE_INT64, {.dbl = 0 }, 0, INT64_MAX, 0},
-{"sample_rate", "", FOFFSET(sample_rate), AV_OPT_TYPE_INT, {.dbl = 0 }, 0, INT_MAX, 0},
+{"width", "", FOFFSET(width), AV_OPT_TYPE_INT, {.i64 = 0 }, 0, INT_MAX, 0},
+{"height", "", FOFFSET(height), AV_OPT_TYPE_INT, {.i64 = 0 }, 0, INT_MAX, 0},
+{"format", "", FOFFSET(format), AV_OPT_TYPE_INT, {.i64 = -1 }, 0, INT_MAX, 0},
+{"channel_layout", "", FOFFSET(channel_layout), AV_OPT_TYPE_INT64, {.i64 = 0 }, 0, INT64_MAX, 0},
+{"sample_rate", "", FOFFSET(sample_rate), AV_OPT_TYPE_INT, {.i64 = 0 }, 0, INT_MAX, 0},
 {NULL},
 };
 
@@ -259,12 +272,12 @@ const AVClass *avcodec_get_frame_class(void)
 #define SROFFSET(x) offsetof(AVSubtitleRect,x)
 
 static const AVOption subtitle_rect_options[]={
-{"x", "", SROFFSET(x), AV_OPT_TYPE_INT, {.dbl = 0 }, 0, INT_MAX, 0},
-{"y", "", SROFFSET(y), AV_OPT_TYPE_INT, {.dbl = 0 }, 0, INT_MAX, 0},
-{"w", "", SROFFSET(w), AV_OPT_TYPE_INT, {.dbl = 0 }, 0, INT_MAX, 0},
-{"h", "", SROFFSET(h), AV_OPT_TYPE_INT, {.dbl = 0 }, 0, INT_MAX, 0},
-{"type", "", SROFFSET(type), AV_OPT_TYPE_INT, {.dbl = 0 }, 0, INT_MAX, 0},
-{"forced", "", SROFFSET(forced), AV_OPT_TYPE_INT, {.dbl = 0}, 0, 1, 0},
+{"x", "", SROFFSET(x), AV_OPT_TYPE_INT, {.i64 = 0 }, 0, INT_MAX, 0},
+{"y", "", SROFFSET(y), AV_OPT_TYPE_INT, {.i64 = 0 }, 0, INT_MAX, 0},
+{"w", "", SROFFSET(w), AV_OPT_TYPE_INT, {.i64 = 0 }, 0, INT_MAX, 0},
+{"h", "", SROFFSET(h), AV_OPT_TYPE_INT, {.i64 = 0 }, 0, INT_MAX, 0},
+{"type", "", SROFFSET(type), AV_OPT_TYPE_INT, {.i64 = 0 }, 0, INT_MAX, 0},
+{"forced", "", SROFFSET(forced), AV_OPT_TYPE_INT, {.i64 = 0}, 0, 1, 0},
 {NULL},
 };
 

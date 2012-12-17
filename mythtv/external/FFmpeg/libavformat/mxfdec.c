@@ -322,7 +322,7 @@ static int mxf_get_d10_aes3_packet(AVIOContext *pb, AVStream *st, AVPacket *pkt,
     data_ptr = pkt->data;
     end_ptr = pkt->data + length;
     buf_ptr = pkt->data + 4; /* skip SMPTE 331M header */
-    for (; buf_ptr + st->codec->channels*4 < end_ptr; ) {
+    for (; buf_ptr + st->codec->channels*4 <= end_ptr; ) {
         for (i = 0; i < st->codec->channels; i++) {
             uint32_t sample = bytestream_get_le32(&buf_ptr);
             if (st->codec->bits_per_coded_sample == 24)
@@ -410,12 +410,14 @@ static int mxf_read_primer_pack(void *arg, AVIOContext *pb, int tag, int size, U
                               item_len);
         return AVERROR_PATCHWELCOME;
     }
-    if (item_num > UINT_MAX / item_len)
+    if (item_num > 65536) {
+        av_log(mxf->fc, AV_LOG_ERROR, "item_num %d is too large\n", item_num);
         return AVERROR_INVALIDDATA;
-    mxf->local_tags_count = item_num;
-    mxf->local_tags = av_malloc(item_num*item_len);
+    }
+    mxf->local_tags = av_calloc(item_num, item_len);
     if (!mxf->local_tags)
         return AVERROR(ENOMEM);
+    mxf->local_tags_count = item_num;
     avio_read(pb, mxf->local_tags, item_num*item_len);
     return 0;
 }
@@ -585,9 +587,7 @@ static int mxf_read_content_storage(void *arg, AVIOContext *pb, int tag, int siz
     switch (tag) {
     case 0x1901:
         mxf->packages_count = avio_rb32(pb);
-        if (mxf->packages_count >= UINT_MAX / sizeof(UID))
-            return AVERROR_INVALIDDATA;
-        mxf->packages_refs = av_malloc(mxf->packages_count * sizeof(UID));
+        mxf->packages_refs = av_calloc(mxf->packages_count, sizeof(UID));
         if (!mxf->packages_refs)
             return AVERROR(ENOMEM);
         avio_skip(pb, 4); /* useless size of objects, always 16 according to specs */
@@ -625,9 +625,7 @@ static int mxf_read_material_package(void *arg, AVIOContext *pb, int tag, int si
     switch(tag) {
     case 0x4403:
         package->tracks_count = avio_rb32(pb);
-        if (package->tracks_count >= UINT_MAX / sizeof(UID))
-            return AVERROR_INVALIDDATA;
-        package->tracks_refs = av_malloc(package->tracks_count * sizeof(UID));
+        package->tracks_refs = av_calloc(package->tracks_count, sizeof(UID));
         if (!package->tracks_refs)
             return AVERROR(ENOMEM);
         avio_skip(pb, 4); /* useless size of objects, always 16 according to specs */
@@ -687,9 +685,7 @@ static int mxf_read_sequence(void *arg, AVIOContext *pb, int tag, int size, UID 
         break;
     case 0x1001:
         sequence->structural_components_count = avio_rb32(pb);
-        if (sequence->structural_components_count >= UINT_MAX / sizeof(UID))
-            return AVERROR_INVALIDDATA;
-        sequence->structural_components_refs = av_malloc(sequence->structural_components_count * sizeof(UID));
+        sequence->structural_components_refs = av_calloc(sequence->structural_components_count, sizeof(UID));
         if (!sequence->structural_components_refs)
             return AVERROR(ENOMEM);
         avio_skip(pb, 4); /* useless size of objects, always 16 according to specs */
@@ -705,9 +701,7 @@ static int mxf_read_source_package(void *arg, AVIOContext *pb, int tag, int size
     switch(tag) {
     case 0x4403:
         package->tracks_count = avio_rb32(pb);
-        if (package->tracks_count >= UINT_MAX / sizeof(UID))
-            return AVERROR_INVALIDDATA;
-        package->tracks_refs = av_malloc(package->tracks_count * sizeof(UID));
+        package->tracks_refs = av_calloc(package->tracks_count, sizeof(UID));
         if (!package->tracks_refs)
             return AVERROR(ENOMEM);
         avio_skip(pb, 4); /* useless size of objects, always 16 according to specs */
@@ -730,6 +724,7 @@ static int mxf_read_index_entry_array(AVIOContext *pb, MXFIndexTableSegment *seg
     int i, length;
 
     segment->nb_index_entries = avio_rb32(pb);
+
     length = avio_rb32(pb);
 
     if (!(segment->temporal_offset_entries=av_calloc(segment->nb_index_entries, sizeof(*segment->temporal_offset_entries))) ||
@@ -810,9 +805,7 @@ static int mxf_read_generic_descriptor(void *arg, AVIOContext *pb, int tag, int 
     switch(tag) {
     case 0x3F01:
         descriptor->sub_descriptors_count = avio_rb32(pb);
-        if (descriptor->sub_descriptors_count >= UINT_MAX / sizeof(UID))
-            return AVERROR_INVALIDDATA;
-        descriptor->sub_descriptors_refs = av_malloc(descriptor->sub_descriptors_count * sizeof(UID));
+        descriptor->sub_descriptors_refs = av_calloc(descriptor->sub_descriptors_count, sizeof(UID));
         if (!descriptor->sub_descriptors_refs)
             return AVERROR(ENOMEM);
         avio_skip(pb, 4); /* useless size of objects, always 16 according to specs */
@@ -920,31 +913,31 @@ static void *mxf_resolve_strong_ref(MXFContext *mxf, UID *strong_ref, enum MXFMe
 
 static const MXFCodecUL mxf_picture_essence_container_uls[] = {
     // video essence container uls
-    { { 0x06,0x0E,0x2B,0x34,0x04,0x01,0x01,0x02,0x0D,0x01,0x03,0x01,0x02,0x04,0x60,0x01 }, 14, CODEC_ID_MPEG2VIDEO }, /* MPEG-ES Frame wrapped */
-    { { 0x06,0x0E,0x2B,0x34,0x04,0x01,0x01,0x01,0x0D,0x01,0x03,0x01,0x02,0x02,0x41,0x01 }, 14,    CODEC_ID_DVVIDEO }, /* DV 625 25mbps */
-    { { 0x06,0x0E,0x2B,0x34,0x04,0x01,0x01,0x01,0x0D,0x01,0x03,0x01,0x02,0x05,0x00,0x00 }, 14,   CODEC_ID_RAWVIDEO }, /* Uncompressed Picture */
-    { { 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00 },  0,      CODEC_ID_NONE },
+    { { 0x06,0x0E,0x2B,0x34,0x04,0x01,0x01,0x02,0x0D,0x01,0x03,0x01,0x02,0x04,0x60,0x01 }, 14, AV_CODEC_ID_MPEG2VIDEO }, /* MPEG-ES Frame wrapped */
+    { { 0x06,0x0E,0x2B,0x34,0x04,0x01,0x01,0x01,0x0D,0x01,0x03,0x01,0x02,0x02,0x41,0x01 }, 14,    AV_CODEC_ID_DVVIDEO }, /* DV 625 25mbps */
+    { { 0x06,0x0E,0x2B,0x34,0x04,0x01,0x01,0x01,0x0D,0x01,0x03,0x01,0x02,0x05,0x00,0x00 }, 14,   AV_CODEC_ID_RAWVIDEO }, /* Uncompressed Picture */
+    { { 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00 },  0,      AV_CODEC_ID_NONE },
 };
 
 /* EC ULs for intra-only formats */
 static const MXFCodecUL mxf_intra_only_essence_container_uls[] = {
-    { { 0x06,0x0E,0x2B,0x34,0x04,0x01,0x01,0x01,0x0D,0x01,0x03,0x01,0x02,0x01,0x00,0x00 }, 14, CODEC_ID_MPEG2VIDEO }, /* MXF-GC SMPTE D-10 Mappings */
-    { { 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00 },  0,       CODEC_ID_NONE },
+    { { 0x06,0x0E,0x2B,0x34,0x04,0x01,0x01,0x01,0x0D,0x01,0x03,0x01,0x02,0x01,0x00,0x00 }, 14, AV_CODEC_ID_MPEG2VIDEO }, /* MXF-GC SMPTE D-10 Mappings */
+    { { 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00 },  0,       AV_CODEC_ID_NONE },
 };
 
 /* intra-only PictureEssenceCoding ULs, where no corresponding EC UL exists */
 static const MXFCodecUL mxf_intra_only_picture_essence_coding_uls[] = {
-    { { 0x06,0x0E,0x2B,0x34,0x04,0x01,0x01,0x0A,0x04,0x01,0x02,0x02,0x01,0x32,0x00,0x00 }, 14,       CODEC_ID_H264 }, /* H.264/MPEG-4 AVC Intra Profiles */
-    { { 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00 },  0,       CODEC_ID_NONE },
+    { { 0x06,0x0E,0x2B,0x34,0x04,0x01,0x01,0x0A,0x04,0x01,0x02,0x02,0x01,0x32,0x00,0x00 }, 14,       AV_CODEC_ID_H264 }, /* H.264/MPEG-4 AVC Intra Profiles */
+    { { 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00 },  0,       AV_CODEC_ID_NONE },
 };
 
 static const MXFCodecUL mxf_sound_essence_container_uls[] = {
     // sound essence container uls
-    { { 0x06,0x0E,0x2B,0x34,0x04,0x01,0x01,0x01,0x0D,0x01,0x03,0x01,0x02,0x06,0x01,0x00 }, 14, CODEC_ID_PCM_S16LE }, /* BWF Frame wrapped */
-    { { 0x06,0x0E,0x2B,0x34,0x04,0x01,0x01,0x02,0x0D,0x01,0x03,0x01,0x02,0x04,0x40,0x01 }, 14,       CODEC_ID_MP2 }, /* MPEG-ES Frame wrapped, 0x40 ??? stream id */
-    { { 0x06,0x0E,0x2B,0x34,0x04,0x01,0x01,0x01,0x0D,0x01,0x03,0x01,0x02,0x01,0x01,0x01 }, 14, CODEC_ID_PCM_S16LE }, /* D-10 Mapping 50Mbps PAL Extended Template */
-    { { 0x06,0x0E,0x2B,0x34,0x01,0x01,0x01,0xFF,0x4B,0x46,0x41,0x41,0x00,0x0D,0x4D,0x4F }, 14, CODEC_ID_PCM_S16LE }, /* 0001GL00.MXF.A1.mxf_opatom.mxf */
-    { { 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00 },  0,      CODEC_ID_NONE },
+    { { 0x06,0x0E,0x2B,0x34,0x04,0x01,0x01,0x01,0x0D,0x01,0x03,0x01,0x02,0x06,0x01,0x00 }, 14, AV_CODEC_ID_PCM_S16LE }, /* BWF Frame wrapped */
+    { { 0x06,0x0E,0x2B,0x34,0x04,0x01,0x01,0x02,0x0D,0x01,0x03,0x01,0x02,0x04,0x40,0x01 }, 14,       AV_CODEC_ID_MP2 }, /* MPEG-ES Frame wrapped, 0x40 ??? stream id */
+    { { 0x06,0x0E,0x2B,0x34,0x04,0x01,0x01,0x01,0x0D,0x01,0x03,0x01,0x02,0x01,0x01,0x01 }, 14, AV_CODEC_ID_PCM_S16LE }, /* D-10 Mapping 50Mbps PAL Extended Template */
+    { { 0x06,0x0E,0x2B,0x34,0x01,0x01,0x01,0xFF,0x4B,0x46,0x41,0x41,0x00,0x0D,0x4D,0x4F }, 14, AV_CODEC_ID_PCM_S16LE }, /* 0001GL00.MXF.A1.mxf_opatom.mxf */
+    { { 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00 },  0,      AV_CODEC_ID_NONE },
 };
 
 static int mxf_get_sorted_table_segments(MXFContext *mxf, int *nb_sorted_segments, MXFIndexTableSegment ***sorted_segments)
@@ -1304,9 +1297,9 @@ finish_decoding_index:
 static int mxf_is_intra_only(MXFDescriptor *descriptor)
 {
     return mxf_get_codec_ul(mxf_intra_only_essence_container_uls,
-                            &descriptor->essence_container_ul)->id != CODEC_ID_NONE ||
+                            &descriptor->essence_container_ul)->id != AV_CODEC_ID_NONE ||
            mxf_get_codec_ul(mxf_intra_only_picture_essence_coding_uls,
-                            &descriptor->essence_codec_ul)->id     != CODEC_ID_NONE;
+                            &descriptor->essence_codec_ul)->id     != AV_CODEC_ID_NONE;
 }
 
 static int mxf_add_timecode_metadata(AVDictionary **pm, const char *key, AVTimecode *tc)
@@ -1498,7 +1491,7 @@ static int mxf_parse_structural_metadata(MXFContext *mxf)
         if (st->codec->codec_type == AVMEDIA_TYPE_VIDEO) {
             source_track->intra_only = mxf_is_intra_only(descriptor);
             container_ul = mxf_get_codec_ul(mxf_picture_essence_container_uls, essence_container_ul);
-            if (st->codec->codec_id == CODEC_ID_NONE)
+            if (st->codec->codec_id == AV_CODEC_ID_NONE)
                 st->codec->codec_id = container_ul->id;
             st->codec->width = descriptor->width;
             st->codec->height = descriptor->height; /* Field height, not frame height */
@@ -1523,10 +1516,11 @@ static int mxf_parse_structural_metadata(MXFContext *mxf)
                 default:
                     av_log(mxf->fc, AV_LOG_INFO, "Unknown frame layout type: %d\n", descriptor->frame_layout);
             }
-            if (st->codec->codec_id == CODEC_ID_RAWVIDEO) {
+            if (st->codec->codec_id == AV_CODEC_ID_RAWVIDEO) {
                 st->codec->pix_fmt = descriptor->pix_fmt;
                 if (st->codec->pix_fmt == PIX_FMT_NONE) {
-                    pix_fmt_ul = mxf_get_codec_ul(ff_mxf_pixel_format_uls, &descriptor->essence_codec_ul);
+                    pix_fmt_ul = mxf_get_codec_ul(ff_mxf_pixel_format_uls,
+                                                  &descriptor->essence_codec_ul);
                     st->codec->pix_fmt = pix_fmt_ul->id;
                     if (st->codec->pix_fmt == PIX_FMT_NONE) {
                         /* support files created before RP224v10 by defaulting to UYVY422
@@ -1542,7 +1536,8 @@ static int mxf_parse_structural_metadata(MXFContext *mxf)
             st->need_parsing = AVSTREAM_PARSE_HEADERS;
         } else if (st->codec->codec_type == AVMEDIA_TYPE_AUDIO) {
             container_ul = mxf_get_codec_ul(mxf_sound_essence_container_uls, essence_container_ul);
-            if (st->codec->codec_id == CODEC_ID_NONE)
+            /* Only overwrite existing codec ID if it is unset or A-law, which is the default according to SMPTE RP 224. */
+            if (st->codec->codec_id == AV_CODEC_ID_NONE || (st->codec->codec_id == AV_CODEC_ID_PCM_ALAW && container_ul->id != AV_CODEC_ID_NONE))
                 st->codec->codec_id = container_ul->id;
             st->codec->channels = descriptor->channels;
             st->codec->bits_per_coded_sample = descriptor->bits_per_sample;
@@ -1550,18 +1545,18 @@ static int mxf_parse_structural_metadata(MXFContext *mxf)
             if (descriptor->sample_rate.den > 0)
                 st->codec->sample_rate = descriptor->sample_rate.num / descriptor->sample_rate.den;
 
-            /* TODO: implement CODEC_ID_RAWAUDIO */
-            if (st->codec->codec_id == CODEC_ID_PCM_S16LE) {
+            /* TODO: implement AV_CODEC_ID_RAWAUDIO */
+            if (st->codec->codec_id == AV_CODEC_ID_PCM_S16LE) {
                 if (descriptor->bits_per_sample > 16 && descriptor->bits_per_sample <= 24)
-                    st->codec->codec_id = CODEC_ID_PCM_S24LE;
+                    st->codec->codec_id = AV_CODEC_ID_PCM_S24LE;
                 else if (descriptor->bits_per_sample == 32)
-                    st->codec->codec_id = CODEC_ID_PCM_S32LE;
-            } else if (st->codec->codec_id == CODEC_ID_PCM_S16BE) {
+                    st->codec->codec_id = AV_CODEC_ID_PCM_S32LE;
+            } else if (st->codec->codec_id == AV_CODEC_ID_PCM_S16BE) {
                 if (descriptor->bits_per_sample > 16 && descriptor->bits_per_sample <= 24)
-                    st->codec->codec_id = CODEC_ID_PCM_S24BE;
+                    st->codec->codec_id = AV_CODEC_ID_PCM_S24BE;
                 else if (descriptor->bits_per_sample == 32)
-                    st->codec->codec_id = CODEC_ID_PCM_S32BE;
-            } else if (st->codec->codec_id == CODEC_ID_MP2) {
+                    st->codec->codec_id = AV_CODEC_ID_PCM_S32BE;
+            } else if (st->codec->codec_id == AV_CODEC_ID_MP2) {
                 st->need_parsing = AVSTREAM_PARSE_FULL;
             }
         }
@@ -1770,10 +1765,10 @@ static int64_t round_to_kag(int64_t position, int kag_size)
     return ret == position ? ret : ret + kag_size;
 }
 
-static int is_pcm(enum CodecID codec_id)
+static int is_pcm(enum AVCodecID codec_id)
 {
     /* we only care about "normal" PCM codecs until we get samples */
-    return codec_id >= CODEC_ID_PCM_S16LE && codec_id < CODEC_ID_PCM_S24DAUD;
+    return codec_id >= AV_CODEC_ID_PCM_S16LE && codec_id < AV_CODEC_ID_PCM_S24DAUD;
 }
 
 /**
@@ -1971,7 +1966,7 @@ static int64_t mxf_set_current_edit_unit(MXFContext *mxf, int64_t current_offset
              * around this fixes the infinite loop on zzuf3.mxf */
             av_log(mxf->fc, AV_LOG_ERROR,
                    "next_ofs didn't change. not deriving packet timestamps\n");
-            return - 1;
+            return -1;
         }
 
         if (next_ofs > current_offset)
@@ -2208,7 +2203,7 @@ static int mxf_read_seek(AVFormatContext *s, int stream_index, int64_t sample_ti
     int ret;
     MXFIndexTable *t;
 
-    if (mxf->index_tables <= 0) {
+    if (mxf->nb_index_tables <= 0) {
     if (!s->bit_rate)
         return AVERROR_INVALIDDATA;
     if (sample_time < 0)
@@ -2247,7 +2242,7 @@ static int mxf_read_seek(AVFormatContext *s, int stream_index, int64_t sample_ti
 
 AVInputFormat ff_mxf_demuxer = {
     .name           = "mxf",
-    .long_name      = NULL_IF_CONFIG_SMALL("Material eXchange Format"),
+    .long_name      = NULL_IF_CONFIG_SMALL("MXF (Material eXchange Format)"),
     .priv_data_size = sizeof(MXFContext),
     .read_probe     = mxf_probe,
     .read_header    = mxf_read_header,

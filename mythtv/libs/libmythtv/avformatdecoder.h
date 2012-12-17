@@ -13,6 +13,7 @@
 #include "decoderbase.h"
 #include "privatedecoder.h"
 #include "audiooutputsettings.h"
+#include "audiooutpututil.h"
 #include "spdifencoder.h"
 #include "vbilut.h"
 #include "H264Parser.h"
@@ -46,7 +47,7 @@ class AudioInfo
 {
   public:
     AudioInfo() :
-        codec_id(CODEC_ID_NONE), format(FORMAT_NONE), sample_size(-2),
+        codec_id(AV_CODEC_ID_NONE), format(FORMAT_NONE), sample_size(-2),
         sample_rate(-1), channels(-1), codec_profile(0),
         do_passthru(false), original_channels(-1)
     {;}
@@ -197,7 +198,7 @@ class AvFormatDecoder : public DecoderBase
     int  filter_max_ch(const AVFormatContext *ic,
                        const sinfo_vec_t     &tracks,
                        const vector<int>     &fs,
-                       enum CodecID           codecId = CODEC_ID_NONE,
+                       enum CodecID           codecId = AV_CODEC_ID_NONE,
                        int                    profile = -1);
 
     friend int get_avf_buffer(struct AVCodecContext *c, AVFrame *pic);
@@ -250,6 +251,7 @@ class AvFormatDecoder : public DecoderBase
     bool HasVideo(const AVFormatContext *ic);
     float normalized_fps(AVStream *stream, AVCodecContext *enc);
     void av_update_stream_timings_video(AVFormatContext *ic);
+    bool OpenAVCodec(AVCodecContext *avctx, const AVCodec *codec);
 
     virtual void UpdateFramesPlayed(void);
     virtual bool DoRewindSeek(long long desiredFrame);

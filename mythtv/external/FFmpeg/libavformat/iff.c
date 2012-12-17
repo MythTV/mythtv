@@ -29,6 +29,7 @@
  */
 
 #include "libavcodec/bytestream.h"
+#include "libavutil/avassert.h"
 #include "libavutil/intreadwrite.h"
 #include "libavutil/dict.h"
 #include "avformat.h"
@@ -60,7 +61,6 @@
 #define ID_ABIT       MKTAG('A','B','I','T')
 #define ID_BODY       MKTAG('B','O','D','Y')
 #define ID_DBOD       MKTAG('D','B','O','D')
-#define ID_ANNO       MKTAG('A','N','N','O')
 #define ID_DPEL       MKTAG('D','P','E','L')
 
 #define LEFT    2
@@ -124,8 +124,12 @@ static int iff_probe(AVProbeData *p)
 {
     const uint8_t *d = p->buf;
 
-    if ( AV_RL32(d)   == ID_FORM &&
-         (AV_RL32(d+8) == ID_8SVX || AV_RL32(d+8) == ID_PBM || AV_RL32(d+8) == ID_ACBM || AV_RL32(d+8) == ID_DEEP || AV_RL32(d+8) == ID_ILBM) )
+    if (  AV_RL32(d)   == ID_FORM &&
+         (AV_RL32(d+8) == ID_8SVX ||
+          AV_RL32(d+8) == ID_PBM  ||
+          AV_RL32(d+8) == ID_ACBM ||
+          AV_RL32(d+8) == ID_DEEP ||
+          AV_RL32(d+8) == ID_ILBM) )
         return AVPROBE_SCORE_MAX;
     return 0;
 }
@@ -238,7 +242,7 @@ static int iff_read_header(AVFormatContext *s)
             else if (fmt_size == sizeof(deep_rgba) && !memcmp(fmt, deep_rgba, sizeof(deep_rgba)))
                 st->codec->pix_fmt = PIX_FMT_RGBA;
             else {
-                av_log_ask_for_sample(NULL, "unsupported color format\n");
+                av_log_ask_for_sample(s, "unsupported color format\n");
                 return AVERROR_PATCHWELCOME;
             }
             break;
@@ -269,7 +273,7 @@ static int iff_read_header(AVFormatContext *s)
 
         if (metadata_tag) {
             if ((res = get_metadata(s, metadata_tag, data_size)) < 0) {
-                av_log(s, AV_LOG_ERROR, "cannot allocate metadata tag %s!", metadata_tag);
+                av_log(s, AV_LOG_ERROR, "cannot allocate metadata tag %s!\n", metadata_tag);
                 return res;
             }
         }
@@ -284,13 +288,13 @@ static int iff_read_header(AVFormatContext *s)
 
         switch (iff->svx8_compression) {
         case COMP_NONE:
-            st->codec->codec_id = CODEC_ID_PCM_S8_PLANAR;
+            st->codec->codec_id = AV_CODEC_ID_PCM_S8_PLANAR;
             break;
         case COMP_FIB:
-            st->codec->codec_id = CODEC_ID_8SVX_FIB;
+            st->codec->codec_id = AV_CODEC_ID_8SVX_FIB;
             break;
         case COMP_EXP:
-            st->codec->codec_id = CODEC_ID_8SVX_EXP;
+            st->codec->codec_id = AV_CODEC_ID_8SVX_EXP;
             break;
         default:
             av_log(s, AV_LOG_ERROR,
@@ -330,10 +334,10 @@ static int iff_read_header(AVFormatContext *s)
 
         switch (iff->bitmap_compression) {
         case BITMAP_RAW:
-            st->codec->codec_id = CODEC_ID_IFF_ILBM;
+            st->codec->codec_id = AV_CODEC_ID_IFF_ILBM;
             break;
         case BITMAP_BYTERUN1:
-            st->codec->codec_id = CODEC_ID_IFF_BYTERUN1;
+            st->codec->codec_id = AV_CODEC_ID_IFF_BYTERUN1;
             break;
         default:
             av_log(s, AV_LOG_ERROR,
@@ -372,7 +376,7 @@ static int iff_read_packet(AVFormatContext *s,
         bytestream_put_be16(&buf, 2);
         ret = avio_read(pb, buf, iff->body_size);
     } else {
-        av_abort();
+        av_assert0(0);
     }
 
     if(iff->sent_bytes == 0)
@@ -385,7 +389,7 @@ static int iff_read_packet(AVFormatContext *s,
 
 AVInputFormat ff_iff_demuxer = {
     .name           = "iff",
-    .long_name      = NULL_IF_CONFIG_SMALL("Interchange File Format"),
+    .long_name      = NULL_IF_CONFIG_SMALL("IFF (Interchange File Format)"),
     .priv_data_size = sizeof(IffDemuxContext),
     .read_probe     = iff_probe,
     .read_header    = iff_read_header,

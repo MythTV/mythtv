@@ -19,8 +19,12 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include <string.h>
+
 #include "avcodec.h"
 #include "libavutil/avstring.h"
+#include "libavutil/internal.h"
+#include "libavutil/mem.h"
 
 static av_cold int ass_encode_init(AVCodecContext *avctx)
 {
@@ -33,9 +37,9 @@ static av_cold int ass_encode_init(AVCodecContext *avctx)
 }
 
 static int ass_encode_frame(AVCodecContext *avctx,
-                            unsigned char *buf, int bufsize, void *data)
+                            unsigned char *buf, int bufsize,
+                            const AVSubtitle *sub)
 {
-    AVSubtitle *sub = data;
     int i, len, total_len = 0;
 
     for (i=0; i<sub->num_rects; i++) {
@@ -59,9 +63,9 @@ static int ass_encode_frame(AVCodecContext *avctx,
 
 AVCodec ff_ass_encoder = {
     .name         = "ass",
-    .long_name    = NULL_IF_CONFIG_SMALL("Advanced SubStation Alpha subtitle"),
+    .long_name    = NULL_IF_CONFIG_SMALL("SSA (SubStation Alpha) subtitle"),
     .type         = AVMEDIA_TYPE_SUBTITLE,
-    .id           = CODEC_ID_SSA,
+    .id           = AV_CODEC_ID_SSA,
     .init         = ass_encode_init,
-    .encode       = ass_encode_frame,
+    .encode_sub   = ass_encode_frame,
 };

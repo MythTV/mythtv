@@ -34,6 +34,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "libavutil/common.h"
 #include "libavutil/intreadwrite.h"
 #include "avcodec.h"
 
@@ -475,7 +476,7 @@ static av_cold int cinepak_decode_end(AVCodecContext *avctx)
 AVCodec ff_cinepak_decoder = {
     .name           = "cinepak",
     .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = CODEC_ID_CINEPAK,
+    .id             = AV_CODEC_ID_CINEPAK,
     .priv_data_size = sizeof(CinepakContext),
     .init           = cinepak_decode_init,
     .close          = cinepak_decode_end,

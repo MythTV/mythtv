@@ -48,9 +48,35 @@ int RENAME(swri_resample)(ResampleContext *c, DELEM *dst, const DELEM *src, int 
         index += dst_index * dst_incr;
         index += (frac + dst_index * (int64_t)dst_incr_frac) / c->src_incr;
         frac   = (frac + dst_index * (int64_t)dst_incr_frac) % c->src_incr;
+    }else if(compensation_distance == 0 && !c->linear && index >= 0){
+        for(dst_index=0; dst_index < dst_size; dst_index++){
+            FELEM *filter= ((FELEM*)c->filter_bank) + c->filter_alloc*(index & c->phase_mask);
+            int sample_index= index >> c->phase_shift;
+
+            if(sample_index + c->filter_length > src_size){
+                break;
+            }else{
+#ifdef COMMON_CORE
+                COMMON_CORE
+#else
+                FELEM2 val=0;
+                for(i=0; i<c->filter_length; i++){
+                    val += src[sample_index + i] * (FELEM2)filter[i];
+                }
+                OUT(dst[dst_index], val);
+#endif
+            }
+
+            frac += dst_incr_frac;
+            index += dst_incr;
+            if(frac >= c->src_incr){
+                frac -= c->src_incr;
+                index++;
+            }
+        }
     }else{
         for(dst_index=0; dst_index < dst_size; dst_index++){
-            FELEM *filter= ((FELEM*)c->filter_bank) + c->filter_length*(index & c->phase_mask);
+            FELEM *filter= ((FELEM*)c->filter_bank) + c->filter_alloc*(index & c->phase_mask);
             int sample_index= index >> c->phase_shift;
             FELEM2 val=0;
 
@@ -63,7 +89,7 @@ int RENAME(swri_resample)(ResampleContext *c, DELEM *dst, const DELEM *src, int 
                 FELEM2 v2=0;
                 for(i=0; i<c->filter_length; i++){
                     val += src[sample_index + i] * (FELEM2)filter[i];
-                    v2  += src[sample_index + i] * (FELEM2)filter[i + c->filter_length];
+                    v2  += src[sample_index + i] * (FELEM2)filter[i + c->filter_alloc];
                 }
                 val+=(v2-val)*(FELEML)frac / c->src_incr;
             }else{
@@ -93,7 +119,7 @@ int RENAME(swri_resample)(ResampleContext *c, DELEM *dst, const DELEM *src, int 
 
     if(compensation_distance){
         compensation_distance -= dst_index;
-        assert(compensation_distance > 0);
+        av_assert1(compensation_distance > 0);
     }
     if(update_ctx){
         c->frac= frac;

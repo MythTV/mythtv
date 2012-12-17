@@ -19,14 +19,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include "libavutil/float_dsp.h"
 #include "avcodec.h"
 #define BITSTREAM_READER_LE
 #include "get_bits.h"
 #include "ra288.h"
 #include "lpc.h"
-#include "celp_math.h"
 #include "celp_filters.h"
-#include "dsputil.h"
 
 #define MAX_BACKWARD_FILTER_ORDER  36
 #define MAX_BACKWARD_FILTER_LEN    40
@@ -38,6 +37,7 @@
 typedef struct {
     AVFrame frame;
     DSPContext dsp;
+    AVFloatDSPContext fdsp;
     DECLARE_ALIGNED(32, float,   sp_lpc)[FFALIGN(36, 16)];   ///< LPC coefficients for speech data (spec: A)
     DECLARE_ALIGNED(32, float, gain_lpc)[FFALIGN(10, 16)];   ///< LPC coefficients for gain        (spec: GB)
 
@@ -62,7 +62,7 @@ static av_cold int ra288_decode_init(AVCodecContext *avctx)
 {
     RA288Context *ractx = avctx->priv_data;
     avctx->sample_fmt = AV_SAMPLE_FMT_FLT;
-    ff_dsputil_init(&ractx->dsp, avctx);
+    avpriv_float_dsp_init(&ractx->fdsp, avctx->flags & CODEC_FLAG_BITEXACT);
 
     avcodec_get_frame_defaults(&ractx->frame);
     avctx->coded_frame = &ractx->frame;
@@ -73,7 +73,7 @@ static av_cold int ra288_decode_init(AVCodecContext *avctx)
 static void convolve(float *tgt, const float *src, int len, int n)
 {
     for (; n >= 0; n--)
-        tgt[n] = ff_dot_productf(src, src - n, len);
+        tgt[n] = ff_scalarproduct_float_c(src, src - n, len);
 
 }
 
@@ -102,7 +102,7 @@ static void decode(RA288Context *ractx, float gain, int cb_coef)
     for (i=0; i < 5; i++)
         buffer[i] = codetable[cb_coef][i] * sumsum;
 
-    sum = ff_dot_productf(buffer, buffer, 5);
+    sum = ff_scalarproduct_float_c(buffer, buffer, 5);
 
     sum = FFMAX(sum, 5. / (1<<24));
 
@@ -137,7 +137,7 @@ static void do_hybrid_window(RA288Context *ractx,
                                             MAX_BACKWARD_FILTER_LEN   +
                                             MAX_BACKWARD_FILTER_NONREC, 16)]);
 
-    ractx->dsp.vector_fmul(work, window, hist, FFALIGN(order + n + non_rec, 16));
+    ractx->fdsp.vector_fmul(work, window, hist, FFALIGN(order + n + non_rec, 16));
 
     convolve(buffer1, work + order    , n      , order);
     convolve(buffer2, work + order + n, non_rec, order);
@@ -164,7 +164,7 @@ static void backward_filter(RA288Context *ractx,
     do_hybrid_window(ractx, order, n, non_rec, temp, hist, rec, window);
 
     if (!compute_lpc_coefs(temp, order, lpc, 0, 1, 1))
-        ractx->dsp.vector_fmul(lpc, lpc, tab, FFALIGN(order, 16));
+        ractx->fdsp.vector_fmul(lpc, lpc, tab, FFALIGN(order, 16));
 
     memmove(hist, hist + n, move_size*sizeof(*hist));
 }
@@ -223,7 +223,7 @@ static int ra288_decode_frame(AVCodecContext * avctx, void *data,
 AVCodec ff_ra_288_decoder = {
     .name           = "real_288",
     .type           = AVMEDIA_TYPE_AUDIO,
-    .id             = CODEC_ID_RA_288,
+    .id             = AV_CODEC_ID_RA_288,
     .priv_data_size = sizeof(RA288Context),
     .init           = ra288_decode_init,
     .decode         = ra288_decode_frame,

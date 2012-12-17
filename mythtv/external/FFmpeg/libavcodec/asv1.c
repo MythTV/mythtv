@@ -31,9 +31,6 @@
 #include "dsputil.h"
 #include "mpeg12data.h"
 
-//#undef NDEBUG
-//#include <assert.h>
-
 #define VLC_BITS 6
 #define ASV2_LEVEL_VLC_BITS 10
 
@@ -294,7 +291,7 @@ static inline void asv2_encode_block(ASV1Context *a, DCTELEM block[64]){
         if( (block[index + 1] = (block[index + 1]*a->q_intra_matrix[index + 1] + (1<<15))>>16) ) ccp |= 2;
         if( (block[index + 9] = (block[index + 9]*a->q_intra_matrix[index + 9] + (1<<15))>>16) ) ccp |= 1;
 
-        assert(i || ccp<8);
+        av_assert2(i || ccp<8);
         if(i) put_bits(&a->pb, ac_ccp_tab[ccp][1], ac_ccp_tab[ccp][0]);
         else  put_bits(&a->pb, dc_ccp_tab[ccp][1], dc_ccp_tab[ccp][0]);
 
@@ -312,7 +309,7 @@ static inline int decode_mb(ASV1Context *a, DCTELEM block[6][64]){
 
     a->dsp.clear_blocks(block[0]);
 
-    if(a->avctx->codec_id == CODEC_ID_ASV1){
+    if(a->avctx->codec_id == AV_CODEC_ID_ASV1){
         for(i=0; i<6; i++){
             if( asv1_decode_block(a, block[i]) < 0)
                 return -1;
@@ -336,7 +333,7 @@ static inline int encode_mb(ASV1Context *a, DCTELEM block[6][64]){
         return -1;
     }
 
-    if(a->avctx->codec_id == CODEC_ID_ASV1){
+    if(a->avctx->codec_id == AV_CODEC_ID_ASV1){
         for(i=0; i<6; i++)
             asv1_encode_block(a, block[i]);
     }else{
@@ -416,7 +413,7 @@ static int decode_frame(AVCodecContext *avctx,
     if (!a->bitstream_buffer)
         return AVERROR(ENOMEM);
 
-    if(avctx->codec_id == CODEC_ID_ASV1)
+    if(avctx->codec_id == AV_CODEC_ID_ASV1)
         a->dsp.bswap_buf((uint32_t*)a->bitstream_buffer, (const uint32_t*)buf, buf_size/4);
     else{
         int i;
@@ -512,7 +509,7 @@ static int encode_frame(AVCodecContext *avctx, AVPacket *pkt,
 
     size= put_bits_count(&a->pb)/32;
 
-    if(avctx->codec_id == CODEC_ID_ASV1)
+    if(avctx->codec_id == AV_CODEC_ID_ASV1)
         a->dsp.bswap_buf((uint32_t*)pkt->data, (uint32_t*)pkt->data, size);
     else{
         int i;
@@ -546,7 +543,7 @@ static av_cold int decode_init(AVCodecContext *avctx){
     ASV1Context * const a = avctx->priv_data;
     AVFrame *p= &a->picture;
     int i;
-    const int scale= avctx->codec_id == CODEC_ID_ASV1 ? 1 : 2;
+    const int scale= avctx->codec_id == AV_CODEC_ID_ASV1 ? 1 : 2;
 
     common_init(avctx);
     init_vlcs(a);
@@ -555,7 +552,7 @@ static av_cold int decode_init(AVCodecContext *avctx){
 
     if(avctx->extradata_size < 1 || (a->inv_qscale= avctx->extradata[0]) == 0){
         av_log(avctx, AV_LOG_ERROR, "illegal qscale 0\n");
-        if(avctx->codec_id == CODEC_ID_ASV1)
+        if(avctx->codec_id == AV_CODEC_ID_ASV1)
             a->inv_qscale= 6;
         else
             a->inv_qscale= 10;
@@ -579,7 +576,7 @@ static av_cold int decode_init(AVCodecContext *avctx){
 static av_cold int encode_init(AVCodecContext *avctx){
     ASV1Context * const a = avctx->priv_data;
     int i;
-    const int scale= avctx->codec_id == CODEC_ID_ASV1 ? 1 : 2;
+    const int scale= avctx->codec_id == AV_CODEC_ID_ASV1 ? 1 : 2;
 
     common_init(avctx);
 
@@ -614,10 +611,11 @@ static av_cold int decode_end(AVCodecContext *avctx){
     return 0;
 }
 
+#if CONFIG_ASV1_DECODER
 AVCodec ff_asv1_decoder = {
     .name           = "asv1",
     .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = CODEC_ID_ASV1,
+    .id             = AV_CODEC_ID_ASV1,
     .priv_data_size = sizeof(ASV1Context),
     .init           = decode_init,
     .close          = decode_end,
@@ -625,11 +623,13 @@ AVCodec ff_asv1_decoder = {
     .capabilities   = CODEC_CAP_DR1,
     .long_name      = NULL_IF_CONFIG_SMALL("ASUS V1"),
 };
+#endif
 
+#if CONFIG_ASV2_DECODER
 AVCodec ff_asv2_decoder = {
     .name           = "asv2",
     .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = CODEC_ID_ASV2,
+    .id             = AV_CODEC_ID_ASV2,
     .priv_data_size = sizeof(ASV1Context),
     .init           = decode_init,
     .close          = decode_end,
@@ -637,12 +637,13 @@ AVCodec ff_asv2_decoder = {
     .capabilities   = CODEC_CAP_DR1,
     .long_name      = NULL_IF_CONFIG_SMALL("ASUS V2"),
 };
+#endif
 
 #if CONFIG_ASV1_ENCODER
 AVCodec ff_asv1_encoder = {
     .name           = "asv1",
     .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = CODEC_ID_ASV1,
+    .id             = AV_CODEC_ID_ASV1,
     .priv_data_size = sizeof(ASV1Context),
     .init           = encode_init,
     .encode2        = encode_frame,
@@ -655,7 +656,7 @@ AVCodec ff_asv1_encoder = {
 AVCodec ff_asv2_encoder = {
     .name           = "asv2",
     .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = CODEC_ID_ASV2,
+    .id             = AV_CODEC_ID_ASV2,
     .priv_data_size = sizeof(ASV1Context),
     .init           = encode_init,
     .encode2        = encode_frame,

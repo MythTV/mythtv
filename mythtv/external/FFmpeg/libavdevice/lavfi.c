@@ -46,6 +46,7 @@ typedef struct {
     AVFilterGraph *graph;
     AVFilterContext **sinks;
     int *sink_stream_map;
+    int *sink_eof;
     int *stream_sink_map;
 } LavfiContext;
 
@@ -72,6 +73,7 @@ av_cold static int lavfi_read_close(AVFormatContext *avctx)
     LavfiContext *lavfi = avctx->priv_data;
 
     av_freep(&lavfi->sink_stream_map);
+    av_freep(&lavfi->sink_eof);
     av_freep(&lavfi->stream_sink_map);
     av_freep(&lavfi->sinks);
     avfilter_graph_free(&lavfi->graph);
@@ -95,8 +97,8 @@ av_cold static int lavfi_read_header(AVFormatContext *avctx)
 
     avfilter_register_all();
 
-    buffersink = avfilter_get_by_name("buffersink");
-    abuffersink = avfilter_get_by_name("abuffersink");
+    buffersink = avfilter_get_by_name("ffbuffersink");
+    abuffersink = avfilter_get_by_name("ffabuffersink");
 
     if (!lavfi->graph_str)
         lavfi->graph_str = av_strdup(avctx->filename);
@@ -119,6 +121,8 @@ av_cold static int lavfi_read_header(AVFormatContext *avctx)
     for (n = 0, inout = output_links; inout; n++, inout = inout->next);
 
     if (!(lavfi->sink_stream_map = av_malloc(sizeof(int) * n)))
+        FAIL(AVERROR(ENOMEM));
+    if (!(lavfi->sink_eof = av_mallocz(sizeof(int) * n)))
         FAIL(AVERROR(ENOMEM));
     if (!(lavfi->stream_sink_map = av_malloc(sizeof(int) * n)))
         FAIL(AVERROR(ENOMEM));
@@ -191,16 +195,10 @@ av_cold static int lavfi_read_header(AVFormatContext *avctx)
         if (type == AVMEDIA_TYPE_VIDEO) {
             AVBufferSinkParams *buffersink_params = av_buffersink_params_alloc();
 
-#if FF_API_OLD_VSINK_API
-            ret = avfilter_graph_create_filter(&sink, buffersink,
-                                               inout->name, NULL,
-                                               pix_fmts, lavfi->graph);
-#else
             buffersink_params->pixel_fmts = pix_fmts;
             ret = avfilter_graph_create_filter(&sink, buffersink,
                                                inout->name, NULL,
                                                buffersink_params, lavfi->graph);
-#endif
             av_freep(&buffersink_params);
 
             if (ret < 0)
@@ -211,10 +209,8 @@ av_cold static int lavfi_read_header(AVFormatContext *avctx)
                                                   AV_SAMPLE_FMT_S32,
                                                   AV_SAMPLE_FMT_FLT,
                                                   AV_SAMPLE_FMT_DBL, -1 };
-            const int64_t *chlayouts = avfilter_all_channel_layouts;
             AVABufferSinkParams *abuffersink_params = av_abuffersink_params_alloc();
             abuffersink_params->sample_fmts = sample_fmts;
-            abuffersink_params->channel_layouts = chlayouts;
 
             ret = avfilter_graph_create_filter(&sink, abuffersink,
                                                inout->name, NULL,
@@ -247,7 +243,7 @@ av_cold static int lavfi_read_header(AVFormatContext *avctx)
         st->codec->codec_type = link->type;
         avpriv_set_pts_info(st, 64, link->time_base.num, link->time_base.den);
         if (link->type == AVMEDIA_TYPE_VIDEO) {
-            st->codec->codec_id   = CODEC_ID_RAWVIDEO;
+            st->codec->codec_id   = AV_CODEC_ID_RAWVIDEO;
             st->codec->pix_fmt    = link->format;
             st->codec->time_base  = link->time_base;
             st->codec->width      = link->w;
@@ -261,7 +257,7 @@ av_cold static int lavfi_read_header(AVFormatContext *avctx)
             st->codec->sample_rate = link->sample_rate;
             st->codec->time_base   = link->time_base;
             st->codec->channel_layout = link->channel_layout;
-            if (st->codec->codec_id == CODEC_ID_NONE)
+            if (st->codec->codec_id == AV_CODEC_ID_NONE)
                 av_log(avctx, AV_LOG_ERROR,
                        "Could not find PCM codec for sample format %s.\n",
                        av_get_sample_fmt_name(link->format));
@@ -292,9 +288,18 @@ static int lavfi_read_packet(AVFormatContext *avctx, AVPacket *pkt)
     for (i = 0; i < avctx->nb_streams; i++) {
         AVRational tb = lavfi->sinks[i]->inputs[0]->time_base;
         double d;
-        int ret = av_buffersink_get_buffer_ref(lavfi->sinks[i],
-                                               &ref, AV_BUFFERSINK_FLAG_PEEK);
-        if (ret < 0)
+        int ret;
+
+        if (lavfi->sink_eof[i])
+            continue;
+
+        ret = av_buffersink_get_buffer_ref(lavfi->sinks[i],
+                                       &ref, AV_BUFFERSINK_FLAG_PEEK);
+        if (ret == AVERROR_EOF) {
+            av_dlog(avctx, "EOF sink_idx:%d\n", i);
+            lavfi->sink_eof[i] = 1;
+            continue;
+        } else if (ret < 0)
             return ret;
         d = av_rescale_q(ref->pts, tb, AV_TIME_BASE_Q);
         av_dlog(avctx, "sink_idx:%d time:%f\n", i, d);
@@ -304,6 +309,9 @@ static int lavfi_read_packet(AVFormatContext *avctx, AVPacket *pkt)
             min_pts_sink_idx = i;
         }
     }
+    if (min_pts == DBL_MAX)
+        return AVERROR_EOF;
+
     av_dlog(avctx, "min_pts_sink_idx:%i\n", min_pts_sink_idx);
 
     av_buffersink_get_buffer_ref(lavfi->sinks[min_pts_sink_idx], &ref, 0);
@@ -333,7 +341,6 @@ static int lavfi_read_packet(AVFormatContext *avctx, AVPacket *pkt)
     pkt->pos = ref->pos;
     pkt->size = size;
     avfilter_unref_buffer(ref);
-
     return size;
 }
 
@@ -342,8 +349,8 @@ static int lavfi_read_packet(AVFormatContext *avctx, AVPacket *pkt)
 #define DEC AV_OPT_FLAG_DECODING_PARAM
 
 static const AVOption options[] = {
-    { "graph", "Libavfilter graph", OFFSET(graph_str),  AV_OPT_TYPE_STRING, {.str = NULL }, 0,  0, DEC },
-    { "dumpgraph", "Dump graph to stderr", OFFSET(dump_graph), AV_OPT_TYPE_STRING, {.str = NULL}, 0,  0, DEC },
+    { "graph",     "set libavfilter graph", OFFSET(graph_str),  AV_OPT_TYPE_STRING, {.str = NULL}, 0, 0, DEC },
+    { "dumpgraph", "dump graph to stderr",  OFFSET(dump_graph), AV_OPT_TYPE_STRING, {.str = NULL}, 0, 0, DEC },
     { NULL },
 };
 

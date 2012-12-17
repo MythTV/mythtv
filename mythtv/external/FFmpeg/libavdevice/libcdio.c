@@ -83,9 +83,9 @@ static av_cold int read_header(AVFormatContext *ctx)
 
     st->codec->codec_type      = AVMEDIA_TYPE_AUDIO;
     if (s->drive->bigendianp)
-        st->codec->codec_id    = CODEC_ID_PCM_S16BE;
+        st->codec->codec_id    = AV_CODEC_ID_PCM_S16BE;
     else
-        st->codec->codec_id    = CODEC_ID_PCM_S16LE;
+        st->codec->codec_id    = AV_CODEC_ID_PCM_S16LE;
     st->codec->sample_rate     = 44100;
     st->codec->channels        = 2;
     if (s->drive->audio_last_sector != CDIO_INVALID_LSN &&
@@ -160,11 +160,11 @@ static int read_seek(AVFormatContext *ctx, int stream_index, int64_t timestamp,
 #define OFFSET(x) offsetof(CDIOContext, x)
 #define DEC AV_OPT_FLAG_DECODING_PARAM
 static const AVOption options[] = {
-    { "speed",              "Drive reading speed.", OFFSET(speed),         AV_OPT_TYPE_INT,   { 0 }, 0,       INT_MAX, DEC },
-    { "paranoia_mode",      "Error recovery mode.", OFFSET(paranoia_mode), AV_OPT_TYPE_FLAGS, { 0 }, INT_MIN, INT_MAX, DEC, "paranoia_mode" },
-        { "verify",         "Verify data integrity in overlap area", 0,    AV_OPT_TYPE_CONST, { PARANOIA_MODE_VERIFY },    0, 0, DEC, "paranoia_mode" },
-        { "overlap",        "Perform overlapped reads.",             0,    AV_OPT_TYPE_CONST, { PARANOIA_MODE_OVERLAP },   0, 0, DEC, "paranoia_mode" },
-        { "neverskip",      "Do not skip failed reads.",             0,    AV_OPT_TYPE_CONST, { PARANOIA_MODE_NEVERSKIP }, 0, 0, DEC, "paranoia_mode" },
+    { "speed",              "Drive reading speed.", OFFSET(speed),         AV_OPT_TYPE_INT,   { .i64 = 0 }, 0,       INT_MAX, DEC },
+    { "paranoia_mode",      "Error recovery mode.", OFFSET(paranoia_mode), AV_OPT_TYPE_FLAGS, { .i64 = 0 }, INT_MIN, INT_MAX, DEC, "paranoia_mode" },
+        { "verify",         "Verify data integrity in overlap area", 0,    AV_OPT_TYPE_CONST, { .i64 = PARANOIA_MODE_VERIFY },    0, 0, DEC, "paranoia_mode" },
+        { "overlap",        "Perform overlapped reads.",             0,    AV_OPT_TYPE_CONST, { .i64 = PARANOIA_MODE_OVERLAP },   0, 0, DEC, "paranoia_mode" },
+        { "neverskip",      "Do not skip failed reads.",             0,    AV_OPT_TYPE_CONST, { .i64 = PARANOIA_MODE_NEVERSKIP }, 0, 0, DEC, "paranoia_mode" },
     { NULL },
 };
 

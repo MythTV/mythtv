@@ -3,20 +3,20 @@
  *
  * Copyright (c) 2012 Paul B Mahol
  *
- * This file is part of Libav.
+ * This file is part of FFmpeg.
  *
- * Libav is free software; you can redistribute it and/or
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
  *
- * Libav is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with Libav; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
@@ -157,10 +157,13 @@ static int xwd_decode_frame(AVCodecContext *avctx, void *data,
     switch (vclass) {
     case XWD_STATIC_GRAY:
     case XWD_GRAY_SCALE:
-        if (bpp != 1)
+        if (bpp != 1 && bpp != 8)
             return AVERROR_INVALIDDATA;
-        if (pixdepth == 1)
+        if (pixdepth == 1) {
             avctx->pix_fmt = PIX_FMT_MONOWHITE;
+        } else if (pixdepth == 8) {
+            avctx->pix_fmt = PIX_FMT_GRAY8;
+        }
         break;
     case XWD_STATIC_COLOR:
     case XWD_PSEUDO_COLOR:
@@ -260,7 +263,7 @@ static av_cold int xwd_decode_close(AVCodecContext *avctx)
 AVCodec ff_xwd_decoder = {
     .name           = "xwd",
     .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = CODEC_ID_XWD,
+    .id             = AV_CODEC_ID_XWD,
     .init           = xwd_decode_init,
     .close          = xwd_decode_close,
     .decode         = xwd_decode_frame,

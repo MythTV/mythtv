@@ -6,9 +6,8 @@
 #include <QMutex>
 #include <QRunnable>
 
-#include "videooutbase.h"
-
 #include "mythplayer.h"
+#include "videooutbase.h"
 
 class VideoDecodeBuffer : public QRunnable
 {

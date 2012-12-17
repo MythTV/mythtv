@@ -112,7 +112,7 @@ static int read_frame(BVID_DemuxContext *vid, AVIOContext *pb, AVPacket *pkt,
         }
         avpriv_set_pts_info(st, 64, 185, vid->sample_rate);
         st->codec->codec_type = AVMEDIA_TYPE_VIDEO;
-        st->codec->codec_id   = CODEC_ID_BETHSOFTVID;
+        st->codec->codec_id   = AV_CODEC_ID_BETHSOFTVID;
         st->codec->width      = vid->width;
         st->codec->height     = vid->height;
     }
@@ -237,7 +237,7 @@ static int vid_read_packet(AVFormatContext *s,
                     return AVERROR(ENOMEM);
                 vid->audio_index                 = st->index;
                 st->codec->codec_type            = AVMEDIA_TYPE_AUDIO;
-                st->codec->codec_id              = CODEC_ID_PCM_U8;
+                st->codec->codec_id              = AV_CODEC_ID_PCM_U8;
                 st->codec->channels              = 1;
                 st->codec->bits_per_coded_sample = 8;
                 st->codec->sample_rate           = vid->sample_rate;
@@ -283,7 +283,7 @@ static int vid_read_close(AVFormatContext *s)
 
 AVInputFormat ff_bethsoftvid_demuxer = {
     .name           = "bethsoftvid",
-    .long_name      = NULL_IF_CONFIG_SMALL("Bethesda Softworks VID format"),
+    .long_name      = NULL_IF_CONFIG_SMALL("Bethesda Softworks VID"),
     .priv_data_size = sizeof(BVID_DemuxContext),
     .read_probe     = vid_probe,
     .read_header    = vid_read_header,

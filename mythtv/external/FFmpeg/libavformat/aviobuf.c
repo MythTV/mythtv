@@ -24,6 +24,7 @@
 #include "libavutil/intreadwrite.h"
 #include "libavutil/log.h"
 #include "libavutil/opt.h"
+#include "libavutil/avassert.h"
 #include "avformat.h"
 #include "avio.h"
 #include "avio_internal.h"
@@ -121,7 +122,7 @@ AVIOContext *avio_alloc_context(
 static void writeout(AVIOContext *s, const uint8_t *data, int len)
 {
     if (s->write_packet && !s->error){
-        int ret= s->write_packet(s->opaque, data, len);
+        int ret= s->write_packet(s->opaque, (uint8_t *)data, len);
         if(ret < 0){
             s->error = ret;
         }
@@ -237,6 +238,7 @@ int64_t avio_seek(AVIOContext *s, int64_t offset, int whence)
             return AVERROR(EPIPE);
         if ((res = s->seek(s->opaque, offset, SEEK_SET)) < 0)
             return res;
+        s->seek_count ++;
         if (!s->write_flag)
             s->buf_end = s->buffer;
         s->buf_ptr = s->buffer;
@@ -387,7 +389,7 @@ static void fill_buffer(AVIOContext *s)
     int len= s->buffer_size - (dst - s->buffer);
     int max_buffer_size = s->max_packet_size ? s->max_packet_size : IO_BUFFER_SIZE;
 
-    /* can't fill the buffer without read_packet, just set EOF if appropiate */
+    /* can't fill the buffer without read_packet, just set EOF if appropriate */
     if (!s->read_packet && s->buf_ptr >= s->buf_end)
         s->eof_reached = 1;
 
@@ -423,6 +425,7 @@ static void fill_buffer(AVIOContext *s)
         s->pos += len;
         s->buf_ptr = dst;
         s->buf_end = dst + len;
+        s->bytes_read += len;
     }
 }
 
@@ -482,6 +485,7 @@ int avio_read(AVIOContext *s, unsigned char *buf, int size)
                     break;
                 } else {
                     s->pos += len;
+                    s->bytes_read += len;
                     size -= len;
                     buf += len;
                     s->buf_ptr = s->buffer;
@@ -710,7 +714,7 @@ int ffio_set_buf_size(AVIOContext *s, int buf_size)
 
 static int url_resetbuf(AVIOContext *s, int flags)
 {
-    assert(flags == AVIO_FLAG_WRITE || flags == AVIO_FLAG_READ);
+    av_assert1(flags == AVIO_FLAG_WRITE || flags == AVIO_FLAG_READ);
 
     if (flags & AVIO_FLAG_WRITE) {
         s->buf_end = s->buffer + s->buffer_size;
@@ -790,8 +794,11 @@ int avio_close(AVIOContext *s)
     if (!s)
         return 0;
 
+    avio_flush(s);
     h = s->opaque;
-    av_free(s->buffer);
+    av_freep(&s->buffer);
+    if (!s->write_flag)
+        av_log(s, AV_LOG_DEBUG, "Statistics: %"PRId64" bytes read, %d seeks\n", s->bytes_read, s->seek_count);
     av_free(s);
     return ffurl_close(h);
 }

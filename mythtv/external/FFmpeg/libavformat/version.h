@@ -30,8 +30,8 @@
 #include "libavutil/avutil.h"
 
 #define LIBAVFORMAT_VERSION_MAJOR 54
-#define LIBAVFORMAT_VERSION_MINOR  6
-#define LIBAVFORMAT_VERSION_MICRO 101
+#define LIBAVFORMAT_VERSION_MINOR 29
+#define LIBAVFORMAT_VERSION_MICRO 104
 
 #define LIBAVFORMAT_VERSION_INT AV_VERSION_INT(LIBAVFORMAT_VERSION_MAJOR, \
                                                LIBAVFORMAT_VERSION_MINOR, \
@@ -44,9 +44,11 @@
 #define LIBAVFORMAT_IDENT       "Lavf" AV_STRINGIFY(LIBAVFORMAT_VERSION)
 
 /**
- * Those FF_API_* defines are not part of public API.
- * They may change, break or disappear at any time.
+ * FF_API_* defines may be placed below to indicate public API that will be
+ * dropped at a future version bump. The defines themselves are not part of
+ * the public API and may change, break or disappear at any time.
  */
+
 #ifndef FF_API_OLD_AVIO
 #define FF_API_OLD_AVIO                (LIBAVFORMAT_VERSION_MAJOR < 55)
 #endif
@@ -76,6 +78,12 @@
 #endif
 #ifndef FF_API_INTERLEAVE_PACKET
 #define FF_API_INTERLEAVE_PACKET       (LIBAVFORMAT_VERSION_MAJOR < 55)
+#endif
+#ifndef FF_API_AV_GETTIME
+#define FF_API_AV_GETTIME              (LIBAVFORMAT_VERSION_MAJOR < 55)
+#endif
+#ifndef FF_API_R_FRAME_RATE
+#define FF_API_R_FRAME_RATE            (LIBAVFORMAT_VERSION_MAJOR < 55)
 #endif
 
 #endif /* AVFORMAT_VERSION_H */

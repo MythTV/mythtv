@@ -27,14 +27,14 @@
 * (http://dirac.sourceforge.net/specification.html).
 */
 
+#include <string.h>
+
 #include "libavutil/imgutils.h"
+#include "libavutil/internal.h"
 #include "libavutil/intreadwrite.h"
+#include "libavutil/mem.h"
 #include "avcodec.h"
 #include "libschroedinger.h"
-
-#undef NDEBUG
-#include <assert.h>
-
 
 #include <schroedinger/schro.h>
 #include <schroedinger/schrodebug.h>
@@ -385,7 +385,7 @@ static void libschroedinger_flush(AVCodecContext *avccontext)
 AVCodec ff_libschroedinger_decoder = {
     .name           = "libschroedinger",
     .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = CODEC_ID_DIRAC,
+    .id             = AV_CODEC_ID_DIRAC,
     .priv_data_size = sizeof(SchroDecoderParams),
     .init           = libschroedinger_decode_init,
     .close          = libschroedinger_decode_close,

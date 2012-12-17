@@ -25,9 +25,7 @@
  */
 
 #include "parser.h"
-
-#define PNGSIG 0x89504e470d0a1a0a
-#define MNGSIG 0x8a4d4e470d0a1a0a
+#include "png.h"
 
 typedef struct PNGParseContext
 {
@@ -44,6 +42,8 @@ static int png_parse(AVCodecParserContext *s, AVCodecContext *avctx,
     PNGParseContext *ppc = s->priv_data;
     int next = END_NOT_FOUND;
     int i = 0;
+
+    s->pict_type = AV_PICTURE_TYPE_NONE;
 
     *poutbuf_size = 0;
     if (buf_size == 0)
@@ -113,9 +113,8 @@ flush:
 }
 
 AVCodecParser ff_png_parser = {
-    { CODEC_ID_PNG },
-    sizeof(PNGParseContext),
-    NULL,
-    png_parse,
-    ff_parse_close,
+    .codec_ids      = { AV_CODEC_ID_PNG },
+    .priv_data_size = sizeof(PNGParseContext),
+    .parser_parse   = png_parse,
+    .parser_close   = ff_parse_close,
 };

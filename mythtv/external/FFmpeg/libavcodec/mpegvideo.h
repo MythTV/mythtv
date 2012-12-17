@@ -53,7 +53,7 @@ enum OutputFormat {
 #define MPEG_BUF_SIZE (16 * 1024)
 
 #define QMAT_SHIFT_MMX 16
-#define QMAT_SHIFT 22
+#define QMAT_SHIFT 21
 
 #define MAX_FCODE 7
 #define MAX_MV 2048
@@ -141,6 +141,7 @@ typedef struct Picture{
     int32_t *mb_cmp_score;      ///< Table for MB cmp scores, for mb decision FIXME remove
     int b_frame_score;          /* */
     struct MpegEncContext *owner2; ///< pointer to the MpegEncContext that allocated this picture
+    int needs_realloc;          ///< Picture needs to be reallocated (eg due to a frame size change)
 } Picture;
 
 /**
@@ -218,7 +219,7 @@ typedef struct MpegEncContext {
     int h263_plus;    ///< h263 plus headers
     int h263_flv;     ///< use flv h263 header
 
-    enum CodecID codec_id;     /* see CODEC_ID_xxx */
+    enum AVCodecID codec_id;     /* see AV_CODEC_ID_xxx */
     int fixed_qscale; ///< fixed qscale if non zero
     int encoding;     ///< true if we are encoding (vs decoding)
     int flags;        ///< AVCodecContext.flags (HQ, MV4, ...)
@@ -469,6 +470,7 @@ typedef struct MpegEncContext {
     /* bit rate control */
     int64_t total_bits;
     int frame_bits;                ///< bits used for the current frame
+    int stuffing_bits;             ///< bits used for stuffing
     int next_lambda;               ///< next lambda used for retrying to encode a frame
     RateControlContext rc_context; ///< contains stuff only accessed in ratecontrol.c
 
@@ -599,6 +601,7 @@ typedef struct MpegEncContext {
     struct MJpegContext *mjpeg_ctx;
     int mjpeg_vsample[3];       ///< vertical sampling factors, default = {2, 1, 1}
     int mjpeg_hsample[3];       ///< horizontal sampling factors, default = {2, 1, 1}
+    int esc_pos;
 
     /* MSMPEG4 specific */
     int mv_table_index;
@@ -714,6 +717,16 @@ typedef struct MpegEncContext {
 
     int mpv_flags;      ///< flags set by private options
     int quantizer_noise_shaping;
+
+    /* error resilience stuff */
+    uint8_t *er_temp_buffer;
+
+    /* temp buffers for rate control */
+    float *cplx_tab, *bits_tab;
+
+    /* flag to indicate a reinitialization is required, e.g. after
+     * a frame size change */
+    int context_reinit;
 } MpegEncContext;
 
 #define REBASE_PICTURE(pic, new_ctx, old_ctx) (pic ? \
@@ -730,16 +743,16 @@ typedef struct MpegEncContext {
 #define FF_MPV_OFFSET(x) offsetof(MpegEncContext, x)
 #define FF_MPV_OPT_FLAGS (AV_OPT_FLAG_VIDEO_PARAM | AV_OPT_FLAG_ENCODING_PARAM)
 #define FF_MPV_COMMON_OPTS \
-{ "mpv_flags",      "Flags common for all mpegvideo-based encoders.", FF_MPV_OFFSET(mpv_flags), AV_OPT_TYPE_FLAGS, { 0 }, INT_MIN, INT_MAX, FF_MPV_OPT_FLAGS, "mpv_flags" },\
-{ "skip_rd",        "RD optimal MB level residual skipping", 0, AV_OPT_TYPE_CONST, { FF_MPV_FLAG_SKIP_RD },    0, 0, FF_MPV_OPT_FLAGS, "mpv_flags" },\
-{ "strict_gop",     "Strictly enforce gop size",             0, AV_OPT_TYPE_CONST, { FF_MPV_FLAG_STRICT_GOP }, 0, 0, FF_MPV_OPT_FLAGS, "mpv_flags" },\
-{ "qp_rd",          "Use rate distortion optimization for qp selection", 0, AV_OPT_TYPE_CONST, { FF_MPV_FLAG_QP_RD },  0, 0, FF_MPV_OPT_FLAGS, "mpv_flags" },\
-{ "cbp_rd",         "use rate distortion optimization for CBP",          0, AV_OPT_TYPE_CONST, { FF_MPV_FLAG_CBP_RD }, 0, 0, FF_MPV_OPT_FLAGS, "mpv_flags" },\
+{ "mpv_flags",      "Flags common for all mpegvideo-based encoders.", FF_MPV_OFFSET(mpv_flags), AV_OPT_TYPE_FLAGS, { .i64 = 0 }, INT_MIN, INT_MAX, FF_MPV_OPT_FLAGS, "mpv_flags" },\
+{ "skip_rd",        "RD optimal MB level residual skipping", 0, AV_OPT_TYPE_CONST, { .i64 = FF_MPV_FLAG_SKIP_RD },    0, 0, FF_MPV_OPT_FLAGS, "mpv_flags" },\
+{ "strict_gop",     "Strictly enforce gop size",             0, AV_OPT_TYPE_CONST, { .i64 = FF_MPV_FLAG_STRICT_GOP }, 0, 0, FF_MPV_OPT_FLAGS, "mpv_flags" },\
+{ "qp_rd",          "Use rate distortion optimization for qp selection", 0, AV_OPT_TYPE_CONST, { .i64 = FF_MPV_FLAG_QP_RD },  0, 0, FF_MPV_OPT_FLAGS, "mpv_flags" },\
+{ "cbp_rd",         "use rate distortion optimization for CBP",          0, AV_OPT_TYPE_CONST, { .i64 = FF_MPV_FLAG_CBP_RD }, 0, 0, FF_MPV_OPT_FLAGS, "mpv_flags" },\
 { "luma_elim_threshold",   "single coefficient elimination threshold for luminance (negative values also consider dc coefficient)",\
-                                                                      FF_MPV_OFFSET(luma_elim_threshold), AV_OPT_TYPE_INT, { 0 }, INT_MIN, INT_MAX, FF_MPV_OPT_FLAGS },\
+                                                                      FF_MPV_OFFSET(luma_elim_threshold), AV_OPT_TYPE_INT, { .i64 = 0 }, INT_MIN, INT_MAX, FF_MPV_OPT_FLAGS },\
 { "chroma_elim_threshold", "single coefficient elimination threshold for chrominance (negative values also consider dc coefficient)",\
-                                                                      FF_MPV_OFFSET(chroma_elim_threshold), AV_OPT_TYPE_INT, { 0 }, INT_MIN, INT_MAX, FF_MPV_OPT_FLAGS },\
-{ "quantizer_noise_shaping", NULL,                                  FF_MPV_OFFSET(quantizer_noise_shaping), AV_OPT_TYPE_INT, { 0 },       0, INT_MAX, FF_MPV_OPT_FLAGS },
+                                                                      FF_MPV_OFFSET(chroma_elim_threshold), AV_OPT_TYPE_INT, { .i64 = 0 }, INT_MIN, INT_MAX, FF_MPV_OPT_FLAGS },\
+{ "quantizer_noise_shaping", NULL,                                  FF_MPV_OFFSET(quantizer_noise_shaping), AV_OPT_TYPE_INT, { .i64 = 0 },       0, INT_MAX, FF_MPV_OPT_FLAGS },
 
 extern const AVOption ff_mpv_generic_options[];
 
@@ -751,8 +764,16 @@ static const AVClass name ## _class = {\
     .version    = LIBAVUTIL_VERSION_INT,\
 };
 
+/**
+ * Set the given MpegEncContext to common defaults (same for encoding
+ * and decoding).  The changed fields will not depend upon the prior
+ * state of the MpegEncContext.
+ */
+void ff_MPV_common_defaults(MpegEncContext *s);
+
 void ff_MPV_decode_defaults(MpegEncContext *s);
 int ff_MPV_common_init(MpegEncContext *s);
+int ff_MPV_common_frame_size_change(MpegEncContext *s);
 void ff_MPV_common_end(MpegEncContext *s);
 void ff_MPV_decode_mb(MpegEncContext *s, DCTELEM block[12][64]);
 int ff_MPV_frame_start(MpegEncContext *s, AVCodecContext *avctx);
@@ -761,7 +782,8 @@ int ff_MPV_encode_init(AVCodecContext *avctx);
 int ff_MPV_encode_end(AVCodecContext *avctx);
 int ff_MPV_encode_picture(AVCodecContext *avctx, AVPacket *pkt,
                           AVFrame *frame, int *got_packet);
-void ff_MPV_common_init_mmx(MpegEncContext *s);
+void ff_dct_encode_init_x86(MpegEncContext *s);
+void ff_MPV_common_init_x86(MpegEncContext *s);
 void ff_MPV_common_init_axp(MpegEncContext *s);
 void ff_MPV_common_init_mmi(MpegEncContext *s);
 void ff_MPV_common_init_arm(MpegEncContext *s);
@@ -787,11 +809,20 @@ void ff_er_frame_end(MpegEncContext *s);
 void ff_er_add_slice(MpegEncContext *s, int startx, int starty, int endx, int endy, int status);
 
 int ff_dct_common_init(MpegEncContext *s);
+int ff_dct_encode_init(MpegEncContext *s);
 void ff_convert_matrix(DSPContext *dsp, int (*qmat)[64], uint16_t (*qmat16)[2][64],
                        const uint16_t *quant_matrix, int bias, int qmin, int qmax, int intra);
+int ff_dct_quantize_c(MpegEncContext *s, DCTELEM *block, int n, int qscale, int *overflow);
 
 void ff_init_block_index(MpegEncContext *s);
 void ff_copy_picture(Picture *dst, Picture *src);
+
+void ff_MPV_motion(MpegEncContext *s,
+                   uint8_t *dest_y, uint8_t *dest_cb,
+                   uint8_t *dest_cr, int dir,
+                   uint8_t **ref_picture,
+                   op_pixels_func (*pix_op)[4],
+                   qpel_mc_func (*qpix_op)[16]);
 
 /**
  * Allocate a Picture.

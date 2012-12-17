@@ -27,13 +27,11 @@
 * (http://dirac.sourceforge.net/specification.html).
 */
 
-#undef NDEBUG
-#include <assert.h>
-
 #include <schroedinger/schro.h>
 #include <schroedinger/schrodebug.h>
 #include <schroedinger/schrovideoformat.h>
 
+#include "libavutil/avassert.h"
 #include "avcodec.h"
 #include "internal.h"
 #include "libschroedinger.h"
@@ -305,8 +303,7 @@ static int libschroedinger_encode_frame(AVCodecContext *avccontext, AVPacket *pk
         case SCHRO_STATE_HAVE_BUFFER:
         case SCHRO_STATE_END_OF_STREAM:
             enc_buf = schro_encoder_pull(encoder, &presentation_frame);
-            assert(enc_buf->length > 0);
-            assert(enc_buf->length <= buf_size);
+            av_assert0(enc_buf->length > 0);
             parse_code = enc_buf->data[4];
 
             /* All non-frame data is prepended to actual frame data to
@@ -440,7 +437,7 @@ static int libschroedinger_encode_close(AVCodecContext *avccontext)
 AVCodec ff_libschroedinger_encoder = {
     .name           = "libschroedinger",
     .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = CODEC_ID_DIRAC,
+    .id             = AV_CODEC_ID_DIRAC,
     .priv_data_size = sizeof(SchroEncoderParams),
     .init           = libschroedinger_encode_init,
     .encode2        = libschroedinger_encode_frame,

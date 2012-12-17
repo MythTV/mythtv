@@ -24,6 +24,8 @@
 #include "dsputil.h"
 #include "png.h"
 
+#include "libavutil/avassert.h"
+
 /* TODO:
  * - add 2, 4 and 16 bit depth support
  */
@@ -147,7 +149,7 @@ static uint8_t *png_choose_filter(PNGEncContext *s, uint8_t *dst,
                                   uint8_t *src, uint8_t *top, int size, int bpp)
 {
     int pred = s->filter_type;
-    assert(bpp || !pred);
+    av_assert0(bpp || !pred);
     if(!top && pred)
         pred = PNG_FILTER_VALUE_SUB;
     if(pred == PNG_FILTER_VALUE_MIXED) {
@@ -242,10 +244,12 @@ static int encode_frame(AVCodecContext *avctx, AVPacket *pkt,
         color_type = PNG_COLOR_TYPE_RGB;
         break;
     case PIX_FMT_RGBA:
+        avctx->bits_per_coded_sample = 32;
         bit_depth = 8;
         color_type = PNG_COLOR_TYPE_RGB_ALPHA;
         break;
     case PIX_FMT_RGB24:
+        avctx->bits_per_coded_sample = 24;
         bit_depth = 8;
         color_type = PNG_COLOR_TYPE_RGB;
         break;
@@ -254,6 +258,7 @@ static int encode_frame(AVCodecContext *avctx, AVPacket *pkt,
         color_type = PNG_COLOR_TYPE_GRAY;
         break;
     case PIX_FMT_GRAY8:
+        avctx->bits_per_coded_sample = 0x28;
         bit_depth = 8;
         color_type = PNG_COLOR_TYPE_GRAY;
         break;
@@ -262,10 +267,12 @@ static int encode_frame(AVCodecContext *avctx, AVPacket *pkt,
         color_type = PNG_COLOR_TYPE_GRAY_ALPHA;
         break;
     case PIX_FMT_MONOBLACK:
+        avctx->bits_per_coded_sample =
         bit_depth = 1;
         color_type = PNG_COLOR_TYPE_GRAY;
         break;
     case PIX_FMT_PAL8:
+        avctx->bits_per_coded_sample =
         bit_depth = 8;
         color_type = PNG_COLOR_TYPE_PALETTE;
         break;
@@ -315,7 +322,7 @@ static int encode_frame(AVCodecContext *avctx, AVPacket *pkt,
     }
 
     /* write png header */
-    memcpy(s->bytestream, ff_pngsig, 8);
+    AV_WB64(s->bytestream, PNGSIG);
     s->bytestream += 8;
 
     AV_WB32(s->buf, avctx->width);
@@ -439,10 +446,11 @@ static av_cold int png_enc_init(AVCodecContext *avctx){
 AVCodec ff_png_encoder = {
     .name           = "png",
     .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = CODEC_ID_PNG,
+    .id             = AV_CODEC_ID_PNG,
     .priv_data_size = sizeof(PNGEncContext),
     .init           = png_enc_init,
     .encode2        = encode_frame,
+    .capabilities   = CODEC_CAP_FRAME_THREADS | CODEC_CAP_INTRA_ONLY,
     .pix_fmts       = (const enum PixelFormat[]){
         PIX_FMT_RGB24, PIX_FMT_RGBA,
         PIX_FMT_RGB48BE, PIX_FMT_RGBA64BE,

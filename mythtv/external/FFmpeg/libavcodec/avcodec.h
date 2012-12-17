@@ -77,6 +77,7 @@
  * @{
  */
 
+
 /**
  * Identify the syntax and semantics of the bitstream.
  * The principle is roughly:
@@ -88,366 +89,438 @@
  * If you add a codec ID to this list, add it so that
  * 1. no value of a existing codec ID changes (that would break ABI),
  * 2. Give it a value which when taken as ASCII is recognized uniquely by a human as this specific codec.
- *    This ensures that 2 forks can independently add CodecIDs without producing conflicts.
+ *    This ensures that 2 forks can independently add AVCodecIDs without producing conflicts.
+ *
+ * After adding new codec IDs, do not forget to add an entry to the codec
+ * descriptor list and bump libavcodec minor version.
  */
-enum CodecID {
-    CODEC_ID_NONE,
+enum AVCodecID {
+    AV_CODEC_ID_NONE,
 
     /* video codecs */
-    CODEC_ID_MPEG1VIDEO,
-    CODEC_ID_MPEG2VIDEO, ///< preferred ID for MPEG-1/2 video decoding
-    CODEC_ID_MPEG2VIDEO_XVMC,
-    CODEC_ID_H261,
-    CODEC_ID_H263,
-    CODEC_ID_RV10,
-    CODEC_ID_RV20,
-    CODEC_ID_MJPEG,
-    CODEC_ID_MJPEGB,
-    CODEC_ID_LJPEG,
-    CODEC_ID_SP5X,
-    CODEC_ID_JPEGLS,
-    CODEC_ID_MPEG4,
-    CODEC_ID_RAWVIDEO,
-    CODEC_ID_MSMPEG4V1,
-    CODEC_ID_MSMPEG4V2,
-    CODEC_ID_MSMPEG4V3,
-    CODEC_ID_WMV1,
-    CODEC_ID_WMV2,
-    CODEC_ID_H263P,
-    CODEC_ID_H263I,
-    CODEC_ID_FLV1,
-    CODEC_ID_SVQ1,
-    CODEC_ID_SVQ3,
-    CODEC_ID_DVVIDEO,
-    CODEC_ID_HUFFYUV,
-    CODEC_ID_CYUV,
-    CODEC_ID_H264,
-    CODEC_ID_INDEO3,
-    CODEC_ID_VP3,
-    CODEC_ID_THEORA,
-    CODEC_ID_ASV1,
-    CODEC_ID_ASV2,
-    CODEC_ID_FFV1,
-    CODEC_ID_4XM,
-    CODEC_ID_VCR1,
-    CODEC_ID_CLJR,
-    CODEC_ID_MDEC,
-    CODEC_ID_ROQ,
-    CODEC_ID_INTERPLAY_VIDEO,
-    CODEC_ID_XAN_WC3,
-    CODEC_ID_XAN_WC4,
-    CODEC_ID_RPZA,
-    CODEC_ID_CINEPAK,
-    CODEC_ID_WS_VQA,
-    CODEC_ID_MSRLE,
-    CODEC_ID_MSVIDEO1,
-    CODEC_ID_IDCIN,
-    CODEC_ID_8BPS,
-    CODEC_ID_SMC,
-    CODEC_ID_FLIC,
-    CODEC_ID_TRUEMOTION1,
-    CODEC_ID_VMDVIDEO,
-    CODEC_ID_MSZH,
-    CODEC_ID_ZLIB,
-    CODEC_ID_QTRLE,
-    CODEC_ID_SNOW,
-    CODEC_ID_TSCC,
-    CODEC_ID_ULTI,
-    CODEC_ID_QDRAW,
-    CODEC_ID_VIXL,
-    CODEC_ID_QPEG,
-    CODEC_ID_PNG,
-    CODEC_ID_PPM,
-    CODEC_ID_PBM,
-    CODEC_ID_PGM,
-    CODEC_ID_PGMYUV,
-    CODEC_ID_PAM,
-    CODEC_ID_FFVHUFF,
-    CODEC_ID_RV30,
-    CODEC_ID_RV40,
-    CODEC_ID_VC1,
-    CODEC_ID_WMV3,
-    CODEC_ID_LOCO,
-    CODEC_ID_WNV1,
-    CODEC_ID_AASC,
-    CODEC_ID_INDEO2,
-    CODEC_ID_FRAPS,
-    CODEC_ID_TRUEMOTION2,
-    CODEC_ID_BMP,
-    CODEC_ID_CSCD,
-    CODEC_ID_MMVIDEO,
-    CODEC_ID_ZMBV,
-    CODEC_ID_AVS,
-    CODEC_ID_SMACKVIDEO,
-    CODEC_ID_NUV,
-    CODEC_ID_KMVC,
-    CODEC_ID_FLASHSV,
-    CODEC_ID_CAVS,
-    CODEC_ID_JPEG2000,
-    CODEC_ID_VMNC,
-    CODEC_ID_VP5,
-    CODEC_ID_VP6,
-    CODEC_ID_VP6F,
-    CODEC_ID_TARGA,
-    CODEC_ID_DSICINVIDEO,
-    CODEC_ID_TIERTEXSEQVIDEO,
-    CODEC_ID_TIFF,
-    CODEC_ID_GIF,
-    CODEC_ID_DXA,
-    CODEC_ID_DNXHD,
-    CODEC_ID_THP,
-    CODEC_ID_SGI,
-    CODEC_ID_C93,
-    CODEC_ID_BETHSOFTVID,
-    CODEC_ID_PTX,
-    CODEC_ID_TXD,
-    CODEC_ID_VP6A,
-    CODEC_ID_AMV,
-    CODEC_ID_VB,
-    CODEC_ID_PCX,
-    CODEC_ID_SUNRAST,
-    CODEC_ID_INDEO4,
-    CODEC_ID_INDEO5,
-    CODEC_ID_MIMIC,
-    CODEC_ID_RL2,
-    CODEC_ID_ESCAPE124,
-    CODEC_ID_DIRAC,
-    CODEC_ID_BFI,
-    CODEC_ID_CMV,
-    CODEC_ID_MOTIONPIXELS,
-    CODEC_ID_TGV,
-    CODEC_ID_TGQ,
-    CODEC_ID_TQI,
-    CODEC_ID_AURA,
-    CODEC_ID_AURA2,
-    CODEC_ID_V210X,
-    CODEC_ID_TMV,
-    CODEC_ID_V210,
-    CODEC_ID_DPX,
-    CODEC_ID_MAD,
-    CODEC_ID_FRWU,
-    CODEC_ID_FLASHSV2,
-    CODEC_ID_CDGRAPHICS,
-    CODEC_ID_R210,
-    CODEC_ID_ANM,
-    CODEC_ID_BINKVIDEO,
-    CODEC_ID_IFF_ILBM,
-    CODEC_ID_IFF_BYTERUN1,
-    CODEC_ID_KGV1,
-    CODEC_ID_YOP,
-    CODEC_ID_VP8,
-    CODEC_ID_PICTOR,
-    CODEC_ID_ANSI,
-    CODEC_ID_A64_MULTI,
-    CODEC_ID_A64_MULTI5,
-    CODEC_ID_R10K,
-    CODEC_ID_MXPEG,
-    CODEC_ID_LAGARITH,
-    CODEC_ID_PRORES,
-    CODEC_ID_JV,
-    CODEC_ID_DFA,
-    CODEC_ID_WMV3IMAGE,
-    CODEC_ID_VC1IMAGE,
-    CODEC_ID_UTVIDEO,
-    CODEC_ID_BMV_VIDEO,
-    CODEC_ID_VBLE,
-    CODEC_ID_DXTORY,
-    CODEC_ID_V410,
-    CODEC_ID_XWD,
-    CODEC_ID_CDXL,
-    CODEC_ID_XBM,
-    CODEC_ID_ZEROCODEC,
-    CODEC_ID_Y41P       = MKBETAG('Y','4','1','P'),
-    CODEC_ID_ESCAPE130  = MKBETAG('E','1','3','0'),
-    CODEC_ID_EXR        = MKBETAG('0','E','X','R'),
-    CODEC_ID_AVRP       = MKBETAG('A','V','R','P'),
+    AV_CODEC_ID_MPEG1VIDEO,
+    AV_CODEC_ID_MPEG2VIDEO, ///< preferred ID for MPEG-1/2 video decoding
+    AV_CODEC_ID_MPEG2VIDEO_XVMC,
+    AV_CODEC_ID_H261,
+    AV_CODEC_ID_H263,
+    AV_CODEC_ID_RV10,
+    AV_CODEC_ID_RV20,
+    AV_CODEC_ID_MJPEG,
+    AV_CODEC_ID_MJPEGB,
+    AV_CODEC_ID_LJPEG,
+    AV_CODEC_ID_SP5X,
+    AV_CODEC_ID_JPEGLS,
+    AV_CODEC_ID_MPEG4,
+    AV_CODEC_ID_RAWVIDEO,
+    AV_CODEC_ID_MSMPEG4V1,
+    AV_CODEC_ID_MSMPEG4V2,
+    AV_CODEC_ID_MSMPEG4V3,
+    AV_CODEC_ID_WMV1,
+    AV_CODEC_ID_WMV2,
+    AV_CODEC_ID_H263P,
+    AV_CODEC_ID_H263I,
+    AV_CODEC_ID_FLV1,
+    AV_CODEC_ID_SVQ1,
+    AV_CODEC_ID_SVQ3,
+    AV_CODEC_ID_DVVIDEO,
+    AV_CODEC_ID_HUFFYUV,
+    AV_CODEC_ID_CYUV,
+    AV_CODEC_ID_H264,
+    AV_CODEC_ID_INDEO3,
+    AV_CODEC_ID_VP3,
+    AV_CODEC_ID_THEORA,
+    AV_CODEC_ID_ASV1,
+    AV_CODEC_ID_ASV2,
+    AV_CODEC_ID_FFV1,
+    AV_CODEC_ID_4XM,
+    AV_CODEC_ID_VCR1,
+    AV_CODEC_ID_CLJR,
+    AV_CODEC_ID_MDEC,
+    AV_CODEC_ID_ROQ,
+    AV_CODEC_ID_INTERPLAY_VIDEO,
+    AV_CODEC_ID_XAN_WC3,
+    AV_CODEC_ID_XAN_WC4,
+    AV_CODEC_ID_RPZA,
+    AV_CODEC_ID_CINEPAK,
+    AV_CODEC_ID_WS_VQA,
+    AV_CODEC_ID_MSRLE,
+    AV_CODEC_ID_MSVIDEO1,
+    AV_CODEC_ID_IDCIN,
+    AV_CODEC_ID_8BPS,
+    AV_CODEC_ID_SMC,
+    AV_CODEC_ID_FLIC,
+    AV_CODEC_ID_TRUEMOTION1,
+    AV_CODEC_ID_VMDVIDEO,
+    AV_CODEC_ID_MSZH,
+    AV_CODEC_ID_ZLIB,
+    AV_CODEC_ID_QTRLE,
+    AV_CODEC_ID_SNOW,
+    AV_CODEC_ID_TSCC,
+    AV_CODEC_ID_ULTI,
+    AV_CODEC_ID_QDRAW,
+    AV_CODEC_ID_VIXL,
+    AV_CODEC_ID_QPEG,
+    AV_CODEC_ID_PNG,
+    AV_CODEC_ID_PPM,
+    AV_CODEC_ID_PBM,
+    AV_CODEC_ID_PGM,
+    AV_CODEC_ID_PGMYUV,
+    AV_CODEC_ID_PAM,
+    AV_CODEC_ID_FFVHUFF,
+    AV_CODEC_ID_RV30,
+    AV_CODEC_ID_RV40,
+    AV_CODEC_ID_VC1,
+    AV_CODEC_ID_WMV3,
+    AV_CODEC_ID_LOCO,
+    AV_CODEC_ID_WNV1,
+    AV_CODEC_ID_AASC,
+    AV_CODEC_ID_INDEO2,
+    AV_CODEC_ID_FRAPS,
+    AV_CODEC_ID_TRUEMOTION2,
+    AV_CODEC_ID_BMP,
+    AV_CODEC_ID_CSCD,
+    AV_CODEC_ID_MMVIDEO,
+    AV_CODEC_ID_ZMBV,
+    AV_CODEC_ID_AVS,
+    AV_CODEC_ID_SMACKVIDEO,
+    AV_CODEC_ID_NUV,
+    AV_CODEC_ID_KMVC,
+    AV_CODEC_ID_FLASHSV,
+    AV_CODEC_ID_CAVS,
+    AV_CODEC_ID_JPEG2000,
+    AV_CODEC_ID_VMNC,
+    AV_CODEC_ID_VP5,
+    AV_CODEC_ID_VP6,
+    AV_CODEC_ID_VP6F,
+    AV_CODEC_ID_TARGA,
+    AV_CODEC_ID_DSICINVIDEO,
+    AV_CODEC_ID_TIERTEXSEQVIDEO,
+    AV_CODEC_ID_TIFF,
+    AV_CODEC_ID_GIF,
+    AV_CODEC_ID_DXA,
+    AV_CODEC_ID_DNXHD,
+    AV_CODEC_ID_THP,
+    AV_CODEC_ID_SGI,
+    AV_CODEC_ID_C93,
+    AV_CODEC_ID_BETHSOFTVID,
+    AV_CODEC_ID_PTX,
+    AV_CODEC_ID_TXD,
+    AV_CODEC_ID_VP6A,
+    AV_CODEC_ID_AMV,
+    AV_CODEC_ID_VB,
+    AV_CODEC_ID_PCX,
+    AV_CODEC_ID_SUNRAST,
+    AV_CODEC_ID_INDEO4,
+    AV_CODEC_ID_INDEO5,
+    AV_CODEC_ID_MIMIC,
+    AV_CODEC_ID_RL2,
+    AV_CODEC_ID_ESCAPE124,
+    AV_CODEC_ID_DIRAC,
+    AV_CODEC_ID_BFI,
+    AV_CODEC_ID_CMV,
+    AV_CODEC_ID_MOTIONPIXELS,
+    AV_CODEC_ID_TGV,
+    AV_CODEC_ID_TGQ,
+    AV_CODEC_ID_TQI,
+    AV_CODEC_ID_AURA,
+    AV_CODEC_ID_AURA2,
+    AV_CODEC_ID_V210X,
+    AV_CODEC_ID_TMV,
+    AV_CODEC_ID_V210,
+    AV_CODEC_ID_DPX,
+    AV_CODEC_ID_MAD,
+    AV_CODEC_ID_FRWU,
+    AV_CODEC_ID_FLASHSV2,
+    AV_CODEC_ID_CDGRAPHICS,
+    AV_CODEC_ID_R210,
+    AV_CODEC_ID_ANM,
+    AV_CODEC_ID_BINKVIDEO,
+    AV_CODEC_ID_IFF_ILBM,
+    AV_CODEC_ID_IFF_BYTERUN1,
+    AV_CODEC_ID_KGV1,
+    AV_CODEC_ID_YOP,
+    AV_CODEC_ID_VP8,
+    AV_CODEC_ID_PICTOR,
+    AV_CODEC_ID_ANSI,
+    AV_CODEC_ID_A64_MULTI,
+    AV_CODEC_ID_A64_MULTI5,
+    AV_CODEC_ID_R10K,
+    AV_CODEC_ID_MXPEG,
+    AV_CODEC_ID_LAGARITH,
+    AV_CODEC_ID_PRORES,
+    AV_CODEC_ID_JV,
+    AV_CODEC_ID_DFA,
+    AV_CODEC_ID_WMV3IMAGE,
+    AV_CODEC_ID_VC1IMAGE,
+    AV_CODEC_ID_UTVIDEO,
+    AV_CODEC_ID_BMV_VIDEO,
+    AV_CODEC_ID_VBLE,
+    AV_CODEC_ID_DXTORY,
+    AV_CODEC_ID_V410,
+    AV_CODEC_ID_XWD,
+    AV_CODEC_ID_CDXL,
+    AV_CODEC_ID_XBM,
+    AV_CODEC_ID_ZEROCODEC,
+    AV_CODEC_ID_MSS1,
+    AV_CODEC_ID_MSA1,
+    AV_CODEC_ID_TSCC2,
+    AV_CODEC_ID_MTS2,
+    AV_CODEC_ID_CLLC,
+    AV_CODEC_ID_MSS2,
+    AV_CODEC_ID_Y41P       = MKBETAG('Y','4','1','P'),
+    AV_CODEC_ID_ESCAPE130  = MKBETAG('E','1','3','0'),
+    AV_CODEC_ID_EXR        = MKBETAG('0','E','X','R'),
+    AV_CODEC_ID_AVRP       = MKBETAG('A','V','R','P'),
 
-    CODEC_ID_G2M        = MKBETAG( 0 ,'G','2','M'),
-    CODEC_ID_AVUI       = MKBETAG('A','V','U','I'),
-    CODEC_ID_AYUV       = MKBETAG('A','Y','U','V'),
-    CODEC_ID_V308       = MKBETAG('V','3','0','8'),
-    CODEC_ID_V408       = MKBETAG('V','4','0','8'),
-    CODEC_ID_YUV4       = MKBETAG('Y','U','V','4'),
+    AV_CODEC_ID_G2M        = MKBETAG( 0 ,'G','2','M'),
+    AV_CODEC_ID_AVUI       = MKBETAG('A','V','U','I'),
+    AV_CODEC_ID_AYUV       = MKBETAG('A','Y','U','V'),
+    AV_CODEC_ID_V308       = MKBETAG('V','3','0','8'),
+    AV_CODEC_ID_V408       = MKBETAG('V','4','0','8'),
+    AV_CODEC_ID_YUV4       = MKBETAG('Y','U','V','4'),
+    AV_CODEC_ID_SANM       = MKBETAG('S','A','N','M'),
+    AV_CODEC_ID_PAF_VIDEO  = MKBETAG('P','A','F','V'),
+    AV_CODEC_ID_AVRN       = MKBETAG('A','V','R','n'),
+    AV_CODEC_ID_CPIA       = MKBETAG('C','P','I','A'),
 
     /* various PCM "codecs" */
-    CODEC_ID_FIRST_AUDIO = 0x10000,     ///< A dummy id pointing at the start of audio codecs
-    CODEC_ID_PCM_S16LE = 0x10000,
-    CODEC_ID_PCM_S16BE,
-    CODEC_ID_PCM_U16LE,
-    CODEC_ID_PCM_U16BE,
-    CODEC_ID_PCM_S8,
-    CODEC_ID_PCM_U8,
-    CODEC_ID_PCM_MULAW,
-    CODEC_ID_PCM_ALAW,
-    CODEC_ID_PCM_S32LE,
-    CODEC_ID_PCM_S32BE,
-    CODEC_ID_PCM_U32LE,
-    CODEC_ID_PCM_U32BE,
-    CODEC_ID_PCM_S24LE,
-    CODEC_ID_PCM_S24BE,
-    CODEC_ID_PCM_U24LE,
-    CODEC_ID_PCM_U24BE,
-    CODEC_ID_PCM_S24DAUD,
-    CODEC_ID_PCM_ZORK,
-    CODEC_ID_PCM_S16LE_PLANAR,
-    CODEC_ID_PCM_DVD,
-    CODEC_ID_PCM_F32BE,
-    CODEC_ID_PCM_F32LE,
-    CODEC_ID_PCM_F64BE,
-    CODEC_ID_PCM_F64LE,
-    CODEC_ID_PCM_BLURAY,
-    CODEC_ID_PCM_LXF,
-    CODEC_ID_S302M,
-    CODEC_ID_PCM_S8_PLANAR,
+    AV_CODEC_ID_FIRST_AUDIO = 0x10000,     ///< A dummy id pointing at the start of audio codecs
+    AV_CODEC_ID_PCM_S16LE = 0x10000,
+    AV_CODEC_ID_PCM_S16BE,
+    AV_CODEC_ID_PCM_U16LE,
+    AV_CODEC_ID_PCM_U16BE,
+    AV_CODEC_ID_PCM_S8,
+    AV_CODEC_ID_PCM_U8,
+    AV_CODEC_ID_PCM_MULAW,
+    AV_CODEC_ID_PCM_ALAW,
+    AV_CODEC_ID_PCM_S32LE,
+    AV_CODEC_ID_PCM_S32BE,
+    AV_CODEC_ID_PCM_U32LE,
+    AV_CODEC_ID_PCM_U32BE,
+    AV_CODEC_ID_PCM_S24LE,
+    AV_CODEC_ID_PCM_S24BE,
+    AV_CODEC_ID_PCM_U24LE,
+    AV_CODEC_ID_PCM_U24BE,
+    AV_CODEC_ID_PCM_S24DAUD,
+    AV_CODEC_ID_PCM_ZORK,
+    AV_CODEC_ID_PCM_S16LE_PLANAR,
+    AV_CODEC_ID_PCM_DVD,
+    AV_CODEC_ID_PCM_F32BE,
+    AV_CODEC_ID_PCM_F32LE,
+    AV_CODEC_ID_PCM_F64BE,
+    AV_CODEC_ID_PCM_F64LE,
+    AV_CODEC_ID_PCM_BLURAY,
+    AV_CODEC_ID_PCM_LXF,
+    AV_CODEC_ID_S302M,
+    AV_CODEC_ID_PCM_S8_PLANAR,
 
     /* various ADPCM codecs */
-    CODEC_ID_ADPCM_IMA_QT = 0x11000,
-    CODEC_ID_ADPCM_IMA_WAV,
-    CODEC_ID_ADPCM_IMA_DK3,
-    CODEC_ID_ADPCM_IMA_DK4,
-    CODEC_ID_ADPCM_IMA_WS,
-    CODEC_ID_ADPCM_IMA_SMJPEG,
-    CODEC_ID_ADPCM_MS,
-    CODEC_ID_ADPCM_4XM,
-    CODEC_ID_ADPCM_XA,
-    CODEC_ID_ADPCM_ADX,
-    CODEC_ID_ADPCM_EA,
-    CODEC_ID_ADPCM_G726,
-    CODEC_ID_ADPCM_CT,
-    CODEC_ID_ADPCM_SWF,
-    CODEC_ID_ADPCM_YAMAHA,
-    CODEC_ID_ADPCM_SBPRO_4,
-    CODEC_ID_ADPCM_SBPRO_3,
-    CODEC_ID_ADPCM_SBPRO_2,
-    CODEC_ID_ADPCM_THP,
-    CODEC_ID_ADPCM_IMA_AMV,
-    CODEC_ID_ADPCM_EA_R1,
-    CODEC_ID_ADPCM_EA_R3,
-    CODEC_ID_ADPCM_EA_R2,
-    CODEC_ID_ADPCM_IMA_EA_SEAD,
-    CODEC_ID_ADPCM_IMA_EA_EACS,
-    CODEC_ID_ADPCM_EA_XAS,
-    CODEC_ID_ADPCM_EA_MAXIS_XA,
-    CODEC_ID_ADPCM_IMA_ISS,
-    CODEC_ID_ADPCM_G722,
-    CODEC_ID_ADPCM_IMA_APC,
+    AV_CODEC_ID_ADPCM_IMA_QT = 0x11000,
+    AV_CODEC_ID_ADPCM_IMA_WAV,
+    AV_CODEC_ID_ADPCM_IMA_DK3,
+    AV_CODEC_ID_ADPCM_IMA_DK4,
+    AV_CODEC_ID_ADPCM_IMA_WS,
+    AV_CODEC_ID_ADPCM_IMA_SMJPEG,
+    AV_CODEC_ID_ADPCM_MS,
+    AV_CODEC_ID_ADPCM_4XM,
+    AV_CODEC_ID_ADPCM_XA,
+    AV_CODEC_ID_ADPCM_ADX,
+    AV_CODEC_ID_ADPCM_EA,
+    AV_CODEC_ID_ADPCM_G726,
+    AV_CODEC_ID_ADPCM_CT,
+    AV_CODEC_ID_ADPCM_SWF,
+    AV_CODEC_ID_ADPCM_YAMAHA,
+    AV_CODEC_ID_ADPCM_SBPRO_4,
+    AV_CODEC_ID_ADPCM_SBPRO_3,
+    AV_CODEC_ID_ADPCM_SBPRO_2,
+    AV_CODEC_ID_ADPCM_THP,
+    AV_CODEC_ID_ADPCM_IMA_AMV,
+    AV_CODEC_ID_ADPCM_EA_R1,
+    AV_CODEC_ID_ADPCM_EA_R3,
+    AV_CODEC_ID_ADPCM_EA_R2,
+    AV_CODEC_ID_ADPCM_IMA_EA_SEAD,
+    AV_CODEC_ID_ADPCM_IMA_EA_EACS,
+    AV_CODEC_ID_ADPCM_EA_XAS,
+    AV_CODEC_ID_ADPCM_EA_MAXIS_XA,
+    AV_CODEC_ID_ADPCM_IMA_ISS,
+    AV_CODEC_ID_ADPCM_G722,
+    AV_CODEC_ID_ADPCM_IMA_APC,
+    AV_CODEC_ID_VIMA       = MKBETAG('V','I','M','A'),
 
     /* AMR */
-    CODEC_ID_AMR_NB = 0x12000,
-    CODEC_ID_AMR_WB,
+    AV_CODEC_ID_AMR_NB = 0x12000,
+    AV_CODEC_ID_AMR_WB,
 
     /* RealAudio codecs*/
-    CODEC_ID_RA_144 = 0x13000,
-    CODEC_ID_RA_288,
+    AV_CODEC_ID_RA_144 = 0x13000,
+    AV_CODEC_ID_RA_288,
 
     /* various DPCM codecs */
-    CODEC_ID_ROQ_DPCM = 0x14000,
-    CODEC_ID_INTERPLAY_DPCM,
-    CODEC_ID_XAN_DPCM,
-    CODEC_ID_SOL_DPCM,
+    AV_CODEC_ID_ROQ_DPCM = 0x14000,
+    AV_CODEC_ID_INTERPLAY_DPCM,
+    AV_CODEC_ID_XAN_DPCM,
+    AV_CODEC_ID_SOL_DPCM,
 
     /* audio codecs */
-    CODEC_ID_MP2 = 0x15000,
-    CODEC_ID_MP3, ///< preferred ID for decoding MPEG audio layer 1, 2 or 3
-    CODEC_ID_AAC,
-    CODEC_ID_AC3,
-    CODEC_ID_DTS,
-    CODEC_ID_VORBIS,
-    CODEC_ID_DVAUDIO,
-    CODEC_ID_WMAV1,
-    CODEC_ID_WMAV2,
-    CODEC_ID_MACE3,
-    CODEC_ID_MACE6,
-    CODEC_ID_VMDAUDIO,
-    CODEC_ID_FLAC,
-    CODEC_ID_MP3ADU,
-    CODEC_ID_MP3ON4,
-    CODEC_ID_SHORTEN,
-    CODEC_ID_ALAC,
-    CODEC_ID_WESTWOOD_SND1,
-    CODEC_ID_GSM, ///< as in Berlin toast format
-    CODEC_ID_QDM2,
-    CODEC_ID_COOK,
-    CODEC_ID_TRUESPEECH,
-    CODEC_ID_TTA,
-    CODEC_ID_SMACKAUDIO,
-    CODEC_ID_QCELP,
-    CODEC_ID_WAVPACK,
-    CODEC_ID_DSICINAUDIO,
-    CODEC_ID_IMC,
-    CODEC_ID_MUSEPACK7,
-    CODEC_ID_MLP,
-    CODEC_ID_GSM_MS, /* as found in WAV */
-    CODEC_ID_ATRAC3,
-    CODEC_ID_VOXWARE,
-    CODEC_ID_APE,
-    CODEC_ID_NELLYMOSER,
-    CODEC_ID_MUSEPACK8,
-    CODEC_ID_SPEEX,
-    CODEC_ID_WMAVOICE,
-    CODEC_ID_WMAPRO,
-    CODEC_ID_WMALOSSLESS,
-    CODEC_ID_ATRAC3P,
-    CODEC_ID_EAC3,
-    CODEC_ID_SIPR,
-    CODEC_ID_MP1,
-    CODEC_ID_TWINVQ,
-    CODEC_ID_TRUEHD,
-    CODEC_ID_MP4ALS,
-    CODEC_ID_ATRAC1,
-    CODEC_ID_BINKAUDIO_RDFT,
-    CODEC_ID_BINKAUDIO_DCT,
-    CODEC_ID_AAC_LATM,
-    CODEC_ID_QDMC,
-    CODEC_ID_CELT,
-    CODEC_ID_G723_1,
-    CODEC_ID_G729,
-    CODEC_ID_8SVX_EXP,
-    CODEC_ID_8SVX_FIB,
-    CODEC_ID_BMV_AUDIO,
-    CODEC_ID_RALF,
-    CODEC_ID_FFWAVESYNTH = MKBETAG('F','F','W','S'),
-    CODEC_ID_8SVX_RAW    = MKBETAG('8','S','V','X'),
-    CODEC_ID_SONIC       = MKBETAG('S','O','N','C'),
-    CODEC_ID_SONIC_LS    = MKBETAG('S','O','N','L'),
+    AV_CODEC_ID_MP2 = 0x15000,
+    AV_CODEC_ID_MP3, ///< preferred ID for decoding MPEG audio layer 1, 2 or 3
+    AV_CODEC_ID_AAC,
+    AV_CODEC_ID_AC3,
+    AV_CODEC_ID_DTS,
+    AV_CODEC_ID_VORBIS,
+    AV_CODEC_ID_DVAUDIO,
+    AV_CODEC_ID_WMAV1,
+    AV_CODEC_ID_WMAV2,
+    AV_CODEC_ID_MACE3,
+    AV_CODEC_ID_MACE6,
+    AV_CODEC_ID_VMDAUDIO,
+    AV_CODEC_ID_FLAC,
+    AV_CODEC_ID_MP3ADU,
+    AV_CODEC_ID_MP3ON4,
+    AV_CODEC_ID_SHORTEN,
+    AV_CODEC_ID_ALAC,
+    AV_CODEC_ID_WESTWOOD_SND1,
+    AV_CODEC_ID_GSM, ///< as in Berlin toast format
+    AV_CODEC_ID_QDM2,
+    AV_CODEC_ID_COOK,
+    AV_CODEC_ID_TRUESPEECH,
+    AV_CODEC_ID_TTA,
+    AV_CODEC_ID_SMACKAUDIO,
+    AV_CODEC_ID_QCELP,
+    AV_CODEC_ID_WAVPACK,
+    AV_CODEC_ID_DSICINAUDIO,
+    AV_CODEC_ID_IMC,
+    AV_CODEC_ID_MUSEPACK7,
+    AV_CODEC_ID_MLP,
+    AV_CODEC_ID_GSM_MS, /* as found in WAV */
+    AV_CODEC_ID_ATRAC3,
+    AV_CODEC_ID_VOXWARE,
+    AV_CODEC_ID_APE,
+    AV_CODEC_ID_NELLYMOSER,
+    AV_CODEC_ID_MUSEPACK8,
+    AV_CODEC_ID_SPEEX,
+    AV_CODEC_ID_WMAVOICE,
+    AV_CODEC_ID_WMAPRO,
+    AV_CODEC_ID_WMALOSSLESS,
+    AV_CODEC_ID_ATRAC3P,
+    AV_CODEC_ID_EAC3,
+    AV_CODEC_ID_SIPR,
+    AV_CODEC_ID_MP1,
+    AV_CODEC_ID_TWINVQ,
+    AV_CODEC_ID_TRUEHD,
+    AV_CODEC_ID_MP4ALS,
+    AV_CODEC_ID_ATRAC1,
+    AV_CODEC_ID_BINKAUDIO_RDFT,
+    AV_CODEC_ID_BINKAUDIO_DCT,
+    AV_CODEC_ID_AAC_LATM,
+    AV_CODEC_ID_QDMC,
+    AV_CODEC_ID_CELT,
+    AV_CODEC_ID_G723_1,
+    AV_CODEC_ID_G729,
+    AV_CODEC_ID_8SVX_EXP,
+    AV_CODEC_ID_8SVX_FIB,
+    AV_CODEC_ID_BMV_AUDIO,
+    AV_CODEC_ID_RALF,
+    AV_CODEC_ID_IAC,
+    AV_CODEC_ID_ILBC,
+    AV_CODEC_ID_FFWAVESYNTH = MKBETAG('F','F','W','S'),
+    AV_CODEC_ID_8SVX_RAW    = MKBETAG('8','S','V','X'),
+    AV_CODEC_ID_SONIC       = MKBETAG('S','O','N','C'),
+    AV_CODEC_ID_SONIC_LS    = MKBETAG('S','O','N','L'),
+    AV_CODEC_ID_PAF_AUDIO   = MKBETAG('P','A','F','A'),
+    AV_CODEC_ID_OPUS        = MKBETAG('O','P','U','S'),
 
     /* subtitle codecs */
-    CODEC_ID_FIRST_SUBTITLE = 0x17000,          ///< A dummy ID pointing at the start of subtitle codecs.
-    CODEC_ID_DVD_SUBTITLE = 0x17000,
-    CODEC_ID_DVB_SUBTITLE,
-    CODEC_ID_TEXT,  ///< raw UTF-8 text
-    CODEC_ID_XSUB,
-    CODEC_ID_SSA,
-    CODEC_ID_MOV_TEXT,
-    CODEC_ID_HDMV_PGS_SUBTITLE,
-    CODEC_ID_DVB_TELETEXT,
-    CODEC_ID_SRT,
-    CODEC_ID_MICRODVD   = MKBETAG('m','D','V','D'),
-    CODEC_ID_EIA_608    = MKBETAG('c','6','0','8'),
-    CODEC_ID_JACOSUB    = MKBETAG('J','S','U','B'),
+    AV_CODEC_ID_FIRST_SUBTITLE = 0x17000,          ///< A dummy ID pointing at the start of subtitle codecs.
+    AV_CODEC_ID_DVD_SUBTITLE = 0x17000,
+    AV_CODEC_ID_DVB_SUBTITLE,
+    AV_CODEC_ID_TEXT,  ///< raw UTF-8 text
+    AV_CODEC_ID_XSUB,
+    AV_CODEC_ID_SSA,
+    AV_CODEC_ID_MOV_TEXT,
+    AV_CODEC_ID_HDMV_PGS_SUBTITLE,
+    AV_CODEC_ID_DVB_TELETEXT,
+    AV_CODEC_ID_SRT,
+    AV_CODEC_ID_MICRODVD   = MKBETAG('m','D','V','D'),
+    AV_CODEC_ID_EIA_608    = MKBETAG('c','6','0','8'),
+    AV_CODEC_ID_JACOSUB    = MKBETAG('J','S','U','B'),
+    AV_CODEC_ID_SAMI       = MKBETAG('S','A','M','I'),
+    AV_CODEC_ID_REALTEXT   = MKBETAG('R','T','X','T'),
+    AV_CODEC_ID_SUBVIEWER  = MKBETAG('S','u','b','V'),
+    AV_CODEC_ID_SUBRIP     = MKBETAG('S','R','i','p'),
+    AV_CODEC_ID_WEBVTT     = MKBETAG('W','V','T','T'),
 
     /* teletext codecs */
-    CODEC_ID_MPEG2VBI,
-    CODEC_ID_DVB_VBI,
+    AV_CODEC_ID_MPEG2VBI,
+    AV_CODEC_ID_DVB_VBI,
 
     /* DSMCC codec */
-    CODEC_ID_DSMCC_B,
+    AV_CODEC_ID_DSMCC_B,
 
     /* other specific kind of codecs (generally used for attachments) */
-    CODEC_ID_FIRST_UNKNOWN = 0x18000,           ///< A dummy ID pointing at the start of various fake codecs.
-    CODEC_ID_TTF = 0x18000,
-    CODEC_ID_BINTEXT    = MKBETAG('B','T','X','T'),
-    CODEC_ID_XBIN       = MKBETAG('X','B','I','N'),
-    CODEC_ID_IDF        = MKBETAG( 0 ,'I','D','F'),
+    AV_CODEC_ID_FIRST_UNKNOWN = 0x18000,           ///< A dummy ID pointing at the start of various fake codecs.
+    AV_CODEC_ID_TTF = 0x18000,
+    AV_CODEC_ID_BINTEXT    = MKBETAG('B','T','X','T'),
+    AV_CODEC_ID_XBIN       = MKBETAG('X','B','I','N'),
+    AV_CODEC_ID_IDF        = MKBETAG( 0 ,'I','D','F'),
+    AV_CODEC_ID_OTF        = MKBETAG( 0 ,'O','T','F'),
 
-    CODEC_ID_PROBE = 0x19000, ///< codec_id is not known (like CODEC_ID_NONE) but lavf should attempt to identify it
+    AV_CODEC_ID_PROBE = 0x19000, ///< codec_id is not known (like AV_CODEC_ID_NONE) but lavf should attempt to identify it
 
-    CODEC_ID_MPEG2TS = 0x20000, /**< _FAKE_ codec to indicate a raw MPEG-2 TS
+    AV_CODEC_ID_MPEG2TS = 0x20000, /**< _FAKE_ codec to indicate a raw MPEG-2 TS
                                 * stream (only used by libavformat) */
-    CODEC_ID_MPEG4SYSTEMS = 0x20001, /**< _FAKE_ codec to indicate a MPEG-4 Systems
+    AV_CODEC_ID_MPEG4SYSTEMS = 0x20001, /**< _FAKE_ codec to indicate a MPEG-4 Systems
                                 * stream (only used by libavformat) */
-    CODEC_ID_FFMETADATA = 0x21000,   ///< Dummy codec for streams containing only metadata information.
+    AV_CODEC_ID_FFMETADATA = 0x21000,   ///< Dummy codec for streams containing only metadata information.
+
+#if FF_API_CODEC_ID
+#include "old_codec_ids.h"
+#endif
 };
+
+#if FF_API_CODEC_ID
+#define CodecID AVCodecID
+#endif
+
+/**
+ * This struct describes the properties of a single codec described by an
+ * AVCodecID.
+ * @see avcodec_get_descriptor()
+ */
+typedef struct AVCodecDescriptor {
+    enum AVCodecID     id;
+    enum AVMediaType type;
+    /**
+     * Name of the codec described by this descriptor. It is non-empty and
+     * unique for each codec descriptor. It should contain alphanumeric
+     * characters and '_' only.
+     */
+    const char      *name;
+    /**
+     * A more descriptive name for this codec. May be NULL.
+     */
+    const char *long_name;
+    /**
+     * Codec properties, a combination of AV_CODEC_PROP_* flags.
+     */
+    int             props;
+} AVCodecDescriptor;
+
+/**
+ * Codec uses only intra compression.
+ * Video codecs only.
+ */
+#define AV_CODEC_PROP_INTRA_ONLY    (1 << 0)
+/**
+ * Codec supports lossy compression. Audio and video codecs only.
+ * @note a codec may support both lossy and lossless
+ * compression modes
+ */
+#define AV_CODEC_PROP_LOSSY         (1 << 1)
+/**
+ * Codec supports lossless compression. Audio and video codecs only.
+ */
+#define AV_CODEC_PROP_LOSSLESS      (1 << 2)
 
 #if FF_API_OLD_DECODE_AUDIO
 /* in bytes */
@@ -728,6 +801,10 @@ typedef struct RcOverride{
  */
 #define CODEC_CAP_VARIABLE_FRAME_SIZE 0x10000
 /**
+ * Codec is intra only.
+ */
+#define CODEC_CAP_INTRA_ONLY       0x40000000
+/**
  * Codec is lossless.
  */
 #define CODEC_CAP_LOSSLESS         0x80000000
@@ -847,6 +924,27 @@ enum AVPacketSideDataType {
      * @endcode
      */
     AV_PKT_DATA_H263_MB_INFO,
+
+    /**
+     * Recommmends skipping the specified number of samples
+     * @code
+     * u32le number of samples to skip from start of this packet
+     * u32le number of samples to skip from end of this packet
+     * u8    reason for start skip
+     * u8    reason for end   skip (0=padding silence, 1=convergence)
+     * @endcode
+     */
+    AV_PKT_DATA_SKIP_SAMPLES=70,
+
+    /**
+     * An AV_PKT_DATA_JP_DUALMONO side data packet indicates that
+     * the packet may contain "dual mono" audio specific to Japanese DTV
+     * and if it is true, recommends only the selected channel to be used.
+     * @code
+     * u8    selected channels (0=mail/left, 1=sub/right, 2=both)
+     * @endcode
+     */
+    AV_PKT_DATA_JP_DUALMONO,
 };
 
 typedef struct AVPacket {
@@ -1284,6 +1382,47 @@ typedef struct AVFrame {
      */
     int64_t pkt_pos;
 
+    /**
+     * duration of the corresponding packet, expressed in
+     * AVStream->time_base units, 0 if unknown.
+     * Code outside libavcodec should access this field using:
+     * av_frame_get_pkt_duration(frame)
+     * - encoding: unused
+     * - decoding: Read by user.
+     */
+    int64_t pkt_duration;
+
+    /**
+     * metadata.
+     * Code outside libavcodec should access this field using:
+     * av_frame_get_metadata(frame)
+     * - encoding: Set by user.
+     * - decoding: Set by libavcodec.
+     */
+    AVDictionary *metadata;
+
+    /**
+     * decode error flags of the frame, set to a combination of
+     * FF_DECODE_ERROR_xxx flags if the decoder produced a frame, but there
+     * were errors during the decoding.
+     * Code outside libavcodec should access this field using:
+     * av_frame_get_decode_error_flags(frame)
+     * - encoding: unused
+     * - decoding: set by libavcodec, read by user.
+     */
+    int decode_error_flags;
+#define FF_DECODE_ERROR_INVALID_BITSTREAM   1
+#define FF_DECODE_ERROR_MISSING_REFERENCE   2
+
+    /**
+     * number of audio channels, only used for audio.
+     * Code outside libavcodec should access this field using:
+     * av_frame_get_channels(frame)
+     * - encoding: unused
+     * - decoding: Read by user.
+     */
+    int64_t channels;
+
     /** ATSC CC data CEA-608/708 
      * - encoding: unused
      * - decoding: Set by libavcodec
@@ -1306,13 +1445,21 @@ typedef struct AVFrame {
  * they should not be accessed directly outside libavcodec.
  */
 int64_t av_frame_get_best_effort_timestamp(const AVFrame *frame);
-int64_t av_frame_get_pkt_pos              (const AVFrame *frame);
-int64_t av_frame_get_channel_layout       (const AVFrame *frame);
-int     av_frame_get_sample_rate          (const AVFrame *frame);
 void    av_frame_set_best_effort_timestamp(AVFrame *frame, int64_t val);
+int64_t av_frame_get_pkt_duration         (const AVFrame *frame);
+void    av_frame_set_pkt_duration         (AVFrame *frame, int64_t val);
+int64_t av_frame_get_pkt_pos              (const AVFrame *frame);
 void    av_frame_set_pkt_pos              (AVFrame *frame, int64_t val);
+int64_t av_frame_get_channel_layout       (const AVFrame *frame);
 void    av_frame_set_channel_layout       (AVFrame *frame, int64_t val);
+int     av_frame_get_channels             (const AVFrame *frame);
+void    av_frame_set_channels             (AVFrame *frame, int     val);
+int     av_frame_get_sample_rate          (const AVFrame *frame);
 void    av_frame_set_sample_rate          (AVFrame *frame, int     val);
+AVDictionary *av_frame_get_metadata       (const AVFrame *frame);
+void          av_frame_set_metadata       (AVFrame *frame, AVDictionary *val);
+int     av_frame_get_decode_error_flags   (const AVFrame *frame);
+void    av_frame_set_decode_error_flags   (AVFrame *frame, int     val);
 
 struct AVCodecInternal;
 
@@ -1343,9 +1490,9 @@ typedef struct AVCodecContext {
     int log_level_offset;
 
     enum AVMediaType codec_type; /* see AVMEDIA_TYPE_xxx */
-    struct AVCodec  *codec;
+    const struct AVCodec  *codec;
     char             codec_name[32];
-    enum CodecID     codec_id; /* see CODEC_ID_xxx */
+    enum AVCodecID     codec_id; /* see AV_CODEC_ID_xxx */
 
     /**
      * fourcc (LSB first, so "ABCD" -> ('D'<<24) + ('C'<<16) + ('B'<<8) + 'A').
@@ -1526,7 +1673,7 @@ typedef struct AVCodecContext {
     /**
      * Pixel format, see PIX_FMT_xxx.
      * May be set by the demuxer if known from headers.
-     * May be overriden by the decoder if it knows better.
+     * May be overridden by the decoder if it knows better.
      * - encoding: Set by user.
      * - decoding: Set by user if known, overridden by libavcodec if known
      */
@@ -2299,7 +2446,7 @@ typedef struct AVCodecContext {
 
     /**
      * ratecontrol qmin qmax limiting method
-     * 0-> clipping, 1-> use a nice continous function to limit qscale wthin qmin/qmax.
+     * 0-> clipping, 1-> use a nice continuous function to limit qscale wthin qmin/qmax.
      * - encoding: Set by user.
      * - decoding: unused
      */
@@ -2820,6 +2967,10 @@ typedef struct AVCodecContext {
 #define FF_PROFILE_AAC_LOW  1
 #define FF_PROFILE_AAC_SSR  2
 #define FF_PROFILE_AAC_LTP  3
+#define FF_PROFILE_AAC_HE   4
+#define FF_PROFILE_AAC_HE_V2 28
+#define FF_PROFILE_AAC_LD   22
+#define FF_PROFILE_AAC_ELD  38
 
 #define FF_PROFILE_DTS         20
 #define FF_PROFILE_DTS_ES      30
@@ -2938,6 +3089,24 @@ typedef struct AVCodecContext {
     uint64_t vbv_delay;
 
     /**
+     * Timebase in which pkt_dts/pts and AVPacket.dts/pts are.
+     * Code outside libavcodec should access this field using:
+     * avcodec_set_pkt_timebase(avctx)
+     * - encoding unused.
+     * - decodimg set by user
+     */
+    AVRational pkt_timebase;
+
+    /**
+     * AVCodecDescriptor
+     * Code outside libavcodec should access this field using:
+     * avcodec_get_codec_descriptior(avctx)
+     * - encoding: unused.
+     * - decoding: set by libavcodec.
+     */
+    const AVCodecDescriptor *codec_descriptor;
+
+    /**
      * Current statistics for PTS correction.
      * - decoding: maintained and used by libavcodec, not intended to be used by user apps
      * - encoding: unused
@@ -2948,6 +3117,12 @@ typedef struct AVCodecContext {
     int64_t pts_correction_last_dts;       /// DTS of the last frame
 } AVCodecContext;
 
+AVRational av_codec_get_pkt_timebase         (const AVCodecContext *avctx);
+void       av_codec_set_pkt_timebase         (AVCodecContext *avctx, AVRational val);
+
+const AVCodecDescriptor *av_codec_get_codec_descriptor(const AVCodecContext *avctx);
+void                     av_codec_set_codec_descriptor(AVCodecContext *avctx, const AVCodecDescriptor *desc);
+
 /**
  * AVProfile.
  */
@@ -2957,6 +3132,8 @@ typedef struct AVProfile {
 } AVProfile;
 
 typedef struct AVCodecDefault AVCodecDefault;
+
+struct AVSubtitle;
 
 /**
  * AVCodec.
@@ -2975,7 +3152,7 @@ typedef struct AVCodec {
      */
     const char *long_name;
     enum AVMediaType type;
-    enum CodecID id;
+    enum AVCodecID id;
     /**
      * Codec capabilities.
      * see CODEC_CAP_*
@@ -3030,7 +3207,8 @@ typedef struct AVCodec {
     void (*init_static_data)(struct AVCodec *codec);
 
     int (*init)(AVCodecContext *);
-    int (*encode)(AVCodecContext *, uint8_t *buf, int buf_size, void *data);
+    int (*encode_sub)(AVCodecContext *, uint8_t *buf, int buf_size,
+                      const struct AVSubtitle *sub);
     /**
      * Encode data to an AVPacket.
      *
@@ -3073,9 +3251,9 @@ typedef struct AVHWAccel {
     /**
      * Codec implemented by the hardware accelerator.
      *
-     * See CODEC_ID_xxx
+     * See AV_CODEC_ID_xxx
      */
-    enum CodecID id;
+    enum AVCodecID id;
 
     /**
      * Supported pixel format.
@@ -3202,7 +3380,7 @@ typedef struct AVSubtitleRect {
 
     /**
      * 0 terminated ASS/SSA compatible event line.
-     * The pressentation of this is unaffected by the other values in this
+     * The presentation of this is unaffected by the other values in this
      * struct.
      */
     char *ass;
@@ -3229,7 +3407,7 @@ typedef struct AVSubtitle {
  * if c is non-NULL, returns the next registered codec after c,
  * or NULL if c is the last one.
  */
-AVCodec *av_codec_next(AVCodec *c);
+AVCodec *av_codec_next(const AVCodec *c);
 
 /**
  * Return the LIBAVCODEC_VERSION_INT constant.
@@ -3317,7 +3495,7 @@ void avcodec_get_context_defaults2(AVCodecContext *s, enum AVMediaType);
  * @return An AVCodecContext filled with default values or NULL on failure.
  * @see avcodec_get_context_defaults
  */
-AVCodecContext *avcodec_alloc_context3(AVCodec *codec);
+AVCodecContext *avcodec_alloc_context3(const AVCodec *codec);
 
 /**
  * Set the fields of the given AVCodecContext to default values corresponding
@@ -3328,7 +3506,7 @@ AVCodecContext *avcodec_alloc_context3(AVCodec *codec);
  * If codec is non-NULL, it is illegal to call avcodec_open2() with a
  * different codec on this AVCodecContext.
  */
-int avcodec_get_context_defaults3(AVCodecContext *s, AVCodec *codec);
+int avcodec_get_context_defaults3(AVCodecContext *s, const AVCodec *codec);
 
 /**
  * Get the AVClass for AVCodecContext. It can be used in combination with
@@ -3369,7 +3547,7 @@ int avcodec_copy_context(AVCodecContext *dest, const AVCodecContext *src);
 
 /**
  * Allocate an AVFrame and set its fields to default values.  The resulting
- * struct can be deallocated by simply calling av_free().
+ * struct must be freed using avcodec_free_frame().
  *
  * @return An AVFrame filled with default values or NULL on failure.
  * @see avcodec_get_frame_defaults
@@ -3379,9 +3557,21 @@ AVFrame *avcodec_alloc_frame(void);
 /**
  * Set the fields of the given AVFrame to default values.
  *
- * @param pic The AVFrame of which the fields should be set to default values.
+ * @param frame The AVFrame of which the fields should be set to default values.
  */
-void avcodec_get_frame_defaults(AVFrame *pic);
+void avcodec_get_frame_defaults(AVFrame *frame);
+
+/**
+ * Free the frame and any dynamically allocated objects in it,
+ * e.g. extended_data.
+ *
+ * @param frame frame to be freed. The pointer will be set to NULL.
+ *
+ * @warning this function does NOT free the data buffers themselves
+ * (it does not know how, since they might have been allocated with
+ *  a custom get_buffer()).
+ */
+void avcodec_free_frame(AVFrame **frame);
 
 #if FF_API_AVCODEC_OPEN
 /**
@@ -3396,7 +3586,7 @@ void avcodec_get_frame_defaults(AVFrame *pic);
  *
  * @code
  * avcodec_register_all();
- * codec = avcodec_find_decoder(CODEC_ID_H264);
+ * codec = avcodec_find_decoder(AV_CODEC_ID_H264);
  * if (!codec)
  *     exit(1);
  *
@@ -3430,7 +3620,7 @@ int avcodec_open(AVCodecContext *avctx, AVCodec *codec);
  * @code
  * avcodec_register_all();
  * av_dict_set(&opts, "b", "2.5M", 0);
- * codec = avcodec_find_decoder(CODEC_ID_H264);
+ * codec = avcodec_find_decoder(AV_CODEC_ID_H264);
  * if (!codec)
  *     exit(1);
  *
@@ -3453,7 +3643,7 @@ int avcodec_open(AVCodecContext *avctx, AVCodec *codec);
  * @see avcodec_alloc_context3(), avcodec_find_decoder(), avcodec_find_encoder(),
  *      av_dict_set(), av_opt_find().
  */
-int avcodec_open2(AVCodecContext *avctx, AVCodec *codec, AVDictionary **options);
+int avcodec_open2(AVCodecContext *avctx, const AVCodec *codec, AVDictionary **options);
 
 /**
  * Close a given AVCodecContext and free all the data associated with it
@@ -3483,17 +3673,15 @@ void avsubtitle_free(AVSubtitle *sub);
  */
 
 /**
- * @deprecated use NULL instead
- */
-attribute_deprecated void av_destruct_packet_nofree(AVPacket *pkt);
-
-/**
  * Default packet destructor.
  */
 void av_destruct_packet(AVPacket *pkt);
 
 /**
  * Initialize optional fields of a packet with default values.
+ *
+ * Note, this does not touch the data and size members, which have to be
+ * initialized separately.
  *
  * @param pkt packet
  */
@@ -3530,6 +3718,13 @@ int av_grow_packet(AVPacket *pkt, int grow_by);
  * packet is allocated if it was not really allocated.
  */
 int av_dup_packet(AVPacket *pkt);
+
+/**
+ * Copy packet, including contents
+ *
+ * @return 0 on success, negative AVERROR on fail
+ */
+int av_copy_packet(AVPacket *dst, AVPacket *src);
 
 /**
  * Free a packet.
@@ -3588,10 +3783,10 @@ int av_packet_split_side_data(AVPacket *pkt);
 /**
  * Find a registered decoder with a matching codec ID.
  *
- * @param id CodecID of the requested decoder
+ * @param id AVCodecID of the requested decoder
  * @return A decoder if one was found, NULL otherwise.
  */
-AVCodec *avcodec_find_decoder(enum CodecID id);
+AVCodec *avcodec_find_decoder(enum AVCodecID id);
 
 /**
  * Find a registered decoder with the specified name.
@@ -4011,10 +4206,10 @@ void av_parser_close(AVCodecParserContext *s);
 /**
  * Find a registered encoder with a matching codec ID.
  *
- * @param id CodecID of the requested encoder
+ * @param id AVCodecID of the requested encoder
  * @return An encoder if one was found, NULL otherwise.
  */
-AVCodec *avcodec_find_encoder(enum CodecID id);
+AVCodec *avcodec_find_encoder(enum AVCodecID id);
 
 /**
  * Find a registered encoder with the specified name.
@@ -4067,11 +4262,12 @@ int attribute_deprecated avcodec_encode_audio(AVCodecContext *avctx,
  *                  The user can supply an output buffer by setting
  *                  avpkt->data and avpkt->size prior to calling the
  *                  function, but if the size of the user-provided data is not
- *                  large enough, encoding will fail. All other AVPacket fields
- *                  will be reset by the encoder using av_init_packet(). If
- *                  avpkt->data is NULL, the encoder will allocate it.
- *                  The encoder will set avpkt->size to the size of the
- *                  output packet.
+ *                  large enough, encoding will fail. If avpkt->data and
+ *                  avpkt->size are set, avpkt->destruct must also be set. All
+ *                  other AVPacket fields will be reset by the encoder using
+ *                  av_init_packet(). If avpkt->data is NULL, the encoder will
+ *                  allocate it. The encoder will set avpkt->size to the size
+ *                  of the output packet.
  *
  *                  If this function fails or produces no output, avpkt will be
  *                  freed using av_free_packet() (i.e. avpkt->destruct will be
@@ -4275,42 +4471,19 @@ int avpicture_alloc(AVPicture *picture, enum PixelFormat pix_fmt, int width, int
 void avpicture_free(AVPicture *picture);
 
 /**
- * Fill in the AVPicture fields.
- * The fields of the given AVPicture are filled in by using the 'ptr' address
- * which points to the image data buffer. Depending on the specified picture
- * format, one or multiple image data pointers and line sizes will be set.
- * If a planar format is specified, several pointers will be set pointing to
- * the different picture planes and the line sizes of the different planes
- * will be stored in the lines_sizes array.
- * Call with ptr == NULL to get the required size for the ptr buffer.
+ * Fill in the AVPicture fields, always assume a linesize alignment of
+ * 1.
  *
- * To allocate the buffer and fill in the AVPicture fields in one call,
- * use avpicture_alloc().
- *
- * @param picture AVPicture whose fields are to be filled in
- * @param ptr Buffer which will contain or contains the actual image data
- * @param pix_fmt The format in which the picture data is stored.
- * @param width the width of the image in pixels
- * @param height the height of the image in pixels
- * @return size of the image data in bytes
+ * @see av_image_fill_arrays()
  */
 int avpicture_fill(AVPicture *picture, uint8_t *ptr,
                    enum PixelFormat pix_fmt, int width, int height);
 
 /**
- * Copy pixel data from an AVPicture into a buffer.
- * The data is stored compactly, without any gaps for alignment or padding
- * which may be applied by avpicture_fill().
+ * Copy pixel data from an AVPicture into a buffer, always assume a
+ * linesize alignment of 1.
  *
- * @see avpicture_get_size()
- *
- * @param[in] src AVPicture containing image data
- * @param[in] pix_fmt The format in which the picture data is stored.
- * @param[in] width the width of the image in pixels.
- * @param[in] height the height of the image in pixels.
- * @param[out] dest A buffer into which picture data will be copied.
- * @param[in] dest_size The size of 'dest'.
- * @return The number of bytes written to dest, or a negative value (error code) on error.
+ * @see av_image_copy_to_buffer()
  */
 int avpicture_layout(const AVPicture* src, enum PixelFormat pix_fmt, int width, int height,
                      unsigned char *dest, int dest_size);
@@ -4318,14 +4491,9 @@ int avpicture_layout(const AVPicture* src, enum PixelFormat pix_fmt, int width, 
 /**
  * Calculate the size in bytes that a picture of the given width and height
  * would occupy if stored in the given picture format.
- * Note that this returns the size of a compact representation as generated
- * by avpicture_layout(), which can be smaller than the size required for e.g.
- * avpicture_fill().
+ * Always assume a linesize alignment of 1.
  *
- * @param pix_fmt the given picture format
- * @param width the width of the image
- * @param height the height of the image
- * @return Image data size in bytes or -1 on error (e.g. too large dimensions).
+ * @see av_image_get_buffer_size().
  */
 int avpicture_get_size(enum PixelFormat pix_fmt, int width, int height);
 
@@ -4335,7 +4503,7 @@ int avpicture_get_size(enum PixelFormat pix_fmt, int width, int height);
 int avpicture_deinterlace(AVPicture *dst, const AVPicture *src,
                           enum PixelFormat pix_fmt, int width, int height);
 /**
- * Copy image src to dst. Wraps av_picture_data_copy() above.
+ * Copy image src to dst. Wraps av_image_copy().
  */
 void av_picture_copy(AVPicture *dst, const AVPicture *src,
                      enum PixelFormat pix_fmt, int width, int height);
@@ -4409,7 +4577,10 @@ unsigned int avcodec_pix_fmt_to_codec_tag(enum PixelFormat pix_fmt);
 int avcodec_get_pix_fmt_loss(enum PixelFormat dst_pix_fmt, enum PixelFormat src_pix_fmt,
                              int has_alpha);
 
+#if FF_API_FIND_BEST_PIX_FMT
 /**
+ * @deprecated use avcodec_find_best_pix_fmt_of_2() instead.
+ *
  * Find the best pixel format to convert to given a certain source pixel
  * format.  When converting from one pixel format to another, information loss
  * may occur.  For example, when converting from RGB24 to GRAY, the color
@@ -4433,15 +4604,38 @@ int avcodec_get_pix_fmt_loss(enum PixelFormat dst_pix_fmt, enum PixelFormat src_
  * @param[out] loss_ptr Combination of flags informing you what kind of losses will occur.
  * @return The best pixel format to convert to or -1 if none was found.
  */
+attribute_deprecated
 enum PixelFormat avcodec_find_best_pix_fmt(int64_t pix_fmt_mask, enum PixelFormat src_pix_fmt,
                               int has_alpha, int *loss_ptr);
+#endif /* FF_API_FIND_BEST_PIX_FMT */
+
+/**
+ * Find the best pixel format to convert to given a certain source pixel
+ * format.  When converting from one pixel format to another, information loss
+ * may occur.  For example, when converting from RGB24 to GRAY, the color
+ * information will be lost. Similarly, other losses occur when converting from
+ * some formats to other formats. avcodec_find_best_pix_fmt_of_2() searches which of
+ * the given pixel formats should be used to suffer the least amount of loss.
+ * The pixel formats from which it chooses one, are determined by the
+ * pix_fmt_list parameter.
+ *
+ *
+ * @param[in] pix_fmt_list PIX_FMT_NONE terminated array of pixel formats to choose from
+ * @param[in] src_pix_fmt source pixel format
+ * @param[in] has_alpha Whether the source pixel format alpha channel is used.
+ * @param[out] loss_ptr Combination of flags informing you what kind of losses will occur.
+ * @return The best pixel format to convert to or -1 if none was found.
+ */
+enum PixelFormat avcodec_find_best_pix_fmt_of_list(enum PixelFormat *pix_fmt_list,
+                                            enum PixelFormat src_pix_fmt,
+                                            int has_alpha, int *loss_ptr);
 
 /**
  * Find the best pixel format to convert to given a certain source pixel
  * format and a selection of two destination pixel formats. When converting from
  * one pixel format to another, information loss may occur.  For example, when converting
  * from RGB24 to GRAY, the color information will be lost. Similarly, other losses occur when
- * converting from some formats to other formats. avcodec_find_best_pix_fmt2() selects which of
+ * converting from some formats to other formats. avcodec_find_best_pix_fmt_of_2() selects which of
  * the given pixel formats should be used to suffer the least amount of loss.
  *
  * If one of the destination formats is PIX_FMT_NONE the other pixel format (if valid) will be
@@ -4453,8 +4647,8 @@ enum PixelFormat avcodec_find_best_pix_fmt(int64_t pix_fmt_mask, enum PixelForma
  * dst_pix_fmt2= PIX_FMT_GRAY8;
  * dst_pix_fmt3= PIX_FMT_RGB8;
  * loss= FF_LOSS_CHROMA; // don't care about chroma loss, so chroma loss will be ignored.
- * dst_pix_fmt = avcodec_find_best_pix_fmt2(dst_pix_fmt1, dst_pix_fmt2, src_pix_fmt, alpha, &loss);
- * dst_pix_fmt = avcodec_find_best_pix_fmt2(dst_pix_fmt, dst_pix_fmt3, src_pix_fmt, alpha, &loss);
+ * dst_pix_fmt = avcodec_find_best_pix_fmt_of_2(dst_pix_fmt1, dst_pix_fmt2, src_pix_fmt, alpha, &loss);
+ * dst_pix_fmt = avcodec_find_best_pix_fmt_of_2(dst_pix_fmt, dst_pix_fmt3, src_pix_fmt, alpha, &loss);
  * @endcode
  *
  * @param[in] dst_pix_fmt1 One of the two destination pixel formats to choose from
@@ -4466,8 +4660,19 @@ enum PixelFormat avcodec_find_best_pix_fmt(int64_t pix_fmt_mask, enum PixelForma
  *                               that occurs when converting from src to selected dst pixel format.
  * @return The best pixel format to convert to or -1 if none was found.
  */
+enum PixelFormat avcodec_find_best_pix_fmt_of_2(enum PixelFormat dst_pix_fmt1, enum PixelFormat dst_pix_fmt2,
+                                            enum PixelFormat src_pix_fmt, int has_alpha, int *loss_ptr);
+
+attribute_deprecated
+#if AV_HAVE_INCOMPATIBLE_FORK_ABI
+enum PixelFormat avcodec_find_best_pix_fmt2(enum PixelFormat *pix_fmt_list,
+                                            enum PixelFormat src_pix_fmt,
+                                            int has_alpha, int *loss_ptr);
+#else
 enum PixelFormat avcodec_find_best_pix_fmt2(enum PixelFormat dst_pix_fmt1, enum PixelFormat dst_pix_fmt2,
                                             enum PixelFormat src_pix_fmt, int has_alpha, int *loss_ptr);
+#endif
+
 
 enum PixelFormat avcodec_default_get_format(struct AVCodecContext *s, const enum PixelFormat * fmt);
 
@@ -4534,15 +4739,15 @@ void avcodec_default_free_buffers(AVCodecContext *s);
  * @param[in] codec_id the codec
  * @return Number of bits per sample or zero if unknown for the given codec.
  */
-int av_get_bits_per_sample(enum CodecID codec_id);
+int av_get_bits_per_sample(enum AVCodecID codec_id);
 
 /**
  * Return the PCM codec associated with a sample format.
  * @param be  endianness, 0 for little, 1 for big,
  *            -1 (or anything else) for native
- * @return  CODEC_ID_PCM_* or CODEC_ID_NONE
+ * @return  AV_CODEC_ID_PCM_* or AV_CODEC_ID_NONE
  */
-enum CodecID av_get_pcm_codec(enum AVSampleFormat fmt, int be);
+enum AVCodecID av_get_pcm_codec(enum AVSampleFormat fmt, int be);
 
 /**
  * Return codec bits per sample.
@@ -4552,7 +4757,7 @@ enum CodecID av_get_pcm_codec(enum AVSampleFormat fmt, int be);
  * @param[in] codec_id the codec
  * @return Number of bits per sample or zero if unknown for the given codec.
  */
-int av_get_exact_bits_per_sample(enum CodecID codec_id);
+int av_get_exact_bits_per_sample(enum AVCodecID codec_id);
 
 /**
  * Return audio frame duration.
@@ -4625,6 +4830,12 @@ void av_fast_malloc(void *ptr, unsigned int *size, size_t min_size);
  * be 0-initialized so that no uninitialized data will ever appear.
  */
 void av_fast_padded_malloc(void *ptr, unsigned int *size, size_t min_size);
+
+/**
+ * Same behaviour av_fast_padded_malloc except that buffer will always
+ * be 0-initialized after call.
+ */
+void av_fast_padded_mallocz(void *ptr, unsigned int *size, size_t min_size);
 
 /**
  * Encode extradata length to a buffer. Used by xiph codecs.
@@ -4700,13 +4911,13 @@ int av_lockmgr_register(int (*cb)(void **mutex, enum AVLockOp op));
 /**
  * Get the type of the given codec.
  */
-enum AVMediaType avcodec_get_type(enum CodecID codec_id);
+enum AVMediaType avcodec_get_type(enum AVCodecID codec_id);
 
 /**
  * Get the name of a codec.
  * @return  a static string identifying the codec; never NULL
  */
-const char *avcodec_get_name(enum CodecID id);
+const char *avcodec_get_name(enum AVCodecID id);
 
 /**
  * @return a positive value if s is open (i.e. avcodec_open2() was called on it
@@ -4717,12 +4928,32 @@ int avcodec_is_open(AVCodecContext *s);
 /**
  * @return a non-zero number if codec is an encoder, zero otherwise
  */
-int av_codec_is_encoder(AVCodec *codec);
+int av_codec_is_encoder(const AVCodec *codec);
 
 /**
  * @return a non-zero number if codec is a decoder, zero otherwise
  */
-int av_codec_is_decoder(AVCodec *codec);
+int av_codec_is_decoder(const AVCodec *codec);
+
+/**
+ * @return descriptor for given codec ID or NULL if no descriptor exists.
+ */
+const AVCodecDescriptor *avcodec_descriptor_get(enum AVCodecID id);
+
+/**
+ * Iterate over all codec descriptors known to libavcodec.
+ *
+ * @param prev previous descriptor. NULL to get the first descriptor.
+ *
+ * @return next descriptor or NULL after the last descriptor
+ */
+const AVCodecDescriptor *avcodec_descriptor_next(const AVCodecDescriptor *prev);
+
+/**
+ * @return codec descriptor with the given name or NULL if no such descriptor
+ *         exists.
+ */
+const AVCodecDescriptor *avcodec_descriptor_get_by_name(const char *name);
 
 const char *ff_codec_id_string(enum CodecID codec_id);
 const char *ff_codec_type_string(enum AVMediaType codec_type);

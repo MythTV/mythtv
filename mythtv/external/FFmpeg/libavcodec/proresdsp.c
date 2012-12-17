@@ -22,6 +22,7 @@
 
 #include "proresdsp.h"
 #include "simple_idct.h"
+#include "libavutil/common.h"
 
 #define BIAS     (1 << (PRORES_BITS_PER_SAMPLE - 1))           ///< bias value for converting signed pixels into unsigned ones
 #define CLIP_MIN (1 << (PRORES_BITS_PER_SAMPLE - 8))           ///< minimum value for clipping resulting pixels
@@ -29,7 +30,7 @@
 
 #define CLIP_AND_BIAS(x) (av_clip((x) + BIAS, CLIP_MIN, CLIP_MAX))
 
-#if CONFIG_PRORES_DECODER
+#if CONFIG_PRORES_DECODER | CONFIG_PRORES_LGPL_DECODER
 /**
  * Add bias value, clamp and output pixels of a slice
  */
@@ -53,7 +54,7 @@ static void prores_idct_put_c(uint16_t *out, int linesize, DCTELEM *block, const
 }
 #endif
 
-#if CONFIG_PRORES_ENCODER
+#if CONFIG_PRORES_KOSTYA_ENCODER
 static void prores_fdct_c(const uint16_t *src, int linesize, DCTELEM *block)
 {
     int x, y;
@@ -70,7 +71,7 @@ static void prores_fdct_c(const uint16_t *src, int linesize, DCTELEM *block)
 
 void ff_proresdsp_init(ProresDSPContext *dsp, AVCodecContext *avctx)
 {
-#if CONFIG_PRORES_DECODER
+#if CONFIG_PRORES_DECODER | CONFIG_PRORES_LGPL_DECODER
     dsp->idct_put = prores_idct_put_c;
     dsp->idct_permutation_type = FF_NO_IDCT_PERM;
 
@@ -79,7 +80,7 @@ void ff_proresdsp_init(ProresDSPContext *dsp, AVCodecContext *avctx)
     ff_init_scantable_permutation(dsp->idct_permutation,
                                   dsp->idct_permutation_type);
 #endif
-#if CONFIG_PRORES_ENCODER
+#if CONFIG_PRORES_KOSTYA_ENCODER
     dsp->fdct                 = prores_fdct_c;
     dsp->dct_permutation_type = FF_NO_IDCT_PERM;
     ff_init_scantable_permutation(dsp->dct_permutation,

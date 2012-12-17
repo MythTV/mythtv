@@ -213,8 +213,8 @@ class MPEG2fixup
     }
     int GetStreamType(int id) const
     {
-        return (inputFC->streams[id]->codec->codec_id == CODEC_ID_AC3) ?
-               CODEC_ID_AC3 : CODEC_ID_MP2;
+        return (inputFC->streams[id]->codec->codec_id == AV_CODEC_ID_AC3) ?
+               AV_CODEC_ID_AC3 : AV_CODEC_ID_MP2;
     }
     AVCodecContext *getCodecContext(int id)
     {

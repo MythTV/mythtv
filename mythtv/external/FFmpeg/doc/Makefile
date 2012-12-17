@@ -6,19 +6,21 @@ HTMLPAGES   = $(PROGS-yes:%=doc/%.html)                                 \
               doc/fate.html                                             \
               doc/general.html                                          \
               doc/git-howto.html                                        \
-              doc/libavfilter.html                                      \
               doc/platform.html                                         \
               doc/syntax.html                                           \
 
 TXTPAGES    = doc/fate.txt                                              \
 
 
-DOCS = $(HTMLPAGES) $(MANPAGES) $(PODPAGES)
-ifdef HAVE_MAKEINFO
-DOCS += $(TXTPAGES)
-endif
+DOCS-$(CONFIG_HTMLPAGES) += $(HTMLPAGES)
+DOCS-$(CONFIG_PODPAGES)  += $(PODPAGES)
+DOCS-$(CONFIG_MANPAGES)  += $(MANPAGES)
+DOCS-$(CONFIG_TXTPAGES)  += $(TXTPAGES)
+DOCS = $(DOCS-yes)
 
-all-$(CONFIG_DOC): documentation
+all-$(CONFIG_DOC): doc
+
+doc: documentation
 
 documentation: $(DOCS)
 
@@ -29,13 +31,11 @@ doc/%.txt: doc/%.texi
 	$(Q)$(TEXIDEP)
 	$(M)makeinfo --force --no-headers -o $@ $< 2>/dev/null
 
-doc/print_options.o: libavformat/options_table.h libavcodec/options_table.h
-
 GENTEXI  = format codec
 GENTEXI := $(GENTEXI:%=doc/avoptions_%.texi)
 
 $(GENTEXI): TAG = GENTEXI
-$(GENTEXI): doc/avoptions_%.texi: doc/print_options
+$(GENTEXI): doc/avoptions_%.texi: doc/print_options$(HOSTEXESUF)
 	$(M)doc/print_options $* > $@
 
 doc/%.html: TAG = HTML
@@ -46,7 +46,7 @@ doc/%.html: doc/%.texi $(SRC_PATH)/doc/t2h.init $(GENTEXI)
 doc/%.pod: TAG = POD
 doc/%.pod: doc/%.texi $(GENTEXI)
 	$(Q)$(TEXIDEP)
-	$(M)$(SRC_PATH)/doc/texi2pod.pl -Idoc $< $@
+	$(M)perl $(SRC_PATH)/doc/texi2pod.pl -Idoc $< $@
 
 doc/%.1: TAG = MAN
 doc/%.1: doc/%.pod $(GENTEXI)
@@ -54,11 +54,15 @@ doc/%.1: doc/%.pod $(GENTEXI)
 
 $(DOCS): | doc/
 
+install-man:
+
+ifdef CONFIG_MANPAGES
 install-progs-$(CONFIG_DOC): install-man
 
 install-man: $(MANPAGES)
 	$(Q)mkdir -p "$(MANDIR)/man1"
 	$(INSTALL) -m 644 $(MANPAGES) "$(MANDIR)/man1"
+endif
 
 uninstall: uninstall-man
 
@@ -70,4 +74,4 @@ clean::
 
 -include $(wildcard $(DOCS:%=%.d))
 
-.PHONY: documentation
+.PHONY: doc documentation

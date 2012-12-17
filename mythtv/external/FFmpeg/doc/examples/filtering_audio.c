@@ -84,21 +84,23 @@ static int init_filters(const char *filters_descr)
     char args[512];
     int ret;
     AVFilter *abuffersrc  = avfilter_get_by_name("abuffer");
-    AVFilter *abuffersink = avfilter_get_by_name("abuffersink");
+    AVFilter *abuffersink = avfilter_get_by_name("ffabuffersink");
     AVFilterInOut *outputs = avfilter_inout_alloc();
     AVFilterInOut *inputs  = avfilter_inout_alloc();
     const enum AVSampleFormat sample_fmts[] = { AV_SAMPLE_FMT_S16, -1 };
-    const int64_t *chlayouts                = avfilter_all_channel_layouts;
     AVABufferSinkParams *abuffersink_params;
     const AVFilterLink *outlink;
+    AVRational time_base = fmt_ctx->streams[audio_stream_index]->time_base;
 
     filter_graph = avfilter_graph_alloc();
 
     /* buffer audio source: the decoded frames from the decoder will be inserted here. */
     if (!dec_ctx->channel_layout)
         dec_ctx->channel_layout = av_get_default_channel_layout(dec_ctx->channels);
-    snprintf(args, sizeof(args), "%d:%d:0x%"PRIx64,
-             dec_ctx->sample_rate, dec_ctx->sample_fmt, dec_ctx->channel_layout);
+    snprintf(args, sizeof(args),
+            "time_base=%d/%d:sample_rate=%d:sample_fmt=%s:channel_layout=0x%"PRIx64,
+             time_base.num, time_base.den, dec_ctx->sample_rate,
+             av_get_sample_fmt_name(dec_ctx->sample_fmt), dec_ctx->channel_layout);
     ret = avfilter_graph_create_filter(&buffersrc_ctx, abuffersrc, "in",
                                        args, NULL, filter_graph);
     if (ret < 0) {
@@ -109,7 +111,6 @@ static int init_filters(const char *filters_descr)
     /* buffer audio sink: to terminate the filter chain. */
     abuffersink_params = av_abuffersink_params_alloc();
     abuffersink_params->sample_fmts     = sample_fmts;
-    abuffersink_params->channel_layouts = chlayouts;
     ret = avfilter_graph_create_filter(&buffersink_ctx, abuffersink, "out",
                                        NULL, abuffersink_params, filter_graph);
     av_free(abuffersink_params);
@@ -194,7 +195,6 @@ int main(int argc, char **argv)
             avcodec_get_frame_defaults(&frame);
             got_frame = 0;
             ret = avcodec_decode_audio4(dec_ctx, &frame, &got_frame, &packet);
-            av_free_packet(&packet);
             if (ret < 0) {
                 av_log(NULL, AV_LOG_ERROR, "Error decoding audio\n");
                 continue;
@@ -208,15 +208,20 @@ int main(int argc, char **argv)
                 }
 
                 /* pull filtered audio from the filtergraph */
-                while (avfilter_poll_frame(buffersink_ctx->inputs[0])) {
-                    av_buffersink_get_buffer_ref(buffersink_ctx, &samplesref, 0);
+                while (1) {
+                    ret = av_buffersink_get_buffer_ref(buffersink_ctx, &samplesref, 0);
+                    if(ret == AVERROR(EAGAIN) || ret == AVERROR_EOF)
+                        break;
+                    if(ret < 0)
+                        goto end;
                     if (samplesref) {
                         print_samplesref(samplesref);
-                        avfilter_unref_buffer(samplesref);
+                        avfilter_unref_bufferp(&samplesref);
                     }
                 }
             }
         }
+        av_free_packet(&packet);
     }
 end:
     avfilter_graph_free(&filter_graph);

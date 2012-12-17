@@ -20,7 +20,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include <string.h>
+
 #include "libavutil/cpu.h"
+#include "libavutil/mem.h"
 #include "libavcodec/dsputil.h"
 #include "dsputil_altivec.h"
 
@@ -192,12 +195,6 @@ void ff_dsputil_init_ppc(DSPContext* c, AVCodecContext *avctx)
                 (avctx->idct_algo == FF_IDCT_ALTIVEC)) {
                 c->idct_put = ff_idct_put_altivec;
                 c->idct_add = ff_idct_add_altivec;
-                c->idct_permutation_type = FF_TRANSPOSE_IDCT_PERM;
-            }else if((CONFIG_VP3_DECODER || CONFIG_VP5_DECODER || CONFIG_VP6_DECODER) &&
-                     avctx->idct_algo==FF_IDCT_VP3){
-                c->idct_put = ff_vp3_idct_put_altivec;
-                c->idct_add = ff_vp3_idct_add_altivec;
-                c->idct     = ff_vp3_idct_altivec;
                 c->idct_permutation_type = FF_TRANSPOSE_IDCT_PERM;
             }
         }

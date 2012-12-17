@@ -24,6 +24,7 @@
 
 #include "libavutil/avassert.h"
 #include "libavutil/avstring.h"
+#include "libavutil/common.h"
 #include "libavutil/mathematics.h"
 #include "libavutil/opt.h"
 
@@ -38,6 +39,9 @@ typedef struct ResampleContext {
     AVAudioResampleContext *avr;
 
     int64_t next_pts;
+
+    /* set by filter_samples() to signal an output frame to request_frame() */
+    int got_output;
 } ResampleContext;
 
 static av_cold void uninit(AVFilterContext *ctx)
@@ -55,18 +59,18 @@ static int query_formats(AVFilterContext *ctx)
     AVFilterLink *inlink  = ctx->inputs[0];
     AVFilterLink *outlink = ctx->outputs[0];
 
-    AVFilterFormats        *in_formats      = avfilter_all_formats(AVMEDIA_TYPE_AUDIO);
-    AVFilterFormats        *out_formats     = avfilter_all_formats(AVMEDIA_TYPE_AUDIO);
+    AVFilterFormats        *in_formats      = ff_all_formats(AVMEDIA_TYPE_AUDIO);
+    AVFilterFormats        *out_formats     = ff_all_formats(AVMEDIA_TYPE_AUDIO);
     AVFilterFormats        *in_samplerates  = ff_all_samplerates();
     AVFilterFormats        *out_samplerates = ff_all_samplerates();
     AVFilterChannelLayouts *in_layouts      = ff_all_channel_layouts();
     AVFilterChannelLayouts *out_layouts     = ff_all_channel_layouts();
 
-    avfilter_formats_ref(in_formats,  &inlink->out_formats);
-    avfilter_formats_ref(out_formats, &outlink->in_formats);
+    ff_formats_ref(in_formats,  &inlink->out_formats);
+    ff_formats_ref(out_formats, &outlink->in_formats);
 
-    avfilter_formats_ref(in_samplerates,  &inlink->out_samplerates);
-    avfilter_formats_ref(out_samplerates, &outlink->in_samplerates);
+    ff_formats_ref(in_samplerates,  &inlink->out_samplerates);
+    ff_formats_ref(out_samplerates, &outlink->in_samplerates);
 
     ff_channel_layouts_ref(in_layouts,  &inlink->out_channel_layouts);
     ff_channel_layouts_ref(out_layouts, &outlink->in_channel_layouts);
@@ -102,12 +106,6 @@ static int config_output(AVFilterLink *outlink)
     av_opt_set_int(s->avr,  "in_sample_rate",    inlink ->sample_rate,    0);
     av_opt_set_int(s->avr, "out_sample_rate",    outlink->sample_rate,    0);
 
-    /* if both the input and output formats are s16 or u8, use s16 as
-       the internal sample format */
-    if (av_get_bytes_per_sample(inlink->format)  <= 2 &&
-        av_get_bytes_per_sample(outlink->format) <= 2)
-        av_opt_set_int(s->avr, "internal_sample_fmt", AV_SAMPLE_FMT_S16P, 0);
-
     if ((ret = avresample_open(s->avr)) < 0)
         return ret;
 
@@ -130,7 +128,11 @@ static int request_frame(AVFilterLink *outlink)
 {
     AVFilterContext *ctx = outlink->src;
     ResampleContext   *s = ctx->priv;
-    int ret = avfilter_request_frame(ctx->inputs[0]);
+    int ret = 0;
+
+    s->got_output = 0;
+    while (ret >= 0 && !s->got_output)
+        ret = ff_request_frame(ctx->inputs[0]);
 
     /* flush the lavr delay buffer */
     if (ret == AVERROR_EOF && s->avr) {
@@ -156,21 +158,21 @@ static int request_frame(AVFilterLink *outlink)
         }
 
         buf->pts = s->next_pts;
-        ff_filter_samples(outlink, buf);
-        return 0;
+        return ff_filter_samples(outlink, buf);
     }
     return ret;
 }
 
-static void filter_samples(AVFilterLink *inlink, AVFilterBufferRef *buf)
+static int filter_samples(AVFilterLink *inlink, AVFilterBufferRef *buf)
 {
     AVFilterContext  *ctx = inlink->dst;
     ResampleContext    *s = ctx->priv;
     AVFilterLink *outlink = ctx->outputs[0];
+    int ret;
 
     if (s->avr) {
         AVFilterBufferRef *buf_out;
-        int delay, nb_samples, ret;
+        int delay, nb_samples;
 
         /* maximum possible samples lavr can output */
         delay      = avresample_get_delay(s->avr);
@@ -179,10 +181,19 @@ static void filter_samples(AVFilterLink *inlink, AVFilterBufferRef *buf)
                                     AV_ROUND_UP);
 
         buf_out = ff_get_audio_buffer(outlink, AV_PERM_WRITE, nb_samples);
+        if (!buf_out) {
+            ret = AVERROR(ENOMEM);
+            goto fail;
+        }
+
         ret     = avresample_convert(s->avr, (void**)buf_out->extended_data,
                                      buf_out->linesize[0], nb_samples,
                                      (void**)buf->extended_data, buf->linesize[0],
                                      buf->audio->nb_samples);
+        if (ret < 0) {
+            avfilter_unref_buffer(buf_out);
+            goto fail;
+        }
 
         av_assert0(!avresample_available(s->avr));
 
@@ -208,11 +219,18 @@ static void filter_samples(AVFilterLink *inlink, AVFilterBufferRef *buf)
 
             s->next_pts = buf_out->pts + buf_out->audio->nb_samples;
 
-            ff_filter_samples(outlink, buf_out);
+            ret = ff_filter_samples(outlink, buf_out);
+            s->got_output = 1;
         }
+
+fail:
         avfilter_unref_buffer(buf);
-    } else
-        ff_filter_samples(outlink, buf);
+    } else {
+        ret = ff_filter_samples(outlink, buf);
+        s->got_output = 1;
+    }
+
+    return ret;
 }
 
 AVFilter avfilter_af_resample = {

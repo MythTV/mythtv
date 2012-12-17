@@ -23,11 +23,16 @@
  * audio and video splitter
  */
 
+#include <stdio.h>
+
+#include "libavutil/internal.h"
+#include "libavutil/mem.h"
 #include "avfilter.h"
 #include "audio.h"
+#include "internal.h"
 #include "video.h"
 
-static int split_init(AVFilterContext *ctx, const char *args, void *opaque)
+static int split_init(AVFilterContext *ctx, const char *args)
 {
     int i, nb_outputs = 2;
 
@@ -47,8 +52,9 @@ static int split_init(AVFilterContext *ctx, const char *args, void *opaque)
         snprintf(name, sizeof(name), "output%d", i);
         pad.type = ctx->filter->inputs[0].type;
         pad.name = av_strdup(name);
+        pad.rej_perms = AV_PERM_WRITE;
 
-        avfilter_insert_outpad(ctx, i, &pad);
+        ff_insert_outpad(ctx, i, &pad);
     }
 
     return 0;
@@ -58,65 +64,97 @@ static void split_uninit(AVFilterContext *ctx)
 {
     int i;
 
-    for (i = 0; i < ctx->output_count; i++)
+    for (i = 0; i < ctx->nb_outputs; i++)
         av_freep(&ctx->output_pads[i].name);
 }
 
-static void start_frame(AVFilterLink *inlink, AVFilterBufferRef *picref)
+static int start_frame(AVFilterLink *inlink, AVFilterBufferRef *picref)
 {
     AVFilterContext *ctx = inlink->dst;
-    int i;
+    int i, ret = AVERROR_EOF;
 
-    for (i = 0; i < ctx->output_count; i++)
-        avfilter_start_frame(ctx->outputs[i],
-                             avfilter_ref_buffer(picref, ~AV_PERM_WRITE));
+    for (i = 0; i < ctx->nb_outputs; i++) {
+        AVFilterBufferRef *buf_out;
+
+        if (ctx->outputs[i]->closed)
+            continue;
+        buf_out = avfilter_ref_buffer(picref, ~AV_PERM_WRITE);
+        if (!buf_out)
+            return AVERROR(ENOMEM);
+
+        ret = ff_start_frame(ctx->outputs[i], buf_out);
+        if (ret < 0)
+            break;
+    }
+    return ret;
 }
 
-static void draw_slice(AVFilterLink *inlink, int y, int h, int slice_dir)
+static int draw_slice(AVFilterLink *inlink, int y, int h, int slice_dir)
 {
     AVFilterContext *ctx = inlink->dst;
-    int i;
+    int i, ret = AVERROR_EOF;
 
-    for (i = 0; i < ctx->output_count; i++)
-        avfilter_draw_slice(ctx->outputs[i], y, h, slice_dir);
+    for (i = 0; i < ctx->nb_outputs; i++) {
+        if (ctx->outputs[i]->closed)
+            continue;
+        ret = ff_draw_slice(ctx->outputs[i], y, h, slice_dir);
+        if (ret < 0)
+            break;
+    }
+    return ret;
 }
 
-static void end_frame(AVFilterLink *inlink)
+static int end_frame(AVFilterLink *inlink)
 {
     AVFilterContext *ctx = inlink->dst;
-    int i;
+    int i, ret = AVERROR_EOF;
 
-    for (i = 0; i < ctx->output_count; i++)
-        avfilter_end_frame(ctx->outputs[i]);
-
-    avfilter_unref_buffer(inlink->cur_buf);
+    for (i = 0; i < ctx->nb_outputs; i++) {
+        if (ctx->outputs[i]->closed)
+            continue;
+        ret = ff_end_frame(ctx->outputs[i]);
+        if (ret < 0)
+            break;
+    }
+    return ret;
 }
 
 AVFilter avfilter_vf_split = {
     .name      = "split",
-    .description = NULL_IF_CONFIG_SMALL("Pass on the input to two outputs."),
+    .description = NULL_IF_CONFIG_SMALL("Pass on the input video to N outputs."),
 
     .init   = split_init,
     .uninit = split_uninit,
 
-    .inputs    = (const AVFilterPad[]) {{ .name      = "default",
-                                    .type            = AVMEDIA_TYPE_VIDEO,
-                                    .get_video_buffer= ff_null_get_video_buffer,
-                                    .start_frame     = start_frame,
-                                    .draw_slice      = draw_slice,
-                                    .end_frame       = end_frame, },
-                                  { .name = NULL}},
-    .outputs   = (AVFilterPad[]) {{ .name = NULL}},
+    .inputs    = (const AVFilterPad[]) {{ .name            = "default",
+                                          .type            = AVMEDIA_TYPE_VIDEO,
+                                          .get_video_buffer= ff_null_get_video_buffer,
+                                          .start_frame     = start_frame,
+                                          .draw_slice      = draw_slice,
+                                          .end_frame       = end_frame, },
+                                        { .name = NULL}},
+    .outputs   = NULL,
 };
 
-static void filter_samples(AVFilterLink *inlink, AVFilterBufferRef *samplesref)
+static int filter_samples(AVFilterLink *inlink, AVFilterBufferRef *samplesref)
 {
     AVFilterContext *ctx = inlink->dst;
-    int i;
+    int i, ret = 0;
 
-    for (i = 0; i < ctx->output_count; i++)
-        ff_filter_samples(inlink->dst->outputs[i],
-                          avfilter_ref_buffer(samplesref, ~AV_PERM_WRITE));
+    for (i = 0; i < ctx->nb_outputs; i++) {
+        AVFilterBufferRef *buf_out = avfilter_ref_buffer(samplesref,
+                                                         ~AV_PERM_WRITE);
+        if (!buf_out) {
+            ret = AVERROR(ENOMEM);
+            break;
+        }
+
+        ret = ff_filter_samples(inlink->dst->outputs[i], buf_out);
+        if (ret < 0)
+            break;
+    }
+    avfilter_unref_buffer(samplesref);
+    return ret;
 }
 
 AVFilter avfilter_af_asplit = {
@@ -131,5 +169,5 @@ AVFilter avfilter_af_asplit = {
                                         .get_audio_buffer = ff_null_get_audio_buffer,
                                         .filter_samples   = filter_samples },
                                       { .name = NULL }},
-    .outputs = (const AVFilterPad[]) {{ .name = NULL }},
+    .outputs = NULL,
 };

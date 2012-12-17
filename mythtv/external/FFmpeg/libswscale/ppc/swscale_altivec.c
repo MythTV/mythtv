@@ -26,6 +26,7 @@
 #include "config.h"
 #include "libswscale/swscale.h"
 #include "libswscale/swscale_internal.h"
+#include "libavutil/attributes.h"
 #include "libavutil/cpu.h"
 #include "yuv2rgb_altivec.h"
 
@@ -310,14 +311,14 @@ static void hScale_altivec_real(SwsContext *c, int16_t *dst, int dstW,
         }
 }
 
-void ff_sws_init_swScale_altivec(SwsContext *c)
+av_cold void ff_sws_init_swScale_altivec(SwsContext *c)
 {
     enum PixelFormat dstFormat = c->dstFormat;
 
     if (!(av_get_cpu_flags() & AV_CPU_FLAG_ALTIVEC))
         return;
 
-    if (c->srcBpc == 8 && c->dstBpc <= 10) {
+    if (c->srcBpc == 8 && c->dstBpc <= 14) {
         c->hyScale = c->hcScale = hScale_altivec_real;
     }
     if (!is16BPS(dstFormat) && !is9_OR_10BPS(dstFormat) &&

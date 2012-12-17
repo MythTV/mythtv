@@ -17,15 +17,15 @@ $(SUBDIR)%-test.o: $(SUBDIR)%.c
 	$(COMPILE_C)
 
 $(SUBDIR)x86/%.o: $(SUBDIR)x86/%.asm
-	$(YASMDEP) $(YASMFLAGS) -I $(<D)/ -M -o $@ $< > $(@:.o=.d)
+	$(DEPYASM) $(YASMFLAGS) -I $(<D)/ -M -o $@ $< > $(@:.o=.d)
 	$(YASM) $(YASMFLAGS) -I $(<D)/ -o $@ $<
 
-$(OBJS) $(OBJS:.o=.s) $(SUBDIR)%.ho $(TESTOBJS): CPPFLAGS += -DHAVE_AV_CONFIG_H
+$(OBJS) $(OBJS:.o=.s) $(SUBDIR)%.h.o $(TESTOBJS): CPPFLAGS += -DHAVE_AV_CONFIG_H
 $(TESTOBJS): CPPFLAGS += -DTEST
 
 $(SUBDIR)$(LIBNAME): $(OBJS)
 	$(RM) $@
-	$(AR) rc $@ $^ $(EXTRAOBJS)
+	$(AR) $(ARFLAGS) $(AR_O) $^ $(EXTRAOBJS)
 	$(RANLIB) $@
 
 
@@ -84,12 +84,12 @@ uninstall-libs::
 	-$(RM) "$(SHLIBDIR)/$(SLIBNAME_WITH_MAJOR)" \
 	       "$(SHLIBDIR)/$(SLIBNAME)"            \
 	       "$(SHLIBDIR)/$(SLIBNAME_WITH_VERSION)"
-	-$(RM) $(SLIB_INSTALL_EXTRA_SHLIB:%="$(SHLIBDIR)"%)
-	-$(RM) $(SLIB_INSTALL_EXTRA_LIB:%="$(LIBDIR)"%)
+	-$(RM)  $(SLIB_INSTALL_EXTRA_SHLIB:%="$(SHLIBDIR)/%")
+	-$(RM)  $(SLIB_INSTALL_EXTRA_LIB:%="$(LIBDIR)/%")
 	-$(RM) "$(LIBDIR)/$(LIBNAME)"
 
 uninstall-headers::
-	$(RM) $(addprefix "$(INCINSTDIR)/",$(HEADERS)) $(addprefix "$(INCINSTDIR)/",$(BUILT_HEADERS))
+	$(RM) $(addprefix "$(INCINSTDIR)/",$(HEADERS) $(BUILT_HEADERS))
 	$(RM) "$(LIBDIR)/pkgconfig/lib$(NAME).pc"
 	-rmdir "$(INCINSTDIR)"
 endef

@@ -11,6 +11,7 @@ HEADERS = adler32.h                                                     \
           avstring.h                                                    \
           avutil.h                                                      \
           base64.h                                                      \
+          blowfish.h                                                    \
           bprint.h                                                      \
           bswap.h                                                       \
           common.h                                                      \
@@ -39,8 +40,11 @@ HEADERS = adler32.h                                                     \
           rational.h                                                    \
           samplefmt.h                                                   \
           sha.h                                                         \
+          time.h                                                        \
           timecode.h                                                    \
           timestamp.h                                                   \
+          version.h                                                     \
+          xtea.h                                                        \
 
 ARCH_HEADERS = bswap.h                                                  \
                intmath.h                                                \
@@ -55,6 +59,7 @@ OBJS = adler32.o                                                        \
        audioconvert.o                                                   \
        avstring.o                                                       \
        base64.o                                                         \
+       blowfish.o                                                       \
        bprint.o                                                         \
        cpu.o                                                            \
        crc.o                                                            \
@@ -63,6 +68,7 @@ OBJS = adler32.o                                                        \
        eval.o                                                           \
        fifo.o                                                           \
        file.o                                                           \
+       float_dsp.o                                                      \
        imgutils.o                                                       \
        intfloat_readwrite.o                                             \
        inverse.o                                                        \
@@ -82,18 +88,26 @@ OBJS = adler32.o                                                        \
        rc4.o                                                            \
        samplefmt.o                                                      \
        sha.o                                                            \
+       time.o                                                           \
        timecode.o                                                       \
        tree.o                                                           \
        utils.o                                                          \
+       xtea.o                                                           \
+
+OBJS-$(HAVE_BROKEN_SNPRINTF) += ../compat/msvcrt/snprintf.o
+
+OBJS-$(HAVE_MSVCRT) += ../compat/strtod.o
 
 TESTPROGS = adler32                                                     \
             aes                                                         \
             avstring                                                    \
             base64                                                      \
+            blowfish                                                    \
             bprint                                                      \
             cpu                                                         \
             crc                                                         \
             des                                                         \
+            error                                                       \
             eval                                                        \
             file                                                        \
             fifo                                                        \
@@ -107,6 +121,7 @@ TESTPROGS = adler32                                                     \
             rational                                                    \
             sha                                                         \
             tree                                                        \
+            xtea                                                        \
 
 TESTPROGS-$(HAVE_LZO1X_999_COMPRESS) += lzo
 

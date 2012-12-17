@@ -2128,18 +2128,18 @@ void NuppelVideoRecorder::WriteHeader(void)
         int vidfcc = 0;
         switch(mpa_vidcodec->id)
         {
-            case CODEC_ID_MPEG4:      vidfcc = FOURCC_DIVX; break;
-            case CODEC_ID_WMV1:       vidfcc = FOURCC_WMV1; break;
-            case CODEC_ID_MSMPEG4V3:  vidfcc = FOURCC_DIV3; break;
-            case CODEC_ID_MSMPEG4V2:  vidfcc = FOURCC_MP42; break;
-            case CODEC_ID_MSMPEG4V1:  vidfcc = FOURCC_MPG4; break;
-            case CODEC_ID_MJPEG:      vidfcc = FOURCC_MJPG; break;
-            case CODEC_ID_H263:       vidfcc = FOURCC_H263; break;
-            case CODEC_ID_H263P:      vidfcc = FOURCC_H263; break;
-            case CODEC_ID_H263I:      vidfcc = FOURCC_I263; break;
-            case CODEC_ID_MPEG1VIDEO: vidfcc = FOURCC_MPEG; break;
-            case CODEC_ID_MPEG2VIDEO: vidfcc = FOURCC_MPG2; break;
-            case CODEC_ID_HUFFYUV:    vidfcc = FOURCC_HFYU; break;
+            case AV_CODEC_ID_MPEG4:      vidfcc = FOURCC_DIVX; break;
+            case AV_CODEC_ID_WMV1:       vidfcc = FOURCC_WMV1; break;
+            case AV_CODEC_ID_MSMPEG4V3:  vidfcc = FOURCC_DIV3; break;
+            case AV_CODEC_ID_MSMPEG4V2:  vidfcc = FOURCC_MP42; break;
+            case AV_CODEC_ID_MSMPEG4V1:  vidfcc = FOURCC_MPG4; break;
+            case AV_CODEC_ID_MJPEG:      vidfcc = FOURCC_MJPG; break;
+            case AV_CODEC_ID_H263:       vidfcc = FOURCC_H263; break;
+            case AV_CODEC_ID_H263P:      vidfcc = FOURCC_H263; break;
+            case AV_CODEC_ID_H263I:      vidfcc = FOURCC_I263; break;
+            case AV_CODEC_ID_MPEG1VIDEO: vidfcc = FOURCC_MPEG; break;
+            case AV_CODEC_ID_MPEG2VIDEO: vidfcc = FOURCC_MPG2; break;
+            case AV_CODEC_ID_HUFFYUV:    vidfcc = FOURCC_HFYU; break;
             default: break;
         }
         moredata.video_fourcc = vidfcc;
@@ -3016,7 +3016,7 @@ void NuppelVideoRecorder::WriteVideo(VideoFrame *frame, bool skipsync,
     // compr ends here
     if (useavcodec)
     {
-        if (mpa_vidcodec->id == CODEC_ID_RAWVIDEO)
+        if (mpa_vidcodec->id == AV_CODEC_ID_RAWVIDEO)
         {
             frameheader.comptype = '0';
             frameheader.packetlength = len;

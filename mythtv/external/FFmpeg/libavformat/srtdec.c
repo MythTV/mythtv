@@ -44,23 +44,30 @@ static int srt_read_header(AVFormatContext *s)
 {
     AVStream *st = avformat_new_stream(s, NULL);
     if (!st)
-        return -1;
+        return AVERROR(ENOMEM);
     avpriv_set_pts_info(st, 64, 1, 1000);
     st->codec->codec_type = AVMEDIA_TYPE_SUBTITLE;
-    st->codec->codec_id   = CODEC_ID_SRT;
+    st->codec->codec_id   = AV_CODEC_ID_SRT;
     return 0;
 }
 
-static int64_t get_pts(const char *buf)
+static int64_t get_pts(const char *buf, int *duration)
 {
-    int i, v, hour, min, sec, hsec;
+    int i, hour, min, sec, hsec;
+    int he, me, se, mse;
 
     for (i=0; i<2; i++) {
-        if (sscanf(buf, "%d:%2d:%2d%*1[,.]%3d --> %*d:%*2d:%*2d%*1[,.]%3d",
-                   &hour, &min, &sec, &hsec, &v) == 5) {
+        int64_t start, end;
+        if (sscanf(buf, "%d:%2d:%2d%*1[,.]%3d --> %d:%2d:%2d%*1[,.]%3d",
+                   &hour, &min, &sec, &hsec, &he, &me, &se, &mse) == 8) {
             min += 60*hour;
             sec += 60*min;
-            return sec*1000+hsec;
+            start = sec*1000+hsec;
+            me += 60*he;
+            se += 60*me;
+            end = se*1000+mse;
+            *duration = end - start;
+            return start;
         }
         buf += strcspn(buf, "\n") + 1;
     }
@@ -87,14 +94,14 @@ static int srt_read_packet(AVFormatContext *s, AVPacket *pkt)
         memcpy(pkt->data, buffer, pkt->size);
         pkt->flags |= AV_PKT_FLAG_KEY;
         pkt->pos = pos;
-        pkt->pts = pkt->dts = get_pts(pkt->data);
+        pkt->pts = pkt->dts = get_pts(pkt->data, &(pkt->duration));
     }
     return res;
 }
 
 AVInputFormat ff_srt_demuxer = {
     .name        = "srt",
-    .long_name   = NULL_IF_CONFIG_SMALL("SubRip subtitle format"),
+    .long_name   = NULL_IF_CONFIG_SMALL("SubRip subtitle"),
     .read_probe  = srt_probe,
     .read_header = srt_read_header,
     .read_packet = srt_read_packet,

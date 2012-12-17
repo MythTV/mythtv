@@ -367,7 +367,7 @@ static void subimage_with_fill(uint16_t *src, unsigned x, unsigned y,
     }
 }
 
-static int encode_slice(AVCodecContext *avctx, AVFrame *pic, int mb_x,
+static int encode_slice(AVCodecContext *avctx, const AVFrame *pic, int mb_x,
         int mb_y, unsigned mb_count, uint8_t *buf, unsigned data_size,
         int unsafe, int *qp)
 {
@@ -437,7 +437,7 @@ static int encode_slice(AVCodecContext *avctx, AVFrame *pic, int mb_x,
     return hdr_size + y_data_size + u_data_size + v_data_size;
 }
 
-static int prores_encode_picture(AVCodecContext *avctx, AVFrame *pic,
+static int prores_encode_picture(AVCodecContext *avctx, const AVFrame *pic,
         uint8_t *buf, const int buf_size)
 {
     int mb_width = (avctx->width + 15) >> 4;
@@ -599,25 +599,27 @@ static av_cold int prores_encode_close(AVCodecContext *avctx)
 AVCodec ff_prores_anatoliy_encoder = {
     .name           = "prores_anatoliy",
     .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = CODEC_ID_PRORES,
+    .id             = AV_CODEC_ID_PRORES,
     .priv_data_size = sizeof(ProresContext),
     .init           = prores_encode_init,
     .close          = prores_encode_close,
     .encode2        = prores_encode_frame,
     .pix_fmts       = (const enum PixelFormat[]){PIX_FMT_YUV422P10, PIX_FMT_NONE},
     .long_name      = NULL_IF_CONFIG_SMALL("Apple ProRes"),
+    .capabilities   = CODEC_CAP_FRAME_THREADS | CODEC_CAP_INTRA_ONLY,
     .profiles       = profiles
 };
 
 AVCodec ff_prores_encoder = {
     .name           = "prores",
     .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = CODEC_ID_PRORES,
+    .id             = AV_CODEC_ID_PRORES,
     .priv_data_size = sizeof(ProresContext),
     .init           = prores_encode_init,
     .close          = prores_encode_close,
     .encode2        = prores_encode_frame,
     .pix_fmts       = (const enum PixelFormat[]){PIX_FMT_YUV422P10, PIX_FMT_NONE},
     .long_name      = NULL_IF_CONFIG_SMALL("Apple ProRes"),
+    .capabilities   = CODEC_CAP_FRAME_THREADS | CODEC_CAP_INTRA_ONLY,
     .profiles       = profiles
 };

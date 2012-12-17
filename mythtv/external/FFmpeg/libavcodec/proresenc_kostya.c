@@ -191,7 +191,9 @@ typedef struct ProresContext {
     int mbs_per_slice;
     int num_chroma_blocks, chroma_factor;
     int slices_width;
-    int num_slices;
+    int slices_per_picture;
+    int pictures_per_frame; // 1 for progressive, 2 for interlaced
+    int cur_picture_idx;
     int num_planes;
     int bits_per_mb;
     int force_quant;
@@ -199,7 +201,7 @@ typedef struct ProresContext {
     char *vendor;
     int quant_sel;
 
-    int frame_size;
+    int frame_size_upper_bound;
 
     int profile;
     const struct prores_profile *profile_info;
@@ -254,24 +256,24 @@ static void get_slice_data(ProresContext *ctx, const uint16_t *src,
             ctx->dsp.fdct(esrc, elinesize, blocks);
             blocks += 64;
             if (blocks_per_mb > 2) {
-                ctx->dsp.fdct(src + 8, linesize, blocks);
+                ctx->dsp.fdct(esrc + 8, elinesize, blocks);
                 blocks += 64;
             }
-            ctx->dsp.fdct(src + linesize * 4, linesize, blocks);
+            ctx->dsp.fdct(esrc + elinesize * 4, elinesize, blocks);
             blocks += 64;
             if (blocks_per_mb > 2) {
-                ctx->dsp.fdct(src + linesize * 4 + 8, linesize, blocks);
+                ctx->dsp.fdct(esrc + elinesize * 4 + 8, elinesize, blocks);
                 blocks += 64;
             }
         } else {
             ctx->dsp.fdct(esrc, elinesize, blocks);
             blocks += 64;
-            ctx->dsp.fdct(src + linesize * 4, linesize, blocks);
+            ctx->dsp.fdct(esrc + elinesize * 4, elinesize, blocks);
             blocks += 64;
             if (blocks_per_mb > 2) {
-                ctx->dsp.fdct(src + 8, linesize, blocks);
+                ctx->dsp.fdct(esrc + 8, elinesize, blocks);
                 blocks += 64;
-                ctx->dsp.fdct(src + linesize * 4 + 8, linesize, blocks);
+                ctx->dsp.fdct(esrc + elinesize * 4 + 8, elinesize, blocks);
                 blocks += 64;
             }
         }
@@ -404,9 +406,14 @@ static int encode_slice(AVCodecContext *avctx, const AVFrame *pic,
     int total_size = 0;
     const uint16_t *src;
     int slice_width_factor = av_log2(mbs_per_slice);
-    int num_cblocks, pwidth;
+    int num_cblocks, pwidth, linesize, line_add;
     int plane_factor, is_chroma;
     uint16_t *qmat;
+
+    if (ctx->pictures_per_frame == 1)
+        line_add = 0;
+    else
+        line_add = ctx->cur_picture_idx ^ !pic->top_field_first;
 
     if (ctx->force_quant) {
         qmat = ctx->quants[0];
@@ -434,12 +441,16 @@ static int encode_slice(AVCodecContext *avctx, const AVFrame *pic,
             num_cblocks = 2;
             pwidth      = avctx->width >> 1;
         }
-        src = (const uint16_t*)(pic->data[i] + yp * pic->linesize[i]) + xp;
 
-        get_slice_data(ctx, src, pic->linesize[i], xp, yp,
-                       pwidth, avctx->height, ctx->blocks[0], ctx->emu_buf,
+        linesize = pic->linesize[i] * ctx->pictures_per_frame;
+        src = (const uint16_t*)(pic->data[i] + yp * linesize +
+                                line_add * pic->linesize[i]) + xp;
+
+        get_slice_data(ctx, src, linesize, xp, yp,
+                       pwidth, avctx->height / ctx->pictures_per_frame,
+                       ctx->blocks[0], ctx->emu_buf,
                        mbs_per_slice, num_cblocks, is_chroma);
-        sizes[i] = encode_slice_plane(ctx, pb, src, pic->linesize[i],
+        sizes[i] = encode_slice_plane(ctx, pb, src, linesize,
                                       mbs_per_slice, ctx->blocks[0],
                                       num_cblocks, plane_factor,
                                       qmat);
@@ -572,7 +583,12 @@ static int find_slice_quant(AVCodecContext *avctx, const AVFrame *pic,
     int slice_bits[TRELLIS_WIDTH], slice_score[TRELLIS_WIDTH];
     int overquant;
     uint16_t *qmat;
+    int linesize[4], line_add;
 
+    if (ctx->pictures_per_frame == 1)
+        line_add = 0;
+    else
+        line_add = ctx->cur_picture_idx ^ !pic->top_field_first;
     mbs = x + mbs_per_slice;
 
     for (i = 0; i < ctx->num_planes; i++) {
@@ -591,10 +607,14 @@ static int find_slice_quant(AVCodecContext *avctx, const AVFrame *pic,
             num_cblocks[i] = 2;
             pwidth         = avctx->width >> 1;
         }
-        src = (const uint16_t*)(pic->data[i] + yp * pic->linesize[i]) + xp;
 
-        get_slice_data(ctx, src, pic->linesize[i], xp, yp,
-                       pwidth, avctx->height, td->blocks[i], td->emu_buf,
+        linesize[i] = pic->linesize[i] * ctx->pictures_per_frame;
+        src = (const uint16_t*)(pic->data[i] + yp * linesize[i] +
+                                line_add * pic->linesize[i]) + xp;
+
+        get_slice_data(ctx, src, linesize[i], xp, yp,
+                       pwidth, avctx->height / ctx->pictures_per_frame,
+                       td->blocks[i], td->emu_buf,
                        mbs_per_slice, num_cblocks[i], is_chroma[i]);
     }
 
@@ -609,7 +629,7 @@ static int find_slice_quant(AVCodecContext *avctx, const AVFrame *pic,
         error = 0;
         for (i = 0; i < ctx->num_planes; i++) {
             bits += estimate_slice_plane(ctx, &error, i,
-                                         src, pic->linesize[i],
+                                         src, linesize[i],
                                          mbs_per_slice,
                                          num_cblocks[i], plane_factor[i],
                                          ctx->quants[q], td);
@@ -638,7 +658,7 @@ static int find_slice_quant(AVCodecContext *avctx, const AVFrame *pic,
             }
             for (i = 0; i < ctx->num_planes; i++) {
                 bits += estimate_slice_plane(ctx, &error, i,
-                                             src, pic->linesize[i],
+                                             src, linesize[i],
                                              mbs_per_slice,
                                              num_cblocks[i], plane_factor[i],
                                              qmat, td);
@@ -726,14 +746,14 @@ static int encode_frame(AVCodecContext *avctx, AVPacket *pkt,
     int sizes[4] = { 0 };
     int slice_hdr_size = 2 + 2 * (ctx->num_planes - 1);
     int frame_size, picture_size, slice_size;
-    int mbs_per_slice = ctx->mbs_per_slice;
     int pkt_size, ret;
+    uint8_t frame_flags;
 
     *avctx->coded_frame           = *pic;
     avctx->coded_frame->pict_type = AV_PICTURE_TYPE_I;
     avctx->coded_frame->key_frame = 1;
 
-    pkt_size = ctx->frame_size + FF_MIN_BUFFER_SIZE;
+    pkt_size = ctx->frame_size_upper_bound + FF_MIN_BUFFER_SIZE;
 
     if ((ret = ff_alloc_packet2(avctx, pkt, pkt_size)) < 0)
         return ret;
@@ -752,7 +772,12 @@ static int encode_frame(AVCodecContext *avctx, AVPacket *pkt,
     bytestream_put_buffer(&buf, ctx->vendor, 4);
     bytestream_put_be16  (&buf, avctx->width);
     bytestream_put_be16  (&buf, avctx->height);
-    bytestream_put_byte  (&buf, ctx->chroma_factor << 6); // frame flags
+
+    frame_flags = ctx->chroma_factor << 6;
+    if (avctx->flags & CODEC_FLAG_INTERLACED_DCT)
+        frame_flags |= pic->top_field_first ? 0x04 : 0x08;
+    bytestream_put_byte  (&buf, frame_flags);
+
     bytestream_put_byte  (&buf, 0);             // reserved
     bytestream_put_byte  (&buf, avctx->color_primaries);
     bytestream_put_byte  (&buf, avctx->color_trc);
@@ -772,56 +797,61 @@ static int encode_frame(AVCodecContext *avctx, AVPacket *pkt,
     }
     bytestream_put_be16  (&tmp, buf - orig_buf); // write back frame header size
 
-    // picture header
-    picture_size_pos = buf + 1;
-    bytestream_put_byte  (&buf, 0x40);          // picture header size (in bits)
-    buf += 4;                                   // picture data size will be stored here
-    bytestream_put_be16  (&buf, ctx->num_slices); // total number of slices
-    bytestream_put_byte  (&buf, av_log2(ctx->mbs_per_slice) << 4); // slice width and height in MBs
+    for (ctx->cur_picture_idx = 0;
+         ctx->cur_picture_idx < ctx->pictures_per_frame;
+         ctx->cur_picture_idx++) {
+        // picture header
+        picture_size_pos = buf + 1;
+        bytestream_put_byte  (&buf, 0x40);          // picture header size (in bits)
+        buf += 4;                                   // picture data size will be stored here
+        bytestream_put_be16  (&buf, ctx->slices_per_picture);
+        bytestream_put_byte  (&buf, av_log2(ctx->mbs_per_slice) << 4); // slice width and height in MBs
 
-    // seek table - will be filled during slice encoding
-    slice_sizes = buf;
-    buf += ctx->num_slices * 2;
+        // seek table - will be filled during slice encoding
+        slice_sizes = buf;
+        buf += ctx->slices_per_picture * 2;
 
-    // slices
-    if (!ctx->force_quant) {
-        ret = avctx->execute2(avctx, find_quant_thread, NULL, NULL,
-                              ctx->mb_height);
-        if (ret)
-            return ret;
-    }
-
-    for (y = 0; y < ctx->mb_height; y++) {
-        mbs_per_slice = ctx->mbs_per_slice;
-        for (x = mb = 0; x < ctx->mb_width; x += mbs_per_slice, mb++) {
-            q = ctx->force_quant ? ctx->force_quant
-                                 : ctx->slice_q[mb + y * ctx->slices_width];
-
-            while (ctx->mb_width - x < mbs_per_slice)
-                mbs_per_slice >>= 1;
-
-            bytestream_put_byte(&buf, slice_hdr_size << 3);
-            slice_hdr = buf;
-            buf += slice_hdr_size - 1;
-            init_put_bits(&pb, buf, (pkt_size - (buf - orig_buf)) * 8);
-            encode_slice(avctx, pic, &pb, sizes, x, y, q, mbs_per_slice);
-
-            bytestream_put_byte(&slice_hdr, q);
-            slice_size = slice_hdr_size + sizes[ctx->num_planes - 1];
-            for (i = 0; i < ctx->num_planes - 1; i++) {
-                bytestream_put_be16(&slice_hdr, sizes[i]);
-                slice_size += sizes[i];
-            }
-            bytestream_put_be16(&slice_sizes, slice_size);
-            buf += slice_size - slice_hdr_size;
+        // slices
+        if (!ctx->force_quant) {
+            ret = avctx->execute2(avctx, find_quant_thread, NULL, NULL,
+                                  ctx->mb_height);
+            if (ret)
+                return ret;
         }
+
+        for (y = 0; y < ctx->mb_height; y++) {
+            int mbs_per_slice = ctx->mbs_per_slice;
+            for (x = mb = 0; x < ctx->mb_width; x += mbs_per_slice, mb++) {
+                q = ctx->force_quant ? ctx->force_quant
+                                     : ctx->slice_q[mb + y * ctx->slices_width];
+
+                while (ctx->mb_width - x < mbs_per_slice)
+                    mbs_per_slice >>= 1;
+
+                bytestream_put_byte(&buf, slice_hdr_size << 3);
+                slice_hdr = buf;
+                buf += slice_hdr_size - 1;
+                init_put_bits(&pb, buf, (pkt_size - (buf - orig_buf)) * 8);
+                encode_slice(avctx, pic, &pb, sizes, x, y, q, mbs_per_slice);
+
+                bytestream_put_byte(&slice_hdr, q);
+                slice_size = slice_hdr_size + sizes[ctx->num_planes - 1];
+                for (i = 0; i < ctx->num_planes - 1; i++) {
+                    bytestream_put_be16(&slice_hdr, sizes[i]);
+                    slice_size += sizes[i];
+                }
+                bytestream_put_be16(&slice_sizes, slice_size);
+                buf += slice_size - slice_hdr_size;
+            }
+        }
+
+        picture_size = buf - (picture_size_pos - 1);
+        bytestream_put_be32(&picture_size_pos, picture_size);
     }
 
     orig_buf -= 8;
     frame_size = buf - orig_buf;
-    picture_size = buf - picture_size_pos - 6;
     bytestream_put_be32(&orig_buf, frame_size);
-    bytestream_put_be32(&picture_size_pos, picture_size);
 
     pkt->size   = frame_size;
     pkt->flags |= AV_PKT_FLAG_KEY;
@@ -834,9 +864,6 @@ static av_cold int encode_close(AVCodecContext *avctx)
 {
     ProresContext *ctx = avctx->priv_data;
     int i;
-
-    if (avctx->coded_frame->data[0])
-        avctx->release_buffer(avctx, avctx->coded_frame);
 
     av_freep(&avctx->coded_frame);
 
@@ -856,6 +883,7 @@ static av_cold int encode_init(AVCodecContext *avctx)
     int mps;
     int i, j;
     int min_quant, max_quant;
+    int interlaced = !!(avctx->flags & CODEC_FLAG_INTERLACED_DCT);
 
     avctx->bits_per_raw_sample = 10;
     avctx->coded_frame = avcodec_alloc_frame();
@@ -864,7 +892,8 @@ static av_cold int encode_init(AVCodecContext *avctx)
 
     ff_proresdsp_init(&ctx->dsp, avctx);
     ff_init_scantable(ctx->dsp.dct_permutation, &ctx->scantable,
-                      ff_prores_progressive_scan);
+                      interlaced ? ff_prores_interlaced_scan
+                                 : ff_prores_progressive_scan);
 
     mps = ctx->mbs_per_slice;
     if (mps & (mps - 1)) {
@@ -880,10 +909,16 @@ static av_cold int encode_init(AVCodecContext *avctx)
     ctx->num_planes    = 3;
 
     ctx->mb_width      = FFALIGN(avctx->width,  16) >> 4;
-    ctx->mb_height     = FFALIGN(avctx->height, 16) >> 4;
+
+    if (interlaced)
+        ctx->mb_height = FFALIGN(avctx->height, 32) >> 5;
+    else
+        ctx->mb_height = FFALIGN(avctx->height, 16) >> 4;
+
     ctx->slices_width  = ctx->mb_width / mps;
     ctx->slices_width += av_popcount(ctx->mb_width - ctx->slices_width * mps);
-    ctx->num_slices    = ctx->mb_height * ctx->slices_width;
+    ctx->slices_per_picture = ctx->mb_height * ctx->slices_width;
+    ctx->pictures_per_frame = 1 + interlaced;
 
     if (ctx->quant_sel == -1)
         ctx->quant_mat = prores_quant_matrices[ctx->profile_info->quant];
@@ -899,7 +934,8 @@ static av_cold int encode_init(AVCodecContext *avctx)
     if (!ctx->force_quant) {
         if (!ctx->bits_per_mb) {
             for (i = 0; i < NUM_MB_LIMITS - 1; i++)
-                if (prores_mb_limits[i] >= ctx->mb_width * ctx->mb_height)
+                if (prores_mb_limits[i] >= ctx->mb_width * ctx->mb_height *
+                                           ctx->pictures_per_frame)
                     break;
             ctx->bits_per_mb   = ctx->profile_info->br_tab[i];
         } else if (ctx->bits_per_mb < 128) {
@@ -914,7 +950,7 @@ static av_cold int encode_init(AVCodecContext *avctx)
                 ctx->quants[i][j] = ctx->quant_mat[j] * i;
         }
 
-        ctx->slice_q = av_malloc(ctx->num_slices * sizeof(*ctx->slice_q));
+        ctx->slice_q = av_malloc(ctx->slices_per_picture * sizeof(*ctx->slice_q));
         if (!ctx->slice_q) {
             encode_close(avctx);
             return AVERROR(ENOMEM);
@@ -960,16 +996,20 @@ static av_cold int encode_init(AVCodecContext *avctx)
             ctx->bits_per_mb += ls * 4;
     }
 
-    ctx->frame_size = ctx->num_slices * (2 + 2 * ctx->num_planes
-                                         + (2 * mps * ctx->bits_per_mb) / 8)
-                      + 200;
+    ctx->frame_size_upper_bound = ctx->pictures_per_frame *
+                                  ctx->slices_per_picture *
+                                  (2 + 2 * ctx->num_planes +
+                                   (mps * ctx->bits_per_mb) / 8)
+                                  + 200;
 
     avctx->codec_tag   = ctx->profile_info->tag;
 
-    av_log(avctx, AV_LOG_DEBUG, "profile %d, %d slices, %d bits per MB\n",
-           ctx->profile, ctx->num_slices, ctx->bits_per_mb);
-    av_log(avctx, AV_LOG_DEBUG, "estimated frame size %d\n",
-           ctx->frame_size);
+    av_log(avctx, AV_LOG_DEBUG,
+           "profile %d, %d slices, interlacing: %s, %d bits per MB\n",
+           ctx->profile, ctx->slices_per_picture * ctx->pictures_per_frame,
+           interlaced ? "yes" : "no", ctx->bits_per_mb);
+    av_log(avctx, AV_LOG_DEBUG, "frame size upper bound: %d\n",
+           ctx->frame_size_upper_bound);
 
     return 0;
 }
@@ -979,35 +1019,35 @@ static av_cold int encode_init(AVCodecContext *avctx)
 
 static const AVOption options[] = {
     { "mbs_per_slice", "macroblocks per slice", OFFSET(mbs_per_slice),
-        AV_OPT_TYPE_INT, { 8 }, 1, MAX_MBS_PER_SLICE, VE },
+        AV_OPT_TYPE_INT, { .i64 = 8 }, 1, MAX_MBS_PER_SLICE, VE },
     { "profile",       NULL, OFFSET(profile), AV_OPT_TYPE_INT,
-        { PRORES_PROFILE_STANDARD },
+        { .i64 = PRORES_PROFILE_STANDARD },
         PRORES_PROFILE_PROXY, PRORES_PROFILE_HQ, VE, "profile" },
-    { "proxy",         NULL, 0, AV_OPT_TYPE_CONST, { PRORES_PROFILE_PROXY },
+    { "proxy",         NULL, 0, AV_OPT_TYPE_CONST, { .i64 = PRORES_PROFILE_PROXY },
         0, 0, VE, "profile" },
-    { "lt",            NULL, 0, AV_OPT_TYPE_CONST, { PRORES_PROFILE_LT },
+    { "lt",            NULL, 0, AV_OPT_TYPE_CONST, { .i64 = PRORES_PROFILE_LT },
         0, 0, VE, "profile" },
-    { "standard",      NULL, 0, AV_OPT_TYPE_CONST, { PRORES_PROFILE_STANDARD },
+    { "standard",      NULL, 0, AV_OPT_TYPE_CONST, { .i64 = PRORES_PROFILE_STANDARD },
         0, 0, VE, "profile" },
-    { "hq",            NULL, 0, AV_OPT_TYPE_CONST, { PRORES_PROFILE_HQ },
+    { "hq",            NULL, 0, AV_OPT_TYPE_CONST, { .i64 = PRORES_PROFILE_HQ },
         0, 0, VE, "profile" },
     { "vendor", "vendor ID", OFFSET(vendor),
         AV_OPT_TYPE_STRING, { .str = "Lavc" }, CHAR_MIN, CHAR_MAX, VE },
     { "bits_per_mb", "desired bits per macroblock", OFFSET(bits_per_mb),
-        AV_OPT_TYPE_INT, { 0 }, 0, 8192, VE },
+        AV_OPT_TYPE_INT, { .i64 = 0 }, 0, 8192, VE },
     { "quant_mat", "quantiser matrix", OFFSET(quant_sel), AV_OPT_TYPE_INT,
-        { -1 }, -1, QUANT_MAT_DEFAULT, VE, "quant_mat" },
-    { "auto",          NULL, 0, AV_OPT_TYPE_CONST, { -1 },
+        { .i64 = -1 }, -1, QUANT_MAT_DEFAULT, VE, "quant_mat" },
+    { "auto",          NULL, 0, AV_OPT_TYPE_CONST, { .i64 = -1 },
         0, 0, VE, "quant_mat" },
-    { "proxy",         NULL, 0, AV_OPT_TYPE_CONST, { QUANT_MAT_PROXY },
+    { "proxy",         NULL, 0, AV_OPT_TYPE_CONST, { .i64 = QUANT_MAT_PROXY },
         0, 0, VE, "quant_mat" },
-    { "lt",            NULL, 0, AV_OPT_TYPE_CONST, { QUANT_MAT_LT },
+    { "lt",            NULL, 0, AV_OPT_TYPE_CONST, { .i64 = QUANT_MAT_LT },
         0, 0, VE, "quant_mat" },
-    { "standard",      NULL, 0, AV_OPT_TYPE_CONST, { QUANT_MAT_STANDARD },
+    { "standard",      NULL, 0, AV_OPT_TYPE_CONST, { .i64 = QUANT_MAT_STANDARD },
         0, 0, VE, "quant_mat" },
-    { "hq",            NULL, 0, AV_OPT_TYPE_CONST, { QUANT_MAT_HQ },
+    { "hq",            NULL, 0, AV_OPT_TYPE_CONST, { .i64 = QUANT_MAT_HQ },
         0, 0, VE, "quant_mat" },
-    { "default",       NULL, 0, AV_OPT_TYPE_CONST, { QUANT_MAT_DEFAULT },
+    { "default",       NULL, 0, AV_OPT_TYPE_CONST, { .i64 = QUANT_MAT_DEFAULT },
         0, 0, VE, "quant_mat" },
     { NULL }
 };
@@ -1022,7 +1062,7 @@ static const AVClass proresenc_class = {
 AVCodec ff_prores_kostya_encoder = {
     .name           = "prores_kostya",
     .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = CODEC_ID_PRORES,
+    .id             = AV_CODEC_ID_PRORES,
     .priv_data_size = sizeof(ProresContext),
     .init           = encode_init,
     .close          = encode_close,

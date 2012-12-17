@@ -24,6 +24,7 @@
 
 #include "libavutil/adler32.h"
 #include "libavutil/imgutils.h"
+#include "libavutil/internal.h"
 #include "libavutil/pixdesc.h"
 #include "libavutil/timestamp.h"
 #include "avfilter.h"
@@ -34,14 +35,14 @@ typedef struct {
     unsigned int frame;
 } ShowInfoContext;
 
-static av_cold int init(AVFilterContext *ctx, const char *args, void *opaque)
+static av_cold int init(AVFilterContext *ctx, const char *args)
 {
     ShowInfoContext *showinfo = ctx->priv;
     showinfo->frame = 0;
     return 0;
 }
 
-static void end_frame(AVFilterLink *inlink)
+static int end_frame(AVFilterLink *inlink)
 {
     AVFilterContext *ctx = inlink->dst;
     ShowInfoContext *showinfo = ctx->priv;
@@ -81,8 +82,7 @@ static void end_frame(AVFilterLink *inlink)
     av_log(ctx, AV_LOG_INFO, "]\n");
 
     showinfo->frame++;
-    avfilter_unref_buffer(picref);
-    avfilter_end_frame(inlink->dst->outputs[0]);
+    return ff_end_frame(inlink->dst->outputs[0]);
 }
 
 AVFilter avfilter_vf_showinfo = {
@@ -92,15 +92,15 @@ AVFilter avfilter_vf_showinfo = {
     .priv_size = sizeof(ShowInfoContext),
     .init      = init,
 
-    .inputs    = (const AVFilterPad[]) {{ .name       = "default",
-                                    .type             = AVMEDIA_TYPE_VIDEO,
-                                    .get_video_buffer = ff_null_get_video_buffer,
-                                    .start_frame      = ff_null_start_frame_keep_ref,
-                                    .end_frame        = end_frame,
-                                    .min_perms        = AV_PERM_READ, },
-                                  { .name = NULL}},
+    .inputs    = (const AVFilterPad[]) {{ .name = "default",
+                                          .type             = AVMEDIA_TYPE_VIDEO,
+                                          .get_video_buffer = ff_null_get_video_buffer,
+                                          .start_frame      = ff_null_start_frame,
+                                          .end_frame        = end_frame,
+                                          .min_perms        = AV_PERM_READ, },
+                                        { .name = NULL}},
 
-    .outputs   = (const AVFilterPad[]) {{ .name       = "default",
-                                    .type             = AVMEDIA_TYPE_VIDEO },
-                                  { .name = NULL}},
+    .outputs   = (const AVFilterPad[]) {{ .name             = "default",
+                                          .type             = AVMEDIA_TYPE_VIDEO },
+                                        { .name = NULL}},
 };

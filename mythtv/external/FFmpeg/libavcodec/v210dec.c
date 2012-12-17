@@ -24,6 +24,8 @@
 #include "avcodec.h"
 #include "v210dec.h"
 #include "libavutil/bswap.h"
+#include "libavutil/internal.h"
+#include "libavutil/mem.h"
 
 #define READ_PIXELS(a, b, c)         \
     do {                             \
@@ -184,7 +186,7 @@ static const AVClass v210dec_class = {
 AVCodec ff_v210_decoder = {
     .name           = "v210",
     .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = CODEC_ID_V210,
+    .id             = AV_CODEC_ID_V210,
     .priv_data_size = sizeof(V210DecContext),
     .init           = decode_init,
     .close          = decode_close,

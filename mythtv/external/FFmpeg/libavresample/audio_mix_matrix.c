@@ -21,6 +21,7 @@
 
 #include <stdint.h>
 
+#include "libavutil/common.h"
 #include "libavutil/libm.h"
 #include "libavutil/samplefmt.h"
 #include "avresample.h"
@@ -53,6 +54,9 @@
 #define WIDE_RIGHT             32
 #define SURROUND_DIRECT_LEFT   33
 #define SURROUND_DIRECT_RIGHT  34
+#define LOW_FREQUENCY_2        35
+
+#define SQRT3_2      1.22474487139158904909  /* sqrt(3/2) */
 
 static av_always_inline int even(uint64_t layout)
 {
@@ -83,13 +87,20 @@ static int sane_layout(uint64_t layout)
 int avresample_build_matrix(uint64_t in_layout, uint64_t out_layout,
                             double center_mix_level, double surround_mix_level,
                             double lfe_mix_level, int normalize,
-                            double *matrix_out, int stride)
+                            double *matrix_out, int stride,
+                            enum AVMatrixEncoding matrix_encoding)
 {
     int i, j, out_i, out_j;
     double matrix[64][64] = {{0}};
-    int64_t unaccounted = in_layout & ~out_layout;
+    int64_t unaccounted;
     double maxcoef = 0;
     int in_channels, out_channels;
+
+    if ((out_layout & AV_CH_LAYOUT_STEREO_DOWNMIX) == AV_CH_LAYOUT_STEREO_DOWNMIX) {
+        out_layout = AV_CH_LAYOUT_STEREO;
+    }
+
+    unaccounted = in_layout & ~out_layout;
 
     in_channels  = av_get_channel_layout_nb_channels( in_layout);
     out_channels = av_get_channel_layout_nb_channels(out_layout);
@@ -140,8 +151,19 @@ int avresample_build_matrix(uint64_t in_layout, uint64_t out_layout,
             matrix[SIDE_LEFT ][BACK_CENTER] += M_SQRT1_2;
             matrix[SIDE_RIGHT][BACK_CENTER] += M_SQRT1_2;
         } else if (out_layout & AV_CH_FRONT_LEFT) {
-            matrix[FRONT_LEFT ][BACK_CENTER] += surround_mix_level * M_SQRT1_2;
-            matrix[FRONT_RIGHT][BACK_CENTER] += surround_mix_level * M_SQRT1_2;
+            if (matrix_encoding == AV_MATRIX_ENCODING_DOLBY ||
+                matrix_encoding == AV_MATRIX_ENCODING_DPLII) {
+                if (unaccounted & (AV_CH_BACK_LEFT | AV_CH_SIDE_LEFT)) {
+                    matrix[FRONT_LEFT ][BACK_CENTER] -= surround_mix_level * M_SQRT1_2;
+                    matrix[FRONT_RIGHT][BACK_CENTER] += surround_mix_level * M_SQRT1_2;
+                } else {
+                    matrix[FRONT_LEFT ][BACK_CENTER] -= surround_mix_level;
+                    matrix[FRONT_RIGHT][BACK_CENTER] += surround_mix_level;
+                }
+            } else {
+                matrix[FRONT_LEFT ][BACK_CENTER] += surround_mix_level * M_SQRT1_2;
+                matrix[FRONT_RIGHT][BACK_CENTER] += surround_mix_level * M_SQRT1_2;
+            }
         } else if (out_layout & AV_CH_FRONT_CENTER) {
             matrix[FRONT_CENTER][BACK_CENTER] += surround_mix_level * M_SQRT1_2;
         } else
@@ -163,8 +185,20 @@ int avresample_build_matrix(uint64_t in_layout, uint64_t out_layout,
                 matrix[SIDE_RIGHT][BACK_RIGHT] += 1.0;
             }
         } else if (out_layout & AV_CH_FRONT_LEFT) {
-            matrix[FRONT_LEFT ][BACK_LEFT ] += surround_mix_level;
-            matrix[FRONT_RIGHT][BACK_RIGHT] += surround_mix_level;
+            if (matrix_encoding == AV_MATRIX_ENCODING_DOLBY) {
+                matrix[FRONT_LEFT ][BACK_LEFT ] -= surround_mix_level * M_SQRT1_2;
+                matrix[FRONT_LEFT ][BACK_RIGHT] -= surround_mix_level * M_SQRT1_2;
+                matrix[FRONT_RIGHT][BACK_LEFT ] += surround_mix_level * M_SQRT1_2;
+                matrix[FRONT_RIGHT][BACK_RIGHT] += surround_mix_level * M_SQRT1_2;
+            } else if (matrix_encoding == AV_MATRIX_ENCODING_DPLII) {
+                matrix[FRONT_LEFT ][BACK_LEFT ] -= surround_mix_level * SQRT3_2;
+                matrix[FRONT_LEFT ][BACK_RIGHT] -= surround_mix_level * M_SQRT1_2;
+                matrix[FRONT_RIGHT][BACK_LEFT ] += surround_mix_level * M_SQRT1_2;
+                matrix[FRONT_RIGHT][BACK_RIGHT] += surround_mix_level * SQRT3_2;
+            } else {
+                matrix[FRONT_LEFT ][BACK_LEFT ] += surround_mix_level;
+                matrix[FRONT_RIGHT][BACK_RIGHT] += surround_mix_level;
+            }
         } else if (out_layout & AV_CH_FRONT_CENTER) {
             matrix[FRONT_CENTER][BACK_LEFT ] += surround_mix_level * M_SQRT1_2;
             matrix[FRONT_CENTER][BACK_RIGHT] += surround_mix_level * M_SQRT1_2;
@@ -187,8 +221,20 @@ int avresample_build_matrix(uint64_t in_layout, uint64_t out_layout,
             matrix[BACK_CENTER][SIDE_LEFT ] += M_SQRT1_2;
             matrix[BACK_CENTER][SIDE_RIGHT] += M_SQRT1_2;
         } else if (out_layout & AV_CH_FRONT_LEFT) {
-            matrix[FRONT_LEFT ][SIDE_LEFT ] += surround_mix_level;
-            matrix[FRONT_RIGHT][SIDE_RIGHT] += surround_mix_level;
+            if (matrix_encoding == AV_MATRIX_ENCODING_DOLBY) {
+                matrix[FRONT_LEFT ][SIDE_LEFT ] -= surround_mix_level * M_SQRT1_2;
+                matrix[FRONT_LEFT ][SIDE_RIGHT] -= surround_mix_level * M_SQRT1_2;
+                matrix[FRONT_RIGHT][SIDE_LEFT ] += surround_mix_level * M_SQRT1_2;
+                matrix[FRONT_RIGHT][SIDE_RIGHT] += surround_mix_level * M_SQRT1_2;
+            } else if (matrix_encoding == AV_MATRIX_ENCODING_DPLII) {
+                matrix[FRONT_LEFT ][SIDE_LEFT ] -= surround_mix_level * SQRT3_2;
+                matrix[FRONT_LEFT ][SIDE_RIGHT] -= surround_mix_level * M_SQRT1_2;
+                matrix[FRONT_RIGHT][SIDE_LEFT ] += surround_mix_level * M_SQRT1_2;
+                matrix[FRONT_RIGHT][SIDE_RIGHT] += surround_mix_level * SQRT3_2;
+            } else {
+                matrix[FRONT_LEFT ][SIDE_LEFT ] += surround_mix_level;
+                matrix[FRONT_RIGHT][SIDE_RIGHT] += surround_mix_level;
+            }
         } else if (out_layout & AV_CH_FRONT_CENTER) {
             matrix[FRONT_CENTER][SIDE_LEFT ] += surround_mix_level * M_SQRT1_2;
             matrix[FRONT_CENTER][SIDE_RIGHT] += surround_mix_level * M_SQRT1_2;
@@ -250,8 +296,8 @@ int avresample_get_matrix(AVAudioResampleContext *avr, double *matrix,
     in_channels  = av_get_channel_layout_nb_channels(avr->in_channel_layout);
     out_channels = av_get_channel_layout_nb_channels(avr->out_channel_layout);
 
-    if ( in_channels < 0 ||  in_channels > AVRESAMPLE_MAX_CHANNELS ||
-        out_channels < 0 || out_channels > AVRESAMPLE_MAX_CHANNELS) {
+    if ( in_channels <= 0 ||  in_channels > AVRESAMPLE_MAX_CHANNELS ||
+        out_channels <= 0 || out_channels > AVRESAMPLE_MAX_CHANNELS) {
         av_log(avr, AV_LOG_ERROR, "Invalid channel layouts\n");
         return AVERROR(EINVAL);
     }
@@ -288,6 +334,7 @@ int avresample_get_matrix(AVAudioResampleContext *avr, double *matrix,
         av_log(avr, AV_LOG_ERROR, "Invalid mix coeff type\n");
         return AVERROR(EINVAL);
     }
+
     return 0;
 }
 
@@ -299,14 +346,16 @@ int avresample_set_matrix(AVAudioResampleContext *avr, const double *matrix,
     in_channels  = av_get_channel_layout_nb_channels(avr->in_channel_layout);
     out_channels = av_get_channel_layout_nb_channels(avr->out_channel_layout);
 
-    if ( in_channels < 0 ||  in_channels > AVRESAMPLE_MAX_CHANNELS ||
-        out_channels < 0 || out_channels > AVRESAMPLE_MAX_CHANNELS) {
+    if ( in_channels <= 0 ||  in_channels > AVRESAMPLE_MAX_CHANNELS ||
+        out_channels <= 0 || out_channels > AVRESAMPLE_MAX_CHANNELS) {
         av_log(avr, AV_LOG_ERROR, "Invalid channel layouts\n");
         return AVERROR(EINVAL);
     }
 
-    if (avr->am->matrix)
-        av_freep(avr->am->matrix);
+    if (avr->am->matrix) {
+        av_free(avr->am->matrix[0]);
+        avr->am->matrix = NULL;
+    }
 
 #define CONVERT_MATRIX(type, expr)                                          \
     avr->am->matrix_## type[0] = av_mallocz(out_channels * in_channels *    \
@@ -341,6 +390,12 @@ int avresample_set_matrix(AVAudioResampleContext *avr, const double *matrix,
 
     /* TODO: detect situations where we can just swap around pointers
              instead of doing matrix multiplications with 0.0 and 1.0 */
+
+    /* set AudioMix params */
+    avr->am->in_layout    = avr->in_channel_layout;
+    avr->am->out_layout   = avr->out_channel_layout;
+    avr->am->in_channels  = in_channels;
+    avr->am->out_channels = out_channels;
 
     return 0;
 }

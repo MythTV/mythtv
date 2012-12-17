@@ -19,6 +19,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include "libavutil/common.h"
 #include "libavutil/eval.h"
 #include "libavutil/pixdesc.h"
 #include "libavutil/parseutils.h"
@@ -85,7 +86,7 @@ do {                                                                            
     MERGE_REF(ret, b, fmts, type, fail);                                        \
 } while (0)
 
-AVFilterFormats *avfilter_merge_formats(AVFilterFormats *a, AVFilterFormats *b)
+AVFilterFormats *ff_merge_formats(AVFilterFormats *a, AVFilterFormats *b)
 {
     AVFilterFormats *ret = NULL;
 
@@ -213,7 +214,7 @@ int64_t *ff_copy_int64_list(const int64_t * const list)
         }                                                               \
     }
 
-AVFilterFormats *avfilter_make_format_list(const int *fmts)
+AVFilterFormats *ff_make_format_list(const int *fmts)
 {
     MAKE_FORMAT_LIST(AVFilterFormats, formats, format_count);
     while (count--)
@@ -250,7 +251,7 @@ do {                                                        \
     return 0;                                               \
 } while (0)
 
-int avfilter_add_format(AVFilterFormats **avff, int64_t fmt)
+int ff_add_format(AVFilterFormats **avff, int64_t fmt)
 {
     ADD_FORMAT(avff, fmt, int, formats, format_count);
 }
@@ -260,14 +261,7 @@ int ff_add_channel_layout(AVFilterChannelLayouts **l, uint64_t channel_layout)
     ADD_FORMAT(l, channel_layout, uint64_t, channel_layouts, nb_channel_layouts);
 }
 
-#if FF_API_OLD_ALL_FORMATS_API
-AVFilterFormats *avfilter_all_formats(enum AVMediaType type)
-{
-    return avfilter_make_all_formats(type);
-}
-#endif
-
-AVFilterFormats *avfilter_make_all_formats(enum AVMediaType type)
+AVFilterFormats *ff_all_formats(enum AVMediaType type)
 {
     AVFilterFormats *ret = NULL;
     int fmt;
@@ -277,7 +271,7 @@ AVFilterFormats *avfilter_make_all_formats(enum AVMediaType type)
     for (fmt = 0; fmt < num_formats; fmt++)
         if ((type != AVMEDIA_TYPE_VIDEO) ||
             (type == AVMEDIA_TYPE_VIDEO && !(av_pix_fmt_descriptors[fmt].flags & PIX_FMT_HWACCEL)))
-            avfilter_add_format(&ret, fmt);
+            ff_add_format(&ret, fmt);
 
     return ret;
 }
@@ -292,18 +286,17 @@ const int64_t avfilter_all_channel_layouts[] = {
 //     return avfilter_make_format64_list(avfilter_all_channel_layouts);
 // }
 
-#if FF_API_PACKING
-AVFilterFormats *avfilter_make_all_packing_formats(void)
+AVFilterFormats *ff_planar_sample_fmts(void)
 {
-    static const int packing[] = {
-        AVFILTER_PACKED,
-        AVFILTER_PLANAR,
-        -1,
-    };
+    AVFilterFormats *ret = NULL;
+    int fmt;
 
-    return avfilter_make_format_list(packing);
+    for (fmt = 0; fmt < AV_SAMPLE_FMT_NB; fmt++)
+        if (av_sample_fmt_is_planar(fmt))
+            ff_add_format(&ret, fmt);
+
+    return ret;
 }
-#endif
 
 AVFilterFormats *ff_all_samplerates(void)
 {
@@ -329,7 +322,7 @@ void ff_channel_layouts_ref(AVFilterChannelLayouts *f, AVFilterChannelLayouts **
     FORMATS_REF(f, ref);
 }
 
-void avfilter_formats_ref(AVFilterFormats *f, AVFilterFormats **ref)
+void ff_formats_ref(AVFilterFormats *f, AVFilterFormats **ref)
 {
     FORMATS_REF(f, ref);
 }
@@ -365,7 +358,7 @@ do {                                                               \
     *ref = NULL;                                                   \
 } while (0)
 
-void avfilter_formats_unref(AVFilterFormats **ref)
+void ff_formats_unref(AVFilterFormats **ref)
 {
     FORMATS_UNREF(ref, formats);
 }
@@ -394,8 +387,7 @@ void ff_channel_layouts_changeref(AVFilterChannelLayouts **oldref,
     FORMATS_CHANGEREF(oldref, newref);
 }
 
-void avfilter_formats_changeref(AVFilterFormats **oldref,
-                                AVFilterFormats **newref)
+void ff_formats_changeref(AVFilterFormats **oldref, AVFilterFormats **newref)
 {
     FORMATS_CHANGEREF(oldref, newref);
 }
@@ -404,14 +396,14 @@ void avfilter_formats_changeref(AVFilterFormats **oldref,
 {                                                                   \
     int count = 0, i;                                               \
                                                                     \
-    for (i = 0; i < ctx->input_count; i++) {                        \
-        if (ctx->inputs[i]) {                                       \
+    for (i = 0; i < ctx->nb_inputs; i++) {                          \
+        if (ctx->inputs[i] && !ctx->inputs[i]->out_fmts) {          \
             ref(fmts, &ctx->inputs[i]->out_fmts);                   \
             count++;                                                \
         }                                                           \
     }                                                               \
-    for (i = 0; i < ctx->output_count; i++) {                       \
-        if (ctx->outputs[i]) {                                      \
+    for (i = 0; i < ctx->nb_outputs; i++) {                         \
+        if (ctx->outputs[i] && !ctx->outputs[i]->in_fmts) {         \
             ref(fmts, &ctx->outputs[i]->in_fmts);                   \
             count++;                                                \
         }                                                           \
@@ -435,7 +427,7 @@ void ff_set_common_samplerates(AVFilterContext *ctx,
                                AVFilterFormats *samplerates)
 {
     SET_COMMON_FORMATS(ctx, samplerates, in_samplerates, out_samplerates,
-                       avfilter_formats_ref, formats);
+                       ff_formats_ref, formats);
 }
 
 /**
@@ -443,10 +435,10 @@ void ff_set_common_samplerates(AVFilterContext *ctx,
  * formats. If there are no links hooked to this filter, the list of formats is
  * freed.
  */
-void avfilter_set_common_formats(AVFilterContext *ctx, AVFilterFormats *formats)
+void ff_set_common_formats(AVFilterContext *ctx, AVFilterFormats *formats)
 {
     SET_COMMON_FORMATS(ctx, formats, in_formats, out_formats,
-                       avfilter_formats_ref, formats);
+                       ff_formats_ref, formats);
 }
 
 int ff_default_query_formats(AVFilterContext *ctx)
@@ -455,7 +447,7 @@ int ff_default_query_formats(AVFilterContext *ctx)
                             ctx->outputs && ctx->outputs[0] ? ctx->outputs[0]->type :
                             AVMEDIA_TYPE_VIDEO;
 
-    avfilter_set_common_formats(ctx, avfilter_all_formats(type));
+    ff_set_common_formats(ctx, ff_all_formats(type));
     if (type == AVMEDIA_TYPE_AUDIO) {
         ff_set_common_channel_layouts(ctx, ff_all_channel_layouts());
         ff_set_common_samplerates(ctx, ff_all_samplerates());
@@ -534,12 +526,6 @@ int ff_parse_channel_layout(int64_t *ret, const char *arg, void *log_ctx)
     return 0;
 }
 
-#if FF_API_FILTERS_PUBLIC
-int avfilter_default_query_formats(AVFilterContext *ctx)
-{
-    return ff_default_query_formats(ctx);
-}
-#endif
 #ifdef TEST
 
 #undef printf
@@ -558,3 +544,4 @@ int main(void)
 }
 
 #endif
+

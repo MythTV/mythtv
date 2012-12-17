@@ -54,14 +54,14 @@ int ff_intel_h263_decode_picture_header(MpegEncContext *s)
 
     s->pict_type = AV_PICTURE_TYPE_I + get_bits1(&s->gb);
 
-    s->unrestricted_mv = get_bits1(&s->gb);
-    s->h263_long_vectors = s->unrestricted_mv;
+    s->h263_long_vectors = get_bits1(&s->gb);
 
     if (get_bits1(&s->gb) != 0) {
         av_log(s->avctx, AV_LOG_ERROR, "SAC not supported\n");
         return -1;      /* SAC: off */
     }
     s->obmc= get_bits1(&s->gb);
+    s->unrestricted_mv = s->obmc || s->h263_long_vectors;
     s->pb_frame = get_bits1(&s->gb);
 
     if (format < 6) {
@@ -77,7 +77,7 @@ int ff_intel_h263_decode_picture_header(MpegEncContext *s)
         }
         if(get_bits(&s->gb, 2))
             av_log(s->avctx, AV_LOG_ERROR, "Bad value for reserved field\n");
-        s->loop_filter = get_bits1(&s->gb);
+        s->loop_filter = get_bits1(&s->gb) * !s->avctx->lowres;
         if(get_bits1(&s->gb))
             av_log(s->avctx, AV_LOG_ERROR, "Bad value for reserved field\n");
         if(get_bits1(&s->gb))
@@ -127,7 +127,7 @@ int ff_intel_h263_decode_picture_header(MpegEncContext *s)
 AVCodec ff_h263i_decoder = {
     .name           = "h263i",
     .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = CODEC_ID_H263I,
+    .id             = AV_CODEC_ID_H263I,
     .priv_data_size = sizeof(MpegEncContext),
     .init           = ff_h263_decode_init,
     .close          = ff_h263_decode_end,

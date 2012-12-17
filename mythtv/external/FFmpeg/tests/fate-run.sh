@@ -75,7 +75,13 @@ probefmt(){
 }
 
 ffmpeg(){
-    run ffmpeg -nostats -threads $threads -thread_type $thread_type -cpuflags $cpuflags "$@"
+    dec_opts="-threads $threads -thread_type $thread_type"
+    ffmpeg_args="-nostats -cpuflags $cpuflags"
+    for arg in $@; do
+        [ ${arg} = -i ] && ffmpeg_args="${ffmpeg_args} ${dec_opts}"
+        ffmpeg_args="${ffmpeg_args} ${arg}"
+    done
+    run ffmpeg ${ffmpeg_args}
 }
 
 framecrc(){
@@ -108,7 +114,7 @@ enc_dec_pcm(){
     cleanfiles=$encfile
     encfile=$(target_path ${encfile})
     ffmpeg -i $src_file "$@" -f $out_fmt -y ${encfile} || return
-    ffmpeg -i ${encfile} -c:a pcm_${pcm_fmt} -f ${dec_fmt} -
+    ffmpeg -flags +bitexact -i ${encfile} -c:a pcm_${pcm_fmt} -f ${dec_fmt} -
 }
 
 FLAGS="-flags +bitexact -sws_flags +accurate_rnd+bitexact"

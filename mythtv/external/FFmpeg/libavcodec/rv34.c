@@ -1490,14 +1490,14 @@ av_cold int ff_rv34_decode_init(AVCodecContext *avctx)
     if ((ret = ff_MPV_common_init(s)) < 0)
         return ret;
 
-    ff_h264_pred_init(&r->h, CODEC_ID_RV40, 8, 1);
+    ff_h264_pred_init(&r->h, AV_CODEC_ID_RV40, 8, 1);
 
 #if CONFIG_RV30_DECODER
-    if (avctx->codec_id == CODEC_ID_RV30)
+    if (avctx->codec_id == AV_CODEC_ID_RV30)
         ff_rv30dsp_init(&r->rdsp, &r->s.dsp);
 #endif
 #if CONFIG_RV40_DECODER
-    if (avctx->codec_id == CODEC_ID_RV40)
+    if (avctx->codec_id == AV_CODEC_ID_RV40)
         ff_rv40dsp_init(&r->rdsp, &r->s.dsp);
 #endif
 
@@ -1537,10 +1537,9 @@ int ff_rv34_decode_update_thread_context(AVCodecContext *dst, const AVCodecConte
         return 0;
 
     if (s->height != s1->height || s->width != s1->width) {
-        ff_MPV_common_end(s);
         s->height = s1->height;
         s->width  = s1->width;
-        if ((err = ff_MPV_common_init(s)) < 0)
+        if ((err = ff_MPV_common_frame_size_change(s)) < 0)
             return err;
         if ((err = rv34_decoder_realloc(r)) < 0)
             return err;
@@ -1650,7 +1649,7 @@ int ff_rv34_decode_frame(AVCodecContext *avctx,
     /* first slice */
     if (si.start == 0) {
         if (s->mb_num_left > 0) {
-            av_log(avctx, AV_LOG_ERROR, "New frame but still %d MB left.",
+            av_log(avctx, AV_LOG_ERROR, "New frame but still %d MB left.\n",
                    s->mb_num_left);
             ff_er_frame_end(s);
             ff_MPV_frame_end(s);
@@ -1659,20 +1658,13 @@ int ff_rv34_decode_frame(AVCodecContext *avctx,
         if (s->width != si.width || s->height != si.height) {
             int err;
 
-            if (HAVE_THREADS &&
-                (s->avctx->active_thread_type & FF_THREAD_FRAME)) {
-                av_log_missing_feature(s->avctx, "Width/height changing with "
-                                       "frame threading is", 0);
-                return AVERROR_PATCHWELCOME;
-            }
-
             av_log(s->avctx, AV_LOG_WARNING, "Changing dimensions to %dx%d\n",
                    si.width, si.height);
-            ff_MPV_common_end(s);
+
             s->width  = si.width;
             s->height = si.height;
             avcodec_set_dimensions(s->avctx, s->width, s->height);
-            if ((err = ff_MPV_common_init(s)) < 0)
+            if ((err = ff_MPV_common_frame_size_change(s)) < 0)
                 return err;
             if ((err = rv34_decoder_realloc(r)) < 0)
                 return err;

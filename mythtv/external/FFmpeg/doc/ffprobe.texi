@@ -94,6 +94,13 @@ For example for printing the output in JSON format, specify:
 For more details on the available output printing formats, see the
 Writers section below.
 
+@item -show_data
+Show payload data, as an hexadecimal and ASCII dump. Coupled with
+@option{-show_packets}, it will dump the packets' data. Coupled with
+@option{-show_streams}, it will dump the codec extradata.
+
+The dump is printed as the "data" field. It may contain newlines.
+
 @item -show_error
 Show information about the error found when trying to probe the input.
 
@@ -163,6 +170,10 @@ Show information related to program and library versions. This is the
 equivalent of setting both @option{-show_program_version} and
 @option{-show_library_versions} options.
 
+@item -bitexact
+Force bitexact output, useful to produce output which is not dependent
+on the specific build.
+
 @item -i @var{input_file}
 Read @var{input_file}.
 
@@ -211,8 +222,11 @@ If set to 1 specify not to print the section header and footer.
 Default value is 0.
 @end table
 
-@section compact
-Compact format.
+@section compact, csv
+Compact and CSV format.
+
+The @code{csv} writer is equivalent to @code{compact}, but supports
+different defaults.
 
 Each section is printed on a single line.
 If no option is specifid, the output has the form:
@@ -233,14 +247,16 @@ The description of the accepted options follows.
 
 @item item_sep, s
 Specify the character to use for separating fields in the output line.
-It must be a single printable character, it is "|" by default.
+It must be a single printable character, it is "|" by default ("," for
+the @code{csv} writer).
 
 @item nokey, nk
 If set to 1 specify not to print the key of each field. Its default
-value is 0.
+value is 0 (1 for the @code{csv} writer).
 
 @item escape, e
-Set the escape mode to use, default to "c".
+Set the escape mode to use, default to "c" ("csv" for the @code{csv}
+writer).
 
 It can assume one of the following values:
 @table @option
@@ -261,13 +277,41 @@ containing a newline ('\n'), a carriage return ('\r'), a double quote
 Perform no escaping.
 @end table
 
+@item print_section, p
+Print the section name at the begin of each line if the value is
+@code{1}, disable it with value set to @code{0}. Default value is
+@code{1}.
+
 @end table
 
-@section csv
-CSV format.
+@section flat
+Flat format.
 
-This writer is equivalent to
-@code{compact=item_sep=,:nokey=1:escape=csv}.
+A free-form output where each line contains an explicit key=value, such as
+"streams.stream.3.tags.foo=bar". The output is shell escaped, so it can be
+directly embedded in sh scripts as long as the separator character is an
+alphanumeric character or an underscore (see @var{sep_char} option).
+
+This writer accepts options as a list of @var{key}=@var{value} pairs,
+separated by ":".
+
+The description of the accepted options follows.
+
+@table @option
+@item sep_char, s
+Separator character used to separate the chapter, the section name, IDs and
+potential tags in the printed field key.
+
+Default value is '.'.
+
+@item hierarchical, h
+Specify if the section name specification should be hierarchical. If
+set to 1, and if there is more than one section in the current
+chapter, the section name will be prefixed by the name of the
+chapter. A value of 0 will disable this behavior.
+
+Default value is 1.
+@end table
 
 @section ini
 INI format output.
@@ -381,7 +425,7 @@ MOV timecode is extracted from tmcd track, so is available in the tmcd
 stream metadata (@option{-show_streams}, see @var{TAG:timecode}).
 
 @item
-DV and GXF timecodes are available in format metadata
+DV, GXF and AVI timecodes are available in format metadata
 (@option{-show_format}, see @var{TAG:timecode}).
 
 @end itemize

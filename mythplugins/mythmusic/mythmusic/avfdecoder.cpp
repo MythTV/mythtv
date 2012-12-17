@@ -27,6 +27,7 @@
 #include <mythconfig.h>
 #include <mythcontext.h>
 #include <audiooutput.h>
+#include <audiooutpututil.h>
 #include <mythlogging.h>
 
 using namespace std;
@@ -307,8 +308,8 @@ bool avfDecoder::initialize()
     // decode 8 bks worth of samples each time we need more
     decodeBytes = bks << 3;
 
-    output_buf = (char *)av_malloc(decodeBytes +
-                                   AVCODEC_MAX_AUDIO_FRAME_SIZE * 2);
+    output_buf = (uint8_t *)av_malloc(decodeBytes +
+                                      AVCODEC_MAX_AUDIO_FRAME_SIZE * 2);
     output_at = 0;
 
     inited = true;
@@ -368,8 +369,7 @@ void avfDecoder::run()
     }
 
     AVPacket pkt, tmp_pkt;
-    AVFrame *frame = avcodec_alloc_frame();
-    int data_size, dec_len;
+    int data_size;
     uint fill, total;
     // account for possible frame expansion in aobase (upmix, float conv)
     uint thresh = bks * 12 / AudioOutputSettings::SampleSize(m_sampleFmt);
@@ -419,29 +419,18 @@ void avfDecoder::run()
                 while (tmp_pkt.size > 0 && !finish &&
                        !user_stop && seekTime <= 0.0)
                 {
-                    // Decode the stream to the output codec
-                    int got_frame = 0;
-
-                    data_size = AVCODEC_MAX_AUDIO_FRAME_SIZE;
-                    dec_len = avcodec_decode_audio4(m_audioDec, frame,
-                                                    &got_frame, &tmp_pkt);
-                    if (dec_len < 0 || !got_frame)
+                    int ret;
+                    ret = AudioOutputUtil::DecodeAudio(m_audioDec,
+                                                       output_buf + output_at,
+                                                       data_size,
+                                                       &tmp_pkt);
+                    if (ret < 0)
                         break;
-
-                    data_size = 
-                        av_samples_get_buffer_size(NULL,
-                                                   m_audioDec->channels,
-                                                   frame->nb_samples,
-                                                   m_audioDec->sample_fmt,
-                                                   1);
-                    // Copy the data to the output buffer
-                    memcpy((char *)(output_buf + output_at), 
-                           frame->extended_data[0], data_size);
 
                     // Increment the output pointer and count
                     output_at += data_size;
-                    tmp_pkt.size -= dec_len;
-                    tmp_pkt.data += dec_len;
+                    tmp_pkt.size -= ret;
+                    tmp_pkt.data += ret;
                 }
 
                 av_free_packet(&pkt);
@@ -491,8 +480,6 @@ void avfDecoder::run()
         DecoderEvent e((DecoderEvent::Type) stat);
         dispatch(e);
     }
-
-    av_free(frame);
 
     deinit();
     RunEpilog();

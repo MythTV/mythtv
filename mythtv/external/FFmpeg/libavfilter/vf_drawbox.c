@@ -25,9 +25,12 @@
  */
 
 #include "libavutil/colorspace.h"
+#include "libavutil/common.h"
 #include "libavutil/pixdesc.h"
 #include "libavutil/parseutils.h"
 #include "avfilter.h"
+#include "formats.h"
+#include "internal.h"
 #include "video.h"
 
 enum { Y, U, V, A };
@@ -38,7 +41,7 @@ typedef struct {
     int vsub, hsub;   ///< chroma subsampling
 } DrawBoxContext;
 
-static av_cold int init(AVFilterContext *ctx, const char *args, void *opaque)
+static av_cold int init(AVFilterContext *ctx, const char *args)
 {
     DrawBoxContext *drawbox= ctx->priv;
     char color_str[1024] = "black";
@@ -71,7 +74,7 @@ static int query_formats(AVFilterContext *ctx)
         PIX_FMT_NONE
     };
 
-    avfilter_set_common_pixel_formats(ctx, avfilter_make_format_list(pix_fmts));
+    ff_set_common_formats(ctx, ff_make_format_list(pix_fmts));
     return 0;
 }
 
@@ -85,14 +88,14 @@ static int config_input(AVFilterLink *inlink)
     if (drawbox->w == 0) drawbox->w = inlink->w;
     if (drawbox->h == 0) drawbox->h = inlink->h;
 
-    av_log(inlink->dst, AV_LOG_INFO, "x:%d y:%d w:%d h:%d color:0x%02X%02X%02X%02X\n",
+    av_log(inlink->dst, AV_LOG_VERBOSE, "x:%d y:%d w:%d h:%d color:0x%02X%02X%02X%02X\n",
            drawbox->x, drawbox->y, drawbox->w, drawbox->h,
            drawbox->yuv_color[Y], drawbox->yuv_color[U], drawbox->yuv_color[V], drawbox->yuv_color[A]);
 
     return 0;
 }
 
-static void draw_slice(AVFilterLink *inlink, int y0, int h, int slice_dir)
+static int draw_slice(AVFilterLink *inlink, int y0, int h, int slice_dir)
 {
     DrawBoxContext *drawbox = inlink->dst->priv;
     int plane, x, y, xb = drawbox->x, yb = drawbox->y;
@@ -118,7 +121,7 @@ static void draw_slice(AVFilterLink *inlink, int y0, int h, int slice_dir)
         }
     }
 
-    avfilter_draw_slice(inlink->dst->outputs[0], y0, h, 1);
+    return ff_draw_slice(inlink->dst->outputs[0], y0, h, 1);
 }
 
 AVFilter avfilter_vf_drawbox = {
@@ -128,17 +131,16 @@ AVFilter avfilter_vf_drawbox = {
     .init      = init,
 
     .query_formats   = query_formats,
-    .inputs    = (const AVFilterPad[]) {{ .name       = "default",
-                                    .type             = AVMEDIA_TYPE_VIDEO,
-                                    .config_props     = config_input,
-                                    .get_video_buffer = ff_null_get_video_buffer,
-                                    .start_frame      = ff_null_start_frame,
-                                    .draw_slice       = draw_slice,
-                                    .end_frame        = ff_null_end_frame,
-                                    .min_perms        = AV_PERM_WRITE | AV_PERM_READ,
-                                    .rej_perms        = AV_PERM_PRESERVE },
-                                  { .name = NULL}},
-    .outputs   = (const AVFilterPad[]) {{ .name       = "default",
-                                    .type             = AVMEDIA_TYPE_VIDEO, },
-                                  { .name = NULL}},
+    .inputs    = (const AVFilterPad[]) {{ .name             = "default",
+                                          .type             = AVMEDIA_TYPE_VIDEO,
+                                          .config_props     = config_input,
+                                          .get_video_buffer = ff_null_get_video_buffer,
+                                          .start_frame      = ff_null_start_frame,
+                                          .draw_slice       = draw_slice,
+                                          .end_frame        = ff_null_end_frame,
+                                          .min_perms        = AV_PERM_WRITE | AV_PERM_READ },
+                                        { .name = NULL}},
+    .outputs   = (const AVFilterPad[]) {{ .name             = "default",
+                                          .type             = AVMEDIA_TYPE_VIDEO, },
+                                        { .name = NULL}},
 };

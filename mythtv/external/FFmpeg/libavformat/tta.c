@@ -102,7 +102,7 @@ static int tta_read_header(AVFormatContext *s)
     avio_skip(s->pb, 4); // seektable crc
 
     st->codec->codec_type = AVMEDIA_TYPE_AUDIO;
-    st->codec->codec_id = CODEC_ID_TTA;
+    st->codec->codec_id = AV_CODEC_ID_TTA;
     st->codec->channels = channels;
     st->codec->sample_rate = samplerate;
     st->codec->bits_per_coded_sample = bps;
@@ -160,7 +160,7 @@ static int tta_read_seek(AVFormatContext *s, int stream_index, int64_t timestamp
 
 AVInputFormat ff_tta_demuxer = {
     .name           = "tta",
-    .long_name      = NULL_IF_CONFIG_SMALL("True Audio"),
+    .long_name      = NULL_IF_CONFIG_SMALL("TTA (True Audio)"),
     .priv_data_size = sizeof(TTAContext),
     .read_probe     = tta_probe,
     .read_header    = tta_read_header,

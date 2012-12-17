@@ -20,6 +20,7 @@
 
 #include <stdint.h>
 
+#include "libavutil/common.h"
 #include "libavutil/libm.h"
 #include "libavutil/samplefmt.h"
 #include "avresample.h"
@@ -305,8 +306,24 @@ int ff_audio_mix_init(AVAudioResampleContext *avr)
 {
     int ret;
 
+    if (avr->internal_sample_fmt != AV_SAMPLE_FMT_S16P &&
+        avr->internal_sample_fmt != AV_SAMPLE_FMT_FLTP) {
+        av_log(avr, AV_LOG_ERROR, "Unsupported internal format for "
+               "mixing: %s\n",
+               av_get_sample_fmt_name(avr->internal_sample_fmt));
+        return AVERROR(EINVAL);
+    }
+
     /* build matrix if the user did not already set one */
-    if (!avr->am->matrix) {
+    if (avr->am->matrix) {
+        if (avr->am->coeff_type != avr->mix_coeff_type      ||
+            avr->am->in_layout  != avr->in_channel_layout   ||
+            avr->am->out_layout != avr->out_channel_layout) {
+            av_log(avr, AV_LOG_ERROR,
+                   "Custom matrix does not match current parameters\n");
+            return AVERROR(EINVAL);
+        }
+    } else {
         int i, j;
         char in_layout_name[128];
         char out_layout_name[128];
@@ -319,8 +336,11 @@ int ff_audio_mix_init(AVAudioResampleContext *avr)
                                       avr->out_channel_layout,
                                       avr->center_mix_level,
                                       avr->surround_mix_level,
-                                      avr->lfe_mix_level, 1, matrix_dbl,
-                                      avr->in_channels);
+                                      avr->lfe_mix_level,
+                                      avr->normalize_mix_level,
+                                      matrix_dbl,
+                                      avr->in_channels,
+                                      avr->matrix_encoding);
         if (ret < 0) {
             av_free(matrix_dbl);
             return ret;

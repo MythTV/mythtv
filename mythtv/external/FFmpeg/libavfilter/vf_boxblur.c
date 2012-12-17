@@ -26,9 +26,13 @@
  */
 
 #include "libavutil/avstring.h"
+#include "libavutil/common.h"
 #include "libavutil/eval.h"
 #include "libavutil/pixdesc.h"
 #include "avfilter.h"
+#include "formats.h"
+#include "internal.h"
+#include "video.h"
 
 static const char *const var_names[] = {
     "w",
@@ -74,7 +78,7 @@ typedef struct {
 #define V 2
 #define A 3
 
-static av_cold int init(AVFilterContext *ctx, const char *args, void *opaque)
+static av_cold int init(AVFilterContext *ctx, const char *args)
 {
     BoxBlurContext *boxblur = ctx->priv;
     int e;
@@ -129,7 +133,7 @@ static int query_formats(AVFilterContext *ctx)
         PIX_FMT_NONE
     };
 
-    avfilter_set_common_pixel_formats(ctx, avfilter_make_format_list(pix_fmts));
+    ff_set_common_formats(ctx, ff_make_format_list(pix_fmts));
     return 0;
 }
 
@@ -172,7 +176,7 @@ static int config_input(AVFilterLink *inlink)
     EVAL_RADIUS_EXPR(chroma);
     EVAL_RADIUS_EXPR(alpha);
 
-    av_log(ctx, AV_LOG_INFO,
+    av_log(ctx, AV_LOG_VERBOSE,
            "luma_radius:%d luma_power:%d "
            "chroma_radius:%d chroma_power:%d "
            "alpha_radius:%d alpha_power:%d "
@@ -298,9 +302,9 @@ static void vblur(uint8_t *dst, int dst_linesize, const uint8_t *src, int src_li
                    h, radius, power, temp);
 }
 
-static void null_draw_slice(AVFilterLink *inlink, int y, int h, int slice_dir) { }
+static int null_draw_slice(AVFilterLink *inlink, int y, int h, int slice_dir) { return 0; }
 
-static void end_frame(AVFilterLink *inlink)
+static int end_frame(AVFilterLink *inlink)
 {
     AVFilterContext *ctx = inlink->dst;
     BoxBlurContext *boxblur = ctx->priv;
@@ -324,8 +328,8 @@ static void end_frame(AVFilterLink *inlink)
               w[plane], h[plane], boxblur->radius[plane], boxblur->power[plane],
               boxblur->temp);
 
-    avfilter_draw_slice(outlink, 0, inlink->h, 1);
-    avfilter_default_end_frame(inlink);
+    ff_draw_slice(outlink, 0, inlink->h, 1);
+    return ff_end_frame(outlink);
 }
 
 AVFilter avfilter_vf_boxblur = {
@@ -336,14 +340,14 @@ AVFilter avfilter_vf_boxblur = {
     .uninit        = uninit,
     .query_formats = query_formats,
 
-    .inputs    = (const AVFilterPad[]) {{ .name       = "default",
-                                    .type             = AVMEDIA_TYPE_VIDEO,
-                                    .config_props     = config_input,
-                                    .draw_slice       = null_draw_slice,
-                                    .end_frame        = end_frame,
-                                    .min_perms        = AV_PERM_READ },
-                                  { .name = NULL}},
-    .outputs   = (const AVFilterPad[]) {{ .name       = "default",
-                                    .type             = AVMEDIA_TYPE_VIDEO, },
-                                  { .name = NULL}},
+    .inputs    = (const AVFilterPad[]) {{ .name             = "default",
+                                          .type             = AVMEDIA_TYPE_VIDEO,
+                                          .config_props     = config_input,
+                                          .draw_slice       = null_draw_slice,
+                                          .end_frame        = end_frame,
+                                          .min_perms        = AV_PERM_READ },
+                                        { .name = NULL}},
+    .outputs   = (const AVFilterPad[]) {{ .name             = "default",
+                                          .type             = AVMEDIA_TYPE_VIDEO, },
+                                        { .name = NULL}},
 };

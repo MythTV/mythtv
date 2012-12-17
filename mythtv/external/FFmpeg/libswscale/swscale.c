@@ -345,8 +345,6 @@ static int swScale(SwsContext *c, const uint8_t *src[],
     int32_t *vChrFilterPos           = c->vChrFilterPos;
     int32_t *hLumFilterPos           = c->hLumFilterPos;
     int32_t *hChrFilterPos           = c->hChrFilterPos;
-    int16_t *vLumFilter              = c->vLumFilter;
-    int16_t *vChrFilter              = c->vChrFilter;
     int16_t *hLumFilter              = c->hLumFilter;
     int16_t *hChrFilter              = c->hChrFilter;
     int32_t *lumMmxFilter            = c->lumMmxFilter;
@@ -422,7 +420,7 @@ static int swScale(SwsContext *c, const uint8_t *src[],
     ) {
         static int warnedAlready=0;
         int cpu_flags = av_get_cpu_flags();
-        if (HAVE_MMX2 && (cpu_flags & AV_CPU_FLAG_SSE2) && !warnedAlready){
+        if (HAVE_MMXEXT && (cpu_flags & AV_CPU_FLAG_SSE2) && !warnedAlready){
             av_log(c, AV_LOG_WARNING, "Warning: data is not aligned! This can lead to a speedloss\n");
             warnedAlready=1;
         }
@@ -471,8 +469,8 @@ static int swScale(SwsContext *c, const uint8_t *src[],
             lastInLumBuf = firstLumSrcY - 1;
         if (firstChrSrcY > lastInChrBuf)
             lastInChrBuf = firstChrSrcY - 1;
-        assert(firstLumSrcY >= lastInLumBuf - vLumBufSize + 1);
-        assert(firstChrSrcY >= lastInChrBuf - vChrBufSize + 1);
+        av_assert0(firstLumSrcY >= lastInLumBuf - vLumBufSize + 1);
+        av_assert0(firstChrSrcY >= lastInChrBuf - vChrBufSize + 1);
 
         DEBUG_BUFFERS("dstY: %d\n", dstY);
         DEBUG_BUFFERS("\tfirstLumSrcY: %d lastLumSrcY: %d lastInLumBuf: %d\n",
@@ -500,9 +498,9 @@ static int swScale(SwsContext *c, const uint8_t *src[],
                 src[3] + (lastInLumBuf + 1 - srcSliceY) * srcStride[3],
             };
             lumBufIndex++;
-            assert(lumBufIndex < 2 * vLumBufSize);
-            assert(lastInLumBuf + 1 - srcSliceY < srcSliceH);
-            assert(lastInLumBuf + 1 - srcSliceY >= 0);
+            av_assert0(lumBufIndex < 2 * vLumBufSize);
+            av_assert0(lastInLumBuf + 1 - srcSliceY < srcSliceH);
+            av_assert0(lastInLumBuf + 1 - srcSliceY >= 0);
             hyscale(c, lumPixBuf[lumBufIndex], dstW, src1, srcW, lumXInc,
                     hLumFilter, hLumFilterPos, hLumFilterSize,
                     formatConvBuffer, pal, 0);
@@ -522,9 +520,9 @@ static int swScale(SwsContext *c, const uint8_t *src[],
                 src[3] + (lastInChrBuf + 1 - chrSrcSliceY) * srcStride[3],
             };
             chrBufIndex++;
-            assert(chrBufIndex < 2 * vChrBufSize);
-            assert(lastInChrBuf + 1 - chrSrcSliceY < (chrSrcSliceH));
-            assert(lastInChrBuf + 1 - chrSrcSliceY >= 0);
+            av_assert0(chrBufIndex < 2 * vChrBufSize);
+            av_assert0(lastInChrBuf + 1 - chrSrcSliceY < (chrSrcSliceH));
+            av_assert0(lastInChrBuf + 1 - chrSrcSliceY >= 0);
             // FIXME replace parameters through context struct (some at least)
 
             if (c->needs_hcscale)
@@ -544,7 +542,7 @@ static int swScale(SwsContext *c, const uint8_t *src[],
         if (!enough_lines)
             break;  // we can't output a dstY line so let's try with the next slice
 
-#if HAVE_MMX
+#if HAVE_MMX_INLINE
         updateMMXDitherTables(c, dstY, lumBufIndex, chrBufIndex,
                               lastInLumBuf, lastInChrBuf);
 #endif
@@ -630,8 +628,8 @@ static int swScale(SwsContext *c, const uint8_t *src[],
                     }
                 }
             } else {
-                assert(lumSrcPtr  + vLumFilterSize - 1 < lumPixBuf  + vLumBufSize * 2);
-                assert(chrUSrcPtr + vChrFilterSize - 1 < chrUPixBuf + vChrBufSize * 2);
+                av_assert1(lumSrcPtr  + vLumFilterSize - 1 < lumPixBuf  + vLumBufSize * 2);
+                av_assert1(chrUSrcPtr + vChrFilterSize - 1 < chrUPixBuf + vChrBufSize * 2);
                 if (c->yuv2packed1 && vLumFilterSize == 1 &&
                     vChrFilterSize <= 2) { // unscaled RGB
                     int chrAlpha = vChrFilterSize == 1 ? 0 : vChrFilter[2 * dstY + 1];
@@ -663,8 +661,8 @@ static int swScale(SwsContext *c, const uint8_t *src[],
     if (isPlanar(dstFormat) && isALPHA(dstFormat) && !alpPixBuf)
         fillPlane(dst[3], dstStride[3], dstW, dstY - lastDstY, lastDstY, 255);
 
-#if HAVE_MMX2
-    if (av_get_cpu_flags() & AV_CPU_FLAG_MMX2)
+#if HAVE_MMXEXT_INLINE
+    if (av_get_cpu_flags() & AV_CPU_FLAG_MMXEXT)
         __asm__ volatile ("sfence" ::: "memory");
 #endif
     emms_c();
@@ -691,7 +689,7 @@ static av_cold void sws_init_swScale_c(SwsContext *c)
 
 
     if (c->srcBpc == 8) {
-        if (c->dstBpc <= 10) {
+        if (c->dstBpc <= 14) {
             c->hyScale = c->hcScale = hScale8To15_c;
             if (c->flags & SWS_FAST_BILINEAR) {
                 c->hyscale_fast = hyscale_fast_c;
@@ -701,12 +699,12 @@ static av_cold void sws_init_swScale_c(SwsContext *c)
             c->hyScale = c->hcScale = hScale8To19_c;
         }
     } else {
-        c->hyScale = c->hcScale = c->dstBpc > 10 ? hScale16To19_c
+        c->hyScale = c->hcScale = c->dstBpc > 14 ? hScale16To19_c
                                                  : hScale16To15_c;
     }
 
     if (c->srcRange != c->dstRange && !isAnyRGB(c->dstFormat)) {
-        if (c->dstBpc <= 10) {
+        if (c->dstBpc <= 14) {
             if (c->srcRange) {
                 c->lumConvertRange = lumRangeFromJpeg_c;
                 c->chrConvertRange = chrRangeFromJpeg_c;

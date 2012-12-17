@@ -19,6 +19,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include "libavutil/common.h"
 #include "libavutil/intreadwrite.h"
 #include "libavutil/imgutils.h"
 #include "avcodec.h"
@@ -237,7 +238,7 @@ static av_cold int sunrast_end(AVCodecContext *avctx) {
 AVCodec ff_sunrast_decoder = {
     .name           = "sunrast",
     .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = CODEC_ID_SUNRAST,
+    .id             = AV_CODEC_ID_SUNRAST,
     .priv_data_size = sizeof(SUNRASTContext),
     .init           = sunrast_init,
     .close          = sunrast_end,

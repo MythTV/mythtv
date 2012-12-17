@@ -1045,16 +1045,18 @@ static int j2kenc_destroy(AVCodecContext *avctx)
 AVCodec ff_jpeg2000_encoder = {
     .name           = "j2k",
     .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = CODEC_ID_JPEG2000,
+    .id             = AV_CODEC_ID_JPEG2000,
     .priv_data_size = sizeof(J2kEncoderContext),
     .init           = j2kenc_init,
     .encode2        = encode_frame,
     .close          = j2kenc_destroy,
     .capabilities   = CODEC_CAP_EXPERIMENTAL,
     .long_name      = NULL_IF_CONFIG_SMALL("JPEG 2000"),
-    .pix_fmts       = (const enum PixelFormat[]) { PIX_FMT_RGB24, PIX_FMT_YUV444P, PIX_FMT_GRAY8,
-/*                                                 PIX_FMT_YUV420P,
-                                                   PIX_FMT_YUV422P, PIX_FMT_YUV444P,
-                                                   PIX_FMT_YUV410P, PIX_FMT_YUV411P,*/
-                                                   PIX_FMT_NONE }
+    .pix_fmts       = (const enum PixelFormat[]) {
+        PIX_FMT_RGB24, PIX_FMT_YUV444P, PIX_FMT_GRAY8,
+/*      PIX_FMT_YUV420P,
+        PIX_FMT_YUV422P, PIX_FMT_YUV444P,
+        PIX_FMT_YUV410P, PIX_FMT_YUV411P,*/
+        PIX_FMT_NONE
+    }
 };

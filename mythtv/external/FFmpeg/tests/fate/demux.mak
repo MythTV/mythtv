@@ -22,6 +22,9 @@ fate-d-cinema-demux: CMD = framecrc -i $(SAMPLES)/d-cinema/THX_Science_FLT_1920-
 FATE_SAMPLES_DEMUX += fate-iv8-demux
 fate-iv8-demux: CMD = framecrc -i $(SAMPLES)/iv8/zzz-partial.mpg -vcodec copy
 
+FATE_SAMPLES_DEMUX += fate-jv-demux
+fate-jv-demux: CMD = framecrc -i $(SAMPLES)/jv/intro.jv -vcodec copy -acodec copy
+
 FATE_SAMPLES_DEMUX += fate-lmlm4-demux
 fate-lmlm4-demux: CMD = framecrc -i $(SAMPLES)/lmlm4/LMLM4_CIFat30fps.divx -t 3 -acodec copy -vcodec copy
 
@@ -42,6 +45,9 @@ fate-nsv-demux: CMD = framecrc -i $(SAMPLES)/nsv/witchblade-51kbps.nsv -t 6 -vco
 
 FATE_SAMPLES_DEMUX += fate-oma-demux
 fate-oma-demux: CMD = crc -i $(SAMPLES)/oma/01-Untitled-partial.oma -acodec copy
+
+FATE_SAMPLES_DEMUX += fate-paf-demux
+fate-paf-demux: CMD = framecrc -i $(SAMPLES)/paf/hod1-partial.paf -vcodec copy -acodec copy
 
 FATE_SAMPLES_DEMUX += fate-psx-str-demux
 fate-psx-str-demux: CMD = framecrc -i $(SAMPLES)/psx-str/descent-partial.str -c copy

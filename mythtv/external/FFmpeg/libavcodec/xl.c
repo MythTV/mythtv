@@ -24,6 +24,7 @@
  * Miro VideoXL codec.
  */
 
+#include "libavutil/common.h"
 #include "libavutil/intreadwrite.h"
 #include "avcodec.h"
 
@@ -153,7 +154,7 @@ static av_cold int decode_end(AVCodecContext *avctx){
 AVCodec ff_xl_decoder = {
     .name           = "xl",
     .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = CODEC_ID_VIXL,
+    .id             = AV_CODEC_ID_VIXL,
     .priv_data_size = sizeof(VideoXLContext),
     .init           = decode_init,
     .close          = decode_end,

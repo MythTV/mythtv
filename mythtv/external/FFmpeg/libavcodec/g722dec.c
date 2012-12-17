@@ -42,7 +42,7 @@
 #define OFFSET(x) offsetof(G722Context, x)
 #define AD AV_OPT_FLAG_AUDIO_PARAM | AV_OPT_FLAG_DECODING_PARAM
 static const AVOption options[] = {
-    { "bits_per_codeword", "Bits per G722 codeword", OFFSET(bits_per_codeword), AV_OPT_TYPE_FLAGS, { 8 }, 6, 8, AD },
+    { "bits_per_codeword", "Bits per G722 codeword", OFFSET(bits_per_codeword), AV_OPT_TYPE_FLAGS, { .i64 = 8 }, 6, 8, AD },
     { NULL }
 };
 
@@ -144,7 +144,7 @@ static int g722_decode_frame(AVCodecContext *avctx, void *data,
 AVCodec ff_adpcm_g722_decoder = {
     .name           = "g722",
     .type           = AVMEDIA_TYPE_AUDIO,
-    .id             = CODEC_ID_ADPCM_G722,
+    .id             = AV_CODEC_ID_ADPCM_G722,
     .priv_data_size = sizeof(G722Context),
     .init           = g722_decode_init,
     .decode         = g722_decode_frame,

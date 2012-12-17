@@ -219,7 +219,7 @@ static void mpeg1_encode_sequence_header(MpegEncContext *s)
 
             for(i=1; i<15; i++){
                 float error= aspect_ratio;
-                if(s->codec_id == CODEC_ID_MPEG1VIDEO || i <=1)
+                if(s->codec_id == AV_CODEC_ID_MPEG1VIDEO || i <=1)
                     error-= 1.0/ff_mpeg1_aspect[i];
                 else
                     error-= av_q2d(ff_mpeg2_aspect[i])*s->height/s->width;
@@ -237,7 +237,7 @@ static void mpeg1_encode_sequence_header(MpegEncContext *s)
 
             if(s->avctx->rc_max_rate){
                 v = (s->avctx->rc_max_rate + 399) / 400;
-                if (v > 0x3ffff && s->codec_id == CODEC_ID_MPEG1VIDEO)
+                if (v > 0x3ffff && s->codec_id == AV_CODEC_ID_MPEG1VIDEO)
                     v = 0x3ffff;
             }else{
                 v= 0x3FFFF;
@@ -262,14 +262,14 @@ static void mpeg1_encode_sequence_header(MpegEncContext *s)
                 s->avctx->me_range && s->avctx->me_range < 128 &&
                 vbv_buffer_size <= 20 &&
                 v <= 1856000/400 &&
-                s->codec_id == CODEC_ID_MPEG1VIDEO;
+                s->codec_id == AV_CODEC_ID_MPEG1VIDEO;
 
             put_bits(&s->pb, 1, constraint_parameter_flag);
 
             ff_write_quant_matrix(&s->pb, s->avctx->intra_matrix);
             ff_write_quant_matrix(&s->pb, s->avctx->inter_matrix);
 
-            if(s->codec_id == CODEC_ID_MPEG2VIDEO){
+            if(s->codec_id == AV_CODEC_ID_MPEG2VIDEO){
                 put_header(s, EXT_START_CODE);
                 put_bits(&s->pb, 4, 1); //seq ext
 
@@ -300,7 +300,7 @@ static void mpeg1_encode_sequence_header(MpegEncContext *s)
             s->gop_picture_number = s->current_picture_ptr->f.coded_picture_number;
             av_assert0(s->drop_frame_timecode == !!(s->tc.flags & AV_TIMECODE_FLAG_DROPFRAME));
             if (s->drop_frame_timecode)
-                time_code = av_timecode_adjust_ntsc_framenum(time_code);
+                time_code = av_timecode_adjust_ntsc_framenum2(time_code, fps);
             put_bits(&s->pb, 5, (uint32_t)((time_code / (fps * 3600)) % 24));
             put_bits(&s->pb, 6, (uint32_t)((time_code / (fps * 60)) % 60));
             put_bits(&s->pb, 1, 1);
@@ -323,7 +323,7 @@ static inline void encode_mb_skip_run(MpegEncContext *s, int run){
 static av_always_inline void put_qscale(MpegEncContext *s)
 {
     if(s->q_scale_type){
-        assert(s->qscale>=1 && s->qscale <=12);
+        av_assert2(s->qscale>=1 && s->qscale <=12);
         put_bits(&s->pb, 5, inv_non_linear_qscale[s->qscale]);
     }else{
         put_bits(&s->pb, 5, s->qscale);
@@ -331,7 +331,7 @@ static av_always_inline void put_qscale(MpegEncContext *s)
 }
 
 void ff_mpeg1_encode_slice_header(MpegEncContext *s){
-    if (s->codec_id == CODEC_ID_MPEG2VIDEO && s->height > 2800) {
+    if (s->codec_id == AV_CODEC_ID_MPEG2VIDEO && s->height > 2800) {
         put_header(s, SLICE_MIN_START_CODE + (s->mb_y & 127));
         put_bits(&s->pb, 3, s->mb_y >> 7);  /* slice_vertical_position_extension */
     } else {
@@ -360,7 +360,7 @@ void ff_mpeg1_encode_picture_header(MpegEncContext *s, int picture_number)
     // RAL: Forward f_code also needed for B frames
     if (s->pict_type == AV_PICTURE_TYPE_P || s->pict_type == AV_PICTURE_TYPE_B) {
         put_bits(&s->pb, 1, 0); /* half pel coordinates */
-        if(s->codec_id == CODEC_ID_MPEG1VIDEO)
+        if(s->codec_id == AV_CODEC_ID_MPEG1VIDEO)
             put_bits(&s->pb, 3, s->f_code); /* forward_f_code */
         else
             put_bits(&s->pb, 3, 7); /* forward_f_code */
@@ -369,7 +369,7 @@ void ff_mpeg1_encode_picture_header(MpegEncContext *s, int picture_number)
     // RAL: Backward f_code necessary for B frames
     if (s->pict_type == AV_PICTURE_TYPE_B) {
         put_bits(&s->pb, 1, 0); /* half pel coordinates */
-        if(s->codec_id == CODEC_ID_MPEG1VIDEO)
+        if(s->codec_id == AV_CODEC_ID_MPEG1VIDEO)
             put_bits(&s->pb, 3, s->b_code); /* backward_f_code */
         else
             put_bits(&s->pb, 3, 7); /* backward_f_code */
@@ -378,7 +378,7 @@ void ff_mpeg1_encode_picture_header(MpegEncContext *s, int picture_number)
     put_bits(&s->pb, 1, 0); /* extra bit picture */
 
     s->frame_pred_frame_dct = 1;
-    if(s->codec_id == CODEC_ID_MPEG2VIDEO){
+    if(s->codec_id == AV_CODEC_ID_MPEG2VIDEO){
         put_header(s, EXT_START_CODE);
         put_bits(&s->pb, 4, 8); //pic ext
         if (s->pict_type == AV_PICTURE_TYPE_P || s->pict_type == AV_PICTURE_TYPE_B) {
@@ -395,7 +395,7 @@ void ff_mpeg1_encode_picture_header(MpegEncContext *s, int picture_number)
         }
         put_bits(&s->pb, 2, s->intra_dc_precision);
 
-        assert(s->picture_structure == PICT_FRAME);
+        av_assert0(s->picture_structure == PICT_FRAME);
         put_bits(&s->pb, 2, s->picture_structure);
         if (s->progressive_sequence) {
             put_bits(&s->pb, 1, 0); /* no repeat */
@@ -459,7 +459,7 @@ static av_always_inline void mpeg1_encode_mb_internal(MpegEncContext *s,
     }
 
     if (cbp == 0 && !first_mb && s->mv_type == MV_TYPE_16X16 &&
-        (mb_x != s->mb_width - 1 || (mb_y != s->mb_height - 1 && s->codec_id == CODEC_ID_MPEG1VIDEO)) &&
+        (mb_x != s->mb_width - 1 || (mb_y != s->end_mb_y - 1 && s->codec_id == AV_CODEC_ID_MPEG1VIDEO)) &&
         ((s->pict_type == AV_PICTURE_TYPE_P && (motion_x | motion_y) == 0) ||
         (s->pict_type == AV_PICTURE_TYPE_B && s->mv_dir == s->last_mv_dir && (((s->mv_dir & MV_DIR_FORWARD) ? ((s->mv[0][0][0] - s->last_mv[0][0][0])|(s->mv[0][0][1] - s->last_mv[0][0][1])) : 0) |
         ((s->mv_dir & MV_DIR_BACKWARD) ? ((s->mv[1][0][0] - s->last_mv[1][0][0])|(s->mv[1][0][1] - s->last_mv[1][0][1])) : 0)) == 0))) {
@@ -474,7 +474,7 @@ static av_always_inline void mpeg1_encode_mb_internal(MpegEncContext *s,
         }
     } else {
         if(first_mb){
-            assert(s->mb_skip_run == 0);
+            av_assert0(s->mb_skip_run == 0);
             encode_mb_skip_run(s, s->mb_x);
         }else{
             encode_mb_skip_run(s, s->mb_skip_run);
@@ -537,7 +537,7 @@ static av_always_inline void mpeg1_encode_mb_internal(MpegEncContext *s,
                 s->last_mv[0][1][0]= s->last_mv[0][0][0]= motion_x;
                 s->last_mv[0][1][1]= s->last_mv[0][0][1]= motion_y;
             }else{
-                assert(!s->frame_pred_frame_dct && s->mv_type == MV_TYPE_FIELD);
+                av_assert2(!s->frame_pred_frame_dct && s->mv_type == MV_TYPE_FIELD);
 
                 if (cbp) {
                     if(s->dquant){
@@ -604,8 +604,8 @@ static av_always_inline void mpeg1_encode_mb_internal(MpegEncContext *s,
                     s->b_count++;
                 }
             }else{
-                assert(s->mv_type == MV_TYPE_FIELD);
-                assert(!s->frame_pred_frame_dct);
+                av_assert2(s->mv_type == MV_TYPE_FIELD);
+                av_assert2(!s->frame_pred_frame_dct);
                 if (cbp){    // With coded bloc pattern
                     if (s->dquant) {
                         if(s->mv_dir == MV_DIR_FORWARD)
@@ -700,7 +700,7 @@ static void mpeg1_encode_motion(MpegEncContext *s, int val, int f_or_b_code)
             sign = 1;
         }
 
-        assert(code > 0 && code <= 16);
+        av_assert2(code > 0 && code <= 16);
 
         put_bits(&s->pb,
                  ff_mpeg12_mbMotionVectorTable[code][1],
@@ -793,7 +793,7 @@ void ff_mpeg1_encode_init(MpegEncContext *s)
     }
     s->me.mv_penalty= mv_penalty;
     s->fcode_tab= fcode_tab;
-    if(s->codec_id == CODEC_ID_MPEG1VIDEO){
+    if(s->codec_id == AV_CODEC_ID_MPEG1VIDEO){
         s->min_qcoeff=-255;
         s->max_qcoeff= 255;
     }else{
@@ -895,7 +895,7 @@ static void mpeg1_encode_block(MpegEncContext *s,
             run = i - last_non_zero - 1;
 
             alevel= level;
-            MASK_ABS(sign, alevel)
+            MASK_ABS(sign, alevel);
             sign&=1;
 
             if (alevel <= mpeg1_max_level[0][run]){
@@ -907,7 +907,7 @@ static void mpeg1_encode_block(MpegEncContext *s,
                 put_bits(&s->pb, table_vlc[111][1], table_vlc[111][0]);
                 /* escape: only clip in this case */
                 put_bits(&s->pb, 6, run);
-                if(s->codec_id == CODEC_ID_MPEG1VIDEO){
+                if(s->codec_id == AV_CODEC_ID_MPEG1VIDEO){
                     if (alevel < 128) {
                         put_sbits(&s->pb, 8, level);
                     } else {
@@ -931,11 +931,10 @@ static void mpeg1_encode_block(MpegEncContext *s,
 #define OFFSET(x) offsetof(MpegEncContext, x)
 #define VE AV_OPT_FLAG_ENCODING_PARAM | AV_OPT_FLAG_VIDEO_PARAM
 #define COMMON_OPTS\
-        {AV_TIMECODE_OPTION(MpegEncContext, tc_opt_str, \
-         AV_OPT_FLAG_ENCODING_PARAM | AV_OPT_FLAG_VIDEO_PARAM)},\
-    { "intra_vlc",           "Use MPEG-2 intra VLC table.",       OFFSET(intra_vlc_format),    AV_OPT_TYPE_INT, { 0 }, 0, 1, VE },\
-    { "drop_frame_timecode", "Timecode is in drop frame format.", OFFSET(drop_frame_timecode), AV_OPT_TYPE_INT, { 0 }, 0, 1, VE}, \
-    { "scan_offset",         "Reserve space for SVCD scan offset user data.", OFFSET(scan_offset), AV_OPT_TYPE_INT, { 0 }, 0, 1, VE },
+    { "gop_timecode",        "MPEG GOP Timecode in hh:mm:ss[:;.]ff format", OFFSET(tc_opt_str), AV_OPT_TYPE_STRING, {.str=NULL}, CHAR_MIN, CHAR_MAX, VE },\
+    { "intra_vlc",           "Use MPEG-2 intra VLC table.",       OFFSET(intra_vlc_format),    AV_OPT_TYPE_INT, { .i64 = 0 }, 0, 1, VE },\
+    { "drop_frame_timecode", "Timecode is in drop frame format.", OFFSET(drop_frame_timecode), AV_OPT_TYPE_INT, { .i64 = 0 }, 0, 1, VE}, \
+    { "scan_offset",         "Reserve space for SVCD scan offset user data.", OFFSET(scan_offset), AV_OPT_TYPE_INT, { .i64 = 0 }, 0, 1, VE },
 
 static const AVOption mpeg1_options[] = {
     COMMON_OPTS
@@ -945,8 +944,8 @@ static const AVOption mpeg1_options[] = {
 
 static const AVOption mpeg2_options[] = {
     COMMON_OPTS
-    { "non_linear_quant",    "Use nonlinear quantizer.",          OFFSET(q_scale_type),         AV_OPT_TYPE_INT, { 0 }, 0, 1, VE },
-    { "alternate_scan",      "Enable alternate scantable.",       OFFSET(alternate_scan),       AV_OPT_TYPE_INT, { 0 }, 0, 1, VE },
+    { "non_linear_quant",    "Use nonlinear quantizer.",          OFFSET(q_scale_type),         AV_OPT_TYPE_INT, { .i64 = 0 }, 0, 1, VE },
+    { "alternate_scan",      "Enable alternate scantable.",       OFFSET(alternate_scan),       AV_OPT_TYPE_INT, { .i64 = 0 }, 0, 1, VE },
     FF_MPV_COMMON_OPTS
     { NULL },
 };
@@ -965,7 +964,7 @@ mpeg12_class(2)
 AVCodec ff_mpeg1video_encoder = {
     .name                 = "mpeg1video",
     .type                 = AVMEDIA_TYPE_VIDEO,
-    .id                   = CODEC_ID_MPEG1VIDEO,
+    .id                   = AV_CODEC_ID_MPEG1VIDEO,
     .priv_data_size       = sizeof(MpegEncContext),
     .init                 = encode_init,
     .encode2              = ff_MPV_encode_picture,
@@ -973,7 +972,7 @@ AVCodec ff_mpeg1video_encoder = {
     .supported_framerates = avpriv_frame_rate_tab+1,
     .pix_fmts             = (const enum PixelFormat[]){ PIX_FMT_YUV420P,
                                                         PIX_FMT_NONE },
-    .capabilities         = CODEC_CAP_DELAY,
+    .capabilities         = CODEC_CAP_DELAY | CODEC_CAP_SLICE_THREADS,
     .long_name            = NULL_IF_CONFIG_SMALL("MPEG-1 video"),
     .priv_class           = &mpeg1_class,
 };
@@ -981,7 +980,7 @@ AVCodec ff_mpeg1video_encoder = {
 AVCodec ff_mpeg2video_encoder = {
     .name                 = "mpeg2video",
     .type                 = AVMEDIA_TYPE_VIDEO,
-    .id                   = CODEC_ID_MPEG2VIDEO,
+    .id                   = AV_CODEC_ID_MPEG2VIDEO,
     .priv_data_size       = sizeof(MpegEncContext),
     .init                 = encode_init,
     .encode2              = ff_MPV_encode_picture,

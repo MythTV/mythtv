@@ -20,6 +20,7 @@
  */
 
 #include "libavutil/parseutils.h"
+#include "libavutil/pixdesc.h"
 #include "libavutil/opt.h"
 #include "libavformat/internal.h"
 #include "avdevice.h"
@@ -36,6 +37,7 @@ struct dshow_ctx {
 
     int   list_options;
     int   list_devices;
+    int   audio_buffer_size;
 
     IBaseFilter *device_filter[2];
     IPin        *device_pin[2];
@@ -46,12 +48,13 @@ struct dshow_ctx {
     HANDLE event;
     AVPacketList *pktl;
 
-    unsigned int curbufsize;
+    int64_t curbufsize;
     unsigned int video_frame_num;
 
     IMediaControl *control;
 
-    char *video_size;
+    enum PixelFormat pixel_format;
+    enum AVCodecID video_codec_id;
     char *framerate;
 
     int requested_width;
@@ -92,16 +95,16 @@ static enum PixelFormat dshow_pixfmt(DWORD biCompression, WORD biBitCount)
     return PIX_FMT_NONE;
 }
 
-static enum CodecID dshow_codecid(DWORD biCompression)
+static enum AVCodecID dshow_codecid(DWORD biCompression)
 {
     switch(biCompression) {
     case MKTAG('d', 'v', 's', 'd'):
-        return CODEC_ID_DVVIDEO;
+        return AV_CODEC_ID_DVVIDEO;
     case MKTAG('M', 'J', 'P', 'G'):
     case MKTAG('m', 'j', 'p', 'g'):
-        return CODEC_ID_MJPEG;
+        return AV_CODEC_ID_MJPEG;
     }
-    return CODEC_ID_NONE;
+    return AV_CODEC_ID_NONE;
 }
 
 static int
@@ -207,10 +210,10 @@ callback(void *priv_data, int index, uint8_t *buf, int buf_size, int64_t time)
 
 //    dump_videohdr(s, vdhdr);
 
-    if(shall_we_drop(s))
-        return;
-
     WaitForSingleObject(ctx->mutex, INFINITE);
+
+    if(shall_we_drop(s))
+        goto fail;
 
     pktl_next = av_mallocz(sizeof(AVPacketList));
     if(!pktl_next)
@@ -370,12 +373,32 @@ dshow_cycle_formats(AVFormatContext *avctx, enum dshowDeviceType devtype,
                 goto next;
             }
             if (!pformat_set) {
+                enum PixelFormat pix_fmt = dshow_pixfmt(bih->biCompression, bih->biBitCount);
+                if (pix_fmt == PIX_FMT_NONE) {
+                    enum AVCodecID codec_id = dshow_codecid(bih->biCompression);
+                    AVCodec *codec = avcodec_find_decoder(codec_id);
+                    if (codec_id == AV_CODEC_ID_NONE || !codec) {
+                        av_log(avctx, AV_LOG_INFO, "  unknown compression type");
+                    } else {
+                        av_log(avctx, AV_LOG_INFO, "  vcodec=%s", codec->name);
+                    }
+                } else {
+                    av_log(avctx, AV_LOG_INFO, "  pixel_format=%s", av_get_pix_fmt_name(pix_fmt));
+                }
                 av_log(avctx, AV_LOG_INFO, "  min s=%ldx%ld fps=%g max s=%ldx%ld fps=%g\n",
                        vcaps->MinOutputSize.cx, vcaps->MinOutputSize.cy,
                        1e7 / vcaps->MaxFrameInterval,
                        vcaps->MaxOutputSize.cx, vcaps->MaxOutputSize.cy,
                        1e7 / vcaps->MinFrameInterval);
                 continue;
+            }
+            if (ctx->video_codec_id != AV_CODEC_ID_RAWVIDEO) {
+                if (ctx->video_codec_id != dshow_codecid(bih->biCompression))
+                    goto next;
+            }
+            if (ctx->pixel_format != PIX_FMT_NONE &&
+                ctx->pixel_format != dshow_pixfmt(bih->biCompression, bih->biBitCount)) {
+                goto next;
             }
             if (ctx->framerate) {
                 int64_t framerate = ((int64_t) ctx->requested_framerate.den*10000000)
@@ -385,7 +408,7 @@ dshow_cycle_formats(AVFormatContext *avctx, enum dshowDeviceType devtype,
                     goto next;
                 *fr = framerate;
             }
-            if (ctx->video_size) {
+            if (ctx->requested_width && ctx->requested_height) {
                 if (ctx->requested_width  > vcaps->MaxOutputSize.cx ||
                     ctx->requested_width  < vcaps->MinOutputSize.cx ||
                     ctx->requested_height > vcaps->MaxOutputSize.cy ||
@@ -447,6 +470,51 @@ end:
 }
 
 /**
+ * Set audio device buffer size in milliseconds (which can directly impact
+ * latency, depending on the device).
+ */
+static int
+dshow_set_audio_buffer_size(AVFormatContext *avctx, IPin *pin)
+{
+    struct dshow_ctx *ctx = avctx->priv_data;
+    IAMBufferNegotiation *buffer_negotiation = NULL;
+    ALLOCATOR_PROPERTIES props = { -1, -1, -1, -1 };
+    IAMStreamConfig *config = NULL;
+    AM_MEDIA_TYPE *type = NULL;
+    int ret = AVERROR(EIO);
+
+    if (IPin_QueryInterface(pin, &IID_IAMStreamConfig, (void **) &config) != S_OK)
+        goto end;
+    if (IAMStreamConfig_GetFormat(config, &type) != S_OK)
+        goto end;
+    if (!IsEqualGUID(&type->formattype, &FORMAT_WaveFormatEx))
+        goto end;
+
+    props.cbBuffer = (((WAVEFORMATEX *) type->pbFormat)->nAvgBytesPerSec)
+                   * ctx->audio_buffer_size / 1000;
+
+    if (IPin_QueryInterface(pin, &IID_IAMBufferNegotiation, (void **) &buffer_negotiation) != S_OK)
+        goto end;
+    if (IAMBufferNegotiation_SuggestAllocatorProperties(buffer_negotiation, &props) != S_OK)
+        goto end;
+
+    ret = 0;
+
+end:
+    if (buffer_negotiation)
+        IAMBufferNegotiation_Release(buffer_negotiation);
+    if (type) {
+        if (type->pbFormat)
+            CoTaskMemFree(type->pbFormat);
+        CoTaskMemFree(type);
+    }
+    if (config)
+        IAMStreamConfig_Release(config);
+
+    return ret;
+}
+
+/**
  * Cycle through available pins using the device_filter device, of type
  * devtype, retrieve the first output pin and return the pointer to the
  * object found in *ppin.
@@ -465,7 +533,10 @@ dshow_cycle_pins(AVFormatContext *avctx, enum dshowDeviceType devtype,
     const GUID *mediatype[2] = { &MEDIATYPE_Video, &MEDIATYPE_Audio };
     const char *devtypename = (devtype == VideoDevice) ? "video" : "audio";
 
-    int set_format = (devtype == VideoDevice && (ctx->video_size || ctx->framerate))
+    int set_format = (devtype == VideoDevice && (ctx->framerate ||
+                                                (ctx->requested_width && ctx->requested_height) ||
+                                                 ctx->pixel_format != PIX_FMT_NONE ||
+                                                 ctx->video_codec_id != AV_CODEC_ID_RAWVIDEO))
                   || (devtype == AudioDevice && (ctx->channels || ctx->sample_rate));
     int format_set = 0;
 
@@ -512,6 +583,10 @@ dshow_cycle_pins(AVFormatContext *avctx, enum dshowDeviceType devtype,
             if (!format_set) {
                 goto next;
             }
+        }
+        if (devtype == AudioDevice && ctx->audio_buffer_size) {
+            if (dshow_set_audio_buffer_size(avctx, pin) < 0)
+                goto next;
         }
 
         if (IPin_EnumMediaTypes(pin, &types) != S_OK)
@@ -639,13 +714,13 @@ error:
     return ret;
 }
 
-static enum CodecID waveform_codec_id(enum AVSampleFormat sample_fmt)
+static enum AVCodecID waveform_codec_id(enum AVSampleFormat sample_fmt)
 {
     switch (sample_fmt) {
-    case AV_SAMPLE_FMT_U8:  return CODEC_ID_PCM_U8;
-    case AV_SAMPLE_FMT_S16: return CODEC_ID_PCM_S16LE;
-    case AV_SAMPLE_FMT_S32: return CODEC_ID_PCM_S32LE;
-    default:                return CODEC_ID_NONE; /* Should never happen. */
+    case AV_SAMPLE_FMT_U8:  return AV_CODEC_ID_PCM_U8;
+    case AV_SAMPLE_FMT_S16: return AV_CODEC_ID_PCM_S16LE;
+    case AV_SAMPLE_FMT_S32: return AV_CODEC_ID_PCM_S32LE;
+    default:                return AV_CODEC_ID_NONE; /* Should never happen. */
     }
 }
 
@@ -706,7 +781,7 @@ dshow_add_device(AVFormatContext *avctx,
         codec->pix_fmt    = dshow_pixfmt(bih->biCompression, bih->biBitCount);
         if (codec->pix_fmt == PIX_FMT_NONE) {
             codec->codec_id = dshow_codecid(bih->biCompression);
-            if (codec->codec_id == CODEC_ID_NONE) {
+            if (codec->codec_id == AV_CODEC_ID_NONE) {
                 av_log(avctx, AV_LOG_ERROR, "Unknown compression type. "
                                  "Please report verbose (-v 9) debug information.\n");
                 dshow_read_close(avctx);
@@ -714,7 +789,7 @@ dshow_add_device(AVFormatContext *avctx,
             }
             codec->bits_per_coded_sample = bih->biBitCount;
         } else {
-            codec->codec_id = CODEC_ID_RAWVIDEO;
+            codec->codec_id = AV_CODEC_ID_RAWVIDEO;
             if (bih->biCompression == BI_RGB || bih->biCompression == BI_BITFIELDS) {
                 codec->bits_per_coded_sample = bih->biBitCount;
                 codec->extradata = av_malloc(9 + FF_INPUT_BUFFER_PADDING_SIZE);
@@ -801,10 +876,13 @@ static int dshow_read_header(AVFormatContext *avctx)
         goto error;
     }
 
-    if (ctx->video_size) {
-        r = av_parse_video_size(&ctx->requested_width, &ctx->requested_height, ctx->video_size);
-        if (r < 0) {
-            av_log(avctx, AV_LOG_ERROR, "Could not parse video size '%s'.\n", ctx->video_size);
+    ctx->video_codec_id = avctx->video_codec_id ? avctx->video_codec_id
+                                                : AV_CODEC_ID_RAWVIDEO;
+    if (ctx->pixel_format != PIX_FMT_NONE) {
+        if (ctx->video_codec_id != AV_CODEC_ID_RAWVIDEO) {
+            av_log(avctx, AV_LOG_ERROR, "Pixel format may only be set when "
+                              "video codec is not set or set to rawvideo\n");
+            ret = AVERROR(EINVAL);
             goto error;
         }
     }
@@ -916,10 +994,11 @@ static int dshow_read_packet(AVFormatContext *s, AVPacket *pkt)
     while (!pktl) {
         WaitForSingleObject(ctx->mutex, INFINITE);
         pktl = ctx->pktl;
-        if (ctx->pktl) {
-            *pkt = ctx->pktl->pkt;
+        if (pktl) {
+            *pkt = pktl->pkt;
             ctx->pktl = ctx->pktl->next;
             av_free(pktl);
+            ctx->curbufsize -= pkt->size;
         }
         ResetEvent(ctx->event);
         ReleaseMutex(ctx->mutex);
@@ -932,27 +1011,27 @@ static int dshow_read_packet(AVFormatContext *s, AVPacket *pkt)
         }
     }
 
-    ctx->curbufsize -= pkt->size;
-
     return pkt->size;
 }
 
 #define OFFSET(x) offsetof(struct dshow_ctx, x)
 #define DEC AV_OPT_FLAG_DECODING_PARAM
 static const AVOption options[] = {
-    { "video_size", "set video size given a string such as 640x480 or hd720.", OFFSET(video_size), AV_OPT_TYPE_STRING, {.str = NULL}, 0, 0, DEC },
+    { "video_size", "set video size given a string such as 640x480 or hd720.", OFFSET(requested_width), AV_OPT_TYPE_IMAGE_SIZE, {.str = NULL}, 0, 0, DEC },
+    { "pixel_format", "set video pixel format", OFFSET(pixel_format), AV_OPT_TYPE_PIXEL_FMT, {.str = NULL}, 0, 0, DEC },
     { "framerate", "set video frame rate", OFFSET(framerate), AV_OPT_TYPE_STRING, {.str = NULL}, 0, 0, DEC },
-    { "sample_rate", "set audio sample rate", OFFSET(sample_rate), AV_OPT_TYPE_INT, {.dbl = 0}, 0, INT_MAX, DEC },
-    { "sample_size", "set audio sample size", OFFSET(sample_size), AV_OPT_TYPE_INT, {.dbl = 0}, 0, 16, DEC },
-    { "channels", "set number of audio channels, such as 1 or 2", OFFSET(channels), AV_OPT_TYPE_INT, {.dbl = 0}, 0, INT_MAX, DEC },
-    { "list_devices", "list available devices", OFFSET(list_devices), AV_OPT_TYPE_INT, {.dbl=0}, 0, 1, DEC, "list_devices" },
-    { "true", "", 0, AV_OPT_TYPE_CONST, {.dbl=1}, 0, 0, DEC, "list_devices" },
-    { "false", "", 0, AV_OPT_TYPE_CONST, {.dbl=0}, 0, 0, DEC, "list_devices" },
-    { "list_options", "list available options for specified device", OFFSET(list_options), AV_OPT_TYPE_INT, {.dbl=0}, 0, 1, DEC, "list_options" },
-    { "true", "", 0, AV_OPT_TYPE_CONST, {.dbl=1}, 0, 0, DEC, "list_options" },
-    { "false", "", 0, AV_OPT_TYPE_CONST, {.dbl=0}, 0, 0, DEC, "list_options" },
-    { "video_device_number", "set video device number for devices with same name (starts at 0)", OFFSET(video_device_number), AV_OPT_TYPE_INT, {.dbl = 0}, 0, INT_MAX, DEC },
-    { "audio_device_number", "set audio device number for devices with same name (starts at 0)", OFFSET(audio_device_number), AV_OPT_TYPE_INT, {.dbl = 0}, 0, INT_MAX, DEC },
+    { "sample_rate", "set audio sample rate", OFFSET(sample_rate), AV_OPT_TYPE_INT, {.i64 = 0}, 0, INT_MAX, DEC },
+    { "sample_size", "set audio sample size", OFFSET(sample_size), AV_OPT_TYPE_INT, {.i64 = 0}, 0, 16, DEC },
+    { "channels", "set number of audio channels, such as 1 or 2", OFFSET(channels), AV_OPT_TYPE_INT, {.i64 = 0}, 0, INT_MAX, DEC },
+    { "list_devices", "list available devices", OFFSET(list_devices), AV_OPT_TYPE_INT, {.i64=0}, 0, 1, DEC, "list_devices" },
+    { "true", "", 0, AV_OPT_TYPE_CONST, {.i64=1}, 0, 0, DEC, "list_devices" },
+    { "false", "", 0, AV_OPT_TYPE_CONST, {.i64=0}, 0, 0, DEC, "list_devices" },
+    { "list_options", "list available options for specified device", OFFSET(list_options), AV_OPT_TYPE_INT, {.i64=0}, 0, 1, DEC, "list_options" },
+    { "true", "", 0, AV_OPT_TYPE_CONST, {.i64=1}, 0, 0, DEC, "list_options" },
+    { "false", "", 0, AV_OPT_TYPE_CONST, {.i64=0}, 0, 0, DEC, "list_options" },
+    { "video_device_number", "set video device number for devices with same name (starts at 0)", OFFSET(video_device_number), AV_OPT_TYPE_INT, {.i64 = 0}, 0, INT_MAX, DEC },
+    { "audio_device_number", "set audio device number for devices with same name (starts at 0)", OFFSET(audio_device_number), AV_OPT_TYPE_INT, {.i64 = 0}, 0, INT_MAX, DEC },
+    { "audio_buffer_size", "set audio device buffer latency size in milliseconds (default is the device's default)", OFFSET(audio_buffer_size), AV_OPT_TYPE_INT, {.i64 = 0}, 0, INT_MAX, DEC },
     { NULL },
 };
 

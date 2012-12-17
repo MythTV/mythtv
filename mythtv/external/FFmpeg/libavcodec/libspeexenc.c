@@ -67,6 +67,9 @@
 #include <speex/speex.h>
 #include <speex/speex_header.h>
 #include <speex/speex_stereo.h>
+
+#include "libavutil/audioconvert.h"
+#include "libavutil/common.h"
 #include "libavutil/opt.h"
 #include "avcodec.h"
 #include "internal.h"
@@ -302,9 +305,9 @@ static av_cold int encode_close(AVCodecContext *avctx)
 #define OFFSET(x) offsetof(LibSpeexEncContext, x)
 #define AE AV_OPT_FLAG_AUDIO_PARAM | AV_OPT_FLAG_ENCODING_PARAM
 static const AVOption options[] = {
-    { "abr",               "Use average bit rate",                      OFFSET(abr),               AV_OPT_TYPE_INT, { 0 }, 0,   1, AE },
-    { "cbr_quality",       "Set quality value (0 to 10) for CBR",       OFFSET(cbr_quality),       AV_OPT_TYPE_INT, { 8 }, 0,  10, AE },
-    { "frames_per_packet", "Number of frames to encode in each packet", OFFSET(frames_per_packet), AV_OPT_TYPE_INT, { 1 }, 1,   8, AE },
+    { "abr",               "Use average bit rate",                      OFFSET(abr),               AV_OPT_TYPE_INT, { .i64 = 0 }, 0,   1, AE },
+    { "cbr_quality",       "Set quality value (0 to 10) for CBR",       OFFSET(cbr_quality),       AV_OPT_TYPE_INT, { .i64 = 8 }, 0,  10, AE },
+    { "frames_per_packet", "Number of frames to encode in each packet", OFFSET(frames_per_packet), AV_OPT_TYPE_INT, { .i64 = 1 }, 1,   8, AE },
     { NULL },
 };
 
@@ -324,7 +327,7 @@ static const AVCodecDefault defaults[] = {
 AVCodec ff_libspeex_encoder = {
     .name           = "libspeex",
     .type           = AVMEDIA_TYPE_AUDIO,
-    .id             = CODEC_ID_SPEEX,
+    .id             = AV_CODEC_ID_SPEEX,
     .priv_data_size = sizeof(LibSpeexEncContext),
     .init           = encode_init,
     .encode2        = encode_frame,
@@ -332,6 +335,10 @@ AVCodec ff_libspeex_encoder = {
     .capabilities   = CODEC_CAP_DELAY,
     .sample_fmts    = (const enum AVSampleFormat[]){ AV_SAMPLE_FMT_S16,
                                                      AV_SAMPLE_FMT_NONE },
+    .channel_layouts = (const uint64_t[]){ AV_CH_LAYOUT_MONO,
+                                           AV_CH_LAYOUT_STEREO,
+                                           0 },
+    .supported_samplerates = (const int[]){ 8000, 16000, 32000, 0 },
     .long_name      = NULL_IF_CONFIG_SMALL("libspeex Speex"),
     .priv_class     = &class,
     .defaults       = defaults,

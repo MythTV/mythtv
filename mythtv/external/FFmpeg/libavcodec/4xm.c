@@ -30,8 +30,7 @@
 #include "dsputil.h"
 #include "get_bits.h"
 
-//#undef NDEBUG
-//#include <assert.h>
+#include "libavutil/avassert.h"
 
 #define BLOCK_TYPE_VLC_BITS 5
 #define ACDC_VLC_BITS 9
@@ -328,7 +327,7 @@ static inline void mcdc(uint16_t *dst, const uint16_t *src, int log2w,
         }
         break;
     default:
-        assert(0);
+        av_assert2(0);
     }
 }
 
@@ -343,7 +342,7 @@ static void decode_p_block(FourXContext *f, uint16_t *dst, uint16_t *src,
     uint16_t *start = (uint16_t *)f->last_picture.data[0];
     uint16_t *end   = start + stride * (f->avctx->height - h + 1) - (1 << log2w);
 
-    assert(code >= 0 && code <= 6);
+    av_assert2(code >= 0 && code <= 6);
 
     if (code == 0) {
         if (f->g.buffer_end - f->g.buffer < 1) {
@@ -837,7 +836,7 @@ static int decode_frame(AVCodecContext *avctx, void *data,
                                      cfrm->size + data_size + FF_INPUT_BUFFER_PADDING_SIZE);
         // explicit check needed as memcpy below might not catch a NULL
         if (!cfrm->data) {
-            av_log(f->avctx, AV_LOG_ERROR, "realloc falure");
+            av_log(f->avctx, AV_LOG_ERROR, "realloc falure\n");
             return -1;
         }
 
@@ -982,7 +981,7 @@ static av_cold int decode_end(AVCodecContext *avctx)
 AVCodec ff_fourxm_decoder = {
     .name           = "4xm",
     .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = CODEC_ID_4XM,
+    .id             = AV_CODEC_ID_4XM,
     .priv_data_size = sizeof(FourXContext),
     .init           = decode_init,
     .close          = decode_end,

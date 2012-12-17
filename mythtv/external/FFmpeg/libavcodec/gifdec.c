@@ -56,7 +56,7 @@ typedef struct GifState {
     uint8_t global_palette[256 * 3];
     uint8_t local_palette[256 * 3];
 
-  AVCodecContext* avctx;
+    AVCodecContext *avctx;
 } GifState;
 
 static const uint8_t gif87a_sig[6] = "GIF87a";
@@ -77,7 +77,7 @@ static int gif_read_image(GifState *s)
     has_local_palette = flags & 0x80;
     bits_per_pixel = (flags & 0x07) + 1;
 
-    av_dlog(s->avctx, "gif: image x=%d y=%d w=%d h=%d\n", left, top, width, height);
+    av_dlog(s->avctx, "image x=%d y=%d w=%d h=%d\n", left, top, width, height);
 
     if (has_local_palette) {
         bytestream_get_buffer(&s->bytestream, s->local_palette, 3 * (1 << bits_per_pixel));
@@ -163,7 +163,7 @@ static int gif_read_extension(GifState *s)
     ext_code = bytestream_get_byte(&s->bytestream);
     ext_len = bytestream_get_byte(&s->bytestream);
 
-    av_dlog(s->avctx, "gif: ext_code=0x%x len=%d\n", ext_code, ext_len);
+    av_dlog(s->avctx, "ext_code=0x%x len=%d\n", ext_code, ext_len);
 
     switch(ext_code) {
     case 0xf9:
@@ -179,7 +179,7 @@ static int gif_read_extension(GifState *s)
             s->transparent_color_index = -1;
         s->gce_disposal = (gce_flags >> 2) & 0x7;
 
-        av_dlog(s->avctx, "gif: gce_flags=%x delay=%d tcolor=%d disposal=%d\n",
+        av_dlog(s->avctx, "gce_flags=%x delay=%d tcolor=%d disposal=%d\n",
                gce_flags, s->gce_delay,
                s->transparent_color_index, s->gce_disposal);
 
@@ -194,7 +194,7 @@ static int gif_read_extension(GifState *s)
             bytestream_get_byte(&s->bytestream);
         ext_len = bytestream_get_byte(&s->bytestream);
 
-        av_dlog(s->avctx, "gif: ext_len1=%d\n", ext_len);
+        av_dlog(s->avctx, "ext_len1=%d\n", ext_len);
     }
     return 0;
 }
@@ -206,13 +206,13 @@ static int gif_read_header1(GifState *s)
     int has_global_palette;
 
     if (s->bytestream_end < s->bytestream + 13)
-        return -1;
+        return AVERROR_INVALIDDATA;
 
     /* read gif signature */
     bytestream_get_buffer(&s->bytestream, sig, 6);
     if (memcmp(sig, gif87a_sig, 6) != 0 &&
         memcmp(sig, gif89a_sig, 6) != 0)
-        return -1;
+        return AVERROR_INVALIDDATA;
 
     /* read screen header */
     s->transparent_color_index = -1;
@@ -220,8 +220,8 @@ static int gif_read_header1(GifState *s)
     s->screen_height = bytestream_get_le16(&s->bytestream);
     if(   (unsigned)s->screen_width  > 32767
        || (unsigned)s->screen_height > 32767){
-        av_log(NULL, AV_LOG_ERROR, "picture size too large\n");
-        return -1;
+        av_log(s->avctx, AV_LOG_ERROR, "picture size too large\n");
+        return AVERROR_INVALIDDATA;
     }
 
     v = bytestream_get_byte(&s->bytestream);
@@ -231,14 +231,14 @@ static int gif_read_header1(GifState *s)
     s->background_color_index = bytestream_get_byte(&s->bytestream);
     bytestream_get_byte(&s->bytestream);                /* ignored */
 
-    av_dlog(s->avctx, "gif: screen_w=%d screen_h=%d bpp=%d global_palette=%d\n",
+    av_dlog(s->avctx, "screen_w=%d screen_h=%d bpp=%d global_palette=%d\n",
            s->screen_width, s->screen_height, s->bits_per_pixel,
            has_global_palette);
 
     if (has_global_palette) {
         n = 1 << s->bits_per_pixel;
         if (s->bytestream_end < s->bytestream + n * 3)
-            return -1;
+            return AVERROR_INVALIDDATA;
         bytestream_get_buffer(&s->bytestream, s->global_palette, n * 3);
     }
     return 0;
@@ -249,7 +249,7 @@ static int gif_parse_next_image(GifState *s)
     while (s->bytestream < s->bytestream_end) {
         int code = bytestream_get_byte(&s->bytestream);
 
-        av_dlog(s->avctx, "gif: code=%02x '%c'\n", code, code);
+        av_dlog(s->avctx, "code=%02x '%c'\n", code, code);
 
         switch (code) {
         case ',':
@@ -291,8 +291,8 @@ static int gif_decode_frame(AVCodecContext *avctx, void *data, int *data_size, A
 
     s->bytestream = buf;
     s->bytestream_end = buf + buf_size;
-    if (gif_read_header1(s) < 0)
-        return -1;
+    if ((ret = gif_read_header1(s)) < 0)
+        return ret;
 
     avctx->pix_fmt = PIX_FMT_PAL8;
     if (av_image_check_size(s->screen_width, s->screen_height, 0, avctx))
@@ -301,9 +301,9 @@ static int gif_decode_frame(AVCodecContext *avctx, void *data, int *data_size, A
 
     if (s->picture.data[0])
         avctx->release_buffer(avctx, &s->picture);
-    if (avctx->get_buffer(avctx, &s->picture) < 0) {
+    if ((ret = avctx->get_buffer(avctx, &s->picture)) < 0) {
         av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
-        return -1;
+        return ret;
     }
     s->image_palette = (uint32_t *)s->picture.data[1];
     ret = gif_parse_next_image(s);
@@ -328,7 +328,7 @@ static av_cold int gif_decode_close(AVCodecContext *avctx)
 AVCodec ff_gif_decoder = {
     .name           = "gif",
     .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = CODEC_ID_GIF,
+    .id             = AV_CODEC_ID_GIF,
     .priv_data_size = sizeof(GifState),
     .init           = gif_decode_init,
     .close          = gif_decode_close,

@@ -188,7 +188,7 @@ static int aac_encode_frame(AVCodecContext *avctx, AVPacket *avpkt,
 AVCodec ff_libvo_aacenc_encoder = {
     .name           = "libvo_aacenc",
     .type           = AVMEDIA_TYPE_AUDIO,
-    .id             = CODEC_ID_AAC,
+    .id             = AV_CODEC_ID_AAC,
     .priv_data_size = sizeof(AACContext),
     .init           = aac_encode_init,
     .encode2        = aac_encode_frame,
@@ -197,5 +197,5 @@ AVCodec ff_libvo_aacenc_encoder = {
     .capabilities   = CODEC_CAP_SMALL_LAST_FRAME | CODEC_CAP_DELAY,
     .sample_fmts    = (const enum AVSampleFormat[]){ AV_SAMPLE_FMT_S16,
                                                      AV_SAMPLE_FMT_NONE },
-    .long_name      = NULL_IF_CONFIG_SMALL("Android VisualOn AAC"),
+    .long_name      = NULL_IF_CONFIG_SMALL("Android VisualOn AAC (Advanced Audio Coding)"),
 };

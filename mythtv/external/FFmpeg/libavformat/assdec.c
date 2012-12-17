@@ -88,7 +88,7 @@ static int read_header(AVFormatContext *s)
         return -1;
     avpriv_set_pts_info(st, 64, 1, 100);
     st->codec->codec_type = AVMEDIA_TYPE_SUBTITLE;
-    st->codec->codec_id= CODEC_ID_SSA;
+    st->codec->codec_id= AV_CODEC_ID_SSA;
 
     header_remaining= INT_MAX;
     dst[0] = &st->codec->extradata;
@@ -147,7 +147,7 @@ static int read_packet(AVFormatContext *s, AVPacket *pkt)
     uint8_t *p, *end;
 
     if(ass->event_index >= ass->event_count)
-        return AVERROR(EIO);
+        return AVERROR_EOF;
 
     p= ass->event[ ass->event_index ];
 
@@ -205,7 +205,7 @@ static int read_seek2(AVFormatContext *s, int stream_index,
 
 AVInputFormat ff_ass_demuxer = {
     .name           = "ass",
-    .long_name      = NULL_IF_CONFIG_SMALL("Advanced SubStation Alpha subtitle format"),
+    .long_name      = NULL_IF_CONFIG_SMALL("SSA (SubStation Alpha) subtitle"),
     .priv_data_size = sizeof(ASSContext),
     .read_probe     = probe,
     .read_header    = read_header,

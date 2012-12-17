@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 Michael Niedermayer (michaelni@gmx.at)
+ * Copyright (C) 2011-2012 Michael Niedermayer (michaelni@gmx.at)
  *
  * This file is part of libswresample
  *
@@ -51,6 +51,13 @@ enum SwrDitherType {
     SWR_DITHER_TRIANGULAR,
     SWR_DITHER_TRIANGULAR_HIGHPASS,
     SWR_DITHER_NB,              ///< not part of API/ABI
+};
+
+/** Resampling Filter Types */
+enum SwrFilterType {
+    SWR_FILTER_TYPE_CUBIC,              /**< Cubic */
+    SWR_FILTER_TYPE_BLACKMAN_NUTTALL,   /**< Blackman Nuttall Windowed Sinc */
+    SWR_FILTER_TYPE_KAISER,             /**< Kaiser Windowed Sinc */
 };
 
 typedef struct SwrContext SwrContext;

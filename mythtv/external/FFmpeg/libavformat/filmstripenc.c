@@ -67,7 +67,7 @@ static int write_trailer(AVFormatContext *s)
     avio_wb16(pb, 1/av_q2d(st->codec->time_base));
     for (i = 0; i < 16; i++)
         avio_w8(pb, 0x00);  // reserved
-    avio_flush(pb);
+
     return 0;
 }
 
@@ -76,8 +76,8 @@ AVOutputFormat ff_filmstrip_muxer = {
     .long_name         = NULL_IF_CONFIG_SMALL("Adobe Filmstrip"),
     .extensions        = "flm",
     .priv_data_size    = sizeof(FilmstripMuxContext),
-    .audio_codec       = CODEC_ID_NONE,
-    .video_codec       = CODEC_ID_RAWVIDEO,
+    .audio_codec       = AV_CODEC_ID_NONE,
+    .video_codec       = AV_CODEC_ID_RAWVIDEO,
     .write_header      = write_header,
     .write_packet      = write_packet,
     .write_trailer     = write_trailer,

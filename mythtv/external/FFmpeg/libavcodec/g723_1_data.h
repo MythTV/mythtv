@@ -25,8 +25,8 @@
  * G723.1 compatible decoder data tables
  */
 
-#ifndef AVCODEC_G729_DATA_H
-#define AVCODEC_G729_DATA_H
+#ifndef AVCODEC_G723_1_DATA_H
+#define AVCODEC_G723_1_DATA_H
 
 #include <stdint.h>
 
@@ -49,23 +49,23 @@
 /**
  * G723.1 frame types
  */
-typedef enum {
-    ActiveFrame,        ///< Active speech
-    SIDFrame,           ///< Silence Insertion Descriptor frame
-    UntransmittedFrame
+typedef enum FrameType {
+    ACTIVE_FRAME,        ///< Active speech
+    SID_FRAME,           ///< Silence Insertion Descriptor frame
+    UNTRANSMITTED_FRAME
 } FrameType;
 
-static const uint8_t frame_size[4] = {24, 20, 4, 1};
+static const uint8_t frame_size[4] = { 24, 20, 4, 1 };
 
-typedef enum {
-    Rate6k3,
-    Rate5k3
+typedef enum Rate {
+    RATE_6300,
+    RATE_5300
 } Rate;
 
 /**
  * G723.1 unpacked data subframe
  */
-typedef struct {
+typedef struct G723_1_Subframe {
     int ad_cb_lag;     ///< adaptive codebook lag
     int ad_cb_gain;
     int dirac_train;
@@ -1319,4 +1319,10 @@ static const int16_t percept_flt_tbl[2][LPC_ORDER] = {
     {16384,  8192,  4096,  2048,  1024,   512,   256,   128,    64,    32}
 };
 
-#endif /* AVCODEC_G729_DATA_H */
+static const int cng_adaptive_cb_lag[4] = { 1, 0, 1, 3 };
+
+static const int cng_filt[4] = { 273, 998, 499, 333 };
+
+static const int cng_bseg[3] = { 2048, 18432, 231233 };
+
+#endif /* AVCODEC_G723_1_DATA_H */

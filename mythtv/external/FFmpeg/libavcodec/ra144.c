@@ -23,6 +23,7 @@
 #include "avcodec.h"
 #include "celp_filters.h"
 #include "ra144.h"
+#include "libavutil/common.h"
 
 const int16_t ff_gain_val_tab[256][3] = {
     { 541, 956,  768}, { 877, 581,  568}, { 675,1574,  635}, {1248,1464,  668},
@@ -1565,8 +1566,9 @@ int ff_eval_refl(int *refl, const int16_t *coefs, AVCodecContext *avctx)
         if (!b)
             b = -2;
 
+        b = 0x1000000 / b;
         for (j=0; j <= i; j++)
-            bp1[j] = ((bp2[j] - ((refl[i+1] * bp2[i-j]) >> 12)) * (0x1000000 / b)) >> 12;
+            bp1[j] = ((bp2[j] - ((refl[i+1] * bp2[i-j]) >> 12)) * b) >> 12;
 
         if ((unsigned) bp1[i] + 0x1000 > 0x1fff)
             return 1;

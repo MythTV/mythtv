@@ -78,7 +78,7 @@ int ff_wma_init(AVCodecContext *avctx, int flags2)
     int coef_vlc_table;
 
     if (   avctx->sample_rate <= 0 || avctx->sample_rate > 50000
-        || avctx->channels    <= 0 || avctx->channels    > 8
+        || avctx->channels    <= 0 || avctx->channels    > 2
         || avctx->bit_rate    <= 0)
         return -1;
 
@@ -90,7 +90,7 @@ int ff_wma_init(AVCodecContext *avctx, int flags2)
     ff_dsputil_init(&s->dsp, avctx);
     ff_fmt_convert_init(&s->fmt_conv, avctx);
 
-    if (avctx->codec->id == CODEC_ID_WMAV1) {
+    if (avctx->codec->id == AV_CODEC_ID_WMAV1) {
         s->version = 1;
     } else {
         s->version = 2;

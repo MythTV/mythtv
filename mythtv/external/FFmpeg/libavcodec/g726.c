@@ -32,7 +32,7 @@
 /**
  * G.726 11bit float.
  * G.726 Standard uses rather odd 11bit floating point arithmentic for
- * numerous occasions. It's a mistery to me why they did it this way
+ * numerous occasions. It's a mystery to me why they did it this way
  * instead of simply using 32bit integer arithmetic.
  */
 typedef struct Float11 {
@@ -378,7 +378,7 @@ static int g726_encode_frame(AVCodecContext *avctx, AVPacket *avpkt,
 #define OFFSET(x) offsetof(G726Context, x)
 #define AE AV_OPT_FLAG_AUDIO_PARAM | AV_OPT_FLAG_ENCODING_PARAM
 static const AVOption options[] = {
-    { "code_size", "Bits per code", OFFSET(code_size), AV_OPT_TYPE_INT, { 4 }, 2, 5, AE },
+    { "code_size", "Bits per code", OFFSET(code_size), AV_OPT_TYPE_INT, { .i64 = 4 }, 2, 5, AE },
     { NULL },
 };
 
@@ -397,7 +397,7 @@ static const AVCodecDefault defaults[] = {
 AVCodec ff_adpcm_g726_encoder = {
     .name           = "g726",
     .type           = AVMEDIA_TYPE_AUDIO,
-    .id             = CODEC_ID_ADPCM_G726,
+    .id             = AV_CODEC_ID_ADPCM_G726,
     .priv_data_size = sizeof(G726Context),
     .init           = g726_encode_init,
     .encode2        = g726_encode_frame,
@@ -489,7 +489,7 @@ static void g726_decode_flush(AVCodecContext *avctx)
 AVCodec ff_adpcm_g726_decoder = {
     .name           = "g726",
     .type           = AVMEDIA_TYPE_AUDIO,
-    .id             = CODEC_ID_ADPCM_G726,
+    .id             = AV_CODEC_ID_ADPCM_G726,
     .priv_data_size = sizeof(G726Context),
     .init           = g726_decode_init,
     .decode         = g726_decode_frame,
