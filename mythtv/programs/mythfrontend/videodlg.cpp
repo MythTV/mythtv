@@ -283,7 +283,7 @@ namespace
         Q_OBJECT
 
       public:
-        FanartLoader() : itemsPast(0)
+        FanartLoader() : itemsPast(0), m_fanart(NULL)
         {
             connect(&m_fanartTimer, SIGNAL(timeout()), SLOT(fanartLoad()));
         }
