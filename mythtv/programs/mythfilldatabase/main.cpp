@@ -70,7 +70,6 @@ int main(int argc, char *argv[])
     bool mark_repeats = true;
 
     bool usingDataDirect = false;
-    bool grab_data = true;
 
     bool from_dd_file = false;
     int sourceid = -1;
@@ -327,10 +326,7 @@ int main(int argc, char *argv[])
         return GENERIC_EXIT_DB_OUTOFDATE;
     }
 
-    if (!grab_data)
-    {
-    }
-    else if (from_file)
+    if (from_file)
     {
         QString status = QObject::tr("currently running.");
         QDateTime GuideDataBefore, GuideDataAfter;
@@ -454,132 +450,118 @@ int main(int argc, char *argv[])
         return GENERIC_EXIT_OK;
     }
 
-    if (grab_data)
+    LOG(VB_GENERAL, LOG_INFO, "Adjusting program database end times.");
+    int update_count = ProgramData::fix_end_times();
+    if (update_count == -1)
+        LOG(VB_GENERAL, LOG_ERR, "fix_end_times failed!");
+    else
+        LOG(VB_GENERAL, LOG_INFO,
+            QString("    %1 replacements made").arg(update_count));
+
+    LOG(VB_GENERAL, LOG_INFO, "Marking generic episodes.");
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("UPDATE program SET generic = 1 WHERE "
+        "((programid = '' AND subtitle = '' AND description = '') OR "
+        " (programid <> '' AND category_type = 'series' AND "
+        "  program.programid LIKE '%0000'));");
+
+    if (!query.exec())
+        MythDB::DBError("mark generic", query);
+    else
+        LOG(VB_GENERAL, LOG_INFO,
+            QString("    Found %1").arg(query.numRowsAffected()));
+
+    LOG(VB_GENERAL, LOG_INFO, "Extending non-unique programids "
+                                "with multiple parts.");
+
+    int found = 0;
+    MSqlQuery sel(MSqlQuery::InitCon());
+    sel.prepare("SELECT DISTINCT programid, partnumber, parttotal "
+                "FROM program WHERE partnumber > 0 AND parttotal > 0 AND "
+                "programid LIKE '%0000'");
+    if (sel.exec())
     {
-        LOG(VB_GENERAL, LOG_INFO, "Adjusting program database end times.");
-        int update_count = ProgramData::fix_end_times();
-        if (update_count == -1)
-            LOG(VB_GENERAL, LOG_ERR, "fix_end_times failed!");
-        else
-            LOG(VB_GENERAL, LOG_INFO,
-                QString("    %1 replacements made").arg(update_count));
-    }
+        MSqlQuery repl(MSqlQuery::InitCon());
+        repl.prepare("UPDATE program SET programid = :NEWID "
+                        "WHERE programid = :OLDID AND "
+                        "partnumber = :PARTNUM AND "
+                        "parttotal = :PARTTOTAL");
 
-    if (grab_data)
-    {
-        LOG(VB_GENERAL, LOG_INFO, "Marking generic episodes.");
-
-        MSqlQuery query(MSqlQuery::InitCon());
-        query.prepare("UPDATE program SET generic = 1 WHERE "
-            "((programid = '' AND subtitle = '' AND description = '') OR "
-            " (programid <> '' AND category_type = 'series' AND "
-            "  program.programid LIKE '%0000'));");
-
-        if (!query.exec())
-            MythDB::DBError("mark generic", query);
-        else
-            LOG(VB_GENERAL, LOG_INFO,
-                QString("    Found %1").arg(query.numRowsAffected()));
-    }
-
-    if (grab_data)
-    {
-        LOG(VB_GENERAL, LOG_INFO, "Extending non-unique programids "
-                                  "with multiple parts.");
-
-        int found = 0;
-        MSqlQuery sel(MSqlQuery::InitCon());
-        sel.prepare("SELECT DISTINCT programid, partnumber, parttotal "
-                    "FROM program WHERE partnumber > 0 AND parttotal > 0 AND "
-                    "programid LIKE '%0000'");
-        if (sel.exec())
+        while (sel.next())
         {
-            MSqlQuery repl(MSqlQuery::InitCon());
-            repl.prepare("UPDATE program SET programid = :NEWID "
-                         "WHERE programid = :OLDID AND "
-                         "partnumber = :PARTNUM AND "
-                         "parttotal = :PARTTOTAL");
+            QString orig_programid = sel.value(0).toString();
+            QString new_programid = orig_programid.left(10);
+            int     partnum, parttotal;
+            QString part;
 
-            while (sel.next())
+            partnum   = sel.value(1).toInt();
+            parttotal = sel.value(2).toInt();
+
+            part.setNum(parttotal);
+            new_programid.append(part.rightJustified(2, '0'));
+            part.setNum(partnum);
+            new_programid.append(part.rightJustified(2, '0'));
+
+            LOG(VB_GENERAL, LOG_INFO,
+                QString("    %1 -> %2 (part %3 of %4)")
+                    .arg(orig_programid).arg(new_programid)
+                    .arg(partnum).arg(parttotal));
+
+            repl.bindValue(":NEWID", new_programid);
+            repl.bindValue(":OLDID", orig_programid);
+            repl.bindValue(":PARTNUM",   partnum);
+            repl.bindValue(":PARTTOTAL", parttotal);
+            if (!repl.exec())
             {
-                QString orig_programid = sel.value(0).toString();
-                QString new_programid = orig_programid.left(10);
-                int     partnum, parttotal;
-                QString part;
-
-                partnum   = sel.value(1).toInt();
-                parttotal = sel.value(2).toInt();
-
-                part.setNum(parttotal);
-                new_programid.append(part.rightJustified(2, '0'));
-                part.setNum(partnum);
-                new_programid.append(part.rightJustified(2, '0'));
-
                 LOG(VB_GENERAL, LOG_INFO,
-                    QString("    %1 -> %2 (part %3 of %4)")
-                        .arg(orig_programid).arg(new_programid)
-                        .arg(partnum).arg(parttotal));
-
-                repl.bindValue(":NEWID", new_programid);
-                repl.bindValue(":OLDID", orig_programid);
-                repl.bindValue(":PARTNUM",   partnum);
-                repl.bindValue(":PARTTOTAL", parttotal);
-                if (!repl.exec())
-                {
-                    LOG(VB_GENERAL, LOG_INFO,
-                        QString("Fudging programid from '%1' to '%2'")
-                            .arg(orig_programid)
-                            .arg(new_programid));
-                }
-                else
-                    found += repl.numRowsAffected();
+                    QString("Fudging programid from '%1' to '%2'")
+                        .arg(orig_programid)
+                        .arg(new_programid));
             }
+            else
+                found += repl.numRowsAffected();
         }
-
-        LOG(VB_GENERAL, LOG_INFO, QString("    Found %1").arg(found));
     }
 
-    if (grab_data)
-    {
-        LOG(VB_GENERAL, LOG_INFO, "Fixing missing original airdates.");
-        MSqlQuery query(MSqlQuery::InitCon());
+    LOG(VB_GENERAL, LOG_INFO, QString("    Found %1").arg(found));
 
-        query.prepare("UPDATE program p "
-                      "JOIN ( "
-                      "  SELECT programid, MAX(originalairdate) maxoad "
-                      "  FROM program "
-                      "  WHERE programid <> '' AND "
-                      "        originalairdate IS NOT NULL "
-                      "  GROUP BY programid ) oad "
-                      "  ON p.programid = oad.programid "
-                      "SET p.originalairdate = oad.maxoad "
-                      "WHERE p.originalairdate IS NULL");
+    LOG(VB_GENERAL, LOG_INFO, "Fixing missing original airdates.");
+    query.prepare("UPDATE program p "
+                    "JOIN ( "
+                    "  SELECT programid, MAX(originalairdate) maxoad "
+                    "  FROM program "
+                    "  WHERE programid <> '' AND "
+                    "        originalairdate IS NOT NULL "
+                    "  GROUP BY programid ) oad "
+                    "  ON p.programid = oad.programid "
+                    "SET p.originalairdate = oad.maxoad "
+                    "WHERE p.originalairdate IS NULL");
 
-        if (query.exec())
-            LOG(VB_GENERAL, LOG_INFO,
-                QString("    Found %1 with programids")
-                .arg(query.numRowsAffected()));
+    if (query.exec())
+        LOG(VB_GENERAL, LOG_INFO,
+            QString("    Found %1 with programids")
+            .arg(query.numRowsAffected()));
 
-        query.prepare("UPDATE program p "
-                      "JOIN ( "
-                      "  SELECT title, subtitle, description, "
-                      "         MAX(originalairdate) maxoad "
-                      "  FROM program "
-                      "  WHERE programid = '' AND "
-                      "        originalairdate IS NOT NULL "
-                      "  GROUP BY title, subtitle, description ) oad "
-                      "  ON p.programid = '' AND "
-                      "     p.title = oad.title AND "
-                      "     p.subtitle = oad.subtitle AND "
-                      "     p.description = oad.description "
-                      "SET p.originalairdate = oad.maxoad "
-                      "WHERE p.originalairdate IS NULL");
+    query.prepare("UPDATE program p "
+                    "JOIN ( "
+                    "  SELECT title, subtitle, description, "
+                    "         MAX(originalairdate) maxoad "
+                    "  FROM program "
+                    "  WHERE programid = '' AND "
+                    "        originalairdate IS NOT NULL "
+                    "  GROUP BY title, subtitle, description ) oad "
+                    "  ON p.programid = '' AND "
+                    "     p.title = oad.title AND "
+                    "     p.subtitle = oad.subtitle AND "
+                    "     p.description = oad.description "
+                    "SET p.originalairdate = oad.maxoad "
+                    "WHERE p.originalairdate IS NULL");
 
-        if (query.exec())
-            LOG(VB_GENERAL, LOG_INFO,
-                QString("    Found %1 without programids")
-                .arg(query.numRowsAffected()));
-    }
+    if (query.exec())
+        LOG(VB_GENERAL, LOG_INFO,
+            QString("    Found %1 without programids")
+            .arg(query.numRowsAffected()));
 
     if (mark_repeats)
     {
@@ -613,78 +595,74 @@ int main(int argc, char *argv[])
     }
 
     // Mark first and last showings
+    MSqlQuery updt(MSqlQuery::InitCon());
+    updt.prepare("UPDATE program SET first = 0, last = 0;");
+    if (!updt.exec())
+        MythDB::DBError("Clearing first and last showings", updt);
 
-    if (grab_data)
-    {
-        MSqlQuery updt(MSqlQuery::InitCon());
-        updt.prepare("UPDATE program SET first = 0, last = 0;");
-        if (!updt.exec())
-            MythDB::DBError("Clearing first and last showings", updt);
+    LOG(VB_GENERAL, LOG_INFO, "Marking episode first showings.");
+    updt.prepare("UPDATE program "
+                    "JOIN (SELECT MIN(starttime) AS starttime, programid "
+                    "      FROM program "
+                    "      WHERE programid <> '' "
+                    "      GROUP BY programid "
+                    "     ) AS firsts "
+                    "ON program.programid = firsts.programid "
+                    "  AND program.starttime = firsts.starttime "
+                    "SET program.first=1;");
+    if (!updt.exec())
+        MythDB::DBError("Marking first showings by id", updt);
+    found = updt.numRowsAffected();
 
-        LOG(VB_GENERAL, LOG_INFO, "Marking episode first showings.");
-        updt.prepare("UPDATE program "
-                     "JOIN (SELECT MIN(starttime) AS starttime, programid "
-                     "      FROM program "
-                     "      WHERE programid <> '' "
-                     "      GROUP BY programid "
-                     "     ) AS firsts "
-                     "ON program.programid = firsts.programid "
-                     "  AND program.starttime = firsts.starttime "
-                     "SET program.first=1;");
-        if (!updt.exec())
-            MythDB::DBError("Marking first showings by id", updt);
-        int found = updt.numRowsAffected();
+    updt.prepare("UPDATE program "
+                    "JOIN (SELECT MIN(starttime) AS starttime, title, subtitle,"
+                    "           LEFT(description, 1024) AS partdesc "
+                    "      FROM program "
+                    "      WHERE programid = '' "
+                    "      GROUP BY title, subtitle, partdesc "
+                    "     ) AS firsts "
+                    "ON program.starttime = firsts.starttime "
+                    "  AND program.title = firsts.title "
+                    "  AND program.subtitle = firsts.subtitle "
+                    "  AND LEFT(program.description, 1024) = firsts.partdesc "
+                    "SET program.first = 1 "
+                    "WHERE program.programid = '';");
+    if (!updt.exec())
+        MythDB::DBError("Marking first showings", updt);
+    found += updt.numRowsAffected();
+    LOG(VB_GENERAL, LOG_INFO, QString("    Found %1").arg(found));
 
-        updt.prepare("UPDATE program "
-                      "JOIN (SELECT MIN(starttime) AS starttime, title, subtitle,"
-                      "           LEFT(description, 1024) AS partdesc "
-                      "      FROM program "
-                      "      WHERE programid = '' "
-                      "      GROUP BY title, subtitle, partdesc "
-                      "     ) AS firsts "
-                      "ON program.starttime = firsts.starttime "
-                      "  AND program.title = firsts.title "
-                      "  AND program.subtitle = firsts.subtitle "
-                      "  AND LEFT(program.description, 1024) = firsts.partdesc "
-                      "SET program.first = 1 "
-                      "WHERE program.programid = '';");
-        if (!updt.exec())
-            MythDB::DBError("Marking first showings", updt);
-        found += updt.numRowsAffected();
-        LOG(VB_GENERAL, LOG_INFO, QString("    Found %1").arg(found));
+    LOG(VB_GENERAL, LOG_INFO, "Marking episode last showings.");
+    updt.prepare("UPDATE program "
+                    "JOIN (SELECT MAX(starttime) AS starttime, programid "
+                    "      FROM program "
+                    "      WHERE programid <> '' "
+                    "      GROUP BY programid "
+                    "     ) AS lasts "
+                    "ON program.programid = lasts.programid "
+                    "  AND program.starttime = lasts.starttime "
+                    "SET program.last=1;");
+    if (!updt.exec())
+        MythDB::DBError("Marking last showings by id", updt);
+    found = updt.numRowsAffected();
 
-        LOG(VB_GENERAL, LOG_INFO, "Marking episode last showings.");
-        updt.prepare("UPDATE program "
-                     "JOIN (SELECT MAX(starttime) AS starttime, programid "
-                     "      FROM program "
-                     "      WHERE programid <> '' "
-                     "      GROUP BY programid "
-                     "     ) AS lasts "
-                     "ON program.programid = lasts.programid "
-                     "  AND program.starttime = lasts.starttime "
-                     "SET program.last=1;");
-        if (!updt.exec())
-            MythDB::DBError("Marking last showings by id", updt);
-        found = updt.numRowsAffected();
-
-        updt.prepare("UPDATE program "
-                      "JOIN (SELECT MAX(starttime) AS starttime, title, subtitle,"
-                      "           LEFT(description, 1024) AS partdesc "
-                      "      FROM program "
-                      "      WHERE programid = '' "
-                      "      GROUP BY title, subtitle, partdesc "
-                      "     ) AS lasts "
-                      "ON program.starttime = lasts.starttime "
-                      "  AND program.title = lasts.title "
-                      "  AND program.subtitle = lasts.subtitle "
-                      "  AND LEFT(program.description, 1024) = lasts.partdesc "
-                      "SET program.last = 1 "
-                      "WHERE program.programid = '';");
-        if (!updt.exec())
-            MythDB::DBError("Marking last showings", updt);
-        found += updt.numRowsAffected();
-        LOG(VB_GENERAL, LOG_INFO, QString("    Found %1").arg(found));
-    }
+    updt.prepare("UPDATE program "
+                    "JOIN (SELECT MAX(starttime) AS starttime, title, subtitle,"
+                    "           LEFT(description, 1024) AS partdesc "
+                    "      FROM program "
+                    "      WHERE programid = '' "
+                    "      GROUP BY title, subtitle, partdesc "
+                    "     ) AS lasts "
+                    "ON program.starttime = lasts.starttime "
+                    "  AND program.title = lasts.title "
+                    "  AND program.subtitle = lasts.subtitle "
+                    "  AND LEFT(program.description, 1024) = lasts.partdesc "
+                    "SET program.last = 1 "
+                    "WHERE program.programid = '';");
+    if (!updt.exec())
+        MythDB::DBError("Marking last showings", updt);
+    found += updt.numRowsAffected();
+    LOG(VB_GENERAL, LOG_INFO, QString("    Found %1").arg(found));
 
     if (1) // limit MSqlQuery's lifetime
     {
@@ -713,7 +691,7 @@ int main(int argc, char *argv[])
             "| the master backend is restarted.                            |\n"
             "===============================================================");
 
-    if (grab_data || mark_repeats)
+    if (mark_repeats)
         ScheduledRecording::RescheduleMatch(0, 0, 0, QDateTime(),
                                             "MythFillDatabase");
 
