@@ -29,10 +29,6 @@
  *
  */
 
-QMutex     EITScanner::resched_lock;
-QDateTime  EITScanner::resched_next_time      = MythDate::current();
-const uint EITScanner::kMinRescheduleInterval = 150;
-
 EITScanner::EITScanner(uint _cardnum)
     : channel(NULL),              eitSource(NULL),
       eitHelper(new EITHelper()), eventThread(new MThread("EIT", this)),
@@ -107,9 +103,10 @@ void EITScanner::run(void)
             t.start();
         }
 
-        // If there have been any new events and we haven't
-        // seen any in a while, tell scheduler to run.
-        // But only for passive scan which can sit hours on the same channel.
+        // Tell the scheduler to run if
+        // we are in passive scan
+        // and there have been updated events since the last scheduler run
+        // but not in the last 60 seconds
         if (!activeScan && eitCount && (t.elapsed() > 60 * 1000))
         {
             LOG(VB_EIT, LOG_INFO,
@@ -183,23 +180,9 @@ void EITScanner::run(void)
  *  This implements some very basic rate limiting. If a call is made
  *  to this within kMinRescheduleInterval of the last call it is ignored.
  */
-const void EITScanner::RescheduleRecordings(void)
+void EITScanner::RescheduleRecordings(void)
 {
-    if (!resched_lock.tryLock())
-        return;
-
-    if (resched_next_time > MythDate::current())
-    {
-        LOG(VB_EIT, LOG_INFO, LOC + "Rate limiting reschedules..");
-        resched_lock.unlock();
-        return;
-    }
-
-    resched_next_time =
-        MythDate::current().addSecs(kMinRescheduleInterval);
-    resched_lock.unlock();
-
-    ScheduledRecording::RescheduleMatch(0, eitHelper->GetSourceID(), 0, QDateTime(), "EITScanner");
+    eitHelper->RescheduleRecordings();
 }
 
 /** \fn EITScanner::StartPassiveScan(ChannelBase*, EITSource*, bool)
@@ -211,7 +194,6 @@ void EITScanner::StartPassiveScan(ChannelBase *_channel,
 {
     QMutexLocker locker(&lock);
 
-    //uint sourceid = _channel->GetCurrentSourceID(); // FIXME why is this 0?
     eitSource     = _eitSource;
     channel       = _channel;
 
@@ -238,6 +220,7 @@ void EITScanner::StopPassiveScan(void)
     channel = NULL;
 
     eitHelper->WriteEITCache();
+    eitHelper->SetChannelID(0);
     eitHelper->SetSourceID(0);
 }
 
