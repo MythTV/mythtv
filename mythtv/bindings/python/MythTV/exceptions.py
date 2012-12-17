@@ -176,3 +176,35 @@ class MythFileError( MythError ):
                     (self.file, self.offset, self.whence),)
         MythError.__init__(self, *args)
 
+class MythTZError( MythError ):
+    """
+    MythTZError('Generic Error Message')
+    MythTZError(TZ_ERROR)
+    MythTZError(TZ_INVALID_FILE)
+    MythTZError(TZ_INVALID_TRANSITION, given, max)
+    MythTZError(TZ_CONVERSION_ERROR, name, datetime)
+
+    Error string will be available as obj.args[0].  Additional attributes
+        may be available depending on the error code.
+    """
+    def __init__(self, *args):
+        if args[0] == self.TZ_ERROR:
+            self.ename = 'TZ_ERROR'
+            self.ecode, self.reason = args
+            self.args = ("Error processing time zone: {0}".format(self.reason))
+        elif args[0] == self.TZ_INVALID_FILE:
+            self.ename = 'TZ_INVALID_FILE'
+            self.ecode, = args
+            self.args = ("ZoneInfo file does not have proper magic string.",)
+        elif args[0] == self.TZ_INVALID_TRANSITION:
+            self.ename = 'TZ_INVALID_TRANSITION'
+            self.ecode, self.given, self.max = args
+            self.args = (("Transition has out-of-bounds definition index "
+                          "(given: {0.given}, max: {0.max})").format(self),)
+        elif args[0] == self.TZ_CONVERSION_ERROR:
+            self.ename = 'TZ_CONVERSION_ERROR'
+            self.ecode, self.tzname, self.datetime = args
+            self.args = (("Timezone ({0.tzname}) does not have sufficiently "
+                          "old data for search: {0.datetime}").format(self),)
+        MythError.__init__(self, *args)
+

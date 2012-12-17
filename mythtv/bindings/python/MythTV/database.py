@@ -9,7 +9,7 @@ from MythTV.altdict import OrdDict, DictData
 from MythTV.logging import MythLog
 from MythTV.msearch import MSearch
 from MythTV.utility import datetime, _donothing, QuickProperty
-from MythTV.exceptions import MythError, MythDBError
+from MythTV.exceptions import MythError, MythDBError, MythTZError
 from MythTV.connections import DBConnection, LoggedCursor, XMLConnection
 
 from socket import gethostname
@@ -184,7 +184,13 @@ class DBData( DictData, MythSchema ):
         for key, val in self._field_order.items():
             if (val.type in ('datetime','timestamp')) \
                     and (data[key] is not None):
-                data[key] = datetime.fromnaiveutc(data[key])
+                try:
+                    # try converting to local time
+                    data[key] = datetime.fromnaiveutc(data[key])
+                except MythTZError:
+                    # just store as UTC
+                    data[key] = datetime.fromDatetime(dt,
+                                                tzinfo=datetime.UTCTZ())
         return data
 
     def _pull(self):

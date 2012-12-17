@@ -214,26 +214,30 @@ class LOGFACILITY( object ):
     LOCAL7      = 17
 
 class ERRCODES( object ):
-    GENERIC             = 0
-    SYSTEM              = 1
-    SOCKET              = 2
-    DB_RAW              = 50
-    DB_CONNECTION       = 51
-    DB_CREDENTIALS      = 52
-    DB_SETTING          = 53
-    DB_SCHEMAMISMATCH   = 54
-    DB_SCHEMAUPDATE     = 55
-    DB_RESTRICT         = 56
-    PROTO_CONNECTION    = 100
-    PROTO_ANNOUNCE      = 101
-    PROTO_MISMATCH      = 102
-    PROTO_PROGRAMINFO   = 103
-    FE_CONNECTION       = 150
-    FE_ANNOUNCE         = 151
-    FILE_ERROR          = 200
-    FILE_FAILED_READ    = 201
-    FILE_FAILED_WRITE   = 202
-    FILE_FAILED_SEEK    = 203
+    GENERIC                 = 0
+    SYSTEM                  = 1
+    SOCKET                  = 2
+    DB_RAW                  = 50
+    DB_CONNECTION           = 51
+    DB_CREDENTIALS          = 52
+    DB_SETTING              = 53
+    DB_SCHEMAMISMATCH       = 54
+    DB_SCHEMAUPDATE         = 55
+    DB_RESTRICT             = 56
+    PROTO_CONNECTION        = 100
+    PROTO_ANNOUNCE          = 101
+    PROTO_MISMATCH          = 102
+    PROTO_PROGRAMINFO       = 103
+    FE_CONNECTION           = 150
+    FE_ANNOUNCE             = 151
+    FILE_ERROR              = 200
+    FILE_FAILED_READ        = 201
+    FILE_FAILED_WRITE       = 202
+    FILE_FAILED_SEEK        = 203
+    TZ_ERROR                = 200
+    TZ_INVALID_FILE         = 201
+    TZ_INVALID_TRANSITION   = 202
+    TZ_CONVERSION_ERROR     = 203
 
 class MythSchema( object ):
     _schema_value = 'DBSchemaVer'
