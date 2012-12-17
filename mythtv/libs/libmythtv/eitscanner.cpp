@@ -109,7 +109,8 @@ void EITScanner::run(void)
 
         // If there have been any new events and we haven't
         // seen any in a while, tell scheduler to run.
-        if (eitCount && (t.elapsed() > 60 * 1000))
+        // But only for passive scan which can sit hours on the same channel.
+        if (!activeScan && eitCount && (t.elapsed() > 60 * 1000))
         {
             LOG(VB_EIT, LOG_INFO,
                 LOC_ID + QString("Added %1 EIT Events").arg(eitCount));
@@ -117,6 +118,7 @@ void EITScanner::run(void)
             RescheduleRecordings();
         }
 
+        // Is it time to move to the next transport in active scan?
         if (activeScan && (MythDate::current() > activeScanNextTrig))
         {
             // if there have been any new events, tell scheduler to run.
@@ -163,6 +165,13 @@ void EITScanner::run(void)
             activeScanCond.wakeAll();
         }
     }
+
+    if (eitCount) /* some events have been handled since the last schedule request */
+    {
+        eitCount = 0;
+        RescheduleRecordings();
+    }
+
     activeScanStopped = true;
     activeScanCond.wakeAll();
     lock.unlock();
@@ -174,7 +183,7 @@ void EITScanner::run(void)
  *  This implements some very basic rate limiting. If a call is made
  *  to this within kMinRescheduleInterval of the last call it is ignored.
  */
-void EITScanner::RescheduleRecordings(void)
+const void EITScanner::RescheduleRecordings(void)
 {
     if (!resched_lock.tryLock())
         return;
@@ -190,7 +199,7 @@ void EITScanner::RescheduleRecordings(void)
         MythDate::current().addSecs(kMinRescheduleInterval);
     resched_lock.unlock();
 
-    ScheduledRecording::RescheduleMatch(0, 0, 0, QDateTime(), "EITScanner");
+    ScheduledRecording::RescheduleMatch(0, eitHelper->GetSourceID(), 0, QDateTime(), "EITScanner");
 }
 
 /** \fn EITScanner::StartPassiveScan(ChannelBase*, EITSource*, bool)
@@ -202,14 +211,14 @@ void EITScanner::StartPassiveScan(ChannelBase *_channel,
 {
     QMutexLocker locker(&lock);
 
-    uint sourceid = _channel->GetCurrentSourceID();
+    //uint sourceid = _channel->GetCurrentSourceID(); // FIXME why is this 0?
     eitSource     = _eitSource;
     channel       = _channel;
 
-    eitHelper->SetSourceID(sourceid);
     eitSource->SetEITHelper(eitHelper);
     eitSource->SetEITRate(1.0f);
-    eitHelper->SetChannelID(_channel->GetChanID());
+    eitHelper->SetChannelID(channel->GetChanID());
+    eitHelper->SetSourceID(ChannelUtil::GetSourceIDForChannel(channel->GetChanID()));
 
     LOG(VB_EIT, LOG_INFO, LOC_ID + "Started passive scan.");
 }

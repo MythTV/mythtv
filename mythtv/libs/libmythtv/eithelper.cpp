@@ -135,6 +135,12 @@ void EITHelper::SetSourceID(uint _sourceid)
     sourceid = _sourceid;
 }
 
+uint EITHelper::GetSourceID(void)
+{
+    QMutexLocker locker(&eitList_lock);
+    return sourceid;
+}
+
 void EITHelper::SetChannelID(uint _channelid)
 {
     QMutexLocker locker(&eitList_lock);

@@ -71,6 +71,7 @@ class EITHelper
     void SetFixup(uint atsc_major, uint atsc_minor, uint eitfixup);
     void SetLanguagePreferences(const QStringList &langPref);
     void SetSourceID(uint _sourceid);
+    uint GetSourceID(void);
 
 #ifdef USING_BACKEND
     void AddEIT(uint atsc_major, uint atsc_minor,
