@@ -4219,7 +4219,7 @@ void TVRec::TuningRestartRecorder(void)
     // Some recorders unpause on Reset, others do not...
     recorder->Unpause();
 
-    if (pseudoLiveTVRecording)
+    if (pseudoLiveTVRecording && curRecording)
     {
         ProgramInfo *rcinfo1 = pseudoLiveTVRecording;
         QString msg1 = QString("Recording: %1 %2 %3 %4")
