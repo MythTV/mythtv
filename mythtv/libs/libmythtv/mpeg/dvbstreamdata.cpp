@@ -522,7 +522,7 @@ bool DVBStreamData::GetEITPIDChanges(const uint_vec_t &cur_pids,
         }
 
         if (find(cur_pids.begin(), cur_pids.end(),
-                 (uint) FREESAT_EIT_PID) == cur_pids.end())
+                 (uint) FREESAT_EIT_PID) != cur_pids.end())
         {
             del_pids.push_back(FREESAT_EIT_PID);
         }
