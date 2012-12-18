@@ -203,7 +203,7 @@ bool MythCDROMLinux::hasWritableMedia()
     if (ioctl(m_DeviceHandle, CDROM_SEND_PACKET, &cgc) < 0)
     {
         LOG(VB_MEDIA, LOG_ERR, LOC +
-            ":hasWritableMedia() - failed to send packet to " + m_DevicePath);
+            ":hasWritableMedia() - failed to send packet to " + m_DevicePath + ENO);
         return false;
     }
 
@@ -262,7 +262,7 @@ int MythCDROMLinux::SCSIstatus()
         || (es->notification_class != 0x4))  // notification class mismatch
     {
         LOG(VB_MEDIA, LOG_ERR, LOC +
-            ":SCSIstatus() - failed to send SCSI packet to " + m_DevicePath);
+            ":SCSIstatus() - failed to send SCSI packet to " + m_DevicePath + ENO);
         return CDS_TRAY_OPEN;
     }
 
@@ -300,7 +300,10 @@ MythMediaError MythCDROMLinux::eject(bool open_close)
     else
     {
         // If the tray is empty, this will fail (Input/Output error)
-        ioctl(m_DeviceHandle, CDROMCLOSETRAY);
+        int res = ioctl(m_DeviceHandle, CDROMCLOSETRAY);
+
+        if (res < 0)
+            LOG(VB_MEDIA, LOG_DEBUG, "CDROMCLOSETRAY ioctl failed" + ENO);
 
         // This allows us to catch any drives that the OS has problems
         // detecting the status of (some always report OPEN when empty)
@@ -616,7 +619,12 @@ MythMediaError MythCDROMLinux::lock()
 {
     MythMediaError ret = MythMediaDevice::lock();
     if (ret == MEDIAERR_OK)
-        ioctl(m_DeviceHandle, CDROM_LOCKDOOR, 1);
+    {
+        int res = ioctl(m_DeviceHandle, CDROM_LOCKDOOR, 1);
+
+        if (res < 0)
+            LOG(VB_MEDIA, LOG_WARNING, "lock() - CDROM_LOCKDOOR ioctl failed" + ENO);
+    }
 
     return ret;
 }
@@ -626,7 +634,10 @@ MythMediaError MythCDROMLinux::unlock()
     if (isDeviceOpen() || openDevice())
     {
         LOG(VB_MEDIA, LOG_DEBUG, LOC + ":unlock - Unlocking CDROM door");
-        ioctl(m_DeviceHandle, CDROM_LOCKDOOR, 0);
+        int res = ioctl(m_DeviceHandle, CDROM_LOCKDOOR, 0);
+
+        if (res < 0)
+            LOG(VB_MEDIA, LOG_WARNING, "unlock() - CDROM_LOCKDOOR ioctl failed" + ENO);
     }
     else
     {
@@ -763,7 +774,7 @@ void MythCDROMLinux::setDeviceSpeed(const char *device, int speed)
 
     if (ioctl(fd, SG_IO, &sghdr) < 0)
     {
-        LOG(VB_MEDIA, LOG_ERR, LOC + " Limit CD/DVD Speed Failed");
+        LOG(VB_MEDIA, LOG_ERR, LOC + " Limit CD/DVD Speed Failed" + ENO);
     }
     else
     {
@@ -772,7 +783,7 @@ void MythCDROMLinux::setDeviceSpeed(const char *device, int speed)
         if (ioctl(fd, CDROM_SELECT_SPEED, speed) < 0)
         {
             LOG(VB_MEDIA, LOG_ERR, LOC + 
-                " Limit CD/DVD CDROM_SELECT_SPEED Failed");
+                " Limit CD/DVD CDROM_SELECT_SPEED Failed" + ENO);
         }
         LOG(VB_MEDIA, LOG_INFO, LOC +
             ":setDeviceSpeed() - CD/DVD Speed Set Successful");
