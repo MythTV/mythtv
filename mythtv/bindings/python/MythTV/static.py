@@ -234,10 +234,10 @@ class ERRCODES( object ):
     FILE_FAILED_READ        = 201
     FILE_FAILED_WRITE       = 202
     FILE_FAILED_SEEK        = 203
-    TZ_ERROR                = 200
-    TZ_INVALID_FILE         = 201
-    TZ_INVALID_TRANSITION   = 202
-    TZ_CONVERSION_ERROR     = 203
+    TZ_ERROR                = 250
+    TZ_INVALID_FILE         = 251
+    TZ_INVALID_TRANSITION   = 252
+    TZ_CONVERSION_ERROR     = 253
 
 class MythSchema( object ):
     _schema_value = 'DBSchemaVer'
