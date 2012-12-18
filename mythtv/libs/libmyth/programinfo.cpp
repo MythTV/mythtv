@@ -1641,7 +1641,7 @@ void ProgramInfo::ToMap(InfoMap &progMap,
     QString star_str = (stars != 0.0f) ?
         QObject::tr("%n star(s)", "", GetStars(star_range)) : "";
     progMap["stars"] = star_str;
-    progMap["numstars"] = QString().number(GetStars(star_range));
+    progMap["numstars"] = QString::number(GetStars(star_range));
 
     if (stars != 0.0f && year)
         progMap["yearstars"] = QString("(%1, %2)").arg(year).arg(star_str);
