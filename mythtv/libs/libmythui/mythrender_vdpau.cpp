@@ -196,7 +196,7 @@ class VDPAUVideoSurface : public VDPAUResource
 class VDPAUBitmapSurface : public VDPAUResource
 {
   public:
-    VDPAUBitmapSurface() {} : m_fmt(0) {}
+    VDPAUBitmapSurface() : m_fmt(0) {}
     VDPAUBitmapSurface(uint id, QSize size, VdpRGBAFormat fmt)
       : VDPAUResource(id, size), m_fmt(fmt) { }
 
