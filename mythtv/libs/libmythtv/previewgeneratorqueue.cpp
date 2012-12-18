@@ -470,6 +470,9 @@ void PreviewGeneratorQueue::UpdatePreviewGeneratorThreads(void)
 void PreviewGeneratorQueue::SetPreviewGenerator(
     const QString &key, PreviewGenerator *g)
 {
+    if (!g)
+        return;
+
     {
         QMutexLocker locker(&m_lock);
         m_tokenToKeyMap[g->GetToken()] = key;
@@ -481,9 +484,10 @@ void PreviewGeneratorQueue::SetPreviewGenerator(
                 if (!g->GetToken().isEmpty())
                     state.tokens.insert(g->GetToken());
                 g->deleteLater();
+                g = NULL;
             }
         }
-        else if (g)
+        else
         {
             g->AttachSignals(this);
             state.gen = g;
