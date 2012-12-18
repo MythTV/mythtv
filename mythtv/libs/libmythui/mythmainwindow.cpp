@@ -2210,12 +2210,6 @@ void MythMainWindow::customEvent(QEvent *ce)
             int k = (keycode & ~Qt::MODIFIER_MASK); /* trim off the mod */
             QString text;
 
-            if (k & Qt::UNICODE_ACCEL)
-            {
-                QChar c(k & ~Qt::UNICODE_ACCEL);
-                text = QString(c);
-            }
-
             QKeyEvent key(jke->isKeyDown() ? QEvent::KeyPress :
                           QEvent::KeyRelease, k, mod, text);
 
