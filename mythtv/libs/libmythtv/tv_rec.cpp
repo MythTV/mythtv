@@ -4476,7 +4476,8 @@ bool TVRec::CreateLiveTVRingBuffer(const QString & channum)
     QString        inputName;
     int            inputID = -1;
 
-    if (!channel->CheckChannel(channum, inputName))
+    if (!channel ||
+        !channel->CheckChannel(channum, inputName))
     {
         ChangeState(kState_None);
         return false;
@@ -4535,7 +4536,8 @@ bool TVRec::SwitchLiveTVRingBuffer(const QString & channum,
     QString        inputName;
     int            inputID = -1;
 
-    if (!channel->CheckChannel(channum, inputName))
+    if (!channel ||
+        !channel->CheckChannel(channum, inputName))
     {
         ChangeState(kState_None);
         return false;
