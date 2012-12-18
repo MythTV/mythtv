@@ -642,7 +642,7 @@ void MythUIType::AdjustMinArea(int delta_x, int delta_y,
     if (bounded.x() + bounded.width() > m_Area.x() + m_Area.width())
         bounded.moveRight(m_Area.x() + m_Area.width());
     if (bounded.y() + bounded.height() > m_Area.y() + m_Area.height())
-        bounded.moveBottom(m_Area.x() + m_Area.height());
+        bounded.moveBottom(m_Area.y() + m_Area.height());
     if (bounded.x() < m_Area.x())
     {
         bounded.moveLeft(m_Area.x());
