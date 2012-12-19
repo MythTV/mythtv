@@ -78,18 +78,20 @@ void ChannelScannerCLI::HandleEvent(const ScannerEvent *scanEvent)
         status_last_log = scanEvent->strValue();
     else if (scanEvent->type() == ScannerEvent::SetStatusText)
         status_text = scanEvent->strValue();
-    else if (scanEvent->type() == ScannerEvent::SetStatusTitleText)
-        ;
     else if (scanEvent->type() == ScannerEvent::SetPercentComplete)
         status_complete = scanEvent->intValue();
-    else if (scanEvent->type() == ScannerEvent::SetStatusRotorPosition)
-        ;
     else if (scanEvent->type() == ScannerEvent::SetStatusSignalLock)
         status_lock = scanEvent->intValue();
     else if (scanEvent->type() == ScannerEvent::SetStatusSignalToNoise)
         status_snr = scanEvent->intValue() / 65535.0;
+#if THESE_ARE_CURRENTLY_IGNORED
+    else if (scanEvent->type() == ScannerEvent::SetStatusTitleText)
+        ;
+    else if (scanEvent->type() == ScannerEvent::SetStatusRotorPosition)
+        ;
     else if (scanEvent->type() == ScannerEvent::SetStatusSignalStrength)
         ;
+#endif
 
     //cout<<"HERE<"<<verboseMask<<">"<<endl;
     QString msg;
