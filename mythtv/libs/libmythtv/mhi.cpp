@@ -818,8 +818,12 @@ int MHIContext::GetChannelIndex(const QString &str)
         nResult = m_currentStream > 0 ? m_currentStream : m_currentChannel;
     else if (str == "rec://svc/def")
         nResult = m_currentChannel;
-    else if (str.startsWith("rec://"))
-        ;
+    else
+    {
+        LOG(VB_GENERAL, LOG_WARNING,
+            QString("[mhi] GetChannelIndex -- Unrecognized URL %1")
+            .arg(str));
+    }
 
   get_channel_index_end:
     LOG(VB_MHEG, LOG_INFO, QString("[mhi] GetChannelIndex %1 => %2")
