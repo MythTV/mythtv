@@ -52,6 +52,8 @@ BDRingBuffer::BDRingBuffer(const QString &lfilename)
 
 BDRingBuffer::~BDRingBuffer()
 {
+    KillReadAheadThread();
+
     close();
 }
 

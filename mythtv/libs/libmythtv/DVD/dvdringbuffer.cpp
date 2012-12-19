@@ -130,6 +130,8 @@ DVDRingBuffer::DVDRingBuffer(const QString &lfilename) :
 
 DVDRingBuffer::~DVDRingBuffer()
 {
+    KillReadAheadThread();
+
     CloseDVD();
     m_menuBtnLock.lock();
     ClearMenuSPUParameters();

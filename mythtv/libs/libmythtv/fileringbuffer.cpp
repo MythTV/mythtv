@@ -86,27 +86,19 @@ FileRingBuffer::FileRingBuffer(const QString &lfilename,
 
 FileRingBuffer::~FileRingBuffer()
 {
-    rwlock.lockForWrite();
+    KillReadAheadThread();
 
-    if (remotefile)
-    {
-        delete remotefile;
-        remotefile = NULL;
-    }
+    delete remotefile;
+    remotefile = NULL;
 
-    if (tfw)
-    {
-        delete tfw;
-        tfw = NULL;
-    }
+    delete tfw;
+    tfw = NULL;
 
     if (fd2 >= 0)
     {
         close(fd2);
         fd2 = -1;
     }
-
-    rwlock.unlock();
 }
 
 /** \fn check_permissions(const QString&)

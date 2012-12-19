@@ -1546,6 +1546,8 @@ HLSRingBuffer::HLSRingBuffer(const QString &lfilename, bool open) :
 
 HLSRingBuffer::~HLSRingBuffer()
 {
+    KillReadAheadThread();
+
     QWriteLocker lock(&rwlock);
 
     m_killed = true;

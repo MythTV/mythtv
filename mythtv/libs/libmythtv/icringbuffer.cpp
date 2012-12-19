@@ -13,7 +13,7 @@
 
 
 ICRingBuffer::ICRingBuffer(const QString &url, RingBuffer *parent)
-  : RingBuffer(kRingBufferType), m_stream(0), m_parent(parent)
+  : RingBuffer(kRingBufferType), m_stream(NULL), m_parent(parent)
 {
     startreadahead = true;
     OpenFile(url);
@@ -21,8 +21,13 @@ ICRingBuffer::ICRingBuffer(const QString &url, RingBuffer *parent)
 
 ICRingBuffer::~ICRingBuffer()
 {
+    KillReadAheadThread();
+
     delete m_stream;
+    m_stream = NULL;
+
     delete m_parent;
+    m_parent = NULL;
 }
 
 bool ICRingBuffer::IsOpen(void) const

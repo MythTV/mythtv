@@ -16,6 +16,8 @@ StreamingRingBuffer::StreamingRingBuffer(const QString &lfilename)
 
 StreamingRingBuffer::~StreamingRingBuffer()
 {
+    KillReadAheadThread();
+
     rwlock.lockForWrite();
     if (m_context)
         ffurl_close(m_context);

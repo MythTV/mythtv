@@ -218,20 +218,23 @@ RingBuffer::RingBuffer(RingBufferType rbtype) :
     }
 }
 
-/** \fn RingBuffer::~RingBuffer(void)
- *  \brief Shuts down any threads and closes any files.
+#undef NDEBUG
+#include <cassert>
+
+/** \brief Deletes 
+ *  \Note Classes inheriting from RingBuffer must implement
+ *        a destructor that calls KillReadAheadThread().
+ *        We can not do that here because this would leave
+ *        pure virtual functions without implementations
+ *        during destruction.
  */
 RingBuffer::~RingBuffer(void)
 {
-    KillReadAheadThread();
+    assert(!isRunning());
+    wait();
 
-    rwlock.lockForWrite();
-
-    if (readAheadBuffer) // this only runs if thread is terminated
-    {
-        delete [] readAheadBuffer;
-        readAheadBuffer = NULL;
-    }
+    delete [] readAheadBuffer;
+    readAheadBuffer = NULL;
 
     if (tfw)
     {
@@ -239,10 +242,6 @@ RingBuffer::~RingBuffer(void)
         delete tfw;
         tfw = NULL;
     }
-
-    rwlock.unlock();
-
-    wait();
 }
 
 /** \fn RingBuffer::Reset(bool, bool, bool)
