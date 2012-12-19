@@ -1345,6 +1345,7 @@ void PlaybackBox::UpdateUIGroupList(const QStringList &groupPreferences)
                         .arg(m_groupDisplayName);
             }
 
+            item->SetText(groupname, "groupname");
             item->SetText(displayName, "name");
             item->SetText(displayName);
 
