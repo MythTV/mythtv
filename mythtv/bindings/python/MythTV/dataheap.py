@@ -104,7 +104,7 @@ class Artwork( MutableString ):
         be.downloadTo(url, self.imagetype, self)
 
     def open(self, mode='r'):
-        return ftopen('myth://{0.imagetype}@{0.hostname}/{0}'.format(self), mode)
+        return ftopen((self.hostname, self.imagetype, str(self)), mode)
 
 class Record( CMPRecord, DBDataWrite, RECTYPE ):
     """
@@ -332,11 +332,9 @@ class Recorded( CMPRecord, DBDataWrite ):
 
     def open(self, type='r'):
         """Recorded.open(type='r') -> file or FileTransfer object"""
-        return ftopen("myth://%s@%s/%s" % ( self.storagegroup,
-                                            self.hostname,
-                                            self.basename),
-                      type, db=self._db,
-                      chanid=self.chanid, starttime=self.starttime)
+        return ftopen((self.hostname, self.storagegroup, self.basename),
+                      type, db=self._db, chanid=self.chanid,
+                      starttime=self.starttime)
 
     def getProgram(self):
         """Recorded.getProgram() -> Program object"""
@@ -930,7 +928,7 @@ class Video( CMPVideo, VideoSchema, DBDataWrite ):
     trailer              = Artwork('trailer')
 
     def open(self, mode='r', nooverwrite=False):
-        return ftopen('myth://Videos@{0.host}/{0.filename}'.format(self),
+        return ftopen((self.host, 'Videos', self.filename),
                     mode, False, nooverwrite, self._db)
 
     def getHash(self):
