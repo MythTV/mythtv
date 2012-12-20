@@ -201,7 +201,11 @@ ServiceHost::ServiceHost(const QMetaObject &metaObject,
         if ((method.methodType() == QMetaMethod::Slot   ) &&
             (method.access()     == QMetaMethod::Public ))
         {
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
             QString sName( method.signature() );
+#else
+            QString sName( method.methodSignature() );      
+#endif
 
             // ------------------------------------------------------
             // Ignore the following methods...
