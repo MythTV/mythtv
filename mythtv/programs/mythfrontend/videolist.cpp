@@ -1,8 +1,8 @@
-#include <memory> // for std::auto_ptr
 #include <algorithm>
 #include <iterator>
 #include <map>
 
+#include <QScopedPointer>
 #include <QFileInfo>
 #include <QList>
 
@@ -430,7 +430,7 @@ class VideoListImp
 
     MythGenericTree *GetTreeRoot()
     {
-        return video_tree_root.get();
+        return video_tree_root.data();
     }
 
     void InvalidateCache() {
@@ -460,7 +460,7 @@ class VideoListImp
     bool m_ListUnknown;
     bool m_LoadMetaData;
 
-    std::auto_ptr<MythGenericTree> video_tree_root;
+    QScopedPointer <MythGenericTree> video_tree_root;
 
     VideoMetadataListManager m_metadata;
     meta_dir_node m_metadata_tree; // master list for tree views
@@ -645,18 +645,18 @@ MythGenericTree *VideoListImp::buildVideoList(bool filebrowser, bool flatlist,
     video_tree_root.reset(new MythGenericTree(QObject::tr("Video Home"),
                     kRootNode, false));
 
-    build_generic_tree(video_tree_root.get(), &m_metadata_view_tree,
+    build_generic_tree(video_tree_root.data(), &m_metadata_view_tree,
                        include_updirs);
 
     if (m_metadata_view_flat.empty())
     {
         video_tree_root.reset(new MythGenericTree(QObject::tr("Video Home"),
                         kRootNode, false));
-        video_tree_root.get()->addNode(QObject::tr("No files found"),
+        video_tree_root.data()->addNode(QObject::tr("No files found"),
                         kNoFilesFound, false);
     }
 
-    return video_tree_root.get();
+    return video_tree_root.data();
 }
 
 bool VideoListImp::refreshNode(MythGenericTree *node)
