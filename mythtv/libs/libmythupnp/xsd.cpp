@@ -94,7 +94,11 @@ bool Xsd::GetXSD( HTTPRequest *pRequest, QString sTypeName )
     }
     else
     {
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
         QObject *pClass = (QObject *)QMetaType::construct( id );
+#else
+        QObject *pClass = (QObject *)QMetaType::create( id );
+#endif
 
         if (pClass != NULL)
             bHandled = RenderXSD( pRequest, pClass );
