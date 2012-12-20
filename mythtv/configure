@@ -2957,6 +2957,7 @@ tmpfile TMPS  .S
 tmpfile TMPSH .sh
 tmpfile TMPV  .ver
 tmpfile TMPMAK .mak
+tmpfile TMPPRO .pro
 
 unset -f mktemp
 
@@ -6149,7 +6150,9 @@ if [ ! -e config.h ] ; then
   ${ln_s} $MYTH_CONFIG_H config.h
 fi
 
-cp_if_changed $TMPMAK $MYTH_CONFIG_MAK
+cat $TMPMAK | sed -e 's/^!/#/' > $TMPPRO
+
+cp_if_changed $TMPPRO $MYTH_CONFIG_MAK
 
 if ! test -L config.mak ; then
   ${ln_s} $MYTH_CONFIG_MAK config.mak
