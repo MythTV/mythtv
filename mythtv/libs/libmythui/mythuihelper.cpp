@@ -632,7 +632,8 @@ MythImage *MythUIHelper::CacheImage(const QString &url, MythImage *im,
 
     LOG(VB_GUI | VB_FILE, LOG_INFO, LOC +
         QString("MythUIHelper::CacheImage : Cache Count = :%1: size :%2:")
-        .arg(d->imageCache.count()).arg(d->m_cacheSize));
+        .arg(d->imageCache.count())
+        .arg(d->m_cacheSize.fetchAndAddRelaxed(0)));
 
     return d->imageCache[url];
 }
