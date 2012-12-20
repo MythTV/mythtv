@@ -9,6 +9,9 @@ DEFINES += MYTH_API
 
 
 QT += network xml sql script
+contains(QT_VERSION, ^5\\.[0-9]\\..*) {
+QT += widgets
+}
 
 QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 
@@ -142,7 +145,11 @@ using_pulse {
 unix:!cygwin {
     SOURCES += mediamonitor-unix.cpp
     HEADERS += mediamonitor-unix.h
-    using_qtdbus: CONFIG += qdbus
+    contains(QT_VERSION, ^5\\.[0-9]\\..*) {
+        using_qtdbus: QT += dbus
+    } else {
+        using_qtdbus: CONFIG += qdbus
+    }
 }
 
 linux:DEFINES += linux

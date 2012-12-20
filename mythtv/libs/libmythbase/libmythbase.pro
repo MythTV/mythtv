@@ -124,6 +124,10 @@ mingw:LIBS += -lws2_32
 
 QT += xml sql network
 
+contains(QT_VERSION, ^5\\.[0-9]\\..*) {
+QT += widgets
+}
+
 include ( ../libs-targetfix.pro )
 
 LIBS += $$EXTRA_LIBS $$LATE_LIBS
