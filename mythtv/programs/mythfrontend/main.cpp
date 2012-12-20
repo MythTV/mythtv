@@ -1450,7 +1450,7 @@ int main(int argc, char **argv)
 
     CleanupGuard callCleanup(cleanup);
 
-#ifdef Q_WS_MACX
+#ifdef Q_OS_MAC
     // Without this, we can't set focus to any of the CheckBoxSetting, and most
     // of the MythPushButton widgets, and they don't use the themed background.
     QApplication::setDesktopSettingsAware(false);

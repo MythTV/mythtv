@@ -39,7 +39,7 @@ static HostLineEdit *MythGalleryDir()
 {
     HostLineEdit *gc = new HostLineEdit("GalleryDir");
     gc->setLabel(QObject::tr("Directory that holds images"));
-#ifdef Q_WS_MACX
+#ifdef Q_OS_MAC
     gc->setValue(QDir::homePath() + "/Pictures");
 #else
     gc->setValue("/var/lib/pictures");

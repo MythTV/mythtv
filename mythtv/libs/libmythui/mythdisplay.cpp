@@ -2,7 +2,7 @@
 #include "mythdisplay.h"
 #include "mythmainwindow.h"
 
-#if defined(Q_WS_MAC) 
+#if defined(Q_OS_MAC) 
 #import "util-osx.h"
 #elif USING_X11
 #include "mythxdisplay.h"
@@ -41,7 +41,7 @@ DisplayInfo MythDisplay::GetDisplayInfo(int video_rate)
 {
     DisplayInfo ret;
 
-#if defined(Q_WS_MAC)
+#if defined(Q_OS_MAC)
     CGDirectDisplayID disp = GetOSXDisplay(GetWindowID());
     if (!disp)
         return ret;
@@ -63,7 +63,7 @@ DisplayInfo MythDisplay::GetDisplayInfo(int video_rate)
     uint height = (uint)CGDisplayPixelsHigh(disp);
     ret.res     = QSize(width, height);
 
-#elif defined(Q_WS_WIN)
+#elif defined(Q_OS_WIN)
     HDC hdc = GetDC(GetWindowID());
     int rate = 0;
     if (hdc)

@@ -237,7 +237,7 @@ void MythContextPrivate::TempMainWindow(bool languagePrompt)
     SilenceDBerrors();
 
     gCoreContext->OverrideSettingForSession("Theme", DEFAULT_UI_THEME);
-#ifdef Q_WS_MACX
+#ifdef Q_OS_MAC
     // Qt 4.4 has window-focus problems
     gCoreContext->OverrideSettingForSession("RunFrontendInWindow", "1");
 #endif

@@ -3332,9 +3332,8 @@ OSDSettings::OSDSettings()
     //cc->addChild(DecodeVBIFormat());
     //addChild(cc);
 
-#if CONFIG_DARWIN
+#if Q_OS_MAC
     // Any Mac OS-specific OSD stuff would go here.
-    // Note that this define should be Q_WS_MACX
 #endif
 }
 
