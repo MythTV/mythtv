@@ -6,6 +6,7 @@
 #include <QFile>
 #include <QDir>
 #include <QNetworkCookieJar>
+#include <QNetworkCookie>
 #include <QAuthenticator>
 #include <QTextStream>
 #include <QNetworkProxy>
