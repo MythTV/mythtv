@@ -1780,9 +1780,12 @@ int AvFormatDecoder::ScanStreams(bool novideo)
     tracks[kTrackTypeTeletextCaptions].clear();
     tracks[kTrackTypeTeletextMenu].clear();
     tracks[kTrackTypeRawText].clear();
-    tracks[kTrackTypeVideo].clear();
-    selectedTrack[kTrackTypeVideo].av_stream_index = -1;
-
+    if (!novideo)
+    {
+        // we won't rescan video streams
+        tracks[kTrackTypeVideo].clear();
+        selectedTrack[kTrackTypeVideo].av_stream_index = -1;
+    }
     map<int,uint> lang_sub_cnt;
     uint subtitleStreamCount = 0;
     map<int,uint> lang_aud_cnt;
