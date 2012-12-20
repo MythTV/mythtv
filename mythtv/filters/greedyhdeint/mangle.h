@@ -4,25 +4,25 @@
  * File licensed under the GPL, see http://www.fsf.org/ for more info.
  */
 
-#ifndef __MANGLE_H
-#define __MANGLE_H
+#ifndef __GREEDYH_MANGLE_H
+#define __GREEDYH_MANGLE_H
 
 /* Feel free to add more to the list, eg. a.out IMO */
 /* Use rip-relative addressing if compiling PIC code on x86-64. */
 #if defined(__CYGWIN__) || defined(__MINGW32__) || defined(__OS2__) || \
     CONFIG_DARWIN || (defined(__OpenBSD__) && !defined(__ELF__))
 #if ARCH_X86_64 && defined(PIC)
-#define MANGLE(a) "_" #a"(%%rip)"
+#define GREEDYH_MANGLE(a) "_" #a"(%%rip)"
 #else
-#define MANGLE(a) "_" #a
+#define GREEDYH_MANGLE(a) "_" #a
 #endif
 #else
 #if ARCH_X86_64 && defined(PIC)
-#define MANGLE(a) #a"(%%rip)"
+#define GREEDYH_MANGLE(a) #a"(%%rip)"
 #else
-#define MANGLE(a) #a
+#define GREEDYH_MANGLE(a) #a
 #endif
 #endif
 
-#endif /* !__MANGLE_H */
+#endif /* !__GREEDYH_MANGLE_H */
 
