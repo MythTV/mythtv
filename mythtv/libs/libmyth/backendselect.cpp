@@ -137,7 +137,7 @@ void BackendSelection::AddItem(DeviceLocation *dev)
         m_mutex.unlock();
 
         InfoMap infomap;
-        dev->GetDeviceDetail(infomap, true);
+        dev->GetDeviceDetail(infomap);
 
         // We only want the version number, not the library version info
         infomap["version"] = infomap["modelnumber"].section('.', 0, 1);
@@ -184,7 +184,7 @@ bool BackendSelection::ConnectBackend(DeviceLocation *dev)
 
     stat    = client.GetConnectionInfo(m_pinCode, m_DBparams, message);
 
-    QString backendName = dev->GetFriendlyName(true);
+    QString backendName = dev->GetFriendlyName();
 
     if (backendName == "<Unknown>")
         backendName = dev->m_sLocation;

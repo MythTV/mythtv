@@ -124,7 +124,7 @@ class UPNP_PUBLIC UPnp
 
         HttpServer *GetHttpServer() { return m_pHttpServer; }
 
-        static UPnpDeviceDesc *GetDeviceDesc( QString &sURL, bool bInQtThread = true);
+        static UPnpDeviceDesc *GetDeviceDesc( QString &sURL );
 
         static QString         GetResultDesc( UPnPResultCode eCode );
         static void            FormatErrorResponse( HTTPRequest   *pRequest, 

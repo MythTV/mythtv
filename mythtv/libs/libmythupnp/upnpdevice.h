@@ -185,7 +185,7 @@ class UPNP_PUBLIC UPnpDeviceDesc
         UPnpDevice *FindDevice( const QString &sURI );
 
         static UPnpDevice     *FindDevice( UPnpDevice *pDevice, const QString &sURI );
-        static UPnpDeviceDesc *Retrieve  ( QString &sURL, bool bInQtThread = true   );
+        static UPnpDeviceDesc *Retrieve  ( QString &sURL );
 
         void toMap(QHash<QString, QString> &map)
         {
@@ -260,19 +260,19 @@ class UPNP_PUBLIC DeviceLocation : public ReferenceCounter
 
         // ==================================================================
 
-        UPnpDeviceDesc *GetDeviceDesc( bool bInQtThread = true )
+        UPnpDeviceDesc *GetDeviceDesc(void)
         {
             if (m_pDeviceDesc == NULL)
-                m_pDeviceDesc = UPnpDeviceDesc::Retrieve( m_sLocation, bInQtThread );
+                m_pDeviceDesc = UPnpDeviceDesc::Retrieve( m_sLocation );
 
             return m_pDeviceDesc;
         }
 
         // ==================================================================
 
-        QString GetFriendlyName( bool bInQtThread = true )
+        QString GetFriendlyName(void)
         {
-            UPnpDeviceDesc *pDevice = GetDeviceDesc( bInQtThread );
+            UPnpDeviceDesc *pDevice = GetDeviceDesc();
 
             if ( pDevice == NULL)
                return "<Unknown>";
@@ -285,9 +285,9 @@ class UPNP_PUBLIC DeviceLocation : public ReferenceCounter
             return sName;
         }
 
-        QString GetNameAndDetails( bool bInQtThread = true )
+        QString GetNameAndDetails(void)
         {
-            UPnpDeviceDesc *pDevice = GetDeviceDesc( bInQtThread );
+            UPnpDeviceDesc *pDevice = GetDeviceDesc();
 
             if ( pDevice == NULL)
                return "<Unknown> (" + m_sLocation + ")";
@@ -297,21 +297,20 @@ class UPNP_PUBLIC DeviceLocation : public ReferenceCounter
                    + pDevice->m_rootDevice.m_sUDN;
         }
 
-        void GetDeviceDetail(QHash<QString, QString> &map,
-                             bool bInQtThread = true)
+        void GetDeviceDetail(QHash<QString, QString> &map)
         {
             map["location"] = m_sLocation;
 
-            UPnpDeviceDesc *pDevice = GetDeviceDesc(bInQtThread);
+            UPnpDeviceDesc *pDevice = GetDeviceDesc();
             if (!pDevice)
                 return;
 
             pDevice->toMap(map);
         }
 
-        bool NeedSecurityPin( bool bInQtThread = true )
+        bool NeedSecurityPin(void)
         {
-            UPnpDeviceDesc *pDevice = GetDeviceDesc(bInQtThread);
+            UPnpDeviceDesc *pDevice = GetDeviceDesc();
             if (!pDevice)
                 return false;
 

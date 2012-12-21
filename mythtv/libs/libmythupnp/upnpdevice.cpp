@@ -12,7 +12,7 @@
 
 #include "upnp.h"
 #include "upnpdevice.h"
-#include "httpcomms.h"
+#include "mythdownloadmanager.h"
 #include "mythlogging.h"
 #include "mythversion.h"  // for MYTH_BINARY_VERSION
 
@@ -635,22 +635,17 @@ UPnpDevice *UPnpDeviceDesc::FindDevice( UPnpDevice    *pDevice,
 //
 /////////////////////////////////////////////////////////////////////////////
 
-UPnpDeviceDesc *UPnpDeviceDesc::Retrieve( QString &sURL, bool bInQtThread )
+UPnpDeviceDesc *UPnpDeviceDesc::Retrieve( QString &sURL )
 {
     UPnpDeviceDesc *pDevice = NULL;
 
-    LOG(VB_UPNP, LOG_DEBUG, QString("UPnpDeviceDesc::Retrieve( %1, %2 )")
-                      .arg(sURL) .arg(bInQtThread));
+    LOG(VB_UPNP, LOG_DEBUG, QString("UPnpDeviceDesc::Retrieve( %1 )")
+        .arg(sURL));
 
-    QString sXml = HttpComms::getHttp( sURL,
-                                       10000, // ms
-                                       3,     // retries
-                                       0,     // redirects
-                                       false, // allow gzip
-                                       NULL,  // login
-                                       bInQtThread );
+    QString sXml;
+    bool ok = GetMythDownloadManager()->download(sURL, sXml);
 
-    if (sXml.startsWith( QString("<?xml") ))
+    if (ok && sXml.startsWith( QString("<?xml") ))
     {
         QString sErrorMsg;
 

@@ -167,9 +167,9 @@ void UPnp::CleanUp()
 //
 //////////////////////////////////////////////////////////////////////////////
 
-UPnpDeviceDesc *UPnp::GetDeviceDesc( QString &sURL, bool bInQtThread )
+UPnpDeviceDesc *UPnp::GetDeviceDesc( QString &sURL )
 {
-    return UPnpDeviceDesc::Retrieve( sURL, bInQtThread );
+    return UPnpDeviceDesc::Retrieve( sURL );
 }
 
 //////////////////////////////////////////////////////////////////////////////
