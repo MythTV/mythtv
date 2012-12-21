@@ -89,7 +89,8 @@ ChannelInfo::ChannelInfo(
 
 ChannelInfo &ChannelInfo::operator=(const ChannelInfo &other)
 {
-    Init();
+    if (this == &other)
+        return *this;
 
     // Channel table
     chanid        = other.chanid;
