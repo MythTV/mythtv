@@ -36,9 +36,14 @@ MythUIText::MythUIText(MythUIType *parent, const QString &name)
       m_numSteps(0),                                 m_curStep(0),
       curR(0.0),              curG(0.0),             curB(0.0),
       incR(0.0),              incG(0.0),             incB(0.0),
-      m_scrollPause(ScrollBounceDelay),              m_scrollOffset(0),
-      m_scrollBounce(false),                         m_scrolling(false),
-      m_scrollDirection(ScrollNone),                 m_textCase(CaseNormal)
+      m_scrollStartDelay(ScrollBounceDelay),
+      m_scrollReturnDelay(ScrollBounceDelay),        m_scrollPause(0),
+      m_scrollForwardRate(70.0 / MythMainWindow::drawRefresh),
+      m_scrollReturnRate(70.0 / MythMainWindow::drawRefresh),
+      m_scrollBounce(false),                         m_scrollOffset(0),
+      m_scrollPos(0),                                m_scrollPosWhole(0),
+      m_scrollDirection(ScrollNone),                 m_scrolling(false),
+      m_textCase(CaseNormal)
 {
 #if 0 // Not currently used
     m_usingAltArea = false;
@@ -71,10 +76,18 @@ MythUIText::MythUIText(const QString &text, const MythFontProperties &font,
 #endif
     m_ShrinkNarrow = true;
     m_MultiLine = false;
-    m_scrollPause = ScrollBounceDelay;
+
+    m_scrollStartDelay = m_scrollReturnDelay = ScrollBounceDelay;
+    m_scrollPause = 0;
+    m_scrollForwardRate = m_scrollReturnRate =
+                          70.0 / MythMainWindow::drawRefresh;
     m_scrollBounce = false;
-    m_scrolling = false;
+    m_scrollOffset = 0;
+    m_scrollPos = 0;
+    m_scrollPosWhole = 0;
     m_scrollDirection = ScrollNone;
+    m_scrolling = false;
+
     m_textCase = CaseNormal;
     m_Ascent = m_Descent = m_leftBearing = m_rightBearing = 0;
     m_Leading = 1;
@@ -803,7 +816,7 @@ void MythUIText::FillCutMessage(void)
                          min_rect, last_line_width, num_lines, true);
 
         m_Canvas.setRect(0, 0, min_rect.x() + min_rect.width(), height);
-        m_scrollPause = ScrollBounceDelay;
+        m_scrollPause = m_scrollStartDelay; // ????
         m_scrollBounce = false;
 
         /**
@@ -1037,102 +1050,127 @@ void MythUIText::Pulse(void)
 
     if (m_scrolling)
     {
-        switch (m_scrollDirection)
+        int whole;
+
+        if (m_scrollPause > 0)
+            --m_scrollPause;
+        else
         {
-          case ScrollLeft :
-            if (m_Canvas.width() > m_drawRect.width())
+            if (m_scrollBounce)
+                m_scrollPos += m_scrollReturnRate;
+            else
+                m_scrollPos += m_scrollForwardRate;
+        }
+
+        whole = static_cast<int>(m_scrollPos);
+        if (m_scrollPosWhole != whole)
+        {
+            int shift = whole - m_scrollPosWhole;
+            m_scrollPosWhole = whole;
+
+            switch (m_scrollDirection)
             {
-                ShiftCanvas(-1, 0);
-                if (m_Canvas.x() + m_Canvas.width() < 0)
-                    SetCanvasPosition(m_drawRect.width(), 0);
-            }
-            break;
-          case ScrollRight :
-            if (m_Canvas.width() > m_drawRect.width())
-            {
-                ShiftCanvas(1, 0);
-                if (m_Canvas.x() > m_drawRect.width())
-                    SetCanvasPosition(-m_Canvas.width(), 0);
-            }
-            break;
-          case ScrollHorizontal:
-            if (m_Canvas.width() <= m_drawRect.width())
-                break;
-            if (m_scrollPause > 0)
-            {
-                --m_scrollPause;
-                break;
-            }
-            if (m_scrollBounce) // scroll right
-            {
-                if (m_Canvas.x() + m_scrollOffset > m_drawRect.x())
+              case ScrollLeft :
+                if (m_Canvas.width() > m_drawRect.width())
                 {
-                    m_scrollBounce = false;
-                    m_scrollPause = ScrollBounceDelay;
+                    ShiftCanvas(-shift, 0);
+                    if (m_Canvas.x() + m_Canvas.width() < 0)
+                    {
+                        SetCanvasPosition(m_drawRect.width(), 0);
+                        m_scrollPos = m_scrollPosWhole = 0;
+                    }
                 }
-                else
-                    ShiftCanvas(1, 0);
-            }
-            else // scroll left
-            {
-                if (m_Canvas.x() + m_Canvas.width() + m_scrollOffset <
-                    m_drawRect.x() + m_drawRect.width())
-                {
-                    m_scrollBounce = true;
-                    m_scrollPause = ScrollBounceDelay;
-                }
-                else
-                    ShiftCanvas(-1, 0);
-            }
-            break;
-          case ScrollUp :
-            if (m_Canvas.height() > m_drawRect.height())
-            {
-                ShiftCanvas(0, -1);
-                if (m_Canvas.y() + m_Canvas.height() < 0)
-                    SetCanvasPosition(0, m_drawRect.height());
-            }
-            break;
-          case ScrollDown :
-            if (m_Canvas.height() > m_drawRect.height())
-            {
-                ShiftCanvas(0, 1);
-                if (m_Canvas.y() > m_drawRect.height())
-                    SetCanvasPosition(0, -m_Canvas.height());
-            }
-            break;
-          case ScrollVertical:
-            if (m_Canvas.height() <= m_drawRect.height())
                 break;
-            if (m_scrollPause > 0)
-            {
-                --m_scrollPause;
+              case ScrollRight :
+                if (m_Canvas.width() > m_drawRect.width())
+                {
+                    ShiftCanvas(shift, 0);
+                    if (m_Canvas.x() > m_drawRect.width())
+                    {
+                        SetCanvasPosition(-m_Canvas.width(), 0);
+                        m_scrollPos = m_scrollPosWhole = 0;
+                    }
+                }
+                break;
+              case ScrollHorizontal:
+                if (m_Canvas.width() <= m_drawRect.width())
+                    break;
+                if (m_scrollBounce) // scroll right
+                {
+                    if (m_Canvas.x() + m_scrollOffset > m_drawRect.x())
+                    {
+                        m_scrollBounce = false;
+                        m_scrollPause = m_scrollStartDelay;
+                        m_scrollPos = m_scrollPosWhole = 0;
+                    }
+                    else
+                        ShiftCanvas(shift, 0);
+                }
+                else // scroll left
+                {
+                    if (m_Canvas.x() + m_Canvas.width() + m_scrollOffset <
+                        m_drawRect.x() + m_drawRect.width())
+                    {
+                        m_scrollBounce = true;
+                        m_scrollPause = m_scrollReturnDelay;
+                        m_scrollPos = m_scrollPosWhole = 0;
+                    }
+                    else
+                        ShiftCanvas(-shift, 0);
+                }
+                break;
+              case ScrollUp :
+                if (m_Canvas.height() > m_drawRect.height())
+                {
+                    ShiftCanvas(0, -shift);
+                    if (m_Canvas.y() + m_Canvas.height() < 0)
+                    {
+                        SetCanvasPosition(0, m_drawRect.height());
+                        m_scrollPos = m_scrollPosWhole = 0;
+                    }
+                }
+                break;
+              case ScrollDown :
+                if (m_Canvas.height() > m_drawRect.height())
+                {
+                    ShiftCanvas(0, shift);
+                    if (m_Canvas.y() > m_drawRect.height())
+                    {
+                        SetCanvasPosition(0, -m_Canvas.height());
+                        m_scrollPos = m_scrollPosWhole = 0;
+                    }
+                }
+                break;
+              case ScrollVertical:
+                if (m_Canvas.height() <= m_drawRect.height())
+                    break;
+                if (m_scrollBounce) // scroll down
+                {
+                    if (m_Canvas.y() + m_scrollOffset > m_drawRect.y())
+                    {
+                        m_scrollBounce = false;
+                        m_scrollPause = m_scrollStartDelay;
+                        m_scrollPos = m_scrollPosWhole = 0;
+                    }
+                    else
+                        ShiftCanvas(0, shift);
+                }
+                else // scroll up
+                {
+                    if (m_Canvas.y() + m_Canvas.height() + m_scrollOffset <
+                        m_drawRect.y() + m_drawRect.height())
+                    {
+                        m_scrollBounce = true;
+                        m_scrollPause = m_scrollReturnDelay;
+                        m_scrollPos = m_scrollPosWhole = 0;
+                    }
+                    else
+                        ShiftCanvas(0, -shift);
+                }
+                break;
+              case ScrollNone:
                 break;
             }
-            if (m_scrollBounce) // scroll down
-            {
-                if (m_Canvas.y() + m_scrollOffset > m_drawRect.y())
-                {
-                    m_scrollBounce = false;
-                    m_scrollPause = ScrollBounceDelay;
-                }
-                else
-                    ShiftCanvas(0, 1);
-            }
-            else // scroll up
-            {
-                if (m_Canvas.y() + m_Canvas.height() + m_scrollOffset <
-                    m_drawRect.y() + m_drawRect.height())
-                {
-                    m_scrollBounce = true;
-                    m_scrollPause = ScrollBounceDelay;
-                }
-                else
-                    ShiftCanvas(0, -1);
-            }
-            break;
-            case ScrollNone:
-                break;
         }
     }
 }
@@ -1316,6 +1354,47 @@ bool MythUIText::ParseElement(
                 }
             }
 
+            tmp = element.attribute("startdelay");
+            if (!tmp.isEmpty())
+            {
+                float seconds = tmp.toFloat();
+                m_scrollStartDelay = static_cast<int>(seconds *
+                      static_cast<float>(MythMainWindow::drawRefresh) + 0.5);
+            }
+            tmp = element.attribute("returndelay");
+            if (!tmp.isEmpty())
+            {
+                float seconds = tmp.toFloat();
+                m_scrollReturnDelay = static_cast<int>(seconds *
+                      static_cast<float>(MythMainWindow::drawRefresh) + 0.5);
+            }
+            tmp = element.attribute("rate");
+            if (!tmp.isEmpty())
+            {
+#if 0 // scroll rate as a percentage of 70Hz
+                float percent = tmp.toFloat() / 100.0;
+                m_scrollForwardRate = percent *
+                      static_cast<float>(MythMainWindow::drawRefresh) / 70.0;
+#else // scroll rate as pixels per second
+                int pixels = tmp.toInt();
+                m_scrollForwardRate =
+                    pixels / static_cast<float>(MythMainWindow::drawRefresh);
+#endif
+            }
+            tmp = element.attribute("returnrate");
+            if (!tmp.isEmpty())
+            {
+#if 0 // scroll rate as a percentage of 70Hz
+                float percent = tmp.toFloat() / 100.0;
+                m_scrollReturnRate = percent *
+                      static_cast<float>(MythMainWindow::drawRefresh) / 70.0;
+#else // scroll rate as pixels per second
+                int pixels = tmp.toInt();
+                m_scrollReturnRate =
+                    pixels / static_cast<float>(MythMainWindow::drawRefresh);
+#endif
+            }
+
             m_scrolling = true;
         }
         else
@@ -1404,8 +1483,12 @@ void MythUIText::CopyFrom(MythUIType *base)
     incG = text->incG;
     incB = text->incB;
 
-    m_scrolling = text->m_scrolling;
+    m_scrollStartDelay = text->m_scrollStartDelay;
+    m_scrollReturnDelay = text->m_scrollReturnDelay;
+    m_scrollForwardRate = text->m_scrollForwardRate;
+    m_scrollReturnRate = text->m_scrollReturnRate;
     m_scrollDirection = text->m_scrollDirection;
+    m_scrolling = text->m_scrolling;
 
     m_textCase = text->m_textCase;
 

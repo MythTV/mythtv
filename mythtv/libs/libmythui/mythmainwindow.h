@@ -37,6 +37,8 @@ class MUI_PUBLIC MythMainWindow : public QWidget
     friend class MythPainterWindowD3D9;
 
   public:
+    enum {drawRefresh = 70};
+
     void Init(QString forcedpainter = QString());
     void ReinitDone(void);
     void Show(void);

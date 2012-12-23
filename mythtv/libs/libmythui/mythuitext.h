@@ -10,6 +10,7 @@
 
 // Mythui headers
 #include "mythuitype.h"
+#include "mythmainwindow.h"
 
 class MythFontProperties;
 
@@ -135,15 +136,22 @@ class MUI_PUBLIC MythUIText : public MythUIType, public StorageUser
     float curR, curG, curB;
     float incR, incG, incB;
 
-    enum Constants {ScrollBounceDelay = 250};
+    // Default delay of 3 seconds before 'bouncing' the scrolling text
+    enum Constants {ScrollBounceDelay = MythMainWindow::drawRefresh * 3};
     enum ScrollDir {ScrollNone, ScrollLeft, ScrollRight, ScrollUp, ScrollDown,
                     ScrollHorizontal, ScrollVertical};
 
-    int  m_scrollPause;
-    int  m_scrollOffset;
-    bool m_scrollBounce;
-    bool m_scrolling;
+    int   m_scrollStartDelay;
+    int   m_scrollReturnDelay;
+    int   m_scrollPause;
+    float m_scrollForwardRate;
+    float m_scrollReturnRate;
+    bool  m_scrollBounce;
+    int   m_scrollOffset;
+    float m_scrollPos;
+    int   m_scrollPosWhole;
     ScrollDir m_scrollDirection;
+    bool  m_scrolling;
 
     enum TextCase {CaseNormal, CaseUpper, CaseLower, CaseCapitaliseFirst,
                    CaseCapitaliseAll};
