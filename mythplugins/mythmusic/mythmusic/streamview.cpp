@@ -481,22 +481,7 @@ void  StreamView::streamItemVisible(MythUIButtonListItem *item)
     if (mdata)
     {
         if (!mdata->LogoUrl().isEmpty())
-        {
-            QString artFile = findIcon("stream", QString("%1").arg(mdata->ID()));
-            if (artFile.isEmpty())
-            {
-                // download image and cache it for later
-                QUrl url(mdata->LogoUrl());
-                QFileInfo fi(url.path());
-                QString saveFilename = GetConfDir() + QString("/MythMusic/Icons/%1/%2.%3")
-                        .arg("stream").arg(mdata->ID()).arg(fi.suffix());
-                GetMythDownloadManager()->queueDownload(mdata->LogoUrl(), saveFilename, this);
-            }
-            else
-            {
-                item->SetImage(artFile);
-            }
-        }
+            item->SetImage(mdata->getAlbumArtFile());
         else
             item->SetImage("");
     }
@@ -514,6 +499,8 @@ void StreamView::addStream(Metadata *mdata)
         return;
     }
 
+    QString url = mdata->Url();
+
     gMusicData->all_streams->addStream(mdata);
 
     updateStreamList();
@@ -525,9 +512,10 @@ void StreamView::addStream(Metadata *mdata)
         Metadata *itemsdata = qVariantValue<Metadata*> (item->GetData());
         if (itemsdata)
         {
-            if (mdata->ID() == itemsdata->ID())
+            if (url == itemsdata->Url())
             {
                 m_streamList->SetItemCurrent(item);
+                m_currentTrack = x;
                 break;
             }
         }
@@ -544,13 +532,49 @@ void StreamView::updateStream(Metadata *mdata)
         return;
     }
 
+    Metadata::IdType id = mdata->ID();
+
     gMusicData->all_streams->updateStream(mdata);
+
+    // update mdata to point to the new item
+    mdata = gMusicData->all_streams->getMetadata(id);
+
+    if (!mdata)
+        return;
 
     // force the icon to reload incase it changed
     QFile::remove(mdata->getAlbumArtFile());
     mdata->reloadAlbumArtImages();
 
     updateStreamList();
+
+    // if we just edited the currently playing stream update the current metadata to match
+    Metadata *currentMetadata = gPlayer->getCurrentMetadata();
+    if (id == currentMetadata->ID())
+    {
+        currentMetadata->setStation(mdata->Station());
+        currentMetadata->setChannel(mdata->Channel());
+    }
+
+    // update the played tracks list to match the new metadata
+    if (m_playedTracksList)
+    {
+        for (int x = 0; x < m_playedTracksList->GetCount(); x++)
+        {
+            MythUIButtonListItem *item = m_playedTracksList->GetItemAt(x);
+            Metadata *playedmdata = qVariantValue<Metadata*> (item->GetData());
+
+            if (playedmdata && playedmdata->ID() == id)
+            {
+                playedmdata->setStation(mdata->Station());
+                playedmdata->setChannel(mdata->Channel());
+
+                MetadataMap metadataMap;
+                playedmdata->toMap(metadataMap);
+                item->SetTextFromMap(metadataMap);
+            }
+        }
+    }
 
     // find the stream and make it the active item
     for (int x = 0; x < m_streamList->GetCount(); x++)
@@ -562,6 +586,7 @@ void StreamView::updateStream(Metadata *mdata)
             if (mdata->ID() == itemsdata->ID())
             {
                 m_streamList->SetItemCurrent(item);
+                m_currentTrack = x;
                 break;
             }
         }

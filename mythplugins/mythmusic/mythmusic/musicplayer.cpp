@@ -543,6 +543,8 @@ void MusicPlayer::customEvent(QEvent *event)
 
         mdata->setID(m_currentMetadata->ID());
         mdata->setTrack(m_playedList.count() + 1);
+        mdata->setStation(m_currentMetadata->Station());
+        mdata->setChannel(m_currentMetadata->Channel());
 
         m_playedList.append(mdata);
 
