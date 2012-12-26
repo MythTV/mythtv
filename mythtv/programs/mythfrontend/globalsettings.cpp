@@ -3332,7 +3332,7 @@ OSDSettings::OSDSettings()
     //cc->addChild(DecodeVBIFormat());
     //addChild(cc);
 
-#if Q_OS_MAC
+#if defined(Q_OS_MACX)
     // Any Mac OS-specific OSD stuff would go here.
 #endif
 }
