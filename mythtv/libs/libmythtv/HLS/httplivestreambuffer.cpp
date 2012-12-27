@@ -56,14 +56,14 @@ enum
 
 /* utility methods */
 
-static QString decoded_URI(QString uri)
+static QString decoded_URI(const QString uri)
 {
     QByteArray ba   = uri.toAscii();
     QUrl url        = QUrl::fromEncoded(ba);
     return url.toString();
 }
 
-static QString relative_URI(QString &surl, QString &spath)
+static QString relative_URI(const QString surl, const QString spath)
 {
     QUrl url  = QUrl(surl);
     QUrl path = QUrl(spath);
@@ -82,13 +82,13 @@ static uint64_t mdate(void)
     return t.tv_sec * 1000000ULL + t.tv_usec;
 }
 
-static bool downloadURL(QString url, QByteArray *buffer)
+static bool downloadURL(const QString url, QByteArray *buffer)
 {
     MythDownloadManager *mdm = GetMythDownloadManager();
     return mdm->download(url, buffer);
 }
 
-static void cancelURL(QString url)
+static void cancelURL(const QString url)
 {
     MythDownloadManager *mdm = GetMythDownloadManager();
     mdm->cancelDownload(url);
@@ -99,8 +99,8 @@ static void cancelURL(QString url)
 class HLSSegment
 {
 public:
-    HLSSegment(const int mduration, const int id, QString &title,
-               QString &uri, QString &current_key_path)
+    HLSSegment(const int mduration, const int id, const QString title,
+               const QString uri, const QString current_key_path)
     {
         m_duration      = mduration; /* seconds */
         m_id            = id;
@@ -145,12 +145,12 @@ public:
         return *this;
     }
 
-    int Duration(void)
+    int Duration(void) const
     {
         return m_duration;
     }
 
-    int Id(void)
+    int Id(void) const
     {
         return m_id;
     }
@@ -165,12 +165,12 @@ public:
         m_lock.unlock();
     }
 
-    bool IsEmpty(void)
+    bool IsEmpty(void) const
     {
         return m_data.isEmpty();
     }
 
-    int32_t Size(void)
+    int32_t Size(void) const
     {
         return m_data.size();
     }
@@ -200,12 +200,12 @@ public:
         }
     }
 
-    QString Url(void)
+    QString Url(void) const
     {
         return m_url;
     }
 
-    int32_t SizePlayed(void)
+    int32_t SizePlayed(void) const
     {
         return m_played;
     }
@@ -241,18 +241,18 @@ public:
         m_data.clear();
     }
 
-    QString Title(void)
+    QString Title(void) const
     {
         return m_title;
     }
-    void SetTitle(QString &x)
+    void SetTitle(const QString x)
     {
         m_title = x;
     }
     /**
      * provides pointer to raw segment data
      */
-    const char *Data(void)
+    const char *Data(void) const
     {
         return m_data.constData();
     }
@@ -277,7 +277,7 @@ public:
         return RET_OK;
     }
 
-    int DecodeData(uint8_t *IV)
+    int DecodeData(const uint8_t *IV)
     {
         /* Decrypt data using AES-128 */
         int aeslen = m_data.size() & ~0xf;
@@ -323,27 +323,27 @@ public:
         return RET_OK;
     }
 
-    bool HasKeyPath(void)
+    bool HasKeyPath(void) const
     {
         return !m_psz_key_path.isEmpty();
     }
 
-    bool KeyLoaded(void)
+    bool KeyLoaded(void) const
     {
         return m_keyloaded;
     }
 
-    QString KeyPath(void)
+    QString KeyPath(void) const
     {
         return m_psz_key_path;
     }
 
-    void SetKeyPath(QString &path)
+    void SetKeyPath(const QString path)
     {
         m_psz_key_path = path;
     }
 
-    void CopyAESKey(HLSSegment &segment)
+    void CopyAESKey(const HLSSegment &segment)
     {
         memcpy(&m_aeskey, &(segment.m_aeskey), sizeof(m_aeskey));
         m_keyloaded = segment.m_keyloaded;
@@ -372,7 +372,7 @@ private:
 class HLSStream
 {
 public:
-    HLSStream(const int mid, const uint64_t bitrate, QString &uri)
+    HLSStream(const int mid, const uint64_t bitrate, const QString uri)
     {
         m_id            = mid;
         m_bitrate       = bitrate;
@@ -389,7 +389,7 @@ public:
 #endif
     }
 
-    HLSStream(HLSStream &rhs, bool copy = true)
+    HLSStream(const HLSStream &rhs, bool copy = true)
     {
         (*this) = rhs;
         if (!copy)
@@ -440,12 +440,12 @@ public:
         return s1->Bitrate() > s2->Bitrate();
     }
 
-    bool operator<(HLSStream &b)
+    bool operator<(const HLSStream &b) const
     {
         return this->Bitrate() < b.Bitrate();
     }
 
-    bool operator>(HLSStream &b)
+    bool operator>(const HLSStream &b) const
     {
         return this->Bitrate() > b.Bitrate();
     }
@@ -461,11 +461,12 @@ public:
             return m_size;
         QMutexLocker lock(&m_lock);
 
-        int64_t size = 0;
-        int count = NumSegments();
+        int64_t size    = 0;
+        int count       = NumSegments();
+
         for (int i = 0; i < count; i++)
         {
-            HLSSegment *segment    = GetSegment(i);
+            HLSSegment *segment = GetSegment(i);
             segment->Lock();
             if (segment->Size() > 0)
             {
@@ -492,7 +493,7 @@ public:
         m_segments.clear();
     }
 
-    int NumSegments(void)
+    int NumSegments(void) const
     {
         return m_segments.size();
     }
@@ -503,7 +504,7 @@ public:
         m_segments.append(segment);
     }
 
-    HLSSegment *GetSegment(const int wanted)
+    HLSSegment *GetSegment(const int wanted) const
     {
         int count = NumSegments();
         if (count <= 0)
@@ -513,7 +514,7 @@ public:
         return m_segments[wanted];
     }
 
-    HLSSegment *FindSegment(const int id, int *segnum = NULL)
+    HLSSegment *FindSegment(const int id, int *segnum = NULL) const
     {
         int count = NumSegments();
         if (count <= 0)
@@ -535,7 +536,7 @@ public:
         return NULL;
     }
 
-    void AddSegment(const int duration, QString &title, QString &uri)
+    void AddSegment(const int duration, const QString title, const QString uri)
     {
         QMutexLocker lock(&m_lock);
         QString psz_uri = relative_URI(m_url, uri);
@@ -590,7 +591,7 @@ public:
         for (it = table.begin(); it != table.end(); ++it)
         {
             bool todelete   = *it;
-            HLSSegment *p  = it.key();
+            HLSSegment *p   = it.key();
             RemoveSegment(p, todelete);
         }
     }
@@ -690,7 +691,7 @@ public:
     {
         return m_id;
     }
-    int Version(void)
+    int Version(void) const
     {
         return m_version;
     }
@@ -698,7 +699,7 @@ public:
     {
         m_version = x;
     }
-    int StartSequence(void)
+    int StartSequence(void) const
     {
         return m_startsequence;
     }
@@ -706,7 +707,7 @@ public:
     {
         m_startsequence = x;
     }
-    int TargetDuration(void)
+    int TargetDuration(void) const
     {
         return m_targetduration;
     }
@@ -718,7 +719,7 @@ public:
     {
         return m_bitrate;
     }
-    bool Cache(void)
+    bool Cache(void) const
     {
         return m_cache;
     }
@@ -726,7 +727,7 @@ public:
     {
         m_cache = x;
     }
-    bool Live(void)
+    bool Live(void) const
     {
         return m_live;
     }
@@ -742,11 +743,11 @@ public:
     {
         m_lock.unlock();
     }
-    QString Url(void)
+    QString Url(void) const
     {
         return m_url;
     }
-    void UpdateWith(HLSStream &upd)
+    void UpdateWith(const HLSStream &upd)
     {
         QMutexLocker lock(&m_lock);
         m_targetduration    = upd.m_targetduration < 0 ?
@@ -801,7 +802,7 @@ public:
         }
         return RET_OK;
     }
-    bool SetAESIV(QString &line)
+    bool SetAESIV(QString line)
     {
         /*
          * If the EXT-X-KEY tag has the IV attribute, implementations MUST use
@@ -827,7 +828,7 @@ public:
     {
         return m_AESIV;
     }
-    void SetKeyPath(QString &x)
+    void SetKeyPath(const QString x)
     {
         m_keypath = x;
     }
@@ -863,7 +864,7 @@ public:
     {
     }
     /* offset is only used from main thread, no need for locking */
-    uint64_t Offset(void)
+    uint64_t Offset(void) const
     {
         return m_offset;
     }
@@ -970,7 +971,7 @@ public:
     /**
      * check that we have at least [count] segments buffered from position [from]
      */
-    bool GotBufferedSegments(int from, int count)
+    bool GotBufferedSegments(int from, int count) const
     {
         if (from + count > m_parent->NumSegments())
             return false;
@@ -1063,7 +1064,7 @@ public:
     {
         m_lock.unlock();
     }
-    int64_t Bandwidth(void)
+    int64_t Bandwidth(void) const
     {
         return m_bandwidth;
     }
@@ -1181,7 +1182,7 @@ protected:
         RunEpilog();
     }
 
-    int BandwidthAdaptation(int progid, uint64_t &bandwidth)
+    int BandwidthAdaptation(int progid, uint64_t &bandwidth) const
     {
         int candidate = -1;
         uint64_t bw = bandwidth;
@@ -1578,7 +1579,7 @@ HLSRingBuffer::~HLSRingBuffer()
     }
 }
 
-void HLSRingBuffer::FreeStreamsList(StreamsList *streams)
+void HLSRingBuffer::FreeStreamsList(StreamsList *streams) const
 {
     /* Free hls streams */
     for (int i = 0; i < streams->size(); i++)
@@ -1596,7 +1597,7 @@ void HLSRingBuffer::FreeStreamsList(StreamsList *streams)
     }
 }
 
-HLSStream *HLSRingBuffer::GetStreamForSegment(int segnum)
+HLSStream *HLSRingBuffer::GetStreamForSegment(int segnum) const
 {
     int stream = m_streamworker->StreamForSegment(segnum);
     if (stream < 0)
@@ -1620,12 +1621,12 @@ HLSStream *HLSRingBuffer::GetStream(const int wanted, const StreamsList *streams
     return streams->at(wanted);
 }
 
-HLSStream *HLSRingBuffer::GetFirstStream(const StreamsList *streams)
+HLSStream *HLSRingBuffer::GetFirstStream(const StreamsList *streams) const
 {
     return GetStream(0, streams);
 }
 
-HLSStream *HLSRingBuffer::GetLastStream(const StreamsList *streams)
+HLSStream *HLSRingBuffer::GetLastStream(const StreamsList *streams) const
 {
     if (streams == NULL)
     {
@@ -1639,7 +1640,7 @@ HLSStream *HLSRingBuffer::GetLastStream(const StreamsList *streams)
 }
 
 HLSStream *HLSRingBuffer::FindStream(const HLSStream *hls_new,
-                                     const StreamsList *streams)
+                                     const StreamsList *streams) const
 {
     if (streams == NULL)
     {
@@ -1709,7 +1710,7 @@ bool HLSRingBuffer::IsHTTPLiveStreaming(QByteArray *s)
     return false;
 }
 
-bool HLSRingBuffer::TestForHTTPLiveStreaming(QString &filename)
+bool HLSRingBuffer::TestForHTTPLiveStreaming(const QString filename)
 {
     bool isHLS = false;
     avcodeclock->lock();
@@ -1744,7 +1745,7 @@ bool HLSRingBuffer::TestForHTTPLiveStreaming(QString &filename)
 }
 
 /* Parsing */
-QString HLSRingBuffer::ParseAttributes(QString &line, const char *attr)
+QString HLSRingBuffer::ParseAttributes(const QString line, const char *attr) const
 {
     int p = line.indexOf(QLatin1String(":"));
     if (p < 0)
@@ -1770,7 +1771,7 @@ QString HLSRingBuffer::ParseAttributes(QString &line, const char *attr)
  * Return the decimal argument in a line of type: blah:<decimal>
  * presence of valud <decimal> is compulsory or it will return RET_ERROR
  */
-int HLSRingBuffer::ParseDecimalValue(QString &line, int &target)
+int HLSRingBuffer::ParseDecimalValue(const QString line, int &target) const
 {
     int p = line.indexOf(QLatin1String(":"));
     if (p < 0)
@@ -1783,8 +1784,8 @@ int HLSRingBuffer::ParseDecimalValue(QString &line, int &target)
     return RET_OK;
 }
 
-int HLSRingBuffer::ParseSegmentInformation(HLSStream *hls, QString &line,
-                                           int &duration, QString &title)
+int HLSRingBuffer::ParseSegmentInformation(const HLSStream *hls, const QString line,
+                                           int &duration, QString &title) const
 {
     /*
      * #EXTINF:<duration>,<title>
@@ -1841,14 +1842,14 @@ int HLSRingBuffer::ParseSegmentInformation(HLSStream *hls, QString &line,
     return RET_OK;
 }
 
-int HLSRingBuffer::ParseTargetDuration(HLSStream *hls, QString &line)
+int HLSRingBuffer::ParseTargetDuration(HLSStream *hls, const QString line) const
 {
     /*
      * #EXT-X-TARGETDURATION:<s>
      *
      * where s is an integer indicating the target duration in seconds.
      */
-    int duration       = -1;
+    int duration = -1;
 
     if (ParseDecimalValue(line, duration) != RET_OK)
     {
@@ -1859,7 +1860,7 @@ int HLSRingBuffer::ParseTargetDuration(HLSStream *hls, QString &line)
     return RET_OK;
 }
 
-HLSStream *HLSRingBuffer::ParseStreamInformation(QString &line, QString &uri)
+HLSStream *HLSRingBuffer::ParseStreamInformation(const QString line, const QString uri) const
 {
     /*
      * #EXT-X-STREAM-INF:[attribute=value][,attribute=value]*
@@ -1900,7 +1901,7 @@ HLSStream *HLSRingBuffer::ParseStreamInformation(QString &line, QString &uri)
     return new HLSStream(id, bw, psz_uri);
 }
 
-int HLSRingBuffer::ParseMediaSequence(HLSStream *hls, QString &line)
+int HLSRingBuffer::ParseMediaSequence(HLSStream *hls, const QString line) const
 {
     /*
      * #EXT-X-MEDIA-SEQUENCE:<number>
@@ -1929,7 +1930,7 @@ int HLSRingBuffer::ParseMediaSequence(HLSStream *hls, QString &line)
 }
 
 
-int HLSRingBuffer::ParseKey(HLSStream *hls, QString &line)
+int HLSRingBuffer::ParseKey(HLSStream *hls, const QString line)
 {
     /*
      * #EXT-X-KEY:METHOD=<method>[,URI="<URI>"][,IV=<IV>]
@@ -1983,8 +1984,7 @@ int HLSRingBuffer::ParseKey(HLSStream *hls, QString &line)
         }
 
         /* Url is between quotes, remove them */
-        QString url = decoded_URI(uri.remove(QChar(QLatin1Char('"'))));
-        hls->SetKeyPath(url);
+        hls->SetKeyPath(decoded_URI(uri.remove(QChar(QLatin1Char('"')))));
 
         iv = ParseAttributes(line, "IV");
         if (!hls->SetAESIV(iv))
@@ -2009,7 +2009,7 @@ int HLSRingBuffer::ParseKey(HLSStream *hls, QString &line)
     return err;
 }
 
-int HLSRingBuffer::ParseProgramDateTime(HLSStream *hls, QString &line)
+int HLSRingBuffer::ParseProgramDateTime(HLSStream *hls, const QString line) const
 {
     /*
      * #EXT-X-PROGRAM-DATE-TIME:<YYYY-MM-DDThh:mm:ssZ>
@@ -2020,7 +2020,7 @@ int HLSRingBuffer::ParseProgramDateTime(HLSStream *hls, QString &line)
     return RET_OK;
 }
 
-int HLSRingBuffer::ParseAllowCache(HLSStream *hls, QString &line)
+int HLSRingBuffer::ParseAllowCache(HLSStream *hls, QString const line) const
 {
     /*
      * The EXT-X-ALLOW-CACHE tag indicates whether the client MAY or MUST
@@ -2044,7 +2044,7 @@ int HLSRingBuffer::ParseAllowCache(HLSStream *hls, QString &line)
     return RET_OK;
 }
 
-int HLSRingBuffer::ParseVersion(QString &line, int &version)
+int HLSRingBuffer::ParseVersion(const QString line, int &version) const
 {
     /*
      * The EXT-X-VERSION tag indicates the compatibility version of the
@@ -2075,7 +2075,7 @@ int HLSRingBuffer::ParseVersion(QString &line, int &version)
     return RET_OK;
 }
 
-int HLSRingBuffer::ParseEndList(HLSStream *hls)
+int HLSRingBuffer::ParseEndList(HLSStream *hls) const
 {
     /*
      * The EXT-X-ENDLIST tag indicates that no more media files will be
@@ -2087,7 +2087,7 @@ int HLSRingBuffer::ParseEndList(HLSStream *hls)
     return RET_OK;
 }
 
-int HLSRingBuffer::ParseDiscontinuity(HLSStream *hls, QString &line)
+int HLSRingBuffer::ParseDiscontinuity(HLSStream *hls, const QString line) const
 {
     /* Not handled, never seen so far */
     LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("#EXT-X-DISCONTINUITY %1").arg(line));
@@ -2171,8 +2171,7 @@ int HLSRingBuffer::ParseM3U8(const QByteArray *buffer, StreamsList *streams)
                 }
                 else
                 {
-                    QString url = decoded_URI(uri);
-                    HLSStream *hls = ParseStreamInformation(line, url);
+                    HLSStream *hls = ParseStreamInformation(line, decoded_URI(uri));
                     if (hls)
                     {
                         /* Download playlist file from server */
@@ -2268,8 +2267,7 @@ int HLSRingBuffer::ParseM3U8(const QByteArray *buffer, StreamsList *streams)
                 err = ParseEndList(hls);
             else if (!line.startsWith(QLatin1String("#")) && !line.isEmpty())
             {
-                QString url = decoded_URI(line);
-                hls->AddSegment(segment_duration, title, url);
+                hls->AddSegment(segment_duration, title, decoded_URI(line));
                 segment_duration = -1; /* reset duration */
                 title = "";
             }
@@ -2309,7 +2307,7 @@ int HLSRingBuffer::Prefetch(int count)
     return RET_OK;
 }
 
-void HLSRingBuffer::SanityCheck(HLSStream *hls, HLSSegment *segment)
+void HLSRingBuffer::SanityCheck(const HLSStream *hls, const HLSSegment *segment) const
 {
     bool live = hls->Live();
     /* sanity check */
@@ -2387,7 +2385,7 @@ int HLSRingBuffer::NumSegments(void) const
     return count;
 }
 
-int HLSRingBuffer::ChooseSegment(int stream)
+int HLSRingBuffer::ChooseSegment(int stream) const
 {
     /* Choose a segment to start which is no closer than
      * 3 times the target duration from the end of the playlist.
@@ -2396,7 +2394,7 @@ int HLSRingBuffer::ChooseSegment(int stream)
     int segid           = 0;
     int wanted_duration = 0;
     int count           = NumSegments();
-    int i = count - 1;
+    int i               = count - 1;
 
     HLSStream *hls = GetStream(stream);
     while(i >= 0)
@@ -2571,7 +2569,7 @@ bool HLSRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
     return true;
 }
 
-bool HLSRingBuffer::SaveToDisk(QString filename, int segstart, int segend)
+bool HLSRingBuffer::SaveToDisk(const QString filename, int segstart, int segend)
 {
     // download it all
     FILE *fp = fopen(filename.toAscii().constData(), "w");
