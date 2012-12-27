@@ -56,6 +56,13 @@ enum
 
 /* utility methods */
 
+static QString decoded_URI(QString uri)
+{
+    QByteArray ba   = uri.toAscii();
+    QUrl url        = QUrl::fromEncoded(ba);
+    return url.toString();
+}
+
 static QString relative_URI(QString &surl, QString &spath)
 {
     QUrl url  = QUrl(surl);
@@ -1976,7 +1983,8 @@ int HLSRingBuffer::ParseKey(HLSStream *hls, QString &line)
         }
 
         /* Url is between quotes, remove them */
-        hls->SetKeyPath(uri.remove(QChar(QLatin1Char('"'))));
+        QString url = decoded_URI(uri.remove(QChar(QLatin1Char('"'))));
+        hls->SetKeyPath(url);
 
         iv = ParseAttributes(line, "IV");
         if (!hls->SetAESIV(iv))
@@ -2163,7 +2171,8 @@ int HLSRingBuffer::ParseM3U8(const QByteArray *buffer, StreamsList *streams)
                 }
                 else
                 {
-                    HLSStream *hls = ParseStreamInformation(line, uri);
+                    QString url = decoded_URI(uri);
+                    HLSStream *hls = ParseStreamInformation(line, url);
                     if (hls)
                     {
                         /* Download playlist file from server */
@@ -2259,7 +2268,8 @@ int HLSRingBuffer::ParseM3U8(const QByteArray *buffer, StreamsList *streams)
                 err = ParseEndList(hls);
             else if (!line.startsWith(QLatin1String("#")) && !line.isEmpty())
             {
-                hls->AddSegment(segment_duration, title, line);
+                QString url = decoded_URI(line);
+                hls->AddSegment(segment_duration, title, url);
                 segment_duration = -1; /* reset duration */
                 title = "";
             }
