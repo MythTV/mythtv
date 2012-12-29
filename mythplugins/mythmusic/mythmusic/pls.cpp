@@ -3,7 +3,7 @@
   Eskil Heyn Olsen, 2005, distributed under the GPL as part of mythtv.
 
   Update July 2010 updated for Qt4 (Paul Harrison)
-
+  Update December 2012 updated to use QSettings for the pls parser
 */
 
 // c
@@ -15,6 +15,8 @@
 #include <QList>
 #include <QMap>
 #include <QStringList>
+#include <QFileInfo>
+#include <QSettings>
 
 // mythtv
 #include <mythlogging.h>
@@ -25,172 +27,6 @@
 
 using namespace std;
 
-class CfgReader
-{
-  public:
-    CfgReader()
-    {
-    }
-    ~CfgReader()
-    {
-    }
-
-    typedef QPair<QString,QString> KeyValue;
-    typedef QList<KeyValue> KeyValueList;
-    typedef QMap<QString, KeyValueList> ConfigMap;
-
-    void parse(const char *d, int l)
-    {
-        const char *ptr = d;
-        int line = 1;
-        bool done = l <= 0;
-
-        QString current_section = "";
-        KeyValueList keyvals;
-
-        while(!done)
-        {
-            switch(*ptr)
-            {
-                case '\0':
-                    done = true;
-                    break;
-                case '#':
-                {
-                    const char *end = strchr(ptr, '\n');
-                    if (!end) done = true;
-                    ptr = end;
-                    break;
-                }
-                case '\n':
-                    ptr ++;
-                    line ++;
-                    break;
-                case '[':
-                {
-                    ptr ++;
-                    const char *nl = strchr(ptr, '\n');
-                    const char *end = strchr(ptr, ']');
-
-                    if (!nl) nl = d + l;
-
-                    if (!end || nl < end)
-                    {
-                        LOG(VB_GENERAL, LOG_ERR,
-                            QString("CfgReader:: Badly formatted section, "
-                                    "line %1").arg(line));
-                        done = true;
-                    }
-
-                    if (current_section.length() > 0)
-                    {
-                        cfg[current_section] = keyvals;
-                        keyvals = KeyValueList();
-                    }
-
-                    current_section = std::string(ptr, end - ptr).c_str();
-                    if (current_section.length() == 0)
-                    {
-                        LOG(VB_GENERAL, LOG_ERR,
-                            QString("CfgReader:: Badly formatted section, "
-                                    "line %1").arg(line));
-                        done = true;
-                    }
-                    ptr = end + 1;
-                    break;
-                }
-                default:
-                {
-                    if (current_section.length() > 0)
-                    {
-                        const char *eq = strchr(ptr, '=');
-                        const char *nl = strchr(ptr, '\n');
-
-                        if (!nl) nl = d + l;
-
-                        if (!eq || nl < eq) 
-                        {
-                            LOG(VB_GENERAL, LOG_ERR,
-                                QString("CfgReader:: Badly formatted line %1")
-                                    .arg(line));
-                            done = true;
-                        }
-                        else
-                        {
-                            QString key = string(ptr, eq - ptr).c_str();
-                            QString val = string(eq + 1, nl - eq - 1).c_str();
-                            keyvals.push_back(KeyValue(key, val));
-                            ptr = nl;
-                        }
-                    }
-                    else
-                    {
-                        LOG(VB_GENERAL, LOG_ERR,
-                            QString("CfgReader:: Badly formatted line %1")
-                                .arg(line));
-                        done = true;
-                    }
-                    break;
-                }
-            }
-
-            if (ptr - d == l) 
-                done = true;
-        }
-
-        if (current_section.length() > 0)
-            cfg[current_section] = keyvals;
-    }
-
-    QList<QString> getSections(void)
-    {
-        QList<QString> res;
-        for (ConfigMap::iterator it = cfg.begin(); it != cfg.end(); ++it)
-            res.push_back(it.key());
-        return res;
-    }
-
-    QList<QString> getKeys(const QString &section)
-    {
-        KeyValueList keylist = cfg[section];
-        QList<QString> res;
-        for (KeyValueList::iterator it = keylist.begin();
-             it != keylist.end(); ++it)
-        {
-            res.push_back((*it).first);
-        }
-        return res;
-    }
-
-    QString getStrVal(const QString &section, const QString &key,
-                      const QString &def = "")
-    {
-        KeyValueList keylist = cfg[section];
-        QString res = def;
-        for (KeyValueList::iterator it = keylist.begin();
-             it != keylist.end(); ++it)
-        {
-            if ((*it).first == key) 
-            {
-                res =(*it).second;
-                break;
-            }
-        }
-        return res;
-    }
-
-    int getIntVal(const QString &section, const QString &key, int def=0) 
-    {
-        QString def_str;
-        def_str.setNum (def);
-        return getStrVal(section, key, def_str).toInt();
-    }
-
-  private:
-    ConfigMap cfg;
-};
-
-/****************************************************************************/
 
 PlayListFile::PlayListFile(void) : m_version(0)
 {
@@ -201,30 +37,29 @@ PlayListFile::~PlayListFile(void)
     clear();
 }
 
-int PlayListFile::parse(PlayListFile *pls, QTextStream *stream, const QString &extension)
+int PlayListFile::parse(PlayListFile *pls, const QString &filename)
 {
     int result = 0;
+    QString extension = QFileInfo(filename).suffix().toLower();
 
     if (extension == "pls")
-        result = PlayListFile::parsePLS(pls, stream);
+        result = PlayListFile::parsePLS(pls, filename);
     else if (extension == "m3u")
-        result = PlayListFile::parseM3U(pls, stream);
+        result = PlayListFile::parseM3U(pls, filename);
 
     return result;
 }
 
-int PlayListFile::parsePLS(PlayListFile *pls, QTextStream *stream)
+int PlayListFile::parsePLS(PlayListFile *pls, const QString &filename)
 {
-    int parsed = 0;
-    QString d = stream->readAll();
-    CfgReader cfg;
-    cfg.parse(d.toAscii(), d.length());
+    QSettings settings(filename, QSettings::IniFormat);
+    settings.beginGroup("playlist");
 
-    int num_entries = cfg.getIntVal("playlist", "numberofentries", -1);
+    int num_entries = settings.value("numberofentries", -1).toInt();
 
     // Some pls files have "numberofentries", some has "NumberOfEntries".
-    if (num_entries == -1) 
-        num_entries = cfg.getIntVal("playlist", "NumberOfEntries", -1);
+    if (num_entries == -1)
+        num_entries = settings.value("NumberOfEntries", -1).toInt();
 
     for (int n = 1; n <= num_entries; n++)
     {
@@ -233,23 +68,27 @@ int PlayListFile::parsePLS(PlayListFile *pls, QTextStream *stream)
         QString f_key = QString("File%1").arg(n);
         QString l_key = QString("Length%1").arg(n);
 
-        e->setFile(cfg.getStrVal("playlist", f_key));
-        e->setTitle(cfg.getStrVal("playlist", t_key));
-        e->setLength(cfg.getIntVal("playlist", l_key));
+        e->setFile(settings.value(f_key).toString());
+        e->setTitle(settings.value(t_key).toString());
+        e->setLength(settings.value(l_key).toInt());
 
         pls->add(e);
-        parsed++;
     }
 
-    return parsed;
+    return pls->size();
 }
 
 #define M3U_HEADER  "#EXTM3U"
 #define M3U_INFO    "#EXTINF"
 
-int PlayListFile::parseM3U(PlayListFile *pls, QTextStream *stream)
+int PlayListFile::parseM3U(PlayListFile *pls, const QString &filename)
 {
-    QString data = stream->readAll();
+    QFile f(filename);
+    if (!f.open(QIODevice::ReadOnly))
+        return 0;
+
+    QTextStream stream(&f);
+    QString data = stream.readAll();
     QStringList lines = data.split(QRegExp("[\r\n]"));
 
     QStringList::iterator it;
