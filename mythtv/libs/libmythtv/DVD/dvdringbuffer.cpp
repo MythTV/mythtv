@@ -342,55 +342,6 @@ bool DVDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
     dvdnav_set_readahead_flag(m_dvdnav, 0);
     dvdnav_set_PGC_positioning_flag(m_dvdnav, 1);
 
-    int32_t num_titles = 0;
-    res = dvdnav_get_number_of_titles(m_dvdnav, &num_titles);
-    if (num_titles == 0 || res == DVDNAV_STATUS_ERR)
-    {
-        char buf[DVD_BLOCK_SIZE * 5];
-        LOG(VB_GENERAL, LOG_INFO,
-            LOC + QString("Reading %1 bytes from the drive")
-                .arg(DVD_BLOCK_SIZE * 5));
-        safe_read(buf, DVD_BLOCK_SIZE * 5);
-        res = dvdnav_get_number_of_titles(m_dvdnav, &num_titles);
-    }
-
-    if (res == DVDNAV_STATUS_ERR)
-    {
-        LOG(VB_GENERAL, LOG_ERR,
-            LOC + QString("Failed to get the number of titles on the DVD" ));
-    }
-    else
-    {
-        LOG(VB_GENERAL, LOG_INFO,
-            LOC + QString("There are %1 titles on the disk")
-                .arg(num_titles));
-    }
-
-    int startTitle = 1;
-    dvdnav_status_t result = DVDNAV_STATUS_ERR;
-    while (startTitle <= num_titles)
-    {
-        result = dvdnav_title_play(m_dvdnav, startTitle);
-        if (result == DVDNAV_STATUS_OK)
-            break;
-        else if (startTitle < num_titles)
-            LOG(VB_GENERAL, LOG_WARNING, QString("Unable to play DVD title %1, "
-                                                 "trying next title")
-                                                    .arg(startTitle));
-        startTitle++;
-    }
-
-    if (result == DVDNAV_STATUS_ERR)
-    {
-        LOG(VB_GENERAL, LOG_ERR, QString("Unable to play any title on this "
-                                         "DVD. Disc may be damaged or "
-                                         "corrupted as a means of copy "
-                                         "protection."));
-
-        rwlock.unlock();
-        return false;
-    }
-
     // Check we aren't starting in a still frame (which will probably fail as
     // ffmpeg will be unable to create a decoder)
     if (dvdnav_get_next_still_flag(m_dvdnav))
@@ -446,6 +397,7 @@ bool DVDRingBuffer::StartFromBeginning(void)
     if (m_dvdnav)
     {
         QMutexLocker lock(&m_seekLock);
+        dvdnav_reset(m_dvdnav);
         dvdnav_first_play(m_dvdnav);
         m_audioStreamsChanged = true;
     }

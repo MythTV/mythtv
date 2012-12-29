@@ -26,6 +26,12 @@ void AvFormatDecoderDVD::UpdateFramesPlayed(void)
     m_parent->SetFramesPlayed(currentpos + 1);
 }
 
+bool AvFormatDecoderDVD::GetFrame(DecodeType decodetype)
+{
+    // Always try to decode audio and video for DVDs
+    return AvFormatDecoder::GetFrame( kDecodeAV );
+}
+
 void AvFormatDecoderDVD::PostProcessTracks(void)
 {
     if (!ringBuffer)

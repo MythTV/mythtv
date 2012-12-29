@@ -334,7 +334,8 @@ AvFormatDecoder::AvFormatDecoder(MythPlayer *parent,
       // Audio
       disable_passthru(false),
       m_fps(0.0f),
-      codec_is_mpeg(false)
+      codec_is_mpeg(false),
+      m_processFrames(true)
 {
     memset(&readcontext, 0, sizeof(readcontext));
     memset(ccX08_in_pmt, 0, sizeof(ccX08_in_pmt));
@@ -684,9 +685,6 @@ void AvFormatDecoder::SeekReset(long long newKey, uint skipFrames,
     if (!ringBuffer)
         return; // nothing to reset...
 
-    if (ringBuffer->IsInDiscMenuOrStillFrame() || newKey == 0)
-        return;
-
     LOG(VB_PLAYBACK, LOG_INFO, LOC +
         QString("SeekReset(%1, %2, %3 flush, %4 discard)")
             .arg(newKey).arg(skipFrames)
@@ -935,6 +933,11 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
     ringBuffer = rbuffer;
 
+    // Process frames immediately unless we're decoding
+    // a DVD, in which case don't so that we don't show
+    // anything whilst probing the data streams.
+    m_processFrames = !ringBuffer->IsDVD();
+
     if (avfRingBuffer)
         delete avfRingBuffer;
     avfRingBuffer = new AVFRingBuffer(rbuffer);
@@ -982,12 +985,6 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     }
 
     int ret = FindStreamInfo();
-
-    // Reset DVD/bluray ringbuffers
-    if (!ringBuffer->StartFromBeginning())
-        return -1;
-    ringBuffer->IgnoreWaitStates(false);
-
     if (ret < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Could not find codec parameters. " +
@@ -1142,6 +1139,23 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
     if (getenv("FORCE_DTS_TIMESTAMPS"))
         force_dts_timestamps = true;
+
+    if (ringBuffer->IsDVD())
+    {
+        // Reset DVD playback and clear any of
+        // our buffers so that none of the data
+        // parsed so far to determine decoders
+        // gets shown.
+        if (!ringBuffer->StartFromBeginning())
+            return -1;
+        ringBuffer->IgnoreWaitStates(false);
+
+        Reset(true, true, true);
+
+        // Now we're ready to process and show frames
+        m_processFrames = true;
+    }
+
 
     // Return true if recording has position map
     return recordingHasPositionMap;
@@ -4483,6 +4497,11 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
     avcodeclock->unlock();
 
     skipaudio = (lastvpts == 0);
+
+    if( !m_processFrames )
+    {
+        return false;
+    }
 
     hasVideo = HasVideo(ic);
     needDummyVideoFrames = false;
