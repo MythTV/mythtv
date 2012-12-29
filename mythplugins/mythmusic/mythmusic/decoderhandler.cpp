@@ -521,14 +521,9 @@ void DecoderHandler::createPlaylistForSingleFile(const QUrl &url)
 
 void DecoderHandler::createPlaylistFromFile(const QUrl &url)
 {
-    QFile f(QFileInfo(url.path()).absolutePath() + "/" + QFileInfo(url.path()).fileName());
-    if (!f.open(QIODevice::ReadOnly))
-        return;
-    QTextStream stream(&f);
+    QString file = url.toLocalFile();
 
-    QString extension = QFileInfo(url.path()).suffix().toLower();
-
-    PlayListFile::parse(&m_playlist, &stream, extension);
+    PlayListFile::parse(&m_playlist, file);
 
     doStart((m_playlist.size() > 0));
 }

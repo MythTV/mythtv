@@ -3,6 +3,7 @@
   Eskil Heyn Olsen, 2005, distributed under the GPL as part of mythtv.
 
   Update July 2010 updated for Qt4 (Paul Harrison)
+  Update December 2012 updated to use QSettings for the pls parser
 */
 
 #ifndef PLS_H_
@@ -87,25 +88,24 @@ class PlayListFile
 
     /** \brief Parse a pls or m3u playlist file.
         \param pls the \p PlaylistFile to add the entries to
-        \param stream the playlist file in a \p QTextStream
-        \param extension the file extension of the original playlist file
+        \param filename the playlist's filename
         \returns the number of entries parsed 
     */
-    static int parse(PlayListFile *pls, QTextStream *stream, const QString &extension);
+    static int parse(PlayListFile *pls, const QString &filename);
 
     /** \brief Parse a pls file.
         \param pls the \p PlaylistFile to add the entries to
-        \param stream the playlist file in a \p QTextStream
+        \param filename the playlist's filename
         \returns the number of entries parsed 
     */
-    static int parsePLS(PlayListFile *pls, QTextStream *stream);
+    static int parsePLS(PlayListFile *pls, const QString &filename);
 
     /** \brief Parse a m3u file.
         \param pls the \p PlaylistFile to add the entries to
-        \param stream the playlist file in a \p QTextStream
+        \param filename the playlist's filename
         \returns the number of entries parsed 
     */
-    static int parseM3U(PlayListFile *pls, QTextStream *stream);
+    static int parseM3U(PlayListFile *pls, const QString &filename);
 
   private:
     QList<PlayListFileEntry*> m_entries;
