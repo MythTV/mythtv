@@ -7,6 +7,7 @@
 #include <mythuibutton.h>
 #include <mythuitext.h>
 #include <mythuitextedit.h>
+#include <mythuicheckbox.h>
 
 
 class Bookmark;
@@ -38,6 +39,7 @@ class BookmarkEditor : public MythScreenType
     MythUITextEdit *m_categoryEdit;
     MythUITextEdit *m_nameEdit;
     MythUITextEdit *m_urlEdit;
+    MythUICheckBox *m_isHomepage;
 
     MythUIButton *m_okButton;
     MythUIButton *m_cancelButton;
