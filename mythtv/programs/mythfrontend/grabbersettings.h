@@ -33,11 +33,19 @@ class GrabberSettings : public MythScreenType
     QList<MetaGrabberScript*> m_tvGrabberList;
     QList<MetaGrabberScript*> m_gameGrabberList;
 
+    QMap<QString, QString>  m_languageMap;
+    QStringList             m_languageList;
+    QString                 m_defaultLanguageCode;
+
     MythUIButtonList   *m_movieGrabberButtonList;
     MythUIButtonList   *m_tvGrabberButtonList;
     MythUIButtonList   *m_gameGrabberButtonList;
 
     MythUICheckBox     *m_dailyUpdatesCheck;
+
+    MythUIButtonList   *m_movieLangButtonList;
+    MythUIButtonList   *m_tvLangButtonList;
+    MythUIButtonList   *m_gameLangButtonList;
 
     MythUIButton       *m_okButton;
     MythUIButton       *m_cancelButton;

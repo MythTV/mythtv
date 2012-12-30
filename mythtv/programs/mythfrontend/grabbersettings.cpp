@@ -11,6 +11,7 @@
 #include "mythdbcon.h"
 #include "mythdirs.h"
 
+#include "mythtranslation.h"
 #include "mythprogressdialog.h"
 #include "metadatacommon.h"
 #include "grabbersettings.h"
@@ -23,6 +24,8 @@ GrabberSettings::GrabberSettings(MythScreenStack *parent, const char *name)
     : MythScreenType(parent, name),
       m_movieGrabberButtonList(NULL),      m_tvGrabberButtonList(NULL),
       m_gameGrabberButtonList(NULL),       m_dailyUpdatesCheck(NULL),
+      m_movieLangButtonList(NULL), m_tvLangButtonList(NULL),
+      m_gameLangButtonList(NULL),
       m_okButton(NULL),                    m_cancelButton(NULL)
 {
 }
@@ -40,6 +43,10 @@ bool GrabberSettings::Create()
     m_movieGrabberButtonList = dynamic_cast<MythUIButtonList *> (GetChild("moviegrabber"));
     m_tvGrabberButtonList = dynamic_cast<MythUIButtonList *> (GetChild("tvgrabber"));
     m_gameGrabberButtonList = dynamic_cast<MythUIButtonList *> (GetChild("gamegrabber"));
+
+    m_movieLangButtonList = dynamic_cast<MythUIButtonList *> (GetChild("moviegrabberlanguage"));
+    m_tvLangButtonList = dynamic_cast<MythUIButtonList *> (GetChild("tvgrabberlanguage"));
+    m_gameLangButtonList = dynamic_cast<MythUIButtonList *> (GetChild("gamegrabberlanguage"));
 
     m_dailyUpdatesCheck = dynamic_cast<MythUICheckBox *> (GetChild("dailyupdates"));
 
@@ -59,6 +66,17 @@ bool GrabberSettings::Create()
                                           "information and artwork about television."));
     m_gameGrabberButtonList->SetHelpText(tr("Select a source to use when searching for "
                                             "information and artwork about video games."));
+
+    QString helpText = tr("Select a different grabber language. "
+                          "Useful if your system language is german and you want "
+                          "the metadat of all your videos to be in english." );
+    if (m_movieLangButtonList)
+        m_movieLangButtonList->SetHelpText(helpText);
+    if (m_tvLangButtonList)
+        m_tvLangButtonList->SetHelpText(helpText);
+    if (m_gameLangButtonList)
+        m_gameLangButtonList->SetHelpText(helpText);
+
     m_okButton->SetHelpText(tr("Save your changes and close this window."));
     m_cancelButton->SetHelpText(tr("Discard your changes and close this window."));
 
@@ -173,6 +191,16 @@ void GrabberSettings::Load(void)
             }
         }
     }
+
+    // Load all available languages into the list
+    m_languageMap = MythTranslation::getLanguages();
+    m_languageList = m_languageMap.values();
+    m_languageList.sort();
+
+    // Get the default language
+    m_defaultLanguageCode = gCoreContext->GetSetting("Language").toLower();
+    if (m_defaultLanguageCode.isEmpty())
+        m_defaultLanguageCode = "en_us";
 }
 
 void GrabberSettings::Init(void)
@@ -239,6 +267,42 @@ void GrabberSettings::Init(void)
         gCoreContext->GetNumSetting("DailyArtworkUpdates", 0);
     if (updates == 1)
         m_dailyUpdatesCheck->SetCheckState(MythUIStateType::Full);
+
+    // Fill the language buttonlists with the names and language
+    // codes of the available languages. Show only the names.
+    for (int i = 0; i < m_languageList.size(); ++i)
+    {
+        QString value = m_languageList.at(i);
+        QString key = m_languageMap.key(value);
+
+        if (m_movieLangButtonList)
+        {
+            MythUIButtonListItem *item = new MythUIButtonListItem(m_movieLangButtonList, value);
+            item->SetData(key);
+        }
+        if (m_tvLangButtonList)
+        {
+            MythUIButtonListItem *item = new MythUIButtonListItem(m_tvLangButtonList, value);
+            item->SetData(key);
+        }
+        if (m_gameLangButtonList)
+        {
+            MythUIButtonListItem *item = new MythUIButtonListItem(m_gameLangButtonList, value);
+            item->SetData(key);
+        }
+    }
+
+    // Preset the language buttonlist with
+    // the currently selected language
+    if (m_movieLangButtonList)
+        m_movieLangButtonList->SetValueByData(qVariantFromValue(gCoreContext->GetSetting("MovieMetadataLanguage", m_defaultLanguageCode)));
+
+    if (m_tvLangButtonList)
+        m_tvLangButtonList->SetValueByData(qVariantFromValue(gCoreContext->GetSetting("TvMetadataLanguage", m_defaultLanguageCode)));
+
+    if (m_gameLangButtonList)
+        m_gameLangButtonList->SetValueByData(qVariantFromValue(gCoreContext->GetSetting("GameMetadataLanguage", m_defaultLanguageCode)));
+
 }
 
 void GrabberSettings::slotSave(void)
@@ -251,6 +315,15 @@ void GrabberSettings::slotSave(void)
     if (m_dailyUpdatesCheck->GetCheckState() == MythUIStateType::Full)
         dailyupdatestate = 1;
     gCoreContext->SaveSetting("DailyArtworkUpdates", dailyupdatestate);
+
+    if (m_movieLangButtonList)
+        gCoreContext->SaveSetting("MovieMetadataLanguage", m_movieLangButtonList->GetDataValue().toString());
+
+    if (m_tvLangButtonList)
+        gCoreContext->SaveSetting("TvMetadataLanguage", m_tvLangButtonList->GetDataValue().toString());
+
+    if (m_gameLangButtonList)
+        gCoreContext->SaveSetting("GameMetadataLanguage", m_gameLangButtonList->GetDataValue().toString());
 
     Close();
 }
