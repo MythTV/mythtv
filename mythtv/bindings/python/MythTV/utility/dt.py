@@ -11,6 +11,7 @@ from datetime import datetime as _pydatetime, \
                      tzinfo as _pytzinfo, \
                      timedelta
 from collections import namedtuple
+import os
 import re
 import time
 import singleton
@@ -177,10 +178,12 @@ class posixtzinfo( basetzinfo ):
 
 
     def __init__(self, name=None):
-        if name is None:
-            fd = open('/etc/localtime')
-        else:
+        if name:
             fd = open('/usr/share/zoneinfo/' + name)
+        elif os.getenv('TZ'):
+            fd = open('/usr/share/zoneinfo/' + os.getenv('TZ'))
+        else:
+            fd = open('/etc/localtime')
 
         version = self._get_version(fd)
         if version == 2:
