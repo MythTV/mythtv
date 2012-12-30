@@ -2325,6 +2325,20 @@ NULL
             return false;
     }
 
+    if (dbver == "1309")
+    {
+        const char *updates[] = {
+// Add this channel filter
+"REPLACE INTO recordfilter (filterid, description, clause, newruledefault) "
+"  VALUES (10, 'This channel', 'channel.callsign = RECTABLE.station', 0)",
+// Convert old, Channel rules to All with channel filter
+"UPDATE record SET type = 4, filter = filter|1024 WHERE type = 3",
+NULL
+};
+        if (!performActualUpdate(&updates[0], "1310", dbver))
+            return false;
+    }
+
     return true;
 }
 

@@ -99,6 +99,24 @@ void ScheduleCommon::ShowUpcomingScheduled(ProgramInfo *pginfo) const
 }
 
 /**
+*  \brief Create a kSingleRecord or bring up recording dialog.
+*/
+void ScheduleCommon::QuickRecord(ProgramInfo *pginfo)
+{
+    if (!pginfo)
+        return;
+
+    if (pginfo->GetRecordingRuleID())
+        EditRecording(pginfo);
+    else
+    {
+        RecordingInfo ri(*pginfo);
+        ri.QuickRecord();
+        *pginfo = ri;
+    }
+}
+
+/**
 *  \brief Creates a dialog for editing the recording status,
 *         blocking until user leaves dialog.
 */
@@ -110,7 +128,7 @@ void ScheduleCommon::EditRecording(ProgramInfo *pginfo)
     RecordingInfo ri(*pginfo);
 
     if (!ri.GetRecordingRuleID())
-        EditScheduled(&ri);
+        ShowNotScheduledDialog(ri);
     else if (ri.GetRecordingStatus() <= rsWillRecord ||
              ri.GetRecordingStatus() == rsOtherShowing)
         ShowRecordingDialog(ri);
@@ -219,10 +237,10 @@ void ScheduleCommon::ShowRecordingDialog(const RecordingInfo& recinfo)
                 recinfo.GetRecordingStatus() != rsTuning &&
                 recinfo.GetRecordingStatus() != rsOtherRecording && 
                 recinfo.GetRecordingStatus() != rsOtherTuning)
-                menuPopup->AddButton(tr("Reactivate"),
+                menuPopup->AddButton(tr("Restart recording this showing"),
                                      qVariantFromValue(recinfo));
             else
-                menuPopup->AddButton(tr("Stop recording"),
+                menuPopup->AddButton(tr("Stop recording this showing"),
                                      qVariantFromValue(recinfo));
         }
 
@@ -233,7 +251,7 @@ void ScheduleCommon::ShowRecordingDialog(const RecordingInfo& recinfo)
             {
                 if (recinfo.GetRecordingStartTime() > now)
                 {
-                    menuPopup->AddButton(tr("Don't record"),
+                    menuPopup->AddButton(tr("Don't record this showing"),
                                          qVariantFromValue(recinfo));
                 }
 
@@ -261,7 +279,7 @@ void ScheduleCommon::ShowRecordingDialog(const RecordingInfo& recinfo)
                       (!recinfo.GetSubtitle().isEmpty() ||
                        !recinfo.GetDescription().isEmpty())) ))
                     {
-                        menuPopup->AddButton(tr("Never record"),
+                        menuPopup->AddButton(tr("Never record this episode"),
                                              qVariantFromValue(recinfo));
                     }
             }
@@ -274,20 +292,17 @@ void ScheduleCommon::ShowRecordingDialog(const RecordingInfo& recinfo)
                     recinfo.GetRecordingStatus() == rsOtherRecording ||
                     recinfo.GetRecordingStatus() == rsOtherTuning)
                 {
-                    menuPopup->AddButton(tr("Modify Recording Options"),
+                    menuPopup->AddButton(tr("Edit options for this showing"),
                                          qVariantFromValue(recinfo));
                 }
                 else
                 {
-                    menuPopup->AddButton(tr("Edit Options"),
-                                         qVariantFromValue(recinfo));
-
-                    if (recinfo.GetRecordingRuleType() != kSingleRecord &&
-                        recinfo.GetRecordingRuleType() != kOneRecord)
+                    if (recinfo.GetRecordingRuleType() != kSingleRecord)
                     {
-                        menuPopup->AddButton(tr("Add Override"),
+                        menuPopup->AddButton(tr("Override this showing with options"),
                                              qVariantFromValue(recinfo));
                     }
+
                 }
             }
 
@@ -299,17 +314,26 @@ void ScheduleCommon::ShowRecordingDialog(const RecordingInfo& recinfo)
                     recinfo.GetRecordingStatus() == rsOtherRecording ||
                     recinfo.GetRecordingStatus() == rsOtherTuning)
                 {
-                    menuPopup->AddButton(tr("Modify Recording Options"),
+                    menuPopup->AddButton(tr("Edit options for this showing"),
                                          qVariantFromValue(recinfo));
                 }
                 else
                 {
-                    menuPopup->AddButton(tr("Edit Override"),
+                    menuPopup->AddButton(tr("Edit override options"),
                                          qVariantFromValue(recinfo));
-                    menuPopup->AddButton(tr("Clear Override"),
+                    menuPopup->AddButton(tr("Delete override rule"),
                                          qVariantFromValue(recinfo));
                 }
             }
+        }
+
+        if (recinfo.GetRecordingRuleType() != kOverrideRecord &&
+            recinfo.GetRecordingRuleType() != kDontRecord)
+        {
+            menuPopup->AddButton(tr("Edit recording options"),
+                                 qVariantFromValue(recinfo));
+            menuPopup->AddButton(tr("Delete recording rule"),
+                                 qVariantFromValue(recinfo));
         }
 
         popupStack->AddScreen(menuPopup);
@@ -382,7 +406,7 @@ void ScheduleCommon::ShowNotRecordingDialog(const RecordingInfo& recinfo)
             (recinfo.GetRecordingStatus() != rsDontRecord) &&
             (recinfo.GetRecordingStatus() != rsNotListed))
         {
-            menuPopup->AddButton(tr("Reactivate"),
+            menuPopup->AddButton(tr("Restart recording this showing"),
                                  qVariantFromValue(recinfo));
         }
 
@@ -399,12 +423,12 @@ void ScheduleCommon::ShowNotRecordingDialog(const RecordingInfo& recinfo)
                 recinfo.GetRecordingStatus() == rsInactive ||
                 recinfo.GetRecordingStatus() == rsLaterShowing))
             {
-                menuPopup->AddButton(tr("Record anyway"),
+                menuPopup->AddButton(tr("Record this showing anyway"),
                                     qVariantFromValue(recinfo));
                 if (recinfo.GetRecordingStatus() == rsPreviousRecording ||
                     recinfo.GetRecordingStatus() == rsNeverRecord)
                 {
-                    menuPopup->AddButton(tr("Forget Previous"),
+                    menuPopup->AddButton(tr("Forget previous recording"),
                                         qVariantFromValue(recinfo));
                 }
             }
@@ -420,7 +444,7 @@ void ScheduleCommon::ShowNotRecordingDialog(const RecordingInfo& recinfo)
                 {
                     if (recinfo.GetRecordingStartTime() > now)
                     {
-                        menuPopup->AddButton(tr("Don't record"),
+                        menuPopup->AddButton(tr("Don't record this showing"),
                                             qVariantFromValue(recinfo));
                     }
 
@@ -444,32 +468,80 @@ void ScheduleCommon::ShowNotRecordingDialog(const RecordingInfo& recinfo)
                           (!recinfo.GetSubtitle().isEmpty() ||
                            !recinfo.GetDescription().isEmpty())) ))
                         {
-                            menuPopup->AddButton(tr("Never record"),
+                            menuPopup->AddButton(tr("Never record this episode"),
                                                  qVariantFromValue(recinfo));
                         }
                 }
-
-                menuPopup->AddButton(tr("Edit Options"),
-                                     qVariantFromValue(recinfo));
 
                 if (recinfo.GetRecordingRuleType() != kSingleRecord &&
                     recinfo.GetRecordingRuleType() != kOneRecord &&
                     recinfo.GetRecordingStatus() != rsNotListed)
                 {
-                    menuPopup->AddButton(tr("Add Override"),
+                    menuPopup->AddButton(tr("Override this showing with options"),
                                         qVariantFromValue(recinfo));
                 }
+
+                menuPopup->AddButton(tr("Edit recording options"),
+                                     qVariantFromValue(recinfo));
+                menuPopup->AddButton(tr("Delete recording rule"),
+                                     qVariantFromValue(recinfo));
             }
 
             if (recinfo.GetRecordingRuleType() == kOverrideRecord ||
                 recinfo.GetRecordingRuleType() == kDontRecord)
             {
-                menuPopup->AddButton(tr("Edit Override"),
+                menuPopup->AddButton(tr("Edit override options"),
                                     qVariantFromValue(recinfo));
-                menuPopup->AddButton(tr("Clear Override"),
+                menuPopup->AddButton(tr("Delete override rule"),
                                     qVariantFromValue(recinfo));
             }
         }
+
+        popupStack->AddScreen(menuPopup);
+    }
+    else
+        delete menuPopup;
+}
+
+/**
+*  \brief Creates a dialog displaying current recording status and options
+*         available
+*/
+void ScheduleCommon::ShowNotScheduledDialog(const RecordingInfo& recinfo)
+{
+    QString message = recinfo.toString(ProgramInfo::kTitleSubtitle, " - ");
+
+    message += "\n\n";
+    message += toDescription(recinfo.GetRecordingStatus(),
+                             recinfo.GetRecordingRuleType(),
+                             recinfo.GetRecordingStartTime());
+
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+    MythDialogBox *menuPopup = new MythDialogBox(message, popupStack,
+                                                 "notSchedOptionPopup", true);
+
+    if (menuPopup->Create())
+    {
+        menuPopup->SetReturnEvent(this, "schedulenotscheduled");
+
+        QDateTime now = MythDate::current();
+
+        if (recinfo.GetRecordingEndTime() > now)
+            menuPopup->AddButton(tr("Record only this showing"),
+                                 qVariantFromValue(recinfo));
+
+        menuPopup->AddButton(tr("Record all showings"),
+                             qVariantFromValue(recinfo));
+
+        if (!recinfo.IsGeneric())
+            menuPopup->AddButton(tr("Record one showing of this episode"),
+                                 qVariantFromValue(recinfo));
+
+        menuPopup->AddButton(tr("Record all showings on this channel"),
+                             qVariantFromValue(recinfo));
+
+        menuPopup->AddButton(tr("Record with more options"),
+                             qVariantFromValue(recinfo));
 
         popupStack->AddScreen(menuPopup);
     }
@@ -486,7 +558,7 @@ void ScheduleCommon::customEvent(QEvent *event)
         QString resultid   = dce->GetId();
         QString resulttext = dce->GetResultText();
 
-        if (resultid == "schedulenotrecording")
+        if (resultid == "schedulenotscheduled")
         {
             if (!qVariantCanConvert<RecordingInfo>(dce->GetData()))
                 return;
@@ -494,33 +566,63 @@ void ScheduleCommon::customEvent(QEvent *event)
             RecordingInfo recInfo = qVariantValue<RecordingInfo>
                 (dce->GetData());
 
-            if (resulttext == tr("Reactivate"))
+            if (resulttext == tr("Record only this showing"))
+                recInfo.ApplyRecordStateChange(kSingleRecord);
+            else if (resulttext == tr("Record all showings"))
+                recInfo.ApplyRecordStateChange(kAllRecord);
+            else if (resulttext == tr("Record one showing of this episode"))
+            {
+                recInfo.ApplyRecordStateChange(kOneRecord, false);
+                recInfo.GetRecordingRule()->m_filter |= 64; // This episode
+                recInfo.GetRecordingRule()->Save();
+            }
+            else if (resulttext == tr("Record all showings on this channel"))
+            {
+                recInfo.ApplyRecordStateChange(kAllRecord, false);
+                recInfo.GetRecordingRule()->m_filter |= 1024; // This channel
+                recInfo.GetRecordingRule()->Save();
+            }
+            else if (resulttext == tr("Record with more options"))
+            {
+                EditScheduled(&recInfo);
+            }
+        }
+        else if (resultid == "schedulenotrecording")
+        {
+            if (!qVariantCanConvert<RecordingInfo>(dce->GetData()))
+                return;
+
+            RecordingInfo recInfo = qVariantValue<RecordingInfo>
+                (dce->GetData());
+
+            if (resulttext == tr("Restart recording this showing"))
                 recInfo.ReactivateRecording();
-            else if (resulttext == tr("Record anyway"))
+            else if (resulttext == tr("Record this showing anyway"))
             {
                 recInfo.ApplyRecordStateChange(kOverrideRecord);
                 if (recInfo.GetRecordingStartTime() < MythDate::current())
                     recInfo.ReactivateRecording();
             }
-            else if (resulttext == tr("Forget Previous"))
+            else if (resulttext == tr("Forget previous recording"))
                 recInfo.ForgetHistory();
-            else if (resulttext == tr("Don't record"))
+            else if (resulttext == tr("Don't record this showing"))
                 recInfo.ApplyRecordStateChange(kDontRecord);
-            else if (resulttext == tr("Never record"))
+            else if (resulttext == tr("Never record this episode"))
             {
                 recInfo.SetRecordingStatus(rsNeverRecord);
                 recInfo.SetScheduledStartTime(MythDate::current());
                 recInfo.SetScheduledEndTime(recInfo.GetRecordingStartTime());
                 recInfo.AddHistory(true, true);
             }
-            else if (resulttext == tr("Clear Override"))
+            else if (resulttext == tr("Delete override rule") ||
+                     resulttext == tr("Delete recording rule"))
                 recInfo.ApplyRecordStateChange(kNotRecording);
-            else if (resulttext == tr("Edit Override") ||
-                     resulttext == tr("Edit Options"))
+            else if (resulttext == tr("Edit override options") ||
+                     resulttext == tr("Edit recording options"))
             {
                 EditScheduled(&recInfo);
             }
-            else if (resulttext == tr("Add Override"))
+            else if (resulttext == tr("Override this showing with options"))
             {
                 MakeOverride(&recInfo);
             }
@@ -533,27 +635,28 @@ void ScheduleCommon::customEvent(QEvent *event)
             RecordingInfo recInfo = qVariantValue<RecordingInfo>
                                                             (dce->GetData());
 
-            if (resulttext == tr("Reactivate"))
+            if (resulttext == tr("Restart recording this showing"))
                 recInfo.ReactivateRecording();
-            else if (resulttext == tr("Stop recording"))
+            else if (resulttext == tr("Stop recording this showing"))
             {
                 ProgramInfo pginfo(
                     recInfo.GetChanID(), recInfo.GetRecordingStartTime());
                 if (pginfo.GetChanID())
                     RemoteStopRecording(&pginfo);
             }
-            else if (resulttext == tr("Don't record"))
+            else if (resulttext == tr("Don't record this showing"))
                 recInfo.ApplyRecordStateChange(kDontRecord);
-            else if (resulttext == tr("Never record"))
+            else if (resulttext == tr("Never record this episode"))
             {
                 recInfo.SetRecordingStatus(rsNeverRecord);
                 recInfo.SetScheduledStartTime(MythDate::current());
                 recInfo.SetScheduledEndTime(recInfo.GetRecordingStartTime());
                 recInfo.AddHistory(true, true);
             }
-            else if (resulttext == tr("Clear Override"))
+            else if (resulttext == tr("Delete override rule") ||
+                     resulttext == tr("Delete recording rule"))
                 recInfo.ApplyRecordStateChange(kNotRecording);
-            else if (resulttext == tr("Modify Recording Options"))
+            else if (resulttext == tr("Edit options for this showing"))
             {
                 if (recInfo.GetRecordingRuleType() == kSingleRecord ||
                     recInfo.GetRecordingRuleType() == kOverrideRecord ||
@@ -562,12 +665,12 @@ void ScheduleCommon::customEvent(QEvent *event)
                 else
                     MakeOverride(&recInfo, true);
             }
-            else if (resulttext == tr("Edit Override") ||
-                     resulttext == tr("Edit Options"))
+            else if (resulttext == tr("Edit override options") ||
+                     resulttext == tr("Edit recording options"))
             {
                 EditScheduled(&recInfo);
             }
-            else if (resulttext == tr("Add Override"))
+            else if (resulttext == tr("Override this showing with options"))
             {
                 MakeOverride(&recInfo);
             }

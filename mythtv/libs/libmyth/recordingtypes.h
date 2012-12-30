@@ -21,7 +21,7 @@ typedef enum RecordingTypes
     kNotRecording = 0,
     kSingleRecord = 1,
     kDailyRecord = 2,
-    kChannelRecord = 3,
+    //kChannelRecord = 3, (Obsolete)
     kAllRecord = 4,
     kWeeklyRecord = 5,
     kOneRecord = 6,

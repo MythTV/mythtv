@@ -54,6 +54,7 @@ static QString fs6(QT_TRANSLATE_NOOP("SchedFilterEditor", "This episode"));
 static QString fs7(QT_TRANSLATE_NOOP("SchedFilterEditor", "This series"));
 static QString fs8(QT_TRANSLATE_NOOP("SchedFilterEditor", "This time"));
 static QString fs9(QT_TRANSLATE_NOOP("SchedFilterEditor", "This day and time"));
+static QString fs10(QT_TRANSLATE_NOOP("SchedFilterEditor", "This channel"));
 
 void *ScheduleEditor::RunScheduleEditor(ProgramInfo *proginfo, void *player)
 {
@@ -296,10 +297,6 @@ void ScheduleEditor::Load()
                 new MythUIButtonListItem(m_rulesList,
                                          tr("Record one showing every day"),
                                          ENUM_TO_QVARIANT(kDailyRecord));
-            if (hasChannel && !isManual)
-                new MythUIButtonListItem(m_rulesList,
-                                     tr("Record all showings on this channel"),
-                                         ENUM_TO_QVARIANT(kChannelRecord));
             if (!isManual)
                 new MythUIButtonListItem(m_rulesList,
                                          ("Record all showings"),

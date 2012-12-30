@@ -435,6 +435,7 @@ class MPUBLIC ProgramInfo
     uint32_t GetProgramFlags(void)        const { return programflags; }
     ProgramInfoType GetProgramInfoType(void) const
         { return (ProgramInfoType)((programflags & FL_TYPEMASK) >> 16); }
+    bool IsGeneric(void) const;
     bool IsInUsePlaying(void)   const { return programflags & FL_INUSEPLAYING;}
     bool IsCommercialFree(void) const { return programflags & FL_CHANCOMMFREE;}
     bool HasCutlist(void)       const { return programflags & FL_CUTLIST;     }

@@ -317,7 +317,7 @@ class MTV_PUBLIC TV : public QObject
 
     // Other toggles
     void ToggleAutoExpire(PlayerContext*);
-    void ToggleRecord(PlayerContext*);
+    void QuickRecord(PlayerContext*);
 
     // General TV state
     static bool StateIsRecording(TVState state);

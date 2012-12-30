@@ -1731,6 +1731,15 @@ uint64_t ProgramInfo::QueryLastFrameInPosMap(void) const
     return last_frame;
 }
 
+bool ProgramInfo::IsGeneric(void) const
+{
+    return
+        (programid.isEmpty() && subtitle.isEmpty() &&
+         description.isEmpty()) ||
+        (!programid.isEmpty() && programid.endsWith("0000")
+         && catType == "series");
+}
+
 QString ProgramInfo::toString(const Verbosity v, QString sep, QString grp)
     const
 {

@@ -220,7 +220,7 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
     QString GetProgramRecordingProfile(void) const;
     void ApplyRecordStateChange(RecordingType newstate, bool save = true);
     void ApplyRecordRecPriorityChange(int);
-    void ToggleRecord(void);
+    void QuickRecord(void);
 
     // Used in determining start and end for RecordingQuality determination
     void SetDesiredStartTime(const QDateTime &dt) { desiredrecstartts = dt; }

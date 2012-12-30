@@ -25,6 +25,7 @@ class ScheduleCommon : public MythScreenType
     void ShowUpcoming(const QString &title, const QString &seriesid) const;
     void ShowUpcoming(ProgramInfo *pginfo) const;
     void ShowUpcomingScheduled(ProgramInfo *pginfo) const;
+    void QuickRecord(ProgramInfo *pginfo);
     void EditRecording(ProgramInfo *pginfo);
     void EditScheduled(ProgramInfo *pginfo);
     void EditScheduled(RecordingInfo *recinfo);
@@ -32,6 +33,7 @@ class ScheduleCommon : public MythScreenType
     void MakeOverride(RecordingInfo *recinfo, bool startActive = false);
     void ShowRecordingDialog(const RecordingInfo &recinfo);
     void ShowNotRecordingDialog(const RecordingInfo &recinfo);
+    void ShowNotScheduledDialog(const RecordingInfo &recinfo);
 
     virtual void customEvent(QEvent*);
 

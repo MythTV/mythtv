@@ -766,53 +766,14 @@ void RecordingInfo::ApplyTranscoderProfileChange(const QString &profile) const
     }
 }
 
-/** \fn RecordingInfo::ToggleRecord(void)
- *  \brief Cycles through recording types.
- *
- *   If the program recording status is kNotRecording,
- *   ApplyRecordStateChange(kSingleRecord) is called.
- *   If the program recording status is kSingleRecording,
- *   ApplyRecordStateChange(kOneRecord) is called.
- *   <br>etc...
- *
- *   The states in order are: kNotRecording, kSingleRecord, kOneRecord,
- *     kWeeklyRecord, kDailyRecord, kChannelRecord, kAllRecord.<br>
- *   And: kOverrideRecord, kDontRecord.
- *
- *   That is if you the recording is in any of the first set of states,
- *   we cycle through those, if not we toggle between kOverrideRecord and
- *   kDontRecord.
+/** \fn RecordingInfo::QuickRecord(void)
+ *  \brief Create a kSingleRecord if not already scheduled.
  */
-void RecordingInfo::ToggleRecord(void)
+void RecordingInfo::QuickRecord(void)
 {
     RecordingType curType = GetProgramRecordingStatus();
-
-    switch (curType)
-    {
-        case kNotRecording:
-            ApplyRecordStateChange(kSingleRecord);
-            break;
-        case kSingleRecord:
-            ApplyRecordStateChange(kOneRecord);
-            break;
-        case kOneRecord:
-            ApplyRecordStateChange(kAllRecord);
-            break;
-        case kAllRecord:
-            ApplyRecordStateChange(kSingleRecord);
-            break;
-
-        case kOverrideRecord:
-            ApplyRecordStateChange(kDontRecord);
-            break;
-        case kDontRecord:
-            ApplyRecordStateChange(kOverrideRecord);
-            break;
-
-        default:
-            ApplyRecordStateChange(kAllRecord);
-            break;
-    }
+    if (curType == kNotRecording)
+        ApplyRecordStateChange(kSingleRecord);
 }
 
 /**

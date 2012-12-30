@@ -3559,29 +3559,24 @@ void Scheduler::UpdateMatches(uint recordid, uint sourceid, uint mplexid,
     QString(" AND channel.visible = 1 ") +
     filterClause + QString(" AND "
 
-"((RECTABLE.type = %1 " // all record
+"("
+" (RECTABLE.type = %1 " // all record
 "  OR RECTABLE.type = %2 " // one record
 "  OR RECTABLE.type = %3 " // daily record
 "  OR RECTABLE.type = %4) " // weekly record
 " OR "
-" ((RECTABLE.station = channel.callsign) " // channel matches
-"  AND "
-"  ((RECTABLE.type = %5) " // channel record
-"   OR"
-"   ((ADDTIME(RECTABLE.startdate, RECTABLE.starttime) = program.starttime) " // date/time matches
-"    AND "
-"    (RECTABLE.type = %6 "
-"     OR RECTABLE.type = %7 "
-"     OR RECTABLE.type = %8)" // single/override/don't record
-"   )"
-"  )"
-" )"
+"  ((RECTABLE.type = %6 " // single record
+"   OR RECTABLE.type = %7 " // override record
+"   OR RECTABLE.type = %8)" // don't record
+"   AND "
+"   ADDTIME(RECTABLE.startdate, RECTABLE.starttime) = program.starttime " // date/time matches
+"   AND "
+"   RECTABLE.station = channel.callsign) " // channel matches
 ") ")
             .arg(kAllRecord)
             .arg(kOneRecord)
             .arg(kDailyRecord)
             .arg(kWeeklyRecord)
-            .arg(kChannelRecord)
             .arg(kSingleRecord)
             .arg(kOverrideRecord)
             .arg(kDontRecord);

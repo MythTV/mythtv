@@ -15,8 +15,7 @@ int RecTypePrecedence(RecordingType rectype)
         case kOneRecord:      return 4; break;
         case kWeeklyRecord:   return 6; break;
         case kDailyRecord:    return 8; break;
-        case kChannelRecord:  return 9; break;
-        case kAllRecord:      return 10; break;
+        case kAllRecord:      return 9; break;
         case kTemplateRecord: return 0; break;
         default: return 11;
      }
@@ -29,8 +28,6 @@ QString toString(RecordingType rectype)
     {
         case kSingleRecord:
             return QObject::tr("Single Record");
-        case kChannelRecord:
-            return QObject::tr("Channel Record");
         case kAllRecord:
             return QObject::tr("Record All");
         case kOneRecord:
@@ -56,8 +53,6 @@ QString toRawString(RecordingType rectype)
     {
         case kSingleRecord:
             return QString("Single Record");
-        case kChannelRecord:
-            return QString("Channel Record");
         case kAllRecord:
             return QString("Record All");
         case kOneRecord:
@@ -80,8 +75,6 @@ RecordingType recTypeFromString(QString type)
         return kNotRecording;
     if (type.toLower() == "single record" || type.toLower() == "single")
         return kSingleRecord;
-    else if (type.toLower() == "channel record" || type.toLower() == "channel")
-        return kChannelRecord;
     else if (type.toLower() == "record all" || type.toLower() == "all")
         return kAllRecord;
     else if (type.toLower() == "record one" || type.toLower() == "one" ||
@@ -109,8 +102,6 @@ QChar toQChar(RecordingType rectype)
     {
         case kSingleRecord:
             ret = QObject::tr("S", "RecTypeChar kSingleRecord");     break;
-        case kChannelRecord:
-            ret = QObject::tr("C", "RecTypeChar kChannelRecord");    break;
         case kAllRecord:
             ret = QObject::tr("A", "RecTypeChar kAllRecord");        break;
         case kOneRecord:

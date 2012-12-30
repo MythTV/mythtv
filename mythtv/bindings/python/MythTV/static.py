@@ -5,7 +5,7 @@ Contains any static and global variables for MythTV Python Bindings
 """
 
 OWN_VERSION = (0,27,-1,0)
-SCHEMA_VERSION = 1309
+SCHEMA_VERSION = 1310
 NVSCHEMA_VERSION = 1007
 MUSICSCHEMA_VERSION = 1018
 PROTO_VERSION = '76'
@@ -39,7 +39,7 @@ class RECTYPE( object ):
     kNotRecording       = 0
     kSingleRecord       = 1
     kDailyRecord        = 2
-    kChannelRecord      = 3
+    #kChannelRecord      = 3 (Obsolete)
     kAllRecord          = 4
     kWeeklyRecord       = 5
     kOneRecord          = 6

@@ -3901,7 +3901,7 @@ bool TV::BrowseHandleAction(PlayerContext *ctx, const QStringList &actions)
         browsehelper->BrowseEnd(ctx, false);
     }
     else if (has_action(ACTION_TOGGLERECORD, actions))
-        ToggleRecord(ctx);
+        QuickRecord(ctx);
     else
     {
         handled = false;
@@ -4481,7 +4481,7 @@ bool TV::ToggleHandleAction(PlayerContext *ctx,
     else if (has_action(ACTION_TOGGLESLEEP, actions))
         ToggleSleepTimer(ctx);
     else if (has_action(ACTION_TOGGLERECORD, actions) && islivetv)
-        ToggleRecord(ctx);
+        QuickRecord(ctx);
     else if (has_action(ACTION_TOGGLEFAV, actions) && islivetv)
         ToggleChannelFavorite(ctx);
     else if (has_action(ACTION_TOGGLECHANCONTROLS, actions) && islivetv)
@@ -9487,7 +9487,7 @@ void TV::customEvent(QEvent *e)
     }
 }
 
-void TV::ToggleRecord(PlayerContext *ctx)
+void TV::QuickRecord(PlayerContext *ctx)
 {
     BrowseInfo bi = browsehelper->GetBrowsedInfo();
     if (bi.m_chanid)
@@ -9498,7 +9498,7 @@ void TV::ToggleRecord(PlayerContext *ctx)
         RecordingInfo::LoadStatus status;
         RecordingInfo recinfo(bi.m_chanid, startts, false, 0, &status);
         if (RecordingInfo::kFoundProgram == status)
-            recinfo.ToggleRecord();
+            recinfo.QuickRecord();
         recinfo.ToMap(infoMap);
         infoMap["iconpath"] = ChannelUtil::GetIcon(recinfo.GetChanID());
         if ((recinfo.IsVideoFile() || recinfo.IsVideoDVD() ||

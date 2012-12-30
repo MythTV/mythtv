@@ -415,11 +415,7 @@ void ProgFinder::getInfo(bool toggle)
         if (curPick)
         {
             if (toggle)
-            {
-                RecordingInfo ri(*curPick);
-                ri.ToggleRecord();
-                *curPick = ri;
-            }
+                QuickRecord(curPick);
             else
                 EditRecording(curPick);
         }

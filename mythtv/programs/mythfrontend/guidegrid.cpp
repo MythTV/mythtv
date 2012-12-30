@@ -1303,9 +1303,6 @@ void GuideGrid::fillProgramRowInfos(unsigned int row, bool useExistingData)
             case kDailyRecord:
                 recFlag = 2;
                 break;
-            case kChannelRecord:
-                recFlag = 3;
-                break;
             case kAllRecord:
                 recFlag = 4;
                 break;
@@ -1983,10 +1980,7 @@ void GuideGrid::quickRecord()
     if (pginfo->GetTitle() == kUnknownTitle)
         return;
 
-    RecordingInfo ri(*pginfo);
-    ri.ToggleRecord();
-    *pginfo = ri;
-
+    QuickRecord(pginfo);
     LoadFromScheduler(m_recList);
     fillProgramInfos();
     updateInfo();
