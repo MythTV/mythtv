@@ -80,9 +80,10 @@ This is not yet supported.
 ## Searching
 
 There are currently three search methods available for use: movies, people, 
-and studios. Search results from TheMovieDb are sent iteratively, twenty
-results per page. The search methods provided by the PyTMDB3 module return
-list-like structures that will automatically grab new pages as needed.
+studios, lists, and collections. Search results from TheMovieDb are sent
+iteratively, twenty results per page. The search methods provided by the
+PyTMDB3 module return list-like structures that will automatically grab new
+pages as needed.
 
   >>> from tmdb3 import searchMovie
   >>> res = searchMovie('A New Hope')
@@ -110,6 +111,16 @@ out. The people search method behaves similarly.
   <Search Results: Sony Pictures>
   >>> res[0]
   <Studio 'Sony Pictures'>
+
+The movieSearch() method accepts a 'year' keyword, tell tell TMDB to filter
+for movies of only that specific year. There is a helper method,
+movieSearchWithYear(), which will process the release year from movie names
+where the year is contained in parentheses, as in:
+
+  >>> from tmdb import searchMovieWithYear
+  >>> list(searchMovieWithYear('Star Wars (1977)'))
+  [<Movie 'Star Wars: Episode IV - A New Hope' (1977)>,
+                <Movie 'The Making of 'Star Wars'' (1977)>]
 
 
 ## Direct Queries
@@ -190,6 +201,8 @@ Collection:
   Backdrop              backdrop
   Poster                poster
   list(Movie)           members             (sorted by release date)
+  list(Backdrop)        backdrops
+  list(Poster)          posters
 
 Movie:
   integer               id
@@ -222,7 +235,12 @@ Movie:
   list(Keyword)         keywords
   dict(Release)         releases            (indexed by country)
   list(Translation)     translations
+  list(Movie)           similar
+  list(List)            lists
   list(Movie)           getSimilar()
+  None                  setFavorite(bool)   mark favorite status for current user
+  None                  setRating(int)      rate movie by current user
+  None                  setWatchlist(bool)  mark watchlist status for current user
 
 Movie classmethods:
   Movie                 fromIMDB(imdbid)    special constructor for use with IMDb codes
@@ -230,6 +248,21 @@ Movie classmethods:
   list(Movie)           nowplaying()        content currently in theater
   list(Movie)           mostpopular()       based off themoviedb.org page view counts
   list(Movie)           toprated()          based off themoviedb.org user ratings
+  list(Movie)           upcoming()          curated list, typically contains 100 movies
+  list(Movie)           favorites()         current user's favorite movies
+  list(Movie)           ratedmovies()       movies rated by current user
+  list(Movie)           watchlist()         movies marked to watch by current user
+
+List:
+  hex string            id
+  string                name
+  string                author
+  string                description
+  integer               favorites           number of users that have marked list
+  string                language
+  integer               count
+  Poster                poster
+  list(Movie)           members
 
 Person:
   integer               id

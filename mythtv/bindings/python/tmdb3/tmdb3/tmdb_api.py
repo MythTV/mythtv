@@ -22,31 +22,43 @@ for search and retrieval of text metadata and image URLs from TMDB.
 Preliminary API specifications can be found at
 http://help.themoviedb.org/kb/api/about-3"""
 
-__version__="v0.6.4"
-# 0.1.0 Initial development
-# 0.2.0 Add caching mechanism for API queries
-# 0.2.1 Temporary work around for broken search paging
-# 0.3.0 Rework backend machinery for managing OO interface to results
-# 0.3.1 Add collection support
-# 0.3.2 Remove MythTV key from results.py
-# 0.3.3 Add functional language support
-# 0.3.4 Re-enable search paging
-# 0.3.5 Add methods for grabbing current, popular, and top rated movies
-# 0.3.6 Rework paging mechanism
-# 0.3.7 Generalize caching mechanism, and allow controllability
-# 0.4.0 Add full locale support (language and country) and optional fall through
-# 0.4.1 Add custom classmethod for dealing with IMDB movie IDs
-# 0.4.2 Improve cache file selection for Windows systems
-# 0.4.3 Add a few missed Person properties
-# 0.4.4 Add support for additional Studio information
-# 0.4.5 Add locale fallthrough for images and alternate titles
-# 0.4.6 Add slice support for search results
-# 0.5.0 Rework cache framework and improve file cache performance
-# 0.6.0 Add user authentication support
-# 0.6.1 Add adult filtering for people searches
-# 0.6.2 Add similar movie search for Movie objects
-# 0.6.3 Add Studio search
-# 0.6.4 Add Genre list and associated Movie search
+__version__="v0.6.16"
+# 0.1.0  Initial development
+# 0.2.0  Add caching mechanism for API queries
+# 0.2.1  Temporary work around for broken search paging
+# 0.3.0  Rework backend machinery for managing OO interface to results
+# 0.3.1  Add collection support
+# 0.3.2  Remove MythTV key from results.py
+# 0.3.3  Add functional language support
+# 0.3.4  Re-enable search paging
+# 0.3.5  Add methods for grabbing current, popular, and top rated movies
+# 0.3.6  Rework paging mechanism
+# 0.3.7  Generalize caching mechanism, and allow controllability
+# 0.4.0  Add full locale support (language and country) and optional fall through
+# 0.4.1  Add custom classmethod for dealing with IMDB movie IDs
+# 0.4.2  Improve cache file selection for Windows systems
+# 0.4.3  Add a few missed Person properties
+# 0.4.4  Add support for additional Studio information
+# 0.4.5  Add locale fallthrough for images and alternate titles
+# 0.4.6  Add slice support for search results
+# 0.5.0  Rework cache framework and improve file cache performance
+# 0.6.0  Add user authentication support
+# 0.6.1  Add adult filtering for people searches
+# 0.6.2  Add similar movie search for Movie objects
+# 0.6.3  Add Studio search
+# 0.6.4  Add Genre list and associated Movie search
+# 0.6.5  Prevent data from being blanked out by subsequent queries
+# 0.6.6  Turn date processing errors into mutable warnings
+# 0.6.7  Add support for searching by year
+# 0.6.8  Add support for collection images
+# 0.6.9  Correct Movie image language filtering
+# 0.6.10 Add upcoming movie classmethod
+# 0.6.11 Fix URL for top rated Movie query
+# 0.6.12 Add support for Movie watchlist query and editing
+# 0.6.13 Fix URL for rating Movies
+# 0.6.14 Add support for Lists
+# 0.6.15 Add ability to search Collections
+# 0.6.16 Make absent primary images return None (previously u'')
 
 from request import set_key, Request
 from util import Datapoint, Datalist, Datadict, Element, NameRepr, SearchRepr
@@ -63,7 +75,18 @@ import datetime
 DEBUG = False
 
 def process_date(datestr):
-    return datetime.date(*[int(x) for x in datestr.split('-')])
+    try:
+        return datetime.date(*[int(x) for x in datestr.split('-')])
+    except TypeError:
+        import sys
+        import warnings
+        import traceback
+        _,_,tb = sys.exc_info()
+        f,l,_,_ = traceback.extract_tb(tb)[-1]
+        warnings.warn_explicit(('"{0}" is not a supported date format. '
+                'Please fix upstream data at http://www.themoviedb.org.')\
+              .format(datestr), Warning, f, l)
+        return None
 
 class Configuration( Element ):
     images = Datapoint('images')
@@ -86,10 +109,31 @@ class Account( NameRepr, Element ):
     def locale(self):
         return get_locale(self.language, self.country)
 
-def searchMovie(query, locale=None, adult=False):
-    return MovieSearchResult(
-                    Request('search/movie', query=query, include_adult=adult),
-                    locale=locale)
+def searchMovie(query, locale=None, adult=False, year=None):
+    kwargs = {'query':query, 'include_adult':adult}
+    if year is not None:
+        try:
+            kwargs['year'] = year.year
+        except AttributeError:
+            kwargs['year'] = year
+    return MovieSearchResult(Request('search/movie', **kwargs), locale=locale)
+
+def searchMovieWithYear(query, locale=None, adult=False):
+    year = None
+    if (len(query) > 6) and (query[-1] == ')') and (query[-6] == '('):
+        # simple syntax check, no need for regular expression
+        try:
+            year = int(query[-5:-1])
+        except ValueError:
+            pass
+        else:
+            if 1885 < year < 2050:
+                # strip out year from search
+                query = query[:-7]
+            else:
+                # sanity check on resolved year failed, pass through
+                year = None
+    return searchMovie(query, locale, adult, year)
 
 class MovieSearchResult( SearchRepr, PagedRequest ):
     """Stores a list of search matches."""
@@ -122,6 +166,30 @@ class StudioSearchResult( SearchRepr, PagedRequest ):
         super(StudioSearchResult, self).__init__(request,
                                 lambda x: Studio(raw=x))
 
+def searchList(query, adult=False):
+    ListSearchResult(Request('search/list', query=query, include_adult=adult))
+
+class ListSearchResult( SearchRepr, PagedRequest ):
+    """Stores a list of search matches."""
+    _name = None
+    def __init__(self, request):
+        super(ListSearchResult, self).__init__(request,
+                                lambda x: List(raw=x))
+
+def searchCollection(query, locale=None):
+    return CollectionSearchResult(Request('search/collection', query=query),
+                           locale=locale)
+
+class CollectionSearchResult( SearchRepr, PagedRequest ):
+    """Stores a list of search matches."""
+    _name=None
+    def __init__(self, request, locale=None):
+        if locale is None:
+            locale = get_locale()
+        super(CollectionSearchResult, self).__init__(
+                                request.new(language=locale.language),
+                                lambda x: Collection(raw=x, locale=locale))
+
 class Image( Element ):
     filename        = Datapoint('file_path', initarg=1,
                                 handler=lambda x: x.lstrip('/'))
@@ -146,8 +214,14 @@ class Image( Element ):
     def __gt__(self, other):
         return (self.language != other.language) \
                 and (other.language == self._locale.language)
+    # direct match for comparison
     def __eq__(self, other):
-        return self.language == other.language
+        return self.filename == other.filename
+    # special handling for boolean to see if exists
+    def __nonzero__(self):
+        if len(self.filename) == 0:
+            return False
+        return True
 
     def __repr__(self):
         # BASE62 encoded filename, no need to worry about unicode
@@ -192,7 +266,8 @@ class Person( Element ):
     dayofdeath  = Datapoint('deathday', default=None, handler=process_date)
     homepage    = Datapoint('homepage')
     birthplace  = Datapoint('place_of_birth')
-    profile     = Datapoint('profile_path', handler=Profile, raw=False)
+    profile     = Datapoint('profile_path', handler=Profile, \
+                                raw=False, default=None)
     adult       = Datapoint('adult')
     aliases     = Datalist('also_known_as')
 
@@ -314,7 +389,8 @@ class Studio( NameRepr, Element ):
     name            = Datapoint('name')
     description     = Datapoint('description')
     headquarters    = Datapoint('headquarters')
-    logo            = Datapoint('logo_path', handler=Logo, raw=False)
+    logo            = Datapoint('logo_path', handler=Logo, \
+                                    raw=False, default=None)
     # FIXME: manage not-yet-defined handlers in a way that will propogate
     #        locale information properly
     parent          = Datapoint('parent_company', \
@@ -365,8 +441,14 @@ class Movie( Element ):
 
     @classmethod
     def toprated(cls, locale=None):
-        res = MovieSearchResult(Request('movie/top-rated'), locale=locale)
+        res = MovieSearchResult(Request('movie/top_rated'), locale=locale)
         res._name = 'Top Rated'
+        return res
+
+    @classmethod
+    def upcoming(cls, locale=None):
+        res = MovieSearchResult(Request('movie/upcoming'), locale=locale)
+        res._name = 'Upcoming'
         return res
 
     @classmethod
@@ -389,6 +471,17 @@ class Movie( Element ):
                     Request('account/{0}/rated_movies'.format(account.id),
                                 session_id=session.sessionid))
         res._name = "Movies You Rated"
+        return res
+
+    @classmethod
+    def watchlist(cls, session=None):
+        if session is None:
+            session = get_session()
+        account = Account(session=session)
+        res = MovieSearchResult(
+                    Request('account/{0}/movie_watchlist'.format(account.id),
+                                session_id=session.sessionid))
+        res._name = "Movies You're Watching"
         return res
 
     @classmethod
@@ -418,8 +511,10 @@ class Movie( Element ):
     homepage        = Datapoint('homepage')
     imdb            = Datapoint('imdb_id')
 
-    backdrop        = Datapoint('backdrop_path', handler=Backdrop, raw=False)
-    poster          = Datapoint('poster_path', handler=Poster, raw=False)
+    backdrop        = Datapoint('backdrop_path', handler=Backdrop, \
+                                    raw=False, default=None)
+    poster          = Datapoint('poster_path', handler=Poster, \
+                                    raw=False, default=None)
 
     popularity      = Datapoint('popularity')
     userrating      = Datapoint('vote_average')
@@ -446,7 +541,7 @@ class Movie( Element ):
     def _populate_images(self):
         kwargs = {}
         if not self._locale.fallthrough:
-            kwargs['country'] = self._locale.country
+            kwargs['language'] = self._locale.language
         return Request('movie/{0}/images'.format(self.id), **kwargs)
     def _populate_keywords(self):
         return Request('movie/{0}/keywords'.format(self.id))
@@ -489,17 +584,36 @@ class Movie( Element ):
     def setRating(self, value):
         if not (0 <= value <= 10):
             raise TMDBError("Ratings must be between '0' and '10'.")
-        req = Request('movie/{0}/favorite'.format(self.id), \
+        req = Request('movie/{0}/rating'.format(self.id), \
                             session_id=self._session.sessionid)
         req.lifetime = 0
         req.add_data({'value':value})
         req.readJSON()
 
+    def setWatchlist(self, value):
+        req = Request('account/{0}/movie_watchlist'.format(\
+                                        Account(session=self._session).id),
+                            session_id=self._session.sessionid)
+        req.lifetime = 0
+        req.add_data({'movie_id':self.id,
+                      'movie_watchlist':str(bool(value)).lower()})
+        req.readJSON()
+
     def getSimilar(self):
+        return self.similar
+
+    @property
+    def similar(self):
         res = MovieSearchResult(Request('movie/{0}/similar_movies'\
                                                             .format(self.id)),
                                         locale=self._locale)
         res._name = 'Similar to {0}'.format(self._printable_name())
+        return res
+
+    @property
+    def lists(self):
+        res = ListSearchResult(Request('movie/{0}/lists'.format(self.id)))
+        res._name = "Lists containing {0}".format(self._printable_name())
         return res
 
     def _printable_name(self):
@@ -535,11 +649,39 @@ class ReverseCrew( Movie ):
 class Collection( NameRepr, Element ):
     id       = Datapoint('id', initarg=1)
     name     = Datapoint('name')
-    backdrop = Datapoint('backdrop_path', handler=Backdrop, raw=False)
-    poster   = Datapoint('poster_path', handler=Poster, raw=False)
+    backdrop = Datapoint('backdrop_path', handler=Backdrop, \
+                            raw=False, default=None)
+    poster   = Datapoint('poster_path', handler=Poster, \
+                            raw=False, default=None)
     members  = Datalist('parts', handler=Movie, sort='releasedate')
 
     def _populate(self):
         return Request('collection/{0}'.format(self.id), \
                             language=self._locale.language)
+    def _populate_images(self):
+        kwargs = {}
+        if not self._locale.fallthrough:
+            kwargs['language'] = self._locale.language
+        return Request('collection/{0}/images'.format(self.id), **kwargs)
+
+    backdrops        = Datalist('backdrops', handler=Backdrop, \
+                                    poller=_populate_images, sort=True)
+    posters          = Datalist('posters', handler=Poster, \
+                                    poller=_populate_images, sort=True)
+
+class List( NameRepr, Element ):
+    id          = Datapoint('id', initarg=1)
+    name        = Datapoint('name')
+    author      = Datapoint('created_by')
+    description = Datapoint('description')
+    favorites   = Datapoint('favorite_count')
+    language    = Datapoint('iso_639_1')
+    count       = Datapoint('item_count')
+    poster      = Datapoint('poster_path', handler=Poster, \
+                                raw=False, default=None)
+
+    members     = Datalist('items', handler=Movie)
+
+    def _populate(self):
+        return Request('list/{0}'.format(self.id))
 
