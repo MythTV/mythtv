@@ -76,7 +76,7 @@ def buildSingle(inetref, opts):
         m.people.append(d)
     for crew in movie.crew:
         d = {'name':crew.name, 'job':crew.job, 'department':crew.department,
-             'url':'http://www.themoviedb.org/people/{0}'.format(cast.id)}
+             'url':'http://www.themoviedb.org/people/{0}'.format(crew.id)}
         if crew.profile: d['thumb'] = crew.profile.geturl()
         m.people.append(d)
     for backdrop in movie.backdrops:
