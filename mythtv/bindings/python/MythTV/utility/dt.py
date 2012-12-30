@@ -192,8 +192,7 @@ class offsettzinfo( _pytzinfo ):
     """Customized timezone class that provides a simple static offset."""
     @classmethod
     def local(cls):
-        offset = -(time.timezone, time.altzone)[time.daylight]
-        return cls(sec=offset)
+        return cls(sec=-time.timezone)
     def __init__(self, direc='+', hr=0, min=0, sec=0):
         sec = int(sec) + 60 * (int(min) + 60 * int(hr))
         if direc == '-':
