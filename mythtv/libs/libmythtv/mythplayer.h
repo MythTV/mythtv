@@ -180,8 +180,8 @@ class MTV_PUBLIC MythPlayer
     float   GetNextPlaySpeed(void) const      { return next_play_speed; }
     int     GetLength(void) const             { return totalLength; }
     uint64_t GetTotalFrameCount(void) const   { return totalFrames; }
+    uint64_t GetCurrentFrameCount(void) const;
     uint64_t GetFramesPlayed(void) const      { return framesPlayed; }
-    virtual  int64_t GetSecondsPlayed(void);
     virtual  int64_t GetTotalSeconds(void) const;
     virtual  uint64_t GetBookmark(void);
     QString   GetError(void) const;
@@ -321,8 +321,9 @@ class MTV_PUBLIC MythPlayer
     virtual void GoToDVDProgram(bool direction) { (void) direction; }
 
     // Position Map Stuff
-    bool PosMapFromEnc(unsigned long long          start,
-                       QMap<long long, long long> &posMap);
+    bool PosMapFromEnc(uint64_t start,
+                       frm_pos_map_t &posMap,
+                       frm_pos_map_t &durMap);
 
     // OSD locking for TV class
     bool TryLockOSD(void) { return osdLock.tryLock(50); }
@@ -391,12 +392,31 @@ class MTV_PUBLIC MythPlayer
     virtual long long CalcMaxFFTime(long long ff, bool setjump = true) const;
     long long CalcRWTime(long long rw) const;
     virtual void calcSliderPos(osdInfo &info, bool paddedFields = false);
-    uint64_t TranslatePositionAbsToRel(uint64_t absPosition) const {
-        return deleteMap.TranslatePositionAbsToRel(absPosition);
+    uint64_t TranslatePositionFrameToMs(uint64_t position,
+                                        bool use_cutlist) const {
+        return deleteMap.TranslatePositionFrameToMs(position,
+                                                    GetFrameRate(),
+                                                    use_cutlist);
     }
-    uint64_t TranslatePositionRelToAbs(uint64_t relPosition) const {
-        return deleteMap.TranslatePositionRelToAbs(relPosition);
+    uint64_t TranslatePositionMsToFrame(uint64_t position,
+                                        bool use_cutlist) const {
+        return deleteMap.TranslatePositionMsToFrame(position,
+                                                    GetFrameRate(),
+                                                    use_cutlist);
     }
+    // TranslatePositionAbsToRel and TranslatePositionRelToAbs are
+    // used for frame calculations when seeking relative to a number
+    // of frames rather than by time.
+    uint64_t TranslatePositionAbsToRel(uint64_t position) const {
+        return deleteMap.TranslatePositionAbsToRel(position);
+    }
+    uint64_t TranslatePositionRelToAbs(uint64_t position) const {
+        return deleteMap.TranslatePositionRelToAbs(position);
+    }
+    float ComputeSecs(uint64_t position, bool use_cutlist) const {
+        return TranslatePositionFrameToMs(position, use_cutlist) / 1000.0;
+    }
+    uint64_t FindFrame(float offset, bool use_cutlist) const;
 
     // Commercial stuff
     void SetAutoCommercialSkip(CommSkipMode autoskip)
@@ -555,6 +575,8 @@ class MTV_PUBLIC MythPlayer
     // The "inaccuracy" argument is generally one of the kInaccuracy* values.
     bool DoFastForward(uint64_t frames, double inaccuracy);
     bool DoRewind(uint64_t frames, double inaccuracy);
+    bool DoFastForwardSecs(float secs, double inaccuracy, bool use_cutlist);
+    bool DoRewindSecs(float secs, double inaccuracy, bool use_cutlist);
     void DoJumpToFrame(uint64_t frame, double inaccuracy);
 
     // Private seeking stuff

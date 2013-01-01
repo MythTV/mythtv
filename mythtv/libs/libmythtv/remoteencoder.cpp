@@ -264,8 +264,8 @@ int64_t RemoteEncoder::GetKeyframePosition(uint64_t desired)
     return -1;
 }
 
-void RemoteEncoder::FillPositionMap(long long start, long long end,
-                                    QMap<long long, long long> &positionMap)
+void RemoteEncoder::FillPositionMap(int64_t start, int64_t end,
+                                    frm_pos_map_t &positionMap)
 {
     QStringList strlist( QString("QUERY_RECORDER %1").arg(recordernum));
     strlist << "FILL_POSITION_MAP";
@@ -279,15 +279,42 @@ void RemoteEncoder::FillPositionMap(long long start, long long end,
     for (; it != strlist.end(); ++it)
     {
         bool ok;
-        long long index = (*it).toLongLong(&ok);
+        uint64_t index = (*it).toLongLong(&ok);
         if (++it == strlist.end() || !ok)
             break;
 
-        long long pos = (*it).toLongLong(&ok);
+        uint64_t pos = (*it).toLongLong(&ok);
         if (!ok)
             break;
 
         positionMap[index] = pos;
+    }
+}
+
+void RemoteEncoder::FillDurationMap(int64_t start, int64_t end,
+                                    frm_pos_map_t &durationMap)
+{
+    QStringList strlist( QString("QUERY_RECORDER %1").arg(recordernum));
+    strlist << "FILL_DURATION_MAP";
+    strlist << QString::number(start);
+    strlist << QString::number(end);
+
+    if (!SendReceiveStringList(strlist))
+        return;
+
+    QStringList::const_iterator it = strlist.begin();
+    for (; it != strlist.end(); ++it)
+    {
+        bool ok;
+        uint64_t index = (*it).toLongLong(&ok);
+        if (++it == strlist.end() || !ok)
+            break;
+
+        uint64_t pos = (*it).toLongLong(&ok);
+        if (!ok)
+            break;
+
+        durationMap[index] = pos;
     }
 }
 

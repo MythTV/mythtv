@@ -74,6 +74,7 @@ bool MythCommFlagPlayer::RebuildSeekTable(
         player_ctx->playingInfo->ClearPositionMap(MARK_KEYFRAME);
         player_ctx->playingInfo->ClearPositionMap(MARK_GOP_START);
         player_ctx->playingInfo->ClearPositionMap(MARK_GOP_BYFRAME);
+        player_ctx->playingInfo->ClearPositionMap(MARK_DURATION_MS);
     }
     player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
 

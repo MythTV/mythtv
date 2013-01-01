@@ -173,6 +173,8 @@ class MTV_PUBLIC RecorderBase : public QRunnable
     int64_t GetKeyframePosition(uint64_t desired) const;
     bool GetKeyframePositions(
         int64_t start, int64_t end, frm_pos_map_t&) const;
+    bool GetKeyframeDurations(
+        int64_t start, int64_t end, frm_pos_map_t&) const;
 
     virtual void StopRecording(void);
     virtual bool IsRecording(void);
@@ -301,6 +303,8 @@ class MTV_PUBLIC RecorderBase : public QRunnable
     mutable QMutex positionMapLock;
     frm_pos_map_t  positionMap;
     frm_pos_map_t  positionMapDelta;
+    frm_pos_map_t  durationMap;
+    frm_pos_map_t  durationMapDelta;
     MythTimer      positionMapTimer;
 
     // Statistics

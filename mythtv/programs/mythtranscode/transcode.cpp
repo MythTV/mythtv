@@ -799,8 +799,7 @@ int Transcode::TranscodeFile(const QString &inputname,
             // through a cut, and then use the cutter to
             // discard the rest
             cutter = new Cutter();
-            cutter->SetCutList(deleteMap);
-
+            cutter->SetCutList(deleteMap, ctx);
             GetPlayer()->SetCutList(cutter->AdjustedCutList());
         }
         else
@@ -1473,6 +1472,7 @@ int Transcode::TranscodeFile(const QString &inputname,
             m_proginfo->ClearPositionMap(MARK_KEYFRAME);
             m_proginfo->ClearPositionMap(MARK_GOP_START);
             m_proginfo->ClearPositionMap(MARK_GOP_BYFRAME);
+            m_proginfo->ClearPositionMap(MARK_DURATION_MS);
         }
 
         if (nvr)

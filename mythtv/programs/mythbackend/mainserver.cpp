@@ -3865,11 +3865,33 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
     }
     else if (command == "FILL_POSITION_MAP")
     {
-        long long start = slist[2].toLongLong();
-        long long end   = slist[3].toLongLong();
+        int64_t start = slist[2].toLongLong();
+        int64_t end   = slist[3].toLongLong();
         frm_pos_map_t map;
 
         if (!enc->GetKeyframePositions(start, end, map))
+        {
+            retlist << "error";
+        }
+        else
+        {
+            frm_pos_map_t::const_iterator it = map.begin();
+            for (; it != map.end(); ++it)
+            {
+                retlist += QString::number(it.key());
+                retlist += QString::number(*it);
+            }
+            if (retlist.empty())
+                retlist << "OK";
+        }
+    }
+    else if (command == "FILL_DURATION_MAP")
+    {
+        int64_t start = slist[2].toLongLong();
+        int64_t end   = slist[3].toLongLong();
+        frm_pos_map_t map;
+
+        if (!enc->GetKeyframeDurations(start, end, map))
         {
             retlist << "error";
         }

@@ -426,6 +426,7 @@ class MTV_PUBLIC TV : public QObject
     void DoSeek(PlayerContext*, float time, const QString &mesg,
                 bool timeIsOffset, bool honorCutlist);
     bool DoPlayerSeek(PlayerContext*, float time);
+    bool DoPlayerSeekToFrame(PlayerContext *ctx, uint64_t target);
     enum ArbSeekWhence {
         ARBSEEK_SET = 0,
         ARBSEEK_REWIND,

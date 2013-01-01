@@ -390,17 +390,6 @@ long long MythDVDPlayer::CalcMaxFFTime(long long ff, bool setjump) const
     return MythPlayer::CalcMaxFFTime(ff, setjump);
 }
 
-int64_t MythDVDPlayer::GetSecondsPlayed(void)
-{
-    if (!player_ctx->buffer->IsDVD())
-        return 0;
-
-    return (m_stillFrameLength > 0) ?
-                (m_stillFrameTimer.elapsed() / 1000) :
-                (player_ctx->buffer->DVD()->GetCurrentTime());
-
-}
-
 int64_t MythDVDPlayer::GetTotalSeconds(void) const
 {
     return (m_stillFrameLength > 0) ? m_stillFrameLength: totalLength;

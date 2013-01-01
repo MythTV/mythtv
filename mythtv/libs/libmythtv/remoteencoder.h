@@ -11,6 +11,7 @@
 #include "mythtvexp.h"
 #include "videoouttypes.h"
 #include "tv.h"
+#include "programtypes.h"
 
 class QStringList;
 class ProgramInfo;
@@ -36,8 +37,10 @@ class MTV_PUBLIC RemoteEncoder
     long long GetFreeDiskSpace();
     long long GetMaxBitrate();
     int64_t GetKeyframePosition(uint64_t desired);
-    void FillPositionMap(long long start, long long end,
-                         QMap<long long, long long> &positionMap);
+    void FillPositionMap(int64_t start, int64_t end,
+                         frm_pos_map_t &positionMap);
+    void FillDurationMap(int64_t start, int64_t end,
+                         frm_pos_map_t &durationMap);
     void StopPlaying(void);
     void SpawnLiveTV(QString chainid, bool pip, QString startchan);
     void StopLiveTV(void);

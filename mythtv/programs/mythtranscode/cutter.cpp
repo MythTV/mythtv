@@ -2,7 +2,7 @@
 
 #include "cutter.h"
 
-void Cutter::SetCutList(frm_dir_map_t &deleteMap)
+void Cutter::SetCutList(frm_dir_map_t &deleteMap, PlayerContext *ctx)
 {
     // Break each cut into two parts, the first for
     // the player and the second for the transcode loop.
@@ -11,6 +11,7 @@ void Cutter::SetCutList(frm_dir_map_t &deleteMap)
     int64_t                 start = 0;
     int64_t                 leadinLength;
 
+    tracker.SetPlayerContext(ctx);
     foreshortenedCutList.clear();
 
     for (it = deleteMap.begin(); it != deleteMap.end(); ++it)
@@ -82,7 +83,7 @@ void Cutter::Activate(float v2a, int64_t total)
     totalFrames = total;
     videoFramesToCut = 0;
     audioFramesToCut = 0;
-    tracker.TrackerReset(0, totalFrames);
+    tracker.TrackerReset(0);
 }
 
 void Cutter::NewFrame(int64_t currentFrame)
@@ -93,12 +94,11 @@ void Cutter::NewFrame(int64_t currentFrame)
         {
             uint64_t jumpTo = 0;
 
-            if (tracker.TrackerWantsToJump(currentFrame, totalFrames,
-                                           jumpTo))
+            if (tracker.TrackerWantsToJump(currentFrame, jumpTo))
             {
                 // Reset the tracker and work out how much video and audio
                 // to drop
-                tracker.TrackerReset(jumpTo, totalFrames);
+                tracker.TrackerReset(jumpTo);
                 videoFramesToCut = jumpTo - currentFrame;
                 audioFramesToCut += (int64_t)(videoFramesToCut *
                                     audioFramesPerVideoFrame + 0.5);

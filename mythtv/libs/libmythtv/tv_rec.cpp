@@ -2557,6 +2557,17 @@ bool TVRec::GetKeyframePositions(
     return false;
 }
 
+bool TVRec::GetKeyframeDurations(
+    int64_t start, int64_t end, frm_pos_map_t &map) const
+{
+    QMutexLocker lock(&stateChangeLock);
+
+    if (recorder)
+        return recorder->GetKeyframeDurations(start, end, map);
+
+    return false;
+}
+
 /** \fn TVRec::GetMaxBitrate(void) const
  *  \brief Returns the maximum bits per second this recorder can produce.
  *

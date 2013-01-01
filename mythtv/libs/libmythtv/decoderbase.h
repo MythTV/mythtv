@@ -141,6 +141,26 @@ class DecoderBase
     virtual bool DoRewind(long long desiredFrame, bool doflush = true);
     virtual bool DoFastForward(long long desiredFrame, bool doflush = true);
 
+    static uint64_t
+        TranslatePositionAbsToRel(const frm_dir_map_t &deleteMap,
+                                  uint64_t absPosition,
+                                  const frm_pos_map_t &map = frm_pos_map_t(),
+                                  float fallback_ratio = 1.0);
+    static uint64_t
+        TranslatePositionRelToAbs(const frm_dir_map_t &deleteMap,
+                                  uint64_t relPosition,
+                                  const frm_pos_map_t &map = frm_pos_map_t(),
+                                  float fallback_ratio = 1.0);
+    static uint64_t TranslatePosition(const frm_pos_map_t &map,
+                                      uint64_t key,
+                                      float fallback_ratio);
+    uint64_t TranslatePositionFrameToMs(uint64_t position,
+                                        float fallback_framerate,
+                                        const frm_dir_map_t &cutlist) const;
+    uint64_t TranslatePositionMsToFrame(uint64_t dur_ms,
+                                        float fallback_framerate,
+                                        const frm_dir_map_t &cutlist) const;
+
     float GetVideoAspect(void) const { return current_aspect; }
 
     virtual int64_t NormalizeVideoTimecode(int64_t timecode) { return timecode; }
@@ -274,6 +294,8 @@ class DecoderBase
 
     mutable QMutex m_positionMapLock;
     vector<PosMapEntry> m_positionMap;
+    frm_pos_map_t m_frameToDurMap; // guarded by m_positionMapLock
+    frm_pos_map_t m_durToFrameMap; // guarded by m_positionMapLock
     bool dontSyncPositionMap;
 
     uint64_t seeksnap;

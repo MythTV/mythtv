@@ -182,6 +182,7 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
     long long GetMaxBitrate(void) const;
     int64_t GetKeyframePosition(uint64_t desired) const;
     bool GetKeyframePositions(int64_t start, int64_t end, frm_pos_map_t&) const;
+    bool GetKeyframeDurations(int64_t start, int64_t end, frm_pos_map_t&) const;
     void SpawnLiveTV(LiveTVChain *newchain, bool pip, QString startchan);
     QString GetChainID(void);
     void StopLiveTV(void);

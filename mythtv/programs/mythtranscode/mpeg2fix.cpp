@@ -2660,12 +2660,23 @@ int MPEG2fixup::BuildKeyframeIndex(QString &file,
 
     av_init_packet(&pkt);
 
+    uint64_t totalDuration = 0;
     while (av_read_frame(inputFC, &pkt) >= 0)
     {
         if (pkt.stream_index == vid_id)
         {
             if (pkt.flags & AV_PKT_FLAG_KEY)
                 posMap[count] = pkt.pos;
+
+            // XXX totalDuration untested.  Results should be the same
+            // as from mythcommflag --rebuild.
+
+            // totalDuration calculation based on
+            // AvFormatDecoder::PreProcessVideoPacket()
+            totalDuration +=
+                av_q2d(inputFC->streams[pkt.stream_index]->time_base) *
+                pkt.duration * 1000000; // usec
+            posMap.insertMulti(count, totalDuration);
             count++;
         }
         av_free_packet(&pkt);

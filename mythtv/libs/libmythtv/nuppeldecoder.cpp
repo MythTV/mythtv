@@ -378,6 +378,10 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
                                      ste.keyframe_number * keyframedist,
                                      ste.file_offset};
                     m_positionMap.push_back(e);
+                    uint64_t frame_num = ste.keyframe_number * keyframedist;
+                    m_frameToDurMap[frame_num] =
+                        frame_num * 1000 / video_frame_rate;
+                    m_durToFrameMap[m_frameToDurMap[frame_num]] = frame_num;
                 }
                 hasFullPositionMap = true;
                 totalLength = (int)((ste.keyframe_number * keyframedist * 1.0) /
@@ -1152,6 +1156,9 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype)
                     {
                         PosMapEntry e = {this_index, lastKey, currentposition};
                         m_positionMap.push_back(e);
+                        m_frameToDurMap[lastKey] =
+                            lastKey * 1000 / video_frame_rate;
+                        m_durToFrameMap[m_frameToDurMap[lastKey]] = lastKey;
                     }
                 }
             }

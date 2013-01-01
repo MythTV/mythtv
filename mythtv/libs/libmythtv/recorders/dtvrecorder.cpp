@@ -81,7 +81,9 @@ DTVRecorder::DTVRecorder(TVRec *rec) :
     _use_pts(false),
     _packet_count(0),
     _continuity_error_count(0),
-    _frames_seen_count(0),          _frames_written_count(0)
+    _frames_seen_count(0),          _frames_written_count(0),
+    _frame_interval(0),             _frame_duration(0),
+    _total_duration(0)
 {
     SetPositionMapType(MARK_GOP_BYFRAME);
     _payload_buffer.reserve(TSPacket::kSize * (50 + 1));
@@ -159,6 +161,8 @@ void DTVRecorder::FinishRecording(void)
         if (ringBuffer)
             curRecording->SaveFilesize(ringBuffer->GetRealFileSize());
         SavePositionMap(true);
+        curRecording->SaveTotalDuration((int64_t)_total_duration);
+        curRecording->SaveTotalFrames(_frames_written_count);
     }
 }
 
@@ -229,7 +233,10 @@ void DTVRecorder::Reset(void)
     _start_code = 0xffffffff;
 
     if (curRecording)
+    {
         curRecording->ClearPositionMap(MARK_GOP_BYFRAME);
+        curRecording->ClearPositionMap(MARK_DURATION_MS);
+    }
 }
 
 void DTVRecorder::SetStreamData(MPEGStreamData *data)
@@ -495,6 +502,11 @@ bool DTVRecorder::FindMPEG2Keyframes(const TSPacket* tspacket)
                                     _repeat_pict = 2;
                                 }
                             }
+                            // The _repeat_pict code above matches
+                            // mpegvideo_extract_headers(), but the
+                            // code in mpeg_field_start() computes a
+                            // value one less, which seems correct.
+                            --_repeat_pict;
                         }
                         break;
                     }
@@ -533,7 +545,7 @@ bool DTVRecorder::FindMPEG2Keyframes(const TSPacket* tspacket)
     {
         _frames_seen_count++;
         if (!_wait_for_keyframe_option || _first_keyframe>=0)
-            _frames_written_count++;
+            UpdateFramesWritten();
     }
 
     if ((aspectRatio > 0) && (aspectRatio != m_videoAspect))
@@ -626,6 +638,20 @@ void DTVRecorder::HandleTimestamps(int stream_id, int64_t pts, int64_t dts)
     _ts_count[stream_id]++;
 }
 
+void DTVRecorder::UpdateFramesWritten(void)
+{
+    _frames_written_count++;
+    if (m_frameRate > 0)
+    {
+        // m_frameRate is frames per 1000 seconds, e.g. 29970 for
+        // 29.97 fps.  Calculate usec values.
+        _frame_interval = 1000000000.0 / m_frameRate;
+        _frame_duration = _frame_interval +
+            (_repeat_pict * _frame_interval * 0.5f);
+        _total_duration += _frame_duration;
+    }
+}
+
 bool DTVRecorder::FindAudioKeyframes(const TSPacket*)
 {
     bool hasKeyFrame = false;
@@ -656,7 +682,7 @@ bool DTVRecorder::FindAudioKeyframes(const TSPacket*)
         }
 
         if (!_wait_for_keyframe_option || _first_keyframe>=0)
-            _frames_written_count++;
+            UpdateFramesWritten();
     }
 
     return hasKeyFrame;
@@ -676,7 +702,7 @@ bool DTVRecorder::FindOtherKeyframes(const TSPacket *tspacket)
             "generating initial key-frame");
 
     _frames_seen_count++;
-    _frames_written_count++;
+    UpdateFramesWritten();
     _last_keyframe_seen = _frames_seen_count;
 
     HandleKeyframe(_frames_written_count);
@@ -716,6 +742,8 @@ void DTVRecorder::HandleKeyframe(uint64_t frameNum, int64_t extra)
         {
             positionMapDelta[frameNum] = startpos;
             positionMap[frameNum]      = startpos;
+            durationMap[frameNum]      = _total_duration / 1000;
+            durationMapDelta[frameNum] = _total_duration / 1000;
         }
     }
     positionMapLock.unlock();
@@ -860,7 +888,7 @@ bool DTVRecorder::FindH264Keyframes(const TSPacket *tspacket)
     {
         _frames_seen_count++;
         if (!_wait_for_keyframe_option || _first_keyframe >= 0)
-            _frames_written_count++;
+            UpdateFramesWritten();
     }
 
     if ((aspectRatio > 0) && (aspectRatio != m_videoAspect))
@@ -907,6 +935,8 @@ void DTVRecorder::HandleH264Keyframe(void)
     {
         positionMapDelta[frameNum] = m_h264_parser.keyframeAUstreamOffset();
         positionMap[frameNum]      = m_h264_parser.keyframeAUstreamOffset();
+        durationMap[frameNum]      = _total_duration / 1000;
+        durationMapDelta[frameNum] = _total_duration / 1000;
     }
     positionMapLock.unlock();
 
@@ -1026,7 +1056,7 @@ void DTVRecorder::FindPSKeyFrames(const uint8_t *buffer, uint len)
         {
             _frames_seen_count++;
             if (!_wait_for_keyframe_option || _first_keyframe >= 0)
-                _frames_written_count++;
+                UpdateFramesWritten();
         }
 
         if (hasKeyFrame)

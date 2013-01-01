@@ -15,7 +15,7 @@ class Cutter
     Cutter() : active(false), videoFramesToCut(0), audioFramesToCut(0),
         audioFramesPerVideoFrame(0.0) {};
 
-    void          SetCutList(frm_dir_map_t &deleteMap);
+    void          SetCutList(frm_dir_map_t &deleteMap, PlayerContext *ctx);
     frm_dir_map_t AdjustedCutList() const;
     void          Activate(float v2a, int64_t total);
     void          NewFrame(int64_t currentFrame);

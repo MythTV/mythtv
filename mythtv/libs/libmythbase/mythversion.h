@@ -12,7 +12,7 @@
 /// Update this whenever the plug-in API changes.
 /// Including changes in the libmythbase, libmyth, libmythtv, libmythav* and
 /// libmythui class methods used by plug-ins.
-#define MYTH_BINARY_VERSION "0.27.20121227-2"
+#define MYTH_BINARY_VERSION "0.27.20121231-1"
 
 /** \brief Increment this whenever the MythTV network protocol changes.
  *
@@ -34,9 +34,13 @@
  *   MythTV Python Bindings
  *       mythtv/bindings/python/MythTV/static.py (version number)
  *       mythtv/bindings/python/MythTV/mythproto.py (layout)
+ *
+ *   Be kind and update the wiki as well.
+ *       http://www.mythtv.org/wiki/Category:Myth_Protocol_Commands
+ *       http://www.mythtv.org/wiki/Category:Myth_Protocol
  */
-#define MYTH_PROTO_VERSION "76"
-#define MYTH_PROTO_TOKEN "FireWilde"
+#define MYTH_PROTO_VERSION "77"
+#define MYTH_PROTO_TOKEN "WindMark"
 
 /** \brief Increment this whenever the MythTV core database schema changes.
  *

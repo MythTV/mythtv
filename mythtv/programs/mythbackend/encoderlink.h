@@ -102,6 +102,7 @@ class EncoderLink
     long long GetFilePosition(void);
     int64_t GetKeyframePosition(uint64_t desired);
     bool GetKeyframePositions(int64_t start, int64_t end, frm_pos_map_t&);
+    bool GetKeyframeDurations(int64_t start, int64_t end, frm_pos_map_t&);
     void SpawnLiveTV(LiveTVChain *chain, bool pip, QString startchan);
     QString GetChainID(void);
     void StopLiveTV(void);

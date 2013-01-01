@@ -437,6 +437,28 @@ bool RecorderBase::GetKeyframePositions(
     return true;
 }
 
+bool RecorderBase::GetKeyframeDurations(
+    int64_t start, int64_t end, frm_pos_map_t &map) const
+{
+    map.clear();
+
+    QMutexLocker locker(&positionMapLock);
+    if (durationMap.empty())
+        return true;
+
+    frm_pos_map_t::const_iterator it = durationMap.lowerBound(start);
+    end = (end < 0) ? INT64_MAX : end;
+    for (; (it != durationMap.end()) &&
+             (it.key() <= (uint64_t)end); ++it)
+        map[it.key()] = *it;
+
+    LOG(VB_GENERAL, LOG_INFO, LOC +
+        QString("GetKeyframeDurations(%1,%2,#%3) out of %4")
+            .arg(start).arg(end).arg(map.size()).arg(durationMap.size()));
+
+    return true;
+}
+
 /** \fn RecorderBase::SavePositionMap(bool)
  *  \brief This saves the postition map delta to the database if force
  *         is true or there are 30 frames in the map or there are five
@@ -456,6 +478,9 @@ void RecorderBase::SavePositionMap(bool force)
         (delta_size >= 1) && (pm_elapsed >= 1500);
     // save every 10 seconds later on
     needToSave |= (delta_size >= 1) && (pm_elapsed >= 10000);
+    // Assume that durationMapDelta is the same size as
+    // positionMapDelta and implicitly use the same logic about when
+    // to same durationMapDelta.
 
     if (curRecording && needToSave)
     {
@@ -467,9 +492,13 @@ void RecorderBase::SavePositionMap(bool force)
             // which is populating the delta map
             frm_pos_map_t deltaCopy(positionMapDelta);
             positionMapDelta.clear();
+            frm_pos_map_t durationDeltaCopy(durationMapDelta);
+            durationMapDelta.clear();
             positionMapLock.unlock();
 
             curRecording->SavePositionMapDelta(deltaCopy, positionMapType);
+            curRecording->SavePositionMapDelta(durationDeltaCopy,
+                                               MARK_DURATION_MS);
         }
         else
         {

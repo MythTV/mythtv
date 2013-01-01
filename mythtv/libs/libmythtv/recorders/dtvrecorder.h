@@ -95,6 +95,7 @@ class DTVRecorder :
 
     void HandleKeyframe(uint64_t frameNum, int64_t extra = 0);
     void HandleTimestamps(int stream_id, int64_t pts, int64_t dts);
+    void UpdateFramesWritten(void);
 
     void BufferedWrite(const TSPacket &tspacket);
 
@@ -182,6 +183,9 @@ class DTVRecorder :
     mutable QAtomicInt _continuity_error_count;
     unsigned long long _frames_seen_count;
     unsigned long long _frames_written_count;
+    double _frame_interval; // usec
+    double _frame_duration; // usec
+    double _total_duration; // usec
 
     // constants
     /// If the number of regular frames detected since the last

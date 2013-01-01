@@ -8,8 +8,8 @@ OWN_VERSION = (0,27,-1,0)
 SCHEMA_VERSION = 1310
 NVSCHEMA_VERSION = 1007
 MUSICSCHEMA_VERSION = 1018
-PROTO_VERSION = '76'
-PROTO_TOKEN = 'FireWilde'
+PROTO_VERSION = '77'
+PROTO_TOKEN = 'WindMark'
 BACKEND_SEP = '[]:[]'
 INSTALL_PREFIX = '/usr/local'
 
@@ -34,6 +34,8 @@ class MARKUP( object ):
     MARK_ASPECT_CUSTOM  = 14
     MARK_VIDEO_WIDTH    = 30
     MARK_VIDEO_HEIGHT   = 31
+    MARK_VIDEO_RATE     = 32
+    MARK_DURATION_MS    = 33
 
 class RECTYPE( object ):
     kNotRecording       = 0

@@ -33,7 +33,7 @@ void DeleteMap::Push(QString undoMessage)
         m_undoStack.pop_back();
     m_undoStack.append(entry);
     m_undoStackPointer ++;
-    SaveMap(0, true);
+    SaveMap(true);
 }
 
 bool DeleteMap::Undo(void)
@@ -43,7 +43,7 @@ bool DeleteMap::Undo(void)
     m_undoStackPointer --;
     m_deleteMap = m_undoStack[m_undoStackPointer].deleteMap;
     m_changed = true;
-    SaveMap(0, true);
+    SaveMap(true);
     return true;
 }
 
@@ -54,7 +54,7 @@ bool DeleteMap::Redo(void)
     m_undoStackPointer ++;
     m_deleteMap = m_undoStack[m_undoStackPointer].deleteMap;
     m_changed = true;
-    SaveMap(0, true);
+    SaveMap(true);
     return true;
 }
 
@@ -70,37 +70,36 @@ QString DeleteMap::GetRedoMessage(void) const
             tr("(Nothing to redo)"));
 }
 
-bool DeleteMap::HandleAction(QString &action, uint64_t frame,
-                             uint64_t played, uint64_t total, double rate)
+bool DeleteMap::HandleAction(QString &action, uint64_t frame, uint64_t played)
 {
     bool handled = true;
     if (action == ACTION_UP)
-        UpdateSeekAmount(1, rate);
+        UpdateSeekAmount(1);
     else if (action == ACTION_DOWN)
-        UpdateSeekAmount(-1, rate);
+        UpdateSeekAmount(-1);
     else if (action == ACTION_CLEARMAP)
         Clear(tr("Clear Cuts"));
     else if (action == ACTION_INVERTMAP)
-        ReverseAll(total);
+        ReverseAll();
     else if (action == "MOVEPREV")
-        MoveRelative(frame, total, false);
+        MoveRelative(frame, false);
     else if (action == "MOVENEXT")
-        MoveRelative(frame, total, true);
+        MoveRelative(frame, true);
     else if (action == "CUTTOBEGINNING")
-        Add(frame, total, MARK_CUT_END, tr("Cut to Beginning"));
+        Add(frame, MARK_CUT_END, tr("Cut to Beginning"));
     else if (action == "CUTTOEND")
     {
-        Add(frame, total, MARK_CUT_START, tr("Cut to End"));
+        Add(frame, MARK_CUT_START, tr("Cut to End"));
         // If the recording is still in progress, add an explicit end
         // mark at the end.
         if (m_ctx->player && m_ctx->player->IsWatchingInprogress())
-            Add(total - 1, total, MARK_CUT_END, "");
+            Add(m_ctx->player->GetTotalFrameCount() - 1, MARK_CUT_END, "");
     }
     else if (action == "NEWCUT")
-        NewCut(frame, total);
+        NewCut(frame);
     else if (action == "DELETE")
         //: Delete the current cut or preserved region
-        Delete(frame, total, tr("Delete"));
+        Delete(frame, tr("Delete"));
     else if (action == "UNDO")
         Undo();
     else if (action == "REDO")
@@ -110,7 +109,7 @@ bool DeleteMap::HandleAction(QString &action, uint64_t frame,
     return handled;
 }
 
-void DeleteMap::UpdateSeekAmount(int change, double framerate)
+void DeleteMap::UpdateSeekAmount(int change)
 {
     m_seekamountpos += change;
     if (m_seekamountpos > 9)
@@ -123,31 +122,34 @@ void DeleteMap::UpdateSeekAmount(int change, double framerate)
     {
         case 0: m_seekText = tr("cut point"); m_seekamount = -2; break;
         case 1: m_seekText = tr("keyframe"); m_seekamount = -1; break;
-        case 2: m_seekText = tr("1 frame"); m_seekamount = 1; break;
-        case 3: m_seekText = tr("0.5 seconds"); m_seekamount = (int)roundf(framerate / 2); break;
-        case 4: m_seekText = tr("%n second(s)", "", 1); m_seekamount = (int)roundf(framerate); break;
-        case 5: m_seekText = tr("%n second(s)", "", 5); m_seekamount = (int)roundf(framerate * 5); break;
-        case 6: m_seekText = tr("%n second(s)", "", 20); m_seekamount = (int)roundf(framerate * 20); break;
-        case 7: m_seekText = tr("%n minute(s)", "", 1); m_seekamount = (int)roundf(framerate * 60); break;
-        case 8: m_seekText = tr("%n minute(s)", "", 5); m_seekamount = (int)roundf(framerate * 300); break;
-        case 9: m_seekText = tr("%n minute(s)", "", 10); m_seekamount = (int)roundf(framerate * 600); break;
-        default: m_seekText = tr("error"); m_seekamount = (int)roundf(framerate); break;
+        case 2: m_seekText = tr("1 frame"); m_seekamount = 0; break;
+        case 3: m_seekText = tr("0.5 seconds"); m_seekamount = 0.5; break;
+        case 4: m_seekText = tr("%n second(s)", "", 1); m_seekamount = 1; break;
+        case 5: m_seekText = tr("%n second(s)", "", 5); m_seekamount = 5; break;
+        case 6: m_seekText = tr("%n second(s)", "", 20); m_seekamount = 20; break;
+        case 7: m_seekText = tr("%n minute(s)", "", 1); m_seekamount = 60; break;
+        case 8: m_seekText = tr("%n minute(s)", "", 5); m_seekamount = 300; break;
+        case 9: m_seekText = tr("%n minute(s)", "", 10); m_seekamount = 600; break;
+        default: m_seekText = tr("error"); m_seekamount = 1; break;
     }
 }
 
-static QString createTimeString(uint64_t frame, uint64_t total,
-                                double frame_rate, bool full_resolution)
+QString DeleteMap::CreateTimeString(uint64_t frame, bool use_cutlist,
+                                    double frame_rate, bool full_resolution)
+    const
 {
-    int secs   = (int)(frame / frame_rate);
-    int frames = frame - (int)(secs * frame_rate);
-    int totalSecs = (int)(total / frame_rate);
+    uint64_t ms = TranslatePositionFrameToMs(frame, frame_rate, use_cutlist);
+    int secs = (int)(ms / 1000);
+    int remainder = (int)(ms % 1000);
+    int totalSecs = (int)
+        (TranslatePositionFrameToMs(frame, frame_rate, use_cutlist) / 1000);
     QString timestr;
     if (totalSecs >= 3600)
         timestr = QString::number(secs / 3600) + ":";
     timestr += QString("%1").arg((secs / 60) % 60, 2, 10, QChar(48)) +
         QString(":%1").arg(secs % 60, 2, 10, QChar(48));
     if (full_resolution)
-        timestr += QString(".%1").arg(frames, 2, 10, QChar(48));
+        timestr += QString(".%1").arg(remainder, 3, 10, QChar(48));
     return timestr;
 }
 
@@ -155,12 +157,11 @@ static QString createTimeString(uint64_t frame, uint64_t total,
  * \brief Show and update the edit mode On Screen Display. The cut regions
  *        are only refreshed if the deleteMap has been updated.
  */
-void DeleteMap::UpdateOSD(uint64_t frame, uint64_t total, double frame_rate,
-                          OSD *osd)
+void DeleteMap::UpdateOSD(uint64_t frame, double frame_rate, OSD *osd)
 {
     if (!osd || !m_ctx)
         return;
-    CleanMap(total);
+    CleanMap();
 
     InfoMap infoMap;
     m_ctx->LockPlayingInfo(__FILE__, __LINE__);
@@ -173,12 +174,12 @@ void DeleteMap::UpdateOSD(uint64_t frame, uint64_t total, double frame_rate,
     if (IsInDelete(frame))
         cutmarker = tr("cut");
 
-    QString timestr = createTimeString(frame, total, frame_rate, true);
-    uint64_t relTotal = TranslatePositionAbsToRel(total);
-    QString relTimeDisplay = createTimeString(TranslatePositionAbsToRel(frame),
-                                              relTotal, frame_rate, false);
-    QString relLengthDisplay = createTimeString(relTotal,
-                                                relTotal, frame_rate, false);
+    uint64_t total = m_ctx->player->GetTotalFrameCount();
+    QString timestr = CreateTimeString(frame, false, frame_rate, true);
+    QString relTimeDisplay;
+    relTimeDisplay = CreateTimeString(frame, true, frame_rate, false);
+    QString relLengthDisplay;
+    relLengthDisplay = CreateTimeString(total, true, frame_rate, false);
     infoMap["timedisplay"]  = timestr;
     infoMap["framedisplay"] = QString::number(frame);
     infoMap["cutindicator"] = cutmarker;
@@ -249,14 +250,14 @@ void DeleteMap::Clear(QString undoMessage)
 }
 
 /// Reverses the direction of each mark in the map.
-void DeleteMap::ReverseAll(uint64_t total)
+void DeleteMap::ReverseAll(void)
 {
     EDIT_CHECK;
     frm_dir_map_t::Iterator it = m_deleteMap.begin();
     for ( ; it != m_deleteMap.end(); ++it)
         Add(it.key(), it.value() == MARK_CUT_END ? MARK_CUT_START :
                                                    MARK_CUT_END);
-    CleanMap(total);
+    CleanMap();
     Push(tr("Reverse Cuts"));
 }
 
@@ -265,8 +266,7 @@ void DeleteMap::ReverseAll(uint64_t total)
  *        existing redundant mark of that type is removed. This simplifies
  *        the cleanup code.
  */
-void DeleteMap::Add(uint64_t frame, uint64_t total, MarkTypes type,
-                    QString undoMessage)
+void DeleteMap::Add(uint64_t frame, MarkTypes type, QString undoMessage)
 {
     EDIT_CHECK;
     if ((MARK_CUT_START != type) && (MARK_CUT_END != type) &&
@@ -280,7 +280,7 @@ void DeleteMap::Add(uint64_t frame, uint64_t total, MarkTypes type,
         {
             // Delete the temporary mark before putting a real mark at its
             // location
-            Delete(frame, total);
+            Delete(frame, "");
         }
         else // Don't add a mark on top of a mark
             return;
@@ -334,20 +334,20 @@ void DeleteMap::Add(uint64_t frame, uint64_t total, MarkTypes type,
     if (remove > -1)
         Delete((uint64_t)remove);
     Add(frame, type);
-    CleanMap(total);
+    CleanMap();
     if (!undoMessage.isEmpty())
         Push(undoMessage);
 }
 
 /// Remove the mark at the given frame.
-void DeleteMap::Delete(uint64_t frame, uint64_t total, QString undoMessage)
+void DeleteMap::Delete(uint64_t frame, QString undoMessage)
 {
     EDIT_CHECK;
     if (m_deleteMap.isEmpty())
         return;
 
-    uint64_t prev = GetNearestMark(frame, total, false);
-    uint64_t next = GetNearestMark(frame, total, true);
+    uint64_t prev = GetNearestMark(frame, false);
+    uint64_t next = GetNearestMark(frame, true);
 
     // If frame is a cut point, GetNearestMark() would return the previous/next
     // mark (not this frame), so check to see if we need to use frame, instead
@@ -366,13 +366,13 @@ void DeleteMap::Delete(uint64_t frame, uint64_t total, QString undoMessage)
     Delete(prev);
     if (prev != next)
         Delete(next);
-    CleanMap(total);
+    CleanMap();
     if (!undoMessage.isEmpty())
         Push(undoMessage);
 }
 
 /// Add a new cut marker (to start or end a cut region)
-void DeleteMap::NewCut(uint64_t frame, uint64_t total)
+void DeleteMap::NewCut(uint64_t frame)
 {
     EDIT_CHECK;
 
@@ -390,6 +390,7 @@ void DeleteMap::NewCut(uint64_t frame, uint64_t total)
 
     if (existing > -1)
     {
+        uint64_t total = m_ctx->player->GetTotalFrameCount();
         uint64_t otherframe = static_cast<uint64_t>(existing);
         if (otherframe == frame)
             Delete(otherframe);
@@ -402,8 +403,8 @@ void DeleteMap::NewCut(uint64_t frame, uint64_t total)
             if (IsInDelete(frame))
             {
                 MarkTypes type = MARK_UNSET;
-                cut_start = GetNearestMark(frame, total, false);
-                cut_end = GetNearestMark(frame, total, true);
+                cut_start = GetNearestMark(frame, false);
+                cut_end = GetNearestMark(frame, true);
                 frm_dir_map_t::Iterator it = m_deleteMap.find(frame);
                 if (it != m_deleteMap.end())
                     type = it.value();
@@ -466,12 +467,12 @@ void DeleteMap::NewCut(uint64_t frame, uint64_t total)
     else
         Add(frame, MARK_PLACEHOLDER);
 
-    CleanMap(total);
+    CleanMap();
     Push(tr("New Cut"));
 }
 
 /// Move the previous (!right) or next (right) cut to frame.
-void DeleteMap::MoveRelative(uint64_t frame, uint64_t total, bool right)
+void DeleteMap::MoveRelative(uint64_t frame, bool right)
 {
     frm_dir_map_t::Iterator it = m_deleteMap.find(frame);
     if (it != m_deleteMap.end())
@@ -490,23 +491,23 @@ void DeleteMap::MoveRelative(uint64_t frame, uint64_t total, bool right)
             // If on a mark, don't collapse a cut region to 0;
             // instead, delete the region
             //: Delete the current cut or preserved region
-            Delete(frame, total, tr("Delete"));
+            Delete(frame, tr("Delete"));
             return;
         }
         else if (MARK_PLACEHOLDER == type)
         {
             // Delete the temporary mark before putting a real mark at its
             // location
-            Delete(frame, total);
+            Delete(frame, "");
         }
     }
 
-    uint64_t from = GetNearestMark(frame, total, right);
-    Move(from, frame, total);
+    uint64_t from = GetNearestMark(frame, right);
+    Move(from, frame);
 }
 
 /// Move an existing mark to a new frame.
-void DeleteMap::Move(uint64_t frame, uint64_t to, uint64_t total)
+void DeleteMap::Move(uint64_t frame, uint64_t to)
 {
     EDIT_CHECK;
     MarkTypes type = Delete(frame);
@@ -514,10 +515,10 @@ void DeleteMap::Move(uint64_t frame, uint64_t to, uint64_t total)
     {
         if (frame == 0)
             type = MARK_CUT_START;
-        else if (frame == total)
+        else if (frame == m_ctx->player->GetTotalFrameCount())
             type = MARK_CUT_END;
     }
-    Add(to, total, type, tr("Move Mark"));
+    Add(to, type, tr("Move Mark"));
 }
 
 /// Private addition to the deleteMap.
@@ -584,9 +585,8 @@ bool DeleteMap::IsTemporaryMark(uint64_t frame) const
  *        frame).  If hasMark is non-NULL, it is set to true if the
  *        next/previous mark exists, and false otherwise.
  */
-uint64_t DeleteMap::GetNearestMark(
-    uint64_t frame, uint64_t total, bool right,
-    bool *hasMark) const
+uint64_t DeleteMap::GetNearestMark(uint64_t frame, bool right, bool *hasMark)
+    const
 {
     uint64_t result;
     if (hasMark)
@@ -594,7 +594,7 @@ uint64_t DeleteMap::GetNearestMark(
     frm_dir_map_t::const_iterator it = m_deleteMap.begin();
     if (right)
     {
-        result = total;
+        result = m_ctx->player->GetTotalFrameCount();
         for (; it != m_deleteMap.end(); ++it)
             if (it.key() > frame)
                 return it.key();
@@ -635,11 +635,12 @@ bool DeleteMap::HasTemporaryMark(void) const
  *        A valid sequence is 1 or more marks of alternating values and does
  *        not include the first or last frames.
  */
-void DeleteMap::CleanMap(uint64_t total)
+void DeleteMap::CleanMap(void)
 {
     if (IsEmpty())
         return;
 
+    uint64_t total = m_ctx->player->GetTotalFrameCount();
     Delete(0);
     Delete(total);
 
@@ -693,19 +694,19 @@ void DeleteMap::SetMap(const frm_dir_map_t &map)
 }
 
 /// Loads the given commercial break map into the deleteMap.
-void DeleteMap::LoadCommBreakMap(uint64_t total, frm_dir_map_t &map)
+void DeleteMap::LoadCommBreakMap(frm_dir_map_t &map)
 {
     Clear();
     frm_dir_map_t::Iterator it = map.begin();
     for ( ; it != map.end(); ++it)
         Add(it.key(), it.value() == MARK_COMM_START ?
                 MARK_CUT_START : MARK_CUT_END);
-    CleanMap(total);
+    CleanMap();
     Push(tr("Load Detected Commercials"));
 }
 
 /// Loads the delete map from the database.
-void DeleteMap::LoadMap(uint64_t total, QString undoMessage)
+void DeleteMap::LoadMap(QString undoMessage)
 {
     if (!m_ctx || !m_ctx->playingInfo || gCoreContext->IsDatabaseIgnored())
         return;
@@ -714,14 +715,14 @@ void DeleteMap::LoadMap(uint64_t total, QString undoMessage)
     m_ctx->LockPlayingInfo(__FILE__, __LINE__);
     m_ctx->playingInfo->QueryCutList(m_deleteMap);
     m_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
-    CleanMap(total);
+    CleanMap();
     if (!undoMessage.isEmpty())
         Push(undoMessage);
 }
 
 /// Returns true if an auto-save map was loaded.
 /// Does nothing and returns false if not.
-bool DeleteMap::LoadAutoSaveMap(uint64_t total)
+bool DeleteMap::LoadAutoSaveMap(void)
 {
     if (!m_ctx || !m_ctx->playingInfo || gCoreContext->IsDatabaseIgnored())
         return false;
@@ -731,7 +732,7 @@ bool DeleteMap::LoadAutoSaveMap(uint64_t total)
     m_ctx->LockPlayingInfo(__FILE__, __LINE__);
     bool result = m_ctx->playingInfo->QueryCutList(m_deleteMap, true);
     m_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
-    CleanMap(total);
+    CleanMap();
     if (result)
         Push(tr("Load Auto-saved Cuts"));
     else
@@ -741,7 +742,7 @@ bool DeleteMap::LoadAutoSaveMap(uint64_t total)
 }
 
 /// Saves the delete map to the database.
-void DeleteMap::SaveMap(uint64_t total, bool isAutoSave)
+void DeleteMap::SaveMap(bool isAutoSave)
 {
     if (!m_ctx || !m_ctx->playingInfo || gCoreContext->IsDatabaseIgnored())
         return;
@@ -760,7 +761,7 @@ void DeleteMap::SaveMap(uint64_t total, bool isAutoSave)
             }
         }
 
-        CleanMap(total);
+        CleanMap();
     }
     m_ctx->LockPlayingInfo(__FILE__, __LINE__);
     m_ctx->playingInfo->SaveMarkupFlag(MARK_UPDATED_CUT);
@@ -774,7 +775,7 @@ void DeleteMap::SaveMap(uint64_t total, bool isAutoSave)
  *        This is used by the player to avoid iterating over the entire map
  *        many times per second.
  */
-void DeleteMap::TrackerReset(uint64_t frame, uint64_t total)
+void DeleteMap::TrackerReset(uint64_t frame)
 {
     m_nextCutStart = 0;
     m_nextCutStartIsValid = false;
@@ -793,11 +794,12 @@ void DeleteMap::TrackerReset(uint64_t frame, uint64_t total)
         {
             ++cutpoint;
             m_nextCutStartIsValid = (cutpoint != m_deleteMap.end());
-            m_nextCutStart = m_nextCutStartIsValid ? cutpoint.key() : total;
+            m_nextCutStart = m_nextCutStartIsValid ? cutpoint.key() :
+                m_ctx->player->GetTotalFrameCount();
         }
     }
     else
-        m_nextCutStart = GetNearestMark(frame, total, !IsInDelete(frame),
+        m_nextCutStart = GetNearestMark(frame, !IsInDelete(frame),
                                         &m_nextCutStartIsValid);
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Tracker next CUT_START: %1")
                                    .arg(m_nextCutStart));
@@ -807,12 +809,12 @@ void DeleteMap::TrackerReset(uint64_t frame, uint64_t total)
  * \brief Returns true if the given frame has passed the last cut point start
  *        and provides the frame number of the next jump.
  */
-bool DeleteMap::TrackerWantsToJump(uint64_t frame, uint64_t total, uint64_t &to)
+bool DeleteMap::TrackerWantsToJump(uint64_t frame, uint64_t &to)
 {
     if (IsEmpty() || !m_nextCutStartIsValid || frame < m_nextCutStart)
         return false;
 
-    to = GetNearestMark(m_nextCutStart, total, true);
+    to = GetNearestMark(m_nextCutStart, true);
     LOG(VB_PLAYBACK, LOG_INFO, LOC +
         QString("Tracker wants to jump to: %1").arg(to));
     return true;
@@ -822,9 +824,9 @@ bool DeleteMap::TrackerWantsToJump(uint64_t frame, uint64_t total, uint64_t &to)
  * \brief Returns the number of the last frame in the video that is not in a
  *        cut sequence.
  */
-uint64_t DeleteMap::GetLastFrame(uint64_t total) const
+uint64_t DeleteMap::GetLastFrame(void) const
 {
-    uint64_t result = total;
+    uint64_t result = m_ctx->player->GetTotalFrameCount();
     if (IsEmpty())
         return result;
 
@@ -862,62 +864,31 @@ bool DeleteMap::IsSaved(void) const
     return currentMap == savedMap;
 }
 
-uint64_t DeleteMap::TranslatePositionAbsToRel(const frm_dir_map_t &deleteMap,
-                                              uint64_t absPosition)
+uint64_t DeleteMap::TranslatePositionFrameToMs(uint64_t position,
+                                               float fallback_framerate,
+                                               bool use_cutlist) const
 {
-    uint64_t subtraction = 0;
-    uint64_t startOfCutRegion = 0;
-    frm_dir_map_t::const_iterator i;
-    bool withinCut = false;
-    bool first = true;
-    for (i = deleteMap.constBegin(); i != deleteMap.constEnd(); ++i)
-    {
-        if (first)
-            withinCut = (i.value() == MARK_CUT_END);
-        first = false;
-        if (i.key() > absPosition)
-            break;
-        if (i.value() == MARK_CUT_START && !withinCut)
-        {
-            withinCut = true;
-            startOfCutRegion = i.key();
-        }
-        else if (i.value() == MARK_CUT_END && withinCut)
-        {
-            withinCut = false;
-            subtraction += (i.key() - startOfCutRegion);
-        }
-    }
-    if (withinCut)
-        subtraction += (absPosition - startOfCutRegion);
-    return absPosition - subtraction;
+    return m_ctx->player->GetDecoder()
+        ->TranslatePositionFrameToMs(position, fallback_framerate,
+                                     use_cutlist ? m_deleteMap :
+                                     frm_dir_map_t());
+}
+uint64_t DeleteMap::TranslatePositionMsToFrame(uint64_t dur_ms,
+                                               float fallback_framerate,
+                                               bool use_cutlist) const
+{
+    return m_ctx->player->GetDecoder()
+        ->TranslatePositionMsToFrame(dur_ms, fallback_framerate,
+                                     use_cutlist ? m_deleteMap :
+                                     frm_dir_map_t());
 }
 
-uint64_t DeleteMap::TranslatePositionRelToAbs(const frm_dir_map_t &deleteMap,
-                                              uint64_t relPosition)
+uint64_t DeleteMap::TranslatePositionAbsToRel(uint64_t position) const
 {
-    uint64_t addition = 0;
-    uint64_t startOfCutRegion = 0;
-    frm_dir_map_t::const_iterator i;
-    bool withinCut = false;
-    bool first = true;
-    for (i = deleteMap.constBegin(); i != deleteMap.constEnd(); ++i)
-    {
-        if (first)
-            withinCut = (i.value() == MARK_CUT_END);
-        first = false;
-        if (i.value() == MARK_CUT_START && !withinCut)
-        {
-            withinCut = true;
-            startOfCutRegion = i.key();
-            if (relPosition + addition <= startOfCutRegion)
-                break;
-        }
-        else if (i.value() == MARK_CUT_END && withinCut)
-        {
-            withinCut = false;
-            addition += (i.key() - startOfCutRegion);
-        }
-    }
-    return relPosition + addition;
+    return DecoderBase::TranslatePositionAbsToRel(m_deleteMap, position);
+}
+
+uint64_t DeleteMap::TranslatePositionRelToAbs(uint64_t position) const
+{
+    return DecoderBase::TranslatePositionRelToAbs(m_deleteMap, position);
 }
