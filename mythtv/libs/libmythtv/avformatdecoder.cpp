@@ -1796,7 +1796,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
     tracks[kTrackTypeRawText].clear();
     if (!novideo)
     {
-        // we won't rescan video streams
+        // we will rescan video streams
         tracks[kTrackTypeVideo].clear();
         selectedTrack[kTrackTypeVideo].av_stream_index = -1;
     }
@@ -2046,7 +2046,6 @@ int AvFormatDecoder::ScanStreams(bool novideo)
         for(;;)
         {
             AVCodec *codec = NULL;
-            selectedTrack[kTrackTypeVideo].av_stream_index == -1;
             LOG(VB_PLAYBACK, LOG_INFO, LOC +
                 "Trying to select best video track");
 
