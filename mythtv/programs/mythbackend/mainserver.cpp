@@ -144,8 +144,6 @@ class ProcessRequestRunnable : public QRunnable
 
     virtual void run(void)
     {
-        LOG(VB_GENERAL, LOG_INFO, QString("Processing request for sock %1")
-            .arg(m_sock->GetSocketDescriptor()));
         m_parent.ProcessRequest(m_sock);
         m_sock->DecrRef();
         m_sock = NULL;
@@ -466,9 +464,6 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
     line = line.simplified();
     QStringList tokens = line.split(' ', QString::SkipEmptyParts);
     QString command = tokens[0];
-#if 1
-    LOG(VB_GENERAL, LOG_INFO, "PRW: command='" + command + "'");
-#endif
     if (command == "MYTH_PROTO_VERSION")
     {
         if (tokens.size() < 2)
