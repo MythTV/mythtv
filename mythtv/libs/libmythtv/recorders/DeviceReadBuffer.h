@@ -117,7 +117,9 @@ class DeviceReadBuffer : protected MThread
     // statistics
     size_t           max_used;
     size_t           avg_used;
-    size_t           avg_cnt;
+    size_t           avg_buf_write_cnt;
+    size_t           avg_buf_read_cnt;
+    size_t           avg_buf_sleep_cnt;
     MythTimer        lastReport;
 };
 

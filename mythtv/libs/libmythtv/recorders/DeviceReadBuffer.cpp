@@ -41,7 +41,8 @@ DeviceReadBuffer::DeviceReadBuffer(
 
       // statistics
       max_used(0),                  avg_used(0),
-      avg_cnt(0)
+      avg_buf_write_cnt(0),         avg_buf_read_cnt(0),
+      avg_buf_sleep_cnt(0)
 {
     for (int i = 0; i < 2; i++)
     {
@@ -115,7 +116,9 @@ bool DeviceReadBuffer::Setup(const QString &streamName, int streamfd,
     // Initialize statistics
     max_used      = 0;
     avg_used      = 0;
-    avg_cnt       = 0;
+    avg_buf_write_cnt = 0;
+    avg_buf_read_cnt  = 0;
+    avg_buf_sleep_cnt = 0;
     lastReport.start();
 
     LOG(VB_RECORD, LOG_INFO, LOC + QString("buffer size %1 KB").arg(size/1024));
@@ -304,7 +307,8 @@ void DeviceReadBuffer::IncrWritePointer(uint len)
     writePtr  = (writePtr >= endPtr) ? buffer + (writePtr - endPtr) : writePtr;
 #if REPORT_RING_STATS
     max_used = max(used, max_used);
-    avg_used = ((avg_used * avg_cnt) + used) / ++avg_cnt;
+    avg_used = ((avg_used * avg_buf_write_cnt) + used) / (avg_buf_write_cnt+1);
+    ++avg_buf_write_cnt;
 #endif
     dataWait.wakeAll();
 }
@@ -315,6 +319,9 @@ void DeviceReadBuffer::IncrReadPointer(uint len)
     used    -= len;
     readPtr += len;
     readPtr  = (readPtr == endPtr) ? buffer : readPtr;
+#if REPORT_RING_STATS
+    ++avg_buf_read_cnt;
+#endif
 }
 
 void DeviceReadBuffer::run(void)
@@ -358,9 +365,10 @@ void DeviceReadBuffer::run(void)
         size_t read_size = min(dev_read_size, unused);
 
         // if read_size > 0 do the read...
+        ssize_t len = 0;
         if (read_size)
         {
-            ssize_t len = read(_stream_fd, writePtr, read_size);
+            len = read(_stream_fd, writePtr, read_size);
             if (!CheckForErrors(len, read_size, errcnt))
             {
                 if (errcnt > 5)
@@ -703,20 +711,26 @@ uint DeviceReadBuffer::WaitForUsed(uint needed, uint max_wait) const
 void DeviceReadBuffer::ReportStats(void)
 {
 #if REPORT_RING_STATS
-    if (lastReport.elapsed() > 20*1000 /* msg every 20 seconds */)
+    static const int secs = 20;
+    static const double d1_s = 1.0 / secs;
+    if (lastReport.elapsed() > secs * 1000 /* msg every 20 seconds */)
     {
         QMutexLocker locker(&lock);
         double rsize = 100.0 / size;
-        QString msg  = QString("fill avg(%1%) ").arg(avg_used*rsize,3,'f',0);
-        msg         += QString("fill max(%2%) ").arg(max_used*rsize,3,'f',0);
-        msg         += QString("samples(%3)").arg(avg_cnt);
+        QString msg  = QString("fill avg(%1%) ").arg(avg_used*rsize,5,'f',2);
+        msg         += QString("fill max(%1%) ").arg(max_used*rsize,5,'f',2);
+        msg         += QString("writes/sec(%1) ").arg(avg_buf_write_cnt*d1_s);
+        msg         += QString("reads/sec(%1) ").arg(avg_buf_read_cnt*d1_s);
+        msg         += QString("sleeps/sec(%1)").arg(avg_buf_sleep_cnt*d1_s);
 
         avg_used    = 0;
-        avg_cnt     = 0;
+        avg_buf_write_cnt = 0;
+        avg_buf_read_cnt = 0;
+        avg_buf_sleep_cnt = 0;
         max_used    = 0;
         lastReport.start();
 
-        LOG(VB_GENERAL, LOG_DEBUG, LOC + msg);
+        LOG(VB_GENERAL, LOG_INFO, LOC + msg);
     }
 #endif
 }
