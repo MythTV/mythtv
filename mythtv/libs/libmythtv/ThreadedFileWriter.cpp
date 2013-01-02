@@ -248,7 +248,10 @@ uint ThreadedFileWriter::Write(const void *data, uint count)
 
     writeBuffers.push_back(buf);
 
-    bufferHasData.wakeAll();
+    if ((writeBuffers.size() > 1) || (buf->data.size() >= kMinWriteSize))
+    {
+        bufferHasData.wakeAll();
+    }
 
     LOG(VB_FILE, LOG_DEBUG, LOC + QString("Write(*, %1) total %2 cnt %3")
             .arg(count,4).arg(totalBufferUse).arg(writeBuffers.size()));
