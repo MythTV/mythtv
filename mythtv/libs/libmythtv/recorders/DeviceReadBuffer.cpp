@@ -625,7 +625,7 @@ bool DeviceReadBuffer::CheckForErrors(
  */
 uint DeviceReadBuffer::Read(unsigned char *buf, const uint count)
 {
-    uint avail = WaitForUsed(min(count, (uint)min_read), 500);
+    uint avail = WaitForUsed(min(count, (uint)dev_read_size), 20);
     size_t cnt = min(count, avail);
 
     if (!cnt)
