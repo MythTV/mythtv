@@ -814,7 +814,7 @@ bool MythDownloadManager::downloadNow(MythDownloadInfo *dlInfo, bool deleteInfo)
     while ((!dlInfo->IsDone()) &&
            (dlInfo->m_errorCode == QNetworkReply::NoError) &&
            (((!dlInfo->m_url.startsWith("myth://")) &&
-             (dlInfo->m_lastStat.secsTo(MythDate::current()) < 10)) ||
+             (dlInfo->m_lastStat.secsTo(MythDate::current()) < 60)) ||
             ((dlInfo->m_url.startsWith("myth://")) &&
              (startedAt.secsTo(MythDate::current()) < 20))))
     {
