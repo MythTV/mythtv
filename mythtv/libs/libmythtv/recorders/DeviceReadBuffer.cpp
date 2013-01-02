@@ -98,7 +98,7 @@ bool DeviceReadBuffer::Setup(const QString &streamName, int streamfd,
         min(dev_read_size, (size_t)deviceBufferSize) : dev_read_size;
     min_read      = read_quanta * 4;
 
-    buffer        = new unsigned char[size + dev_read_size];
+    buffer        = new (nothrow) unsigned char[size + dev_read_size];
     readPtr       = buffer;
     writePtr      = buffer;
     endPtr        = buffer + size;
