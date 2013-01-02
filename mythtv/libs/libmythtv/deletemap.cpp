@@ -15,24 +15,32 @@
     } \
 } while(0)
 
-DeleteMapUndoEntry::DeleteMapUndoEntry(frm_dir_map_t dm, QString msg) :
+DeleteMapUndoEntry::DeleteMapUndoEntry(const frm_dir_map_t &dm,
+                                       const QString &msg) :
     deleteMap(dm), message(msg) { }
 
-DeleteMapUndoEntry::DeleteMapUndoEntry(void)
-{
-    frm_dir_map_t dm;
-    deleteMap = dm;
-    message = "";
-}
+DeleteMapUndoEntry::DeleteMapUndoEntry(void) : message("") { }
 
-void DeleteMap::Push(QString undoMessage)
+void DeleteMap::Push(const QString &undoMessage)
 {
     DeleteMapUndoEntry entry(m_deleteMap, undoMessage);
     // Remove all "redo" entries
-    while (m_undoStack.size() > m_undoStackPointer + 1)
+    while (m_undoStack.size() > m_undoStackPointer)
         m_undoStack.pop_back();
     m_undoStack.append(entry);
     m_undoStackPointer ++;
+    SaveMap(true);
+}
+
+void DeleteMap::PushDeferred(const frm_dir_map_t &savedMap,
+                             const QString &undoMessage)
+{
+    // Temporarily roll back to the initial state, push the undo
+    // entry, then restore the correct state.
+    frm_dir_map_t tmp = m_deleteMap;
+    m_deleteMap = savedMap;
+    Push(undoMessage);
+    m_deleteMap = tmp;
     SaveMap(true);
 }
 
@@ -41,7 +49,9 @@ bool DeleteMap::Undo(void)
     if (!HasUndo())
         return false;
     m_undoStackPointer --;
+    frm_dir_map_t tmp = m_deleteMap;
     m_deleteMap = m_undoStack[m_undoStackPointer].deleteMap;
+    m_undoStack[m_undoStackPointer].deleteMap = tmp;
     m_changed = true;
     SaveMap(true);
     return true;
@@ -51,8 +61,10 @@ bool DeleteMap::Redo(void)
 {
     if (!HasRedo())
         return false;
-    m_undoStackPointer ++;
+    frm_dir_map_t tmp = m_deleteMap;
     m_deleteMap = m_undoStack[m_undoStackPointer].deleteMap;
+    m_undoStack[m_undoStackPointer].deleteMap = tmp;
+    m_undoStackPointer ++;
     m_changed = true;
     SaveMap(true);
     return true;
@@ -60,13 +72,13 @@ bool DeleteMap::Redo(void)
 
 QString DeleteMap::GetUndoMessage(void) const
 {
-    return (HasUndo() ? m_undoStack[m_undoStackPointer].message :
+    return (HasUndo() ? m_undoStack[m_undoStackPointer - 1].message :
             tr("(Nothing to undo)"));
 }
 
 QString DeleteMap::GetRedoMessage(void) const
 {
-    return (HasRedo() ? m_undoStack[m_undoStackPointer + 1].message :
+    return (HasRedo() ? m_undoStack[m_undoStackPointer].message :
             tr("(Nothing to redo)"));
 }
 
@@ -243,22 +255,22 @@ bool DeleteMap::IsEmpty(void) const
 /// Clears the deleteMap.
 void DeleteMap::Clear(QString undoMessage)
 {
-    m_deleteMap.clear();
-    m_changed = true;
     if (!undoMessage.isEmpty())
         Push(undoMessage);
+    m_deleteMap.clear();
+    m_changed = true;
 }
 
 /// Reverses the direction of each mark in the map.
 void DeleteMap::ReverseAll(void)
 {
     EDIT_CHECK;
+    Push(tr("Reverse Cuts"));
     frm_dir_map_t::Iterator it = m_deleteMap.begin();
     for ( ; it != m_deleteMap.end(); ++it)
         Add(it.key(), it.value() == MARK_CUT_END ? MARK_CUT_START :
                                                    MARK_CUT_END);
     CleanMap();
-    Push(tr("Reverse Cuts"));
 }
 
 /**
@@ -335,8 +347,6 @@ void DeleteMap::Add(uint64_t frame, MarkTypes type, QString undoMessage)
         Delete((uint64_t)remove);
     Add(frame, type);
     CleanMap();
-    if (!undoMessage.isEmpty())
-        Push(undoMessage);
 }
 
 /// Remove the mark at the given frame.
@@ -345,6 +355,9 @@ void DeleteMap::Delete(uint64_t frame, QString undoMessage)
     EDIT_CHECK;
     if (m_deleteMap.isEmpty())
         return;
+
+    if (!undoMessage.isEmpty())
+        Push(undoMessage);
 
     uint64_t prev = GetNearestMark(frame, false);
     uint64_t next = GetNearestMark(frame, true);
@@ -358,7 +371,7 @@ void DeleteMap::Delete(uint64_t frame, QString undoMessage)
         if (MARK_PLACEHOLDER == type)
             next = prev = frame;
         else if (MARK_CUT_END == type)
-            next  = frame;
+            next = frame;
         else if (MARK_CUT_START == type)
             prev = frame;
     }
@@ -367,14 +380,16 @@ void DeleteMap::Delete(uint64_t frame, QString undoMessage)
     if (prev != next)
         Delete(next);
     CleanMap();
-    if (!undoMessage.isEmpty())
-        Push(undoMessage);
 }
 
 /// Add a new cut marker (to start or end a cut region)
 void DeleteMap::NewCut(uint64_t frame)
 {
     EDIT_CHECK;
+
+    // Defer pushing the undo entry until the end, when we're sure a
+    // change has been made.
+    frm_dir_map_t initialDeleteMap = m_deleteMap;
 
     // find any existing temporary marker to determine cut range
     int64_t existing = -1;
@@ -468,7 +483,7 @@ void DeleteMap::NewCut(uint64_t frame)
         Add(frame, MARK_PLACEHOLDER);
 
     CleanMap();
-    Push(tr("New Cut"));
+    PushDeferred(initialDeleteMap, tr("New Cut"));
 }
 
 /// Move the previous (!right) or next (right) cut to frame.
@@ -685,24 +700,25 @@ void DeleteMap::CleanMap(void)
 /// Use the given map.
 void DeleteMap::SetMap(const frm_dir_map_t &map)
 {
-    Clear();
-    m_deleteMap = map;
-    m_deleteMap.detach();
     // Can't save an undo point for SetMap() or transcodes fail.
     // Leaving as a marker for refactor.
     //Push(tr("Set New Cut List"));
+
+    Clear();
+    m_deleteMap = map;
+    m_deleteMap.detach();
 }
 
 /// Loads the given commercial break map into the deleteMap.
 void DeleteMap::LoadCommBreakMap(frm_dir_map_t &map)
 {
+    Push(tr("Load Detected Commercials"));
     Clear();
     frm_dir_map_t::Iterator it = map.begin();
     for ( ; it != map.end(); ++it)
         Add(it.key(), it.value() == MARK_COMM_START ?
                 MARK_CUT_START : MARK_CUT_END);
     CleanMap();
-    Push(tr("Load Detected Commercials"));
 }
 
 /// Loads the delete map from the database.
@@ -711,13 +727,13 @@ void DeleteMap::LoadMap(QString undoMessage)
     if (!m_ctx || !m_ctx->playingInfo || gCoreContext->IsDatabaseIgnored())
         return;
 
+    if (!undoMessage.isEmpty())
+        Push(undoMessage);
     Clear();
     m_ctx->LockPlayingInfo(__FILE__, __LINE__);
     m_ctx->playingInfo->QueryCutList(m_deleteMap);
     m_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
     CleanMap();
-    if (!undoMessage.isEmpty())
-        Push(undoMessage);
 }
 
 /// Returns true if an auto-save map was loaded.
@@ -734,7 +750,7 @@ bool DeleteMap::LoadAutoSaveMap(void)
     m_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
     CleanMap();
     if (result)
-        Push(tr("Load Auto-saved Cuts"));
+        PushDeferred(tmpDeleteMap, tr("Load Auto-saved Cuts"));
     else
         m_deleteMap = tmpDeleteMap;
 

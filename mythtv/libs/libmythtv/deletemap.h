@@ -14,7 +14,7 @@ typedef struct DeleteMapUndoEntry
 {
     frm_dir_map_t deleteMap;
     QString message; // how we got from previous map to this map
-    DeleteMapUndoEntry(frm_dir_map_t dm, QString msg);
+    DeleteMapUndoEntry(const frm_dir_map_t &dm, const QString &msg);
     DeleteMapUndoEntry(void);
 } DeleteMapUndoEntry;
 
@@ -26,9 +26,8 @@ class MTV_PUBLIC DeleteMap
                  m_nextCutStartIsValid(false),
                  m_nextCutStart(0), m_changed(true),
                  m_seekamountpos(4), m_seekamount(1.0),
-                 m_ctx(NULL), m_cachedTotalForOSD(0), m_undoStackPointer(-1)
+                 m_ctx(NULL), m_cachedTotalForOSD(0), m_undoStackPointer(0)
     {
-        Push("");
     }
 
     void SetPlayerContext(PlayerContext *ctx) { m_ctx = ctx; }
@@ -86,7 +85,7 @@ class MTV_PUBLIC DeleteMap
     bool Redo(void);
     bool HasUndo(void) const { return m_undoStackPointer > 0; }
     bool HasRedo(void) const
-        { return m_undoStackPointer < m_undoStack.size() - 1; }
+        { return m_undoStackPointer < m_undoStack.size(); }
     QString GetUndoMessage(void) const;
     QString GetRedoMessage(void) const;
 
@@ -94,7 +93,9 @@ class MTV_PUBLIC DeleteMap
     void Add(uint64_t frame, MarkTypes type);
     MarkTypes Delete(uint64_t frame);
 
-    void Push(QString undoMessage);
+    void Push(const QString &undoMessage);
+    void PushDeferred(const frm_dir_map_t &savedMap,
+                      const QString &undoMessage);
 
     QString CreateTimeString(uint64_t frame, bool use_cutlist,
                              double frame_rate, bool full_resolution) const;
@@ -110,7 +111,6 @@ class MTV_PUBLIC DeleteMap
     PlayerContext *m_ctx;
     uint64_t      m_cachedTotalForOSD;
 
-    // Invariant: m_undoStack[m_undoStackPointer].deleteMap == m_deleteMap
     QVector<DeleteMapUndoEntry> m_undoStack;
     int m_undoStackPointer;
 };
