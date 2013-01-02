@@ -598,9 +598,9 @@ void TV::InitKeys(void)
     REG_KEY("TV Playback", ACTION_JUMPBKMRK, QT_TRANSLATE_NOOP("MythControls",
             "Jump to bookmark"), "K");
     REG_KEY("TV Playback", "FFWDSTICKY", QT_TRANSLATE_NOOP("MythControls",
-            "Fast Forward (Sticky) or Forward one frame while paused"), ">,.");
+            "Fast Forward (Sticky) or Forward one second while paused"), ">,.");
     REG_KEY("TV Playback", "RWNDSTICKY", QT_TRANSLATE_NOOP("MythControls",
-            "Rewind (Sticky) or Rewind one frame while paused"), ",,<");
+            "Rewind (Sticky) or Rewind one second while paused"), ",,<");
     REG_KEY("TV Playback", "NEXTSOURCE", QT_TRANSLATE_NOOP("MythControls",
             "Next Video Source"), "Y");
     REG_KEY("TV Playback", "PREVSOURCE", QT_TRANSLATE_NOOP("MythControls",
@@ -6196,22 +6196,33 @@ bool TV::SeekHandleAction(PlayerContext *actx, const QStringList &actions,
         {
             QString message = (flags & kRewind) ? tr("Rewind") :
                                                   tr("Forward");
-            actx->LockDeletePlayer(__FILE__, __LINE__);
-            uint64_t frameAbs = actx->player->GetFramesPlayed();
-            uint64_t frameRel =
-                actx->player->TranslatePositionAbsToRel(frameAbs);
-            uint64_t targetRel = frameRel + direction;
-            if (frameRel == 0 && direction < 0)
-                targetRel = 0;
-            uint64_t maxAbs = actx->player->GetCurrentFrameCount();
-            uint64_t maxRel = actx->player->TranslatePositionAbsToRel(maxAbs);
-            if (targetRel > maxRel)
-                targetRel = maxRel;
-            uint64_t targetAbs =
-                actx->player->TranslatePositionRelToAbs(targetRel);
-            actx->UnlockDeletePlayer(__FILE__, __LINE__);
-            DoPlayerSeekToFrame(actx, targetAbs);
-            UpdateOSDSeekMessage(actx, message, kOSDTimeout_Med);
+            if (flags & kAbsolute) // FFWDSTICKY/RWNDSTICKY
+            {
+                float time = direction;
+                DoSeek(actx, time, message,
+                       /*timeIsOffset*/true,
+                       /*honorCutlist*/!(flags & kIgnoreCutlist));
+            }
+            else
+            {
+                actx->LockDeletePlayer(__FILE__, __LINE__);
+                uint64_t frameAbs = actx->player->GetFramesPlayed();
+                uint64_t frameRel =
+                    actx->player->TranslatePositionAbsToRel(frameAbs);
+                uint64_t targetRel = frameRel + direction;
+                if (frameRel == 0 && direction < 0)
+                    targetRel = 0;
+                uint64_t maxAbs = actx->player->GetCurrentFrameCount();
+                uint64_t maxRel =
+                    actx->player->TranslatePositionAbsToRel(maxAbs);
+                if (targetRel > maxRel)
+                    targetRel = maxRel;
+                uint64_t targetAbs =
+                    actx->player->TranslatePositionRelToAbs(targetRel);
+                actx->UnlockDeletePlayer(__FILE__, __LINE__);
+                DoPlayerSeekToFrame(actx, targetAbs);
+                UpdateOSDSeekMessage(actx, message, kOSDTimeout_Med);
+            }
         }
     }
     else if (flags & kSticky)
