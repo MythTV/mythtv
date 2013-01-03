@@ -529,7 +529,8 @@ void MythCCExtractorPlayer::Process708Captions(uint flags)
 static QStringList to_string_list(const TeletextSubPage &subPage)
 {
     QStringList content;
-    for (int i = 0; i < 25; ++i)
+    // Skip the page header (line 0)
+    for (int i = 1; i < 25; ++i)
     {
         QString str = decode_teletext(subPage.lang, subPage.data[i]).trimmed();
         if (!str.isEmpty())
