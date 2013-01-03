@@ -156,10 +156,10 @@ class DecoderBase
                                       float fallback_ratio);
     uint64_t TranslatePositionFrameToMs(uint64_t position,
                                         float fallback_framerate,
-                                        const frm_dir_map_t &cutlist) const;
+                                        const frm_dir_map_t &cutlist);
     uint64_t TranslatePositionMsToFrame(uint64_t dur_ms,
                                         float fallback_framerate,
-                                        const frm_dir_map_t &cutlist) const;
+                                        const frm_dir_map_t &cutlist);
 
     float GetVideoAspect(void) const { return current_aspect; }
 
@@ -297,6 +297,7 @@ class DecoderBase
     frm_pos_map_t m_frameToDurMap; // guarded by m_positionMapLock
     frm_pos_map_t m_durToFrameMap; // guarded by m_positionMapLock
     bool dontSyncPositionMap;
+    mutable QDateTime m_lastPositionMapUpdate; // guarded by m_positionMapLock
 
     uint64_t seeksnap;
     bool livetv;

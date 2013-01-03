@@ -393,11 +393,7 @@ class MTV_PUBLIC MythPlayer
     long long CalcRWTime(long long rw) const;
     virtual void calcSliderPos(osdInfo &info, bool paddedFields = false);
     uint64_t TranslatePositionFrameToMs(uint64_t position,
-                                        bool use_cutlist) const {
-        return deleteMap.TranslatePositionFrameToMs(position,
-                                                    GetFrameRate(),
-                                                    use_cutlist);
-    }
+                                        bool use_cutlist) const;
     uint64_t TranslatePositionMsToFrame(uint64_t position,
                                         bool use_cutlist) const {
         return deleteMap.TranslatePositionMsToFrame(position,

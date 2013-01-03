@@ -425,6 +425,10 @@ bool DecoderBase::SyncPositionMap(void)
                 .arg(totframes).arg(length).arg(new_posmap_size));
     }
     recordingHasPositionMap |= (0 != new_posmap_size);
+    {
+        QMutexLocker locker(&m_positionMapLock);
+        m_lastPositionMapUpdate = QDateTime::currentDateTime();
+    }
     return ret_val;
 }
 
@@ -1265,9 +1269,25 @@ uint64_t DecoderBase::TranslatePosition(const frm_pos_map_t &map,
 uint64_t DecoderBase::TranslatePositionFrameToMs(uint64_t position,
                                                  float fallback_framerate,
                                                  const frm_dir_map_t &cutlist)
-    const
 {
     QMutexLocker locker(&m_positionMapLock);
+    // Accurate calculation of duration requires an up-to-date
+    // duration map.  However, the last frame (total duration) will
+    // almost always appear to be past the end of the duration map, so
+    // we limit duration map syncing to once every 3 seconds (a
+    // somewhat arbitrary value).
+    if (!m_frameToDurMap.empty())
+    {
+        frm_pos_map_t::const_iterator it = m_frameToDurMap.end();
+        --it;
+        if (position > it.key())
+        {
+            if (!m_lastPositionMapUpdate.isValid() ||
+                (QDateTime::currentDateTime() >
+                 m_lastPositionMapUpdate.addSecs(3)))
+                SyncPositionMap();
+        }
+    }
     return TranslatePositionAbsToRel(cutlist, position, m_frameToDurMap,
                                      1000 / fallback_framerate);
 }
@@ -1277,7 +1297,6 @@ uint64_t DecoderBase::TranslatePositionFrameToMs(uint64_t position,
 uint64_t DecoderBase::TranslatePositionMsToFrame(uint64_t dur_ms,
                                                  float fallback_framerate,
                                                  const frm_dir_map_t &cutlist)
-    const
 {
     QMutexLocker locker(&m_positionMapLock);
     // Convert relative position in milliseconds (cutlist-adjusted) to

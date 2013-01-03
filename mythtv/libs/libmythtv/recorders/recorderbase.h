@@ -189,13 +189,9 @@ class MTV_PUBLIC RecorderBase : public QRunnable
     virtual bool IsPaused(bool holding_lock = false) const;
     virtual bool WaitForPause(int timeout = 1000);
 
-    /** \brief Returns an approximation of the frame rate.
-     *
-     *  \bug This can be off by at least half, our non-frame grabber based
-     *       recorders do not not try to approximate the frame rate. So
-     *       a 720p recording at 60fps will report a frame-rate of 25fps.
+    /** \brief Returns the latest frame rate.
      */
-    double GetFrameRate(void) { return video_frame_rate; }
+    double GetFrameRate(void) { return m_frameRate / 1000; }
 
     /** \brief If requested, switch to new RingBuffer/ProgramInfo objects
      */
