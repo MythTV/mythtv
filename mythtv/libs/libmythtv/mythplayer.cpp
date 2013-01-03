@@ -4093,9 +4093,9 @@ void MythPlayer::HandleArbSeek(bool right)
     if (deleteMap.GetSeekAmount() == -2)
     {
         uint64_t framenum = deleteMap.GetNearestMark(framesPlayed, right);
-        if (right && (framenum > (int64_t)framesPlayed))
+        if (right && (framenum > framesPlayed))
             DoFastForward(framenum - framesPlayed, kInaccuracyNone);
-        else if (!right && ((int64_t)framesPlayed > framenum))
+        else if (!right && (framesPlayed > framenum))
             DoRewind(framesPlayed - framenum, kInaccuracyNone);
     }
     else
@@ -4821,7 +4821,7 @@ uint64_t MythPlayer::TranslatePositionFrameToMs(uint64_t position,
                                                 bool use_cutlist) const
 {
     float frameRate = GetFrameRate();
-    if (position == -1)
+    if (position == (uint64_t)-1)
     {
         float recorderFrameRate = player_ctx->recorder->GetFrameRate();
         if (recorderFrameRate > 0)
