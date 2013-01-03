@@ -1226,7 +1226,7 @@ uint64_t DecoderBase::TranslatePosition(const frm_pos_map_t &map,
     // <= the given key, so back up one element upon > condition.
     if (lower != map.begin() && (lower == map.end() || lower.key() > key))
         --lower;
-    if (lower == map.end())
+    if (lower == map.end() || lower.key() > key)
     {
         key1 = 0;
         val1 = 0;
