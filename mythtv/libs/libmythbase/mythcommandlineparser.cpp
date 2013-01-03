@@ -1624,28 +1624,27 @@ bool MythCommandLineParser::Parse(int argc, const char * const * argv)
  */
 bool MythCommandLineParser::ReconcileLinks(void)
 {
-    QList<CommandLineArg*> links;
-    QMap<QString,CommandLineArg*>::iterator i1;
-    QList<CommandLineArg*>::iterator i2;
-
     if (m_verbose)
         cerr << "Reconciling links for option interdependencies." << endl;
-
-    for (i1 = m_namedArgs.begin(); i1 != m_namedArgs.end(); ++i1)
+ 
+    QMap<QString,CommandLineArg*>::iterator args_it;
+    for (args_it = m_namedArgs.begin(); args_it != m_namedArgs.end(); ++args_it)
     {
-        links = (*i1)->m_parents;
-        for (i2 = links.begin(); i2 != links.end(); ++i2)
+        QList<CommandLineArg*> links = (*args_it)->m_parents;
+        QList<CommandLineArg*>::iterator links_it;
+        for (links_it = links.begin(); links_it != links.end(); ++links_it)
         {
-            if ((*i2)->m_type != QVariant::Invalid)
+            if ((*links_it)->m_type != QVariant::Invalid)
                 continue; // already handled
 
-            if (!m_namedArgs.contains((*i2)->m_name))
+            if (!m_namedArgs.contains((*links_it)->m_name))
             {
                 // not found
                 cerr << "ERROR: could not reconcile linked argument." << endl
-                     << "  '" << (*i1)->m_name.toLocal8Bit().constData()
+                     << "  '" << (*args_it)->m_name.toLocal8Bit().constData()
                      << "' could not find '"
-                     << (*i2)->m_name.toLocal8Bit().constData() << "'." << endl
+                     << (*links_it)->m_name.toLocal8Bit().constData()
+                     << "'." << endl
                      << "  Please resolve dependency and recompile." << endl;
                 return false;
             }
@@ -1653,25 +1652,26 @@ bool MythCommandLineParser::ReconcileLinks(void)
             // replace linked argument
             if (m_verbose)
                 cerr << QString("  Setting %1 as child of %2")
-                            .arg((*i1)->m_name).arg((*i2)->m_name)
+                            .arg((*args_it)->m_name).arg((*links_it)->m_name)
                             .toLocal8Bit().constData()
                      << endl;
-            (*i1)->SetChildOf(m_namedArgs[(*i2)->m_name]);
+            (*args_it)->SetChildOf(m_namedArgs[(*links_it)->m_name]);
         }
 
-        links = (*i1)->m_children;
-        for (i2 = links.begin(); i2 != links.end(); ++i2)
+        links = (*args_it)->m_children;
+        for (links_it = links.begin(); links_it != links.end(); ++links_it)
         {
-            if ((*i2)->m_type != QVariant::Invalid)
+            if ((*links_it)->m_type != QVariant::Invalid)
                 continue; // already handled
 
-            if (!m_namedArgs.contains((*i2)->m_name))
+            if (!m_namedArgs.contains((*links_it)->m_name))
             {
                 // not found
                 cerr << "ERROR: could not reconcile linked argument." << endl
-                     << "  '" << (*i1)->m_name.toLocal8Bit().constData()
+                     << "  '" << (*args_it)->m_name.toLocal8Bit().constData()
                      << "' could not find '"
-                     << (*i2)->m_name.toLocal8Bit().constData() << "'." << endl
+                     << (*links_it)->m_name.toLocal8Bit().constData()
+                     << "'." << endl
                      << "  Please resolve dependency and recompile." << endl;
                 return false;
             }
@@ -1679,25 +1679,26 @@ bool MythCommandLineParser::ReconcileLinks(void)
             // replace linked argument
             if (m_verbose)
                 cerr << QString("  Setting %1 as parent of %2")
-                            .arg((*i1)->m_name).arg((*i2)->m_name)
+                            .arg((*args_it)->m_name).arg((*links_it)->m_name)
                             .toLocal8Bit().constData()
                      << endl;
-            (*i1)->SetParentOf(m_namedArgs[(*i2)->m_name]);
+            (*args_it)->SetParentOf(m_namedArgs[(*links_it)->m_name]);
         }
 
-        links = (*i1)->m_requires;
-        for (i2 = links.begin(); i2 != links.end(); ++i2)
+        links = (*args_it)->m_requires;
+        for (links_it = links.begin(); links_it != links.end(); ++links_it)
         {
-            if ((*i2)->m_type != QVariant::Invalid)
+            if ((*links_it)->m_type != QVariant::Invalid)
                 continue; // already handled
 
-            if (!m_namedArgs.contains((*i2)->m_name))
+            if (!m_namedArgs.contains((*links_it)->m_name))
             {
                 // not found
                 cerr << "ERROR: could not reconcile linked argument." << endl
-                     << "  '" << (*i1)->m_name.toLocal8Bit().constData()
+                     << "  '" << (*args_it)->m_name.toLocal8Bit().constData()
                      << "' could not find '"
-                     << (*i2)->m_name.toLocal8Bit().constData() << "'." << endl
+                     << (*links_it)->m_name.toLocal8Bit().constData()
+                     << "'." << endl
                      << "  Please resolve dependency and recompile." << endl;
                 return false;
             }
@@ -1705,57 +1706,64 @@ bool MythCommandLineParser::ReconcileLinks(void)
             // replace linked argument
             if (m_verbose)
                 cerr << QString("  Setting %1 as requiring %2")
-                            .arg((*i1)->m_name).arg((*i2)->m_name)
+                            .arg((*args_it)->m_name).arg((*links_it)->m_name)
                             .toLocal8Bit().constData()
                      << endl;
-            (*i1)->SetRequires(m_namedArgs[(*i2)->m_name]);
+            (*args_it)->SetRequires(m_namedArgs[(*links_it)->m_name]);
         }
 
-        i2 = (*i1)->m_requiredby.begin();
-        while (i2 != (*i1)->m_requiredby.end())
+        QList<CommandLineArg*>::iterator req_it =
+            (*args_it)->m_requiredby.begin();
+        while (req_it != (*args_it)->m_requiredby.end())
         {
-            if ((*i2)->m_type == QVariant::Invalid)
+            if ((*req_it)->m_type == QVariant::Invalid)
             {
                 // if its not an invalid, it shouldnt be here anyway
-                if (m_namedArgs.contains((*i2)->m_name))
+                if (m_namedArgs.contains((*req_it)->m_name))
                 {
-                    m_namedArgs[(*i2)->m_name]->SetRequires(*i1);
+                    m_namedArgs[(*req_it)->m_name]->SetRequires(*args_it);
                     if (m_verbose)
+                    {
                         cerr << QString("  Setting %1 as blocking %2")
-                                    .arg((*i1)->m_name).arg((*i2)->m_name)
+                                    .arg((*args_it)->m_name)
+                                    .arg((*req_it)->m_name)
                                     .toLocal8Bit().constData()
                              << endl;
+                    }
                 }
             }
 
-            (*i2)->DecrRef();
-            i2 = (*i1)->m_requiredby.erase(i2);
+            (*req_it)->DecrRef();
+            req_it = (*args_it)->m_requiredby.erase(req_it);
         }
 
-        i2 = (*i1)->m_blocks.begin();
-        while (i2 != (*i1)->m_blocks.end())
+        QList<CommandLineArg*>::iterator block_it =
+            (*args_it)->m_blocks.begin();
+        while (block_it != (*args_it)->m_blocks.end())
         {
-            if ((*i2)->m_type != QVariant::Invalid)
+            if ((*block_it)->m_type != QVariant::Invalid)
             {
-                ++i2;
+                ++block_it;
                 continue; // already handled
             }
 
-            if (!m_namedArgs.contains((*i2)->m_name))
+            if (!m_namedArgs.contains((*block_it)->m_name))
             {
-                (*i2)->DecrRef();
-                i2 = (*i1)->m_blocks.erase(i2);
+                (*block_it)->DecrRef();
+                block_it = (*args_it)->m_blocks.erase(block_it);
                 continue; // if it doesnt exist, it cant block this command
             }
 
             // replace linked argument
             if (m_verbose)
+            {
                 cerr << QString("  Setting %1 as blocking %2")
-                            .arg((*i1)->m_name).arg((*i2)->m_name)
+                            .arg((*args_it)->m_name).arg((*block_it)->m_name)
                             .toLocal8Bit().constData()
                      << endl;
-            (*i1)->SetBlocks(m_namedArgs[(*i2)->m_name]);
-            ++i2;
+            }
+            (*args_it)->SetBlocks(m_namedArgs[(*block_it)->m_name]);
+            ++block_it;
         }
     }
 
