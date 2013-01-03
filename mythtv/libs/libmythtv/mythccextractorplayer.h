@@ -145,7 +145,7 @@ class MTV_PUBLIC MythCCExtractorPlayer : public MythPlayer
     void Process708Captions(uint flags);
 
     void IngestTeletext(void);
-    void ProcessTeletext(void);
+    void ProcessTeletext(uint flags);
 
     void IngestDVBSubtitles(void);
     void ProcessDVBSubtitles(uint flags);
