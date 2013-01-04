@@ -4345,7 +4345,7 @@ def getStreamList(folder):
 def isFileOkayForDVD(file, folder):
     """return true if the file is dvd compliant"""
 
-    if string.lower(getVideoCodec(folder)) != "mpeg2video":
+    if string.lower(getVideoCodec(folder)) != "mpeg2video (main)":
         return False
 
 #    if string.lower(getAudioCodec(folder)) != "ac3" and encodeToAC3:
@@ -4425,7 +4425,7 @@ def doProcessFile(file, folder, count):
         #can only use mythtranscode to cut commercials on mpeg2 files
         write("File type is '%s'" % getFileType(folder))
         write("Video codec is '%s'" % getVideoCodec(folder))
-        if string.lower(getVideoCodec(folder)) == "mpeg2video": 
+        if string.lower(getVideoCodec(folder)).startswith("mpeg2video"):
             if file.attributes["usecutlist"].value == "1" and getText(infoDOM.getElementsByTagName("hascutlist")[0]) == "yes":
                 # Run from local file?
                 if file.hasAttribute("localfilename"):
@@ -4462,8 +4462,8 @@ def doProcessFile(file, folder, count):
         write("File type is '%s'" % getFileType(folder))
         write("Video codec is '%s'" % getVideoCodec(folder))
 
-        if (alwaysRunMythtranscode == True and 
-                string.lower(getVideoCodec(folder)) == "mpeg2video" and
+        if (alwaysRunMythtranscode == True and
+                string.lower(getVideoCodec(folder)).startswith("mpeg2video") and
                 isFileOkayForDVD(file, folder)):
             if file.hasAttribute("localfilename"):
                 localfile = file.attributes["localfilename"].value
