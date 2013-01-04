@@ -98,14 +98,18 @@ bool DeleteMap::HandleAction(QString &action, uint64_t frame, uint64_t played)
     else if (action == "MOVENEXT")
         MoveRelative(frame, true);
     else if (action == "CUTTOBEGINNING")
-        Add(frame, MARK_CUT_END, tr("Cut to Beginning"));
+    {
+        Push(tr("Cut to Beginning"));
+        AddMark(frame, MARK_CUT_END);
+    }
     else if (action == "CUTTOEND")
     {
-        Add(frame, MARK_CUT_START, tr("Cut to End"));
+        Push(tr("Cut to End"));
+        AddMark(frame, MARK_CUT_START);
         // If the recording is still in progress, add an explicit end
         // mark at the end.
         if (m_ctx->player && m_ctx->player->IsWatchingInprogress())
-            Add(m_ctx->player->GetTotalFrameCount() - 1, MARK_CUT_END, "");
+            AddMark(m_ctx->player->GetTotalFrameCount() - 1, MARK_CUT_END);
     }
     else if (action == "NEWCUT")
         NewCut(frame);
@@ -278,7 +282,7 @@ void DeleteMap::ReverseAll(void)
  *        existing redundant mark of that type is removed. This simplifies
  *        the cleanup code.
  */
-void DeleteMap::Add(uint64_t frame, MarkTypes type, QString undoMessage)
+void DeleteMap::AddMark(uint64_t frame, MarkTypes type)
 {
     EDIT_CHECK;
     if ((MARK_CUT_START != type) && (MARK_CUT_END != type) &&
@@ -525,6 +529,7 @@ void DeleteMap::MoveRelative(uint64_t frame, bool right)
 void DeleteMap::Move(uint64_t frame, uint64_t to)
 {
     EDIT_CHECK;
+    Push(tr("Move Mark"));
     MarkTypes type = Delete(frame);
     if (MARK_UNSET == type)
     {
@@ -533,7 +538,7 @@ void DeleteMap::Move(uint64_t frame, uint64_t to)
         else if (frame == m_ctx->player->GetTotalFrameCount())
             type = MARK_CUT_END;
     }
-    Add(to, type, tr("Move Mark"));
+    AddMark(to, type);
 }
 
 /// Private addition to the deleteMap.
