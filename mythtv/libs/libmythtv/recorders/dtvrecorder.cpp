@@ -202,6 +202,8 @@ void DTVRecorder::ResetForNewFile(void)
     //_seen_sps
     positionMap.clear();
     positionMapDelta.clear();
+    durationMap.clear();
+    durationMapDelta.clear();
     _payload_buffer.clear();
 
     locker.unlock();
@@ -222,6 +224,7 @@ void DTVRecorder::ClearStatistics(void)
     _continuity_error_count.fetchAndStoreRelaxed(0);
     _frames_seen_count          = 0;
     _frames_written_count       = 0;
+    _total_duration             = 0;
 }
 
 // documented in recorderbase.h
