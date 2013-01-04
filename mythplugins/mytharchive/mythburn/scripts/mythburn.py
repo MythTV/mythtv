@@ -2003,7 +2003,7 @@ def encodeVideoToMPEG2(source, destvideofile, video, audio1, audio2, aspectratio
         if audio1[AUDIO_CODEC] == "AC3":
             if name == "-acodec":
                 value = "copy"
-            if name == "-ar" or name == "-ab" or name == "-ac":
+            if name == "-ar" or name == "-b:a" or name == "-ac":
                 name = ""
                 value = ""
 
@@ -2024,14 +2024,12 @@ def encodeVideoToMPEG2(source, destvideofile, video, audio1, audio2, aspectratio
             if audio1[AUDIO_CODEC] == "AC3":
                 if name == "-acodec":
                     value = "copy"
-                if name == "-ar" or name == "-ab" or name == "-ac":
+                if name == "-ar" or name == "-b:a" or name == "-ac":
                     name = ""
                     value = ""
 
-            if name == "-acodec" or name == "-ar" or name == "-ab" or name == "-ac":
+            if name == "-acodec" or name == "-ar" or name == "-b:a" or name == "-ac":
                     command += " " + name + " " + value
-
-        command += " -newaudio" 
 
     #make sure we get the correct stream(s) that we want
     command += " -map 0:%d -map 0:%d " % (video[VIDEO_INDEX], audio1[AUDIO_INDEX])
