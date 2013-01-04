@@ -3691,6 +3691,8 @@ bool MythPlayer::IsNearEnd(void)
     if (!player_ctx->IsPIP() &&
         player_ctx->GetState() == kState_WatchingPreRecorded)
     {
+        if (framesRead >= deleteMap.GetLastFrame())
+            return true;
         uint64_t frameCount = GetCurrentFrameCount();
         framesLeft = (frameCount > framesRead) ? frameCount - framesRead : 0;
         return (framesLeft < (uint64_t)margin);
