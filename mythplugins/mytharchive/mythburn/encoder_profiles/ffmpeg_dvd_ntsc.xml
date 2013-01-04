@@ -8,11 +8,11 @@
         <parameter name="-v"           value="1"/>
         <parameter name="-i"           value="%inputfile"/>
         <parameter name="-r"           value="ntsc"/>
-        <parameter name="-target"      value="dvd"/>
-        <parameter name="-b"           value="9000k"/>
+        <parameter name="-target"      value="ntsc-dvd"/>
+        <parameter name="-b:v"         value="9000k"/>
         <parameter name="-s"           value="720x480"/>
         <parameter name="-acodec"      value="ac3"/>
-        <parameter name="-ab"          value="192k"/>
+        <parameter name="-b:a"         value="192k"/>
         <parameter name="-ac"          value="2"/>
         <parameter name="-copyts"      value=""/>
         <parameter name="-aspect"      value="%aspect"/>
@@ -29,11 +29,11 @@
         <parameter name="-v"      value="1"/>
         <parameter name="-i"      value="%inputfile"/>
         <parameter name="-r"      value="ntsc"/>
-        <parameter name="-target" value="dvd"/>
-        <parameter name="-b"      value="4771k"/>
+        <parameter name="-target" value="ntsc-dvd"/>
+        <parameter name="-b:v"    value="4771k"/>
         <parameter name="-s"      value="720x480"/>
         <parameter name="-acodec" value="ac3"/>
-        <parameter name="-ab"     value="192k"/>
+        <parameter name="-b:a"    value="192k"/>
         <parameter name="-ac"     value="2"/>
         <parameter name="-copyts" value=""/>
         <parameter name="-aspect" value="%aspect"/>
@@ -48,11 +48,11 @@
         <parameter name="-v"      value="1"/>
         <parameter name="-i"      value="%inputfile"/>
         <parameter name="-r"      value="ntsc"/>
-        <parameter name="-target" value="dvd"/>
-        <parameter name="-b"      value="2344k"/>
+        <parameter name="-target" value="ntsc-dvd"/>
+        <parameter name="-b:v"    value="2344k"/>
         <parameter name="-s"      value="352x480"/>
         <parameter name="-acodec" value="ac3"/>
-        <parameter name="-ab"     value="192k"/>
+        <parameter name="-b:a"    value="192k"/>
         <parameter name="-ac"     value="2"/>
         <parameter name="-copyts" value=""/>
         <parameter name="-aspect" value="%aspect"/>
@@ -67,11 +67,11 @@
         <parameter name="-v"      value="1"/>
         <parameter name="-i"      value="%inputfile"/>
         <parameter name="-r"      value="ntsc"/>
-        <parameter name="-target" value="dvd"/>
-        <parameter name="-b"      value="1526k"/>
+        <parameter name="-target" value="ntsc-dvd"/>
+        <parameter name="-b:v"    value="1526k"/>
         <parameter name="-s"      value="352x240"/>
         <parameter name="-acodec" value="ac3"/>
-        <parameter name="-ab"     value="128k"/>
+        <parameter name="-b:a"    value="128k"/>
         <parameter name="-ac"     value="2"/>
         <parameter name="-copyts" value=""/>
         <parameter name="-aspect" value="%aspect"/>
