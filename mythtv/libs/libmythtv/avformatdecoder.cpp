@@ -2956,8 +2956,11 @@ void AvFormatDecoder::HandleGopStart(
                 m_positionMap.push_back(dur);
             }
             m_positionMap.push_back(entry);
-            m_frameToDurMap[framesRead] = totalDuration / 1000;
-            m_durToFrameMap[m_frameToDurMap[framesRead]] = framesRead;
+            if (trackTotalDuration)
+            {
+                m_frameToDurMap[framesRead] = totalDuration / 1000;
+                m_durToFrameMap[m_frameToDurMap[framesRead]] = framesRead;
+            }
         }
 
 #if 0
@@ -3243,7 +3246,9 @@ bool AvFormatDecoder::PreProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
     if (on_frame)
         framesRead++;
 
-    totalDuration += av_q2d(curstream->time_base) * pkt->duration * 1000000; // usec
+    if (trackTotalDuration)
+        totalDuration +=
+            av_q2d(curstream->time_base) * pkt->duration * 1000000; // usec
 
     justAfterChange = false;
 

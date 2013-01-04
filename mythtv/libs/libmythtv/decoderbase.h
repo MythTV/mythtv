@@ -242,6 +242,7 @@ class DecoderBase
     void ResetTotalDuration(void) { totalDuration = 0; }
     void SaveTotalFrames(void);
     bool GetVideoInverted(void) const { return video_inverted; }
+    void TrackTotalDuration(bool track) { trackTotalDuration = track; }
 
   protected:
     virtual int  AutoSelectTrack(uint type);
@@ -282,6 +283,11 @@ class DecoderBase
     long long lastKey;
     int keyframedist;
     long long indexOffset;
+
+    // The totalDuration field is only valid when the video is played
+    // from start to finish without any jumping.  trackTotalDuration
+    // indicates whether this is the case.
+    bool trackTotalDuration;
 
     bool ateof;
     bool exitafterdecoded;

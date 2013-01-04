@@ -29,6 +29,7 @@ DecoderBase::DecoderBase(MythPlayer *parent, const ProgramInfo &pginfo)
 
       framesPlayed(0), framesRead(0), totalDuration(0),
       lastKey(0), keyframedist(-1), indexOffset(0),
+      trackTotalDuration(false),
 
       ateof(false), exitafterdecoded(false), transcoding(false),
 

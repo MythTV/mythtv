@@ -102,6 +102,8 @@ bool MythCommFlagPlayer::RebuildSeekTable(
 
     DecoderGetFrame(kDecodeNothing,true);
 
+    decoder->TrackTotalDuration(true);
+
     if (showPercentage)
         cout << "\r                         \r" << flush;
 
