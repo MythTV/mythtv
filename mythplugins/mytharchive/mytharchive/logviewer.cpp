@@ -26,12 +26,49 @@ void showLogViewer(void)
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
     QString logDir = getTempDirectory() + "logs";
+    QString progressLog;
+    QString fullLog;
+
+    // wait for a log file to be available
+    int tries = 10;
+    while (tries--)
+    {
+        if (QFile::exists(logDir + "/progress.log"))
+            progressLog = logDir + "/progress.log";
+
+        if (QFile::exists(logDir + "/mythburn.log"))
+            fullLog = logDir + "/mythburn.log";
+
+        // we wait for both the progress.log and mythburn.log
+        if ((!progressLog.isEmpty()) && (!fullLog.isEmpty()))
+            break;
+
+        // or we wait for a log from mytharchivehelper
+        if (progressLog.isEmpty() && fullLog.isEmpty())
+        {
+            QStringList logFiles;
+            QStringList filters;
+            filters << "*.log";
+
+            QDir d(logDir);
+            logFiles = d.entryList(filters, QDir::Files | QDir::Readable, QDir::Time);
+
+            if (logFiles.count())
+            {
+                // the first log file should be the newest one available
+                progressLog = logDir + '/' + logFiles[0];
+                break;
+            }
+        }
+
+        sleep(1);
+    }
 
     // do any logs exist?
-    if (QFile::exists(logDir + "/progress.log") || QFile::exists(logDir + "/mythburn.log"))
+    if ((!progressLog.isEmpty()) || (!fullLog.isEmpty()))
     {
         LogViewer *viewer = new LogViewer(mainStack);
-        viewer->setFilenames(logDir + "/progress.log", logDir + "/mythburn.log");
+        viewer->setFilenames(progressLog, fullLog);
         if (viewer->Create())
             mainStack->AddScreen(viewer);
     }
@@ -244,6 +281,8 @@ QString LogViewer::getSetting(const QString &key)
 
 bool LogViewer::loadFile(QString filename, QStringList &list, int startline)
 {
+    bool strip = !(filename.endsWith("progress.log") || filename.endsWith("mythburn.log"));
+
     list.clear();
 
     QFile file(filename);
@@ -267,6 +306,16 @@ bool LogViewer::loadFile(QString filename, QStringList &list, int startline)
         while ( !stream.atEnd() )
         {
             s = stream.readLine();
+
+            if (strip)
+            {
+                // the logging from mytharchivehelper contains a lot of junk
+                // we are not interested in so just strip it out
+                int pos = s.indexOf(" - ");
+                if (pos != -1)
+                    s = s.mid(pos + 3);
+            }
+
             list.append(s);
         }
         file.close();
