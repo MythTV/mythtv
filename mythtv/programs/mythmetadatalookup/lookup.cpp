@@ -52,7 +52,7 @@ void LookerUpper::HandleSingleRecording(const uint chanid,
     m_updaterules = updaterules;
 
     m_busyRecList.append(pginfo);
-    m_metadataFactory->Lookup(pginfo, false, false, false);
+    m_metadataFactory->Lookup(pginfo, true, false, false);
 }
 
 void LookerUpper::HandleAllRecordings(bool updaterules)
@@ -82,7 +82,7 @@ void LookerUpper::HandleAllRecordings(bool updaterules)
             LOG(VB_GENERAL, LOG_INFO, msg);
 
             m_busyRecList.append(pginfo);
-            m_metadataFactory->Lookup(pginfo, false, false, false);
+            m_metadataFactory->Lookup(pginfo, true, false, false);
         }
         else
             delete pginfo;
@@ -107,7 +107,7 @@ void LookerUpper::HandleAllRecordingRules()
             LOG(VB_GENERAL, LOG_INFO, msg);
 
             m_busyRecList.append(pginfo);
-            m_metadataFactory->Lookup(pginfo, false, false, true);
+            m_metadataFactory->Lookup(pginfo, true, false, true);
         }
         else
             delete pginfo;
@@ -145,7 +145,7 @@ void LookerUpper::HandleAllArtwork(bool aggressive)
                 LOG(VB_GENERAL, LOG_INFO, msg);
 
                 m_busyRecList.append(pginfo);
-                m_metadataFactory->Lookup(pginfo, false, true, true);
+                m_metadataFactory->Lookup(pginfo, true, true, true);
                 continue;
             }
         }
@@ -187,7 +187,7 @@ void LookerUpper::HandleAllArtwork(bool aggressive)
                 LOG(VB_GENERAL, LOG_INFO, msg);
 
                 m_busyRecList.append(pginfo);
-                m_metadataFactory->Lookup(pginfo, false, true, aggressive);
+                m_metadataFactory->Lookup(pginfo, true, true, aggressive);
                 continue;
             }
         }
