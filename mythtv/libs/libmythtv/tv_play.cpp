@@ -951,7 +951,7 @@ TV::TV(void)
       tryUnflaggedSkip(false),
       smartForward(false),
       ff_rew_repos(1.0f), ff_rew_reverse(false),
-      jumped_back(false),
+      jumped_back(false), // XXX unused, remove this field
       vbimode(VBIMode::None),
       // State variables
       switchToInputId(0),
@@ -3300,6 +3300,12 @@ void TV::HandleEndOfPlaybackTimerEvent(void)
             continue;
         }
 
+        // If the end of playback is destined to pop up the end of
+        // recording delete prompt, then don't exit the player here.
+        if (ctx->GetState() == kState_WatchingPreRecorded &&
+            db_end_of_rec_exit_prompt && !inPlaylist && !underNetworkControl)
+            continue;
+
         ForceNextStateNone(ctx);
         if (mctx == ctx)
         {
@@ -3351,16 +3357,12 @@ void TV::HandleEndOfRecordingExitPromptTimerEvent(void)
     }
     ReturnOSDLock(mctx, osd);
 
-    bool do_prompt = false;
+    bool do_prompt;
     mctx->LockDeletePlayer(__FILE__, __LINE__);
-    if (mctx->GetState() == kState_WatchingPreRecorded && mctx->player)
-    {
-        if (!mctx->player->IsNearEnd())
-            jumped_back = false;
-
-        do_prompt = mctx->player->IsNearEnd() && !jumped_back &&
-            !mctx->player->IsEmbedding() && !mctx->player->IsPaused();
-    }
+    do_prompt = (mctx->GetState() == kState_WatchingPreRecorded &&
+                 mctx->player &&
+                 !mctx->player->IsEmbedding() &&
+                 !mctx->player->IsPlaying());
     mctx->UnlockDeletePlayer(__FILE__, __LINE__);
 
     if (do_prompt)

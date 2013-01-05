@@ -2891,7 +2891,8 @@ void MythPlayer::EventLoop(void)
     }
 
     // Handle end of file
-    if (GetEof() && !allpaused)
+    if ((GetEof() && !allpaused) ||
+        (!GetEditMode() && framesPlayed >= deleteMap.GetLastFrame()))
     {
 #ifdef USING_MHEG
         if (interactiveTV && interactiveTV->StreamStarted(false))
@@ -2907,6 +2908,7 @@ void MythPlayer::EventLoop(void)
             return;
         }
 
+        Pause();
         SetPlaying(false);
         return;
     }
@@ -3687,6 +3689,7 @@ bool MythPlayer::IsNearEnd(void)
     bool watchingTV = IsWatchingInprogress();
 
     framesRead = decoder->GetFramesRead();
+    framesRead = framesPlayed;
 
     if (!player_ctx->IsPIP() &&
         player_ctx->GetState() == kState_WatchingPreRecorded)
