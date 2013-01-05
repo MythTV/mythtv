@@ -65,6 +65,7 @@ using namespace std;
 #include <mythsystem.h>
 #include <mythdate.h>
 #include <mythlogging.h>
+#include <storagegroup.h>
 
 extern "C" {
 #include <libavcodec/avcodec.h>
@@ -119,6 +120,7 @@ class NativeArchive
       int exportVideo(QDomElement &itemNode, const QString &saveDirectory);
   private:
       QString findNodeText(const QDomElement &elem, const QString &nodeName);
+      int getFieldList(QStringList &fieldList, const QString &tableName);
 };
 
 NativeArchive::NativeArchive(void)
@@ -145,80 +147,15 @@ NativeArchive::~NativeArchive(void)
 
 bool NativeArchive::copyFile(const QString &source, const QString &destination)
 {
-    QFile srcFile(source), destFile(destination);
-
-    LOG(VB_JOBQUEUE, LOG_INFO, QString("copying from %1").arg(source));
-    LOG(VB_JOBQUEUE, LOG_INFO, QString("to %2").arg(destination));
-
-    if (!srcFile.open(QIODevice::ReadOnly))
-    {
-        LOG(VB_JOBQUEUE, LOG_ERR, "Unable to open source file");
-        return false;
-    }
-
-    if (!destFile.open(QIODevice::WriteOnly))
-    {
-        LOG(VB_JOBQUEUE, LOG_ERR, "Unable to open destination file");
-        LOG(VB_JOBQUEUE, LOG_ERR, "Do you have write access to the directory?");
-        srcFile.close();
-        return false;
-    }
-
-    // get free space available on destination
-    int64_t dummy;
-    int64_t freeSpace = getDiskSpace(destination, dummy, dummy);
-
-    int srcLen, destLen, percent = 0, lastPercent = 0;
-    int64_t wroteSize = 0, totalSize = srcFile.size();
-    char buffer[1024*1024];
-
-    if (freeSpace != -1 && freeSpace < totalSize / 1024)
+    QString command = QString("mythutil --copyfile --infile %1 --outfile %2")
+                              .arg(source).arg(destination);
+    uint res = myth_system(command);
+    if (res != GENERIC_EXIT_OK)
     {
         LOG(VB_JOBQUEUE, LOG_ERR,
-            "Not enough free space available on destination filesystem.");
-        LOG(VB_JOBQUEUE, LOG_ERR, QString("Available: %1 Needed %2")
-                             .arg(freeSpace).arg(totalSize));
-        destFile.close();
-        srcFile.close();
+            QString("Failed while running %1. Result: %2").arg(command).arg(res));
         return false;
     }
-
-    while ((srcLen = srcFile.read(buffer, sizeof(buffer))) > 0)
-    {
-        destLen = destFile.write(buffer, srcLen);
-
-        if (destLen == -1 || srcLen != destLen)
-        {
-            LOG(VB_JOBQUEUE, LOG_ERR,
-                "While trying to write to destination file.");
-            srcFile.close();
-            destFile.close();
-            return false;
-        }
-        wroteSize += destLen;
-        percent = (int) ((100.0 * wroteSize) / totalSize);
-        if (percent % 5 == 0  && percent != lastPercent)
-        {
-            LOG(VB_JOBQUEUE, LOG_INFO, QString("%1 out of %2 (%3%) completed")
-                    .arg(formatSize(wroteSize/1024))
-                    .arg(formatSize(totalSize/1024)).arg(percent));
-            lastPercent = percent;
-        }
-    }
-
-    srcFile.close();
-    destFile.close();
-    if (srcFile.size() != destFile.size())
-    {
-        LOG(VB_JOBQUEUE, LOG_ERR, "Copy not completed OK - "
-            "Source and destination file sizes do not match!!");
-        LOG(VB_JOBQUEUE, LOG_ERR,
-            QString("Source is %1 bytes, Destination is %2 bytes")
-                .arg(srcFile.size()).arg(destFile.size()));
-        return false;
-    }
-    else
-        LOG(VB_JOBQUEUE, LOG_INFO, "Copy completed OK");
 
     return true;
 }
@@ -466,6 +403,24 @@ static QString fixFilename(const QString &filename)
     return ret;
 }
 
+int NativeArchive::getFieldList(QStringList &fieldList, const QString &tableName)
+{
+    fieldList.clear();
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    if (query.exec("DESCRIBE " + tableName))
+    {
+        while (query.next())
+        {
+            fieldList.append(query.value(0).toString());
+        }
+    }
+    else
+        MythDB::DBError("describe table", query);
+
+    return fieldList.count();
+}
+
 int NativeArchive::exportRecording(QDomElement   &itemNode,
                                    const QString &saveDirectory)
 {
@@ -512,16 +467,13 @@ int NativeArchive::exportRecording(QDomElement   &itemNode,
     root.appendChild(recorded);
 
     // get details from recorded
+    QStringList fieldList;
+    getFieldList(fieldList, "recorded");
+
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT chanid, starttime, endtime, title, subtitle,"
-                  " description, category, hostname, bookmark, editing,"
-                  " cutlist, autoexpire, commflagged, recgroup, recordid,"
-                  " seriesid, programid, lastmodified, filesize, stars,"
-                  " previouslyshown, originalairdate, preserve, findid,"
-                  " deletepending, transcoder, timestretch, recpriority,"
-                  " basename, progstart, progend, playgroup, profile,"
-                  " duplicate, transcoded FROM recorded "
-            "WHERE chanid = :CHANID and starttime = :STARTTIME;");
+    query.prepare("SELECT " + fieldList.join(",")
+                + " FROM recorded"
+                  " WHERE chanid = :CHANID and starttime = :STARTTIME;");
     query.bindValue(":CHANID", chanID);
     query.bindValue(":STARTTIME", startTime);
 
@@ -530,181 +482,19 @@ int NativeArchive::exportRecording(QDomElement   &itemNode,
         QDomElement elem;
         QDomText text;
 
-        elem = doc.createElement("chanid");
-        text = doc.createTextNode(query.value(0).toString());
-        elem.appendChild(text);
-        recorded.appendChild(elem);
+        for (int x = 0; x < fieldList.size(); x++)
+        {
+            elem = doc.createElement(fieldList[x]);
+            text = doc.createTextNode(query.value(x).toString());
+            elem.appendChild(text);
+            recorded.appendChild(elem);
+        }
 
-        elem = doc.createElement("starttime");
-        text = doc.createTextNode(query.value(1).toString());
-        elem.appendChild(text);
-        recorded.appendChild(elem);
-
-        elem = doc.createElement("endtime");
-        text = doc.createTextNode(query.value(2).toString());
-        elem.appendChild(text);
-        recorded.appendChild(elem);
-
-        elem = doc.createElement("title");
-        text = doc.createTextNode(query.value(3).toString());
-        elem.appendChild(text);
-        recorded.appendChild(elem);
-
-        elem = doc.createElement("subtitle");
-        text = doc.createTextNode(query.value(4).toString());
-        elem.appendChild(text);
-        recorded.appendChild(elem);
-
-        elem = doc.createElement("description");
-        text = doc.createTextNode(query.value(5).toString());
-        elem.appendChild(text);
-        recorded.appendChild(elem);
-
-        elem = doc.createElement("category");
-        text = doc.createTextNode(query.value(6).toString());
-        elem.appendChild(text);
-        recorded.appendChild(elem);
-
-        elem = doc.createElement("hostname");
-        text = doc.createTextNode(query.value(7).toString());
-        elem.appendChild(text);
-        recorded.appendChild(elem);
-
-        elem = doc.createElement("bookmark");
-        text = doc.createTextNode(query.value(8).toString());
-        elem.appendChild(text);
-        recorded.appendChild(elem);
-
-        elem = doc.createElement("editing");
-        text = doc.createTextNode(query.value(9).toString());
-        elem.appendChild(text);
-        recorded.appendChild(elem);
-
-        elem = doc.createElement("cutlist");
-        text = doc.createTextNode(query.value(10).toString());
-        elem.appendChild(text);
-        recorded.appendChild(elem);
-
-        elem = doc.createElement("autoexpire");
-        text = doc.createTextNode(query.value(11).toString());
-        elem.appendChild(text);
-        recorded.appendChild(elem);
-
-        elem = doc.createElement("commflagged");
-        text = doc.createTextNode(query.value(12).toString());
-        elem.appendChild(text);
-        recorded.appendChild(elem);
-
-        elem = doc.createElement("recgroup");
-        text = doc.createTextNode(query.value(13).toString());
-        elem.appendChild(text);
-        recorded.appendChild(elem);
-
-        elem = doc.createElement("recordid");
-        text = doc.createTextNode(query.value(14).toString());
-        elem.appendChild(text);
-        recorded.appendChild(elem);
-
-        elem = doc.createElement("seriesid");
-        text = doc.createTextNode(query.value(15).toString());
-        elem.appendChild(text);
-        recorded.appendChild(elem);
-
-        elem = doc.createElement("programid");
-        text = doc.createTextNode(query.value(16).toString());
-        elem.appendChild(text);
-        recorded.appendChild(elem);
-
-        elem = doc.createElement("lastmodified");
-        text = doc.createTextNode(query.value(17).toString());
-        elem.appendChild(text);
-        recorded.appendChild(elem);
-
-        elem = doc.createElement("filesize");
-        text = doc.createTextNode(query.value(18).toString());
-        elem.appendChild(text);
-        recorded.appendChild(elem);
-
-        elem = doc.createElement("stars");
-        text = doc.createTextNode(query.value(19).toString());
-        elem.appendChild(text);
-        recorded.appendChild(elem);
-
-        elem = doc.createElement("previouslyshown");
-        text = doc.createTextNode(query.value(20).toString());
-        elem.appendChild(text);
-        recorded.appendChild(elem);
-
-        elem = doc.createElement("originalairdate");
-        text = doc.createTextNode(query.value(21).toString());
-        elem.appendChild(text);
-        recorded.appendChild(elem);
-
-        elem = doc.createElement("preserve");
-        text = doc.createTextNode(query.value(22).toString());
-        elem.appendChild(text);
-        recorded.appendChild(elem);
-
-        elem = doc.createElement("findid");
-        text = doc.createTextNode(query.value(23).toString());
-        elem.appendChild(text);
-        recorded.appendChild(elem);
-
-        elem = doc.createElement("deletepending");
-        text = doc.createTextNode(query.value(24).toString());
-        elem.appendChild(text);
-        recorded.appendChild(elem);
-
-        elem = doc.createElement("transcoder");
-        text = doc.createTextNode(query.value(25).toString());
-        elem.appendChild(text);
-        recorded.appendChild(elem);
-
-        elem = doc.createElement("timestretch");
-        text = doc.createTextNode(query.value(26).toString());
-        elem.appendChild(text);
-        recorded.appendChild(elem);
-
-        elem = doc.createElement("recpriority");
-        text = doc.createTextNode(query.value(27).toString());
-        elem.appendChild(text);
-        recorded.appendChild(elem);
-
-        elem = doc.createElement("basename");
-        text = doc.createTextNode(query.value(28).toString());
-        elem.appendChild(text);
-        recorded.appendChild(elem);
-
-        elem = doc.createElement("progstart");
-        text = doc.createTextNode(query.value(29).toString());
-        elem.appendChild(text);
-        recorded.appendChild(elem);
-
-        elem = doc.createElement("progend");
-        text = doc.createTextNode(query.value(30).toString());
-        elem.appendChild(text);
-        recorded.appendChild(elem);
-
-        elem = doc.createElement("playgroup");
-        text = doc.createTextNode(query.value(31).toString());
-        elem.appendChild(text);
-        recorded.appendChild(elem);
-
-        elem = doc.createElement("profile");
-        text = doc.createTextNode(query.value(32).toString());
-        elem.appendChild(text);
-        recorded.appendChild(elem);
-
-        elem = doc.createElement("duplicate");
-        text = doc.createTextNode(query.value(33).toString());
-        elem.appendChild(text);
-        recorded.appendChild(elem);
-
-        elem = doc.createElement("transcoded");
-        text = doc.createTextNode(query.value(34).toString());
-        elem.appendChild(text);
-        recorded.appendChild(elem);
         LOG(VB_JOBQUEUE, LOG_INFO, "Created recorded element for " + title);
+    }
+    else
+    {
+        LOG(VB_JOBQUEUE, LOG_INFO, "Failed to get recorded field list");
     }
 
     // add channel details
@@ -777,7 +567,7 @@ int NativeArchive::exportRecording(QDomElement   &itemNode,
 
     // add the recordedmarkup table
     QDomElement recordedmarkup = doc.createElement("recordedmarkup");
-    query.prepare("SELECT chanid, starttime, mark, offset, type "
+    query.prepare("SELECT chanid, starttime, mark, type, data "
             "FROM recordedmarkup "
             "WHERE chanid = :CHANID and starttime = :STARTTIME;");
     query.bindValue(":CHANID", chanID);
@@ -788,13 +578,12 @@ int NativeArchive::exportRecording(QDomElement   &itemNode,
         {
             QDomElement mark = doc.createElement("mark");
             mark.setAttribute("mark", query.value(2).toString());
-            mark.setAttribute("offset", query.value(3).toString());
-            mark.setAttribute("type", query.value(4).toString());
+            mark.setAttribute("type", query.value(3).toString());
+            mark.setAttribute("data", query.value(4).toString());
             recordedmarkup.appendChild(mark);
         }
         root.appendChild(recordedmarkup);
-        LOG(VB_JOBQUEUE, LOG_INFO,
-            "Created recordedmarkup element for " + title);
+        LOG(VB_JOBQUEUE, LOG_INFO, "Created recordedmarkup element for " + title);
     }
 
     // add the recordedseek table
@@ -815,7 +604,8 @@ int NativeArchive::exportRecording(QDomElement   &itemNode,
             recordedseek.appendChild(mark);
         }
         root.appendChild(recordedseek);
-        LOG(VB_JOBQUEUE, LOG_INFO, "Created recordedseek element for " + title);
+        LOG(VB_JOBQUEUE, LOG_INFO,
+            "Created recordedseek element for " + title);
     }
 
     // finally save the xml to the file
@@ -1211,88 +1001,44 @@ int NativeArchive::importRecording(const QDomElement &itemNode,
         }
     }
 
-    // find the default storage location for this host
-    QString storageDir = "";
-    query.prepare("SELECT dirname FROM storagegroup "
-            "WHERE groupname = :GROUPNAME AND hostname = :HOSTNAME;");
-    query.bindValue(":GROUPNAME", "Default");
-    query.bindValue(":HOSTNAME", gCoreContext->GetHostName());
-    if (query.exec())
-    {
-        query.first();
-        storageDir = query.value(0).toString();
-    }
-    else
-    {
-        LOG(VB_JOBQUEUE, LOG_ERR,
-            "Failed to get 'Default' storage directory for this host");
-        return 1;
-    }
+    QString destFile = gCoreContext->GenMythURL(gCoreContext->GetSetting("MasterServerIP"),
+                                                gCoreContext->GetSetting("MasterServerPort"),
+                                                basename , "Default");
 
     // copy file to recording directory
-    LOG(VB_JOBQUEUE, LOG_INFO, "Copying video file.");
-    if (!copyFile(videoFile,  storageDir + "/" + basename))
+    LOG(VB_JOBQUEUE, LOG_INFO, "Copying video file to: " + destFile);
+    if (!copyFile(videoFile,  destFile))
         return 1;
 
     // copy any preview image to recording directory
     if (QFile::exists(videoFile + ".png"))
     {
-        LOG(VB_JOBQUEUE, LOG_INFO, "Copying preview image file.");
-        if (!copyFile(videoFile + ".png", storageDir + "/" + basename + ".png"))
+        LOG(VB_JOBQUEUE, LOG_INFO, "Copying preview image file to: " + destFile + ".png");
+        if (!copyFile(videoFile + ".png", destFile + ".png"))
             return 1;
     }
 
+    // get a list of fields from the xmlFile
+    QStringList fieldList;
+    QStringList bindList;
+    QDomNodeList nodes =  recordedNode.childNodes();
+
+    for (int x = 0; x < nodes.count(); x++)
+    {
+        QDomNode n = nodes.item(x);
+        QString field = n.nodeName();
+        fieldList.append(field);
+        bindList.append(":" + field.toUpper());
+    }
+
     // copy recorded to database
-    query.prepare("INSERT INTO recorded (chanid,starttime,endtime,"
-            "title,subtitle,description,category,hostname,bookmark,"
-            "editing,cutlist,autoexpire, commflagged,recgroup,"
-            "recordid, seriesid,programid,lastmodified,filesize,stars,"
-            "previouslyshown,originalairdate,preserve,findid,deletepending,"
-            "transcoder,timestretch,recpriority,basename,progstart,progend,"
-            "playgroup,profile,duplicate,transcoded) "
-            "VALUES(:CHANID,:STARTTIME,:ENDTIME,:TITLE,"
-            ":SUBTITLE,:DESCRIPTION,:CATEGORY,:HOSTNAME,"
-            ":BOOKMARK,:EDITING,:CUTLIST,:AUTOEXPIRE,"
-            ":COMMFLAGGED,:RECGROUP,:RECORDID,:SERIESID,"
-            ":PROGRAMID,:LASTMODIFIED,:FILESIZE,:STARS,"
-            ":PREVIOUSLYSHOWN,:ORIGINALAIRDATE,:PRESERVE,:FINDID,"
-            ":DELETEPENDING,:TRANSCODER,:TIMESTRETCH,:RECPRIORITY,"
-            ":BASENAME,:PROGSTART,:PROGEND,:PLAYGROUP,:PROFILE,:DUPLICATE,:TRANSCODED);");
+    query.prepare("INSERT INTO recorded (" + fieldList.join(",") + ") "
+                  "VALUES (" + bindList.join(",") + ");");
     query.bindValue(":CHANID", chanID);
     query.bindValue(":STARTTIME", startTime);
-    query.bindValue(":ENDTIME", findNodeText(recordedNode, "endtime"));
-    query.bindValue(":TITLE", findNodeText(recordedNode, "title"));
-    query.bindValue(":SUBTITLE", findNodeText(recordedNode, "subtitle"));
-    query.bindValue(":DESCRIPTION", findNodeText(recordedNode, "description"));
-    query.bindValue(":CATEGORY", findNodeText(recordedNode, "category"));
-    query.bindValue(":HOSTNAME", gCoreContext->GetHostName());
-    query.bindValue(":BOOKMARK", findNodeText(recordedNode, "bookmark"));
-    query.bindValue(":EDITING", findNodeText(recordedNode, "editing"));
-    query.bindValue(":CUTLIST", findNodeText(recordedNode, "cutlist"));
-    query.bindValue(":AUTOEXPIRE", findNodeText(recordedNode, "autoexpire"));
-    query.bindValue(":COMMFLAGGED", findNodeText(recordedNode, "commflagged"));
-    query.bindValue(":RECGROUP", findNodeText(recordedNode, "recgroup"));
-    query.bindValue(":RECORDID", findNodeText(recordedNode, "recordid"));
-    query.bindValue(":SERIESID", findNodeText(recordedNode, "seriesid"));
-    query.bindValue(":PROGRAMID", findNodeText(recordedNode, "programid"));
-    query.bindValue(":LASTMODIFIED", findNodeText(recordedNode, "lastmodified"));
-    query.bindValue(":FILESIZE", findNodeText(recordedNode, "filesize"));
-    query.bindValue(":STARS", findNodeText(recordedNode, "stars"));
-    query.bindValue(":PREVIOUSLYSHOWN", findNodeText(recordedNode, "previouslyshown"));
-    query.bindValue(":ORIGINALAIRDATE", findNodeText(recordedNode, "originalairdate"));
-    query.bindValue(":PRESERVE", findNodeText(recordedNode, "preserve"));
-    query.bindValue(":FINDID", findNodeText(recordedNode, "findid"));
-    query.bindValue(":DELETEPENDING", findNodeText(recordedNode, "deletepending"));
-    query.bindValue(":TRANSCODER", findNodeText(recordedNode, "transcoder"));
-    query.bindValue(":TIMESTRETCH", findNodeText(recordedNode, "timestretch"));
-    query.bindValue(":RECPRIORITY", findNodeText(recordedNode, "recpriority"));
-    query.bindValue(":BASENAME", findNodeText(recordedNode, "basename"));
-    query.bindValue(":PROGSTART", findNodeText(recordedNode, "progstart"));
-    query.bindValue(":PROGEND", findNodeText(recordedNode, "progend"));
-    query.bindValue(":PLAYGROUP", findNodeText(recordedNode, "playgroup"));
-    query.bindValue(":PROFILE", findNodeText(recordedNode, "profile"));
-    query.bindValue(":DUPLICATE", findNodeText(recordedNode, "duplicate"));
-    query.bindValue(":TRANSCODED", findNodeText(recordedNode, "transcoded"));
+
+    for (int x = 0; x < fieldList.count(); x++)
+        query.bindValue(bindList.at(x), findNodeText(recordedNode, fieldList.at(x)));
 
     if (query.exec())
         LOG(VB_JOBQUEUE, LOG_INFO, "Inserted recorded details into database");
@@ -1319,18 +1065,26 @@ int NativeArchive::importRecording(const QDomElement &itemNode,
         }
         else
         {
+            // delete any records for this recordings
+            query.prepare("DELETE FROM recordedmarkup "
+                          "WHERE chanid = CHANID AND starttime = STARTTIME;");
+                query.bindValue(":CHANID", chanID);
+                query.bindValue(":STARTTIME", startTime);
+            query.exec();
+
+            // add any new records for this recording
             for (int x = 0; x < nodeList.count(); x++)
             {
                 n = nodeList.item(x);
                 QDomElement e = n.toElement();
                 query.prepare("INSERT INTO recordedmarkup (chanid, starttime, "
-                        "mark, offset, type)"
-                        "VALUES(:CHANID,:STARTTIME,:MARK,:OFFSET,:TYPE);");
+                        "mark, type, data)"
+                        "VALUES(:CHANID,:STARTTIME,:MARK,:TYPE,:DATA);");
                 query.bindValue(":CHANID", chanID);
                 query.bindValue(":STARTTIME", startTime);
                 query.bindValue(":MARK", e.attribute("mark"));
-                query.bindValue(":OFFSET", e.attribute("offset"));
                 query.bindValue(":TYPE", e.attribute("type"));
+                query.bindValue(":DATA", e.attribute("data"));
 
                 if (!query.exec())
                 {
@@ -1364,6 +1118,14 @@ int NativeArchive::importRecording(const QDomElement &itemNode,
         }
         else
         {
+            // delete any records for this recordings
+            query.prepare("DELETE FROM recordedseek "
+                          "WHERE chanid = CHANID AND starttime = STARTTIME;");
+                query.bindValue(":CHANID", chanID);
+                query.bindValue(":STARTTIME", startTime);
+            query.exec();
+
+            // add the new records for this recording
             for (int x = 0; x < nodeList.count(); x++)
             {
                 n = nodeList.item(x);
