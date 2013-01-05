@@ -58,7 +58,7 @@ bool PlayerSettings::Create()
         m_autoLookupCD->SetCheckState(MythUIStateType::Full);
     int loadAutoPlayCD = gCoreContext->GetNumSetting("AutoPlayCD", 0);
     if (loadAutoPlayCD == 1)
-        m_autoLookupCD->SetCheckState(MythUIStateType::Full);
+        m_autoPlayCD->SetCheckState(MythUIStateType::Full);
 
     m_resumeMode->SetHelpText(tr("Resume playback at either the beginning of the "
                  "active play queue, the beginning of the last track, "
