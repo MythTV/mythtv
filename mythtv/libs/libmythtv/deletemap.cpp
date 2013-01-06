@@ -847,7 +847,7 @@ bool DeleteMap::TrackerWantsToJump(uint64_t frame, uint64_t &to)
  */
 uint64_t DeleteMap::GetLastFrame(void) const
 {
-    uint64_t result = m_ctx->player->GetTotalFrameCount();
+    uint64_t result = m_ctx->player->GetCurrentFrameCount();
     if (IsEmpty())
         return result;
 
