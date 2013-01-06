@@ -103,7 +103,7 @@ void HDHRRecorder::run(void)
 
         if (!_stream_handler->IsRunning())
         {
-            _error = "Stream handler died unexpectedly."; 
+            _error = "Stream handler died unexpectedly.";
             LOG(VB_GENERAL, LOG_ERR, LOC + _error);
         }
     }

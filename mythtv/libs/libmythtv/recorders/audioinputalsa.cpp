@@ -190,13 +190,13 @@ bool AudioInputALSA::PrepHwParams(void)
     }
     uint buffer_time = 64000; // 64 msec
     uint period_time = buffer_time / 4;
-    if (AlsaBad(snd_pcm_hw_params_set_period_time_near(pcm_handle, hwparams, &period_time, NULL), 
+    if (AlsaBad(snd_pcm_hw_params_set_period_time_near(pcm_handle, hwparams, &period_time, NULL),
                 "failed to set period time"))
         return false;
-    if (AlsaBad(snd_pcm_hw_params_set_buffer_time_near(pcm_handle, hwparams, &buffer_time, NULL), 
+    if (AlsaBad(snd_pcm_hw_params_set_buffer_time_near(pcm_handle, hwparams, &buffer_time, NULL),
                 "failed to set buffer time"))
         return false;
-    if (AlsaBad(snd_pcm_hw_params_get_period_size(hwparams, &period_size, NULL), 
+    if (AlsaBad(snd_pcm_hw_params_get_period_size(hwparams, &period_size, NULL),
                 "failed to get period size"))
         return false;
 

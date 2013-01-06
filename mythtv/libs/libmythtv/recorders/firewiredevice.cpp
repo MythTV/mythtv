@@ -11,7 +11,7 @@
 #include <QMap>
 
 // for usleep
-#include <unistd.h> 
+#include <unistd.h>
 
 // MythTV headers
 #include "linuxfirewiredevice.h"

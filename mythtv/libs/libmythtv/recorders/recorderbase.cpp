@@ -192,7 +192,7 @@ void RecorderBase::SetIntOption(RecordingProfile *profile, const QString &name)
     if (setting)
         SetOption(name, setting->getValue().toInt());
     else
-        LOG(VB_GENERAL, LOG_ERR, LOC + 
+        LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("SetIntOption(...%1): Option not in profile.").arg(name));
 }
 

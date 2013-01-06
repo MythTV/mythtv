@@ -76,7 +76,7 @@ void ASIRecorder::run(void)
         _error = "MPEGStreamData pointer has not been set";
         LOG(VB_GENERAL, LOG_ERR, LOC + _error);
         Close();
-        return;        
+        return;
     }
 
     {

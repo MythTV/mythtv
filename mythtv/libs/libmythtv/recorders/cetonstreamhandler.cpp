@@ -356,7 +356,7 @@ bool CetonStreamHandler::TuneProgram(uint program)
     QStringList program_list = GetProgramList();
     if (!program_list.contains(QString::number(program)))
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + 
+        LOG(VB_GENERAL, LOG_ERR, LOC +
         QString("TuneProgram(%1) - Requested program not in the program list")
             .arg(program));
         return false;
@@ -444,7 +444,7 @@ uint CetonStreamHandler::GetProgramNumber(void) const
             .arg(prog).arg(i));
 
         uint prognum = prog.toUInt();
-        if (prognum != 0) 
+        if (prognum != 0)
             return prognum;
 
         usleep(100000);

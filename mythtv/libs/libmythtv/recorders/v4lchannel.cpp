@@ -353,7 +353,7 @@ int V4LChannel::SetFreqTable(const QString &tablename)
         listname = (char *)chanlists[i].name;
     }
 
-    LOG(VB_CHANNEL, LOG_ERR, 
+    LOG(VB_CHANNEL, LOG_ERR,
         QString("Channel(%1)::SetFreqTable(): Invalid "
                 "frequency table name %2, using %3.").
             arg(device).arg(name).arg((char *)chanlists[1].name));
@@ -441,7 +441,7 @@ bool V4LChannel::Tune(uint64_t frequency, QString inputname)
     if (ioctlval >= 0)
     {
         isTunerCapLow = (mod.capability & V4L2_TUNER_CAP_LOW);
-        LOG(VB_CHANNEL, LOG_INFO, 
+        LOG(VB_CHANNEL, LOG_INFO,
             QString("  name: %1").arg((char *)mod.name));
         LOG(VB_CHANNEL, LOG_INFO, QString("CapLow: %1").arg(isTunerCapLow));
     }

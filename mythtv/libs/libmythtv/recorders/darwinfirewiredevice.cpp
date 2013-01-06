@@ -764,7 +764,7 @@ bool DarwinFirewireDevice::UpdatePlugRegisterPrivate(
     new_plug_val &= ~(0x03<<14);
     new_plug_val |= (new_speed & 0x03) << 14;
 
-    old_plug_val = EndianU32_NtoB(old_plug_val); 
+    old_plug_val = EndianU32_NtoB(old_plug_val);
     new_plug_val = EndianU32_NtoB(new_plug_val);
 
     return (kIOReturnSuccess == (*fw_handle)->CompareSwap(

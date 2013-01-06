@@ -53,7 +53,7 @@ void StreamHandler::AddListener(MPEGStreamData *data,
                 .arg((uint64_t)data,0,16));
     if (!data)
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + 
+        LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("AddListener(0x%1) -- null data")
                 .arg((uint64_t)data,0,16));
         return;

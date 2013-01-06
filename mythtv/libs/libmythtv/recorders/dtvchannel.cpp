@@ -370,7 +370,7 @@ bool DTVChannel::SetChannelByString(const QString &channum)
         int pcrpid = -1;
         vector<uint> pids;
         vector<uint> types;
-        pid_cache_t::iterator pit = pid_cache.begin(); 
+        pid_cache_t::iterator pit = pid_cache.begin();
         for (; pit != pid_cache.end(); ++pit)
         {
             if (!pit->GetStreamID())

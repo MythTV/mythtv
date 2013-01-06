@@ -371,8 +371,8 @@ static QDateTime ts_to_qdatetime(
 }
 
 static const uint frameRateMap[16] = {
-    0, 23796, 24000, 25000, 29970, 30000, 50000, 59940, 60000, 
-    0, 0, 0, 0, 0, 0, 0 
+    0, 23796, 24000, 25000, 29970, 30000, 50000, 59940, 60000,
+    0, 0, 0, 0, 0, 0, 0
 };
 
 /** \fn DTVRecorder::FindMPEG2Keyframes(const TSPacket* tspacket)
@@ -470,7 +470,7 @@ bool DTVRecorder::FindMPEG2Keyframes(const TSPacket* tspacket)
             }
             else if (PESStreamID::MPEG2ExtensionStartCode == stream_id)
             {
-                if (bytes_left >= 1) 
+                if (bytes_left >= 1)
                 {
                     ext_type = (bufptr[0] >> 4);
                     switch(ext_type)
@@ -491,7 +491,7 @@ bool DTVRecorder::FindMPEG2Keyframes(const TSPacket* tspacket)
 
                             /* check if we must repeat the frame */
                             _repeat_pict = 1;
-                            if (repeat_first_field) 
+                            if (repeat_first_field)
                             {
                                 if (_progressive_sequence)
                                 {
@@ -500,7 +500,7 @@ bool DTVRecorder::FindMPEG2Keyframes(const TSPacket* tspacket)
                                     else
                                         _repeat_pict = 3;
                                 }
-                                else if (progressive_frame) 
+                                else if (progressive_frame)
                                 {
                                     _repeat_pict = 2;
                                 }
@@ -841,7 +841,7 @@ bool DTVRecorder::FindH264Keyframes(const TSPacket *tspacket)
             }
 
             // we now know where the PES payload is
-            // normally, we should have used 6, but use 5 because the for 
+            // normally, we should have used 6, but use 5 because the for
             // loop will bump i
             i += 5 + pes_header_length;
             _pes_synced = true;
@@ -912,7 +912,7 @@ bool DTVRecorder::FindH264Keyframes(const TSPacket *tspacket)
 
         LOG(VB_RECORD, LOG_INFO, LOC +
             QString("FindH264Keyframes: timescale: %1, tick: %2, framerate: %3")
-                      .arg( m_h264_parser.GetTimeScale() ) 
+                      .arg( m_h264_parser.GetTimeScale() )
                       .arg( m_h264_parser.GetUnitsInTick() )
                       .arg( frameRate ) );
         m_frameRate = frameRate;
@@ -1074,7 +1074,7 @@ void DTVRecorder::FindPSKeyFrames(const uint8_t *buffer, uint len)
             AspectChange((AspectRatio)aspectRatio, _frames_written_count);
         }
 
-        if (height && width && 
+        if (height && width &&
             (height != m_videoHeight || m_videoWidth != width))
         {
             m_videoHeight = height;

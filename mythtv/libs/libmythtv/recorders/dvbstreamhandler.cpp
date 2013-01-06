@@ -712,7 +712,7 @@ bool DVBPIDInfo::Close(const QString &dvb_dev)
     int err = close(tmp);
     if (err < 0)
     {
-        LOG(VB_GENERAL, LOG_ERR, 
+        LOG(VB_GENERAL, LOG_ERR,
             LOC + QString("Failed to close mux (pid 0x%1)")
                 .arg(_pid, 0, 16) + ENO);
 
