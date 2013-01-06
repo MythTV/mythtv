@@ -3766,6 +3766,7 @@ void MythPlayer::WaitForSeek(uint64_t frame, uint64_t seeksnap_wanted)
     if (!decoder)
         return;
 
+    SetEof(false);
     decoder->SetSeekSnap(seeksnap_wanted);
 
     bool islivetvcur = (livetv && player_ctx->tvchain &&
