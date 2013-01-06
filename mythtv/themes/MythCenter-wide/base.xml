@@ -35,8 +35,8 @@
     <fontdef name="baselarge" from="basemedium">
         <pixelsize>30</pixelsize>
         <shadowcolor>#000000</shadowcolor>
-        <shadowoffset>4,4</shadowoffset>
-        <shadowalpha>64</shadowalpha>
+        <shadowoffset>2,2</shadowoffset>
+        <shadowalpha>100</shadowalpha>
         <weight>bold</weight>
     </fontdef>
 
