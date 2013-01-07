@@ -31,7 +31,7 @@ DecoderBase::DecoderBase(MythPlayer *parent, const ProgramInfo &pginfo)
       lastKey(0), keyframedist(-1), indexOffset(0),
       trackTotalDuration(false),
 
-      ateof(false), exitafterdecoded(false), transcoding(false),
+      ateof(kEofStateNone), exitafterdecoded(false), transcoding(false),
 
       hasFullPositionMap(false), recordingHasPositionMap(false),
       posmapStarted(false), positionMapType(MARK_UNSET),
@@ -92,7 +92,7 @@ void DecoderBase::Reset(bool reset_video_data, bool seek_reset, bool reset_file)
     if (reset_file)
     {
         waitingForChange = false;
-        SetEof(false);
+        SetEofState(kEofStateNone);
     }
 }
 

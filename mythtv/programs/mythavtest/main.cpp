@@ -107,7 +107,7 @@ class VideoPerformanceTest
                 break;
             }
 
-            if (mp->GetEof())
+            if (mp->GetEof() != kEofStateNone)
             {
                 LOG(VB_GENERAL, LOG_INFO, "End of file.");
                 break;

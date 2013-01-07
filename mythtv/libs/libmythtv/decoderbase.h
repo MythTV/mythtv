@@ -59,6 +59,14 @@ typedef enum AudioTrackType
 } AudioTrackType;
 QString toString(AudioTrackType type);
 
+// Eof States
+typedef enum
+{
+    kEofStateNone,     // no eof
+    kEofStateDelayed,  // decoder eof, but let player drain buffered frames
+    kEofStateImmediate // true eof
+} EofState;
+
 class StreamInfo
 {
   public:
@@ -115,8 +123,11 @@ class DecoderBase
                          char testbuf[kDecoderProbeBufferSize],
                          int testbufsize = kDecoderProbeBufferSize) = 0;
 
-    virtual void SetEof(bool eof)  { ateof = eof;  }
-    bool         GetEof(void) const { return ateof; }
+    virtual void SetEofState(EofState eof)  { ateof = eof;  }
+    virtual void SetEof(bool eof)  {
+        ateof = eof ? kEofStateDelayed : kEofStateNone;
+    }
+    EofState     GetEof(void)      { return ateof; }
 
     void SetSeekSnap(uint64_t snap)  { seeksnap = snap; }
     uint64_t GetSeekSnap(void) const { return seeksnap;  }
@@ -289,7 +300,7 @@ class DecoderBase
     // indicates whether this is the case.
     bool trackTotalDuration;
 
-    bool ateof;
+    EofState ateof;
     bool exitafterdecoded;
     bool transcoding;
 

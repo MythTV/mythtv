@@ -113,7 +113,7 @@ bool ClassicLogoDetector::searchForLogo(MythPlayer* player)
 
         loops = 0;
         seekFrame = commDetector->preRoll + seekIncrement;
-        while(loops < maxLoops && !player->GetEof())
+        while (loops < maxLoops && player->GetEof() == kEofStateNone)
         {
             VideoFrame* vf = player->GetRawVideoFrame(seekFrame);
 

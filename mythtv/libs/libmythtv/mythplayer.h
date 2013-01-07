@@ -142,7 +142,7 @@ class MTV_PUBLIC MythPlayer
     void SetLength(int len)                   { totalLength = len; }
     void SetFramesPlayed(uint64_t played);
     void SetVideoFilters(const QString &override);
-    void SetEof(bool eof);
+    void SetEof(EofState eof);
     void SetPIPActive(bool is_active)         { pip_active = is_active; }
     void SetPIPVisible(bool is_visible)       { pip_visible = is_visible; }
 
@@ -198,7 +198,7 @@ class MTV_PUBLIC MythPlayer
     bool    IsPaused(void) const              { return allpaused;      }
     bool    GetRawAudioState(void) const;
     bool    GetLimitKeyRepeat(void) const     { return limitKeyRepeat; }
-    bool    GetEof(void);
+    EofState GetEof(void);
     bool    IsErrored(void) const;
     bool    IsPlaying(uint wait_ms = 0, bool wait_for = true) const;
     bool    AtNormalSpeed(void) const         { return next_normal_speed; }

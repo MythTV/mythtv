@@ -235,7 +235,7 @@ long long PrePostRollFlagger::findBreakInrange(long long startFrame,
 
     long long foundFrame = 0;
 
-    while (!player->GetEof())
+    while (player->GetEof() == kEofStateNone)
     {
         struct timeval startTime;
         if (stillRecording)

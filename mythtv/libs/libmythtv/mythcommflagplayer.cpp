@@ -108,7 +108,7 @@ bool MythCommFlagPlayer::RebuildSeekTable(
         cout << "\r                         \r" << flush;
 
     int prevperc = -1;
-    while (!GetEof())
+    while (GetEof() == kEofStateNone)
     {
         if (inuse_timer.elapsed() > 2534)
         {

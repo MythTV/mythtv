@@ -591,7 +591,7 @@ bool CommDetector2::go(void)
         clock.start();
         passTime.start();
         memset(&getframetime, 0, sizeof(getframetime));
-        while (!(*currentPass).empty() && !player->GetEof())
+        while (!(*currentPass).empty() && player->GetEof() == kEofStateNone)
         {
             struct timeval start, end, elapsedtv;
 

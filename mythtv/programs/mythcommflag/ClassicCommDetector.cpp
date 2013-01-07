@@ -404,7 +404,7 @@ bool ClassicCommDetector::go()
 
     player->ResetTotalDuration();
 
-    while (!player->GetEof())
+    while (player->GetEof() == kEofStateNone)
     {
         struct timeval startTime;
         if (stillRecording)
