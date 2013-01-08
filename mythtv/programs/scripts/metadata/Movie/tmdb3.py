@@ -11,7 +11,7 @@
 #-----------------------
 __title__ = "TheMovieDB.org V3"
 __author__ = "Raymond Wagner"
-__version__ = "0.3.3"
+__version__ = "0.3.4"
 # 0.1.0 Initial version
 # 0.2.0 Add language support, move cache to home directory
 # 0.3.0 Enable version detection to allow use in MythTV
@@ -19,6 +19,7 @@ __version__ = "0.3.3"
 # 0.3.2 Add --area parameter to allow country selection for release date and
 #       parental ratings
 # 0.3.3 Use translated title if available
+# 0.3.4 Add support for finding by IMDB under -D (simulate previous version)
 
 from optparse import OptionParser
 import sys
@@ -27,7 +28,13 @@ def buildSingle(inetref, opts):
     from MythTV.tmdb3 import Movie
     from MythTV import VideoMetadata
     from lxml import etree
-    movie = Movie(inetref)
+
+    import re
+    if re.match('^0[0-9]{6}$', inetref):
+        movie = Movie.fromIMDB(inetref)
+    else:
+        movie = Movie(inetref)
+
     tree = etree.XML(u'<metadata></metadata>')
     mapping = [['runtime',      'runtime'],     ['title',       'originaltitle'],
                ['releasedate',  'releasedate'], ['tagline',     'tagline'],
