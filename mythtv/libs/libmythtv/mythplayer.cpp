@@ -4658,6 +4658,11 @@ int MythPlayer::GetSecondsBehind(void) const
     return (int)((float)(written - played) / video_frame_rate);
 }
 
+int64_t MythPlayer::GetSecondsPlayed(bool honorCutList)
+{
+    return TranslatePositionFrameToMs(framesPlayed, honorCutList) / 1000;
+}
+
 int64_t MythPlayer::GetTotalSeconds(void) const
 {
     return totalDuration;
@@ -4761,15 +4766,14 @@ void MythPlayer::calcSliderPos(osdInfo &info, bool paddedFields)
     // Set the raw values, followed by the translated values.
     for (int i = 0; i < 2 ; ++i)
     {
-        QString relPrefix = (i == 0 ? "" : "rel");
+        bool honorCutList = (i > 0);
+        QString relPrefix = (honorCutList ? "rel" : "");
         if (!fixed_playbacklen)
             playbackLen =
-                TranslatePositionFrameToMs(total_frames, (i > 0))
+                TranslatePositionFrameToMs(total_frames, honorCutList)
             / 1000;
         playbackLen = max(playbackLen, 1);
-        float secsplayed =
-            TranslatePositionFrameToMs(frames_played, (i > 0))
-            / 1000;
+        float secsplayed = GetSecondsPlayed(honorCutList);
         secsplayed = min((float)playbackLen, max(secsplayed, 0.0f));
 
         info.values.insert(relPrefix + "secondsplayed", (int)secsplayed);

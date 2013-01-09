@@ -19,6 +19,7 @@ class MythDVDPlayer : public MythPlayer
 
     // Gets
     virtual uint64_t GetBookmark(void);
+    virtual  int64_t GetSecondsPlayed(bool honorCutList);
     virtual  int64_t GetTotalSeconds(void) const;
 
     // DVD public stuff
