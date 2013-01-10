@@ -151,6 +151,7 @@ class DecoderBase
     virtual long long GetChapter(int chapter)             { return framesPlayed; }
     virtual bool DoRewind(long long desiredFrame, bool doflush = true);
     virtual bool DoFastForward(long long desiredFrame, bool doflush = true);
+    virtual void SetIdrOnlyKeyframes(bool value) { }
 
     static uint64_t
         TranslatePositionAbsToRel(const frm_dir_map_t &deleteMap,
@@ -216,6 +217,8 @@ class DecoderBase
     void SetTranscoding(bool value) { transcoding = value; }
 
     bool IsErrored() const { return errored; }
+
+    bool HasPositionMap(void) const { return GetPositionMapSize(); }
 
     void SetWaitForChange(void);
     bool GetWaitForChange(void) const;

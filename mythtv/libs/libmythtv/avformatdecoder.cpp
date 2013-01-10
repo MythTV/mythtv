@@ -354,7 +354,7 @@ AvFormatDecoder::AvFormatDecoder(MythPlayer *parent,
 
     cc608_build_parity_table(cc608_parity_table);
 
-    m_h264_parser->use_I_forKeyframes(false);
+    SetIdrOnlyKeyframes(true);
 
     LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("PlayerFlags: 0x%1")
         .arg(playerFlags, 0, 16));

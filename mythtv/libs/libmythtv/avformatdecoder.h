@@ -161,6 +161,9 @@ class AvFormatDecoder : public DecoderBase
     virtual long long GetChapter(int chapter);
     virtual bool DoRewind(long long desiredFrame, bool doflush = true);
     virtual bool DoFastForward(long long desiredFrame, bool doflush = true);
+    virtual void SetIdrOnlyKeyframes(bool value) {
+        m_h264_parser->use_I_forKeyframes(!value);
+    }
 
     virtual int64_t NormalizeVideoTimecode(int64_t timecode);
     virtual int64_t NormalizeVideoTimecode(AVStream *st, int64_t timecode);
