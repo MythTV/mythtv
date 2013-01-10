@@ -1182,6 +1182,16 @@ void* MythPlayer::GetDecoderContext(unsigned char* buf, uint8_t*& id)
     return NULL;
 }
 
+bool MythPlayer::HasReachedEof(void) const
+{
+    EofState eof = GetEof();
+    if (eof != kEofStateNone && !allpaused)
+        return true;
+    if (GetEditMode())
+        return false;
+    return (framesPlayed >= deleteMap.GetLastFrame());
+}
+
 VideoFrame *MythPlayer::GetCurrentFrame(int &w, int &h)
 {
     w = video_dim.width();
@@ -2893,9 +2903,8 @@ void MythPlayer::EventLoop(void)
     }
 
     // Handle end of file
-    EofState _eof = GetEof();
-    if ((_eof != kEofStateNone && !allpaused) ||
-        (!GetEditMode() && framesPlayed >= deleteMap.GetLastFrame()))
+    EofState eof = GetEof();
+    if (HasReachedEof())
     {
 #ifdef USING_MHEG
         if (interactiveTV && interactiveTV->StreamStarted(false))
@@ -2911,10 +2920,10 @@ void MythPlayer::EventLoop(void)
             return;
         }
 
-        if (_eof != kEofStateDelayed ||
+        if (eof != kEofStateDelayed ||
             (videoOutput && videoOutput->ValidVideoFrames() < 1))
         {
-            if (_eof == kEofStateDelayed)
+            if (eof == kEofStateDelayed)
                 LOG(VB_PLAYBACK, LOG_INFO,
                     QString("waiting for no video frames %1")
                     .arg(videoOutput->ValidVideoFrames()));
@@ -3111,7 +3120,7 @@ void MythPlayer::DecoderPauseCheck(void)
 }
 
 //// FIXME - move the eof ownership back into MythPlayer
-EofState MythPlayer::GetEof(void)
+EofState MythPlayer::GetEof(void) const
 {
     if (is_current_thread(playerThread))
         return decoder ? decoder->GetEof() : kEofStateImmediate;

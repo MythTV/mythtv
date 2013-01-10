@@ -13,6 +13,7 @@ class MythDVDPlayer : public MythPlayer
     // Decoder stuff..
     virtual void ReleaseNextVideoFrame(VideoFrame *buffer, int64_t timecode,
                                        bool wrap = true);
+    virtual bool HasReachedEof(void) const;
 
     // Add data
     virtual bool PrepareAudioSample(int64_t &timecode);

@@ -9,6 +9,16 @@ MythBDPlayer::MythBDPlayer(PlayerFlags flags)
 {
 }
 
+bool MythBDPlayer::HasReachedEof(void) const
+{
+    EofState eof = GetEof();
+    if (eof != kEofStateNone && !allpaused)
+        return true;
+    // DeleteMap and EditMode from the parent MythPlayer should not be
+    // relevant here.
+    return false;
+}
+
 void MythBDPlayer::PreProcessNormalFrame(void)
 {
     DisplayMenu();

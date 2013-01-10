@@ -30,6 +30,16 @@ void MythDVDPlayer::ReleaseNextVideoFrame(VideoFrame *buffer,
                         !player_ctx->buffer->IsInDiscMenuOrStillFrame());
 }
 
+bool MythDVDPlayer::HasReachedEof(void) const
+{
+    EofState eof = GetEof();
+    if (eof != kEofStateNone && !allpaused)
+        return true;
+    // DeleteMap and EditMode from the parent MythPlayer should not be
+    // relevant here.
+    return false;
+}
+
 void MythDVDPlayer::DisableCaptions(uint mode, bool osd_msg)
 {
     if ((kDisplayAVSubtitle & mode) && player_ctx->buffer->IsDVD())
