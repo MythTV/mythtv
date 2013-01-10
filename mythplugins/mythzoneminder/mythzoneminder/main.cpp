@@ -166,5 +166,8 @@ int mythplugin_config(void)
     return 0;
 }
 
-
+void mythplugin_destroy(void)
+{
+    delete ZMClient::get();
+}
 
