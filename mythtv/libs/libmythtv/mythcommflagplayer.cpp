@@ -194,9 +194,10 @@ bool MythCommFlagPlayer::RebuildSeekTable(
         // I-frames to be treated as keyframes.
         uint64_t frames = decoder->GetFramesRead();
         if (!usingIframes &&
-            (GetEof() == kEofStateNone || (frames > 1000 && frames < 1100)) &&
+            (GetEof() != kEofStateNone || (frames > 1000 && frames < 1100)) &&
             !decoder->HasPositionMap())
         {
+            cout << "No I-frames found, rewinding..." << endl;
             decoder->DoRewind(0);
             decoder->Reset(true, true, true);
             pmap_first = pmap_last = myFramesPlayed = 0;
