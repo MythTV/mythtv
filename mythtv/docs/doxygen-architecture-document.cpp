@@ -45,7 +45,7 @@ There are also a few simple \ref testing "testing shortcuts".
 
 %MythTV is divided up into 20 libraries:
 <dl>
-  <dt>libmythbase
+  <dt>\ref libmythbase "libmythbase"
   <dd>Lowest-level %MythTV library. Used by the Plugins.
 
       Contains the \ref database_subsystem "database",
@@ -978,4 +978,12 @@ currently supported, so the ImportRecorder is substituted for DEMO cards.
 
 /** \defgroup db_schema    MythTV Database Schema
 This line is filler that is ignored by Doxygen.
+*/
+
+/** \defgroup libraries    MythTV Libraries
+This line is filler that is ignored by Doxygen.
+*/
+
+/** \defgroup libmythbase    libmythbase - Core MythTV library
+    \ingroup libraries
 */
