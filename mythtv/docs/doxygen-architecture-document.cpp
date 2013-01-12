@@ -612,9 +612,12 @@ to access these assets:
   <li>GetConfDir() returns the value of the runtime env. var. $MYTHCONFDIR,
       or $HOME/.mythtv</li>
 
-  <li>mysql.txt is loaded from GetShareDir(), GetInstallPrefix() + /etc/mythtv,
-      GetConfDir(), and the current directory. Later files override the values
-      from earlier ones.</li>
+  <li>The new config.xml has replaced the old mysql.txt, and is loaded from
+      GetConfDir() only. If not found, MythTV will attempt to discover the
+      database credentials over UPnP from the master backend, falling back to
+      the compiled-in defaults of mythtv:mythtv@localhost/mythconverg. If no
+      connection can be established, the necessary information is queried from
+      the user.</li>
 </ol>
 
  */
