@@ -133,7 +133,25 @@ const char* NamedOptType(int type)
     }
 }
 
+/** \defgroup commandlineparser Command Line Processing
+ *  \ingroup libmythbase
+ *  \brief Utility responsible for processing arguments from the command line
+ *
+ *  This fundamental design for this utility is a class that can be modularly
+ *  configured with different optional arguments and behaviors, let process
+ *  the received input arguments, and then persist for the results to be read
+ *  out as needed.
+ *
+ *  In typical use, one will subclass MythCommandLineParser() and overwrite
+ *  the LoadArguments() and GetHelpHeader() virtual functions. LoadArguments()
+ *  is a convenient place to define default behaviors and accepted arguments.
+ *  GetHelpHeader() is called for text describing the application, used when
+ *  calling the '--help' argument. This utility will automatically handle help
+ *  output, as well as check relationships between arguments.
+ */
+
 /** \class CommandLineArg
+ *  \ingroup commandlineparser
  *  \brief Definition for a single command line option
  *
  *  This class contains instructions for the command line parser about what
@@ -1118,6 +1136,7 @@ void CommandLineArg::PrintDeprecatedWarning(QString &keyword) const
 }
 
 /** \class MythCommandLineParser
+ *  \ingroup commandlineparser
  *  \brief Parent class for defining application command line parsers
  *
  *  This class provides a generic interface for defining and parsing available
