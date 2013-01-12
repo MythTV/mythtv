@@ -527,7 +527,8 @@ SubtitleScreen::SubtitleScreen(MythPlayer *player, const char * name,
     m_player(player),  m_subreader(NULL),   m_608reader(NULL),
     m_708reader(NULL), m_safeArea(QRect()),
     m_removeHTML(QRegExp("</?.+>")),        m_subtitleType(kDisplayNone),
-    m_textFontZoom(100), m_textFontZoomPrev(100), m_refreshArea(false),
+    m_textFontZoom(100), m_textFontZoomPrev(100),
+    m_refreshModified(false), m_refreshDeleted(false),
     m_fontStretch(fontStretch),
     m_format(new SubtitleFormat)
 {
@@ -639,8 +640,8 @@ void SubtitleScreen::Pulse(void)
 
     OptimiseDisplayedArea();
     MythScreenType::Pulse();
-    m_refreshArea = false;
     m_textFontZoomPrev = m_textFontZoom;
+    ResetElementState();
 }
 
 void SubtitleScreen::ClearAllSubtitles(void)
@@ -667,12 +668,12 @@ void SubtitleScreen::ClearNonDisplayedSubtitles(void)
 
 void SubtitleScreen::ClearDisplayedSubtitles(void)
 {
+    SetElementDeleted();
     for (int i = 0; i < 8; i++)
         Clear708Cache(i);
     DeleteAllChildren();
     m_expireTimes.clear();
     m_avsubCache.clear();
-    SetRedraw();
 }
 
 void SubtitleScreen::ExpireSubtitles(void)
@@ -686,17 +687,46 @@ void SubtitleScreen::ExpireSubtitles(void)
         it.next();
         if (it.value() < now)
         {
+            SetElementDeleted();
             m_avsubCache.remove(it.key());
             DeleteChild(it.key());
             it.remove();
-            SetRedraw();
         }
     }
 }
 
+// SetElementAdded() should be called after a new element is added to
+// the subtitle screen.
+void SubtitleScreen::SetElementAdded(void)
+{
+    m_refreshModified = true;
+}
+
+// SetElementResized() should be called after a subtitle screen
+// element's size is changed.
+void SubtitleScreen::SetElementResized(void)
+{
+    SetElementAdded();
+}
+
+// SetElementAdded() should be called *before* an element is deleted
+// from the subtitle screen.
+void SubtitleScreen::SetElementDeleted(void)
+{
+    if (!m_refreshDeleted)
+        SetRedraw();
+    m_refreshDeleted = true;
+}
+
+void SubtitleScreen::ResetElementState(void)
+{
+    m_refreshModified = false;
+    m_refreshDeleted = false;
+}
+
 void SubtitleScreen::OptimiseDisplayedArea(void)
 {
-    if (!m_refreshArea)
+    if (!m_refreshModified)
         return;
 
     QRegion visible;
@@ -746,7 +776,7 @@ void SubtitleScreen::DisplayAVSubtitles(void)
                 it.value()->Resize(size);
             }
         }
-        m_refreshArea = true;
+        SetElementResized();
     }
 
     AVSubtitles* subs = m_subreader->GetAVSubtitles();
@@ -1010,11 +1040,11 @@ int SubtitleScreen::DisplayScaledAVSubtitles(const AVSubtitleRect *rect,
         uiimage = new MythUIImage(this, imagename);
         if (uiimage)
         {
-            m_refreshArea = true;
             uiimage->SetImage(image);
             uiimage->SetArea(MythRect(scaled));
             m_expireTimes.insert(uiimage, displayuntil);
             m_avsubCache.insert(uiimage, image);
+            SetElementAdded();
         }
         image->DecrRef();
         image = NULL;
@@ -1082,8 +1112,8 @@ void SubtitleScreen::DisplayTextSubtitles(void)
         return;
     }
 
+    SetElementDeleted();
     DeleteAllChildren();
-    SetRedraw();
     if (playPos == 0)
     {
         subs->Unlock();
@@ -1133,7 +1163,8 @@ void SubtitleScreen::DrawTextSubtitles(QStringList &wrappedsubs,
     fsub.InitFromSRT(wrappedsubs, m_textFontZoom);
     fsub.WrapLongLines();
     fsub.Layout();
-    m_refreshArea = fsub.Draw(m_family, NULL, start, duration) || m_refreshArea;
+    if (fsub.Draw(m_family, NULL, start, duration))
+        SetElementAdded();
 }
 
 void SubtitleScreen::DisplayDVDButton(AVSubtitle* dvdButton, QRect &buttonPos)
@@ -1145,8 +1176,8 @@ void SubtitleScreen::DisplayDVDButton(AVSubtitle* dvdButton, QRect &buttonPos)
     if (!vo)
         return;
 
+    SetElementDeleted();
     DeleteAllChildren();
-    SetRedraw();
 
     float tmp = 0.0;
     QRect dummy;
@@ -1275,6 +1306,7 @@ void SubtitleScreen::DisplayCC608Subtitles(void)
     if (textlist)
         textlist->lock.lock();
 
+    SetElementDeleted();
     DeleteAllChildren();
 
     if (!textlist)
@@ -1282,7 +1314,6 @@ void SubtitleScreen::DisplayCC608Subtitles(void)
 
     if (textlist->buffers.empty())
     {
-        SetRedraw();
         textlist->lock.unlock();
         return;
     }
@@ -1291,7 +1322,8 @@ void SubtitleScreen::DisplayCC608Subtitles(void)
     fsub.InitFromCC608(textlist->buffers, m_textFontZoom);
     fsub.Layout608();
     fsub.Layout();
-    m_refreshArea = fsub.Draw(m_family) || m_refreshArea;
+    if (fsub.Draw(m_family))
+        SetElementAdded();
     textlist->lock.unlock();
 }
 
@@ -1348,10 +1380,10 @@ void SubtitleScreen::DisplayCC708Subtitles(void)
                 shape->SetFillBrush(fill);
                 shape->SetArea(MythRect(fsub.m_bounds));
                 m_708imageCache[i].append(shape);
-                m_refreshArea = true;
+                SetElementAdded();
             }
-            m_refreshArea =
-                fsub.Draw(m_family, &m_708imageCache[i]) || m_refreshArea;
+            if (fsub.Draw(m_family, &m_708imageCache[i]))
+                SetElementAdded();
         }
         for (uint j = 0; j < list.size(); j++)
             delete list[j];
@@ -1364,7 +1396,10 @@ void SubtitleScreen::Clear708Cache(int num)
     if (!m_708imageCache[num].isEmpty())
     {
         foreach(MythUIType* image, m_708imageCache[num])
+        {
+            SetElementDeleted();
             DeleteChild(image);
+        }
         m_708imageCache[num].clear();
     }
 }
@@ -1393,9 +1428,9 @@ void SubtitleScreen::AddScaledImage(QImage &img, QRect &pos)
         MythUIImage *uiimage = new MythUIImage(this, "dvd_button");
         if (uiimage)
         {
-            m_refreshArea = true;
             uiimage->SetImage(image);
             uiimage->SetArea(MythRect(scaled));
+            SetElementAdded();
         }
         image->DecrRef();
     }
@@ -2261,8 +2296,8 @@ void SubtitleScreen::RenderAssTrack(uint64_t timecode)
         return;
 
     int count = 0;
+    SetElementDeleted();
     DeleteAllChildren();
-    SetRedraw();
     while (images)
     {
         if (images->w == 0 || images->h == 0)
@@ -2317,9 +2352,9 @@ void SubtitleScreen::RenderAssTrack(uint64_t timecode)
             uiimage = new MythUIImage(this, name);
             if (uiimage)
             {
-                m_refreshArea = true;
                 uiimage->SetImage(image);
                 uiimage->SetArea(MythRect(img_rect));
+                SetElementAdded();
             }
             image->DecrRef();
         }

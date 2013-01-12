@@ -61,6 +61,10 @@ class SubtitleScreen : public MythScreenType
     virtual void Pulse(void);
 
   private:
+    void SetElementAdded(void);
+    void SetElementResized(void);
+    void SetElementDeleted(void);
+    void ResetElementState(void);
     void OptimiseDisplayedArea(void);
     void DisplayAVSubtitles(void);
     int  DisplayScaledAVSubtitles(const AVSubtitleRect *rect, QRect &bbox,
@@ -91,7 +95,8 @@ class SubtitleScreen : public MythScreenType
     int                m_fontSize;
     int                m_textFontZoom; // valid for 708 & text subs
     int                m_textFontZoomPrev;
-    bool               m_refreshArea;
+    bool               m_refreshModified;
+    bool               m_refreshDeleted;
     QHash<int,QList<MythUIType*> > m_708imageCache;
     int                m_fontStretch;
     QString            m_family; // 608, 708, text, teletext
