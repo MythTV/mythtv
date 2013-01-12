@@ -177,7 +177,7 @@ void CC708Window::DefineWindow(int _priority,         int _visible,
         delete [] text;
         text = new_text;
     }
-    else if (text && (!exists || (old_row != true_row_count) ||
+    else if (text && (!exists || /*(old_row != true_row_count) ||*/
                       (old_col != true_column_count)))
     {
         delete [] text;
