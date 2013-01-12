@@ -134,6 +134,16 @@ void CC708Window::DefineWindow(int _priority,         int _visible,
                                int _row_lock,         int _column_lock,
                                int _pen_style,        int _window_style)
 {
+    // The DefineWindow command may be sent frequently to allow a
+    // caption decoder just tuning in to get in synch quickly.
+    // Usually the row_count and column_count are unchanged, but it is
+    // possible to add or remove rows or columns.  Due to the
+    // one-dimensional row-major representation of characters, if the
+    // number of columns is changed, a new array must be created and
+    // the old characters copied in.  If only the number of rows
+    // decreases, the array can be left unchanged.  If only the number
+    // of rows increases, the old characters can be copied into the
+    // new character array directly without any index translation.
     QMutexLocker locker(&lock);
 
     _row_count++;
@@ -145,8 +155,6 @@ void CC708Window::DefineWindow(int _priority,         int _visible,
     relative_pos      = _relative_pos;
     anchor_vertical   = _anchor_vertical;
     anchor_horizontal = _anchor_horizontal;
-    row_count         = _row_count;
-    column_count      = _column_count;
     row_lock          = _row_lock;
     column_lock       = _column_lock;
 
@@ -156,46 +164,71 @@ void CC708Window::DefineWindow(int _priority,         int _visible,
     if ((!_window_style && !exists) || _window_style)
         SetWindowStyle(_window_style ? _window_style : 1);
 
-    uint old_row = true_row_count;
-    uint old_col = true_column_count;
-    // these could be bigger if row/column lock is false, resp.
-    true_row_count    = row_count; // (row_lock) ? row_count : max(row_count + 1, (uint)2);
-    true_column_count = column_count;
-
-    if (text && exists && (old_col == true_column_count) &&
-        (old_row < true_row_count))
-    {
-        // We need to add more rows to an existing window
-        uint num = true_row_count * true_column_count;
-        CC708Character *new_text = new CC708Character[num];
-        pen.column = 0;
-        pen.row = 0;
-        for (uint i = 0; i < old_row * old_col; i++)
-            new_text[i] = text[i];
-        for (uint i = old_row * old_col; i < num; i++)
-            new_text[i].attr = pen.attr;
-        delete [] text;
-        text = new_text;
-    }
-    else if (text && (!exists || (old_row != true_row_count) ||
-                      (old_col != true_column_count)))
-    {
-        delete [] text;
-        text = NULL;
-    }
-
-    if (!text)
-    {
-        uint num   = true_row_count * true_column_count;
-        text       = new CC708Character[num];
-        pen.column = 0;
-        pen.row    = 0;
-        for (uint i = 0; i < num; i++)
-            text[i].attr = pen.attr;
-    }
+    Resize(_row_count, _column_count);
+    row_count = _row_count;
+    column_count = _column_count;
+    LimitPenLocation();
 
     exists  = true;
     changed = true;
+}
+
+// Expand the internal array of characters if necessary to accommodate
+// the current values of row_count and column_count.  Any new (space)
+// characters exposed are given the current pen attributes.  At the
+// end, row_count and column_count are NOT updated.
+void CC708Window::Resize(uint new_rows, uint new_columns)
+{
+    if (!exists || text == NULL)
+    {
+        true_row_count = 0;
+        true_column_count = 0;
+    }
+    if (new_rows > true_row_count || new_columns > true_column_count)
+    {
+        // Expand the array if the new size exceeds the current capacity
+        // in either dimension.
+        CC708Character *new_text =
+            new CC708Character[new_rows * new_columns];
+        pen.column = 0;
+        pen.row = 0;
+        uint i, j;
+        for (i = 0; text && i < row_count; ++i)
+        {
+            for (j = 0; j < column_count; ++j)
+                new_text[i * new_columns + j] = text[i * true_column_count + j];
+            for (; j < new_columns; ++j)
+                new_text[i * new_columns + j].attr = pen.attr;
+        }
+        for (; i < new_rows; ++i)
+            for (j = 0; j < new_columns; ++j)
+                new_text[i * new_columns + j].attr = pen.attr;
+
+        delete [] text;
+        text = new_text;
+        true_row_count = new_rows;
+        true_column_count = new_columns;
+        changed = true;
+    }
+    else if (new_rows > row_count || new_columns > column_count)
+    {
+        // At least one dimension expanded into existing space, so
+        // those newly exposed characters must be cleared.
+        for (uint i = 0; i < row_count; ++i)
+            for (uint j = column_count; j < new_columns; ++j)
+            {
+                text[i * true_column_count + j].character = ' ';
+                text[i * true_column_count + j].attr = pen.attr;
+            }
+        for (uint i = row_count; i < new_rows; ++i)
+            for (uint j = 0; j < new_columns; ++j)
+            {
+                text[i * true_column_count + j].character = ' ';
+                text[i * true_column_count + j].attr = pen.attr;
+            }
+        changed = true;
+    }
+    exists = true;
 }
 
 
@@ -249,9 +282,9 @@ vector<CC708String*> CC708Window::GetStrings(void) const
     if (!text)
         return list;
 
-    for (uint j = 0; j < true_row_count; j++)
+    for (uint j = 0; j < row_count; j++)
     {
-        for (uint i = 0; i < true_column_count; i++)
+        for (uint i = 0; i < column_count; i++)
         {
             CC708Character &chr = text[j * true_column_count + i];
             if (!cur)

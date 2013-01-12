@@ -669,6 +669,8 @@ QString CC608Decoder::ToASCII(const QString &cc608str, bool suppress_unknown)
     {
         QChar cp = cc608str[i];
         int cpu = cp.unicode();
+        if (cpu == 0)
+            break;
         switch (cpu)
         {
             case 0x2120 :  ret += "(SM)"; break;
@@ -689,10 +691,10 @@ QString CC608Decoder::ToASCII(const QString &cc608str, bool suppress_unknown)
                     if (!suppress_unknown)
                         ret += QString("[%1]").arg(cpu - 0x7000, 2, 16);
                 }
-                else if (cpu >= 0x20 && cpu <= 0x80)
+                else if (cpu <= 0x80)
                     ret += QString(cp.toLatin1());
-                if (!suppress_unknown)
-                    ret += QString("[%1]").arg(cpu - 0x7000, 2, 16);
+                else if (!suppress_unknown)
+                    ret += QString("{%1}").arg(cpu, 2, 16);
         }
     }
 
