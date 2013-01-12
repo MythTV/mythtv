@@ -19,6 +19,7 @@ __version__ = "0.3.3"
 # 0.3.2 Add --area parameter to allow country selection for release date and
 #       parental ratings
 # 0.3.3 Use translated title if available
+# 0.3.4 Add support for finding by IMDB under -D (simulate previous version) - Greg Cockburn <greg _@_ performancemagic.com>
 
 from optparse import OptionParser
 import sys
@@ -27,7 +28,14 @@ def buildSingle(inetref, opts):
     from MythTV.tmdb3 import Movie
     from MythTV import VideoMetadata
     from lxml import etree
-    movie = Movie(inetref)
+    try:
+      if len(inetref) == 7:
+        movie = Movie.fromIMDB(inetref)
+      else:
+        movie = Movie(inetref)
+    except:
+      sys.exit(1)
+
     tree = etree.XML(u'<metadata></metadata>')
     mapping = [['runtime',      'runtime'],     ['title',       'originaltitle'],
                ['releasedate',  'releasedate'], ['tagline',     'tagline'],
@@ -56,6 +64,7 @@ def buildSingle(inetref, opts):
             m.releasedate = releases[0][1].releasedate
 
     m.inetref = str(movie.id)
+    m.imdb = str(movie.imdb).lstrip("t")
     if movie.collection:
         m.collectionref = str(movie.collection.id)
     if movie.releasedate:
@@ -113,6 +122,7 @@ def buildList(query, opts):
             if getattr(res, j):
                 setattr(m, i, getattr(res, j))
         m.inetref = str(res.id)
+        m.imdb = str(res.imdb).lstrip("t")
 
         if res.title:
             m.title = res.title
