@@ -299,7 +299,7 @@ void ScheduleEditor::Load()
                                          ENUM_TO_QVARIANT(kDailyRecord));
             if (!isManual)
                 new MythUIButtonListItem(m_rulesList,
-                                         ("Record all showings"),
+                                         tr("Record all showings"),
                                          ENUM_TO_QVARIANT(kAllRecord));
         }
 
