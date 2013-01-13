@@ -4695,14 +4695,18 @@ uint64_t MythPlayer::GetCurrentFrameCount(void) const
 uint64_t MythPlayer::FindFrame(float offset, bool use_cutlist) const
 {
     uint64_t length_ms = TranslatePositionFrameToMs(totalFrames, use_cutlist);
-    uint64_t offset_ms = offset * 1000 + 0.5;
+    uint64_t position_ms;
     if (signbit(offset))
-        offset_ms += length_ms;
-    if (offset_ms < 0)
-        offset_ms = 0;
-    if (offset_ms > length_ms)
-        offset_ms = length_ms;
-    return TranslatePositionMsToFrame(offset_ms, use_cutlist);
+    {
+        uint64_t offset_ms = -offset * 1000 + 0.5;
+        position_ms = (offset_ms > length_ms) ? 0 : length_ms - offset_ms;
+    }
+    else
+    {
+        position_ms = offset * 1000 + 0.5;
+        position_ms = min(position_ms, length_ms);
+    }
+    return TranslatePositionMsToFrame(position_ms, use_cutlist);
 }
 
 void MythPlayer::calcSliderPos(osdInfo &info, bool paddedFields)
