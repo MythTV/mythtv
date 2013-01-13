@@ -4725,7 +4725,6 @@ void MythPlayer::calcSliderPos(osdInfo &info, bool paddedFields)
     info.values.insert("progbefore", 0);
     info.values.insert("progafter",  0);
 
-    uint64_t frames_played = framesPlayed;
     uint64_t total_frames = totalFrames;
     int playbackLen = 0;
     bool fixed_playbacklen = false;
