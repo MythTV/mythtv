@@ -134,7 +134,12 @@ bool MythDVDPlayer::VideoLoop(void)
         // if we go below the pre-buffering limit, the player will pause
         // so do this 'manually'
         DisplayNormalFrame(false);
-        dvd_stillframe_showing = false;
+        // unpause the still frame if more frames become available
+        if (dvd_stillframe_showing && nbframes > 1)
+        {
+            dvd_stillframe_showing = false;
+            UnpauseVideo();
+        }
         return !IsErrored();
     }
 
