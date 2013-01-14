@@ -1189,7 +1189,11 @@ bool MythPlayer::HasReachedEof(void) const
         return true;
     if (GetEditMode())
         return false;
-    return (framesPlayed >= deleteMap.GetLastFrame());
+    if (livetv)
+        return false;
+    if (framesPlayed >= deleteMap.GetLastFrame())
+        return true;
+    return false;
 }
 
 VideoFrame *MythPlayer::GetCurrentFrame(int &w, int &h)
@@ -3708,7 +3712,6 @@ bool MythPlayer::IsNearEnd(void)
     margin = (long long) (margin * audio.GetStretchFactor());
     bool watchingTV = IsWatchingInprogress();
 
-    framesRead = decoder->GetFramesRead();
     framesRead = framesPlayed;
 
     if (!player_ctx->IsPIP() &&
