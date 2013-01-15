@@ -6058,8 +6058,6 @@ void TV::DoSeek(PlayerContext *ctx, float time, const QString &mesg,
             currentFrameAbs;
         int64_t desiredFrameRel = (timeIsOffset ? currentFrameRel : 0) +
             time * framerate + 0.5;
-        if (desiredFrameRel < 0)
-            desiredFrameRel = 0;
         uint64_t desiredFrameAbs = honorCutlist ?
             ctx->player->TranslatePositionRelToAbs(desiredFrameRel) :
             desiredFrameRel;
