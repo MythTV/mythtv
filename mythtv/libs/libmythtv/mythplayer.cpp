@@ -2428,9 +2428,15 @@ bool MythPlayer::Rewind(float seconds)
     if (rewindtime <= 0)
     {
         float current = ComputeSecs(framesPlayed, true);
-        float dest = current + seconds;
+        float dest = current - seconds;
+        if (dest < 0)
+        {
+            if (CalcRWTime(framesPlayed + 1) < 0)
+                return true;
+            dest = 0;
+        }
         uint64_t target = FindFrame(dest, true);
-        rewindtime = target - framesPlayed;
+        rewindtime = framesPlayed - target;
     }
     return (uint64_t)rewindtime >= framesPlayed;
 }

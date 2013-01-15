@@ -6270,17 +6270,18 @@ void TV::DoSeek(PlayerContext *ctx, float time, const QString &mesg,
         keyRepeatTimer.start();
         NormalSpeed(ctx);
         time += StopFFRew(ctx);
-        uint64_t currentFrameAbs = ctx->player->GetFramesPlayed();
         if (timeIsOffset)
-            time +=
-                ctx->player->TranslatePositionFrameToMs(currentFrameAbs,
-                                                        honorCutlist) / 1000.0;
-        if (time < 0)
-            time = 0;
-        uint64_t desiredFrameRel =
-            ctx->player->TranslatePositionMsToFrame(time * 1000, honorCutlist);
-        ctx->UnlockDeletePlayer(__FILE__, __LINE__);
-        DoPlayerSeekToFrame(ctx, desiredFrameRel);
+        {
+            ctx->UnlockDeletePlayer(__FILE__, __LINE__);
+            DoPlayerSeek(ctx, time);
+        }
+        else
+        {
+            uint64_t desiredFrameRel = ctx->player->
+                TranslatePositionMsToFrame(time * 1000, honorCutlist);
+            ctx->UnlockDeletePlayer(__FILE__, __LINE__);
+            DoPlayerSeekToFrame(ctx, desiredFrameRel);
+        }
         UpdateOSDSeekMessage(ctx, mesg, kOSDTimeout_Med);
     }
     else
