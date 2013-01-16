@@ -2645,6 +2645,13 @@ void MythMainWindow::EnterStandby(bool manual)
 
     d->standby = true;
     gCoreContext->AllowShutdown();
+
+    QVariantMap state;
+    state.insert("state", "standby");
+    state.insert("menutheme",
+        GetMythDB()->GetSetting("menutheme", "defaultmenu"));
+    state.insert("currentlocation", GetMythUI()->GetCurrentLocation());
+    MythUIStateTracker::SetState(state);
 }
 
 void MythMainWindow::ExitStandby(bool manual)
@@ -2664,6 +2671,13 @@ void MythMainWindow::ExitStandby(bool manual)
 
     d->standby = false;
     gCoreContext->BlockShutdown();
+
+    QVariantMap state;
+    state.insert("state", "idle");
+    state.insert("menutheme",
+         GetMythDB()->GetSetting("menutheme", "defaultmenu"));
+    state.insert("currentlocation", GetMythUI()->GetCurrentLocation());
+    MythUIStateTracker::SetState(state);
 }
 
 
