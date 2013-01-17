@@ -1130,6 +1130,8 @@ void MythPlayer::ReleaseNextVideoFrame(VideoFrame *buffer,
         videoOutput->ReleaseFrame(buffer);
 
     detect_letter_box->Detect(buffer);
+    if (allpaused)
+        CheckAspectRatio(buffer);
 }
 
 /** \fn MythPlayer::ClearDummyVideoFrame(VideoFrame*)
