@@ -319,6 +319,14 @@ package MythTV::Program;
             $omonth = '00';
             $oday   = '00';
         }
+    # Season/Episode/InetRef
+        my ($season, $episode, $inetref);
+        $season = ($self->{'season'} or '');
+        $season = "0$season" if ($season && $season < 10);
+        $episode = ($self->{'episode'} or '');
+        $episode = "0$episode" if ($episode && $episode < 10);
+        $inetref = ($self->{'intetref'} or '');
+
     # Build a list of name format options
         my %fields;
         ($fields{'T'} = ($self->{'title'}       or '')) =~ s/%/%%/g;
@@ -400,6 +408,11 @@ package MythTV::Program;
         $fields{'om'} = $omonth;            # month, leading zero
         $fields{'oj'} = int($oday);         # day of month
         $fields{'od'} = $oday;              # day of month, leading zero
+    # Season/Episode/Inetref
+        $fields{'ss'} = $season;
+        $fields{'ep'} = $episode;
+        $fields{'in'} = $inetref;
+
     # Literals
         $fields{'%'}   = '%';
         ($fields{'-'}  = $separator) =~ s/%/%%/g;
