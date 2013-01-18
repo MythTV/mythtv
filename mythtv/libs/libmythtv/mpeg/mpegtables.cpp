@@ -49,8 +49,15 @@ uint StreamID::Normalize(uint stream_id, const desc_list_t &desc,
     if ((sistandard != "dvb") && (OpenCableVideo == stream_id))
         return MPEG2Video;
 
+    /* normalize DVB style signalling to ATSC style signalling to make
+     * IsAudio work with either, see A/52:2010 A4 vs A5 */
     if (MPEGDescriptor::Find(desc, DescriptorID::ac3))
         return AC3Audio;
+
+    /* normalize DVB style signalling to ATSC style signalling to make
+     * IsAudio work with either */
+    if (MPEGDescriptor::Find(desc, DescriptorID::eac3))
+        return EAC3Audio;
 
     QString reg;
     const unsigned char *d = MPEGDescriptor::Find(
@@ -62,8 +69,17 @@ uint StreamID::Normalize(uint stream_id, const desc_list_t &desc,
             reg = rd.FormatIdentifierString();
     }
 
-    if (reg == "DTS1")
+    /* normalize all three DTS frame sizes, via http://www.smpte-ra.org/mpegreg/mpegreg.html */
+    if ((reg == "DTS1") || (reg == "DTS2") || (reg == "DTS3"))
         return DTSAudio;
+
+    /* normalize AC-3 signalling according to A/52:2010 A4 */
+    if (reg == "AC-3")
+        return AC3Audio;
+
+    /* normalize E-AC-3 signalling with guesswork via http://www.smpte-ra.org/mpegreg/mpegreg.html */
+    if (reg == "EAC3")
+        return EAC3Audio;
 
 #if 0
     // not needed while there is no specific stream id for these
@@ -938,6 +954,8 @@ const char *StreamID::toString(uint streamID)
     // audio
     case StreamID::AC3Audio:
         return "audio-ac3";  // EIT, PMT
+    case StreamID::EAC3Audio:
+        return "audio-eac3";  // EIT, PMT
     case StreamID::MPEG2Audio:
         return "audio-mp2-layer[1,2,3]"; // EIT, PMT
     case StreamID::MPEG1Audio:
@@ -971,8 +989,8 @@ const char *StreamID::toString(uint streamID)
 
     //case TableID::STUFFING: XXX: Duplicate?
     //    return "stuffing"; // optionally in any
-    case TableID::CENSOR:
-        return "censor"; // EIT, optionally in PMT
+    //case TableID::CENSOR: FIXME collides with StreamID::EAC3Audio
+    //    return "censor"; // EIT, optionally in PMT
     case TableID::ECN:
         return "extended channel name";
     case TableID::SRVLOC:
@@ -1015,6 +1033,8 @@ QString StreamID::GetDescription(uint stream_id)
             return "13818-3 AAC LATM MPEG-2 Audio";
         case StreamID::AC3Audio:
             return "AC3 Audio";
+        case StreamID::EAC3Audio:
+            return "E-AC3 Audio";
         case StreamID::DTSAudio:
             return "DTS Audio";
 

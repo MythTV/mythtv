@@ -121,7 +121,8 @@ class MTV_PUBLIC StreamID
         MPEG2Audio     = 0x04, ///< ISO 13818-3
         MPEG2AACAudio  = 0x0f, ///< ISO 13818-7 Audio w/ADTS syntax
         MPEG2AudioAmd1 = 0x11, ///< ISO 13818-3/AMD-1 Audio using LATM syntax
-        AC3Audio       = 0x81,
+        AC3Audio       = 0x81, ///< A/53 Part 3:2009 6.7.1
+        EAC3Audio      = 0x87, ///< A/53 Part 3:2009 6.7.3
         DTSAudio       = 0x8a,
 
         // DSM-CC Object Carousel
@@ -177,6 +178,7 @@ class MTV_PUBLIC StreamID
                 (StreamID::MPEG2AudioAmd1 == type) ||
                 (StreamID::MPEG2AACAudio  == type) ||
                 (StreamID::AC3Audio       == type) ||
+                (StreamID::EAC3Audio      == type) ||
                 (StreamID::DTSAudio       == type));
     }
     /// Returns true iff stream contains DSMCC Object Carousel
