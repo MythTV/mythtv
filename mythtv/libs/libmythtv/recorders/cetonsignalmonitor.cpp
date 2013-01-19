@@ -13,7 +13,8 @@
 #include "cetonrecorder.h"
 #include "cetonchannel.h"
 
-#define LOC QString("CetonSM(%1): ").arg(channel->GetDevice())
+#define LOC QString("CetonSM[%1](%2): ") \
+            .arg(capturecardnum).arg(channel->GetDevice())
 
 /**
  *  \brief Initializes signal lock and signal values.

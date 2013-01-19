@@ -35,7 +35,7 @@ class MTV_PUBLIC ATSCStreamData : virtual public MPEGStreamData
     virtual void Reset(void) { ResetATSC(-1, -1); }
     virtual void ResetMPEG(int desiredProgram);
     virtual void ResetATSC(int desiredMajorChannel, int desiredMinorChannel);
-    void SetDesiredChannel(int major, int minor);
+    void SetDesiredChannel(int major, int minor, int cardid);
 
     // Table processing
     virtual bool HandleTables(uint pid, const PSIPTable &psip);

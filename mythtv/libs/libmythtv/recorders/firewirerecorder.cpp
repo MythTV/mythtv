@@ -12,7 +12,9 @@
 #include "mpegstreamdata.h"
 #include "tv_rec.h"
 
-#define LOC QString("FireRecBase(%1): ").arg(channel->GetDevice())
+#define LOC QString("FireRecBase[%1](%2): ") \
+            .arg(tvrec ? tvrec->GetCaptureCardNum() : -1) \
+            .arg(channel->GetDevice())
 
 FirewireRecorder::FirewireRecorder(TVRec *rec, FirewireChannel *chan) :
     DTVRecorder(rec),

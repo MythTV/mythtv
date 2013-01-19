@@ -21,7 +21,8 @@
 #include "hdhrrecorder.h"
 #include "hdhrstreamhandler.h"
 
-#define LOC QString("HDHRSM(%1): ").arg(channel->GetDevice())
+#define LOC QString("HDHRSM[%1](%2): ") \
+            .arg(capturecardnum).arg(channel->GetDevice())
 
 /**
  *  \brief Initializes signal lock and signal values.

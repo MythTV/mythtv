@@ -13,7 +13,8 @@
 #include "tv_rec.h"
 #include "mythlogging.h"
 
-#define LOC QString("HDHRRec(%1): ").arg(tvrec->GetCaptureCardNum())
+#define LOC QString("HDHRRec[%1]: ") \
+            .arg(tvrec ? tvrec->GetCaptureCardNum() : -1)
 
 HDHRRecorder::HDHRRecorder(TVRec *rec, HDHRChannel *channel)
     : DTVRecorder(rec), _channel(channel), _stream_handler(NULL)

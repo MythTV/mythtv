@@ -33,8 +33,8 @@ using namespace std;
 #define TVREC_CARDNUM \
         ((tvrec != NULL) ? QString::number(tvrec->GetCaptureCardNum()) : "NULL")
 
-#define LOC      QString("RecBase(%1:%2): ") \
-                 .arg(TVREC_CARDNUM).arg(videodevice)
+#define LOC QString("RecBase[%1](%2): ") \
+            .arg(TVREC_CARDNUM).arg(videodevice)
 
 const uint RecorderBase::kTimeOfLatestDataIntervalTarget = 5000;
 

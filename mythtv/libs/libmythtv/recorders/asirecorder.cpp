@@ -28,7 +28,9 @@
 #include "ringbuffer.h"
 #include "tv_rec.h"
 
-#define LOC QString("ASIRec(%1): ").arg(tvrec->GetCaptureCardNum())
+#define LOC QString("ASIRec[%1](%2): ") \
+            .arg(tvrec ? tvrec->GetCaptureCardNum() : -1) \
+            .arg(channel->GetDevice())
 
 ASIRecorder::ASIRecorder(TVRec *rec, ASIChannel *channel) :
     DTVRecorder(rec), m_channel(channel), m_stream_handler(NULL),

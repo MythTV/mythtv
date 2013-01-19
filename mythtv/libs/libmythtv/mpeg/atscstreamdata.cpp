@@ -57,7 +57,7 @@ ATSCStreamData::~ATSCStreamData()
     _atsc81_eit_listeners.clear();
 }
 
-void ATSCStreamData::SetDesiredChannel(int major, int minor)
+void ATSCStreamData::SetDesiredChannel(int major, int minor, int cardid)
 {
     bool reset = true;
     const MasterGuideTable *mgt = GetCachedMGT();
@@ -91,12 +91,12 @@ void ATSCStreamData::SetDesiredChannel(int major, int minor)
             if (cvct)
             {
                 ProcessCVCT(cvct->TransportStreamID(), cvct);
-                SetDesiredProgram(cvct->ProgramNumber(chan_idx));
+                SetDesiredProgram(cvct->ProgramNumber(chan_idx), cardid);
             }
             else if (tvct)
             {
                 ProcessTVCT(tvct->TransportStreamID(), tvct);
-                SetDesiredProgram(tvct->ProgramNumber(chan_idx));
+                SetDesiredProgram(tvct->ProgramNumber(chan_idx), cardid);
             }
             reset = false;
         }

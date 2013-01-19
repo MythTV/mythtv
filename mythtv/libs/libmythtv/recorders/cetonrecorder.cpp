@@ -12,7 +12,8 @@
 #include "mythlogging.h"
 #include "tv_rec.h"
 
-#define LOC QString("CetonRec(%1): ").arg(tvrec->GetCaptureCardNum())
+#define LOC QString("CetonRec[%1]: ") \
+            .arg(tvrec ? tvrec->GetCaptureCardNum() : -1)
 
 CetonRecorder::CetonRecorder(TVRec *rec, CetonChannel *channel) :
     DTVRecorder(rec), _channel(channel), _stream_handler(NULL)

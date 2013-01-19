@@ -16,7 +16,7 @@
 #include "mythlogging.h"
 #include "mythdb.h"
 
-#define LOC QString("IPTVChan(%1): ").arg(GetCardID())
+#define LOC QString("IPTVChan[%1]: ").arg(GetCardID())
 
 IPTVChannel::IPTVChannel(TVRec *rec, const QString&) :
     DTVChannel(rec), m_open(false),

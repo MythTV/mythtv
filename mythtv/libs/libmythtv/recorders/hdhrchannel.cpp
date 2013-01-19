@@ -28,7 +28,7 @@ using namespace std;
 #include "channelutil.h"
 #include "hdhrstreamhandler.h"
 
-#define LOC     QString("HDHRChan(%1): ").arg(GetDevice())
+#define LOC     QString("HDHRChan[%1](%2): ").arg(GetCardID()).arg(GetDevice())
 
 HDHRChannel::HDHRChannel(TVRec *parent, const QString &device)
     : DTVChannel(parent),

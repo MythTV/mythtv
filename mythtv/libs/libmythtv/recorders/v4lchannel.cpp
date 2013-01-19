@@ -28,7 +28,8 @@ using namespace std;
 
 #define DEBUG_ATTRIB 1
 
-#define LOC      QString("V4LChannel(%1): ").arg(device)
+#define LOC      QString("V4LChannel[%1](%2): ") \
+                 .arg(GetCardID()).arg(GetDevice())
 
 static int format_to_mode(const QString &fmt);
 static QString mode_to_format(int mode);

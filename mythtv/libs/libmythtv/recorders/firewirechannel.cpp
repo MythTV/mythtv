@@ -13,7 +13,7 @@
 #endif
 #include "firewirechannel.h"
 
-#define LOC QString("FireChan(%1): ").arg(GetDevice())
+#define LOC QString("FireChan[%1](%2): ").arg(GetCardID()).arg(GetDevice())
 
 FirewireChannel::FirewireChannel(TVRec *parent, const QString &_videodevice,
                                  const FireWireDBOptions &firewire_opts) :

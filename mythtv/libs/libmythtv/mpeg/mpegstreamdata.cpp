@@ -105,12 +105,15 @@ MPEGStreamData::~MPEGStreamData()
     _mpeg_sp_listeners.clear();
 }
 
-void MPEGStreamData::SetDesiredProgram(int p)
+void MPEGStreamData::SetDesiredProgram(int p, int cardid)
 {
     bool reset = true;
     uint pid = 0;
     const ProgramAssociationTable* pat = NULL;
     pat_vec_t pats = GetCachedPATs();
+
+    LOG(VB_RECORD, LOG_INFO, QString("SetDesiredProgram[%1] (%2)")
+        .arg(cardid).arg(p));
 
     for (uint i = (p) ? 0 : pats.size(); i < pats.size() && !pid; i++)
     {
@@ -812,8 +815,7 @@ void MPEGStreamData::ProcessPAT(const ProgramAssociationTable *pat)
     {
         _invalid_pat_warning = true; // only emit one warning...
         // After 400ms emit error if we haven't found correct PAT.
-        LOG(VB_GENERAL, LOG_ERR,
-            "ProcessPAT: Program not found in PAT. "
+        LOG(VB_GENERAL, LOG_ERR, "ProcessPAT: Program not found in PAT. "
             "Rescan your transports.");
 
         send_single_program = CreatePATSingleProgram(*pat);

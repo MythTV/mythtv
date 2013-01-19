@@ -13,7 +13,7 @@
 #include "channelutil.h"
 #include "mythdbcon.h"
 
-#define LOC QString("CetonChan(%1): ").arg(GetDevice())
+#define LOC QString("CetonChan[%1](%2): ").arg(GetCardID()).arg(GetDevice())
 
 CetonChannel::CetonChannel(TVRec *parent, const QString &device) :
     DTVChannel(parent), _device_id(device), _stream_handler(NULL)

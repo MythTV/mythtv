@@ -24,8 +24,8 @@
 #define TVREC_CARDNUM \
         ((tvrec != NULL) ? QString::number(tvrec->GetCaptureCardNum()) : "NULL")
 
-#define LOC      QString("V4LRec(%1:%2): ") \
-                 .arg(TVREC_CARDNUM).arg(videodevice)
+#define LOC QString("V4LRec[%1](%2): ") \
+            .arg(TVREC_CARDNUM).arg(videodevice)
 
 V4LRecorder::V4LRecorder(TVRec *tv) :
     DTVRecorder(tv),          vbimode(VBIMode::None),

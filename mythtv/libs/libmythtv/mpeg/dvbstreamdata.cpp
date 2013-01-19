@@ -40,7 +40,8 @@ DVBStreamData::~DVBStreamData()
     _dvb_has_eit.clear();
 }
 
-void DVBStreamData::SetDesiredService(uint netid, uint tsid, int serviceid)
+void DVBStreamData::SetDesiredService(uint netid, uint tsid, int serviceid,
+                                      int cardid)
 {
     bool reset = true;
 
@@ -62,7 +63,7 @@ void DVBStreamData::SetDesiredService(uint netid, uint tsid, int serviceid)
                 ProcessSDT(_desired_tsid, sdt);
                 ReturnCachedTable(sdt);
             }
-            SetDesiredProgram(serviceid);
+            SetDesiredProgram(serviceid, cardid);
         }
     }
 

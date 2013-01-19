@@ -14,9 +14,11 @@ using namespace std;
 
 #undef DBG_SM
 #define DBG_SM(FUNC, MSG) LOG(VB_CHANNEL, LOG_INFO, \
-    QString("DTVSM(%1)::%2: %3").arg(channel->GetDevice()).arg(FUNC).arg(MSG))
+    QString("DTVSM[%1](%2)::%3: %4").arg(capturecardnum) \
+    .arg(channel->GetDevice()).arg(FUNC).arg(MSG))
 
-#define LOC QString("DTVSM(%1): ").arg(channel->GetDevice())
+#define LOC QString("DTVSM[%1](%2): ") \
+            .arg(capturecardnum).arg(channel->GetDevice())
 
 // inserts tid&crc value into an ordered list
 // returns true if item is inserted
@@ -211,7 +213,7 @@ void DTVSignalMonitor::SetChannel(int major, int minor)
                     kDTVSigMon_CryptSeen | kDTVSigMon_CryptMatch);
         majorChannel = major;
         minorChannel = minor;
-        GetATSCStreamData()->SetDesiredChannel(major, minor);
+        GetATSCStreamData()->SetDesiredChannel(major, minor, capturecardnum);
         AddFlags(kDTVSigMon_WaitForVCT | kDTVSigMon_WaitForPAT);
     }
 }
@@ -226,7 +228,7 @@ void DTVSignalMonitor::SetProgramNumber(int progNum)
                     kDTVSigMon_CryptSeen | kDTVSigMon_CryptMatch);
         programNumber = progNum;
         if (GetStreamData())
-            GetStreamData()->SetDesiredProgram(programNumber);
+            GetStreamData()->SetDesiredProgram(programNumber, capturecardnum);
         AddFlags(kDTVSigMon_WaitForPMT);
     }
 }
@@ -253,7 +255,8 @@ void DTVSignalMonitor::SetDVBService(uint netid, uint tsid, int serviceid)
 
     if (GetDVBStreamData())
     {
-        GetDVBStreamData()->SetDesiredService(netid, tsid, programNumber);
+        GetDVBStreamData()->SetDesiredService(netid, tsid, programNumber,
+                                              capturecardnum);
         AddFlags(kDTVSigMon_WaitForPMT | kDTVSigMon_WaitForSDT);
         GetDVBStreamData()->AddListeningPID(DVB_SDT_PID);
     }

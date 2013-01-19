@@ -10,7 +10,7 @@ using namespace std;
 #include "mpegtables.h"
 #include "mythlogging.h"
 
-#define LOC QString("DTVChan(%1): ").arg(GetDevice())
+#define LOC QString("DTVChan[%1](%2): ").arg(GetCardID()).arg(GetDevice())
 
 QReadWriteLock DTVChannel::master_map_lock(QReadWriteLock::Recursive);
 typedef QMap<QString,QList<DTVChannel*> > MasterMap;

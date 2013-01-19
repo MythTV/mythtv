@@ -39,8 +39,8 @@
 #define TVREC_CARDNUM \
         ((tvrec != NULL) ? QString::number(tvrec->GetCaptureCardNum()) : "NULL")
 
-#define LOC      QString("ImportRec(%1:%2): ") \
-                 .arg(TVREC_CARDNUM).arg(videodevice)
+#define LOC QString("ImportRec[%1](%2): ") \
+            .arg(TVREC_CARDNUM).arg(videodevice)
 
 ImportRecorder::ImportRecorder(TVRec *rec) :
     DTVRecorder(rec), _import_fd(-1)

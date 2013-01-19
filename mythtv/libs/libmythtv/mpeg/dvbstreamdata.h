@@ -36,7 +36,7 @@ class MTV_PUBLIC DVBStreamData : virtual public MPEGStreamData
         uint desired_netid, uint desired_tsid, int desired_sid);
 
     // DVB table monitoring
-    void SetDesiredService(uint netid, uint tsid, int serviceid);
+    void SetDesiredService(uint netid, uint tsid, int serviceid, int cardid);
     uint DesiredNetworkID(void)   const { return _desired_netid; }
     uint DesiredTransportID(void) const { return _desired_tsid;  }
 

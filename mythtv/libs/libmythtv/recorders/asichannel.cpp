@@ -7,7 +7,7 @@
 #include "mpegtables.h"
 #include "asichannel.h"
 
-#define LOC     QString("ASIChan(%1): ").arg(GetDevice())
+#define LOC     QString("ASIChan[%1](%2): ").arg(GetCardID()).arg(GetDevice())
 
 ASIChannel::ASIChannel(TVRec *parent, const QString &device) :
     DTVChannel(parent), m_device(device), m_isopen(false)

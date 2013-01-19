@@ -39,7 +39,7 @@
 
 #define DEBUG_CHANNEL_PREFIX 0 /**< set to 1 to channel prefixing */
 
-#define LOC QString("TVRec(%1): ").arg(cardid)
+#define LOC QString("TVRec[%1]: ").arg(cardid)
 
 /// How many milliseconds the signal monitor should wait between checks
 const uint TVRec::kSignalMonitoringRate = 50; /* msec */
@@ -3718,14 +3718,15 @@ void TVRec::TuningFrequency(const TuningRequest &request)
 
             ATSCStreamData *atsc = dynamic_cast<ATSCStreamData*>(mpeg);
             if (atsc)
-                atsc->SetDesiredChannel(request.majorChan, request.minorChan);
+                atsc->SetDesiredChannel(request.majorChan, request.minorChan,
+                                        cardid);
         }
         else if (request.progNum >= 0)
         {
             channel->SetChannelByString(request.channel);
 
             if (mpeg)
-                mpeg->SetDesiredProgram(request.progNum);
+                mpeg->SetDesiredProgram(request.progNum, cardid);
         }
     }
 

@@ -43,7 +43,7 @@ using namespace std;
 #include "cardutil.h"
 #include "compat.h"
 
-#define LOC QString("ChannelBase(%1): ").arg(GetCardID())
+#define LOC QString("ChannelBase[%1]: ").arg(GetCardID())
 
 ChannelBase::ChannelBase(TVRec *parent) :
     m_pParent(parent), m_curchannelname(""),

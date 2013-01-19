@@ -33,7 +33,7 @@ extern "C" {
 }
 
 #define LOC ((tvrec) ? \
-    QString("DTVRec(%1): ").arg(tvrec->GetCaptureCardNum()) : \
+    QString("DTVRec[%1]: ").arg(tvrec->GetCaptureCardNum()) : \
     QString("DTVRec(0x%1): ").arg(intptr_t(this),0,16))
 
 const uint DTVRecorder::kMaxKeyFrameDistance = 80;
@@ -269,9 +269,11 @@ void DTVRecorder::InitStreamData(void)
 
     if (atsc && atsc->DesiredMinorChannel())
         atsc->SetDesiredChannel(atsc->DesiredMajorChannel(),
-                                atsc->DesiredMinorChannel());
+                                atsc->DesiredMinorChannel(),
+                                tvrec ? tvrec->GetCaptureCardNum() : -1);
     else if (_stream_data->DesiredProgram() >= 0)
-        _stream_data->SetDesiredProgram(_stream_data->DesiredProgram());
+        _stream_data->SetDesiredProgram(_stream_data->DesiredProgram(),
+                                       tvrec ? tvrec->GetCaptureCardNum() : -1);
 }
 
 void DTVRecorder::BufferedWrite(const TSPacket &tspacket)

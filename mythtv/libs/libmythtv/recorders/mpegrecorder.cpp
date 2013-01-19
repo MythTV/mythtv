@@ -46,7 +46,8 @@ extern "C" {
 
 #define IVTV_KERNEL_VERSION(a,b,c) (((a) << 16) + ((b) << 8) + (c))
 
-#define LOC QString("MPEGRec(%1): ").arg(videodevice)
+#define LOC QString("MPEGRec[%1](%2): ") \
+            .arg(tvrec ? tvrec->GetCaptureCardNum() : -1).arg(videodevice)
 
 const int MpegRecorder::audRateL1[] =
 {
@@ -1367,7 +1368,7 @@ void MpegRecorder::StopEncoding(void)
 void MpegRecorder::InitStreamData(void)
 {
     _stream_data->AddMPEGSPListener(this);
-    _stream_data->SetDesiredProgram(1);
+    _stream_data->SetDesiredProgram(1, tvrec ? tvrec->GetCaptureCardNum() : -1);
 }
 
 void MpegRecorder::SetBitrate(int bitrate, int maxbitrate,

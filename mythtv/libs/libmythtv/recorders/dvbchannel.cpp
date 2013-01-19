@@ -55,7 +55,7 @@ static struct dvb_frontend_parameters dtvmultiplex_to_dvbparams(
 static DTVMultiplex dvbparams_to_dtvmultiplex(
     DTVTunerType, const dvb_frontend_parameters&);
 
-#define LOC QString("DVBChan(%1:%2): ").arg(GetCardID()).arg(device)
+#define LOC QString("DVBChan[%1](%2): ").arg(GetCardID()).arg(GetDevice())
 
 /** \class DVBChannel
  *  \brief Provides interface to the tuning hardware when using DVB drivers
