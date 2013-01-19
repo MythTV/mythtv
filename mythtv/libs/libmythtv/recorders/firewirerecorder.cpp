@@ -225,5 +225,6 @@ void FirewireRecorder::InitStreamData(void)
     _stream_data->AddMPEGSPListener(this);
 
     if (_stream_data->DesiredProgram() >= 0)
-        _stream_data->SetDesiredProgram(_stream_data->DesiredProgram());
+        _stream_data->SetDesiredProgram(_stream_data->DesiredProgram(),
+                                tvrec ? tvrec->GetCaptureCardNum() : -1);
 }
