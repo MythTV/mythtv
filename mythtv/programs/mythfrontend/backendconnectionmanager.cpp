@@ -25,8 +25,7 @@ class Reconnect : public QRunnable
 
     virtual void run(void)
     {
-        // Note: GetMasterHostPrefix() implicitly reconnects the sockets
-        if (gCoreContext->GetMasterHostPrefix().isEmpty())
+        if (!gCoreContext->SafeConnectToMasterServer())
             gCoreContext->dispatch(MythEvent(QString("RECONNECT_FAILURE")));
         else
             gCoreContext->dispatch(MythEvent(QString("RECONNECT_SUCCESS")));
