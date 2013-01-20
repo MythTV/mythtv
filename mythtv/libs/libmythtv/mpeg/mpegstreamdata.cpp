@@ -570,13 +570,6 @@ bool MPEGStreamData::CreatePMTSingleProgram(const ProgramMapTable &pmt)
         uint type = StreamID::Normalize(
             pmt.StreamType(i), desc, _sistandard);
 
-        // Fixup for ITV HD
-        if (pid == 3401 && type == StreamID::PrivData &&
-            pmt.ProgramNumber() == 10510)
-        {
-            type = StreamID::H264Video;
-        }
-
         bool is_video = StreamID::IsVideo(type);
         bool is_audio = StreamID::IsAudio(type);
 
