@@ -60,6 +60,8 @@ class MBASE_PUBLIC MythCoreContext : public QObject, public MythObservable, publ
     void SetEventSocket(MythSocket *eventSock);
     void SetScheduler(MythScheduler *sched);
 
+    bool SafeConnectToMasterServer(bool blockingClient = true,
+                                   bool openEventSocket = true);
     bool ConnectToMasterServer(bool blockingClient = true,
                                bool openEventSocket = true);
 

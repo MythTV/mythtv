@@ -293,6 +293,19 @@ bool MythCoreContext::SetupCommandSocket(MythSocket *serverSock,
     return true;
 }
 
+// Connects to master server safely (i.e. by taking m_sockLock)
+bool MythCoreContext::SafeConnectToMasterServer(bool blockingClient,
+                                                bool openEventSocket)
+{
+    QMutexLocker locker(&d->m_sockLock);
+    bool success = true;
+
+    if (!d->m_serverSock || !d->m_serverSock->IsConnected())
+        success = ConnectToMasterServer(blockingClient, openEventSocket);
+
+    return success;
+}
+
 // Assumes that either m_sockLock is held, or the app is still single
 // threaded (i.e. during startup).
 bool MythCoreContext::ConnectToMasterServer(bool blockingClient,
