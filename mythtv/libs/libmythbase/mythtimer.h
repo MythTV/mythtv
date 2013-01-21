@@ -1,31 +1,31 @@
 #ifndef MYTHTIMER_H_
 #define MYTHTIMER_H_
 
-#include <QTime>
+#include <QElapsedTimer>
 #include "mythbaseexp.h"
+
+/** A QElapsedTimer based timer to replace use of QTime as a timer.
+ *  
+ *  This class is not thread-safe.
+ */
 
 class MBASE_PUBLIC MythTimer
 {
   public:
-    MythTimer() : m_running(false) {}
+    MythTimer() : m_offset(0) { m_timer.invalidate(); }
 
-    void start() { m_running = true; m_timer.start(); }
-    int restart() { int ret = elapsed();
-                    m_timer.restart();
-                    return ret;
-                  }
-    int elapsed() { int ret = m_timer.elapsed();
-                    if (ret > 86300000) { ret = 0;  m_timer.restart(); }
-                    return ret;
-                  }
-    void stop() { m_running = false; }
-    bool isRunning() const { return m_running; }
+    void start(void);
+    int restart(void);
+    void stop(void);
 
-    void addMSecs(int ms) { m_timer.addMSecs(ms); }
+    void addMSecs(int ms);
+
+    int elapsed(void) const;
+    bool isRunning(void) const;
 
   private:
-    QTime m_timer;
-    bool  m_running;
+    QElapsedTimer m_timer;
+    int m_offset;
 };
 
 #endif
