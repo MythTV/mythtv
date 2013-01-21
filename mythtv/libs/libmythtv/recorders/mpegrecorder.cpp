@@ -922,7 +922,9 @@ void MpegRecorder::run(void)
     if (driver == "hdpvr")
     {
         int progNum = 1;
-        MPEGStreamData *sd = new MPEGStreamData(progNum, true);
+        MPEGStreamData *sd = new MPEGStreamData
+                             (progNum, tvrec ? tvrec->GetCaptureCardNum() : -1,
+                              true);
         sd->SetRecordingType(_recording_type);
         SetStreamData(sd);
 

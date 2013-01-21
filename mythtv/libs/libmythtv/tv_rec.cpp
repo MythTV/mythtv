@@ -1827,7 +1827,7 @@ bool TVRec::SetupDTVSignalMonitor(bool EITscan)
         ATSCStreamData *asd = dynamic_cast<ATSCStreamData*>(sd);
         if (!asd)
         {
-            sd = asd = new ATSCStreamData(major, minor);
+            sd = asd = new ATSCStreamData(major, minor, cardid);
             sd->SetCaching(true);
             if (GetDTVRecorder())
                 GetDTVRecorder()->SetStreamData(asd);
@@ -1858,7 +1858,7 @@ bool TVRec::SetupDTVSignalMonitor(bool EITscan)
         DVBStreamData *dsd = dynamic_cast<DVBStreamData*>(sd);
         if (!dsd)
         {
-            sd = dsd = new DVBStreamData(netid, tsid, progNum);
+            sd = dsd = new DVBStreamData(netid, tsid, progNum, cardid);
             sd->SetCaching(true);
             if (GetDTVRecorder())
                 GetDTVRecorder()->SetStreamData(dsd);
@@ -1896,7 +1896,7 @@ bool TVRec::SetupDTVSignalMonitor(bool EITscan)
     {
         if (!sd)
         {
-            sd = new MPEGStreamData(progNum, true);
+            sd = new MPEGStreamData(progNum, cardid, true);
             sd->SetCaching(true);
             if (GetDTVRecorder())
                 GetDTVRecorder()->SetStreamData(sd);

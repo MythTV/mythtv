@@ -94,7 +94,7 @@ typedef QMap<uint, PIDPriority> pid_map_t;
 class MTV_PUBLIC MPEGStreamData : public EITSource
 {
   public:
-    MPEGStreamData(int desiredProgram, bool cacheTables);
+    MPEGStreamData(int desiredProgram, int cardnum, bool cacheTables);
     virtual ~MPEGStreamData();
 
     void SetCaching(bool cacheTables) { _cache_tables = cacheTables; }
@@ -353,6 +353,7 @@ class MTV_PUBLIC MPEGStreamData : public EITSource
     void CachePMT(const ProgramMapTable *pmt);
 
   protected:
+    int                       _cardid;
     QString                   _sistandard;
 
     bool                      _have_CRC_bug;
