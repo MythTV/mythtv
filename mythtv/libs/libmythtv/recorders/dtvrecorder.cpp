@@ -269,11 +269,9 @@ void DTVRecorder::InitStreamData(void)
 
     if (atsc && atsc->DesiredMinorChannel())
         atsc->SetDesiredChannel(atsc->DesiredMajorChannel(),
-                                atsc->DesiredMinorChannel(),
-                                tvrec ? tvrec->GetCaptureCardNum() : -1);
+                                atsc->DesiredMinorChannel());
     else if (_stream_data->DesiredProgram() >= 0)
-        _stream_data->SetDesiredProgram(_stream_data->DesiredProgram(),
-                                       tvrec ? tvrec->GetCaptureCardNum() : -1);
+        _stream_data->SetDesiredProgram(_stream_data->DesiredProgram());
 }
 
 void DTVRecorder::BufferedWrite(const TSPacket &tspacket)

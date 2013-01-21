@@ -291,7 +291,7 @@ class MTV_PUBLIC MPEGStreamData : public EITSource
 
   public:
     // Single program stuff, sets
-    void SetDesiredProgram(int p, int cardid);
+    void SetDesiredProgram(int p);
     inline void SetPATSingleProgram(ProgramAssociationTable*);
     inline void SetPMTSingleProgram(ProgramMapTable*);
     void SetVideoStreamsRequired(uint num)

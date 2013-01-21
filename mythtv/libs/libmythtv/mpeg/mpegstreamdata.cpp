@@ -105,15 +105,15 @@ MPEGStreamData::~MPEGStreamData()
     _mpeg_sp_listeners.clear();
 }
 
-void MPEGStreamData::SetDesiredProgram(int p, int cardid)
+void MPEGStreamData::SetDesiredProgram(int p)
 {
     bool reset = true;
     uint pid = 0;
     const ProgramAssociationTable* pat = NULL;
     pat_vec_t pats = GetCachedPATs();
 
-    LOG(VB_RECORD, LOG_INFO, QString("SetDesiredProgram[%1] (%2)")
-        .arg(cardid).arg(p));
+    LOG(VB_RECORD, LOG_INFO, QString("SetDesiredProgram(%2)")
+        .arg(p));
 
     for (uint i = (p) ? 0 : pats.size(); i < pats.size() && !pid; i++)
     {

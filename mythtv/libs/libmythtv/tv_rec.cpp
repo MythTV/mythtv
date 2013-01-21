@@ -3718,15 +3718,14 @@ void TVRec::TuningFrequency(const TuningRequest &request)
 
             ATSCStreamData *atsc = dynamic_cast<ATSCStreamData*>(mpeg);
             if (atsc)
-                atsc->SetDesiredChannel(request.majorChan, request.minorChan,
-                                        cardid);
+                atsc->SetDesiredChannel(request.majorChan, request.minorChan);
         }
         else if (request.progNum >= 0)
         {
             channel->SetChannelByString(request.channel);
 
             if (mpeg)
-                mpeg->SetDesiredProgram(request.progNum, cardid);
+                mpeg->SetDesiredProgram(request.progNum);
         }
     }
 

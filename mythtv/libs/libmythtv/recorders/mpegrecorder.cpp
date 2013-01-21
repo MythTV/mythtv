@@ -1368,7 +1368,7 @@ void MpegRecorder::StopEncoding(void)
 void MpegRecorder::InitStreamData(void)
 {
     _stream_data->AddMPEGSPListener(this);
-    _stream_data->SetDesiredProgram(1, tvrec ? tvrec->GetCaptureCardNum() : -1);
+    _stream_data->SetDesiredProgram(1);
 }
 
 void MpegRecorder::SetBitrate(int bitrate, int maxbitrate,

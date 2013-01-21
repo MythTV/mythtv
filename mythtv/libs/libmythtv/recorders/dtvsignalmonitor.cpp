@@ -213,7 +213,7 @@ void DTVSignalMonitor::SetChannel(int major, int minor)
                     kDTVSigMon_CryptSeen | kDTVSigMon_CryptMatch);
         majorChannel = major;
         minorChannel = minor;
-        GetATSCStreamData()->SetDesiredChannel(major, minor, capturecardnum);
+        GetATSCStreamData()->SetDesiredChannel(major, minor);
         AddFlags(kDTVSigMon_WaitForVCT | kDTVSigMon_WaitForPAT);
     }
 }
@@ -228,7 +228,7 @@ void DTVSignalMonitor::SetProgramNumber(int progNum)
                     kDTVSigMon_CryptSeen | kDTVSigMon_CryptMatch);
         programNumber = progNum;
         if (GetStreamData())
-            GetStreamData()->SetDesiredProgram(programNumber, capturecardnum);
+            GetStreamData()->SetDesiredProgram(programNumber);
         AddFlags(kDTVSigMon_WaitForPMT);
     }
 }
@@ -255,8 +255,7 @@ void DTVSignalMonitor::SetDVBService(uint netid, uint tsid, int serviceid)
 
     if (GetDVBStreamData())
     {
-        GetDVBStreamData()->SetDesiredService(netid, tsid, programNumber,
-                                              capturecardnum);
+        GetDVBStreamData()->SetDesiredService(netid, tsid, programNumber);
         AddFlags(kDTVSigMon_WaitForPMT | kDTVSigMon_WaitForSDT);
         GetDVBStreamData()->AddListeningPID(DVB_SDT_PID);
     }
