@@ -507,6 +507,7 @@ bool FirewireDevice::IsSTBSupported(const QString &panel_model)
             (model == "DCT-6200") ||
             (model == "DCT-6212") ||
             (model == "DCT-6216") ||
+            (model == "DCX-3200") ||
             (model == "SA3250HD") ||
             (model == "SA4200HD") ||
             (model == "SA4250HDC") ||
