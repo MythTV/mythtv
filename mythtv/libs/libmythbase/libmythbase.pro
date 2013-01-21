@@ -47,7 +47,6 @@ SOURCES += mythplugin.cpp
 unix {
     SOURCES += system-unix.cpp
     HEADERS += system-unix.h
-    QMAKE_CXXFLAGS += -fno-strict-aliasing
 }
 
 mingw {
