@@ -12,6 +12,7 @@ using namespace std;
 
 // Qt headers
 #include <QString>
+#include <QCoreApplication>
 
 // MythTV headers
 #include "mythmiscutil.h"
@@ -295,7 +296,8 @@ bool ClassicCommDetector::go()
     int requiredHeadStart = requiredBuffer;
     bool wereRecording = stillRecording;
 
-    emit statusUpdate(QObject::tr("Building Head Start Buffer"));
+    emit statusUpdate(QCoreApplication::translate("(mythcommflag)",
+        "Building Head Start Buffer"));
     secsSince = recordingStartedAt.secsTo(MythDate::current());
     while (stillRecording && (secsSince < requiredHeadStart))
     {
@@ -320,7 +322,8 @@ bool ClassicCommDetector::go()
         requiredHeadStart += max(0,recordingStartedAt.secsTo(startedAt));
         requiredHeadStart += logoDetector->getRequiredAvailableBufferForSearch();
 
-        emit statusUpdate(QObject::tr("Building Logo Detection Buffer"));
+        emit statusUpdate(QCoreApplication::translate("(mythcommflag)",
+            "Building Logo Detection Buffer"));
         secsSince = recordingStartedAt.secsTo(MythDate::current());
         while (stillRecording && (secsSince < requiredHeadStart))
         {
@@ -350,7 +353,8 @@ bool ClassicCommDetector::go()
 
     if (commDetectMethod & COMM_DETECT_LOGO)
     {
-        emit statusUpdate(QObject::tr("Searching for Logo"));
+        emit statusUpdate(QCoreApplication::translate("(mythcommflag)",
+            "Searching for Logo"));
 
         if (showProgress)
         {
@@ -523,11 +527,13 @@ bool ClassicCommDetector::go()
             }
 
             if (myTotalFrames)
-                emit statusUpdate(QObject::tr("%1% Completed @ %2 fps.")
-                                  .arg(percentage).arg(flagFPS));
+                emit statusUpdate(QCoreApplication::translate("(mythcommflag)",
+                    "%1% Completed @ %2 fps.")
+                        .arg(percentage).arg(flagFPS));
             else
-                emit statusUpdate(QObject::tr("%1 Frames Completed @ %2 fps.")
-                                  .arg(currentFrameNumber).arg(flagFPS));
+                emit statusUpdate(QCoreApplication::translate("(mythcommflag)",
+                    "%1 Frames Completed @ %2 fps.")
+                        .arg(currentFrameNumber).arg(flagFPS));
 
             if (percentage % 10 == 0 && prevpercent != percentage)
             {

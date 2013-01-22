@@ -2,6 +2,9 @@
 
 #include "PrePostRollFlagger.h"
 
+// Qt headers
+#include <QCoreApplication>
+
 // MythTV headers
 #include "mythcorecontext.h"
 #include "programinfo.h"
@@ -38,7 +41,8 @@ bool PrePostRollFlagger::go()
     secsSince = startedAt.secsTo(MythDate::current());
     while (stillRecording && (secsSince < requiredHeadStart))
     {
-        emit statusUpdate(QObject::tr("Waiting to pass preroll + head start"));
+        emit statusUpdate(QCoreApplication::translate("(mythcommflag)",
+            "Waiting to pass preroll + head start"));
 
         emit breathe();
         if (m_bStop)
@@ -151,7 +155,8 @@ bool PrePostRollFlagger::go()
             emit breathe();
             if (m_bStop)
                 return false;
-            emit statusUpdate(QObject::tr("Waiting for recording to finish"));
+            emit statusUpdate(QCoreApplication::translate("(mythcommflag)",
+                "Waiting for recording to finish"));
             sleep(5);
         }
         stillRecording = false;
@@ -325,11 +330,13 @@ long long PrePostRollFlagger::findBreakInrange(long long startFrame,
             }
 
             if (stopFrame)
-                emit statusUpdate(QObject::tr("%1% Completed @ %2 fps.")
-                                  .arg(percentage).arg(flagFPS));
+                emit statusUpdate(QCoreApplication::translate("(mythcommflag)",
+                    "%1% Completed @ %2 fps.")
+                        .arg(percentage).arg(flagFPS));
             else
-                emit statusUpdate(QObject::tr("%1 Frames Completed @ %2 fps.")
-                                  .arg((long)currentFrameNumber).arg(flagFPS));
+                emit statusUpdate(QCoreApplication::translate("(mythcommflag)",
+                    "%1 Frames Completed @ %2 fps.")
+                        .arg((long)currentFrameNumber).arg(flagFPS));
 
             if (percentage % 10 == 0 && prevpercent != percentage)
             {

@@ -12,6 +12,7 @@ using namespace std;
 // Qt headers
 #include <QDir>
 #include <QFileInfo>
+#include <QCoreApplication>
 
 // MythTV headers
 #include "compat.h"
@@ -455,13 +456,13 @@ void CommDetector2::reportState(int elapsedms, long long frameno,
 
     if (nframes)
     {
-        emit statusUpdate(QObject::tr("%1% Completed @ %2 fps.")
-                .arg(percentage).arg(fps));
+        emit statusUpdate(QCoreApplication::translate("(mythcommflag)",
+            "%1% Completed @ %2 fps.").arg(percentage).arg(fps));
     }
     else
     {
-        emit statusUpdate(QObject::tr("%1 Frames Completed @ %2 fps.")
-                .arg(frameno).arg(fps));
+        emit statusUpdate(QCoreApplication::translate("(mythcommflag)",
+            "%1 Frames Completed @ %2 fps.").arg(frameno).arg(fps));
     }
 
     if (percentage % 10 == 0 && prevpercent != percentage)
@@ -586,7 +587,8 @@ bool CommDetector2::go(void)
         player->ResetTotalDuration();
 
         if (searchingForLogo(logoFinder, *currentPass))
-            emit statusUpdate(QObject::tr("Performing Logo Identification"));
+            emit statusUpdate(QCoreApplication::translate("(mythcommflag)",
+                "Performing Logo Identification"));
 
         clock.start();
         passTime.start();
