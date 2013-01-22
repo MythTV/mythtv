@@ -360,14 +360,9 @@ bool DVDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
             "http://code.mythtv.org/trac");
     }
 
-    dvdnav_current_title_info(m_dvdnav, &m_title, &m_part);
     dvdnav_get_title_string(m_dvdnav, &m_dvdname);
     dvdnav_get_serial_string(m_dvdnav, &m_serialnumber);
-    dvdnav_get_angle_info(m_dvdnav, &m_currentAngle, &m_currentTitleAngleCount);
     SetDVDSpeed();
-
-    // Populate the chapter list for this title, used in the OSD menu
-    GetChapterTimes(m_title);
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC +
             QString("DVD Serial Number %1").arg(m_serialnumber));
@@ -594,7 +589,15 @@ int DVDRingBuffer::safe_read(void *data, uint sz)
                 dvdnav_current_title_info(m_dvdnav, &m_title, &m_part);
                 dvdnav_get_number_of_parts(m_dvdnav, m_title, &m_titleParts);
                 dvdnav_get_position(m_dvdnav, &pos, &length);
-                m_titleLength = length *DVD_BLOCK_SIZE;
+                dvdnav_get_angle_info(m_dvdnav, &m_currentAngle, &m_currentTitleAngleCount);
+
+                if (m_title != m_lastTitle)
+                {
+                    // Populate the chapter list for this title, used in the OSD menu
+                    GetChapterTimes(m_title);
+                }
+
+                m_titleLength = length * DVD_BLOCK_SIZE;
                 if (!m_seeking)
                     m_cellstartPos = GetReadPosition();
 
@@ -811,7 +814,13 @@ int DVDRingBuffer::safe_read(void *data, uint sz)
                 }
 
                 // debug
-                LOG(VB_PLAYBACK, LOG_DEBUG, LOC + "DVDNAV_NAV_PACKET");
+                LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("DVDNAV_NAV_PACKET - time:%1, pos:%2, vob:%3, cell:%4, seeking:%5, seektime:%6")
+                    .arg(m_currentTime)
+                    .arg(m_currentpos)
+                    .arg(m_vobid)
+                    .arg(m_cellid)
+                    .arg(m_seeking)
+                    .arg(m_seektime));
 
                 // release buffer
                 if (blockBuf != m_dvdBlockWriteBuf)
