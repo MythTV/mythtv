@@ -1193,7 +1193,7 @@ bool MythPlayer::HasReachedEof(void) const
         return false;
     if (livetv)
         return false;
-    if (framesPlayed >= deleteMap.GetLastFrame())
+    if (!deleteMap.IsEmpty() && framesPlayed >= deleteMap.GetLastFrame())
         return true;
     return false;
 }
@@ -2939,6 +2939,9 @@ void MythPlayer::EventLoop(void)
                 LOG(VB_PLAYBACK, LOG_INFO,
                     QString("waiting for no video frames %1")
                     .arg(videoOutput->ValidVideoFrames()));
+            LOG(VB_PLAYBACK, LOG_INFO,
+                QString("HasReachedEof() at framesPlayed=%1 totalFrames=%2")
+                .arg(framesPlayed).arg(GetCurrentFrameCount()));
             Pause();
             SetPlaying(false);
             return;
