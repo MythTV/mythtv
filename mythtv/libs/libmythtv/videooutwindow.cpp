@@ -887,8 +887,8 @@ void VideoOutWindow::Zoom(ZoomDirection direction)
         if ((mz_scale_h < kManualZoomMaxHorizontalZoom) &&
             (mz_scale_v < kManualZoomMaxVerticalZoom))
         {
-            mz_scale_h *= 1.05f;
-            mz_scale_v *= 1.05f;
+            mz_scale_h *= 1.025f;
+            mz_scale_v *= 1.025f;
         }
         else
         {
@@ -902,8 +902,8 @@ void VideoOutWindow::Zoom(ZoomDirection direction)
         if ((mz_scale_h > kManualZoomMinHorizontalZoom) &&
             (mz_scale_v > kManualZoomMinVerticalZoom))
         {
-            mz_scale_h *= 1.0f / 1.05f;
-            mz_scale_v *= 1.0f / 1.05f;
+            mz_scale_h *= 1.0f / 1.025f;
+            mz_scale_v *= 1.0f / 1.025f;
         }
         else
         {
@@ -931,16 +931,16 @@ void VideoOutWindow::Zoom(ZoomDirection direction)
         }
     }
     else if (kZoomUp    == direction && (mz_move.y() <= +kManualZoomMaxMove))
-        mz_move.setY(mz_move.y() + 2);
+        mz_move.setY(mz_move.y() + 1);
     else if (kZoomDown  == direction && (mz_move.y() >= -kManualZoomMaxMove))
-        mz_move.setY(mz_move.y() - 2);
+        mz_move.setY(mz_move.y() - 1);
     else if (kZoomLeft  == direction && (mz_move.x() <= +kManualZoomMaxMove))
         mz_move.setX(mz_move.x() + 2);
     else if (kZoomRight == direction && (mz_move.x() >= -kManualZoomMaxMove))
         mz_move.setX(mz_move.x() - 2);
 
-    mz_scale_v = snap(mz_scale_v, 1.0f, 0.03f);
-    mz_scale_h = snap(mz_scale_h, 1.0f, 0.03f);
+    mz_scale_v = snap(mz_scale_v, 1.0f, 0.02f);
+    mz_scale_h = snap(mz_scale_h, 1.0f, 0.02f);
 }
 
 /// Correct for rounding errors
