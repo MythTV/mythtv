@@ -119,6 +119,8 @@ class VideoOutput
     virtual void ToggleAdjustFill(
         AdjustFillMode adjustFillMode = kAdjustFill_Toggle);
 
+    QString GetZoomString(void) const { return window.GetZoomString(); }
+
     // pass in null to use the pause frame, if it exists.
     virtual void ProcessFrame(VideoFrame *frame, OSD *osd,
                               FilterChain *filterList,

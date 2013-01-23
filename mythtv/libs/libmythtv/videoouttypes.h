@@ -36,6 +36,7 @@ typedef enum ZoomDirection
     kZoomRight,
     kZoomAspectUp,
     kZoomAspectDown,
+    kZoom_END
 } ZoomDirection;
 
 typedef enum AspectOverrideMode

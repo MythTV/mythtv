@@ -3971,61 +3971,70 @@ bool TV::ManualZoomHandleAction(PlayerContext *actx, const QStringList &actions)
 
     bool end_manual_zoom = false;
     bool handled = true;
+    bool updateOSD = true;
+    ZoomDirection zoom = kZoom_END;
     if (has_action(ACTION_ZOOMUP, actions))
-        actx->player->Zoom(kZoomUp);
+        zoom = kZoomUp;
     else if (has_action(ACTION_ZOOMDOWN, actions))
-        actx->player->Zoom(kZoomDown);
+        zoom = kZoomDown;
     else if (has_action(ACTION_ZOOMLEFT, actions))
-        actx->player->Zoom(kZoomLeft);
+        zoom = kZoomLeft;
     else if (has_action(ACTION_ZOOMRIGHT, actions))
-        actx->player->Zoom(kZoomRight);
+        zoom = kZoomRight;
     else if (has_action(ACTION_ZOOMASPECTUP, actions))
-        actx->player->Zoom(kZoomAspectUp);
+        zoom = kZoomAspectUp;
     else if (has_action(ACTION_ZOOMASPECTDOWN, actions))
-        actx->player->Zoom(kZoomAspectDown);
+        zoom = kZoomAspectDown;
     else if (has_action(ACTION_ZOOMIN, actions))
-        actx->player->Zoom(kZoomIn);
+        zoom = kZoomIn;
     else if (has_action(ACTION_ZOOMOUT, actions))
-        actx->player->Zoom(kZoomOut);
+        zoom = kZoomOut;
     else if (has_action(ACTION_ZOOMQUIT, actions))
     {
-        actx->player->Zoom(kZoomHome);
+        zoom = kZoomHome;
         end_manual_zoom = true;
     }
     else if (has_action(ACTION_ZOOMCOMMIT, actions))
+    {
+        end_manual_zoom = true;
         SetManualZoom(actx, false, tr("Zoom Committed"));
+    }
     else if (has_action(ACTION_UP, actions) ||
         has_action(ACTION_CHANNELUP, actions))
     {
-        actx->player->Zoom(kZoomUp);
+        zoom = kZoomUp;
     }
     else if (has_action(ACTION_DOWN, actions) ||
              has_action(ACTION_CHANNELDOWN, actions))
     {
-        actx->player->Zoom(kZoomDown);
+        zoom = kZoomDown;
     }
     else if (has_action(ACTION_LEFT, actions))
-        actx->player->Zoom(kZoomLeft);
+        zoom = kZoomLeft;
     else if (has_action(ACTION_RIGHT, actions))
-        actx->player->Zoom(kZoomRight);
+        zoom = kZoomRight;
     else if (has_action(ACTION_VOLUMEUP, actions))
-        actx->player->Zoom(kZoomAspectUp);
+        zoom = kZoomAspectUp;
     else if (has_action(ACTION_VOLUMEDOWN, actions))
-        actx->player->Zoom(kZoomAspectDown);
+        zoom = kZoomAspectDown;
     else if (has_action("ESCAPE", actions) ||
              has_action("BACK", actions))
     {
-        actx->player->Zoom(kZoomHome);
+        zoom = kZoomHome;
         end_manual_zoom = true;
     }
     else if (has_action(ACTION_SELECT, actions))
+    {
+        end_manual_zoom = true;
         SetManualZoom(actx, false, tr("Zoom Committed"));
+    }
     else if (has_action(ACTION_JUMPFFWD, actions))
-        actx->player->Zoom(kZoomIn);
+        zoom = kZoomIn;
     else if (has_action(ACTION_JUMPRWND, actions))
-        actx->player->Zoom(kZoomOut);
+        zoom = kZoomOut;
     else
     {
+        updateOSD = false;
         // only pass-through actions listed below
         handled = !(has_action("STRETCHINC",     actions) ||
                     has_action("STRETCHDEC",     actions) ||
@@ -4034,10 +4043,22 @@ bool TV::ManualZoomHandleAction(PlayerContext *actx, const QStringList &actions)
                     has_action(ACTION_PAUSE,     actions) ||
                     has_action(ACTION_CLEAROSD,  actions));
     }
+    QString msg = tr("Zoom Committed");
+    if (zoom != kZoom_END)
+    {
+        actx->player->Zoom(zoom);
+        if (end_manual_zoom)
+            msg = tr("Zoom Ignored");
+        else
+            msg = actx->player->GetVideoOutput()->GetZoomString();
+    }
+    else if (end_manual_zoom)
+        msg = tr("%1 Committed")
+            .arg(actx->player->GetVideoOutput()->GetZoomString());
     actx->UnlockDeletePlayer(__FILE__, __LINE__);
 
-    if (end_manual_zoom)
-        SetManualZoom(actx, false, tr("Zoom Ignored"));
+    if (updateOSD)
+        SetManualZoom(actx, !end_manual_zoom, msg);
 
     return handled;
 }
@@ -12140,7 +12161,8 @@ void TV::SetManualZoom(const PlayerContext *ctx, bool zoomON, QString desc)
         ClearOSD(ctx);
 
     if (!desc.isEmpty())
-        UpdateOSDSeekMessage(ctx, desc, kOSDTimeout_Med);
+        UpdateOSDSeekMessage(ctx, desc,
+                             zoomON ? kOSDTimeout_None : kOSDTimeout_Med);
 }
 
 bool TV::HandleJumpToProgramAction(
