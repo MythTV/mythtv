@@ -810,6 +810,28 @@ void TV::InitKeys(void)
             "Switch title"), "");
     REG_KEY("TV Playback", ACTION_SWITCHANGLE, QT_TRANSLATE_NOOP("MythControls",
             "Switch angle"), "");
+    REG_KEY("TV Playback", ACTION_ZOOMUP, QT_TRANSLATE_NOOP("MythControls",
+            "Zoom mode - shift up"), "");
+    REG_KEY("TV Playback", ACTION_ZOOMDOWN, QT_TRANSLATE_NOOP("MythControls",
+            "Zoom mode - shift down"), "");
+    REG_KEY("TV Playback", ACTION_ZOOMLEFT, QT_TRANSLATE_NOOP("MythControls",
+            "Zoom mode - shift left"), "");
+    REG_KEY("TV Playback", ACTION_ZOOMRIGHT, QT_TRANSLATE_NOOP("MythControls",
+            "Zoom mode - shift right"), "");
+    REG_KEY("TV Playback", ACTION_ZOOMASPECTUP,
+            QT_TRANSLATE_NOOP("MythControls",
+            "Zoom mode - increase aspect ratio"), "");
+    REG_KEY("TV Playback", ACTION_ZOOMASPECTDOWN,
+            QT_TRANSLATE_NOOP("MythControls",
+            "Zoom mode - decrease aspect ratio"), "");
+    REG_KEY("TV Playback", ACTION_ZOOMIN, QT_TRANSLATE_NOOP("MythControls",
+            "Zoom mode - zoom in"), "");
+    REG_KEY("TV Playback", ACTION_ZOOMOUT, QT_TRANSLATE_NOOP("MythControls",
+            "Zoom mode - zoom out"), "");
+    REG_KEY("TV Playback", ACTION_ZOOMQUIT, QT_TRANSLATE_NOOP("MythControls",
+            "Zoom mode - quit and abandon changes"), "");
+    REG_KEY("TV Playback", ACTION_ZOOMCOMMIT, QT_TRANSLATE_NOOP("MythControls",
+            "Zoom mode - commit changes"), "");
 
     /* Interactive Television keys */
     REG_KEY("TV Playback", ACTION_MENURED,    QT_TRANSLATE_NOOP("MythControls",
@@ -3949,7 +3971,30 @@ bool TV::ManualZoomHandleAction(PlayerContext *actx, const QStringList &actions)
 
     bool end_manual_zoom = false;
     bool handled = true;
-    if (has_action(ACTION_UP, actions) ||
+    if (has_action(ACTION_ZOOMUP, actions))
+        actx->player->Zoom(kZoomUp);
+    else if (has_action(ACTION_ZOOMDOWN, actions))
+        actx->player->Zoom(kZoomDown);
+    else if (has_action(ACTION_ZOOMLEFT, actions))
+        actx->player->Zoom(kZoomLeft);
+    else if (has_action(ACTION_ZOOMRIGHT, actions))
+        actx->player->Zoom(kZoomRight);
+    else if (has_action(ACTION_ZOOMASPECTUP, actions))
+        actx->player->Zoom(kZoomAspectUp);
+    else if (has_action(ACTION_ZOOMASPECTDOWN, actions))
+        actx->player->Zoom(kZoomAspectDown);
+    else if (has_action(ACTION_ZOOMIN, actions))
+        actx->player->Zoom(kZoomIn);
+    else if (has_action(ACTION_ZOOMOUT, actions))
+        actx->player->Zoom(kZoomOut);
+    else if (has_action(ACTION_ZOOMQUIT, actions))
+    {
+        actx->player->Zoom(kZoomHome);
+        end_manual_zoom = true;
+    }
+    else if (has_action(ACTION_ZOOMCOMMIT, actions))
+        SetManualZoom(actx, false, tr("Zoom Committed"));
+    else if (has_action(ACTION_UP, actions) ||
         has_action(ACTION_CHANNELUP, actions))
     {
         actx->player->Zoom(kZoomUp);

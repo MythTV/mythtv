@@ -47,10 +47,10 @@ static QSize fix_alignment(QSize raw);
 static float fix_aspect(float raw);
 static float snap(float value, float snapto, float diff);
 
-const float VideoOutWindow::kManualZoomMaxHorizontalZoom = 2.0f;
-const float VideoOutWindow::kManualZoomMaxVerticalZoom   = 2.0f;
-const float VideoOutWindow::kManualZoomMinHorizontalZoom = 0.5f;
-const float VideoOutWindow::kManualZoomMinVerticalZoom   = 0.5f;
+const float VideoOutWindow::kManualZoomMaxHorizontalZoom = 4.0f;
+const float VideoOutWindow::kManualZoomMaxVerticalZoom   = 4.0f;
+const float VideoOutWindow::kManualZoomMinHorizontalZoom = 0.25f;
+const float VideoOutWindow::kManualZoomMinVerticalZoom   = 0.25f;
 const int   VideoOutWindow::kManualZoomMaxMove           = 50;
 
 VideoOutWindow::VideoOutWindow() :
@@ -890,12 +890,6 @@ void VideoOutWindow::Zoom(ZoomDirection direction)
             mz_scale_h *= 1.025f;
             mz_scale_v *= 1.025f;
         }
-        else
-        {
-            float ratio = mz_scale_v / mz_scale_h;
-            mz_scale_h = 1.0f;
-            mz_scale_v = ratio * mz_scale_h;
-        }
     }
     else if (kZoomOut == direction)
     {
@@ -904,12 +898,6 @@ void VideoOutWindow::Zoom(ZoomDirection direction)
         {
             mz_scale_h *= 1.0f / 1.025f;
             mz_scale_v *= 1.0f / 1.025f;
-        }
-        else
-        {
-            float ratio = mz_scale_v / mz_scale_h;
-            mz_scale_h = 1.0f;
-            mz_scale_v = ratio * mz_scale_h;
         }
     }
     else if (kZoomAspectUp == direction)
