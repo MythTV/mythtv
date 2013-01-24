@@ -28,6 +28,7 @@ using namespace std;
 #include "commandlineparser.h"
 #include "recordinginfo.h"
 #include "signalhandling.h"
+#include "HLS/httplivestream.h"
 
 static void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist,
                         frm_dir_map_t *deleteMap, int &resultCode);
@@ -480,7 +481,13 @@ int main(int argc, char *argv[])
     ProgramInfo *pginfo = NULL;
     if (cmdline.toBool("hls"))
     {
-        pginfo = new ProgramInfo();
+        if (cmdline.toBool("hlsstreamid"))
+        {
+            HTTPLiveStream hls(cmdline.toInt("hlsstreamid"));
+            pginfo = new ProgramInfo(hls.GetSourceFile());
+        }
+        if (pginfo == NULL)
+            pginfo = new ProgramInfo();
     }
     else if (isVideo)
     {
