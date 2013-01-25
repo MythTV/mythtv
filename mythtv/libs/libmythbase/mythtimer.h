@@ -12,7 +12,7 @@
 class MBASE_PUBLIC MythTimer
 {
   public:
-    MythTimer() : m_offset(0) { m_timer.invalidate(); }
+    MythTimer() : m_offset(0) { m_timer.start(); }
 
     void start(void);
     int restart(void);
