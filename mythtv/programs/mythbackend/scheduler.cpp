@@ -1220,6 +1220,8 @@ bool Scheduler::TryAnotherShowing(RecordingInfo *p, bool samePriority,
 
         q->SetRecordingStatus(rsWillRecord);
         MarkOtherShowings(q);
+        if (q->GetRecordingStartTime() < livetvTime)
+            livetvTime = q->GetRecordingStartTime();
         PrintRec(p, "     -");
         PrintRec(q, "     +");
         return true;
@@ -1255,6 +1257,7 @@ void Scheduler::SchedNewRecords(void)
             "- = unschedule a showing in favor of another one");
     }
 
+    livetvTime = QDateTime::currentDateTime().addSecs(3600);
     int openEnd = gCoreContext->GetNumSetting("SchedOpenEnd", 0);
 
     RecIter i = worklist.begin();
@@ -1270,18 +1273,9 @@ void Scheduler::SchedNewRecords(void)
             if (!conflict)
             {
                 p->SetRecordingStatus(rsWillRecord);
-
-                if (p->GetRecordingStartTime() < schedTime.addSecs(90))
-                {
-                    QString id = p->MakeUniqueSchedulerKey();
-                    if (!recPendingList.contains(id))
-                        recPendingList[id] = false;
-
-                    livetvTime = (livetvTime < schedTime) ?
-                        schedTime : livetvTime;
-                }
-
                 MarkOtherShowings(p);
+                if (p->GetRecordingStartTime() < livetvTime)
+                    livetvTime = p->GetRecordingStartTime();
                 PrintRec(p, "  +");
             }
             else
@@ -1328,7 +1322,11 @@ void Scheduler::MoveHigherRecords(bool move_this)
         }
 
         if (p->GetRecordingStatus() == rsWillRecord)
+        {
+            if (p->GetRecordingStartTime() < livetvTime)
+                livetvTime = p->GetRecordingStartTime();
             PrintRec(p, "  +");
+        }
     }
 
     i = retrylist.begin();
@@ -1361,7 +1359,11 @@ void Scheduler::MoveHigherRecords(bool move_this)
         }
 
         if (move_this && p->GetRecordingStatus() == rsWillRecord)
+        {
+            if (p->GetRecordingStartTime() < livetvTime)
+                livetvTime = p->GetRecordingStartTime();
             PrintRec(p, "  +");
+        }
     }
 }
 
@@ -1972,7 +1974,7 @@ int Scheduler::CalcTimeToNextHandleRecordingEvent(
         int secs_to_next = curtime.secsTo((*i)->GetRecordingStartTime());
 
         if ((*i)->GetRecordingStatus() == rsWillRecord &&
-            !recPendingList[(*i)->MakeUniqueSchedulerKey()])
+            !recPendingList.contains((*i)->MakeUniqueSchedulerKey()))
             secs_to_next -= 30;
 
         if (secs_to_next < 0)
@@ -2318,13 +2320,12 @@ bool Scheduler::HandleRecording(
         if (!recPendingList.contains(schedid))
         {
             recPendingList[schedid] = false;
-
-            livetvTime = (livetvTime < nextrectime) ?
-                nextrectime : livetvTime;
-
-            m_queueLock.lock();
-            reschedQueue.enqueue(0);
-            m_queueLock.unlock();
+            if (schedTime.secsTo(curtime) > 30)
+            {
+                m_queueLock.lock();
+                reschedQueue.enqueue(0);
+                m_queueLock.unlock();
+            }
         }
     }
 
@@ -4926,14 +4927,12 @@ void Scheduler::FillDirectoryInfoCache(bool force)
 
 void Scheduler::SchedPreserveLiveTV(void)
 {
-    if (!livetvTime.isValid())
-        return;
+    int prerollseconds = gCoreContext->GetNumSetting("RecordPreRoll", 0);
+    QDateTime curtime = QDateTime::currentDateTime();
+    int secsleft = curtime.secsTo(livetvTime);
 
-    if (livetvTime < schedTime)
-    {
-        livetvTime = QDateTime();
+    if (secsleft - prerollseconds > 120)
         return;
-    }
 
     livetvpriority = gCoreContext->GetNumSetting("LiveTVPriority", 0);
 
@@ -4952,11 +4951,14 @@ void Scheduler::SchedPreserveLiveTV(void)
         if (!in.inputid)
             continue;
 
-        // Get the program that will be recording on this channel
-        // at record start time, if this LiveTV session continues.
+        // Get the program that will be recording on this channel at
+        // record start time and assume this LiveTV session continues
+        // for at least another 30 minutes from now.
         RecordingInfo *dummy = new RecordingInfo(
             in.chanid, livetvTime, true, 4);
-
+        dummy->SetRecordingStartTime(schedTime); 
+        if (schedTime.secsTo(dummy->GetRecordingEndTime()) < 1800) 
+            dummy->SetRecordingEndTime(schedTime.addSecs(1800)); 
         dummy->SetCardID(enc->GetCardID());
         dummy->SetInputID(in.inputid);
         dummy->SetRecordingStatus(rsUnknown);
