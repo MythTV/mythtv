@@ -865,6 +865,12 @@ int Transcode::TranscodeFile(const QString &inputname,
             case AV_CODEC_ID_MP2:
                 audio_codec_name = "mp2";
                 break;
+            case AV_CODEC_ID_AAC:
+                audio_codec_name = "aac";
+                break;
+            case AV_CODEC_ID_AAC_LATM:
+                audio_codec_name = "aac_latm";
+                break;
             default:
                 audio_codec_name = "unknown";
         }
