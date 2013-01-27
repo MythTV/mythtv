@@ -56,11 +56,18 @@ class TestMythTimer: public QObject
         QVERIFY(t.elapsed() > 50);
     }
 
-    void TimeDoesNotElapseImmediatelyAfterConstruction(void)
+    void TimeDoesNotElapseImmediatelyAfterConstructionByDefault(void)
     {
         MythTimer t;
         usleep(52 * 1000);
         QVERIFY(t.elapsed() == 0);
+    }
+
+    void TimeDoesNotElapsesImmediatelyAfterContructionIfIntended(void)
+    {
+        MythTimer t(MythTimer::kStartRunning);
+        usleep(52 * 1000);
+        QVERIFY(t.elapsed() > 50);
     }
 
     void TimeElapsesContinually(void)

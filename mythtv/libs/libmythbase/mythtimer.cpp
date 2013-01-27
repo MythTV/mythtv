@@ -22,6 +22,25 @@
 // MythTV includes
 #include "mythtimer.h"
 
+//#define DEBUG_TIMER_API_USAGE
+#ifdef DEBUG_TIMER_API_USAGE
+#undef NDEBUG
+#include <cassert>
+#endif
+
+/** Creates a timer.
+ *
+ *  If a start state of kStartRunning is passed in the timer is
+ *  started immediately as if start() had been called.
+ */
+MythTimer::MythTimer(StartState state) : m_offset(0)
+{
+    if (kStartRunning == state)
+        start();
+    else
+        stop();
+}
+
 /// starts measuring elapsed time.
 void MythTimer::start(void)
 {
@@ -69,7 +88,12 @@ void MythTimer::stop(void)
 int MythTimer::elapsed(void) const
 {
     if (!m_timer.isValid())
+    {
+#ifdef DEBUG_TIMER_API_USAGE
+        assert(0 == "elapsed called without timer being started");
+#endif
         return 0;
+    }
 
     int64_t e = m_timer.elapsed();
     if (!m_timer.isMonotonic() && (e > 86300000))

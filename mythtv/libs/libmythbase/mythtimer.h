@@ -12,7 +12,12 @@
 class MBASE_PUBLIC MythTimer
 {
   public:
-    MythTimer() : m_offset(0) { m_timer.start(); }
+    typedef enum {
+        kStartRunning,
+        kStartInactive,
+    } StartState;
+
+    MythTimer(StartState state = kStartInactive);
 
     void start(void);
     int restart(void);
