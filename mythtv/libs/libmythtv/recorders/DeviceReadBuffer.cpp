@@ -34,7 +34,7 @@ DeviceReadBuffer::DeviceReadBuffer(
 
       size(0),                      used(0),
       read_quanta(0),
-      dev_read_size(0),             min_read(0),
+      dev_read_size(0),             readThreshold(0),
 
       buffer(NULL),                 readPtr(NULL),
       writePtr(NULL),               endPtr(NULL),
@@ -96,7 +96,7 @@ bool DeviceReadBuffer::Setup(const QString &streamName, int streamfd,
     dev_read_size = read_quanta * (using_poll ? 256 : 48);
     dev_read_size = (deviceBufferSize) ?
         min(dev_read_size, (size_t)deviceBufferSize) : dev_read_size;
-    min_read      = read_quanta * 4;
+    readThreshold = read_quanta * 128;
 
     buffer        = new (nothrow) unsigned char[size + dev_read_size];
     readPtr       = buffer;
@@ -382,6 +382,10 @@ void DeviceReadBuffer::run(void)
                 memcpy(buffer, endPtr, writePtr + len - endPtr);
             IncrWritePointer(len);
         }
+
+        // Slow down reading if not under load
+        if (len < static_cast<int32_t>(dev_read_size / 2))
+            usleep(1000);
     }
 
     ClosePipes();
@@ -625,7 +629,7 @@ bool DeviceReadBuffer::CheckForErrors(
  */
 uint DeviceReadBuffer::Read(unsigned char *buf, const uint count)
 {
-    uint avail = WaitForUsed(min(count, (uint)dev_read_size), 20);
+    uint avail = WaitForUsed(min(count, (uint)readThreshold), 20);
     size_t cnt = min(count, avail);
 
     if (!cnt)

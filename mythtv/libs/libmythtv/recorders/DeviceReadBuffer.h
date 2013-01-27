@@ -103,7 +103,7 @@ class DeviceReadBuffer : protected MThread
     size_t           used;
     size_t           read_quanta;
     size_t           dev_read_size;
-    size_t           min_read;
+    size_t           readThreshold;
     unsigned char   *buffer;
     unsigned char   *readPtr;
     unsigned char   *writePtr;

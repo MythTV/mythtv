@@ -206,12 +206,6 @@ void ASIStreamHandler::run(void)
             _error = true;
         }
 
-        if ((0 == len) || (-1 == len))
-        {
-            usleep(100);
-            continue;
-        }
-
         len += remainder;
 
         if (len < 10) // 10 bytes = 4 bytes TS header + 6 bytes PES header
