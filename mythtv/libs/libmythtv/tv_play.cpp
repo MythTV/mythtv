@@ -7946,7 +7946,8 @@ void TV::UpdateOSDSignal(const PlayerContext *ctx, const QStringList &strlist)
     SignalMonitorList slist = SignalMonitorValue::Parse(strlist);
 
     InfoMap infoMap = ctx->lastSignalUIInfo;
-    if (ctx->lastSignalUIInfoTime.elapsed() > 5000 ||
+    if ((!ctx->lastSignalUIInfoTime.isRunning() ||
+         (ctx->lastSignalUIInfoTime.elapsed() > 5000)) ||
         infoMap["callsign"].isEmpty())
     {
         ctx->lastSignalUIInfo.clear();
