@@ -2524,6 +2524,31 @@ uint CardUtil::GetASIBufferSize(uint device_num, QString *error)
 #endif
 }
 
+uint CardUtil::GetASINumBuffers(uint device_num, QString *error)
+{
+#ifdef USING_ASI
+    // get the buffer size
+    QString sys_numbuffers_contents = read_sys(sys_dev(device_num, "buffers"));
+    bool ok;
+    uint num_buffers = sys_numbuffers_contents.toUInt(&ok);
+    if (!ok)
+    {
+        if (error)
+        {
+            *error = QString("Failed to read num buffers from '%1'")
+                .arg(sys_dev(device_num, "buffers"));
+        }
+        return 0;
+    }
+    return num_buffers;
+#else
+    (void) device_num;
+    if (error)
+        *error = "Not compiled with ASI support.";
+    return 0;
+#endif
+}
+
 int CardUtil::GetASIMode(uint device_num, QString *error)
 {
 #ifdef USING_ASI

@@ -77,6 +77,7 @@ class ASIStreamHandler : public StreamHandler
   private:
     int                                     _device_num;
     int                                     _buf_size;
+    int                                     _num_buffers;
     int                                     _fd;
     uint                                    _packet_size;
     ASIClockSource                          _clock_source;

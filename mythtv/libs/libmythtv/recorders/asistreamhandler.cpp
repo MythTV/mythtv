@@ -145,7 +145,8 @@ void ASIStreamHandler::run(void)
     }
 
     DeviceReadBuffer *drb = new DeviceReadBuffer(this, true, false);
-    bool ok = drb->Setup(_device, _fd, _packet_size, _buf_size);
+    bool ok = drb->Setup(_device, _fd, _packet_size, _buf_size,
+                         _num_buffers / 4);
     if (!ok)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to allocate DRB buffer");
@@ -275,6 +276,13 @@ bool ASIStreamHandler::Open(void)
 
     _buf_size = CardUtil::GetASIBufferSize(_device_num, &error);
     if (_buf_size <= 0)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + error);
+        return false;
+    }
+
+    _num_buffers = CardUtil::GetASINumBuffers(_device_num, &error);
+    if (_num_buffers <= 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + error);
         return false;
