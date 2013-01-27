@@ -128,7 +128,7 @@ void MythScreenStack::PopScreen(MythScreenType *screen, bool allowFade,
                 m_Children.remove(i);
         }
         if (deleteScreen)
-            delete screen;
+            screen->deleteLater();
 
         screen = NULL;
 
