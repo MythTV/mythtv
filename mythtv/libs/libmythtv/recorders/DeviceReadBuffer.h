@@ -41,7 +41,8 @@ class DeviceReadBuffer : protected MThread
     bool Setup(const QString &streamName,
                int streamfd,
                uint readQuanta       = sizeof(TSPacket),
-               uint deviceBufferSize = 0);
+               uint deviceBufferSize = 0,
+               uint deviceBufferCount = 1);
 
     void Start(void);
     void Reset(const QString &streamName, int streamfd);
@@ -102,6 +103,7 @@ class DeviceReadBuffer : protected MThread
     size_t           size;
     size_t           used;
     size_t           read_quanta;
+    size_t           dev_buffer_count;
     size_t           dev_read_size;
     size_t           readThreshold;
     unsigned char   *buffer;
