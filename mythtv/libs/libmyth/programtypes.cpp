@@ -249,7 +249,8 @@ QString toDescription(RecStatusType recstatus, RecordingType rectype,
     QString message;
     QDateTime now = MythDate::current();
 
-    if (recstatus <= rsWillRecord)
+    if (recstatus <= rsWillRecord ||
+        recstatus == rsOtherShowing)
     {
         switch (recstatus)
         {
@@ -274,38 +275,36 @@ QString toDescription(RecStatusType recstatus, RecordingType rectype,
                 message = QObject::tr("This showing was recorded.");
                 break;
             case rsAborted:
-                message = QObject::tr(
-                    "This showing was recorded but was aborted "
-                    "before recording was completed.");
+                message = QObject::tr("This showing was recorded but was "
+                                      "aborted before completion.");
                 break;
             case rsMissed:
-                message = QObject::tr(
-                    "This showing was not recorded because the "
-                    "master backend was hung or not running.");
-                break;
             case rsMissedFuture:
-                message = 
-                    "This showing was not recorded because the "
-                    "master backend was hung or not running.";
+                message = QObject::tr("This showing was not recorded because "
+                                      "the master backend was not running.");
                 break;
             case rsCancelled:
-                message = QObject::tr(
-                    "This showing was not recorded because it "
-                    "was manually cancelled.");
+                message = QObject::tr("This showing was not recorded because "
+                                      "it was manually cancelled.");
                 break;
             case rsLowDiskSpace:
-                message = QObject::tr(
-                    "There wasn't enough disk space available.");
+                message = QObject::tr("This showing was not recorded because "
+                                      "there wasn't enough disk space.");
                 break;
             case rsTunerBusy:
-                message = QObject::tr("The tuner card was already being used.");
+                message = QObject::tr("This showing was not recorded because "
+                                      "the recorder was already in use.");
                 break;
             case rsFailed:
-                message = QObject::tr("The recorder failed to record.");
+                message = QObject::tr("This showing was not recorded because "
+                                      "the recorder failed.");
+                break;
+            case rsOtherShowing:
+                message += QObject::tr("This showing will be recorded on a "
+                                       "different channel.");
                 break;
             default:
-                message = QObject::tr(
-                    "The status of this showing is unknown.");
+                message = QObject::tr("The status of this showing is unknown.");
                 break;
         }
 
@@ -346,7 +345,7 @@ QString toDescription(RecStatusType recstatus, RecordingType rectype,
             break;
         case rsLaterShowing:
             message += QObject::tr("this episode will be recorded at a "
-                                   "later time.");
+                                   "later time instead.");
             break;
         case rsRepeat:
             message += QObject::tr("this episode is a repeat.");
@@ -362,11 +361,7 @@ QString toDescription(RecStatusType recstatus, RecordingType rectype,
             message += QObject::tr("it was marked to never be recorded.");
             break;
         case rsOffLine:
-            message += QObject::tr("the backend recorder is off-line.");
-            break;
-        case rsOtherShowing:
-            message += QObject::tr("this episode will be recorded on a "
-                                   "different channel in this time slot.");
+            message += QObject::tr("the required recorder is off-line.");
             break;
         default:
             if (recstartts > now)
