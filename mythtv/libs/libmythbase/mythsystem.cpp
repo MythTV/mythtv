@@ -110,7 +110,7 @@ void MythSystem::SetCommand(const QString &command,
     // add logging arguments
     if (GetSetting("PropagateLogs"))
     {
-        if (m_args.isEmpty())
+        if (GetSetting("UseShell") && m_args.isEmpty())
         {
             m_command += logPropagateArgs;
             if (!logPropagateQuiet())
