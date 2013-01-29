@@ -68,7 +68,6 @@ using namespace std;
 #include "myththemedmenu.h"
 #include "mediarenderer.h"
 #include "mythmainwindow.h"
-#include "screenwizard.h"
 #include "mythcontrols.h"
 #include "mythuihelper.h"
 #include "mythdirs.h"
@@ -292,17 +291,40 @@ namespace
 
 static void startAppearWiz(void)
 {
-    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+    int curX = gCoreContext->GetNumSetting("GuiOffsetX", 0);
+    int curY = gCoreContext->GetNumSetting("GuiOffsetY", 0);
+    int curW = gCoreContext->GetNumSetting("GuiWidth", 0);
+    int curH = gCoreContext->GetNumSetting("GuiHeight", 0);
 
-    ScreenWizard *screenwizard = new ScreenWizard(mainStack,
-                                                        "screenwizard");
+    MythSystem *wizard = new MythSystem(
+                    GetInstallPrefix() + "/bin/mythscreenwizard",
+                    QStringList(),
+                    kMSNoRunShell | kMSDisableUDPListener | kMSPropagateLogs);
+    wizard->Run();
 
-    if (screenwizard->Create())
-        mainStack->AddScreen(screenwizard);
-    else
-        delete screenwizard;
+    bool reload = false;
+
+    if (!wizard->Wait())
+    {
+        // no reported errors, check for changed geometry parameters
+        gCoreContext->ClearSettingsCache("GuiOffsetX");
+        gCoreContext->ClearSettingsCache("GuiOffsetY");
+        gCoreContext->ClearSettingsCache("GuiWidth");
+        gCoreContext->ClearSettingsCache("GuiHeight");
+
+        if ((curX != gCoreContext->GetNumSetting("GuiOffsetX", 0)) ||
+            (curY != gCoreContext->GetNumSetting("GuiOffsetY", 0)) ||
+            (curW != gCoreContext->GetNumSetting("GuiWidth", 0)) ||
+            (curH != gCoreContext->GetNumSetting("GuiHeight", 0)))
+                reload = true;
+    }
+
+    delete wizard;
+    wizard = NULL;
+
+    if (reload)
+        GetMythMainWindow()->JumpTo("Reload Theme");
 }
-
 
 static void startKeysSetup()
 {
@@ -864,7 +886,7 @@ static void TVMenuCallback(void *data, QString &selection)
     }
     else if (sel == "screensetupwizard")
     {
-       startAppearWiz();
+        startAppearWiz();
     }
     else if (sel == "setup_keys")
     {

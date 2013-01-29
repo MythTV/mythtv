@@ -10,20 +10,20 @@
             <align>center</align>
         </textarea>
 
-        <imagetype name="topleft">
-            <position>0,0</position>
-            <filename>topleft.png</filename>
-        </imagetype>
+        <shape name="blackout">
+            <type>box</type>
+            <fill style="solid" color="black"></fill>
+        </shape>
 
-        <imagetype name="bottomright">
-            <position>800,600</position>
-            <filename>bottomright.png</filename>
+        <imagetype name="preview">
+            <filename>preview.png</filename>
+            <preserveaspect>FALSE</preserveaspect>
         </imagetype>
 
         <textarea name="part1" from="basetextarea">
             <font>basemedium</font>
             <area>100,140,600,170</area>
-            <value>Move the selected arrow to the corner of the TV screen.  Press SELECT to edit the other arrow.  Press MENU for options and ESC to quit.</value>
+            <value>Move the selected corner of the preview image to the corner of the TV screen.  Press SELECT to edit the other corner.  Press MENU for options and ESC to quit.</value>
             <multiline>yes</multiline>
         </textarea>
 
