@@ -2800,7 +2800,6 @@ void MythPlayer::EventStart(void)
 
 void MythPlayer::EventLoop(void)
 {
-    uint64_t frameCount = GetCurrentFrameCount();
     // recreate the osd if a reinit was triggered by another thread
     if (reinit_osd)
         ReinitOSD();
@@ -2990,6 +2989,7 @@ void MythPlayer::EventLoop(void)
         {
             QString msg;
             uint64_t jumpto = 0;
+            uint64_t frameCount = GetCurrentFrameCount();
             // XXX CommBreakMap should use duration map not video_frame_rate
             bool jump = commBreakMap.DoSkipCommercials(jumpto, framesPlayed,
                                                        video_frame_rate,
@@ -3009,6 +3009,7 @@ void MythPlayer::EventLoop(void)
        (kCommSkipOff != commBreakMap.GetAutoCommercialSkip()))
     {
         QString msg;
+        uint64_t frameCount = GetCurrentFrameCount();
         // XXX CommBreakMap should use duration map not video_frame_rate
         bool jump = commBreakMap.AutoCommercialSkip(jumpto, framesPlayed,
                                                     video_frame_rate,
