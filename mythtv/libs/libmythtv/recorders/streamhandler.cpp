@@ -356,7 +356,7 @@ bool StreamHandler::UpdateFiltersFromStreamData(void)
         ok &= AddPIDFilter(*ait);
 
     // Cycle filters if it's been a while
-    if (_cycle_timer.elapsed() > 1000)
+    if (_cycle_timer.isRunning() && (_cycle_timer.elapsed() > 1000))
         CycleFiltersByPriority();
 
     return ok;
