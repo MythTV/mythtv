@@ -94,7 +94,7 @@ MPEGStreamData::MPEGStreamData(int desiredProgram, int cardnum,
 
 MPEGStreamData::~MPEGStreamData()
 {
-    ResetMPEG(-1);
+    Reset(-1);
     SetPATSingleProgram(NULL);
     SetPMTSingleProgram(NULL);
 
@@ -140,7 +140,7 @@ void MPEGStreamData::SetDesiredProgram(int p)
     ReturnCachedPATTables(pats);
 
     if (reset)
-        ResetMPEG(p);
+        Reset(p);
 }
 
 void MPEGStreamData::SetRecordingType(const QString &recording_type)
@@ -172,7 +172,7 @@ void MPEGStreamData::SetEITRate(float rate)
     _eit_rate = rate;
 }
 
-void MPEGStreamData::ResetMPEG(int desiredProgram)
+void MPEGStreamData::Reset(int desiredProgram)
 {
     _desired_program       = desiredProgram;
     _recording_type        = "all";

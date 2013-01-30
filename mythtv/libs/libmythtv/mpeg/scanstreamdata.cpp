@@ -43,8 +43,9 @@ bool ScanStreamData::HandleTables(uint pid, const PSIPTable &psip)
 
 void ScanStreamData::Reset(void)
 {
-    ATSCStreamData::Reset();
-    DVBStreamData::Reset();
+    MPEGStreamData::Reset(-1);
+    ATSCStreamData::Reset(-1,-1);
+    DVBStreamData::Reset(0,0,-1);
 
     if (m_no_default_pid)
     {
@@ -58,26 +59,6 @@ void ScanStreamData::Reset(void)
     AddListeningPID(DVB_SDT_PID);
     if (dvb_uk_freesat_si)
         AddListeningPID(FREESAT_SI_PID);
-}
-
-void ScanStreamData::ResetMPEG(int desired_program)
-{
-    ATSCStreamData::ResetMPEG(desired_program);
-    DVBStreamData::ResetMPEG(desired_program);
-}
-
-void ScanStreamData::ResetATSC(
-    int desired_major_channel, int desired_minor_channel)
-{
-    DVBStreamData::ResetDVB(0, 0, -1);
-    ATSCStreamData::ResetATSC(desired_major_channel, desired_minor_channel);
-}
-
-void ScanStreamData::ResetDVB(
-    uint desired_netid, uint desired_tsid, int desired_sid)
-{
-    ATSCStreamData::ResetATSC(0, 0);
-    DVBStreamData::ResetDVB(desired_netid, desired_tsid, desired_sid);
 }
 
 QString ScanStreamData::GetSIStandard(QString guess) const

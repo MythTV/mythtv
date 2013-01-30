@@ -8,6 +8,7 @@
 #include "mythtvexp.h"
 
 class MTV_PUBLIC ScanStreamData :
+    public virtual MPEGStreamData,
     public ATSCStreamData,
     public DVBStreamData
 {
@@ -18,10 +19,7 @@ class MTV_PUBLIC ScanStreamData :
     bool IsRedundant(uint pid, const PSIPTable&) const;
     bool HandleTables(uint pid, const PSIPTable &psip);
 
-    virtual void Reset(void);
-    virtual void ResetMPEG(int program);
-    virtual void ResetATSC(int major_channel, int minor_channel);
-    virtual void ResetDVB(uint netid, uint tsid, int sid);
+    void Reset(void);
 
     bool HasEITPIDChanges(const uint_vec_t& /*in_use_pids*/) const
         { return false; }
