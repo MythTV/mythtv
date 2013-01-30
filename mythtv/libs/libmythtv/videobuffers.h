@@ -94,7 +94,7 @@ class VideoBuffers
     void requeue(BufferType dst, BufferType src, int num = 1);
     void enqueue(BufferType, VideoFrame*);
     void safeEnqueue(BufferType, VideoFrame* frame);
-    void remove(BufferType, VideoFrame *); // multiple buffer types ok
+    void Remove(BufferType, VideoFrame *); // multiple buffer types ok
     frame_queue_t::iterator begin_lock(BufferType); // this locks VideoBuffer
     frame_queue_t::iterator end(BufferType);
     void end_lock() { global_lock.unlock(); } // this unlocks VideoBuffer

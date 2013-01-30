@@ -531,7 +531,6 @@ bool DBUtil::CreateTemporaryDBConf(
     filename = createTempFile("/tmp/mythtv_db_backup_conf_XXXXXX");
     const QByteArray     tmpfile     = filename.toLocal8Bit();
     const DatabaseParams dbParams    = gCoreContext->GetDatabaseParams();
-    const QString        dbSchemaVer = gCoreContext->GetSetting("DBSchemaVer");
 
     FILE *fp = fopen(tmpfile.constData(), "w");
     if (!fp)

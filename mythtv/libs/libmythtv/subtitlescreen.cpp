@@ -871,10 +871,10 @@ void SubtitleScreen::DisplayAVSubtitles(void)
                 if (lh > 0)
                 {
                     bbox = QRect(0, uh, rect->w, lh);
-                    lh = DisplayScaledAVSubtitles(rect, bbox, false, display,
-                                                  subtitle.forced,
-                                                  QString("avsub%1b").arg(i),
-                                                  displayuntil, late);
+                    DisplayScaledAVSubtitles(rect, bbox, false, display,
+                                             subtitle.forced,
+                                             QString("avsub%1b").arg(i),
+                                             displayuntil, late);
                 }
             }
 #ifdef USING_LIBASS

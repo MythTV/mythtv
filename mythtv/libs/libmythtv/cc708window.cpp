@@ -552,9 +552,8 @@ void CC708Pen::SetPenStyle(uint style)
 }
 
 CC708Character::CC708Character(const CC708Window &win)
+    : attr(win.pen.attr), character(' ')
 {
-    attr = win.pen.attr;
-    character = ' ';
 }
 
 bool CC708CharacterAttribute::operator==(

@@ -353,7 +353,7 @@ void VideoBuffers::DoneDisplayingFrame(VideoFrame *frame)
     QMutexLocker locker(&global_lock);
 
     if(used.contains(frame))
-        remove(kVideoBuffer_used, frame);
+        Remove(kVideoBuffer_used, frame);
 
     enqueue(kVideoBuffer_finished, frame);
 
@@ -364,7 +364,7 @@ void VideoBuffers::DoneDisplayingFrame(VideoFrame *frame)
     {
         if (!decode.contains(*it))
         {
-            remove(kVideoBuffer_finished, *it);
+            Remove(kVideoBuffer_finished, *it);
             enqueue(kVideoBuffer_avail, *it);
         }
     }
@@ -488,7 +488,7 @@ void VideoBuffers::enqueue(BufferType type, VideoFrame *frame)
     return;
 }
 
-void VideoBuffers::remove(BufferType type, VideoFrame *frame)
+void VideoBuffers::Remove(BufferType type, VideoFrame *frame)
 {
     if (!frame)
         return;
@@ -531,7 +531,7 @@ void VideoBuffers::safeEnqueue(BufferType dst, VideoFrame* frame)
 
     QMutexLocker locker(&global_lock);
 
-    remove(kVideoBuffer_all, frame);
+    Remove(kVideoBuffer_all, frame);
     enqueue(dst, frame);
 }
 
@@ -663,7 +663,7 @@ void VideoBuffers::DiscardFrames(bool next_frame_keyframe)
     // Make sure frames used by decoder are last...
     // This is for libmpeg2 which still uses the frames after a reset.
     for (it = decode.begin(); it != decode.end(); ++it)
-        remove(kVideoBuffer_all, *it);
+        Remove(kVideoBuffer_all, *it);
     for (it = decode.begin(); it != decode.end(); ++it)
         available.enqueue(*it);
     decode.clear();

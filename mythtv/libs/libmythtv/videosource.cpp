@@ -2406,7 +2406,7 @@ void CaptureCard::Save(void)
         init_cardid = cardid;
 
     // Delete old clone cards as required.
-    for (uint i = cardids.size() - 1; (i > cloneCount) && cardids.size(); i--)
+    for (uint i = cardids.size() - 1; (i > cloneCount) && !cardids.empty(); i--)
     {
         CardUtil::DeleteCard(cardids.back());
         cardids.pop_back();
@@ -2773,7 +2773,7 @@ void StartingChannel::SetSourceID(const QString &sourceid)
     // (selecting the old start channel if it is there).
     QString order = gCoreContext->GetSetting("ChannelOrdering", "channum");
     ChannelUtil::SortChannels(channels, order);
-    bool has_visible = false, found_existing = false;
+    bool has_visible = false;
     for (uint i = 0; i < channels.size() && !has_visible; i++)
         has_visible |= channels[i].visible;
 
@@ -2784,7 +2784,6 @@ void StartingChannel::SetSourceID(const QString &sourceid)
         if (!has_visible || channels[i].visible || sel)
         {
             addSelection(channum, channum, sel);
-            found_existing |= sel;
         }
     }
 }

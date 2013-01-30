@@ -938,7 +938,6 @@ void MSqlEscapeAsAQuery(QString &query, MSqlBindings &bindings)
         i += rx.matchedLength();
     }
 
-    q = query;
     QVariant val;
     QString holder;
 
