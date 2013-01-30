@@ -387,8 +387,8 @@ VideoFrame* VideoOutputNullVDPAU::GetLastDecodedFrame(void)
 
     VideoFrame* gpu = vbuffers.GetLastDecodedFrame();
     for (uint i = 0; i < vbuffers.Size(); i++)
-        if (vbuffers.at(i) == gpu)
-            return m_shadowBuffers->at(i);
+        if (vbuffers.At(i) == gpu)
+            return m_shadowBuffers->At(i);
     LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to find frame.");
     return NULL;
 }
@@ -401,8 +401,8 @@ VideoFrame* VideoOutputNullVDPAU::GetLastShownFrame(void)
 
     VideoFrame* gpu = vbuffers.GetLastShownFrame();
     for (uint i = 0; i < vbuffers.Size(); i++)
-        if (vbuffers.at(i) == gpu)
-            return m_shadowBuffers->at(i);
+        if (vbuffers.At(i) == gpu)
+            return m_shadowBuffers->At(i);
     LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to find frame.");
     return NULL;
 }
@@ -416,9 +416,9 @@ void VideoOutputNullVDPAU::DiscardFrame(VideoFrame *frame)
     // is this a CPU frame
     for (uint i = 0; i < m_shadowBuffers->Size(); i++)
     {
-        if (m_shadowBuffers->at(i) == frame)
+        if (m_shadowBuffers->At(i) == frame)
         {
-            frame = vbuffers.at(i);
+            frame = vbuffers.At(i);
             break;
         }
     }
@@ -426,7 +426,7 @@ void VideoOutputNullVDPAU::DiscardFrame(VideoFrame *frame)
     // is this a GPU frame
     for (uint i = 0; i < vbuffers.Size(); i++)
     {
-        if (vbuffers.at(i) == frame)
+        if (vbuffers.At(i) == frame)
         {
             m_lock.lock();
             vbuffers.DoneDisplayingFrame(frame);
@@ -445,9 +445,9 @@ void VideoOutputNullVDPAU::DoneDisplayingFrame(VideoFrame *frame)
     // is this a CPU frame
     for (uint i = 0; i < m_shadowBuffers->Size(); i++)
     {
-        if (m_shadowBuffers->at(i) == frame)
+        if (m_shadowBuffers->At(i) == frame)
         {
-            frame = vbuffers.at(i);
+            frame = vbuffers.At(i);
             break;
         }
     }
@@ -455,10 +455,10 @@ void VideoOutputNullVDPAU::DoneDisplayingFrame(VideoFrame *frame)
     // is this a GPU frame
     for (uint i = 0; i < vbuffers.Size(); i++)
     {
-        if (vbuffers.at(i) == frame)
+        if (vbuffers.At(i) == frame)
         {
             m_lock.lock();
-            if (vbuffers.contains(kVideoBuffer_used, frame))
+            if (vbuffers.Contains(kVideoBuffer_used, frame))
                 DiscardFrame(frame);
             CheckFrameStates();
             m_lock.unlock();
@@ -484,9 +484,9 @@ void VideoOutputNullVDPAU::ReleaseFrame(VideoFrame *frame)
             // assume a direct mapping of GPU to CPU buffers
             for (uint i = 0; i < vbuffers.Size(); i++)
             {
-                if (vbuffers.at(i)->buf == frame->buf)
+                if (vbuffers.At(i)->buf == frame->buf)
                 {
-                    VideoFrame *vf = m_shadowBuffers->at(i);
+                    VideoFrame *vf = m_shadowBuffers->At(i);
                     uint32_t pitches[] = {
                         vf->pitches[0],
                         vf->pitches[2],
@@ -579,7 +579,7 @@ void VideoOutputNullVDPAU::CheckFrameStates(void)
     while (it != vbuffers.end(kVideoBuffer_displayed))
     {
         VideoFrame* frame = *it;
-        if (vbuffers.contains(kVideoBuffer_decode, frame))
+        if (vbuffers.Contains(kVideoBuffer_decode, frame))
         {
             LOG(VB_PLAYBACK, LOG_INFO, LOC +
                 QString("Frame %1 is in use by avlib and so is "
@@ -588,7 +588,7 @@ void VideoOutputNullVDPAU::CheckFrameStates(void)
         }
         else
         {
-            vbuffers.safeEnqueue(kVideoBuffer_avail, frame);
+            vbuffers.SafeEnqueue(kVideoBuffer_avail, frame);
             vbuffers.end_lock();
             it = vbuffers.begin_lock(kVideoBuffer_displayed);
             continue;

@@ -826,9 +826,9 @@ void VideoOutputVDPAU::UpdatePauseFrame(int64_t &disp_timecode)
 
     vbuffers.begin_lock(kVideoBuffer_used);
 
-    if (vbuffers.size(kVideoBuffer_used) && m_render)
+    if (vbuffers.Size(kVideoBuffer_used) && m_render)
     {
-        VideoFrame *frame = vbuffers.head(kVideoBuffer_used);
+        VideoFrame *frame = vbuffers.Head(kVideoBuffer_used);
         disp_timecode = frame->disp_timecode;
         if (codec_is_std(video_codec_id))
         {
@@ -978,7 +978,7 @@ void VideoOutputVDPAU::DiscardFrame(VideoFrame *frame)
 
     m_lock.lock();
     if (FrameIsInUse(frame))
-        vbuffers.safeEnqueue(kVideoBuffer_displayed, frame);
+        vbuffers.SafeEnqueue(kVideoBuffer_displayed, frame);
     else
     {
         vbuffers.DoneDisplayingFrame(frame);
@@ -1002,7 +1002,7 @@ void VideoOutputVDPAU::DiscardFrames(bool next_frame_keyframe)
 void VideoOutputVDPAU::DoneDisplayingFrame(VideoFrame *frame)
 {
     m_lock.lock();
-    if (vbuffers.contains(kVideoBuffer_used, frame))
+    if (vbuffers.Contains(kVideoBuffer_used, frame))
         DiscardFrame(frame);
     CheckFrameStates();
     m_lock.unlock();
@@ -1018,7 +1018,7 @@ void VideoOutputVDPAU::CheckFrameStates(void)
         VideoFrame* frame = *it;
         if (!FrameIsInUse(frame))
         {
-            if (vbuffers.contains(kVideoBuffer_decode, frame))
+            if (vbuffers.Contains(kVideoBuffer_decode, frame))
             {
                 LOG(VB_PLAYBACK, LOG_INFO, LOC +
                     QString("Frame %1 is in use by avlib and so is "
@@ -1027,7 +1027,7 @@ void VideoOutputVDPAU::CheckFrameStates(void)
             }
             else
             {
-                vbuffers.safeEnqueue(kVideoBuffer_avail, frame);
+                vbuffers.SafeEnqueue(kVideoBuffer_avail, frame);
                 vbuffers.end_lock();
                 it = vbuffers.begin_lock(kVideoBuffer_displayed);
                 continue;

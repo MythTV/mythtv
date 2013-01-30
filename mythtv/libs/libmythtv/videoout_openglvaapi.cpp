@@ -237,9 +237,9 @@ void VideoOutputOpenGLVAAPI::UpdatePauseFrame(int64_t &disp_timecode)
     }
 
     vbuffers.begin_lock(kVideoBuffer_used);
-    if (vbuffers.size(kVideoBuffer_used))
+    if (vbuffers.Size(kVideoBuffer_used))
     {
-        VideoFrame *frame = vbuffers.head(kVideoBuffer_used);
+        VideoFrame *frame = vbuffers.Head(kVideoBuffer_used);
         m_pauseBuffer = frame->buf;
         disp_timecode = frame->disp_timecode;
     }

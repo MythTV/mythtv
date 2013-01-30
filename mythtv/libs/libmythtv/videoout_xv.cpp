@@ -1762,8 +1762,8 @@ void VideoOutputXv::UpdatePauseFrame(int64_t &disp_timecode)
         vbuffers.begin_lock(kVideoBuffer_used);
 
         VideoFrame *used_frame = NULL;
-        if (vbuffers.size(kVideoBuffer_used) > 0)
-            used_frame = vbuffers.head(kVideoBuffer_used);
+        if (vbuffers.Size(kVideoBuffer_used) > 0)
+            used_frame = vbuffers.Head(kVideoBuffer_used);
 
         if (used_frame)
             CopyFrame(&av_pause_frame, used_frame);

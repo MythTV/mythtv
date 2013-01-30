@@ -686,7 +686,7 @@ void VideoOutputOpenGL::MoveResize(void)
 void VideoOutputOpenGL::UpdatePauseFrame(int64_t &disp_timecode)
 {
     QMutexLocker locker(&gl_context_lock);
-    VideoFrame *used_frame = vbuffers.head(kVideoBuffer_used);
+    VideoFrame *used_frame = vbuffers.Head(kVideoBuffer_used);
     if (!used_frame)
         used_frame = vbuffers.GetScratchFrame();
 

@@ -187,8 +187,8 @@ VideoFrame* VideoOutputNullVAAPI::GetLastDecodedFrame(void)
 {
     VideoFrame* gpu = vbuffers.GetLastDecodedFrame();
     for (uint i = 0; i < vbuffers.Size(); i++)
-        if (vbuffers.at(i) == gpu)
-            return m_shadowBuffers->at(i);
+        if (vbuffers.At(i) == gpu)
+            return m_shadowBuffers->At(i);
     LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to find frame.");
     return NULL;
 }
@@ -198,8 +198,8 @@ VideoFrame* VideoOutputNullVAAPI::GetLastShownFrame(void)
 {
     VideoFrame* gpu = vbuffers.GetLastShownFrame();
     for (uint i = 0; i < vbuffers.Size(); i++)
-        if (vbuffers.at(i) == gpu)
-            return m_shadowBuffers->at(i);
+        if (vbuffers.At(i) == gpu)
+            return m_shadowBuffers->At(i);
     LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to find frame.");
     return NULL;
 }
@@ -210,9 +210,9 @@ void VideoOutputNullVAAPI::DiscardFrame(VideoFrame *frame)
     // is this a CPU frame
     for (uint i = 0; i < m_shadowBuffers->Size(); i++)
     {
-        if (m_shadowBuffers->at(i) == frame)
+        if (m_shadowBuffers->At(i) == frame)
         {
-            frame = vbuffers.at(i);
+            frame = vbuffers.At(i);
             break;
         }
     }
@@ -220,7 +220,7 @@ void VideoOutputNullVAAPI::DiscardFrame(VideoFrame *frame)
     // is this a GPU frame
     for (uint i = 0; i < vbuffers.Size(); i++)
     {
-        if (vbuffers.at(i) == frame)
+        if (vbuffers.At(i) == frame)
         {
             m_lock.lock();
             vbuffers.DiscardFrame(frame);
@@ -236,9 +236,9 @@ void VideoOutputNullVAAPI::DoneDisplayingFrame(VideoFrame *frame)
     // is this a CPU frame
     for (uint i = 0; i < m_shadowBuffers->Size(); i++)
     {
-        if (m_shadowBuffers->at(i) == frame)
+        if (m_shadowBuffers->At(i) == frame)
         {
-            frame = vbuffers.at(i);
+            frame = vbuffers.At(i);
             break;
         }
     }
@@ -246,7 +246,7 @@ void VideoOutputNullVAAPI::DoneDisplayingFrame(VideoFrame *frame)
     // is this a GPU frame
     for (uint i = 0; i < vbuffers.Size(); i++)
     {
-        if (vbuffers.at(i) == frame)
+        if (vbuffers.At(i) == frame)
         {
             m_lock.lock();
             VideoOutput::DiscardFrame(frame);
@@ -270,9 +270,9 @@ void VideoOutputNullVAAPI::ReleaseFrame(VideoFrame *frame)
     QMutexLocker lock(&m_lock);
     for (uint i = 0; i < vbuffers.Size() && m_ctx; i++)
     {
-        if (vbuffers.at(i)->buf == frame->buf)
+        if (vbuffers.At(i)->buf == frame->buf)
         {
-            VideoFrame *vf = m_shadowBuffers->at(i);
+            VideoFrame *vf = m_shadowBuffers->At(i);
             vf->aspect = frame->aspect;
             vf->disp_timecode = frame->disp_timecode;
             vf->dummy = frame->dummy;
@@ -281,7 +281,7 @@ void VideoOutputNullVAAPI::ReleaseFrame(VideoFrame *frame)
             vf->timecode = frame->timecode;
             vf->repeat_pict = frame->repeat_pict;
             vf->top_field_first = frame->top_field_first;
-            m_ctx->CopySurfaceToFrame(vf, vbuffers.at(i)->buf);
+            m_ctx->CopySurfaceToFrame(vf, vbuffers.At(i)->buf);
         }
     }
     VideoOutput::ReleaseFrame(frame);

@@ -1657,7 +1657,7 @@ void VideoOutputQuartz::UpdatePauseFrame(int64_t &disp_timecode)
     }
 
     VideoFrame *pauseb = vbuffers.GetScratchFrame();
-    VideoFrame *pauseu = vbuffers.head(kVideoBuffer_used);
+    VideoFrame *pauseu = vbuffers.Head(kVideoBuffer_used);
     if (pauseu)
         CopyFrame(&pauseFrame, pauseu);
     else

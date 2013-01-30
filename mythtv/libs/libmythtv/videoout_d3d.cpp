@@ -427,7 +427,7 @@ void VideoOutputD3D::Zoom(ZoomDirection direction)
 void VideoOutputD3D::UpdatePauseFrame(int64_t &disp_timecode)
 {
     QMutexLocker locker(&m_lock);
-    VideoFrame *used_frame = vbuffers.head(kVideoBuffer_used);
+    VideoFrame *used_frame = vbuffers.Head(kVideoBuffer_used);
 
     if (codec_is_std(video_codec_id))
     {
