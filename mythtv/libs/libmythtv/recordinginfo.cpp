@@ -103,7 +103,8 @@ RecordingInfo::RecordingInfo(
     uint _subtitleType,
     uint _videoproperties,
     uint _audioproperties,
-    bool _future) :
+    bool _future,
+    int _schedorder) :
     ProgramInfo(
         _title, _subtitle, _description, _season, _episode,
         _category, _chanid, _chanstr, _chansign, _channame,
@@ -113,6 +114,7 @@ RecordingInfo::RecordingInfo(
     oldrecstatus(_oldrecstatus),
     savedrecstatus(rsUnknown),
     future(_future),
+    schedorder(_schedorder),
     desiredrecstartts(_startts),
     desiredrecendts(_endts),
     record(NULL)
@@ -211,6 +213,7 @@ RecordingInfo::RecordingInfo(
     oldrecstatus(rsUnknown),
     savedrecstatus(rsUnknown),
     future(false),
+    schedorder(0),
     desiredrecstartts(_startts),
     desiredrecendts(_endts),
     record(NULL)
@@ -244,6 +247,7 @@ RecordingInfo::RecordingInfo(
     oldrecstatus(rsUnknown),
     savedrecstatus(rsUnknown),
     future(false),
+    schedorder(0),
     desiredrecstartts(),
     desiredrecendts(),
     record(NULL)
@@ -394,6 +398,7 @@ void RecordingInfo::clone(const RecordingInfo &other,
         oldrecstatus   = other.oldrecstatus;
         savedrecstatus = other.savedrecstatus;
         future         = other.future;
+        schedorder     = other.schedorder;
         desiredrecstartts = other.desiredrecstartts;
         desiredrecendts = other.desiredrecendts;
     }
@@ -420,6 +425,7 @@ void RecordingInfo::clone(const ProgramInfo &other,
     oldrecstatus   = rsUnknown;
     savedrecstatus = rsUnknown;
     future         = false;
+    schedorder     = 0;
     desiredrecstartts = QDateTime();
     desiredrecendts = QDateTime();
 }
@@ -434,6 +440,7 @@ void RecordingInfo::clear(void)
     oldrecstatus = rsUnknown;
     savedrecstatus = rsUnknown;
     future = false;
+    schedorder = 0;
     desiredrecstartts = QDateTime();
     desiredrecendts = QDateTime();
 }

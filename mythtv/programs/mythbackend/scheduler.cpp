@@ -323,6 +323,9 @@ static bool comp_priority(RecordingInfo *a, RecordingInfo *b)
     if (a->GetRecordingPriority() != b->GetRecordingPriority())
         return a->GetRecordingPriority() > b->GetRecordingPriority();
 
+    if (a->GetRecordingPriority2() != b->GetRecordingPriority2())
+        return a->GetRecordingPriority2() > b->GetRecordingPriority2();
+
     QDateTime pasttime = MythDate::current().addSecs(-30);
     int apast = (a->GetRecordingStartTime() < pasttime &&
                  !a->IsReactivated());
@@ -346,11 +349,54 @@ static bool comp_priority(RecordingInfo *a, RecordingInfo *b)
             return a->GetRecordingStartTime() < b->GetRecordingStartTime();
     }
 
-    if (a->GetRecordingPriority2() != b->GetRecordingPriority2())
-        return a->GetRecordingPriority2() < b->GetRecordingPriority2();
+    if (a->schedorder != b->schedorder)
+        return a->schedorder < b->schedorder;
 
     if (a->GetInputID() != b->GetInputID())
         return a->GetInputID() < b->GetInputID();
+
+    return a->GetRecordingRuleID() < b->GetRecordingRuleID();
+}
+
+static bool comp_retry(RecordingInfo *a, RecordingInfo *b)
+{
+    int arec = (a->GetRecordingStatus() != rsRecording &&
+                a->GetRecordingStatus() != rsTuning);
+    int brec = (b->GetRecordingStatus() != rsRecording &&
+                b->GetRecordingStatus() != rsTuning);
+
+    if (arec != brec)
+        return arec < brec;
+
+    if (a->GetRecordingPriority() != b->GetRecordingPriority())
+        return a->GetRecordingPriority() > b->GetRecordingPriority();
+
+    if (a->GetRecordingPriority2() != b->GetRecordingPriority2())
+        return a->GetRecordingPriority2() > b->GetRecordingPriority2();
+
+    QDateTime pasttime = MythDate::current().addSecs(-30);
+    int apast = (a->GetRecordingStartTime() < pasttime &&
+                 !a->IsReactivated());
+    int bpast = (b->GetRecordingStartTime() < pasttime &&
+                 !b->IsReactivated());
+
+    if (apast != bpast)
+        return apast < bpast;
+
+    int aprec = RecTypePrecedence(a->GetRecordingRuleType());
+    int bprec = RecTypePrecedence(b->GetRecordingRuleType());
+
+    if (aprec != bprec)
+        return aprec < bprec;
+
+    if (a->GetRecordingStartTime() != b->GetRecordingStartTime())
+        return a->GetRecordingStartTime() > b->GetRecordingStartTime();
+
+    if (a->schedorder != b->schedorder)
+        return a->schedorder > b->schedorder;
+
+    if (a->GetInputID() != b->GetInputID())
+        return a->GetInputID() > b->GetInputID();
 
     return a->GetRecordingRuleID() < b->GetRecordingRuleID();
 }
@@ -1139,7 +1185,9 @@ bool Scheduler::TryAnotherShowing(RecordingInfo *p, bool samePriority,
             continue;
 
         if (samePriority &&
-            (q->GetRecordingPriority() < p->GetRecordingPriority()))
+            (q->GetRecordingPriority() < p->GetRecordingPriority() ||
+             (q->GetRecordingPriority() == p->GetRecordingPriority() &&
+              q->GetRecordingPriority2() < p->GetRecordingPriority2())))
         {
             continue;
         }
@@ -1255,7 +1303,7 @@ void Scheduler::SchedNewRecords(void)
             }
             else
             {
-                retrylist.push_front(p);
+                retrylist.push_back(p);
                 PrintRec(p, "  #");
                 PrintRec(conflict, "     !");
             }
@@ -1265,6 +1313,7 @@ void Scheduler::SchedNewRecords(void)
         ++i;
         if (i == worklist.end() || lastpri != (*i)->GetRecordingPriority())
         {
+            SORT_RECLIST(retrylist, comp_retry);
             MoveHigherRecords();
             retrylist.clear();
         }
@@ -1313,9 +1362,6 @@ void Scheduler::MoveHigherRecords(bool livetv)
 
         PrintRec(p, "  ?");
 
-        if (!livetv && TryAnotherShowing(p, false))
-            continue;
-
         BackupRecStatus();
         p->SetRecordingStatus(rsWillRecord);
         if (!livetv)
@@ -1343,6 +1389,7 @@ void Scheduler::MoveHigherRecords(bool livetv)
 void Scheduler::PruneRedundants(void)
 {
     RecordingInfo *lastp = NULL;
+    int lastrecpri2 = 0;
 
     RecIter i = worklist.begin();
     while (i != worklist.end())
@@ -1394,6 +1441,7 @@ void Scheduler::PruneRedundants(void)
             !lastp->IsSameTimeslot(*p))
         {
             lastp = p;
+            lastrecpri2 = lastp->GetRecordingPriority2();
             lastp->SetRecordingPriority2(0);
             ++i;
         }
@@ -1402,11 +1450,11 @@ void Scheduler::PruneRedundants(void)
             // Flag lower priority showings that will recorded so we
             // can warn the user about them
             if (lastp->GetRecordingStatus() == rsWillRecord &&
-                p->GetRecordingPriority() >
-                lastp->GetRecordingPriority() - lastp->GetRecordingPriority2())
+                p->GetRecordingPriority2() >
+                lastrecpri2 - lastp->GetRecordingPriority2())
             {
                 lastp->SetRecordingPriority2(
-                    lastp->GetRecordingPriority() - p->GetRecordingPriority());
+                    lastrecpri2 - p->GetRecordingPriority2());
             }
             delete p;
             *(i++) = NULL;
@@ -4073,8 +4121,8 @@ void Scheduler::AddNewRecords(void)
             result.value(40).toUInt(),//subtitleType
             result.value(39).toUInt(),//videoproperties
             result.value(41).toUInt(),//audioproperties
-            result.value(46).toInt());//future
-        p->SetRecordingPriority2(result.value(47).toInt()); // schedorder
+            result.value(46).toInt(),//future
+            result.value(47).toInt());//schedorder
 
         if (!p->future && !p->IsReactivated() &&
             p->oldrecstatus != rsAborted &&
@@ -4083,8 +4131,7 @@ void Scheduler::AddNewRecords(void)
             p->SetRecordingStatus(p->oldrecstatus);
         }
 
-        p->SetRecordingPriority(p->GetRecordingPriority() +
-                                result.value(51).toInt());
+        p->SetRecordingPriority2(result.value(51).toInt());
 
         // Check to see if the program is currently recording and if
         // the end time was changed.  Ideally, checking for a new end
@@ -4121,7 +4168,7 @@ void Scheduler::AddNewRecords(void)
         RecStatusType newrecstatus = rsUnknown;
         // Check for rsOffLine
         if ((doRun || specsched) &&
-            (!cardMap.contains(p->GetCardID()) || !p->GetRecordingPriority2()))
+            (!cardMap.contains(p->GetCardID()) || !p->schedorder))
             newrecstatus = rsOffLine;
 
         // Check for rsTooManyRecordings
