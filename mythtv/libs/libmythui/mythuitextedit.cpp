@@ -219,6 +219,7 @@ void MythUITextEdit::SetText(const QString &text, bool moveCursor)
         return;
 
     m_Message = text;
+    m_Message.detach();
 
     if (m_isPassword)
     {
@@ -234,6 +235,13 @@ void MythUITextEdit::SetText(const QString &text, bool moveCursor)
         MoveCursor(MoveEnd);
 
     emit valueChanged();
+}
+
+QString MythUITextEdit::GetText(void) const
+{
+    QString ret = m_Message;
+    ret.detach();
+    return ret;   
 }
 
 void MythUITextEdit::InsertText(const QString &text)

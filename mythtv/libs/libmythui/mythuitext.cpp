@@ -128,6 +128,7 @@ void MythUIText::Reset()
 void MythUIText::SetText(const QString &text)
 {
     QString newtext = text;
+    newtext.detach();
 
     if (!m_Layouts.isEmpty() && newtext == m_Message)
         return;
@@ -203,7 +204,9 @@ void MythUIText::SetTextFromMap(QHash<QString, QString> &map)
 
 QString MythUIText::GetText(void) const
 {
-    return m_Message;
+    QString ret = m_Message;
+    ret.detach();
+    return ret;
 }
 
 QString MythUIText::GetDefaultText(void) const
