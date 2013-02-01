@@ -398,11 +398,6 @@
                                 <filename>watermarks/watchrec.png</filename>
                             </imagetype>
                         </state>
-                        <state name="TV_DELETE" from="default">
-                            <imagetype name="icon">
-                                <filename>watermarks/delete.png</filename>
-                            </imagetype>
-                        </state>
                         <state name="TV_PREVIOUS" from="default">
                             <imagetype name="icon">
                                 <filename>watermarks/previously_recorded.png</filename>
@@ -795,11 +790,6 @@
                         <state name="TV_WATCH_RECORDINGS" from="default">
                             <imagetype name="icon">
                                 <filename>watermarks/watchrec.png</filename>
-                            </imagetype>
-                        </state>
-                        <state name="TV_DELETE" from="default">
-                            <imagetype name="icon">
-                                <filename>watermarks/delete.png</filename>
                             </imagetype>
                         </state>
                         <state name="TV_PREVIOUS" from="default">

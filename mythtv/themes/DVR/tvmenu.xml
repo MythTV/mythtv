@@ -8,14 +8,6 @@
         <action>TV_WATCH_LIVE</action>
     </button>
 
-    <button>
-        <type>TV_DELETE</type>
-        <text>Delete Recordings</text>
-        <description>Remove television recordings</description>
-        <action>TV_DELETE</action>
-        <dependswindow xmlfile="recordings-ui.xml">deleterecordings</dependswindow>
-    </button>
-
 <!-- EXECTV sample.  %s args in order are video, audio, and vbi devices
     <button>
         <type>TV_PLAYBACK</type>

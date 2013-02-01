@@ -416,11 +416,6 @@
                     <filename>watermark/play.png</filename>
                 </imagetype>
             </state>
-            <state name="TV_DELETE" from="DEFAULT">
-                <imagetype name="watermark">
-                    <filename>watermark/error.png</filename>
-                </imagetype>
-            </state>
             <state name="TV_PREVIOUS" from="DEFAULT">
                 <imagetype name="watermark">
                     <filename>watermark/big_arrow_down.png</filename>

@@ -60,12 +60,6 @@ class PlaybackBox : public ScheduleCommon
     friend class PlaybackBoxListItem;
 
   public:
-    typedef enum
-    {
-        kPlayBox,
-        kDeleteBox,
-    } BoxType;
-
     // ViewType values cannot change; they are stored in the database.
     typedef enum {
         TitlesOnly = 0,
@@ -120,7 +114,7 @@ class PlaybackBox : public ScheduleCommon
         kDone
     } killStateType;
 
-    PlaybackBox(MythScreenStack *parent, QString name, BoxType ltype,
+    PlaybackBox(MythScreenStack *parent, QString name,
                 TV *player = NULL, bool showTV = false);
    ~PlaybackBox(void);
 
@@ -354,9 +348,6 @@ class PlaybackBox : public ScheduleCommon
     InfoMap m_currentMap;
 
     // Settings ///////////////////////////////////////////////////////////////
-    /// If "Play"  this is a recording playback selection UI,
-    /// if "Delete this is a recording deletion selection UI.
-    BoxType             m_type;
     /// titleView controls showing titles in group list
     bool                m_titleView;
     /// useCategories controls showing categories in group list

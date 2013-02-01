@@ -131,11 +131,6 @@
     </fontdef>
 
     <!-- Fonts for specific screens -->
-    <fontdef name="deleterecordings_filesize_font" from="basemedium">
-        <pixelsize>40</pixelsize>
-        <color>#bbbb33</color>
-        <weight>bold</weight>
-    </fontdef>
     <fontdef name="baseguide" from="basesmall">
         <pixelsize>20</pixelsize>
         <weight>normal</weight>

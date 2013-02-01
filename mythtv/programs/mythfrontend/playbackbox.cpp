@@ -364,7 +364,7 @@ void * PlaybackBox::RunPlaybackBox(void * player, bool showTV)
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
     PlaybackBox *pbb = new PlaybackBox(
-        mainStack,"playbackbox", PlaybackBox::kPlayBox, (TV *)player, showTV);
+        mainStack,"playbackbox", (TV *)player, showTV);
 
     if (pbb->Create())
         mainStack->AddScreen(pbb);
@@ -374,7 +374,7 @@ void * PlaybackBox::RunPlaybackBox(void * player, bool showTV)
     return NULL;
 }
 
-PlaybackBox::PlaybackBox(MythScreenStack *parent, QString name, BoxType ltype,
+PlaybackBox::PlaybackBox(MythScreenStack *parent, QString name,
                             TV *player, bool showTV)
     : ScheduleCommon(parent, name),
       m_prefixes(QObject::tr("^(The |A |An )")),
@@ -382,7 +382,6 @@ PlaybackBox::PlaybackBox(MythScreenStack *parent, QString name, BoxType ltype,
       // Artwork Variables
       m_artHostOverride(),
       // Settings
-      m_type(ltype),
       m_watchListAutoExpire(false),
       m_watchListMaxAge(60),              m_watchListBlackOut(2),
       m_listOrder(1),
@@ -502,13 +501,8 @@ PlaybackBox::~PlaybackBox(void)
 
 bool PlaybackBox::Create()
 {
-    if (m_type == kDeleteBox &&
-            LoadWindowFromXML("recordings-ui.xml", "deleterecordings", this))
-        LOG(VB_GENERAL, LOG_DEBUG,
-            "Found a customized delete recording screen");
-    else
-        if (!LoadWindowFromXML("recordings-ui.xml", "watchrecordings", this))
-            return false;
+    if (!LoadWindowFromXML("recordings-ui.xml", "watchrecordings", this))
+        return false;
 
     m_recgroupList  = dynamic_cast<MythUIButtonList *> (GetChild("recgroups"));
     m_groupList     = dynamic_cast<MythUIButtonList *> (GetChild("groups"));
@@ -671,7 +665,7 @@ void PlaybackBox::updateGroupInfo(const QString &groupname,
     QString desc = tr("There is/are %n recording(s) in this display group",
                       "", countInGroup);
 
-    if (m_type == kDeleteBox && countInGroup > 1)
+    if (countInGroup > 1)
     {
         ProgramList  group     = m_progLists[groupname];
         float        groupSize = 0.0;
@@ -1624,7 +1618,7 @@ bool PlaybackBox::UpdateUILists(void)
         }
 
         vector<ProgramInfo*> list;
-        bool newest_first = (0==m_allOrder) || (kDeleteBox==m_type);
+        bool newest_first = (0==m_allOrder);
         m_programInfoCache.GetOrdered(list, newest_first);
         vector<ProgramInfo*>::const_iterator it = list.begin();
         for ( ; it != list.end(); ++it)
@@ -1786,7 +1780,7 @@ bool PlaybackBox::UpdateUILists(void)
             if (!Iprog.key().isEmpty())
             {
                 std::stable_sort((*Iprog).begin(), (*Iprog).end(),
-                                 (m_listOrder == 0 || m_type == kDeleteBox) ?
+                                 (m_listOrder == 0) ?
                                  comp_originalAirDate_rev_less_than :
                                  comp_originalAirDate_less_than);
             }
@@ -1800,7 +1794,7 @@ bool PlaybackBox::UpdateUILists(void)
             if (!Iprog.key().isEmpty())
             {
                 std::stable_sort((*Iprog).begin(), (*Iprog).end(),
-                                 (m_listOrder == 0 || m_type == kDeleteBox) ?
+                                 (m_listOrder == 0) ?
                                  comp_programid_rev_less_than :
                                  comp_programid_less_than);
             }
@@ -1814,7 +1808,7 @@ bool PlaybackBox::UpdateUILists(void)
             if (!it.key().isEmpty())
             {
                 std::stable_sort((*it).begin(), (*it).end(),
-                                 (!m_listOrder || m_type == kDeleteBox) ?
+                                 (!m_listOrder) ?
                                  comp_recordDate_rev_less_than :
                                  comp_recordDate_less_than);
             }
@@ -1828,7 +1822,7 @@ bool PlaybackBox::UpdateUILists(void)
             if (!it.key().isEmpty())
             {
                 std::stable_sort((*it).begin(), (*it).end(),
-                                 (!m_listOrder || m_type == kDeleteBox) ?
+                                 (!m_listOrder) ?
                                  comp_season_rev_less_than :
                                  comp_season_less_than);
             }
@@ -2317,11 +2311,7 @@ void PlaybackBox::selected(MythUIButtonListItem *item)
     if (!item)
         return;
 
-    switch (m_type)
-    {
-        case kPlayBox:   PlayFromBookmark(item);   break;
-        case kDeleteBox: deleteSelected(item); break;
-    }
+    PlayFromBookmark(item);
 }
 
 void PlaybackBox::popupClosed(QString which, int result)

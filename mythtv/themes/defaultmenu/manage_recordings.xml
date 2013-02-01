@@ -23,14 +23,6 @@
     </button>
 
     <button>
-        <type>TV_DELETE</type>
-        <text>Delete Recordings</text>
-        <description>Remove television recordings</description>
-        <action>TV_DELETE</action>
-        <dependswindow xmlfile="recordings-ui.xml">deleterecordings</dependswindow>
-    </button>
-
-    <button>
         <type>TV_PREVIOUS</type>
         <text>Previously Recorded</text>
         <description>See what you have recorded</description>
