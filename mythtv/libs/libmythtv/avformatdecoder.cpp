@@ -879,7 +879,9 @@ extern "C" void HandleBDStreamChange(void *data)
 int AvFormatDecoder::FindStreamInfo(void)
 {
     QMutexLocker lock(avcodeclock);
-    silence_ffmpeg_logging = true;
+    // Suppress ffmpeg logging unless "-v libav --loglevel debug"
+    if (!VERBOSE_LEVEL_CHECK(VB_LIBAV, LOG_DEBUG))
+        silence_ffmpeg_logging = true;
     int retval = av_find_stream_info(ic);
     silence_ffmpeg_logging = false;
     return retval;
