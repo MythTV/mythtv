@@ -76,7 +76,6 @@ NetworkControl::NetworkControl() :
     jumpMap["programguide"]          = "Program Guide";
     jumpMap["ripcd"]                 = "Rip CD";
     jumpMap["musicplaylists"]        = "Select music playlists";
-    jumpMap["deleterecordings"]      = "TV Recording Deletion";
     jumpMap["playbackrecordings"]    = "TV Recording Playback";
     jumpMap["videobrowser"]          = "Video Browser";
     jumpMap["videogallery"]          = "Video Gallery";
@@ -93,7 +92,6 @@ NetworkControl::NetworkControl() :
     jumpMap["guidegrid"]             = "Program Guide";
     jumpMap["managerecrules"]        = "Manage Recording Rules";
     jumpMap["statusbox"]             = "Status Screen";
-    jumpMap["deletebox"]             = "TV Recording Deletion";
     jumpMap["playbackbox"]           = "TV Recording Playback";
     jumpMap["pbb"]                   = "TV Recording Playback";
 
