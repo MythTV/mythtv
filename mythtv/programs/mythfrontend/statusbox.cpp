@@ -624,7 +624,24 @@ void StatusBox::doScheduleStatus()
 
     MSqlQuery query(MSqlQuery::InitCon());
 
-    query.prepare("SELECT COUNT(*) FROM record WHERE search = 0");
+    query.prepare("SELECT COUNT(*) FROM record WHERE type = :TEMPLATE");
+    query.bindValue(":TEMPLATE", kTemplateRecord);
+    if (query.exec() && query.next())
+    {
+        QString rules = tr("%n template rule(s) (is) defined", "",
+                            query.value(0).toInt());
+        AddLogLine(rules, helpmsg);
+    }
+    else
+    {
+        MythDB::DBError("StatusBox::doScheduleStatus()", query);
+        return;
+    }
+
+    query.prepare("SELECT COUNT(*) FROM record "
+                  "WHERE type <> :TEMPLATE AND search = :NOSEARCH");
+    query.bindValue(":TEMPLATE", kTemplateRecord);
+    query.bindValue(":NOSEARCH", kNoSearch);
     if (query.exec() && query.next())
     {
         QString rules = tr("%n standard rule(s) (is) defined", "",
@@ -637,7 +654,8 @@ void StatusBox::doScheduleStatus()
         return;
     }
 
-    query.prepare("SELECT COUNT(*) FROM record WHERE search > 0");
+    query.prepare("SELECT COUNT(*) FROM record WHERE search > :NOSEARCH");
+    query.bindValue(":NOSEARCH", kNoSearch);
     if (query.exec() && query.next())
     {
         QString rules = tr("%n search rule(s) are defined", "",
