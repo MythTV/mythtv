@@ -900,7 +900,8 @@ void GLSingleView::EffectInOut(void)
 
     int  texnum  = m_texCur;
     bool fadeout = false;
-    if (m_effect_frame_time.elapsed() <= m_effect_transition_timeout / 2)
+    float const elapsed = m_effect_frame_time.elapsed();
+    if (elapsed <= m_effect_transition_timeout / 2)
     {
         texnum  = (m_texCur) ? 0 : 1;
         fadeout = true;
@@ -909,14 +910,14 @@ void GLSingleView::EffectInOut(void)
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
-    float tt = m_effect_frame_time.elapsed() * m_effect_transition_timeout_inv;
-    float t = 2.0f / ((fadeout) ? (0.5f - tt) : (tt - 0.5f));
+    float tt = elapsed * m_effect_transition_timeout_inv;
+    float t = 2.0f * ((fadeout) ? (0.5f - tt) : (tt - 0.5f));
 
-    glScalef(t, t, 1.0f);
+    glScalef(t, t, 1);
     t = 1.0f - t;
-    glTranslatef((m_effect_rotate_direction % 2 == 0) ? ((m_effect_rotate_direction == 2)? 1 : -1) * t : 0.0f,
-                 (m_effect_rotate_direction % 2 == 1) ? ((m_effect_rotate_direction == 1)? 1 : -1) * t : 0.0f,
-                 0.0f);
+    glTranslatef((m_effect_rotate_direction % 2 == 0) ? ((m_effect_rotate_direction == 2)? t : -t) : 0,
+                 (m_effect_rotate_direction % 2 == 1) ? ((m_effect_rotate_direction == 1)? t : -t) : 0,
+                 0);
 
     m_texItem[texnum].MakeQuad();
 
