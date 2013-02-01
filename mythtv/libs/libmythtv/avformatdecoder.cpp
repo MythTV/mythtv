@@ -912,8 +912,10 @@ int AvFormatDecoder::FindStreamInfo(void)
     // Suppress ffmpeg logging unless "-v libav --loglevel debug"
     if (!VERBOSE_LEVEL_CHECK(VB_LIBAV, LOG_DEBUG))
         silence_ffmpeg_logging = true;
+    avfRingBuffer->SetInInit(ringBuffer->IsStreamed());
     int retval = avformat_find_stream_info(ic, NULL);
     silence_ffmpeg_logging = false;
+    avfRingBuffer->SetInInit(false);
     return retval;
 }
 
