@@ -506,6 +506,9 @@ class MTV_PUBLIC TV : public QObject
     bool SubtitleZoomHandleAction(PlayerContext *ctx,
                                   const QStringList &actions);
     void ChangeSubtitleZoom(PlayerContext *ctx, int dir);
+    bool SubtitleDelayHandleAction(PlayerContext *ctx,
+                                   const QStringList &actions);
+    void ChangeSubtitleDelay(PlayerContext *ctx, int dir);
 
     // PxP handling
     bool CreatePBP(PlayerContext *lctx, const ProgramInfo *info);
@@ -696,6 +699,7 @@ class MTV_PUBLIC TV : public QObject
     bool stretchAdjustment; ///< True if time stretch is turned on
     bool audiosyncAdjustment; ///< True if audiosync is turned on
     bool subtitleZoomAdjustment; ///< True if subtitle zoom is turned on
+    bool subtitleDelayAdjustment; ///< True if subtitle delay is turned on
     bool editmode;          ///< Are we in video editing mode
     bool zoomMode;
     bool sigMonMode;     ///< Are we in signal monitoring mode?

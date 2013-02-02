@@ -40,7 +40,9 @@ class SubtitleScreen : public MythScreenType
     void DisplayDVDButton(AVSubtitle* dvdButton, QRect &buttonPos);
 
     void SetZoom(int percent);
-    int GetZoom(void);
+    int GetZoom(void) const;
+    void SetDelay(int ms);
+    int GetDelay(void) const;
 
     QSize CalcTextSize(const QString &text,
                        const CC708CharacterAttribute &format,
@@ -95,6 +97,8 @@ class SubtitleScreen : public MythScreenType
     int                m_fontSize;
     int                m_textFontZoom; // valid for 708 & text subs
     int                m_textFontZoomPrev;
+    int                m_textFontDelayMs; // valid for text subs
+    int                m_textFontDelayMsPrev;
     bool               m_refreshModified;
     bool               m_refreshDeleted;
     QHash<int,QList<MythUIType*> > m_708imageCache;

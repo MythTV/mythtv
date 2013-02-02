@@ -528,6 +528,7 @@ SubtitleScreen::SubtitleScreen(MythPlayer *player, const char * name,
     m_708reader(NULL), m_safeArea(QRect()),
     m_removeHTML(QRegExp("</?.+>")),        m_subtitleType(kDisplayNone),
     m_textFontZoom(100), m_textFontZoomPrev(100),
+    m_textFontDelayMs(0), m_textFontDelayMsPrev(0),
     m_refreshModified(false), m_refreshDeleted(false),
     m_fontStretch(fontStretch),
     m_format(new SubtitleFormat)
@@ -594,6 +595,7 @@ void SubtitleScreen::EnableSubtitles(int type, bool forced_only)
         break;
     }
     m_textFontZoomPrev = m_textFontZoom;
+    m_textFontDelayMsPrev = m_textFontDelayMs;
 }
 
 void SubtitleScreen::DisableForcedSubtitles(void)
@@ -641,6 +643,7 @@ void SubtitleScreen::Pulse(void)
     OptimiseDisplayedArea();
     MythScreenType::Pulse();
     m_textFontZoomPrev = m_textFontZoom;
+    m_textFontDelayMsPrev = m_textFontDelayMs;
     ResetElementState();
 }
 
@@ -1069,6 +1072,7 @@ void SubtitleScreen::DisplayTextSubtitles(void)
         return;
 
     bool changed = (m_textFontZoom != m_textFontZoomPrev);
+    changed |= (m_textFontDelayMs != m_textFontDelayMsPrev);
     VideoOutput *vo = m_player->GetVideoOutput();
     if (!vo)
         return;
@@ -1081,12 +1085,14 @@ void SubtitleScreen::DisplayTextSubtitles(void)
     TextSubtitles *subs = m_subreader->GetTextSubtitles();
     subs->Lock();
     uint64_t playPos = 0;
+    int playPosAdj = m_textFontDelayMs;
     if (subs->IsFrameBasedTiming())
     {
         // frame based subtitles get out of synch after running mythcommflag
         // for the file, i.e., the following number is wrong and does not
         // match the subtitle frame numbers:
         playPos = currentFrame->frameNumber;
+        playPosAdj /= m_player->GetFrameRate();
     }
     else
     {
@@ -1104,6 +1110,7 @@ void SubtitleScreen::DisplayTextSubtitles(void)
         //else
         playPos = m_player->GetDecoder()->NormalizeVideoTimecode(currentFrame->timecode);
     }
+    playPos -= playPosAdj;
     if (playPos != 0)
         changed |= subs->HasSubtitleChanged(playPos);
     if (!changed)
@@ -1451,9 +1458,19 @@ void SubtitleScreen::SetZoom(int percent)
         gCoreContext->SaveSetting("OSDCC708TextZoom", percent);
 }
 
-int SubtitleScreen::GetZoom(void)
+int SubtitleScreen::GetZoom(void) const
 {
     return m_textFontZoom;
+}
+
+void SubtitleScreen::SetDelay(int ms)
+{
+    m_textFontDelayMs = ms;
+}
+
+int SubtitleScreen::GetDelay(void) const
+{
+    return m_textFontDelayMs;
 }
 
 static QString srtColorString(QColor color)

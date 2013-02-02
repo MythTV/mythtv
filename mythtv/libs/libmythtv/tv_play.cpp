@@ -981,6 +981,7 @@ TV::TV(void)
       stretchAdjustment(false),
       audiosyncAdjustment(false),
       subtitleZoomAdjustment(false),
+      subtitleDelayAdjustment(false),
       editmode(false),     zoomMode(false),
       sigMonMode(false),
       endOfRecording(false),
@@ -3860,6 +3861,7 @@ bool TV::ProcessKeypress(PlayerContext *actx, QKeyEvent *e)
     handled = handled || TimeStretchHandleAction(actx, actions);
     handled = handled || AudioSyncHandleAction(actx, actions);
     handled = handled || SubtitleZoomHandleAction(actx, actions);
+    handled = handled || SubtitleDelayHandleAction(actx, actions);
     handled = handled || DiscMenuHandleAction(actx, actions);
     handled = handled || ActiveHandleAction(
         actx, actions, isDVD, isMenuOrStill);
@@ -4151,6 +4153,30 @@ bool TV::SubtitleZoomHandleAction(PlayerContext *ctx,
     else if (has_action(ACTION_DOWN, actions))
         ChangeSubtitleZoom(ctx, 10);
     else if (has_action(ACTION_TOGGLESUBTITLEZOOM, actions))
+        ClearOSD(ctx);
+    else
+        handled = false;
+
+    return handled;
+}
+
+bool TV::SubtitleDelayHandleAction(PlayerContext *ctx,
+                                   const QStringList &actions)
+{
+    if (!subtitleDelayAdjustment)
+        return false;
+
+    bool handled = true;
+
+    if (has_action(ACTION_LEFT, actions))
+        ChangeSubtitleDelay(ctx, -1);
+    else if (has_action(ACTION_RIGHT, actions))
+        ChangeSubtitleDelay(ctx, 1);
+    else if (has_action(ACTION_UP, actions))
+        ChangeSubtitleDelay(ctx, -10);
+    else if (has_action(ACTION_DOWN, actions))
+        ChangeSubtitleDelay(ctx, 10);
+    else if (has_action(ACTION_TOGGLESUBTITLEDELAY, actions))
         ClearOSD(ctx);
     else
         handled = false;
@@ -4531,6 +4557,8 @@ bool TV::ToggleHandleAction(PlayerContext *ctx,
         ChangeAudioSync(ctx, 0);   // just display
     else if (has_action(ACTION_TOGGLESUBTITLEZOOM, actions))
         ChangeSubtitleZoom(ctx, 0);   // just display
+    else if (has_action(ACTION_TOGGLESUBTITLEDELAY, actions))
+        ChangeSubtitleDelay(ctx, 0);   // just display
     else if (has_action(ACTION_TOGGLEVISUALISATION, actions))
         EnableVisualisation(ctx, false, true /*toggle*/);
     else if (has_action(ACTION_ENABLEVISUALISATION, actions))
@@ -8791,6 +8819,44 @@ void TV::ChangeSubtitleZoom(PlayerContext *ctx, int dir)
 }
 
 // dir in 10ms jumps
+void TV::ChangeSubtitleDelay(PlayerContext *ctx, int dir)
+{
+    ctx->LockDeletePlayer(__FILE__, __LINE__);
+    if (!ctx->player)
+    {
+        ctx->UnlockDeletePlayer(__FILE__, __LINE__);
+        return;
+    }
+
+    OSD *osd = GetOSDLock(ctx);
+    SubtitleScreen *subs = NULL;
+    if (osd)
+        subs = osd->InitSubtitles();
+    ReturnOSDLock(ctx, osd);
+    subtitleDelayAdjustment = true;
+    uint capmode = ctx->player->GetCaptionMode();
+    bool showing = ctx->player->GetCaptionsEnabled() &&
+        (capmode == kDisplayRawTextSubtitle ||
+         capmode == kDisplayTextSubtitle);
+    int newval = (subs ? subs->GetDelay() : 100) + dir * 10;
+    newval = max(-5000, newval);
+    newval = min(5000, newval);
+    ctx->UnlockDeletePlayer(__FILE__, __LINE__);
+
+    if (showing && !browsehelper->IsBrowsing())
+    {
+        // range of -5000ms..+5000ms, scale to 0..1000
+        UpdateOSDStatus(ctx, tr("Adjust Subtitle Delay"), tr("Subtitle Delay"),
+                        QString::number(newval),
+                        kOSDFunctionalType_SubtitleDelayAdjust,
+                        "ms", newval / 10 + 500, kOSDTimeout_Long);
+        SetUpdateOSDPosition(false);
+        if (subs)
+            subs->SetDelay(newval);
+    }
+}
+
+// dir in 10ms jumps
 void TV::ChangeAudioSync(PlayerContext *ctx, int dir, int newsync)
 {
     long long newval;
@@ -9702,6 +9768,9 @@ void TV::HandleOSDClosed(int osdType)
             break;
         case kOSDFunctionalType_SubtitleZoomAdjust:
             subtitleZoomAdjustment = false;
+            break;
+        case kOSDFunctionalType_SubtitleDelayAdjust:
+            subtitleDelayAdjustment = false;
             break;
         case kOSDFunctionalType_Default:
             break;
@@ -10632,6 +10701,8 @@ void TV::OSDDialogEvent(int result, QString text, QString action)
         ChangeAudioSync(actx, 0);
     else if (action == ACTION_TOGGLESUBTITLEZOOM)
         ChangeSubtitleZoom(actx, 0);
+    else if (action == ACTION_TOGGLESUBTITLEDELAY)
+        ChangeSubtitleDelay(actx, 0);
     else if (action == ACTION_TOGGLEVISUALISATION)
         EnableVisualisation(actx, false, true /*toggle*/);
     else if (action == ACTION_ENABLEVISUALISATION)
@@ -11293,6 +11364,7 @@ void TV::FillOSDMenuSubtitles(const PlayerContext *ctx, OSD *osd,
         backaction = "MAIN";
         currenttext = tr("Subtitles");
 
+        uint capmode = ctx->player->GetCaptionMode();
         if (have_subs && enabled)
             osd->DialogAddButton(tr("Disable Subtitles"), ACTION_DISABLESUBS);
         else if (have_subs && !enabled)
@@ -11343,6 +11415,11 @@ void TV::FillOSDMenuSubtitles(const PlayerContext *ctx, OSD *osd,
         if (enabled)
             osd->DialogAddButton(tr("Adjust Subtitle Zoom"),
                                  ACTION_TOGGLESUBTITLEZOOM);
+        if (enabled &&
+            (capmode == kDisplayRawTextSubtitle ||
+             capmode == kDisplayTextSubtitle))
+            osd->DialogAddButton(tr("Adjust Subtitle Delay"),
+                                 ACTION_TOGGLESUBTITLEDELAY);
     }
     else if (category == "AVSUBTITLES")
     {
