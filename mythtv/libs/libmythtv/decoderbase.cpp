@@ -499,15 +499,18 @@ bool DecoderBase::FindPosition(long long desired_value, bool search_adjusted,
 
     upper_bound = upper;
     lower_bound = lower;
+    bool empty = m_positionMap.empty();
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC +
         QString("FindPosition(%1, search%3 adjusted)")
             .arg(desired_value).arg((search_adjusted) ? "" : " not") +
         QString(" --> \n\t\t\t[%1:%2(%3),%4:%5(%6)]")
-            .arg(lower_bound).arg(GetKey(m_positionMap[lower_bound]))
+            .arg(lower_bound)
+            .arg(empty ? -1 : GetKey(m_positionMap[lower_bound]))
             .arg(m_positionMap[lower_bound].pos)
-            .arg(upper_bound).arg(GetKey(m_positionMap[upper_bound]))
-            .arg(m_positionMap[upper_bound].pos));
+            .arg(upper_bound)
+            .arg(empty ? -1 : GetKey(m_positionMap[upper_bound]))
+            .arg(empty ? -1 : m_positionMap[upper_bound].pos));
 
     return false;
 }
