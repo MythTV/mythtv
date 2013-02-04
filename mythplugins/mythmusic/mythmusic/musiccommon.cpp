@@ -41,6 +41,12 @@ using namespace std;
 #include "streamview.h"
 #include "visualizerview.h"
 #include "searchview.h"
+#include "generalsettings.h"
+#include "playersettings.h"
+#include "visualizationsettings.h"
+#include "importsettings.h"
+#include "ratingsettings.h"
+#include "importmusic.h"
 
 MusicCommon::MusicCommon(MythScreenStack *parent, const QString &name)
             : MythScreenType(parent, name)
@@ -1474,6 +1480,37 @@ void MusicCommon::customEvent(QEvent *event)
             playlist->changed();
             gPlayer->playlistChanged(playlist->getID());
         }
+        else if (resultid == "settingsmenu")
+        {
+            MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+            MythScreenType *settings = NULL;
+
+            if (resulttext == tr("General"))
+            {
+                settings = new GeneralSettings(mainStack, "general settings");
+            }
+            else if (resulttext == tr("Player"))
+            {
+                settings = new PlayerSettings(mainStack, "player settings");
+            }
+            else if (resulttext == tr("Rating"))
+            {
+                settings = new RatingSettings(mainStack, "rating settings");
+            }
+            else if (resulttext == tr("Visualization"))
+            {
+                settings = new VisualizationSettings(mainStack, "visualization settings");
+            }
+            else if (resulttext == tr("Import"))
+            {
+                settings = new ImportSettings(mainStack, "import settings");
+            }
+
+            if (settings != NULL && settings->Create())
+                mainStack->AddScreen(settings);
+            else
+                delete settings;
+        }
     }
     else if (event->type() == MusicPlayerEvent::TrackChangeEvent)
     {
@@ -2093,6 +2130,8 @@ MythMenu* MusicCommon::createMainMenu(void)
     if (m_visualizerVideo)
         menu->AddItem(tr("Change Visualizer"), NULL, createVisualizerMenu());
 
+    menu->AddItem(tr("Settings..."),   NULL, createSettingsMenu());
+
     return menu;
 }
 
@@ -2267,6 +2306,21 @@ MythMenu* MusicCommon::createPlaylistOptionsMenu(void)
 
     menu->AddItem(tr("Replace Tracks"));
     menu->AddItem(tr("Add Tracks"));
+
+    return menu;
+}
+
+MythMenu* MusicCommon::createSettingsMenu(void)
+{
+    QString label = tr("Settings Options");
+
+    MythMenu *menu = new MythMenu(label, this, "settingsmenu");
+
+    menu->AddItem(tr("General"));
+    menu->AddItem(tr("Player"));
+    menu->AddItem(tr("Rating"));
+    menu->AddItem(tr("Visualization"));
+    menu->AddItem(tr("Import"));
 
     return menu;
 }

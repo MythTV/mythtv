@@ -20,6 +20,7 @@
 #include "romedit.h"
 #include "gamescan.h"
 #include "gameui.h"
+#include "gamesettings.h"
 
 class GameTreeInfo
 {
@@ -428,34 +429,47 @@ void GameUI::showMenu()
 {
     MythGenericTree *node = m_gameUITree->GetCurrentNode();
 
+    MythMenu *menu = new MythMenu(tr("Game Menu"), this, "showMenuPopup");
+    menu->AddItem(tr("Scan For Changes"));
+    if (isLeaf(node))
+    {
+        RomInfo *romInfo = qVariantValue<RomInfo *>(node->GetData());
+        if (romInfo)
+        {
+            menu->AddItem(tr("Show Information"));
+            if (romInfo->Favorite())
+                menu->AddItem(tr("Remove Favorite"));
+            else
+                menu->AddItem(tr("Make Favorite"));
+            menu->AddItem(tr("Retrieve Details"));
+            menu->AddItem(tr("Edit Details"));
+        }
+    }
+    menu->AddItem(tr("Settings..."),   NULL, createSettingsMenu());
+
     MythScreenStack *popupStack = GetMythMainWindow()->
                                           GetStack("popup stack");
-    MythDialogBox *showMenuPopup =
-            new MythDialogBox(node->getString(), popupStack, "showMenuPopup");
+    MythDialogBox *menuPopup =
+            new MythDialogBox(menu, popupStack, "showMenuPopup");
 
-    if (showMenuPopup->Create())
-    {
-        showMenuPopup->SetReturnEvent(this, "showMenuPopup");
-
-        showMenuPopup->AddButton(tr("Scan For Changes"));
-        if (isLeaf(node))
-        {
-            RomInfo *romInfo = qVariantValue<RomInfo *>(node->GetData());
-            if (romInfo)
-            {
-                showMenuPopup->AddButton(tr("Show Information"));
-                if (romInfo->Favorite())
-                    showMenuPopup->AddButton(tr("Remove Favorite"));
-                else
-                    showMenuPopup->AddButton(tr("Make Favorite"));
-                showMenuPopup->AddButton(tr("Retrieve Details"));
-                showMenuPopup->AddButton(tr("Edit Details"));
-            }
-        }
-        popupStack->AddScreen(showMenuPopup);
-    }
+    if (menuPopup->Create())
+        popupStack->AddScreen(menuPopup);
     else
-        delete showMenuPopup;
+        delete menu;
+}
+
+MythMenu* GameUI::createSettingsMenu(void)
+{
+    QString label = tr("Settings Options");
+
+    MythMenu *menu = new MythMenu(label, this, "settingsmenu");
+
+    menu->AddItem(tr("General Settings"));
+    menu->AddItem(tr("Player Settings"));
+    menu->AddItem(tr("Update Game Database"));
+    menu->AddItem(tr("Clear Game Database"));
+
+    return menu;
 }
 
 void GameUI::searchStart(void)
@@ -561,6 +575,40 @@ void GameUI::customEvent(QEvent *event)
         {
             // Play button pushed
             itemClicked(0);
+        }
+        else if (resulttext == tr("General Settings"))
+        {
+            MythGameGeneralSettings settings;
+            settings.exec();
+
+            // Reload the game data
+            gCoreContext->ClearSettingsCache();
+            m_gameShowFileName = gCoreContext->GetSetting("GameShowFileNames").toInt();
+            reloadAllData(true);
+        }
+        else if (resulttext == tr("Player Settings"))
+        {
+            MythGamePlayerEditor settings;
+            settings.exec();
+
+            // Reload the game data
+            gCoreContext->ClearSettingsCache();
+            m_gameShowFileName = gCoreContext->GetSetting("GameShowFileNames").toInt();
+            reloadAllData(true);
+        }
+        else if (resulttext == tr("Update Game Database"))
+        {
+            GameHandler::processAllGames();
+        }
+        else if (resulttext == tr("Clear Game Database"))
+        {
+            GameHandler *handler = new GameHandler();
+            handler->clearAllGameData();
+
+            // Reload the game data
+            gCoreContext->ClearSettingsCache();
+            m_gameShowFileName = gCoreContext->GetSetting("GameShowFileNames").toInt();
+            reloadAllData(true);
         }
     }
     if (event->type() == MetadataLookupEvent::kEventType)
@@ -1113,4 +1161,3 @@ void GameUI::reloadAllData(bool dbChanged)
         BuildTree();
     }
 }
-

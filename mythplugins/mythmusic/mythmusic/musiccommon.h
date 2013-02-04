@@ -85,6 +85,7 @@ class MPUBLIC MusicCommon : public MythScreenType
     MythMenu* createShuffleMenu(void);
     MythMenu* createVisualizerMenu(void);
     MythMenu* createPlaylistOptionsMenu(void);
+    MythMenu* createSettingsMenu(void);
 
     void playlistItemClicked(MythUIButtonListItem *item);
     void playlistItemVisible(MythUIButtonListItem *item);

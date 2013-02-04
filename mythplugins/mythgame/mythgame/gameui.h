@@ -20,6 +20,7 @@ class QTimer;
 class QKeyEvent;
 class QEvent;
 class GameScanner;
+class MythMenu;
 
 class GameUI : public MythScreenType
 {
@@ -53,6 +54,7 @@ class GameUI : public MythScreenType
     void edit(void);
     void showInfo(void);
     void showMenu(void);
+    MythMenu* createSettingsMenu(void);
     void searchStart(void);
     void toggleFavorite(void);
     void customEvent(QEvent *event);
