@@ -297,6 +297,17 @@ void MythBrowser::slotTabLosingFocus(void)
     SetFocusWidget(activeBrowser());
 }
 
+void MythBrowser::slotSettings()
+{
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+    BrowserConfig *config = new BrowserConfig(mainStack, "browserconfig");
+
+    if (config->Create())
+        mainStack->AddScreen(config);
+    else
+        delete config;
+}
+
 bool MythBrowser::keyPressEvent(QKeyEvent *event)
 {
     // Always send keypress events to the currently focused widget first
@@ -344,6 +355,7 @@ bool MythBrowser::keyPressEvent(QKeyEvent *event)
                 m_menuPopup->AddButton(tr("Delete Tab"), SLOT(slotDeleteTab()));
 
             m_menuPopup->AddButton(tr("Add Bookmark"), SLOT(slotAddBookmark()));
+            m_menuPopup->AddButton(tr("Settings..."), SLOT(slotSettings()));
         }
         else if (action == "INFO")
         {
