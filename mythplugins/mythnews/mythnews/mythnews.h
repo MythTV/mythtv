@@ -48,6 +48,7 @@ class MythNews : public MythScreenType
     void deleteNewsSite(void);
     void ShowEditDialog(bool edit);
     void ShowFeedManager();
+    void showSettings(void);
 
     mutable QMutex m_lock;
     NewsSite::List m_NewsSites;

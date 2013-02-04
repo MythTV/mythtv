@@ -904,6 +904,7 @@ void MythNews::ShowMenu(void)
             m_menuPopup->AddButton(tr("Edit Feed"));
             m_menuPopup->AddButton(tr("Delete Feed"));
         }
+        m_menuPopup->AddButton(tr("Settings..."));
     }
     else
     {
@@ -927,6 +928,17 @@ void MythNews::deleteNewsSite(void)
             loadSites();
         }
     }
+}
+
+void MythNews::showSettings(void)
+{
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+    MythNewsConfig *mythnewsconfig = new MythNewsConfig(mainStack, "mythnewsconfig");
+
+    if (mythnewsconfig->Create())
+        mainStack->AddScreen(mythnewsconfig);
+    else
+        delete mythnewsconfig;
 }
 
 // does not need locking
@@ -958,6 +970,8 @@ void MythNews::customEvent(QEvent *event)
                     ShowEditDialog(true);
                 else if (buttonnum == 3)
                     deleteNewsSite();
+                else if (buttonnum == 4)
+                    showSettings();
             }
             else
                 if (buttonnum == 0)
