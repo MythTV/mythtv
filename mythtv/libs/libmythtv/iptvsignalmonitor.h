@@ -48,6 +48,7 @@ class IPTVSignalMonitor : public DTVSignalMonitor, public TSDataListener
   protected:
     volatile bool dtvMonitorRunning;
     IPTVTableMonitorThread *tableMonitorThread;
+    int           m_lock_timeout;
 
   private:
     mutable bool m_gotlock;

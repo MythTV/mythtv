@@ -40,7 +40,8 @@ IPTVSignalMonitor::IPTVSignalMonitor(int db_cardnum,
                                      IPTVChannel *_channel,
                                      uint64_t _flags) :
     DTVSignalMonitor(db_cardnum, _channel, _flags),
-    dtvMonitorRunning(false), tableMonitorThread(NULL)
+    dtvMonitorRunning(false), tableMonitorThread(NULL),
+    m_lock_timeout(1000 * 60 /* 1 minute */)
 {
     bool isLocked = false;
     IPTVChannelInfo chaninfo = GetChannel()->GetCurrentChanInfo();
@@ -139,6 +140,9 @@ bool IPTVSignalMonitor::IsAllGood(void) const
  */
 void IPTVSignalMonitor::UpdateValues(void)
 {
+    if (lock_timer.elapsed() > m_lock_timeout)
+        error = "Timed out.";
+
     if (!running || exit)
         return;
 
