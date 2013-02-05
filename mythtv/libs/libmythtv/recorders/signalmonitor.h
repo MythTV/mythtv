@@ -215,6 +215,7 @@ class SignalMonitor : protected MThread
 
     mutable QMutex     statusLock;
     mutable QMutex     listenerLock;
+    MythTimer          lock_timer;
 };
 
 inline QString sm_flags_to_string(uint64_t flags)

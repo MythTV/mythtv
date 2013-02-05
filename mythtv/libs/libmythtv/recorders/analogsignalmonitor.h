@@ -30,6 +30,7 @@ class AnalogSignalMonitor : public SignalMonitor
     int      m_stable_time;
     uint     m_lock_cnt;
     MythTimer m_timer;
+    int      m_lock_timeout;
 };
 
 #endif // _ANALOG_SIGNAL_MONITOR_H_

@@ -33,6 +33,7 @@ class IPTVSignalMonitor : public DTVSignalMonitor
 
   protected:
     bool m_streamHandlerStarted;
+    int  m_lock_timeout;
 };
 
 #endif // _IPTVSIGNALMONITOR_H_

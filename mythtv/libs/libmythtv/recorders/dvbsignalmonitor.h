@@ -59,6 +59,7 @@ class DVBSignalMonitor: public DTVSignalMonitor
 
     bool               streamHandlerStarted;
     DVBStreamHandler  *streamHandler;
+    int                lock_timeout;
 };
 
 #endif // DVBSIGNALMONITOR_H
