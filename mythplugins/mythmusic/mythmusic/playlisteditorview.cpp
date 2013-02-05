@@ -860,7 +860,7 @@ void PlaylistEditorView::filterTracks(MusicGenericTree *node)
     if (!tracks)
         return;
 
-    if (node->getAction() == "all tracks")
+    if (node->getAction() == "all tracks" || node->getAction() == "album")
     {
         QMap<QString, int> map;
 
@@ -869,7 +869,17 @@ void PlaylistEditorView::filterTracks(MusicGenericTree *node)
             Metadata *mdata = tracks->at(x);
             if (mdata)
             {
-                map.insertMulti(mdata->Title(), mdata->ID());
+                QString key = mdata->Title();
+                // Sort the titles by track number only when
+                // an album is selected. When all tracks
+                // are selected, show them in alphabetical order.
+                if (mdata->Track() > 0 && node->getAction() == "album")
+                {
+                    key.prepend(QString::number(mdata->Track()) + " - ");
+                    if (mdata->Track() < 10)
+                        key.prepend("0");
+                }
+                map.insertMulti(key, mdata->ID());
             }
         }
 
@@ -1158,7 +1168,7 @@ void PlaylistEditorView::filterTracks(MusicGenericTree *node)
         }
     }
     else if (node->getAction() == "artist" || node->getAction() == "compartist" ||
-             node->getAction() == "album" || node->getAction() == "genre" ||
+             node->getAction() == "genre" ||
              node->getAction() == "rating" || node->getAction() == "year" ||
              node->getAction() == "compilations")
     {
