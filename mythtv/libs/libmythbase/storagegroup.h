@@ -26,7 +26,8 @@ class MBASE_PUBLIC StorageGroup
     QString GetFirstDir(bool appendSlash = false) const;
 
     QStringList GetDirFileList(QString dir, QString base,
-                               bool recursive = false);
+                               bool recursive = false, bool onlyDirs = false);
+    QStringList GetDirList(QString Path, bool recursive = false);
     QStringList GetFileList(QString Path, bool recursive = false);
     QStringList GetFileInfoList(QString Path);
     bool FileExists(QString filename);
