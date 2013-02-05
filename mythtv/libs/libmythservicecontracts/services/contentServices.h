@@ -39,7 +39,7 @@
 class SERVICE_PUBLIC ContentServices : public Service  //, public QScriptable ???
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "1.33" );
+    Q_CLASSINFO( "version"    , "1.34" );
     Q_CLASSINFO( "DownloadFile_Method",            "POST" )
 
     public:
@@ -63,6 +63,8 @@ class SERVICE_PUBLIC ContentServices : public Service  //, public QScriptable ??
                                                           int Width, int Height ) = 0;
 
         virtual QStringList         GetFileList         ( const QString   &StorageGroup ) = 0;
+
+        virtual QStringList         GetDirList          ( const QString   &StorageGroup ) = 0;
 
         virtual QFileInfo           GetRecordingArtwork ( const QString   &Type,
                                                           const QString   &Inetref,

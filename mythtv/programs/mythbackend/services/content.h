@@ -49,6 +49,8 @@ class Content : public ContentServices
 
         QStringList         GetFileList         ( const QString   &StorageGroup );
 
+        QStringList         GetDirList          ( const QString   &StorageGroup );
+
         QFileInfo           GetRecordingArtwork ( const QString   &Type,
                                                   const QString   &Inetref,
                                                   int Season, int Width,
