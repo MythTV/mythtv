@@ -206,6 +206,26 @@ QFileInfo Content::GetImageFile( const QString &sStorageGroup,
 //
 /////////////////////////////////////////////////////////////////////////////
 
+QStringList Content::GetDirList( const QString &sStorageGroup )
+{
+
+    if (sStorageGroup.isEmpty())
+    {
+        QString sMsg( "GetDirList - StorageGroup missing.");
+        LOG(VB_UPNP, LOG_ERR, sMsg);
+
+        throw sMsg;
+    }
+
+    StorageGroup sgroup(sStorageGroup);
+
+    return sgroup.GetDirList("", true);
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
 QStringList Content::GetFileList( const QString &sStorageGroup )
 {
 
