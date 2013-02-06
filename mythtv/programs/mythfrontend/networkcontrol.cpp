@@ -1014,6 +1014,9 @@ QString NetworkControl::processSet(NetworkCommand *nc)
 
     if (nc->getArg(1) == "verbose")
     {
+        if (nc->getArgCount() < 3)
+            return QString("ERROR: Missing filter name.");
+
         if (nc->getArgCount() > 3)
             return QString("ERROR: Separate filters with commas with no "
                            "space: playback,audio\r\n See 'help %1' for usage "
