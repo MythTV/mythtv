@@ -334,7 +334,7 @@
         <translation>No es posible conectar con mythzmserver - ¿Está ejecutándose? ¿Ha establecido la IP y el puerto correctos en la configuración?</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmclient.cpp" line="194"/>
+        <location filename="../mythzoneminder/zmclient.cpp" line="200"/>
         <source>The mythzmserver didn&apos;t respond to our request to get the protocol version!!</source>
         <translation>¡¡El mythzmserver no respondió a nuestras peticiones de obtener la versión del protocolo!!</translation>
     </message>
@@ -420,7 +420,7 @@
     <name>ZMPlayer</name>
     <message>
         <location filename="../mythzoneminder/zmplayer.cpp" line="107"/>
-        <location filename="../mythzoneminder/zmplayer.cpp" line="291"/>
+        <location filename="../mythzoneminder/zmplayer.cpp" line="292"/>
         <source>Pause</source>
         <translation>Pausa</translation>
     </message>
@@ -440,8 +440,8 @@
         <translation>Siguiente</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmplayer.cpp" line="298"/>
-        <location filename="../mythzoneminder/zmplayer.cpp" line="377"/>
+        <location filename="../mythzoneminder/zmplayer.cpp" line="299"/>
+        <location filename="../mythzoneminder/zmplayer.cpp" line="378"/>
         <source>Play</source>
         <translation>Reproducir</translation>
     </message>

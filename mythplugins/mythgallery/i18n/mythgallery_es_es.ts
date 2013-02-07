@@ -12,57 +12,57 @@
 <context>
     <name>GalleryFilterDialog</name>
     <message>
-        <location filename="../mythgallery/galleryfilterdlg.cpp" line="145"/>
+        <location filename="../mythgallery/galleryfilterdlg.cpp" line="143"/>
         <source>Filter result : (unknown)</source>
         <translation>Resultado del filtro : (desconocido)</translation>
     </message>
     <message>
-        <location filename="../mythgallery/galleryfilterdlg.cpp" line="178"/>
+        <location filename="../mythgallery/galleryfilterdlg.cpp" line="176"/>
         <source>-- please be patient --</source>
         <translation>-- por favor, sea paciente --</translation>
     </message>
     <message>
-        <location filename="../mythgallery/galleryfilterdlg.cpp" line="190"/>
+        <location filename="../mythgallery/galleryfilterdlg.cpp" line="188"/>
         <source>-- scanning current filter --</source>
         <translation>-- explorando el filtro actual --</translation>
     </message>
     <message>
-        <location filename="../mythgallery/galleryfilterdlg.cpp" line="205"/>
+        <location filename="../mythgallery/galleryfilterdlg.cpp" line="203"/>
         <source>No files / folders found</source>
         <translation>No se encontraron archivos / carpetas</translation>
     </message>
     <message>
-        <location filename="../mythgallery/galleryfilterdlg.cpp" line="209"/>
+        <location filename="../mythgallery/galleryfilterdlg.cpp" line="207"/>
         <source>Filter result : %1 folder(s) found but no files</source>
         <translation>Resultado del filtro: se encontraron %1 carpeta(s) pero ningún archivo</translation>
     </message>
     <message>
-        <location filename="../mythgallery/galleryfilterdlg.cpp" line="213"/>
+        <location filename="../mythgallery/galleryfilterdlg.cpp" line="211"/>
         <source>Filter result : %1 folder(s), %2 movie(s) found</source>
         <translation>Resultado del filtro: se encontraron %1 carpeta(s) y %2 película(s)</translation>
     </message>
     <message>
-        <location filename="../mythgallery/galleryfilterdlg.cpp" line="217"/>
+        <location filename="../mythgallery/galleryfilterdlg.cpp" line="215"/>
         <source>Filter result : %1 folder(s), %2 image(s) found</source>
         <translation>Resultado del filtro: se encontraron %1 carpeta(s) y %2 imágen(es)</translation>
     </message>
     <message>
-        <location filename="../mythgallery/galleryfilterdlg.cpp" line="221"/>
+        <location filename="../mythgallery/galleryfilterdlg.cpp" line="219"/>
         <source>Filter result : %1 folder(s), %2 image(s) and %3 movie(s) found</source>
         <translation>Resultado del filtro: se encontraron %1 carpeta(s), %2 imágen(es) y %3 película(s)</translation>
     </message>
     <message>
-        <location filename="../mythgallery/galleryfilterdlg.cpp" line="226"/>
+        <location filename="../mythgallery/galleryfilterdlg.cpp" line="224"/>
         <source>Filter result : %1 image(s) and %2 movie(s) found</source>
         <translation>Resultado del filtro: Encontradas %1 imágen(es) y %2 película(s)</translation>
     </message>
     <message>
-        <location filename="../mythgallery/galleryfilterdlg.cpp" line="230"/>
+        <location filename="../mythgallery/galleryfilterdlg.cpp" line="228"/>
         <source>Filter result : %1 image(s) found</source>
         <translation>Resultado del filtro: Encontrada(s) %1 imágen(es)</translation>
     </message>
     <message>
-        <location filename="../mythgallery/galleryfilterdlg.cpp" line="233"/>
+        <location filename="../mythgallery/galleryfilterdlg.cpp" line="231"/>
         <source>Filter result : %1 movie(s) found</source>
         <translation>Resultado del filtro: Encontrada(s) %1 película(s)</translation>
     </message>
@@ -574,62 +574,62 @@ Check the directory exists, is readable and the setting is correct on MythGaller
 Compruebe que el directorio exista, sea legible y la configuración de MythGallery sea correcta.</translation>
     </message>
     <message>
-        <location filename="../mythgallery/galleryfilterdlg.cpp" line="138"/>
+        <location filename="../mythgallery/galleryfilterdlg.cpp" line="136"/>
         <source>All</source>
         <translation>Todas</translation>
     </message>
     <message>
-        <location filename="../mythgallery/galleryfilterdlg.cpp" line="140"/>
+        <location filename="../mythgallery/galleryfilterdlg.cpp" line="138"/>
         <source>Images only</source>
         <translation>Sólo imágenes</translation>
     </message>
     <message>
-        <location filename="../mythgallery/galleryfilterdlg.cpp" line="142"/>
+        <location filename="../mythgallery/galleryfilterdlg.cpp" line="140"/>
         <source>Movies only</source>
         <translation>Sólo películas</translation>
     </message>
     <message>
-        <location filename="../mythgallery/galleryfilterdlg.cpp" line="148"/>
+        <location filename="../mythgallery/galleryfilterdlg.cpp" line="146"/>
         <source>Unsorted</source>
         <translation>Sin ordenar</translation>
     </message>
     <message>
-        <location filename="../mythgallery/galleryfilterdlg.cpp" line="150"/>
+        <location filename="../mythgallery/galleryfilterdlg.cpp" line="148"/>
         <source>Name (A-Z alpha)</source>
         <translation>Nombre (A-Z alfa)</translation>
     </message>
     <message>
-        <location filename="../mythgallery/galleryfilterdlg.cpp" line="153"/>
+        <location filename="../mythgallery/galleryfilterdlg.cpp" line="151"/>
         <source>Reverse Name (Z-A alpha)</source>
         <translation>Nombre Inverso (Z-A alfa)</translation>
     </message>
     <message>
-        <location filename="../mythgallery/galleryfilterdlg.cpp" line="155"/>
+        <location filename="../mythgallery/galleryfilterdlg.cpp" line="153"/>
         <source>Mod Time (oldest first)</source>
         <translation>Fecha de Mod. (primero la más antigua)</translation>
     </message>
     <message>
-        <location filename="../mythgallery/galleryfilterdlg.cpp" line="158"/>
+        <location filename="../mythgallery/galleryfilterdlg.cpp" line="156"/>
         <source>Reverse Mod Time (newest first)</source>
         <translation>Fecha de Mod. Inversa (primero la más reciente)</translation>
     </message>
     <message>
-        <location filename="../mythgallery/galleryfilterdlg.cpp" line="160"/>
+        <location filename="../mythgallery/galleryfilterdlg.cpp" line="158"/>
         <source>Extension (A-Z alpha)</source>
         <translation>Extensión (A-Z alfa)</translation>
     </message>
     <message>
-        <location filename="../mythgallery/galleryfilterdlg.cpp" line="163"/>
+        <location filename="../mythgallery/galleryfilterdlg.cpp" line="161"/>
         <source>Reverse Extension (Z-A alpha)</source>
         <translation>Extensión Inversa (Z-A alfa)</translation>
     </message>
     <message>
-        <location filename="../mythgallery/galleryfilterdlg.cpp" line="166"/>
+        <location filename="../mythgallery/galleryfilterdlg.cpp" line="164"/>
         <source>Filesize (smallest first)</source>
         <translation>Tamaño de Archivo (primero el menor)</translation>
     </message>
     <message>
-        <location filename="../mythgallery/galleryfilterdlg.cpp" line="169"/>
+        <location filename="../mythgallery/galleryfilterdlg.cpp" line="167"/>
         <source>Reverse Filesize (largest first)</source>
         <translation>Tamaño de Archivo Inverso (primero el mayor)</translation>
     </message>
