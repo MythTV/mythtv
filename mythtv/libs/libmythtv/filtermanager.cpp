@@ -53,10 +53,48 @@ FilterChain::~FilterChain()
     filters.clear();
 }
 
+// Applies a crop filter, modifed from filter_crop.c, to crop the
+// bottom 8 lines of a 1088-line frame, which often contains garbage.
+static void crop1088(VideoFrame *frame)
+{
+    if (frame->height != 1088)
+        return;
+    if (frame->width != 1920 && frame->width != 1440)
+        return;
+    if (frame->pitches[1] != frame->pitches[2])
+        return;
+    // assume input and output formats are FMT_YV12
+    uint64_t *ybuf = (uint64_t*) (frame->buf + frame->offsets[0]);
+    uint64_t *ubuf = (uint64_t*) (frame->buf + frame->offsets[1]);
+    uint64_t *vbuf = (uint64_t*) (frame->buf + frame->offsets[2]);
+    const uint64_t Y_black  = 0x0000000000000000LL; // 8 bytes
+    const uint64_t UV_black = 0x8080808080808080LL; // 8 bytes
+    int y;
+    int sz = (frame->pitches[0] * frame->height) >> 3; // div 8 bytes
+    // Luma bottom
+    y = ((frame->height >> 4) - 1) * frame->pitches[0] << 1;
+    y = (y + sz) / 2;
+    for (; y < sz; y++)
+    {
+        ybuf[y] = Y_black;
+    }
+    // Chroma bottom
+    sz = (frame->pitches[1] * (frame->height >> 1)) >> 3; // div 8 bytes
+    y = ((frame->height >> 4) - 1) * frame->pitches[1];
+    y = (y + sz) / 2;
+    for (; y < sz; y++)
+    {
+        ubuf[y] = UV_black;
+        vbuf[y] = UV_black;
+    }
+}
+
 void FilterChain::ProcessFrame(VideoFrame *frame, FrameScanType scan)
 {
     if (!frame)
         return;
+
+    crop1088(frame);
 
     vector<VideoFilter*>::iterator it = filters.begin();
     for (; it != filters.end(); ++it)
