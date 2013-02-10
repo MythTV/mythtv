@@ -140,7 +140,6 @@ void VideoOutWindow::MoveResize(void)
     }
 
     // Apply various modifications
-    Apply1080Fixup();
     ApplyDBScaleAndMove();
     ApplyLetterboxing();
     ApplyManualScaleAndMove();
@@ -151,20 +150,6 @@ void VideoOutWindow::MoveResize(void)
     }
     PrintMoveResizeDebug();
     needrepaint = true;
-}
-
-/** \fn VideoOutWindow::Apply1080Fixup(void)
-
- *  \brief If the video is reported as 1088 lines, apply a vertical
- *  scaling operation to bring it effectively to 1080 lines.
- */
-void VideoOutWindow::Apply1080Fixup(void)
-{
-    if (video_dim.height() == 1088)
-    {
-        int height = display_video_rect.height();
-        display_video_rect.setHeight(height * 1088.0 / 1084 + 0.5);
-    }
 }
 
 /** \fn VideoOutWindow::ApplyDBScaleAndMove(void)

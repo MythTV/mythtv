@@ -3025,6 +3025,8 @@ bool AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)
         current_aspect = get_aspect(*m_h264_parser);
         uint  width  = m_h264_parser->pictureWidth();
         uint  height = m_h264_parser->pictureHeight();
+        if (height == 1088 && current_height == 1080)
+            height = 1080;
         float seqFPS = m_h264_parser->frameRate() * 0.001f;
 
         bool res_changed = ((width  != (uint)current_width) ||

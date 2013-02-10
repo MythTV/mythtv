@@ -106,7 +106,6 @@ class VideoOutWindow
                      bool         do_pixel_adj = true) const;
 
   protected:
-    void Apply1080Fixup(void);
     void ApplyDBScaleAndMove(void);
     void ApplyManualScaleAndMove(void);
     void ApplyLetterboxing(void);
