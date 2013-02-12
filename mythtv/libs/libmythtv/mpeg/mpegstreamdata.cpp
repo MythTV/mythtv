@@ -834,7 +834,7 @@ void MPEGStreamData::ProcessPAT(const ProgramAssociationTable *pat)
         QMutexLocker locker(&_listener_lock);
         ProgramAssociationTable *pat_sp = PATSingleProgram();
         for (uint i = 0; i < _mpeg_sp_listeners.size(); i++)
-            _mpeg_sp_listeners[i]->HandleSingleProgramPAT(pat_sp);
+            _mpeg_sp_listeners[i]->HandleSingleProgramPAT(pat_sp, false);
     }
 }
 
@@ -869,7 +869,7 @@ void MPEGStreamData::ProcessPMT(const ProgramMapTable *pmt)
         QMutexLocker locker(&_listener_lock);
         ProgramMapTable *pmt_sp = PMTSingleProgram();
         for (uint i = 0; i < _mpeg_sp_listeners.size(); i++)
-            _mpeg_sp_listeners[i]->HandleSingleProgramPMT(pmt_sp);
+            _mpeg_sp_listeners[i]->HandleSingleProgramPMT(pmt_sp, false);
     }
 }
 
@@ -980,7 +980,7 @@ void MPEGStreamData::HandleTSTables(const TSPacket* tspacket)
             QMutexLocker locker(&_listener_lock);
             ProgramAssociationTable *pat_sp = PATSingleProgram();
             for (uint i = 0; i < _mpeg_sp_listeners.size(); i++)
-                _mpeg_sp_listeners[i]->HandleSingleProgramPAT(pat_sp);
+                _mpeg_sp_listeners[i]->HandleSingleProgramPAT(pat_sp, false);
         }
         if (TableID::PMT == psip->TableID() &&
             tspacket->PID() == _pid_pmt_single_program)
@@ -988,7 +988,7 @@ void MPEGStreamData::HandleTSTables(const TSPacket* tspacket)
             QMutexLocker locker(&_listener_lock);
             ProgramMapTable *pmt_sp = PMTSingleProgram();
             for (uint i = 0; i < _mpeg_sp_listeners.size(); i++)
-                _mpeg_sp_listeners[i]->HandleSingleProgramPMT(pmt_sp);
+                _mpeg_sp_listeners[i]->HandleSingleProgramPMT(pmt_sp, false);
         }
         DONE_WITH_PSIP_PACKET(); // already parsed this table, toss it.
     }

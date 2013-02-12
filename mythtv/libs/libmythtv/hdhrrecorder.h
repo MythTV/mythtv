@@ -26,6 +26,7 @@ class HDHRRecorder : public DTVRecorder
     bool Open(void);
     bool IsOpen(void) const { return _stream_handler; }
     void Close(void);
+    void StartNewFile(void);
 
     QString GetSIStandard(void) const;
 

@@ -68,6 +68,7 @@ class ASIRecorder : public DTVRecorder
     bool Open(void);
     bool IsOpen(void) const;
     void Close(void);
+    void StartNewFile(void);
 
   private:
     ASIChannel       *m_channel;
