@@ -24,6 +24,7 @@ class IPTVRecorder : public DTVRecorder
     virtual bool Open(void); // RecorderBase
     virtual void Close(void); // RecorderBase
     bool IsOpen(void) const;
+    void StartNewFile(void);
 
     virtual void SetStreamData(MPEGStreamData*); // DTVRecorder
     virtual bool PauseAndWait(int timeout = 100); // RecorderBase

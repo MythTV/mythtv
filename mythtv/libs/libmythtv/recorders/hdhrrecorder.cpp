@@ -48,6 +48,13 @@ void HDHRRecorder::Close(void)
     LOG(VB_RECORD, LOG_INFO, LOC + "Close() -- end");
 }
 
+void HDHRRecorder::StartNewFile(void)
+{
+    // Make sure the first things in the file are a PAT & PMT
+    HandleSingleProgramPAT(_stream_data->PATSingleProgram(), true);
+    HandleSingleProgramPMT(_stream_data->PMTSingleProgram(), true);
+}
+
 void HDHRRecorder::run(void)
 {
     LOG(VB_RECORD, LOG_INFO, LOC + "run -- begin");
@@ -67,12 +74,7 @@ void HDHRRecorder::run(void)
         recordingWait.wakeAll();
     }
 
-    // Make sure the first things in the file are a PAT & PMT
-    bool tmp = _wait_for_keyframe_option;
-    _wait_for_keyframe_option = false;
-    HandleSingleProgramPAT(_stream_data->PATSingleProgram());
-    HandleSingleProgramPMT(_stream_data->PMTSingleProgram());
-    _wait_for_keyframe_option = tmp;
+    StartNewFile();
 
     _stream_data->AddAVListener(this);
     _stream_data->AddWritingListener(this);

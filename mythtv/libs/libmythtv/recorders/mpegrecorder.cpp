@@ -932,9 +932,8 @@ void MpegRecorder::run(void)
         _stream_data->AddWritingListener(this);
 
         // Make sure the first things in the file are a PAT & PMT
-        _wait_for_keyframe_option = false;
-        HandleSingleProgramPAT(_stream_data->PATSingleProgram());
-        HandleSingleProgramPMT(_stream_data->PMTSingleProgram());
+        HandleSingleProgramPAT(_stream_data->PATSingleProgram(), true);
+        HandleSingleProgramPMT(_stream_data->PMTSingleProgram(), true);
         _wait_for_keyframe_option = true;
     }
 
@@ -1252,9 +1251,9 @@ void MpegRecorder::RestartEncoding(void)
         _stream_data->PATSingleProgram() &&
         _stream_data->PMTSingleProgram())
     {
-        _wait_for_keyframe_option = false;
-        HandleSingleProgramPAT(_stream_data->PATSingleProgram());
-        HandleSingleProgramPMT(_stream_data->PMTSingleProgram());
+        _payload_buffer.clear();  // No reason to keep part of a frame
+        HandleSingleProgramPAT(_stream_data->PATSingleProgram(), true);
+        HandleSingleProgramPMT(_stream_data->PMTSingleProgram(), true);
     }
 
     if (driver == "hdpvr") // HD-PVR will sometimes reset to defaults

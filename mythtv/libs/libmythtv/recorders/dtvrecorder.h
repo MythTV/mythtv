@@ -64,8 +64,8 @@ class DTVRecorder :
     void HandleEncryptionStatus(uint /*pnum*/, bool /*encrypted*/) { }
 
     // MPEG Single Program Stream Listener
-    void HandleSingleProgramPAT(ProgramAssociationTable *pat);
-    void HandleSingleProgramPMT(ProgramMapTable *pmt);
+    void HandleSingleProgramPAT(ProgramAssociationTable *pat, bool insert);
+    void HandleSingleProgramPMT(ProgramMapTable *pmt, bool insert);
 
     // ATSC Main
     void HandleSTT(const SystemTimeTable*) { UpdateCAMTimeOffset(); }
@@ -93,11 +93,11 @@ class DTVRecorder :
     void FinishRecording(void);
     void ResetForNewFile(void);
 
-    void HandleKeyframe(uint64_t frameNum, int64_t extra = 0);
+    void HandleKeyframe(int64_t extra);
     void HandleTimestamps(int stream_id, int64_t pts, int64_t dts);
     void UpdateFramesWritten(void);
 
-    void BufferedWrite(const TSPacket &tspacket);
+    void BufferedWrite(const TSPacket &tspacket, bool insert = false);
 
     // MPEG TS "audio only" support
     bool FindAudioKeyframes(const TSPacket *tspacket);

@@ -72,6 +72,13 @@ void DVBRecorder::Close(void)
     LOG(VB_RECORD, LOG_INFO, LOC + "Close() -- end");
 }
 
+void DVBRecorder::StartNewFile(void)
+{
+    // Make sure the first things in the file are a PAT & PMT
+    HandleSingleProgramPAT(_stream_data->PATSingleProgram(), true);
+    HandleSingleProgramPMT(_stream_data->PMTSingleProgram(), true);
+}
+
 void DVBRecorder::run(void)
 {
     if (!Open())
@@ -92,12 +99,7 @@ void DVBRecorder::run(void)
     if (_channel && (_channel->GetSIStandard() == "dvb"))
         _stream_data->AddListeningPID(DVB_TDT_PID);
 
-    // Make sure the first things in the file are a PAT & PMT
-    bool tmp = _wait_for_keyframe_option;
-    _wait_for_keyframe_option = false;
-    HandleSingleProgramPAT(_stream_data->PATSingleProgram());
-    HandleSingleProgramPMT(_stream_data->PMTSingleProgram());
-    _wait_for_keyframe_option = tmp;
+    StartNewFile();
 
     _stream_data->AddAVListener(this);
     _stream_data->AddWritingListener(this);
