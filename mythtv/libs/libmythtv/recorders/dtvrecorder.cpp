@@ -534,7 +534,8 @@ bool DTVRecorder::FindMPEG2Keyframes(const TSPacket* tspacket)
         hasKeyFrame &= (_last_seq_seen + maxKFD) < _frames_seen_count;
     }
 
-    if (hasKeyFrame)
+    // _buffer_packets will only be true if a payload start has been seen
+    if (hasKeyFrame && _buffer_packets)
     {
         LOG(VB_RECORD, LOG_DEBUG, LOC + QString
             ("Keyframe @ %1 + %2 = %3")
@@ -889,7 +890,8 @@ bool DTVRecorder::FindH264Keyframes(const TSPacket *tspacket)
         }
     } // for (; i < TSPacket::kSize; ++i)
 
-    if (hasKeyFrame)
+    // _buffer_packets will only be true if a payload start has been seen
+    if (hasKeyFrame && _buffer_packets)
     {
         LOG(VB_RECORD, LOG_DEBUG, LOC + QString
             ("Keyframe @ %1 + %2 = %3 AU %4")
@@ -1359,8 +1361,12 @@ bool DTVRecorder::ProcessAudioTSPacket(const TSPacket &tspacket)
 bool DTVRecorder::ProcessAVTSPacket(const TSPacket &tspacket)
 {
     // Sync recording start to first keyframe
-    if (!_buffer_packets && _wait_for_keyframe_option && _first_keyframe < 0)
+    if (_wait_for_keyframe_option && _first_keyframe < 0)
+    {
+        if (_buffer_packets)
+            BufferedWrite(tspacket);
         return true;
+    }
 
     const uint pid = tspacket.PID();
 
@@ -1379,17 +1385,11 @@ bool DTVRecorder::ProcessAVTSPacket(const TSPacket &tspacket)
                 .arg(erate,5,'f',2));
     }
 
-    // Sync streams to the first Payload Unit Start Indicator
-    // _after_ first keyframe iff _wait_for_keyframe_option is true
-    if (!(_pid_status[pid] & kPayloadStartSeen) && tspacket.HasPayload())
+    if (!(_pid_status[pid] & kPayloadStartSeen))
     {
-        if (!tspacket.PayloadStart())
-            return true; // not payload start - drop packet
-
+        _pid_status[pid] |= kPayloadStartSeen;
         LOG(VB_RECORD, LOG_INFO, LOC +
             QString("PID 0x%1 Found Payload Start").arg(pid,0,16));
-
-        _pid_status[pid] |= kPayloadStartSeen;
     }
 
     BufferedWrite(tspacket);
