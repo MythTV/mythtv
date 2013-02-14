@@ -300,18 +300,15 @@ QStringList StorageGroup::GetFileInfoList(QString Path)
     if (!d.exists())
         return files;
 
+    d.setFilter(QDir::NoDotAndDotDot);
     QFileInfoList list = d.entryInfoList();
     if (!list.size())
         return files;
 
     for (QFileInfoList::iterator p = list.begin(); p != list.end(); ++p)
     {
-        if (p->fileName() == "." ||
-            p->fileName() == ".." ||
-            p->fileName() == "Thumbs.db")
-        {
+        if (p->fileName() == "Thumbs.db")
             continue;
-        }
 
         QString tmp;
 

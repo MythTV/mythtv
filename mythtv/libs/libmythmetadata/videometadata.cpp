@@ -414,7 +414,8 @@ class VideoMetadataImp
 bool VideoMetadataImp::removeDir(const QString &dirName)
 {
     QDir d(dirName);
-
+    
+    d.setFilter(QDir::NoDotAndDotDot);
     QFileInfoList contents = d.entryInfoList();
     if (!contents.size())
     {
@@ -423,11 +424,6 @@ bool VideoMetadataImp::removeDir(const QString &dirName)
 
     for (QFileInfoList::iterator p = contents.begin(); p != contents.end(); ++p)
     {
-        if (p->fileName() == "." ||
-            p->fileName() == "..")
-        {
-            continue;
-        }
         if (p->isDir())
         {
             QString fileName = p->fileName();

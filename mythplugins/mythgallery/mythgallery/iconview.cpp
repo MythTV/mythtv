@@ -1388,7 +1388,8 @@ void IconView::ImportFromDir(const QString &fromDir, const QString &toDir)
     d.setNameFilters(GalleryUtil::GetMediaFilter());
     d.setSorting((QDir::SortFlag)m_sortorder);
     d.setFilter(QDir::Files       | QDir::AllDirs |
-                QDir::NoSymLinks  | QDir::Readable);
+                QDir::NoSymLinks  | QDir::Readable |
+                QDir::NoDotAndDotDot);
     QFileInfoList list = d.entryInfoList();
     QFileInfoList::const_iterator it = list.begin();
     const QFileInfo *fi;
@@ -1397,8 +1398,6 @@ void IconView::ImportFromDir(const QString &fromDir, const QString &toDir)
     {
         fi = &(*it);
         ++it;
-        if (fi->fileName() == "." || fi->fileName() == "..")
-            continue;
 
         if (fi->isDir())
         {
@@ -1566,7 +1565,8 @@ int ChildCountThread::getChildCount(const QString &filepath)
     isGallery = (gList.count() != 0);
 
     QFileInfoList list = d.entryInfoList(GalleryUtil::GetMediaFilter(),
-                                         QDir::Files | QDir::AllDirs);
+                                         QDir::Files | QDir::AllDirs |
+                                         QDir::NoDotAndDotDot);
 
     if (list.isEmpty())
         return 0;
@@ -1579,8 +1579,6 @@ int ChildCountThread::getChildCount(const QString &filepath)
     {
         fi = &(*it);
         ++it;
-        if (fi->fileName() == "." || fi->fileName() == "..")
-            continue;
 
         // remove these already-resized pictures.
         if (isGallery && (

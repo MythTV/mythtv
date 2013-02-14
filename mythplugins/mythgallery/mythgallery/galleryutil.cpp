@@ -260,9 +260,10 @@ bool GalleryUtil::LoadDirectory(ThumbList& itemList, const QString& dir,
     // Create .thumbcache dir if neccesary
     if (thumbGen)
         thumbGen->getThumbcacheDir(currDir);
-
+    
     QFileInfoList list = d.entryInfoList(GetMediaFilter(),
-                                         QDir::Files | QDir::AllDirs,
+                                         QDir::Files | QDir::AllDirs |
+                                         QDir::NoDotAndDotDot,
                                          (QDir::SortFlag)flt.getSort());
 
     if (list.isEmpty())
@@ -286,8 +287,6 @@ bool GalleryUtil::LoadDirectory(ThumbList& itemList, const QString& dir,
     {
         fi = &(*it);
         ++it;
-        if (fi->fileName() == "." || fi->fileName() == "..")
-            continue;
 
         // remove these already-resized pictures.
         if (isGallery && (
@@ -585,16 +584,14 @@ bool GalleryUtil::CopyDirectory(const QFileInfo src, QFileInfo &dst)
 
     bool ok = true;
     QDir dstDir(dst.absoluteFilePath());
+    srcDir.setFilter(QDir::NoDotAndDotDot);
     QFileInfoList list = srcDir.entryInfoList();
     QFileInfoList::const_iterator it = list.begin();
     for (; it != list.end(); ++it)
     {
         const QString fn = it->fileName();
-        if (fn != "." && fn != "..")
-        {
-            QFileInfo dfi(dstDir, fn);
-            ok &= Copy(*it, dfi);
-        }
+        QFileInfo dfi(dstDir, fn);
+        ok &= Copy(*it, dfi);
     }
 
     return ok;
@@ -616,16 +613,14 @@ bool GalleryUtil::MoveDirectory(const QFileInfo src, QFileInfo &dst)
 
     bool ok = true;
     QDir dstDir(dst.absoluteFilePath());
+    srcDir.setFilter(QDir::NoDotAndDotDot);
     QFileInfoList list = srcDir.entryInfoList();
     QFileInfoList::const_iterator it = list.begin();
     for (; it != list.end(); ++it)
     {
         const QString fn = it->fileName();
-        if (fn != "." && fn != "..")
-        {
-            QFileInfo dfi(dstDir, fn);
-            ok &= Move(*it, dfi);
-        }
+        QFileInfo dfi(dstDir, fn);
+        ok &= Move(*it, dfi);
     }
 
     return ok && FileDelete(src);
@@ -637,13 +632,13 @@ bool GalleryUtil::DeleteDirectory(const QFileInfo &dir)
         return false;
 
     QDir srcDir(dir.absoluteFilePath());
+    srcDir.setFilter(QDir::NoDotAndDotDot);
     QFileInfoList list = srcDir.entryInfoList();
     QFileInfoList::const_iterator it = list.begin();
     for (; it != list.end(); ++it)
     {
         const QString fn = it->fileName();
-        if (fn != "." && fn != "..")
-            Delete(*it);
+        Delete(*it);
     }
 
     return FileDelete(dir);

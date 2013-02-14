@@ -256,15 +256,12 @@ bool MediaMonitorUnix::CheckMountable(void)
     m_fifo = open(kUDEV_FIFO, O_RDONLY | O_NONBLOCK);
 
     QDir sysfs("/sys/block");
-    sysfs.setFilter(QDir::Dirs);
+    sysfs.setFilter(QDir::Dirs | QDir::NoDotAndDotDot);
 
     QStringList devices = sysfs.entryList();
 
     for (QStringList::iterator it = devices.begin(); it != devices.end(); ++it)
     {
-        if (*it == "." || *it == "..")
-            continue;
-
         // ignore floppies, too slow
         if ((*it).startsWith("fd"))
             continue;
@@ -772,16 +769,13 @@ bool MediaMonitorUnix::FindPartitions(const QString &dev, bool checkPartitions)
     {
         // check for partitions
         QDir sysfs(dev);
-        sysfs.setFilter(QDir::Dirs);
+        sysfs.setFilter(QDir::Dirs | QDir::NoDotAndDotDot);
 
         bool found_partitions = false;
         QStringList parts = sysfs.entryList();
         for (QStringList::iterator pit = parts.begin();
              pit != parts.end(); ++pit)
         {
-            if (*pit == "." || *pit == "..")
-                continue;
-
             // skip some sysfs dirs that are _not_ sub-partitions
             if (*pit == "device" || *pit == "holders" || *pit == "queue"
                                  || *pit == "slaves"  || *pit == "subsystem"

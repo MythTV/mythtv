@@ -554,6 +554,7 @@ void ImportMusicDialog::scanDirectory(QString &directory, vector<TrackInfo*> *tr
     if (!d.exists())
         return;
 
+    d.setFilter(QDir::NoDotAndDotDot);
     const QFileInfoList list = d.entryInfoList();
     if (list.isEmpty())
         return;
@@ -565,8 +566,6 @@ void ImportMusicDialog::scanDirectory(QString &directory, vector<TrackInfo*> *tr
     {
         fi = &(*it);
         ++it;
-        if (fi->fileName() == "." || fi->fileName() == "..")
-            continue;
         QString filename = fi->absoluteFilePath();
         if (fi->isDir())
             scanDirectory(filename, tracks);
@@ -1028,7 +1027,8 @@ void ImportCoverArtDialog::scanDirectory()
     QString nameFilter = gCoreContext->GetSetting("AlbumArtFilter",
                                               "*.png;*.jpg;*.jpeg;*.gif;*.bmp");
 
-    QFileInfoList list = d.entryInfoList(nameFilter.split(";"));
+    QFileInfoList list = d.entryInfoList(nameFilter.split(";"),
+                                         QDir::NoDotAndDotDot);
     if (list.isEmpty())
         return;
 
@@ -1039,8 +1039,6 @@ void ImportCoverArtDialog::scanDirectory()
     {
         fi = &(*it);
         ++it;
-        if (fi->fileName() == "." || fi->fileName() == "..")
-            continue;
         QString filename = fi->absoluteFilePath();
         if (!fi->isDir())
         {

@@ -87,6 +87,7 @@ void FileScanner::BuildFileList(QString &directory, MusicLoadedMap &music_files,
     if (!d.exists())
         return;
 
+    d.setFilter(QDir::NoDotAndDotDot);
     QFileInfoList list = d.entryInfoList();
     if (list.isEmpty())
         return;
@@ -102,8 +103,6 @@ void FileScanner::BuildFileList(QString &directory, MusicLoadedMap &music_files,
     {
         fi = &(*it);
         ++it;
-        if (fi->fileName() == "." || fi->fileName() == "..")
-            continue;
         QString filename = fi->absoluteFilePath();
         if (fi->isDir())
         {

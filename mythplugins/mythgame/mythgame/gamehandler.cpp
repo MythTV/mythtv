@@ -561,18 +561,13 @@ int GameHandler::buildFileCount(QString directory, GameHandler *handler)
     if (!RomDir.isReadable())
         return 0;
 
+    RomDir.setFilter(QDir::NoDotAndDotDot);
     QFileInfoList List = RomDir.entryInfoList();
     for (QFileInfoList::const_iterator it = List.begin();
          it != List.end(); ++it)
     {
         QFileInfo Info = *it;
         QString RomName = Info.fileName();
-
-        if (RomName == "." ||
-            RomName == "..")
-        {
-            continue;
-        }
 
         if (Info.isDir())
         {
@@ -633,6 +628,7 @@ void GameHandler::buildFileList(QString directory, GameHandler *handler,
         return;
 
     RomDir.setSorting( QDir:: DirsFirst | QDir::Name );
+    RomDir.setFilter(QDir::NoDotAndDotDot);
     QFileInfoList List = RomDir.entryInfoList();
     for (QFileInfoList::const_iterator it = List.begin();
          it != List.end(); ++it)
@@ -640,12 +636,6 @@ void GameHandler::buildFileList(QString directory, GameHandler *handler,
         QFileInfo Info = *it;
         QString RomName = Info.fileName();
         QString GameName = Info.completeBaseName();
-
-        if (RomName == "." ||
-            RomName == "..")
-        {
-            continue;
-        }
 
         if (Info.isDir())
         {

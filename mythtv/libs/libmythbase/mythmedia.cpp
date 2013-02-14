@@ -249,7 +249,7 @@ bool MythMediaDevice::ScanMediaType(const QString &directory, ext_cnt_t &cnt)
     if (!d.exists())
         return false;
 
-
+    d.setFilter(QDir::NoDotAndDotDot);
     QFileInfoList list = d.entryInfoList();
 
     for( QFileInfoList::iterator it = list.begin();
@@ -257,9 +257,6 @@ bool MythMediaDevice::ScanMediaType(const QString &directory, ext_cnt_t &cnt)
                                ++it )
     {
         QFileInfo &fi = *it;
-
-        if (("." == fi.fileName()) || (".." == fi.fileName()))
-            continue;
 
         if (fi.isSymLink())
             continue;
