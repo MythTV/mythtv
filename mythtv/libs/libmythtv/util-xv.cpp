@@ -117,7 +117,7 @@ void del_open_xv_port(int port)
     {
         open_xv_ports.remove(port);
 
-        if (!open_xv_ports.count())
+        if (open_xv_ports.isEmpty())
         {
             SignalHandler::SetHandler(SIGINT, NULL);
             SignalHandler::SetHandler(SIGTERM, NULL);

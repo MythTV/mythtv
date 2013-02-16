@@ -356,11 +356,11 @@ static int score_match(const QString &a, const QString &b)
 
     QStringList al, bl;
     al = A.split(" ", QString::SkipEmptyParts);
-    if (!al.size())
+    if (al.isEmpty())
         return 0;
 
     bl = B.split(" ", QString::SkipEmptyParts);
-    if (!bl.size())
+    if (bl.isEmpty())
         return 0;
 
     // score words symmetrically

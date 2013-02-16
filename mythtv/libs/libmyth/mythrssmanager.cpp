@@ -95,7 +95,7 @@ void RSSManager::processAndInsertRSS(RSSSite *site)
         m_inprogress.removeOne(site);
     }
 
-    if (!m_inprogress.count())
+    if (m_inprogress.isEmpty())
         emit finished();
 }
 

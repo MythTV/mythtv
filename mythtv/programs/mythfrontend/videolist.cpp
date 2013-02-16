@@ -1013,7 +1013,7 @@ void VideoListImp::buildDbList()
 
     QStringList dirs = GetVideoDirs();
 
-    if (!dirs.size())
+    if (dirs.isEmpty())
         return;
 
     QString test_prefix(dirs[0]);

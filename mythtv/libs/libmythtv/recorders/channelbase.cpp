@@ -267,7 +267,7 @@ uint ChannelBase::GetNextChannel(const QString &channum, int direction) const
 int ChannelBase::GetNextInputNum(void) const
 {
     // Exit early if inputs don't exist..
-    if (!m_inputs.size())
+    if (m_inputs.isEmpty())
         return -1;
 
     // Find current input
