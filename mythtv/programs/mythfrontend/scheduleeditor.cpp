@@ -309,7 +309,7 @@ void ScheduleEditor::Load()
                                          ENUM_TO_QVARIANT(kChannelRecord));
             if (!isManual)
                 new MythUIButtonListItem(m_rulesList,
-                                         ("Record at any time on any channel"),
+                                       tr("Record at any time on any channel"),
                                          ENUM_TO_QVARIANT(kAllRecord));
         }
 
