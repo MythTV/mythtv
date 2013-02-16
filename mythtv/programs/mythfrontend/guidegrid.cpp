@@ -174,7 +174,7 @@ void GuideGrid::RunProgramGuide(uint chanid, const QString &channum,
     // check there are some channels setup
     ChannelInfoList channels = ChannelUtil::GetChannels(
         0, true, "", (changrpid<0) ? 0 : changrpid);
-    if (!channels.size())
+    if (channels.empty())
     {
         QString message;
         if (changrpid == -1)

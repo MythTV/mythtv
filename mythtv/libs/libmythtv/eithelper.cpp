@@ -71,7 +71,7 @@ uint EITHelper::ProcessEvents(void)
     QMutexLocker locker(&eitList_lock);
     uint insertCount = 0;
 
-    if (!db_events.size())
+    if (db_events.empty())
         return 0;
 
     MSqlQuery query(MSqlQuery::InitCon());

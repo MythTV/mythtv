@@ -1859,7 +1859,7 @@ InputNames CardUtil::ProbeV4LVideoInputs(int videofd, bool &ok)
 #endif // USING_V4L1
 
     // Create an input on single input cards that don't advertise input
-    if (!list.size())
+    if (list.isEmpty())
         list[0] = "Television";
 
     ok = true;

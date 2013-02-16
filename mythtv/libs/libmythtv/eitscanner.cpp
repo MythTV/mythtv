@@ -228,7 +228,7 @@ void EITScanner::StartActiveScan(TVRec *_rec, uint max_seconds_per_source)
 {
     rec = _rec;
 
-    if (!activeScanChannels.size())
+    if (activeScanChannels.isEmpty())
     {
         // TODO get input name and use it in crawl.
         MSqlQuery query(MSqlQuery::InitCon());

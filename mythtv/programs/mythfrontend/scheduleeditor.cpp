@@ -1714,7 +1714,7 @@ void MetadataOptions::HandleDownloadedImages(MetadataLookup *lookup)
 
     DownloadMap map = lookup->GetDownloads();
 
-    if (!map.size())
+    if (map.isEmpty())
         return;
 
     for (DownloadMap::const_iterator i = map.begin(); i != map.end(); ++i)

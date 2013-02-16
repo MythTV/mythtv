@@ -119,7 +119,7 @@ void MythUIEditBar::Display(void)
 
     ClearImages();
 
-    if (!m_regions.size())
+    if (m_regions.isEmpty())
     {
         if (keep)
             keep->SetVisible(true);

@@ -1199,7 +1199,7 @@ void NetTree::TreeRefresh()
 
 void NetTree::updateRSS()
 {
-    if (!findAllDBRSS().count())
+    if (findAllDBRSS().isEmpty())
         return;
 
     QString title(tr("Updating RSS.  This could take a while..."));
