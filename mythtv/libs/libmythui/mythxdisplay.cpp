@@ -247,7 +247,7 @@ bool MythXDisplay::CheckErrors(Display *disp)
     Sync();
     const std::vector<XErrorEvent>& events = xerrors[d];
 
-    if (events.size() < 1)
+    if (events.empty())
         return true;
 
     for (int i = events.size() -1; i>=0; --i)
@@ -275,7 +275,7 @@ bool MythXDisplay::CheckErrors(Display *disp)
 
 void MythXDisplay::CheckOrphanedErrors(void)
 {
-    if (xerrors.size() < 1)
+    if (xerrors.empty())
         return;
 
     std::map<Display*, XErrorVectorType>::iterator errors = xerrors.begin();

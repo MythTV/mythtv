@@ -459,7 +459,7 @@ void MythRAOPConnection::SendResendRequest(uint64_t timestamp,
  */
 void MythRAOPConnection::ExpireResendRequests(uint64_t timestamp)
 {
-    if (!m_resends.size())
+    if (m_resends.isEmpty())
         return;
 
     QMutableMapIterator<uint16_t,uint64_t> it(m_resends);
