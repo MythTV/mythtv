@@ -31,14 +31,15 @@
  * implementors. The original code is available from http://code.google.com/p/nelly2pcm/
  */
 
-#include "nellymoser.h"
+#include "libavutil/channel_layout.h"
 #include "libavutil/lfg.h"
 #include "libavutil/random_seed.h"
-#include "libavutil/audioconvert.h"
 #include "avcodec.h"
 #include "dsputil.h"
 #include "fft.h"
 #include "fmtconvert.h"
+#include "internal.h"
+#include "nellymoser.h"
 #include "sinewin.h"
 
 #define BITSTREAM_READER_LE
@@ -129,6 +130,7 @@ static av_cold int decode_init(AVCodecContext * avctx) {
     if (!ff_sine_128[127])
         ff_init_ff_sine_windows(7);
 
+    avctx->channels       = 1;
     avctx->channel_layout = AV_CH_LAYOUT_MONO;
 
     avcodec_get_frame_defaults(&s->frame);
@@ -170,7 +172,7 @@ static int decode_tag(AVCodecContext *avctx, void *data,
 
     /* get output buffer */
     s->frame.nb_samples = NELLY_SAMPLES * blocks;
-    if ((ret = avctx->get_buffer(avctx, &s->frame)) < 0) {
+    if ((ret = ff_get_buffer(avctx, &s->frame)) < 0) {
         av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
         return ret;
     }

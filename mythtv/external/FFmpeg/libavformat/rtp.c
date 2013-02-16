@@ -19,7 +19,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include <libavutil/opt.h>
+#include "libavutil/opt.h"
 #include "avformat.h"
 
 #include "rtp.h"
@@ -90,13 +90,14 @@ int ff_rtp_get_codec_info(AVCodecContext *codec, int payload_type)
     return -1;
 }
 
-int ff_rtp_get_payload_type(AVFormatContext *fmt, AVCodecContext *codec)
+int ff_rtp_get_payload_type(AVFormatContext *fmt,
+                            AVCodecContext *codec, int idx)
 {
     int i;
     AVOutputFormat *ofmt = fmt ? fmt->oformat : NULL;
 
     /* Was the payload type already specified for the RTP muxer? */
-    if (ofmt && ofmt->priv_class) {
+    if (ofmt && ofmt->priv_class && fmt->priv_data) {
         int64_t payload_type;
         if (av_opt_get_int(fmt->priv_data, "payload_type", 0, &payload_type) >= 0 &&
             payload_type >= 0)
@@ -106,8 +107,8 @@ int ff_rtp_get_payload_type(AVFormatContext *fmt, AVCodecContext *codec)
     /* static payload type */
     for (i = 0; AVRtpPayloadTypes[i].pt >= 0; ++i)
         if (AVRtpPayloadTypes[i].codec_id == codec->codec_id) {
-            if (codec->codec_id == AV_CODEC_ID_H263 && (!fmt ||
-                !fmt->oformat->priv_class ||
+            if (codec->codec_id == AV_CODEC_ID_H263 && (!fmt || !fmt->oformat ||
+                !fmt->oformat->priv_class || !fmt->priv_data ||
                 !av_opt_flag_is_set(fmt->priv_data, "rtpflags", "rfc2190")))
                 continue;
             /* G722 has 8000 as nominal rate even if the sample rate is 16000,
@@ -124,8 +125,11 @@ int ff_rtp_get_payload_type(AVFormatContext *fmt, AVCodecContext *codec)
             return AVRtpPayloadTypes[i].pt;
         }
 
+    if (idx < 0)
+        idx = codec->codec_type == AVMEDIA_TYPE_AUDIO;
+
     /* dynamic payload type */
-    return RTP_PT_PRIVATE + (codec->codec_type == AVMEDIA_TYPE_AUDIO);
+    return RTP_PT_PRIVATE + idx;
 }
 
 const char *ff_rtp_enc_name(int payload_type)

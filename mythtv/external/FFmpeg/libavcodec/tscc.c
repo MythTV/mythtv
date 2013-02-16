@@ -39,6 +39,7 @@
 #include <stdlib.h>
 
 #include "avcodec.h"
+#include "internal.h"
 #include "msrledec.h"
 
 #include <zlib.h>
@@ -70,7 +71,8 @@ typedef struct TsccContext {
  * Decode a frame
  *
  */
-static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, AVPacket *avpkt)
+static int decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
+                        AVPacket *avpkt)
 {
     const uint8_t *buf = avpkt->data;
     int buf_size = avpkt->size;
@@ -91,7 +93,7 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, AVPac
         av_log(avctx, AV_LOG_ERROR, "Inflate reset error: %d\n", zret);
         return AVERROR(EINVAL);
     }
-    c->zstream.next_in = encoded;
+    c->zstream.next_in = (uint8_t*)encoded;
     c->zstream.avail_in = len;
     c->zstream.next_out = c->decomp_buf;
     c->zstream.avail_out = c->decomp_size;
@@ -110,7 +112,7 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, AVPac
     }
 
     /* make the palette available on the way out */
-    if (c->avctx->pix_fmt == PIX_FMT_PAL8) {
+    if (c->avctx->pix_fmt == AV_PIX_FMT_PAL8) {
         const uint8_t *pal = av_packet_get_side_data(avpkt, AV_PKT_DATA_PALETTE, NULL);
 
         if (pal) {
@@ -120,7 +122,7 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, AVPac
         memcpy(c->pic.data[1], c->pal, AVPALETTE_SIZE);
     }
 
-    *data_size = sizeof(AVFrame);
+    *got_frame      = 1;
     *(AVFrame*)data = c->pic;
 
     /* always report that the buffer was completely consumed */
@@ -147,12 +149,12 @@ static av_cold int decode_init(AVCodecContext *avctx)
     // Needed if zlib unused or init aborted before inflateInit
     memset(&c->zstream, 0, sizeof(z_stream));
     switch(avctx->bits_per_coded_sample){
-    case  8: avctx->pix_fmt = PIX_FMT_PAL8; break;
-    case 16: avctx->pix_fmt = PIX_FMT_RGB555; break;
+    case  8: avctx->pix_fmt = AV_PIX_FMT_PAL8; break;
+    case 16: avctx->pix_fmt = AV_PIX_FMT_RGB555; break;
     case 24:
-             avctx->pix_fmt = PIX_FMT_BGR24;
+             avctx->pix_fmt = AV_PIX_FMT_BGR24;
              break;
-    case 32: avctx->pix_fmt = PIX_FMT_RGB32; break;
+    case 32: avctx->pix_fmt = AV_PIX_FMT_RGB32; break;
     default: av_log(avctx, AV_LOG_ERROR, "Camtasia error: unknown depth %i bpp\n", avctx->bits_per_coded_sample);
              return AVERROR_PATCHWELCOME;
     }

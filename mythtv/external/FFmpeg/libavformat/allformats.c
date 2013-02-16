@@ -18,25 +18,36 @@
  * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
+
 #include "avformat.h"
 #include "rtp.h"
 #include "rdt.h"
 #include "url.h"
 #include "version.h"
 
-#define REGISTER_MUXER(X,x) { \
-    extern AVOutputFormat ff_##x##_muxer; \
-    if(CONFIG_##X##_MUXER) av_register_output_format(&ff_##x##_muxer); }
+#define REGISTER_MUXER(X, x)                                            \
+    {                                                                   \
+        extern AVOutputFormat ff_##x##_muxer;                           \
+        if (CONFIG_##X##_MUXER)                                         \
+            av_register_output_format(&ff_##x##_muxer);                 \
+    }
 
-#define REGISTER_DEMUXER(X,x) { \
-    extern AVInputFormat ff_##x##_demuxer; \
-    if(CONFIG_##X##_DEMUXER) av_register_input_format(&ff_##x##_demuxer); }
+#define REGISTER_DEMUXER(X, x)                                          \
+    {                                                                   \
+        extern AVInputFormat ff_##x##_demuxer;                          \
+        if (CONFIG_##X##_DEMUXER)                                       \
+            av_register_input_format(&ff_##x##_demuxer);                \
+    }
 
-#define REGISTER_MUXDEMUX(X,x)  REGISTER_MUXER(X,x); REGISTER_DEMUXER(X,x)
+#define REGISTER_MUXDEMUX(X, x) REGISTER_MUXER(X, x); REGISTER_DEMUXER(X, x)
 
-#define REGISTER_PROTOCOL(X,x) { \
-    extern URLProtocol ff_##x##_protocol; \
-    if(CONFIG_##X##_PROTOCOL) ffurl_register_protocol(&ff_##x##_protocol, sizeof(ff_##x##_protocol)); }
+#define REGISTER_PROTOCOL(X, x)                                         \
+    {                                                                   \
+        extern URLProtocol ff_##x##_protocol;                           \
+        if (CONFIG_##X##_PROTOCOL)                                      \
+            ffurl_register_protocol(&ff_##x##_protocol,                 \
+                                    sizeof(ff_##x##_protocol));         \
+    }
 
 void av_register_all(void)
 {

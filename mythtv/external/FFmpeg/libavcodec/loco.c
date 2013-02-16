@@ -27,6 +27,7 @@
 #include "avcodec.h"
 #include "get_bits.h"
 #include "golomb.h"
+#include "internal.h"
 #include "mathops.h"
 
 enum LOCO_MODE {LOCO_UNKN=0, LOCO_CYUY2=-1, LOCO_CRGB=-2, LOCO_CRGBA=-3, LOCO_CYV12=-4,
@@ -160,7 +161,7 @@ static int loco_decode_plane(LOCOContext *l, uint8_t *data, int width, int heigh
 }
 
 static int decode_frame(AVCodecContext *avctx,
-                        void *data, int *data_size,
+                        void *data, int *got_frame,
                         AVPacket *avpkt)
 {
     const uint8_t *buf = avpkt->data;
@@ -173,7 +174,7 @@ static int decode_frame(AVCodecContext *avctx,
         avctx->release_buffer(avctx, p);
 
     p->reference = 0;
-    if(avctx->get_buffer(avctx, p) < 0){
+    if(ff_get_buffer(avctx, p) < 0){
         av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
         return -1;
     }
@@ -215,22 +216,22 @@ static int decode_frame(AVCodecContext *avctx,
                                     -p->linesize[0], buf, buf_size, 3);
         break;
     case LOCO_CRGBA: case LOCO_RGBA:
-        decoded = loco_decode_plane(l, p->data[0], avctx->width, avctx->height,
-                                    p->linesize[0], buf, buf_size, 4);
+        decoded = loco_decode_plane(l, p->data[0] + p->linesize[0]*(avctx->height-1), avctx->width, avctx->height,
+                                    -p->linesize[0], buf, buf_size, 4);
         ADVANCE_BY_DECODED;
-        decoded = loco_decode_plane(l, p->data[0] + 1, avctx->width, avctx->height,
-                                    p->linesize[0], buf, buf_size, 4);
+        decoded = loco_decode_plane(l, p->data[0] + p->linesize[0]*(avctx->height-1) + 1, avctx->width, avctx->height,
+                                    -p->linesize[0], buf, buf_size, 4);
         ADVANCE_BY_DECODED;
-        decoded = loco_decode_plane(l, p->data[0] + 2, avctx->width, avctx->height,
-                                    p->linesize[0], buf, buf_size, 4);
+        decoded = loco_decode_plane(l, p->data[0] + p->linesize[0]*(avctx->height-1) + 2, avctx->width, avctx->height,
+                                    -p->linesize[0], buf, buf_size, 4);
         ADVANCE_BY_DECODED;
-        decoded = loco_decode_plane(l, p->data[0] + 3, avctx->width, avctx->height,
-                                    p->linesize[0], buf, buf_size, 4);
+        decoded = loco_decode_plane(l, p->data[0] + p->linesize[0]*(avctx->height-1) + 3, avctx->width, avctx->height,
+                                    -p->linesize[0], buf, buf_size, 4);
         break;
     }
 stop:
 
-    *data_size = sizeof(AVFrame);
+    *got_frame      = 1;
     *(AVFrame*)data = l->pic;
 
     return buf_size < 0 ? -1 : avpkt->size - buf_size;
@@ -262,16 +263,16 @@ static av_cold int decode_init(AVCodecContext *avctx){
     l->mode = AV_RL32(avctx->extradata + 4);
     switch(l->mode) {
     case LOCO_CYUY2: case LOCO_YUY2: case LOCO_UYVY:
-        avctx->pix_fmt = PIX_FMT_YUV422P;
+        avctx->pix_fmt = AV_PIX_FMT_YUV422P;
         break;
     case LOCO_CRGB: case LOCO_RGB:
-        avctx->pix_fmt = PIX_FMT_BGR24;
+        avctx->pix_fmt = AV_PIX_FMT_BGR24;
         break;
     case LOCO_CYV12: case LOCO_YV12:
-        avctx->pix_fmt = PIX_FMT_YUV420P;
+        avctx->pix_fmt = AV_PIX_FMT_YUV420P;
         break;
     case LOCO_CRGBA: case LOCO_RGBA:
-        avctx->pix_fmt = PIX_FMT_RGB32;
+        avctx->pix_fmt = AV_PIX_FMT_RGB32;
         break;
     default:
         av_log(avctx, AV_LOG_INFO, "Unknown colorspace, index = %i\n", l->mode);

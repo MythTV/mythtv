@@ -123,10 +123,10 @@ int ff_h264_fill_default_ref_list(H264Context *h){
         for(list= 0; list<2; list++){
             len= add_sorted(sorted    , h->short_ref, h->short_ref_count, cur_poc, 1^list);
             len+=add_sorted(sorted+len, h->short_ref, h->short_ref_count, cur_poc, 0^list);
-            assert(len<=32);
+            av_assert0(len<=32);
             len= build_def_list(h->default_ref_list[list]    , sorted     , len, 0, s->picture_structure);
             len+=build_def_list(h->default_ref_list[list]+len, h->long_ref, 16 , 1, s->picture_structure);
-            assert(len<=32);
+            av_assert0(len<=32);
 
             if(len < h->ref_count[list])
                 memset(&h->default_ref_list[list][len], 0, sizeof(Picture)*(h->ref_count[list] - len));
@@ -141,17 +141,17 @@ int ff_h264_fill_default_ref_list(H264Context *h){
     }else{
         len = build_def_list(h->default_ref_list[0]    , h->short_ref, h->short_ref_count, 0, s->picture_structure);
         len+= build_def_list(h->default_ref_list[0]+len, h-> long_ref, 16                , 1, s->picture_structure);
-        assert(len <= 32);
+        av_assert0(len<=32);
         if(len < h->ref_count[0])
             memset(&h->default_ref_list[0][len], 0, sizeof(Picture)*(h->ref_count[0] - len));
     }
 #ifdef TRACE
     for (i=0; i<h->ref_count[0]; i++) {
-        tprintf(h->s.avctx, "List0: %s fn:%d 0x%p\n", (h->default_ref_list[0][i].long_ref ? "LT" : "ST"), h->default_ref_list[0][i].pic_id, h->default_ref_list[0][i].data[0]);
+        tprintf(h->s.avctx, "List0: %s fn:%d 0x%p\n", (h->default_ref_list[0][i].long_ref ? "LT" : "ST"), h->default_ref_list[0][i].pic_id, h->default_ref_list[0][i].f.data[0]);
     }
     if(h->slice_type_nos==AV_PICTURE_TYPE_B){
         for (i=0; i<h->ref_count[1]; i++) {
-            tprintf(h->s.avctx, "List1: %s fn:%d 0x%p\n", (h->default_ref_list[1][i].long_ref ? "LT" : "ST"), h->default_ref_list[1][i].pic_id, h->default_ref_list[1][i].data[0]);
+            tprintf(h->s.avctx, "List1: %s fn:%d 0x%p\n", (h->default_ref_list[1][i].long_ref ? "LT" : "ST"), h->default_ref_list[1][i].pic_id, h->default_ref_list[1][i].f.data[0]);
         }
     }
 #endif
@@ -488,11 +488,8 @@ static int check_opcodes(MMCO *mmco1, MMCO *mmco2, int n_mmcos)
     int i;
 
     for (i = 0; i < n_mmcos; i++) {
-        if (mmco1[i].opcode != mmco2[i].opcode) {
-            av_log(NULL, AV_LOG_ERROR, "MMCO opcode [%d, %d] at %d mismatches between slices\n",
-                   mmco1[i].opcode, mmco2[i].opcode, i);
+        if (mmco1[i].opcode != mmco2[i].opcode)
             return -1;
-        }
     }
 
     return 0;
@@ -525,8 +522,8 @@ int ff_generate_sliding_window_mmcos(H264Context *h, int first_slice)
                (mmco_index != h->mmco_index ||
                 (i = check_opcodes(h->mmco, mmco_temp, mmco_index)))) {
         av_log(h->s.avctx, AV_LOG_ERROR,
-               "Inconsistent MMCO state between slices [%d, %d]\n",
-               mmco_index, h->mmco_index);
+               "Inconsistent MMCO state between slices [%d, %d, %d]\n",
+               mmco_index, h->mmco_index, i);
         return AVERROR_INVALIDDATA;
     }
     return 0;
@@ -781,8 +778,8 @@ int ff_h264_decode_ref_pic_marking(H264Context *h, GetBitContext *gb,
                (mmco_index != h->mmco_index ||
                 (i = check_opcodes(h->mmco, mmco_temp, mmco_index)))) {
         av_log(h->s.avctx, AV_LOG_ERROR,
-               "Inconsistent MMCO state between slices [%d, %d]\n",
-               mmco_index, h->mmco_index);
+               "Inconsistent MMCO state between slices [%d, %d, %d]\n",
+               mmco_index, h->mmco_index, i);
         return AVERROR_INVALIDDATA;
     }
 

@@ -11,6 +11,7 @@ ifeq ($(ARCH_X86_32), yes)
     endif
 endif
 
-HEADERS = postprocess.h
+HEADERS = postprocess.h        \
+          version.h            \
 
 OBJS = postprocess.o

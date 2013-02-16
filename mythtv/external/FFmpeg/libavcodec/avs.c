@@ -44,7 +44,7 @@ typedef enum {
 
 static int
 avs_decode_frame(AVCodecContext * avctx,
-                 void *data, int *data_size, AVPacket *avpkt)
+                 void *data, int *got_frame, AVPacket *avpkt)
 {
     const uint8_t *buf = avpkt->data;
     const uint8_t *buf_end = avpkt->data + avpkt->size;
@@ -57,7 +57,7 @@ avs_decode_frame(AVCodecContext * avctx,
     int i, j, x, y, stride, vect_w = 3, vect_h = 3;
     AvsVideoSubType sub_type;
     AvsBlockType type;
-    GetBitContext change_map;
+    GetBitContext change_map = {0}; //init to silence warning
 
     if (avctx->reget_buffer(avctx, p)) {
         av_log(avctx, AV_LOG_ERROR, "reget_buffer() failed\n");
@@ -87,7 +87,7 @@ avs_decode_frame(AVCodecContext * avctx,
         buf += 4;
         for (i=first; i<last; i++, buf+=3) {
             pal[i] = (buf[0] << 18) | (buf[1] << 10) | (buf[2] << 2);
-            pal[i] |= 0xFF << 24 | (pal[i] >> 6) & 0x30303;
+            pal[i] |= 0xFFU << 24 | (pal[i] >> 6) & 0x30303;
         }
 
         sub_type = buf[0];
@@ -152,7 +152,7 @@ avs_decode_frame(AVCodecContext * avctx,
     }
 
     *picture   = avs->picture;
-    *data_size = sizeof(AVPicture);
+    *got_frame = 1;
 
     return buf_size;
 }
@@ -160,7 +160,7 @@ avs_decode_frame(AVCodecContext * avctx,
 static av_cold int avs_decode_init(AVCodecContext * avctx)
 {
     AvsContext *const avs = avctx->priv_data;
-    avctx->pix_fmt = PIX_FMT_PAL8;
+    avctx->pix_fmt = AV_PIX_FMT_PAL8;
     avcodec_get_frame_defaults(&avs->picture);
     avcodec_set_dimensions(avctx, 318, 198);
     return 0;

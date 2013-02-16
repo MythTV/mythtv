@@ -41,10 +41,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "libavutil/mem.h"
 #include "avcodec.h"
 #include "bytestream.h"
+#include "internal.h"
 #include "lcl.h"
-#include "libavutil/lzo.h"
 
 #if CONFIG_ZLIB_DECODER
 #include <zlib.h>
@@ -139,7 +140,7 @@ static int zlib_decomp(AVCodecContext *avctx, const uint8_t *src, int src_len, i
         av_log(avctx, AV_LOG_ERROR, "Inflate reset error: %d\n", zret);
         return -1;
     }
-    c->zstream.next_in = src;
+    c->zstream.next_in = (uint8_t *)src;
     c->zstream.avail_in = src_len;
     c->zstream.next_out = c->decomp_buf + offset;
     c->zstream.avail_out = c->decomp_size - offset;
@@ -163,7 +164,7 @@ static int zlib_decomp(AVCodecContext *avctx, const uint8_t *src, int src_len, i
  * Decode a frame
  *
  */
-static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, AVPacket *avpkt)
+static int decode_frame(AVCodecContext *avctx, void *data, int *got_frame, AVPacket *avpkt)
 {
     const uint8_t *buf = avpkt->data;
     int buf_size = avpkt->size;
@@ -186,7 +187,7 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, AVPac
 
     c->pic.reference = 0;
     c->pic.buffer_hints = FF_BUFFER_HINTS_VALID;
-    if(avctx->get_buffer(avctx, &c->pic) < 0){
+    if(ff_get_buffer(avctx, &c->pic) < 0){
         av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
         return -1;
     }
@@ -198,7 +199,9 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, AVPac
     case AV_CODEC_ID_MSZH:
         switch (c->compression) {
         case COMP_MSZH:
-            if (c->flags & FLAG_MULTITHREAD) {
+            if (c->imgtype == IMGTYPE_RGB24 && len == width * height * 3) {
+                ;
+            } else if (c->flags & FLAG_MULTITHREAD) {
                 mthread_inlen = AV_RL32(encoded);
                 mthread_inlen = FFMIN(mthread_inlen, len - 8);
                 mthread_outlen = AV_RL32(encoded+4);
@@ -466,7 +469,7 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, AVPac
         return -1;
     }
 
-    *data_size = sizeof(AVFrame);
+    *got_frame = 1;
     *(AVFrame*)data = c->pic;
 
     /* always report that the buffer was completely consumed */
@@ -482,7 +485,8 @@ static av_cold int decode_init(AVCodecContext *avctx)
 {
     LclDecContext * const c = avctx->priv_data;
     unsigned int basesize = avctx->width * avctx->height;
-    unsigned int max_basesize = FFALIGN(avctx->width, 4) * FFALIGN(avctx->height, 4) + AV_LZO_OUTPUT_PADDING;
+    unsigned int max_basesize = FFALIGN(avctx->width,  4) *
+                                FFALIGN(avctx->height, 4);
     unsigned int max_decomp_size;
 
     avcodec_get_frame_defaults(&c->pic);
@@ -502,37 +506,37 @@ static av_cold int decode_init(AVCodecContext *avctx)
     case IMGTYPE_YUV111:
         c->decomp_size = basesize * 3;
         max_decomp_size = max_basesize * 3;
-        avctx->pix_fmt = PIX_FMT_YUV444P;
+        avctx->pix_fmt = AV_PIX_FMT_YUV444P;
         av_log(avctx, AV_LOG_DEBUG, "Image type is YUV 1:1:1.\n");
         break;
     case IMGTYPE_YUV422:
         c->decomp_size = basesize * 2;
         max_decomp_size = max_basesize * 2;
-        avctx->pix_fmt = PIX_FMT_YUV422P;
+        avctx->pix_fmt = AV_PIX_FMT_YUV422P;
         av_log(avctx, AV_LOG_DEBUG, "Image type is YUV 4:2:2.\n");
         break;
     case IMGTYPE_RGB24:
         c->decomp_size = basesize * 3;
         max_decomp_size = max_basesize * 3;
-        avctx->pix_fmt = PIX_FMT_BGR24;
+        avctx->pix_fmt = AV_PIX_FMT_BGR24;
         av_log(avctx, AV_LOG_DEBUG, "Image type is RGB 24.\n");
         break;
     case IMGTYPE_YUV411:
         c->decomp_size = basesize / 2 * 3;
         max_decomp_size = max_basesize / 2 * 3;
-        avctx->pix_fmt = PIX_FMT_YUV411P;
+        avctx->pix_fmt = AV_PIX_FMT_YUV411P;
         av_log(avctx, AV_LOG_DEBUG, "Image type is YUV 4:1:1.\n");
         break;
     case IMGTYPE_YUV211:
         c->decomp_size = basesize * 2;
         max_decomp_size = max_basesize * 2;
-        avctx->pix_fmt = PIX_FMT_YUV422P;
+        avctx->pix_fmt = AV_PIX_FMT_YUV422P;
         av_log(avctx, AV_LOG_DEBUG, "Image type is YUV 2:1:1.\n");
         break;
     case IMGTYPE_YUV420:
         c->decomp_size = basesize / 2 * 3;
         max_decomp_size = max_basesize / 2 * 3;
-        avctx->pix_fmt = PIX_FMT_YUV420P;
+        avctx->pix_fmt = AV_PIX_FMT_YUV420P;
         av_log(avctx, AV_LOG_DEBUG, "Image type is YUV 4:2:0.\n");
         break;
     default:

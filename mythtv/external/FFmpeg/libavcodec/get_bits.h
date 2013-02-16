@@ -306,15 +306,35 @@ static inline void skip_bits1(GetBitContext *s)
  */
 static inline unsigned int get_bits_long(GetBitContext *s, int n)
 {
-    if (n <= MIN_CACHE_BITS)
+    if (!n) {
+        return 0;
+    } else if (n <= MIN_CACHE_BITS)
         return get_bits(s, n);
     else {
 #ifdef BITSTREAM_READER_LE
-        int ret = get_bits(s, 16);
+        unsigned ret = get_bits(s, 16);
         return ret | (get_bits(s, n-16) << 16);
 #else
-        int ret = get_bits(s, 16) << (n-16);
+        unsigned ret = get_bits(s, 16) << (n-16);
         return ret | get_bits(s, n-16);
+#endif
+    }
+}
+
+/**
+ * Read 0-64 bits.
+ */
+static inline uint64_t get_bits64(GetBitContext *s, int n)
+{
+    if (n <= 32) {
+        return get_bits_long(s, n);
+    } else {
+#ifdef BITSTREAM_READER_LE
+        uint64_t ret = get_bits_long(s, 32);
+        return ret | (uint64_t)get_bits_long(s, n - 32) << 32;
+#else
+        uint64_t ret = (uint64_t)get_bits_long(s, n - 32) << 32;
+        return ret | get_bits_long(s, 32);
 #endif
     }
 }
@@ -350,25 +370,49 @@ static inline int check_marker(GetBitContext *s, const char *msg)
 }
 
 /**
- * Inititalize GetBitContext.
- * @param buffer bitstream buffer, must be FF_INPUT_BUFFER_PADDING_SIZE bytes larger than the actual read bits
- * because some optimized bitstream readers read 32 or 64 bit at once and could read over the end
+ * Initialize GetBitContext.
+ * @param buffer bitstream buffer, must be FF_INPUT_BUFFER_PADDING_SIZE bytes
+ *        larger than the actual read bits because some optimized bitstream
+ *        readers read 32 or 64 bit at once and could read over the end
  * @param bit_size the size of the buffer in bits
+ * @return 0 on success, AVERROR_INVALIDDATA if the buffer_size would overflow.
  */
-static inline void init_get_bits(GetBitContext *s, const uint8_t *buffer,
-                                 int bit_size)
+static inline int init_get_bits(GetBitContext *s, const uint8_t *buffer,
+                                int bit_size)
 {
-    int buffer_size = (bit_size+7)>>3;
-    if (buffer_size < 0 || bit_size < 0) {
+    int buffer_size;
+    int ret = 0;
+
+    if (bit_size >= INT_MAX - 7 || bit_size < 0 || !buffer) {
         buffer_size = bit_size = 0;
         buffer = NULL;
+        ret = AVERROR_INVALIDDATA;
     }
+
+    buffer_size = (bit_size + 7) >> 3;
 
     s->buffer       = buffer;
     s->size_in_bits = bit_size;
     s->size_in_bits_plus8 = bit_size + 8;
     s->buffer_end   = buffer + buffer_size;
     s->index        = 0;
+    return ret;
+}
+
+/**
+ * Initialize GetBitContext.
+ * @param buffer bitstream buffer, must be FF_INPUT_BUFFER_PADDING_SIZE bytes
+ *        larger than the actual read bits because some optimized bitstream
+ *        readers read 32 or 64 bit at once and could read over the end
+ * @param byte_size the size of the buffer in bytes
+ * @return 0 on success, AVERROR_INVALIDDATA if the buffer_size would overflow.
+ */
+static inline int init_get_bits8(GetBitContext *s, const uint8_t *buffer,
+                                 int byte_size)
+{
+    if (byte_size > INT_MAX / 8 || byte_size < 0)
+        byte_size = -1;
+    return init_get_bits(s, buffer, byte_size * 8);
 }
 
 static inline void align_get_bits(GetBitContext *s)
@@ -525,7 +569,7 @@ static inline void print_bin(int bits, int n)
         av_log(NULL, AV_LOG_DEBUG, " ");
 }
 
-static inline int get_bits_trace(GetBitContext *s, int n, char *file,
+static inline int get_bits_trace(GetBitContext *s, int n, const char *file,
                                  const char *func, int line)
 {
     int r = get_bits(s, n);
@@ -536,7 +580,7 @@ static inline int get_bits_trace(GetBitContext *s, int n, char *file,
     return r;
 }
 static inline int get_vlc_trace(GetBitContext *s, VLC_TYPE (*table)[2],
-                                int bits, int max_depth, char *file,
+                                int bits, int max_depth, const char *file,
                                 const char *func, int line)
 {
     int show  = show_bits(s, 24);
@@ -551,7 +595,7 @@ static inline int get_vlc_trace(GetBitContext *s, VLC_TYPE (*table)[2],
            bits2, len, r, pos, file, func, line);
     return r;
 }
-static inline int get_xbits_trace(GetBitContext *s, int n, char *file,
+static inline int get_xbits_trace(GetBitContext *s, int n, const char *file,
                                   const char *func, int line)
 {
     int show = show_bits(s, n);

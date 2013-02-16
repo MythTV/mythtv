@@ -32,8 +32,11 @@
 /* XXX: POST protocol is not completely implemented because ffmpeg uses
    only a subset of it. */
 
-/* used for protocol handling */
-#define BUFFER_SIZE 4096
+/* The IO buffer size is unrelated to the max URL size in itself, but needs
+ * to be large enough to fit the full request headers (including long
+ * path names).
+ */
+#define BUFFER_SIZE MAX_URL_SIZE
 #define MAX_REDIRECTS 8
 
 typedef struct {
@@ -43,6 +46,7 @@ typedef struct {
     int line_count;
     int http_code;
     int64_t chunksize;      /**< Used if "Transfer-Encoding: chunked" otherwise -1. */
+    char *content_type;
     char *user_agent;
     int64_t off, filesize;
     char location[MAX_URL_SIZE];
@@ -50,6 +54,7 @@ typedef struct {
     HTTPAuthState proxy_auth_state;
     char *headers;
     int willclose;          /**< Set if the server correctly handles Connection: close and will close the connection after feeding us the content. */
+    int seekable;           /**< Control seekability, 0 = disable, 1 = enable, -1 = probe. */
     int chunked_post;
     int end_chunked_post;   /**< A flag which indicates if the end of chunked encoding has been sent. */
     int end_header;         /**< A flag which indicates we have finished to read POST reply. */
@@ -57,6 +62,8 @@ typedef struct {
     uint8_t *post_data;
     int post_datalen;
     int is_akamai;
+    int rw_timeout;
+    char *mime_type;
 } HTTPContext;
 
 #define OFFSET(x) offsetof(HTTPContext, x)
@@ -64,11 +71,15 @@ typedef struct {
 #define E AV_OPT_FLAG_ENCODING_PARAM
 #define DEC AV_OPT_FLAG_DECODING_PARAM
 static const AVOption options[] = {
+{"seekable", "Control seekability of connection", OFFSET(seekable), AV_OPT_TYPE_INT, {.i64 = -1}, -1, 1, D },
 {"chunked_post", "use chunked transfer-encoding for posts", OFFSET(chunked_post), AV_OPT_TYPE_INT, {.i64 = 1}, 0, 1, E },
 {"headers", "custom HTTP headers, can override built in default headers", OFFSET(headers), AV_OPT_TYPE_STRING, { 0 }, 0, 0, D|E },
+{"content_type", "force a content type", OFFSET(content_type), AV_OPT_TYPE_STRING, { 0 }, 0, 0, D|E },
 {"user-agent", "override User-Agent header", OFFSET(user_agent), AV_OPT_TYPE_STRING, {.str = NULL}, 0, 0, DEC},
 {"multiple_requests", "use persistent connections", OFFSET(multiple_requests), AV_OPT_TYPE_INT, {.i64 = 0}, 0, 1, D|E },
 {"post_data", "custom HTTP post data", OFFSET(post_data), AV_OPT_TYPE_BINARY, .flags = D|E },
+{"timeout", "timeout of socket i/o operations", OFFSET(rw_timeout), AV_OPT_TYPE_INT, {.i64 = -1}, -1, INT_MAX, D|E },
+{"mime_type", "", OFFSET(mime_type), AV_OPT_TYPE_STRING, {0}, 0, 0, 0 },
 {NULL}
 };
 #define HTTP_CLASS(flavor)\
@@ -101,8 +112,8 @@ static int http_open_cnx(URLContext *h)
     const char *path, *proxy_path, *lower_proto = "tcp", *local_path;
     char hostname[1024], hoststr[1024], proto[10];
     char auth[1024], proxyauth[1024] = "";
-    char path1[1024];
-    char buf[1024], urlbuf[1024];
+    char path1[MAX_URL_SIZE];
+    char buf[1024], urlbuf[MAX_URL_SIZE];
     int port, use_proxy, err, location_changed = 0, redirects = 0, attempts = 0;
     HTTPAuthType cur_auth_type, cur_proxy_auth_type;
     HTTPContext *s = h->priv_data;
@@ -146,8 +157,15 @@ static int http_open_cnx(URLContext *h)
     ff_url_join(buf, sizeof(buf), lower_proto, NULL, hostname, port, NULL);
 
     if (!s->hd) {
+        AVDictionary *opts = NULL;
+        char opts_format[20];
+        if (s->rw_timeout != -1) {
+            snprintf(opts_format, sizeof(opts_format), "%d", s->rw_timeout);
+            av_dict_set(&opts, "timeout", opts_format, 0);
+        } /* if option is not given, don't pass it and let tcp use its own default */
         err = ffurl_open(&s->hd, buf, AVIO_FLAG_READ_WRITE,
-                         &h->interrupt_callback, NULL);
+                         &h->interrupt_callback, &opts);
+        av_dict_free(&opts);
         if (err < 0)
             goto fail;
     }
@@ -207,7 +225,10 @@ static int http_open(URLContext *h, const char *uri, int flags)
 {
     HTTPContext *s = h->priv_data;
 
-    h->is_streamed = 1;
+    if( s->seekable == 1 )
+        h->is_streamed = 0;
+    else
+        h->is_streamed = 1;
 
     s->filesize = -1;
     av_strlcpy(s->location, uri, sizeof(s->location));
@@ -305,7 +326,7 @@ static int process_line(URLContext *h, char *line, int line_count,
         while (isspace(*p))
             p++;
         if (!av_strcasecmp(tag, "Location")) {
-            strcpy(s->location, p);
+            av_strlcpy(s->location, p, sizeof(s->location));
             *new_location = 1;
         } else if (!av_strcasecmp (tag, "Content-Length") && s->filesize == -1) {
             s->filesize = strtoll(p, NULL, 10);
@@ -318,9 +339,9 @@ static int process_line(URLContext *h, char *line, int line_count,
                 if ((slash = strchr(p, '/')) && strlen(slash) > 0)
                     s->filesize = strtoll(slash+1, NULL, 10);
             }
-            if (!s->is_akamai || s->filesize != 2147483647)
+            if (s->seekable == -1 && (!s->is_akamai || s->filesize != 2147483647))
                 h->is_streamed = 0; /* we _can_ in fact seek */
-        } else if (!av_strcasecmp(tag, "Accept-Ranges") && !strncmp(p, "bytes", 5)) {
+        } else if (!av_strcasecmp(tag, "Accept-Ranges") && !strncmp(p, "bytes", 5) && s->seekable == -1) {
             h->is_streamed = 0;
         } else if (!av_strcasecmp (tag, "Transfer-Encoding") && !av_strncasecmp(p, "chunked", 7)) {
             s->filesize = -1;
@@ -336,6 +357,8 @@ static int process_line(URLContext *h, char *line, int line_count,
                 s->willclose = 1;
         } else if (!av_strcasecmp (tag, "Server") && !av_strcasecmp (p, "AkamaiGHost")) {
             s->is_akamai = 1;
+        } else if (!av_strcasecmp (tag, "Content-Type")) {
+            av_free(s->mime_type); s->mime_type = av_strdup(p);
         }
     }
     return 1;
@@ -352,7 +375,7 @@ static inline int has_header(const char *str, const char *header)
 static int http_read_header(URLContext *h, int *new_location)
 {
     HTTPContext *s = h->priv_data;
-    char line[1024];
+    char line[MAX_URL_SIZE];
     int err = 0;
 
     s->chunksize = -1;
@@ -411,10 +434,10 @@ static int http_connect(URLContext *h, const char *path, const char *local_path,
     if (!has_header(s->headers, "\r\nAccept: "))
         len += av_strlcpy(headers + len, "Accept: */*\r\n",
                           sizeof(headers) - len);
-    // Note: we send this on purpose even when s->off is 0,
+    // Note: we send this on purpose even when s->off is 0 when we're probing,
     // since it allows us to detect more reliably if a (non-conforming)
     // server supports seeking by analysing the reply headers.
-    if (!has_header(s->headers, "\r\nRange: ") && !post)
+    if (!has_header(s->headers, "\r\nRange: ") && !post && (s->off > 0 || s->seekable == -1))
         len += av_strlcatf(headers + len, sizeof(headers) - len,
                            "Range: bytes=%"PRId64"-\r\n", s->off);
 
@@ -434,6 +457,9 @@ static int http_connect(URLContext *h, const char *path, const char *local_path,
     if (!has_header(s->headers, "\r\nContent-Length: ") && s->post_data)
         len += av_strlcatf(headers + len, sizeof(headers) - len,
                            "Content-Length: %d\r\n", s->post_datalen);
+    if (!has_header(s->headers, "\r\nContent-Type: ") && s->content_type)
+        len += av_strlcatf(headers + len, sizeof(headers) - len,
+                           "Content-Type: %s\r\n", s->content_type);
 
     /* now add in custom headers */
     if (s->headers)
@@ -701,8 +727,13 @@ static int http_proxy_open(URLContext *h, const char *uri, int flags)
     HTTPAuthType cur_auth_type;
     char *authstr;
     int new_loc;
+    AVDictionary *opts = NULL;
+    char opts_format[20];
 
-    h->is_streamed = 1;
+    if( s->seekable == 1 )
+        h->is_streamed = 0;
+    else
+        h->is_streamed = 1;
 
     av_url_split(NULL, 0, auth, sizeof(auth), hostname, sizeof(hostname), &port,
                  pathbuf, sizeof(pathbuf), uri);
@@ -714,8 +745,13 @@ static int http_proxy_open(URLContext *h, const char *uri, int flags)
     ff_url_join(lower_url, sizeof(lower_url), "tcp", NULL, hostname, port,
                 NULL);
 redo:
+    if (s->rw_timeout != -1) {
+        snprintf(opts_format, sizeof(opts_format), "%d", s->rw_timeout);
+        av_dict_set(&opts, "timeout", opts_format, 0);
+    } /* if option is not given, don't pass it and let tcp use its own default */
     ret = ffurl_open(&s->hd, lower_url, AVIO_FLAG_READ_WRITE,
-                     &h->interrupt_callback, NULL);
+                     &h->interrupt_callback, &opts);
+    av_dict_free(&opts);
     if (ret < 0)
         return ret;
 

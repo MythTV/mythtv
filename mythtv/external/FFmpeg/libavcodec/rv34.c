@@ -24,6 +24,7 @@
  * RV30/40 decoder common data
  */
 
+#include "libavutil/imgutils.h"
 #include "libavutil/internal.h"
 
 #include "avcodec.h"
@@ -214,7 +215,7 @@ static int rv34_decode_cbp(GetBitContext *gb, RV34VLC *vlc, int table)
 }
 
 /**
- * Get one coefficient value from the bistream and store it.
+ * Get one coefficient value from the bitstream and store it.
  */
 static inline void decode_coeff(DCTELEM *dst, int coef, int esc, GetBitContext *gb, VLC* vlc, int q)
 {
@@ -725,12 +726,12 @@ static inline void rv34_mc(RV34DecContext *r, const int block_type,
         uint8_t *uvbuf = s->edge_emu_buffer + 22 * s->linesize;
 
         srcY -= 2 + 2*s->linesize;
-        s->dsp.emulated_edge_mc(s->edge_emu_buffer, srcY, s->linesize, (width<<3)+6, (height<<3)+6,
+        s->vdsp.emulated_edge_mc(s->edge_emu_buffer, srcY, s->linesize, (width<<3)+6, (height<<3)+6,
                             src_x - 2, src_y - 2, s->h_edge_pos, s->v_edge_pos);
         srcY = s->edge_emu_buffer + 2 + 2*s->linesize;
-        s->dsp.emulated_edge_mc(uvbuf     , srcU, s->uvlinesize, (width<<2)+1, (height<<2)+1,
+        s->vdsp.emulated_edge_mc(uvbuf     , srcU, s->uvlinesize, (width<<2)+1, (height<<2)+1,
                             uvsrc_x, uvsrc_y, s->h_edge_pos >> 1, s->v_edge_pos >> 1);
-        s->dsp.emulated_edge_mc(uvbuf + 16, srcV, s->uvlinesize, (width<<2)+1, (height<<2)+1,
+        s->vdsp.emulated_edge_mc(uvbuf + 16, srcV, s->uvlinesize, (width<<2)+1, (height<<2)+1,
                             uvsrc_x, uvsrc_y, s->h_edge_pos >> 1, s->v_edge_pos >> 1);
         srcU = uvbuf;
         srcV = uvbuf + 16;
@@ -1483,7 +1484,7 @@ av_cold int ff_rv34_decode_init(AVCodecContext *avctx)
     r->s.avctx = avctx;
     avctx->flags |= CODEC_FLAG_EMU_EDGE;
     r->s.flags |= CODEC_FLAG_EMU_EDGE;
-    avctx->pix_fmt = PIX_FMT_YUV420P;
+    avctx->pix_fmt = AV_PIX_FMT_YUV420P;
     avctx->has_b_frames = 1;
     s->low_delay = 0;
 
@@ -1660,6 +1661,9 @@ int ff_rv34_decode_frame(AVCodecContext *avctx,
 
             av_log(s->avctx, AV_LOG_WARNING, "Changing dimensions to %dx%d\n",
                    si.width, si.height);
+
+            if (av_image_check_size(si.width, si.height, 0, s->avctx))
+                return AVERROR_INVALIDDATA;
 
             s->width  = si.width;
             s->height = si.height;

@@ -43,6 +43,7 @@
 #include <string.h>
 #include <math.h>
 
+#include "libavutil/channel_layout.h"
 #include "avcodec.h"
 #include "dsputil.h"
 #include "libavutil/common.h"
@@ -54,6 +55,7 @@
 #include "acelp_pitch_delay.h"
 #include "lsp.h"
 #include "amr.h"
+#include "internal.h"
 
 #include "amrnbdata.h"
 
@@ -161,7 +163,16 @@ static av_cold int amrnb_decode_init(AVCodecContext *avctx)
     AMRContext *p = avctx->priv_data;
     int i;
 
-    avctx->sample_fmt = AV_SAMPLE_FMT_FLT;
+    if (avctx->channels > 1) {
+        av_log_missing_feature(avctx, "multi-channel AMR", 0);
+        return AVERROR_PATCHWELCOME;
+    }
+
+    avctx->channels       = 1;
+    avctx->channel_layout = AV_CH_LAYOUT_MONO;
+    if (!avctx->sample_rate)
+        avctx->sample_rate = 8000;
+    avctx->sample_fmt     = AV_SAMPLE_FMT_FLT;
 
     // p->excitation always points to the same position in p->excitation_buf
     p->excitation = &p->excitation_buf[PITCH_DELAY_MAX + LP_FILTER_ORDER + 1];
@@ -955,7 +966,7 @@ static int amrnb_decode_frame(AVCodecContext *avctx, void *data,
 
     /* get output buffer */
     p->avframe.nb_samples = AMR_BLOCK_SIZE;
-    if ((ret = avctx->get_buffer(avctx, &p->avframe)) < 0) {
+    if ((ret = ff_get_buffer(avctx, &p->avframe)) < 0) {
         av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
         return ret;
     }
@@ -969,7 +980,7 @@ static int amrnb_decode_frame(AVCodecContext *avctx, void *data,
     if (p->cur_frame_mode == MODE_DTX) {
         av_log_missing_feature(avctx, "dtx mode", 0);
         av_log(avctx, AV_LOG_INFO, "Note: libopencore_amrnb supports dtx\n");
-        return -1;
+        return AVERROR_PATCHWELCOME;
     }
 
     if (p->cur_frame_mode == MODE_12k2) {
