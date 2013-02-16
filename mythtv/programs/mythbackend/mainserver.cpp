@@ -3365,7 +3365,7 @@ void MainServer::HandleSGGetFileList(QStringList &sList,
     if (slaveUnreachable)
         strList << "SLAVE UNREACHABLE: " << host;
 
-    if (strList.count() == 0 || (strList.at(0) == "0"))
+    if (strList.isEmpty() || (strList.at(0) == "0"))
         strList << "EMPTY LIST";
 
     SendResponse(pbssock, strList);

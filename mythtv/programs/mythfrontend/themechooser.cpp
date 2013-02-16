@@ -853,7 +853,7 @@ void ThemeChooser::removeThemeDir(const QString &dirname)
     if (!dir.exists())
         return;
     
-    dir.setFilter(QDir::NoDotAndDotDot);
+    dir.setFilter(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot);
     QFileInfoList list = dir.entryInfoList();
     QFileInfoList::const_iterator it = list.begin();
     const QFileInfo *fi;
