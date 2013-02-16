@@ -249,7 +249,7 @@ bool MythMediaDevice::ScanMediaType(const QString &directory, ext_cnt_t &cnt)
     if (!d.exists())
         return false;
 
-    d.setFilter(QDir::NoDotAndDotDot);
+    d.setFilter(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot);
     QFileInfoList list = d.entryInfoList();
 
     for( QFileInfoList::iterator it = list.begin();

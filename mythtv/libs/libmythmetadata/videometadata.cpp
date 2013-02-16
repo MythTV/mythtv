@@ -415,7 +415,7 @@ bool VideoMetadataImp::removeDir(const QString &dirName)
 {
     QDir d(dirName);
     
-    d.setFilter(QDir::NoDotAndDotDot);
+    d.setFilter(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot);
     QFileInfoList contents = d.entryInfoList();
     if (!contents.size())
     {

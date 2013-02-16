@@ -55,10 +55,10 @@ namespace
         if (!d.exists())
             return false;
         
-        d.setFilter(QDir::NoDotAndDotDot);
+        d.setFilter(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot);
         QFileInfoList list = d.entryInfoList();
         // An empty directory is fine
-        if (!list.size())
+        if (list.isEmpty())
             return true;
 
         QDir dir_tester;
@@ -149,7 +149,7 @@ namespace
             return false;
         }
 
-        if ((!list.size()) || (list.at(0) == "EMPTY LIST"))
+        if (list.isEmpty() || (list.at(0) == "EMPTY LIST"))
             return true;
 
         for (QStringList::iterator p = list.begin(); p != list.end(); ++p)

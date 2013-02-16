@@ -300,9 +300,9 @@ QStringList StorageGroup::GetFileInfoList(QString Path)
     if (!d.exists())
         return files;
 
-    d.setFilter(QDir::NoDotAndDotDot);
+    d.setFilter(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot);
     QFileInfoList list = d.entryInfoList();
-    if (!list.size())
+    if (list.isEmpty())
         return files;
 
     for (QFileInfoList::iterator p = list.begin(); p != list.end(); ++p)
