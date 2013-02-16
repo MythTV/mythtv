@@ -1679,7 +1679,9 @@ int lirc_code2char(const struct lirc_state *state, struct lirc_config *config,ch
 {
 	if(config->sockfd!=-1)
 	{
-		char command[10+strlen(code)+1+1];
+		char* command = malloc((10+strlen(code)+1+1) * sizeof(char));
+		if (command == NULL)
+			return LIRC_RET_ERROR;
 		static char buf[LIRC_PACKET_SIZE];
 		size_t buf_len = LIRC_PACKET_SIZE;
 		int success;
@@ -1699,8 +1701,10 @@ int lirc_code2char(const struct lirc_state *state, struct lirc_config *config,ch
 			{
 				*string = NULL;
 			}
+			free(command);
 			return LIRC_RET_SUCCESS;
 		}
+		free(command);
 		return LIRC_RET_ERROR;
 	}
 	return lirc_code2char_internal(state, config, code, string, NULL);
@@ -2179,11 +2183,14 @@ int lirc_send_command(const struct lirc_state *lstate, int sockfd, const char *c
 
 int lirc_identify(const struct lirc_state *state, int sockfd)
 {
-	char command[10+strlen(state->lirc_prog)+1+1];
+	char* command = malloc((10+strlen(state->lirc_prog)+1+1) * sizeof(char));
+	if (command == NULL)
+		return LIRC_RET_ERROR;
 	int success;
-	
+
 	sprintf(command, "IDENT %s\n", state->lirc_prog);
-	
+
 	(void) lirc_send_command(state, sockfd, command, NULL, NULL, &success);
+	free(command);
 	return success;
 }
