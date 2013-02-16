@@ -95,7 +95,7 @@ void MetadataDownload::run()
                 else if (!lookup->GetSubtitle().isEmpty())
                     list = handleVideoUndetermined(lookup);
 
-                if (!list.size())
+                if (list.isEmpty())
                     list = handleRecordingGeneric(lookup);
             }
             else if (lookup->GetSubtype() == kProbableMovie)

@@ -472,7 +472,7 @@ void MHListGroup::Deactivation(MHEngine *engine)
 // which aren't.
 void MHListGroup::Update(MHEngine *engine)
 {
-    if (!m_ItemList.size())   // Special cases when the list becomes empty
+    if (m_ItemList.isEmpty())   // Special cases when the list becomes empty
     {
         if (m_fFirstItemDisplayed)
         {

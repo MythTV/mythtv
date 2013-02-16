@@ -1621,7 +1621,7 @@ vector<uint> CardUtil::GetSharedInputGroups(uint cardid)
         return list;
 
     list = GetInputGroups(inputs[0]);
-    for (uint i = 1; (i < inputs.size()) && list.size(); i++)
+    for (uint i = 1; (i < inputs.size()) && !list.empty(); i++)
     {
         vector<uint> curlist = GetInputGroups(inputs[i]);
         vector<uint> newlist;
