@@ -87,9 +87,9 @@ static int ifoRead_VOBU_ADMAP_internal(ifo_handle_t *ifofile,
 static int ifoRead_PGCIT_internal(ifo_handle_t *ifofile, pgcit_t *pgcit,
                                   unsigned int offset);
 
-static void ifoFree_PGC(pgc_t *pgc);
+static void ifoFree_PGC(pgc_t **pgc);
 static void ifoFree_PGC_COMMAND_TBL(pgc_command_tbl_t *cmd_tbl);
-static void ifoFree_PGCIT_internal(pgcit_t *pgcit);
+static void ifoFree_PGCIT_internal(pgcit_t **pgcit);
 
 static inline int DVDFileSeekForce_( dvd_file_t *dvd_file, uint32_t offset, int force_size ) {
   return (DVDFileSeekForce(dvd_file, (int)offset, force_size) == (int)offset);
@@ -923,7 +923,6 @@ static int ifoRead_PGC(ifo_handle_t *ifofile, pgc_t *pgc, unsigned int offset) {
 
     if(!ifoRead_PGC_COMMAND_TBL(ifofile, pgc->command_tbl,
                                 offset + pgc->command_tbl_offset)) {
-      free(pgc->command_tbl);
       return 0;
     }
   } else {
@@ -933,13 +932,10 @@ static int ifoRead_PGC(ifo_handle_t *ifofile, pgc_t *pgc, unsigned int offset) {
   if(pgc->program_map_offset != 0 && pgc->nr_of_programs>0) {
     pgc->program_map = malloc(pgc->nr_of_programs * sizeof(pgc_program_map_t));
     if(!pgc->program_map) {
-      ifoFree_PGC_COMMAND_TBL(pgc->command_tbl);
       return 0;
     }
     if(!ifoRead_PGC_PROGRAM_MAP(ifofile, pgc->program_map,pgc->nr_of_programs,
                                 offset + pgc->program_map_offset)) {
-      ifoFree_PGC_COMMAND_TBL(pgc->command_tbl);
-      free(pgc->program_map);
       return 0;
     }
   } else {
@@ -949,18 +945,11 @@ static int ifoRead_PGC(ifo_handle_t *ifofile, pgc_t *pgc, unsigned int offset) {
   if(pgc->cell_playback_offset != 0 && pgc->nr_of_cells>0) {
     pgc->cell_playback = malloc(pgc->nr_of_cells * sizeof(cell_playback_t));
     if(!pgc->cell_playback) {
-      ifoFree_PGC_COMMAND_TBL(pgc->command_tbl);
-      if(pgc->program_map)
-        free(pgc->program_map);
       return 0;
     }
     if(!ifoRead_CELL_PLAYBACK_TBL(ifofile, pgc->cell_playback,
                                   pgc->nr_of_cells,
                                   offset + pgc->cell_playback_offset)) {
-      ifoFree_PGC_COMMAND_TBL(pgc->command_tbl);
-      if(pgc->program_map)
-        free(pgc->program_map);
-      free(pgc->cell_playback);
       return 0;
     }
   } else {
@@ -970,13 +959,11 @@ static int ifoRead_PGC(ifo_handle_t *ifofile, pgc_t *pgc, unsigned int offset) {
   if(pgc->cell_position_offset != 0 && pgc->nr_of_cells>0) {
     pgc->cell_position = malloc(pgc->nr_of_cells * sizeof(cell_position_t));
     if(!pgc->cell_position) {
-      ifoFree_PGC(pgc);
       return 0;
     }
     if(!ifoRead_CELL_POSITION_TBL(ifofile, pgc->cell_position,
                                   pgc->nr_of_cells,
                                   offset + pgc->cell_position_offset)) {
-      ifoFree_PGC(pgc);
       return 0;
     }
   } else {
@@ -999,29 +986,33 @@ int ifoRead_FP_PGC(ifo_handle_t *ifofile) {
   if(ifofile->vmgi_mat->first_play_pgc == 0)
     return 1;
 
-  ifofile->first_play_pgc = (pgc_t *)malloc(sizeof(pgc_t));
+  ifofile->first_play_pgc = (pgc_t *)calloc(1, sizeof(pgc_t));
   if(!ifofile->first_play_pgc)
     return 0;
 
+  ifofile->first_play_pgc->ref_count = 1;
   if(!ifoRead_PGC(ifofile, ifofile->first_play_pgc,
                   ifofile->vmgi_mat->first_play_pgc)) {
-    free(ifofile->first_play_pgc);
-    ifofile->first_play_pgc = 0;
+    ifoFree_PGC(&ifofile->first_play_pgc);
     return 0;
   }
 
   return 1;
 }
 
-static void ifoFree_PGC(pgc_t *pgc) {
-  if(pgc) {
-    ifoFree_PGC_COMMAND_TBL(pgc->command_tbl);
-    if(pgc->program_map)
-      free(pgc->program_map);
-    if(pgc->cell_playback)
-      free(pgc->cell_playback);
-    if(pgc->cell_position)
-      free(pgc->cell_position);
+static void ifoFree_PGC(pgc_t **pgc) {
+  if(pgc && *pgc && (--(*pgc)->ref_count) <= 0) {
+    ifoFree_PGC_COMMAND_TBL((*pgc)->command_tbl);
+    if((*pgc)->program_map)
+      free((*pgc)->program_map);
+    if((*pgc)->cell_playback)
+      free((*pgc)->cell_playback);
+    if((*pgc)->cell_position)
+      free((*pgc)->cell_position);
+    free(*pgc);
+  }
+  if (pgc) {
+    *pgc = NULL;
   }
 }
 
@@ -1030,9 +1021,7 @@ void ifoFree_FP_PGC(ifo_handle_t *ifofile) {
     return;
 
   if(ifofile->first_play_pgc) {
-    ifoFree_PGC(ifofile->first_play_pgc);
-    free(ifofile->first_play_pgc);
-    ifofile->first_play_pgc = 0;
+    ifoFree_PGC(&ifofile->first_play_pgc);
   }
 }
 
@@ -1080,6 +1069,12 @@ int ifoRead_TT_SRPT(ifo_handle_t *ifofile) {
     fprintf(stderr, "libdvdread: Unable to read read TT_SRPT.\n");
     ifoFree_TT_SRPT(ifofile);
     return 0;
+  }
+
+  if(tt_srpt->nr_of_srpts>info_length/sizeof(title_info_t)){
+    fprintf(stderr,"libdvdread: data mismatch: info_length (%ld)!= nr_of_srpts (%d). Truncating.\n",
+            info_length/sizeof(title_info_t),tt_srpt->nr_of_srpts);
+    tt_srpt->nr_of_srpts=info_length/sizeof(title_info_t);
   }
 
   for(i =  0; i < tt_srpt->nr_of_srpts; i++) {
@@ -1250,6 +1245,13 @@ int ifoRead_VTS_PTT_SRPT(ifo_handle_t *ifofile) {
       CHECK_VALUE(vts_ptt_srpt->title[i].ptt[j].pgcn < 1000); /* ?? */
       CHECK_VALUE(vts_ptt_srpt->title[i].ptt[j].pgn != 0);
       CHECK_VALUE(vts_ptt_srpt->title[i].ptt[j].pgn < 100); /* ?? */
+      if (vts_ptt_srpt->title[i].ptt[j].pgcn == 0 ||
+          vts_ptt_srpt->title[i].ptt[j].pgcn >= 1000 ||
+          vts_ptt_srpt->title[i].ptt[j].pgn == 0 ||
+          vts_ptt_srpt->title[i].ptt[j].pgn >= 100) {
+        return 0;
+      }
+
     }
   }
 
@@ -1434,7 +1436,6 @@ int ifoRead_VTS_TMAPT(ifo_handle_t *ifofile) {
 
   if(ifofile->vtsi_mat->vts_tmapt == 0) { /* optional(?) */
     ifofile->vts_tmapt = NULL;
-    fprintf(stderr,"Please send bug report - no VTS_TMAPT ?? \n");
     return 1;
   }
 
@@ -1818,10 +1819,11 @@ int ifoRead_PGCIT(ifo_handle_t *ifofile) {
   if(ifofile->vtsi_mat->vts_pgcit == 0) /* mandatory */
     return 0;
 
-  ifofile->vts_pgcit = (pgcit_t *)malloc(sizeof(pgcit_t));
+  ifofile->vts_pgcit = (pgcit_t *)calloc(1, sizeof(pgcit_t));
   if(!ifofile->vts_pgcit)
     return 0;
 
+  ifofile->vts_pgcit->ref_count = 1;
   if(!ifoRead_PGCIT_internal(ifofile, ifofile->vts_pgcit,
                              ifofile->vtsi_mat->vts_pgcit * DVD_BLOCK_LEN)) {
     free(ifofile->vts_pgcit);
@@ -1830,6 +1832,17 @@ int ifoRead_PGCIT(ifo_handle_t *ifofile) {
   }
 
   return 1;
+}
+
+static int find_dup_pgc(pgci_srp_t *pgci_srp, uint32_t start_byte, int count) {
+  int i;
+
+  for(i = 0; i < count; i++) {
+    if(pgci_srp[i].pgc_start_byte == start_byte) {
+      return i;
+    }
+  }
+  return -1;
 }
 
 static int ifoRead_PGCIT_internal(ifo_handle_t *ifofile, pgcit_t *pgcit,
@@ -1880,21 +1893,26 @@ static int ifoRead_PGCIT_internal(ifo_handle_t *ifofile, pgcit_t *pgcit,
     CHECK_VALUE(pgcit->pgci_srp[i].pgc_start_byte + PGC_SIZE <= pgcit->last_byte+1);
 
   for(i = 0; i < pgcit->nr_of_pgci_srp; i++) {
-    pgcit->pgci_srp[i].pgc = malloc(sizeof(pgc_t));
+    int dup;
+    if((dup = find_dup_pgc(pgcit->pgci_srp, pgcit->pgci_srp[i].pgc_start_byte, i)) >= 0) {
+      pgcit->pgci_srp[i].pgc = pgcit->pgci_srp[dup].pgc;
+      pgcit->pgci_srp[i].pgc->ref_count++;
+      continue;
+    }
+    pgcit->pgci_srp[i].pgc = calloc(1, sizeof(pgc_t));
     if(!pgcit->pgci_srp[i].pgc) {
       int j;
       for(j = 0; j < i; j++) {
-        ifoFree_PGC(pgcit->pgci_srp[j].pgc);
-        free(pgcit->pgci_srp[j].pgc);
+        ifoFree_PGC(&pgcit->pgci_srp[j].pgc);
       }
       goto fail;
     }
+    pgcit->pgci_srp[i].pgc->ref_count = 1;
     if(!ifoRead_PGC(ifofile, pgcit->pgci_srp[i].pgc,
                     offset + pgcit->pgci_srp[i].pgc_start_byte)) {
       int j;
-      for(j = 0; j < i; j++) {
-        ifoFree_PGC(pgcit->pgci_srp[j].pgc);
-        free(pgcit->pgci_srp[j].pgc);
+      for(j = 0; j <= i; j++) {
+        ifoFree_PGC(&pgcit->pgci_srp[j].pgc);
       }
       free(pgcit->pgci_srp[i].pgc);
       goto fail;
@@ -1908,16 +1926,18 @@ fail:
   return 0;
 }
 
-static void ifoFree_PGCIT_internal(pgcit_t *pgcit) {
-  if(pgcit) {
+static void ifoFree_PGCIT_internal(pgcit_t **pgcit) {
+  if(pgcit && *pgcit && (--(*pgcit)->ref_count <= 0)) {
     int i;
-    for(i = 0; i < pgcit->nr_of_pgci_srp; i++)
+    for(i = 0; i < (*pgcit)->nr_of_pgci_srp; i++)
     {
-      ifoFree_PGC(pgcit->pgci_srp[i].pgc);
-      free(pgcit->pgci_srp[i].pgc);
+      ifoFree_PGC(&(*pgcit)->pgci_srp[i].pgc);
     }
-    free(pgcit->pgci_srp);
+    free((*pgcit)->pgci_srp);
+    free(*pgcit);
   }
+  if (pgcit)
+    *pgcit = NULL;
 }
 
 void ifoFree_PGCIT(ifo_handle_t *ifofile) {
@@ -1925,12 +1945,20 @@ void ifoFree_PGCIT(ifo_handle_t *ifofile) {
     return;
 
   if(ifofile->vts_pgcit) {
-    ifoFree_PGCIT_internal(ifofile->vts_pgcit);
-    free(ifofile->vts_pgcit);
-    ifofile->vts_pgcit = 0;
+    ifoFree_PGCIT_internal(&ifofile->vts_pgcit);
   }
 }
 
+static int find_dup_lut(pgci_lu_t *lu, uint32_t start_byte, int count) {
+  int i;
+
+  for(i = 0; i < count; i++) {
+    if(lu[i].lang_start_byte == start_byte) {
+      return i;
+    }
+  }
+  return -1;
+}
 
 int ifoRead_PGCI_UT(ifo_handle_t *ifofile) {
   pgci_ut_t *pgci_ut;
@@ -2024,27 +2052,31 @@ int ifoRead_PGCI_UT(ifo_handle_t *ifofile) {
   }
 
   for(i = 0; i < pgci_ut->nr_of_lus; i++) {
+    int dup;
+    if((dup = find_dup_lut(pgci_ut->lu, pgci_ut->lu[i].lang_start_byte, i)) >= 0) {
+      pgci_ut->lu[i].pgcit = pgci_ut->lu[dup].pgcit;
+      pgci_ut->lu[i].pgcit->ref_count++;
+      continue;
+    }
     pgci_ut->lu[i].pgcit = malloc(sizeof(pgcit_t));
     if(!pgci_ut->lu[i].pgcit) {
       unsigned int j;
       for(j = 0; j < i; j++) {
-        ifoFree_PGCIT_internal(pgci_ut->lu[j].pgcit);
-        free(pgci_ut->lu[j].pgcit);
+        ifoFree_PGCIT_internal(&pgci_ut->lu[j].pgcit);
       }
       free(pgci_ut->lu);
       free(pgci_ut);
       ifofile->pgci_ut = 0;
       return 0;
     }
+    pgci_ut->lu[i].pgcit->ref_count = 1;
     if(!ifoRead_PGCIT_internal(ifofile, pgci_ut->lu[i].pgcit,
                                sector * DVD_BLOCK_LEN
                                + pgci_ut->lu[i].lang_start_byte)) {
       unsigned int j;
-      for(j = 0; j < i; j++) {
-        ifoFree_PGCIT_internal(pgci_ut->lu[j].pgcit);
-        free(pgci_ut->lu[j].pgcit);
+      for(j = 0; j <= i; j++) {
+        ifoFree_PGCIT_internal(&pgci_ut->lu[j].pgcit);
       }
-      free(pgci_ut->lu[i].pgcit);
       free(pgci_ut->lu);
       free(pgci_ut);
       ifofile->pgci_ut = 0;
@@ -2066,8 +2098,7 @@ void ifoFree_PGCI_UT(ifo_handle_t *ifofile) {
 
   if(ifofile->pgci_ut) {
     for(i = 0; i < ifofile->pgci_ut->nr_of_lus; i++) {
-      ifoFree_PGCIT_internal(ifofile->pgci_ut->lu[i].pgcit);
-      free(ifofile->pgci_ut->lu[i].pgcit);
+      ifoFree_PGCIT_internal(&ifofile->pgci_ut->lu[i].pgcit);
     }
     free(ifofile->pgci_ut->lu);
     free(ifofile->pgci_ut);
