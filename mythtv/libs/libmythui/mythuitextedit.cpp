@@ -322,6 +322,22 @@ bool MythUITextEdit::MoveCursor(MoveDirection moveDir)
                 return false;
             m_Position++;
             break;
+        case MoveUp:
+        {
+            int newPos = m_Text->MoveCursor(true);
+            if (newPos == -1)
+                return false;
+            m_Position = newPos - 1;
+            break;
+        }
+        case MoveDown:
+        {
+            int newPos = m_Text->MoveCursor(false);
+            if (newPos == -1)
+                return false;
+            m_Position = newPos - 1;
+            break;
+        }
         case MoveEnd:
             m_Position = m_Message.size() - 1;
             break;
@@ -467,6 +483,14 @@ bool MythUITextEdit::keyPressEvent(QKeyEvent *event)
         else if (action == "RIGHT")
         {
             MoveCursor(MoveRight);
+        }
+        else if (action == "UP")
+        {
+            handled = MoveCursor(MoveUp);
+        }
+        else if (action == "DOWN")
+        {
+            handled = MoveCursor(MoveDown);
         }
         else if (action == "DELETE")
         {

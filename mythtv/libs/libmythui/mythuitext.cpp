@@ -938,6 +938,100 @@ void MythUIText::FillCutMessage(void)
     }
 }
 
+int MythUIText::MoveCursor(bool up)
+{
+    QVector<QTextLayout *>::const_iterator Ipara;
+    int    x = 0;
+    int    offset = m_textCursor;
+    int    currPos = 0;
+
+    for (Ipara = m_Layouts.constBegin(); Ipara != m_Layouts.constEnd(); ++Ipara)
+    {
+        QTextLine line = (*Ipara)->lineForTextPosition(offset);
+
+        if (line.isValid())
+        {
+            x = line.cursorToX(&offset);
+
+            // we've found the current line
+            int lineNo = line.lineNumber();
+
+            if (up)
+            {
+                // try to find the previous line
+                if (lineNo - 1 >= 0)
+                {
+                    line = (*Ipara)->lineAt(lineNo - 1);
+                    return currPos + line.xToCursor(x);
+                }
+                else
+                {
+                    // no more lines in the current layout try the previous one
+                    if (Ipara == m_Layouts.constBegin())
+                    {
+                        // can't move any further up
+                        return -1;
+                    }
+
+                    --Ipara;
+
+                    if ((*Ipara)->lineCount() > 0)
+                    {
+                        line = (*Ipara)->lineAt((*Ipara)->lineCount() - 1);
+                        return currPos - ((*Ipara)->text().size() + 1) + line.xToCursor(x);
+                    }
+
+                    return -1;
+                }
+            }
+            else
+            {
+                // try to find the next line
+                if (lineNo + 1 < (*Ipara)->lineCount())
+                {
+                    line = (*Ipara)->lineAt(lineNo + 1);
+                    return currPos + line.xToCursor(x);
+                }
+                else
+                {
+                    // no more lines in the current layout try the next one
+                    currPos += ((*Ipara)->text().size() + 1);
+                    ++Ipara;
+                    if (Ipara == m_Layouts.constEnd())
+                    {
+                        // can't move any further down
+                        return -1;
+                    }
+
+                    if ((*Ipara)->lineCount() > 0)
+                    {
+                        line = (*Ipara)->lineAt(0);
+                        return currPos + line.xToCursor(x);
+                    }
+
+                    return -1;
+                }
+            }
+
+            break;
+        }
+
+        offset -= ((*Ipara)->text().size() + 1); // Account for \n
+        currPos += ((*Ipara)->text().size() + 1);
+    }
+
+    if (Ipara == m_Layouts.constEnd())
+    {
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("'%1' (%2)MoveCursor offset %3 not found in "
+                    "ANY paragraph!")
+            .arg(objectName()).arg(GetXMLLocation()).arg(m_textCursor));
+        return m_textCursor;
+    }
+
+    return -1;
+}
+
 QPoint MythUIText::CursorPosition(int text_offset)
 {
     if (m_Layouts.empty())
