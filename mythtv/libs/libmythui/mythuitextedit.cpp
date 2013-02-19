@@ -500,6 +500,13 @@ bool MythUITextEdit::keyPressEvent(QKeyEvent *event)
         {
             RemoveCharacter(m_Position);
         }
+        else if (action == "NEWLINE")
+        {
+            QString newmessage = m_Message;
+            newmessage.insert(m_Position + 1, '\n');
+            SetText(newmessage, false);
+            MoveCursor(MoveRight);
+        }
         else if (action == "SELECT" && keynum != Qt::Key_Space
                  && GetMythDB()->GetNumSetting("UseVirtualKeyboard", 1) == 1)
         {
