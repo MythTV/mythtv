@@ -5,6 +5,7 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <strings.h>
 
 #include "file.h"
 #include "util/macro.h"
