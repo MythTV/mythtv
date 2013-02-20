@@ -34,3 +34,10 @@ libmythmetadata.depends = $$LIBMYTHTVDEPS libmythtv
 #libmythmediaserver
 SUBDIRS += libmythprotoserver
 libmythprotoserver.depends = $$LIBMYTHTVDEPS libmythtv
+
+# unit tests
+SUBDIRS += lib*/test
+
+unittest.target = test
+unittest.commands = ../programs/scripts/unittests.sh
+unix:QMAKE_EXTRA_TARGETS += unittest
