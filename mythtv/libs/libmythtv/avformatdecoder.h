@@ -220,7 +220,7 @@ class AvFormatDecoder : public DecoderBase
 
     /// Preprocess a packet, setting the video parms if necessary.
     void MpegPreProcessPkt(AVStream *stream, AVPacket *pkt);
-    bool H264PreProcessPkt(AVStream *stream, AVPacket *pkt);
+    int  H264PreProcessPkt(AVStream *stream, AVPacket *pkt);
     bool PreProcessVideoPacket(AVStream *stream, AVPacket *pkt);
     bool ProcessVideoPacket(AVStream *stream, AVPacket *pkt);
     bool ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic);
