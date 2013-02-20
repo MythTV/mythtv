@@ -93,3 +93,6 @@ uninstall: $(addsuffix _uninstall,$(SUBDIRS))
 	-rmdir $(INSTALL_ROOT)/${PREFIX}/include/mythtv
 	-rmdir $(INSTALL_ROOT)/${PREFIX}/lib/mythtv
 	-rmdir $(INSTALL_ROOT)/${PREFIX}/share/mythtv
+
+test:
+	-./programs/scripts/unittests.sh
