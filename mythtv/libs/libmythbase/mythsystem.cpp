@@ -159,6 +159,11 @@ MythSystem::MythSystem(const MythSystem &other) :
 // QBuffers may also need freeing
 MythSystem::~MythSystem(void)
 {
+    if (GetStatus() == GENERIC_EXIT_RUNNING)
+    {
+        d->Term(true);
+        d->Wait();
+    }
     d->DecrRef();
 }
 
