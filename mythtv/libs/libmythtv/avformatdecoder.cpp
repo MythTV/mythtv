@@ -2973,12 +2973,13 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
     }
 }
 
-bool AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)
+// Returns the number of frame starts identified in the packet.
+int AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)
 {
     AVCodecContext *context = stream->codec;
     const uint8_t  *buf     = pkt->data;
     const uint8_t  *buf_end = pkt->data + pkt->size;
-    bool on_frame = false;
+    int num_frames = 0;
 
     // crude NAL unit vs Annex B detection.
     // the parser only understands Annex B
@@ -2994,7 +2995,7 @@ bool AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)
         {
             if (pkt->flags & AV_PKT_FLAG_KEY)
                 HandleGopStart(pkt, false);
-            return true;
+            return 1;
         }
     }
 
@@ -3007,7 +3008,7 @@ bool AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)
             if (m_h264_parser->FieldType() != H264Parser::FIELD_BOTTOM)
             {
                 if (m_h264_parser->onFrameStart())
-                    on_frame = true;
+                    ++num_frames;
 
                 if (!m_h264_parser->onKeyFrameStart())
                     continue;
@@ -3107,13 +3108,13 @@ bool AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)
         pkt->flags |= AV_PKT_FLAG_KEY;
     }
 
-    return on_frame;
+    return num_frames;
 }
 
 bool AvFormatDecoder::PreProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
 {
     AVCodecContext *context = curstream->codec;
-    bool on_frame = true;
+    int num_frames = 1;
 
     if (CODEC_IS_FFMPEG_MPEG(context->codec_id))
     {
@@ -3121,7 +3122,7 @@ bool AvFormatDecoder::PreProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
     }
     else if (CODEC_IS_H264(context->codec_id))
     {
-        on_frame = H264PreProcessPkt(curstream, pkt);
+        num_frames = H264PreProcessPkt(curstream, pkt);
     }
     else
     {
@@ -3147,8 +3148,7 @@ bool AvFormatDecoder::PreProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
         return false;
     }
 
-    if (on_frame)
-        framesRead++;
+    framesRead += num_frames;
 
     totalDuration += av_q2d(curstream->time_base) * pkt->duration * 1000000; // usec
 
