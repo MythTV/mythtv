@@ -18,6 +18,8 @@
  *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#include <unistd.h> // for usleep
+
 #include <QtTest/QtTest>
 
 #include "mythtimer.h"
