@@ -4,6 +4,8 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <string.h>
+#include <strings.h>
 
 #include "mythtvexp.h"
 
