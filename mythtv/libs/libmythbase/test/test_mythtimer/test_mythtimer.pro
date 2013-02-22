@@ -6,7 +6,7 @@ TARGET = test_mythtimer
 DEPENDPATH += . ../..
 INCLUDEPATH += . ../..
 
-eval(QMAKE_CXX = g++) {
+contains(QMAKE_CXX, "g++") {
   QMAKE_CXXFLAGS += -O0 -fprofile-arcs -ftest-coverage 
   QMAKE_LFLAGS += -fprofile-arcs 
 }
