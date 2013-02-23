@@ -59,9 +59,13 @@ static void UpdatePositionMap(frm_pos_map_t &posMap, QString mapfile,
         frm_pos_map_t::const_iterator it;
         fprintf (mapfh, "Type: %d\n", keyType);
         for (it = posMap.begin(); it != posMap.end(); ++it)
+        {
             if (it.key() == keyType)
-                fprintf(mapfh, "%lld %lld\n",
-                        it.key(), *it);
+            {
+                QString str = QString("%1 %2\n").arg(it.key()).arg(*it);
+                fprintf(mapfh, "%s", qPrintable(str));
+            }
+        }
         fclose(mapfh);
     }
 }
