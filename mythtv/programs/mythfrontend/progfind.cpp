@@ -402,7 +402,17 @@ void ProgFinder::showGuide()
         if (startchannel.isEmpty())
             startchannel = '3';
         uint startchanid = 0;
-        GuideGrid::RunProgramGuide(startchanid, startchannel, m_player, m_embedVideo, false, -2);
+        QDateTime starttime;
+
+        if (GetFocusWidget() == m_timesList)
+        {
+            ProgramInfo *pginfo = m_showData[m_timesList->GetCurrentPos()];
+            startchannel = pginfo->GetChanNum();
+            startchanid = pginfo->GetChanID();
+            starttime = pginfo->GetScheduledStartTime();
+        }
+        GuideGrid::RunProgramGuide(startchanid, startchannel, starttime,
+                                   m_player, m_embedVideo, false, -2);
     }
 }
 

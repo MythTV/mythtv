@@ -58,7 +58,7 @@ struct osdInfo;
 typedef QMap<QString,InfoMap>    DDValueMap;
 typedef QMap<QString,DDValueMap> DDKeyMap;
 typedef void (*EMBEDRETURNVOID) (void *, bool);
-typedef void (*EMBEDRETURNVOIDEPG) (uint, const QString &, TV *, bool, bool, int);
+typedef void (*EMBEDRETURNVOIDEPG) (uint, const QString &, const QDateTime, TV *, bool, bool, int);
 typedef void (*EMBEDRETURNVOIDFINDER) (TV *, bool, bool);
 typedef void (*EMBEDRETURNVOIDSCHEDIT) (const ProgramInfo *, void *);
 

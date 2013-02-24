@@ -343,7 +343,8 @@ static void startGuide(void)
     uint chanid = 0;
     QString channum = gCoreContext->GetSetting("DefaultTVChannel");
     channum = (channum.isEmpty()) ? "3" : channum;
-    GuideGrid::RunProgramGuide(chanid, channum, NULL, false, true, -2);
+    QDateTime startTime;
+    GuideGrid::RunProgramGuide(chanid, channum, startTime, NULL, false, true, -2);
 }
 
 static void startFinder(void)
