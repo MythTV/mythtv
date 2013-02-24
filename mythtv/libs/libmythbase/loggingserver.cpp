@@ -1201,7 +1201,7 @@ void LogForwardThread::expireClients(void)
         QString clientId = logClientToDel.takeFirst();
         logClientCount.deref();
         LOG(VB_GENERAL, LOG_INFO, QString("Expiring client %1 (#%2)")
-            .arg(clientId).arg(logClientCount));
+            .arg(clientId).arg(logClientCount.fetchAndAddOrdered(0)));
         LoggerListItem *item = logClientMap.take(clientId);
         if (!item)
             continue;
@@ -1228,8 +1228,10 @@ void LogForwardThread::expireClients(void)
         delete list;
     }
 
+    // TODO FIXME: This is not thread-safe!
     // just this daemon left
-    if (logClientCount == 1 && m_shutdownTimer && !m_shutdownTimer->isActive())
+    if (logClientCount.fetchAndAddOrdered(0) == 1 &&
+        m_shutdownTimer && !m_shutdownTimer->isActive())
     {
         LOG(VB_GENERAL, LOG_INFO, "Starting 5min shutdown timer");
         m_shutdownTimer->start(5*60*1000);
@@ -1307,9 +1309,10 @@ void LogForwardThread::forwardMessage(LogMessage *msg)
 
         logClientCount.ref();
         LOG(VB_GENERAL, LOG_INFO, QString("New Client: %1 (#%2)")
-            .arg(clientId).arg(logClientCount));
+            .arg(clientId).arg(logClientCount.fetchAndAddOrdered(0)));
 
-        if (logClientCount > 1 && m_shutdownTimer &&
+        // TODO FIXME This is not thread-safe!
+        if (logClientCount.fetchAndAddOrdered(0) > 1 && m_shutdownTimer &&
             m_shutdownTimer->isActive())
         {
             LOG(VB_GENERAL, LOG_INFO, "Aborting shutdown timer");
