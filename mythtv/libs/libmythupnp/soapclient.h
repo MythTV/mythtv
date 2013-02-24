@@ -17,7 +17,6 @@
 #include <QString>
 #include <QUrl>
 
-#include "httpcomms.h"
 #include "upnputil.h"
 #include "upnpexp.h"
 

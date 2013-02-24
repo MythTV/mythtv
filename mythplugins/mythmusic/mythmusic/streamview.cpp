@@ -16,7 +16,6 @@
 #include <mythuiprogressbar.h>
 #include <mythuiutils.h>
 #include <mythdialogbox.h>
-#include <httpcomms.h>
 #include <mythuihelper.h>
 #include <mythdownloadmanager.h>
 #include <mythdirs.h>
