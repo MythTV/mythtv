@@ -18,7 +18,7 @@
 #include "dbaccess.h"
 #include "videometadatalistmanager.h"
 #include "videoutils.h"
-#include "netutils.h"
+#include "programinfo.h" // for format_season_and_episode
 
 struct SortData
 {
@@ -1186,14 +1186,14 @@ void VideoMetadata::toMap(MetadataMap &metadataMap)
 
     if (GetSeason() > 0 || GetEpisode() > 0)
     {
-        metadataMap["season"] = GetDisplaySeasonEpisode(GetSeason(), 1);
-        metadataMap["episode"] = GetDisplaySeasonEpisode(GetEpisode(), 1);
-        metadataMap["s##e##"] = QString("s%1e%2").arg(GetDisplaySeasonEpisode
-                                             (GetSeason(), 2))
-                        .arg(GetDisplaySeasonEpisode(GetEpisode(), 2));
-        metadataMap["##x##"] = QString("%1x%2").arg(GetDisplaySeasonEpisode
-                                             (GetSeason(), 1))
-                        .arg(GetDisplaySeasonEpisode(GetEpisode(), 2));
+        metadataMap["season"] = format_season_and_episode(GetSeason(), 1);
+        metadataMap["episode"] = format_season_and_episode(GetEpisode(), 1);
+        metadataMap["s##e##"] = QString("s%1e%2")
+            .arg(format_season_and_episode(GetSeason(), 2))
+            .arg(format_season_and_episode(GetEpisode(), 2));
+        metadataMap["##x##"] = QString("%1x%2")
+            .arg(format_season_and_episode(GetSeason(), 1))
+            .arg(format_season_and_episode(GetEpisode(), 2));
     }
     else
     {

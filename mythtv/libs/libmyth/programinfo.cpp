@@ -32,7 +32,6 @@ using namespace std;
 #include "remoteutil.h"
 #include "dialogbox.h"
 #include "mythdate.h"
-#include "netutils.h"
 #include "mythdb.h"
 
 #define LOC      QString("ProgramInfo(%1): ").arg(GetBasename())
@@ -1431,14 +1430,14 @@ void ProgramInfo::ToMap(InfoMap &progMap,
 
     if (season > 0 || episode > 0)
     {
-        progMap["season"] = GetDisplaySeasonEpisode(season, 1);
-        progMap["episode"] = GetDisplaySeasonEpisode(episode, 1);
-        progMap["s00e00"] = QString("s%1e%2").arg(GetDisplaySeasonEpisode
-                                             (GetSeason(), 2))
-                        .arg(GetDisplaySeasonEpisode(GetEpisode(), 2));
-        progMap["00x00"] = QString("%1x%2").arg(GetDisplaySeasonEpisode
-                                             (GetSeason(), 1))
-                        .arg(GetDisplaySeasonEpisode(GetEpisode(), 2));
+        progMap["season"] = format_season_and_episode(season, 1);
+        progMap["episode"] = format_season_and_episode(episode, 1);
+        progMap["s00e00"] = QString("s%1e%2")
+            .arg(format_season_and_episode(GetSeason(), 2))
+            .arg(format_season_and_episode(GetEpisode(), 2));
+        progMap["00x00"] = QString("%1x%2")
+            .arg(format_season_and_episode(GetSeason(), 1))
+            .arg(format_season_and_episode(GetEpisode(), 2));
     }
     else
     {
@@ -5049,6 +5048,21 @@ PMapDBReplacement::PMapDBReplacement() : lock(new QMutex())
 PMapDBReplacement::~PMapDBReplacement()
 {
     delete lock;
+}
+
+MPUBLIC QString format_season_and_episode(int seasEp, int digits)
+{
+    QString seasEpNum;
+
+    if (seasEp > -1)
+    {
+        seasEpNum = QString::number(seasEp);
+
+        if (digits == 2 && seasEpNum.size() < 2)
+            seasEpNum.prepend("0");
+    }
+
+    return seasEpNum;
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
